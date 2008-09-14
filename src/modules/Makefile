@@ -25,7 +25,7 @@ PKGSUBDIRS	= track simu graphic telemetry
 
 src_PKGFILES	= Makefile
 
-src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCS-NG_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 
