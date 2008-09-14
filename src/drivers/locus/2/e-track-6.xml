@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file                 : viper-gts-r.xml
+    created              : Sat Mar  3 18:46:37 CET 2001
+    copyright            : (C) 2001 by Eric Espié                         
+    email                : Eric.Espie@torcs.org   
+    version              : $Id: e-track-1.xml,v 1.8 2003/08/23 01:03:31 berniw Exp $                                  
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="Viper GTS-R" type="template">
+
+  <section name="private">
+		<!-- CornerSpeed - increase to make car corner quicker        -->
+    <attnum name="CornerSpeed" val="25.5"/>
+
+		<!-- CornerAccel - increase to accelerate more out of corners -->
+		<!--               it multiplies CornerSpeed, so be careful   -->
+    <attnum name="CornerAccel" val="1.0"/>
+
+		<!-- BrakeDelay - increase to brake later                     -->
+    <attnum name="BrakeDelay" val="20.0"/>
+
+		<!-- AvoidSpeedAdjust - increase or decrease avoidance speed  -->
+		<!--                    relative to CornerSpeed               -->
+    <attnum name="AvoidSpeedAdjust" val="-2.5"/>
+
+		<!-- ExtMargin - decrease to get closer to track's edge on    -->
+		<!--             the approaches to & exits from corners       -->
+    <attnum name="ExtMargin" val="1.4"/>
+
+		<!-- IntMargin - decrease to cut closer to the corner apex    -->
+    <attnum name="IntMargin" val="0.3"/>
+
+		<!-- PitOffset - adjusts cars entry point into the pit lane   -->
+		<!--             positive to make it closer to pits, negative -->
+		<!--             to make it start turning in further away     -->
+    <attnum name="PitOffset" val="0.0"/>
+  </section>
+
+  <section name="Rear Wing">
+    <attnum name="angle" unit="deg" min="0" max="30" val="7.2"/>
+	</section>
+
+</params>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
