@@ -24,7 +24,7 @@ SHIP      =  buggy.rgb settings.xml
 
 src-robots-K1999_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 
-src-robots-K1999_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-K1999_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCSNG_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 
