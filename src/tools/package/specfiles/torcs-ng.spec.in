@@ -1,25 +1,25 @@
-Summary: The Open Racing Car Simulator
-Name: TORCS
+Summary: The Open Racing Car Simulator Next Generation
+Name: TORCS-NG
 Version: @VERSION@
 Release: 1
 Epoch: 1
-Source: TORCS-%{version}-src.tgz
+Source: TORCS-NG-%{version}-src.tgz
 Group: Amusements/Games
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Copyright: GPL
 BuildArch: i386
 URL: http://torcs.org
 Packager: Eric Espié <Eric.Espie@free.fr>
-Requires: TORCS-data
+Requires: TORCS-NG-data
 
 %description
 A 3D racing car simulator using OpenGL.
 
 %prep
-%setup -n torcs-@VERSION@
+%setup -n torcs-ng-@VERSION@
 
 %build
-export TORCS_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
+export TORCSNG_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
 ./configure --prefix=%{_prefix}
 make
 
@@ -33,7 +33,7 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_prefix}/bin/*
 %{_prefix}/lib/*
-%{_prefix}/share/games/torcs/*
+%{_prefix}/share/games/torcs-ng/*
 
 %changelog
 * Mon Mar 24 2003 Eric Espié <Eric.Espie@free.fr> 1.2.0

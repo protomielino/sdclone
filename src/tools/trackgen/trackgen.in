@@ -24,8 +24,8 @@ exec_prefix=@exec_prefix@
 BINDIR=@bindir@
 LIBDIR=@libdir@/torcs
 DATAROOTDIR=@datarootdir@
-DATADIR=$DATAROOTDIR/games/torcs
-VARDIR=@localstatedir@/games/torcs
+DATADIR=$DATAROOTDIR/games/torcs-ng
+VARDIR=@localstatedir@/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 

@@ -1,19 +1,19 @@
-Summary: TORCS - Base Track Pack
-Name: TORCS-data-tracks-base
+Summary: TORCS NG - Base Track Pack
+Name: TORCS-NG-data-tracks-base
 Version: @VERSION@
 Release: 1
 Epoch: 1
-Source: TORCS-%{version}-data-tracks-base.tgz
+Source: TORCS-NG-%{version}-data-tracks-base.tgz
 Group: Amusements/Games
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Copyright: GPL
 BuildArch: noarch
 URL: http://torcs.org
 Packager: Eric Espié <Eric.Espie@free.fr>
-Requires: TORCS
+Requires: TORCS-NG
 
 %description
-Base Track Pack for TORCS
+Base Track Pack for TORCS NG
 
 %prep
 %setup -c
@@ -21,15 +21,15 @@ Base Track Pack for TORCS
 %build
 
 %install
-mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs
-cp -r * $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
+cp -r * $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{_prefix}/share/games/torcs/*
+%{_prefix}/share/games/torcs-ng/*
 
 %changelog
 * Mon Mar 24 2003 Eric Espié <Eric.Espie@free.fr> 1.2.0
