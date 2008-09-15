@@ -20,8 +20,8 @@
 #include <windows.h>
 #define HAVE_CONFIG_H
 #endif
-#include <SDL.h>
-//#include <GL/glut.h>
+//#include <SDL.h>
+#include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
 

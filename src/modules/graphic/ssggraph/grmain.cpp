@@ -23,8 +23,8 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <SDL.h>
-//#include <GL/glut.h>
+//#include <SDL.h>
+#include <GL/glut.h>
 #include <plib/ssg.h>
 
 #include <tgfclient.h>

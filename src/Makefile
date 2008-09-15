@@ -16,7 +16,7 @@
 ##############################################################################
 
 
-# #### The Open Racing Car Simulator ####
+# #### The Open Racing Car Simulator Next Generation ####
 
 
 SHIPSUBDIRS	= drivers modules libs raceman

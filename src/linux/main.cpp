@@ -105,7 +105,7 @@ main(int argc, char *argv[])
     
     GfScrInit(argc, argv);	/* init screen */
 
-    Torcs-ngEntry();		/* launch TORCS-NG */
+    TorcsEntry();		/* launch TORCS-NG */
     
     glutMainLoop();		/* event loop of glut */
 
