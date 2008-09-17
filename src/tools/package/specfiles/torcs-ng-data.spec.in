@@ -1,0 +1,44 @@
+Summary: The Open Racing Car Simulator Next Generation - DATA
+Name: TORCS-NG-data
+Version: @VERSION@
+Release: 1
+Epoch: 1
+Source: torcs-ng-%{version}-data.tgz
+Group: Amusements/Games
+BuildRoot: %{_tmppath}/%{name}-buildroot
+Copyright: GPL
+BuildArch: noarch
+URL: http://torcs.org
+Packager: Eric Espié <Eric.Espie@free.fr>
+
+%description
+Mandatory data (images, fonts, menus...) for TORCS-NG
+
+%prep
+%setup -c
+
+%build
+
+%install
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
+cp -r * $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%{_prefix}/share/games/torcs-ng/*
+
+%changelog
+* Wed Sep 17 2008 Xavier Bertaux <bertauxx@yahoo.fr> 1.3.1
+- Modif Torcs -> torcs-ng
+
+* Mon Mar 24 2003 Eric Espié <Eric.Espie@free.fr> 1.2.0
+- new version
+
+* Mon Jul 15 2002 Eric Espié <Eric.Espie@free.fr> 1.1.0-2
+- improved specfile
+
+* Sat Jul 13 2002 Eric Espié <Eric.Espie@free.fr> 1.1.0
+- initial RPM
