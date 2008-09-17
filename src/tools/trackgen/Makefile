@@ -21,7 +21,7 @@ TOOLSDIR	=
 
 TOOLSCRIPT	= trackgen
 
-PROGRAM      	= trackgen-bin
+PROGRAM      	= trackgen-ng-bin
 
 DATADIR      	= tools/trackgen
 

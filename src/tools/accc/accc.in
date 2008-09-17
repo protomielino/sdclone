@@ -22,14 +22,14 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 
 BINDIR=@bindir@
-LIBDIR=@libdir@/torcs
+LIBDIR=@libdir@/torcs-ng
 DATAROOTDIR=@datarootdir@
-DATADIR=$DATAROOTDIR/games/torcs
-VARDIR=@localstatedir@/games/torcs
+DATADIR=$DATAROOTDIR/games/torcs-ng
+VARDIR=@localstatedir@/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/accc-bin $*
+$LIBDIR/accc-ng-bin $*
 
 rm -f temp.objf
 

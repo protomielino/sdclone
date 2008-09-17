@@ -20,7 +20,7 @@ TOOLSDIR	=
 
 TOOLSCRIPT	= nfsperf
 
-PROGRAM		= nfsperf-bin
+PROGRAM		= nfsperf-ng-bin
 
 SOURCES		= mainnfsperf.cpp
 

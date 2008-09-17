@@ -21,7 +21,7 @@ TOOLSDIR	=
 
 TOOLSCRIPT	= accc
 
-PROGRAM		= accc-bin
+PROGRAM		= accc-ng-bin
 
 DATADIR		= tools/accc
 

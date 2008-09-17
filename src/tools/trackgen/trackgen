@@ -22,7 +22,7 @@ prefix=/usr/local
 exec_prefix=${prefix}
 
 BINDIR=${exec_prefix}/bin
-LIBDIR=${exec_prefix}/lib/torcs
+LIBDIR=${exec_prefix}/lib/torcs-ng
 DATAROOTDIR=${prefix}/share
 DATADIR=$DATAROOTDIR/games/torcs-ng
 VARDIR=${prefix}/var/games/torcs-ng
@@ -31,6 +31,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
 echo "Changing to $DATADIR"
 cd $DATADIR
-$LIBDIR/trackgen-bin -L $LIBDIR $*
+$LIBDIR/trackgen-ng-bin -L $LIBDIR $*
 
 exit 0

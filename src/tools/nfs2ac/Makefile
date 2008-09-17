@@ -18,7 +18,7 @@ TOOLSDIR	=
 
 TOOLSCRIPT	= nfs2ac
 
-PROGRAM		= nfs2ac-bin
+PROGRAM		= nfs2ac-ng-bin
 
 SOURCES		= mainnfs2ac.cpp
 

@@ -22,13 +22,13 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 
 BINDIR=@bindir@
-LIBDIR=@libdir@/torcs
+LIBDIR=@libdir@/torcs-ng
 DATAROOTDIR=@datarootdir@
-DATADIR=$DATAROOTDIR/games/torcs
-VARDIR=@localstatedir@/games/torcs
+DATADIR=$DATAROOTDIR/games/torcs-ng
+VARDIR=@localstatedir@/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/nfs2ac-bin $*
+$LIBDIR/nfs2ac-ng-bin $*
 
 exit 0

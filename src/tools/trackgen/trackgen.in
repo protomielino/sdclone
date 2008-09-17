@@ -22,7 +22,7 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 
 BINDIR=@bindir@
-LIBDIR=@libdir@/torcs
+LIBDIR=@libdir@/torcs-ng
 DATAROOTDIR=@datarootdir@
 DATADIR=$DATAROOTDIR/games/torcs-ng
 VARDIR=@localstatedir@/games/torcs-ng
@@ -31,6 +31,6 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
 echo "Changing to $DATADIR"
 cd $DATADIR
-$LIBDIR/trackgen-bin -L $LIBDIR $*
+$LIBDIR/trackgen-ng-bin -L $LIBDIR $*
 
 exit 0
