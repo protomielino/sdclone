@@ -1,41 +1,41 @@
-Summary: TORCS - Base Robots
-Name: TORCS-robots-base
+Summary: Torcs-NG - Base Robots
+Name: Torcs-NG-robots-base
 Version: @VERSION@
 Release: 1
 Epoch: 1
-Source:  TORCS-%{version}-src.tgz
-Source1: TORCS-%{version}-src-robots-base.tgz
+Source:  Torcs-NG%{version}-src.tgz
+Source1: Torcs-NG-%{version}-src-robots-base.tgz
 Group: Amusements/Games
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Copyright: GPL
 BuildArch: i386
-URL: http://torcs.org
+URL: http://Torcs.org
 Packager: Eric Espié <Eric.Espie@free.fr>
-Requires: TORCS
+Requires: Torcs-NG
 
 %description
-Base Robots for TORCS
+Base Robots for Torcs-NG
 
 %prep
-%setup -n torcs-@VERSION@
-%setup -T -D -b 1 -n torcs-@VERSION@
-cd $RPM_BUILD_DIR/torcs-@VERSION@/src/drivers
+%setup -n Torcs-NG-@VERSION@
+%setup -T -D -b 1 -n Torcs-NG-@VERSION@
+cd $RPM_BUILD_DIR/Torcs-NG-@VERSION@/src/drivers
 rm -rf human
 
 %build
-export TORCS_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
+export TORCSNG_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
 ./configure --prefix=%{_prefix}
 make
 
 %install
 make install DESTDIR=%{_tmppath}/%{name}-ship
-cd %{_tmppath}/%{name}-ship/%{_prefix}/share/games/torcs
-mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs
-cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs
+cd %{_tmppath}/%{name}-ship/%{_prefix}/share/games/Torcs-NG
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/Torcs-NG
+cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/share/games/Torcs-NG
 cd -
-cd %{_tmppath}/%{name}-ship/%{_prefix}/lib/torcs
-mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/torcs
-cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/lib/torcs
+cd %{_tmppath}/%{name}-ship/%{_prefix}/lib/Torcs-NG
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/Torcs-NG
+cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/lib/Torcs-NG
 cd -
 rm -rf %{_tmppath}/%{name}-ship
 
@@ -44,10 +44,13 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{_prefix}/share/games/torcs/*
-%{_prefix}/lib/torcs/*
+%{_prefix}/share/games/Torcs-NG/*
+%{_prefix}/lib/Torcs-NG/*
 
 %changelog
+* Thu Sep 17 2008 Xavier Bertaux <bertauxx@yahoo.fr> 1.3.1
+- Modif Torcs -> Torcs-NG
+
 * Mon Aug 25 2003 Eric Espié <Eric.Espie@free.fr> 1.2.2
 - added copying of libraries
 
