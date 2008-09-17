@@ -16,7 +16,7 @@
 ROBOT       = locus
 SHIPDIR     = drivers/${ROBOT}/1
 SHIP        = $(shell find *.xml -maxdepth 0 -type f -print) $(shell find *.rgb -maxdepth 0 -type f -print)
-SHIPSUBDIRS = practice qualifying race
+#SHIPSUBDIRS = practice qualifying race
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-locus_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
