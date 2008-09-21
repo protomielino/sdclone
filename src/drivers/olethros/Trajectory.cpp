@@ -14,6 +14,7 @@
 #include <cassert>
 #include <list>
 #include <vector>
+//#include <cstring> //GCC 4.3
 #include "Trajectory.h"
 #include <time.h>
 

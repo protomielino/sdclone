@@ -12,7 +12,10 @@
 // (at your option) any later version.
 //
 ////////////////////////////////////////////////////////////////////////////
-#include <iostream-h>
+// #include <iostream> // GCC 4.3
+// using namespace std; // GCC 4.3
+#include <iostream.h>
+
 #ifndef WIN32
 
 #if defined(__GNUC__) && __GNUC__ > 2
@@ -24,9 +27,11 @@
 #endif // WIN32
 
 #include <iomanip.h>
+// #include <iomanip> // GCC 4.3
 #include <math.h>
 #include <stdlib.h>
 #include <fstream.h>
+// #include <fstream> // GCC 4.3
 #include <string.h>
 
 #include "tgf.h" 

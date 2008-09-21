@@ -33,6 +33,7 @@
 
 #include <algorithm>
 #include <new.h>
+// #include <new> // GCC 4.3
 
 class BBoxCompAxis {
 public:

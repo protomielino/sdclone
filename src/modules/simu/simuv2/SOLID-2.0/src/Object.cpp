@@ -34,6 +34,7 @@
 #include "Complex.h" 
 
 #include <new.h>
+// #include <new> // GCC 4.3
 
 Object::Object(DtObjectRef obj, ShapePtr shape) : 
   ref(obj), 

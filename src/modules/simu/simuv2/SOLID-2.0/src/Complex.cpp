@@ -33,6 +33,7 @@
 #include "BBoxTree.h"
 
 #include <new.h>
+// #include <new> // GCC 4.3
 
 BBoxInternal *free_node;
 
