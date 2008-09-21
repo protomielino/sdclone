@@ -32,7 +32,7 @@
 #include "Transform.h"
 #include "BBoxTree.h"
 
-#include <new>
+#include <new.h>
 
 BBoxInternal *free_node;
 

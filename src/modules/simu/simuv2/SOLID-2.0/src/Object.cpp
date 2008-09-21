@@ -33,7 +33,7 @@
 #include "Convex.h" 
 #include "Complex.h" 
 
-#include <new>
+#include <new.h>
 
 Object::Object(DtObjectRef obj, ShapePtr shape) : 
   ref(obj), 

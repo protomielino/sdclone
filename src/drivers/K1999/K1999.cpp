@@ -12,7 +12,7 @@
 // (at your option) any later version.
 //
 ////////////////////////////////////////////////////////////////////////////
-#include <iostream>
+#include <iostream-h>
 #ifndef WIN32
 
 #if defined(__GNUC__) && __GNUC__ > 2
@@ -23,10 +23,10 @@
 
 #endif // WIN32
 
-#include <iomanip>
+#include <iomanip.h>
 #include <math.h>
 #include <stdlib.h>
-#include <fstream>
+#include <fstream.h>
 #include <string.h>
 
 #include "tgf.h" 
