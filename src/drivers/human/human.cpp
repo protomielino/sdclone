@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:16:38 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: human.cpp,v 1.45 2006/09/06 23:46:45 berniw Exp $
+    version              : $Id: human.cpp,v 1.45.2.2 2008/06/01 07:42:14 berniw Exp $
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: human.cpp,v 1.45 2006/09/06 23:46:45 berniw Exp $
+    @version	$Id: human.cpp,v 1.45.2.2 2008/06/01 07:42:14 berniw Exp $
 */
 
 
@@ -90,7 +90,7 @@ static tKeyInfo skeyInfo[256];
 static int currentKey[256];
 static int currentSKey[256];
 
-static double lastKeyUpdate = -10.0;
+static tdble lastKeyUpdate = -10.0;
 
 static int	firstTime = 0;
 
@@ -226,8 +226,7 @@ human(tModInfo *modInfo)
 			}
 			strncpy(names[i], driver, MAXNAMELEN);
 			modInfo->name    = names[i];	/* name of the module (short) */
-			//modInfo->name    = driver;	/* name of the module (short) */
-			modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
+			modInfo->desc    = strdup("Joystick controlable driver");	/* description of the module (can be long) */
 			modInfo->fctInit = InitFuncPt;	/* init function */
 			modInfo->gfId    = ROB_IDENT;	/* supported framework version */
 			modInfo->index   = i+1;
@@ -472,12 +471,12 @@ onSKeyAction(int key, int modifier, int state)
 static void common_drive(int index, tCarElt* car, tSituation *s)
 {
 	tdble slip;
-	float ax0;
-	float brake;
-	float clutch;
-	float throttle;
-	float leftSteer;
-	float rightSteer;
+	tdble ax0;
+	tdble brake;
+	tdble clutch;
+	tdble throttle;
+	tdble leftSteer;
+	tdble rightSteer;
 	int scrw, scrh, dummy;
 	int idx = index - 1;
 	tControlCmd	*cmd = HCtx[idx]->CmdControl;
@@ -739,6 +738,9 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			car->_clutchCmd = 0;
 			break;
 	}
+ // if player's used the clutch manually then we dispense with autoClutch
+ 	if (car->_clutchCmd != 0.0f)
+ 	HCtx[idx]->autoClutch = 0;
 
 	switch (cmd[CMD_THROTTLE].type) {
 		case GFCTRL_TYPE_JOY_AXIS:
@@ -784,30 +786,31 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			break;
 	}
 
-	if (s->currentTime > 1.0)
-	{
+	if (s->currentTime > 1.0) {
 		// thanks Christos for the following: gradual accel/brake changes for on/off controls.
-		float inc_rate = 0.2f;
+		const tdble inc_rate = 0.2f;
 		
 		if (cmd[CMD_BRAKE].type == GFCTRL_TYPE_JOY_BUT ||
 		    cmd[CMD_BRAKE].type == GFCTRL_TYPE_MOUSE_BUT ||
 		    cmd[CMD_BRAKE].type == GFCTRL_TYPE_KEYBOARD ||
 		    cmd[CMD_BRAKE].type == GFCTRL_TYPE_SKEYBOARD)
 		{
-			float d_brake = car->_brakeCmd - HCtx[idx]->pbrake;
-			if (fabs(d_brake) > inc_rate && car->_brakeCmd > HCtx[idx]->pbrake)
+			tdble d_brake = car->_brakeCmd - HCtx[idx]->pbrake;
+			if (fabs(d_brake) > inc_rate && car->_brakeCmd > HCtx[idx]->pbrake) {
 				car->_brakeCmd = MIN(car->_brakeCmd, HCtx[idx]->pbrake + inc_rate*d_brake/fabs(d_brake));
+			}
 			HCtx[idx]->pbrake = car->_brakeCmd;
 		}
 
 		if (cmd[CMD_THROTTLE].type == GFCTRL_TYPE_JOY_BUT ||
-		    cmd[CMD_THROTTLE].type == GFCTRL_TYPE_MOUSE_BUT ||
-		    cmd[CMD_THROTTLE].type == GFCTRL_TYPE_KEYBOARD ||
-		    cmd[CMD_THROTTLE].type == GFCTRL_TYPE_SKEYBOARD)
+			cmd[CMD_THROTTLE].type == GFCTRL_TYPE_MOUSE_BUT ||
+			cmd[CMD_THROTTLE].type == GFCTRL_TYPE_KEYBOARD ||
+			cmd[CMD_THROTTLE].type == GFCTRL_TYPE_SKEYBOARD)
 		{
-			float d_accel = car->_accelCmd - HCtx[idx]->paccel;
-			if (fabs(d_accel) > inc_rate && car->_accelCmd > HCtx[idx]->paccel)
+			tdble d_accel = car->_accelCmd - HCtx[idx]->paccel;
+			if (fabs(d_accel) > inc_rate && car->_accelCmd > HCtx[idx]->paccel) {
 				car->_accelCmd = MIN(car->_accelCmd, HCtx[idx]->paccel + inc_rate*d_accel/fabs(d_accel));
+			}
 			HCtx[idx]->paccel = car->_accelCmd;
 		}
 	}
@@ -823,10 +826,10 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 	{
 		if (fabs(car->_speed_x) > 10.0)
 		{
-			double rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+			tdble rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
 			int i;
 
-			double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+			tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
 			NORM_PI_PI(skidAng);
 
 			if (car->_speed_x > 5 && fabs(skidAng) > 0.2)
@@ -834,7 +837,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 
 			if (fabs(car->_steerCmd) > 0.1)
 			{
-				double decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.6);
+				tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.6);
 				car->_brakeCmd = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
 
@@ -848,7 +851,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 
 			if (meanSpd > 1.0) {
 				for (i = 0; i < 4; i++) {
-					if (((meanSpd - car->_wheelSpinVel(i)) / meanSpd) < -0.1) {
+					if (((meanSpd - car->_wheelSpinVel(i)) / meanSpd) < -0.05) {
 						slip = 1.0;
 					}
 				}
@@ -874,11 +877,11 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 
 	if (HCtx[idx]->ParamAsr) 
 	{
-    double trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
-		double angle = trackangle - car->_yaw;
+    	tdble trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
+		tdble angle = trackangle - car->_yaw;
 		NORM_PI_PI(angle);
 
-		double maxaccel = 0.0;
+		tdble maxaccel = 0.0;
 		if (car->_trkPos.seg->type == TR_STR)
 			maxaccel = MIN(car->_accelCmd, 0.2);
 		else if (car->_trkPos.seg->type == TR_LFT && angle < 0.0)
@@ -886,8 +889,8 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		else if (car->_trkPos.seg->type == TR_RGT && angle > 0.0)
 			maxaccel = MIN(car->_accelCmd, MIN(0.6, angle));
 
-		double origaccel = car->_accelCmd;
-		double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
+		tdble origaccel = car->_accelCmd;
+		tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
 		NORM_PI_PI(skidAng);
 
 		if (car->_speed_x > 5 && fabs(skidAng) > 0.2)
@@ -898,11 +901,11 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 
 		if (fabs(car->_steerCmd) > 0.1)
 		{
-			double decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.8);
+			tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.8);
 			car->_accelCmd = MIN(car->_accelCmd, MAX(0.35, 1.0 - decel));
 		}
 
-		double drivespeed = 0.0;
+		tdble drivespeed = 0.0;
 		switch (HCtx[idx]->drivetrain)
 		{
 			case D4WD:
@@ -921,7 +924,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 				break;
 		}
 
-		double slip = drivespeed - fabs(car->_speed_x);
+		tdble slip = drivespeed - fabs(car->_speed_x);
 		if (slip > 2.0)
 			car->_accelCmd = MIN(car->_accelCmd, origaccel - MIN(origaccel-0.1, ((slip - 2.0)/10.0)));
 	}
@@ -960,18 +963,19 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 }
 
 
-static double getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
+static tdble getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
 {
- if (newgear != 0)
- {
-  if (newgear != gear)
-   HCtx[idx]->clutchtime = 0.332 - ((double) newgear / 65);
-  if (HCtx[idx]->clutchtime > 0.0)
-   HCtx[idx]->clutchtime -= RCM_MAX_DT_ROBOTS;
-  return 2.0 * HCtx[idx]->clutchtime;
- }
+	if (newgear != 0 && newgear < car->_gearNb) {
+		if (newgear != gear) {
+			HCtx[idx]->clutchtime = 0.332f - ((tdble) newgear / 65.0f);
+		}
 
- return 0.0;
+		if (HCtx[idx]->clutchtime > 0.0f)
+			HCtx[idx]->clutchtime -= RCM_MAX_DT_ROBOTS;
+		return 2.0f * HCtx[idx]->clutchtime;
+	}
+	
+	return 0.0f;
 }
 
 /*
@@ -1040,7 +1044,7 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
 		}
 	}
 
-	if (HCtx[idx]->autoClutch)
+	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
 		car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
 
 }
