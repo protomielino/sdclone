@@ -12,9 +12,16 @@
 // (at your option) any later version.
 //
 ////////////////////////////////////////////////////////////////////////////
-// #include <iostream> // GCC 4.3
-// using namespace std; // GCC 4.3
+#if defined(__GNUC__) && __GNUC__ > 3 && __GNUC_MINOR__ > 2
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+using namespace std;
+#else
 #include <iostream.h>
+#include <iomanip.h>
+#include <fstream.h>
+#endif // __GNUC__
 
 #ifndef WIN32
 
@@ -26,11 +33,12 @@
 
 #endif // WIN32
 
-#include <iomanip.h>
+
+//#include <iomanip.h>
 // #include <iomanip> // GCC 4.3
 #include <math.h>
 #include <stdlib.h>
-#include <fstream.h>
+//#include <fstream.h>
 // #include <fstream> // GCC 4.3
 #include <string.h>
 
