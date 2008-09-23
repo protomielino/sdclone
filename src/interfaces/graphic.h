@@ -66,6 +66,12 @@
 #define GR_ATT_SMOKENB		"smoke value"
 #define GR_ATT_SMOKEDELTAT	"smoke interval"
 #define GR_ATT_SMOKEDLIFE	"smoke duration"
+#define GR_ATT_WHEEL3D						"Wheel 3D"
+#define GR_ATT_WHEEL3D_ENABLED	"enabled"
+#define GR_ATT_WHEEL3D_DISABLED	"disabled"
+#define GR_ATT_ANIMDRIVER					"Animated Driver"
+#define GR_ATT_ANIMDRIVER_ENABLED	"enabled"
+#define GR_ATT_ANIMDRIVER_DISABLED	"disabled"
 
 #define GR_ATT_MAXSTRIPBYWHEEL	"skid value"
 #define GR_ATT_MAXPOINTBYSTRIP	"skid length"
