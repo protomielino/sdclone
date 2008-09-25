@@ -68,6 +68,8 @@ SaveGraphicOptions(void *prevMenu)
 	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, SmokeValue);
 	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, SkidValue);
 	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, LodFactorValue);
+	//GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_WHEEL3D, NULL, Wheel3dOtionId);
+	//GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ANIMDRIVER, NULL, AnimDriverOptionId);
 	
 	GfParmWriteFile(NULL, grHandle, "graph");
 

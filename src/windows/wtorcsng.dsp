@@ -109,7 +109,7 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\torcs.rc
+SOURCE=..\..\torcs-ng.rc
 # End Source File
 # Begin Source File
 
