@@ -1,13 +1,13 @@
 #! /bin/bash
-# src/tools/nfsperf/nfsperf.  Generated from nfsperf.in by configure.
+# src/tools/accc/accc-ng.  Generated from accc-ng.in by configure.
 
 ##############################################################################
 #
-#    file        : nfsperf.in
+#    file        : accc.in
 #    created     : Tue Aug 19 23:23:51 CEST 2003
 #    copyright   : (C) 2003 by Eric Espi�                        
 #    email       : Eric.Espie@torcs.org   
-#    version     : $Id: nfsperf.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
+#    version     : $Id: accc.in,v 1.2.2.1 2008/06/01 20:19:38 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -18,7 +18,7 @@
 #
 ##############################################################################
 
-prefix=/usr/local
+prefix=/home/pouillot
 exec_prefix=${prefix}
 
 BINDIR=${exec_prefix}/bin
@@ -29,6 +29,8 @@ VARDIR=${prefix}/var/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/nfsperf-ng-bin $*
+$LIBDIR/accc-bin $*
+
+rm -f temp.objf
 
 exit 0

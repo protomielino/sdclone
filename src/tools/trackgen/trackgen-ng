@@ -1,13 +1,13 @@
 #! /bin/bash
-# src/tools/nfs2ac/nfs2ac.  Generated from nfs2ac.in by configure.
+# src/tools/trackgen/trackgen-ng.  Generated from trackgen-ng.in by configure.
 
 ##############################################################################
 #
-#    file        : nfs2ac.in
+#    file        : trackgen.in
 #    created     : Tue Aug 19 23:23:51 CEST 2003
 #    copyright   : (C) 2003 by Eric Espi�                        
 #    email       : Eric.Espie@torcs.org   
-#    version     : $Id: nfs2ac.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
+#    version     : $Id: trackgen.in,v 1.2.2.1 2008/06/01 20:19:39 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -18,7 +18,7 @@
 #
 ##############################################################################
 
-prefix=/usr/local
+prefix=/home/pouillot
 exec_prefix=${prefix}
 
 BINDIR=${exec_prefix}/bin
@@ -29,6 +29,8 @@ VARDIR=${prefix}/var/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/nfs2ac-ng-bin $*
+echo "Changing to $DATADIR"
+cd $DATADIR
+$LIBDIR/trackgen-bin -L $LIBDIR $*
 
 exit 0

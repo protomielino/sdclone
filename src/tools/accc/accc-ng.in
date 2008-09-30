@@ -1,5 +1,5 @@
 #! /bin/bash
-# src/tools/accc/accc.  Generated from accc.in by configure.
+# @configure_input@
 
 ##############################################################################
 #
@@ -18,18 +18,18 @@
 #
 ##############################################################################
 
-prefix=/usr/local
-exec_prefix=${prefix}
+prefix=@prefix@
+exec_prefix=@exec_prefix@
 
-BINDIR=${exec_prefix}/bin
-LIBDIR=${exec_prefix}/lib/torcs-ng
-DATAROOTDIR=${prefix}/share
+BINDIR=@bindir@
+LIBDIR=@libdir@/torcs-ng
+DATAROOTDIR=@datarootdir@
 DATADIR=$DATAROOTDIR/games/torcs-ng
-VARDIR=${prefix}/var/games/torcs-ng
+VARDIR=@localstatedir@/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/accc-ng-bin $*
+$LIBDIR/accc-bin $*
 
 rm -f temp.objf
 

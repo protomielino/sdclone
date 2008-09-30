@@ -18,9 +18,9 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= texmapper
+TOOLSCRIPT	= texmapper-ng
 
-PROGRAM   	= texmapper-ng-bin
+PROGRAM   	= texmapper-bin
 
 SOURCES   	= maintexmapper.cpp ssgSaveAC.cpp
 

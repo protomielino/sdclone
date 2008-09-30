@@ -3,11 +3,11 @@
 
 ##############################################################################
 #
-#    file        : nfs2ac.in
+#    file        : nfsperf.in
 #    created     : Tue Aug 19 23:23:51 CEST 2003
 #    copyright   : (C) 2003 by Eric Espi�                        
 #    email       : Eric.Espie@torcs.org   
-#    version     : $Id: nfs2ac.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
+#    version     : $Id: nfsperf.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -29,6 +29,6 @@ VARDIR=@localstatedir@/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/nfs2ac-ng-bin $*
+$LIBDIR/nfsperf-bin $*
 
 exit 0

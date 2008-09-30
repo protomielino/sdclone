@@ -19,7 +19,7 @@ TOOLSDIR    =
 
 TOOLSCRIPT  = torcs-ng
 
-PROGRAM = torcs-ng-bin
+PROGRAM = torcs-bin
 
 SOURCES = main.cpp linuxspec.cpp
 
@@ -42,7 +42,7 @@ EXPORTS = osspec.h
 
 src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 
-src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCSNG_BASE},,$(shell pwd))
+src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 

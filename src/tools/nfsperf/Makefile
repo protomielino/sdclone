@@ -18,9 +18,9 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= nfsperf
+TOOLSCRIPT	= nfsperf-ng
 
-PROGRAM		= nfsperf-ng-bin
+PROGRAM		= nfsperf-bin
 
 SOURCES		= mainnfsperf.cpp
 

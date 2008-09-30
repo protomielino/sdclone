@@ -1,24 +1,24 @@
-# Microsoft Developer Studio Project File - Name="wtorcsng" - Package Owner=<4>
+# Microsoft Developer Studio Project File - Name="wtorcs" - Package Owner=<4>
 # Microsoft Developer Studio Generated Build File, Format Version 6.00
 # ** NICHT BEARBEITEN **
 
 # TARGTYPE "Win32 (x86) Console Application" 0x0103
 
-CFG=wtorcsng - Win32 Debug
+CFG=wtorcs - Win32 Debug
 !MESSAGE Dies ist kein gültiges Makefile. Zum Erstellen dieses Projekts mit NMAKE
 !MESSAGE verwenden Sie den Befehl "Makefile exportieren" und führen Sie den Befehl
 !MESSAGE 
-!MESSAGE NMAKE /f "wtorcsng.mak".
+!MESSAGE NMAKE /f "wtorcs.mak".
 !MESSAGE 
 !MESSAGE Sie können beim Ausführen von NMAKE eine Konfiguration angeben
 !MESSAGE durch Definieren des Makros CFG in der Befehlszeile. Zum Beispiel:
 !MESSAGE 
-!MESSAGE NMAKE /f "wtorcsng.mak" CFG="wtorcsng - Win32 Debug"
+!MESSAGE NMAKE /f "wtorcs.mak" CFG="wtorcs - Win32 Debug"
 !MESSAGE 
 !MESSAGE Für die Konfiguration stehen zur Auswahl:
 !MESSAGE 
-!MESSAGE "wtorcsng - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
-!MESSAGE "wtorcsng - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE "wtorcs - Win32 Release" (basierend auf  "Win32 (x86) Console Application")
+!MESSAGE "wtorcs - Win32 Debug" (basierend auf  "Win32 (x86) Console Application")
 !MESSAGE 
 
 # Begin Project
@@ -28,7 +28,7 @@ CFG=wtorcsng - Win32 Debug
 CPP=cl.exe
 RSC=rc.exe
 
-!IF  "$(CFG)" == "wtorcsng - Win32 Release"
+!IF  "$(CFG)" == "wtorcs - Win32 Release"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 0
@@ -45,7 +45,7 @@ RSC=rc.exe
 # ADD CPP /nologo /G6 /W2 /GX /O2 /Ob2 /I "..\..\export\include" /I "..\windows\include" /I "..\.." /D "WIN32" /D "NDEBUG" /D "_CONSOLE" /D "_MBCS" /FD /c
 # SUBTRACT CPP /WX /YX
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
-# ADD RSC /l 0x409 /fo"Release/tocs.res" /d "NDEBUG"
+# ADD RSC /l 0x409 /fo"Release/torcs.res" /d "NDEBUG"
 BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
@@ -58,10 +58,10 @@ WkspDir=.
 TargetDir=.\Release
 SOURCE="$(InputPath)"
 PostBuild_Desc=exports
-PostBuild_Cmds=copy $(TargetDir)\wtorcsng.exe $(WkspDir)\runtime	copy dll\glut32.dll $(WkspDir)\runtime	copy dll\OpenAL32.dll $(WkspDir)\runtime
+PostBuild_Cmds=copy $(TargetDir)\wtorcs.exe $(WkspDir)\runtime	copy dll\glut32.dll $(WkspDir)\runtime	copy dll\OpenAL32.dll $(WkspDir)\runtime
 # End Special Build Tool
 
-!ELSEIF  "$(CFG)" == "wtorcsng - Win32 Debug"
+!ELSEIF  "$(CFG)" == "wtorcs - Win32 Debug"
 
 # PROP BASE Use_MFC 0
 # PROP BASE Use_Debug_Libraries 1
@@ -91,15 +91,15 @@ WkspDir=.
 TargetDir=.\Debug
 SOURCE="$(InputPath)"
 PostBuild_Desc=exports
-PostBuild_Cmds=copy $(TargetDir)\wtorcsng.exe $(WkspDir)\runtimed	copy dll\glut32.dll $(WkspDir)\runtimed	copy dll\OpenAL32.dll $(WkspDir)\runtimed
+PostBuild_Cmds=copy $(TargetDir)\wtorcs.exe $(WkspDir)\runtimed	copy dll\glut32.dll $(WkspDir)\runtimed	copy dll\OpenAL32.dll $(WkspDir)\runtimed
 # End Special Build Tool
 
 !ENDIF 
 
 # Begin Target
 
-# Name "wtorcsng - Win32 Release"
-# Name "wtorcsng - Win32 Debug"
+# Name "wtorcs - Win32 Release"
+# Name "wtorcs - Win32 Debug"
 # Begin Group "Source Files"
 
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
@@ -109,7 +109,7 @@ SOURCE=.\main.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\..\torcs-ng.rc
+SOURCE=..\..\torcs.rc
 # End Source File
 # Begin Source File
 

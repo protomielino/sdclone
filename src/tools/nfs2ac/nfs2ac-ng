@@ -1,13 +1,13 @@
 #! /bin/bash
-# @configure_input@
+# src/tools/nfs2ac/nfs2ac-ng.  Generated from nfs2ac-ng.in by configure.
 
 ##############################################################################
 #
-#    file        : nfsperf.in
+#    file        : nfs2ac.in
 #    created     : Tue Aug 19 23:23:51 CEST 2003
 #    copyright   : (C) 2003 by Eric Espi�                        
 #    email       : Eric.Espie@torcs.org   
-#    version     : $Id: nfsperf.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
+#    version     : $Id: nfs2ac.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -18,17 +18,17 @@
 #
 ##############################################################################
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
+prefix=/home/pouillot
+exec_prefix=${prefix}
 
-BINDIR=@bindir@
-LIBDIR=@libdir@/torcs-ng
-DATAROOTDIR=@datarootdir@
+BINDIR=${exec_prefix}/bin
+LIBDIR=${exec_prefix}/lib/torcs-ng
+DATAROOTDIR=${prefix}/share
 DATADIR=$DATAROOTDIR/games/torcs-ng
-VARDIR=@localstatedir@/games/torcs-ng
+VARDIR=${prefix}/var/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/nfsperf-ng-bin $*
+$LIBDIR/nfs2ac-bin $*
 
 exit 0

@@ -53,12 +53,12 @@ then
     case $1 in
 	# List the library used
 	-l) shift
-	    ldd $LIBDIR/torcs-ng-bin
+	    ldd $LIBDIR/torcs-bin
 	    ;;
 
 	# Run under GDB
 	-d) shift
-	    gdb  $LIBDIR/torcs-ng-bin <<EOF
+	    gdb  $LIBDIR/torcs-bin <<EOF
 r -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 bt
 EOF
@@ -79,7 +79,7 @@ EOF
 	    ;;
 
 	# Normal run
-	*) $LIBDIR/torcs-ng-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
+	*) $LIBDIR/torcs-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 	    ;;
 
     esac

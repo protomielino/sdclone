@@ -3,11 +3,11 @@
 
 ##############################################################################
 #
-#    file        : trackgen.in
+#    file        : texmapper.in
 #    created     : Tue Aug 19 23:23:51 CEST 2003
 #    copyright   : (C) 2003 by Eric Espi�                        
 #    email       : Eric.Espie@torcs.org   
-#    version     : $Id: trackgen.in,v 1.2.2.1 2008/06/01 20:19:39 berniw Exp $                                  
+#    version     : $Id: texmapper.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -29,8 +29,6 @@ VARDIR=@localstatedir@/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-echo "Changing to $DATADIR"
-cd $DATADIR
-$LIBDIR/trackgen-ng-bin -L $LIBDIR $*
+$LIBDIR/texmapper-bin $*
 
 exit 0

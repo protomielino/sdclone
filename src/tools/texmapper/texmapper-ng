@@ -1,5 +1,5 @@
 #! /bin/bash
-# @configure_input@
+# src/tools/texmapper/texmapper-ng.  Generated from texmapper-ng.in by configure.
 
 ##############################################################################
 #
@@ -18,17 +18,17 @@
 #
 ##############################################################################
 
-prefix=@prefix@
-exec_prefix=@exec_prefix@
+prefix=/home/pouillot
+exec_prefix=${prefix}
 
-BINDIR=@bindir@
-LIBDIR=@libdir@/torcs-ng
-DATAROOTDIR=@datarootdir@
+BINDIR=${exec_prefix}/bin
+LIBDIR=${exec_prefix}/lib/torcs-ng
+DATAROOTDIR=${prefix}/share
 DATADIR=$DATAROOTDIR/games/torcs-ng
-VARDIR=@localstatedir@/games/torcs-ng
+VARDIR=${prefix}/var/games/torcs-ng
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/texmapper-ng-bin $*
+$LIBDIR/texmapper-bin $*
 
 exit 0
