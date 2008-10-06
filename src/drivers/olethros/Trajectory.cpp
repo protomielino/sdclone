@@ -14,13 +14,9 @@
 #include <cassert>
 #include <list>
 #include <vector>
-//#include <cstring> //GCC 4.3
+#include <cstring>
 #include "Trajectory.h"
 #include <time.h>
-
-#if defined(__GNUC__) && __GNUC__ > 3 &&__GNUC_MINOR__ > 2
-#include <cstring>
-#endif // __GNUC__
 
 /// Return a point
 Point Trajectory::GetPoint (Segment& s, float w)

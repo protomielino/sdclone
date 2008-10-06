@@ -33,12 +33,7 @@
 #include "Convex.h" 
 #include "Complex.h" 
 
-#if defined(__GNUC__) && __GNUC__ > 3 &&__GNUC_MINOR__ > 2
 #include <new>
-#else
-#include <new.h>
-#endif
-// #include <new> // GCC 4.3
 
 Object::Object(DtObjectRef obj, ShapePtr shape) : 
   ref(obj), 

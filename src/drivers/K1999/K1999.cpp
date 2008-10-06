@@ -12,34 +12,12 @@
 // (at your option) any later version.
 //
 ////////////////////////////////////////////////////////////////////////////
-#if defined(__GNUC__) && __GNUC__ > 3 && __GNUC_MINOR__ > 2
 #include <iostream>
-#include <iomanip>
-#include <fstream>
-using namespace std;
-#else
-#include <iostream.h>
-#include <iomanip.h>
-#include <fstream.h>
-#endif // __GNUC__
-
-#ifndef WIN32
-
-#if defined(__GNUC__) && __GNUC__ > 2
 #include <strstream>
-#else
-#include <strstream.h>
-#endif // __GNUC__
-
-#endif // WIN32
-
-
-//#include <iomanip.h>
-// #include <iomanip> // GCC 4.3
+#include <iomanip>
 #include <math.h>
 #include <stdlib.h>
-//#include <fstream.h>
-// #include <fstream> // GCC 4.3
+#include <fstream>
 #include <string.h>
 
 #include "tgf.h" 
@@ -48,6 +26,8 @@ using namespace std;
 #include "raceman.h" 
 #include "robot.h" 
 #include "robottools.h"
+
+using namespace std;
 
 ////////////////////////////////////////////////////////////////////////////
 // Parameters
