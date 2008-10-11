@@ -16,7 +16,7 @@
 ##############################################################################
 
 
-PKGSUBDIRS	= $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
+PKGSUBDIRS	= $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
 
 src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 

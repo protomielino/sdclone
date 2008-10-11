@@ -26,7 +26,7 @@ src-robots-base_PKGDIR		= ${PACKAGE}-${VERSION}/$(subst ${TORCSNG_BASE},,$(shell
 
 # Recursion
 
-SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
+SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 

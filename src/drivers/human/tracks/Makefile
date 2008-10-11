@@ -15,7 +15,7 @@
 #
 ##############################################################################
 
-SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
+SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
 
 PKGSUBDIRS	= $(SHIPSUBDIRS)
 

@@ -17,7 +17,7 @@
 
 
 
-SUBDIRS		= $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
+SUBDIRS		= $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
 
 TOOLSUBDIRS	= $(SUBDIRS)
 

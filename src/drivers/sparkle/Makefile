@@ -22,7 +22,7 @@ SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp
 
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml logo.rgb
-SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
+SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-base_PKGFILES = $(shell find * -maxdepth 0 -type f -print)

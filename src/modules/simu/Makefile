@@ -16,12 +16,12 @@
 ##############################################################################
 
 
-#SUBDIRS		= $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
-SUBDIRS		= simuv2
+SUBDIRS		= $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
+#SUBDIRS		= simuv2
 
 DATASUBDIRS	= $(SUBDIRS)
 
-EXPINCDIRS	= $(shell find * -maxdepth 0 -type d -print | grep -v CVS)
+EXPINCDIRS	= $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
 
 PKGSUBDIRS	= $(SUBDIRS)
 
