@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BT_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /G6 /W2 /GX /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BT_EXPORTS" /FD /c
+# ADD CPP /nologo /G6 /W2 /GX /I "../../../export/include" /I "../../windows/include" /I "../../.." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BT_EXPORTS" /FD /c
 # SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
@@ -56,9 +56,10 @@ LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
 # ADD LINK32 tgf.lib robottools.lib sg.lib ul.lib /nologo /dll /map /machine:I386 /nodefaultlib:"LIBCD" /libpath:"../../../export/lib" /libpath:"../../windows/lib"
 # Begin Special Build Tool
+WkspDir=.
 TargetDir=.\Release
 SOURCE="$(InputPath)"
-PostBuild_Cmds=copy $(TargetDir)\*.dll c:\andrew\torcs\drivers\locus
+PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtime\drivers\locus
 # End Special Build Tool
 
 !ELSEIF  "$(CFG)" == "locus - Win32 Debug"
@@ -75,7 +76,7 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll c:\andrew\torcs\drivers\locus
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BT_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /G5 /W3 /Gm /GX /ZI /Od /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BT_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /G5 /W3 /Gm /GX /ZI /Od /I "../../../export/include" /I "../../windows/include" /I "../../.." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "BT_EXPORTS" /YX /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "_DEBUG"
@@ -85,7 +86,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib tgf.lib robottools.lib sg.lib ul.lib /nologo /dll /map /debug /machine:I386 /libpath:"../../../export/lib" /libpath:"../../windows/lib"
+# ADD LINK32 tgf.lib robottools.lib sg.lib ul.lib /nologo /dll /map /debug /machine:I386 /nodefaultlib:"LIBC" /pdbtype:sept /libpath:"../../../export/libd" /libpath:"../../windows/lib"
 # Begin Special Build Tool
 WkspDir=.
 TargetDir=.\Debug
@@ -112,6 +113,14 @@ SOURCE=.\driver.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\locus.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\locus.def
+# End Source File
+# Begin Source File
+
 SOURCE=.\opponent.cpp
 # End Source File
 # Begin Source File
@@ -129,14 +138,6 @@ SOURCE=.\spline.cpp
 # Begin Source File
 
 SOURCE=.\strategy.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\locus.cpp
-# End Source File
-# Begin Source File
-
-SOURCE=.\locus.def
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -174,7 +175,6 @@ SOURCE=.\spline.h
 
 SOURCE=.\strategy.h
 # End Source File
-
 # End Group
 # End Target
 # End Project

@@ -43,7 +43,8 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SPARKLE_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /G5 /W3 /GX /O2 /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SPARKLE_EXPORTS" /YX /FD /c
+# ADD CPP /nologo /G6 /W2 /GX /O2 /Ob2 /I "../../../export/include" /I "../../windows/include" /I "../../.." /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SPARKLE_EXPORTS" /FD /c
+# SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "NDEBUG"
@@ -75,7 +76,8 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtime\drivers\sparkle
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SPARKLE_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /G5 /W3 /Gm /GX /ZI /Od /I "../../../export/include" /I "../../windows/include" /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SPARKLE_EXPORTS" /YX /FD /GZ /c
+# ADD CPP /nologo /G6 /W2 /GX /ZI /Od /I "../../../export/include" /I "../../windows/include" /I "../../.." /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "SPARKLE_EXPORTS" /D "DEBUG" /D "DEBUG_OUT" /FR /FD /GZ /c
+# SUBTRACT CPP /YX
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x40c /d "_DEBUG"
@@ -84,8 +86,9 @@ BSC32=bscmake.exe
 # ADD BASE BSC32 /nologo
 # ADD BSC32 /nologo
 LINK32=link.exe
-# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 robottools.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib sg.lib ul.lib /nologo /dll /map /debug /machine:I386 /pdbtype:sept /libpath:"../../../export/libd" /libpath:"../../windows/lib"
+# ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdsparkleype:sept
+# ADD LINK32 tgf.lib robottools.lib sg.lib ul.lib /nologo /dll /map /debug /machine:I386 /nodefaultlib:"LIBC" /pdbtype:sept /libpath:"../../../export/libd" /libpath:"../../windows/lib"
+# SUBTRACT LINK32 /pdb:none
 # Begin Special Build Tool
 WkspDir=.
 TargetDir=.\Debug
@@ -104,16 +107,52 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll $(WkspDir)\runtimed\drivers\sparkle
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
+SOURCE=.\driver.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\opponent.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=.\pit.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=.\sparkle.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=.\sparkle.def
 # End Source File
+# Begin Source File
+
+SOURCE=.\spline.cpp
+# End Source File
 # End Group
 # Begin Group "Header Files"
 
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
+# Begin Source File
+
+SOURCE=.\driver.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\linalg.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\opponent.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\pit.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\spline.h
+# End Source File
 # End Group
 # End Target
 # End Project
