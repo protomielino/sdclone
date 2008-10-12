@@ -31,25 +31,34 @@ LOCAL_CONF=$HOME/.torcs-ng
 
 if [ -d $DATADIR ]
 then
-    if [ ! -d $LOCAL_CONF ]
-    then
-	rm -rf $LOCAL_CONF
-	mkdir -p $LOCAL_CONF
-	echo "$LOCAL_CONF created, copying/linking game data"
-    fi
-    export LD_LIBRARY_PATH=$LIBDIR/lib:$LD_LIBRARY_PATH
     cd $DATADIR
-    if [ -f $LIBDIR/setup_linux.sh ]
+    if [ "$1" != "-k" ] || [ ! -d $LOCAL_CONF ]
     then
-	/bin/bash $LIBDIR/setup_linux.sh $LOCAL_CONF
-	if [ $? -ne 0 ]
+	if [ ! -d $LOCAL_CONF ]
 	then
+	    rm -rf $LOCAL_CONF
+	    mkdir -p $LOCAL_CONF
+	    echo "Created $LOCAL_CONF"
+	fi
+	if [ -f $LIBDIR/setup_linux.sh ]
+	then
+	    echo "Copying/linking/updating game data"
+	    /bin/bash $LIBDIR/setup_linux.sh $LOCAL_CONF
+	    if [ $? -ne 0 ]
+	    then
+		exit 1
+	    fi
+	else
+	    echo "$LIBDIR/setup_linux.sh file does not exist, check your installation"
 	    exit 1
 	fi
-    else
-	echo "$LIBDIR/setup_linux.sh file does not exist, check your installation"
-	exit 1
     fi
+    if [ "$1" = "-k" ]
+    then
+	echo "Kept game data untouched"
+	shift
+    fi
+    export LD_LIBRARY_PATH=$LIBDIR/lib:$LD_LIBRARY_PATH
     case $1 in
 	# List the library used
 	-l) shift
@@ -72,7 +81,8 @@ EOF
 	    ;;
 
 	-h)
-	    echo "usage: torcs-ng [-l|-d|-e]"
+	    echo "usage: torcs-ng [-k] [-l|-d|-e]"
+	    echo "   -k  keep untouched $LOCAL_CONF, even just after a make install"
 	    echo "   -l  list the dynamically linked libraries"
 	    echo "   -d  run under gdb and print stack trace on exit"
 	    echo "   -e  display the commands to issue when you want to run under gdb"
