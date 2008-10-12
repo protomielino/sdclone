@@ -16,7 +16,7 @@
 ##############################################################################
 
 
-SHIPDIR   = config/raceman
+SHIPDIR   = extra
 
 SHIPCREATEDIRS = $(shell find * -maxdepth 0 -name '*.xml' -print | sed -e 's!\.xml!!' -e 's!^!results/!')
 
@@ -24,11 +24,7 @@ SHIP      = $(shell find * -maxdepth 0 -name '*.xml' -print)
 
 CONFIGCREATEDIRS = ${SHIPCREATEDIRS} ${SHIPDIR}
 
-SHIPSUBDIRS = extra
-
 CONFIG = ${SHIP}
-
-PKGSUBDIRS	= $(SHIPSUBDIRS)
 
 src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 
