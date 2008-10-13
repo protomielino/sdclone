@@ -15,7 +15,7 @@
 
   <!-- change below value to set skill level >>> |||             -->
   <!--                                           VVV             -->
-  <attnum name="level" min="0.0" max="10.0" val="10.0"/>
+  <attnum name="level" min="0.0" max="10.0" val="0.0"/>
   <!--                                           ^^^             -->
   <!-- change above value to set skill level >>> |||             -->
 

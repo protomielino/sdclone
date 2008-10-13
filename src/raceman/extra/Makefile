@@ -16,7 +16,7 @@
 ##############################################################################
 
 
-SHIPDIR   = extra
+SHIPDIR   = config/raceman/extra
 
 SHIPCREATEDIRS = $(shell find * -maxdepth 0 -name '*.xml' -print | sed -e 's!\.xml!!' -e 's!^!results/!')
 
