@@ -113,7 +113,8 @@ MouseCalAutomaton(void)
     if (CalState < 4) {
 	glutIdleFunc(Idle2);
     } else {
-	glutIdleFunc(GfuiIdle);
+	glutIdleFunc(0);
+	glutPostRedisplay();
     }
 }
 
@@ -131,6 +132,9 @@ Idle2(void)
 	    return;
 	}
     }
+
+	/* Let CPU take breath (and fans stay at low and quiet speed) */
+	GfuiScreenSleep(0.001);
 }
 
 static void

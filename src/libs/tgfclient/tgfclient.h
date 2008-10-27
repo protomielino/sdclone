@@ -137,6 +137,7 @@ extern void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 extern void GfuiSKeyEventRegister(void *scr, tfuiSKeyCallback onSKeyAction);
 extern void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 extern void GfuiSKeyEventRegisterCurrent(tfuiSKeyCallback onSKeyAction);
+extern void GfuiScreenSleep(double delay);
 
 /* mouse */
 typedef struct MouseInfo

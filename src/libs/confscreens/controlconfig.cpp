@@ -208,7 +208,7 @@ onKeyAction(unsigned char key, int /* modifier */, int state)
 	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
     }
 
-    glutIdleFunc(GfuiIdle);
+    glutIdleFunc(0);
     InputWaited = 0;
     updateButtonText();
     return 1;
@@ -227,7 +227,7 @@ onSKeyAction(int key, int /* modifier */, int state)
     Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_SKEYBOARD;
     GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
 
-    glutIdleFunc(GfuiIdle);
+    glutIdleFunc(0);
     InputWaited = 0;
     updateButtonText();
     return 1;
@@ -263,7 +263,7 @@ Idle(void)
     /* Check for a mouse button pressed */
     for (i = 0; i < 3; i++) {
 	if (mouseInfo.edgedn[i]) {
-	    glutIdleFunc(GfuiIdle);
+	    glutIdleFunc(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_BUT, i);
 	    Cmd[CurrentCmd].ref.index = i;
@@ -277,7 +277,7 @@ Idle(void)
     /* Check for a mouse axis moved */
     for (i = 0; i < 4; i++) {
 	if (mouseInfo.ax[i] > 20.0) {
-	    glutIdleFunc(GfuiIdle);
+	    glutIdleFunc(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_AXIS, i);
 	    Cmd[CurrentCmd].ref.index = i;
@@ -297,7 +297,7 @@ Idle(void)
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((rawb[index] & mask) == 0)) {
 		    /* Button i fired */
-		    glutIdleFunc(GfuiIdle);
+		    glutIdleFunc(0);
 		    InputWaited = 0;
 		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + 32 * index);
 		    Cmd[CurrentCmd].ref.index = i + 32 * index;
@@ -315,7 +315,7 @@ Idle(void)
     /* detect joystick movement */
     axis = getMovedAxis();
     if (axis != -1) {
-	glutIdleFunc(GfuiIdle);
+	glutIdleFunc(0);
 	InputWaited = 0;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
 	Cmd[CurrentCmd].ref.index = axis;
@@ -324,6 +324,9 @@ Idle(void)
 	glutPostRedisplay();
 	return;
     }
+
+	/* Let CPU take breath (and fans stay at low and quiet speed) */
+	GfuiScreenSleep(0.001);
 }
 
 static void

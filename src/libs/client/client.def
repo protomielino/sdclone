@@ -110,3 +110,4 @@ EXPORTS
 	GfctrlJoyGetCurrent
 	GfuiGlutExtensionSupported
 	ssggraph
+	GfuiScreenSleep

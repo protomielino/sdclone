@@ -147,7 +147,7 @@ Idle2(void)
 		    /* Button fired */
 		    JoyCalAutomaton();
 		    if (CalState >= NB_STEPS) {
-			glutIdleFunc(GfuiIdle);
+			glutIdleFunc(0);
 		    }
 		    glutPostRedisplay();
 		    rawb[index] = b;
@@ -157,6 +157,9 @@ Idle2(void)
 	    rawb[index] = b;
 	}
     }
+
+	/* Let CPU take breath (and fans stay at low and quite speed) */
+	GfuiScreenSleep(0.001);
 }
 
 

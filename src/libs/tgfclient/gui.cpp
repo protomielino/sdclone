@@ -999,4 +999,14 @@ GfuiScreenAddBgImg(void *scr, char *filename)
 	GfParmReleaseHandle(handle);
 }
 
+/** Passive wait (no CPU use) for the current thread.
+    @ingroup	gui
+    @param	delay		The number of seconds to sleep (real granularity is platform-dependant)
+    @return	None.
+ */
+void
+GfuiScreenSleep(double delay)
+{
+  ulMilliSecondSleep(delay*1000); // ms.
+}
 
