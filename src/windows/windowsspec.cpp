@@ -641,6 +641,24 @@ windowsTimeClock(void)
     return( D );
 }
 
+static void
+windowsSetAffinity(void)
+{
+    /* Restrict wtorcs.exe to one CPU core/processor - avoids jerky rendering 
+     * especially under Vista.                                                 */
+
+    HANDLE hProcess = GetCurrentProcess();
+    ULONG_PTR ProcAM, SysAM;
+
+    GetProcessAffinityMask( hProcess, (PDWORD_PTR) &ProcAM, (PDWORD_PTR) &SysAM );
+    if (ProcAM > 1)
+    {
+	ProcAM = 1;
+	SetProcessAffinityMask( hProcess, ProcAM );
+    }
+    return;
+}
+
 
 /*
 * Function
@@ -672,6 +690,8 @@ WindowsSpecInit(void)
     GfOs.dirGetList = windowsDirGetList;
     GfOs.dirGetListFiltered = windowsDirGetListFiltered;
     GfOs.timeClock = windowsTimeClock;
+
+    windowsSetAffinity();
 
 
 }
