@@ -44,7 +44,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		p[4].x = p[3].x + pitinfo->len;
 		p[0].x = pitinfo->pitEntry->lgfromstart + pitoffset;
 		p[1].x = pitinfo->pitStart->lgfromstart;
-		p[5].x = p[3].x + (pitinfo->nMaxPits - car->index) * pitinfo->len;
+		p[5].x = pitinfo->pitStart->lgfromstart + pitinfo->nMaxPits * pitinfo->len;
 		p[6].x = pitinfo->pitExit->lgfromstart;
 
 		pitentry = p[0].x;
