@@ -738,9 +738,10 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			car->_clutchCmd = 0;
 			break;
 	}
- // if player's used the clutch manually then we dispense with autoClutch
- 	if (car->_clutchCmd != 0.0f)
- 	HCtx[idx]->autoClutch = 0;
+
+	// if player's used the clutch manually then we dispense with autoClutch
+	if (car->_clutchCmd != 0.0f)
+		HCtx[idx]->autoClutch = 0;
 
 	switch (cmd[CMD_THROTTLE].type) {
 		case GFCTRL_TYPE_JOY_AXIS:
@@ -841,43 +842,24 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 				car->_brakeCmd = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
 
-			tdble meanSpd = 0;
+			const tdble abs_slip = 2.5;
+			const tdble abs_range = 5.0;
 
 			slip = 0;
 			for (i = 0; i < 4; i++) {
-				meanSpd += car->_wheelSpinVel(i);
+				slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
 			}
-			meanSpd /= 4.0;
+			slip = car->_speed_x - slip/4.0f;
 
-			if (meanSpd > 1.0) {
-				for (i = 0; i < 4; i++) {
-					if (((meanSpd - car->_wheelSpinVel(i)) / meanSpd) < -0.05) {
-						slip = 1.0;
-					}
-				}
-			}
-			if (slip != 0) {
-				HCtx[idx]->ABS *= 0.9;
-				if (HCtx[idx]->ABS < 0.1) {
-					HCtx[idx]->ABS = 0.1;
-				}
-			} else {
-				if (HCtx[idx]->ABS < 0.1) {
-					HCtx[idx]->ABS = 0.1;
-				}
-				HCtx[idx]->ABS *= 1.1;
-				if (HCtx[idx]->ABS > 1.0) {
-					HCtx[idx]->ABS = 1.0;
-				}
-			}
-			car->_brakeCmd = MIN(car->_brakeCmd, HCtx[idx]->ABS * 1.5);
+			if (slip > abs_slip)
+				car->_brakeCmd = car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range);
 		}
 	}
 
 
 	if (HCtx[idx]->ParamAsr) 
 	{
-    	tdble trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
+	    	tdble trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
 		tdble angle = trackangle - car->_yaw;
 		NORM_PI_PI(angle);
 
@@ -890,6 +872,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			maxaccel = MIN(car->_accelCmd, MIN(0.6, angle));
 
 		tdble origaccel = car->_accelCmd;
+#if 0
 		tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
 		NORM_PI_PI(skidAng);
 
@@ -898,10 +881,12 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			car->_accelCmd = MIN(car->_accelCmd, 0.15 + 0.70 * cos(skidAng));
 			car->_accelCmd = MAX(car->_accelCmd, maxaccel);
 		}
+#endif
 
-		if (fabs(car->_steerCmd) > 0.1)
+		tdble steer = MIN(fabs(car->_steerCmd), fabs(car->_steerCmd+car->_yaw_rate/3));
+		if (steer > 0.1 && fabs(car->_speed_x) > 7.0)
 		{
-			tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.8);
+			tdble decel = ((steer-0.1) * (1.0 + steer) * 0.8);
 			car->_accelCmd = MIN(car->_accelCmd, MAX(0.35, 1.0 - decel));
 		}
 
@@ -925,8 +910,8 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		}
 
 		tdble slip = drivespeed - fabs(car->_speed_x);
-		if (slip > 2.0)
-			car->_accelCmd = MIN(car->_accelCmd, origaccel - MIN(origaccel-0.1, ((slip - 2.0)/10.0)));
+		if (slip > 2.5)
+			car->_accelCmd = MIN(car->_accelCmd, origaccel - MIN(origaccel-0.2, ((slip - 2.5)/20.0)));
 	}
 
 	if (speedLimiter) {
@@ -1157,7 +1142,7 @@ static void drive_at(int index, tCarElt* car, tSituation *s)
 		}
     }
 
-	if (HCtx[idx]->autoClutch)
+	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
 	    car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
 }
 
