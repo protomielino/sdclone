@@ -65,10 +65,10 @@ TorcsMainMenuInit(void)
 
     GfuiScreenAddBgImg(menuHandle, "data/img/splash-main.png");
 
-    GfuiTitleCreate(menuHandle, "TORCS", 0);
+    GfuiTitleCreate(menuHandle, "TORCS-NG", 0);
 
     GfuiLabelCreate(menuHandle,
-		    "The Open Racing Car Simulator",
+		    "The Open Racing Car Simulator - Next Generation",
 		    GFUI_FONT_LARGE,
 		    320,
 		    420,
@@ -90,7 +90,7 @@ TorcsMainMenuInit(void)
     GfuiMenuDefaultKeysAdd(menuHandle);
 
     GfuiMenuBackQuitButtonCreate(menuHandle,
-				 "Quit", "Quit TORCS",
+				 "Quit", "Quit TORCS-NG",
 				 TorcsMainExitMenuInit(menuHandle), GfuiScreenActivate);
 
     return 0;
