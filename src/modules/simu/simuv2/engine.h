@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:07 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: engine.h,v 1.10 2005/03/31 16:01:00 olethros Exp $
+    version              : $Id: engine.h,v 1.11 2008/06/05 07:09:11 olethros Exp $
 
  ***************************************************************************/
 
@@ -45,6 +45,8 @@ typedef struct
     tdble		I;
     tdble		rads;   /* revs in rad/s ... */
     tdble		Tq;	/* output torque */
+    tdble       Tq_response; /* response Tq due to mismatch */
+    tdble       I_joint; /* joint inertia */
     tdble		fuelcons;
     tdble		brakeCoeff;
 	tdble       pressure;

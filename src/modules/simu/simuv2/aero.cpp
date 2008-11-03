@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:04:50 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: aero.cpp,v 1.14 2005/04/04 21:42:48 berniw Exp $
+    version              : $Id: aero.cpp,v 1.15 2008/05/07 19:05:59 torcs Exp $
 
  ***************************************************************************/
 
@@ -124,15 +124,19 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     tdble vt2 = car->airSpeed2;
 	// compute angle of attack
 	tdble aoa = atan2(car->DynGC.vel.z, car->DynGC.vel.x) + car->DynGCg.pos.ay;
-	aoa += wing->angle;
-	// the sinus of the angle of attack
-	tdble sinaoa = sin(aoa);
-
-    if (car->DynGC.vel.x > 0.0) {
-		wing->forces.x = wing->Kx * vt2 * (1.0 + (tdble)car->dammage / 10000.0) * sinaoa;
-		wing->forces.z = wing->Kz * vt2 * sinaoa;
+    if (aoa < 0) {
+        wing->forces.x = wing->forces.z = 0;
     } else {
-		wing->forces.x = wing->forces.z = 0;
+        aoa += wing->angle;
+        // the sinus of the angle of attack
+        tdble sinaoa = sin(aoa);
+
+        if (car->DynGC.vel.x > 0.0) {
+            wing->forces.x = wing->Kx * vt2 * (1.0 + (tdble)car->dammage / 10000.0) * sinaoa;
+            wing->forces.z = wing->Kz * vt2 * sinaoa;
+        } else {
+            wing->forces.x = wing->forces.z = 0;
+        }
     }
 }
 

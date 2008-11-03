@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:05:43 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: car.cpp,v 1.24 2007/10/30 21:45:23 berniw Exp $
+    version              : $Id: car.cpp,v 1.25 2008/06/05 07:09:10 olethros Exp $
 
  ***************************************************************************/
 
@@ -178,9 +178,7 @@ SimCarUpdateForces(tCar *car)
 		F.F.z += car->wheel[i].forces.z;
 		/* moments */
 		F.M.x += car->wheel[i].forces.z * car->wheel[i].staticPos.y +
-			car->wheel[i].forces.y * car->wheel[i].rollCenter;
-			// Eventually TODO: activate fix below and make all cars/robots fit.
-			//car->wheel[i].forces.y * (car->statGC.z + car->wheel[i].rideHeight);
+			car->wheel[i].forces.y * (car->statGC.z + car->wheel[i].rideHeight);
 		F.M.y -= car->wheel[i].forces.z * car->wheel[i].staticPos.x +
 			car->wheel[i].forces.x * (car->statGC.z + car->wheel[i].rideHeight);
 		F.M.z += -car->wheel[i].forces.x * car->wheel[i].staticPos.y +
