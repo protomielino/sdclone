@@ -646,7 +646,18 @@ windowsSetAffinity(void)
 {
     /* Restrict wtorcs.exe to one CPU core/processor - avoids jerky rendering 
      * especially under Vista.                                                 */
-
+	
+	#ifndef ULONG_PTR
+	typedef unsigned long ULONG_PTR;
+	#endif
+	
+	#ifndef PDWORD_PTR
+	#ifndef DWORD_PTR
+	typedef ULONG_PTR DWORD_PTR;
+	#endif
+	typedef DWORD_PTR *PDWORD_PTR;
+	#define
+	 
     HANDLE hProcess = GetCurrentProcess();
     ULONG_PTR ProcAM, SysAM;
 
