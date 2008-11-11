@@ -43,6 +43,8 @@ SimDifferentialConfig(void *hdle, char *section, tDifferential *differential)
         differential->type = DIFF_VISCOUS_COUPLER;
     } else if (strcmp(type, VAL_DIFF_SPOOL) == 0) {
         differential->type = DIFF_SPOOL;
+    }  else if (strcmp(type, VAL_DIFF_LOCKING) == 0) {
+        differential->type = DIFF_LOCKING;
     }  else if (strcmp(type, VAL_DIFF_FREE) == 0) {
         differential->type = DIFF_FREE;
     } else {
@@ -176,6 +178,36 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
             break;
 
                        
+        case DIFF_LOCKING:
+            // Locking differential - used to be LIMITED_SLIP
+                    
+            if (DrTq > differential->lockInputTq) {
+                updateSpool(car, differential, first);
+                return;
+            }	
+
+            spdRatioMax = differential->dSlipMax - DrTq * differential->dSlipMax / differential->lockInputTq;
+            if (spdRatio > spdRatioMax) {
+                deltaSpd = (spdRatio - spdRatioMax) * fabs(spinVel0 + spinVel1) / 2.0;
+                if (spinVel0 > spinVel1) {
+                    spinVel0 -= deltaSpd;
+                    spinVel1 += deltaSpd;
+                } else {
+                    spinVel0 += deltaSpd;
+                    spinVel1 -= deltaSpd;
+                }
+            }
+                    
+            if (spinVel0 > spinVel1) {
+                DrTq1 = DrTq * (0.5 + differential->bias);
+                DrTq0 = DrTq * (0.5 - differential->bias);
+            } else {
+                DrTq1 = DrTq * (0.5 - differential->bias);
+                DrTq0 = DrTq * (0.5 + differential->bias);
+            }
+            break;
+
+
         case DIFF_LIMITED_SLIP:
             // Limited slip differential with:
             // - Gradual frictive locking
@@ -201,9 +233,13 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
 
                 float pressure = tanh(rate*(spinVel1-spinVel0));
                 float bias = differential->dSlipMax * 0.5f* pressure;
-                float open = 1.0f;// - rate;
-                DrTq0 = DrTq*(0.5f+bias) + spiderTq*open;
-                DrTq1 = DrTq*(0.5f-bias) - spiderTq*open;
+                float open = 1.0f - fabs(pressure);
+                DrTq0 = DrTq*(0.5f+bias) + spiderTq;
+                DrTq1 = DrTq*(0.5f-bias) - spiderTq;
+                DrTq0 = open*(DrTq*(0.5f) + spiderTq)
+                    + (1 - open)*(DrTq*(0.5f + bias));
+                DrTq1 = open*(DrTq*(0.5f) - spiderTq)
+                    + (1 - open)*(DrTq*(0.5f - bias));
             }
             break;
 
