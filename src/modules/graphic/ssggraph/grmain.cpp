@@ -446,7 +446,8 @@ initTrack(tTrack *track)
 	grContext.makeCurrent();
 
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	grLoadScene(track);
+	if (grNbScreen)
+		grLoadScene(track);
 
 	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 		grScreens[i] = new cGrScreen(i);
