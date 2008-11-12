@@ -90,7 +90,7 @@ static tKeyInfo skeyInfo[256];
 static int currentKey[256];
 static int currentSKey[256];
 
-static tdble lastKeyUpdate = -10.0;
+static double lastKeyUpdate = -10.0;
 
 static int	firstTime = 0;
 
@@ -226,7 +226,7 @@ human(tModInfo *modInfo)
 			}
 			strncpy(names[i], driver, MAXNAMELEN);
 			modInfo->name    = names[i];	/* name of the module (short) */
-			modInfo->desc    = strdup("Joystick controlable driver");	/* description of the module (can be long) */
+			modInfo->desc    = "Joystick controllable driver";	/* description of the module (can be long) */
 			modInfo->fctInit = InitFuncPt;	/* init function */
 			modInfo->gfId    = ROB_IDENT;	/* supported framework version */
 			modInfo->index   = i+1;
@@ -842,7 +842,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 				car->_brakeCmd = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
 
-			const tdble abs_slip = 2.5;
+			const tdble abs_slip = 3.5;
 			const tdble abs_range = 5.0;
 
 			slip = 0;
