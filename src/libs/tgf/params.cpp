@@ -977,7 +977,7 @@ GfParmReadBuf (char *buffer)
 
     /* Parameters reading in buffer */
     if (parseXml (parmHandle, buffer, strlen (buffer), 1)) {
-	GfError ("gfParmReadBuf: Parse failed for buffer\n");
+	GfError ("gfParmReadBuf: Parsing failed for buffer\n");
 	goto bailout;
     }
 
@@ -999,7 +999,7 @@ GfParmReadBuf (char *buffer)
     @ingroup	conf
     @param	logHandle	log handle
     @param	file		name of the file to read or content if input is a buffer.
-    @param	mode		openning mode is a mask of:
+    @param	mode		opening mode is a mask of:
     				#GF_PARM_RMODE_STD
     				#GF_PARM_RMODE_REREAD
     				#GF_PARM_RMODE_CREAT
@@ -1017,7 +1017,7 @@ GfParmReadFile (const char *file, int mode)
     int			len;
     int			done;
 
-    /* search for an already openned header & clean the conf if necessary */
+    /* search for an already open header & clean the conf if necessary */
     conf = getSharedHeader (file, mode);
 
     /* Conf Header creation */
@@ -1044,7 +1044,7 @@ GfParmReadFile (const char *file, int mode)
 	parmHandle->flag = PARM_HANDLE_FLAG_PRIVATE;
     }
 
-    /* File openning */
+    /* File opening */
     if (mode & GFPARM_RMODE_REREAD) {
 	in = fopen (file, "r");
 	if (!in && ((mode & GFPARM_RMODE_CREAT) == 0)) {
@@ -1063,12 +1063,12 @@ GfParmReadFile (const char *file, int mode)
 		len = fread (buf, 1, sizeof(buf), in);
 		done = len < (int)sizeof(buf);
 		if (parseXml (parmHandle, buf, len, done)) {
-		    GfError ("gfParmReadFile: Parse failed in file \"%s\"\n", file);
+		    GfError ("gfParmReadFile: Parsing failed in file \"%s\"\n", file);
 		    goto bailout;
 		}
 		if (parmHandle->flag & PARM_HANDLE_FLAG_PARSE_ERROR) {
 		    /* parse error occured, ignore */
-		    GfError ("gfParmReadFile: Parse failed in file \"%s\"\n", file);
+		    GfError ("gfParmReadFile: Parsing failed in file \"%s\"\n", file);
 		    goto bailout;
 		}
 	    } while (!done);
@@ -1080,7 +1080,7 @@ GfParmReadFile (const char *file, int mode)
 
     GF_TAILQ_INSERT_HEAD (&parmHandleList, parmHandle, linkHandle);
 
-    GfOut ("GfParmReadFile: Openning \"%s\" (%p)\n", file, parmHandle);
+    GfOut ("GfParmReadFile: Opening \"%s\" (%p)\n", file, parmHandle);
 
     return parmHandle;
 
