@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    file                 : usr.xml
+    created              : Wed Jan 8 18:31:16 CET 2003
+    copyright            : (C) 2002 Andrew Sumner
+    email                : firechief@bluewin.ch
+    version              : $Id: usr.xml,v 1.2 2003/08/13 00:04:14 firechief Exp $
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
+
+<params name="GP3601" type="robotdef">
+  <section name="Robots">
+    <section name="index">
+
+      <section name="1">
+        <attstr name="name" val="GP3601 a12c"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="a"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-alfa12c"></attstr>
+        <attnum name="race number" val="86"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="2">
+        <attstr name="name" val="GP3601 p3"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="b"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-alfatipo"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="3">
+        <attstr name="name" val="GP3601 AU"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="c"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-autounion"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="4">
+        <attstr name="name" val="GP3601 Bug"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="d"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-bugatti"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="5">
+        <attstr name="name" val="GP3601 v8ri"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="f"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-maserati"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="6">
+        <attstr name="name" val="GP3601 6c"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="g"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-maserati6C34"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="7">
+        <attstr name="name" val="GP3601 w25"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="h"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+      <section name="8">
+        <attstr name="name" val="GP3601 era"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="e"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-era"></attstr>
+        <attnum name="race number" val="87"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
+      </section>
+
+
+    </section>
+  </section>
+</params>
