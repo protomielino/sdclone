@@ -22,7 +22,7 @@ SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp strategy.c
 
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml logo.rgb
-SHIPSUBDIRS = 1 2 cars
+SHIPSUBDIRS = cars
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-usr_GP3601_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
