@@ -40,7 +40,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <cstring>
+#include <string.h>
 #include <ctype.h>
 #include <assert.h>
 
