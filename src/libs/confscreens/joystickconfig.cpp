@@ -20,7 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <cstring>
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>

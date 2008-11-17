@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
+#include <cstring>
 #include <math.h>
 
 #include <tgf.h>

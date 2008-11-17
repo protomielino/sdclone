@@ -31,7 +31,7 @@
 
 #include <stdio.h>
 #include <assert.h>
-#include <string.h>
+#include <cstring>
 #include <time.h>
 #ifdef WIN32
 #include <windows.h>

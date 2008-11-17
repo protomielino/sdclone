@@ -27,7 +27,7 @@
 
 #include <tgf.h>
 #include <time.h>
-#include <string.h>
+#include <cstring>
 
 extern void gfDirInit(void);
 extern void gfModInit(void);
@@ -208,7 +208,7 @@ char * GfGetTimeStr(void)
     @param	sec	Time to convert
     @param	sgn	Flag to indicate if the sign (+) is to be displayed for positive values of time.
     @return	Time string.
-    @warning	The returned string has to be free by the caller.
+    @warning	The returned cstringas to be free by the caller.
  */
 char * GfTime2Str(tdble sec, int sgn)
 {

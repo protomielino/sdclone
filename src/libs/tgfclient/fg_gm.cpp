@@ -45,7 +45,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include <stdio.h>
-#include <string.h>
+#include <cstring>
 #include <stdlib.h>
 #include <math.h>
 

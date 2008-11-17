@@ -24,7 +24,7 @@
 */
 
 #include <stdlib.h>
-#include <string.h>
+#include <cstring>
 #ifdef WIN32
 #include <windows.h>
 #endif

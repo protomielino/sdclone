@@ -24,7 +24,7 @@
     @version	$Id: loadingscreen.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
 */
 
-#include <string.h>
+#include <cstring>
 #include <stdlib.h>
 #ifdef WIN32
 #include <windows.h>

@@ -20,7 +20,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <string.h>
+#include <cstring>
 
 #include <tgf.h>
 

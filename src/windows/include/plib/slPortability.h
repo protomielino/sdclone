@@ -47,7 +47,7 @@
 
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <string.h>
+#include <cstring>
 #include <limits.h>
 #include <math.h>
 

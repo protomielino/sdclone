@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 #include <stdlib.h>
-#include <string.h>
+#include <cstring>
 
 #include <GL/glut.h>
 

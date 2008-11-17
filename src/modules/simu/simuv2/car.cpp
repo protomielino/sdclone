@@ -19,7 +19,7 @@
 
 
 
-#include <string.h>
+#include <cstring>
 #include <stdio.h>
 
 #include "sim.h"

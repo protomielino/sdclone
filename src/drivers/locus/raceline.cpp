@@ -15,7 +15,7 @@
 
 #include <math.h>
 #include <stdlib.h>
-#include <string.h>
+#include <cstring>
 
 #include "tgf.h" 
 #include "track.h" 
