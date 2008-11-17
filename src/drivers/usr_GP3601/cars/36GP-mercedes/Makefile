@@ -16,7 +16,7 @@
 ROBOT       = usr_GP3601
 SHIPDIR     = drivers/${ROBOT}/cars/36GP-mercedes
 SHIP        = $(shell find *.xml -maxdepth 0 -type f -print)
-SHIPSUBDIRS = qualifying
+SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-usr_GP3601_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
