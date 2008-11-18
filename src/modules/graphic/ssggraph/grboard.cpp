@@ -244,7 +244,7 @@ cGrBoard::grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdb
 	glVertex2f(X1 + THNSSFG, Y1 + curH);
 	glVertex2f(X1 - THNSSFG, Y1 + curH);
 	glEnd();
-	GfuiPrintString(title, grBlue, GFUI_FONT_MEDIUM, (int)X1, (int)(Y1 - THNSSBG - GfuiFontHeight(GFUI_FONT_MEDIUM)), GFUI_ALIGN_HC_VB);
+	GfuiPrintString((char *)title, grBlue, GFUI_FONT_MEDIUM, (int)X1, (int)(Y1 - THNSSBG - GfuiFontHeight(GFUI_FONT_MEDIUM)), GFUI_ALIGN_HC_VB);
 }
 
 void 

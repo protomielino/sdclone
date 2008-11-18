@@ -55,7 +55,7 @@ void grInitSound(tSituation* s, int ncars)
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	const char *optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOpenALStr);
+	const char *optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, (char *)soundOpenALStr);
 	float global_volume = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (!strcmp(optionName, soundDisabledStr)) {
 		sound_mode = DISABLED;

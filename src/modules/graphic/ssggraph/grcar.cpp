@@ -472,7 +472,7 @@ grInitShadow(tCarElt *car)
 
 	grCarInfo[car->index].shadowBase = new ssgVtxTableShadow(GL_TRIANGLE_STRIP, shd_vtx, shd_nrm, shd_tex, shd_clr);
 	grMipMap = 0;
-	grCarInfo[car->index].shadowBase->setState(grSsgLoadTexState(shdTexName));
+	grCarInfo[car->index].shadowBase->setState(grSsgLoadTexState((char *)shdTexName));
 	grCarInfo[car->index].shadowCurr = (ssgVtxTableShadow *)grCarInfo[car->index].shadowBase->clone(SSG_CLONE_GEOMETRY);
 	grCarInfo[car->index].shadowAnchor->addKid(grCarInfo[car->index].shadowCurr);
 	ShadowAnchor->addKid(grCarInfo[car->index].shadowAnchor);
@@ -598,6 +598,7 @@ grInitCar(tCarElt *car)
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carName);
+	lg += sprintf(grFilePath + lg, "drivers/%d/%s;", car->_driverIndex, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s;", car->_modName);
 	lg += sprintf(grFilePath + lg, "cars/%s", car->_carName);
 
@@ -605,7 +606,7 @@ grInitCar(tCarElt *car)
 	if (strlen(param) != 0) {
 		grGammaValue = 1.8;
 		grMipMap = 0;
-		grCarInfo[index].wheelTexture = grSsgLoadTexState(param);
+		grCarInfo[index].wheelTexture = grSsgLoadTexState((char *)param);
 		/*if (grCarInfo[index].wheelTexture->getRef() > 0) {
 		grCarInfo[index].wheelTexture->deRef();
 	}*/
