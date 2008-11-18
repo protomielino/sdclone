@@ -43,9 +43,9 @@ char *grFilePath;			// Multiple path (';' separated) used to search for files.
 char *grTexturePath = NULL;	// Default ssg path.
 
 
-int grGetFilename(char *filename, char *filepath, char *buf)
+int grGetFilename(const char *filename, const char *filepath, char *buf)
 {
-	char *c1, *c2;
+	const char *c1, *c2;
 	int found = 0;
 	int lg;
 
@@ -134,7 +134,7 @@ typedef struct stlist
 static stlist * stateList = NULL;
 
 
-static grManagedState * grGetState(char *img)
+static grManagedState * grGetState(const char *img)
 {
     stlist	*curr;
 
@@ -185,10 +185,10 @@ static void grSetupState(grManagedState *st, char *buf)
 }
 
 
-ssgState * grSsgLoadTexState(char *img)
+ssgState * grSsgLoadTexState(const char *img)
 {
 	char buf[256];
-	char *s;
+	const char *s;
 	grManagedState *st; 
 
 	// remove the directory
@@ -216,10 +216,10 @@ ssgState * grSsgLoadTexState(char *img)
 	return (ssgState*)st;
 }
 
-ssgState * grSsgEnvTexState(char *img)
+ssgState * grSsgEnvTexState(const char *img)
 {
 	char buf[256];
-	char *s;
+	const char *s;
 	grMultiTexState *st;
 
 	// remove the directory
@@ -243,10 +243,10 @@ ssgState * grSsgEnvTexState(char *img)
 }
 
 ssgState *
-grSsgLoadTexStateEx(char *img, char *filepath, int wrap, int mipmap)
+grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap)
 {
 	char buf[256];
-	char *s;
+	const char *s;
 	grManagedState *st; 
 
 	// remove the directory
@@ -278,7 +278,7 @@ grSsgLoadTexStateEx(char *img, char *filepath, int wrap, int mipmap)
 void  grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
 {
 	char  buf[256];
-	char* sign;
+	const char* sign;
 
 	if (sec < 0.0) {
 		sec = -sec;

@@ -55,8 +55,8 @@ gfuiColorInit(void)
 {
 	void *hdle;
 	int  i, j;
-	char *rgba[4] = {GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA};
-	char *clr[GFUI_COLORNB] = {
+	const char *rgba[4] = {GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA};
+	const char *clr[GFUI_COLORNB] = {
 		GFSCR_ELT_BGCOLOR, GFSCR_ELT_TITLECOLOR, GFSCR_ELT_BGBTNFOCUS, GFSCR_ELT_BGBTNCLICK,
 		GFSCR_ELT_BGBTNENABLED, GFSCR_ELT_BGBTNDISABLED, GFSCR_ELT_BTNFOCUS, GFSCR_ELT_BTNCLICK,
 		GFSCR_ELT_BTNENABLED, GFSCR_ELT_BTNDISABLED, GFSCR_ELT_LABELCOLOR, GFSCR_ELT_TIPCOLOR,
@@ -752,7 +752,7 @@ GfuiSKeyEventRegisterCurrent(tfuiSKeyCallback onSKeyAction)
     @param	onKeyReleased	Callback function
  */
 void
-GfuiAddKey(void *scr, unsigned char key, char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+GfuiAddKey(void *scr, unsigned char key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
 	tGfuiKey	*curKey;
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
@@ -809,7 +809,7 @@ GfuiAddKey(void *scr, unsigned char key, char *descr, void *userData, tfuiCallba
     @param	onKeyReleased	Callback function
  */
 void
-GfuiRegisterKey(unsigned char key, char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+GfuiRegisterKey(unsigned char key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
 	GfuiAddKey(GfuiScreen, key, descr, userData, onKeyPressed, onKeyReleased);
 }
@@ -825,7 +825,7 @@ GfuiRegisterKey(unsigned char key, char *descr, void *userData, tfuiCallback onK
     @param	onKeyReleased	Callback function
  */
 void
-GfuiAddSKey(void *scr, int key, char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+GfuiAddSKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
 	tGfuiKey	*curKey;
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
@@ -969,7 +969,7 @@ GfuiScreenShot(void * /* notused */)
     @return	None.
  */
 void
-GfuiScreenAddBgImg(void *scr, char *filename)
+GfuiScreenAddBgImg(void *scr, const char *filename)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	void *handle;

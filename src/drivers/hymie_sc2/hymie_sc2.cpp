@@ -38,7 +38,7 @@
 #define BUFSIZE 20
 #define NBBOTS 10
 
-static char* botname[NBBOTS] = {
+static const char* botname[NBBOTS] = {
  "SC: Calvin Lang",
  "SC: Jon Stewart",
  "SC: Mick Donna",
@@ -70,8 +70,8 @@ extern "C" int hymie_sc2(tModInfo *modInfo)
 	memset(modInfo, 0, NBBOTS*sizeof(tModInfo));
 
 	for (i = 0; i < NBBOTS; i++) {
-		modInfo[i].name    = botname[i];  			// name of the module (short).
-		modInfo[i].desc    = botname[i];			// Description of the module (can be long).
+		modInfo[i].name    = strdup(botname[i]);		// name of the module (short).
+		modInfo[i].desc    = strdup(botname[i]);		// Description of the module (can be long).
 		modInfo[i].fctInit = InitFuncPt;			// Init function.
 		modInfo[i].gfId    = ROB_IDENT;				// Supported framework version.
 		modInfo[i].index   = i+1;						// Indices from 0 to 9.

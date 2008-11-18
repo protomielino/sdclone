@@ -31,7 +31,7 @@
 #define NO_DRV	"--- empty ---"
 #define dllname   "human"
 
-static char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 static const int nbLevels = sizeof(level_str) / sizeof(level_str[0]);
 
 static char buf[1024];
@@ -57,7 +57,8 @@ static int AutoReverseId;
 
 typedef struct tInfo
 {
-    char	*name;
+    const char	*name;
+    char        *mem_name;  // Seperate pointer to delete name if possible (NULL otherwise)
     char	*dispname;
 } tInfo;
 
@@ -90,7 +91,7 @@ typedef struct PlayerInfo
     tInfo	info;
     tCarInfo	*carinfo;
     int		racenumber;
-    char	*transmission;
+    const char	*transmission;
     int		nbpitstops;
     float	color[4];
     int		skilllevel;
@@ -98,6 +99,7 @@ typedef struct PlayerInfo
 } tPlayerInfo;
 
 #define _Name		info.name
+#define _MemName        info.mem_name
 #define _DispName	info.dispname
 
 static tPlayerInfo PlayersInfo[NB_DRV];
@@ -106,7 +108,7 @@ static tCatsInfoHead CatsInfoList;
 
 static tPlayerInfo	*curPlayer;
 
-static char *Yn[] = {HM_VAL_YES, HM_VAL_NO};
+static const char *Yn[] = {HM_VAL_YES, HM_VAL_NO};
 
 static void
 refreshEditVal(void)
@@ -180,6 +182,7 @@ GenCarsInfo(void)
 	tFList	*curFile;
 	void	*carparam;
 	char	*str;
+	const char	*cstr;
 	void	*hdle;
 
 	/* Empty the lists */
@@ -187,10 +190,10 @@ GenCarsInfo(void)
 		GF_TAILQ_REMOVE(&CatsInfoList, curCat, link);
 		while ((curCar = GF_TAILQ_FIRST(&(curCat->CarsInfoList))) != NULL) {
 			GF_TAILQ_REMOVE(&(curCat->CarsInfoList), curCar, link);
-			free(curCar->_Name);
+			free(curCar->_MemName);
 			free(curCar);
 		}
-		free(curCat->_Name);
+		free(curCat->_MemName);
 		free(curCat);
 	}
 
@@ -203,7 +206,8 @@ GenCarsInfo(void)
 			GF_TAILQ_INIT(&(curCat->CarsInfoList));
 			str = strchr(curFile->name, '.');
 			*str = '\0';
-			curCat->_Name = strdup(curFile->name);
+			curCat->_MemName = strdup(curFile->name);
+			curCat->_Name = curCat->_MemName;
 			sprintf(buf, "categories/%s.xml", curFile->name);
 			hdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 			if (!hdle) {
@@ -221,7 +225,8 @@ GenCarsInfo(void)
 	do {
 	    curFile = curFile->next;
 	    curCar = (tCarInfo*)calloc(1, sizeof(tCarInfo));
-	    curCar->_Name = strdup(curFile->name);
+	    curCar->_MemName = strdup(curFile->name);
+	    curCar->_Name = curCar->_MemName;
 	    sprintf(buf, "cars/%s/%s.xml", curFile->name, curFile->name);
 	    carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	    if (!carparam) {
@@ -229,11 +234,11 @@ GenCarsInfo(void)
 	    }
 	    curCar->_DispName = GfParmGetName(carparam);
 	    /* search for the category */
-	    str = GfParmGetStr(carparam, SECT_CAR, PRM_CATEGORY, "");
+	    cstr = GfParmGetStr(carparam, SECT_CAR, PRM_CATEGORY, "");
 	    curCat = GF_TAILQ_FIRST(&CatsInfoList);
 	    if (curCat != NULL) {
 		do {
-		    if (strcmp(curCat->_Name, str) == 0) {
+		    if (strcmp(curCat->_Name, cstr) == 0) {
 			break;
 		    }
 		} while ((curCat = GF_TAILQ_NEXT(curCat, link)) != NULL);
@@ -253,7 +258,7 @@ GenCarsInfo(void)
 	if (curCar == NULL) {
 	    GfOut("Removing empty category %s\n", tmpCat->_DispName);
 	    GF_TAILQ_REMOVE(&CatsInfoList, tmpCat, link);
-	    free(tmpCat->_Name);
+	    free(tmpCat->_MemName);
 	    free(tmpCat);
 	}
     } while (curCat  != NULL);
@@ -303,10 +308,10 @@ GenDrvList(void)
 	char sstring[256];
 	int i;
 	int j;
-	char *driver;
+	const char *driver;
 	tCarInfo *car;
 	tCatInfo *cat;
-	char *str;
+	const char *str;
 	int found;
 
 	sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
@@ -321,6 +326,7 @@ GenDrvList(void)
 		if (strlen(driver) == 0) {
 			PlayersInfo[i]._DispName = strdup(NO_DRV);
 			PlayersInfo[i]._Name = dllname;
+			PlayersInfo[i]._MemName = NULL;
 			PlayersInfo[i].carinfo = GF_TAILQ_FIRST(&((GF_TAILQ_FIRST(&CatsInfoList))->CarsInfoList));
 			PlayersInfo[i].racenumber = 0;
 			PlayersInfo[i].color[0] = 1.0;
@@ -330,6 +336,7 @@ GenDrvList(void)
 		} else {
 			PlayersInfo[i]._DispName = strdup(driver);
 			PlayersInfo[i]._Name = dllname;
+			PlayersInfo[i]._MemName = NULL;
 			PlayersInfo[i].skilllevel = 0;
 			str = GfParmGetStr(drvinfo, sstring, ROB_ATTR_LEVEL, level_str[0]);
 			for(j = 0; j < nbLevels; j++) {
@@ -581,7 +588,7 @@ ChangeTrans(void * /* dummy */)
     if (curPlayer == NULL) {
 	return;
     }
-    if (curPlayer->transmission != HM_VAL_AUTO) {
+    if (!strcmp(curPlayer->transmission,HM_VAL_AUTO)==0) {
 	curPlayer->transmission = HM_VAL_AUTO;
     } else {
 	curPlayer->transmission = HM_VAL_MANUAL;

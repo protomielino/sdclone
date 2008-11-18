@@ -44,29 +44,29 @@ static tdble	xmin, xmax, ymin, ymax, zmin, zmax;
 /*
  * Sides global variables
  */
-static char *KeySideSurface[2]    = {TRK_ATT_RSSURF, TRK_ATT_LSSURF};
-static char *KeySideWidth[2]      = {TRK_ATT_RSW, TRK_ATT_LSW};
-static char *KeySideStartWidth[2] = {TRK_ATT_RSWS, TRK_ATT_LSWS};
-static char *KeySideEndWidth[2]   = {TRK_ATT_RSWE, TRK_ATT_LSWE};
-static char *KeySideBankType[2]   = {TRK_ATT_RST, TRK_ATT_LST};
+static const char *KeySideSurface[2]    = {TRK_ATT_RSSURF, TRK_ATT_LSSURF};
+static const char *KeySideWidth[2]      = {TRK_ATT_RSW, TRK_ATT_LSW};
+static const char *KeySideStartWidth[2] = {TRK_ATT_RSWS, TRK_ATT_LSWS};
+static const char *KeySideEndWidth[2]   = {TRK_ATT_RSWE, TRK_ATT_LSWE};
+static const char *KeySideBankType[2]   = {TRK_ATT_RST, TRK_ATT_LST};
 
-static char *KeyBorderSurface[2]  = {TRK_ATT_RBSURF, TRK_ATT_LBSURF};
-static char *KeyBorderWidth[2]    = {TRK_ATT_RBW, TRK_ATT_LBW};
-static char *KeyBorderStyle[2]    = {TRK_ATT_RBS, TRK_ATT_LBS};
-static char *KeyBorderHeight[2]   = {TRK_ATT_RBH, TRK_ATT_LBH};
+static const char *KeyBorderSurface[2]  = {TRK_ATT_RBSURF, TRK_ATT_LBSURF};
+static const char *KeyBorderWidth[2]    = {TRK_ATT_RBW, TRK_ATT_LBW};
+static const char *KeyBorderStyle[2]    = {TRK_ATT_RBS, TRK_ATT_LBS};
+static const char *KeyBorderHeight[2]   = {TRK_ATT_RBH, TRK_ATT_LBH};
 
-static char *KeyBarrierSurface[2] = {TRK_ATT_RBASURF, TRK_ATT_LBASURF};
-static char *KeyBarrierWidth[2]   = {TRK_ATT_RBAW, TRK_ATT_LBAW};
-static char *KeyBarrierStyle[2]   = {TRK_ATT_RBAS, TRK_ATT_LBAS};
-static char *KeyBarrierHeight[2]  = {TRK_ATT_RBAH, TRK_ATT_LBAH};
+static const char *KeyBarrierSurface[2] = {TRK_ATT_RBASURF, TRK_ATT_LBASURF};
+static const char *KeyBarrierWidth[2]   = {TRK_ATT_RBAW, TRK_ATT_LBAW};
+static const char *KeyBarrierStyle[2]   = {TRK_ATT_RBAS, TRK_ATT_LBAS};
+static const char *KeyBarrierHeight[2]  = {TRK_ATT_RBAH, TRK_ATT_LBAH};
 
-static char *ValStyle[4] = {TRK_VAL_PLAN, TRK_VAL_WALL, TRK_VAL_CURB, TRK_VAL_FENCE};
+static const char *ValStyle[4] = {TRK_VAL_PLAN, TRK_VAL_WALL, TRK_VAL_CURB, TRK_VAL_FENCE};
 
 
 static tdble sideEndWidth[2];
 static tdble sideStartWidth[2];
 static int sideBankType[2];
-static char *sideMaterial[2];
+static const char *sideMaterial[2];
 static tTrackSurface *sideSurface[2];
 
 
@@ -75,20 +75,20 @@ static int envIndex;
 static tdble borderWidth[2];
 static tdble borderHeight[2];
 static int borderStyle[2];
-static char *borderMaterial[2];
+static const char *borderMaterial[2];
 static tTrackSurface *borderSurface[2];
 
 static tdble barrierWidth[2];
 static tdble barrierHeight[2];
 static int barrierStyle[2];
-static char *barrierMaterial[2];
+static const char *barrierMaterial[2];
 static tTrackSurface *barrierSurface[2];
 
 static tdble	GlobalStepLen = 0;
 static char	path[256];
 
 static tTrackSurface*
-AddTrackSurface(void *TrackHandle, tTrack *theTrack, char *material)
+AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
 {
     tTrackSurface	*curSurf;
 
@@ -127,7 +127,7 @@ static void
 InitSides(void *TrackHandle, tTrack *theTrack)
 {
     int side;
-    char *style;
+    const char *style;
 
     for (side = 0; side < 2; side++) {
 	sideMaterial[side] = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, KeySideSurface[side], TRK_VAL_GRASS);
@@ -184,7 +184,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     tdble	maxWidth;
     int		type;
     int		side;
-    char	*style;
+    const char	*style;
     tdble	Kew;
     static char	path[256];
 
@@ -789,12 +789,12 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
     tdble	etgtr, stgtr;
     tdble	stepslg = 0;
     int		steps, curStep;
-    char        *segtype = (char*)NULL;
-    char	*material;
+    const char  *segtype = (const char*)NULL;
+    const char	*material;
     tTrackSurface *surface;
     char	*segName;
     int		type;
-    char	*profil;
+    const char	*profil;
     tdble	totLength;
 
     tdble	tl, dtl, T1l, T2l;
@@ -873,11 +873,11 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 
 		/* Turn Marks */
 		if (ext) {
-			char *marks = GfParmGetCurStr(TrackHandle, path, TRK_ATT_MARKS, NULL);
+			char *marks = GfParmGetCurStrNC(TrackHandle, path, TRK_ATT_MARKS, NULL);
 			ind = 0;
 			if (marks) {
 				marks = strdup(marks);
-				char *s = strtok(marks, ";");
+				const char *s = strtok(marks, ";");
 				while ((s != NULL) && (ind < MAX_TMP_INTS)) {
 					mi[ind] = (int)strtol(s, NULL, 0);
 					ind++;
@@ -1284,13 +1284,13 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     tTrackSeg		*pitEnd = NULL;
     tTrackSeg		*curPitSeg = NULL;
     tTrackPitInfo	*pits;
-    char		*segName;
+    const char		*segName;
     int			segId;
     tRoadCam		*curCam;
     tTrkLocPos		trkPos;
     int			found = 0;
-    char		*paramVal;
-    char		*pitType;
+    const char		*paramVal;
+    const char		*pitType;
     static char		path[256];
     static char		path2[256];
     int			changeSeg;

@@ -115,9 +115,9 @@ reConfigRunState(void)
 {
     int		i;
     int		curConf;
-    char	*conf;
+    const char	*conf;
     int		numOpt;
-    char	*opt;
+    const char	*opt;
     void	*params = ReInfo->params;
 
     curConf = (int)GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
@@ -222,7 +222,7 @@ reSelectLoadFile(char *filename)
 static void
 reLoadMenu(void *prevHandle)
 {
-    char *str;
+    const char *str;
     void *params = ReInfo->params;
 
     fs.prevScreen = prevHandle;
@@ -241,7 +241,7 @@ reLoadMenu(void *prevHandle)
 int
 ReRacemanMenu(void)
 {
-    char	*str;
+    const char	*str;
     void	*params = ReInfo->params;
 
     if (racemanMenuHdle) {
@@ -301,7 +301,7 @@ reStateManage(void * /* dummy */)
 int
 ReNewTrackMenu(void)
 {
-    char	*str;
+    const char	*str;
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
 

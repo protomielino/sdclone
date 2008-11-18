@@ -210,7 +210,7 @@ extern "C" int
 human(tModInfo *modInfo)
 {
 	int i;
-	char *driver;
+	const char *driver;
 
 	memset(modInfo, 0, 10*sizeof(tModInfo));
 
@@ -261,7 +261,7 @@ human(tModInfo *modInfo)
  */
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s)
 {
-	char *carname;
+	const char *carname;
 	char *s1, *s2;
 	char trackname[256];
 	tdble fuel;
@@ -382,7 +382,7 @@ void newrace(int index, tCarElt* car, tSituation *s)
 #endif
 #endif
 
-	char *traintype =GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+	const char *traintype =GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
 	if (strcmp(traintype, VAL_TRANS_RWD) == 0) {
 		HCtx[idx]->drivetrain = DRWD;
 	} else if (strcmp(traintype, VAL_TRANS_FWD) == 0) {

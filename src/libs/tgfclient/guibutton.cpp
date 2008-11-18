@@ -60,7 +60,7 @@ gfuiButtonInit(void)
 		<br>-1 Error
  */
 int
-GfuiGrButtonCreate(void *scr, char *disabled, char *enabled, char *focused, char *pushed,
+GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
 		   int x, int y, int align, int mouse,
 		   void *userDataOnPush, tfuiCallback onPush, 
 		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
@@ -186,7 +186,7 @@ GfuiGrButtonCreate(void *scr, char *disabled, char *enabled, char *focused, char
 		<br>-1 Error
  */
 int
-GfuiButtonStateCreate(void *scr, char *text, int font, int x, int y, int width, int align, int mouse,
+GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
 		      void *userDataOnPush, tfuiCallback onPush, 
 		      void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -245,7 +245,7 @@ GfuiButtonStateCreate(void *scr, char *text, int font, int x, int y, int width, 
 		<br>-1 Error
  */
 int
-GfuiButtonCreate(void *scr, char *text, int font, int x, int y, int width, int align, int mouse,
+GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
 		 void *userDataOnPush, tfuiCallback onPush, 
 		 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -332,7 +332,7 @@ GfuiButtonCreate(void *scr, char *text, int font, int x, int y, int width, int a
     @param	text	New label of the button
  */
 void
-GfuiButtonSetText(void *scr, int id, char *text)
+GfuiButtonSetText(void *scr, int id, const char *text)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;

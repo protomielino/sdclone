@@ -47,17 +47,17 @@ static tdble	xmin, xmax, ymin, ymax, zmin, zmax;
 /*
  * Sides global variables
  */
-static char *SectSide[2]    = {TRK_SECT_RSIDE, TRK_SECT_LSIDE};
-static char *SectBorder[2]  = {TRK_SECT_RBORDER, TRK_SECT_LBORDER};
-static char *SectBarrier[2] = {TRK_SECT_RBARRIER, TRK_SECT_LBARRIER};
+static const char *SectSide[2]    = {TRK_SECT_RSIDE, TRK_SECT_LSIDE};
+static const char *SectBorder[2]  = {TRK_SECT_RBORDER, TRK_SECT_LBORDER};
+static const char *SectBarrier[2] = {TRK_SECT_RBARRIER, TRK_SECT_LBARRIER};
 
-static char *ValStyle[] = {TRK_VAL_PLAN, TRK_VAL_CURB, TRK_VAL_WALL, TRK_VAL_FENCE, TRK_VAL_FENCE};
+static const char *ValStyle[] = {TRK_VAL_PLAN, TRK_VAL_CURB, TRK_VAL_WALL, TRK_VAL_FENCE, TRK_VAL_FENCE};
 
 
 static tdble sideEndWidth[2];
 static tdble sideStartWidth[2];
 static int sideBankType[2];
-static char *sideMaterial[2];
+static const char *sideMaterial[2];
 static tTrackSurface *sideSurface[2];
 
 
@@ -67,20 +67,20 @@ static tdble DoVfactor=1.0;
 static tdble borderWidth[2];
 static tdble borderHeight[2];
 static int borderStyle[2];
-static char *borderMaterial[2];
+static const char *borderMaterial[2];
 static tTrackSurface *borderSurface[2];
 
 static tdble barrierWidth[2];
 static tdble barrierHeight[2];
 static int barrierStyle[2];
-static char *barrierMaterial[2];
+static const char *barrierMaterial[2];
 static tTrackSurface *barrierSurface[2];
 
 static tdble	GlobalStepLen = 0;
 static char	path[256];
 
 static tTrackSurface*
-AddTrackSurface(void *TrackHandle, tTrack *theTrack, char *material)
+AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
 {
     tTrackSurface	*curSurf;
     
@@ -119,7 +119,7 @@ static void
 InitSides(void *TrackHandle, tTrack *theTrack)
 {
     int 	side;
-    char 	*style;
+    const char 	*style;
     static char	path[256];
     
     for (side = 0; side < 2; side++) {
@@ -183,7 +183,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     tdble	maxWidth;
     int		type;
     int		side;
-    char	*style;
+    const char	*style;
     tdble	Kew;
     static char	path[256];
     static char	path2[256];
@@ -798,12 +798,12 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
     tdble	etgtr, stgtr;
     tdble	stepslg = 0;
     int		steps, curStep;
-    char        *segtype = (char*)NULL;
-    char	*material;
+    const char  *segtype = (const char*)NULL;
+    const char	*material;
     tTrackSurface *surface;
     char	*segName;
     int		type;
-    char	*profil;
+    const char	*profil;
     tdble	totLength;
 
     tdble	tl, dtl, T1l, T2l;
@@ -885,7 +885,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 	
 	/* Turn Marks */
 	if (ext) {
-	    char *marks = GfParmGetCurStr(TrackHandle, path, TRK_ATT_MARKS, NULL);
+	    char *marks = GfParmGetCurStrNC(TrackHandle, path, TRK_ATT_MARKS, NULL);
 	    ind = 0;
 	    if (marks) {
 		marks = strdup(marks);
@@ -1318,7 +1318,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     tRoadCam		*curCam;
     tTrkLocPos		trkPos;
     int			found = 0;
-    char		*paramVal;
+    const char		*paramVal;
     static char		path[256];
     static char		path2[256];
     int			changeSeg;
@@ -1334,7 +1334,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     /* PITS */
     pits = &(theTrack->pits);
     sprintf(path2, "%s/%s", TRK_SECT_MAIN, TRK_SECT_PITS);
-    segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_ENTRY, NULL);
+    segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_ENTRY, NULL);
     
     if (segName != 0) {
 	sprintf(path, "%s/%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, segName);
@@ -1355,7 +1355,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
 
 	/* Pits Exit */
-	segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_EXIT, NULL);
+	segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_EXIT, NULL);
 	if (segName != 0) {
 	    /* Search backward the last segment with that name */
 	    pitExitSeg = theTrack->seg; /* last track segment */
@@ -1374,7 +1374,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
 
 	/* Pits Start */
-	segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_START, NULL);
+	segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_START, NULL);
 	if (segName != 0) {
 	    pitStart = theTrack->seg;
 	    found = 0;
@@ -1393,7 +1393,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
 
 	/* Pits End */
-	segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_END, NULL);
+	segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_END, NULL);
 	if (segName != 0) {
 	    /* Search backward the last segment with that name */
 	    pitEnd = theTrack->seg; /* last track segment */
@@ -1553,7 +1553,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 		*camList = curCam;
 	    }
 	    curCam->name = GfParmListGetCurEltName(TrackHandle, TRK_SECT_CAM);
-	    segName = GfParmGetCurStr(TrackHandle, TRK_SECT_CAM, TRK_ATT_SEGMENT, NULL);
+	    segName = GfParmGetCurStrNC(TrackHandle, TRK_SECT_CAM, TRK_ATT_SEGMENT, NULL);
 	    if (segName == 0) {
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_SEGMENT);
 	    }
@@ -1573,7 +1573,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    TrackLocal2Global(&trkPos, &(curCam->pos.x), &(curCam->pos.y));
 	    curCam->pos.z = TrackHeightL(&trkPos) + GfParmGetCurNum(TrackHandle, TRK_SECT_CAM, TRK_ATT_HEIGHT, (char*)NULL, 0);
 
-	    segName = GfParmGetCurStr(TrackHandle, TRK_SECT_CAM, TRK_ATT_CAM_FOV, NULL);
+	    segName = GfParmGetCurStrNC(TrackHandle, TRK_SECT_CAM, TRK_ATT_CAM_FOV, NULL);
 	    if (segName == 0) {
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_CAM_FOV);
 	    }
@@ -1586,7 +1586,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 		}
 		curSeg = curSeg->next;
 	    }
-	    segName = GfParmGetCurStr(TrackHandle, TRK_SECT_CAM, TRK_ATT_CAM_FOVE, NULL);
+	    segName = GfParmGetCurStrNC(TrackHandle, TRK_SECT_CAM, TRK_ATT_CAM_FOVE, NULL);
 	    if (segName == 0) {
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_CAM_FOVE);
 	    }

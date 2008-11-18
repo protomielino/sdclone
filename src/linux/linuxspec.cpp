@@ -50,7 +50,7 @@
  *	
  */
 static int
-linuxModLoad(unsigned int /* gfid */, char *sopath, tModList **modlist)
+linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 {
     tfModInfo		fModInfo;	/* init function of the modules */
     void		*handle;	/* */
@@ -119,7 +119,7 @@ linuxModLoad(unsigned int /* gfid */, char *sopath, tModList **modlist)
  *	
  */
 static int
-linuxModInfo(unsigned int /* gfid */, char *sopath, tModList **modlist)
+linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 {
     tfModInfo		fModInfo;	/* init function of the modules */
     void		*handle;	/* */
@@ -214,7 +214,7 @@ linuxModInfo(unsigned int /* gfid */, char *sopath, tModList **modlist)
  *	
  */
 static int
-linuxModLoadDir(unsigned int gfid, char *dir, tModList **modlist)
+linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 {
     tfModInfo		fModInfo;	/* init function of the modules */
     char		dname[256];	/* name of the funtions */
@@ -319,7 +319,7 @@ linuxModLoadDir(unsigned int gfid, char *dir, tModList **modlist)
  *	
  */
 static int
-linuxModInfoDir(unsigned int /* gfid */, char *dir, int level, tModList **modlist)
+linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **modlist)
 {
     tfModInfo		fModInfo;	/* init function of the modules */
     char		dname[256];	/* name of the funtions */
@@ -531,7 +531,7 @@ linuxModFreeInfoList(tModList **modlist)
  *	list of directory entries
  */
 static tFList *
-linuxDirGetList(char *dir)
+linuxDirGetList(const char *dir)
 {
 	DIR *dp;
 	struct dirent *ep;
@@ -589,7 +589,7 @@ linuxDirGetList(char *dir)
  *	list of directory entries
  */
 static tFList *
-linuxDirGetListFiltered(char *dir, char *suffix)
+linuxDirGetListFiltered(const char *dir, const char *suffix)
 {
 	DIR	*dp;
 	struct dirent *ep;

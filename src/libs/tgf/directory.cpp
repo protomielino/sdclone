@@ -41,7 +41,7 @@ gfDirInit(void)
     @param	dir	directory name
     @return	The list of files
  */
-tFList * GfDirGetList(char *dir)
+tFList * GfDirGetList(const char *dir)
 {
 	if (GfOs.dirGetList) {
 		return GfOs.dirGetList(dir);
@@ -56,7 +56,7 @@ tFList * GfDirGetList(char *dir)
     @param	dir	directory name
     @return	The list of files
  */
-tFList * GfDirGetListFiltered(char *dir, char *suffix)
+tFList * GfDirGetListFiltered(const char *dir, const char *suffix)
 {
 	if (GfOs.dirGetListFiltered) {
 		return GfOs.dirGetListFiltered(dir, suffix);

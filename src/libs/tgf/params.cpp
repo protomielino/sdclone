@@ -138,7 +138,7 @@ static struct parmHead	parmHandleList;
 
 static char *getFullName(const char *sectionName, const char *paramName);
 static struct param *getParamByName (struct parmHeader *conf, const char *sectionName, const char *paramName, int flag);
-static void removeParamByName (struct parmHeader *conf, char *sectionName, char *paramName);
+static void removeParamByName (struct parmHeader *conf, const char *sectionName, const char *paramName);
 static void removeParam (struct parmHeader *conf, struct section *section, struct param *param);
 static struct param *addParam (struct parmHeader *conf, struct section *section, const char *paramName, const char *value);
 static void removeSection (struct parmHeader *conf, struct section *section);
@@ -227,7 +227,7 @@ getParamByName (struct parmHeader *conf, const char *sectionName, const char *pa
 
 /* Remove a parameter */
 static void
-removeParamByName (struct parmHeader *conf, char *sectionName, char *paramName)
+removeParamByName (struct parmHeader *conf, const char *sectionName, const char *paramName)
 {
     char		*fullName;
     struct param	*param;
@@ -1365,7 +1365,7 @@ GfParmSetDTD (void *parmHandle, char *dtd, char*header)
     <br>1 if Error
 */
 int
-GfParmWriteFile (const char *file, void *parmHandle, char *name)
+GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 {
     struct parmHandle	*handle = (struct parmHandle *)parmHandle;
     struct parmHeader	*conf = handle->conf;
@@ -1760,7 +1760,7 @@ GfParmGetFileName (void *handle)
     @return	element count
  */
 int
-GfParmGetEltNb (void *handle, char *path)
+GfParmGetEltNb (void *handle, const char *path)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -1799,7 +1799,7 @@ GfParmGetEltNb (void *handle, char *path)
     @see	GfParmListGetCurEltName
  */
 int
-GfParmListSeekFirst (void *handle, char *path)
+GfParmListSeekFirst (void *handle, const char *path)
 {
 
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
@@ -1831,7 +1831,7 @@ GfParmListSeekFirst (void *handle, char *path)
     @see	GfParmListGetCurEltName
  */
 int
-GfParmListSeekNext (void *handle, char *path)
+GfParmListSeekNext (void *handle, const char *path)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -1864,7 +1864,7 @@ GfParmListSeekNext (void *handle, char *path)
 		<br>-1 Error
  */
 int
-GfParmListClean (void *handle, char *path)
+GfParmListClean (void *handle, const char *path)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -1898,7 +1898,7 @@ GfParmListClean (void *handle, char *path)
     @note	String MUST be released by called.
  */
 char *
-GfParmListGetCurEltName (void *handle, char *path)
+GfParmListGetCurEltName (void *handle, const char *path)
 {
 	struct parmHandle *parmHandle = (struct parmHandle *)handle;
 	struct parmHeader *conf = parmHandle->conf;
@@ -1942,8 +1942,46 @@ GfParmListGetCurEltName (void *handle, char *path)
     		copy it elsewhere, because removing the attribute will
     		produce incoherent pointer.
 */
+const char *
+GfParmGetStr (void *parmHandle, const char *path, const char *key, const char *deflt)
+{
+	struct param *param;
+	struct parmHandle *handle = (struct parmHandle *)parmHandle;
+	struct parmHeader *conf;
+	char *val;
+
+	conf = handle->conf;
+
+	if (handle->magic != PARM_MAGIC) {
+		GfFatal ("gfParmGetStr: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	param = getParamByName (conf, path, key, 0);
+	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR)) {
+		return deflt;
+	}
+
+	val = param->value;
+
+	return val;
+}
+
+/** Get string parameter value.
+    @ingroup	paramsdata
+    @param	parmHandle	Configuration handle
+    @param	path		Parameter section name
+    @param	key		Parameter name
+    @param	deflt		Default value if parameter not existing
+    @return	Parameter value
+    <br>deflt if Error or not found
+    @note	The pointer returned is for immediate use, if you plan
+    		to keep the value for a long time, it is necessary to
+    		copy it elsewhere, because removing the attribute will
+    		produce incoherent pointer.
+*/
 char *
-GfParmGetStr (void *parmHandle, const char *path, const char *key, char *deflt)
+GfParmGetStrNC (void *parmHandle, const char *path, const char *key, char *deflt)
 {
 	struct param *param;
 	struct parmHandle *handle = (struct parmHandle *)parmHandle;
@@ -1977,8 +2015,43 @@ GfParmGetStr (void *parmHandle, const char *path, const char *key, char *deflt)
     @warning	the return value is allocated by the function the caller must free it.
     @see	GfParmListSeekNext
 */
+const char *
+GfParmGetCurStr (void *handle, const char *path, const char *key, const char *deflt)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*section;
+    struct param	*param;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetCurStr: bad handle (%p)\n", parmHandle);
+	return deflt;
+    }
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return deflt;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, 0);
+    if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR)) {
+	return deflt;
+    }
+
+    return param->value;
+}
+
+/** Get a string parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	deflt	default string	
+    @return	parameter value
+    @warning	the return value is allocated by the function the caller must free it.
+    @see	GfParmListSeekNext
+*/
 char *
-GfParmGetCurStr (void *handle, char *path, char *key, char *deflt)
+GfParmGetCurStrNC (void *handle, const char *path, const char *key, char *deflt)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -2046,7 +2119,7 @@ GfParmGetNum (void *handle, const char *path, const char *key, const char *unit,
     @return	parameter value
  */
 tdble
-GfParmGetCurNum (void *handle, char *path, char *key, char *unit, tdble deflt)
+GfParmGetCurNum (void *handle, const char *path, const char *key, const char *unit, tdble deflt)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -2085,7 +2158,7 @@ GfParmGetCurNum (void *handle, char *path, char *key, char *unit, tdble deflt)
     @warning	The key is created is necessary	
  */
 int
-GfParmSetStr(void *handle, char *path, char *key, char *val)
+GfParmSetStr(void *handle, const char *path, const char *key, const char *val)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -2129,7 +2202,7 @@ GfParmSetStr(void *handle, char *path, char *key, char *val)
     @warning	The key is created is necessary	
  */
 int
-GfParmSetCurStr(void *handle, char *path, char *key, char *val)
+GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;
@@ -2258,7 +2331,7 @@ GfParmSetNumEx(void *handle, char *path, char *key, char *unit, tdble val, tdble
     @warning	The key is created is necessary
  */
 int
-GfParmSetCurNum(void *handle, char *path, char *key, char *unit, tdble val)
+GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
     struct parmHeader	*conf = parmHandle->conf;

@@ -267,7 +267,7 @@ xmlReadFile(const char *file)
 }
 
 static void
-wr(int indent, char *buf, FILE *out)
+wr(int indent, const char *buf, FILE *out)
 {
     char		blank[BUFMAX];
     int			i;

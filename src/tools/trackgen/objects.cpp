@@ -121,7 +121,7 @@ InitObjects(tTrack *track, void *TrackHandle)
 {
     int			objnb, i;
     struct objdef	*curObj;
-    char		*objName;
+    const char		*objName;
     static char		*search;
     myLoaderOptions	options ;
     sgMat4		m;
@@ -417,7 +417,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 {
     ssgLoaderOptionsEx	options;
     int			i, j;
-    char		*map;
+    const char		*map;
     unsigned char	*MapImage;
     int			width, height;
     tdble		xmin, xmax, ymin, ymax;
@@ -425,7 +425,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
     tdble		kX, kY, dX, dY;
     unsigned int	clr;
     int			index;
-    char		*extName;
+    const char		*extName;
     FILE		*curFd;
 
     ssgSetCurrentOptions(&options);

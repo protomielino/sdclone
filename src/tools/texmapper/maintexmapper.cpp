@@ -32,10 +32,10 @@
 
 #include <tgfclient.h>
 
-char	*InputFileName = NULL;
-char	*OutputFileName = NULL;
-char	*ParamFileName = NULL;
-char	*SkinFileName = NULL;
+const char	*InputFileName = NULL;
+const char	*OutputFileName = NULL;
+const char	*ParamFileName = NULL;
+const char	*SkinFileName = NULL;
 void	*ParamHandle = NULL;
 
 FILE	*in, *out;
@@ -49,7 +49,7 @@ typedef struct Face
     GF_TAILQ_ENTRY(struct Face) link;
 
     ssgTransform	*branch;
-    char	*faceName;
+    const char	*faceName;
 
     sgVec3	lbbmin;		/* Bounding (unscaled) box */
     sgVec3	lbbmax;
@@ -220,8 +220,8 @@ void init_graphics ()
 {
     int   fake_argc = 1 ;
     char *fake_argv[3] ;
-    fake_argv[0] = "TexMapper" ;
-    fake_argv[1] = "Texture Auto Mapper" ;
+    fake_argv[0] = strdup("TexMapper") ;
+    fake_argv[1] = strdup("Texture Auto Mapper") ;
     fake_argv[2] = NULL ;
 
     /*
@@ -255,6 +255,9 @@ void init_graphics ()
     load_database();
 
     glutMainLoop();
+
+    free(fake_argv[0]);
+    free(fake_argv[1]);
 }
 
 void updt_bbox(ssgEntity *start, sgVec3 min, sgVec3 max)
@@ -543,7 +546,7 @@ void load_params(void)
     char	*col;
     char	buf[256];
     tFace	*curFace;
-    char	*s;
+    const char	*s;
     
     ImgSize  = (int)GfParmGetNum(ParamHandle, "image", "size", NULL, 256);
 

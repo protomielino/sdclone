@@ -46,7 +46,7 @@
 
 #include "raceinit.h"
 
-static char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 
 static tModList *reEventModList = 0;
 tModList *ReRaceModList = 0;
@@ -63,7 +63,7 @@ typedef struct
 void
 ReInit(void)
 {
-	char *dllname;
+	const char *dllname;
 	char key[256];
 	tRmMovieCapture *capture;
 
@@ -163,7 +163,7 @@ reRegisterRaceman(tFList *racemanCur)
 {
 	sprintf(buf, "%sconfig/raceman/%s", GetLocalDir(), racemanCur->name);
 	racemanCur->userData = GfParmReadFile(buf, GFPARM_RMODE_STD);
-	racemanCur->dispName = GfParmGetStr(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_NAME, 0);
+	racemanCur->dispName = GfParmGetStrNC(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_NAME, 0);
 }
 
 /* Sort race managers by priority */
@@ -270,7 +270,7 @@ initStartingGrid(void)
 	tdble speedInit;
 	tdble heightInit;
 	tCarElt *car;
-	char *pole;
+	const char *pole;
 	void *trHdle = ReInfo->track->params;
 	void *params = ReInfo->params;
 
@@ -470,18 +470,18 @@ ReInitCars(void)
 	int nCars;
 	int index;
 	int i, j, k;
-	char *cardllname;
+	const char *cardllname;
 	int robotIdx;
 	tModInfo *curModInfo;
 	tRobotItf *curRobot;
 	void *handle;
-	char *category;
+	const char *category;
 	void *cathdle;
 	void *carhdle;
 	void *robhdle;
 	tCarElt *elt;
-	char *focused;
-	char *str;
+	const char *focused;
+	const char *str;
 	int focusedIdx;
 	void *params = ReInfo->params;
 
@@ -650,7 +650,7 @@ reDumpTrack(tTrack *track, int verbose)
     int		i;
     tTrackSeg	*seg;
 #ifdef DEBUG
-    char	*stype[4] = { "", "RGT", "LFT", "STR" };
+    const char	*stype[4] = { "", "RGT", "LFT", "STR" };
 #endif
 
     RmLoadingScreenSetText("Loading Track Geometry...");
@@ -734,8 +734,8 @@ reDumpTrack(tTrack *track, int verbose)
 int
 ReInitTrack(void)
 {
-    char	*trackName;
-    char	*catName;
+    const char	*trackName;
+    const char	*catName;
     int		curTrkIdx;
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
@@ -802,7 +802,7 @@ ReGetCurrentRaceName(void)
 
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
     sprintf(path, "%s/%d", RM_SECT_RACES, curRaceIdx);
-    return GfParmGetStr(params, path, RM_ATTR_NAME, 0);
+    return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
 }
 
 char *
@@ -814,5 +814,5 @@ ReGetPrevRaceName(void)
 
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1) - 1;
     sprintf(path, "%s/%d", RM_SECT_RACES, curRaceIdx);
-    return GfParmGetStr(params, path, RM_ATTR_NAME, 0);
+    return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
 }

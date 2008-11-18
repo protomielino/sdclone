@@ -49,7 +49,7 @@ ssggraph(tModInfo *modInfo);
 *	
 */
 static int
-windowsModLoad(unsigned int gfid, char *sopath, tModList **modlist)
+windowsModLoad(unsigned int gfid, const char *sopath, tModList **modlist)
 {
     tfModInfo	fModInfo;	/* init function of the modules */
     HMODULE	handle;		/* */
@@ -138,7 +138,7 @@ windowsModLoad(unsigned int gfid, char *sopath, tModList **modlist)
 *	
 */
 static int
-windowsModInfo(unsigned int gfid, char *sopath, tModList **modlist)
+windowsModInfo(unsigned int gfid, const char *sopath, tModList **modlist)
 {
     tfModInfo	fModInfo;	/* init function of the modules */
     HMODULE	handle;		/* */
@@ -233,7 +233,7 @@ windowsModInfo(unsigned int gfid, char *sopath, tModList **modlist)
 *	
 */
 static int
-windowsModLoadDir(unsigned int gfid, char *dir, tModList **modlist)
+windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 {
     tfModInfo	fModInfo;	/* init function of the modules */
     char	dname[256];	/* name of the funtions */
@@ -325,7 +325,7 @@ windowsModLoadDir(unsigned int gfid, char *dir, tModList **modlist)
 *	
 */
 static int
-windowsModInfoDir(unsigned int gfid, char *dir, int level, tModList **modlist)
+windowsModInfoDir(unsigned int gfid, const char *dir, int level, tModList **modlist)
 {
     tfModInfo	fModInfo;	/* init function of the modules */
     char	dname[256];	/* name of the funtions */
@@ -516,7 +516,7 @@ windowsModFreeInfoList(tModList **modlist)
 *	list of directory entries
 */
 static tFList *
-windowsDirGetList(char *dir)
+windowsDirGetList(const char *dir)
 {
     tFList	*flist = NULL;
     tFList	*curf;
@@ -574,7 +574,7 @@ windowsDirGetList(char *dir)
 *	list of directory entries
 */
 static tFList *
-windowsDirGetListFiltered(char *dir, char *suffix)
+windowsDirGetListFiltered(const char *dir, const char *suffix)
 {
     tFList	*flist = NULL;
     tFList	*curf;

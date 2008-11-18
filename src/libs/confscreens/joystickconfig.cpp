@@ -47,7 +47,7 @@ static int	rawb[NUM_JOY] = {0};
 
 #define OFFSET_CMD	5
 
-static char *Instructions[] = {
+static const char *Instructions[] = {
     "Center the joystick then press a button",
     "Steer left then press a button",
     "Steer right then press a button",
@@ -61,7 +61,7 @@ static char *Instructions[] = {
 static int CalState;
 static int InstId;
 
-static char *LabName[] = { "Steer", "Throttle", "Brake", "Clutch" };
+static const char *LabName[] = { "Steer", "Throttle", "Brake", "Clutch" };
 static int  LabAxisId[4];
 static int  LabMinId[4];
 static int  LabMaxId[4];

@@ -31,14 +31,14 @@ extern void *TorcsControlMenuInit(void *prevMenu, int index);
 
 typedef struct
 {
-    char	*name;
+    const char	*name;
     tCtrlRef	ref;
     int		Id;
-    char	*minName;
+    const char	*minName;
     float	min;
-    char	*maxName;
+    const char	*maxName;
     float	max;
-    char	*powName;
+    const char	*powName;
     float	pow;
     int		keyboardPossible;
 } tCmdInfo;

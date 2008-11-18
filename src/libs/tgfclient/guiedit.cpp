@@ -54,7 +54,7 @@ gfuiEditboxInit(void)
 		<br>-1 Error
  */
 int
-GfuiEditboxCreate(void *scr, char *text, int font, int x, int y, int width, int maxlen,
+GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width, int maxlen,
 		  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiEditbox	*editbox;
@@ -378,7 +378,7 @@ GfuiEditboxGetString(void *scr, int id)
     @param	text		text to set
     @return	none
  */
-void GfuiEditboxSetString(void *scr, int id, char *text)
+void GfuiEditboxSetString(void *scr, int id, const char *text)
 {
     tGfuiObject		*curObject;
     tGfuiEditbox	*editbox;

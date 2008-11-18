@@ -28,10 +28,10 @@
 #endif
 #include <tgf.h>
 char	*catfile = NULL;
-char	*infile = "carp.txt";
-char	*outfile = "carp.xml";
+const char	*infile = "carp.txt";
+const char	*outfile = "carp.xml";
 
-char	*gears[] = {"r", "n", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
+const char	*gears[] = {"r", "n", "1", "2", "3", "4", "5", "6", "7", "8", "9"};
 void usage(void)
 {
     fprintf(stderr, "Car Specifications Converter $Revision: 1.2 $ \n");

@@ -164,7 +164,7 @@ rmSelectDeselect(void * /* dummy */ )
     char	*name;
     int		src, dst;
     tDrvElt	*curDrv;
-    char	*cardllname;
+    const char	*cardllname;
     int		robotIdx;
     int		sel;
 
@@ -249,13 +249,13 @@ RmDriversSelect(void *vs)
     tModList	*curmod;
     char	dname[256];
     char	*sp;
-    char	*cardllname;
+    const char	*cardllname;
     int		i, index;
     tDrvElt	*curDrv;
     int		nCars, robotIdx;
     void	*robhdle;
     struct stat st;
-    char	*carName;
+    const char	*carName;
     void	*carhdle;
     int		human;
 

@@ -34,7 +34,7 @@
 static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
 
 /* list of available simulation engine */
-static char *simuVersionList[] = {"simuv2", "simuv3"};
+static const char *simuVersionList[] = {"simuv2", "simuv3"};
 static const int nbVersions = sizeof(simuVersionList) / sizeof(simuVersionList[0]);
 static int curVersion = 0;
 
@@ -48,7 +48,7 @@ static void	*prevHandle = NULL;
 
 static void ReadSimuCfg(void)
 {
-	char *versionName;
+	const char *versionName;
 	int i;
 
 	char buf[1024];

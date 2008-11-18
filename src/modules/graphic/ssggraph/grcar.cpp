@@ -106,7 +106,7 @@ initWheel(tCarElt *car, int wheel_index)
 	sgVec2	tex;
 	float	b_offset = 0;
 	tdble	curAngle = 0.0;
-    char *wheel_obj;
+	const char *wheel_obj;
 
 #define BRK_BRANCH	16
 #define BRK_ANGLE	(2.0 * M_PI / (tdble)BRK_BRANCH)
@@ -414,7 +414,7 @@ void
 grInitShadow(tCarElt *car)
 {
 	char		buf[256];
-	char		*shdTexName;
+	const char	*shdTexName;
 	int			i;
 	float		x;
 	sgVec3		vtx;
@@ -531,13 +531,13 @@ grInitCar(tCarElt *car)
 	int nranges;
 	int i, j;
 	void *handle;
-	char *param;
+	const char *param;
 	int lg;
 	char path[256];
 	myLoaderOptions options;
 	sgVec3 lightPos;
 	int lightNum;
-	char *lightType;
+	const char *lightType;
 	int lightTypeNum;
 
 

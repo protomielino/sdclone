@@ -100,7 +100,8 @@ ReUpdateStandings(void)
 	int			maxDrv;
 	int			curDrv;
 	int			runDrv;
-	char		*carName;
+	const char		*carName;
+	char			*tmpCarName;
 	char		*modName;
 	int			drvIdx;
 	int			points;
@@ -158,7 +159,7 @@ ReUpdateStandings(void)
 				break;
 			}
 			/* Swap with preceeding */
-			carName = standings[j].carName;
+			tmpCarName = standings[j].carName;
 			modName = standings[j].modName;
 			drvIdx  = standings[j].drvIdx;
 			points  = standings[j].points;
@@ -168,7 +169,7 @@ ReUpdateStandings(void)
 			standings[j].drvIdx  = standings[j - 1].drvIdx;
 			standings[j].points  = standings[j - 1].points;
 		
-			standings[j - 1].carName = carName;
+			standings[j - 1].carName = tmpCarName;
 			standings[j - 1].modName = modName;
 			standings[j - 1].drvIdx  = drvIdx;
 			standings[j - 1].points  = points;
@@ -198,7 +199,7 @@ ReUpdateStandings(void)
 
 
 void
-ReStoreRaceResults(char *race)
+ReStoreRaceResults(const char *race)
 {
 	int		i;
 	int		nCars;
@@ -313,7 +314,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 	int		maxLines;
 	void	*carparam;
 	char	*carName;
-	char	*race = ReInfo->_reRaceName;
+	const char	*race = ReInfo->_reRaceName;
 	void	*results = ReInfo->results;
 	
 	ReResEraseScreen();

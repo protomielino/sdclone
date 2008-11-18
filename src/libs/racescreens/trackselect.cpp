@@ -183,7 +183,7 @@ static void rmtsAddKeys(void)
     @ingroup	racemantools
  */
 char *
-RmGetTrackName(char *category, char *trackName)
+RmGetTrackName(const char *category, const char *trackName)
 {
 	void *trackHandle;
 	char *name;
@@ -195,7 +195,7 @@ RmGetTrackName(char *category, char *trackName)
 		name = strdup(GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_NAME, trackName));
 	} else {
 		GfTrace("File %s has pb\n", buf);
-		return "";
+		return NULL;
 	}
 
 	GfParmReleaseHandle(trackHandle);
@@ -209,7 +209,7 @@ RmGetTrackName(char *category, char *trackName)
     @ingroup	racemantools
 */
 char *
-RmGetCategoryName(char *category)
+RmGetCategoryName(const char *category)
 {
 	void *categoryHandle;
 	char *name;
@@ -221,7 +221,7 @@ RmGetCategoryName(char *category)
 		name = strdup(GfParmGetStr(categoryHandle, TRK_SECT_HDR, TRK_ATT_NAME, category));
 	} else {
 		GfTrace("File %s has pb\n", buf);
-		return "";
+		return NULL;
 	}
 
 	GfParmReleaseHandle(categoryHandle);
@@ -238,8 +238,8 @@ RmGetCategoryName(char *category)
 void
 RmTrackSelect(void *vs)
 {
-	char *defaultTrack;
-	char *defaultCategory;
+	const char *defaultTrack;
+	const char *defaultCategory;
 	tFList *CatCur;
 	tFList *TrList, *TrCur;
 	int Xpos, Ypos, DX, DY;
@@ -257,7 +257,7 @@ RmTrackSelect(void *vs)
 	CatCur = CategoryList;
 	do {
 		CatCur->dispName = RmGetCategoryName(CatCur->name);
-		if (strlen(CatCur->dispName) == 0) {
+		if (!CatCur->dispName || strlen(CatCur->dispName) == 0) {
 			GfTrace("RmTrackSelect: No definition for track category %s\n", CatCur->name);
 			return;
 		}
@@ -274,7 +274,7 @@ RmTrackSelect(void *vs)
 		TrCur = TrList;
 		do {
 			TrCur->dispName = RmGetTrackName(CatCur->name, TrCur->name);
-			if (strlen(TrCur->dispName) == 0) {
+			if (!TrCur || strlen(TrCur->dispName) == 0) {
 				GfTrace("RmTrackSelect: No definition for track %s\n", TrCur->name);
 				return;
 			}

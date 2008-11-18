@@ -136,7 +136,7 @@ reAddKeys(void)
 
 
 void
-ReSetRaceMsg(char *msg)
+ReSetRaceMsg(const char *msg)
 {
     static char *curMsg = 0;
 
@@ -151,7 +151,7 @@ ReSetRaceMsg(char *msg)
 }
 
 void
-ReSetRaceBigMsg(char *msg)
+ReSetRaceBigMsg(const char *msg)
 {
     static char *curMsg = 0;
     
@@ -310,8 +310,8 @@ ReResScreenInit(void)
 {
     int		i;
     int		y, dy;
-    char	*img;
-    static char	*title[3] = {"Practice", "Qualifications", "Race"};
+    const char	*img;
+    static const char	*title[3] = {"Practice", "Qualifications", "Race"};
 
     if (reResScreenHdle) {
 	GfuiScreenRelease(reResScreenHdle);
@@ -354,7 +354,7 @@ ReResScreenInit(void)
 }
 
 void
-ReResScreenSetTitle(char *title)
+ReResScreenSetTitle(const char *title)
 {
     if (reResScreenHdle) {
 	GfuiLabelSetText(reResScreenHdle, reResTitleId, title);
@@ -362,7 +362,7 @@ ReResScreenSetTitle(char *title)
 }
 
 void
-ReResScreenAddText(char *text)
+ReResScreenAddText(const char *text)
 {
     int		i;
 
@@ -380,7 +380,7 @@ ReResScreenAddText(char *text)
 }
 
 void
-ReResScreenSetText(char *text, int line, int clr)
+ReResScreenSetText(const char *text, int line, int clr)
 {
     if (line < LINES) {
 	FREEZ(reResMsg[line]);

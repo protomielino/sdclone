@@ -22,15 +22,15 @@
 #include <tgf.h>
      
 /* dynamic module (dll) interfaces */
-typedef int (*tfModLoad)(unsigned int, char*, tModList **);
-typedef int (*tfModLoadDir)(unsigned int, char*, tModList **);
+typedef int (*tfModLoad)(unsigned int, const char*, tModList **);
+typedef int (*tfModLoadDir)(unsigned int, const char*, tModList **);
 typedef int (*tfModUnloadList)(tModList **);
-typedef int (*tfModGetInfo)(unsigned int, char*, tModList **);
-typedef int (*tfModGetInfoDir)(unsigned int, char*, int, tModList **);
+typedef int (*tfModGetInfo)(unsigned int, const char*, tModList **);
+typedef int (*tfModGetInfoDir)(unsigned int, const char*, int, tModList **);
 typedef int (*tfModFreeInfoList)(tModList **);
 /* directory interface */
-typedef tFList *(*tfDirGetList)(char *);
-typedef tFList *(*tfDirGetListFiltered)(char *, char *);
+typedef tFList *(*tfDirGetList)(const char *);
+typedef tFList *(*tfDirGetListFiltered)(const char *, const char *);
 /* time interface */
 typedef double (*tfTimeClock)(void);
 

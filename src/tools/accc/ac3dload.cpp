@@ -75,7 +75,7 @@ double   tmptexa[200000];
 int     tmpsurf[100000];  
 ob_t * root_ob;
 int refs=0;
-char *shadowtexture="shadow2.rgb";
+char * const shadowtexture=strdup("shadow2.rgb");
 
 FILE * ofile;
 
@@ -98,7 +98,7 @@ char tex[256][256];
 int texnum=0;
 double smooth_angle=70.0;
 typedef struct verbaction {
-    char * verb;
+    const char * verb;
     int  (*doVerb)(char * Line,  ob_t *object, mat_t * material);
 } verbaction_t;
 

@@ -120,10 +120,11 @@ static void
 GetTrackHeader(void *TrackHandle)
 {
     tTrackGraphicInfo	*graphic;
-    char		**env;
+    const char		**env;
     int			i;
     char		buf[256];
-    char		*s;
+    const char		*s;
+    char		*cs;
 
     theTrack->name = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_NAME, "no name");
     theTrack->version = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_VERSION, (char*)NULL, 0);
@@ -151,7 +152,7 @@ GetTrackHeader(void *TrackHandle)
     if (graphic->envnb < 1) {
 	graphic->envnb = 1;
     }
-    graphic->env = (char**)calloc(graphic->envnb, sizeof(char*));
+    graphic->env = (const char**)calloc(graphic->envnb, sizeof(const char*));
     env = graphic->env;
     for (i = 1; i <= graphic->envnb; i++) {
 	sprintf(buf, "%s/%s/%d", TRK_SECT_GRAPH, TRK_LST_ENV, i);
@@ -169,9 +170,9 @@ GetTrackHeader(void *TrackHandle)
 	}
 
 	theTrack->internalname = strdup(s);
-	s = strrchr(theTrack->internalname, '.');
-	if (s != NULL) {
-		*s = 0;
+	cs = strrchr(theTrack->internalname, '.');
+	if (cs != NULL) {
+		*cs = 0;
 	}
 
     graphic->turnMarksInfo.height = GfParmGetNum(TrackHandle, TRK_SECT_TURNMARKS, TRK_ATT_HEIGHT, NULL, 1);

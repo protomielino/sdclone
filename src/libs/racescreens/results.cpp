@@ -81,7 +81,7 @@ static void
 rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 {
     void		*results = info->results;
-    char		*race = info->_reRaceName;
+    const char		*race = info->_reRaceName;
     int			i;
     int			x1, x2, x3, x4, x5, x6;
     int			offset;
@@ -228,7 +228,7 @@ static void
 rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 {
     void		*results = info->results;
-    char		*race = info->_reRaceName;
+    const char		*race = info->_reRaceName;
     int			i;
     int			x1, x2, x3, x4, x5, x6, x7, x8;
     int			dlap;
@@ -406,7 +406,7 @@ static void
 rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 {
     void		*results = info->results;
-    char		*race = info->_reRaceName;
+    const char		*race = info->_reRaceName;
     int			i;
     int			x1, x2, x3;
     int			y;
@@ -544,7 +544,7 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
     int			offset;
     void		*results = info->results;
-    char		*race = info->_reRaceName;
+    const char		*race = info->_reRaceName;
 
     rmScrHdle = GfuiScreenCreate();
     sprintf(buf, "%s Results", race);

@@ -119,7 +119,7 @@ static void
 onSave(void * /* dummy */)
 {
     int		i;
-    char	*str;
+    const char	*str;
 
     GfParmSetNum(PrefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
     GfParmSetNum(PrefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
@@ -150,7 +150,7 @@ static void
 updateButtonText(void)
 {
     int		i;
-    char	*str;
+    const char	*str;
     int		displayMouseCal = GFUI_INVISIBLE;
     int		displayJoyCal = GFUI_INVISIBLE;
 
@@ -191,7 +191,7 @@ static int InputWaited = 0;
 static int
 onKeyAction(unsigned char key, int /* modifier */, int state)
 {
-    char *name;
+    const char *name;
 
     if (!InputWaited || (state == GFUI_KEY_UP)) {
 	return 0;
@@ -217,7 +217,7 @@ onKeyAction(unsigned char key, int /* modifier */, int state)
 static int
 onSKeyAction(int key, int /* modifier */, int state)
 {
-    char *name;
+    const char *name;
 
     if (!InputWaited || (state == GFUI_KEY_UP)) {
 	return 0;
@@ -255,7 +255,7 @@ Idle(void)
     int		mask;
     int		b, i;
     int		index;
-    char	*str;
+    const char	*str;
     int		axis;
 
     GfctrlMouseGetCurrent(&mouseInfo);
@@ -360,7 +360,7 @@ static void
 onActivate(void * /* dummy */)
 {
     int		cmd;
-    char	*prm;
+    const char	*prm;
     tCtrlRef	*ref;
 
     if (ReloadValues) {

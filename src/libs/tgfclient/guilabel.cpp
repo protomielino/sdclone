@@ -61,7 +61,7 @@ gfuiLabelInit(void)
     @see	GfuiSetLabelText
  */
 int 
-GfuiLabelCreateEx(void *scr, char *text, float *fgColor, int font, int x, int y, int align, int maxlen)
+GfuiLabelCreateEx(void *scr, const char *text, float *fgColor, int font, int x, int y, int align, int maxlen)
 {
     tGfuiLabel	*label;
     tGfuiObject	*object;
@@ -138,7 +138,7 @@ GfuiLabelCreateEx(void *scr, char *text, float *fgColor, int font, int x, int y,
     @see	GfuiSetLabelText
  */
 int
-GfuiLabelCreate(void *scr, char *text, int font, int x, int y, int align, int maxlen)
+GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, int maxlen)
 {
     return GfuiLabelCreateEx(scr, text, &(GfuiColor[GFUI_LABELCOLOR][0]), font, x, y, align, maxlen);
 }
@@ -151,7 +151,7 @@ GfuiLabelCreate(void *scr, char *text, int font, int x, int y, int align, int ma
     @see	GfuiSetLabelText
  */
 int
-GfuiTipCreate(void *scr, char *text, int maxlen)
+GfuiTipCreate(void *scr, const char *text, int maxlen)
 {
     return GfuiLabelCreateEx(scr, text, &(GfuiColor[GFUI_TIPCOLOR][0]), GFUI_FONT_SMALL, 320, 15, GFUI_ALIGN_HC_VB, maxlen);
 }
@@ -166,13 +166,13 @@ GfuiTipCreate(void *scr, char *text, int maxlen)
     @see	GfuiSetLabelText
  */
 int
-GfuiTitleCreate(void *scr, char *text, int maxlen)
+GfuiTitleCreate(void *scr, const char *text, int maxlen)
 {
     return GfuiLabelCreateEx(scr, text, &(GfuiColor[GFUI_TITLECOLOR][0]), GFUI_FONT_BIG, 320, 440, GFUI_ALIGN_HC_VB, maxlen);
 }
 
 void
-gfuiSetLabelText(tGfuiObject *curObject, tGfuiLabel *label, char *text)
+gfuiSetLabelText(tGfuiObject *curObject, tGfuiLabel *label, const char *text)
 {
     int		pw, w;
 
@@ -205,7 +205,7 @@ gfuiSetLabelText(tGfuiObject *curObject, tGfuiLabel *label, char *text)
     @see	GfuiAddLabel
  */
 void
-GfuiLabelSetText(void *scr, int id, char *text)
+GfuiLabelSetText(void *scr, int id, const char *text)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;

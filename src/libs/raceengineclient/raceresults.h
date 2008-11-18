@@ -28,7 +28,7 @@
 
 
 extern void ReInitResults(void);
-extern void ReStoreRaceResults(char *race);
+extern void ReStoreRaceResults(const char *race);
 extern int  ReDisplayResults(void);
 extern void ReDisplayStandings(void);
 extern void ReSavePracticeLap(tCarElt *car);

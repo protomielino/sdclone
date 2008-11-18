@@ -1810,7 +1810,7 @@ void Driver::initWheelPos()
  {
   //wheelz[i] = car->priv.wheel[i].relPos.z;
 
-  char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+  const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
   //char *SuspSect[4] = {SECT_FRNTRGTSUSP, SECT_FRNTLFTSUSP, SECT_REARRGTSUSP, SECT_REARLFTSUSP};
   float rh = 0.0; //, bc = 0.0, rimdiam = 0.0, tireratio = 0.0, tirewidth = 0.0;
   rh = GfParmGetNum(car->_carHandle,WheelSect[i],PRM_RIDEHEIGHT,(char *)NULL, 0.10f);
@@ -7706,7 +7706,7 @@ bool Driver::isStuck()
 // Compute aerodynamic downforce coefficient CA.
 void Driver::initCa()
 {
- char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+ const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
  double rearwingarea = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGAREA, (char*) NULL, 0.0);
  double rearwingangle = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGANGLE, (char*) NULL, 0.0);
  double frontwingarea = GfParmGetNum(car->_carHandle, SECT_FRNTWING, PRM_WINGAREA, (char*) NULL, 0.0);
@@ -7733,7 +7733,7 @@ void Driver::initCa()
 // Compute aerodynamic drag coefficient CW.
 void Driver::initCw()
 {
- char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+ const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
  double cx = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_CX, (char*) NULL, 0.0);
  double frontarea = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*) NULL, 0.0);
  double frontwingangle = GfParmGetNum(car->_carHandle, SECT_FRNTWING, PRM_WINGANGLE, (char*) NULL, 0.0);
@@ -7765,7 +7765,7 @@ void Driver::initCR()
 // Init the friction coefficient of the the tires.
 void Driver::initTireMu()
 {
- char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+ const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
  double tm = FLT_MAX;
  int i;
 
@@ -8155,7 +8155,7 @@ fprintf(stderr,"filterTCL - accel=%.3f decel=%.3f ",accel,decel);
 // Traction Control (TCL) setup.
 void Driver::initTCLfilter()
 {
- char *traintype = GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+ const char *traintype = GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
  if (strcmp(traintype, VAL_TRANS_RWD) == 0) {
   drivetrain = DRWD;
   GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_RWD;

@@ -128,8 +128,8 @@ int
 RePreRace(void)
 {
 	tdble dist;
-	char *raceName;
-	char *raceType;
+	const char *raceName;
+	const char *raceType;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 
@@ -172,7 +172,7 @@ reRaceRealStart(void)
 	int sw, sh, vw, vh;
 	tRobotItf *robot;
 	tReCarInfo *carInfo;
-	char *dllname;
+	const char *dllname;
 	char key[256];
 	int foundHuman;
 	void *params = ReInfo->params;
@@ -296,8 +296,8 @@ ReRaceStart(void)
 	int nCars;
 	int maxCars;
 	char *prevRaceName;
-	char *gridType;
-	char *raceName = ReInfo->_reRaceName;
+	const char *gridType;
+	const char *raceName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 

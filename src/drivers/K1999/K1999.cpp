@@ -49,7 +49,7 @@ static double SideDistInt = 1.0; // Security distance wrt inside
 class CK1999Data
 {
  public:
-  CK1999Data(double x1, double x2, double x3, double x4, double x5, char * const psz) :
+  CK1999Data(double x1, double x2, double x3, double x4, double x5, const char * const psz) :
    WingRInverse(x1),
    TireAccel1(x2),
    MaxBrake(x3),
@@ -65,7 +65,7 @@ class CK1999Data
   const double MaxBrake;
   const double SlipLimit;
   const double SteerSkid;
-  char * const pszCarName; 
+  const char * const pszCarName; 
 
   double ABS;
   double TractionHelp;
@@ -484,8 +484,8 @@ extern "C" int K1999(tModInfo *modInfo)
  for (int i = CARS; --i >= 0;)
  {
   OUTPUT("modInfo[" << i << "].name = " << tpdata[i]->pszCarName);
-  modInfo[i].name    = tpdata[i]->pszCarName;
-  modInfo[i].desc    = tpdata[i]->pszCarName;
+  modInfo[i].name    = strdup(tpdata[i]->pszCarName);
+  modInfo[i].desc    = strdup(tpdata[i]->pszCarName);
   modInfo[i].fctInit = InitFuncPt;
   modInfo[i].gfId    = ROB_IDENT;
   modInfo[i].index   = i + 1;

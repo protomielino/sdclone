@@ -56,7 +56,7 @@ rmDeativate(void * /* dummy */)
     @return	None.
 */
 void
-RmLoadingScreenStart(char *title, char *bgimg)
+RmLoadingScreenStart(const char *title, const char *bgimg)
 {
     int		i;
     int		y;
@@ -112,7 +112,7 @@ RmShutdownLoadingScreen(void)
     @return	None.
 */
 void
-RmLoadingScreenSetText(char *text)
+RmLoadingScreenSetText(const char *text)
 {
     int		i, j;
     

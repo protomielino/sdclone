@@ -239,8 +239,8 @@ typedef struct FList
     void		*userData;	/**< User data */
 } tFList;
 
-extern tFList *GfDirGetList(char *dir);
-extern tFList *GfDirGetListFiltered(char *dir, char *suffix);
+extern tFList *GfDirGetList(const char *dir);
+extern tFList *GfDirGetListFiltered(const char *dir, const char *suffix);
 typedef void (*tfDirfreeUserData)(void*);	/**< Function to call for releasing the user data associated with file entry */
 extern void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool freename = false, bool freedispname = false);
 
@@ -273,7 +273,7 @@ extern void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool
 
 extern void *GfParmReadFile(const char *file, int mode);
 /* parameter file write */
-extern int GfParmWriteFile(const char *file, void* handle, char *name);
+extern int GfParmWriteFile(const char *file, void* handle, const char *name);
 
 extern char *GfParmGetName(void *handle);
 extern char *GfParmGetFileName(void *handle);
@@ -282,22 +282,24 @@ extern char *GfParmGetFileName(void *handle);
 extern void GfParmSetDTD (void *parmHandle, char *dtd, char*header);
 
 /* get string parameter value */
-extern char *GfParmGetStr(void *handle, const char *path, const char *key, char *deflt);
+extern const char *GfParmGetStr(void *handle, const char *path, const char *key, const char *deflt);
+extern char *GfParmGetStrNC(void *handle, const char *path, const char *key, char *deflt);
 /* get string parameter value */
-extern char *GfParmGetCurStr(void *handle, char *path, char *key, char *deflt);
+extern const char *GfParmGetCurStr(void *handle, const char *path, const char *key, const char *deflt);
+extern char *GfParmGetCurStrNC(void *handle, const char *path, const char *key, char *deflt);
 /* set string parameter value */
-extern int GfParmSetStr(void *handle, char *path, char *key, char *val);
+extern int GfParmSetStr(void *handle, const char *path, const char *key, const char *val);
 /* set string parameter value */
-extern int GfParmSetCurStr(void *handle, char *path, char *key, char *val);
+extern int GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val);
 
 /* get num parameter value */
 extern tdble GfParmGetNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* get num parameter value */
-extern tdble GfParmGetCurNum(void *handle, char *path, char *key, char *unit, tdble deflt);
+extern tdble GfParmGetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* set num parameter value */
 extern int GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 /* set num parameter value */
-extern int GfParmSetCurNum(void *handle, char *path, char *key, char *unit, tdble val);
+extern int GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 
 
 /* clean all the parameters of a set */
@@ -320,11 +322,11 @@ extern void *GfParmMergeHandles(void *ref, void *tgt, int mode);
 extern int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
 
 
-extern int GfParmGetEltNb(void *handle, char *path);
-extern int GfParmListSeekFirst(void *handle, char *path);
-extern int GfParmListSeekNext(void *handle, char *path);
-extern char *GfParmListGetCurEltName(void *handle, char *path);
-extern int GfParmListClean(void *handle, char *path);
+extern int GfParmGetEltNb(void *handle, const char *path);
+extern int GfParmListSeekFirst(void *handle, const char *path);
+extern int GfParmListSeekNext(void *handle, const char *path);
+extern char *GfParmListGetCurEltName(void *handle, const char *path);
+extern int GfParmListClean(void *handle, const char *path);
 
 /******************* 
  * Trace Interface *
@@ -338,7 +340,7 @@ extern int GfParmListClean(void *handle, char *path);
 #define GfTrace printf
 
 static inline void
-GfFatal(char *fmt, ...)
+GfFatal(const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
@@ -364,7 +366,7 @@ GfFatal(char *fmt, ...)
     @fn	 GfOut(s, args...)
  */
 static inline void
-GfOut(char *fmt, ...)
+GfOut(const char *fmt, ...)
 {
 }
 
@@ -396,11 +398,11 @@ extern void gfMeanReset(tdble v, tMeanVal *pvt);
 
 /* MISC */
 extern char *GetLocalDir(void);
-extern void SetLocalDir(char *buf);
+extern void SetLocalDir(const char *buf);
 extern char *GetLibDir(void);
-extern void SetLibDir(char *buf);
+extern void SetLibDir(const char *buf);
 extern char *GetDataDir(void);
-extern void SetDataDir(char *buf);
+extern void SetDataDir(const char *buf);
 extern int GetSingleTextureMode (void);
 extern void SetSingleTextureMode (void);
 extern int GfNearestPow2 (int x);

@@ -37,9 +37,9 @@
 #include "util.h"
 
 int
-GetFilename(char *filename, char *filepath, char *buf)
+GetFilename(const char *filename, const char *filepath, char *buf)
 {
-    char	*c1, *c2;
+    const char	*c1, *c2;
     int		found = 0;
     int		lg;
     

@@ -66,3 +66,7 @@ EXPORTS
 	GetSingleTextureMode
 	GfNearestPow2
 	GfCreateDir
+	GfParmGetMinorVersion
+	GfParmGetMajorVersion
+	GfParmGetStrNC
+	GfParmGetCurStrNC

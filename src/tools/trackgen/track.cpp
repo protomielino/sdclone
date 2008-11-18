@@ -319,8 +319,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     } while (0)
 
 #define CHECKDISPLIST(mat, name, id, off) do {									\
-	char *texname;												\
-	char *texnamebump;											\
+	const char *texname;												\
+	const char *texnamebump;											\
 	int  mipmap;												\
 	static char path_[256];											\
 	if (Track->version < 4) {										\
@@ -333,7 +333,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, (char*)NULL, 0);			\
 	SETTEXTURE(texname, texnamebump, mipmap);										\
 	if ((curTexId != prevTexId) || (startNeeded)) {								\
-	    char *textype;											\
+	    const char *textype;											\
             if (bump) {												\
 		curTexType = 1;											\
 		curTexLink = 1;											\

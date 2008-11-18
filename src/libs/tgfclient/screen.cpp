@@ -77,9 +77,9 @@ static char	*Res[] = {"640x480", "800x600", "1024x768", "1152x768", "1152x864", 
 static const int nbRes = sizeof(Res) / sizeof(Res[0]);
 #endif // USE_RANDR_EXT
 
-static char	*Mode[] = {"Full-screen mode", "Window mode"};
-static char *VInit[] = {GFSCR_VAL_VINIT_COMPATIBLE, GFSCR_VAL_VINIT_BEST};
-static char	*Depthlist[] = {"24", "32", "16"};
+static const char	*Mode[] = {"Full-screen mode", "Window mode"};
+static const char	*VInit[] = {GFSCR_VAL_VINIT_COMPATIBLE, GFSCR_VAL_VINIT_BEST};
+static const char	*Depthlist[] = {"24", "32", "16"};
 
 //static const int nbRes = sizeof(Res) / sizeof(Res[0]);
 static const int nbMode = sizeof(Mode) / sizeof(Mode[0]);
@@ -111,7 +111,7 @@ gfScreenInit(void)
 {
 #ifdef USE_RANDR_EXT
 	// Get display, screen and root window handles.
-	char *displayname = getenv("DISPLAY");
+	const char *displayname = getenv("DISPLAY");
 	if (displayname == NULL) {
 		displayname = ":0.0";
 	}
@@ -243,8 +243,8 @@ void GfScrInit(int argc, char *argv[])
     int		xw, yw;
     int		winX, winY;
     void	*handle;
-    char	*fscr;
-	char	*vinit;
+    const char	*fscr;
+    const char	*vinit;
     int		fullscreen;
     int		maxfreq;
     int		i, depth;
@@ -283,7 +283,7 @@ void GfScrInit(int argc, char *argv[])
 
 	vinit = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
 
-    glutInit(&argc, argv);
+	glutInit(&argc, argv);
 
 	// Depending on "video mode init" setting try to get the best mode or try to get a mode in a safe way...
 	// This is a workaround for driver/glut/glx bug, which lie about the capabilites of the visual.
@@ -485,11 +485,11 @@ void
 GfScrReinit(void * /* dummy */)
 {
     int retcode = 0;
-	static const int CMDSIZE = 1024;
-	char cmd[CMDSIZE];
+    static const int CMDSIZE = 1024;
+    char cmd[CMDSIZE];
 
 #ifndef WIN32
-    char	*arg[8];
+    const char	*arg[8];
     int		curArg;
 #endif
 
@@ -678,7 +678,7 @@ initFromConf(void)
 	}
 
 	curVInit = 0;
-	char *tmp = GfParmGetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
+	const char *tmp = GfParmGetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
 	for (i = 0; i < nbVInit; i++) {
 		if (strcmp(VInit[i], tmp) == 0) {
 			curVInit = i;

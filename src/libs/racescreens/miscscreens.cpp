@@ -36,9 +36,9 @@ static void *fourStateHdle = 0;
 
 void *
 RmTwoStateScreen(
-	char *title,
-	char *label1, char *tip1, void *screen1,
-	char *label2, char *tip2, void *screen2)
+	const char *title,
+	const char *label1, const char *tip1, void *screen1,
+	const char *label2, const char *tip2, void *screen2)
 {
 	if (twoStateHdle) {
 		GfuiScreenRelease(twoStateHdle);
@@ -57,10 +57,10 @@ RmTwoStateScreen(
 
 void *
 RmTriStateScreen(
-	char *title,
-	char *label1, char *tip1, void *screen1,
-	char *label2, char *tip2, void *screen2,
-	char *label3, char *tip3, void *screen3)
+	const char *title,
+	const char *label1, const char *tip1, void *screen1,
+	const char *label2, const char *tip2, void *screen2,
+	const char *label3, const char *tip3, void *screen3)
 {
 	if (triStateHdle) {
 		GfuiScreenRelease(triStateHdle);
@@ -79,11 +79,11 @@ RmTriStateScreen(
 
 void *
 RmFourStateScreen(
-	char *title,
-	char *label1, char *tip1, void *screen1,
-	char *label2, char *tip2, void *screen2,
-	char *label3, char *tip3, void *screen3,
-	char *label4, char *tip4, void *screen4)
+	const char *title,
+	const char *label1, const char *tip1, void *screen1,
+	const char *label2, const char *tip2, void *screen2,
+	const char *label3, const char *tip3, void *screen3,
+	const char *label4, const char *tip4, void *screen4)
 {
 	if (fourStateHdle) {
 		GfuiScreenRelease(fourStateHdle);
@@ -135,20 +135,20 @@ rmChgStartScreen(void *vpsrc)
 static void
 rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 {
-	static char		path[1024];
-	int			nCars;
-	int			i;
-	int			y;
-	int			x, dx;
-	int			rows, curRow;
-	char		*img;
-	char		*name;
-	int			robotIdx;
+	static char	path[1024];
+	int		nCars;
+	int		i;
+	int		y;
+	int		x, dx;
+	int		rows, curRow;
+	const char	*img;
+	const char	*name;
+	int		robotIdx;
 	void		*robhdle;
 	void		*carHdle;
-	char		*carName;
+	const char	*carName;
 	void		*params = info->params;
-	char		*race = info->_reRaceName;
+	const char	*race = info->_reRaceName;
 	
 	rmScrHdle = GfuiScreenCreate();
 	GfuiTitleCreate(rmScrHdle, race, strlen(race));	

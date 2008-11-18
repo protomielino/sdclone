@@ -74,7 +74,7 @@ GfuiMenuDefaultKeysAdd(void *scr)
     @return	Handle of the menu
  */
 void *
-GfuiMenuScreenCreate(char *title)
+GfuiMenuScreenCreate(const char *title)
 {
     void	*scr;
 
@@ -108,7 +108,7 @@ remInfo(void *cbinfo)
     @return	Button Id
  */
 int
-GfuiMenuButtonCreate(void *scr, char *text, char *tip, void *userdata, tfuiCallback onpush)
+GfuiMenuButtonCreate(void *scr, const char *text, const char *tip, void *userdata, tfuiCallback onpush)
 {
     tMnuCallbackInfo	*cbinfo;
     int			xpos, ypos;
@@ -154,7 +154,7 @@ GfuiMenuButtonCreate(void *scr, char *text, char *tip, void *userdata, tfuiCallb
     @return	Button Id
  */
 int
-GfuiMenuBackQuitButtonCreate(void *scr, char *text, char *tip, void *userdata, tfuiCallback onpush)
+GfuiMenuBackQuitButtonCreate(void *scr, const char *text, const char *tip, void *userdata, tfuiCallback onpush)
 {
     tMnuCallbackInfo	*cbinfo;
     int			xpos, ypos;
