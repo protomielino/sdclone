@@ -102,19 +102,6 @@
         <attnum name="blue" val="1.0"></attnum>
       </section>
 
-      <section name="8">
-        <attstr name="name" val="GP3601 era"></attstr>
-        <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="e"></attstr>
-        <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-era"></attstr>
-        <attnum name="race number" val="87"></attnum>
-        <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
-      </section>
-
-
     </section>
   </section>
 </params>
