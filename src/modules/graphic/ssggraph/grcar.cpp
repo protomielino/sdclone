@@ -651,7 +651,7 @@ grInitCar(tCarElt *car)
 	carEntity = grssgCarLoadAC3D(param, NULL, index);
 	grCarInfo[index].carEntity = carEntity;
 	/* Set a selector on the driver */
-	ssgBranch *b = (ssgBranch *)carEntity->getByName( "DRIVER" );
+	ssgBranch *b = (ssgBranch *)carEntity->getByName((char*)"DRIVER");
 	grCarInfo[index].driverSelector = new ssgSelector;
 	if (b) {
 		ssgBranch *bp = b->getParent(0);
