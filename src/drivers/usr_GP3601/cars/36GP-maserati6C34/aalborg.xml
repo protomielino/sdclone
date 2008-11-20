@@ -16,10 +16,11 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 1.33.30 -->
+	<!-- 1.28.90 -->
 	<section name="private">
-		<attnum name="CornerSpeed" val="11.7"/>
-		<attnum name="BrakeDelay" val="30.00"/>
+		<attnum name="BaseCornerSpeedX" val="1.10"/>
+		<attnum name="CornerSpeed" val="11.80"/>
+		<attnum name="BrakeDelay" val="31.00"/>
 		<attnum name="SteerGain" val="2.2"/>
 		<attnum name="SteerDebug" val="0"/>
 		<attnum name="OvertakeDebug" val="0"/>
@@ -29,17 +30,27 @@
 
 		<attnum name="RLSpeed0Div" val="290"/>
 		<attnum name="RLSpeed0DivEnd" val="320"/>
-		<attnum name="RLSpeed0" val="10.7"/>
+		<attnum name="RLSpeed0" val="8.0"/>
 		<attnum name="RLSpeed1Div" val="490"/>
 		<attnum name="RLSpeed1DivEnd" val="515"/>
 		<attnum name="RLSpeed1" val="11.0"/>
-		<attnum name="RLBrake0Div" val="1"/>
-		<attnum name="RLBrake0DivEnd" val="70"/>
-		<attnum name="RLBrake0" val="-6.0"/>
+		<attnum name="RLSpeed2Div" val="70"/>
+		<attnum name="RLSpeed2DivEnd" val="90"/>
+		<attnum name="RLSpeed2" val="11.4"/>
+
+		<attnum name="RLBrake0Div" val="420"/>
+		<attnum name="RLBrake0DivEnd" val="515"/>
+		<attnum name="RLBrake0" val="-2.0"/>
+		<attnum name="RLBrake1Div" val="1"/>
+		<attnum name="RLBrake1DivEnd" val="70"/>
+		<attnum name="RLBrake1" val="-7.0"/>
 
     <attnum name="LaneShift0Div" val="1"/>
     <attnum name="LaneShift0DivEnd" val="60"/>
     <attnum name="ExtMargin0" val="-0.5"/>
+    <attnum name="LaneShift7Div" val="1"/>
+    <attnum name="LaneShift7DivEnd" val="210"/>
+    <attnum name="IntMargin7" val="-0.5"/>
     <attnum name="LaneShift1Div" val="225"/>
     <attnum name="LaneShift1DivEnd" val="252"/>
     <attnum name="ExtMargin1" val="1.0"/>
@@ -60,9 +71,6 @@
     <attnum name="LaneShift6Div" val="785"/>
     <attnum name="LaneShift6DivEnd" val="830"/>
     <attnum name="ExtMargin6" val="-0.5"/>
-    <attnum name="LaneShift7Div" val="1"/>
-    <attnum name="LaneShift7DivEnd" val="210"/>
-    <attnum name="IntMargin7" val="-0.5"/>
     <attnum name="LaneShift8Div" val="350"/>
     <attnum name="LaneShift8DivEnd" val="705"/>
     <attnum name="IntMargin8" val="-0.6"/>

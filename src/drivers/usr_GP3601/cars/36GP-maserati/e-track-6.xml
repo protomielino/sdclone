@@ -16,12 +16,11 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 1.50.70 -->
+	<!-- 1.46.32 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
-		<attnum name="BaseCornerSpeedX" val="1.1"/>
-		<attnum name="BaseCornerSpeed" val="-0.3"/>
-		<attnum name="CornerSpeed" val="9.5"/>
+		<attnum name="BaseCornerSpeedX" val="1.10"/>
+		<attnum name="CornerSpeed" val="10.5"/>
 		<attnum name="BrakeDelay" val="24.00"/>
 		<attnum name="SteerGain" val="2.0"/>
 		<attnum name="SteerDebug" val="0"/>
@@ -29,43 +28,45 @@
 		<attnum name="IntMargin" val="1.25"/>
 		<attnum name="ExtMargin" val="1.3"/>
 		<attnum name="AccelExit" val="0.5"/>
+		<attnum name="SkidCorrection" val="1.3"/>
 
 		<attnum name="RLSpeed0Div" val="1"/>
 		<attnum name="RLSpeed0DivEnd" val="150"/>
-		<attnum name="RLSpeed0" val="9.0"/>
+		<attnum name="RLSpeed0" val="8.0"/>
+		<attnum name="RLSpeed0Div" val="151"/>
+		<attnum name="RLSpeed0DivEnd" val="279"/>
+		<attnum name="RLSpeed0" val="10.0"/>
 		<attnum name="RLSpeed1Div" val="1210"/>
 		<attnum name="RLSpeed1DivEnd" val="1280"/>
-		<attnum name="RLSpeed1" val="8.0"/>
+		<attnum name="RLSpeed1" val="8.7"/>
 		<attnum name="RLSpeed2Div" val="280"/>
 		<attnum name="RLSpeed2DivEnd" val="360"/>
-		<attnum name="RLSpeed2" val="10.3"/>
+		<attnum name="RLSpeed2" val="10.6"/>
 		<attnum name="RLSpeed3Div" val="730"/>
 		<attnum name="RLSpeed3DivEnd" val="760"/>
-		<attnum name="RLSpeed3" val="10.4"/>
+		<attnum name="RLSpeed3" val="10.7"/>
 		<attnum name="RLSpeed4Div" val="1090"/>
 		<attnum name="RLSpeed4DivEnd" val="1150"/>
-		<attnum name="RLSpeed4" val="11.6"/>
+		<attnum name="RLSpeed4" val="10.8"/>
 
-		<attnum name="RLBrake0Div" val="100"/>
+		<attnum name="RLBrake0Div" val="1"/>
 		<attnum name="RLBrake0DivEnd" val="170"/>
 		<attnum name="RLBrake0" val="-8"/>
 		<attnum name="RLBrake1Div" val="1020"/>
 		<attnum name="RLBrake1DivEnd" val="1100"/>
 		<attnum name="RLBrake1" val="-4"/>
-		<attnum name="RLBrake2Div" val="1440"/>
-		<attnum name="RLBrake2DivEnd" val="1500"/>
-		<attnum name="RLBrake2" val="-4"/>
 
 		<attnum name="SpeedLimit0Div" val="990"/>
 		<attnum name="SpeedLimit0DivEnd" val="1120"/>
 		<attnum name="SpeedLimit0" val="1000"/>
 
+		<attnum name="SkidCorrection0Div" val="990"/>
+		<attnum name="SkidCorrection0DivEnd" val="1100"/>
+		<attnum name="SkidCorrection0" val="1.6"/>
+
 		<attnum name="LaneShift0Div" val="930"/>
 		<attnum name="LaneShift0DivEnd" val="1110"/>
-		<attnum name="ExtMargin0" val="0.5"/>
-		<attnum name="LaneShift1Div" val="1250"/>
-		<attnum name="LaneShift1DivEnd" val="1300"/>
-		<attnum name="ExtMargin1" val="0.5"/>
+		<attnum name="ExtMargin0" val="1.0"/>
 	</section>
 
 </params>

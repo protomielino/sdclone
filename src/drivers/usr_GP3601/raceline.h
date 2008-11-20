@@ -201,6 +201,7 @@ class LRaceLine {
   LRLMod *tSteerGain;
   LRLMod *tSkidAccel;
   LRLMod *tAccelExit;
+  LRLMod *tSkidCorrection;
   LRaceLineData *data;
 
   int fDirt;

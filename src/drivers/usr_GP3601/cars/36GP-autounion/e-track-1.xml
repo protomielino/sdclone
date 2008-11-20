@@ -16,10 +16,10 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 1.28.30 -->
+	<!-- 1.26.60 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
-		<attnum name="BaseCornerSpeed" val="0.60"/>
+		<attnum name="BaseCornerSpeed" val="0.80"/>
 		<attnum name="CornerSpeed" val="9.40"/>
 		<attnum name="BrakeDelay" val="32.00"/>
 		<attnum name="SteerGain" val="2.0"/>
@@ -28,6 +28,7 @@
 		<attnum name="IntMargin" val="1.15"/>
 		<attnum name="ExtMargin" val="1.8"/>
 		<attnum name="AccelExit" val="0.5"/>
+		<attnum name="SkidCorrection" val="1.2"/>
 
 		<attnum name="RLSpeed0Div" val="650"/>
 		<attnum name="RLSpeed0DivEnd" val="820"/>
@@ -47,6 +48,10 @@
 		<attnum name="OTCaution0DivEnd" val="1110"/>
 		<attnum name="OTCaution0" val="1.0"/>
 
+		<attnum name="SkidCorrection0Div" val="800"/>
+		<attnum name="SkidCorrection0DivEnd" val="1060"/>
+		<attnum name="SkidCorrection0" val="1.5"/>
+
 		<attnum name="SpeedLimit0Div" val="980"/>
 		<attnum name="SpeedLimit0DivEnd" val="1060"/>
 		<attnum name="SpeedLimit0" val="43"/>
@@ -60,6 +65,12 @@
 		<attnum name="LaneShift2Div" val="1115"/>
 		<attnum name="LaneShift2DivEnd" val="1215"/>
 		<attnum name="ExtMargin2" val="4"/>
+		<attnum name="LaneShift3Div" val="320"/>
+		<attnum name="LaneShift3DivEnd" val="420"/>
+		<attnum name="ExtMargin3" val="2"/>
+		<attnum name="LaneShift4Div" val="520"/>
+		<attnum name="LaneShift4DivEnd" val="580"/>
+		<attnum name="ExtMargin4" val="1"/>
 	</section>
 
 </params>

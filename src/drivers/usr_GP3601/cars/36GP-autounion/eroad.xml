@@ -19,7 +19,7 @@
 	<!-- 1.28.00 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
-		<attnum name="BaseCornerSpeed" val="0.7"/>
+		<attnum name="BaseCornerSpeed" val="0.3"/>
 		<attnum name="CornerSpeed" val="10.0"/>
 		<attnum name="BrakeDelay" val="32.00"/>
 		<attnum name="SteerGain" val="2.0"/>
@@ -28,6 +28,7 @@
 		<attnum name="IntMargin" val="1.25"/>
 		<attnum name="ExtMargin" val="1.3"/>
 		<attnum name="AccelExit" val="0.5"/>
+		<attnum name="SkidCorrection" val="1.3"/>
 
 		<attnum name="RLSpeed0Div" val="1"/>
 		<attnum name="RLSpeed0DivEnd" val="150"/>
@@ -35,12 +36,15 @@
 		<attnum name="RLSpeed1Div" val="290"/>
 		<attnum name="RLSpeed1DivEnd" val="380"/>
 		<attnum name="RLSpeed1" val="9.0"/>
-		<attnum name="RLSpeed2Div" val="600"/>
+		<attnum name="RLSpeed2Div" val="530"/>
 		<attnum name="RLSpeed2DivEnd" val="690"/>
 		<attnum name="RLSpeed2" val="8.0"/>
-		<attnum name="RLSpeed3Div" val="1070"/>
-		<attnum name="RLSpeed3DivEnd" val="1130"/>
-		<attnum name="RLSpeed3" val="9.3"/>
+		<attnum name="RLSpeed3Div" val="691"/>
+		<attnum name="RLSpeed3DivEnd" val="1040"/>
+		<attnum name="RLSpeed3" val="10.4"/>
+		<attnum name="RLSpeed4Div" val="1070"/>
+		<attnum name="RLSpeed4DivEnd" val="1130"/>
+		<attnum name="RLSpeed4" val="9.3"/>
 
 		<attnum name="RLBrake0Div" val="1"/>
 		<attnum name="RLBrake0DivEnd" val="230"/>

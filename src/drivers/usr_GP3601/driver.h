@@ -220,6 +220,7 @@ class Driver {
 		float SideMargin;
 		float OutSteerFactor;
 		float StuckAccel;
+		float FollowMargin;
 		float SteerLookahead;
 		double SteerMaxRI;
 		float lookahead;

@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 9.12.27 -->
+	<!-- 9.11.27 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
 		<attnum name="CornerSpeed" val="9.2"/>

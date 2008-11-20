@@ -141,6 +141,7 @@ Driver::Driver(int index) :
 		SideMargin(0.0f),
 		OutSteerFactor(0.0f),
 		StuckAccel(0.8f),
+		FollowMargin(0.0f),
 		SteerLookahead(0.0f),
 		SteerMaxRI(0.008),
 		lookahead(10.0f),
@@ -236,8 +237,8 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	char* trackname = strrchr(track->filename, '/') + 1;
 	char carName[256];
 	{
-		const char *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-		const char *key = PRM_CAR;
+		char *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
+		char *key = PRM_CAR;
 		strncpy( carName, GfParmGetStr(carHandle, path, key, ""), sizeof(carName) );
 		char *p = strrchr(carName, '.');
 		if (p) *p = '\0';
@@ -326,6 +327,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	SideMargin = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "SideMargin", (char *)NULL, 0.0f );
 	OutSteerFactor = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "OutSteerFactor", (char *)NULL, 1.0f );
 	StuckAccel = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "StuckAccel", (char *)NULL, 0.8f );
+	FollowMargin = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "FollowMargin", (char *)NULL, 0.0f );
 	SteerLookahead = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "SteerLookahead", (char *)NULL, 0.0f );
 	SteerMaxRI = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "SteerMaxRI", (char *)NULL, 0.008f );
 	MaxGear = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "MaxGear", (char *)NULL, 6.0f );
@@ -395,7 +397,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	opponent = opponents->getOpponentPtr();
 
 	// Set team mate.
-	const char *teammate = GfParmGetStr(car->_carHandle, BT_SECT_PRIV, BT_ATT_TEAMMATE, NULL);
+	char *teammate = GfParmGetStr(car->_carHandle, BT_SECT_PRIV, BT_ATT_TEAMMATE, NULL);
 	if (teammate != NULL) {
 		opponents->setTeamMate(teammate);
 	}
@@ -957,7 +959,7 @@ double Driver::getFollowDistance()
 		if (opponent[i].getDistance() > 5.0)
 			continue;
 
-		mindist = MIN(mindist, opponent[i].getDistance());
+		mindist = MIN(mindist, opponent[i].getDistance()) - FollowMargin;
 	}
 	return mindist;
 }
@@ -2924,7 +2926,7 @@ void Driver::initWheelPos()
 {
  for (int i=0; i<4; i++)
  {
-  const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+  char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
   float rh = 0.0;
   rh = GfParmGetNum(car->_carHandle,WheelSect[i],PRM_RIDEHEIGHT,(char *)NULL, 0.10f);
   wheelz[i] = (-rh / 1.0 + car->info.wheel[i].wheelRadius) - 0.01;
@@ -2933,7 +2935,7 @@ void Driver::initWheelPos()
 
 void Driver::initCa()
 {
-	const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+	char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 	float rearwingarea = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGAREA, (char*) NULL, 0.0f);
 	float rearwingangle = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGANGLE, (char*) NULL, 0.0f);
 	float wingca = 1.23f*rearwingarea*sin(rearwingangle);
@@ -2961,7 +2963,7 @@ void Driver::initCw()
 // Init the friction coefficient of the the tires.
 void Driver::initTireMu()
 {
-	const char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+	char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 	float tm = FLT_MAX;
 	int i;
 
@@ -3228,7 +3230,7 @@ fprintf(stderr,"friction %.3f accel=%.3f->%.3f\n",wseg0->surface->kFriction,acce
 // Traction Control (TCL) setup.
 void Driver::initTCLfilter()
 {
-	const char *traintype = GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+	char *traintype = GfParmGetStr(car->_carHandle, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
 	if (strcmp(traintype, VAL_TRANS_RWD) == 0) {
 		GET_DRIVEN_WHEEL_SPEED = &Driver::filterTCL_RWD;
 	} else if (strcmp(traintype, VAL_TRANS_FWD) == 0) {
