@@ -42,16 +42,6 @@ static int	SkidValue = 20;
 static int	LodFactorEditId;
 static tdble	LodFactorValue = 1.0;
 
-static char const *wheel3dOptionList[] = {GR_ATT_WHEEL3D_DISABLED, GR_ATT_WHEEL3D_ENABLED}; // menu activate wheel3d
-static const int nbOptionsWheel3d = sizeof(wheel3dOptionList) / sizeof(wheel3dOptionList[0]);
-static int curOptionWheel3d = 0;
-static int Wheel3dOptionId;
-
-static char const *AnimDriverdOptionList[] = {GR_ATT_ANIMDRIVER_DISABLED, GR_ATT_ANIMDRIVER_ENABLED}; // menu activate animated driver
-static const int nbOptionsDriver = sizeof(AnimDriverdOptionList) / sizeof(AnimDriverdOptionList[0]);
-static int curOptionAnimDriver = 0;
-static int AnimDriverOptionId;
-
 static void
 ExitGraphicOptions(void *prevMenu)
 {
