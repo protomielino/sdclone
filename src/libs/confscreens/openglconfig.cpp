@@ -59,7 +59,7 @@ static void readOpenGLCfg(void)
 	char buf[1024];
 
 	sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// Read texture compression parameters.
 	const char *optionName = GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION, textureCompressOptionList[0]);
@@ -109,7 +109,7 @@ static void readOpenGLCfg(void)
 		}
 	}
 	sprintf(valuebuf, "%d", textureSizeOptionList[curOptionTextSize]);
-	GfuiLabelSetText(scrHandle, TextureSizeOptionId, valuebuf);
+	GfuiLabelSetText(scrHandle, TextureSizeOptionId, (char const*)valuebuf);
 
 	GfParmReleaseHandle(paramHandle);
 }
@@ -120,7 +120,7 @@ static void saveOpenGLOption(void *)
 {
 	char buf[1024];
 	sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// Texture compression.
 	GfParmSetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION, textureCompressOptionList[curOptionTextComp]);
@@ -168,7 +168,7 @@ static void changeTextureSizeState(void *vp)
 	}
 
 	sprintf(valuebuf, "%d", textureSizeOptionList[curOptionTextSize]);
-	GfuiLabelSetText(scrHandle, TextureSizeOptionId, valuebuf);
+	GfuiLabelSetText(scrHandle, TextureSizeOptionId, (char const*)valuebuf);
 }
 
 

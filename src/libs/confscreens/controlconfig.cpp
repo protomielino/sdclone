@@ -121,24 +121,24 @@ onSave(void * /* dummy */)
     int		i;
     const char	*str;
 
-    GfParmSetNum(PrefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
-    GfParmSetNum(PrefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
+    GfParmSetNum(PrefHdle, (char const*)CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
+    GfParmSetNum(PrefHdle, (char const*)CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
 
     for (i = 0; i < maxCmd; i++) {
 	str = GfctrlGetNameByRef(Cmd[i].ref.type, Cmd[i].ref.index);
 	if (str) {
-	    GfParmSetStr(PrefHdle, CurrentSection, Cmd[i].name, str);
+	    GfParmSetStr(PrefHdle, (char const*)CurrentSection, Cmd[i].name, str);
 	} else {
-	    GfParmSetStr(PrefHdle, CurrentSection, Cmd[i].name, "");
+	    GfParmSetStr(PrefHdle, (char const*)CurrentSection, Cmd[i].name, "");
 	}
 	if (Cmd[i].minName) {
-	    GfParmSetNum(PrefHdle, CurrentSection, Cmd[i].minName, NULL, Cmd[i].min);
+	    GfParmSetNum(PrefHdle, (char const*)CurrentSection, Cmd[i].minName, NULL, Cmd[i].min);
 	}
 	if (Cmd[i].maxName) {
-	    GfParmSetNum(PrefHdle, CurrentSection, Cmd[i].maxName, NULL, Cmd[i].max);
+	    GfParmSetNum(PrefHdle, (char const*)CurrentSection, Cmd[i].maxName, NULL, Cmd[i].max);
 	}
 	if (Cmd[i].powName) {
-	    GfParmSetNum(PrefHdle, CurrentSection, Cmd[i].powName, NULL, Cmd[i].pow);
+	    GfParmSetNum(PrefHdle, (char const*)CurrentSection, Cmd[i].powName, NULL, Cmd[i].pow);
 	}
     }
 
@@ -200,12 +200,12 @@ onKeyAction(unsigned char key, int /* modifier */, int state)
 	/* escape */
 	Cmd[CurrentCmd].ref.index = -1;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
-	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, "");
+	GfParmSetStr(PrefHdle, (char const*)CurrentSection, Cmd[CurrentCmd].name, "");
     } else {
 	name = GfctrlGetNameByRef(GFCTRL_TYPE_KEYBOARD, (int)key);
 	Cmd[CurrentCmd].ref.index = (int)key;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_KEYBOARD;
-	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
+	GfParmSetStr(PrefHdle, (char const*)CurrentSection, Cmd[CurrentCmd].name, name);
     }
 
     glutIdleFunc(0);
@@ -225,7 +225,7 @@ onSKeyAction(int key, int /* modifier */, int state)
     name = GfctrlGetNameByRef(GFCTRL_TYPE_SKEYBOARD, key);
     Cmd[CurrentCmd].ref.index = key;
     Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_SKEYBOARD;
-    GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
+    GfParmSetStr(PrefHdle, (char const*)CurrentSection, Cmd[CurrentCmd].name, name);
 
     glutIdleFunc(0);
     InputWaited = 0;
@@ -339,7 +339,7 @@ onPush(void *vi)
     GfuiButtonSetText (scrHandle, Cmd[i].Id, "");
     Cmd[i].ref.index = -1;
     Cmd[i].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
-    GfParmSetStr(PrefHdle, CurrentSection, Cmd[i].name, "");
+    GfParmSetStr(PrefHdle, (char const*)CurrentSection, Cmd[i].name, "");
     if (Cmd[CurrentCmd].keyboardPossible) {
 	InputWaited = 1;
     }
@@ -374,28 +374,28 @@ onActivate(void * /* dummy */)
 		prm = "---";
 	    }
 	    prm = GfParmGetStr(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].name, prm);
-	    prm = GfParmGetStr(PrefHdle, CurrentSection, Cmd[cmd].name, prm);
+	    prm = GfParmGetStr(PrefHdle, (char const*)CurrentSection, Cmd[cmd].name, prm);
 	    ref = GfctrlGetRefByName(prm);
 	    Cmd[cmd].ref.type = ref->type;
 	    Cmd[cmd].ref.index = ref->index;
 	    if (Cmd[cmd].minName) {
 		Cmd[cmd].min = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].minName, NULL, Cmd[cmd].min);
-		Cmd[cmd].min = GfParmGetNum(PrefHdle, CurrentSection, Cmd[cmd].minName, NULL, Cmd[cmd].min);
+		Cmd[cmd].min = GfParmGetNum(PrefHdle, (char const*)CurrentSection, Cmd[cmd].minName, NULL, Cmd[cmd].min);
 	    }
 	    if (Cmd[cmd].maxName) {
 		Cmd[cmd].max = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].maxName, NULL, Cmd[cmd].max);
-		Cmd[cmd].max = GfParmGetNum(PrefHdle, CurrentSection, Cmd[cmd].maxName, NULL, Cmd[cmd].max);
+		Cmd[cmd].max = GfParmGetNum(PrefHdle, (char const*)CurrentSection, Cmd[cmd].maxName, NULL, Cmd[cmd].max);
 	    }
 	    if (Cmd[cmd].powName) {
 		Cmd[cmd].pow = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].powName, NULL, Cmd[cmd].pow);
-		Cmd[cmd].pow = GfParmGetNum(PrefHdle, CurrentSection, Cmd[cmd].powName, NULL, Cmd[cmd].pow);
+		Cmd[cmd].pow = GfParmGetNum(PrefHdle, (char const*)CurrentSection, Cmd[cmd].powName, NULL, Cmd[cmd].pow);
 	    }
 	}
 
 	SteerSensVal = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_SENS, NULL, 0);
-	SteerSensVal = GfParmGetNum(PrefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
+	SteerSensVal = GfParmGetNum(PrefHdle, (char const*)CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
 	DeadZoneVal = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_DEAD, NULL, 0);
-	DeadZoneVal = GfParmGetNum(PrefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
+	DeadZoneVal = GfParmGetNum(PrefHdle, (char const*)CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
     }
     
     updateButtonText();

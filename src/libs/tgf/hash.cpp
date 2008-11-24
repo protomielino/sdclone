@@ -145,7 +145,7 @@ gfIncreaseHash(tHashHeader *curHeader)
 	    /* insert in new list */
 	    switch (curHeader->type) {
 	    case GF_HASH_TYPE_STR:
-		hindex = hash_str(curHeader, curElem->key);
+		hindex = hash_str(curHeader, (char const*)curElem->key);
 		break;
 	    case GF_HASH_TYPE_BUF:
 		hindex = hash_buf(curHeader, curElem->key, curElem->size);
@@ -224,7 +224,7 @@ GfHashRemStr(void *hash, char *key)
     tHashElem		*curElem;
     unsigned int	index;
 
-    index = hash_str(curHeader, key);
+    index = hash_str(curHeader, (char const*)key);
     curElem = GF_TAILQ_FIRST(&(curHeader->hashHead[index]));
     while (curElem) {
 	if (!strcmp(curElem->key, key)) {

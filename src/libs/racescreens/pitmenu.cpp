@@ -44,7 +44,7 @@ rmUpdtFuel(void * /* dummy */)
     val = GfuiEditboxGetString(menuHandle, fuelId);
     rmCar->pitcmd.fuel = (tdble)strtol(val, (char **)NULL, 0);
     sprintf(buf, "%f", rmCar->pitcmd.fuel);
-    GfuiEditboxSetString(menuHandle, fuelId, buf);
+    GfuiEditboxSetString(menuHandle, fuelId, (char const*)buf);
 }
 
 static void
@@ -56,7 +56,7 @@ rmUpdtRepair(void * /* dummy */)
     val = GfuiEditboxGetString(menuHandle, repairId);
     rmCar->pitcmd.repair = strtol(val, (char **)NULL, 0);
     sprintf(buf, "%d", rmCar->pitcmd.repair);
-    GfuiEditboxSetString(menuHandle, repairId, buf);
+    GfuiEditboxSetString(menuHandle, repairId, (char const*)buf);
 }
 
 static tfuiCallback rmCallback;
@@ -93,22 +93,22 @@ RmPitMenuStart(tCarElt *car, void *userdata, tfuiCallback callback)
     x = 80;
     y = 380;
     sprintf(buf, "Driver: %s", car->_name);
-    GfuiLabelCreate(menuHandle, buf, GFUI_FONT_LARGE_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiLabelCreate(menuHandle, (char const*)buf, GFUI_FONT_LARGE_C, x, y, GFUI_ALIGN_HL_VB, 0);
     dy = GfuiFontHeight(GFUI_FONT_LARGE_C) + 5;
 
     y -= dy;
     sprintf(buf, "Remaining Laps: %d", car->_remainingLaps);
-    GfuiLabelCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiLabelCreate(menuHandle, (char const*)buf, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
 
     y -= dy;
     sprintf(buf, "Remaining Fuel: %.1f l", car->_fuel);
-    GfuiLabelCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiLabelCreate(menuHandle, (char const*)buf, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
 
     y -= dy;
     GfuiLabelCreate(menuHandle, "Fuel amount (liters):", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
 
     sprintf(buf, "%d", (int)car->pitcmd.fuel);
-    fuelId = GfuiEditboxCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C,
+    fuelId = GfuiEditboxCreate(menuHandle, (char const*)buf, GFUI_FONT_MEDIUM_C,
 			       x + GfuiFontWidth(GFUI_FONT_MEDIUM_C, "Fuel amount (liters):") + 20, y,
 			       0, 10, NULL, (tfuiCallback)NULL, rmUpdtFuel);
 
@@ -116,7 +116,7 @@ RmPitMenuStart(tCarElt *car, void *userdata, tfuiCallback callback)
     GfuiLabelCreate(menuHandle, "Repair amount:", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
 
     sprintf(buf, "%d", (int)car->pitcmd.repair);
-    repairId = GfuiEditboxCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C,
+    repairId = GfuiEditboxCreate(menuHandle, (char const*)buf, GFUI_FONT_MEDIUM_C,
 				 x + GfuiFontWidth(GFUI_FONT_MEDIUM_C, "Fuel amount (liters):") + 20, y,
 				 0, 10, NULL, (tfuiCallback)NULL, rmUpdtRepair);
     

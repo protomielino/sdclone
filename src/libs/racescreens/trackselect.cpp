@@ -92,7 +92,7 @@ static void rmUpdateTrackInfo(void)
 
 	sprintf(buf, "tracks/%s/%s/%s.%s", CategoryList->name, ((tFList*)CategoryList->userData)->name,
 		((tFList*)CategoryList->userData)->name, TRKEXT);
-	trackHandle = GfParmReadFile(buf, GFPARM_RMODE_STD); /* COMMENT VALID? don't release, the name is used later */
+	trackHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD); /* COMMENT VALID? don't release, the name is used later */
 
 	if (!trackHandle) {
 		GfTrace("File %s has pb\n", buf);
@@ -105,14 +105,14 @@ static void rmUpdateTrackInfo(void)
 
 	tmp = GfParmGetNum(trackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, NULL, 0);
 	sprintf(buf, "%.2f m", tmp);
-	GfuiLabelSetText(scrHandle, WidthId, buf);
+	GfuiLabelSetText(scrHandle, WidthId, (char const*)buf);
 	tmp = trk->length;
 	sprintf(buf, "%.2f m", tmp);
-	GfuiLabelSetText(scrHandle, LengthId, buf);
+	GfuiLabelSetText(scrHandle, LengthId, (char const*)buf);
 
 	if (trk->pits.nMaxPits != 0) {
 		sprintf(buf, "%d", trk->pits.nMaxPits);
-		GfuiLabelSetText(scrHandle, PitsId, buf);
+		GfuiLabelSetText(scrHandle, PitsId, (char const*)buf);
 	} else {
 		GfuiLabelSetText(scrHandle, PitsId, "none");
 	}
@@ -157,8 +157,8 @@ void rmtsSelect(void * /* dummy */)
 
 	curTrkIdx = (int)GfParmGetNum(ts->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
 	sprintf(path, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-	GfParmSetStr(ts->param, path, RM_ATTR_CATEGORY, CategoryList->name);
-	GfParmSetStr(ts->param, path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
+	GfParmSetStr(ts->param, (char const*)path, RM_ATTR_CATEGORY, CategoryList->name);
+	GfParmSetStr(ts->param, (char const*)path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
 
 	rmtsDeactivate(ts->nextScreen);
 }
@@ -189,7 +189,7 @@ RmGetTrackName(const char *category, const char *trackName)
 	char *name;
 
 	sprintf(buf, "tracks/%s/%s/%s.%s", category, trackName, trackName, TRKEXT);
-	trackHandle = GfParmReadFile(buf, GFPARM_RMODE_STD); /* don't release, the name is used later */
+	trackHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD); /* don't release, the name is used later */
 
 	if (trackHandle) {
 		name = strdup(GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_NAME, trackName));
@@ -215,7 +215,7 @@ RmGetCategoryName(const char *category)
 	char *name;
 
 	sprintf(buf, "data/tracks/%s.%s", category, TRKEXT);
-	categoryHandle = GfParmReadFile(buf, GFPARM_RMODE_STD); /* don't release, the name is used later */
+	categoryHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD); /* don't release, the name is used later */
 
 	if (categoryHandle) {
 		name = strdup(GfParmGetStr(categoryHandle, TRK_SECT_HDR, TRK_ATT_NAME, category));
@@ -264,7 +264,7 @@ RmTrackSelect(void *vs)
 
 		/* get the tracks in the category directory */
 		sprintf(buf, "tracks/%s", CatCur->name);
-		TrList = GfDirGetList(buf);
+		TrList = GfDirGetList((char const*)buf);
 		if (TrList == NULL) {
 			GfTrace("RmTrackSelect: No track for category %s available\n", CatCur->name);
 			return;
@@ -286,9 +286,9 @@ RmTrackSelect(void *vs)
 
 	curTrkIdx = (int)GfParmGetNum(ts->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
 	sprintf(path, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-	defaultCategory = GfParmGetStr(ts->param, path, RM_ATTR_CATEGORY, CategoryList->name);
+	defaultCategory = GfParmGetStr(ts->param, (char const*)path, RM_ATTR_CATEGORY, CategoryList->name);
 	/* XXX coherency check */
-	defaultTrack = GfParmGetStr(ts->param, path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
+	defaultTrack = GfParmGetStr(ts->param, (char const*)path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
 
 	CatCur = CategoryList;
 	do {

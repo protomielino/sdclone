@@ -108,13 +108,13 @@ rmdsSelect(void * /* dummy */)
     int		index;
     
     sprintf(buf, "%s", RM_SECT_DRIVERS);
-    GfParmListClean(ds->param, buf);
+    GfParmListClean(ds->param, (char const*)buf);
     name = GfuiScrollListExtractElement(scrHandle, selectedScrollList, 0, (void**)&curDrv);
     index = 1;
     while (name != NULL) {
 	sprintf(buf, "%s/%d", RM_SECT_DRIVERS, index);
-	GfParmSetNum(ds->param, buf, RM_ATTR_IDX, (char*)NULL, curDrv->index);
-	GfParmSetStr(ds->param, buf, RM_ATTR_MODULE, curDrv->dname);
+	GfParmSetNum(ds->param, (char const*)buf, RM_ATTR_IDX, (char*)NULL, curDrv->index);
+	GfParmSetStr(ds->param, (char const*)buf, RM_ATTR_MODULE, curDrv->dname);
 	index++;
 	name = GfuiScrollListExtractElement(scrHandle, selectedScrollList, 0, (void**)&curDrv);
     }
@@ -144,10 +144,10 @@ rmdsClickOnDriver(void * /* dummy */)
 	GfuiLabelSetText(scrHandle, PickDrvNameLabelId, curDrv->name);
 	/* search driver infos */
 	sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), curDrv->dname, curDrv->dname);
-	robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	robhdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD);
 	if (!robhdle) {
 	    sprintf(buf, "drivers/%s/%s.xml", curDrv->dname, curDrv->dname);
-	    robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	    robhdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD);
 	}
 	if (robhdle != NULL) {
 	    sprintf(buf, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, curDrv->index);
@@ -326,21 +326,21 @@ RmDriversSelect(void *vs)
 					strcpy(dname, sp);
 					dname[strlen(dname) - strlen(DLLEXT) - 1] = 0; /* cut .so or .dll */
 					sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), dname, dname);
-					robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+					robhdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD);
 					if (!robhdle) {
 						sprintf(buf, "drivers/%s/%s.xml", dname, dname);
-						robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+						robhdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD);
 					}
 					sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, curmod->modInfo[i].index);
-					carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "");
-					if (strcmp(GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT), ROB_VAL_ROBOT)) {
+					carName = GfParmGetStr(robhdle, (char const*)path, ROB_ATTR_CAR, "");
+					if (strcmp(GfParmGetStr(robhdle, (char const*)path, ROB_ATTR_TYPE, ROB_VAL_ROBOT), ROB_VAL_ROBOT)) {
 						human = 1;
 					} else {
 						human = 0;
 					}
 					sprintf(path, "cars/%s/%s.xml", carName, carName);
 					if (!stat(path, &st)) {
-						carhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
+						carhdle = GfParmReadFile((char const*)path, GFPARM_RMODE_STD);
 						if (carhdle) {
 							curDrv = (tDrvElt*)calloc(1, sizeof(tDrvElt));
 							curDrv->index = curmod->modInfo[i].index;
@@ -372,8 +372,8 @@ RmDriversSelect(void *vs)
     index = 1;
     for (i = 1; i < nCars+1; i++) {
 	sprintf(dname, "%s/%d", RM_SECT_DRIVERS, i);
-	cardllname = GfParmGetStr(ds->param, dname, RM_ATTR_MODULE, "");
-	robotIdx = (int)GfParmGetNum(ds->param, dname, RM_ATTR_IDX, (char*)NULL, 0);
+	cardllname = GfParmGetStr(ds->param, (char const*)dname, RM_ATTR_MODULE, "");
+	robotIdx = (int)GfParmGetNum(ds->param, (char const*)dname, RM_ATTR_IDX, (char*)NULL, 0);
 
 	curDrv = GF_TAILQ_FIRST(&DrvList);
 	if (curDrv != NULL) {

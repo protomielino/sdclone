@@ -250,7 +250,7 @@ void GfScrInit(int argc, char *argv[])
     int		i, depth;
 
     sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-    handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    handle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     xw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, 640);
     yw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, 480);
     winX = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, xw);
@@ -584,7 +584,7 @@ updateLabelText(void)
     GfuiLabelSetText (scrHandle, ModeLabelId, Mode[curMode]);
 #ifdef WIN32
     sprintf(buf, "%d", curMaxFreq);
-    GfuiEditboxSetString(scrHandle, MaxFreqId, buf);
+    GfuiEditboxSetString(scrHandle, MaxFreqId, (char const*)buf);
 #endif
 	GfuiLabelSetText (scrHandle, VInitLabelId, VInit[curVInit]);
 }
@@ -707,7 +707,7 @@ ChangeMaxFreq(void * /* dummy */)
     val = GfuiEditboxGetString(scrHandle, MaxFreqId);
     curMaxFreq = (int)strtol(val, (char **)NULL, 0);
     sprintf(buf, "%d", curMaxFreq);
-    GfuiEditboxSetString(scrHandle, MaxFreqId, buf);
+    GfuiEditboxSetString(scrHandle, MaxFreqId, (char const*)buf);
 }
 #endif
 
@@ -733,7 +733,7 @@ GfScrMenuInit(void *precMenu)
 	const int yoffset1 = 30, yoffset2 = 40;
 #endif // WIN32
     sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-    paramHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    paramHdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     if (scrHandle) return scrHandle;
 

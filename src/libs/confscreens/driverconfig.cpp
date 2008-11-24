@@ -209,7 +209,7 @@ GenCarsInfo(void)
 			curCat->_MemName = strdup(curFile->name);
 			curCat->_Name = curCat->_MemName;
 			sprintf(buf, "categories/%s.xml", curFile->name);
-			hdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+			hdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD);
 			if (!hdle) {
 			continue;
 			}
@@ -228,7 +228,7 @@ GenCarsInfo(void)
 	    curCar->_MemName = strdup(curFile->name);
 	    curCar->_Name = curCar->_MemName;
 	    sprintf(buf, "cars/%s/%s.xml", curFile->name, curFile->name);
-	    carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	    carparam = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD);
 	    if (!carparam) {
 		continue;
 	    }
@@ -315,14 +315,14 @@ GenDrvList(void)
 	int found;
 
 	sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
-	drvinfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+	drvinfo = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD);
 	if (drvinfo == NULL) {
 		return -1;
 	}
 
 	for (i = 0; i < NB_DRV; i++) {
 		sprintf(sstring, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
-		driver = GfParmGetStr(drvinfo, sstring, ROB_ATTR_NAME, "");
+		driver = GfParmGetStr(drvinfo, (char const*)sstring, ROB_ATTR_NAME, "");
 		if (strlen(driver) == 0) {
 			PlayersInfo[i]._DispName = strdup(NO_DRV);
 			PlayersInfo[i]._Name = dllname;
@@ -338,14 +338,14 @@ GenDrvList(void)
 			PlayersInfo[i]._Name = dllname;
 			PlayersInfo[i]._MemName = NULL;
 			PlayersInfo[i].skilllevel = 0;
-			str = GfParmGetStr(drvinfo, sstring, ROB_ATTR_LEVEL, level_str[0]);
+			str = GfParmGetStr(drvinfo, (char const*)sstring, ROB_ATTR_LEVEL, level_str[0]);
 			for(j = 0; j < nbLevels; j++) {
 				if (strcmp(level_str[j], str) == 0) {
 					PlayersInfo[i].skilllevel = j;
 					break;
 				}
 			}
-			str = GfParmGetStr(drvinfo, sstring, ROB_ATTR_CAR, "");
+			str = GfParmGetStr(drvinfo, (char const*)sstring, ROB_ATTR_CAR, "");
 			found = 0;
 			cat = GF_TAILQ_FIRST(&CatsInfoList);
 			PlayersInfo[i].carinfo = GF_TAILQ_FIRST(&(cat->CarsInfoList));
@@ -360,17 +360,17 @@ GenDrvList(void)
 					} while (!found && ((car = GF_TAILQ_NEXT(car, link)) != NULL));
 				}
 			} while (!found && ((cat = GF_TAILQ_NEXT(cat, link)) != NULL));
-			PlayersInfo[i].racenumber  = (int)GfParmGetNum(drvinfo, sstring, ROB_ATTR_RACENUM, (char*)NULL, 0);
-			PlayersInfo[i].color[0]    = (float)GfParmGetNum(drvinfo, sstring, ROB_ATTR_RED, (char*)NULL, 1.0);
-			PlayersInfo[i].color[1]    = (float)GfParmGetNum(drvinfo, sstring, ROB_ATTR_GREEN, (char*)NULL, 1.0);;
-			PlayersInfo[i].color[2]    = (float)GfParmGetNum(drvinfo, sstring, ROB_ATTR_BLUE, (char*)NULL, 0.5);;
+			PlayersInfo[i].racenumber  = (int)GfParmGetNum(drvinfo, (char const*)sstring, ROB_ATTR_RACENUM, (char*)NULL, 0);
+			PlayersInfo[i].color[0]    = (float)GfParmGetNum(drvinfo, (char const*)sstring, ROB_ATTR_RED, (char*)NULL, 1.0);
+			PlayersInfo[i].color[1]    = (float)GfParmGetNum(drvinfo, (char const*)sstring, ROB_ATTR_GREEN, (char*)NULL, 1.0);;
+			PlayersInfo[i].color[2]    = (float)GfParmGetNum(drvinfo, (char const*)sstring, ROB_ATTR_BLUE, (char*)NULL, 0.5);;
 			PlayersInfo[i].color[3]    = 1.0;
 		}
     }
     UpdtScrollList();
 
     sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
-    PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    PrefHdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD);
     if (PrefHdle == NULL) {
 		GfParmReleaseHandle(drvinfo);
 		return -1;
@@ -378,14 +378,14 @@ GenDrvList(void)
 
     for (i = 0; i < NB_DRV; i++) {
 		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
-		str = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
+		str = GfParmGetStr(PrefHdle, (char const*)sstring, HM_ATT_TRANS, HM_VAL_AUTO);
 		if (strcmp(str, HM_VAL_AUTO) == 0) {
 			PlayersInfo[i].transmission = HM_VAL_AUTO;
 		} else {
 			PlayersInfo[i].transmission = HM_VAL_MANUAL;
 		}
-		PlayersInfo[i].nbpitstops = (int)GfParmGetNum(PrefHdle, sstring, HM_ATT_NBPITS, (char*)NULL, 0);
-		if (!strcmp(GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[0]), Yn[0])) {
+		PlayersInfo[i].nbpitstops = (int)GfParmGetNum(PrefHdle, (char const*)sstring, HM_ATT_NBPITS, (char*)NULL, 0);
+		if (!strcmp(GfParmGetStr(PrefHdle, (char const*)sstring, HM_ATT_AUTOREVERSE, Yn[0]), Yn[0])) {
 			PlayersInfo[i].autoreverse = 0;
 		} else {
 			PlayersInfo[i].autoreverse = 1;
@@ -406,34 +406,34 @@ SaveDrvList(void * /* dummy */)
     int		i;
 
     sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
-    drvinfo = GfParmReadFile(buf, GFPARM_RMODE_STD);
+    drvinfo = GfParmReadFile((const char*)buf, GFPARM_RMODE_STD);
     if (drvinfo == NULL) {
 	return;
     }
     for (i = 0; i < NB_DRV; i++) {
 	sprintf(str, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
 	if (strcmp(PlayersInfo[i]._DispName, NO_DRV) == 0) {
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_NAME, "");
+	    GfParmSetStr(drvinfo, (const char*)str, ROB_ATTR_NAME, "");
 	} else {
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_NAME, PlayersInfo[i]._DispName);
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_CAR, PlayersInfo[i].carinfo->_Name);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_RACENUM, (char*)NULL, PlayersInfo[i].racenumber);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_RED, (char*)NULL, PlayersInfo[i].color[0]);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_GREEN, (char*)NULL, PlayersInfo[i].color[1]);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_BLUE, (char*)NULL, PlayersInfo[i].color[2]);
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_TYPE, ROB_VAL_HUMAN);
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_LEVEL, level_str[PlayersInfo[i].skilllevel]);
+	    GfParmSetStr(drvinfo, (char const*)str, ROB_ATTR_NAME, PlayersInfo[i]._DispName);
+	    GfParmSetStr(drvinfo, (char const*)str, ROB_ATTR_CAR, PlayersInfo[i].carinfo->_Name);
+	    GfParmSetNum(drvinfo, (char const*)str, ROB_ATTR_RACENUM, (char*)NULL, PlayersInfo[i].racenumber);
+	    GfParmSetNum(drvinfo, (char const*)str, ROB_ATTR_RED, (char*)NULL, PlayersInfo[i].color[0]);
+	    GfParmSetNum(drvinfo, (char const*)str, ROB_ATTR_GREEN, (char*)NULL, PlayersInfo[i].color[1]);
+	    GfParmSetNum(drvinfo, (char const*)str, ROB_ATTR_BLUE, (char*)NULL, PlayersInfo[i].color[2]);
+	    GfParmSetStr(drvinfo, (char const*)str, ROB_ATTR_TYPE, ROB_VAL_HUMAN);
+	    GfParmSetStr(drvinfo, (char const*)str, ROB_ATTR_LEVEL, level_str[PlayersInfo[i].skilllevel]);
 	}
     }
     GfParmWriteFile(NULL, drvinfo, dllname);
 
     sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
-    PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    PrefHdle = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     for (i = 0; i < NB_DRV; i++) {
 	sprintf(str, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
-	GfParmSetStr(PrefHdle, str, HM_ATT_TRANS, PlayersInfo[i].transmission);
-	GfParmSetNum(PrefHdle, str, HM_ATT_NBPITS, (char*)NULL, (tdble)PlayersInfo[i].nbpitstops);
-	GfParmSetStr(PrefHdle, str, HM_ATT_AUTOREVERSE, Yn[PlayersInfo[i].autoreverse]);
+	GfParmSetStr(PrefHdle, (char const*)str, HM_ATT_TRANS, PlayersInfo[i].transmission);
+	GfParmSetNum(PrefHdle, (char const*)str, HM_ATT_NBPITS, (char*)NULL, (tdble)PlayersInfo[i].nbpitstops);
+	GfParmSetStr(PrefHdle, (char const*)str, HM_ATT_AUTOREVERSE, Yn[PlayersInfo[i].autoreverse]);
     }
     GfParmWriteFile(NULL, PrefHdle, "preferences");
     GfParmReleaseHandle(PrefHdle);
