@@ -2,7 +2,7 @@
 
     file        : controlconfig.cpp
     created     : Wed Mar 12 21:20:34 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: controlconfig.cpp,v 1.5 2003/11/23 20:21:11 torcs Exp $                                  
 
@@ -32,7 +32,6 @@
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
-#include <js.h>
 
 #include "controlconfig.h"
 #include "mouseconfig.h"
@@ -66,10 +65,10 @@ static tCmdInfo Cmd[] = {
 
 static int maxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
 
-static jsJoystick	*js[NUM_JOY] = {NULL};
-static float		ax[MAX_AXES * NUM_JOY] = {0};
-static float 		axCenter[MAX_AXES * NUM_JOY];
-static int		rawb[NUM_JOY] = {0};
+static jsJoystick	*js[GFCTRL_JOY_NUMBER] = {NULL};
+static float		ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER] = {0};
+static float 		axCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
+static int		rawb[GFCTRL_JOY_NUMBER] = {0};
 
 static float SteerSensVal;
 static float DeadZoneVal;
@@ -240,7 +239,7 @@ getMovedAxis(void)
     int		Index = -1;
     float	maxDiff = 0.3;
 
-    for (i = 0; i < MAX_AXES * NUM_JOY; i++) {
+    for (i = 0; i < GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER; i++) {
 	if (maxDiff < fabs(ax[i] - axCenter[i])) {
 	    maxDiff = fabs(ax[i] - axCenter[i]);
 	    Index = i;
@@ -289,9 +288,9 @@ Idle(void)
     }
 
     /* Check for a Joystick button pressed */
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index]) {
-	    js[index]->read(&b, &ax[index * MAX_AXES]);
+	    js[index]->read(&b, &ax[index * GFCTRL_JOY_MAX_AXES]);
 
 	    /* Joystick buttons */
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
@@ -348,9 +347,9 @@ onPush(void *vi)
     memset(&mouseInfo, 0, sizeof(mouseInfo));
     GfctrlMouseGetCurrent(&mouseInfo);
 
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index]) {
-	    js[index]->read(&rawb[index], &ax[index * MAX_AXES]); /* initial value */
+	    js[index]->read(&rawb[index], &ax[index * GFCTRL_JOY_MAX_AXES]); /* initial value */
 	}
     }
     memcpy(axCenter, ax, sizeof(axCenter));
@@ -426,7 +425,7 @@ TorcsControlMenuInit(void *prevMenu, int idx)
 	return scrHandle;
     }
 
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index] == NULL) {
 	    js[index] = new jsJoystick(index);
 	}

@@ -31,7 +31,6 @@
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
-#include <js.h>
 
 #include "controlconfig.h"
 #include "mouseconfig.h"

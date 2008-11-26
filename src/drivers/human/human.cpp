@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <cstring>
 #include <math.h>
-#include <js.h>
 
 #include <tgfclient.h>
 

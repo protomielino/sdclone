@@ -26,7 +26,6 @@
 #include <robot.h>
 #include "driverconfig.h"
 #include <playerpref.h>
-#include <js.h>
 
 #include "controlconfig.h"
 #include "joystickconfig.h"
@@ -38,10 +37,10 @@ static int maxCmd;
 
 static char buf[1024];
 
-static jsJoystick *js[NUM_JOY] = {NULL};
+static jsJoystick *js[GFCTRL_JOY_NUMBER] = {NULL};
 
-static float 	ax[MAX_AXES * NUM_JOY] = {0};
-static int	rawb[NUM_JOY] = {0};
+static float 	ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER] = {0};
+static int	rawb[GFCTRL_JOY_NUMBER] = {0};
 
 #define NB_STEPS	6
 
@@ -74,7 +73,7 @@ onBack(void *prevMenu)
     GfuiScreenActivate(prevMenu);
 }
 
-static float 	axCenter[MAX_AXES * NUM_JOY];
+static float 	axCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
 
 static void advanceStep (void)
 {
@@ -137,9 +136,9 @@ Idle2(void)
     int		b, i;
     int		index;
 
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index]) {
-	    js[index]->read(&b, &ax[index * MAX_AXES]);
+	    js[index]->read(&b, &ax[index * GFCTRL_JOY_MAX_AXES]);
 	    
 	    /* Joystick buttons */
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
@@ -174,9 +173,9 @@ onActivate(void * /* dummy */)
     GfuiLabelSetText(scrHandle2, InstId, Instructions[CalState]);
     glutIdleFunc(Idle2);
     glutPostRedisplay();
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index]) {
-	    js[index]->read(&rawb[index], &ax[index * MAX_AXES]); /* initial value */
+	    js[index]->read(&rawb[index], &ax[index * GFCTRL_JOY_MAX_AXES]); /* initial value */
 	}
     }
     for (i = 0; i < 4; i++) {
@@ -226,7 +225,7 @@ JoyCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
 	y -= dy;
     }
 
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index] == NULL) {
 	    js[index] = new jsJoystick(index);
 	}

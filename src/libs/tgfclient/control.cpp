@@ -2,7 +2,7 @@
 
     file        : control.cpp
     created     : Thu Mar  6 22:01:33 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: control.cpp,v 1.3 2003/11/11 16:36:22 torcs Exp $                                  
 
@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
-#include <js.h>
 
 #include <tgfclient.h>
 
@@ -112,7 +111,7 @@ static int gfmaxSKey		= sizeof(GfSKey)	/ sizeof(GfSKey[0]);
 static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
 
 static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
-static jsJoystick *js[NUM_JOY] = {NULL};
+static jsJoystick *js[GFCTRL_JOY_NUMBER] = {NULL};
 
 
 /** Get a control reference by its name
@@ -256,7 +255,7 @@ gfJoyFirstInit(void)
     
     gfctrlJoyPresent = GFCTRL_JOY_NONE;
 
-    for (index = 0; index < NUM_JOY; index++) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (js[index] == NULL) {
 	    js[index] = new jsJoystick(index);
 	}
@@ -336,26 +335,26 @@ GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo)
     unsigned int	mask;
 
     if (gfctrlJoyPresent == GFCTRL_JOY_PRESENT) {
-    	for (ind = 0; ind < NUM_JOY; ind++) {
+    	for (ind = 0; ind < GFCTRL_JOY_NUMBER; ind++) {
 	    if (js[ind]) {
-		js[ind]->read(&b, &(joyInfo->ax[MAX_AXES * ind]));
+		js[ind]->read(&b, &(joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind]));
 
 		/* Joystick buttons */
-		for (i = 0, mask = 1; i < GFCTRL_JOY_MAXBUTTON; i++, mask *= 2) {
+		for (i = 0, mask = 1; i < GFCTRL_JOY_MAX_BUTTONS; i++, mask *= 2) {
 		    if (((b & mask) != 0) && ((joyInfo->oldb[ind] & mask) == 0)) {
-			joyInfo->edgeup[i + GFCTRL_JOY_MAXBUTTON * ind] = 1;
+			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
 		    } else {
-			joyInfo->edgeup[i + GFCTRL_JOY_MAXBUTTON * ind] = 0;
+			joyInfo->edgeup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
 		    }
 		    if (((b & mask) == 0) && ((joyInfo->oldb[ind] & mask) != 0)) {
-			joyInfo->edgedn[i + GFCTRL_JOY_MAXBUTTON * ind] = 1;
+			joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
 		    } else {
-			joyInfo->edgedn[i + GFCTRL_JOY_MAXBUTTON * ind] = 0;
+			joyInfo->edgedn[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
 		    }
 		    if ((b & mask) != 0) {
-			joyInfo->levelup[i + GFCTRL_JOY_MAXBUTTON * ind] = 1;
+			joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 1;
 		    } else {
-			joyInfo->levelup[i + GFCTRL_JOY_MAXBUTTON * ind] = 0;
+			joyInfo->levelup[i + GFCTRL_JOY_MAX_BUTTONS * ind] = 0;
 		    }
 		}
 		joyInfo->oldb[ind] = b;

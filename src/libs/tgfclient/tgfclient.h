@@ -29,7 +29,7 @@
 
 #include <tgf.h>
 #include <GL/glut.h>
-#include <js.h>
+#include <plib/js.h>
 #include <screen_properties.h>
 
 extern void GfInitClient(void);
@@ -265,16 +265,18 @@ typedef struct
 #define GFCTRL_JOY_NONE		0
 #define GFCTRL_JOY_PRESENT	1
 
-#define GFCTRL_JOY_MAXBUTTON	32 /* Size of integer so don't change please */
+#define GFCTRL_JOY_NUMBER	8 /* Max number of managed joysticks */
+#define GFCTRL_JOY_MAX_BUTTONS	32	 /* Size of integer so don't change please */
+#define GFCTRL_JOY_MAX_AXES	_JS_MAX_AXES
 
 /** Joystick Information Structure */
 typedef struct
 {
-    int		oldb[NUM_JOY];
-    float	ax[MAX_AXES * NUM_JOY];			/**< Axis values */
-    int		edgeup[GFCTRL_JOY_MAXBUTTON * NUM_JOY];	/**< Button transition from down (pressed) to up */
-    int		edgedn[GFCTRL_JOY_MAXBUTTON * NUM_JOY];	/**< Button transition from up to down */
-    int		levelup[GFCTRL_JOY_MAXBUTTON * NUM_JOY];/**< Button state (1 = up) */
+    int		oldb[GFCTRL_JOY_NUMBER];
+    float	ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];	     /**< Axis values */
+    int		edgeup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from down (pressed) to up */
+    int		edgedn[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from up to down */
+    int		levelup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER]; /**< Button state (1 = up) */
 } tCtrlJoyInfo;
 
 extern tCtrlJoyInfo *GfctrlJoyInit(void);
