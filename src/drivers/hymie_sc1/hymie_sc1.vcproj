@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="hymie_sc1"
 	ProjectGUID="{9A0908DA-6811-4B28-8283-D5367FFC7954}"
 	>
@@ -74,12 +74,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalOptions="/pdhymie_sc1ype:sept"
 				AdditionalDependencies="odbc32.lib odbccp32.lib tgf.lib robottools.lib sg.lib ul.lib"
 				OutputFile=".\Debug/hymie_sc1.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../windows/lib"
+				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\hymie_sc1.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/hymie_sc1.pdb"
@@ -182,7 +182,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBCD"
+				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\hymie_sc1.def"
 				ProgramDatabaseFile=".\Release/hymie_sc1.pdb"
 				GenerateMapFile="true"

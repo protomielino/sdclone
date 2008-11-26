@@ -542,7 +542,7 @@ void CK1999Data::InitTrack(tTrack* track, void **carParmHandle, tSituation *p)
  for (int Step = 128; (Step /= 2) > 0;)
  {
   OUTPUT("Step = " << Step);
-  for (int i = Iterations * int(sqrt(Step)); --i >= 0;)
+  for (int i = Iterations * int(sqrt((double)Step)); --i >= 0;)
    Smooth(Step);
   Interpolate(Step);
  }

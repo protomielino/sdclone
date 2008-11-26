@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="hymie_sc2"
-	ProjectGUID="{37AE5AC7-283C-4C9E-92AA-2E9CC86CDA63}"
+	Name="simuv2"
+	ProjectGUID="{CF0AC72A-0DAE-449D-BA7E-7E9DFFD95AB7}"
 	>
 	<Platforms>
 		<Platform
@@ -41,22 +41,22 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/hymie_sc2.tlb"
+				TypeLibraryName=".\Debug/simuv2.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
-				MinimalRebuild="true"
+				AdditionalIncludeDirectories="../../../../export/include,../../../windows/include"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;SIMUV2_EXPORTS;DEBUG;DEBUG_OUT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\Debug/hymie_sc2.pch"
+				PrecompiledHeaderFile=".\Debug/simuv2.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
-				WarningLevel="3"
+				BrowseInformation="1"
+				WarningLevel="2"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
 			/>
@@ -74,18 +74,18 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="odbc32.lib odbccp32.lib tgf.lib robottools.lib sg.lib ul.lib"
-				OutputFile=".\Debug/hymie_sc2.dll"
+				AdditionalDependencies="solid.lib tgf.lib robottools.lib sg.lib ul.lib"
+				OutputFile=".\Debug/simuv2.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../export/libd,../../windows/lib"
+				AdditionalLibraryDirectories="../../../../export/libd,../../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
-				ModuleDefinitionFile=".\hymie_sc2.def"
+				ModuleDefinitionFile=".\simuv2.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/hymie_sc2.pdb"
+				ProgramDatabaseFile=".\Debug/simuv2.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Debug/hymie_sc2.map"
-				ImportLibrary=".\Debug/hymie_sc2.lib"
+				MapFileName=".\Debug/simuv2.map"
+				ImportLibrary=".\Debug/simuv2.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -100,7 +100,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/hymie_sc2.bsc"
+				OutputFile=".\Debug/simuv2.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtimed\drivers\hymie_sc2"
+				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtimed\modules\simu"
 			/>
 		</Configuration>
 		<Configuration
@@ -144,19 +144,19 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/hymie_sc2.tlb"
+				TypeLibraryName=".\Release/simuv2.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
+				InlineFunctionExpansion="2"
+				AdditionalIncludeDirectories="../../../../export/include,../../../windows/include"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;SIMUV2_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/hymie_sc2.pch"
+				PrecompiledHeaderFile=".\Release/simuv2.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -177,17 +177,17 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
-				OutputFile=".\Release/hymie_sc2.dll"
+				AdditionalDependencies="solid.lib tgf.lib robottools.lib sg.lib ul.lib odbc32.lib odbccp32.lib"
+				OutputFile=".\Release/simuv2.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
+				AdditionalLibraryDirectories="../../../../export/lib,../../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
-				ModuleDefinitionFile=".\hymie_sc2.def"
-				ProgramDatabaseFile=".\Release/hymie_sc2.pdb"
+				ModuleDefinitionFile=".\simuv2.def"
+				ProgramDatabaseFile=".\Release/simuv2.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Release/hymie_sc2.map"
-				ImportLibrary=".\Release/hymie_sc2.lib"
+				MapFileName=".\Release/simuv2.map"
+				ImportLibrary=".\Release/simuv2.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -202,7 +202,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/hymie_sc2.bsc"
+				OutputFile=".\Release/simuv2.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -215,7 +215,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtime\drivers\hymie_sc2"
+				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtime\modules\simu"
 			/>
 		</Configuration>
 	</Configurations>
@@ -227,7 +227,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="cardata.cpp"
+				RelativePath="aero.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -249,7 +249,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="correct.cpp"
+				RelativePath="axle.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -271,7 +271,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="driver.cpp"
+				RelativePath="brake.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -293,7 +293,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="hymie_sc2.cpp"
+				RelativePath="car.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -315,11 +315,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="hymie_sc2.def"
-				>
-			</File>
-			<File
-				RelativePath="learn.cpp"
+				RelativePath="categories.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -341,7 +337,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="opponent.cpp"
+				RelativePath="collide.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -363,7 +359,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="pit.cpp"
+				RelativePath="differential.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -385,7 +381,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="spline.cpp"
+				RelativePath="engine.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -407,7 +403,121 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="strategy.cpp"
+				RelativePath="simu.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="simuitf.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="simuv2.def"
+				>
+			</File>
+			<File
+				RelativePath="steer.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="susp.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="transmission.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="wheel.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -434,37 +544,54 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="cardata.h"
+				RelativePath="aero.h"
 				>
 			</File>
 			<File
-				RelativePath="driver.h"
+				RelativePath="axle.h"
 				>
 			</File>
 			<File
-				RelativePath="learn.h"
+				RelativePath="brake.h"
 				>
 			</File>
 			<File
-				RelativePath="linalg.h"
+				RelativePath="carstruct.h"
 				>
 			</File>
 			<File
-				RelativePath="opponent.h"
+				RelativePath="differential.h"
 				>
 			</File>
 			<File
-				RelativePath="pit.h"
+				RelativePath="engine.h"
 				>
 			</File>
 			<File
-				RelativePath="spline.h"
+				RelativePath="sim.h"
 				>
 			</File>
 			<File
-				RelativePath="strategy.h"
+				RelativePath="steer.h"
 				>
 			</File>
+			<File
+				RelativePath="susp.h"
+				>
+			</File>
+			<File
+				RelativePath="transmission.h"
+				>
+			</File>
+			<File
+				RelativePath="wheel.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Resource Files"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 		</Filter>
 	</Files>
 	<Globals>

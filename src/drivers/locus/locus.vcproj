@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="locus"
-	ProjectGUID="{9A0908DA-6811-4B28-8283-D5367FFC7954}"
+	ProjectGUID="{2DA63E2B-0B12-4F12-AA17-02366E0BA760}"
 	>
 	<Platforms>
 		<Platform
@@ -47,7 +47,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
+				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
 				RuntimeLibrary="0"
 				PrecompiledHeaderFile=".\Release/locus.pch"
@@ -108,7 +108,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetDir)&quot;*.dll c:\andrew\torcs\drivers\locus"
+				CommandLine="copy &quot;$(TargetDir)&quot;*.dll $(SolutionDir)runtime\drivers\locus"
 			/>
 		</Configuration>
 		<Configuration
@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
+				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -177,7 +177,7 @@
 				OutputFile=".\Debug/locus.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
+				AdditionalLibraryDirectories="../../../export/libd,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\locus.def"
 				GenerateDebugInformation="true"
@@ -210,7 +210,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetDir)&quot;*.dll c:\andrew\hobbies\torcs\drivers\locus"
+				CommandLine="copy &quot;$(TargetDir)&quot;*.dll $(SolutionDir)runtimed\drivers\locus"
 			/>
 		</Configuration>
 	</Configurations>

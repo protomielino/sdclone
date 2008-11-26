@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="tgf"
-	ProjectGUID="{B5D3E0E8-B2FE-46A1-A6F7-52A74627076A}"
+	Name="olethros"
+	ProjectGUID="{8E885009-EE69-4045-B3F5-C1612E2CA1F0}"
 	>
 	<Platforms>
 		<Platform
@@ -41,19 +41,19 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/tgf.tlb"
+				TypeLibraryName=".\Release/olethros.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TGF_EXPORTS"
+				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;OLETHROS_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/tgf.pch"
+				PrecompiledHeaderFile=".\Release/olethros.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -66,22 +66,22 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
-				Culture="1036"
+				Culture="2055"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib txml.lib sg.lib ul.lib"
-				OutputFile=".\Release/tgf.dll"
+				AdditionalDependencies="learning.lib tgf.lib robottools.lib sg.lib ul.lib"
+				OutputFile=".\Release/olethros.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBCD"
-				ModuleDefinitionFile=".\tgf.def"
-				ProgramDatabaseFile=".\Release/tgf.pdb"
-				ImportLibrary=".\Release/tgf.lib"
+				IgnoreDefaultLibraryNames="LIBC"
+				ModuleDefinitionFile=".\olethros.def"
+				ProgramDatabaseFile=".\Release/olethros.pdb"
+				ImportLibrary=".\Release/olethros.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -96,7 +96,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/tgf.bsc"
+				OutputFile=".\Release/olethros.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -109,7 +109,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)*.dll ..\..\..\runtime&#x0D;&#x0A;copy $(TargetDir)*.lib ..\..\..\export\lib&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtime\drivers\olethros"
 			/>
 		</Configuration>
 		<Configuration
@@ -140,21 +140,20 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/tgf.tlb"
+				TypeLibraryName=".\Debug/olethros.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TGF_EXPORTS;DEBUG;DEBUG_OUT"
+				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;OLETHROS_EXPORTS;DEBUG;DEBUG_OUT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\Debug/tgf.pch"
+				PrecompiledHeaderFile=".\Debug/olethros.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
-				BrowseInformation="1"
 				WarningLevel="2"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -164,26 +163,26 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_DEBUG,DEBUG,DEBUG_OUT"
-				Culture="1036"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="2055"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib txml.lib sg.lib ul.lib"
-				OutputFile=".\Debug/tgf.dll"
+				AdditionalDependencies="learning.lib tgf.lib robottools.lib sg.lib ul.lib"
+				OutputFile=".\Debug/olethros.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
-				ModuleDefinitionFile=".\tgf.def"
+				ModuleDefinitionFile=".\olethros.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/tgf.pdb"
+				ProgramDatabaseFile=".\Debug/olethros.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Debug/tgf.map"
-				ImportLibrary=".\Debug/tgf.lib"
+				MapFileName=".\Debug/olethros.map"
+				ImportLibrary=".\Debug/olethros.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -198,7 +197,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/tgf.bsc"
+				OutputFile=".\Debug/olethros.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -211,7 +210,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtimed&#x0D;&#x0A;copy $(TargetDir)*.lib $(SolutionDir)export\libd&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtimed\drivers\olethros"
 			/>
 		</Configuration>
 	</Configurations>
@@ -219,11 +218,11 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
+			Name="Quellcodedateien"
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="directory.cpp"
+				RelativePath="cardata.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -245,7 +244,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="hash.cpp"
+				RelativePath="driver.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -267,7 +266,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="module.cpp"
+				RelativePath="geometry.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -289,7 +288,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="os.cpp"
+				RelativePath="learn.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -311,7 +310,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="params.cpp"
+				RelativePath="olethros.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -333,7 +332,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="tgf.cpp"
+				RelativePath="olethros.def"
+				>
+			</File>
+			<File
+				RelativePath="opponent.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -355,11 +358,95 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="tgf.def"
+				RelativePath="pit.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="trace.cpp"
+				RelativePath="spline.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="strategy.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="TrackData.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="Trajectory.cpp"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -382,21 +469,58 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Header Files"
+			Name="Header-Dateien"
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="os.h"
+				RelativePath="cardata.h"
 				>
 			</File>
 			<File
-				RelativePath="params.h"
+				RelativePath="driver.h"
 				>
 			</File>
 			<File
-				RelativePath="tgf.h"
+				RelativePath="geometry.h"
 				>
 			</File>
+			<File
+				RelativePath="learn.h"
+				>
+			</File>
+			<File
+				RelativePath="linalg.h"
+				>
+			</File>
+			<File
+				RelativePath="opponent.h"
+				>
+			</File>
+			<File
+				RelativePath="pit.h"
+				>
+			</File>
+			<File
+				RelativePath="spline.h"
+				>
+			</File>
+			<File
+				RelativePath="strategy.h"
+				>
+			</File>
+			<File
+				RelativePath="TrackData.h"
+				>
+			</File>
+			<File
+				RelativePath="Trajectory.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Ressourcendateien"
+			Filter="ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe"
+			>
 		</Filter>
 	</Files>
 	<Globals>

@@ -55,11 +55,10 @@ windowsModLoad(unsigned int gfid, const char *sopath, tModList **modlist)
     HMODULE	handle;		/* */
     tModList	*curMod;
     char	dname[256];	/* name of the funtions */
-    char	*lastSlash;
     
     curMod = (tModList*)calloc(1, sizeof(tModList));
     GfOut("loading windows module %s\n",sopath);
-    lastSlash = strrchr(sopath, '/');
+    const char *lastSlash = strrchr(sopath, '/');
     if (lastSlash) {
 	strcpy(dname, lastSlash+1);
     } else {
@@ -144,14 +143,13 @@ windowsModInfo(unsigned int gfid, const char *sopath, tModList **modlist)
     HMODULE	handle;		/* */
     tModList	*curMod;
     char	dname[256];	/* name of the funtions */
-    char	*lastSlash;
     int		i;
     tModList	*cMod;
     int		prio;
     
     curMod = (tModList*)calloc(1, sizeof(tModList));
     
-    lastSlash = strrchr(sopath, '/');
+    const char *lastSlash = strrchr(sopath, '/');
     if (lastSlash) {
 	strcpy(dname, lastSlash+1);
     } else {

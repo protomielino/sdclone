@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="track"
-	ProjectGUID="{EFCB11D0-3F6A-45A2-A265-83D89E2DE5DA}"
+	Name="bt"
+	ProjectGUID="{960FDFF6-35C2-4BC5-9E97-2A558EC6E7CF}"
 	>
 	<Platforms>
 		<Platform
@@ -41,22 +41,21 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Debug/track.tlb"
+				TypeLibraryName=".\Debug/bt.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;TRACK_EXPORTS;DEBUG;DEBUG_OUT"
+				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BT_EXPORTS;DEBUG;DEBUG_OUT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				PrecompiledHeaderFile=".\Debug/track.pch"
+				PrecompiledHeaderFile=".\Debug/bt.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
 				BrowseInformation="1"
-				BrowseInformationFile=".\Debug/"
 				WarningLevel="2"
 				SuppressStartupBanner="true"
 				DebugInformationFormat="4"
@@ -75,18 +74,18 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib txml.lib ssg.lib ul.lib sg.lib"
-				OutputFile=".\Debug/track.dll"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				OutputFile=".\Debug/bt.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
-				ModuleDefinitionFile=".\track.def"
+				ModuleDefinitionFile=".\bt.def"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/track.pdb"
+				ProgramDatabaseFile=".\Debug/bt.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Debug/track.map"
-				ImportLibrary=".\Debug/track.lib"
+				MapFileName=".\Debug/bt.map"
+				ImportLibrary=".\Debug/bt.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -101,7 +100,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/track.bsc"
+				OutputFile=".\Debug/bt.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -114,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtimed\modules\track"
+				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtimed\drivers\bt"
 			/>
 		</Configuration>
 		<Configuration
@@ -145,19 +144,19 @@
 				MkTypLibCompatible="true"
 				SuppressStartupBanner="true"
 				TargetEnvironment="1"
-				TypeLibraryName=".\Release/track.tlb"
+				TypeLibraryName=".\Release/bt.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;TRACK_EXPORTS"
+				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
 				StringPooling="true"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/track.pch"
+				PrecompiledHeaderFile=".\Release/bt.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -178,16 +177,17 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="sg.lib tgf.lib robottools.lib txml.lib ssg.lib ul.lib"
-				OutputFile=".\Release/track.dll"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				OutputFile=".\Release/bt.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
-				ModuleDefinitionFile=".\track.def"
+				ModuleDefinitionFile=".\bt.def"
+				ProgramDatabaseFile=".\Release/bt.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Release/track.map"
-				ImportLibrary=".\Release/track.lib"
+				MapFileName=".\Release/bt.map"
+				ImportLibrary=".\Release/bt.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -202,7 +202,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/track.bsc"
+				OutputFile=".\Release/bt.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -215,7 +215,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtime\modules\track"
+				CommandLine="copy $(TargetDir)*.dll $(SolutionDir)runtime\drivers\bt"
 			/>
 		</Configuration>
 	</Configurations>
@@ -227,7 +227,7 @@
 			Filter="cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 			>
 			<File
-				RelativePath="track.cpp"
+				RelativePath="bt.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -249,33 +249,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="track.def"
+				RelativePath="bt.def"
 				>
 			</File>
 			<File
-				RelativePath="track3.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="track4.cpp"
+				RelativePath="cardata.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -297,7 +275,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="trackitf.cpp"
+				RelativePath="driver.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -319,7 +297,95 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="trackutil.cpp"
+				RelativePath="learn.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="opponent.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="pit.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="spline.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="strategy.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -346,7 +412,35 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="trackinc.h"
+				RelativePath="cardata.h"
+				>
+			</File>
+			<File
+				RelativePath="driver.h"
+				>
+			</File>
+			<File
+				RelativePath="learn.h"
+				>
+			</File>
+			<File
+				RelativePath="linalg.h"
+				>
+			</File>
+			<File
+				RelativePath="opponent.h"
+				>
+			</File>
+			<File
+				RelativePath="pit.h"
+				>
+			</File>
+			<File
+				RelativePath="spline.h"
+				>
+			</File>
+			<File
+				RelativePath="strategy.h"
 				>
 			</File>
 		</Filter>

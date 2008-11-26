@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="client"
 	ProjectGUID="{897F33C7-EA4C-4A50-B85A-0A5E90CA9146}"
 	>
@@ -180,7 +180,7 @@
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC,libcmtd"
+				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\client.def"
 				ProgramDatabaseFile=".\Release/client.pdb"
 				ImportLibrary=".\Release/client.lib"
