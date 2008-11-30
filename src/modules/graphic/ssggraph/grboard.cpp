@@ -754,7 +754,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
 	if (curInst->digital) {
 		// Do not add "%3d" or something, because the digital font DOES NOT SUPPORT BLANKS!!!!
 		sprintf(buf, "%d", abs((int)(car->_speed_x * 3.6)));
-		GfuiPrintString(buf, grBlue, GFUI_FONT_DIGIT,
+		GfuiPrintString(buf, grRed, GFUI_FONT_DIGIT,
 			(int)curInst->digitXCenter, (int)(curInst->digitYCenter), GFUI_ALIGN_HC_VB);
 	}
 	
