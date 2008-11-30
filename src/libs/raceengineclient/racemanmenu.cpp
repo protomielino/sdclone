@@ -128,7 +128,7 @@ reConfigRunState(void)
     }
     
     sprintf(path, "%s/%d", RM_SECT_CONF, curConf);
-    conf = GfParmGetStr(params, (char const*)path, RM_ATTR_TYPE, 0);
+    conf = GfParmGetStr(params, path, RM_ATTR_TYPE, 0);
     if (!conf) {
 	GfOut("no %s here %s\n", RM_ATTR_TYPE, path);
 	goto menuback;
@@ -167,14 +167,14 @@ reConfigRunState(void)
 	    rp.prevScreen = reConfigBackHookInit();
 	}
 	rp.param = ReInfo->params;
-	rp.title = GfParmGetStr(params, (char const*)path, RM_ATTR_RACE, "Race");
+	rp.title = GfParmGetStr(params, path, RM_ATTR_RACE, "Race");
 	/* Select options to configure */
 	rp.confMask = 0;
 	sprintf(path, "%s/%d/%s", RM_SECT_CONF, curConf, RM_SECT_OPTIONS);
-	numOpt = GfParmGetEltNb(params, (char const*)path);
+	numOpt = GfParmGetEltNb(params, path);
 	for (i = 1; i < numOpt + 1; i++) {
 	    sprintf(path, "%s/%d/%s/%d", RM_SECT_CONF, curConf, RM_SECT_OPTIONS, i);
-	    opt = GfParmGetStr(params, (char const*)path, RM_ATTR_TYPE, "");
+	    opt = GfParmGetStr(params, path, RM_ATTR_TYPE, "");
 	    if (!strcmp(opt, RM_VAL_CONFRACELEN)) {
 		/* Configure race length */
 		rp.confMask |= RM_CONF_RACE_LEN;
@@ -214,7 +214,7 @@ reSelectLoadFile(char *filename)
 {
     sprintf(buf, "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
     GfOut("Loading Saved File %s...\n", buf);
-    ReInfo->results = GfParmReadFile((char const*)buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    ReInfo->results = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     ReInfo->_reRaceName = ReInfo->_reName;
     RmShowStandings(ReInfo->_reGameScreen, ReInfo);
 }
@@ -328,7 +328,7 @@ ReNewTrackMenu(void)
 	    ReInfo->track->name);
 
     GfuiLabelCreateEx(newTrackMenuHdle,
-		      (char const*)buf,
+		      buf,
 		      red,
 		      GFUI_FONT_MEDIUM_C,
 		      320, 420,

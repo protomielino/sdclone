@@ -60,7 +60,7 @@ static void readSoundCfg(void)
 	char buf[1024];
 
 	sprintf(buf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
-	void *paramHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[0]);
 
 	for (i = 0; i < nbOptions; i++) {
@@ -89,7 +89,7 @@ static void saveSoundOption(void *)
 {
 	char buf[1024];
 	sprintf(buf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
-	void *paramHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[curOption]);
 	GfParmSetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", VolumeValue);
 	GfParmWriteFile(NULL, paramHandle, "sound");
@@ -127,7 +127,7 @@ static void changeVolume(void * )
     val = GfuiEditboxGetString(scrHandle, VolumeValueId);
     sscanf(val, "%g", &VolumeValue);
     sprintf(buf, "%g", VolumeValue);
-    GfuiEditboxSetString(scrHandle, VolumeValueId, (char const*)buf);
+    GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
 }
 */
 
@@ -186,7 +186,7 @@ void * SoundMenuInit(void *prevMenu)
 
 	
     sprintf(buf, "%f", VolumeValue);
-    VolumeValueId = GfuiEditboxCreate(scrHandle, (char const*)buf, GFUI_FONT_MEDIUM_C,
+    VolumeValueId = GfuiEditboxCreate(scrHandle, buf, GFUI_FONT_MEDIUM_C,
 				    x2+10, y+2, x4-x2+20, 16, NULL, (tfuiCallback)NULL, changeVolume);
 
 

@@ -143,7 +143,7 @@ ReSetRaceMsg(const char *msg)
     if (curMsg) free(curMsg);
     if (msg) {
 	curMsg = strdup(msg);
-	GfuiLabelSetText(reScreenHandle, reMsgId, (char const*)curMsg);
+	GfuiLabelSetText(reScreenHandle, reMsgId, curMsg);
     } else {
 	curMsg = 0;
 	GfuiLabelSetText(reScreenHandle, reMsgId, "");
@@ -158,7 +158,7 @@ ReSetRaceBigMsg(const char *msg)
     if (curMsg) free(curMsg);
     if (msg) {
 	curMsg = strdup(msg);
-	GfuiLabelSetText(reScreenHandle, reBigMsgId, (char const*)curMsg);
+	GfuiLabelSetText(reScreenHandle, reBigMsgId, curMsg);
     } else {
 	curMsg = 0;
 	GfuiLabelSetText(reScreenHandle, reBigMsgId, "");

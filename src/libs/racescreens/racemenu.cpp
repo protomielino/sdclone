@@ -73,7 +73,7 @@ rmrpUpdDist(void * /* dummy */)
 	rmrpLaps = 0;
 	GfuiEditboxSetString(scrHandle, rmrpLapsId, "---");
     }
-    GfuiEditboxSetString(scrHandle, rmrpDistId, (char const*)buf);
+    GfuiEditboxSetString(scrHandle, rmrpDistId, buf);
 }
 
 static void
@@ -90,7 +90,7 @@ rmrpUpdLaps(void * /* dummy */)
 	rmrpDistance = 0;
 	GfuiEditboxSetString(scrHandle, rmrpDistId, "---");
     }
-    GfuiEditboxSetString(scrHandle, rmrpLapsId, (char const*)buf);
+    GfuiEditboxSetString(scrHandle, rmrpLapsId, buf);
 }
 
 
@@ -136,7 +136,7 @@ RmRaceParamMenu(void *vrp)
     rp = (tRmRaceParam*)vrp;
 
     sprintf(buf, "%s Options", rp->title);
-    scrHandle = GfuiMenuScreenCreate((char const*)buf);
+    scrHandle = GfuiMenuScreenCreate(buf);
     GfuiScreenAddBgImg(scrHandle, "data/img/splash-raceopt.png");
     
     x = 80;
@@ -155,7 +155,7 @@ RmRaceParamMenu(void *vrp)
 	    sprintf(buf, "%d", rmrpDistance);
 	    rmrpLaps = 0;
 	}
-	rmrpDistId = GfuiEditboxCreate(scrHandle, (char const*)buf, GFUI_FONT_MEDIUM_C,
+	rmrpDistId = GfuiEditboxCreate(scrHandle, buf, GFUI_FONT_MEDIUM_C,
 				       x + dx, y,
 				       0, 8, NULL, (tfuiCallback)NULL, rmrpUpdDist);
 
@@ -166,7 +166,7 @@ RmRaceParamMenu(void *vrp)
 	} else {
 	    sprintf(buf, "%d", rmrpLaps);
 	}
-	rmrpLapsId = GfuiEditboxCreate(scrHandle, (char const*)buf, GFUI_FONT_MEDIUM_C,
+	rmrpLapsId = GfuiEditboxCreate(scrHandle, buf, GFUI_FONT_MEDIUM_C,
 				       x + dx, y,
 				       0, 8, NULL, (tfuiCallback)NULL, rmrpUpdLaps);
 	y -= dy;

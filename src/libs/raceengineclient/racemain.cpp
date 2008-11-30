@@ -159,7 +159,7 @@ RePreRace(void)
 
 	/* Cleanup results */
 	sprintf(path, "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, raceName);
-	GfParmListClean(results, (char const*)path);
+	GfParmListClean(results, path);
 
 	return RM_SYNC | RM_NEXT_STEP;
 }
@@ -214,7 +214,7 @@ reRaceRealStart(void)
 
 	for (i = 0; i < s->_ncars; i++) {
 		sprintf(buf, "Initializing Driver %s...", s->cars[i]->_name);
-		RmLoadingScreenSetText((char const*)buf);
+		RmLoadingScreenSetText(buf);
 		robot = s->cars[i]->robot;
 		robot->rbNewRace(robot->index, s->cars[i], s);
 	}
@@ -239,7 +239,7 @@ reRaceRealStart(void)
 			ReUpdateQualifCurRes(s->cars[0]);
 		} else {
 			sprintf(buf, "%s on %s", s->cars[0]->_name, ReInfo->track->name);
-			ReResScreenSetTitle((char const*)buf);
+			ReResScreenSetTitle(buf);
 		}
 	}
 
@@ -318,8 +318,8 @@ ReRaceStart(void)
 
 		sprintf(path, "%s/%d", RM_SECT_DRIVERS, i);
 		sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, 1);
-		GfParmSetStr(params, (char const*)path2, RM_ATTR_MODULE, GfParmGetStr(params, (char const*)path, RM_ATTR_MODULE, ""));
-		GfParmSetNum(params, (char const*)path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, (char const*)path, RM_ATTR_IDX, NULL, 0));
+		GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
+		GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
 	} else {
 		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
 		RmLoadingScreenSetText("Preparing Starting Grid...");
@@ -337,8 +337,8 @@ ReRaceStart(void)
 			for (i = 1; i < nCars + 1; i++) {
 				sprintf(path, "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, i);
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, i);
-				GfParmSetStr(params, (char const*)path2, RM_ATTR_MODULE, GfParmGetStr(results, (char const*)path, RE_ATTR_MODULE, ""));
-				GfParmSetNum(params, (char const*)path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, (char const*)path, RE_ATTR_IDX, NULL, 0));
+				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
+				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
 			}
 		} else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER)) {
 			/* Starting grid in the reversed arrival order of the previous race */
@@ -352,8 +352,8 @@ ReRaceStart(void)
 			for (i = 1; i < nCars + 1; i++) {
 				sprintf(path, "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, nCars - i + 1);
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, i);
-				GfParmSetStr(params, (char const*)path2, RM_ATTR_MODULE, GfParmGetStr(results, (char const*)path, RE_ATTR_MODULE, ""));
-				GfParmSetNum(params, (char const*)path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, (char const*)path, RE_ATTR_IDX, NULL, 0));
+				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
+				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
 			}
 		} else {
 			/* Starting grid in the drivers list order */
@@ -363,8 +363,8 @@ ReRaceStart(void)
 			for (i = 1; i < nCars + 1; i++) {
 				sprintf(path, "%s/%d", RM_SECT_DRIVERS, i);
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, i);
-				GfParmSetStr(params, (char const*)path2, RM_ATTR_MODULE, GfParmGetStr(params, (char const*)path, RM_ATTR_MODULE, ""));
-				GfParmSetNum(params, (char const*)path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, (char const*)path, RM_ATTR_IDX, NULL, 0));
+				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
+				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
 			}
 		}
 	}

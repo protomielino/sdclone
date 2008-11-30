@@ -68,7 +68,7 @@ void checkCompressARBEnabled(bool &result)
 		const char *tcEnabledStr = GR_ATT_TEXTURECOMPRESSION_ENABLED;
 		char fnbuf[1024];
 		sprintf(fnbuf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-		void *paramHandle = GfParmReadFile((char const*)fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+		void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 		const char *optionName = GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION, GR_ATT_TEXTURECOMPRESSION_DISABLED);
 
 		if (strcmp(optionName, tcEnabledStr) != 0) {
@@ -119,7 +119,7 @@ void getUserTextureMaxSize(int &result)
 {
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-	void *paramHandle = GfParmReadFile((char const*)fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	result = (int) GfParmGetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURESIZE, (char*)NULL, (tdble) glTextureMaxSize);
 	if (result > glTextureMaxSize) {
 		result = glTextureMaxSize;

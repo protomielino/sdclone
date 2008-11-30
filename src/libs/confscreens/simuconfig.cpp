@@ -54,7 +54,7 @@ static void ReadSimuCfg(void)
 	char buf[1024];
 	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
 
-	void *paramHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	versionName = GfParmGetStr(paramHandle, "Modules", "simu", simuVersionList[0]);
 
 	for (i = 0; i < nbVersions; i++) {
@@ -76,7 +76,7 @@ static void SaveSimuVersion(void * /* dummy */)
 	char buf[1024];
 	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
 
-	void *paramHandle = GfParmReadFile((char const*)buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, "Modules", "simu", simuVersionList[curVersion]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
