@@ -831,6 +831,7 @@ grDrawCar(tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, doubl
 
 	if ((car == curCar) && (dispCarFlag != 1)) {
 		grCarInfo[index].LODSelector->select(0);
+		grCarInfo[index].DRMSelector->select(0);
 	} else {
 		lod = curCam->getLODFactor(car->_pos_X, car->_pos_Y, car->_pos_Z);
 		i = 0;
@@ -846,33 +847,35 @@ grDrawCar(tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, doubl
 		} else {
 			grCarInfo[index].driverSelector->select(0);
 		}
+
+ 		// Animated driver model selection according to steering wheel angle
+		// TODO: Add a delay between changes to prevent rapid flickering
+		// back & forth between animations
+		if (grCarInfo[index].nDRM > 0)
+		{
+			// choose a driver model to display
+			int curDRM = 0;
+			float curSteer = 0.0f;
+	
+			for (i=0; i<grCarInfo[index].nDRM; i++)
+			{
+				if ((curCar->_steerCmd > 0.0 && 
+				    grCarInfo[index].DRMThreshold[i] >= 0.0 &&
+				    grCarInfo[index].DRMThreshold[i] <= curCar->_steerCmd &&
+				    grCarInfo[index].DRMThreshold[i] >= curSteer) ||
+				    (curCar->_steerCmd < 0.0 && 
+				    grCarInfo[index].DRMThreshold[i] <= 0.0 &&
+				    grCarInfo[index].DRMThreshold[i] >= curCar->_steerCmd &&
+				    grCarInfo[index].DRMThreshold[i] <= curSteer))
+				{
+					curDRM = i;
+					curSteer = grCarInfo[index].DRMThreshold[i];
+				}
+			}
+	
+			grCarInfo[index].DRMSelector->select( grCarInfo[index].DRMSelectMask[curDRM] );
+		}
 	}
-
-    // Animated driver model selection according to steering wheel angle
-    if (grCarInfo[index].nDRM > 0)
-    {
-        // choose a driver model to display
-        int curDRM = 0;
-        float curSteer = 0.0f;
-
-        for (i=0; i<grCarInfo[index].nDRM; i++)
-        {
-            if ((curCar->_steerCmd > 0.0 && 
-                 grCarInfo[index].DRMThreshold[i] >= 0.0 &&
-                 grCarInfo[index].DRMThreshold[i] <= curCar->_steerCmd &&
-                 grCarInfo[index].DRMThreshold[i] >= curSteer) ||
-                (curCar->_steerCmd < 0.0 && 
-                 grCarInfo[index].DRMThreshold[i] <= 0.0 &&
-                 grCarInfo[index].DRMThreshold[i] >= curCar->_steerCmd &&
-                 grCarInfo[index].DRMThreshold[i] <= curSteer))
-            {
-                curDRM = i;
-                curSteer = grCarInfo[index].DRMThreshold[i];
-            }
-        }
-
-        grCarInfo[index].DRMSelector->select( grCarInfo[index].DRMSelectMask[curDRM] );
-    }
 
 
 	sgCopyMat4(grCarInfo[index].carPos, car->_posMat);
