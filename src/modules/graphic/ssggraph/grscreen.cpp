@@ -278,7 +278,7 @@ void cGrScreen::camDraw(tSituation *s)
 	qsort(cars, s->_ncars, sizeof(tCarElt*), comparCars);
 	
 	for (i = 0; i < s->_ncars; i++) {
-		grDrawCar(cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
+		grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
 	} 
 	STOP_PROFILE("grDrawCar*");
 	

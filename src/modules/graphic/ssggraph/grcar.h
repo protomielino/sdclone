@@ -50,6 +50,7 @@ typedef struct
     int			DRMSelectMask[32];
     int                 nDRM;
     float		DRMThreshold[32];
+    float               lastDRMswitch;
     ssgSelector		*driverSelector;
 	bool driverSelectorinsg;
     ssgStateSelector	*envSelector;
@@ -76,7 +77,7 @@ typedef struct
 extern tgrCarInfo	*grCarInfo;
 
 extern void grInitCar(tCarElt *car);
-extern void grDrawCar(tCarElt*, tCarElt *, int, int, double curTime, class cGrPerspCamera *curCam);
+extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, double curTime, class cGrPerspCamera *curCam);
 extern void grDrawShadow(tCarElt *car);
 extern void grInitShadow(tCarElt *car);
 extern tdble grGetDistToStart(tCarElt *car);

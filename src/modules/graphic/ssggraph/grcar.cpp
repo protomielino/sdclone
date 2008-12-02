@@ -701,54 +701,54 @@ grInitCar(tCarElt *car)
 	/* default range selection */
 	LODSel->select(grCarInfo[index].LODSelectMask[0]);
 
-    // separate driver models for animation according to steering wheel angle ...
-    sprintf(path, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
-    nranges = GfParmGetEltNb(handle, path) + 1;
-    grCarInfo[index].nDRM = nranges - 1;
-    grCarInfo[index].DRMSelector = NULL;
+	// separate driver models for animation according to steering wheel angle ...
+	sprintf(path, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
+	nranges = GfParmGetEltNb(handle, path) + 1;
+	grCarInfo[index].nDRM = nranges - 1;
+	grCarInfo[index].DRMSelector = NULL;
 
-    if (nranges > 1)
-    {
-        // We have at least one separate driver model to add...
-        ssgEntity *driverEntity;
-        ssgSelector *DRMSel;
-        grCarInfo[index].DRMSelector = DRMSel = new ssgSelector;
-        grCarInfo[index].carTransform->addKid(DRMSel);
+	if (nranges > 1)
+	{
+		// We have at least one separate driver model to add...
+		ssgEntity *driverEntity;
+		ssgSelector *DRMSel;
+		grCarInfo[index].DRMSelector = DRMSel = new ssgSelector;
+		grCarInfo[index].carTransform->addKid(DRMSel);
+	
+		sprintf(buf, "cars/%s", car->_carName);
+		ssgModelPath(buf);
+		sprintf(buf, "drivers/%s/%d;drivers/%s;cars/%s", car->_modName, car->_driverIndex, car->_modName, car->_carName);
+		ssgTexturePath(buf);
+		grTexturePath = strdup(buf);
+		selIndex = 0;
 
-        sprintf(buf, "cars/%s", car->_carName);
-        ssgModelPath(buf);
-        sprintf(buf, "drivers/%s/%d;drivers/%s;cars/%s", car->_modName, car->_driverIndex, car->_modName, car->_carName);
-        ssgTexturePath(buf);
-        grTexturePath = strdup(buf);
-        selIndex = 0;
-
-        // add the drivers
-        for (i = 1; i < nranges; i++)
-        {
-            ssgBranch *driverBody = new ssgBranch;
-            sprintf(buf, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
-            param = GfParmGetStr(handle, buf, PRM_DRIVERMODEL, "");
-            grCarInfo[index].DRMThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_DRIVERSTEER, NULL, 0.0);
-            driverEntity = grssgCarLoadAC3D(param, NULL, index);
-            DBG_SET_NAME(driverEntity, "DRM", index, i-1);
-            driverBody->addKid(driverEntity);
-            DRMSel->addKid(driverBody);
-            grCarInfo[index].DRMSelectMask[i-1] = 1 << selIndex; 
-            selIndex++;
-        }
-
-        // select a default driver - steer value of 0.0 is desired...
-        for (i = 1; i < nranges; i++)
-        {
-            if (grCarInfo[index].DRMThreshold[i-1] == 0.0f)
-            {
-                DRMSel->select( grCarInfo[index].DRMSelectMask[i-1] );
-                break;
-            }
-        }
-        if (i == nranges)
-            DRMSel->select( grCarInfo[index].DRMSelectMask[0] );
-    }
+		// add the drivers
+		for (i = 1; i < nranges; i++)
+		{
+			ssgBranch *driverBody = new ssgBranch;
+			sprintf(buf, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
+			param = GfParmGetStr(handle, buf, PRM_DRIVERMODEL, "");
+			grCarInfo[index].DRMThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_DRIVERSTEER, NULL, 0.0);
+			driverEntity = grssgCarLoadAC3D(param, NULL, index);
+			DBG_SET_NAME(driverEntity, "DRM", index, i-1);
+			driverBody->addKid(driverEntity);
+			DRMSel->addKid(driverBody);
+			grCarInfo[index].DRMSelectMask[i-1] = 1 << selIndex; 
+			selIndex++;
+		}
+		
+		// select a default driver - steer value of 0.0 is desired...
+		for (i = 1; i < nranges; i++)
+		{
+			if (grCarInfo[index].DRMThreshold[i-1] == 0.0f)
+			{
+				DRMSel->select( grCarInfo[index].DRMSelectMask[i-1] );
+				break;
+			}
+		}
+		if (i == nranges)
+			DRMSel->select( grCarInfo[index].DRMSelectMask[0] );
+	}
 
 
 	CarsAnchor->addKid(grCarInfo[index].carTransform);
@@ -810,7 +810,7 @@ tdble grGetDistToStart(tCarElt *car)
 }
 
 void
-grDrawCar(tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, double curTime, class cGrPerspCamera *curCam)
+grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, double curTime, class cGrPerspCamera *curCam)
 {
 	sgCoord wheelpos;
 	int index, i, j;
@@ -850,13 +850,12 @@ grDrawCar(tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, doubl
 		}
 
  		// Animated driver model selection according to steering wheel angle
-		// TODO: Add a delay between changes to prevent rapid flickering
-		// back & forth between animations
-		if (grCarInfo[index].nDRM > 0)
+		if (grCarInfo[index].nDRM > 0 && s->currentTime - grCarInfo[index].lastDRMswitch > 0.2)
 		{
 			// choose a driver model to display
 			int curDRM = 0;
 			float curSteer = 0.0f;
+			int lastDRM = grCarInfo[index].DRMSelector->getSelect();
 	
 			for (i=0; i<grCarInfo[index].nDRM; i++)
 			{
@@ -869,12 +868,18 @@ grDrawCar(tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, doubl
 				    grCarInfo[index].DRMThreshold[i] >= curCar->_steerCmd &&
 				    grCarInfo[index].DRMThreshold[i] <= curSteer))
 				{
+					float fsteer = fabs(curCar->_steerCmd);
+
 					curDRM = i;
 					curSteer = grCarInfo[index].DRMThreshold[i];
 				}
 			}
 	
 			grCarInfo[index].DRMSelector->select( grCarInfo[index].DRMSelectMask[curDRM] );
+			if (lastDRM != curDRM)
+			{
+				grCarInfo[index].lastDRMswitch = s->currentTime;
+			}
 		}
 	}
 
