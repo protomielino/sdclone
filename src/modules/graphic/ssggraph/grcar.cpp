@@ -831,7 +831,8 @@ grDrawCar(tCarElt *car, tCarElt *curCar, int dispCarFlag, int dispDrvFlag, doubl
 
 	if ((car == curCar) && (dispCarFlag != 1)) {
 		grCarInfo[index].LODSelector->select(0);
-		grCarInfo[index].DRMSelector->select(0);
+		if (grCarInfo[index].nDRM > 0)
+			grCarInfo[index].DRMSelector->select(0);
 	} else {
 		lod = curCam->getLODFactor(car->_pos_X, car->_pos_Y, car->_pos_Z);
 		i = 0;
