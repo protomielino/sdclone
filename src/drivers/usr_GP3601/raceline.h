@@ -110,6 +110,7 @@ class LRaceLine {
   void setTimeFactor( double wi ) { TimeFactor = wi; }
   void setCarHandle( void *pCarHandle ) { carhandle = pCarHandle; }
   void setSkill( double tskill) { skill = tskill; }
+  void setCW( double cw ) { cw = CW; }
   int getCarefulBrake() { return GetModI( tCarefulBrake, Next ); }
   double getRLAngle();
 
@@ -117,6 +118,7 @@ class LRaceLine {
   double BaseCornerSpeed;
   double BaseCornerSpeedX;
   double CornerSpeed;
+  double CornerSpeedX;
   double CornerAccel;
   double BrakeDelay;
   double IntMargin;
@@ -138,6 +140,7 @@ class LRaceLine {
   double OvertakeCaution;    // default 0.0 - higher increases caution in overtaking
   double SkidCorrection;     // default 1.0.  Higher corrects steer errors faster & reduces wobble
 
+  double CW;
   double wheelbase;
   double wheeltrack;
   double k1999steer;

@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 1.55.15 -->
+	<!-- 1.57.15 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
 		<attnum name="BaseCornerSpeedX" val="1.15"/>
@@ -34,9 +34,9 @@
 		<attnum name="RLSpeed0Div" val="580"/>
 		<attnum name="RLSpeed0DivEnd" val="1090"/>
 		<attnum name="RLSpeed0" val="8.5"/>
-		<attnum name="RLSpeed1Div" val="580"/>
+		<attnum name="RLSpeed1Div" val="1091"/>
 		<attnum name="RLSpeed1DivEnd" val="1460"/>
-		<attnum name="RLSpeed1" val="10.4"/>
+		<attnum name="RLSpeed1" val="9.6"/>
 		<attnum name="RLSpeed2Div" val="1600"/>
 		<attnum name="RLSpeed2DivEnd" val="2100"/>
 		<attnum name="RLSpeed2" val="9.5"/>

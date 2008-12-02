@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 1.32.60 -->
+	<!-- 1.32.50 -->
 	<section name="private">
 		<attnum name="CornerSpeed" val="11.20"/>
 		<attnum name="BrakeDelay" val="30.00"/>

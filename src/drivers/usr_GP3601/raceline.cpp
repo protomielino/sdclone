@@ -73,6 +73,7 @@ LRaceLine::LRaceLine() :
    BaseCornerSpeed(0.0),
    BaseCornerSpeedX(1.0),
    CornerSpeed(15.0),
+   CornerSpeedX(0.0),
    CornerAccel(0.0),
    BrakeDelay(20.0),
    IntMargin(1.5),
@@ -93,6 +94,7 @@ LRaceLine::LRaceLine() :
    AvoidAccelExit(0.0),
    OvertakeCaution(0.0),
    SkidCorrection(1.0),
+   CW(0.0),
    wheelbase(0.0),
    wheeltrack(0.0),
    k1999steer(0.0),
@@ -339,6 +341,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0 );
  BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0 );
  CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0 );
+ CornerSpeedX = GfParmGetNum( carhandle, "private", "CornerSpeedX", (char *)NULL, 0.0 );
  AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0 );
  CornerAccel = GfParmGetNum( carhandle, "private", "CornerAccel", (char *)NULL, 0.0 );
  IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1 );
@@ -1242,12 +1245,15 @@ void LRaceLine::TrackInit(tSituation *p)
 
    if (fabs(rInverse) > MinCornerInverse * 1.01)
    {
+    double rI = fabs(rInverse);
+    if (CornerSpeedX)
+     rI *= MIN(1.0, (1.0 - (rI*20*CornerSpeedX) + (3.0+CW)/30));
     double tca = GetModD( tCornerAccel, i );
     double ca = (tca >= 0.0 ? tca : CornerAccel);
     int tao = GetModI( tAccelCurveOffset, i );
     int ao = (tao != 0 ? tao : AccelCurveOffset);
 
-    MaxSpeed = sqrt(TireAccel / (fabs(rInverse) - MinCornerInverse));
+    MaxSpeed = sqrt(TireAccel / (rI - MinCornerInverse));
 
     if (rl == LINE_RL && ca > 0.0)
     {
@@ -1262,7 +1268,7 @@ void LRaceLine::TrackInit(tSituation *p)
     }
 
 #if 1
-    if (!trlspeed && fabs(rInverse) > 0.002)
+    if (!trlspeed && rI > 0.002)
     {
      double camber = SegCamber(i);
 
@@ -1322,6 +1328,7 @@ void LRaceLine::TrackInit(tSituation *p)
   // Anticipate braking
   //
   double brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0)) * 0.6;
+fprintf(stderr,"BD=%.2f CA=%.2f CAX=%.2f\n",BrakeDelay,CornerAccel,CornerSpeedX);
 
 #if 0 // K++ braking method
 

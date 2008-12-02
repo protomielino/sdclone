@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file                 : viper-gts-r.xml
+    created              : Sat Mar  3 18:46:37 CET 2001
+    copyright            : (C) 2001 by Eric Espié                         
+    email                : Eric.Espie@torcs.org   
+    version              : $Id: e-track-1.xml,v 1.8 2003/08/23 01:03:31 berniw Exp $                                  
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="Viper GTS-R" type="template">
+  <section name="private">
+	  <!-- 2.27.90 -->
+    <attnum name="BaseCornerSpeedX" val="0.46"/>
+    <attnum name="CornerSpeed" val="21.0"/>
+    <attnum name="CurveFactor" val="0.16"/>
+    <attnum name="AvoidSpeedAdjust" val="-1.0"/>
+    <attnum name="BrakeDelay" val="23.0"/>
+    <attnum name="ExtMargin" val="1.4"/>
+    <attnum name="IntMargin" val="1.1"/>
+    <attnum name="SteerGain" val="2.4"/>
+    <attnum name="FuelSpeedUp" val="0.7"/>
+    <attnum name="FuelPerLap" val="3.9"/>
+    <attnum name="NoTeamWaiting" val="1"/>
+    <attnum name="SkidCorrection" val="1.1"/>
+    <attnum name="SteerDebug" val="0"/>
+
+    <attnum name="RLBrake0Div" val="1650"/>
+    <attnum name="RLBrake0DivEnd" val="1750"/>
+    <attnum name="RLBrake0" val="-7.0"/>
+    <attnum name="RLBrake1Div" val="950"/>
+    <attnum name="RLBrake1DivEnd" val="1080"/>
+    <attnum name="RLBrake1" val="-6.0"/>
+    <attnum name="RLBrake2Div" val="2000"/>
+    <attnum name="RLBrake2DivEnd" val="2600"/>
+    <attnum name="RLBrake2" val="-6.0"/>
+
+    <attnum name="RLSpeed7Div" val="1340"/>
+    <attnum name="RLSpeed7DivEnd" val="1600"/>
+    <attnum name="RLSpeed7" val="18.0"/>
+    <attnum name="RLSpeed8Div" val="400"/>
+    <attnum name="RLSpeed8DivEnd" val="1850"/>
+    <attnum name="RLSpeed8" val="19.0"/>
+    <attnum name="RLSpeed0Div" val="550"/>
+    <attnum name="RLSpeed0DivEnd" val="650"/>
+    <attnum name="RLSpeed0" val="19.0"/>
+    <attnum name="RLSpeed1Div" val="1260"/>
+    <attnum name="RLSpeed1DivEnd" val="1335"/>
+    <attnum name="RLSpeed1" val="26.0"/>
+    <attnum name="RLSpeed2Div" val="1650"/>
+    <attnum name="RLSpeed2DivEnd" val="1766"/>
+    <attnum name="RLSpeed2" val="18.5"/>
+    <attnum name="RLSpeed3Div" val="1767"/>
+    <attnum name="RLSpeed3DivEnd" val="1850"/>
+    <attnum name="RLSpeed3" val="19.0"/>
+    <attnum name="RLSpeed4Div" val="2280"/>
+    <attnum name="RLSpeed4DivEnd" val="2550"/>
+    <attnum name="RLSpeed4" val="15.0"/>
+    <attnum name="RLSpeed5Div" val="1080"/>
+    <attnum name="RLSpeed5DivEnd" val="1110"/>
+    <attnum name="RLSpeed5" val="20.8"/>
+    <attnum name="RLSpeed6Div" val="490"/>
+    <attnum name="RLSpeed6DivEnd" val="520"/>
+    <attnum name="RLSpeed6" val="20.0"/>
+    <attnum name="RLSpeed9Div" val="2600"/>
+    <attnum name="RLSpeed9DivEnd" val="2900"/>
+    <attnum name="RLSpeed9" val="19.0"/>
+
+    <attnum name="OTCaution0Div" val="2450"/>
+    <attnum name="OTCaution0DivEnd" val="2550"/>
+    <attnum name="OTCaution0" val="4.0"/>
+    <attnum name="OTCaution1Div" val="1"/>
+    <attnum name="OTCaution1DivEnd" val="2449"/>
+    <attnum name="OTCaution1" val="0.1"/>
+
+    <attnum name="AvoidSpeed0Div" val="980"/>
+    <attnum name="AvoidSpeed0DivEnd" val="1310"/>
+    <attnum name="AvoidSpeed0" val="-3.0"/>
+    <attnum name="AvoidSpeed1Div" val="1750"/>
+    <attnum name="AvoidSpeed1DivEnd" val="1800"/>
+    <attnum name="AvoidSpeed1" val="-4.0"/>
+
+    <attnum name="LaneShift0Div" val="1180"/>
+    <attnum name="LaneShift0DivEnd" val="1310"/>
+    <attnum name="LaneShift0" val="-3.0"/>
+    <attnum name="LaneShift1Div" val="1420"/>
+    <attnum name="LaneShift1DivEnd" val="1662"/>
+    <attnum name="IntMargin1" val="0.5"/>
+    <attnum name="LaneShift2Div" val="120"/>
+    <attnum name="LaneShift2DivEnd" val="200"/>
+    <attnum name="LaneShift2" val="-1"/>
+    <attnum name="ExtMargin2" val="-0.5"/>
+    <attnum name="LaneShift3Div" val="900"/>
+    <attnum name="LaneShift3DivEnd" val="1000"/>
+    <attnum name="ExtMargin3" val="-1.0"/>
+    <attnum name="LaneShift4Div" val="1314"/>
+    <attnum name="LaneShift4DivEnd" val="1345"/>
+    <attnum name="ExtMargin4" val="-1.0"/>
+    <attnum name="LaneShift5Div" val="2400"/>
+    <attnum name="LaneShift5DivEnd" val="2520"/>
+    <attnum name="ExtMargin5" val="0.1"/>
+    <attnum name="LaneShift6Div" val="2540"/>
+    <attnum name="LaneShift6DivEnd" val="2580"/>
+    <attnum name="IntMargin6" val="1.0"/>
+    <attnum name="LaneShift7Div" val="560"/>
+    <attnum name="LaneShift7DivEnd" val="620"/>
+    <attnum name="ExtMargin7" val="2.0"/>
+  </section>
+</params>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

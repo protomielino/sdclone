@@ -16,9 +16,10 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- 1.27.30 -->
+	<!-- 1.30.70 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
+		<attnum name="BaseCornerSpeed" val="-0.50"/>
 		<attnum name="CornerSpeed" val="10.30"/>
 		<attnum name="BrakeDelay" val="32.00"/>
 		<attnum name="SteerGain" val="2.0"/>
@@ -31,20 +32,29 @@
 
 		<attnum name="RLSpeed0Div" val="650"/>
 		<attnum name="RLSpeed0DivEnd" val="820"/>
-		<attnum name="RLSpeed0" val="11.4"/>
+		<attnum name="RLSpeed0" val="11.6"/>
 		<attnum name="RLSpeed1Div" val="320"/>
 		<attnum name="RLSpeed1DivEnd" val="450"/>
 		<attnum name="RLSpeed1" val="9.4"/>
+		<attnum name="RLSpeed2Div" val="530"/>
+		<attnum name="RLSpeed2DivEnd" val="649"/>
+		<attnum name="RLSpeed2" val="9.7"/>
+		<attnum name="RLSpeed3Div" val="1"/>
+		<attnum name="RLSpeed3DivEnd" val="210"/>
+		<attnum name="RLSpeed3" val="9.6"/>
 
 		<attnum name="RLBrake0Div" val="360"/>
 		<attnum name="RLBrake0DivEnd" val="450"/>
 		<attnum name="RLBrake0" val="40"/>
 		<attnum name="RLBrake1Div" val="650"/>
 		<attnum name="RLBrake1DivEnd" val="760"/>
-		<attnum name="RLBrake1" val="8"/>
+		<attnum name="RLBrake1" val="4"/>
 		<attnum name="RLBrake2Div" val="1"/>
 		<attnum name="RLBrake2DivEnd" val="154"/>
-		<attnum name="RLBrake2" val="5"/>
+		<attnum name="RLBrake2" val="2"/>
+		<attnum name="RLBrake3Div" val="960"/>
+		<attnum name="RLBrake3DivEnd" val="1080"/>
+		<attnum name="RLBrake3" val="-3"/>
 
 		<attnum name="OTCaution0Div" val="940"/>
 		<attnum name="OTCaution0DivEnd" val="1110"/>
