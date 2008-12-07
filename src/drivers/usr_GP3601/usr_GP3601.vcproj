@@ -47,9 +47,9 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="4"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
-				RuntimeLibrary="0"
+				AdditionalIncludeDirectories="../../../export/include,../../../../3rdParty/include,../../windows/include,../../.."
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
+				RuntimeLibrary="2"
 				PrecompiledHeaderFile=".\Release/usr_GP3601.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
@@ -76,7 +76,7 @@
 				OutputFile=".\Release/usr_GP3601.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../export/lib,../../windows/lib"
+				AdditionalLibraryDirectories="../../../export/lib,../../../../3rdParty/lib,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\usr_GP3601.def"
 				ProgramDatabaseFile=".\Release/usr_GP3601.pdb"
@@ -146,10 +146,10 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/RTCc /RTCu /RTCs"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
+				AdditionalIncludeDirectories="../../../export/include,../../../../3rdParty/include,../../windows/include,../../.."
+				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Debug/usr_GP3601.pch"
 				AssemblerListingLocation=".\Debug/"
@@ -178,7 +178,7 @@
 				OutputFile=".\Debug/usr_GP3601.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../export/libd,../../windows/lib"
+				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC.lib"
 				ModuleDefinitionFile=".\usr_GP3601.def"
 				GenerateDebugInformation="true"
@@ -231,7 +231,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -241,7 +241,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -255,7 +255,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -265,7 +265,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -279,7 +279,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -289,7 +289,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -303,7 +303,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -313,7 +313,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -327,7 +327,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -337,7 +337,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -351,7 +351,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -361,7 +361,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -375,7 +375,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -385,7 +385,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -399,7 +399,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -409,7 +409,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
@@ -423,7 +423,7 @@
 					<Tool
 						Name="VCCLCompilerTool"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -433,7 +433,7 @@
 						Name="VCCLCompilerTool"
 						Optimization="0"
 						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
+						PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_MBCS;_USRDLL;BT_EXPORTS;$(NoInherit)"
 						BasicRuntimeChecks="3"
 					/>
 				</FileConfiguration>
