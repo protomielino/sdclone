@@ -69,19 +69,58 @@ static int usedGM = 0;
 static int usedFG = 0;
 #endif
 
+/* Default list of resolutions in case no RANDR_EXT (Windows)
+   or something went wrong during resolution detection */
+static const char *DefRes[] =
+  { "320x200",
+	"320x240",
+	"400x300",
+	"416x312",
+	"512x384",
+	"576x384",
+	"576x432",
+	"640x384",
+	"640x400",
+	"640x480",
+	"640x512",
+	"700x525",
+	"720x450",
+	"800x512",
+	"800x512",
+	"800x600",
+	"832x624",
+	"840x525",
+	"896x672",
+	"928x696",
+	"960x600",
+	"960x720",
+	"1024x768",
+	"1152x768",
+	"1152x864",
+	"1280x768",
+	"1280x800",
+	"1280x960",
+	"1280x1024",
+	"1400x1050",
+	"1440x900",
+	"1600x1024",
+	"1680x1050",
+	"1920x1200" };
+
+static const int NbDefRes = sizeof(DefRes) / sizeof(DefRes[0]);
+
 #ifdef USE_RANDR_EXT
 static char	**Res = NULL;
 static int nbRes = 0;
 #else // USE_RANDR_EXT
-static char	*Res[] = {"640x480", "800x600", "1024x768", "1152x768", "1152x864", "1200x854", "1200x960", "1280x1024", "1400x900", "1600x1200", "1680x1050", "1920x1200", "320x200"};
-static const int nbRes = sizeof(Res) / sizeof(Res[0]);
+static const char	**Res = DefRes;
+static int nbRes = NbDefRes;
 #endif // USE_RANDR_EXT
 
 static const char	*Mode[] = {"Full-screen mode", "Window mode"};
 static const char	*VInit[] = {GFSCR_VAL_VINIT_COMPATIBLE, GFSCR_VAL_VINIT_BEST};
 static const char	*Depthlist[] = {"24", "32", "16"};
 
-//static const int nbRes = sizeof(Res) / sizeof(Res[0]);
 static const int nbMode = sizeof(Mode) / sizeof(Mode[0]);
 static const int nbVInit = sizeof(VInit) / sizeof(VInit[0]);
 static const int nbDepth = sizeof(Depthlist) / sizeof(Depthlist[0]);
@@ -112,24 +151,25 @@ gfScreenInit(void)
 #ifdef USE_RANDR_EXT
 	// Get display, screen and root window handles.
 	const char *displayname = getenv("DISPLAY");
-	if (displayname == NULL) {
+	if (displayname == 0) {
 		displayname = ":0.0";
 	}
 
 	Display *display = XOpenDisplay(displayname);
 
-	if( display != NULL) {
+	if( display) {
 		// If we have a display fill in the resolutions advertised by Xrandr.
 		int screen = DefaultScreen(display);
     	Window root = RootWindow(display, screen);
 
 		XRRScreenConfiguration *screenconfig = XRRGetScreenInfo (display, root);
-		if (screenconfig != NULL) {
+		if (screenconfig) {
 			int i, j, nsize;
 			XRRScreenSize *sizes = XRRConfigSizes(screenconfig, &nsize);
 
 			if (nsize > 0) {
-				// Check if 320x200, 640x480, 800x600 are available, construct a mode wish list.
+				// Force 320x200, 640x480, 800x600 to be available to the user,
+				// even if X did not report about.
 				int check_resx[] = {320, 640, 800};
 				int check_resy[] = {240, 480, 600};
 				bool mode_in_list[] = {false, false, false};
@@ -137,7 +177,7 @@ gfScreenInit(void)
 
 				for (i = 0; i < nsize; i++) {
 					for (j = 0; j < 3; j++) {
-						if ((mode_in_list[j] == false) && (sizes[i].width == check_resx[j])) {
+						if (!mode_in_list[j] && sizes[i].width == check_resx[j]) {
 							if (sizes[i].height == check_resy[j]) {
 								// Mode already in list.
 								mode_in_list[j] = true;
@@ -147,11 +187,13 @@ gfScreenInit(void)
 					}
 				}
 
+				// Build the mode list, adding "forced" resolutions at the end if necessary.
 				const int bufsize = 20;
 				char buffer[bufsize];
 				Res = (char**) malloc(sizeof(char *)*(nsize+add_modes));
 				int resx[nsize+add_modes];
 				int resy[nsize+add_modes];
+				GfOut("Available resolutions :\n");
 				for (i = 0; i < nsize+add_modes; i++) {
 					if (i < nsize) {
 						// Add mode from screenconfig (system).
@@ -159,6 +201,7 @@ gfScreenInit(void)
 						Res[i] = strndup(buffer, bufsize);
 						resx[i] = sizes[i].width;
 						resy[i] = sizes[i].height;
+						GfOut("  %dx%d  \t(detected)\n", resx[i], resy[i]);
 					} else {
 						// Add mode from wish list.
 						unsigned int j;
@@ -169,6 +212,7 @@ gfScreenInit(void)
 								Res[i] = strndup(buffer, bufsize);
 								resx[i] = check_resx[j];
 								resy[i] = check_resy[j];
+								GfOut("  %dx%d  \t(forced)\n", resx[i], resy[i]);
 								break;
 							}
 						}
@@ -177,8 +221,8 @@ gfScreenInit(void)
 					// Stupid sorting (not much elements, don't worry).
 					int j;
 					for (j = i; j > 0; j--) {
-						if ((resx[j] < resx[j-1]) ||
-							(resx[j] == resx[j-1] && resy[j] < resy[j-1]))
+						if (resx[j] < resx[j-1]
+							|| (resx[j] == resx[j-1] && resy[j] < resy[j-1]))
 						{
 							int tx, ty;
 							char *tc;
@@ -198,6 +242,7 @@ gfScreenInit(void)
 				}
 
 				nbRes = nsize + add_modes;
+
 			}
 
 			XRRFreeScreenConfigInfo(screenconfig);
@@ -207,17 +252,14 @@ gfScreenInit(void)
 
 	if (Res == NULL || nbRes == 0) {
 		// We failed to get a handle to the display, so fill in some defaults.
-		GfOut("Failed to initialize resolutions for display '%s'", XDisplayName(displayname));
-		nbRes = 8;
+		GfError("Failed to initialize resolutions for display '%s' ; using defaults", 
+				XDisplayName(displayname));
+		nbRes = NbDefRes;
 		Res = (char **) malloc(sizeof(char *)*nbRes);
-		Res[0] = strdup("640x480");
-		Res[1] = strdup("800x600");
-		Res[2] = strdup("1024x768");
-		Res[3] = strdup("1152x864");
-		Res[4] = strdup("1200x960");
-		Res[5] = strdup("1280x1024");
-		Res[6] = strdup("1600x1200");
-		Res[7] = strdup("320x200");
+		int i;
+		for (i = 0; i < nbRes; i++) {
+			Res[i] = strdup(DefRes[i]);
+		}
 	}
 #endif // USE_RANDR_EXT
 }
@@ -270,14 +312,16 @@ void GfScrInit(int argc, char *argv[])
 		GfOut ("Freeglut not detected...\n");
 		for (i = maxfreq; i > 59; i--) {
 			sprintf(buf, "%dx%d:%d@%d", winX, winY, depth, i);
-			GfOut("Trying %s mode\n", buf);
+			GfOut("Trying %s video mode\n", buf);
 			fglutGameModeString(buf);
 			if (fglutEnterGameMode()) {
-				GfOut("OK done for %s\n", buf);
+				GfTrace("OK for %s video mode\n", buf);
 				usedFG = 1;
 				break;
 			}
 		}
+		if (!usedFG)
+		  GfError("Could not find any usable video mode\n");
 	}
 #endif
 
@@ -285,8 +329,11 @@ void GfScrInit(int argc, char *argv[])
 
 	glutInit(&argc, argv);
 
-	// Depending on "video mode init" setting try to get the best mode or try to get a mode in a safe way...
-	// This is a workaround for driver/glut/glx bug, which lie about the capabilites of the visual.
+	// Depending on "video mode init" settings, try to get the best mode or try to get a mode in a safe way...
+	// This is a workaround for driver/glut/glx bug, which lies about the capabilites of the visual.
+
+	GfTrace("Visual Properties Report\n");
+	GfTrace("------------------------\n");
 
 	if (strcmp(vinit, GFSCR_VAL_VINIT_BEST) == 0) {
 
@@ -339,34 +386,31 @@ void GfScrInit(int argc, char *argv[])
 			glutInitDisplayString("rgb double depth>=16");
 		}
 
-		printf("Visual Properties Report\n");
-		printf("------------------------\n");
-
 		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
 			// All failed.
-			printf("The minimum display requirements are not fulfilled.\n");
-			printf("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
+			GfTrace("The minimum display requirements are not fulfilled.\n");
+			GfTrace("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
 			// Try fallback as last resort.
-			printf("Trying generic initialization, fallback.\n");
+			GfTrace("Trying generic initialization, fallback.\n");
 			glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
 		} else {
 			// We have got a mode, report the properties.
-			printf("z-buffer depth: %d (%s)\n", visualDepthBits, visualDepthBits < 24 ? "bad" : "good");
-			printf("multisampling : %s\n", visualSupportsMultisample ? "available" : "no");
-			printf("alpha bits    : %s\n", visualSupportsAlpha ? "available" : "no");
+			GfTrace("View size: %dx%d\n", winX, winY);
+			GfTrace("z-buffer depth: %d (%s)\n", visualDepthBits, visualDepthBits < 24 ? "bad" : "good");
+			GfTrace("multisampling : %s\n", visualSupportsMultisample ? "available" : "no");
+			GfTrace("alpha bits    : %s\n", visualSupportsAlpha ? "available" : "no");
 			if (visualDepthBits < 24) {
 				// Show a hint if the z-buffer depth is not optimal.
-				printf("The z-buffer resolution is below 24 bit, you will experience rendering\n");
-				printf("artefacts. Try to improve the setup of your graphics board or look\n");
-				printf("for an alternate driver.\n");
+				GfTrace("The z-buffer resolution is below 24 bit, you will experience rendering\n");
+				GfTrace("artefacts. Try to improve the setup of your graphics board or look\n");
+				GfTrace("for an alternate driver.\n");
 			}
 		}
 	} else {
 		// Compatibility mode.
 		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-		printf("Visual Properties Report\n");
-		printf("------------------------\n");
-		printf("Compatibility mode, properties unknown.\n");
+		GfTrace("View size: %dx%d\n", winX, winY);
+		GfTrace("Compatibility mode, other properties unknown.\n");
 	}
 
 
@@ -374,12 +418,12 @@ void GfScrInit(int argc, char *argv[])
 		for (i = maxfreq; i > 59; i--) {
 			sprintf(buf, "%dx%d:%d@%d", winX, winY, depth, i);
 			glutGameModeString(buf);
-			GfOut("2 - Trying %s mode\n", buf);
+			GfOut("2 - Trying %s video mode\n", buf);
 			if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
-				GfOut("2- %s mode Possible\n", buf);
+				GfOut("2- %s video mode available\n", buf);
 				glutEnterGameMode();
 				if (glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED)) {
-					GfOut("Use GameMode %s\n", buf);
+					GfOut("OK for %s video mode\n", buf);
 					usedGM = 1;
 					fullscreen = 1;
 					break;
@@ -388,6 +432,9 @@ void GfScrInit(int argc, char *argv[])
 				}
 			}
 		}
+		if (!usedGM)
+		  GfError("Could not find any usable video mode\n");
+
 	}
 
 	if (!fullscreen) {
@@ -396,7 +443,7 @@ void GfScrInit(int argc, char *argv[])
 		glutInitWindowSize(winX, winY);
 		Window = glutCreateWindow(argv[0]);
 		if (!Window) {
-			printf("Error, couldn't open window\n");
+			GfError("Error, couldn't open window\n");
 			GfScrShutdown();
 			exit(1);
 		}
