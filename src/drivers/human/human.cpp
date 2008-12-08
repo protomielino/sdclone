@@ -843,8 +843,8 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 				car->_brakeCmd = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
 
-			const tdble abs_slip = 5.0;
-			const tdble abs_range = 7.0;
+			const tdble abs_slip = 1.0;
+			const tdble abs_range = 9.0;
 
 			// reduce brake if wheels are slipping
 			slip = 0;
