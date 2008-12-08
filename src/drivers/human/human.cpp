@@ -829,21 +829,24 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			tdble rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
 			int i;
 
+			// reduce brake if car sliding sideways
 			tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
 			NORM_PI_PI(skidAng);
 
 			if (car->_speed_x > 5 && fabs(skidAng) > 0.2)
 				car->_brakeCmd = MIN(car->_brakeCmd, 0.10 + 0.70 * cos(skidAng));
 
+			// reduce brake if car steering sharply
 			if (fabs(car->_steerCmd) > 0.1)
 			{
-				tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.6);
+				tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.4);
 				car->_brakeCmd = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
 
-			const tdble abs_slip = 3.5;
-			const tdble abs_range = 5.0;
+			const tdble abs_slip = 5.0;
+			const tdble abs_range = 7.0;
 
+			// reduce brake if wheels are slipping
 			slip = 0;
 			for (i = 0; i < 4; i++) {
 				slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
@@ -851,7 +854,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			slip = car->_speed_x - slip/4.0f;
 
 			if (slip > abs_slip)
-				car->_brakeCmd = car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range);
+				car->_brakeCmd = MAX(MIN(0.35, car->_brakeCmd), car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range));
 		}
 	}
 
