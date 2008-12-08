@@ -636,9 +636,9 @@ grInitCar(tCarElt *car)
 	LODSel->addKid(carBody);
 
 	/* The car's model is under cars/<model> */
-	sprintf(buf, "cars/%s", car->_carName);
+	//sprintf(buf, "cars/%s", car->_carName);
+	sprintf(buf, "drivers/%s/%s/%d;drivers/%s/%s;drivers/%s/%d;cars/%s", car->_modName, car->_carName, car->_driverIndex, car->_modName, car->_carName, car->_modName, car->_driverIndex, car->_carName);
 	ssgModelPath(buf);
-	sprintf(buf, "drivers/%s/%d;drivers/%s;cars/%s", car->_modName, car->_driverIndex, car->_modName, car->_carName);
 	ssgTexturePath(buf);
 	grTexturePath = strdup(buf);
 
@@ -664,7 +664,6 @@ grInitCar(tCarElt *car)
 	} else {
 		grCarInfo[index].driverSelectorinsg = false;
 	}
-
 
 	DBG_SET_NAME(carEntity, "Body", index, -1);
 	carBody->addKid(carEntity);
@@ -701,6 +700,44 @@ grInitCar(tCarElt *car)
 	/* default range selection */
 	LODSel->select(grCarInfo[index].LODSelectMask[0]);
 
+	/* add Steering Wheel for car 0 (if one exists) */
+	param = GfParmGetStr(handle, path, PRM_STEERWHEEL, NULL);
+	if (param)
+	{
+		grCarInfo[index].steerWheel = grssgCarLoadAC3D(param, NULL, index);
+		
+		if (grCarInfo[index].steerWheel)
+		{
+			ssgBranch *steerBranch = new ssgBranch;
+			ssgTransform *steerLoc = new ssgTransform;
+
+			sgCoord steerpos;
+			tdble xpos = GfParmGetNum(handle, path, PRM_STEERWHEELX, NULL, 0.0);
+			tdble ypos = GfParmGetNum(handle, path, PRM_STEERWHEELY, NULL, 0.0);
+			tdble zpos = GfParmGetNum(handle, path, PRM_STEERWHEELZ, NULL, 0.0);
+			tdble angl = GfParmGetNum(handle, path, PRM_STEERWHEELA, NULL, 0.0);
+
+			grCarInfo[index].steerMovt = GfParmGetNum(handle, path, PRM_STEERMOVT, NULL, 1.0);
+
+			grCarInfo[index].steerRot = new ssgTransform;
+			sgSetCoord(&steerpos, 0, 0, 0, 0, 0, 0);
+			grCarInfo[index].steerRot->setTransform( &steerpos );
+			grCarInfo[index].steerRot->addKid(grCarInfo[index].steerWheel);
+
+			sgSetCoord(&steerpos, xpos, ypos, zpos, 0, 0, angl);
+			steerLoc->setTransform( &steerpos);
+			steerLoc->addKid( grCarInfo[index].steerRot );
+			steerBranch->addKid( steerLoc );
+
+			grCarInfo[index].steerSelector = new ssgSelector;
+			grCarInfo[index].steerSelector->addKid( steerBranch );
+			grCarInfo[index].steerSelector->select(1);
+			grCarInfo[index].carTransform->addKid( grCarInfo[index].steerSelector );
+		}
+	}
+	else
+		grCarInfo[index].steerWheel = NULL;
+
 	// separate driver models for animation according to steering wheel angle ...
 	sprintf(path, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
 	nranges = GfParmGetEltNb(handle, path) + 1;
@@ -715,11 +752,6 @@ grInitCar(tCarElt *car)
 		grCarInfo[index].DRMSelector = DRMSel = new ssgSelector;
 		grCarInfo[index].carTransform->addKid(DRMSel);
 	
-		sprintf(buf, "cars/%s", car->_carName);
-		ssgModelPath(buf);
-		sprintf(buf, "drivers/%s/%d;drivers/%s;cars/%s", car->_modName, car->_driverIndex, car->_modName, car->_carName);
-		ssgTexturePath(buf);
-		grTexturePath = strdup(buf);
 		selIndex = 0;
 
 		// add the drivers
@@ -749,7 +781,6 @@ grInitCar(tCarElt *car)
 		if (i == nranges)
 			DRMSel->select( grCarInfo[index].DRMSelectMask[0] );
 	}
-
 
 	CarsAnchor->addKid(grCarInfo[index].carTransform);
     
@@ -843,46 +874,55 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 			i++;
 		}
 		grCarInfo[index].LODSelector->select(grCarInfo[index].LODSelectMask[i]);
-		if (dispDrvFlag) {
-			grCarInfo[index].driverSelector->select(1);
-		} else {
-			grCarInfo[index].driverSelector->select(0);
-		}
-
- 		// Animated driver model selection according to steering wheel angle
-		if (grCarInfo[index].nDRM > 0 && s->currentTime - grCarInfo[index].lastDRMswitch > 0.2)
+		if (dispDrvFlag || car != curCar) 
 		{
-			// choose a driver model to display
-			int curDRM = 0;
-			float curSteer = 0.0f;
-			int lastDRM = grCarInfo[index].DRMSelector->getSelect();
-	
-			for (i=0; i<grCarInfo[index].nDRM; i++)
-			{
-				if ((curCar->_steerCmd > 0.0 && 
-				    grCarInfo[index].DRMThreshold[i] >= 0.0 &&
-				    grCarInfo[index].DRMThreshold[i] <= curCar->_steerCmd &&
-				    grCarInfo[index].DRMThreshold[i] >= curSteer) ||
-				    (curCar->_steerCmd < 0.0 && 
-				    grCarInfo[index].DRMThreshold[i] <= 0.0 &&
-				    grCarInfo[index].DRMThreshold[i] >= curCar->_steerCmd &&
-				    grCarInfo[index].DRMThreshold[i] <= curSteer))
-				{
-					float fsteer = fabs(curCar->_steerCmd);
+			grCarInfo[index].driverSelector->select(1);
 
-					curDRM = i;
-					curSteer = grCarInfo[index].DRMThreshold[i];
+	 		// Animated driver model selection according to steering wheel angle
+			if (grCarInfo[index].nDRM > 0 && s->currentTime - grCarInfo[index].lastDRMswitch > 0.1)
+			{
+				// choose a driver model to display
+				int curDRM = 0;
+				float curSteer = 0.0f;
+				int lastDRM = grCarInfo[index].DRMSelector->getSelect();
+	
+				for (i=0; i<grCarInfo[index].nDRM; i++)
+				{
+					if ((car->_steerCmd > 0.0 && 
+					    grCarInfo[index].DRMThreshold[i] >= 0.0 &&
+					    grCarInfo[index].DRMThreshold[i] <= car->_steerCmd &&
+					    grCarInfo[index].DRMThreshold[i] >= curSteer) ||
+					    (car->_steerCmd < 0.0 && 
+					    grCarInfo[index].DRMThreshold[i] <= 0.0 &&
+					    grCarInfo[index].DRMThreshold[i] >= car->_steerCmd &&
+					    grCarInfo[index].DRMThreshold[i] <= curSteer))
+					{
+						float fsteer = fabs(car->_steerCmd);
+	
+						curDRM = i;
+						curSteer = grCarInfo[index].DRMThreshold[i];
+					}
+				}
+		
+				grCarInfo[index].DRMSelector->select( grCarInfo[index].DRMSelectMask[curDRM] );
+				if (lastDRM != curDRM)
+				{
+					grCarInfo[index].lastDRMswitch = s->currentTime;
 				}
 			}
-	
-			grCarInfo[index].DRMSelector->select( grCarInfo[index].DRMSelectMask[curDRM] );
-			if (lastDRM != curDRM)
-			{
-				grCarInfo[index].lastDRMswitch = s->currentTime;
-			}
+		} 
+		else 
+		{
+			grCarInfo[index].driverSelector->select(0);
+			grCarInfo[index].DRMSelector->select(0);
 		}
 	}
 
+	if (grCarInfo[index].steerWheel)
+	{
+		sgSetCoord( &wheelpos, 0, 0, 0, 0, RAD2DEG(-car->_steerCmd * grCarInfo[index].steerMovt), 0 );
+		grCarInfo[index].steerRot->setTransform( &wheelpos );
+	}
 
 	sgCopyMat4(grCarInfo[index].carPos, car->_posMat);
 	grCarInfo[index].px=car->_pos_X;
