@@ -148,7 +148,9 @@ class Driver {
 		float deltaTime;
 		float FuelSpeedUp;
 		float TclSlip;
+		float TclRange;
 		float AbsSlip;
+		float AbsRange;
 		unsigned int random_seed;
 		int DebugMsg;
 		int racetype;
@@ -266,7 +268,6 @@ class Driver {
 		static const float FULL_ACCEL_MARGIN;
 		static const float SHIFT;
 		static const float SHIFT_MARGIN;
-		static const float ABS_RANGE ;
 		static const float ABS_MINSPEED;
 		static const float LOOKAHEAD_CONST;
 		static const float LOOKAHEAD_FACTOR;
@@ -278,7 +279,6 @@ class Driver {
 		static const float PIT_BRAKE_AHEAD;
 		static const float PIT_MU;
 		static const float MAX_SPEED;
-		static const float TCL_RANGE;
 		static const float MAX_FUEL_PER_METER;
 		static const float CLUTCH_SPEED;
 		static const float CENTERDIV;

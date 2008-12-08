@@ -32,9 +32,7 @@ const float Driver::G = 9.81f;								// [m/(s*s)] Welcome on Earth.
 const float Driver::FULL_ACCEL_MARGIN = 1.0f;				// [m/s] Margin reduce oscillation of brake/acceleration.
 const float Driver::SHIFT = 0.9f;							// [-] (% of rpmredline) When do we like to shift gears.
 const float Driver::SHIFT_MARGIN = 4.0f;					// [m/s] Avoid oscillating gear changes.
-const float Driver::ABS_RANGE = 5.0f;						// [m/s] range [0..10]
 const float Driver::ABS_MINSPEED = 3.0f;					// [m/s] Below this speed the ABS is disabled (numeric, division by small numbers).
-const float Driver::TCL_RANGE = 10.0f;						// [m/s] range [0..10]
 const float Driver::LOOKAHEAD_CONST = 18.0f;				// [m]
 const float Driver::LOOKAHEAD_FACTOR = 0.33f;				// [-]
 const float Driver::WIDTHDIV = 3.0f;						// [-] Defines the percentage of the track to use (2/WIDTHDIV).
@@ -70,7 +68,9 @@ Driver::Driver(int index) :
 		deltaTime(0.0f),
 		FuelSpeedUp(0.0f),
 		TclSlip(2.0f),
+		TclRange(10.0f),
 		AbsSlip(2.5f),
+		AbsRange(5.0f),
 		random_seed(0),
 		DebugMsg(0),
 		racetype(0),
@@ -359,7 +359,9 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	if (brdebug) DebugMsg |= debug_brake;
 	FuelSpeedUp = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "FuelSpeedUp", NULL, 0.0f);
 	TclSlip = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "TclSlip", NULL, 2.0f);
+	TclRange = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "TclRange", NULL, 10.0f);
 	AbsSlip = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "AbsSlip", NULL, 2.5f);
+	AbsRange = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "AbsRange", NULL, 5.0f);
 	fuelperlap = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "FuelPerLap", NULL, 5.0f);
 	CARMASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
 	maxfuel = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
@@ -3104,7 +3106,7 @@ float Driver::filterABS(float brake)
 
 	float absslip = (car->_speed_x < 20.0f ? MIN(AbsSlip, 2.0f) : AbsSlip);
 	if (slip > absslip) {
-		brake = brake - MIN(brake, (slip - absslip)/ABS_RANGE);
+		brake = brake - MIN(brake, (slip - absslip)/AbsRange);
 	}
 	brake = MAX(brake, MIN(origbrake, 0.1f));
 
