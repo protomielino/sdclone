@@ -3218,7 +3218,7 @@ fprintf(stderr,"friction %.3f accel=%.3f->%.3f\n",wseg0->surface->kFriction,acce
 
 	float slip = (this->*GET_DRIVEN_WHEEL_SPEED)() - fabs(car->_speed_x);
 	if (slip > TclSlip) {
-		accel3 = accel3 - MIN(accel3, (slip - TclSlip)/TCL_RANGE);
+		accel3 = accel3 - MIN(accel3, (slip - TclSlip)/TclRange);
 	}
 
 	accel = MAX(accel/4, MIN(accel1, MIN(accel2, accel3)));
