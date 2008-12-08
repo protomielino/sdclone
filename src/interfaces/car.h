@@ -532,12 +532,11 @@ typedef struct CarElt
 #define PRM_BONNET		"bonnet"
 #define PRM_WHEEL_TEXTURE	"wheel texture"
 #define PRM_SHADOW_TEXTURE	"shadow texture"
-#define PRM_STEERWHEEL          "steer wheel"
-#define PRM_STEERWHEELX         "steer wheel xpos"
-#define PRM_STEERWHEELY         "steer wheel ypos"
-#define PRM_STEERWHEELZ         "steer wheel zpos"
-#define PRM_STEERWHEELA         "steer wheel angle"
-#define PRM_STEERMOVT           "steer wheel movt"
+
+#define SECT_STEERWHEEL	        "Steer Wheel"
+#define PRM_SW_MODEL            "model"
+#define PRM_SW_ANGLE            "angle"
+#define PRM_SW_MOVT             "movt"
 
 #define LST_DRIVER              "Driver"
 #define PRM_DRIVERSTEER         "steer"

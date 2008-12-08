@@ -700,10 +700,12 @@ grInitCar(tCarElt *car)
 	/* default range selection */
 	LODSel->select(grCarInfo[index].LODSelectMask[0]);
 
-	/* add Steering Wheel for car 0 (if one exists) */
-	param = GfParmGetStr(handle, path, PRM_STEERWHEEL, NULL);
+	/* add Steering Wheel 0 (if one exists) */
+	sprintf(path, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+	param = GfParmGetStr(handle, path, PRM_SW_MODEL, NULL);
 	if (param)
 	{
+fprintf(stderr,"\n\nLOADING STEER WHEEL\n");
 		grCarInfo[index].steerWheel = grssgCarLoadAC3D(param, NULL, index);
 		
 		if (grCarInfo[index].steerWheel)
@@ -712,12 +714,12 @@ grInitCar(tCarElt *car)
 			ssgTransform *steerLoc = new ssgTransform;
 
 			sgCoord steerpos;
-			tdble xpos = GfParmGetNum(handle, path, PRM_STEERWHEELX, NULL, 0.0);
-			tdble ypos = GfParmGetNum(handle, path, PRM_STEERWHEELY, NULL, 0.0);
-			tdble zpos = GfParmGetNum(handle, path, PRM_STEERWHEELZ, NULL, 0.0);
-			tdble angl = GfParmGetNum(handle, path, PRM_STEERWHEELA, NULL, 0.0);
+			tdble xpos = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0.0);
+			tdble ypos = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0.0);
+			tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
+			tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
 
-			grCarInfo[index].steerMovt = GfParmGetNum(handle, path, PRM_STEERMOVT, NULL, 1.0);
+			grCarInfo[index].steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
 
 			grCarInfo[index].steerRot = new ssgTransform;
 			sgSetCoord(&steerpos, 0, 0, 0, 0, 0, 0);
@@ -736,7 +738,10 @@ grInitCar(tCarElt *car)
 		}
 	}
 	else
+	{
+fprintf(stderr,"\n\nNOT LOADING STEER WHEEL\n");
 		grCarInfo[index].steerWheel = NULL;
+	}
 
 	// separate driver models for animation according to steering wheel angle ...
 	sprintf(path, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
