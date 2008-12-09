@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
   <section name="private">
-	  <!-- 0.50.60 -->
+	  <!-- 0.51.00 -->
     <attnum name="BaseCornerSpeed" val="-13.4"/>
     <attnum name="CornerSpeed" val="22.0"/>
     <attnum name="TurnDecel" val="0.5"/>
@@ -32,7 +32,7 @@
     <attnum name="LookAhead" val="1.0"/>
     <attnum name="IncFactor" val="0.7"/>
     <attnum name="FuelSpeedUp" val="6.8"/>
-    <attnum name="FuelPerLap" val="1.35"/>
+    <attnum name="FuelPerLap" val="1.25"/>
     <attnum name="InitialFuel" val="86"/>
     <attnum name="TimeFactor" val="1"/>
     <attnum name="SteerDebug" val="0"/>

@@ -19,14 +19,16 @@
 	<!-- 1.41.40 -->
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
+		<attnum name="BaseCornerSpeed" val="0.1"/>
 		<attnum name="CornerSpeed" val="10.5"/>
-		<attnum name="BrakeDelay" val="32.00"/>
+		<attnum name="BrakeDelay" val="27.00"/>
 		<attnum name="SteerGain" val="2.0"/>
 		<attnum name="SteerDebug" val="0"/>
 		<attnum name="OvertakeDebug" val="0"/>
 		<attnum name="IntMargin" val="1.25"/>
 		<attnum name="ExtMargin" val="1.3"/>
 		<attnum name="AccelExit" val="0.5"/>
+		<attnum name="FuelPerLap" val="2.1"/>
 
 		<attnum name="SkidCorrection0Div" val="680"/>
 		<attnum name="SkidCorrection0DivEnd" val="770"/>

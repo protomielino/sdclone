@@ -30,7 +30,7 @@
 		<attnum name="AccelExit" val="0.5"/>
 		<attnum name="TclSlip" val="4.0"/>
 		<attnum name="AbsSlip" val="4.0"/>
-		<attnum name="FuelPerLap" val="6.4"/>
+		<attnum name="FuelPerLap" val="3.5"/>
 		<attnum name="SkidCorrection" val="1.3"/>
 
 		<attnum name="Bump1Div" val="950"/>

@@ -20,7 +20,7 @@
 	<section name="private">
 		<attnum name="MinCornerInverse" val="0.000001"/>
 		<attnum name="CornerSpeed" val="10.5"/>
-		<attnum name="BrakeDelay" val="32.00"/>
+		<attnum name="BrakeDelay" val="27.00"/>
 		<attnum name="SteerGain" val="2.0"/>
 		<attnum name="SteerDebug" val="0"/>
 		<attnum name="OvertakeDebug" val="0"/>

@@ -39,6 +39,9 @@
 		<attnum name="RLBrake0Div" val="1700"/>
 		<attnum name="RLBrake0DivEnd" val="1870"/>
 		<attnum name="RLBrake0" val="-4"/>
+		<attnum name="RLBrake1Div" val="1"/>
+		<attnum name="RLBrake1DivEnd" val="270"/>
+		<attnum name="RLBrake1" val="-4"/>
 
 		<attnum name="SpeedLimit0Div" val="990"/>
 		<attnum name="SpeedLimit0DivEnd" val="1120"/>

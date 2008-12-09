@@ -51,7 +51,7 @@
 		<attnum name="RLBrake1" val="2"/>
 		<attnum name="RLBrake2Div" val="1"/>
 		<attnum name="RLBrake2DivEnd" val="154"/>
-		<attnum name="RLBrake2" val="-2"/>
+		<attnum name="RLBrake2" val="-5"/>
 		<attnum name="RLBrake3Div" val="960"/>
 		<attnum name="RLBrake3DivEnd" val="1080"/>
 		<attnum name="RLBrake3" val="-5"/>

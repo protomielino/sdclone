@@ -21,7 +21,7 @@
 		<attnum name="MinCornerInverse" val="0.000001"/>
 		<attnum name="BaseCornerSpeedX" val="1.04"/>
 		<attnum name="CornerSpeed" val="10.5"/>
-		<attnum name="BrakeDelay" val="24.00"/>
+		<attnum name="BrakeDelay" val="21.50"/>
 		<attnum name="SteerGain" val="2.0"/>
 		<attnum name="SteerDebug" val="0"/>
 		<attnum name="OvertakeDebug" val="0"/>
