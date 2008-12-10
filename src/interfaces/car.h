@@ -535,6 +535,7 @@ typedef struct CarElt
 
 #define SECT_STEERWHEEL	        "Steer Wheel"
 #define PRM_SW_MODEL            "model"
+#define PRM_SW_MODELHR          "hi res model"
 #define PRM_SW_ANGLE            "angle"
 #define PRM_SW_MOVT             "movt"
 

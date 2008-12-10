@@ -44,8 +44,8 @@ typedef struct
     ssgTransform	*carTransform;
     ssgSelector		*LODSelector;
     ssgSelector		*DRMSelector;
-	ssgEntity       *carEntity;
-	ssgEntity       *steerWheel;
+    ssgEntity		*carEntity;
+    int                 nSteer;
     int			LODSelectMask[32];
     float		LODThreshold[32];
     int			DRMSelectMask[32];
@@ -54,11 +54,11 @@ typedef struct
     float               lastDRMswitch;
     ssgSelector		*driverSelector;
     ssgSelector         *steerSelector;
-	bool driverSelectorinsg;
+    bool driverSelectorinsg;
     ssgStateSelector	*envSelector;
     ssgTransform	*wheelPos[4];
     ssgTransform	*wheelRot[4];
-    ssgTransform	*steerRot;
+    ssgTransform	*steerRot[2];
     ssgColourArray	*brkColor[4];
     ssgSelector		*wheelselector[4];
     ssgState		*wheelTexture;

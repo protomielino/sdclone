@@ -705,11 +705,15 @@ grInitCar(tCarElt *car)
 	param = GfParmGetStr(handle, path, PRM_SW_MODEL, NULL);
 	if (param)
 	{
-fprintf(stderr,"\n\nLOADING STEER WHEEL\n");
-		grCarInfo[index].steerWheel = grssgCarLoadAC3D(param, NULL, index);
+		ssgEntity *steerEntityLo = grssgCarLoadAC3D(param, NULL, index);
+		ssgEntity *steerEntityHi = NULL;
 		
-		if (grCarInfo[index].steerWheel)
+		if (steerEntityLo)
 		{
+			grCarInfo[index].nSteer = 1;
+			grCarInfo[index].steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
+
+			grCarInfo[index].steerSelector = new ssgSelector;
 			ssgBranch *steerBranch = new ssgBranch;
 			ssgTransform *steerLoc = new ssgTransform;
 
@@ -719,28 +723,49 @@ fprintf(stderr,"\n\nLOADING STEER WHEEL\n");
 			tdble zpos = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.0);
 			tdble angl = GfParmGetNum(handle, path, PRM_SW_ANGLE, NULL, 0.0);
 
-			grCarInfo[index].steerMovt = GfParmGetNum(handle, path, PRM_SW_MOVT, NULL, 1.0);
-
-			grCarInfo[index].steerRot = new ssgTransform;
+			grCarInfo[index].steerRot[0] = new ssgTransform;
 			sgSetCoord(&steerpos, 0, 0, 0, 0, 0, 0);
-			grCarInfo[index].steerRot->setTransform( &steerpos );
-			grCarInfo[index].steerRot->addKid(grCarInfo[index].steerWheel);
+			grCarInfo[index].steerRot[0]->setTransform( &steerpos );
+			grCarInfo[index].steerRot[0]->addKid( steerEntityLo );
 
 			sgSetCoord(&steerpos, xpos, ypos, zpos, 0, 0, angl);
 			steerLoc->setTransform( &steerpos);
-			steerLoc->addKid( grCarInfo[index].steerRot );
+			steerLoc->addKid( grCarInfo[index].steerRot[0] );
 			steerBranch->addKid( steerLoc );
 
-			grCarInfo[index].steerSelector = new ssgSelector;
 			grCarInfo[index].steerSelector->addKid( steerBranch );
 			grCarInfo[index].steerSelector->select(1);
+
+			param = GfParmGetStr(handle, path, PRM_SW_MODELHR, NULL);
+			if (param)
+			{
+				steerEntityHi = grssgCarLoadAC3D(param, NULL, index);
+				if (steerEntityHi)
+				{
+					grCarInfo[index].nSteer = 2;
+
+					grCarInfo[index].steerRot[1] = new ssgTransform;
+					sgSetCoord(&steerpos, 0, 0, 0, 0, 0, 0);
+					grCarInfo[index].steerRot[1]->setTransform( &steerpos );
+					grCarInfo[index].steerRot[1]->addKid( steerEntityHi );
+
+					steerBranch = new ssgBranch;
+					steerLoc = new ssgTransform;
+
+					sgSetCoord(&steerpos, xpos, ypos, zpos, 0, 0, angl);
+					steerLoc->setTransform( &steerpos);
+					steerLoc->addKid( grCarInfo[index].steerRot[1] );
+					steerBranch->addKid( steerLoc );
+					grCarInfo[index].steerSelector->addKid( steerBranch );
+				}
+			}
+
 			grCarInfo[index].carTransform->addKid( grCarInfo[index].steerSelector );
 		}
 	}
 	else
 	{
-fprintf(stderr,"\n\nNOT LOADING STEER WHEEL\n");
-		grCarInfo[index].steerWheel = NULL;
+		grCarInfo[index].nSteer = 0;
 	}
 
 	// separate driver models for animation according to steering wheel angle ...
@@ -865,6 +890,9 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 	grCarInfo[index].distFromStart=grGetDistToStart(car);
 	grCarInfo[index].envAngle=RAD2DEG(car->_yaw);
 
+	if (grCarInfo[index].nSteer > 0)
+		grCarInfo[index].steerSelector->select(1);
+
 	if ((car == curCar) && (dispCarFlag != 1)) {
 		grCarInfo[index].LODSelector->select(0);
 		if (grCarInfo[index].nDRM > 0)
@@ -920,13 +948,17 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 		{
 			grCarInfo[index].driverSelector->select(0);
 			grCarInfo[index].DRMSelector->select(0);
+			if (grCarInfo[index].nSteer > 1)
+				grCarInfo[index].steerSelector->select(2);
 		}
 	}
 
-	if (grCarInfo[index].steerWheel)
+	if (grCarInfo[index].nSteer)
 	{
 		sgSetCoord( &wheelpos, 0, 0, 0, 0, RAD2DEG(-car->_steerCmd * grCarInfo[index].steerMovt), 0 );
-		grCarInfo[index].steerRot->setTransform( &wheelpos );
+		grCarInfo[index].steerRot[0]->setTransform( &wheelpos );
+		if (grCarInfo[index].nSteer > 1)
+			grCarInfo[index].steerRot[1]->setTransform( &wheelpos );
 	}
 
 	sgCopyMat4(grCarInfo[index].carPos, car->_posMat);
