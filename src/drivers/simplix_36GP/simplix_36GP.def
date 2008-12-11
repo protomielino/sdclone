@@ -1,0 +1,32 @@
+;
+;   file        : simplix.def
+;   created     : 22 Nov 2008
+;   last changed: 04 Dez 2008
+;   copyright   : (C) 2008 Wolf-Dieter Beelitz
+;
+;
+;    This program is free software; you can redistribute it and/or modify
+;    it under the terms of the GNU General Public License as published by
+;    the Free Software Foundation; either version 2 of the License, or   
+;    (at your option) any later version.                                 
+;
+
+LIBRARY	simplix
+
+SECTIONS .data READ WRITE
+
+EXPORTS
+	simplix_trb1a
+	simplix_trb1b
+	simplix_sca
+	simplix_scb
+	simplix_36GP
+	my_simplix_1
+	my_simplix_2
+	my_simplix_3
+	my_simplix_4
+	my_simplix_5
+	my_simplix_6
+	my_simplix_7
+	my_simplix_8
+	my_simplix_9

@@ -19,88 +19,125 @@
     <section name="index">
 
       <section name="1">
-        <attstr name="name" val="GP3601 a12c"></attstr>
+        <attstr name="name" val="Luigi Fagioli"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="a"></attstr>
+        <attstr name="team" val="36 Mercedes"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-alfa12c"></attstr>
-        <attnum name="race number" val="86"></attnum>
-        <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attnum name="race number" val="7"></attnum>
+        <attnum name="red" val="0.9"></attnum>
+        <attnum name="green" val="0.9"></attnum>
+        <attnum name="blue" val="0.9"></attnum>
       </section>
 
       <section name="2">
-        <attstr name="name" val="GP3601 p3"></attstr>
+        <attstr name="name" val="Manfred von Brauchitsch"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="b"></attstr>
+        <attstr name="team" val="36 Mercedes"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-alfatipo"></attstr>
-        <attnum name="race number" val="87"></attnum>
-        <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attnum name="race number" val="8"></attnum>
+        <attnum name="red" val="0.9"></attnum>
+        <attnum name="green" val="0.9"></attnum>
+        <attnum name="blue" val="0.9"></attnum>
       </section>
 
       <section name="3">
-        <attstr name="name" val="GP3601 AU"></attstr>
+        <attstr name="name" val="Tazio Nuvolari"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="c"></attstr>
+        <attstr name="team" val="36 Scuderia Ferrari"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-autounion"></attstr>
-        <attnum name="race number" val="87"></attnum>
-        <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attstr name="car name" val="36GP-alfa12c"></attstr>
+        <attnum name="race number" val="18"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.2"></attnum>
       </section>
 
       <section name="4">
-        <attstr name="name" val="GP3601 Bug"></attstr>
+        <attstr name="name" val="Carlo Pintacuda"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="d"></attstr>
+        <attstr name="team" val="36 Scuderia Ferrari"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-bugatti"></attstr>
-        <attnum name="race number" val="87"></attnum>
-        <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attstr name="car name" val="36GP-alfa12c"></attstr>
+        <attnum name="race number" val="20"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.2"></attnum>
       </section>
 
       <section name="5">
-        <attstr name="name" val="GP3601 v8ri"></attstr>
+        <attstr name="name" val="Bernd Rosemeyer"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="f"></attstr>
+        <attstr name="team" val="36 Auto Union"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-maserati"></attstr>
-        <attnum name="race number" val="87"></attnum>
-        <attnum name="red" val="0.4"></attnum>
+        <attstr name="car name" val="36GP-autounion"></attstr>
+        <attnum name="race number" val="11"></attnum>
+        <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attnum name="blue" val="0.2"></attnum>
       </section>
 
       <section name="6">
-        <attstr name="name" val="GP3601 6c"></attstr>
+        <attstr name="name" val="Richard Seaman"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="g"></attstr>
+        <attstr name="team" val="36 Scuderia Torino"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="36GP-maserati6C34"></attstr>
-        <attnum name="race number" val="87"></attnum>
-        <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attnum name="race number" val="34"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.5"></attnum>
+        <attnum name="blue" val="0.0"></attnum>
       </section>
 
       <section name="7">
-        <attstr name="name" val="GP3601 w25"></attstr>
+        <attstr name="name" val="Robert Benoist"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="h"></attstr>
+        <attstr name="team" val="36 Ettore Bugatti"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="36GP-mercedes"></attstr>
-        <attnum name="race number" val="87"></attnum>
+        <attstr name="car name" val="36GP-bugatti"></attstr>
+        <attnum name="race number" val="25"></attnum>
         <attnum name="red" val="0.4"></attnum>
-        <attnum name="green" val="0.7"></attnum>
+        <attnum name="green" val="0.4"></attnum>
         <attnum name="blue" val="1.0"></attnum>
       </section>
+
+      <section name="8">
+        <attstr name="name" val="Philippe Etancelin"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="36 Private 1"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-maserati"></attstr>
+        <attnum name="race number" val="40"></attnum>
+        <attnum name="red" val="0.7"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="0.7"></attnum>
+      </section>
+
+      <section name="9">
+        <attstr name="name" val="Raymond Sommer"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="36 Private 2"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-alfatipo"></attstr>
+        <attnum name="race number" val="29"></attnum>
+        <attnum name="red" val="0.7"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="0.7"></attnum>
+      </section>
+
+      <section name="10">
+        <attstr name="name" val="Hans Ruesch"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="36 Private 3"></attstr>
+        <attstr name="author" val="Andrew Sumner"></attstr>
+        <attstr name="car name" val="36GP-maserati6C34"></attstr>
+        <attnum name="race number" val="48"></attnum>
+        <attnum name="red" val="0.7"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="0.7"></attnum>
+      </section>
+
 
     </section>
   </section>
