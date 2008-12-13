@@ -47,8 +47,8 @@ SOURCES     = unitmain.cpp \
 		unitvec2d.cpp \
 		unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
-SHIP        = 
-SHIPSUBDIRS = 
+SHIP        = ${ROBOT}.xml logo.rgb
+SHIPSUBDIRS = tracks
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-simplix_36GP_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
