@@ -109,10 +109,10 @@ class CK1999Data
   void Drive(tCarElt* car, tSituation *s);
 };
 
-CK1999Data data1(0.0032,  9.50,  8.00, 8.00, 0.40, "K1999-buggy");
-CK1999Data data2(0.0032, 12.00, 11.00, 2.00, 0.20, "K1999-cg-nascar-rwd");
+static CK1999Data data1(0.0032,  9.50,  8.00, 8.00, 0.40, "K1999-buggy");
+static CK1999Data data2(0.0032, 12.00, 11.00, 2.00, 0.20, "K1999-cg-nascar-rwd");
 
-CK1999Data *tpdata[] = {&data1, &data2};
+static CK1999Data *tpdata[] = {&data1, &data2};
 
 #define CARS (sizeof(tpdata)/sizeof(*tpdata))
 
@@ -481,6 +481,7 @@ static int InitFuncPt(int index, void *pt);
 extern "C" int K1999(tModInfo *modInfo) 
 { 
  OUTPUT("modInfo");
+ memset(modInfo, 0, 10*sizeof(tModInfo));
  for (int i = CARS; --i >= 0;)
  {
   OUTPUT("modInfo[" << i << "].name = " << tpdata[i]->pszCarName);
