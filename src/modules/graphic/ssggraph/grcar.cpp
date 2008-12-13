@@ -947,7 +947,9 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 		else 
 		{
 			grCarInfo[index].driverSelector->select(0);
-			grCarInfo[index].DRMSelector->select(0);
+			//grCarInfo[index].DRMSelector->select(0);
+			if (grCarInfo[index].nDRM > 0)
+				grCarInfo[index].DRMSelector->select(0);
 			if (grCarInfo[index].nSteer > 1)
 				grCarInfo[index].steerSelector->select(2);
 		}
