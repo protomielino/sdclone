@@ -15,7 +15,7 @@
 ##############################################################################
 
 ROBOT       = simplix_36GP
-SHIPDIR     = drivers/${ROBOT}/8
+SHIPDIR     = drivers/${ROBOT}/9
 SHIP        = 36GP-bugatti.png
 SHIPSUBDIRS = 
 

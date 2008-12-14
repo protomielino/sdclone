@@ -14,9 +14,9 @@
 #
 ##############################################################################
 
-ROBOT       = simplix_sca
-SHIPDIR     = drivers/${ROBOT}/0
-SHIP        = logo.rgb sc-996.rgb
+ROBOT       = simplix_36GP
+SHIPDIR     = drivers/${ROBOT}/1
+SHIP        = 36GP-mercedes.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

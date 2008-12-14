@@ -15,7 +15,7 @@
 ##############################################################################
 
 ROBOT       = simplix_36GP
-SHIPDIR     = drivers/${ROBOT}/2
+SHIPDIR     = drivers/${ROBOT}/3
 SHIP        = 36GP-autounion.png
 SHIPSUBDIRS = 
 

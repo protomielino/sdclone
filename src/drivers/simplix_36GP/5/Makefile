@@ -15,7 +15,7 @@
 ##############################################################################
 
 ROBOT       = simplix_36GP
-SHIPDIR     = drivers/${ROBOT}/4
+SHIPDIR     = drivers/${ROBOT}/5
 SHIP        = 36GP-maserati.png
 SHIPSUBDIRS = 
 
