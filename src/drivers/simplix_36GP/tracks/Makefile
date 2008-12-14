@@ -13,7 +13,7 @@
 #
 ##############################################################################
 
-ROBOT       = simplix_sca
+ROBOT       = simplix_36GP
 SHIPDIR     = drivers/${ROBOT}/tracks
 SHIP        = $(shell find * -maxdepth 0 -type f -print)
 SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print)

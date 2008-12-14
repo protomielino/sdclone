@@ -14,9 +14,9 @@
 #
 ##############################################################################
 
-ROBOT       = simplix_sc1a
+ROBOT       = simplix_36GP
 SHIPDIR     = drivers/${ROBOT}/9
-SHIP        = logo.rgb sc-lynx-220.rgb
+SHIP        = 36GP-bugatti.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

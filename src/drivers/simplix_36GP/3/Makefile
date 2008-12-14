@@ -14,9 +14,9 @@
 #
 ##############################################################################
 
-ROBOT       = simplix_sc1a
+ROBOT       = simplix_36GP
 SHIPDIR     = drivers/${ROBOT}/2
-SHIP        = logo.rgb sc-ciclon-300.rgb
+SHIP        = 36GP-autounion.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

@@ -14,9 +14,9 @@
 #
 ##############################################################################
 
-ROBOT       = simplix_sca
+ROBOT       = simplix_36GP
 SHIPDIR     = drivers/${ROBOT}/4
-SHIP        = logo.rgb sc-f360.rgb
+SHIP        = 36GP-maserati.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
