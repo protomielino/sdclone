@@ -2,7 +2,7 @@
 #
 #    file                 : Makefile
 #    created              : 22 Nov 2008
-#    last changed         : 03 Dez 2008
+#    last changed         : 15 Dez 2008
 #    copyright            : (C) 2008 Wolf-Dieter Beelitz
 #
 ##############################################################################
@@ -17,6 +17,35 @@
 ROBOT       = simplix_trb1b
 MODULE      = ${ROBOT}.so
 MODULEDIR   = drivers/${ROBOT}
+SOURCES     = ../unitmain.cpp \
+		../unitcarparam.cpp \
+		../unitcharacteristic.cpp \
+		../unitclothoid.cpp \
+		../unitcollision.cpp \
+		../unitcommon.cpp \
+		../unitcommondata.cpp \
+		../unitcubic.cpp \
+		../unitcubicspline.cpp \
+		../unitdriver.cpp \
+		../unitfixcarparam.cpp \
+		../unitlane.cpp \
+		../unitlanepoint.cpp \
+		../unitlinalg.cpp \
+		../unitlinreg.cpp \
+		../unitopponent.cpp \
+		../unitparabel.cpp \
+		../unitparam.cpp \
+		../unitpidctrl.cpp \
+		../unitpit.cpp \
+		../unitpitparam.cpp \
+		../unitsection.cpp \
+		../unitstrategy.cpp \
+		../unitsysfoo.cpp \
+		../unitteammanager.cpp \
+		../unittmpcarparam.cpp \
+		../unittrack.cpp \
+		../unitvec2d.cpp \
+		../unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml default.xml logo.rgb readme.txt
 SHIPSUBDIRS = 0 1 2 3 car6-trb1 car7-trb1 tracks
