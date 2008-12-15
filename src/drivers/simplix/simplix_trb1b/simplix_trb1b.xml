@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    file          : simplix_trb1b.xml
+    created       : 07 Mar 2008
+    last modified : 22 Nov 2008
+    copyright     : (C) 2008 Wolf-Dieter Beelitz
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
+
+<params name="simplix_trb1b" type="robotdef">
+  <section name="Robots">
+    <section name="index">
+
+      <section name="0">
+        <attstr name="name" val="Wolf-Dieter"></attstr>
+        <attstr name="desc" val="SA: car6a"></attstr>
+        <attstr name="team" val="simplix_trb1bc6"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="car6-trb1"></attstr>
+        <attnum name="race number" val="51"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.3"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+      </section>
+
+      <section name="1">
+        <attstr name="name" val="Juergen"></attstr>
+        <attstr name="desc" val="SA: car6b"></attstr>
+        <attstr name="team" val="simplix_trb1bc6"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="car6-trb1"></attstr>
+        <attnum name="race number" val="52"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.3"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+      </section>
+
+      <section name="2">
+        <attstr name="name" val="Andrew"></attstr>
+        <attstr name="desc" val="SA: car7a"></attstr>
+        <attstr name="team" val="simplix_trb1bc7"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="car7-trb1"></attstr>
+        <attnum name="race number" val="53"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.3"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+      </section>
+
+      <section name="3">
+        <attstr name="name" val="Miguel"></attstr>
+        <attstr name="desc" val="SA: car7b"></attstr>
+        <attstr name="team" val="simplix_trb1bc7"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="car7-trb1"></attstr>
+        <attnum name="race number" val="54"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.3"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+      </section>
+
+    </section>
+  </section>
+</params>
