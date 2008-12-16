@@ -243,7 +243,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 			driver_skill = MIN(1.0, MAX(0.0, driver_skill));
 		}
 
-		skill = (global_skill + driver_skill) * (1.0 + driver_skill);
+		skill = (global_skill + driver_skill * 2) * (1.0 + driver_skill);
 	}
 #endif
 
