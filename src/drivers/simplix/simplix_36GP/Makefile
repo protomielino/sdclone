@@ -17,35 +17,35 @@
 ROBOT       = simplix_36GP
 MODULE      = ${ROBOT}.so
 MODULEDIR   = drivers/${ROBOT}
-SOURCES     = ../unitmain.cpp \
-		../unitcarparam.cpp \
-		../unitcharacteristic.cpp \
-		../unitclothoid.cpp \
-		../unitcollision.cpp \
-		../unitcommon.cpp \
-		../unitcommondata.cpp \
-		../unitcubic.cpp \
-		../unitcubicspline.cpp \
-		../unitdriver.cpp \
-		../unitfixcarparam.cpp \
-		../unitlane.cpp \
-		../unitlanepoint.cpp \
-		../unitlinalg.cpp \
-		../unitlinreg.cpp \
-		../unitopponent.cpp \
-		../unitparabel.cpp \
-		../unitparam.cpp \
-		../unitpidctrl.cpp \
-		../unitpit.cpp \
-		../unitpitparam.cpp \
-		../unitsection.cpp \
-		../unitstrategy.cpp \
-		../unitsysfoo.cpp \
-		../unitteammanager.cpp \
-		../unittmpcarparam.cpp \
-		../unittrack.cpp \
-		../unitvec2d.cpp \
-		../unitvec3d.cpp
+SOURCES     = ../src/unitmain.cpp \
+		../src/unitcarparam.cpp \
+		../src/unitcharacteristic.cpp \
+		../src/unitclothoid.cpp \
+		../src/unitcollision.cpp \
+		../src/unitcommon.cpp \
+		../src/unitcommondata.cpp \
+		../src/unitcubic.cpp \
+		../src/unitcubicspline.cpp \
+		../src/unitdriver.cpp \
+		../src/unitfixcarparam.cpp \
+		../src/unitlane.cpp \
+		../src/unitlanepoint.cpp \
+		../src/unitlinalg.cpp \
+		../src/unitlinreg.cpp \
+		../src/unitopponent.cpp \
+		../src/unitparabel.cpp \
+		../src/unitparam.cpp \
+		../src/unitpidctrl.cpp \
+		../src/unitpit.cpp \
+		../src/unitpitparam.cpp \
+		../src/unitsection.cpp \
+		../src/unitstrategy.cpp \
+		../src/unitsysfoo.cpp \
+		../src/unitteammanager.cpp \
+		../src/unittmpcarparam.cpp \
+		../src/unittrack.cpp \
+		../src/unitvec2d.cpp \
+		../src/unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml default.xml logo.rgb 
 SHIPSUBDIRS = 0 1 2 3 4 5 6 7 8 9 tracks 36GP-alfa12c 36GP-alfatipo 36GP-autounion 36GP-bugatti 36GP-maserati 36GP-maserati6C34 36GP-mercedes

@@ -14,42 +14,7 @@
 #
 ##############################################################################
 
-ROBOT       = simplix
-MODULE      = ${ROBOT}.so
-MODULEDIR   = drivers/${ROBOT}
-SOURCES     = ../unitmain.cpp \
-		../unitcarparam.cpp \
-		../unitcharacteristic.cpp \
-		../unitclothoid.cpp \
-		../unitcollision.cpp \
-		../unitcommon.cpp \
-		../unitcommondata.cpp \
-		../unitcubic.cpp \
-		../unitcubicspline.cpp \
-		../unitdriver.cpp \
-		../unitfixcarparam.cpp \
-		../unitlane.cpp \
-		../unitlanepoint.cpp \
-		../unitlinalg.cpp \
-		../unitlinreg.cpp \
-		../unitopponent.cpp \
-		../unitparabel.cpp \
-		../unitparam.cpp \
-		../unitpidctrl.cpp \
-		../unitpit.cpp \
-		../unitpitparam.cpp \
-		../unitsection.cpp \
-		../unitstrategy.cpp \
-		../unitsysfoo.cpp \
-		../unitteammanager.cpp \
-		../unittmpcarparam.cpp \
-		../unittrack.cpp \
-		../unitvec2d.cpp \
-		../unitvec3d.cpp
-SHIPDIR     = drivers/${ROBOT}
-SHIP        = ${ROBOT}.xml default.xml logo.rgb readme.txt
-
-SUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
+SUBDIRS = src $(shell find * -maxdepth 0 -type d -print | grep -v .svn | grep -v src)
 SHIPSUBDIRS = $(SUBDIRS)
 PKGSUBDIRS	= $(SUBDIRS)
 
