@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2008.12.14
+// Last changed : 2008.12.16
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
@@ -17,6 +17,7 @@
 // How to use the schismatic robot:
 // This robot exports more than one modul entry point routines.
 // There are alias names for:
+//   simplix(tModInfo *ModInfo) (for use with user customized team)
 //   simplix_trb1a(tModInfo *ModInfo) (for use with Trb1-Car-Set car1-car5)
 //   simplix_trb1b(tModInfo *ModInfo) (for use with Trb1-Car-Set car6-car7)
 //   simplix_sca(tModInfo *ModInfo) (for use with Supercar-Set car1-car5)
@@ -29,6 +30,7 @@
 // Zur Nutzung der Abspaltung des Robots:
 // Der Roboter exportiert mehr als eine Modul-Entry-Point routine.
 // Folgende Aliasnamen sind vorhanden:
+//   simplix(tModInfo *ModInfo) (für anwenderdefiniertes Team)
 //   simplix_trb1a(tModInfo *ModInfo) (für das Trb1-Car-Set car1-car5)
 //   simplix_trb1b(tModInfo *ModInfo) (für das Trb1-Car-Set car6-car7)
 //   simplix_sca(tModInfo *ModInfo) (für das Supecar-Set car1-car5)
@@ -258,7 +260,7 @@ char* GetBotName(int Index)
 // Teilt TORCS mit, wer wir sind, wie wir angesprochen werden wollen und
 // was wir können.
 //--------------------------------------------------------------------------*
-extern "C" int simplix(tModInfo *ModInfo)
+extern "C" int simplix_internal(tModInfo *ModInfo)
 {
   if (Prepare()) // Check Footprint and prepare names
   { // Run once only: Clear memory provided 
@@ -444,6 +446,22 @@ static void Shutdown(int Index)
 //==========================================================================*
 
 //==========================================================================*
+// Schismatic entry point for simplix
+//--------------------------------------------------------------------------*
+extern "C" int simplix(tModInfo *ModInfo)
+{
+  TDriver::NBBOTS = 10;                                   // use 10 cars
+  TDriver::MyBotName = "simplix";                         // Name of this bot 
+  TDriver::ROBOT_DIR = "drivers/simplix";                 // Sub path to dll
+  TDriver::SECT_PRIV = "simplix private";                 // Private section
+  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  TDriver::AdvancedParameters = true;
+
+  return simplix_internal(ModInfo);
+};
+//==========================================================================*
+
+//==========================================================================*
 // Schismatic entry point for simplix_trb1a
 //--------------------------------------------------------------------------*
 extern "C" int simplix_trb1a(tModInfo *ModInfo)
@@ -454,7 +472,7 @@ extern "C" int simplix_trb1a(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
 
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -468,7 +486,7 @@ extern "C" int simplix_trb1b(tModInfo *ModInfo)
   TDriver::ROBOT_DIR = "drivers/simplix_trb1b";           // Sub path to dll
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -483,7 +501,7 @@ extern "C" int simplix_sca(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "sc-996";                    // Default car type
 
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -497,7 +515,7 @@ extern "C" int simplix_scb(tModInfo *ModInfo)
   TDriver::ROBOT_DIR = "drivers/simplix_scb";             // Sub path to dll
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "sc-996";                    // Default car type
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -512,7 +530,7 @@ extern "C" int simplix_36GP(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "36GP-alfa12c";              // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -527,7 +545,7 @@ extern "C" int my_simplix_0(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -542,7 +560,7 @@ extern "C" int my_simplix_1(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -557,7 +575,7 @@ extern "C" int my_simplix_2(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -572,7 +590,7 @@ extern "C" int my_simplix_3(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -587,7 +605,7 @@ extern "C" int my_simplix_4(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -602,7 +620,7 @@ extern "C" int my_simplix_5(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -617,7 +635,7 @@ extern "C" int my_simplix_6(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -632,7 +650,7 @@ extern "C" int my_simplix_7(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -647,7 +665,7 @@ extern "C" int my_simplix_8(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 
@@ -662,7 +680,7 @@ extern "C" int my_simplix_9(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
   TDriver::AdvancedParameters = true;
-  return simplix(ModInfo);
+  return simplix_internal(ModInfo);
 };
 //==========================================================================*
 

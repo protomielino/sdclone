@@ -1,7 +1,7 @@
 ;
 ;   file        : simplix.def
 ;   created     : 22 Nov 2008
-;   last changed: 14 Dez 2008
+;   last changed: 16 Dez 2008
 ;   copyright   : (C) 2008 Wolf-Dieter Beelitz
 ;
 ;
@@ -16,6 +16,7 @@ LIBRARY	simplix
 SECTIONS .data READ WRITE
 
 EXPORTS
+    simplix
 	simplix_trb1a
 	simplix_trb1b
 	simplix_sca
