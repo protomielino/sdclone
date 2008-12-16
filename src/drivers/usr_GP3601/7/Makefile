@@ -16,7 +16,7 @@
 
 ROBOT       = usr_GP3601
 SHIPDIR     = drivers/${ROBOT}/7
-SHIP        = 36GP-bugatti.png
+SHIP        = 36GP-bugatti.png skill.xml
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

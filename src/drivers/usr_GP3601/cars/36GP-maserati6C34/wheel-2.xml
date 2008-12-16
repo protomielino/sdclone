@@ -29,7 +29,7 @@
     <attnum name="FuelPerLap" val="3.9"/>
     <attnum name="NoTeamWaiting" val="1"/>
     <attnum name="SkidCorrection" val="1.1"/>
-    <attnum name="SteerDebug" val="0"/>
+    <attnum name="SteerDebug" val="-1"/>
 
     <attnum name="RLBrake0Div" val="1650"/>
     <attnum name="RLBrake0DivEnd" val="1750"/>

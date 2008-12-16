@@ -32,7 +32,10 @@
 		<attnum name="OvertakeDebug" min="0" max="1" val="0"/>
 		<attnum name="IntMargin" min="0" max="2" val="1.4"/>
 		<attnum name="NoTeamWaiting" min="0" max="2" val="1"/>
-		<attnum name="AvoidSpeedAdjust" min="-20" max="20" val="-2"/>
+		<attnum name="IncFactor" min="0" max="5" val="0.7"/>
+		<attnum name="AvoidSpeedAdjust" min="-20" max="20" val="-3"/>
+		<attnum name="AvoidBrakeAdjust" min="-20" max="20" val="-6"/>
+		<attnum name="LookAhead" min="1" max="5" val="2.6"/>
 		<attnum name="OvertakeCaution" min="-20" max="20" val="0.2"/>
 		<attnum name="AccelExit" min="-20" max="20" val="2.0"/>
 		<attnum name="SteerSkid" min="-1" max="3" val="-0.04"/>
