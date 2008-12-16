@@ -338,14 +338,15 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  AccelCurveDampen = GfParmGetNum( carhandle, "private", "AccelCurveDampen", (char *)NULL, 1.0 );
  AccelCurveOffset = (int) GfParmGetNum( carhandle, "private", "AccelCurveOffset", (char *)NULL, 0.0 );
  MinCornerInverse = GfParmGetNum( carhandle, "private", "MinCornerInverse", (char *)NULL, 0.002 );
- BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0 );
- BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0 );
  CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0 );
  CornerSpeedX = GfParmGetNum( carhandle, "private", "CornerSpeedX", (char *)NULL, 0.0 );
+ BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0 ) - skill/5;
+ BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0 );
  AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0 );
+ AvoidBrakeAdjust = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjust", (char *)NULL, 0.0 );
  CornerAccel = GfParmGetNum( carhandle, "private", "CornerAccel", (char *)NULL, 0.0 );
- IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1 );
- ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7 );
+ IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1 ) + skill/20;
+ ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7 ) + skill/10;
  TimeFactor = GfParmGetNum( carhandle, "private", "TimeFactor", (char *)NULL, 0.0 );
  BrakeDelay = GfParmGetNum( carhandle, "private", "BrakeDelay", (char *)NULL, 35.0 );
  
@@ -1642,7 +1643,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  data->aInverse = tRInverse[LINE_MID][Index];
  double divcount = 1.0;
 
- Index = (Index + Divs - 5) % Divs;
+ This = Index = (Index + Divs - 5) % Divs;
  //double timefactor = s->deltaTime*(3 + (data->exiting ? MAX(0.0, car->_accel_x*MIN(6.0, fabs(tRInverse[LINE_RL][Next] * 800)) * TimeFactor) : 0.0));
  int SNext = Index;
 
@@ -1742,7 +1743,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  TargetSpeed = (1 - c0) * tSpeed[LINE_RL][SNext] + c0 * tSpeed[LINE_RL][Index];
  data->speed = TargetSpeed;
  if (TargetSpeed > ospeed && ATargetSpeed < aspeed)
-	 data->avspeed = ATargetSpeed = MAX(data->avspeed, aspeed * (TargetSpeed / ospeed));
+  data->avspeed = ATargetSpeed = MAX(data->avspeed, aspeed * (TargetSpeed / ospeed));
  data->avspeed = MAX(data->speed*0.6, MIN(data->speed+2.0, data->avspeed));
  
  double laneoffset = Width/2 - (tLane[Next] * Width);
@@ -2276,6 +2277,8 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 {
  // TODO - merge point with where car's headed?
  double offlane = ((track->width/2) - offset) / track->width;
+ double off2lft = track->width/2 - offset;
+ double off2rgt = track->width - off2lft;
  tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;
  double dist = car->_trkPos.toStart;
@@ -2284,19 +2287,35 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
  int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
- double laneoffset = Width/2 - (tLane[Next] * Width);
+ double laneoffset = Width/2 - (tLane[Index] * Width);
+ double rInv = tRInverse[LINE_MID][Index];
+ Index = This; 
+#if 1
+ if (fabs(tRInverse[LINE_RL][Next]) > fabs(rInv) &&
+     ((tRInverse[LINE_RL][Next] < 0 && rInv <= 0.0005) ||
+      (tRInverse[LINE_RL][Next] > 0 && rInv >= -0.0005)))
+  rInv = tRInverse[LINE_RL][Next];
+#endif
 
- double time = 0.63;
- if ((tRInverse[LINE_MID][Index] > 0.0 && offset > 0.0) ||
-     (tRInverse[LINE_MID][Index] < 0.0 && offset < 0.0))
+ //double time = 0.63;
+ double time = 0.02 * 20 * (1.0 + (car->_speed_x-20)/20);
+
+ if (rInv > 0.0 && off2lft > 0.0)
+  time *= (1.0 + ((off2lft/track->width) * (off2lft/(track->width-3.0)) * fabs(rInv*60)));
+ else if (rInv < 0.0 && off2rgt > 0.0)
+  time *= (1.0 + ((off2rgt/track->width) * (off2rgt/(track->width-3.0)) * fabs(rInv*60)));
+#if 0
+ if ((tRInverse[LINE_MID][Index] > 0.0 && offset > seg->width * 0.1) ||
+     (tRInverse[LINE_MID][Index] < 0.0 && offset < seg->width * -0.1))
  {
-  time = MAX(0.10, MIN(0.63, 0.63 - (fabs(offset)/(track->width/2))*fabs(tRInverse[LINE_MID][Index]*6.0)));
+  //time = MAX(time/4, MIN(time, time - (fabs(offset)/(track->width*0.4)*fabs(tRInverse[LINE_MID][Index]*20.0))));
  }
- else if ((tRInverse[LINE_MID][Next] > 0.0 && offset < laneoffset) ||
-          (tRInverse[LINE_MID][Next] < -0.0 && offset > laneoffset))
+ else if ((tRInverse[LINE_MID][Next] > 0.0 && offset < 0.0) ||
+          (tRInverse[LINE_MID][Next] < -0.0 && offset > 0.0))
  {
-  time *= 1.0 + (fabs(offset-laneoffset)/track->width)*fabs(tRInverse[LINE_MID][Next]*40);
+  time *= 1.0 + (fabs(offset)/(track->width/2))*fabs(tRInverse[LINE_MID][Next]*40) * 9;
  }
+#endif
  double X = car->_pos_X + car->_speed_X * time;
  double Y = car->_pos_Y + car->_speed_Y * time;
  int next = Index;

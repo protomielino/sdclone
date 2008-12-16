@@ -235,11 +235,14 @@ class Driver {
 		float collision;
 
 		float global_skill;
+		float driver_aggression;
 		float skill;
-		double speed_adjust_limit;
-		double speed_adjust_timer;
-		double speed_adjust_targ;
-		double speed_adjust_perc;
+		double skill_adjust_limit;
+		double skill_adjust_timer;
+		double decel_adjust_targ;
+		double decel_adjust_perc;
+		double brake_adjust_targ;
+		double brake_adjust_perc;
 
 		float fuelperlap;
 
