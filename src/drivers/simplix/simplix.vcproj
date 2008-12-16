@@ -231,7 +231,7 @@
 				>
 			</File>
 			<File
-				RelativePath="unitcarparam.cpp"
+				RelativePath=".\src\unitcarparam.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -253,7 +253,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitcharacteristic.cpp"
+				RelativePath=".\src\unitcharacteristic.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -275,7 +275,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitclothoid.cpp"
+				RelativePath=".\src\unitclothoid.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -297,7 +297,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitcollision.cpp"
+				RelativePath=".\src\unitcollision.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -319,7 +319,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitcommon.cpp"
+				RelativePath=".\src\unitcommon.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -341,7 +341,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitcommondata.cpp"
+				RelativePath=".\src\unitcommondata.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -363,7 +363,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitcubic.cpp"
+				RelativePath=".\src\unitcubic.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -385,7 +385,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitcubicspline.cpp"
+				RelativePath=".\src\unitcubicspline.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -407,7 +407,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitdriver.cpp"
+				RelativePath=".\src\unitdriver.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -429,33 +429,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\unitfixcarparam.cpp"
+				RelativePath=".\src\unitfixcarparam.cpp"
 				>
 			</File>
 			<File
-				RelativePath="unitlane.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories=""
-						PreprocessorDefinitions=""
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="unitlanepoint.cpp"
+				RelativePath=".\src\unitlane.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -477,7 +455,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitlinalg.cpp"
+				RelativePath=".\src\unitlanepoint.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -499,15 +477,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\unitlinreg.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\unitmain.cpp"
-				>
-			</File>
-			<File
-				RelativePath="unitopponent.cpp"
+				RelativePath=".\src\unitlinalg.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -529,7 +499,15 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitparabel.cpp"
+				RelativePath=".\src\unitlinreg.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unitmain.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unitopponent.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -551,11 +529,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\unitparam.cpp"
-				>
-			</File>
-			<File
-				RelativePath="unitpidctrl.cpp"
+				RelativePath=".\src\unitparabel.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -577,7 +551,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitpit.cpp"
+				RelativePath=".\src\unitparam.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unitpidctrl.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -599,11 +577,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\unitpitparam.cpp"
-				>
-			</File>
-			<File
-				RelativePath="unitsection.cpp"
+				RelativePath=".\src\unitpit.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -625,7 +599,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitstrategy.cpp"
+				RelativePath=".\src\unitpitparam.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unitsection.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -647,7 +625,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitsysfoo.cpp"
+				RelativePath=".\src\unitstrategy.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -669,7 +647,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitteammanager.cpp"
+				RelativePath=".\src\unitsysfoo.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -691,11 +669,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\unittmpcarparam.cpp"
-				>
-			</File>
-			<File
-				RelativePath="unittrack.cpp"
+				RelativePath=".\src\unitteammanager.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -717,7 +691,11 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitvec2d.cpp"
+				RelativePath=".\src\unittmpcarparam.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\unittrack.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -739,7 +717,29 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="unitvec3d.cpp"
+				RelativePath=".\src\unitvec2d.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalIncludeDirectories=""
+						PreprocessorDefinitions=""
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\src\unitvec3d.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
@@ -766,119 +766,119 @@
 			Filter="h;hpp;hxx;hm;inl"
 			>
 			<File
-				RelativePath="unitcarparam.h"
+				RelativePath=".\src\unitcarparam.h"
 				>
 			</File>
 			<File
-				RelativePath="unitcharacteristic.h"
+				RelativePath=".\src\unitcharacteristic.h"
 				>
 			</File>
 			<File
-				RelativePath="unitclothoid.h"
+				RelativePath=".\src\unitclothoid.h"
 				>
 			</File>
 			<File
-				RelativePath="unitcollision.h"
+				RelativePath=".\src\unitcollision.h"
 				>
 			</File>
 			<File
-				RelativePath="unitcommon.h"
+				RelativePath=".\src\unitcommon.h"
 				>
 			</File>
 			<File
-				RelativePath="unitcommondata.h"
+				RelativePath=".\src\unitcommondata.h"
 				>
 			</File>
 			<File
-				RelativePath="unitcubic.h"
+				RelativePath=".\src\unitcubic.h"
 				>
 			</File>
 			<File
-				RelativePath="unitcubicspline.h"
+				RelativePath=".\src\unitcubicspline.h"
 				>
 			</File>
 			<File
-				RelativePath="unitdriver.h"
+				RelativePath=".\src\unitdriver.h"
 				>
 			</File>
 			<File
-				RelativePath=".\unitfixcarparam.h"
+				RelativePath=".\src\unitfixcarparam.h"
 				>
 			</File>
 			<File
-				RelativePath="unitglobal.h"
+				RelativePath=".\src\unitglobal.h"
 				>
 			</File>
 			<File
-				RelativePath="unitlane.h"
+				RelativePath=".\src\unitlane.h"
 				>
 			</File>
 			<File
-				RelativePath="unitlanepoint.h"
+				RelativePath=".\src\unitlanepoint.h"
 				>
 			</File>
 			<File
-				RelativePath="unitlinalg.h"
+				RelativePath=".\src\unitlinalg.h"
 				>
 			</File>
 			<File
-				RelativePath=".\unitlinreg.h"
+				RelativePath=".\src\unitlinreg.h"
 				>
 			</File>
 			<File
-				RelativePath="unitopponent.h"
+				RelativePath=".\src\unitopponent.h"
 				>
 			</File>
 			<File
-				RelativePath="unitparabel.h"
+				RelativePath=".\src\unitparabel.h"
 				>
 			</File>
 			<File
-				RelativePath=".\unitparam.h"
+				RelativePath=".\src\unitparam.h"
 				>
 			</File>
 			<File
-				RelativePath="unitpidctrl.h"
+				RelativePath=".\src\unitpidctrl.h"
 				>
 			</File>
 			<File
-				RelativePath="unitpit.h"
+				RelativePath=".\src\unitpit.h"
 				>
 			</File>
 			<File
-				RelativePath=".\unitpitparam.h"
+				RelativePath=".\src\unitpitparam.h"
 				>
 			</File>
 			<File
-				RelativePath="unitsection.h"
+				RelativePath=".\src\unitsection.h"
 				>
 			</File>
 			<File
-				RelativePath="unitstrategy.h"
+				RelativePath=".\src\unitstrategy.h"
 				>
 			</File>
 			<File
-				RelativePath="unitsysfoo.h"
+				RelativePath=".\src\unitsysfoo.h"
 				>
 			</File>
 			<File
-				RelativePath="unitteammanager.h"
+				RelativePath=".\src\unitteammanager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\unittmpcarparam.h"
+				RelativePath=".\src\unittmpcarparam.h"
 				>
 			</File>
 			<File
-				RelativePath="unittrack.h"
+				RelativePath=".\src\unittrack.h"
 				>
 			</File>
 			<File
-				RelativePath="unitvec2d.h"
+				RelativePath=".\src\unitvec2d.h"
 				>
 			</File>
 			<File
-				RelativePath="unitvec3d.h"
+				RelativePath=".\src\unitvec3d.h"
 				>
 			</File>
 		</Filter>
