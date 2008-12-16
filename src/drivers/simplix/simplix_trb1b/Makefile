@@ -47,7 +47,7 @@ SOURCES     = ../src/unitmain.cpp \
 		../src/unitvec2d.cpp \
 		../src/unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
-SHIP        = ${ROBOT}.xml default.xml logo.rgb readme.txt
+SHIP        = ${ROBOT}.xml default.xml logo.rgb 
 SHIPSUBDIRS = 0 1 2 3 car6-trb1 car7-trb1 tracks
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
