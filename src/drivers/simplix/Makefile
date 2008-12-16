@@ -2,7 +2,7 @@
 #
 #    file                 : Makefile
 #    created              : 22 Nov 2008
-#    last changed         : 15 Dez 2008
+#    last changed         : 16 Dez 2008
 #    copyright            : (C) 2008 Wolf-Dieter Beelitz
 #
 ##############################################################################
@@ -14,7 +14,10 @@
 #
 ##############################################################################
 
-PKGSUBDIRS  = $(shell find * -maxdepth 0 -type d -print)
+SUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
+SHIPSUBDIRS = $(SUBDIRS)
+PKGSUBDIRS	= $(SUBDIRS)
+
 src-robots-simplix_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
 src-robots-simplix_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 
