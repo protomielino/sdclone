@@ -309,14 +309,18 @@ Generate(void)
 {
 	const char *trackdllname;
 	const char *extName;
+	const char *libdir = GetLibDir();
 	FILE *outfd = NULL;
+
+	if (!libdir)
+		libdir = "";
 
 	// Get the trackgen paramaters.
 	sprintf(buf, "%s", CFG_FILE);
 	CfgHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	trackdllname = GfParmGetStr(CfgHandle, "Modules", "track", "track");
-	sprintf(buf, "%smodules/track/%s.%s", GetLibDir (), trackdllname, DLLEXT);
+	sprintf(buf, "%smodules/track/%s.%s", libdir, trackdllname, DLLEXT);
 	if (GfModLoad(TRK_IDENT, buf, &modlist) < 0) {
 		GfFatal("Failed to find the track module %s", buf);
 	}
