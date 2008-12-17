@@ -138,7 +138,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	// Load and set parameters.
 	MU_FACTOR = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_MUFACTOR, (char*)NULL, 0.69f);
 
-	double MinCornerInverse = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "MinCornerInverse", (char *)NULL, 0.002 );
+	double MinCornerInverse = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "MinCornerInverse", (char *)NULL, 0.002f );
 	double CornerSpeed = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "CornerSpeed", (char *)NULL, 15.0 );
 	double AvoidSpeed = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "AvoidSpeedAdjust", (char *)NULL, 2.0 );
 	double CornerAccel = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "CornerAccel", (char *)NULL, 1.0 );

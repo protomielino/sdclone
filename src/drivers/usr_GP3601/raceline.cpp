@@ -325,30 +325,30 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tSegDivStart, 0, (nseg+1) * sizeof(int));
  memset(tSegment, 0, (nseg+1) * sizeof(tTrackSeg *));
 
- CurveFactor = GfParmGetNum( carhandle, "private", "CurveFactor", (char *)NULL, 0.12 );
- SecurityZ = GfParmGetNum( carhandle, "private", "Security", (char *)NULL, 0.00 );
- SteerGain = GfParmGetNum( carhandle, "private", "SteerGain", (char *)NULL, 1.30 );
- SteerSkid = GfParmGetNum( carhandle, "private", "SteerSkid", (char *)NULL, 0.06 );
- SkidAccel = GfParmGetNum( carhandle, "private", "SkidAccel", (char *)NULL, 0.0 );
- AccelExit = GfParmGetNum( carhandle, "private", "AccelExit", (char *)NULL, 0.0 );
- AvoidAccelExit = GfParmGetNum( carhandle, "private", "AvoidAccelExit", (char *)NULL, 0.0 );
- Iterations = (int) GfParmGetNum( carhandle, "private", "Iterations", (char *)NULL, 100.0 );
- OvertakeCaution = GfParmGetNum( carhandle, "private", "OvertakeCaution", (char *)NULL, 0.0 );
- SkidCorrection = GfParmGetNum( carhandle, "private", "SkidCorrection", (char *)NULL, 1.0 );
- AccelCurveDampen = GfParmGetNum( carhandle, "private", "AccelCurveDampen", (char *)NULL, 1.0 );
- AccelCurveOffset = (int) GfParmGetNum( carhandle, "private", "AccelCurveOffset", (char *)NULL, 0.0 );
- MinCornerInverse = GfParmGetNum( carhandle, "private", "MinCornerInverse", (char *)NULL, 0.002 );
- CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0 );
- CornerSpeedX = GfParmGetNum( carhandle, "private", "CornerSpeedX", (char *)NULL, 0.0 );
- BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0 ) - skill/5;
- BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0 );
- AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0 );
- AvoidBrakeAdjust = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjust", (char *)NULL, 0.0 );
- CornerAccel = GfParmGetNum( carhandle, "private", "CornerAccel", (char *)NULL, 0.0 );
- IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1 ) + skill/20;
- ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7 ) + skill/10;
- TimeFactor = GfParmGetNum( carhandle, "private", "TimeFactor", (char *)NULL, 0.0 );
- BrakeDelay = GfParmGetNum( carhandle, "private", "BrakeDelay", (char *)NULL, 35.0 );
+ CurveFactor = GfParmGetNum( carhandle, "private", "CurveFactor", (char *)NULL, 0.12f );
+ SecurityZ = GfParmGetNum( carhandle, "private", "Security", (char *)NULL, 0.00f );
+ SteerGain = GfParmGetNum( carhandle, "private", "SteerGain", (char *)NULL, 1.30f );
+ SteerSkid = GfParmGetNum( carhandle, "private", "SteerSkid", (char *)NULL, 0.06f );
+ SkidAccel = GfParmGetNum( carhandle, "private", "SkidAccel", (char *)NULL, 0.0f );
+ AccelExit = GfParmGetNum( carhandle, "private", "AccelExit", (char *)NULL, 0.0f );
+ AvoidAccelExit = GfParmGetNum( carhandle, "private", "AvoidAccelExit", (char *)NULL, 0.0f );
+ Iterations = (int) GfParmGetNum( carhandle, "private", "Iterations", (char *)NULL, 100.0f );
+ OvertakeCaution = GfParmGetNum( carhandle, "private", "OvertakeCaution", (char *)NULL, 0.0f );
+ SkidCorrection = GfParmGetNum( carhandle, "private", "SkidCorrection", (char *)NULL, 1.0f );
+ AccelCurveDampen = GfParmGetNum( carhandle, "private", "AccelCurveDampen", (char *)NULL, 1.0f );
+ AccelCurveOffset = (int) GfParmGetNum( carhandle, "private", "AccelCurveOffset", (char *)NULL, 0.0f );
+ MinCornerInverse = GfParmGetNum( carhandle, "private", "MinCornerInverse", (char *)NULL, 0.002f );
+ CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0f );
+ CornerSpeedX = GfParmGetNum( carhandle, "private", "CornerSpeedX", (char *)NULL, 0.0f );
+ BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0f ) - skill/5;
+ BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0f );
+ AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0f );
+ AvoidBrakeAdjust = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjust", (char *)NULL, 0.0f );
+ CornerAccel = GfParmGetNum( carhandle, "private", "CornerAccel", (char *)NULL, 0.0f );
+ IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1f ) + skill/20;
+ ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7f ) + skill/10;
+ TimeFactor = GfParmGetNum( carhandle, "private", "TimeFactor", (char *)NULL, 0.0f );
+ BrakeDelay = GfParmGetNum( carhandle, "private", "BrakeDelay", (char *)NULL, 35.0f );
  
  // read custom values...
  for (i=0; i<50; i++)

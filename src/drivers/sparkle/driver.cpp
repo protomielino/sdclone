@@ -24,28 +24,28 @@
 #define BT_ATT_MUFACTOR "mufactor"
 
 const float Driver::MAX_UNSTUCK_ANGLE = 15.0/180.0*PI;		/* [radians] */
-const float Driver::UNSTUCK_TIME_LIMIT = 2.0;				/* [s] */
-const float Driver::MAX_UNSTUCK_SPEED = 5.0;				/* [m/s] */
-const float Driver::MIN_UNSTUCK_DIST = 3.0;					/* [m] */
-const float Driver::G = 9.81;								/* [m/(s*s)] */
-const float Driver::FULL_ACCEL_MARGIN = 1.0;				/* [m/s] */
-const float Driver::SHIFT = 0.9;							/* [-] (% of rpmredline) */
-const float Driver::SHIFT_MARGIN = 4.0;						/* [m/s] */
-const float Driver::ABS_SLIP = 0.9;							/* [-] range [0.95..0.3] */
-const float Driver::ABS_MINSPEED = 3.0;						/* [m/s] */
-const float Driver::TCL_SLIP = 0.8;							/* [-] range [0.95..0.3] */
-const float Driver::TCL_RANGE = 0.2;						/* [-] */
-const float Driver::TCL_MINSPEED = 3.0;						/* [m/s] */
-const float Driver::LOOKAHEAD_CONST = 17.0;					/* [m] */
-const float Driver::LOOKAHEAD_FACTOR = 0.33;				/* [-] */
-const float Driver::WIDTHDIV = 3.0;							/* [-] */
-const float Driver::SIDECOLL_MARGIN = 2.0;					/* [m] */
-const float Driver::BORDER_OVERTAKE_MARGIN = 0.5;			/* [m] */
-const float Driver::OVERTAKE_OFFSET_SPEED = 5.0;			/* [m/s] */
-const float Driver::PIT_LOOKAHEAD = 6.0;					/* [m] */
-const float Driver::PIT_BRAKE_AHEAD = 200.0;				/* [m] */
-const float Driver::PIT_MU = 0.4;							/* [-] */
-const float Driver::MAX_SPEED = 84.0;						/* [m/s] */
+const float Driver::UNSTUCK_TIME_LIMIT = 2.0f;				/* [s] */
+const float Driver::MAX_UNSTUCK_SPEED = 5.0f;				/* [m/s] */
+const float Driver::MIN_UNSTUCK_DIST = 3.0f;				/* [m] */
+const float Driver::G = 9.81f;								/* [m/(s*s)] */
+const float Driver::FULL_ACCEL_MARGIN = 1.0f;				/* [m/s] */
+const float Driver::SHIFT = 0.9f;							/* [-] (% of rpmredline) */
+const float Driver::SHIFT_MARGIN = 4.0f;					/* [m/s] */
+const float Driver::ABS_SLIP = 0.9f;						/* [-] range [0.95..0.3] */
+const float Driver::ABS_MINSPEED = 3.0f;					/* [m/s] */
+const float Driver::TCL_SLIP = 0.8f;						/* [-] range [0.95..0.3] */
+const float Driver::TCL_RANGE = 0.2f;						/* [-] */
+const float Driver::TCL_MINSPEED = 3.0f;					/* [m/s] */
+const float Driver::LOOKAHEAD_CONST = 17.0f;				/* [m] */
+const float Driver::LOOKAHEAD_FACTOR = 0.33f;				/* [-] */
+const float Driver::WIDTHDIV = 3.0f;						/* [-] */
+const float Driver::SIDECOLL_MARGIN = 2.0f;					/* [m] */
+const float Driver::BORDER_OVERTAKE_MARGIN = 0.5f;			/* [m] */
+const float Driver::OVERTAKE_OFFSET_SPEED = 5.0f;			/* [m/s] */
+const float Driver::PIT_LOOKAHEAD = 6.0f;					/* [m] */
+const float Driver::PIT_BRAKE_AHEAD = 200.0f;				/* [m] */
+const float Driver::PIT_MU = 0.4f;							/* [-] */
+const float Driver::MAX_SPEED = 84.0f;						/* [m/s] */
 
 Driver::Driver(int index)
 {
@@ -89,18 +89,18 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 		*carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     }
 
-	float fuel = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_FUELPERLAP, (char*)NULL, 5.0);
+	float fuel = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_FUELPERLAP, (char*)NULL, 5.0f);
 	fuel *= (s->_totLaps + 1.0);
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, MIN(fuel, 100.0));
 
-	MU_FACTOR = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_MUFACTOR, (char*)NULL, 0.69);
+	MU_FACTOR = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_MUFACTOR, (char*)NULL, 0.69f);
 }
 
 
 /* Start a new race. */
 void Driver::newRace(tCarElt* car, tSituation *s)
 {
-	float deltaTime = RCM_MAX_DT_ROBOTS;
+	float deltaTime = (float)RCM_MAX_DT_ROBOTS;
 	MAX_UNSTUCK_COUNT = int(UNSTUCK_TIME_LIMIT/deltaTime);
 	OVERTAKE_OFFSET_INC = OVERTAKE_OFFSET_SPEED*deltaTime;
 	stuck = 0;
@@ -413,7 +413,7 @@ void Driver::initCa()
 	float h = 0.0;
 	int i;
 	for (i = 0; i < 4; i++)
-		h += GfParmGetNum(car->_carHandle, WheelSect[i], PRM_RIDEHEIGHT, (char*) NULL, 0.20);
+		h += GfParmGetNum(car->_carHandle, WheelSect[i], PRM_RIDEHEIGHT, (char*) NULL, 0.20f);
 	h*= 1.5; h = h*h; h = h*h; h = 2.0 * exp(-3.0*h);
 	CA = h*cl + 4.0*wingca;
 }

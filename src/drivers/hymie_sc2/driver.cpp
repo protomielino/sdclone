@@ -987,35 +987,35 @@ void Driver::K1999InitTrack(tTrack* track, void **carParmHandle, tSituation *p)
   AvoidMargin = value;
  if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "TurnDecel", (char*) NULL, TurnDecel)))
   TurnDecel = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "Learning", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "Learning", (char*) NULL, 0.0f)))
   Learning = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "RaceLearning", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "RaceLearning", (char*) NULL, 0.0f)))
   RaceLearning = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "LearnLimit", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "LearnLimit", (char*) NULL, 0.0f)))
   LearnLimit = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "NoAccelRelax", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "NoAccelRelax", (char*) NULL, 0.0f)))
   NoAccelRelax = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "SaveSVG", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "SaveSVG", (char*) NULL, 0.0f)))
   SaveSVG = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "LoadSVG", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "LoadSVG", (char*) NULL, 0.0f)))
   LoadSVG = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "NoTeamWaiting", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "NoTeamWaiting", (char*) NULL, 0.0f)))
   NoTeamWaiting = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "Iterations", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "Iterations", (char*) NULL, 0.0f)))
   Iterations = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "K1999Brakes", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "K1999Brakes", (char*) NULL, 0.0f)))
   K1999Brakes = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "OverrideLearning", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "OverrideLearning", (char*) NULL, 0.0f)))
   OverrideLearning = (int) value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "AvoidBTBoost", (char*) NULL, 0.9)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "AvoidBTBoost", (char*) NULL, 0.9f)))
   AvoidBTBoost = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "BTBoost", (char*) NULL, 1.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "BTBoost", (char*) NULL, 1.0f)))
   BTBoost = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "TeamWaitTime", (char*) NULL, 0.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "TeamWaitTime", (char*) NULL, 0.0f)))
   TeamWaitTime = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "ABS_SLIP", (char*) NULL, 1.8)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "ABS_SLIP", (char*) NULL, 1.8f)))
   ABS_SLIP = value;
- if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "ABS_RANGE", (char*) NULL, 5.0)))
+ if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "ABS_RANGE", (char*) NULL, 5.0f)))
   ABS_RANGE = value;
  if (0.0 != (value = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, "MaxIncFactor", (char*) NULL, MaxIncFactor)))
   MaxIncFactor = value;
@@ -3859,8 +3859,8 @@ void Driver::drive(tSituation *s)
 
     if (0 && racetype == RM_TYPE_QUALIF && car->_speed_x < TargetSpeed + 3.0)
     {
-     car->_brakeCmd = 0.0;
-     car->_accelCmd = 0.2;
+     car->_brakeCmd = 0.0f;
+     car->_accelCmd = 0.2f;
     }
     else if (!fStuck && !fStuckForward && car->_brakeCmd > 0.5 && MAX(fabs(car->_yaw_rate), fabs(angle)*1.4) > 1.2 && (brake_collision || getCorrecting() || avoiding))
     {
@@ -5783,7 +5783,7 @@ double Driver::getClutch()
    clutchtime = 0.0;
   double clutcht = (ctlimit - clutchtime)/ctlimit;
   if (car->_gear >= 1 && car->_accelCmd > 0.0) {
-   clutchtime += (double) RCM_MAX_DT_ROBOTS;
+   clutchtime += (float)RCM_MAX_DT_ROBOTS;
   }
 
   if (car->_gearCmd == 1 || drpm > 0) {

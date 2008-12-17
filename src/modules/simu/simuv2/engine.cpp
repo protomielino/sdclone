@@ -225,7 +225,7 @@ freerads += engine->Tq / engine->I * SimDeltaTime;
      sdI = 1.0;
  }
 
- float alpha = 0.1; // transition coefficient
+ float alpha = 0.1f; // transition coefficient
  engine->I_joint = engine->I_joint*(1.0-alpha) +  alpha*trans->curI;
 
  // only use these values when the clutch is engaged or the gear

@@ -201,8 +201,8 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
     }
     if (car->_state & RM_CAR_STATE_NO_SIMU
         || 
-        ((car->_speed_x*car->_speed_x + car->_speed_y*car->_speed_y) < 0.1f)
-        && (flag == false)) {
+        (((car->_speed_x*car->_speed_x + car->_speed_y*car->_speed_y) < 0.1f)
+        && (flag == false))) {
         return;
     }
 

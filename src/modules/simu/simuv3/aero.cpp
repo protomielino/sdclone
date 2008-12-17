@@ -27,10 +27,10 @@ SimAeroConfig(tCar *car)
     void *hdle = car->params;
     tdble Cx, FrntArea;
     
-    Cx       = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.4);
-    FrntArea = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.5);
-    car->aero.Clift[0] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0);
-    car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0);
+    Cx       = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.4f);
+    FrntArea = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.5f);
+    car->aero.Clift[0] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0f);
+    car->aero.Clift[1] = GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0f);
     float aero_factor = car->options->aero_factor;
 
     car->aero.SCx2 = 0.5f * AIR_DENSITY * Cx * FrntArea;
@@ -241,7 +241,7 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     // The value -0.4 should depend on the positioning of the wing. 
     // we also make this be like that.
     if (index==1) {
-        i_flow = PartialFlowSmooth (-0.4, aoa);
+        i_flow = PartialFlowSmooth (-0.4f, aoa);
     } 
     // Flow to the wings gets cut off by other cars.
     tdble airSpeed = car->DynGC.vel.x;

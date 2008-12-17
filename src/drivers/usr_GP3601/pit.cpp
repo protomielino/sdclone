@@ -95,10 +95,10 @@ fprintf(stderr,"pitentry = %.1f (%.1f)\n",pitentry,pitinfo->pitEntry->lgfromstar
 		memcpy(pBACK, pMID, sizeof(pMID));
 
 		pBACK[3].x -= car->_dimension_x/2 + 0.1;
-		pBACK[2].x -= 1.2;
+		pBACK[2].x -= 1.2f;
 
 		pFRONT[3].x += car->_dimension_x/2 + 0.1;
-		pFRONT[4].x += 1.0;
+		pFRONT[4].x += 1.0f;
 
 		splineFRONT = new Spline(NPOINTS, pFRONT);
 		splineBACK = new Spline(NPOINTS, pBACK);

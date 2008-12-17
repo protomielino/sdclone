@@ -326,7 +326,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	MaxGear = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "MaxGear", (char *)NULL, 6.0f );
 	NoPit = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "NoPit", (char *)NULL, 0.0f );
 	NoTeamWaiting = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "NoTeamWaiting", (char *)NULL, 1.0f );
-	TeamWaitTime = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "TeamWaitTime", (char *)NULL, 0.0f );
+	TeamWaitTime = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "TeamWaitTime", (char *)NULL, 0.0f);
 }
 
 
