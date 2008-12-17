@@ -36,7 +36,7 @@
 #include <car.h>
 #include <raceman.h>
 #include <robot.h>
-#include <racescreens.h>
+#include "racescreens.h"
 
 static void		*scrHandle;
 static tRmDrvSelect	*ds;
@@ -45,7 +45,7 @@ static int		FocDrvLabelId;
 static int		PickDrvNameLabelId;
 static int		PickDrvCarLabelId;
 static int		PickDrvCategoryLabelId;
-static float		aColor[] = {1.0, 0.0, 0.0, 1.0};
+static const float	aColor[] = {1.0, 0.0, 0.0, 1.0};
 static char		buf[256];    
 static char		path[256];    
 static int		nbSelectedDrivers;
@@ -88,7 +88,7 @@ rmdsDeactivate(void *screen)
 static void
 rmdsSetFocus(void * /* dummy */)
 {
-    char	*name;
+    const char	*name;
     tDrvElt	*curDrv;
 
     name = GfuiScrollListGetSelectedElement(scrHandle, selectedScrollList, (void**)&curDrv);
@@ -103,7 +103,7 @@ rmdsSetFocus(void * /* dummy */)
 static void
 rmdsSelect(void * /* dummy */)
 {
-    char	*name;
+    const char	*name;
     tDrvElt	*curDrv;
     int		index;
     
@@ -131,7 +131,7 @@ rmMove(void *vd)
 static void
 rmdsClickOnDriver(void * /* dummy */)
 {
-    char	*name;
+    const char	*name;
     tDrvElt	*curDrv;
     void	*robhdle;
 
@@ -161,7 +161,7 @@ rmdsClickOnDriver(void * /* dummy */)
 static void
 rmSelectDeselect(void * /* dummy */ )
 {
-    char	*name;
+    const char	*name;
     int		src, dst;
     tDrvElt	*curDrv;
     const char	*cardllname;
@@ -315,7 +315,7 @@ RmDriversSelect(void *vs)
 	if (curmod != NULL) {
 		do {
 			curmod = curmod->next;
-			for (i = 0; i < MAX_MOD_ITF; i++) {
+			for (i = 0; i < curmod->modInfoSize; i++) {
 				if (curmod->modInfo[i].name) {
 					sp = strrchr(curmod->sopath, '/');
 					if (sp == NULL) {
@@ -365,6 +365,8 @@ RmDriversSelect(void *vs)
 			}
 		} while (curmod != list);
 	}
+
+    GfModFreeInfoList(&list);
 
     nbSelectedDrivers = 0;
     nbMaxSelectedDrivers = (int)GfParmGetNum(ds->param, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 0);

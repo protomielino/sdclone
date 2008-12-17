@@ -30,6 +30,7 @@
 #define _GNU_SOURCE
 #endif
 #include <math.h>
+#include "portability.h"
 #include "accc.h"
 
 
@@ -768,6 +769,7 @@ int doKids(char *Line, ob_t *object, mat_t *material)
 
 
 	if (distSplit>0 && typeConvertion!=_AC3DTOAC3DS )
+	{
 	    if(!strnicmp(object->next->name,"tkrb",4) || !strnicmp(object->next->name,"tkmn",4)
 	       || !strnicmp(object->next->name,"tkrs",4) 
 	       || !strnicmp(object->next->name,"tklb",4) 
@@ -799,6 +801,7 @@ int doKids(char *Line, ob_t *object, mat_t *material)
 		    terrainSplitOb (&object->next);
 		}
 	    }
+	}
       
 	numrefs=numrefstotal=0;
 	numvertFound=0;

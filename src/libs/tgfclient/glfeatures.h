@@ -31,12 +31,12 @@ to another part eventually.
 #ifdef WIN32
 #include <windows.h>
 #include <GL/gl.h>
-#include <GL/glext.h>
+#include "GL/glext.h"
 #else
 #include <GL/gl.h>
 #endif // WIN32
 
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include <graphic.h>
 
 // Initialize

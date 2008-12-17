@@ -26,8 +26,9 @@
 #include <stdio.h>
 #include <cstring>
 #include <sys/stat.h>
+#include "portability.h"
 #include "xmlparse.h"
-#include <xml.h>
+#include "xml.h"
 
 #define BUFMAX	256
 

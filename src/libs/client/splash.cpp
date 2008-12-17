@@ -18,11 +18,11 @@
  ***************************************************************************/
 #ifdef WIN32
 #include <windows.h>
+#ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif
-//#include <SDL.h>
-#include <GL/glut.h>
-#include <stdlib.h>
+#endif
+
 #include <stdio.h>
 
 #ifdef HAVE_CONFIG_H
@@ -44,13 +44,13 @@ static char buf[1024];
  *	splashKey
  *
  * Description
- *	
+ *	Close the splash screen and start main menu
  *
  * Parameters
- *	
+ *	None
  *
  * Return
- *	
+ *	Nothing
  *
  * Remarks
  *	
@@ -126,7 +126,8 @@ static void splashDisplay( void )
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 		
-	if (s_texture != 0) {
+	if (s_texture != 0) 
+	{
 		GLfloat tx1 = 0.0f, tx2 = 1.0f, ty1 = 0.0f, ty2 = 1.0f;
 		
 		// Compute texture coordinates to ensure proper unskewed/unstretched display of
@@ -134,12 +135,15 @@ static void splashDisplay( void )
 		//tdble rfactor = (float)(s_imgWidth*ViewH)/(float)(s_imgHeight*ViewW);
 		tdble rfactor = (16.0f*ViewH)/(10.0f*ViewW);
 
-		if (rfactor >= 1.0f) {
+		if (rfactor >= 1.0f) 
+		{
 			// Aspect ratio of view is smaller than 16:10, "cut off" sides
 			tdble tdx = (1.0f-1.0f/rfactor)/2.0f;
 			tx1 += tdx;
 			tx2 -= tdx;
-		} else {
+		} 
+		else 
+		{
 			// Aspect ratio of view is larger than 16:10, "cut off" top and bottom
 			tdble tdy = (1.0f-rfactor)/2.0f;
 			ty1 += tdy;
@@ -202,7 +206,8 @@ int SplashScreen(void)
 	float	screen_gamma;
 	const char	*filename = "data/img/splash.png";
 	
-	if (s_texture != 0) {
+	if (s_texture != 0) 
+	{
 		glDeleteTextures(1, &s_texture); 
 	}
 	
@@ -210,7 +215,8 @@ int SplashScreen(void)
 	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);	
 	GLbyte *tex = (GLbyte*)GfImgReadPng(filename, &s_imgWidth, &s_imgHeight, screen_gamma);
-	if (!tex) {
+	if (!tex) 
+	{
 		GfParmReleaseHandle(handle);
 		GfTrace("Couldn't read %s\n", filename);
 		return -1;
@@ -231,5 +237,4 @@ int SplashScreen(void)
     
 	return 0;
 }
-
 

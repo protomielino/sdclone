@@ -485,8 +485,8 @@ extern "C" int K1999(tModInfo *modInfo)
  for (int i = CARS; --i >= 0;)
  {
   OUTPUT("modInfo[" << i << "].name = " << tpdata[i]->pszCarName);
-  modInfo[i].name    = strdup(tpdata[i]->pszCarName);
-  modInfo[i].desc    = strdup(tpdata[i]->pszCarName);
+  modInfo[i].name    = tpdata[i]->pszCarName;
+  modInfo[i].desc    = tpdata[i]->pszCarName;
   modInfo[i].fctInit = InitFuncPt;
   modInfo[i].gfId    = ROB_IDENT;
   modInfo[i].index   = i + 1;

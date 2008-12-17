@@ -28,7 +28,7 @@
 #include <cstring>
 #include <time.h>
 
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 
 #include <portability.h>
@@ -258,9 +258,10 @@ gfuiKeyboard(unsigned char key, int /* x */, int /* y */)
 	}
 	
 	/* now see the user's defined keys */
-	if (GfuiScreen->userKeys != NULL) {
+	if (GfuiScreen->userKeys) {
 		curKey = GfuiScreen->userKeys;
-		do {
+		do 
+		{
 			curKey = curKey->next;
 			if ((curKey->key == key) && ((curKey->modifier == 0) || (curKey->modifier & modifier) != 0)) {
 				if (curKey->onPress) curKey->onPress(curKey->userData);
@@ -290,14 +291,17 @@ gfuiSpecial(int key, int /* x */, int /* y */)
 	modifier = glutGetModifiers();
 	
 	/* user preempt key */
-	if (GfuiScreen->onSKeyAction && GfuiScreen->onSKeyAction(key, modifier, GFUI_KEY_DOWN)) {
+	if (GfuiScreen->onSKeyAction && GfuiScreen->onSKeyAction(key, modifier, GFUI_KEY_DOWN)) 
+	{
 		return;
 	}
 	
 	/* now see the user's defined keys */
-	if (GfuiScreen->userSpecKeys != NULL) {
+	if (GfuiScreen->userSpecKeys) 
+	{
 		curKey = GfuiScreen->userSpecKeys;
-		do {
+		do 
+		{
 			curKey = curKey->next;
 			if ((curKey->specialkey == key) && ((curKey->modifier == 0) || (curKey->modifier & modifier) != 0)) {
 				if (curKey->onPress) curKey->onPress(curKey->userData);
@@ -307,8 +311,10 @@ gfuiSpecial(int key, int /* x */, int /* y */)
 	}
 
 	obj = GfuiScreen->hasFocus;
-	if (obj != NULL) {
-		switch (obj->widget) {
+	if (obj != NULL) 
+	{
+		switch (obj->widget) 
+		{
 		case GFUI_EDITBOX:
 			gfuiEditboxKey(obj, key + 256, modifier);
 			break;
@@ -331,9 +337,11 @@ gfuiKeyboardUp(unsigned char key, int /* x */, int /* y */)
 	}
 	
 	/* now see the user's defined keys */
-	if (GfuiScreen->userKeys != NULL) {
+	if (GfuiScreen->userKeys != NULL) 
+	{
 		curKey = GfuiScreen->userKeys;
-		do {
+		do 
+		{
 			curKey = curKey->next;
 			if ((curKey->key == key) && ((curKey->modifier == 0) || (curKey->modifier & modifier) != 0)) {
 				if (curKey->onRelease) curKey->onRelease(curKey->userData);
@@ -354,14 +362,17 @@ gfuiSpecialUp(int key, int /* x */, int /* y */)
 	modifier = glutGetModifiers();
 	
 	/* user preempt key */
-	if (GfuiScreen->onSKeyAction && GfuiScreen->onSKeyAction(key, modifier, GFUI_KEY_UP)) {
+	if (GfuiScreen->onSKeyAction && GfuiScreen->onSKeyAction(key, modifier, GFUI_KEY_UP)) 
+	{
 		return;
 	}
 	
 	/* now see the user's defined keys */
-	if (GfuiScreen->userSpecKeys != NULL) {
+	if (GfuiScreen->userSpecKeys != NULL) 
+	{
 		curKey = GfuiScreen->userSpecKeys;
-		do {
+		do 
+		{
 			curKey = curKey->next;
 			if ((curKey->specialkey == key) && ((curKey->modifier == 0) || (curKey->modifier & modifier) != 0)) {
 				if (curKey->onRelease) curKey->onRelease(curKey->userData);
@@ -490,7 +501,8 @@ GfuiScreenActivate(void *screen)
 	
 	if (GfuiScreen->onActivate) GfuiScreen->onActivate(GfuiScreen->userActData);
 	
-	if (GfuiScreen->onlyCallback == 0) {
+	if (GfuiScreen->onlyCallback == 0) 
+	{
 		GfuiDisplay();
 		glutPostRedisplay();
 	}
@@ -507,9 +519,8 @@ GfuiScreenReplace(void *screen)
 {
 	tGfuiScreen	*oldScreen = GfuiScreen;
 
-	//GfuiScreenActivate(screen);
-
-	if (oldScreen) {
+	if (oldScreen) 
+	{
 		GfuiScreenRelease(oldScreen);
 	}
 	GfuiScreenActivate(screen);
@@ -1005,7 +1016,7 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
     @return	None.
  */
 void
-GfuiScreenSleep(double delay)
+GfuiSleep(double delay)
 {
   ulMilliSecondSleep(delay*1000); // ms.
 }

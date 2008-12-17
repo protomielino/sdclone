@@ -32,7 +32,7 @@
 #endif
 #include <tgfclient.h>
 #include <osspec.h>
-#include <racescreens.h>
+#include "racescreens.h"
 #include <robottools.h>
 #include <robot.h>
 

@@ -30,7 +30,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
 
@@ -250,31 +250,31 @@ gfuiScrollListRemElt(tGfuiScrollList *scrollist, int index)
     @return	Name of the retrieved element
 		<br>NULL if Error
  */
-char *
+const char *
 GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
     tGfuiListElement	*elt;
-    char		*name;
+    const char		*name;
     int			i;
 
     
     object = gfuiGetObject(scr, Id);
     if (object == NULL) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     if (object->widget != GFUI_SCROLLIST) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     scrollist = &(object->u.scrollist);
 
     if (scrollist->selectedElt == -1) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
 
     if (scrollist->elts == NULL) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
 
     elt = scrollist->elts;
@@ -302,30 +302,30 @@ GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData)
     @return	Name of the retrieved element
 		<br>NULL if Error
  */
-char *
+const char *
 GfuiScrollListGetElement(void *scr, int Id, int index, void **userData)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
     tGfuiListElement	*elt;
-    char		*name;
+    const char		*name;
     int			i;
 
     object = gfuiGetObject(scr, Id);
     if (object == NULL) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     if (object->widget != GFUI_SCROLLIST) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     scrollist = &(object->u.scrollist);
 
     if ((index < 0) || (index > scrollist->nbElts - 1)) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
 
     if (scrollist->elts == NULL) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     elt = scrollist->elts;
     i = 0;
@@ -351,25 +351,25 @@ GfuiScrollListGetElement(void *scr, int Id, int index, void **userData)
     @return	Name of the extracted element
 		<br>NULL if Error
  */
-char *
+const char *
 GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
     tGfuiListElement	*elt;
-    char		*name;
+    const char		*name;
     
     object = gfuiGetObject(scr, Id);
     if (object == NULL) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     if (object->widget != GFUI_SCROLLIST) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     scrollist = &(object->u.scrollist);
 
     if (scrollist->selectedElt == -1) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
 
     elt = gfuiScrollListRemElt(scrollist, scrollist->selectedElt);
@@ -395,25 +395,25 @@ GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData)
     @return	Name of the extracted element
 		<br>NULL if Error
  */
-char *
+const char *
 GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
     tGfuiListElement	*elt;
-    char		*name;
+    const char		*name;
     
     object = gfuiGetObject(scr, Id);
     if (object == NULL) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     if (object->widget != GFUI_SCROLLIST) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
     scrollist = &(object->u.scrollist);
 
     if ((index < 0) || (index > scrollist->nbElts - 1)) {
-	return (char*)NULL;
+	return (const char*)NULL;
     }
 
     elt = gfuiScrollListRemElt(scrollist, index);
@@ -442,7 +442,7 @@ GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData)
 		<br><tt>-1 .. </tt>Error
  */
 int
-GfuiScrollListInsertElement(void *scr, int Id, char *element, int index, void *userData)
+GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
@@ -473,14 +473,48 @@ GfuiScrollListInsertElement(void *scr, int Id, char *element, int index, void *u
     return 0;
 }
 
+void GfuiScrollListShowElement(void *scr, int Id, int index)
+{
+    tGfuiObject		*object;
+    tGfuiScrollList	*scrollist;
+    tGfuiListElement	*elt;
+    int			oldFirstVisible;
+    
+    object = gfuiGetObject(scr, Id);
+    if (object == NULL) {
+	return;
+    }
+    if (object->widget != GFUI_SCROLLIST) {
+	return;
+    }
+    scrollist = &(object->u.scrollist);
+    
+    if (index < 0) {
+      index = 0;
+    } else if (index >= scrollist->nbElts) {
+      index = scrollist->nbElts - 1;
+    }
+
+    oldFirstVisible = scrollist->firstVisible;
+    if (index < scrollist->firstVisible) {
+        scrollist->firstVisible = index;
+    } else if (index >= scrollist->firstVisible + scrollist->nbVisible) {
+        scrollist->firstVisible = index - scrollist->nbVisible + 1;
+    }
+
+    if (scrollist->firstVisible != oldFirstVisible && scrollist->scrollBar) {
+        GfuiScrollBarPosSet(scr, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+			    scrollist->nbVisible, scrollist->firstVisible);
+    }
+}
 
 void
 gfuiDrawScrollist(tGfuiObject *obj)
 {
 	tGfuiScrollList	*scrollist;
 	tGfuiListElement	*elt;
-	float		*fgColor;
-	float		*bgColor;
+	const float		*fgColor;
+	const float		*bgColor;
 	char		buf[256];
 	int			w, h, x, y;
 	int			index;

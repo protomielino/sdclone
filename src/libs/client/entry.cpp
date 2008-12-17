@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 
-#include <client.h>
+#include "client.h"
 #include <tgfclient.h>
 #include <plib/ssg.h>
 

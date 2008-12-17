@@ -28,7 +28,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 
 
@@ -45,7 +45,7 @@
 		<br>-1 Error
     @warning	the image must be sqare and its size must be a power of 2.
 */
-int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, char *name)
+int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name)
 {
 	tGfuiImage *image;
 	tGfuiObject *object;
@@ -83,7 +83,7 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, char *name)
     @return	none
     @warning	the image must be sqare and its size must be a power of 2.
 */
-void GfuiStaticImageSet(void *scr, int id, char *name)
+void GfuiStaticImageSet(void *scr, int id, const char *name)
 {
 	tGfuiObject *curObject;
 	tGfuiScreen *screen = (tGfuiScreen*)scr;

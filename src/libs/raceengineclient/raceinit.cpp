@@ -151,7 +151,9 @@ static void reSelectRaceman(void *params)
 	}
 
 	e = strstr(s, PARAMEXT);
-	ReInfo->_reFilename = strndup(s, e-s+1);
+	//This line doesn't compile for windows
+	//ReInfo->_reFilename = strndup(s, e-s+1);
+	ReInfo->_reFilename = strdup(s);
 	ReInfo->_reFilename[e-s] = '\0';
 	ReInfo->_reName = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 	ReStateApply(RE_STATE_CONFIG);
@@ -472,7 +474,7 @@ ReInitCars(void)
 	int i, j, k;
 	const char *cardllname;
 	int robotIdx;
-	tModInfo *curModInfo;
+	tModInfoNC *curModInfo;
 	tRobotItf *curRobot;
 	void *handle;
 	const char *category;
@@ -511,8 +513,9 @@ ReInitCars(void)
 		}
 
 		/* search for corresponding index */
-		for (j = 0; j < MAX_MOD_ITF; j++) {
-			if ((*(ReInfo->modList))->modInfo[j].index == robotIdx) {
+		for (j = 0; j < (*(ReInfo->modList))->modInfoSize; j++) {
+			if ((*(ReInfo->modList))->modInfo[j].name
+			    && (*(ReInfo->modList))->modInfo[j].index == robotIdx) {
 				/* good robot found */
 				curModInfo = &((*(ReInfo->modList))->modInfo[j]);
 				GfOut("Driver's name: %s\n", curModInfo->name);

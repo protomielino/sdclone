@@ -92,7 +92,7 @@ DiscretePolicy::DiscretePolicy (int n_states, int n_actions, real alpha,
 		e[s] = new real [n_actions];
 		vQ[s] = new real [n_actions];
 		for (int a=0; a<n_actions; a++) {
-			P[s][a] = 1.0/((float)  n_actions);
+			P[s][a] = 1.0f/((float)n_actions);
 			Q[s][a] = init_eval;
 			e[s][a] = 0.0;
 			vQ[s][a] = 1.0;
@@ -314,10 +314,10 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 	int a, amax;
 	int argmax = argMax (Q[s]);
 
-	P[s][argmax] += zeta*(1.0-P[s][argmax]);
+	P[s][argmax] += zeta*(1.0f-P[s][argmax]);
 	for (int j=0; j<n_actions; j++) {
 		if (j!=argmax) {
-			P[s][j] += zeta*(0.0-P[s][j]);
+			P[s][j] += zeta*(0.0f-P[s][j]);
 		}
 	}
 
@@ -409,7 +409,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 		real gl = gamma * lambda;
 		real variance_threshold = 0.0001f;		
 		if  (confidence_eligibility == false) {
-			vQ[ps][pa] = (1.0 - zeta)*vQ[ps][pa] + zeta*(ad*ad);
+			vQ[ps][pa] = (1.0f - zeta)*vQ[ps][pa] + zeta*(ad*ad);
 			if (vQ[ps][pa]<variance_threshold) {
 				vQ[ps][pa]=variance_threshold;
 			}
@@ -426,7 +426,7 @@ int DiscretePolicy::SelectAction (int s, real r, int forced_a)
 					Q[i][j] += ad * e[i][j];
 					if (confidence_eligibility == true) {
 						real zeta_el = zeta * e[i][j];
-						vQ[i][j] = (1.0 - zeta_el)*vQ[i][j] + zeta_el*(ad*ad);
+						vQ[i][j] = (1.0f - zeta_el)*vQ[i][j] + zeta_el*(ad*ad);
 						if (vQ[i][j]<variance_threshold) {
 							vQ[i][j]=variance_threshold;
 						}
@@ -521,14 +521,14 @@ void DiscretePolicy::loadFile (char* f)
 	for (i=0; i<n_states; i++) {
 		for (j=0; j<n_actions; j++) {
 			{
-				P[i][j] = 1.0/((real) n_actions);
+				P[i][j] = 1.0f/((real) n_actions);
 			}
 		}
 		int argmax = argMax (Q[i]);
-		P[i][argmax] += 0.001*(1.0-P[i][argmax]);
+		P[i][argmax] += 0.001f*(1.0f-P[i][argmax]);
 		for (int j=0; j<n_actions; j++) {
 			if (j!=argmax) {
-				P[i][j] += 0.001*(0.0-P[i][j]);
+				P[i][j] += 0.001f*(0.0f-P[i][j]);
 			}
 		}
 	}
@@ -730,7 +730,7 @@ int DiscretePolicy::confMax(real* Qs, real* vQs, real p) {
 				cum += exp ((Qs[j]-Q)/sqrt(vQs[j]));
 			}
 		}
-		eval[a] = 1.0/(cum);//#exp(Qs[a]/sqrt(vQs[a]));
+		eval[a] = 1.0f/(cum);//#exp(Qs[a]/sqrt(vQs[a]));
 		sum += eval[a];
 	}
 #endif
@@ -806,7 +806,7 @@ int DiscretePolicy::eGreedy(real* Qs) {
 	for (int a=0; a<n_actions; a++) {
 		eval[a] = base_prob;
 	}
-	eval[amax] += 1.0-temp;
+	eval[amax] += 1.0f-temp;
 	if (X<temp) {
 		return rand()%n_actions;
 	}

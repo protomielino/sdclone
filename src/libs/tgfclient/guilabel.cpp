@@ -28,7 +28,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
 
@@ -61,7 +61,7 @@ gfuiLabelInit(void)
     @see	GfuiSetLabelText
  */
 int 
-GfuiLabelCreateEx(void *scr, const char *text, float *fgColor, int font, int x, int y, int align, int maxlen)
+GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, int x, int y, int align, int maxlen)
 {
     tGfuiLabel	*label;
     tGfuiObject	*object;
@@ -232,7 +232,7 @@ GfuiLabelSetText(void *scr, int id, const char *text)
     @see	GfuiAddLabel
  */
 void
-GfuiLabelSetColor(void *scr, int id, float *color)
+GfuiLabelSetColor(void *scr, int id, const float *color)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;

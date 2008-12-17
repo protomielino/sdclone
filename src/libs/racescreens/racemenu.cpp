@@ -35,7 +35,7 @@
 #include <car.h>
 #include <raceman.h>
 #include <robot.h>
-#include <racescreens.h>
+#include "racescreens.h"
 
 static void		*scrHandle;
 static tRmRaceParam	*rp;

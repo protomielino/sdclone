@@ -36,7 +36,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgf.h>
+#include "tgf.h"
 
 #include <assert.h>
 
@@ -183,7 +183,7 @@ getFullName (const char *sectionName, const char *paramName)
 	
 	fullName = (char *) malloc (strlen (sectionName) + strlen (paramName) + 2);
 	if (!fullName) {
-		GfError ("getFullName: malloc (%d) failed", strlen (sectionName) + strlen (paramName) + 2);
+		GfError ("getFullName: malloc (%lu) failed", (unsigned long)(strlen (sectionName) + strlen (paramName) + 2));
 		return NULL;
 	}
 	sprintf (fullName, "%s/%s", sectionName, paramName);
@@ -308,7 +308,7 @@ addParam (struct parmHeader *conf, struct section *section, const char *paramNam
 	
 	param = (struct param *) calloc (1, sizeof (struct param));
 	if (!param) {
-		GfError ("addParam: calloc (1, %d) failed\n", sizeof (struct param));
+		GfError ("addParam: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct param));
 		goto bailout;
 	}
 
@@ -428,7 +428,7 @@ addSection (struct parmHeader *conf, const char *sectionName)
 
 	section = (struct section *) calloc (1, sizeof (struct section));
 	if (!section) {
-		GfError ("addSection: calloc (1, %d) failed\n", sizeof (struct section));
+		GfError ("addSection: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct section));
 		return NULL;
 	}
 
@@ -494,7 +494,7 @@ createParmHeader (const char *file)
 
     conf = (struct parmHeader *) calloc (1, sizeof (struct parmHeader));
     if (!conf) {
-	GfError ("gfParmReadFile: calloc (1, %d) failed\n", sizeof (struct parmHeader));
+	GfError ("gfParmReadFile: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHeader));
 	return NULL;
     }
 
@@ -502,7 +502,7 @@ createParmHeader (const char *file)
 
     conf->rootSection = (struct section *) calloc (1, sizeof (struct section));
     if (!conf->rootSection) {
-	GfError ("gfParmReadFile: calloc (1, %d) failed\n", sizeof (struct section));
+	GfError ("gfParmReadFile: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct section));
 	goto bailout;
     }
     GF_TAILQ_INIT (&(conf->rootSection->paramList));
@@ -567,7 +567,7 @@ myStrcmp(const void *s1, const void * s2)
 static tdble
 getValNumFromStr (const char *str)
 {
-    tdble val;
+    tdble val = 0.0;
 
     if (!str || !strlen (str)) {
 	return 0.0;
@@ -960,7 +960,7 @@ GfParmReadBuf (char *buffer)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-	GfError ("gfParmReadBuf: calloc (1, %d) failed\n", sizeof (struct parmHandle));
+	GfError ("gfParmReadBuf: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHandle));
 	goto bailout;
     }
 
@@ -1033,7 +1033,7 @@ GfParmReadFile (const char *file, int mode)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-	GfError ("gfParmReadFile: calloc (1, %d) failed\n", sizeof (struct parmHandle));
+	GfError ("gfParmReadFile: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHandle));
 	goto bailout;
     }
 
@@ -1478,7 +1478,7 @@ static void parmReleaseHeader(struct parmHeader *conf)
 		return;
 	}
 
-	GfOut ("parmReleaseHeader: refcount null free \"%s\"\n", conf->filename);
+	//GfOut ("parmReleaseHeader: refcount null free \"%s\"\n", conf->filename);
 
 	parmClean (conf);
 
@@ -1504,7 +1504,7 @@ static void parmReleaseHandle (struct parmHandle *parmHandle)
 {
 	struct parmHeader *conf = parmHandle->conf;
 
-	GfOut ("parmReleaseHandle: release \"%s\" (%p)\n", conf->filename, parmHandle);
+	//GfOut ("parmReleaseHandle: release \"%s\" (%p)\n", conf->filename, parmHandle);
 
 	GF_TAILQ_REMOVE (&parmHandleList, parmHandle, linkHandle);
 	parmHandle->magic = 0;
@@ -1853,6 +1853,122 @@ GfParmListSeekNext (void *handle, const char *path)
 	return 0;
     }
     return 1;			/* EOL reached */
+}
+
+
+/** Remove a section element with given name of a list.
+    @ingroup	paramslist
+    @param	handle	handle of parameters
+    @param	path	path of list
+    @param	key	name of the element to remove
+    @return	0 Ok
+		<br>-1 Error
+ */
+int
+GfParmListRemoveElt (void *handle, const char *path, const char *key)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*listSection;
+    struct section	*section;
+    char		*fullName;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmListRemoveElt: bad handle (%p)\n", parmHandle);
+	return -1;
+    }
+    listSection = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if (!listSection) {
+	GfOut ("GfParmListRemoveElt: \"%s\" not found\n", path);
+	return -1;
+    }
+    fullName = (char *) malloc (strlen (path) + strlen (key) + 2);
+    if (!fullName) {
+	GfError ("GfParmListRemoveElt: malloc (%lu) failed\n", strlen (path) + strlen (key) + 2);
+	return -1;
+    }
+    sprintf (fullName, "%s/%s", path, key);
+    section = (struct section *)GfHashGetStr (conf->sectionHash, fullName);
+    freez(fullName);
+    if (!section) {
+      GfError ("GfParmListRemoveElt: Element \"%s\" not found in \"%s\"\n", key, path);
+	return -1;
+    }
+    removeSection (conf, section);
+    return 0;
+}
+
+
+/** Remove a section element with given name of a list.
+    @ingroup	paramslist
+    @param	handle	handle of parameters
+    @param	path	path of list
+    @param	oldKey	name of the element to rename
+    @param	newKey	new name to give to the element
+    @return	0 Ok
+		<br>-1 Error
+ */
+int
+GfParmListRenameElt (void *handle, const char *path, const char *oldKey, const char *newKey)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*section;
+    struct param	*param;
+    char		*oldFullName;
+    char		*newFullName;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmListRenameElt: bad handle (%p)\n", parmHandle);
+	return -1;
+    }
+
+	// Build new element full name.
+    newFullName = (char *) malloc (strlen (path) + strlen (newKey) + 2);
+    if (!newFullName) {
+	GfError ("GfParmListRenameElt: malloc (%lu) failed\n", strlen (path) + strlen (newKey) + 2);
+	return -1;
+    }
+    sprintf (newFullName, "%s/%s", path, newKey);
+
+	// Check if no other element has same fullname in the list.
+    section = (struct section *)GfHashGetStr (conf->sectionHash, newFullName);
+    if (section) {
+      GfError ("GfParmListRenameElt: Element \"%s\" already in list \"%s\"\n", newKey, path);
+	return -1;
+    }
+
+	// Check if no other element has same fullname in the list.
+    oldFullName = (char *) malloc (strlen (path) + strlen (oldKey) + 2);
+    if (!oldFullName) {
+	GfError ("GfParmListRenameElt: malloc (%lu) failed", strlen (path) + strlen (oldKey) + 2);
+	return -1;
+    }
+    sprintf (oldFullName, "%s/%s", path, oldKey);
+    section = (struct section *)GfHashGetStr (conf->sectionHash, oldFullName);
+    if (!section) {
+      GfError ("GfParmListRenameElt: Element \"%s\" not found in list \"%s\"\n", newKey, path);
+	return -1;
+    }
+
+	// Modify element fullname in section hash list.
+    GfHashRemStr(conf->sectionHash, oldFullName);
+    freez(oldFullName);
+    section->fullName = newFullName;
+    GfHashAddStr(conf->sectionHash, newFullName, section);
+
+	// Modify the full name of each param of the list in the section param hash list.
+    for (param = GF_TAILQ_FIRST (&(section->paramList));
+	 param != GF_TAILQ_END (&(section->paramList));
+	 param = GF_TAILQ_NEXT (param, linkParam)) 
+	{
+        GfHashRemStr(conf->paramHash, param->fullName);
+        freez(param->fullName);
+		param->fullName = getFullName(section->fullName, param->name);
+		GfHashAddStr(conf->paramHash, param->fullName, param);
+    }
+
+    return 0;
 }
 
 
@@ -2602,7 +2718,7 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     /* Handle creation */
     parmHandleOut = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandleOut) {
-	GfError ("gfParmReadBuf: calloc (1, %d) failed\n", sizeof (struct parmHandle));
+	GfError ("gfParmReadBuf: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHandle));
 	parmReleaseHeader (confOut);
 	return NULL;
     }

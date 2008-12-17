@@ -50,8 +50,8 @@ extern float	GfuiColor[GFUI_COLORNB][4];
 typedef struct
 {
     char	*text;		/* text */
-    float	*bgColor;	/* RGBA */
-    float	*fgColor;
+    const float	*bgColor;	/* RGBA */
+    const float	*fgColor;
     GfuiFontClass	*font;		/* ttf font */
     int		x, y;		/* label position */
     int		align;
@@ -69,11 +69,11 @@ typedef struct
 
 typedef struct
 {
-    tGfuiLabel		label;
-    float		*bgColor[3];
-    float		*fgColor[3];
-    float		*bgFocusColor[3];
-    float		*fgFocusColor[3];
+    tGfuiLabel	label;
+    const float	*bgColor[3];
+    const float	*fgColor[3];
+    const float	*bgFocusColor[3];
+    const float	*fgFocusColor[3];
     unsigned int	state;
     int			buttonType;
     int			mouseBehaviour;
@@ -107,8 +107,8 @@ typedef struct
 
 typedef struct GfuiListElement
 {
-    char			*name;
-    char			*label;
+    const char		*name;
+    const char		*label;
     void			*userData;
     int				selected;
     int				index;
@@ -119,10 +119,10 @@ typedef struct GfuiListElement
 typedef struct
 {
     int			sbPos;
-    float		*bgColor[3];
-    float		*fgColor[3];
-    float		*bgSelectColor[3];
-    float		*fgSelectColor[3];
+    const float	*bgColor[3];
+    const float	*fgColor[3];
+    const float	*bgSelectColor[3];
+    const float	*fgSelectColor[3];
     GfuiFontClass	*font;
     tGfuiListElement	*elts;
     int			nbElts;
@@ -145,12 +145,12 @@ typedef struct
 
 typedef struct
 {
-    tGfuiLabel		label;
-    float		*cursorColor[3];
-    float		*bgColor[3];
-    float		*fgColor[3];
-    float		*bgFocusColor[3];
-    float		*fgFocusColor[3];
+    tGfuiLabel	label;
+    const float	*cursorColor[3];
+    const float	*bgColor[3];
+    const float	*fgColor[3];
+    const float	*bgFocusColor[3];
+    const float	*fgFocusColor[3];
     int			state;
     int			cursorx;
     int			cursory1;

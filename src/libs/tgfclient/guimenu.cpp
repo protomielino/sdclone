@@ -32,7 +32,7 @@
 #endif
 #include <GL/glut.h>
 
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 #include "guimenu.h"
 
@@ -43,12 +43,15 @@ gfMenuInit(void)
 
 /** Add the default menu keyboard callback to a screen.
     The keys are:
+    <br><tt>F1 .......... </tt>Help
+    <br><tt>Escape ...... </tt>Quit the menu
+    <br><tt>Enter ....... </tt>Perform Action
     <br><tt>Up Arrow .... </tt>Select Previous Entry
     <br><tt>Down Arrow .. </tt>Select Next Entry
-    <br><tt>F1 .......... </tt>Help
+    <br><tt>Page Up ..... </tt>Select Previous Entry
+    <br><tt>Page Down ... </tt>Select Next Entry
     <br><tt>Tab ......... </tt>Select Next Entry
-    <br><tt>Enter ....... </tt>Perform Action
-    <br><tt>Escape ...... </tt>Quit the menu
+    <br><tt>F12 ......... </tt>Screen shot
     @ingroup	gui
     @param	scr	Screen Id
  */

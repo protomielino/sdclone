@@ -33,7 +33,7 @@
 #include <track.h>
 #include <osspec.h>
 #include <raceman.h>
-#include <racescreens.h>
+#include "racescreens.h"
 
 
 /* Tracks Categories */

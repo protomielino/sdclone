@@ -33,6 +33,8 @@
 
 #include <math.h>
 
+#include "portability.h"
+
 #include "accc.h"
 /* -g  g-track-2.ac -l0 g2.ac -d3 200900 -d2 200 -d1 100 -S 200 >t */
 /* +es 80 p-gt1.ac porsche-gt1.ac>t */
@@ -254,10 +256,12 @@ void init_args(int argc, char **argv)
 	else
 	  if (typeConvertion==_AC3DTOAC3D)
 	    if (argc>=5)
+	    {
 	      if (!strcmp(argv[4],"-order"))
 		OrderString=argv[5];
 	      else
 		far_dist=atoi(argv[4]);
+            }
 
       }
 }

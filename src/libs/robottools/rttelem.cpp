@@ -38,7 +38,7 @@
 #include <windows.h>
 #endif
 #include <telemetry.h>
-#include <robottools.h>
+#include "robottools.h"
 #include <tgf.h>
 
 #if 0
@@ -56,7 +56,7 @@ void RtTelemInit(tdble ymin, tdble ymax)
 {
 #ifdef later
     char	buf[256];
-    tModInfo	*curModInfo;
+    tModInfoNC	*curModInfo;
 
     memset(&tlm, 0, sizeof(tTelemItf));
     sprintf(buf, "%smodules/telemetry/%s.%s", "telemetry", GetLibDir (), DLLEXT);

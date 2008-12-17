@@ -29,7 +29,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
 
@@ -388,8 +388,8 @@ gfuiDrawButton(tGfuiObject *obj)
 {
     tGfuiLabel	*label;
     tGfuiButton	*button;
-    float	*fgColor;
-    float	*bgColor;
+    const float	*fgColor;
+    const float	*bgColor;
 
     button = &(obj->u.button);
     if (obj->state == GFUI_DISABLE) {

@@ -31,7 +31,7 @@
 #include <endian.h>
 #endif
 
-#include <tgfclient.h>
+#include "tgfclient.h"
 
 #include "guifont.h"
 

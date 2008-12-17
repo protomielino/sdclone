@@ -27,7 +27,7 @@
 #include <tgfclient.h>
 #include <robot.h>
 
-#include <racescreens.h>
+#include "racescreens.h"
 
 static void *twoStateHdle = 0;
 static void *triStateHdle = 0;

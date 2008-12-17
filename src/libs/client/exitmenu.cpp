@@ -47,16 +47,16 @@ void * exitMenuInit(void *menu, void *menuHandle)
     GfuiScreenAddBgImg(menuHandle, "data/img/splash-quit.png");
 
     GfuiMenuButtonCreate(menuHandle,
-		      "No, Back to Game",
-		      "Return to TORCS",
+		      "Yes, let's Quit",
+		      "Exit of Torcs-NG",
+		      NULL,
+		      endofprog);
+    GfuiMenuButtonCreate(menuHandle,
+		      "No, back to Game",
+		      "Return to Torcs-NG",
 		      menu,
 		      GfuiScreenActivate);
     
-    GfuiMenuButtonCreate(menuHandle,
-		      "Yes, Let's Quit",
-		      "Exit of TORCS",
-		      NULL,
-		      endofprog);
     return menuHandle;
 }
 

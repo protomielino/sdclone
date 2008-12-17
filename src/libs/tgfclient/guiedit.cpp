@@ -29,7 +29,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
 
@@ -160,8 +160,8 @@ gfuiDrawEditbox(tGfuiObject *obj)
 {
     tGfuiLabel		*label;
     tGfuiEditbox	*editbox;
-    float		*fgColor;
-    float		*bgColor;
+    const float		*fgColor;
+    const float		*bgColor;
 
     editbox = &(obj->u.editbox);
     if (obj->state == GFUI_DISABLE) {

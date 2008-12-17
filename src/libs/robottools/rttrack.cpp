@@ -37,7 +37,7 @@
 #include <car.h>
 #include <track.h>
 
-#include <robottools.h>
+#include "robottools.h"
 
 /** Get the track width at the specified point.
     @ingroup	tracktools

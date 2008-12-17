@@ -19,7 +19,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include <time.h>
 
 #include "gui.h"

@@ -2,7 +2,7 @@
 
     file        : fileselect.cpp
     created     : Sun Feb 16 13:09:23 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $                                  
 
@@ -33,7 +33,7 @@
 #include <windows.h>
 #endif
 #include <tgfclient.h>
-#include <racescreens.h>
+#include "racescreens.h"
 
 static void		*scrHandle = NULL;
 static int		fileScrollList;

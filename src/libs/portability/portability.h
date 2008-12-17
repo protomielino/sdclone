@@ -24,7 +24,9 @@
 #include <cstring>
 
 #ifdef WIN32
+#ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
+#endif
 #endif
 
 #ifdef HAVE_CONFIG_H
@@ -56,13 +58,24 @@ static char *strndup(const char *str, int len)
 
 #endif
 
+// Posix functions special names with MS compilers.
+#if defined(WIN32)
 
-#ifdef WIN32
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
+
+// For MSVC 2005 and newer
+#if _MSC_VER >= 1400
+#ifdef strdup
+#undef strdup
+#endif
+#define strdup _strdup
+#define stricmp _stricmp
+#define strnicmp _strnicmp
+#define chdir _chdir
 #endif
 
-
+#endif
 
 #endif // _TORCS_PORTABILITY_H_
 

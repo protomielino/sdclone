@@ -30,7 +30,7 @@
 
 #include "png.h"
 
-#include <tgfclient.h>
+#include "tgfclient.h"
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef WIN32
@@ -68,7 +68,7 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	png_uint_32 i;
 	
 	if ((fp = fopen(filename, "rb")) == NULL) {
-		GfTrace("Can't open file %s\n", filename);
+		GfTrace("Can't open file %s for reading\n", filename);
 		return (unsigned char *)NULL;
 	}
 	
@@ -155,7 +155,7 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	
 	// RGBA expected.
 	if (rowbytes != (4 * width)) {
-		GfTrace("%s bad byte count... %u instead of %u\n", filename, rowbytes, 4 * width);
+		GfTrace("%s bad byte count... %lu instead of %lu\n", filename, (unsigned long)rowbytes, (unsigned long)(4 * width));
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return (unsigned char *)NULL;
@@ -214,7 +214,7 @@ GfImgWritePng(unsigned char *img, const char *filename, int width, int height)
 	
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {
-		GfTrace("Can't open file %s\n", filename);
+		GfTrace("Can't open file %s for writing\n", filename);
 		return -1;
 	}
 	
@@ -290,7 +290,7 @@ GfImgFreeTex(GLuint tex)
     @return	None.
  */
 GLuint
-GfImgReadTex(char *filename)
+GfImgReadTex(const char *filename)
 {
 	void *handle;
 	float screen_gamma;

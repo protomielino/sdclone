@@ -30,7 +30,7 @@
 #include <tgf.h>
 #include <GL/glut.h>
 #include <plib/js.h>
-#include <screen_properties.h>
+#include "screen_properties.h"
 
 extern void GfInitClient(void);
 
@@ -41,7 +41,7 @@ extern void GfInitClient(void);
 extern unsigned char *GfImgReadPng(const char *filename, int *widthp, int *heightp, float gamma);
 extern int GfImgWritePng(unsigned char *img, const char *filename, int width, int height);
 extern void GfImgFreeTex(GLuint tex);
-extern GLuint GfImgReadTex(char *filename);
+extern GLuint GfImgReadTex(const char *filename);
 
 extern void GfScrInit(int argc, char *argv[]);
 extern void GfScrShutdown(void);
@@ -137,7 +137,7 @@ extern void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 extern void GfuiSKeyEventRegister(void *scr, tfuiSKeyCallback onSKeyAction);
 extern void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 extern void GfuiSKeyEventRegisterCurrent(tfuiSKeyCallback onSKeyAction);
-extern void GfuiScreenSleep(double delay);
+extern void GfuiSleep(double delay);
 
 /* mouse */
 typedef struct MouseInfo
@@ -174,13 +174,13 @@ extern void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_DIGIT		8
 extern int GfuiLabelCreate(void *scr, const char *text, 
 			int font, int x, int y, int align, int maxlen);
-extern int GfuiLabelCreateEx(void *scr, const char *text, float *fgColor, int font, int x, int y, int align, int maxlen);
+extern int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, int x, int y, int align, int maxlen);
 
 extern int GfuiTipCreate(void *scr, const char *text, int maxlen);
 extern int GfuiTitleCreate(void *scr, const char *text, int maxlen);
 
 extern void GfuiLabelSetText(void *scr, int id, const char *text);
-extern void GfuiLabelSetColor(void *scr, int id, float *color);
+extern void GfuiLabelSetColor(void *scr, int id, const float *color);
 
 extern void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, int align);
 extern int  GfuiFontHeight(int font);
@@ -214,12 +214,13 @@ extern void GfuiEditboxSetString(void *scr, int id, const char *text);
 /* Scrolling lists */
 extern int GfuiScrollListCreate(void *scr, int font, int x, int y, int align,
 				int width, int height, int scrollbar, void *userDataOnSelect, tfuiCallback onSelect);
-extern int GfuiScrollListInsertElement(void *scr, int Id, char *element, int index, void *userData);
+extern int GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData);
 extern int GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta);
-extern char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
-extern char *GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData);
-extern char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
-extern char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
+extern const char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
+extern const char *GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData);
+extern const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
+extern const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
+extern void GfuiScrollListShowElement(void *scr, int Id, int index);
 
 /* scroll bars */
 extern int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
@@ -229,8 +230,8 @@ extern void GfuiScrollBarPosSet(void *scr, int id, int min, int max, int len, in
 extern int GfuiScrollBarPosGet(void *scr, int id);
 
 /* Images */
-extern int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, char *name);
-extern void GfuiStaticImageSet(void *scr, int id, char *name);
+extern int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name);
+extern void GfuiStaticImageSet(void *scr, int id, const char *name);
 
 /*****************************
  * Menu Management Interface *
