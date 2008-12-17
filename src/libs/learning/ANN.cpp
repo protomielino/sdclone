@@ -695,7 +695,7 @@ real ANN_Backpropagate(LISTITEM * p, real * d, bool use_eligibility, real TD)
 					delta = a * d[j];
 				}
 				c->dw += delta;
-				c->v = (1.0 - l->zeta)*c->v + (l->zeta)*fabs(delta);
+				c->v = (1.0f - l->zeta)*c->v + (l->zeta)*fabs(delta);
 				if (c->v < 0.01f) c->v = 0.01f;
 				c++;
 			}

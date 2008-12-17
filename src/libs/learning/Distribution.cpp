@@ -14,7 +14,7 @@
 #include <cmath>
 #include <learning/Distribution.h>
 
-static const double PI = 3.14159265358979323846;
+static const float PI = 3.1415927f;
 
 void setRandomSeed(unsigned int seed)
 {
@@ -36,16 +36,16 @@ real urandom(real min, real max)
 
 real UniformDistribution::generate()
 {
-	return m + (urandom()-0.5)*s;
+	return m + (urandom()-0.5f)*s;
 }
 
 real UniformDistribution::pdf(real x)
 {
 	real dx=x-m;
-	real sh=.5*s;
+	real sh=.5f*s;
 	if ((dx > -sh)&&(dx <= sh))
-		return 1.0/s;
-	return 0.0;
+		return 1.0f/s;
+	return 0.0f;
 }
 
 
@@ -56,23 +56,23 @@ real NormalDistribution::generate()
 	if(!cache) {
 		normal_x = urandom();
 		normal_y = urandom();
-		normal_rho = sqrt(-2.0 * log(1.0 - normal_y));
+		normal_rho = sqrt(-2.0f * log(1.0f - normal_y));
 		cache = true;
 	} else {
 		cache = false;
 	}
 	
 	if (cache) {
-		return normal_rho * cos(2.0 * PI * normal_x) * s + m;
+		return normal_rho * cos(2.0f * PI * normal_x) * s + m;
 	} else {
-		return normal_rho * sin(2.0 * PI * normal_x) * s + m;	
+		return normal_rho * sin(2.0f * PI * normal_x) * s + m;	
 	}
 }
 
 real NormalDistribution::pdf(real x)
 {
 	real d = (m-x)/s;
-	return exp(-0.5 * d*d)/(sqrt(2.0 * PI) * s);
+	return exp(-0.5f * d*d)/(sqrt(2.0f * PI) * s);
 }
 
 real LaplacianDistribution::generate()
@@ -86,19 +86,19 @@ real LaplacianDistribution::generate()
 		sgnx = -1.0;
 	}
 	
-	return m + sgnx * log(1.0 - absx) / l;
+	return m + sgnx * log(1.0f - absx) / l;
 
 }
 
 real LaplacianDistribution::pdf(real x)
 {
-	return 0.5*l * exp (-l*fabs(x-m));
+	return 0.5f*l * exp (-l*fabs(x-m));
 }
 
 real ExponentialDistribution::generate()
 {
 	real x = urandom();
-	return - log (1.0 - x) / l;
+	return - log (1.0f - x) / l;
 }
 
 real ExponentialDistribution::pdf(real x)
@@ -120,7 +120,7 @@ DiscreteDistribution::DiscreteDistribution(int N) {
 	n_outcomes = 0;
 	p = (real*) malloc (sizeof(real) * N);
 	n_outcomes = N;
-	real invN = 1.0/((real) N);
+	real invN = 1.0f/((real) N);
 	for (int i=0; i<N; i++) {
 		p[i] = invN;
 	}
