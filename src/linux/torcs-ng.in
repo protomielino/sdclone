@@ -67,10 +67,15 @@ then
 
 	# Run under GDB
 	-d) shift
-	    gdb  $LIBDIR/torcs-bin <<EOF
+	    gdb $LIBDIR/torcs-bin <<EOF
 r -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 bt
 EOF
+	    ;;
+
+	# Run under valgrind
+	-v) shift
+	    valgrind --leak-check=full $LIBDIR/torcs-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 	    ;;
 
 	-e) shift
@@ -85,6 +90,7 @@ EOF
 	    echo "   -k  keep untouched $LOCAL_CONF, even just after a make install"
 	    echo "   -l  list the dynamically linked libraries"
 	    echo "   -d  run under gdb and print stack trace on exit"
+	    echo "   -v  run under valgrind and print leak info on exit"
 	    echo "   -e  display the commands to issue when you want to run under gdb"
 	    ;;
 
