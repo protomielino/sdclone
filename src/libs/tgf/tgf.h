@@ -34,12 +34,14 @@
 #endif /* WIN32 */
 #include <stdlib.h>
 #ifdef WIN32
+#include <limits.h>
 #include <windows.h>
 #endif
 #include <stdarg.h>
 #include <cstring>
 #include <math.h>
 #include <osspec.h>
+#include <modinfo.h>
 
 
 /* typedef double tdble; */
@@ -50,10 +52,12 @@ typedef float tdble;
 
 extern void GfInit(void);
 
+/** Maximum between two values */
 #ifndef MAX
 #define MAX(x,y) ((x) > (y) ? (x) : (y))
 #endif
 
+/** Minimum between two values */
 #ifndef MIN
 #define MIN(x,y) ((x) < (y) ? (x) : (y))
 #endif
@@ -75,7 +79,7 @@ const tdble G = 9.80665f; /**< m/s/s */
 #define RPM2RADS(x) ((x)*.104719755)		/**< RPM to Radian/s conversion */
 #define RAD2DEG(x)  ((x)*(180.0/PI))		/**< Radian to degree conversion */
 #define DEG2RAD(x)  ((x)*(PI/180.0))		/**< Degree to radian conversion */
-#define FEET2M(x)   ((x)*0.304801)		/**< Feet to meter conversion */
+#define FEET2M(x)   ((x)*0.304801)			/**< Feet to meter conversion */
 #define SIGN(x)     ((x) < 0 ? -1.0 : 1.0)	/**< Sign of the expression */
 
 /** Angle normalization between 0 and 2 * PI */
@@ -96,11 +100,6 @@ do {						\
 #ifndef DIST
 /** Distance between two points */
 #define DIST(x1, y1, x2, y2) sqrt(((x1) - (x2)) * ((x1) - (x2)) + ((y1) - (y2)) * ((y1) - (y2)))
-#endif
-
-#ifndef MIN
-/** Minimum between two values */
-#define MIN(x,y) ((x) < (y) ? (x) : (y))
 #endif
 
 
@@ -161,6 +160,9 @@ typedef struct
 #define calloc _tgf_win_calloc
 #define realloc _tgf_win_realloc
 #define free _tgf_win_free
+#ifdef strdup
+#undef strdup
+#endif
 #define strdup _tgf_win_strdup
 #define _strdup _tgf_win_strdup
 extern void * _tgf_win_malloc(size_t size);
@@ -175,53 +177,18 @@ extern char * _tgf_win_strdup(const char * str);
  * Interface For Dynamic Modules *
  *********************************/
 
-/** initialisation of the function table 
-    @see	ModInfo
-*/
-typedef int (*tfModPrivInit)(int index, void *);
+/* Gaming Framework Id value for "no filtering on GFId" */
+#define GfIdAny		UINT_MAX
 
-/** Maximum number of interface in one DLL
-    @see	ModList
- */
-#define MAX_MOD_ITF 10
-
-/** Module information structure  */
-typedef struct ModInfo {
-    char		*name;		/**< name of the module (short) (NULL if no module) */
-    char		*desc;		/**< description of the module (can be long) */
-    tfModPrivInit	fctInit;	/**< init function */
-    unsigned int	gfId;		/**< supported framework version */
-    int			index;		/**< index if multiple interface in one dll */
-    int			prio;		/**< priority if needed */
-    int			magic;		/**< magic number for integrity check */
-} tModInfo;
-
-/* module init function interface */
-typedef int (*tfModInfo)(tModInfo *);	/* first function called in the module */
-
-/* module shutdown function interface */
-typedef int (*tfModShut)(void);	/* last function called in the module */
-
-
-/** list of module interfaces */
-typedef struct ModList {
-    tModInfo		modInfo[MAX_MOD_ITF];	/**< module info list for this dll */
-#ifdef _WIN32
-    HMODULE		handle;			/**< handle of loaded module */
-#else
-    void		*handle;		/**< handle of loaded module */
-#endif
-    char		*sopath;		/**< path name of file */
-    struct ModList	*next;			/**< next module in list */
-} tModList;
-
-
-extern int GfModLoad(unsigned int gfid, char *dllname, tModList **modlist);
-extern int GfModLoadDir(unsigned int gfid, char *dir, tModList **modlist);
+extern tModList *GfModIsInList(const char *dllname, tModList *modlist);
+extern void GfModAddInList(tModList *mod, tModList **modlist, int priosort);
+extern void GfModMoveToListHead(tModList *mod, tModList **modlist);
+extern int GfModLoad(unsigned int gfid, const char *dllname, tModList **modlist);
 extern int GfModUnloadList(tModList **modlist);
-extern int GfModInfo(unsigned int gfid, char *filename, tModList **modlist);
-extern int GfModInfoDir(unsigned int gfid, char *dir, int level, tModList **modlist);
+extern int GfModInfo(unsigned int gfid, const char *filename, tModList **modlist);
+extern int GfModInfoDir(unsigned int gfid, const char *dir, int level, tModList **modlist);
 extern int GfModFreeInfoList(tModList **modlist);
+
 
 /************************
  * Directory management *
@@ -326,6 +293,8 @@ extern int GfParmGetEltNb(void *handle, const char *path);
 extern int GfParmListSeekFirst(void *handle, const char *path);
 extern int GfParmListSeekNext(void *handle, const char *path);
 extern char *GfParmListGetCurEltName(void *handle, const char *path);
+extern int GfParmListRemoveElt(void *handle, const char *path, const char *key);
+extern int GfParmListRenameElt(void *handle, const char *path, const char *oldKey, const char *newKey);
 extern int GfParmListClean(void *handle, const char *path);
 
 /******************* 
@@ -335,6 +304,7 @@ extern int GfParmListClean(void *handle, const char *path);
 #ifdef WIN32
 #define GfTrace	printf
 #define GfFatal printf
+
 #else
 
 #define GfTrace printf
@@ -350,15 +320,17 @@ GfFatal(const char *fmt, ...)
     assert (0);
     exit (1);
 }
-#endif
+#endif //WIN32
 
 #define GfError printf
 
 #if !(_DEBUG || DEBUG)
-#ifdef WIN32
-#define GfOut printf
-#else
 
+#ifdef WIN32
+
+#define GfOut printf
+
+#else
 
 /** Console output
     @param	s	string to display

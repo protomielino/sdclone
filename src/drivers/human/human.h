@@ -2,7 +2,7 @@
 
     file        : human.h
     created     : Sat May 10 19:12:46 CEST 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: human.h,v 1.3 2003/11/08 16:37:17 torcs Exp $                                  
 
@@ -25,6 +25,8 @@
 
 #ifndef _HUMAN_H_
 #define _HUMAN_H_
+
+#include <vector>
 
 typedef struct HumanContext
 {
@@ -59,7 +61,7 @@ typedef struct HumanContext
 } tHumanContext;
 
 
-extern tHumanContext *HCtx[];
+extern std::vector<tHumanContext*> HCtx;
 
 extern int joyPresent;
 

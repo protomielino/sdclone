@@ -61,26 +61,48 @@ telemInit(int index, void *pt)
 
 /*
  * Function
- *	telemetry
+ *	moduleMaxInterfaces
  *
  * Description
- *	module entry point
+ *	Return the max number of interfaces of the module
  *
  * Parameters
- *	modinfo : administrative info to be filled by the module
+ *	None
  *
  * Return
- *	0  Ok
- *	-1 NOk
+ *	A positive or null integer, if no error occured 
+ *	-1, if any error occured 
  *
  * Remarks
- *	all the logical modules should be linked in a ring
+ *	MUST be called before moduleInitialize()
+ */
+extern "C" int moduleMaxInterfaces()
+{
+  return 1;
+}
+
+/*
+ * Function
+ *	moduleInitialize
+ *
+ * Description
+ *	Module entry point
+ *
+ * Parameters
+ *	modInfo : Module interfaces info array to fill-in
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
+ *
+ * Remarks
+ *	
  */
 extern "C" int
-telemetry(tModInfo *modInfo)
+moduleInitialize(tModInfo *modInfo)
 {
-    modInfo->name = strdup("telemetry");	/* name of the module (short) */
-    modInfo->desc = strdup("Telemetry module, used to store telemetry information");	/* description of the module (can be long) */
+    modInfo->name = "telemetry";	/* name of the module (short) */
+    modInfo->desc = "Telemetry module (to store telemetry information)";	/* description of the module (can be long) */
     modInfo->fctInit = telemInit;	/* init function */
     modInfo->gfId = TLM_IDENT;		/* always loaded  */
     modInfo->index = 0;
@@ -88,5 +110,25 @@ telemetry(tModInfo *modInfo)
     return 0;
 }
 
-
-
+/*
+ * Function
+ *	moduleTerminate
+ *
+ * Description
+ *	Module exit point
+ *
+ * Parameters
+ *	None
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
+ *
+ * Remarks
+ *	
+ */
+extern "C" int
+moduleTerminate()
+{
+    return 0;
+}

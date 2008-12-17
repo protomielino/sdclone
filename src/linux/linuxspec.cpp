@@ -18,10 +18,7 @@
  ***************************************************************************/
 
 
-#include <stdlib.h>
 #include <stddef.h>
-#include <stdio.h>
-#include <cstring>
 #include <sys/types.h>
 #include <dirent.h>
 #include <dlfcn.h>
@@ -31,71 +28,72 @@
 
 #include <tgf.h>
 
-#include "os.h"
+#include <os.h>
+
 
 /*
  * Function
  *	linuxModLoad
  *
  * Description
- *	
+ *	Load the module of given shared library file
+ *	(Load the shared library, then retrieve info about the module (tModInfo struct) ;
+ *	 the library is NOT unloaded).
  *
  * Parameters
- *	
+ *	sopath  (in)     path of the shared library file to load
+ *	modlist	(in/out) list of module interfaces description structure (may begin empty)
  *
  * Return
- *	
+ *	0	Ok
+ *	-1	error
  *
  * Remarks
+ *	* Nothing done if a module with equal shared library file path-name
+ *	  already exists in modlist (WARNING: if same shared library file, but with different 
+ *	  path-names, like with an absolute and a relative one, the module is loaded again !)
+ *	* The loaded module info structure is added at the HEAD of the list (**modlist)
+ *	  (not added, but only moved to HEAD, if a module with equal shared library file path-name
+ *	   already exists in modlist).
  *	
  */
 static int
 linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 {
-    tfModInfo		fModInfo;	/* init function of the modules */
-    void		*handle;	/* */
-    tModList		*curMod;
-    char		dname[256];	/* name of the funtions */
-    char		*lastSlash;
+    tSOHandle handle;
+    tModList* curMod;
     
-    curMod = (tModList*)calloc(1, sizeof(tModList));
-    
-    lastSlash = strrchr(sopath, '/');
-    if (lastSlash) {
-	strcpy(dname, lastSlash+1);
-    } else {
-	strcpy(dname, sopath);
+    /* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
+    if ((curMod = GfModIsInList(sopath, *modlist)) != 0)
+    {
+      GfOut("Module %s already loaded\n", sopath);
+      GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
+      return 0;
     }
-    dname[strlen(dname) - 3] = 0; /* cut .so */
+
+    GfOut("Loading linux module %s\n", sopath);
     
+    /* Load the shared library */
     handle = dlopen(sopath, RTLD_LAZY);
-    if (handle != NULL) {
-	if ((fModInfo = (tfModInfo)dlsym(handle, dname)) != NULL) {
-	    /* DLL loaded, init function exists, call it... */
-	    if (fModInfo(curMod->modInfo) == 0) {
-		GfOut(">>> %s >>>\n", sopath);
-		curMod->handle = handle;
-		curMod->sopath = strdup(sopath);
-		if (*modlist == NULL) {
-		    *modlist = curMod;
-		    curMod->next = curMod;
-		} else {
-		    curMod->next = (*modlist)->next;
-		    (*modlist)->next = curMod;
-		    *modlist = curMod;
-		}
-	    } else {
-		dlclose(handle);
-		printf("linuxModLoad: Module: %s not loaded\n", dname);
-		return -1;
-	    }
-	} else {
-	    printf("linuxModLoad: ...  %s\n", dlerror());
+    if (handle)
+    {
+	/* Initialize the module */
+        if (GfModInitialize(handle, sopath, GfIdAny, &curMod) == 0)
+	{
+	    if (curMod) /* Retained against GfIdAny */
+	        // Add the loaded module at the head of the list (no sort by priority).
+	        GfModAddInList(curMod, modlist, /* priosort */ 0);
+	}
+	else 
+	{
 	    dlclose(handle);
+	    GfError("linuxModLoad: Module init function failed %s\n", sopath);
 	    return -1;
 	}
-    } else {
-	printf("linuxModLoad: ...  %s\n", dlerror());
+    }
+    else
+    {
+	GfError("linuxModLoad: ...  %s\n", dlerror());
 	return -1;
     }
     
@@ -104,95 +102,79 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 
 /*
  * Function
- *	linuxModLoad
+ *	linuxModInfo
  *
  * Description
- *	
+ *	Retrieve info about the module of given shared library file,
+ *	(Load the shared library, then retrieve info about the module (tModInfo struct),
+ *	 and finally unload the library).
  *
  * Parameters
- *	
+ *	sopath  (in)     path of the shared library file to load
+ *	modlist	(in/out) list of module interfaces description structure (may begin empty)
  *
  * Return
- *	
+ *	0	Ok
+ *	-1	error
  *
  * Remarks
+ *	* Nothing done if a module with equal shared library file path-name
+ *	  already exists in modlist (WARNING: if same shared library file, but with different 
+ *	  path-names, like with an absolute and a relative one, the module is loaded again !)
+ *	* The loaded module info structure is added at the HEAD of the list (**modlist)
+ *	  (not added, but only moved to HEAD, if a module with equal shared library file path-name
+ *	   already exists in modlist).
  *	
  */
 static int
 linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 {
-    tfModInfo		fModInfo;	/* init function of the modules */
-    void		*handle;	/* */
-    tModList		*curMod;
-    char		dname[256];	/* name of the funtions */
-    char		*lastSlash;
-    int			i;
-    tModList		*cMod;
-    int			prio;
+    tSOHandle handle;
+    tModList *curMod;
+    int       infoSts = 0;
     
-    curMod = (tModList*)calloc(1, sizeof(tModList));
-    
-    lastSlash = strrchr(sopath, '/');
-    if (lastSlash) {
-	strcpy(dname, lastSlash+1);
-    } else {
-	strcpy(dname, sopath);
+    /* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
+    if ((curMod = GfModIsInList(sopath, *modlist)) != 0)
+    {
+      GfOut("Module %s already requested\n", sopath);
+      GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
+      return infoSts;
     }
-    dname[strlen(dname) - 3] = 0; /* cut .so */
-    
+
+    GfOut("Querying linux module %s\n", sopath);
+
+    /* Load the shared library */
     handle = dlopen(sopath, RTLD_LAZY);
-    if (handle != NULL) {
-	if ((fModInfo = (tfModInfo)dlsym(handle, dname)) != NULL) {
-	    /* DLL loaded, init function exists, call it... */
-	    if (fModInfo(curMod->modInfo) == 0) {
-		GfOut("Request Info for %s\n", sopath);
-		for (i = 0; i < MAX_MOD_ITF; i++) {
-		    if (curMod->modInfo[i].name) {
-			curMod->modInfo[i].name = strdup(curMod->modInfo[i].name);
-			curMod->modInfo[i].desc = strdup(curMod->modInfo[i].desc);
-		    }
-		}
-		curMod->handle = NULL;
-		curMod->sopath = strdup(sopath);
-		if (*modlist == NULL) {
-		    *modlist = curMod;
-		    curMod->next = curMod;
-		} else {
-		    /* sort by prio */
-		    prio = curMod->modInfo[0].prio;
-		    if (prio >= (*modlist)->modInfo[0].prio) {
-			curMod->next = (*modlist)->next;
-			(*modlist)->next = curMod;
-			*modlist = curMod;
-		    } else {
-			cMod = *modlist;
-			do {
-			    if (prio < cMod->next->modInfo[0].prio) {
-				curMod->next = cMod->next;
-				cMod->next = curMod;
-				break;
-			    }
-			    cMod = cMod->next;
-			} while (cMod != *modlist);
-		    }
-		}
-		dlclose(handle);
-	    } else {
-		dlclose(handle);
-		printf("linuxModInfo: Module: %s not loaded\n", dname);
-		return -1;
+    if (handle) 
+    {
+	/* Initialize the module */
+        if (GfModInitialize(handle, sopath, GfIdAny, &curMod) == 0)
+	{
+	    if (curMod) /* Retained against GfIdAny */
+	    {
+	        // Add the loaded module at the head of the list (no sort by priority).
+	        GfModAddInList(curMod, modlist, /* priosort */ 0);
 	    }
-	} else {
-	    printf("linuxModInfo: ...  %s\n", dlerror());
-	    dlclose(handle);
-	    return -1;
+
+	    /* Terminate the module */
+	    infoSts = GfModTerminate(handle, sopath);
+	} 
+	else 
+	{
+	    GfOut("linuxModInfo: Module init function failed %s\n", sopath);
+	    infoSts = -1;
 	}
-    } else {
-	printf("linuxModInfo: ...  %s\n", dlerror());
-	return -1;
+
+	/* Close the DLL whatever happened */
+	dlclose(handle);
+    } 
+    else 
+    {
+	GfError("linuxModInfo: ...  %s\n", dlerror());
+	infoSts = -1;
     }
     
-    return 0;
+    return infoSts;
 }
 
 /*
@@ -200,103 +182,88 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
  *	linuxModLoadDir
  *
  * Description
- *	Load the modules contained in a directory
+ *	Load the modules whose shared library files are contained in a given directory
+ *	(for each shared library, load it and retrieve info about the module (tModInfo struct) ;
+ *	 the shared library is NOT unloaded)
  *
  * Parameters
- *	dir	directory to search (relative)
- *	modlist	list of module description structure
+ *	gfid    (in)		id of the gaming framework of the modules to load,
+ *	dir     (in)		directory to search (relative)
+ *	modlist (in/out)	list of module description structure (may begin empty)
  *
  * Return
  *	>=0	number of modules loaded
  *	-1	error
  *
  * Remarks
+ *	The loaded module info structures are added in the list according to each module's priority
+ *	(NOT at the head of the list).
  *	
  */
 static int
 linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 {
-    tfModInfo		fModInfo;	/* init function of the modules */
-    char		dname[256];	/* name of the funtions */
     char		sopath[256];	/* path of the lib[x].so */
-    void		*handle;	/* */
-    DIR			*dp;		/* */
-    struct dirent	*ep;		/* */
+    tSOHandle 		handle;
+    DIR			*dp;
+    struct dirent	*ep;
     int			modnb;		/* number on loaded modules */
     tModList		*curMod;
-    tModList		*cMod;
-    int			prio;
     
     modnb = 0;
-    curMod = (tModList*)calloc(1, sizeof(tModList));
     
     /* open the current directory */
     dp = opendir(dir);
-    if (dp != NULL) {
+    if (dp) 
+    {
 	/* some files in it */
-	while ((ep = readdir (dp)) != 0) {
+	while ((ep = readdir (dp)) != 0) 
+	{
 	    if ((strlen(ep->d_name) > 4) &&
-		(strcmp(".so", ep->d_name+strlen(ep->d_name)-3) == 0)) { /* xxxx.so */
+		(strcmp(".so", ep->d_name+strlen(ep->d_name)-3) == 0)) /* xxxx.so */
+	    {
 		sprintf(sopath, "%s/%s", dir, ep->d_name);
-		strcpy(dname, ep->d_name);
-		dname[strlen(dname) - 3] = 0; /* cut .so */
-		handle = dlopen(sopath, RTLD_LAZY);
-		if (handle != NULL) {
-		    if ((fModInfo = (tfModInfo)dlsym(handle, dname)) != NULL) {
-			/* DLL loaded, init function exists, call it... */
-			if ((fModInfo(curMod->modInfo) == 0) && (curMod->modInfo[0].gfId == gfid)) {
-			    GfOut(">>> %s loaded >>>\n", sopath);
-			    modnb++;
-			    curMod->handle = handle;
-			    curMod->sopath = strdup(sopath);
-			    /* add the module in the list */
-			    if (*modlist == NULL) {
-				*modlist = curMod;
-				curMod->next = curMod;
-			    } else {
-				/* sort by prio */
-				prio = curMod->modInfo[0].prio;
-				if (prio >= (*modlist)->modInfo[0].prio) {
-				    curMod->next = (*modlist)->next;
-				    (*modlist)->next = curMod;
-				    *modlist = curMod;
-				} else {
-				    cMod = *modlist;
-				    do {
-					if (prio < cMod->next->modInfo[0].prio) {
-					    curMod->next = cMod->next;
-					    cMod->next = curMod;
-					    break;
-					}
-					cMod = cMod->next;
-				    } while (cMod != *modlist);
-				}
+		/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
+		if (!GfModIsInList(sopath, *modlist))
+		{
+		    /* Load the shared library */
+		    GfOut("Loading linux module %s\n", sopath);
+		    handle = dlopen(sopath, RTLD_LAZY);
+		    if (handle)
+		    {
+			/* Initialize the module */
+		        if (GfModInitialize(handle, sopath, gfid, &curMod) == 0)
+			{
+			    if (curMod) /* Retained against gfid */
+			    {
+			        modnb++;
+				GfModAddInList(curMod, modlist, /* priosort */ 1);
 			    }
-			    curMod = (tModList*)calloc(1, sizeof(tModList));
-			} else {
+			} 
+			else
+			{
 			    dlclose(handle);
-			    GfTrace("linuxModLoadDir: Module: %s not retained\n", dname);
+			    modnb = -1;
+			    break;
 			}
-		    } else {
-			printf("linuxModLoadDir: ...  %s [1]\n", dlerror());
-			dlclose(handle);
-			(void) closedir (dp);
-			return -1;
 		    }
-		} else {
-		    printf("linuxModLoadDir: ...  %s [2]\n", dlerror());
-		    (void) closedir (dp);
-		    return -1;
+		    else
+		    {
+		        GfOut("linuxModLoadDir: ...  %s\n", dlerror());
+			modnb = -1;
+			break;
+		    }
 		}
 	    }
 	}
-	(void) closedir (dp);
-    } else {
-	printf("linuxModLoadDir: ... Couldn't open the directory %s\n", dir);
-	return -1;
+	(void)closedir(dp);
+    }
+    else 
+    {
+	GfOut("linuxModLoadDir: ... Couldn't open the directory %s\n", dir);
+	modnb = -1;
     }
 
-    free(curMod);
     return modnb;
 }
 
@@ -305,114 +272,95 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
  *	linuxModInfoDir
  *
  * Description
- *	Load the modules contained in a directory and retrieve info
+ *	Retrieve info about the modules whose shared library files are contained in a given directory
+ *	(for each shared library, load it, retrieve info about the module (tModInfo struct),
+ *	 and finally unload the library).
  *
  * Parameters
- *	dir	directory to search (relative)
- *	modlist	list of module description structure
+ *	dir	(in)     directory to search (relative)
+ *	level   (in)     if 1, load any shared library contained in the subdirs of dir
+ *	                 and whose name is the same as the containing subdir (ex: bt/bt.so)
+ *	                 if 0, load any shared library contained in dir (ignore subdirs)
+ *	modlist	(in/out) list of module description structure (may begin empty)
  *
  * Return
  *	>=0	number of modules loaded
  *	-1	error
  *
  * Remarks
+ *	The loaded module info structures are added in the list according to each module's priority
+ *	(NOT at the head of the list).
  *	
  */
 static int
 linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **modlist)
 {
-    tfModInfo		fModInfo;	/* init function of the modules */
-    char		dname[256];	/* name of the funtions */
-    char		sopath[256];	/* path of the lib[x].so */
-    void		*handle;	/* */
-    DIR			*dp;		/* */
-    struct dirent	*ep;		/* */
-    int			modnb;		/* number on loaded modules */
+    char		 sopath[256];	/* path of the lib[x].so */
+    tSOHandle		 handle;
+    DIR			*dp;
+    struct dirent	*ep;
+    int			 modnb;		/* number on loaded modules */
     tModList		*curMod;
-    int			i;
-    tModList		*cMod;
-    int			prio;
     
     modnb = 0;
-    curMod = (tModList*)calloc(1, sizeof(tModList));
     
     /* open the current directory */
     dp = opendir(dir);
-    if (dp != NULL) {
+    if (dp)
+    {
 	/* some files in it */
-	while ((ep = readdir (dp)) != 0) {
+	while ((ep = readdir (dp)) != 0) 
+	{
 	    if (((strlen(ep->d_name) > 4) && 
-		 (strcmp(".so", ep->d_name+strlen(ep->d_name)-3) == 0)) || 
-		((level == 1) && (ep->d_name[0] != '.'))) { /* xxxx.so */
-		if (level == 1) {
+		 (strcmp(".so", ep->d_name+strlen(ep->d_name)-3) == 0)) /* xxxx.so */
+		|| ((level == 1) && (ep->d_name[0] != '.')))
+	    {
+	        if (level == 1)
 		    sprintf(sopath, "%s/%s/%s.so", dir, ep->d_name, ep->d_name);
-		    strcpy(dname, ep->d_name);
-		} else {
+		else
 		    sprintf(sopath, "%s/%s", dir, ep->d_name);
-		    strcpy(dname, ep->d_name);
-		    dname[strlen(dname) - 3] = 0; /* cut .so */
-		}
-		handle = dlopen(sopath, RTLD_LAZY);
-		if (handle != NULL) {
-		    if ((fModInfo = (tfModInfo)dlsym(handle, dname)) != NULL) {
-			GfOut("Request Info for %s\n", sopath);
-			/* DLL loaded, init function exists, call it... */
-			if (fModInfo(curMod->modInfo) == 0) {
-			    modnb++;
-			    for (i = 0; i < MAX_MOD_ITF; i++) {
-					if (curMod->modInfo[i].name) {
-						curMod->modInfo[i].name = strdup(curMod->modInfo[i].name);
-						curMod->modInfo[i].desc = strdup(curMod->modInfo[i].desc);
-					}
-				}
-				curMod->handle = NULL;
-				curMod->sopath = strdup(sopath);
 
-				/* add the module in the list */
-				if (*modlist == NULL) {
-					*modlist = curMod;
-					curMod->next = curMod;
-			    } else {
-					/* sort by prio */
-					prio = curMod->modInfo[0].prio;
-					if (prio >= (*modlist)->modInfo[0].prio) {
-						curMod->next = (*modlist)->next;
-						(*modlist)->next = curMod;
-						*modlist = curMod;
-					} else {
-						cMod = *modlist;
-						do {
-							if (prio < cMod->next->modInfo[0].prio) {
-								curMod->next = cMod->next;
-								cMod->next = curMod;
-								break;
-							}
-							cMod = cMod->next;
-						} while (cMod != *modlist);
-					}
+		/* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
+		if (!GfModIsInList(sopath, *modlist))
+		{
+		    /* Load the shared library */
+		    GfOut("Querying linux module %s\n", sopath);
+		    handle = dlopen(sopath, RTLD_LAZY);
+		    if (handle)
+		    {
+			/* Initialize the module */
+		        GfOut("Request info for %s\n", sopath);
+		        if (GfModInitialize(handle, sopath, GfIdAny, &curMod) == 0)
+			{
+			    if (curMod) /* Retained against gfid */
+			    {
+				/* Get associated info */
+			        modnb++;
+				GfModAddInList(curMod, modlist, /* priosort */ 1);
 			    }
-			    dlclose(handle);
-			    curMod = (tModList*)calloc(1, sizeof(tModList));
-			} else {
-			    dlclose(handle);
-			    GfTrace("linuxModInfoDir: Module: %s not retained\n", dname);
+
+			    /* Terminate the module */
+			    GfModTerminate(handle, sopath);
 			}
-		    } else {
-			printf("linuxModInfoDir: ...  %s [1]\n", dlerror());
+
+			/* Close the shared library */
 			dlclose(handle);
+		    } 
+		    else 
+		    {
+		        GfOut("linuxModInfoDir: ...  %s\n", dlerror());
 		    }
-		} else {
-		    printf("linuxModInfoDir: ...  %s [2]\n", dlerror());
 		}
 	    }
 	}
-	(void) closedir (dp);
-    } else {
-	printf("linuxModInfoDir: ... Couldn't open the directory %s.\n", dir);
+	(void)closedir(dp);
+    } 
+    else 
+    {
+	GfOut("linuxModInfoDir: ... Couldn't open the directory %s.\n", dir);
 	return -1;
     }
 
-    free(curMod);
     return modnb;
 }
 
@@ -424,7 +372,7 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
  *	Unload the modules of a list
  *
  * Parameters
- *	modlist	list of modules to unload
+ *	modlist	(in/out) list of modules to unload
  *
  * Return
  *	0	Ok
@@ -438,83 +386,38 @@ linuxModUnloadList(tModList **modlist)
 {
     tModList		*curMod;
     tModList		*nextMod;
-    tfModShut		fModShut;
-    char		dname[256];	/* name of the funtions */
-    char		*lastSlash;
+    int                 termSts;
+    int                 unloadSts = 0;
 
     curMod = *modlist;
-    if (curMod == 0) {
+    if (curMod == 0)
 	return 0;
-    }
-    nextMod = curMod->next;
-    do {
-	curMod = nextMod;
+
+    do 
+    {
 	nextMod = curMod->next;
-	GfOut("<<< %s unloaded <<<\n", curMod->sopath);
-	lastSlash = strrchr(curMod->sopath, '/');
-	if (lastSlash) {
-	    strcpy(dname, lastSlash+1);
-	} else {
-	    strcpy(dname, curMod->sopath);
-	}
-	strcpy(&dname[strlen(dname) - 3], "Shut"); /* cut .so */
-	if ((fModShut = (tfModShut)dlsym(curMod->handle, dname)) != NULL) {
-	    GfOut("Call %s\n", dname);
-	    fModShut();
-	}
+
+	/* Terminate the module */
+	termSts = GfModTerminate(curMod->handle, curMod->sopath);
+	if (termSts)
+	    unloadSts = termSts;
 
 	// Comment out for valgrind runs, be aware that the driving with the keyboard does
 	// just work to first time this way.
 	dlclose(curMod->handle);
+	GfOut("Unloaded linux module %s\n", curMod->sopath);
 
+	GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
 	free(curMod->sopath);
 	free(curMod);
-    } while (curMod != *modlist);
-    
-    *modlist = (tModList *)NULL;
-    return 0;
-}
 
-/*
- * Function
- *	linuxModFreeInfoList
- *
- * Description
- *	
- *
- * Parameters
- *	modlist	list of info to free
- *
- * Return
- *	0	Ok
- *	-1	Error
- *
- * Remarks
- *	
- */
-static int
-linuxModFreeInfoList(tModList **modlist)
-{
-    tModList		*curMod;
-    tModList		*nextMod;
-    int			i;
-    
-    curMod = *modlist;
-    nextMod = curMod->next;
-    do {
 	curMod = nextMod;
-	for (i = 0; i < MAX_MOD_ITF; i++) {
-	    if (curMod->modInfo[i].name) {
-		free(curMod->modInfo[i].name);
-		free(curMod->modInfo[i].desc);
-	    }
-	}
-	free(curMod->sopath);
-	free(curMod);
-    } while (curMod != *modlist);
+    }
+    while (curMod != *modlist);
     
     *modlist = (tModList *)NULL;
-    return 0;
+
+    return unloadSts;
 }
 
 /*
@@ -679,7 +582,6 @@ LinuxSpecInit(void)
     GfOs.modUnloadList = linuxModUnloadList;
     GfOs.modInfo = linuxModInfo;
     GfOs.modInfoDir = linuxModInfoDir;
-    GfOs.modFreeInfoList = linuxModFreeInfoList;
     GfOs.dirGetList = linuxDirGetList;
     GfOs.dirGetListFiltered = linuxDirGetListFiltered;
     GfOs.timeClock = linuxTimeClock;

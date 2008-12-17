@@ -41,6 +41,7 @@
 #include <raceman.h>
 #include <robottools.h>
 #include <robot.h>
+#include <modinfo.h>
 
 #include <playerpref.h>
 #include "pref.h"
@@ -70,7 +71,7 @@ static tCtrlJoyInfo	*joyInfo = NULL;
 static tCtrlMouseInfo	*mouseInfo = NULL;
 static int		masterPlayer = -1;
 
-tHumanContext *HCtx[10] = {0};
+std::vector<tHumanContext*> HCtx;
 
 static int speedLimiter	= 0;
 static tdble Vtarget;
@@ -93,6 +94,12 @@ static double lastKeyUpdate = -10.0;
 
 static int	firstTime = 0;
 
+// Human drivers names.
+static std::vector<char*> VecNames;
+
+// Number of human drivers (initialized by moduleMaxInterfaces).
+static int NbDrivers = -1;
+
 #ifdef _WIN32
 /* should be present in mswindows */
 BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
@@ -107,7 +114,11 @@ shutdown(int index)
 	//static int	firstTime = 1;
 	int		idx = index - 1;
 
+	free (VecNames[idx]);
+	VecNames[idx] = 0;
+
 	free (HCtx[idx]);
+	HCtx[idx] = 0;
 
 	if (firstTime) {
 		//GfParmReleaseHandle(DrvInfo);
@@ -161,6 +172,8 @@ InitFuncPt(int index, void *pt)
 
 
 	/* Allocate a new context for that player */
+	if ((int)HCtx.size() < idx+1)
+	  HCtx.resize(idx+1);
 	HCtx[idx] = (tHumanContext *) calloc (1, sizeof (tHumanContext));
 
 	HCtx[idx]->ABS = 1.0;
@@ -186,13 +199,128 @@ InitFuncPt(int index, void *pt)
 
 /*
  * Function
- *	human
+ *	moduleMaxInterfaces
  *
  * Description
- *	DLL entry point (general to all types of modules)
+ *	Determine the number of human drivers
+ *
+ * Parameters
+ *	None
+ *
+ * Return
+ *	A positive or null integer, if no error occured 
+ *	-1, if any error occured 
+ *
+ * Remarks
+ *	MUST be called before moduleInitialize()
+ */
+
+extern "C" int moduleMaxInterfaces()
+{
+    void *drvInfo;
+    const char *driver;
+
+    // Open and load the human drivers params file
+    sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+    drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+
+    NbDrivers = -1;
+    if (drvInfo)
+    {
+	// Count the number of human drivers registered in the params 
+	do
+	{
+	    NbDrivers++;
+	    sprintf(sstring, "Robots/index/%d", NbDrivers+1);
+	    driver = GfParmGetStr(drvInfo, sstring, "name", "");
+	}
+	while (strlen(driver) > 0);
+
+	// Release in case we got it.
+	GfParmReleaseHandle(drvInfo);
+    }
+
+    return NbDrivers;
+}
+
+/*
+ * Function
+ *	moduleInitialize
+ *
+ * Description
+ *	module entry point
  *
  * Parameters
  *	modInfo	administrative info on module
+ *
+ * Return
+ *	0 if no error occured
+ *	-1, if any error occured 
+ *
+ * Remarks
+ *
+ */
+
+extern "C" int moduleInitialize(tModInfo *modInfo)
+{
+    int i;
+    void *drvInfo;
+    const char *driver;
+    
+    if (NbDrivers <= 0)
+    {
+	GfOut("human : No human driver registered, or moduleMaxInterfaces() was not called (NbDrivers=%d)\n", NbDrivers);
+	return -1;
+    }
+
+    // Reset module interfaces info.
+    memset(modInfo, 0, NbDrivers*sizeof(tModInfo));
+    
+    /* Clear the local driver name vector */
+    for (i = 0; i < (int)VecNames.size(); i++)
+	if (VecNames[i])
+	    free(VecNames[i]);
+    VecNames.clear();
+
+    // Open and load the human drivers params file
+    sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+    drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+
+    if (drvInfo)
+    {
+	// Fill the module interfaces info : each driver is associated to 1 interface.
+	for (i = 0; i < NbDrivers; i++) 
+	{
+	    sprintf(sstring, "Robots/index/%d", i+1);
+	    driver = GfParmGetStr(drvInfo, sstring, "name", "");
+	    if (strlen(driver) == 0)
+		break;
+
+	    VecNames.push_back(strdup(driver)); // Don't rely on GfParm allocated data
+	    modInfo->name    = VecNames[i];	/* name of the module (short) */
+	    modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
+	    modInfo->fctInit = InitFuncPt;	/* init function */
+	    modInfo->gfId    = ROB_IDENT;	/* supported framework version */
+	    modInfo->index   = i+1;
+	    modInfo++;
+	}
+	// Release in case we got it.
+	GfParmReleaseHandle(drvInfo);
+    }
+    
+    return 0;
+}
+
+
+/*
+ * Function
+ *	moduleTerminate
+ *
+ * Description
+ *	Module exit point
+ *
+ * Parameters
+ *	None
  *
  * Return
  *	0
@@ -201,43 +329,15 @@ InitFuncPt(int index, void *pt)
  *
  */
 
-#define MAXNAMELEN 100
-
-static char names[10][MAXNAMELEN];
-
-extern "C" int
-human(tModInfo *modInfo)
+extern "C" int moduleTerminate()
 {
-	int i;
-	const char *driver;
+    /* Free local copy of driver names if not already done */
+    for (unsigned i = 0; i < VecNames.size(); i++)
+	if (VecNames[i])
+	    free(VecNames[i]);
 
-	memset(modInfo, 0, 10*sizeof(tModInfo));
-
-	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
-	void *DrvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-	if (DrvInfo != NULL) {
-		for (i = 0; i < 10; i++) {
-			sprintf(sstring, "Robots/index/%d", i+1);
-			driver = GfParmGetStr(DrvInfo, sstring, "name", "");
-			if (strlen(driver) == 0) {
-				break;
-			}
-			strncpy(names[i], driver, MAXNAMELEN);
-			modInfo->name    = names[i];	/* name of the module (short) */
-			modInfo->desc    = "Joystick controllable driver";	/* description of the module (can be long) */
-			modInfo->fctInit = InitFuncPt;	/* init function */
-			modInfo->gfId    = ROB_IDENT;	/* supported framework version */
-			modInfo->index   = i+1;
-			modInfo++;
-		}
-		// Just release in case we got it.
-		GfParmReleaseHandle(DrvInfo);
-	}
-
-	return 0;
+    return 0;
 }
-
 
 /*
  * Function
@@ -406,7 +506,7 @@ updateKeys(void)
 	int idx;
 	tControlCmd *cmd;
 
-	for (idx = 0; idx < 10; idx++) {
+	for (idx = 0; idx < (int)HCtx.size(); idx++) {
 		if (HCtx[idx]) {
 			cmd = HCtx[idx]->CmdControl;
 			for (i = 0; i < nbCmdControl; i++) {

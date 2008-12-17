@@ -1,5 +1,5 @@
 ;
-; torcs.def
+; client.def
 ;
 
 LIBRARY
@@ -80,6 +80,7 @@ EXPORTS
 	GfuiScrollListExtractElement
 	GfuiScrollListGetSelectedElement
 	GfuiScrollListGetElement
+	GfuiScrollListShowElement
 	GfuiScrollBarCreate
 	GfuiScrollBarPosSet
 	GfuiScrollBarPosGet
@@ -89,7 +90,7 @@ EXPORTS
 	GfuiMenuBackQuitButtonCreate
 	gfuiDrawImage
 	gfuiReleaseImage
-    	GfuiStaticImageCreate
+  GfuiStaticImageCreate
 	GfuiStaticImageSet
 	GfuiScreenIsActive
 	GfuiHookRelease
@@ -109,5 +110,6 @@ EXPORTS
 	GfctrlMouseGetCurrent
 	GfctrlJoyGetCurrent
 	GfuiGlutExtensionSupported
-	ssggraph
-	GfuiScreenSleep
+	ssggraph_moduleInitialize
+	ssggraph_moduleMaxInterfaces
+	ssggraph_moduleTerminate

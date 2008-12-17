@@ -22,8 +22,10 @@ EXPORTS
 	GfParmWriteFile
 	GfParmGetName
 	GfParmGetStr
+	GfParmGetStrNC
 	GetDataDir
 	GfParmGetCurStr
+	GfParmGetCurStrNC
 	GfParmSetStr
 	GfParmSetCurStr
 	GfParmGetNum
@@ -42,6 +44,8 @@ EXPORTS
 	GfParmListSeekNext
 	GfParmListGetCurEltName
 	GfParmListClean
+	GfParmListRenameElt
+	GfParmListRemoveElt
 	GfParmGetFileName
 	GfTime2Str
 	GfTimeClock
@@ -66,5 +70,12 @@ EXPORTS
 	GetSingleTextureMode
 	GfNearestPow2
 	GfCreateDir
-	GfParmGetStrNC
-	GfParmGetCurStrNC
+	GfModIsInList
+	GfModAddInList
+	GfModMoveToListHead
+	GfModInfoAllocate
+	GfModInfoDuplicate
+	GfModInfoFree
+	GfModInfoFreeNC
+	GfModInitialize
+	GfModTerminate

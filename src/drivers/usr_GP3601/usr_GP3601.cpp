@@ -55,21 +55,27 @@ static int InitFuncPt(int index, void *pt);
 static void endRace(int index, tCarElt *car, tSituation *s);
 
 
-// Module entry point.
-extern "C" int usr_GP3601(tModInfo *modInfo)
+// Module entry point (new fixed name scheme).
+extern "C" int moduleMaxInterfaces()
+{
+    return NBBOTS;
+}
+
+// Module entry point (new fixed name scheme).
+extern "C" int moduleInitialize(tModInfo *modInfo)
 {
 	int i;
 	
 	// Clear all structures.
-	memset(modInfo, 0, 10*sizeof(tModInfo));
+	memset(modInfo, 0, NBBOTS*sizeof(tModInfo));
 	memset(&DriverNames[0], 0, DRIVERLEN * NBBOTS);
 
 	for (i = 0; i < NBBOTS; i++) {
-		modInfo[i].name    = Default_botname[i];  			// name of the module (short).
-		modInfo[i].desc    = botdesc[i];			// Description of the module (can be long).
-		modInfo[i].fctInit = InitFuncPt;			// Init function.
-		modInfo[i].gfId    = ROB_IDENT;				// Supported framework version.
-		modInfo[i].index   = i+1;						// Indices from 0 to 9.
+		modInfo[i].name    = Default_botname[i]; // name of the module (short).
+		modInfo[i].desc    = botdesc[i];	 // Description of the module (can be long).
+		modInfo[i].fctInit = InitFuncPt;	 // Init function.
+		modInfo[i].gfId    = ROB_IDENT;		 // Supported framework version.
+		modInfo[i].index   = i+1;		 // Indices from 0 to 9.
 	}
 
 	char path[256];
@@ -92,9 +98,31 @@ extern "C" int usr_GP3601(tModInfo *modInfo)
 		}
 	}
 
+	GfOut("Initialized usr_GP3601\n");
+	    
 	return 0;
 }
 
+
+// Module entry point (Torcs backward compatibility scheme).
+extern "C" int usr_GP3601(tModInfo *modInfo)
+{
+    return moduleInitialize(modInfo);
+}
+
+// Module exit point (new fixed name scheme).
+extern "C" int moduleTerminate()
+{
+    GfOut("Terminated usr_GP3601\n");
+	
+    return 0;
+}
+
+// Module exit point (Torcs backward compatibility scheme).
+extern "C" int usr_GP3601Shut()
+{
+    return moduleTerminate();
+}
 
 // Module interface initialization.
 static int InitFuncPt(int index, void *pt)

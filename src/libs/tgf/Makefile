@@ -27,12 +27,13 @@ SOURCES   = 	module.cpp \
 		trace.cpp \
 		directory.cpp \
 		profiler.cpp \
-		hash.cpp
+		hash.cpp \
+		modinfo.cpp
 
 
 EXPDIR  = include
 
-EXPORTS = tgf.h os.h
+EXPORTS = tgf.h os.h modinfo.h
 
 SHIPDIR = config
 

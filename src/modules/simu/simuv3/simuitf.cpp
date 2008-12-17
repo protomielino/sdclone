@@ -63,30 +63,73 @@ simuInit(int /* index */, void *pt)
 
 /*
  * Function
- *	simuv3
+ *	moduleMaxInterfaces
  *
  * Description
- *	DLL entry point
+ *	Return the max number of interfaces of the module
  *
  * Parameters
- *	
+ *	None
  *
  * Return
- *	
+ *	A positive or null integer, if no error occured 
+ *	-1, if any error occured 
+ *
+ * Remarks
+ *	MUST be called before moduleInitialize()
+ */
+extern "C" int moduleMaxInterfaces()
+{
+  return 1;
+}
+
+/*
+ * Function
+ *	moduleInitialize
+ *
+ * Description
+ *	Module entry point
+ *
+ * Parameters
+ *	modInfo : Module interfaces info array to fill-in
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
  *
  * Remarks
  *	
  */
 extern "C" int
-simuv3(tModInfo *modInfo)
+moduleInitialize(tModInfo *modInfo)
 {
-    modInfo->name = strdup("simu");		/* name of the module (short) */
-    modInfo->desc = strdup("Simulation Engine V3.0");	/* description of the module (can be long) */
+    modInfo->name = "simu";		/* name of the module (short) */
+    modInfo->desc = "Simulation Engine V3.0";	/* description of the module (can be long) */
     modInfo->fctInit = simuInit;	/* init function */
     modInfo->gfId = SIM_IDENT;		/* ident */
     modInfo->index = 0;
     return 0;
 }
 
-
-
+/*
+ * Function
+ *	moduleTerminate
+ *
+ * Description
+ *	Module exit point
+ *
+ * Parameters
+ *	None
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
+ *
+ * Remarks
+ *	
+ */
+extern "C" int
+moduleTerminate()
+{
+    return 0;
+}

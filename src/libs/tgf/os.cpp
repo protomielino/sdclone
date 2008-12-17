@@ -24,16 +24,13 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <tgf.h>
+#include "tgf.h"
 #include "os.h"
 
 
 /*
- * Globals definitions
+ * Globals initializations
  */
-#ifdef WIN32
-__declspec(dllexport)
-#endif // WIN32
 tGfOs GfOs = {0};
 
 /** Init of the module */

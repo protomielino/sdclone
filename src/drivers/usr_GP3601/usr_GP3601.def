@@ -15,5 +15,7 @@ LIBRARY	usr_GP3601
 SECTIONS .data READ WRITE
 
 EXPORTS
-	usr_GP3601
+	moduleMaxInterfaces
+	moduleInitialize
+	moduleTerminate
 

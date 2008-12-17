@@ -36,6 +36,173 @@ extern void gfParamInit(void);
 extern void gfRlstInit(void);
 
 
+/*
+ * Function
+ *	GfModIsInList
+ *
+ * Description
+ *	Check if a module with given shared library file is present the given list
+ *      WARNING: Only compare given sopath to stored ones, NOT shared library files identity
+ *               (so, avoid mixing relative and absolute path-names in modlist).
+ *
+ * Parameters
+ *	sopath  path-name of the shared library file to check
+ *	modlist	list of module interfaces description structure
+ *
+ * Return
+ *	The address of the matching modlist item if found, 0 otherwise.
+ *
+ * Remarks
+ *	
+ */
+tModList *GfModIsInList(const char *sopath, tModList *modlist)
+{
+    tModList		*curMod;
+    tModList		*nextMod;
+
+    curMod = modlist;
+    if (curMod == 0) {
+	return 0;
+    }
+    nextMod = curMod->next;
+    do {
+	curMod = nextMod;
+	nextMod = curMod->next;
+	if (!strcmp(sopath, curMod->sopath))
+	  return curMod;
+    } while (curMod != modlist);
+    
+    return 0;
+}
+
+/*
+ * Function
+ *	GfModAddInList
+ *
+ * Description
+ *	Add the given module in the given list
+ *
+ * Parameters
+ *	mod      module interfaces description structure
+ *	modlist	 list of module interfaces description structure
+ *	priosort flag to sort list by prio
+ *
+ * Return
+ *	Nothing
+ *
+ * Remarks
+ *	
+ */
+void GfModAddInList(tModList *mod, tModList **modlist, int priosort)
+{
+    tModList		*curMod;
+    int			prio;
+
+    if (*modlist == 0) {
+        *modlist = mod;
+	mod->next = mod;
+    } else {
+        /* sort by prio if specified, otherwise put at list head */
+        prio = mod->modInfo[0].prio;
+	if (!priosort || prio >= (*modlist)->modInfo[0].prio) {
+	    mod->next = (*modlist)->next;
+	    (*modlist)->next = mod;
+	    *modlist = mod;
+	} else {
+	    curMod = *modlist;
+	    do {
+	        if (prio < curMod->next->modInfo[0].prio) {
+		    mod->next = curMod->next;
+		    curMod->next = mod;
+		    break;
+		}
+		curMod = curMod->next;
+	    } while (curMod != *modlist);
+	}
+    }
+}
+
+/*
+ * Function
+ *	GfModMoveToListHead
+ *
+ * Description
+ *	Move the given module to the head of the given list
+ *
+ * Parameters
+ *	mod      module interfaces description structure to move
+ *	modlist	 list of module interfaces description structure
+ *
+ * Return
+ *	Nothing
+ *
+ * Remarks
+ *	Nothing done if mod or *modlist is NULL
+ *	
+ */
+void GfModMoveToListHead(tModList *mod, tModList **modlist)
+{
+    tModList *curMod;
+
+    if (mod && *modlist) {
+
+        // Search for mod in modlist
+        curMod = *modlist;
+	do {
+	    // If found, make *modlist point on it and return
+	    if (curMod == mod) {
+	      *modlist = mod;
+	      break;
+	    }
+	    curMod = curMod->next;
+	} while (curMod != *modlist);
+    }
+}
+
+/*
+* Function
+*	GfModFreeInfoList
+*
+* Description
+*	Free a modules info list without unloading the modules
+*
+* Parameters
+*	modlist	(in/out) list of info to free
+*
+* Return
+*	0	Ok
+*	-1	Error
+*
+* Remarks
+*	
+*/
+int GfModFreeInfoList(tModList **modlist)
+{
+    tModList	*curMod;
+    tModList	*nextMod;
+    
+    curMod = *modlist;
+    if (curMod == 0)
+	return 0;
+
+    do 
+    {
+	nextMod = curMod->next;
+
+	GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
+	free(curMod->sopath);
+	free(curMod);
+
+	curMod = nextMod;
+    }
+    while (curMod != *modlist);
+    
+    *modlist = 0;
+
+    return 0;
+}
+
+
 #ifdef WIN32
 #include <crtdbg.h>
 #include <assert.h>
@@ -208,7 +375,7 @@ char * GfGetTimeStr(void)
     @param	sec	Time to convert
     @param	sgn	Flag to indicate if the sign (+) is to be displayed for positive values of time.
     @return	Time string.
-    @warning	The returned cstringas to be free by the caller.
+    @warning	The returned string has to be freed by the caller.
  */
 char * GfTime2Str(tdble sec, int sgn)
 {
@@ -259,6 +426,7 @@ char * GetLocalDir(void)
 void SetLocalDir(const char *buf)
 {
 	localDir = strdup(buf);
+	GfOut("LocalDir='%s'\n", localDir);
 }
 
 
@@ -271,6 +439,7 @@ char * GetLibDir(void)
 void SetLibDir(const char *buf)
 {
 	libDir = strdup(buf);
+	GfOut("LibDir='%s'\n", libDir);
 }
 
 
@@ -283,6 +452,7 @@ char * GetDataDir(void)
 void SetDataDir(const char *buf)
 {
 	dataDir = strdup(buf);
+	GfOut("DataDir='%s'\n", dataDir);
 }
 
 

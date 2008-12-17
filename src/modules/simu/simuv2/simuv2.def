@@ -7,5 +7,7 @@ LIBRARY
 SECTIONS .data READ WRITE
 
 EXPORTS
-	simuv2
+	moduleMaxInterfaces
+	moduleInitialize
+	moduleTerminate
 

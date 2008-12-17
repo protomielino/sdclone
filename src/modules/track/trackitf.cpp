@@ -67,25 +67,48 @@ trackInit(int /* index */, void *pt)
 
 /*
  * Function
- *	trackv1
+ *	moduleMaxInterfaces
  *
  * Description
- *	
+ *	Return the max number of interfaces of the module
  *
  * Parameters
- *	
+ *	None
  *
  * Return
- *	
+ *	A positive or null integer, if no error occured 
+ *	-1, if any error occured 
+ *
+ * Remarks
+ *	MUST be called before moduleInitialize()
+ */
+extern "C" int moduleMaxInterfaces()
+{
+  return 1;
+}
+
+/*
+ * Function
+ *	moduleInitialize
+ *
+ * Description
+ *	Module entry point
+ *
+ * Parameters
+ *	modInfo : Module interfaces info array to fill-in
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
  *
  * Remarks
  *	
  */
 extern "C" int
-track(tModInfo *modInfo)
+moduleInitialize(tModInfo *modInfo)
 {
-    modInfo->name = strdup("trackv1");		/* name of the module (short) */
-    modInfo->desc = strdup("Track V1.0");	/* description of the module (can be long) */
+    modInfo->name = "trackv1";		/* name of the module (short) */
+    modInfo->desc = "Track V1.0";	/* description of the module (can be long) */
     modInfo->fctInit = trackInit;	/* init function */
     modInfo->gfId = TRK_IDENT;		/* always loaded  */
     modInfo->index = 0;
@@ -93,5 +116,27 @@ track(tModInfo *modInfo)
     return 0;
 }
 
+/*
+ * Function
+ *	moduleTerminate
+ *
+ * Description
+ *	Module exit point
+ *
+ * Parameters
+ *	None
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
+ *
+ * Remarks
+ *	
+ */
+extern "C" int
+moduleTerminate()
+{
+    return 0;
+}
 
 

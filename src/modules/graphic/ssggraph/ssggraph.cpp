@@ -47,24 +47,88 @@ graphInit(int /* idx */, void *pt)
 
 /*
  * Function
- *	ssggraph
+ *	moduleMaxInterfaces
  *
  * Description
- *	module entry point
+ *	Return the max number of interfaces of the module
  *
  * Parameters
- *	
+ *	None
  *
  * Return
+ *	A positive or null integer, if no error occured 
+ *	-1, if any error occured 
+ *
+ * Remarks
+ *	MUST be called before moduleInitialize()
+ */
+// We need a unique global name for static link under Windows.
+#ifdef WIN32
+extern "C" int ssggraph_moduleMaxInterfaces()
+#else
+extern "C" int moduleMaxInterfaces()
+#endif
+{
+  return 1;
+}
+
+/*
+ * Function
+ *	moduleInitialize
+ *
+ * Description
+ *	Module entry point
+ *
+ * Parameters
+ *	modInfo : Module interfaces info array to fill-in
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
+ *
+ * Remarks
  *	
  */
-extern "C" int
-ssggraph(tModInfo *modInfo)
+// We need a unique global name for static link under Windows.
+#ifdef WIN32
+extern "C" int ssggraph_moduleInitialize(tModInfo *modInfo)
+#else
+extern "C" int moduleInitialize(tModInfo *modInfo)
+#endif
 {
-    modInfo->name = strdup("ssggraph");		        		/* name of the module (short) */
-    modInfo->desc = strdup("The Graphic Library using PLIB ssg");	/* description of the module (can be long) */
+    modInfo->name = "ssggraph";		        		/* name of the module (short) */
+    modInfo->desc = "The Graphic Library using PLIB ssg";	/* description of the module (can be long) */
     modInfo->fctInit = graphInit;				/* init function */
     modInfo->gfId = 1;						/* v 1  */
+    modInfo->index = 0;
 
     return 0;
 }
+
+/*
+ * Function
+ *	moduleTerminate
+ *
+ * Description
+ *	Module exit point
+ *
+ * Parameters
+ *	None
+ *
+ * Return
+ *	0, if no error occured 
+ *	non 0, otherwise
+ *
+ * Remarks
+ *	
+ */
+// We need a unique global name for static link under Windows.
+#ifdef WIN32
+extern "C" int ssggraph_moduleTerminate()
+#else
+extern "C" int moduleTerminate()
+#endif
+{
+    return 0;
+}
+

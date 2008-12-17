@@ -73,12 +73,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib txml.lib sg.lib ul.lib"
+				AdditionalDependencies="libpng.lib txml.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Release/tgf.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/lib,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBCD"
+				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\tgf.def"
 				ProgramDatabaseFile=".\Release/tgf.pdb"
 				ImportLibrary=".\Release/tgf.lib"
@@ -172,12 +172,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libpng.lib txml.lib sg.lib ul.lib"
+				AdditionalDependencies="libpng.lib txml.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Debug/tgf.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\tgf.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/tgf.pdb"
@@ -265,6 +265,10 @@
 						PreprocessorDefinitions=""
 					/>
 				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\modinfo.cpp"
+				>
 			</File>
 			<File
 				RelativePath="module.cpp"
@@ -385,6 +389,10 @@
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl"
 			>
+			<File
+				RelativePath=".\modinfo.h"
+				>
+			</File>
 			<File
 				RelativePath="os.h"
 				>
