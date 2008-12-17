@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Release/tita.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -176,12 +176,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Debug/tita.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\tita.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/tita.pdb"

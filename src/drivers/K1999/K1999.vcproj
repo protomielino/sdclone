@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="sg.lib ul.lib tgf.lib txml.lib"
+				AdditionalDependencies="sg.lib ul.lib tgf.lib txml.lib user32.lib"
 				OutputFile=".\Release/K1999.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -176,12 +176,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib sg.lib ul.lib txml.lib"
+				AdditionalDependencies="tgf.lib sg.lib ul.lib txml.lib user32.lib"
 				OutputFile=".\Debug/K1999.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\K1999.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/K1999.pdb"

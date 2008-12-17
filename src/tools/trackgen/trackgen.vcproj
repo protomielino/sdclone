@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="trackgen"
 	ProjectGUID="{D5CE06C7-F393-4405-8887-094594B42D25}"
 	>
@@ -73,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sl.lib client.lib robottools.lib sg.lib ssg.lib ssggraphlib.lib txml.lib ul.lib libpng.lib tgf.lib"
+				AdditionalDependencies="sl.lib client.lib robottools.lib sg.lib ssg.lib ssggraphlib.lib txml.lib ul.lib libpng.lib tgf.lib user32.lib"
 				OutputFile=".\Release/trackgen.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -169,12 +169,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="sl.lib client.lib robottools.lib sg.lib ssg.lib ssggraphlib.lib txml.lib ul.lib libpng.lib tgf.lib"
+				AdditionalDependencies="sl.lib client.lib robottools.lib sg.lib ssg.lib ssggraphlib.lib txml.lib ul.lib libpng.lib tgf.lib user32.lib"
 				OutputFile=".\Debug/trackgen.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/trackgen.pdb"
 				GenerateMapFile="true"

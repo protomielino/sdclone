@@ -73,12 +73,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="txml.lib libpng.lib sg.lib ul.lib tgf.lib robottools.lib ssggraphlib.lib ssg.lib ssgAux.lib sl.lib js.lib OpenAL32.lib Alut.lib"
+				AdditionalDependencies="txml.lib libpng.lib sg.lib ul.lib tgf.lib robottools.lib ssggraphlib.lib ssg.lib ssgAux.lib sl.lib js.lib OpenAL32.lib Alut.lib user32.lib advapi32.lib"
 				OutputFile=".\Debug/client.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\client.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/client.pdb"
@@ -175,12 +175,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="txml.lib libpng.lib sg.lib ul.lib tgf.lib robottools.lib ssggraphlib.lib ssg.lib ssgAux.lib sl.lib js.lib OpenAL32.lib Alut.lib"
+				AdditionalDependencies="txml.lib libpng.lib sg.lib ul.lib tgf.lib robottools.lib ssggraphlib.lib ssg.lib ssgAux.lib sl.lib js.lib OpenAL32.lib Alut.lib user32.lib advapi32.lib"
 				OutputFile=".\Release/client.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/lib,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBCMT"
+				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\client.def"
 				ProgramDatabaseFile=".\Release/client.pdb"
 				ImportLibrary=".\Release/client.lib"

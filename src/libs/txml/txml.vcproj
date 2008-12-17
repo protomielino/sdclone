@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="txml"
 	ProjectGUID="{633815A6-D8F8-4A18-ABF3-276A7F9B3AB2}"
 	>
@@ -73,11 +73,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="user32.lib"
 				OutputFile=".\Debug/txml.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\txml.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/txml.pdb"
@@ -174,11 +175,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="user32.lib"
 				OutputFile=".\Release/txml.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBCD"
+				IgnoreDefaultLibraryNames="LIBC"
 				ModuleDefinitionFile=".\txml.def"
 				ProgramDatabaseFile=".\Release/txml.pdb"
 				ImportLibrary=".\Release/txml.lib"

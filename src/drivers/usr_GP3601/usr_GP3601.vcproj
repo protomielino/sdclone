@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="usr_GP3601"
 	ProjectGUID="{A2F45E6D-B16A-4CE6-8B30-EE7EB029E3EB}"
 	>
@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Release/usr_GP3601.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -146,7 +146,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/RTCc /RTCu /RTCs"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include,../../windows/include,../../.."
+				AdditionalIncludeDirectories="../../../export/include,../../../../3rdParty/include,../../windows/include,../../.."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_WINDOWS;_USRDLL;BT_EXPORTS"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -174,12 +174,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Debug/usr_GP3601.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdparty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC.lib"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\usr_GP3601.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/usr_GP3601.pdb"

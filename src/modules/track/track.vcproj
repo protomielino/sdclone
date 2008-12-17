@@ -75,12 +75,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib txml.lib ssg.lib ul.lib sg.lib"
+				AdditionalDependencies="tgf.lib robottools.lib txml.lib ssg.lib ul.lib sg.lib user32.lib"
 				OutputFile=".\Debug/track.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\track.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/track.pdb"
@@ -178,7 +178,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="sg.lib tgf.lib robottools.lib txml.lib ssg.lib ul.lib"
+				AdditionalDependencies="sg.lib tgf.lib robottools.lib txml.lib ssg.lib ul.lib user32.lib"
 				OutputFile=".\Release/track.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

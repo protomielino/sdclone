@@ -70,7 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib"
+				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib"
 				OutputFile=".\Release/wtorcs.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -166,12 +166,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib"
+				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib"
 				OutputFile=".\Debug/wtorcs.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../export/libd,../../../3rdParty/lib,../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/wtorcs.pdb"
 				GenerateMapFile="true"
@@ -184,7 +184,7 @@
 			/>
 			<Tool
 				Name="VCManifestTool"
-				EmbedManifest="false"
+				EmbedManifest="true"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
@@ -206,7 +206,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="exports"
-				CommandLine="copy $(TargetDir)wtorcs.exe $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\freeglut.dll ( copy ..\..\..\3rdParty\bin\freeglut.dll $(SolutionDir)runtime ) else if exist bin\freeglut.dll copy bin\freeglut.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\glut32.dll ( copy ..\..\..\3rdParty\bin\glut32.dll $(SolutionDir)runtime ) else if exist bin\glut32.dll copy bin\glut32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\OpenAL32.dll ( copy ..\..\..\3rdParty\bin\OpenAL32.dll $(SolutionDir)runtime ) else copy bin\OpenAL32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\alut.dll ( copy ..\..\..\3rdParty\bin\alut.dll $(SolutionDir)runtime ) else copy bin\alut.dll $(SolutionDir)runtimed&#x0D;&#x0A;&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)wtorcs.exe $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\freeglut.dll ( copy ..\..\..\3rdParty\bin\freeglut.dll $(SolutionDir)runtimed ) else if exist bin\freeglut.dll copy bin\freeglut.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\glut32.dll ( copy ..\..\..\3rdParty\bin\glut32.dll $(SolutionDir)runtimed ) else if exist bin\glut32.dll copy bin\glut32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\OpenAL32.dll ( copy ..\..\..\3rdParty\bin\OpenAL32.dll $(SolutionDir)runtimed ) else copy bin\OpenAL32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\alut.dll ( copy ..\..\..\3rdParty\bin\alut.dll $(SolutionDir)runtimed ) else copy bin\alut.dll $(SolutionDir)runtimed&#x0D;&#x0A;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>

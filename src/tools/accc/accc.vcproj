@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="accc"
 	ProjectGUID="{3D450B00-A8ED-4A02-87D2-7D4D421BCAF0}"
 	>
@@ -43,6 +43,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="../../../export/include,../../../../3rdParty/include,../../windows/include,../.."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;DEBUG;DEBUG_OUT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -68,10 +69,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="user32.lib"
 				OutputFile=".\Debug/accc.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/accc.pdb"
 				GenerateMapFile="true"
@@ -138,6 +140,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="../../../export/include,../../../../3rdParty/include,../../windows/include,../.."
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;NDEBUG;_CONSOLE"
 				StringPooling="true"
 				RuntimeLibrary="2"
@@ -162,7 +165,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="odbc32.lib odbccp32.lib"
+				AdditionalDependencies="user32.lib"
 				OutputFile=".\Release/accc.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

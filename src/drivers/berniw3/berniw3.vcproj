@@ -74,7 +74,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Release/berniw3.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -176,12 +176,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Debug/berniw3.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\berniw3.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/berniw3.pdb"

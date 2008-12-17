@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="learning"
 	ProjectGUID="{C88C7DE7-19E1-4D19-875B-BF4CCE133839}"
 	>
@@ -73,10 +73,11 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="user32.lib"
 				OutputFile=".\Debug/learning.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\learning.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/learning.pdb"
@@ -173,6 +174,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				AdditionalDependencies="user32.lib"
 				OutputFile=".\Release/learning.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"

@@ -73,7 +73,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="tgf.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Release/robottools.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -172,12 +172,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="tgf.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Debug/robottools.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\robotools.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/robottools.pdb"

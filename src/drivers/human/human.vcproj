@@ -74,12 +74,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="client.lib tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="client.lib tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Debug/human.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../../export/libd,../../../../3rdParty/lib,../../windows/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				ModuleDefinitionFile=".\human.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/human.pdb"
@@ -177,7 +177,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="client.lib tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="client.lib tgf.lib robottools.lib sg.lib ul.lib user32.lib"
 				OutputFile=".\Release/human.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
