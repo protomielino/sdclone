@@ -2,7 +2,7 @@
 
     file                 : playerpref.h
     created              : Wed Mar 21 21:50:23 CET 2001
-    copyright            : (C) 2001 by Eric Espié
+    copyright            : (C) 2001 by Eric Espiï¿½
     email                : Eric.Espie@torcs.org
     version              : $Id: playerpref.h,v 1.10 2004/10/07 17:05:04 olethros Exp $
 
@@ -110,7 +110,8 @@
 #define HM_ATT_NBPITS	"programmed pit stops"
 
 #define HM_VAL_AUTO	"auto"
-#define HM_VAL_MANUAL	"manual"
+#define HM_VAL_SEQ	"sequential"
+#define HM_VAL_GRID	"grid"
 
 #define HM_VAL_YES	"yes"
 #define HM_VAL_NO	"no"

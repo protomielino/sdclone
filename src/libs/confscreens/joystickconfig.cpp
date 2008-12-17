@@ -44,7 +44,7 @@ static int	rawb[GFCTRL_JOY_NUMBER] = {0};
 
 #define NB_STEPS	6
 
-#define OFFSET_CMD	5
+const int OFFSET_CMD	= -1;
 
 static const char *Instructions[] = {
     "Center the joystick then press a button",
@@ -158,7 +158,7 @@ Idle2(void)
     }
 
 	/* Let CPU take breath (and fans stay at low and quite speed) */
-	GfuiScreenSleep(0.001);
+	GfuiSleep(0.001);
 }
 
 

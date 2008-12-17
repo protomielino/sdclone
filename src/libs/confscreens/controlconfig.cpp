@@ -20,55 +20,94 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: controlconfig.cpp,v 1.5 2003/11/23 20:21:11 torcs Exp $
+    @version	$Id: controlconfig.cpp,v 1.6 2008/03/27 21:26:51 torcs Exp $
 */
 
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <cstring>
+#include <string.h>
 
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
+#include <plib/js.h>
 
 #include "controlconfig.h"
 #include "mouseconfig.h"
 #include "joystickconfig.h"
 
-static void 	*scrHandle = NULL;
-static void	*prevHandle = NULL;
+static void 	*ScrHandle = NULL;
+static void	*PrevScrHandle = NULL;
 static void	*PrefHdle = NULL;
 
 static int	MouseCalButton;
 static int	JoyCalButton;
 
-static tCtrlMouseInfo	mouseInfo;
+static tCtrlMouseInfo	MouseInfo;
 static char	CurrentSection[256];
 
+/* Control command information */
 static tCmdInfo Cmd[] = {
-    {HM_ATT_GEAR_R,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_N,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_UP_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_DN_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_LIGHT1_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_ASR_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_LEFTSTEER,  {1,  GFCTRL_TYPE_MOUSE_AXIS},   0, HM_ATT_LEFTSTEER_MIN,  0, HM_ATT_LEFTSTEER_MAX,  0, HM_ATT_LEFTSTEER_POW,  1.0, 1},
-    {HM_ATT_RIGHTSTEER, {2,  GFCTRL_TYPE_MOUSE_AXIS},   0, HM_ATT_RIGHTSTEER_MIN, 0, HM_ATT_RIGHTSTEER_MAX, 0, HM_ATT_RIGHTSTEER_POW, 1.0, 1},
-    {HM_ATT_THROTTLE,   {1,  GFCTRL_TYPE_MOUSE_BUT},    0, HM_ATT_THROTTLE_MIN,   0, HM_ATT_THROTTLE_MAX,   0, HM_ATT_THROTTLE_POW,   1.0, 1},
-    {HM_ATT_BRAKE,      {2,  GFCTRL_TYPE_MOUSE_BUT},    0, HM_ATT_BRAKE_MIN,      0, HM_ATT_BRAKE_MAX,      0, HM_ATT_BRAKE_POW,      1.0, 1},
-    {HM_ATT_CLUTCH,     {3,  GFCTRL_TYPE_MOUSE_BUT},    0, HM_ATT_CLUTCH_MIN,     0, HM_ATT_CLUTCH_MAX,     0, HM_ATT_CLUTCH_POW,     1.0, 1},
-    {HM_ATT_ABS_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_SPDLIM_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 1}
+    {HM_ATT_LEFTSTEER,  {1,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_LEFTSTEER_MIN,  0, HM_ATT_LEFTSTEER_MAX,  0, HM_ATT_LEFTSTEER_POW,  1.0, 1},
+    {HM_ATT_RIGHTSTEER, {2,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_RIGHTSTEER_MIN, 0, HM_ATT_RIGHTSTEER_MAX, 0, HM_ATT_RIGHTSTEER_POW, 1.0, 1},
+    {HM_ATT_THROTTLE,   {1,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_THROTTLE_MIN,   0, HM_ATT_THROTTLE_MAX,   0, HM_ATT_THROTTLE_POW,   1.0, 1},
+    {HM_ATT_BRAKE,      {2,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_BRAKE_MIN,      0, HM_ATT_BRAKE_MAX,      0, HM_ATT_BRAKE_POW,      1.0, 1},
+    {HM_ATT_CLUTCH,     {3,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_CLUTCH_MIN,     0, HM_ATT_CLUTCH_MAX,     0, HM_ATT_CLUTCH_POW,     1.0, 1},
+    {HM_ATT_ABS_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_ASR_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_SPDLIM_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_LIGHT1_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_R,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_N,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_DN_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_UP_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_1,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_2,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_3,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_4,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_5,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1}
 };
 
-static int maxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
+static const int MaxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
+static const int ICmdReverseGear = 9;
+static const int ICmdNeutralGear = 10;
 
-static jsJoystick	*js[GFCTRL_JOY_NUMBER] = {NULL};
-static float		ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER] = {0};
-static float 		axCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
-static int		rawb[GFCTRL_JOY_NUMBER] = {0};
+/* Command editbox display info according to the selected gear changing mode */
+typedef struct tCmdDispInfo
+{
+    unsigned gearChangeModeMask;
+    int      y;
+} tCmdDispInfo;
+
+static tCmdDispInfo CmdDispInfo[] = {
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 400 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 370 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 340 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 310 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 280 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 250 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 220 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 190 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 160 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 400 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 370 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ,                  340 },
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ,                  310 },
+    {                                  GEAR_MODE_GRID, 340 },
+    {                                  GEAR_MODE_GRID, 310 },
+    {                                  GEAR_MODE_GRID, 280 },
+    {                                  GEAR_MODE_GRID, 250 },
+    {                                  GEAR_MODE_GRID, 220 },
+    {                                  GEAR_MODE_GRID, 190 }
+};
+
+static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER] = {NULL};
+static float		JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER] = {0};
+static float 		JoyAxisCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
+static int		JoyButtons[GFCTRL_JOY_NUMBER] = {0};
 
 static float SteerSensVal;
 static float DeadZoneVal;
@@ -77,8 +116,10 @@ static char buf[1024];
 
 static int SteerSensEditId;
 static int DeadZoneEditId;
+static tGearChangeMode GearChangeMode;
 
 static int ReloadValues = 1;
+
 
 static void
 onSteerSensChange(void * /* dummy */)
@@ -86,13 +127,13 @@ onSteerSensChange(void * /* dummy */)
     char	*val;
     float	fv;
 
-    val = GfuiEditboxGetString(scrHandle, SteerSensEditId);
+    val = GfuiEditboxGetString(ScrHandle, SteerSensEditId);
     if (sscanf(val, "%f", &fv) == 1) {
 	sprintf(buf, "%f", fv);
 	SteerSensVal = fv;
-	GfuiEditboxSetString(scrHandle, SteerSensEditId, buf);
+	GfuiEditboxSetString(ScrHandle, SteerSensEditId, buf);
     } else {
-	GfuiEditboxSetString(scrHandle, SteerSensEditId, "");
+	GfuiEditboxSetString(ScrHandle, SteerSensEditId, "");
     }
     
 }
@@ -103,46 +144,24 @@ onDeadZoneChange(void * /* dummy */)
     char	*val;
     float	fv;
 
-    val = GfuiEditboxGetString(scrHandle, DeadZoneEditId);
+    val = GfuiEditboxGetString(ScrHandle, DeadZoneEditId);
     if (sscanf(val, "%f", &fv) == 1) {
 	sprintf(buf, "%f", fv);
 	DeadZoneVal = fv;
-	GfuiEditboxSetString(scrHandle, DeadZoneEditId, buf);
+	GfuiEditboxSetString(ScrHandle, DeadZoneEditId, buf);
     } else {
-	GfuiEditboxSetString(scrHandle, SteerSensEditId, "");
+	GfuiEditboxSetString(ScrHandle, SteerSensEditId, "");
     }
     
 }
 
+/* Save settings in the players preferences and go back to previous screen */
 static void
 onSave(void * /* dummy */)
 {
-    int		i;
-    const char	*str;
+    TorcsControlPutSettings();
 
-    GfParmSetNum(PrefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
-    GfParmSetNum(PrefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
-
-    for (i = 0; i < maxCmd; i++) {
-	str = GfctrlGetNameByRef(Cmd[i].ref.type, Cmd[i].ref.index);
-	if (str) {
-	    GfParmSetStr(PrefHdle, CurrentSection, Cmd[i].name, str);
-	} else {
-	    GfParmSetStr(PrefHdle, CurrentSection, Cmd[i].name, "");
-	}
-	if (Cmd[i].minName) {
-	    GfParmSetNum(PrefHdle, CurrentSection, Cmd[i].minName, NULL, Cmd[i].min);
-	}
-	if (Cmd[i].maxName) {
-	    GfParmSetNum(PrefHdle, CurrentSection, Cmd[i].maxName, NULL, Cmd[i].max);
-	}
-	if (Cmd[i].powName) {
-	    GfParmSetNum(PrefHdle, CurrentSection, Cmd[i].powName, NULL, Cmd[i].pow);
-	}
-    }
-
-    GfParmWriteFile(NULL, PrefHdle, "preferences");
-    GfuiScreenActivate(prevHandle);
+    GfuiScreenActivate(PrevScrHandle);
 }
 
 static void
@@ -153,13 +172,19 @@ updateButtonText(void)
     int		displayMouseCal = GFUI_INVISIBLE;
     int		displayJoyCal = GFUI_INVISIBLE;
 
-    for (i = 0; i < maxCmd; i++) {
+    /* For each control: */
+    for (i = 0; i < MaxCmd; i++) {
+
+	/* Update associated editbox according to detected input device action */
 	str = GfctrlGetNameByRef(Cmd[i].ref.type, Cmd[i].ref.index);
 	if (str) {
-	    GfuiButtonSetText (scrHandle, Cmd[i].Id, str);
+	    GfuiButtonSetText (ScrHandle, Cmd[i].Id, str);
 	} else {
-	    GfuiButtonSetText (scrHandle, Cmd[i].Id, "---");
+	    GfuiButtonSetText (ScrHandle, Cmd[i].Id, "---");
 	}
+
+	/* According to detected action, set the visibility of the mouse or joystick
+	   calibration button */
 	if (Cmd[i].ref.type == GFCTRL_TYPE_MOUSE_AXIS) {
 	    displayMouseCal = GFUI_VISIBLE;
 	} else if (Cmd[i].ref.type == GFCTRL_TYPE_JOY_AXIS) {
@@ -167,14 +192,18 @@ updateButtonText(void)
 	}
     }
 
+    /* Update Steer Sensibility editbox */
     sprintf(buf, "%f", SteerSensVal);
-    GfuiEditboxSetString(scrHandle, SteerSensEditId, buf);
+    GfuiEditboxSetString(ScrHandle, SteerSensEditId, buf);
 
+    /* Update Steer Dead Zone editbox */
     sprintf(buf, "%f", DeadZoneVal);
-    GfuiEditboxSetString(scrHandle, DeadZoneEditId, buf);
+    GfuiEditboxSetString(ScrHandle, DeadZoneEditId, buf);
 
-    GfuiVisibilitySet(scrHandle, MouseCalButton, displayMouseCal);
-    GfuiVisibilitySet(scrHandle, JoyCalButton, displayJoyCal);
+    /* Show / hide mouse / joystick calibration button(s),
+       according to the detected input device actions */
+    GfuiVisibilitySet(ScrHandle, MouseCalButton, displayMouseCal);
+    GfuiVisibilitySet(ScrHandle, JoyCalButton, displayJoyCal);
 }
 
 static void
@@ -199,12 +228,10 @@ onKeyAction(unsigned char key, int /* modifier */, int state)
 	/* escape */
 	Cmd[CurrentCmd].ref.index = -1;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
-	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, "");
     } else {
 	name = GfctrlGetNameByRef(GFCTRL_TYPE_KEYBOARD, (int)key);
 	Cmd[CurrentCmd].ref.index = (int)key;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_KEYBOARD;
-	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
     }
 
     glutIdleFunc(0);
@@ -224,7 +251,6 @@ onSKeyAction(int key, int /* modifier */, int state)
     name = GfctrlGetNameByRef(GFCTRL_TYPE_SKEYBOARD, key);
     Cmd[CurrentCmd].ref.index = key;
     Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_SKEYBOARD;
-    GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
 
     glutIdleFunc(0);
     InputWaited = 0;
@@ -240,14 +266,15 @@ getMovedAxis(void)
     float	maxDiff = 0.3;
 
     for (i = 0; i < GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER; i++) {
-	if (maxDiff < fabs(ax[i] - axCenter[i])) {
-	    maxDiff = fabs(ax[i] - axCenter[i]);
+	if (maxDiff < fabs(JoyAxis[i] - JoyAxisCenter[i])) {
+	    maxDiff = fabs(JoyAxis[i] - JoyAxisCenter[i]);
 	    Index = i;
 	}
     }
     return Index;
 }
 
+/* GLUT idle function : For collecting input devices actions */
 static void
 Idle(void)
 {
@@ -257,17 +284,17 @@ Idle(void)
     const char	*str;
     int		axis;
 
-    GfctrlMouseGetCurrent(&mouseInfo);
+    GfctrlMouseGetCurrent(&MouseInfo);
 
     /* Check for a mouse button pressed */
     for (i = 0; i < 3; i++) {
-	if (mouseInfo.edgedn[i]) {
+	if (MouseInfo.edgedn[i]) {
 	    glutIdleFunc(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_BUT, i);
 	    Cmd[CurrentCmd].ref.index = i;
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_BUT;
-	    GfuiButtonSetText (scrHandle, Cmd[CurrentCmd].Id, str);
+	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 	    glutPostRedisplay();
 	    return;
 	}
@@ -275,13 +302,13 @@ Idle(void)
 
     /* Check for a mouse axis moved */
     for (i = 0; i < 4; i++) {
-	if (mouseInfo.ax[i] > 20.0) {
+	if (MouseInfo.ax[i] > 20.0) {
 	    glutIdleFunc(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_AXIS, i);
 	    Cmd[CurrentCmd].ref.index = i;
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_AXIS;
-	    GfuiButtonSetText (scrHandle, Cmd[CurrentCmd].Id, str);
+	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 	    glutPostRedisplay();
 	    return;
 	}
@@ -289,25 +316,25 @@ Idle(void)
 
     /* Check for a Joystick button pressed */
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (js[index]) {
-	    js[index]->read(&b, &ax[index * GFCTRL_JOY_MAX_AXES]);
+	if (Joystick[index]) {
+	    Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 
 	    /* Joystick buttons */
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
-		if (((b & mask) != 0) && ((rawb[index] & mask) == 0)) {
+		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Button i fired */
 		    glutIdleFunc(0);
 		    InputWaited = 0;
 		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + 32 * index);
 		    Cmd[CurrentCmd].ref.index = i + 32 * index;
 		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_BUT;
-		    GfuiButtonSetText (scrHandle, Cmd[CurrentCmd].Id, str);
+		    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 		    glutPostRedisplay();
-		    rawb[index] = b;
+		    JoyButtons[index] = b;
 		    return;
 		}
 	    }
-	    rawb[index] = b;
+	    JoyButtons[index] = b;
 	}
     }
 
@@ -319,82 +346,77 @@ Idle(void)
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
 	Cmd[CurrentCmd].ref.index = axis;
 	str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
-	GfuiButtonSetText (scrHandle, Cmd[CurrentCmd].Id, str);
+	GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 	glutPostRedisplay();
 	return;
     }
 
 	/* Let CPU take breath (and fans stay at low and quiet speed) */
-	GfuiScreenSleep(0.001);
+	GfuiSleep(0.001);
 }
 
+/* Push button callback for each command button : activate input devices action collection loop */
 static void
 onPush(void *vi)
 {
     int		index;    
     long	i = (long)vi;
     
+    /* Selected given command as the currently awaited one */
     CurrentCmd = i;
-    GfuiButtonSetText (scrHandle, Cmd[i].Id, "");
+
+    /* Empty button text to tell the user we will soon be waiting for its input */
+    GfuiButtonSetText (ScrHandle, Cmd[i].Id, "");
+
+    /* Reset selected command action */
     Cmd[i].ref.index = -1;
     Cmd[i].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
-    GfParmSetStr(PrefHdle, CurrentSection, Cmd[i].name, "");
+
+    /* State that a keyboard action is awaited */
     if (Cmd[CurrentCmd].keyboardPossible) {
 	InputWaited = 1;
     }
+
+    /* Read initial mouse status */
     glutIdleFunc(Idle);
     GfctrlMouseInitCenter();
-    memset(&mouseInfo, 0, sizeof(mouseInfo));
-    GfctrlMouseGetCurrent(&mouseInfo);
+    memset(&MouseInfo, 0, sizeof(MouseInfo));
+    GfctrlMouseGetCurrent(&MouseInfo);
 
+    /* Read initial joysticks status */
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (js[index]) {
-	    js[index]->read(&rawb[index], &ax[index * GFCTRL_JOY_MAX_AXES]); /* initial value */
+	if (Joystick[index]) {
+	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 	}
     }
-    memcpy(axCenter, ax, sizeof(axCenter));
+    memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
 }
 
 static void
 onActivate(void * /* dummy */)
 {
-    int		cmd;
-    const char	*prm;
-    tCtrlRef	*ref;
+    int	cmd;
 
     if (ReloadValues) {
-	sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
-	PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	/* Mouse Settings */
-	for (cmd = 0; cmd < maxCmd; cmd++) {
-	    prm = GfctrlGetNameByRef(Cmd[cmd].ref.type, Cmd[cmd].ref.index);
-	    if (!prm) {
-		prm = "---";
+        /* Load command settings from preference params for current player */
+        TorcsControlGetSettings();
+
+	/* For each control : */
+	for (cmd = 0; cmd < MaxCmd; cmd++) {
+
+	    /* Show / hide control editbox according to selected gear changing mode code */
+	    if (GearChangeMode & CmdDispInfo[cmd].gearChangeModeMask)
+	    {
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].labelId, GFUI_VISIBLE);
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].Id, GFUI_VISIBLE);
 	    }
-	    prm = GfParmGetStr(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].name, prm);
-	    prm = GfParmGetStr(PrefHdle, CurrentSection, Cmd[cmd].name, prm);
-	    ref = GfctrlGetRefByName(prm);
-	    Cmd[cmd].ref.type = ref->type;
-	    Cmd[cmd].ref.index = ref->index;
-	    if (Cmd[cmd].minName) {
-		Cmd[cmd].min = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].minName, NULL, Cmd[cmd].min);
-		Cmd[cmd].min = GfParmGetNum(PrefHdle, CurrentSection, Cmd[cmd].minName, NULL, Cmd[cmd].min);
-	    }
-	    if (Cmd[cmd].maxName) {
-		Cmd[cmd].max = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].maxName, NULL, Cmd[cmd].max);
-		Cmd[cmd].max = GfParmGetNum(PrefHdle, CurrentSection, Cmd[cmd].maxName, NULL, Cmd[cmd].max);
-	    }
-	    if (Cmd[cmd].powName) {
-		Cmd[cmd].pow = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, Cmd[cmd].powName, NULL, Cmd[cmd].pow);
-		Cmd[cmd].pow = GfParmGetNum(PrefHdle, CurrentSection, Cmd[cmd].powName, NULL, Cmd[cmd].pow);
+	    else
+	    {
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].labelId, GFUI_INVISIBLE);
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].Id, GFUI_INVISIBLE);
 	    }
 	}
-
-	SteerSensVal = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_SENS, NULL, 0);
-	SteerSensVal = GfParmGetNum(PrefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
-	DeadZoneVal = GfParmGetNum(PrefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_DEAD, NULL, 0);
-	DeadZoneVal = GfParmGetNum(PrefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
     }
     
     updateButtonText();
@@ -408,84 +430,213 @@ DevCalibrate(void *menu)
 }
 
 
+/* */
 void *
-TorcsControlMenuInit(void *prevMenu, int idx)
+TorcsControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
 {
-    int		x, y, x2, dy, i;
-    int		index;
+    int		x, x2, i;
+    int		jsInd;
 
     ReloadValues = 1;
-    sprintf(CurrentSection, "%s/%d", HM_SECT_DRVPREF, idx);
 
-    prevHandle = prevMenu;
-    sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
-    PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    PrevScrHandle = prevMenu;
 
-    if (scrHandle) {
-	return scrHandle;
+    PrefHdle = prefHdle;
+
+    /* Select current player section in the players preferences */
+    sprintf(CurrentSection, "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
+
+    /* Set specified gear changing mode for current player */
+    GearChangeMode = gearChangeMode;
+
+    /* Don't recreate screen if already done */
+    if (ScrHandle) {
+	return ScrHandle;
     }
 
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (js[index] == NULL) {
-	    js[index] = new jsJoystick(index);
+    /* Initialize joysticks layer */
+    for (jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {
+	if (Joystick[jsInd] == NULL) {
+	    Joystick[jsInd] = new jsJoystick(jsInd);
 	}
     
-	if (js[index]->notWorking()) {
+	if (Joystick[jsInd]->notWorking()) {
 	    /* don't configure the joystick */
-	    js[index] = NULL;
+	    delete Joystick[jsInd];
+	    Joystick[jsInd] = NULL;
+	}
+	else {
+	  GfOut("Detected joystick #%d type '%s' %d axes\n", 
+		jsInd, Joystick[jsInd]->getName(), Joystick[jsInd]->getNumAxes());
 	}
     }
     
-    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-    GfuiTitleCreate(scrHandle, "Control Configuration", 0);
+    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    GfuiScreenAddBgImg(scrHandle, "data/img/splash-mouseconf.png");
+    /* Screen title */
+    GfuiTitleCreate(ScrHandle, "Control Configuration", 0);
 
-    GfuiMenuDefaultKeysAdd(scrHandle);
+    /* Background image */
+    GfuiScreenAddBgImg(ScrHandle, "data/img/splash-mouseconf.png");
 
+    /* Default keyboard shortcuts */
+    GfuiMenuDefaultKeysAdd(ScrHandle);
+
+    /* Screen coordinates for labels, buttons, ... */
     x = 10;
     x2 = 210;
-    y = 340;
-    dy = 30;
 
-    for (i = 0; i < maxCmd; i++) {
-	GfuiLabelCreate(scrHandle, Cmd[i].name, GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-	Cmd[i].Id = GfuiButtonStateCreate (scrHandle, "MOUSE_MIDDLE_BUTTON", GFUI_FONT_MEDIUM_C, x+x2, y, 0, GFUI_ALIGN_HC_VB, GFUI_MOUSE_DOWN, 
+    /* For each control (in Cmd array), create the associated label and editbox */
+    for (i = 0; i < MaxCmd; i++) {
+	Cmd[i].labelId = GfuiLabelCreate(ScrHandle, Cmd[i].name, GFUI_FONT_MEDIUM, x, CmdDispInfo[i].y, GFUI_ALIGN_HL_VB, 0);
+	Cmd[i].Id = GfuiButtonStateCreate (ScrHandle, "MOUSE_MIDDLE_BUTTON", GFUI_FONT_MEDIUM_C, x+x2, CmdDispInfo[i].y, 0, GFUI_ALIGN_HC_VB, GFUI_MOUSE_DOWN, 
 					   (void*)i, onPush, NULL, (tfuiCallback)NULL, onFocusLost);
-	y -= dy;
-	if (i == (maxCmd / 2 - 1)) {
+	/* If first column done, change to the second */
+	if (i == MaxCmd / 2 - 1) {
 	    x = 320;
-	    y = 340;
 	    x2 = 220;
 	}
     }
 
-    GfuiLabelCreate(scrHandle, "Steer Sensibility", GFUI_FONT_MEDIUM, 30, 90, GFUI_ALIGN_HL_VB, 0);
-    SteerSensEditId = GfuiEditboxCreate(scrHandle, "", GFUI_FONT_MEDIUM_C,
+    /* Steer Sensibility label and associated editbox */
+    GfuiLabelCreate(ScrHandle, "Steer Sensibility", GFUI_FONT_MEDIUM, 30, 90, GFUI_ALIGN_HL_VB, 0);
+    SteerSensEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
 					200, 90, 80, 8, NULL, (tfuiCallback)NULL, onSteerSensChange);
 
-    GfuiLabelCreate(scrHandle, "Steer Dead Zone", GFUI_FONT_MEDIUM, 340, 90, GFUI_ALIGN_HL_VB, 0);
-    DeadZoneEditId = GfuiEditboxCreate(scrHandle, "", GFUI_FONT_MEDIUM_C,
+    /* Steer Dead Zone label and associated editbox */
+    GfuiLabelCreate(ScrHandle, "Steer Dead Zone", GFUI_FONT_MEDIUM, 340, 90, GFUI_ALIGN_HL_VB, 0);
+    DeadZoneEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
 					510, 90, 80, 8, NULL, (tfuiCallback)NULL, onDeadZoneChange);
 
 
-    GfuiAddKey(scrHandle, 13, "Save", NULL, onSave, NULL);
-    GfuiButtonCreate(scrHandle, "Save", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+    /* Save button and associated keyboard shortcut */
+    GfuiAddKey(ScrHandle, 13 /* Return */, "Save", NULL, onSave, NULL);
+    GfuiButtonCreate(ScrHandle, "Save", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, onSave, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    MouseCalButton = GfuiButtonCreate(scrHandle, "Calibrate", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-				      MouseCalMenuInit(scrHandle, Cmd, maxCmd), DevCalibrate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    /* Mouse calibration screen access button */
+    MouseCalButton = GfuiButtonCreate(ScrHandle, "Calibrate", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+				      MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    JoyCalButton = GfuiButtonCreate(scrHandle, "Calibrate", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-				    JoyCalMenuInit(scrHandle, Cmd, maxCmd), DevCalibrate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    /* Joystick/joypad/wheel calibration screen access button */
+    JoyCalButton = GfuiButtonCreate(ScrHandle, "Calibrate", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+				    JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+    /* Cancel button and associated keyboard shortcut */
+    GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel", prevMenu, GfuiScreenActivate, NULL);
+    GfuiButtonCreate(ScrHandle, "Cancel", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
 
-    GfuiKeyEventRegister(scrHandle, onKeyAction);
-    GfuiSKeyEventRegister(scrHandle, onSKeyAction);
+    /* General callbacks for keyboard keys and special keys */
+    GfuiKeyEventRegister(ScrHandle, onKeyAction);
+    GfuiSKeyEventRegister(ScrHandle, onSKeyAction);
 
-    return scrHandle;
+    return ScrHandle;
+}
+
+/* From parms (prefHdle) to global vars (Cmd, SteerSensVal, DeadZoneVal) */
+void TorcsControlGetSettings(void *prefHdle, unsigned index)
+{
+    int		iCmd;
+    const char	*prm;
+    tCtrlRef	*ref;
+
+    /* If handle on preferences params not given, get current */
+    if (!prefHdle)
+        prefHdle = PrefHdle;
+
+    /* Select current player section in the players preferences if specified */
+    if (index > 0)
+        sprintf(CurrentSection, "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
+
+    /* For each control : */
+    for (iCmd = 0; iCmd < MaxCmd; iCmd++) {
+        prm = GfctrlGetNameByRef(Cmd[iCmd].ref.type, Cmd[iCmd].ref.index);
+	if (!prm) {
+	    prm = "---";
+	}
+	/* Load associated command settings from preferences params for the current player,
+	   by default from the default "mouse" settings */
+	prm = GfParmGetStr(prefHdle, HM_SECT_MOUSEPREF, Cmd[iCmd].name, prm);
+	prm = GfParmGetStr(prefHdle, CurrentSection, Cmd[iCmd].name, prm);
+	ref = GfctrlGetRefByName(prm);
+	Cmd[iCmd].ref.type = ref->type;
+	Cmd[iCmd].ref.index = ref->index;
+	
+	if (Cmd[iCmd].minName) {
+	    Cmd[iCmd].min = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, Cmd[iCmd].minName, NULL, Cmd[iCmd].min);
+	    Cmd[iCmd].min = GfParmGetNum(prefHdle, CurrentSection, Cmd[iCmd].minName, NULL, Cmd[iCmd].min);
+	}
+	if (Cmd[iCmd].maxName) {
+	    Cmd[iCmd].max = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, Cmd[iCmd].maxName, NULL, Cmd[iCmd].max);
+	    Cmd[iCmd].max = GfParmGetNum(prefHdle, CurrentSection, Cmd[iCmd].maxName, NULL, Cmd[iCmd].max);
+	}
+	if (Cmd[iCmd].powName) {
+	    Cmd[iCmd].pow = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, Cmd[iCmd].powName, NULL, Cmd[iCmd].pow);
+	    Cmd[iCmd].pow = GfParmGetNum(prefHdle, CurrentSection, Cmd[iCmd].powName, NULL, Cmd[iCmd].pow);
+	}
+    }
+
+    /* Load also Steer sensibility (default from mouse prefs) */
+    SteerSensVal = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_SENS, NULL, 0);
+    SteerSensVal = GfParmGetNum(prefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
+
+    /* Load also Dead zone (default from mouse prefs) */
+    DeadZoneVal = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_DEAD, NULL, 0);
+    DeadZoneVal = GfParmGetNum(prefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
+}
+
+/* From global vars (Cmd, SteerSensVal, DeadZoneVal) to parms (prefHdle) */
+void TorcsControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
+{
+    int		iCmd;
+    const char	*str;
+
+    /* If handle on preferences not given, get current */
+    if (!prefHdle)
+        prefHdle = PrefHdle;
+
+    /* Change current player section in the players preferences if specified */
+    if (index > 0)
+        sprintf(CurrentSection, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
+
+    /* Select current player gear change mode if not specified */
+    if (gearChangeMode == GEAR_MODE_NONE)
+        gearChangeMode = GearChangeMode;
+
+    /* Allow neutral gear in sequential mode if no reverse gear command defined */
+    if (gearChangeMode == GEAR_MODE_SEQ
+	&& !GfctrlGetNameByRef(Cmd[ICmdReverseGear].ref.type, Cmd[ICmdReverseGear].ref.index))
+	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_YES);
+    else
+	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_NO);
+
+    /* Release gear lever goes neutral in grid mode if no neutral gear command defined */
+    if (gearChangeMode == GEAR_MODE_GRID
+	&& !GfctrlGetNameByRef(Cmd[ICmdNeutralGear].ref.type, Cmd[ICmdNeutralGear].ref.index))
+	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_REL_BUT_NEUTRAL, HM_VAL_YES);
+    else
+	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_REL_BUT_NEUTRAL, HM_VAL_NO);
+
+    GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
+    GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
+
+    for (iCmd = 0; iCmd < MaxCmd; iCmd++) {
+	str = GfctrlGetNameByRef(Cmd[iCmd].ref.type, Cmd[iCmd].ref.index);
+	if (str) {
+	    GfParmSetStr(prefHdle, CurrentSection, Cmd[iCmd].name, str);
+	} else {
+	    GfParmSetStr(prefHdle, CurrentSection, Cmd[iCmd].name, "");
+	}
+	if (Cmd[iCmd].minName) {
+	    GfParmSetNum(prefHdle, CurrentSection, Cmd[iCmd].minName, NULL, Cmd[iCmd].min);
+	}
+	if (Cmd[iCmd].maxName) {
+	    GfParmSetNum(prefHdle, CurrentSection, Cmd[iCmd].maxName, NULL, Cmd[iCmd].max);
+	}
+	if (Cmd[iCmd].powName) {
+	    GfParmSetNum(prefHdle, CurrentSection, Cmd[iCmd].powName, NULL, Cmd[iCmd].pow);
+	}
+    }
 }

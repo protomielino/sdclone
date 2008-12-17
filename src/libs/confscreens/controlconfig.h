@@ -2,9 +2,9 @@
 
     file        : controlconfig.h
     created     : Wed Mar 12 22:09:01 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
-    version     : $Id: controlconfig.h,v 1.3 2003/11/08 16:37:18 torcs Exp $                                  
+    version     : $Id: controlconfig.h,v 1.4 2008/03/27 21:26:51 torcs Exp $                                  
 
  ***************************************************************************/
 
@@ -26,7 +26,20 @@
 #ifndef _CONTROLCONFIG_H_
 #define _CONTROLCONFIG_H_
 
-extern void *TorcsControlMenuInit(void *prevMenu, int index);
+/* Gear change mode */
+typedef enum { GEAR_MODE_NONE = 0, GEAR_MODE_AUTO = 1, 
+	       GEAR_MODE_SEQ  = 2, GEAR_MODE_GRID = 4 } tGearChangeMode;
+
+extern void *TorcsControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
+
+/* Load control settings for player of given index (the current one if 0) 
+   from preferences (if given parm handle is null, use current) */
+extern void TorcsControlGetSettings(void *prefHdle = 0, unsigned index = 0);
+
+/* Save control settings for player of given index (the current one if 0) 
+   into preference, according to its selected gear change mode
+   (if given parm handle is null, use current) */
+extern void TorcsControlPutSettings(void *prefHdle = 0, unsigned index = 0, tGearChangeMode gearChangeMode = GEAR_MODE_NONE);
 
 
 typedef struct
@@ -34,6 +47,7 @@ typedef struct
     const char	*name;
     tCtrlRef	ref;
     int		Id;
+    int         labelId;
     const char	*minName;
     float	min;
     const char	*maxName;

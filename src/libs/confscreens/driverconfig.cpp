@@ -4,7 +4,7 @@
     created              : Wed Apr 26 20:05:12 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: driverconfig.cpp,v 1.7 2005/02/01 15:55:51 berniw Exp $
+    version              : $Id: driverconfig.cpp,v 1.8 2008/03/27 21:26:51 torcs Exp $
 
  ***************************************************************************/
 
@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <deque>
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
@@ -28,40 +29,45 @@
 
 #include "driverconfig.h"
 
-#define NO_DRV	"--- empty ---"
-#define dllname   "human"
+static const int   MAX_DRV_NAME_LEN	= 16;
+static const char *DRV_NAME_PROMPT		= "-- Enter name --";
+static const char *NO_DRV			= "-- No one --";
+static const char *HumanDriverModuleName	= "human";
 
-static const char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
-static const int nbLevels = sizeof(level_str) / sizeof(level_str[0]);
+static const char *SkillLevelString[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const int NbSkillLevels = sizeof(SkillLevelString) / sizeof(SkillLevelString[0]);
 
 static char buf[1024];
 
-static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
+static const float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
 
-static int	scrollList;
-static void	*scrHandle = NULL;
-static void	*prevHandle = NULL;
+static int	ScrollList;
+static void	*ScrHandle = NULL;
+static void	*PrevScrHandle = NULL;
 
 static void	*PrefHdle = NULL;
+static void	*DrvHdle = NULL;
 
 static int NameEditId;
 static int CarEditId;
 static int CatEditId;
 static int RaceNumEditId;
-static int TransEditId;
+static int GearChangeEditId;
 static int PitsEditId;
-static int SkillId;
-static int AutoReverseId;
+static int SkillEditId;
+static int AutoReverseEditId;
+static int AutoReverseLeftId;
+static int AutoReverseRightId;
+static int AutoReverseLabelId;
 
-#define NB_DRV	10
-
+/* Struct to define a generic ("internal name / id", "displayable name") pair */
 typedef struct tInfo
 {
-    const char	*name;
-    char        *mem_name;  // Seperate pointer to delete name if possible (NULL otherwise)
+    char	*name;
     char	*dispname;
 } tInfo;
 
+/* Car names and car categories double-linked lists structs */
 struct tCarInfo;
 struct tCatInfo;
 
@@ -86,159 +92,292 @@ typedef struct tCarInfo
     GF_TAILQ_ENTRY(struct tCarInfo) link;
 } tCarInfo;
 
-typedef struct PlayerInfo
-{
-    tInfo	info;
-    tCarInfo	*carinfo;
-    int		racenumber;
-    const char	*transmission;
-    int		nbpitstops;
-    float	color[4];
-    int		skilllevel;
-    int		autoreverse;
-} tPlayerInfo;
-
-#define _Name		info.name
-#define _MemName        info.mem_name
-#define _DispName	info.dispname
-
-static tPlayerInfo PlayersInfo[NB_DRV];
-
+/* The car category / name double-linked lists */
 static tCatsInfoHead CatsInfoList;
 
-static tPlayerInfo	*curPlayer;
+/* Player info struct */
+struct tPlayerInfo
+{
+public:
 
+  tPlayerInfo(const char *name = HumanDriverModuleName, const char *dispname = 0, tCarInfo *carinfo = 0, 
+			  int racenumber = 0, int skilllevel = 0, float *color = 0, 
+			  tGearChangeMode gearchangemode = GEAR_MODE_AUTO, int autoreverse = 0, 
+			  int nbpitstops = 0) 
+  {
+	_info.name = 0;
+	setName(name);
+	_info.dispname = 0;
+	setDispName(dispname);
+	_carinfo = carinfo ? carinfo : GF_TAILQ_FIRST(&((GF_TAILQ_FIRST(&CatsInfoList))->CarsInfoList));
+	_racenumber = racenumber; 
+	_gearchangemode = gearchangemode; 
+	_nbpitstops = nbpitstops; 
+	_skilllevel = skilllevel; 
+	_autoreverse = autoreverse; 
+	_color[0] = color ? color[0] : 1.0; 
+	_color[1] = color ? color[1] : 1.0; 
+	_color[2] = color ? color[2] : 0.5; 
+	_color[3] = color ? color[3] : 1.0;
+  }
+
+  tPlayerInfo(const tPlayerInfo &src)
+  {
+	_info.name = 0;
+	setName(src._info.name);
+	_info.dispname = 0;
+	setDispName(src._info.dispname);
+	_carinfo = src._carinfo;
+	_racenumber = src._racenumber; 
+	_gearchangemode = src._gearchangemode; 
+	_nbpitstops = src._nbpitstops; 
+	_skilllevel = src._skilllevel; 
+	_autoreverse = src._autoreverse; 
+	_color[0] = src._color[0]; 
+	_color[1] = src._color[1]; 
+	_color[2] = src._color[2]; 
+	_color[3] = src._color[3];
+  }
+
+  const char *name()  const { return _info.name; };
+  const char *dispName()  const { return _info.dispname; }
+  tCarInfo *carInfo() const { return _carinfo; }
+  int raceNumber() const { return _racenumber; }
+  tGearChangeMode gearChangeMode() const { return _gearchangemode; }
+  int nbPitStops() const { return _nbpitstops; }
+  float color(int idx) const { return (idx >= 0 && idx < 4) ? _color[idx] : 0.0; }
+  int skillLevel() const { return _skilllevel; }
+  int autoReverse() const { return _autoreverse; }
+
+  void setName(const char *name)
+  {
+    if (_info.name)
+	    delete[] _info.name;
+	if (!name || strlen(name) == 0)
+	  name = HumanDriverModuleName;
+	_info.name = new char[strlen(name)+1];
+	strcpy(_info.name, name); // Can't use strdup : free crashes in destructor !?
+  }
+  void setDispName(const char *dispname)
+  {
+    if (_info.dispname)
+	    delete[] _info.dispname;
+	if (!dispname || strlen(dispname) == 0)
+	  dispname = NO_DRV;
+	_info.dispname = new char[strlen(dispname)+1];
+	strcpy(_info.dispname, dispname); // Can't use strdup : free crashes in destructor !?
+  }
+  void setCarInfo(tCarInfo *carInfo) { _carinfo = carInfo; }
+  void setRaceNumber(int raceNumber) { _racenumber = raceNumber; }
+  void setGearChangeMode(tGearChangeMode gearChangeMode) { _gearchangemode = gearChangeMode; }
+  void setNbPitStops(int nbPitStops) { _nbpitstops = nbPitStops; }
+  void setSkillLevel(int skillLevel) { _skilllevel = skillLevel; }
+  void setAutoReverse(int autoReverse) { _autoreverse = autoReverse; }
+
+  ~tPlayerInfo() 
+  {
+	if (_info.dispname)
+	  delete[] _info.dispname;
+	if (_info.name)
+	  delete[] _info.name;
+  }
+
+  // Gear change mode enum to string conversion
+  const char *gearChangeModeString() const
+  { 
+	const char *gearChangeStr;
+	
+	if (_gearchangemode == GEAR_MODE_AUTO) {
+	  gearChangeStr = HM_VAL_AUTO;
+	} else if (_gearchangemode == GEAR_MODE_GRID) {
+	  gearChangeStr = HM_VAL_GRID;
+	} else {
+	  gearChangeStr = HM_VAL_SEQ;
+	}
+ 
+	return gearChangeStr;
+  }
+
+private:
+
+  tInfo			_info;
+  tCarInfo*		_carinfo;
+  int				_racenumber;
+  tGearChangeMode	_gearchangemode;
+  int				_nbpitstops;
+  float			_color[4];
+  int				_skilllevel;
+  int				_autoreverse;
+};
+
+
+/* The human driver (= player) info list */
+typedef std::deque<tPlayerInfo*> tPlayerInfoList;
+static tPlayerInfoList PlayersInfo;
+
+/* The currently selected player (PlayersInfo.end() if none) */
+static tPlayerInfoList::iterator CurrPlayer;
+
+/* A bool to ("yes", "no") conversion table */
 static const char *Yn[] = {HM_VAL_YES, HM_VAL_NO};
 
+static int ReloadValues = 1;
+
+/* Load screen editable fields with relevant values :
+   - all empty if no player selected,
+   - from selected player current settings otherwise 
+*/
 static void
 refreshEditVal(void)
 {
-    if (curPlayer == NULL) {
-	GfuiEditboxSetString(scrHandle, NameEditId, "");
-	GfuiEnable(scrHandle, NameEditId, GFUI_DISABLE);
+    int autoRevVisible = GFUI_INVISIBLE;
 
-	GfuiEditboxSetString(scrHandle, RaceNumEditId, "");
-	GfuiEnable(scrHandle, RaceNumEditId, GFUI_DISABLE);
+    if (CurrPlayer == PlayersInfo.end()) {
 
-	GfuiLabelSetText(scrHandle, CarEditId, "");
-	GfuiEnable(scrHandle, CarEditId, GFUI_DISABLE);
+	GfuiEditboxSetString(ScrHandle, NameEditId, "");
+	GfuiEnable(ScrHandle, NameEditId, GFUI_DISABLE);
+
+	GfuiEditboxSetString(ScrHandle, RaceNumEditId, "");
+	GfuiEnable(ScrHandle, RaceNumEditId, GFUI_DISABLE);
+
+	GfuiLabelSetText(ScrHandle, CarEditId, "");
+	GfuiEnable(ScrHandle, CarEditId, GFUI_DISABLE);
 	
-	GfuiLabelSetText(scrHandle, CatEditId, "");
+	GfuiLabelSetText(ScrHandle, CatEditId, "");
+	GfuiEnable(ScrHandle, CatEditId, GFUI_DISABLE);
 
-	GfuiEditboxSetString(scrHandle, RaceNumEditId, "");
-	GfuiEnable(scrHandle, RaceNumEditId, GFUI_DISABLE);
+	GfuiLabelSetText(ScrHandle, GearChangeEditId, "");
+	GfuiEnable(ScrHandle, GearChangeEditId, GFUI_DISABLE);
 
-	GfuiLabelSetText(scrHandle, TransEditId, "");
+	GfuiEditboxSetString(ScrHandle, PitsEditId, "");
+	GfuiEnable(ScrHandle, PitsEditId, GFUI_DISABLE);
 
-	GfuiEditboxSetString(scrHandle, PitsEditId, "");
-	GfuiEnable(scrHandle, PitsEditId, GFUI_DISABLE);
+	GfuiLabelSetText(ScrHandle, SkillEditId, "");
+	GfuiEnable(ScrHandle, SkillEditId, GFUI_DISABLE);
 
-	GfuiLabelSetText(scrHandle, SkillId, "");
+	GfuiLabelSetText(ScrHandle, AutoReverseEditId, "");
+	GfuiEnable(ScrHandle, AutoReverseEditId, GFUI_DISABLE);
 
-	GfuiLabelSetText(scrHandle, AutoReverseId, "");
     } else {
-	GfuiEditboxSetString(scrHandle, NameEditId, curPlayer->_DispName);
-	GfuiEnable(scrHandle, NameEditId, GFUI_ENABLE);
 
-	sprintf(buf, "%d", curPlayer->racenumber);
-	GfuiEditboxSetString(scrHandle, RaceNumEditId, buf);
-	GfuiEnable(scrHandle, RaceNumEditId, GFUI_ENABLE);
+        if (strcmp((*CurrPlayer)->dispName(), NO_DRV)) {
+	    GfuiEditboxSetString(ScrHandle, NameEditId, (*CurrPlayer)->dispName());
+	} else {
+	    GfuiEditboxSetString(ScrHandle, NameEditId, DRV_NAME_PROMPT);
+	}
+	GfuiEnable(ScrHandle, NameEditId, GFUI_ENABLE);
 
-	GfuiLabelSetText(scrHandle, CarEditId, curPlayer->carinfo->_DispName);
-	GfuiEnable(scrHandle, CarEditId, GFUI_ENABLE);
+	sprintf(buf, "%d", (*CurrPlayer)->raceNumber());
+	GfuiEditboxSetString(ScrHandle, RaceNumEditId, buf);
+	GfuiEnable(ScrHandle, RaceNumEditId, GFUI_ENABLE);
 
-	GfuiLabelSetText(scrHandle, CatEditId, curPlayer->carinfo->cat->_DispName);
+	GfuiLabelSetText(ScrHandle, CarEditId, (*CurrPlayer)->carInfo()->info.dispname);
+	GfuiEnable(ScrHandle, CarEditId, GFUI_ENABLE);
 
-	sprintf(buf, "%d", curPlayer->racenumber);
-	GfuiEditboxSetString(scrHandle, RaceNumEditId, buf);
-	GfuiEnable(scrHandle, RaceNumEditId, GFUI_ENABLE);
+	GfuiLabelSetText(ScrHandle, CatEditId, (*CurrPlayer)->carInfo()->cat->info.dispname);
+	GfuiEnable(ScrHandle, CatEditId, GFUI_ENABLE);
 
-	GfuiLabelSetText(scrHandle, TransEditId, curPlayer->transmission);
+	GfuiLabelSetText(ScrHandle, GearChangeEditId, (*CurrPlayer)->gearChangeModeString());
+	GfuiEnable(ScrHandle, GearChangeEditId, GFUI_ENABLE);
 
-	sprintf(buf, "%d", curPlayer->nbpitstops);
-	GfuiEditboxSetString(scrHandle, PitsEditId, buf);
-	GfuiEnable(scrHandle, PitsEditId, GFUI_ENABLE);
+	sprintf(buf, "%d", (*CurrPlayer)->nbPitStops());
+	GfuiEditboxSetString(ScrHandle, PitsEditId, buf);
+	GfuiEnable(ScrHandle, PitsEditId, GFUI_ENABLE);
 
-	GfuiLabelSetText(scrHandle, SkillId, level_str[curPlayer->skilllevel]);
+	GfuiLabelSetText(ScrHandle, SkillEditId, SkillLevelString[(*CurrPlayer)->skillLevel()]);
+	GfuiEnable(ScrHandle, SkillEditId, GFUI_ENABLE);
 
-	GfuiLabelSetText(scrHandle, AutoReverseId, Yn[curPlayer->autoreverse]);
+	GfuiLabelSetText(ScrHandle, AutoReverseEditId, Yn[(*CurrPlayer)->autoReverse()]);
+	GfuiEnable(ScrHandle, AutoReverseEditId, GFUI_ENABLE);
+
+	if ((*CurrPlayer)->gearChangeMode() == GEAR_MODE_AUTO)
+	    autoRevVisible = GFUI_VISIBLE;
     }
+
+    GfuiVisibilitySet(ScrHandle, AutoReverseLabelId, autoRevVisible);
+    GfuiVisibilitySet(ScrHandle, AutoReverseLeftId, autoRevVisible);
+    GfuiVisibilitySet(ScrHandle, AutoReverseEditId, autoRevVisible);
+    GfuiVisibilitySet(ScrHandle, AutoReverseRightId, autoRevVisible);
+    
 }
 
 static void
 onSelect(void * /* Dummy */)
 {
-    GfuiScrollListGetSelectedElement(scrHandle, scrollList, (void**)&curPlayer);
+    tPlayerInfoList::difference_type elemIdx;
+    GfuiScrollListGetSelectedElement(ScrHandle, ScrollList, (void**)&elemIdx);
+
+    CurrPlayer = PlayersInfo.begin() + elemIdx;
+
     refreshEditVal();
 }
 
+/* Load the car category info / car info double-linked lists
+   from installed category dirs and car description xml files */
 static void
 GenCarsInfo(void)
 {
-	tCarInfo	*curCar;
-	tCatInfo	*curCat;
-	tCatInfo	*tmpCat;
-	tFList	*files;
-	tFList	*curFile;
-	void	*carparam;
-	char	*str;
-	const char	*cstr;
-	void	*hdle;
-
-	/* Empty the lists */
-	while ((curCat = GF_TAILQ_FIRST(&CatsInfoList)) != NULL) {
-		GF_TAILQ_REMOVE(&CatsInfoList, curCat, link);
-		while ((curCar = GF_TAILQ_FIRST(&(curCat->CarsInfoList))) != NULL) {
-			GF_TAILQ_REMOVE(&(curCat->CarsInfoList), curCar, link);
-			free(curCar->_MemName);
-			free(curCar);
-		}
-		free(curCat->_MemName);
-		free(curCat);
-	}
-
-	files = GfDirGetList("categories");
-	curFile = files;
-	if ((curFile != NULL) && (curFile->name[0] != '.')) {
-		do {
-			curFile = curFile->next;
-			curCat = (tCatInfo*)calloc(1, sizeof(tCatInfo));
-			GF_TAILQ_INIT(&(curCat->CarsInfoList));
-			str = strchr(curFile->name, '.');
-			*str = '\0';
-			curCat->_MemName = strdup(curFile->name);
-			curCat->_Name = curCat->_MemName;
-			sprintf(buf, "categories/%s.xml", curFile->name);
-			hdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-			if (!hdle) {
-			continue;
-			}
-			curCat->_DispName = GfParmGetName(hdle);
-			GF_TAILQ_INSERT_TAIL(&CatsInfoList, curCat, link);
-		} while (curFile != files);
-	}
-	GfDirFreeList(files, NULL, true, true);
+    tCarInfo	*curCar;
+    tCatInfo	*curCat;
+    tCatInfo	*tmpCat;
+    tFList	*files;
+    tFList	*curFile;
+    void	*carparam;
+    void	*hdle;
     
+    /* Empty the cars/categories lists */
+    while ((curCat = GF_TAILQ_FIRST(&CatsInfoList)) != NULL) {
+        GF_TAILQ_REMOVE(&CatsInfoList, curCat, link);
+	while ((curCar = GF_TAILQ_FIRST(&(curCat->CarsInfoList))) != NULL) {
+	    GF_TAILQ_REMOVE(&(curCat->CarsInfoList), curCar, link);
+	    free(curCar->info.name);
+	    free(curCar);
+	}
+	free(curCat);
+    }
+    
+    /* Load the category list */
+    files = GfDirGetList("categories");
+    curFile = files;
+    if ((curFile != NULL) && (curFile->name[0] != '.')) {
+        do {
+	    curFile = curFile->next;
+	    curCat = (tCatInfo*)calloc(1, sizeof(tCatInfo));
+	    GF_TAILQ_INIT(&(curCat->CarsInfoList));
+	    char *str = strchr(curFile->name, '.');
+	    *str = '\0';
+	    curCat->info.name = strdup(curFile->name);
+	    sprintf(buf, "categories/%s.xml", curFile->name);
+	    hdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	    if (!hdle) {
+	        continue;
+	    }
+	    curCat->info.dispname = GfParmGetName(hdle);
+	    GF_TAILQ_INSERT_TAIL(&CatsInfoList, curCat, link);
+	} while (curFile != files);
+    }
+    GfDirFreeList(files, NULL, true, true);
+    
+    /* Load the car info list */
     files = GfDirGetList("cars");
     curFile = files;
     if ((curFile != NULL) && (curFile->name[0] != '.')) {
 	do {
 	    curFile = curFile->next;
-	    curCar = (tCarInfo*)calloc(1, sizeof(tCarInfo));
-	    curCar->_MemName = strdup(curFile->name);
-	    curCar->_Name = curCar->_MemName;
 	    sprintf(buf, "cars/%s/%s.xml", curFile->name, curFile->name);
 	    carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	    if (!carparam) {
 		continue;
 	    }
-	    curCar->_DispName = GfParmGetName(carparam);
+	    curCar = (tCarInfo*)calloc(1, sizeof(tCarInfo));
+	    curCar->info.name = strdup(curFile->name);
+	    curCar->info.dispname = GfParmGetName(carparam);
 	    /* search for the category */
-	    cstr = GfParmGetStr(carparam, SECT_CAR, PRM_CATEGORY, "");
+	    const char *str = GfParmGetStr(carparam, SECT_CAR, PRM_CATEGORY, "");
 	    curCat = GF_TAILQ_FIRST(&CatsInfoList);
 	    if (curCat != NULL) {
 		do {
-		    if (strcmp(curCat->_Name, cstr) == 0) {
+		    if (strcmp(curCat->info.name, str) == 0) {
 			break;
 		    }
 		} while ((curCat = GF_TAILQ_NEXT(curCat, link)) != NULL);
@@ -256,209 +395,398 @@ GenCarsInfo(void)
 	tmpCat = curCat;
 	curCat = GF_TAILQ_NEXT(curCat, link);
 	if (curCar == NULL) {
-	    GfOut("Removing empty category %s\n", tmpCat->_DispName);
+	    GfOut("Removing empty category %s\n", tmpCat->info.dispname);
 	    GF_TAILQ_REMOVE(&CatsInfoList, tmpCat, link);
-	    free(tmpCat->_MemName);
+	    free(tmpCat->info.name);
 	    free(tmpCat);
 	}
     } while (curCat  != NULL);
     
 }
 
+/* Update players scroll-list from PlayersInfo array */
 static void
 UpdtScrollList(void)
 {
-    char	*str;
+    const char	*str;
     int		i;
     void	*tmp;
 
     /* free the previous scrollist elements */
-    while((str = GfuiScrollListExtractElement(scrHandle, scrollList, 0, (void**)&tmp)) != NULL) {
+    while((str = GfuiScrollListExtractElement(ScrHandle, ScrollList, 0, (void**)&tmp)) != NULL) {
     }
-    for (i = 0; i < NB_DRV; i++) {
-	GfuiScrollListInsertElement(scrHandle, scrollList, PlayersInfo[i]._DispName, i, (void*)&(PlayersInfo[i]));
+    for (i = 0; i < (int)PlayersInfo.size(); i++) {
+	GfuiScrollListInsertElement(ScrHandle, ScrollList, PlayersInfo[i]->dispName(), i, (void*)i);
+    }
+
+    if (CurrPlayer != PlayersInfo.end()) {
+      GfuiScrollListShowElement(ScrHandle, ScrollList, (int)(CurrPlayer - PlayersInfo.begin()));
     }
 }
 
+/* Put given player settings (from PlayersInfo array) to the human drivers and preferences params (index is the identification number in params, beginning at 1)*/
+static void
+PutDrvSettings(unsigned index)
+{
+    char drvSectionPath[256];
+
+    if (!DrvHdle || !PrefHdle) {
+	return;
+    }
+
+    tPlayerInfo *player = PlayersInfo[index-1];
+
+    // Human driver params
+    sprintf(drvSectionPath, "%s/%s/%u", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
+    GfParmSetStr(DrvHdle, drvSectionPath, ROB_ATTR_NAME, player->dispName());
+    GfParmSetStr(DrvHdle, drvSectionPath, ROB_ATTR_CAR, player->carInfo()->info.name);
+    GfParmSetNum(DrvHdle, drvSectionPath, ROB_ATTR_RACENUM, (char*)NULL, player->raceNumber());
+    GfParmSetNum(DrvHdle, drvSectionPath, ROB_ATTR_RED, (char*)NULL, player->color(0));
+    GfParmSetNum(DrvHdle, drvSectionPath, ROB_ATTR_GREEN, (char*)NULL, player->color(1));
+    GfParmSetNum(DrvHdle, drvSectionPath, ROB_ATTR_BLUE, (char*)NULL, player->color(2));
+    GfParmSetStr(DrvHdle, drvSectionPath, ROB_ATTR_TYPE, ROB_VAL_HUMAN);
+    GfParmSetStr(DrvHdle, drvSectionPath, ROB_ATTR_LEVEL, SkillLevelString[player->skillLevel()]);
+
+    // Driver preferences params
+    sprintf(drvSectionPath, "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
+    GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_TRANS, player->gearChangeModeString());
+    GfParmSetNum(PrefHdle, drvSectionPath, HM_ATT_NBPITS, (char*)NULL, (tdble)player->nbPitStops());
+    GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_AUTOREVERSE, Yn[player->autoReverse()]);
+    
+    /* Allow neutral gear in sequential mode if no reverse gear command defined */
+    if (player->gearChangeMode() == GEAR_MODE_SEQ
+	&& !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_R, "-"), "-"))
+        GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_YES);
+    else
+        GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_NO);
+    
+    /* Release gear lever goes neutral in grid mode if no neutral gear command defined */
+    if (player->gearChangeMode() == GEAR_MODE_GRID
+	&& !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_N, "-"), "-"))
+        GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_REL_BUT_NEUTRAL, HM_VAL_YES);
+    else
+        GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_REL_BUT_NEUTRAL, HM_VAL_NO);
+}
+
+/* Create a brand new player into the list, and update players scroll-list and all editable fields*/
+static void
+NewPlayer(void * /* dummy */)
+{
+    unsigned newPlayerIdx, playerIdx;
+    char sectionPath[256];
+    char driverId[5];
+    char newDriverId[5];
+
+    // Insert new player after current (or after last if no current)
+    CurrPlayer = PlayersInfo.insert(CurrPlayer + (CurrPlayer == PlayersInfo.end() ? 0 : 1),
+				   new tPlayerInfo(HumanDriverModuleName));
+
+    // Get new current player index (= identification number in params).
+    newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
+
+    // Update preferences and drivers params (rename those after, add new).
+    sprintf(sectionPath, "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
+    for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
+        sprintf(driverId, "%u", playerIdx);
+	sprintf(newDriverId, "%u", playerIdx+1);
+	GfParmListRenameElt(PrefHdle, sectionPath, driverId, newDriverId);
+    }
+
+    sprintf(sectionPath, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
+    for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
+        sprintf(driverId, "%u", playerIdx);
+	sprintf(newDriverId, "%u", playerIdx+1);
+	GfParmListRenameElt(DrvHdle, sectionPath, driverId, newDriverId);
+    }
+
+    PutDrvSettings(newPlayerIdx);
+
+    // Update GUI.
+    refreshEditVal();
+    UpdtScrollList();
+}
+
+/* Create a new player into the list by copying the currently selected one, and update players scroll-list and all editable fields (copy also the control settings) */
+static void
+CopyPlayer(void * /* dummy */)
+{
+    unsigned curPlayerIdx, newPlayerIdx;
+    unsigned playerIdx;
+    char sectionPath[256];
+    char driverId[5];
+    char newDriverId[5];
+
+    tGearChangeMode gearChange;
+    
+    if (CurrPlayer != PlayersInfo.end()) {
+
+        // Get current (source) player index (= identification number in params).
+        curPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
+
+	// Save current player gear change mode
+	gearChange = (*CurrPlayer)->gearChangeMode();
+
+	 // Get current player control settings.
+        TorcsControlGetSettings(PrefHdle, curPlayerIdx);
+
+	// Insert new player after current
+        CurrPlayer = PlayersInfo.insert(CurrPlayer + 1, new tPlayerInfo(**CurrPlayer));
+
+        // Get new (copy) player index (= identification number in params).
+        newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
+
+	// Update preferences and drivers params (rename those after, add new).
+	sprintf(sectionPath, "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
+	for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
+	    sprintf(driverId, "%u", playerIdx);
+	    sprintf(newDriverId, "%u", playerIdx+1);
+	    GfParmListRenameElt(PrefHdle, sectionPath, driverId, newDriverId);
+	}
+    
+	sprintf(sectionPath, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
+	for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
+	    sprintf(driverId, "%u", playerIdx);
+	    sprintf(newDriverId, "%u", playerIdx+1);
+	    GfParmListRenameElt(DrvHdle, sectionPath, driverId, newDriverId);
+	}
+
+	PutDrvSettings(newPlayerIdx);
+
+	// Set new player control settings (copy of previous current one's).
+	TorcsControlPutSettings(PrefHdle, newPlayerIdx, gearChange);
+
+	// Update GUI.
+        refreshEditVal();
+        UpdtScrollList();
+    }
+}
+
+/* Remove the selected player from the list, and update players scroll-list and all editable fields*/
 static void
 DeletePlayer(void * /* dummy */)
 {
-    if (curPlayer) {
-	curPlayer->_DispName = strdup(NO_DRV);
+    int delPlayerIdx;
+    unsigned int playerIdx;
+    char sectionPath[256];
+    char driverId[5];
+    char newDriverId[5];
+    
+    if (CurrPlayer != PlayersInfo.end()) {
+
+        // Get current player index (= identification number in params).
+        delPlayerIdx = CurrPlayer - PlayersInfo.begin() + 1;
+
+	// Remove current player from list. Select next if any.
+	delete *CurrPlayer;
+        CurrPlayer = PlayersInfo.erase(CurrPlayer);
+
+	// Update preferences and drivers params.
+	sprintf(sectionPath, "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
+	sprintf(driverId, "%d", delPlayerIdx);
+	if (!GfParmListRemoveElt(PrefHdle, sectionPath, driverId)) {
+	    for (playerIdx = delPlayerIdx; playerIdx <= PlayersInfo.size(); playerIdx++) {
+	        sprintf(driverId, "%u", playerIdx+1);
+	        sprintf(newDriverId, "%u", playerIdx);
+	        GfParmListRenameElt(PrefHdle, sectionPath, driverId, newDriverId);
+	    }
+	}
+
+	sprintf(sectionPath, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
+	sprintf(driverId, "%d", delPlayerIdx);
+	if (!GfParmListRemoveElt(DrvHdle, sectionPath, driverId)) {
+	    for (playerIdx = delPlayerIdx; playerIdx <= PlayersInfo.size(); playerIdx++) {
+	        sprintf(driverId, "%u", playerIdx+1);
+	        sprintf(newDriverId, "%u", playerIdx);
+	        GfParmListRenameElt(DrvHdle, sectionPath, driverId, newDriverId);
+	    }
+	}
+
+	// Update GUI.
 	refreshEditVal();
 	UpdtScrollList();
     }
 }
 
+/* Activate the control config screen if a player is selected */
 static void
 ConfControls(void * /* dummy */ )
 {
-    int index;
+    unsigned curPlayerIdx;
     
-    if (curPlayer) {
-	index = curPlayer - PlayersInfo + 1;
-	GfuiScreenActivate(TorcsControlMenuInit(scrHandle, index));
+    if (CurrPlayer != PlayersInfo.end()) {
+
+        ReloadValues = 0;
+
+        curPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
+	GfuiScreenActivate(TorcsControlMenuInit(ScrHandle, PrefHdle, curPlayerIdx, (*CurrPlayer)->gearChangeMode()));
     }
 }
 
+/* Load human driver (=player) info list (PlayersInfo) from preferences and human drivers files ;
+   load associated scroll list */
 static int
 GenDrvList(void)
 {
-	void *drvinfo;
-	char sstring[256];
-	int i;
-	int j;
-	const char *driver;
-	tCarInfo *car;
-	tCatInfo *cat;
-	const char *str;
-	int found;
+    char sstring[256];
+    int i;
+    int j;
+    const char *driver;
+    int skilllevel;
+    tCarInfo *car, *carinfo;
+    tCatInfo *cat;
+    const char *str;
+    int found;
+    int racenumber;
+    float color[4];
+    
+    /* Reset players list */
+    tPlayerInfoList::iterator playerIter;
+    for (playerIter = PlayersInfo.begin(); playerIter != PlayersInfo.end(); playerIter++)
+        delete *playerIter;
+    PlayersInfo.clear();
 
-	sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
-	drvinfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-	if (drvinfo == NULL) {
-		return -1;
-	}
-
-	for (i = 0; i < NB_DRV; i++) {
-		sprintf(sstring, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
-		driver = GfParmGetStr(drvinfo, sstring, ROB_ATTR_NAME, "");
-		if (strlen(driver) == 0) {
-			PlayersInfo[i]._DispName = strdup(NO_DRV);
-			PlayersInfo[i]._Name = dllname;
-			PlayersInfo[i]._MemName = NULL;
-			PlayersInfo[i].carinfo = GF_TAILQ_FIRST(&((GF_TAILQ_FIRST(&CatsInfoList))->CarsInfoList));
-			PlayersInfo[i].racenumber = 0;
-			PlayersInfo[i].color[0] = 1.0;
-			PlayersInfo[i].color[1] = 1.0;
-			PlayersInfo[i].color[2] = 0.5;
-			PlayersInfo[i].color[3] = 1.0;
-		} else {
-			PlayersInfo[i]._DispName = strdup(driver);
-			PlayersInfo[i]._Name = dllname;
-			PlayersInfo[i]._MemName = NULL;
-			PlayersInfo[i].skilllevel = 0;
-			str = GfParmGetStr(drvinfo, sstring, ROB_ATTR_LEVEL, level_str[0]);
-			for(j = 0; j < nbLevels; j++) {
-				if (strcmp(level_str[j], str) == 0) {
-					PlayersInfo[i].skilllevel = j;
-					break;
-				}
-			}
-			str = GfParmGetStr(drvinfo, sstring, ROB_ATTR_CAR, "");
-			found = 0;
-			cat = GF_TAILQ_FIRST(&CatsInfoList);
-			PlayersInfo[i].carinfo = GF_TAILQ_FIRST(&(cat->CarsInfoList));
-			do {
-				car = GF_TAILQ_FIRST(&(cat->CarsInfoList));
-				if (car != NULL) {
-					do {
-						if (strcmp(car->_Name, str) == 0) {
-							found = 1;
-							PlayersInfo[i].carinfo = car;
-						}
-					} while (!found && ((car = GF_TAILQ_NEXT(car, link)) != NULL));
-				}
-			} while (!found && ((cat = GF_TAILQ_NEXT(cat, link)) != NULL));
-			PlayersInfo[i].racenumber  = (int)GfParmGetNum(drvinfo, sstring, ROB_ATTR_RACENUM, (char*)NULL, 0);
-			PlayersInfo[i].color[0]    = (float)GfParmGetNum(drvinfo, sstring, ROB_ATTR_RED, (char*)NULL, 1.0);
-			PlayersInfo[i].color[1]    = (float)GfParmGetNum(drvinfo, sstring, ROB_ATTR_GREEN, (char*)NULL, 1.0);;
-			PlayersInfo[i].color[2]    = (float)GfParmGetNum(drvinfo, sstring, ROB_ATTR_BLUE, (char*)NULL, 0.5);;
-			PlayersInfo[i].color[3]    = 1.0;
-		}
+    /* Load players settings from human.xml file*/
+    sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
+    DrvHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
+    if (DrvHdle == NULL) {
+        return -1;
     }
+
+    for (i = 0; ; i++) {
+        sprintf(sstring, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
+	driver = GfParmGetStr(DrvHdle, sstring, ROB_ATTR_NAME, "");
+	if (strlen(driver) == 0) {
+	    break; // Exit at end of driver list.
+	} else {
+	    str = GfParmGetStr(DrvHdle, sstring, ROB_ATTR_LEVEL, SkillLevelString[0]);
+	    skilllevel = 0;
+	    for(j = 0; j < NbSkillLevels; j++) {
+	        if (strcmp(SkillLevelString[j], str) == 0) {
+		    skilllevel = j;
+		    break;
+		}
+	    }
+	    str = GfParmGetStr(DrvHdle, sstring, ROB_ATTR_CAR, "");
+	    found = 0;
+	    carinfo = 0;
+	    cat = GF_TAILQ_FIRST(&CatsInfoList);
+	    do {
+	        car = GF_TAILQ_FIRST(&(cat->CarsInfoList));
+		if (car != NULL) {
+		    do {
+		        if (strcmp(car->info.name, str) == 0) {
+			    found = 1;
+			    carinfo = car;
+			}
+		    } while (!found && ((car = GF_TAILQ_NEXT(car, link)) != NULL));
+		}
+	    } while (!found && ((cat = GF_TAILQ_NEXT(cat, link)) != NULL));
+	    racenumber  = (int)GfParmGetNum(DrvHdle, sstring, ROB_ATTR_RACENUM, (char*)NULL, 0);
+	    color[0]    = (float)GfParmGetNum(DrvHdle, sstring, ROB_ATTR_RED, (char*)NULL, 1.0);
+	    color[1]    = (float)GfParmGetNum(DrvHdle, sstring, ROB_ATTR_GREEN, (char*)NULL, 1.0);;
+	    color[2]    = (float)GfParmGetNum(DrvHdle, sstring, ROB_ATTR_BLUE, (char*)NULL, 0.5);;
+	    color[3]    = 1.0;
+	    PlayersInfo.push_back(new tPlayerInfo(HumanDriverModuleName, // Driver module name
+						  driver,  // Driver (display) name
+						  carinfo, // Car
+						  racenumber, // Race number
+						  skilllevel, // skill level
+						  color)); // Colors
+	}
+    }
+
+	/* No currently selected driver */
+    CurrPlayer = PlayersInfo.end();
+
+	/* Update scroll-list from PlayersInfo */
     UpdtScrollList();
 
+    /* Load players settings from human.xml file*/
     sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
     PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
-    if (PrefHdle == NULL) {
-		GfParmReleaseHandle(drvinfo);
-		return -1;
+    if (!PrefHdle) {
+        return -1;
     }
 
-    for (i = 0; i < NB_DRV; i++) {
-		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
-		str = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
-		if (strcmp(str, HM_VAL_AUTO) == 0) {
-			PlayersInfo[i].transmission = HM_VAL_AUTO;
-		} else {
-			PlayersInfo[i].transmission = HM_VAL_MANUAL;
-		}
-		PlayersInfo[i].nbpitstops = (int)GfParmGetNum(PrefHdle, sstring, HM_ATT_NBPITS, (char*)NULL, 0);
-		if (!strcmp(GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[0]), Yn[0])) {
-			PlayersInfo[i].autoreverse = 0;
-		} else {
-			PlayersInfo[i].autoreverse = 1;
-		}
+    for (i = 0; i < (int)PlayersInfo.size(); i++) {
+        sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
+	str = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
+	if (!strcmp(str, HM_VAL_AUTO)) {
+	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_AUTO);
+	} else if (!strcmp(str, HM_VAL_GRID)) {
+	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_GRID);
+	} else {
+	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_SEQ);
+	} /* Note: Deprecated "manual" value (after R1.3.0) smoothly converted to "sequential" (backward compatibility) */
+	PlayersInfo[i]->setNbPitStops(GfParmGetNum(PrefHdle, sstring, HM_ATT_NBPITS, (char*)NULL, 0));
+	if (!strcmp(GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[0]), Yn[0])) {
+	    PlayersInfo[i]->setAutoReverse(0);
+	} else {
+	    PlayersInfo[i]->setAutoReverse(1);
+	}
     }
-
-	GfParmReleaseHandle(PrefHdle);
-	GfParmReleaseHandle(drvinfo);
 
     return 0;
 }
 
+/* Quit driver config menu (changes must have been saved before if needed) */
 static void
-SaveDrvList(void * /* dummy */)
+QuitDriverConfig(void * /* dummy */)
 {
-    void	*drvinfo;
-    char	str[32];
-    int		i;
+    // Next time, we'll have to reload the player settings from the files.
+    ReloadValues = 1;
 
-    sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
-    drvinfo = GfParmReadFile(buf, GFPARM_RMODE_STD);
-    if (drvinfo == NULL) {
-	return;
-    }
-    for (i = 0; i < NB_DRV; i++) {
-	sprintf(str, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
-	if (strcmp(PlayersInfo[i]._DispName, NO_DRV) == 0) {
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_NAME, "");
-	} else {
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_NAME, PlayersInfo[i]._DispName);
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_CAR, PlayersInfo[i].carinfo->_Name);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_RACENUM, (char*)NULL, PlayersInfo[i].racenumber);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_RED, (char*)NULL, PlayersInfo[i].color[0]);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_GREEN, (char*)NULL, PlayersInfo[i].color[1]);
-	    GfParmSetNum(drvinfo, str, ROB_ATTR_BLUE, (char*)NULL, PlayersInfo[i].color[2]);
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_TYPE, ROB_VAL_HUMAN);
-	    GfParmSetStr(drvinfo, str, ROB_ATTR_LEVEL, level_str[PlayersInfo[i].skilllevel]);
-	}
-    }
-    GfParmWriteFile(NULL, drvinfo, dllname);
+    // Reset player list
+    tPlayerInfoList::iterator playerIter;
+    for (playerIter = PlayersInfo.begin(); playerIter != PlayersInfo.end(); playerIter++)
+        delete *playerIter;
+    PlayersInfo.clear();
 
-    sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
-    PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    for (i = 0; i < NB_DRV; i++) {
-	sprintf(str, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
-	GfParmSetStr(PrefHdle, str, HM_ATT_TRANS, PlayersInfo[i].transmission);
-	GfParmSetNum(PrefHdle, str, HM_ATT_NBPITS, (char*)NULL, (tdble)PlayersInfo[i].nbpitstops);
-	GfParmSetStr(PrefHdle, str, HM_ATT_AUTOREVERSE, Yn[PlayersInfo[i].autoreverse]);
-    }
-    GfParmWriteFile(NULL, PrefHdle, "preferences");
+    // Close driver and preference params files.
+    GfParmReleaseHandle(DrvHdle);
+    DrvHdle = 0;
+
     GfParmReleaseHandle(PrefHdle);
-    PrefHdle = NULL;
-    GfuiScreenActivate(prevHandle);
+    PrefHdle = 0;
+
+    // Activate caller screen/menu
+    GfuiScreenActivate(PrevScrHandle);
+
     return;
 }
 
+/* Save players info (from PlayersInfo array) to the human drivers and preferences XML files */
+static void
+SaveDrvList(void * /* dummy */)
+{
+    int		index;
+
+    if (!DrvHdle || !PrefHdle) {
+	return;
+    }
+
+    for (index = 1; index <= (int)PlayersInfo.size(); index++) {
+        PutDrvSettings(index);
+    }
+
+    GfParmWriteFile(NULL, DrvHdle, HumanDriverModuleName);
+    GfParmWriteFile(NULL, PrefHdle, "preferences");
+
+    QuitDriverConfig(0 /* dummy */);
+
+    return;
+}
 
 static void
 ChangeName(void * /* dummy */)
 {
     char	*val;
 
-    val = GfuiEditboxGetString(scrHandle, NameEditId);
-    if (curPlayer != NULL) {
-	if (curPlayer->_DispName) {
-	    free(curPlayer->_DispName);
-	}
-	if (strlen(val)) {
-	    curPlayer->_DispName = strdup(val);
-	} else {
-	    curPlayer->_DispName = strdup(NO_DRV);
-	}
+    if (CurrPlayer != PlayersInfo.end()) {
+        val = GfuiEditboxGetString(ScrHandle, NameEditId);
+        (*CurrPlayer)->setDispName(strcmp(val, DRV_NAME_PROMPT) ? val : NO_DRV);
     }
+
     UpdtScrollList();
 }
 
@@ -467,11 +795,11 @@ ChangeNum(void * /* dummy */)
 {
     char	*val;
     
-    val = GfuiEditboxGetString(scrHandle, RaceNumEditId);
-    if (curPlayer != NULL) {
-	curPlayer->racenumber = (int)strtol(val, (char **)NULL, 0);
-	sprintf(buf, "%d", curPlayer->racenumber);
-	GfuiEditboxSetString(scrHandle, RaceNumEditId, buf);
+    if (CurrPlayer != PlayersInfo.end()) {
+       val = GfuiEditboxGetString(ScrHandle, RaceNumEditId);
+       (*CurrPlayer)->setRaceNumber((int)strtol(val, (char **)NULL, 0));
+	sprintf(buf, "%d", (*CurrPlayer)->raceNumber());
+	GfuiEditboxSetString(ScrHandle, RaceNumEditId, buf);
     }
 }
 
@@ -480,11 +808,11 @@ ChangePits(void * /* dummy */)
 {
     char	*val;
     
-    val = GfuiEditboxGetString(scrHandle, PitsEditId);
-    if (curPlayer != NULL) {    
-	curPlayer->nbpitstops = (int)strtol(val, (char **)NULL, 0);
-	sprintf(buf, "%d", curPlayer->nbpitstops);
-	GfuiEditboxSetString(scrHandle, PitsEditId, buf);
+    if (CurrPlayer != PlayersInfo.end()) {    
+        val = GfuiEditboxGetString(ScrHandle, PitsEditId);
+        (*CurrPlayer)->setNbPitStops((int)strtol(val, (char **)NULL, 0));
+	sprintf(buf, "%d", (*CurrPlayer)->nbPitStops());
+	GfuiEditboxSetString(ScrHandle, PitsEditId, buf);
     }
 }
 
@@ -494,22 +822,24 @@ ChangeCar(void *vp)
     tCarInfo	*car;
     tCatInfo	*cat;
     
-    if (curPlayer == NULL) {
+    if (CurrPlayer == PlayersInfo.end()) {
 	return;
     }
-    cat = curPlayer->carinfo->cat;
+
+    cat = (*CurrPlayer)->carInfo()->cat;
     if (vp == 0) {
-	car = GF_TAILQ_PREV(curPlayer->carinfo, CarsInfoHead, link);
+	car = GF_TAILQ_PREV((*CurrPlayer)->carInfo(), CarsInfoHead, link);
 	if (car == NULL) {
 	    car = GF_TAILQ_LAST(&(cat->CarsInfoList), CarsInfoHead);
 	}
     } else {
-	car = GF_TAILQ_NEXT(curPlayer->carinfo, link);
+	car = GF_TAILQ_NEXT((*CurrPlayer)->carInfo(), link);
 	if (car == NULL) {
 	    car = GF_TAILQ_FIRST(&(cat->CarsInfoList));
 	}
     }
-    curPlayer->carinfo = car;
+    (*CurrPlayer)->setCarInfo(car);
+
     refreshEditVal();
 }
 
@@ -519,10 +849,11 @@ ChangeCat(void *vp)
     tCarInfo	*car;
     tCatInfo	*cat;
     
-    if (curPlayer == NULL) {
+    if (CurrPlayer == PlayersInfo.end()) {
 	return;
     }
-    cat = curPlayer->carinfo->cat;
+
+    cat = (*CurrPlayer)->carInfo()->cat;
     if (vp == 0) {
 	do {
 	    cat = GF_TAILQ_PREV(cat, CatsInfoHead, link);
@@ -540,59 +871,100 @@ ChangeCat(void *vp)
 	    car = GF_TAILQ_FIRST(&(cat->CarsInfoList));
 	} while (car == NULL);	/* skip empty categories */
     }
-    curPlayer->carinfo = car;
+    (*CurrPlayer)->setCarInfo(car);
+
     refreshEditVal();
 }
 
 static void
 ChangeLevel(void *vp)
 {
-    if (curPlayer == NULL) {
+    if (CurrPlayer == PlayersInfo.end()) {
 	return;
     }
+
+    int skillLevel = (*CurrPlayer)->skillLevel();
     if (vp == 0) {
-	curPlayer->skilllevel--;
-	if (curPlayer->skilllevel < 0) {
-	    curPlayer->skilllevel = nbLevels - 1;
+	skillLevel--;
+	if (skillLevel < 0) {
+	    skillLevel = NbSkillLevels - 1;
 	}
     } else {
-	curPlayer->skilllevel++;
-	if (curPlayer->skilllevel == nbLevels) {
-	    curPlayer->skilllevel = 0;
+	skillLevel++;
+	if (skillLevel == NbSkillLevels) {
+	    skillLevel = 0;
 	}
     }
+    (*CurrPlayer)->setSkillLevel(skillLevel);
+
     refreshEditVal();
 }
 
 static void
 ChangeReverse(void *vdelta)
 {
-    long delta = (long)vdelta;
+    const long delta = (long)vdelta;
     
-    if (curPlayer == NULL) {
+    if (CurrPlayer == PlayersInfo.end()) {
 	return;
     }
-    curPlayer->autoreverse += (int)delta;
-    if (curPlayer->autoreverse < 0) {
-	curPlayer->autoreverse = 1;
-    } else if (curPlayer->autoreverse > 1) {
-	curPlayer->autoreverse = 0;
+
+    int autoReverse = (*CurrPlayer)->autoReverse();
+    autoReverse += (int)delta;
+    if (autoReverse < 0) {
+	autoReverse = 1;
+    } else if (autoReverse > 1) {
+	autoReverse = 0;
     }
+    (*CurrPlayer)->setAutoReverse(autoReverse);
+
+    refreshEditVal();
+}
+
+
+/* Gear change mode change callback */
+static void
+ChangeGearChange(void *vp)
+{
+    if (CurrPlayer == PlayersInfo.end()) {
+	return;
+    }
+    tGearChangeMode gearChangeMode = (*CurrPlayer)->gearChangeMode();
+    if (vp == 0) {
+	if (gearChangeMode == GEAR_MODE_AUTO) {
+	    gearChangeMode = GEAR_MODE_GRID;
+	} else if (gearChangeMode == GEAR_MODE_SEQ) {
+	    gearChangeMode = GEAR_MODE_AUTO;
+	}
+	else {
+	    gearChangeMode = GEAR_MODE_SEQ;
+	}
+    } else {
+	if (gearChangeMode == GEAR_MODE_AUTO) {
+	    gearChangeMode = GEAR_MODE_SEQ;
+	} else if (gearChangeMode == GEAR_MODE_SEQ) {
+	    gearChangeMode = GEAR_MODE_GRID;
+	}
+	else {
+	    gearChangeMode = GEAR_MODE_AUTO;
+	}
+    }
+    (*CurrPlayer)->setGearChangeMode(gearChangeMode);
 
     refreshEditVal();
 }
 
 static void
-ChangeTrans(void * /* dummy */)
+onActivate(void * /* dummy */)
 {
-    if (curPlayer == NULL) {
-	return;
+    if (ReloadValues) {
+	  
+	    /* Load car/categories and players settings */
+	    GenCarsInfo();
+		GenDrvList();
     }
-    if (!strcmp(curPlayer->transmission,HM_VAL_AUTO)==0) {
-	curPlayer->transmission = HM_VAL_AUTO;
-    } else {
-	curPlayer->transmission = HM_VAL_MANUAL;
-    }
+	
+    /* Display editable fields values */
     refreshEditVal();
 }
 
@@ -602,45 +974,59 @@ TorcsDriverMenuInit(void *prevMenu)
     int		x, y, x2, x3, x4, dy;
     static int	firstTime = 1;
 
+    /* Initialize cars and categories info if not already done */
     if (firstTime) {
 	firstTime = 0;
 	GF_TAILQ_INIT(&CatsInfoList);
     }
     
-    /* screen already created */
-    if (scrHandle) {
-	GenCarsInfo();
-	GenDrvList();
-	return scrHandle;
+    /* Screen already created : nothing more to do */
+    if (ScrHandle) {
+	return ScrHandle;
     }
-    prevHandle = prevMenu;
 
-    scrHandle = GfuiScreenCreate();
-    GfuiTitleCreate(scrHandle, "Player Configuration", 0);
+    /* Save previous screen handle for exit time */ 
+    PrevScrHandle = prevMenu;
 
-    GfuiScreenAddBgImg(scrHandle, "data/img/splash-qrdrv.png");
+    /* Create the screen */
+    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    GfuiLabelCreate(scrHandle, "Players", GFUI_FONT_LARGE, 496, 400, GFUI_ALIGN_HC_VB, 0);
+    /* Title */
+    GfuiTitleCreate(ScrHandle, "Player Configuration", 0);
 
-    scrollList = GfuiScrollListCreate(scrHandle, GFUI_FONT_MEDIUM_C,
-				      396, 390 - NB_DRV * GfuiFontHeight(GFUI_FONT_MEDIUM_C),
-				      GFUI_ALIGN_HL_VB, 200, NB_DRV * GfuiFontHeight(GFUI_FONT_MEDIUM_C), GFUI_SB_NONE,
+    /* Background image */
+    GfuiScreenAddBgImg(ScrHandle, "data/img/splash-qrdrv.png");
+
+    /* Players label and associated scroll list just below */
+    GfuiLabelCreate(ScrHandle, "Players", GFUI_FONT_LARGE, 496, 400, GFUI_ALIGN_HC_VB, 0);
+
+    const unsigned scrollListSize = 12;
+    ScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C,
+				      396, 390 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C),
+				      GFUI_ALIGN_HL_VB, 200, scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C), GFUI_SB_RIGHT,
 				      NULL, onSelect);
 
-    GfuiButtonCreate(scrHandle, "Delete", GFUI_FONT_LARGE, 496, 340 - NB_DRV * GfuiFontHeight(GFUI_FONT_MEDIUM_C),
+    /* New player button */
+    GfuiButtonCreate(ScrHandle, "New", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C),
+		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+		     NULL, NewPlayer, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+
+    /* Copy player button */
+    GfuiButtonCreate(ScrHandle, "Copy", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 30,
+		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+		     NULL, CopyPlayer, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+
+    /* Delete player button */
+    GfuiButtonCreate(ScrHandle, "Delete", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 60,
 		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, DeletePlayer, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiButtonCreate(scrHandle, "Controls", GFUI_FONT_LARGE, 496, 340 - NB_DRV * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 30,
+    /* Access to control screen button*/
+    GfuiButtonCreate(ScrHandle, "Controls", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 90,
 		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, ConfControls, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GenCarsInfo();
-    if (GenDrvList()) {
-	GfuiScreenRelease(scrHandle);
-	return NULL;
-    }
-
+    /* Screen coordinates and deltas for labels, buttons, ... */
     x = 20;
     x2 = 170;
     x3 = x2 + 100;
@@ -648,108 +1034,126 @@ TorcsDriverMenuInit(void *prevMenu)
     y = 370;
     dy = 30;
 
-    GfuiLabelCreate(scrHandle, "Name:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    NameEditId = GfuiEditboxCreate(scrHandle, "", GFUI_FONT_MEDIUM_C,
-				    x2+10, y, 180, 16, NULL, (tfuiCallback)NULL, ChangeName);
+    /* Player name label and associated editbox */
+    GfuiLabelCreate(ScrHandle, "Name:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    NameEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
+				   x2+10, y, 180, MAX_DRV_NAME_LEN, 
+				   NULL, (tfuiCallback)NULL, ChangeName);
 
+    /* Player skill level and associated "combobox" (left arrow, label, right arrow) */
     y -= dy;
-    GfuiLabelCreate(scrHandle, "Category:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeCat,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeCat,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    CatEditId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(scrHandle, CatEditId, LabelColor);
-
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Car:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeCar,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeCar,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    CarEditId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(scrHandle, CarEditId, LabelColor);
-
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Race Number:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    RaceNumEditId = GfuiEditboxCreate(scrHandle, "0", GFUI_FONT_MEDIUM_C,
-				      x2+10, y, 0, 2, NULL, (tfuiCallback)NULL, ChangeNum);
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Transmission:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeTrans,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeTrans,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    TransEditId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(scrHandle, TransEditId, LabelColor);
-
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Pit Stops:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    PitsEditId = GfuiEditboxCreate(scrHandle, "", GFUI_FONT_MEDIUM_C,
-				   x2+10, y, 0, 2, NULL, (tfuiCallback)NULL, ChangePits);
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Level:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
+    GfuiLabelCreate(ScrHandle, "Level:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
 		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
 		       x2, y, GFUI_ALIGN_HL_VB, 1,
 		       (void*)0, ChangeLevel,
 		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
 		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
 		       x4, y, GFUI_ALIGN_HR_VB, 1,
 		       (void*)1, ChangeLevel,
 		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    SkillId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(scrHandle, SkillId, LabelColor);
+    SkillEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
+    GfuiLabelSetColor(ScrHandle, SkillEditId, LabelColor);
 
+    /* Race number and associated editbox */
     y -= dy;
-    GfuiLabelCreate(scrHandle, "Auto Reverse:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
+    GfuiLabelCreate(ScrHandle, "Race Number:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    RaceNumEditId = GfuiEditboxCreate(ScrHandle, "0", GFUI_FONT_MEDIUM_C,
+				      x2+10, y, 0, 2, NULL, (tfuiCallback)NULL, ChangeNum);
+
+    /* Number of pit stops and associated editbox */
+    y -= dy;
+    GfuiLabelCreate(ScrHandle, "Pit Stops:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    PitsEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
+				   x2+10, y, 0, 2, NULL, (tfuiCallback)NULL, ChangePits);
+
+    /* Gear changing mode and associated "combobox" (left arrow, label, right arrow) */
+    y -= dy;
+    GfuiLabelCreate(ScrHandle, "Gear change:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
 		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
 		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)-1, ChangeReverse,
+		       (void*)0, ChangeGearChange,
 		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
+		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
+		       x4, y, GFUI_ALIGN_HR_VB, 1,
+		       (void*)1, ChangeGearChange,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    GearChangeEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
+    GfuiLabelSetColor(ScrHandle, GearChangeEditId, LabelColor);
+
+    /* Gear changing auto-reverse flag and associated "combobox" (left arrow, label, right arrow) */
+    y -= dy;
+    AutoReverseLabelId =
+      GfuiLabelCreate(ScrHandle, "Auto Reverse:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    AutoReverseLeftId =
+      GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
+			 "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
+			 x2, y, GFUI_ALIGN_HL_VB, 1,
+			 (void*)-1, ChangeReverse,
+			 NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+    AutoReverseRightId =
+      GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
 		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
 		       x4, y, GFUI_ALIGN_HR_VB, 1,
 		       (void*)1, ChangeReverse,
 		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    AutoReverseId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(scrHandle, AutoReverseId, LabelColor);
+    AutoReverseEditId = 
+      GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
+    GfuiLabelSetColor(ScrHandle, AutoReverseEditId, LabelColor);
     
-    GfuiButtonCreate(scrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+    /* Car category and associated "combobox" (left arrow, label, right arrow) */
+    y -= dy;
+    y -= dy;
+    GfuiLabelCreate(ScrHandle, "Category:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
+		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
+		       x2, y, GFUI_ALIGN_HL_VB, 1,
+		       (void*)0, ChangeCat,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
+		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
+		       x4, y, GFUI_ALIGN_HR_VB, 1,
+		       (void*)1, ChangeCat,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CatEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
+    GfuiLabelSetColor(ScrHandle, CatEditId, LabelColor);
+
+    /* Car name and associated "combobox" (left arrow, label, right arrow) */
+    y -= dy;
+    GfuiLabelCreate(ScrHandle, "Car:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
+		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
+		       x2, y, GFUI_ALIGN_HL_VB, 1,
+		       (void*)0, ChangeCar,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
+		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
+		       x4, y, GFUI_ALIGN_HR_VB, 1,
+		       (void*)1, ChangeCar,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CarEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
+    GfuiLabelSetColor(ScrHandle, CarEditId, LabelColor);
+
+    /* Screen validation button */
+    GfuiButtonCreate(ScrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
      NULL, SaveDrvList, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-     prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    /* Screen cancelation button */
+    GfuiButtonCreate(ScrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+     NULL, QuitDriverConfig, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiAddKey(scrHandle, 13, "Save Drivers", NULL, SaveDrvList, NULL);
-    GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_UP, "Previous Car Category", (void*)0, ChangeCat, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_DOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
+    /* Keybord shortcuts */
+    GfuiAddKey(ScrHandle, 13 /* Return */, "Save Drivers", NULL, SaveDrvList, NULL);
+    GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel Selection", NULL, QuitDriverConfig, NULL);
+    GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(ScrHandle, GLUT_KEY_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
+    GfuiAddSKey(ScrHandle, GLUT_KEY_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);
+    GfuiAddSKey(ScrHandle, GLUT_KEY_UP, "Previous Car Category", (void*)0, ChangeCat, NULL);
+    GfuiAddSKey(ScrHandle, GLUT_KEY_DOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
 
-    refreshEditVal();
-    return scrHandle;
+    return ScrHandle;
 }
 

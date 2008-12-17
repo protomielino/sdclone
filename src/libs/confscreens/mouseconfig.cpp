@@ -2,7 +2,7 @@
 
     file        : mouseconfig.cpp
     created     : Thu Mar 13 21:27:03 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: mouseconfig.cpp,v 1.5 2003/11/08 16:37:18 torcs Exp $                                  
 
@@ -39,7 +39,7 @@ static void 	*scrHandle2 = NULL;
 
 static tCtrlMouseInfo	mouseInfo;
 
-#define CMD_OFFSET	6
+const int CMD_OFFSET = 0;
 
 /*
  * Mouse calibration
@@ -97,7 +97,7 @@ MouseCalAutomaton(void)
     case 3:
 	GfctrlMouseGetCurrent(&mouseInfo);
 	axv = mouseInfo.ax[Cmd[CMD_OFFSET + CalState].ref.index];
-	    if (fabs(axv) < 0.01) {
+	if (fabs(axv) < 0.01) {
 	    return;		/* ignore no move input */
 	}
 	Cmd[CMD_OFFSET + CalState].max = axv;
@@ -133,7 +133,7 @@ Idle2(void)
     }
 
 	/* Let CPU take breath (and fans stay at low and quiet speed) */
-	GfuiScreenSleep(0.001);
+	GfuiSleep(0.001);
 }
 
 static void
