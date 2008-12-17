@@ -2298,7 +2298,7 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 #endif
 
  //double time = 0.63;
- double time = 0.02 * 20 * (1.0 + (car->_speed_x-20)/20);
+ double time = 0.02 * 20 * (1.0 + (car->_speed_x-20)/18);
 
  if (rInv > 0.0 && off2lft > 0.0)
   time *= (1.0 + ((off2lft/track->width) * (off2lft/(track->width-3.0)) * fabs(rInv*60)));
