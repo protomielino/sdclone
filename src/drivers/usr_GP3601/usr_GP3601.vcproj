@@ -108,7 +108,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetDir)&quot;*.dll $(SolutionDir)runtime\drivers\usr_GP3601"
+				CommandLine="copy &quot;$(TargetDir)&quot;*.dll c:\andrew\hobbies\torcs-ng\drivers\usr_GP3601"
 			/>
 		</Configuration>
 		<Configuration
@@ -211,7 +211,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetDir)&quot;*.dll $(SolutionDir)runtimed\drivers\usr_GP3601"
+				CommandLine="copy &quot;$(TargetDir)&quot;*.dll c:\andrew\hobbies\torcs-ng\drivers\usr_GP3601"
 			/>
 		</Configuration>
 	</Configurations>

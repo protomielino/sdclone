@@ -124,6 +124,7 @@ class LRaceLine {
   double IntMargin;
   double ExtMargin;
   double AvoidSpeedAdjust;
+  double AvoidSpeedAdjustX;
   double AvoidBrakeAdjust;
   double CurveFactor;
   double SecurityZ;

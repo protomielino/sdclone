@@ -932,10 +932,10 @@ void Driver::calcSkill()
     double rand3 = (double) getRandom() / 65536.0;  // whether change is positive or negative
 
     // acceleration to use in current time limit
-    decel_adjust_targ = (skill/6 * rand1);
+    decel_adjust_targ = (skill/4 * rand1);
 
     // brake to use - usually 1.0, sometimes less (more rarely on higher skill)
-    brake_adjust_targ = MAX(0.7, 1.0 - (skill/20 * rand2));
+    brake_adjust_targ = MAX(0.7, 1.0 - MAX(0.0, skill/10 * (rand2-0.7)));
 
     // how long this skill mode to last for
     skill_adjust_limit = 5.0 + rand3 * 50.0;
@@ -1057,6 +1057,7 @@ float Driver::getSteer(tSituation *s)
 		{
 			if (lastmode == mode_normal ||
 			    (angle_ok &&
+			     (simtime > 15.0 || car->_speed_x > 20) &&
 			     yr_ok &&
 			     skid < 0.1 &&
 			     steer_ok &&
@@ -1317,6 +1318,9 @@ int Driver::checkFlying()
 
 float Driver::correctSteering( float avoidsteer, float racesteer )
 {
+	if (simtime < 15.0 && car->_speed_x < 20.0)
+		return avoidsteer;
+
 	float steer = avoidsteer;
 	float accel = MIN(0.0f, car->_accel_x);
 	double speed = 50.0; //MAX(50.0, getSpeed());
@@ -1696,19 +1700,22 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	tCarElt *ocar = o->getCarPtr();
 	int osegid = ocar->_trkPos.seg->id;
 	double otry_factor = (lenient ? (0.2 + (1.0 - ((simtime-frontavoidtime)/7.0)) * 0.8) : 1.0);
-	double overtakecaution = (rldata->overtakecaution + (outside ? MIN(0.0, car->_accel_x/8) : 0.0)) - driver_aggression;
-	double distance = o->getDistance() * otry_factor * (1.0 + overtakecaution) - (ocar->_pos > car->_pos ? MIN(o->getDistance()/2, 3.0) : 0.0);
+	double overtakecaution = MAX(0.0, rldata->overtakecaution + (outside ? MIN(0.0, car->_accel_x/8) : 0.0)) - driver_aggression;
+	double distance = o->getDistance() * otry_factor * MAX(0.5, 1.0 + overtakecaution) - (ocar->_pos > car->_pos ? MIN(o->getDistance()/2, 3.0) : 0.0);
 	double speed = MIN(rldata->avspeed, getSpeed() + MAX(0.0, (10.0 - distance)/3));
 	double ospeed = o->getSpeed();
-	double speeddiff = MAX((15.0-fabs(rldata->rInverse)*1000) - distance, fabs(speed - ospeed) * (8 - MIN(5.5, fabs(rldata->rInverse)*300)));
+	double orInv = fabs(raceline->getRInverse(o->getDistance()));
+	double rInv = MAX(fabs(rldata->rInverse), orInv);
+
+	double speeddiff = MAX((15.0-rInv*1000) - distance, fabs(speed - ospeed) * (8 - MIN(5.5, rInv*300)));
 	if (outside)
-		ospeed *= 1.0 + fabs(rldata->rInverse)*3;
-	double catchdist = (double) MIN(speed*distance/(speed-ospeed), distance*CATCH_FACTOR) * otry_factor;
+		ospeed *= 1.0 + rInv*3;
+	double catchdist = (double) MIN((speed*distance)/(speed-ospeed), distance*CATCH_FACTOR) * otry_factor;
 
 	if (catchdist < *mincatchdist+0.1 && distance < MIN(speeddiff, catchdist/2 + 5.0))
 	{
 		if (DebugMsg & debug_overtake)
-				fprintf(stderr,"%.1f %s: OVERTAKE! (cd %.1f<%.1f) (dist %.1f < (%.1f-%.1f)*X = %.1f caut=%.1f\n",otry_factor,ocar->_name,catchdist,*mincatchdist,distance,speed,ospeed,speeddiff,overtakecaution);
+				fprintf(stderr,"%.1f %s: OVERTAKE! (cd %.1f<%.1f) (dist %.1f (%.1f) < (%.1f-%.1f)*X = %.1f caut=%.1f\n",otry_factor,ocar->_name,catchdist,*mincatchdist,distance,o->getDistance(),speed,ospeed,speeddiff,overtakecaution);
 		*mincatchdist = catchdist;
 		return true;
 	}
@@ -2044,7 +2051,7 @@ fprintf(stderr,"%s SIDE %s, NO MOVE AT ALL! %.1f\n",car->_name,ocar->_name,myoff
 		maxoffset = rldata->offset + rldata->rgtmargin;
 #endif
 
-	//if (fabs(angle) + car->_accel_x/100 < 0.5)
+	if (car->_speed_x > 20.0 || simtime > 10.0)
 	{
 		double caution = rldata->overtakecaution;
 
@@ -2497,7 +2504,7 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
 
 #if 1
 	// no-one to avoid, work back towards raceline
-	if (mode == mode_correcting)
+	if (mode == mode_correcting && (simtime > 15.0 || car->_speed_x > 20))
 	{
 		double factor = (fabs(car->_trkPos.toMiddle) < car->_trkPos.seg->width/2 + 2.0 ? 0.25 : 1.0);
 		if (fabs(myoffset) > fabs(rldata->offset))

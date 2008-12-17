@@ -79,6 +79,7 @@ LRaceLine::LRaceLine() :
    IntMargin(1.5),
    ExtMargin(2.0),
    AvoidSpeedAdjust(0.0),
+   AvoidSpeedAdjustX(1.0),
    AvoidBrakeAdjust(0.0),
    CurveFactor(0.14),
    SecurityZ(0.0),
@@ -340,13 +341,14 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  MinCornerInverse = GfParmGetNum( carhandle, "private", "MinCornerInverse", (char *)NULL, 0.002f );
  CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0f );
  CornerSpeedX = GfParmGetNum( carhandle, "private", "CornerSpeedX", (char *)NULL, 0.0f );
- BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0f ) - skill/5;
- BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0f );
+ BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0f );
+ BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0f ) * (0.8 + MIN(0.2, ((12.0-skill)/12) / 5));
  AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0f );
+ AvoidSpeedAdjustX = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjustX", (char *)NULL, 1.0f );
  AvoidBrakeAdjust = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjust", (char *)NULL, 0.0f );
  CornerAccel = GfParmGetNum( carhandle, "private", "CornerAccel", (char *)NULL, 0.0f );
- IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1f ) + skill/20;
- ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7f ) + skill/10;
+ IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1f ) + skill/12;
+ ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7f ) + skill/5;
  TimeFactor = GfParmGetNum( carhandle, "private", "TimeFactor", (char *)NULL, 0.0f );
  BrakeDelay = GfParmGetNum( carhandle, "private", "BrakeDelay", (char *)NULL, 35.0f );
  
@@ -1231,7 +1233,7 @@ void LRaceLine::TrackInit(tSituation *p)
    double avspeed = GetModD( tAvoidSpeed, i );
    double cornerspeed = ((trlspeed ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX;
    if (rl == LINE_MID)
-    cornerspeed += (avspeed != 0.0 ? avspeed : AvoidSpeedAdjust) * BaseCornerSpeedX;
+    cornerspeed += (avspeed != 0.0 ? avspeed : AvoidSpeedAdjust) * BaseCornerSpeedX * AvoidSpeedAdjustX;
    double TireAccel = cornerspeed * tFriction[i];
    int nnext = (i + 5) % Divs;
    int next = (i + 1) % Divs;
@@ -1686,6 +1688,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  data->rgtmargin = GetModD( tRLMarginRgt, Index );
  data->lftmargin = GetModD( tRLMarginLft, Index );
  data->overtakecaution = MAX(OvertakeCaution, GetModD( tOTCaution, Index ));
+ if (data->overtakecaution < 0.0)
+  data->overtakecaution = MAX(-0.5, data->overtakecaution/3);
  data->braking = tSpeed[LINE_RL][Index] - tSpeed[LINE_RL][Next];
  data->rlangle = getRLAngle();
 
