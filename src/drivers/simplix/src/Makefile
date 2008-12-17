@@ -2,7 +2,7 @@
 #
 #    file                 : Makefile
 #    created              : 22 Nov 2008
-#    last changed         : 16 Dez 2008
+#    last changed         : 17 Dez 2008
 #    copyright            : (C) 2008 Wolf-Dieter Beelitz
 #
 ##############################################################################
@@ -47,8 +47,8 @@ SOURCES     = unitmain.cpp \
 	      unitvec2d.cpp \
 	      unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
-SHIP        = ${ROBOT}.xml
-SHIPSUBDIRS = 
+SHIP        = ${ROBOT}.xml default.xml logo.rgb 
+SHIPSUBDIRS = 0 car1-trb1 tracks
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 
