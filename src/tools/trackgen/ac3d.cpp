@@ -42,7 +42,7 @@ Ac3dOpen(char *filename, int nbObjects)
 {
     FILE *save_fd;
 
-    save_fd = fopen(filename, "wa");
+    save_fd = fopen(filename, "w"); //save_fd = fopen(filename, "wa");
 
     if (save_fd == NULL) {
 	    GfOut("Failed to open '%s' for writing", filename);

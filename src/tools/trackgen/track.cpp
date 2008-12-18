@@ -79,26 +79,54 @@ static unsigned int	*trackindices;
 static tdble		TrackStep;
 
 static void
-initPits(tTrackPitInfo *pits)
+initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
 {
     tTrackSeg	*curMainSeg;
     tTrackSeg	*curPitSeg = NULL;
+    tTrackSeg	*pitBuildingsStart = NULL; 
+    const char	*segName;
+    int			found = 0;
     tdble	toStart = 0;
     tdble	offset = 0;
     tTrkLocPos	curPos;
     int		changeSeg;
     int		i;
+    static char		path2[256];
+    sprintf(path2, "%s/%s", TRK_SECT_MAIN, TRK_SECT_PITS);
 
     switch (pits->type) {
     case TR_PIT_ON_TRACK_SIDE:
 	pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
-	pits->driversPitsNb = pits->nMaxPits;
+	pits->driversPitsNb = pits->nPitSeg; // pits->driversPitsNb = pits->nMaxPits;
 	curPos.type = TR_LPOS_MAIN;
-	curMainSeg = pits->pitStart->prev;
+
+	segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_BUILDINGS_START, NULL);
+	if (segName != 0) {
+		pitBuildingsStart = theTrack->seg;
+		found = 0;
+		for(i = 0; i < theTrack->nseg; i++)  {
+			if (!strcmp(segName, pitBuildingsStart->name)) {
+				found = 1;
+			} else if (found) {
+				pitBuildingsStart = pitBuildingsStart->next;
+				break;
+			}
+			pitBuildingsStart = pitBuildingsStart->prev;
+		}
+		if (!found) {
+			pitBuildingsStart = NULL;
+	}
+	}
+
+	if (pitBuildingsStart == NULL)
+		pitBuildingsStart = pits->pitStart;
+
+//	curMainSeg = pits->pitStart->prev;
+	curMainSeg = pitBuildingsStart->prev;
 	changeSeg = 1;
 	toStart = 0;
 	i = 0;
-	while (i < pits->nMaxPits) {
+	while (i < pits->nPitSeg) { // while (i < pits->nMaxPits) {
 	    if (changeSeg) {
 		changeSeg = 0;
 		offset = 0;
@@ -2362,7 +2390,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 #define PIT_TOP		0.2
 
 	pits = &(Track->pits);
-	initPits(pits);
+	initPits(Track,TrackHandle,pits);
     
 	if (pits->type == TR_PIT_ON_TRACK_SIDE) {
 	    int		uid = 1;
