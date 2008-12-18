@@ -646,9 +646,13 @@ grCustomizePits(void)
 	pits = &(grTrack->pits);
 	/* draw the pit identification */
 	
+    if ((pits->nPitSeg < 1) && (pits->nMaxPits > 1)) 
+		pits->nPitSeg = pits->nMaxPits;              
+
 	switch (pits->type) {
 	case TR_PIT_ON_TRACK_SIDE:
-		for (i = 0; i < pits->nMaxPits; i++) {
+		for (i = 0; i < pits->nPitSeg; i++) {
+			GfOut("Pit Nbr: %d\n",i);        
 			char buf[256];
 			t3Dd normalvector;
 			sgVec3 vtx;
