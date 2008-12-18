@@ -1310,6 +1310,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
     tTrackSeg		*pitEntrySeg = NULL;
     tTrackSeg		*pitExitSeg = NULL;
     tTrackSeg		*pitStart = NULL;
+    tTrackSeg		*pitBuildingsStart = NULL; 
     tTrackSeg		*pitEnd = NULL;
     tTrackSeg		*curPitSeg = NULL;
     tTrackPitInfo	*pits;
@@ -1392,6 +1393,27 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    }
 	}
 
+	/* Pit Buildings Start */
+	segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_BUILDINGS_START, NULL);
+	if (segName != 0) {
+	    pitBuildingsStart = theTrack->seg;
+	    found = 0;
+	    for(i = 0; i < theTrack->nseg; i++)  {
+		if (!strcmp(segName, pitBuildingsStart->name)) {
+		    found = 1;
+		} else if (found) {
+		    pitBuildingsStart = pitBuildingsStart->next;
+		    break;
+		}
+		pitBuildingsStart = pitBuildingsStart->prev;
+	    }
+	    if (!found) {
+		pitBuildingsStart = pitStart;
+	    }
+	}
+	else
+		pitBuildingsStart = pitStart;
+
 	/* Pits End */
 	segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_END, NULL);
 	if (segName != 0) {
@@ -1443,7 +1465,10 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
 	pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
 
-	mSeg = pitStart->prev;
+	//mSeg = pitStart->prev;
+	if (pitBuildingsStart == NULL)
+		pitBuildingsStart = pitStart;
+	mSeg = pitBuildingsStart->prev;
 	changeSeg = 1;
 	toStart = 0;
 	i = 0; 
@@ -1497,6 +1522,8 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    }
 	    i++;
 	}
+	pits->nPitSeg = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nMaxPits));
+	GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
 
 	for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
 	    curSeg2 = NULL;
@@ -1504,14 +1531,14 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    case TR_RGT:
 		curSeg = mSeg->rside;
 		curSeg2 = curSeg->rside;
-		if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
+		if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
 		    mSeg->barrier[0]->style = TR_PITBUILDING;
 		}
 		break;
 	    case TR_LFT:
 		curSeg = mSeg->lside;
 		curSeg2 = curSeg->lside;
-		if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
+        if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
 		    mSeg->barrier[1]->style = TR_PITBUILDING;
 		}
 		break;
@@ -1535,6 +1562,22 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
     }
 
+	for (mSeg = pitBuildingsStart; mSeg != pitEnd; mSeg = mSeg->next) {
+	    curSeg2 = NULL;
+	    switch(pits->side) {
+	    case TR_RGT:
+		curSeg = mSeg->rside;
+		curSeg2 = curSeg->rside;
+	    mSeg->barrier[0]->style = TR_PITBUILDING;
+		break;
+	    case TR_LFT:
+		curSeg = mSeg->lside;
+		curSeg2 = curSeg->lside;
+	    mSeg->barrier[1]->style = TR_PITBUILDING;
+		break;
+    }
+    }
+
     /* 
      * camera definitions
      */
@@ -1542,7 +1585,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	do {
 	    curCam = (tRoadCam*)calloc(1, sizeof(tRoadCam));
 	    if (!curCam) {
-		GfFatal("ReadTrack3: Memory allocation error");
+		GfFatal("ReadTrack4: Memory allocation error");
 	    }
 	    if (*camList == NULL) {
 		*camList = curCam;
