@@ -163,6 +163,9 @@
 #define TRK_ATT_DOVFACTOR	"DoV factor"
 
 #define TRK_SECT_PITS		"Pits"
+#define TRK_ATT_MAX_PITS    "max pits"             
+#define TRK_ATT_BUILDINGS_START "start buildings"  
+
 
 #define TRK_ATT_ENTRY		"entry"
 #define TRK_ATT_EXIT		"exit"
