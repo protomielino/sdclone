@@ -472,7 +472,7 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 	
 		// Check wether light is to draw
 		for (i = 0; i < theCarslight[car->index].numberCarlight; i++) {
-  			boolean DoDraw = false; // Initialize draw state
+  			bool DoDraw = false; // Initialize draw state
 
 			switch (theCarslight[car->index].lightType[i]) {
 				case LIGHT_TYPE_BRAKE:
