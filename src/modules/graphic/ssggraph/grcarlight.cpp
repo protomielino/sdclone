@@ -16,6 +16,9 @@
  *                                                                         *
  ***************************************************************************/
 
+// Added missing lights: rearlight2
+// Control nbr of draws: Set to 4
+// Deleted unused code
 
 #include <math.h>
 #include <stdlib.h>
@@ -112,6 +115,10 @@ ssgVtxTableCarlight::~ssgVtxTableCarlight ()
 
 void ssgVtxTableCarlight::draw_geometry ()
 {
+	if (on == 0) {
+		return;
+	}
+
 	int num_normals = getNumNormals();
 	float alpha;
 	GLfloat modelView[16];
@@ -122,10 +129,6 @@ void ssgVtxTableCarlight::draw_geometry ()
 	sgMat4 mat3;
 	sgVec3 *vx = (sgVec3 *) vertices->get(0);
 	sgVec3 *nm = (sgVec3 *) normals->get(0);
-
-	if (on == 0) {
-		return;
-	}
 
 	alpha = 0.75f;
 	glDepthMask(GL_FALSE);
@@ -184,25 +187,28 @@ void ssgVtxTableCarlight::draw_geometry ()
 	glMultMatrixf((float *)mat3);
 	glMatrixMode(GL_MODELVIEW);
 
-	glBegin(gltype) ;
-	glColor4f(0.8, 0.8, 0.8, alpha);
-	if (num_normals == 1) {
-		glNormal3fv(nm[0]);
+	for (int I = 0; I < on; I++)
+	{
+		glBegin(gltype) ;
+		glColor4f(0.8, 0.8, 0.8, alpha);
+		if (num_normals == 1) {
+			glNormal3fv(nm[0]);
+		}
+		// the computed coordinates are translated from the smoke position with the x,y,z speed.
+		glTexCoord2f(0, 0);
+		glVertex3f(vx[0][0] + factor*size*A[0], vx[0][1] + factor*size*A[1], vx[0][2] + factor*size*A[2]);
+		glTexCoord2f(0, 1);
+
+		glVertex3f(vx[0][0] + factor*size*B[0], vx[0][1] + factor*size*B[1], vx[0][2] + factor*size*B[2]);
+		glTexCoord2f(1, 0);
+
+		glVertex3f(vx[0][0] + factor*size*D[0], vx[0][1] + factor*size*D[1], vx[0][2] + factor*size*D[2]);
+		glTexCoord2f(1, 1);
+
+		glVertex3f(vx[0][0]+factor*size*C[0],vx[0][1]+factor*size*C[1], vx[0][2]+factor*size*C[2]);
+
+		glEnd();
 	}
-	// the computed coordinates are translated from the smoke position with the x,y,z speed.
-	glTexCoord2f(0, 0);
-	glVertex3f(vx[0][0] + factor*size*A[0], vx[0][1] + factor*size*A[1], vx[0][2] + factor*size*A[2]);
-	glTexCoord2f(0, 1);
-
-	glVertex3f(vx[0][0] + factor*size*B[0], vx[0][1] + factor*size*B[1], vx[0][2] + factor*size*B[2]);
-	glTexCoord2f(1, 0);
-
-	glVertex3f(vx[0][0] + factor*size*D[0], vx[0][1] + factor*size*D[1], vx[0][2] + factor*size*D[2]);
-	glTexCoord2f(1, 1);
-
-	glVertex3f(vx[0][0]+factor*size*C[0],vx[0][1]+factor*size*C[1], vx[0][2]+factor*size*C[2]);
-
-	glEnd();
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	if (maxTextureUnits > 1) {
@@ -346,6 +352,10 @@ void grAddCarlight(tCarElt *car, int type, sgVec3 pos, double size)
 			theCarslight[car->index].lightArray[theCarslight[car->index].numberCarlight]->setState(rearlight1);
 			theCarslight[car->index].lightArray[theCarslight[car->index].numberCarlight]->setCullFace(0);
 			break;
+		case LIGHT_TYPE_REAR2: // Added missing lights
+			theCarslight[car->index].lightArray[theCarslight[car->index].numberCarlight]->setState(rearlight2);
+			theCarslight[car->index].lightArray[theCarslight[car->index].numberCarlight]->setCullFace(0);
+			break;
 		case LIGHT_TYPE_BRAKE:
 			theCarslight[car->index].lightArray[theCarslight[car->index].numberCarlight]->setState(breaklight1);
 			theCarslight[car->index].lightArray[theCarslight[car->index].numberCarlight]->setCullFace(0);
@@ -376,7 +386,7 @@ void grLinkCarlights(tCarElt *car)
 	CarlightAnchor->addKid(theCarslight[car->index].lightAnchor);
 }
 
-
+/* OLD version 
 void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 {
 	int i = 0;
@@ -444,3 +454,66 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 		clight->setFactor(1);
 	}
 }
+*/
+
+/* NEW version */
+void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
+{
+	int i = 0;
+	ssgVtxTableCarlight	*clight;
+
+	for (i = 0; i < theCarslight[car->index].numberCarlight; i++) {
+		if (theCarslight[car->index].lightAnchor->getNumKids() != 0) {
+			theCarslight[car->index].lightAnchor->removeKid(theCarslight[car->index].lightCurr[i]);
+		}
+	}
+
+	if (disp) {
+	
+		// Check wether light is to draw
+		for (i = 0; i < theCarslight[car->index].numberCarlight; i++) {
+  			boolean DoDraw = false; // Initialize draw state
+
+			switch (theCarslight[car->index].lightType[i]) {
+				case LIGHT_TYPE_BRAKE:
+				case LIGHT_TYPE_BRAKE2:
+					if (car->_brakeCmd>0) 
+						DoDraw = true;
+					break;
+				case LIGHT_TYPE_FRONT:
+					if (car->_lightCmd & RM_LIGHT_HEAD1) 
+						DoDraw = true;
+					break;
+				case LIGHT_TYPE_FRONT2:
+					if (car->_lightCmd & RM_LIGHT_HEAD2) 
+						DoDraw = true;
+					break;
+				case LIGHT_TYPE_REAR:
+					if ((car->_lightCmd & RM_LIGHT_HEAD1) ||
+						(car->_lightCmd & RM_LIGHT_HEAD2))
+						DoDraw = true;
+					break;
+				case LIGHT_TYPE_REAR2:
+					if ((car->_lightCmd & RM_LIGHT_HEAD1) ||
+						(car->_lightCmd & RM_LIGHT_HEAD2))
+						DoDraw = true;
+					break;
+				default:
+					break;
+
+			}
+
+			if (DoDraw) {
+				clight = (ssgVtxTableCarlight *)theCarslight[car->index].lightArray[i]->clone(SSG_CLONE_GEOMETRY);
+				clight->setOnOff(4); // Control nbr of draws: Here set to 4! TODO: Read it from file!
+ 				clight->setCullFace(0);
+  				clight->setFactor(1);
+				clight->transform(grCarInfo[car->index].carPos);
+				theCarslight[car->index].lightCurr[i]=clight;
+				theCarslight[car->index].lightAnchor->addKid(clight);
+			}
+		}
+	}
+}
+
+
