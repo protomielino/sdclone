@@ -33,7 +33,7 @@
 		<attnum name="IntMargin" min="0" max="2" val="1.4"/>
 		<attnum name="NoTeamWaiting" min="0" max="2" val="1"/>
 		<attnum name="IncFactor" min="0" max="5" val="0.9"/>
-		<attnum name="AvoidSpeedAdjustX" min="-20" max="20" val="0.8"/>
+		<attnum name="AvoidSpeedAdjustX" min="-20" max="20" val="0.65"/>
 		<attnum name="AvoidBrakeAdjust" min="-20" max="20" val="-6"/>
 		<attnum name="LookAhead" min="1" max="5" val="2.6"/>
 		<attnum name="OvertakeCaution" min="-20" max="20" val="0.2"/>

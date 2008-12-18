@@ -241,7 +241,7 @@ class LRaceLine {
   double getK1999Steer() { return k1999steer; }
   double getRInverse(int div) { return tRInverse[LINE_RL][((div + Divs) % Divs)]; }
   double getRInverse() { return tRInverse[LINE_RL][Next]; }
-  double getRInverse(double distance);
+  void getOpponentInfo(double distance, double *aspeed, double *rInv);
   double getRLMarginRgt(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginRgt, div ); }
   double getRLMarginLft(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginLft, div ); }
   double getAvoidSteer(double offset, LRaceLineData *data);

@@ -17,33 +17,35 @@
 <params name="Viper GTS-R" type="template">
   <section name="private">
 	  <!-- 2.27.30 -->
-    <attnum name="BaseCornerSpeedX" val="0.45"/>
-    <attnum name="CornerSpeed" val="21.0"/>
+    <attnum name="BaseCornerSpeedX" val="0.455"/>
+    <attnum name="CornerSpeed" val="22.0"/>
     <attnum name="CurveFactor" val="0.16"/>
     <attnum name="AvoidSpeedAdjust" val="-1.0"/>
     <attnum name="BrakeDelay" val="23.0"/>
     <attnum name="ExtMargin" val="1.4"/>
     <attnum name="IntMargin" val="1.1"/>
     <attnum name="SteerGain" val="2.4"/>
-    <attnum name="FuelSpeedUp" val="0.7"/>
     <attnum name="FuelPerLap" val="3.9"/>
     <attnum name="NoTeamWaiting" val="1"/>
     <attnum name="SkidCorrection" val="1.3"/>
-    <attnum name="SteerDebug" val="0"/>
+    <attnum name="SteerDebug" val="-1"/>
     <attnum name="OvertakeDebug" val="1"/>
 
-    <attnum name="RLBrake0Div" val="1650"/>
-    <attnum name="RLBrake0DivEnd" val="1750"/>
-    <attnum name="RLBrake0" val="-7.0"/>
-    <attnum name="RLBrake1Div" val="800"/>
-    <attnum name="RLBrake1DivEnd" val="1080"/>
-    <attnum name="RLBrake1" val="-7.0"/>
-    <attnum name="RLBrake2Div" val="2000"/>
-    <attnum name="RLBrake2DivEnd" val="2600"/>
-    <attnum name="RLBrake2" val="-6.0"/>
-    <attnum name="RLBrake3Div" val="1"/>
-    <attnum name="RLBrake3DivEnd" val="180"/>
-    <attnum name="RLBrake3" val="-4.0"/>
+    <attnum name="RLBrake0Div" val="940"/>
+    <attnum name="RLBrake0DivEnd" val="1100"/>
+    <attnum name="RLBrake0" val="-6.0"/>
+    <attnum name="xLBrake0Div" val="1650"/>
+    <attnum name="xLBrake0DivEnd" val="1750"/>
+    <attnum name="xLBrake0" val="-7.0"/>
+    <attnum name="xLBrake1Div" val="800"/>
+    <attnum name="xLBrake1DivEnd" val="1080"/>
+    <attnum name="xLBrake1" val="-7.0"/>
+    <attnum name="xLBrake2Div" val="2000"/>
+    <attnum name="xLBrake2DivEnd" val="2600"/>
+    <attnum name="xLBrake2" val="-6.0"/>
+    <attnum name="xLBrake3Div" val="1"/>
+    <attnum name="xLBrake3DivEnd" val="180"/>
+    <attnum name="xLBrake3" val="-4.0"/>
 
     <attnum name="RLSpeed7Div" val="1340"/>
     <attnum name="RLSpeed7DivEnd" val="1600"/>
@@ -83,9 +85,9 @@
     <attnum name="OTCaution1DivEnd" val="2449"/>
     <attnum name="OTCaution1" val="0.1"/>
 
-    <attnum name="AvoidSpeed0Div" val="730"/>
+    <attnum name="AvoidSpeed0Div" val="800"/>
     <attnum name="AvoidSpeed0DivEnd" val="1310"/>
-    <attnum name="AvoidSpeed0" val="-3.0"/>
+    <attnum name="AvoidSpeed0" val="-7.0"/>
     <attnum name="AvoidSpeed1Div" val="1750"/>
     <attnum name="AvoidSpeed1DivEnd" val="1800"/>
     <attnum name="AvoidSpeed1" val="-4.0"/>

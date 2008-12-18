@@ -1376,13 +1376,15 @@ fprintf(stderr,"BD=%.2f CA=%.2f CAX=%.2f\n",BrakeDelay,CornerAccel,CornerSpeedX)
    int next = (i+1) % Divs;
    double bd = brakedelay + GetModD( tRLBrake, i );
    if (rl == LINE_MID)
-	   bd += GetModD( tAvoidBrake, i );
+    bd += GetModD( tAvoidBrake, i );
 
    if (tSpeed[rl][i] > tSpeed[rl][next])
    {
+    double bspd = (MIN(100.0, tSpeed[rl][next]) - 30.0) / 60 + fabs(tRInverse[rl][next])*40;
     tSpeed[rl][i] = MIN(tSpeed[rl][i], tSpeed[rl][next] + MAX(0.1, 
-       ((0.1 - MIN(0.085, fabs(tRInverse[rl][next])*8)) 
-        * MAX(bd/4.0, bd / ((tSpeed[rl][next]*(tSpeed[rl][next]/20))/20)))));
+       ((0.1 - MIN(0.085, fabs(tRInverse[rl][next])*7)) 
+        * MAX(bd/4.0, bd / ((tSpeed[rl][next]*(tSpeed[rl][next]/20))/20))) 
+        * MAX(0.2, 1.0 - (tSpeed[rl][next] > 30.0 ? bspd*(bspd+0.2)  : 0.0))));
    }
   }
 #endif
@@ -1558,19 +1560,23 @@ void LRaceLine::NewRace(tCarElt* newcar, tSituation *s)
                car->priv.wheel[REAR_RGT].relPos.y) / 2;
 } 
 
-double LRaceLine::getRInverse(double distance)
+void LRaceLine::getOpponentInfo(double distance, double *aSpeed, double *rInv)
 {
  int dist = int(distance / DivLength);
  double rinv = tRInverse[LINE_RL][Next];
+ double aspd = 1000.0;
 
  for (int i=1; i<dist; i++)
  {
   int div = (Next + i) % Divs;
   if (fabs(tRInverse[LINE_RL][div]) > fabs(rinv))
    rinv = tRInverse[LINE_RL][div];
+  if (tSpeed[LINE_MID][div] < aspd)
+   aspd = tSpeed[LINE_MID][div];
  }
 
- return rinv;
+ *aSpeed = aspd;
+ *rInv = rinv;
 }
 
 double LRaceLine::getRLAngle()

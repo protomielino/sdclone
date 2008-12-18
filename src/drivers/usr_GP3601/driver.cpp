@@ -1700,14 +1700,15 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	tCarElt *ocar = o->getCarPtr();
 	int osegid = ocar->_trkPos.seg->id;
 	double otry_factor = (lenient ? (0.2 + (1.0 - ((simtime-frontavoidtime)/7.0)) * 0.8) : 1.0);
-	double overtakecaution = MAX(0.0, rldata->overtakecaution + (outside ? MIN(0.0, car->_accel_x/8) : 0.0)) - driver_aggression;
-	double distance = o->getDistance() * otry_factor * MAX(0.5, 1.0 + overtakecaution) - (ocar->_pos > car->_pos ? MIN(o->getDistance()/2, 3.0) : 0.0);
-	double speed = MIN(rldata->avspeed, getSpeed() + MAX(0.0, (10.0 - distance)/3));
+	double overtakecaution = MAX(0.0, rldata->overtakecaution + (outside ? MIN(0.0, car->_accel_x/8) : 0.0)) - driver_aggression/2;
+	double orInv=0.0, oAspeed=0.0;
+	raceline->getOpponentInfo(o->getDistance(), &orInv, &oAspeed);
+	double rInv = MAX(fabs(rldata->rInverse), fabs(orInv));
+	double distance = o->getDistance() * otry_factor * MAX(0.5, 1.0 - (ocar->_pos > car->_pos ? MIN(o->getDistance()/2, 3.0) : 0.0));
+	double speed = MIN(rldata->avspeed, MIN(oAspeed, getSpeed() + MAX(0.0, (30.0 - distance) * MAX(0.1, 1.0 - rInv*70))));
 	double ospeed = o->getSpeed();
-	double orInv = fabs(raceline->getRInverse(o->getDistance()));
-	double rInv = MAX(fabs(rldata->rInverse), orInv);
 
-	double speeddiff = MAX((15.0-rInv*1000) - distance, fabs(speed - ospeed) * (8 - MIN(5.5, rInv*300)));
+	double speeddiff = MAX((15.0-(rInv*1000*1.0+overtakecaution/2)) - distance, fabs(speed - ospeed) * (8 - MIN(5.5, rInv*300)));
 	if (outside)
 		ospeed *= 1.0 + rInv*3;
 	double catchdist = (double) MIN((speed*distance)/(speed-ospeed), distance*CATCH_FACTOR) * otry_factor;
@@ -2540,14 +2541,14 @@ if (DebugMsg & debug_overtake)
 
 int Driver::checkSwitch( int side, Opponent *o, tCarElt *ocar )
 {
+	double xdist = o->getDistance();
 	double t_impact = MAX(0.0, MIN(10.0, o->getTimeImpact()));
-	if (car->_speed_x - ocar->_speed_x < MIN(5.0, o->getDistance()*3))
+	if (car->_speed_x - ocar->_speed_x < MIN(5.0, xdist*3))
 		t_impact *= (1.0 + (5.0 - (car->_speed_x - ocar->_speed_x)));
-	t_impact = MIN(3.0, t_impact);
+	t_impact = MIN(3.0, MIN(t_impact, (5.0-(xdist-fabs(rldata->mInverse*1000)))/10));
 
 	double mcatchleft = MAX(1.0, MIN(track->width-1.0, car->_trkPos.toLeft - speedangle * (t_impact * 10)));
 	double ocatchleft = MAX(1.0, MIN(track->width-1.0, ocar->_trkPos.toLeft - o->getSpeedAngle() * (t_impact * 10)));
-	double xdist = o->getDistance();
 	double ydist = mcatchleft-ocatchleft;
 	double sdiff = MAX(0.0, getSpeed() - o->getSpeed());
 	double radius = MIN(car->_dimension_y*3, fabs(nextCRinverse) * 200);
@@ -2570,15 +2571,12 @@ if (DebugMsg & debug_overtake)
 fprintf(stderr,"CHECKSWITCH: Rgt - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
 				if (nextCRinverse > 0.0)
 					radius = 0.0;
-				if (side == prefer_side || 
-				    xdist > sdiff + ydist + MAX(0.0, angle*10) ||
-				    ocatchleft > (car->_dimension_y + 3.0 + radius + speedchange))
+				if ((side == prefer_side || 
+				     ocatchleft < mcatchleft - 1.5 ||
+				     xdist > sdiff + ydist + MAX(0.0, angle*10)) &&
+				    track->width - ocatchleft > (car->_dimension_y + 3.0 + radius + speedchange))
 				{
-					if (ocatchleft < (car->_dimension_y + 1.5 + radius) ||
-					    (ocatchleft < car->_trkPos.seg->width-(car->_dimension_y+1.5+radius) && ocatchleft < mcatchleft - 1.5))
-					{
-						side = TR_LFT;
-					}
+					side = TR_LFT;
 				}
 				break;
 
@@ -2588,15 +2586,12 @@ if (DebugMsg & debug_overtake)
 fprintf(stderr,"CHECKSWITCH: Lft - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",t_impact,deltamult,ocar->_trkPos.toLeft,ocatchleft,car->_trkPos.toLeft,mcatchleft);
 				if (nextCRinverse < 0.0)
 					radius = 0.0;
-				if (side == prefer_side || 
-				    xdist > sdiff + (-ydist) + MAX(0.0, -angle*10) ||
-				    ocatchleft > (car->_trkPos.seg->width - (car->_dimension_y + 3.0 + radius + speedchange)))
+				if ((side == prefer_side || 
+				     ocatchleft > mcatchleft + 1.5 ||
+				     xdist > sdiff + (-ydist) + MAX(0.0, -angle*10)) &&
+				    ocatchleft > (car->_dimension_y + 3.0 + radius + speedchange))
 				{
-					if (ocatchleft > (car->_trkPos.seg->width - (car->_dimension_y + 1.5 + radius)) ||
-					    (ocatchleft > (car->_dimension_y+1.5+radius) && ocatchleft > mcatchleft + 1.5))
-					{
-						side = TR_RGT;
-					}
+					side = TR_RGT;
 				}
 				break;
 		}

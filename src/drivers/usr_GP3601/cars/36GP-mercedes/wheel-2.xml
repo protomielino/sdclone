@@ -25,24 +25,14 @@
     <attnum name="ExtMargin" val="1.4"/>
     <attnum name="IntMargin" val="1.1"/>
     <attnum name="SteerGain" val="2.4"/>
-    <attnum name="FuelSpeedUp" val="0.7"/>
     <attnum name="FuelPerLap" val="2.9"/>
     <attnum name="NoTeamWaiting" val="1"/>
     <attnum name="SkidCorrection" val="1.1"/>
     <attnum name="SteerDebug" val="0"/>
 
-    <attnum name="RLBrake0Div" val="1650"/>
-    <attnum name="RLBrake0DivEnd" val="1750"/>
-    <attnum name="RLBrake0" val="-7.0"/>
-    <attnum name="RLBrake1Div" val="950"/>
-    <attnum name="RLBrake1DivEnd" val="1080"/>
-    <attnum name="RLBrake1" val="-6.0"/>
-    <attnum name="RLBrake2Div" val="2000"/>
-    <attnum name="RLBrake2DivEnd" val="2600"/>
-    <attnum name="RLBrake2" val="-6.0"/>
-    <attnum name="RLBrake3Div" val="1"/>
-    <attnum name="RLBrake3DivEnd" val="180"/>
-    <attnum name="RLBrake3" val="-4.0"/>
+    <attnum name="RLBrake0Div" val="940"/>
+    <attnum name="RLBrake0DivEnd" val="1080"/>
+    <attnum name="RLBrake0" val="-6.0"/>
 
     <attnum name="RLSpeed7Div" val="1340"/>
     <attnum name="RLSpeed7DivEnd" val="1640"/>
