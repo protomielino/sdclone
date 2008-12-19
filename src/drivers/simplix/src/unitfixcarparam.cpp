@@ -6,11 +6,11 @@
 // Unveränderliche Parameter des Fahrzeugs und Nebenrechnungen
 //
 // Datei    : unitfixcarparam.cpp
-// Erstellt : 25.11.2007
-// Stand    : 24.11.2008
+// Erstellt : 2007.11.25
+// Stand    : 2008.12.19
 // Copyright: © 2007-2008 Wolf-Dieter Beelitz
 // eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// Version  : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -38,6 +38,7 @@
 #include "unitglobal.h"
 #include "unitcommon.h"
 
+#include "unitdriver.h"
 #include "unitparabel.h"
 #include "unitfixcarparam.h"
 
@@ -190,6 +191,7 @@ double	TFixCarParam::CalcBraking
 
   double V = Speed;
   double U = V;
+  double Acc;
 
   for (int I = 0; I < 10; I++)
   {
@@ -212,8 +214,11 @@ double	TFixCarParam::CalcBraking
 
 	double Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
-	double Acc = CarParam.oScaleBrake * Ftanroad 
+	Acc = CarParam.oScaleBrake * Ftanroad 
 	  / (oTmpCarParam->oMass * oTmpCarParam->oSkill);
+    
+	if (TDriver::UseBrakeLimit)
+	  Acc = MAX(Acc,-6);
 
 	double Inner = MAX(0, V * V - 2 * Acc * Dist);
 	double OldU = U;

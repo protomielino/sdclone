@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2008.12.12
+// Last changed : 2008.12.19
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -82,6 +82,7 @@ char* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
 char* TDriver::SECT_PRIV = "simplix private";      // Private section
 char* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
+bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 
 double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
@@ -751,6 +752,10 @@ void TDriver::InitTrack
   oTeamEnabled = (int)
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,(float)oTeamEnabled);
   GfOut("oTeamEnabled %d\n",oTeamEnabled);
+
+  //oCar->brkSyst.rep   = GfParmGetNum(Handle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
+  //oCar->brkSyst.coeff = GfParmGetNum(Handle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, 1000000);
+
   // ... Adjust driving
 
   // Adjust skilling ...
@@ -2597,9 +2602,6 @@ double TDriver::FilterTCL(double Accel)
 {
   if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
 	return Accel;
-
-  if (DistanceRaced < 100)                       // Don't use it at start
-	  return Accel;
 
   double Spin = 0;                               // Initialize spin
   double Wr = 0;                                 // wheel radius

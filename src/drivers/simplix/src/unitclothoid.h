@@ -6,11 +6,11 @@
 // Fahrspur clothoidenähnlich
 //
 // Datei    : unitclothoid.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
+// Erstellt : 2007.11.17
+// Stand    : 2008.12.19
 // Copyright: © 2007-2008 Wolf-Dieter Beelitz
 // eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// Version  : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*

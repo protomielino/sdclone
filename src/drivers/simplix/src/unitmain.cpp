@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2008.12.16
+// Last changed : 2008.12.19
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
@@ -530,6 +530,7 @@ extern "C" int simplix_36GP(tModInfo *ModInfo)
   TDriver::SECT_PRIV = "simplix private";                 // Private section
   TDriver::DEFAULTCARTYPE  = "36GP-alfa12c";              // Default car type
   TDriver::AdvancedParameters = true;
+  TDriver::UseBrakeLimit = true;
   return simplix_internal(ModInfo);
 };
 //==========================================================================*

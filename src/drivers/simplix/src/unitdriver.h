@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2008.12.12
+// Last changed : 2008.12.19
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -350,6 +350,7 @@ private:
 	static char* DEFAULTCARTYPE;                 // Default car type
 
 	static bool AdvancedParameters;
+	static bool UseBrakeLimit;
 
 };
 //==========================================================================*
