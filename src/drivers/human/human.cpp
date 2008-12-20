@@ -199,23 +199,25 @@ InitFuncPt(int index, void *pt)
 
 /*
  * Function
- *	moduleMaxInterfaces
+ *	moduleWelcome
  *
  * Description
- *	Determine the number of human drivers
+ *	First function of the module called at load time :
+ *      - the caller gives the module some information about its run-time environment
+ *      - the module gives the caller some information about what he needs
  *
  * Parameters
- *	None
+ *	welcomeIn  : Run-time info given by the module loader at load time
+ *	welcomeOut : Module run-time information returned to the called
  *
  * Return
- *	A positive or null integer, if no error occured 
- *	-1, if any error occured 
+ *	0, if no error occured 
+ *	non 0, otherwise
  *
  * Remarks
  *	MUST be called before moduleInitialize()
  */
-
-extern "C" int moduleMaxInterfaces()
+extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
     void *drvInfo;
     const char *driver;
@@ -240,7 +242,9 @@ extern "C" int moduleMaxInterfaces()
 	GfParmReleaseHandle(drvInfo);
     }
 
-    return NbDrivers;
+    welcomeOut->maxNbItf = NbDrivers;
+
+    return 0;
 }
 
 /*

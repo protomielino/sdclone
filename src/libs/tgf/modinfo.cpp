@@ -145,10 +145,13 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
  */
 int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, tModList **mod)
 {
-    tfModInfoMaxItfSetName fModInfoMaxItf; /* function that gives the max nb of itf of the module and defines its name*/
-    tfModInfoInit	fModInfoInit;	 /* init function of the module */
-    int			initSts = 0;	     /* returned status */
-    int			retained = 1;
+    tfModInfoWelcome    fModInfoWelcome; /* function to exchange  information with the module at welcome time */
+    tfModInfoInitialize	fModInfoInit;	 /* init function of the module */
+    int   initSts = 0;	 /* returned status */
+    int	  retained = 1;
+    char  soName[256];
+    char  soDir[1024];
+    char* lastSlash;
     
     /* Allocate module entry in list */
     if (!(*mod = (tModList*)calloc(1, sizeof(tModList))))
@@ -157,13 +160,40 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 	return -1;
     }
     
-    /* Determine the number of interfaces of the module :
-       1) Call the dedicated module function if present */
-    if ((fModInfoMaxItf = (tfModInfoMaxItfSetName)dlsym(soHandle, GfModInfoMaxItfFuncName)) != 0) 
+    /* Determine the shared library / DLL name and load dir */
+    strcpy(soDir, soPath);
+    lastSlash = strrchr(soDir, '/');
+    if (lastSlash)
     {
-        /* DLL loaded, nbItf function exists, call it... */
-        // Give DLL path to robot to define its name used by TORCS-NG
-		(*mod)->modInfoSize = fModInfoMaxItf(soPath);  
+	strcpy(soName, lastSlash+1);
+	*lastSlash = 0;
+    }
+    else
+    {
+	strcpy(soName, soPath);
+	*soDir = 0;
+    }
+    soName[strlen(soName) - SOFileExtLen] = 0; /* cut so file extension */
+
+    /* Welcome the module : exchange informations with it :
+       1) Call the dedicated module function if present */
+    if ((fModInfoWelcome = (tfModInfoWelcome)dlsym(soHandle, GfModInfoWelcomeFuncName)) != 0) 
+    {
+        /* Prepare information to give to the module */
+	tModWelcomeIn welcomeIn;
+	welcomeIn.itfVerMajor = 1;
+	welcomeIn.itfVerMinor = 0;
+	welcomeIn.name = soName;
+	welcomeIn.loadPath = soDir;
+
+	/* Prepare a place for the module-given information */
+	tModWelcomeOut welcomeOut;
+
+	/* Call the welcome function */
+	initSts = fModInfoWelcome(&welcomeIn, &welcomeOut);  
+
+	/* Save information given by the module */
+	(*mod)->modInfoSize = welcomeOut.maxNbItf;
     } 
 
     /* 2) If not present, default number of interfaces (backward compatibility) */
@@ -174,19 +204,11 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 
     /* Get module initialization function :
        1) Try the new sheme (fixed name) */
-    if ((fModInfoInit = (tfModInfoInit)dlsym(soHandle, GfModInfoInitFuncName)) == 0)
+    if ((fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, GfModInfoInitializeFuncName)) == 0)
     {
 	/* 2) Backward compatibility (dll name) */
-	char fname[256];
-	const char* lastSlash = strrchr(soPath, '/');
-	if (lastSlash) 
-	    strcpy(fname, lastSlash+1);
-	else
-	    strcpy(fname, soPath);
-	fname[strlen(fname) - SOFileExtLen] = 0; /* cut so file extension */
-	fModInfoInit = (tfModInfoInit)dlsym(soHandle, fname);
+	fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, soName);
     }
-
 
     /* Call module initialization function if found */
     if (fModInfoInit) 
@@ -272,22 +294,22 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
  */
 int GfModTerminate(tSOHandle soHandle, const char *soPath)
 {
-    tfModInfoTerm	fModInfoTerm;	/* Termination function of the module */
+    tfModInfoTerminate fModInfoTerm;	/* Termination function of the module */
     int			termSts = 0;	/* Returned status */
     
     /* Get the module termination function if any :
        1) Try the new sheme (fixed name) */
-    if ((fModInfoTerm = (tfModInfoTerm)dlsym(soHandle, GfModInfoTermFuncName)) == 0)
+    if ((fModInfoTerm = (tfModInfoTerminate)dlsym(soHandle, GfModInfoTerminateFuncName)) == 0)
     {
 	/* 2) Backward compatibility (dll name + "Shut") */
-	char fname[256];
+	char soName[256];
 	const char* lastSlash = strrchr(soPath, '/');
 	if (lastSlash)
-	    strcpy(fname, lastSlash+1);
+	    strcpy(soName, lastSlash+1);
 	else
-	    strcpy(fname, soPath);
-	strcpy(&fname[strlen(fname) - SOFileExtLen], "Shut"); /* cut so file ext */
-	fModInfoTerm = (tfModInfoTerm)dlsym(soHandle, fname);
+	    strcpy(soName, soPath);
+	strcpy(&soName[strlen(soName) - SOFileExtLen], "Shut"); /* cut so file ext */
+	fModInfoTerm = (tfModInfoTerminate)dlsym(soHandle, soName);
     }
 
     /* Call the module termination function if any */

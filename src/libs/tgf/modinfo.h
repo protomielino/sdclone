@@ -37,14 +37,28 @@
 #define MAX_MOD_ITF 10
 #define GfModInfoDefaultMaxItf MAX_MOD_ITF
 
-/* Name of the module function that gives its max number of interfaces (new scheme) */
-#define GfModInfoMaxItfFuncName "moduleMaxInterfaces"
+/* Name of the module function where run-time informations are exchanged (new scheme) 
+   This function is called before moduleInitialize if present */
+#define GfModInfoWelcomeFuncName "moduleWelcome"
 
 /* Name of the module function entry point (new scheme) */
-#define GfModInfoInitFuncName "moduleInitialize"
+#define GfModInfoInitializeFuncName "moduleInitialize"
 
 /* Name of the module function exit point (new scheme) */
-#define GfModInfoTermFuncName "moduleTerminate"
+#define GfModInfoTerminateFuncName "moduleTerminate"
+
+/** Welcome information that a module receives at load time */
+typedef struct ModWelcomeIn {
+    unsigned int         itfVerMajor;   /**< Major version of the module interface scheme */
+    unsigned int         itfVerMinor;   /**< Minor version of the module interface scheme */
+    const char		*name;		/**< name = identifier of the module */
+    const char		*loadPath;	/**< path of the dir from which the so/dll was loaded */
+} tModWelcomeIn;
+
+/** Welcome information that a module gives back at load time */
+typedef struct ModWelcomeOut {
+    unsigned int	maxNbItf;	/**< name = identifier of the module */
+} tModWelcomeOut;
 
 /** initialisation of the function table 
     @see	ModInfo
@@ -91,14 +105,15 @@ typedef struct ModList {
 } tModList;
 
 
-/* Interface of module function to determine the max number of interfaces */
-typedef int (*tfModInfoMaxItf)(); /* first function called in the module, if present */
+/* Interface of module function where run-time informations are exchanged 
+   This function is called before moduleInitialize if present */
+typedef int (*tfModInfoWelcome)(const tModWelcomeIn*, tModWelcomeOut*);
 
 /* Interface of module initialization function */
-typedef int (*tfModInfoInit)(tModInfo *);  /* second/first function called in the module */
+typedef int (*tfModInfoInitialize)(tModInfo *);  /* second/first function called in the module */
 
 /* Interface of module termination function */
-typedef int (*tfModInfoTerm)(void);	/* last function called in the module */
+typedef int (*tfModInfoTerminate)(void);	/* last function called in the module */
 
 
 /********************************************

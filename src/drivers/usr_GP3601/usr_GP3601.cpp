@@ -69,10 +69,10 @@ static Driver *driver[MAXNBBOTS];                // Array of drivers
 // Number of drivers defined in robot's xml-file
 static int NBBOTS = 0;                           // Still unknown
 // Robot's name
-char nameBuffer[BUFSIZE];                        // Buffer for robot's name
+static char nameBuffer[BUFSIZE];                 // Buffer for robot's name
 static const char* robotName = nameBuffer;       // Pointer to robot's name
 // Robot's xml-filename
-char pathBuffer[BUFSIZE];                        // Buffer for robot's xml-filename
+static char pathBuffer[BUFSIZE];                 // Buffer for robot's xml-filename
 static const char* pathXml = pathBuffer;         // Pointer to robot's xml-filename
 
 // Save start index offset from robot's xml file
@@ -93,55 +93,27 @@ void SetUpUSR_GP3601()
 	// Add usr_GP3601 specific initialization here
 };
 
-// Get robots's name and xml-filename
-const char* getRobotNames(const char * libPath)
+// Set robots's name, path and xml file pathname
+static void setRobotNameAndDir(const char *name, const char *dir)
 {
 	char* c;
 
-	int Len = MIN(BUFSIZE-2,strlen(libPath));    // Get length of path/filename of robots lib
-	snprintf(pathBuffer, Len, libPath);          // Save path/filename 
-	if (pathBuffer[Len-4] == '.')                // Check wether it is a windows .dll or a linux .so 
-	{
-      // Windows version .dll -> .xml
-      pathBuffer[Len-3] = 'x';
-      pathBuffer[Len-2] = 'm';
-      pathBuffer[Len-1] = 'l';
-      pathBuffer[Len] = 0;
+	strcpy(nameBuffer, name);
+	snprintf(pathBuffer, BUFSIZE, "%s/%s.xml", dir, name);
 
-	  c = &pathBuffer[Len-4];                    // Start for search of robot name 
-	}
-	else
-	{
-      // Linux version .so -> .xml
-      pathBuffer[Len-2] = 'x';
-      pathBuffer[Len-1] = 'm';
-      pathBuffer[Len] = 'l';
-      pathBuffer[Len+1] = 0;
-
-	  c = &pathBuffer[Len-3];                    // Start for search of robot name 
-	}
-
-    // Get robot name
-	int LenName = -1;
-	while (*c != '/')
-	{
-	    LenName++;
-        c--;
-	}
-	snprintf(nameBuffer, LenName, ++c);          // Save robot name
 	GfOut("Robot Name: >%s<\n",robotName);
-
-	return pathXml;                              
 }
 
 // Module entry point (new fixed name scheme).
 // Extended for use with schismatic robots
-extern "C" int moduleMaxInterfaces(const char * libPath)
+extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
 	int i;
 
-	GfOut("\n\n\nRobot LIB-Path: %s\n",libPath);
-	GfOut("Robot XML-Path: %s\n\n",getRobotNames(libPath));
+	// Save module name and loadDir, and determine module XML file pathname.
+	setRobotNameAndDir(welcomeIn->name, welcomeIn->loadPath);
+
+	GfOut("Robot XML-Path: %s\n\n",pathXml);
 
 	// Filehandle for robot's xml-file
 	void *RobotSettings = GfParmReadFile( pathXml, GFPARM_RMODE_STD );
@@ -200,7 +172,10 @@ extern "C" int moduleMaxInterfaces(const char * libPath)
 	else 
 		SetUpUSR();
 
-	return NBBOTS;
+	// Set max nb of interfaces to return.
+	welcomeOut->maxNbItf = NBBOTS;
+
+	return 0;
 }
 
 // Module entry point (new fixed name scheme).

@@ -7,6 +7,6 @@ LIBRARY
 SECTIONS .data READ WRITE
 
 EXPORTS
-	moduleMaxInterfaces
+	moduleWelcome
 	moduleInitialize
 	moduleTerminate

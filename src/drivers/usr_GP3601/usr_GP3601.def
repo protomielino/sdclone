@@ -9,12 +9,12 @@
 ;    the Free Software Foundation; either version 2 of the License, or   
 ;    (at your option) any later version.                                 
 ;
-;    Traditional Interface:
+;    Legacy TORCS Interface:
 ;      usr_GP3601
 ;      usr_GP3601Shut
 ;
-;    TORCS-NG-Interface:
-;      moduleMaxInterfaces
+;    TORCS-NG Interface:
+;      moduleWelcome
 ;      moduleInitialize
 ;      moduleTerminate
 ;
@@ -26,7 +26,7 @@ SECTIONS .data READ WRITE
 EXPORTS
 	usr_GP3601
 	usr_GP3601Shut
-	moduleMaxInterfaces
+	moduleWelcome
 	moduleInitialize
 	moduleTerminate
 

@@ -7,7 +7,7 @@ LIBRARY	human
 SECTIONS .data READ WRITE
 
 EXPORTS
-	moduleMaxInterfaces
+	moduleWelcome
 	moduleInitialize
 	moduleTerminate
 
