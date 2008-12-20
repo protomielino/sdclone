@@ -138,6 +138,30 @@
         <attnum name="blue" val="0.7"></attnum>
       </section>
 
+      <section name="11">
+        <attstr name="name" val="Achilli Varzi"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="36 Auto Union"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="36GP-autounion"></attstr>
+        <attnum name="race number" val="12"></attnum>
+        <attnum name="red" val="0.8"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="0.2"></attnum>
+      </section>
+
+      <section name="12">
+        <attstr name="name" val="Hans Stuck"></attstr>
+        <attstr name="desc" val=""></attstr>
+        <attstr name="team" val="36 Auto Union"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="36GP-autounion"></attstr>
+        <attnum name="race number" val="13"></attnum>
+        <attnum name="red" val="0.8"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="0.2"></attnum>
+      </section>
+
 
     </section>
   </section>
