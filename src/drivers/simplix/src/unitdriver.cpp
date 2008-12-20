@@ -62,6 +62,10 @@
 #include <tgf.h>
 #include <robottools.h>
 
+#include <direct.h>
+#include <stdlib.h>
+#include <stdio.h>
+
 #include "unitglobal.h"
 #include "unitcommon.h"
 
@@ -99,6 +103,7 @@ static char *WheelSect[4] =                        // TORCS defined sections
 // R: Avoid to right
 //--------------------------------------------------------------------------*
 #define BUFLEN 256
+static char TestPathFilenameBuffer[BUFLEN];      // for path and filename
 static char PathFilenameBuffer[BUFLEN];          // for path and filename
 static char TrackNameBuffer[BUFLEN];             // for track name
 static char TrackLoadQualifyBuffer[BUFLEN];      // for track filename Q
@@ -410,6 +415,17 @@ void TDriver::InitTrack
   // Initialize race type array
   char* RaceType[] =
     {"practice", "qualify", "race"};
+
+  char* TestBaseParamPath;
+
+  // Get the current working directory: 
+  if( (TestBaseParamPath = _getcwd( NULL, 0 )) == NULL )
+     perror( "_getcwd error" );
+  else
+  {
+     printf( "\n\n\n%s \nLength: %d\n\n\n", TestBaseParamPath, strlen(TestBaseParamPath) );
+     free(TestBaseParamPath);
+  }
 
   // Initialize the base param path
   char* BaseParamPath = TDriver::ROBOT_DIR;

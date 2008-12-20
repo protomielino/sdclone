@@ -113,7 +113,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix\simplix.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_36GP\simplix_36GP.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_trb1a\simplix_trb1a.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_trb1b\simplix_trb1b.dll&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix\simplix.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_36GP\simplix_36GP.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_trb1\simplix_trb1.dll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -215,7 +215,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix\simplix.dll&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix\simplix.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_36GP\simplix_36GP.dll&#x0D;&#x0A;copy $(TargetDir)simplix.dll ..\..\..\runtime\drivers\simplix_trb1\simplix_trb1.dll&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
