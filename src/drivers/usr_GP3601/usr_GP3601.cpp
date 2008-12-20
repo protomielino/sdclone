@@ -183,7 +183,7 @@ extern "C" int moduleMaxInterfaces(const char * libPath)
 				snprintf( &DriverNames[i*DRIVERLEN], DRIVERLEN-1, DriverName );
 			    const char *DriverDesc = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_DESC, defaultBotDesc[i]);
 				snprintf( &DriverDescs[i*DRIVERLEN], DRIVERLEN-1, DriverDesc );
-				NBBOTS = i + 1 - indexOffset;
+				NBBOTS = i + 1;
 			}
 		}
 	}
