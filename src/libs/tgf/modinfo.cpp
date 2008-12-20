@@ -145,9 +145,9 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
  */
 int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, tModList **mod)
 {
-    tfModInfoMaxItf	fModInfoMaxItf;	/* function that gives the max nb of itf of the module */
-    tfModInfoInit	fModInfoInit;	/* init function of the module */
-    int			initSts = 0;	/* returned status */
+    tfModInfoMaxItfSetName fModInfoMaxItf; /* function that gives the max nb of itf of the module and defines its name*/
+    tfModInfoInit	fModInfoInit;	 /* init function of the module */
+    int			initSts = 0;	     /* returned status */
     int			retained = 1;
     
     /* Allocate module entry in list */
@@ -159,10 +159,11 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
     
     /* Determine the number of interfaces of the module :
        1) Call the dedicated module function if present */
-    if ((fModInfoMaxItf = (tfModInfoMaxItf)dlsym(soHandle, GfModInfoMaxItfFuncName)) != 0) 
+    if ((fModInfoMaxItf = (tfModInfoMaxItfSetName)dlsym(soHandle, GfModInfoMaxItfFuncName)) != 0) 
     {
         /* DLL loaded, nbItf function exists, call it... */
-        (*mod)->modInfoSize = fModInfoMaxItf();
+        // Give DLL path to robot to define its name used by TORCS-NG
+		(*mod)->modInfoSize = fModInfoMaxItf(soPath);  
     } 
 
     /* 2) If not present, default number of interfaces (backward compatibility) */
