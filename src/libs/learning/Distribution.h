@@ -94,7 +94,7 @@ public:
 	virtual real generate();
 	virtual real pdf(real x);
 	virtual void setVariance (real var) 
-	{s = sqrt(12.0 * var);} 
+	{s = sqrt(12.0f * var);} 
 	virtual void setMean (real mean)
 	{m = mean;}
 };
@@ -121,7 +121,7 @@ public:
 	virtual real generate();
 	virtual real pdf(real x);
 	virtual void setVariance (real var)
-	{l = sqrt(0.5 / var);}
+	{l = sqrt(0.5f / var);}
 	virtual void setMean (real mean)
 	{m = mean;}
 };
@@ -146,7 +146,7 @@ public:
 	virtual real generate();
 	virtual real pdf(real x);
 	virtual void setVariance (real var)
-	{l = sqrt(1.0 / var);}
+	{l = sqrt(1.0f / var);}
 	virtual void setMean (real mean)
 	{m = mean;}
 };
