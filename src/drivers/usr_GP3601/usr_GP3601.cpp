@@ -77,6 +77,21 @@ static const char* pathXml = pathBuffer;         // Pointer to robot's xml-filen
 
 // Save start index offset from robot's xml file
 static int indexOffset = 0;
+// Marker for undefined drivers to be able to comment out drivers 
+// in the robot's xml-file between others, not only at the end of the list
+char undefined[] = "undefined";                  
+
+// Schismatic init for usr
+void SetUpUSR()
+{
+	// Add usr specific initialization here
+};
+
+// Schismatic init for usr_GP3601
+void SetUpUSR_GP3601()
+{
+	// Add usr_GP3601 specific initialization here
+};
 
 // Get robots's name and xml-filename
 const char* getRobotNames(const char * libPath)
@@ -141,10 +156,10 @@ extern "C" int moduleMaxInterfaces(const char * libPath)
 
 		// Try to get first driver from index 0
 		const char *DriverName = GfParmGetStrNC( RobotSettings, 
-			Section, (char *) ROB_ATTR_NAME, "undefined");
+			Section, (char *) ROB_ATTR_NAME, undefined);
 
 		// Check wether index 0 is used as start index
-		if (strncmp(DriverName,"undefined",9) != 0)
+		if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
 		{
 			// Teams xml file uses index 0, 1, ..., N - 1
             indexOffset = 0; 
@@ -161,14 +176,14 @@ extern "C" int moduleMaxInterfaces(const char * libPath)
 			memset(&DriverNames[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
 			memset(&DriverDescs[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
 			snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i + indexOffset );
-			const char *DriverName = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_NAME,"undefined");
+			const char *DriverName = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_NAME,undefined);
 
-	        if (strncmp(DriverName,"undefined",9) != 0)
+	        if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
 			{   // This driver is defined in robot's xml-file
 				snprintf( &DriverNames[i*DRIVERLEN], DRIVERLEN-1, DriverName );
 			    const char *DriverDesc = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_DESC, defaultBotDesc[i]);
 				snprintf( &DriverDescs[i*DRIVERLEN], DRIVERLEN-1, DriverDesc );
-				NBBOTS++;
+				NBBOTS = i + 1 - indexOffset;
 			}
 		}
 	}
@@ -179,6 +194,12 @@ extern "C" int moduleMaxInterfaces(const char * libPath)
 		NBBOTS = 1;
 	}
 	GfOut("NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
+
+    if (strncmp(robotName,"usr_GP3601",strlen("usr_GP3601")) == 0)
+		SetUpUSR_GP3601();
+	else 
+		SetUpUSR();
+
 	return NBBOTS;
 }
 
@@ -208,7 +229,36 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
 // Module entry point (Torcs backward compatibility scheme).
 extern "C" int usr_GP3601(tModInfo *modInfo)
 {
-    return moduleInitialize(modInfo);
+  NBBOTS = 10;
+  memset(DriverNames, 0, NBBOTS*DRIVERLEN);
+  memset(DriverDescs, 0, NBBOTS*DRIVERLEN);
+
+  snprintf(pathBuffer, BUFSIZE, "drivers/usr_GP3601/usr_GP3601.xml");
+  snprintf(nameBuffer, BUFSIZE, "usr_GP3601");
+
+  // Filehandle for robot's xml-file
+  void *RobotSettings = GfParmReadFile(pathXml, GFPARM_RMODE_STD );
+
+  // Let's look what we have to provide here
+  if (RobotSettings)
+  {
+	char SectionBuf[BUFSIZE];
+	char *Section = SectionBuf;
+
+	snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
+
+    int I;
+    for (I = 0; I < NBBOTS; I++) 
+    {
+	  const char *DriverName = GfParmGetStr( RobotSettings, 
+		  Section, (char *) ROB_ATTR_NAME, defaultBotName[I]);
+	  snprintf(&DriverNames[I*DRIVERLEN], DRIVERLEN-1, DriverName);
+      const char *DriverDesc = GfParmGetStr( RobotSettings, 
+		  Section, (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
+	  snprintf(&DriverDescs[I*DRIVERLEN], DRIVERLEN-1, DriverDesc);
+    }
+  }
+  return moduleInitialize(modInfo);
 }
 
 // Module exit point (new fixed name scheme).
