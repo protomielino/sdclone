@@ -136,10 +136,10 @@ static char DriverDescs[DRIVERLEN * MAX_NBBOTS]; // Buffer for driver's descript
 // Number of drivers defined in robot's xml-file
 static int NBBOTS = 0;                           // Still unknown
 // Robot's name
-static char nameBuffer[BUFSIZE];                        // Buffer for robot's name
+static char nameBuffer[BUFSIZE];                 // Buffer for robot's name
 static const char* robotName = nameBuffer;       // Pointer to robot's name
 // Robot's xml-filename
-static char pathBuffer[BUFSIZE];                        // Buffer for robot's xml-filename
+static char pathBuffer[BUFSIZE];                 // Buffer for robot's xml-filename
 static const char* pathXml = pathBuffer;         // Pointer to robot's xml-filename
 // Robot's dir
 static char dirBuffer[BUFSIZE];
@@ -225,13 +225,13 @@ void SetUpSimplix_36GP()
 //==========================================================================*
 // Set robots's name, path and xml file pathname
 //--------------------------------------------------------------------------*
-static void setRobotNameAndDir(const char *name, const char *dir)
+static void setRobotName(const char *name)
 {
 	char* c;
 
 	strcpy(nameBuffer, name);
-	strcpy(dirBuffer, dir);
-	snprintf(pathBuffer, BUFSIZE, "%s/%s.xml", dir, name);
+	snprintf(dirBuffer, BUFSIZE, "drivers/%s", name);
+	snprintf(pathBuffer, BUFSIZE, "%s/%s.xml", robotDir, name);
 
 	GfOut("Robot Name: >%s<\n",robotName);
 }
@@ -246,9 +246,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 	int i;
 
 	// Save module name and loadDir, and determine module XML file pathname.
-	setRobotNameAndDir(welcomeIn->name, welcomeIn->loadPath);
+	setRobotName(welcomeIn->name);
 
-	GfOut("\n\n\nRobot dir: %s\n",robotDir);
 	GfOut("Robot XML-Path: %s\n\n",pathXml);
 
 	// Filehandle for robot's xml-file

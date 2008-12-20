@@ -93,13 +93,13 @@ void SetUpUSR_GP3601()
 	// Add usr_GP3601 specific initialization here
 };
 
-// Set robots's name, path and xml file pathname
-static void setRobotNameAndDir(const char *name, const char *dir)
+// Set robots's name and xml file pathname
+static void setRobotName(const char *name)
 {
 	char* c;
 
 	strcpy(nameBuffer, name);
-	snprintf(pathBuffer, BUFSIZE, "%s/%s.xml", dir, name);
+	snprintf(pathBuffer, BUFSIZE, "drivers/%s/%s.xml", name, name);
 
 	GfOut("Robot Name: >%s<\n",robotName);
 }
@@ -111,7 +111,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 	int i;
 
 	// Save module name and loadDir, and determine module XML file pathname.
-	setRobotNameAndDir(welcomeIn->name, welcomeIn->loadPath);
+	setRobotName(welcomeIn->name);
 
 	GfOut("Robot XML-Path: %s\n\n",pathXml);
 
