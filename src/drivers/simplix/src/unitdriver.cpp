@@ -62,9 +62,14 @@
 #include <tgf.h>
 #include <robottools.h>
 
+#ifdef WIN32
 #include <direct.h>
+#endif
+
 #include <stdlib.h>
 #include <stdio.h>
+
+#include <portability.h>
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -419,8 +424,8 @@ void TDriver::InitTrack
   char* TestBaseParamPath;
 
   // Get the current working directory: 
-  if( (TestBaseParamPath = _getcwd( NULL, 0 )) == NULL )
-     perror( "_getcwd error" );
+  if( (TestBaseParamPath = getcwd( NULL, 0 )) == NULL )
+     perror( "getcwd error" );
   else
   {
      printf( "\n\n\n%s \nLength: %d\n\n\n", TestBaseParamPath, strlen(TestBaseParamPath) );
