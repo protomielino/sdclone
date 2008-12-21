@@ -190,10 +190,15 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 	tModWelcomeOut welcomeOut;
 
 	/* Call the welcome function */
-	initSts = fModInfoWelcome(&welcomeIn, &welcomeOut);  
-
-	/* Save information given by the module */
-	(*mod)->modInfoSize = welcomeOut.maxNbItf;
+	if ((initSts = fModInfoWelcome(&welcomeIn, &welcomeOut)) != 0)
+	{
+	    GfError("GfModInitialize: Module welcome function failed %s\n", soPath);
+	}
+	else
+	{
+	    /* Save information given by the module */
+	    (*mod)->modInfoSize = welcomeOut.maxNbItf;
+	}
     } 
 
     /* 2) If not present, default number of interfaces (backward compatibility) */
@@ -202,16 +207,17 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
         (*mod)->modInfoSize = GfModInfoDefaultMaxItf;
     }
 
-    /* Get module initialization function :
+    /* Get module initialization function if welcome succeeded :
        1) Try the new sheme (fixed name) */
-    if ((fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, GfModInfoInitializeFuncName)) == 0)
+    if (initSts == 0
+	&& (fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, GfModInfoInitializeFuncName)) == 0)
     {
 	/* 2) Backward compatibility (dll name) */
 	fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, soName);
     }
 
-    /* Call module initialization function if found */
-    if (fModInfoInit) 
+    /* Call module initialization function if welcome succeeded and init function found */
+    if (initSts == 0 && fModInfoInit) 
     {
 	/* Allocate module interfaces info array according to the size we got */
 	tModInfo* constModInfo;
