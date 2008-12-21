@@ -243,6 +243,9 @@ int moduleWelcomeV1_00
 	GfOut("Load path        : %s\n",welcomeIn->loadPath);
 	GfOut("Robot XML-Path   : %s\n\n",robotXml);
 
+    memset(DriverNames, 0, MAXNBBOTS*DRIVERLEN);
+    memset(DriverDescs, 0, MAXNBBOTS*DRIVERLEN);
+
 	// Filehandle for robot's xml-file
 	void *RobotSettings = GfParmReadFile(robotXml, GFPARM_RMODE_STD );
 
@@ -275,8 +278,8 @@ int moduleWelcomeV1_00
 		// save defined driver names and desc.
 		for (i = 0; i < MAXNBBOTS; i++)
 		{
-			memset(&DriverNames[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
-			memset(&DriverDescs[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
+			//memset(&DriverNames[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
+			//memset(&DriverDescs[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
 			snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", 
 				ROB_SECT_ROBOTS, ROB_LIST_INDEX, i + IndexOffset );
 			const char *DriverName = GfParmGetStr( RobotSettings, Section, 
@@ -408,6 +411,8 @@ int simplixEntryPoint(tModInfo *ModInfo)
     int I;
     for (I = 0; I < NBBOTS; I++) 
     {
+	  snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", 
+		  ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
 	  const char *DriverName = GfParmGetStr( RobotSettings, 
 		  Section, (char *) ROB_ATTR_NAME, defaultBotName[I]);
 	  snprintf(&DriverNames[I*DRIVERLEN], DRIVERLEN-1, DriverName);
