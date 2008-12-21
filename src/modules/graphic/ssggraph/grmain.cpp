@@ -47,6 +47,8 @@
 int maxTextureUnits = 0;
 static double OldTime;
 static int nFrame;
+static int nTotalFrame;
+static int nSeconds;
 float grFps;
 double grCurTime;
 double grDeltaTime;
@@ -246,6 +248,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     OldTime = GfTimeClock();
     nFrame = 0;
+    nTotalFrame = 0;
+    nSeconds = 0;
     grFps = 0;
 
     sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
@@ -304,12 +308,14 @@ refresh(tSituation *s)
     START_PROFILE("refresh");
 
     nFrame++;
+    nTotalFrame++;
     grCurTime = GfTimeClock();
     grDeltaTime = grCurTime - OldTime;
     if ((grCurTime - OldTime) > 1.0) {
 	/* The Frames Per Second (FPS) display is refreshed every second */
 	grFps = (tdble)nFrame / (grCurTime - OldTime);
 	nFrame = 0;
+	++nSeconds;
 	OldTime = grCurTime;
     }
 
@@ -434,7 +440,9 @@ shutdownCars(void)
 	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 		grScreens[i]->setCurrentCar(NULL);
 	}
-}
+
+	if (nSeconds > 0)
+		printf( "Average FPS: %.2f\n", (double)nTotalFrame/((double)nSeconds+GfTimeClock()-OldTime) );}
 
 int
 initTrack(tTrack *track)

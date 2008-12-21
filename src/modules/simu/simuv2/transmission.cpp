@@ -19,7 +19,6 @@
 
 #include "sim.h"
 
-static const char *gearname[MAX_GEARS] = {"r", "n", "1", "2", "3", "4", "5", "6", "7", "8"};
 
 void
 SimTransmissionConfig(tCar *car)
@@ -80,7 +79,10 @@ SimTransmissionConfig(tCar *car)
     trans->gearbox.gearMax = 0;
     //printf ("engine I %f\n", car->engine.I);
     for (i = MAX_GEARS - 1; i >= 0; i--) {
-		sprintf(path, "%s/%s/%s", SECT_GEARBOX, ARR_GEARS, gearname[i]);
+		if (i<2)
+			sprintf(path, "%s/%s/%s", SECT_GEARBOX, ARR_GEARS, i==0 ? "r" : "n");
+		else
+			sprintf(path, "%s/%s/%d", SECT_GEARBOX, ARR_GEARS, i-1);
 		gRatio = GfParmGetNum(hdle, path, PRM_RATIO, (char*)NULL, 0.0f);
 		if ((trans->gearbox.gearMax == 0) && (gRatio != 0.0f)) {
 			trans->gearbox.gearMax = i - 1;

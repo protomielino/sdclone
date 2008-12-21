@@ -467,8 +467,6 @@ cGrBoard::grDispCarBoard(tCarElt *car, tSituation *s)
 	}
 }
 
-static const char *gearStr[MAX_GEARS] = {"R", "N", "1", "2", "3", "4", "5", "6", "7", "8"};
-
 #define ALIGN_CENTER	0
 #define ALIGN_LEFT	1
 #define ALIGN_RIGHT	2
@@ -570,12 +568,15 @@ cGrBoard::grDispCounterBoard(tCarElt *car)
 	
 	x = Winx + Winw/2;
 	y = Winy;
-	sprintf(buf, " kph %s", gearStr[car->_gear+car->_gearOffset]);
+	if (car->_gear <= 0)
+		sprintf(buf, " kph %s", car->_gear == 0 ? "N" : "R");
+	else
+		sprintf(buf, " kph %d", car->_gear);
 	GfuiPrintString(buf, grBlue, GFUI_FONT_BIG_C, x, y, GFUI_ALIGN_HL_VB);
 	
 	x = Winx + Winw/2;
 	sprintf(buf, "%3d", abs((int)(car->_speed_x * 3.6)));
-	GfuiPrintString(buf, grBlue, GFUI_FONT_DIGIT, x, y, GFUI_ALIGN_HR_VB);
+	GfuiPrintString(buf, grBlue, GFUI_FONT_BIG_C, x, y, GFUI_ALIGN_HR_VB);
 }
 
 void
@@ -721,8 +722,12 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
 	glCallList(curInst->needleList);
 	glPopMatrix();
 	
-	GfuiPrintString((char*)(gearStr[car->_gear+car->_gearOffset]), grRed, GFUI_FONT_LARGE_C,
-			(int)curInst->digitXCenter, (int)(curInst->digitYCenter), GFUI_ALIGN_HC_VB);
+	if (car->_gear <= 0)
+		strcpy(buf, car->_gear == 0 ? "N" : "R");
+	else
+		sprintf(buf, "%d", car->_gear);
+	GfuiPrintString(buf, grRed, GFUI_FONT_LARGE_C,
+			(int)curInst->digitXCenter, (int)curInst->digitYCenter, GFUI_ALIGN_HC_VB);
 	
 	
 	curInst = &(grCarInfo[index].instrument[1]);
@@ -754,8 +759,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
 	if (curInst->digital) {
 		// Do not add "%3d" or something, because the digital font DOES NOT SUPPORT BLANKS!!!!
 		sprintf(buf, "%d", abs((int)(car->_speed_x * 3.6)));
-		GfuiPrintString(buf, grRed, GFUI_FONT_DIGIT,
-			(int)curInst->digitXCenter, (int)(curInst->digitYCenter), GFUI_ALIGN_HC_VB);
+		GfuiPrintString(buf, grRed, GFUI_FONT_LARGE_C,
+			(int)curInst->digitXCenter, (int)curInst->digitYCenter, GFUI_ALIGN_HC_VB);
 	}
 	
 	if (counterFlag == 1){
@@ -831,7 +836,10 @@ cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
 	sprintf(buf, "%3d km/h", abs((int)(car->_speed_x * 3.6)));
 	GfuiPrintString(buf, grDefaultClr, GFUI_FONT_BIG_C, x, y, GFUI_ALIGN_HR_VB);
 	y = YM;
-	sprintf(buf, "%s", gearStr[car->_gear+car->_gearOffset]);
+	if (car->_gear <= 0)
+		sprintf(buf, "%s", car->_gear == 0 ? "N" : "R");
+	else
+		sprintf(buf, "%d", car->_gear);
 	GfuiPrintString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, GFUI_ALIGN_HR_VB);
 
 	grDispEngineLeds (car, Winx + Winw - XM, YM + dy + GfuiFontHeight (GFUI_FONT_BIG_C), ALIGN_RIGHT, 0);
@@ -899,7 +907,7 @@ void grInitBoardCar(tCarElt *car)
 	curInst->needleXCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XCENTER, (char*)NULL, xSz / 2.0) + xpos;
 	curInst->needleYCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YCENTER, (char*)NULL, ySz / 2.0) + ypos;
 	curInst->digitXCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XDIGITCENTER, (char*)NULL, xSz / 2.0) + xpos;
-	curInst->digitYCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YDIGITCENTER, (char*)NULL, 16) + ypos;
+	curInst->digitYCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YDIGITCENTER, (char*)NULL, 10) + ypos;
 	curInst->minValue = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_MINVAL, (char*)NULL, 0);
 	curInst->maxValue = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_MAXVAL, (char*)NULL, RPM2RADS(10000)) - curInst->minValue;
 	curInst->minAngle = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_MINANG, "deg", 225);
