@@ -71,7 +71,7 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
       return 0;
     }
 
-    GfOut("Loading linux module %s\n", sopath);
+    GfOut("Loading module %s\n", sopath);
     
     /* Load the shared library */
     handle = dlopen(sopath, RTLD_LAZY);
@@ -141,7 +141,7 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
       return infoSts;
     }
 
-    GfOut("Querying linux module %s\n", sopath);
+    GfOut("Querying module %s\n", sopath);
 
     /* Load the shared library */
     handle = dlopen(sopath, RTLD_LAZY);
@@ -227,7 +227,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		if (!GfModIsInList(sopath, *modlist))
 		{
 		    /* Load the shared library */
-		    GfOut("Loading linux module %s\n", sopath);
+		    GfOut("Loading module %s\n", sopath);
 		    handle = dlopen(sopath, RTLD_LAZY);
 		    if (handle)
 		    {
@@ -324,7 +324,7 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 		if (!GfModIsInList(sopath, *modlist))
 		{
 		    /* Load the shared library */
-		    GfOut("Querying linux module %s\n", sopath);
+		    GfOut("Querying module %s\n", sopath);
 		    handle = dlopen(sopath, RTLD_LAZY);
 		    if (handle)
 		    {
@@ -405,7 +405,7 @@ linuxModUnloadList(tModList **modlist)
 	// Comment out for valgrind runs, be aware that the driving with the keyboard does
 	// just work to first time this way.
 	dlclose(curMod->handle);
-	GfOut("Unloaded linux module %s\n", curMod->sopath);
+	GfOut("Unloaded module %s\n", curMod->sopath);
 
 	GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
 	free(curMod->sopath);

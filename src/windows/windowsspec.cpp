@@ -176,7 +176,7 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
       return 0;
     }
 
-    GfOut("Loading windows module %s\n", soPath);
+    GfOut("Loading module %s\n", soPath);
     
     /* ssggraph is statically linked under Windows ... */
     char fname[256];
@@ -212,7 +212,7 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 	return -1;
     }
       
-    GfOut("Windows module %s loaded\n",soPath);
+    GfOut("Module %s loaded\n",soPath);
     return 0;
 }
 
@@ -252,7 +252,7 @@ windowsModInfo(unsigned int /* gfid */, const char *soPath, tModList **modlist)
       return infoSts;
     }
 
-    GfOut("Querying windows module %s\n", soPath);
+    GfOut("Querying module %s\n", soPath);
 
     /* Load the DLL */
     handle = LoadLibrary( soPath );
@@ -336,7 +336,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 	    if (!GfModIsInList(soPath, *modlist))
 	    {
 		/* Load the DLL */
-		GfOut("Loading windows module %s\n", soPath);
+		GfOut("Loading module %s\n", soPath);
 	        handle = LoadLibrary( soPath );
 		if (handle)
 		{
@@ -430,7 +430,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 		if (!GfModIsInList(soPath, *modlist))
 		{
 		    /* Load the DLL */
-		    GfOut("Querying windows module %s\n", soPath);
+		    GfOut("Querying module %s\n", soPath);
 		    handle = LoadLibrary( soPath );
 		    if (handle)
 		    {
@@ -513,7 +513,7 @@ windowsModUnloadList(tModList **modlist)
 
 	    FreeLibrary(curMod->handle);
 	}
-	GfOut("Unloaded windows module %s\n", curMod->sopath);
+	GfOut("Unloaded module %s\n", curMod->sopath);
 
 	GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
 	free(curMod->sopath);
