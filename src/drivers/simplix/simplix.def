@@ -13,6 +13,21 @@
 ;    Legacy TORCS Interface:
 ;      simplix
 ;      simplixShut
+;      simplix_trb1a
+;      simplix_trb1b
+;      simplix_sca
+;      simplix_scb
+;      simplix_36GP
+;      my_simplix_0
+;      my_simplix_1
+;      my_simplix_2
+;      my_simplix_3
+;      my_simplix_4
+;      my_simplix_5
+;      my_simplix_6
+;      my_simplix_7
+;      my_simplix_8
+;      my_simplix_9
 ;
 ;    TORCS-NG Interface:
 ;      moduleWelcome
@@ -27,6 +42,21 @@ SECTIONS .data READ WRITE
 EXPORTS
     simplix
     simplixShut
+    simplix_trb1a
+    simplix_trb1b
+    simplix_sca
+    simplix_scb
+    simplix_36GP
+    my_simplix_0
+    my_simplix_1
+    my_simplix_2
+    my_simplix_3
+    my_simplix_4
+    my_simplix_5
+    my_simplix_6
+    my_simplix_7
+    my_simplix_8
+    my_simplix_9
     moduleWelcome
     moduleInitialize
     moduleTerminate

@@ -37,16 +37,20 @@
 #define mysecure           // Use _fopen_s
 #define myhypot _hypot     // Use _hypot instead of hypot
 #define myfopen _fopen_s   // Use _fopen_s instead of fopen
+#ifdef WIN32
+#include <direct.h>
+#endif
 #else                    // but in a poor world without walls and fences, ...
 #define myhypot hypot      // Use hypot
 #define myfopen fopen      // Use fopen
 #endif                   // ... who needs windows and gates?   
 // ... but the answer is just 42!
 
-//#include <portability.h> do not use this, vc++ 2005 warnings ...
+#include <portability.h> // can be used now without vc++ 2005 warnings ...
 
 // VC++ 2005 ...
 #if defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++ 2005
+#undef snprintf 
 #define snprintf _snprintf_s
 #endif
 // ... VC++ 2005
@@ -61,6 +65,13 @@
 #undef mysecure
 #endif
 // ... VC++ 6.0
+
+#include <stdlib.h>
+#include <stdio.h>
+
+#include <string.h>
+#include <math.h>
+#include <time.h>
 
 #include <tgf.h>     // TORCS
 #include <track.h>   // TORCS

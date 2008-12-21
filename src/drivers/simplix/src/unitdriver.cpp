@@ -2,14 +2,14 @@
 // unitdriver.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A schismatic robot for TORCS-Version 1.3.0 and 1.3.1
+// A robot for TORCS-NG-Version 1.4.0
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2008.12.19
+// Last changed : 2008.12.21
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -61,15 +61,6 @@
 #include <tmath/v2_t.h>
 #include <tgf.h>
 #include <robottools.h>
-
-#ifdef WIN32
-#include <direct.h>
-#endif
-
-#include <stdlib.h>
-#include <stdio.h>
-
-#include <portability.h>
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -366,7 +357,7 @@ void TDriver::SetBotName(char* Value)
   void* RobotSettings = GfParmReadFile           // Open team setup file
     (PathFilename,GFPARM_RMODE_STD);
 
-  GfOut("\n\n\nPathFilename: %s\n",PathFilename);
+  GfOut("\nPathFilename: %s\n",PathFilename);
   if (RobotSettings)
   {
 	oCarType = GfParmGetStr                      // Get pointer to
@@ -395,10 +386,10 @@ void TDriver::SetBotName(char* Value)
 	oTeamName = oCarType;
 	oRaceNumber = oIndex + 1;
   }
-  GfOut("Bot name: %s\n",oBotName);
-  GfOut("Team name: %s\n",oTeamName);
-  GfOut("Car type: %s\n",oCarType);
-  GfOut("Race number: %d\n",oRaceNumber);
+  GfOut("Bot name    : %s\n",oBotName);
+  GfOut("Team name   : %s\n",oTeamName);
+  GfOut("Car type    : %s\n",oCarType);
+  GfOut("Race number : %d\n",oRaceNumber);
 
 };
 //==========================================================================*
@@ -773,10 +764,6 @@ void TDriver::InitTrack
   oTeamEnabled = (int)
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,(float)oTeamEnabled);
   GfOut("oTeamEnabled %d\n",oTeamEnabled);
-
-  //oCar->brkSyst.rep   = GfParmGetNum(Handle, SECT_BRKSYST, PRM_BRKREP, (char*)NULL, 0.5);
-  //oCar->brkSyst.coeff = GfParmGetNum(Handle, SECT_BRKSYST, PRM_BRKPRESS, (char*)NULL, 1000000);
-
   // ... Adjust driving
 
   // Adjust skilling ...
