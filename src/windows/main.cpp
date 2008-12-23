@@ -37,9 +37,8 @@ init_args(int argc, char **argv)
 		if ((strncmp(argv[i], "-s", 2) == 0) || (strncmp(argv[i], "/s", 2) == 0)) {
 			i++;
 			SetSingleTextureMode ();
-		} else {
+		} else
 			i++;		// Ignore bad args
-		}
 	}
 
 	static const int BUFSIZE = 1024;
@@ -54,14 +53,10 @@ init_args(int argc, char **argv)
 		*(end) = '\0';
 		// replace '\' with '/'
 		for (i = 0; i < BUFSIZE && buf[i] != '\0'; i++) {
-			if (buf[i] == '\\') {
+			if (buf[i] == '\\')
 				buf[i] = '/';
-			}
 		}
 
-		// TODO: Let localdir point to users "home" directory (I think on NT successors this exists,
-		// perhaps HOMEDRIVE, HOMEPATH).
-		SetLocalDir(buf);
 		SetDataDir(buf);
 		SetLibDir("");
 	} else {
@@ -75,11 +70,9 @@ init_args(int argc, char **argv)
 			*(end) = '\0';
 			// replace '\' with '/'
 			for (i = 0; i < BUFSIZE && buf[i] != '\0'; i++) {
-				if (buf[i] == '\\') {
+				if (buf[i] == '\\')
 					buf[i] = '/';
-				}
 			}
-			SetLocalDir(buf);
 			SetDataDir(buf);
 			SetLibDir("");
 		} else {
@@ -87,6 +80,14 @@ init_args(int argc, char **argv)
 			exit(1);
 		}
 	}
+
+	// Set LocalDir to the user settings dir for Torcs-NG
+	snprintf(buf, BUFSIZE, "%s/.torcs-ng/", getenv("USERPROFILE"));
+	for (i = 0; i < BUFSIZE && buf[i] != '\0'; i++) {
+		if (buf[i] == '\\')
+			buf[i] = '/';
+	}
+	SetLocalDir(buf);
 }
 
 /*

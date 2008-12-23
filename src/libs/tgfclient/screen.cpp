@@ -549,8 +549,8 @@ GfScrReinit(void * /* dummy */)
     saveParams();
 
 #ifdef WIN32
-	snprintf(cmd, CMDSIZE, "%swtorcs.exe", GetLocalDir());
-    int i;
+	snprintf(cmd, CMDSIZE, "%swtorcs.exe", GetDataDir());
+	int i;
 	for (i = 0; i < CMDSIZE && cmd[i] != NULL; i++) {
 		if (cmd[i] == '/') {
 			cmd[i] = '\\';
@@ -558,7 +558,8 @@ GfScrReinit(void * /* dummy */)
 	}
 	
 	char cmdarg[CMDSIZE];
-	snprintf(cmdarg, CMDSIZE, "\"%swtorcs.exe\"", GetLocalDir());
+	strcpy(cmdarg, "wtorcs.exe");
+	//snprintf(cmdarg, CMDSIZE, "wtorcs.exe", GetDataDir());
 	for (i = 0; i < CMDSIZE && cmdarg[i] != NULL; i++) {
 		if (cmdarg[i] == '/') {
 			cmdarg[i] = '\\';
@@ -624,7 +625,7 @@ GfScrReinit(void * /* dummy */)
 
 #endif
     if (retcode) {
-	perror("torcs");
+	perror("wtorcs.exe");
 	exit(1);
     }
 }
