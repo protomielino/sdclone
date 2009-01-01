@@ -78,6 +78,15 @@ static unsigned int	*trackindices;
 
 static tdble		TrackStep;
 
+#ifndef sqr
+#define sqr(x) ((x)*(x))
+#endif
+
+tdble Distance(tdble x0, tdble y0, tdble z0, tdble x1, tdble y1, tdble z1)
+{
+	return sqrt((x0-x1)*(x0-x1)+(y0-y1)*(y0-y1)+(z0-z1)*(z0-z1));
+}
+
 static void
 initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
 {
@@ -184,12 +193,18 @@ initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
     }
 }
 
+/** Bug fix:
+	If width of border decreased, additional vertices are needed to avoid missing surfaces
+	Implementation: 
+	Compares old end vertices and new start vertices, set startNeeded if one is different
+**/
 int
 InitScene(tTrack *Track, void *TrackHandle, int bump)
 {
 
     int 		i, j;
     tTrackSeg 		*seg;
+    tTrackSeg 		*lastSeg;
     tTrackSeg 		*mseg;
     int 		nbvert;
     tdble 		width, wi2;
@@ -229,6 +244,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     int			hasBorder;
     tDispElt		*theCurDispElt = NULL;
     char		sname[256];
+	float		dmax = 0;
 
 #define	LG_STEP_MAX	50.0
 
@@ -983,6 +999,15 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		    hasBorder = 0;
 		}
 	    }
+
+		if (!startNeeded)
+		{
+			tdble d0 = Distance(lastSeg->vertex[TR_EL].x, lastSeg->vertex[TR_EL].y, lastSeg->vertex[TR_EL].z, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+			tdble d1 = Distance(lastSeg->vertex[TR_ER].x, lastSeg->vertex[TR_ER].y, lastSeg->vertex[TR_ER].z, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+			if ((d0 > 0.01) || (d1 > 0.01))
+				startNeeded = 1;
+		}
+
 	    CHECKDISPLIST(seg->surface->material, "tkRS", i, mseg->lgfromstart);
 	    if (!curTexLink) {
 		curTexSeg = 0;
@@ -1002,8 +1027,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		SETPOINT(texLen, 0, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
 		SETPOINT(texLen, texMaxT, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
 	    }
-	    
-	    switch (seg->type) {
+
+		switch (seg->type) {
 	    case TR_STR:
 		ts = LMAX;
 		texStep = LMAX / curTexSize;
@@ -1099,6 +1124,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
 	    startNeeded = 0;
 	    runninglentgh += seg->length;
+		lastSeg = seg;
 	} else {
 	    startNeeded = 1;
 	}
@@ -1501,7 +1527,16 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		    hasBorder = 0;
 		}
 	    }
-	    CHECKDISPLIST(seg->surface->material, "tkLS", i, mseg->lgfromstart);
+
+		if (!startNeeded)
+		{
+			tdble d0 = Distance(lastSeg->vertex[TR_EL].x, lastSeg->vertex[TR_EL].y, lastSeg->vertex[TR_EL].z, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
+			tdble d1 = Distance(lastSeg->vertex[TR_ER].x, lastSeg->vertex[TR_ER].y, lastSeg->vertex[TR_ER].z, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
+			if ((d0 > 0.01) || (d1 > 0.01))
+				startNeeded = 1;
+		}
+
+		CHECKDISPLIST(seg->surface->material, "tkLS", i, mseg->lgfromstart);
 	    if (!curTexLink) {
 		curTexSeg = 0;
 	    } else {
@@ -1519,8 +1554,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		SETPOINT(texLen, texMaxT, seg->vertex[TR_SL].x, seg->vertex[TR_SL].y, seg->vertex[TR_SL].z);
 		SETPOINT(texLen, 0, seg->vertex[TR_SR].x, seg->vertex[TR_SR].y, seg->vertex[TR_SR].z);
 	    }
-	    
-	    switch (seg->type) {
+
+		switch (seg->type) {
 	    case TR_STR:
 		ts = LMAX;
 		texStep = LMAX / curTexSize;
@@ -1616,6 +1651,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
 	    startNeeded = 0;
 	    runninglentgh += seg->length;
+	    lastSeg = seg;
 	} else {
 	    startNeeded = 1;
 	}

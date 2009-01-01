@@ -2221,11 +2221,11 @@ GenerateTerrain(tTrack *track, void *TrackHandle, char *outfile, FILE *AllFd, in
     FILE	*curFd = NULL;
 
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, 10.0);
-    GfOut("Track step: %.2f ", TrackStep);
+    GfOut("Track step: %.2f\n", TrackStep);
     Margin    = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BMARGIN, NULL, 100.0);
     GridStep  = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BSTEP, NULL, 10.0);
     ExtHeight = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_BHEIGHT, NULL, 0.0);
-    GfOut("Border margin: %.2f    step: %.2f    height: %.2f", Margin, GridStep, ExtHeight);
+    GfOut("Border margin: %.2f    step: %.2f    height: %.2f\n", Margin, GridStep, ExtHeight);
     
     GroupSize = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_GRPSZ, NULL, 100.0);
     XGroupOffset = track->min.x - Margin;
