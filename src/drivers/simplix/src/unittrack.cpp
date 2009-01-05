@@ -485,12 +485,14 @@ void TTrackDescription::InitTrack
 			&& (I >= oPitSideMod.start)
 			&& (I <= oPitSideMod.end)))
 		  {
+/*
 			if ((((S == TR_SIDE_LFT)             // Reset width
 			  && (Seg->type == TR_RGT))          // on outer side
 			  || ((S == TR_SIDE_RGT)             // if friction is
 			  && (Seg->type == TR_LFT)))         // lower
 			  && (PSide->surface->kFriction < Seg->surface->kFriction))
 			  WCurb = 0;
+*/
 		  }
 		}
 		else if (PSide->style == TR_PLAN)        // On plan
@@ -524,7 +526,7 @@ void TTrackDescription::InitTrack
 		  }
 		  else
             W = 0.8 * W;                         // Use 80%
-
+/*
 		  if(((S == TR_SIDE_LFT)                 // Keep 2 m to outer side
 			  && ((Seg->type == TR_RGT) && (Seg->radiusr < 200))
 			|| (S == TR_SIDE_RGT)
@@ -542,6 +544,7 @@ void TTrackDescription::InitTrack
 		  {
 			W = MIN(0,-2.0 + N * 0.05);
 		  }
+*/
 		}
 		else
 		{
@@ -573,7 +576,8 @@ void TTrackDescription::InitTrack
 	NormalizeDir(Seg, DistFromStart - Seg->lgfromstart,	
 	  oSections[I].T, oSections[I].Center, oSections[I].ToRight);
   }}
-  SmoothSides(0.22);
+//  SmoothSides(0.22);
+  SmoothSides(1.0);
 }
 //==========================================================================*
 

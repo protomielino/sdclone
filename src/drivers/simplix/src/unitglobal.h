@@ -9,24 +9,29 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2008.12.12
+// Last changed : 2008.12.28
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
@@ -242,6 +247,7 @@ enum
 #define CarGearCmd (oCar->_gearCmd)
 #define CarSteerCmd (oCar->_steerCmd)
 #define CarRaceCmd (oCar->_raceCmd)
+#define CarLightCmd (oCar->_lightCmd)
 // ... Shortcuts for TORCS
 
 // Shortcuts for TORCS ...
@@ -270,6 +276,7 @@ enum
 #define CarPubGlobAccX (oCar->pub.DynGCg.acc.x)
 #define CarPubGlobAccY (oCar->pub.DynGCg.acc.y)
 #define CarRpm (oCar->_enginerpm)
+#define CarRpmMaxTq (oCar->_enginerpmMaxTq)
 #define CarRpmLimit (oCar->_enginerpmRedLine)
 #define CarSeg (oCar->_trkPos.seg)
 #define CarSpeedLat (oCar->_speed_y)
@@ -329,7 +336,6 @@ enum
 // Internal parameters ...
 #define ANALYSE_STEPS 2 
 #define LENGTH_MARGIN (2.0f) // Initial value for PRV_LENGTH_MARGIN
-#define NOAVOIDLENGTH 0 
 #define AVG_KEEP (0.75)
 #define AVG_CHANGE (1 - AVG_KEEP) 
 #define MAX_SPEED_CRV 0.00175 // R = 571,428 m
@@ -347,6 +353,13 @@ enum
 #define PRV_MIN_LAPS         "min laps"
 #define PRV_LENGTH_MARGIN	 "length margin"
 #define PRV_QUALIFICATION    "qualification"      // Practice as qualifying
+
+#define PRV_BRAKE_LIMIT      "brake limit" 
+#define PRV_BRAKE_LIMIT_SCALE "brake limit scale" 
+#define PRV_BRAKE_LIMIT_BASE "brake limit base" 
+
+#define PRV_SPEED_LIMIT_SCALE "speed limit scale" 
+#define PRV_SPEED_LIMIT_BASE "speed limit base" 
 
 #define PRV_PIT_USE_FIRST    "pit use first" 
 #define PRV_PIT_USE_SMOOTH   "pit use smooth" 

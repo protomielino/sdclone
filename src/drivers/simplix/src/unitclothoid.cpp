@@ -2,7 +2,9 @@
 // unitclothoid.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-NG Version 1.4.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Lane clothoide like
 // Fahrspur clothoidenähnlich
 //
 // File         : unitclothoid.cpp

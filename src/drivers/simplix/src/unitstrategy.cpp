@@ -2,16 +2,17 @@
 // unitstrategy.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Pitstop strategy
 // Boxenstop-Strategie
-// (C++-Portierung der Unit UnitStrategy.pas)
 //
 // Datei    : unitstrategy.cpp
-// Erstellt : 20.02.2007
-// Stand    : 26.11.2008
+// Erstellt : 2007.02.20
+// Stand    : 2008.12.28
 // Copyright: © 2007-2008 Wolf-Dieter Beelitz
 // eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// Version  : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -27,19 +28,24 @@
 //    Copyright: (C) 2006 Tim Foden
 //
 //--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -147,7 +153,7 @@ bool TSimpleStrategy::NeedPitStop()
     if (CarFuel < FuelNeeded)                    // Wenn der Tankinhalt nicht
 	{
       Result = true;                             //   reicht, tanken
-      GfOut("Pitstop by fuel\n");
+	  GfOut("#Pitstop by fuel\n");
 	}
     else if (oDriver->oCarsPerPit == 1)
     {
@@ -174,7 +180,7 @@ bool TSimpleStrategy::NeedPitStop()
           if (CarFuel < FuelNeeded)              // Wenn der Tankinhalt nicht
 	      {                                      // reicht, tanken
             Result = true;
-            GfOut("Pitstop by Teammate\n");
+			GfOut("#Pitstop by Teammate\n");
 	      }
         }
 	  }
@@ -278,7 +284,7 @@ int TSimpleStrategy::RepairWanted(int AcceptedDammage)
 //--------------------------------------------------------------------------*
 int TSimpleStrategy::PitRepair()
 {
-  oState = PIT_EXIT;
+  oState = PIT_EXIT_WAIT;
   oWasInPit = true;
   return RepairWanted(0);
 }
@@ -305,12 +311,12 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMaxFuel =            
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Maximal möglicher
 	PRV_MAX_FUEL,(char*) NULL,oMaxFuel);         //   Tankinhalt
-  GfOut("oMaxFuel (private) = %.1f\n",oMaxFuel);
+  GfOut("#oMaxFuel (private) = %.1f\n",oMaxFuel);
 
   oStartFuel =            
 	GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Tankinhalt beim Start
 	PRV_START_FUEL,(char*) NULL,oStartFuel);          
-  GfOut("oStartFuel (private) = %.1f\n",oStartFuel);
+  GfOut("#oStartFuel (private) = %.1f\n",oStartFuel);
 
   if ((!TDriver::Qualification)                  // Fürs Rennen 
 	  && (oStartFuel > 0))
@@ -324,7 +330,7 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMinLaps = (int)           
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Mindestanzahl an Runden
 	PRV_MIN_LAPS,(char*) NULL,(float) oMinLaps); //   die mit dem Tankinhalt
-  GfOut("oMinLaps (private) = %d\n",oMinLaps);   //   möglich sein müssen
+  GfOut("#oMinLaps (private) = %d\n",oMinLaps);   //   möglich sein müssen
 
   if (Fuel == 0)                                 // Wenn nichts bekannt ist,
     Fuel = oMaxFuel;                             // Volltanken
@@ -398,11 +404,14 @@ bool TSimpleStrategy::StopPitEntry(float Offset)
 //==========================================================================*
 // Update Data
 //--------------------------------------------------------------------------*
-void TSimpleStrategy::Update(PtCarElt Car)
+void TSimpleStrategy::Update(PtCarElt Car, 
+  float MinDistBack, double MinTimeSlot)
 {
   double CurrentFuelConsum;                      // Current fuel consum
   float DL;                                      // Distance longitudinal
   float DW;                                      // Distance lateral  
+  oMinDistBack = MinDistBack;
+  oMinTimeSlot = MinTimeSlot;
 
   oCar = Car;                                    // Save pointer
 
@@ -479,11 +488,21 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
       // We are on the pitlane and drive to out pit
  	  if (!oPit->oPitLane[0].CanStop(TrackPos))
 	  { // We have to wait, till we reached the point to stop
+	    if (oDriver->CurrSpeed() < 3)
+		{
+	      oCar->ctrl.accelCmd =                    // a little throttle
+			  MAX(0.05f,oCar->ctrl.accelCmd);
+	      oCar->ctrl.brakeCmd = 0.0;               // Start braking
+		  //GfOut("#PIT_ENTER: Wait %g (%g)\n",TrackPos,oDriver->CurrSpeed());
+		}
+		else
+		  //GfOut("#PIT_ENTER: Wait %g\n",TrackPos);
 		break;
 	  }
 
 	  // We reached the poit to stopp
 	  oState = PIT_ASKED;
+  	  //GfOut("#PIT_ENTER: %g\n",TrackPos);
 
  	  // falls through...
 
@@ -491,10 +510,11 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  // We are still going to the pit
 	  if (oPit->oPitLane[0].CanStop(TrackPos))
 	  { // If we can stop a this position we start pit procedure
+  	    //GfOut("#PIT_ASKED: CanStop %g (%g)\n",TrackPos,oDriver->CurrSpeed());
 		oDriver->oStanding = true;               // For motion survey!
         oPitTicker = 0;                          // Start service timer
 	    oCar->ctrl.accelCmd = 0;                 // release throttle
-	    oCar->ctrl.brakeCmd = 0.5f*PitScaleBrake;// Start braking
+	    oCar->ctrl.brakeCmd = 1.0;               // Start braking
 	    oCar->ctrl.raceCmd = RM_CMD_PIT_ASKED;   // Tell TORCS to service us! To test oPitTicker comment out
 	    oState = PIT_SERVICE;                    
 	  }
@@ -502,10 +522,20 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  { // We can't stop here (to early or to late)
 	    if (oPit->oPitLane[0].Overrun(TrackPos))
 		{ // if to late
-		  GfOut("Overrun 1: %g\n",TrackPos);
+			GfOut("#Overrun 1: %g\n",TrackPos);
 		  PitRelease();
-	      oState = PIT_EXIT;
+	      oState = PIT_EXIT_WAIT;
 	      // pit stop finished, need to exit pits now.
+		}
+		else
+		{
+		  //GfOut("#ToShort 1: %g\n",TrackPos);
+	      if (oDriver->CurrSpeed() < 3)
+		  {
+	        oCar->ctrl.accelCmd =                    // a little throttle
+			  MAX(0.05f,oCar->ctrl.accelCmd);
+	        oCar->ctrl.brakeCmd = 0.0;               // Start braking
+		  }
 		}
 	  }
 	  break;
@@ -516,20 +546,22 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  oPitTicker++;                              // Check time to start service
 	  if (oPitTicker > 150)                      // Check Timer
 	  { // If we have to wait to long
-		GfOut("oPitTicker: %d\n",oPitTicker);
+		  GfOut("#oPitTicker: %d\n",oPitTicker);
 	    PitRelease();                            // Something went wrong, we have 
-	    oState = PIT_EXIT;                       // to leave and release pit for teammate
+	    oState = PIT_EXIT_WAIT;                  // to leave and release pit for teammate
 	  }
 	  else if (oPit->oPitLane[0].Overrun(TrackPos))
 	  { // If we couldn't stop in place
-		GfOut("Overrun 2: %g\n",TrackPos);
+		  GfOut("#Overrun 2: %g\n",TrackPos);
 	    PitRelease();                            // We have to release the pit
-	    oState = PIT_EXIT;                       // for teammate
+	    oState = PIT_EXIT_WAIT;                  // for teammate
 	  }
 	  else
 	  { // There is nothing that hampers TORCS to service us
+  	    //GfOut("#PIT_SERVICE: %g (%g)\n",TrackPos,oDriver->CurrSpeed());
+		oCar->ctrl.lightCmd = 0;                 // No lights on
         oCar->ctrl.accelCmd = 0;                 // No throttle
-	    oCar->ctrl.brakeCmd = 1.0f*PitScaleBrake;// Still braking
+	    oCar->ctrl.brakeCmd = 1.0;               // Still braking
 	    oCar->ctrl.raceCmd = RM_CMD_PIT_ASKED;   // Tell TORCS to service us! To test oPitTicker comment out
         // oState is set to next state in PitRepair()!
 		// If TORCS doesn't service us, no call to PitRepair() is done!
@@ -537,20 +569,42 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  }
 	  break;
 
+	case PIT_EXIT_WAIT:
+      // We are still in the box
+	  oDriver->oStanding = true;                 // Keep motion survey quiet
+	  if ((oMinTimeSlot < 7)                     // If start slot to short
+		|| ((oMinDistBack > -7)                  // or cars aside
+		&& (oMinDistBack < 5)))                  // we have to wait
+	  {
+		oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;    // Only small lights on           
+		oCar->ctrl.accelCmd = 0.0;               
+	    oCar->ctrl.brakeCmd = 1.0;               
+  	    //GfOut("#PIT_EXIT: %g (%gm)(%g)\n",TrackPos,oMinDistBack,oDriver->CurrSpeed());
+	  }
+	  else
+	  {
+		oCar->ctrl.lightCmd = RM_LIGHT_HEAD1;    // Only big lights on           
+	    oState = PIT_EXIT;
+	  }
+	  break;
+
 	case PIT_EXIT:
       // We are still in the box
 	  oDriver->oStanding = true;                 // Keep motion survey quiet
-  	  oGoToPit = false;                          // Service is finished, lets go
-	  oState = PIT_GONE;                          
+      oGoToPit = false;                          // Service is finished, lets go
 	  oCar->ctrl.accelCmd = 0.5;                 // Press throttle
 	  oCar->ctrl.brakeCmd = 0;                   // Release brake
 	  PitRelease();                              // Release pit for teammate
+	  if (oDriver->CurrSpeed() > 5)
+	    oState = PIT_GONE;                          
 	  break;
 
 	case PIT_GONE:
       // We are on our path back to the track
 	  if (!oPit->oPitLane[0].InPitSection(TrackPos))
 	  { // If we reached the end of the pitlane
+        oCar->ctrl.lightCmd = RM_LIGHT_HEAD1 |   // All lights on
+			RM_LIGHT_HEAD2;                      
 		oState = PIT_NONE;                       // Switch to default mode 
 	  }
  	  break;

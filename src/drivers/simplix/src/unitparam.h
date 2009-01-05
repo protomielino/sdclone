@@ -2,31 +2,35 @@
 // unitparam.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
 // Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
 //
-// Datei    : unitparam.h
-// Erstellt : 11.04.2008
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitparam.h
+// Created      : 2007.04.11
+// Last changed : 2008.12.26
+// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
-//--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #ifndef _UNITPARAM_H_
 #define _UNITPARAM_H_

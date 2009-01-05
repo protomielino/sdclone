@@ -2,17 +2,16 @@
 // unitopponent.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
 // Rivalen (und Teammitglieder)
 //
-// Datei    : unitopponent.cpp
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
-//--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
+// File         : unitopponent.cpp
+// Created      : 2007.11.17
+// Last changed : 2008.12.28
+// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -39,19 +38,24 @@
 //    eMail    : wdb@wdbee.de
 //
 //--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #include <robottools.h>
 
@@ -130,7 +134,9 @@ void TOpponent::Update(
   const PCarElt MyCar,
   PTeamManager TeamManager,
   double MyDirX,
-  double MyDirY)
+  double MyDirY,
+  float &MinDistBack,
+  double &MinTimeSlot)
 {
   oTeamManager = TeamManager;                    // Save Pointer
 
@@ -209,6 +215,22 @@ void TOpponent::Update(
     RelPos += TrackLen;
 
   oInfo.State.RelPos = RelPos;
+//  float RelLat = fabs(MyCar->pub.trkPos.toMiddle - CarToMiddle);
+
+  if ((RelPos > MinDistBack)                     // Opponent is near
+	&& (RelPos < 5))                             // and not in front
+  {
+    MinDistBack = RelPos;
+  }
+
+  double T = -RelPos/oInfo.State.TrackVelLong;   // Time to start out of pit
+  if ((T > 0)                                    // Opponent is back or aside
+	&& (T < 200))                                // and arrives within 20 sec
+  {
+    if (MinTimeSlot > T)
+	  MinTimeSlot = T;
+  }
+  
   if ((RelPos > 0) && (RelPos < 50))             // We just lapped back
     LapBackTimer = 60.0;                         //   delay granting letpass
   else if (RelPos < -100)                        // else if distance is too
@@ -399,6 +421,10 @@ bool TOpponent::Classify(
 	  }
 	  else                                       // Opp is at side
 	  {
+if ((MyCar->priv.driverIndex == 6) 
+&& (TDriver::CurrSimTime > 2)
+&& ((oCar->priv.driverIndex == 8) || (oCar->priv.driverIndex == 9)))
+oInfo.Flags = oInfo.Flags;   
 		if ((oInfo.Flags & F_TEAMMATE) == 0)
 		  oInfo.Flags |= F_AT_SIDE;              // Set flags
 		else
@@ -434,6 +460,25 @@ bool TOpponent::Classify(
 			&& (CollX < OpState.MinDistLong))
 		  {
 			double RelSpd = (OpState.MinDistLong - OpState.CarDistLong) / T;
+			oInfo.Flags |= F_COLLIDE;
+			oInfo.CatchTime = T;
+			oInfo.CatchSpeed = OpVelLong - 3;
+			oInfo.CatchDecel = (MyState.Speed - (OpVelLong - RelSpd)) / T;
+		  }
+		}
+		else if ((OpState.CarDistLong <= 0)       // Distance is <= 0 and move together
+		  && (OpState.CarDistLat * OpState.CarDiffVelLat < 0))
+		{
+		  // side collision in T seconds?
+		  double T =
+			(fabs(OpState.CarDistLat) - OpState.MinDistLat) / fabs(OpState.CarDiffVelLat);
+
+		  double CollX = OpState.CarDiffVelLong * T - OpState.CarDistLong;
+
+//		  if ((CollX > AheadDist)
+//			&& (CollX < OpState.MinDistLong))
+		  {
+			double RelSpd = (OpState.MinDistLong + OpState.CarDistLong) / T;
 			oInfo.Flags |= F_COLLIDE;
 			oInfo.CatchTime = T;
 			oInfo.CatchSpeed = OpVelLong - 3;

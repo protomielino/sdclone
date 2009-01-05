@@ -10,7 +10,7 @@
 // Stand    : 2008.12.19
 // Copyright: © 2007-2008 Wolf-Dieter Beelitz
 // eMail    : wdb@wdbee.de
-// Version  : 2.02.000
+// Version  : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -115,6 +115,7 @@ class TFixCarParam
 	double oWidth;                               // Width of car (m)
 
 	double oPitBrakeDist;
+    PSimpleStrategy oStrategy;                   // Pit strategy
 
 };
 //==========================================================================*

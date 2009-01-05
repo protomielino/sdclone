@@ -2,18 +2,17 @@
 // unitpit.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
-// Box und Boxengasse
-// (C++-Portierung der Unit UnitPit.pas)
-//
-// Datei    : unitpit.cpp
-// Erstellt : 20.02.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// A robot for TORCS-NG-Version 1.4.0
 //--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
+// Pit ans pitlane
+// Box und Boxengasse
+//
+// File         : unitpit.cpp
+// Created      : 2007.02.20
+// Last changed : 2008.12.28
+// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -26,19 +25,24 @@
 //    eMail    : wdb@wdbee.de
 //
 //--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -261,8 +265,6 @@ void TPitLane::MakePath
   (char* Filename, TClothoidLane* BasePath,
   const TParam& Param, int Index)
 {
-  const float F[3] = {0.5, 0.0, 1.0};
-
   const tTrackOwnPit* Pit = CarPit;              // Get my pit
   if (Pit == NULL)                               // If pit is NULL
   {                                              // nothing to do
@@ -283,6 +285,16 @@ void TPitLane::MakePath
   double Y[NPOINTS];                             // Y-coordinates
   double S[NPOINTS];                             // Directions
 
+  int Sign =                                     // Get the side of pits
+	(PitInfo->side == TR_LFT) ? -1 : 1;
+
+  float F[3] = {0.5, 1.0, 0.0};                  // Avoid offsets
+  if (Sign < 0)                                  // If pits are on the
+  {                                              // left side
+    F[1] = 0.0;                                  // swap
+    F[2] = 1.0;
+  }
+
   oStoppingDist = Param.Pit.oStoppingDist;       // Distance to brake
   oPitStopOffset = Param.Pit.oLongOffset;        // Offset for fine tuning
   double PitLaneOffset =                         // Offset of the pitlane
@@ -294,14 +306,19 @@ void TPitLane::MakePath
   oCarParam.oScaleMu =                           // Scale friction estimation
 	MIN(1.30,CarParam.oScaleMu);                 //   of pitlane
 
+  float Ratio = 0.5 * 
+	  PitInfo->len / (fabs(PitInfo->driversPits->pos.toMiddle) - PitLaneOffset);
+
   // Compute pit spline points along the track defined by TORCS
   X[0] = PitInfo->pitEntry->lgfromstart          // Start of Pitlane defined by TORCS
 	  + Param.Pit.oEntryLong;                    //   our own offset along the track
   X[1] = PitInfo->pitStart->lgfromstart;         // Start of speedlimit
   X[3] = Pit->pos.seg->lgfromstart               // Center of our own pit
 	+ Pit->pos.toStart + oPitStopOffset;         //   with own offset along track
-  X[2] = X[3] - PitInfo->len;                    // Start enter own pit here
-  X[4] = X[3] + PitInfo->len;                    // Leave own pit here
+  X[2] = X[3] - PitInfo->len                     // Start enter own pit here
+	- F[Index] * Ratio * Param.Pit.oLaneEntryOffset;
+  X[4] = X[3] + PitInfo->len                     // Leave own pit here
+	+ F[Index] * Ratio * Param.Pit.oLaneExitOffset;
   X[5] = X[1] + PitInfo->nMaxPits * PitInfo->len;// End of speed limit
   X[6] = PitInfo->pitExit->lgfromstart           // End of pitlane defind by TORCS
 	+ PitInfo->pitExit->length                   //   and own offset alog track
@@ -355,9 +372,6 @@ void TPitLane::MakePath
   Y[6] = Point.Offset;                           // Lateral distance and
   S[6] = -tan(Point.Angle                        // and direction at the
 	- oTrack->ForwardAngle(oPitExitPos));        // TORCS end of pitlane
-
-  int Sign =                                     // Get the side of pits
-	(PitInfo->side == TR_LFT) ? -1 : 1;
 
   // First use a generic path through the pitlane without the pit itself
   if (Param.Pit.oUseFirstPit && FirstPit)        // If allowed and possible
@@ -453,11 +467,7 @@ void TPitLane::MakePath
 
   // Section with speedlimit, keep it
   Idx0 = oTrack->IndexFromPos(oPitStartPos);     // Index to first point
-  //if (Param.Pit.oUseFirstPit && FirstPit)        // If needed
-    Idx0 = (Idx0 + 5) % NSEG;                    // Index to first point + 5 m
-//  else
-//    Idx0 = (Idx0 + 5) % NSEG;                    // Index to first point + 5 m
-//    Idx0 = (Idx0 - 5 + NSEG) % NSEG;             // Index to first point - 5 m
+  Idx0 = (Idx0 + 5) % NSEG;                      // Index to first point + 5 m
   Idx1 = oTrack->IndexFromPos(oPitEndPos);       // Index to last point
 
   // Change offsets to go to the pitlane
@@ -514,9 +524,18 @@ void TPitLane::MakePath
   float Speed = 4.0;
   oPathPoints[Idx0].MaxSpeed = oPathPoints[Idx0].Speed = Speed;
   Idx1 = (Idx0 + NSEG - 1) % NSEG;
-  for (I = 0; I < 6; I++)
+
+  int N = 6;
+  float Delta = 0.75;
+  if (TDriver::UseBrakeLimit)
   {
-    Speed += 0.75;
+	  N = N * 3;
+	  Delta = Delta / 3;
+  }
+
+  for (I = 0; I < N; I++)
+  {
+    Speed += Delta;
     oPathPoints[Idx1].MaxSpeed = oPathPoints[Idx1].Speed = Speed;
     Idx1 = (Idx1 + NSEG - 1) % NSEG;
   }

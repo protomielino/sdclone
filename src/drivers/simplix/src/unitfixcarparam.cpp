@@ -2,7 +2,9 @@
 // unitfixcarparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Constant parameters of the car and calculations with it
 // Unveränderliche Parameter des Fahrzeugs und Nebenrechnungen
 //
 // Datei    : unitfixcarparam.cpp
@@ -19,19 +21,24 @@
 //    Copyright: (C) 2006-2007 Tim Foden
 //
 //--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #include <math.h>
 
@@ -64,7 +71,8 @@ TFixCarParam::TFixCarParam():
   oTyreMuFront(0),
   oTyreMuRear(0),
   oWidth(2.0),
-  oPitBrakeDist(150.0)
+  oPitBrakeDist(150.0),
+  oStrategy(NULL)
 {
 }
 //==========================================================================*
@@ -172,7 +180,8 @@ double	TFixCarParam::CalcBraking
 
   Mu_F = Friction * oTyreMuFront;
   Mu_R = Friction * oTyreMuRear;
-  Mu = (Mu_F + Mu_R) / 2;
+//  Mu = (Mu_F + Mu_R) / 2;
+  Mu = MIN(Mu_F,Mu_R);
 
   // From TORCS:
   double Cd = oCdBody * 
@@ -181,6 +190,7 @@ double	TFixCarParam::CalcBraking
 //  double Crv = (Crv0 + Crv1) * 0.5;
 //  double Crvz = (Crvz0 + Crvz1) * 0.5;
   double Crv = (0.25*Crv0 + 0.75*Crv1);
+  double AbsCrv = fabs(Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
   if (Crvz > 0)
 	Crvz = 0; 
@@ -218,7 +228,10 @@ double	TFixCarParam::CalcBraking
 	  / (oTmpCarParam->oMass * oTmpCarParam->oSkill);
     
 	if (TDriver::UseBrakeLimit)
-	  Acc = MAX(Acc,-6);
+	{
+      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale * (AbsCrv - TDriver::BrakeLimitBase));
+	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
+	}
 
 	double Inner = MAX(0, V * V - 2 * Acc * Dist);
 	double OldU = U;
@@ -252,7 +265,8 @@ double	TFixCarParam::CalcBrakingPit
 
   Mu_F = Friction * oTyreMuFront;
   Mu_R = Friction * oTyreMuRear;
-  Mu = (Mu_F + Mu_R) / 2;
+//  Mu = (Mu_F + Mu_R) / 2;
+  Mu = MIN(Mu_F,Mu_R);
 
   // From TORCS:
   double Cd = oCdBody * 
@@ -293,6 +307,9 @@ double	TFixCarParam::CalcBrakingPit
 
 	double Acc = CarParam.oScaleBrakePit * Ftanroad 
 	  / oTmpCarParam->oMass;
+
+	if (TDriver::UseBrakeLimit)
+	  Acc = MAX(Acc,TDriver::BrakeLimit/2);
 
 	double Inner = MAX(0, V * V - 2 * Acc * Dist);
 	double OldU = U;
@@ -341,6 +358,12 @@ double TFixCarParam::CalcMaxSpeed
   else
 	factor = 0.985;
 
+  if (TDriver::UseBrakeLimit)
+  {
+    if (oStrategy->OutOfPitlane())
+      factor *= 1.0 - MAX(0.0,TDriver::SpeedLimitScale * (AbsCrv - TDriver::SpeedLimitBase));
+  }
+
   double Den;
 
   double ScaleBump;
@@ -351,7 +374,8 @@ double TFixCarParam::CalcMaxSpeed
 
   double MuF = Friction * oTyreMuFront * CarParam.oScaleMu;
   double MuR = Friction * oTyreMuRear * CarParam.oScaleMu;
-  Mu = (MuF + MuR) / (2 * oTmpCarParam->oSkill);
+  //Mu = (MuF + MuR) / (2 * oTmpCarParam->oSkill);
+  Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
 
   Den = (AbsCrv - ScaleBump * CrvZ)
     - (oCaFrontWing * MuF + oCaRearWing * MuR + oCaGroundEffect * Mu) / oTmpCarParam->oMass;

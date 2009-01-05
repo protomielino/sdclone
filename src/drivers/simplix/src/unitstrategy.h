@@ -7,11 +7,11 @@
 // (C++-Portierung der Unit UnitStrategy.pas)
 //
 // Datei    : unitstrategy.h
-// Erstellt : 20.02.2007
-// Stand    : 26.11.2008
+// Erstellt : 2007.02.20
+// Stand    : 2008.12.28
 // Copyright: © 2007-2008 Wolf-Dieter Beelitz
 // eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// Version  : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -74,6 +74,7 @@ class TAbstractStrategy
 	  PIT_ENTER,
 	  PIT_ASKED,
 	  PIT_SERVICE,
+	  PIT_EXIT_WAIT,
 	  PIT_EXIT,
 	  PIT_GONE
 	};
@@ -102,7 +103,7 @@ class TAbstractStrategy
 	virtual double SetFuelAtRaceStart
 	  (PTrack Track, PCarSettings *CarSettings, PSituation Situation, float Fuel) = 0;
 	virtual void Update
-	  (PtCarElt Car) = 0;
+	  (PtCarElt Car, float MinDistBack, double MinTimeSlot) = 0;
 	void PitIsFree();
 
     virtual void CheckPitState(float PitScaleBrake) = 0;
@@ -139,6 +140,8 @@ class TSimpleStrategy
     float oTrackLength;         // Länge der Rennstrecke in m
     float oMaxFuel;             // Maximaler Tankinhalt in kg
 	int oMinLaps;               // Mindestanzahl von Runden mit Tankinhalt
+    float oMinDistBack;
+    double oMinTimeSlot;
 
 	TSimpleStrategy();
 	~TSimpleStrategy();
@@ -154,7 +157,7 @@ class TSimpleStrategy
 	double SetFuelAtRaceStart
 	  (PTrack Track, PCarSettings *CarSettings, PSituation Situation, float Fuel);
 	void Update
-	  (PtCarElt Car);
+	  (PtCarElt Car, float MinDistBack, double MinTimeSlot);
 
     void CheckPitState(float PitScaleBrake);
 	bool GoToPit();

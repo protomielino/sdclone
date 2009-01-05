@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2008.12.21
+// Last changed : 2008.12.28
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
@@ -129,17 +129,26 @@ static char DriverDescs[DRIVERLEN * MAXNBBOTS];
 // Number of drivers defined in robot's xml-file
 static int NBBOTS = 0;                           // Still unknown
 // Robot's name
-static char nameBuffer[BUFSIZE];                 // Buffer for robot's name
-static const char* robotName = nameBuffer;       // Pointer to robot's name
-// Robot's xml-filename
-static char pathBuffer[BUFSIZE];                 // for robot's xml-filename
-static const char* robotXml = pathBuffer;        // to robot's xml-filename
-// Robot's dir
-static char dirBuffer[BUFSIZE];
-static const char* robotDir = dirBuffer;         // Pointer to robot's dir
+static char BufName[BUFSIZE];                    // Buffer for robot's name
+static const char* RobName = BufName;            // Pointer to robot's name
+// Robot's relative dir
+static char BufPathDirRel[BUFSIZE];              // Robot's dir relative
+static const char* RobPathDirRel = BufPathDirRel;// to installation dir
+// Robot's relative xml-filename
+static char BufPathXMLRel[BUFSIZE];              // Robot's xml-filename
+static const char* RobPathXMLRel = BufPathXMLRel;// relative to install. dir
+// Robot's absolute dir
+static char BufPathDir[BUFSIZE];                 // Robot's dir 
+static const char* RobPathDir = BufPathDir;      // Pointer to robot's dir
+// Robot's absolute xml-filename
+static char BufPathXML[BUFSIZE];                 // Robot's xml-filename
+static const char* RobPathXML = BufPathXML;      // Pointer to xml-filename
+
+static void *RobotSettings;                      // Filehandle
 
 // Save start index offset from robot's xml file
 static int IndexOffset = 0;
+
 // Marker for undefined drivers to be able to comment out drivers 
 // in the robot's xml-file between others, not only at the end of the list
 char undefined[] = "undefined";                  
@@ -163,26 +172,57 @@ static int cUnusedCount;
 //==========================================================================*
 
 //==========================================================================*
-// Buffers
-// Puffer
+// Get filehandle for robot's xml-file
 //--------------------------------------------------------------------------*
-static char FilenameBuffer[BUFSIZE];             // for path and filename
-static bool Footprint = false;                   // Never called yet
-static int InitDriver = -1;                      // None initialized yet
+void* GetFileHandle(const char* RobotName)
+{
+    snprintf(BufName, BUFSIZE, RobotName);       // Save robot's name
+    snprintf(BufPathDirRel, BUFSIZE,             // Robot's directory  
+		"drivers/%s",RobotName);                 // relative to installation
+    snprintf(BufPathXMLRel, BUFSIZE,             // Robot's xml-filename
+		"drivers/%s/%s.xml",RobotName,RobotName);// relative to installation
+
+	// Test local installation path
+    snprintf(BufPathXML, BUFSIZE, "%s%s",         
+		GetLocalDir(), RobPathXMLRel);
+	snprintf(BufPathDir, BUFSIZE, "%s%s", 
+		GetLocalDir(), RobPathDirRel);
+	RobotSettings = GfParmReadFile
+		(RobPathXML, GFPARM_RMODE_STD );
+
+	if (!RobotSettings)
+	{
+	  // If not found, use global installation path
+	  snprintf(BufPathXML, BUFSIZE, "%s%s", 
+		  GetDataDir(), RobPathXMLRel);
+  	  snprintf(BufPathDir, BUFSIZE, "%s%s", 
+		  GetDataDir(), RobPathDirRel);
+	  RobotSettings = GfParmReadFile
+		  (RobPathXML, GFPARM_RMODE_STD );
+	}
+	return RobotSettings;
+}
 //==========================================================================*
 
+//==========================================================================*
+// Set parameters 
+//--------------------------------------------------------------------------*
+void SetParameters(int N, char* DefaultCarType)
+{
+  TDriver::NBBOTS = N;                                    // Used nbr of cars
+  TDriver::MyBotName = BufName;                           // Name of this bot 
+  TDriver::ROBOT_DIR = BufPathDir;                        // Path to dll
+  TDriver::SECT_PRIV = "simplix private";                 // Private section
+  TDriver::DEFAULTCARTYPE  = DefaultCarType;              // Default car type
+};
+//==========================================================================*
 
 //==========================================================================*
 // Schismatic entry point for simplix
 //--------------------------------------------------------------------------*
 void SetUpSimplix()
 {
-  TDriver::NBBOTS = NBBOTS;                               // f. nbr of cars
-  TDriver::MyBotName = (char *) robotName;                // Name of this bot 
-  snprintf(dirBuffer,BUFSIZE,"drivers/%s",robotName);
-  TDriver::ROBOT_DIR = dirBuffer;                         // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(NBBOTS, "car1-trb1");
   TDriver::AdvancedParameters = true;
 };
 //==========================================================================*
@@ -192,11 +232,16 @@ void SetUpSimplix()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_trb1()
 {
-  TDriver::NBBOTS = NBBOTS;                               // f. nbr of cars
-  TDriver::MyBotName = "simplix_trb1";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_trb1";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(NBBOTS, "car1-trb1");
+};
+//==========================================================================*
+
+//==========================================================================*
+// Schismatic entry point for simplix_sc
+//--------------------------------------------------------------------------*
+void SetUpSimplix_sc()
+{
+  SetParameters(NBBOTS, "sc996");
 };
 //==========================================================================*
 
@@ -205,25 +250,11 @@ void SetUpSimplix_trb1()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_36GP()
 {
-  TDriver::NBBOTS = NBBOTS;                               // f. nbr of cars
-  TDriver::MyBotName = "simplix_36GP";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_36GP";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "36GP-alfa12c";              // Default car type
+  SetParameters(NBBOTS, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
+  //TDriver::UseBrakeLimit = false;
 };
-//==========================================================================*
-
-//==========================================================================*
-// Set robots's name, path and xml file pathname
-//--------------------------------------------------------------------------*
-static void setRobotName(const char *name)
-{
-	strcpy(nameBuffer, name);
-	snprintf(dirBuffer, BUFSIZE, "drivers/%s", name);
-	snprintf(pathBuffer, BUFSIZE, "%s/%s.xml", robotDir, name);
-}
 //==========================================================================*
 
 //==========================================================================*
@@ -232,30 +263,25 @@ static void setRobotName(const char *name)
 int moduleWelcomeV1_00
   (const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
-	int i;
-
-	// Save module name and loadDir, and determine module XML file pathname.
-	setRobotName(welcomeIn->name);
-
-	GfOut("\nInterface Version: %d.%d\n",
-		welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
-	GfOut("Robot Name       : %s\n",robotName);
-	GfOut("Load path        : %s\n",welcomeIn->loadPath);
-	GfOut("Robot XML-Path   : %s\n\n",robotXml);
-
     memset(DriverNames, 0, MAXNBBOTS*DRIVERLEN);
     memset(DriverDescs, 0, MAXNBBOTS*DRIVERLEN);
 
-	// Filehandle for robot's xml-file
-	void *RobotSettings = GfParmReadFile(robotXml, GFPARM_RMODE_STD );
+	GfOut("\n#Interface Version: %d.%d\n",
+		welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 
+	// Get filehandle for robot's xml-file
+	void *RobotSettings = GetFileHandle(welcomeIn->name);
 	// Let's look what we have to provide here
 	if (RobotSettings)
 	{
-		char SectionBuf[BUFSIZE];
-		char *Section = SectionBuf;
+		GfOut("#Robot name      : %s\n",RobName);
+ 	    GfOut("#Robot directory : %s\n",RobPathDir);
+		GfOut("#Robot XML-file  : %s\n",RobPathXML);
 
-		snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", 
+		char Buffer[BUFSIZE];
+		char *Section = Buffer;
+
+		snprintf(Buffer, BUFSIZE, "%s/%s/%d", 
 			ROB_SECT_ROBOTS, ROB_LIST_INDEX, 0);
 
 		// Try to get first driver from index 0
@@ -276,42 +302,45 @@ int moduleWelcomeV1_00
 
 		// Loop over all possible drivers, clear all buffers, 
 		// save defined driver names and desc.
-		for (i = 0; i < MAXNBBOTS; i++)
+	    int I;
+		for (I = 0; I < MAXNBBOTS; I++)
 		{
-			//memset(&DriverNames[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
-			//memset(&DriverDescs[i*DRIVERLEN], 0, DRIVERLEN); // Clear buffer
-			snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", 
-				ROB_SECT_ROBOTS, ROB_LIST_INDEX, i + IndexOffset );
+			snprintf(Section, BUFSIZE, "%s/%s/%d", 
+				ROB_SECT_ROBOTS, ROB_LIST_INDEX, I + IndexOffset );
 			const char *DriverName = GfParmGetStr( RobotSettings, Section, 
 				(char *) ROB_ATTR_NAME,undefined);
 
 	        if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
 			{   // This driver is defined in robot's xml-file
-				snprintf(&DriverNames[i*DRIVERLEN], DRIVERLEN-1, DriverName);
+				snprintf(&DriverNames[I*DRIVERLEN], DRIVERLEN-1, DriverName);
 			    const char *DriverDesc = GfParmGetStr(RobotSettings, Section, 
-					(char *) ROB_ATTR_DESC, defaultBotDesc[i]);
-				snprintf(&DriverDescs[i*DRIVERLEN], DRIVERLEN-1, DriverDesc);
-				NBBOTS = i + 1 - IndexOffset;
+					(char *) ROB_ATTR_DESC, defaultBotDesc[I]);
+				snprintf(&DriverDescs[I*DRIVERLEN], DRIVERLEN-1, DriverDesc);
+				NBBOTS = I + 1;
 			}
 		}
 	}
 	else
 	{
-		// For schismatic robots NBBOTS is unknown!
 		// Handle error here
-		NBBOTS = 1;
+ 	    GfOut("#Robot XML-Path not found: (%s) or (%s) %s\n\n",
+			GetLocalDir(),GetDataDir(),RobPathXMLRel);
+
+		NBBOTS = 0;
+	    welcomeOut->maxNbItf = NBBOTS;
+	    return -1;
 	}
-	//GfOut("NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 
 	// Handle additional settings for wellknown identities
-	if (strncmp(robotName,"simplix_trb1",strlen("simplix_trb1")) == 0)
+	if (strncmp(RobName,"simplix_trb1",strlen("simplix_trb1")) == 0)
 		SetUpSimplix_trb1();
-	else if (strncmp(robotName,"simplix_36GP",strlen("simplix_36GP")) == 0)
+	else if (strncmp(RobName,"simplix_sc",strlen("simplix_sc")) == 0)
+		SetUpSimplix_sc();
+	else if (strncmp(RobName,"simplix_36GP",strlen("simplix_36GP")) == 0)
 		SetUpSimplix_36GP();
 	else 
 		SetUpSimplix();
 
-	//GfOut("NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 	// Set max nb of interfaces to return.
 	welcomeOut->maxNbItf = NBBOTS;
 
@@ -326,16 +355,13 @@ int moduleWelcomeV1_00
 extern "C" int moduleWelcome
   (const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
-	GfOut("\n\n\nGetDataDir:  %s\n",GetDataDir());
-	GfOut("GetLocalDir: %s\n\n\n",GetLocalDir());
-
 	if (welcomeIn->itfVerMajor >= 1)
 	{
 		if (welcomeIn->itfVerMinor >= 0)
           return moduleWelcomeV1_00(welcomeIn, welcomeOut);
 	}
 
-    GfOut("\nUnknown Interface Version: %d.%d\n",
+    GfOut("\n#Unhandled Interface Version: %d.%d\n",
   		welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 	welcomeOut->maxNbItf = 0;
 	return -1;
@@ -351,8 +377,8 @@ extern "C" int moduleWelcome
 //--------------------------------------------------------------------------*
 extern "C" int moduleInitialize(tModInfo *ModInfo)
 {
-  GfOut("\nInitialize from %s ...\n",robotXml);
-  GfOut("NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
+  GfOut("\n#Initialize from %s ...\n",RobPathXML);
+  GfOut("#NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 
   // Clear all structures.
   memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
@@ -367,7 +393,7 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
     ModInfo[I].index = I+IndexOffset;            // Drivers index
   }
 
-  GfOut("... Initialized from %s\n\n",robotXml);
+  GfOut("# ... Initialized\n\n");
 
   return 0;
 }
@@ -378,7 +404,7 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int moduleTerminate()
 {
-  GfOut("\nTerminated %s\n",robotName);
+  GfOut("\n#Terminated %s\n",RobName);
 	
   return 0;
 }
@@ -387,22 +413,16 @@ extern "C" int moduleTerminate()
 //==========================================================================*
 // Module entry point (Torcs backward compatibility scheme).
 //--------------------------------------------------------------------------*
-int simplixEntryPoint(tModInfo *ModInfo)
+int simplixEntryPoint(tModInfo *ModInfo, void *RobotSettings)
 {
-  GfOut("\nTorcs backward compatibility scheme used\n");
-  NBBOTS = 10;
+    GfOut("\n#Torcs backward compatibility scheme used\n");
+    NBBOTS = MIN(10,NBBOTS);
 
-  memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
-  memset(DriverNames, 0, MAXNBBOTS*DRIVERLEN);
-  memset(DriverDescs, 0, MAXNBBOTS*DRIVERLEN);
+    memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
+    memset(DriverNames, 0, MAXNBBOTS*DRIVERLEN);
+    memset(DriverDescs, 0, MAXNBBOTS*DRIVERLEN);
 
-  // Filehandle for robot's xml-file
-  void *RobotSettings = GfParmReadFile(robotXml, GFPARM_RMODE_STD );
-
-  // Let's look what we have to provide here
-  if (RobotSettings)
-  {
-	char SectionBuf[BUFSIZE];
+    char SectionBuf[BUFSIZE];
 	char *Section = SectionBuf;
 
 	snprintf( SectionBuf, BUFSIZE, "%s/%s/%d", 
@@ -420,9 +440,8 @@ int simplixEntryPoint(tModInfo *ModInfo)
 		  Section, (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
 	  snprintf(&DriverDescs[I*DRIVERLEN], DRIVERLEN-1, DriverDesc);
     }
-  }
 
-  return moduleInitialize(ModInfo);
+    return moduleInitialize(ModInfo);
 }
 //==========================================================================*
 
@@ -469,7 +488,8 @@ static int InitFuncPt(int Index, void *Pt)
   cRobot[Index-IndexOffset] =                    // Create a driver
 	  new TDriver(Index-IndexOffset);
   cRobot[Index-IndexOffset]->SetBotName          // Store customized name
-	  (&DriverNames[Index-IndexOffset*DRIVERLEN]);  
+	  (RobotSettings,                            // Robot's xml-file
+	  &DriverNames[(Index-IndexOffset)*DRIVERLEN]);// not drivers xml-file!  
 
   return 0;
 }
@@ -520,8 +540,8 @@ static void NewRace(int Index, tCarElt* Car, tSituation *S)
 //--------------------------------------------------------------------------*
 static void Drive(int Index, tCarElt* Car, tSituation *S)
 {
-  //GfOut(">>> TDriver::Drive\n");
-  if (cRobot[Index-IndexOffset]->CurrSimTime != S->currentTime)
+  //GfOut("#>>> TDriver::Drive\n");
+  //if (cRobot[Index-IndexOffset]->CurrSimTime != S->currentTime)
   {
     clock_t StartTicks = clock();                // Start used time 
 
@@ -550,9 +570,9 @@ static void Drive(int Index, tCarElt* Car, tSituation *S)
 	cTickCount++;
   	cTicks += Duration;
   }
-  else
-    cUnusedCount++;
-  //GfOut("<<< TDriver::Drive\n");
+//  else
+//    cUnusedCount++;
+  //GfOut("#<<< TDriver::Drive\n");
 }
 //==========================================================================*
 
@@ -591,16 +611,16 @@ static void Shutdown(int Index)
   cRobot[Index-IndexOffset]->Shutdown();
   delete cRobot[Index-IndexOffset];
 
-  GfOut("\n\nClock\n");
-  GfOut("Total Time used: %g sec\n",cTicks/1000.0);
-  //GfOut("Min   Time used: %g msec\n",cMinTicks);
-  //GfOut("Max   Time used: %g msec\n",cMaxTicks);
-  GfOut("Mean  Time used: %g msec\n",cTicks/cTickCount);
-  //GfOut("Long Time Steps: %d\n",cLongSteps);
-  //GfOut("Critical Steps : %d\n",cCriticalSteps);
-  //GfOut("Unused Steps   : %d\n",cUnusedCount);
+  GfOut("\n\n#Clock\n");
+  GfOut("#Total Time used: %g sec\n",cTicks/1000.0);
+  //GfOut("#Min   Time used: %g msec\n",cMinTicks);
+  //GfOut("#Max   Time used: %g msec\n",cMaxTicks);
+  GfOut("#Mean  Time used: %g msec\n",cTicks/cTickCount);
+  //GfOut("#Long Time Steps: %d\n",cLongSteps);
+  //GfOut("#Critical Steps : %d\n",cCriticalSteps);
+  //GfOut("#Unused Steps   : %d\n",cUnusedCount);
   
-  GfOut("\n\n");
+  GfOut("\n\n#");
 }
 //==========================================================================*
 
@@ -609,17 +629,12 @@ static void Shutdown(int Index)
 //--------------------------------------------------------------------------*
 extern "C" int simplix(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "simplix");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/simplix");
-  snprintf(pathBuffer, BUFSIZE, "drivers/simplix/simplix.xml");
-
-  TDriver::NBBOTS = 1;                                    // use 1 car
-  TDriver::MyBotName = "simplix";                         // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix";                 // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
-
-  return simplixEntryPoint(ModInfo);
+  void *RobotSettings = GetFileHandle("simplix");
+  if (!RobotSettings)
+	  return -1;
+  
+  SetParameters(1, "car1-trb1");
+  return simplixEntryPoint(ModInfo,RobotSettings);
 }
 //==========================================================================*
 
@@ -628,17 +643,12 @@ extern "C" int simplix(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int simplix_trb1a(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "simplix_trb1a");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/simplix_trb1a");
-  snprintf(pathBuffer, BUFSIZE, "drivers/simplix_trb1a/simplix_trb1a.xml");
+  void *RobotSettings = GetFileHandle("simplix_trb1a");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 2*5 cars
-  TDriver::MyBotName = "simplix_trb1a";                   // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_trb1a";           // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
-
-  return simplixEntryPoint(ModInfo);
+  SetParameters(10, "car1-trb1");
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -647,17 +657,12 @@ extern "C" int simplix_trb1a(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int simplix_trb1b(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "simplix_trb1b");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/simplix_trb1b");
-  snprintf(pathBuffer, BUFSIZE, "drivers/simplix_trb1b/simplix_trb1b.xml");
+  void *RobotSettings = GetFileHandle("simplix_trb1b");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 2*5 cars
-  TDriver::MyBotName = "simplix_trb1b";                   // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_trb1b";           // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
-
-  return simplixEntryPoint(ModInfo);
+  SetParameters(10, "car6-trb1");
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -666,17 +671,12 @@ extern "C" int simplix_trb1b(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int simplix_sca(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "simplix_sca");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/simplix_sca");
-  snprintf(pathBuffer, BUFSIZE, "drivers/simplix_sca/simplix_sca.xml");
+  void *RobotSettings = GetFileHandle("simplix_sca");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 2*5 cars
-  TDriver::MyBotName = "simplix_sca";                     // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_sca";             // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "sc-996";                    // Default car type
-
-  return simplixEntryPoint(ModInfo);
+  SetParameters(10, "sc-996");
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -685,17 +685,12 @@ extern "C" int simplix_sca(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int simplix_scb(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "simplix_scb");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/simplix_scb");
-  snprintf(pathBuffer, BUFSIZE, "drivers/simplix_scb/simplix_scb.xml");
+  void *RobotSettings = GetFileHandle("simplix_scb");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 2*5 cars
-  TDriver::MyBotName = "simplix_scb";                     // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_scb";             // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "sc-996";                    // Default car type
-
-  return simplixEntryPoint(ModInfo);
+  SetParameters(10, "sc-996");
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -704,19 +699,14 @@ extern "C" int simplix_scb(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int simplix_36GP(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "simplix_36GP");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/simplix_36GP");
-  snprintf(pathBuffer, BUFSIZE, "drivers/simplix_36GP/simplix_36GP.xml");
+  void *RobotSettings = GetFileHandle("simplix_36GP");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "simplix_36GP";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/simplix_36GP";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "36GP-alfa12c";              // Default car type
+  SetParameters(10, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -725,18 +715,13 @@ extern "C" int simplix_36GP(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_0(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_0");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_0");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_0/my_simplix_0.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_0");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_0";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_0";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -745,18 +730,13 @@ extern "C" int my_simplix_0(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_1(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_1");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_1");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_1/my_simplix_1.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_1");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_1";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_1";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -765,18 +745,13 @@ extern "C" int my_simplix_1(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_2(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_2");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_2");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_2/my_simplix_2.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_2");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_2";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_2";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -785,18 +760,13 @@ extern "C" int my_simplix_2(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_3(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_3");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_3");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_3/my_simplix_3.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_3");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_3";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_3";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -805,18 +775,13 @@ extern "C" int my_simplix_3(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_4(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_4");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_4");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_4/my_simplix_4.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_4");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_4";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_4";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -825,18 +790,13 @@ extern "C" int my_simplix_4(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_5(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_5");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_5");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_5/my_simplix_5.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_5");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_5";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_5";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -845,18 +805,13 @@ extern "C" int my_simplix_5(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_6(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_6");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_6");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_6/my_simplix_6.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_6");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_6";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_6";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -865,18 +820,13 @@ extern "C" int my_simplix_6(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_7(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_7");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_7");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_7/my_simplix_7.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_7");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_7";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_7";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -885,18 +835,13 @@ extern "C" int my_simplix_7(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_8(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_8");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_8");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_8/my_simplix_8.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_8");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_8";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_8";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 
@@ -905,18 +850,13 @@ extern "C" int my_simplix_8(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int my_simplix_9(tModInfo *ModInfo)
 {
-  snprintf(nameBuffer, BUFSIZE, "my_simplix_9");
-  snprintf(dirBuffer, BUFSIZE,  "drivers/my_simplix_9");
-  snprintf(pathBuffer, BUFSIZE, "drivers/my_simplix_9/my_simplix_9.xml");
+  void *RobotSettings = GetFileHandle("my_simplix_9");
+  if (!RobotSettings)
+	  return -1;
 
-  TDriver::NBBOTS = 10;                                   // use 10 cars
-  TDriver::MyBotName = "my_simplix_9";                    // Name of this bot 
-  TDriver::ROBOT_DIR = "drivers/my_simplix_9";            // Sub path to dll
-  TDriver::SECT_PRIV = "simplix private";                 // Private section
-  TDriver::DEFAULTCARTYPE  = "car1-trb1";                 // Default car type
+  SetParameters(10, "car1-trb1");
   TDriver::AdvancedParameters = true;
-
-  return simplixEntryPoint(ModInfo);
+  return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
 

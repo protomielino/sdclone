@@ -2,17 +2,16 @@
 // unitopponent.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
 // Rivalen (und Teammitglieder)
 //
-// Datei    : unitopponent.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
-//--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
+// File         : unitopponent.h
+// Created      : 2007.11.17
+// Last changed : 2008.12.28
+// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -136,7 +135,9 @@ class TOpponent
 	void Update                                  // Update
 	  (const PCarElt MyCar,
 	  PTeamManager TeamManager,
-      double MyDirX, double MyDirY );
+      double MyDirX, double MyDirY,
+      float &MinDistBack,
+      double &MinTimeSlot);
 
 	bool Classify                                // Classification of opponents
 	  (const PCarElt MyCar,

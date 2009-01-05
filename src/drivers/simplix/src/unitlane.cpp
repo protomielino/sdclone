@@ -223,6 +223,8 @@ void TLane::Initialise
       oPathPoints[I].WPitToR = Sec.PitWidthToRight;
 	  oPathPoints[I].Fix = false;
     }
+    oPathPoints[0].WToL = oPathPoints[1].WToL;
+	oPathPoints[0].WToR = oPathPoints[1].WToR;
   }
   else if (MaxRight < 999.0)
   {
@@ -248,6 +250,8 @@ void TLane::Initialise
       oPathPoints[I].WPitToR = Sec.PitWidthToRight;
 	  oPathPoints[I].Fix = false;
     }
+    oPathPoints[0].WToL = oPathPoints[1].WToL;
+	oPathPoints[0].WToR = oPathPoints[1].WToR;
   }
   else
   {
@@ -273,6 +277,9 @@ void TLane::Initialise
       oPathPoints[I].WPitToR = Sec.PitWidthToRight;
 	  oPathPoints[I].Fix = false;
     }
+    oPathPoints[0].WToL = oPathPoints[1].WToL;
+	oPathPoints[0].WToR = oPathPoints[1].WToR;
+
   }
   CalcCurvaturesXY();
   CalcCurvaturesZ();

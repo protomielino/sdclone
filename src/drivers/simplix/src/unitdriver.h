@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2008.12.19
+// Last changed : 2008.12.28
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -82,8 +82,6 @@
 class TDriver  
 {
   public:
-    double CurrSimTime;                          // Current simulation time
-
 	TDriver(int Index);                          // Constructor
 	~TDriver();                                  // Destructor
 
@@ -154,11 +152,12 @@ class TDriver
     void BrakingForceRegulatorTraffic();         // R. b. in trafic
 
 	void SetBotName                              // Set name of bot
-	  (char* Value);
+	  (void* RobotSettings, char* Value);
 	inline void	SetCommonData                    // Set pointer to common data
 	  (TCommonData* CommonData);
 	inline TTeamManager::TTeam* GetTeam();
     inline char* GetBotName();
+    inline float CurrSpeed();
 
 private:
 	void AvoidOtherCars                          // Avoiding
@@ -174,6 +173,7 @@ private:
 
 	double FilterABS(double Brake);              // ABS filter
     double FilterBrake(double Brake);            // 
+    double FilterSkillBrake(double Brake);
 
 	double FilterDrifting(double Accel);         // Drifting
 	double FilterLetPass(double Accel);          // Reduce accel
@@ -194,6 +194,7 @@ private:
 
     void SetRandomSeed(unsigned int Seed);
     unsigned int getRandom();
+	double CalcSkill(double TargetSpeed);
 
 
 private:
@@ -305,8 +306,6 @@ private:
 	int oLetPassSide;                            // Go to side to let pass
 	double oOldTarget;
     bool oReduced;
-	double oNoAvoidLength;
-	double oStartSide;
     double oFuelNeeded;
 	double oRepairNeeded;
 
@@ -322,11 +321,15 @@ private:
 
     bool oSkilling;                              // Skilling on/off
 	double oSkill;                               // Skilling
-	double oSkillLevel;                          // Global skilling level
-	double oCurSpeedAdjust;                      // Current speed adjust
-	double oSpeedAdjustTimer;                    // Timer
-	double oSpeedAdjustLimit;                    // Limit
-	double oTargetSpeedAdjust;                   // Target speed adjust
+	double oSkillDriver;                         // Individual skilling level
+	double oSkillGlobal;                         // Global skilling level
+    double oDriverAggression;
+	double oSkillAdjustTimer;                    // Timer
+	double oSkillAdjustLimit;                    // Limit
+    double oBrakeAdjustTarget;                   //
+    double oBrakeAdjustPerc;                     // 
+    double oDecelAdjustTarget;                   //
+    double oDecelAdjustPerc;                     // 
     unsigned int oRandomSeed;                    // seed of generator
 	
   public:
@@ -344,6 +347,7 @@ private:
 	int oCarsPerPit;                             // Pit sharing
 
 	static int NBBOTS;                           // Nbr of cars
+    static double CurrSimTime;                   // Current simulation time
 	static char* MyBotName;                      // Name of this bot 
 	static char* ROBOT_DIR;                      // Sub path to dll
 	static char* SECT_PRIV;                      // Private section
@@ -351,6 +355,11 @@ private:
 
 	static bool AdvancedParameters;
 	static bool UseBrakeLimit;
+	static float BrakeLimit;
+	static float BrakeLimitScale;
+	static float BrakeLimitBase;
+	static float SpeedLimitScale;
+	static float SpeedLimitBase;
 
 };
 //==========================================================================*
@@ -390,6 +399,13 @@ PTrack TDriver::Track()
 //--------------------------------------------------------------------------*
 PtCarElt TDriver::Car()
   {return oCar;};
+//==========================================================================*
+
+//==========================================================================*
+// Get Pointer to TORCS data of car
+//--------------------------------------------------------------------------*
+float TDriver::CurrSpeed()
+  {return oCurrSpeed;};
 //==========================================================================*
 #endif // _UNITDRIVER_H_
 //--------------------------------------------------------------------------*
