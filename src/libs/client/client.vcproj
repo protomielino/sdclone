@@ -279,6 +279,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath="..\racescreens\driver.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\confscreens\driverconfig.cpp"
 				>
 				<FileConfiguration
@@ -1235,6 +1239,10 @@
 			>
 			<File
 				RelativePath="client.h"
+				>
+			</File>
+			<File
+				RelativePath="..\racescreens\driver.h"
 				>
 			</File>
 			<File
