@@ -45,10 +45,11 @@ static char path2[1024];
 
 typedef struct
 {
-	char	*carName;
+	char	*drvName;
 	char	*modName;
-	int		drvIdx;
-	int		points;
+	char	*carName;
+	int	 drvIdx;
+	int	 points;
 } tReStandings;
 
 void
@@ -97,16 +98,17 @@ ReEventInitResults(void)
 void
 ReUpdateStandings(void)
 {
-	int			maxDrv;
-	int			curDrv;
-	int			runDrv;
-	const char		*carName;
-	char			*tmpCarName;
+	int		maxDrv;
+	int		curDrv;
+	int		runDrv;
+	const char	*drvName;
+	char		*tmpDrvName;
 	char		*modName;
-	int			drvIdx;
-	int			points;
-	int			i, j;
-	int			found;
+	char		*carName;
+	int		drvIdx;
+	int		points;
+	int		i, j;
+	int		found;
 	tReStandings	*standings = 0;
 	void		*results = ReInfo->results;
 	char		str1[1024], str2[1024];
@@ -122,8 +124,9 @@ ReUpdateStandings(void)
 	/* Read the current standings */
 	for (i = 0; i < curDrv; i++) {
 		sprintf(path2, "%s/%d", RE_SECT_STANDINGS, i + 1);
-		standings[i].carName = strdup(GfParmGetStr(results, path2, RE_ATTR_NAME, 0));
+		standings[i].drvName = strdup(GfParmGetStr(results, path2, RE_ATTR_NAME, 0));
 		standings[i].modName = strdup(GfParmGetStr(results, path2, RE_ATTR_MODULE, 0));
+		standings[i].carName = strdup(GfParmGetStr(results, path2, RE_ATTR_CAR, 0));
 		standings[i].drvIdx  = (int)GfParmGetNum(results, path2, RE_ATTR_IDX, NULL, 0);
 		standings[i].points  = (int)GfParmGetNum(results, path2, RE_ATTR_POINTS, NULL, 0);
 	}
@@ -134,9 +137,9 @@ ReUpdateStandings(void)
 		/* Search the driver in the standings */
 		found = 0;
 		sprintf(path, "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, ReInfo->_reRaceName, RE_SECT_RANK, i + 1);
-		carName = GfParmGetStr(results, path, RE_ATTR_NAME, 0);
+		drvName = GfParmGetStr(results, path, RE_ATTR_NAME, 0);
 		for (j = 0; j < curDrv; j++) {
-			if (!strcmp(carName, standings[j].carName)) {
+			if (!strcmp(drvName, standings[j].drvName)) {
 				found = 1;
 				break;
 			}
@@ -145,8 +148,9 @@ ReUpdateStandings(void)
 		if (!found) {
 			/* Add the new driver */
 			curDrv++;
-			standings[j].carName = strdup(carName);
+			standings[j].drvName = strdup(drvName);
 			standings[j].modName = strdup(GfParmGetStr(results, path, RE_ATTR_MODULE, 0));
+			standings[j].carName = strdup(GfParmGetStr(results, path, RE_ATTR_CAR, 0));
 			standings[j].drvIdx  = (int)GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
 			standings[j].points  = (int)GfParmGetNum(results, path, RE_ATTR_POINTS, NULL, 0);
 		} else {
@@ -159,18 +163,21 @@ ReUpdateStandings(void)
 				break;
 			}
 			/* Swap with preceeding */
-			tmpCarName = standings[j].carName;
+			tmpDrvName = standings[j].drvName;
 			modName = standings[j].modName;
+			carName = standings[j].carName;
 			drvIdx  = standings[j].drvIdx;
 			points  = standings[j].points;
 		
-			standings[j].carName = standings[j - 1].carName;
+			standings[j].drvName = standings[j - 1].drvName;
 			standings[j].modName = standings[j - 1].modName;
+			standings[j].carName = standings[j - 1].carName;
 			standings[j].drvIdx  = standings[j - 1].drvIdx;
 			standings[j].points  = standings[j - 1].points;
 		
-			standings[j - 1].carName = tmpCarName;
+			standings[j - 1].drvName = tmpDrvName;
 			standings[j - 1].modName = modName;
+			standings[j - 1].carName = carName;
 			standings[j - 1].drvIdx  = drvIdx;
 			standings[j - 1].points  = points;
 		
@@ -181,10 +188,12 @@ ReUpdateStandings(void)
 	/* Store the standing back */
 	for (i = 0; i < curDrv; i++) {
 		sprintf(path, "%s/%d", RE_SECT_STANDINGS, i + 1);
-		GfParmSetStr(results, path, RE_ATTR_NAME, standings[i].carName);
-		free(standings[i].carName);
+		GfParmSetStr(results, path, RE_ATTR_NAME, standings[i].drvName);
+		free(standings[i].drvName);
 		GfParmSetStr(results, path, RE_ATTR_MODULE, standings[i].modName);
 		free(standings[i].modName);
+		GfParmSetStr(results, path, RE_ATTR_CAR, standings[i].carName);
+		free(standings[i].carName);
 		GfParmSetNum(results, path, RE_ATTR_IDX, NULL, standings[i].drvIdx);
 		GfParmSetNum(results, path, RE_ATTR_POINTS, NULL, standings[i].points);
 	}
