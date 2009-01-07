@@ -500,7 +500,7 @@ SimShutdown(void)
 			 timer_force_calculation,
 			timer_wheel_to_car,
 			access_times);
-#endif
+//#endif
     SimCarCollideShutdown(SimNbCars);
     if (SimCarTable) {
 		for (ncar = 0; ncar < SimNbCars; ncar++) {
