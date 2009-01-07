@@ -22,7 +22,7 @@
 void 
 SimDifferentialConfig(void *hdle, const char *section, tDifferential *differential)
 {
-    char *type;
+    const char *type;
 
     differential->I		= GfParmGetNum(hdle, section, PRM_INERTIA, (char*)NULL, 0.1);
     differential->efficiency	= GfParmGetNum(hdle, section, PRM_EFFICIENCY, (char*)NULL, 1.0);

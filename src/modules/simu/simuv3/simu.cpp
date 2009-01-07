@@ -480,7 +480,6 @@ SimShutdown(void)
     tCar *car;
     int	 ncar;
 	double elapsed_time = GfTimeClock() - simu_init_time;
-#if 0
 	printf ("delta_time: %f\n", SimDeltaTime);
 	printf ("simu time: %fs (%f%% of %fs)\n", simu_total_time,
 			100.0f * simu_total_time/elapsed_time, elapsed_time);

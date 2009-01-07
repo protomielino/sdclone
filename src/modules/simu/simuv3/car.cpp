@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:05:43 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: car.cpp,v 1.28 2007/12/01 11:52:15 olethros Exp $
+    version              : $Id: car.cpp,v 1.31 2007/12/14 12:45:43 olethros Exp $
 
 ***************************************************************************/
 
@@ -19,7 +19,7 @@
 
 
 
-#include <string.h>
+#include <cstring>
 #include <stdio.h>
 
 #include "sim.h"
