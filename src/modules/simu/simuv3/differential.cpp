@@ -20,7 +20,7 @@
 #include "sim.h"
 
 void 
-SimDifferentialConfig(void *hdle, char *section, tDifferential *differential)
+SimDifferentialConfig(void *hdle, const char *section, tDifferential *differential)
 {
     char *type;
 
