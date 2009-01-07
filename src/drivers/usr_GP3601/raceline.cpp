@@ -342,7 +342,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0f );
  CornerSpeedX = GfParmGetNum( carhandle, "private", "CornerSpeedX", (char *)NULL, 0.0f );
  BaseCornerSpeed = GfParmGetNum( carhandle, "private", "BaseCornerSpeed", (char *)NULL, 0.0f );
- BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0f ) * (0.8 + MIN(0.2, ((12.0-skill)/12) / 5));
+ BaseCornerSpeedX = GfParmGetNum( carhandle, "private", "BaseCornerSpeedX", (char *)NULL, 1.0f ) * (0.8 + MIN(0.25, ((12.0-skill)/12) / 4));
  AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0f );
  AvoidSpeedAdjustX = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjustX", (char *)NULL, 1.0f );
  AvoidBrakeAdjust = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjust", (char *)NULL, 0.0f );
@@ -1015,7 +1015,7 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
  double dRInverse = GetRInverse(prev, tx[rl][i] + dx, ty[rl][i] + dy, next, rl);
  double tcf = GetModD( tCurveFactor, i );
  double cf = (tcf != 0.0 ? tcf : CurveFactor);
- double intmargin = ((IntMargin+skill/7) + GetModD( tIntMargin, i )) - cf * 5;
+ double intmargin = ((IntMargin) + GetModD( tIntMargin, i )) - cf * 5;
  double extmargin = ExtMargin + GetModD( tExtMargin, i );
  
  if (dRInverse > 0.000000001)
@@ -2308,7 +2308,7 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 #endif
 
  //double time = 0.63;
- double time = 0.02 * 20 * (1.0 + (car->_speed_x-20)/18);
+ double time = 0.02 * 20 * (1.0 + MIN(15.0*(1.0+fabs(rInv*240)), MAX(0.0, (car->_speed_x-(40*(1.0-MIN(0.8, fabs(rInv*70)))))))/18);
 
  if (rInv > 0.0 && off2lft > 0.0)
   time *= (1.0 + ((off2lft/track->width) * (off2lft/(track->width-3.0)) * fabs(rInv*60)));

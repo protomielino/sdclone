@@ -228,9 +228,13 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 		snprintf(buffer, BUFSIZE, "config/raceman/extra/skill.xml");
 		void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
 		if (skillHandle)
-			global_skill = GfParmGetNum(skillHandle, "skill", "level", (char *) NULL, 0.0);
+		{
+			global_skill = GfParmGetNum(skillHandle, (char *)"skill", (char *)"level", (char *) NULL, 10.0f);
+		}
 		else
+		{
 			global_skill = 0.0f;
+		}
 		global_skill = MAX(0.0f, MIN(10.0f, global_skill));
 
 		float driver_skill = 0.0f;
@@ -375,7 +379,6 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	raceline = new LRaceLine();
 	raceline->NewRace( car, s );
 	raceline->setSkill( skill );
-fprintf(stderr,"\n\n\n%s: SKILL = global %.2f, total %.2f, aggression %.2f\n\n",car->_name,global_skill,skill,driver_aggression);
 	raceline->InitTrack(track, s);
 	raceline->setCW( CW );
 
@@ -1223,7 +1226,7 @@ double Driver::calcSteer( double targetAngle, int rl )
 		double sa = MAX(-0.3, MIN(0.3, speedangle/3));
 		//double anglediff = (sa - angle) * (0.3 + fabs(angle)/6);
 		double anglediff = (speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
-		steer += (float) (anglediff*0.5);
+		steer += (float) (anglediff*0.7);
 	}
 
 	if (fabs(angle) > 1.2)
@@ -1702,13 +1705,14 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	double otry_factor = (lenient ? (0.2 + (1.0 - ((simtime-frontavoidtime)/7.0)) * 0.8) : 1.0);
 	double overtakecaution = MAX(0.0, rldata->overtakecaution + (outside ? MIN(0.0, car->_accel_x/8) : 0.0)) - driver_aggression/2;
 	double orInv=0.0, oAspeed=0.0;
-	raceline->getOpponentInfo(o->getDistance(), &orInv, &oAspeed);
+	raceline->getOpponentInfo(o->getDistance(), &oAspeed, &orInv);
 	double rInv = MAX(fabs(rldata->rInverse), fabs(orInv));
 	double distance = o->getDistance() * otry_factor * MAX(0.5, 1.0 - (ocar->_pos > car->_pos ? MIN(o->getDistance()/2, 3.0) : 0.0));
-	double speed = MIN(rldata->avspeed, MIN(oAspeed, getSpeed() + MAX(0.0, (30.0 - distance) * MAX(0.1, 1.0 - rInv*70))));
+	double speed = MIN(rldata->avspeed, MIN(oAspeed, getSpeed() + MAX(0.0, (30.0 - distance) * MAX(0.1, 1.0 - MAX(0.0, rInv-0.001)*80))));
 	double ospeed = o->getSpeed();
 
-	double speeddiff = MAX((15.0-(rInv*1000*1.0+overtakecaution/2)) - distance, fabs(speed - ospeed) * (8 - MIN(5.5, rInv*300)));
+	//double speeddiff = MAX((15.0-(rInv*1000*1.0+overtakecaution/2)) - distance, fabs(speed - ospeed) * (8 - MIN(5.5, rInv*300)));
+	double speeddiff = speed - ospeed;
 	if (outside)
 		ospeed *= 1.0 + rInv*3;
 	double catchdist = (double) MIN((speed*distance)/(speed-ospeed), distance*CATCH_FACTOR) * otry_factor;
@@ -1716,12 +1720,12 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	if (catchdist < *mincatchdist+0.1 && distance < MIN(speeddiff, catchdist/2 + 5.0))
 	{
 		if (DebugMsg & debug_overtake)
-				fprintf(stderr,"%.1f %s: OVERTAKE! (cd %.1f<%.1f) (dist %.1f (%.1f) < (%.1f-%.1f)*X = %.1f caut=%.1f\n",otry_factor,ocar->_name,catchdist,*mincatchdist,distance,o->getDistance(),speed,ospeed,speeddiff,overtakecaution);
+				fprintf(stderr,"%.1f %s: OVERTAKE! (cd %.1f<%.1f) (dist %.1f (%.1f) < (%.1f-%.1f)*X = %.1f caut=%.1f avspd=%.1f oAspd=%.1f\n",otry_factor,ocar->_name,catchdist,*mincatchdist,distance,o->getDistance(),speed,ospeed,speeddiff,overtakecaution,rldata->avspeed,oAspeed);
 		*mincatchdist = catchdist;
 		return true;
 	}
 	else if (DebugMsg & debug_overtake)
-		fprintf(stderr,"%.1f %s: FAIL!!!!! (cd %.1f<%.1f) (dist %.1f < (%.1f-%.1f)*2 = %.1f caut=%.1f\n",otry_factor,ocar->_name,catchdist,*mincatchdist,distance,speed,ospeed,speeddiff,overtakecaution);
+		fprintf(stderr,"%.1f %s: FAIL!!!!! (cd %.1f<%.1f) (dist %.1f (%.1f) < (%.1f-%.1f)*X = %.1f caut=%.1f avspd=%.1f oAspd=%.1f\n",otry_factor,ocar->_name,catchdist,*mincatchdist,distance,o->getDistance(),speed,ospeed,speeddiff,overtakecaution,rldata->avspeed,oAspeed);
 #else
 	double distance = o->getDistance();
 	double speed = MIN(rldata->avspeed, getSpeed() + MAX(0.0, (getSpeed()/3 - distance)/2));
@@ -2572,10 +2576,12 @@ fprintf(stderr,"CHECKSWITCH: Rgt - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",
 				if (nextCRinverse > 0.0)
 					radius = 0.0;
 				if ((side == prefer_side || 
-				     ocatchleft < mcatchleft - 1.5 ||
-				     xdist > sdiff + ydist + MAX(0.0, angle*10)) &&
+				     ocatchleft < mcatchleft - 1.5) &&
+				    xdist > sdiff + ydist + MAX(0.0, angle*10) &&
 				    track->width - ocatchleft > (car->_dimension_y + 3.0 + radius + speedchange))
 				{
+if (DebugMsg & debug_overtake)
+fprintf(stderr,"            Switch to his right (side=lft) - %d %d %d %d\n",(side==prefer_side),(ocatchleft<mcatchleft-1.5),(xdist>sdiff+ydist+MAX(0.0, angle*10)),(track->width-ocatchleft>(car->_dimension_y+3+radius+speedchange)));
 					side = TR_LFT;
 				}
 				break;
@@ -2587,8 +2593,8 @@ fprintf(stderr,"CHECKSWITCH: Lft - ti=%.2f dm=%.1f o=%.2f->%.2f m=%.2f->%.2f\n",
 				if (nextCRinverse < 0.0)
 					radius = 0.0;
 				if ((side == prefer_side || 
-				     ocatchleft > mcatchleft + 1.5 ||
-				     xdist > sdiff + (-ydist) + MAX(0.0, -angle*10)) &&
+				     ocatchleft > mcatchleft + 1.5) &&
+				    xdist > sdiff + (-ydist) + MAX(0.0, -angle*10) &&
 				    ocatchleft > (car->_dimension_y + 3.0 + radius + speedchange))
 				{
 					side = TR_RGT;
@@ -2965,7 +2971,6 @@ void Driver::initCw()
 	float cx = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_CX, (char*) NULL, 0.0f);
 	float frontarea = GfParmGetNum(car->_carHandle, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*) NULL, 0.0f);
 	CW = 0.645f*cx*frontarea;
-fprintf(stderr,"\n\nCW=%.5f\n",CW);fflush(stderr);
 }
 
 
@@ -3188,7 +3193,6 @@ float Driver::filterTCL(float accel)
 			accel1 = (float) MAX(0.0f, accel1 - (seg->surface->kFriction - wseg0->surface->kFriction));
 		if (wseg1->surface->kFriction < seg->surface->kFriction)
 			accel1 = (float) MAX(0.0f, accel1 - (seg->surface->kFriction - wseg1->surface->kFriction));
-fprintf(stderr,"friction %.3f accel=%.3f->%.3f\n",wseg0->surface->kFriction,accel,accel1);
 #endif
 
 		if (wseg0->surface->kRollRes > MAX(0.01, seg->surface->kRollRes*1.2))
