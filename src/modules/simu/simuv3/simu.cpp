@@ -480,6 +480,7 @@ SimShutdown(void)
     tCar *car;
     int	 ncar;
 	double elapsed_time = GfTimeClock() - simu_init_time;
+#if 0
 	printf ("delta_time: %f\n", SimDeltaTime);
 	printf ("simu time: %fs (%f%% of %fs)\n", simu_total_time,
 			100.0f * simu_total_time/elapsed_time, elapsed_time);
@@ -500,7 +501,7 @@ SimShutdown(void)
 			 timer_force_calculation,
 			timer_wheel_to_car,
 			access_times);
-//#endif
+#endif
     SimCarCollideShutdown(SimNbCars);
     if (SimCarTable) {
 		for (ncar = 0; ncar < SimNbCars; ncar++) {
