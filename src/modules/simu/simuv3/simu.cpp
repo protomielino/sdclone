@@ -84,22 +84,22 @@ ctrlCheck(tCar *car)
 
     /* When the car is broken try to send it on the track side */
     if (car->carElt->_state & RM_CAR_STATE_BROKEN) {
-		car->ctrl->accelCmd = 0.0f;
-		car->ctrl->brakeCmd = 0.1f;
+		car->ctrl->accelCmd = 0.0;
+		car->ctrl->brakeCmd = 0.1;
 		car->ctrl->gear = 0;
 		if (car->trkPos.toRight >  car->trkPos.seg->width / 2.0) {
-			car->ctrl->steer = 0.1f;
+			car->ctrl->steer = 0.1;
 		} else {
-			car->ctrl->steer = -0.1f;
+			car->ctrl->steer = -0.1;
 		}
     } else if (car->carElt->_state & RM_CAR_STATE_ELIMINATED) {
-		car->ctrl->accelCmd = 0.0f;
-		car->ctrl->brakeCmd = 0.1f;
+		car->ctrl->accelCmd = 0.0;
+		car->ctrl->brakeCmd = 0.1;
 		car->ctrl->gear = 0;
 		if (car->trkPos.toRight >  car->trkPos.seg->width / 2.0) {
-			car->ctrl->steer = 0.1f;
+			car->ctrl->steer = 0.1;
 		} else {
-			car->ctrl->steer = -0.1f;
+			car->ctrl->steer = -0.1;
 		}
     } else if (car->carElt->_state & RM_CAR_STATE_FINISH) {
 		/* when the finish line is passed, continue at "slow" pace */
@@ -111,24 +111,24 @@ ctrlCheck(tCar *car)
 
     /* check boundaries */
     if (car->ctrl->accelCmd > 1.0) {
-		car->ctrl->accelCmd = 1.0f;
+		car->ctrl->accelCmd = 1.0;
     } else if (car->ctrl->accelCmd < 0.0) {
-		car->ctrl->accelCmd = 0.0f;
+		car->ctrl->accelCmd = 0.0;
     }
     if (car->ctrl->brakeCmd > 1.0) {
-		car->ctrl->brakeCmd = 1.0f;
+		car->ctrl->brakeCmd = 1.0;
     } else if (car->ctrl->brakeCmd < 0.0) {
 		car->ctrl->brakeCmd = 0.0;
     }
     if (car->ctrl->clutchCmd > 1.0) {
-		car->ctrl->clutchCmd = 1.0f;
+		car->ctrl->clutchCmd = 1.0;
     } else if (car->ctrl->clutchCmd < 0.0) {
-		car->ctrl->clutchCmd = 0.0f;
+		car->ctrl->clutchCmd = 0.0;
     }
     if (car->ctrl->steer > 1.0) {
-		car->ctrl->steer = 1.0f;
+		car->ctrl->steer = 1.0;
     } else if (car->ctrl->steer < -1.0) {
-		car->ctrl->steer = -1.0f;
+		car->ctrl->steer = -1.0;
     }
 
     clutch->transferValue = 1.0 - car->ctrl->clutchCmd;
@@ -175,15 +175,15 @@ SimReConfig(tCarElt *carElt)
     }
     if (carElt->pitcmd.repair > 0) {
 		for (int i=0; i<4; i++) {
-			carElt->_tyreCondition(i) = 1.01f;
-			carElt->_tyreT_in(i) = 50.0f;
-			carElt->_tyreT_mid(i) = 50.0f;
-			carElt->_tyreT_out(i) = 50.0f;
+			carElt->_tyreCondition(i) = 1.01;
+			carElt->_tyreT_in(i) = 50.0;
+			carElt->_tyreT_mid(i) = 50.0;
+			carElt->_tyreT_out(i) = 50.0;
 			car->wheel[i].bent_damage_x = urandom();
 			car->wheel[i].bent_damage_z = urandom();
-			car->wheel[i].rotational_damage_x = 0.0f;
-			car->wheel[i].rotational_damage_z = 0.0f;
-			car->wheel[i].susp.damper.efficiency = 1.0f;
+			car->wheel[i].rotational_damage_x = 0.0;
+			car->wheel[i].rotational_damage_z = 0.0;
+			car->wheel[i].susp.damper.efficiency = 1.0;
 		}
 		
 		// (no need to repair wings because effect depends on damage).
@@ -479,8 +479,8 @@ SimShutdown(void)
 {
     tCar *car;
     int	 ncar;
-#if 0
 	double elapsed_time = GfTimeClock() - simu_init_time;
+#if 0
 	printf ("delta_time: %f\n", SimDeltaTime);
 	printf ("simu time: %fs (%f%% of %fs)\n", simu_total_time,
 			100.0f * simu_total_time/elapsed_time, elapsed_time);
