@@ -1179,6 +1179,13 @@ void TDriver::FindRacinglines()
     oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
     oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
   }
+
+  for (int I = 0; I < NBRRL; I++)
+  {
+    oRacingLine[I].CalcMaxSpeeds(1);
+    oRacingLine[I].PropagateBreaking(1);
+    oRacingLine[I].PropagateAcceleration(1);
+  }
   GfOut("# ... Done\n");
 }
 //==========================================================================*
