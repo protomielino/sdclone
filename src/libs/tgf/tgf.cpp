@@ -402,11 +402,11 @@ char * GfTime2Str(tdble sec, int sgn)
 	int c = (int)floor((sec) * 100.0);
 
 	if (h) {
-		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d:%2.2d", sign,h,m,s,c);
+		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%2.2d", sign,h,m,s,c);
 	} else if (m) {
-		(void)sprintf(buf, "   %s%2.2d:%2.2d:%2.2d", sign,m,s,c);
+		(void)sprintf(buf, "   %s%2.2d:%2.2d.%2.2d", sign,m,s,c);
 	} else {
-		(void)sprintf(buf, "      %s%2.2d:%2.2d", sign,s,c);
+		(void)sprintf(buf, "      %s%2.2d.%2.2d", sign,s,c);
 	}
 	return strdup(buf);
 }
