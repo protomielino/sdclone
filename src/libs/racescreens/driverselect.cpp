@@ -340,23 +340,7 @@ RmDriversSelect(void *vs)
     UnSelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 396, 80, GFUI_ALIGN_HL_VB,
 						200, 250, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
 
-    // Driver type and associated "combobox" (left arrow, label, right arrow)
-    GfuiLabelCreate(ScrHandle, "Driver type:", GFUI_FONT_MEDIUM, 260, y+4, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       396, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, rmdsChangeDrvTyp,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       596, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, rmdsChangeDrvTyp,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    DrvTypEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, 496, y+4, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, DrvTypEditId, PurpleColor);
-
     // Car category and associated "combobox" (left arrow, label, right arrow)
-    y -= dy;
     GfuiLabelCreate(ScrHandle, "Car category:", GFUI_FONT_MEDIUM, 260, y+4, GFUI_ALIGN_HL_VB, 0);
     GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
 		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
@@ -370,6 +354,22 @@ RmDriversSelect(void *vs)
 		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
     CarCatEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, 496, y+4, GFUI_ALIGN_HC_VB, 32);
     GfuiLabelSetColor(ScrHandle, CarCatEditId, PurpleColor);
+
+    // Driver type and associated "combobox" (left arrow, label, right arrow)
+    y -= dy;
+    GfuiLabelCreate(ScrHandle, "Driver type:", GFUI_FONT_MEDIUM, 260, y+4, GFUI_ALIGN_HL_VB, 0);
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
+		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
+		       396, y, GFUI_ALIGN_HL_VB, 1,
+		       (void*)0, rmdsChangeDrvTyp,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
+		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
+		       596, y, GFUI_ALIGN_HR_VB, 1,
+		       (void*)1, rmdsChangeDrvTyp,
+		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    DrvTypEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, 496, y+4, GFUI_ALIGN_HC_VB, 32);
+    GfuiLabelSetColor(ScrHandle, DrvTypEditId, PurpleColor);
 
     // Scroll-lists manipulation buttons
     y -= dy;
