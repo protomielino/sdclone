@@ -27,7 +27,14 @@
 #include <cstring>
 #ifdef WIN32
 #include <windows.h>
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
 #endif
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 #include <GL/glut.h>
 #include <math.h>
 #ifndef WIN32
@@ -444,15 +451,21 @@ void GfScrInit(int argc, char *argv[])
 	}
 
 	if (!fullscreen) {
-	/* Give an initial size and position so user doesn't have to place window */
+		/* Give an initial size and position so user doesn't have to place window */
 		glutInitWindowPosition(0, 0);
 		glutInitWindowSize(winX, winY);
-		Window = glutCreateWindow(argv[0]);
+
+		/* Create the window (with a smart versioned title) */
+		sprintf(buf, "Torcs-NG %s", VERSION);
+		Window = glutCreateWindow(buf);
 		if (!Window) {
 			GfError("Error, couldn't open window\n");
 			GfScrShutdown();
 			exit(1);
 		}
+
+		/* Set a versioned title for iconified window */
+		glutSetIconTitle(buf);
 	}
 
 	if ((strcmp(fscr, GFSCR_VAL_YES) == 0) && (!fullscreen)) {

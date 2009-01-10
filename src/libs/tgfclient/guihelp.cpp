@@ -26,6 +26,12 @@
 #include <stdlib.h>
 #ifdef WIN32
 #include <windows.h>
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
+#endif
+#endif
+#ifdef HAVE_CONFIG_H
+#include "config.h"
 #endif
 #include "tgfclient.h"
 #include "gui.h"
@@ -103,6 +109,8 @@ GfuiHelpScreen(void *prevScreen)
 		     NULL,
 		     (tfuiCallback)NULL,
 		     (tfuiCallback)NULL);
+
+    GfuiLabelCreateEx(scrHandle, VERSION, fgColor2, GFUI_FONT_SMALL_C, 320, 8, GFUI_ALIGN_HC_VB, 0);
 
     GfuiAddKey(scrHandle, (unsigned char)27, "", prevScreen, GfuiScreenReplace, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_F1, "", prevScreen, GfuiScreenReplace, NULL);
