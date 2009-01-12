@@ -32,15 +32,16 @@
 #include <tgfclient.h>
 #include <car.h>
 
-static void		*menuHandle = NULL;
-#define			TEXTLINES	23
-static int		rmTextId[TEXTLINES];
-static char		*rmTextLines[TEXTLINES] = {0};
-static int		rmCurText;
 
-float	black[4] = {0.0, 0.0, 0.0, 0.0};
-float	white[TEXTLINES][4];
+static const	unsigned NbTextLines = 23;
 
+static float	BGColor[4] = {0.0, 0.0, 0.0, 0.0};
+static float	FGColors[NbTextLines][4];
+
+static void		*MenuHandle = NULL;
+static int		 TextLineIds[NbTextLines];
+static char		*TextLines[NbTextLines] = {0};
+static int		 CurTextLineIdx;
 
 
 static void
@@ -52,7 +53,7 @@ rmDeativate(void * /* dummy */)
 /** 
     @ingroup	racemantools
     @param	title	Screen title.
-    @param	bgimg	Optionnal backgrounf image (0 for no img).
+    @param	bgimg	Optional background image (0 for no img).
     @return	None.
 */
 void
@@ -61,47 +62,47 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
     int		i;
     int		y;
 
-    if (GfuiScreenIsActive(menuHandle)) {
+    if (GfuiScreenIsActive(MenuHandle)) {
 	/* Already active */
 	return;
     }
     
-    if (menuHandle) {
-	GfuiScreenRelease(menuHandle);
+    if (MenuHandle) {
+	GfuiScreenRelease(MenuHandle);
     }
-    menuHandle = GfuiScreenCreateEx(black, NULL, NULL, NULL, rmDeativate, 0);
+    MenuHandle = GfuiScreenCreateEx(BGColor, NULL, NULL, NULL, rmDeativate, 0);
 
-    GfuiTitleCreate(menuHandle, title, strlen(title));
+    GfuiTitleCreate(MenuHandle, title, strlen(title));
 
-    /* create 20 lines of text */
-    for (i = 0, y = 400; i < TEXTLINES; i++, y -= 16) {
-	white[i][0] = white[i][1] = white[i][2] = 1.0;
-	white[i][3] = (float)i * 0.0421 + 0.2;
-	rmTextId[i] = GfuiLabelCreateEx(menuHandle, "", white[i], GFUI_FONT_MEDIUM_C, 60, y, 
-					GFUI_ALIGN_HL_VB, 100);
-	if (rmTextLines[i]) {
+    /* create one label for each text line*/
+    for (i = 0, y = 400; i < NbTextLines; i++, y -= 16) {
+	FGColors[i][0] = FGColors[i][1] = FGColors[i][2] = 1.0;
+	FGColors[i][3] = (float)i * 0.0421 + 0.2;
+	TextLineIds[i] = GfuiLabelCreateEx(MenuHandle, "", FGColors[i], GFUI_FONT_MEDIUM_C, 60, y, 
+									   GFUI_ALIGN_HL_VB, 100);
+	if (TextLines[i]) {
 	    /* free old text */
-	    free(rmTextLines[i]);
-	    rmTextLines[i] = NULL;
+	    free(TextLines[i]);
+	    TextLines[i] = NULL;
 	}
     }
 
-    rmCurText = 0;
+    CurTextLineIdx = 0;
     
     if (bgimg) {
-	GfuiScreenAddBgImg(menuHandle, bgimg);
+	GfuiScreenAddBgImg(MenuHandle, bgimg);
     }
 
-    GfuiScreenActivate(menuHandle);
+    GfuiScreenActivate(MenuHandle);
     GfuiDisplay();
 }
 
 void
 RmShutdownLoadingScreen(void)
 {
-    if (menuHandle) {
-	GfuiScreenRelease(menuHandle);
-	menuHandle = 0;
+    if (MenuHandle) {
+	GfuiScreenRelease(MenuHandle);
+	MenuHandle = 0;
     }
 }
 
@@ -118,24 +119,24 @@ RmLoadingScreenSetText(const char *text)
     
     GfOut("%s\n", text);
     
-    if (menuHandle) {
-	if (rmTextLines[rmCurText]) {
-	    free(rmTextLines[rmCurText]);
+    if (MenuHandle) {
+	if (TextLines[CurTextLineIdx]) {
+	    free(TextLines[CurTextLineIdx]);
 	}
 	if (text) {
-	    rmTextLines[rmCurText] = strdup(text);
-	    rmCurText = (rmCurText + 1) % TEXTLINES;
+	    TextLines[CurTextLineIdx] = strdup(text);
+	    CurTextLineIdx = (CurTextLineIdx + 1) % NbTextLines;
 	}
 	
-	i = rmCurText;
+	i = CurTextLineIdx;
 	j = 0;
 	do {
-	    if (rmTextLines[i]) {
-		GfuiLabelSetText(menuHandle, rmTextId[j], rmTextLines[i]);
+	    if (TextLines[i]) {
+		GfuiLabelSetText(MenuHandle, TextLineIds[j], TextLines[i]);
 	    }
 	    j++;
-	    i = (i + 1) % TEXTLINES;
-	} while (i != rmCurText);
+	    i = (i + 1) % NbTextLines;
+	} while (i != CurTextLineIdx);
 	
 	GfuiDisplay();
     }

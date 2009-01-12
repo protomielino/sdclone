@@ -2,7 +2,7 @@
 
     file        : racemain.cpp
     created     : Sat Nov 16 12:13:31 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: racemain.cpp,v 1.13 2005/08/17 20:48:39 berniw Exp $                                  
 
@@ -112,7 +112,7 @@ ReRaceEventInit(void)
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
 	ReInitTrack();
-	RmLoadingScreenSetText("Loading Track 3D Description...");
+	RmLoadingScreenSetText("Loading track ...");
 	ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 	ReEventInitResults();
 
@@ -179,10 +179,12 @@ reRaceRealStart(void)
 	void *results = ReInfo->results;
 	tSituation *s = ReInfo->s;
 
-	RmLoadingScreenSetText("Loading Simulation Engine...");
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
+	sprintf(buf, "Loading simulation engine %s ...", dllname);
+	RmLoadingScreenSetText(buf);
 	sprintf(key, "%smodules/simu/%s.%s", GetLibDir (), dllname, DLLEXT);
-	if (GfModLoad(0, key, &ReRaceModList)) return RM_QUIT;
+	if (GfModLoad(0, key, &ReRaceModList)) 
+		return RM_QUIT;
 	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);
 
 	if (ReInitCars()) {
@@ -213,7 +215,7 @@ reRaceRealStart(void)
 	}
 
 	for (i = 0; i < s->_ncars; i++) {
-		sprintf(buf, "Initializing Driver %s...", s->cars[i]->_name);
+		sprintf(buf, "Initializing driver %s ...", s->cars[i]->_name);
 		RmLoadingScreenSetText(buf);
 		robot = s->cars[i]->robot;
 		robot->rbNewRace(robot->index, s->cars[i], s);
@@ -225,7 +227,7 @@ reRaceRealStart(void)
 		carInfo[i].prevTrkPos = s->cars[i]->_trkPos;
 	}
 
-	RmLoadingScreenSetText("Running Prestart...");
+	RmLoadingScreenSetText("Running Prestart ...");
 	for (i = 0; i < s->_ncars; i++) {
 		memset(&(s->cars[i]->ctrl), 0, sizeof(tCarCtrl));
 		s->cars[i]->ctrl.brakeCmd = 1.0;
@@ -243,8 +245,6 @@ reRaceRealStart(void)
 		}
 	}
 
-	RmLoadingScreenSetText("Ready.");
-
 	ReInfo->_reTimeMult = 1.0;
 	ReInfo->_reLastTime = -1.0;
 	ReInfo->s->currentTime = -2.0;
@@ -256,9 +256,11 @@ reRaceRealStart(void)
 	ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
 
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
-		/* RmLoadingScreenSetText("Loading Cars 3D Objects..."); */
+		RmLoadingScreenSetText("Loading cars ...");
 		ReInfo->_reGraphicItf.initcars(s);
 	}
+
+	RmLoadingScreenSetText("Ready.");
 
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 

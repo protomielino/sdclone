@@ -489,7 +489,7 @@ ReInitCars(void)
 
 	/* Get the number of cars racing */
 	nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
-	GfOut("loading %d cars\n", nCars);
+	GfOut("Loading %d cars\n", nCars);
 
 	FREEZ(ReInfo->carList);
 	ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
@@ -508,7 +508,7 @@ ReInitCars(void)
 
 		/* load the robot shared library */
 		if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) {
-			GfTrace("Pb with loading %s driver\n", path);
+			GfError("Failed to load %s driver\n", path);
 			break;
 		}
 
@@ -528,7 +528,7 @@ ReInitCars(void)
 					sprintf(buf, "drivers/%s/%s.xml", cardllname, cardllname);
 					robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				}
-				if (robhdle != NULL) {
+				if (robhdle) {
 					elt = &(ReInfo->carList[index]);
 					GF_TAILQ_INIT(&(elt->_penaltyList));
 
@@ -568,10 +568,10 @@ ReInitCars(void)
 					/* handle contains the drivers modifications to the car */
 					/* Read Car model specifications */
 					sprintf(buf, "cars/%s/%s.xml", elt->_carName, elt->_carName);
-					GfOut("Car Specification: %s\n", buf);
+					GfOut("Car file: %s\n", buf);
 					carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 					category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-					sprintf(buf, "Loading Driver %-20s... Car: %s", curModInfo->name, elt->_carName);
+					sprintf(buf, "Loading driver %-20s (car %s)", curModInfo->name, elt->_carName);
 					RmLoadingScreenSetText(buf);
 					if (category != 0) {
 						strncpy(elt->_category, category, MAX_NAME_LEN - 1);
@@ -579,10 +579,10 @@ ReInitCars(void)
 
 						/* Read Car Category specifications */
 						sprintf(buf, "categories/%s.xml", category);
-						GfOut("Category Specification: %s\n", buf);
+						GfOut("Category file: %s\n", buf);
 						cathdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 						if (GfParmCheckHandle(cathdle, carhdle)) {
-							GfTrace("Car %s not in Category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+							GfError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
 							break;
 						}
 						carhdle = GfParmMergeHandles(cathdle, carhdle,
@@ -590,7 +590,7 @@ ReInitCars(void)
 										curRobot->rbNewTrack(robotIdx, ReInfo->track, carhdle, &handle, ReInfo->s);
 						if (handle != NULL) {
 							if (GfParmCheckHandle(carhdle, handle)) {
-								GfTrace("Bad Car parameters for driver %s\n", elt->_name);
+								GfError("Bad car parameters for driver %s\n", elt->_name);
 								break;
 							}
 							handle = GfParmMergeHandles(carhdle, handle,
@@ -602,12 +602,12 @@ ReInitCars(void)
 						//GfParmWriteFile("toto.xml", handle, "toto");
 					} else {
 						elt->_category[0] = '\0';
-						GfTrace("Bad Car category for driver %s\n", elt->_name);
+						GfError("Bad car category for driver %s\n", elt->_name);
 						break;
 					}
 					index ++;
 				} else {
-					GfTrace("Pb No description file for driver %s\n", cardllname);
+					GfError("No description file for driver %s\n", cardllname);
 				}
 				break;
 			}
@@ -616,7 +616,7 @@ ReInitCars(void)
 
 	nCars = index; /* real number of cars */
 	if (nCars == 0) {
-		GfTrace("No driver for that race...\n");
+		GfError("No driver for that race ; exiting ...\n");
 		return -1;
 	} else {
 		GfOut("%d drivers ready to race\n", nCars);
@@ -656,24 +656,18 @@ reDumpTrack(tTrack *track, int verbose)
     const char	*stype[4] = { "", "RGT", "LFT", "STR" };
 #endif
 
-    RmLoadingScreenSetText("Loading Track Geometry...");
-    sprintf(buf, ">>> Track Name    %s", track->name);
-    RmLoadingScreenSetText(buf);
-    sprintf(buf, ">>> Track Author  %s", track->author);
-    RmLoadingScreenSetText(buf);
-    sprintf(buf, ">>> Track Length  %.2f m", track->length);
-    RmLoadingScreenSetText(buf);
-    sprintf(buf, ">>> Track Width   %.2f m", track->width);
+    sprintf(buf, "  by %s (%.2f m length, %.2f m wide) ...", 
+			track->author, track->length, track->width);
     RmLoadingScreenSetText(buf);
 
     GfOut("++++++++++++ Track ++++++++++++\n");
-    GfOut("name     = %s\n", track->name);
-    GfOut("author   = %s\n", track->author);
-    GfOut("filename = %s\n", track->filename);
-    GfOut("nseg     = %d\n", track->nseg);
-    GfOut("version  = %d\n", track->version);
-    GfOut("length   = %f\n", track->length);
-    GfOut("width    = %f\n", track->width);
+    GfOut("Name     = %s\n", track->name);
+    GfOut("Author   = %s\n", track->author);
+    GfOut("Filename = %s\n", track->filename);
+    GfOut("NSeg     = %d\n", track->nseg);
+    GfOut("Version  = %d\n", track->version);
+    GfOut("Length   = %f\n", track->length);
+    GfOut("Width    = %f\n", track->width);
     GfOut("XSize    = %f\n", track->max.x);
     GfOut("YSize    = %f\n", track->max.y);
     GfOut("ZSize    = %f\n", track->max.z);
@@ -750,7 +744,7 @@ ReInitTrack(void)
     catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
     if (!catName) return -1;
 
-    sprintf(buf, "Loading Track %s...", trackName);
+    sprintf(buf, "Loading track %s ...", trackName);
     RmLoadingScreenSetText(buf);
     sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
     ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
