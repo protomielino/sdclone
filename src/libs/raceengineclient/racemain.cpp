@@ -112,7 +112,6 @@ ReRaceEventInit(void)
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
 	ReInitTrack();
-	RmLoadingScreenSetText("Loading track ...");
 	ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 	ReEventInitResults();
 
@@ -180,7 +179,7 @@ reRaceRealStart(void)
 	tSituation *s = ReInfo->s;
 
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
-	sprintf(buf, "Loading simulation engine %s ...", dllname);
+	sprintf(buf, "Loading simulation engine (%s) ...", dllname);
 	RmLoadingScreenSetText(buf);
 	sprintf(key, "%smodules/simu/%s.%s", GetLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, key, &ReRaceModList)) 

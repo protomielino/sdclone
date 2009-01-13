@@ -571,7 +571,7 @@ ReInitCars(void)
 					GfOut("Car file: %s\n", buf);
 					carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 					category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-					sprintf(buf, "Loading driver %-20s (car %s)", curModInfo->name, elt->_carName);
+					sprintf(buf, "Loading driver %s (%s) ...", curModInfo->name, elt->_carName);
 					RmLoadingScreenSetText(buf);
 					if (category != 0) {
 						strncpy(elt->_category, category, MAX_NAME_LEN - 1);
@@ -740,12 +740,16 @@ ReInitTrack(void)
     curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
     sprintf(buf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
     trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
-    if (!trackName) return -1;
+    if (!trackName)
+	return -1;
+
     catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
-    if (!catName) return -1;
+    if (!catName) 
+	return -1;
 
     sprintf(buf, "Loading track %s ...", trackName);
     RmLoadingScreenSetText(buf);
+
     sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
     ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
     reDumpTrack(ReInfo->track, 0);
