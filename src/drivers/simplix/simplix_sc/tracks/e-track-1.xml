@@ -23,7 +23,7 @@
 		<attnum name="pit long offset" min="-5" max="5" val="0.0"/>
 		<attnum name="pit scale brake" val="1.0"/>
 		<attnum name="pit stop dist" val="1.5"/>
-		<attnum name="offset skill" val="0.35"/>
+		<attnum name="offset skill" val="0.30"/>
 		<attnum name="scale skill" val="1.0500"/>
 		<attnum name="scale bump" min="0" max="1" val="0.01"/>
 		<attnum name="scale bump outer" min="0" max="2" val="0.01"/>

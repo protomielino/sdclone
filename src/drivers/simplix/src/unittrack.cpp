@@ -415,6 +415,8 @@ void TTrackDescription::InitTrack
 	  LastSegType = LastSeg->type;               //   reset
 
     Seg = oSections[I].Seg;                      // Get torcs segment
+	//if (strncmp(Seg->name,"180",3) == 0)
+	//  GfOut("%s\n",Seg->name);
 
 	double DistFromStart =                       // Distance from start
       oSections[I].DistFromStart;                //   of section
@@ -446,6 +448,7 @@ void TTrackDescription::InitTrack
 	  double ExtraW = 0;                         // Initialize add. width
 	  double ExtraWpit = 0;                      // Initialize add. width
 	  bool Done = false;                         // Reset flag
+	  bool PitOnly = false;                      // Reset flag
 	  while(PSide)                               // Loop all side-segments
 	  {
 	    double Wpit = 0.0;                       // Initialize
@@ -476,10 +479,16 @@ void TTrackDescription::InitTrack
 	        WCurb = MIN(WCurb, 0.15);            // use 15 cm only
 
 		  // Don't go too far up raised curbs
-		  if (slope > 0.15)                      // If more
+		  if (slope > 0.151)                     // If more
 		    WCurb = 0;                           //   keep off
-		  else if (slope > 0.10)                 // Use 15 cm 
+		  else if (slope > 0.121)                // Use 15 cm 
 		    WCurb = MIN(WCurb, 0.15);            //   
+		  else if (slope > 0.101)                // Use 30 cm 
+		    WCurb = MIN(WCurb, 0.30);            //   
+		  else if (slope > 0.051)                // Use 60 cm 
+		    WCurb = MIN(WCurb, 0.60);            //   
+		  else if (slope > 0.021)                // Use 120 cm 
+		    WCurb = MIN(WCurb, 1.20);            //   
 		}
 	    else if (PSide->style == TR_CURB)        // On curbs without height
 		{
@@ -550,10 +559,16 @@ void TTrackDescription::InitTrack
 		}
 
 		ExtraWpit += Wpit;
-		if (Done)
-  	      ExtraW += WCurb;
-		else
-		  ExtraW += W;
+		if (!PitOnly)
+		{
+		  if (Done)
+  	        ExtraW += WCurb;
+		  else
+		    ExtraW += W;
+
+		  if (Done)
+		    PitOnly = true;
+		} 
 
 		PSide = PSide->side[S];
 	  }
