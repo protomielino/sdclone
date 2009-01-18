@@ -2,17 +2,18 @@
 // unittrack.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Track description with variable step length
 // Streckenbeschreibung mit variabler Abtastrate
 // und segmentgenauen Abschnittsgrenzen
-// (C++-Portierung der Unit UnitTrack.pas)
 //
-// Datei    : unittrack.cpp
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unittrack.cpp
+// Created      : 2007.11.17
+// Last changed : 2009.01.17
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000 
 //--------------------------------------------------------------------------*
 // Stellt Funktionen zur Streckenbeschreibung zur Verfügung
 //--------------------------------------------------------------------------*
@@ -40,19 +41,24 @@
 //    Copyright: (C) 2006 Tim Foden
 //
 //--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 
 #include <robottools.h>
@@ -442,76 +448,73 @@ void TTrackDescription::InitTrack
 	  bool Done = false;                         // Reset flag
 	  while(PSide)                               // Loop all side-segments
 	  {
-	    double Wpit = 0.0;                       // Save it for pitlane 
-		double WCurb = 0.0;                      // Save it 
-		double W = PSide->startWidth +           // Estimate width of section
-		  (PSide->endWidth - PSide->startWidth) * T;
+	    double Wpit = 0.0;                       // Initialize
+		double WCurb = 0.0;                      // additional with
+		double W = PSide->startWidth + T *       // Estimate width of section
+		  (PSide->endWidth - PSide->startWidth); // at current position
+		float slope = PSide->height/PSide->width;// Slope of border
+		bool outer = ((S == TR_SIDE_LFT)         // Is it the outer side?
+		    && (Seg->type == TR_RGT))       
+		    || ((S == TR_SIDE_RGT)          
+		    && (Seg->type == TR_LFT));      
+		bool pitlane = (((S == oPitSideMod.side) // If side of pits
+			&& (I >= oPitSideMod.start)          // and between start
+			&& (I <= oPitSideMod.end)));         // and end of pitlane
+
+		if (pitlane)                             // if side along pitlane
+	      W = 0.0;                               // Keep out!
 
 		if ((PSide->style == TR_CURB)            // On curbs with height
-		  && (PSide->height > 0.03)) 
+		  && (slope > 0.01))                     // and great slope
 		{
+		  Done = true;                           // Last possible to use 
           WCurb = 0.8 * W;                       // Use 80%
-		  W = 0;
+          WCurb = MIN(WCurb, 1.5);               // Keep a wheel on track
 
-		  if (!((S == oPitSideMod.side)          // Exclude pits
-			&& (I >= oPitSideMod.start)
-			&& (I <= oPitSideMod.end)))
-		  {
-	        WCurb = MIN(WCurb, 1.5);             // Keep a wheel on track
-			Done = true;
-		  }
+		  if (outer                              // If outer side and friction lower
+			&& (PSide->surface->kFriction < Seg->surface->kFriction))
+	        WCurb = MIN(WCurb, 0.15);            // use 15 cm only
 
-		  if ((((S == TR_SIDE_LFT)               // Reset width
-		    && (Seg->type == TR_RGT))            // on outer side
-		    || ((S == TR_SIDE_RGT)               // if friction is
-		    && (Seg->type == TR_LFT)))           // lower
-		    && (PSide->surface->kFriction < Seg->surface->kFriction))
-		    WCurb = 0;
-
-		  // Don't go too far up raised curbs (max 2cm).
-		  if (PSide->height > 0.02)              // If more than 2 cm
+		  // Don't go too far up raised curbs
+		  if (slope > 0.15)                      // If more
 		    WCurb = 0;                           //   keep off
-		  else if (PSide->height > 0.01)         // Use 15 cm up to
-		    WCurb = MIN(WCurb, 0.15);            //   2 cm height
- 		  else if (PSide->height > 0.0)          // Use 30 cm up to
-		    WCurb = MIN(WCurb, 0.3);             //   1 cm height
-
+		  else if (slope > 0.10)                 // Use 15 cm 
+		    WCurb = MIN(WCurb, 0.15);            //   
 		}
 	    else if (PSide->style == TR_CURB)        // On curbs without height
 		{
           WCurb = 0.8 * W;                       // Use 80%
-		  W = 0;
-		  if (!((S == oPitSideMod.side)          // Exclude pits
-			&& (I >= oPitSideMod.start)
-			&& (I <= oPitSideMod.end)))
+		  if (pitlane)                           // if side along pitlane
 		  {
-/*
-			if ((((S == TR_SIDE_LFT)             // Reset width
-			  && (Seg->type == TR_RGT))          // on outer side
-			  || ((S == TR_SIDE_RGT)             // if friction is
-			  && (Seg->type == TR_LFT)))         // lower
-			  && (PSide->surface->kFriction < Seg->surface->kFriction))
-			  WCurb = 0;
-*/
+            WCurb = 0.15;                         
+		    Done = true;
+		  }
+		  else if (outer && (PSide->surface->kFriction < Seg->surface->kFriction))
+		  {
+		    WCurb = MIN(WCurb,1.5);              // Keep two wheels on track
+		    Done = true;
+		  }
+		  else
+		  {
+		    W = 0;
 		  }
 		}
 		else if (PSide->style == TR_PLAN)        // On plan
 		{
+          WCurb = 0.8 * W;                       // Use 80%
 		  if ((InPit && (oPitSide == S))         // Exclude pits
 			|| (PSide->raceInfo & (TR_SPEEDLIMIT | TR_PITLANE)))
 		  {
             Wpit = W;                            // Save it for pitlane
-		    W = 0;
+            WCurb = 0;                           // Use 80%
 		    Done = true;
 	      }
-          else if ((S == oPitSideMod.side)       // Exclude pit side
-			&& (I >= oPitSideMod.start)
-			&& (I <= oPitSideMod.end))
+          else if (pitlane)
 		  {
             Wpit = W;                            // Save it for pitlane
-			if (W > 0.5)                         // Only 50 cm
+			if (W > 0.15)                        // Only 15 cm
 			{
-			  WCurb = 0.5;
+			  WCurb = 0.15;
 			  Done = true;
 			}
 		  }
@@ -521,42 +524,35 @@ void TTrackDescription::InitTrack
 			|| (PSide->surface->kRollRes > MAX_RESIST)
 			|| (fabs(PSide->Kzw - SLOPE) > 0.005))
 		  {
-			W = 0;
+            WCurb = 0;                           
 			Done = true;
 		  }
-		  else
-            W = 0.8 * W;                         // Use 80%
-/*
-		  if(((S == TR_SIDE_LFT)                 // Keep 2 m to outer side
-			  && ((Seg->type == TR_RGT) && (Seg->radiusr < 200))
-			|| (S == TR_SIDE_RGT)
-			&& ((Seg->type == TR_LFT) && (Seg->radiusl < 200)))
-			&& (PSide->surface->kFriction < Seg->surface->kFriction))
+		  else if (outer
+			  && ((PSide->surface->kFriction < Seg->surface->kFriction)
+			  || (PSide->surface->kRoughness > MAX_ROUGH)
+			  || (PSide->surface->kRollRes > MAX_RESIST)
+			  || (fabs(PSide->Kzw - SLOPE) > 0.005)))
 		  {
-			W = -2.0;
+            WCurb = 0;                           
+			Done = true;
 		  }
-
-		  if(((S == TR_SIDE_LFT)                 // Decrease buffer on
-			&& ((LastSegType == TR_RGT) && (LastSeg->radiusr < 200)) // straights
-			|| (S == TR_SIDE_RGT)
-			&& ((LastSegType == TR_LFT) && (LastSeg->radiusl < 200)))
-			&& (PSide->surface->kFriction < Seg->surface->kFriction))
+		  else if (PSide->surface->kFriction < Seg->surface->kFriction)
 		  {
-			W = MIN(0,-2.0 + N * 0.05);
+			WCurb = MIN(WCurb,1.5);
+			Done = true;
 		  }
-*/
 		}
 		else
 		{
 		  // Wall of some sort
-		  W = (PSide->style == TR_WALL) ? -1.0 : 0;
-		  ExtraW += W;
+		  WCurb = (PSide->style == TR_WALL) ? -1.0 : 0;
 		  Done = true;
 		}
 
 		ExtraWpit += Wpit;
-  	    ExtraW += WCurb;
-		if (!Done)
+		if (Done)
+  	      ExtraW += WCurb;
+		else
 		  ExtraW += W;
 
 		PSide = PSide->side[S];

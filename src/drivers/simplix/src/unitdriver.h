@@ -2,15 +2,15 @@
 // unitdriver.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A schismatic robot for TORCS-Version 1.3.0 and 1.3.1 
+// A robot for TORCS-NG-Version 1.4.0
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2008.12.28
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2009.01.11
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -323,6 +323,8 @@ private:
 	double oSkill;                               // Skilling
 	double oSkillDriver;                         // Individual skilling level
 	double oSkillGlobal;                         // Global skilling level
+	double oSkillScale;                          // Track skilling level
+	double oSkillOffset;                         // Hymie skilling level
     double oDriverAggression;
 	double oSkillAdjustTimer;                    // Timer
 	double oSkillAdjustLimit;                    // Limit
@@ -354,13 +356,14 @@ private:
 	static char* DEFAULTCARTYPE;                 // Default car type
 
 	static bool AdvancedParameters;
+    static bool UseOldSkilling;
 	static bool UseBrakeLimit;
 	static float BrakeLimit;
 	static float BrakeLimitScale;
 	static float BrakeLimitBase;
 	static float SpeedLimitScale;
 	static float SpeedLimitBase;
-
+	
 };
 //==========================================================================*
 

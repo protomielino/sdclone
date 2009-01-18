@@ -83,6 +83,7 @@ char* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
 char* TDriver::SECT_PRIV = "simplix private";      // Private section
 char* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
+bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 float TDriver::BrakeLimit = -6;                    // Brake limit
 float TDriver::BrakeLimitBase = 0.025f;            // Brake limit base
@@ -276,6 +277,8 @@ TDriver::TDriver(int Index):
   oSkill(0.0),
   oSkillDriver(0.0),
   oSkillGlobal(0.0),
+  oSkillScale(14.0),
+  oSkillOffset(0.0),
   oDriverAggression(0.0),
   oSkillAdjustTimer(0.0),
   oSkillAdjustLimit(0.0),
@@ -786,10 +789,28 @@ void TDriver::InitTrack
   }
   else
   {
-    oSkill = (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver);
-    oLookAhead = oLookAhead / (1+oSkill/24);
-    oLookAheadFactor = oLookAheadFactor / (1+oSkill/24);
-    Param.Tmp.oSkill = 1.0 + oSkill/24.0;
+    oSkillOffset = MAX(0.0,MIN(1000.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, oSkillOffset)));
+    GfOut("#SkillOffset: %g\n", oSkillOffset);
+    oSkillScale = MAX(0.0,MIN(1000.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, oSkillScale)));
+    GfOut("#SkillScale: %g\n", oSkillScale);
+
+    oLookAhead = oLookAhead / (1+oSkillGlobal/24);
+    oLookAheadFactor = oLookAheadFactor / (1+oSkillGlobal/24);
+
+	if (UseOldSkilling)
+	  oSkill = 
+		-0.0000455 * oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal
+		+0.0014 * oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal
+		-0.0145 * oSkillGlobal*oSkillGlobal*oSkillGlobal
+		+0.0512 * oSkillGlobal*oSkillGlobal
+		+0.0978 * oSkillGlobal
+		+ oSkillOffset + oSkillDriver;
+	else
+	  oSkill = (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver);
+
+	oSkill *= oSkillScale;
+
+    Param.Tmp.oSkill = 1.0 + oSkill;
 	GfOut("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
 		oSkill,oSkillGlobal,oSkillDriver,oLookAhead,oLookAheadFactor,Param.Tmp.oSkill);
   }
@@ -1113,7 +1134,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(1));
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1141,7 +1162,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(1, FLT_MAX, -oAvoidWidth, true));
-      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1160,7 +1181,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(1, -oAvoidWidth, FLT_MAX, true));
-      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1174,9 +1195,9 @@ void TDriver::FindRacinglines()
 	  if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
         MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	}
-    oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-    oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-    oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+    //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+    //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+    //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
     oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
   }
 
@@ -1247,7 +1268,7 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
     oAngleSpeed = atan2(CarSpeedY, CarSpeedX);   // direction of movement
 
   Param.Tmp.oSkill =
-	(1.0 + oSkill/24 + CarDamage/30000);         // Adjust skill to damages
+	(1.0 + oSkill/oSkillScale + CarDamage/30000);// Adjust skill to damages
 
   oTrackAngle =                                  // Direction of track at the
 	 RtTrackSideTgAngleL(&CarTrackPos);          // position of the car
@@ -2680,8 +2701,8 @@ double TDriver::FilterStart(double Speed)
   if (Qualification)
 	  return Speed;
 
-  if (DistanceRaced < TrackLength)
-	  return Speed * 0.9;
+  //if (DistanceRaced < TrackLength)
+  //  return Speed * 0.9;
 
   return Speed;
 }

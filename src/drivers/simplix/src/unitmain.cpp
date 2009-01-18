@@ -242,6 +242,7 @@ void SetUpSimplix_trb1()
 void SetUpSimplix_sc()
 {
   SetParameters(NBBOTS, "sc996");
+  TDriver::UseOldSkilling = true;                // Use old skilling
 };
 //==========================================================================*
 
