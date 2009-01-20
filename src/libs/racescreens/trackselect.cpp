@@ -29,16 +29,16 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+#include <portability.h>
 #include <tgfclient.h>
 #include <track.h>
-#include <osspec.h>
 #include <raceman.h>
 #include "racescreens.h"
 
 
 /* Tracks Categories */
 static tFList *CategoryList;
-static void *scrHandle;
+static void *ScrHandle;
 static int TrackLabelId;
 static int CatLabelId;
 static int MapId;
@@ -47,9 +47,7 @@ static int LengthId;
 static int WidthId;
 static int DescId;
 static int PitsId;
-static tRmTrackSelect *ts;
-static char buf[1024];
-static char path[1024];
+static tRmTrackSelect *TrackSelect;
 
 
 static void rmtsActivate(void * /* dummy */)
@@ -65,17 +63,18 @@ static void rmtsFreeLists(void *vl)
 }
 
 
-static char * rmGetMapName(void)
+static char * rmtsGetMapName(char* mapNameBuf, unsigned mapNameBufSize)
 {
-	sprintf(buf, "tracks/%s/%s/%s.png", CategoryList->name,
-		((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
-	return buf;
+	snprintf(mapNameBuf, mapNameBufSize, "tracks/%s/%s/%s.png", CategoryList->name,
+		 ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
+	mapNameBuf[mapNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
+	return mapNameBuf;
 }
 
 
 static void rmtsDeactivate(void *screen)
 {
-	GfuiScreenRelease(scrHandle);
+	GfuiScreenRelease(ScrHandle);
 
 	GfDirFreeList(CategoryList, rmtsFreeLists, true, true);
 	if (screen) {
@@ -84,95 +83,55 @@ static void rmtsDeactivate(void *screen)
 }
 
 
-static void rmUpdateTrackInfo(void)
+static void rmtsUpdateTrackInfo(void)
 {
+	const unsigned bufSize = 256;
+	static char buf[bufSize];
+
 	void *trackHandle;
 	float tmp;
 	tTrack *trk;
 
+	/* Try and load track XML file */
 	sprintf(buf, "tracks/%s/%s/%s.%s", CategoryList->name, ((tFList*)CategoryList->userData)->name,
 		((tFList*)CategoryList->userData)->name, TRKEXT);
-	trackHandle = GfParmReadFile(buf, GFPARM_RMODE_STD); /* COMMENT VALID? don't release, the name is used later */
-
+	trackHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	if (!trackHandle) {
-		GfTrace("File %s has pb\n", buf);
+		GfError("Could not load track file %s\n", buf);
 		return;
 	}
-	trk = ts->trackItf.trkBuild(buf);
 
-	GfuiLabelSetText(scrHandle, DescId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, ""));
-	GfuiLabelSetText(scrHandle, AuthorId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, ""));
+	/* Try and load track 3D model (never fails ?) */
+	trk = TrackSelect->trackItf.trkBuild(buf);
+	if (!trk) {
+		GfError("Could not load track 3D model\n");
+		GfParmReleaseHandle(trackHandle);
+		return;
+	}
+
+	/* Update GUI with track info */
+	GfuiLabelSetText(ScrHandle, DescId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, ""));
+	GfuiLabelSetText(ScrHandle, AuthorId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, ""));
 
 	tmp = GfParmGetNum(trackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, NULL, 0);
 	sprintf(buf, "%.2f m", tmp);
-	GfuiLabelSetText(scrHandle, WidthId, buf);
+	GfuiLabelSetText(ScrHandle, WidthId, buf);
 	tmp = trk->length;
 	sprintf(buf, "%.2f m", tmp);
-	GfuiLabelSetText(scrHandle, LengthId, buf);
+	GfuiLabelSetText(ScrHandle, LengthId, buf);
 
-	if (trk->pits.nMaxPits != 0) {
+	if (trk->pits.nMaxPits) {
 		sprintf(buf, "%d", trk->pits.nMaxPits);
-		GfuiLabelSetText(scrHandle, PitsId, buf);
+		GfuiLabelSetText(ScrHandle, PitsId, buf);
 	} else {
-		GfuiLabelSetText(scrHandle, PitsId, "none");
+		GfuiLabelSetText(ScrHandle, PitsId, "none");
 	}
 
-	ts->trackItf.trkShutdown();
+	/* Unload track 3D model */
+	TrackSelect->trackItf.trkShutdown();
+
+	/* Close track XML file */
 	GfParmReleaseHandle(trackHandle);
-}
-
-
-static void rmtsPrevNext(void *vsel)
-{
-	if (vsel == 0) {
-		CategoryList->userData = (void*)(((tFList*)CategoryList->userData)->prev);
-	} else {
-		CategoryList->userData = (void*)(((tFList*)CategoryList->userData)->next);
-	}
-
-	GfuiLabelSetText(scrHandle, TrackLabelId, ((tFList*)CategoryList->userData)->dispName);
-	GfuiStaticImageSet(scrHandle, MapId, rmGetMapName());
-	rmUpdateTrackInfo();
-}
-
-
-static void rmCatPrevNext(void *vsel)
-{
-	if (vsel == 0) {
-		CategoryList = CategoryList->prev;
-	} else {
-		CategoryList = CategoryList->next;
-	}
-
-	GfuiLabelSetText(scrHandle, CatLabelId, CategoryList->dispName);
-	GfuiLabelSetText(scrHandle, TrackLabelId, ((tFList*)CategoryList->userData)->dispName);
-	GfuiStaticImageSet(scrHandle, MapId, rmGetMapName());
-	rmUpdateTrackInfo();
-}
-
-
-void rmtsSelect(void * /* dummy */)
-{
-	int curTrkIdx;
-
-	curTrkIdx = (int)GfParmGetNum(ts->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
-	sprintf(path, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-	GfParmSetStr(ts->param, path, RM_ATTR_CATEGORY, CategoryList->name);
-	GfParmSetStr(ts->param, path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
-
-	rmtsDeactivate(ts->nextScreen);
-}
-
-
-static void rmtsAddKeys(void)
-{
-	GfuiAddKey(scrHandle, 13, "Select Track", NULL, rmtsSelect, NULL);
-	GfuiAddKey(scrHandle, 27, "Cancel Selection", ts->prevScreen, rmtsDeactivate, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Track", (void*)0, rmtsPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Track", (void*)1, rmtsPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_UP, "Previous Track Category", (void*)0, rmCatPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_DOWN, "Next Track Category", (void*)1, rmCatPrevNext, NULL);
 }
 
 
@@ -185,17 +144,18 @@ static void rmtsAddKeys(void)
 char *
 RmGetTrackName(const char *category, const char *trackName)
 {
+	static char path[256];
 	void *trackHandle;
 	char *name;
 
-	sprintf(buf, "tracks/%s/%s/%s.%s", category, trackName, trackName, TRKEXT);
-	trackHandle = GfParmReadFile(buf, GFPARM_RMODE_STD); /* don't release, the name is used later */
+	sprintf(path, "tracks/%s/%s/%s.%s", category, trackName, trackName, TRKEXT);
+	trackHandle = GfParmReadFile(path, GFPARM_RMODE_STD);
 
 	if (trackHandle) {
 		name = strdup(GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_NAME, trackName));
 	} else {
-		GfTrace("File %s has pb\n", buf);
-		return NULL;
+		GfTrace("Could not read file %s\n", path);
+		return 0;
 	}
 
 	GfParmReleaseHandle(trackHandle);
@@ -211,23 +171,142 @@ RmGetTrackName(const char *category, const char *trackName)
 char *
 RmGetCategoryName(const char *category)
 {
+	static char path[256];
 	void *categoryHandle;
 	char *name;
 
-	sprintf(buf, "data/tracks/%s.%s", category, TRKEXT);
-	categoryHandle = GfParmReadFile(buf, GFPARM_RMODE_STD); /* don't release, the name is used later */
+	sprintf(path, "data/tracks/%s.%s", category, TRKEXT);
+	categoryHandle = GfParmReadFile(path, GFPARM_RMODE_STD);
 
 	if (categoryHandle) {
 		name = strdup(GfParmGetStr(categoryHandle, TRK_SECT_HDR, TRK_ATT_NAME, category));
 	} else {
-		GfTrace("File %s has pb\n", buf);
-		return NULL;
+		GfTrace("Could not read file %s\n", path);
+		return 0;
 	}
 
 	GfParmReleaseHandle(categoryHandle);
 	return name;
 }
 
+
+/* Select next/previous track from currently selected track category */
+static void rmtsTrackPrevNext(void *vsel)
+{
+	const unsigned maxPathSize = 256;
+	static char path[maxPathSize];
+
+	/* Get next/previous usable track
+	   Note: Here, we assume there's at least one usable track in current category,
+	         which is guaranteed by CategoryList initialization in RmTrackSelect,
+	         and by rmtsTrackCatPrevNext */
+	tFList *curTr = (tFList*)(CategoryList->userData);
+	do {
+	    
+	    curTr = vsel ? curTr->next : curTr->prev;
+	    
+	    /* Try and get the track display name if not already done */
+	    if (!curTr->dispName) {
+		curTr->dispName = RmGetTrackName(CategoryList->name, curTr->name);
+		if (!curTr->dispName || strlen(curTr->dispName) == 0) {
+		    GfTrace("rmtsTrackPrevNext: No definition for track %s\n", curTr->name);
+		}
+	    }
+	    
+	} while (!curTr->dispName && curTr != (tFList*)(CategoryList->userData));
+	CategoryList->userData = (void*)curTr;
+	
+	/* Update GUI */
+	GfuiLabelSetText(ScrHandle, TrackLabelId, curTr->dispName);
+	GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+	rmtsUpdateTrackInfo();
+}
+
+/* Select next/previous track category */
+static void rmtsTrackCatPrevNext(void *vsel)
+{
+    const unsigned maxPathSize = 256;
+    static char path[maxPathSize];
+
+    /* Get next/previous usable track category
+       Note: Here, we assume there's at least one,
+             which is guaranteed by CategoryList initialization in RmTrackSelect */
+    tFList *curCat = CategoryList;
+    do {
+	
+	/* Next/previous category */
+	curCat = vsel ? curCat->next : curCat->prev;
+	
+	/* Try and get the category display name if not already done */
+	if (curCat->userData && !curCat->dispName) {
+	    curCat->dispName = RmGetCategoryName(curCat->name);
+	    if (!curCat->dispName || strlen(curCat->dispName) == 0) {
+		GfTrace("rmtsTrackCatPrevNext: No definition for track category %s\n", curCat->name);
+	    }
+	}
+	
+	/* If the category is loadable and not empty : */
+	if (curCat->dispName && curCat->userData) {
+	    
+	    /* Select the first usable track in the category */
+	    tFList *curTr = (tFList*)(curCat->userData);
+	    do {
+	
+		/* Try and get the track display name if not already done */
+		if (!curTr->dispName) {
+		    curTr->dispName = RmGetTrackName(curCat->name, curTr->name);
+		    if (!curTr->dispName || strlen(curTr->dispName) == 0) {
+			GfTrace("rmtsTrackCatPrevNext: No definition for track %s\n", curTr->name);
+		    }
+		}
+
+		/* That's all if the track is usable*/
+		if (curTr->dispName)
+		    break;
+	
+		/* Next track */
+		curTr = curTr->next;
+	
+	    } while (curTr != (tFList*)(curCat->userData));
+	    curCat->userData = (void*)curTr;
+	}
+
+    } while ((!curCat->dispName || !curCat->userData || !((tFList*)(curCat->userData))->dispName) 
+	     && curCat != CategoryList);
+    CategoryList = curCat;
+    
+    /* Update GUI */
+    GfuiLabelSetText(ScrHandle, CatLabelId, CategoryList->dispName);
+    GfuiLabelSetText(ScrHandle, TrackLabelId, ((tFList*)curCat->userData)->dispName);
+    GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+    rmtsUpdateTrackInfo();
+}
+
+
+void rmtsSelect(void * /* dummy */)
+{
+	static char path[256];
+	int curTrkIdx;
+
+	curTrkIdx = (int)GfParmGetNum(TrackSelect->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
+	sprintf(path, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
+	GfParmSetStr(TrackSelect->param, path, RM_ATTR_CATEGORY, CategoryList->name);
+	GfParmSetStr(TrackSelect->param, path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
+
+	rmtsDeactivate(TrackSelect->nextScreen);
+}
+
+
+static void rmtsAddKeys(void)
+{
+	GfuiAddKey(ScrHandle, 13, "Select Track", NULL, rmtsSelect, NULL);
+	GfuiAddKey(ScrHandle, 27, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
+	GfuiAddSKey(ScrHandle, GLUT_KEY_LEFT, "Previous Track", (void*)0, rmtsTrackPrevNext, NULL);
+	GfuiAddSKey(ScrHandle, GLUT_KEY_RIGHT, "Next Track", (void*)1, rmtsTrackPrevNext, NULL);
+	GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddSKey(ScrHandle, GLUT_KEY_UP, "Previous Track Category", (void*)0, rmtsTrackCatPrevNext, NULL);
+	GfuiAddSKey(ScrHandle, GLUT_KEY_DOWN, "Next Track Category", (void*)1, rmtsTrackCatPrevNext, NULL);
+}
 
 
 /** Interactive track selection
@@ -238,216 +317,345 @@ RmGetCategoryName(const char *category)
 void
 RmTrackSelect(void *vs)
 {
+	const unsigned maxPathSize = 256;
+	static char path[maxPathSize];
+
 	const char *defaultTrack;
 	const char *defaultCategory;
-	tFList *CatCur;
-	tFList *TrList, *TrCur;
+	tFList *curCat;
+	tFList *trList, *curTr;
 	int Xpos, Ypos, DX, DY;
 	int curTrkIdx;
 
-	ts = (tRmTrackSelect*)vs;
+	TrackSelect = (tRmTrackSelect*)vs;
 
-	/* Get the list of categories directories */
+	/* Get default category and track for the current race type */
+	curTrkIdx = (int)GfParmGetNum(TrackSelect->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
+	sprintf(path, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
+	defaultCategory = GfParmGetStr(TrackSelect->param, path, RM_ATTR_CATEGORY, 0);
+	defaultTrack = GfParmGetStr(TrackSelect->param, path, RM_ATTR_NAME, 0);
+
+	/* Get the list of track category directories */
 	CategoryList = GfDirGetList("tracks");
-	if (CategoryList == NULL) {
+	if (!CategoryList) {
 		GfTrace("RmTrackSelect: No track category available\n");
 		return;
 	}
 
-	CatCur = CategoryList;
+	/* For each track category directory, get the track sub-dirs in it 
+	   Note: We avoid loading every category and track XML file now, 
+	         for a faster screen display ; these files are loaded only when needed 
+		 (on the fly), only once, here and in rmtsTrackPrevNext and rmtsTrackPrevNext */
+	curCat = CategoryList;
 	do {
-		CatCur->dispName = RmGetCategoryName(CatCur->name);
-		if (!CatCur->dispName || strlen(CatCur->dispName) == 0) {
-			GfTrace("RmTrackSelect: No definition for track category %s\n", CatCur->name);
-			return;
-		}
-
-		/* get the tracks in the category directory */
-		sprintf(buf, "tracks/%s", CatCur->name);
-		TrList = GfDirGetList(buf);
-		if (TrList == NULL) {
-			GfTrace("RmTrackSelect: No track for category %s available\n", CatCur->name);
-			return;
-		}
-		TrList = TrList->next; /* get the first one */
-		CatCur->userData = (void*)TrList;
-		TrCur = TrList;
+	    
+	    /* Initialize the display name to 0, as a category "not yet loaded" indicator */
+	    curCat->dispName = 0;
+	    
+	    /* Get the tracks in the category directory */
+	    sprintf(path, "tracks/%s", curCat->name);
+	    trList = GfDirGetList(path);
+	    
+	    /* Attach the track dir list to the category if not empty */
+	    if (!trList) {
+		GfTrace("RmTrackSelect: No track available in dir tracks/%s\n", curCat->name);
+	    } else {
+		//trList = trList->next; /* get the first one */
+		
+		/* For each track dir in the category dir */
+		curTr = trList;
 		do {
-			TrCur->dispName = RmGetTrackName(CatCur->name, TrCur->name);
-			if (!TrCur || strlen(TrCur->dispName) == 0) {
-				GfTrace("RmTrackSelect: No definition for track %s\n", TrCur->name);
-				return;
+		    
+		    /* Initialize the display name to 0, as a track "not yet loaded" indicator */
+		    curTr->dispName = 0;
+		    
+		    /* Next track dir*/
+		    curTr = curTr->next;
+		    
+		  } while (curTr != trList);
+	    }
+
+	    curCat->userData = (void*)trList;
+	    
+	    /* Next category dir */
+	    curCat = curCat->next;
+
+	} while (curCat != CategoryList);
+
+	/* Initialize currently selected category and track from default ones, if any */
+	if (defaultCategory) {
+
+	    /* For each track category directory : */
+	    curCat = CategoryList;
+	    
+	    do {
+
+		/* If current category is not empty and is the default one, */
+		if (curCat->userData && !strcmp(curCat->name, defaultCategory)) {
+		    
+		    /* Try and get the category display name, and exit loop if it failed */
+		    curCat->dispName = RmGetCategoryName(curCat->name);
+		    if (!curCat->dispName || strlen(curCat->dispName) == 0) {
+			GfTrace("RmTrackSelect: No definition for default track category %s\n", 
+				curCat->name);
+			break;
+		    }
+		    
+		    /* Now, we have the currently selected category */
+		    CategoryList = curCat;
+		    
+		    /* Initialize currently selected track from default one, if any */
+		    if (defaultTrack) {
+			
+			/* For each track dir in the category dir */
+			curTr = (tFList*)(curCat->userData);
+			do {
+			    
+			    /* If current track is the default one, */
+			    if (!strcmp(curTr->name, defaultTrack)) {
+				
+				/* Try and get the track display name */
+				curTr->dispName = RmGetTrackName(curCat->name, curTr->name);
+				if (!curTr->dispName || strlen(curTr->dispName) == 0)
+				    GfTrace("RmTrackSelect: No definition for default track %s\n",
+					    curTr->name);
+				
+				/* Now, we have the default selected track 
+				   in the default selected category ; but beware,
+				   it may be not usable : dispName may be 0 */
+				curCat->userData = (void*)curTr;
+				break;
+			    }
+			    
+			    /* Next track dir*/
+			    curTr = curTr->next;
+			    
+			} while (curTr != trList);
+		    }
+		    
+		    /* Nothing more to do, whatever happened */
+		    break;
+		}
+		
+		/* Next category dir */
+		curCat = curCat->next;
+		
+	    } while (curCat != CategoryList);
+	}
+
+	/* If we don't have yet a usable currently selected category (empty dir or unreadable XML
+	   or empty name), or a usable currently selected track (unreadable XML or empty name),
+	   try and get the first usable category and track going ahead */
+	if (!CategoryList->userData || !((tFList*)(CategoryList->userData))->dispName) {
+	    
+	    /* For each track category directory : */
+	    curCat = CategoryList;
+
+	    do {
+		
+		/* Try and get the category display name if not already done */
+		if (curCat->userData && !curCat->dispName) {
+		    curCat->dispName = RmGetCategoryName(curCat->name);
+		    if (!curCat->dispName || strlen(curCat->dispName) == 0) {
+			GfTrace("RmTrackSelect: No definition for track category %s\n", curCat->name);
+		    }
+		}
+		    
+		/* If current category is usable, and has a usable track inside,
+		   select them and exit loop */
+		if (curCat->userData && curCat->dispName && strlen(curCat->dispName) > 0) {
+
+		    /* Select the category */
+		    CategoryList = curCat;
+
+		    /* For each track  directory : */
+		    curTr = (tFList*)(CategoryList->userData);
+		    do {
+		
+			/* Try and load the track file if we don't have yet the track disp name */
+			if (!curTr->dispName) {
+			    curTr->dispName = RmGetTrackName(curCat->name, curTr->name);
+			    if (!curTr->dispName || strlen(curTr->dispName) == 0)
+				GfTrace("RmTrackSelect: No definition for track %s\n", curTr->name);
 			}
-			TrCur = TrCur->next;
-		} while (TrCur != TrList);
+			if (curTr->dispName && strlen(curTr->dispName) > 0)
+			    break;
+		
+			curTr = curTr->next;
+		
+		    } while (curTr != (tFList*)(curCat->userData));
 
-		CatCur = CatCur->next;
-	} while (CatCur != CategoryList);
+		    /* Select the track */
+		    CategoryList->userData = (void*)curTr;
 
-	curTrkIdx = (int)GfParmGetNum(ts->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
-	sprintf(path, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-	defaultCategory = GfParmGetStr(ts->param, path, RM_ATTR_CATEGORY, CategoryList->name);
-	/* XXX coherency check */
-	defaultTrack = GfParmGetStr(ts->param, path, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
-
-	CatCur = CategoryList;
-	do {
-	if (strcmp(CatCur->name, defaultCategory) == 0) {
-		CategoryList = CatCur;
-		TrCur = (tFList*)(CatCur->userData);
-		do {
-		if (strcmp(TrCur->name, defaultTrack) == 0) {
-			CatCur->userData = (void*)TrCur;
+		    /* If a track was really selected, exit loop */
+		    if (((tFList*)(CategoryList->userData))->dispName)
 			break;
 		}
-		TrCur = TrCur->next;
-		} while (TrCur != TrList);
-		break;
+		
+		/* Next category dir */
+		curCat = curCat->next;
+		
+	    } while (curCat != CategoryList);
 	}
-	CatCur = CatCur->next;
-	} while (CatCur != CategoryList);
 
-	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmtsActivate, NULL, (tfuiCallback)NULL, 1);
-	GfuiScreenAddBgImg(scrHandle, "data/img/splash-qrtrk.png");
+	/* If no usable category/track found, ... return */
+	if (!CategoryList->userData || !((tFList*)(CategoryList->userData))->dispName) {
+	    
+	    GfError("RmTrackSelect: No available track for any category\n");
+	    return; // or exit(1) abruptly ?
+	}
+
+	GfOut("Cat=%s, Track=%s\n", CategoryList->dispName, ((tFList*)(CategoryList->userData))->dispName);
+
+	/* Create the screen, set background image, title and keyboard shortcuts */
+	ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmtsActivate, 
+				       NULL, (tfuiCallback)NULL, 1);
+	GfuiScreenAddBgImg(ScrHandle, "data/img/splash-qrtrk.png");
+
+	GfuiTitleCreate(ScrHandle, "Select Track", 0);
 
 	rmtsAddKeys();
 
-	GfuiTitleCreate(scrHandle, "Select Track", 0);
-
-	GfuiGrButtonCreate(scrHandle,
+	/* Create category and track selection combo-boxes 
+	   (initialized to currently selected category and track) */
+	GfuiGrButtonCreate(ScrHandle,
 			"data/img/arrow-left.png",
 			"data/img/arrow-left.png",
 			"data/img/arrow-left.png",
 			"data/img/arrow-left-pushed.png",
 			80, 400, GFUI_ALIGN_HC_VB, 0,
-			(void*)0, rmCatPrevNext,
+			(void*)0, rmtsTrackCatPrevNext,
 			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-
-	CatLabelId = GfuiLabelCreate(scrHandle,
+	CatLabelId = GfuiLabelCreate(ScrHandle,
 				CategoryList->dispName,
 				GFUI_FONT_LARGE_C,
 				320, 400, GFUI_ALIGN_HC_VB,
 				30);
 
-	GfuiGrButtonCreate(scrHandle,
+	GfuiGrButtonCreate(ScrHandle,
 			"data/img/arrow-right.png",
 			"data/img/arrow-right.png",
 			"data/img/arrow-right.png",
 			"data/img/arrow-right-pushed.png",
 			540, 400, GFUI_ALIGN_HC_VB, 0,
-			(void*)1, rmCatPrevNext,
+			(void*)1, rmtsTrackCatPrevNext,
 			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-	GfuiGrButtonCreate(scrHandle,
+	GfuiGrButtonCreate(ScrHandle,
 			"data/img/arrow-left.png",
 			"data/img/arrow-left.png",
 			"data/img/arrow-left.png",
 			"data/img/arrow-left-pushed.png",
 			80, 370, GFUI_ALIGN_HC_VB, 0,
-			(void*)0, rmtsPrevNext,
+			(void*)0, rmtsTrackPrevNext,
 			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-
-	TrackLabelId = GfuiLabelCreate(scrHandle,
+	TrackLabelId = GfuiLabelCreate(ScrHandle,
 				((tFList*)CategoryList->userData)->dispName,
 				GFUI_FONT_LARGE_C,
 				320, 370, GFUI_ALIGN_HC_VB,
 				30);
 
-	GfuiGrButtonCreate(scrHandle,
+	GfuiGrButtonCreate(ScrHandle,
 			"data/img/arrow-right.png",
 			"data/img/arrow-right.png",
 			"data/img/arrow-right.png",
 			"data/img/arrow-right-pushed.png",
 			540, 370, GFUI_ALIGN_HC_VB, 0,
-			(void*)1, rmtsPrevNext,
+			(void*)1, rmtsTrackPrevNext,
 			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-	MapId = GfuiStaticImageCreate(scrHandle,
-				320, 100, 260, 195,
-				rmGetMapName());
+	/* Create static preview/map for currently selected track */
+	MapId = GfuiStaticImageCreate(ScrHandle,
+				      320, 100, 260, 195,
+				      rmtsGetMapName(path, maxPathSize));
 
-	GfuiButtonCreate(scrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-			NULL, rmtsSelect, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	GfuiButtonCreate(ScrHandle, "Accept", GFUI_FONT_LARGE, 
+			 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+			 NULL, rmtsSelect, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-	GfuiButtonCreate(scrHandle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-			ts->prevScreen, rmtsDeactivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	GfuiButtonCreate(ScrHandle, "Back", GFUI_FONT_LARGE, 
+			 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+			 TrackSelect->prevScreen, rmtsDeactivate, NULL, 
+			 (tfuiCallback)NULL, (tfuiCallback)NULL);
 
+	/* Create and initialize info labels for currently selected track */
 	Xpos = 20;
 	Ypos = 320;
 	DX = 110;
 	DY = 30;
 
-	GfuiLabelCreate(scrHandle,
+	GfuiLabelCreate(ScrHandle,
 			"Description:",
 			GFUI_FONT_MEDIUM,
 			Xpos, Ypos,
 			GFUI_ALIGN_HL_VB, 0);
 
-	DescId =  GfuiLabelCreate(scrHandle,
-				"",
-				GFUI_FONT_MEDIUM_C,
-				Xpos + DX, Ypos,
-				GFUI_ALIGN_HL_VB, 50);
+	DescId =  GfuiLabelCreate(ScrHandle,
+				  "",
+				  GFUI_FONT_MEDIUM_C,
+				  Xpos + DX, Ypos,
+				  GFUI_ALIGN_HL_VB, 50);
 
 	Ypos -= DY;
 
-	GfuiLabelCreate(scrHandle,
+	GfuiLabelCreate(ScrHandle,
 			"Author:",
 			GFUI_FONT_MEDIUM,
 			Xpos, Ypos,
 			GFUI_ALIGN_HL_VB, 0);
 
-	AuthorId = GfuiLabelCreate(scrHandle,
-				"",
-				GFUI_FONT_MEDIUM_C,
-				Xpos + DX, Ypos,
-				GFUI_ALIGN_HL_VB, 20);
+	AuthorId = GfuiLabelCreate(ScrHandle,
+				   "",
+				   GFUI_FONT_MEDIUM_C,
+				   Xpos + DX, Ypos,
+				   GFUI_ALIGN_HL_VB, 20);
 
 	Ypos -= DY;
 
-	GfuiLabelCreate(scrHandle,
+	GfuiLabelCreate(ScrHandle,
 			"Length:",
 			GFUI_FONT_MEDIUM,
 			Xpos, Ypos,
 			GFUI_ALIGN_HL_VB, 0);
 
-	LengthId = GfuiLabelCreate(scrHandle,
-				"",
-				GFUI_FONT_MEDIUM_C,
-				Xpos + DX, Ypos,
-				GFUI_ALIGN_HL_VB, 20);
+	LengthId = GfuiLabelCreate(ScrHandle,
+				   "",
+				   GFUI_FONT_MEDIUM_C,
+				   Xpos + DX, Ypos,
+				   GFUI_ALIGN_HL_VB, 20);
 
 	Ypos -= DY;
 
-	GfuiLabelCreate(scrHandle,
+	GfuiLabelCreate(ScrHandle,
 			"Width:",
 			GFUI_FONT_MEDIUM,
 			Xpos, Ypos,
 			GFUI_ALIGN_HL_VB, 0);
 
-	WidthId = GfuiLabelCreate(scrHandle,
-				"",
-				GFUI_FONT_MEDIUM_C,
-				Xpos + DX, Ypos,
-				GFUI_ALIGN_HL_VB, 20);
+	WidthId = GfuiLabelCreate(ScrHandle,
+				  "",
+				  GFUI_FONT_MEDIUM_C,
+				  Xpos + DX, Ypos,
+				  GFUI_ALIGN_HL_VB, 20);
 
 	Ypos -= DY;
 
-	GfuiLabelCreate(scrHandle,
+	GfuiLabelCreate(ScrHandle,
 			"Pits:",
 			GFUI_FONT_MEDIUM,
 			Xpos, Ypos,
 			GFUI_ALIGN_HL_VB, 0);
 
-	PitsId = GfuiLabelCreate(scrHandle,
-				"",
-				GFUI_FONT_MEDIUM_C,
-				Xpos + DX, Ypos,
-				GFUI_ALIGN_HL_VB, 20);
+	PitsId = GfuiLabelCreate(ScrHandle,
+				 "",
+				 GFUI_FONT_MEDIUM_C,
+				 Xpos + DX, Ypos,
+				 GFUI_ALIGN_HL_VB, 20);
 
-	rmUpdateTrackInfo();
+	rmtsUpdateTrackInfo();
 
-	GfuiScreenActivate(scrHandle);
+	GfuiScreenActivate(ScrHandle);
 }
