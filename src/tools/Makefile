@@ -17,7 +17,7 @@
 
 
 
-SUBDIRS		= $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
+SUBDIRS		= $(shell find * -maxdepth 0 -type d -print | grep -v .svn | grep -v blender)
 
 TOOLSUBDIRS	= $(SUBDIRS)
 
