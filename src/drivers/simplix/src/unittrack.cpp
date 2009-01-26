@@ -479,16 +479,11 @@ void TTrackDescription::InitTrack
 	        WCurb = MIN(WCurb, 0.15);            // use 15 cm only
 
 		  // Don't go too far up raised curbs
-		  if (slope > 0.151)                     // If more
+		  if (slope > 0.15)                      // If more
 		    WCurb = 0;                           //   keep off
-		  else if (slope > 0.121)                // Use 15 cm 
-		    WCurb = MIN(WCurb, 0.15);            //   
-		  else if (slope > 0.101)                // Use 30 cm 
-		    WCurb = MIN(WCurb, 0.30);            //   
-		  else if (slope > 0.051)                // Use 60 cm 
-		    WCurb = MIN(WCurb, 0.60);            //   
-		  else if (slope > 0.021)                // Use 120 cm 
-		    WCurb = MIN(WCurb, 1.20);            //   
+          else                                   // less slope
+            WCurb = MIN(WCurb,3.0/slope);        // more width used
+
 		}
 	    else if (PSide->style == TR_CURB)        // On curbs without height
 		{

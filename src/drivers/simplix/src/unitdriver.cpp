@@ -277,7 +277,7 @@ TDriver::TDriver(int Index):
   oSkill(0.0),
   oSkillDriver(0.0),
   oSkillGlobal(0.0),
-  oSkillScale(14.0),
+  oSkillScale(1.0),
   oSkillOffset(0.0),
   oDriverAggression(0.0),
   oSkillAdjustTimer(0.0),
@@ -789,9 +789,9 @@ void TDriver::InitTrack
   }
   else
   {
-    oSkillOffset = MAX(0.0,MIN(1000.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, oSkillOffset)));
+    oSkillOffset = MAX(0.0,MIN(1.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, oSkillOffset)));
     GfOut("#SkillOffset: %g\n", oSkillOffset);
-    oSkillScale = MAX(0.0,MIN(1000.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, oSkillScale)));
+    oSkillScale = MAX(0.0,MIN(2.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, oSkillScale)));
     GfOut("#SkillScale: %g\n", oSkillScale);
 
     oLookAhead = oLookAhead / (1+oSkillGlobal/24);
@@ -990,11 +990,14 @@ void TDriver::Drive()
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;        // Only small lights on
   else
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD1;        // Only big lights on
-//    oCar->ctrl.lightCmd =                      // All front lights on
-//	    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+  oCar->ctrl.lightCmd =                          // All front lights on
+    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 */
+  oCar->ctrl.lightCmd =                          // All front lights on
+    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;             // All rear lights on
+
   if (!Qualification)                            // Don't use pit while
-    oStrategy->CheckPitState(0.6f);               //  qualification
+    oStrategy->CheckPitState(0.6f);              //  qualification
 }
 //==========================================================================*
 
