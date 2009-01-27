@@ -96,9 +96,9 @@ grInitCommonState(void)
 
 
 static ssgTransform *
-initWheel(tCarElt *car, int wheel_index)
+initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 {
-	int		i, j, k;
+	int	i, j, k;
 	float	alpha;
 	sgVec3	vtx;
 	sgVec4	clr;
@@ -106,33 +106,32 @@ initWheel(tCarElt *car, int wheel_index)
 	sgVec2	tex;
 	float	b_offset = 0;
 	tdble	curAngle = 0.0;
-	const char *wheel_obj;
 
-#define BRK_BRANCH	16
-#define BRK_ANGLE	(2.0 * M_PI / (tdble)BRK_BRANCH)
-#define BRK_OFFSET	0.1
+	static const unsigned brakeBranch = 16;
+	static const tdble brakeAngle = 2.0 * M_PI / (tdble)brakeBranch;
+	static const tdble brakeOffset = 0.1;
 
 	switch(wheel_index) {
 		case FRNT_RGT:
-			curAngle = -(M_PI / 2.0 + BRK_ANGLE);
-			b_offset = BRK_OFFSET - car->_tireWidth(wheel_index) / 2.0;
+			curAngle = -(M_PI / 2.0 + brakeAngle);
+			b_offset = brakeOffset - car->_tireWidth(wheel_index) / 2.0;
 			break;
 		case FRNT_LFT:
-			curAngle = -(M_PI / 2.0 + BRK_ANGLE);
-			b_offset = car->_tireWidth(wheel_index) / 2.0 - BRK_OFFSET;
+			curAngle = -(M_PI / 2.0 + brakeAngle);
+			b_offset = car->_tireWidth(wheel_index) / 2.0 - brakeOffset;
 			break;
 		case REAR_RGT:
-			curAngle = (M_PI / 2.0 - BRK_ANGLE);
-			b_offset = BRK_OFFSET - car->_tireWidth(wheel_index) / 2.0;
+			curAngle = (M_PI / 2.0 - brakeAngle);
+			b_offset = brakeOffset - car->_tireWidth(wheel_index) / 2.0;
 			break;
 		case REAR_LFT:
-			curAngle = (M_PI / 2.0 - BRK_ANGLE);
-			b_offset = car->_tireWidth(wheel_index) / 2.0 - BRK_OFFSET;
+			curAngle = (M_PI / 2.0 - brakeAngle);
+			b_offset = car->_tireWidth(wheel_index) / 2.0 - brakeOffset;
 			break;
 	}
 
 	/* hub */
-	ssgVertexArray	*brk_vtx = new ssgVertexArray(BRK_BRANCH + 1);
+	ssgVertexArray	*brk_vtx = new ssgVertexArray(brakeBranch + 1);
 	ssgColourArray	*brk_clr = new ssgColourArray(1);
 	ssgNormalArray	*brk_nrm = new ssgNormalArray(1);
 	tdble hubRadius;
@@ -143,8 +142,8 @@ initWheel(tCarElt *car, int wheel_index)
 	brk_vtx->add(vtx);
 	
 	hubRadius = car->_brakeDiskRadius(wheel_index) * 0.6;
-	for (i = 0; i < BRK_BRANCH; i++) {
-		alpha = (float)i * 2.0 * M_PI / (float)(BRK_BRANCH - 1);
+	for (i = 0; i < brakeBranch; i++) {
+		alpha = (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
 		vtx[0] = hubRadius * cos(alpha);
 		vtx[1] = b_offset;
 		vtx[2] = hubRadius * sin(alpha);
@@ -179,12 +178,12 @@ initWheel(tCarElt *car, int wheel_index)
 	wheel->addKid(brk);
 
 	/* Brake disk */
-	brk_vtx = new ssgVertexArray(BRK_BRANCH + 4);
+	brk_vtx = new ssgVertexArray(brakeBranch + 4);
 	brk_clr = new ssgColourArray(1);
 	brk_nrm = new ssgNormalArray(1);
 
-	for (i = 0; i < (BRK_BRANCH / 2 + 2); i++) {
-		alpha = curAngle + (float)i * 2.0 * M_PI / (float)(BRK_BRANCH - 1);
+	for (i = 0; i < (brakeBranch / 2 + 2); i++) {
+		alpha = curAngle + (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
 		vtx[0] = car->_brakeDiskRadius(wheel_index) * cos(alpha);
 		vtx[1] = b_offset;
 		vtx[2] = car->_brakeDiskRadius(wheel_index) * sin(alpha);
@@ -211,12 +210,12 @@ initWheel(tCarElt *car, int wheel_index)
 	wheel->addKid(brk);
 
 	/* Brake caliper */
-	brk_vtx = new ssgVertexArray(BRK_BRANCH - 4);
+	brk_vtx = new ssgVertexArray(brakeBranch - 4);
 	brk_clr = new ssgColourArray(1);
 	brk_nrm = new ssgNormalArray(1);
 
-	for (i = 0; i < (BRK_BRANCH / 2 - 2); i++) {
-		alpha = - curAngle + (float)i * 2.0 * M_PI / (float)(BRK_BRANCH - 1);
+	for (i = 0; i < (brakeBranch / 2 - 2); i++) {
+		alpha = - curAngle + (float)i * 2.0 * M_PI / (float)(brakeBranch - 1);
 		vtx[0] = (car->_brakeDiskRadius(wheel_index) + 0.02) * cos(alpha);
 		vtx[1] = b_offset;
 		vtx[2] = (car->_brakeDiskRadius(wheel_index) + 0.02) * sin(alpha);
@@ -255,96 +254,105 @@ initWheel(tCarElt *car, int wheel_index)
 	whrotation->addKid(whselector);
 	grCarInfo[grCarIndex].wheelselector[wheel_index] = whselector;
 
-	float	wheelRadius = car->_rimRadius(wheel_index) + car->_tireHeight(wheel_index);
+	float wheelRadius = car->_rimRadius(wheel_index) + car->_tireHeight(wheel_index);
+
 
 	// Create wheels for 4 speeds (stillstanding - fast --> motion blur, look at the texture).
-	for (j = 0; j < 4; j++) {
-		ssgBranch	*whl_branch = new ssgBranch;
-		ssgEntity *whl3d;
-
-        // load speed-dependant 3D wheels if available
+	// Note: These hard-coded values should really be read from the car's XML file
         char wheel_file_name[32];
+	for (j = 0; j < 4; j++) {
 
-        // note: again, these hard-coded values should really be read from the car's XML file
-        wheel_obj = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_WHEEL_3D, "wheel");
+	    ssgBranch *whl_branch = new ssgBranch;
+	    
+	    // Load speed-dependant 3D wheel model if available
+	    ssgEntity *whl3d = 0;
+	    if (wheel_mod_name && strlen(wheel_mod_name)) {
+		sprintf(wheel_file_name, "%s%d.acc", wheel_mod_name, j);
+		whl3d = grssgCarLoadAC3D(wheel_file_name, NULL, car->index);
+	    }
 
-        sprintf(wheel_file_name, "%s%d.acc", wheel_obj, j);
-        whl3d = grssgCarLoadAC3D(wheel_file_name, NULL, car->index);
-
-        // if we have a 3D wheel, use it.  otherwise use normal generated wheel...
-        if (whl3d) {
-            // Adapt size of the wheel
-            ssgTransform *whl_size = new ssgTransform;
-            sgMat4 wheelsz;
-
-            sgSetVec4(wheelsz[0], wheelRadius * 2, SG_ZERO, SG_ZERO, SG_ZERO) ;
-            sgSetVec4(wheelsz[1], SG_ZERO, car->_tireWidth(wheel_index), SG_ZERO, SG_ZERO) ;
-            sgSetVec4(wheelsz[2], SG_ZERO, SG_ZERO, wheelRadius * 2, SG_ZERO) ;
-            sgSetVec4(wheelsz[3], SG_ZERO, SG_ZERO, SG_ZERO, SG_ONE) ;
-
-            whl_size->setTransform(wheelsz);
-
-            whl_size->addKid(whl3d);
-            whl3d = whl_size;
-
-            if (wheel_index == FRNT_RGT || wheel_index == REAR_RGT) {
-                // flip wheel around so it faces the right way
-                ssgTransform *whl_mesh_transform = new ssgTransform;
-                sgCoord wheelpos;
-                sgSetCoord(&wheelpos, 0, 0, 0, 180, 0, 0);
-                whl_mesh_transform->setTransform( &wheelpos);
-                whl_mesh_transform->addKid(whl3d);
-                whl_branch->addKid(whl_mesh_transform);
-            } else {
-                whl_branch->addKid(whl3d);
-            }
-        } else {
-            static sgVec2 toffset[4] = { { 0.0, 0.5 }, { 0.5, 0.5 }, { 0.0, 0.0 }, { 0.5, 0.0 } };
-            // TORCS's standard generated wheel
-
-#define WHL_BRANCH	16
-
-		/* Tread */
-		{
-			ssgVertexArray	*whl_vtx = new ssgVertexArray(2 * WHL_BRANCH);
-			ssgColourArray	*whl_clr = new ssgColourArray(2 * WHL_BRANCH);
-			ssgNormalArray	*whl_nrm = new ssgNormalArray(1);
-
-			whl_nrm->add(nrm);
-			clr[3] = 1.0;
-			for (i = 0; i < WHL_BRANCH; i++) {
-				alpha = (float)i * 2.0 * M_PI / (float)(WHL_BRANCH - 1);
-				vtx[0] = wheelRadius * cos(alpha);
-				vtx[2] = wheelRadius * sin(alpha);
-				vtx[1] = - car->_tireWidth(wheel_index) / 2.0;
-				whl_vtx->add(vtx);
-				vtx[1] = car->_tireWidth(wheel_index) / 2.0;
-				whl_vtx->add(vtx);
-				if (i % 2) {
-					clr[0] = clr[1] = clr[2] = 0.15;
-				} else {
-					clr[0] = clr[1] = clr[2] = 0.0;
-				}
-				whl_clr->add(clr);
-				whl_clr->add(clr);
-			}
-			ssgVtxTable *whl = new ssgVtxTable(GL_TRIANGLE_STRIP, whl_vtx, whl_nrm, NULL, whl_clr);
-			whl->setState(commonState);
-			whl->setCullFace(0);
-			whl_branch->addKid(whl);
+	    // If we have a 3D wheel, use it, otherwise use auto- generated wheel...
+	    if (whl3d) {
+		// Adapt size of the wheel
+		ssgTransform *whl_size = new ssgTransform;
+		sgMat4 wheelsz;
+		
+		sgSetVec4(wheelsz[0], wheelRadius * 2, SG_ZERO, SG_ZERO, SG_ZERO) ;
+		sgSetVec4(wheelsz[1], SG_ZERO, car->_tireWidth(wheel_index), SG_ZERO, SG_ZERO) ;
+		sgSetVec4(wheelsz[2], SG_ZERO, SG_ZERO, wheelRadius * 2, SG_ZERO) ;
+		sgSetVec4(wheelsz[3], SG_ZERO, SG_ZERO, SG_ZERO, SG_ONE) ;
+		
+		whl_size->setTransform(wheelsz);
+		
+		whl_size->addKid(whl3d);
+		whl3d = whl_size;
+		
+		if (wheel_index == FRNT_RGT || wheel_index == REAR_RGT) {
+		    // flip wheel around so it faces the right way
+		    ssgTransform *whl_mesh_transform = new ssgTransform;
+		    sgCoord wheelpos;
+		    sgSetCoord(&wheelpos, 0, 0, 0, 180, 0, 0);
+		    whl_mesh_transform->setTransform( &wheelpos);
+		    whl_mesh_transform->addKid(whl3d);
+		    whl_branch->addKid(whl_mesh_transform);
+		} else {
+		    whl_branch->addKid(whl3d);
 		}
 
+	    // If we don't have a 3D wheel, use auto-generated wheel...
+	    } else {
+
+	        static const unsigned wheelBranch = 16;
+		static const sgVec2 toffset[4] = 
+		    { { 0.0, 0.5 }, { 0.5, 0.5 }, { 0.0, 0.0 }, { 0.5, 0.0 } };
+
+		/* Try and load rim texture if not already done */
+		if (!grCarInfo[grCarIndex].wheelTexture) {
+		    char *wheelTexFName = 
+		      GfParmGetStrNC(car->_carHandle, SECT_GROBJECTS, PRM_WHEEL_TEXTURE, "tex-wheel.png");
+		    grCarInfo[grCarIndex].wheelTexture = grSsgLoadTexState(wheelTexFName);
+		    /*if (grCarInfo[grCarIndex].wheelTexture->getRef() > 0)
+		      grCarInfo[grCarIndex].wheelTexture->deRef();*/
+		}
+
+		/* Tread */
+		ssgVertexArray	*whl_vtx = new ssgVertexArray(2 * wheelBranch);
+		ssgColourArray	*whl_clr = new ssgColourArray(2 * wheelBranch);
+		ssgNormalArray	*whl_nrm = new ssgNormalArray(1);
+		
+		whl_nrm->add(nrm);
+		clr[3] = 1.0;
+		for (i = 0; i < wheelBranch; i++) {
+		    alpha = (float)i * 2.0 * M_PI / (float)(wheelBranch - 1);
+		    vtx[0] = wheelRadius * cos(alpha);
+		    vtx[2] = wheelRadius * sin(alpha);
+		    vtx[1] = - car->_tireWidth(wheel_index) / 2.0;
+		    whl_vtx->add(vtx);
+		    vtx[1] = car->_tireWidth(wheel_index) / 2.0;
+		    whl_vtx->add(vtx);
+		    if (i % 2)
+			clr[0] = clr[1] = clr[2] = 0.15;
+		    else
+			clr[0] = clr[1] = clr[2] = 0.0;
+		    whl_clr->add(clr);
+		    whl_clr->add(clr);
+		}
+
+		ssgVtxTable *whl = new ssgVtxTable(GL_TRIANGLE_STRIP, whl_vtx, whl_nrm, NULL, whl_clr);
+		whl->setState(commonState);
+		whl->setCullFace(0);
+		whl_branch->addKid(whl);
 
 		/* Rim */
 		switch(wheel_index) {
-			case FRNT_RGT:
-			case REAR_RGT:
-				b_offset = -0.05;
-				break;
-			case FRNT_LFT:
-			case REAR_LFT:
-				b_offset = 0.05;
-				break;
+		    case FRNT_RGT:
+		    case REAR_RGT:
+			b_offset = -0.05;
+			break;
+		    case FRNT_LFT:
+		    case REAR_LFT:
+			b_offset = 0.05;
+			break;
 		}
 
 		// Make inside rim very dark and take care of normals.
@@ -352,56 +360,56 @@ initWheel(tCarElt *car, int wheel_index)
 		float norm_orig = nrm[1];
 
 		if (nrm[1] > 0.0f) {
-			colorfactor[0] = 0.3f;
-			colorfactor[1] = 1.0f;
-			nrm[1] *= -1.0f;
+		    colorfactor[0] = 0.3f;
+		    colorfactor[1] = 1.0f;
+		    nrm[1] *= -1.0f;
 		} else {
-			colorfactor[0] = 1.0f;
-			colorfactor[1] = 0.3f;
+		    colorfactor[0] = 1.0f;
+		    colorfactor[1] = 0.3f;
 		}
 
 		for (k = 0; k < 2; k++) {
-			ssgVertexArray	*whl_vtx = new ssgVertexArray(WHL_BRANCH + 1);
-			ssgTexCoordArray	*whl_tex = new ssgTexCoordArray(WHL_BRANCH + 1);
-			ssgColourArray	*whl_clr = new ssgColourArray(1);
-			ssgNormalArray	*whl_nrm = new ssgNormalArray(1);
+		    ssgVertexArray	*whl_vtx = new ssgVertexArray(wheelBranch + 1);
+		    ssgTexCoordArray	*whl_tex = new ssgTexCoordArray(wheelBranch + 1);
+		    ssgColourArray	*whl_clr = new ssgColourArray(1);
+		    ssgNormalArray	*whl_nrm = new ssgNormalArray(1);
 
-			clr[0] = 0.8f*colorfactor[k];
-			clr[1] = 0.8f*colorfactor[k];
-			clr[2] = 0.8f*colorfactor[k];
-			clr[3] = 1.0f;
-
-			whl_clr->add(clr);
-			whl_nrm->add(nrm);
-			vtx[0] = vtx[2] = 0.0;
-			vtx[1] = (float)(2 * k - 1) * car->_tireWidth(wheel_index) / 2.0 - b_offset;
+		    clr[0] = 0.8f*colorfactor[k];
+		    clr[1] = 0.8f*colorfactor[k];
+		    clr[2] = 0.8f*colorfactor[k];
+		    clr[3] = 1.0f;
+		    
+		    whl_clr->add(clr);
+		    whl_nrm->add(nrm);
+		    vtx[0] = vtx[2] = 0.0;
+		    vtx[1] = (float)(2 * k - 1) * car->_tireWidth(wheel_index) / 2.0 - b_offset;
+		    whl_vtx->add(vtx);
+		    tex[0] = 0.25 + toffset[j][0];
+		    tex[1] = 0.25 + toffset[j][1];
+		    whl_tex->add(tex);
+		    vtx[1] = (float)(2 * k - 1) * car->_tireWidth(wheel_index) / 2.0;
+		    for (i = 0; i < wheelBranch; i++) {
+			alpha = (float)i * 2.0 * M_PI / (float)(wheelBranch - 1);
+			vtx[0] = wheelRadius * cos(alpha);
+			vtx[2] = wheelRadius * sin(alpha);
 			whl_vtx->add(vtx);
-			tex[0] = 0.25 + toffset[j][0];
-			tex[1] = 0.25 + toffset[j][1];
+			tex[0] = 0.25 + 0.25 * cos(alpha) + toffset[j][0];
+			tex[1] = 0.25 + 0.25 * sin(alpha) + toffset[j][1];
 			whl_tex->add(tex);
-			vtx[1] = (float)(2 * k - 1) * car->_tireWidth(wheel_index) / 2.0;
-			for (i = 0; i < WHL_BRANCH; i++) {
-				alpha = (float)i * 2.0 * M_PI / (float)(WHL_BRANCH - 1);
-				vtx[0] = wheelRadius * cos(alpha);
-				vtx[2] = wheelRadius * sin(alpha);
-				whl_vtx->add(vtx);
-				tex[0] = 0.25 + 0.25 * cos(alpha) + toffset[j][0];
-				tex[1] = 0.25 + 0.25 * sin(alpha) + toffset[j][1];
-				whl_tex->add(tex);
-			}
-			ssgVtxTable *whl = new ssgVtxTable(GL_TRIANGLE_FAN, whl_vtx, whl_nrm, whl_tex, whl_clr);
-			whl->setState(grCarInfo[grCarIndex].wheelTexture);
-			whl->setCullFace(0);
-			whl_branch->addKid(whl);
-
-			// Swap normal for "inside" rim face.
-			nrm[1] *= -1.0;
+		    }
+		    ssgVtxTable *whl = new ssgVtxTable(GL_TRIANGLE_FAN, whl_vtx, whl_nrm, whl_tex, whl_clr);
+		    whl->setState(grCarInfo[grCarIndex].wheelTexture);
+		    whl->setCullFace(0);
+		    whl_branch->addKid(whl);
+		    
+		    // Swap normal for "inside" rim face.
+		    nrm[1] *= -1.0;
 		}
 
 		nrm[1] = norm_orig;
-        }
+	    }
 
-		whselector->addKid(whl_branch);
+	    whselector->addKid(whl_branch);
 	}
 	
 	return wheel;
@@ -593,25 +601,17 @@ grInitCar(tCarElt *car)
 
 	GfOut("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
 
+	/* Set textures search path : 
+	   1) driver level specified, 2) car level specified, 3) common textures */
 	grFilePath = (char*)malloc(4096);
 	lg = 0;
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carName);
-	lg += sprintf(grFilePath + lg, "drivers/%d/%s;", car->_driverIndex, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s;", car->_modName);
-	lg += sprintf(grFilePath + lg, "cars/%s", car->_carName);
+	lg += sprintf(grFilePath + lg, "cars/%s;", car->_carName);
+	lg += sprintf(grFilePath + lg, "data/textures");
 
-	param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEEL_TEXTURE, "");
-	if (strlen(param) != 0) {
-		grGammaValue = 1.8;
-		grMipMap = 0;
-		grCarInfo[index].wheelTexture = grSsgLoadTexState((char *)param);
-		/*if (grCarInfo[index].wheelTexture->getRef() > 0) {
-		grCarInfo[index].wheelTexture->deRef();
-	}*/
-	}
-    
 	grCarInfo[index].envSelector = (ssgStateSelector*)grEnvSelector->clone();
 	grCarInfo[index].envSelector->ref();
 
@@ -635,9 +635,15 @@ grInitCar(tCarElt *car)
 	DBG_SET_NAME(carBody, "LOD", index, 0);
 	LODSel->addKid(carBody);
 
-	/* The car's model is under cars/<model> */
-	//sprintf(buf, "cars/%s", car->_carName);
-	sprintf(buf, "drivers/%s/%s/%d;drivers/%s/%s;drivers/%s/%d;cars/%s", car->_modName, car->_carName, car->_driverIndex, car->_modName, car->_carName, car->_modName, car->_driverIndex, car->_carName);
+	/* Set textures/models search path : 
+	   1) driver level specified, 2) car level specified, 3) common models / textures */
+	sprintf(buf, "drivers/%s/%d/%s;drivers/%s/%d;drivers/%s/%s;drivers/%s;"
+		"cars/%s;data/objects;data/textures", 
+		car->_modName, car->_driverIndex, car->_carName,
+		car->_modName, car->_driverIndex,
+		car->_modName, car->_carName,
+		car->_modName,
+		car->_carName);
 	ssgModelPath(buf);
 	ssgTexturePath(buf);
 	grTexturePath = strdup(buf);
@@ -648,9 +654,9 @@ grInitCar(tCarElt *car)
 	sprintf(path, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
 	param = GfParmGetStr(handle, path, PRM_CAR, buf);
 	grCarInfo[index].LODThreshold[selIndex] = GfParmGetNum(handle, path, PRM_THRESHOLD, NULL, 0.0);
-	/*carEntity = ssgLoad(param);*/
 	carEntity = grssgCarLoadAC3D(param, NULL, index);
 	grCarInfo[index].carEntity = carEntity;
+
 	/* Set a selector on the driver */
 	ssgBranch *b = (ssgBranch *)carEntity->getByName((char*)"DRIVER");
 	grCarInfo[index].driverSelector = new ssgSelector;
@@ -667,11 +673,26 @@ grInitCar(tCarElt *car)
 
 	DBG_SET_NAME(carEntity, "Body", index, -1);
 	carBody->addKid(carEntity);
-	/* add wheels */
+
+	/* add wheels : 3D wheel model is now shipped as wheel<speed-i>.acc files : 
+	   auto-generated one is kept in code , but not used anymore */
+	/*char *wheelTexFName = 
+	    GfParmGetStrNC(handle, SECT_GROBJECTS, PRM_WHEEL_TEXTURE, "tex-wheel.png");
+	    grCarInfo[index].wheelTexture = grSsgLoadTexState(wheelTexFName);*/
+	/*if (grCarInfo[grCarIndex].wheelTexture->getRef() > 0)
+	  grCarInfo[grCarIndex].wheelTexture->deRef();*/
+	grCarInfo[index].wheelTexture = 0;
+	const char *wheel3DModFileNamePrfx = 
+	    GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEEL_3D, "wheel");
+
+	grGammaValue = 1.8;
+	grMipMap = 0;
+
 	for (i = 0; i < 4; i++){
-		wheel[i] = initWheel(car, i);
-		carBody->addKid(wheel[i]);
+	    wheel[i] = initWheel(car, i, wheel3DModFileNamePrfx);
+	    carBody->addKid(wheel[i]);
 	}
+
 	grCarInfo[index].LODSelectMask[0] = 1 << selIndex; /* car mask */
 	selIndex++;
 	grCarInfo[index].sx=carTrackRatioX;
