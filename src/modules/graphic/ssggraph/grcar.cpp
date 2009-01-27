@@ -107,7 +107,7 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 	float	b_offset = 0;
 	tdble	curAngle = 0.0;
 
-	static const unsigned brakeBranch = 16;
+	static const int brakeBranch = 16;
 	static const tdble brakeAngle = 2.0 * M_PI / (tdble)brakeBranch;
 	static const tdble brakeOffset = 0.1;
 
@@ -302,14 +302,14 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 	    // If we don't have a 3D wheel, use auto-generated wheel...
 	    } else {
 
-	        static const unsigned wheelBranch = 16;
+	        static const int wheelBranch = 16;
 		static const sgVec2 toffset[4] = 
 		    { { 0.0, 0.5 }, { 0.5, 0.5 }, { 0.0, 0.0 }, { 0.5, 0.0 } };
 
 		/* Try and load rim texture if not already done */
 		if (!grCarInfo[grCarIndex].wheelTexture) {
-		    char *wheelTexFName = 
-		      GfParmGetStrNC(car->_carHandle, SECT_GROBJECTS, PRM_WHEEL_TEXTURE, "tex-wheel.png");
+		    const char *wheelTexFName = 
+		      GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_WHEEL_TEXTURE, "tex-wheel.png");
 		    grCarInfo[grCarIndex].wheelTexture = grSsgLoadTexState(wheelTexFName);
 		    /*if (grCarInfo[grCarIndex].wheelTexture->getRef() > 0)
 		      grCarInfo[grCarIndex].wheelTexture->deRef();*/
@@ -951,8 +951,6 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 					    grCarInfo[index].DRMThreshold[i] >= car->_steerCmd &&
 					    grCarInfo[index].DRMThreshold[i] <= curSteer))
 					{
-						float fsteer = fabs(car->_steerCmd);
-	
 						curDRM = i;
 						curSteer = grCarInfo[index].DRMThreshold[i];
 					}
