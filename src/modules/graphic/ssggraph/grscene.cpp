@@ -601,7 +601,6 @@ initBackground(void)
     grEnvSelector->selectStep(0); /* mandatory !!! */
     grEnvState=(grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
     grEnvShadowState=(grMultiTexState*)grSsgEnvTexState("envshadow.png");
-    grEnvShadowStateOnCars=(grMultiTexState*)grSsgEnvTexState("shadow2.rgb");
     if (grEnvShadowState==NULL)
       {
 	ulSetError ( UL_WARNING, "grscene:initBackground Failed to open envshadow.png for reading") ;
@@ -612,9 +611,12 @@ initBackground(void)
 	GfScrShutdown();
 	exit(-1);
       }
+    grEnvShadowStateOnCars=(grMultiTexState*)grSsgEnvTexState("shadow2.png");
+    if (grEnvShadowStateOnCars==NULL)
+        grEnvShadowStateOnCars=(grMultiTexState*)grSsgEnvTexState("shadow2.rgb");
     if (grEnvShadowStateOnCars==NULL)
       {
-	ulSetError ( UL_WARNING, "grscene:initBackground Failed to open shadow2.rgb for reading") ;
+	ulSetError ( UL_WARNING, "grscene:initBackground Failed to open shadow2.png/rgb for reading") ;
 	ulSetError ( UL_WARNING, "        no shadow mapping on cars for this track ") ;
       }
 }
