@@ -569,6 +569,22 @@ class AC3DExport: # the ac3d exporter part
 		self.file.write('data %s\n%s\n' % (num, str))
 
 	def texture(self, faces,mesh):
+		uvlayer0=""
+		uvlayer1=""
+		uvlayer2=""
+		uvlayer3=""
+
+		uvlayers = mesh.getUVLayerNames()
+		numlayer = len(uvlayers)
+		if numlayer>0:
+			uvlayer0 = uvlayers[0]
+		if numlayer>1:
+			uvlayer1 = uvlayers[1]
+		if numlayer>2:
+			uvlayer2 = uvlayers[2]
+		if numlayer>3:
+			uvlayer3 = uvlayers[3]
+
 		mmat = mesh.materials;
 		tex = ""
 		for f in faces:
@@ -586,22 +602,35 @@ class AC3DExport: # the ac3d exporter part
 #TODO support multi textures
 #lookup second texture value
 			fmat = mmat[f.mat]
-			shadowtex =""
+			tex1 =""
+			tex2=""
 			mtextures = fmat.getTextures()
 			for mtex in mtextures:
 				if not ( mtex == None ):
-					if mtex.uvlayer=="ShadowUV":
-						simg = mtex.tex.getImage()
-						shadowtex=simg.getFilename()
+					if mtex.uvlayer==uvlayer1:
+						img1 = mtex.tex.getImage()
+						tex1=img1.getFilename()
+						tex1=bsys.basename(tex1)
+					if mtex.uvlayer==uvlayer2:
+						img2 = mtex.tex.getImage()
+						tex2 = img2.getFilename()
+						tex2=bsys.basename(tex2)
+
 			
-			if shadowtex!="":
+			if tex1!="":
 				buf +='texture "'
-				buf +=shadowtex
+				buf +=tex1
 				buf+='" tiled\n'
 			else:
 				buf+='texture empty_texture_no_mapping skids\n'
 
-			buf +='texture empty_texture_no_mapping skids\n'
+			if tex2!="":
+				buf+='texture "'
+				buf+=tex2
+				buf+='" tiled\n'
+			else:
+				buf +='texture empty_texture_no_mapping skids\n'
+
 			buf +='texture empty_texture_no_mapping shad\n'
 
 			xrep = image.xrep
@@ -711,30 +740,90 @@ class AC3DExport: # the ac3d exporter part
 			refstr = "refs %s\n" % refs
 			u, v, vi = 0, 0, 0
 			fvstr = []
+			
+			uvlayer0=""
+			uvlayer1=""
+			uvlayer2=""
+			uvlayer3=""
+
+			uvlayers = mesh.getUVLayerNames()
+			numlayer = len(uvlayers)
+			if numlayer>0:
+				uvlayer0 = uvlayers[0]
+			if numlayer>1:
+				uvlayer1 = uvlayers[1]
+			if numlayer>2:
+				uvlayer2 = uvlayers[2]
+			if numlayer>3:
+				uvlayer3 = uvlayers[3]
+
 			if foomesh:
 				for vert in f.v:
 					fvstr.append(str(vert.index))
 					if hasFaceUV:
-						mesh.activeUVLayer ="ImageUV"
-						u = f.uv[vi][0]
-						v = f.uv[vi][1]
-						mesh.activeUVLayer ="ShadowUV"
-						u2 = f.uv[vi][0]
-						v2 = f.uv[vi][1]
+						if uvlayer0!="":
+							mesh.activeUVLayer = uvlayer0
+							u = f.uv[vi][0]
+							v = f.uv[vi][1]
+
+						if uvlayer1!="":
+							mesh.activeUVLayer =uvlayer1
+							u2 = f.uv[vi][0]
+							v2 = f.uv[vi][1]
+
+						if uvlayer2!="":
+							mesh.activeUVLayer =uvlayer2
+							u3 = f.uv[vi][0]
+							v3 = f.uv[vi][1]
+
+						if uvlayer3!="":
+							mesh.activeUVLayer =uvlayer3
+							u4 = f.uv[vi][0]
+							v4 = f.uv[vi][1]
+
 						vi += 1
-					fvstr.append(" %s %s %s \n" % (u, v, u2, v2))
+						if numlayer==1:
+							fvstr.append(" %s \n" % (u, v))
+						if numlayer==2:
+							fvstr.append(" %s %s %s \n" % (u, v, u2, v2))
+						if numlayer==3:
+							fvstr.append(" %s %s %s %s %s\n" % (u, v, u2, v2, u3, v3))
+						if numlayer==4:
+							fvstr.append(" %s %s %s %s %s %s %s\n" % (u, v, u2, v2, u3, v3, u4, v4))
+
 			else:
 				for vert in f.v:
 					fvstr.append(str(verts.index(vert)))
 					if hasFaceUV:
-						mesh.activeUVLayer ="ImageUV"
-						u = f.uv[vi][0]
-						v = f.uv[vi][1]
-						mesh.activeUVLayer ="ShadowUV"
-						u2 = f.uv[vi][0]
-						v2 = f.uv[vi][1]
+						if uvlayer0!="":
+							mesh.activeUVLayer = uvlayer0
+							u = f.uv[vi][0]
+							v = f.uv[vi][1]
+
+						if uvlayer1!="":
+							mesh.activeUVLayer =uvlayer1
+							u2 = f.uv[vi][0]
+							v2 = f.uv[vi][1]
+
+						if uvlayer2!="":
+							mesh.activeUVLayer =uvlayer2
+							u3 = f.uv[vi][0]
+							v3 = f.uv[vi][1]
+
+						if uvlayer3!="":
+							mesh.activeUVLayer =uvlayer3
+							u4 = f.uv[vi][0]
+							v4 = f.uv[vi][1]
+
 						vi += 1
-					fvstr.append(" %s %s %s %s\n" % (u, v, u2, v2))
+						if numlayer==1:
+							fvstr.append(" %s %s\n" % (u, v))
+						if numlayer==2:
+							fvstr.append(" %s %s %s %s \n" % (u, v, u2, v2))
+						if numlayer==3:
+							fvstr.append(" %s %s %s %s %s %s\n" % (u, v, u2, v2, u3, v3))
+						if numlayer==4:
+							fvstr.append(" %s %s %s %s %s %s %s %s\n" % (u, v, u2, v2, u3, v3, u4, v4))
 
 			fvstr = "".join(fvstr)
 
