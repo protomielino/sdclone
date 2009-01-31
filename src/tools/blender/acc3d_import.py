@@ -85,8 +85,8 @@ from Blender.Mathutils import Vector, Matrix, Euler
 
 # Default folder for AC3D textures, to override wrong paths, change to your
 # liking or leave as "":
-TEXTURES_DIR = ""
-
+TEXTURES_DIR = "c:\\torcs-ng-sdl\\share\\data\\textures\\"
+TEXTURES_DIR2 = "c:\\torcs-ng-sdl\\share\\data\\textures\\"
 tooltips = {
 	'TEXTURES_DIR': 'additional dir to look for missing textures'
 }
@@ -185,6 +185,7 @@ class AC3DImport:
 		self.i = 0
 		errmsg = ''
 		self.importdir = bsys.dirname(filename)
+
 		try:
 			file = open(filename, 'r')
 		except IOError, (errno, strerror):
@@ -672,14 +673,16 @@ class AC3DImport:
 			m.specCol = (mat[4][0], mat[4][1], mat[4][2])
 			m.spec = mat[5]
 			m.alpha = mat[6]
+			#force it to zero because that is how torcs-ng works
+			m.alpha = 0.0
 			if m.alpha < 1.0:
 				m.mode |= MAT_MODE_ZTRANSP
 				has_transp_mats = True
 #			bmat[name]=m
 
-		if has_transp_mats:
-			for mat in bmat:
-				mat.mode |= MAT_MODE_TRANSPSHADOW
+#		if has_transp_mats:
+#			for mat in bmat:
+#				mat.mode |= MAT_MODE_TRANSPSHADOW
 
 		obj_idx = 0 # index of current obj in loop
 		for obj in objlist:
@@ -773,9 +776,11 @@ class AC3DImport:
 							if bsys.exists(objtex) == 1:
 								texfname = objtex
 							else:
-								objtex = bsys.join(TEXTURES_DIR, baseimgname)
+								objtex = bsys.join(TEXTURES_DIR2, baseimgname)
 								if bsys.exists(objtex):
 									texfname = objtex
+								else:
+                                                                        inform("Couldn't find texture in alt path %s" % TEXTURES_DIR2)
 						if texfname:
 							try:
 								img = Image.Load(texfname)
@@ -806,9 +811,12 @@ class AC3DImport:
 							if bsys.exists(objtex) == 1:
 								texfname = objtex2
 							else:
-								objtex2 = bsys.join(TEXTURES_DIR, baseimgname)
+								objtex2 = bsys.join(TEXTURES_DIR2, baseimgname)
 								if bsys.exists(objtex2):
-									texfname = objtex2
+                                                                        texfname = objtex2
+								else:
+                                                                        inform("Couldn't find texture in alt path %s" % objtex2)
+
 						if texfname:
 							try:
 								img2 = Image.Load(texfname)
@@ -841,23 +849,23 @@ class AC3DImport:
 							if iname not in bl_textures.keys():
 								basetex = Texture.New(iname)
 								basetex.setType('Image')
-								map=Texture.MapTo.COL
+								map1=Texture.MapTo.COL|Texture.MapTo.ALPHA
 								basetex.image = img
 								bl_textures[iname] = basetex;
 							
 							basetex = bl_textures[iname]
-							m1.setTexture(0,basetex,Texture.TexCo.UV,map)
+							m1.setTexture(0,basetex,Texture.TexCo.UV,map1)
 						
 						if img2:
 							iname2 = img2.getName()
 							if iname2 not in bl_textures.keys():
 								basetex2 = Texture.New(iname2)
 								basetex2.setType('Image')
-								map=Texture.MapTo.COL
+								map2=Texture.MapTo.COL
 								basetex2.image = img2
 								bl_textures[iname2] = basetex2					
 							basetex2 = bl_textures[iname2]					
-							m1.setTexture(1,basetex2,Texture.TexCo.UV,map)
+							m1.setTexture(1,basetex2,Texture.TexCo.UV,map2)
 										
 						if m1.alpha < 1.0:
 							m1.mode |= MAT_MODE_ZTRANSP
