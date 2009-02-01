@@ -81,7 +81,7 @@ ssgBranch *SkidAnchor = 0;
 ssgBranch *CarlightAnchor = 0;
 
 ssgBranch *ThePits = 0;
-ssgTransform *sun = NULL ;
+ssgTransform *TheSun = NULL ;
 
 static void initBackground(void);
 
@@ -150,13 +150,13 @@ grInitScene(void)
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 
-    if (!sun) {
+    if (!TheSun) {
 	ssgaLensFlare      *sun_obj      = NULL ;
 	sun_obj  = new ssgaLensFlare () ;
-	sun      = new ssgTransform ;
-	sun      -> setTransform    ( light_position ) ;
-	sun      -> addKid          ( sun_obj  ) ;
-	SunAnchor-> addKid(sun) ;
+	TheSun   = new ssgTransform ;
+	TheSun-> setTransform( light_position ) ;
+	TheSun-> addKid( sun_obj  ) ;
+	SunAnchor-> addKid(TheSun) ;
     }
 
     /* GUIONS GL_TRUE */
