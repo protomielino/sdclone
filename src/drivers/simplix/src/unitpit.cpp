@@ -9,8 +9,8 @@
 //
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2008.12.28
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2009.02.01
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*

@@ -7,12 +7,12 @@
 // Pitstop strategy
 // Boxenstop-Strategie
 //
-// Datei    : unitstrategy.cpp
-// Erstellt : 2007.02.20
-// Stand    : 2008.12.28
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 2.00.000
+// File         : unitstrategy.cpp
+// Created      : 2007.02.20
+// Last changed : 2009.02.01
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -415,6 +415,9 @@ void TSimpleStrategy::Update(PtCarElt Car,
 
   oCar = Car;                                    // Save pointer
 
+  if (!oPit->HasPits())
+    return;
+
   RtDistToPit                                    // Get distance to pit
    (Car,oTrack,&DL,&DW);                         
 
@@ -460,6 +463,8 @@ void TSimpleStrategy::Update(PtCarElt Car,
 void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 {
   if (oPit == NULL)                              // No Pit no service 
+    return;
+  if (!oPit->HasPits())
     return;
 
   double TrackPos = RtGetDistFromStart(oCar);    // Distance to pit

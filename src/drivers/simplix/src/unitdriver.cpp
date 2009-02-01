@@ -9,8 +9,8 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2008.12.28
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2009.02.01
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -1189,19 +1189,22 @@ void TDriver::FindRacinglines()
 	}
 
     double MaxPitDist = 0.0;
-    for (int I = 0; I < NBRRL; I++)              // Adjust racinglines
-    {                                            // using car parameters
-	  GfOut("# ... adjust pit path %d ...\n",I);
-      oStrategy->oPit->oPitLane[I].MakePath
-	    (oPitLoad[I],&oRacingLine[I], Param, I);
+	if (oStrategy->oPit->HasPits())
+	{
+      for (int I = 0; I < NBRRL; I++)            // Adjust racinglines
+      {                                          // using car parameters
+	    GfOut("# ... adjust pit path %d ...\n",I);
+        oStrategy->oPit->oPitLane[I].MakePath
+	      (oPitLoad[I],&oRacingLine[I], Param, I);
 
-	  if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
-        MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
+	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
+          MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
+	  }
+	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
 	}
-    //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-    //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-    //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
-    oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
   }
 
   for (int I = 0; I < NBRRL; I++)
@@ -1836,7 +1839,9 @@ void TDriver::GearTronic()
 //--------------------------------------------------------------------------*
 void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 {
-  if (oStrategy->oPit != NULL && !oStrategy->oWasInPit
+  if (oStrategy->oPit != NULL 
+	&& oStrategy->oPit->HasPits()
+	&& !oStrategy->oWasInPit
 	&& oStrategy->GoToPit() && oStrategy->oPit->oPitLane[Path].ContainsPos(Pos))
   {
     //GfOut("#+");
@@ -1847,7 +1852,9 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 	oOmegaBase = Param.Fix.oLength / 2;
 	oGoToPit = true;
   }
-  else if (oStrategy->oPit != NULL && oStrategy->oWasInPit
+  else if (oStrategy->oPit != NULL 
+	&& oStrategy->oPit->HasPits()
+	&& oStrategy->oWasInPit
 	&& oStrategy->oPit->oPitLane[Path].ContainsPos(Pos))
   {
     //GfOut("#-");
