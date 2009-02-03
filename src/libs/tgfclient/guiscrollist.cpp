@@ -473,6 +473,12 @@ GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, v
     return 0;
 }
 
+/** Scroll the list in order to show a given element.
+    @ingroup	gui
+    @param	scr		Current screen
+    @param	Id		Scroll list Id
+    @param	index		Position of the element to show
+ */
 void GfuiScrollListShowElement(void *scr, int Id, int index)
 {
     tGfuiObject		*object;
@@ -488,6 +494,9 @@ void GfuiScrollListShowElement(void *scr, int Id, int index)
 	return;
     }
     scrollist = &(object->u.scrollist);
+    
+    if (scrollist->nbElts <= 0)
+	return;
     
     if (index < 0) {
       index = 0;
