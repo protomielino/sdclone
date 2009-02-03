@@ -32,9 +32,6 @@
 #include <list>
 #include <vector>
 #include <algorithm>
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include <tgfclient.h>
 #include <track.h>
 #include <car.h>
@@ -335,10 +332,10 @@ RmDriversSelect(void *vs)
     GfuiLabelCreate(ScrHandle, "Selected", GFUI_FONT_LARGE, 120, 400, GFUI_ALIGN_HC_VB, 0);
     GfuiLabelCreate(ScrHandle, "Not selected", GFUI_FONT_LARGE, 496, 400, GFUI_ALIGN_HC_VB, 0);
 
-    SelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 20, 80, GFUI_ALIGN_HL_VB,
-					      200, 310, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
-    UnSelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 396, 80, GFUI_ALIGN_HL_VB,
-						200, 250, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
+    SelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 20, 78, GFUI_ALIGN_HL_VB,
+					      200, 312, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
+    UnSelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 396, 78, GFUI_ALIGN_HL_VB,
+						200, 252, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
 
     // Car category and associated "combobox" (left arrow, label, right arrow)
     GfuiLabelCreate(ScrHandle, "Car category:", GFUI_FONT_MEDIUM, 260, y+4, GFUI_ALIGN_HL_VB, 0);
@@ -590,4 +587,7 @@ rmdsFilterDrvScrollList(const char* carCat, const char* drvTyp)
 		GfuiScrollListInsertElement(ScrHandle, UnSelectedScrollList, curDrv->name, NbTotDrivers, (void*)curDrv);
 	} while ((curDrv = GF_TAILQ_NEXT(curDrv, link)));
     }
+
+    // Show first element if any
+    GfuiScrollListShowElement(ScrHandle, UnSelectedScrollList, 0);
 }
