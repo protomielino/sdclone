@@ -980,13 +980,13 @@ TorcsDriverMenuInit(void *prevMenu)
 	GF_TAILQ_INIT(&CatsInfoList);
     }
     
+    /* Save previous screen handle for exit time */ 
+    PrevScrHandle = prevMenu;
+
     /* Screen already created : nothing more to do */
     if (ScrHandle) {
 	return ScrHandle;
     }
-
-    /* Save previous screen handle for exit time */ 
-    PrevScrHandle = prevMenu;
 
     /* Create the screen */
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
