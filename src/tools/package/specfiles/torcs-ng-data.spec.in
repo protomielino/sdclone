@@ -1,7 +1,7 @@
 Summary: The Open Racing Car Simulator Next Generation - DATA
 Name: TORCS-NG-data
 Version: @VERSION@
-Release: 1
+Release: mkrel2
 Epoch: 1
 Source: torcs-ng-%{version}-data.tgz
 Group: Amusements/Games
