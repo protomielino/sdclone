@@ -1111,7 +1111,7 @@ ssgEntity *grssgCarLoadAC3D ( const char *fname, const ssgLoaderOptions* options
   t_xmin=+999999.0;
   t_ymin=+999999.0;
 
-  GfOut("CarLoadAC3D loading %s\n", fname);
+  GfOut("Loading %s\n", fname);
 
   ssgEntity *obj = myssgLoadAC ( fname, options ) ;
   
@@ -1145,7 +1145,7 @@ ssgEntity *grssgLoadAC3D ( const char *fname, const ssgLoaderOptions* options )
   t_xmin=+999999.0;
   t_ymin=+999999.0;
 
-  GfOut("LoadAC3D loading %s\n", fname);
+  GfOut("Loading %s\n", fname);
 
   ssgEntity *obj = myssgLoadAC ( fname, options ) ;
 
