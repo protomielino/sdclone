@@ -347,6 +347,7 @@ private:
     bool oTreatTeamMateAsLapper;
 	bool oTeamEnabled;
 	int oCarsPerPit;                             // Pit sharing
+	float oBumpMode;                             //
 
 	static int NBBOTS;                           // Nbr of cars
     static double CurrSimTime;                   // Current simulation time

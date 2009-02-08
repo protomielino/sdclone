@@ -10,7 +10,7 @@
 //
 // File         : unittrack.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.01.17
+// Last changed : 2009.02.08
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
@@ -411,11 +411,11 @@ void TTrackDescription::InitTrack
 	else                                         // increase counter
       N++;                                       //   on straights
 
-	if (N > 10)                                  // After 10 sections
+	if (N > 10)                                  // After 10 sections 
 	  LastSegType = LastSeg->type;               //   reset
 
     Seg = oSections[I].Seg;                      // Get torcs segment
-	//if (strncmp(Seg->name,"180",3) == 0)
+	//if (strncmp(Seg->name,"60",2) == 0)
 	//  GfOut("%s\n",Seg->name);
 
 	double DistFromStart =                       // Distance from start
@@ -497,10 +497,6 @@ void TTrackDescription::InitTrack
 		  {
 		    WCurb = MIN(WCurb,1.5);              // Keep two wheels on track
 		    Done = true;
-		  }
-		  else
-		  {
-		    W = 0;
 		  }
 		}
 		else if (PSide->style == TR_PLAN)        // On plan

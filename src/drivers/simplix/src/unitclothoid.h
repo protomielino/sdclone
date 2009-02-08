@@ -7,8 +7,8 @@
 //
 // Datei    : unitclothoid.h
 // Erstellt : 2007.11.17
-// Stand    : 2008.12.19
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2009.02.08
+// Copyright: © 2007-2009 Wolf-Dieter Beelitz
 // eMail    : wdb@wdbee.de
 // Version  : 2.00.000
 //--------------------------------------------------------------------------*
@@ -106,7 +106,7 @@ class TClothoidLane : public TLane
 	   /* const TParam& Param, */
 	   const TOptions& Opts);
 
-	bool SaveToFile(const char* Filename);       // Save to file
+    bool SaveToFile(const char* Filename);       // Save to file
     void SavePointsToFile(const char* TrackLoad);
     bool LoadPointsFromFile(const char* TrackLoad);
 

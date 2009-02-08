@@ -9,8 +9,8 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2008.12.21
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2009.02.08
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -115,10 +115,11 @@ void TClothoidLane::MakeSmoothPath(
 	//GfOut("Step: %d\n",Step);
  	for (int I = 0; I < L; I++)
 	{
-	  OptimisePath(Step, Delta, 0 /*, Opts.Smooth*/);
+	  OptimisePath(Step, Delta, 0);
 	}
     Step >>= 1;
   }
+
   if (Opts.BumpMod)
   {
     //GfOut("AnalyseBumps:\n");
@@ -132,7 +133,7 @@ void TClothoidLane::MakeSmoothPath(
 	  //GfOut("Step: %d\n",Step);
   	  for (int I = 0; I < L; I++)
 	  {
-		OptimisePath(Step, Delta, Opts.BumpMod /*, Opts.Smooth*/);
+		OptimisePath(Step, Delta, Opts.BumpMod);
 	    CalcCurvaturesZ();
 		CalcFwdAbsCrv(FwdRange);
 		CalcMaxSpeeds(Step);

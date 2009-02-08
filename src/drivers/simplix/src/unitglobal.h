@@ -375,10 +375,14 @@ enum
 #define PRV_PIT_BRAKE_DIST   "pit brake dist"
 #define PRV_PIT_TEST_STOP    "pit test stop" 
 
+#define PRV_BUMP_MODE        "bump mode"          // bump detection model
+
+#define PRV_SCALE__BRAKE     "scale_brake"        // Scale brake force
 #define PRV_SCALE_BRAKE      "scale brake"        // Scale brake force
 #define PRV_SCALE_BUMP       "scale bump"         // Scale bump detection inside
 #define PRV_SCALE_BUMPOUTER  "scale bump outer"   // Scale bump detection outside
-#define PRV_SCALE_MU         "scale mu"           // Scale friction calculation 
+#define PRV_SCALE_MU         "scale_mu"           // Scale friction calculation 
+#define PRV_SCALE__MU        "scale mu"           // Scale friction calculation 
 #define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation 
 #define PRV_SCALE_BRAKING	 "scale braking"      // Scale brake calculation 
 
