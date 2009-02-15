@@ -48,10 +48,10 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../export/include;../../../../3rdParty/include;../../..;&quot;C:\Programme\Microsoft Platform SDK for Windows Server 2003 R2\Include&quot;"
+				AdditionalIncludeDirectories="../../../export/include;../../../../3rdParty/include;../../windows/include;../../.."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE;DEBUG;DEBUG_OUT"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				PrecompiledHeaderFile=".\Debug/simplix.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
@@ -78,8 +78,8 @@
 				OutputFile=".\Debug/simplix.dll"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="../../../export/libd;../../../../3rdParty/lib;&quot;C:\Programme\Microsoft Platform SDK for Windows Server 2003 R2\Lib&quot;"
-				IgnoreDefaultLibraryNames="LIBC;LIBCD"
+				AdditionalLibraryDirectories="../../../export/libd;../../../../3rdParty/lib;../../windows/lib"
+				IgnoreDefaultLibraryNames="LIBCD;LIBCMTD"
 				ModuleDefinitionFile=".\simplix.def"
 				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Debug/simplix.pdb"
@@ -151,10 +151,10 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				InlineFunctionExpansion="2"
-				AdditionalIncludeDirectories="&quot;C:\Programme\Microsoft Platform SDK for Windows Server 2003 R2\Include&quot;;../../../../3rdParty/include;../../../export/include;../../.."
+				AdditionalIncludeDirectories="../../../export/include;../../../../3rdParty\include;../../windows/include;../../.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;_CRT_SECURE_NO_DEPRECATE"
 				StringPooling="true"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="true"
 				PrecompiledHeaderFile=".\Release/simplix.pch"
 				AssemblerListingLocation=".\Release/"
@@ -177,12 +177,12 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib User32.lib"
 				OutputFile=".\Release/simplix.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;C:\Programme\Microsoft Platform SDK for Windows Server 2003 R2\Lib&quot;;../../../export/lib;../../../../3rdParty/lib"
-				IgnoreDefaultLibraryNames="LIBC"
+				AdditionalLibraryDirectories="../../../export/lib;../../../../3rdParty\lib;../../windows/lib"
+				IgnoreDefaultLibraryNames="LIBC;LIBCMT"
 				ModuleDefinitionFile=".\simplix.def"
 				ProgramDatabaseFile=".\Release/simplix.pdb"
 				GenerateMapFile="true"
@@ -890,3 +890,4 @@
 	<Globals>
 	</Globals>
 </VisualStudioProject>
+
