@@ -2,15 +2,17 @@
 // unitclothoid.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Lane clothoide like
 // Fahrspur clothoidenähnlich
 //
-// Datei    : unitclothoid.h
-// Erstellt : 2007.11.17
-// Last changed : 2009.02.08
-// Copyright: © 2007-2009 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 2.00.000
+// File         : unitclothoid.h
+// Created      : 2007.11.17
+// Last changed : 2009.02.14
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -73,6 +75,13 @@ class TClothoidLane : public TLane
 	  FLAG_FLYING = 0x01
 	};
 
+	enum
+	{
+	  ltFree = 0x00,
+	  ltLeft = 0x01,
+	  ltRight = 0x02
+	};
+
 	struct TOptions
 	{
 	  double BumpMod;
@@ -111,6 +120,8 @@ class TClothoidLane : public TLane
     bool LoadPointsFromFile(const char* TrackLoad);
 
   private:
+	int LaneType;
+
 	void AnalyseBumps
 	  (bool DumpInfo = false);
     void Adjust

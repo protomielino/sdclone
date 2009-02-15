@@ -9,7 +9,7 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.08
+// Last changed : 2009.02.13
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -91,6 +91,14 @@ void TClothoidLane::MakeSmoothPath(
   const TOptions& Opts)
 {
   TCarParam& CarParam = Param.oCarParam;
+
+  if (Opts.MaxR < FLT_MAX)
+    LaneType = ltLeft;
+  else if (Opts.MaxL < FLT_MAX)
+    LaneType = ltRight;
+  else
+    LaneType = ltFree;
+
   if (Opts.Side)
   {
     //GfOut("Switch to CarParam2\n");
@@ -103,7 +111,7 @@ void TClothoidLane::MakeSmoothPath(
   CalcFwdAbsCrv(FwdRange);
 
   const int Delta = 25;
-  const int L = 8;
+  int L = 8;
 
   int Step = 1;                                  // Initialize step width
   while (Step * 16 < Count)                      // Find largest step width
@@ -128,6 +136,7 @@ void TClothoidLane::MakeSmoothPath(
 
 	Step = 1;
 	Step <<= ANALYSE_STEPS;
+
 	while (Step > 0)
 	{
 	  //GfOut("Step: %d\n",Step);
@@ -151,6 +160,7 @@ void TClothoidLane::MakeSmoothPath(
 	PropagateBreaking(Step);
 	PropagateAcceleration(Step);
   }
+
 }
 //==========================================================================*
 
@@ -237,8 +247,13 @@ void TClothoidLane::AnalyseBumps(bool DumpInfo)
 	  double OldPz = Pz;
 
 	  double V = (oPathPoints[J].AccSpd + oPathPoints[K].AccSpd) * 0.5;
+	  if (V < 1.00)
+		V = 1.0;
 	  double S = TUtils::VecLenXY(oPathPoints[J].Point - oPathPoints[K].Point);
 	  double Dt = S / V;
+
+	  if (Dt > 1.00)
+		Dt = 1.00;
 
 	  Pz = oPathPoints[J].Point.z;
 	  Sz += Vz * Dt - 0.5 * G * Dt * Dt;
@@ -335,17 +350,43 @@ void TClothoidLane::SetOffset
   double BorderInner = oFixCarParam.oBorderInner + MAX(0.0,MIN(oFixCarParam.oMaxBorderInner, oFixCarParam.oBorderScale * fabs(Crv) - 1));
   double BorderOuter = oFixCarParam.oBorderOuter;
 
-  if (Crv >= 0)
+  if (Crv >= 0) // turn to left
   {
-	WL += BorderInner;
-	T = MAX(T,WL);
- 	T = MIN(T,WR - P->BufR - BorderOuter);
+    if (LaneType == ltLeft)
+	{
+	  T = MAX(T,WL);
+ 	  T = MIN(T,WR);
+	}
+	else if (LaneType == ltRight)
+	{
+	  T = MAX(T,WL);
+ 	  T = MIN(T,WR - P->BufR - BorderOuter);
+	}
+	else
+	{
+	  WL += BorderInner;
+	  T = MAX(T,WL);
+ 	  T = MIN(T,WR - P->BufR - BorderOuter);
+	}
   }
-  else
+  else // turn to right
   {
-	WR -= BorderInner;
-	T = MIN(T,WR);
-	T = MAX(T,WL + P->BufL + BorderOuter);
+    if (LaneType == ltLeft)
+	{
+	  T = MIN(T,WR);
+	  T = MAX(T,WL + P->BufL + BorderOuter);
+	}
+	else if (LaneType == ltRight)
+	{
+	  T = MIN(T,WR);
+	  T = MAX(T,WL);
+	}
+	else
+	{
+  	  WR -= BorderInner;
+	  T = MIN(T,WR);
+	  T = MAX(T,WL + P->BufL + BorderOuter);
+	}
   }
 
   if (!(P->Fix))

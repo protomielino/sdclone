@@ -363,6 +363,9 @@ void TLane::CalcMaxSpeeds
 	  oTrack->Friction(P),
   	  TrackRollAngle);
 
+	if (Speed < 5)
+		Speed = 5.0;
+
 	oPathPoints[P].MaxSpeed = Speed;
 	oPathPoints[P].Speed = Speed;
 	oPathPoints[P].AccSpd = Speed;

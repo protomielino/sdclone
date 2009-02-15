@@ -7,12 +7,12 @@
 // Constant parameters of the car and calculations with it
 // Unveränderliche Parameter des Fahrzeugs und Nebenrechnungen
 //
-// Datei    : unitfixcarparam.cpp
-// Erstellt : 2007.11.25
-// Stand    : 2008.12.19
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 2.00.000
+// File         : unitfixcarparam.cpp
+// Created      : 2007.11.25
+// Last changed : 2009.02.14
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -346,8 +346,6 @@ double TFixCarParam::CalcMaxSpeed
 
   double Cos = cos(TrackRollAngle);
   double Sin = sin(TrackRollAngle);
-  //Cos *= Cos;
-  //Sin *= Sin;
 
   double AbsCrv0 = MAX(0.001, fabs(Crv0));
   double AbsCrv1 = MAX(0.001, fabs(Crv1));

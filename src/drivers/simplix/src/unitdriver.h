@@ -162,6 +162,7 @@ class TDriver
 private:
 	void AvoidOtherCars                          // Avoiding
 	  (double K, bool& IsClose, bool& IsLapper);
+    bool EcoShift();                             // Reduce fuel consumption
     void EvaluateCollisionFlags(                 // Check flags
       int I, 
       TCollision::TCollInfo& Coll,
@@ -278,7 +279,8 @@ private:
     double oDistFromStart;                       // Position along Track
     double oShift[MAX_GEARS];                    // Shift levels
     double oShiftMargin;                         // Shift back margin
-	PSituation oSituation;                       // TORCS data fpr situation
+    int oShiftCounter;                           // Shift timer
+    PSituation oSituation;                       // TORCS data fpr situation
 	double oStartDistance;                       // max Dist. raced while starting
 	double oStartRPM;
     int oStuckCounter;                           // Tick counter

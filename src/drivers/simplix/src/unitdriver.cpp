@@ -9,8 +9,8 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.01
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2009.02.14
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitzf
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -1118,6 +1118,8 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
   {
@@ -1142,7 +1144,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1159,7 +1161,7 @@ void TDriver::FindRacinglines()
 	  MIN(0.97,Param.oCarParam.oScaleMu);        //   to be able to avoid
 	Param.oCarParam2.oScaleBrake =               // Adjust brake scale
 	  MIN(0.95,Param.oCarParam.oScaleBrake);     //   to be able to avoid
-
+	
     if (!oRacingLine[oRL_LEFT].LoadSmoothPath    // Load a smooth path
 	  (oTrackLoadLeft,
 	  &oTrackDesc, Param,                        // as avoid to left racingline
@@ -1170,7 +1172,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1179,9 +1181,9 @@ void TDriver::FindRacinglines()
     Param.oCarParam2.oScaleBumpRight =           // Reset outer bump scale
 	  Param.oCarParam.oScaleBump;                //   to keep speed
 
-    if (!oRacingLine[oRL_RIGHT].LoadSmoothPath   // Load a smooth path
+	if (!oRacingLine[oRL_RIGHT].LoadSmoothPath   // Load a smooth path
 	  (oTrackLoadRight,
-	  &oTrackDesc, Param,                        // as avoid to left racingline
+	  &oTrackDesc, Param,                        // as avoid to right racingline
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true)))
 	{
       GfOut("# ... make avoid path right ...\n");
@@ -1189,7 +1191,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1205,9 +1207,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
 	}
   }
@@ -1550,7 +1552,7 @@ void TDriver::StartAutomatic()
 	return;
   }
 
-  if (CarGearCmd == 1)
+  if ((CarGearCmd == 1) && (TDriver::CurrSimTime < 20))
   {
 	if (CarRpm < oStartRPM) 
 	  oClutch += oClutchDelta;
@@ -1685,7 +1687,10 @@ void TDriver::InitAdaptiveShiftLevels()
   for (I = 0; I < MAX_GEARS; I++)
   {
     oShift[I] = 2000.0;
-    oGearEff[I] = 0.95;
+    if (TDriver::UseBrakeLimit)
+	  oGearEff[I] = 0.95;
+	else
+	  oGearEff[I] = 0.95;
   }
 
   for (I = 0; I < IMax; I++)
@@ -1749,7 +1754,10 @@ void TDriver::InitAdaptiveShiftLevels()
 
   int J;
   for (J = 0; J < CarGearNbr; J++)
-    oShift[J] = RevsLimiter * 0.974;
+    if (TDriver::UseBrakeLimit)
+      oShift[J] = RevsLimiter * 0.90; //0.87;
+	else
+      oShift[J] = RevsLimiter * 0.974;
 
   for (J = 1; J < oLastGear; J++)
   {
@@ -1805,6 +1813,29 @@ void TDriver::InitAdaptiveShiftLevels()
 //==========================================================================*
 
 //==========================================================================*
+// EcoShift to reduce fuel consuption
+//--------------------------------------------------------------------------*
+bool TDriver::EcoShift()
+{
+  bool ShiftUp = false;
+
+  if (CarRpm > NextRpm)
+  {
+    oShiftCounter++;
+	if (oShiftCounter > 100)
+	{
+      oShiftCounter = 0;
+      ShiftUp = true;
+	}
+  }
+  else
+    oShiftCounter = 0;
+
+  return ShiftUp;
+}
+//==========================================================================*
+
+//==========================================================================*
 // S²GCuASL ;D
 // = Simplified sequential gear controller using adaptive shift levels
 //--------------------------------------------------------------------------*
@@ -1817,7 +1848,7 @@ void TDriver::GearTronic()
   else
   {
     if((UsedGear < oLastGear)
-	  && (GearRatio() * CarSpeedLong / oWheelRadius > NextRpm))
+	  && (EcoShift() || (GearRatio() * CarSpeedLong / oWheelRadius > NextRpm)))
 	{
       oUnstucking = false;
       TreadClutch;
@@ -2655,8 +2686,11 @@ double TDriver::FilterTCL(double Accel)
 
   double Slip = Spin * Wr - CarSpeedLong;        // Calculate slip
   if (Slip > oTclSlip)                           // Decrease accel if needed
+  {
+	float MinAccel = 0.2 * Accel;
 	Accel -= MIN(Accel, (Slip - oTclSlip)/oTclRange);
-
+	Accel = MAX(MinAccel,Accel);
+  }
   return Accel;
 }
 //==========================================================================*
