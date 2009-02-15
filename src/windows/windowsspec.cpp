@@ -666,6 +666,35 @@ windowsTimeClock(void)
     return( D );
 }
 
+static void
+windowsSetAffinity(void)
+{
+    /* Restrict Torcs-NG executable to one CPU core/processor
+       This avoids jerky rendering, especially under Vista.                                                 */
+	
+#ifndef ULONG_PTR
+    typedef unsigned long ULONG_PTR;
+#endif
+
+#ifndef PDWORD_PTR
+#ifndef DWORD_PTR
+    typedef ULONG_PTR DWORD_PTR;
+#endif
+    typedef DWORD_PTR *PDWORD_PTR;
+#endif
+
+    HANDLE hProcess = GetCurrentProcess();
+    ULONG_PTR ProcAM, SysAM;
+
+    GetProcessAffinityMask( hProcess, (PDWORD_PTR) &ProcAM, (PDWORD_PTR) &SysAM );
+    if (ProcAM > 1)
+    {
+	ProcAM = 1;
+	SetProcessAffinityMask( hProcess, ProcAM );
+    }
+    return;
+}
+
 
 /*
 * Function
@@ -697,5 +726,5 @@ WindowsSpecInit(void)
     GfOs.dirGetListFiltered = windowsDirGetListFiltered;
     GfOs.timeClock = windowsTimeClock;
 
-
+    windowsSetAffinity();
 }
