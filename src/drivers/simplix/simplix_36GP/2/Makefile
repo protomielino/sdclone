@@ -2,8 +2,8 @@
 #
 #    file                 : Makefile
 #    created              : 05 Dez 2008
-#    last changed         : 14 Dez 2008
-#    copyright            : (C) 2008 Wolf-Dieter Beelitz
+#    last changed         : 16 Feb 2009
+#    copyright            : (C) 2008-2009 Wolf-Dieter Beelitz
 #
 ##############################################################################
 #
@@ -16,7 +16,7 @@
 
 ROBOT       = simplix_36GP
 SHIPDIR     = drivers/${ROBOT}/2
-SHIP        = 36GP-autounion.png
+SHIP        = 36GP-mercedes.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
