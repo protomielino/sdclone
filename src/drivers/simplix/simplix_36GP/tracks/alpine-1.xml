@@ -12,6 +12,9 @@
 <!DOCTYPE params SYSTEM "../../../src/libs/tgf/params.dtd">
 <params name="" type="template" mode="mw">
 	<section name="simplix private">
+		<attnum name="offset skill" val="0.4"/>
+		<attnum name="scale skill" val="0.03"/>
+
 		<attnum name="avoid width" min="0.0" max="3.0" val="0.25"/>
 		<attnum name="border outer" min="0.0" max="3.0" val="0.25"/>
 		<attnum name="border inner" min="0.0" max="3.0" val="0.25"/>

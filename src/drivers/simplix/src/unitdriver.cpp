@@ -811,7 +811,10 @@ void TDriver::InitTrack
 		+0.0978 * oSkillGlobal
 		+ oSkillOffset + oSkillDriver;
 	else
-	  oSkill = (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver);
+	{
+	  oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
+	  oSkill = (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + 10 * oSkillOffset;
+	}
 
 	oSkill *= oSkillScale;
 
