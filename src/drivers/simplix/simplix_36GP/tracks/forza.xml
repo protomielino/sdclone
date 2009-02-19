@@ -13,7 +13,7 @@
 <params name="" type="template" mode="mw">
 	<section name="simplix private">
 		<attnum name="offset skill" val="0.0"/>
-		<attnum name="scale skill" val="0.20"/>
+		<attnum name="scale skill" val="0.040"/>
 
 		<attnum name="border inner" min="0.0" max="3.0" val="0.0"/>
 		<attnum name="border outer" min="0.0" max="3.0" val="1.5"/>
