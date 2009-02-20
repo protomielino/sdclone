@@ -41,7 +41,7 @@
 #include <cstring>
 #include <math.h>
 #include <osspec.h>
-#include <modinfo.h>
+#include "modinfo.h"
 
 
 /* typedef double tdble; */
