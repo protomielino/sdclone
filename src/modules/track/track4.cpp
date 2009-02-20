@@ -1523,7 +1523,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    i++;
 	}
 	pits->nPitSeg = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nMaxPits));
-	GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
+	//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
 
 	for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
 	    curSeg2 = NULL;
