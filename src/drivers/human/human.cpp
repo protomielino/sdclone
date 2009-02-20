@@ -111,7 +111,6 @@ BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
 static void
 shutdown(int index)
 {
-	//static int	firstTime = 1;
 	int		idx = index - 1;
 
 	free (VecNames[idx]);
@@ -121,7 +120,6 @@ shutdown(int index)
 	HCtx[idx] = 0;
 
 	if (firstTime) {
-		//GfParmReleaseHandle(DrvInfo);
 		GfParmReleaseHandle(PrefHdle);
 		GfctrlJoyRelease(joyInfo);
 		GfctrlMouseRelease(mouseInfo);
@@ -159,9 +157,8 @@ InitFuncPt(int index, void *pt)
 		masterPlayer = index;
 	}
 
-	if (firstTime < 1) {
+	if (!firstTime) {
 		firstTime = 1;
-		//DrvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 		joyInfo = GfctrlJoyInit();
 		if (joyInfo) {
 			joyPresent = 1;
