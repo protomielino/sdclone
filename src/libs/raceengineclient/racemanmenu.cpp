@@ -2,7 +2,7 @@
 
     file        : racemanmenu.cpp
     created     : Fri Jan  3 22:24:41 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: racemanmenu.cpp,v 1.5 2004/08/11 17:44:06 torcs Exp $                                  
 
@@ -273,9 +273,9 @@ ReRacemanMenu(void)
 			 "Configure Race", "Configure The Race",
 			 NULL, reConfigureMenu);
 
-/*     GfuiMenuButtonCreate(racemanMenuHdle, */
-/* 			 "Configure Players", "Players configuration menu", */
-/* 			 TorcsDriverMenuInit(racemanMenuHdle), GfuiScreenActivate); */
+     GfuiMenuButtonCreate(racemanMenuHdle,
+			  "Configure Players", "Players configuration menu",
+			  TorcsDriverMenuInit(racemanMenuHdle), GfuiScreenActivate);
 
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
 	GfuiMenuButtonCreate(racemanMenuHdle, 
