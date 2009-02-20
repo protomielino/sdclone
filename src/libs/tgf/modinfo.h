@@ -52,7 +52,6 @@ typedef struct ModWelcomeIn {
     unsigned int         itfVerMajor;   /**< Major version of the module interface scheme */
     unsigned int         itfVerMinor;   /**< Minor version of the module interface scheme */
     const char		*name;		/**< name = identifier of the module */
-    const char		*loadPath;	/**< path of the dir from which the so/dll was loaded */
 } tModWelcomeIn;
 
 /** Welcome information that a module gives back at load time */

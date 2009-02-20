@@ -24,8 +24,8 @@
 
 #include <cstring>
 
-#include <modinfo.h>
-#include <tgf.h> // To get malloc/calloc/free replacements under Windows
+#include "modinfo.h"
+#include "tgf.h" // To get malloc/calloc/free replacements under Windows
 
 
 #ifdef WIN32
@@ -184,7 +184,6 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 	welcomeIn.itfVerMajor = 1;
 	welcomeIn.itfVerMinor = 0;
 	welcomeIn.name = soName;
-	welcomeIn.loadPath = soDir;
 
 	/* Prepare a place for the module-given information */
 	tModWelcomeOut welcomeOut;
