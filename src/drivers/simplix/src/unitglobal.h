@@ -382,8 +382,8 @@ enum
 #define PRV_SCALE_BRAKE      "scale brake"        // Scale brake force
 #define PRV_SCALE_BUMP       "scale bump"         // Scale bump detection inside
 #define PRV_SCALE_BUMPOUTER  "scale bump outer"   // Scale bump detection outside
-#define PRV_SCALE_MU         "scale_mu"           // Scale friction calculation 
-#define PRV_SCALE__MU        "scale mu"           // Scale friction calculation 
+#define PRV_SCALE_MU         "scale mu"           // Scale friction calculation 
+#define PRV_SCALE__MU        "scale_mu"           // Scale friction calculation 
 #define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation 
 #define PRV_SCALE_BRAKING	 "scale braking"      // Scale brake calculation 
 
