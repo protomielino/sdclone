@@ -238,7 +238,11 @@ enum
 // ... my own planet
 
 // pit states ...
+#ifdef _USE_RTTEAMMANAGER_
+#define PIT_IS_FREE NULL
+#else
 #define PIT_IS_FREE (-1)
+#endif
 // ... pit states
 
 // Shortcuts for TORCS commands ...

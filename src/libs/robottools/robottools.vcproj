@@ -4,6 +4,7 @@
 	Version="8,00"
 	Name="robottools"
 	ProjectGUID="{65130FEC-5171-4924-B6AE-0456FB4029A1}"
+	RootNamespace="robottools"
 	>
 	<Platforms>
 		<Platform
@@ -235,6 +236,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\rtteammanager.cpp"
+				>
+			</File>
+			<File
 				RelativePath="rttelem.cpp"
 				>
 				<FileConfiguration
@@ -285,6 +290,10 @@
 			>
 			<File
 				RelativePath="robottools.h"
+				>
+			</File>
+			<File
+				RelativePath=".\teammanager.h"
 				>
 			</File>
 		</Filter>

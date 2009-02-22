@@ -132,13 +132,19 @@ TOpponent::TInfo& TOpponent::Info()
 //--------------------------------------------------------------------------*
 void TOpponent::Update(
   const PCarElt MyCar,
+#ifdef _USE_RTTEAMMANAGER_
+#else
   PTeamManager TeamManager,
+#endif
   double MyDirX,
   double MyDirY,
   float &MinDistBack,
   double &MinTimeSlot)
 {
+#ifdef _USE_RTTEAMMANAGER_
+#else
   oTeamManager = TeamManager;                    // Save Pointer
+#endif
 
   if((CarState & RM_CAR_STATE_NO_SIMU) &&        // omit cars out of race
     (CarState & RM_CAR_STATE_PIT) == 0 )         //   if not in pit
@@ -317,7 +323,11 @@ bool TOpponent::Classify(
     DistAhead = MIN(MAX(50, DistAhead), 100);    // view to min 50 max 100 m
 
   // Teammate?
+#ifdef _USE_RTTEAMMANAGER_
+  if (RtIsTeamMate(MyCar,oCar))                  // If Opp. is teammate
+#else
   if (oTeamManager->IsTeamMate(MyCar,oCar))      // If Opp. is teammate
+#endif
   {
     oInfo.Flags |= F_TEAMMATE;                   // Set teammate flag
     oInfo.TeamMateDamage = oCar->_dammage;       // Save his damages

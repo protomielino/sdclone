@@ -10,7 +10,7 @@
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
 // Last changed : 2009.02.14
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitzf
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -1052,6 +1052,7 @@ void TDriver::EndRace()
 //--------------------------------------------------------------------------*
 void TDriver::Shutdown()
 {
+	RtFreeGlobalTeamManager();
 }
 //==========================================================================*
 
@@ -1111,7 +1112,11 @@ void TDriver::FindRacinglines()
   if(oCommonData->Track != oTrackDesc.Track())   // New track?
   {
     oCommonData->Track = oTrackDesc.Track();     // Save pointer
+#ifdef _USE_RTTEAMMANAGER_
+//    oCommonData->TeamManager->Clear();           // release old informations
+#else
     oCommonData->TeamManager.Clear();            // release old informations
+#endif
   }
 
   GfOut("# ... load smooth path ...\n");
@@ -1232,7 +1237,11 @@ void TDriver::FindRacinglines()
 //--------------------------------------------------------------------------*
 void TDriver::TeamInfo()
 {
+#ifdef _USE_RTTEAMMANAGER_
+  oTeam = RtTeamManagerAdd(oCommonData->TeamManager,oCar);
+#else
   oTeam = oCommonData->TeamManager.Add(oCar);
+#endif
   //GfOut("#\n\n# Team: %s\n\n\n",oTeam->TeamName);
 }
 //==========================================================================*
@@ -1312,7 +1321,10 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   for (int I = 0; I < oNbrCars; I++)
   {
 	oOpponents[I].Update(oCar,
+#ifdef _USE_RTTEAMMANAGER_
+#else
 	  &oCommonData->TeamManager, 
+#endif
 	  MyDomX, MyDomY, MinDistBack, MinTimeSlot);
   }
 

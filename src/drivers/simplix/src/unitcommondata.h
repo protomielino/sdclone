@@ -60,7 +60,11 @@
 
 #include <track.h>
 #include "unitglobal.h"
+#ifdef _USE_RTTEAMMANAGER_
+#include <teammanager.h>
+#else
 #include "unitteammanager.h"
+#endif
 #include "unitclothoid.h"
 
 //==========================================================================*
@@ -73,7 +77,11 @@ class TCommonData
     ~TCommonData();                              // Destructor
 
   public:
+#ifdef _USE_RTTEAMMANAGER_
+    tTeamManager* TeamManager;                   // Team manager 
+#else
     TTeamManager TeamManager;                    // Team manager 
+#endif
     PTrack Track;                                // TORCS Track data  
 };
 //==========================================================================*

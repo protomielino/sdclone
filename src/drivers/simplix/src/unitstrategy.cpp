@@ -106,9 +106,15 @@ bool TSimpleStrategy::IsPitFree()
 {
   if (CarPit != NULL)
   {
+#ifdef _USE_RTTEAMMANAGER_
+	tTeam* Team = oDriver->GetTeam();
+	if ((CarPit->pitCarIndex == TR_PIT_STATE_FREE)
+      && ((Team->PitState == oCar) || (Team->PitState == PIT_IS_FREE)))
+#else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	if ((CarPit->pitCarIndex == TR_PIT_STATE_FREE)
       && ((Team->PitState == CarDriverIndex) || (Team->PitState == PIT_IS_FREE)))
+#endif
       return true;
   }
   return false;
@@ -161,14 +167,25 @@ bool TSimpleStrategy::NeedPitStop()
 	}
 	else                                         // Ansonsten prüfen, für
 	{                                            //   welche Anzahl von Runden
-	  TTeamManager::TTeam* Team =                //   alle Teammitglieder
-		oDriver->GetTeam();                      //   noch Treibstoff haben
-	                                            
+												 //   alle Teammitglieder
+												 //   noch Treibstoff haben
+#ifdef _USE_RTTEAMMANAGER_
+	tTeam* Team = oDriver->GetTeam();
+#else
+	TTeamManager::TTeam* Team = oDriver->GetTeam();
+#endif
       FuelNeeded = FuelConsum * oTrackLength;    // Treibstoff für eine Runde 
+#ifdef _USE_RTTEAMMANAGER_
+	  int FuelForLaps =                          // Eigene Reichweite
+	    (int) (CarFuel / FuelNeeded - 1);        
+	  RtTeamSetMinLaps(Team,oCar,FuelForLaps);   // Eigene Reichweite melden
+	  int MinLaps = RtTeamGetMinLaps(Team,oCar); // Mindestreichweite der anderen
+#else
 	  int FuelForLaps =                          // Eigene Reichweite
         Team->FuelForLaps[CarDriverIndex] =      
 	    (int) (CarFuel / FuelNeeded - 1);        
 	  int MinLaps = Team->GetMinLaps(oCar);      // Mindestreichweite der anderen
+#endif
 
 	  // Wenn Tanken, dann der, der weniger Runden weit kommen würde
       if (FuelForLaps < MinLaps) 
@@ -194,8 +211,13 @@ bool TSimpleStrategy::NeedPitStop()
 
   if (Result)
   {
+#ifdef _USE_RTTEAMMANAGER_
+	tTeam* Team = oDriver->GetTeam();
+	Team->PitState = oCar;                       // Box reserviert
+#else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	Team->PitState = CarDriverIndex;             // Box reserviert
+#endif
   }
   return Result;
 };
@@ -206,8 +228,13 @@ bool TSimpleStrategy::NeedPitStop()
 //--------------------------------------------------------------------------*
 void TAbstractStrategy::PitRelease()
 {
+#ifdef _USE_RTTEAMMANAGER_
+  tTeam* Team = oDriver->GetTeam();
+  if (Team->PitState == oCar)                    // Box für mich reserviert?
+#else
   TTeamManager::TTeam* Team = oDriver->GetTeam();
   if (Team->PitState == CarDriverIndex)          // Box für mich reserviert?
+#endif
   {
     Team->PitState = PIT_IS_FREE;
     oCar->ctrl.raceCmd = 0;
@@ -447,11 +474,11 @@ void TSimpleStrategy::Update(PtCarElt Car,
     oLastPitFuel = 0.0;                          // Refueled
     oFuelChecked = true;                         // We did the estimation in this lap
 
-    if (!oGoToPit)                               // If decision isn'd made
-  	  oGoToPit = NeedPitStop();                  // Check if we sholud have a pitstop
+    if (!oGoToPit)                               // If decision isn't made
+  	  oGoToPit = NeedPitStop();                  // Check if we should have a pitstop
   }
   else if (DL < 50)                              // I we are out of the window
-  {                                              // to estimate
+  {                                              // to estimate fuel consumption
     oFuelChecked = false;                        // reset flag
   };
 };

@@ -155,7 +155,11 @@ class TDriver
 	  (void* RobotSettings, char* Value);
 	inline void	SetCommonData                    // Set pointer to common data
 	  (TCommonData* CommonData);
+#ifdef _USE_RTTEAMMANAGER_
+	inline tTeam* GetTeam();
+#else
 	inline TTeamManager::TTeam* GetTeam();
+#endif
     inline char* GetBotName();
     inline float CurrSpeed();
 
@@ -216,7 +220,11 @@ private:
 	double oAvoidScale;			                 // scale avoiding 
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
+#ifdef _USE_RTTEAMMANAGER_
+	tTeam* oTeam;
+#else
 	TTeamManager::TTeam* oTeam;                  // Team
+#endif
 
 	int	oDriveTrainType;                         // Drive train type
 	TPidController oPIDCLine;      	             // Controller for line error.
@@ -387,7 +395,11 @@ void TDriver::SetCommonData
 //==========================================================================*
 // Get Team
 //--------------------------------------------------------------------------*
+#ifdef _USE_RTTEAMMANAGER_
+tTeam* TDriver::GetTeam()
+#else
 TTeamManager::TTeam* TDriver::GetTeam()
+#endif
 {
   return oTeam;
 }

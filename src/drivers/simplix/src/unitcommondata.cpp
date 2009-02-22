@@ -66,6 +66,9 @@
 TCommonData::TCommonData():
   Track(NULL)
 {
+#ifdef _USE_RTTEAMMANAGER_
+	TeamManager = RtGetGlobalTeamManager();
+#endif
 }
 //==========================================================================*
 

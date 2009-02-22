@@ -61,7 +61,10 @@
 #include "unitglobal.h"
 #include "unitcommon.h"
 
+#ifdef _USE_RTTEAMMANAGER_
+#else
 #include "unitteammanager.h"
+#endif
 
 //==========================================================================*
 // Class TOpponent
@@ -134,7 +137,10 @@ class TOpponent
 
 	void Update                                  // Update
 	  (const PCarElt MyCar,
+#ifdef _USE_RTTEAMMANAGER_
+#else
 	  PTeamManager TeamManager,
+#endif
       double MyDirX, double MyDirY,
       float &MinDistBack,
       double &MinTimeSlot);
@@ -151,7 +157,10 @@ class TOpponent
 	double oDeltaTime;                           // Simulation delta time
     int oIndex;                                  // Opponents cars index
 	TInfo oInfo;                                 // info of this opponent
+#ifdef _USE_RTTEAMMANAGER_
+#else
     PTeamManager oTeamManager;                   // Teammanager
+#endif
 	double LapBackTimer;
 
 };
