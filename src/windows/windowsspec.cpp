@@ -91,7 +91,6 @@ modLoadSsggraph(const char *soPath, tModList **modlist)
 	welcomeIn.itfVerMajor = 1;
 	welcomeIn.itfVerMinor = 0;
 	welcomeIn.name = soName;
-	welcomeIn.loadPath = soDir;
 	
 	/* 2) Prepare a place for the module-given information */
 	tModWelcomeOut welcomeOut;
