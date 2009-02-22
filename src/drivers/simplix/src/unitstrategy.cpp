@@ -137,7 +137,10 @@ bool TSimpleStrategy::NeedPitStop()
   if (oDriver->oCarsPerPit > 1)                  // Ist pitsharing aktiviert?
   {                                              // Wenn ja,
     if (!IsPitFree())                            //   ist die Box frei?
+	{
+	  GfOut("#IsPitFree = false: %s\n",oDriver->GetBotName());
       return Result;                             //   Wenn nicht, Pech!
+	}
   }
   oRemainingDistance =                           // Restliche Strecke des
     oRaceDistance - DistanceRaced;               //   Rennens ermitteln
@@ -159,7 +162,7 @@ bool TSimpleStrategy::NeedPitStop()
     if (CarFuel < FuelNeeded)                    // Wenn der Tankinhalt nicht
 	{
       Result = true;                             //   reicht, tanken
-	  GfOut("#Pitstop by fuel\n");
+	  GfOut("#Pitstop by fuel: %s\n",oDriver->GetBotName());
 	}
     else if (oDriver->oCarsPerPit == 1)
     {
@@ -188,7 +191,7 @@ bool TSimpleStrategy::NeedPitStop()
 #endif
 
 	  // Wenn Tanken, dann der, der weniger Runden weit kommen würde
-      if (FuelForLaps < MinLaps) 
+      if (FuelForLaps <= MinLaps) 
       {                                      
         if ((MinLaps < oMinLaps)
 		&& (RemainingLaps > FuelForLaps))
@@ -197,7 +200,7 @@ bool TSimpleStrategy::NeedPitStop()
           if (CarFuel < FuelNeeded)              // Wenn der Tankinhalt nicht
 	      {                                      // reicht, tanken
             Result = true;
-			GfOut("#Pitstop by Teammate\n");
+			GfOut("#Pitstop by Teammate: %s (%d:%d)\n",oDriver->GetBotName(),FuelForLaps,MinLaps);
 	      }
         }
 	  }

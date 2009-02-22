@@ -406,17 +406,46 @@ void TDriver::InitTrack
   char* PathFilename = PathFilenameBuffer;
 
   // Check pitsharing (enabled/disabled)
-//  snprintf(PathFilenameBuffer, BUFLEN,
-//	  "%sconfig/raceman/endrace.xml",GetDataDir());
+#define _TEST_LOCAL_FILES_
+#undef _TEST_LOCAL_FILES_ // Comment this line out to test it
+#ifdef _TEST_LOCAL_FILES_
+/* THIS DOESN'T WORK WITH TORCS AT THE MOMENT >>> */
+  GfOut("#GetLocalDir(): %s\n",GetLocalDir());
   snprintf(PathFilenameBuffer, BUFLEN,
-	  "config/raceman/endrace.xml");
-  GfOut("\n\n\n#config: %s \n\n\n",PathFilenameBuffer);
+    "%sconfig/raceman/endrace.xml",GetLocalDir());
   void* ConfigHandle = GfParmReadFile
 	(PathFilename, GFPARM_RMODE_REREAD);
+
+  if (!ConfigHandle)
+  {
+    GfOut("#GetDataDir(): %s\n",GetDataDir());
+    snprintf(PathFilenameBuffer, BUFLEN,
+      "%sconfig/raceman/endrace.xml",GetDataDir());
+    ConfigHandle = GfParmReadFile
+	  (PathFilename, GFPARM_RMODE_REREAD);
+  }
+  GfOut("\n\n\n#config: %s\n",PathFilenameBuffer);
+/* THIS DOESN'T WORK WITH TORCS AT THE MOMENT <<< */
+#else
+/* This works, but this way we can't use the local data files in .torcs-ng/config !!! >>> */
+  GfOut("#GetDataDir(): %s\n",GetDataDir());
+  snprintf(PathFilenameBuffer, BUFLEN,
+    "config/raceman/endrace.xml");
+  void* ConfigHandle = GfParmReadFile
+    (PathFilename, GFPARM_RMODE_REREAD);
+/* This works, but this way we cant use the local data files in .torcs-ng/config !!! <<< */
+#endif
+
   if (ConfigHandle)
   {
     oCarsPerPit = (int) MAX(1,MIN(4,GfParmGetNum(ConfigHandle,
 	  "Race", "cars per pit", (char *) NULL, (float) 1)));
+    GfOut("#Cars per pit: %d \n\n\n",oCarsPerPit);
+  }
+  else
+  {
+    GfOut("\n\n\n#No config file found!\n\n\n");
+    GfOut("#Cars per pit: %d \n\n\n",oCarsPerPit);
   }
 
   // Global skilling from Andrew Sumner ...
