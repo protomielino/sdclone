@@ -1081,7 +1081,9 @@ void TDriver::EndRace()
 //--------------------------------------------------------------------------*
 void TDriver::Shutdown()
 {
+#ifdef _USE_RTTEAMMANAGER_
 	RtFreeGlobalTeamManager();
+#endif
 }
 //==========================================================================*
 

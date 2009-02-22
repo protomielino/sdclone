@@ -24,7 +24,7 @@ SOURCES   = rttrack.cpp rttelem.cpp
 
 EXPDIR  = include
 
-EXPORTS = robottools.h
+EXPORTS = robottools.h teammanager.h
 
 src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 
