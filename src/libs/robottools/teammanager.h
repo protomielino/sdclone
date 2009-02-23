@@ -150,7 +150,7 @@ extern void RtTeamSetMinLaps(tTeam* const Team, const int TeamIndex, const int F
 extern void RtTeamUpdate(tTeam* const Team, const int TeamIndex, tTeammateData& Data); 
 extern int RtTeamAdd(tTeam* const Team, tTeammate* const Teammate);
 extern bool RtTeamAllocatePit(tTeam* const Team, const int TeamIndex);
-extern bool RtTeamIsPitFree(tTeam* const Team, const int TeamIndex);
+extern bool RtTeamIsPitFree(tTeam* const Team, const int TeamIndex); 
 extern void RtTeamReleasePit(tTeam* const Team, const int TeamIndex);
 
 
