@@ -20,7 +20,7 @@ SOLIBRARY = librobottools.so
 
 SOLIBDIR  = .
 
-SOURCES   = rttrack.cpp rttelem.cpp
+SOURCES   = rttrack.cpp rttelem.cpp rtteammanager.cpp
 
 EXPDIR  = include
 
