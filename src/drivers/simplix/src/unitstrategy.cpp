@@ -107,9 +107,8 @@ bool TSimpleStrategy::IsPitFree()
   if (CarPit != NULL)
   {
 #ifdef _USE_RTTEAMMANAGER_
-	tTeam* Team = oDriver->GetTeam();
-	if ((CarPit->pitCarIndex == TR_PIT_STATE_FREE)
-      && ((Team->PitState == oCar) || (Team->PitState == PIT_IS_FREE)))
+    if (RtTeamIsPitFree(oDriver->GetTeam(), oDriver->TeamIndex()))
+      return true;
 #else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	if ((CarPit->pitCarIndex == TR_PIT_STATE_FREE)
@@ -138,7 +137,7 @@ bool TSimpleStrategy::NeedPitStop()
   {                                              // Wenn ja,
     if (!IsPitFree())                            //   ist die Box frei?
 	{
-	  GfOut("#IsPitFree = false: %s\n",oDriver->GetBotName());
+	  //GfOut("#IsPitFree = false: %s\n",oDriver->GetBotName());
       return Result;                             //   Wenn nicht, Pech!
 	}
   }
@@ -162,7 +161,7 @@ bool TSimpleStrategy::NeedPitStop()
     if (CarFuel < FuelNeeded)                    // Wenn der Tankinhalt nicht
 	{
       Result = true;                             //   reicht, tanken
-	  GfOut("#Pitstop by fuel: %s\n",oDriver->GetBotName());
+	  GfOut("#Pitstop by fuel: %s (%g<%g)\n",oDriver->GetBotName(),CarFuel,FuelNeeded);
 	}
     else if (!oDriver->oPitSharing)              // Ist pitsharing aktiviert?
     {
@@ -211,7 +210,7 @@ bool TSimpleStrategy::NeedPitStop()
           if (CarFuel < FuelNeeded)              // Wenn der Tankinhalt nicht
 	      {                                      // reicht, tanken
             Result = true;
-			GfOut("#Pitstop by Teammate: %s (%d:%d)\n",oDriver->GetBotName(),FuelForLaps,MinLaps);
+			GfOut("#Pitstop by Teammate: %s (%d<=%d)\n",oDriver->GetBotName(),FuelForLaps,MinLaps);
 	      }
         }
 	  }
@@ -242,16 +241,16 @@ bool TSimpleStrategy::NeedPitStop()
 void TAbstractStrategy::PitRelease()
 {
 #ifdef _USE_RTTEAMMANAGER_
-  tTeam* Team = oDriver->GetTeam();
-  if (Team->PitState == oCar)                    // Box für mich reserviert?
+  RtTeamReleasePit(oDriver->GetTeam(),oDriver->TeamIndex());
+  oCar->ctrl.raceCmd = 0;
 #else
   TTeamManager::TTeam* Team = oDriver->GetTeam();
   if (Team->PitState == CarDriverIndex)          // Box für mich reserviert?
-#endif
   {
     Team->PitState = PIT_IS_FREE;
     oCar->ctrl.raceCmd = 0;
   }
+#endif
 };
 //==========================================================================*
 

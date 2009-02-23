@@ -255,6 +255,8 @@ void RtTeamUpdate(tTeam* const Team, const int TeamIndex, tTeammateData& Data)
 		return;
 	Team->Data[TeamIndex].Fuel = Data.Fuel;  
 	Team->Data[TeamIndex].MinLapTime = Data.MinLapTime;  
+	Team->Data[TeamIndex].Damages = Data.Damages;  
+	Team->Data[TeamIndex].RemainingDistance = Data.RemainingDistance;
 	Team->Data[TeamIndex].TimeBeforeNextTeammate = Data.TimeBeforeNextTeammate;
 	if ((Team->Header.MajorVersion < 2) || (Data.MajorVersion < 2))
 		return;
@@ -291,6 +293,18 @@ bool RtTeamAllocatePit(tTeam* const Team, const int TeamIndex)
       Team->PitState = Team->Cars[TeamIndex];
 
     return Team->PitState == Team->Cars[TeamIndex];
+}
+
+//
+// Is pit free?
+//
+bool RtTeamIsPitFree(tTeam* const Team, const int TeamIndex)
+{
+	if ((Team->Cars[TeamIndex]->_pit->pitCarIndex == TR_PIT_STATE_FREE)
+      && ((Team->PitState == Team->Cars[TeamIndex]) || (Team->PitState == PIT_IS_FREE)))
+	  return true;
+	else
+	  return false;
 }
 
 //
