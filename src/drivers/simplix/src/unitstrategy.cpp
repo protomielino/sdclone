@@ -9,7 +9,7 @@
 //
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.02.01
+// Last changed : 2009.02.23
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -134,7 +134,7 @@ bool TSimpleStrategy::NeedPitStop()
   if (CarPit == NULL)                            // Ist eine Box vorhanden?
     return Result;                               //   Wenn nicht, Pech!
 
-  if (oDriver->oCarsPerPit > 1)                  // Ist pitsharing aktiviert?
+  if (oDriver->oPitSharing)                      // Ist pitsharing aktiviert?
   {                                              // Wenn ja,
     if (!IsPitFree())                            //   ist die Box frei?
 	{
@@ -164,7 +164,7 @@ bool TSimpleStrategy::NeedPitStop()
       Result = true;                             //   reicht, tanken
 	  GfOut("#Pitstop by fuel: %s\n",oDriver->GetBotName());
 	}
-    else if (oDriver->oCarsPerPit == 1)
+    else if (!oDriver->oPitSharing)              // Ist pitsharing aktiviert?
     {
   	  Result = false; 
 	}
@@ -181,8 +181,19 @@ bool TSimpleStrategy::NeedPitStop()
 #ifdef _USE_RTTEAMMANAGER_
 	  int FuelForLaps =                          // Eigene Reichweite
 	    (int) (CarFuel / FuelNeeded - 1);        
-	  RtTeamSetMinLaps(Team,oCar,FuelForLaps);   // Eigene Reichweite melden
-	  int MinLaps = RtTeamGetMinLaps(Team,oCar); // Mindestreichweite der anderen
+
+	  //RtTeamSetMinLaps(Team,oDriver->TeamIndex(),FuelForLaps);  
+
+	  // Eigene Daten dem Teammanager melden
+	  tTeammateData Data;
+	  Data.MajorVersion = 0;                     // Only Fuel per Lap is used here
+	  Data.MinorVersion = 0;
+	  Data.Size = sizeof(tTeammateData);
+	  Data.FuelForLaps = FuelForLaps;
+	  RtTeamUpdate(Team,oDriver->TeamIndex(),Data);  
+
+       // Mindestreichweite der anderen
+	  int MinLaps = RtTeamGetMinLaps(Team,oDriver->TeamIndex());
 #else
 	  int FuelForLaps =                          // Eigene Reichweite
         Team->FuelForLaps[CarDriverIndex] =      
@@ -215,8 +226,7 @@ bool TSimpleStrategy::NeedPitStop()
   if (Result)
   {
 #ifdef _USE_RTTEAMMANAGER_
-	tTeam* Team = oDriver->GetTeam();
-	Team->PitState = oCar;                       // Box reserviert
+	Result = RtTeamAllocatePit(oDriver->GetTeam(),oDriver->TeamIndex());
 #else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	Team->PitState = CarDriverIndex;             // Box reserviert

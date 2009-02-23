@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.01.11
+// Last changed : 2009.02.23
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -162,6 +162,7 @@ class TDriver
 #endif
     inline char* GetBotName();
     inline float CurrSpeed();
+    inline int TeamIndex();
 
 private:
 	void AvoidOtherCars                          // Avoiding
@@ -200,6 +201,7 @@ private:
     void SetRandomSeed(unsigned int Seed);
     unsigned int getRandom();
 	double CalcSkill(double TargetSpeed);
+    bool CheckPitSharing();
 
 
 private:
@@ -356,7 +358,8 @@ private:
 	double oSpeedScale;                          //
     bool oTreatTeamMateAsLapper;
 	bool oTeamEnabled;
-	int oCarsPerPit;                             // Pit sharing
+    bool oPitSharing;	                         // Flag: Pitsharing activated
+	int oTeamIndex;                              // Index of car in Teams arrays;
 	float oBumpMode;                             //
 
 	static int NBBOTS;                           // Nbr of cars
@@ -383,6 +386,13 @@ private:
 //--------------------------------------------------------------------------*
 char* TDriver::GetBotName()
   {return oBotName;};
+//==========================================================================*
+
+//==========================================================================*
+// Get index to team
+//--------------------------------------------------------------------------*
+int TDriver::TeamIndex()
+  {return oTeamIndex;};
 //==========================================================================*
 
 //==========================================================================*

@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.14
+// Last changed : 2009.02.23
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -298,7 +298,8 @@ TDriver::TDriver(int Index):
   oSpeedScale(0.0),
   oTreatTeamMateAsLapper(false),
   oTeamEnabled(true),
-  oCarsPerPit(1),
+  oPitSharing(false),
+  oTeamIndex(0),
   oBumpMode(1)
 {
 //  GfOut("#TDriver::TDriver() >>>\n");
@@ -404,49 +405,6 @@ void TDriver::InitTrack
   // Initialize the base param path
   char* BaseParamPath = TDriver::ROBOT_DIR;
   char* PathFilename = PathFilenameBuffer;
-
-  // Check pitsharing (enabled/disabled)
-#define _TEST_LOCAL_FILES_
-#undef _TEST_LOCAL_FILES_ // Comment this line out to test it
-#ifdef _TEST_LOCAL_FILES_
-/* THIS DOESN'T WORK WITH TORCS AT THE MOMENT >>> */
-  GfOut("#GetLocalDir(): %s\n",GetLocalDir());
-  snprintf(PathFilenameBuffer, BUFLEN,
-    "%sconfig/raceman/endrace.xml",GetLocalDir());
-  void* ConfigHandle = GfParmReadFile
-	(PathFilename, GFPARM_RMODE_REREAD);
-
-  if (!ConfigHandle)
-  {
-    GfOut("#GetDataDir(): %s\n",GetDataDir());
-    snprintf(PathFilenameBuffer, BUFLEN,
-      "%sconfig/raceman/endrace.xml",GetDataDir());
-    ConfigHandle = GfParmReadFile
-	  (PathFilename, GFPARM_RMODE_REREAD);
-  }
-  GfOut("\n\n\n#config: %s\n",PathFilenameBuffer);
-/* THIS DOESN'T WORK WITH TORCS AT THE MOMENT <<< */
-#else
-/* This works, but this way we can't use the local data files in .torcs-ng/config !!! >>> */
-  GfOut("#GetDataDir(): %s\n",GetDataDir());
-  snprintf(PathFilenameBuffer, BUFLEN,
-    "config/raceman/endrace.xml");
-  void* ConfigHandle = GfParmReadFile
-    (PathFilename, GFPARM_RMODE_REREAD);
-/* This works, but this way we cant use the local data files in .torcs-ng/config !!! <<< */
-#endif
-
-  if (ConfigHandle)
-  {
-    oCarsPerPit = (int) MAX(1,MIN(4,GfParmGetNum(ConfigHandle,
-	  "Race", "cars per pit", (char *) NULL, (float) 1)));
-    GfOut("#Cars per pit: %d \n\n\n",oCarsPerPit);
-  }
-  else
-  {
-    GfOut("\n\n\n#No config file found!\n\n\n");
-    GfOut("#Cars per pit: %d \n\n\n",oCarsPerPit);
-  }
 
   // Global skilling from Andrew Sumner ...
   // Check if skilling is enabled
@@ -895,6 +853,32 @@ void TDriver::InitTrack
 //==========================================================================*
 
 //==========================================================================*
+// Check if pit sharing is activated
+//--------------------------------------------------------------------------*
+bool TDriver::CheckPitSharing()
+{
+  const tTrackOwnPit* OwnPit = CarPit;           // Get my pit
+
+  if (OwnPit == NULL)                            // If pit is NULL
+  {                                              // nothing to do
+	GfOut("\n\nPit = NULL\n\n");                 // here
+	return false;
+  }
+
+  if (OwnPit->freeCarIndex > 1)
+  {
+  	  GfOut("\n\nPitSharing = true\n\n");    
+	  return true;
+  }
+  else
+  {
+  	  GfOut("\n\nPitSharing = false\n\n");    
+	  return false;
+  }
+}
+//==========================================================================*
+
+//==========================================================================*
 // Start a new race.
 //--------------------------------------------------------------------------*
 void TDriver::NewRace(PtCarElt Car, PSituation Situation)
@@ -909,6 +893,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 
   InitCarModells();                              // Initilize Car modells
   oStrategy->Init(this);                         // Init strategy
+  oPitSharing = CheckPitSharing();               // Is pitsharing activated?
   FindRacinglines();                             // Find a good racingline
   TeamInfo();                                    // Find team info
 
@@ -1157,7 +1142,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1183,7 +1168,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1211,7 +1196,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1230,7 +1215,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1246,9 +1231,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
 	}
   }
@@ -1269,7 +1254,7 @@ void TDriver::FindRacinglines()
 void TDriver::TeamInfo()
 {
 #ifdef _USE_RTTEAMMANAGER_
-  oTeam = RtTeamManagerAdd(oCommonData->TeamManager,oCar);
+  oTeam = RtTeamManagerAdd(oCommonData->TeamManager,oCar,oTeamIndex);
 #else
   oTeam = oCommonData->TeamManager.Add(oCar);
 #endif

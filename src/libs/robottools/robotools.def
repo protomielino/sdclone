@@ -19,6 +19,8 @@ EXPORTS
 	RtGetDistFromStart2
 	RtDistToPit
 	RtTrackGetSeg
+    RtGetMajorVersion
+    RtGetMinorVersion
 	RtIsTeamMate
 	RtTeamManager
 	RtTeamManagerFree
@@ -29,6 +31,9 @@ EXPORTS
 	RtTeamFree
 	RtTeamGetMinLaps
 	RtTeamSetMinLaps
+	RtTeamUpdate
 	RtTeamAdd
+	RtTeamAllocatePit
+	RtTeamReleasePit
 	RtTeammate
 	RtTeammateFree

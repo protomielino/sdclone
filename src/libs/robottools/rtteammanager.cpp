@@ -42,7 +42,25 @@
 #include "robottools.h"
 #include "teammanager.h"
 
-static tTeamManager* GlobalTeamManager;
+static tTeamManager* GlobalTeamManager; // the one and only!
+
+
+// Private functions
+
+//
+// Set Header
+//
+tDataStructVersionHeader RtSetHeader(const int Size)
+{
+  tDataStructVersionHeader Header;
+  Header.MajorVersion = CURRENT_MAJOR_VERSION;
+  Header.MinorVersion = CURRENT_MINOR_VERSION;
+  Header.Size = Size;
+  return Header;
+}
+
+
+// Published functions:
 
 //
 // Check if Car0 is teammate of Car1
@@ -53,22 +71,41 @@ bool RtIsTeamMate(const CarElt* Car0, const CarElt* Car1)
 }
 
 //
-// Create a team manager
+// Get MajorVersion of global teammanager
 //
-tTeamManager* RtTeamManager()                    // Default constructor
+short int RtGetMajorVersion()
 {
-    tTeamManager* TeamManager = (tTeamManager*)  // get memory 
+  return CURRENT_MAJOR_VERSION;
+}
+
+//
+// Get MinorVersion of global teammanager
+//
+short int RtGetMinorVersion()
+{
+  return CURRENT_MINOR_VERSION;
+}
+
+//
+// Create a global team manager (allocate memory for data)
+//
+tTeamManager* RtTeamManager()                    
+{
+    tTeamManager* TeamManager = (tTeamManager*)  
 		malloc(sizeof(tTeamManager));            
-	TeamManager->Count = 0;                      // Nbr of Teams
-	TeamManager->Teams = NULL;                   // The next team member
+
+	TeamManager->Header = RtSetHeader(sizeof(tTeamManager));
+
+	TeamManager->Count = 0;                      
+	TeamManager->Teams = NULL;                   
 
 	return TeamManager;
 }
 
 //
-// Destroy a team manager
+// Destroy a global team manager 's allocated data
 //
-void RtTeamManagerFree(tTeamManager *TeamManager)// Destructor
+void RtTeamManagerFree(tTeamManager* const TeamManager)
 {
 	tTeam* Team = TeamManager->Teams;
 	while (Team != NULL)
@@ -84,20 +121,20 @@ void RtTeamManagerFree(tTeamManager *TeamManager)// Destructor
         RtTeamFree(Team);
 		Team = NextTeam;
 	}
-    free(TeamManager);                           // Release memory 
+    free(TeamManager);                           
 }
 
 //
-// Add a car to his team
+// Add a car to it's team
 //
-tTeam* RtTeamManagerAdd(tTeamManager *TeamManager, CarElt* Car)
+tTeam* RtTeamManagerAdd(tTeamManager* const TeamManager, CarElt* const Car, int& TeamIndex)
 {
-	tTeammate* NewTeammate = RtTeammate();       // Add car: new teammate 
-	NewTeammate->Car = Car ;                     // Set car pointer
-	NewTeammate->Next = NULL;                    // Empty list
+	tTeammate* NewTeammate = RtTeammate();       
+	NewTeammate->Car = Car ;                     
+	NewTeammate->Next = NULL;                    
 
-	tTeam* Team = TeamManager->Teams;            // Get first Team;
-	while (Team != NULL)                         // Loop over all teams
+	tTeam* Team = TeamManager->Teams;            
+	while (Team != NULL)                         
 	{
 		if (strcmp(Car->_teamname,Team->TeamName) == 0) 
 		{   // If Team is cars team add car to team
@@ -109,13 +146,14 @@ tTeam* RtTeamManagerAdd(tTeamManager *TeamManager, CarElt* Car)
 	}
 
 	// If the team doesn't exists yet
-	tTeam* NewTeam = RtTeam();                     // Create a new team
-	NewTeam->TeamName = Car->_teamname;            // Set its teamname
-	RtTeamAdd(NewTeam, NewTeammate);               // Add new teammate
+	TeamManager->Count++;                        // We need a new team 
+	tTeam* NewTeam = RtTeam();                   
+	NewTeam->TeamName = Car->_teamname;          
+	RtTeamAdd(NewTeam, NewTeammate);             // Add new teammate
 
-	if (TeamManager->Teams == NULL)                // Add new team to
-		TeamManager->Teams = NewTeam;              // linked list of
-	else                                           // teams
+	if (TeamManager->Teams == NULL)              // Add new team to
+		TeamManager->Teams = NewTeam;            // linked list of
+	else                                         // teams
 	{                                     
 		Team = TeamManager->Teams;
 		while (Team->Teams != NULL)       
@@ -146,66 +184,89 @@ void RtFreeGlobalTeamManager()
 	GlobalTeamManager = NULL;
 }
 
+
 //
-// Create a team
+// Create a team (allocate memory for data)
 //
-tTeam* RtTeam()                                  // Default constructor
+tTeam* RtTeam()                                  
 {
-    tTeam* Team = (tTeam*) malloc(sizeof(tTeam));// get memory 
-	Team->Count = 0;                             // Nbr of Teammates
-	Team->PitState = PIT_IS_FREE;	             // Request for shared pit
-	Team->TeamName = NULL;	                     // Name of team
-	Team->Teams = NULL;                          // Empty list
-	Team->Teammates = NULL;                      // Empty list
-	for (int I = 0; I < TR_PIT_MAXCARPERPIT; I++)// Loop over all
-	{                                            // possible members 
-	  Team->Cars[I] = NULL;                      // No Cars
-	  Team->FuelForLaps[I] = 99;                 // Fuel still unlimited
+    tTeam* Team = (tTeam*) malloc(sizeof(tTeam));
+	Team->Header = RtSetHeader(sizeof(tTeam));   
+	Team->TeamName = NULL;	                     
+	Team->Teams = NULL;                          
+	Team->Teammates = NULL;                      
+	Team->Teampit = NULL;                        
+	Team->PitState = PIT_IS_FREE;	             // Request for first shared pit
+	Team->Count = 0;        
+	Team->MinMajorVersion = INT_MAX;
+    
+	// Initialize all possible teammates data
+	for (int I = 0; I < MAXTEAMMATES; I++)       // Loop over all
+	{                                            // possible teammates 
+	  Team->Cars[I] = NULL;                      
+	  Team->Data[I].Size = sizeof(tTeammateData);            
+	  Team->Data[I].FuelForLaps = 99;            
+  	  Team->Data[I].Fuel = 99;                   
+	  Team->Data[I].MinLapTime = 0;              
+	  Team->Data[I].TimeBeforeNextTeammate = 0;  
+      // Add additional initializations here
 	}
 
 	return Team;
 }
 
 //
-// Destroy a team
+// Destroy a team's allocated data
 //
-void RtTeamFree(tTeam *Team)                     // Destructor
+void RtTeamFree(tTeam* const Team)               
 {
-    free(Team);                                  // Release memory 
+    free(Team);                                  
 }
 
 //
 // Get nbr of laps all other teammates can race with current fuel
 //
-int RtTeamGetMinLaps(tTeam *Team, CarElt* Car)   // Get Nbr of laps, all
-{                                                //  teammates has fuel for 
-	int MinL = 99;                               // Assume unlimited
-	for (int I = 0; I < TR_PIT_MAXCARPERPIT; I++)// Loop over all possible
-	  if (Team->Cars[I] != Car)                  // entries!
-		MinL = MIN(MinL,Team->FuelForLaps[I]);   // If not self, calculate 
+int RtTeamGetMinLaps(tTeam* const Team, const int TeamIndex) 
+{                                                
+	int L = 99;                                  // Assume unlimited
+	for (int I = 0; I < MAXTEAMMATES; I++)       
+	  if (I != TeamIndex)                  
+		L = MIN(L,Team->Data[I].FuelForLaps);    
 
-	return MinL;                                 // Nbr of laps all can race 
+	return L;                                    
 }
 
 //
-// Set nbr of laps this teammate can race with current fuel
+// Set nbr of laps this teammate can race with current fuel (old way)
 //
-void RtTeamSetMinLaps(tTeam *Team, CarElt* Car, int FuelForLaps) 
+void RtTeamSetMinLaps(tTeam* const Team, const int TeamIndex, const int FuelForLaps) 
 {                                                
-	for (int I = 0; I < TR_PIT_MAXCARPERPIT; I++)// Loop over all teammates
-	{                                            
-		if (Team->Cars[I] == Car)                // If self, set value
-		{
-			Team->FuelForLaps[I] = FuelForLaps;             
-			break;
-		}
-	}
+	Team->Data[TeamIndex].FuelForLaps = FuelForLaps;             
+}
+
+//
+// Update teammates current data (new way)
+//
+void RtTeamUpdate(tTeam* const Team, const int TeamIndex, tTeammateData& Data) 
+{
+	Team->MinMajorVersion = MIN(Team->MinMajorVersion,Data.MajorVersion);
+	Team->Data[TeamIndex].FuelForLaps = Data.FuelForLaps;  
+	if (Data.MajorVersion < 1) // If an old robot uses it
+		return;
+	Team->Data[TeamIndex].Fuel = Data.Fuel;  
+	Team->Data[TeamIndex].MinLapTime = Data.MinLapTime;  
+	Team->Data[TeamIndex].TimeBeforeNextTeammate = Data.TimeBeforeNextTeammate;
+	if ((Team->Header.MajorVersion < 2) || (Data.MajorVersion < 2))
+		return;
+	// ... Add additional values here
+	//if ((Team->Header.MajorVersion < 3) || (Data.MajorVersion < 3))
+	//	return;
 }
 
 //
 // Add a teammate to the team
 //
-void RtTeamAdd(tTeam *Team, tTeammate* NewTeammate)
+int RtTeamAdd(tTeam* const Team, tTeammate* const NewTeammate)
 {
 	tTeammate* Teammate = Team->Teammates;       
 	if (Teammate == NULL)
@@ -216,25 +277,48 @@ void RtTeamAdd(tTeam *Team, tTeammate* NewTeammate)
 	        Teammate = Teammate->Next;
 		Teammate->Next = NewTeammate;            
 	}
-    Team->Cars[Team->Count++] = NewTeammate->Car;
+    Team->Cars[Team->Count] = NewTeammate->Car;
+
+	return Team->Count++;
 }
 
 //
-// Create a teammate
+// Allocate pit
 //
-tTeammate* RtTeammate()                          // Default constructor
+bool RtTeamAllocatePit(tTeam* const Team, const int TeamIndex)
+{
+    if (Team->PitState == PIT_IS_FREE)
+      Team->PitState = Team->Cars[TeamIndex];
+
+    return Team->PitState == Team->Cars[TeamIndex];
+}
+
+//
+// Release pit
+//
+void RtTeamReleasePit(tTeam* const Team, const int TeamIndex)
+{
+    if (Team->PitState == Team->Cars[TeamIndex])
+		Team->PitState = PIT_IS_FREE;
+}
+
+//
+// Create a teammate (allocate memory for data)
+//
+tTeammate* RtTeammate()                          
 {
     tTeammate* Teammate = (tTeammate*) malloc(sizeof(tTeammate));
-	Teammate->Car = NULL;                       // Teammates car
-	Teammate->Next = NULL;                      // Empty list
+	Teammate->Header = RtSetHeader(sizeof(tTeammate));
+	Teammate->Car = NULL;                           
+	Teammate->Next = NULL;                          
 
 	return Teammate;
 }
 
 //
-// Destroy a teammate
+// Destroy a teammate's allocated data
 //
-void RtTeammateFree(tTeammate* Teammate)        
+void RtTeammateFree(tTeammate* const Teammate)        
 {
-    free(Teammate);                             // Release memory 
+    free(Teammate);                             
 }
