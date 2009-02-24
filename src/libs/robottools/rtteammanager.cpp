@@ -138,7 +138,7 @@ tTeam* RtTeamManagerAdd(tTeamManager* const TeamManager, CarElt* const Car, int&
 	{
 		if (strcmp(Car->_teamname,Team->TeamName) == 0) 
 		{   // If Team is cars team add car to team
-			RtTeamAdd(Team, NewTeammate); 
+			TeamIndex = RtTeamAdd(Team, NewTeammate); 
 			return Team;
 		}
 		else
@@ -149,7 +149,7 @@ tTeam* RtTeamManagerAdd(tTeamManager* const TeamManager, CarElt* const Car, int&
 	TeamManager->Count++;                        // We need a new team 
 	tTeam* NewTeam = RtTeam();                   
 	NewTeam->TeamName = Car->_teamname;          
-	RtTeamAdd(NewTeam, NewTeammate);             // Add new teammate
+	TeamIndex = RtTeamAdd(NewTeam, NewTeammate); // Add new teammate
 
 	if (TeamManager->Teams == NULL)              // Add new team to
 		TeamManager->Teams = NewTeam;            // linked list of
@@ -279,9 +279,9 @@ int RtTeamAdd(tTeam* const Team, tTeammate* const NewTeammate)
 	        Teammate = Teammate->Next;
 		Teammate->Next = NewTeammate;            
 	}
-    Team->Cars[Team->Count] = NewTeammate->Car;
+    Team->Cars[Team->Count++] = NewTeammate->Car;
 
-	return Team->Count++;
+	return Team->Count - 1;
 }
 
 //
@@ -292,7 +292,7 @@ bool RtTeamAllocatePit(tTeam* const Team, const int TeamIndex)
     if (Team->PitState == PIT_IS_FREE)
       Team->PitState = Team->Cars[TeamIndex];
 
-    return Team->PitState == Team->Cars[TeamIndex];
+    return (Team->PitState == Team->Cars[TeamIndex]);
 }
 
 //
