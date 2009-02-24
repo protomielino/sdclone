@@ -22,19 +22,12 @@ EXPORTS
     RtGetMajorVersion
     RtGetMinorVersion
 	RtIsTeamMate
-	RtTeamManager
-	RtTeamManagerFree
-	RtTeamManagerAdd
-	RtGetGlobalTeamManager
+	RtGetTeamIndex
 	RtFreeGlobalTeamManager
-	RtTeam
-	RtTeamFree
-	RtTeamGetMinLaps
-	RtTeamSetMinLaps
-	RtTeamUpdate
-	RtTeamAdd
-	RtTeamAllocatePit
-	RtTeamIsPitFree
-	RtTeamReleasePit
-	RtTeammate
-	RtTeammateFree
+	RtGetMinLaps
+	RtSetMinLaps
+	RtAllocatePit
+	RtIsPitFree
+	RtReleasePit
+	RtNeedPitStop
+	RtGetRemainingDistance

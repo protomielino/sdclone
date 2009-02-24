@@ -8,7 +8,7 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.02.23
+// Last changed : 2009.02.24
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -221,20 +221,23 @@ void TOpponent::Update(
     RelPos += TrackLen;
 
   oInfo.State.RelPos = RelPos;
-//  float RelLat = fabs(MyCar->pub.trkPos.toMiddle - CarToMiddle);
 
-  if ((RelPos > MinDistBack)                     // Opponent is near
-	&& (RelPos < 5))                             // and not in front
-  {
-    MinDistBack = RelPos;
-  }
+  if (fabs(CarToMiddle) - oTrack->Width() > 1.0) // If opponent is outside of track
+  {                                              // we assume it is in the pitlane
 
-  double T = -RelPos/oInfo.State.TrackVelLong;   // Time to start out of pit
-  if ((T > 0)                                    // Opponent is back or aside
-	&& (T < 200))                                // and arrives within 20 sec
-  {
-    if (MinTimeSlot > T)
-	  MinTimeSlot = T;
+    if ((RelPos > MinDistBack)                   // Opponent is near
+	  && (RelPos < 5))                           // and not in front
+    {
+      MinDistBack = RelPos;
+    }
+
+    double T = -RelPos/oInfo.State.TrackVelLong; // Time to start out of pit
+    if ((T > 0)                                  // Opponent is back or aside
+	  && (T < 200))                              // and arrives within 20 sec
+    {
+      if (MinTimeSlot > T)
+	    MinTimeSlot = T;
+    }
   }
   
   if ((RelPos > 0) && (RelPos < 50))             // We just lapped back

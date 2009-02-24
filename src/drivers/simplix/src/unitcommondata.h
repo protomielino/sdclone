@@ -5,12 +5,12 @@
 // Roboter für TORCS-Version 1.3.0
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
-// Datei    : unitcommondata.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitcommondata.h
+// Created      : 2007.11.17
+// Last changed : 1009.02.24
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -61,7 +61,6 @@
 #include <track.h>
 #include "unitglobal.h"
 #ifdef _USE_RTTEAMMANAGER_
-#include <teammanager.h>
 #else
 #include "unitteammanager.h"
 #endif
@@ -78,7 +77,6 @@ class TCommonData
 
   public:
 #ifdef _USE_RTTEAMMANAGER_
-    tTeamManager* TeamManager;                   // Team manager 
 #else
     TTeamManager TeamManager;                    // Team manager 
 #endif

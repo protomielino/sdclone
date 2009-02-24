@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.23
+// Last changed : 2009.02.24
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -175,7 +175,6 @@ TDriver::TDriver(int Index):
   oAvoidScale(10.0),
   oAvoidWidth(0.5),
   oGoToPit(false),
-  oTeam(NULL),
 
   oDriveTrainType(cDT_RWD),
   // oPIDCLine;
@@ -1129,7 +1128,6 @@ void TDriver::FindRacinglines()
   {
     oCommonData->Track = oTrackDesc.Track();     // Save pointer
 #ifdef _USE_RTTEAMMANAGER_
-//    oCommonData->TeamManager->Clear();           // release old informations
 #else
     oCommonData->TeamManager.Clear();            // release old informations
 #endif
@@ -1254,11 +1252,11 @@ void TDriver::FindRacinglines()
 void TDriver::TeamInfo()
 {
 #ifdef _USE_RTTEAMMANAGER_
-  oTeam = RtTeamManagerAdd(oCommonData->TeamManager,oCar,oTeamIndex);
+  oTeamIndex = RtGetTeamIndex(oCar,oTrack,oSituation);
 #else
   oTeam = oCommonData->TeamManager.Add(oCar);
 #endif
-  //GfOut("#\n\n# Team: %s\n\n\n",oTeam->TeamName);
+  GfOut("#\n# %s Team: %s Teamindex: %d\n#\n",oBotName, oCar->_teamname, oTeamIndex);
 }
 //==========================================================================*
 
@@ -2779,7 +2777,11 @@ double TDriver::FilterTrack(double Accel)
 double TDriver::FilterStart(double Speed)
 {
   if (Qualification)
-	  return Speed;
+  {
+    if (oIndex > 0)
+      return Speed * 0.98;
+	return Speed;
+  }
 
   //if (DistanceRaced < TrackLength)
   //  return Speed * 0.9;

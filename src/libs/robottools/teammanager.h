@@ -28,6 +28,56 @@
 
 #include <car.h>
 #include <track.h>                               // TR_PIT_MAXCARPERPIT = 4
+#include <raceman.h>                             // tSituation
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Robot developer API:
+//
+
+//
+// Teammanager related functions for use by robots
+//
+extern int RtGetTeamIndex(                       // Add a Teammate to it's team
+	CarElt* const Car,                           // -> teammate's car 
+	tTrack* const Track,                         // -> track
+	tSituation* Situation);                      // -> situaion
+                                                 // <- TeamIndex as handle for the subsequent calls
+
+extern void RtFreeGlobalTeamManager();           // Free at Shutdown
+
+
+//
+// Team related functions for use by robots
+//
+extern int RtGetMinLaps(                         // Get nbr of laps all other teammates using the same pit can still race 
+	const int TeamIndex);
+
+extern void RtSetMinLaps(                        // Set the nbr of laps this teammate can still drive without refueling
+	const int TeamIndex, const int FuelForLaps); 
+
+extern float RtGetRemainingDistance(             // Get the remaining distance to race for this teammate
+	const int TeamIndex);                        // (depends from being overlapped or not)
+
+extern bool RtNeedPitStop(                       // Check wether this teammate should got to pit for refueling 
+	const int TeamIndex, float FuelPerM);        // (depends from the fuel of all other teammates using the same pit)
+
+extern bool RtAllocatePit(                       // Try to allocate the pit for use of this teammate 
+	const int TeamIndex);
+
+extern bool RtIsPitFree(                         // Check wether the pit to use is available
+	const int TeamIndex);
+
+extern void RtReleasePit(                        // Release the pit
+	const int TeamIndex);
+
+//
+// End of robot developer API
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Implementation:
+//
 
 // Teammanager defines
 
@@ -35,9 +85,13 @@
 #define CURRENT_MINOR_VERSION 0                  // Without changes solong
 
 #define PIT_IS_FREE NULL                         // = *Car if reserved/used
-#define MAXTEAMMATES TR_PIT_MAXCARPERPIT
+
 
 // Teammanager Utilities
+
+//
+// Version header
+//
 typedef struct 
 {                                                // NEVER CHANGE THIS >>> 
     short int MajorVersion;                      // Changed if struct is extended 
@@ -63,33 +117,17 @@ typedef struct tTeammate
 //
 // Data of a teams pit (For later use with multiple pits per team)
 //
-typedef struct tTeampit
+typedef struct tTeamPit
 {                                                // NEVER CHANGE THIS >>> V1.X
     tDataStructVersionHeader Header;             // Version and size of this struct
-	tTeampit* Teampit;                           // Linked list of pits of this team for later use
+	tTeamPit* Next;                              // Linked list of pits of this team for later use
+	tTeammate* Teammates;						 // Linked list of teammates of this pit
+	int Count;                                   // Nbr of Teammates using this pit
 	CarElt*	PitState;                            // Request for shared pit
+	tTrackOwnPit* Pit;                           // TORCS pit
 	                                             // <<< NEVER CHANGE THIS V1.X
 	                                             // Extend it here if needed but increment MAJOR VERSION!
-} tTeampit;
-
-
-//
-// Data of a teammate
-//
-typedef struct
-{                                                // NEVER CHANGE THIS >>> V1.X
-	short int MajorVersion;                      // Set by Robot to define updated set
-	short int MinorVersion;                      // Set by Robot
-	int Size;                                    // sizeof the struct including this header
-	int FuelForLaps;                             // Fuel for laps 
-	int Fuel;                                    // current fuel 
-	int MinLapTime;                              // Lap time of fastest lap
-	int Damages;                                 // Dammages of teammate
-	float RemainingDistance;                     // Remaining Distance to race
-	double TimeBeforeNextTeammate;               // Time in s
-	                                             // <<< NEVER CHANGE THIS V1.X
-	                                             // Extend it here if needed but increment MAJOR VERSION!
-} tTeammateData;
+} tTeamPit;
 
 //
 // Data of a team
@@ -99,24 +137,46 @@ typedef struct tTeam
     tDataStructVersionHeader Header;             // Version and size of this struct
 	char* TeamName;	                             // Name of team
 	tTeam* Teams;                                // Linked list of teams
-	tTeammate* Teammates;						 // Linked list of teammates
-	tTeampit* Teampit;                           // Linked list of additional pits of this team for later use
-	CarElt*	PitState;                            // Request for shared pit for teams frist pit
-	CarElt* Cars[MAXTEAMMATES];                  // Cars (used to identify the own team by robots)
-	int Count;                                   // Nbr of Teammates
+	tTeamPit* TeamPits;                          // Linked list of pits of this team
+	int Count;                                   // Nbr of teammates
+	int PitCount;                                // Nbr of pits of the team
 	int MinMajorVersion;                         // Min MajorVersion used by an teammates robot
 	                                             // <<< NEVER CHANGE THIS V1.X
-    tTeammateData Data[MAXTEAMMATES];            // Extend it here if needed but increment MAJOR VERSION!
 } tTeam;                                         // and add the additional values to function RtTeamUpdate
-                                                 // and initialization in function RtTeam
+												 // and initialization in function RtTeam
+
 //
-// Data of a team manager
+// Data of a driver beeing in the race
+//
+typedef struct tTeamDriver 
+{                                                // NEVER CHANGE THIS >>> V1.X
+    tDataStructVersionHeader Header;             // Version and size of this struct
+	tTeamDriver* Next;                           // Linked list of drivers (containig all drivers of the race)
+	int Count;                                   // Nbr of drivers
+	tCarElt* Car;                                // Drivers car
+	tTeam* Team;                                 // Drivers Team
+	tTeamPit* TeamPit;                           // Drivers Pit
+
+	float RemainingDistance;                     // Distance still to race
+	float Reserve;                               // Reserve in [m] to keep fuel for
+	int FuelForLaps;                             // Driver has still fuel for this nbr of laps
+	int MinLaps;                                 // All Teammates using this pit have to be able to drive this nbr of laps 
+	int LapsRemaining;                           // Nbr of laps still to race
+	                                             // <<< NEVER CHANGE THIS V1.X
+} tTeamDriver; 
+
+//
+// Data of the one and only team manager
 //
 typedef struct 
 {                                                // NEVER CHANGE THIS >>> V1.X
     tDataStructVersionHeader Header;             // Version and size of this struct
-	int Count;                                   // Nbr of Teammates
+	int Count;                                   // Nbr of Teammates/Drivers
 	tTeam* Teams;                                // Linked list of teams
+	tTeamDriver* TeamDrivers;                    // Linked list of drivers belonging to a team
+	tTrack* Track;                               // Track
+	float RaceDistance;							 // Distance to race
+	bool PitSharing;                             // Pit sharing activated? 
 	                                             // <<< NEVER CHANGE THIS V1.X
 	                                             // Extend it here if needed but increment MAJOR VERSION!
 } tTeamManager;
@@ -131,31 +191,39 @@ bool RtIsTeamMate(const CarElt* Car0, const CarElt* Car1);
 
 
 //
-// Teammanager related functions
+// Teammanager related internal functions
 //
 extern tTeamManager* RtTeamManager();           
-extern void RtTeamManagerFree(tTeamManager* const Teammanager);  
-extern tTeam* RtTeamManagerAdd(tTeamManager* const TeamManager, CarElt* const Car, int& TeamIndex);
-extern tTeamManager* RtGetGlobalTeamManager();   
-extern void RtFreeGlobalTeamManager();
+extern void RtTeamManagerFree();  
+extern void RtInitGlobalTeamManager();           
 
 
 //
-// Team related functions
+// TeamDriver related internal functions
+//
+extern tTeamDriver* RtTeamDriver();
+extern void RtTeamDriverFree(tTeamDriver* TeamDriver);
+extern tTeamDriver* RtGetTeamDriver(const int TeamIndex);
+
+
+//
+// TeamPit related internal functions
+//
+extern tTeamPit* RtTeamPit();     
+extern void RtTeamPitFree(tTeamPit* TeamPit);
+extern int RtTeamPitAdd(tTeamPit* const TeamPit, tTeammate* const Teammate);
+
+
+//
+// Team related internal functions
 //
 extern tTeam* RtTeam();                    
 extern void RtTeamFree(tTeam* const Team);
-extern int RtTeamGetMinLaps(tTeam* const Team, const int TeamIndex);
-extern void RtTeamSetMinLaps(tTeam* const Team, const int TeamIndex, const int FuelForLaps); 
-extern void RtTeamUpdate(tTeam* const Team, const int TeamIndex, tTeammateData& Data); 
-extern int RtTeamAdd(tTeam* const Team, tTeammate* const Teammate);
-extern bool RtTeamAllocatePit(tTeam* const Team, const int TeamIndex);
-extern bool RtTeamIsPitFree(tTeam* const Team, const int TeamIndex); 
-extern void RtTeamReleasePit(tTeam* const Team, const int TeamIndex);
+extern tTeamPit* RtTeamAdd(tTeam* const Team, tTeammate* const Teammate);
 
 
 //
-// Teammate related functions
+// Teammate related internal functions
 //
 extern tTeammate* RtTeammate();                    
 extern void RtTeammateFree(tTeammate* const Teammate);

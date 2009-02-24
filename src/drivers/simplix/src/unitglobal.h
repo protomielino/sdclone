@@ -258,6 +258,7 @@ enum
 // Shortcuts for TORCS ...
 #define CarAccelLat (oCar->_accel_y)
 #define CarAccelLong (oCar->_accel_x)
+#define CarBestLapTime (oCar->_bestLapTime)
 #define CarDamage (oCar->_dammage)
 #define CarDriverIndex (oCar->_driverIndex)
 #define CarFriction (oCar->_trkPos.seg->surface->kFriction)

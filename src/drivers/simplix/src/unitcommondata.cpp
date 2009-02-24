@@ -9,8 +9,8 @@
 //
 // File         : unitcommondata.cpp
 // Created      : 2007.11.17
-// Last changed : 2008.12.21
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 1009.02.24
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -66,9 +66,6 @@
 TCommonData::TCommonData():
   Track(NULL)
 {
-#ifdef _USE_RTTEAMMANAGER_
-	TeamManager = RtGetGlobalTeamManager();
-#endif
 }
 //==========================================================================*
 

@@ -6,12 +6,12 @@
 // Boxenstop-Strategie
 // (C++-Portierung der Unit UnitStrategy.pas)
 //
-// Datei    : unitstrategy.h
-// Erstellt : 2007.02.20
-// Stand    : 2008.12.28
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 2.00.000
+// File         : unitstrategy.h
+// Created      : 2007.02.20
+// Last changed : 2009.02.24
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -60,6 +60,12 @@
 #include "unitcommon.h"
 #include "unitdriver.h"
 #include "unitpit.h"
+
+#ifdef _USE_RTTEAMMANAGER_
+#include "teammanager.h"
+#else
+#endif
+
 
 //==========================================================================*
 // Basisklasse für Strategien zum Boxenstopp
@@ -134,6 +140,7 @@ class TSimpleStrategy
     float oLastFuel;            // Tankinhalt beim Überqueren der Startlinie
     float oExpectedFuelPerM;    // Gesch. Treibst.bedarf fürs Rennen in kg/m
 	int oPitTicker;             // Overrunner
+	int oPitStartTicker;        // Blockadebrecher
     float oRaceDistance;        // Gesamtlänge des Rennens in m
     float oRemainingDistance;   // Verbeleibende Länge des Rennens in m
     float oReserve;             // Reserve in m

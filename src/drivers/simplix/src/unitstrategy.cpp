@@ -104,19 +104,18 @@ void TSimpleStrategy::Init(TDriver *Driver)
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::IsPitFree()
 {
+#ifdef _USE_RTTEAMMANAGER_
+    return RtIsPitFree(oDriver->TeamIndex());
+#else
   if (CarPit != NULL)
   {
-#ifdef _USE_RTTEAMMANAGER_
-    if (RtTeamIsPitFree(oDriver->GetTeam(), oDriver->TeamIndex()))
-      return true;
-#else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	if ((CarPit->pitCarIndex == TR_PIT_STATE_FREE)
       && ((Team->PitState == CarDriverIndex) || (Team->PitState == PIT_IS_FREE)))
-#endif
       return true;
   }
   return false;
+#endif
 }
 //==========================================================================*
 
@@ -125,21 +124,38 @@ bool TSimpleStrategy::IsPitFree()
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::NeedPitStop()
 {
+#ifdef _USE_RTTEAMMANAGER_
+  double FuelConsum;                             // Fuel consumption per m
+  if (oFuelPerM == 0.0)                          // If still undefined
+    FuelConsum = oExpectedFuelPerM;              //   use estimated value
+  else                                           // If known
+    FuelConsum = oFuelPerM;                      //   use it
+
+  bool Result = RtNeedPitStop(oDriver->TeamIndex(), FuelConsum);
+  oRemainingDistance = RtGetRemainingDistance(oDriver->TeamIndex());
+  if (oRemainingDistance > oTrackLength + 100)   // More to race?
+  {
+    if (RepairWanted(cPIT_DAMMAGE) > 0)          // Check damages
+      Result = true;
+  }
+#else
+  if (CarPit == NULL)                            // Ist eine Box vorhanden?
+    return false;                                //   Wenn nicht, Pech!
+
   double FuelConsum;                             // Spritverbrauch (pro m)
   double FuelNeeded;                             // Für nächste Runde nötig
 
   bool Result = false;                           // Annahme: Kein Boxenstopp
 
-  if (CarPit == NULL)                            // Ist eine Box vorhanden?
-    return Result;                               //   Wenn nicht, Pech!
-
   if (oDriver->oPitSharing)                      // Ist pitsharing aktiviert?
   {                                              // Wenn ja,
     if (!IsPitFree())                            //   ist die Box frei?
 	{
-	  //GfOut("#IsPitFree = false: %s\n",oDriver->GetBotName());
+	  //GfOut("#IsPitFree = false: %s (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
       return Result;                             //   Wenn nicht, Pech!
 	}
+	//else
+	//  GfOut("#IsPitFree = true: %s (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
   }
   oRemainingDistance =                           // Restliche Strecke des
     oRaceDistance - DistanceRaced;               //   Rennens ermitteln
@@ -171,34 +187,12 @@ bool TSimpleStrategy::NeedPitStop()
 	{                                            //   welche Anzahl von Runden
 												 //   alle Teammitglieder
 												 //   noch Treibstoff haben
-#ifdef _USE_RTTEAMMANAGER_
-	tTeam* Team = oDriver->GetTeam();
-#else
-	TTeamManager::TTeam* Team = oDriver->GetTeam();
-#endif
       FuelNeeded = FuelConsum * oTrackLength;    // Treibstoff für eine Runde 
-#ifdef _USE_RTTEAMMANAGER_
 	  int FuelForLaps =                          // Eigene Reichweite
 	    (int) (CarFuel / FuelNeeded - 1);        
-
-	  //RtTeamSetMinLaps(Team,oDriver->TeamIndex(),FuelForLaps);  
-
-	  // Eigene Daten dem Teammanager melden
-	  tTeammateData Data;
-	  Data.MajorVersion = 0;                     // Only Fuel per Lap is used here
-	  Data.MinorVersion = 0;
-	  Data.Size = sizeof(tTeammateData);
-	  Data.FuelForLaps = FuelForLaps;
-	  RtTeamUpdate(Team,oDriver->TeamIndex(),Data);  
-
-       // Mindestreichweite der anderen
-	  int MinLaps = RtTeamGetMinLaps(Team,oDriver->TeamIndex());
-#else
-	  int FuelForLaps =                          // Eigene Reichweite
-        Team->FuelForLaps[CarDriverIndex] =      
-	    (int) (CarFuel / FuelNeeded - 1);        
+	  TTeamManager::TTeam* Team = oDriver->GetTeam();
+      Team->FuelForLaps[CarDriverIndex] = FuelForLaps;
 	  int MinLaps = Team->GetMinLaps(oCar);      // Mindestreichweite der anderen
-#endif
 
 	  // Wenn Tanken, dann der, der weniger Runden weit kommen würde
       if (FuelForLaps <= MinLaps) 
@@ -221,11 +215,16 @@ bool TSimpleStrategy::NeedPitStop()
        Result = true;
 	}
   };
+#endif
 
   if (Result)
   {
 #ifdef _USE_RTTEAMMANAGER_
-	Result = RtTeamAllocatePit(oDriver->GetTeam(),oDriver->TeamIndex());
+	Result = RtAllocatePit(oDriver->TeamIndex());
+	if (Result)
+	  GfOut("#Allocated Pit: %s\n",oDriver->GetBotName());
+	else
+	  GfOut("#Not allocated Pit: %s\n",oDriver->GetBotName());
 #else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	Team->PitState = CarDriverIndex;             // Box reserviert
@@ -241,7 +240,7 @@ bool TSimpleStrategy::NeedPitStop()
 void TAbstractStrategy::PitRelease()
 {
 #ifdef _USE_RTTEAMMANAGER_
-  RtTeamReleasePit(oDriver->GetTeam(),oDriver->TeamIndex());
+  RtReleasePit(oDriver->TeamIndex());
   oCar->ctrl.raceCmd = 0;
 #else
   TTeamManager::TTeam* Team = oDriver->GetTeam();
@@ -367,9 +366,9 @@ double TSimpleStrategy::SetFuelAtRaceStart
   }
 
   oMinLaps = (int)           
-	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Mindestanzahl an Runden
+	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV, // Mindestanzahl an Runden
 	PRV_MIN_LAPS,(char*) NULL,(float) oMinLaps); //   die mit dem Tankinhalt
-  GfOut("#oMinLaps (private) = %d\n",oMinLaps);   //   möglich sein müssen
+  GfOut("#oMinLaps (private) = %d\n",oMinLaps);  //   möglich sein müssen
 
   if (Fuel == 0)                                 // Wenn nichts bekannt ist,
     Fuel = oMaxFuel;                             // Volltanken
@@ -610,6 +609,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
         // oState is set to next state in PitRepair()!
 		// If TORCS doesn't service us, no call to PitRepair() is done!
 		// We run into timeout! (oPitTicker)
+		oPitStartTicker = 600;
 	  }
 	  break;
 
@@ -620,10 +620,13 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 		|| ((oMinDistBack > -7)                  // or cars aside
 		&& (oMinDistBack < 5)))                  // we have to wait
 	  {
+        oPitStartTicker--;
+        if (oPitStartTicker < 0)
+	      oState = PIT_EXIT;
 		oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;    // Only small lights on           
 		oCar->ctrl.accelCmd = 0.0;               
 	    oCar->ctrl.brakeCmd = 1.0;               
-  	    //GfOut("#PIT_EXIT: %g (%gm)(%g)\n",TrackPos,oMinDistBack,oDriver->CurrSpeed());
+  	    GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
 	  }
 	  else
 	  {

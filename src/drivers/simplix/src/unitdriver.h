@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.02.23
+// Last changed : 2009.02.24
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -74,7 +74,12 @@
 #include "unitparam.h"                           // TParam
 #include "unitpidctrl.h"
 #include "unitsysfoo.h"
+
+#ifdef _USE_RTTEAMMANAGER_
+#include "teammanager.h"
+#else
 #include "unitteammanager.h"
+#endif
 
 //==========================================================================*
 // Deklaration der Klasse TDriver
@@ -156,7 +161,6 @@ class TDriver
 	inline void	SetCommonData                    // Set pointer to common data
 	  (TCommonData* CommonData);
 #ifdef _USE_RTTEAMMANAGER_
-	inline tTeam* GetTeam();
 #else
 	inline TTeamManager::TTeam* GetTeam();
 #endif
@@ -223,7 +227,6 @@ private:
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
 #ifdef _USE_RTTEAMMANAGER_
-	tTeam* oTeam;
 #else
 	TTeamManager::TTeam* oTeam;                  // Team
 #endif
@@ -406,13 +409,12 @@ void TDriver::SetCommonData
 // Get Team
 //--------------------------------------------------------------------------*
 #ifdef _USE_RTTEAMMANAGER_
-tTeam* TDriver::GetTeam()
 #else
 TTeamManager::TTeam* TDriver::GetTeam()
-#endif
 {
   return oTeam;
 }
+#endif
 //==========================================================================*
 
 //==========================================================================*
