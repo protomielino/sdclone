@@ -656,7 +656,7 @@ reDumpTrack(tTrack *track, int verbose)
     const char	*stype[4] = { "", "RGT", "LFT", "STR" };
 #endif
 
-    sprintf(buf, "  by %s (%.2f m length, %.2f m wide) ...", 
+    sprintf(buf, "  by %s (%.2f m long, %.2f m wide) ...", 
 			track->author, track->length, track->width);
     RmLoadingScreenSetText(buf);
 
