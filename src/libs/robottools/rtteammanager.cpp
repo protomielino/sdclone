@@ -137,26 +137,30 @@ int RtTeamDriverAdd(tTeam* const Team, tTeammate* const Teammate, tTeamPit* cons
 		TeamDriver->Car = Teammate->Car;
 		TeamDriver->Team = Team;
 		TeamDriver->TeamPit = TeamPit;
-		TeamDriver->MinLaps = 1;
+		TeamDriver->MinLaps = TeamPit->Count + 1;
 	}
 	else
 	{
-		GlobalTeamManager->Count++;
-		TeamDriver->MinLaps = GlobalTeamManager->Count;
+		if (TeamDriver->TeamPit == TeamPit)
+			TeamDriver->MinLaps = TeamPit->Count + 1;
+
 		tTeamDriver* NewTeamDriver = RtTeamDriver();
 		NewTeamDriver->Car = Teammate->Car; 
 		NewTeamDriver->Team = Team;
 		NewTeamDriver->TeamPit = TeamPit;
-		NewTeamDriver->MinLaps = GlobalTeamManager->Count;
+		NewTeamDriver->MinLaps = TeamPit->Count + 1;
+
 		while (TeamDriver->Next)
 		{
 			TeamDriver = TeamDriver->Next;
-			TeamDriver->MinLaps = GlobalTeamManager->Count;
+			if (TeamDriver->TeamPit == TeamPit)
+				TeamDriver->MinLaps = TeamPit->Count + 1;
 		}
+
 		TeamDriver->Next = NewTeamDriver;
 	}
 
-	return GlobalTeamManager->Count; // For use as handle for the driver
+	return GlobalTeamManager->Count++; // For use as handle for the driver
 }
 
 // Published functions:
