@@ -8,7 +8,7 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.02.24
+// Last changed : 2009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -132,7 +132,7 @@ TOpponent::TInfo& TOpponent::Info()
 //--------------------------------------------------------------------------*
 void TOpponent::Update(
   const PCarElt MyCar,
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
   PTeamManager TeamManager,
 #endif
@@ -141,7 +141,7 @@ void TOpponent::Update(
   float &MinDistBack,
   double &MinTimeSlot)
 {
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
   oTeamManager = TeamManager;                    // Save Pointer
 #endif
@@ -326,7 +326,7 @@ bool TOpponent::Classify(
     DistAhead = MIN(MAX(50, DistAhead), 100);    // view to min 50 max 100 m
 
   // Teammate?
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
   if (RtIsTeamMate(MyCar,oCar))                  // If Opp. is teammate
 #else
   if (oTeamManager->IsTeamMate(MyCar,oCar))      // If Opp. is teammate

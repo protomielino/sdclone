@@ -9,7 +9,7 @@
 //
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.02.23
+// Last changed : 2009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -104,8 +104,13 @@ void TSimpleStrategy::Init(TDriver *Driver)
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::IsPitFree()
 {
-#ifdef _USE_RTTEAMMANAGER_
-    return RtIsPitFree(oDriver->TeamIndex());
+#ifdef TORCS_NG
+    bool IsFree = RtIsPitFree(oDriver->TeamIndex());
+	if (IsFree)
+		GfOut("%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+	else
+		GfOut("%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+    return IsFree;
 #else
   if (CarPit != NULL)
   {
@@ -124,20 +129,15 @@ bool TSimpleStrategy::IsPitFree()
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::NeedPitStop()
 {
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
   double FuelConsum;                             // Fuel consumption per m
   if (oFuelPerM == 0.0)                          // If still undefined
     FuelConsum = oExpectedFuelPerM;              //   use estimated value
   else                                           // If known
     FuelConsum = oFuelPerM;                      //   use it
 
-  bool Result = RtNeedPitStop(oDriver->TeamIndex(), FuelConsum);
-  oRemainingDistance = RtGetRemainingDistance(oDriver->TeamIndex());
-  if (oRemainingDistance > oTrackLength + 100)   // More to race?
-  {
-    if (RepairWanted(cPIT_DAMMAGE) > 0)          // Check damages
-      Result = true;
-  }
+  bool Result = RtNeedPitStop(oDriver->TeamIndex(), FuelConsum, RepairWanted(cPIT_DAMMAGE));
+
 #else
   if (CarPit == NULL)                            // Ist eine Box vorhanden?
     return false;                                //   Wenn nicht, Pech!
@@ -219,12 +219,8 @@ bool TSimpleStrategy::NeedPitStop()
 
   if (Result)
   {
-#ifdef _USE_RTTEAMMANAGER_
-	Result = RtAllocatePit(oDriver->TeamIndex());
-	if (Result)
-	  GfOut("#Allocated Pit: %s\n",oDriver->GetBotName());
-	else
-	  GfOut("#Not allocated Pit: %s\n",oDriver->GetBotName());
+#ifdef TORCS_NG
+	  GfOut("#Allocated Pit: %s(%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
 #else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	Team->PitState = CarDriverIndex;             // Box reserviert
@@ -239,7 +235,7 @@ bool TSimpleStrategy::NeedPitStop()
 //--------------------------------------------------------------------------*
 void TAbstractStrategy::PitRelease()
 {
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
   RtReleasePit(oDriver->TeamIndex());
   oCar->ctrl.raceCmd = 0;
 #else
@@ -290,6 +286,8 @@ float TSimpleStrategy::PitRefuel()
     Fuel = oMaxFuel - CarFuel;                   // Tankinhalt begrenzen
   else                                           // ansonsten Bedarf
     Fuel = Fuel - CarFuel;                       // abzügl. Tankinhalt
+
+  //Fuel = MIN(Fuel,10.0);                         // NUR ZUM TEST DES TEAMMANAGERS
 
   oLastPitFuel = (float) MAX(Fuel,0.0);          // Wenn genug da ist = 0.0
 
@@ -385,6 +383,8 @@ double TSimpleStrategy::SetFuelAtRaceStart
     else                                         // Bei fünf Tankfüllungen
       oLastFuel = Fuel / 5;                      //   ein Fünftel tanken
   };
+
+  //oLastFuel = MIN(oLastFuel,15.0);               // NUR ZUM TEST DES TEAMMANAGERS
 
   oLastFuel = MIN(oLastFuel, oMaxFuel);          // Überlaufen verhindern
   GfParmSetNum(*CarSettings, SECT_CAR, PRM_FUEL, // Gewünschte Tankfüllung
@@ -622,11 +622,13 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  {
         oPitStartTicker--;
         if (oPitStartTicker < 0)
+		{
+  		  GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
 	      oState = PIT_EXIT;
+		}
 		oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;    // Only small lights on           
 		oCar->ctrl.accelCmd = 0.0;               
 	    oCar->ctrl.brakeCmd = 1.0;               
-  	    GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
 	  }
 	  else
 	  {

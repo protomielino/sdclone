@@ -45,21 +45,26 @@ extern int RtGetTeamIndex(                       // Add a Teammate to it's team
 
 extern void RtFreeGlobalTeamManager();           // Free at Shutdown
 
+extern void RtDumpTeammanager();                 // For tests: Dump content to console
+
+
 
 //
 // Team related functions for use by robots
 //
 extern int RtGetMinLaps(                         // Get nbr of laps all other teammates using the same pit can still race 
-	const int TeamIndex);
-
+	const int TeamIndex, const int FuelForLaps);
+/*
 extern void RtSetMinLaps(                        // Set the nbr of laps this teammate can still drive without refueling
 	const int TeamIndex, const int FuelForLaps); 
-
+*/
 extern float RtGetRemainingDistance(             // Get the remaining distance to race for this teammate
 	const int TeamIndex);                        // (depends from being overlapped or not)
 
 extern bool RtNeedPitStop(                       // Check wether this teammate should got to pit for refueling 
-	const int TeamIndex, float FuelPerM);        // (depends from the fuel of all other teammates using the same pit)
+	const int TeamIndex,                         // (depends from the fuel of all other teammates using the same pit)
+	float FuelPerM,                              // Fuel consumption per m
+	int RepairWanted);                           // Damage to repair at next pitstop
 
 extern bool RtAllocatePit(                       // Try to allocate the pit for use of this teammate 
 	const int TeamIndex);
@@ -92,11 +97,12 @@ extern void RtReleasePit(                        // Release the pit
 //
 // Version header
 //
-typedef struct 
+typedef struct tDataStructVersionHeader
 {                                                // NEVER CHANGE THIS >>> 
     short int MajorVersion;                      // Changed if struct is extended 
     short int MinorVersion;                      // Changed for changes without extending the struct 
 	int Size;                                    // sizeof the struct including this header
+	tDataStructVersionHeader* Next;              // Linked list for garbage collection
                                                  // NEVER CHANGE THIS <<< 
 } tDataStructVersionHeader;
 
@@ -109,6 +115,7 @@ typedef struct tTeammate
     tDataStructVersionHeader Header;             // Version and size of this struct
 	CarElt*	Car;		                         // The car of this team member
 	tTeammate* Next;	                         // The next team member
+	int Count;                                   // Nbr of Teammates in this list
 	                                             // <<< NEVER CHANGE THIS V1.X
 	                                             // Extend it here if needed but increment MAJOR VERSION!
 } tTeammate;
@@ -122,9 +129,10 @@ typedef struct tTeamPit
     tDataStructVersionHeader Header;             // Version and size of this struct
 	tTeamPit* Next;                              // Linked list of pits of this team for later use
 	tTeammate* Teammates;						 // Linked list of teammates of this pit
-	int Count;                                   // Nbr of Teammates using this pit
 	CarElt*	PitState;                            // Request for shared pit
 	tTrackOwnPit* Pit;                           // TORCS pit
+	int Count;                                   // Nbr of TeamPits in this list
+	char* Name;                                  // Name of the Teampit
 	                                             // <<< NEVER CHANGE THIS V1.X
 	                                             // Extend it here if needed but increment MAJOR VERSION!
 } tTeamPit;
@@ -136,10 +144,9 @@ typedef struct tTeam
 {                                                // NEVER CHANGE THIS >>> V1.X
     tDataStructVersionHeader Header;             // Version and size of this struct
 	char* TeamName;	                             // Name of team
-	tTeam* Teams;                                // Linked list of teams
+	tTeam* Next;                                 // Linked list of teams
 	tTeamPit* TeamPits;                          // Linked list of pits of this team
 	int Count;                                   // Nbr of teammates
-	int PitCount;                                // Nbr of pits of the team
 	int MinMajorVersion;                         // Min MajorVersion used by an teammates robot
 	                                             // <<< NEVER CHANGE THIS V1.X
 } tTeam;                                         // and add the additional values to function RtTeamUpdate
@@ -159,8 +166,9 @@ typedef struct tTeamDriver
 
 	float RemainingDistance;                     // Distance still to race
 	float Reserve;                               // Reserve in [m] to keep fuel for
-	int FuelForLaps;                             // Driver has still fuel for this nbr of laps
+	float MinFuel;                               // Min fuel of all other teammates using this pit
 	int MinLaps;                                 // All Teammates using this pit have to be able to drive this nbr of laps 
+	int FuelForLaps;                             // Driver has still fuel for this nbr of laps
 	int LapsRemaining;                           // Nbr of laps still to race
 	                                             // <<< NEVER CHANGE THIS V1.X
 } tTeamDriver; 
@@ -171,7 +179,7 @@ typedef struct tTeamDriver
 typedef struct 
 {                                                // NEVER CHANGE THIS >>> V1.X
     tDataStructVersionHeader Header;             // Version and size of this struct
-	int Count;                                   // Nbr of Teammates/Drivers
+    tDataStructVersionHeader* GarbageCollection; // Linked List of allocated memory blocks used for destruction
 	tTeam* Teams;                                // Linked list of teams
 	tTeamDriver* TeamDrivers;                    // Linked list of drivers belonging to a team
 	tTrack* Track;                               // Track

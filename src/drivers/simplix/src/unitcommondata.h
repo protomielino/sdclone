@@ -7,7 +7,7 @@
 //
 // File         : unitcommondata.h
 // Created      : 2007.11.17
-// Last changed : 1009.02.24
+// Last changed : 1009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -60,7 +60,7 @@
 
 #include <track.h>
 #include "unitglobal.h"
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 #include "unitteammanager.h"
 #endif
@@ -76,7 +76,7 @@ class TCommonData
     ~TCommonData();                              // Destructor
 
   public:
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
     TTeamManager TeamManager;                    // Team manager 
 #endif

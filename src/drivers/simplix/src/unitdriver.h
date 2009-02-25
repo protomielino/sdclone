@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.02.24
+// Last changed : 2009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -75,7 +75,7 @@
 #include "unitpidctrl.h"
 #include "unitsysfoo.h"
 
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #include "teammanager.h"
 #else
 #include "unitteammanager.h"
@@ -160,7 +160,7 @@ class TDriver
 	  (void* RobotSettings, char* Value);
 	inline void	SetCommonData                    // Set pointer to common data
 	  (TCommonData* CommonData);
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 	inline TTeamManager::TTeam* GetTeam();
 #endif
@@ -226,7 +226,7 @@ private:
 	double oAvoidScale;			                 // scale avoiding 
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 	TTeamManager::TTeam* oTeam;                  // Team
 #endif
@@ -408,7 +408,7 @@ void TDriver::SetCommonData
 //==========================================================================*
 // Get Team
 //--------------------------------------------------------------------------*
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 TTeamManager::TTeam* TDriver::GetTeam()
 {

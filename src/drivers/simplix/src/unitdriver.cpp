@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.24
+// Last changed : 2009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -1065,7 +1065,7 @@ void TDriver::EndRace()
 //--------------------------------------------------------------------------*
 void TDriver::Shutdown()
 {
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 	RtFreeGlobalTeamManager();
 #endif
 }
@@ -1127,7 +1127,7 @@ void TDriver::FindRacinglines()
   if(oCommonData->Track != oTrackDesc.Track())   // New track?
   {
     oCommonData->Track = oTrackDesc.Track();     // Save pointer
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
     oCommonData->TeamManager.Clear();            // release old informations
 #endif
@@ -1251,8 +1251,9 @@ void TDriver::FindRacinglines()
 //--------------------------------------------------------------------------*
 void TDriver::TeamInfo()
 {
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
   oTeamIndex = RtGetTeamIndex(oCar,oTrack,oSituation);
+  RtDumpTeammanager();
 #else
   oTeam = oCommonData->TeamManager.Add(oCar);
 #endif
@@ -1335,7 +1336,7 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   for (int I = 0; I < oNbrCars; I++)
   {
 	oOpponents[I].Update(oCar,
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 	  &oCommonData->TeamManager, 
 #endif

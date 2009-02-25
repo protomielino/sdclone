@@ -8,7 +8,7 @@
 //
 // File         : unitopponent.h
 // Created      : 2007.11.17
-// Last changed : 2009.02.23
+// Last changed : 2009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -61,7 +61,7 @@
 #include "unitglobal.h"
 #include "unitcommon.h"
 
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 #include "unitteammanager.h"
 #endif
@@ -137,7 +137,7 @@ class TOpponent
 
 	void Update                                  // Update
 	  (const PCarElt MyCar,
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
 	  PTeamManager TeamManager,
 #endif
@@ -157,7 +157,7 @@ class TOpponent
 	double oDeltaTime;                           // Simulation delta time
     int oIndex;                                  // Opponents cars index
 	TInfo oInfo;                                 // info of this opponent
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #else
     PTeamManager oTeamManager;                   // Teammanager
 #endif

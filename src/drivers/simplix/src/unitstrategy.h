@@ -8,7 +8,7 @@
 //
 // File         : unitstrategy.h
 // Created      : 2007.02.20
-// Last changed : 2009.02.24
+// Last changed : 2009.02.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -61,7 +61,7 @@
 #include "unitdriver.h"
 #include "unitpit.h"
 
-#ifdef _USE_RTTEAMMANAGER_
+#ifdef TORCS_NG
 #include "teammanager.h"
 #else
 #endif

@@ -25,9 +25,9 @@ EXPORTS
 	RtGetTeamIndex
 	RtFreeGlobalTeamManager
 	RtGetMinLaps
-	RtSetMinLaps
 	RtAllocatePit
 	RtIsPitFree
 	RtReleasePit
 	RtNeedPitStop
 	RtGetRemainingDistance
+	RtDumpTeammanager
