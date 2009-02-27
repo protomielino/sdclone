@@ -19,15 +19,17 @@ EXPORTS
 	RtGetDistFromStart2
 	RtDistToPit
 	RtTrackGetSeg
-    RtGetMajorVersion
-    RtGetMinorVersion
 	RtIsTeamMate
-	RtGetTeamIndex
-	RtFreeGlobalTeamManager
-	RtGetMinLaps
-	RtAllocatePit
-	RtIsPitFree
-	RtReleasePit
-	RtNeedPitStop
-	RtGetRemainingDistance
-	RtDumpTeammanager
+	RtTeamManagerDump
+    RtTeamManagerGetMajorVersion
+    RtTeamManagerGetMinorVersion
+	RtTeamManagerIndex
+	RtTeamManagerInit
+	RtTeamManagerLaps
+	RtTeamManagerRelease
+	RtTeamManagerShowInfo
+	RtTeamAllocatePit
+	RtTeamIsPitFree
+	RtTeamNeedPitStop
+	RtTeamReleasePit
+	RtTeamUpdate

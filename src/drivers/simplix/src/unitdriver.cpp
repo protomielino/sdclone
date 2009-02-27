@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.25
+// Last changed : 2009.02.27
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -389,10 +389,13 @@ void TDriver::InitTrack
   PCarSettings *CarSettings, PSituation Situation)
 {
   GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
-  if (CarHandle == NULL)
-    CarHandle = NULL;
 
   oTrack = Track;                                // save pointers
+  if (TrackLength < 2000)
+	RtTeamManagerLaps(3);
+  else if (TrackLength < 3000)
+	RtTeamManagerLaps(2);
+
   oSituation = Situation;
 
   oSkillGlobal = oSkill = oDecelAdjustPerc = oDriverAggression = 0.0;
@@ -474,20 +477,15 @@ void TDriver::InitTrack
   oTrackName = TrackNameBuffer;                  // Set pointer to buffer
 
   // Read/merge car parms
-  PCarHandle Handle = NULL;                      // TORCS does not initialize it!
-  char Buf[1024];                                // Multi purpose buffer
-
-  // TORCS params for car type (e.g. .../cars/carX-trb1/carX-trb1.xml)
-  snprintf(Buf,sizeof(Buf),                      // Build path to
-    "%scars/%s/%s.xml",GetDataDir()              // cars torcs config file
-	,oCarType,oCarType);                         // name of car type
-  GfOut("#cartype.xml: %s\n", Buf);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
-  oMaxFuel = GfParmGetNum(Handle                 // Maximal möglicher
+  // First all params out of the common files
+  oMaxFuel = GfParmGetNum(CarHandle              // Maximal möglicher
     , SECT_CAR, PRM_TANK                         //   Tankinhalt
     , (char*) NULL, 100.0);
   GfOut("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
-  Handle = 0;                                    // Reset handle
+
+  // Next Params out of the own files
+  PCarHandle Handle = NULL;                      // Start with an "empty file"
+  char Buf[1024];                                // Multi purpose buffer
 
   // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
   snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
@@ -537,7 +535,7 @@ void TDriver::InitTrack
   // Override params for car type on track with driver on track
   snprintf(Buf,sizeof(Buf),"%s/%d/%s.xml",
     BaseParamPath,oIndex,oTrackName);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
+//  Handle = TUtils::MergeParamFile(Handle,Buf);
 
   // Override params for driver on track with params of specific race type
   snprintf(Buf,sizeof(Buf),"%s/%d/%s-%s.xml",
@@ -815,7 +813,7 @@ void TDriver::InitTrack
   PitSideMod.side = PitSide();                   // Get side of pitlane
   PitSideMod.start =                             // Exclude pits
 	int(GfParmGetNum(Handle,                     //   while getting extra width
-	TDriver::SECT_PRIV,PRV_TRKPIT_START,0,0));            //   starting here
+	TDriver::SECT_PRIV,PRV_TRKPIT_START,0,0));   //   starting here
   PitSideMod.end =                               //   and stopping here
 	int(GfParmGetNum(Handle,
 	TDriver::SECT_PRIV,PRV_TRKPIT_END,0,0));
@@ -1066,7 +1064,8 @@ void TDriver::EndRace()
 void TDriver::Shutdown()
 {
 #ifdef TORCS_NG
-	RtFreeGlobalTeamManager();
+	RtTeamManagerDump();
+	RtTeamManagerRelease();
 #endif
 }
 //==========================================================================*
@@ -1252,8 +1251,9 @@ void TDriver::FindRacinglines()
 void TDriver::TeamInfo()
 {
 #ifdef TORCS_NG
-  oTeamIndex = RtGetTeamIndex(oCar,oTrack,oSituation);
-  RtDumpTeammanager();
+  RtTeamManagerShowInfo();
+  oTeamIndex = RtTeamManagerIndex(oCar,oTrack,oSituation);
+  RtTeamManagerDump();
 #else
   oTeam = oCommonData->TeamManager.Add(oCar);
 #endif

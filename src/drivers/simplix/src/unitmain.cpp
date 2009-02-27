@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2009.02.25
+// Last changed : 2009.02.26
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
@@ -162,13 +162,13 @@ static char** BotDesc = defaultBotDesc;
 
 static TDriver *cRobot[MAXNBBOTS];
 static TCommonData gCommonData;
-static double cTicks;
-static double cMinTicks;
-static double cMaxTicks;
-static int cTickCount;
-static int cLongSteps;
-static int cCriticalSteps;
-static int cUnusedCount;
+static double cTicks[MAXNBBOTS];
+static double cMinTicks[MAXNBBOTS];
+static double cMaxTicks[MAXNBBOTS];
+static int cTickCount[MAXNBBOTS];
+static int cLongSteps[MAXNBBOTS];
+static int cCriticalSteps[MAXNBBOTS];
+static int cUnusedCount[MAXNBBOTS];
 //==========================================================================*
 
 //==========================================================================*
@@ -515,13 +515,13 @@ static void InitTrack(int Index,
 //--------------------------------------------------------------------------*
 static void NewRace(int Index, tCarElt* Car, tSituation *S)
 {
-  cTicks = 0.0;                                  // Initialize counters
-  cMinTicks = FLT_MAX;                           // and time data 
-  cMaxTicks = 0.0;
-  cTickCount = 0;
-  cLongSteps = 0;
-  cCriticalSteps = 0;
-  cUnusedCount = 0;
+  cTicks[Index-IndexOffset] = 0.0;               // Initialize counters
+  cMinTicks[Index-IndexOffset] = FLT_MAX;        // and time data 
+  cMaxTicks[Index-IndexOffset] = 0.0;
+  cTickCount[Index-IndexOffset] = 0;
+  cLongSteps[Index-IndexOffset] = 0;
+  cCriticalSteps[Index-IndexOffset] = 0;
+  cUnusedCount[Index-IndexOffset] = 0;
   
   cRobot[Index-IndexOffset]->NewRace(Car, S);
 }
@@ -557,19 +557,19 @@ static void Drive(int Index, tCarElt* Car, tSituation *S)
 	clock_t StopTicks = clock();                 // Calculate used time 
     double Duration = 1000.0 * (StopTicks - StartTicks)/CLOCKS_PER_SEC;
 
-	if (cTickCount > 0)                          // Collect used time 
+	if (cTickCount[Index-IndexOffset] > 0)       // Collect used time 
 	{
 	  if (Duration > 1.0)
-        cLongSteps++;
+        cLongSteps[Index-IndexOffset]++;
 	  if (Duration > 2.0)
-        cCriticalSteps++;
-	  if (cMinTicks > Duration)
-	    cMinTicks = Duration;
-	  if (cMaxTicks < Duration)
-	    cMaxTicks = Duration;
+        cCriticalSteps[Index-IndexOffset]++;
+	  if (cMinTicks[Index-IndexOffset] > Duration)
+	    cMinTicks[Index-IndexOffset] = Duration;
+	  if (cMaxTicks[Index-IndexOffset] < Duration)
+	    cMaxTicks[Index-IndexOffset] = Duration;
 	}
-	cTickCount++;
-  	cTicks += Duration;
+	cTickCount[Index-IndexOffset]++;
+  	cTicks[Index-IndexOffset] += Duration;
   }
 //  else
 //    cUnusedCount++;
@@ -613,13 +613,13 @@ static void Shutdown(int Index)
   delete cRobot[Index-IndexOffset];
 
   GfOut("\n\n#Clock\n");
-  GfOut("#Total Time used: %g sec\n",cTicks/1000.0);
-  //GfOut("#Min   Time used: %g msec\n",cMinTicks);
-  //GfOut("#Max   Time used: %g msec\n",cMaxTicks);
-  GfOut("#Mean  Time used: %g msec\n",cTicks/cTickCount);
-  //GfOut("#Long Time Steps: %d\n",cLongSteps);
-  //GfOut("#Critical Steps : %d\n",cCriticalSteps);
-  //GfOut("#Unused Steps   : %d\n",cUnusedCount);
+  GfOut("#Total Time used: %g sec\n",cTicks[Index-IndexOffset]/1000.0);
+  //GfOut("#Min   Time used: %g msec\n",cMinTicks[Index-IndexOffset]);
+  //GfOut("#Max   Time used: %g msec\n",cMaxTicks[Index-IndexOffset]);
+  GfOut("#Mean  Time used: %g msec\n",cTicks[Index-IndexOffset]/cTickCount[Index-IndexOffset]);
+  //GfOut("#Long Time Steps: %d\n",cLongSteps[Index-IndexOffset]);
+  //GfOut("#Critical Steps : %d\n",cCriticalSteps[Index-IndexOffset]);
+  //GfOut("#Unused Steps   : %d\n",cUnusedCount[Index-IndexOffset]);
   
   GfOut("\n\n#");
 }

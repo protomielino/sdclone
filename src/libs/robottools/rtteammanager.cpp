@@ -19,9 +19,9 @@
 
 /** @file	
     This is a collection of useful functions for using a teammanager with
-	teams being build of different robots.
-	You can see an example of teammanager usage in the robots of GP36: 
-	  simplix_36GP and usr_36GP.
+	teams build of different robots.
+	It can handle teams with more drivers than cars per pit.
+	You can see how to use in the simplix robots. 
 
     @author	<a href=mailto:wdb@wdbee.de>Wolf-Dieter Beelitz</a>
     @version	
@@ -42,8 +42,13 @@
 #include "robottools.h"
 #include "teammanager.h"
 
-static tTeamManager* GlobalTeamManager = NULL;   // the one and only!
-//static bool PitSharing = false;                  // Is pitsharing activated?
+// Private variable
+
+static tTeamManager* RtTM = NULL;                // The one and only team manager!
+static bool RtTMShowInfo = false;                // Flag: Show team manager infos at console
+static int RtTMLaps = 1;                         // Nbr of laps to add for MinLaps (Increase for short tracks regarding the possibility of high damages to repair)
+
+
 
 // Private functions
 
@@ -53,10 +58,10 @@ static tTeamManager* GlobalTeamManager = NULL;   // the one and only!
 tDataStructVersionHeader RtSetHeader(const int Size)
 {
   tDataStructVersionHeader Header;
-  Header.MajorVersion = CURRENT_MAJOR_VERSION;
-  Header.MinorVersion = CURRENT_MINOR_VERSION;
+  Header.MajorVersion = RT_TM_CURRENT_MAJOR_VERSION;
+  Header.MinorVersion = RT_TM_CURRENT_MINOR_VERSION;
   Header.Size = Size;
-  Header.Next = GlobalTeamManager->GarbageCollection;
+  Header.Next = RtTM->GarbageCollection;
 
   return Header;
 }
@@ -81,9 +86,6 @@ bool RtIsPitSharing(const CarElt* Car)
 	}
 }
 
-
-
-
 //
 // Create a team driver (allocate memory for data)
 //
@@ -91,7 +93,7 @@ tTeamDriver* RtTeamDriver()
 {
 	tTeamDriver* TeamDriver = (tTeamDriver*) malloc(sizeof(tTeamDriver));
 	TeamDriver->Header = RtSetHeader(sizeof(tTeamDriver));   
-    GlobalTeamManager->GarbageCollection = (tDataStructVersionHeader*) TeamDriver;
+    RtTM->GarbageCollection = (tDataStructVersionHeader*) TeamDriver;
 
 	TeamDriver->Next = NULL;   
 	TeamDriver->Count = 0;   
@@ -110,27 +112,11 @@ tTeamDriver* RtTeamDriver()
 };
 
 //
-// Destroy a team driver (free allocated memory)
-//
-void RtTeamDriverFree(tTeamDriver* TeamDriver)
-{
-	GfOut("# %s (%s) pit: %p\n",TeamDriver->Car->info.name,TeamDriver->Team->TeamName,&(TeamDriver->TeamPit));
-	free(TeamDriver);
-};
-
-//
 // Get TeamDriver from index
 //
-extern tTeamDriver* RtGetTeamDriver(const int TeamIndex)
+extern tTeamDriver* RtTeamDriverGet(const int TeamIndex)
 {
-	tTeamDriver* TeamDriver = GlobalTeamManager->TeamDrivers;
-	while (TeamDriver)
-	{
-		if (TeamDriver->Count == TeamIndex)
-			return TeamDriver;
-		TeamDriver = TeamDriver->Next;
-	}
-	return NULL;
+	return RtTM->Drivers[TeamIndex - 1];
 };
 
 //
@@ -139,10 +125,10 @@ extern tTeamDriver* RtGetTeamDriver(const int TeamIndex)
 int RtTeamDriverAdd(tTeam* const Team, tTeammate* const Teammate, tTeamPit* const TeamPit)
 {
 	tTeamDriver* TeamDriver = RtTeamDriver();
-	if (GlobalTeamManager->TeamDrivers)
+	if (RtTM->TeamDrivers)
 	{
-		TeamDriver->Next = GlobalTeamManager->TeamDrivers;
-		TeamDriver->Count = 1 + GlobalTeamManager->TeamDrivers->Count;
+		TeamDriver->Next = RtTM->TeamDrivers;
+		TeamDriver->Count = 1 + RtTM->TeamDrivers->Count;
 	}
 	else
 		TeamDriver->Count = 1;
@@ -152,34 +138,10 @@ int RtTeamDriverAdd(tTeam* const Team, tTeammate* const Teammate, tTeamPit* cons
 	TeamDriver->TeamPit = TeamPit;
 	TeamDriver->MinLaps = TeamPit->Teammates->Count + 1;
 
-	GlobalTeamManager->TeamDrivers = TeamDriver;
+	RtTM->TeamDrivers = TeamDriver;
+	RtTM->Drivers[TeamDriver->Count - 1] = TeamDriver;
+
 	return TeamDriver->Count; // For use as handle for the driver
-}
-
-// Published functions:
-
-//
-// Check if Car0 is teammate of Car1
-//
-bool RtIsTeamMate(const CarElt* Car0, const CarElt* Car1)
-{
-  return strcmp(Car0->_teamname, Car1->_teamname) == 0;
-}
-
-//
-// Get MajorVersion of global teammanager
-//
-short int RtGetMajorVersion()
-{
-  return CURRENT_MAJOR_VERSION;
-}
-
-//
-// Get MinorVersion of global teammanager
-//
-short int RtGetMinorVersion()
-{
-  return CURRENT_MINOR_VERSION;
 }
 
 //
@@ -190,8 +152,8 @@ tTeamManager* RtTeamManager()
     tTeamManager* TeamManager = (tTeamManager*)  
 		malloc(sizeof(tTeamManager));            
 
-	TeamManager->Header.MajorVersion = CURRENT_MAJOR_VERSION;
-	TeamManager->Header.MinorVersion = CURRENT_MINOR_VERSION;
+	TeamManager->Header.MajorVersion = RT_TM_CURRENT_MAJOR_VERSION;
+	TeamManager->Header.MinorVersion = RT_TM_CURRENT_MINOR_VERSION;
 	TeamManager->Header.Size = sizeof(tTeamManager);	
 	TeamManager->Header.Next = NULL;
 
@@ -199,9 +161,11 @@ tTeamManager* RtTeamManager()
 
 	TeamManager->Teams = NULL;                   
 	TeamManager->TeamDrivers = NULL;                   
+	TeamManager->Drivers = NULL;                   
 	TeamManager->Track = NULL;                   
-	TeamManager->RaceDistance = 500000;
+	TeamManager->Count = 0;     
 	TeamManager->PitSharing = false;
+	TeamManager->RaceDistance = 500000;
 
 	return TeamManager;
 }
@@ -211,97 +175,33 @@ tTeamManager* RtTeamManager()
 //
 void RtTeamManagerFree()
 {
-    if (GlobalTeamManager != NULL)                           
+    if (RtTM != NULL)                           
 	{
-		tDataStructVersionHeader* Block = GlobalTeamManager->GarbageCollection;
+		free(RtTM->Drivers);
+
+		tDataStructVersionHeader* Block = RtTM->GarbageCollection;
 		while (Block)
 		{
 			tDataStructVersionHeader* ToFree = Block;
 			Block = Block->Next;
 			free(ToFree);
 		}
-		GlobalTeamManager = NULL;                           
+		RtTM = NULL;                           
 	}
-}
-
-//
-// Add a car to it's teams resources
-//
-tTeam* RtTeamManagerAddToTeam(CarElt* const Car, tTeammate* Teammate, tTeamPit** TeamPit)
-{
-	tTeam* Team = GlobalTeamManager->Teams;            
-	while (Team != NULL)                         
-	{
-		if (strcmp(Car->_teamname,Team->TeamName) == 0) 
-		{   // If Team is cars team add car to team
-			*TeamPit = RtTeamAdd(Team, Teammate); 
-			return Team;
-		}
-		else
-			Team = Team->Next;
-	}
-
-	// If the team doesn't exists yet
-	tTeam* NewTeam = RtTeam();                   
-
-	// Add new team to linked list of teams
-	if (GlobalTeamManager->Teams)                
-	{
-		NewTeam->Next = GlobalTeamManager->Teams;
-		NewTeam->Count = 1 + GlobalTeamManager->Teams->Count;      
-	}
-	else                                         
-	{                                     
-		NewTeam->Count = 1;      
-	}
-	NewTeam->TeamName = Car->_teamname;          
-	GlobalTeamManager->Teams = NewTeam;
-
-	// Add new teammate to team
-	*TeamPit = RtTeamAdd(NewTeam, Teammate);     
-
-	return NewTeam;
-}
-
-
-//
-// Add a car to it's team and get it's TeamIndex as handle for subsequent calls
-//
-int RtGetTeamIndex(CarElt* const Car, tTrack* const Track, tSituation* Situation)
-{
-    RtInitGlobalTeamManager(); // Initializes the global team manager if needed
-
- 	GlobalTeamManager->Track = Track;            
-	GlobalTeamManager->RaceDistance = Track->length * Situation->_totLaps;            
-
-	tTeammate* Teammate = RtTeammate();
-	Teammate->Count = 0;
-	Teammate->Car = Car;                     
-
-	tTeamPit* TeamPit = NULL;
-	tTeam* Team = RtTeamManagerAddToTeam(Car,Teammate,&TeamPit);
-
-	return RtTeamDriverAdd(Team, Teammate, TeamPit);
 }
 
 //
 // Initialize the global teammanager
 //
-void RtInitGlobalTeamManager()
+bool RtTeamManagerInit()
 {
-	if (GlobalTeamManager == NULL)
-		GlobalTeamManager = RtTeamManager();
+	if (RtTM == NULL)
+	{
+		RtTM = RtTeamManager();
+		return true;
+	}
+	return false;
 }
-
-//
-// Release the global teammanager
-//
-void RtFreeGlobalTeamManager()
-{
-	RtTeamManagerFree();
-}
-
-
 
 //
 // Create a team (allocate memory for data)
@@ -310,7 +210,7 @@ tTeam* RtTeam()
 {
     tTeam* Team = (tTeam*) malloc(sizeof(tTeam));
 	Team->Header = RtSetHeader(sizeof(tTeam));   
-    GlobalTeamManager->GarbageCollection = (tDataStructVersionHeader*) Team;
+    RtTM->GarbageCollection = (tDataStructVersionHeader*) Team;
 
 	Team->TeamName = NULL;	                     
 	Team->Next = NULL;                          
@@ -322,32 +222,17 @@ tTeam* RtTeam()
 }
 
 //
-// Destroy a team's allocated data
-//
-void RtTeamFree(tTeam* const Team)               
-{
-	tTeamPit* TeamPit = Team->TeamPits;
-	while (TeamPit != NULL)
-	{
-		tTeamPit* NextTeamPit = TeamPit->Next;
-		RtTeamPitFree(TeamPit);
-		TeamPit = NextTeamPit;
-	}
-    free(Team);                                  
-}
-
-//
 // Get nbr of laps all other teammates using the same pit can race with current fuel
 //
-int RtMinLaps(tTeamDriver* TeamDriver, const int FuelForLaps) 
+int RtTeamDriverUpdate(tTeamDriver* TeamDriver, const int FuelForLaps) 
 {                                                
 	TeamDriver->FuelForLaps = FuelForLaps;             
 	tTeamPit* TeamPit = TeamDriver->TeamPit;
 
-	int MinLaps = INT_MAX;                            // Assume unlimited
+	int MinLaps = INT_MAX;                       // Assume unlimited
 	float MinFuel = FLT_MAX;
 
-	tTeamDriver* OtherTeamDriver = GlobalTeamManager->TeamDrivers;
+	tTeamDriver* OtherTeamDriver = RtTM->TeamDrivers;
 
 	while (OtherTeamDriver)
 	{
@@ -363,21 +248,56 @@ int RtMinLaps(tTeamDriver* TeamDriver, const int FuelForLaps)
 }
 
 //
-// Get nbr of laps all other teammates using the same pit can race with current fuel
+// Create a pit of a team (allocate memory for data)
 //
-int RtGetMinLaps(const int TeamIndex, const int FuelForLaps) 
-{                                                
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
-	return RtMinLaps(TeamDriver,FuelForLaps);
+tTeamPit* RtTeamPit()                                  
+{
+    tTeamPit* TeamPit = (tTeamPit*) malloc(sizeof(tTeamPit));
+	TeamPit->Header = RtSetHeader(sizeof(tTeamPit));   
+    RtTM->GarbageCollection = (tDataStructVersionHeader*) TeamPit;
+
+	TeamPit->Teammates = NULL;                      
+	TeamPit->Next = NULL;                        
+	TeamPit->PitState = RT_TM_PIT_IS_FREE;	     // Request for this shared pit
+	TeamPit->Count = 0;        
+	TeamPit->Pit = NULL;
+	TeamPit->Name = NULL;
+
+	return TeamPit;
 }
 
 //
-// Set nbr of laps this teammate can race with current fuel
+// Add a teammate to a pit of the team
 //
-void RtSetMinLaps(const int TeamIndex, const int FuelForLaps) 
-{                                    
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
-	TeamDriver->FuelForLaps = FuelForLaps;             
+int RtTeamPitAdd(tTeamPit* const TeamPit, tTeammate* const NewTeammate)
+{
+	if (TeamPit->Teammates)
+	{
+		NewTeammate->Next = TeamPit->Teammates;
+		NewTeammate->Count = 1 + TeamPit->Teammates->Count;
+	}
+	else
+		NewTeammate->Count = 1;
+
+	TeamPit->Teammates = NewTeammate;
+
+	return NewTeammate->Count;
+}
+
+//
+// Create a teammate (allocate memory for data)
+//
+tTeammate* RtTeammate()                          
+{
+    tTeammate* Teammate = (tTeammate*) malloc(sizeof(tTeammate));
+	Teammate->Header = RtSetHeader(sizeof(tTeammate));
+    RtTM->GarbageCollection = (tDataStructVersionHeader*) Teammate;
+
+	Teammate->Count = 0;
+	Teammate->Car = NULL;                           
+	Teammate->Next = NULL;                          
+
+	return Teammate;
 }
 
 //
@@ -419,13 +339,152 @@ tTeamPit* RtTeamAdd(tTeam* const Team, tTeammate* const Teammate)
 }
 
 //
+// Add a car to it's teams resources
+//
+tTeam* RtTeamManagerAdd(CarElt* const Car, tTeammate* Teammate, tTeamPit** TeamPit)
+{
+	tTeam* Team = RtTM->Teams;            
+	while (Team != NULL)                         
+	{
+		if (strcmp(Car->_teamname,Team->TeamName) == 0) 
+		{   // If Team is cars team add car to team
+			*TeamPit = RtTeamAdd(Team, Teammate); 
+			return Team;
+		}
+		else
+			Team = Team->Next;
+	}
+
+	// If the team doesn't exists yet
+	tTeam* NewTeam = RtTeam();                   
+
+	// Add new team to linked list of teams
+	if (RtTM->Teams)                
+	{
+		NewTeam->Next = RtTM->Teams;
+		NewTeam->Count = 1 + RtTM->Teams->Count;      
+	}
+	else                                         
+	{                                     
+		NewTeam->Count = 1;      
+	}
+	NewTeam->TeamName = Car->_teamname;          
+	RtTM->Teams = NewTeam;
+
+	// Add new teammate to team
+	*TeamPit = RtTeamAdd(NewTeam, Teammate);     
+
+	return NewTeam;
+}
+
+
+
+
+// Published functions:
+
+//
+// Get MajorVersion of global teammanager
+//
+short int RtTeamManagerGetMajorVersion()
+{
+  return RT_TM_CURRENT_MAJOR_VERSION;
+}
+
+//
+// Get MinorVersion of global teammanager
+//
+short int RtTeamManagerGetMinorVersion()
+{
+  return RT_TM_CURRENT_MINOR_VERSION;
+}
+
+//
+// Check if Car0 is teammate of Car1
+//
+bool RtIsTeamMate(const CarElt* Car0, const CarElt* Car1)
+{
+  return strcmp(Car0->_teamname, Car1->_teamname) == 0;
+}
+
+//
+// Nbr of laps to add for MinLaps 
+// (Increase for short tracks regarding the possibility of high damages to repair)
+//
+void RtTeamManagerLaps(const int Laps)
+{
+	RtTMLaps = Laps;
+}
+
+//
+// Add a car to it's team and get it's TeamIndex as handle for subsequent calls
+//
+int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situation)
+{
+    RtTeamManagerInit(); // Initializes the global team manager if needed
+	if (RtTM->Drivers == NULL)
+	{
+		RtTM->Count = Situation->_ncars;
+		RtTM->Drivers = 
+			(tTeamDriver**) malloc(Situation->_ncars * sizeof(tTeamDriver*));
+	}
+
+ 	RtTM->Track = Track;            
+	RtTM->RaceDistance = Track->length * Situation->_totLaps;   
+
+	tTeammate* Teammate = RtTeammate();
+	Teammate->Car = Car;                     
+
+	tTeamPit* TeamPit = NULL;
+	tTeam* Team = RtTeamManagerAdd(Car,Teammate,&TeamPit);
+
+	int TeamIndex = RtTeamDriverAdd(Team, Teammate, TeamPit);
+
+	tTeamDriver* TeamDriver = RtTM->TeamDrivers;
+	if (TeamDriver->Count < RtTM->Count)
+		return TeamIndex;
+
+	// Last driver is added, let's update the number of teammates
+	while(TeamDriver)
+	{
+		TeamDriver->MinLaps = TeamDriver->TeamPit->Teammates->Count + RtTMLaps;
+		TeamDriver = TeamDriver->Next;
+	}
+	return TeamIndex;
+}
+
+//
+// Switch on teammanager info output
+//
+void RtTeamManagerShowInfo()
+{
+	RtTMShowInfo = true;
+}
+
+//
+// Release the global teammanager
+//
+void RtTeamManagerRelease()
+{
+	RtTeamManagerFree();
+}
+
+//
+// Get nbr of laps all other teammates using the same pit can race with current fuel
+//
+int RtTeamUpdate(const int TeamIndex, const int FuelForLaps) 
+{                                                
+	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
+	return RtTeamDriverUpdate(TeamDriver,FuelForLaps);
+}
+
+//
 // Allocate pit
 //
-bool RtAllocatePit(const int TeamIndex)
+bool RtTeamAllocatePit(const int TeamIndex)
 {
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
+	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
-	if (TeamDriver->TeamPit->PitState == PIT_IS_FREE)
+	if (TeamDriver->TeamPit->PitState == RT_TM_PIT_IS_FREE)
 		TeamDriver->TeamPit->PitState = TeamDriver->Car;
 
     return (TeamDriver->TeamPit->PitState == TeamDriver->Car);
@@ -434,12 +493,12 @@ bool RtAllocatePit(const int TeamIndex)
 //
 // Is pit free?
 //
-bool RtIsPitFree(const int TeamIndex)
+bool RtTeamIsPitFree(const int TeamIndex)
 {
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
+	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	if ((TeamDriver->Car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
-      && ((TeamDriver->TeamPit->PitState == TeamDriver->Car) || (TeamDriver->TeamPit->PitState == PIT_IS_FREE)))
+      && ((TeamDriver->TeamPit->PitState == TeamDriver->Car) || (TeamDriver->TeamPit->PitState == RT_TM_PIT_IS_FREE)))
 	  return true;
 	else
 	  return false;
@@ -448,107 +507,20 @@ bool RtIsPitFree(const int TeamIndex)
 //
 // Release pit
 //
-void RtReleasePit(const int TeamIndex)
+void RtTeamReleasePit(const int TeamIndex)
 {
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
+	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	if (TeamDriver->TeamPit->PitState == TeamDriver->Car)
-		TeamDriver->TeamPit->PitState = PIT_IS_FREE;
-}
-
-
-//
-// Create a pit of a team (allocate memory for data)
-//
-tTeamPit* RtTeamPit()                                  
-{
-    tTeamPit* TeamPit = (tTeamPit*) malloc(sizeof(tTeamPit));
-	TeamPit->Header = RtSetHeader(sizeof(tTeamPit));   
-    GlobalTeamManager->GarbageCollection = (tDataStructVersionHeader*) TeamPit;
-
-	TeamPit->Teammates = NULL;                      
-	TeamPit->Next = NULL;                        
-	TeamPit->PitState = PIT_IS_FREE;	             // Request for this shared pit
-	TeamPit->Count = 0;        
-	TeamPit->Pit = NULL;
-	TeamPit->Name = NULL;
-
-	return TeamPit;
-}
-
-//
-// Destroy a pit's data
-//
-void RtTeamPitFree(tTeamPit* TeamPit)
-{
-	tTeammate* Teammate = TeamPit->Teammates;
-	while (Teammate != NULL)
-	{
-		tTeammate* NextTeammate = Teammate->Next;
-		RtTeammateFree(Teammate);
-		Teammate = NextTeammate;
-	}
-	free(TeamPit);
-}
-
-
-//
-// Add a teammate to a pit of the team
-//
-int RtTeamPitAdd(tTeamPit* const TeamPit, tTeammate* const NewTeammate)
-{
-	if (TeamPit->Teammates)
-	{
-		NewTeammate->Next = TeamPit->Teammates;
-		NewTeammate->Count = 1 + TeamPit->Teammates->Count;
-	}
-	else
-		NewTeammate->Count = 1;
-
-	TeamPit->Teammates = NewTeammate;
-
-	return NewTeammate->Count;
-}
-
-
-//
-// Create a teammate (allocate memory for data)
-//
-tTeammate* RtTeammate()                          
-{
-    tTeammate* Teammate = (tTeammate*) malloc(sizeof(tTeammate));
-	Teammate->Header = RtSetHeader(sizeof(tTeammate));
-    GlobalTeamManager->GarbageCollection = (tDataStructVersionHeader*) Teammate;
-
-	Teammate->Car = NULL;                           
-	Teammate->Next = NULL;                          
-
-	return Teammate;
-}
-
-//
-// Destroy a teammate's allocated data
-//
-void RtTeammateFree(tTeammate* const Teammate)        
-{
-    free(Teammate);                             
-}
-
-//
-// Get remaining distance to race
-//
-float RtGetRemainingDistance(const int TeamIndex)
-{
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
-	return TeamDriver->RemainingDistance;
+		TeamDriver->TeamPit->PitState = RT_TM_PIT_IS_FREE;
 }
 
 //
 // Simple check: Is pit stop needed?
 //
-bool RtNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWanted)
+bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWanted)
 {
-	tTeamDriver* TeamDriver = RtGetTeamDriver(TeamIndex);
+	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	CarElt* Car = TeamDriver->Car; 
 	if (Car->_pit == NULL)  
@@ -557,21 +529,20 @@ bool RtNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWa
 	bool PitSharing = RtIsPitSharing(Car);
 	if (PitSharing)                        
 	{                             
-//		if (!RtIsPitFree(TeamIndex))   
 		if (!((Car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
-			&& ((TeamDriver->TeamPit->PitState == Car) || (TeamDriver->TeamPit->PitState == PIT_IS_FREE))))
+			&& ((TeamDriver->TeamPit->PitState == Car) || (TeamDriver->TeamPit->PitState == RT_TM_PIT_IS_FREE))))
 		{
-			GfOut("%s pit is locked(%d)\n",Car->info.name,TeamIndex);
+			if (RtTMShowInfo) GfOut("TM: %s pit is locked(%d)\n",Car->info.name,TeamIndex);
 			return false;              
 		}
 	}
 
 	float FuelConsum;     
 	float FuelNeeded;     
-	float TrackLength = GlobalTeamManager->Track->length;
+	float TrackLength = RtTM->Track->length;
 	bool GotoPit = false;
 
-	TeamDriver->RemainingDistance = GlobalTeamManager->RaceDistance 
+	TeamDriver->RemainingDistance = RtTM->RaceDistance 
 		+ TeamDriver->Reserve
 		- Car->_distRaced
 		- TrackLength * Car->_lapsBehindLeader; 
@@ -589,35 +560,33 @@ bool RtNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWa
 
 		if (Car->_fuel < FuelNeeded)   
 		{
-			GfOut("%s pitstop by fuel (%d) (%g<%g)\n",Car->info.name,TeamIndex,Car->_fuel,FuelNeeded);
+			if (RtTMShowInfo) GfOut("TM: %s pitstop by fuel (%d) (%g<%g)\n",Car->info.name,TeamIndex,Car->_fuel,FuelNeeded);
 			GotoPit = true;    
 		}
 		else if (!PitSharing)           
 		{
-			GfOut("%s !PitSharing (%d)\n",Car->info.name,TeamIndex);
+			if (RtTMShowInfo) GfOut("TM: %s !PitSharing (%d)\n",Car->info.name,TeamIndex);
   			GotoPit = false; 
 		}
 		else                            
 		{                               
 			FuelNeeded = FuelConsum * TrackLength ;
 			int FuelForLaps = (int) (Car->_fuel / FuelNeeded - 1);        
-//			RtSetMinLaps(TeamIndex,FuelForLaps);  
-//			int MinLaps = RtGetMinLaps(TeamIndex);
-			int MinLaps = RtMinLaps(TeamDriver,FuelForLaps);
+			int MinLaps = RtTeamDriverUpdate(TeamDriver,FuelForLaps);
 
 			if (FuelForLaps < MinLaps) 
 			{                                      
 				if ((MinLaps < TeamDriver->MinLaps)
 					&& (TeamDriver->LapsRemaining > FuelForLaps))
 				{                                      
-					GfOut("%s pitstop by teammate (%d) (L:%d<%d<%d)\n",Car->info.name,TeamIndex,FuelForLaps,MinLaps,TeamDriver->MinLaps);
+					if (RtTMShowInfo) GfOut("TM: %s pitstop by teammate (%d) (L:%d<%d<%d)\n",Car->info.name,TeamIndex,FuelForLaps,MinLaps,TeamDriver->MinLaps);
 					GotoPit = true;    
 				}
 				else if ((MinLaps == TeamDriver->MinLaps)
 					&& (Car->_fuel < TeamDriver->MinFuel)
 					&& (TeamDriver->LapsRemaining > FuelForLaps))
 				{                                      
-					GfOut("%s pitstop by teammate (%d) (L:%d(%d=%d)(F:%g<%g)\n",Car->info.name,TeamIndex,FuelForLaps,MinLaps,TeamDriver->MinLaps,Car->_fuel,TeamDriver->MinFuel);
+					if (RtTMShowInfo) GfOut("TM: %s pitstop by teammate (%d) (L:%d(%d=%d)(F:%g<%g)\n",Car->info.name,TeamIndex,FuelForLaps,MinLaps,TeamDriver->MinLaps,Car->_fuel,TeamDriver->MinFuel);
 					GotoPit = true;    
 				}
 			}
@@ -630,7 +599,7 @@ bool RtNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWa
 		{
 			if (RepairWanted > 0)          
 			{
-				GfOut("%s pitstop by damage (%d)(D:%d)\n",Car->info.name,TeamIndex,RepairWanted);
+				if (RtTMShowInfo) GfOut("TM: %s pitstop by damage (%d)(D:%d)\n",Car->info.name,TeamIndex,RepairWanted);
 				GotoPit = true;
 			}
 		}
@@ -638,8 +607,7 @@ bool RtNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWa
 
 	if(GotoPit)
 	{
-//		GotoPit = RtAllocatePit(TeamIndex);
-		if (TeamDriver->TeamPit->PitState == PIT_IS_FREE)
+		if (TeamDriver->TeamPit->PitState == RT_TM_PIT_IS_FREE)
 			TeamDriver->TeamPit->PitState = TeamDriver->Car;
 
 		GotoPit = (TeamDriver->TeamPit->PitState == TeamDriver->Car);
@@ -648,74 +616,91 @@ bool RtNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWa
 };
 
 //
+// Get remaining distance to race
+//
+float RtTeamDriverRemainingDistance(const int TeamIndex)
+{
+	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
+	return TeamDriver->RemainingDistance;
+}
+
+//
 // For tests: Dump all Info
 //
-void RtDumpTeammanager()
+void RtTeamManagerDump(int DumpMode)
 {
-	GfOut("\n\n\nRtDumpTeammanager >>>\n");
+	if (!RtTMShowInfo)
+		return;
 
-	RtInitGlobalTeamManager();
+	if (!RtTM)
+		return;
 
-	GfOut("Initialized\n");
+	if ((DumpMode < 2)
+		&& (RtTM->TeamDrivers->Count != RtTM->Count))
+		return;
 
-	int I = 0;
+	if ((DumpMode == 0)
+		&& (RtTM->Count == 1))
+		return;
 
-	tTeamDriver* TeamDriver = GlobalTeamManager->TeamDrivers;
+	GfOut("\n\nTM: RtTeamManagerDump(%d) >>>\n",DumpMode);
+
+	if (RtTeamManagerInit())
+		GfOut("TM: Initialized\n");
+
+	tTeamDriver* TeamDriver = RtTM->TeamDrivers;
 	if (TeamDriver) 
-		GfOut("\nTeamDriver->Count: %d\n\n",TeamDriver->Count);
+		GfOut("\nTM: TeamDriver->Count: %d\n",TeamDriver->Count);
 	while (TeamDriver)
 	{
-		GfOut("TeamDriver %d:\n",TeamDriver->Count);
-		GfOut("Header           : V%d.%d (%d Bytes): x%p\n",TeamDriver->Header.MajorVersion,TeamDriver->Header.MinorVersion,TeamDriver->Header.Size,TeamDriver);
-		GfOut("Name             : %s\n",TeamDriver->Car->info.name);
-		GfOut("FuelForLaps      : %d\n",TeamDriver->FuelForLaps);
-		GfOut("MinLaps          : %d\n",TeamDriver->MinLaps);
-		GfOut("LapsRemaining    : %d\n",TeamDriver->LapsRemaining);
-		GfOut("RemainingDistance: %g m\n",TeamDriver->RemainingDistance);
-		GfOut("Reserve          : %g m\n",TeamDriver->Reserve);
-		GfOut("Team->TeamName   : %s\n",TeamDriver->Team->TeamName);
-		GfOut("Next             : x%p\n",TeamDriver->Next);
+		GfOut("\nTM: TeamDriver %d:\n",TeamDriver->Count);
+//		GfOut("TM: Header           : V%d.%d (%d Bytes): x%p\n",TeamDriver->Header.MajorVersion,TeamDriver->Header.MinorVersion,TeamDriver->Header.Size,TeamDriver);
+		GfOut("TM: Name             : %s\n",TeamDriver->Car->info.name);
+		GfOut("TM: FuelForLaps      : %d\n",TeamDriver->FuelForLaps);
+		GfOut("TM: MinLaps          : %d\n",TeamDriver->MinLaps);
+		GfOut("TM: LapsRemaining    : %d\n",TeamDriver->LapsRemaining);
+		GfOut("TM: RemainingDistance: %g m\n",TeamDriver->RemainingDistance);
+		GfOut("TM: Reserve          : %g m\n",TeamDriver->Reserve);
+		GfOut("TM: Team->TeamName   : %s\n",TeamDriver->Team->TeamName);
+//		GfOut("TM: Next             : x%p\n",TeamDriver->Next);
 
 		TeamDriver = TeamDriver->Next;
 
 	}
 
-	I = 0;
-	tTeam* Team = GlobalTeamManager->Teams;
+	tTeam* Team = RtTM->Teams;
 	if (Team)
-		GfOut("\nTeam->Count: %d\n\n",Team->Count);
+		GfOut("\n\nTM: Team->Count: %d\n",Team->Count);
 	while (Team)
 	{
-		GfOut("Team %d:\n",Team->Count);
-		GfOut("Header           : V%d.%d (%d Bytes): x%p\n",Team->Header.MajorVersion,Team->Header.MinorVersion,Team->Header.Size,Team);
-		GfOut("Name             : %s\n",Team->TeamName);
-		GfOut("MinMajorVersion  : %d\n",Team->MinMajorVersion);
-		GfOut("Next             : x%p\n",Team->Next);
+		GfOut("\nTM: Team %d:\n",Team->Count);
+//		GfOut("TM: Header           : V%d.%d (%d Bytes): x%p\n",Team->Header.MajorVersion,Team->Header.MinorVersion,Team->Header.Size,Team);
+		GfOut("TM: Name             : %s\n",Team->TeamName);
+		GfOut("TM: MinMajorVersion  : %d\n",Team->MinMajorVersion);
+//		GfOut("TM: Next             : x%p\n",Team->Next);
 
 		tTeamPit* TeamPit = Team->TeamPits;
 		if (TeamPit)
-			GfOut("\nTeamPit.Count    : %d\n\n",TeamPit->Count);
-		int J = 0;
+			GfOut("\nTM: TeamPit.Count    : %d\n\n",TeamPit->Count);
 		while (TeamPit)
 		{
-			GfOut("TeamPit %d:\n",TeamPit->Count);
-			GfOut("Header           : V%d.%d (%d Bytes): x%p\n",TeamPit->Header.MajorVersion,TeamPit->Header.MinorVersion,TeamPit->Header.Size,TeamPit);
-			GfOut("Name             : %s\n",TeamPit->Name);
-			GfOut("PitState         : %d\n",TeamPit->PitState);
-			GfOut("Pit              : x%p\n",TeamPit->Pit);
-			GfOut("Teammates        : x%p\n",TeamPit->Teammates);
-			GfOut("Next             : x%p\n",TeamPit->Next);
+			GfOut("TM: TeamPit %d:\n",TeamPit->Count);
+//			GfOut("TM: Header           : V%d.%d (%d Bytes): x%p\n",TeamPit->Header.MajorVersion,TeamPit->Header.MinorVersion,TeamPit->Header.Size,TeamPit);
+			GfOut("TM: Name             : %s\n",TeamPit->Name);
+			GfOut("TM: PitState         : %d\n",TeamPit->PitState);
+			GfOut("TM: Pit              : x%p\n",TeamPit->Pit);
+//			GfOut("TM: Teammates        : x%p\n",TeamPit->Teammates);
+//			GfOut("TM: Next             : x%p\n",TeamPit->Next);
 
 			tTeammate* Teammate = TeamPit->Teammates;
 			if (Teammate)
-				GfOut("\nTeammate.Count   : %d\n\n",Teammate->Count);
-			int K = 0;
+				GfOut("\nTM: Teammate.Count   : %d\n\n",Teammate->Count);
 			while (Teammate)
 			{
-				GfOut("Teammate %d:\n",Teammate->Count);
-				GfOut("Header           : V%d.%d (%d Bytes): x%p\n",Teammate->Header.MajorVersion,Teammate->Header.MinorVersion,Teammate->Header.Size,Teammate);
-				GfOut("Name             : %s\n",Teammate->Car->info.name);
-				GfOut("Next             : x%p\n\n",Teammate->Next);
+				GfOut("TM: Teammate %d:\n",Teammate->Count);
+//				GfOut("TM: Header           : V%d.%d (%d Bytes): x%p\n",Teammate->Header.MajorVersion,Teammate->Header.MinorVersion,Teammate->Header.Size,Teammate);
+				GfOut("TM: Name             : %s\n",Teammate->Car->info.name);
+//				GfOut("TM: Next             : x%p\n\n",Teammate->Next);
 
   				Teammate = Teammate->Next;
 			}
@@ -725,5 +710,5 @@ void RtDumpTeammanager()
 
 	}
 
-	GfOut("\n\n<<< RtDumpTeammanager\n\n\n");
+	GfOut("\n\nTM: <<< RtTeamManagerDump\n\n");
 }

@@ -9,7 +9,7 @@
 //
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.02.25
+// Last changed : 2009.02.26
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -105,11 +105,11 @@ void TSimpleStrategy::Init(TDriver *Driver)
 bool TSimpleStrategy::IsPitFree()
 {
 #ifdef TORCS_NG
-    bool IsFree = RtIsPitFree(oDriver->TeamIndex());
+    bool IsFree = RtTeamIsPitFree(oDriver->TeamIndex());
 	if (IsFree)
-		GfOut("%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+		GfOut("#%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
 	else
-		GfOut("%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
+		GfOut("#%s pit is locked (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
     return IsFree;
 #else
   if (CarPit != NULL)
@@ -136,7 +136,7 @@ bool TSimpleStrategy::NeedPitStop()
   else                                           // If known
     FuelConsum = oFuelPerM;                      //   use it
 
-  bool Result = RtNeedPitStop(oDriver->TeamIndex(), FuelConsum, RepairWanted(cPIT_DAMMAGE));
+  bool Result = RtTeamNeedPitStop(oDriver->TeamIndex(), FuelConsum, RepairWanted(cPIT_DAMMAGE));
 
 #else
   if (CarPit == NULL)                            // Ist eine Box vorhanden?
@@ -220,7 +220,6 @@ bool TSimpleStrategy::NeedPitStop()
   if (Result)
   {
 #ifdef TORCS_NG
-	  GfOut("#Allocated Pit: %s(%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
 #else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	Team->PitState = CarDriverIndex;             // Box reserviert
@@ -236,7 +235,7 @@ bool TSimpleStrategy::NeedPitStop()
 void TAbstractStrategy::PitRelease()
 {
 #ifdef TORCS_NG
-  RtReleasePit(oDriver->TeamIndex());
+  RtTeamReleasePit(oDriver->TeamIndex());
   oCar->ctrl.raceCmd = 0;
 #else
   TTeamManager::TTeam* Team = oDriver->GetTeam();

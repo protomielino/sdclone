@@ -18,9 +18,14 @@
  ***************************************************************************/
 
 /** @file   
-    		Teammanager
+    This is a collection of useful functions for using a teammanager with
+	teams build of different robots.
+	It can handle teams with more drivers than cars per pit.
+	You can see how to use in the simplix robots. 
+
     @author	<a href=mailto:wdb@wdbee.de>Wolf-Dieter Beelitz</a>
     @version	
+    @ingroup	robottools
 */
 
 #ifndef _TEAMMANAGER_H_
@@ -31,49 +36,66 @@
 #include <raceman.h>                             // tSituation
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// Teammanager
 // Robot developer API:
 //
 
 //
+// Utility functions
+//
+bool RtIsTeamMate                                // Check wether Car0 is Teammate of Car1
+	(const CarElt* Car0, const CarElt* Car1);
+
+//
 // Teammanager related functions for use by robots
 //
-extern int RtGetTeamIndex(                       // Add a Teammate to it's team
+short int RtTeamManagerGetMajorVersion();        // Get major version of used team manager data blocks
+short int RtTeamManagerGetMinorVersion();        // Get minor version of used team manager data blocks
+
+extern void RtTeamManagerShowInfo();             // Switch on team manager info output 
+extern void RtTeamManagerLaps(int Laps);         // Nbr of laps to add for MinLaps 
+
+extern bool RtTeamManagerInit();                 // Initialize team manager (is called by RtTeamManagerIndex
+                                                 // and RtTeamManagerDump implicitly)
+
+extern int RtTeamManagerIndex(                   // Add a Teammate to it's team (at NewRace)
 	CarElt* const Car,                           // -> teammate's car 
 	tTrack* const Track,                         // -> track
 	tSituation* Situation);                      // -> situaion
                                                  // <- TeamIndex as handle for the subsequent calls
 
-extern void RtFreeGlobalTeamManager();           // Free at Shutdown
+extern void RtTeamManagerRelease();              // Release team manager at Shutdown
 
-extern void RtDumpTeammanager();                 // For tests: Dump content to console
-
-
-
+extern void RtTeamManagerDump(int DumpMode = 0); // For tests: Dump content to console
+                                                 // -> DumpMode = 2, dump allways
+                                                 // -> DumpMode = 1, dump only after last driver has been added
+                                                 // -> DumpMode = 0, dump only after last driver has been added if more than 1 driver is used
 //
 // Team related functions for use by robots
 //
-extern int RtGetMinLaps(                         // Get nbr of laps all other teammates using the same pit can still race 
-	const int TeamIndex, const int FuelForLaps);
-/*
-extern void RtSetMinLaps(                        // Set the nbr of laps this teammate can still drive without refueling
-	const int TeamIndex, const int FuelForLaps); 
-*/
-extern float RtGetRemainingDistance(             // Get the remaining distance to race for this teammate
-	const int TeamIndex);                        // (depends from being overlapped or not)
+extern bool RtTeamAllocatePit(                   // Try to allocate the pit for use of this teammate 
+	const int TeamIndex);
 
-extern bool RtNeedPitStop(                       // Check wether this teammate should got to pit for refueling 
+extern bool RtTeamIsPitFree(                     // Check wether the pit to use is available
+	const int TeamIndex);
+
+extern bool RtTeamNeedPitStop(                   // Check wether this teammate should got to pit for refueling 
 	const int TeamIndex,                         // (depends from the fuel of all other teammates using the same pit)
 	float FuelPerM,                              // Fuel consumption per m
 	int RepairWanted);                           // Damage to repair at next pitstop
 
-extern bool RtAllocatePit(                       // Try to allocate the pit for use of this teammate 
+extern void RtTeamReleasePit(                    // Release the pit
 	const int TeamIndex);
 
-extern bool RtIsPitFree(                         // Check wether the pit to use is available
-	const int TeamIndex);
+extern int RtTeamUpdate(                         // Get nbr of laps all other teammates using the same pit can still race 
+	const int TeamIndex, const int FuelForLaps); // -> Nbr of laps the driver has fuel for
+                                                 // <- Min nbr of laps all other teammates using the same pit have fuel for
 
-extern void RtReleasePit(                        // Release the pit
-	const int TeamIndex);
+//
+// Team driver related functions for use by robots
+//
+extern float RtTeamDriverRemainingDistance       // Get the remaining distance to race
+	(const int TeamIndex);						 // Depends on beeing overlapped or not
 
 //
 // End of robot developer API
@@ -86,10 +108,10 @@ extern void RtReleasePit(                        // Release the pit
 
 // Teammanager defines
 
-#define CURRENT_MAJOR_VERSION 1                  // First version of teammanager
-#define CURRENT_MINOR_VERSION 0                  // Without changes solong
+#define RT_TM_CURRENT_MAJOR_VERSION 1            // First version of teammanager
+#define RT_TM_CURRENT_MINOR_VERSION 0            // Without changes solong
 
-#define PIT_IS_FREE NULL                         // = *Car if reserved/used
+#define RT_TM_PIT_IS_FREE NULL                   // = *Car if reserved/used
 
 
 // Teammanager Utilities
@@ -183,60 +205,12 @@ typedef struct
 	tTeam* Teams;                                // Linked list of teams
 	tTeamDriver* TeamDrivers;                    // Linked list of drivers belonging to a team
 	tTrack* Track;                               // Track
-	float RaceDistance;							 // Distance to race
+	tTeamDriver** Drivers;                       // Array of pointers to TeamDrivers 
+	int Count;                                   // Nbr of drivers in race
 	bool PitSharing;                             // Pit sharing activated? 
+	float RaceDistance;							 // Distance to race
 	                                             // <<< NEVER CHANGE THIS V1.X
 	                                             // Extend it here if needed but increment MAJOR VERSION!
 } tTeamManager;
 
-
-//
-// Utility functions
-//
-short int RtGetMajorVersion();
-short int RtGetMinorVersion();
-bool RtIsTeamMate(const CarElt* Car0, const CarElt* Car1);
-
-
-//
-// Teammanager related internal functions
-//
-extern tTeamManager* RtTeamManager();           
-extern void RtTeamManagerFree();  
-extern void RtInitGlobalTeamManager();           
-
-
-//
-// TeamDriver related internal functions
-//
-extern tTeamDriver* RtTeamDriver();
-extern void RtTeamDriverFree(tTeamDriver* TeamDriver);
-extern tTeamDriver* RtGetTeamDriver(const int TeamIndex);
-
-
-//
-// TeamPit related internal functions
-//
-extern tTeamPit* RtTeamPit();     
-extern void RtTeamPitFree(tTeamPit* TeamPit);
-extern int RtTeamPitAdd(tTeamPit* const TeamPit, tTeammate* const Teammate);
-
-
-//
-// Team related internal functions
-//
-extern tTeam* RtTeam();                    
-extern void RtTeamFree(tTeam* const Team);
-extern tTeamPit* RtTeamAdd(tTeam* const Team, tTeammate* const Teammate);
-
-
-//
-// Teammate related internal functions
-//
-extern tTeammate* RtTeammate();                    
-extern void RtTeammateFree(tTeammate* const Teammate);
-
 #endif /* _TEAMMANAGER_H_ */ 
-
-
-
