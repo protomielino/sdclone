@@ -37,6 +37,11 @@
 #include <robottools.h>
 #include <robot.h>
 
+#define TORCS_NG
+#ifdef TORCS_NG
+#include <teammanager.h>
+#endif
+
 #include "driver.h"
 
 enum { STRATEGY_DESPERATE=0, STRATEGY_NORMAL, STRATEGY_CAREFUL, STRATEGY_PASSIVE };
@@ -45,6 +50,10 @@ class Opponents;
 
 class AbstractStrategy {
 	public:
+#ifdef TORCS_NG
+		int teamIndex;
+		bool releasePit;
+#endif
 
 		// Need this empty constructor... do not remove.
 		virtual ~AbstractStrategy() {}
@@ -61,6 +70,9 @@ class AbstractStrategy {
 		// Pit Free?
 		virtual bool isPitFree(tCarElt* car) = 0;
 		virtual void setTrack(tTrack *thetrack) = 0;
+#ifdef TORCS_NG
+		inline void setTeamIndex(int theTeamIndex){teamIndex = theTeamIndex;};
+#endif
 
 	protected:
 		int strategy;

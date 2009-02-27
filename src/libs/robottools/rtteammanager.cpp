@@ -497,6 +497,9 @@ bool RtTeamIsPitFree(const int TeamIndex)
 {
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
+	if (TeamDriver->Car->_pit == NULL)
+	  return false;
+
 	if ((TeamDriver->Car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
       && ((TeamDriver->TeamPit->PitState == TeamDriver->Car) || (TeamDriver->TeamPit->PitState == RT_TM_PIT_IS_FREE)))
 	  return true;

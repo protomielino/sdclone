@@ -42,6 +42,10 @@ SimpleStrategy::SimpleStrategy() :
 	pit_reason(0),
 	track(NULL)
 {
+#ifdef TORCS_NG
+	teamIndex = 0;
+	releasePit = false;
+#endif
 	// Nothing so far.
 }
 
@@ -182,6 +186,32 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
  if (forcepit)
   return true;
 
+#ifdef TORCS_NG
+ int repairWanted = 10000;
+
+ if ((laps > 0) && (laps < 20))
+ {
+   repairWanted = MIN(8000, PIT_DAMMAGE + (20-laps)*200);
+ }
+
+ if (car->_dammage < 9000 && (laps <= 2 || strategy == STRATEGY_DESPERATE))
+   repairWanted = 0;
+
+ if (car->_dammage < 3000)
+   repairWanted = 0;
+
+ float cmpfuel = (m_fuelperlap == 0.0) ? m_expectedfuelperlap : m_fuelperlap;
+
+ float fuelPerM = cmpfuel / track->length;
+ bool GotoPit = RtTeamNeedPitStop(teamIndex,fuelPerM,repairWanted);
+ if (GotoPit)
+   is_pitting = 1;
+ else
+   is_pitting = 0;
+
+ return GotoPit;
+#else
+
  if (laps > 0) 
  {
   float cmpfuel = (m_fuelperlap == 0.0) ? m_expectedfuelperlap : m_fuelperlap;
@@ -254,17 +284,27 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 
  is_pitting = 0;
  return false;
+#endif
 }
 
 
 bool SimpleStrategy::isPitFree(tCarElt* car)
 {
+#ifdef TORCS_NG
+    bool IsFree = RtTeamIsPitFree(teamIndex);
+	if (IsFree)
+		GfOut("#%s pit is free (%d)\n",car->_name,teamIndex);
+	else
+		GfOut("#%s pit is locked (%d)\n",car->_name,teamIndex);
+    return IsFree;
+#else
 	if (car->_pit != NULL) {	
 		if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE) {
 			return true;
 		}
 	}
 	return false;
+#endif
 }
 
 
@@ -309,6 +349,11 @@ void SimpleStrategy2::update(tCarElt* car, tSituation *s)
 	} else if (id > 5) {
 		m_fuelchecked = false;
 	}
+#ifdef TORCS_NG
+	if (releasePit)
+		RtTeamReleasePit(teamIndex);
+	releasePit = false;
+#endif
 }
 
 
@@ -353,6 +398,9 @@ void SimpleStrategy2::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSitua
 	float ifuel = GfParmGetNum(*carParmHandle, "private", "MaxFuel", (char *)NULL, 0.0f);
 	if (ifuel)
 		fuel = ifuel;
+#ifdef TORCS_NG
+	fuel = MIN(fuel,15.0f); // To test the team manager only 
+#endif
 	// Add fuel dependent on index to avoid fuel stop in the same lap.
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*) NULL, fuel);
 }
@@ -419,9 +467,17 @@ float SimpleStrategy2::pitRefuel(tCarElt* car, tSituation *s)
 	}
 
 	float maxfuel = GfParmGetNum(car->_carHandle, "private", "MaxFuel", (char *)NULL, 0.0);
+#ifdef TORCS_NG
+	//maxfuel = MIN(maxfuel,10.0f); // To test the team manager only
+#endif
 	if (maxfuel)
 		fuel = maxfuel;
 	m_lastpitfuel = fuel;
+
+#ifdef TORCS_NG
+	releasePit = true;
+#endif
+
 	return fuel;
 }
 

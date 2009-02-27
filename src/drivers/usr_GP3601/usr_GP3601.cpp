@@ -306,5 +306,6 @@ static void endRace(int index, tCarElt *car, tSituation *s)
 // Called before the module is unloaded.
 static void shutdown(int index)
 {
+	driver[index-indexOffset]->shutdown();
 	delete driver[index-indexOffset];
 }

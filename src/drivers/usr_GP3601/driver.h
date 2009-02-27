@@ -68,6 +68,7 @@ class Driver {
 		void drive(tSituation *s);
 		int pitCommand(tSituation *s);
 		void endRace(tSituation *s);
+		void shutdown();
 
 		tCarElt *getCarPtr() { return car; }
 		tTrack *getTrackPtr() { return track; }
@@ -245,6 +246,10 @@ class Driver {
 		double brake_adjust_perc;
 
 		float fuelperlap;
+#ifdef TORCS_NG
+		int teamIndex;
+		bool pitStopChecked;
+#endif
 
 		// Data that should stay constant after first initialization.
 		int MAX_UNSTUCK_COUNT;

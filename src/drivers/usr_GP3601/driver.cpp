@@ -161,6 +161,10 @@ Driver::Driver(int index) :
 		brake_adjust_targ(1.0),
 		brake_adjust_perc(1.0),
 		fuelperlap(5.0f),
+#ifdef TORCS_NG
+		teamIndex(0),
+		pitStopChecked(false),
+#endif
 		MAX_UNSTUCK_COUNT(0),
 		INDEX(0),
 		CARMASS(0.0f),
@@ -330,7 +334,8 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	MaxGear = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "MaxGear", (char *)NULL, 6.0f );
 	NoPit = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "NoPit", (char *)NULL, 0.0f );
 	NoTeamWaiting = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "NoTeamWaiting", (char *)NULL, 1.0f );
-	TeamWaitTime = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "TeamWaitTime", (char *)NULL, 0.0f);
+//	TeamWaitTime = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "TeamWaitTime", (char *)NULL, 0.0f);
+	TeamWaitTime = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "TeamWaitTime", (char *)NULL, 0.0f);
 }
 
 
@@ -422,6 +427,13 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 			break;
  		}
  	}
+#ifdef TORCS_NG
+    RtTeamManagerShowInfo();
+	teamIndex = RtTeamManagerIndex(car,track,s);
+    RtTeamManagerDump();
+
+	strategy->setTeamIndex(teamIndex);
+#endif
 }
 
 void Driver::calcSpeed()
@@ -673,9 +685,19 @@ int Driver::pitCommand(tSituation *s)
 }
 
 
-// End of the current race.
+// Never called by TORCS!!! End of the current race.
 void Driver::endRace(tSituation *s)
 {
+	// Nothing for now.
+}
+
+// Clean up
+void Driver::shutdown()
+{
+#ifdef TORCS_NG
+	RtTeamManagerDump();
+	RtTeamManagerRelease();
+#endif
 	// Nothing for now.
 }
 
@@ -2630,9 +2652,23 @@ void Driver::update(tSituation *s)
 
 	if (car->_state <= RM_CAR_STATE_PIT && !NoPit)
 	{
+#ifdef TORCS_NG
+		float DLong, DLat;                             // Dist to Pit
+		RtDistToPit(car,track,&DLong,&DLat);
+
+		if (DLong > 500)
+			pitStopChecked = false;
+
+		if (!pit->getPitstop() 
+			&& (!pitStopChecked)
+			&& (DLong < 500)
+			&& (car->_distFromStartLine < pit->getNPitEntry() || car->_distFromStartLine > pit->getNPitEnd())) 
+#else
 		if (!pit->getPitstop() && (car->_distFromStartLine < pit->getNPitEntry() || car->_distFromStartLine > pit->getNPitEnd())) 
+#endif
 		{
 			pit->setPitstop(strategy->needPitstop(car, s, opponents));
+			pitStopChecked = true;
 		}
 
 		if (pit->getPitstop() && car->_pit)
