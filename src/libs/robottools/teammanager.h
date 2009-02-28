@@ -113,6 +113,10 @@ extern float RtTeamDriverRemainingDistance       // Get the remaining distance t
 
 #define RT_TM_PIT_IS_FREE NULL                   // = *Car if reserved/used
 
+#define RT_TM_STATE_NULL 0                       // Team manager was created
+#define RT_TM_STATE_INIT 1                       // Team manager was initialized
+#define RT_TM_STATE_USED 2                       // Team manager was used
+
 
 // Teammanager Utilities
 
@@ -206,6 +210,7 @@ typedef struct
 	tTeamDriver* TeamDrivers;                    // Linked list of drivers belonging to a team
 	tTrack* Track;                               // Track
 	tTeamDriver** Drivers;                       // Array of pointers to TeamDrivers 
+	int State;                                   // State of team manager
 	int Count;                                   // Nbr of drivers in race
 	bool PitSharing;                             // Pit sharing activated? 
 	float RaceDistance;							 // Distance to race

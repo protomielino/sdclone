@@ -685,10 +685,12 @@ int Driver::pitCommand(tSituation *s)
 }
 
 
-// Never called by TORCS!!! End of the current race.
+// End of the current race for this driver, may be 
+// it was eliminated from a continuing race, so release pit!
 void Driver::endRace(tSituation *s)
 {
-	// Nothing for now.
+	RtTeamReleasePit(teamIndex); // Release pit if eliminated
+    car->ctrl.raceCmd = 0;
 }
 
 // Clean up

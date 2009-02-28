@@ -1052,9 +1052,9 @@ int TDriver::PitCmd()
 //--------------------------------------------------------------------------*
 void TDriver::EndRace()
 {
-  //GfOut("#TDriver::EndRace() >>>\n");
-  // This is never called by TORCS! Don't use it!
-  //GfOut("#<<< TDriver::EndRace()\n");
+  GfOut("#TDriver::EndRace() >>>\n");
+  oStrategy->PitRelease();                       // Release pit if eliminated
+  GfOut("#<<< TDriver::EndRace()\n");
 }
 //==========================================================================*
 

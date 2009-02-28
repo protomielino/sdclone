@@ -163,6 +163,7 @@ tTeamManager* RtTeamManager()
 	TeamManager->TeamDrivers = NULL;                   
 	TeamManager->Drivers = NULL;                   
 	TeamManager->Track = NULL;                   
+	TeamManager->State = RT_TM_STATE_INIT;     
 	TeamManager->Count = 0;     
 	TeamManager->PitSharing = false;
 	TeamManager->RaceDistance = 500000;
@@ -199,6 +200,15 @@ bool RtTeamManagerInit()
 	{
 		RtTM = RtTeamManager();
 		return true;
+	}
+	else
+	{
+		if (RtTM->State != RT_TM_STATE_NULL)
+		{
+			RtTeamManagerFree();
+			RtTM = NULL;     
+			return RtTeamManagerInit();
+		}
 	}
 	return false;
 }
@@ -448,6 +458,7 @@ int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situa
 	{
 		TeamDriver->MinLaps = TeamDriver->TeamPit->Teammates->Count + RtTMLaps;
 		TeamDriver = TeamDriver->Next;
+		RtTM->State = RT_TM_STATE_INIT; 
 	}
 	return TeamIndex;
 }
@@ -614,6 +625,11 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 			TeamDriver->TeamPit->PitState = TeamDriver->Car;
 
 		GotoPit = (TeamDriver->TeamPit->PitState == TeamDriver->Car);
+	}
+
+	if(GotoPit)
+	{
+		RtTM->State = RT_TM_STATE_USED;     
 	}
 	return GotoPit; 
 };
