@@ -399,7 +399,7 @@ void SimpleStrategy2::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSitua
 	if (ifuel)
 		fuel = ifuel;
 #ifdef TORCS_NG
-	fuel = MIN(fuel,15.0f); // To test the team manager only 
+	//fuel = MIN(fuel,15.0f); // To test the team manager only 
 #endif
 	// Add fuel dependent on index to avoid fuel stop in the same lap.
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*) NULL, fuel);
