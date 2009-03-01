@@ -70,6 +70,9 @@ extern void RtTeamManagerDump(int DumpMode = 0); // For tests: Dump content to c
                                                  // -> DumpMode = 2, dump allways
                                                  // -> DumpMode = 1, dump only after last driver has been added
                                                  // -> DumpMode = 0, dump only after last driver has been added if more than 1 driver is used
+
+extern void RtTeamManagerStart();                // Start team manager, needed to start if not all robots use it 
+
 //
 // Team related functions for use by robots
 //

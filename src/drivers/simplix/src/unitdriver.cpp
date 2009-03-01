@@ -930,6 +930,9 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 //--------------------------------------------------------------------------*
 void TDriver::Drive()
 {
+#ifdef TORCS_NG
+  RtTeamManagerStart();
+#endif
 /*
   if (CarLaps == 1 + oIndex)
     oTestPitStop = 1;

@@ -163,7 +163,7 @@ tTeamManager* RtTeamManager()
 	TeamManager->TeamDrivers = NULL;                   
 	TeamManager->Drivers = NULL;                   
 	TeamManager->Track = NULL;                   
-	TeamManager->State = RT_TM_STATE_INIT;     
+	TeamManager->State = RT_TM_STATE_NULL;     
 	TeamManager->Count = 0;     
 	TeamManager->PitSharing = false;
 	TeamManager->RaceDistance = 500000;
@@ -211,6 +211,20 @@ bool RtTeamManagerInit()
 		}
 	}
 	return false;
+}
+
+//
+// Setup array of Team drivers
+//
+void RtTeamManagerSetup()
+{
+	tTeamDriver* TeamDriver = RtTM->TeamDrivers;
+	while(TeamDriver)
+	{
+		TeamDriver->MinLaps = TeamDriver->TeamPit->Teammates->Count + RtTMLaps;
+		TeamDriver = TeamDriver->Next;
+		RtTM->State = RT_TM_STATE_INIT; 
+	}
 }
 
 //
@@ -426,6 +440,19 @@ void RtTeamManagerLaps(const int Laps)
 }
 
 //
+// Start team manager, needed to start if not all robots use it 
+//
+void RtTeamManagerStart()
+{
+	if (RtTM->State == RT_TM_STATE_NULL)
+	{
+		// The race started, but the Teamdriver array wasn't updated 
+		// because not all robots are using the teammanager!
+		RtTeamManagerSetup();
+	}
+}
+
+//
 // Add a car to it's team and get it's TeamIndex as handle for subsequent calls
 //
 int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situation)
@@ -453,13 +480,8 @@ int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situa
 	if (TeamDriver->Count < RtTM->Count)
 		return TeamIndex;
 
-	// Last driver is added, let's update the number of teammates
-	while(TeamDriver)
-	{
-		TeamDriver->MinLaps = TeamDriver->TeamPit->Teammates->Count + RtTMLaps;
-		TeamDriver = TeamDriver->Next;
-		RtTM->State = RT_TM_STATE_INIT; 
-	}
+	RtTeamManagerSetup();
+
 	return TeamIndex;
 }
 

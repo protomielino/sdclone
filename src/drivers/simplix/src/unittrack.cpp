@@ -545,7 +545,7 @@ void TTrackDescription::InitTrack
 		else
 		{
 		  // Wall of some sort
-		  WCurb = (PSide->style == TR_WALL) ? -1.0 : 0;
+		  WCurb = (PSide->style >= TR_WALL) ? -1.0 : 0;
 		  Done = true;
 		}
 

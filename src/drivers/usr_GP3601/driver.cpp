@@ -602,6 +602,10 @@ void Driver::drive(tSituation *s)
 	laststeer = car->_steerCmd;
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
+#ifdef TORCS_NG
+    RtTeamManagerStart(); // Start team manager in case not all robots are using it
+#endif
+
 	update(s);
 
 	//pit->setPitstop(true);

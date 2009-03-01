@@ -28,6 +28,7 @@ EXPORTS
 	RtTeamManagerLaps
 	RtTeamManagerRelease
 	RtTeamManagerShowInfo
+	RtTeamManagerStart
 	RtTeamAllocatePit
 	RtTeamIsPitFree
 	RtTeamNeedPitStop
