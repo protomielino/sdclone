@@ -218,12 +218,18 @@ bool RtTeamManagerInit()
 //
 void RtTeamManagerSetup()
 {
-	tTeamDriver* TeamDriver = RtTM->TeamDrivers;
-	while(TeamDriver)
+	if (RtTM != NULL)
 	{
-		TeamDriver->MinLaps = TeamDriver->TeamPit->Teammates->Count + RtTMLaps;
-		TeamDriver = TeamDriver->Next;
-		RtTM->State = RT_TM_STATE_INIT; 
+		if (RtTM->State != RT_TM_STATE_INIT)
+		{
+			tTeamDriver* TeamDriver = RtTM->TeamDrivers;
+			while(TeamDriver)
+			{
+				TeamDriver->MinLaps = TeamDriver->TeamPit->Teammates->Count + RtTMLaps;
+				TeamDriver = TeamDriver->Next;
+				RtTM->State = RT_TM_STATE_INIT; 
+			}
+		}
 	}
 }
 
@@ -444,11 +450,17 @@ void RtTeamManagerLaps(const int Laps)
 //
 void RtTeamManagerStart()
 {
-	if (RtTM->State == RT_TM_STATE_NULL)
+	if (!RtTM)
+		return;
+
+	if (RtTM->Drivers != NULL)
 	{
-		// The race started, but the Teamdriver array wasn't updated 
-		// because not all robots are using the teammanager!
-		RtTeamManagerSetup();
+		if (RtTM->State == RT_TM_STATE_NULL)
+		{
+			// The race started, but the Teamdriver array wasn't updated 
+			// because not all robots are using the teammanager!
+			RtTeamManagerSetup();
+		}
 	}
 }
 
@@ -506,6 +518,9 @@ void RtTeamManagerRelease()
 //
 int RtTeamUpdate(const int TeamIndex, const int FuelForLaps) 
 {                                                
+	if (!RtTM)
+		return 99;
+
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 	return RtTeamDriverUpdate(TeamDriver,FuelForLaps);
 }
@@ -515,6 +530,9 @@ int RtTeamUpdate(const int TeamIndex, const int FuelForLaps)
 //
 bool RtTeamAllocatePit(const int TeamIndex)
 {
+	if (!RtTM)
+		return false;
+
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	if (TeamDriver->TeamPit->PitState == RT_TM_PIT_IS_FREE)
@@ -528,6 +546,9 @@ bool RtTeamAllocatePit(const int TeamIndex)
 //
 bool RtTeamIsPitFree(const int TeamIndex)
 {
+	if (!RtTM)
+		return true;
+
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	if (TeamDriver->Car->_pit == NULL)
@@ -545,6 +566,9 @@ bool RtTeamIsPitFree(const int TeamIndex)
 //
 void RtTeamReleasePit(const int TeamIndex)
 {
+	if (!RtTM)
+		return;
+
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	if (TeamDriver->TeamPit->PitState == TeamDriver->Car)
@@ -556,6 +580,9 @@ void RtTeamReleasePit(const int TeamIndex)
 //
 bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int RepairWanted)
 {
+	if (!RtTM)
+		return false;
+
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 
 	CarElt* Car = TeamDriver->Car; 
@@ -649,10 +676,6 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 		GotoPit = (TeamDriver->TeamPit->PitState == TeamDriver->Car);
 	}
 
-	if(GotoPit)
-	{
-		RtTM->State = RT_TM_STATE_USED;     
-	}
 	return GotoPit; 
 };
 
@@ -661,6 +684,9 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 //
 float RtTeamDriverRemainingDistance(const int TeamIndex)
 {
+	if (!RtTM)
+		return -1.0;
+
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
 	return TeamDriver->RemainingDistance;
 }
