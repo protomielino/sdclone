@@ -212,6 +212,7 @@ typedef struct {
 #define RM_CAR_STATE_BROKEN	 	0x00000200				/**< Engine no more working */
 #define RM_CAR_STATE_OUTOFGAS	 	0x00000400				/**< Out of Gas */
 #define RM_CAR_STATE_ELIMINATED	 	0x00000800				/**< Eliminated due to rules infringement */
+#define RM_CAR_STATE_ENDRACE_CALLED	0x00001000				/**< Endrace called so robot freed a part of its data */
 #define RM_CAR_STATE_SIMU_NO_MOVE	0x00010000 				/**< Simulation without car move (i.e. clutch applied and no wheel move)  */
     tPosd	corner[4];
 

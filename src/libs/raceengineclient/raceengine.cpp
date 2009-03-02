@@ -548,6 +548,12 @@ ReOneStep(double deltaTimeIncrement)
 				robot = s->cars[i]->robot;
 				robot->rbDrive(robot->index, s->cars[i], s);
 			}
+			else if (! (s->cars[i]->_state & RM_CAR_STATE_ENDRACE_CALLED ) && s->cars[i]->_state & RM_CAR_STATE_OUT ) { //No simu, look if it is out
+				robot = s->cars[i]->robot;
+				if (robot->rbEndRace)
+					robot->rbEndRace(robot->index, s->cars[i], s);
+				s->cars[i]->_state |= RM_CAR_STATE_ENDRACE_CALLED;
+			}
 		}
 		ReInfo->_reLastTime = s->currentTime;
 	}
