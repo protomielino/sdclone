@@ -712,9 +712,6 @@ void RtTeamManagerDump(int DumpMode)
 
 	GfOut("\n\nTM: RtTeamManagerDump(%d) >>>\n",DumpMode);
 
-	if (RtTeamManagerInit())
-		GfOut("TM: Initialized\n");
-
 	tTeamDriver* TeamDriver = RtTM->TeamDrivers;
 	if (TeamDriver) 
 		GfOut("\nTM: TeamDriver->Count: %d\n",TeamDriver->Count);
