@@ -486,15 +486,7 @@ int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situa
 	tTeamPit* TeamPit = NULL;
 	tTeam* Team = RtTeamManagerAdd(Car,Teammate,&TeamPit);
 
-	int TeamIndex = RtTeamDriverAdd(Team, Teammate, TeamPit);
-
-	tTeamDriver* TeamDriver = RtTM->TeamDrivers;
-	if (TeamDriver->Count < RtTM->Count)
-		return TeamIndex;
-
-	RtTeamManagerSetup();
-
-	return TeamIndex;
+	return RtTeamDriverAdd(Team, Teammate, TeamPit);
 }
 
 //

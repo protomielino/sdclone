@@ -38,6 +38,8 @@
 #include "racestate.h"
 #include "racemanmenu.h"
 
+#include "teammanager.h"
+
 #include "racemain.h"
 
 static char buf[1024];
@@ -220,6 +222,7 @@ reRaceRealStart(void)
 		robot->rbNewRace(robot->index, s->cars[i], s);
 	}
 	carInfo = ReInfo->_reCarInfo;
+	RtTeamManagerStart();
 
 	ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
 	for (i = 0; i < s->_ncars; i++) {

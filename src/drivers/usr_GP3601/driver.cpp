@@ -428,10 +428,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
  		}
  	}
 #ifdef TORCS_NG
-    RtTeamManagerShowInfo();
 	teamIndex = RtTeamManagerIndex(car,track,s);
-    RtTeamManagerDump();
-
 	strategy->setTeamIndex(teamIndex);
 #endif
 }
@@ -602,10 +599,6 @@ void Driver::drive(tSituation *s)
 	laststeer = car->_steerCmd;
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
-#ifdef TORCS_NG
-    RtTeamManagerStart(); // Start team manager in case not all robots are using it
-#endif
-
 	update(s);
 
 	//pit->setPitstop(true);
@@ -701,7 +694,6 @@ void Driver::endRace(tSituation *s)
 void Driver::shutdown()
 {
 #ifdef TORCS_NG
-	RtTeamManagerDump();
 	RtTeamManagerRelease();
 #endif
 	// Nothing for now.

@@ -44,6 +44,8 @@
 #include "racegl.h"
 #include "raceresults.h"
 
+#include "teammanager.h"
+
 #include "raceinit.h"
 
 static const char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
@@ -786,6 +788,7 @@ ReRaceCleanDrivers(void)
 		GfParmReleaseHandle(ReInfo->s->cars[i]->_paramsHandle);
 		free(robot);
 	}
+	RtTeamManagerRelease();
 
 	FREEZ(ReInfo->s->cars);
 	ReInfo->s->cars = 0;
