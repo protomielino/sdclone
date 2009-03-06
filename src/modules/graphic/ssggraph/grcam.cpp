@@ -238,11 +238,18 @@ void cGrBackgroundCam::update(cGrCamera *curCam)
 }
 
 
+// Change define value to choose desired dynamic behaviour of the CamInside cameras
+// * 0 = No dynamic behaviour : like a CamInsideFixed (apart from the position)
+// * 1 = Torcs's one : strange rotation of the camera around speed vector axis
+// * 2 = Use attenuated car yaw to translate camera center (by Andrew)
+#define CamInsideDynamicBehaviour 0
 
 class cGrCarCamInside : public cGrPerspCamera
 {
+#if (CamInsideDynamicBehaviour == 2)
  private:
     tdble PreA;
+#endif
 
  public:
     cGrCarCamInside(class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
@@ -252,7 +259,13 @@ class cGrCarCamInside : public cGrPerspCamera
 	: cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
 			 myfovy, myfovymin, myfovymax,
 			 myfnear, myffar, myfogstart, myfogend) {
+#if (CamInsideDynamicBehaviour == 2)
 	PreA = 0.0f;
+#elif (CamInsideDynamicBehaviour == 1)
+	up[0] = 0;
+	up[1] = 0;
+	up[2] = 1;
+#endif
     }
 
     void update(tCarElt *car, tSituation *s) {
@@ -263,28 +276,6 @@ class cGrCarCamInside : public cGrPerspCamera
 	p[2] = car->_drvPos_z;
 	sgXformPnt3(p, car->_posMat);
 	
-	tdble A;
-	tdble CosA;
-	tdble SinA;
-	tdble x;
-	tdble y;
-	tdble brake = 0.0f;
-
-	A = car->_yaw;
-	if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
-	    PreA += 2*PI;
-	} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
-	    PreA -= 2*PI;
-	}
-	RELAXATION(A, PreA, 4.0f);
-	CosA = cos(A);
-	SinA = sin(A);
-	x = p[0] * CosA;
-	y = p[1] * SinA;
-
-	if (car->_accel_x < 0.0)
-		brake = MIN(2.0, fabs(car->_accel_x) / 20.0);
-    
 	eye[0] = p[0];
 	eye[1] = p[1];
 	eye[2] = p[2];
@@ -294,19 +285,41 @@ class cGrCarCamInside : public cGrPerspCamera
 	P[2] = car->_drvPos_z;
 	sgXformPnt3(P, car->_posMat);
 
+#if (CamInsideDynamicBehaviour == 2)
+
+	tdble A = car->_yaw;
+	if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
+	    PreA += 2*PI;
+	} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
+	    PreA -= 2*PI;
+	}
+	RELAXATION(A, PreA, 4.0f);
+	const tdble CosA = cos(A);
+	const tdble SinA = sin(A);
+
+	//tdble brake = 0.0f;
+	//if (car->_accel_x < 0.0)
+	//	brake = MIN(2.0, fabs(car->_accel_x) / 20.0);
+
+	center[0] = P[0] - (10 - 1) * CosA;
+	center[1] = P[1] - (10 - 1) * SinA;
+	center[2] = P[2]; // - brake;  // this does not work yet
+
+#else
 	center[0] = P[0];
 	center[1] = P[1];
-	//center[0] = P[0] - (10 - 1) * CosA;
-	//center[1] = P[1] - (10 - 1) * SinA;
-	center[2] = P[2]; // - brake;  // this not working yet
+	center[2] = P[2];
+#endif
 
+#if (CamInsideDynamicBehaviour != 1)
 	up[0] = car->_posMat[2][0];
 	up[1] = car->_posMat[2][1];
 	up[2] = car->_posMat[2][2];
+#endif
 
-	speed[0] =car->pub.DynGCg.vel.x;
-	speed[1] =car->pub.DynGCg.vel.y;
-	speed[2] =car->pub.DynGCg.vel.z;
+	speed[0] = car->pub.DynGCg.vel.x;
+	speed[1] = car->pub.DynGCg.vel.y;
+	speed[2] = car->pub.DynGCg.vel.z;
     }
 };
 
@@ -1339,7 +1352,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
     
-    /* cam F2 = car inside with car (driver view) */
+    /* cam F2 = car inside with car (driver view)*/
     cam = new cGrCarCamInside(myscreen,
 			      id,
 			      1,	/* drawCurr */
