@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file                 : viper-gts-r.xml
+    created              : Sat Mar  3 18:46:37 CET 2001
+    copyright            : (C) 2001 by Eric Espié                         
+    email                : Eric.Espie@torcs.org   
+    version              : $Id: e-track-1.xml,v 1.8 2003/08/23 01:03:31 berniw Exp $                                  
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="Viper GTS-R" type="template">
+
+	<section name="private">
+		<attnum name="MinCornerInverse" min="0" max="2" val="0.001"/>
+		<attnum name="CornerSpeed" min="10.0" max="50.0" val="12.00"/>
+		<attnum name="DefaultCornerSpeedX" min="0.0" max="50.0" val="1.14"/>
+		<attnum name="TurnDecel" min="0" max="2" val="0.4"/>
+		<attnum name="CurveFactor" min="0" max="2" val="0.14"/>
+		<attnum name="RevsChangeUp" min="0" max="2" val="0.84"/>
+		<attnum name="RevsChangeDown" min="0" max="2" val="0.64"/>
+		<attnum name="RevsChangeDownMax" min="0" max="2" val="0.74"/>
+		<attnum name="BrakeDelay" min="10.0" max="100.0" val="30.00"/>
+		<attnum name="SteerGain" min="0" max="3" val="2.2"/>
+		<attnum name="SteerDebug" min="-1" max="1" val="-1"/>
+		<attnum name="OvertakeDebug" min="0" max="1" val="0"/>
+		<attnum name="IntMargin" min="0" max="2" val="1.4"/>
+		<attnum name="NoTeamWaiting" min="0" max="2" val="1"/>
+		<attnum name="SteerSkid" min="-1" max="3" val="-0.02"/>
+		<attnum name="AvoidSpeedAdjustX" min="-20" max="20" val="0.85"/>
+		<attnum name="AvoidBrakeAdjust" min="-20" max="20" val="-6"/>
+		<attnum name="LookAhead" min="1" max="5" val="2.6"/>
+		<attnum name="OvertakeCaution" min="-20" max="20" val="0.2"/>
+		<attnum name="AccelExit" min="-20" max="20" val="0.0"/>
+		<attnum name="AbsSlip" min="0.5" max="4.5" val="1.0"/>
+		<attnum name="AbsRange" min="0.5" max="10.5" val="9.0"/>
+		<attnum name="TclSlip" min="0.5" max="8.5" val="4.0"/>
+	</section>
+
+</params>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

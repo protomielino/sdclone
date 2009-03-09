@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file                 : viper-gts-r.xml
+    created              : Sat Mar  3 18:46:37 CET 2001
+    copyright            : (C) 2001 by Eric Espié                         
+    email                : Eric.Espie@torcs.org   
+    version              : $Id: e-track-1.xml,v 1.8 2003/08/23 01:03:31 berniw Exp $                                  
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="Viper GTS-R" type="template">
+
+	<!-- 2.51.35 -->
+	<section name="private">
+		<attnum name="MinCornerInverse" val="0.00001"/>
+		<attnum name="BaseCornerSpeedX" val="1.09"/>
+		<attnum name="CornerSpeed" val="11.30"/>
+		<attnum name="BrakeDelay" val="25.00"/>
+		<attnum name="SteerGain" val="2.0"/>
+		<attnum name="SteerDebug" val="0"/>
+		<attnum name="OvertakeDebug" val="0"/>
+		<attnum name="IntMargin" val="1.9"/>
+		<attnum name="Security" val="0.1"/>
+
+		<attnum name="RLSpeed0Div" val="1430"/>
+		<attnum name="RLSpeed0DivEnd" val="1600"/>
+		<attnum name="RLSpeed0" val="8.5"/>
+		<attnum name="RLSpeed1Div" val="930"/>
+		<attnum name="RLSpeed1DivEnd" val="2300"/>
+		<attnum name="RLSpeed1" val="9.0"/>
+
+		<attnum name="RLBrake0Div" val="650"/>
+		<attnum name="RLBrake0DivEnd" val="730"/>
+		<attnum name="RLBrake0" val="-10"/>
+		<attnum name="RLBrake1Div" val="850"/>
+		<attnum name="RLBrake1DivEnd" val="2300"/>
+		<attnum name="RLBrake1" val="-8"/>
+		<attnum name="RLBrake2Div" val="250"/>
+		<attnum name="RLBrake2DivEnd" val="350"/>
+		<attnum name="RLBrake2" val="-3"/>
+	</section>
+
+</params>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file                 : viper-gts-r.xml
+    created              : Sat Mar  3 18:46:37 CET 2001
+    copyright            : (C) 2001 by Eric Espié                         
+    email                : Eric.Espie@torcs.org   
+    version              : $Id: e-track-1.xml,v 1.8 2003/08/23 01:03:31 berniw Exp $                                  
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="Viper GTS-R" type="template">
+
+	<!-- 1.30.80 -->
+	<section name="private">
+		<attnum name="CornerSpeed" val="12.00"/>
+		<attnum name="BrakeDelay" val="32.00"/>
+		<attnum name="SteerGain" val="2.2"/>
+		<attnum name="SteerDebug" val="0"/>
+		<attnum name="OvertakeDebug" val="0"/>
+		<attnum name="IntMargin" val="1.0"/>
+		<attnum name="ExtMargin" val="1.3"/>
+
+		<attnum name="RLSpeed0Div" val="290"/>
+		<attnum name="RLSpeed0DivEnd" val="320"/>
+		<attnum name="RLSpeed0" val="10.5"/>
+
+    <attnum name="LaneShift0Div" val="1"/>
+    <attnum name="LaneShift0DivEnd" val="60"/>
+    <attnum name="ExtMargin0" val="-0.5"/>
+    <attnum name="LaneShift1Div" val="225"/>
+    <attnum name="LaneShift1DivEnd" val="252"/>
+    <attnum name="ExtMargin1" val="1.0"/>
+    <attnum name="LaneShift2Div" val="270"/>
+    <attnum name="LaneShift2DivEnd" val="320"/>
+    <attnum name="IntMargin2" val="1.0"/>
+    <attnum name="LaneShift3Div" val="540"/>
+    <attnum name="LaneShift3DivEnd" val="570"/>
+    <attnum name="ExtMargin3" val="-0.7"/>
+    <attnum name="LaneShift4Div" val="620"/>
+    <attnum name="LaneShift4DivEnd" val="660"/>
+    <attnum name="ExtMargin4" val="-0.7"/>
+    <attnum name="LaneShift5Div" val="715"/>
+    <attnum name="LaneShift5DivEnd" val="784"/>
+    <attnum name="IntMargin5" val="0.5"/>
+    <attnum name="LaneShift6Div" val="785"/>
+    <attnum name="LaneShift6DivEnd" val="830"/>
+    <attnum name="ExtMargin6" val="-0.5"/>
+	</section>
+
+</params>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

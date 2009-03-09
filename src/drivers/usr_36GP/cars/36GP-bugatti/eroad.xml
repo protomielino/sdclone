@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file                 : viper-gts-r.xml
+    created              : Sat Mar  3 18:46:37 CET 2001
+    copyright            : (C) 2001 by Eric Espié                         
+    email                : Eric.Espie@torcs.org   
+    version              : $Id: e-track-1.xml,v 1.8 2003/08/23 01:03:31 berniw Exp $                                  
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="Viper GTS-R" type="template">
+
+	<!-- 1.29.60 -->
+	<section name="private">
+		<attnum name="MinCornerInverse" val="0.000001"/>
+		<attnum name="BaseCornerSpeed" val="0.7"/>
+		<attnum name="CornerSpeed" val="10.0"/>
+		<attnum name="BrakeDelay" val="32.00"/>
+		<attnum name="SteerGain" val="2.0"/>
+		<attnum name="SteerDebug" val="0"/>
+		<attnum name="OvertakeDebug" val="0"/>
+		<attnum name="IntMargin" val="1.25"/>
+		<attnum name="ExtMargin" val="1.3"/>
+		<attnum name="AccelExit" val="0.5"/>
+
+		<attnum name="RLSpeed0Div" val="1"/>
+		<attnum name="RLSpeed0DivEnd" val="150"/>
+		<attnum name="RLSpeed0" val="7.1"/>
+		<attnum name="RLSpeed1Div" val="290"/>
+		<attnum name="RLSpeed1DivEnd" val="380"/>
+		<attnum name="RLSpeed1" val="9.0"/>
+		<attnum name="RLSpeed2Div" val="600"/>
+		<attnum name="RLSpeed2DivEnd" val="690"/>
+		<attnum name="RLSpeed2" val="8.0"/>
+		<attnum name="RLSpeed3Div" val="711"/>
+		<attnum name="RLSpeed3DivEnd" val="1030"/>
+		<attnum name="RLSpeed3" val="10.5"/>
+
+		<attnum name="RLBrake0Div" val="1"/>
+		<attnum name="RLBrake0DivEnd" val="230"/>
+		<attnum name="RLBrake0" val="-4"/>
+
+		<attnum name="SpeedLimit0Div" val="980"/>
+		<attnum name="SpeedLimit0DivEnd" val="1060"/>
+		<attnum name="SpeedLimit0" val="150"/>
+
+		<attnum name="LaneShift0Div" val="150"/>
+		<attnum name="LaneShift0DivEnd" val="190"/>
+		<attnum name="LaneShift0" val="-1.2"/>
+	</section>
+
+</params>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
