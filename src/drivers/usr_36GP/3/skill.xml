@@ -4,7 +4,7 @@
 
 <params name="Skill" type="template">
 
- <!-- Tazio Nuvolari - one of the best, took big risks overtaking.       -->
+ <!-- Bernd Rosemeyer - perhaps the greatest driver of the time          -->
 
  <section name="skill">
 
@@ -19,7 +19,7 @@
   <!-- driver take more risks, while negative values make them more      -->
   <!-- careful about when they choose to overtake.  Don't go too high    -->
   <!-- with the positive values!                                         -->
-  <attnum name="aggression" min="-3.0" max="1.5" val="1.2"/>
+  <attnum name="aggression" min="-3.0" max="1.5" val="-0.5"/>
 
  </section>
 
