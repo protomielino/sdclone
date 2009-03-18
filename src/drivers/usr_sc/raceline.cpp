@@ -355,7 +355,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  BrakeDelay = GfParmGetNum( carhandle, "private", "BrakeDelay", (char *)NULL, 35.0f );
  
  // read custom values...
- for (i=0; i<50; i++)
+ for (i=0; i<1024; i++)
  {
   char str[32];
   sprintf(str, "RLSpeed%dDiv", i);

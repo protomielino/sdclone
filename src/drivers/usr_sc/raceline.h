@@ -75,7 +75,7 @@ typedef struct {
 } LRLModData;
 
 typedef struct {
-  LRLModData data[50];
+  LRLModData data[1024];
   int used;
 } LRLMod;
 

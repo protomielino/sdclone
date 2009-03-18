@@ -18,7 +18,10 @@
 
 	<section name="private">
 		<attnum name="MinCornerInverse" min="0" max="2" val="0.001"/>
-		<attnum name="CornerSpeed" min="10.0" max="50.0" val="15.00"/>
+		<attnum name="ExitSpeedInc" min="0.0" max="50.0" val="0.60"/>
+		<attnum name="EntrySpeedInc" min="0.0" max="50.0" val="0.25"/>
+		<attnum name="BrakeDelayInc" min="0.0" max="50.0" val="1.00"/>
+		<attnum name="CornerSpeed" min="1.0" max="50.0" val="4.00"/>
 		<attnum name="CornerSpeedX" min="0.0" max="10.0" val="0.80"/>
 		<attnum name="TurnDecel" min="0" max="2" val="0.4"/>
 		<attnum name="CurveFactor" min="0" max="2" val="0.14"/>
