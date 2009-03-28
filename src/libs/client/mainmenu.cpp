@@ -26,6 +26,7 @@
 #include "mainmenu.h"
 #include "exitmenu.h"
 #include "optionmenu.h"
+#include "credits.h"
 
 
 void *menuHandle = NULL;
@@ -69,11 +70,7 @@ TorcsMainMenuInit(void)
 
     GfuiLabelCreate(menuHandle,
 		    "The Open Racing Car Simulator - Next Generation",
-		    GFUI_FONT_LARGE,
-		    320,
-		    420,
-		    GFUI_ALIGN_HC_VB,
-		    0);
+		    GFUI_FONT_LARGE, 320, 420, GFUI_ALIGN_HC_VB, 0);
 
     GfuiMenuButtonCreate(menuHandle,
 			 "Race", "Races Menu",
@@ -86,6 +83,10 @@ TorcsMainMenuInit(void)
     GfuiMenuButtonCreate(menuHandle,
 			 "Options", "Configure",
 			 TorcsOptionOptionInit(menuHandle), GfuiScreenActivate);
+    
+    GfuiMenuButtonCreate(menuHandle,
+			 "Credits", "Thanks to all contributors",
+			 menuHandle, TorcsCreditsScreenActivate);
     
     GfuiMenuDefaultKeysAdd(menuHandle);
 

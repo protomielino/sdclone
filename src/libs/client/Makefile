@@ -20,8 +20,7 @@ SOLIBRARY = libclient.so
 
 SOLIBDIR  = .
 
-SOURCES   = entry.cpp mainmenu.cpp splash.cpp exitmenu.cpp \
-	    optionmenu.cpp
+SOURCES   = entry.cpp mainmenu.cpp splash.cpp exitmenu.cpp optionmenu.cpp credits.cpp
 
 LIBS      =  -lplibssg -lplibsg -lplibul
 

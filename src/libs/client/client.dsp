@@ -144,6 +144,10 @@ SOURCE=.\exitmenu.cpp
 # End Source File
 # Begin Source File
 
+SOURCE=.\credits.cpp
+# End Source File
+# Begin Source File
+
 SOURCE=..\racescreens\fileselect.cpp
 # End Source File
 # Begin Source File
@@ -313,6 +317,10 @@ SOURCE=.\driverconfig.h
 # Begin Source File
 
 SOURCE=.\exitmenu.h
+# End Source File
+# Begin Source File
+
+SOURCE=.\credits.h
 # End Source File
 # Begin Source File
 
