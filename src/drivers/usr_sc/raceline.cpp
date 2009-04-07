@@ -92,6 +92,7 @@ LRaceLine::LRaceLine() :
    SkidAccel(0.00),
    DivLength(3.0),
    AccelCurveDampen(1.0),
+   BrakeCurveDampen(1.0),
    AccelExit(0.0),
    AvoidAccelExit(0.0),
    OvertakeCaution(0.0),
@@ -105,6 +106,7 @@ LRaceLine::LRaceLine() :
    lastNasteer(0.0),
    skill(0.0),
    lastyaw(0.0),
+   maxfuel(0.0),
    Divs(0),
    Segs(0),
    AccelCurveOffset(0),
@@ -137,8 +139,10 @@ LRaceLine::LRaceLine() :
    tRLMarginRgt(NULL),
    tRLMarginLft(NULL),
    tOTCaution(NULL),
-   tRLSpeed(NULL),
-   tRLBrake(NULL),
+   tRLSpeed0(NULL),
+   tRLSpeed1(NULL),
+   tRLBrake0(NULL),
+   tRLBrake1(NULL),
    tIntMargin(NULL),
    tExtMargin(NULL),
    tSecurity(NULL),
@@ -161,6 +165,7 @@ LRaceLine::LRaceLine() :
    fDirt(0),
    Next(0),
    This(0),
+   CarDiv(0),
    track(NULL),
    carhandle(NULL),
    car(NULL)
@@ -214,18 +219,22 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  nseg++;
  nseg = MAX(Divs, nseg);
 
- tx = (double **) malloc( 2 * sizeof(double) );
- ty = (double **) malloc( 2 * sizeof(double) );
- tRInverse = (double **) malloc( 2 * sizeof(double) );
- tSpeed = (double **) malloc( 2 * sizeof(double) );
+ tx = (double **) malloc( 3 * sizeof(double *) );
+ ty = (double **) malloc( 3 * sizeof(double *) );
+ tRInverse = (double **) malloc( 3 * sizeof(double) );
+ tSpeed = (double **) malloc( 3 * sizeof(double) );
  tx[0] = (double *) malloc( (Divs+1) * sizeof(double) );
  tx[1] = (double *) malloc( (Divs+1) * sizeof(double) );
+ tx[2] = (double *) malloc( (Divs+1) * sizeof(double) );
  ty[0] = (double *) malloc( (Divs+1) * sizeof(double) );
  ty[1] = (double *) malloc( (Divs+1) * sizeof(double) );
+ ty[2] = (double *) malloc( (Divs+1) * sizeof(double) );
  tRInverse[0] = (double *) malloc( (Divs+1) * sizeof(double) );
  tRInverse[1] = (double *) malloc( (Divs+1) * sizeof(double) );
+ tRInverse[2] = (double *) malloc( (Divs+1) * sizeof(double) );
  tSpeed[0] = (double *) malloc( (Divs+1) * sizeof(double) );
  tSpeed[1] = (double *) malloc( (Divs+1) * sizeof(double) );
+ tSpeed[2] = (double *) malloc( (Divs+1) * sizeof(double) );
  tDistance = (double *) malloc( (Divs+1) * sizeof(double) );
  tMaxSpeed = (double *) malloc( (Divs+1) * sizeof(double) );
  txLeft = (double *) malloc( (Divs+1) * sizeof(double) );
@@ -250,8 +259,10 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  tRLMarginRgt = (LRLMod *) malloc( sizeof(LRLMod) );
  tRLMarginLft = (LRLMod *) malloc( sizeof(LRLMod) );
  tOTCaution = (LRLMod *) malloc( sizeof(LRLMod) );
- tRLSpeed = (LRLMod *) malloc( sizeof(LRLMod) );
- tRLBrake = (LRLMod *) malloc( sizeof(LRLMod) );
+ tRLSpeed0 = (LRLMod *) malloc( sizeof(LRLMod) );
+ tRLSpeed1 = (LRLMod *) malloc( sizeof(LRLMod) );
+ tRLBrake0 = (LRLMod *) malloc( sizeof(LRLMod) );
+ tRLBrake1 = (LRLMod *) malloc( sizeof(LRLMod) );
  tIntMargin = (LRLMod *) malloc( sizeof(LRLMod) );
  tExtMargin = (LRLMod *) malloc( sizeof(LRLMod) );
  tSecurity = (LRLMod *) malloc( sizeof(LRLMod) );
@@ -274,12 +285,16 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
 
  memset(tx[0], 0, (Divs+1) * sizeof(double));
  memset(tx[1], 0, (Divs+1) * sizeof(double));
+ memset(tx[2], 0, (Divs+1) * sizeof(double));
  memset(ty[0], 0, (Divs+1) * sizeof(double));
  memset(ty[1], 0, (Divs+1) * sizeof(double));
+ memset(ty[2], 0, (Divs+1) * sizeof(double));
  memset(tRInverse[0], 0, (Divs+1) * sizeof(double));
  memset(tRInverse[1], 0, (Divs+1) * sizeof(double));
+ memset(tRInverse[2], 0, (Divs+1) * sizeof(double));
  memset(tSpeed[0], 0, (Divs+1) * sizeof(double));
  memset(tSpeed[1], 0, (Divs+1) * sizeof(double));
+ memset(tSpeed[2], 0, (Divs+1) * sizeof(double));
  memset(tDistance, 0, (Divs+1) * sizeof(double));
  memset(tMaxSpeed, 0, (Divs+1) * sizeof(double));
  memset(txLeft, 0, (Divs+1) * sizeof(double));
@@ -300,8 +315,10 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tOTCaution, 0, sizeof(LRLMod));
  memset(tRLMarginRgt, 0, sizeof(LRLMod));
  memset(tRLMarginLft, 0, sizeof(LRLMod));
- memset(tRLSpeed, 0, sizeof(LRLMod));
- memset(tRLBrake, 0, sizeof(LRLMod));
+ memset(tRLSpeed0, 0, sizeof(LRLMod));
+ memset(tRLSpeed1, 0, sizeof(LRLMod));
+ memset(tRLBrake0, 0, sizeof(LRLMod));
+ memset(tRLBrake1, 0, sizeof(LRLMod));
  memset(tLaneShift, 0, sizeof(LRLMod));
  memset(tIntMargin, 0, sizeof(LRLMod));
  memset(tExtMargin, 0, sizeof(LRLMod));
@@ -338,6 +355,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  OvertakeCaution = GfParmGetNum( carhandle, "private", "OvertakeCaution", (char *)NULL, 0.0f );
  SkidCorrection = GfParmGetNum( carhandle, "private", "SkidCorrection", (char *)NULL, 1.0f );
  AccelCurveDampen = GfParmGetNum( carhandle, "private", "AccelCurveDampen", (char *)NULL, 1.0f );
+ BrakeCurveDampen = GfParmGetNum( carhandle, "private", "BrakeCurveDampen", (char *)NULL, 1.0f );
  AccelCurveOffset = (int) GfParmGetNum( carhandle, "private", "AccelCurveOffset", (char *)NULL, 0.0f );
  MinCornerInverse = GfParmGetNum( carhandle, "private", "MinCornerInverse", (char *)NULL, 0.002f );
  CornerSpeed = GfParmGetNum( carhandle, "private", "CornerSpeed", (char *)NULL, 15.0f );
@@ -353,6 +371,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7f ) + skill/5;
  TimeFactor = GfParmGetNum( carhandle, "private", "TimeFactor", (char *)NULL, 0.0f );
  BrakeDelay = GfParmGetNum( carhandle, "private", "BrakeDelay", (char *)NULL, 35.0f );
+ maxfuel = GfParmGetNum( carhandle, SECT_CAR, PRM_TANK, (char *)NULL, 100.0f );
  
  // read custom values...
  for (i=0; i<1024; i++)
@@ -369,12 +388,16 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   enddiv = MAX(div, MIN(Divs, enddiv));
  
   sprintf(str, "RLSpeed%d", i);
-  double speed = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+  double speed0 = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+  sprintf(str, "RLSpeedZ%d", i);
+  double speed1 = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
   sprintf(str, "RLDecel%d", i);
   double decel = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
 
-  if (speed > 0.0)
-   AddMod( tRLSpeed, div, enddiv, speed, 0 );
+  if (speed0 > 0.0)
+   AddMod( tRLSpeed0, div, enddiv, speed0, 0 );
+  if (speed1 > 0.0)
+   AddMod( tRLSpeed1, div, enddiv, speed1, 0 );
   if (decel > 0.0)
    AddMod( tDecel, div, enddiv, decel, 0 );
  }
@@ -393,9 +416,13 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   enddiv = MAX(div, MIN(Divs, enddiv));
 
   sprintf(str, "RLBrake%d", i);
-  double brake = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+  double brake0 = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+  sprintf(str, "RLBrakeZ%d", i);
+  double brake1 = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
 
-  AddMod( tRLBrake, div, enddiv, brake, 0 );
+  AddMod( tRLBrake0, div, enddiv, brake0, 0 );
+  if (brake1 > 0)
+   AddMod( tRLBrake1, div, enddiv, brake1, 0 );
  }
 
  for (i=0; i<50; i++)
@@ -690,6 +717,11 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   double em = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
   sprintf(str, "Security%d", i);
   double sec = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+  sprintf(str, "AccelCurveDampen%d", i);
+  double dampen = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+
+  if (dampen)
+   AddMod( tAccelCurveDampen, div, enddiv, dampen, 0 );
 
   int d;
   for (d=div; d<enddiv; d++)
@@ -773,7 +805,7 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
    SetSegmentInfo(psegCurrent, Distance + Step, i, Step);
   tSegDivStart[psegCurrent->id] = i;
 
-  if (rl == LINE_RL)
+  if (rl >= LINE_RL_0)
   {
    for (int side=0; side<2; side++)
    {
@@ -897,7 +929,7 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
  Width = psegCurrent->width;
  Length = Distance;
 
- if (rl == LINE_RL)
+ if (rl >= LINE_RL_0)
  {
   // evaluate changes in slope, used later for flying mitigation
   double *tLSlope = (double *) malloc( (Divs + 1) * sizeof(double) );
@@ -984,7 +1016,7 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
   tLane[i] = 1.2;
 #endif
 
- if (rl == LINE_RL)
+ if (rl >= LINE_RL_0)
  {
   if (tLane[i] < -0.2-tLaneLMargin[i])
    tLane[i] = -0.2-tLaneLMargin[i];
@@ -1031,7 +1063,7 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
   if (IntLane > 0.5)
    IntLane = 0.5;
 
-  if (rl == LINE_RL)
+  if (rl >= LINE_RL_0)
   {
    if (TargetRInverse >= 0.0)
    {
@@ -1095,7 +1127,7 @@ void LRaceLine::Smooth(int Step, int rl)
  
   double Security = lPrev * lNext / (8 * SecurityR);
 
-  if (rl == LINE_RL)
+  if (rl >= LINE_RL_0)
   {
    int movingout = 0;
    if ((TargetRInverse > 0.0 && tLane[next] > tLane[prev]) ||
@@ -1111,12 +1143,11 @@ void LRaceLine::Smooth(int Step, int rl)
      double curvefactor = (tcf != 0.0 ? tcf : CurveFactor);
      double tcd = GetModD( tAccelCurveDampen, next );
      double ca = (tcd > 0.0 ? tcd : AccelCurveDampen);
-     //if (movingout == 1 && rl == LINE_RL)
-     // curvefactor *= MAX(0.2, (1.0 - ca));
+     double cb = BrakeCurveDampen;
      if (ac1 < ac2) // curve is increasing
-      ri0 += curvefactor * (ri1 - ri0);
+      ri0 += curvefactor * (ri1 - ri0 * cb);
      else if (ac2 < ac1) // curve is decreasing
-      ri1 += curvefactor*ca * (ri0 - ri1);
+      ri1 += curvefactor * (ri0 - ri1 * ca);
     }
 
     TargetRInverse = (lNext * ri0 + lPrev * ri1) / (lNext + lPrev);
@@ -1210,28 +1241,44 @@ void LRaceLine::TrackInit(tSituation *p)
 
  for (int rl=LINE_MID; rl<=LINE_RL; rl++)
  {
-  SplitTrack(track, rl);
-
-  //
-  // Smoothing loop
-  //
-  int Iter = 4, i;
-  if (rl == LINE_RL)
-   Iter = Iterations;
-  int MaxStep = 132;
-  for (int Step = MaxStep; (Step /= 2) > 0;)
+#if 0
+  if (rl == LINE_RL_0)
   {
-   for (i = Iter * int(sqrt((float) Step)); --i >= 0;)
-    Smooth(Step, rl);
-   Interpolate(Step, rl);
+   for (int i=0; i<Divs; i++)
+   {
+    tx[LINE_RL_0][i] = tx[LINE_RL][i];
+    ty[LINE_RL_0][i] = ty[LINE_RL][i];
+    tRInverse[LINE_RL_0][i] = tRInverse[LINE_RL][i];
+   }
+  }
+  else
+#endif
+  {
+   SplitTrack(track, rl);
+
+   //
+   // Smoothing loop
+   //
+   int Iter = 4, i;
+   if (rl >= LINE_RL_0)
+    Iter = Iterations;
+   int MaxStep = 132;
+   for (int Step = MaxStep; (Step /= 2) > 0;)
+   {
+    for (i = Iter * int(sqrt((float) Step)); --i >= 0;)
+     Smooth(Step, rl);
+    Interpolate(Step, rl);
+   }
   }
  
   //
   // Compute curvature and speed along the path
   //
-  for (i = Divs; --i >= 0;)
+  for (int i = Divs; --i >= 0;)
   {
-   double trlspeed = GetModD( tRLSpeed, i );
+   double trlspeed = (rl == LINE_RL_0 ? GetModD( tRLSpeed0, i ) : GetModD( tRLSpeed1, i ));
+   if (trlspeed <= 0.0)
+    trlspeed = GetModD( tRLSpeed0, i );
    double avspeed = GetModD( tAvoidSpeed, i );
    double cornerspeed = ((trlspeed ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
    if (rl == LINE_MID)
@@ -1260,7 +1307,7 @@ void LRaceLine::TrackInit(tSituation *p)
 
     MaxSpeed = sqrt(TireAccel / (rI - MinCornerInverse));
 
-    if (rl == LINE_RL && ca > 0.0)
+    if (rl >= LINE_RL_0 && ca > 0.0)
     {
      int canext = nnext;
      if (ao > 0)
@@ -1294,7 +1341,7 @@ void LRaceLine::TrackInit(tSituation *p)
     MaxSpeed = 10000;
 
    double tbump = GetModD( tBump, i );
-   if (rl == LINE_RL && tbump > 0.0f && fabs(delta) > 0.08)
+   if (rl >= LINE_RL_0 && tbump > 0.0f && fabs(delta) > 0.08)
    {
     // look for dangerous bumps in the track and slow the car down for them
     double gamma = fabs(delta) * 2.0f;
@@ -1372,10 +1419,10 @@ void LRaceLine::TrackInit(tSituation *p)
   // hymie braking method
   brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0));
 
-  for (i = Divs-1; --i >= 0;)
+  for (int i = Divs-1; --i >= 0;)
   {
    int next = (i+1) % Divs;
-   double bd = brakedelay + GetModD( tRLBrake, i );
+   double bd = brakedelay + (rl == LINE_RL ? GetModD( tRLBrake1, i ) : GetModD( tRLBrake0, i ));
    if (rl == LINE_MID)
     bd += GetModD( tAvoidBrake, i );
 
@@ -1414,24 +1461,28 @@ void LRaceLine::FreeTrack()
  {
   if (tx[0]) free(tx[0]);
   if (tx[1]) free(tx[1]);
+  if (tx[2]) free(tx[2]);
   free(tx);
  }
  if (ty)
  {
   if (ty[0]) free(ty[0]);
   if (ty[1]) free(ty[1]);
+  if (ty[2]) free(ty[2]);
   free(ty);
  }
  if (tRInverse)
  {
   if (tRInverse[0]) free(tRInverse[0]);
   if (tRInverse[1]) free(tRInverse[1]);
+  if (tRInverse[2]) free(tRInverse[2]);
   free(tRInverse);
  }
  if (tSpeed)
  {
   if (tSpeed[0]) free(tSpeed[0]);
   if (tSpeed[1]) free(tSpeed[1]);
+  if (tSpeed[2]) free(tSpeed[2]);
   free(tSpeed);
  }
  if (tDistance) free(tDistance);
@@ -1450,8 +1501,10 @@ void LRaceLine::FreeTrack()
  if (tRLMarginRgt) free(tRLMarginRgt);
  if (tRLMarginLft) free(tRLMarginLft);
  if (tOTCaution) free(tOTCaution);
- if (tRLSpeed) free(tRLSpeed);
- if (tRLBrake) free(tRLBrake);
+ if (tRLSpeed1) free(tRLSpeed1);
+ if (tRLBrake1) free(tRLBrake1);
+ if (tRLSpeed0) free(tRLSpeed0);
+ if (tRLBrake0) free(tRLBrake0);
  if (tIntMargin) free(tIntMargin);
  if (tExtMargin) free(tExtMargin);
  if (tSecurity) free(tSecurity);
@@ -1497,7 +1550,8 @@ void LRaceLine::FreeTrack()
  tLaneRMargin = NULL;
  tSegDivStart = NULL;
 
- tRLMarginRgt = tRLMarginLft = tOTCaution = tRLSpeed = tRLBrake = tIntMargin = NULL;
+ tRLMarginRgt = tRLMarginLft = tOTCaution = tRLSpeed1 = tRLBrake1 = tIntMargin = NULL;
+ tRLSpeed0 = tRLBrake0 = NULL;
  tExtMargin = tSecurity = tDecel = tADecel = tBump = tSpeedLimit =tCornerAccel = tAccelCurveDampen = NULL;
  tCurveFactor = tAvoidSpeed = tAvoidSpeedX = tAvoidBrake = tAccelCurveOffset = tCarefulBrake = NULL;
  tSteerGain = tSkidAccel = tAccelExit = tSkidCorrection = NULL;
@@ -1754,7 +1808,15 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   c1 /= sum;
  }
 
- TargetSpeed = (1 - c0) * tSpeed[LINE_RL][SNext] + c0 * tSpeed[LINE_RL][Index];
+ {
+  double spdnxt = tSpeed[LINE_RL_0][SNext] + (tSpeed[LINE_RL][SNext] - tSpeed[LINE_RL_0][SNext]) * (1.0 - (car->_fuel-5.0) / (maxfuel-5.0));
+  double spdidx = tSpeed[LINE_RL_0][Index] + (tSpeed[LINE_RL][Index] - tSpeed[LINE_RL_0][Index]) * (1.0 - (car->_fuel-5.0) / (maxfuel-5.0));
+  //double spdnxt = tSpeed[LINE_RL_0][SNext];
+  //double spdidx = tSpeed[LINE_RL_0][Index];
+
+  TargetSpeed = (1 - c0) * spdnxt + c0 * spdidx;
+ }
+
  data->speed = TargetSpeed;
  if (TargetSpeed > ospeed && ATargetSpeed < aspeed)
   data->avspeed = ATargetSpeed = MAX(data->avspeed, aspeed * (TargetSpeed / ospeed));
@@ -1844,7 +1906,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   {
    k1999steer = atan(wheelbase * TargetCurvature) / car->_steerLock;
    
-   double steergain = GetModD( tSteerGain, This );
+   double steergain = GetModD( tSteerGain, CarDiv );
    if (!steergain) steergain = SteerGain;
 
    double cspeed = carspeed;
@@ -2312,7 +2374,7 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 #endif
 
  //double time = 0.63;
- double time = 0.02 * 20 * (1.0 + MIN(15.0*(1.0+fabs(rInv*240)), MAX(0.0, (car->_speed_x-(40*(1.0-MIN(0.8, fabs(rInv*70)))))))/18);
+ double time = 0.02 * 10 * (1.0 + MIN(15.0*(1.0+fabs(rInv*240)), MAX(0.0, (car->_speed_x-(40*(1.0-MIN(0.8, fabs(rInv*70)))))))/18);
 
  if (rInv > 0.0 && off2lft > 0.0)
   time *= (1.0 + ((off2lft/track->width) * (off2lft/(track->width-3.0)) * fabs(rInv*60)));

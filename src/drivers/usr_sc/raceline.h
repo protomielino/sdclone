@@ -22,7 +22,7 @@
 
 #include "linalg.h"
 
-enum { LINE_MID=0, LINE_RL };
+enum { LINE_MID=0, LINE_RL_0, LINE_RL };
 enum { mode_normal=1, mode_correcting, mode_avoiding, mode_pitting };
 
 #define MAXSEGMENTS 3000
@@ -137,6 +137,7 @@ class LRaceLine {
   double SkidAccel;
   double DivLength;
   double AccelCurveDampen;   //
+  double BrakeCurveDampen;
   double AccelExit;          //
   double AvoidAccelExit;     //
   double OvertakeCaution;    // default 0.0 - higher increases caution in overtaking
@@ -151,6 +152,7 @@ class LRaceLine {
   double lastNasteer;
   double skill;
   double lastyaw;
+  double maxfuel;
 
   int Divs;
   int Segs;
@@ -186,8 +188,10 @@ class LRaceLine {
   LRLMod *tRLMarginRgt;
   LRLMod *tRLMarginLft;
   LRLMod *tOTCaution;
-  LRLMod *tRLSpeed;
-  LRLMod *tRLBrake;
+  LRLMod *tRLSpeed0;
+  LRLMod *tRLSpeed1;
+  LRLMod *tRLBrake0;
+  LRLMod *tRLBrake1;
   LRLMod *tIntMargin;
   LRLMod *tExtMargin;
   LRLMod *tSecurity;
@@ -212,6 +216,7 @@ class LRaceLine {
   int fDirt;
   int Next;
   int This;
+  int CarDiv;
   tTrack *track;
 
   void *carhandle;

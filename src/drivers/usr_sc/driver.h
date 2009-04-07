@@ -161,6 +161,7 @@ class Driver {
 		int allow_stuck;		 
 		int stuckcheck;
 		float stuck_timer;		 
+		float last_stuck_time;		 
 		int prefer_side;
 		int allowcorrecting;
 		int pitpos;

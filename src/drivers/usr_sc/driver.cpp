@@ -47,7 +47,7 @@ const float Driver::MAX_FUEL_PER_METER = 0.0008f;			// [liter/m] fuel consumtion
 const float Driver::CLUTCH_SPEED = 5.0f;					// [m/s]
 const float Driver::CENTERDIV = 0.1f;						// [-] (factor) [0.01..0.6].
 const float Driver::DISTCUTOFF = 200.0f;					// [m] How far to look, terminate while loops.
-const float Driver::MAX_INC_FACTOR = 12.0f;					// [m] Increment faster if speed is slow [1.0..10.0].
+const float Driver::MAX_INC_FACTOR = 8.0f;					// [m] Increment faster if speed is slow [1.0..10.0].
 const float Driver::CATCH_FACTOR = 8.0f;					// [-] select MIN(catchdist, dist*CATCH_FACTOR) to overtake.
 const float Driver::CLUTCH_FULL_MAX_TIME = 2.0f;			// [s] Time to apply full clutch.
 const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;		// [m] if offset < this use the learned stuff
@@ -80,6 +80,7 @@ Driver::Driver(int index) :
 		allow_stuck(1),
 		stuckcheck(0),
 		stuck_timer(0.0f),
+		last_stuck_time(-100.0f),
 		prefer_side(0),
 		allowcorrecting(0),
 		pitpos(0),
@@ -348,6 +349,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	alone = allow_stuck = 1;
 	stuckcheck = 0;
 	clutchtime = stuck_timer = 0.0f;
+	last_stuck_time = -100.0f;
 	oldlookahead = laststeer = lastbrake = lastaccel = avgaccel_x = lastNSasteer = lastNSksteer = 0.0f;
 	brake_adjust_targ = decel_adjust_targ = 1.0f;
 	brake_adjust_perc = decel_adjust_perc = 1.0f;
@@ -438,7 +440,7 @@ void Driver::calcSpeed()
 	accelcmd = brakecmd = 0.0f;
 	faccelcmd = fbrakecmd = 0.0f;
 	double speed = rldata->speed;
-	double avspeed = MAX((getSpeed()+0.4)-(MAX(0.0, 0.9-fabs(MAX(0.0, angle-speedangle))*5)), rldata->avspeed);
+	double avspeed = MAX((getSpeed()+0.4)-(MAX(0.0, 1.6-fabs(MAX(0.0, angle-speedangle))*5)), rldata->avspeed);
 	double slowavspeed = rldata->slowavspeed;
 
 	if (mode == mode_avoiding && !allowcorrecting)
@@ -613,10 +615,12 @@ void Driver::drive(tSituation *s)
 		car->_steerCmd = -stucksteer;
 		car->_gearCmd = -1;		// Reverse gear.
 		car->_accelCmd = 0.5f;	// 100% accelerator pedal.
-		if (fabs(car->_speed_x) < 5.0 && car->_gearCmd < 0)
-			car->_accelCmd = MAX(car->_accelCmd, 0.75);
+		if (fabs(car->_speed_x) < 3.0 && car->_gearCmd < 0)
+			car->_accelCmd = 1.0f;
 		else if (fabs(angle) > 0.8 && car->_gearCmd > 0)
 			car->_accelCmd = MAX(MIN(car->_accelCmd, 0.4), 1.0 - fabs(angle)/3);
+		else if (MIN(car->_trkPos.toLeft, car->_trkPos.toRight) > 2.0)
+			car->_accelCmd = MAX(0.1f, car->_accelCmd - fabs(car->_speed_x)/8);
 		car->_brakeCmd = 0.0f;	// No brakes.
 		car->_clutchCmd = 0.0f;	// Full clutch (gearbox connected with engine).
 		if (DebugMsg & debug_steer)
@@ -634,10 +638,11 @@ void Driver::drive(tSituation *s)
 		if (!collision && stuckcheck == 1)
 		{
 			car->_steerCmd = stuckSteering( stucksteer );
+			car->_accelCmd = MAX(car->_accelCmd, 0.5f);
 			if (GET_DRIVEN_WHEEL_SPEED == &Driver::filterTCL_RWD && rearOffTrack())
 			{
 				// drive wheels at rear and we're off the track, so be careful!
-				car->_accelCmd = MAX(MAX((5.0f-car->_speed_x)/10.0f, 0.15f), car->_accelCmd - fabs(car->_yaw_rate));
+				car->_accelCmd = MAX(MAX((5.0f-car->_speed_x)/10.0f, 0.35f), car->_accelCmd - fabs(car->_yaw_rate*0.6));
 			}
 			else if (car->_speed_x < 10.0f && !collision && fabs(angle) > 1.0f)
 			{
@@ -649,6 +654,12 @@ void Driver::drive(tSituation *s)
 			if (mode == mode_normal)
 				car->_steerCmd -= car->_yaw_rate / 10;
 			car->_brakeCmd = 0.0f;
+
+			if (car->_speed_x < -1.0f)
+			{
+				car->_accelCmd = 0.0f;
+				car->_brakeCmd = 0.7f;
+			}
 		}
 		car->_clutchCmd = getClutch();
 		if (DebugMsg & debug_steer)
@@ -2667,7 +2678,6 @@ void Driver::update(tSituation *s)
 #endif
 		{
 			pit->setPitstop(strategy->needPitstop(car, s, opponents));
-			pitStopChecked = true;
 		}
 
 		if (pit->getPitstop() && car->_pit)
