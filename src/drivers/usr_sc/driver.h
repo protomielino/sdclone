@@ -152,6 +152,7 @@ class Driver {
 		float TclRange;
 		float AbsSlip;
 		float AbsRange;
+		float OversteerASR;
 		unsigned int random_seed;
 		int DebugMsg;
 		int racetype;

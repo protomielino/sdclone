@@ -71,6 +71,7 @@ Driver::Driver(int index) :
 		TclRange(10.0f),
 		AbsSlip(2.5f),
 		AbsRange(5.0f),
+		OversteerASR(0.7f),
 		random_seed(0),
 		DebugMsg(0),
 		racetype(0),
@@ -366,6 +367,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	TclRange = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "TclRange", NULL, 10.0f);
 	AbsSlip = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "AbsSlip", NULL, 2.5f);
 	AbsRange = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "AbsRange", NULL, 5.0f);
+	OversteerASR = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "OversteerASR", NULL, 0.7f);
 	fuelperlap = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "FuelPerLap", NULL, 5.0f);
 	CARMASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
 	maxfuel = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
@@ -492,10 +494,10 @@ void Driver::calcSpeed()
 		    (skidangle > 0.0 && laststeer < 0.0 && rldata->rInverse > 0.001))
 		{
 			// increase acceleration if correcting a skid
-			double diff = MAX(0.0, MIN(fabs(laststeer), MAX(fabs(skidangle/7)/50, fabs(rldata->rInverse * 50)))) * (7-skid);
+			double diff = MAX(0.0, MIN(fabs(laststeer), MAX(fabs(skidangle/7)/1000, fabs(rldata->rInverse * 50)))) * MAX(0.0, MIN(2.0, (7-skid)));
 			if (collision)
 				diff *= MIN(1.0, collision / 3.0f)*0.8;
-			x += diff;
+			x += diff * OversteerASR;
 		}
 		else if (mode != mode_normal && 
 		         (car->_accel_x < 1.0 || sidedanger) &&
