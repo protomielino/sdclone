@@ -16,12 +16,12 @@
 
 ROBOT       = usr_sc
 SHIPDIR     = drivers/${ROBOT}/10
-SHIP        = 36GP-maserati6C34.png skill.xml
+SHIP        = skill.xml
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
-src-robots-simplix_trb1a_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-simplix_trb1a_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-usr_sc_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
+src-robots-usr_sc_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 

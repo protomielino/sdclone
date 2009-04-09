@@ -16,7 +16,7 @@
 
 ROBOT       = usr_36GP
 SHIPDIR     = drivers/${ROBOT}/4
-SHIP        = 36GP-alfa12c.png skill.xml
+SHIP        = 36GP-maserati6C34.png skill.xml
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
