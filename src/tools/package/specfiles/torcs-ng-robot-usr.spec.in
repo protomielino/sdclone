@@ -1,0 +1,53 @@
+Summary: TORCS NG - USR Robots
+Name: TORCS-NG-robots-usr
+Version: @VERSION@
+Release: 1
+Epoch: 4
+Source:  torcs-ng-%{version}-src.tgz
+Source1: torcs-ng-%{version}-src-robots-usr.tgz
+Group: Amusements/Games
+BuildRoot: %{_tmppath}/%{name}-buildroot
+Copyright: GPL
+BuildArch: i386
+URL: http://www.torcs-ng.org
+Packager: Xavier Bertaux <bertauxx@yahoo.fr>
+Requires: torcs-ng
+
+%description
+USR Robots for TORCS NG
+by Andrew Sumner <Andrew.Sumner@lansa.com.au>
+
+%prep
+%setup -n torcs-ng-@VERSION@
+%setup -T -D -b 1 -n torcs-ng-@VERSION@
+cd $RPM_BUILD_DIR/torcs-ng-@VERSION@/src/drivers
+rm -rf human
+
+%build
+export TORCSNG_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
+./configure --prefix=%{_prefix}
+make
+
+%install
+make install DESTDIR=%{_tmppath}/%{name}-ship
+cd %{_tmppath}/%{name}-ship/%{_prefix}/share/games/torcs-ng
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
+cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
+cd -
+cd %{_tmppath}/%{name}-ship/%{_prefix}/lib/torcs-ng
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/torcs-ng
+cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/lib/torcs-ng
+cd -
+rm -rf %{_tmppath}/%{name}-ship
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%{_prefix}/share/games/torcs-ng/*
+%{_prefix}/lib/torcs-ng/*
+
+%changelog
+* Wed Sep 17 2008 Xavier Bertaux <bertauxx@yahoo.fr> 1.4.0
+- Initial RPM

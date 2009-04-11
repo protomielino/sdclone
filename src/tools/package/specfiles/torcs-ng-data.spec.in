@@ -8,7 +8,7 @@ Group: Amusements/Games
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Copyright: GPL
 BuildArch: noarch
-URL: http://www.torcs.org
+URL: http://www.torcs-ng.org
 Packager: Eric Espié <Eric.Espie@free.fr>
 
 %description
