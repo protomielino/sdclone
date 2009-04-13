@@ -639,7 +639,7 @@ void Driver::drive(tSituation *s)
 
 		if (!collision && stuckcheck == 1)
 		{
-			car->_steerCmd = stuckSteering( stucksteer );
+			//car->_steerCmd = stuckSteering( stucksteer );
 			car->_accelCmd = MAX(car->_accelCmd, 0.5f);
 			if (GET_DRIVEN_WHEEL_SPEED == &Driver::filterTCL_RWD && rearOffTrack())
 			{
@@ -656,13 +656,14 @@ void Driver::drive(tSituation *s)
 			if (mode == mode_normal)
 				car->_steerCmd -= car->_yaw_rate / 10;
 			car->_brakeCmd = 0.0f;
-
-			if (car->_speed_x < -1.0f)
-			{
-				car->_accelCmd = 0.0f;
-				car->_brakeCmd = 0.7f;
-			}
 		}
+
+		if (car->_speed_x < -1.0f)
+		{
+			car->_accelCmd = 0.0f;
+			car->_brakeCmd = 0.7f;
+		}
+
 		car->_clutchCmd = getClutch();
 		if (DebugMsg & debug_steer)
 			fprintf(stderr,"%s %d/%d: ",car->_name,rldata->thisdiv,rldata->nextdiv);
@@ -2957,9 +2958,13 @@ fprintf(stderr,"NOT STUCK: Stick with Forwards ps=%d fr=%d (%.3f <= %.3f)\n",pos
 		return false;
 	}
 
-	if (car->_gear >= 1 && fabs(angle) < MAX(fabs(rldata->rlangle)*4, fabs(rldata->rInverse)*500) && (MIN(car->_trkPos.toLeft, car->_trkPos.toRight) > 2.0 || fabs(angle) < 0.3))
+	if (car->_gear >= 1 && fabs(angle) < MAX(fabs(rldata->rlangle)*4, fabs(rldata->rInverse)*500) && 
+	    last_stuck_time < simtime - 4.0 &&
+	    (MIN(car->_trkPos.toLeft, car->_trkPos.toRight) > 2.0 || fabs(angle) < 0.3))
 		stuckcheck = 0;
 	else if (mode == mode_normal && fabs(angle) > MAX(fabs(rldata->rlangle)*4, fabs(rldata->rInverse)*500))
+		stuckcheck = 1;
+	else if (last_stuck_time >= simtime - 4.0 && !pit->getInPit())
 		stuckcheck = 1;
 
 	if (car->_gear == -1)
@@ -2967,7 +2972,7 @@ fprintf(stderr,"NOT STUCK: Stick with Forwards ps=%d fr=%d (%.3f <= %.3f)\n",pos
 		allow_stuck = 0;
 		stuck_timer = simtime;
 	}
-	else if ((!allow_stuck && simtime-stuck_timer > 3.0) || !stuckcheck)
+	else if ((!allow_stuck && simtime-stuck_timer > 3.0) || !stuckcheck || simtime - last_stuck_time > 4.0)
 	{
 		allow_stuck = 1;
 		stuck_timer = simtime;

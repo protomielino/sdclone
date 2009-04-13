@@ -54,7 +54,8 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 
 		pitentry = pMID[0].x;
 		pitexit = pMID[6].x;
-fprintf(stderr,"pitentry = %.1f (%.1f)\n",pitentry,pitinfo->pitEntry->lgfromstart);fflush(stderr);
+		pitstart = pMID[1].x;
+		pitend = pMID[5].x;
 
 		// Normalizing spline segments to >= 0.0.
 		int i;
@@ -79,7 +80,8 @@ fprintf(stderr,"pitentry = %.1f (%.1f)\n",pitentry,pitinfo->pitEntry->lgfromstar
 			pMID[5].x = pMID[4].x;
 		}
 
-		float sign = (pitinfo->side == TR_LFT) ? 1.0 : -1.0;
+		side = pitinfo->side;
+		float sign = (side == TR_LFT) ? 1.0 : -1.0;
 		pMID[0].y = 0.0;
 		pMID[6].y = 0.0;
 		for (i = 1; i < NPOINTS - 1; i++) {
@@ -132,7 +134,7 @@ float Pit::getPitOffset(float offset, float fromstart, int which)
 {
 	if (mypit != NULL) 
 	{
-		if (getInPit() || (getPitstop() && isBetween(fromstart))) 
+		if (getInPit() || (getPitstop() && isBetween(fromstart, 0))) 
 		{
 			fromstart = toSplineCoord(fromstart);
 			double newoffset;
@@ -161,7 +163,7 @@ void Pit::setPitstop(bool pitstop)
 
 	float fromstart = car->_distFromStartLine;
 
-	if (!isBetween(fromstart)) {
+	if (!isBetween(fromstart, 0)) {
 		this->pitstop = pitstop;
 	} else if (!pitstop) {
 		this->pitstop = pitstop;
@@ -171,20 +173,40 @@ void Pit::setPitstop(bool pitstop)
 
 
 // Check if the argument fromstart is in the range of the pit.
-bool Pit::isBetween(float fromstart)
+bool Pit::isBetween(float fromstart, int pitonly)
 {
-	if (pitentry <= pitexit) {
-		if (fromstart >= pitentry && fromstart <= pitexit) {
-			return true;
+	if (pitonly)
+	{
+		if (pitstart <= pitend) {
+			if (fromstart >= pitstart && fromstart <= pitend) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
-			return false;
+			// Warning: TORCS reports sometimes negative values for "fromstart"!
+			if (fromstart <= pitend || fromstart >= pitstart) {
+				return true;
+			} else {
+				return false;
+			}
 		}
-	} else {
-		// Warning: TORCS reports sometimes negative values for "fromstart"!
-		if (fromstart <= pitexit || fromstart >= pitentry) {
-			return true;
+	}
+	else
+	{
+		if (pitentry <= pitexit) {
+			if (fromstart >= pitentry && fromstart <= pitexit) {
+				return true;
+			} else {
+				return false;
+			}
 		} else {
-			return false;
+			// Warning: TORCS reports sometimes negative values for "fromstart"!
+			if (fromstart <= pitexit || fromstart >= pitentry) {
+				return true;
+			} else {
+				return false;
+			}
 		}
 	}
 }
@@ -214,9 +236,19 @@ bool Pit::isTimeout(float distance)
 void Pit::update()
 {
 	if (mypit != NULL) {
-		if (isBetween(car->_distFromStartLine)) {
+		if (isBetween(car->_distFromStartLine, 0)) {
 			if (getPitstop()) {
-				setInPit(true);
+				if (!isBetween(car->_distFromStartLine, 1) ||
+				    (side == TR_LFT && car->_trkPos.toLeft < 0.0) ||
+				    (side == TR_RGT && car->_trkPos.toRight < 0.0))
+				{
+					setInPit(true);
+				}
+				else
+				{
+					setInPit(false);
+					setPitstop(false);
+				}
 			}
 		} else {
 			setInPit(false);

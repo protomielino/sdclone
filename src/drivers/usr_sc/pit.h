@@ -40,7 +40,7 @@ class Pit {
 
 		float getPitOffset(float offset, float fromstart, int which);
 
-		bool isBetween(float fromstart);
+		bool isBetween(float fromstart, int pitonly);
 		bool isTimeout(float distance);
 
 		float getNPitStart() { return pMID[1].x; }
@@ -74,12 +74,15 @@ class Pit {
 		bool inpitlane;					// We are still in the pit lane.
 		float pitentry;					// Distance to start line of the pit entry.
 		float pitexit;					// Distance to the start line of the pit exit.
+		float pitstart;
+		float pitend;
 
 		float speedlimitsqr;			// Pit speed limit squared.
 		float speedlimit;				// Pit speed limit.
 		float pitspeedlimitsqr;			// The original speedlimit squared.
 
 		float pittimer;					// Timer for pit timeouts.
+		int side;
 
 		static const float SPEED_LIMIT_MARGIN;
 };
