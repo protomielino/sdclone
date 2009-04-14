@@ -221,8 +221,8 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
 
  tx = (double **) malloc( 3 * sizeof(double *) );
  ty = (double **) malloc( 3 * sizeof(double *) );
- tRInverse = (double **) malloc( 3 * sizeof(double) );
- tSpeed = (double **) malloc( 3 * sizeof(double) );
+ tRInverse = (double **) malloc( 3 * sizeof(double *) );
+ tSpeed = (double **) malloc( 3 * sizeof(double *) );
  tx[0] = (double *) malloc( (Divs+1) * sizeof(double) );
  tx[1] = (double *) malloc( (Divs+1) * sizeof(double) );
  tx[2] = (double *) malloc( (Divs+1) * sizeof(double) );
