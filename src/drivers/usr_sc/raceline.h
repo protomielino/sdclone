@@ -28,6 +28,8 @@ enum { mode_normal=1, mode_correcting, mode_avoiding, mode_pitting };
 #define MAXSEGMENTS 3000
 #define MAXDIVS 10000
 
+#define LMOD_DATA 200
+
 typedef struct {
   double rInverse;
   double mInverse;
@@ -75,7 +77,7 @@ typedef struct {
 } LRLModData;
 
 typedef struct {
-  LRLModData data[1024];
+  LRLModData data[LMOD_DATA];
   int used;
 } LRLMod;
 

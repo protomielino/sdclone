@@ -319,7 +319,6 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tRLSpeed1, 0, sizeof(LRLMod));
  memset(tRLBrake0, 0, sizeof(LRLMod));
  memset(tRLBrake1, 0, sizeof(LRLMod));
- memset(tLaneShift, 0, sizeof(LRLMod));
  memset(tIntMargin, 0, sizeof(LRLMod));
  memset(tExtMargin, 0, sizeof(LRLMod));
  memset(tSecurity, 0, sizeof(LRLMod));
@@ -374,7 +373,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  maxfuel = GfParmGetNum( carhandle, SECT_CAR, PRM_TANK, (char *)NULL, 100.0f );
  
  // read custom values...
- for (i=0; i<1024; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "RLSpeed%dDiv", i);
@@ -402,7 +401,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
    AddMod( tDecel, div, enddiv, decel, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "RLBrake%dDiv", i);
@@ -425,7 +424,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
    AddMod( tRLBrake1, div, enddiv, brake1, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "AccelCurve%dDiv", i);
@@ -453,7 +452,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
    AddMod( tCornerAccel, div, enddiv, accel, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "CurveFactor%dDiv", i);
@@ -472,7 +471,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tCurveFactor, div, enddiv, factor, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "Bump%dDiv", i);
@@ -492,7 +491,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tOTCaution, div, enddiv, bump*7, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "SpeedLimit%dDiv", i);
@@ -511,7 +510,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tSpeedLimit, div, enddiv, limit, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "OTCaution%dDiv", i);
@@ -530,7 +529,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tOTCaution, div, enddiv, factor, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "RLMargin%dDiv", i);
@@ -554,7 +553,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
    AddMod( tRLMarginLft, div, enddiv, lft, 0 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "CornerAccel%dDiv", i);
@@ -573,7 +572,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tCornerAccel, div, enddiv, accel, 0 );
  }
 
- for (i=0; i<100; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "AvoidSpeed%dDiv", i);
@@ -605,7 +604,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
    AddMod( tADecel, div, enddiv, decel, 0 );
  }
 
- for (i=0; i<32; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "SkidAccel%dDiv", i);
@@ -623,7 +622,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tSkidAccel, div, enddiv, s, 0 );
  }
 
- for (i=0; i<64; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "AccelExit%dDiv", i);
@@ -641,7 +640,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tAccelExit, div, enddiv, s, 0 );
  }
 
- for (i=0; i<32; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "SkidCorrection%dDiv", i);
@@ -659,7 +658,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tSkidCorrection, div, enddiv, s, 0 );
  }
 
- for (i=0; i<32; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "SteerGain%dDiv", i);
@@ -677,7 +676,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tSteerGain, div, enddiv, s, 0 );
  }
 
- for (i=0; i<32; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "CarefulBrake%dDiv", i);
@@ -693,7 +692,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   AddMod( tCarefulBrake, div, enddiv, 0.0, 1 );
  }
 
- for (i=0; i<50; i++)
+ for (i=0; i<LMOD_DATA; i++)
  {
   char str[32];
   sprintf(str, "LaneShift%dDiv", i);
