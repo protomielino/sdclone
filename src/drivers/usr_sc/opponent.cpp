@@ -241,8 +241,11 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 				{
 					// hymie collision method
 					int collide;
+					vec2f targ;
+					driver->GetSteerPoint(100.0, &targ, -100.0, MAX(0.01, t_impact));
+
 				        //if (mspeed > 5.0)
-						collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5);
+						collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5, &targ);
 					//else
 					//	collide = testCollision(driver, t_impact, 1.2);
 	
@@ -444,7 +447,7 @@ int Opponent::polyOverlap( tPosd *op, tPosd *dp )
  return 0;
 }
 
-int Opponent::testCollision(Driver *driver, double impact, double sizefactor)
+int Opponent::testCollision(Driver *driver, double impact, double sizefactor, vec2f *targ )
 {
  int collide = 0, i, j;
  double nSlices = MAX(1.0, (impact * deltamult));
@@ -468,35 +471,6 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor)
  {
   // find where the cars would be according to their velocity angle, allowing for angle changes
 
-  // new way of doing it, borrowing from modules/simu/simuv2/car.cpp, line 254ish & other places.
-  // why work out my own hack, when Torcs's own calculations do a far better job?  Assuming
-  // of course I've implemented it right...
-	// ... and of course its wrong.  disabling for now.
-  
-#if 0
-  // what will be the car's yaw, based on yaw_rate * impact time?
-  double oyaw = car->_yaw + car->_yaw_rate * impact;
-  double dyaw = dcar->_yaw + dcar->_yaw_rate * impact;
-  //double dyaw = dcar->_yaw + dcar->_yaw_rate * impact;
-
-  NORM_PI_PI(oyaw);
-  NORM_PI_PI(dyaw);
-
-  double oSinz = sin(oyaw);
-  double oCosz = cos(oyaw);
-  double dSinz = sin(dyaw);
-  double dCosz = cos(dyaw);
-
-  double dturn = fabs(dcar->_yaw_rate) > fabs(dyaw) ? fabs(dcar->_yaw_rate) - fabs(dyaw) : 0.0;
-  double oturn = fabs(car->_yaw_rate) > fabs(lastyr) ? fabs(car->_yaw_rate) - fabs(lastyr) : 0.0;
-
-  // adjust speeds based on accel rates * impact time
-  o_speedX += car->pub.DynGCg.acc.x * (impact+oturn/3);
-  o_speedY += car->pub.DynGCg.acc.y * (impact+oturn/3);
-  d_speedX += dcar->pub.DynGCg.acc.x * (impact+dturn/3);
-  d_speedY += dcar->pub.DynGCg.acc.y * (impact+dturn/3);
-#endif
-
   // find new positions for the cars
   double o_newPos_x = car->pub.DynGC.pos.x + (o_speedX*impact);
   double o_newPos_y = car->pub.DynGC.pos.y + (o_speedY*impact);
@@ -514,6 +488,12 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor)
  }
 
  double rincr = (team == TEAM_FRIEND ? 2.0 : 4.0);
+
+ // make our car's front extend a bit according to speed
+ d_new[FRNT_LFT].ax += d_speedX/5;
+ d_new[FRNT_LFT].ay += d_speedY/5;
+ d_new[FRNT_RGT].ax += d_speedX/5;
+ d_new[FRNT_RGT].ay += d_speedY/5;
 
  // make other car's future rectangle a tad larger
  double fsideincr_x = (o_new[FRNT_LFT].ax - o_new[FRNT_RGT].ax) / car->_dimension_x / 2;
@@ -585,6 +565,25 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor)
    return 2;
   }
  }
+
+ if (targ != NULL)
+ {
+  // locate front of car at steer target position
+  double frx = (d_new[FRNT_RGT].ax + d_new[FRNT_LFT].ax) / 2;
+  double fry = (d_new[FRNT_RGT].ay + d_new[FRNT_LFT].ay) / 2;
+
+  d_new[FRNT_RGT].ax = targ->x + (d_cur[FRNT_RGT].ax - frx);
+  d_new[FRNT_LFT].ax = targ->x + (d_cur[FRNT_LFT].ax - frx);
+  d_new[FRNT_RGT].ay = targ->y + (d_cur[FRNT_RGT].ay - fry);
+  d_new[FRNT_LFT].ay = targ->y + (d_cur[FRNT_LFT].ay - fry);
+
+  if (polyOverlap(o_new, d_new))
+  {
+//fprintf(stderr,"COLLIDE 5\n");fflush(stderr);
+   return 5;
+  }
+ }
+
 
 #if 1
  if (impact < 0.6 || distance < 0.5)

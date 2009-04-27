@@ -87,6 +87,7 @@ class Driver {
 		int getAlone() { return alone; }
 		int getCarefulBrake() { return raceline->getCarefulBrake(); }
 		double speedAngleChange() { return speedangle - prevspeedangle; }
+		void GetSteerPoint( double lookahead, vec2f *rt, double offset=-100.0, double time=-1.0 );
 
 	private:
 		// Utility functions.
@@ -136,6 +137,8 @@ class Driver {
 		void calcSkill();
 		int rearOffTrack();
 
+		void LoadDAT( tSituation *s, char *carname, char *trackname );
+
 		void computeRadius(float *radius);
 		int isAlone();
 		void SetRandomSeed( unsigned int seed );
@@ -153,6 +156,7 @@ class Driver {
 		float AbsSlip;
 		float AbsRange;
 		float OversteerASR;
+		float BrakeMu;
 		unsigned int random_seed;
 		int DebugMsg;
 		int racetype;
@@ -215,6 +219,7 @@ class Driver {
 		float faccelcmd, fbrakecmd;  
 		float TurnDecel;
 		float PitOffset;
+		float PitAccelCap;
 		float RevsChangeDown;
 		float RevsChangeUp;
 		float RevsChangeDownMax;

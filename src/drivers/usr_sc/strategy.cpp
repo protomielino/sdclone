@@ -175,7 +175,7 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s, Opponents *opp, int 
 bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 {
  // Do we need to refuel?
- int laps = car->_remainingLaps-car->_lapsBehindLeader;
+ int remainlaps = car->_remainingLaps;//-car->_lapsBehindLeader;
  int this_pit_dammage = PIT_DAMMAGE;
 
  if (!car->_pit)
@@ -188,12 +188,12 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 #ifdef TORCS_NG
  int repairWanted = 10000;
 
- if ((laps > 0) && (laps < 20))
+ if ((remainlaps > 0) && (remainlaps < 20))
  {
-   repairWanted = MIN(8000, PIT_DAMMAGE + (20-laps)*200);
+   repairWanted = MIN(8000, PIT_DAMMAGE + (20-remainlaps)*200);
  }
 
- if (car->_dammage < 9000 && (laps <= 2 || strategy == STRATEGY_DESPERATE))
+ if (car->_dammage < 9000 && (remainlaps <= 2 || strategy == STRATEGY_DESPERATE))
    repairWanted = 0;
 
  if (car->_dammage < 3000)
@@ -210,23 +210,23 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 
  return GotoPit;
 #else
- if (laps > 0) 
+ if (remainlaps > 0) 
  {
   float cmpfuel = (m_fuelperlap == 0.0) ? m_expectedfuelperlap : m_fuelperlap;
   if (car->_fuel < 2.5*cmpfuel &&
-      car->_fuel < laps*cmpfuel)
+      car->_fuel < remainlaps*cmpfuel)
   {
    is_pitting = 1;
    pit_reason = REASON_FUEL;
    return true;
   }
-  else if (laps < 20)
-   this_pit_dammage = MIN(8000, PIT_DAMMAGE + (20-laps)*200);
+  else if (remainlaps < 20)
+   this_pit_dammage = MIN(8000, PIT_DAMMAGE + (20-remainlaps)*200);
  }
 
  if (isPitFree(car))
  {
-  if (car->_dammage < 9000 && (laps <= 2 || strategy == STRATEGY_DESPERATE))
+  if (car->_dammage < 9000 && (remainlaps <= 2 || strategy == STRATEGY_DESPERATE))
   {
    is_pitting = 0;
    return false;

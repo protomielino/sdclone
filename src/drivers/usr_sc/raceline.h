@@ -31,6 +31,7 @@ enum { mode_normal=1, mode_correcting, mode_avoiding, mode_pitting };
 #define LMOD_DATA 200
 
 typedef struct {
+  tSituation *s;
   double rInverse;
   double mInverse;
   double aInverse;
@@ -129,6 +130,7 @@ class LRaceLine {
   double AvoidSpeedAdjust;
   double AvoidSpeedAdjustX;
   double AvoidBrakeAdjust;
+  double AvoidBrakeAdjustX;
   double CurveFactor;
   double SecurityZ;
   double TimeFactor;
@@ -207,9 +209,11 @@ class LRaceLine {
   LRLMod *tAvoidSpeed;
   LRLMod *tAvoidSpeedX;
   LRLMod *tAvoidBrake;
+  LRLMod *tAvoidBrakeX;
   LRLMod *tAccelCurveOffset;
   LRLMod *tCarefulBrake;
-  LRLMod *tSteerGain;
+  LRLMod *tSteerGain0;
+  LRLMod *tSteerGain1;
   LRLMod *tSkidAccel;
   LRLMod *tAccelExit;
   LRLMod *tSkidCorrection;
@@ -242,7 +246,7 @@ class LRaceLine {
   void NewRace(tCarElt* newcar, tSituation *s);
   void GetRaceLineData(tSituation *s, LRaceLineData *data);
   void GetPoint( double offset, vec2f *rt, double *mInverse );
-  void GetSteerPoint( double lookahead, vec2f *rt, double offset = -100.0 );
+  void GetSteerPoint( double lookahead, vec2f *rt, double offset = -100.0, double time = -1.0 );
   int isOnLine();
   double correctLimit(double avoidsteer, double racesteer);
   double getAvoidSpeedDiff( float distance );

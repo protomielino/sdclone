@@ -72,6 +72,7 @@ Driver::Driver(int index) :
 		AbsSlip(2.5f),
 		AbsRange(5.0f),
 		OversteerASR(0.7f),
+		BrakeMu(1.0f),
 		random_seed(0),
 		DebugMsg(0),
 		racetype(0),
@@ -259,7 +260,15 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
 	// Load a custom setup if one is available.
 	// Get a pointer to the first char of the track filename.
-	char* trackname = strrchr(track->filename, '/') + 1;
+	char *ptrackname = strrchr(track->filename, '/') + 1;
+	char *p = strrchr(ptrackname, '.');
+	char trackname[256] = {0};  
+
+	if (p)
+		strncpy(trackname, ptrackname, p - ptrackname);
+	else
+		strcpy(trackname, ptrackname);
+
 	char carName[256];
 	{
 		char *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
@@ -275,13 +284,13 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
 	switch (s->_raceType) {
 		case RM_TYPE_PRACTICE:
-			snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/practice/%s", robot_name, carName, trackname);
+			snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/practice/%s.xml", robot_name, carName, trackname);
 			break;
 		case RM_TYPE_QUALIF:
-			snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/qualifying/%s", robot_name, carName, trackname);
+			snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/qualifying/%s.xml", robot_name, carName, trackname);
 			break;
 		case RM_TYPE_RACE:
-			snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/race/%s", robot_name, carName, trackname);
+			snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/race/%s.xml", robot_name, carName, trackname);
 			break;
 		default:
 			break;
@@ -297,7 +306,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	}
 	else
 	{
-		snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/%s", robot_name, carName, trackname);
+		snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/%s.xml", robot_name, carName, trackname);
 		newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 		if (newhandle)
 		{
@@ -331,13 +340,96 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	OutSteerFactor = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "OutSteerFactor", (char *)NULL, 1.0f );
 	StuckAccel = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "StuckAccel", (char *)NULL, 0.8f );
 	FollowMargin = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "FollowMargin", (char *)NULL, 0.0f );
-	SteerLookahead = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "SteerLookahead", (char *)NULL, 0.0f );
+	SteerLookahead = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "SteerLookahead", (char *)NULL, 1.0f );
 	SteerMaxRI = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "SteerMaxRI", (char *)NULL, 0.008f );
 	MaxGear = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "MaxGear", (char *)NULL, 6.0f );
 	NoPit = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "NoPit", (char *)NULL, 0.0f );
 	NoTeamWaiting = (int) GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "NoTeamWaiting", (char *)NULL, 1.0f );
 	TeamWaitTime = GfParmGetNum( *carParmHandle, BT_SECT_PRIV, "TeamWaitTime", (char *)NULL, 0.0f);
 }
+
+void Driver::LoadDAT( tSituation *s, char *carname, char *trackname )
+{
+ FILE *fp;
+ char buffer[1024+1];
+
+ switch (s->_raceType) {
+  case RM_TYPE_PRACTICE:
+   snprintf(buffer, 1024, "drivers/%s/cars/%s/practice/%s.dat", robot_name, carname, trackname);
+   break;
+  case RM_TYPE_QUALIF:
+   snprintf(buffer, 1024, "drivers/%s/cars/%s/qualifying/%s.dat", robot_name, carname, trackname);
+   break;
+  case RM_TYPE_RACE:
+   snprintf(buffer, 1024, "drivers/%s/cars/%s/race/%s.dat", robot_name, carname, trackname);
+   break;
+ }
+
+ if (!(fp = fopen(buffer, "r")))
+ {
+   fprintf(stderr, "Failed to load %s\n", buffer);
+   snprintf(buffer, 1024, "drivers/%s/cars/%s/%s.dat", robot_name, carname, trackname);
+
+   if (!(fp = fopen(buffer, "r")))
+   {
+    fprintf(stderr, "Failed to load %s\n", buffer);
+    return;
+   }
+ }
+
+ fprintf(stderr, "Loading %s\n", buffer);
+ while (fgets(buffer, 1024, fp))
+ {
+  int len = strlen(buffer);
+  if (len <= 1)
+   continue;
+
+  char *p = buffer + (len-1);
+  while (p >= buffer && (*p == 10 || *p == 13))
+  {
+   *p = 0;
+   p--;
+  }
+  if (p <= buffer)
+   return;
+
+  p = strtok( buffer, " " );
+  int spd = strcmp(p, "SPD");
+  int brk = strcmp(p, "BRK");
+  int gan = strcmp(p, "GAN");
+
+  if (!spd || !brk || !gan)
+  {
+   p = strtok( NULL, " " );
+   int bgn = atoi(p);
+   p = strtok( NULL, " " );
+   int end = atoi(p);
+   p = strtok( NULL, " " );
+   double val = atof(p);
+   p = strtok( NULL, " " );
+   double valX = atof(p);
+
+   if (!spd)
+   {
+    raceline->AddMod( raceline->tRLSpeed0, bgn, end, val, 0 );
+    raceline->AddMod( raceline->tRLSpeed1, bgn, end, valX, 0 );
+   }
+   else if (!gan)
+   {
+    raceline->AddMod( raceline->tSteerGain0, bgn, end, val, 0 );
+    raceline->AddMod( raceline->tSteerGain1, bgn, end, valX, 0 );
+   }
+   else
+   {
+    raceline->AddMod( raceline->tRLBrake0, bgn, end, val, 0 );
+    raceline->AddMod( raceline->tRLBrake1, bgn, end, valX, 0 );
+   }
+  }
+ }
+
+ fclose(fp);
+}
+
 
 
 // Start a new race.
@@ -368,6 +460,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	AbsSlip = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "AbsSlip", NULL, 2.5f);
 	AbsRange = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "AbsRange", NULL, 5.0f);
 	OversteerASR = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "OversteerASR", NULL, 0.7f);
+	BrakeMu = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "BrakeMu", NULL, 1.0f);
 	fuelperlap = GfParmGetNum(car->_carHandle, BT_SECT_PRIV, "FuelPerLap", NULL, 5.0f);
 	CARMASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
 	maxfuel = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
@@ -387,6 +480,28 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	raceline = new LRaceLine();
 	raceline->NewRace( car, s );
 	raceline->setSkill( skill );
+	raceline->AllocTrack( track );
+	{
+		char *ptrackname = strrchr(track->filename, '/') + 1;
+		char *p = strrchr(ptrackname, '.');
+		char trackname[256] = {0};  
+	
+		if (p)
+			strncpy(trackname, ptrackname, p - ptrackname);
+		else
+			strcpy(trackname, ptrackname);
+
+		char carName[256];
+		{
+			char *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
+			char *key = PRM_CAR;
+			strncpy( carName, GfParmGetStr(car->_carHandle, path, key, ""), sizeof(carName) );
+			char *p = strrchr(carName, '.');
+			if (p) *p = '\0';
+		}
+
+		LoadDAT( s, carName, trackname );
+	}
 	raceline->InitTrack(track, s);
 	raceline->setCW( CW );
 
@@ -772,6 +887,20 @@ float Driver::getAccel()
 		accelcmd = MIN(1.0f, accelcmd);
 		if (fabs(angle) > 0.8 && getSpeed() > 10.0f)
 			accelcmd = MAX(0.0f, MIN(accelcmd, 1.0f - getSpeed()/100.0f * fabs(angle)));
+
+		if (pit->getInPit() && car->_brakeCmd == 0.0f)
+		{
+			float s = pit->toSplineCoord( car->_distFromStartLine );
+	
+			if (pit->getPitstop() || s < pit->getNPitEnd())
+			{
+				if (currentspeedsqr > pit->getSpeedlimitSqr()*0.9) 
+					accelcmd = MIN(accelcmd, 0.4f);
+			}
+			else
+				accelcmd = MIN(accelcmd, PitAccelCap);
+		}
+
 		return accelcmd;
 	} else {
 		return 1.0;
@@ -1030,6 +1159,7 @@ float Driver::getSteer(tSituation *s)
 	rldata->steer = rldata->laststeer = laststeer;
 	rldata->alone = alone;
 	rldata->followdist = getFollowDistance();
+	rldata->s = s;
 	raceline->GetRaceLineData( s, rldata );
 	if (FuelSpeedUp)
 	{
@@ -1041,6 +1171,8 @@ float Driver::getSteer(tSituation *s)
 	double avoidsteer = 0.0;
 	double racesteer = (rldata->ksteer);
 	vec2f	target;
+
+#if 0
 	if (SteerLookahead > 6.0f)
 	{
 		raceline->GetSteerPoint( (double) SteerLookahead, &target );
@@ -1049,6 +1181,7 @@ float Driver::getSteer(tSituation *s)
 		double rIf = MIN(1.0, fabs(rldata->rInverse) / SteerMaxRI);
 		racesteer = racesteer + (rldata->ksteer - racesteer) * rIf;
 	}
+#endif
 
 	target = getTargetPoint();
 	steer = avoidsteer = racesteer;
@@ -1615,22 +1748,11 @@ vec2f Driver::getTargetPoint()
 		// Usual lookahead.
 		lookahead = (float) rldata->lookahead;
 
-#if 0
-	  if ((mode == mode_avoiding || mode == mode_correcting) && fabs(rldata->rInverse) > 0.002 &&
-				((rldata->rInverse > 0.0 && car->_trkPos.toLeft <= 1.0) ||
-				 (rldata->rInverse < 0.0 && car->_trkPos.toRight <= 1.0)))
-		{
-			// close in on a corner while we're not on raceline - decrease lookahead
-			// to prevent car from cutting the corner too close.
-			lookahead *= MAX(0.5, 1.0 - fabs(rldata->rInverse)*40);
-		}
-#endif
-
-#if 1
 		double speed = MAX(20.0, getSpeed());// + MAX(0.0, car->_accel_x));
 		lookahead = (float) (LOOKAHEAD_CONST * 1.2 + speed * 0.60);
 		lookahead = MIN(lookahead, (float) (LOOKAHEAD_CONST + ((speed*(speed/7)) * 0.15)));
-#if 1
+		lookahead *= SteerLookahead;
+
 		if (fabs(rldata->rInverse) > 0.001)
 		{
 			// increase lookahead if on the outside of a corner
@@ -1642,9 +1764,6 @@ vec2f Driver::getTargetPoint()
 				cornerfx = (1.0 - MAX(0.0, (cornerlmt-car->_trkPos.toLeft)/cornerlmt))*1.5;
 			lookahead *= cornerfx;
 		}
-#endif
-		//lookahead = MAX(lookahead, LOOKAHEAD_CONST + ((speed*(speed/3)) * (0.4*cornerfx)));
-#endif
 #if 0
 		lookahead = LOOKAHEAD_CONST + car->_speed_x*LOOKAHEAD_FACTOR;
 		lookahead = MAX(lookahead, LOOKAHEAD_CONST + ((car->_speed_x*(car->_speed_x/2)) / 60.0));
@@ -1691,7 +1810,7 @@ vec2f Driver::getTargetPoint()
 	vec2f s;
 	//if (mode != mode_pitting)
 	{
-		raceline->GetPoint( offset, &s, NULL );
+		raceline->GetSteerPoint( lookahead, &s, offset );
 		return s;
 	}
 
@@ -2551,9 +2670,9 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
 		{
 			double inc = OVERTAKE_OFFSET_INC * MIN(lftinc, rgtinc) * factor;
 			if (myoffset < rldata->offset)
-				myoffset += (float) (MIN(rldata->offset-myoffset, inc));
+				myoffset += (float) (MIN(rldata->offset-myoffset, OVERTAKE_OFFSET_INC * rgtinc/3 * factor));
 			else if (myoffset > rldata->offset)
-				myoffset -= (float) (MIN(myoffset-rldata->offset, inc));
+				myoffset -= (float) (MIN(myoffset-rldata->offset, OVERTAKE_OFFSET_INC * lftinc/3 * factor));
 		}
 	}
 #endif
@@ -2565,6 +2684,8 @@ end_getoffset:
 	if (mode == mode_avoiding && !avoidmovt)
 		avoidtime = MIN(simtime, avoidtime+deltaTime*1.5);
 
+	minoffset = MAX(minoffset, MIN(1.5, rldata->offset));
+	maxoffset = MIN(maxoffset, MAX(track->width - 1.5, rldata->offset));
 	myoffset = (float) (MAX(minoffset, MIN(maxoffset, myoffset)));
 if (DebugMsg & debug_overtake)
 	if (mode != mode_normal)
@@ -2972,7 +3093,7 @@ fprintf(stderr,"NOT STUCK: Stick with Forwards ps=%d fr=%d (%.3f <= %.3f)\n",pos
 		allow_stuck = 0;
 		stuck_timer = simtime;
 	}
-	else if ((!allow_stuck && simtime-stuck_timer > 3.0) || !stuckcheck || simtime - last_stuck_time > 4.0)
+	else if ((!allow_stuck && (simtime-stuck_timer > 3.0 || !stuckcheck || simtime - last_stuck_time > 4.0)))
 	{
 		allow_stuck = 1;
 		stuck_timer = simtime;
@@ -3039,6 +3160,13 @@ void Driver::initTireMu()
 	TIREMU = tm;
 }
 
+void Driver::GetSteerPoint( double lookahead, vec2f *rt, double offset, double time )
+{
+	if (offset < -90.0 && mode != mode_normal)
+		offset = myoffset;
+
+	raceline->GetSteerPoint( lookahead, rt, offset, time );
+}
 
 // Reduces the brake value such that it fits the speed (more downforce -> more braking).
 float Driver::filterBrakeSpeed(float brake)
@@ -3117,7 +3245,7 @@ float Driver::filterBColl(float brake)
 	if (simtime < 1.5)
 		return brake;
 
-	float mu = car->_trkPos.seg->surface->kFriction;
+	float mu = car->_trkPos.seg->surface->kFriction * BrakeMu;
 	int i;
 	float thisbrake = 0.0f;
 	for (i = 0; i < opponents->getNOpponents(); i++) 

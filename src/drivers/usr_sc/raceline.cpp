@@ -1,10 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////
 //
-// K1999.cpp
+// raceline.cpp
 //
 // car driver for TORCS
-// (c) Remi Coulom
-// March 2000
+// (c) Remi Coulom, March 2000
+// (c) Andrew Sumner, 2005 through 2009
 //
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,6 +14,7 @@
 ////////////////////////////////////////////////////////////////////////////
 
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -82,6 +83,7 @@ LRaceLine::LRaceLine() :
    AvoidSpeedAdjust(0.0),
    AvoidSpeedAdjustX(1.0),
    AvoidBrakeAdjust(0.0),
+   AvoidBrakeAdjustX(1.0),
    CurveFactor(0.14),
    SecurityZ(0.0),
    TimeFactor(0.0),
@@ -156,9 +158,11 @@ LRaceLine::LRaceLine() :
    tAvoidSpeed(NULL),
    tAvoidSpeedX(NULL),
    tAvoidBrake(NULL),
+   tAvoidBrakeX(NULL),
    tAccelCurveOffset(NULL),
    tCarefulBrake(NULL),
-   tSteerGain(NULL),
+   tSteerGain0(NULL),
+   tSteerGain1(NULL),
    tSkidAccel(NULL),
    tAccelExit(NULL),
    tSkidCorrection(NULL),
@@ -171,7 +175,6 @@ LRaceLine::LRaceLine() :
    car(NULL)
 {
 }
-
 
 /////////////////////////////////////////////////////////////////////////////
 // Update tx and ty arrays
@@ -277,8 +280,10 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  tAvoidSpeed = (LRLMod *) malloc( sizeof(LRLMod) );
  tAvoidSpeedX = (LRLMod *) malloc( sizeof(LRLMod) );
  tAvoidBrake = (LRLMod *) malloc( sizeof(LRLMod) );
+ tAvoidBrakeX = (LRLMod *) malloc( sizeof(LRLMod) );
  tCarefulBrake = (LRLMod *) malloc( sizeof(LRLMod) );
- tSteerGain = (LRLMod *) malloc( sizeof(LRLMod) );
+ tSteerGain0 = (LRLMod *) malloc( sizeof(LRLMod) );
+ tSteerGain1 = (LRLMod *) malloc( sizeof(LRLMod) );
  tSkidAccel = (LRLMod *) malloc( sizeof(LRLMod) );
  tAccelExit = (LRLMod *) malloc( sizeof(LRLMod) );
  tSkidCorrection = (LRLMod *) malloc( sizeof(LRLMod) );
@@ -331,8 +336,10 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tAvoidSpeed, 0, sizeof(LRLMod));
  memset(tAvoidSpeedX, 0, sizeof(LRLMod));
  memset(tAvoidBrake, 0, sizeof(LRLMod));
+ memset(tAvoidBrakeX, 0, sizeof(LRLMod));
  memset(tCarefulBrake, 0, sizeof(LRLMod));
- memset(tSteerGain, 0, sizeof(LRLMod));
+ memset(tSteerGain0, 0, sizeof(LRLMod));
+ memset(tSteerGain1, 0, sizeof(LRLMod));
  memset(tSkidAccel, 0, sizeof(LRLMod));
  memset(tAccelExit, 0, sizeof(LRLMod));
  memset(tSkidCorrection, 0, sizeof(LRLMod));
@@ -365,6 +372,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  AvoidSpeedAdjust = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjust", (char *)NULL, 0.0f );
  AvoidSpeedAdjustX = GfParmGetNum( carhandle, "private", "AvoidSpeedAdjustX", (char *)NULL, 1.0f );
  AvoidBrakeAdjust = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjust", (char *)NULL, 0.0f );
+ AvoidBrakeAdjustX = GfParmGetNum( carhandle, "private", "AvoidBrakeAdjustX", (char *)NULL, 1.0f );
  CornerAccel = GfParmGetNum( carhandle, "private", "CornerAccel", (char *)NULL, 0.0f );
  IntMargin = GfParmGetNum( carhandle, "private", "IntMargin", (char *)NULL, 1.1f ) + skill/12;
  ExtMargin = GfParmGetNum( carhandle, "private", "ExtMargin", (char *)NULL, 1.7f ) + skill/5;
@@ -591,6 +599,8 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   double asx = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
   sprintf(str, "AvoidBrake%d", i);
   double ab = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
+  sprintf(str, "AvoidBrakeX%d", i);
+  double abx = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
   sprintf(str, "AvoidDecel%d", i);
   double decel = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
 
@@ -600,6 +610,8 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
    AddMod( tAvoidSpeedX, div, enddiv, as, 0 );
   if (ab != 0.0)
    AddMod( tAvoidBrake, div, enddiv, ab, 0 );
+  if (abx != 0.0)
+   AddMod( tAvoidBrakeX, div, enddiv, abx, 0 );
   if (decel != 0.0)
    AddMod( tADecel, div, enddiv, decel, 0 );
  }
@@ -673,7 +685,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   sprintf(str, "SteerGain%d", i);
   double s = GfParmGetNum(carhandle, "private", str, (char *) NULL, 0.0);
 
-  AddMod( tSteerGain, div, enddiv, s, 0 );
+  AddMod( tSteerGain0, div, enddiv, s, 0 );
  }
 
  for (i=0; i<LMOD_DATA; i++)
@@ -1232,8 +1244,6 @@ void LRaceLine::InitTrack(tTrack* ptrack, tSituation *p)
 
 void LRaceLine::TrackInit(tSituation *p)
 {
- AllocTrack(track);
-
  //
  // split track
  //
@@ -1281,7 +1291,10 @@ void LRaceLine::TrackInit(tSituation *p)
    double avspeed = GetModD( tAvoidSpeed, i );
    double cornerspeed = ((trlspeed ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
    if (rl == LINE_MID)
-    cornerspeed += (avspeed != 0.0 ? avspeed : AvoidSpeedAdjust) * BaseCornerSpeedX * AvoidSpeedAdjustX;
+   {
+    cornerspeed += (avspeed != 0.0 ? avspeed : AvoidSpeedAdjust) ;
+    cornerspeed *= AvoidSpeedAdjustX;
+   }
    double TireAccel = cornerspeed * tFriction[i];
    int nnext = (i + 5) % Divs;
    int next = (i + 1) % Divs;
@@ -1378,9 +1391,9 @@ void LRaceLine::TrackInit(tSituation *p)
   //
   // Anticipate braking
   //
+#if 0 // K++ braking method
   double brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0)) * 0.6;
 
-#if 0 // K++ braking method
 
   for (int i = Divs; --i >= 0;)
   {
@@ -1416,14 +1429,21 @@ void LRaceLine::TrackInit(tSituation *p)
 #else
 
   // hymie braking method
-  brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0));
+  double brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0));
+  if (rl == LINE_MID)
+   brakedelay *= AvoidBrakeAdjustX;
 
   for (int i = Divs-1; --i >= 0;)
   {
    int next = (i+1) % Divs;
    double bd = brakedelay + (rl == LINE_RL ? GetModD( tRLBrake1, i ) : GetModD( tRLBrake0, i ));
    if (rl == LINE_MID)
+   {
     bd += GetModD( tAvoidBrake, i );
+    double bax = GetModD( tAvoidBrakeX, i );
+    if (bax > 0.1)
+     bd *= bax;
+   }
 
    if (tSpeed[rl][i] > tSpeed[rl][next])
    {
@@ -1518,11 +1538,13 @@ void LRaceLine::FreeTrack()
  if (tAvoidSpeed) free(tAvoidSpeed);
  if (tAvoidSpeedX) free(tAvoidSpeedX);
  if (tAvoidBrake) free(tAvoidBrake);
+ if (tAvoidBrakeX) free(tAvoidBrakeX);
  if (tCarefulBrake) free(tCarefulBrake);
  if (tSkidAccel) free(tSkidAccel);
  if (tAccelExit) free(tAccelExit);
  if (tSkidCorrection) free(tSkidCorrection);
- if (tSteerGain) free(tSteerGain);
+ if (tSteerGain0) free(tSteerGain0);
+ if (tSteerGain1) free(tSteerGain1);
 
  tSegDist = NULL;
  tSegIndex = NULL;
@@ -1552,8 +1574,8 @@ void LRaceLine::FreeTrack()
  tRLMarginRgt = tRLMarginLft = tOTCaution = tRLSpeed1 = tRLBrake1 = tIntMargin = NULL;
  tRLSpeed0 = tRLBrake0 = NULL;
  tExtMargin = tSecurity = tDecel = tADecel = tBump = tSpeedLimit =tCornerAccel = tAccelCurveDampen = NULL;
- tCurveFactor = tAvoidSpeed = tAvoidSpeedX = tAvoidBrake = tAccelCurveOffset = tCarefulBrake = NULL;
- tSteerGain = tSkidAccel = tAccelExit = tSkidCorrection = NULL;
+ tCurveFactor = tAvoidSpeed = tAvoidSpeedX = tAvoidBrake = tAvoidBrakeX = tAccelCurveOffset = tCarefulBrake = NULL;
+ tSteerGain0 = tSteerGain1 = tSkidAccel = tAccelExit = tSkidCorrection = NULL;
 }
 
 void LRaceLine::AddMod( LRLMod *mod, int divstart, int divend, double dval, int ival )
@@ -1646,8 +1668,12 @@ double LRaceLine::getRLAngle()
 ////////////////////////////////////////////////////////////////////////////
 // Car control
 ////////////////////////////////////////////////////////////////////////////
-void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset )
+void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, double time )
 {
+ double offlane = (offset > -90 ? ((track->width/2) - offset) / track->width : tLane[Next] * track->width);
+
+ int maxcount = ((int) lookahead) / DivLength + 1;
+ int count = 0;
  tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;
  double dist = car->_trkPos.toStart;
@@ -1655,21 +1681,69 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset )
   dist = 0;
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
- dist += lookahead;
- int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+ int next = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+ dist = 0.0;
+ double txLast = car->_pos_X;
+ double tyLast = car->_pos_Y;
+ double Time = data->s->deltaTime*3 + time/2;
 
- //Index = (Index + int(lookahead / DivLength)) % Divs;
- //double remainder = (lookahead - (double) (int(lookahead / DivLength) * DivLength)) / DivLength;
-
+ if (time > 0.0)
  {
-  rt->x = tx[LINE_RL][Index];
-  rt->y = ty[LINE_RL][Index];
+  double X = car->_pos_X + car->_speed_X * Time;
+  double Y = car->_pos_Y + car->_speed_Y * Time;
+  int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+  Index = (Index + Divs - 5) % Divs;
 
-  //if (remainder > 0.0 && remainder < 1.0)
-  //{
-   //rt->x += (tx[LINE_RL][Index] - rt->x) * remainder;
-   //rt->y += (ty[LINE_RL][Index] - rt->y) * remainder;
-  //}
+  maxcount = MAX(30, int(car->_speed_x*2));
+
+  while(count < maxcount)
+  {
+   next = (Index + 1) % Divs;
+
+   if (
+       ((tx[LINE_RL][Next] - tx[LINE_RL][Index]) * (X - tx[LINE_RL][Next]) +
+        (ty[LINE_RL][Next] - ty[LINE_RL][Index]) * (Y - ty[LINE_RL][Next])) 
+       < -0.1)
+   {
+    break;
+   }
+
+   Index = Next;
+   count++;
+  }
+
+  rt->x = offlane * txRight[next] + (1 - offlane) * txLeft[next];
+  rt->y = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
+ }
+ else
+ {
+  while (count < maxcount)
+  {
+   double txNext = offlane * txRight[next] + (1 - offlane) * txLeft[next];
+   double tyNext = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
+   double distx = txNext - txLast;
+   double disty = tyNext - tyLast;
+   double thisdist = sqrt( distx*distx + disty*disty );
+   if ((offset < 0.0 && tRInverse[LINE_RL][next] > 0.0) ||
+       (offset > 0.0 && tRInverse[LINE_RL][next] < 0.0))
+   {
+    thisdist *= 1.0 - MIN(0.7, (fabs(offset) / (track->width/2)) * fabs(tRInverse[LINE_RL][next]) * car->_speed_x * car->_speed_x/10);
+   }
+   dist += thisdist;
+ 
+   rt->x = txNext;
+   rt->y = tyNext;
+  
+   if (dist >= lookahead)
+   {
+    break;
+   }
+
+   next = (next + 1) % Divs;
+   txLast = txNext;
+   tyLast = tyNext;
+   count++;
+  }
  }
 }
 
@@ -1905,7 +1979,10 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   {
    k1999steer = atan(wheelbase * TargetCurvature) / car->_steerLock;
    
-   double steergain = GetModD( tSteerGain, CarDiv );
+   double steergain0 = GetModD( tSteerGain0, CarDiv );
+   double steergain1 = GetModD( tSteerGain1, CarDiv );
+
+   double steergain = steergain0 + (steergain1 - steergain0) * (1.0 - (car->_fuel-5.0) / (maxfuel-5.0));
    if (!steergain) steergain = SteerGain;
 
    double cspeed = carspeed;

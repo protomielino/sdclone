@@ -15,7 +15,7 @@
 
 ROBOT       = usr_sc
 SHIPDIR     = drivers/${ROBOT}/cars/sc-f360
-SHIP        = $(shell find *.xml -maxdepth 0 -type f -print)
+SHIP        = $(shell find *.xml -maxdepth 0 -type f -print) $(shell find *.dat -maxdepth 0 -type f print)
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
