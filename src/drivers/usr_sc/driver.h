@@ -88,6 +88,7 @@ class Driver {
 		int getCarefulBrake() { return raceline->getCarefulBrake(); }
 		double speedAngleChange() { return speedangle - prevspeedangle; }
 		void GetSteerPoint( double lookahead, vec2f *rt, double offset=-100.0, double time=-1.0 );
+		float getWidth() { return mycardata->getWidthOnTrack(); }
 
 	private:
 		// Utility functions.
@@ -106,7 +107,6 @@ class Driver {
 		float correctSteering( float avoidsteer, float racesteer );
 		double calcSteer( double targetAngle, int rl );
 		void setMode( int newmode );
-		float getWidth() { return mycardata->getWidthOnTrack(); }
 		void calcSpeed();
 		float adjustOffset( float offset );
 		bool canOvertake( Opponent *o, double *mincatchdist, bool outside, bool lenient );

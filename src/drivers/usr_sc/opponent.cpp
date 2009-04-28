@@ -280,6 +280,49 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 					}
 #endif
 
+#if 1
+					double speed = getSpeed();
+					double dspeed = driver->getSpeed();
+					double time_margin = MAX(4.0, (dspeed-speed) / 16);
+					double width = cardata->getWidthOnTrack();
+					double dwidth = driver->getWidth();
+					double ow = width;
+					double dw = dwidth;
+					double osa = ((car->_trkPos.toLeft - prevleft)*0.8) * (t_impact/s->deltaTime);
+					double dsa = ((driver->getNextLeft() - mycar->_trkPos.toLeft)*0.8) * (t_impact/s->deltaTime);
+					double oleft = car->_trkPos.toLeft + osa*0.8;
+					double dleft = mycar->_trkPos.toLeft + dsa*0.8;
+					tTrackSeg *cseg = car->_trkPos.seg;
+					tTrackSeg *seg = mycar->_trkPos.seg;
+
+
+					if (!collide && t_impact < time_margin/2)
+					{
+						// sanity check for cars that are about to plow full speed into the back of other cars
+						double margin = dwidth + 0.5; 
+						double time = 0.6;
+						double mti = t_impact;
+
+						if (mti < time || (team == TEAM_FRIEND && mti < 3.0))
+						{
+							double addition = 0.25;//0.5;
+							if (team != TEAM_FRIEND && fabs(car->_trkPos.toMiddle) > fabs(mycar->_trkPos.toMiddle))
+							{
+								margin *= 1.0;
+							}
+       						
+							if (fabs(oleft - dleft) < ow/2 + dw/2 + addition ||
+							    (mti < 0.8 &&
+							    (((cseg->type != TR_STR && cseg->radius <= 120.0) || (seg->type != TR_STR && seg->radius <= 120.0)) &&
+							    ((oleft - ow/2 < margin && dleft - dw/4 < oleft + ow/2) ||
+							    (oleft + ow/2 > cseg->width-margin && dleft + dw/4 > oleft - ow/2)))))
+							{
+								collide = 8;
+							}
+						}
+					}
+#endif
+
 #ifdef OPP_DEBUG
 fprintf(stderr,"\n");fflush(stderr);
 #endif
@@ -566,7 +609,7 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   }
  }
 
- if (targ != NULL)
+ if (targ != NULL && t_impact < 1.0)
  {
   // locate front of car at steer target position
   double frx = (d_new[FRNT_RGT].ax + d_new[FRNT_LFT].ax) / 2;

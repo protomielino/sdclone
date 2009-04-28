@@ -2969,7 +2969,7 @@ bool Driver::isStuck()
 	// does the car's position indicate we're stuck?
 	bool position_stuck = (((fabs(angle) > MAX_UNSTUCK_ANGLE &&
 	                        ((car->_gear == -1 && car->_speed_x < MAX_UNSTUCK_SPEED) ||
-				 (car->_gear > -1 && fabs(car->_speed_x) < MAX_UNSTUCK_SPEED)) &&
+				 (car->_gear > -1 && fabs(car->_speed_x+car->_accel_x) < MAX_UNSTUCK_SPEED)) &&
 	                        (MIN(car->_trkPos.toLeft, car->_trkPos.toRight)) < MIN_UNSTUCK_DIST)));
 	int reversing_ok = 0, force_reverse = 0;
 	if (car->_gear == -1 && fabs(angle) > 0.6)
@@ -3093,7 +3093,7 @@ fprintf(stderr,"NOT STUCK: Stick with Forwards ps=%d fr=%d (%.3f <= %.3f)\n",pos
 		allow_stuck = 0;
 		stuck_timer = simtime;
 	}
-	else if ((!allow_stuck && (simtime-stuck_timer > 3.0 || !stuckcheck || simtime - last_stuck_time > 4.0)))
+	else if ((!allow_stuck && simtime-stuck_timer > 3.0 && position_stuck && (!stuckcheck || simtime - last_stuck_time > 4.0)))
 	{
 		allow_stuck = 1;
 		stuck_timer = simtime;
