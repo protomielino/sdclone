@@ -460,6 +460,7 @@ typedef struct CarElt
 #define PRM_MU			"mu"
 #define PRM_RIMDIAM		"rim diameter"
 #define PRM_TIREWIDTH		"tire width"
+#define PRM_TIREHEIGHT		"tire height"
 #define PRM_TIRERATIO		"tire height-width ratio"
 #define PRM_RIDEHEIGHT		"ride height"
 #define PRM_ROLLINGRESIST	"rolling resistance"
