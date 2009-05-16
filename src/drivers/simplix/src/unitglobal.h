@@ -87,7 +87,7 @@
 //==========================================================================*
 // Global constants, to be changed for different wdbee-bots
 //--------------------------------------------------------------------------*
-static const int MAX_NBBOTS = 20;                // Number of drivers/robots
+static const int MAX_NBBOTS = 100;               // Number of drivers/robots
 // Estimation of acceleration: depends on car types
 // carX-trb1:
 const double PAR_A = 0.001852;                   // Parameters of a quadratic
