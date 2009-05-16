@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.27
+// Last changed : 2009.05.16
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -84,6 +84,7 @@ char* TDriver::SECT_PRIV = "simplix private";      // Private section
 char* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
+bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 float TDriver::BrakeLimit = -6;                    // Brake limit
 float TDriver::BrakeLimitBase = 0.025f;            // Brake limit base
@@ -214,9 +215,9 @@ TDriver::TDriver(int Index):
   oSteerAngle(0.0f),
   oCarType(NULL),
   oClutchMax(0.5),
-  oClutchDelta(0.05),
+  oClutchDelta(0.009),
   oClutchRange(0.82),
-  oClutchRelease(0.4),
+  oClutchRelease(0.5),
   oCurrSpeed(0),
   // oGearEff
   oIndex(0),
@@ -263,6 +264,7 @@ TDriver::TDriver(int Index):
   oReduced(false),
   oFuelNeeded(0.0),
   oRepairNeeded(0.0),
+  oSideReduction(1.0),
 
   NBRRL(0),
   oRL_FREE(0),
@@ -431,29 +433,44 @@ void TDriver::InitTrack
 	oSkilling = true;                            // of TORCS-Installation
     GfOut("#Skilling: On\n");
 
+	void* SkillHandle = NULL;
+
     snprintf(PathFilenameBuffer, BUFLEN,
-	  "%sconfig/raceman/extra/skill.xml",GetDataDir());
+	  "%sconfig/raceman/extra/skill.xml",GetLocalDir());
     GfOut("#skill.xml: %s\n", PathFilename);
-    void* SkillHandle = GfParmReadFile
+    SkillHandle = GfParmReadFile
 	  (PathFilename, GFPARM_RMODE_REREAD);
     if (SkillHandle)
     {
       oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
 		  "skill", "level", (char *) NULL, 10.0)));
-      GfOut("#SkillGlobal: %g\n", oSkillGlobal);
+	  GfOut("#LocalDir: SkillGlobal: %g\n", oSkillGlobal);
+    }
+	else
+	{
+      snprintf(PathFilenameBuffer, BUFLEN,
+	    "%sconfig/raceman/extra/skill.xml",GetDataDir());
+      GfOut("#skill.xml: %s\n", PathFilename);
+      SkillHandle = GfParmReadFile
+	    (PathFilename, GFPARM_RMODE_REREAD);
+      if (SkillHandle)
+      {
+        oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
+		  "skill", "level", (char *) NULL, 10.0)));
+		GfOut("#DataDir: SkillGlobal: %g\n", oSkillGlobal);
+	  }
     }
 
     // Get individual skilling
     int SkillEnabled = 0;
     snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
       BaseParamPath,oIndex);
-    GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
+	GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
     SkillHandle = GfParmReadFile
 	  (PathFilename, GFPARM_RMODE_REREAD);
     if (SkillHandle)
     {
-      oSkillDriver =
-	    MIN(10.0,GfParmGetNum(SkillHandle,"skill","level",0,0.0));
+      oSkillDriver = GfParmGetNum(SkillHandle,"skill","level",0,0.0);
       oSkillDriver = MIN(1.0, MAX(0.0, oSkillDriver));
       GfOut("#oSkillDriver: %g\n", oSkillDriver);
 
@@ -515,7 +532,7 @@ void TDriver::InitTrack
     BaseParamPath,oTrackName);
   oPitLoad[2] = PitLoadRightBuffer;              // Set pointer to buffer
 
-  // Override params for track (Pitting)
+  // Override params for track (Pitting) 
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
   Handle = TUtils::MergeParamFile(Handle,Buf);
@@ -555,9 +572,13 @@ void TDriver::InitTrack
   if ((oSituation->_raceType == RM_TYPE_QUALIF)
 	|| (TestQualification > 0))
   {
-	Qualification = true;
-	GfOut("#Qualification = True\n");
-	NBRRL = 1;
+    if ((oSituation->_raceType == RM_TYPE_PRACTICE)
+      || (oSituation->_raceType == RM_TYPE_QUALIF))
+	{
+	  Qualification = true;
+	  GfOut("#Qualification = True\n");
+	  NBRRL = 1;
+	}
   }
 
   // Get car's length
@@ -778,15 +799,17 @@ void TDriver::InitTrack
   }
   else
   {
-    oSkillOffset = MAX(0.0,MIN(1.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, oSkillOffset)));
+    oSkillOffset = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, oSkillOffset)));
     GfOut("#SkillOffset: %g\n", oSkillOffset);
-    oSkillScale = MAX(0.0,MIN(2.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, oSkillScale)));
+    oSkillScale = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, oSkillScale)));
     GfOut("#SkillScale: %g\n", oSkillScale);
 
     oLookAhead = oLookAhead / (1+oSkillGlobal/24);
     oLookAheadFactor = oLookAheadFactor / (1+oSkillGlobal/24);
 
 	if (UseOldSkilling)
+	{
+      // Scaling to match hymies
 	  oSkill = 
 		-0.0000455 * oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal
 		+0.0014 * oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal
@@ -794,13 +817,24 @@ void TDriver::InitTrack
 		+0.0512 * oSkillGlobal*oSkillGlobal
 		+0.0978 * oSkillGlobal
 		+ oSkillOffset + oSkillDriver;
+	}
+	else if (UseSCSkilling)
+	{
+      // Scaling to match usr_sc
+	  oSkillScale = oSkillScale/50.0;
+	  oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
+	  oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
+	}
 	else
 	{
+      // Scaling 
+	  oSkillScale = oSkillScale/50.0;
 	  oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
-	  oSkill = (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + 10 * oSkillOffset;
+	  oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
 	}
 
-	oSkill *= oSkillScale;
+	if (Qualification)
+  	  oSkill *= 1.5;
 
     Param.Tmp.oSkill = 1.0 + oSkill;
 	GfOut("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
@@ -1003,7 +1037,7 @@ void TDriver::Drive()
   oCar->ctrl.clutchCmd = (float) oClutch;
   oCar->ctrl.gear = oGear;
   oCar->ctrl.steer = (float) oSteer;
-  //GfOut("#%d: A: %g B: %g C: %g G: %d S: %g\n",oIndex,oAccel,oBrake,oClutch,oGear,oSteer);
+  //GfOut("#%d: %g A: %g B: %g C: %g G: %d S: %g\n",oIndex,CurrSimTime,oAccel,oBrake,oClutch,oGear,oSteer);
 /*
   if (oDoAvoid)
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;        // Only small lights on
@@ -1017,6 +1051,9 @@ void TDriver::Drive()
 
   if (!Qualification)                            // Don't use pit while
     oStrategy->CheckPitState(0.6f);              //  qualification
+
+  //if ((oCurrSpeed < 100.0/3.6) && (CurrSimTime > 0) && (CurrSimTime < 10))
+  //  GfOut("t:%.2f s v:%.1f km/h A:%.3f C:%.3f G:%d\n",CurrSimTime,oCurrSpeed*3.6,oAccel,oClutch,oGear);
 }
 //==========================================================================*
 
@@ -1251,7 +1288,7 @@ void TDriver::FindRacinglines()
 void TDriver::TeamInfo()
 {
 #ifdef TORCS_NG
-  RtTeamManagerShowInfo();
+  //RtTeamManagerShowInfo();
   oTeamIndex = RtTeamManagerIndex(oCar,oTrack,oSituation);
   RtTeamManagerDump();
 #else
@@ -1307,8 +1344,9 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   else                                           // else use
     oAngleSpeed = atan2(CarSpeedY, CarSpeedX);   // direction of movement
 
-  Param.Tmp.oSkill =
-	(1.0 + oSkill/oSkillScale + CarDamage/30000);// Adjust skill to damages
+//  Param.Tmp.oSkill =
+//	(1.0 + oSkill/oSkillScale + CarDamage/30000);// Adjust skill to damages
+//	(1.0 + oSkill + CarDamage/30000);            // Adjust skill to damages
 
   oTrackAngle =                                  // Direction of track at the
 	 RtTrackSideTgAngleL(&CarTrackPos);          // position of the car
@@ -1344,6 +1382,14 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   }
 
   oStrategy->Update(oCar,MinDistBack,MinTimeSlot);// Update strategic params
+
+  oSideReduction = 1.0;
+  if (WheelSeg(REAR_RGT) != WheelSeg(REAR_LFT))
+  {
+    float MinFriction = MIN(WheelSegFriction(REAR_RGT),WheelSegFriction(REAR_LFT));
+	oSideReduction = MIN(1.0,MinFriction / CarFriction);
+	//GfOut("SideReduction: %g\n",oSideReduction);
+  }
 }
 //==========================================================================*
 
@@ -1631,7 +1677,7 @@ void TDriver::Clutching()
 //--------------------------------------------------------------------------*
 void TDriver::Turning()
 {
-  if (!oUnstucking && (DistanceRaced > 10))
+  if (!oUnstucking && (DistanceRaced > 25))
   {
     double Angle = oLanePoint.Angle - CarYaw;    // Direction moving to
     DOUBLE_NORM_PI_PI(Angle);                    // normalize it
@@ -1831,6 +1877,7 @@ void TDriver::InitAdaptiveShiftLevels()
 		}
  	    Rpm += 1;
 	  }
+
   }
   
   //for (J = 1; J < oLastGear; J++)
@@ -2398,10 +2445,10 @@ bool TDriver::TargetReached(double Target, double AvoidTarget)
 void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
 {
   // Scale limits of change of lateral movement (accellerations/velocities)
-  double RangeAccMax = 0.00075 * Scale;          // Range accelleration and
+  double RangeAccMax = 0.0005 * Scale;           // Range accelleration and
   double RangeVelMax = 0.005 * Scale;            // velocity per sim.step
-  double OffsetAccMax = 0.0003 * Scale;          // Offset accelleration and
-  double OffsetVelMax = 0.2 * Scale;             // velocity per sim.step
+  double OffsetAccMax = 0.00015 * Scale;         // Offset accelleration and
+  double OffsetVelMax = 0.1 * Scale;             // velocity per sim.step
 
   double AvoidTarget = 0;                        // Assume come back to RL
   if (DoAvoid)                                   // But if needed
@@ -2689,6 +2736,9 @@ double TDriver::FilterSkillBrake(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterTCL(double Accel)
 {
+  if (DistanceRaced < 50)                        // Not at start
+	return Accel;
+
   if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
 	return Accel;
 
@@ -2767,6 +2817,8 @@ double TDriver::FilterTrack(double Accel)
 	if (fabs(oDeltaOffset) > oTolerance)         // Check offset difference
 	  Accel *= (float)                           //   Decrease acceleration
 	    (MAX(1.0 - (fabs(oDeltaOffset) - oTolerance) * 0.2, 0.4));
+
+    Accel *= oSideReduction;
   }
   return Accel;
 }
@@ -2910,6 +2962,10 @@ double TDriver::CalcSkill(double TargetSpeed)
       double Rand1 = (double) getRandom() / 65536.0;
       double Rand2 = (double) getRandom() / 65536.0;
       double Rand3 = (double) getRandom() / 65536.0;
+
+	  //double Rand1 = 0.0;
+      //double Rand2 = 0.0;
+      //double Rand3 = 0.0;
 
       // acceleration to use in current time limit
       oDecelAdjustTarget = (oSkill/4 * Rand1);

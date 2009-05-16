@@ -209,6 +209,7 @@ void* GetFileHandle(const char* RobotName)
 //--------------------------------------------------------------------------*
 void SetParameters(int N, char* DefaultCarType)
 {
+  NBBOTS = N;
   TDriver::NBBOTS = N;                                    // Used nbr of cars
   TDriver::MyBotName = BufName;                           // Name of this bot 
   TDriver::ROBOT_DIR = BufPathDir;                        // Path to dll
@@ -242,7 +243,8 @@ void SetUpSimplix_trb1()
 void SetUpSimplix_sc()
 {
   SetParameters(NBBOTS, "sc996");
-  TDriver::UseOldSkilling = true;                // Use old skilling
+//  TDriver::UseOldSkilling = true;                // Use old skilling
+  TDriver::UseSCSkilling = true;                 // Use supercar skilling
 };
 //==========================================================================*
 

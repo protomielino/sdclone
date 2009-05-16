@@ -9,7 +9,7 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.14
+// Last changed : 2009.04.26
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -225,7 +225,7 @@ double	TFixCarParam::CalcBraking
 	double Ftanroad = -sqrt(Froad * Froad - Flatroad * Flatroad) + Ftan;
 
 	Acc = CarParam.oScaleBrake * Ftanroad 
-	  / (oTmpCarParam->oMass * oTmpCarParam->oSkill);
+	  / (oTmpCarParam->oMass * ( 3 + oTmpCarParam->oSkill) / 4);
     
 	if (TDriver::UseBrakeLimit)
 	{
@@ -372,7 +372,7 @@ double TFixCarParam::CalcMaxSpeed
 
   double MuF = Friction * oTyreMuFront * CarParam.oScaleMu;
   double MuR = Friction * oTyreMuRear * CarParam.oScaleMu;
-  //Mu = (MuF + MuR) / (2 * oTmpCarParam->oSkill);
+  //Mu = MIN(MuF,MuR) /(( 3 + oTmpCarParam->oSkill)/4);
   Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
 
   Den = (AbsCrv - ScaleBump * CrvZ)

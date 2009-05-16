@@ -4,6 +4,7 @@
 // TORCS: "The Open Racing Car Simulator"
 // A robot for TORCS-NG-Version 1.4.0
 //--------------------------------------------------------------------------*
+// Opponents
 // Rivalen (und Teammitglieder)
 //
 // File         : unitopponent.cpp

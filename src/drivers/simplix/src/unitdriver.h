@@ -323,6 +323,8 @@ private:
     bool oReduced;
     double oFuelNeeded;
 	double oRepairNeeded;
+	float oSideReduction;
+
 
 	int NBRRL;
 	int oRL_FREE;
@@ -374,6 +376,7 @@ private:
 
 	static bool AdvancedParameters;
     static bool UseOldSkilling;
+    static bool UseSCSkilling;
 	static bool UseBrakeLimit;
 	static float BrakeLimit;
 	static float BrakeLimitScale;

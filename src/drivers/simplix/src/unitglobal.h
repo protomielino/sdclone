@@ -262,6 +262,8 @@ enum
 #define CarDamage (oCar->_dammage)
 #define CarDriverIndex (oCar->_driverIndex)
 #define CarFriction (oCar->_trkPos.seg->surface->kFriction)
+#define CarRoughness (oCar->_trkPos.seg->surface->kRoughness)
+#define CarRollRes (oCar->_trkPos.seg->surface->kRollRes)
 #define CarFuel (oCar->_fuel)
 #define CarGearNbr (oCar->_gearNb)
 #define CarGearOffset (oCar->_gearOffset)
@@ -311,6 +313,10 @@ enum
 #define SteerLock (oCar->_steerLock)
 #define WheelRad(x) (oCar->_wheelRadius(x))
 #define WheelSpinVel(x) (oCar->_wheelSpinVel(x))
+#define WheelSeg(x) (oCar->_wheelSeg(x))
+#define WheelSegFriction(x) (oCar->_wheelSeg(x)->surface->kFriction)
+#define WheelSegRoughness(x) (oCar->_wheelSeg(x)->surface->kRoughness)
+#define WheelSegRollRes(x) (oCar->_wheelSeg(x)->surface->kRollRes)
 #define UsedGear (oCar->_gear)
 // ... Shortcuts for TORCS
 
