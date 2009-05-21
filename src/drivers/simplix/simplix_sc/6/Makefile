@@ -15,7 +15,7 @@
 ##############################################################################
 
 ROBOT       = simplix_sc
-SHIPDIR     = drivers/${ROBOT}/7
+SHIPDIR     = drivers/${ROBOT}/6
 SHIP        = sc-gt4.png
 SHIPSUBDIRS = 
 
