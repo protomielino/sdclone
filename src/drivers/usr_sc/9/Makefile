@@ -16,7 +16,7 @@
 
 ROBOT       = usr_sc
 SHIPDIR     = drivers/${ROBOT}/9
-SHIP        = skill.xml
+SHIP        = skill.xml logo.rgb sc-lynx-220.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

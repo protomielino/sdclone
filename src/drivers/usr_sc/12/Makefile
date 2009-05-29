@@ -16,7 +16,7 @@
 
 ROBOT       = usr_sc
 SHIPDIR     = drivers/${ROBOT}/12
-SHIP        = skill.xml
+SHIP        = skill.xml logo.rgb sc-nsx.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

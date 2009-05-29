@@ -1,9 +1,10 @@
 ##############################################################################
 #
 #    file                 : Makefile
-#    created              : 05 Dez 2008
-#    last changed         : 05 Dez 2008
-#    copyright            : (C) 2008 Wolf-Dieter Beelitz
+#    created              : Wed Jan 8 18:31:16 CET 2003
+#    copyright            : (C) 2002-2004 Bernhard Wymann
+#    email                : berniw@bluewin.ch
+#    version              : $Id: Makefile,v 1.6 2004/09/23 14:04:17 berniw Exp $
 #
 ##############################################################################
 #
@@ -14,14 +15,17 @@
 #
 ##############################################################################
 
-ROBOT       = usr_sc
-SHIPDIR     = drivers/${ROBOT}/11
-SHIP        = skill.xml logo.rgb sc-nsx.png
-SHIPSUBDIRS = 
+ROBOT       = usr_trb1
+#MODULE      = ${ROBOT}.so
+#MODULEDIR   = drivers/${ROBOT}
+#SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp strategy.cpp cardata.cpp raceline.cpp
+
+SHIPDIR     = drivers/${ROBOT}
+SHIP        = ${ROBOT}.xml 
+SHIPSUBDIRS = 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-usr_sc_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
 src-robots-usr_sc_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
-

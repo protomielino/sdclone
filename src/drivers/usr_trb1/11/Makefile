@@ -14,9 +14,9 @@
 #
 ##############################################################################
 
-ROBOT       = usr_sc
+ROBOT       = usr_trb1
 SHIPDIR     = drivers/${ROBOT}/11
-SHIP        = skill.xml logo.rgb sc-nsx.png
+SHIP        = car6-trb1.rgb wheel3d.png
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
