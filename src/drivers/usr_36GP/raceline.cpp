@@ -302,7 +302,6 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tRLMarginLft, 0, sizeof(LRLMod));
  memset(tRLSpeed, 0, sizeof(LRLMod));
  memset(tRLBrake, 0, sizeof(LRLMod));
- memset(tLaneShift, 0, sizeof(LRLMod));
  memset(tIntMargin, 0, sizeof(LRLMod));
  memset(tExtMargin, 0, sizeof(LRLMod));
  memset(tSecurity, 0, sizeof(LRLMod));
