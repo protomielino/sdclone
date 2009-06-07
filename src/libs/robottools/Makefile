@@ -20,11 +20,11 @@ SOLIBRARY = librobottools.so
 
 SOLIBDIR  = .
 
-SOURCES   = rttrack.cpp rttelem.cpp rtteammanager.cpp
+SOURCES   = rttrack.cpp rttelem.cpp rtteammanager.cpp rttimeanalysis.cpp
 
 EXPDIR  = include
 
-EXPORTS = robottools.h teammanager.h
+EXPORTS = robottools.h teammanager.h timeanalysis.h
 
 src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 
