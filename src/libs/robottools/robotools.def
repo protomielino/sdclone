@@ -34,3 +34,7 @@ EXPORTS
 	RtTeamNeedPitStop
 	RtTeamReleasePit
 	RtTeamUpdate
+	RtInitTimer
+	RtTimerFrequency
+	RtTimeStamp
+	RtDuration

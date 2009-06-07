@@ -262,6 +262,10 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\rttimeanalysis.cpp"
+				>
+			</File>
+			<File
 				RelativePath="rttrack.cpp"
 				>
 				<FileConfiguration
@@ -294,6 +298,10 @@
 			</File>
 			<File
 				RelativePath=".\teammanager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\timeanalysis.h"
 				>
 			</File>
 		</Filter>
