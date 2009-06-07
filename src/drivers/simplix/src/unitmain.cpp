@@ -53,6 +53,7 @@
 #include <car.h>
 #include <raceman.h>
 #include <robottools.h>
+#include <timeanalysis.h>
 #include <robot.h>
 
 #include "unitglobal.h"
@@ -517,6 +518,9 @@ static void InitTrack(int Index,
 //--------------------------------------------------------------------------*
 static void NewRace(int Index, tCarElt* Car, tSituation *S)
 {
+#ifdef TORCS_NG
+  RtInitTimer(); // Check existance of Performance Counter Hardware
+#endif
   cTicks[Index-IndexOffset] = 0.0;               // Initialize counters
   cMinTicks[Index-IndexOffset] = FLT_MAX;        // and time data 
   cMaxTicks[Index-IndexOffset] = 0.0;
@@ -546,7 +550,7 @@ static void Drive(int Index, tCarElt* Car, tSituation *S)
   //GfOut("#>>> TDriver::Drive\n");
   //if (cRobot[Index-IndexOffset]->CurrSimTime != S->currentTime)
   {
-    clock_t StartTicks = clock();                // Start used time 
+	double StartTimeStamp = RtTimeStamp(); 
 
     cRobot[Index-IndexOffset]->CurrSimTime =     // Update current time
 		S->currentTime; 
@@ -556,8 +560,7 @@ static void Drive(int Index, tCarElt* Car, tSituation *S)
 	else                                         // or
 	  cRobot[Index-IndexOffset]->Drive();        //   Drive
 
-	clock_t StopTicks = clock();                 // Calculate used time 
-    double Duration = 1000.0 * (StopTicks - StartTicks)/CLOCKS_PER_SEC;
+	double Duration = RtDuration(StartTimeStamp);
 
 	if (cTickCount[Index-IndexOffset] > 0)       // Collect used time 
 	{
@@ -600,7 +603,9 @@ static void EndRace(int Index, tCarElt *Car, tSituation *S)
 {
   // Dummy: use parameters
   if ((Index < 0) || (Car == NULL) || (S == NULL))
-    printf("EndRace\n");
+	  Index = 0;
+
+  printf("EndRace\n");
   cRobot[Index-IndexOffset]->EndRace();
 }
 //==========================================================================*
@@ -611,19 +616,19 @@ static void EndRace(int Index, tCarElt *Car, tSituation *S)
 //--------------------------------------------------------------------------*
 static void Shutdown(int Index)
 {
-  cRobot[Index-IndexOffset]->Shutdown();
-  delete cRobot[Index-IndexOffset];
-
   GfOut("\n\n#Clock\n");
   GfOut("#Total Time used: %g sec\n",cTicks[Index-IndexOffset]/1000.0);
-  //GfOut("#Min   Time used: %g msec\n",cMinTicks[Index-IndexOffset]);
-  //GfOut("#Max   Time used: %g msec\n",cMaxTicks[Index-IndexOffset]);
+  GfOut("#Min   Time used: %g msec\n",cMinTicks[Index-IndexOffset]);
+  GfOut("#Max   Time used: %g msec\n",cMaxTicks[Index-IndexOffset]);
   GfOut("#Mean  Time used: %g msec\n",cTicks[Index-IndexOffset]/cTickCount[Index-IndexOffset]);
-  //GfOut("#Long Time Steps: %d\n",cLongSteps[Index-IndexOffset]);
-  //GfOut("#Critical Steps : %d\n",cCriticalSteps[Index-IndexOffset]);
-  //GfOut("#Unused Steps   : %d\n",cUnusedCount[Index-IndexOffset]);
+  GfOut("#Long Time Steps: %d\n",cLongSteps[Index-IndexOffset]);
+  GfOut("#Critical Steps : %d\n",cCriticalSteps[Index-IndexOffset]);
+  GfOut("#Unused Steps   : %d\n",cUnusedCount[Index-IndexOffset]);
   
   GfOut("\n\n#");
+
+  cRobot[Index-IndexOffset]->Shutdown();
+  delete cRobot[Index-IndexOffset];
 }
 //==========================================================================*
 
