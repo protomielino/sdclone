@@ -378,7 +378,7 @@ extern void SetDataDir(const char *buf);
 extern int GetSingleTextureMode (void);
 extern void SetSingleTextureMode (void);
 extern int GfNearestPow2 (int x);
-extern int GfCreateDir(char *path);
+extern int GfCreateDir(const char *path);
 
 /*
  * Copyright (c) 1991, 1993

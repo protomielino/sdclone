@@ -490,7 +490,7 @@ int GfNearestPow2 (int x)
 }
 
 
-int GfCreateDir(char *path)
+int GfCreateDir(const char *path)
 {
 	if (path == NULL) {
 		return GF_DIR_CREATION_FAILED;
@@ -499,7 +499,6 @@ int GfCreateDir(char *path)
 	const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
 	strncpy(buf, path, BUFSIZE);
-	path = buf;
 
 #ifdef WIN32
 #define mkdir(x) _mkdir(x)
