@@ -925,8 +925,9 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 
 	if (HCtx[idx]->ParamAbs) 
 	{
-		if (fabs(car->_speed_x) > 10.0)
+		if (fabs(car->_speed_x) > 10.0 && car->_brakeCmd > 0.0)
 		{
+			tdble brake1 = car->_brakeCmd, brake2 = car->_brakeCmd, brake3 = car->_brakeCmd;
 			tdble rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
 			int i;
 
@@ -935,13 +936,13 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			NORM_PI_PI(skidAng);
 
 			if (car->_speed_x > 5 && fabs(skidAng) > 0.2)
-				car->_brakeCmd = MIN(car->_brakeCmd, 0.10 + 0.70 * cos(skidAng));
+				brake1 = MIN(car->_brakeCmd, 0.10 + 0.70 * cos(skidAng));
 
 			// reduce brake if car steering sharply
 			if (fabs(car->_steerCmd) > 0.1)
 			{
-				tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.4);
-				car->_brakeCmd = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
+				tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.2);
+				brake2 = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
 
 			const tdble abs_slip = 1.0;
@@ -955,7 +956,9 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 			slip = car->_speed_x - slip/4.0f;
 
 			if (slip > abs_slip)
-				car->_brakeCmd = MAX(MIN(0.35, car->_brakeCmd), car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range));
+				brake3 = MAX(MIN(0.35, car->_brakeCmd), car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range) * 0.7);
+
+			car->_brakeCmd = MIN(brake1, MIN(brake2, brake3));
 		}
 	}
 
