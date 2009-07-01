@@ -68,6 +68,8 @@ SimWheelConfig(tCar *car, int index)
 
 	patchLen = wheel->weight0 / (tirewidth * pressure);
 
+	wheel->width = tirewidth;
+
 	if (tireheight > 0.0)
 		wheel->radius = rimdiam / 2.0f + tireheight;
 	else
