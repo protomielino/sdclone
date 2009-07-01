@@ -30,13 +30,14 @@ SimWheelConfig(tCar *car, int index)
 	void *hdle = car->params;
 	tCarElt *carElt = car->carElt;
 	tWheel *wheel = &(car->wheel[index]);
-	tdble rimdiam, tirewidth, tireratio, pressure;
+	tdble rimdiam, tirewidth, tireratio, pressure, tireheight;
 	tdble x0, Ca, RFactor, EFactor, patchLen;
 
 	pressure              = GfParmGetNum(hdle, WheelSect[index], PRM_PRESSURE, (char*)NULL, 275600);
 	rimdiam               = GfParmGetNum(hdle, WheelSect[index], PRM_RIMDIAM, (char*)NULL, 0.33f);
 	tirewidth             = GfParmGetNum(hdle, WheelSect[index], PRM_TIREWIDTH, (char*)NULL, 0.145f);
 	tireratio             = GfParmGetNum(hdle, WheelSect[index], PRM_TIRERATIO, (char*)NULL, 0.75f);
+	tireheight            = GfParmGetNum(hdle, WheelSect[index], PRM_TIREHEIGHT, (char*)NULL, -1.0f);
 	wheel->mu             = GfParmGetNum(hdle, WheelSect[index], PRM_MU, (char*)NULL, 1.0f);
 	wheel->I              = GfParmGetNum(hdle, WheelSect[index], PRM_INERTIA, (char*)NULL, 1.5f);
 	wheel->I += wheel->brake.I; // add brake inertia
@@ -67,7 +68,10 @@ SimWheelConfig(tCar *car, int index)
 
 	patchLen = wheel->weight0 / (tirewidth * pressure);
 
-	wheel->radius = rimdiam / 2.0f + tirewidth * tireratio;
+	if (tireheight > 0.0)
+		wheel->radius = rimdiam / 2.0f + tireheight;
+	else
+		wheel->radius = rimdiam / 2.0f + tirewidth * tireratio;
 	wheel->tireSpringRate = wheel->weight0 / (wheel->radius * (1.0f - cos(asin(patchLen / (2.0f * wheel->radius)))));
 	wheel->relPos.x = wheel->staticPos.x = car->axle[index/2].xpos;
 	wheel->relPos.y = wheel->staticPos.y;
