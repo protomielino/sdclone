@@ -682,16 +682,40 @@ grInitCar(tCarElt *car)
 	/*if (grCarInfo[grCarIndex].wheelTexture->getRef() > 0)
 	  grCarInfo[grCarIndex].wheelTexture->deRef();*/
 	grCarInfo[index].wheelTexture = 0;
+	const char *wheelFront3DModFileNamePrfx = 
+	    GfParmGetStr(handle, SECT_GROBJECTS, PRM_FRONT_WHEEL_3D, "");
+	const char *wheelRear3DModFileNamePrfx = 
+	    GfParmGetStr(handle, SECT_GROBJECTS, PRM_REAR_WHEEL_3D, "");
 	const char *wheel3DModFileNamePrfx = 
 	    GfParmGetStr(handle, SECT_GROBJECTS, PRM_WHEEL_3D, "wheel");
 
 	grGammaValue = 1.8;
 	grMipMap = 0;
 
-	for (i = 0; i < 4; i++){
-	    wheel[i] = initWheel(car, i, wheel3DModFileNamePrfx);
-	    carBody->addKid(wheel[i]);
+	if (*wheelFront3DModFileNamePrfx)
+	{
+	    wheel[FRNT_RGT] = initWheel(car, FRNT_RGT, wheelFront3DModFileNamePrfx);
+	    wheel[FRNT_LFT] = initWheel(car, FRNT_LFT, wheelFront3DModFileNamePrfx);
 	}
+	else
+	{
+	    wheel[FRNT_RGT] = initWheel(car, FRNT_RGT, wheel3DModFileNamePrfx);
+	    wheel[FRNT_LFT] = initWheel(car, FRNT_LFT, wheel3DModFileNamePrfx);
+	}
+
+	if (*wheelRear3DModFileNamePrfx)
+	{
+	    wheel[REAR_RGT] = initWheel(car, REAR_RGT, wheelRear3DModFileNamePrfx);
+	    wheel[REAR_LFT] = initWheel(car, REAR_LFT, wheelRear3DModFileNamePrfx);
+	}
+	else
+	{
+	    wheel[REAR_RGT] = initWheel(car, REAR_RGT, wheel3DModFileNamePrfx);
+	    wheel[REAR_LFT] = initWheel(car, REAR_LFT, wheel3DModFileNamePrfx);
+	}
+
+	for (i = 0; i < 4; i++)
+	    carBody->addKid(wheel[i]);
 
 	grCarInfo[index].LODSelectMask[0] = 1 << selIndex; /* car mask */
 	selIndex++;
