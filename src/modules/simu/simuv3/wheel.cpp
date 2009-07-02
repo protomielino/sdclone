@@ -86,7 +86,10 @@ SimWheelConfig(tCar *car, int index)
 	SimBrakeConfig(hdle, BrkSect[index], &(wheel->brake));
 
 	carElt->_rimRadius(index) = rimdiam / 2.0f;
-	carElt->_tireHeight(index) = tirewidth * tireratio;
+	if (tireheight > 0.0)
+		carElt->_tireHeight(index) = tireheight;
+	else
+		carElt->_tireHeight(index) = tirewidth * tireratio;
 	carElt->_tireWidth(index) = tirewidth;
 	carElt->_brakeDiskRadius(index) = wheel->brake.radius;
 	carElt->_wheelRadius(index) = wheel->radius;
