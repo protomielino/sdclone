@@ -33,6 +33,8 @@ void SimulationOptions::SetFromSkill (int skill)
         option_list.Set(PRM_DAMAGE_SUSPENSION, false);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
         option_list.Set(PRM_DAMAGE_AERO, false);
+        option_list.Set(PRM_MODEL_AERO_FACTOR, 1.0f);
+        option_list.Set(PRM_MODEL_AEROFLOW, SIMPLE);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
         break;
     case 2:
@@ -40,13 +42,17 @@ void SimulationOptions::SetFromSkill (int skill)
         option_list.Set(PRM_DAMAGE_SUSPENSION, false);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
         option_list.Set(PRM_DAMAGE_AERO, false);
+        option_list.Set(PRM_MODEL_AERO_FACTOR, 1.0f);
+        option_list.Set(PRM_MODEL_AEROFLOW, SIMPLE);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
         break;
     case 3:
         option_list.Set(PRM_DAMAGE_TYRES, 0.0f);
-        option_list.Set(PRM_DAMAGE_SUSPENSION, true);
+        option_list.Set(PRM_DAMAGE_SUSPENSION, false);
+        //option_list.Set(PRM_DAMAGE_SUSPENSION, true);
         option_list.Set(PRM_DAMAGE_ALIGNMENT, true);
-        option_list.Set(PRM_DAMAGE_AERO, true);
+        option_list.Set(PRM_DAMAGE_AERO, false);
+        //option_list.Set(PRM_DAMAGE_AERO, true);
         option_list.Set(PRM_MODEL_TYRE_TEMPERATURE, false);
         option_list.Set(PRM_MODEL_AERO_FACTOR, 1.0f);
         option_list.Set(PRM_MODEL_AEROFLOW, SIMPLE);

@@ -291,7 +291,11 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 		}
 
 		if ((car[i]->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
-			car[i]->dammage += (int)(CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[car[i]->carElt->_skillLevel]);
+			float dammage = (CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[car[i]->carElt->_skillLevel]);
+			dammage *= MIN(1.5, dammage / 500.0);
+			if (dammage < 10)
+				dammage = 0;
+			car[i]->dammage += (int)(dammage);
 		}
 
 		// Compute collision velocity.

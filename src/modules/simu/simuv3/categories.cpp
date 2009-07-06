@@ -29,4 +29,5 @@
 
 tdble simDammageFactor[] = {0.0f, 0.5f, 0.8f, 1.0f, 1.0f};
 
-tdble simSkidFactor[] = {0.40f, 0.35f, 0.3f, 0.0f, 0.0f};
+//tdble simSkidFactor[] = {0.40f, 0.35f, 0.3f, 0.0f, 0.0f};
+tdble simSkidFactor[] = {0.00f, 0.00f, 0.0f, 0.0f, 0.0f};
