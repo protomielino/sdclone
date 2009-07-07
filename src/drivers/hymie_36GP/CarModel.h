@@ -38,6 +38,7 @@ struct PathMod {
 	double AHEAD_FACTOR;
 	double  LFT_MARGIN;
 	double  RGT_MARGIN;
+	double  SPEED_LIMIT;
 };
 
 class CarModel  

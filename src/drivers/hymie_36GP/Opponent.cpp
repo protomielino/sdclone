@@ -176,6 +176,7 @@ void	Opponent::ProcessMyCar(
 	const Sit&			mySit,
 	const MyRobot&		me,
 	double				myMaxAccX,
+	double			aggression,
 	int					idx )
 {
 	CarElt*	oCar = m_path.GetCar();
@@ -219,7 +220,7 @@ void	Opponent::ProcessMyCar(
 		}
 	}
 
-	double	distAhead = MX(20, mySit.spd * mySit.spd / 30);
+	double	distAhead = MX(20, mySit.spd * mySit.spd / 20);
 	if( (m_info.flags & F_DANGEROUS) == 0 )
 		distAhead = MN(MX(40, distAhead), 80);
 
@@ -425,7 +426,7 @@ void	Opponent::ProcessMyCar(
 
 	const double myk = MAX(fabs(mypi.k), fabs(pi.k));
 	const double closeDist = 3.0 * MAX(0.0, 1.0 - myk*200) * m_otscale;
-	const double timeLimit = (7.0 - MIN(4.0, myk * 1000)) * m_otscale;
+	const double timeLimit = ((7.0 + aggression*2) - MIN(4.0, myk * 1000)) * m_otscale;
 	m_info.newCatchSpd = oSit.tVX - mySit.tVX*1.01;
 	m_info.newCatching = false;
 	if( oSit.relPos > oSit.minDX )

@@ -1,0 +1,14 @@
+This robot is based on "Mouse", created by Tim Foden and entered in the
+TRB World Championship in 2006 and 2007.  That robot was derived from 
+"Sparky" and "Dodger", which were developed by Tim for TORCS's precedessor 
+RARS.
+
+I've fixed a few bugs, especially returning to the raceline after a spinout
+and a few problems with pitting, and also enhanced its ability to drift
+around corners and its decision making when overtaking.
+
+Andrew Sumner, 2009.
+
+Its the same old story. Nobody cares for a robot. Just wind him up, turn
+him loose, and grease him every thousand miles.
+

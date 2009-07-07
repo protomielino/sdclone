@@ -165,7 +165,8 @@ public:
 						   double myDirX, double myDirY );
 	void		ProcessMyCar( const Situation* s, const TeamInfo* pTeamInfo,
 							  const CarElt* myCar, const Sit& mySit,
-							  const MyRobot& me, double myMaxAccX, int idx );
+							  const MyRobot& me, double myMaxAccX, 
+							  double aggression, int idx );
 	void		SetOTScale( double otscale ) { m_otscale = otscale; }
 
 private:

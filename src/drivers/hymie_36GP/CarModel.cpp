@@ -88,6 +88,7 @@ double	CarModel::CalcMaxSpeed(
 	int aero = AERO;
 	double mu_scale = MU_SCALE;
 	double kz_scale = KZ_SCALE;
+	double speed_limit = -1.0;
 
 	k = MAX(0.0, fabs(k) - RI_CUTOFF);
 
@@ -98,6 +99,7 @@ double	CarModel::CalcMaxSpeed(
 			aero = m_pm[i].AERO;
 			mu_scale = m_pm[i].MU_SCALE;
 			kz_scale = m_pm[i].KZ_SCALE;
+			speed_limit = m_pm[i].SPEED_LIMIT;
 			break;
 		}
 	}
@@ -154,6 +156,8 @@ double	CarModel::CalcMaxSpeed(
 
 	if( spd > 200 )
 		spd = 200;
+	if (speed_limit > 0)
+		spd = MIN(spd, speed_limit);
 
 	return spd;
 }

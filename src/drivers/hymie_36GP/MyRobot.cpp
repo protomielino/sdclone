@@ -83,6 +83,7 @@
 #define PRV_LEFT_MARGIN		"left margin"
 #define PRV_RIGHT_MARGIN	"right margin"
 #define PRV_RI_CUTOFF		"curv cutoff"
+#define PRV_SPEED_LIMIT		"speed limit"
 #define PRV_VERBOSE		"verbose"
 #define PRV_MAX_FUEL		"max fuel"
 
@@ -410,6 +411,8 @@ void	MyRobot::InitTrack(
 			m_cm.m_pm[m_cm.m_pmused].LFT_MARGIN = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.LFT_MARGIN);
 			sprintf(tmpstr, "%d %s", i, PRV_RIGHT_MARGIN);
 			m_cm.m_pm[m_cm.m_pmused].RGT_MARGIN = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.RGT_MARGIN);
+			sprintf(tmpstr, "%d %s", i, PRV_SPEED_LIMIT);
+			m_cm.m_pm[m_cm.m_pmused].SPEED_LIMIT = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, -1.0f);
 
 			m_cm.m_pmused++;
 		}
@@ -2170,7 +2173,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
         car->ctrl.brakeCmd = brk;
 	if (m_verbose)
 	{
-		fprintf(stderr,"%s %d: steer=%.3f gear=%d accel=%.3f brake=%.3f\n",car->_carName,pi.idx,steer,gear,acc,brk);
+		fprintf(stderr,"%s %d: speed=%.3f steer=%.3f gear=%d accel=%.3f brake=%.3f\n",car->_carName,pi.idx,car->_speed_x,steer,gear,acc,brk);
 		fflush(stderr);
 	}
 
@@ -2293,7 +2296,7 @@ void	MyRobot::AvoidOtherCars(
 	{for( int i = 0; i < m_nCars; i++ )
 	{
 		m_opp[i].ProcessMyCar( s, &m_pShared->m_teamInfo, car, mySit, *this,
-								m_maxAccel.CalcY(car->_speed_x), i );
+					m_maxAccel.CalcY(car->_speed_x), m_aggression, i );
 	}}
 
 #if defined(USE_NEW_AVOIDANCE)
