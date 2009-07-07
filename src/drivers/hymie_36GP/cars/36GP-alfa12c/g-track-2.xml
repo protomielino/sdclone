@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+    file          : track-e-track-1.xml
+    created       : 10 Apr 2006
+    copyright     : (C) 2006 by Tim Foden
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
+<!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
+
+<params name="" type="template" mode="mw">
+
+<!-- 1:07.50 -->
+
+  <section name="hymie private">
+	<attnum name="kz scale" val="0.15"/>
+	<attnum name="bump mod" val="1"/>
+	<attnum name="aero mod" val="0"/>
+	<attnum name="brake mod" val="1"/>
+	<attnum name="curv cutoff" val="0.0005"/>
+	<attnum name="acc scale" val="1.05"/>
+	<attnum name="brk scale" val="1.05"/>
+	<attnum name="mu scale" val="0.7"/>
+	<attnum name="factor 0" val="1.010"/>
+	<attnum name="steer k acc" val="2.2"/>
+	<attnum name="steer k dec" val="2.2"/>
+	<attnum name="spd ctrl normal" val="0"/>
+	<attnum name="spd ctrl traffic" val="3"/>
+	<attnum name="skidsteer" val="1.4"/>
+
+	<attnum name="0 begin div" val="300"/>
+	<attnum name="0 end div" val="360"/>
+	<attnum name="0 right margin" val="1.0"/>
+	<attnum name="1 begin div" val="400"/>
+	<attnum name="1 end div" val="540"/>
+	<attnum name="1 mu scale" val="0.55"/>
+	<attnum name="2 begin div" val="840"/>
+	<attnum name="2 end div" val="925"/>
+	<attnum name="2 mu scale" val="0.80"/>
+	<attnum name="3 begin div" val="926"/>
+	<attnum name="3 end div" val="980"/>
+	<attnum name="3 kz scale" val="0.08"/>
+  </section>
+
+</params>
