@@ -98,6 +98,7 @@ protected:
 
 	double		m_maxL;
 	double		m_maxR;
+	int		m_NSEG;
 };
 
 #endif // !defined(AFX_LINEPATH_H__0A22D193_004E_40A8_8D71_E0B6F6A51171__INCLUDED_)
