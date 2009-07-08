@@ -60,6 +60,7 @@
 #define PRV_BRK_SCALE		"brk scale"
 #define PRV_BRK_FACTOR		"brk factor"
 #define PRV_MU_FACTOR		"mu factor"
+#define PRV_KZ_FACTOR		"kz factor"
 #define PRV_AVOID_BRK_SCALE	"avoid brk scale"
 #define PRV_BRAKE_PRESSURE	"brk pressure"
 #define PRV_ACC_SCALE		"acc scale"
@@ -86,6 +87,7 @@
 #define PRV_SPEED_LIMIT		"speed limit"
 #define PRV_VERBOSE		"verbose"
 #define PRV_MAX_FUEL		"max fuel"
+#define PRV_YR_ACCEL		"yr accel"
 
 #define FLY_COUNT		20
 
@@ -321,23 +323,25 @@ void	MyRobot::InitTrack(
 
 	// get the private parameters now.
 
-	double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, "rpm", 7000);
+	double rpm = GfParmGetNum(hCarParm, SECT_PRIV, PRV_GEAR_UP_RPM, NULL, 7000);
 	m_gearUpRpm = rpm / 10.0;
 //	GfOut( "*** Mid rpm: %.0f\n", rpm );
 
+	double kz_factor = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_FACTOR, NULL, 1.00f);
 	double mu_factor = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_FACTOR, NULL, 1.00f);
 	double brk_factor = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRK_FACTOR, NULL, 1.00f);
 
 	m_cm.AERO = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_AERO_MOD, 0, 0);
 	m_cm.BRAKE_MOD = (int)GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRAKE_MOD, 0, 0);
-	m_cm.MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_SCALE, NULL, 0.9f) * mu_factor;
+	m_cm.MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_MU_SCALE, NULL, 0.9f);
 	m_cm.BRK_MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRK_MU_SCALE, NULL, 0.9f);
 	m_cm.KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_KZ_SCALE, NULL, 0.43f);
-	m_cm.BRK_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRK_SCALE, NULL, 1.00f) * brk_factor;
+	m_cm.BRK_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, PRV_BRK_SCALE, NULL, 1.00f);
 	m_cm.AHEAD_FACTOR = GfParmGetNum(hCarParm, SECT_PRIV, PRV_AHEAD_FACTOR, NULL, 1.00f);
 	m_cm.LFT_MARGIN = GfParmGetNum(hCarParm, SECT_PRIV, PRV_LEFT_MARGIN, NULL, 0.00f);
 	m_cm.RGT_MARGIN = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RIGHT_MARGIN, NULL, 0.00f);
 	m_cm.RI_CUTOFF = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RI_CUTOFF, NULL, 0.0f);
+	m_cm.YR_ACCEL = GfParmGetNum(hCarParm, SECT_PRIV, PRV_YR_ACCEL, NULL, 0.0f);
 
 	if (m_skill > 0.0)
 	{
@@ -400,11 +404,11 @@ void	MyRobot::InitTrack(
 			sprintf(tmpstr, "%d %s", i, PRV_BRAKE_MOD);
 			m_cm.m_pm[m_cm.m_pmused].BRAKE_MOD = int(GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, (double)m_cm.BRAKE_MOD));
 			sprintf(tmpstr, "%d %s", i, PRV_MU_SCALE);
-			m_cm.m_pm[m_cm.m_pmused].MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.MU_SCALE);
+			m_cm.m_pm[m_cm.m_pmused].MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.MU_SCALE) * mu_factor;
 			sprintf(tmpstr, "%d %s", i, PRV_BRK_MU_SCALE);
-			m_cm.m_pm[m_cm.m_pmused].BRK_MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.BRK_MU_SCALE);
+			m_cm.m_pm[m_cm.m_pmused].BRK_MU_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.BRK_MU_SCALE) * brk_factor;
 			sprintf(tmpstr, "%d %s", i, PRV_KZ_SCALE);
-			m_cm.m_pm[m_cm.m_pmused].KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.KZ_SCALE);
+			m_cm.m_pm[m_cm.m_pmused].KZ_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.KZ_SCALE) * kz_factor;
 			sprintf(tmpstr, "%d %s", i, PRV_BRK_SCALE);
 			m_cm.m_pm[m_cm.m_pmused].BRK_SCALE = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.BRK_SCALE);
 			sprintf(tmpstr, "%d %s", i, PRV_LEFT_MARGIN);
@@ -413,10 +417,16 @@ void	MyRobot::InitTrack(
 			m_cm.m_pm[m_cm.m_pmused].RGT_MARGIN = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, m_cm.RGT_MARGIN);
 			sprintf(tmpstr, "%d %s", i, PRV_SPEED_LIMIT);
 			m_cm.m_pm[m_cm.m_pmused].SPEED_LIMIT = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, -1.0f);
+			sprintf(tmpstr, "%d %s", i, PRV_YR_ACCEL);
+			m_cm.m_pm[m_cm.m_pmused].YR_ACCEL = GfParmGetNum(hCarParm, SECT_PRIV, tmpstr, 0, -1.0f);
 
 			m_cm.m_pmused++;
 		}
 	}}
+
+	m_cm.KZ_SCALE *= kz_factor;
+	m_cm.MU_SCALE *= mu_factor;
+	m_cm.BRK_SCALE *= brk_factor;
 
 	GfOut( "FLY_HEIGHT %g\n", FLY_HEIGHT );
 	GfOut( "BUMP_MOD %d\n", BUMP_MOD );
@@ -1374,7 +1384,7 @@ void	MyRobot::SpeedControl0(
 			else if( spd0 - 6 < targetSpd )
 				brk = 0.5;
 			else
-				brk = 0.5;//targetSpd == 0 ? 0.5 : 0.75;
+				brk = 0.8;//targetSpd == 0 ? 0.5 : 0.75;
 #endif
 //			brk = spd0 - 3 < targetSpd ? 0.14 : spd0 - 5 < targetSpd ? 0.25 : 0.5;
 			acc = 0;
@@ -1431,7 +1441,7 @@ void	MyRobot::SpeedControl1(
 			else if( spd0 - 5 < targetSpd )
 				brk = 0.5;
 			else
-				brk = 0.5;//targetSpd == 0 ? 0.5 : 0.75;
+				brk = 0.8;//targetSpd == 0 ? 0.5 : 0.75;
 #endif
 //			brk = spd0 - 3 < targetSpd ? 0.14 : spd0 - 5 < targetSpd ? 0.25 : 0.5;
 			acc = 0;
@@ -1873,6 +1883,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 		if (x > 0)
 			targetSpd = MAX(targetSpd, spd0);
 	}
+
 //	if( pi.idx >= 461 && pi.idx <= 484 )
 //		targetSpd = 100;
 
@@ -1894,6 +1905,8 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 		else
 			SpeedControl1( targetSpd, spd0, acc, brk );
 	}
+
+	acc = MAX(0.0, acc - fabs(car->_yaw_rate - steer) * m_cm.GetYRAccel(pi.idx));
 
 	brk *= BRAKE_PRESSURE;
 
@@ -3101,15 +3114,20 @@ double	MyRobot::ApplyAbs( tCarElt* car, double brake )
 
 	double	slip = 0.0;
 	for( int i = 0; i < 4; i++ )
-		slip += car->_wheelSpinVel(i) * car->_wheelRadius(i) / car->_speed_x;
-	slip /= 4.0;
+		slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
+	slip = car->_speed_x - slip/4.0;
 
+#if 1
+	if (slip > 2.5)
+		brake = brake * (1.0 - MIN(0.8, (slip - 2.5) / 4.5));
+#else
 	if( slip < 0.9 )//ABS_SLIP )
 	{
 //		GfOut( "ABS ABS ABS ABS ABS ABS ABS  slip %g\n", slip );
 //		brake *= slip;
 		brake *= 0.5;
 	}
+#endif
 
 	return brake;
 }

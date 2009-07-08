@@ -39,6 +39,7 @@ struct PathMod {
 	double  LFT_MARGIN;
 	double  RGT_MARGIN;
 	double  SPEED_LIMIT;
+	double  YR_ACCEL;
 };
 
 class CarModel  
@@ -64,6 +65,7 @@ public:
 							double& minSpd, double& maxSpd ) const;
 	void	CalcSimuSpeedRanges( double spd0, double dist, double kFriction,
 								 double& minSpd, double& maxSpd, double& maxDY ) const;
+	double	GetYRAccel(int div);
 
 public:
 	int		AERO;		// which aero calc to use.
@@ -89,6 +91,7 @@ public:
 	double  LFT_MARGIN;
 	double  RGT_MARGIN;
 	double  RI_CUTOFF;
+	double  YR_ACCEL;
 	struct PathMod m_pm[64];
 	int	m_pmused;
 };

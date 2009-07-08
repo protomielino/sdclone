@@ -15,12 +15,12 @@
 
 ROBOT       = hymie_36GP
 SHIPDIR     = drivers/${ROBOT}/cars/36GP-alfa12c
-SHIP        = $(shell find *.xml -maxdepth 0 -type f -print) $(shell find *.dat -maxdepth 0 -type f print)
+SHIP        = $(shell find *.xml -maxdepth 0 -type f -print)
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
-src-robots-usr_sc_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-usr_sc_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-hymie_36GP_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
+src-robots-hymie_36GP_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}
 
 

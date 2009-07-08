@@ -63,6 +63,20 @@ CarModel::~CarModel()
 
 //===========================================================================
 
+double	CarModel::GetYRAccel( int div )
+{
+	for (int i=0; i<m_pmused; i++)
+	{
+		if (div >= m_pm[i].bgn_div && div <= m_pm[i].end_div &&
+		    m_pm[i].YR_ACCEL >= 0.0)
+			return m_pm[i].YR_ACCEL;
+	}
+
+	return YR_ACCEL;
+}
+
+//===========================================================================
+
 double	CarModel::CalcMaxSpeed(
 	int div,
 	double k,

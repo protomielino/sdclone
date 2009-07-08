@@ -14,35 +14,35 @@
 
 <params name="" type="template" mode="mw">
 
-<!-- 2:11.10 -->
+<!-- 8:26.55 -->
 
   <section name="hymie private">
 	<attnum name="kz scale" val="0.15"/>
 	<attnum name="bump mod" val="1"/>
 	<attnum name="aero mod" val="0"/>
 	<attnum name="brake mod" val="1"/>
-	<attnum name="curv cutoff" val="0.0002"/>
+	<attnum name="curv cutoff" val="0.0005"/>
 	<attnum name="acc scale" val="1.05"/>
-	<attnum name="brk scale" val="1.00"/>
-	<attnum name="mu scale" val="0.82"/>
-	<attnum name="factor 0" val="1.010"/>
+	<attnum name="brk scale" val="0.85"/>
+	<attnum name="mu scale" val="0.68"/>
+	<attnum name="factor 0" val="1.012"/>
 	<attnum name="steer k acc" val="2.2"/>
 	<attnum name="steer k dec" val="2.2"/>
 	<attnum name="spd ctrl normal" val="0"/>
 	<attnum name="spd ctrl traffic" val="3"/>
 	<attnum name="skidsteer" val="1.4"/>
 
-	<attnum name="0 begin div" val="20"/>
-	<attnum name="0 end div" val="160"/>
-	<attnum name="0 brk scale" val="0.85"/>
+	<attnum name="0 begin div" val="1890"/>
+	<attnum name="0 end div" val="1940"/>
+	<attnum name="0 left margin" val="1"/>
 
-	<attnum name="1 begin div" val="920"/>
-	<attnum name="1 end div" val="940"/>
-	<attnum name="1 mu scale" val="0.65"/>
+	<attnum name="1 begin div" val="3240"/>
+	<attnum name="1 end div" val="3280"/>
+	<attnum name="1 mu scale" val="0.53"/>
 
-	<attnum name="2 begin div" val="1200"/>
-	<attnum name="2 end div" val="1280"/>
-	<attnum name="2 mu scale" val="0.65"/>
+	<attnum name="2 begin div" val="3660"/>
+	<attnum name="2 end div" val="3770"/>
+	<attnum name="2 left margin" val="1"/>
   </section>
 
 </params>
