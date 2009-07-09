@@ -2132,6 +2132,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 //		acc = MN(acc, 0.2);
 	}
 
+#if 0
 	if( car->ctrl.accelCmd == 1 && car->ctrl.brakeCmd == 0 )
 	{
 		m_maxAccel.Learn( car->_speed_x, car->_accel_x );
@@ -2140,6 +2141,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 //			GfOut( " %4.1f", m_maxAccel.GetY(i) );
 //		GfOut( "\n" );
 	}
+#endif
 
 	if( fabs(pi.k * spd0 - car->_yaw_rate) < 0.02 )
 	{
@@ -2309,7 +2311,8 @@ void	MyRobot::AvoidOtherCars(
 	{for( int i = 0; i < m_nCars; i++ )
 	{
 		m_opp[i].ProcessMyCar( s, &m_pShared->m_teamInfo, car, mySit, *this,
-					m_maxAccel.CalcY(car->_speed_x), m_aggression, i );
+					car->_speed_x, m_aggression, i );
+					//m_maxAccel.CalcY(car->_speed_x), m_aggression, i );
 	}}
 
 #if defined(USE_NEW_AVOIDANCE)

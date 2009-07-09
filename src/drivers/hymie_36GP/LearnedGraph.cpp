@@ -79,6 +79,7 @@ LearnedGraph::LearnedGraph( double minX, double maxX, int xSteps, double initial
 LearnedGraph::~LearnedGraph()
 {
 	delete [] m_pData;
+	delete [] m_pAxis;
 }
 
 int		LearnedGraph::GetNAxes() const
@@ -166,7 +167,7 @@ void	LearnedGraph::SetBeta( double beta )
 
 double	LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
 {
-	if( dim < m_nAxes )
+	if( dim < m_nAxes && dim >= 0 )
 	{
 		int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
 		int		offs_j = offs + m_pAxis[dim].m_itemSize * idx[dim].j;
@@ -182,7 +183,7 @@ double	LearnedGraph::CalcValue( int dim, int offs, const Idx* idx ) const
 
 void	LearnedGraph::LearnValue( int dim, int offs, const Idx* idx, double delta )
 {
-	if( dim < m_nAxes )
+	if( dim < m_nAxes && dim >= 0 )
 	{
 		int		offs_i = offs + m_pAxis[dim].m_itemSize * idx[dim].i;
 		int		offs_j = offs + m_pAxis[dim].m_itemSize * idx[dim].j;

@@ -38,7 +38,7 @@
 
 static const int	NBOTS = 20;//2;
 static int NBBOTS = 0;
-static MyRobot		s_robot[NBOTS];
+static MyRobot		*s_robot[NBOTS];
 static Shared		s_shared;
 static const int BUFSIZE = 256;
 static const int MAXNBBOTS = 20;
@@ -199,6 +199,8 @@ static int InitFuncPt( int index, void* pt )
 
 	tRobotItf* itf = (tRobotItf*)pt;
 
+	s_robot[index - indexOffset] = new MyRobot();
+
 	// Create robot instance for index.
 	itf->rbNewTrack = initTrack;	// Give the robot the track view called.
 	itf->rbNewRace  = newRace;		// Start a new race.
@@ -224,41 +226,42 @@ static int InitFuncPt( int index, void* pt )
 static void initTrack( int index, tTrack* track, void* carHandle,
 						void** carParmHandle, tSituation* s )
 {
-	s_robot[index].SetShared( &s_shared );
-	s_robot[index].InitTrack(index, track, carHandle, carParmHandle, s);
+	s_robot[index - indexOffset]->SetShared( &s_shared );
+	s_robot[index - indexOffset]->InitTrack(index - indexOffset, track, carHandle, carParmHandle, s);
 }
 
 
 // Start a new race.
 static void newRace( int index, tCarElt* car, tSituation* s )
 {
-	s_robot[index].NewRace( index, car, s );
+	s_robot[index - indexOffset]->NewRace( index - indexOffset, car, s );
 }
 
 // Drive during race.
 static void drive( int index, tCarElt* car, tSituation* s )
 {
-	s_robot[index].Drive( index, car, s );
+	s_robot[index - indexOffset]->Drive( index - indexOffset, car, s );
 }
 
 
 // Pitstop callback.
 static int pitcmd( int index, tCarElt* car, tSituation* s )
 {
-	return s_robot[index].PitCmd(index, car, s);
+	return s_robot[index - indexOffset]->PitCmd(index - indexOffset, car, s);
 }
 
 
 // End of the current race.
 static void endRace( int index, tCarElt* car, tSituation* s )
 {
-	s_robot[index].EndRace( index, car, s );
+	s_robot[index - indexOffset]->EndRace( index - indexOffset, car, s );
 }
 
 
 // Called before the module is unloaded.
 static void shutdown( int index )
 {
-	s_robot[index].Shutdown( index );
+	s_robot[index]->Shutdown( index - indexOffset );
+	delete s_robot[index - indexOffset];
 }
 
