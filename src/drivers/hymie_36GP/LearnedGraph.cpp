@@ -21,7 +21,8 @@ LearnedGraph::LearnedGraph()
 :	m_nAxes(0),
 	m_beta(0.5),
 	m_pAxis(0),
-	m_pData(0)
+	m_pData(0),
+	m_dataSize(0)
 {
 }
 
