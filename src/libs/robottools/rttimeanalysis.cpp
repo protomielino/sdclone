@@ -32,27 +32,26 @@
 #include "timeanalysis.h"
 
 // Private variables
-static bool RtUsePerformanceCounter = false;	// Hardware exists?
 static double RtTicksPerSec = 1000.0;			// Ticks per second
 
 // Public functions
 
 // Init Timer
-void RtInitTimer()
+bool RtInitTimer()
 {
 #ifdef WIN32
   ULONGLONG TicksPerSec;
   if (!QueryPerformanceFrequency((LARGE_INTEGER*)&TicksPerSec)) 
   {
-	  //printf("\n\n\nPerformance Counter not foundn\n\n\n"); 
-	  RtUsePerformanceCounter = false;
+	  //printf("\n\n\nPerformance Counter not found\n\n\n"); 
+	  return false;
   }
   else
   {
 	  RtTicksPerSec = (double) TicksPerSec;
 	  //printf("\n\n\nFrequency for Performance Counter: %g GHz (= 1 / %u)\n",(1000000000.0/RtTicksPerSec),TicksPerSec); 
 	  //printf("Resolution for Performance Counter: %g nanosec\n\n\n",TicksPerSec/1000000000.0); 
-	  RtUsePerformanceCounter = true;
+	  return true;
   }
 #endif
 }
@@ -67,19 +66,11 @@ double RtTimerFrequency()
 double RtTimeStamp()
 {
 #ifdef WIN32
-	if (RtUsePerformanceCounter)
-	{
-		static ULONGLONG TickCount; 
-//		DWORD_PTR oldmask = ::SetThreadAffinityMask(::GetCurrentThread(), 0);
-		QueryPerformanceCounter((LARGE_INTEGER*)&TickCount); 
-//		::SetThreadAffinityMask(::GetCurrentThread(), oldmask);
-		return (1000.0 * TickCount)/RtTicksPerSec;
-	}
-	else
-	{
-  	  clock_t StartTicks = clock();
-	  return (1000.0 * StartTicks)/CLOCKS_PER_SEC;
-	}
+	ULONGLONG TickCount; 
+//	DWORD_PTR oldmask = ::SetThreadAffinityMask(::GetCurrentThread(), 0);
+	QueryPerformanceCounter((LARGE_INTEGER*)&TickCount); 
+//	::SetThreadAffinityMask(::GetCurrentThread(), oldmask);
+	return (1000.0 * TickCount)/RtTicksPerSec;
 #else
 	struct timeval tv;
 	gettimeofday(&tv, 0); 

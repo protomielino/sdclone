@@ -39,7 +39,7 @@
 // Time Analysis
 // Robot developer API:
 //
-extern void RtInitTimer();						// Check performance counter hardware
+extern bool RtInitTimer();						// Check performance counter hardware
 extern double RtTimerFrequency();				// Get timer frequency in Hz
 extern double RtTimeStamp();					// Get time stamp in msec
 extern double RtDuration(double StartTimeStamp);// Calculate duration between time stamps
