@@ -55,6 +55,8 @@
 #ifndef _UNITOPPONENT_H_
 #define _UNITOPPONENT_H_
 
+//#undef TORCS_NG
+
 #include <car.h>
 #include <raceman.h>
 
@@ -116,6 +118,7 @@ class TOpponent
 	  double CatchDecel;
 	  double CatchAccTime;
 	  double CatchOffset;
+	  double CarDistLong;
 	  double DangerousLatchTime;
 	  double TeamMateDamage;
 	  double AvoidSide;

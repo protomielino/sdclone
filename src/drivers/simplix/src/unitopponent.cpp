@@ -9,7 +9,7 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.02.25
+// Last changed : 2009.07.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -58,6 +58,8 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
+//#undef TORCS_NG
+
 #include <robottools.h>
 
 #include "unitglobal.h"
@@ -260,8 +262,7 @@ bool TOpponent::Classify(
   // Initialization
   bool Result = false;
   oInfo.Flags = 0;                               // Reset Opps. flags
-  for (int I = 0; I < MAXBLOCKED; I++)
-	  oInfo.Blocked[I] = false;
+  oInfo.CarDistLong = INT_MAX;
 
   // Classification needed?
   if ((oCar == MyCar)                            // Can't avoid me myself
@@ -324,7 +325,7 @@ bool TOpponent::Classify(
 	MAX(30, MyState.Speed * MyState.Speed / 30); //   depending on my speed
 
   if ((oInfo.Flags & F_DANGEROUS) == 0)          // If not dangerouse, limit
-    DistAhead = MIN(MAX(50, DistAhead), 100);    // view to min 50 max 100 m
+    DistAhead = MIN(MAX(50, DistAhead), 200);    // view to min 50 max 200 m
 
   // Teammate?
 #ifdef TORCS_NG
@@ -348,6 +349,7 @@ bool TOpponent::Classify(
 	if (OpState.CarDistLong > OpState.MinDistLong)
 	{
       oInfo.Flags |= F_AHEAD | F_FRONT;          // Opp. is in front of me
+      oInfo.CarDistLong = OpState.CarDistLong;
 
       TParabel MyPar                             // Const. value as parabel!
 		(0, 0, 0, MyState.CarAvgAccLat);
@@ -384,7 +386,7 @@ bool TOpponent::Classify(
 		{                                        // The offset will be to small
           oInfo.Flags |= F_COLLIDE;              // Classify as potential collision
 
-          if (OpState.CarDistLong < OpState.MinDistLong + 0.15)
+          if (OpState.CarDistLong < OpState.MinDistLong + 0.5)
             oInfo.CatchDecel = 999;              // Maximum decel. needed
 		}
         else
@@ -435,10 +437,6 @@ bool TOpponent::Classify(
 	  }
 	  else                                       // Opp is at side
 	  {
-if ((MyCar->priv.driverIndex == 6) 
-&& (TDriver::CurrSimTime > 2)
-&& ((oCar->priv.driverIndex == 8) || (oCar->priv.driverIndex == 9)))
-oInfo.Flags = oInfo.Flags;   
 		if ((oInfo.Flags & F_TEAMMATE) == 0)
 		  oInfo.Flags |= F_AT_SIDE;              // Set flags
 		else

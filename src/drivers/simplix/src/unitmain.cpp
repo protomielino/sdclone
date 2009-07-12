@@ -48,6 +48,8 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
+//#undef TORCS_NG
+
 #include <tgf.h>
 #include <track.h>
 #include <car.h>

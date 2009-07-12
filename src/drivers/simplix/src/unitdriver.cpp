@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.05.16
+// Last changed : 2009.07.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -58,9 +58,12 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
+//#undef TORCS_NG
+
 #include <tmath/v2_t.h>
 #include <tgf.h>
 #include <robottools.h>
+#include <timeanalysis.h>
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -96,6 +99,8 @@ double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
 static char *WheelSect[4] =                        // TORCS defined sections
 {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+
+//static double cTimeSum[7] = {0,0,0,0,0,0,0};
 //==========================================================================*
 
 //==========================================================================*
@@ -209,7 +214,7 @@ TDriver::TDriver(int Index):
   // oRaceNumber
   oBrakeDiffInitial(2.0),
   oBrakeForceMax(0.5),
-  oBrakeScale(72.0),
+  oBrakeScale(INITIAL_BRAKE_SCALE),
   oInitialBrakeCoeff(0.5),
   oCar(NULL),
   oSteerAngle(0.0f),
@@ -265,6 +270,7 @@ TDriver::TDriver(int Index):
   oFuelNeeded(0.0),
   oRepairNeeded(0.0),
   oSideReduction(1.0),
+  oMinDistLong(FLT_MAX),
 
   NBRRL(0),
   oRL_FREE(0),
@@ -294,6 +300,7 @@ TDriver::TDriver(int Index):
   // Param
   oFuelPer100km(0.0),
   oMaxFuel(0.0),
+  oMaxPressure(INITIAL_BRAKE_PRESSURE),
   oBestLapTime(0.0),
   oBestFuelPer100km(0.0),
   oSpeedScale(0.0),
@@ -331,6 +338,10 @@ TDriver::TDriver(int Index):
 TDriver::~TDriver()
 {
 //  GfOut("#TDriver::~TDriver() >>>\n");
+//  for (int I = 0; I < oNbrCars; I++)
+//    delete oOpponents[I];
+  delete [] oOpponents; 
+
   if (oStrategy != NULL)
     delete oStrategy;
   if (oSysFooStuckX != NULL)
@@ -393,10 +404,13 @@ void TDriver::InitTrack
   GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
 
   oTrack = Track;                                // save pointers
+#ifdef TORCS_NG
   if (TrackLength < 2000)
 	RtTeamManagerLaps(3);
   else if (TrackLength < 3000)
 	RtTeamManagerLaps(2);
+#else
+#endif
 
   oSituation = Situation;
 
@@ -499,6 +513,16 @@ void TDriver::InitTrack
     , SECT_CAR, PRM_TANK                         //   Tankinhalt
     , (char*) NULL, 100.0);
   GfOut("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
+
+  oMaxPressure = GfParmGetNum(CarHandle          // Maximal möglicher
+    , "Brake System", MAXPRESSURE                //   Bremsdruck
+    , (char*) NULL, oMaxPressure);
+  GfOut("#oMaxPressure       = %.1f\n",oMaxPressure);
+
+  oBrakeScale *= MAX(1.0,INITIAL_BRAKE_PRESSURE / oMaxPressure);
+  GfOut("#oBrakeScale       = %.3f\n",oBrakeScale);
+  oBrakeForceMax *= oBrakeScale/INITIAL_BRAKE_SCALE;
+  GfOut("#oBrakeForceMax    = %.3f\n",oBrakeForceMax);
 
   // Next Params out of the own files
   PCarHandle Handle = NULL;                      // Start with an "empty file"
@@ -920,6 +944,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   oSituation = Situation;                        // file and situation
   oLastGear = CarGearNbr - 1;                    // Save index of last gear
 
+  // 
   OwnCarOppIndex();                              // Find own opponent index
 
   InitCarModells();                              // Initilize Car modells
@@ -955,6 +980,10 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
     Param.oCarParam.oScaleMu -= 0.1;
   }
 */
+/*
+ for (int I = 0; I < 2; I++)
+	cTimeSum[I] = 0.0;
+*/
   //GfOut("#<<< TDriver::NewRace()\n");
 }
 //==========================================================================*
@@ -987,12 +1016,23 @@ void TDriver::Drive()
   oAccel = 1.0;                                  // Assume full throttle
   oBrake = 0.0;                                  // Assume no braking
 
+  double StartTimeStamp = RtTimeStamp(); 
+
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track
 
   GetPosInfo(Pos,oLanePoint);                    // Get info about pts on track
-  oTargetSpeed = FilterStart(oLanePoint.Speed);  // Target for speed control
+  oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
+  oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
+
+//  cTimeSum[0] += RtDuration(StartTimeStamp);
+
   AvoidOtherCars(oLanePoint.Crv,Close,oLetPass); // General avoiding
+
+//  cTimeSum[1] += RtDuration(StartTimeStamp);
+
   oSteer = Steering();                           // Steering
+
+//  cTimeSum[2] += RtDuration(StartTimeStamp);
 
   if(Close)                                      // If opponents are close
   {
@@ -1014,13 +1054,14 @@ void TDriver::Drive()
   GearTronic();                                  // Shift if needed
   Turning();                                     // Check driving direction
   FlightControl();                               // Prepare landing while flying
-
+/*
   if (IsFullThrottle)                            // Learning only if untroubled
 	oMaxAccel.Measurement                        // get samples
 	  (CarSpeedLong,CarAccelLong);
-
+*/
   // Filters for brake
   oBrake = FilterBrake(oBrake);
+  oBrake = FilterBrakeSpeed(oBrake);
   oBrake = FilterABS(oBrake);
   if (oBrake == 0.0)
   {
@@ -1053,7 +1094,8 @@ void TDriver::Drive()
     oStrategy->CheckPitState(0.6f);              //  qualification
 
   //if ((oCurrSpeed < 100.0/3.6) && (CurrSimTime > 0) && (CurrSimTime < 10))
-  //  GfOut("t:%.2f s v:%.1f km/h A:%.3f C:%.3f G:%d\n",CurrSimTime,oCurrSpeed*3.6,oAccel,oClutch,oGear);
+  //if (fabs(oLanePoint.Crv) > 1/21.5)
+  //  GfOut("t:%.2f s v:%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,MAX(0.75,MIN(3.0,600000.0*fabs(oLanePoint.Crv * oLanePoint.Crv * oLanePoint.Crv))));
 }
 //==========================================================================*
 
@@ -1104,6 +1146,12 @@ void TDriver::Shutdown()
 	RtTeamManagerDump();
 	RtTeamManagerRelease();
 #endif
+/*
+	GfOut("\n\n\n");
+	for (int I = 0; I < 7; I++)
+		GfOut("cTimeSum[%d]: %g msec\n",I,cTimeSum[I]);
+	GfOut("\n\n\n");
+*/
 }
 //==========================================================================*
 
@@ -1123,11 +1171,21 @@ void TDriver::OwnCarOppIndex()
 {
   oOwnOppIdx = -1;                               // Mark as undefined
 
-  oNbrCars = oSituation->_ncars;                 // Save Nbr of cars in race
+  if (oNbrCars == 0)
+  {
+	// First call: Get memory
+    oNbrCars = oSituation->_ncars;               // Save Nbr of cars in race
+	oOpponents = new TOpponent[oNbrCars];
+
+    for (int I = 0; I < oNbrCars; I++)           // Loop all cars
+    {
+      oOpponents[I].Initialise                   // Initialize opponents
+	    (&oTrackDesc, oSituation, I);            //   situation
+	}
+  }
+
   for (int I = 0; I < oNbrCars; I++)             // Loop all cars
   {
-    oOpponents[I].Initialise                     // Initialize opponents
-	  (&oTrackDesc, oSituation, I);              //   situation
     if (oSituation->cars[I] == oCar)             // Check if is own car
       oOwnOppIdx = I;                            //   save index
   }
@@ -1292,7 +1350,7 @@ void TDriver::TeamInfo()
   oTeamIndex = RtTeamManagerIndex(oCar,oTrack,oSituation);
   RtTeamManagerDump();
 #else
-  oTeam = oCommonData->TeamManager.Add(oCar);
+  oTeam = oCommonData->TeamManager.Add(oCar,oSituation);
 #endif
   GfOut("#\n# %s Team: %s Teamindex: %d\n#\n",oBotName, oCar->_teamname, oTeamIndex);
 }
@@ -2196,6 +2254,7 @@ void TDriver::BrakingForceRegulator()
 
   oLastBrake = oBrake;
   oLastTargetSpeed = 0;
+
 }
 //==========================================================================*
 
@@ -2228,6 +2287,9 @@ void TDriver::BrakingForceRegulatorAvoid()
 	}
   }
 
+  if (oMinDistLong < 10.0)
+	oBrake *= 1.3;
+
   oLastTargetSpeed = 0;
 }
 //==========================================================================*
@@ -2252,7 +2314,7 @@ void TDriver::BrakingForceRegulatorTraffic()
   {
 	int	B = int(floor(oCurrSpeed/2));
 	oAccel = 0;
-	oBrake = MAX(0, MIN(oBrakeCoeff[B] * Diff, oBrakeForceMax));
+	oBrake = MAX(0, MIN(oBrakeCoeff[B] * Diff * Diff, oBrakeForceMax));
 	oLastBrakeCoefIndex = B;
 	oLastBrake = oBrake;
 	oLastTargetSpeed = 0;
@@ -2263,6 +2325,10 @@ void TDriver::BrakingForceRegulatorTraffic()
 		oLastTargetSpeed = oTargetSpeed;
 	}
   }
+
+  if (oMinDistLong < 10.0)
+	oBrake *= 1.3;
+
 }
 //==========================================================================*
 
@@ -2289,9 +2355,12 @@ void TDriver::EvaluateCollisionFlags(
 
   if (OppInfo.GotFlags(F_FRONT))                 // Is opponent in front of us
   {
+    if (oMinDistLong > OppInfo.CarDistLong)
+	  oMinDistLong = OppInfo.CarDistLong;
+
 	if (OppInfo.GotFlags(F_COLLIDE)
 	  && (OppInfo.CatchDecel > 12.5 * CarFriction))
-	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed);
+	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed * 0.9);
 
 	if (OppInfo.Flags & (F_COLLIDE | F_CATCHING))
 	  MinCatchTime = MIN(MinCatchTime, OppInfo.CatchTime);
@@ -2549,7 +2618,7 @@ void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
 //==========================================================================*
 
 //==========================================================================*
-// General avoidance controll
+// General avoidance control
 //--------------------------------------------------------------------------*
 void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 {
@@ -2557,6 +2626,10 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 	oOpponents[oOwnOppIdx].Info().State;
 
   int I;
+  for (I = 0; I < oNbrCars; I++)                 // All opponents
+	for (int J = 0; J < MAXBLOCKED; J++)		 //   all lanes
+	  oOpponents[I].Info().Blocked[J] = false;
+
   for (I = 0; I < oNbrCars; I++)                 // Get info about imminent
   {                                              //   collisions from
       oOpponents[I].Classify(                    //   all opponents depending
@@ -2663,7 +2736,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   }
 
   double TargetSpeed =                           // Adjust target speed
-	MIN(oTargetSpeed, Coll.TargetSpeed);
+	MIN(oTargetSpeed, Coll.TargetSpeed * 0.9);
 
   // Skilling from Andrew Sumner ...
   oTargetSpeed = CalcSkill(TargetSpeed);
@@ -2679,6 +2752,21 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 	oAvoidScale /(oAvoidWidth + HalfWidth);
 
   Runaround(Scale,Target,oDoAvoid);              // runaround most urgent obstacle
+}
+//==========================================================================*
+
+//==========================================================================*
+// Filter Start
+//--------------------------------------------------------------------------*
+double TDriver::FilterStart(double Speed)
+{
+  // Decrease target speed with increasing rank
+  if ((!Qualification) && (DistanceRaced < 1000))
+  {
+    double Offset = 0.01;
+    Speed *= MAX(0.6,(1.0 - (oCar->race.pos - 1) * Offset));
+  }
+  return Speed;
 }
 //==========================================================================*
 
@@ -2728,6 +2816,18 @@ double TDriver::FilterSkillBrake(double Brake)
 {
   //Brake *= oBrakeAdjustPerc;
   return Brake;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Reduces the brake value such that it fits the speed (more downforce -> more braking).
+//--------------------------------------------------------------------------*
+double TDriver::FilterBrakeSpeed(double Brake)
+{
+	float WF = Param.Tmp.oMass * G / Param.Fix.oCa;
+	float F2 = WF + 10000;
+	float F1 = WF + oCurrSpeed * oCurrSpeed;
+	return Brake * F1/F2;
 }
 //==========================================================================*
 
@@ -2821,25 +2921,6 @@ double TDriver::FilterTrack(double Accel)
     Accel *= oSideReduction;
   }
   return Accel;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Filter Start
-//--------------------------------------------------------------------------*
-double TDriver::FilterStart(double Speed)
-{
-  if (Qualification)
-  {
-    if (oIndex > 0)
-      return Speed * 0.98;
-	return Speed;
-  }
-
-  //if (DistanceRaced < TrackLength)
-  //  return Speed * 0.9;
-
-  return Speed;
 }
 //==========================================================================*
 

@@ -36,6 +36,8 @@
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
 
+//#undef TORCS_NG
+
 // The great question, ...
 #if defined(WIN32) || defined(_WIN32)
 #include <windows.h>     // The rich world of windows and gates, ...
@@ -355,6 +357,9 @@ enum
 #define DELTA_T 0.0001   
 #define UNSTUCK_COUNTER 90
 #define MAXBLOCKED 9
+#define MAXPRESSURE "max pressure"
+#define INITIAL_BRAKE_PRESSURE 30000000.0
+#define INITIAL_BRAKE_SCALE 72.0
 // ... Internal parameters
 
 // Parameters of this robot ...

@@ -9,7 +9,7 @@
 //
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.02.01
+// Last changed : 2009.07.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -294,7 +294,6 @@ void TPitLane::MakePath
     F[1] = 0.0;                                  // swap
     F[2] = 1.0;
   }
-
   oStoppingDist = Param.Pit.oStoppingDist;       // Distance to brake
   oPitStopOffset = Param.Pit.oLongOffset;        // Offset for fine tuning
   double PitLaneOffset =                         // Offset of the pitlane
@@ -302,11 +301,11 @@ void TPitLane::MakePath
 	- PitInfo->width;                            //   track
 
   oCarParam.oScaleBrake =                        // Limit brake to be used
-	MIN(1.30,CarParam.oScaleBrake);              //   in pitlane
+	MIN(0.60f,CarParam.oScaleBrake);              //   in pitlane
   oCarParam.oScaleMu =                           // Scale friction estimation
-	MIN(1.30,CarParam.oScaleMu);                 //   of pitlane
+	MIN(1.00f,CarParam.oScaleMu);                 //   of pitlane
 
-  float Ratio = 0.5 * 
+  float Ratio = (float) 0.5 * 
 	  PitInfo->len / (fabs(PitInfo->driversPits->pos.toMiddle) - PitLaneOffset);
 
   // Compute pit spline points along the track defined by TORCS

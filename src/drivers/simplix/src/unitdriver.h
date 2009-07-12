@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.02.25
+// Last changed : 2009.07.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -55,6 +55,8 @@
 //--------------------------------------------------------------------------*
 #ifndef _UNITDRIVER_H_
 #define _UNITDRIVER_H_
+
+//#undef TORCS_NG
 
 #include <track.h>
 #include <car.h>
@@ -184,6 +186,7 @@ private:
 	double FilterABS(double Brake);              // ABS filter
     double FilterBrake(double Brake);            // 
     double FilterSkillBrake(double Brake);
+    double FilterBrakeSpeed(double Brake);
 
 	double FilterDrifting(double Accel);         // Drifting
 	double FilterLetPass(double Accel);          // Reduce accel
@@ -236,7 +239,8 @@ private:
 	int	oFlying;				                 // Flag prepare landing 
 	int oNbrCars;                                // Nbr of cars in race
 	int	oOwnOppIdx;                              // Index of own car in list of opponents
-	TOpponent oOpponents[cMAX_OPP];		         // Infos about other cars.
+//	TOpponent oOpponents[cMAX_OPP];		         // Infos about other cars.
+	TOpponent* oOpponents;						 // Infos about other cars.
 
 	double oAvoidRange;				             // Where we are T->LR (0..1).
 	double oAvoidRangeDelta;                     // Delta to change range
@@ -324,6 +328,7 @@ private:
     double oFuelNeeded;
 	double oRepairNeeded;
 	float oSideReduction;
+	double oMinDistLong;
 
 
 	int NBRRL;
@@ -358,6 +363,7 @@ private:
 	TParam Param;                                // Parameters
 	double oFuelPer100km;                        //
 	double oMaxFuel;                             // tank capacity
+	double oMaxPressure;                         // brake pressure
 	double oBestLapTime;
 	double oBestFuelPer100km;                    //
 	double oSpeedScale;                          //

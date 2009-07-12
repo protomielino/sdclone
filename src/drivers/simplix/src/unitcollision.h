@@ -2,17 +2,17 @@
 // unitcollision.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Collisions and avoiding
 // Kollisionen ausweichen
 //
-// Datei    : unitcollision.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
-//--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
+// File         : unitcollision.h
+// Created      : 2007.11.17
+// Last changed : 2009.02.25
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -39,21 +39,24 @@
 //    Copyright: (C) 2006-2007 Tim Foden
 //
 //--------------------------------------------------------------------------*
-// Diese Version wurde mit MS Visual C++ 2005 Express Edition entwickelt.
-//--------------------------------------------------------------------------*
+// This program was developed and tested on windows XP
+// There are no known Bugs, but:
+// Who uses the files accepts, that no responsibility is adopted
+// for bugs, dammages, aftereffects or consequential losses.
+//
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
 // Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
 // Folgefehler oder Folgeschäden keine Haftung übernommen wird.
-//
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
-// GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
+//
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// GNU GPL (General Public License)
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #ifndef _UNITCOLLISION_H_
 #define _UNITCOLLISION_H_
@@ -79,6 +82,7 @@ class TCollision
 	  double MinRSideDist;
 	  double MinLDist;                           // Min dist. left side
 	  double MinRDist;                           // Min dist. right side
+	  double CarDistLong;
       int NextSide;                              // Side of next curve
 	  int OppsAhead;                             // Opponents ahead?
 	  int OppsAtSide;                            // Opponents at side?
@@ -93,6 +97,7 @@ class TCollision
 		MinRSideDist(INT_MAX),
 		MinLDist(INT_MAX),
 		MinRDist(INT_MAX),
+		CarDistLong(INT_MAX),
 		NextSide(0),
 		OppsAhead(0),
 		OppsAtSide(0),

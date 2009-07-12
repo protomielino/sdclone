@@ -58,6 +58,8 @@
 #ifndef _UNITCOMMONDATA_H_
 #define _UNITCOMMONDATA_H_
 
+//#undef TORCS_NG
+
 #include <track.h>
 #include "unitglobal.h"
 #ifdef TORCS_NG

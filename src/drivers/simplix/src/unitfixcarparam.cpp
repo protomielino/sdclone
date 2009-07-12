@@ -9,7 +9,7 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.04.26
+// Last changed : 2009.07.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -55,8 +55,8 @@
 TFixCarParam::TFixCarParam():
   oCar(NULL),
   oTmpCarParam(NULL),
-  oBorderInner(0.25),
-  oBorderOuter(0.25),
+  oBorderInner(0.5),
+  oBorderOuter(0.5),
   oMaxBorderInner(1.00),
   oBorderScale(50.0),
   oCa(0),
@@ -173,25 +173,27 @@ double	TFixCarParam::CalcBraking
   double Friction,                               // Friction
   double TrackRollAngle) const                   // Track roll angle
 {
-  Friction *= 0.95;
+  if (Speed > 180/3.6)
+    Friction *= 0.90;
+  else
+    Friction *= 0.95;
   double Mu = Friction * oTyreMu;
   double Mu_F = Mu;
   double Mu_R = Mu;
 
   Mu_F = Friction * oTyreMuFront;
   Mu_R = Friction * oTyreMuRear;
-//  Mu = (Mu_F + Mu_R) / 2;
   Mu = MIN(Mu_F,Mu_R);
 
   // From TORCS:
   double Cd = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
-//  double Crv = (Crv0 + Crv1) * 0.5;
-//  double Crvz = (Crvz0 + Crvz1) * 0.5;
-  double Crv = (0.25*Crv0 + 0.75*Crv1);
-  double AbsCrv = fabs(Crv1);
+  double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
+
+  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
+
   if (Crvz > 0)
 	Crvz = 0; 
 
@@ -229,7 +231,7 @@ double	TFixCarParam::CalcBraking
     
 	if (TDriver::UseBrakeLimit)
 	{
-      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale * (AbsCrv - TDriver::BrakeLimitBase));
+      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale * (fabs(Crv) - TDriver::BrakeLimitBase));
 	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
 	}
 
@@ -258,24 +260,26 @@ double	TFixCarParam::CalcBrakingPit
   double Friction,                               // Friction
   double TrackRollAngle) const                   // Track roll angle
 {
-  Friction *= 0.95;
+  if (Speed > 180/3.6)
+    Friction *= 0.90;
+  else
+    Friction *= 0.95;
   double Mu = Friction * oTyreMu;
   double Mu_F = Mu;
   double Mu_R = Mu;
 
   Mu_F = Friction * oTyreMuFront;
   Mu_R = Friction * oTyreMuRear;
-//  Mu = (Mu_F + Mu_R) / 2;
   Mu = MIN(Mu_F,Mu_R);
 
   // From TORCS:
   double Cd = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
-  double Crv = (Crv0 + Crv1) * 0.5;
-  double Crvz = (Crvz0 + Crvz1) * 0.5;
-  if (Crvz > 0)
-	Crvz = 0; 
+  double Crv = (0.3*Crv0 + 0.9*Crv1);
+  double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
+
+  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat  = G * sin(TrackRollAngle);
@@ -352,9 +356,20 @@ double TFixCarParam::CalcMaxSpeed
   double AbsCrv = AbsCrv0;
   double factor = 1.0;
   if (AbsCrv > AbsCrv1)
-	factor = 1.00;
+  {
+    if (fabs(AbsCrv) > 1/21.5)
+      AbsCrv *= MAX(0.75,MIN(5.0,600000.0*AbsCrv*AbsCrv*AbsCrv));
+
+	factor = 1.015;
+  }
   else
+  {
 	factor = 0.985;
+    if (fabs(AbsCrv) > 1/21.5)
+      AbsCrv *= MAX(0.75,MIN(5.0,600000.0*AbsCrv*AbsCrv*AbsCrv));
+	else
+      AbsCrv *= MAX(0.75,MIN(3.0,600000.0*AbsCrv*AbsCrv*AbsCrv));
+  }
 
   if (TDriver::UseBrakeLimit)
   {
@@ -382,9 +397,10 @@ double TFixCarParam::CalcMaxSpeed
    Den = 0.00001;
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
-
-  if (Speed > 150)                               // (100 m/s = 360 km/h)
-    Speed = 150;                                 // (150 m/s = 540 km/h)
+  if (fabs(AbsCrv) > 1/21.5)
+    Speed *= 0.90;                               // Filter hairpins
+  else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
+    Speed = 112;                                 
 
   return Speed;
 }
@@ -407,8 +423,7 @@ double TFixCarParam::CalcMaxLateralF
 //--------------------------------------------------------------------------*
 double TFixCarParam::CalcMaxSpeedCrv() const
 {
-//  const double MAX_SPD = 100; // 360 km/h
-  const double MAX_SPD = 150; // 540 km/h
+  const double MAX_SPD = 112; // 400 km/h
   return G * oTyreMu / (MAX_SPD * MAX_SPD);
 }
 //==========================================================================*
