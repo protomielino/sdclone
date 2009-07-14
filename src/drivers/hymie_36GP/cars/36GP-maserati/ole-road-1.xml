@@ -41,10 +41,10 @@
 	<attnum name="0 speed limit" val="51"/>
 	<attnum name="1 begin div" val="820"/>
 	<attnum name="1 end div" val="840"/>
-	<attnum name="1 speed limit" val="30"/>
+	<attnum name="1 speed limit" val="32"/>
 	<attnum name="8 begin div" val="855"/>
 	<attnum name="8 end div" val="865"/>
-	<attnum name="8 speed limit" val="30"/>
+	<attnum name="8 speed limit" val="32"/>
 
 	<attnum name="2 begin div" val="1080"/>
 	<attnum name="2 end div" val="1090"/>
@@ -61,10 +61,6 @@
 	<attnum name="9 begin div" val="1160"/>
 	<attnum name="9 end div" val="1180"/>
 	<attnum name="9 speed limit" val="22"/>
-
-	<attnum name="10 begin div" val="1250"/>
-	<attnum name="10 end div" val="1480"/>
-	<attnum name="10 mu scale" val="0.6"/>
 
 	<attnum name="6 begin div" val="1500"/>
 	<attnum name="6 end div" val="1580"/>

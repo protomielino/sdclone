@@ -24,7 +24,7 @@
 	<attnum name="curv cutoff" val="0.003"/>
 	<attnum name="acc scale" val="1.25"/>
 	<attnum name="brk scale" val="1.15"/>
-	<attnum name="mu scale" val="0.57"/>
+	<attnum name="mu scale" val="0.60"/>
 	<attnum name="factor 0" val="1.010"/>
 	<attnum name="steer k acc" val="2.2"/>
 	<attnum name="steer k dec" val="2.2"/>
@@ -41,10 +41,6 @@
 	<attnum name="1 mu scale" val="0.45"/>
 	<attnum name="1 brk scale" val="1.02"/>
 	<attnum name="1 right margin" val="1.50"/>
-
-	<attnum name="2 begin div" val="861"/>
-	<attnum name="2 end div" val="910"/>
-	<attnum name="2 mu scale" val="0.50"/>
   </section>
 
 </params>

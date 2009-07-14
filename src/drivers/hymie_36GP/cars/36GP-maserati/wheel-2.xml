@@ -36,13 +36,9 @@
 	<attnum name="0 end div" val="160"/>
 	<attnum name="0 brk scale" val="0.85"/>
 
-	<attnum name="1 begin div" val="660"/>
-	<attnum name="1 end div" val="770"/>
-	<attnum name="1 mu scale" val="0.70"/>
-
-	<attnum name="2 begin div" val="920"/>
-	<attnum name="2 end div" val="940"/>
-	<attnum name="2 mu scale" val="0.65"/>
+	<attnum name="1 begin div" val="920"/>
+	<attnum name="1 end div" val="940"/>
+	<attnum name="1 mu scale" val="0.60"/>
 
 	<attnum name="2 begin div" val="1200"/>
 	<attnum name="2 end div" val="1280"/>

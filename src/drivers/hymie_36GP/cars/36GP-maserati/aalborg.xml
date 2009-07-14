@@ -36,18 +36,27 @@
 	<attnum name="0 end div" val="164"/>
 	<attnum name="0 right margin" val="1.40"/>
 
+	<attnum name="4 begin div" val="170"/>
+	<attnum name="4 end div" val="189"/>
+	<attnum name="4 right margin" val="0.50"/>
+
 	<attnum name="1 begin div" val="190"/>
 	<attnum name="1 end div" val="210"/>
 	<attnum name="1 left margin" val="1.00"/>
 
+	<attnum name="5 begin div" val="520"/>
+	<attnum name="5 end div" val="540"/>
+	<attnum name="5 left margin" val="0.90"/>
+
 	<attnum name="2 begin div" val="600"/>
 	<attnum name="2 end div" val="640"/>
-	<attnum name="2 right margin" val="0.60"/>
-	<attnum name="2 left margin" val="0.60"/>
+	<attnum name="2 right margin" val="0.90"/>
+	<attnum name="2 left margin" val="0.90"/>
 
 	<attnum name="3 begin div" val="700"/>
 	<attnum name="3 end div" val="740"/>
-	<attnum name="3 right margin" val="1.60"/>
+	<attnum name="3 right margin" val="1.90"/>
+	<attnum name="3 mu scale" val="0.25"/>
   </section>
 
 </params>

@@ -22,9 +22,9 @@
 	<attnum name="aero mod" val="0"/>
 	<attnum name="brake mod" val="1"/>
 	<attnum name="curv cutoff" val="0.0005"/>
-	<attnum name="acc scale" val="1.15"/>
+	<attnum name="acc scale" val="1.05"/>
 	<attnum name="brk scale" val="1.00"/>
-	<attnum name="mu scale" val="0.76"/>
+	<attnum name="mu scale" val="0.80"/>
 	<attnum name="factor 0" val="1.010"/>
 	<attnum name="steer k acc" val="2.2"/>
 	<attnum name="steer k dec" val="2.2"/>
@@ -38,13 +38,9 @@
 	<attnum name="0 left margin" val="1.0"/>
 	<attnum name="0 brk scale" val="0.85"/>
 
-	<attnum name="4 begin div" val="240"/>
-	<attnum name="4 end div" val="300"/>
-	<attnum name="4 mu scale" val="0.70"/>
-
 	<attnum name="1 begin div" val="580"/>
 	<attnum name="1 end div" val="720"/>
-	<attnum name="1 mu scale" val="0.74"/>
+	<attnum name="1 mu scale" val="0.79"/>
 
 	<attnum name="2 begin div" val="900"/>
 	<attnum name="2 end div" val="920"/>
@@ -52,7 +48,7 @@
 
 	<attnum name="3 begin div" val="1130"/>
 	<attnum name="3 end div" val="1200"/>
-	<attnum name="3 mu scale" val="0.6"/>
+	<attnum name="3 mu scale" val="0.7"/>
   </section>
 
 </params>

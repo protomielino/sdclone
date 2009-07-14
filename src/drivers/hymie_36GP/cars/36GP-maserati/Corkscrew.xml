@@ -23,8 +23,8 @@
 	<attnum name="brake mod" val="1"/>
 	<attnum name="curv cutoff" val="0.003"/>
 	<attnum name="acc scale" val="1.00"/>
-	<attnum name="brk scale" val="0.90"/>
-	<attnum name="mu scale" val="0.58"/>
+	<attnum name="brk scale" val="0.95"/>
+	<attnum name="mu scale" val="0.60"/>
 	<attnum name="factor 0" val="1.010"/>
 	<attnum name="steer k acc" val="2.2"/>
 	<attnum name="steer k dec" val="2.2"/>
@@ -43,8 +43,8 @@
 
 	<attnum name="2 begin div" val="770"/>
 	<attnum name="2 end div" val="840"/>
-	<attnum name="2 mu scale" val="0.46"/>
-	<attnum name="2 brk scale" val="0.70"/>
+	<attnum name="2 mu scale" val="0.50"/>
+	<attnum name="2 brk scale" val="0.80"/>
 
 	<attnum name="3 begin div" val="1030"/>
 	<attnum name="3 end div" val="1100"/>
