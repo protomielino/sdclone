@@ -51,6 +51,7 @@ void	Opponent::Initialise( MyTrack* pTrack, CarElt* pCar )
 
 	m_info.flags = 0;
 	m_info.avoidLatchTime = 0;
+	m_tracklen = pTrack->GetLength();
 }
 
 CarElt*	Opponent::GetCar()
@@ -167,6 +168,57 @@ void	Opponent::UpdateSit(
 		relPos += trackLen;
 
 	m_info.sit.relPos = relPos;
+}
+
+void	Opponent::CanOvertake(
+		const MyRobot&		me,
+		const CarElt *car, 
+		const CarElt *ocar, 
+		double aggression, 
+		int side)
+{
+	int segid = car->_trkPos.seg->id;
+	int osegid = ocar->_trkPos.seg->id;
+
+	PtInfo	mpi, opi, oapi, mapi;
+	me.GetPtInfo( MyRobot::PATH_NORMAL, ocar->_distFromStartLine*0.5, opi );
+	me.GetPtInfo( MyRobot::PATH_NORMAL, car->_distFromStartLine*0.5, mpi );
+	me.GetPtInfo( (side == TR_LFT ? MyRobot::PATH_LEFT : MyRobot::PATH_RIGHT), ocar->_distFromStartLine*0.5, oapi );
+	me.GetPtInfo( (side == TR_LFT ? MyRobot::PATH_LEFT : MyRobot::PATH_RIGHT), car->_distFromStartLine*0.5, mapi );
+
+	double orInv=opi.k, oAspeed=oapi.spd;
+
+	double rInv = MAX(fabs(mpi.k), fabs(opi.k));
+
+	double odist = ocar->_distFromStartLine;
+	double mdist = car->_distFromStartLine;
+	if (odist < mdist)
+		odist += m_tracklen;
+
+	double distance = (odist - mdist);
+        distance *= MAX(0.5, 1.0 - (ocar->_pos > car->_pos ? MIN(distance/2, 3.0) : 0.0));
+
+	double speed = car->_speed_x;
+	double avspeed = MIN(mapi.spd, speed + 2.0);
+	speed = MIN(avspeed, (speed + MAX(0.0, (30.0 - distance) * MAX(0.1, 1.0 - MAX(0.0, rInv-0.001)*80))));
+	double ospeed = ocar->_speed_x;
+	double timeLimit = 3.0 - MIN(2.4, rInv * 1000);
+	double timeImpact = MAX(0.0, distance / (speed - ospeed));
+
+	double speeddiff = (MIN(speed, avspeed) - ospeed) * 2;
+	if ((side == TR_LFT && mpi.k < 0.0) || (side == TR_RGT && mpi.k > 0.0))
+		ospeed *= 1.0 + rInv*3;
+
+	double catchdist = (double) ((speed*distance)/(speed-ospeed)) * 0.8 + distance/10;
+	double mcd = car->_speed_x * (2.0 - MIN(1.5, rInv * 500));
+
+	if (catchdist < mcd && MIN(speed, avspeed) > ospeed && 
+	    (distance * (1.0-aggression) < MIN(speeddiff, catchdist/4 + 2.0) * (1.0-rInv*30) ||
+	     timeImpact * (1.0-aggression) < timeLimit))
+	{
+		m_info.newCatchDist = catchdist + 0.1;
+		m_info.canOvertake = true;
+	}
 }
 
 void	Opponent::ProcessMyCar(
@@ -423,6 +475,12 @@ void	Opponent::ProcessMyCar(
 //	me.GetPtInfo( MyRobot::PATH_NORMAL, catPos * 0.5, pi );
 	me.GetPtInfo( MyRobot::PATH_NORMAL, oCar->_distFromStartLine*0.5, pi );
 	me.GetPtInfo( MyRobot::PATH_NORMAL, myCar->_distFromStartLine*0.5, mypi );
+
+	m_info.newCatchDist = 10000.0;
+	m_info.canOvertake = false;
+
+	if ((m_info.flags & F_AHEAD) && (m_info.flags & F_FRONT))
+		CanOvertake(me, myCar, oCar, aggression, (myCar->_trkPos.toLeft > oCar->_trkPos.toLeft ? TR_RGT : TR_LFT));
 
 	const double myk = MAX(fabs(mypi.k), fabs(pi.k));
 	const double closeDist = 3.0 * MAX(0.0, 1.0 - myk*200) * m_otscale;

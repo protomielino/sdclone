@@ -343,7 +343,7 @@ void	MyRobot::InitTrack(
 	m_cm.RI_CUTOFF = GfParmGetNum(hCarParm, SECT_PRIV, PRV_RI_CUTOFF, NULL, 0.0f);
 	m_cm.YR_ACCEL = GfParmGetNum(hCarParm, SECT_PRIV, PRV_YR_ACCEL, NULL, 0.0f);
 
-	if (m_skill > 0.0)
+	if (m_skill > 0.0 && pS->_raceType != RM_TYPE_PRACTICE)
 	{
 		m_cm.LFT_MARGIN = MAX(m_cm.LFT_MARGIN, m_skill/12);
 		m_cm.RGT_MARGIN = MAX(m_cm.RGT_MARGIN, m_skill/12);
@@ -480,6 +480,8 @@ void	MyRobot::NewRace( int index, tCarElt* pCar, tSituation* pS )
 
 	SetRandomSeed((index + 1));
 
+	m_pCar = pCar;
+
 	m_cm.MASS = GfParmGetNum(pCar->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0);
 
     float fwingarea = GfParmGetNum(pCar->_carHandle, SECT_FRNTWING,
@@ -554,8 +556,11 @@ void	MyRobot::NewRace( int index, tCarElt* pCar, tSituation* pS )
 //	cm.CD = cx * frontArea + wingca;
 //	m_cm.CD = 0.645 * cx * frontArea;
 	m_cm2 = m_cm;
-	m_cm2.BRK_SCALE = GfParmGetNum(pCar->_carHandle, SECT_PRIV, PRV_AVOID_BRK_SCALE, NULL, 0.9f);
-	m_cm2.MU_SCALE = MN(1.0, m_cm.MU_SCALE);
+	//m_cm2.RI_CUTOFF = 0.0f;
+	double mu_factor = GfParmGetNum(pCar->_carHandle, SECT_PRIV, PRV_MU_FACTOR, NULL, 1.00f);
+	double brk_factor = GfParmGetNum(pCar->_carHandle, SECT_PRIV, PRV_BRK_FACTOR, NULL, 1.00f);
+	m_cm2.BRK_SCALE = GfParmGetNum(pCar->_carHandle, SECT_PRIV, PRV_AVOID_BRK_SCALE, NULL, 0.9f) * brk_factor;
+	m_cm2.MU_SCALE = GfParmGetNum(pCar->_carHandle, SECT_PRIV, PRV_AVOID_MU_SCALE, NULL, m_cm.MU_SCALE * 0.9) * mu_factor;
 	{ for (int i=0; i<m_cm2.m_pmused; i++)
 	{
 		char tmpstr[64];
@@ -567,12 +572,12 @@ void	MyRobot::NewRace( int index, tCarElt* pCar, tSituation* pS )
 		if (avoid_mu_scale > 0.1)
 			m_cm2.m_pm[i].MU_SCALE = avoid_mu_scale;
 		else
-			m_cm2.m_pm[i].MU_SCALE = MN(1.0, m_cm.m_pm[i].MU_SCALE);
+			m_cm2.m_pm[i].MU_SCALE = -1.0;
 
 		if (avoid_brk_scale > 0.1)
 			m_cm2.m_pm[i].BRK_SCALE = avoid_brk_scale;
 		else
-			m_cm2.m_pm[i].BRK_SCALE = m_cm2.BRK_SCALE;
+			m_cm2.m_pm[i].BRK_SCALE = -1.0;
 
 		m_cm2.m_pm[i].AHEAD_FACTOR = MN(10, m_cm.m_pm[i].AHEAD_FACTOR/2);
 	}}
@@ -758,6 +763,7 @@ loadpathend:
 
 	m_reverseTime = 0.0;
 	m_realSpeed = 0.0;
+
 }
 
 void	MyRobot::GetPtInfo( int path, double pos, PtInfo& pi ) const
@@ -769,16 +775,18 @@ void	MyRobot::GetPtInfo( int path, double pos, PtInfo& pi ) const
 		m_path[path].GetPtInfo( pos, pi );
 }
 
-void	InterpPtInfo( PtInfo& pi0, const PtInfo& pi1, double t )
+void	InterpPtInfo( PtInfo& pi0, const PtInfo& pi1, double t, double sa )
 {
 //		pi.k	= piL.k    * (1 - t) + piR.k    * t;
 		pi0.k	= Utils::InterpCurvature(pi0.k, pi1.k, t);
 		double	deltaOAng = pi1.oang - pi0.oang;
 		NORM_PI_PI(deltaOAng);
 		pi0.oang = pi0.oang + deltaOAng * t;
-		pi0.offs = pi0.offs * (1 - t) + pi1.offs * t;
-		pi0.spd	 = pi0.spd  * (1 - t) + pi1.spd  * t;
-//		pi.toL
+		pi0.offs = pi0.offs * (1.0 - t) + pi1.offs * t;
+
+		t -= MIN(t, sa/2);
+		double spda = MIN(pi1.spd, MAX(pi1.spd*0.6, pi0.spd));
+		pi0.spd	 = spda  * (1.0 - t) + pi1.spd  * t;
 }
 
 void	MyRobot::GetPosInfo(
@@ -789,22 +797,41 @@ void	MyRobot::GetPosInfo(
 {
 	GetPtInfo( PATH_NORMAL, pos, pi );
 
+	PtInfo	pirN;
+	PtInfo  pir = pi;
 	PtInfo	piL, piR;
 
 	if( u != 1 )
 	{
 		GetPtInfo( PATH_LEFT,  pos, piL );
 		GetPtInfo( PATH_RIGHT, pos, piR );
+		GetPtInfo( PATH_NORMAL, pos + 10, pirN );
 
 		double	s = u;
 		double	t = (v + 1) * 0.5;
 
-		InterpPtInfo( piL, pi, s );
-		InterpPtInfo( piR, pi, s );
+		InterpPtInfo( piL, pi, s, m_speedangle );
+		InterpPtInfo( piR, pi, s, m_speedangle );
 
 		pi = piL;
 
-		InterpPtInfo( pi, piR, t );
+		InterpPtInfo( pi, piR, t, m_speedangle );
+
+		double avspeed = MAX((m_pCar->_speed_x+0.4) - (MAX(0.0, 1.6 - fabs(MAX(0.0, m_carangle - m_speedangle))*5)), pi.spd);
+		double pispeed = pi.spd;
+
+		if ((m_avoidT < 0.0 && pir.k > 0.0 && pirN.offs < pir.offs) ||
+		    (m_avoidT > 0.0 && pir.k < 0.0 && pirN.offs > pir.offs))
+		{
+			// exiting from corner inside raceline
+			pi.spd = pir.spd;
+		}
+		else if (m_avoidT > 0.0 && pir.k > 0.0)
+			pi.spd = MIN(pi.spd, piL.spd);
+		else if (m_avoidT < 0.0 && pir.k < 0.0)
+			pi.spd = MIN(pi.spd, piR.spd);
+		else
+			pi.spd = avspeed;
 	}
 }
 
@@ -822,8 +849,8 @@ double	MyRobot::CalcPathTarget( double pos, double offs, double s ) const
 	GetPtInfo( PATH_LEFT, pos, piL );
 	GetPtInfo( PATH_RIGHT, pos, piR );
 
-	InterpPtInfo( piL, pi, s );
-	InterpPtInfo( piR, pi, s );
+	InterpPtInfo( piL, pi, s, m_speedangle );
+	InterpPtInfo( piR, pi, s, m_speedangle );
 
 	double	t = (offs - piL.offs) / (piR.offs - piL.offs);
 
@@ -844,8 +871,8 @@ Vec2d	MyRobot::CalcPathTarget2( double pos, double offs ) const
 
 	double	s = m_avoidS;
 
-	InterpPtInfo( piL, pi, s );
-	InterpPtInfo( piR, pi, s );
+	InterpPtInfo( piL, pi, s, m_speedangle );
+	InterpPtInfo( piR, pi, s, m_speedangle );
 
 	double	t = (offs - piL.offs) / (piR.offs - piL.offs);
 
@@ -859,10 +886,10 @@ double	MyRobot::CalcPathOffset( double pos, double s, double t ) const
 	GetPtInfo( PATH_LEFT, pos, piL );
 	GetPtInfo( PATH_RIGHT, pos, piR );
 
-	InterpPtInfo( piL, pi, s );
-	InterpPtInfo( piR, pi, s );
+	InterpPtInfo( piL, pi, s, m_speedangle );
+	InterpPtInfo( piR, pi, s, m_speedangle );
 
-	InterpPtInfo( piL, piR, (t + 1) * 0.5 );
+	InterpPtInfo( piL, piR, (t + 1) * 0.5, m_speedangle );
 
 	return piL.offs;
 }
@@ -1676,6 +1703,13 @@ void	MyRobot::CalcSkill( tSituation *s )
 
 void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 {
+	double trackangle = RtTrackSideTgAngleL( &(car->_trkPos) );
+	m_carangle = trackangle - car->_yaw;
+	NORM_PI_PI(m_carangle);
+	m_carangle = -m_carangle;
+	m_speedangle = -(trackangle - atan2(car->_speed_Y, car->_speed_X));
+	NORM_PI_PI(m_speedangle);
+
 	CalcSkill( s );
 
 	m_realSpeed = 0.0;
@@ -1783,18 +1817,12 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 
 	// steer into skid
 #if 1
-	double trackangle = RtTrackSideTgAngleL( &(car->_trkPos) );
-	double carangle = trackangle - car->_yaw;
-	NORM_PI_PI(carangle);
-	carangle = -carangle;
-	double speedangle = -(trackangle - atan2(car->_speed_Y, car->_speed_X));
-	NORM_PI_PI(speedangle);
-	double nextangle = carangle + car->_yaw_rate/3;
-//fprintf(stderr,"ta=%.3f ca=%.3f sa=%.3f na=%.3f steer=%.3f ",trackangle,carangle,speedangle,nextangle,steer);
-	if (fabs(nextangle) > fabs(speedangle))
+	double nextangle = m_carangle + car->_yaw_rate/3;
+//fprintf(stderr,"ta=%.3f ca=%.3f sa=%.3f na=%.3f steer=%.3f ",trackangle,m_carangle,m_speedangle,nextangle,steer);
+	if (fabs(nextangle) > fabs(m_speedangle))
 	{
-		double sa = MAX(-0.3, MIN(0.3, speedangle/3));
-		double anglediff = (speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
+		double sa = MAX(-0.3, MIN(0.3, m_speedangle/3));
+		double anglediff = (m_speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
 		steer += anglediff * (SKIDSTEER + MAX(1.0, 1.0 - car->_accel_x/5));
 //fprintf(stderr," + %.3f ",anglediff*SKIDSTEER);
 	}
@@ -1847,7 +1875,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 	const double G = 9.81;
 
 	double	acc = (!m_pitControl.WantToPit() ? 0.5 : 1.0);
-	double	brk = 0;
+	double	brk = 0.0;
 
 	double	targetSpd = pi.spd;
 	double	skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
@@ -1910,7 +1938,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 
 	brk *= BRAKE_PRESSURE;
 
-	if (m_skill > 0.0)
+	if (m_skill > 0.0 && s->_raceType != RM_TYPE_PRACTICE)
 	{
 		// apply random skill changes
 		double turndecel = m_skill_decel_adjust_perc * 2;
@@ -2027,12 +2055,12 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 	double	dirAng = pi.oang - car->_yaw;
 	NORM_PI_PI(dirAng);
 	if( gear > 0 && s->currentTime - m_reverseTime < 5.0 && m_reverseTime <= s->currentTime &&
-		(fabs(dirAng) > 75 * PI / 180 || fabs(carangle) > 1.4))//car->_speed_x < 0 )
+		(fabs(dirAng) > 75 * PI / 180 || fabs(m_carangle) > 1.4))//car->_speed_x < 0 )
 	{
 //		GfOut( "Backwards (dirAng %lg) (offs %lg)\n", dirAng, pi.offs );
 //		if( dirAng * pi.offs < 0 )
 		if( dirAng * car->_trkPos.toMiddle < 0 || 
-		    (spd0 < 1 && fabs(carangle) > 0.8 + 
+		    (spd0 < 1 && fabs(m_carangle) > 0.8 + 
 		      MN(0.7, MX(0.0, car->_trkPos.seg->width -
 		       MN(car->_trkPos.toLeft, car->_trkPos.toRight))/10)) )
 		{
@@ -2045,7 +2073,7 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 	}
 	if (car->_gear == -1 && 
 		gear > 0 && 
-		fabs(carangle) > 1.3 && 
+		fabs(m_carangle) > 1.3 && 
 		s->currentTime - m_reverseTime < 4.0 &&
 		m_reverseTime <= s->currentTime)
 	{
@@ -2071,13 +2099,19 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
 	}
 
 	if (gear == -1 && car->_speed_x < -5.0 && 
-	    ((car->_trkPos.toMiddle > 2.0 && speedangle > 0.4 && speedangle < 2.8) ||
-	     (car->_trkPos.toMiddle < -2.0 && speedangle < -0.4 && speedangle > -2.8)))
+	    ((car->_trkPos.toMiddle > 2.0 && m_speedangle > 0.4 && m_speedangle < 2.8) ||
+	     (car->_trkPos.toMiddle < -2.0 && m_speedangle < -0.4 && m_speedangle > -2.8)))
 	{
 		// reversing out of control - break!
 		gear = 1;
 		brk = 0.5;
 		acc = 0.0;
+	}
+
+	if (car->_speed_x < 3.0 && fabs(car->_yaw_rate) < 0.3 && brk == 0.0)
+	{
+		// get us started!
+		acc = MAX(acc, 0.8);
 	}
 
 
@@ -2188,7 +2222,10 @@ void	MyRobot::Drive( int index, tCarElt* car, tSituation* s )
         car->ctrl.brakeCmd = brk;
 	if (m_verbose)
 	{
-		fprintf(stderr,"%s %d: speed=%.3f steer=%.3f gear=%d accel=%.3f brake=%.3f\n",car->_carName,pi.idx,car->_speed_x,steer,gear,acc,brk);
+		PtInfo	piL, piR;
+		GetPtInfo( PATH_LEFT,  pos, piL );
+		GetPtInfo( PATH_RIGHT, pos, piR );
+		fprintf(stderr,"%s %d %.1f/%.1f: speed=%.1f (r%.1f L%.1f R%.1f) steer=%.3f gear=%d accel=%.3f brake=%.3f\n",car->_carName,pi.idx,m_avoidS,m_avoidT, car->_speed_x,pi.spd,piL.spd,piR.spd,steer,gear,acc,brk);
 		fflush(stderr);
 	}
 
@@ -2367,8 +2404,8 @@ void	MyRobot::AvoidOtherCars(
 		rootSpan.Extend( pi.offs );
 
 		double	myOffs = -car->_trkPos.toMiddle;
-		bool	toSideL = false;
-		bool	toSideR = false;
+		m_toSideL = false;
+		m_toSideR = false;
 		double	repulsion = 0;
 
 		//
@@ -2376,6 +2413,7 @@ void	MyRobot::AvoidOtherCars(
 		//
 
 		int		which = 0;
+		m_sideratio = 100.0;
 		for( ;	which < cnt &&
 				m_opp[sort[which]].GetInfo().newCatchTime == 0; which++ )
 		{
@@ -2384,7 +2422,7 @@ void	MyRobot::AvoidOtherCars(
 			// to side.
 			if( oi.sit.rdPY > 0 )
 			{
-				toSideL = true;
+				m_toSideL = true;
 
 				double	offs;
 				if( oi.newPiL.isSpace )
@@ -2395,11 +2433,14 @@ void	MyRobot::AvoidOtherCars(
 
 				double	dist = fabs(myOffs - offs);
 				if( dist < 3 )
+				{
 					repulsion -= 0.2;//0.5 / MX(1, dist);
+					m_sideratio = MIN(m_sideratio, dist/3.0);
+				}
 			}
 			else
 			{
-				toSideR = true;
+				m_toSideR = true;
 
 				double	offs;
 				if( oi.newPiR.isSpace )
@@ -2410,7 +2451,10 @@ void	MyRobot::AvoidOtherCars(
 
 				double	dist = fabs(myOffs - offs);
 				if( dist < 3 )
+				{
 					repulsion += 0.2;//0.5 / MX(1, dist);
+					m_sideratio = MIN(m_sideratio, dist/3.0);
+				}
 			}
 
 			targ = myOffs * 0.95 + pi.offs * 0.05 + repulsion;
@@ -2421,12 +2465,12 @@ void	MyRobot::AvoidOtherCars(
 		//
 
 		PathRange	pr;
-		if( toSideL || toSideR )
+		if( m_toSideL || m_toSideR )
 		{
-			if( toSideL )
+			if( m_toSideL )
 				pr.AddGreater( myPos, rootSpan.a, false, *this );
 
-			if( toSideR )
+			if( m_toSideR )
 				pr.AddLesser( myPos, rootSpan.b, false, *this );
 		}
 
@@ -2437,6 +2481,9 @@ void	MyRobot::AvoidOtherCars(
 		{for( ; which < cnt; which++ )
 		{
 			Opponent::Info&	oi = m_opp[sort[which]].GetInfo();
+
+			if( !oi.canOvertake )
+				continue;
 
 			if( rootSpan.IsNull() )
 			{
@@ -2576,7 +2623,7 @@ void	MyRobot::AvoidOtherCars(
 //		else
 //			newAvoidS = 1;
 
-		if( toSideL || toSideR )
+		if( m_toSideL || m_toSideR )
 		{
 //			if( newAvoidS != 1 )
 			{
@@ -2706,7 +2753,7 @@ void	MyRobot::AvoidOtherCars(
 //				bool	avoidL = oi.sit.rdPY < -oi.sit.minDY && spaceR;
 //				bool	avoidR = oi.sit.rdPY >  oi.sit.minDY && spaceL;
 
-				if( fabs(k) < maxSpdK )
+				if( fabs(k) < maxSpdK && oi.canOvertake )
 				{
 					if( !avoidL && !avoidR )
 					{

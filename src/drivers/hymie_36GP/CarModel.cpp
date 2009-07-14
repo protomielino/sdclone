@@ -111,10 +111,10 @@ double	CarModel::CalcMaxSpeed(
 		if (div >= m_pm[i].bgn_div && div <= m_pm[i].end_div)
 		{
 			aero = m_pm[i].AERO;
-			mu_scale = m_pm[i].MU_SCALE;
+			if (m_pm[i].MU_SCALE > 0.0)
+			  mu_scale = m_pm[i].MU_SCALE;
 			kz_scale = m_pm[i].KZ_SCALE;
 			speed_limit = m_pm[i].SPEED_LIMIT;
-			break;
 		}
 	}
 
@@ -170,7 +170,7 @@ double	CarModel::CalcMaxSpeed(
 
 	if( spd > 200 )
 		spd = 200;
-	if (speed_limit > 0)
+	if (speed_limit > 1.0)
 		spd = MIN(spd, speed_limit);
 
 	return spd;
@@ -252,9 +252,9 @@ double	CarModel::CalcBreaking(
 		if (div >= m_pm[i].bgn_div && div <= m_pm[i].end_div)
 		{
 			aero = m_pm[i].AERO;
-			brk_scale = m_pm[i].BRK_SCALE;
+			if (m_pm[i].BRK_SCALE > 0.0)
+				brk_scale = m_pm[i].BRK_SCALE;
 			brk_mu_scale = m_pm[i].BRK_MU_SCALE;
-			break;
 		}
 	}
 

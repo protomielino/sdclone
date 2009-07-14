@@ -320,6 +320,16 @@ void	LinePath::CalcCurvaturesZ( int start, int len, int step )
 	}}
 }
 
+void	LinePath::CheckSpeeds( PathPt *rlPath )
+{
+	for (int count=0; count<m_NSEG; count++)
+	{
+		m_pPath[count].spd = MIN(MAX(m_pPath[count].spd, rlPath[count].spd * 0.8), rlPath[count].spd);
+		m_pPath[count].maxSpd = MIN(MAX(m_pPath[count].maxSpd, rlPath[count].maxSpd * 0.8), rlPath[count].maxSpd);
+		m_pPath[count].accSpd = MIN(MAX(m_pPath[count].accSpd, rlPath[count].accSpd * 0.8), rlPath[count].accSpd);
+	}
+}
+
 void	LinePath::CalcMaxSpeeds( int start, int len, const CarModel& carModel, int step )
 {
 	{for( int count = 0; count < len; count += step )

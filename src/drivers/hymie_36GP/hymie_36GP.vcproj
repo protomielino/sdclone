@@ -183,6 +183,7 @@
 				AdditionalLibraryDirectories="../../../export/lib,../../../../3rdParty/lib,../../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC,LIBCMT"
 				ModuleDefinitionFile=".\hymie_36GP.def"
+				GenerateDebugInformation="true"
 				ProgramDatabaseFile=".\Release/hymie_36GP.pdb"
 				GenerateMapFile="true"
 				MapFileName=".\Release/hymie_36GP.map"

@@ -133,7 +133,7 @@ private:
 
 	enum
 	{
-		cMAX_OPP = 20,
+		cMAX_OPP = 64,
 	};
 
 	struct	PathRange
@@ -162,6 +162,7 @@ private:
 
 	CarModel		m_cm;
 	CarModel		m_cm2;
+	CarElt*			m_pCar;
 
 	double			FLY_HEIGHT;
 	Array<double>	FACTORS;
@@ -235,6 +236,11 @@ private:
 	double			m_lastBrk;
 	double			m_lastTargV;
 	double			m_steersum;
+	double			m_carangle;
+	double			m_speedangle;
+	bool			m_toSideL;
+	bool			m_toSideR;
+	double			m_sideratio;
 };
 
 #endif // !defined(AFX_MYROBOT_H__AA11EF80_E44F_4A64_B4ED_36FDD5FE6C69__INCLUDED_)

@@ -17,19 +17,23 @@
 <!-- 1:10.22 - 1.05.60 -->
 
   <section name="hymie private">
-	<attnum name="kz scale" val="0.2"/>
-	<attnum name="bump mod" val="0"/>
-	<attnum name="aero mod" val="0"/>
-	<attnum name="brake mod" val="1"/>
-	<attnum name="acc scale" val="1.40"/>
-	<attnum name="brk scale" val="0.90"/>
-	<attnum name="mu scale" val="0.70"/>
-	<attnum name="factor 0" val="1.025"/>
-	<attnum name="steer k acc" val="0.2"/>
-	<attnum name="steer k dec" val="0.2"/>
-	<attnum name="spd ctrl normal" val="0"/>
-	<attnum name="spd ctrl traffic" val="3"/>
-	<attnum name="skidsteer" val="1.4"/>
+	<attnum name="kz scale" min="0.0" max="1.0" val="0.2"/>
+	<attnum name="bump mod" min="0.0" max="1.0" val="0"/>
+	<attnum name="aero mod" min="0.0" max="1.0" val="0"/>
+	<attnum name="brake mod" min="0.0" max="1.0" val="1"/>
+	<attnum name="curv cutoff" min="0.0" max="1.0" val="0.004"/>
+	<attnum name="acc scale" min="0.0" max="10.0" val="1.40"/>
+	<attnum name="brk scale" min="0.0" max="10.0" val="1.00"/>
+	<attnum name="mu scale" min="0.0" max="10.0" val="0.50"/>
+	<attnum name="brk factor" min="0.0" max="10.0" val="1.10"/>
+	<attnum name="mu factor" min="0.0" max="10.0" val="1.15"/>
+	<attnum name="factor 0" min="0.0" max="10.0" val="1.005"/>
+	<attnum name="steer k acc" min="0.0" max="20.0" val="5.2"/>
+	<attnum name="steer k dec" min="0.0" max="20.0" val="4.2"/>
+	<attnum name="spd ctrl normal" min="0.0" max="10.0" val="0"/>
+	<attnum name="spd ctrl traffic" min="0.0" max="10.0" val="3"/>
+	<attnum name="skidsteer" min="0.0" max="3.0" val="1.4"/>
+	<attnum name="aheadfactor" min="0.0" max="30.0" val="8.0"/>
   </section>
 
 </params>

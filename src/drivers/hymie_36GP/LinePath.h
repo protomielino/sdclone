@@ -70,12 +70,14 @@ public:
 	void	Initialise( MyTrack* pTrack, double maxL = 999, double maxR = 999 );
 
 	const PathPt&	GetAt( int idx ) const;
+	PathPt *	GetPath() { return m_pPath; }
 
 	void	CalcCurvaturesXY( int start, int len, int step = 1 );
 	void	CalcCurvaturesZ( int start, int len, int step = 1 );
 	void	CalcMaxSpeeds( int start, int len, const CarModel& cm, int step = 1 );
 	void	PropagateBreaking( int start, int len, const CarModel& cm, int step = 1 );
 	void	PropagateAcceleration( int start, int len, const CarModel& cm, int step = 1 );
+	void	CheckSpeeds( PathPt *rlPath );
 
 	void	CalcCurvaturesXY( int step = 1 );
 	void	CalcCurvaturesZ( int step = 1 );

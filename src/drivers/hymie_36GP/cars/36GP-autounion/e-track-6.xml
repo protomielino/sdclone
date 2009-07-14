@@ -14,7 +14,7 @@
 
 <params name="" type="template" mode="mw">
 
-<!-- 1:39.40 -->
+<!-- 1:40.82 -->
 
   <section name="hymie private">
 	<attnum name="kz scale" val="0.2"/>
@@ -39,6 +39,10 @@
 	<attnum name="1 begin div" val="230"/>
 	<attnum name="1 end div" val="960"/>
 	<attnum name="1 mu scale" val="0.60"/>
+
+	<attnum name="2 begin div" val="1000"/>
+	<attnum name="2 end div" val="1060"/>
+	<attnum name="2 avoid mu scale" val="0.30"/>
   </section>
 
 </params>

@@ -27,6 +27,8 @@
 	<attnum name="mu scale" min="0.0" max="10.0" val="0.50"/>
 	<attnum name="brk factor" min="0.0" max="10.0" val="1.00"/>
 	<attnum name="mu factor" min="0.0" max="10.0" val="1.00"/>
+	<attnum name="avoid movt" min="0.0" max="10.0" val="0.80"/>
+	<attnum name="avoid mu scale" min="0.0" max="10.0" val="0.45"/>
 	<attnum name="factor 0" min="0.0" max="10.0" val="1.005"/>
 	<attnum name="steer k acc" min="0.0" max="20.0" val="5.2"/>
 	<attnum name="steer k dec" min="0.0" max="20.0" val="4.2"/>

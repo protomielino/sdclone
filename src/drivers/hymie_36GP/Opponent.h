@@ -135,6 +135,8 @@ public:
 		double		catchAccY;
 		double		catchAccSpd;
 
+		double		newCatchDist;
+		bool		canOvertake;
 		bool		newCatching;
 		double		newCatchSpd;
 		double		newCatchTime;
@@ -168,11 +170,17 @@ public:
 							  const MyRobot& me, double myMaxAccX, 
 							  double aggression, int idx );
 	void		SetOTScale( double otscale ) { m_otscale = otscale; }
+	void		CanOvertake( const MyRobot &me, 
+			             const CarElt *car, 
+				     const CarElt *ocar, 
+				     double aggression, 
+				     int side);
 
 private:
 	Info			m_info;
 	PathRecord		m_path;		// info about path of this opponent.
 	double			m_otscale;
+	double			m_tracklen;
 };
 
 #endif // !defined(AFX_OPPONENT_H__36326AD0_5287_4D35_B380_AE45AD76DF12__INCLUDED_)
