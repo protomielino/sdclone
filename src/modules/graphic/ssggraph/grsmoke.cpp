@@ -295,7 +295,7 @@ void grAddSmoke(tCarElt *car, double t)
 
 				smoke_life_coefficient = smoke_life_coefficient * (1.0f - urandom()*urandom());
 				tdble spd_fx=tanh(0.001f*car->_reaction[i])*smoke_speed_coefficient*sqrt(spd2);
-				double slip = MAX(0.0, ((car->_wheelSpinVel(i) * car->_wheelRadius(i)) - fabs(car->_speed_x)) - 6.0);
+				double slip = MAX(0.0, ((car->_wheelSpinVel(i) * car->_wheelRadius(i)) - fabs(car->_speed_x)) - 9.0);
 				bool skidsmoke = (car->_skid[i] + 0.025f*urandom()*spd_fx>urandom() + threshold); // instead of 0.3, to randomize
 				if (skidsmoke || slip > 0.0) // smoke from driven wheel spin
 				{
