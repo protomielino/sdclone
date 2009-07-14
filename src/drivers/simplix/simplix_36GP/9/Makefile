@@ -16,7 +16,7 @@
 
 ROBOT       = simplix_36GP
 SHIPDIR     = drivers/${ROBOT}/9
-SHIP        = 36GP-bugatti.png
+SHIP        = 36GP-bugatti.png skill.xml logo.rgb
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

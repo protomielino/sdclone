@@ -16,7 +16,7 @@
 
 ROBOT       = hymie_36GP
 SHIPDIR     = drivers/${ROBOT}/7
-SHIP        = 36GP-alfatipo.png skill.xml
+SHIP        = 36GP-alfatipo.png skill.xml logo.rgb
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

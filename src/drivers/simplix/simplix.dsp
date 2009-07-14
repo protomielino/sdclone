@@ -106,127 +106,127 @@ PostBuild_Cmds=copy $(TargetDir)\*.dll C:\Programme\Torcs\drivers\simplix
 # PROP Default_Filter "cpp;c;cxx;rc;def;r;odl;idl;hpj;bat"
 # Begin Source File
 
-SOURCE=.\src\src\unitmain.cpp
+SOURCE=.\unitmain.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\simplix.def
+SOURCE=.\simplix.def
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcarparam.cpp
+SOURCE=.\unitcarparam.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcharacteristic.cpp
+SOURCE=.\unitcharacteristic.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitclothoid.cpp
+SOURCE=.\unitclothoid.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcollision.cpp
+SOURCE=.\unitcollision.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcommon.cpp
+SOURCE=.\unitcommon.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcommondata.cpp
+SOURCE=.\unitcommondata.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcubic.cpp
+SOURCE=.\unitcubic.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcubicspline.cpp
+SOURCE=.\unitcubicspline.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitdriver.cpp
+SOURCE=.\unitdriver.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitdynarray.cpp
+SOURCE=.\unitdynarray.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitfixcarparam.cpp
+SOURCE=.\unitfixcarparam.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlane.cpp
+SOURCE=.\unitlane.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlanepoint.cpp
+SOURCE=.\unitlanepoint.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlinalg.cpp
+SOURCE=.\unitlinalg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlinreg.cpp
+SOURCE=.\unitlinreg.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitopponent.cpp
+SOURCE=.\unitopponent.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitparabel.cpp
+SOURCE=.\unitparabel.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitparam.cpp
+SOURCE=.\unitparam.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitpidctrl.cpp
+SOURCE=.\unitpidctrl.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitpit.cpp
+SOURCE=.\unitpit.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitpitparam.cpp
+SOURCE=.\unitpitparam.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitsection.cpp
+SOURCE=.\unitsection.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitstrategy.cpp
+SOURCE=.\unitstrategy.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitsysfoo.cpp
+SOURCE=.\unitsysfoo.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitteammanager.cpp
+SOURCE=.\unitteammanager.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unittmpcarparam.cpp
+SOURCE=.\unittmpcarparam.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unittrack.cpp
+SOURCE=.\unittrack.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitvec2d.cpp
+SOURCE=.\unitvec2d.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitvec3d.cpp
+SOURCE=.\unitvec3d.cpp
 # End Source File
 # End Group
 # Begin Group "Header Files"
@@ -234,124 +234,124 @@ SOURCE=.\src\unitvec3d.cpp
 # PROP Default_Filter "h;hpp;hxx;hm;inl"
 # Begin Source File
 
-SOURCE=.\src\unitcarparam.h
+SOURCE=.\unitcarparam.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcharacteristic.h
+SOURCE=.\unitcharacteristic.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitclothoid.h
+SOURCE=.\unitclothoid.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcollision.h
+SOURCE=.\unitcollision.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcommon.h
+SOURCE=.\unitcommon.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcommondata.h
+SOURCE=.\unitcommondata.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcubic.h
+SOURCE=.\unitcubic.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitcubicspline.h
+SOURCE=.\unitcubicspline.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitdriver.h
+SOURCE=.\unitdriver.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitdynarray.h
+SOURCE=.\unitdynarray.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitfixcarparam.h
+SOURCE=.\unitfixcarparam.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlane.h
+SOURCE=.\unitlane.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlanepoint.h
+SOURCE=.\unitlanepoint.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlinalg.h
+SOURCE=.\unitlinalg.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitlinreg.h
+SOURCE=.\unitlinreg.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitopponent.h
+SOURCE=.\unitopponent.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitparabel.h
+SOURCE=.\unitparabel.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitparam.h
+SOURCE=.\unitparam.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitpidctrl.h
+SOURCE=.\unitpidctrl.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitpit.h
+SOURCE=.\unitpit.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitpitparam.h
+SOURCE=.\unitpitparam.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitsection.h
+SOURCE=.\unitsection.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitstrategy.h
+SOURCE=.\unitstrategy.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitsysfoo.h
+SOURCE=.\unitsysfoo.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitteammanager.h
+SOURCE=.\unitteammanager.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unittmpcarparam.h
+SOURCE=.\unittmpcarparam.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unittrack.h
+SOURCE=.\unittrack.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitvec2d.h
+SOURCE=.\unitvec2d.h
 # End Source File
 # Begin Source File
 
-SOURCE=.\src\unitvec3d.h
+SOURCE=.\unitvec3d.h
 # End Source File
 # End Group
 # Begin Source File
 
-SOURCE=.\src\Makefile
+SOURCE=.\Makefile
 # End Source File
 # End Target
 # End Project
