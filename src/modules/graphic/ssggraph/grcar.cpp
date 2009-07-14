@@ -833,12 +833,25 @@ grInitCar(tCarElt *car)
 		for (i = 1; i < nranges; i++)
 		{
 			ssgBranch *driverBody = new ssgBranch;
+			ssgTransform *driverLoc = new ssgTransform;
+			sgCoord driverpos;
+
 			sprintf(buf, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
 			param = GfParmGetStr(handle, buf, PRM_DRIVERMODEL, "");
 			grCarInfo[index].DRMThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_DRIVERSTEER, NULL, 0.0);
+
+			tdble xpos = GfParmGetNum(handle, buf, PRM_XPOS, NULL, 0.0);
+			tdble ypos = GfParmGetNum(handle, buf, PRM_YPOS, NULL, 0.0);
+			tdble zpos = GfParmGetNum(handle, buf, PRM_ZPOS, NULL, 0.0);
+			sgSetCoord(&driverpos, xpos, ypos, zpos, 0, 0, 0.0);
+			driverLoc->setTransform( &driverpos);
+
 			driverEntity = grssgCarLoadAC3D(param, NULL, index);
 			DBG_SET_NAME(driverEntity, "DRM", index, i-1);
-			driverBody->addKid(driverEntity);
+
+			driverLoc->addKid(driverEntity);
+
+			driverBody->addKid(driverLoc);
 			DRMSel->addKid(driverBody);
 			grCarInfo[index].DRMSelectMask[i-1] = 1 << selIndex; 
 			selIndex++;
