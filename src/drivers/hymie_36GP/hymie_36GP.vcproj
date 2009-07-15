@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="hymie_36GP"
 	ProjectGUID="{706F50A3-034A-4E02-911A-49D944E90581}"
+	RootNamespace="hymie_36GP"
 	>
 	<Platforms>
 		<Platform
@@ -176,7 +177,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib"
+				AdditionalDependencies="tgf.lib robottools.lib sg.lib ul.lib User32.lib"
 				OutputFile=".\Release/hymie_36GP.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
