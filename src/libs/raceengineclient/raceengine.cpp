@@ -388,9 +388,11 @@ ReRaceRules(tCarElt *car)
 	// Allowed time is longest pitstop possible + time for tracklength with speed??? (currently fixed 10 [m/s]).
 	// for simplicity. Human driver is an exception to this rule, to allow explorers
 	// to enjoy the landscape.
+	// Also - don't remove cars that are currently being repaired in pits
 	// TODO: Make it configurable.
 	if ((car->_curLapTime > 84.5 + ReInfo->track->length/10.0) &&
-		(car->_driverType != RM_DRV_HUMAN))
+	    !(car->_state & RM_CAR_STATE_PIT) &&
+	    (car->_driverType != RM_DRV_HUMAN))
 	{
 		car->_state |= RM_CAR_STATE_ELIMINATED;
 	    return;
