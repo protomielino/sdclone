@@ -106,6 +106,7 @@ class LRaceLine {
 
   double MinCornerInverse;
   double IncCornerInverse;
+  double IncCornerFactor;
   double BaseCornerSpeed;
   double BaseCornerSpeedX;
   double DefaultCornerSpeedX;

@@ -250,6 +250,7 @@ class Driver {
 		float *radius;
 		int alone;
 		int carindex;
+		int teamindex;
 		float collision;
 
 		float global_skill;

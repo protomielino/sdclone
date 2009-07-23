@@ -3056,7 +3056,12 @@ void Driver::update(tSituation *s)
 		pitpos = PIT_NONE;
 	}
 
+#ifdef TORCS_NG
+	if (pitpos == PIT_NONE)
+		RtTeamReleasePit(teamIndex); 
+#else
 	car->_lightCmd = (char) pitpos;
+#endif
 
 	pit->update();
 	alone = isAlone();

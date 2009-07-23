@@ -102,6 +102,7 @@ class Opponent {
 		float t_impact;
 		int state;			// State variable to characterize the relation to the opponent, e. g. opponent is behind.
 		int team;
+		int teamindex;
 		int index;
 		float overlaptimer;
 

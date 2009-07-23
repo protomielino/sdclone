@@ -72,6 +72,7 @@ static double Max(double x1, double x2)
 LRaceLine::LRaceLine() :
    MinCornerInverse(0.001),
    IncCornerInverse(1.000),
+   IncCornerFactor(1.000),
    BaseCornerSpeed(0.0),
    BaseCornerSpeedX(1.0),
    DefaultCornerSpeedX(1.0),
@@ -373,7 +374,8 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  OvertakeCaution = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_OVERTAKE_CAUTION, (char *)NULL, 0.0f );
  SkidCorrection = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_SKID_CORRECTION, (char *)NULL, 1.0f );
  MinCornerInverse = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MIN_CORNER_INV, (char *)NULL, 0.002f );
- IncCornerInverse = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INC_CORNER_INV, (char *)NULL, 1.002f );
+ IncCornerInverse = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INC_CORNER_INV, (char *)NULL, 0.400f );
+ IncCornerFactor = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INC_CORNER_FACTOR, (char *)NULL, 1.0f );
  CornerSpeed = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_SPEED, (char *)NULL, 15.0f );
  BaseCornerSpeedX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_SPEED_X, (char *)NULL, 1.0f ) * (0.8 + MIN(0.25, ((12.0-skill)/12) / 4));
  AvoidSpeedAdjust = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_SPEED, (char *)NULL, 0.0f );
@@ -977,6 +979,7 @@ void LRaceLine::CalcZCurvature(int rl)
  {
   tTrackSeg *seg = tSegment[tDivSeg[i]];
   
+#if 0
   vec2f sl, el, sr, er, rp, vp;
   sl.x = seg->vertex[TR_SL].x; sl.y = seg->vertex[TR_SL].y;
   el.x = seg->vertex[TR_EL].x; el.y = seg->vertex[TR_EL].y;
@@ -1001,6 +1004,9 @@ void LRaceLine::CalcZCurvature(int rl)
   tz[rl][i] += (seg->vertex[TR_SR].z - avgz) * (1.0 - srdist/dist2);
   tz[rl][i] += (seg->vertex[TR_EL].z - avgz) * (1.0 - eldist/dist2);
   tz[rl][i] += (seg->vertex[TR_ER].z - avgz) * (1.0 - erdist/dist1);
+#else
+  tz[rl][i] = RtTrackHeightG(seg, tx[rl][i], ty[rl][i]);
+#endif
  }
 
  for ( i = 0; i < Divs; i++ )
@@ -1149,7 +1155,7 @@ void LRaceLine::TrackInit(tSituation *p)
    if (rI > MinCornerInverse)
    {
     if (rI > IncCornerInverse)
-     rI *= (1.0 + (rI - IncCornerInverse) * 50);
+     rI *= (1.0 + (rI - IncCornerInverse) * 50 * IncCornerFactor);
     if (CornerSpeedX)
      rI *= MIN(1.0, (1.0 - (rI*20*CornerSpeedX) + (3.0+CW)/30));
     double tca = GetModD( tCornerAccel, i );
@@ -1182,7 +1188,7 @@ void LRaceLine::TrackInit(tSituation *p)
    {
     // look for a sudden downturn in approaching track segments
     double prevzd = 0.0, nextzd = 0.0;
-    int range = MAX(40.0, MIN(100.0, MaxSpeed)) / 10.0;
+    int range = int(MAX(40.0, MIN(100.0, MaxSpeed)) / 10.0);
 
     bc += rI * 80;
 
@@ -1539,7 +1545,7 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
 void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, double time )
 {
 
- int maxcount = ((int) lookahead) / DivLength + 1;
+ int maxcount = int(lookahead / DivLength + 1);
  int count = 0;
  tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;

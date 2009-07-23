@@ -36,6 +36,7 @@
 #define PRV_SKID_CORRECTION   "skid correction"
 #define PRV_MIN_CORNER_INV    "min corner inverse"
 #define PRV_INC_CORNER_INV    "increase corner inverse"
+#define PRV_INC_CORNER_FACTOR "increase corner factor"
 #define PRV_BASE_SPEED        "base speed"
 #define PRV_BASE_SPEED_X      "base speed factor"
 #define PRV_AVOID_SPEED       "add avoid speed"

@@ -37,7 +37,7 @@
 #include <robottools.h>
 #include <robot.h>
 
-//#define TORCS_NG
+#define TORCS_NG
 
 #ifdef TORCS_NG
 #include <teammanager.h>

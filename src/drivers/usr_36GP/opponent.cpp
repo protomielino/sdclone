@@ -46,6 +46,7 @@ Opponent::Opponent() :
 		t_impact(0.0f),
 		state(0),
 		team(0),
+		teamindex(0),
 		index(0),
 		overlaptimer(0.0f),
 		car(NULL),
@@ -99,7 +100,10 @@ void Opponent::update(tSituation *s, Driver *driver, int DebugMsg)
 	if (team == -1)
 	{
 		if ((!strcmp(car->_teamname, mycar->_teamname)))
+		{
 			team = TEAM_FRIEND;
+			teamindex = RtTeamManagerIndex(car, track, s);
+		}
 		else
 			team = TEAM_FOE;
 		deltamult = 1.0 / s->deltaTime;
