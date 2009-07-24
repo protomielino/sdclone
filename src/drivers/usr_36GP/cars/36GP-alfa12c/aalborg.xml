@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
 
-	<!-- alfa12c		1:27.30 -->
+	<!-- alfa12c		1:27.07 -->
 	<section name="private">
 		<attnum name="increase corner inverse" val="0.090"/>
 		<attnum name="base speed" val="11.30"/>

@@ -20,7 +20,7 @@
 	<section name="private">
 		<attnum name="min corner inverse" val="0.0005"/>
 		<attnum name="increase corner inverse" val="0.1"/>
-		<attnum name="base speed" val="11.80"/>
+		<attnum name="base speed" val="12.10"/>
 		<attnum name="base brake" val="34.00"/>
 		<attnum name="int margin" val="1.8"/>
 		<attnum name="ext margin" val="1.3"/>

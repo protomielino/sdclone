@@ -21,7 +21,7 @@
 		<attnum name="min corner inverse" val="0.001"/>
 		<attnum name="increase corner inverse" val="0.025"/>
 		<attnum name="s1ope factor" val="0.2"/>
-		<attnum name="base speed" val="11.50"/>
+		<attnum name="base speed" val="11.80"/>
 		<attnum name="base brake" val="22.00"/>
 		<attnum name="int margin" val="1.4"/>
 		<attnum name="ext margin" val="1.3"/>

@@ -20,13 +20,12 @@
 	<section name="private">
 		<attnum name="min corner inverse" val="0.0005"/>
 		<attnum name="increase corner inverse" val="0.1"/>
-		<attnum name="base speed" val="12.20"/>
+		<attnum name="base speed" val="12.50"/>
 		<attnum name="base brake" val="33.00"/>
 		<attnum name="slope factor" val="0.5"/>
 		<attnum name="int margin" val="1.8"/>
 		<attnum name="ext margin" val="1.3"/>
 		<attnum name="bump caution" val="1.0"/>
-		<attnum name="skid correction" val="0.4"/>
 
 		<attnum name="0 bgn" val="1230"/>
 		<attnum name="0 end" val="1310"/>
