@@ -573,8 +573,9 @@ ReInitCars(void)
 					GfOut("Car file: %s\n", buf);
 					carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 					category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-					sprintf(buf, "Loading driver %s (%s) ...", curModInfo->name, elt->_carName);
-					RmLoadingScreenSetText(buf);
+					//sprintf(buf, "Loading driver %s (%s) ...", curModInfo->name, elt->_carName);
+					//RmLoadingScreenSetText(buf);
+					GfOut("Loading driver %s (%s) ...", curModInfo->name, elt->_carName);
 					if (category != 0) {
 						strncpy(elt->_category, category, MAX_NAME_LEN - 1);
 						elt->_category[MAX_NAME_LEN - 1] = '\0';

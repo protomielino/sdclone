@@ -216,7 +216,7 @@ reRaceRealStart(void)
 	}
 
 	for (i = 0; i < s->_ncars; i++) {
-		sprintf(buf, "Initializing driver %s ...", s->cars[i]->_name);
+		sprintf(buf, "Loading driver %s (%s) ...", s->cars[i]->_name, s->cars[i]->_carName);
 		RmLoadingScreenSetText(buf);
 		robot = s->cars[i]->robot;
 		robot->rbNewRace(robot->index, s->cars[i], s);
