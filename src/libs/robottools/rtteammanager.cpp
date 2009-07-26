@@ -476,6 +476,18 @@ int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situa
 		RtTM->Drivers = 
 			(tTeamDriver**) malloc(Situation->_ncars * sizeof(tTeamDriver*));
 	}
+	else
+	{
+		// Avoid adding same car twice
+		tTeamDriver* TeamDriver = RtTM->TeamDrivers;
+		while (TeamDriver)
+		{
+			if (TeamDriver->Car == Car)
+				return TeamDriver->Count;
+
+			TeamDriver = TeamDriver->Next;
+		}
+	}
 
  	RtTM->Track = Track;            
 	RtTM->RaceDistance = Track->length * Situation->_totLaps;   
@@ -562,6 +574,8 @@ void RtTeamReleasePit(const int TeamIndex)
 		return;
 
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
+	if (TeamDriver == NULL)
+		return;
 
 	if (TeamDriver->TeamPit->PitState == TeamDriver->Car)
 		TeamDriver->TeamPit->PitState = RT_TM_PIT_IS_FREE;
@@ -576,8 +590,13 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 		return false;
 
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
+	if (TeamDriver == NULL)  
+		return false;	
 
 	CarElt* Car = TeamDriver->Car; 
+	if (Car == NULL)  
+		return false;	
+
 	if (Car->_pit == NULL)  
 		return false;	
 
