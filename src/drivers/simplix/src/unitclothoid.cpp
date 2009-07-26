@@ -581,7 +581,8 @@ void TClothoidLane::OptimisePath
 	  }
 	  else
 	  {
-		Optimise(1.015, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+//		Optimise(1.015, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+		Optimise(1.016, L3, L0, L1, L2, L4, L5, L6, BumpMod);
 	  }
 
       K += Step;
@@ -647,7 +648,7 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 
   int Version;
   fread(&Version,sizeof(int),1,F);
-  if (Version < 109)
+  if (Version < 110)
     return false;
 
   int N;
@@ -676,7 +677,7 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int K = 0;
   fwrite(&K,sizeof(int),1,F);
 
-  int Version = 109;
+  int Version = 110;
   fwrite(&Version,sizeof(int),1,F);
 
   int N = oTrack->Count();

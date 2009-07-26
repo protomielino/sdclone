@@ -172,6 +172,7 @@ static int cTickCount[MAXNBBOTS];
 static int cLongSteps[MAXNBBOTS];
 static int cCriticalSteps[MAXNBBOTS];
 static int cUnusedCount[MAXNBBOTS];
+static int cRobotType;
 //==========================================================================*
 
 //==========================================================================*
@@ -226,6 +227,7 @@ void SetParameters(int N, char* DefaultCarType)
 //--------------------------------------------------------------------------*
 void SetUpSimplix()
 {
+  cRobotType = RTYPE_SIMPLIX;
   SetParameters(NBBOTS, "car1-trb1");
   TDriver::AdvancedParameters = true;
 };
@@ -236,6 +238,7 @@ void SetUpSimplix()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_trb1()
 {
+  cRobotType = RTYPE_SIMPLIX_TRB1;
   SetParameters(NBBOTS, "car1-trb1");
 };
 //==========================================================================*
@@ -245,6 +248,7 @@ void SetUpSimplix_trb1()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_sc()
 {
+  cRobotType = RTYPE_SIMPLIX_SC;
   SetParameters(NBBOTS, "sc996");
 //  TDriver::UseOldSkilling = true;                // Use old skilling
   TDriver::UseSCSkilling = true;                 // Use supercar skilling
@@ -256,6 +260,7 @@ void SetUpSimplix_sc()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_36GP()
 {
+  cRobotType = RTYPE_SIMPLIX_36GP;
   SetParameters(NBBOTS, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
@@ -496,6 +501,40 @@ static int InitFuncPt(int Index, void *Pt)
   cRobot[Index-IndexOffset]->SetBotName          // Store customized name
 	  (RobotSettings,                            // Robot's xml-file
 	  &DriverNames[(Index-IndexOffset)*DRIVERLEN]);// not drivers xml-file!  
+
+  if (cRobotType == RTYPE_SIMPLIX)
+  {
+	  GfOut("#cRobotType == RTYPE_SIMPLIX\n");
+    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix;
+    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
+    cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
+    cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_TRB1)
+  {
+    GfOut("#cRobotType == RTYPE_SIMPLIX_TRB1\n");
+    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_TRB1;
+    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_TRB1;
+    cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
+    cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_SC)
+  {
+    GfOut("#cRobotType == RTYPE_SIMPLIX_SC\n");
+    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
+    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_SC;
+    cRobot[Index-IndexOffset]->ScaleSide(0.90f,0.95f);
+    cRobot[Index-IndexOffset]->SideBorderOuter(0.30f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_36GP)
+  {
+    GfOut("#cRobotType == RTYPE_SIMPLIX_36GP\n");
+    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
+    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_36GP;
+    cRobot[Index-IndexOffset]->ScaleSide(0.85f,0.85f);
+    cRobot[Index-IndexOffset]->SideBorderOuter(0.75f);
+    //cRobot[Index-IndexOffset]->UseFilterAccel();
+  }
 
   return 0;
 }

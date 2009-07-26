@@ -2,14 +2,14 @@
 // unitglobal.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A schismatic robot for TORCS-Version 1.3.0 and 1.3.1 
+// A robot for TORCS-NG-Version 1.4.0
 //--------------------------------------------------------------------------*
 // Global data types and definitions
 // Globale Datentypen und Definitionen
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.02.25
+// Last changed : 2009.07.26
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -85,6 +85,15 @@
 #include <track.h>   // TORCS
 #include <car.h>     // TORCS
 #include <raceman.h> // TORCS
+
+//==========================================================================*
+// Global constants, to be changed for different wdbee-bots
+//--------------------------------------------------------------------------*
+#define RTYPE_SIMPLIX 0                          // Robot type simplix
+#define RTYPE_SIMPLIX_TRB1 1                     // Robot type simplix_trb1
+#define RTYPE_SIMPLIX_SC 2                       // Robot type simplix_sc
+#define RTYPE_SIMPLIX_36GP 3                     // Robot type simplix_36GP
+//==========================================================================*
 
 //==========================================================================*
 // Global constants, to be changed for different wdbee-bots
@@ -349,7 +358,7 @@ enum
 
 // Internal parameters ...
 #define ANALYSE_STEPS 2 
-#define LENGTH_MARGIN (2.0f) // Initial value for PRV_LENGTH_MARGIN
+#define LENGTH_MARGIN (3.0f) // Initial value for PRV_LENGTH_MARGIN
 #define AVG_KEEP (0.75)
 #define AVG_CHANGE (1 - AVG_KEEP) 
 #define MAX_SPEED_CRV 0.00175 // R = 571,428 m
@@ -363,6 +372,8 @@ enum
 // ... Internal parameters
 
 // Parameters of this robot ...
+#define PRV_ACCEL_OUT        "accel out"
+#define PRV_FORCE_LANE       "force lane"         // Force lane for tests
 #define PRV_SKILL            "skill"              // Car specific skilling
 
 #define PRV_MAX_FUEL         "max fuel"
@@ -403,8 +414,14 @@ enum
 #define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation 
 #define PRV_SCALE_BRAKING	 "scale braking"      // Scale brake calculation 
 
+#define PRV_SCALE_BRAKE_Q    "qualy brake"        // Scale brake force for qualyfying
+#define PRV_SCALE_MU_Q       "qualy mu"           // Scale friction calculation for qualyfying 
+
 #define PRV_SCALE_MIN_MU     "scale min mu"
 #define PRV_SCALE_STEER	     "scale steer"
+
+#define PRV_SIDE_MU          "side mu"            // Scale friction calculation for sides
+#define PRV_SIDE_BRAKE       "side brake"         // Scale brake calculation for sides
 
 #define PRV_AVOID_SCALE		 "avoid scale"
 #define PRV_AVOID_WIDTH		 "avoid width"

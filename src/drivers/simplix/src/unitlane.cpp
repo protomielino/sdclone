@@ -153,11 +153,14 @@ bool TLane::GetLanePoint(double TrackPos, TLanePoint& LanePoint) const
 
   double Crv1 = TUtils::CalcCurvatureXY(P0, P1, P2);
   double Crv2 = TUtils::CalcCurvatureXY(P1, P2, P3);
+  double Crv1z = TUtils::CalcCurvatureZ(P0, P1, P2);
+  double Crv2z = TUtils::CalcCurvatureZ(P1, P2, P3);
 
   double Tx = (TrackPos - Dist0) / (Dist1 - Dist0);
 
   LanePoint.Index = Idx0;
-  LanePoint.Crv = (1.0 - Tx) * Crv1 + Tx * Crv2;;
+  LanePoint.Crv = (1.0 - Tx) * Crv1 + Tx * Crv2;
+  LanePoint.Crvz = (1.0 - Tx) * Crv1z + Tx * Crv2z;
   LanePoint.T = Tx;
   LanePoint.Offset =
 	(oPathPoints[Idx0].Offset)
@@ -375,13 +378,16 @@ void TLane::CalcMaxSpeeds
 	int Q = (P + 1) % N;
 
     double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
-
+    double Factor = 1.0;
+		 
 	double Speed = oFixCarParam.CalcMaxSpeed(
       oCarParam,
       oPathPoints[P].Crv,
+//      oPathPoints[P].CrvRated,
       oPathPoints[Q].Crv,
+//      oPathPoints[Q].CrvRated,
 	  oPathPoints[P].CrvZ,
-	  oTrack->Friction(P),
+	  oTrack->Friction(P)*Factor,
   	  TrackRollAngle);
 
 	if (Speed < 5)
@@ -675,6 +681,16 @@ double	TLane::CalcEstimatedLapTime() const
   }
 
   return LapTime;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Calculate Track Rollangle
+//--------------------------------------------------------------------------*
+double TLane::CalcTrackRollangle(double TrackPos)
+{
+  int P = oTrack->IndexFromPos(TrackPos);
+  return atan2(oPathPoints[P].Norm().z, 1);
 }
 //==========================================================================*
 

@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.07.12
+// Last changed : 2009.07.26
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -183,6 +183,8 @@ private:
       double& MinVCatTime, 
 	  bool& IsLapper);
 
+	double FilterSteerSpeed(double Steer);       // Control steer speed
+
 	double FilterABS(double Brake);              // ABS filter
     double FilterBrake(double Brake);            // 
     double FilterSkillBrake(double Brake);
@@ -191,6 +193,7 @@ private:
 	double FilterDrifting(double Accel);         // Drifting
 	double FilterLetPass(double Accel);          // Reduce accel
 	double FilterTCL(double Accel);              // Tracktion control
+	double FilterAccel(double Accel);            // Tracktion control
     double FilterTrack(double Accel);            // Keep on track
 
     double FilterStart(double Speed);            // Filter Start
@@ -239,7 +242,6 @@ private:
 	int	oFlying;				                 // Flag prepare landing 
 	int oNbrCars;                                // Nbr of cars in race
 	int	oOwnOppIdx;                              // Index of own car in list of opponents
-//	TOpponent oOpponents[cMAX_OPP];		         // Infos about other cars.
 	TOpponent* oOpponents;						 // Infos about other cars.
 
 	double oAvoidRange;				             // Where we are T->LR (0..1).
@@ -249,17 +251,19 @@ private:
 
 	TCharacteristic oMaxAccel;                   // Cars accelleration characteristic
 
-	double oBrakeCoeff[NBR_BRAKECOEFF];          // Brake coefficients 
+	double oBrakeCoeff[NBR_BRAKECOEFF+1];        // Brake coefficients 
 	int	oLastBrakeCoefIndex;                     // Index of last brake coef.
-	double oLastBrake;                           // Last brake command
 	double oLastTargetSpeed;                     // Last target speed
 
     // State values to update commands 
 	double oAccel;                               // Accelleration
+	double oLastAccel;                           // Last accel command
 	double oBrake;                               // Braking
+	double oLastBrake;                           // Last brake command
 	double oClutch;                              // Clutching
 	int oGear;                                   // Gear
 	double oSteer;                               // Steering
+	double oLastSteer;                           // Steering
 
 	double oAbsDelta;
 	double oAbsScale;
@@ -343,6 +347,7 @@ private:
 
     bool oSkilling;                              // Skilling on/off
 	double oSkill;                               // Skilling
+	double oSkillMax;                            // Max skilling
 	double oSkillDriver;                         // Individual skilling level
 	double oSkillGlobal;                         // Global skilling level
 	double oSkillScale;                          // Track skilling level
@@ -372,6 +377,12 @@ private:
     bool oPitSharing;	                         // Flag: Pitsharing activated
 	int oTeamIndex;                              // Index of car in Teams arrays;
 	float oBumpMode;                             //
+	int oTestLane;
+    bool oUseFilterAccel;
+    bool oUseAccelOut;
+	float oSideScaleMu;
+	float oSideScaleBrake;
+	float oSideBorderOuter;
 
 	static int NBBOTS;                           // Nbr of cars
     static double CurrSimTime;                   // Current simulation time
@@ -389,7 +400,29 @@ private:
 	static float BrakeLimitBase;
 	static float SpeedLimitScale;
 	static float SpeedLimitBase;
-	
+
+	void ScaleSide(float FactorMu, float FactorBrake);
+	void SideBorderOuter(float Factor);
+
+	double CalcCrv(double Crv);
+	double CalcHairpin(double Crv);
+
+	double (TDriver::*CalcCrvFoo)(double Crv);
+	double (TDriver::*CalcHairpinFoo)(double Crv);
+
+	double CalcCrv_simplix(double Crv);
+	double CalcCrv_simplix_TRB1(double Crv);
+	double CalcCrv_simplix_SC(double Crv);
+	double CalcCrv_simplix_36GP(double Crv);
+
+	double CalcHairpin_simplix(double Crv);
+	double CalcHairpin_simplix_TRB1(double Crv);
+	double CalcHairpin_simplix_SC(double Crv);
+	double CalcHairpin_simplix_36GP(double Crv);
+
+	void UseFilterAccel(){oUseFilterAccel = true;};
+	void UseAccelOut(){oUseAccelOut = true;};
+
 };
 //==========================================================================*
 

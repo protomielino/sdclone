@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.07.12
+// Last changed : 2009.07.26
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -100,6 +100,8 @@ bool TDriver::Qualification;                       // Global flag
 static char *WheelSect[4] =                        // TORCS defined sections
 {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
+static double (TDriver::*CalcCrv)(double Crv);
+
 //static double cTimeSum[7] = {0,0,0,0,0,0,0};
 //==========================================================================*
 
@@ -159,7 +161,8 @@ void TDriver::InterpolatePointInfo
 {
   double DeltaOAngle = P1.Angle - P0.Angle;
 
-  P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, Q);
+//  P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, Q);
+  P0.Crv = TUtils::InterpCurvature(P0.Crv, P1.Crv, (1 - Q));
   DOUBLE_NORM_PI_PI(DeltaOAngle);
   P0.Angle = P0.Angle + DeltaOAngle * (1 - Q);
   P0.Offset = Q * P0.Offset + (1 - Q) * P1.Offset;
@@ -178,7 +181,7 @@ TDriver::TDriver(int Index):
   oFlyHeight(0.06f),
   oScaleSteer(1.0),
   oStayTogether(10.0),
-  oAvoidScale(10.0),
+  oAvoidScale(8.0),
   oAvoidWidth(0.5),
   oGoToPit(false),
 
@@ -195,14 +198,16 @@ TDriver::TDriver(int Index):
   oMaxAccel(0, 100, 101, 1),
   //oBrakeCoeff
   oLastBrakeCoefIndex(0),
-  oLastBrake(0.0),
   oLastTargetSpeed(0.0),
 
   oAccel(0),
+  oLastAccel(1.0),
   oBrake(0),
+  oLastBrake(0.0),
   oClutch(0.5),
   oGear(0),
   oSteer(0),
+  oLastSteer(0),
 
   oAbsDelta(1.1),
   oAbsScale(0.5),
@@ -282,6 +287,7 @@ TDriver::TDriver(int Index):
   oDoAvoid(false),
   oSkilling(true),
   oSkill(0.0),
+  oSkillMax(24.0),
   oSkillDriver(0.0),
   oSkillGlobal(0.0),
   oSkillScale(1.0),
@@ -308,7 +314,13 @@ TDriver::TDriver(int Index):
   oTeamEnabled(true),
   oPitSharing(false),
   oTeamIndex(0),
-  oBumpMode(1)
+  oBumpMode(1),
+  oTestLane(0),
+  oUseFilterAccel(false),
+  oUseAccelOut(false),
+  oSideScaleMu(0.97f),
+  oSideScaleBrake(0.97f),
+  oSideBorderOuter(0.2f)
 {
 //  GfOut("#TDriver::TDriver() >>>\n");
   int I;
@@ -318,7 +330,7 @@ TDriver::TDriver(int Index):
   oSysFooStuckX = new TSysFoo(1,128);            // Ringbuffer for X
   oSysFooStuckY = new TSysFoo(1,128);            // and Y coordinates
 
-  for (I = 0; I < NBR_BRAKECOEFF; I++)           // Initialize braking
+  for (I = 0; I <= NBR_BRAKECOEFF; I++)          // Initialize braking
     oBrakeCoeff[I] = 0.5;
 
   NBRRL = gNBR_RL;                               // Setup number
@@ -591,6 +603,17 @@ void TDriver::InitTrack
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LENGTH_MARGIN,0,LENGTH_MARGIN);
   GfOut("#LengthMargin %.2f\n",TDriver::LengthMargin);
 
+  // Check test flag:
+  const char* ForceLane = GfParmGetStr(Handle,
+	TDriver::SECT_PRIV,PRV_FORCE_LANE,"F");    
+  
+  if (strcmp(ForceLane,"L") == 0)
+	oTestLane = -1;
+  else if (strcmp(ForceLane,"R") == 0)
+	oTestLane = 1;
+  else 
+	oTestLane = 0;
+
   int TestQualification =
 	(int) GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_QUALIFICATION,0,0);
   if ((oSituation->_raceType == RM_TYPE_QUALIF)
@@ -685,7 +708,10 @@ void TDriver::InitTrack
 
   // Adjust driving ...
   Param.oCarParam.oScaleBrake = ScaleBrake *
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE,NULL,0.85f);
+    GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE,NULL,0.85f);
+  if(Qualification)
+    Param.oCarParam.oScaleBrake = 
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE_Q,NULL,Param.oCarParam.oScaleBrake);
   GfOut("#Scale Brake: %g\n",Param.oCarParam.oScaleBrake);
 
   oBumpMode =
@@ -704,11 +730,22 @@ void TDriver::InitTrack
 
   Param.oCarParam.oScaleMu = ScaleMu *
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU,NULL,Param.oCarParam.oScaleMu);
+  if(Qualification)
+    Param.oCarParam.oScaleMu = 
+  	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU_Q,NULL,Param.oCarParam.oScaleMu);
   GfOut("#Scale Mu: %g\n",Param.oCarParam.oScaleMu);
 
   Param.oCarParam.oScaleMinMu =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MIN_MU,NULL,Param.oCarParam.oScaleMinMu);
   GfOut("#Scale Min Mu %g\n",Param.oCarParam.oScaleMinMu);
+
+  oSideScaleMu = 
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_MU,NULL,oSideScaleMu);
+  GfOut("#Side Scale Mu%g\n",oSideScaleMu);
+
+  oSideScaleBrake = 
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_BRAKE,NULL,oSideScaleBrake);
+  GfOut("#Side Scale Brake%g\n",oSideScaleMu);
 
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,oAvoidScale);
@@ -719,6 +756,13 @@ void TDriver::InitTrack
   GfOut("#oAvoidWidth %g\n",oAvoidWidth);
 
   oLookAhead = Param.Fix.oLength;
+  oLookAhead =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LOOKAHEAD,0,oLookAhead);
+  GfOut("#oLookAhead %g\n",oLookAhead);
+
+  if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
+	  UseAccelOut();
+
   oOmegaAhead = Param.Fix.oLength;
   oInitialBrakeCoeff = oBrakeCoeff[0];
 
@@ -770,10 +814,10 @@ void TDriver::InitTrack
   GfOut("#oScaleSteer %g\n",oScaleSteer);
 
   oStayTogether =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_STAY_TOGETHER,0,0);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_STAY_TOGETHER,0,10);
   GfOut("#oStayTogether %g\n",oStayTogether);
 
-  for (int I = 0; I < NBR_BRAKECOEFF; I++)       // Initialize braking
+  for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
     oBrakeCoeff[I] = oInitialBrakeCoeff;
 
   oTclRange =
@@ -853,12 +897,16 @@ void TDriver::InitTrack
 	{
       // Scaling 
 	  oSkillScale = oSkillScale/50.0;
-	  oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
+	  oSkillDriver = oSkillDriver / (5.0 * ((50.0 - oSkillGlobal)/40.0));
 	  oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
+	  oSkillMax = oSkillScale * 24 + oSkillOffset;
 	}
 
 	if (Qualification)
+	{
   	  oSkill *= 1.5;
+	  oSkillMax *= 1.5;
+	}
 
     Param.Tmp.oSkill = 1.0 + oSkill;
 	GfOut("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
@@ -894,7 +942,7 @@ void TDriver::InitTrack
 
   float Reserve = GfParmGetNum(Handle            // Reserve in m
     , TDriver::SECT_PRIV, PRV_RESERVE
-    , (char*) NULL, 5000);
+    , (char*) NULL, 2000);
   GfOut("#Reserve: %.0f\n",Reserve);
   oStrategy->oReserve = Reserve;
   oFuelNeeded =
@@ -1007,7 +1055,7 @@ void TDriver::Drive()
   if (oTestPitStop)                              // If defined, try
     oStrategy->TestPitStop();                    //   to stop in pit
 
-  //Propagation();                                 // Propagation
+  Propagation();                                 // Propagation
 
   oAlone = true;                                 // Assume free way to race
   bool Close = false;                            // Assume free way to race
@@ -1023,6 +1071,7 @@ void TDriver::Drive()
   GetPosInfo(Pos,oLanePoint);                    // Get info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
+  double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
 
 //  cTimeSum[0] += RtDuration(StartTimeStamp);
 
@@ -1031,6 +1080,7 @@ void TDriver::Drive()
 //  cTimeSum[1] += RtDuration(StartTimeStamp);
 
   oSteer = Steering();                           // Steering
+  oSteer = FilterSteerSpeed(oSteer);             // Steering
 
 //  cTimeSum[2] += RtDuration(StartTimeStamp);
 
@@ -1070,15 +1120,21 @@ void TDriver::Drive()
     oAccel = FilterDrifting(oAccel);
     oAccel = FilterTrack(oAccel);
     oAccel = FilterTCL(oAccel);
+    if (oUseFilterAccel)
+      oAccel = FilterAccel(oAccel);
   }
 
+  oLastSteer = oSteer;
   // Tell TORCS what we want do do
+  oLastAccel = oAccel;
   oCar->ctrl.accelCmd = (float) oAccel;
   oCar->ctrl.brakeCmd = (float) oBrake;
   oCar->ctrl.clutchCmd = (float) oClutch;
   oCar->ctrl.gear = oGear;
   oCar->ctrl.steer = (float) oSteer;
-  //GfOut("#%d: %g A: %g B: %g C: %g G: %d S: %g\n",oIndex,CurrSimTime,oAccel,oBrake,oClutch,oGear,oSteer);
+
+  //int Idx = oTrackDesc.IndexFromPos(Pos);
+  //GfOut("#%d: %g P:%.0f(%d) A: %g B: %g C: %g G: %d S: %g\n",oIndex,CurrSimTime,Pos,Idx,oAccel,oBrake,oClutch,oGear,oSteer);
 /*
   if (oDoAvoid)
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;        // Only small lights on
@@ -1094,8 +1150,11 @@ void TDriver::Drive()
     oStrategy->CheckPitState(0.6f);              //  qualification
 
   //if ((oCurrSpeed < 100.0/3.6) && (CurrSimTime > 0) && (CurrSimTime < 10))
-  //if (fabs(oLanePoint.Crv) > 1/21.5)
-  //  GfOut("t:%.2f s v:%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,MAX(0.75,MIN(3.0,600000.0*fabs(oLanePoint.Crv * oLanePoint.Crv * oLanePoint.Crv))));
+  //if (fabs(oLanePoint.Crv) > 1/50.0)
+  //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
+  //else
+  //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
+  //GfOut("t:%.2f s v:(%.1f)%.1f km/h Z:%.3f RA:%.3f RAD:%.1f F:%.3f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz,TrackRollangle,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)),CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
 }
 //==========================================================================*
 
@@ -1274,9 +1333,10 @@ void TDriver::FindRacinglines()
     Param.oCarParam2.oScaleBumpRight =           // Adjust outer bump scale
 	  Param.oCarParam.oScaleBumpOuter;           //   to be able to avoid
 	Param.oCarParam2.oScaleMu =                  // Adjust mu scale
-	  MIN(0.97,Param.oCarParam.oScaleMu);        //   to be able to avoid
+	  oSideScaleMu*Param.oCarParam.oScaleMu;     //   to be able to avoid
 	Param.oCarParam2.oScaleBrake =               // Adjust brake scale
-	  MIN(0.95,Param.oCarParam.oScaleBrake);     //   to be able to avoid
+	  oSideScaleBrake*Param.oCarParam.oScaleBrake; //   to be able to avoid
+    Param.Fix.oBorderOuter += oSideBorderOuter;
 	
     if (!oRacingLine[oRL_LEFT].LoadSmoothPath    // Load a smooth path
 	  (oTrackLoadLeft,
@@ -1365,7 +1425,7 @@ void TDriver::InitCarModells()
   oCarParams[1] = &Param.oCarParam2;
   oCarParams[2] = &Param.oCarParam2;
 
-  Param.Initialize(oCar);                        // Initialize parameters
+  Param.Initialize(this,oCar);                   // Initialize parameters
 
   Param.SetEmptyMass(                            // Set car mass
 	GfParmGetNum(oCarHandle,
@@ -2246,15 +2306,16 @@ void TDriver::BrakingForceRegulator()
 
   if ((oLastBrake > 0)
 	&& (oBrake > 0)
-	&& (Diff < 6))
+	&& (Diff < 2))
   {
 	oBrake = 0;
 	oAccel = 0.06;
   }
 
+  oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
+
   oLastBrake = oBrake;
   oLastTargetSpeed = 0;
-
 }
 //==========================================================================*
 
@@ -2287,8 +2348,10 @@ void TDriver::BrakingForceRegulatorAvoid()
 	}
   }
 
+  oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
+
   if (oMinDistLong < 10.0)
-	oBrake *= 1.3;
+	oBrake *= 1.1;
 
   oLastTargetSpeed = 0;
 }
@@ -2312,7 +2375,7 @@ void TDriver::BrakingForceRegulatorTraffic()
 
   if (Diff > 0.0)
   {
-	int	B = int(floor(oCurrSpeed/2));
+	int	B = (int) MIN(NBR_BRAKECOEFF,(floor(oCurrSpeed/2)));
 	oAccel = 0;
 	oBrake = MAX(0, MIN(oBrakeCoeff[B] * Diff * Diff, oBrakeForceMax));
 	oLastBrakeCoefIndex = B;
@@ -2326,8 +2389,10 @@ void TDriver::BrakingForceRegulatorTraffic()
 	}
   }
 
+  oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
+
   if (oMinDistLong < 10.0)
-	oBrake *= 1.3;
+	oBrake *= 1.1;
 
 }
 //==========================================================================*
@@ -2735,6 +2800,17 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 	}
   }
 
+  if (oTestLane > 0)
+  {
+    oDoAvoid = true;                             // side to make pit stop
+    Target = oTestLane;
+  }
+  else if (oTestLane < 0)
+  {
+    oDoAvoid = true;                             // side to make pit stop
+    Target = oTestLane;
+  }
+
   double TargetSpeed =                           // Adjust target speed
 	MIN(oTargetSpeed, Coll.TargetSpeed * 0.9);
 
@@ -2767,6 +2843,39 @@ double TDriver::FilterStart(double Speed)
     Speed *= MAX(0.6,(1.0 - (oCar->race.pos - 1) * Offset));
   }
   return Speed;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Limit steer speed
+//--------------------------------------------------------------------------*
+double TDriver::FilterSteerSpeed(double Steer)
+{
+  if (oCurrSpeed < 20)
+	return Steer;
+
+  if (!Qualification)
+  {
+    const float MaxSteerSpeed = 0.1f;
+    double Ratio = fabs(oLastSteer - Steer)/MaxSteerSpeed;
+
+    if (Ratio > 1.0)
+	{
+	  if (Steer > oLastSteer)
+	    Steer = oLastSteer + MaxSteerSpeed;
+	  else
+	    Steer = oLastSteer - MaxSteerSpeed;
+	}
+
+    double Range = MIN(1.0,0.3 + 1250.0/(oCurrSpeed*oCurrSpeed));
+
+	if (Steer > 0)
+      Steer = MIN(Range,Steer);
+	else
+      Steer = MAX(-Range,Steer);
+
+  }
+  return Steer;
 }
 //==========================================================================*
 
@@ -2830,6 +2939,25 @@ double TDriver::FilterBrakeSpeed(double Brake)
 	return Brake * F1/F2;
 }
 //==========================================================================*
+
+//==========================================================================*
+// Filter acceleration Control
+//--------------------------------------------------------------------------*
+double TDriver::FilterAccel(double Accel)
+{
+  if (DistanceRaced < 50)                        // Not at start
+	return Accel;
+
+  if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
+	return Accel;
+
+  //if (fabs(oDriftAngle) > 0.3)
+  //  return MIN(Accel, oLastAccel + 0.01);
+
+  return MIN(Accel,oLastAccel + 0.05);
+}
+//==========================================================================*
+
 
 //==========================================================================*
 // Filter Traction Control
@@ -3072,10 +3200,128 @@ double TDriver::CalcSkill(double TargetSpeed)
         oBrakeAdjustPerc -= 
 		  MIN(oSituation->deltaTime*2, oBrakeAdjustPerc - oBrakeAdjustTarget);
     }
-    TargetSpeed *= (1 - oDecelAdjustPerc/20);
+	//GfOut("TS: %g DAP: %g (%g)",TargetSpeed,oDecelAdjustPerc,(1 - oDecelAdjustPerc/10));
+    TargetSpeed *= (1 - oSkill/oSkillMax * oDecelAdjustPerc/20);
+	//GfOut("TS: %g\n",TargetSpeed);
   }
   //GfOut("%g %g\n",oDecelAdjustPerc,(1 - oDecelAdjustPerc/10));
   return TargetSpeed;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Set scaling factor for avoiding racinglines
+//--------------------------------------------------------------------------*
+void TDriver::ScaleSide(float FactorMu, float FactorBrake)
+{
+  oSideScaleMu = FactorMu;
+  oSideScaleBrake = FactorBrake;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Set additional border to outer side
+//--------------------------------------------------------------------------*
+void TDriver::SideBorderOuter(float Factor)
+{
+  oSideBorderOuter = Factor;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Calculate the crv
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv(double Crv)
+{
+  return (this->*CalcCrvFoo)(Crv);
+}
+//==========================================================================*
+
+//==========================================================================*
+// Calculate the hairpin
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin(double Crv)
+{
+  return (this->*CalcHairpinFoo)(Crv);
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix(double Crv)
+{
+  return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_TRB1
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_TRB1(double Crv)
+{
+  return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_sc
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_SC(double Crv)
+{
+  return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_36GP
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_36GP(double Crv)
+{
+  if (Qualification)
+    return MAX(1.00,MIN(2.8,5200.0 * Crv * Crv)); 
+  else
+    return MAX(1.00,MIN(3.2,7500.0 * Crv * Crv)); 
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix(double Crv)
+{
+  return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_TRB1
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix_TRB1(double Crv)
+{
+  return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_sc
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix_SC(double Crv)
+{
+  return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_36GP
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix_36GP(double Crv)
+{
+  //GfOut("HP\n");
+  if (Qualification)
+    return MAX(1.00,MIN(3.0,2300.0  * Crv * Crv)); 
+  else
+    return MAX(1.00,MIN(3.2,6000.0  * Crv * Crv));
 }
 //==========================================================================*
 

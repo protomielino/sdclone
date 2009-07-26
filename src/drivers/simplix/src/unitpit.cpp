@@ -75,6 +75,8 @@ TPit::TPit(TDriver *Driver)
 	oSpeedLimitSqr = oSpeedLimit*oSpeedLimit;
 	oPitSpeedLimitSqr = oPitInfo->speedLimit*oPitInfo->speedLimit;
   }
+  else
+    GfOut("\n\n\n SIMPLIX: NO PIT \n\n\n");
 
   for (int I = 0; I < gNBR_RL; I++)
     oPitLane[I].Init(Driver->Car());

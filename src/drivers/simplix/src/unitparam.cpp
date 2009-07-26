@@ -2,15 +2,17 @@
 // unitparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
-// Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Container for parameters of car, lane, pit ...
+// Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
 //
-// Datei    : unitparam.cpp
-// Erstellt : 11.04.2008
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitparam.cpp
+// Created      : 2008.04.11
+// Last changed : 2009.07.12
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -55,12 +57,12 @@ TParam::~TParam()
 //==========================================================================*
 // Initialize
 //--------------------------------------------------------------------------*
-void TParam::Initialize(PtCarElt Car)
+void TParam::Initialize(PDriver Driver, PtCarElt Car)
 {
   oCar = Car;
 
   Tmp.Initialize(Car);                           // State of the car
-  Fix.Initialize(Car);                           // Data of the car
+  Fix.Initialize(Driver,Car);                           // Data of the car
 }
 //==========================================================================*
 

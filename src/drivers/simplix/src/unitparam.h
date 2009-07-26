@@ -4,11 +4,12 @@
 // TORCS: "The Open Racing Car Simulator"
 // A robot for TORCS-NG-Version 1.4.0
 //--------------------------------------------------------------------------*
+// Container for parameters of car, lane, pit ...
 // Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.
 //
 // File         : unitparam.h
 // Created      : 2007.04.11
-// Last changed : 2008.12.26
+// Last changed : 2009.07.12
 // Copyright    : © 2007-2008 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -53,7 +54,7 @@ class TParam
     ~TParam();                                   // Destructor
 
 	void Initialize
-	  (PtCarElt Car);
+	  (PDriver Driver, PtCarElt Car);
 	void SetEmptyMass(float EmptyMass);
     void Update();
 

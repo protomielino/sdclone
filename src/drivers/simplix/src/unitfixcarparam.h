@@ -2,19 +2,17 @@
 // unitfixcarparam.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for TORCS-NG-Version 1.4.0
+//--------------------------------------------------------------------------*
+// Unchanged parameters of car
 // Unveränderliche Parameter des Fahrzeugs
 //
-// Datei    : unitfixcarparam.h
-// Erstellt : 2007.11.25
-// Stand    : 2008.12.19
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 2.00.000
-//--------------------------------------------------------------------------*
-// Ein erweiterter TORCS-Roboters
-//--------------------------------------------------------------------------*
-// Diese Version wurde mit MS Visual C++ 2005 Express Edition entwickelt.
+// File         : unitfixcarparam.h
+// Created      : 2007.11.25
+// Last changed : 2009.07.12
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
@@ -45,6 +43,7 @@
 class TFixCarParam  
 {
   private:
+    PDriver oDriver;
 
   public:
     PtCarElt oCar;                               // Pointer to TORCS data of car
@@ -94,7 +93,7 @@ class TFixCarParam
 	double CalcMaxSpeedCrv() const;
 
 	void Initialize
-	  (PtCarElt Car);
+	  (PDriver Driver, PtCarElt Car);
 
   public:
 	double oBorderInner;                         // Const. Buffer to inner

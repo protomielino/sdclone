@@ -88,8 +88,9 @@ TFixCarParam::~TFixCarParam()
 //==========================================================================*
 // Initialize
 //--------------------------------------------------------------------------*
-void TFixCarParam::Initialize(PtCarElt Car)
+void TFixCarParam::Initialize(PDriver Driver, PtCarElt Car)
 {
+  oDriver = Driver;
   oCar = Car;
 }
 //==========================================================================*
@@ -357,26 +358,29 @@ double TFixCarParam::CalcMaxSpeed
   double factor = 1.0;
   if (AbsCrv > AbsCrv1)
   {
-    if (fabs(AbsCrv) > 1/21.5)
-      AbsCrv *= MAX(0.75,MIN(5.0,600000.0*AbsCrv*AbsCrv*AbsCrv));
-
-	factor = 1.015;
+//    if (fabs(AbsCrv) > 1/45.0)
+    if (fabs(AbsCrv) > 1/50.0)
+	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
+	else if (!oDriver->oUseAccelOut)
+	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
+	else
+	  factor = 1.015;
   }
   else
   {
 	factor = 0.985;
-    if (fabs(AbsCrv) > 1/21.5)
-      AbsCrv *= MAX(0.75,MIN(5.0,600000.0*AbsCrv*AbsCrv*AbsCrv));
+    if (fabs(AbsCrv) > 1/45.0)
+	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
 	else
-      AbsCrv *= MAX(0.75,MIN(3.0,600000.0*AbsCrv*AbsCrv*AbsCrv));
+	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
   }
-
+/*
   if (TDriver::UseBrakeLimit)
   {
     if (oStrategy->OutOfPitlane())
       factor *= 1.0 - MAX(0.0,TDriver::SpeedLimitScale * (AbsCrv - TDriver::SpeedLimitBase));
   }
-
+/**/
   double Den;
 
   double ScaleBump;
@@ -401,6 +405,9 @@ double TFixCarParam::CalcMaxSpeed
     Speed *= 0.90;                               // Filter hairpins
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
     Speed = 112;                                 
+
+  if (Speed < 15)
+	  Speed =  15;
 
   return Speed;
 }

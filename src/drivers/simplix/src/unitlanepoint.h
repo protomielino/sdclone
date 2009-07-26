@@ -52,6 +52,7 @@ class TLanePoint
 	double Offset; 	                             // Offset from middle for the path.
 	double Angle;	                             // Global angle
 	double Crv;		                             // Curvature at point
+	double Crvz;                                 // Curvature in z at point
 	double Speed;                                // Speed
 	double AccSpd;                               // Accelleration speed
 	int Index;	                                 // Index of sec.

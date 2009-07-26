@@ -73,6 +73,7 @@ class TLane
 		const TSection*	Sec;		             // Track seg that contains this Seg
 		TVec3d Center;                           // Lane specific center
 		double Crv;	 		                     // Curvature in xy
+		//double CrvRated;	                     // Curvature in xy
 		double CrvZ;			                 // Curvature in z direction... e.g. bumps
 		double Offset;                           // Offset from centre point
 		TVec3d Point;                            // Actual point (same as CalcPt())
@@ -149,6 +150,7 @@ class TLane
 	double CalcEstimatedTime
 	  (int Start, int Len) const;
 	double CalcEstimatedLapTime() const;
+	double CalcTrackRollangle(double TrackPos);
 
   protected:
 	TTrackDescription* oTrack;                   // TORCS track data

@@ -7,8 +7,8 @@
 //
 // File         : unitcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2008.12.26
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2009.07.26
+// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
