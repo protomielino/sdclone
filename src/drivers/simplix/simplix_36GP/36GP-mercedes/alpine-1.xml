@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-    file                 : e-track-4.xml
-    created              : Sam Dec 19 00:33:00 CET 2008
-    copyright            : (C) 2008 by Wolf-Dieter Beelitz 
-    email                : wdbee@wdbee.de   
-    version              : $Id: 
+    file          : alpine-1.xml
+    created       : 19 Dec 2008 
+    last modified : 26 Jul 2009
+    copyright     : (C) 2008-2009 Wolf-Dieter Beelitz
 -->
-
 <!--    This program is free software; you can redistribute it and/or modify  -->
 <!--    it under the terms of the GNU General Public License as published by  -->
 <!--    the Free Software Foundation; either version 2 of the License, or     -->
@@ -14,12 +12,12 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="36GP-bugatti" type="template">
+<params name="36GP-mercedes" type="template">
 	<section name="simplix private">
-		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.5"/>
-		<attnum name="scale brake" min="0" max="1" val="0.85"/>
-		<attnum name="scale bump" min="0" max="1" val="0.01"/>
-		<attnum name="scale mu" min="0" max="2" val="0.77"/>
+		<attnum name="qualy brake" min="0" max="1" val="0.90"/>
+		<attnum name="qualy mu" min="0" max="2" val="0.90"/>
+		<attnum name="scale brake" min="0" max="1" val="0.78"/>
+		<attnum name="scale mu" min="0" max="2" val="0.85"/>
 	</section>
 </params>
 

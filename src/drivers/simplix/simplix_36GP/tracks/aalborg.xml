@@ -12,7 +12,7 @@
 <!DOCTYPE params SYSTEM "../../../src/libs/tgf/params.dtd">
 <params name="" type="template" mode="mw">
 	<section name="simplix private">
-		<attstr name="force lane" in="L,R,F" val="F"/>
+		<attstr name="force lane" in="L,R,F" val="L"/>
 		<attnum name="pit test stop" min="0" max="1" val="0"/>
 		<attnum name="qualification" min="0" max="1" val="0"/>
 

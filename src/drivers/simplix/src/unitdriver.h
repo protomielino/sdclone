@@ -254,6 +254,7 @@ private:
 	double oBrakeCoeff[NBR_BRAKECOEFF+1];        // Brake coefficients 
 	int	oLastBrakeCoefIndex;                     // Index of last brake coef.
 	double oLastTargetSpeed;                     // Last target speed
+	double oLastAheadDist;                       // Last look ahead distance
 
     // State values to update commands 
 	double oAccel;                               // Accelleration

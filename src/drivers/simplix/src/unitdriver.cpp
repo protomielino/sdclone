@@ -182,7 +182,7 @@ TDriver::TDriver(int Index):
   oScaleSteer(1.0),
   oStayTogether(10.0),
   oAvoidScale(8.0),
-  oAvoidWidth(0.5),
+  oAvoidWidth(1.5),
   oGoToPit(false),
 
   oDriveTrainType(cDT_RWD),
@@ -199,6 +199,7 @@ TDriver::TDriver(int Index):
   //oBrakeCoeff
   oLastBrakeCoefIndex(0),
   oLastTargetSpeed(0.0),
+  oLastAheadDist(10.0),
 
   oAccel(0),
   oLastAccel(1.0),
@@ -750,6 +751,15 @@ void TDriver::InitTrack
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,oAvoidScale);
   GfOut("#oAvoidScale %g\n",oAvoidScale);
+
+  if (oTrack->width < 11)
+    oAvoidWidth = 0.5;
+  else if (oTrack->width < 12)
+    oAvoidWidth = 0.75;
+  else if (oTrack->width < 13)
+    oAvoidWidth = 1.0;
+  else if (oTrack->width < 14)
+    oAvoidWidth = 1.25;
 
   oAvoidWidth =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_WIDTH,0,oAvoidWidth);
@@ -2208,8 +2218,15 @@ double TDriver::SteerAngle(TLanePoint& AheadPointInfo)
 {
   // Look this far ahead.
   double AheadDist = oLookBase + oCurrSpeed * oLookScale;
+  if (oDoAvoid)
+	AheadDist = 1.5 + oCurrSpeed * 0.04;
   if (oGoToPit)
 	AheadDist = 2.0;
+  if (AheadDist < oLastAheadDist - 0.05)
+    AheadDist = oLastAheadDist - 0.05;
+  else if (AheadDist > oLastAheadDist + 0.05)
+    AheadDist = oLastAheadDist + 0.05;
+  oLastAheadDist = AheadDist;
   double AheadPos = oTrackDesc.CalcPos(oCar, AheadDist);
 
   // Get info about pts on track.
