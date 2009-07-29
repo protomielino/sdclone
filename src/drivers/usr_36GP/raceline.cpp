@@ -29,6 +29,13 @@
 #include "spline.h"
 
 ////////////////////////////////////////////////////////////////////////////
+// Structures and Statics
+////////////////////////////////////////////////////////////////////////////
+
+static SRaceLine SRL[5] = { 0 };
+static int SRLinit = 0;
+
+////////////////////////////////////////////////////////////////////////////
 // Parameters
 ////////////////////////////////////////////////////////////////////////////
 
@@ -124,38 +131,14 @@ LRaceLine::LRaceLine() :
    deltaTime(0.02),
    avgerror(0.00),
    Divs(0),
-   Segs(0),
    AccelCurveOffset(0),
    Iterations(100),
    SteerMod(0),
    Width(0.0),
    Length(0.0),
-   tSegDist(NULL),
-   tSegIndex(NULL),
-   tSegDivStart(NULL),
-   tElemLength(NULL),
-   tSegment(NULL),
-   tx(NULL),
-   ty(NULL),
-   tz(NULL),
-   tzd(NULL),
-   tDistance(NULL),
-   tRInverse(NULL),
    tSpeed(NULL),
-   txLeft(NULL),
-   tyLeft(NULL),
-   txRight(NULL),
-   tyRight(NULL),
-   tLane(NULL),
-   tFriction(NULL),
-   tBrakeFriction(NULL),
-   tLaneLMargin(NULL),
-   tLaneRMargin(NULL),
    tLaneShift(NULL),
-   tLDelta(NULL),
-   tRDelta(NULL),
    tExtLimit(NULL),
-   tDivSeg(NULL),
    tRLMarginRgt(NULL),
    tRLMarginLft(NULL),
    tOTCaution(NULL),
@@ -188,6 +171,9 @@ LRaceLine::LRaceLine() :
    carhandle(NULL),
    car(NULL)
 {
+ if (!SRLinit)
+  memset(SRL, 0, sizeof(SRL));
+ SRLinit = 1;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -195,23 +181,28 @@ LRaceLine::LRaceLine() :
 /////////////////////////////////////////////////////////////////////////////
 void LRaceLine::UpdateTxTy(int i, int rl)
 {
- tx[rl][i] = tLane[i] * txRight[i] + (1 - tLane[i]) * txLeft[i];
- ty[rl][i] = tLane[i] * tyRight[i] + (1 - tLane[i]) * tyLeft[i];
+ SRL[rl].tx[i] = SRL[rl].tLane[i] * SRL[rl].txRight[i] + (1 - SRL[rl].tLane[i]) * SRL[rl].txLeft[i];
+ SRL[rl].ty[i] = SRL[rl].tLane[i] * SRL[rl].tyRight[i] + (1 - SRL[rl].tLane[i]) * SRL[rl].tyLeft[i];
 }                                                                               
 
 /////////////////////////////////////////////////////////////////////////////
 // Set segment info
 /////////////////////////////////////////////////////////////////////////////
-void LRaceLine::SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l)
+void LRaceLine::SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l, int rl)
 {
  if (pseg)
  {
-  tSegDist[pseg->id] = d;
-  tSegIndex[pseg->id] = i;
-  tElemLength[pseg->id] = l;
-  if (pseg->id >= Segs)
-   Segs = pseg->id + 1;
+  //SRL[rl].tSegDist[pseg->id] = d;
+  SRL[rl].tSegIndex[pseg->id] = i;
+  SRL[rl].tElemLength[pseg->id] = l;
+  if (pseg->id >= SRL[rl].Segs)
+   SRL[rl].Segs = pseg->id + 1;
  }
+}
+
+double LRaceLine::getRInverse( int div )
+{
+ return SRL[SRLidx].tRInverse[((div + Divs) % Divs)];
 }
 
 void LRaceLine::AllocTrack( tTrack *ptrack )
@@ -219,7 +210,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  const tTrackSeg *psegCurrent = ptrack->seg;
  int i = 0, nseg = 0;
 
- FreeTrack();
+ FreeTrack(false);
 
  DivLength = GfParmGetNum( carhandle, "private", "DivLength", (char *)NULL, 3.0 );
 
@@ -236,49 +227,33 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  nseg++;
  nseg = MAX(Divs, nseg);
 
- tx = (double **) malloc( 2 * sizeof(double *) );
- ty = (double **) malloc( 2 * sizeof(double *) );
- tz = (double **) malloc( 2 * sizeof(double *) );
- tzd = (double **) malloc( 2 * sizeof(double *) );
- tRInverse = (double **) malloc( 2 * sizeof(double *) );
  tSpeed = (double **) malloc( 2 * sizeof(double *) );
- tx[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- tx[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- ty[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- ty[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- tz[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- tz[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- tzd[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- tzd[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- tRInverse[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- tRInverse[1] = (double *) malloc( (Divs+1) * sizeof(double) );
+
+ SRLidx = (skill < 2.5 ? LINE_RL :
+          (skill < 5.0 ? LINE_RL+1 :
+          (skill < 8.0 ? LINE_RL+2 : LINE_RL+3)));
+
+ if (SRL[LINE_MID].init)
+ {
+  if (strcmp(SRL[LINE_MID].trackname, ptrack->name))
+   FreeRaceline( LINE_MID );
+ }
+ if (SRL[SRLidx].init)
+ {
+  if (strcmp(SRL[SRLidx].trackname, ptrack->name))
+   FreeRaceline( SRLidx );
+ }
+
+ if (!SRL[LINE_MID].init)
+  AllocRaceline( LINE_MID, ptrack->name );
+ 
+ if (!SRL[SRLidx].init)
+  AllocRaceline( SRLidx, ptrack->name );
+
  tSpeed[0] = (double *) malloc( (Divs+1) * sizeof(double) );
  tSpeed[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- tDistance = (double *) malloc( (Divs+1) * sizeof(double) );
- txLeft = (double *) malloc( (Divs+1) * sizeof(double) );
- tyLeft = (double *) malloc( (Divs+1) * sizeof(double) );
- txRight = (double *) malloc( (Divs+1) * sizeof(double) );
- tyRight = (double *) malloc( (Divs+1) * sizeof(double) );
- tLane = (double *) malloc( (Divs+1) * sizeof(double) );
- tFriction = (double **) malloc( 2 * sizeof(double *) );
- tFriction[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- tFriction[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- tBrakeFriction = (double **) malloc( 2 * sizeof(double *) );
- tBrakeFriction[0] = (double *) malloc( (Divs+1) * sizeof(double) );
- tBrakeFriction[1] = (double *) malloc( (Divs+1) * sizeof(double) );
- tDivSeg = (int *) malloc( (Divs+1) * sizeof(int) );
- tLaneLMargin = (double *) malloc( (Divs+1) * sizeof(double) );
- tLaneRMargin = (double *) malloc( (Divs+1) * sizeof(double) );
  tLaneShift = (double *) malloc( (Divs+1) * sizeof(double) );
- tLDelta = (double *) malloc( (Divs+1) * sizeof(double) );
- tRDelta = (double *) malloc( (Divs+1) * sizeof(double) );
  tExtLimit = (double *) malloc( (Divs+1) * sizeof(double) );
-
- tSegDist = (double *) malloc( (nseg+1) * sizeof(double) );
- tElemLength = (double *) malloc( (nseg+1) * sizeof(double) );
- tSegIndex = (int *) malloc( (nseg+1) * sizeof(int) );
- tSegDivStart = (int *) malloc( (nseg+1) * sizeof(int) );
- tSegment = (tTrackSeg **) malloc( (nseg+1) * sizeof(tTrackSeg *) );
 
  tRLMarginRgt = (LRLMod *) malloc( sizeof(LRLMod) );
  tRLMarginLft = (LRLMod *) malloc( sizeof(LRLMod) );
@@ -305,34 +280,9 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  tSkidCorrection = (LRLMod *) malloc( sizeof(LRLMod) );
  tBumpCaution = (LRLMod *) malloc( sizeof(LRLMod) );
 
- memset(tx[0], 0, (Divs+1) * sizeof(double));
- memset(tx[1], 0, (Divs+1) * sizeof(double));
- memset(ty[0], 0, (Divs+1) * sizeof(double));
- memset(ty[1], 0, (Divs+1) * sizeof(double));
- memset(tz[0], 0, (Divs+1) * sizeof(double));
- memset(tz[1], 0, (Divs+1) * sizeof(double));
- memset(tzd[0], 0, (Divs+1) * sizeof(double));
- memset(tzd[1], 0, (Divs+1) * sizeof(double));
- memset(tFriction[0], 0, (Divs+1) * sizeof(double));
- memset(tFriction[1], 0, (Divs+1) * sizeof(double));
- memset(tBrakeFriction[0], 0, (Divs+1) * sizeof(double));
- memset(tBrakeFriction[1], 0, (Divs+1) * sizeof(double));
- memset(tRInverse[0], 0, (Divs+1) * sizeof(double));
- memset(tRInverse[1], 0, (Divs+1) * sizeof(double));
  memset(tSpeed[0], 0, (Divs+1) * sizeof(double));
  memset(tSpeed[1], 0, (Divs+1) * sizeof(double));
- memset(tDistance, 0, (Divs+1) * sizeof(double));
- memset(txLeft, 0, (Divs+1) * sizeof(double));
- memset(tyLeft, 0, (Divs+1) * sizeof(double));
- memset(txRight, 0, (Divs+1) * sizeof(double));
- memset(tyRight, 0, (Divs+1) * sizeof(double));
- memset(tLane, 0, (Divs+1) * sizeof(double));
- memset(tDivSeg, 0, (Divs + 1) * sizeof(int));
- memset(tLaneLMargin, 0, (Divs+1) * sizeof(double));
- memset(tLaneRMargin, 0, (Divs+1) * sizeof(double));
  memset(tLaneShift, 0, (Divs+1) * sizeof(double));
- memset(tLDelta, 0, (Divs+1) * sizeof(double));
- memset(tRDelta, 0, (Divs+1) * sizeof(double));
  memset(tExtLimit, 0, (Divs+1) * sizeof(double));
 
  memset(tDecel, 0, sizeof(LRLMod));
@@ -360,12 +310,6 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tSkidCorrection, 0, sizeof(LRLMod));
  memset(tBumpCaution, 0, sizeof(LRLMod));
 
- memset(tSegDist, 0, (nseg+1) * sizeof(double));
- memset(tElemLength, 0, (nseg+1) * sizeof(double));
- memset(tSegIndex, 0, (nseg+1) * sizeof(int));
- memset(tSegDivStart, 0, (nseg+1) * sizeof(int));
- memset(tSegment, 0, (nseg+1) * sizeof(tTrackSeg *));
-
  CurveFactor = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_CURVE_FACTOR, (char *)NULL, 0.12f );
  SecurityZ = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_SECURITY, (char *)NULL, 0.00f );
  SteerGain = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_STEER_GAIN, (char *)NULL, 1.30f );
@@ -382,8 +326,8 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  AvoidSpeedAdjustX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_SPEED_X, (char *)NULL, 1.0f );
  AvoidBrakeAdjust = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_BRAKE, (char *)NULL, 0.0f );
  AvoidBrakeAdjustX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_BRAKE_X, (char *)NULL, 1.0f );
- IntMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INT_MARGIN, (char *)NULL, 1.1f ) + skill/12;
- ExtMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXT_MARGIN, (char *)NULL, 1.7f ) + skill/5;
+ IntMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INT_MARGIN, (char *)NULL, 1.1f ) + (double) (SRLidx-1)/4; //skill/12;
+ ExtMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXT_MARGIN, (char *)NULL, 1.7f ) + (double) (SRLidx-1);   //skill/5;
  BrakeDelay = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE, (char *)NULL, 35.0f );
  BrakeDelayX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE_X, (char *)NULL, 1.0f );
  BrakeMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_MOD, (char *)NULL, 0.0f );
@@ -496,23 +440,13 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
 /////////////////////////////////////////////////////////////////////////////
 void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 {
- Segs = 0;
+ int rf = (rl > LINE_RL ? LINE_RL : rl);
+
+ SRL[rl].Segs = 0;
  tTrackSeg *psegCurrent = ptrack->seg;
 
- memset(tx[rl], 0, (Divs+1) * sizeof(double));
- memset(ty[rl], 0, (Divs+1) * sizeof(double));
- memset(tz[rl], 0, (Divs+1) * sizeof(double));
- memset(tzd[rl], 0, (Divs+1) * sizeof(double));
- memset(tFriction[rl], 0, (Divs+1) * sizeof(double));
- memset(tBrakeFriction[rl], 1, (Divs+1) * sizeof(double));
- memset(tRInverse[rl], 0, (Divs+1) * sizeof(double));
- memset(tSpeed[rl], 0, (Divs+1) * sizeof(double));
- memset(tDistance, 0, (Divs+1) * sizeof(double));
- memset(txLeft, 0, (Divs+1) * sizeof(double));
- memset(tyLeft, 0, (Divs+1) * sizeof(double));
- memset(txRight, 0, (Divs+1) * sizeof(double));
- memset(tyRight, 0, (Divs+1) * sizeof(double));
- memset(tLane, 0, (Divs+1) * sizeof(double));
+ memset(tSpeed[rf], 0, (Divs+1) * sizeof(double));
+ memset(tExtLimit, 0, (Divs+1) * sizeof(double));
 
  double Distance = 0;
  double Angle = psegCurrent->angle[TR_ZS];
@@ -530,8 +464,7 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
   double lmargin = 0.0, rmargin = 0.0;
 
   //if (rl == LINE_MID)
-   SetSegmentInfo(psegCurrent, Distance + Step, i, Step);
-  tSegDivStart[psegCurrent->id] = i;
+   SetSegmentInfo(psegCurrent, Distance + Step, i, Step, rl);
 
   if (rl >= LINE_RL)
   {
@@ -625,17 +558,16 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 
    double dx = -psegCurrent->width * sin(Angle) / 2;
    double dy = psegCurrent->width * cos(Angle) / 2;
-   txLeft[i] = xPos + dx;
-   tyLeft[i] = yPos + dy;
-   txRight[i] = xPos - dx;
-   tyRight[i] = yPos - dy;
-   tLane[i] = 0.5;
-   tLaneLMargin[i] = lmargin;
-   tLaneRMargin[i] = rmargin;
-   tFriction[rl][i] = psegCurrent->surface->kFriction;
-   if (tFriction[rl][i] < 1) // ??? ugly trick for dirt
+   SRL[rl].txLeft[i] = xPos + dx;
+   SRL[rl].tyLeft[i] = yPos + dy;
+   SRL[rl].txRight[i] = xPos - dx;
+   SRL[rl].tyRight[i] = yPos - dy;
+   SRL[rl].tLane[i] = 0.5;
+   SRL[rl].tLaneLMargin[i] = lmargin;
+   SRL[rl].tLaneRMargin[i] = rmargin;
+   SRL[rl].tFriction[i] = psegCurrent->surface->kFriction;
+   if (SRL[rl].tFriction[i] < 1) // ??? ugly trick for dirt
    {
-    //tFriction[rl][i] *= 0.90;
     fDirt = 1;
     //SideDistInt = -1.5;
     //SideDistExt = 0.0;
@@ -643,9 +575,9 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
    UpdateTxTy(i, rl);
 
    Distance += Step;
-   tDistance[i] = Distance;
-   tDivSeg[i] = psegCurrent->id;
-   tSegment[psegCurrent->id] = psegCurrent;
+   SRL[rl].tDistance[i] = Distance;
+   SRL[rl].tDivSeg[i] = psegCurrent->id;
+   SRL[rl].tSegment[psegCurrent->id] = psegCurrent;
 
    i++;
   }
@@ -656,49 +588,6 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 
  Width = psegCurrent->width;
  Length = Distance;
-
- if (rl >= LINE_RL)
- {
-  // evaluate changes in slope, used later for flying mitigation
-  double *tLSlope = (double *) malloc( (Divs + 1) * sizeof(double) );
-  double *tRSlope = (double *) malloc( (Divs + 1) * sizeof(double) );
-  memset(tLSlope, 0, sizeof(tLSlope));
-  memset(tRSlope, 0, sizeof(tRSlope));
-  psegCurrent = ptrack->seg;
-
-  do {
-   int i = psegCurrent->id, j = psegCurrent->prev->id;
-   double length = psegCurrent->length + (psegCurrent->length > 80.0f ? psegCurrent->length : 0.0f);
-
-   {
-    tLSlope[i] = (psegCurrent->vertex[TR_EL].z - psegCurrent->vertex[TR_SL].z) * (10.0f / length);
-    tRSlope[i] = (psegCurrent->vertex[TR_ER].z - psegCurrent->vertex[TR_SR].z) * (10.0f / length);
-   }
-  
-   if (tLSlope[i] < 0.0) tLSlope[i] *= 1.0f + MIN(1.0, fabs(tLSlope[j]-tLSlope[i])*0.3);
-   if (tRSlope[i] < 0.0) tRSlope[i] *= 1.0f + MIN(1.0, fabs(tRSlope[j]-tRSlope[i])*0.3);
- 
-   psegCurrent = psegCurrent->next;
-  }
-  while (psegCurrent != ptrack->seg);
-
-  psegCurrent = ptrack->seg;
-  do {
-   int i = psegCurrent->id;
-   tTrackSeg *psegNext = psegCurrent->next;
-   int j = psegNext->id;
- 
-   tLDelta[i] = atan((tLSlope[j] - tLSlope[i]) / 4.0);
-   tRDelta[i] = atan((tRSlope[j] - tRSlope[i]) / 4.0);
- 
-   psegCurrent = psegCurrent->next;
-  }
-  while (psegCurrent != ptrack->seg);
-
-  free(tLSlope);
-  free(tRSlope);
- }
-
 }
  
 /////////////////////////////////////////////////////////////////////////////
@@ -706,12 +595,12 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 /////////////////////////////////////////////////////////////////////////////
 double LRaceLine::GetRInverse(int prev, double x, double y, int next, int rl)
 {
- double x1 = tx[rl][next] - x;
- double y1 = ty[rl][next] - y;
- double x2 = tx[rl][prev] - x;
- double y2 = ty[rl][prev] - y;
- double x3 = tx[rl][next] - tx[rl][prev];
- double y3 = ty[rl][next] - ty[rl][prev];
+ double x1 = SRL[rl].tx[next] - x;
+ double y1 = SRL[rl].ty[next] - y;
+ double x2 = SRL[rl].tx[prev] - x;
+ double y2 = SRL[rl].ty[prev] - y;
+ double x3 = SRL[rl].tx[next] - SRL[rl].tx[prev];
+ double y3 = SRL[rl].ty[next] - SRL[rl].ty[prev];
  
  double det = x1 * y2 - x2 * y1;
  double n1 = x1 * x1 + y1 * y1;
@@ -727,39 +616,32 @@ double LRaceLine::GetRInverse(int prev, double x, double y, int next, int rl)
 /////////////////////////////////////////////////////////////////////////////
 void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl, double Security)
 {
- double OldLane = tLane[i];
+ double OldLane = SRL[rl].tLane[i];
  
  //
  // Start by aligning points for a reasonable initial lane
  //
- tLane[i] = (-(ty[rl][next] - ty[rl][prev]) * (txLeft[i] - tx[rl][prev]) +
-              (tx[rl][next] - tx[rl][prev]) * (tyLeft[i] - ty[rl][prev])) /
-            ( (ty[rl][next] - ty[rl][prev]) * (txRight[i] - txLeft[i]) -
-              (tx[rl][next] - tx[rl][prev]) * (tyRight[i] - tyLeft[i]));
-
-#if 0
- if (tLane[i] < -0.2)
-  tLane[i] = -0.2;
- else if (tLane[i] > 1.2)
-  tLane[i] = 1.2;
-#endif
+ SRL[rl].tLane[i] = (-(SRL[rl].ty[next] - SRL[rl].ty[prev]) * (SRL[rl].txLeft[i] - SRL[rl].tx[prev]) +
+                      (SRL[rl].tx[next] - SRL[rl].tx[prev]) * (SRL[rl].tyLeft[i] - SRL[rl].ty[prev])) /
+                    ( (SRL[rl].ty[next] - SRL[rl].ty[prev]) * (SRL[rl].txRight[i] - SRL[rl].txLeft[i]) -
+                      (SRL[rl].tx[next] - SRL[rl].tx[prev]) * (SRL[rl].tyRight[i] - SRL[rl].tyLeft[i]));
 
  if (rl >= LINE_RL)
  {
-  if (tLane[i] < -0.2-tLaneLMargin[i])
-   tLane[i] = -0.2-tLaneLMargin[i];
-  else if (tLane[i] > 1.2+tLaneRMargin[i])
-   tLane[i] = 1.2+tLaneRMargin[i];
+  if (SRL[rl].tLane[i] < -0.2-SRL[rl].tLaneLMargin[i])
+   SRL[rl].tLane[i] = -0.2-SRL[rl].tLaneLMargin[i];
+  else if (SRL[rl].tLane[i] > 1.2+SRL[rl].tLaneRMargin[i])
+   SRL[rl].tLane[i] = 1.2+SRL[rl].tLaneRMargin[i];
 
   /*
   if (fabs(tLaneShift[i]) >= 0.01)
   {
-   tLane[i] += tLaneShift[i] / Width;
+   SRL[rl].tLane[i] += tLaneShift[i] / Width;
    tLaneShift[i] /= 2;
   }
   */
   if (Security == -1)
-   tLane[i] += tLaneShift[i] / Width;
+   SRL[rl].tLane[i] += tLaneShift[i] / Width;
  }
 
  if (Security == -1)
@@ -771,10 +653,10 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
  //
  const double dLane = 0.0001;
  
- double dx = dLane * (txRight[i] - txLeft[i]);
- double dy = dLane * (tyRight[i] - tyLeft[i]);
+ double dx = dLane * (SRL[rl].txRight[i] - SRL[rl].txLeft[i]);
+ double dy = dLane * (SRL[rl].tyRight[i] - SRL[rl].tyLeft[i]);
  
- double dRInverse = GetRInverse(prev, tx[rl][i] + dx, ty[rl][i] + dy, next, rl);
+ double dRInverse = GetRInverse(prev, SRL[rl].tx[i] + dx, SRL[rl].ty[i] + dy, next, rl);
  double tcf = GetModD( tCurveFactor, i );
  double cf = (tcf != 0.0 ? tcf : CurveFactor);
  double intmargin = ((IntMargin) + GetModD( tIntMargin, i )) - cf * 5;
@@ -786,7 +668,7 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
  
  if (dRInverse > 0.000000001)
  {
-  tLane[i] += (dLane / dRInverse) * TargetRInverse;
+  SRL[rl].tLane[i] += (dLane / dRInverse) * TargetRInverse;
  
   double ExtLane = (extmargin + Security) / Width;
   double IntLane = ((intmargin) + Security) / Width;
@@ -799,39 +681,39 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
   {
    if (TargetRInverse >= 0.0)
    {
-    IntLane -= tLaneLMargin[i];
-    ExtLane -= tLaneRMargin[i];
+    IntLane -= SRL[rl].tLaneLMargin[i];
+    ExtLane -= SRL[rl].tLaneRMargin[i];
    }
    else
    {
-    ExtLane -= tLaneLMargin[i];
-    IntLane -= tLaneRMargin[i];
+    ExtLane -= SRL[rl].tLaneLMargin[i];
+    IntLane -= SRL[rl].tLaneRMargin[i];
    }
   }
 
   if (TargetRInverse >= 0.0)
   {
-   if (tLane[i] < IntLane)
-    tLane[i] = IntLane;
-   if (1 - tLane[i] < ExtLane)
+   if (SRL[rl].tLane[i] < IntLane)
+    SRL[rl].tLane[i] = IntLane;
+   if (1 - SRL[rl].tLane[i] < ExtLane)
    {
     if (1 - OldLane < ExtLane)
-     tLane[i] = Min(OldLane, tLane[i]);
+     SRL[rl].tLane[i] = Min(OldLane, SRL[rl].tLane[i]);
     else
-     tLane[i] = 1 - ExtLane;
+     SRL[rl].tLane[i] = 1 - ExtLane;
    }
   }
   else
   {
-   if (tLane[i] < ExtLane)
+   if (SRL[rl].tLane[i] < ExtLane)
    {
     if (OldLane < ExtLane)
-     tLane[i] = Max(OldLane, tLane[i]);
+     SRL[rl].tLane[i] = Max(OldLane, SRL[rl].tLane[i]);
     else
-     tLane[i] = ExtLane;
+     SRL[rl].tLane[i] = ExtLane;
    }
-   if (1 - tLane[i] < IntLane)
-    tLane[i] = 1 - IntLane;
+   if (1 - SRL[rl].tLane[i] < IntLane)
+    SRL[rl].tLane[i] = 1 - IntLane;
   }
 
   if (rl == LINE_RL)
@@ -840,9 +722,9 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
    double rgtlane = 1.0 - rgtmargin / track->width;
 
    if (lftlane > 0.0)
-    tLane[i] = MAX(tLane[i], lftlane);
+    SRL[rl].tLane[i] = MAX(SRL[rl].tLane[i], lftlane);
    if (rgtlane < 1.0)
-    tLane[i] = MIN(tLane[i], rgtlane);
+    SRL[rl].tLane[i] = MIN(SRL[rl].tLane[i], rgtlane);
   }
  }
  
@@ -861,10 +743,10 @@ void LRaceLine::Smooth(int Step, int rl)
  
  for (int i = 0; i <= Divs - Step; i += Step)
  {
-  double ri0 = GetRInverse(prevprev, tx[rl][prev], ty[rl][prev], i, rl);
-  double ri1 = GetRInverse(i, tx[rl][next], ty[rl][next], nextnext, rl);
-  double lPrev = Mag(tx[rl][i] - tx[rl][prev], ty[rl][i] - ty[rl][prev]);
-  double lNext = Mag(tx[rl][i] - tx[rl][next], ty[rl][i] - ty[rl][next]);
+  double ri0 = GetRInverse(prevprev, SRL[rl].tx[prev], SRL[rl].ty[prev], i, rl);
+  double ri1 = GetRInverse(i, SRL[rl].tx[next], SRL[rl].ty[next], nextnext, rl);
+  double lPrev = Mag(SRL[rl].tx[i] - SRL[rl].tx[prev], SRL[rl].ty[i] - SRL[rl].ty[prev]);
+  double lNext = Mag(SRL[rl].tx[i] - SRL[rl].tx[next], SRL[rl].ty[i] - SRL[rl].ty[next]);
 
   double TargetRInverse = (lNext * ri0 + lPrev * ri1) / (lNext + lPrev);
  
@@ -873,8 +755,8 @@ void LRaceLine::Smooth(int Step, int rl)
   if (rl >= LINE_RL)
   {
    int movingout = 0;
-   if ((TargetRInverse > 0.0 && tLane[next] > tLane[prev]) ||
-       (TargetRInverse < 0.0 && tLane[next] < tLane[prev]))
+   if ((TargetRInverse > 0.0 && SRL[rl].tLane[next] > SRL[rl].tLane[prev]) ||
+       (TargetRInverse < 0.0 && SRL[rl].tLane[next] < SRL[rl].tLane[prev]))
      movingout = 1;
 
    if (ri0 * ri1 > 0)
@@ -891,7 +773,7 @@ void LRaceLine::Smooth(int Step, int rl)
      {
       ri0 += curvefactor * (ri1 - ri0 * cb);
 
-      tTrackSeg *seg = tSegment[tDivSeg[i]];
+      tTrackSeg *seg = SRL[rl].tSegment[SRL[rl].tDivSeg[i]];
       if (BrakeCurveLimit > 0.0 && seg->type != TR_STR && seg->radius < 400.0)
        tExtLimit[i] = MIN(BrakeCurveLimit, (400.0 - seg->radius) / 50.0);
      }
@@ -899,7 +781,7 @@ void LRaceLine::Smooth(int Step, int rl)
      {
       ri1 += curvefactor * (ri0 - ri1 * ca);
 
-      tTrackSeg *seg = tSegment[tDivSeg[i]];
+      tTrackSeg *seg = SRL[rl].tSegment[SRL[rl].tDivSeg[i]];
       if (AccelCurveLimit > 0.0 && seg->type != TR_STR && seg->radius < 400.0)
        tExtLimit[i] = MIN(AccelCurveLimit, (400.0 - seg->radius) / 50.0);
      }
@@ -933,8 +815,8 @@ void LRaceLine::StepInterpolate(int iMin, int iMax, int Step, int rl)
  if (prev > Divs - Step)
   prev -= Step;
  
- double ir0 = GetRInverse(prev, tx[rl][iMin], ty[rl][iMin], iMax % Divs, rl);
- double ir1 = GetRInverse(iMin, tx[rl][iMax % Divs], ty[rl][iMax % Divs], next, rl);
+ double ir0 = GetRInverse(prev, SRL[rl].tx[iMin], SRL[rl].ty[iMin], iMax % Divs, rl);
+ double ir1 = GetRInverse(iMin, SRL[rl].tx[iMax % Divs], SRL[rl].ty[iMax % Divs], next, rl);
 
  for (int k = iMax; --k > iMin;)
  {
@@ -977,36 +859,14 @@ void LRaceLine::CalcZCurvature(int rl)
 
  for( i = 0; i < Divs; i++ )
  {
-  tTrackSeg *seg = tSegment[tDivSeg[i]];
+  tTrackSeg *seg = SRL[rl].tSegment[SRL[rl].tDivSeg[i]];
   
-#if 0
-  vec2f sl, el, sr, er, rp, vp;
-  sl.x = seg->vertex[TR_SL].x; sl.y = seg->vertex[TR_SL].y;
-  el.x = seg->vertex[TR_EL].x; el.y = seg->vertex[TR_EL].y;
-  sr.x = seg->vertex[TR_SR].x; sr.y = seg->vertex[TR_SR].y;
-  er.x = seg->vertex[TR_ER].x; er.y = seg->vertex[TR_ER].y;
-  rp.x = tx[rl][i]; rp.y = ty[rl][i];
+  SRL[rl].tz[i] = RtTrackHeightG(seg, SRL[rl].tx[i], SRL[rl].ty[i]);
 
-  double sldist = PointDist(&sl, &rp);
-  double eldist = PointDist(&el, &rp);
-  double srdist = PointDist(&sr, &rp);
-  double erdist = PointDist(&er, &rp);
-
-  double pointdist = sldist + eldist + srdist + erdist;
-
-  double dist1 = PointDist(&sl, &er);
-  double dist2 = PointDist(&sr, &el);
-
-  double avgz = (seg->vertex[TR_SL].z + seg->vertex[TR_EL].z + seg->vertex[TR_SR].z + seg->vertex[TR_ER].z) / 4;
-
-  tz[rl][i] = avgz;
-  tz[rl][i] += (seg->vertex[TR_SL].z - avgz) * (1.0 - sldist/dist1);
-  tz[rl][i] += (seg->vertex[TR_SR].z - avgz) * (1.0 - srdist/dist2);
-  tz[rl][i] += (seg->vertex[TR_EL].z - avgz) * (1.0 - eldist/dist2);
-  tz[rl][i] += (seg->vertex[TR_ER].z - avgz) * (1.0 - erdist/dist1);
-#else
-  tz[rl][i] = RtTrackHeightG(seg, tx[rl][i], ty[rl][i]);
-#endif
+  int next = (i + 1) % Divs;
+  int prev = (i - 1 + Divs) % Divs;
+  double rInverse = GetRInverse(prev, SRL[rl].tx[i], SRL[rl].ty[i], next, rl);
+  SRL[rl].tRInverse[i] = rInverse;
  }
 
  for ( i = 0; i < Divs; i++ )
@@ -1014,10 +874,38 @@ void LRaceLine::CalcZCurvature(int rl)
   int j = ((i-1)+Divs) % Divs;
 
   vec2f pi, pj;
-  pi.x = tx[rl][i]; pi.y = ty[rl][i];
-  pj.x = tx[rl][j]; pj.y = ty[rl][j];
+  pi.x = SRL[rl].tx[i]; pi.y = SRL[rl].ty[i];
+  pj.x = SRL[rl].tx[j]; pj.y = SRL[rl].ty[j];
 
-  tzd[rl][i] = (tz[rl][i] - tz[rl][j]) / PointDist(&pi, &pj);
+  SRL[rl].tzd[i] = (SRL[rl].tz[i] - SRL[rl].tz[j]) / PointDist(&pi, &pj);
+ }
+
+ for ( i = 0; i < Divs; i++ )
+ {
+  double zd = 0.0;
+  for (int nx=0; nx<4; nx++)
+  {
+   int nex = (i + nx) % Divs;
+   if (SRL[rl].tzd[nex] < 0.0)
+    zd += SRL[rl].tzd[nex] * 2;
+   else
+    zd += SRL[rl].tzd[nex] * 0.2;
+  }
+
+  double camber = SegCamber(rl, i) - 0.002;
+  if (camber < 0.0)
+  {
+   camber *= 3;
+   if (rl == LINE_MID)
+    camber *= 2;
+  }
+  double slope = camber + zd/3 * SlopeFactor;
+  SRL[rl].tFriction[i] *= 1.0 + MAX(-0.4, slope);
+
+  if (slope < 0.0)
+   SRL[rl].tBrakeFriction[i] = 1.0 + MAX(-0.4, slope/10);
+  else
+   SRL[rl].tBrakeFriction[i] = 1.0 + slope/20;
  }
 }
 
@@ -1035,15 +923,14 @@ void LRaceLine::Interpolate(int Step, int rl)
  }
 }
 
-double LRaceLine::SegCamber(int div)
+double LRaceLine::SegCamber(int rl, int div)
 {
- tTrackSeg *seg = tSegment[tDivSeg[div]];
- //double distratio = ((double)((div - tSegDivStart[tDivSeg[div]]) * DivLength) + DivLength/2) * 1.2 / seg->length;
+ tTrackSeg *seg = SRL[rl].tSegment[SRL[rl].tDivSeg[div]];
  double camber  = (((seg->vertex[TR_SR].z-seg->vertex[TR_SL].z) / 2) + ((seg->vertex[TR_ER].z-seg->vertex[TR_EL].z) / 2)) / seg->width;
  double camber1 = ((seg->vertex[TR_SR].z-seg->vertex[TR_SL].z)) / seg->width;
  double camber2 = ((seg->vertex[TR_ER].z-seg->vertex[TR_EL].z)) / seg->width;
 
- if (tRInverse[LINE_RL][div] < 0.0)
+ if (SRL[SRLidx].tRInverse[div] < 0.0)
  {
   camber = -camber;
   camber2 = -camber2;
@@ -1069,321 +956,333 @@ void LRaceLine::TrackInit(tSituation *p)
 
  for (int rl=LINE_MID; rl<=LINE_RL; rl++)
  {
+  int idx = (rl == LINE_MID ? LINE_MID : SRLidx);
+
+#ifdef GET_THIS_WORKING
+  if (SRL[idx].init <= 1)
+#else
+  if (1)
+#endif
   {
-   SplitTrack(track, rl);
+   fprintf(stderr,"\nInitializing Raceline %d (%s) for %s...\n",idx,SRL[idx].trackname,car->_name); fflush(stderr);
+
+   SRL[idx].init = 2;
+   SplitTrack(track, idx);
 
    //
    // Smoothing loop
    //
    int Iter = 4, i;
-   if (rl >= LINE_RL)
+   if (idx >= LINE_RL)
     Iter = Iterations;
    int MaxStep = 132;
    for (int Step = MaxStep; (Step /= 2) > 0;)
    {
     for (i = Iter * int(sqrt((float) Step)); --i >= 0;)
-     Smooth(Step, rl);
-    Interpolate(Step, rl);
+     Smooth(Step, idx);
+    Interpolate(Step, idx);
    }
 
-   CalcZCurvature(rl);
+   CalcZCurvature(idx);
   }
- 
-  //
-  // Compute curvature and speed along the path
-  //
-  for (int i = Divs; --i >= 0;)
-   tSpeed[rl][i] = -1.0;
-
-  for (int i = Divs; --i >= 0;)
+  else
   {
-   double trlspeed = GetModD( tRLSpeed, i );
-   double avspeed = GetModD( tAvoidSpeed, i );
-   double avspeedx = GetModD( tAvoidSpeedX, i );
-   double cornerspeed = ((trlspeed > 0 ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
-   if (rl == LINE_MID)
-   {
-    if (avspeed != 0.0)
-     cornerspeed += avspeed;
-    else if (avspeedx > 0.0)
-     cornerspeed *= avspeedx;
-    else
-    {
-     cornerspeed += AvoidSpeedAdjust;
-     cornerspeed *= AvoidSpeedAdjustX;
-    }
-   }
-   int nnext = (i + 5) % Divs;
-   int next = (i + 1) % Divs;
-   int prev = (i - 1 + Divs) % Divs;
- 
-   double rInverse = GetRInverse(prev, tx[rl][i], ty[rl][i], next, rl);
-   tRInverse[rl][i] = rInverse;
-
-   double delta = tLDelta[tDivSeg[i]] * (1.0 - tLane[i]) + tRDelta[tDivSeg[i]] * tLane[i];
- 
-   double MaxSpeed;
-
-   double rI = fabs(rInverse);
-
-   {
-    double zd = 0.0;
-    for (int nx=0; nx<4; nx++)
-    {
-     int nex = (i + nx) % Divs;
-     if (tzd[rl][nex] < 0.0)
-      zd += tzd[rl][nex] * 2;
-     else
-      zd += tzd[rl][nex] * 0.2;
-    }
-
-    double camber = SegCamber(i) - 0.002;
-    if (camber < 0.0)
-     camber *= 3;
-    double slope = camber + zd/3 * SlopeFactor;
-
-    tFriction[rl][i] *= 1.0 + MAX(-0.4, slope);
-
-    if (slope < 0.0)
-     tBrakeFriction[rl][i] = 1.0 + MAX(-0.4, slope/10);
-    else
-     tBrakeFriction[rl][i] = 1.0 + slope/20;
-   }
-
-   double TireAccel = cornerspeed * tFriction[rl][i];
-
-   if (rI > MinCornerInverse)
-   {
-    if (rI > IncCornerInverse)
-     rI *= (1.0 + (rI - IncCornerInverse) * 50 * IncCornerFactor);
-    if (CornerSpeedX)
-     rI *= MIN(1.0, (1.0 - (rI*20*CornerSpeedX) + (3.0+CW)/30));
-    double tca = GetModD( tCornerAccel, i );
-    double ca = (tca >= 0.0 ? tca : CornerAccel);
-    int tao = GetModI( tAccelCurveOffset, i );
-    int ao = (tao != 0 ? tao : AccelCurveOffset);
-
-    MaxSpeed = sqrt(TireAccel / (rI - MinCornerInverse));
-
-    if (rl >= LINE_RL && ca > 0.0)
-    {
-     int canext = nnext;
-     if (ao > 0)
-       canext = (canext + ao) % Divs;
-     if ((rInverse > 0.0 && tLane[canext] > tLane[i]) ||
-         (rInverse < 0.0 && tLane[canext] < tLane[i]))
-     {
-      MaxSpeed *= (rInverse > 0.0 ? 1.0 + ((ca/3+tLane[canext]*0.7)/7)*ca : 1.0+((ca/3+(1.0-tLane[canext])*0.7)/7)*ca);
-     }
-    }
-   }
-   else
-    MaxSpeed = 10000;
-
-   double bc = GetModD( tBumpCaution, i );
-   if (bc < 0.01 && bc > -0.01)
-    bc = BumpCaution;
-
-   if (bc > 0.0)
-   {
-    // look for a sudden downturn in approaching track segments
-    double prevzd = 0.0, nextzd = 0.0;
-    int range = int(MAX(40.0, MIN(100.0, MaxSpeed)) / 10.0);
-
-    bc += rI * 80;
-
-    for (int n=1; n<range; n++)
-    {
-     int x = ((i-n) + Divs) % Divs;
-     prevzd += tzd[rl][x];
-    }
-
-    for (int n=0; n<range; n++)
-    {
-     int x = ((i+n) + Divs) % Divs;
-     nextzd += tzd[rl][x];
-    }
-
-    double diff = prevzd - nextzd;
-
-    if (diff > 0.10)
-    {
-     diff -= 0.10;
-     double safespeed = MAX(15.0, 100.0 - (diff*diff) * 400 * bc);
-     if (safespeed < MIN(70.0, MaxSpeed))
-     {
-      // do a couple of divs before this one to be sure we actually reduce speed
-      for (int n=0; n<4; n++)
-      {
-       int f = ((i-n)+Divs) % Divs;
-       tSpeed[rl][f] = safespeed;
-      }
-
-      for (int n=0; n<4; n++)
-      {
-       int f = (i+n) % Divs;
-       tSpeed[rl][f] = safespeed;
-      }
-
-      MaxSpeed = MIN(MaxSpeed, safespeed);
-     }
-    }
-   }
-
-   double tlimit = GetModD( tSpeedLimit, i );
-   if (tlimit > 10.0)
-    MaxSpeed = MIN(MaxSpeed, tlimit);
-
-   if (tSpeed[rl][i] < 0.0)
-    tSpeed[rl][i] = MaxSpeed;
-   else
-    tSpeed[rl][i] = MIN(tSpeed[rl][i], MaxSpeed);
+   fprintf(stderr,"\nRe-using Raceline %d for %s...\n",idx,car->_name);
+   fflush(stderr);
   }
 
-  //
-  // Anticipate braking
-  //
-  double brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0)) * BrakeDelayX;
+  ComputeSpeed(idx);
+ }
+}
+ 
+void LRaceLine::ComputeSpeed(int rl)
+{
+ //
+ // Compute curvature and speed along the path
+ //
+ int rf = (rl > LINE_RL ? LINE_RL : rl);
+
+ for (int i = Divs; --i >= 0;)
+  tSpeed[rf][i] = -1.0;
+
+ for (int i = Divs; --i >= 0;)
+ {
+  double trlspeed = GetModD( tRLSpeed, i );
+  double avspeed = GetModD( tAvoidSpeed, i );
+  double avspeedx = GetModD( tAvoidSpeedX, i );
+  double cornerspeed = ((trlspeed > 0 ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
   if (rl == LINE_MID)
-   brakedelay *= AvoidBrakeAdjustX;
+  {
+   if (avspeed != 0.0)
+    cornerspeed += avspeed;
+   else if (avspeedx > 0.0)
+    cornerspeed *= avspeedx;
+   else
+   {
+    cornerspeed += AvoidSpeedAdjust;
+    cornerspeed *= AvoidSpeedAdjustX;
+   }
+  }
+  int nnext = (i + 5) % Divs;
+  int next = (i + 1) % Divs;
+  int prev = (i - 1 + Divs) % Divs;
+ 
+  double rInverse = SRL[rl].tRInverse[i];
+  double rI = fabs(rInverse);
+  double MaxSpeed;
+
+  double TireAccel = cornerspeed * SRL[rl].tFriction[i];
+
+  if (rI > MinCornerInverse)
+  {
+   if (rI > IncCornerInverse)
+    rI *= (1.0 + (rI - IncCornerInverse) * 50 * IncCornerFactor);
+   if (CornerSpeedX)
+    rI *= MIN(1.0, (1.0 - (rI*20*CornerSpeedX) + (3.0+CW)/30));
+   double tca = GetModD( tCornerAccel, i );
+   double ca = (tca >= 0.0 ? tca : CornerAccel);
+   int tao = GetModI( tAccelCurveOffset, i );
+   int ao = (tao != 0 ? tao : AccelCurveOffset);
+
+   MaxSpeed = sqrt(TireAccel / (rI - MinCornerInverse));
+
+   if (rl >= LINE_RL && ca > 0.0)
+   {
+    int canext = nnext;
+    if (ao > 0)
+      canext = (canext + ao) % Divs;
+    if ((rInverse > 0.0 && SRL[rl].tLane[canext] > SRL[rl].tLane[i]) ||
+        (rInverse < 0.0 && SRL[rl].tLane[canext] < SRL[rl].tLane[i]))
+    {
+     MaxSpeed *= (rInverse > 0.0 ? 1.0 + ((ca/3+SRL[rl].tLane[canext]*0.7)/7)*ca : 1.0+((ca/3+(1.0-SRL[rl].tLane[canext])*0.7)/7)*ca);
+    }
+   }
+  }
+  else
+   MaxSpeed = 10000;
+
+  double bc = GetModD( tBumpCaution, i );
+  if (bc < 0.01 && bc > -0.01)
+   bc = BumpCaution;
+
+  if (bc > 0.0)
+  {
+   // look for a sudden downturn in approaching track segments
+   double prevzd = 0.0, nextzd = 0.0;
+   int range = int(MAX(40.0, MIN(100.0, MaxSpeed)) / 10.0);
+
+   bc += rI * 80;
+
+   for (int n=1; n<range; n++)
+   {
+    int x = ((i-n) + Divs) % Divs;
+    prevzd += SRL[rl].tzd[x];
+   }
+
+   for (int n=0; n<range; n++)
+   {
+    int x = ((i+n) + Divs) % Divs;
+    nextzd += SRL[rl].tzd[x];
+   }
+
+   double diff = prevzd - nextzd;
+
+   if (diff > 0.10)
+   {
+    diff -= 0.10;
+    double safespeed = MAX(15.0, 100.0 - (diff*diff) * 400 * bc);
+    if (safespeed < MIN(70.0, MaxSpeed))
+    {
+     // do a couple of divs before this one to be sure we actually reduce speed
+     for (int n=0; n<4; n++)
+     {
+      int f = ((i-n)+Divs) % Divs;
+      tSpeed[rf][f] = safespeed;
+     }
+
+     for (int n=0; n<4; n++)
+     {
+      int f = (i+n) % Divs;
+      tSpeed[rf][f] = safespeed;
+     }
+
+     MaxSpeed = MIN(MaxSpeed, safespeed);
+    }
+   }
+  }
+
+  double tlimit = GetModD( tSpeedLimit, i );
+  if (tlimit > 10.0)
+   MaxSpeed = MIN(MaxSpeed, tlimit);
+
+  if (tSpeed[rf][i] < 0.0)
+   tSpeed[rf][i] = MaxSpeed;
+  else
+   tSpeed[rf][i] = MIN(tSpeed[rf][i], MaxSpeed);
+ }
+
+ //
+ // Anticipate braking
+ //
+ double brakedelay = (BrakeDelay + (rl == LINE_MID ? AvoidBrakeAdjust : 0.0)) * BrakeDelayX;
+ if (rl == LINE_MID)
+  brakedelay *= AvoidBrakeAdjustX;
+
+ for (int i = Divs-1; --i >= 0;)
+ {
+  int next = (i+1) % Divs;
+  double bd = brakedelay + GetModD( tRLBrake, i );
+  if (rl == LINE_MID)
+  {
+   bd += GetModD( tAvoidBrake, i );
+   double bax = GetModD( tAvoidBrakeX, i );
+   if (bax > 0.1)
+    bd *= bax;
+  }
+
+  bd *= SRL[rl].tFriction[i];
+
+  if (tSpeed[rf][i] > tSpeed[rf][next])
+  {
+   if (BrakeMod)
+   {
+    double bspd = (MIN(100.0, tSpeed[rf][next]) - 30.0) / 60 + fabs(SRL[rl].tRInverse[next])*40;
+    tSpeed[rf][i] = MIN(tSpeed[rf][i], 
+       tSpeed[rf][next] + MAX(0.1, 
+       ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*7)) 
+        * SRL[rl].tBrakeFriction[i]
+        * MAX(bd/4.0, bd / ((tSpeed[rf][next]*(tSpeed[rf][next]/20))/20))) 
+        * MAX(0.2, 1.0 - (tSpeed[rf][next] > 30.0 ? bspd*(bspd+0.2)  : 0.0))));
+   }
+   else
+   {
+    tSpeed[rf][i] = MIN(tSpeed[rf][i], tSpeed[rf][next] + MAX(0.1, 
+                        ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*8)) 
+                         * SRL[rl].tBrakeFriction[i]
+                         * MAX(bd/4.0, bd / ((tSpeed[rf][next]*(tSpeed[rf][next]/20))/20)))));
+   }
+  }
+ }
+
+ //
+ // Exaggerate Acceleration
+ //
+ if (AccelExit > 0.0)
+ {
+  double *tmpSpeed = new double[Divs];
 
   for (int i = Divs-1; --i >= 0;)
   {
    int next = (i+1) % Divs;
-   double bd = brakedelay + GetModD( tRLBrake, i );
-   if (rl == LINE_MID)
+   if (tSpeed[rf][i] < tSpeed[rf][next])
    {
-    bd += GetModD( tAvoidBrake, i );
-    double bax = GetModD( tAvoidBrakeX, i );
-    if (bax > 0.1)
-     bd *= bax;
-   }
-
-   bd *= tFriction[rl][i];
-
-   if (tSpeed[rl][i] > tSpeed[rl][next])
-   {
-    if (BrakeMod)
-    {
-     double bspd = (MIN(100.0, tSpeed[rl][next]) - 30.0) / 60 + fabs(tRInverse[rl][next])*40;
-     tSpeed[rl][i] = MIN(tSpeed[rl][i], 
-        tSpeed[rl][next] + MAX(0.1, 
-        ((0.1 - MIN(0.085, fabs(tRInverse[rl][next])*7)) 
-         * tBrakeFriction[rl][i]
-         * MAX(bd/4.0, bd / ((tSpeed[rl][next]*(tSpeed[rl][next]/20))/20))) 
-         * MAX(0.2, 1.0 - (tSpeed[rl][next] > 30.0 ? bspd*(bspd+0.2)  : 0.0))));
-    }
-    else
-    {
-     tSpeed[rl][i] = MIN(tSpeed[rl][i], tSpeed[rl][next] + MAX(0.1, 
-                         ((0.1 - MIN(0.085, fabs(tRInverse[rl][next])*8)) 
-                          * tBrakeFriction[rl][i]
-                          * MAX(bd/4.0, bd / ((tSpeed[rl][next]*(tSpeed[rl][next]/20))/20)))));
-    }
+    double sdiff = tSpeed[rf][next] - tSpeed[rf][i];
+    sdiff *= AccelExit * MAX(0.2, 1.0 - fabs(SRL[rl].tRInverse[i]) * 80);
+    tmpSpeed[i] = tSpeed[rf][i] + sdiff;
    }
   }
 
-  //
-  // Exaggerate Acceleration
-  //
-  if (AccelExit > 0.0)
-  {
-   double *tmpSpeed = new double[Divs];
+  for (int i = Divs-1; --i >= 0;)
+   tSpeed[rf][i] = tmpSpeed[i];
 
-   for (int i = Divs-1; --i >= 0;)
-   {
-    int next = (i+1) % Divs;
-    if (tSpeed[rl][i] < tSpeed[rl][next])
-    {
-     double sdiff = tSpeed[rl][next] - tSpeed[rl][i];
-     sdiff *= AccelExit * MAX(0.2, 1.0 - fabs(tRInverse[rl][i]) * 80);
-     tmpSpeed[i] = tSpeed[rl][i] + sdiff;
-    }
-   }
-
-   for (int i = Divs-1; --i >= 0;)
-    tSpeed[rl][i] = tmpSpeed[i];
-
-   delete tmpSpeed;
-  }
+  delete tmpSpeed;
  }
-
-#if 0
- for (int i = 0; i < Divs; i++)
- {
-  fprintf(stderr,"%d: segrad=%.1f rInv=%.3f\n",i,tSegment[tDivSeg[i]]->radius,tRInverse[LINE_RL][i]);
- }
- fflush(stderr);
-#endif
 } 
 
-void LRaceLine::FreeTrack()
+void LRaceLine::FreeRaceline(int rl)
 {
- if (tSegDist) free(tSegDist);
- if (tSegIndex) free(tSegIndex);
- if (tElemLength) free(tElemLength);
- if (tSegment) free(tSegment);
+ if (SRL[rl].init)
+ {
+  fprintf(stderr,"Freeing raceline structure %d\n",rl); fflush(stderr);
+  SRL[rl].init = 0;
+  if (SRL[rl].tx) free(SRL[rl].tx);
+  if (SRL[rl].ty) free(SRL[rl].ty);
+  if (SRL[rl].tz) free(SRL[rl].tz);
+  if (SRL[rl].tzd) free(SRL[rl].tzd);
+  if (SRL[rl].tRInverse) free(SRL[rl].tRInverse);
+  if (SRL[rl].tLane) free(SRL[rl].tLane);
+  if (SRL[rl].tDivSeg) free(SRL[rl].tDivSeg);
+  if (SRL[rl].txLeft) free(SRL[rl].txLeft);
+  if (SRL[rl].txRight) free(SRL[rl].txRight);
+  if (SRL[rl].tyLeft) free(SRL[rl].tyLeft);
+  if (SRL[rl].tyRight) free(SRL[rl].tyRight);
+  if (SRL[rl].tLaneLMargin) free(SRL[rl].tLaneLMargin);
+  if (SRL[rl].tLaneRMargin) free(SRL[rl].tLaneRMargin);
+  if (SRL[rl].tDistance) free(SRL[rl].tDistance);
+  if (SRL[rl].tBrakeFriction) free(SRL[rl].tBrakeFriction);
+  if (SRL[rl].tFriction) free(SRL[rl].tFriction);
+  if (SRL[rl].tSegment) free(SRL[rl].tSegment);
+  if (SRL[rl].tSegIndex) free(SRL[rl].tSegIndex);
+  if (SRL[rl].tElemLength) free(SRL[rl].tElemLength);
+ }
 
- if (tLDelta) free(tLDelta);
- if (tRDelta) free(tRDelta);
- if (tDivSeg) free(tDivSeg);
- if (tx)
+ memset( &SRL[rl], 0, sizeof(SRaceLine) );
+}
+
+void LRaceLine::AllocRaceline(int rl, const char *trackname)
+{
+ if (!SRL[rl].init)
  {
-  if (tx[0]) free(tx[0]);
-  if (tx[1]) free(tx[1]);
-  free(tx);
+  fprintf(stderr,"Allocating raceline structure %d\n",rl); fflush(stderr);
+  SRL[rl].init = 1;
+  strncpy( SRL[rl].trackname, trackname, 63 );
+  SRL[rl].tx = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].ty = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tz = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tzd = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tRInverse = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tLane = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tDivSeg = (int *) malloc( (Divs+1) * sizeof(int) );
+  SRL[rl].txLeft = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tyLeft = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].txRight = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tyRight = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tLaneLMargin = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tLaneRMargin = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tDistance = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tElemLength = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tFriction = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tBrakeFriction = (double *) malloc( (Divs+1) * sizeof(double) );
+  SRL[rl].tSegIndex = (int *) malloc( (Divs+1) * sizeof(int) );
+  SRL[rl].tSegment = (tTrackSeg **) malloc( (Divs+1) * sizeof(tTrackSeg *) );
+  memset(SRL[rl].tx, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].ty, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tz, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tzd, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tRInverse, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tLane, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tDivSeg, 0, (Divs+1) * sizeof(int));
+  memset(SRL[rl].tSegIndex, 0, (Divs+1) * sizeof(int));
+  memset(SRL[rl].tSegment, 0, (Divs+1) * sizeof(tTrackSeg *));
+  memset(SRL[rl].txLeft, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tyLeft, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].txRight, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tyRight, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tDistance, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tElemLength, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tFriction, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tBrakeFriction, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tLaneLMargin, 0, (Divs+1) * sizeof(double));
+  memset(SRL[rl].tLaneRMargin, 0, (Divs+1) * sizeof(double));
  }
- if (ty)
+}
+
+void LRaceLine::FreeTrack(bool freeall)
+{
+ if (freeall)
  {
-  if (ty[0]) free(ty[0]);
-  if (ty[1]) free(ty[1]);
-  free(ty);
+  FreeRaceline(LINE_MID);
+  FreeRaceline(SRLidx);
  }
- if (tz)
- {
-  if (tz[0]) free(tz[0]);
-  if (tz[1]) free(tz[1]);
-  free(tz);
- }
- if (tzd)
- {
-  if (tzd[0]) free(tzd[0]);
-  if (tzd[1]) free(tzd[1]);
-  free(tzd);
- }
- if (tRInverse)
- {
-  if (tRInverse[0]) free(tRInverse[0]);
-  if (tRInverse[1]) free(tRInverse[1]);
-  free(tRInverse);
- }
- if (tFriction)
- {
-  if (tFriction[0]) free(tFriction[0]);
-  if (tFriction[1]) free(tFriction[1]);
-  free(tFriction);
- }
- if (tBrakeFriction)
- {
-  if (tBrakeFriction[0]) free(tBrakeFriction[0]);
-  if (tBrakeFriction[1]) free(tBrakeFriction[1]);
-  free(tBrakeFriction);
- }
+
  if (tSpeed)
  {
   if (tSpeed[0]) free(tSpeed[0]);
   if (tSpeed[1]) free(tSpeed[1]);
   free(tSpeed);
  }
- if (tDistance) free(tDistance);
- if (txLeft) free(txLeft);
- if (tyLeft) free(tyLeft);
- if (txRight) free(txRight);
- if (tyRight) free(tyRight);
- if (tLane) free(tLane);
  if (tLaneShift) free(tLaneShift);
  if (tExtLimit) free(tExtLimit);
- if (tSegDivStart) free(tSegDivStart);
 
  if (tRLMarginRgt) free(tRLMarginRgt);
  if (tRLMarginLft) free(tRLMarginLft);
@@ -1409,33 +1308,9 @@ void LRaceLine::FreeTrack()
  if (tAccelExit) free(tAccelExit);
  if (tSkidCorrection) free(tSkidCorrection);
 
- tSegDist = NULL;
- tSegIndex = NULL;
- tElemLength = NULL;
- tSegment = NULL;
-
- tLDelta = NULL;
- tRDelta = NULL;
  tExtLimit = NULL;
- tDivSeg = NULL;
- tx = NULL;
- ty = NULL;
- tz = NULL;
- tzd = NULL;
- tRInverse = NULL;
- tDistance = NULL;
  tSpeed = NULL;
- txLeft = NULL;
- tyLeft = NULL;
- txRight = NULL;
- tyRight = NULL;
- tLane = NULL;
- tFriction = NULL;
- tBrakeFriction = NULL;
  tLaneShift = NULL;
- tLaneLMargin = NULL;
- tLaneRMargin = NULL;
- tSegDivStart = NULL;
 
  tRLMarginRgt = tRLMarginLft = tOTCaution = tRLSpeed = tRLBrake = tIntMargin = NULL;
  tExtMargin = tSecurity = tDecel = tADecel = tSpeedLimit =tCornerAccel = tAccelCurveDampen = NULL;
@@ -1466,14 +1341,14 @@ void LRaceLine::NewRace(tCarElt* newcar, tSituation *s)
 void LRaceLine::getOpponentInfo(double distance, double *aSpeed, double *rInv)
 {
  int dist = int(distance / DivLength);
- double rinv = tRInverse[LINE_RL][Next];
+ double rinv = SRL[SRLidx].tRInverse[Next];
  double aspd = 1000.0;
 
  for (int i=1; i<dist; i++)
  {
   int div = (Next + i) % Divs;
-  if (fabs(tRInverse[LINE_RL][div]) > fabs(rinv))
-   rinv = tRInverse[LINE_RL][div];
+  if (fabs(SRL[SRLidx].tRInverse[div]) > fabs(rinv))
+   rinv = SRL[SRLidx].tRInverse[div];
   if (tSpeed[LINE_MID][div] < aspd)
    aspd = tSpeed[LINE_MID][div];
  }
@@ -1485,8 +1360,8 @@ void LRaceLine::getOpponentInfo(double distance, double *aSpeed, double *rInv)
 double LRaceLine::getRLAngle(int div)
 {
  int prev = (div - 2 + Divs) % Divs;
- double dx = tx[LINE_RL][div] - tx[LINE_RL][prev];
- double dy = ty[LINE_RL][div] - ty[LINE_RL][prev];
+ double dx = SRL[SRLidx].tx[div] - SRL[SRLidx].tx[prev];
+ double dy = SRL[SRLidx].ty[div] - SRL[SRLidx].ty[prev];
 
  double angle = -(RtTrackSideTgAngleL(&(car->_trkPos)) - atan2(dy, dx));
  NORM_PI_PI(angle);
@@ -1506,7 +1381,7 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
   dist = 0;
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
- int next = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+ int next = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
  dist = 0.0;
  double txLast = car->_pos_X;
  double tyLast = car->_pos_Y;
@@ -1515,7 +1390,7 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
  {
   double X = car->_pos_X + car->_speed_X * Time;
   double Y = car->_pos_Y + car->_speed_Y * Time;
-  int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+  int Index = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
   Index = (Index + Divs - 5) % Divs;
 
   int maxcount = MAX(100, int(car->_speed_x*2));
@@ -1525,8 +1400,8 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
    next = (Index + 1) % Divs;
 
    if (
-       ((tx[LINE_RL][next] - tx[LINE_RL][Index]) * (X - tx[LINE_RL][next]) +
-        (ty[LINE_RL][next] - ty[LINE_RL][Index]) * (Y - ty[LINE_RL][next])) 
+       ((SRL[SRLidx].tx[next] - SRL[SRLidx].tx[Index]) * (X - SRL[SRLidx].tx[next]) +
+        (SRL[SRLidx].ty[next] - SRL[SRLidx].ty[Index]) * (Y - SRL[SRLidx].ty[next])) 
        < -0.1)
    {
     break;
@@ -1536,9 +1411,9 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
    count++;
   }
 
-  rt->x = tx[LINE_RL][next];
-  rt->y = ty[LINE_RL][next];
-  *offset = -(tLane[next] * seg->width - seg->width/2);
+  rt->x = SRL[SRLidx].tx[next];
+  rt->y = SRL[SRLidx].ty[next];
+  *offset = -(SRL[SRLidx].tLane[next] * seg->width - seg->width/2);
  }
 }
 
@@ -1549,24 +1424,26 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
  int count = 0;
  tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;
- double dist = car->_trkPos.toStart;
+ double dist = 0.0;//car->_trkPos.toStart;
+#if 0
  if (dist < 0)
   dist = 0;
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
- int next = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+#endif
+ int next = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
  dist = 0.0;
  double txLast = car->_pos_X;
  double tyLast = car->_pos_Y;
  double Time = deltaTime*3 + MAX(0.0, time/2);
  double carspeed = Mag(car->_speed_X, car->_speed_Y);
- double offlane = (offset > -90 ? ((track->width/2) - offset) / track->width : tLane[next]);
+ double offlane = (offset > -90 ? ((track->width/2) - offset) / track->width : SRL[SRLidx].tLane[next]);
 
  if (time > 0.0 && carspeed > 10.0)
  {
   double X = car->_pos_X + car->_speed_X * Time;
   double Y = car->_pos_Y + car->_speed_Y * Time;
-  int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+  int Index = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
   Index = (Index + Divs - 5) % Divs;
 
   maxcount = MAX(100, int(car->_speed_x*2));
@@ -1576,8 +1453,8 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
    next = (Index + 1) % Divs;
 
    if (
-       ((tx[LINE_RL][next] - tx[LINE_RL][Index]) * (X - tx[LINE_RL][next]) +
-        (ty[LINE_RL][next] - ty[LINE_RL][Index]) * (Y - ty[LINE_RL][next])) 
+       ((SRL[SRLidx].tx[next] - SRL[SRLidx].tx[Index]) * (X - SRL[SRLidx].tx[next]) +
+        (SRL[SRLidx].ty[next] - SRL[SRLidx].ty[Index]) * (Y - SRL[SRLidx].ty[next])) 
        < -0.1)
    {
     break;
@@ -1587,22 +1464,26 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
    count++;
   }
 
-  rt->x = offlane * txRight[next] + (1 - offlane) * txLeft[next];
-  rt->y = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
+  rt->x = offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next];
+  rt->y = offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next];
  }
  else
  {
+  next = Next;
+  double txLast = offlane * SRL[SRLidx].txRight[This] + (1 - offlane) * SRL[SRLidx].txLeft[This];
+  double tyLast = offlane * SRL[SRLidx].tyRight[This] + (1 - offlane) * SRL[SRLidx].tyLeft[This];
+
   while (count < maxcount)
   {
-   double txNext = offlane * txRight[next] + (1 - offlane) * txLeft[next];
-   double tyNext = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
+   double txNext = offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next];
+   double tyNext = offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next];
    double distx = txNext - txLast;
    double disty = tyNext - tyLast;
    double thisdist = sqrt( distx*distx + disty*disty );
-   if ((offset < 0.0 && tRInverse[LINE_RL][next] > 0.0) ||
-       (offset > 0.0 && tRInverse[LINE_RL][next] < 0.0))
+   if ((offset < 0.0 && SRL[SRLidx].tRInverse[next] > 0.0) ||
+       (offset > 0.0 && SRL[SRLidx].tRInverse[next] < 0.0))
    {
-    thisdist *= 1.0 - MIN(0.7, (fabs(offset) / (track->width/2)) * fabs(tRInverse[LINE_RL][next]) * car->_speed_x * car->_speed_x/10);
+    thisdist *= 1.0 - MIN(0.7, (fabs(offset) / (track->width/2)) * fabs(SRL[SRLidx].tRInverse[next]) * car->_speed_x * car->_speed_x/10);
    }
    dist += thisdist;
  
@@ -1635,9 +1516,9 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   dist = 0;
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
- int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
+ int Index = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
  This = data->thisdiv = Index;
- double d = tSegDist[SegId] + dist;
+ //double d = SRL[SRLidx].tSegDist[SegId] + dist;
  laststeer = data->steer;
 
  double timefactor = s->deltaTime*(3.6);// + MAX(0.0, ((car->_speed_x-45.0) / 10) * TimeFactor));
@@ -1651,11 +1532,10 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  double Xk = car->_pos_X + car->_speed_X * 0.1 / 2;
  double Yk = car->_pos_Y + car->_speed_Y * 0.1 / 2;
  data->lookahead = 0.0f;
- data->aInverse = tRInverse[LINE_MID][Index];
+ data->aInverse = SRL[LINE_MID].tRInverse[Index];
  double divcount = 1.0;
 
  This = Index = (Index + Divs - 5) % Divs;
- //double timefactor = s->deltaTime*(3 + (data->exiting ? MAX(0.0, car->_accel_x*MIN(6.0, fabs(tRInverse[LINE_RL][Next] * 800)) * TimeFactor) : 0.0));
  int SNext = Index, SNext2 = Index;
  int limit = MAX(30, int(car->_speed_x*2));
  int count = 0;
@@ -1663,17 +1543,17 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  while(count < limit)
  {
   Next = SNext = SNext2 = (Index + 1) % Divs;
-  double dx = tx[LINE_RL][Next] - car->_pos_X;
-  double dy = ty[LINE_RL][Next] - car->_pos_Y;
+  double dx = SRL[SRLidx].tx[Next] - car->_pos_X;
+  double dy = SRL[SRLidx].ty[Next] - car->_pos_Y;
   data->lookahead = sqrt(dx*dx + dy*dy);
   if (//data->lookahead > 10.0f &&
-      (tx[LINE_RL][Next] - tx[LINE_RL][Index]) * (X - tx[LINE_RL][Next]) +
-      (ty[LINE_RL][Next] - ty[LINE_RL][Index]) * (Y - ty[LINE_RL][Next]) < MIN(-0.1, -((car->_speed_x/400) + (car->_accel_x/20))))
+      (SRL[SRLidx].tx[Next] - SRL[SRLidx].tx[Index]) * (X - SRL[SRLidx].tx[Next]) +
+      (SRL[SRLidx].ty[Next] - SRL[SRLidx].ty[Index]) * (Y - SRL[SRLidx].ty[Next]) < MIN(-0.1, -((car->_speed_x/400) + (car->_accel_x/20))))
   {
    break;
   }
   Index = Next;
-  data->aInverse += tRInverse[LINE_RL][Index] * MAX(0.0, 1.0 - divcount/15);
+  data->aInverse += SRL[SRLidx].tRInverse[Index] * MAX(0.0, 1.0 - divcount/15);
   divcount++;
   count++;
  }
@@ -1696,8 +1576,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  This = data->thisdiv = Index;
  data->nextdiv = Next;
  data->lookahead *= 0.8f;
- data->rInverse = tRInverse[LINE_RL][Index];
- data->mInverse = tRInverse[LINE_MID][Index];
+ data->rInverse = SRL[SRLidx].tRInverse[Index];
+ data->mInverse = SRL[LINE_MID].tRInverse[Index];
  data->decel = GetModD( tDecel, Index );
  data->adecel = GetModD( tADecel, Index );
  data->overtakecaution = MAX(OvertakeCaution, GetModD( tOTCaution, Index ));
@@ -1707,31 +1587,31 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  data->rlangle = getRLAngle(Next);
 
 #if 1
- if ((tRInverse[LINE_RL][Next] < 0.0 && car->_trkPos.toMiddle > 0.0) ||
-     (tRInverse[LINE_RL][Next] > 0.0 && car->_trkPos.toMiddle < 0.0))
+ if ((SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toMiddle > 0.0) ||
+     (SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toMiddle < 0.0))
  {
-  data->lookahead *= MAX(1.0, MIN(3.6, 1.0 + (MIN(2.6, fabs(car->_trkPos.toMiddle) / (seg->width/2)) / 2) * (1.0 + fabs(tRInverse[LINE_RL][Next]) * 65.0 + car->_speed_x/120.0)));
+  data->lookahead *= MAX(1.0, MIN(3.6, 1.0 + (MIN(2.6, fabs(car->_trkPos.toMiddle) / (seg->width/2)) / 2) * (1.0 + fabs(SRL[SRLidx].tRInverse[Next]) * 65.0 + car->_speed_x/120.0)));
  }
- else if ((tRInverse[LINE_RL][Next] < 0.0 && car->_trkPos.toRight < 5.0) ||
-          (tRInverse[LINE_RL][Next] > 0.0 && car->_trkPos.toLeft < 5.0))
+ else if ((SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toRight < 5.0) ||
+          (SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toLeft < 5.0))
  {
-  data->lookahead *= MAX(0.8, MIN(1.0, 1.0 - fabs(tRInverse[LINE_RL][Next])*200.0 * ((5.0-MIN(car->_trkPos.toRight, car->_trkPos.toLeft))/5.0)));
+  data->lookahead *= MAX(0.8, MIN(1.0, 1.0 - fabs(SRL[SRLidx].tRInverse[Next])*200.0 * ((5.0-MIN(car->_trkPos.toRight, car->_trkPos.toLeft))/5.0)));
  }
 #endif
 
- data->target.x = tx[LINE_RL][Next];
- data->target.y = ty[LINE_RL][Next];
- data->lane = tLane[Index];
+ data->target.x = SRL[SRLidx].tx[Next];
+ data->target.y = SRL[SRLidx].ty[Next];
+ data->lane = SRL[SRLidx].tLane[Index];
 
  //
  // Find target speed
  //
  int avnext = (Next-3+Divs) % Divs;
  int avindex = (Index-3+Divs) % Divs;
- double c0 = (tx[LINE_RL][avnext] - tx[LINE_RL][avindex]) * (tx[LINE_RL][avnext] - X)*1.5 +
-             (ty[LINE_RL][avnext] - ty[LINE_RL][avindex]) * (ty[LINE_RL][avnext] - Y)*1.5;
- double c1 = (tx[LINE_RL][avnext] - tx[LINE_RL][avindex]) * (X - tx[LINE_RL][avindex])*3 +
-             (ty[LINE_RL][avnext] - ty[LINE_RL][avindex]) * (Y - ty[LINE_RL][avindex])*3;
+ double c0 = (SRL[SRLidx].tx[avnext] - SRL[SRLidx].tx[avindex]) * (SRL[SRLidx].tx[avnext] - X)*1.5 +
+             (SRL[SRLidx].ty[avnext] - SRL[SRLidx].ty[avindex]) * (SRL[SRLidx].ty[avnext] - Y)*1.5;
+ double c1 = (SRL[SRLidx].tx[avnext] - SRL[SRLidx].tx[avindex]) * (X - SRL[SRLidx].tx[avindex])*3 +
+             (SRL[SRLidx].ty[avnext] - SRL[SRLidx].ty[avindex]) * (Y - SRL[SRLidx].ty[avindex])*3;
  {
   double sum = c0 + c1;
   c0 /= sum;
@@ -1747,10 +1627,10 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   data->avspeed = MAX(ATargetSpeed, tSpeed[LINE_MID][avnext] - data->overtakecaution/8);
  data->slowavspeed = MAX(data->avspeed-3.0, data->avspeed*0.9);
 
- c0 = (tx[LINE_RL][Next] - tx[LINE_RL][Index]) * (tx[LINE_RL][Next] - X) +
-      (ty[LINE_RL][Next] - ty[LINE_RL][Index]) * (ty[LINE_RL][Next] - Y);
- c1 = (tx[LINE_RL][Next] - tx[LINE_RL][Index]) * (X - tx[LINE_RL][Index]) +
-      (ty[LINE_RL][Next] - ty[LINE_RL][Index]) * (Y - ty[LINE_RL][Index]);
+ c0 = (SRL[SRLidx].tx[Next] - SRL[SRLidx].tx[Index]) * (SRL[SRLidx].tx[Next] - X) +
+      (SRL[SRLidx].ty[Next] - SRL[SRLidx].ty[Index]) * (SRL[SRLidx].ty[Next] - Y);
+ c1 = (SRL[SRLidx].tx[Next] - SRL[SRLidx].tx[Index]) * (X - SRL[SRLidx].tx[Index]) +
+      (SRL[SRLidx].ty[Next] - SRL[SRLidx].ty[Index]) * (Y - SRL[SRLidx].ty[Index]);
  {
   double sum = c0 + c1;
   c0 /= sum;
@@ -1770,7 +1650,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   data->avspeed = ATargetSpeed = MAX(data->avspeed, aspeed * (TargetSpeed / ospeed));
  data->avspeed = MAX(data->speed*0.6, MIN(data->speed+2.0, data->avspeed));
  
- double laneoffset = Width/2 - (tLane[Next] * Width);
+ double laneoffset = Width/2 - (SRL[SRLidx].tLane[Next] * Width);
  data->offset = laneoffset;
 //fprintf(stderr,"GetRLData: offset=%.2f Next=%d lane=%.4f Width=%.2f\n",laneoffset,Next,tLane[Next],Width);
 
@@ -1787,7 +1667,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   data->amInverse = 0.0;
 
   for (int i=0; i<nextinc; i++)
-   data->amInverse += fabs(tRInverse[LINE_MID][((Next+i)%Divs)]);
+   data->amInverse += fabs(SRL[LINE_MID].tRInverse[((Next+i)%Divs)]);
   data->amInverse /= nextinc;
  }
 
@@ -1796,7 +1676,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  //
  // Find target curvature (for the inside wheel)
  //
- double TargetCurvature = (1 - c0) * tRInverse[LINE_RL][KNext] + c0 * tRInverse[LINE_RL][Index];
+ double TargetCurvature = (1 - c0) * SRL[SRLidx].tRInverse[KNext] + c0 * SRL[SRLidx].tRInverse[Index];
  if (fabs(TargetCurvature) > 0.01)
  {
   double r = 1 / TargetCurvature;
@@ -1809,28 +1689,28 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
 
  data->insideline = data->outsideline = 0;
- if ((tRInverse[LINE_RL][Next] > 0.0 && car->_trkPos.toLeft <= tLane[Next] * Width + 1.0) ||
-     (tRInverse[LINE_RL][Next] < 0.0 && car->_trkPos.toLeft >= tLane[Next] * Width - 1.0))
+ if ((SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toLeft <= SRL[SRLidx].tLane[Next] * Width + 1.0) ||
+     (SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toLeft >= SRL[SRLidx].tLane[Next] * Width - 1.0))
  {
   // inside raceline
   data->insideline = 1;
  }
  else if (tSpeed[LINE_RL][Next] >= tSpeed[LINE_RL][This] && 
-          ((tRInverse[LINE_RL][Next] > 0.0 && tLane[Next] > tLane[This] && car->_trkPos.toLeft > tLane[Next]*Width+1.0) ||
-           (tRInverse[LINE_RL][Next] < 0.0 && tLane[Next] < tLane[This] && car->_trkPos.toLeft < tLane[Next]*Width-1.0)))
+          ((SRL[SRLidx].tRInverse[Next] > 0.0 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[This] && car->_trkPos.toLeft > SRL[SRLidx].tLane[Next]*Width+1.0) ||
+           (SRL[SRLidx].tRInverse[Next] < 0.0 && SRL[SRLidx].tLane[Next] < SRL[SRLidx].tLane[This] && car->_trkPos.toLeft < SRL[SRLidx].tLane[Next]*Width-1.0)))
  {
    data->outsideline = 1;
  }
 
  data->closing = data->exiting = 0;
- if ((tRInverse[LINE_RL][Next] < -0.001 && tLane[Next] > tLane[Index]) ||
-     (tRInverse[LINE_RL][Next] > 0.001 && tLane[Next] < tLane[Index]))
+ if ((SRL[SRLidx].tRInverse[Next] < -0.001 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[Index]) ||
+     (SRL[SRLidx].tRInverse[Next] > 0.001 && SRL[SRLidx].tLane[Next] < SRL[SRLidx].tLane[Index]))
   data->closing = 1;
  else
  {
   data->slowavspeed = MAX(data->avspeed-(data->insideline?1.0:2.5), data->avspeed*0.9);
-  if (((tRInverse[LINE_RL][Next] < -0.001 && tLane[Next] < tLane[Index]) ||
-       (tRInverse[LINE_RL][Next] > 0.001 && tLane[Next] > tLane[Index])) &&
+  if (((SRL[SRLidx].tRInverse[Next] < -0.001 && SRL[SRLidx].tLane[Next] < SRL[SRLidx].tLane[Index]) ||
+       (SRL[SRLidx].tRInverse[Next] > 0.001 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[Index])) &&
       tSpeed[LINE_RL][nnext] >= tSpeed[LINE_RL][This])
   {
    data->exiting = 1;
@@ -1859,7 +1739,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   vec2f target;
   double carspeed = Mag(car->_speed_X, car->_speed_Y);
   double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
-  double lane2left = track->width * tLane[Next];
+  double lane2left = track->width * SRL[SRLidx].tLane[Next];
 
   // an idea to implement soon...
   //if (car->_accel_x < 0.0)
@@ -1867,7 +1747,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
   GetSteerPoint(5.0 + car->_speed_x/10, &target, -100.0, steertime);
   double targetAngle = atan2(target.y - car->_pos_Y, target.x - car->_pos_X);
-  double offline = MIN(2.0, MAX(-2.0, (tLane[Next] * track->width - car->_trkPos.toLeft)));
+  double offline = MIN(2.0, MAX(-2.0, (SRL[SRLidx].tLane[Next] * track->width - car->_trkPos.toLeft)));
   targetAngle -= offline/15;
 
   double steer_direction = targetAngle - (car->_yaw + car->_yaw_rate/15);
@@ -1886,8 +1766,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
   int Prev = (KIndex + Divs - 1) % Divs;
   int NextNext = (KNext + 1) % Divs;
-  double dx = tx[LINE_RL][NextNext] - tx[LINE_RL][Prev];
-  double dy = ty[LINE_RL][NextNext] - ty[LINE_RL][Prev];
+  double dx = SRL[SRLidx].tx[NextNext] - SRL[SRLidx].tx[Prev];
+  double dy = SRL[SRLidx].ty[NextNext] - SRL[SRLidx].ty[Prev];
 
   double vx = car->_speed_X;
   double vy = car->_speed_Y;
@@ -1895,12 +1775,13 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   double diry = sin(car->_yaw);
   double SinAngleError = dx * diry - dy * dirx;
 
-  if (fabs(tRInverse[LINE_RL][Next]) > MinCornerInverse &&
+  if (fabs(SRL[SRLidx].tRInverse[Next]) > MinCornerInverse &&
       fabs(k1999steer) > 0.2 &&
-      ((SinAngleError > 0.0 && tRInverse[LINE_RL][Next] > 0.0 && data->speedangle < 0.0) || 
-       (SinAngleError < 0.0 && tRInverse[LINE_RL][Next] < 0.0 && data->speedangle > 0.0))) 
+      ((SinAngleError > 0.0 && SRL[SRLidx].tRInverse[Next] > 0.0 && data->speedangle < 0.0) || 
+       (SinAngleError < 0.0 && SRL[SRLidx].tRInverse[Next] < 0.0 && data->speedangle > 0.0))) 
   {
-   data->accel_redux = fabs(SinAngleError) * ((fabs(k1999steer)-0.2)*0.7) + (fabs(tRInverse[LINE_RL][Next]) - MinCornerInverse) * 1500 * fabs(data->speedangle);
+   data->accel_redux = fabs(SinAngleError) * ((fabs(k1999steer)-0.2)*0.7) + 
+           (fabs(SRL[SRLidx].tRInverse[Next]) - MinCornerInverse) * 1500 * fabs(data->speedangle);
   }
  }
  else
@@ -1938,65 +1819,41 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
      cspeed -= data->collision*3;
 
     double curlane = car->_trkPos.toLeft / track->width;
-    double inside = (!data->closing ? 0.0 : MAX(0.0, ((TargetCurvature < 0.0 ? curlane-tLane[Index] : tLane[Index]-curlane))));
+    double inside = (!data->closing ? 0.0 : MAX(0.0, 
+         ((TargetCurvature < 0.0 ? curlane-SRL[SRLidx].tLane[Index] : SRL[SRLidx].tLane[Index]-curlane))));
     steergain = MIN(steergain, MAX(1.0, steergain - inside*2));
 
-#if 0
-    // decrease steergain if speed significantly slower than targetspeed
-    if (cspeed < TargetSpeed && !data->alone && //tSpeed[LINE_RL][Next] <= tSpeed[LINE_RL][Index] &&
-        ((tRInverse[LINE_RL][Next] > 0.0 && car->_trkPos.toRight > MIN(track->width/2, tRInverse[LINE_RL][Next] * 500)) ||
-         (tRInverse[LINE_RL][Next] < 0.0 && car->_trkPos.toLeft > MIN(track->width/2, fabs(tRInverse[LINE_RL][Next]) * 500))))
-    {
-     steergain = MAX(0.7, steergain - MAX((TargetSpeed-cspeed)/6.0, (1.0 - (cspeed/TargetSpeed)) * 10));
-    }
-#else
     if (carspeed < TargetSpeed-1.0 && (data->mode != mode_normal || data->aligned_time < 10))
     {
      // decrease steergain as speed is slower than targetspeed and we're either avoiding
      // or have just recovered from avoiding.
-     steergain = MAX(0.7, steergain - MAX(((TargetSpeed-1.0)-carspeed)/5.0, (1.0 - (carspeed/(TargetSpeed-1.0))) * 12) * (1.0 + fabs(tRInverse[LINE_RL][Next]*10)));
+     steergain = MAX(0.7, steergain - MAX(((TargetSpeed-1.0)-carspeed)/5.0, (1.0 - (carspeed/(TargetSpeed-1.0))) * 12) * (1.0 + fabs(SRL[SRLidx].tRInverse[Next]*10)));
     }
-#endif
 
     // decrease steergain at high speed to stop bouncing over curbs
     if (carspeed > 60)
      steergain = MAX(MIN(1.0, SteerGain), steergain - (carspeed-60.0)/40);
 
-#if 0
-    if (data->followdist <= 5.0 && data->closing == 1 && car->_accel_x < 0.0)
-    {
-     steergain = MAX(0.8, steergain - (5.0 - data->followdist)*(fabs(car->_accel_x)/15.0));
-    }
-#endif
-
     // what does this do???
     {
-     if (tRInverse[LINE_RL][Next] < -0.002)
+     if (SRL[SRLidx].tRInverse[Next] < -0.002)
      {
-      if (car->_trkPos.toRight < (-tRInverse[LINE_RL][Next] * 200))
-       steergain = MAX(1.0, steergain - ((-tRInverse[LINE_RL][Next]*200) - car->_trkPos.toRight)/20);
+      if (car->_trkPos.toRight < (-SRL[SRLidx].tRInverse[Next] * 200))
+       steergain = MAX(1.0, steergain - ((-SRL[SRLidx].tRInverse[Next]*200) - car->_trkPos.toRight)/20);
      }
-     else if (tRInverse[LINE_RL][Next] > 0.002)
+     else if (SRL[SRLidx].tRInverse[Next] > 0.002)
      {
-      if (car->_trkPos.toLeft < (tRInverse[LINE_RL][Next] * 200))
-       steergain = MAX(1.0, steergain - ((tRInverse[LINE_RL][Next]*200) - car->_trkPos.toLeft)/20);
+      if (car->_trkPos.toLeft < (SRL[SRLidx].tRInverse[Next] * 200))
+       steergain = MAX(1.0, steergain - ((SRL[SRLidx].tRInverse[Next]*200) - car->_trkPos.toLeft)/20);
      }
     }
 
     k1999steer = atan(wheelbase * steergain * TargetCurvature) / car->_steerLock;
 //fprintf(stderr," b %.3f",k1999steer);
 
-#if 0 // mouse's steer k dec...
-    if (car->_accel_x < 0.0)
-    {
-     double ri = (tRInverse[LINE_RL][Next] + tRInverse[LINE_RL][nnext]) / 2;
-     k1999steer += ri * 0.4;
-    }
-#endif
-
     if (car->_accel_x > 0.0)
     {
-     double ri = (tRInverse[LINE_RL][Next] + tRInverse[LINE_RL][nnext]) / 2;
+     double ri = (SRL[SRLidx].tRInverse[Next] + SRL[SRLidx].tRInverse[nnext]) / 2;
      if (data->mode != mode_normal || data->aligned_time < 5)
       k1999steer += ri * SteerRIAccC;
      else
@@ -2015,21 +1872,21 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
    //
    if (data->mode == mode_normal && data->aligned_time > 10)
    {
-    double dx = tx[LINE_RL][NextNext] - tx[LINE_RL][Prev];
-    double dy = ty[LINE_RL][NextNext] - ty[LINE_RL][Prev];
-    Error = (dx * (Y - ty[LINE_RL][Prev]) - dy * (X - tx[LINE_RL][Prev])) / Mag(dx, dy);
+    double dx = SRL[SRLidx].tx[NextNext] - SRL[SRLidx].tx[Prev];
+    double dy = SRL[SRLidx].ty[NextNext] - SRL[SRLidx].ty[Prev];
+    Error = (dx * (Y - SRL[SRLidx].ty[Prev]) - dy * (X - SRL[SRLidx].tx[Prev])) / Mag(dx, dy);
    }  
    else
    {
-    double dx = tx[LINE_RL][KNext] - tx[LINE_RL][KIndex];
-    double dy = ty[LINE_RL][KNext] - ty[LINE_RL][KIndex];
-    Error = (dx * (Y - ty[LINE_RL][Index]) - dy * (X - tx[LINE_RL][Index])) / Mag(dx, dy);
+    double dx = SRL[SRLidx].tx[KNext] - SRL[SRLidx].tx[KIndex];
+    double dy = SRL[SRLidx].ty[KNext] - SRL[SRLidx].ty[KIndex];
+    Error = (dx * (Y - SRL[SRLidx].ty[Index]) - dy * (X - SRL[SRLidx].tx[Index])) / Mag(dx, dy);
    }
 
-   double Prevdx = tx[LINE_RL][KNext] - tx[LINE_RL][Prev];
-   double Prevdy = ty[LINE_RL][KNext] - ty[LINE_RL][Prev];
-   double Nextdx = tx[LINE_RL][NextNext] - tx[LINE_RL][KIndex];
-   double Nextdy = ty[LINE_RL][NextNext] - ty[LINE_RL][KIndex];
+   double Prevdx = SRL[SRLidx].tx[KNext] - SRL[SRLidx].tx[Prev];
+   double Prevdy = SRL[SRLidx].ty[KNext] - SRL[SRLidx].ty[Prev];
+   double Nextdx = SRL[SRLidx].tx[NextNext] - SRL[SRLidx].tx[KIndex];
+   double Nextdy = SRL[SRLidx].ty[NextNext] - SRL[SRLidx].ty[KIndex];
    double dx = c0 * Prevdx + (1 - c0) * Nextdx;
    double dy = c0 * Prevdy + (1 - c0) * Nextdy;
    double n = Mag(dx, dy);
@@ -2059,26 +1916,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
     Skid = 0.9;
    if (Skid < -0.9)
     Skid = -0.9;
-   /*
-   double skidfactor = 0.9 + MAX(-0.5, (data->collision ? -(5.0-data->collision)/9 
-                         : (data->mode != mode_normal ? MIN(0.0, MAX(-0.5, car->_accel_x/40))
-                          : (((data->angle < 0.0 && tRInverse[Next] < 0.0) || (data->angle > 0.0 && tRInverse[Next] > 0.0)) ?
-                             MAX(-0.3, -fabs(data->angle)) : 0.0))));
-                             */
    double skidfactor = 1.0 - MIN(0.6, carspeed/120);
-   /*
-   if (car->_accel_x < 0.0)
-    skidfactor +=  MIN(0.3, MAX(-0.4, (tRInverse[LINE_RL][Next] < 0.0 ? data->angle : -data->angle) * (fabs(tRInverse[LINE_RL][Next])*200))) * (-car->_accel_x/30);
-   else
-    skidfactor -= MIN(0.6, car->_accel_x/15);
-   if (data->mode != mode_normal)
-   {
-    if (car->_accel_x < 0.0)
-     skidfactor = MAX(0.3, skidfactor + ((car->_accel_x/50) - fabs(car->_yaw_rate)/5));
-   }
-   if (data->collision > 0.0)
-    skidfactor *= 1.0 + (5.0 - data->collision)/4;
-    */
 
    double sc = GetModD( tSkidCorrection, This );
    if (sc <= 0.0)
@@ -2087,7 +1925,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
     // if sc not explicitly stated, we reduce it for braking areas where car is turning
     if (car->_accel_x < 0.0)
-     sc = MAX(1.0, sc - fabs(tRInverse[LINE_RL][Next]) * 40);
+     sc = MAX(1.0, sc - fabs(SRL[SRLidx].tRInverse[Next]) * 40);
    }
    else
     sc += 1.0;
@@ -2109,7 +1947,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
    }
 //fprintf(stderr," f %.3f",k1999steer);
 
-   if (fabs(k1999steer) < 0.35 && fabs(tRInverse[LINE_RL][Next]) > 0.002)
+   if (fabs(k1999steer) < 0.35 && fabs(SRL[SRLidx].tRInverse[Next]) > 0.002)
     k1999steer *= (1.0 + (0.35 - fabs(k1999steer)) * 1.3);
 //fprintf(stderr," g %.3f\n",k1999steer);  fflush(stderr);
 
@@ -2139,19 +1977,20 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 #endif
   }
 
-  if (fabs(tRInverse[LINE_RL][Next]) > MinCornerInverse &&
+  if (fabs(SRL[SRLidx].tRInverse[Next]) > MinCornerInverse &&
       fabs(k1999steer) > 0.2 &&
-      ((SinAngleError > 0.0 && tRInverse[LINE_RL][Next] > 0.0 && data->speedangle < 0.0) || 
-       (SinAngleError < 0.0 && tRInverse[LINE_RL][Next] < 0.0 && data->speedangle > 0.0))) 
+      ((SinAngleError > 0.0 && SRL[SRLidx].tRInverse[Next] > 0.0 && data->speedangle < 0.0) || 
+       (SinAngleError < 0.0 && SRL[SRLidx].tRInverse[Next] < 0.0 && data->speedangle > 0.0))) 
   {
-   data->accel_redux = fabs(SinAngleError) * ((fabs(k1999steer)-0.2)*0.7) + (fabs(tRInverse[LINE_RL][Next]) - MinCornerInverse) * 1500 * fabs(data->speedangle);
+   data->accel_redux = fabs(SinAngleError) * ((fabs(k1999steer)-0.2)*0.7) + 
+           (fabs(SRL[SRLidx].tRInverse[Next]) - MinCornerInverse) * 1500 * fabs(data->speedangle);
   }
  }
 
 
  if (RaceLineDebug)
  {
-  fprintf(stderr, "%s: %d/%d RI=%.3f/%.3f z=%.3f (%.3f/%.3f) Fr=%.3f Speed=%.1f (%.1f/%.1f) Steer=%.3f (redux=%.3f)\n", car->_name, This, Next,tRInverse[LINE_RL][Next],tRInverse[LINE_MID][Next],tz[LINE_RL][Next],tzd[LINE_RL][Next],SegCamber(Next),tFriction[LINE_RL][Next],TargetSpeed,tSpeed[LINE_RL][Next],tSpeed[LINE_MID][Next],k1999steer,data->accel_redux);
+  fprintf(stderr, "%s: %d/%d RI=%.3f/%.3f z=%.3f (%.3f/%.3f) Fr=%.3f Speed=%.1f (%.1f/%.1f) Steer=%.3f (redux=%.3f)\n", car->_name, This, Next,SRL[SRLidx].tRInverse[Next],SRL[SRLidx].tRInverse[Next],SRL[SRLidx].tz[Next],SRL[SRLidx].tzd[Next],SegCamber(SRLidx, Next),SRL[SRLidx].tFriction[Next],TargetSpeed,tSpeed[LINE_RL][Next],tSpeed[LINE_MID][Next],k1999steer,data->accel_redux);
   fflush(stderr);
  }
 
@@ -2162,279 +2001,68 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
 double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
 {
- double offlane = ((track->width/2) - offset) / track->width;
- tTrackSeg *seg = car->_trkPos.seg;
- int SegId = car->_trkPos.seg->id;
- double dist = car->_trkPos.toStart;
- if (dist < 0)
-  dist = 0;
- if (car->_trkPos.seg->type != TR_STR)
-  dist *= car->_trkPos.seg->radius;
- int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
- vec2f rt;
-
- double time = 0.35;
- if ((tRInverse[LINE_MID][Index] > 0.0 && offset > 0.0) ||
-     (tRInverse[LINE_MID][Index] < 0.0 && offset < 0.0))
-  time = MAX(0.06, MIN(0.35, 0.35 - (fabs(offset)/(track->width/2))*fabs(tRInverse[LINE_MID][Index]*6.5)));
- rt.x = car->_pos_X + car->_speed_X * time;
- rt.y = car->_pos_Y + car->_speed_Y * time;
- int next = Index;
-
- double txIndex = offlane * txRight[Index] + (1 - offlane) * txLeft[Index];
- double tyIndex = offlane * tyRight[Index] + (1 - offlane) * tyLeft[Index];
- double txNext = offlane * txRight[next] + (1 - offlane) * txLeft[next];
- double tyNext = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
- while(1)
- {
-  next = (Index + 1) % Divs;
-  txNext = offlane * txRight[next] + (1 - offlane) * txLeft[next];
-  tyNext = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
-  double dx = txNext - car->_pos_X;
-  double dy = tyNext - car->_pos_Y;
-  if (//data->lookahead > 10.0f &&
-      (txNext - txIndex) * (rt.x - txNext) +
-      (tyNext - tyIndex) * (rt.y - tyNext) < -0.1)
-  {
-   txNext += (rt.x - txNext)*0.4;
-   tyNext += (rt.y - tyNext)*0.4;
-   break;
-  }
-  Index = next;
-  txIndex = offlane * txRight[Index] + (1 - offlane) * txLeft[Index];
-  tyIndex = offlane * tyRight[Index] + (1 - offlane) * tyLeft[Index];
- }
-
- double c0, c1;
- c0 = (txNext - txIndex) * (txNext - rt.x) +
-      (tyNext - tyIndex) * (tyNext - rt.y);
- c1 = (txNext - txIndex) * (rt.x - txIndex)*2 +
-      (tyNext - tyIndex) * (rt.y - tyIndex)*2;
- {
-  double sum = c0 + c1;
-  c0 /= sum;
-  c1 /= sum;
- }
-
- double tspeed = (1 - c0) * tSpeed[LINE_MID][next] + c0 * tSpeed[LINE_MID][Index];
- data->avspeed = MAX(10.0, tspeed);
- data->slowavspeed = MAX(data->avspeed-3.0, data->avspeed*0.9);
-
-#if 1
- int KNext = next;
- int nnext = (next + int(car->_speed_x/5)) % Divs;
-
- //
- // Find target curvature (for the inside wheel)
- //
- double rINext = tRInverse[LINE_MID][KNext];
- double rIIndex = tRInverse[LINE_MID][Index];
- /*
- if (rINext > 0.0 && offset > 0.0)
-  rINext *= MAX(0.4, MIN(1.0, 1.0 - (offset/track->width)));
- else if (rINext < 0.0 && offset < 0.0)
-  rINext *= MAX(0.4, MIN(1.0, 1.0 - (-offset/track->width)));
- if (rIIndex > 0.0 && offset > 0.0)
-  rIIndex *= MAX(0.4, MIN(1.0, 1.0 - (offset/track->width)));
- else if (rIIndex < 0.0 && offset < 0.0)
-  rIIndex *= MAX(0.4, MIN(1.0, 1.0 - (-offset/track->width)));
-  */
-
- double TargetCurvature = (1 - c0) * rINext + c0 * rIIndex;
- if (fabs(TargetCurvature) > 0.01)
- {
-  double r = 1 / TargetCurvature;
-  if (r > 0)
-   r -= wheeltrack / 2;
-  else
-   r += wheeltrack / 2;
-  TargetCurvature = 1 / r;
- }
-
- //
- // Steering control
- //
- double Error = 0;
- double VnError = 0;
- double Skid = 0;
- double CosAngleError = 1;
- double SinAngleError = 0;
- double carspeed = Mag(car->_speed_X, car->_speed_Y);
  double steer = 0.0;
+
+ vec2f target;
+ double carspeed = Mag(car->_speed_X, car->_speed_Y);
+ double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
+ double lane2left = track->width * SRL[SRLidx].tLane[Next];
+
+ double amI = MIN(0.05, MAX(-0.05, SRL[SRLidx].tRInverse[Next]));
+ double famI = fabs(amI);
+ double time_mod = 1.0;
+
+ if (famI > 0.0)
  {
-  //
-  // Ideal value
-  //
+  double toMid = car->_trkPos.toMiddle + data->speedangle * 20;
+  double modfactor = (car->_speed_x / data->avspeed);
+  modfactor *= modfactor;
+
+  if (amI > 0.0)
   {
-   steer = atan(wheelbase * TargetCurvature) / car->_steerLock;
-   
-   double steergain = SteerGain;
-   
-   if (carspeed < TargetSpeed-1.0 && (!data->alone || data->mode != mode_normal || data->aligned_time < 10))
-   {
-    // decrease steergain as speed is slower than targetspeed and we're either avoiding
-    // or have just recovered from avoiding.
-    steergain = MAX(0.7, steergain - MAX(((TargetSpeed-1.0)-carspeed)/5.0, (1.0 - (carspeed/(TargetSpeed-1.0))) * 12) * (1.0 + fabs(tRInverse[LINE_RL][Next]*10)));
-   }
-#if 0
+   if (toMid < 0.0)
+    time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
    else
-   {
-    // what does this do again???
-    if (tRInverse[LINE_RL][Next] < -0.002)
-    {
-     if (car->_trkPos.toRight < (-tRInverse[LINE_RL][Next] * 150))
-      steergain = MAX(1.0, steergain - ((-tRInverse[LINE_RL][Next]*150) - car->_trkPos.toRight)/20);
-    }
-    else if (tRInverse[LINE_RL][Next] > 0.002)
-    {
-     if (car->_trkPos.toLeft < (tRInverse[LINE_RL][Next] * 150))
-      steergain = MAX(1.0, steergain - ((tRInverse[LINE_RL][Next]*150) - car->_trkPos.toLeft)/20);
-    }
-   }
-#endif
-
-   steer = atan(wheelbase * steergain * TargetCurvature) / car->_steerLock;
+    time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30 * modfactor);
   }
-  
-  // smooth steering.
-  if (data->mode != mode_pitting)
+  else
   {
-    double rI = tRInverse[LINE_RL][nnext];
-    double minspeedfactor = ((90.0 - (MAX(50.0, MIN(70.0, car->_speed_x)))) / 450) * MAX(0.2, MIN(1.1, 1.0 - (rI>0.0 ? rI*30 : fabs(rI)*5)));
-    double maxspeedfactor = ((90.0 - (MAX(50.0, MIN(70.0, car->_speed_x)))) / 450) * MAX(0.2, MIN(1.1, 1.0 - (rI<0.0 ? fabs(rI)*30 : rI*5)));
-
-#if 0
-    if (data->rInverse > 0.0)
-    {
-      if (fabs(steer) > fabs(lastNasteer))
-        minspeedfactor = MAX(minspeedfactor/4, minspeedfactor - data->rInverse * 40);
-     // maxspeedfactor = MIN(maxspeedfactor*1.4, maxspeedfactor + data->rInverse * 1);
-    }
-    else
-    {
-      if (fabs(steer) > fabs(lastNasteer))
-        maxspeedfactor = MAX(maxspeedfactor/4, maxspeedfactor + data->rInverse * 40);
-     // minspeedfactor = MIN(minspeedfactor*1.4, minspeedfactor - data->rInverse * 1);
-    }
-#endif
-      
-    steer = (float) MAX(lastNasteer - minspeedfactor, MIN(lastNasteer + maxspeedfactor, steer));
-  }
-
-  lastNasteer = steer;
-
-  //
-  // Servo system to stay on the pre-computed path
-  //
-  {
-   double dx = txNext - txIndex;
-   double dy = tyNext - tyIndex;
-   Error = (dx * (rt.y - tyIndex) - dy * (rt.x - txIndex)) / Mag(dx, dy);
-  }  
-
-  int Prev = (Index + Divs - 1) % Divs;
-  double txPrev = offlane * txRight[Prev] + (1 - offlane) * txLeft[Prev];
-  double tyPrev = offlane * tyRight[Prev] + (1 - offlane) * tyLeft[Prev];
-  int PrevPrev = (Index + Divs - 5) % Divs;
-  int NextNext = (KNext + 1) % Divs;
-  double txNextNext = offlane * txRight[NextNext] + (1 - offlane) * txLeft[NextNext];
-  double tyNextNext = offlane * tyRight[NextNext] + (1 - offlane) * tyLeft[NextNext];
-  double Prevdx = txNext - txPrev;
-  double Prevdy = tyNext - tyPrev;
-  double Nextdx = txNextNext - txIndex;
-  double Nextdy = tyNextNext - tyIndex;
-  double dx = c0 * Prevdx + (1 - c0) * Nextdx;
-  double dy = c0 * Prevdy + (1 - c0) * Nextdy;
-  double n = Mag(dx, dy);
-  dx /= n;
-  dy /= n;
-  double sError = (dx * car->_speed_Y - dy * car->_speed_X) / (carspeed + 0.01);
-  double cError = (dx * car->_speed_X + dy * car->_speed_Y) / (carspeed + 0.01);
-  VnError = asin(sError);
-  if (cError < 0)
-   VnError = PI - VnError;
-
-  steer -= (atan(Error * (300 / (carspeed + 300)) / 15) + VnError) / car->_steerLock;
-
-
-  //
-  // Steer into the skid
-  //
-  double vx = car->_speed_X;
-  double vy = car->_speed_Y;
-  double dirx = cos(car->_yaw);
-  double diry = sin(car->_yaw);
-  CosAngleError = dx * dirx + dy * diry;
-  SinAngleError = dx * diry - dy * dirx;
-  Skid = (dirx * vy - vx * diry) / (carspeed + 0.1);
-  if (Skid > 0.9)
-   Skid = 0.9;
-  if (Skid < -0.9)
-   Skid = -0.9;
-  /*
-  double skidfactor = 0.9 + MAX(-0.5, (data->collision ? -(5.0-data->collision)/9 
-                        : (data->mode != mode_normal ? MIN(0.0, MAX(-0.5, car->_accel_x/40))
-                         : (((data->angle < 0.0 && tRInverse[Next] < 0.0) || (data->angle > 0.0 && tRInverse[Next] > 0.0)) ?
-                            MAX(-0.3, -fabs(data->angle)) : 0.0))));
-                            */
-  double skidfactor = 0.8;//MAX(0.6, 0.8 - MAX(0.0, MIN(25.0, car->_speed_x-45.0))/120);
-  steer += (asin(Skid) / car->_steerLock) * skidfactor;
-
-  double yr = carspeed * TargetCurvature;
-  double diff = car->_yaw_rate - yr;
-  double steerskid = 0.1 + MAX(0.0, MIN(0.1, (-car->_accel_x)/200));
-  steer -= (steerskid * (1 + fDirt) * (100 / (carspeed + 100)) * diff) / car->_steerLock;
-
-  {
-   double trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
-   double angle = trackangle - car->_yaw;
-   NORM_PI_PI(angle);
-
-   if (fabs(angle) >= 1.6)
-   {
-    // facing the wrong way.  Work out the ideal steer angle...
-    steer = -steer;
-    /*
-    if (angle > 1.6)
-    {
-     if (car->_trkPos.toRight <= 2.0)
-      k1999steer = -(fabs(k1999steer));
-     else if (car->_trkPos.toLeft <= 2.0)
-      k1999steer = fabs(k1999steer);
-    }
-    else
-    {
-     if (car->_trkPos.toRight <= 2.0)
-      k1999steer = (fabs(k1999steer));
-     else if (car->_trkPos.toLeft <= 2.0)
-      k1999steer = -(fabs(k1999steer));
-    }
-    */
-  
-    // we're facing the wrong way.  Set it to full steer in whatever direction for now ...
-    if (steer > 0.0)
-     steer = 1.0;
-    else
-     steer = -1.0;
-   }
-   {
-    // limit how far we can steer against raceline 
-    double limit = (90.0 - MAX(40.0, MIN(60.0, car->_speed_x))) / 130;
-    steer = MAX(data->steer-limit, MIN(data->steer+limit, steer));
-   }
-
-
+   if (toMid > 0.0)
+    time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
+   else
+    time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30 * modfactor);
   }
  }
 
-#endif
- return steer;
+ // an idea to implement soon...
+ //if (car->_accel_x < 0.0)
+ // steertime *= MIN(1.4, MAX(1.0, -car->_accel_x/10));
 
+ GetSteerPoint(5.0 + car->_speed_x/10, &target, offset, steertime * time_mod);
+ double targetAngle = atan2(target.y - car->_pos_Y, target.x - car->_pos_X);
+ //double offline = MIN(2.0, MAX(-2.0, (offset - car->_trkPos.toMiddle)));
+ //targetAngle -= offline/15;
+
+ double steer_direction = targetAngle - (car->_yaw + car->_yaw_rate/15);
+ NORM_PI_PI(steer_direction);
+
+ steer = steer_direction / car->_steerLock;
+
+ double nextangle = data->angle + car->_yaw_rate/3;
+
+ if (fabs(nextangle) > fabs(data->speedangle))
+ {
+  double sa = MAX(-0.3, MIN(0.3, data->speedangle/3));
+  double anglediff = (data->speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
+  steer += anglediff * (1.0 + MAX(1.0, 1.0 - car->_accel_x/5));
+ }
+
+ return steer;
 } 
 
 int LRaceLine::isOnLine()
 {
- double lane2left = tLane[This] * Width;
+ double lane2left = SRL[SRLidx].tLane[This] * Width;
  
  if (fabs(car->_trkPos.toLeft - lane2left) < MAX(0.06, 1.0 - (car->_speed_x * (car->_speed_x/10))/600))
   return 1;
@@ -2455,15 +2083,15 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
   dist = 0;
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
- int Index = tSegIndex[SegId] + int(dist / tElemLength[SegId]);
- double laneoffset = Width/2 - (tLane[Index] * Width);
- double rInv = tRInverse[LINE_MID][Index];
+ int Index = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
+ double laneoffset = Width/2 - (SRL[SRLidx].tLane[Index] * Width);
+ double rInv = SRL[LINE_MID].tRInverse[Index];
  Index = This; 
 #if 1
- if (fabs(tRInverse[LINE_RL][Next]) > fabs(rInv) &&
-     ((tRInverse[LINE_RL][Next] < 0 && rInv <= 0.0005) ||
-      (tRInverse[LINE_RL][Next] > 0 && rInv >= -0.0005)))
-  rInv = tRInverse[LINE_RL][Next];
+ if (fabs(SRL[SRLidx].tRInverse[Next]) > fabs(rInv) &&
+     ((SRL[SRLidx].tRInverse[Next] < 0 && rInv <= 0.0005) ||
+      (SRL[SRLidx].tRInverse[Next] > 0 && rInv >= -0.0005)))
+  rInv = SRL[SRLidx].tRInverse[Next];
 #endif
 
  //double time = 0.63;
@@ -2473,34 +2101,22 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
   time *= (1.0 + ((off2lft/track->width) * (off2lft/(track->width-3.0)) * fabs(rInv*60)));
  else if (rInv < 0.0 && off2rgt > 0.0)
   time *= (1.0 + ((off2rgt/track->width) * (off2rgt/(track->width-3.0)) * fabs(rInv*60)));
-#if 0
- if ((tRInverse[LINE_MID][Index] > 0.0 && offset > seg->width * 0.1) ||
-     (tRInverse[LINE_MID][Index] < 0.0 && offset < seg->width * -0.1))
- {
-  //time = MAX(time/4, MIN(time, time - (fabs(offset)/(track->width*0.4)*fabs(tRInverse[LINE_MID][Index]*20.0))));
- }
- else if ((tRInverse[LINE_MID][Next] > 0.0 && offset < 0.0) ||
-          (tRInverse[LINE_MID][Next] < -0.0 && offset > 0.0))
- {
-  time *= 1.0 + (fabs(offset)/(track->width/2))*fabs(tRInverse[LINE_MID][Next]*40) * 9;
- }
-#endif
  double X = car->_pos_X + car->_speed_X * time;
  double Y = car->_pos_Y + car->_speed_Y * time;
  int next = Index;
  double avgmInverse = 0.0;
  int divcount = 0;
 
- double txIndex = offlane * txRight[Index] + (1 - offlane) * txLeft[Index];
- double tyIndex = offlane * tyRight[Index] + (1 - offlane) * tyLeft[Index];
- double txNext = offlane * txRight[next] + (1 - offlane) * txLeft[next];
- double tyNext = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
+ double txIndex = offlane * SRL[SRLidx].txRight[Index] + (1 - offlane) * SRL[SRLidx].txLeft[Index];
+ double tyIndex = offlane * SRL[SRLidx].tyRight[Index] + (1 - offlane) * SRL[SRLidx].tyLeft[Index];
+ double txNext = offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next];
+ double tyNext = offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next];
  int count = 0, limit = MAX(30, int(car->_speed_x*2));
  while(count < limit)
  {
   next = (Index + 1) % Divs;
-  txNext = offlane * txRight[next] + (1 - offlane) * txLeft[next];
-  tyNext = offlane * tyRight[next] + (1 - offlane) * tyLeft[next];
+  txNext = offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next];
+  tyNext = offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next];
   double dx = txNext - car->_pos_X;
   double dy = tyNext - car->_pos_Y;
   if ((txNext - txIndex) * (X - txNext) +
@@ -2511,11 +2127,11 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
    break;
   }
   Index = next;
-  txIndex = offlane * txRight[Index] + (1 - offlane) * txLeft[Index];
-  tyIndex = offlane * tyRight[Index] + (1 - offlane) * tyLeft[Index];
+  txIndex = offlane * SRL[SRLidx].txRight[Index] + (1 - offlane) * SRL[SRLidx].txLeft[Index];
+  tyIndex = offlane * SRL[SRLidx].tyRight[Index] + (1 - offlane) * SRL[SRLidx].tyLeft[Index];
   if (next >= Next)
   {
-   avgmInverse += tRInverse[LINE_RL][Index] * MAX(0.0, 1.0 - (double)divcount/15);
+   avgmInverse += SRL[SRLidx].tRInverse[Index] * MAX(0.0, 1.0 - (double)divcount/15);
    divcount++;
   }
   count++;
@@ -2534,12 +2150,12 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 int LRaceLine::findNextCorner( double *nextCRinverse )
 {
  tTrackSeg *seg = car->_trkPos.seg;;
- int prefer_side = ((tRInverse[LINE_RL][Next] > 0.001) ? TR_LFT : 
-                    ((tRInverse[LINE_RL][Next]) < -0.001 ? TR_RGT : TR_STR));
+ int prefer_side = ((SRL[SRLidx].tRInverse[Next] > 0.001) ? TR_LFT : 
+                    ((SRL[SRLidx].tRInverse[Next]) < -0.001 ? TR_RGT : TR_STR));
  double curlane = car->_trkPos.toLeft / track->width;
  int next = (Next+5) % Divs, i = 1, div;
  double distance = 0.0;
- double CR = tRInverse[LINE_RL][Next];
+ double CR = SRL[SRLidx].tRInverse[Next];
 
  if (car->_speed_x < 5.0)
  {
@@ -2552,16 +2168,16 @@ int LRaceLine::findNextCorner( double *nextCRinverse )
   for (i=1; i<iend; i++)
   {
    div = (Next + i) % Divs;
-   if (tRInverse[LINE_RL][div] > 0.001)
+   if (SRL[SRLidx].tRInverse[div] > 0.001)
     prefer_side = TR_LFT;
-   else if (tRInverse[LINE_RL][div] < -0.001)
+   else if (SRL[SRLidx].tRInverse[div] < -0.001)
     prefer_side = TR_RGT;
    if (prefer_side != TR_STR)
    {
-    double thisCR = tRInverse[LINE_RL][div];
-    double distance = tDistance[div] - tDistance[This];
+    double thisCR = SRL[SRLidx].tRInverse[div];
+    double distance = SRL[SRLidx].tDistance[div] - SRL[SRLidx].tDistance[This];
     if (distance < 0.0)
-     distance = (tDistance[div]+Length) - tDistance[This];
+     distance = (SRL[SRLidx].tDistance[div]+Length) - SRL[SRLidx].tDistance[This];
     double time2reach = distance / car->_speed_x;
     thisCR /= MAX(1.0, time2reach*2);
     if (fabs(thisCR) > fabs(CR))
@@ -2574,38 +2190,6 @@ int LRaceLine::findNextCorner( double *nextCRinverse )
 
  *nextCRinverse = CR;
 
-
-#if 0
- if (prefer_side == TR_LFT && MAX(tLane[next], curlane) > 0.4 && tLane[next] > tLane[This])
- {
-  int starti = i;
-  for (; i<starti + 20; i++)
-  {
-   div = (Next + i) % Divs;
-   if (-tRInverse[LINE_RL][div] > *nextCRinverse)
-   {
-    prefer_side = TR_RGT;
-    *nextCRinverse = tRInverse[LINE_RL][div];
-    break;
-   }
-  }
- }
- else if (prefer_side == TR_RGT && MIN(tLane[next], curlane) < 0.6 && tLane[next] < tLane[This])
- {
-  int starti = i;
-  for (; i<starti + 20; i++)
-  {
-   div = (Next + i) % Divs;
-   if (-tRInverse[LINE_RL][div] < *nextCRinverse)
-   {
-    prefer_side = TR_LFT;
-    *nextCRinverse = tRInverse[LINE_RL][div];
-    break;
-   }
-  }
- }
-#endif
-
  if (prefer_side == TR_STR)
   *nextCRinverse = 0.0;
 
@@ -2614,20 +2198,20 @@ int LRaceLine::findNextCorner( double *nextCRinverse )
 
 double LRaceLine::correctLimit(double avoidsteer, double racesteer)
 {
- double nlane2left = tLane[Next] * Width;
+ double nlane2left = SRL[SRLidx].tLane[Next] * Width;
  double tbump = BumpCaution;//GetModD( tBump, This ) * 4;
 
  // correct would take us in the opposite direction to a corner - correct less!
- if ((tRInverse[LINE_RL][Next] > 0.001 && avoidsteer > racesteer) ||
-     (tRInverse[LINE_RL][Next] < -0.001 && avoidsteer < racesteer))
-  return MAX(0.2, MIN(1.0, 1.0 - fabs(tRInverse[LINE_RL][Next]) * 100.0 - tbump));
+ if ((SRL[SRLidx].tRInverse[Next] > 0.001 && avoidsteer > racesteer) ||
+     (SRL[SRLidx].tRInverse[Next] < -0.001 && avoidsteer < racesteer))
+  return MAX(0.2, MIN(1.0, 1.0 - fabs(SRL[SRLidx].tRInverse[Next]) * 100.0 - tbump));
 
  // correct would take us in the opposite direction to a corner - correct less (but not as much as above)
  int nnext = (Next + (int) (car->_speed_x/3)) % Divs;
- double nnlane2left = tLane[nnext] * Width;
- if ((tRInverse[LINE_RL][nnext] > 0.001 && avoidsteer > racesteer) ||
-     (tRInverse[LINE_RL][nnext] < -0.001 && avoidsteer < racesteer))
-  return MAX(0.3, MIN(1.0, 1.0 - fabs(tRInverse[LINE_RL][nnext]) * 40.0 - tbump));
+ double nnlane2left = SRL[SRLidx].tLane[nnext] * Width;
+ if ((SRL[SRLidx].tRInverse[nnext] > 0.001 && avoidsteer > racesteer) ||
+     (SRL[SRLidx].tRInverse[nnext] < -0.001 && avoidsteer < racesteer))
+  return MAX(0.3, MIN(1.0, 1.0 - fabs(SRL[SRLidx].tRInverse[nnext]) * 40.0 - tbump));
 
  // ok, we're not inside the racing line.  Check and see if we're outside it and turning 
  // into a corner, in which case we want to correct more to try and get closer to the
@@ -2802,6 +2386,7 @@ return;
 /////////////////////////////////////////////////////////////////////////////
 void LRaceLine::CI_Update(double Dist)
 {
+#if 0
  interpdata.i1 = This;
  interpdata.i0 = (interpdata.i1 + Divs - 1) % Divs;
  interpdata.i2 = (interpdata.i1 + 1) % Divs;
@@ -2832,6 +2417,7 @@ void LRaceLine::CI_Update(double Dist)
  interpdata.a1 = 3 * (1 - interpdata.t) * (1 - interpdata.t) * interpdata.t;
  interpdata.a2 = 3 * (1 - interpdata.t) * interpdata.t * interpdata.t;
  interpdata.a3 = interpdata.t * interpdata.t * interpdata.t;
+#endif
 }
 
 /////////////////////////////////////////////////////////////////////////////

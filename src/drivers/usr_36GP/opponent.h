@@ -100,6 +100,7 @@ class Opponent {
 		float nextleft;
 		float prevleft;
 		float t_impact;
+		float brakemargin;
 		int state;			// State variable to characterize the relation to the opponent, e. g. opponent is behind.
 		int team;
 		int teamindex;

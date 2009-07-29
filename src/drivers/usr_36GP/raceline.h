@@ -31,6 +31,33 @@ enum { mode_normal=1, mode_correcting, mode_avoiding, mode_pitting };
 #define MAXDIVS 10000
 
 typedef struct {
+ double *tRInverse;
+ double *tx;
+ double *ty;
+ double *tz;
+ double *tzd;
+ double *tLane;
+ double *txLeft;
+ double *tyLeft;
+ double *txRight;
+ double *tyRight;
+ double *tLaneLMargin;
+ double *tLaneRMargin;
+ double *tFriction;
+ double *tBrakeFriction;
+ //double *tSegDist;
+ double *tElemLength;
+ double *tDistance;
+ tTrackSeg **tSegment;
+ int *tDivSeg;
+ int *tSegIndex;
+ char trackname[64];
+ int Segs;
+ int init;
+ int offset;
+} SRaceLine;
+
+typedef struct {
   tSituation *s;
   double rInverse;
   double mInverse;
@@ -40,10 +67,12 @@ typedef struct {
   double adecel;
   double lane;
   double ksteer;
+  double tsteer;
   double collision;
   double speedangle;
   double angle;
   double speed;
+  double tspeed;
   double avspeed;
   double slowavspeed;
   double accel_redux;
@@ -160,37 +189,15 @@ class LRaceLine {
   double avgerror;
 
   int Divs;
-  int Segs;
   int AccelCurveOffset;
   int Iterations;
   int SteerMod;
+  int SRLidx;
   double Width;
   double Length;
-  double *tSegDist;
-  int *tSegIndex;
-  int *tSegDivStart;
-  double *tElemLength;
-  tTrackSeg **tSegment;
 
-  double **tx;
-  double **ty;
-  double **tz;
-  double **tzd;
-  double *tDistance;
-  double **tRInverse;
   double **tSpeed;
-  double *txLeft;
-  double *tyLeft;
-  double *txRight;
-  double *tyRight;
-  double *tLane;
-  double **tFriction;
-  double **tBrakeFriction;
-  double *tLaneLMargin;
-  double *tLaneRMargin;
   double *tLaneShift;
-  double *tLDelta;
-  double *tRDelta;
   double *tExtLimit;
   int *tDivSeg;
 
@@ -230,14 +237,17 @@ class LRaceLine {
   tCarElt *car;
 
   void UpdateTxTy(int i, int rl);
-  void SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l);
+  void SetSegmentInfo(const tTrackSeg *pseg, double d, int i, double l, int rl);
   void AllocTrack(tTrack *ptrack);
-  void FreeTrack();
+  void AllocRaceline(int rl, const char *trackname);
+  void FreeRaceline(int rl);
+  void FreeTrack(bool freeall);
   void SplitTrack(tTrack *ptrack, int rl);
-  double SegCamber(int div);
+  double SegCamber(int rl, int div);
   double GetRInverse(int prev, double x, double y, int next, int rl);
   void AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl, double Security = -1);
   void Smooth(int Step, int rl);
+  void ComputeSpeed(int rl);
   void StepInterpolate(int iMin, int iMax, int Step, int rl);
   void Interpolate(int Step, int rl);
   void CalcZCurvature(int rl);
@@ -254,8 +264,8 @@ class LRaceLine {
   double correctLimit(double avoidsteer, double racesteer);
   double getAvoidSpeedDiff( float distance );
   double getK1999Steer() { return k1999steer; }
-  double getRInverse(int div) { return tRInverse[LINE_RL][((div + Divs) % Divs)]; }
-  double getRInverse() { return tRInverse[LINE_RL][Next]; }
+  double getRInverse(int div);
+  double getRInverse() { return getRInverse(Next); }
   void getOpponentInfo(double distance, double *aspeed, double *rInv);
   double getRLMarginRgt(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginRgt, div ); }
   double getRLMarginLft(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginLft, div ); }

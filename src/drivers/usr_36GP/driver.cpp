@@ -163,6 +163,7 @@ Driver::Driver(int index) :
 		SkidSteer(0.7),
 		MinAccel(0.2),
 		lookahead(10.0f),
+		brakemargin(0.0f),
 		MaxGear(0),
 		NoPit(0),
 		radius(NULL),
@@ -201,7 +202,7 @@ Driver::~Driver()
 {
     if (raceline)
     {
-        raceline->FreeTrack();
+        raceline->FreeTrack(true);
         delete raceline;
     }
 	delete opponents;
@@ -545,6 +546,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	CARMASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
 	maxfuel = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
 	steerLock = GfParmGetNum(car->_carHandle, SECT_STEER, PRM_STEERLOCK, (char *)NULL, 4.0f);
+	brakemargin = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_BRAKE_MARGIN, (char *)NULL, 0.0f);
 	myoffset = 0.0f;
 	simtime = correcttimer = skill_adjust_limit = aligned_timer = stopped_timer = 0.0;
 	avoidtime = frontavoidtime = 0.0;
@@ -1417,7 +1419,7 @@ float Driver::getSteer(tSituation *s)
 
 double Driver::calcSteer( double targetAngle, int rl )
 {
-#if 0
+#if 1
 	if (mode != mode_pitting)
 	{
 		float kksteer = raceline->getAvoidSteer(myoffset, rldata);
@@ -1448,7 +1450,7 @@ double Driver::calcSteer( double targetAngle, int rl )
 
 
 #else  // old ki steering
-	double steer_direction = targetAngle - car->_yaw;
+	double steer_direction = targetAngle - car->_yaw - car->_speed_x/300 * car->_yaw_rate;
 
 	NORM_PI_PI(steer_direction);
 	if (DebugMsg & debug_steer)
@@ -2027,6 +2029,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	double catchdist = (double) ((speed*distance)/(speed-ospeed)) * otry_factor * 0.8 + distance/10;
 	double mcd = car->_speed_x * (2.0 - MIN(1.5, rInv * 500));
 
+#if 0
 	// TRB ENDURANCE RACES ONLY!!!
 	if (car->race.laps < 2 && 
 	    ocar->_pos < car->_pos &&
@@ -2035,6 +2038,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	{
 		overtakecaution += (2 - car->race.laps) * 4;
 	}
+#endif
 
 	if (catchdist < mcd && MIN(speed, avspeed) > ospeed && //catchdist < *mincatchdist+0.1 && 
 	    (distance * (1.0+overtakecaution) < MIN(speeddiff, catchdist/4 + 2.0) * (1.0-rInv*30) ||
@@ -2238,7 +2242,7 @@ if (DebugMsg & debug_overtake)
 fprintf(stderr,"%s SIDE %s\n",car->_name,ocar->_name);fflush(stderr);
 			
 			double sidedist = fabs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
-			double sidemargin = opponent[i].getWidth()/2 + getWidth()/2 + 3.0f + MAX(fabs(rldata->rInverse), fabs(rldata->mInverse))*100;
+			double sidemargin = opponent[i].getWidth()/2 + getWidth()/2 + 5.0f + MAX(fabs(rldata->rInverse), fabs(rldata->mInverse))*100;
 			double side = (car->_trkPos.toMiddle-angle) - (ocar->_trkPos.toMiddle-opponent[i].getAngle());
 			double sidedist2 = sidedist;
 			if (side > 0.0)
@@ -3168,18 +3172,17 @@ bool Driver::isStuck()
 {
 	double toSide = MIN(car->_trkPos.toLeft, car->_trkPos.toRight);
 	double stangle = angle;
+	double fangle = fabs(angle);
 
-	vec2f target = getTargetPoint(true, 0.0);
+	vec2f target = getTargetPoint(false, 0.0);
 	double targetAngle = atan2(target.y - car->_pos_Y, target.x - car->_pos_X);
-	double stucksteer = calcSteer( targetAngle, 0 );
+	double stuck_steer = calcSteer( targetAngle, 0 );
 
 	if (stangle < 1.0 && stangle > -0.3 && car->_trkPos.toLeft < 1.0)
 		stangle += MIN(0.5, car->_trkPos.toLeft / 5);
 	else if (stangle > -1.0 && stangle < 0.3 && car->_trkPos.toRight < 1.0)
 		stangle -= MIN(0.5, car->_trkPos.toRight / 5);
 
-	double fangle = fabs(angle);
-	static float stuck_steer = -100.0f;
 	bool returning = ((car->_trkPos.toMiddle > 0.0 && speedangle < -0.2) ||
 	                  (car->_trkPos.toMiddle < 0.0 && speedangle > 0.2));
 	bool departing = ((car->_trkPos.toMiddle > 0.0 && speedangle > 0.2) ||
@@ -3224,7 +3227,7 @@ bool Driver::isStuck()
 	{
 		stuck = 0;
 		stuck_timer = simtime;
-		stuck_steer = -100.0f;
+		stucksteer = -100.0f;
 	}
 
 	if (stuck)
@@ -3236,7 +3239,7 @@ bool Driver::isStuck()
 		{
 			stuck = 0;
 			stuck_timer = simtime;
-			stuck_steer = -100.0f;
+			stucksteer = -100.0f;
 			return false;
 		}
 
@@ -3296,7 +3299,7 @@ bool Driver::isStuck()
 		else
 		{
 			// free to keep driving
-			stuck_steer = -100.0f;
+			stucksteer = -100.0f;
 			stuck = 0;
 			return false;
 		}
@@ -3304,35 +3307,49 @@ bool Driver::isStuck()
 	else
 	{
 		// free to keep driving
-		stuck_steer = -100.0f;
+		stucksteer = -100.0f;
 		stuck = 0;
 		return false;
 	}
 
 	// seeing we're stuck, determine steering, braking, accel
-	if (fabs(angle) > 1.7)
-		stucksteer = -stucksteer;
-
-	if (stuck_steer < -99.0f)
+	if (fangle > 1.7)
 	{
-		stuck_steer = stucksteer;
+		stuck_steer = -stuck_steer;
+		if (stuck_steer > 0.0)
+			stuck_steer = 1.0;
+		else
+			stuck_steer = -1.0;
+	}
+	else if (car->_speed_x > 5.0 && fangle < 0.6 &&
+		 ((car->_trkPos.toLeft < 2.0 && racesteer < stuck_steer) ||
+		  (car->_trkPos.toRight < 2.0 && racesteer > stuck_steer)))
+	{
+		stuck_steer += MAX(-0.1, MIN(0.1, racesteer - stuck_steer));
+	}
+
+
+	if (stucksteer < -99.0f)
+	{
+		stucksteer = stuck_steer;
 	}
 	else
 	{
-		double ssteer = stucksteer;
+		double ssteer = stuck_steer;
 
-		if (((stuck_steer > 0.0 && ssteer < 0.0) || (stuck_steer < 0.0 && ssteer > 0.0)) &&
+		if (stuck == STUCK_FORWARD &&
+		    ((stucksteer > 0.0 && ssteer < 0.0) || (stucksteer < 0.0 && ssteer > 0.0)) &&
 		    fabs(angle) < 1.6)
-			stuck_steer = ssteer;
-		else if (stuck_steer > 0.0)
-			stuck_steer = fabs(ssteer);
+			stucksteer = ssteer;
+		else if (stucksteer > 0.0)
+			stucksteer = fabs(ssteer);
 		else
-			stuck_steer = -fabs(ssteer);
+			stucksteer = -fabs(ssteer);
 	}
 
 	if (stuck == STUCK_REVERSE)
 	{
-		car->_steerCmd = -stuck_steer*1.4;
+		car->_steerCmd = -stucksteer*1.4;
 
 		if (car->_speed_x > 3.0 || (toSide < 0.0 && departing))
 		{
@@ -3351,7 +3368,7 @@ bool Driver::isStuck()
 	}
 	else
 	{
-		car->_steerCmd = stuck_steer;
+		car->_steerCmd = stucksteer;
 
 		if (car->_speed_x < -3.0)
 		{
@@ -3363,7 +3380,9 @@ bool Driver::isStuck()
 		{
 			car->_brakeCmd = 0.0f;
 			car->_accelCmd = GetSafeStuckAccel();
-		        car->_accelCmd = MAX(car->_accelCmd/3, car->_accelCmd - fabs(stuck_steer/2));
+		        car->_accelCmd = MAX(car->_accelCmd/3, car->_accelCmd - fabs(stucksteer/2));
+			if (car->_speed_x < 2.0 || fabs(car->_yaw_rate) < 0.5)
+				car->_accelCmd = MAX(0.3, car->_accelCmd);
 			car->_clutchCmd = 0.0f;
 		}
 
@@ -3371,216 +3390,6 @@ bool Driver::isStuck()
 	}
 
 	return true;
-
-#if 0
-	float lftmargin = MAX(4.0f, car->_trkPos.seg->width*0.4);
-	float rgtmargin = MAX(4.0f, car->_trkPos.seg->width*0.4);
-	float lftwidth = 0.0f, rgtwidth = 0.0f;
-	
-	if (fabs(car->_speed_x) > 1.0 || fabs(angle) < 0.9)
-		stopped_timer = simtime;
-
-	if (car->_trkPos.seg->side[TR_SIDE_RGT] != NULL)
-	{
-		rgtmargin = MIN(car->_trkPos.seg->width * 0.4, 4.0 + MAX(0.0, 5.0 - car->_trkPos.seg->side[TR_SIDE_RGT]->width));
-		if (car->_trkPos.seg->side[TR_SIDE_RGT]->style != TR_PLAN)
-			rgtmargin = car->_trkPos.seg->width*0.6;
-		else
-			rgtwidth -= car->_trkPos.seg->side[TR_SIDE_RGT]->width;
-	}
-	if (car->_trkPos.seg->side[TR_SIDE_LFT] != NULL)
-	{
-		MIN(car->_trkPos.seg->width * 0.4, 4.0 + MAX(0.0, 5.0 - car->_trkPos.seg->side[TR_SIDE_LFT]->width));
-		if (car->_trkPos.seg->side[TR_SIDE_LFT]->style != TR_PLAN)
-			lftmargin = car->_trkPos.seg->width*0.6;
-		else
-			lftwidth -= car->_trkPos.seg->side[TR_SIDE_LFT]->width;
-	}
-
-	lftwidth = (lftwidth + car->_trkPos.toLeft);
-	rgtwidth = (rgtwidth + car->_trkPos.toRight);
-
-	if (pit->getInPit() || (car->_trkPos.toLeft > lftmargin && car->_trkPos.toRight > rgtmargin))
-		allow_stuck = 0;
-	//float ss = (-mycardata->getCarAngle() / car->_steerLock);
-	float ss = angle/2; // * (fabs(angle) > 1.8 ? -1 : 1);
-	if ((car->_steerCmd > 0.0 && ss < 0.0) || (car->_steerCmd < 0.0 && ss > 0.0))
-		ss = -ss;
-#if 0
-	if ((angle > 0.0 && lftwidth < 4.0 && ss > 0.0) ||
-	    (angle < 0.0 && rgtwidth < 4.0 && ss < 0.0))
-		ss = -ss;
-#endif
-
-	if (fabs(angle) > 1.5 && (stuckcheck || (fabs(car->_speed_x) < 4.0 && fabs(car->_yaw_rate) < 0.2)))
-	{
-		stucksteer = ss;
-	}
-	else if (fabs(angle) > 0.6 && stuckcheck)
-	{
-		if (stucksteer > 0.0f)
-			stucksteer = 1.0f;
-		else
-			stucksteer = -1.0f;
-	}
-	else
-		stucksteer = car->_steerCmd;
-
-	if (fabs(angle) > 1.4 && mode != mode_correcting)
-		setMode( mode_correcting );
-
-	double walldist = MIN(mycardata->toLftWall(), mycardata->toRgtWall());
-	double minstuckangle = StuckAngle * MAX(0.4, 1.0 - MAX(0.0, 4.0-walldist) / 7);
-
-	if (simtime - stopped_timer > 4.0)
-		walldist = 0.0;
-
-	// does the car's position indicate we're stuck?
-	bool position_stuck = (((fabs(angle) > minstuckangle &&
-	                        ((car->_gear == -1 && car->_speed_x < MAX_UNSTUCK_SPEED) ||
-				 (car->_gear > -1 && fabs(car->_speed_x+car->_accel_x) < MAX_UNSTUCK_SPEED)) &&
-	                        (walldist < (MIN_UNSTUCK_DIST + (fabs(angle)-minstuckangle)*3)))));
-	int reversing_ok = 0, force_reverse = 0;
-	if (car->_gear == -1 && fabs(angle) > 0.6)
-	{
-		position_stuck = 1;
-		if ((car->_trkPos.toLeft < lftmargin && speedangle < -0.5) ||
-		    (car->_trkPos.toRight < rgtmargin && speedangle > 0.5))
-		{
-			reversing_ok = 1;
-		}
-if (DebugMsg & debug_steer)
-fprintf(stderr,"REVERSING: ok=%d force=%d (%.2f/%.2f -> %.2f)\n",reversing_ok, force_reverse,car->_trkPos.toLeft,car->_trkPos.toRight,speedangle);
-
-	}
-
-	if (car->_gear != -1 && fabs(car->_speed_x) < 7.0 &&
-	    ((rgtwidth < 2.0 && angle < -0.7 && angle > -2.5) ||
-	     (lftwidth < 2.0 && angle > 0.7 && angle < 2.5)))
-	{
-		force_reverse = 1;
-	}
-
-	if (position_stuck == 1)
-	{
-		stuckcheck = 1;
-		
-		if (car->_gear == 1 && car->_speed_x > 3.0 &&
-		    ((car->_trkPos.toLeft < 4.0 && speedangle < -0.5) ||
-		     (car->_trkPos.toRight < 4.0 && speedangle > 0.5)))
-		{
-			position_stuck = 0;
-		}
-	}
-
-	if ((car->_gear == -1 || position_stuck) && allow_stuck)
-	{
-
-		// we need to reverse (in theory)...
-		if (fabs(car->_speed_x) > 3.0)
-		{
-			if (simtime-stuck_timer > 3.0 || force_reverse)
-			{
-				if (reversing_ok)
-				{
-					// heading towards track, keep reversing
-if (DebugMsg & debug_steer)
-fprintf(stderr,"STUCK: Reversing, timeup (fast)\n");
-					stuckcheck = 1;
-					return true;
-				}
-				else
-				{
-					// travelling backwards for long enough.  Try forwards
-if (DebugMsg & debug_steer)
-fprintf(stderr,"STUCK: Cancelling, timeup, (%.2f/%.2f, %.2f)\n",car->_trkPos.toLeft,car->_trkPos.toRight,speedangle);
-					stuck_timer = simtime;
-					allow_stuck = 0;
-					return false;
-				}
-			}
-			else if (!reversing_ok)
-			{
-				// travelling backwards for long enough.  Try forwards
-if (DebugMsg & debug_steer)
-fprintf(stderr,"STUCK: Cancelling, !reverse_ok, (%.2f/%.2f, %.2f)\n",car->_trkPos.toLeft,car->_trkPos.toRight,speedangle);
-				stuck_timer = simtime;
-				allow_stuck = 0;
-				return false;
-			}
-
-if (DebugMsg & debug_steer)
-fprintf(stderr,"STUCK: Reversing, time ok (fast)\n");
-			return true;
-		}
-		else
-		{
-			if (simtime - stuck_timer > 4.0)
-			{
-if (DebugMsg & debug_steer)
-fprintf(stderr,"STUCK: Cancelling, timeup (slow)\n");
-				stuck_timer = simtime;
-				allow_stuck = 0;
-				return false;
-			}
-
-			// yep, we're stuck.  Go backwards.
-if (DebugMsg & debug_steer)
-fprintf(stderr,"STUCK: Reversing (slow)\n");
-			stuckcheck = 1;
-			return true;
-		}
-	}
-	else if (allow_stuck && (position_stuck || fabs(car->_speed_x) < 2.0) && (reversing_ok || fabs(car->_speed_x) < 5.0) && !pit->getInPit())
-	{
-		if (simtime-stuck_timer > MAX(2.0, fabs(car->_speed_x/2)+0.5) || force_reverse)
-		{
-			// been sitting still for a while even though not stuck.  Try reverse.
-if (DebugMsg & debug_steer)
-fprintf(stderr,"NOT STUCK: Switch to Reverse (%.3f > %.3f)\n",simtime-stuck_timer,fabs(car->_speed_x)+1.0);
-			stuck_timer = simtime;
-			allow_stuck = stuckcheck = 1;
-			return true;
-		}
-
-if (DebugMsg & debug_steer)
-fprintf(stderr,"NOT STUCK: Stick with Forwards ps=%d fr=%d (%.3f <= %.3f)\n",position_stuck,force_reverse,simtime-stuck_timer,fabs(car->_speed_x/2)+0.5);
-		return false;
-	}
-
-	if (car->_gear >= 1 && fabs(angle) < MAX(fabs(rldata->rlangle)*4, fabs(rldata->rInverse)*500) && 
-	    last_stuck_time < simtime - 4.0 &&
-	    (MIN(car->_trkPos.toLeft, car->_trkPos.toRight) > 2.0 || fabs(angle) < 0.3))
-		stuckcheck = 0;
-	else if (mode == mode_normal && fabs(angle) > MAX(fabs(rldata->rlangle)*4, fabs(rldata->rInverse)*500))
-		stuckcheck = 1;
-	else if (last_stuck_time >= simtime - 4.0 && !pit->getInPit())
-		stuckcheck = 1;
-
-	if (car->_gear == -1)
-	{
-		allow_stuck = 0;
-		stuck_timer = simtime;
-	}
-	else if ((!allow_stuck && simtime-stuck_timer > 3.0 && position_stuck && (!stuckcheck || simtime - last_stuck_time > 4.0)))
-	{
-		allow_stuck = 1;
-		stuck_timer = simtime;
-	}
-	else if (simtime - stuck_timer > 4.0 && 
-	         (fabs(angle) > 1.0 || MIN(car->_trkPos.toLeft, car->_trkPos.toRight)<-1.0) &&
-		 car->_speed_x < 1.0)
-	{
-		allow_stuck = 1;
-	}
-	else
-	{
-if (DebugMsg & debug_steer)
-fprintf(stderr," timer=%.3f %d %d %d %d\n",simtime-stuck_timer,allow_stuck,position_stuck,stuckcheck,(simtime-last_stuck_time>4));
-	}
-
-	return false;
-#endif
 }
 
 

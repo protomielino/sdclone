@@ -21,8 +21,9 @@
 		<attnum name="increase corner inverse" min="0" max="2" val="0.030"/>
 		<attnum name="increase corner factor" min="0" max="4" val="3.500"/>
 		<attnum name="add avoid speed" min="-20" max="20" val="0.0"/>
-		<attnum name="avoid speed factor" min="-20" max="20" val="1.0"/>
-		<attnum name="avoid brake factor" min="-20" max="20" val="1.0"/>
+		<attnum name="avoid speed factor" min="-20" max="20" val="0.9"/>
+		<attnum name="avoid brake factor" min="-20" max="20" val="0.9"/>
+		<attnum name="brake margin" min="-20" max="20" val="1.0"/>
 		<attnum name="base speed factor" min="0.0" max="50.0" val="1.15"/>
 		<attnum name="base brake factor" min="0.0" max="50.0" val="1.05"/>
 		<attnum name="base speed" min="0.0" max="50.0" val="10.00"/>
@@ -41,8 +42,8 @@
 		<attnum name="revs change down max" min="0" max="2" val="0.74"/>
 		<attnum name="steer skid" min="0" max="3" val="0.0"/>
 		<attnum name="steer gain" min="0" max="3" val="1.5"/>
-		<attnum name="max steer time" min="0.5" max="10" val="2.0"/>
-		<attnum name="min steer time" min="0.5" max="10" val="1.0"/>
+		<attnum name="max steer time" min="0.5" max="10" val="2.2"/>
+		<attnum name="min steer time" min="0.5" max="10" val="1.8"/>
 		<attnum name="int margin" min="0" max="2" val="1.7"/>
 		<attnum name="ext margin" min="0" max="2" val="1.3"/>
 		<attnum name="no team waiting" min="0" max="2" val="1"/>

@@ -84,6 +84,7 @@ class Driver {
 		void GetRLSteerPoint( vec2f *rt, double *offset, double time ) { return raceline->GetRLSteerPoint( rt, offset, time ); }
 		int GetMode() { return mode; }
 		float getWidth() { return mycardata->getWidthOnTrack(); }
+		double getBrakeMargin() { return brakemargin; }
 
 	private:
 		// Utility functions.
@@ -244,6 +245,7 @@ class Driver {
 		double SkidSteer;
 		double MinAccel;
 		float lookahead;
+		float brakemargin;
 		int MaxGear;
 		int NoPit;
 

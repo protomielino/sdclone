@@ -44,6 +44,7 @@ Opponent::Opponent() :
 		lastyr(0.0f),
 		prevleft(0.0f),
 		t_impact(0.0f),
+		brakemargin(0.0f),
 		state(0),
 		team(0),
 		teamindex(0),
@@ -102,11 +103,11 @@ void Opponent::update(tSituation *s, Driver *driver, int DebugMsg)
 		if ((!strcmp(car->_teamname, mycar->_teamname)))
 		{
 			team = TEAM_FRIEND;
-			teamindex = RtTeamManagerIndex(car, track, s);
 		}
 		else
 			team = TEAM_FOE;
 		deltamult = 1.0 / s->deltaTime;
+		brakemargin = driver->getBrakeMargin();
 	}
 
 	// If the car is out of the simulation ignore it.
@@ -269,7 +270,7 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 
 
 					//if (mode == mode_normal)
-						collide = testCollision(driver, t_impact, MIN(2.0, MAX(0.0, (mspeed-ospeed)/5)), &targ);
+						collide = testCollision(driver, t_impact, MIN(2.0, MAX(0.0, (mspeed-ospeed)/5)) + brakemargin/2, &targ);
 						//collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5, &targ);
 					//else
 					//	collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5, NULL);
@@ -311,7 +312,7 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 					{
 						double speed = ospeed;//getSpeed();
 						double dspeed = mspeed;//driver->getSpeed();
-						double time_margin = MAX(4.0, (dspeed-speed) / 16);
+						double time_margin = MAX(4.0, (dspeed-speed) / 16) + brakemargin;
 						double width = cardata->getWidthOnTrack();
 						double dwidth = driver->getWidth();
 						double ow = width;
@@ -327,7 +328,7 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 						if (!collide && t_impact < time_margin/2)
 						{
 							// sanity check for cars that are about to plow full speed into the back of other cars
-							double margin = dwidth + 0.5; 
+							double margin = dwidth + 0.5 + brakemargin;
 							double time = 0.6;
 							double mti = t_impact;
 
@@ -606,10 +607,10 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   fsideincr_y *= sizefactor;
   rsideincr_x *= sizefactor;
   rsideincr_y *= sizefactor;
-  rlftincr_x *= sizefactor;
-  rlftincr_y *= sizefactor;
-  rrgtincr_x *= sizefactor;
-  rrgtincr_y *= sizefactor;
+  rlftincr_x *= sizefactor + 1.0;
+  rlftincr_y *= sizefactor + 1.0;
+  rrgtincr_x *= sizefactor + 1.0;
+  rrgtincr_y *= sizefactor + 1.0;
  }
 
 

@@ -101,6 +101,7 @@
 #define PRV_FUEL_PER_LAP      "fuel per lap"
 #define PRV_YAW_RATE_ACCEL    "yaw rate accel"
 #define PRV_MAX_FUEL          "max fuel"
+#define PRV_BRAKE_MARGIN      "brake margin"
 
 #define SECT_SKILL            "skill"
 #define PRV_SKILL_LEVEL       "level"
