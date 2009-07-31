@@ -48,10 +48,13 @@ typedef struct {
  //double *tSegDist;
  double *tElemLength;
  double *tDistance;
+ double *ExtLimit;
  tTrackSeg **tSegment;
  int *tDivSeg;
  int *tSegIndex;
  char trackname[64];
+ double Width;
+ double Length;
  int Segs;
  int init;
  int offset;
@@ -193,12 +196,9 @@ class LRaceLine {
   int Iterations;
   int SteerMod;
   int SRLidx;
-  double Width;
-  double Length;
 
   double **tSpeed;
   double *tLaneShift;
-  double *tExtLimit;
   int *tDivSeg;
 
   LRLMod *tRLMarginRgt;

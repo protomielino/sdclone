@@ -3321,13 +3321,12 @@ bool Driver::isStuck()
 		else
 			stuck_steer = -1.0;
 	}
-	else if (car->_speed_x > 5.0 && fangle < 0.6 &&
+	else if (car->_speed_x > 5.0 && fangle < 0.6 && stuck == STUCK_FORWARD &&
 		 ((car->_trkPos.toLeft < 2.0 && racesteer < stuck_steer) ||
 		  (car->_trkPos.toRight < 2.0 && racesteer > stuck_steer)))
 	{
-		stuck_steer += MAX(-0.1, MIN(0.1, racesteer - stuck_steer));
+		stuck_steer += MAX(-0.15, MIN(0.15, racesteer - stuck_steer));
 	}
-
 
 	if (stucksteer < -99.0f)
 	{
@@ -3335,16 +3334,14 @@ bool Driver::isStuck()
 	}
 	else
 	{
-		double ssteer = stuck_steer;
-
 		if (stuck == STUCK_FORWARD &&
-		    ((stucksteer > 0.0 && ssteer < 0.0) || (stucksteer < 0.0 && ssteer > 0.0)) &&
+		    ((stucksteer > 0.0 && stuck_steer < 0.0) || (stucksteer < 0.0 && stuck_steer > 0.0)) &&
 		    fabs(angle) < 1.6)
-			stucksteer = ssteer;
+			stucksteer = stuck_steer;
 		else if (stucksteer > 0.0)
-			stucksteer = fabs(ssteer);
+			stucksteer = fabs(stuck_steer);
 		else
-			stucksteer = -fabs(ssteer);
+			stucksteer = -fabs(stuck_steer);
 	}
 
 	if (stuck == STUCK_REVERSE)
