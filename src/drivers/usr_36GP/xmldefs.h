@@ -65,6 +65,7 @@
 #define PRV_PIT_OFFSET        "pit offset"
 #define PRV_PIT_EXIT_SPEED    "pit exit speed"
 #define PRV_NO_PIT            "no pit"
+#define PRV_FORCE_PIT         "force pit"
 #define PRV_TURN_DECEL        "turn decel"
 #define PRV_REVS_UP           "revs change up"
 #define PRV_REVS_DOWN         "revs change down"

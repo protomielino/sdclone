@@ -183,7 +183,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
  if (!car->_pit)
   return false;
 
- int forcepit = (int) GfParmGetNum( car->_carHandle, "private", "ForcePit", (char *)NULL, 0.0 );
+ int forcepit = (int) GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_FORCE_PIT, (char *)NULL, 0.0 );
  if (forcepit)
   return true;
 

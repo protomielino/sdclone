@@ -108,7 +108,7 @@ LRaceLine::LRaceLine() :
    AccelCurveDampen(1.0),
    BrakeCurveDampen(1.0),
    AccelCurveLimit(1.0),
-   BrakeCurveLimit(1.0),
+   BrakeCurveLimit(1.5),
    AccelExit(0.0),
    AvoidAccelExit(0.0),
    OvertakeCaution(0.0),
@@ -316,13 +316,13 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  IncCornerInverse = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INC_CORNER_INV, (char *)NULL, 0.400f );
  IncCornerFactor = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INC_CORNER_FACTOR, (char *)NULL, 1.0f );
  CornerSpeed = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_SPEED, (char *)NULL, 15.0f );
- BaseCornerSpeedX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_SPEED_X, (char *)NULL, 1.0f ) * (0.8 + MIN(0.25, ((12.0-skill)/12) / 4));
+ BaseCornerSpeedX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_SPEED_X, (char *)NULL, 1.0f ) * (0.6 + MIN(0.45, ((12.0-skill)/12) / 2));
  AvoidSpeedAdjust = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_SPEED, (char *)NULL, 0.0f );
  AvoidSpeedAdjustX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_SPEED_X, (char *)NULL, 1.0f );
  AvoidBrakeAdjust = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_BRAKE, (char *)NULL, 0.0f );
  AvoidBrakeAdjustX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AVOID_BRAKE_X, (char *)NULL, 1.0f );
  IntMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_INT_MARGIN, (char *)NULL, 1.1f ) + (double) (SRLidx-1)/4; //skill/12;
- ExtMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXT_MARGIN, (char *)NULL, 1.7f ) + (double) (SRLidx-1);   //skill/5;
+ ExtMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXT_MARGIN, (char *)NULL, 1.7f ) + (double) (SRLidx-1)/2;   //skill/5;
  BrakeDelay = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE, (char *)NULL, 35.0f );
  BrakeDelayX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE_X, (char *)NULL, 1.0f );
  BrakeMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_MOD, (char *)NULL, 0.0f );
@@ -333,7 +333,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  AccelCurveDampen =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_ACCEL_CURVE, (char *)NULL, 1.0f );
  BrakeCurveDampen =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_CURVE, (char *)NULL, 1.0f );
  AccelCurveLimit =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_ACCEL_CURVE_LIMIT, (char *)NULL, 1.0f );
- BrakeCurveLimit =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_CURVE_LIMIT, (char *)NULL, 1.0f );
+ BrakeCurveLimit =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_CURVE_LIMIT, (char *)NULL, 1.5f );
  BumpCaution =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BUMP_CAUTION, (char *)NULL, 0.0f );
  SlopeFactor =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_SLOPE_FACTOR, (char *)NULL, 1.0f );
  maxfuel = GfParmGetNum( carhandle, SECT_CAR, PRM_TANK, (char *)NULL, 100.0f );
@@ -621,6 +621,41 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
                     ( (SRL[rl].ty[next] - SRL[rl].ty[prev]) * (SRL[rl].txRight[i] - SRL[rl].txLeft[i]) -
                       (SRL[rl].tx[next] - SRL[rl].tx[prev]) * (SRL[rl].tyRight[i] - SRL[rl].tyLeft[i]));
 
+ double bumpExtMargin = 0.0;
+
+#if 0
+ if (rl != LINE_MID)
+ {
+  int range = 5;
+  double prevzd=0.0, nextzd=0.0;
+  double rI = TargetRInverse;
+
+  for (int n=1; n<range; n++)
+  {
+   int x = ((i-n) + Divs) % Divs;
+   prevzd += SRL[LINE_MID].tzd[x];
+  }
+
+  for (int n=0; n<range; n++)
+  {
+   int x = ((i+n) + Divs) % Divs;
+   nextzd += SRL[LINE_MID].tzd[x];
+  }
+
+  double diff = prevzd - nextzd;
+
+  if (diff > 0.10)
+  {
+   diff -= 0.10;
+   double safespeed = MAX(15.0, 100.0 - (diff*diff) * 400);
+   if (safespeed < 70.0)
+   {
+    bumpExtMargin = fabs((diff*diff) * (rI*200));
+   }
+  }
+ }
+#endif
+
  if (rl >= LINE_RL)
  {
   if (SRL[rl].tLane[i] < -0.2-SRL[rl].tLaneLMargin[i])
@@ -660,6 +695,7 @@ void LRaceLine::AdjustRadius(int prev, int i, int next, double TargetRInverse, i
  double lftmargin = GetModD( tRLMarginLft, i );
 
  extmargin = MAX(extmargin, SRL[rl].ExtLimit[i]);
+ extmargin = MAX(extmargin, bumpExtMargin);
  
  if (dRInverse > 0.000000001)
  {
@@ -770,7 +806,7 @@ void LRaceLine::Smooth(int Step, int rl)
 
       tTrackSeg *seg = SRL[rl].tSegment[SRL[rl].tDivSeg[i]];
       if (BrakeCurveLimit > 0.0 && seg->type != TR_STR && seg->radius < 400.0)
-       SRL[rl].ExtLimit[i] = MIN(BrakeCurveLimit, (400.0 - seg->radius) / 50.0);
+       SRL[rl].ExtLimit[i] = MIN(BrakeCurveLimit, (400.0 - seg->radius) / 35.0);
      }
      else if (ac2 < ac1) // curve is decreasing
      {
@@ -953,12 +989,7 @@ void LRaceLine::TrackInit(tSituation *p)
  {
   int idx = (rl == LINE_MID ? LINE_MID : SRLidx);
 
-#define GET_THIS_WORKING
-#ifdef GET_THIS_WORKING
   if (SRL[idx].init <= 1)
-#else
-  if (1)
-#endif
   {
    fprintf(stderr,"\nInitializing Raceline %d (%s) for %s...\n",idx,SRL[idx].trackname,car->_name); fflush(stderr);
 
@@ -1519,8 +1550,39 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  laststeer = data->steer;
 
  double timefactor = s->deltaTime*(3.6);// + MAX(0.0, ((car->_speed_x-45.0) / 10) * TimeFactor));
- //if (data->collision)
- //  timefactor += MAX(0.0, (5.0-data->collision) * s->deltaTime*4);
+ if (data->followdist < car->_speed_x*0.7)
+	 timefactor *= 1.0 + (car->_speed_X*0.7 - data->followdist)/car->_speed_x*0.5;
+ 
+ {
+  double amI = MIN(0.05, MAX(-0.05, SRL[SRLidx].tRInverse[Next]));
+  double famI = fabs(amI);
+  double time_mod = 1.0;
+
+  if (famI > 0.0)
+  {
+   double toMid = car->_trkPos.toMiddle + data->speedangle * 20;
+   double toLeft = car->_trkPos.toLeft - data->speedangle * 20;
+   double toRight = car->_trkPos.toRight + data->speedangle * 20;
+   double modfactor = (car->_speed_x / data->avspeed);
+   modfactor *= modfactor;
+
+   if (amI > 0.0)
+   {
+    if (toMid < 0.0)
+     time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
+   }
+   else
+   {
+    if (toMid > 0.0)
+     time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
+   }
+  }
+
+  timefactor *= time_mod;
+ }
+
+ if (data->collision)
+   timefactor *= 1.0 + MAX(0.0, (5.0-data->collision) / 5.0);
  double Time = timefactor; // + CornerAccel/80;
  double X4 = car->_pos_X + car->_speed_X * 0.5 / 2;
  double Y4 = car->_pos_Y + car->_speed_Y * 0.5 / 2;
@@ -1926,6 +1988,13 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
    }
    else
     sc += 1.0;
+   
+   //if (data->collision)
+   // sc += (5.0 - data->collision) / 3;
+
+   //if (data->followdist < 10.0 && data->followdist > 0.0)
+   // sc += (10.0 - data->followdist) / 8;
+
    k1999steer += (asin(Skid*sc) / car->_steerLock) * skidfactor;
 //fprintf(stderr," e %.3f",k1999steer);
 
@@ -1944,8 +2013,9 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
    }
 //fprintf(stderr," f %.3f",k1999steer);
 
-   if (fabs(k1999steer) < 0.35 && fabs(SRL[SRLidx].tRInverse[Next]) > 0.002)
-    k1999steer *= (1.0 + (0.35 - fabs(k1999steer)) * 1.3);
+   if (data->alone)
+    if (fabs(k1999steer) < 0.35 && fabs(SRL[SRLidx].tRInverse[Next]) > 0.002)
+     k1999steer *= (1.0 + (0.35 - fabs(k1999steer)) * 1.3);
 //fprintf(stderr," g %.3f\n",k1999steer);  fflush(stderr);
 
    if (fabs(car->_yaw_rate) >= 4.0 && carspeed > 10.0)
@@ -2003,6 +2073,8 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
  vec2f target;
  double carspeed = Mag(car->_speed_X, car->_speed_Y);
  double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
+ if (data->followdist < 5.0)
+	 steertime = MIN(MaxSteerTime*1.1, steertime * 1.0 + (5.0 - data->followdist)/20);
  double lane2left = track->width * SRL[SRLidx].tLane[Next];
 
  double amI = MIN(0.05, MAX(-0.05, SRL[SRLidx].tRInverse[Next]));
@@ -2012,6 +2084,8 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
  if (famI > 0.0)
  {
   double toMid = car->_trkPos.toMiddle + data->speedangle * 20;
+  double toLeft = car->_trkPos.toLeft - data->speedangle * 20;
+  double toRight = car->_trkPos.toRight + data->speedangle * 20;
   double modfactor = (car->_speed_x / data->avspeed);
   modfactor *= modfactor;
 
@@ -2019,15 +2093,15 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
   {
    if (toMid < 0.0)
     time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
-   else
-    time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30 * modfactor);
+   else if (toLeft < track->width/3)
+    time_mod -= MIN(0.7, famI * (MIN(track->width/3, MAX(0.0, track->width/3-toLeft)) / track->width) * 40 * modfactor);
   }
   else
   {
    if (toMid > 0.0)
     time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
-   else
-    time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30 * modfactor);
+   else if (toRight < track->width/3)
+    time_mod -= MIN(0.7, famI * (MIN(track->width/3, MAX(0.0, track->width/3-toRight)) / track->width) * 40 * modfactor);
   }
  }
 
@@ -2040,7 +2114,7 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
  //double offline = MIN(2.0, MAX(-2.0, (offset - car->_trkPos.toMiddle)));
  //targetAngle -= offline/15;
 
- double steer_direction = targetAngle - (car->_yaw + car->_yaw_rate/15);
+ double steer_direction = targetAngle - (car->_yaw + car->_yaw_rate/(15-MIN(8, car->_speed_x/10)));
  NORM_PI_PI(steer_direction);
 
  steer = steer_direction / car->_steerLock;

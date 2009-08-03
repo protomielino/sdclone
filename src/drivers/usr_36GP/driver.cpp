@@ -1205,7 +1205,7 @@ void Driver::calcSkill()
     decel_adjust_targ = (skill/4 * rand1);
 
     // brake to use - usually 1.0, sometimes less (more rarely on higher skill)
-    brake_adjust_targ = MAX(0.7, 1.0 - MAX(0.0, skill/10 * (rand2-0.7)));
+    brake_adjust_targ = MAX(0.85, 1.0 - MAX(0.0, skill/15 * (rand2-0.85)));
 
     // how long this skill mode to last for
     skill_adjust_limit = 5.0 + rand3 * 50.0;
@@ -1237,7 +1237,7 @@ double Driver::getFollowDistance()
 	for (int i = 0; i < opponents->getNOpponents(); i++)
 	{
 		if (opponent[i].getCarPtr() == car) continue;
-		if (opponent[i].getTeam() != TEAM_FRIEND) continue;
+		//if (opponent[i].getTeam() != TEAM_FRIEND) continue;
 		if (!(opponent[i].getState() & OPP_FRONT))
   			continue;
 
@@ -2479,7 +2479,7 @@ fprintf(stderr,"%s -> %s CANCEL 1 (%.1f > %.1f || %.1f < %.1f || %.3f > %.3f)\n"
 			double sdist = (rInverse > 0.0 ? (-sidedist - 3.0) : (sidedist - 3.0));
 
 			//int avoidingside = (otm > wm && myoffset > -w) ? TR_RGT : ((otm < -wm && myoffset < w) ? TR_LFT : TR_STR);
-			int avoidingside = (car->_trkPos.toLeft > ocar->_trkPos.toLeft/*+4.0*/ ? TR_LFT : (car->_trkPos.toLeft<ocar->_trkPos.toLeft/*-4.0*/ ? TR_RGT : TR_STR));
+			int avoidingside = (car->_trkPos.toLeft > ocar->_trkPos.toLeft ? TR_LFT : TR_RGT);
 			int mustmove = 0;
 			int cancelovertake = 0;
 			double distance = o->getDistance();
@@ -2538,7 +2538,7 @@ fprintf(stderr,"%s -> %s CANCEL 3 (%.1f < %.1f)\n",car->_name,ocar->_name,catchd
 				{
 					sidedist -= (speedangle - o->getSpeedAngle()) * 20;
 					if (mustmove || 
-					    sidedist < car->_dimension_y + ocar->_dimension_y + 1.0 ||
+					    sidedist < car->_dimension_y + ocar->_dimension_y + 2.0 ||
 					    (o->getState() & OPP_COLL) ||
 					    (prefer_side == TR_RGT && car->_trkPos.toRight > MIN(lane2right, 3.0 - nextCRinverse*1000)))
 					{
@@ -2566,7 +2566,7 @@ fprintf(stderr,"%s LFT %s, HOLDING LINE\n",car->_name,ocar->_name);
 				{
 					sidedist -= (o->getSpeedAngle() - speedangle) * 20;
 					if (mustmove || 
-					    sidedist < car->_dimension_y + ocar->_dimension_y + 1.0 ||
+					    sidedist < car->_dimension_y + ocar->_dimension_y + 2.0 ||
 					    (o->getState() & OPP_COLL) ||
 				            (prefer_side == TR_LFT && car->_trkPos.toLeft > MIN(lane2left, 3.0 + nextCRinverse*1000)))
 					{
@@ -3570,8 +3570,8 @@ float Driver::filterABS(float brake)
 	}
 	//slip *= 1.0f + MAX(rearskid, MAX(fabs(car->_yaw_rate)/10, fabs(angle)/8));
 	slip = car->_speed_x - slip/4.0f;
-	if (collision)
-		slip *= 0.25f;
+	//if (collision)
+	//	slip *= 0.25f;
 	if (origbrake == 2.0f)
 		slip *= 0.1f;
 

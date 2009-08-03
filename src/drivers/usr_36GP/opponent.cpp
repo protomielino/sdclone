@@ -312,7 +312,7 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 					{
 						double speed = ospeed;//getSpeed();
 						double dspeed = mspeed;//driver->getSpeed();
-						double time_margin = MAX(4.0, (dspeed-speed) / 16) + brakemargin;
+						double time_margin = MAX(6.0, (dspeed-speed) / 12) + brakemargin;
 						double width = cardata->getWidthOnTrack();
 						double dwidth = driver->getWidth();
 						double ow = width;
