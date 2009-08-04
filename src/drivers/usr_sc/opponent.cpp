@@ -44,8 +44,10 @@ Opponent::Opponent() :
 		lastyr(0.0f),
 		prevleft(0.0f),
 		t_impact(0.0f),
+		brakemargin(0.0f),
 		state(0),
 		team(0),
+		teamindex(0),
 		index(0),
 		overlaptimer(0.0f),
 		car(NULL),
@@ -99,10 +101,13 @@ void Opponent::update(tSituation *s, Driver *driver, int DebugMsg)
 	if (team == -1)
 	{
 		if ((!strcmp(car->_teamname, mycar->_teamname)))
+		{
 			team = TEAM_FRIEND;
+		}
 		else
 			team = TEAM_FOE;
 		deltamult = 1.0 / s->deltaTime;
+		brakemargin = driver->getBrakeMargin();
 	}
 
 	// If the car is out of the simulation ignore it.
@@ -123,9 +128,11 @@ void Opponent::update(tSituation *s, Driver *driver, int DebugMsg)
 		distance += track->length;
 	}
 
-	double ospeed = MAG(car->_speed_Y, car->_speed_X);
-	double mspeed = MAG(mycar->_speed_Y, mycar->_speed_X);
-	t_impact = MIN(10.0, MAX(0.0, (distance) / (mspeed - ospeed)));
+	//double ospeed = MAG(car->_speed_Y, car->_speed_X);
+	//double mspeed = MAG(mycar->_speed_Y, mycar->_speed_X);
+	double ospeed = getSpeed();
+	double mspeed = driver->getSpeed();
+	//t_impact = MIN(10.0, MAX(0.0, (distance) / (mspeed - ospeed)));
 
 	float SIDECOLLDIST = MAX(car->_dimension_x, mycar->_dimension_x);
 	nextleft = car->_trkPos.toLeft + (car->_trkPos.toLeft - prevleft);
@@ -155,6 +162,9 @@ fprintf(stderr," SIDE sd=%.3f",sidedist);
 #endif
 			float drsa = driver->getSpeedAngle();
 			
+			if (team == TEAM_FRIEND && car->_dammage-1000 < mycar->_dammage && distance > 2.0)
+				state |= OPP_FRONT_FOLLOW;
+
 			if (car->_trkPos.toLeft > mycar->_trkPos.toLeft)
 				sidedist -= (speedangle - drsa) * 10;
 			else
@@ -175,7 +185,7 @@ fprintf(stderr,"SIDECOLLIDE %s %d\n",car->_name,collide);
 		} 
 
 		// Is opponent in front and slower.
-		if (distance > car->_dimension_x*0.9 && getSpeed() <= driver->getSpeed()) 
+		if (distance > car->_dimension_x*0.9 && mspeed > ospeed)
 		{
 			state |= OPP_FRONT;
 #ifdef OPP_DEBUG
@@ -193,7 +203,8 @@ fprintf(stderr," FRONTSLOW\n");
 				distance = GetCloseDistance( distance, mycar );
 			}
 
-			catchdist = driver->getSpeed()*distance/(driver->getSpeed() - getSpeed());
+			catchdist = mspeed*distance/(mspeed - ospeed);
+			//catchdist = driver->getSpeed()*distance/(driver->getSpeed() - getSpeed());
 			//t_impact = MAX(0.0, (distance+0.5) / (mspeed - ospeed));
 			t_impact = MAX(0.0, (distance) / (mspeed - ospeed));
 
@@ -240,12 +251,29 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 				if (!(state & OPP_COLL))
 				{
 					// hymie collision method
-					int collide;
+					int collide = 0;
 					vec2f targ;
-					driver->GetSteerPoint(100.0, &targ, -100.0, MAX(0.01, t_impact));
+					double targoffset = 0.0, oltargoffset = mycar->_trkPos.toMiddle;// + driver->getSpeedAngle() * 10 * t_impact;
+					int mode = driver->GetMode();
 
-				        //if (mspeed > 5.0)
-						collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5, &targ);
+					if (mode != mode_normal &&
+					    MIN(car->_trkPos.toLeft, car->_trkPos.toRight) < -2.0 &&
+					    fabs(car->_trkPos.toMiddle - targoffset) > 4.0)
+					{
+						goto nocollide;
+					}
+
+					if (mode == mode_normal)// && t_impact > 1.0)
+						driver->GetRLSteerPoint(&targ, &targoffset, MAX(0.01, t_impact + 0.06));
+					else
+						driver->GetSteerPoint(0.0, &targ, oltargoffset, MAX(0.01, t_impact + 0.06));
+
+
+					//if (mode == mode_normal)
+						collide = testCollision(driver, t_impact, MIN(2.0, MAX(0.0, (mspeed-ospeed)/5)) + brakemargin/2, &targ);
+						//collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5, &targ);
+					//else
+					//	collide = testCollision(driver, t_impact, MIN(1.0, MAX(0.0, 1.0-distance/2))*0.5, NULL);
 					//else
 					//	collide = testCollision(driver, t_impact, 1.2);
 	
@@ -281,43 +309,45 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 #endif
 
 #if 1
-					double speed = getSpeed();
-					double dspeed = driver->getSpeed();
-					double time_margin = MAX(4.0, (dspeed-speed) / 16);
-					double width = cardata->getWidthOnTrack();
-					double dwidth = driver->getWidth();
-					double ow = width;
-					double dw = dwidth;
-					double osa = ((car->_trkPos.toLeft - prevleft)*0.8) * (t_impact/s->deltaTime);
-					double dsa = ((driver->getNextLeft() - mycar->_trkPos.toLeft)*0.8) * (t_impact/s->deltaTime);
-					double oleft = car->_trkPos.toLeft + osa*0.8;
-					double dleft = mycar->_trkPos.toLeft + dsa*0.8;
-					tTrackSeg *cseg = car->_trkPos.seg;
-					tTrackSeg *seg = mycar->_trkPos.seg;
-
-
-					if (!collide && t_impact < time_margin/2)
 					{
-						// sanity check for cars that are about to plow full speed into the back of other cars
-						double margin = dwidth + 0.5; 
-						double time = 0.6;
-						double mti = t_impact;
+						double speed = ospeed;//getSpeed();
+						double dspeed = mspeed;//driver->getSpeed();
+						double time_margin = MAX(6.0, (dspeed-speed) / 12) + brakemargin;
+						double width = cardata->getWidthOnTrack();
+						double dwidth = driver->getWidth();
+						double ow = width;
+						double dw = dwidth;
+						double osa = ((car->_trkPos.toLeft - prevleft)*0.8) * (t_impact/s->deltaTime);
+						double dsa = ((driver->getNextLeft() - mycar->_trkPos.toLeft)*0.8) * (t_impact/s->deltaTime);
+						double oleft = car->_trkPos.toLeft + osa*0.8;
+						double dleft = mycar->_trkPos.toLeft + dsa*0.8;
+						tTrackSeg *cseg = car->_trkPos.seg;
+						tTrackSeg *seg = mycar->_trkPos.seg;
 
-						if (mti < time || (team == TEAM_FRIEND && mti < 3.0))
+
+						if (!collide && t_impact < time_margin/2)
 						{
-							double addition = 0.25;//0.5;
-							if (team != TEAM_FRIEND && fabs(car->_trkPos.toMiddle) > fabs(mycar->_trkPos.toMiddle))
+							// sanity check for cars that are about to plow full speed into the back of other cars
+							double margin = dwidth + 0.5 + brakemargin;
+							double time = 0.6;
+							double mti = t_impact;
+
+							if (mti < time || (team == TEAM_FRIEND && mti < 3.0))
 							{
-								margin *= 1.0;
-							}
+								double addition = 0.25;//0.5;
+								if (team != TEAM_FRIEND && fabs(car->_trkPos.toMiddle) > fabs(mycar->_trkPos.toMiddle))
+								{
+									margin *= 1.0;
+								}
        						
-							if (fabs(oleft - dleft) < ow/2 + dw/2 + addition ||
-							    (mti < 0.8 &&
-							    (((cseg->type != TR_STR && cseg->radius <= 120.0) || (seg->type != TR_STR && seg->radius <= 120.0)) &&
-							    ((oleft - ow/2 < margin && dleft - dw/4 < oleft + ow/2) ||
-							    (oleft + ow/2 > cseg->width-margin && dleft + dw/4 > oleft - ow/2)))))
-							{
-								collide = 8;
+								if (fabs(oleft - dleft) < ow/2 + dw/2 + addition ||
+								    (mti < 0.8 &&
+								    (((cseg->type != TR_STR && cseg->radius <= 120.0) || (seg->type != TR_STR && seg->radius <= 120.0)) &&
+								    ((oleft - ow/2 < margin && dleft - dw/4 < oleft + ow/2) ||
+								    (oleft + ow/2 > cseg->width-margin && dleft + dw/4 > oleft - ow/2)))))
+								{
+									collide = 8;
+								}
 							}
 						}
 					}
@@ -327,6 +357,7 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 fprintf(stderr,"\n");fflush(stderr);
 #endif
 
+nocollide:
 					if (collide)
 					{
 if (DebugMsg & debug_brake)
@@ -339,18 +370,21 @@ fprintf(stderr,"%s - %s FRONT COLLIDE=%d\n",mycar->_name,car->_name,collide);
 		}
 		// Is opponent behind and faster.
 	 	else if (distance < -SIDECOLLDIST && distance > -(SIDECOLLDIST*5)
-			 && getSpeed() > driver->getSpeed() - SPEED_PASS_MARGIN) 
+			 && ospeed > mspeed - SPEED_PASS_MARGIN) 
+			 //&& getSpeed() > driver->getSpeed() - SPEED_PASS_MARGIN) 
 		{
 #ifdef OPP_DEBUG
 fprintf(stderr," BACK\n");
 #endif
-			catchdist = driver->getSpeed()*distance/(getSpeed() - driver->getSpeed());
+			//catchdist = driver->getSpeed()*distance/(getSpeed() - driver->getSpeed());
+			catchdist = mspeed*distance/(ospeed - mspeed);
 			state |= OPP_BACK;
 			distance -= MAX(car->_dimension_x, mycar->_dimension_x);
 			distance -= LENGTH_MARGIN;
 		} 
 		// Opponent is in front and faster.
-		else if (distance > SIDECOLLDIST && getSpeed() > driver->getSpeed()) 
+		//else if (distance > SIDECOLLDIST && getSpeed() > driver->getSpeed()) 
+		else if (distance > SIDECOLLDIST && ospeed > mspeed)
 		{
 #ifdef OPP_DEBUG
 fprintf(stderr," FRONTFAST\n");
@@ -360,9 +394,9 @@ fprintf(stderr," FRONTFAST\n");
 			if (team == TEAM_FRIEND && car->_dammage-1000 < mycar->_dammage)
 				state |= OPP_FRONT_FOLLOW;
 
-			double dSpeed = driver->getSpeed();
-			//if (getSpeed() < MIN(dSpeed+3.0, dSpeed + dSpeed/35.0))
-			if (distance < 20.0 - (getSpeed()-driver->getSpeed())*4)
+			double dSpeed = mspeed;//driver->getSpeed();
+			//if (distance < 20.0 - (getSpeed()-driver->getSpeed())*4)
+			if (distance < 20.0 - (ospeed-mspeed)*4)
 				state |= OPP_FRONT;
 
 			float cardist = car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
@@ -492,6 +526,7 @@ int Opponent::polyOverlap( tPosd *op, tPosd *dp )
 
 int Opponent::testCollision(Driver *driver, double impact, double sizefactor, vec2f *targ )
 {
+ tCarElt *mycar = driver->getCarPtr();
  int collide = 0, i, j;
  double nSlices = MAX(1.0, (impact * deltamult));
  tCarElt *dcar = driver->getCarPtr();
@@ -511,32 +546,58 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   d_cur[i].ay = dcar->_corner_y(i);
  }
 
+ if (targ)
  {
-  // find where the cars would be according to their velocity angle, allowing for angle changes
-
-  // find new positions for the cars
-  double o_newPos_x = car->pub.DynGC.pos.x + (o_speedX*impact);
-  double o_newPos_y = car->pub.DynGC.pos.y + (o_speedY*impact);
+  // position driver's car at targ
+  for (i=0; i<4; i++)
+  {
+   d_new2[i].ax = d_new[i].ax = dcar->_corner_x(i) + (targ->x - mycar->_pos_X);
+   d_new2[i].ay = d_new[i].ay = dcar->_corner_y(i) + (targ->y - mycar->_pos_Y);
+  }
+ }
+ else
+ {
+  // position driver's car according to velocity angle
   double d_newPos_x = dcar->pub.DynGC.pos.x + (d_speedX*impact);
   double d_newPos_y = dcar->pub.DynGC.pos.y + (d_speedY*impact);
 
   // correct corner positions
   for (i=0; i<4; i++)
   {
-   o_new2[i].ax = o_new[i].ax = car->_corner_x(i) + (o_speedX*impact);
-   o_new2[i].ay = o_new[i].ay = car->_corner_y(i) + (o_speedY*impact);
    d_new2[i].ax = d_new[i].ax = dcar->_corner_x(i) + (d_speedX*impact);
    d_new2[i].ay = d_new[i].ay = dcar->_corner_y(i) + (d_speedY*impact);
   }
  }
 
+#if 1
+ {
+  // position opponent car according to velocity angle
+  double o_newPos_x = car->pub.DynGC.pos.x + (o_speedX*impact);
+  double o_newPos_y = car->pub.DynGC.pos.y + (o_speedY*impact);
+
+  // correct corner positions
+  for (i=0; i<4; i++)
+  {
+   o_new2[i].ax = o_new[i].ax = car->_corner_x(i) + (o_speedX*impact);
+   o_new2[i].ay = o_new[i].ay = car->_corner_y(i) + (o_speedY*impact);
+  }
+ }
+#endif
+
  double rincr = (team == TEAM_FRIEND ? 2.0 : 4.0);
 
  // make our car's front extend a bit according to speed
+#if 1
+ d_new[FRNT_LFT].ax += (d_new[FRNT_LFT].ax - d_new[REAR_LFT].ax) / 3;
+ d_new[FRNT_LFT].ay += (d_new[FRNT_LFT].ay - d_new[REAR_LFT].ay) / 3;
+ d_new[FRNT_RGT].ax += (d_new[FRNT_RGT].ax - d_new[REAR_RGT].ax) / 3;
+ d_new[FRNT_RGT].ay += (d_new[FRNT_RGT].ay - d_new[REAR_RGT].ay) / 3;
+#else
  d_new[FRNT_LFT].ax += d_speedX/5;
  d_new[FRNT_LFT].ay += d_speedY/5;
  d_new[FRNT_RGT].ax += d_speedX/5;
  d_new[FRNT_RGT].ay += d_speedY/5;
+#endif
 
  // make other car's future rectangle a tad larger
  double fsideincr_x = (o_new[FRNT_LFT].ax - o_new[FRNT_RGT].ax) / car->_dimension_x / 2;
@@ -555,10 +616,10 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   fsideincr_y *= sizefactor;
   rsideincr_x *= sizefactor;
   rsideincr_y *= sizefactor;
-  rlftincr_x *= sizefactor;
-  rlftincr_y *= sizefactor;
-  rrgtincr_x *= sizefactor;
-  rrgtincr_y *= sizefactor;
+  rlftincr_x *= sizefactor + 1.0;
+  rlftincr_y *= sizefactor + 1.0;
+  rrgtincr_x *= sizefactor + 1.0;
+  rrgtincr_y *= sizefactor + 1.0;
  }
 
 
@@ -609,6 +670,7 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   }
  }
 
+#if 0
  if (targ != NULL && t_impact < 1.0)
  {
   // locate front of car at steer target position
@@ -626,6 +688,7 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
    return 5;
   }
  }
+#endif
 
 
 #if 1

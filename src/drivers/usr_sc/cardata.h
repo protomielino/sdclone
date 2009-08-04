@@ -52,8 +52,12 @@ class SingleCardata {
                 inline tPosd *getLastSpeed() { return lastspeed; }
                 inline double getSpeedDeltaX() { return (car->_speed_X - lastspeed[1].ax)*0.7 + (lastspeed[1].ax-lastspeed[2].ax)/4; }
                 inline double getSpeedDeltaY() { return (car->_speed_Y - lastspeed[1].ay)*0.7 + (lastspeed[1].ay-lastspeed[2].ay)/4; }
+		inline float toLftWall() { return tolftwall; }
+		inline float toRgtWall() { return torgtwall; }
+		inline float getDistFromStart() { return car->_distFromStartLine; }
 
 		void update();
+		void updateWalls();
 		void evalTrueSpeed();
 
 	protected:
@@ -65,6 +69,8 @@ class SingleCardata {
 		float length;		// the cars needed length on the track.
 		float trackangle;	// Track angle at the opponents position.
 		float angle;		// The angle of the car relative to the track tangent.
+		float tolftwall;        // how far to the nearest left barrier
+		float torgtwall;        // how far to the nearest Right barrier
 
                 tPosd corner1[4];
                 tPosd corner2[4];
@@ -82,6 +88,8 @@ class Cardata {
 
 		void update();
 		SingleCardata *findCar(tCarElt *car);
+		int getNCars() { return ncars; }
+		SingleCardata *getCarData(int i) { return data + i; }
 
 	protected:
 		SingleCardata *data;	// Array with car data.

@@ -34,6 +34,8 @@ class Pit {
 
 		void setPitstop(bool pitstop);
 		bool getPitstop() { return pitstop; }
+		void needPitstop(bool npitstop) { needpitstop = npitstop; }
+		bool needPitstop() { return needpitstop; }
 
 		void setInPit(bool inpitlane) { this->inpitlane = inpitlane; }
 		bool getInPit() { return inpitlane; }
@@ -70,6 +72,7 @@ class Pit {
 		Spline *splineFRONT;					// Spline.
 		Spline *splineBACK;					// Spline.
 
+		bool needpitstop;				// Pitstop planned.
 		bool pitstop;					// Pitstop planned.
 		bool inpitlane;					// We are still in the pit lane.
 		float pitentry;					// Distance to start line of the pit entry.

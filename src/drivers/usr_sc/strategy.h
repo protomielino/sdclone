@@ -101,9 +101,9 @@ class SimpleStrategy : public AbstractStrategy {
 		float m_lastfuel;				// the fuel available when we cross the start lane.
 		float m_expectedfuelperlap;		// Expected fuel per lap (may be very inaccurate).
 		float m_fuelsum;				// all the fuel used.
+		int PitDamage;
 
 		static const float MAX_FUEL_PER_METER;	// [kg/m] fuel consumtion.
-		static const int PIT_DAMMAGE;			// If damage > we request a pit stop.
 		int pit_damage;
 		int min_damage;
 		int is_pitting;

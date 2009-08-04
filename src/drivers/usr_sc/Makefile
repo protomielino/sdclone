@@ -21,7 +21,7 @@ MODULEDIR   = drivers/${ROBOT}
 SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp strategy.cpp cardata.cpp raceline.cpp
 
 SHIPDIR     = drivers/${ROBOT}
-SHIP        = ${ROBOT}.xml logo.rgb
+SHIP        = ${ROBOT}.xml
 SHIPSUBDIRS = 1 2 3 4 5 6 7 8 9 10 11 12 cars
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

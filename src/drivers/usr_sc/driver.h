@@ -38,15 +38,8 @@
 #include "strategy.h"
 #include "cardata.h"
 #include "raceline.h"
-
-#define BT_SECT_PRIV "private"
-#define BT_ATT_FUELPERLAP "fuelperlap"
-#define BT_ATT_MUFACTOR "mufactor"
-#define BT_ATT_PITTIME "pittime"
-#define BT_ATT_BESTLAP "bestlap"
-#define BT_ATT_WORSTLAP "worstlap"
-#define BT_ATT_TEAMMATE "teammate"
-
+#include "mod.h"
+#include "xmldefs.h"
 
 class Opponents;
 class Opponent;
@@ -88,7 +81,10 @@ class Driver {
 		int getCarefulBrake() { return raceline->getCarefulBrake(); }
 		double speedAngleChange() { return speedangle - prevspeedangle; }
 		void GetSteerPoint( double lookahead, vec2f *rt, double offset=-100.0, double time=-1.0 );
+		void GetRLSteerPoint( vec2f *rt, double *offset, double time ) { return raceline->GetRLSteerPoint( rt, offset, time ); }
+		int GetMode() { return mode; }
 		float getWidth() { return mycardata->getWidthOnTrack(); }
+		double getBrakeMargin() { return brakemargin; }
 
 	private:
 		// Utility functions.
@@ -100,7 +96,7 @@ class Driver {
 		int getGear();
 		float getSteer(tSituation *s);
 		float getClutch();
-		vec2f getTargetPoint();
+		vec2f getTargetPoint(bool use_lookahead, double targetoffset = -100.0);
 		float getOffset();
 		float brakedist(float allowedspeed, float mu);
 		float smoothSteering( float steercmd );
@@ -136,6 +132,7 @@ class Driver {
 		int checkFlying();
 		void calcSkill();
 		int rearOffTrack();
+		float GetSafeStuckAccel();
 
 		void LoadDAT( tSituation *s, char *carname, char *trackname );
 
@@ -157,6 +154,7 @@ class Driver {
 		float AbsRange;
 		float OversteerASR;
 		float BrakeMu;
+		float YawRateAccel;
 		unsigned int random_seed;
 		int DebugMsg;
 		int racetype;
@@ -164,6 +162,7 @@ class Driver {
 		int avoidmode;
 		int lastmode;
 		int allow_stuck;		 
+		int stuck;		 
 		int stuckcheck;
 		float stuck_timer;		 
 		float last_stuck_time;		 
@@ -190,6 +189,9 @@ class Driver {
 		AbstractStrategy *strategy;		// Pit stop strategy.
 
 		SingleCardata *mycardata;		// Pointer to "global" data about my car.
+		LRLMod *tLftMargin;
+		LRLMod *tRgtMargin;
+		LRLMod *tYawRateAccel;
 
 		double simtime;       // how long since the race started
 		double avoidtime;    // how long since we began avoiding
@@ -199,14 +201,17 @@ class Driver {
 		double aligned_timer;
 		double stopped_timer;
 		double brakedelay;
+		double brakeratio;
 		double deltamult;
 		double nextCRinverse;
 		double sideratio;
 		double laststeer_direction;
 		double steerLock;
 		float currentspeedsqr;	// Square of the current speed_x.
+		float currentspeed;
 		float clutchtime;		// Clutch timer.
 		float oldlookahead;		// Lookahead for steering in the previous step.
+		float oldtime_mod;		// Lookahead for steering in the previous step.
 		float racesteer;     // steer command to get to raceline
 		float stucksteer;
 		float prevleft;
@@ -219,27 +224,35 @@ class Driver {
 		float faccelcmd, fbrakecmd;  
 		float TurnDecel;
 		float PitOffset;
-		float PitAccelCap;
+		float PitExitSpeed;
 		float RevsChangeDown;
 		float RevsChangeUp;
 		float RevsChangeDownMax;
-		float CollBrake;
+		float MaxSteerTime;
+		float MinSteerTime;
+		float SteerCutoff;
 		float SmoothSteer;
 		float LookAhead;
 		float IncFactor;
 		float SideMargin;
 		float OutSteerFactor;
 		float StuckAccel;
+		float StuckAngle;
 		float FollowMargin;
 		float SteerLookahead;
+		float CorrectDelay;
 		double SteerMaxRI;
+		double SkidSteer;
+		double MinAccel;
 		float lookahead;
+		float brakemargin;
 		int MaxGear;
 		int NoPit;
 
 		float *radius;
 		int alone;
 		int carindex;
+		int teamindex;
 		float collision;
 
 		float global_skill;
@@ -267,6 +280,10 @@ class Driver {
 		float TIREMU;		// Friction coefficient of tires.
 		float OVERTAKE_OFFSET_INC;		// [m/timestep]
 		float MU_FACTOR;				// [-]
+
+		float GearRevsChangeDown[6];
+		float GearRevsChangeUp[6];
+		float GearRevsChangeDownMax[6];
 
 		// Track variables.
 		tTrack* track;

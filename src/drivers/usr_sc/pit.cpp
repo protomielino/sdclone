@@ -19,6 +19,7 @@
 
 
 #include "pit.h"
+#include "xmldefs.h"
 
 const float Pit::SPEED_LIMIT_MARGIN = 0.5;		// [m/s] savety margin to avoid pit speeding.
 
@@ -49,7 +50,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		pMID[5].x = pitinfo->pitStart->lgfromstart + pitinfo->nMaxPits * pitinfo->len;
 		pMID[6].x = pitinfo->pitExit->lgfromstart;
 
-		double PitEndOffset = GfParmGetNum( car->_carHandle, "private", "PitEndOffset", (char *)NULL, 0.0 );
+		double PitEndOffset = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_END_OFFSET, (char *)NULL, 0.0 );
 		pMID[6].x += PitEndOffset;
 
 		pitentry = pMID[0].x;
@@ -89,7 +90,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 			pMID[i].y *= sign;
 		}
 
-		double PitShift = GfParmGetNum( car->_carHandle, "private", "PitShift", (char *)NULL, 0.0 );
+		double PitShift = GfParmGetNum( car->_carHandle, SECT_PRIVATE, "PitShift", (char *)NULL, 0.0 );
 		pMID[3].y = (fabs(pitinfo->driversPits->pos.toMiddle)+PitShift+1.0)*sign;
 		splineMID = new Spline(NPOINTS, pMID);
 
@@ -177,6 +178,9 @@ bool Pit::isBetween(float fromstart, int pitonly)
 {
 	if (pitonly)
 	{
+		if (fromstart > pMID[4].x)
+			needpitstop = false;
+
 		if (pitstart <= pitend) {
 			if (fromstart >= pitstart && fromstart <= pitend) {
 				return true;

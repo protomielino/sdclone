@@ -23,9 +23,9 @@
 
 
 #include "strategy.h"
+#include "xmldefs.h"
 
 const float SimpleStrategy::MAX_FUEL_PER_METER = 0.0008f;	// [kg/m] fuel consumtion.
-const int SimpleStrategy::PIT_DAMMAGE = 5000;				// [-]
 
 
 SimpleStrategy::SimpleStrategy() :
@@ -40,6 +40,7 @@ SimpleStrategy::SimpleStrategy() :
 	is_pitting(0),
 	remainlaps(0),
 	pit_reason(0),
+	PitDamage(5000),
 	track(NULL)
 {
 #ifdef TORCS_NG
@@ -64,12 +65,13 @@ void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituat
 	m_expectedfuelperlap = fuel;
 	float maxfuel = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*) NULL, 100.0f);
 	fuel *= (s->_totLaps + 1.0f);
-	float ifuel = GfParmGetNum(*carParmHandle, "private", "MaxFuel", (char *)NULL, 0.0f);
-	m_fuelperlap = GfParmGetNum(*carParmHandle, "private", "FuelPerLap", (char *)NULL, 0.0f);
+	float ifuel = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_MAX_FUEL, (char *)NULL, 0.0f);
+	m_fuelperlap = GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_FUEL_PER_LAP, (char *)NULL, 0.0f);
 	if (ifuel)
 		fuel = ifuel;
 	m_lastfuel = MIN(fuel, maxfuel);
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*) NULL, m_lastfuel);
+	PitDamage = (int) GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_PIT_DAMAGE, (char *)NULL, 5000.0f);
 }
 
 
@@ -176,12 +178,12 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 {
  // Do we need to refuel?
  int remainlaps = car->_remainingLaps;//-car->_lapsBehindLeader;
- int this_pit_dammage = PIT_DAMMAGE;
+ int this_pit_dammage = PitDamage;
 
  if (!car->_pit)
   return false;
 
- int forcepit = (int) GfParmGetNum( car->_carHandle, "private", "ForcePit", (char *)NULL, 0.0 );
+ int forcepit = (int) GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_FORCE_PIT, (char *)NULL, 0.0 );
  if (forcepit)
   return true;
 
@@ -190,13 +192,13 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 
  if ((remainlaps > 0) && (remainlaps < 20))
  {
-   repairWanted = MIN(8000, PIT_DAMMAGE + (20-remainlaps)*200);
+   repairWanted = MIN(8000, PitDamage + (20-remainlaps)*200);
  }
 
  if (car->_dammage < 9000 && (remainlaps <= 2 || strategy == STRATEGY_DESPERATE))
    repairWanted = 0;
 
- if (car->_dammage < 3000)
+ if (car->_dammage < MIN(3000, PitDamage/2))
    repairWanted = 0;
 
  float cmpfuel = (m_fuelperlap == 0.0) ? m_expectedfuelperlap : m_fuelperlap;
@@ -221,25 +223,20 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
    return true;
   }
   else if (remainlaps < 20)
-   this_pit_dammage = MIN(8000, PIT_DAMMAGE + (20-remainlaps)*200);
+   this_pit_dammage = MIN(8000, PitDamage + (20-remainlaps)*200);
  }
 
  if (isPitFree(car))
  {
-  if (car->_dammage < 9000 && (remainlaps <= 2 || strategy == STRATEGY_DESPERATE))
+  // don't pit for damage if getting close to end
+  if (car->_dammage < MAX(PitDamage/2, 9500 - remainlaps*1000))
   {
    is_pitting = 0;
    return false;
   }
 
-  if (car->_dammage < 3000)
-  {
-   is_pitting = 0;
-   return false;
-  }
-
-  // Do we need to repair?
-  if (car->_dammage > this_pit_dammage)
+  // Ok, otherwise do we need to repair?
+  if (car->_dammage >= PitDamage)
   {
    is_pitting = 1;
    pit_reason = REASON_DAMAGE;
@@ -247,11 +244,12 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
   }
 
   // Can we safely repair a lesser amount of damage?
-  int damage;
+  int canrepair_damage;
   pit_reason = REASON_NONE;
-  if ((damage = calcRepair(car, s, opp, 0)) >= MIN(2800, this_pit_dammage))
+
+  if ((canrepair_damage = calcRepair(car, s, opp, 0)) >= PitDamage/2)
   {
-   if (car->_pos < 4)
+   if (car->_pos < 6)
    {
     // if there's a chance of overtaking an opponent that's
     // not far in front, avoid going in to fix optional damage.
@@ -262,18 +260,18 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
      if (ocar->_pos >= car->_pos) continue;
      if (o->getTeam() == TEAM_FRIEND) continue;
  
-     if (o->getDistance() > 100.0 && ocar->_fuel > 7.0 && ocar->_dammage < car->_dammage + 1500) continue;
-     return false;
+     if (o->getDistance() < 200.0 && car->_dammage < ocar->_dammage + 1500 && car->_dammage < PitDamage) 
+     {
+	     // close behind opponent, so lets not pit for damage purposes
+	     return false;
+     }
     }
    }
 
-   if (damage < MIN(car->_dammage, this_pit_dammage))
-    return false;
-
    if (is_pitting)
-    pit_damage = MIN(car->_dammage, MAX(pit_damage, damage));
+    pit_damage = MIN(car->_dammage, MAX(pit_damage, canrepair_damage));
    else
-    pit_damage = MIN(car->_dammage, MIN(pit_damage, damage));
+    pit_damage = MIN(car->_dammage, MIN(pit_damage, canrepair_damage));
    is_pitting = 1;
    pit_reason = REASON_DAMAGE;
    return true;
@@ -368,6 +366,7 @@ void SimpleStrategy2::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSitua
 	m_bestlap = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_BESTLAP, (char*) NULL, 87.0f);
 	m_worstlap = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_WORSTLAP, (char*) NULL, 87.0f);
 	float maxfuel = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*) NULL, 100.0f);
+	PitDamage = (int) GfParmGetNum(*carParmHandle, "private", "PitDamage", (char *)NULL, 5000.0f);
 
 	// Fuel for the whole race.
 	float fuelforrace = (s->_totLaps + 1.0f)*fuel;
@@ -395,6 +394,9 @@ void SimpleStrategy2::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSitua
 
 	fuel = m_lastfuel + m_expectedfuelperlap;
 	float ifuel = GfParmGetNum(*carParmHandle, "private", "MaxFuel", (char *)NULL, 0.0f);
+	if (ifuel)
+		fuel = ifuel;
+	ifuel = GfParmGetNum(*carParmHandle, "private", "InitFuel", (char *)NULL, 0.0f);
 	if (ifuel)
 		fuel = ifuel;
 	// Add fuel dependent on index to avoid fuel stop in the same lap.
