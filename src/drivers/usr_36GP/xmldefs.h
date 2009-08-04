@@ -56,6 +56,10 @@
 #define PRV_BUMP_CAUTION      "bump caution"
 #define PRV_SLOPE_FACTOR      "slope factor"
 #define PRV_STEER_MOD         "steer mod"
+#define PRV_EXIT_BOOST        "exit boost"
+#define PRV_EXIT_BOOST_X      "exit boost factor"
+#define PRV_AV_EXIT_BOOST     "avoid exit boost"
+#define PRV_AV_EXIT_BOOST_X   "avoid exit boost factor"
 #define PRV_BEGIN             "bgn"
 #define PRV_END               "end"
 

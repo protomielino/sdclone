@@ -176,6 +176,10 @@ class LRaceLine {
   double SteerRIAccC;
   double BumpCaution;
   double SlopeFactor;
+  double ExitBoost;
+  double ExitBoostX;
+  double AvoidExitBoost;
+  double AvoidExitBoostX;
   bool RaceLineDebug;
 
   double CW;

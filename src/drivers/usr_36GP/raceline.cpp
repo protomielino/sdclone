@@ -117,6 +117,10 @@ LRaceLine::LRaceLine() :
    SteerRIAccC(2.0),
    BumpCaution(0.0),
    SlopeFactor(1.0),
+   ExitBoost(0.0),
+   ExitBoostX(1.0),
+   AvoidExitBoost(0.0),
+   AvoidExitBoostX(1.0),
    RaceLineDebug(false),
    CW(0.0),
    wheelbase(0.0),
@@ -336,6 +340,10 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  BrakeCurveLimit =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_CURVE_LIMIT, (char *)NULL, 1.5f );
  BumpCaution =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BUMP_CAUTION, (char *)NULL, 0.0f );
  SlopeFactor =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_SLOPE_FACTOR, (char *)NULL, 1.0f );
+ ExitBoost =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXIT_BOOST, (char *)NULL, 0.0f );
+ ExitBoostX =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXIT_BOOST_X, (char *)NULL, 1.0f );
+ AvoidExitBoost =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AV_EXIT_BOOST, (char *)NULL, 0.0f );
+ AvoidExitBoostX =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AV_EXIT_BOOST_X, (char *)NULL, 1.0f );
  maxfuel = GfParmGetNum( carhandle, SECT_CAR, PRM_TANK, (char *)NULL, 100.0f );
  
  // read custom values...
@@ -1037,7 +1045,9 @@ void LRaceLine::ComputeSpeed(int rl)
   double trlspeed = GetModD( tRLSpeed, i );
   double avspeed = GetModD( tAvoidSpeed, i );
   double avspeedx = GetModD( tAvoidSpeedX, i );
+  int previ = ((i - 1) + Divs) % Divs;
   double cornerspeed = ((trlspeed > 0 ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
+
   if (rl == LINE_MID)
   {
    if (avspeed != 0.0)
@@ -1050,6 +1060,22 @@ void LRaceLine::ComputeSpeed(int rl)
     cornerspeed *= AvoidSpeedAdjustX;
    }
   }
+
+  if (((SRL[rl].tRInverse[i] < -0.001 && SRL[rl].tLane[i] < SRL[rl].tLane[previ]) ||
+       (SRL[rl].tRInverse[i] > 0.001 && SRL[rl].tLane[i] > SRL[rl].tLane[previ])))
+  {
+   if (rl == LINE_MID)
+   {
+    cornerspeed += AvoidExitBoost;
+    cornerspeed *= AvoidExitBoostX;
+   }
+   else
+   {
+    cornerspeed += ExitBoost;
+    cornerspeed *= ExitBoostX;
+   }
+  }
+
   int nnext = (i + 5) % Divs;
   int next = (i + 1) % Divs;
   int prev = (i - 1 + Divs) % Divs;
@@ -1581,8 +1607,10 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   timefactor *= time_mod;
  }
 
- if (data->collision)
-   timefactor *= 1.0 + MAX(0.0, (5.0-data->collision) / 5.0);
+ if (car->_accel_x < 0.0)
+  timefactor *= 1.0 + MIN(2.0, -(car->_accel_x/10));
+ //if (data->collision)
+ //  timefactor *= 1.0 + MAX(0.0, (5.0-data->collision) / 5.0);
  double Time = timefactor; // + CornerAccel/80;
  double X4 = car->_pos_X + car->_speed_X * 0.5 / 2;
  double Y4 = car->_pos_Y + car->_speed_Y * 0.5 / 2;

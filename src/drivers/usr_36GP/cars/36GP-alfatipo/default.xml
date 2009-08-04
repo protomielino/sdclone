@@ -23,6 +23,7 @@
 		<attnum name="add avoid speed" min="-20" max="20" val="0.0"/>
 		<attnum name="avoid speed factor" min="-20" max="20" val="0.9"/>
 		<attnum name="avoid brake factor" min="-20" max="20" val="0.9"/>
+		<attnum name="avoid exit boost factor" min="-20" max="20" val="1.1"/>
 		<attnum name="brake margin" min="-20" max="20" val="1.0"/>
 		<attnum name="base speed factor" min="0.0" max="50.0" val="1.15"/>
 		<attnum name="base brake factor" min="0.0" max="50.0" val="1.05"/>

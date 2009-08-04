@@ -264,9 +264,9 @@ fprintf(stderr,">>> NOCOLL cd=%.3f >= %.3f ",cardist,SIDE_MARGIN - MAX(0.0, (dis
 					}
 
 					if (mode == mode_normal)// && t_impact > 1.0)
-						driver->GetRLSteerPoint(&targ, &targoffset, MAX(0.01, t_impact));
+						driver->GetRLSteerPoint(&targ, &targoffset, MAX(0.01, t_impact + 0.06));
 					else
-						driver->GetSteerPoint(0.0, &targ, oltargoffset, MAX(0.01, t_impact));
+						driver->GetSteerPoint(0.0, &targ, oltargoffset, MAX(0.01, t_impact + 0.06));
 
 
 					//if (mode == mode_normal)
@@ -569,8 +569,9 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   }
  }
 
+#if 1
  {
-  // position this car according to velocity angle
+  // position opponent car according to velocity angle
   double o_newPos_x = car->pub.DynGC.pos.x + (o_speedX*impact);
   double o_newPos_y = car->pub.DynGC.pos.y + (o_speedY*impact);
 
@@ -581,14 +582,22 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
    o_new2[i].ay = o_new[i].ay = car->_corner_y(i) + (o_speedY*impact);
   }
  }
+#endif
 
  double rincr = (team == TEAM_FRIEND ? 2.0 : 4.0);
 
  // make our car's front extend a bit according to speed
+#if 1
+ d_new[FRNT_LFT].ax += (d_new[FRNT_LFT].ax - d_new[REAR_LFT].ax) / 3;
+ d_new[FRNT_LFT].ay += (d_new[FRNT_LFT].ay - d_new[REAR_LFT].ay) / 3;
+ d_new[FRNT_RGT].ax += (d_new[FRNT_RGT].ax - d_new[REAR_RGT].ax) / 3;
+ d_new[FRNT_RGT].ay += (d_new[FRNT_RGT].ay - d_new[REAR_RGT].ay) / 3;
+#else
  d_new[FRNT_LFT].ax += d_speedX/5;
  d_new[FRNT_LFT].ay += d_speedY/5;
  d_new[FRNT_RGT].ax += d_speedX/5;
  d_new[FRNT_RGT].ay += d_speedY/5;
+#endif
 
  // make other car's future rectangle a tad larger
  double fsideincr_x = (o_new[FRNT_LFT].ax - o_new[FRNT_RGT].ax) / car->_dimension_x / 2;
