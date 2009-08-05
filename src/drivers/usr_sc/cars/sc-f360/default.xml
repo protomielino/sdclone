@@ -18,17 +18,17 @@
 
 	<section name="private">
 		<attnum name="min corner inverse" min="0" max="2" val="0.002"/>
-		<attnum name="increase corner inverse" min="0" max="2" val="0.030"/>
+		<attnum name="increase corner inverse" min="0" max="2" val="0.040"/>
 		<attnum name="add avoid speed" min="-20" max="20" val="0.0"/>
 		<attnum name="avoid speed factor" min="-20" max="20" val="0.80"/>
 		<attnum name="avoid brake factor" min="-20" max="20" val="0.9"/>
-		<attnum name="exit boost factor" min="-20" max="20" val="1.05"/>
+		<attnum name="exit boost factor" min="-20" max="20" val="1.15"/>
 		<attnum name="avoid exit boost factor" min="-20" max="20" val="1.2"/>
 		<attnum name="brake margin" min="-20" max="20" val="1.5"/>
 		<attnum name="base speed factor" min="0.0" max="50.0" val="1.00"/>
 		<attnum name="base brake factor" min="0.0" max="50.0" val="1.00"/>
-		<attnum name="base speed" min="0.0" max="50.0" val="10.00"/>
-		<attnum name="base brake" min="10.0" max="100.0" val="21.00"/>
+		<attnum name="base speed" min="0.0" max="50.0" val="12.00"/>
+		<attnum name="base brake" min="10.0" max="100.0" val="25.00"/>
 		<attnum name="brake mod" min="0.0" max="1.0" val="1.00"/>
 		<attnum name="steer mod" min="0.0" max="1.0" val="1.00"/>
 		<attnum name="slope factor" min="0.0" max="1.0" val="0.50"/>
