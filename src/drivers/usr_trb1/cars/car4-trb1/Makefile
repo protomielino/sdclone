@@ -2,9 +2,7 @@
 #
 #    file                 : Makefile
 #    created              : Wed Jan 8 18:31:16 CET 2003
-#    copyright            : (C) 2002-2004 Bernhard Wymann
-#    email                : berniw@bluewin.ch
-#    version              : $Id: Makefile,v 1.6 2004/09/23 14:04:17 berniw Exp $
+#    copyright            : (C) 2002 Bernhard Wymann
 #
 ##############################################################################
 #
@@ -16,16 +14,13 @@
 ##############################################################################
 
 ROBOT       = usr_trb1
-#MODULE      = ${ROBOT}.so
-#MODULEDIR   = drivers/${ROBOT}
-#SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp strategy.cpp cardata.cpp raceline.cpp
-
-SHIPDIR     = drivers/${ROBOT}
-SHIP        = ${ROBOT}.xml 
-SHIPSUBDIRS = 1 2 3 4 5 6 7 8 9 10 11 12 13 14 cars
+SHIPDIR     = drivers/${ROBOT}/cars/car4-trb1
+SHIP        = $(shell find *.xml -maxdepth 0 -type f -print) $(shell find *.dat -maxdepth 0 -type f print)
+SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
-src-robots-usr_sc_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-usr_sc_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
-
+src-robots-usr_trb1_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
+src-robots-usr_trb1_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}
+
+
