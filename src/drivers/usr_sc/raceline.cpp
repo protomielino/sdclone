@@ -831,7 +831,7 @@ void LRaceLine::Smooth(int Step, int rl)
   }
 
   AdjustRadius(prev, i, next, TargetRInverse, rl, Security);
- 
+
   prevprev = prev;
   prev = i;
   next = nextnext;
