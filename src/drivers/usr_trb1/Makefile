@@ -16,9 +16,9 @@
 ##############################################################################
 
 ROBOT       = usr_trb1
-#MODULE      = ${ROBOT}.so
-#MODULEDIR   = drivers/${ROBOT}
-#SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp strategy.cpp cardata.cpp raceline.cpp
+MODULE      = ${ROBOT}.so
+MODULEDIR   = drivers/${ROBOT}
+SOURCES     = ${ROBOT}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp strategy.cpp cardata.cpp raceline.cpp
 
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml 
