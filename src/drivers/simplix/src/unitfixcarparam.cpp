@@ -406,8 +406,8 @@ double TFixCarParam::CalcMaxSpeed
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
     Speed = 112;                                 
 
-  if (Speed < 15)
-	  Speed =  15;
+  if (Speed < 13.0)
+	  Speed =  13.0;
 
   return Speed;
 }

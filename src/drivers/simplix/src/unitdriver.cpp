@@ -245,6 +245,7 @@ TDriver::TDriver(int Index):
   oDistFromStart(0.0),
   // oShift
   oShiftMargin(0),
+  oShiftCounter(0),
   oSituation(NULL),
   oStartDistance(50.0),
   oStartRPM(100.0),
@@ -1164,7 +1165,7 @@ void TDriver::Drive()
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
   //else
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
-  //GfOut("t:%.2f s v:(%.1f)%.1f km/h Z:%.3f RA:%.3f RAD:%.1f F:%.3f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz,TrackRollangle,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)),CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
+  GfOut("t:%.2f s v:(%.1f)%.1f km/h Z:%.3f RA:%.3f RAD:%.1f F:%.3f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz,TrackRollangle,1/oLanePoint.Crv,CalcCrv_simplix_SC(fabs(oLanePoint.Crv)),CalcHairpin_simplix_SC(fabs(oLanePoint.Crv)));
 }
 //==========================================================================*
 
@@ -3277,7 +3278,8 @@ double TDriver::CalcCrv_simplix(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_TRB1(double Crv)
 {
-  return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+  return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
 }
 //==========================================================================*
 
@@ -3286,7 +3288,8 @@ double TDriver::CalcCrv_simplix_TRB1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
 {
-  return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+  return MAX(0.75,MIN(3.0,75000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
 }
 //==========================================================================*
 
@@ -3316,7 +3319,8 @@ double TDriver::CalcHairpin_simplix(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 {
-  return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+  return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
 }
 //==========================================================================*
 
@@ -3325,7 +3329,8 @@ double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_SC(double Crv)
 {
-  return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+  return MAX(1.0,MIN(2.5,140000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
 }
 //==========================================================================*
 
