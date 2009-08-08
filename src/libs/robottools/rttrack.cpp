@@ -712,6 +712,9 @@ RtDistToPit(struct CarElt *car, tTrack *track, tdble *dL, tdble *dW)
     tdble	pitts;
     tdble	carts;
     
+	// In case there is no pit initialize the output variables
+	*dL = 99999.0; // Means far far away
+	*dW = 0.0;     // Any side
     if (car->_pit == NULL) return 1;
     
     pitpos = &(car->_pit->pos);
