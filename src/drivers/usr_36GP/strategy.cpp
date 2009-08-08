@@ -47,6 +47,7 @@ SimpleStrategy::SimpleStrategy() :
 	teamIndex = 0;
 	releasePit = false;
 #endif
+	strategy = STRATEGY_DESPERATE;
 }
 
 
