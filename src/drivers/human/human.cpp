@@ -345,10 +345,7 @@ extern "C" int moduleTerminate()
  *
  *
  * Description
- *	search under drivers/human/tracks/<trackname>/car-<model>-<index>.xml
- *		     drivers/human/car-<model>-<index>.xml
- *		     drivers/human/tracks/<trackname>/car-<model>.xml
- *		     drivers/human/car-<model>.xml
+ *	search under drivers/human/cars/<carname>/<trackname>.xml
  *
  * Parameters
  *
@@ -381,33 +378,27 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 		carname = GfParmGetStr(DrvInfo, sstring, "car name", "");
 	}
 
-	sprintf(sstring, "%sdrivers/human/tracks/%s/car-%s-%d.xml", GetLocalDir(), trackname, carname, index);
+	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GetLocalDir(), carname);
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-	if (*carParmHandle != NULL) {
-		GfOut("Player: %s Loaded\n", sstring);
-	} else {
-		sprintf(sstring, "%sdrivers/human/tracks/%s/car-%s.xml", GetLocalDir(), trackname, carname);
-		*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+
+	sprintf(sstring, "%sdrivers/human/cars/%s/%s.xml", GetLocalDir(), carname, trackname);
+	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	if (newhandle)
+	{
+		if (*carParmHandle)
+			*carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, 
+			       (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
+		else
+			*carParmHandle = newhandle;
+
 		if (*carParmHandle != NULL) {
 			GfOut("Player: %s Loaded\n", sstring);
-		} else {
-			sprintf(sstring, "%sdrivers/human/car-%s-%d.xml", GetLocalDir(), carname, index);
-			*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-			if (*carParmHandle != NULL) {
-				GfOut("Player: %s Loaded\n", sstring);
-			} else {
-				sprintf(sstring, "%sdrivers/human/car-%s.xml", GetLocalDir(), carname);
-				*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-				if (*carParmHandle != NULL) {
-					GfOut("Player: %s Loaded\n", sstring);
-				} else {
-					sprintf(sstring, "%sdrivers/human/car.xml", GetLocalDir ());
-					*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-					if (*carParmHandle != NULL) {
-						GfOut("Player: %s Loaded\n", sstring);
-					}
-				}
-			}
+		}
+	}
+	else
+	{
+		if (*carParmHandle != NULL) {
+			GfOut("Player: %s Default Setup Loaded\n", sstring);
 		}
 	}
 

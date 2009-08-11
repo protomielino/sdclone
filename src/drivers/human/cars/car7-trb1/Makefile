@@ -1,10 +1,8 @@
 ##############################################################################
 #
 #    file                 : Makefile
-#    created              : Mon Apr 10 22:11:53 CEST 2000
-#    copyright            : (C) 2000 by Eric Espie                         
-#    email                : torcs@free.fr   
-#    version              : $Id: Makefile,v 1.3 2002/06/30 14:11:15 torcs Exp $                                  
+#    created              : Wed Jan 8 18:31:16 CET 2003
+#    copyright            : (C) 2002 Bernhard Wymann
 #
 ##############################################################################
 #
@@ -15,14 +13,14 @@
 #
 ##############################################################################
 
-SHIPSUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
+ROBOT       = human
+SHIPDIR     = drivers/${ROBOT}/cars/car7-trb1
+SHIP        = $(shell find *.xml -maxdepth 0 -type f -print)
+SHIPSUBDIRS = 
 
-PKGSUBDIRS	= $(SHIPSUBDIRS)
-
-src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
-
-src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCSNG_BASE},,$(shell pwd))
-
+PKGSUBDIRS  = ${SHIPSUBDIRS}
+src-robots-human_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
+src-robots-human_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}
 
 

@@ -34,7 +34,7 @@ CONFIGCREATEDIRS = ${SHIPDIR}
 
 CONFIG    = $(shell find *.xml -maxdepth 0 -type f -print)
 
-SHIPSUBDIRS = tracks
+SHIPSUBDIRS = cars
 
 PKGSUBDIRS	= $(SHIPSUBDIRS)
 
