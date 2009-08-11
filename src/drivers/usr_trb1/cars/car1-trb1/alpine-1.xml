@@ -33,6 +33,7 @@
 	</section>
 	
 	<section name="private">
+		<attnum name="int margin" val="2.4"/>
 	</section>
 
 </params>

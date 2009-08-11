@@ -17,22 +17,23 @@
 <params name="Viper GTS-R" type="template">
 
 	<section name="Front Wing">
-		<attnum name="angle" unit="deg" min="0" max="12" val="12"/>
+		<attnum name="angle" unit="deg" val="12"/>
 	</section>
 	
 	<section name="Rear Wing">
-		<attnum name="angle" unit="deg" min="0" max="18" val="16"/>
+		<attnum name="angle" unit="deg" val="16"/>
 	</section>
 
 	<section name="Rear Left Suspension">
-		<attnum name="bellcrank" min="0.1" max="5" val="1.25"/>
+		<attnum name="bellcrank" val="1.25"/>
 	</section>
 
 	<section name="Rear Right Suspension">
-		<attnum name="bellcrank" min="0.1" max="5" val="1.25"/>
+		<attnum name="bellcrank" val="1.25"/>
 	</section>
 	
 	<section name="private">
+		<attnum name="int margin" val="2.4"/>
 	</section>
 
 </params>

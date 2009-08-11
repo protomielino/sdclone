@@ -1129,16 +1129,16 @@ void LRaceLine::ComputeSpeed(int rl)
    for (int n=1; n<range; n++)
    {
     int x = ((i-n) + Divs) % Divs;
-    prevzd += SRL[rl].tzd[x];
+    prevzd += SRL[rl].tzd[x] / MAX(1.0, double(n)/2);
    }
 
    for (int n=0; n<range; n++)
    {
     int x = ((i+n) + Divs) % Divs;
-    nextzd += SRL[rl].tzd[x];
+    nextzd += SRL[rl].tzd[x] / MAX(1.0, double(n+1)/2);
    }
 
-   double diff = prevzd - nextzd;
+   double diff = (prevzd - nextzd) * 2.2;
 
    if (diff > 0.10)
    {

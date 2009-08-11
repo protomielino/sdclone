@@ -121,6 +121,7 @@ LRaceLine::LRaceLine() :
    ExitBoostX(1.0),
    AvoidExitBoost(0.0),
    AvoidExitBoostX(1.0),
+   AccelReduxX(1.0),
    RaceLineDebug(false),
    CW(0.0),
    wheelbase(0.0),
@@ -344,6 +345,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  ExitBoostX =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXIT_BOOST_X, (char *)NULL, 1.0f );
  AvoidExitBoost =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AV_EXIT_BOOST, (char *)NULL, 0.0f );
  AvoidExitBoostX =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_AV_EXIT_BOOST_X, (char *)NULL, 1.0f );
+ AccelReduxX =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_ACCEL_REDUX_X, (char *)NULL, 1.0f );
  maxfuel = GfParmGetNum( carhandle, SECT_CAR, PRM_TANK, (char *)NULL, 100.0f );
  
  // read custom values...
@@ -938,6 +940,9 @@ void LRaceLine::CalcZCurvature(int rl)
    if (rl == LINE_MID)
     camber *= 2;
   }
+  else
+   camber *= 0.7;
+
   double slope = camber + zd/3 * SlopeFactor;
   SRL[rl].tFriction[i] *= 1.0 + MAX(-0.4, slope);
 
@@ -1045,7 +1050,7 @@ void LRaceLine::ComputeSpeed(int rl)
   double trlspeed = GetModD( tRLSpeed, i );
   double avspeed = GetModD( tAvoidSpeed, i );
   double avspeedx = GetModD( tAvoidSpeedX, i );
-  int previ = ((i - 1) + Divs) % Divs;
+  int previ = ((i - 3) + Divs) % Divs;
   double cornerspeed = ((trlspeed > 0 ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
 
   if (rl == LINE_MID)
@@ -1129,16 +1134,16 @@ void LRaceLine::ComputeSpeed(int rl)
    for (int n=1; n<range; n++)
    {
     int x = ((i-n) + Divs) % Divs;
-    prevzd += SRL[rl].tzd[x];
+    prevzd += SRL[rl].tzd[x] / MAX(1.0, double(n)/2);
    }
 
    for (int n=0; n<range; n++)
    {
     int x = ((i+n) + Divs) % Divs;
-    nextzd += SRL[rl].tzd[x];
+    nextzd += SRL[rl].tzd[x] / MAX(1.0, double(n+1)/2);
    }
 
-   double diff = prevzd - nextzd;
+   double diff = (prevzd - nextzd) * 2.2;
 
    if (diff > 0.10)
    {
@@ -1868,7 +1873,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
        (SinAngleError < 0.0 && SRL[SRLidx].tRInverse[Next] < 0.0 && data->speedangle > 0.0))) 
   {
    data->accel_redux = fabs(SinAngleError) * ((fabs(k1999steer)-0.2)*0.7) + 
-           (fabs(SRL[SRLidx].tRInverse[Next]) - MinCornerInverse) * 1500 * fabs(data->speedangle);
+           (fabs(SRL[SRLidx].tRInverse[Next]) - MinCornerInverse) * 1500 * fabs(data->speedangle)
+	   * AccelReduxX;
   }
  }
  else

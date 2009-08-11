@@ -60,6 +60,7 @@
 #define PRV_EXIT_BOOST_X      "exit boost factor"
 #define PRV_AV_EXIT_BOOST     "avoid exit boost"
 #define PRV_AV_EXIT_BOOST_X   "avoid exit boost factor"
+#define PRV_ACCEL_REDUX_X     "accel redux factor"
 #define PRV_BEGIN             "bgn"
 #define PRV_END               "end"
 
