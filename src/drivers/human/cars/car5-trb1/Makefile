@@ -15,8 +15,11 @@
 
 ROBOT       = human
 SHIPDIR     = drivers/${ROBOT}/cars/car5-trb1
-SHIP        = $(shell find *.xml -maxdepth 0 -type f -print)
+SHIP        = $(shell find * -maxdepth 0 -name '*.xml' -print)
 SHIPSUBDIRS = 
+
+CONFIGCREATEDIRS = ${SHIPDIR}
+CONFIG = ${SHIP}
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-human_PKGFILES = $(shell find * -maxdepth 0 -type f -print)

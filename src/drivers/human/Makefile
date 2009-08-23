@@ -28,13 +28,13 @@ SOURCES   = ${ROBOT}.cpp pref.cpp
 
 SHIPDIR   = drivers/${ROBOT}
 
-SHIP      = $(shell find *.xml -maxdepth 0 -type f -print) $(shell find *.rgb -maxdepth 0 -type f -print)
+SHIP      = $(shell find * -maxdepth 0 -name '*.xml' -type f -print) $(shell find * -maxdepth 0 -name '*.rgb' -type f -print)
+
+SHIPSUBDIRS = cars
 
 CONFIGCREATEDIRS = ${SHIPDIR}
 
-CONFIG    = $(shell find *.xml -maxdepth 0 -type f -print)
-
-SHIPSUBDIRS = cars
+CONFIG    = $(shell find * -maxdepth 0 -name '*.xml' -type f -print)
 
 PKGSUBDIRS	= $(SHIPSUBDIRS)
 
