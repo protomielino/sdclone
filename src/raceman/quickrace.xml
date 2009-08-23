@@ -69,7 +69,7 @@
     </section>
 
     <section name="5">
-      <attnum name="idx" val="1"
+      <attnum name="idx" val="9"/>
       <attstr name="module" val="usr_sc"/>
     </section>
 
