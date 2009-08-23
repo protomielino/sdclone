@@ -381,6 +381,11 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GetLocalDir(), carname);
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 
+	if (!*carParmHandle) {
+		sprintf(sstring, "%s/drivers/human/car.xml", GetLocalDir());
+		*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	}
+
 	sprintf(sstring, "%sdrivers/human/cars/%s/%s.xml", GetLocalDir(), carname, trackname);
 	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (newhandle)
