@@ -23,6 +23,7 @@
 #include <time.h>
 #include <direct.h>
 #include <io.h>
+#include <windows.h>
 
 #include <tgf.h>
 #include <os.h>
@@ -665,12 +666,23 @@ windowsTimeClock(void)
     return( D );
 }
 
+/*
+* Function
+*	windowsSetAffinity
+*
+* Description
+*	Restrict Torcs-NG executable to one CPU core/processor.
+*	This avoids jerky rendering, especially under Vista.
+*
+* Parameters
+*	none
+*
+* Return
+*	none
+*/
 static void
 windowsSetAffinity(void)
 {
-    /* Restrict Torcs-NG executable to one CPU core/processor
-       This avoids jerky rendering, especially under Vista.                                                 */
-	
 #ifndef ULONG_PTR
     typedef unsigned long ULONG_PTR;
 #endif
@@ -689,11 +701,177 @@ windowsSetAffinity(void)
     if (ProcAM > 1)
     {
 	ProcAM = 1;
+	GfOut("Setting process affinity mask to 1");
 	SetProcessAffinityMask( hProcess, ProcAM );
     }
-    return;
 }
 
+
+/*
+* Function
+*	windowsGetOSInfo
+*
+* Description
+*	Get some info about the running Windows OS.
+*
+* Parameters
+*	pnMajor : pointer to the target OS major version integer
+*	pnMinor : pointer to the target OS minor version integer
+*	pnBits  : pointer to the target OS number of bits (32 or 64) integer
+*
+* Return
+*	none
+*/
+static bool
+windowsGetOSInfo(int* pnMajor, int* pnMinor, int* pnBits)
+{
+    static char pszVerSionString[512];
+
+    OSVERSIONINFOEX osvi;
+    SYSTEM_INFO si;
+    typedef void (WINAPI *PGNSI)(LPSYSTEM_INFO);
+    PGNSI pGNSI;
+
+    ZeroMemory(&si, sizeof(SYSTEM_INFO));
+    ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
+    
+    osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
+    
+    if (!GetVersionEx((OSVERSIONINFO*)&osvi))
+    {
+	GfOut("Error: Could not get Windows OS version info");
+	return false;
+    }
+
+    // Call GetNativeSystemInfo if supported or GetSystemInfo otherwise.
+    pGNSI = (PGNSI)GetProcAddress(GetModuleHandle(TEXT("kernel32.dll")), "GetNativeSystemInfo");
+    if (pGNSI)
+	pGNSI(&si);
+    else 
+	GetSystemInfo(&si);
+
+    *pnMajor = osvi.dwMajorVersion;
+    *pnMinor = osvi.dwMinorVersion;
+    *pnBits  = 32; // Default value, fixed afterward if necessary.
+
+    strcpy(pszVerSionString, "Windows ");
+
+    // Windows <= 4
+    if (osvi.dwPlatformId != VER_PLATFORM_WIN32_NT || osvi.dwMajorVersion <= 4)
+    {
+	strcat(pszVerSionString, "NT 4 or older");
+    }
+
+    // Windows Vista
+    else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0)
+    {
+ 	    if( osvi.wProductType == VER_NT_WORKSTATION)
+		strcat(pszVerSionString, "Vista ");
+	    else 
+		strcat(pszVerSionString, "Server 2008 ");
+    }
+
+    // Windows 7
+    else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1)
+    {
+	if( osvi.wProductType == VER_NT_WORKSTATION)
+	    strcat(pszVerSionString, "7 ");
+	else 
+	    strcat(pszVerSionString, "Server 2008 R2 ");
+    }
+
+    // Windows Server or XP Pro x64
+    else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 2)
+    {
+	if (osvi.wProductType == VER_NT_WORKSTATION
+	    && si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
+	{
+	    *pnBits = 64;
+	    strcat(pszVerSionString, "XP Professional x64 Edition");
+	}
+	else 
+	    strcat(pszVerSionString, 
+		   "Server 2003 / 2003 R2 / Storage Server 2003 or Home Server, ");
+
+	// Test for the server type.
+	if (osvi.wProductType != VER_NT_WORKSTATION)
+	{
+	    if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_IA64)
+	    {
+		*pnBits = 64;
+		strcat(pszVerSionString, "Some Itanium Edition");
+	    }
+
+	    else if (si.wProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64)
+	    {
+		*pnBits = 64;
+		strcat(pszVerSionString, "Some x64 Edition");
+	    }
+
+	    else
+		strcat(pszVerSionString, "Some 32bit Edition");
+	}
+    }
+
+    // Windows XP
+    else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1)
+    {
+	strcat(pszVerSionString, "XP ");
+	if (osvi.wSuiteMask & VER_SUITE_PERSONAL)
+	    strcat(pszVerSionString, "Home Edition");
+	else 
+	    strcat(pszVerSionString, "Professional");
+    }
+
+    // Windows 2000
+    else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0)
+    {
+	strcat(pszVerSionString, "2000 ");
+
+	if (osvi.wProductType == VER_NT_WORKSTATION)
+	{
+	    strcat(pszVerSionString, "Professional");
+	}
+	else 
+	{
+	    if (osvi.wSuiteMask & VER_SUITE_DATACENTER)
+		strcat(pszVerSionString, "Datacenter Server");
+	    else if (osvi.wSuiteMask & VER_SUITE_ENTERPRISE)
+		strcat(pszVerSionString, "Advanced Server");
+	    else 
+		strcat(pszVerSionString, "Server");
+	}
+    }
+
+    // Include service pack and build number.
+    if (strlen(osvi.szCSDVersion) > 0)
+    {
+	 strcat(pszVerSionString, " ");
+	 strcat(pszVerSionString, osvi.szCSDVersion);
+    }
+
+    // Include build number.
+    char buf[80];
+    sprintf(buf, " (build %d)", osvi.dwBuildNumber);
+    strcat(pszVerSionString, buf);
+
+    if (osvi.dwMajorVersion >= 6)
+    {
+	if (si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_AMD64)
+	{
+	    strcat(pszVerSionString, ", 64-bit");
+	    *pnBits = 64;
+	}
+	else if (si.wProcessorArchitecture==PROCESSOR_ARCHITECTURE_INTEL)
+	{
+	  strcat(pszVerSionString, ", 32-bit");
+	}
+    }
+
+    GfOut("Detected %s (%d.%d)\n", pszVerSionString, *pnMajor, *pnMinor);
+
+    return true;
+}
 
 /*
 * Function
@@ -725,5 +903,8 @@ WindowsSpecInit(void)
     GfOs.dirGetListFiltered = windowsDirGetListFiltered;
     GfOs.timeClock = windowsTimeClock;
 
-    windowsSetAffinity();
+    // Workaround for Vista jerky rendering on multicore CPUs.
+    int nMajor, nMinor, nBits;
+    if (windowsGetOSInfo(&nMajor, &nMinor, &nBits) && nMajor >= 6)
+	windowsSetAffinity();
 }
