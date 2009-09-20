@@ -15,7 +15,11 @@
 #
 ##############################################################################
 
-SUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v .svn)
+# Uncomment to build just every present robot
+#SUBDIRS = $(shell find * -maxdepth 0 -type d -print)
+
+# Build just every present robot but educational "bt" and "K1999"
+SUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v K1999 | grep -v bt)
 
 SHIPSUBDIRS = $(SUBDIRS)
 
