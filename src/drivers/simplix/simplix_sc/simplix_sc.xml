@@ -19,8 +19,8 @@
 
       <section name="0">
         <attstr name="name" val="Yuuki Kyousou"></attstr>
-        <attstr name="desc" val="SC: 996A"></attstr>
-        <attstr name="team" val="simplix_sc996A"></attstr>
+        <attstr name="desc" val="SC: 96A"></attstr>
+        <attstr name="team" val="simplix_sc96A"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-996"></attstr>
         <attnum name="race number" val="996"></attnum>
@@ -31,8 +31,8 @@
 
       <section name="1">
         <attstr name="name" val="Haruna Say"></attstr>
-        <attstr name="desc" val="SC: 996B"></attstr>
-        <attstr name="team" val="simplix_sc996A"></attstr>
+        <attstr name="desc" val="SC: 96B"></attstr>
+        <attstr name="team" val="simplix_sc96A"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-996"></attstr>
         <attnum name="race number" val="997"></attnum>
@@ -43,8 +43,8 @@
 
       <section name="2">
         <attstr name="name" val="Marisol Carrillo"></attstr>
-        <attstr name="desc" val="SC: ciclonA"></attstr>
-        <attstr name="team" val="simplix_scciclon"></attstr>
+        <attstr name="desc" val="SC: SpiritA"></attstr>
+        <attstr name="team" val="simplix_scspirit"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-ciclon-300"></attstr>
         <attnum name="race number" val="110"></attnum>
@@ -55,8 +55,8 @@
 
       <section name="3">
         <attstr name="name" val="Luis Barreto"></attstr>
-        <attstr name="desc" val="SC: ciclonB"></attstr>
-        <attstr name="team" val="simplix_scciclon"></attstr>
+        <attstr name="desc" val="SC: spiritB"></attstr>
+        <attstr name="team" val="simplix_scspirit"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-ciclon-300"></attstr>
         <attnum name="race number" val="44"></attnum>
@@ -67,8 +67,8 @@
 
       <section name="4">
         <attstr name="name" val="Vittorio Basso"></attstr>
-        <attstr name="desc" val="SC: f360A"></attstr>
-        <attstr name="team" val="simplix_scf360"></attstr>
+        <attstr name="desc" val="SC: c360A"></attstr>
+        <attstr name="team" val="simplix_scc360"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-f360"></attstr>
         <attnum name="race number" val="62"></attnum>
@@ -79,8 +79,8 @@
 
       <section name="5">
         <attstr name="name" val="Sal Moretti"></attstr>
-        <attstr name="desc" val="SC: f360B"></attstr>
-        <attstr name="team" val="simplix_scf360"></attstr>
+        <attstr name="desc" val="SC: c360B"></attstr>
+        <attstr name="team" val="simplix_scc360"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-f360"></attstr>
         <attnum name="race number" val="63"></attnum>
@@ -138,9 +138,9 @@
       </section>
 
 <!--      <section name="10">
-        <attstr name="name" val="SCB: 996A"></attstr>
-        <attstr name="desc" val="SCB: 996A"></attstr>
-        <attstr name="team" val="simplix_sc996B"></attstr>
+        <attstr name="name" val="SCB: 96A"></attstr>
+        <attstr name="desc" val="SCB: 96A"></attstr>
+        <attstr name="team" val="simplix_sc96B"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-996"></attstr>
         <attnum name="race number" val="51"></attnum>
@@ -150,9 +150,9 @@
       </section>
 
       <section name="11">
-        <attstr name="name" val="SCB: 996B"></attstr>
-        <attstr name="desc" val="SCB: 996B"></attstr>
-        <attstr name="team" val="simplix_sc996B"></attstr>
+        <attstr name="name" val="SCB: 96B"></attstr>
+        <attstr name="desc" val="SCB: 96B"></attstr>
+        <attstr name="team" val="simplix_sc96B"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="sc-996"></attstr>
         <attnum name="race number" val="52"></attnum>
