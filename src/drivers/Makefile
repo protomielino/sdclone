@@ -19,7 +19,7 @@
 #SUBDIRS = $(shell find * -maxdepth 0 -type d -print)
 
 # Build just every present robot but educational "bt" and "K1999"
-SUBDIRS = $(shell find * -maxdepth 0 -type d -print | grep -v K1999 | grep -v bt)
+SUBDIRS = $(shell find * -maxdepth 0 -type d -not -name 'bt' -not -name 'K1999' -print)
 
 SHIPSUBDIRS = $(SUBDIRS)
 
