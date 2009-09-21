@@ -14,14 +14,14 @@
 #
 ##############################################################################
 
-ROBOT       = hymie_36GP
+ROBOT       = usr_36GP
 SHIPDIR     = drivers/${ROBOT}/3
 SHIP        = 36GP-autounion.png skill.xml logo.rgb
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
-src-robots-hymie_36GP_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-hymie_36GP_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-usr_36GP_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
+src-robots-usr_36GP_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 
