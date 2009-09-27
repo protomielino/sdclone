@@ -100,7 +100,7 @@ init_args(int argc, char **argv)
 		buf[i] = '/';
 	if (buf[0] && buf[strlen(buf)-1] != '/')
 	    strcat(buf, "/");
-	strcat(buf, ".torcs-ng/");
+	strcat(buf, "speed-dreams.settings/");
 	SetLocalDir(buf);
     }
     else

@@ -158,7 +158,7 @@ SOURCE=.\windowsspec.h
 # End Group
 # Begin Source File
 
-SOURCE=..\..\Ticon.ico
+SOURCE=..\..\icon.ico
 # End Source File
 # End Target
 # End Project

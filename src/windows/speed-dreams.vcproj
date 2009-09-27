@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8,00"
-	Name="wtorcs"
+	Name="speed-dreams"
 	ProjectGUID="{2DA64204-0DC6-438C-8E0B-8C4C6029AF48}"
 	>
 	<Platforms>
@@ -37,7 +37,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/wtorcs.tlb"
+				TypeLibraryName=".\Release/speed-dreams.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -49,7 +49,7 @@
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				PrecompiledHeaderFile=".\Release/wtorcs.pch"
+				PrecompiledHeaderFile=".\Release/speed-dreams.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
 				ProgramDataBaseFileName=".\Release/"
@@ -63,21 +63,21 @@
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="NDEBUG"
 				Culture="1033"
-				ResourceOutputFileName="Release/torcs.res"
+				ResourceOutputFileName="Release/speed-dreams.res"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib shell32.lib"
-				OutputFile=".\Release/wtorcs.exe"
+				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib"
+				OutputFile=".\Release/speed-dreams.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../export/lib,../../../3rdParty/lib,../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC"
 				GenerateMapFile="true"
-				MapFileName=".\Release/wtorcs.map"
+				MapFileName=".\Release/speed-dreams.map"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -93,7 +93,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Release/wtorcs.bsc"
+				OutputFile=".\Release/speed-dreams.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -107,7 +107,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="exports"
-				CommandLine="copy $(TargetDir)wtorcs.exe $(SolutionDir)runtime&#x0D;&#x0A;if exist $(TargetDir)wtorcs.exe.manifest copy $(TargetDir)wtorcs.exe.manifest $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\freeglut.dll ( copy ..\..\..\3rdParty\bin\freeglut.dll $(SolutionDir)runtime ) else if exist bin\freeglut.dll copy bin\freeglut.dll $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\glut32.dll ( copy ..\..\..\3rdParty\bin\glut32.dll $(SolutionDir)runtime ) else if exist bin\glut32.dll copy bin\glut32.dll $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\OpenAL32.dll ( copy ..\..\..\3rdParty\bin\OpenAL32.dll $(SolutionDir)runtime ) else copy bin\OpenAL32.dll $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\alut.dll ( copy ..\..\..\3rdParty\bin\alut.dll $(SolutionDir)runtime ) else copy bin\alut.dll $(SolutionDir)runtime&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)speed-dreams.exe $(SolutionDir)runtime&#x0D;&#x0A;if exist $(TargetDir)speed-dreams.exe.manifest copy $(TargetDir)speed-dreams.exe.manifest $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\freeglut.dll ( copy ..\..\..\3rdParty\bin\freeglut.dll $(SolutionDir)runtime ) else if exist bin\freeglut.dll copy bin\freeglut.dll $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\glut32.dll ( copy ..\..\..\3rdParty\bin\glut32.dll $(SolutionDir)runtime ) else if exist bin\glut32.dll copy bin\glut32.dll $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\OpenAL32.dll ( copy ..\..\..\3rdParty\bin\OpenAL32.dll $(SolutionDir)runtime ) else copy bin\OpenAL32.dll $(SolutionDir)runtime&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\alut.dll ( copy ..\..\..\3rdParty\bin\alut.dll $(SolutionDir)runtime ) else copy bin\alut.dll $(SolutionDir)runtime&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -134,7 +134,7 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Debug/wtorcs.tlb"
+				TypeLibraryName=".\Debug/speed-dreams.tlb"
 				HeaderFileName=""
 			/>
 			<Tool
@@ -144,7 +144,7 @@
 				PreprocessorDefinitions="WIN32;_CRT_SECURE_NO_DEPRECATE;_DEBUG;_CONSOLE;DEBUG;DEBUG_OUT"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				PrecompiledHeaderFile=".\Debug/wtorcs.pch"
+				PrecompiledHeaderFile=".\Debug/speed-dreams.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
 				ProgramDataBaseFileName=".\Debug/"
@@ -166,16 +166,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib shell32.lib"
-				OutputFile=".\Debug/wtorcs.exe"
+				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib"
+				OutputFile=".\Debug/speed-dreams.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../export/libd,../../../3rdParty/lib,../windows/lib"
 				IgnoreDefaultLibraryNames="LIBC;MSVCRT"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=".\Debug/wtorcs.pdb"
+				ProgramDatabaseFile=".\Debug/speed-dreams.pdb"
 				GenerateMapFile="true"
-				MapFileName=".\Debug/wtorcs.map"
+				MapFileName=".\Debug/speed-dreams.map"
 				SubSystem="1"
 				TargetMachine="1"
 			/>
@@ -192,7 +192,7 @@
 			<Tool
 				Name="VCBscMakeTool"
 				SuppressStartupBanner="true"
-				OutputFile=".\Debug/wtorcs.bsc"
+				OutputFile=".\Debug/speed-dreams.bsc"
 			/>
 			<Tool
 				Name="VCFxCopTool"
@@ -206,7 +206,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="exports"
-				CommandLine="copy $(TargetDir)wtorcs.exe $(SolutionDir)runtimed&#x0D;&#x0A;if exist $(TargetDir)wtorcs.exe.manifest copy $(TargetDir)wtorcs.exe.manifest $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\freeglut.dll ( copy ..\..\..\3rdParty\bin\freeglut.dll $(SolutionDir)runtimed ) else if exist bin\freeglut.dll copy bin\freeglut.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\glut32.dll ( copy ..\..\..\3rdParty\bin\glut32.dll $(SolutionDir)runtimed ) else if exist bin\glut32.dll copy bin\glut32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\OpenAL32.dll ( copy ..\..\..\3rdParty\bin\OpenAL32.dll $(SolutionDir)runtimed ) else copy bin\OpenAL32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\alut.dll ( copy ..\..\..\3rdParty\bin\alut.dll $(SolutionDir)runtimed ) else copy bin\alut.dll $(SolutionDir)runtimed&#x0D;&#x0A;&#x0D;&#x0A;"
+				CommandLine="copy $(TargetDir)speed-dreams.exe $(SolutionDir)runtimed&#x0D;&#x0A;if exist $(TargetDir)speed-dreams.exe.manifest copy $(TargetDir)speed-dreams.exe.manifest $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\freeglut.dll ( copy ..\..\..\3rdParty\bin\freeglut.dll $(SolutionDir)runtimed ) else if exist bin\freeglut.dll copy bin\freeglut.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\glut32.dll ( copy ..\..\..\3rdParty\bin\glut32.dll $(SolutionDir)runtimed ) else if exist bin\glut32.dll copy bin\glut32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\OpenAL32.dll ( copy ..\..\..\3rdParty\bin\OpenAL32.dll $(SolutionDir)runtimed ) else copy bin\OpenAL32.dll $(SolutionDir)runtimed&#x0D;&#x0A;if exist ..\..\..\3rdParty\bin\alut.dll ( copy ..\..\..\3rdParty\bin\alut.dll $(SolutionDir)runtimed ) else copy bin\alut.dll $(SolutionDir)runtimed&#x0D;&#x0A;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -240,7 +240,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="..\..\torcs.rc"
+				RelativePath="..\..\speed-dreams.rc"
 				>
 				<FileConfiguration
 					Name="Release|Win32"
@@ -248,7 +248,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="\Torcs-NG\trunk"
+						AdditionalIncludeDirectories="..\.."
 					/>
 				</FileConfiguration>
 				<FileConfiguration
@@ -257,7 +257,7 @@
 					<Tool
 						Name="VCResourceCompilerTool"
 						PreprocessorDefinitions=""
-						AdditionalIncludeDirectories="\Torcs-NG\trunk"
+						AdditionalIncludeDirectories="..\.."
 					/>
 				</FileConfiguration>
 			</File>
@@ -326,7 +326,7 @@
 			</File>
 		</Filter>
 		<File
-			RelativePath="..\..\Ticon.ico"
+			RelativePath="..\..\icon.ico"
 			>
 		</File>
 	</Files>
