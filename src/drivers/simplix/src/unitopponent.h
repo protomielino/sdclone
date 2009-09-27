@@ -55,7 +55,7 @@
 #ifndef _UNITOPPONENT_H_
 #define _UNITOPPONENT_H_
 
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <car.h>
 #include <raceman.h>
@@ -63,7 +63,7 @@
 #include "unitglobal.h"
 #include "unitcommon.h"
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 #include "unitteammanager.h"
 #endif
@@ -140,7 +140,7 @@ class TOpponent
 
 	void Update                                  // Update
 	  (const PCarElt MyCar,
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 	  PTeamManager TeamManager,
 #endif
@@ -160,7 +160,7 @@ class TOpponent
 	double oDeltaTime;                           // Simulation delta time
     int oIndex;                                  // Opponents cars index
 	TInfo oInfo;                                 // info of this opponent
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
     PTeamManager oTeamManager;                   // Teammanager
 #endif

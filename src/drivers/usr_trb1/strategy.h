@@ -37,9 +37,9 @@
 #include <robottools.h>
 #include <robot.h>
 
-#define TORCS_NG
+#define SPEED_DREAMS
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #include <teammanager.h>
 #endif
 
@@ -51,7 +51,7 @@ class Opponents;
 
 class AbstractStrategy {
 	public:
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 		int teamIndex;
 		bool releasePit;
 #endif
@@ -60,7 +60,7 @@ class AbstractStrategy {
 		virtual ~AbstractStrategy() {}
 		// Set Initial fuel at race start.
 		virtual void setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituation *s, int index) = 0;
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 		inline void setTeamIndex(int theTeamIndex) { teamIndex = theTeamIndex; }
 #endif
 		// Update internal data at every timestep.

@@ -48,7 +48,7 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <tgf.h>
 #include <track.h>
@@ -559,7 +559,7 @@ static void InitTrack(int Index,
 //--------------------------------------------------------------------------*
 static void NewRace(int Index, tCarElt* Car, tSituation *S)
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
   RtInitTimer(); // Check existance of Performance Counter Hardware
 #endif
   cTicks[Index-IndexOffset] = 0.0;               // Initialize counters

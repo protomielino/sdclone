@@ -20,7 +20,7 @@ SHIPSUBDIRS =
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-usr_trb1_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-usr_trb1_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-usr_trb1_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${SPEED_DREAMS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}
 
 

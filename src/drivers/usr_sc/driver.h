@@ -266,7 +266,7 @@ class Driver {
 		double brake_adjust_perc;
 
 		float fuelperlap;
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 		int teamIndex;
 		bool pitStopChecked;
 #endif

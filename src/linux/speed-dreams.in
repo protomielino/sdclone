@@ -3,11 +3,11 @@
 
 ##############################################################################
 #
-#    file                 : torcs-ng.in
+#    file                 : speed-dreams.in
 #    created              : Sat Sep 11 20:20:04 CEST 1999
 #    copyright            : (C) 1999 by Eric Espie                         
 #    email                : torcs@free.fr   
-#    version              : $Id: torcs.in,v 1.5.2.1 2008/06/01 20:19:38 berniw Exp $                                  
+#    version              : $Id: speed-dreams.in,v 1.5.2.1 2008/06/01 20:19:38 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -22,12 +22,12 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 
 BINDIR=@bindir@
-LIBDIR=@libdir@/torcs-ng
+LIBDIR=@libdir@/speed-dreams
 DATAROOTDIR=@datarootdir@
-DATADIR=$DATAROOTDIR/games/torcs-ng
-VARDIR=@localstatedir@/games/torcs-ng
+DATADIR=$DATAROOTDIR/games/speed-dreams
+VARDIR=@localstatedir@/games/speed-dreams
 
-LOCAL_CONF=$HOME/.torcs-ng
+LOCAL_CONF=$HOME/.speed-dreams
 
 if [ -d $DATADIR ]
 then
@@ -62,12 +62,12 @@ then
     case $1 in
 	# List the library used
 	-l) shift
-	    ldd $LIBDIR/torcs-bin
+	    ldd $LIBDIR/speed-dreams-bin
 	    ;;
 
 	# Run under GDB
 	-d) shift
-	    gdb $LIBDIR/torcs-bin <<EOF
+	    gdb $LIBDIR/speed-dreams-bin <<EOF
 r -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 bt
 EOF
@@ -75,18 +75,18 @@ EOF
 
 	# Run under valgrind
 	-v) shift
-	    valgrind --leak-check=full $LIBDIR/torcs-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
+	    valgrind --leak-check=full $LIBDIR/speed-dreams-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 	    ;;
 
 	-e) shift
 	    echo "cd $DATADIR"
 	    echo "export LD_LIBRARY_PATH=$LIBDIR/lib:$LD_LIBRARY_PATH"
-	    echo "gdb  $LIBDIR/torcs-bin"
+	    echo "gdb  $LIBDIR/speed-dreams-bin"
 	    echo "r -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*"
 	    ;;
 
 	-h)
-	    echo "usage: torcs-ng [-k] [-l|-d|-e]"
+	    echo "usage: speed-dreams [-k] [-l|-d|-e]"
 	    echo "   -k  keep untouched $LOCAL_CONF, even just after a make install"
 	    echo "   -l  list the dynamically linked libraries"
 	    echo "   -d  run under gdb and print stack trace on exit"
@@ -95,13 +95,13 @@ EOF
 	    ;;
 
 	# Normal run
-	*) $LIBDIR/torcs-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
+	*) $LIBDIR/speed-dreams-bin -l $LOCAL_CONF -L $LIBDIR -D $DATADIR $*
 	    ;;
 
     esac
     exit 0
 fi
 
-echo "TORCS-NG location not found"
+echo "Speed Dreams location not found"
 	
 	

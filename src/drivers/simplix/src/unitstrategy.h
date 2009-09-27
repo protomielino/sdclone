@@ -50,7 +50,7 @@
 #ifndef _UNITSTRATEGY_H_
 #define _UNITSTRATEGY_H_
 
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -69,7 +69,7 @@
 #include "unitdriver.h"
 #include "unitpit.h"
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #include "teammanager.h"
 #else
 #endif

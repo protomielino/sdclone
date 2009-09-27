@@ -33,7 +33,7 @@ PKGSUBDIRS	= interfaces libs linux modules windows tools drivers doc raceman
 
 src_PKGFILES	= Makefile
 
-src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCSNG_BASE},,$(shell pwd))
+src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${SPEED_DREAMS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 

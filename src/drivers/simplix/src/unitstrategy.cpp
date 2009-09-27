@@ -47,7 +47,7 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -106,7 +106,7 @@ void TSimpleStrategy::Init(TDriver *Driver)
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::IsPitFree()
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
     bool IsFree = RtTeamIsPitFree(oDriver->TeamIndex());
 	if (IsFree)
 		GfOut("#%s pit is free (%d)\n",oDriver->GetBotName(),oDriver->TeamIndex());
@@ -131,7 +131,7 @@ bool TSimpleStrategy::IsPitFree()
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::NeedPitStop()
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
   double FuelConsum;                             // Fuel consumption per m
   if (oFuelPerM == 0.0)                          // If still undefined
     FuelConsum = oExpectedFuelPerM;              //   use estimated value
@@ -221,7 +221,7 @@ bool TSimpleStrategy::NeedPitStop()
 
   if (Result)
   {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 	TTeamManager::TTeam* Team = oDriver->GetTeam();
 	Team->PitState = CarDriverIndex;             // Box reserviert
@@ -236,7 +236,7 @@ bool TSimpleStrategy::NeedPitStop()
 //--------------------------------------------------------------------------*
 void TAbstractStrategy::PitRelease()
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
   RtTeamReleasePit(oDriver->TeamIndex());
   oCar->ctrl.raceCmd = 0;
 #else

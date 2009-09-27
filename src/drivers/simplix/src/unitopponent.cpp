@@ -58,7 +58,7 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <robottools.h>
 
@@ -135,7 +135,7 @@ TOpponent::TInfo& TOpponent::Info()
 //--------------------------------------------------------------------------*
 void TOpponent::Update(
   const PCarElt MyCar,
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
   PTeamManager TeamManager,
 #endif
@@ -144,7 +144,7 @@ void TOpponent::Update(
   float &MinDistBack,
   double &MinTimeSlot)
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
   oTeamManager = TeamManager;                    // Save Pointer
 #endif
@@ -328,7 +328,7 @@ bool TOpponent::Classify(
     DistAhead = MIN(MAX(50, DistAhead), 200);    // view to min 50 max 200 m
 
   // Teammate?
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
   if (RtIsTeamMate(MyCar,oCar))                  // If Opp. is teammate
 #else
   if (oTeamManager->IsTeamMate(MyCar,oCar))      // If Opp. is teammate

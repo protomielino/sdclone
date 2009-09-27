@@ -180,7 +180,7 @@ Driver::Driver(int index) :
 		brake_adjust_targ(1.0),
 		brake_adjust_perc(1.0),
 		fuelperlap(5.0f),
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 		teamIndex(0),
 		pitStopChecked(false),
 #endif
@@ -628,7 +628,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
  		}
  	}
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	teamIndex = RtTeamManagerIndex( car, track, s );
 	strategy->setTeamIndex( teamIndex );
 #endif
@@ -907,7 +907,7 @@ int Driver::pitCommand(tSituation *s)
 // continuing race, so release the pit.
 void Driver::endRace(tSituation *s)
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	RtTeamReleasePit(teamIndex); 
 #endif
 	car->ctrl.raceCmd = 0;
@@ -916,7 +916,7 @@ void Driver::endRace(tSituation *s)
 // cleanup
 void Driver::shutdown()
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	RtTeamManagerRelease();
 #endif
 }
@@ -2977,7 +2977,7 @@ void Driver::update(tSituation *s)
 
 	if (car->_state <= RM_CAR_STATE_PIT && !NoPit)
 	{
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 		float DLong, DLat;                             // Dist to Pit
 		RtDistToPit(car,track,&DLong,&DLat);
 
@@ -3060,7 +3060,7 @@ void Driver::update(tSituation *s)
 		pitpos = PIT_NONE;
 	}
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	if (pitpos == PIT_NONE)
 		RtTeamReleasePit(teamIndex); 
 #else

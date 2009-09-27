@@ -85,7 +85,7 @@ init_args(int argc, char **argv)
  *	main
  *
  * Description
- *	LINUX entry point of TORCS
+ *	LINUX entry point of Speed Dreams
  *
  * Parameters
  *	
@@ -105,7 +105,7 @@ main(int argc, char *argv[])
     
     GfScrInit(argc, argv);	/* init screen */
 
-    TorcsEntry();		/* launch TORCS */
+    TorcsEntry();		/* launch Speed Dreams */
     
     glutMainLoop();		/* event loop of glut */
 

@@ -456,7 +456,7 @@ void GfScrInit(int argc, char *argv[])
 		glutInitWindowSize(winX, winY);
 
 		/* Create the window (with a smart versioned title) */
-		sprintf(buf, "Torcs-NG %s", VERSION);
+		sprintf(buf, "Speed Dreams %s", VERSION);
 		Window = glutCreateWindow(buf);
 		if (!Window) {
 			GfError("Error, couldn't open window\n");
@@ -562,7 +562,7 @@ GfScrReinit(void * /* dummy */)
     saveParams();
 
 #ifdef WIN32
-	snprintf(cmd, CMDSIZE, "%swtorcs.exe", GetDataDir());
+	snprintf(cmd, CMDSIZE, "%sspeed-dreams.exe", GetDataDir());
 	int i;
 	for (i = 0; i < CMDSIZE && cmd[i] != NULL; i++) {
 		if (cmd[i] == '/') {
@@ -571,8 +571,8 @@ GfScrReinit(void * /* dummy */)
 	}
 	
 	char cmdarg[CMDSIZE];
-	strcpy(cmdarg, "wtorcs.exe");
-	//snprintf(cmdarg, CMDSIZE, "wtorcs.exe", GetDataDir());
+	strcpy(cmdarg, "speed-dreams.exe");
+	//snprintf(cmdarg, CMDSIZE, "speed-dreams.exe", GetDataDir());
 	for (i = 0; i < CMDSIZE && cmdarg[i] != NULL; i++) {
 		if (cmdarg[i] == '/') {
 			cmdarg[i] = '\\';
@@ -583,7 +583,7 @@ GfScrReinit(void * /* dummy */)
 #else
     GfScrShutdown();
 
-    sprintf (cmd, "%storcs-bin", GetLibDir ());
+    sprintf (cmd, "%sspeed-dreams-bin", GetLibDir ());
     memset (arg, 0, sizeof (arg));
     curArg = 0;
     if (GfuiMouseHW) {
@@ -638,7 +638,7 @@ GfScrReinit(void * /* dummy */)
 
 #endif
     if (retcode) {
-	perror("wtorcs.exe");
+	perror(cmd);
 	exit(1);
     }
 }

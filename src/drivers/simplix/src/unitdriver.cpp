@@ -58,7 +58,7 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <tmath/v2_t.h>
 #include <tgf.h>
@@ -257,7 +257,7 @@ TDriver::TDriver(int Index):
   oTargetSpeed(0.0),
   oTclRange(10.0),
   oTclSlip(1.6),
-  oTORCS_NG(true),
+  oSPEED_DREAMS(true),
   oTrackName(NULL),
   oTrackLoad(NULL),
   oTrackLoadQualify(NULL),
@@ -418,7 +418,7 @@ void TDriver::InitTrack
   GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
 
   oTrack = Track;                                // save pointers
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
   if (TrackLength < 2000)
 	RtTeamManagerLaps(3);
   else if (TrackLength < 3000)
@@ -1212,7 +1212,7 @@ void TDriver::EndRace()
 //--------------------------------------------------------------------------*
 void TDriver::Shutdown()
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	RtTeamManagerDump();
 	RtTeamManagerRelease();
 #endif
@@ -1291,7 +1291,7 @@ void TDriver::FindRacinglines()
   if(oCommonData->Track != oTrackDesc.Track())   // New track?
   {
     oCommonData->Track = oTrackDesc.Track();     // Save pointer
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
     oCommonData->TeamManager.Clear();            // release old informations
 #endif
@@ -1416,7 +1416,7 @@ void TDriver::FindRacinglines()
 //--------------------------------------------------------------------------*
 void TDriver::TeamInfo()
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
   //RtTeamManagerShowInfo();
   oTeamIndex = RtTeamManagerIndex(oCar,oTrack,oSituation);
   RtTeamManagerDump();
@@ -1503,7 +1503,7 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   for (int I = 0; I < oNbrCars; I++)
   {
 	oOpponents[I].Update(oCar,
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 	  &oCommonData->TeamManager, 
 #endif

@@ -58,11 +58,11 @@
 #ifndef _UNITCOMMONDATA_H_
 #define _UNITCOMMONDATA_H_
 
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <track.h>
 #include "unitglobal.h"
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 #include "unitteammanager.h"
 #endif
@@ -78,7 +78,7 @@ class TCommonData
     ~TCommonData();                              // Destructor
 
   public:
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
     TTeamManager TeamManager;                    // Team manager 
 #endif

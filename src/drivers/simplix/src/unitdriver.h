@@ -56,7 +56,7 @@
 #ifndef _UNITDRIVER_H_
 #define _UNITDRIVER_H_
 
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 #include <track.h>
 #include <car.h>
@@ -77,7 +77,7 @@
 #include "unitpidctrl.h"
 #include "unitsysfoo.h"
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #include "teammanager.h"
 #else
 #include "unitteammanager.h"
@@ -162,7 +162,7 @@ class TDriver
 	  (void* RobotSettings, char* Value);
 	inline void	SetCommonData                    // Set pointer to common data
 	  (TCommonData* CommonData);
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 	inline TTeamManager::TTeam* GetTeam();
 #endif
@@ -232,7 +232,7 @@ private:
 	double oAvoidScale;			                 // scale avoiding 
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 	TTeamManager::TTeam* oTeam;                  // Team
 #endif
@@ -313,7 +313,7 @@ private:
     double oTargetSpeed;                         // Target speed for speed controller
 	double oTclRange;                            // TCL range
 	double oTclSlip;                             // Max TCL slip
-	bool oTORCS_NG;
+	bool oSPEED_DREAMS;
 	char* oTrackName;                            // Name of track to drive on
 	char* oTrackLoad;                            // Name of track to drive on
 	char* oTrackLoadQualify;                     // Name of track to drive on
@@ -451,7 +451,7 @@ void TDriver::SetCommonData
 //==========================================================================*
 // Get Team
 //--------------------------------------------------------------------------*
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #else
 TTeamManager::TTeam* TDriver::GetTeam()
 {

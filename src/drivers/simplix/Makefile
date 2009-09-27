@@ -19,6 +19,6 @@ SHIPSUBDIRS = $(SUBDIRS)
 PKGSUBDIRS	= $(SUBDIRS)
 
 src-robots-simplix_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-simplix_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-simplix_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${SPEED_DREAMS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}

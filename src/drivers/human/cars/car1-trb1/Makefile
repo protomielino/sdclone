@@ -23,7 +23,7 @@ CONFIG = ${SHIP}
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-human_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-human_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-human_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${SPEED_DREAMS_BASE},,$(shell pwd))
 include ${MAKE_DEFAULT}
 
 

@@ -36,7 +36,7 @@
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
 
-//#undef TORCS_NG
+//#undef SPEED_DREAMS
 
 // The great question, ...
 #if defined(WIN32) || defined(_WIN32)
@@ -249,7 +249,7 @@ enum
 // ... my own planet
 
 // pit states ...
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 #define PIT_IS_FREE NULL
 #else
 #define PIT_IS_FREE (-1)

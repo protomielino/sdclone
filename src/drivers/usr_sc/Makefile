@@ -26,6 +26,6 @@ SHIPSUBDIRS = 1 2 3 4 5 6 7 8 9 10 11 12 cars
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-usr_sc_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
-src-robots-usr_sc_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${TORCS_BASE},,$(shell pwd))
+src-robots-usr_sc_PKGDIR   = ${PACKAGE}-${VERSION}/$(subst ${SPEED_DREAMS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}

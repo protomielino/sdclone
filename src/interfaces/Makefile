@@ -21,7 +21,7 @@ EXPORTS = $(shell find * -maxdepth 0 -name '*.h' -print)
 
 src_PKGFILES	= $(shell find * -maxdepth 0 -type f -print)
 
-src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${TORCSNG_BASE},,$(shell pwd))
+src_PKGDIR	= ${PACKAGE}-${VERSION}/$(subst ${SPEED_DREAMS_BASE},,$(shell pwd))
 
 include ${MAKE_DEFAULT}
 

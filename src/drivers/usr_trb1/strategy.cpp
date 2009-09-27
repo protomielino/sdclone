@@ -43,7 +43,7 @@ SimpleStrategy::SimpleStrategy() :
 	PitDamage(5000),
 	track(NULL)
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	teamIndex = 0;
 	releasePit = false;
 #endif
@@ -187,7 +187,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
  if (forcepit)
   return true;
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
  int repairWanted = 10000;
 
  if ((remainlaps > 0) && (remainlaps < 20))
@@ -286,7 +286,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 
 bool SimpleStrategy::isPitFree(tCarElt* car)
 {
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
     bool IsFree = RtTeamIsPitFree(teamIndex);
 	if (IsFree)
 		GfOut("#%s pit is free (%d)\n",car->_name,teamIndex);
@@ -346,7 +346,7 @@ void SimpleStrategy2::update(tCarElt* car, tSituation *s)
 		m_fuelchecked = false;
 	}
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	if (releasePit)
 		RtTeamReleasePit(teamIndex);
 	releasePit = false;
@@ -469,7 +469,7 @@ float SimpleStrategy2::pitRefuel(tCarElt* car, tSituation *s)
 		fuel = maxfuel;
 	m_lastpitfuel = fuel;
 
-#ifdef TORCS_NG
+#ifdef SPEED_DREAMS
 	releasePit = true;
 #endif
 
