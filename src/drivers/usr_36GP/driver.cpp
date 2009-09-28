@@ -524,7 +524,7 @@ void Driver::LoadDAT( tSituation *s, char *carname, char *trackname )
 // Start a new race.
 void Driver::newRace(tCarElt* car, tSituation *s)
 {
-	deltaTime = (float) RCM_MAX_DT_ROBOTS;
+	deltaTime = (float) RCM_MAX_DT_ROBOTS*SKIPLIMIT;
 	MAX_UNSTUCK_COUNT = int(UNSTUCK_TIME_LIMIT/deltaTime);
 	OVERTAKE_OFFSET_INC = OVERTAKE_OFFSET_SPEED*deltaTime;
 	random_seed = 0;
@@ -850,9 +850,8 @@ void Driver::drive(tSituation *s)
 	laststeer = car->_steerCmd;
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
-	if (skipcount > 0)
+	if (++skipcount > 1)
 	{
-		skipcount++;
 		if (skipcount >= SKIPLIMIT)
 			skipcount = 0;
 
@@ -916,6 +915,12 @@ void Driver::drive(tSituation *s)
 	lastaccel = car->_accelCmd;
 	lastmode = mode;
 	prevleft = car->_trkPos.toLeft;
+
+	cmd_accel = car->_accelCmd;
+	cmd_brake = car->_brakeCmd;
+	cmd_steer = car->_steerCmd;
+	cmd_clutch = car->_clutchCmd;
+	cmd_gear = car->_gearCmd;
 }
 
 
@@ -1766,7 +1771,7 @@ float Driver::getClutch()
 		if (car->_gear != car->_gearCmd && car->_gearCmd < MaxGear)
 			clutchtime = maxtime;
 		if (clutchtime > 0.0f)
-			clutchtime -= (float) (RCM_MAX_DT_ROBOTS * (0.02f + ((float) car->_gearCmd / 8.0f)));
+			clutchtime -= (float) (RCM_MAX_DT_ROBOTS * SKIPLIMIT * (0.02f + ((float) car->_gearCmd / 8.0f)));
 		return 2.0f * clutchtime;
 	} else {
 		float drpm = car->_enginerpm - car->_enginerpmRedLine/2.0f;
@@ -1778,7 +1783,7 @@ float Driver::getClutch()
 			clutchtime = 0.0f;
 		float clutcht = (ctlimit - clutchtime) / ctlimit;
 		if (car->_gear == 1 && car->_accelCmd > 0.0f) {
-			clutchtime += (float) RCM_MAX_DT_ROBOTS;
+			clutchtime += (float) RCM_MAX_DT_ROBOTS * SKIPLIMIT;
 		}
 
 		if (car->_gearCmd == 1 || drpm > 0) {
@@ -1947,7 +1952,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 		lookahead *= LookAhead;
 
 		// Prevent "snap back" of lookahead on harsh braking.
-		float cmplookahead = oldlookahead - (car->_speed_x*RCM_MAX_DT_ROBOTS)*0.65f;//0.55f;
+		float cmplookahead = oldlookahead - (car->_speed_x*RCM_MAX_DT_ROBOTS*SKIPLIMIT)*0.65f;//0.55f;
 		if (lookahead < cmplookahead) {
 			lookahead = cmplookahead;
 		}
