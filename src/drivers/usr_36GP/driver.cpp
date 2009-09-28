@@ -55,6 +55,8 @@ const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;		// [m] if offset < this us
 const float Driver::TEAM_REAR_DIST = 50.0f;					//
 const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 700;			// When to change position in the team?
 
+#define SKIPLIMIT 4
+
 enum { FLYING_FRONT = 1, FLYING_BACK = 2, FLYING_SIDE = 4 };
 enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
 
@@ -192,7 +194,14 @@ Driver::Driver(int index) :
 		TIREMU(0.0f),
 		OVERTAKE_OFFSET_INC(0.0f),
 		MU_FACTOR(0.0f),
-		track(NULL)
+		track(NULL),
+		skipcount(0),
+		cmd_accel(0.0f),
+		cmd_brake(0.0f),
+		cmd_steer(0.0f),
+		cmd_gear(0),
+		cmd_clutch(0.0f),
+		cmd_light(0.0f)
 {
 	INDEX = index;
 }
@@ -548,6 +557,9 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	steerLock = GfParmGetNum(car->_carHandle, SECT_STEER, PRM_STEERLOCK, (char *)NULL, 4.0f);
 	brakemargin = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_BRAKE_MARGIN, (char *)NULL, 0.0f);
 	myoffset = 0.0f;
+	cmd_accel = cmd_brake = cmd_clutch = cmd_steer = cmd_light = 0.0f;
+	cmd_gear = 1;
+	skipcount = 0;
 	simtime = correcttimer = skill_adjust_limit = aligned_timer = stopped_timer = 0.0;
 	avoidtime = frontavoidtime = 0.0;
 	correctlimit = 1000.0;
@@ -838,6 +850,21 @@ void Driver::drive(tSituation *s)
 	laststeer = car->_steerCmd;
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
+	if (skipcount > 0)
+	{
+		skipcount++;
+		if (skipcount >= SKIPLIMIT)
+			skipcount = 0;
+
+		car->_accelCmd = cmd_accel;
+		car->_brakeCmd = cmd_brake;
+		car->_steerCmd = cmd_steer;
+		car->_clutchCmd = cmd_clutch;
+		car->_gearCmd = cmd_gear;
+		return;
+	}
+
+
 	update(s);
 
 	//pit->setPitstop(true);
@@ -1015,10 +1042,9 @@ float Driver::filterOverlap(float accel)
 	}
 
 	for (i = 0; i < opponents->getNOpponents(); i++) {
-		if ((opponent[i].getState() & OPP_LETPASS) &&
-		    fabs(car->_trkPos.toLeft - opponent[i].getCarPtr()->_trkPos.toLeft) > 5.0)
+		if (opponent[i].getState() & OPP_LETPASS) 
 		{
-			return accel*0.6f;
+			return accel*0.4f;
 		}
 	}
 	return accel;
@@ -3788,6 +3814,6 @@ float Driver::brakedist(float allowedspeed, float mu)
 	float d = (CA*mu + CW)/mass;
 	float v1sqr = currentspeedsqr;
 	float v2sqr = allowedspeed*allowedspeed;
-	return (-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d));
+	return (-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d)) + 1.0;
 }
 
