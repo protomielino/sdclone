@@ -60,6 +60,7 @@ extern ssgState *grSsgLoadTexStateEx(const char *img, const char *filepath, int 
 extern bool grLoadPngTexture (const char *fname, ssgTextureInfo* info);
 extern void grShutdownState(void);
 extern void grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn);
+extern void grWriteTimeBuf(char *buf, tdble sec, int sgn);
 extern float grGetHOT(float x, float y);
 
 #endif /* _GRUTIL_H_ */ 

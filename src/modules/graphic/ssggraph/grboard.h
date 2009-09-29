@@ -20,8 +20,8 @@
 #ifndef _GRBOARD_H_
 #define _GRBOARD_H_
 
-#include <raceman.h>
 #include "grtrackmap.h"
+#include <string>
 
 class cGrBoard
 {
@@ -29,7 +29,6 @@ class cGrBoard
     int	id;		/* Board Id */
 
     int	boardFlag;
-
     int leaderFlag;
     int debugFlag;
     int leaderNb;
@@ -46,12 +45,14 @@ class cGrBoard
     void grDispCarBoard2(tCarElt *car, tSituation *s);
     void grDispCarBoard(tCarElt *car, tSituation *s);
     void grDispCounterBoard(tCarElt *car);
-    void grDispLeaderBoard(tCarElt *car, tSituation *s);
+    void grDispLeaderBoard(const tCarElt *car, const tSituation *s) const;
+    void grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const;
+		void grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s) const;
     void grDispCounterBoard2(tCarElt *car);
     void grDispArcade(tCarElt *car, tSituation *s);
-
-	// Track overview object
-	cGrTrackMap *trackMap;
+		std::string grGenerateLeaderBoardEntry(const tCarElt *car, const bool isLeader) const;
+		// Track overview object
+		cGrTrackMap *trackMap;
 
  public:
     cGrBoard(int myid);
@@ -62,7 +63,7 @@ class cGrBoard
     void selectBoard(int brd);
     void dispGaph(tCarElt *car);
     void initBoardCar(tCarElt *car);
-	cGrTrackMap *getTrackMap() { return trackMap; }
+		cGrTrackMap *getTrackMap() { return trackMap; }
 
     void refreshBoard(tSituation *s, float Fps, int forceArcade, tCarElt *curr);
     void loadDefaults(tCarElt *curCar);
@@ -72,6 +73,3 @@ extern void grInitBoardCar(tCarElt *car);
 extern void grShutdownBoardCar(void);
 
 #endif /* _GRBOARD_H_ */ 
-
-
-

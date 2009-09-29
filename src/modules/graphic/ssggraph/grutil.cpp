@@ -275,9 +275,42 @@ grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap)
 }
 
 
+/*
+ * 
+ * name: grWriteTime
+ * Formats and outputs the time as a string.
+ * 
+ * @param color: colour to use
+ * @param font: font to use
+ * @param x: X coord to start output
+ * @param y: Y coord to start output
+ * @param sec: time to format, in seconds
+ * @param sgn: whether use +/- signs or not
+ * 
+ * @return
+ */
 void  grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
 {
 	char  buf[256];
+	
+	grWriteTimeBuf(buf, sec, sgn);
+  GfuiPrintString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
+}
+
+
+/*
+ * 
+ * name: grWriteTimeBuf
+ * Formats and write the time into the supplied character buffer.
+ * 
+ * @param buf: character buffer. Caller is totally responsible for this.
+ * @param sec: time to format, in seconds
+ * @param sgn: whether use +/- signs or not
+ * 
+ * @return
+ */
+void  grWriteTimeBuf(char *buf, tdble sec, int sgn)
+{
 	const char* sign;
 
 	if (sec < 0.0) {
@@ -299,14 +332,12 @@ void  grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
     sec -= s;
     int c = (int)floor((sec) * 100.0);
     if (h) {
-		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d:%2.2d", sign,h,m,s,c);
+			sprintf(buf, "%s%2.2d:%2.2d:%2.2d:%2.2d", sign,h,m,s,c);
     } else if (m) {
-		(void)sprintf(buf, "   %s%2.2d:%2.2d:%2.2d", sign,m,s,c);
+			sprintf(buf, "   %s%2.2d:%2.2d:%2.2d", sign,m,s,c);
     } else {
-		(void)sprintf(buf, "      %s%2.2d:%2.2d", sign,s,c);
+			sprintf(buf, "      %s%2.2d:%2.2d", sign,s,c);
     }
-
-    GfuiPrintString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
 }
 
 
