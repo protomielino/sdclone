@@ -55,7 +55,7 @@ const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;		// [m] if offset < this us
 const float Driver::TEAM_REAR_DIST = 50.0f;					//
 const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 700;			// When to change position in the team?
 
-#define SKIPLIMIT 4
+#define SKIPLIMIT 2
 
 enum { FLYING_FRONT = 1, FLYING_BACK = 2, FLYING_SIDE = 4 };
 enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
@@ -524,7 +524,7 @@ void Driver::LoadDAT( tSituation *s, char *carname, char *trackname )
 // Start a new race.
 void Driver::newRace(tCarElt* car, tSituation *s)
 {
-	deltaTime = (float) RCM_MAX_DT_ROBOTS*SKIPLIMIT;
+	deltaTime = (float) RCM_MAX_DT_ROBOTS;
 	MAX_UNSTUCK_COUNT = int(UNSTUCK_TIME_LIMIT/deltaTime);
 	OVERTAKE_OFFSET_INC = OVERTAKE_OFFSET_SPEED*deltaTime;
 	random_seed = 0;
@@ -850,19 +850,9 @@ void Driver::drive(tSituation *s)
 	laststeer = car->_steerCmd;
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
-	if (++skipcount > 1)
-	{
-		if (skipcount >= SKIPLIMIT)
-			skipcount = 0;
-
-		car->_accelCmd = cmd_accel;
-		car->_brakeCmd = cmd_brake;
-		car->_steerCmd = cmd_steer;
-		car->_clutchCmd = cmd_clutch;
-		car->_gearCmd = cmd_gear;
-		return;
-	}
-
+	skipcount++;
+	if (skipcount >= SKIPLIMIT)
+		skipcount = 0;
 
 	update(s);
 
@@ -1771,7 +1761,7 @@ float Driver::getClutch()
 		if (car->_gear != car->_gearCmd && car->_gearCmd < MaxGear)
 			clutchtime = maxtime;
 		if (clutchtime > 0.0f)
-			clutchtime -= (float) (RCM_MAX_DT_ROBOTS * SKIPLIMIT * (0.02f + ((float) car->_gearCmd / 8.0f)));
+			clutchtime -= (float) (RCM_MAX_DT_ROBOTS * (0.02f + ((float) car->_gearCmd / 8.0f)));
 		return 2.0f * clutchtime;
 	} else {
 		float drpm = car->_enginerpm - car->_enginerpmRedLine/2.0f;
@@ -1783,7 +1773,7 @@ float Driver::getClutch()
 			clutchtime = 0.0f;
 		float clutcht = (ctlimit - clutchtime) / ctlimit;
 		if (car->_gear == 1 && car->_accelCmd > 0.0f) {
-			clutchtime += (float) RCM_MAX_DT_ROBOTS * SKIPLIMIT;
+			clutchtime += (float) RCM_MAX_DT_ROBOTS;
 		}
 
 		if (car->_gearCmd == 1 || drpm > 0) {
@@ -1866,7 +1856,8 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 {
 	tTrackSeg *seg = car->_trkPos.seg;
 	float length = getDistToSegEnd();
-	float offset = (targetoffset > -99 ? targetoffset : getOffset());
+	float offset = (targetoffset > -99 ? targetoffset 
+			: (skipcount == 0 ? getOffset() : myoffset));
 	double time_mod = 1.0;
 	pitoffset = -100.0f;
 
@@ -1952,7 +1943,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 		lookahead *= LookAhead;
 
 		// Prevent "snap back" of lookahead on harsh braking.
-		float cmplookahead = oldlookahead - (car->_speed_x*RCM_MAX_DT_ROBOTS*SKIPLIMIT)*0.65f;//0.55f;
+		float cmplookahead = oldlookahead - (car->_speed_x*RCM_MAX_DT_ROBOTS)*0.65f;//0.55f;
 		if (lookahead < cmplookahead) {
 			lookahead = cmplookahead;
 		}
@@ -3613,7 +3604,7 @@ float Driver::filterABS(float brake)
 	brake = MAX(brake, MIN(origbrake, 0.1f));
 
 	//brake = MAX(MIN(origbrake, collision ? 0.15f :0.05f), brake - MAX(fabs(angle), fabs(car->_yaw_rate) / 2));
-	brake = (float) (MAX(MIN(origbrake, (collision ? MAX(0.05f, (5.0-collision)/30) : 0.05f)), brake - fabs(angle-speedangle)*3));
+	brake = (float) (MAX(MIN(origbrake, (collision ? MAX(0.05f, (5.0-collision)/30) : 0.05f)), brake - fabs(angle-speedangle)*0.3));
 
 	if (fbrakecmd)
 		brake = MAX(brake, fbrakecmd);
