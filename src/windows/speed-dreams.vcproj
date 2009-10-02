@@ -70,7 +70,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib"
+				AdditionalDependencies="client.lib txml.lib libpng.lib tgf.lib user32.lib shell32.lib"
 				OutputFile=".\Release/speed-dreams.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
