@@ -88,7 +88,7 @@ LRaceLine::LRaceLine() :
    CornerAccel(0.0),
    BrakeDelay(20.0),
    BrakeDelayX(1.0),
-   BrakeMod(0),
+   BrakeMod(1.0),
    IntMargin(1.5),
    ExtMargin(2.0),
    AvoidSpeedAdjust(0.0),
@@ -329,7 +329,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  ExtMargin = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_EXT_MARGIN, (char *)NULL, 1.7f ) + (double) (SRLidx-1)/2;   //skill/5;
  BrakeDelay = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE, (char *)NULL, 35.0f );
  BrakeDelayX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE_X, (char *)NULL, 1.0f );
- BrakeMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_MOD, (char *)NULL, 0.0f );
+ BrakeMod = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_MOD, (char *)NULL, 1.0f );
  SteerMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_STEER_MOD, (char *)NULL, 0.0f );
  MaxSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MAX_STEER_TIME, (char *)NULL, 1.5f );
  MinSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MIN_STEER_TIME, (char *)NULL, 1.0f );
@@ -831,7 +831,7 @@ void LRaceLine::Smooth(int Step, int rl)
   }
 
   AdjustRadius(prev, i, next, TargetRInverse, rl, Security);
-
+ 
   prevprev = prev;
   prev = i;
   next = nextnext;
@@ -1197,7 +1197,7 @@ void LRaceLine::ComputeSpeed(int rl)
 
   if (tSpeed[rf][i] > tSpeed[rf][next])
   {
-   if (BrakeMod)
+   if (BrakeMod > 0.1)
    {
     double bspd = (MIN(100.0, tSpeed[rf][next]) - 30.0) / 60 + fabs(SRL[rl].tRInverse[next])*40;
     tSpeed[rf][i] = MIN(tSpeed[rf][i], 
@@ -1205,7 +1205,7 @@ void LRaceLine::ComputeSpeed(int rl)
        ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*7)) 
         * SRL[rl].tBrakeFriction[i]
         * MAX(bd/4.0, bd / ((tSpeed[rf][next]*(tSpeed[rf][next]/20))/20))) 
-        * MAX(0.2, 1.0 - (tSpeed[rf][next] > 30.0 ? bspd*(bspd+0.2)  : 0.0))));
+        * (MAX(0.2, 1.0 - (tSpeed[rf][next] > 30.0 ? bspd*(bspd+0.2)  : 0.0)) * BrakeMod)));
    }
    else
    {

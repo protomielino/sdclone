@@ -55,7 +55,7 @@ const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;		// [m] if offset < this us
 const float Driver::TEAM_REAR_DIST = 50.0f;					//
 const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 700;			// When to change position in the team?
 
-#define SKIPLIMIT 2
+#define SKIPLIMIT 4
 
 enum { FLYING_FRONT = 1, FLYING_BACK = 2, FLYING_SIDE = 4 };
 enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
@@ -851,8 +851,39 @@ void Driver::drive(tSituation *s)
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
 	skipcount++;
-	if (skipcount >= SKIPLIMIT)
+
+	if (skipcount > SKIPLIMIT)
 		skipcount = 0;
+
+	if (skipcount > 1)
+	{
+		// potentially can skip (we never do if skipcount == 0)
+
+		if (mode == mode_normal)
+		{
+			// driving on the raceline
+			if (fabs(car->_yaw_rate) < 0.15 &&
+			    fabs(car->_accel_x) > -2 &&
+			    fabs(speedangle - angle) < 0.1)
+			{
+				// car not under stress, we can skip
+				car->_accelCmd = cmd_accel;
+				car->_brakeCmd = cmd_brake;
+				car->_steerCmd = cmd_steer;
+				car->_gearCmd = cmd_gear;
+				car->_clutchCmd = cmd_clutch;
+				car->_lightCmd = cmd_light;
+				return;
+			}
+		}
+		else
+		{
+			// we're avoiding someone, don't skip (for the most part)
+			if (skipcount > 2)
+				skipcount = 0;
+		}
+	}
+
 
 	update(s);
 
@@ -911,6 +942,7 @@ void Driver::drive(tSituation *s)
 	cmd_steer = car->_steerCmd;
 	cmd_clutch = car->_clutchCmd;
 	cmd_gear = car->_gearCmd;
+	cmd_light = car->_lightCmd;
 }
 
 
@@ -1857,7 +1889,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 	tTrackSeg *seg = car->_trkPos.seg;
 	float length = getDistToSegEnd();
 	float offset = (targetoffset > -99 ? targetoffset 
-			: (skipcount == 0 ? getOffset() : myoffset));
+			: (skipcount < 2 ? getOffset() : myoffset));
 	double time_mod = 1.0;
 	pitoffset = -100.0f;
 

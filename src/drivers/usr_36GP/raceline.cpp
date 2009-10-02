@@ -1210,7 +1210,7 @@ void LRaceLine::ComputeSpeed(int rl)
    else
    {
     tSpeed[rf][i] = MIN(tSpeed[rf][i], tSpeed[rf][next] + MAX(0.1, 
-                        ((0.1 - MIN(0.085, 0.05 + fabs(SRL[rl].tRInverse[next])*3)) 
+                        ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*8)) 
                          * SRL[rl].tBrakeFriction[i]
                          * MAX(bd/4.0, bd / ((tSpeed[rf][next]*(tSpeed[rf][next]/20))/20)))));
    }

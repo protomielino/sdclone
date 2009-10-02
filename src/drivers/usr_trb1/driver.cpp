@@ -55,6 +55,8 @@ const float Driver::USE_LEARNED_OFFSET_RANGE = 0.2f;		// [m] if offset < this us
 const float Driver::TEAM_REAR_DIST = 50.0f;					//
 const int Driver::TEAM_DAMAGE_CHANGE_LEAD = 700;			// When to change position in the team?
 
+#define SKIPLIMIT 4
+
 enum { FLYING_FRONT = 1, FLYING_BACK = 2, FLYING_SIDE = 4 };
 enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
 
@@ -192,7 +194,14 @@ Driver::Driver(int index) :
 		TIREMU(0.0f),
 		OVERTAKE_OFFSET_INC(0.0f),
 		MU_FACTOR(0.0f),
-		track(NULL)
+		track(NULL),
+		skipcount(0),
+		cmd_accel(0.0f),
+		cmd_brake(0.0f),
+		cmd_steer(0.0f),
+		cmd_gear(0),
+		cmd_clutch(0.0f),
+		cmd_light(0.0f)
 {
 	INDEX = index;
 }
@@ -249,9 +258,9 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 	global_skill = skill = decel_adjust_perc = driver_aggression = 0.0;
 #ifdef CONTROL_SKILL
  // load the skill level
-	if (s->_raceType == RM_TYPE_PRACTICE)
-		global_skill = 0.0;
-	else
+	//if (s->_raceType == RM_TYPE_PRACTICE)
+	//	global_skill = 0.0;
+	//else
 	{
 		snprintf(buffer, BUFSIZE, "config/raceman/extra/skill.xml");
 		void *skillHandle = GfParmReadFile(buffer, GFPARM_RMODE_REREAD);
@@ -548,6 +557,9 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 	steerLock = GfParmGetNum(car->_carHandle, SECT_STEER, PRM_STEERLOCK, (char *)NULL, 4.0f);
 	brakemargin = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_BRAKE_MARGIN, (char *)NULL, 0.0f);
 	myoffset = 0.0f;
+	cmd_accel = cmd_brake = cmd_clutch = cmd_steer = cmd_light = 0.0f;
+	cmd_gear = 1;
+	skipcount = 0;
 	simtime = correcttimer = skill_adjust_limit = aligned_timer = stopped_timer = 0.0;
 	avoidtime = frontavoidtime = 0.0;
 	correctlimit = 1000.0;
@@ -838,6 +850,41 @@ void Driver::drive(tSituation *s)
 	laststeer = car->_steerCmd;
 	memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
+	skipcount++;
+
+	if (skipcount > SKIPLIMIT)
+		skipcount = 0;
+
+	if (skipcount > 1)
+	{
+		// potentially can skip (we never do if skipcount == 0)
+
+		if (mode == mode_normal)
+		{
+			// driving on the raceline
+			if (fabs(car->_yaw_rate) < 0.15 &&
+			    fabs(car->_accel_x) > -2 &&
+			    fabs(speedangle - angle) < 0.1)
+			{
+				// car not under stress, we can skip
+				car->_accelCmd = cmd_accel;
+				car->_brakeCmd = cmd_brake;
+				car->_steerCmd = cmd_steer;
+				car->_gearCmd = cmd_gear;
+				car->_clutchCmd = cmd_clutch;
+				car->_lightCmd = cmd_light;
+				return;
+			}
+		}
+		else
+		{
+			// we're avoiding someone, don't skip (for the most part)
+			if (skipcount > 2)
+				skipcount = 0;
+		}
+	}
+
+
 	update(s);
 
 	//pit->setPitstop(true);
@@ -889,6 +936,13 @@ void Driver::drive(tSituation *s)
 	lastaccel = car->_accelCmd;
 	lastmode = mode;
 	prevleft = car->_trkPos.toLeft;
+
+	cmd_accel = car->_accelCmd;
+	cmd_brake = car->_brakeCmd;
+	cmd_steer = car->_steerCmd;
+	cmd_clutch = car->_clutchCmd;
+	cmd_gear = car->_gearCmd;
+	cmd_light = car->_lightCmd;
 }
 
 
@@ -1015,10 +1069,9 @@ float Driver::filterOverlap(float accel)
 	}
 
 	for (i = 0; i < opponents->getNOpponents(); i++) {
-		if ((opponent[i].getState() & OPP_LETPASS) &&
-		    fabs(car->_trkPos.toLeft - opponent[i].getCarPtr()->_trkPos.toLeft) > 5.0)
+		if (opponent[i].getState() & OPP_LETPASS) 
 		{
-			return accel*0.6f;
+			return accel*0.4f;
 		}
 	}
 	return accel;
@@ -1193,7 +1246,7 @@ void Driver::setMode( int newmode )
 void Driver::calcSkill()
 {
 #ifdef CONTROL_SKILL
-  if (RM_TYPE_PRACTICE != racetype)
+  //if (RM_TYPE_PRACTICE != racetype)
   {
    if (skill_adjust_timer == -1.0 || simtime - skill_adjust_timer > skill_adjust_limit)
    {
@@ -1835,7 +1888,8 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 {
 	tTrackSeg *seg = car->_trkPos.seg;
 	float length = getDistToSegEnd();
-	float offset = (targetoffset > -99 ? targetoffset : getOffset());
+	float offset = (targetoffset > -99 ? targetoffset 
+			: (skipcount < 2 ? getOffset() : myoffset));
 	double time_mod = 1.0;
 	pitoffset = -100.0f;
 
@@ -3582,7 +3636,7 @@ float Driver::filterABS(float brake)
 	brake = MAX(brake, MIN(origbrake, 0.1f));
 
 	//brake = MAX(MIN(origbrake, collision ? 0.15f :0.05f), brake - MAX(fabs(angle), fabs(car->_yaw_rate) / 2));
-	brake = (float) (MAX(MIN(origbrake, (collision ? MAX(0.05f, (5.0-collision)/30) : 0.05f)), brake - fabs(angle-speedangle)*3));
+	brake = (float) (MAX(MIN(origbrake, (collision ? MAX(0.05f, (5.0-collision)/30) : 0.05f)), brake - fabs(angle-speedangle)*0.3));
 
 	if (fbrakecmd)
 		brake = MAX(brake, fbrakecmd);
@@ -3788,6 +3842,6 @@ float Driver::brakedist(float allowedspeed, float mu)
 	float d = (CA*mu + CW)/mass;
 	float v1sqr = currentspeedsqr;
 	float v2sqr = allowedspeed*allowedspeed;
-	return (-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d));
+	return (-log((c + v2sqr*d)/(c + v1sqr*d))/(2.0f*d)) + 1.0;
 }
 

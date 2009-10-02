@@ -288,6 +288,14 @@ class Driver {
 		// Track variables.
 		tTrack* track;
 
+		int skipcount;
+		float cmd_accel;
+		float cmd_brake;
+		float cmd_steer;
+		int cmd_gear;
+		float cmd_clutch;
+		float cmd_light;
+
 		float (Driver::*GET_DRIVEN_WHEEL_SPEED)();
 		static Cardata *cardata;		// Data about all cars shared by all instances.
 
