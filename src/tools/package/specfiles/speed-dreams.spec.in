@@ -1,25 +1,25 @@
-Summary: The Open Racing Car Simulator - Next Generation
-Name: TORCS-NG
+Summary: Speed Dreams - An Open Motorsport Simulator
+Name: speed-dreams
 Version: @VERSION@
 Release: 1
 Epoch: 1
-Source: torcs-ng-%{version}-src.tgz
+Source: speed-dreams-%{version}-src.tgz
 Group: Amusements/Games
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Copyright: GPL
 BuildArch: i386
-URL: http://www.torcs.org
-Packager: Eric Espié <Eric.Espie@free.fr>
-Requires: TORCS-NG-data
+URL: http://speed-dreams.sourceforge.net
+Packager: Xavier Bertaux <bertauxx@yahoo.fr>
+Requires: speed-dreams-data
 
 %description
 A 3D racing car simulator using OpenGL.
 
 %prep
-%setup -n torcs-ng-@VERSION@
+%setup -n speed-dreams-@VERSION@
 
 %build
-export TORCSNG_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
+export SPEED_DREAMS_BASE=`pwd` MAKE_DEFAULT=`pwd`/Make-default.mk
 ./configure --prefix=%{_prefix}
 make
 
@@ -33,26 +33,26 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(-,root,root,-)
 %{_prefix}/bin/*
 %{_prefix}/lib/*
-%{_prefix}/share/games/torcs-ng/*
+%{_prefix}/share/games/speed-dreams/*
 
 %changelog
 * Wed Sep 17 2008 Xavier Bertaux <bertauxx@yahoo.fr> 1.4.0
-- torcs -> torcs-ng
+- torcs -> speed-dreams
 
-* Mon Mar 24 2003 Eric Espié <Eric.Espie@free.fr> 1.2.0
+* Mon Mar 24 2003 Eric Espiï¿½ <Eric.Espie@free.fr> 1.2.0
 - new version
 
-* Mon Jul 15 2002 Eric Espié <Eric.Espie@free.fr> 1.1.0-2
+* Mon Jul 15 2002 Eric Espiï¿½ <Eric.Espie@free.fr> 1.1.0-2
 - improved specfile
 
-* Sat Jul 13 2002 Eric Espié <Eric.Espie@free.fr> 1.1.0
+* Sat Jul 13 2002 Eric Espiï¿½ <Eric.Espie@free.fr> 1.1.0
 - version 1.1.0
 
-* Mon Dec 17 2001 Eric Espié <Eric.Espie@free.fr> 1.0.0
+* Mon Dec 17 2001 Eric Espiï¿½ <Eric.Espie@free.fr> 1.0.0
 - version 1.0.0 final
 
-* Sun Dec  9 2001 Eric Espié <Eric.Espie@free.fr> 1.0.0-rc5
+* Sun Dec  9 2001 Eric Espiï¿½ <Eric.Espie@free.fr> 1.0.0-rc5
 - installation updates
 
-* Sat Dec  8 2001 Eric Espié <Eric.Espie@free.fr> 1.0.0-rc4
+* Sat Dec  8 2001 Eric Espiï¿½ <Eric.Espie@free.fr> 1.0.0-rc4
 - initial RPM
