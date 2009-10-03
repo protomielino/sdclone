@@ -1033,7 +1033,8 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 	if(s->currentTime >= iTimer + LEADERBOARD_SCROLL_TIME)
 		{
 			iTimer = s->currentTime;
-			iStart = ++iStart % (s->_ncars + 1);  //Limit: number of cars + one separator line
+			++iStart;
+			iStart = iStart % (s->_ncars + 1);  //Limit: number of cars + one separator line
 		}
 		
 	char buf[256];
