@@ -179,6 +179,7 @@ reRaceRealStart(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	tSituation *s = ReInfo->s;
+	void* carHdle;
 
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
 	sprintf(buf, "Loading simulation engine (%s) ...", dllname);
@@ -216,7 +217,9 @@ reRaceRealStart(void)
 	}
 
 	for (i = 0; i < s->_ncars; i++) {
-		sprintf(buf, "Loading driver %s (%s) ...", s->cars[i]->_name, s->cars[i]->_carName);
+		sprintf(buf, "cars/%s/%s.xml", s->cars[i]->_carName, s->cars[i]->_carName);
+		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+		sprintf(buf, "Loading driver %s (%s) ...", s->cars[i]->_name, GfParmGetName(carHdle));
 		RmLoadingScreenSetText(buf);
 		robot = s->cars[i]->robot;
 		robot->rbNewRace(robot->index, s->cars[i], s);

@@ -489,7 +489,7 @@ ReInitCars(void)
 	int focusedIdx;
 	void *params = ReInfo->params;
 
-	/* Get the number of cars racing */
+	/* Get the number of cars (= drivers) racing */
 	nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
 	GfOut("Loading %d cars\n", nCars);
 
@@ -501,35 +501,45 @@ ReInitCars(void)
 	focusedIdx = (int)GfParmGetNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
 	index = 0;
 
+	/* For each car/driver : */
 	for (i = 1; i < nCars + 1; i++) {
-		/* Get Shared library name */
+
+		/* Get the name of the module (= shared library) of the driver type */
 		sprintf(path, "%s/%d", RM_SECT_DRIVERS_RACING, i);
 		cardllname = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
 		robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
 		sprintf(path, "%sdrivers/%s/%s.%s", GetLibDir (), cardllname, cardllname, DLLEXT);
 
-		/* load the robot shared library */
+		/* Load the driver type shared library */
 		if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) {
 			GfError("Failed to load %s driver\n", path);
 			break;
 		}
 
-		/* search for corresponding index */
+		/* Search for the index of the racing driver in the list of interfaces 
+		   of the module */
 		for (j = 0; j < (*(ReInfo->modList))->modInfoSize; j++) {
+
 			if ((*(ReInfo->modList))->modInfo[j].name
 			    && (*(ReInfo->modList))->modInfo[j].index == robotIdx) {
-				/* good robot found */
+
+				/* We have the right driver */
 				curModInfo = &((*(ReInfo->modList))->modInfo[j]);
 				GfOut("Driver's name: %s\n", curModInfo->name);
-				/* retrieve the robot interface (function pointers) */
+				/* Retrieve the driver interface (function pointers) */
 				curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
+				/* ... and initialize the driver */
 				curModInfo->fctInit(robotIdx, (void*)(curRobot));
+				/* Retrieve and load the driver type XML file :
+				   1) from user settings dir (local dir)
+				   2) from installed data dir */
 				sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), cardllname, cardllname);
 				robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				if (!robhdle) {
 					sprintf(buf, "drivers/%s/%s.xml", cardllname, cardllname);
 					robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 				}
+				/* Load car/driver info (in race engine data structure) */
 				if (robhdle) {
 					elt = &(ReInfo->carList[index]);
 					GF_TAILQ_INIT(&(elt->_penaltyList));
@@ -548,7 +558,7 @@ ReInitCars(void)
 					elt->_teamname[MAX_NAME_LEN - 1] = 0;
 					
 					strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
-					elt->_carName[MAX_NAME_LEN - 1] = 0;
+					elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
 					elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
 					if (strcmp(GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT), ROB_VAL_ROBOT)) {
 						elt->_driverType = RM_DRV_HUMAN;
@@ -567,16 +577,16 @@ ReInitCars(void)
 					elt->_pos        = index+1;
 					elt->_remainingLaps = ReInfo->s->_totLaps;
 
-					/* handle contains the drivers modifications to the car */
+					/* Retrieve and load car specs : merge car default specs,
+					   category specs and driver modifications (=> handle) */
 					/* Read Car model specifications */
 					sprintf(buf, "cars/%s/%s.xml", elt->_carName, elt->_carName);
 					GfOut("Car file: %s\n", buf);
 					carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 					category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-					//sprintf(buf, "Loading driver %s (%s) ...", curModInfo->name, elt->_carName);
-					//RmLoadingScreenSetText(buf);
-					GfOut("Loading driver %s (%s) ...", curModInfo->name, elt->_carName);
-					if (category != 0) {
+					sprintf(buf, "Loading/merging %s specs for %s ...\n", elt->_carName, curModInfo->name);
+					GfOut(buf);
+					if (category) {
 						strncpy(elt->_category, category, MAX_NAME_LEN - 1);
 						elt->_category[MAX_NAME_LEN - 1] = '\0';
 
@@ -591,7 +601,7 @@ ReInitCars(void)
 						carhdle = GfParmMergeHandles(cathdle, carhdle,
 										GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
 										curRobot->rbNewTrack(robotIdx, ReInfo->track, carhdle, &handle, ReInfo->s);
-						if (handle != NULL) {
+						if (handle) {
 							if (GfParmCheckHandle(carhdle, handle)) {
 								GfError("Bad car parameters for driver %s\n", elt->_name);
 								break;
@@ -602,7 +612,7 @@ ReInitCars(void)
 							handle = carhdle;
 						}
 						elt->_carHandle = handle;
-						//GfParmWriteFile("toto.xml", handle, "toto");
+						//GfParmWriteFile("/tmp/toto.xml", handle, 0);
 					} else {
 						elt->_category[0] = '\0';
 						GfError("Bad car category for driver %s\n", elt->_name);
@@ -622,7 +632,7 @@ ReInitCars(void)
 		GfError("No driver for that race ; exiting ...\n");
 		return -1;
 	} else {
-		GfOut("%d drivers ready to race\n", nCars);
+		GfOut("%d driver(s) ready to race\n", nCars);
 	}
 
 	ReInfo->s->_ncars = nCars;
