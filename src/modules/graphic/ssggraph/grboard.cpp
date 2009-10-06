@@ -49,6 +49,14 @@ static int	Winh	= 600;
 
 static char	path[1024];
 
+//Scrolling leaderboard variables
+static int iStart = 0;
+static double iTimer = 0.0;
+static int iStringStart = 0;
+static int iRaceLaps = -1;
+static string st;	//This is the line we will display in the bottom
+	
+
 cGrBoard::cGrBoard (int myid) {
 	id = myid;
 	trackMap = NULL;
@@ -783,12 +791,19 @@ cGrBoard::initBoard(void)
 
 void
 cGrBoard::shutdown(void)
-{
+{																																																																																																																																					
 	if (trackMap != NULL) {
 		delete trackMap;
 		trackMap = NULL;
 	}
+	
+	//Resetting scrolling leaderboard variables
 	sShortNames.clear();
+	st.clear();
+	iStart = 0;
+	iTimer = 0.0;
+	iStringStart = 0;
+	iRaceLaps = -1;
 }
 
 void
@@ -1012,7 +1027,6 @@ void grInitBoardCar(tCarElt *car)
 
 void grShutdownBoardCar(void)
 {
-	sShortNames.clear();
 	/*int i;
 	for (i = 0; i < nstate; i++) {
 		printf("%d\n", i);
@@ -1025,8 +1039,6 @@ void grShutdownBoardCar(void)
 	nstate = 0;*/
 }
 
-static int iStart = 0;
-static double iTimer = 0;
 #define LEADERBOARD_SCROLL_TIME 2.0
 /**
  * grDispLeaderBoardScroll
@@ -1117,8 +1129,6 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 }//grDispLeaderBoardScroll
 
 
-static int iStringStart = 0;
-static int iRaceLaps = -1;
 #define LEADERBOARD_LINE_SCROLL_TIME 0.1
 /** 
  * name: grDispLeaderBoardScrollLine
@@ -1131,7 +1141,7 @@ void
 cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 {
 	//Scrolling
-	if(iTimer == 0 || iStringStart == 0) grMakeThreeLetterNames(s);
+	if(iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0) grMakeThreeLetterNames(s);
 	if(iTimer == 0 || s->currentTime < iTimer) iTimer = s->currentTime;
 	if(s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME)
 		{
@@ -1167,8 +1177,6 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 	glEnd();
 	glDisable(GL_BLEND);
 
-	static string st;	//This is the line we will display
-	
 	//Another lap gone by?
 	if(s->cars[0]->race.laps > iRaceLaps) {
 		//Let's regenerate the roster.
