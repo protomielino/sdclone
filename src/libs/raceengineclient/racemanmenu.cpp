@@ -238,6 +238,16 @@ reLoadMenu(void *prevHandle)
     RmFileSelect((void*)&fs);
 }
 
+static void
+rePlayerConfig(void * /* dummy */)
+{
+    /* Here, we need to call TorcsOptionOptionInit each time the firing button
+       is pressed, and not only once at the Raceman menu initialization,
+       because the previous menu has to be saved (ESC, Back) and because it can be this menu,
+       as well as the Main menu */
+    GfuiScreenActivate(TorcsDriverMenuInit(racemanMenuHdle));
+}
+
 int
 ReRacemanMenu(void)
 {
@@ -275,7 +285,7 @@ ReRacemanMenu(void)
 
      GfuiMenuButtonCreate(racemanMenuHdle,
 			  "Configure Players", "Players configuration menu",
-			  TorcsDriverMenuInit(racemanMenuHdle), GfuiScreenActivate);
+			  NULL, rePlayerConfig);
 
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
 	GfuiMenuButtonCreate(racemanMenuHdle, 

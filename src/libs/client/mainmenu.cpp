@@ -33,6 +33,16 @@ void *menuHandle = NULL;
 tModList *RacemanModLoaded = (tModList*)NULL;
 
 static void
+onActivatePlayerConfig(void * /* dummy */)
+{
+    /* Here, we need to call TorcsOptionOptionInit each time the firing button
+       is pressed, and not only once at the Main menu initialization,
+       because the previous menu has to be saved (ESC, Back) and because it can be this menu,
+       as well as the Raceman menu */
+    GfuiScreenActivate(TorcsDriverMenuInit(menuHandle));
+}
+
+static void
 TorcsMainMenuActivate(void * /* dummy */)
 {
 	if (RacemanModLoaded != NULL) {
@@ -78,7 +88,7 @@ TorcsMainMenuInit(void)
 
     GfuiMenuButtonCreate(menuHandle,
 			 "Configure Players", "Players configuration menu",
-			 TorcsDriverMenuInit(menuHandle), GfuiScreenActivate);
+			 NULL, onActivatePlayerConfig);
 
     GfuiMenuButtonCreate(menuHandle,
 			 "Options", "Configure",
