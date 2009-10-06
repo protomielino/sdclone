@@ -4,7 +4,7 @@
     created              : Thu Aug 17 23:52:20 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grboard.cpp,v 1.27 2006/09/06 21:56:06 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -28,6 +28,7 @@
 #include <robottools.h>
 
 #include <iostream>
+#include <algorithm>	//remove
 using namespace std;
 
 static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
@@ -572,17 +573,16 @@ cGrBoard::grDispCounterBoard(tCarElt *car)
 	GfuiPrintString(buf, grBlue, GFUI_FONT_BIG_C, x, y, GFUI_ALIGN_HR_VB);
 }
 
-/*
+/** 
+ * grDispLeaderBoard
  * 
- * name: grDispLeaderBoard
  * Displayes the leader board (in the lower left corner of the screen)
  * If [drawLaps] is on, writes the lap counter on the top of the list.
- * @param	tCarElt *car: the car currently being viewed
- * @param tSituation *s: situation
- * @return: void
+ * @param	car the car currently being viewed
+ * @param s situation provided by the sim
  */
 void
-cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s) const
+cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
 {
 	if(leaderFlag == 4)	
 	  {
@@ -658,7 +658,7 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s) const
       GfuiPrintString(buf, clr, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
 
       //Display driver time / time behind leader / laps behind leader
-			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], (i==0));
+			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], s, (i==0));
       if(s->cars[i]->_state & RM_CAR_STATE_DNF)	{	//driver DNF, show 'out' in red
 				clr = grRed;
 			}
@@ -788,6 +788,7 @@ cGrBoard::shutdown(void)
 		delete trackMap;
 		trackMap = NULL;
 	}
+	sShortNames.clear();
 }
 
 void
@@ -851,7 +852,8 @@ cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
 }
 
 
-void cGrBoard::refreshBoard(tSituation *s, float Fps, int forceArcade, tCarElt *curr)
+void
+cGrBoard::refreshBoard(tSituation *s, float Fps, int forceArcade, tCarElt *curr)
 {
 	if (arcadeFlag || forceArcade) {
 		grDispArcade(curr, s);
@@ -902,7 +904,7 @@ void grInitBoardCar(tCarElt *car)
 	cleanup[nstate] = curInst->texture;
 	nstate++;
 	
-	/* Load the intrument placement */
+	/* Load the instrument placement */
 	xSz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XSZ, (char*)NULL, 128);
 	ySz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YSZ, (char*)NULL, 128);
 	xpos = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XPOS, (char*)NULL, Winw / 2.0 - xSz);
@@ -1010,6 +1012,7 @@ void grInitBoardCar(tCarElt *car)
 
 void grShutdownBoardCar(void)
 {
+	sShortNames.clear();
 	/*int i;
 	for (i = 0; i < nstate; i++) {
 		printf("%d\n", i);
@@ -1025,6 +1028,15 @@ void grShutdownBoardCar(void)
 static int iStart = 0;
 static double iTimer = 0;
 #define LEADERBOARD_SCROLL_TIME 2.0
+/**
+ * grDispLeaderBoardScroll
+ * 
+ * Displays the leaderboard in a vertical scrolled fashion,
+ * if there are more than 10 names to display.
+ * 
+ * @param car pointer to the currently displayed car
+ * @param s current situation, provided by the sim
+*/
 void
 cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 {
@@ -1089,7 +1101,7 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 			GfuiPrintString(buf, clr, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
 			
       //Display driver time / time behind leader / laps behind leader
-			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], (i==0));
+			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], s, (i==0));
       if(s->cars[i]->_state & RM_CAR_STATE_DNF)	{	//driver DNF, show 'out' in red
 				clr = grRed;
 			}
@@ -1108,18 +1120,18 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 static int iStringStart = 0;
 static int iRaceLaps = -1;
 #define LEADERBOARD_LINE_SCROLL_TIME 0.1
-/*
- * 
+/** 
  * name: grDispLeaderBoardScrollLine
  * Scrolls the leaderboard on the bottom line, as seen on TV broadcasts.
- * @param:	tCarElt* car
- * @param:	tSituation *s
- * @return:	void
+ * 
+ * @param car pointer to the currently displayed car
+ * @param s current situation, provided by the sim
  */
 void
-cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s) const
+cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 {
 	//Scrolling
+	if(iTimer == 0 || iStringStart == 0) grMakeThreeLetterNames(s);
 	if(iTimer == 0 || s->currentTime < iTimer) iTimer = s->currentTime;
 	if(s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME)
 		{
@@ -1174,11 +1186,11 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s) c
 
 		for(int i = 0; i < s->_ncars; i++) {
 			//Driver position + name
-			sprintf(buf, "%3d. %s", i + 1, s->cars[i]->_name);
+			sprintf(buf, "%3d: %s", i + 1, sShortNames[i].c_str());
 			roster.append(buf);
 
       //Display driver time / time behind leader / laps behind leader
-			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], (i==0));
+			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], s, (i==0));
 
 			//get rid of leading spaces
 			size_t iCut = sEntry.find_first_not_of(' ');
@@ -1191,7 +1203,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s) c
 			roster.append("   ");
 		}//for i
 	
-		string sep("   TORCS-NG   ");	//separator
+		string sep("   SPEED-DREAMS   ");	//separator
 	
 		if(st.empty())
 			st.assign(roster + sep);
@@ -1210,8 +1222,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s) c
 }//grDispLeaderBoardScrollLine
 
 
-/*
- * 
+/** 
  * name: grGenerateLeaderBoardEntry
  * 
  * Generates one leaderboard entry,
@@ -1220,12 +1231,12 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s) c
  * in the line, but colour handling and positioning
  * is not available then.
  * 
- * @param:	tCarElt* car
- * @param:	bool isLeader
- * @return:	string
+ * @param	car
+ * @param isLeader
+ * @return string
  */
 string
-cGrBoard::grGenerateLeaderBoardEntry(const tCarElt* car, const bool isLeader) const
+cGrBoard::grGenerateLeaderBoardEntry(const tCarElt* car, const tSituation* s, const bool isLeader) const
 {
 	string ret;
 	char buf[256];
@@ -1267,3 +1278,48 @@ cGrBoard::grGenerateLeaderBoardEntry(const tCarElt* car, const bool isLeader) co
 	
 	return ret;
 }//grGenerateLeaderBoardEntry
+
+
+/** 
+ * grMakeThreeLetterNames
+ * 
+ * Let's build an array of 3-letter name abbreviations (sShortNames).
+ * As we follow original name order, this array can be indexed
+ * the same as the original names' array.
+ * 
+ * @param s situation provided by SD
+ */
+void
+cGrBoard::grMakeThreeLetterNames(const tSituation *s)
+{
+	//Build up two arrays of the original and the short names, same order.
+	sShortNames.clear();
+	vector<string> origNames;
+	for(int i = 0; i < s->_ncars; i++) {	//Loop over each name in the race
+		string st(s->cars[i]->_name);
+		origNames.push_back(st);
+		remove(st.begin(), st.end(), ' ');	//Remove spaces
+		sShortNames.push_back(st.substr(0, 3));	//Cut to 3 characters
+	}//for i
+	vector<string> origShortNames(sShortNames);	//Copy to hold original 3-letter names, for search
+
+	//Check for matching names
+	for(unsigned int i = 0; i < sShortNames.size(); i++) {
+		string sSearch(origShortNames[i]);
+		for(unsigned int j = i + 1; j < sShortNames.size(); j++) {
+			if(sSearch == origShortNames[j]) {	//Same 3-letter name found
+				//Let's find the first mismatching character
+				unsigned int k;
+				for(k = 0; k < min(origNames[i].size(), origNames[j].size()); k++) {
+					if(origNames[i][k] != origNames[j][k]) break;
+				}//for k
+				//Set 3rd char of the short name to the mismatching char (or last one).
+				//It is the driver designer's responsibility from now on
+				//to provide some unsimilarities between driver names.
+				sShortNames[i][2] = origNames[i][k];
+				sShortNames[j][2] = origNames[j][k];
+			}//if sSearch
+		}//for j
+	}//for i
+	//3-letter name array ready to use!
+}//grMakeThreeLetterName
