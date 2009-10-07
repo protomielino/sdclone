@@ -50,6 +50,7 @@
 #define DRWD 0
 #define DFWD 1
 #define D4WD 2
+#define RESERVE_FUEL 5;
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void drive_mt(int index, tCarElt* car, tSituation *s);
@@ -414,7 +415,8 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 	} else {
 		HCtx[idx]->NbPitStopProg = 0;
 	}
-	fuel = 0.0008 * curTrack->length * (s->_totLaps + 1) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + 20.0;
+	//fuel = 0.0008 * curTrack->length * (s->_totLaps + 1) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + 20.0;
+	fuel = 0.0008 * curTrack->length * (s->_totLaps + 1) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + RESERVE_FUEL;
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, fuel);
 	Vtarget = curTrack->pits.speedLimit;
 	if (DrvInfo != NULL) {
