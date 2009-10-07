@@ -1131,7 +1131,8 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 
 #define LEADERBOARD_LINE_SCROLL_TIME 0.1
 /** 
- * name: grDispLeaderBoardScrollLine
+ * grDispLeaderBoardScrollLine
+ * 
  * Scrolls the leaderboard on the bottom line, as seen on TV broadcasts.
  * 
  * @param car pointer to the currently displayed car
@@ -1143,19 +1144,14 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 	//Scrolling
 	if(iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0) grMakeThreeLetterNames(s);
 	if(iTimer == 0 || s->currentTime < iTimer) iTimer = s->currentTime;
-	if(s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME)
-		{
-			//When in initial position, show it fixed (no scroll) for 3 secs.
-			if(
-				(iStringStart == 0 && s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME * 1)//15)
-				||
-				(iStringStart > 0)
-			)
-				{
-					iTimer = s->currentTime;
-					++iStringStart;
-				}
-		}
+	if(s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME) {
+		//When in initial position, show it fixed (no scroll) for 3 secs.
+		if((iStringStart == 0 && s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME * 15)
+			|| (iStringStart > 0)) {
+				iTimer = s->currentTime;
+				++iStringStart;
+			}//if iStringStart
+	}//if currentTime
 		
 	//Coords, limits
 	int x = Winx + 5;
@@ -1181,7 +1177,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 	if(s->cars[0]->race.laps > iRaceLaps) {
 		//Let's regenerate the roster.
 		//The roster holds the driver's position, name and difference
-		//at the time the leader starts a new lap.
+		//*at the time* the leader starts a new lap.
 		//So it can happen it is somewhat mixed up, it will settle down
 		//in the next lap.
 		iRaceLaps++;
@@ -1202,26 +1198,28 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 
 			//get rid of leading spaces
 			size_t iCut = sEntry.find_first_not_of(' ');
-			if(iCut != string::npos && iCut != 0)
-				{
+			if(iCut != string::npos && iCut != 0) {
 					sEntry = sEntry.substr(iCut - 1);
-				}
+			}//if iCut
 			//Add to roster, then separate it from next one
 			roster.append(sEntry);
 			roster.append("   ");
 		}//for i
-	
-		string sep("   SPEED-DREAMS   ");	//separator
+
+		//Add the track name as separator, embedded with 3 spaces each side.
+		string sep(grTrack->name);
+		sep.insert(sep.begin(), 3, ' ');
+		sep.insert(sep.end(), 3, ' ');
 	
 		if(st.empty())
-			st.assign(roster + sep);
+			st.assign(sep + roster);
 		else {
-			st.append(roster + sep);
+			st.append(sep + roster);
 			st = st.substr(iStringStart);	//Let's make sure the string won't grow big
 			iStringStart = 0;
 		}//TODO!!! It can happen garbage remains at the beginning of st.
 		//Somehow should get rid of it when it moves out of screen.
-	}
+	}//if race.laps
 	
 	//Display the line
 	GfuiPrintString(st.c_str() + iStringStart, grWhite, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB);
