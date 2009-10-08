@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:16:38 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: human.cpp,v 1.45.2.2 2008/06/01 07:42:14 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: human.cpp,v 1.45.2.2 2008/06/01 07:42:14 berniw Exp $
+    @version	$Id$
 */
 
 
@@ -29,36 +29,27 @@
 #define isnan _isnan
 #endif
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cstring>
-#include <math.h>
-
 #include <tgfclient.h>
-
-#include <track.h>
-#include <car.h>
-#include <raceman.h>
-#include <robottools.h>
+#include <robottools.h>	//Rt*
 #include <robot.h>
-#include <modinfo.h>
-
 #include <playerpref.h>
 #include "pref.h"
 #include "human.h"
 
+#include <string>
+
 #define DRWD 0
 #define DFWD 1
 #define D4WD 2
-#define RESERVE_FUEL 5;
+
+#define RESERVE_FUEL 5
+#define MAX_FUEL_PER_METER 0.0008f	// [kg/m] fuel consumtion.
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void drive_mt(int index, tCarElt* car, tSituation *s);
 static void drive_at(int index, tCarElt* car, tSituation *s);
 static void newrace(int index, tCarElt* car, tSituation *s);
 static int  pitcmd(int index, tCarElt* car, tSituation *s);
-
-int joyPresent = 0;
 
 static char	sstring[1024];
 static char	buf[1024];
@@ -68,15 +59,15 @@ static tTrack	*curTrack;
 
 static float color[] = {0.0, 0.0, 1.0, 1.0};
 
+bool joyPresent = false;
 static tCtrlJoyInfo	*joyInfo = NULL;
 static tCtrlMouseInfo	*mouseInfo = NULL;
-static int		masterPlayer = -1;
+static int masterPlayer = -1;
 
 std::vector<tHumanContext*> HCtx;
 
-static int speedLimiter	= 0;
+static bool speedLimiter = false;
 static tdble Vtarget;
-
 
 typedef struct
 {
@@ -93,10 +84,10 @@ static int currentSKey[256];
 
 static double lastKeyUpdate = -10.0;
 
-static int	firstTime = 0;
+static bool firstTime = false;
 
 // Human drivers names.
-static std::vector<char*> VecNames;
+static std::vector<std::string> VecNames;
 
 // Number of human drivers (initialized by moduleMaxInterfaces).
 static int NbDrivers = -1;
@@ -109,13 +100,13 @@ BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
 }
 #endif
 
-static void
-shutdown(int index)
-{
-	int		idx = index - 1;
 
-	free (VecNames[idx]);
-	VecNames[idx] = 0;
+static void
+shutdown(const int index)
+{
+	int	idx = index - 1;
+
+	VecNames.erase(VecNames.begin() + idx);
 
 	free (HCtx[idx]);
 	HCtx[idx] = 0;
@@ -126,30 +117,23 @@ shutdown(int index)
 		GfctrlMouseRelease(mouseInfo);
 		GfuiKeyEventRegisterCurrent(NULL);
 		GfuiSKeyEventRegisterCurrent(NULL);
-		firstTime = 0;
-	}
-}
+		firstTime = false;
+	}//if firstTime
+}//shutdown
 
 
 
-/*
- * Function
+/**
+ * 
  *	InitFuncPt
  *
- * Description
- *	Robot functions initialisation
+ *	Robot functions initialisation.
  *
- * Parameters
- *	pt	pointer on functions structure
- *
- * Return
- *	0
- *
- * Remarks
- *
+ *	@param pt	pointer on functions structure
+ *  @return 0
  */
 static int
-InitFuncPt(int index, void *pt)
+InitFuncPt(const int index, void *pt)
 {
 	tRobotItf *itf = (tRobotItf *)pt;
 	int idx = index - 1;
@@ -159,19 +143,17 @@ InitFuncPt(int index, void *pt)
 	}
 
 	if (!firstTime) {
-		firstTime = 1;
+		firstTime = true;
 		joyInfo = GfctrlJoyInit();
 		if (joyInfo) {
-			joyPresent = 1;
-		}
-
+			joyPresent = true;
+		}//if joyInfo
 		mouseInfo = GfctrlMouseInit();
-	}
-
+	}//if !firstTime
 
 	/* Allocate a new context for that player */
-	if ((int)HCtx.size() < idx+1)
-	  HCtx.resize(idx+1);
+	if ((int)HCtx.size() < idx + 1)
+	  HCtx.resize(idx + 1);
 	HCtx[idx] = (tHumanContext *) calloc (1, sizeof (tHumanContext));
 
 	HCtx[idx]->ABS = 1.0;
@@ -183,201 +165,153 @@ InitFuncPt(int index, void *pt)
 
 	HmReadPrefs(index);
 
-	if (HCtx[idx]->Transmission == 0) {
-		itf->rbDrive    = drive_at;
-	} else {
-		itf->rbDrive    = drive_mt;		/* drive during race */
-	}
+	/* drive during race */
+	itf->rbDrive = (HCtx[idx]->Transmission == 0) ? drive_at : drive_mt;
 	itf->rbShutdown = shutdown;
 	itf->rbPitCmd   = pitcmd;
 	itf->index      = index;
 
 	return 0;
-}
+}//InitFuncPt
 
-/*
- * Function
- *	moduleWelcome
+
+/**
+ * 
+ * moduleWelcome
  *
- * Description
- *	First function of the module called at load time :
- *      - the caller gives the module some information about its run-time environment
- *      - the module gives the caller some information about what he needs
+ * First function of the module called at load time :
+ *  - the caller gives the module some information about its run-time environment
+ *  - the module gives the caller some information about what he needs
+ * MUST be called before moduleInitialize()
  *
- * Parameters
- *	welcomeIn  : Run-time info given by the module loader at load time
- *	welcomeOut : Module run-time information returned to the called
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	MUST be called before moduleInitialize()
+ * @param	welcomeIn Run-time info given by the module loader at load time
+ * @param welcomeOut Module run-time information returned to the called
+ * @return 0 if no error occured, not 0 otherwise
  */
-extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
+extern "C" int
+moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
-    void *drvInfo;
-    const char *driver;
+	void *drvInfo;
+	const char *driver;
 
-    // Open and load the human drivers params file
-    sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
-    drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	// Open and load the human drivers params file
+	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+	drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
-    NbDrivers = -1;
-    if (drvInfo)
-    {
-	// Count the number of human drivers registered in the params 
-	do
-	{
+	NbDrivers = -1;
+	if (drvInfo) {
+		// Count the number of human drivers registered in the params 
+		do {
 	    NbDrivers++;
 	    sprintf(sstring, "Robots/index/%d", NbDrivers+1);
 	    driver = GfParmGetStr(drvInfo, sstring, "name", "");
-	}
-	while (strlen(driver) > 0);
+		} while (strlen(driver) > 0);
 
-	// Release in case we got it.
-	GfParmReleaseHandle(drvInfo);
-    }
+		// Release in case we got it.
+		GfParmReleaseHandle(drvInfo);
+	}//if drvInfo
 
-    welcomeOut->maxNbItf = NbDrivers;
+	welcomeOut->maxNbItf = NbDrivers;
 
-    return 0;
-}
+	return 0;
+}//moduleWelcome
 
-/*
- * Function
- *	moduleInitialize
+
+/**
+ * 
+ * moduleInitialize
  *
- * Description
- *	module entry point
+ * Module entry point
  *
- * Parameters
- *	modInfo	administrative info on module
- *
- * Return
- *	0 if no error occured
- *	-1, if any error occured 
- *
- * Remarks
- *
+ * @param modInfo	administrative info on module
+ * @return 0 if no error occured, -1 if any error occured 
  */
-
-extern "C" int moduleInitialize(tModInfo *modInfo)
+extern "C" int
+moduleInitialize(tModInfo *modInfo)
 {
-    int i;
-    void *drvInfo;
-    const char *driver;
-    
-    if (NbDrivers <= 0)
-    {
-	GfOut("human : No human driver registered, or moduleMaxInterfaces() was not called (NbDrivers=%d)\n", NbDrivers);
-	return -1;
-    }
+	if (NbDrivers <= 0) {
+		GfOut("human : No human driver registered, or moduleMaxInterfaces() was not called (NbDrivers=%d)\n", NbDrivers);
+		return -1;
+	}
 
-    // Reset module interfaces info.
-    memset(modInfo, 0, NbDrivers*sizeof(tModInfo));
-    
-    /* Clear the local driver name vector */
-    for (i = 0; i < (int)VecNames.size(); i++)
-	if (VecNames[i])
-	    free(VecNames[i]);
-    VecNames.clear();
+	// Reset module interfaces info.
+	memset(modInfo, 0, NbDrivers*sizeof(tModInfo));
 
-    // Open and load the human drivers params file
-    sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
-    drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	// Clear the local driver name vector
+	VecNames.clear();
 
-    if (drvInfo)
-    {
-	// Fill the module interfaces info : each driver is associated to 1 interface.
-	for (i = 0; i < NbDrivers; i++) 
-	{
+	// Open and load the human drivers params file
+	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+
+	if (drvInfo) {
+		// Fill the module interfaces info : each driver is associated to 1 interface.
+		for (int i = 0; i < NbDrivers; i++) {
 	    sprintf(sstring, "Robots/index/%d", i+1);
-	    driver = GfParmGetStr(drvInfo, sstring, "name", "");
-	    if (strlen(driver) == 0)
-		break;
+	    std::string driver(GfParmGetStr(drvInfo, sstring, "name", ""));
+	    if (driver.size() > 0) {
+				VecNames.push_back(driver); // Don't rely on GfParm allocated data
+				modInfo->name    = VecNames[i].c_str();	/* name of the module (short) */
+				modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
+				modInfo->fctInit = InitFuncPt;	/* init function */
+				modInfo->gfId    = ROB_IDENT;	/* supported framework version */
+				modInfo->index   = i+1;
+				modInfo++;
+			}//if strlen
+		}//for i
+	
+		GfParmReleaseHandle(drvInfo);	// Release in case we got it.
+	}//if drvInfo
+	
+	return 0;
+}//moduleInitialize
 
-	    VecNames.push_back(strdup(driver)); // Don't rely on GfParm allocated data
-	    modInfo->name    = VecNames[i];	/* name of the module (short) */
-	    modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
-	    modInfo->fctInit = InitFuncPt;	/* init function */
-	    modInfo->gfId    = ROB_IDENT;	/* supported framework version */
-	    modInfo->index   = i+1;
-	    modInfo++;
-	}
-	// Release in case we got it.
-	GfParmReleaseHandle(drvInfo);
-    }
-    
-    return 0;
-}
+
+/**
+ * moduleTerminate
+ *
+ * Module exit point
+ *
+ * @return 0
+ */
+extern "C" int
+moduleTerminate()
+{
+	VecNames.clear();	//Free local copy of driver names
+	return 0;
+}//moduleTerminate
 
 
-/*
- * Function
- *	moduleTerminate
+/**
+ * initTrack
  *
- * Description
- *	Module exit point
+ * Search under drivers/human/cars/<carname>/<trackname>.xml
  *
- * Parameters
- *	None
- *
- * Return
- *	0
- *
- * Remarks
+ * @param index
+ * @param track
+ * @param carHandle
+ * @param carParmHandle
+ * @param s situation provided by the sim
  *
  */
-
-extern "C" int moduleTerminate()
+static void
+initTrack(const int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s)
 {
-    /* Free local copy of driver names if not already done */
-    for (unsigned i = 0; i < VecNames.size(); i++)
-	if (VecNames[i])
-	    free(VecNames[i]);
-
-    return 0;
-}
-
-/*
- * Function
- *
- *
- * Description
- *	search under drivers/human/cars/<carname>/<trackname>.xml
- *
- * Parameters
- *
- *
- * Return
- *
- *
- * Remarks
- *
- */
-static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s)
-{
-	const char *carname;
-	char *s1, *s2;
 	char trackname[256];
-	tdble fuel;
 	int idx = index - 1;
 
 	curTrack = track;
-	s1 = strrchr(track->filename, '/') + 1;
-	s2 = strchr(s1, '.');
-	strncpy(trackname, s1, s2-s1);
-	trackname[s2-s1] = 0;
+	char *s1 = strrchr(track->filename, '/') + 1;
+	char *s2 = strchr(s1, '.');
+	strncpy(trackname, s1, s2 - s1);
+	trackname[s2 - s1] = 0;
 	sprintf(sstring, "Robots/index/%d", index);
 
 	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
 	void *DrvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	carname = "";
-	if (DrvInfo != NULL) {
-		carname = GfParmGetStr(DrvInfo, sstring, "car name", "");
-	}
+	const char *carname = (DrvInfo != NULL)
+		? GfParmGetStr(DrvInfo, sstring, "car name", "")
+		: "";
 
 	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GetLocalDir(), carname);
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
@@ -389,69 +323,63 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 
 	sprintf(sstring, "%sdrivers/human/cars/%s/%s.xml", GetLocalDir(), carname, trackname);
 	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-	if (newhandle)
-	{
-		if (*carParmHandle)
-			*carParmHandle = GfParmMergeHandles(*carParmHandle, newhandle, 
-			       (GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST));
-		else
-			*carParmHandle = newhandle;
+	if (newhandle) {
+		*carParmHandle = (*carParmHandle)
+			? GfParmMergeHandles(*carParmHandle, newhandle,
+				(GFPARM_MMODE_SRC|GFPARM_MMODE_DST|GFPARM_MMODE_RELSRC|GFPARM_MMODE_RELDST))
+			: newhandle;
 
-		if (*carParmHandle != NULL) {
+		if (*carParmHandle) {
 			GfOut("Player: %s Loaded\n", sstring);
 		}
-	}
-	else
-	{
-		if (*carParmHandle != NULL) {
+	} else {
+		if (*carParmHandle) {
 			GfOut("Player: %s Default Setup Loaded\n", sstring);
 		}
-	}
+	}//if-else newhandle
 
 	if (curTrack->pits.type != TR_PIT_NONE) {
 		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
 		HCtx[idx]->NbPitStopProg = (int)GfParmGetNum(PrefHdle, sstring, HM_ATT_NBPITS, (char*)NULL, 0);
-		GfOut("Player: index %d , Pits stops %d\n", index, HCtx[idx]->NbPitStopProg);
+		GfOut("Player: index %d , Pit stops %d\n", index, HCtx[idx]->NbPitStopProg);
 	} else {
 		HCtx[idx]->NbPitStopProg = 0;
-	}
-	//fuel = 0.0008 * curTrack->length * (s->_totLaps + 1) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + 20.0;
-	fuel = 0.0008 * curTrack->length * (s->_totLaps + 1) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + RESERVE_FUEL;
+	}//if-else curTrack->pits
+
+	//Initial fuel fill computation
+	tdble fuel = MAX_FUEL_PER_METER * curTrack->length * (s->_totLaps + 1) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + RESERVE_FUEL;
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, fuel);
+	
 	Vtarget = curTrack->pits.speedLimit;
-	if (DrvInfo != NULL) {
+	
+	if(DrvInfo) {
 		GfParmReleaseHandle(DrvInfo);
 	}
-}
+}//initTrack
 
 
-/*
- * Function
+/**
  *
+ * newrace
  *
- * Description
- *
- *
- * Parameters
- *
- *
- * Return
- *
+ * @param index
+ * @param car
+ * @param s situation provided by the sim
+ * 
  */
-
-void newrace(int index, tCarElt* car, tSituation *s)
+void
+newrace(const int index, tCarElt* car, tSituation *s)
 {
-	int i;
-	int idx = index - 1;
+	const int idx = index - 1;
 
-	for (i = 0; i < MAX_GEARS; i++) {
+	for (int i = 0; i < MAX_GEARS; i++) {
 		if (car->_gearRatio[i] != 0) {
 			HCtx[idx]->shiftThld[i] = car->_enginerpmRedLine * car->_wheelRadius(2) * 0.85 / car->_gearRatio[i];
 			GfOut("Gear %d: Spd %f\n", i, HCtx[idx]->shiftThld[i] * 3.6);
 		} else {
-	    	HCtx[idx]->shiftThld[i] = 10000.0;
+	    HCtx[idx]->shiftThld[i] = 10000.0;
 		}
-	}
+	}//for i
 
 	if (HCtx[idx]->MouseControlUsed) {
 		GfctrlMouseCenter();
@@ -495,7 +423,8 @@ void newrace(int index, tCarElt* car, tSituation *s)
 		HCtx[idx]->autoClutch = 1;
 	else
 		HCtx[idx]->autoClutch = 0;
-}
+}//newrace
+
 
 static void
 updateKeys(void)
@@ -546,8 +475,8 @@ updateKeys(void)
 				}
 			}
 		}
-    }
-}
+	}
+}//updateKeys
 
 
 static int
@@ -556,7 +485,8 @@ onKeyAction(unsigned char key, int modifier, int state)
 	currentKey[key] = state;
 
 	return 0;
-}
+}//onKeyAction
+
 
 static int
 onSKeyAction(int key, int modifier, int state)
@@ -564,9 +494,11 @@ onSKeyAction(int key, int modifier, int state)
 	currentSKey[key] = state;
 
 	return 0;
-}
+}//onSKeyAction
 
-static void common_drive(int index, tCarElt* car, tSituation *s)
+
+static void
+common_drive(const int index, tCarElt* car, tSituation *s)
 {
 	tdble slip;
 	tdble ax0;
@@ -579,21 +511,19 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 	int idx = index - 1;
 	tControlCmd	*cmd = HCtx[idx]->CmdControl;
 
-	static int firstTime = 1;
+	static bool firstTime = true;
 
 	if (firstTime) {
 		if (HCtx[idx]->MouseControlUsed) {
-	    	GfuiMouseShow();
-	    	GfctrlMouseInitCenter();
+			GfuiMouseShow();
+			GfctrlMouseInitCenter();
 		}
 		GfuiKeyEventRegisterCurrent(onKeyAction);
 		GfuiSKeyEventRegisterCurrent(onSKeyAction);
-		firstTime = 0;
-    }
-
+		firstTime = false;
+	}
 
 	HCtx[idx]->distToStart = RtGetDistFromStart(car);
-
 	HCtx[idx]->Gear = (tdble)car->_gear;	/* telemetry */
 
 	GfScrGetSize(&scrw, &scrh, &dummy, &dummy);
@@ -645,10 +575,10 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 	((cmd[CMD_SPDLIM].type == GFCTRL_TYPE_KEYBOARD) && (keyInfo[cmd[CMD_SPDLIM].val].state == GFUI_KEY_DOWN)) ||
 	((cmd[CMD_SPDLIM].type == GFCTRL_TYPE_SKEYBOARD) && (skeyInfo[cmd[CMD_SPDLIM].val].state == GFUI_KEY_DOWN)))
 	{
-		speedLimiter = 1;
+		speedLimiter = true;
 		sprintf(car->_msgCmd[1], "Speed Limiter On");
 	} else {
-		speedLimiter = 0;
+		speedLimiter = false;
 		sprintf(car->_msgCmd[1], "Speed Limiter Off");
 	}
 
@@ -926,7 +856,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		if (fabs(car->_speed_x) > 10.0 && car->_brakeCmd > 0.0)
 		{
 			tdble brake1 = car->_brakeCmd, brake2 = car->_brakeCmd, brake3 = car->_brakeCmd;
-			tdble rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+			//tdble rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
 			int i;
 
 			// reduce brake if car sliding sideways
@@ -1019,17 +949,16 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 	}
 
 	if (speedLimiter) {
-		tdble Dv;
 		if (Vtarget != 0) {
-			Dv = Vtarget - car->_speed_x;
+			tdble Dv = Vtarget - car->_speed_x;
 			if (Dv > 0.0) {
 				car->_accelCmd = MIN(car->_accelCmd, fabs(Dv/6.0));
 			} else {
 				car->_brakeCmd = MAX(car->_brakeCmd, fabs(Dv/5.0));
 				car->_accelCmd = 0;
-			}
-		}
-	}
+			}//if-else Dv
+		}//if Vtarget
+	}//if speedLimiter
 
 
 #ifndef WIN32
@@ -1049,10 +978,11 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 #endif
 
 	HCtx[idx]->lap = car->_laps;
-}
+}//common_drive
 
 
-static tdble getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
+static tdble
+getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
 {
 	if (newgear != 0 && newgear < car->_gearNb) {
 		if (newgear != gear) {
@@ -1065,7 +995,8 @@ static tdble getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
 	}
 	
 	return 0.0f;
-}
+}//getAutoClutch
+
 
 /*
  * Function
@@ -1083,7 +1014,8 @@ static tdble getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
  * Remarks
  *	
  */
-static void drive_mt(int index, tCarElt* car, tSituation *s)
+static void
+drive_mt(const int index, tCarElt* car, tSituation *s)
 {
 	int i;
 	int idx = index - 1;
@@ -1135,8 +1067,9 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
 
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
 		car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
+}//drive_mt
 
-}
+
 /*
  * Function
  *
@@ -1153,7 +1086,8 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
  * Remarks
  *	
  */
-static void drive_at(int index, tCarElt* car, tSituation *s)
+static void
+drive_at(const int index, tCarElt* car, tSituation *s)
 {
 	int gear, i;
 	int idx = index - 1;
@@ -1228,7 +1162,7 @@ static void drive_at(int index, tCarElt* car, tSituation *s)
 		}
 	}
 
-    if (HCtx[idx]->AutoReverse) {
+	if (HCtx[idx]->AutoReverse) {
 		/* Automatic Reverse Gear Mode */
 		if (!HCtx[idx]->AutoReverseEngaged) {
 			if ((car->_brakeCmd > car->_accelCmd) && (car->_speed_x < 1.0)) {
@@ -1244,13 +1178,15 @@ static void drive_at(int index, tCarElt* car, tSituation *s)
 				car->_gearCmd = CMD_GEAR_R - CMD_GEAR_N;
 			}
 		}
-    }
+	}
 
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
-	    car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
-}
+	  car->_clutchCmd = getAutoClutch(idx, car->_gear, car->_gearCmd, car);
+}//drive_at
 
-static int pitcmd(int index, tCarElt* car, tSituation *s)
+
+static int
+pitcmd(const int index, tCarElt* car, tSituation *s)
 {
 	tdble f1, f2;
 	tdble ns;
@@ -1272,15 +1208,11 @@ static int pitcmd(int index, tCarElt* car, tSituation *s)
 
 	car->_pitRepair = (int)car->_dammage;
 
-	int i;
-	int key;
-	tControlCmd *cmd;
-
 	if (HCtx[idx]) {
-		cmd = HCtx[idx]->CmdControl;
-		for (i = 0; i < nbCmdControl; i++) {
+		tControlCmd *cmd = HCtx[idx]->CmdControl;
+		for (int i = 0; i < nbCmdControl; i++) {
 			if (cmd[i].type == GFCTRL_TYPE_KEYBOARD || cmd[i].type == GFCTRL_TYPE_SKEYBOARD) {
-				key = cmd[i].val;
+				int key = cmd[i].val;
 				keyInfo[key].state = GFUI_KEY_UP;
 				keyInfo[key].edgeDn = 0;
 				keyInfo[key].edgeUp = 0;
@@ -1289,10 +1221,10 @@ static int pitcmd(int index, tCarElt* car, tSituation *s)
 				skeyInfo[key].edgeUp = 0;
 				currentKey[key] = GFUI_KEY_UP;
 				currentSKey[key] = GFUI_KEY_UP;
-			}
-		}
-	}
+			}//if cmd...
+		}//for i
+	}//if HCtx
 
 	return ROB_PIT_MENU; /* The player is able to modify the value by menu */
-}
+}//pitcmd
 

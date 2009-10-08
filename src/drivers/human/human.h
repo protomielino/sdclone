@@ -4,7 +4,7 @@
     created     : Sat May 10 19:12:46 CEST 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: human.h,v 1.3 2003/11/08 16:37:17 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: human.h,v 1.3 2003/11/08 16:37:17 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _HUMAN_H_
@@ -63,7 +63,7 @@ typedef struct HumanContext
 
 extern std::vector<tHumanContext*> HCtx;
 
-extern int joyPresent;
+extern bool joyPresent;
 
 #endif /* _HUMAN_H_ */ 
 
