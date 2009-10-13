@@ -580,9 +580,9 @@ SimCarUpdateCornerPos(tCar *car)
 void 
 SimTelemetryOut(tCar *car)
 {
-    int i;
-    tdble Fzf, Fzr;
+    //int i;
 #if 0
+    tdble Fzf, Fzr;
     printf("-----------------------------\nCar: %d %s ---\n", car->carElt->index, car->carElt->_name);
     printf("Seg: %d (%s)  Ts:%f  Tr:%f\n",
            car->trkPos.seg->id, car->trkPos.seg->name, car->trkPos.toStart, car->trkPos.toRight);
@@ -632,7 +632,9 @@ SimCarUpdate(tCar *car, tSituation * /* s */)
 void
 SimCarUpdate2(tCar *car, tSituation * /* s */)
 {
+#if 0
     static int cnt = 10;
+#endif //0
     if (SimTelemetry == car->carElt->index) SimTelemetryOut(car);
 #if 0
     cnt--;

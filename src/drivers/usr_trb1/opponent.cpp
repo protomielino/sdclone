@@ -214,15 +214,15 @@ fprintf(stderr," FRONTSLOW\n");
 				double max = MAX(lane, MAX(mycar->_trkPos.seg->width-mycar->_dimension_y/2, driver->getNextLeft()));
 				double min = MIN(lane, MIN(mycar->_dimension_y/2, driver->getNextLeft()));
 				//double mleft = MIN(max, MAX(min, (mycar->_trkPos.toLeft+(driver->getNextLeft()-mycar->_trkPos.toLeft) * (t_impact*deltamult)))) - driver->getAngle();
-				double mleft = MIN(max, MAX(min, (mycar->_trkPos.toLeft+(t_impact*driver->getSpeedAngle())) + driver->getAngle()));
+				//double mleft = MIN(max, MAX(min, (mycar->_trkPos.toLeft+(t_impact*driver->getSpeedAngle())) + driver->getAngle()));
 				max = MAX(nextleft, car->_trkPos.seg->width-car->_dimension_y/2);
 				min = MIN(nextleft, car->_dimension_y/2);
 				//double oleft = MIN(max, MAX(min, (car->_trkPos.toLeft+(nextleft-car->_trkPos.toLeft) * (t_impact*deltamult)))) - angle;
-				double oleft = MIN(max, MAX(min, (car->_trkPos.toLeft+(t_impact*speedangle)) + angle));
+				//double oleft = MIN(max, MAX(min, (car->_trkPos.toLeft+(t_impact*speedangle)) + angle));
 
 				//double sepdist = fabs(mleft - oleft);
 				double sepdist = fabs(car->_trkPos.toLeft - mycar->_trkPos.toLeft) + driver->getAngle()*2;
-				int diverging = 0; //(sepdist > (fabs(getWidth()/2.0f) + mycar->_dimension_y/3.0f) + 0.3);
+				//int diverging = 0; //(sepdist > (fabs(getWidth()/2.0f) + mycar->_dimension_y/3.0f) + 0.3);
 
 				//t_impact = MIN(mspeed/7, t_impact);
 
@@ -234,7 +234,7 @@ fprintf(stderr," FRONTSLOW\n");
 					float cardist = car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
 					sidedist = cardist;
 					cardist = sepdist - fabs(getWidth()/2.0f) - mycar->_dimension_y/2.0f;
-					double deduction = t_impact / MAX(1.0, distance);
+					//double deduction = t_impact / MAX(1.0, distance);
 					if (cardist < SIDE_MARGIN) { 
 if (DebugMsg & debug_brake)
 fprintf(stderr,"FRONTCOLLIDE %s cardist=%.3f sepdist=%.3f\n",car->_name,cardist,sepdist);
@@ -394,7 +394,7 @@ fprintf(stderr," FRONTFAST\n");
 			if (team == TEAM_FRIEND && car->_dammage-1000 < mycar->_dammage)
 				state |= OPP_FRONT_FOLLOW;
 
-			double dSpeed = mspeed;//driver->getSpeed();
+			//double dSpeed = mspeed;//driver->getSpeed();
 			//if (distance < 20.0 - (getSpeed()-driver->getSpeed())*4)
 			if (distance < 20.0 - (ospeed-mspeed)*4)
 				state |= OPP_FRONT;
@@ -527,15 +527,15 @@ int Opponent::polyOverlap( tPosd *op, tPosd *dp )
 int Opponent::testCollision(Driver *driver, double impact, double sizefactor, vec2f *targ )
 {
  tCarElt *mycar = driver->getCarPtr();
- int collide = 0, i, j;
- double nSlices = MAX(1.0, (impact * deltamult));
+ int /*collide = 0,*/ i/*, j*/;
+ //double nSlices = MAX(1.0, (impact * deltamult));
  tCarElt *dcar = driver->getCarPtr();
  double o_speedX = car->_speed_X;// + (cardata->getSpeedDeltaX()) * (impact * deltamult) / 2;
  double o_speedY = car->_speed_Y;// + (cardata->getSpeedDeltaY()) * (impact * deltamult) / 2;
  double d_speedX = dcar->_speed_X;// + driver->getSpeedDeltaX() * (impact * deltamult) / 2;
  double d_speedY = dcar->_speed_Y;// + driver->getSpeedDeltaY() * (impact * deltamult) / 2;
 
- tPosd o_cur[4], d_cur[4], o_curp[4], d_curp[4], o_new[4], d_new[4], o_new2[4], d_new2[4];
+ tPosd o_cur[4], d_cur[4], /*o_curp[4], d_curp[4],*/ o_new[4], d_new[4], o_new2[4], d_new2[4];
 
  // set up car current positions
  for (i=0; i<4; i++)
@@ -558,8 +558,8 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
  else
  {
   // position driver's car according to velocity angle
-  double d_newPos_x = dcar->pub.DynGC.pos.x + (d_speedX*impact);
-  double d_newPos_y = dcar->pub.DynGC.pos.y + (d_speedY*impact);
+  //double d_newPos_x = dcar->pub.DynGC.pos.x + (d_speedX*impact);
+  //double d_newPos_y = dcar->pub.DynGC.pos.y + (d_speedY*impact);
 
   // correct corner positions
   for (i=0; i<4; i++)
@@ -572,8 +572,8 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
 #if 1
  {
   // position opponent car according to velocity angle
-  double o_newPos_x = car->pub.DynGC.pos.x + (o_speedX*impact);
-  double o_newPos_y = car->pub.DynGC.pos.y + (o_speedY*impact);
+  //double o_newPos_x = car->pub.DynGC.pos.x + (o_speedX*impact);
+  //double o_newPos_y = car->pub.DynGC.pos.y + (o_speedY*impact);
 
   // correct corner positions
   for (i=0; i<4; i++)
@@ -698,8 +698,8 @@ int Opponent::testCollision(Driver *driver, double impact, double sizefactor, ve
   double ti = MAX(0.001, impact) + 0.1;
   tPosd *o_old1 = cardata->getCorner1();
   tPosd *d_old1 = driver->getCorner1();
-  tPosd *o_old2 = cardata->getCorner2();
-  tPosd *d_old2 = driver->getCorner2();
+  //tPosd *o_old2 = cardata->getCorner2();
+  //tPosd *d_old2 = driver->getCorner2();
   
   for (i=0; i<4; i++)
   {

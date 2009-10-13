@@ -37,7 +37,9 @@
 #include <robottools.h>
 #include <robot.h>
 
+#ifndef SPEED_DREAMS
 #define SPEED_DREAMS
+#endif //SPEED_DREAMS
 
 #ifdef SPEED_DREAMS
 #include <teammanager.h>

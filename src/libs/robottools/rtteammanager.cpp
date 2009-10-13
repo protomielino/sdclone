@@ -762,7 +762,7 @@ void RtTeamManagerDump(int DumpMode)
 			GfOut("TM: TeamPit %d:\n",TeamPit->Count);
 //			GfOut("TM: Header           : V%d.%d (%d Bytes): x%p\n",TeamPit->Header.MajorVersion,TeamPit->Header.MinorVersion,TeamPit->Header.Size,TeamPit);
 			GfOut("TM: Name             : %s\n",TeamPit->Name);
-			GfOut("TM: PitState         : %d\n",TeamPit->PitState);
+			GfOut("TM: PitState         : %p\n",TeamPit->PitState);
 			GfOut("TM: Pit              : x%p\n",TeamPit->Pit);
 //			GfOut("TM: Teammates        : x%p\n",TeamPit->Teammates);
 //			GfOut("TM: Next             : x%p\n",TeamPit->Next);

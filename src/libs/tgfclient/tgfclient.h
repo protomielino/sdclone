@@ -303,7 +303,7 @@ extern void GfctrlMouseInitCenter(void);
 extern tCtrlRef *GfctrlGetRefByName(const char *name);
 extern const char *GfctrlGetNameByRef(int type, int index);
 
-extern int GfuiGlutExtensionSupported(char *str);
+extern int GfuiGlutExtensionSupported(char const *str);
 
 
 #endif /* __TGFCLIENT__H__ */

@@ -301,8 +301,8 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
 	char carName[256];
 	{
-		char *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-		char *key = PRM_CAR;
+		char const *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
+		char const *key = PRM_CAR;
 		strncpy( carName, GfParmGetStr(carHandle, path, key, ""), sizeof(carName) );
 		char *p = strrchr(carName, '.');
 		if (p) *p = '\0';
@@ -587,8 +587,8 @@ void Driver::newRace(tCarElt* car, tSituation *s)
 
 		char carName[256];
 		{
-			char *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
-			char *key = PRM_CAR;
+			char const *path = SECT_GROBJECTS "/" LST_RANGES "/" "1";
+			char const *key = PRM_CAR;
 			strncpy( carName, GfParmGetStr(car->_carHandle, path, key, ""), sizeof(carName) );
 			char *p = strrchr(carName, '.');
 			if (p) *p = '\0';
@@ -1034,7 +1034,7 @@ float Driver::getAccel()
 
 		if (pit->getInPit() && car->_brakeCmd == 0.0f)
 		{
-			float s = pit->toSplineCoord( car->_distFromStartLine );
+			//float s = pit->toSplineCoord( car->_distFromStartLine );
 	
 #if 0
 			if (pit->needPitstop())
@@ -1376,7 +1376,7 @@ float Driver::getSteer(tSituation *s)
 
 		bool yr_ok = (fabs(car->_yaw_rate) < 0.1 || (car->_yaw_rate > rldata->rInverse*100-0.1 && car->_yaw_rate < rldata->rInverse*100+0.1));
 		bool angle_ok = (angle > rldata->rlangle-0.06 && angle < rldata->rlangle+0.06);
-		double rlsteer = (fabs(rldata->rInverse) >= 0.004 ? rldata->rInverse * 12 : 0.0);
+		//double rlsteer = (fabs(rldata->rInverse) >= 0.004 ? rldata->rInverse * 12 : 0.0);
 		bool steer_ok = (racesteer<laststeer+0.05 && racesteer>laststeer-0.05);
 
 		double skid = (car->_skid[0] + car->_skid[1] + car->_skid[2] + car->_skid[3]) / 2;
@@ -1543,7 +1543,7 @@ double Driver::calcSteer( double targetAngle, int rl )
 	if (fabs(nextangle) > fabs(speedangle))
 	{
 		// steer into the skid
-		double sa = MAX(-0.3, MIN(0.3, speedangle/3));
+		//double sa = MAX(-0.3, MIN(0.3, speedangle/3));
 		//double anglediff = (sa - angle) * (0.3 + fabs(angle)/6);
 		double anglediff = (speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
 		steer += (float) (anglediff*SkidSteer);
@@ -1647,7 +1647,7 @@ float Driver::correctSteering( float avoidsteer, float racesteer )
 		return avoidsteer;
 
 	float steer = avoidsteer;
-	float accel = MIN(0.0f, car->_accel_x);
+	//float accel = MIN(0.0f, car->_accel_x);
 	double speed = 50.0; //MAX(50.0, currentspeed);
 	double changelimit = MIN(raceline->correctLimit(avoidsteer, racesteer), (((120.0-currentspeed)/6000) * (0.1 + fabs(rldata->mInverse/4)))) * SmoothSteer;
 
@@ -2023,7 +2023,7 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
 	// all the BT code below is for steering into pits only.
 	s.x = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x)/2;
 	s.y = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y)/2;
-	double dx, dy;
+	//double dx, dy;
 	vec2f t, rt;
 
 	if ( seg->type == TR_STR) {
@@ -2059,9 +2059,9 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 	if (!o) return false;
 
 #if 1
-	int segid = car->_trkPos.seg->id;
+	//int segid = car->_trkPos.seg->id;
 	tCarElt *ocar = o->getCarPtr();
-	int osegid = ocar->_trkPos.seg->id;
+	//int osegid = ocar->_trkPos.seg->id;
 	double otry_factor = (lenient ? (0.2 + MAX(0.0, 1.0 - ((simtime-frontavoidtime)/7.0)) * 0.8) : 1.0);
 	double overtakecaution = MAX(0.0, rldata->overtakecaution + (outside ? MIN(0.0, car->_accel_x/8) : 0.0)) - driver_aggression/2;
 	double orInv=0.0, oAspeed=0.0;
@@ -2166,7 +2166,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
 float Driver::getOffset()
 {
 	int i, avoidmovt = 0;
-	double catchdist, mincatchdist = MAX(100.0, car->_speed_x * 5), mindist = -1000.0;
+	double /*catchdist,*/ mincatchdist = MAX(100.0, car->_speed_x * 5), mindist = -1000.0;
 	Opponent *o = NULL;
 	double lane2left = rldata->lane * car->_trkPos.seg->width;
 	double lane2right = car->_trkPos.seg->width-lane2left;
@@ -2179,7 +2179,7 @@ float Driver::getOffset()
 	// Increment speed dependent.
 	//double incspeed = MIN(40.0, MAX(30.0, currentspeed));
 	//double incfactor = (MAX_INC_FACTOR*0.5 - MIN(incspeed/10, MAX_INC_FACTOR*0.5-0.5)) * 60 * IncFactor;
-	double incspeed = MIN(60.0, MAX(40.0, currentspeed)) - 10.0;
+	//double incspeed = MIN(60.0, MAX(40.0, currentspeed)) - 10.0;
 	//double incfactor = (MAX_INC_FACTOR - MIN(fabs(incspeed)/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * IncFactor;
 	double incfactor = (MAX_INC_FACTOR - MIN(40.0/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * IncFactor;
 
@@ -2204,7 +2204,7 @@ float Driver::getOffset()
 
 	double moffset = car->_trkPos.toMiddle;
 
-	double origoffset = moffset;
+	//double origoffset = moffset;
 
 	double Width = car->_trkPos.seg->width;
 #if 1
@@ -2235,8 +2235,8 @@ float Driver::getOffset()
 	{
 		// reduce amount we deviate from the raceline according to how long we've been avoiding, and also
 		// how fast we're going.
-		double dspeed = MAX(0.0, rldata->speed - currentspeed) * 4;
-		double pspeed = MAX(1.0, 60.0 - (currentspeed - (30.0 + MAX(0.0, car->_accel_x) + dspeed))) / 10;
+		//double dspeed = MAX(0.0, rldata->speed - currentspeed) * 4;
+		//double pspeed = MAX(1.0, 60.0 - (currentspeed - (30.0 + MAX(0.0, car->_accel_x) + dspeed))) / 10;
 
 		// instead of toMiddle just aiming at where the car currently is, we move it in the direction 
 		// the car's travelling ... but less so if the speedangle is different from the car's angle.
@@ -2524,13 +2524,13 @@ fprintf(stderr,"%s -> %s CANCEL 1 (%.1f > %.1f || %.1f < %.1f || %.3f > %.3f)\n"
 			tCarElt *ocar = o->getCarPtr();
 
 			// Compute the width around the middle which we can use for overtaking.
-			float w = ocar->_trkPos.seg->width/WIDTHDIV-BORDER_OVERTAKE_MARGIN;
+			//float w = ocar->_trkPos.seg->width/WIDTHDIV-BORDER_OVERTAKE_MARGIN;
 			// Compute the opponents distance to the middle.
-			float otm = ocar->_trkPos.toMiddle;
+			//float otm = ocar->_trkPos.toMiddle;
 			// Define the with of the middle range.
-			float wm = ocar->_trkPos.seg->width*CENTERDIV;
+			//float wm = ocar->_trkPos.seg->width*CENTERDIV;
 			float sidedist = fabs(car->_trkPos.toMiddle-ocar->_trkPos.toMiddle);
-			double sdist = (rInverse > 0.0 ? (-sidedist - 3.0) : (sidedist - 3.0));
+			//double sdist = (rInverse > 0.0 ? (-sidedist - 3.0) : (sidedist - 3.0));
 
 			//int avoidingside = (otm > wm && myoffset > -w) ? TR_RGT : ((otm < -wm && myoffset < w) ? TR_LFT : TR_STR);
 			int avoidingside = (car->_trkPos.toLeft > ocar->_trkPos.toLeft ? TR_LFT : TR_RGT);
@@ -2878,7 +2878,7 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
 		double factor = 0.25;//(fabs(car->_trkPos.toMiddle) < car->_trkPos.seg->width/2 + 2.0 ? 0.25 : 1.0);
 		if (fabs(myoffset) > fabs(rldata->offset))
 		{
-			double inc = OVERTAKE_OFFSET_INC * MIN(lftinc, rgtinc) * factor;
+			//double inc = OVERTAKE_OFFSET_INC * MIN(lftinc, rgtinc) * factor;
 			if (myoffset < rldata->offset && myoffset < 2.0)
 				myoffset += (float) (MIN(rldata->offset-myoffset, OVERTAKE_OFFSET_INC * rgtinc/3 * factor));
 			else if (myoffset > rldata->offset && myoffset > 2.0)
@@ -3060,7 +3060,7 @@ void Driver::update(tSituation *s)
 
 			for (int i=0; i<opponents->getNOpponents(); i++)
 			{
-				int idx = opponent[i].getIndex();
+				//int idx = opponent[i].getIndex();
 				if (opponent[i].getTeam() != TEAM_FRIEND) continue;
 				if (opponent[i].getCarPtr() == car) continue;
 				if (opponent[i].getCarPtr()->_state > RM_CAR_STATE_PIT)
@@ -3449,7 +3449,7 @@ void Driver::initWheelPos()
 {
  for (int i=0; i<4; i++)
  {
-  char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+  char const *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
   float rh = 0.0;
   rh = GfParmGetNum(car->_carHandle,WheelSect[i],PRM_RIDEHEIGHT,(char *)NULL, 0.10f);
   wheelz[i] = (-rh / 1.0 + car->info.wheel[i].wheelRadius) - 0.01;
@@ -3458,7 +3458,7 @@ void Driver::initWheelPos()
 
 void Driver::initCa()
 {
-	char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+	char const *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 	float rearwingarea = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGAREA, (char*) NULL, 0.0f);
 	float rearwingangle = GfParmGetNum(car->_carHandle, SECT_REARWING, PRM_WINGANGLE, (char*) NULL, 0.0f);
 	float wingca = 1.23f*rearwingarea*sin(rearwingangle);
@@ -3486,7 +3486,7 @@ void Driver::initCw()
 // Init the friction coefficient of the the tires.
 void Driver::initTireMu()
 {
-	char *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
+	char const *WheelSect[4] = {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 	float tm = FLT_MAX;
 	int i;
 
@@ -3616,7 +3616,7 @@ float Driver::filterABS(float brake)
 {
 	if (car->_speed_x < ABS_MINSPEED) return brake;
 	float origbrake = brake;
-	float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
+	//float rearskid = MAX(0.0f, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
 	int i;
 	float slip = 0.0f;
 	for (i = 0; i < 4; i++) {

@@ -107,7 +107,7 @@ static const int MAXNBBOTS = MAX_NBBOTS;         // Number of drivers/robots
 static const int BUFSIZE = 256;
 
 // Default driver names
-static char* defaultBotName[MAXNBBOTS] = {
+static char const* defaultBotName[MAXNBBOTS] = {
 	"driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
 	"driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10", 
 	"driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
@@ -115,7 +115,7 @@ static char* defaultBotName[MAXNBBOTS] = {
 };
 
 // Default driver descriptions
-static char* defaultBotDesc[MAXNBBOTS] = {
+static char const* defaultBotDesc[MAXNBBOTS] = {
 	"driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
 	"driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10", 
 	"driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
@@ -161,7 +161,7 @@ char undefined[] = "undefined";
 //  Robot of this modul
 //  Roboter des Moduls
 //--------------------------------------------------------------------------*
-static char** BotDesc = defaultBotDesc;
+static char const** BotDesc = defaultBotDesc;
 
 static TDriver *cRobot[MAXNBBOTS];
 static TCommonData gCommonData;
@@ -211,7 +211,7 @@ void* GetFileHandle(const char* RobotName)
 //==========================================================================*
 // Set parameters 
 //--------------------------------------------------------------------------*
-void SetParameters(int N, char* DefaultCarType)
+void SetParameters(int N, char const* DefaultCarType)
 {
   NBBOTS = N;
   TDriver::NBBOTS = N;                                    // Used nbr of cars

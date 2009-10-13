@@ -47,14 +47,14 @@ static void endRace(int index, tCarElt *car, tSituation *s);
 // TORCS-NG-Interface
 static const int BUFSIZE = 256;  // Buffer size for path/filename buffers
 static const int MAXNBBOTS = 20; // Set value to max capacity you want to use here
-static char* defaultBotName[MAXNBBOTS] = {
+static char const* defaultBotName[MAXNBBOTS] = {
 	"driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
 	"driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10", 
 	"driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
 	"driver 16", "driver 17", "driver 18", "driver 19", "driver 20" 
 };
 
-static char* defaultBotDesc[MAXNBBOTS] = {
+static char const* defaultBotDesc[MAXNBBOTS] = {
 	"driver 1",  "driver 2",  "driver 3",  "driver 4",  "driver 5",
 	"driver 6",  "driver 7",  "driver 8",  "driver 9",  "driver 10", 
 	"driver 11", "driver 12", "driver 13", "driver 14", "driver 15",
@@ -96,7 +96,7 @@ void SetUpUSR_trb1()
 // Set robots's name and xml file pathname
 static void setRobotName(const char *name)
 {
-	char* c;
+	//char* c;
 
 	strcpy(nameBuffer, name);
 	snprintf(pathBuffer, BUFSIZE, "drivers/%s/%s.xml", name, name);

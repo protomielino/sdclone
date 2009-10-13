@@ -81,10 +81,10 @@
 //--------------------------------------------------------------------------*
 int TDriver::NBBOTS = MAX_NBBOTS;                  // Nbr of drivers/robots
 double TDriver::CurrSimTime = 0;                   // Current simulation time
-char* TDriver::MyBotName = "simplix";              // Name of this bot
-char* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
-char* TDriver::SECT_PRIV = "simplix private";      // Private section
-char* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
+char const* TDriver::MyBotName = "simplix";              // Name of this bot
+char const* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
+char const* TDriver::SECT_PRIV = "simplix private";      // Private section
+char const* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
@@ -97,10 +97,10 @@ float TDriver::SpeedLimitScale = 25;               // Speed limit scale
 
 double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
-static char *WheelSect[4] =                        // TORCS defined sections
+static char const *WheelSect[4] =                        // TORCS defined sections
 {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
-static double (TDriver::*CalcCrv)(double Crv);
+//static double (TDriver::*CalcCrv)(double Crv);
 
 //static double cTimeSum[7] = {0,0,0,0,0,0,0};
 //==========================================================================*
@@ -431,11 +431,11 @@ void TDriver::InitTrack
   oSkillGlobal = oSkill = oDecelAdjustPerc = oDriverAggression = 0.0;
 
   // Initialize race type array
-  char* RaceType[] =
+  char const* RaceType[] =
     {"practice", "qualify", "race"};
 
   // Initialize the base param path
-  char* BaseParamPath = TDriver::ROBOT_DIR;
+  char const* BaseParamPath = TDriver::ROBOT_DIR;
   char* PathFilename = PathFilenameBuffer;
 
   // Global skilling from Andrew Sumner ...
@@ -490,7 +490,7 @@ void TDriver::InitTrack
     }
 
     // Get individual skilling
-    int SkillEnabled = 0;
+    //int SkillEnabled = 0;
     snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
       BaseParamPath,oIndex);
 	GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
@@ -1075,7 +1075,7 @@ void TDriver::Drive()
   oAccel = 1.0;                                  // Assume full throttle
   oBrake = 0.0;                                  // Assume no braking
 
-  double StartTimeStamp = RtTimeStamp(); 
+  //double StartTimeStamp = RtTimeStamp(); 
 
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track
 

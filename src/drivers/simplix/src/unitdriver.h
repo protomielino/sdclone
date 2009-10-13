@@ -387,10 +387,10 @@ private:
 
 	static int NBBOTS;                           // Nbr of cars
     static double CurrSimTime;                   // Current simulation time
-	static char* MyBotName;                      // Name of this bot 
-	static char* ROBOT_DIR;                      // Sub path to dll
-	static char* SECT_PRIV;                      // Private section
-	static char* DEFAULTCARTYPE;                 // Default car type
+	static char const* MyBotName;                      // Name of this bot 
+	static char const* ROBOT_DIR;                      // Sub path to dll
+	static char const* SECT_PRIV;                      // Private section
+	static char const* DEFAULTCARTYPE;                 // Default car type
 
 	static bool AdvancedParameters;
     static bool UseOldSkilling;

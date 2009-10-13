@@ -380,7 +380,7 @@ double TFixCarParam::CalcMaxSpeed
     if (oStrategy->OutOfPitlane())
       factor *= 1.0 - MAX(0.0,TDriver::SpeedLimitScale * (AbsCrv - TDriver::SpeedLimitBase));
   }
-/**/
+*//**/
   double Den;
 
   double ScaleBump;

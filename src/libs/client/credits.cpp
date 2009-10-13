@@ -82,7 +82,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 {
     static const unsigned maxBufSize = 256;
     static char	buf[maxBufSize];
-    static char	bufColInd[4];
+    //static char	bufColInd[4];
 
     static float colNameColor[4] = {1.0, 0.0, 1.0, 1.0};
 

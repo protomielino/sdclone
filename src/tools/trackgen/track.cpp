@@ -204,7 +204,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
     int 		i, j;
     tTrackSeg 		*seg;
-    tTrackSeg 		*lastSeg;
+    tTrackSeg 		*lastSeg = NULL;
     tTrackSeg 		*mseg;
     int 		nbvert;
     tdble 		width, wi2;
@@ -244,7 +244,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     int			hasBorder;
     tDispElt		*theCurDispElt = NULL;
     char		sname[256];
-	float		dmax = 0;
+	//float		dmax = 0;
 
 #define	LG_STEP_MAX	50.0
 

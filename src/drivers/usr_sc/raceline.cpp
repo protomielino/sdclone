@@ -32,7 +32,7 @@
 // Structures and Statics
 ////////////////////////////////////////////////////////////////////////////
 
-static SRaceLine SRL[5] = { 0 };
+static SRaceLine SRL[5] = { { 0 } };
 static int SRLinit = 0;
 
 ////////////////////////////////////////////////////////////////////////////
@@ -45,8 +45,8 @@ static int SRLinit = 0;
 //static const int Iterations = 100;     // Number of smoothing operations
  
 static const double SecurityR = 100.0; // Security radius
-static double SideDistExt = 2.0; // Security distance wrt outside
-static double SideDistInt = 1.0; // Security distance wrt inside          
+//static double SideDistExt = 2.0; // Security distance wrt outside
+//static double SideDistInt = 1.0; // Security distance wrt inside          
 
 /////////////////////////////////////////////////////////////////////////////
 // Some utility macros and functions
@@ -865,7 +865,7 @@ void LRaceLine::StepInterpolate(int iMin, int iMax, int Step, int rl)
  }
 }
  
-static void ClosestPointOnLineFromPoint(
+/*static void ClosestPointOnLineFromPoint(
   vec2f *lp1, vec2f *lp2,
   vec2f *p,   vec2f *r )
 {
@@ -880,7 +880,7 @@ static void ClosestPointOnLineFromPoint(
 
   r->x = lp1->x + ratio * vx;
   r->y = lp1->y + ratio * vy;
-}
+}*/
 
 static double PointDist(vec2f *p1, vec2f *p2)
 {
@@ -1077,8 +1077,8 @@ void LRaceLine::ComputeSpeed(int rl)
   }
 
   int nnext = (i + 5) % Divs;
-  int next = (i + 1) % Divs;
-  int prev = (i - 1 + Divs) % Divs;
+  //int next = (i + 1) % Divs;
+  //int prev = (i - 1 + Divs) % Divs;
  
   double rInverse = SRL[rl].tRInverse[i];
   double rI = fabs(rInverse);
@@ -1437,8 +1437,8 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
   dist *= car->_trkPos.seg->radius;
  int next = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
  dist = 0.0;
- double txLast = car->_pos_X;
- double tyLast = car->_pos_Y;
+ //double txLast = car->_pos_X;
+ //double tyLast = car->_pos_Y;
  double Time = deltaTime*3 + MAX(0.0, time);
 
  {
@@ -1476,7 +1476,7 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
 
  int maxcount = int(lookahead / DivLength + 1);
  int count = 0;
- tTrackSeg *seg = car->_trkPos.seg;
+ //tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;
  double dist = 0.0;//car->_trkPos.toStart;
 #if 0
@@ -1487,8 +1487,8 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
 #endif
  int next = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
  dist = 0.0;
- double txLast = car->_pos_X;
- double tyLast = car->_pos_Y;
+ //double txLast = car->_pos_X;
+ //double tyLast = car->_pos_Y;
  double Time = deltaTime*3 + MAX(0.0, time/2);
  double carspeed = Mag(car->_speed_X, car->_speed_Y);
  double offlane = (offset > -90 ? ((track->width/2) - offset) / track->width : SRL[SRLidx].tLane[next]);
@@ -1587,8 +1587,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   if (famI > 0.0)
   {
    double toMid = car->_trkPos.toMiddle + data->speedangle * 20;
-   double toLeft = car->_trkPos.toLeft - data->speedangle * 20;
-   double toRight = car->_trkPos.toRight + data->speedangle * 20;
+   //double toLeft = car->_trkPos.toLeft - data->speedangle * 20;
+   //double toRight = car->_trkPos.toRight + data->speedangle * 20;
    double modfactor = (car->_speed_x / data->avspeed);
    modfactor *= modfactor;
 
@@ -1612,12 +1612,12 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  //if (data->collision)
  //  timefactor *= 1.0 + MAX(0.0, (5.0-data->collision) / 5.0);
  double Time = timefactor; // + CornerAccel/80;
- double X4 = car->_pos_X + car->_speed_X * 0.5 / 2;
- double Y4 = car->_pos_Y + car->_speed_Y * 0.5 / 2;
+ //double X4 = car->_pos_X + car->_speed_X * 0.5 / 2;
+ //double Y4 = car->_pos_Y + car->_speed_Y * 0.5 / 2;
  double X = car->_pos_X + car->_speed_X * Time / 2;
  double Y = car->_pos_Y + car->_speed_Y * Time / 2;
- double Xk = car->_pos_X + car->_speed_X * 0.1 / 2;
- double Yk = car->_pos_Y + car->_speed_Y * 0.1 / 2;
+ //double Xk = car->_pos_X + car->_speed_X * 0.1 / 2;
+ //double Yk = car->_pos_Y + car->_speed_Y * 0.1 / 2;
  data->lookahead = 0.0f;
  data->aInverse = SRL[LINE_MID].tRInverse[Index];
  double divcount = 1.0;
@@ -1647,7 +1647,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
  if (data->followdist <= 5.0)
  {
-  int snext = SNext;
+  //int snext = SNext;
   //Next = (Next + int((car->_dimension_x + (5.0 - data->followdist)*1.2) / DivLength)) % Divs;
   SNext = (Next + int((car->_dimension_x + (5.0 - data->followdist)*6) / DivLength)) % Divs;
   if (car->_accel_x > 0.0 && data->followdist <= 2.0)
@@ -1741,7 +1741,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  data->offset = laneoffset;
 //fprintf(stderr,"GetRLData: offset=%.2f Next=%d lane=%.4f Width=%.2f\n",laneoffset,Next,tLane[Next],Width);
 
- double sa = (data->angle > 0.0 ? MIN(data->angle, data->angle+data->speedangle/2) : MAX(data->angle, data->angle+data->speedangle/2));
+ //double sa = (data->angle > 0.0 ? MIN(data->angle, data->angle+data->speedangle/2) : MAX(data->angle, data->angle+data->speedangle/2));
  //CalcAvoidSpeed( Next, data, sa );
 
 #if 1
@@ -1826,7 +1826,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   vec2f target;
   double carspeed = Mag(car->_speed_X, car->_speed_Y);
   double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
-  double lane2left = track->width * SRL[SRLidx].tLane[Next];
+  //double lane2left = track->width * SRL[SRLidx].tLane[Next];
 
   // an idea to implement soon...
   //if (car->_accel_x < 0.0)
@@ -1846,7 +1846,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
   if (fabs(nextangle) > fabs(data->speedangle))
   {
-    double sa = MAX(-0.3, MIN(0.3, data->speedangle/3));
+    //double sa = MAX(-0.3, MIN(0.3, data->speedangle/3));
    double anglediff = (data->speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
    k1999steer += anglediff * (1.0 + MAX(1.0, 1.0 - car->_accel_x/5));
   }
@@ -1856,8 +1856,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   double dx = SRL[SRLidx].tx[NextNext] - SRL[SRLidx].tx[Prev];
   double dy = SRL[SRLidx].ty[NextNext] - SRL[SRLidx].ty[Prev];
 
-  double vx = car->_speed_X;
-  double vy = car->_speed_Y;
+  //double vx = car->_speed_X;
+  //double vy = car->_speed_Y;
   double dirx = cos(car->_yaw);
   double diry = sin(car->_yaw);
   double SinAngleError = dx * diry - dy * dirx;
@@ -1951,7 +1951,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
    data->NSsteer = lastNksteer = k1999steer;
    int Prev = (KIndex + Divs - 1) % Divs;
-   int PrevPrev = (KIndex + Divs - 5) % Divs;
+   //int PrevPrev = (KIndex + Divs - 5) % Divs;
    int NextNext = (KNext + 1) % Divs;
 
    //
@@ -2103,7 +2103,7 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
  double steertime = MIN(MaxSteerTime, MinSteerTime + MAX(0.0, carspeed-20.0)/30.0);
  if (data->followdist < 5.0)
 	 steertime = MIN(MaxSteerTime*1.1, steertime * 1.0 + (5.0 - data->followdist)/20);
- double lane2left = track->width * SRL[SRLidx].tLane[Next];
+ //double lane2left = track->width * SRL[SRLidx].tLane[Next];
 
  double amI = MIN(0.05, MAX(-0.05, SRL[SRLidx].tRInverse[Next]));
  double famI = fabs(amI);
@@ -2151,7 +2151,7 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
 
  if (fabs(nextangle) > fabs(data->speedangle))
  {
-  double sa = MAX(-0.3, MIN(0.3, data->speedangle/3));
+  //double sa = MAX(-0.3, MIN(0.3, data->speedangle/3));
   double anglediff = (data->speedangle - nextangle) * (0.1 + fabs(nextangle)/6);
   steer += anglediff * (1.0 + MAX(1.0, 1.0 - car->_accel_x/5));
  }
@@ -2175,7 +2175,7 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
  double offlane = ((track->width/2) - offset) / track->width;
  double off2lft = track->width/2 - offset;
  double off2rgt = track->width - off2lft;
- tTrackSeg *seg = car->_trkPos.seg;
+ //tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;
  double dist = car->_trkPos.toStart;
  if (dist < 0)
@@ -2183,7 +2183,7 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
  if (car->_trkPos.seg->type != TR_STR)
   dist *= car->_trkPos.seg->radius;
  int Index = SRL[SRLidx].tSegIndex[SegId] + int(dist / SRL[SRLidx].tElemLength[SegId]);
- double laneoffset = SRL[SRLidx].Width/2 - (SRL[SRLidx].tLane[Index] * SRL[SRLidx].Width);
+ //double laneoffset = SRL[SRLidx].Width/2 - (SRL[SRLidx].tLane[Index] * SRL[SRLidx].Width);
  double rInv = SRL[LINE_MID].tRInverse[Index];
  Index = This; 
 #if 1
@@ -2216,8 +2216,8 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
   next = (Index + 1) % Divs;
   txNext = offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next];
   tyNext = offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next];
-  double dx = txNext - car->_pos_X;
-  double dy = tyNext - car->_pos_Y;
+  //double dx = txNext - car->_pos_X;
+  //double dy = tyNext - car->_pos_Y;
   if ((txNext - txIndex) * (X - txNext) +
       (tyNext - tyIndex) * (Y - tyNext) < -0.1)
   {
@@ -2248,12 +2248,12 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 
 int LRaceLine::findNextCorner( double *nextCRinverse )
 {
- tTrackSeg *seg = car->_trkPos.seg;;
+ //tTrackSeg *seg = car->_trkPos.seg;;
  int prefer_side = ((SRL[SRLidx].tRInverse[Next] > 0.001) ? TR_LFT : 
                     ((SRL[SRLidx].tRInverse[Next]) < -0.001 ? TR_RGT : TR_STR));
- double curlane = car->_trkPos.toLeft / track->width;
- int next = (Next+5) % Divs, i = 1, div;
- double distance = 0.0;
+ //double curlane = car->_trkPos.toLeft / track->width;
+ int /*next = (Next+5) % Divs,*/ i = 1, div;
+ //double distance = 0.0;
  double CR = SRL[SRLidx].tRInverse[Next];
 
  if (car->_speed_x < 5.0)
@@ -2297,7 +2297,7 @@ int LRaceLine::findNextCorner( double *nextCRinverse )
 
 double LRaceLine::correctLimit(double avoidsteer, double racesteer)
 {
- double nlane2left = SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width;
+ //double nlane2left = SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width;
  double tbump = BumpCaution;//GetModD( tBump, This ) * 4;
 
  // correct would take us in the opposite direction to a corner - correct less!
@@ -2307,7 +2307,7 @@ double LRaceLine::correctLimit(double avoidsteer, double racesteer)
 
  // correct would take us in the opposite direction to a corner - correct less (but not as much as above)
  int nnext = (Next + (int) (car->_speed_x/3)) % Divs;
- double nnlane2left = SRL[SRLidx].tLane[nnext] * SRL[SRLidx].Width;
+ //double nnlane2left = SRL[SRLidx].tLane[nnext] * SRL[SRLidx].Width;
  if ((SRL[SRLidx].tRInverse[nnext] > 0.001 && avoidsteer > racesteer) ||
      (SRL[SRLidx].tRInverse[nnext] < -0.001 && avoidsteer < racesteer))
   return MAX(0.3, MIN(1.0, 1.0 - fabs(SRL[SRLidx].tRInverse[nnext]) * 40.0 - tbump));

@@ -485,7 +485,7 @@ bool TOpponent::Classify(
 		  double T =
 			(fabs(OpState.CarDistLat) - OpState.MinDistLat) / fabs(OpState.CarDiffVelLat);
 
-		  double CollX = OpState.CarDiffVelLong * T - OpState.CarDistLong;
+		  //double CollX = OpState.CarDiffVelLong * T - OpState.CarDistLong;
 
 //		  if ((CollX > AheadDist)
 //			&& (CollX < OpState.MinDistLong))

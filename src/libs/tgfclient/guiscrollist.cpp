@@ -483,7 +483,7 @@ void GfuiScrollListShowElement(void *scr, int Id, int index)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
+    //tGfuiListElement	*elt;
     int			oldFirstVisible;
     
     object = gfuiGetObject(scr, Id);

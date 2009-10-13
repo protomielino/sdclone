@@ -35,12 +35,12 @@ SimpleStrategy::SimpleStrategy() :
 	m_lastfuel(0.0f),
 	m_expectedfuelperlap(0.0f),
 	m_fuelsum(0.0f),
+	PitDamage(5000),
 	pit_damage(0),
 	min_damage(0),
 	is_pitting(0),
 	remainlaps(0),
 	pit_reason(0),
-	PitDamage(5000),
 	track(NULL)
 {
 #ifdef SPEED_DREAMS
@@ -178,7 +178,7 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 {
  // Do we need to refuel?
  int remainlaps = car->_remainingLaps;//-car->_lapsBehindLeader;
- int this_pit_dammage = PitDamage;
+ //int this_pit_dammage = PitDamage;
 
  if (!car->_pit)
   return false;

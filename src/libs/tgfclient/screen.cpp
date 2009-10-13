@@ -969,7 +969,7 @@ GfScrMenuInit(void *precMenu)
 
 
 
-int GfuiGlutExtensionSupported(char *str)
+int GfuiGlutExtensionSupported(char const *str)
 {
     return glutExtensionSupported(str);
 }

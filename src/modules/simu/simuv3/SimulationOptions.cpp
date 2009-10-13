@@ -76,14 +76,14 @@ void SimulationOptions::LoadFromFile(void* handle) {
 }
 
 void SimulationOptions::SetFloatFromGfParm(void* handle, const char* name) {
-    float v;
+    float v = 0.0f;
     option_list.Get(name, v);
     v = GfParmGetNum (handle, SECT_SIMU_SETTINGS, name, (char*) NULL, v);
     option_list.Set(name, v);
 }
 
 void SimulationOptions::SetBoolFromGfParm(void* handle, const char* name) {
-    bool v;
+    bool v = false;
     option_list.Get(name, v);
     const char* s = GfParmGetStr (handle, SECT_SIMU_SETTINGS, name, "none");
     v = StrToBool (s, v);
