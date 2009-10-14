@@ -54,7 +54,6 @@ static char	path[1024];
 static int iStart = 0;
 static double iTimer = 0.0;
 static int iStringStart = 0;
-static int iRaceLaps = -1;
 static string st;	//This is the line we will display in the bottom
 	
 
@@ -804,7 +803,6 @@ cGrBoard::shutdown(void)
 	iStart = 0;
 	iTimer = 0.0;
 	iStringStart = 0;
-	iRaceLaps = -1;
 }
 
 void
@@ -1184,19 +1182,17 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 	//Are we at the end of the scrolled string? If yes, let's regenerate it
 	if(st.empty() || (iStringStart == (int)st.size())) {
 		st.clear();
-		//Let's regenerate the roster.
-		//The roster holds the driver's position, name and difference
-		//*at the time* the leader starts a new lap.
-		//So it can happen it is somewhat mixed up, it will settle down
-		//in the next lap.
-		if(s->cars[0]->race.laps > iRaceLaps)
-			iRaceLaps++;
+		/*!The roster holds the driver's position, name and difference
+		 * *at the time* the leader starts a new lap.
+		 * So it can happen it is somewhat mixed up, it will settle down
+		 * in the next lap.
+		*/ 
 		
 		ostringstream osRoster;
 		//Add the track name as separator, embedded with 3 spaces each side.
 		osRoster << "   " << grTrack->name << "   ";
 		//Add # of laps
-		osRoster << "Lap " << iRaceLaps << " | ";
+		osRoster << "Lap " << s->cars[0]->race.laps << " | ";
 		for(int i = 0; i < s->_ncars; i++) {
 			//Driver position + name
 			osRoster.width(3);
