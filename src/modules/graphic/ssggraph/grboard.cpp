@@ -1130,7 +1130,7 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 }//grDispLeaderBoardScroll
 
 
-#define LEADERBOARD_LINE_SCROLL_TIME 0.1
+#define LEADERBOARD_LINE_SCROLL_TIME 0.07
 /** 
  * grDispLeaderBoardScrollLine
  * 
@@ -1142,12 +1142,19 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 void
 cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 {
-	//Scrolling
-	if(iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0) grMakeThreeLetterNames(s);
-	if(iTimer == 0 || s->currentTime < iTimer) iTimer = s->currentTime;
+	//At the start of the race or when first engaging this mode,
+	//we generate the 3-letter names to be used
+	if(iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0)
+		grMakeThreeLetterNames(s);
+	
+	//At first, get the current time
+	if(iTimer == 0 || s->currentTime < iTimer)
+		iTimer = s->currentTime;
+		
+	//Scrolling needed?
 	if(s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME) {
-		//When in initial position, show it fixed (no scroll) for 3 secs.
-		if((iStringStart == 0 && s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME * 15)
+		//When in initial position, show it fixed (no scroll) for some secs.
+		if((iStringStart == 0 && s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME * 20)
 			|| (iStringStart > 0)) {
 				iTimer = s->currentTime;
 				++iStringStart;
@@ -1174,29 +1181,27 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 	glEnd();
 	glDisable(GL_BLEND);
 
-	//Add the track name as separator, embedded with 3 spaces each side.
-	ostringstream osSep;
-	osSep << "   " << grTrack->name << "   ";
-
-	//Another lap gone by?
-	if(s->cars[0]->race.laps > iRaceLaps) {
+	//Are we at the end of the scrolled string? If yes, let's regenerate it
+	if(st.empty() || (iStringStart == (int)st.size())) {
+		st.clear();
 		//Let's regenerate the roster.
 		//The roster holds the driver's position, name and difference
 		//*at the time* the leader starts a new lap.
 		//So it can happen it is somewhat mixed up, it will settle down
 		//in the next lap.
-		iRaceLaps++;
+		if(s->cars[0]->race.laps > iRaceLaps)
+			iRaceLaps++;
 		
-		char buf[256];
-		string roster;
-
-		sprintf(buf, "Lap %d | ", iRaceLaps);
-		roster.append(buf);
-
+		ostringstream osRoster;
+		//Add the track name as separator, embedded with 3 spaces each side.
+		osRoster << "   " << grTrack->name << "   ";
+		//Add # of laps
+		osRoster << "Lap " << iRaceLaps << " | ";
 		for(int i = 0; i < s->_ncars; i++) {
 			//Driver position + name
-			sprintf(buf, "%3d: %s", i + 1, sShortNames[i].c_str());
-			roster.append(buf);
+			osRoster.width(3);
+			osRoster << (i + 1);
+			osRoster << ": " << sShortNames[i];
 
       //Display driver time / time behind leader / laps behind leader
 			string sEntry = grGenerateLeaderBoardEntry(s->cars[i], s, (i==0));
@@ -1204,26 +1209,17 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 			//get rid of leading spaces
 			size_t iCut = sEntry.find_first_not_of(' ');
 			if(iCut != string::npos && iCut != 0) {
-					sEntry = sEntry.substr(iCut - 1);
+				sEntry = sEntry.substr(iCut - 1);
 			}//if iCut
 			//Add to roster, then separate it from next one
-			roster.append(sEntry);
-			roster.append("   ");
+			osRoster << sEntry << "   ";
 		}//for i
 
-		if(st.empty())
-			st.assign(osSep.str() + roster);
-		else {
-			st.append(osSep.str() + roster);
-			st = st.substr(iStringStart);	//Let's make sure the string won't grow big
-			iStringStart = 0;
-		}//TODO!!! It can happen garbage remains at the beginning of st.
-		//Somehow should get rid of it when it moves out of screen.
-	}//if race.laps
+		st.assign(osRoster.str());
+	}//if st.empty || iStringStart > size
 	
 	//Display the line
 	GfuiPrintString(st.c_str() + iStringStart, grWhite, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB);
-	//iStringStart = (iStringStart == st.size() ? 0 : iStringStart);
 	iStringStart = iStringStart % st.size();
 }//grDispLeaderBoardScrollLine
 
