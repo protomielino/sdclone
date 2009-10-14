@@ -29,6 +29,7 @@
 
 #include <iostream>
 #include <algorithm>	//remove
+#include <sstream>
 using namespace std;
 
 static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
@@ -1173,6 +1174,10 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 	glEnd();
 	glDisable(GL_BLEND);
 
+	//Add the track name as separator, embedded with 3 spaces each side.
+	ostringstream osSep;
+	osSep << "   " << grTrack->name << "   ";
+
 	//Another lap gone by?
 	if(s->cars[0]->race.laps > iRaceLaps) {
 		//Let's regenerate the roster.
@@ -1206,15 +1211,10 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 			roster.append("   ");
 		}//for i
 
-		//Add the track name as separator, embedded with 3 spaces each side.
-		string sep(grTrack->name);
-		sep.insert(sep.begin(), 3, ' ');
-		sep.insert(sep.end(), 3, ' ');
-	
 		if(st.empty())
-			st.assign(sep + roster);
+			st.assign(osSep.str() + roster);
 		else {
-			st.append(sep + roster);
+			st.append(osSep.str() + roster);
 			st = st.substr(iStringStart);	//Let's make sure the string won't grow big
 			iStringStart = 0;
 		}//TODO!!! It can happen garbage remains at the beginning of st.
