@@ -2,7 +2,7 @@
 // unitstrategy.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for TORCS-NG-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0
 //--------------------------------------------------------------------------*
 // Pitstop strategy
 // Boxenstop-Strategie

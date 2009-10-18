@@ -62,8 +62,8 @@ init_args(int argc, char **argv)
 	SetLibDir("");
     } else {
 	if (_fullpath(buf, argv[0], BUFSIZE) &&
-	    (strcmp(argv[0], "wtorcs") == 0 ||
-	     strcmp(argv[0], "wtorcs.exe") == 0)
+	    (strcmp(argv[0], "speed-dreams") == 0 ||
+	     strcmp(argv[0], "speed-dreams.exe") == 0)
 	   )
 	{
 	    end = strrchr(buf, '\\');
@@ -77,20 +77,13 @@ init_args(int argc, char **argv)
 	    SetDataDir(buf);
 	    SetLibDir("");
 	} else {
-	    printf("Run wtorcs.exe either from the GUI or from the directory which contains wtorcs.exe\n");
+	    printf("Run speed-dreams.exe either from the GUI or from the directory which contains speed-dreams.exe\n");
 	    exit(1);
 	}
     }
     
-    // Set LocalDir to the user settings dir for Torcs-NG 
+    // Set LocalDir to the user settings dir for Speed Dreams 
     // (in My documents, to give access to the user for advanced settings).
-    //snprintf(buf, BUFSIZE, "%s", getenv("USERPROFILE"));
-//#if (WINVER < 0x0600)
-//    if (SHGetSpecialFolderPath(0, buf, CSIDL_PERSONAL, 0))
-//#else
-//  How can we do that under Vista / 7 as CSIDL_PERSONAL is a virtual folder
-//  and SHGetSpecialFolderPath is told to fail in this case ?
-//#endif
     LPITEMIDLIST pidl;
     if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
 	&& SHGetPathFromIDList(pidl, buf))
@@ -115,7 +108,7 @@ init_args(int argc, char **argv)
  *    main
  *
  * Description
- *    Win32 entry point of TORCS
+ *    Win32 entry point of Speed Dreams
  *
  * Parameters
  *
@@ -135,9 +128,9 @@ main(int argc, char *argv[])
 
     GfScrInit(argc, argv);   /* init screen */
 
-    TorcsEntry();	     /* launch TORCS */
+    GameEntry();	     /* launch the game */
 
-    glutMainLoop();	     /* event loop of glut */
+    glutMainLoop();	     /* event loop of GLUT */
 
     return 0;	             /* just for the compiler, never reached */
 }

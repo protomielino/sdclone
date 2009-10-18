@@ -18,17 +18,17 @@
  ***************************************************************************/
  
  
-#ifndef _TORCS_H_
-#define _TORCS_H_
+#ifndef _CLIENT_H_
+#define _CLIENT_H_
 
 #if _WIN32
 #include <windows.h>
 #endif
 
 
-extern void TorcsEntry(void);
+extern void GameEntry(void);
 
-#endif /* _TORCS_H_ */ 
+#endif /* _CLIENT_H_ */ 
 
 
 

@@ -55,7 +55,7 @@ class Driver {
 		Driver(int index);
 		~Driver();
 
-		// Callback functions called from TORCS.
+		// Callback functions called from Speed Dreams / TORCS.
 		void initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituation *s);
 		void newRace(tCarElt* car, tSituation *s);
 		void drive(tSituation *s);

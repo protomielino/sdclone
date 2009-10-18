@@ -60,7 +60,7 @@ static void splashKey( unsigned char /* key */, int /* x */, int /* y */)
 	SplashDisplaying = 0;
 	glDeleteTextures(1, &s_texture);
 	s_texture = 0;
-	TorcsMainMenuRun();
+	MainMenuRun();
 }
 
 /*
@@ -85,7 +85,7 @@ static void splashTimer(int /* value */)
 		SplashDisplaying = 0;
 		glDeleteTextures(1, &s_texture);
 		s_texture = 0;
-		TorcsMainMenuRun();
+		MainMenuRun();
 	}
 }
 	
@@ -179,7 +179,7 @@ static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
 		SplashDisplaying = 0;
 		glDeleteTextures(1, &s_texture);
 		s_texture = 0;
-		TorcsMainMenuRun();
+		MainMenuRun();
 	}
 }
 

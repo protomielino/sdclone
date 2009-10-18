@@ -27,10 +27,10 @@
 
 /*
  * Function
- *	TorcsEntry
+ *	GameEntry
  *
  * Description
- *	entry point of TORCS
+ *	entry point of the game
  *
  * Parameters
  *	none
@@ -42,13 +42,13 @@
  *	
  */
 void
-TorcsEntry(void)
+GameEntry(void)
 {
     ssgInit();
 
     GfInitClient();
 
-    TorcsMainMenuInit();
+    MainMenuInit();
     
     SplashScreen();
 }

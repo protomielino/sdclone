@@ -527,7 +527,7 @@ CopyPlayer(void * /* dummy */)
 	gearChange = (*CurrPlayer)->gearChangeMode();
 
 	 // Get current player control settings.
-        TorcsControlGetSettings(PrefHdle, curPlayerIdx);
+        ControlGetSettings(PrefHdle, curPlayerIdx);
 
 	// Insert new player after current
         CurrPlayer = PlayersInfo.insert(CurrPlayer + 1, new tPlayerInfo(**CurrPlayer));
@@ -553,7 +553,7 @@ CopyPlayer(void * /* dummy */)
 	PutDrvSettings(newPlayerIdx);
 
 	// Set new player control settings (copy of previous current one's).
-	TorcsControlPutSettings(PrefHdle, newPlayerIdx, gearChange);
+	ControlPutSettings(PrefHdle, newPlayerIdx, gearChange);
 
 	// Update GUI.
         refreshEditVal();
@@ -618,7 +618,7 @@ ConfControls(void * /* dummy */ )
         ReloadValues = 0;
 
         curPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
-	GfuiScreenActivate(TorcsControlMenuInit(ScrHandle, PrefHdle, curPlayerIdx, (*CurrPlayer)->gearChangeMode()));
+	GfuiScreenActivate(ControlMenuInit(ScrHandle, PrefHdle, curPlayerIdx, (*CurrPlayer)->gearChangeMode()));
     }
 }
 
@@ -969,7 +969,7 @@ onActivate(void * /* dummy */)
 }
 
 void *
-TorcsDriverMenuInit(void *prevMenu)
+DriverMenuInit(void *prevMenu)
 {
     int		x, y, x2, x3, x4, dy;
     static int	firstTime = 1;

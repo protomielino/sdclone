@@ -20,7 +20,7 @@
 #ifndef _CREDITS_H_
 #define _CREDITS_H_
 
-extern void TorcsCreditsScreenActivate(void *retScrHdle);
+extern void CreditsScreenActivate(void *retScrHdle);
 
 
 #endif /* _CREDITS_H_ */ 

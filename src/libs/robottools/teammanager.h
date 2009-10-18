@@ -159,7 +159,7 @@ typedef struct tTeamPit
 	tTeamPit* Next;                              // Linked list of pits of this team for later use
 	tTeammate* Teammates;						 // Linked list of teammates of this pit
 	CarElt*	PitState;                            // Request for shared pit
-	tTrackOwnPit* Pit;                           // TORCS pit
+	tTrackOwnPit* Pit;                           // Game pit
 	int Count;                                   // Nbr of TeamPits in this list
 	char* Name;                                  // Name of the Teampit
 	                                             // <<< NEVER CHANGE THIS V1.X

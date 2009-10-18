@@ -7,9 +7,9 @@ LIBRARY
 SECTIONS .data READ WRITE
 
 EXPORTS
-	?TorcsEntry@@YAXXZ
-	TorcsExitMenuInit
-	TorcsMainExitMenuInit
+	?GameEntry@@YAXXZ
+	ExitMenuInit
+	MainExitMenuInit
 	RmTrackSelect
 	RmGetTrackName
 	RmDriversSelect

@@ -44,7 +44,7 @@ static void shutdown(int index);
 static int InitFuncPt(int index, void *pt);
 static void endRace(int index, tCarElt *car, tSituation *s);
 
-// TORCS-NG-Interface
+// Speed Dreams-Interface
 static const int BUFSIZE = 256;  // Buffer size for path/filename buffers
 static const int MAXNBBOTS = 20; // Set value to max capacity you want to use here
 static char const* defaultBotName[MAXNBBOTS] = {

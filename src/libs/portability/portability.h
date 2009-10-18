@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _TORCS_PORTABILITY_H_
-#define _TORCS_PORTABILITY_H_
+#ifndef _SD_PORTABILITY_H_
+#define _SD_PORTABILITY_H_
 
 #include <stdlib.h>
 #include <cstring>
@@ -78,5 +78,5 @@ static char *strndup(const char *str, int len)
 
 #endif
 
-#endif // _TORCS_PORTABILITY_H_
+#endif // _SD_PORTABILITY_H_
 

@@ -2,7 +2,7 @@
 // unitparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for TORCS-NG-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0
 //--------------------------------------------------------------------------*
 // Container for parameters of car, lane, pit ...
 // Container für Parameter des Fahrzeugs, der Fahrspuren, der Box usw.

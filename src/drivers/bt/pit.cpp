@@ -146,7 +146,7 @@ bool Pit::isBetween(float fromstart)
 			return false;
 		}
 	} else {
-		// Warning: TORCS reports sometimes negative values for "fromstart"!
+		// Warning: The game reports sometimes negative values for "fromstart"!
 		if (fromstart <= pitexit || fromstart >= pitentry) {
 			return true;
 		} else {

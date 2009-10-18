@@ -2,7 +2,7 @@
 // unitdriver.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for TORCS-NG-Version 1.4.0
+// A robot for Speed Dreams Version 1.4.0
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter

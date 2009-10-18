@@ -2,7 +2,7 @@
 // unitcharacteristic.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-NG Version 1.4.0
+// Roboter für Speed Dreams Version 1.4.0
 // Angepasste (angelernte) Kennlinie
 //
 // File         : unitcharacteristic.cpp

@@ -2,7 +2,7 @@
 // unitmain.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for TORCS-NG-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0
 //--------------------------------------------------------------------------*
 // Interface to TORCS
 // 
@@ -13,8 +13,8 @@
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
 //--------------------------------------------------------------------------*
-// V2.00 (TORCS-NG):
-// Uses new TORCS-NG Interfaces
+// V2.00 (Speed Dreams):
+// Uses new Speed Dreams Interfaces
 //--------------------------------------------------------------------------*
 // V1.10:
 // Features of the advanced TORCS Interface:
@@ -101,7 +101,7 @@ static void Shutdown
 //==========================================================================*
 
 //==========================================================================*
-// TORCS-NG-Interface
+// Speed Dreams-Interface
 //--------------------------------------------------------------------------*
 static const int MAXNBBOTS = MAX_NBBOTS;         // Number of drivers/robots
 static const int BUFSIZE = 256;
@@ -269,7 +269,7 @@ void SetUpSimplix_36GP()
 //==========================================================================*
 
 //==========================================================================*
-// Handle module entry for TORCS-NG Interface V1.00 (new fixed name scheme)
+// Handle module entry for Speed Dreams Interface V1.00 (new fixed name scheme)
 //--------------------------------------------------------------------------*
 int moduleWelcomeV1_00
   (const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)

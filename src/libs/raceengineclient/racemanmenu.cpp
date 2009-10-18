@@ -241,11 +241,11 @@ reLoadMenu(void *prevHandle)
 static void
 rePlayerConfig(void * /* dummy */)
 {
-    /* Here, we need to call TorcsOptionOptionInit each time the firing button
+    /* Here, we need to call OptionOptionInit each time the firing button
        is pressed, and not only once at the Raceman menu initialization,
        because the previous menu has to be saved (ESC, Back) and because it can be this menu,
        as well as the Main menu */
-    GfuiScreenActivate(TorcsDriverMenuInit(racemanMenuHdle));
+    GfuiScreenActivate(DriverMenuInit(racemanMenuHdle));
 }
 
 int

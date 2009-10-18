@@ -30,16 +30,16 @@
 typedef enum { GEAR_MODE_NONE = 0, GEAR_MODE_AUTO = 1, 
 	       GEAR_MODE_SEQ  = 2, GEAR_MODE_GRID = 4 } tGearChangeMode;
 
-extern void *TorcsControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
+extern void *ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
 
 /* Load control settings for player of given index (the current one if 0) 
    from preferences (if given parm handle is null, use current) */
-extern void TorcsControlGetSettings(void *prefHdle = 0, unsigned index = 0);
+extern void ControlGetSettings(void *prefHdle = 0, unsigned index = 0);
 
 /* Save control settings for player of given index (the current one if 0) 
    into preference, according to its selected gear change mode
    (if given parm handle is null, use current) */
-extern void TorcsControlPutSettings(void *prefHdle = 0, unsigned index = 0, tGearChangeMode gearChangeMode = GEAR_MODE_NONE);
+extern void ControlPutSettings(void *prefHdle = 0, unsigned index = 0, tGearChangeMode gearChangeMode = GEAR_MODE_NONE);
 
 
 typedef struct

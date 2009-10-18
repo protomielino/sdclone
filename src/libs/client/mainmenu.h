@@ -28,8 +28,8 @@
 extern void *menuHandle;
 extern tModList *RacemanModLoaded;
 
-extern int TorcsMainMenuInit(void);
-extern int TorcsMainMenuRun(void);
+extern int MainMenuInit(void);
+extern int MainMenuRun(void);
 
 #endif /* _MAINMENU_H_ */ 
 

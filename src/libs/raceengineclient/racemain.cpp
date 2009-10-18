@@ -444,7 +444,7 @@ static void
 QuitHookActivate(void * /* dummy */)
 {
 	if (StopScrHandle) {
-		GfuiScreenActivate(TorcsExitMenuInit(StopScrHandle));
+		GfuiScreenActivate(ExitMenuInit(StopScrHandle));
 	}
 }
 

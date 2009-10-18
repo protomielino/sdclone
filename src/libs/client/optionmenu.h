@@ -21,7 +21,7 @@
 #ifndef _OPTIONMENU_H_
 #define _OPTIONMENU_H_
 
-extern void *TorcsOptionOptionInit(void *precMenu);
+extern void *OptionOptionInit(void *precMenu);
 
 
 #endif /* _OPTIONMENU_H_ */ 

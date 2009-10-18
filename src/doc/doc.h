@@ -23,8 +23,8 @@
     @version	$Id: torcsdoc.h,v 1.3 2003/06/24 21:01:54 torcs Exp $
 */
 
-#ifndef _TORCSDOC_H_
-#define _TORCSDOC_H_
+#ifndef _SD_DOC_H_
+#define _SD_DOC_H_
 
 /**
    @defgroup module		Dynamic Modules
@@ -89,7 +89,7 @@
 */
 /**
    @defgroup definitions	Global definitions
-   This is the global definitions used in TORCS.
+   This is the global definitions used in the game.
 */
 /**
    @defgroup trackstruct	Tracks Structure
@@ -132,7 +132,7 @@
 */
 
 /**
-    @mainpage	Welcome to the TORCS documentation !
+    @mainpage	Welcome to the Speed Dreams documentation !
 
     @section robotlist		Robots related documentation.
     <ul>
@@ -153,7 +153,7 @@
 
 */
 
-#endif /* _TORCSDOC_H_ */ 
+#endif /* _SD_DOC_H_ */ 
 
 
 

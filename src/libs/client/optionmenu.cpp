@@ -28,7 +28,7 @@
 static void *optionHandle = NULL;
 
 void *
-TorcsOptionOptionInit(void *precMenu)
+OptionOptionInit(void *precMenu)
 {
     if (optionHandle) return optionHandle;
 

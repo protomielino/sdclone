@@ -45,7 +45,7 @@
 
 
 /* typedef double tdble; */
-/** Floating point type used in TORCS.
+/** Floating point type used everywhere.
     @ingroup definitions
 */
 typedef float tdble;

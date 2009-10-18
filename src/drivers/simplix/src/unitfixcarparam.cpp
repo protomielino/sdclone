@@ -2,7 +2,7 @@
 // unitfixcarparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for TORCS-NG-Version 1.4.0
+// A robot for Speed Dreams Version 1.4.0
 //--------------------------------------------------------------------------*
 // Constant parameters of the car and calculations with it
 // Unveränderliche Parameter des Fahrzeugs und Nebenrechnungen

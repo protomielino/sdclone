@@ -671,7 +671,7 @@ windowsTimeClock(void)
 *	windowsSetAffinity
 *
 * Description
-*	Restrict Torcs-NG executable to one CPU core/processor.
+*	Restrict game executable to one CPU core/processor.
 *	This avoids jerky rendering, especially under Vista.
 *
 * Parameters

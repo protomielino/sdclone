@@ -48,12 +48,12 @@ void * exitMenuInit(void *menu, void *menuHandle)
 
     GfuiMenuButtonCreate(menuHandle,
 		      "Yes, let's Quit",
-		      "Exit of Torcs-NG",
+		      "Exit from the game",
 		      NULL,
 		      endofprog);
     GfuiMenuButtonCreate(menuHandle,
 		      "No, back to Game",
-		      "Return to Torcs-NG",
+		      "Return to the game",
 		      menu,
 		      GfuiScreenActivate);
     
@@ -62,7 +62,7 @@ void * exitMenuInit(void *menu, void *menuHandle)
 
 /*
  * Function
- *	TorcsExitMenuInit
+ *	ExitMenuInit
  *
  * Description
  *	init the exit menus
@@ -76,14 +76,14 @@ void * exitMenuInit(void *menu, void *menuHandle)
  * Remarks
  *	
  */
-void * TorcsExitMenuInit(void *menu)
+void * ExitMenuInit(void *menu)
 {
 	exitmenuHandle = exitMenuInit(menu, exitmenuHandle);
 	return exitmenuHandle;
 }
 
 
-void * TorcsMainExitMenuInit(void *mainMenu)
+void * MainExitMenuInit(void *mainMenu)
 {
 	exitMainMenuHandle = exitMenuInit(mainMenu, exitMainMenuHandle);
 	return exitMainMenuHandle;

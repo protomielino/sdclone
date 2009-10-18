@@ -22,7 +22,7 @@
 #ifndef _DRIVERCONFIG_H_
 #define _DRIVERCONFIG_H_
 
-extern void *TorcsDriverMenuInit(void *prevMenu);
+extern void *DriverMenuInit(void *prevMenu);
 
 #endif /* _DRIVERCONFIG_H_ */ 
 

@@ -159,7 +159,7 @@ onDeadZoneChange(void * /* dummy */)
 static void
 onSave(void * /* dummy */)
 {
-    TorcsControlPutSettings();
+    ControlPutSettings();
 
     GfuiScreenActivate(PrevScrHandle);
 }
@@ -400,7 +400,7 @@ onActivate(void * /* dummy */)
     if (ReloadValues) {
 
         /* Load command settings from preference params for current player */
-        TorcsControlGetSettings();
+        ControlGetSettings();
 
 	/* For each control : */
 	for (cmd = 0; cmd < MaxCmd; cmd++) {
@@ -432,7 +432,7 @@ DevCalibrate(void *menu)
 
 /* */
 void *
-TorcsControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
+ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
 {
     int		x, x2, i;
     int		jsInd;
@@ -536,7 +536,7 @@ TorcsControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChange
 }
 
 /* From parms (prefHdle) to global vars (Cmd, SteerSensVal, DeadZoneVal) */
-void TorcsControlGetSettings(void *prefHdle, unsigned index)
+void ControlGetSettings(void *prefHdle, unsigned index)
 {
     int		iCmd;
     const char	*prm;
@@ -588,7 +588,7 @@ void TorcsControlGetSettings(void *prefHdle, unsigned index)
 }
 
 /* From global vars (Cmd, SteerSensVal, DeadZoneVal) to parms (prefHdle) */
-void TorcsControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
+void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
 {
     int		iCmd;
     const char	*str;

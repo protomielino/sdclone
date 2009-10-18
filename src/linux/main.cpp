@@ -105,9 +105,9 @@ main(int argc, char *argv[])
     
     GfScrInit(argc, argv);	/* init screen */
 
-    TorcsEntry();		/* launch Speed Dreams */
+    GameEntry();	     /* launch the game */
     
-    glutMainLoop();		/* event loop of glut */
+    glutMainLoop();		/* event loop of GLUT */
 
     return 0;			/* just for the compiler, never reached */
 }

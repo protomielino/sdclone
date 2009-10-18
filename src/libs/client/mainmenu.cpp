@@ -35,15 +35,15 @@ tModList *RacemanModLoaded = (tModList*)NULL;
 static void
 onActivatePlayerConfig(void * /* dummy */)
 {
-    /* Here, we need to call TorcsOptionOptionInit each time the firing button
+    /* Here, we need to call OptionOptionInit each time the firing button
        is pressed, and not only once at the Main menu initialization,
        because the previous menu has to be saved (ESC, Back) and because it can be this menu,
        as well as the Raceman menu */
-    GfuiScreenActivate(TorcsDriverMenuInit(menuHandle));
+    GfuiScreenActivate(DriverMenuInit(menuHandle));
 }
 
 static void
-TorcsMainMenuActivate(void * /* dummy */)
+MainMenuActivate(void * /* dummy */)
 {
 	if (RacemanModLoaded != NULL) {
 		GfModUnloadList(&RacemanModLoaded);
@@ -52,7 +52,7 @@ TorcsMainMenuActivate(void * /* dummy */)
 
 /*
  * Function
- *	TorcsMainMenuInit
+ *	MainMenuInit
  *
  * Description
  *	init the main menus
@@ -67,16 +67,16 @@ TorcsMainMenuActivate(void * /* dummy */)
  *	
  */
 int
-TorcsMainMenuInit(void)
+MainMenuInit(void)
 {
     menuHandle = GfuiScreenCreateEx((float*)NULL, 
-				    NULL, TorcsMainMenuActivate, 
+				    NULL, MainMenuActivate, 
 				    NULL, (tfuiCallback)NULL, 
 				    1);
 
     GfuiScreenAddBgImg(menuHandle, "data/img/splash-main.png");
 
-    GfuiTitleCreate(menuHandle, "TORCS-NG", 0);
+    GfuiTitleCreate(menuHandle, "Speed Dreams", 0);
 
     GfuiLabelCreate(menuHandle,
 		    "The Open Racing Car Simulator - Next Generation",
@@ -92,17 +92,17 @@ TorcsMainMenuInit(void)
 
     GfuiMenuButtonCreate(menuHandle,
 			 "Options", "Configure",
-			 TorcsOptionOptionInit(menuHandle), GfuiScreenActivate);
+			 OptionOptionInit(menuHandle), GfuiScreenActivate);
     
     GfuiMenuButtonCreate(menuHandle,
 			 "Credits", "Thanks to all contributors",
-			 menuHandle, TorcsCreditsScreenActivate);
+			 menuHandle, CreditsScreenActivate);
     
     GfuiMenuDefaultKeysAdd(menuHandle);
 
     GfuiMenuBackQuitButtonCreate(menuHandle,
-				 "Quit", "Quit TORCS-NG",
-				 TorcsMainExitMenuInit(menuHandle), GfuiScreenActivate);
+				 "Quit", "Quit game",
+				 MainExitMenuInit(menuHandle), GfuiScreenActivate);
 
     return 0;
 }
@@ -124,7 +124,7 @@ TorcsMainMenuInit(void)
  *	
  */
 int
-TorcsMainMenuRun(void)
+MainMenuRun(void)
 {
     GfuiScreenActivate(menuHandle);
     return 0;

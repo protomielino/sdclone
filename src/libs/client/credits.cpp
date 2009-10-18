@@ -245,7 +245,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 }
 
 // Menu entry.
-void TorcsCreditsScreenActivate(void *retScrHdle)
+void CreditsScreenActivate(void *retScrHdle)
 {
     // Store return screen handle.
     RetScrHdle = retScrHdle;

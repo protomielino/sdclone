@@ -2,7 +2,7 @@
 // unitglobal.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for TORCS-NG-Version 1.4.0
+// A robot for Speed Dreams Version 1.4.0
 //--------------------------------------------------------------------------*
 // Global data types and definitions
 // Globale Datentypen und Definitionen
