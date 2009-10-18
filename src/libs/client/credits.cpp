@@ -3,7 +3,7 @@
     file                 : credits.cpp
     created              : Tue Mar 3 12:00:00 CEST 2009
     copyright            : (C) 2009 by Jean-Philippe Meuret
-    web                  : torcs-ng.sourceforge.net
+    web                  : speed-dreams.sourceforge.net
 
  ***************************************************************************/
 
