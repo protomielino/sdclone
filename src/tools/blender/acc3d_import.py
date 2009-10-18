@@ -1,19 +1,19 @@
 #!BPY
 
 """ Registration info for Blender menus:
-Name: 'TORCS-NG (.acc)...'
+Name: 'Speed Dreams / Torcs (.acc)...'
 Blender: 248
 Group: 'Import'
-Tip: 'Import an TORCS-NG (.acc) file.'
+Tip: 'Import a Speed Dreams / Torcs (.acc) file.'
 """
 
 __author__ = "Brian Gavin based on Willian P. Germano .ac Importer"
-__url__ = ("blender", "elysiun", "TORCD's homepage, http://http://torcs-ng.sourceforge.net",
+__url__ = ("blender", "elysiun", "Speed Dreams's homepage, http://http://speed-dreams.sourceforge.net",
 	"PLib 3d gaming lib, http://plib.sf.net")
 __version__ = "2.43 2007-02-12"
 
 __bpydoc__ = """\
-This script imports TORCS AC3D models into Blender.
+This script imports Speed Dreams / Torcs AC3D models into Blender.
 
 AC3D is a simple and affordable commercial 3d modeller also built with OpenGL.
 The .ac file format is an easy to parse text format well supported,
@@ -176,7 +176,7 @@ class AC3DImport:
 
 	def __init__(self, filename):
 		
-		inform('torcs-ng ACC file importer version 0.1')
+		inform('Speed Dreams / Torcs ACC file importer version 0.1')
 
 		global errmsg
 
@@ -673,7 +673,7 @@ class AC3DImport:
 			m.specCol = (mat[4][0], mat[4][1], mat[4][2])
 			m.spec = mat[5]
 			m.alpha = mat[6]
-			#force it to zero because that is how torcs-ng works
+			#force it to zero because that is how Speed Dreams / Torcs work
 			m.alpha = 0.0
 			if m.alpha < 1.0:
 				m.mode |= MAT_MODE_ZTRANSP
@@ -972,4 +972,4 @@ def filesel_callback(filename):
 
 Window.EditMode(0)
 
-Window.FileSelector(filesel_callback, "Import TORCS ACC", "*.acc")
+Window.FileSelector(filesel_callback, "Import Speed Dreams / Torcs ACC", "*.acc")

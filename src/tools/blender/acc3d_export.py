@@ -1,10 +1,10 @@
 #!BPY
 
 """ Registration info for Blender menus:
-Name: 'TORCS-NG (.acc)...'
+Name: 'Speed Dreams / Torcs (.acc) ...'
 Blender: 248
 Group: 'Export'
-Tip: 'Export selected meshes to TORCS-NG (.acc) format'
+Tip: 'Export selected meshes to Speed Dreams / Torcs (.acc) format'
 """
 
 __author__ = "Brian Gavin taken from Willian P. Germano .ac export script"
