@@ -33,9 +33,12 @@
 #include "gui.h"
 #include "guifont.h"
 
+
+
 void
 gfuiButtonInit(void)
 {
+
 }
 
 /** Add a graphical button to a screen.
@@ -84,11 +87,14 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const c
     button->onFocus = onFocus;
     button->onFocusLost = onFocusLost;
     button->mouseBehaviour = mouse;
+ 
+	
 
-    button->disabled = GfImgReadPng(disabled, &width, &height, 1.0);
-    button->enabled = GfImgReadPng(enabled, &width, &height, 1.0);
-    button->focused = GfImgReadPng(focused, &width, &height, 1.0);
-    button->pushed = GfImgReadPng(pushed, &width, &height, 1.0);
+
+    button->disabled = GfImgReadTex(disabled, width, height);
+    button->enabled = GfImgReadTex(enabled, width, height);
+    button->focused = GfImgReadTex(focused, width, height);
+    button->pushed = GfImgReadTex(pushed, width, height);
 
     switch (align) {
     case GFUI_ALIGN_HR_VB:
@@ -270,19 +276,27 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
     button->onFocusLost = onFocusLost;
     button->mouseBehaviour = mouse;
     button->buttonType = GFUI_BTN_PUSH;
+    button->bShowBox = true;
 
-    button->bgColor[0] = &(GfuiColor[GFUI_BGBTNDISABLED][0]);
-    button->bgColor[1] = &(GfuiColor[GFUI_BGBTNENABLED][0]);
-    button->bgColor[2] = &(GfuiColor[GFUI_BGBTNCLICK][0]);
-    button->bgFocusColor[0] = &(GfuiColor[GFUI_BGBTNDISABLED][0]);
-    button->bgFocusColor[1] = &(GfuiColor[GFUI_BGBTNFOCUS][0]);
-    button->bgFocusColor[2] = &(GfuiColor[GFUI_BGBTNCLICK][0]);
-    button->fgColor[0] = &(GfuiColor[GFUI_BTNDISABLED][0]);
-    button->fgColor[1] = &(GfuiColor[GFUI_BTNENABLED][0]);
-    button->fgColor[2] = &(GfuiColor[GFUI_BTNCLICK][0]);
-    button->fgFocusColor[0] = &(GfuiColor[GFUI_BTNDISABLED][0]);
-    button->fgFocusColor[1] = &(GfuiColor[GFUI_BTNFOCUS][0]);
-    button->fgFocusColor[2] = &(GfuiColor[GFUI_BTNCLICK][0]);
+
+    button->disabled = 0;
+    button->enabled = 0;
+    button->focused = 0;
+    button->pushed = 0;
+
+
+    button->bgColor[0] = GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
+    button->bgColor[1] = GetColor(&(GfuiColor[GFUI_BGBTNENABLED][0]));
+    button->bgColor[2] = GetColor(&(GfuiColor[GFUI_BGBTNCLICK][0]));
+    button->bgFocusColor[0] = GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
+    button->bgFocusColor[1] = GetColor(&(GfuiColor[GFUI_BGBTNFOCUS][0]));
+    button->bgFocusColor[2] = GetColor(&(GfuiColor[GFUI_BGBTNCLICK][0]));
+    button->fgColor[0] = GetColor(&(GfuiColor[GFUI_BTNDISABLED][0]));
+    button->fgColor[1] = GetColor(&(GfuiColor[GFUI_BTNENABLED][0]));
+    button->fgColor[2] = GetColor(&(GfuiColor[GFUI_BTNCLICK][0]));
+    button->fgFocusColor[0] = GetColor(&(GfuiColor[GFUI_BTNDISABLED][0]));
+    button->fgFocusColor[1] = GetColor(&(GfuiColor[GFUI_BTNFOCUS][0]));
+    button->fgFocusColor[2] = GetColor(&(GfuiColor[GFUI_BTNCLICK][0]));
 
     label = &(button->label);
     label->text = (char*)calloc(1, 100);
@@ -356,6 +370,172 @@ GfuiButtonSetText(void *scr, int id, const char *text)
     }    
 }
 
+
+
+void
+GfuiButtonShowBox(void *scr, int id,bool bShow)
+{
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_BUTTON) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    
+			curObject->u.button.bShowBox = bShow;
+
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+}
+
+
+
+/** Change the label of a button.
+    @ingroup	gui
+    @param	scr	Screen
+    @param	id	Button Id
+    @param	text	New label of the button
+ */
+void
+GfuiButtonSetColor(void *scr, int id,Color color)
+{
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_BUTTON) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    curObject->u.button.fgColor[1] = color;
+
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+}
+
+
+void 
+GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile)
+{
+    GLuint disable = 0;
+    GLuint enable = 0;
+    GLuint focused = 0;
+    GLuint pushed = 0;
+
+    if (strlen(disableFile)!=0)
+    	disable = GfImgReadTex(disableFile);
+    if (strlen(enableFile)!=0)
+    	enable = GfImgReadTex(enableFile);
+    if (strlen(focusedFile)!=0)
+    	focused = GfImgReadTex(focusedFile);
+    if (strlen(pushedFile)!=0)
+    	pushed = GfImgReadTex(pushedFile);
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_BUTTON) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    curObject->u.button.disabled = disable;
+		    curObject->u.button.enabled = enable;
+		    curObject->u.button.focused = focused;
+		    curObject->u.button.pushed = pushed;
+		    curObject->u.button.imgX = x;
+		    curObject->u.button.imgY = y;
+	            curObject->u.button.imgWidth = w;
+	            curObject->u.button.imgHeight = h;
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+
+}
+
+
+void
+GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor)
+{
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_BUTTON) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    curObject->u.button.fgFocusColor[1] = focuscolor;
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+}
+
+void
+GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor)
+{
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_BUTTON) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    curObject->u.button.fgFocusColor[2] = pushcolor;
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+}
+
 /** Get the Id of the button focused in the current screen.
     @ingroup	gui
     @return	Button Id
@@ -388,8 +568,9 @@ gfuiDrawButton(tGfuiObject *obj)
 {
     tGfuiLabel	*label;
     tGfuiButton	*button;
-    const float	*fgColor;
-    const float	*bgColor;
+    Color fgColor;
+    Color bgColor;
+
 
     button = &(obj->u.button);
     if (obj->state == GFUI_DISABLE) {
@@ -402,34 +583,89 @@ gfuiDrawButton(tGfuiObject *obj)
 	fgColor = button->fgColor[button->state];
 	bgColor = button->bgColor[button->state];
     }
-    if (bgColor[3] != 0.0) {
-	glColor4fv(bgColor);
-	glBegin(GL_QUADS);
-	glVertex2i(obj->xmin, obj->ymin);
-	glVertex2i(obj->xmin, obj->ymax);
-	glVertex2i(obj->xmax, obj->ymax);
-	glVertex2i(obj->xmax, obj->ymin);
-	glEnd();
-	glColor4fv(fgColor);
-	glBegin(GL_LINE_STRIP);
-	glVertex2i(obj->xmin, obj->ymin);
-	glVertex2i(obj->xmin, obj->ymax);
-	glVertex2i(obj->xmax, obj->ymax);
-	glVertex2i(obj->xmax, obj->ymin);
-	glVertex2i(obj->xmin, obj->ymin);
-	glEnd();	
-    }
-    label = &(button->label);
-    glColor4fv(fgColor);
-    gfuiPrintString(label->x, label->y, label->font, label->text);
+
+
+	if (bgColor.alpha != 0.0) 
+	{
+		if (button->bShowBox)
+		{
+			glColor4fv(bgColor.GetPtr());
+			glBegin(GL_QUADS);
+			glVertex2i(obj->xmin, obj->ymin);
+			glVertex2i(obj->xmin, obj->ymax);
+			glVertex2i(obj->xmax, obj->ymax);
+			glVertex2i(obj->xmax, obj->ymin);
+			glEnd();
+			glColor4fv(fgColor.GetPtr());
+			glBegin(GL_LINE_STRIP);
+			glVertex2i(obj->xmin, obj->ymin);
+			glVertex2i(obj->xmin, obj->ymax);
+			glVertex2i(obj->xmax, obj->ymax);
+			glVertex2i(obj->xmax, obj->ymin);
+			glVertex2i(obj->xmin, obj->ymin);
+			glEnd();	
+		}
+	}
+
+    	//Draw image if any	
+    	GLuint img = 0;
+
+    	if (obj->state == GFUI_DISABLE) {
+		img = button->disabled;
+    	} else if (button->state == GFUI_BTN_PUSHED) {
+		img = button->pushed;
+    	} else if (obj->focus) {
+		img = button->focused;
+    	} else {
+		img = button->enabled;
+    	}
+
+	if (img!=0)
+	{
+		int x1 = obj->xmin+ button->imgX;
+		int x2 = x1 + button->imgWidth;
+		int y1 = obj->ymin+ button->imgY;
+		int y2 = y1 + button->imgHeight;
+
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+		//set color to mix with image
+		glColor3f(1.0,1.0,1.0);
+	
+		glEnable(GL_BLEND);
+		glEnable(GL_TEXTURE_2D);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+		glBindTexture(GL_TEXTURE_2D,img);
+		glBegin(GL_QUADS);
+	
+		glTexCoord2f (0.0, 0.0);
+		glVertex2i(x1,y1);
+		
+		glTexCoord2f (0.0, 1.0);
+		glVertex2i(x1,y2);
+		
+		glTexCoord2f (1.0, 1.0);
+		glVertex2i(x2,y2);
+		
+		glTexCoord2f (1.0, 0.0);
+		glVertex2i(x2,y1);
+	
+		glEnd();
+		glDisable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	label = &(button->label);
+    	glColor4fv(fgColor.GetPtr());
+    	gfuiPrintString(label->x, label->y, label->font, label->text);
 }
 
 void
 gfuiDrawGrButton(tGfuiObject *obj)
 {
-    int sw, sh, vw, vh;
+    //int sw, sh, vw, vh;
     tGfuiGrButton	*button;
-    unsigned char	*img;
+    GLuint img;
 
     button = &(obj->u.grbutton);
     if (obj->state == GFUI_DISABLE) {
@@ -441,10 +677,43 @@ gfuiDrawGrButton(tGfuiObject *obj)
     } else {
 	img = button->enabled;
     }
+
+
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//set color to mix with image
+	glColor3f(1.0,1.0,1.0);
+
+	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glBindTexture(GL_TEXTURE_2D,img);
+	glBegin(GL_QUADS);
+
+	glTexCoord2f (0.0, 0.0);
+	glVertex2i(obj->xmin, obj->ymin);
+	
+	glTexCoord2f (0.0, 1.0);
+	glVertex2i(obj->xmin, obj->ymax);
+	
+	glTexCoord2f (1.0, 1.0);
+	glVertex2i(obj->xmax, obj->ymax);
+	
+	glTexCoord2f (1.0, 0.0);
+	glVertex2i(obj->xmax, obj->ymin);
+
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
+/*
     GfScrGetSize(&sw, &sh, &vw, &vh);
     glRasterPos2i(obj->xmin, obj->ymin);
     glPixelZoom((float)vw / (float)GfuiScreen->width, (float)vh / (float)GfuiScreen->height);
     glDrawPixels(button->width, button->height, GL_RGBA, GL_UNSIGNED_BYTE, img);
+*/
+	
 }
 
 void
@@ -592,6 +861,12 @@ gfuiReleaseButton(tGfuiObject *obj)
     tGfuiLabel	*label;
 
     button = &(obj->u.button);
+
+    GfImgFreeTex(button->disabled);
+    GfImgFreeTex(button->enabled);
+    GfImgFreeTex(button->focused);
+    GfImgFreeTex(button->pushed);
+
     label = &(button->label);
 
 	freez(button->userDataOnFocus);
@@ -605,10 +880,11 @@ gfuiReleaseGrButton(tGfuiObject *obj)
     tGfuiGrButton	*button;
     
     button = &(obj->u.grbutton);
-    
-    free(button->disabled);
-    free(button->enabled);
-    free(button->focused);
-    free(button->pushed);
+
+    GfImgFreeTex(button->disabled);
+    GfImgFreeTex(button->enabled);
+    GfImgFreeTex(button->focused);
+    GfImgFreeTex(button->pushed);
+
     free(obj);
 }

@@ -128,7 +128,7 @@ gfuiDrawImage(tGfuiObject *obj)
 
     glBegin(GL_TRIANGLE_STRIP);
     {
-	glColor4f(1.0, 1.0, 1.0, 0.0);
+	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glTexCoord2f(0.0, 0.0); glVertex2f(obj->xmin, obj->ymin);
 	glTexCoord2f(0.0, 1.0); glVertex2f(obj->xmin, obj->ymax);
 	glTexCoord2f(1.0, 0.0); glVertex2f(obj->xmax, obj->ymin);

@@ -99,6 +99,18 @@ gfuiInit(void)
 /*     glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF); */
 }
 
+Color 
+GetColor(float *color)
+{
+     Color c;
+     c.red = color[0];
+     c.green = color[1];
+     c.blue = color[2];
+     c.alpha = color[3];
+
+     return c;
+}
+
 
 /** Dummy display function for glut.
     Declare this function to glut if nothing is to be displayed by the redisplay mechanism.
@@ -154,11 +166,11 @@ GfuiDisplay(void)
 	glMatrixMode(GL_MODELVIEW);  
 	glLoadIdentity();
 	
-	if (GfuiScreen->bgColor[3] != 0.0) {
-		glClearColor(GfuiScreen->bgColor[0],
-					GfuiScreen->bgColor[1],
-					GfuiScreen->bgColor[2],
-					GfuiScreen->bgColor[3]);
+	if (GfuiScreen->bgColor.alpha != 0.0) {
+		glClearColor(GfuiScreen->bgColor.red,
+					GfuiScreen->bgColor.green,
+					GfuiScreen->bgColor.blue,
+					GfuiScreen->bgColor.alpha);
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 	
@@ -562,12 +574,8 @@ GfuiScreenCreate(void)
 	screen->width = 640.0;
 	screen->height = 480.0;
 
-	screen->bgColor = (float*)calloc(4, sizeof(float));
-	int i;
-	for(i = 0; i < 4; i++) {
-		screen->bgColor[i] = GfuiColor[GFUI_BGCOLOR][i];
-	}
 
+	screen->bgColor = GetColor(&GfuiColor[GFUI_BGCOLOR][0]);
 
 	// screen->bgColor = &(GfuiColor[GFUI_BGCOLOR][0]);
 	screen->mouseColor[0] = &(GfuiColor[GFUI_MOUSECOLOR1][0]);
@@ -603,24 +611,12 @@ GfuiScreenCreateEx(float *bgColor,
 	screen->width = 640.0;
 	screen->height = 480.0;
 	
-	screen->bgColor = (float*)calloc(4, sizeof(float));
-	for(i = 0; i < 4; i++) {
-		if (bgColor != NULL) {
-			screen->bgColor[i] = bgColor[i];
-		} else {
-			screen->bgColor[i] = GfuiColor[GFUI_BGCOLOR][i];
-		}
-	}
-	
-	/*
 	if (bgColor != NULL) {
-		screen->bgColor = (float*)calloc(4, sizeof(float));
-		for(i = 0; i < 4; i++) {
-			screen->bgColor[i] = bgColor[i];
-		}
+		screen->bgColor = GetColor(bgColor);
 	} else {
-		screen->bgColor = &(GfuiColor[GFUI_BGCOLOR][0]);
-	}*/
+		screen->bgColor = GetColor(&GfuiColor[GFUI_BGCOLOR][0]);
+	}
+
 	screen->mouseColor[0] = &(GfuiColor[GFUI_MOUSECOLOR1][0]);
 	screen->mouseColor[1] = &(GfuiColor[GFUI_MOUSECOLOR2][0]);
 	screen->onActivate = onActivate;
@@ -653,11 +649,6 @@ GfuiScreenRelease(void *scr)
 
 	if (screen->bgImage != 0) {
 		glDeleteTextures(1, &screen->bgImage);
-	}
-
-	if (screen->bgColor != NULL) {
-		free(screen->bgColor);
-		screen->bgColor = NULL;
 	}
 
 	curObject = screen->objects;

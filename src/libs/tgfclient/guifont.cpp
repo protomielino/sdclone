@@ -25,9 +25,13 @@
 
 #ifdef WIN32
 #include <windows.h>
-#elif defined(__FreeBSD__)
+#endif 
+
+#if defined(__FreeBSD__) || defined(__APPLE__)
 #include <machine/endian.h>
-#else
+#endif
+
+#ifdef LINUX
 #include <endian.h>
 #endif
 
@@ -70,6 +74,7 @@ void gfuiLoadFonts(void)
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "b5.glf"));
+	//sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "liberation-sans.glf"));
 
 	for(i = 0; i < 4; i++) {
 		size = (int)GfParmGetNum(param, "Menu Font", keySize[i], (char*)NULL, 10.0);
@@ -214,7 +219,7 @@ int GfuiFontClass::getWidth(const char* text)
 	//Loop through characters
 	for (i = 0; i < Length; i++) {
 		//Get pointer to glFont character
-		Char = &font->Char[(int)text[i] - font->IntStart];
+		Char = &font->Char[(int)((unsigned char)text[i]) - font->IntStart];
 		float w2 = Char->dx * size;
 		width = width + w2;
 		//width += Char->dx * size;
@@ -260,7 +265,7 @@ void GfuiFontClass::output(int X, int Y, const char* text)
 	for (i = 0; i < Length; i++)
 	{
 		//Get pointer to glFont character
-		Char = &font->Char[(int)text[i] - font->IntStart];
+		Char = &font->Char[(int)((unsigned char)text[i]) - font->IntStart];
 
 		//Specify vertices and texture coordinates
 		glTexCoord2f(Char->tx1, Char->ty1);

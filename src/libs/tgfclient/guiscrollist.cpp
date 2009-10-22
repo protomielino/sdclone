@@ -153,10 +153,10 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int align, int width, in
     object->ymax = y + height;
 
     scrollist = &(object->u.scrollist);
-    scrollist->fgColor[0] = &(GfuiColor[GFUI_FGSCROLLIST][0]);
-    scrollist->bgColor[0] = &(GfuiColor[GFUI_BGSCROLLIST][0]);
-    scrollist->fgSelectColor[0] = &(GfuiColor[GFUI_FGSELSCROLLIST][0]);
-    scrollist->bgSelectColor[0] = &(GfuiColor[GFUI_BGSELSCROLLIST][0]);
+    scrollist->fgColor[0] = GetColor(&(GfuiColor[GFUI_FGSCROLLIST][0]));
+    scrollist->bgColor[0] = GetColor(&(GfuiColor[GFUI_BGSCROLLIST][0]));
+    scrollist->fgSelectColor[0] = GetColor(&(GfuiColor[GFUI_FGSELSCROLLIST][0]));
+    scrollist->bgSelectColor[0] = GetColor(&(GfuiColor[GFUI_BGSELSCROLLIST][0]));
     scrollist->font = gfuiFont[font];
     scrollist->nbVisible = height / (scrollist->font->getDescender() + scrollist->font->getHeight());
     scrollist->selectedElt = -1;
@@ -483,8 +483,7 @@ void GfuiScrollListShowElement(void *scr, int Id, int index)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
-    //tGfuiListElement	*elt;
-    int			oldFirstVisible;
+    int				oldFirstVisible;
     
     object = gfuiGetObject(scr, Id);
     if (object == NULL) {
@@ -518,12 +517,71 @@ void GfuiScrollListShowElement(void *scr, int Id, int index)
 }
 
 void
+GfuiScrollListSetColor(void *scr, int id,Color color)
+{
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_SCROLLIST) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    curObject->u.scrollist.fgColor[0] = color;
+		    curObject->u.scrollist.fgColor[1] = color;
+		    curObject->u.scrollist.fgColor[2] = color;
+
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+}
+
+
+void
+GfuiScrollListSetSelectColor(void *scr, int id,Color color)
+{
+
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int oldmin, oldmax;
+    
+    curObject = screen->objects;
+    if (curObject != NULL) {
+	do {
+	    curObject = curObject->next;
+	    if (curObject->id == id) {
+		if (curObject->widget == GFUI_SCROLLIST) {
+		    oldmax = curObject->xmax;
+		    oldmin = curObject->xmin;
+		    curObject->u.scrollist.fgSelectColor[0] = color;
+		    curObject->u.scrollist.fgSelectColor[1] = color;
+		    curObject->u.scrollist.fgSelectColor[2] = color;
+
+		    curObject->xmax = oldmax;
+		    curObject->xmin = oldmin;
+		}
+		return;
+	    }
+	} while (curObject != screen->objects);
+    }    
+}
+
+void
 gfuiDrawScrollist(tGfuiObject *obj)
 {
 	tGfuiScrollList	*scrollist;
 	tGfuiListElement	*elt;
-	const float		*fgColor;
-	const float		*bgColor;
+	Color			fgColor;
+	Color			bgColor;
 	char		buf[256];
 	int			w, h, x, y;
 	int			index;
@@ -533,9 +591,9 @@ gfuiDrawScrollist(tGfuiObject *obj)
 	fgColor = scrollist->fgColor[0];
 	bgColor = scrollist->bgColor[0];
 
-	if (bgColor[3] != 0.0) {
+	if (bgColor.alpha != 0.0) {
 		glBegin(GL_QUADS);
-		glColor4fv(bgColor);
+		glColor4fv(bgColor.GetPtr());
 		glVertex2i(obj->xmin, obj->ymin);
 		glVertex2i(obj->xmin, obj->ymax);
 		glVertex2i(obj->xmax, obj->ymax);
@@ -544,7 +602,7 @@ gfuiDrawScrollist(tGfuiObject *obj)
 	}
 
 	glBegin(GL_LINE_STRIP);
-	glColor4fv(fgColor);
+	glColor4fv(fgColor.GetPtr());
 	glVertex2i(obj->xmin, obj->ymin);
 	glVertex2i(obj->xmin, obj->ymax);
 	glVertex2i(obj->xmax, obj->ymax);
@@ -573,9 +631,9 @@ gfuiDrawScrollist(tGfuiObject *obj)
 				continue;
 			}
 			if (index == scrollist->selectedElt) {
-				glColor4fv(scrollist->fgSelectColor[0]);
+				glColor4fv(scrollist->fgSelectColor[0].GetPtr());
 			} else {
-				glColor4fv(scrollist->fgColor[0]);
+				glColor4fv(scrollist->fgColor[0].GetPtr());
 			}
 			index++;
 			if (index > (scrollist->firstVisible + scrollist->nbVisible)) {

@@ -61,12 +61,14 @@ gfuiLabelInit(void)
     @see	GfuiSetLabelText
  */
 int 
-GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, int x, int y, int align, int maxlen)
+GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font, int x, int y, int align, int maxlen)
 {
     tGfuiLabel	*label;
     tGfuiObject	*object;
     int 	width;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
+
+    Color fgColor = GetColor((float*)fgColorPtr);
     
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
     object->widget = GFUI_LABEL;
@@ -114,6 +116,7 @@ GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, i
 
     return object->id;
 }
+
 
 /** Add a label to a screen.
     @ingroup	gui
@@ -232,8 +235,9 @@ GfuiLabelSetText(void *scr, int id, const char *text)
     @see	GfuiAddLabel
  */
 void
-GfuiLabelSetColor(void *scr, int id, const float *color)
+GfuiLabelSetColor(void *scr, int id, const float * colorPtr)
 {
+    Color color = GetColor((float*)colorPtr);
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
     
@@ -258,8 +262,8 @@ gfuiDrawLabel(tGfuiObject *obj)
     tGfuiLabel	*label;
 
     label = &(obj->u.label);
-    if (label->bgColor[3] != 0.0) {
-	glColor4fv(label->bgColor);
+    if (label->bgColor.alpha != 0.0) {
+	glColor4fv(label->bgColor.GetPtr());
 	glBegin(GL_QUADS);
 	glVertex2i(obj->xmin, obj->ymin);
 	glVertex2i(obj->xmin, obj->ymax);
@@ -267,7 +271,7 @@ gfuiDrawLabel(tGfuiObject *obj)
 	glVertex2i(obj->xmax, obj->ymin);
 	glEnd();
     }
-    glColor4fv(label->fgColor);
+    glColor4fv(label->fgColor.GetPtr());
     gfuiPrintString(label->x, label->y, label->font, label->text);
 
 }

@@ -319,3 +319,33 @@ GfImgReadTex(const char *filename)
 	GfParmReleaseHandle(handle);
 	return retTex;
 }
+
+GLuint
+GfImgReadTex(const char *filename, int &width,int &height)
+{
+	void *handle;
+	float screen_gamma;
+	GLbyte *tex;
+	GLuint retTex;
+
+	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
+	tex = (GLbyte*)GfImgReadPng(filename, &width, &height, screen_gamma);
+
+	if (!tex) {
+		GfParmReleaseHandle(handle);
+		return 0;
+	}
+
+	glGenTextures(1, &retTex);
+	glBindTexture(GL_TEXTURE_2D, retTex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
+
+	free(tex);
+
+	GfParmReleaseHandle(handle);
+	return retTex;
+}

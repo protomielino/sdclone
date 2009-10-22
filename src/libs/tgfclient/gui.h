@@ -45,13 +45,21 @@ extern float	GfuiColor[GFUI_COLORNB][4];
 #define GFUI_BGSELSCROLLIST	18
 #define GFUI_FGSELSCROLLIST	19
 #define GFUI_EDITCURSORCLR	20
-#define GFUI_IMAGE		21
+#define GFUI_LABELCOLORDRIVER   21
+#define GFUI_BASECOLORBGIMAGE   22
+#define GFUI_EDITBOXCOLOR 23
+#define GFUI_LABELCOLOROPTIONS 24
+#define GFUI_TABLEHEADER 25
+
+#define GFUI_IMAGE		200
+
+Color GetColor(float *color);
 
 typedef struct
 {
     char	*text;		/* text */
-    const float	*bgColor;	/* RGBA */
-    const float	*fgColor;
+    Color bgColor;	/* RGBA */
+    Color fgColor;
     GfuiFontClass	*font;		/* ttf font */
     int		x, y;		/* label position */
     int		align;
@@ -67,13 +75,15 @@ typedef struct
 #define GFUI_BTN_PUSH		0
 #define GFUI_BTN_STATE		1
 
+
 typedef struct
 {
     tGfuiLabel	label;
-    const float	*bgColor[3];
-    const float	*fgColor[3];
-    const float	*bgFocusColor[3];
-    const float	*fgFocusColor[3];
+    Color bgColor[3];
+    Color fgColor[3];
+    Color bgFocusColor[3];
+    Color fgFocusColor[3];
+
     unsigned int	state;
     int			buttonType;
     int			mouseBehaviour;
@@ -82,15 +92,32 @@ typedef struct
     void		*userDataOnFocus;
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
+    
+    int  imgX,imgY;
+    int imgWidth,imgHeight;
+
+    //if skin used
+    GLuint disabled;
+    GLuint enabled;
+    GLuint focused;
+    GLuint pushed;
+    
+    bool bShowBox;
 } tGfuiButton;
 
 typedef struct
 {
     unsigned int	state;
-    unsigned char	*disabled;
-    unsigned char	*enabled;
-    unsigned char	*focused;
-    unsigned char	*pushed;
+    //unsigned char	*disabled;
+    //unsigned char	*enabled;
+    //unsigned char	*focused;
+    //unsigned char	*pushed;
+    //Texture handles
+    GLuint disabled;
+    GLuint enabled;
+    GLuint focused;
+    GLuint pushed;
+    
     int			width, height;
     int			buttonType;
     int			mouseBehaviour;
@@ -101,9 +128,11 @@ typedef struct
     tfuiCallback	onFocusLost;
 } tGfuiGrButton;
 
+
 #define GFUI_FOCUS_NONE		0
 #define GFUI_FOCUS_MOUSE_MOVE	1
 #define GFUI_FOCUS_MOUSE_CLICK	2
+
 
 typedef struct GfuiListElement
 {
@@ -119,10 +148,11 @@ typedef struct GfuiListElement
 typedef struct
 {
     int			sbPos;
-    const float	*bgColor[3];
-    const float	*fgColor[3];
-    const float	*bgSelectColor[3];
-    const float	*fgSelectColor[3];
+    Color	bgColor[3];
+    Color	fgColor[3];
+    Color	bgSelectColor[3];
+    Color	fgSelectColor[3];
+
     GfuiFontClass	*font;
     tGfuiListElement	*elts;
     int			nbElts;
@@ -146,11 +176,11 @@ typedef struct
 typedef struct
 {
     tGfuiLabel	label;
-    const float	*cursorColor[3];
-    const float	*bgColor[3];
-    const float	*fgColor[3];
-    const float	*bgFocusColor[3];
-    const float	*fgFocusColor[3];
+    Color    cursorColor[3];
+    Color    bgColor[3];
+    Color    fgColor[3];
+    Color    bgFocusColor[3];
+    Color    fgFocusColor[3];
     int			state;
     int			cursorx;
     int			cursory1;
@@ -208,7 +238,7 @@ typedef struct GfuiKey
 typedef struct 
 {
     float		width, height;
-    float		*bgColor;	/* RGBA */
+    Color		bgColor;	/* RGBA */
     GLuint		bgImage;
 
     /* sub-objects */
@@ -228,6 +258,9 @@ typedef struct
     tfuiKeyCallback	onKeyAction;
     tfuiSKeyCallback	onSKeyAction;
 
+    /* key auto-repeat mode */
+    int			keyAutoRepeat;
+
     /* mouse handling */
     int			mouse;
     int			mouseAllowed;
@@ -239,6 +272,7 @@ typedef struct
     /* Screen type */
     int			onlyCallback;
 } tGfuiScreen;
+
 
 
 extern tGfuiScreen	*GfuiScreen;

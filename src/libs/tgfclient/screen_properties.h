@@ -2,7 +2,7 @@
 
     file        : screen_properties.h
     created     : Sat Apr 19 23:37:41 CEST 2003
-    copyright   : (C) 2003 by Eric Espié                        
+    copyright   : (C) 2003 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: screen_properties.h,v 1.4 2005/02/01 15:55:55 berniw Exp $                                  
 
@@ -71,6 +71,11 @@
 #define GFSCR_ELT_BGSELSCROLLIST "background selected scroll list"
 #define GFSCR_ELT_SELSCROLLIST	"selected scroll list"
 #define GFSCR_ELT_EDITCURSORCLR	"edit box cursor color"
+#define GFSCR_ELT_LABELCOLORDRIVERCONFIG "driver config label color"
+#define GFSCR_ELT_BASECOLORBGIMAGE "base color background image"
+#define GFSCR_ELT_EDITBOXCOLOR "edit box color"
+#define GFSCR_ELt_LABELCOLOROPTIONS "label color options"
+#define GFSCR_ELT_TABLEHEADER "table header"
 
 #define GFSCR_ATTR_RED		"red"
 #define GFSCR_ATTR_GREEN	"green"

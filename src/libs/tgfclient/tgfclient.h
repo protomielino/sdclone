@@ -32,7 +32,13 @@
 #include <plib/js.h>
 #include "screen_properties.h"
 
-extern void GfInitClient(void);
+class Color
+{
+public:
+	float red,green,blue,alpha;
+	float *GetPtr() { return (float*)this;}
+};
+ void GfInitClient(void);
 
 /******************** 
  * Screen Interface *
@@ -42,6 +48,7 @@ extern unsigned char *GfImgReadPng(const char *filename, int *widthp, int *heigh
 extern int GfImgWritePng(unsigned char *img, const char *filename, int width, int height);
 extern void GfImgFreeTex(GLuint tex);
 extern GLuint GfImgReadTex(const char *filename);
+extern GLuint GfImgReadTex(const char *filename,int &height,int &width);
 
 extern void GfScrInit(int argc, char *argv[]);
 extern void GfScrShutdown(void);
@@ -210,6 +217,9 @@ extern int GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y
 extern int GfuiEditboxGetFocused(void);
 extern char *GfuiEditboxGetString(void *scr, int id);
 extern void GfuiEditboxSetString(void *scr, int id, const char *text);
+extern void GfuiEditboxSetColor(void *scr, int id,Color color);
+extern void GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor);
+
 
 /* Scrolling lists */
 extern int GfuiScrollListCreate(void *scr, int font, int x, int y, int align,
@@ -221,8 +231,9 @@ extern const char *GfuiScrollListExtractElement(void *scr, int Id, int index, vo
 extern const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
 extern const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
 extern void GfuiScrollListShowElement(void *scr, int Id, int index);
-
-/* scroll bars */
+extern void GfuiScrollListSetColor(void *scr, int id,Color color);
+extern void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
+/* bars */
 extern int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
 			       int min, int max, int len, int start, 
 			       void *userData, tfuiSBCallback onScroll);
@@ -305,6 +316,21 @@ extern const char *GfctrlGetNameByRef(int type, int index);
 
 extern int GfuiGlutExtensionSupported(char const *str);
 
+extern void GfuiButtonShowBox(void *scr, int id,bool bShow);
+extern void GfuiButtonSetColor(void *scr, int id,Color color);
+extern void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
+extern void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
+extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+
+
+extern void *LoadMenuXML(const char *pFilePath);
+extern bool CreateStaticControls(void *param,void *menuHandle);
+
+extern int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
+extern int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
+extern int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
+extern int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+extern int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect);
 
 #endif /* __TGFCLIENT__H__ */
 
