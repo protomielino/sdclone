@@ -21,7 +21,7 @@
 
 #include "guifont.h"
 
-#define GFUI_COLORNB	21
+#define GFUI_COLORNB	26
 extern float	GfuiColor[GFUI_COLORNB][4];
 
 #define GFUI_BGCOLOR		0

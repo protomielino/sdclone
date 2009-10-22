@@ -66,6 +66,31 @@ MainMenuActivate(void * /* dummy */)
  * Remarks
  *	
  */
+
+int
+MainMenuInit(void)
+{
+    menuHandle = GfuiScreenCreateEx((float*)NULL, 
+				    NULL, MainMenuActivate, 
+				    NULL, (tfuiCallback)NULL, 
+				    1);
+
+    void *param = LoadMenuXML("welcomemenu.xml");
+
+    CreateStaticControls(param,menuHandle);
+
+    //Add buttons and create based on xml
+    CreateButtonControl(menuHandle,param,"race",ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
+    CreateButtonControl(menuHandle,param,"configure",DriverMenuInit(menuHandle),GfuiScreenActivate);
+    CreateButtonControl(menuHandle,param,"options",OptionOptionInit(menuHandle),GfuiScreenActivate);
+    CreateButtonControl(menuHandle,param,"credits",menuHandle,CreditsScreenActivate);
+    CreateButtonControl(menuHandle,param,"quit",MainExitMenuInit(menuHandle), GfuiScreenActivate);
+
+    GfuiMenuDefaultKeysAdd(menuHandle);
+
+    return 0;
+}
+/*
 int
 MainMenuInit(void)
 {
@@ -106,7 +131,7 @@ MainMenuInit(void)
 
     return 0;
 }
-
+*/
 /*
  * Function
  *	

@@ -755,11 +755,11 @@ void *
 LoadMenuXML(const char *pMenuPath)
 {
 	std::string strPath = pMenuPath;
-	strPath = "config/"+strPath;
+	strPath = "menu/"+strPath;
     void *param = NULL;
 
     char buf[1024];
-	sprintf(buf, "%s%s", GetLocalDir(),strPath.c_str());
+    sprintf(buf, "%s%s", GetDataDir(),strPath.c_str());
     param = GfParmReadFile(buf, GFPARM_RMODE_STD);
 
    return param;

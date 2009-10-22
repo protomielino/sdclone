@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Screen" version="0.33">
+<params name="Screen" version="0.51">
   <section name="Screen Properties">
     <attnum name="x" val="800"/>
     <attnum name="y" val="600"/>
