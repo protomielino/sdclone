@@ -755,7 +755,7 @@ void *
 LoadMenuXML(const char *pMenuPath)
 {
 	std::string strPath = pMenuPath;
-	strPath = "menu/"+strPath;
+	strPath = "data/menu/"+strPath;
     void *param = NULL;
 
     char buf[1024];
