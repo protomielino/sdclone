@@ -19,7 +19,7 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= trackgen-ng
+TOOLSCRIPT	= sd-trackgen
 
 PROGRAM      	= trackgen-bin
 

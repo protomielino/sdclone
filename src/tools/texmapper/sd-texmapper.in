@@ -3,11 +3,11 @@
 
 ##############################################################################
 #
-#    file        : accc.in
+#    file        : texmapper.in
 #    created     : Tue Aug 19 23:23:51 CEST 2003
 #    copyright   : (C) 2003 by Eric Espi�                        
 #    email       : Eric.Espie@torcs.org   
-#    version     : $Id: accc.in,v 1.2.2.1 2008/06/01 20:19:38 berniw Exp $                                  
+#    version     : $Id: texmapper.in,v 1.1.2.1 2008/06/01 20:19:39 berniw Exp $                                  
 #
 ##############################################################################
 #
@@ -22,15 +22,13 @@ prefix=@prefix@
 exec_prefix=@exec_prefix@
 
 BINDIR=@bindir@
-LIBDIR=@libdir@/torcs-ng
+LIBDIR=@libdir@/speed-dreams
 DATAROOTDIR=@datarootdir@
-DATADIR=$DATAROOTDIR/games/torcs-ng
-VARDIR=@localstatedir@/games/torcs-ng
+DATADIR=$DATAROOTDIR/games/speed-dreams
+VARDIR=@localstatedir@/games/speed-dreams
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$LIBDIR/lib
 
-$LIBDIR/accc-bin $*
-
-rm -f temp.objf
+$LIBDIR/texmapper-bin $*
 
 exit 0

@@ -19,7 +19,7 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= accc-ng
+TOOLSCRIPT	= sd-accc
 
 PROGRAM		= accc-bin
 

@@ -18,7 +18,7 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= nfsperf-ng
+TOOLSCRIPT	= sd-nfsperf
 
 PROGRAM		= nfsperf-bin
 

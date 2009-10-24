@@ -16,7 +16,7 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= nfs2ac-ng
+TOOLSCRIPT	= sd-nfs2ac
 
 PROGRAM		= nfs2ac-bin
 

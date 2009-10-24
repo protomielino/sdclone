@@ -18,7 +18,7 @@
 
 TOOLSDIR	= 
 
-TOOLSCRIPT	= texmapper-ng
+TOOLSCRIPT	= sd-texmapper
 
 PROGRAM   	= texmapper-bin
 
