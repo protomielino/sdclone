@@ -16,7 +16,7 @@
 
 ROBOT       = simplix_sc
 SHIPDIR     = drivers/${ROBOT}/11
-SHIP        = sc-996.rgb
+SHIP        = sc-996.rgb skill.xml
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}

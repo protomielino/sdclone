@@ -48,7 +48,7 @@ SOURCES     = ../src/unitmain.cpp \
 		../src/unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml default.xml logo.rgb readme.txt
-SHIPSUBDIRS = 0 1 2 3 4 5 6 7 8 9 10 11 12 13 sc-996 sc-ciclon-300 sc-f360 sc-gt4 sc-lynx-220 sc-nsx tracks
+SHIPSUBDIRS = 0 1 2 3 4 5 6 7 8 9 12 13 sc-996 sc-ciclon-300 sc-f360 sc-gt4 sc-lynx-220 sc-nsx tracks
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-simplix_sc_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
