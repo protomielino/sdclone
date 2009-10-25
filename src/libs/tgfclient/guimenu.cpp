@@ -30,7 +30,6 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <SDL/SDL.h>
 
 #include "tgfclient.h"
 #include "gui.h"
@@ -59,14 +58,14 @@ gfMenuInit(void)
 void
 GfuiMenuDefaultKeysAdd(void *scr)
 {
-    GfuiAddKey(scr, SDLK_TAB, "Select Next Entry", NULL, gfuiSelectNext, NULL);
-    GfuiAddKey(scr, SDLK_RETURN, "Perform Action", (void*)2, gfuiMouseAction, NULL);
-    GfuiAddSKey(scr, SDLK_UP, "Select Previous Entry", NULL, gfuiSelectPrev, NULL);
-    GfuiAddSKey(scr, SDLK_DOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
-    GfuiAddSKey(scr, SDLK_PAGEUP, "Select Previous Entry", NULL, gfuiSelectPrev, NULL);
-    GfuiAddSKey(scr, SDLK_PAGEDOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
-    GfuiAddSKey(scr, SDLK_F1, "Help", scr, GfuiHelpScreen, NULL);
-    GfuiAddSKey(scr, SDLK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(scr, 9, "Select Next Entry", NULL, gfuiSelectNext, NULL);
+    GfuiAddKey(scr, 13, "Perform Action", (void*)2, gfuiMouseAction, NULL);
+    GfuiAddSKey(scr, GLUT_KEY_UP, "Select Previous Entry", NULL, gfuiSelectPrev, NULL);
+    GfuiAddSKey(scr, GLUT_KEY_DOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
+    GfuiAddSKey(scr, GLUT_KEY_PAGE_UP, "Select Previous Entry", NULL, gfuiSelectPrev, NULL);
+    GfuiAddSKey(scr, GLUT_KEY_PAGE_DOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
+    GfuiAddSKey(scr, GLUT_KEY_F1, "Help", scr, GfuiHelpScreen, NULL);
+    GfuiAddSKey(scr, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     
 }
 
@@ -228,7 +227,7 @@ GfuiMenuBackQuitButtonCreate(void *scr, const char *text, const char *tip, void 
 			(void*)cbinfo, dispInfo,
 			remInfo);
 
-    GfuiAddKey(scr, SDLK_ESCAPE, tip, userdata, onpush, NULL);
+    GfuiAddKey(scr, 27, tip, userdata, onpush, NULL);
 
     return bId;
 }
@@ -263,7 +262,7 @@ GfuiMenuBackQuitButtonCreateEx(void *scr, const char *text, const char *tip, voi
 			(void*)cbinfo, dispInfo,
 			remInfo);
 
-    GfuiAddKey(scr, SDLK_ESCAPE, tip, userdata, onpush, NULL);
+    GfuiAddKey(scr, 27, tip, userdata, onpush, NULL);
 
     return bId;
 }

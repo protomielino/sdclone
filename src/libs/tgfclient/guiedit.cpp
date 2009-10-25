@@ -29,7 +29,6 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <SDL/SDL.h>
 #include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
