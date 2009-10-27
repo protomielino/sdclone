@@ -254,7 +254,7 @@ ReRacemanMenu(void)
     const char	*str;
     void	*params = ReInfo->params;
 
-    if (racemanMenuHdle) {
+	if (racemanMenuHdle) {
 	GfuiScreenRelease(racemanMenuHdle);
     }
     racemanMenuHdle = GfuiScreenCreateEx(NULL, 
@@ -262,41 +262,29 @@ ReRacemanMenu(void)
 					 NULL, (tfuiCallback)NULL, 
 					 1);
 
-    str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
-    if (str) {
-	GfuiScreenAddBgImg(racemanMenuHdle, str);
-    }
-    
-    GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+
+	void *param2 = LoadMenuXML("racechoicemenu.xml");
+    CreateStaticControls(param2,racemanMenuHdle);
+
 
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
     if (str) {
-	GfuiTitleCreate(racemanMenuHdle, str, strlen(str));
+		int id = CreateLabelControl(racemanMenuHdle,param2,"title");
+		GfuiLabelSetText(racemanMenuHdle,id,str);
     }
 
+    CreateButtonControl(racemanMenuHdle,param2,"newrace",NULL,ReStartNewRace);
+    CreateButtonControl(racemanMenuHdle,param2,"configurerace",NULL,reConfigureMenu);
+    CreateButtonControl(racemanMenuHdle,param2,"configureplayers",DriverMenuInit(racemanMenuHdle),GfuiScreenActivate);
+    
+	CreateButtonControl(racemanMenuHdle,param2,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);
 
-    GfuiMenuButtonCreate(racemanMenuHdle,
-			 "New Race", "Start a New Race",
-			 NULL, ReStartNewRace);
-
-    GfuiMenuButtonCreate(racemanMenuHdle, 
-			 "Configure Race", "Configure The Race",
-			 NULL, reConfigureMenu);
-
-     GfuiMenuButtonCreate(racemanMenuHdle,
-			  "Configure Players", "Players configuration menu",
-			  NULL, rePlayerConfig);
 
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-	GfuiMenuButtonCreate(racemanMenuHdle, 
-			     "Load", "Load a Previously Saved Game",
-			     racemanMenuHdle, reLoadMenu);
+			CreateButtonControl(racemanMenuHdle,param2,"load",racemanMenuHdle,reLoadMenu);
     }
     
-    GfuiMenuBackQuitButtonCreate(racemanMenuHdle,
-				 "Back to Main", "Return to previous Menu",
-				 ReInfo->_reMenuScreen, GfuiScreenActivate);
-
     GfuiScreenActivate(racemanMenuHdle);
 
     return RM_ASYNC | RM_NEXT_STEP;
