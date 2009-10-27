@@ -30,39 +30,23 @@ static void *optionHandle = NULL;
 void *
 OptionOptionInit(void *precMenu)
 {
-    if (optionHandle) return optionHandle;
+	   if (optionHandle) return optionHandle;
 
-    optionHandle = GfuiMenuScreenCreate("OPTIONS");
-
-    GfuiScreenAddBgImg(optionHandle, "data/img/splash-options.png");
-
-    GfuiMenuButtonCreate(optionHandle,
-			 "Graphic", "Configure graphic parameters",
-			 GraphMenuInit(optionHandle), GfuiScreenActivate);
-
-    GfuiMenuButtonCreate(optionHandle,
-			 "Display", "Configure display parameters",
-			 GfScrMenuInit(optionHandle), GfuiScreenActivate);
+    optionHandle = GfuiScreenCreateEx((float*)NULL, 
+					    NULL, NULL, 
+					    NULL, (tfuiCallback)NULL, 
+					    1);
 
 
-    GfuiMenuButtonCreate(optionHandle,
-			 "Simulation", "Configure simulation parameters",
-			 SimuMenuInit(optionHandle), GfuiScreenActivate);
-
-
-    GfuiMenuButtonCreate(optionHandle,
-			 "Sound", "Configure sound parameters",
-			 SoundMenuInit(optionHandle), GfuiScreenActivate);
-
-    GfuiMenuButtonCreate(optionHandle,
-			 "OpenGL", "Configure OpenGL parameters",
-			 OpenGLMenuInit(optionHandle), GfuiScreenActivate);
-
-    GfuiMenuBackQuitButtonCreate(optionHandle,
-				 "Back",
-				 "Back to Main",
-				 precMenu,
-				 GfuiScreenActivate);
+     void *param = LoadMenuXML("optionsmenu.xml");
+    CreateStaticControls(param,optionHandle);
+    
+    CreateButtonControl(optionHandle,param,"graphic",GraphMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"display",GfScrMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"simulation",SimuMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"sound",SoundMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"opengl",OpenGLMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"back",precMenu,GfuiScreenActivate);
 
     return optionHandle;
 }

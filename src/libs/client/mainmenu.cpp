@@ -91,48 +91,6 @@ MainMenuInit(void)
     return 0;
 }
 /*
-int
-MainMenuInit(void)
-{
-    menuHandle = GfuiScreenCreateEx((float*)NULL, 
-				    NULL, MainMenuActivate, 
-				    NULL, (tfuiCallback)NULL, 
-				    1);
-
-    GfuiScreenAddBgImg(menuHandle, "data/img/splash-main.png");
-
-    GfuiTitleCreate(menuHandle, "Speed Dreams", 0);
-
-    GfuiLabelCreate(menuHandle,
-		    "The Open Racing Car Simulator - Next Generation",
-		    GFUI_FONT_LARGE, 320, 420, GFUI_ALIGN_HC_VB, 0);
-
-    GfuiMenuButtonCreate(menuHandle,
-			 "Race", "Races Menu",
-			 ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
-
-    GfuiMenuButtonCreate(menuHandle,
-			 "Configure Players", "Players configuration menu",
-			 NULL, onActivatePlayerConfig);
-
-    GfuiMenuButtonCreate(menuHandle,
-			 "Options", "Configure",
-			 OptionOptionInit(menuHandle), GfuiScreenActivate);
-    
-    GfuiMenuButtonCreate(menuHandle,
-			 "Credits", "Thanks to all contributors",
-			 menuHandle, CreditsScreenActivate);
-    
-    GfuiMenuDefaultKeysAdd(menuHandle);
-
-    GfuiMenuBackQuitButtonCreate(menuHandle,
-				 "Quit", "Quit game",
-				 MainExitMenuInit(menuHandle), GfuiScreenActivate);
-
-    return 0;
-}
-*/
-/*
  * Function
  *	
  *

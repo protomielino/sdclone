@@ -37,6 +37,7 @@
 #include "controlconfig.h"
 #include "mouseconfig.h"
 #include "joystickconfig.h"
+#include <string>
 
 static void 	*ScrHandle = NULL;
 static void	*PrevScrHandle = NULL;
@@ -473,11 +474,9 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    /* Screen title */
-    GfuiTitleCreate(ScrHandle, "Control Configuration", 0);
+    void *param = LoadMenuXML("controlconfigmenu.xml");
+    CreateStaticControls(param,ScrHandle);
 
-    /* Background image */
-    GfuiScreenAddBgImg(ScrHandle, "data/img/splash-mouseconf.png");
 
     /* Default keyboard shortcuts */
     GfuiMenuDefaultKeysAdd(ScrHandle);
@@ -487,46 +486,45 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     x2 = 210;
 
     /* For each control (in Cmd array), create the associated label and editbox */
-    for (i = 0; i < MaxCmd; i++) {
-	Cmd[i].labelId = GfuiLabelCreate(ScrHandle, Cmd[i].name, GFUI_FONT_MEDIUM, x, CmdDispInfo[i].y, GFUI_ALIGN_HL_VB, 0);
-	Cmd[i].Id = GfuiButtonStateCreate (ScrHandle, "MOUSE_MIDDLE_BUTTON", GFUI_FONT_MEDIUM_C, x+x2, CmdDispInfo[i].y, 0, GFUI_ALIGN_HC_VB, GFUI_MOUSE_DOWN, 
-					   (void*)i, onPush, NULL, (tfuiCallback)NULL, onFocusLost);
-	/* If first column done, change to the second */
-	if (i == MaxCmd / 2 - 1) {
-	    x = 320;
-	    x2 = 220;
-	}
+    for (i = 0; i < MaxCmd; i++) 
+	{
+		std::string strCmd = Cmd[i].name;
+		Cmd[i].labelId = CreateLabelControl(ScrHandle,param,strCmd.c_str());
+		std::string strCmdEdit = strCmd+" button";
+		Cmd[i].Id = CreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
+
+		/* If first column done, change to the second */
+		if (i == MaxCmd / 2 - 1) {
+			x = 320;
+			x2 = 220;
+		}
     }
 
     /* Steer Sensibility label and associated editbox */
-    GfuiLabelCreate(ScrHandle, "Steer Sensibility", GFUI_FONT_MEDIUM, 30, 90, GFUI_ALIGN_HL_VB, 0);
-    SteerSensEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
-					200, 90, 80, 8, NULL, (tfuiCallback)NULL, onSteerSensChange);
+	CreateLabelControl(ScrHandle,param,"Steer Sensitivity");
+	SteerSensEditId = CreateEditControl(ScrHandle,param,"SteerSensitivityEdit",NULL,NULL,onSteerSensChange);
+
 
     /* Steer Dead Zone label and associated editbox */
-    GfuiLabelCreate(ScrHandle, "Steer Dead Zone", GFUI_FONT_MEDIUM, 340, 90, GFUI_ALIGN_HL_VB, 0);
-    DeadZoneEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
-					510, 90, 80, 8, NULL, (tfuiCallback)NULL, onDeadZoneChange);
-
+	CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
+	DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
 
     /* Save button and associated keyboard shortcut */
+	CreateButtonControl(ScrHandle,param,"save",NULL,onSave);
+
+	/* Save button and associated keyboard shortcut */
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save", NULL, onSave, NULL);
     GfuiButtonCreate(ScrHandle, "Save", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, onSave, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
     /* Mouse calibration screen access button */
-    MouseCalButton = GfuiButtonCreate(ScrHandle, "Calibrate", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-				      MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+	MouseCalButton = CreateButtonControl(ScrHandle,param,"mousecalibrate",MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
     /* Joystick/joypad/wheel calibration screen access button */
-    JoyCalButton = GfuiButtonCreate(ScrHandle, "Calibrate", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-				    JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	JoyCalButton = CreateButtonControl(ScrHandle,param,"joycalibrate",JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
 
-    /* Cancel button and associated keyboard shortcut */
+	/* Cancel button and associated keyboard shortcut */
     GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    GfuiButtonCreate(ScrHandle, "Cancel", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+	CreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
     /* General callbacks for keyboard keys and special keys */
     GfuiKeyEventRegister(ScrHandle, onKeyAction);

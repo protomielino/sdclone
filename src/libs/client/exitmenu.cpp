@@ -42,21 +42,16 @@ void * exitMenuInit(void *menu, void *menuHandle)
     if (menuHandle) {
 		GfuiScreenRelease(menuHandle);
     }
-    
-    menuHandle = GfuiMenuScreenCreate("Quit ?");
-    GfuiScreenAddBgImg(menuHandle, "data/img/splash-quit.png");
 
-    GfuiMenuButtonCreate(menuHandle,
-		      "Yes, let's Quit",
-		      "Exit from the game",
-		      NULL,
-		      endofprog);
-    GfuiMenuButtonCreate(menuHandle,
-		      "No, back to Game",
-		      "Return to the game",
-		      menu,
-		      GfuiScreenActivate);
+    menuHandle = GfuiScreenCreate();
+
+     void *param = LoadMenuXML("quitscreen.xml");
+    CreateStaticControls(param,menuHandle);
+    CreateButtonControl(menuHandle,param,"yesquit",NULL,endofprog);
+    CreateButtonControl(menuHandle,param,"nobacktogame",menu,GfuiScreenActivate);
     
+    GfuiMenuDefaultKeysAdd(menuHandle);
+
     return menuHandle;
 }
 
