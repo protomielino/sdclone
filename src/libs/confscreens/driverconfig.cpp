@@ -28,6 +28,7 @@
 #include <controlconfig.h>
 
 #include "driverconfig.h"
+#include <string>
 
 static const int   MAX_DRV_NAME_LEN	= 16;
 static const char *DRV_NAME_PROMPT		= "-- Enter name --";
