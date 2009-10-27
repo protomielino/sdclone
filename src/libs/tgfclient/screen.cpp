@@ -793,176 +793,44 @@ onActivate(void * /* dummy */)
 void *
 GfScrMenuInit(void *precMenu)
 {
-    int		y, x1, x2;
-#ifndef WIN32
-	const int yoffset1 = 30, yoffset2 = 60;
-#else // WIN32
-	const int yoffset1 = 30, yoffset2 = 40;
-#endif // WIN32
     sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
     paramHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
     if (scrHandle) return scrHandle;
 
     scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-    GfuiTitleCreate(scrHandle, "Screen configuration", 0);
-    GfuiScreenAddBgImg(scrHandle, "data/img/splash-graphic.png");
+     void *param = LoadMenuXML("screenconfigmenu.xml");
+     CreateStaticControls(param,scrHandle);
 
-    x1 = 200;
-    x2 = 440;
-    y = 400;
-    GfuiLabelCreate(scrHandle,
-		    "Screen Resolution",
-		    GFUI_FONT_LARGE,
-		    320, y, GFUI_ALIGN_HC_VB,
-		    0);   
+	CreateButtonControl(scrHandle,param,"resleftarrow",(void*)-1,ResPrevNext);
+	CreateButtonControl(scrHandle,param,"resrightarrow",(void*)1,ResPrevNext);
+	ResLabelId = CreateLabelControl(scrHandle,param,"reslabel");
 
-    y -= yoffset1; //30;
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left-pushed.png",
-		       x1, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)-1, ResPrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
-
-    ResLabelId = GfuiLabelCreate(scrHandle,
-				 "",
-				 GFUI_FONT_LARGE_C,
-				 320, y, GFUI_ALIGN_HC_VB,
-				 30);
-    GfuiLabelSetColor(scrHandle, ResLabelId, LabelColor);
-
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right-pushed.png",
-		       x2, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)1, ResPrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
-
-    y -= yoffset2; //60;
-    GfuiLabelCreate(scrHandle,
-		    "Color Depth",
-		    GFUI_FONT_LARGE,
-		    320, y, GFUI_ALIGN_HC_VB,
-		    0);
-    y -= yoffset1; //30;
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left-pushed.png",
-		       x1, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)-1, DepthPrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    DepthLabelId = GfuiLabelCreate(scrHandle,
-				   "",
-				   GFUI_FONT_LARGE_C,
-				   320, y, GFUI_ALIGN_HC_VB,
-				   30);
-    GfuiLabelSetColor(scrHandle, DepthLabelId, LabelColor);
-
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right-pushed.png",
-		       x2, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)1, DepthPrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    y -= yoffset2; //60;
-    GfuiLabelCreate(scrHandle,
-		    "Display Mode",
-		    GFUI_FONT_LARGE,
-		    320, y, GFUI_ALIGN_HC_VB,
-		    0);
-
-    y -= yoffset1; //30;
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left-pushed.png",
-		       x1, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)-1, ModePrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    ModeLabelId = GfuiLabelCreate(scrHandle,
-				  "",
-				  GFUI_FONT_LARGE_C,
-				  320, y, GFUI_ALIGN_HC_VB,
-				  30);
-    GfuiLabelSetColor(scrHandle, ModeLabelId, LabelColor);
-
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right-pushed.png",
-		       x2, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)1, ModePrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    GfuiAddKey(scrHandle, 'f', "Display Mode", (void*)1, ModePrevNext, NULL);
-
-#ifdef WIN32
-    y -= yoffset2; //60;
-    GfuiLabelCreate(scrHandle,
-		    "Max Frequency",
-		    GFUI_FONT_LARGE,
-		    320, y, GFUI_ALIGN_HC_VB,
-		    0);
-    y -= yoffset1; //30;
-    MaxFreqId = GfuiEditboxCreate(scrHandle, "", GFUI_FONT_MEDIUM_C,
-				   275, y, 0, 8, NULL, (tfuiCallback)NULL, ChangeMaxFreq);
-#endif
-
-	y -= yoffset2; //60;
-    GfuiLabelCreate(scrHandle,
-		    "Video Mode Initialization",
-		    GFUI_FONT_LARGE,
-		    320, y, GFUI_ALIGN_HC_VB,
-		    0);
-    y -= yoffset1; //30;
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left.png",
-		       "data/img/arrow-left-pushed.png",
-		       x1, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)-1, VInitPrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    VInitLabelId = GfuiLabelCreate(scrHandle,
-				  "",
-				  GFUI_FONT_LARGE_C,
-				  320, y, GFUI_ALIGN_HC_VB,
-				  30);
-    GfuiLabelSetColor(scrHandle, VInitLabelId, LabelColor);
-
-    GfuiGrButtonCreate(scrHandle,
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right.png",
-		       "data/img/arrow-right-pushed.png",
-		       x2, y, GFUI_ALIGN_HC_VB, 0,
-		       (void*)1, VInitPrevNext,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-
     GfuiAddKey(scrHandle, 13, "Apply Mode", NULL, GfScrReinit, NULL);
     GfuiButtonCreate(scrHandle, "Apply", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, GfScrReinit, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
     GfuiAddKey(scrHandle, 27, "Cancel", precMenu, GfuiScreenActivate, NULL);
     GfuiButtonCreate(scrHandle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     precMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+
+	CreateButtonControl(scrHandle,param,"depthleftarrow",(void*)-1,DepthPrevNext);
+	CreateButtonControl(scrHandle,param,"depthrightarrow",(void*)1,DepthPrevNext);
+	DepthLabelId = CreateLabelControl(scrHandle,param,"depthlabel");
+
+	CreateButtonControl(scrHandle,param,"displeftarrow",(void*)-1,ModePrevNext);
+	CreateButtonControl(scrHandle,param,"disprightarrow",(void*)1,ModePrevNext);
+	ModeLabelId = CreateLabelControl(scrHandle,param,"displabel");
+
+#ifdef WIN32
+	CreateLabelControl(scrHandle,param,"maxfreqlabel");
+	MaxFreqId = CreateEditControl(scrHandle,param,"freqedit",NULL,ChangeMaxFreq,NULL);
+#endif
+
+	CreateButtonControl(scrHandle,param,"vmleftarrow",(void*)-1, VInitPrevNext);
+	CreateButtonControl(scrHandle,param,"vmrightarrow",(void*)1, VInitPrevNext);
+	VInitLabelId = CreateLabelControl(scrHandle,param,"vmlabel");
 
     return scrHandle;
 }

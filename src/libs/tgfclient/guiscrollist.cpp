@@ -242,6 +242,41 @@ gfuiScrollListRemElt(tGfuiScrollList *scrollist, int index)
     return cur;
 }
 
+/** Set the selected element from the scroll list.
+    @ingroup	gui
+    @param	scr		Current screen
+    @param	Id		Scroll list Id
+    @param	userData	address of the userData of the element to retrieve
+    @return	Name of the retrieved element
+		<br>NULL if Error
+ */
+bool
+GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
+{
+    tGfuiObject		*object;
+    tGfuiScrollList	*scrollist;
+    tGfuiListElement	*elt;
+    const char		*name;
+    int			i;
+
+    
+    object = gfuiGetObject(scr, Id);
+    if (object == NULL) {
+	return (const char*)NULL;
+    }
+    if (object->widget != GFUI_SCROLLIST) {
+	return (const char*)NULL;
+    }
+    scrollist = &(object->u.scrollist);
+
+	if (selectElement >= scrollist->nbElts)
+		return false;
+
+    scrollist->selectedElt == selectElement;
+    
+	return true;
+}
+
 /** Get the selected element from the scroll list.
     @ingroup	gui
     @param	scr		Current screen

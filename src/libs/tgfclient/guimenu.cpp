@@ -35,6 +35,7 @@
 #include "gui.h"
 #include "guimenu.h"
 #include <string>
+#include "gui.h"
 
 void
 gfMenuInit(void)
@@ -469,7 +470,7 @@ CreateLabelControl(void *menuHandle,void *param,const char *pControlName)
 }
 
 int 
-CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush)
+CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	std::string strText,strTip;
 	int textsize;
@@ -540,8 +541,8 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 			   textsize,
 			   x, y, width, alignH, GFUI_MOUSE_UP,
 			   userdata, onpush,
-			   NULL, NULL,
-			   NULL);
+			   userDataOnFocus, onFocus,
+			   onFocusLost);
 		GfuiButtonShowBox(menuHandle,id,bShowbox);
 		GfuiButtonSetImage(menuHandle,id,imgX,imgY,imgWidth,imgHeight,
 			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str());
@@ -562,7 +563,7 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 }
 
 int 
-CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush)
+CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	std::string strTip,strText;
 	//int textsize;
@@ -592,24 +593,30 @@ CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,v
 		x,y,alignment,GFUI_MOUSE_UP
 		,userdata,
 		onpush,
-		NULL,
-		(tfuiCallback)NULL,
-		(tfuiCallback)NULL);
+	    userDataOnFocus, 
+	    onFocus,
+		onFocusLost);
 
-    	return id;
+	return id;
 }
 
 int 
 CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush)
+{
+	return CreateButtonControlEx(menuHandle,param,pControlName,userdata,onpush,NULL,NULL,NULL);
+}
+
+int 
+CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	std::string strControlName = pControlName;
 	strControlName = "dynamiccontrols/"+strControlName;
 
 	std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
 	if (strType == "textbutton")
-		return CreateTextButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush);
+		return CreateTextButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
 	else if(strType == "imagebutton")
-		return CreateImageButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush);
+		return CreateImageButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
 	else
 		printf("ERROR: unknown button type\n");
 

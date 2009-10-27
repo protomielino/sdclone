@@ -229,6 +229,7 @@ extern int GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta);
 extern const char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
 extern const char *GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData);
 extern const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
+extern bool GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement);
 extern const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
 extern void GfuiScrollListShowElement(void *scr, int Id, int index);
 extern void GfuiScrollListSetColor(void *scr, int id,Color color);
@@ -327,6 +328,7 @@ extern void *LoadMenuXML(const char *pFilePath);
 extern bool CreateStaticControls(void *param,void *menuHandle);
 
 extern int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
+extern int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
 extern int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
 extern int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
