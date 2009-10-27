@@ -31,7 +31,6 @@
 #include "simuconfig.h"
 #include <portability.h>
 
-static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
 
 /* list of available simulation engine */
 static const char *simuVersionList[] = {"simuv2", "simuv3"};
@@ -124,36 +123,17 @@ SimuMenuInit(void *prevMenu)
     prevHandle = prevMenu;
 
     scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-    GfuiTitleCreate(scrHandle, "Simulation Configuration", 0);
-    GfuiScreenAddBgImg(scrHandle, "data/img/splash-simucfg.png");
 
-    x = 20;
-    x2 = 240;
-    x3 = x2 + 100;
-    x4 = x2 + 200;
-    y = 370;
-    dy = 30;
+	void *param = LoadMenuXML("simulationmenu.xml");
+    CreateStaticControls(param,scrHandle);
 
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Simulation version:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)-1, ChangeSimuVersion,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeSimuVersion,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    SimuVersionId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(scrHandle, SimuVersionId, LabelColor);
+	CreateButtonControl(scrHandle,param,"simvleftarrow",(void*)-1,ChangeSimuVersion);
+	CreateButtonControl(scrHandle,param,"simvrightarrow",(void*)1,ChangeSimuVersion);
 
-    GfuiButtonCreate(scrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-     NULL, SaveSimuVersion, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-     prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	SimuVersionId = CreateLabelControl(scrHandle,param,"simulabel");
+	CreateButtonControl(scrHandle,param,"accept",NULL,SaveSimuVersion);
+	CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
     GfuiAddKey(scrHandle, 13, "Save", NULL, SaveSimuVersion, NULL);
     GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);

@@ -31,7 +31,8 @@
 #include <glfeatures.h>
 #include "openglconfig.h"
 
-static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
+
+//static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
 
 // Texture compression.
 static const char *textureCompressOptionList[] = {GR_ATT_TEXTURECOMPRESSION_DISABLED, GR_ATT_TEXTURECOMPRESSION_ENABLED};
@@ -189,67 +190,28 @@ void * OpenGLMenuInit(void *prevMenu)
 	}
 
 	prevHandle = prevMenu;
-
 	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-	GfuiTitleCreate(scrHandle, "OpenGL Options", 0);
-	GfuiScreenAddBgImg(scrHandle, "data/img/splash-simucfg.png");
+        void *param = LoadMenuXML("opengloptionsmenu.xml");
+        CreateStaticControls(param,scrHandle);
 
-	y = 400;
-	dy = 30;
-
-	const int xleft = 160;	// Center of left elements.
-	const int xright = 480;	// Center of right elements.
-	const int width = 240;	// Width of elements.
-
-	y -= dy;
 
 	// Texture compression.
-	GfuiLabelCreate(scrHandle, "Texture Compression", GFUI_FONT_LARGE, xleft, 400, GFUI_ALIGN_HC_VB, 0);
-
 	if (isCompressARBAvailable()) {
-		GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-				"data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-				xleft-width/2, y, GFUI_ALIGN_HC_VB, 1,
-				(void*)-1, changeTextureCompressState,
-				NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-		GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-				"data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-				xleft+width/2, y, GFUI_ALIGN_HC_VB, 1,
-				(void*)1, changeTextureCompressState,
-				NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-		TextureCompressOptionId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_LARGE_C, xleft, y, GFUI_ALIGN_HC_VB, 32);
-		GfuiLabelSetColor(scrHandle, TextureCompressOptionId, LabelColor);
+                CreateButtonControl(scrHandle,param,"compressleftarrow",(void*)-1, changeTextureCompressState);
+                CreateButtonControl(scrHandle,param,"compressrightarrow",(void*)1, changeTextureCompressState);
+		TextureCompressOptionId = CreateLabelControl(scrHandle,param,"compressiontext");
 	} else {
-		GfuiLabelCreate(scrHandle, "not available", GFUI_FONT_LARGE_C, xleft, y, GFUI_ALIGN_HC_VB, 0);
+		CreateLabelControl(scrHandle,param,"na");
 	}
 
 
 	// Texture sizing.
-	GfuiLabelCreate(scrHandle, "Texture Size Limit", GFUI_FONT_LARGE, xright, 400, GFUI_ALIGN_HC_VB, 0);
+    CreateButtonControl(scrHandle,param,"textureleftarrow",(void*)-1, changeTextureCompressState);
+	CreateButtonControl(scrHandle,param,"texturerightarrow",(void*)1, changeTextureCompressState);
+	TextureSizeOptionId = CreateLabelControl(scrHandle,param,"texturetext");
 
-	GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-			"data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-			xright-width/2, y, GFUI_ALIGN_HC_VB, 0,
-			(void*)-1, changeTextureSizeState,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-			"data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-			xright+width/2, y, GFUI_ALIGN_HC_VB, 0,
-			(void*)1, changeTextureSizeState,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	TextureSizeOptionId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_LARGE_C, xright, y, GFUI_ALIGN_HC_VB, 32);
-	GfuiLabelSetColor(scrHandle, TextureSizeOptionId, LabelColor);
-
-
-	GfuiButtonCreate(scrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	NULL, saveOpenGLOption, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(scrHandle,param,"accept",NULL, saveOpenGLOption);
+	CreateButtonControl(scrHandle,param,"cancel",prevMenu, GfuiScreenActivate);
 
 	GfuiAddKey(scrHandle, 13, "Save", NULL, saveOpenGLOption, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);

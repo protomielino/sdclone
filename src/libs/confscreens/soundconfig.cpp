@@ -140,10 +140,6 @@ static void onActivate(void * /* dummy */)
 // Sound menu
 void * SoundMenuInit(void *prevMenu)
 {
-	int x, y, x2, x3, x4, dy;
-//	char buf[1024];
-	
-
 	// Has screen already been created?
 	if (scrHandle) {
 		return scrHandle;
@@ -152,50 +148,18 @@ void * SoundMenuInit(void *prevMenu)
 	prevHandle = prevMenu;
 
 	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-	GfuiTitleCreate(scrHandle, "Sound Configuration", 0);
-	GfuiScreenAddBgImg(scrHandle, "data/img/splash-qrdrv.png");
 
-	x = 20;
-	x2 = 200;
-	x3 = 340;
-	x4 = (x2+x3)/2;
-	y = 400;
-	dy = 30;
+	void *param = LoadMenuXML("soundmenu.xml");
+    CreateStaticControls(param,scrHandle);
 
-	y -= dy;
-
-	GfuiLabelCreate(scrHandle, "Sound System:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-	GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-			"data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-			x2, y-5, GFUI_ALIGN_HL_VB, 1,
-			(void*)-1, changeSoundState,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-			"data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-			x3, y-5, GFUI_ALIGN_HR_VB, 1,
-			(void*)1, changeSoundState,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	SoundOptionId = GfuiLabelCreate(scrHandle, "", GFUI_FONT_MEDIUM_C, x4, y, GFUI_ALIGN_HC_VB, 32);
-	GfuiLabelSetColor(scrHandle, SoundOptionId, LabelColor);
-
-/*
-    y -= dy;
-    GfuiLabelCreate(scrHandle, "Volume:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-
-	
-    sprintf(buf, "%f", VolumeValue);
-    VolumeValueId = GfuiEditboxCreate(scrHandle, buf, GFUI_FONT_MEDIUM_C,
-				    x2+10, y+2, x4-x2+20, 16, NULL, (tfuiCallback)NULL, changeVolume);
+	CreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
+	CreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
 
 
-*/
-	GfuiButtonCreate(scrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	NULL, saveSoundOption, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	SoundOptionId = CreateLabelControl(scrHandle,param,"soundlabel");
+	CreateButtonControl(scrHandle,param,"accept",NULL,saveSoundOption);
+	CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
-	GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
 	GfuiAddKey(scrHandle, 13, "Save", NULL, saveSoundOption, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);

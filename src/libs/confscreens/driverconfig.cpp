@@ -971,8 +971,9 @@ onActivate(void * /* dummy */)
 void *
 DriverMenuInit(void *prevMenu)
 {
-    int		x, y, x2, x3, x4, dy;
     static int	firstTime = 1;
+
+    void *param = LoadMenuXML("drivermenu.xml");
 
     /* Initialize cars and categories info if not already done */
     if (firstTime) {
@@ -991,159 +992,62 @@ DriverMenuInit(void *prevMenu)
     /* Create the screen */
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    /* Title */
-    GfuiTitleCreate(ScrHandle, "Player Configuration", 0);
+    CreateStaticControls(param,ScrHandle);
 
-    /* Background image */
-    GfuiScreenAddBgImg(ScrHandle, "data/img/splash-qrdrv.png");
 
-    /* Players label and associated scroll list just below */
-    GfuiLabelCreate(ScrHandle, "Players", GFUI_FONT_LARGE, 496, 400, GFUI_ALIGN_HC_VB, 0);
+    std::string strText,strTip;
+    //int textsize;
+    //int alignment;
 
-    const unsigned scrollListSize = 12;
-    ScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C,
-				      396, 390 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C),
-				      GFUI_ALIGN_HL_VB, 200, scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C), GFUI_SB_RIGHT,
-				      NULL, onSelect);
+    ScrollList = CreateScrollListControl(ScrHandle,param,"playerscrolllist",NULL, onSelect);
 
     /* New player button */
-    GfuiButtonCreate(ScrHandle, "New", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C),
-		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, NewPlayer, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+    CreateButtonControl(ScrHandle,param,"new",NULL,NewPlayer);
     /* Copy player button */
-    GfuiButtonCreate(ScrHandle, "Copy", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 30,
-		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, CopyPlayer, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+    CreateButtonControl(ScrHandle,param,"copy",NULL,CopyPlayer);
     /* Delete player button */
-    GfuiButtonCreate(ScrHandle, "Delete", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 60,
-		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, DeletePlayer, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+    CreateButtonControl(ScrHandle,param,"delete",NULL,DeletePlayer);
     /* Access to control screen button*/
-    GfuiButtonCreate(ScrHandle, "Controls", GFUI_FONT_LARGE, 496, 360 - scrollListSize * GfuiFontHeight(GFUI_FONT_MEDIUM_C) - 90,
-		     140, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, ConfControls, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    /* Screen coordinates and deltas for labels, buttons, ... */
-    x = 20;
-    x2 = 170;
-    x3 = x2 + 100;
-    x4 = x2 + 200;
-    y = 370;
-    dy = 30;
+    CreateButtonControl(ScrHandle,param,"controls",NULL,ConfControls);
 
     /* Player name label and associated editbox */
-    GfuiLabelCreate(ScrHandle, "Name:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    NameEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
-				   x2+10, y, 180, MAX_DRV_NAME_LEN, 
-				   NULL, (tfuiCallback)NULL, ChangeName);
+    NameEditId = CreateEditControl(ScrHandle,param,"nameedit",NULL,NULL,ChangeName);
 
     /* Player skill level and associated "combobox" (left arrow, label, right arrow) */
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Level:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeLevel,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeLevel,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    SkillEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, SkillEditId, LabelColor);
+    CreateButtonControl(ScrHandle,param,"levelleftarrow",NULL, ChangeLevel);
+    CreateButtonControl(ScrHandle,param,"levelrightarrow",NULL, ChangeLevel);
+    SkillEditId = CreateLabelControl(ScrHandle,param,"skillstext");
 
-    /* Race number and associated editbox */
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Race Number:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    RaceNumEditId = GfuiEditboxCreate(ScrHandle, "0", GFUI_FONT_MEDIUM_C,
-				      x2+10, y, 0, 2, NULL, (tfuiCallback)NULL, ChangeNum);
+    RaceNumEditId = CreateEditControl(ScrHandle,param,"racenumedit",NULL,NULL,ChangeNum);
 
-    /* Number of pit stops and associated editbox */
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Pit Stops:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    PitsEditId = GfuiEditboxCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
-				   x2+10, y, 0, 2, NULL, (tfuiCallback)NULL, ChangePits);
-
-    /* Gear changing mode and associated "combobox" (left arrow, label, right arrow) */
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Gear change:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeGearChange,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeGearChange,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    GearChangeEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, GearChangeEditId, LabelColor);
+    PitsEditId = CreateEditControl(ScrHandle,param,"pitstopedit",NULL,NULL,ChangePits);
+    
+    //Combobox like control
+    CreateButtonControl(ScrHandle,param,"gearleftarrow",NULL, ChangeGearChange);
+    CreateButtonControl(ScrHandle,param,"gearrightarrow",NULL, ChangeGearChange);
+    GearChangeEditId = CreateLabelControl(ScrHandle,param,"geartext");
 
     /* Gear changing auto-reverse flag and associated "combobox" (left arrow, label, right arrow) */
-    y -= dy;
-    AutoReverseLabelId =
-      GfuiLabelCreate(ScrHandle, "Auto Reverse:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    AutoReverseLeftId =
-      GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-			 "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-			 x2, y, GFUI_ALIGN_HL_VB, 1,
-			 (void*)-1, ChangeReverse,
-			 NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    AutoReverseRightId =
-      GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeReverse,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    AutoReverseEditId = 
-      GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, AutoReverseEditId, LabelColor);
-    
+    //Combobox like control
+    AutoReverseLabelId = CreateLabelControl(ScrHandle,param,"autoreversetext");
+
+    AutoReverseLeftId = CreateButtonControl(ScrHandle,param,"autoleftarrow",(void*)-1, ChangeReverse);
+    AutoReverseRightId = CreateButtonControl(ScrHandle,param,"autorightarrow",(void*)1, ChangeReverse);
+    AutoReverseEditId = CreateLabelControl(ScrHandle,param,"autotext");
+
     /* Car category and associated "combobox" (left arrow, label, right arrow) */
-    y -= dy;
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Category:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeCat,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeCat,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    CatEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, CatEditId, LabelColor);
+    //Combobox like control
+    CreateButtonControl(ScrHandle,param,"categoryleftarrow",NULL, ChangeCat);
+    CreateButtonControl(ScrHandle,param,"categoryrightarrow",NULL, ChangeCat);
+    CatEditId = CreateLabelControl(ScrHandle,param,"categorylabel");
 
-    /* Car name and associated "combobox" (left arrow, label, right arrow) */
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Car:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       x2, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, ChangeCar,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       x4, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, ChangeCar,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    CarEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, x3, y, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, CarEditId, LabelColor);
+    //Combobox like control
+    CreateButtonControl(ScrHandle,param,"carleftarrow",NULL, ChangeCar);
+    CreateButtonControl(ScrHandle,param,"carrightarrow",NULL, ChangeCar);
+    CarEditId = CreateLabelControl(ScrHandle,param,"carlabel");
 
-    /* Screen validation button */
-    GfuiButtonCreate(ScrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-     NULL, SaveDrvList, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    /* Screen cancelation button */
-    GfuiButtonCreate(ScrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-     NULL, QuitDriverConfig, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CreateButtonControl(ScrHandle,param,"accept",NULL, SaveDrvList);
+    CreateButtonControl(ScrHandle,param,"cancel",NULL, QuitDriverConfig);
 
     /* Keybord shortcuts */
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save Drivers", NULL, SaveDrvList, NULL);
