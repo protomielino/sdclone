@@ -23,10 +23,34 @@
 #endif
 #include "tgfclient.h"
 #include "gui.h"
+#include <string>
+
+static int g_mouseOffsetX = 0;
+static int g_mouseOffsetY = 0;
+static int g_mouseH = 20;
+static int g_mouseW = 20;
+static GLuint g_mouseImage = 0;
 
 void
 gfuiObjectInit(void)
 {
+	//Read mouse pointer settings
+	char buf[1024];
+	void *param;
+	int	size;
+	int	i;
+
+	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	std::string strSec = "Mouse Pointer";
+	g_mouseOffsetX = (int)GfParmGetNum(param, strSec.c_str(),"offsetX", (char*)NULL, 0.0);
+	g_mouseOffsetY = (int)GfParmGetNum(param, strSec.c_str(),"offsetY", (char*)NULL, 0.0);
+	g_mouseH = (int)GfParmGetNum(param, strSec.c_str(),"height", (char*)NULL, 20.0);
+	g_mouseW = (int)GfParmGetNum(param, strSec.c_str(),"width", (char*)NULL, 20.0);
+	std::string strImage = GfParmGetStr(param, strSec.c_str(), "image", "data/img/mouse.png");
+	
+	g_mouseImage = GfImgReadTex(strImage.c_str());
 }
 
 void 
@@ -79,35 +103,39 @@ GfuiDrawCursor()
     float xf = (float)(GfuiMouse.X);
     float yf = (float)(GfuiMouse.Y);
 
-#define SCALE 1.3
-    
-    glColor4fv(GfuiScreen->mouseColor[0]) ;
-    glBegin(GL_TRIANGLES);
-    glVertex2f(xf, yf);
-    glVertex2f(xf + 4.8 * SCALE, yf - 10.4 * SCALE);
-    glVertex2f(xf + 6.4 * SCALE, yf - 6.4 * SCALE);
-    glEnd();
+	int xmin = g_mouseOffsetX+xf;
+	int ymin = g_mouseOffsetY+yf;
+	int xmax = xmin+g_mouseW;
+	int ymax = ymin-g_mouseH;
 
-    glBegin(GL_QUADS);
-    glVertex2f(xf + 5.6 * SCALE, yf - 6.4 * SCALE);
-    glVertex2f(xf + 6 * SCALE, yf - 6 * SCALE);
-    glVertex2f(xf + 12.4 * SCALE, yf - 12.4 * SCALE);
-    glVertex2f(xf + 12 * SCALE, yf - 12.8 * SCALE);
-    glEnd();
 
-    glColor4fv(GfuiScreen->mouseColor[1]) ;
-    glBegin(GL_TRIANGLES);
-    glVertex2f(xf, yf) ;
-    glVertex2f(xf + 10.4 * SCALE, yf - 4.8 * SCALE);
-    glVertex2f(xf + 6.4 * SCALE, yf - 6.4 * SCALE);
-    glEnd();
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	//set color to mix with image
+	glColor3f(1.0,1.0,1.0);
 
-    glBegin(GL_QUADS);
-    glVertex2f(xf + 6 * SCALE, yf - 6 * SCALE);
-    glVertex2f(xf + 6.4 * SCALE, yf - 4.8 * SCALE);
-    glVertex2f(xf + 12.8 * SCALE, yf - 12 * SCALE);
-    glVertex2f(xf + 12.4 * SCALE, yf - 12.4 * SCALE);  
-    glEnd();
+	glEnable(GL_BLEND);
+	glEnable(GL_TEXTURE_2D);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	glBindTexture(GL_TEXTURE_2D,g_mouseImage);
+	glBegin(GL_QUADS);
+
+	glTexCoord2f (0.0, 1.0);
+	glVertex2i(xmin, ymin);
+	
+	glTexCoord2f (0.0, 0.0);
+	glVertex2i(xmin, ymax);
+	
+	glTexCoord2f (1.0, 0.0);
+	glVertex2i(xmax, ymax);
+	
+	glTexCoord2f (1.0, 1.0);
+	glVertex2i(xmax, ymin);
+
+	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 }
 

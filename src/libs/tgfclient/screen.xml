@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Screen" version="0.51">
+<params name="Screen" version="0.522">
   <section name="Screen Properties">
     <attnum name="x" val="800"/>
     <attnum name="y" val="600"/>
@@ -34,6 +34,14 @@
   <section name="Digital Font">
     <attstr name="name" val="digital.glf"/>
     <attnum name="size big" val="6"/>
+  </section>
+
+  <section name="Mouse Pointer">
+    <attstr name="image" val="data/img/mouse.png"/>
+    <attnum name="offsetX" val="0"/>
+    <attnum name="offsetY" val="0"/>
+    <attnum name="width" val="16"/>
+    <attnum name="height" val="16"/>
   </section>
 
   <section name="Menu Colors">

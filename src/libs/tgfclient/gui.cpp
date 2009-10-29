@@ -30,6 +30,7 @@
 
 #include "tgfclient.h"
 #include "gui.h"
+#include <string>
 
 #include <portability.h>
 
@@ -49,6 +50,7 @@ static tdble DelayRepeat;
 static double LastTimeClick;
 #define REPEAT1	1.0
 #define REPEAT2 0.2
+
 
 static void
 gfuiColorInit(void)
