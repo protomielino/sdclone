@@ -477,7 +477,6 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     void *param = LoadMenuXML("controlconfigmenu.xml");
     CreateStaticControls(param,ScrHandle);
 
-
     /* Default keyboard shortcuts */
     GfuiMenuDefaultKeysAdd(ScrHandle);
 
@@ -487,44 +486,45 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 
     /* For each control (in Cmd array), create the associated label and editbox */
     for (i = 0; i < MaxCmd; i++) 
-	{
-		std::string strCmd = Cmd[i].name;
-		Cmd[i].labelId = CreateLabelControl(ScrHandle,param,strCmd.c_str());
-		std::string strCmdEdit = strCmd+" button";
-		Cmd[i].Id = CreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
-
-		/* If first column done, change to the second */
-		if (i == MaxCmd / 2 - 1) {
-			x = 320;
-			x2 = 220;
-		}
+    {
+	std::string strCmd = Cmd[i].name;
+	Cmd[i].labelId = CreateLabelControl(ScrHandle,param,strCmd.c_str());
+	std::string strCmdEdit = strCmd+" button";
+	Cmd[i].Id = CreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
+	
+	/* If first column done, change to the second */
+	if (i == MaxCmd / 2 - 1) {
+	    x = 320;
+	    x2 = 220;
+	}
     }
-
+    
     /* Steer Sensibility label and associated editbox */
-	CreateLabelControl(ScrHandle,param,"Steer Sensitivity");
-	SteerSensEditId = CreateEditControl(ScrHandle,param,"SteerSensitivityEdit",NULL,NULL,onSteerSensChange);
+    CreateLabelControl(ScrHandle,param,"Steer Sensitivity");
+    SteerSensEditId = CreateEditControl(ScrHandle,param,"SteerSensitivityEdit",NULL,NULL,onSteerSensChange);
 
 
     /* Steer Dead Zone label and associated editbox */
-	CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
-	DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
+    CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
+    DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
 
     /* Save button and associated keyboard shortcut */
-	CreateButtonControl(ScrHandle,param,"save",NULL,onSave);
+    CreateButtonControl(ScrHandle,param,"save",NULL,onSave);
 
-	/* Save button and associated keyboard shortcut */
+    /* Save button and associated keyboard shortcut */
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save", NULL, onSave, NULL);
     GfuiButtonCreate(ScrHandle, "Save", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, onSave, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
     /* Mouse calibration screen access button */
-	MouseCalButton = CreateButtonControl(ScrHandle,param,"mousecalibrate",MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
-    /* Joystick/joypad/wheel calibration screen access button */
-	JoyCalButton = CreateButtonControl(ScrHandle,param,"joycalibrate",JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
+    MouseCalButton = CreateButtonControl(ScrHandle,param,"mousecalibrate",MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
 
-	/* Cancel button and associated keyboard shortcut */
+    /* Joystick/joypad/wheel calibration screen access button */
+    JoyCalButton = CreateButtonControl(ScrHandle,param,"joycalibrate",JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
+
+    /* Cancel button and associated keyboard shortcut */
     GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-	CreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+    CreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
     /* General callbacks for keyboard keys and special keys */
     GfuiKeyEventRegister(ScrHandle, onKeyAction);

@@ -129,5 +129,7 @@ RmPitMenuStart(tCarElt *car, void *userdata, tfuiCallback callback)
     GfuiButtonCreate(menuHandle, "Stop & Go", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, rmStopAndGo, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
+    GfuiAddSKey(menuHandle, GLUT_KEY_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(menuHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiScreenActivate(menuHandle);
 }

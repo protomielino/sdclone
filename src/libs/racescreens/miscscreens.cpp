@@ -49,6 +49,8 @@ RmTwoStateScreen(
 	GfuiMenuButtonCreate(twoStateHdle, label1, tip1, screen1, GfuiScreenActivate);
 	GfuiMenuButtonCreate(twoStateHdle, label2, tip2, screen2, GfuiScreenActivate);
 	GfuiAddKey(twoStateHdle, 27, tip2, screen2, GfuiScreenActivate, NULL);
+	GfuiAddSKey(twoStateHdle, GLUT_KEY_F1, "Help", twoStateHdle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(twoStateHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 	GfuiScreenActivate(twoStateHdle);
 
 	return twoStateHdle;
@@ -72,6 +74,8 @@ RmTriStateScreen(
 	GfuiMenuButtonCreate(triStateHdle, label2, tip2, screen2, GfuiScreenActivate);
 	GfuiMenuButtonCreate(triStateHdle, label3, tip3, screen3, GfuiScreenActivate);
 	GfuiAddKey(triStateHdle, 27, tip3, screen3, GfuiScreenActivate, NULL);
+	GfuiAddSKey(triStateHdle, GLUT_KEY_F1, "Help", triStateHdle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(triStateHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 	GfuiScreenActivate(triStateHdle);
 	
 	return triStateHdle;
@@ -96,6 +100,8 @@ RmFourStateScreen(
 	GfuiMenuButtonCreate(fourStateHdle, label3, tip3, screen3, GfuiScreenActivate);
 	GfuiMenuButtonCreate(fourStateHdle, label4, tip4, screen4, GfuiScreenActivate);
 	GfuiAddKey(fourStateHdle, 27, tip4, screen4, GfuiScreenActivate, NULL);
+	GfuiAddSKey(fourStateHdle, GLUT_KEY_F1, "Help", fourStateHdle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(fourStateHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 	GfuiScreenActivate(fourStateHdle);
 	
 	return fourStateHdle;
@@ -258,8 +264,9 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 				NULL,
 				(tfuiCallback)NULL,
 				(tfuiCallback)NULL);
+
 	GfuiAddKey(rmScrHdle, (unsigned char)27, "Abandon", abortScr, GfuiScreenReplace, NULL);
-	
+	GfuiAddSKey(rmScrHdle, GLUT_KEY_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 	
 	GfuiScreenActivate(rmScrHdle);

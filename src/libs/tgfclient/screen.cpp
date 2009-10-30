@@ -155,8 +155,6 @@ static int VInitLabelId;
 
 static void	*paramHdle;
 
-static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
-
 
 void
 gfScreenInit(void)

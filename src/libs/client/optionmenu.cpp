@@ -28,17 +28,17 @@
 static void *optionHandle = NULL;
 
 void *
-OptionOptionInit(void *precMenu)
+OptionOptionInit(void *prevMenu)
 {
-	   if (optionHandle) return optionHandle;
+    if (optionHandle) 
+	return optionHandle;
 
     optionHandle = GfuiScreenCreateEx((float*)NULL, 
 					    NULL, NULL, 
 					    NULL, (tfuiCallback)NULL, 
 					    1);
 
-
-     void *param = LoadMenuXML("optionsmenu.xml");
+    void *param = LoadMenuXML("optionsmenu.xml");
     CreateStaticControls(param,optionHandle);
     
     CreateButtonControl(optionHandle,param,"graphic",GraphMenuInit(optionHandle),GfuiScreenActivate);
@@ -46,7 +46,10 @@ OptionOptionInit(void *precMenu)
     CreateButtonControl(optionHandle,param,"simulation",SimuMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"sound",SoundMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"opengl",OpenGLMenuInit(optionHandle),GfuiScreenActivate);
-    CreateButtonControl(optionHandle,param,"back",precMenu,GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"back",prevMenu,GfuiScreenActivate);
+
+    GfuiMenuDefaultKeysAdd(optionHandle);
+    GfuiAddKey(optionHandle, 27, "Back", prevMenu, GfuiScreenActivate, NULL);
 
     return optionHandle;
 }

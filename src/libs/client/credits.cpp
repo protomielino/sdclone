@@ -82,7 +82,6 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 {
     static const unsigned maxBufSize = 256;
     static char	buf[maxBufSize];
-    //static char	bufColInd[4];
 
     static float colNameColor[4] = {1.0, 0.0, 1.0, 1.0};
 
@@ -238,6 +237,8 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	       RetScrHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(pageScrHdle, (unsigned char)13, "Exit Credits Screen", 
 	       RetScrHdle, GfuiScreenReplace, NULL);
+    GfuiAddSKey(pageScrHdle, GLUT_KEY_F1, "Help", 
+		pageScrHdle, GfuiHelpScreen, NULL);
     GfuiAddSKey(pageScrHdle, GLUT_KEY_F12, "Take a Screen Shot", 
 		NULL, GfuiScreenShot, NULL);
     

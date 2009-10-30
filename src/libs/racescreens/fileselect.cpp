@@ -116,7 +116,8 @@ RmFileSelect(void *vs)
     GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, rmDeactivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    /* Default menu keyboard actions */
+    GfuiAddKey(scrHandle, (unsigned char)27, "Cancel", NULL, rmDeactivate, NULL);
     GfuiMenuDefaultKeysAdd(scrHandle);
+
     GfuiScreenActivate(scrHandle);
 }

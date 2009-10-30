@@ -150,7 +150,7 @@ void * SoundMenuInit(void *prevMenu)
 	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
 	void *param = LoadMenuXML("soundmenu.xml");
-    CreateStaticControls(param,scrHandle);
+	CreateStaticControls(param,scrHandle);
 
 	CreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
 	CreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
@@ -163,6 +163,7 @@ void * SoundMenuInit(void *prevMenu)
 
 	GfuiAddKey(scrHandle, 13, "Save", NULL, saveSoundOption, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);

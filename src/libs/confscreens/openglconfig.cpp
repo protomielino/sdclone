@@ -32,8 +32,6 @@
 #include "openglconfig.h"
 
 
-//static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
-
 // Texture compression.
 static const char *textureCompressOptionList[] = {GR_ATT_TEXTURECOMPRESSION_DISABLED, GR_ATT_TEXTURECOMPRESSION_ENABLED};
 static const int nbOptionsTextComp = sizeof(textureCompressOptionList) / sizeof(textureCompressOptionList[0]);
@@ -182,8 +180,6 @@ static void onActivate(void * /* dummy */)
 // OpenGL menu
 void * OpenGLMenuInit(void *prevMenu)
 {
-	int y, dy;
-
 	// Has screen already been created?
 	if (scrHandle) {
 		return scrHandle;
@@ -206,8 +202,8 @@ void * OpenGLMenuInit(void *prevMenu)
 
 
 	// Texture sizing.
-    CreateButtonControl(scrHandle,param,"textureleftarrow",(void*)-1, changeTextureCompressState);
-	CreateButtonControl(scrHandle,param,"texturerightarrow",(void*)1, changeTextureCompressState);
+	CreateButtonControl(scrHandle,param,"textureleftarrow",(void*)-1, changeTextureSizeState);
+	CreateButtonControl(scrHandle,param,"texturerightarrow",(void*)1, changeTextureSizeState);
 	TextureSizeOptionId = CreateLabelControl(scrHandle,param,"texturetext");
 
 	CreateButtonControl(scrHandle,param,"accept",NULL, saveOpenGLOption);
@@ -215,6 +211,7 @@ void * OpenGLMenuInit(void *prevMenu)
 
 	GfuiAddKey(scrHandle, 13, "Save", NULL, saveOpenGLOption, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Option in list", (void*)0, changeTextureCompressState, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Option in list", (void*)1, changeTextureCompressState, NULL);

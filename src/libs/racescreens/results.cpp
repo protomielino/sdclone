@@ -209,6 +209,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 
     GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddSKey(rmScrHdle, GLUT_KEY_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
     GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(rmScrHdle);

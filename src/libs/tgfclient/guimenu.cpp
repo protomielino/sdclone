@@ -45,7 +45,6 @@ gfMenuInit(void)
 /** Add the default menu keyboard callback to a screen.
     The keys are:
     <br><tt>F1 .......... </tt>Help
-    <br><tt>Escape ...... </tt>Quit the menu
     <br><tt>Enter ....... </tt>Perform Action
     <br><tt>Up Arrow .... </tt>Select Previous Entry
     <br><tt>Down Arrow .. </tt>Select Next Entry
@@ -424,10 +423,10 @@ CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName)
 int 
 CreateLabel(void *menuHandle,void *param,const char *pControlName)
 {
-	std::string strType = GfParmGetStr(param, pControlName, "type", "");
+	const std::string strType = GfParmGetStr(param, pControlName, "type", "");
 	if (strType!="label")
 	{
-		printf("Error not label type\n");
+		GfError("Error: Control '%s' is not a label\n", pControlName);
 		return -1;
 	}
 	
@@ -612,13 +611,13 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
 	std::string strControlName = pControlName;
 	strControlName = "dynamiccontrols/"+strControlName;
 
-	std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
+	const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
 	if (strType == "textbutton")
 		return CreateTextButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
 	else if(strType == "imagebutton")
 		return CreateImageButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
 	else
-		printf("ERROR: unknown button type\n");
+	    printf("Error: Unknown button type '%s'\n", strType.c_str());
 
 	return -1;
 }
@@ -762,11 +761,11 @@ LoadMenuXML(const char *pMenuPath)
 {
 	std::string strPath = pMenuPath;
 	strPath = "data/menu/"+strPath;
-    void *param = NULL;
-
-    char buf[1024];
-    sprintf(buf, "%s%s", GetDataDir(),strPath.c_str());
-    param = GfParmReadFile(buf, GFPARM_RMODE_STD);
-
-   return param;
+	void *param = NULL;
+	
+	char buf[1024];
+	sprintf(buf, "%s%s", GetDataDir(),strPath.c_str());
+	param = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	
+	return param;
 }

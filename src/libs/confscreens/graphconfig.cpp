@@ -51,21 +51,46 @@ ExitGraphicOptions(void *prevMenu)
 static void
 SaveGraphicOptions(void *prevMenu)
 {
-	sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-	void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", FovFactorValue);
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, SmokeValue);
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, SkidValue);
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, LodFactorValue);
+    //GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_WHEEL3D, NULL, Wheel3dOtionId);
+    //GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ANIMDRIVER, NULL, AnimDriverOptionId);
+    
+    GfParmWriteFile(NULL, grHandle, "graph");
+    
+    GfParmReleaseHandle(grHandle);
+    
+    ExitGraphicOptions(prevMenu);
+}
 
-	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", FovFactorValue);
-	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, SmokeValue);
-	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, SkidValue);
-	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, LodFactorValue);
-	//GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_WHEEL3D, NULL, Wheel3dOtionId);
-	//GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_ANIMDRIVER, NULL, AnimDriverOptionId);
-	
-	GfParmWriteFile(NULL, grHandle, "graph");
+static void
+LoadGraphicOptions()
+{
+    sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    
+    FovFactorValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", 100.0);
+    sprintf(buf, "%d", FovFactorValue);
+    GfuiEditboxSetString(scrHandle,FovEditId,buf);
+      
+    SmokeValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, 300.0);
+    sprintf(buf, "%d", SmokeValue);
+    GfuiEditboxSetString(scrHandle,SmokeEditId,buf);
 
-	GfParmReleaseHandle(grHandle);
+    SkidValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, 20.0);
+    sprintf(buf, "%d", SkidValue);
+    GfuiEditboxSetString(scrHandle,SkidEditId,buf);
 
-	ExitGraphicOptions(prevMenu);
+    LodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
+    sprintf(buf, "%g", LodFactorValue);
+    GfuiEditboxSetString(scrHandle,LodFactorEditId,buf);
+
+    GfParmReleaseHandle(grHandle);
 }
 
 static void
@@ -113,61 +138,38 @@ ChangeSkid(void * /* dummy */)
 }
 
 
+static void onActivate(void * /* dummy */)
+{
+    LoadGraphicOptions();
+}
+
+
 void *
 GraphMenuInit(void *prevMenu)
 {
-    int		x, y, x2, dy;
-    
-
     /* screen already created */
     if (scrHandle) {
 	return scrHandle;
     }
 
-
-	sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-	void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-
-	scrHandle = GfuiScreenCreate();
+    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *param = LoadMenuXML("graphicconfig.xml");
 
     CreateStaticControls(param,scrHandle);
 
-
-
-    int option = 0;
-    int i = 0;
+    FovEditId = CreateEditControl(scrHandle,param,"fovedit",NULL,NULL,ChangeFov);
+    SmokeEditId = CreateEditControl(scrHandle,param,"smokeedit",NULL,NULL,ChangeSmoke);
+    SkidEditId = CreateEditControl(scrHandle,param,"skidedit",NULL,NULL,ChangeSkid);
+    LodFactorEditId = CreateEditControl(scrHandle,param,"lodedit",NULL,NULL,ChangeLodFactor);
     
-    FovFactorValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", 100.0);
-    sprintf(buf, "%d", FovFactorValue);
-	FovEditId = CreateEditControl(scrHandle,param,"fovedit",NULL,ChangeFov,NULL);
-	GfuiEditboxSetString(scrHandle,FovEditId,buf);
-
-      
-	SmokeValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, 300.0);
-    sprintf(buf, "%d", SmokeValue);
-
-    SmokeEditId = CreateEditControl(scrHandle,param,"smokeedit",NULL,ChangeSmoke,NULL);
-	GfuiEditboxSetString(scrHandle,SmokeEditId,buf);
-
-    SkidValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, 20.0);
-    sprintf(buf, "%d", SkidValue);
-    SkidEditId = CreateEditControl(scrHandle,param,"skidedit",NULL,ChangeSkid,NULL);
-    GfuiEditboxSetString(scrHandle,SkidEditId,buf);
-
-    LodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
-    sprintf(buf, "%g", LodFactorValue);
-
-	LodFactorEditId = CreateEditControl(scrHandle,param,"lodedit",NULL,ChangeLodFactor,NULL);
-	GfuiEditboxSetString(scrHandle,LodFactorEditId,buf);
-	
-	CreateButtonControl(scrHandle,param,"accept",prevMenu, SaveGraphicOptions);
-	CreateButtonControl(scrHandle,param,"cancel",prevMenu, GfuiScreenActivate);
-
-	GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-
-	GfParmReleaseHandle(grHandle);
-
+    CreateButtonControl(scrHandle, param, "accept", prevMenu, SaveGraphicOptions);
+    CreateButtonControl(scrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
+    
+    GfuiAddKey(scrHandle, 13, "Save", prevMenu, SaveGraphicOptions, NULL);
+    GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+  
     return scrHandle;
 }

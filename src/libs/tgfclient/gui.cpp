@@ -607,7 +607,6 @@ GfuiScreenCreateEx(float *bgColor,
 		   void *userDataOnDeactivate, tfuiCallback onDeactivate,
 		   int mouseAllowed)
 {
-	int		i;
 	tGfuiScreen	*screen;
 	
 	screen = (tGfuiScreen*)calloc(1, sizeof(tGfuiScreen));
@@ -954,7 +953,7 @@ GfuiScreenShot(void * /* notused */)
 		
 		t = time(NULL);
 		stm = localtime(&t);
-		snprintf(buf, 1024, "%s/torcs-%4d%02d%02d%02d%02d%02d.png",
+		snprintf(buf, 1024, "%s/sd-%4d%02d%02d%02d%02d%02d.png",
 			path,
 			stm->tm_year+1900,
 			stm->tm_mon+1,

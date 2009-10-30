@@ -45,9 +45,9 @@ onActivatePlayerConfig(void * /* dummy */)
 static void
 MainMenuActivate(void * /* dummy */)
 {
-	if (RacemanModLoaded != NULL) {
-		GfModUnloadList(&RacemanModLoaded);
-	}
+    if (RacemanModLoaded) {
+	GfModUnloadList(&RacemanModLoaded);
+    }
 }
 
 /*
@@ -81,12 +81,14 @@ MainMenuInit(void)
 
     //Add buttons and create based on xml
     CreateButtonControl(menuHandle,param,"race",ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
-    CreateButtonControl(menuHandle,param,"configure",DriverMenuInit(menuHandle),GfuiScreenActivate);
+    CreateButtonControl(menuHandle,param,"configure",NULL,onActivatePlayerConfig);
     CreateButtonControl(menuHandle,param,"options",OptionOptionInit(menuHandle),GfuiScreenActivate);
     CreateButtonControl(menuHandle,param,"credits",menuHandle,CreditsScreenActivate);
     CreateButtonControl(menuHandle,param,"quit",MainExitMenuInit(menuHandle), GfuiScreenActivate);
 
     GfuiMenuDefaultKeysAdd(menuHandle);
+    GfuiAddKey(menuHandle, (unsigned char)27, "Quit Game", 
+	       MainExitMenuInit(menuHandle), GfuiScreenActivate, NULL);
 
     return 0;
 }

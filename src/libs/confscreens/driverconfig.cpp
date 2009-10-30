@@ -1053,6 +1053,7 @@ DriverMenuInit(void *prevMenu)
     /* Keybord shortcuts */
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save Drivers", NULL, SaveDrvList, NULL);
     GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel Selection", NULL, QuitDriverConfig, NULL);
+    GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddSKey(ScrHandle, GLUT_KEY_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
     GfuiAddSKey(ScrHandle, GLUT_KEY_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);

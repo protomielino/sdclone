@@ -255,9 +255,6 @@ GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
-    const char		*name;
-    int			i;
 
     
     object = gfuiGetObject(scr, Id);
@@ -269,12 +266,12 @@ GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
     }
     scrollist = &(object->u.scrollist);
 
-	if (selectElement >= scrollist->nbElts)
-		return false;
+    if (selectElement >= (unsigned)scrollist->nbElts)
+	return false;
 
-    scrollist->selectedElt == selectElement;
+    scrollist->selectedElt = selectElement;
     
-	return true;
+    return true;
 }
 
 /** Get the selected element from the scroll list.

@@ -106,7 +106,7 @@ ChangeSimuVersion(void *vp)
 
 static void onActivate(void * /* dummy */)
 {
-        ReadSimuCfg();
+    ReadSimuCfg();
 }
 
 
@@ -114,8 +114,6 @@ static void onActivate(void * /* dummy */)
 void *
 SimuMenuInit(void *prevMenu)
 {
-    int		x, y, x2, x3, x4, dy;
-
     /* screen already created */
     if (scrHandle) {
 	return scrHandle;
@@ -127,16 +125,16 @@ SimuMenuInit(void *prevMenu)
 	void *param = LoadMenuXML("simulationmenu.xml");
     CreateStaticControls(param,scrHandle);
 
-	CreateButtonControl(scrHandle,param,"simvleftarrow",(void*)-1,ChangeSimuVersion);
-	CreateButtonControl(scrHandle,param,"simvrightarrow",(void*)1,ChangeSimuVersion);
+    CreateButtonControl(scrHandle,param,"simvleftarrow",(void*)-1,ChangeSimuVersion);
+    CreateButtonControl(scrHandle,param,"simvrightarrow",(void*)1,ChangeSimuVersion);
 
-
-	SimuVersionId = CreateLabelControl(scrHandle,param,"simulabel");
-	CreateButtonControl(scrHandle,param,"accept",NULL,SaveSimuVersion);
-	CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+    SimuVersionId = CreateLabelControl(scrHandle,param,"simulabel");
+    CreateButtonControl(scrHandle,param,"accept",NULL,SaveSimuVersion);
+    CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
     GfuiAddKey(scrHandle, 13, "Save", NULL, SaveSimuVersion, NULL);
     GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Version in list", (void*)0, ChangeSimuVersion, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Version in list", (void*)1, ChangeSimuVersion, NULL);

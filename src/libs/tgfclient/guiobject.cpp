@@ -37,20 +37,18 @@ gfuiObjectInit(void)
 	//Read mouse pointer settings
 	char buf[1024];
 	void *param;
-	int	size;
-	int	i;
 
 	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	std::string strSec = "Mouse Pointer";
-	g_mouseOffsetX = (int)GfParmGetNum(param, strSec.c_str(),"offsetX", (char*)NULL, 0.0);
-	g_mouseOffsetY = (int)GfParmGetNum(param, strSec.c_str(),"offsetY", (char*)NULL, 0.0);
-	g_mouseH = (int)GfParmGetNum(param, strSec.c_str(),"height", (char*)NULL, 20.0);
-	g_mouseW = (int)GfParmGetNum(param, strSec.c_str(),"width", (char*)NULL, 20.0);
-	std::string strImage = GfParmGetStr(param, strSec.c_str(), "image", "data/img/mouse.png");
-	
-	g_mouseImage = GfImgReadTex(strImage.c_str());
+	static const char* pszSec = "Mouse Pointer";
+	g_mouseOffsetX = (int)GfParmGetNum(param, pszSec,"offsetX", (char*)NULL, 0.0);
+	g_mouseOffsetY = (int)GfParmGetNum(param, pszSec,"offsetY", (char*)NULL, 0.0);
+	g_mouseH = (int)GfParmGetNum(param, pszSec,"height", (char*)NULL, 20.0);
+	g_mouseW = (int)GfParmGetNum(param, pszSec,"width", (char*)NULL, 20.0);
+
+	const char* pszImage = GfParmGetStr(param, pszSec, "image", "data/img/mouse.png");
+	g_mouseImage = GfImgReadTex(pszImage);
 }
 
 void 

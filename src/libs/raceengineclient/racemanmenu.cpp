@@ -254,7 +254,7 @@ ReRacemanMenu(void)
     const char	*str;
     void	*params = ReInfo->params;
 
-	if (racemanMenuHdle) {
+    if (racemanMenuHdle) {
 	GfuiScreenRelease(racemanMenuHdle);
     }
     racemanMenuHdle = GfuiScreenCreateEx(NULL, 
@@ -262,29 +262,30 @@ ReRacemanMenu(void)
 					 NULL, (tfuiCallback)NULL, 
 					 1);
 
-	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
-
-	void *param2 = LoadMenuXML("racechoicemenu.xml");
+    void *param2 = LoadMenuXML("racechoicemenu.xml");
     CreateStaticControls(param2,racemanMenuHdle);
 
 
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
     if (str) {
-		int id = CreateLabelControl(racemanMenuHdle,param2,"title");
-		GfuiLabelSetText(racemanMenuHdle,id,str);
+	int id = CreateLabelControl(racemanMenuHdle,param2,"title");
+	GfuiLabelSetText(racemanMenuHdle,id,str);
     }
 
     CreateButtonControl(racemanMenuHdle,param2,"newrace",NULL,ReStartNewRace);
     CreateButtonControl(racemanMenuHdle,param2,"configurerace",NULL,reConfigureMenu);
-    CreateButtonControl(racemanMenuHdle,param2,"configureplayers",DriverMenuInit(racemanMenuHdle),GfuiScreenActivate);
+    CreateButtonControl(racemanMenuHdle,param2,"configureplayers",NULL,rePlayerConfig);
     
-	CreateButtonControl(racemanMenuHdle,param2,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);
+    CreateButtonControl(racemanMenuHdle,param2,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);
 
 
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-			CreateButtonControl(racemanMenuHdle,param2,"load",racemanMenuHdle,reLoadMenu);
+	CreateButtonControl(racemanMenuHdle,param2,"load",racemanMenuHdle,reLoadMenu);
     }
     
+    GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+    GfuiAddKey(racemanMenuHdle, 27, "Back to Main menu", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+
     GfuiScreenActivate(racemanMenuHdle);
 
     return RM_ASYNC | RM_NEXT_STEP;
