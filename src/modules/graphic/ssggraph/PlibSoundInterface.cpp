@@ -30,7 +30,6 @@ PlibSoundInterface::PlibSoundInterface(float sampling_rate, int n_channels) : So
 	sched->setMaxConcurrent (n_channels);
 	engpri = NULL;
 	car_src = NULL;
-	global_gain = 1.0f;
 
 	// initialise mappings
 	grass.schar = &CarSoundData::grass;

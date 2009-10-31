@@ -103,7 +103,7 @@ class SoundInterface {
 	std::vector<TorcsSound*> sound_list; ///< keeps track of sounds used
 	SoundPri* engpri; ///< the engine priority, used for sorting
 
-    /// The following are mappings for sound prioritisation
+	/// The following are mappings for sound prioritisation
 	QueueSoundMap road; 
 	QueueSoundMap grass; 
 	QueueSoundMap grass_skid;
@@ -112,33 +112,36 @@ class SoundInterface {
 	QueueSoundMap turbo;
 	QueueSoundMap axle;
 
-    /** Find the max amplitude sound in car_sound_data and put it in smap  */
+	/// Global gain [0, 1]
+	float global_gain;
+
+	/** Find the max amplitude sound in car_sound_data and put it in smap  */
 	void SortSingleQueue (CarSoundData** car_sound_data, 
 			      QueueSoundMap* smap,
 			      int n_cars);
 
-    /** Using the smap->id, get the appropriate entry in
-    car_sound_data and call apprioriate methods for smap->snd in order
-    to play the sound.*/
+	/** Using the smap->id, get the appropriate entry in
+	    car_sound_data and call apprioriate methods for smap->snd in order
+	    to play the sound.*/
 	void SetMaxSoundCar(CarSoundData** car_sound_data,
 			    QueueSoundMap* smap);
 	
  public:
-    /// Make a new sound interface
+	/// Make a new sound interface
 	SoundInterface(float sampling_rate, int n_channels);
 
-    /// Destructor - does nothing
+	/// Destructor - does nothing
 	virtual ~SoundInterface() {}
 
-    /// Set the number of cars - must be defined in children classes
+	/// Set the number of cars - must be defined in children classes
 	virtual void setNCars(int n_cars) = 0;
 
-    /// Add a new sample - must be defined in children classes
+	/// Add a new sample - must be defined in children classes
 	virtual TorcsSound* addSample (const char* filename,
 				       int flags = (ACTIVE_VOLUME|ACTIVE_PITCH),
 				       bool loop = false, bool static_pool = true) = 0;
 
-    /// initialised the pool of shared sources
+	/// initialised the pool of shared sources
 	virtual void initSharedSourcePool() {}
 
 	void setSkidSound (const char* sound_name)
@@ -214,6 +217,7 @@ class SoundInterface {
 		TorcsSound* sound = addSample (sound_name, 0, false);
 		gear_change_sound = sound;
 	}
+
 	/// Update sound for a given observer.
 	virtual void update(CarSoundData** car_sound_data,
 			    int n_cars, sgVec3 p_obs, sgVec3 u_obs, 
@@ -221,10 +225,15 @@ class SoundInterface {
 	{
 		// do nothing
 	}
-	virtual float getGlobalGain() {return 1.0f;}
+
+	virtual float getGlobalGain()
+	{ 
+		return global_gain; 
+	}
+
 	virtual void setGlobalGain(float g) 
 	{
-		fprintf (stderr, "Warning, gain setting not supported\n");
+		global_gain = (g < 0.0 ? 0.0 : g > 1.0 ? 1.0 : g);
 	}
 
 };
@@ -245,8 +254,7 @@ class PlibSoundInterface : public SoundInterface {
 	SoundSource tyre_src[4];
 	void DopplerShift (SoundChar* sound, float* p_src, float* u_src, float* p, float* u);
 	void SetMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap);
-	float global_gain;
- public:
+public:
 	PlibSoundInterface(float sampling_rate, int n_channels);
 	virtual ~PlibSoundInterface();
 	virtual void setNCars(int n_cars);
@@ -278,7 +286,6 @@ class OpenalSoundInterface : public SoundInterface {
 	SoundSource tyre_src[4];
 	ALCcontext* cc;
 	ALCdevice* dev;
-	float global_gain;
 	int OSI_MAX_BUFFERS;
 	int OSI_MAX_SOURCES;
 	int OSI_MAX_STATIC_SOURCES;

@@ -45,11 +45,11 @@ static int SoundOptionId;
 
 // volume
 static float VolumeValue = 100.0f;
-//static int VolumeValueId;
+static int VolumeValueId;
 
 // gui screen handles.
-static void	*scrHandle = NULL;
-static void	*prevHandle = NULL;
+static void *scrHandle = NULL;
+static void *prevHandle = NULL;
 
 
 // Read sound configuration.
@@ -59,6 +59,7 @@ static void readSoundCfg(void)
 	int	i;
 	char buf[1024];
 
+	// Sound interface.
 	sprintf(buf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[0]);
@@ -70,17 +71,21 @@ static void readSoundCfg(void)
 		}
 	}
 
+	GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
+
+	// Sound volume.
 	VolumeValue = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (VolumeValue>100.0f) {
 		VolumeValue = 100.0f;
 	} 
-	if (VolumeValue < 0.0f) {
+	else if (VolumeValue < 0.0f) {
 		VolumeValue = 0.0f;
 	}
 
-	GfParmReleaseHandle(paramHandle);
+	sprintf(buf, "%g", VolumeValue);
+	GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
 
-	GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
+	GfParmReleaseHandle(paramHandle);
 }
 
 
@@ -118,17 +123,22 @@ static void changeSoundState(void *vp)
     GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
 }
 
-/*// Volume
+// Volume
 static void changeVolume(void * )
 {
     char	*val;
     char buf[256];
     val = GfuiEditboxGetString(scrHandle, VolumeValueId);
     sscanf(val, "%g", &VolumeValue);
+    if (VolumeValue > 100.0f) {
+	VolumeValue = 100.0f;
+    } 
+    else if (VolumeValue < 0.0f) {
+	VolumeValue = 0.0f;
+    }
     sprintf(buf, "%g", VolumeValue);
     GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
 }
-*/
 
 static void onActivate(void * /* dummy */)
 {
@@ -157,6 +167,8 @@ void * SoundMenuInit(void *prevMenu)
 	SoundOptionId = CreateLabelControl(scrHandle,param,"soundlabel");
 	CreateButtonControl(scrHandle,param,"accept",NULL,saveSoundOption);
 	CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+
+	VolumeValueId = CreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
 
 	GfParmReleaseHandle(param);
     

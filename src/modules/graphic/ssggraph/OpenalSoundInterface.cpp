@@ -132,7 +132,6 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	}
 	
 	engpri = NULL;
-	global_gain = 1.0f;
 	
 	// initialise mappings
 	grass.schar = &CarSoundData::grass;

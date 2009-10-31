@@ -80,7 +80,7 @@ void grInitSound(tSituation* s, int ncars)
 	case DISABLED:
 		return;
 	default:
-		GfOut (" -- Unknown sound mode %d\n", sound_mode);
+		GfError ("Error: Unknown sound mode %d (%s)\n", sound_mode, optionName);
 		exit(-1);
 	}
 
@@ -94,27 +94,27 @@ void grInitSound(tSituation* s, int ncars)
 		tCarElt	*car = s->cars[i];
 		const char* param;
 		char filename[512];
-        FILE *file = NULL;
+		FILE *file = NULL;
 
 		// ENGINE PARAMS
 		tdble rpm_scale;
 		param = GfParmGetStr(handle, "Sound", "engine sample", "engine-1.wav");
 		rpm_scale = GfParmGetNum(handle, "Sound", "rpm scale", NULL, 1.0);
-        sprintf (filename, "cars/%s/%s", car->_carName, param);
-        file = fopen(filename, "r");
-        if (!file)
-        {
- 		    sprintf (filename, "data/sound/%s", param);
-        }
-        else
-        {
-            fclose(file);
-        }
+		sprintf (filename, "cars/%s/%s", car->_carName, param);
+		file = fopen(filename, "r");
+		if (!file)
+		{
+ 			sprintf (filename, "data/sound/%s", param);
+		}
+		else
+		{
+			fclose(file);
+		}
 
 		car_sound_data[car->index] = new CarSoundData (car->index, sound_interface);
 		TorcsSound* engine_sound = sound_interface->addSample(filename, ACTIVE_VOLUME | ACTIVE_PITCH | ACTIVE_LP_FILTER, true, false);
 		car_sound_data[i]->setEngineSound (engine_sound, rpm_scale);
-
+	
 		// TURBO PARAMS
 		float default_turbo_rpm = 100.0f;//0.5f*car->_enginerpmMaxTq;
 		bool turbo_on;
@@ -127,7 +127,7 @@ void grInitSound(tSituation* s, int ncars)
 			}
 			turbo_on = false;
 		}
-		
+	
 		float turbo_rpm = GfParmGetNum(handle, SECT_ENGINE, PRM_TURBO_RPM, NULL, default_turbo_rpm);
 		float turbo_lag = GfParmGetNum(handle, SECT_ENGINE, PRM_TURBO_LAG, NULL, 1.0f);
 		car_sound_data[i]->setTurboParameters (turbo_on, turbo_rpm, turbo_lag);
@@ -144,10 +144,10 @@ void grInitSound(tSituation* s, int ncars)
 	sound_interface->setTurboSound("data/sound/turbo1.wav");
 	sound_interface->setBackfireLoopSound("data/sound/backfire_loop.wav");
 
-    for (i = 0; i < NB_CRASH_SOUND; i++) {
+	for (i = 0; i < NB_CRASH_SOUND; i++) {
 		sprintf(buf, "data/sound/crash%d.wav", i+1);
 		sound_interface->setCrashSound(buf, i);
-    }
+	}
 
 	sound_interface->setBangSound("data/sound/boom.wav");
 	sound_interface->setBottomCrashSound("data/sound/bottom_crash.wav");
@@ -155,7 +155,8 @@ void grInitSound(tSituation* s, int ncars)
 	sound_interface->setGearChangeSound("data/sound/gear_change1.wav");
 
 	sound_interface->setNCars(ncars);
-    soundInitialized = 1;
+	soundInitialized = 1;
+
 	// Must happen after all static non-shared have been allocated. 
 	sound_interface->initSharedSourcePool();
 }
@@ -166,16 +167,16 @@ grShutdownSound(int ncars)
 {
     GfOut("-- grShutdownSound\n");
 
-	if (sound_mode == DISABLED) {
-		return;
-	}
+    if (sound_mode == DISABLED) {
+	return;
+    }
 
     if (!soundInitialized) {
 		return;
     }
     soundInitialized = 0;
 
-	delete sound_interface;
+    delete sound_interface;
 
     if (__slPendingError) {
 		GfOut("!!! error ignored: %s\n", __slPendingError);
@@ -199,11 +200,12 @@ grRefreshSound(tSituation *s, cGrCamera	*camera)
 	}
 	lastUpdated = s->currentTime;
 
-    tCarElt	*car;//= s->cars[s->current];
+	tCarElt	*car;//= s->cars[s->current];
 
-	// TODO: Fix for a lot of cars. I guess in this implementation we can change the Update() call to have _ncars = 1?
+	// TODO: Fix for a lot of cars. 
+	// I guess in this implementation we can change the Update() call to have _ncars = 1?
 
-	// TODO: Just consider cars near the camera, doing computations  just for them?
+	// TODO: Just consider cars near the camera, doing computations just for them?
 
 	if (camera) {
 		sgVec3* p_camera = camera->getPosv();
@@ -224,9 +226,9 @@ grRefreshSound(tSituation *s, cGrCamera	*camera)
 			car_sound_data[car->index]->update(car);
 		}
 
-		sound_interface->update (car_sound_data, s->_ncars, *p_camera, *u_camera, c_camera, *a_camera);
-
-
+		sound_interface->update (car_sound_data, s->_ncars, 
+					 *p_camera, *u_camera, c_camera, *a_camera);
 	}
+
 	return 0.0f;
 }

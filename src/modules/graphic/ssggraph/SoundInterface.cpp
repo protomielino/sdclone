@@ -52,6 +52,7 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	} else if (n_engine_sounds > MAX_N_ENGINE_SOUNDS) {
 		n_engine_sounds = MAX_N_ENGINE_SOUNDS;
 	}
+	global_gain = 1.0f;
 }
 
 void SoundInterface::SortSingleQueue (CarSoundData** car_sound_data, QueueSoundMap* smap, int n_cars)
