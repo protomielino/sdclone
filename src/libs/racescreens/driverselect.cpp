@@ -466,7 +466,9 @@ RmDriversSelect(void *vs)
     CreateButtonControl(ScrHandle,param,"accept",NULL,rmdsAccept);
     CreateButtonControl(ScrHandle,param,"cancel",DrvSel->prevScreen,rmdsDeactivate);
 
-	// Keyboard shortcuts
+    GfParmReleaseHandle(param);
+
+    // Keyboard shortcuts
     GfuiMenuDefaultKeysAdd(ScrHandle);
     rmdsAddKeys();
 

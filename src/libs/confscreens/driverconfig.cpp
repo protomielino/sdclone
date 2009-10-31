@@ -21,14 +21,14 @@
 #include <stdlib.h>
 #include <cstring>
 #include <deque>
+#include <string>
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
-#include <controlconfig.h>
 
+#include "controlconfig.h"
 #include "driverconfig.h"
-#include <string>
 
 static const int   MAX_DRV_NAME_LEN	= 16;
 static const char *DRV_NAME_PROMPT		= "-- Enter name --";
@@ -382,9 +382,18 @@ GenCarsInfo(void)
 			break;
 		    }
 		} while ((curCat = GF_TAILQ_NEXT(curCat, link)) != NULL);
+		if (curCat) {
+		    curCar->cat = curCat;
+		    GF_TAILQ_INSERT_TAIL(&(curCat->CarsInfoList), curCar, link);
+		} else {
+		    GfError("Car %s ignored because unknown category %s\n", 
+			    curCar->info.dispname, str);
+		}
 	    }
-	    curCar->cat = curCat;
-	    GF_TAILQ_INSERT_TAIL(&(curCat->CarsInfoList), curCar, link);
+	    if (curCat == NULL) {
+		free(curCar->info.name);
+		free(curCar);
+	    }
 	} while (curFile != files);
     }
     GfDirFreeList(files, NULL, true, true);
@@ -965,6 +974,10 @@ onActivate(void * /* dummy */)
 		GenDrvList();
     }
 	
+	//Set default player
+     CurrPlayer = PlayersInfo.begin();
+
+	GfuiScrollListSetSelectedElement(ScrHandle,ScrollList,1);
     /* Display editable fields values */
     refreshEditVal();
 }

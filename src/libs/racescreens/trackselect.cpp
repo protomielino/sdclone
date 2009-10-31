@@ -580,7 +580,7 @@ RmTrackSelect(void *vs)
 	PitsId = CreateLabelControl(ScrHandle,param,"pitslabel");
 	AuthorId = CreateLabelControl(ScrHandle,param,"authorlabel");
 
-
+	GfParmReleaseHandle(param);
 
 	rmtsUpdateTrackInfo();
 
