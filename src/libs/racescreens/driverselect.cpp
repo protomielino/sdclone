@@ -316,77 +316,34 @@ RmDriversSelect(void *vs)
     int		human;
     const char* initCarCat;
 
-    int y = 370;
-    const int dy = 30;
-    const int dfy = 3 * GfuiFontHeight(GFUI_FONT_MEDIUM) / 4;
-
     // Initialize drivers selection
     DrvSel = (tRmDrvSelect*)vs;
 
     // Create screen, background image and title
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmdsActivate, NULL, (tfuiCallback)NULL, 1);
-    GfuiScreenAddBgImg(ScrHandle, "data/img/splash-qrdrv.png");
-    GfuiTitleCreate(ScrHandle, "Select Drivers", sizeof("Select Drivers"));
+    
+    void *param = LoadMenuXML("driverselectmenu.xml");
+    CreateStaticControls(param,ScrHandle);
 
-    // Selected and unselected scroll-lists
-    GfuiLabelCreate(ScrHandle, "Selected", GFUI_FONT_LARGE, 120, 400, GFUI_ALIGN_HC_VB, 0);
-    GfuiLabelCreate(ScrHandle, "Not selected", GFUI_FONT_LARGE, 496, 400, GFUI_ALIGN_HC_VB, 0);
+    SelectedScrollList = CreateScrollListControl(ScrHandle,param,"selectedscrolllist",NULL,rmdsClickOnDriver);
+    UnSelectedScrollList = CreateScrollListControl(ScrHandle,param,"notselectedscrolllist",NULL,rmdsClickOnDriver);
 
-    SelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 20, 78, GFUI_ALIGN_HL_VB,
-					      200, 312, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
-    UnSelectedScrollList = GfuiScrollListCreate(ScrHandle, GFUI_FONT_MEDIUM_C, 396, 78, GFUI_ALIGN_HL_VB,
-						200, 252, GFUI_SB_RIGHT, NULL, rmdsClickOnDriver);
-
-    // Car category and associated "combobox" (left arrow, label, right arrow)
-    GfuiLabelCreate(ScrHandle, "Car category:", GFUI_FONT_MEDIUM, 260, y+4, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       396, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, rmdsChangeCarCat,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       596, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, rmdsChangeCarCat,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    CarCatEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, 496, y+4, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, CarCatEditId, PurpleColor);
+    CreateButtonControl(ScrHandle,param,"carleftarrow",(void*)0,rmdsChangeCarCat);
+    CreateButtonControl(ScrHandle,param,"carrightarrow",(void*)1,rmdsChangeCarCat);
+    CarCatEditId = CreateLabelControl(ScrHandle,param,"cartext");
+    
 
     // Driver type and associated "combobox" (left arrow, label, right arrow)
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Driver type:", GFUI_FONT_MEDIUM, 260, y+4, GFUI_ALIGN_HL_VB, 0);
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-		       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-		       396, y, GFUI_ALIGN_HL_VB, 1,
-		       (void*)0, rmdsChangeDrvTyp,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-    GfuiGrButtonCreate(ScrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-		       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-		       596, y, GFUI_ALIGN_HR_VB, 1,
-		       (void*)1, rmdsChangeDrvTyp,
-		       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    DrvTypEditId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C, 496, y+4, GFUI_ALIGN_HC_VB, 32);
-    GfuiLabelSetColor(ScrHandle, DrvTypEditId, PurpleColor);
+    CreateButtonControl(ScrHandle,param,"drvleftarrow",(void*)0,rmdsChangeDrvTyp);
+    CreateButtonControl(ScrHandle,param,"drvrightarrow",(void*)1,rmdsChangeDrvTyp);
+    DrvTypEditId = CreateLabelControl(ScrHandle,param,"drvtext");
 
     // Scroll-lists manipulation buttons
-    y -= dy;
-#ifdef FOCUS
-    GfuiButtonCreate(ScrHandle, "Set Focus", GFUI_FONT_MEDIUM, 320, y, 100, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmdsSetFocus, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-#endif
-    
-    y -= dy;
-    GfuiButtonCreate(ScrHandle, "Move Up", GFUI_FONT_MEDIUM, 320, y, 100, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     (void*)-1, rmdsMove, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CreateButtonControl(ScrHandle,param,"moveup",(void*)-1,rmdsMove);
+    CreateButtonControl(ScrHandle,param,"movedown",(void*)1,rmdsMove);
 
-    y -= dy;
-    GfuiButtonCreate(ScrHandle, "Move Down", GFUI_FONT_MEDIUM, 320, y, 100, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     (void*)1, rmdsMove, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    
-    y -= dy;
-    GfuiButtonCreate(ScrHandle, "(De)Select", GFUI_FONT_MEDIUM, 320, y, 100, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     (void*)0, rmdsSelectDeselect, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    
+    CreateButtonControl(ScrHandle,param,"select",(void*)0,rmdsSelectDeselect);
+
     // Load driver full list, driver type list and driven car category list
     GF_TAILQ_INIT(&DrvList);
 
@@ -500,53 +457,16 @@ RmDriversSelect(void *vs)
     GfuiLabelSetText(ScrHandle, DrvTypEditId, AnyDrvTyp);
     GfuiLabelSetText(ScrHandle, CarCatEditId, initCarCat);
 
-    // Focused driver
-    y -= dy;
-#ifdef FOCUS
-    GfuiLabelCreate(ScrHandle, "Focused:", GFUI_FONT_MEDIUM, 320, y, GFUI_ALIGN_HC_VB, 0);
-    moduleName = GfParmGetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-    robotIdx = (int)GfParmGetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
-    curDrv = GF_TAILQ_FIRST(&DrvList);
-    if (curDrv) {
-	do {
-	    if (curDrv->interfaceIndex == robotIdx && !strcmp(curDrv->moduleName, moduleName))
-		break;
-	} while ((curDrv = GF_TAILQ_NEXT(curDrv, link)));
-    }
-    if (!curDrv)
-	curDrv = GF_TAILQ_FIRST(&DrvList);
-    if (!curDrv)
-	FocDrvLabelId = GfuiLabelCreate(ScrHandle, "", GFUI_FONT_MEDIUM_C,
-					320, y - dfy, GFUI_ALIGN_HC_VB, 256);
-    else
-	FocDrvLabelId = GfuiLabelCreate(ScrHandle, curDrv->name, GFUI_FONT_MEDIUM_C,
-					320, y - dfy, GFUI_ALIGN_HC_VB, 256);
-#endif
-
     // Picked Driver Info
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Driver type:", GFUI_FONT_MEDIUM, 320, y, GFUI_ALIGN_HC_VB, 0);
-    PickDrvTypLabelId = GfuiLabelCreateEx(ScrHandle, "", RedColor, GFUI_FONT_MEDIUM_C,
-					  320, y - dfy, GFUI_ALIGN_HC_VB, 256);
-
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Car category:", GFUI_FONT_MEDIUM, 320, y, GFUI_ALIGN_HC_VB, 0);
-    PickDrvCategoryLabelId = GfuiLabelCreateEx(ScrHandle, "", RedColor, GFUI_FONT_MEDIUM_C,
-					       320, y - dfy, GFUI_ALIGN_HC_VB, 256);
-
-    y -= dy;
-    GfuiLabelCreate(ScrHandle, "Car model:", GFUI_FONT_MEDIUM, 320, y, GFUI_ALIGN_HC_VB, 0);
-    PickDrvCarLabelId = GfuiLabelCreateEx(ScrHandle, "", RedColor, GFUI_FONT_MEDIUM_C,
-					  320, y - dfy, GFUI_ALIGN_HC_VB, 256);
-
+    PickDrvTypLabelId = CreateLabelControl(ScrHandle,param,"pickdrvtyplabel");
+    PickDrvCategoryLabelId = CreateLabelControl(ScrHandle,param,"pickdrvcatlabel");
+    PickDrvCarLabelId = CreateLabelControl(ScrHandle,param,"pickdrvcarlabel");
+    
     // Accept and Cancel buttons
-    GfuiButtonCreate(ScrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmdsAccept, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CreateButtonControl(ScrHandle,param,"accept",NULL,rmdsAccept);
+    CreateButtonControl(ScrHandle,param,"cancel",DrvSel->prevScreen,rmdsDeactivate);
 
-    GfuiButtonCreate(ScrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     DrvSel->prevScreen, rmdsDeactivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-    // Keyboard shortcuts
+	// Keyboard shortcuts
     GfuiMenuDefaultKeysAdd(ScrHandle);
     rmdsAddKeys();
 

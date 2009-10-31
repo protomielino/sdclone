@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
+#include <string>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -41,11 +42,12 @@ static tFList *CategoryList;
 static void *ScrHandle;
 static int TrackLabelId;
 static int CatLabelId;
-static int MapId;
+//static int MapId;
 static int AuthorId;
 static int LengthId;
 static int WidthId;
 static int DescId;
+static int Desc2Id;
 static int PitsId;
 static tRmTrackSelect *TrackSelect;
 
@@ -82,6 +84,32 @@ static void rmtsDeactivate(void *screen)
 	}
 }
 
+static void WordWrap(const std::string str,std::string &str1,std::string &str2,unsigned int length)
+{
+	if (str.length()<=length)
+	{
+		str1 = str;
+		return;
+	}
+
+	int index = str.find(" ");
+
+	bool bOk = true;
+	while(bOk)
+	{
+		const int spot = str.find(" ",index+1);
+		if (spot <= (int)length && spot != -1)
+			index = spot;
+		else 
+			bOk = false;
+	}
+
+	if (index >= (int)length)
+		index = length-1;
+
+	str1 = str.substr(0,index);
+	str2 = str.substr(index);
+}
 
 static void rmtsUpdateTrackInfo(void)
 {
@@ -110,7 +138,13 @@ static void rmtsUpdateTrackInfo(void)
 	}
 
 	/* Update GUI with track info */
-	GfuiLabelSetText(ScrHandle, DescId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, ""));
+	std::string strDesc = GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, "");
+
+	std::string str1,str2;
+	WordWrap(strDesc,str1,str2,21);
+	GfuiLabelSetText(ScrHandle, DescId, str1.c_str());
+	GfuiLabelSetText(ScrHandle, Desc2Id, str2.c_str());
+
 	GfuiLabelSetText(ScrHandle, AuthorId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, ""));
 
 	tmp = GfParmGetNum(trackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, NULL, 0);
@@ -218,7 +252,8 @@ static void rmtsTrackPrevNext(void *vsel)
 	
 	/* Update GUI */
 	GfuiLabelSetText(ScrHandle, TrackLabelId, curTr->dispName);
-	GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+	//GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+	GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
 	rmtsUpdateTrackInfo();
 }
 
@@ -278,7 +313,8 @@ static void rmtsTrackCatPrevNext(void *vsel)
     /* Update GUI */
     GfuiLabelSetText(ScrHandle, CatLabelId, CategoryList->dispName);
     GfuiLabelSetText(ScrHandle, TrackLabelId, ((tFList*)curCat->userData)->dispName);
-    GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+    //GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+    GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
     rmtsUpdateTrackInfo();
 }
 
@@ -325,7 +361,6 @@ RmTrackSelect(void *vs)
 	const char *defaultCategory;
 	tFList *curCat;
 	tFList *trList, *curTr;
-	int Xpos, Ypos, DX, DY;
 	int curTrkIdx;
 
 	TrackSelect = (tRmTrackSelect*)vs;
@@ -512,149 +547,40 @@ RmTrackSelect(void *vs)
 	/* Create the screen, set background image, title and keyboard shortcuts */
 	ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmtsActivate, 
 				       NULL, (tfuiCallback)NULL, 1);
-	GfuiScreenAddBgImg(ScrHandle, "data/img/splash-qrtrk.png");
 
-	GfuiTitleCreate(ScrHandle, "Select Track", 0);
+	void *param = LoadMenuXML("trackselectmenu.xml");
+    	CreateStaticControls(param,ScrHandle);
 
 	rmtsAddKeys();
 
 	/* Create category and track selection combo-boxes 
 	   (initialized to currently selected category and track) */
-	GfuiGrButtonCreate(ScrHandle,
-			"data/img/arrow-left.png",
-			"data/img/arrow-left.png",
-			"data/img/arrow-left.png",
-			"data/img/arrow-left-pushed.png",
-			80, 400, GFUI_ALIGN_HC_VB, 0,
-			(void*)0, rmtsTrackCatPrevNext,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(ScrHandle,param,"trackcatleftarrow",(void*)0,rmtsTrackCatPrevNext);
+	CreateButtonControl(ScrHandle,param,"trackcatrightarrow",(void*)1,rmtsTrackCatPrevNext);
+	CatLabelId = CreateLabelControl(ScrHandle,param,"trackcatlabel");
+	GfuiLabelSetText(ScrHandle,CatLabelId,CategoryList->dispName);
 
-	CatLabelId = GfuiLabelCreate(ScrHandle,
-				CategoryList->dispName,
-				GFUI_FONT_LARGE_C,
-				320, 400, GFUI_ALIGN_HC_VB,
-				30);
-
-	GfuiGrButtonCreate(ScrHandle,
-			"data/img/arrow-right.png",
-			"data/img/arrow-right.png",
-			"data/img/arrow-right.png",
-			"data/img/arrow-right-pushed.png",
-			540, 400, GFUI_ALIGN_HC_VB, 0,
-			(void*)1, rmtsTrackCatPrevNext,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	GfuiGrButtonCreate(ScrHandle,
-			"data/img/arrow-left.png",
-			"data/img/arrow-left.png",
-			"data/img/arrow-left.png",
-			"data/img/arrow-left-pushed.png",
-			80, 370, GFUI_ALIGN_HC_VB, 0,
-			(void*)0, rmtsTrackPrevNext,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
-	TrackLabelId = GfuiLabelCreate(ScrHandle,
-				((tFList*)CategoryList->userData)->dispName,
-				GFUI_FONT_LARGE_C,
-				320, 370, GFUI_ALIGN_HC_VB,
-				30);
-
-	GfuiGrButtonCreate(ScrHandle,
-			"data/img/arrow-right.png",
-			"data/img/arrow-right.png",
-			"data/img/arrow-right.png",
-			"data/img/arrow-right-pushed.png",
-			540, 370, GFUI_ALIGN_HC_VB, 0,
-			(void*)1, rmtsTrackPrevNext,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(ScrHandle,param,"trackleftarrow",(void*)0,rmtsTrackPrevNext);
+	CreateButtonControl(ScrHandle,param,"trackrightarrow",(void*)1,rmtsTrackPrevNext);
+	TrackLabelId = CreateLabelControl(ScrHandle,param,"tracklabel");
+	GfuiLabelSetText(ScrHandle,TrackLabelId,((tFList*)CategoryList->userData)->dispName);
 
 	/* Create static preview/map for currently selected track */
-	MapId = GfuiStaticImageCreate(ScrHandle,
-				      320, 100, 260, 195,
-				      rmtsGetMapName(path, maxPathSize));
+	//MapId = CreateStaticImageControl(ScrHandle,param,"trackimage");
+	//GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+	GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
 
-	GfuiButtonCreate(ScrHandle, "Accept", GFUI_FONT_LARGE, 
-			 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-			 NULL, rmtsSelect, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(ScrHandle,param,"accept",NULL,rmtsSelect);
+	CreateButtonControl(ScrHandle,param,"back",TrackSelect->prevScreen,rmtsDeactivate);
 
-	GfuiButtonCreate(ScrHandle, "Back", GFUI_FONT_LARGE, 
-			 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-			 TrackSelect->prevScreen, rmtsDeactivate, NULL, 
-			 (tfuiCallback)NULL, (tfuiCallback)NULL);
+	DescId = CreateLabelControl(ScrHandle,param,"descriptionlabel");
+	Desc2Id = CreateLabelControl(ScrHandle,param,"descriptionlabel2");
+	LengthId = CreateLabelControl(ScrHandle,param,"lengthlabel");
+	WidthId = CreateLabelControl(ScrHandle,param,"widthlabel");
+	PitsId = CreateLabelControl(ScrHandle,param,"pitslabel");
+	AuthorId = CreateLabelControl(ScrHandle,param,"authorlabel");
 
-	/* Create and initialize info labels for currently selected track */
-	Xpos = 20;
-	Ypos = 320;
-	DX = 110;
-	DY = 30;
 
-	GfuiLabelCreate(ScrHandle,
-			"Description:",
-			GFUI_FONT_MEDIUM,
-			Xpos, Ypos,
-			GFUI_ALIGN_HL_VB, 0);
-
-	DescId =  GfuiLabelCreate(ScrHandle,
-				  "",
-				  GFUI_FONT_MEDIUM_C,
-				  Xpos + DX, Ypos,
-				  GFUI_ALIGN_HL_VB, 50);
-
-	Ypos -= DY;
-
-	GfuiLabelCreate(ScrHandle,
-			"Author:",
-			GFUI_FONT_MEDIUM,
-			Xpos, Ypos,
-			GFUI_ALIGN_HL_VB, 0);
-
-	AuthorId = GfuiLabelCreate(ScrHandle,
-				   "",
-				   GFUI_FONT_MEDIUM_C,
-				   Xpos + DX, Ypos,
-				   GFUI_ALIGN_HL_VB, 20);
-
-	Ypos -= DY;
-
-	GfuiLabelCreate(ScrHandle,
-			"Length:",
-			GFUI_FONT_MEDIUM,
-			Xpos, Ypos,
-			GFUI_ALIGN_HL_VB, 0);
-
-	LengthId = GfuiLabelCreate(ScrHandle,
-				   "",
-				   GFUI_FONT_MEDIUM_C,
-				   Xpos + DX, Ypos,
-				   GFUI_ALIGN_HL_VB, 20);
-
-	Ypos -= DY;
-
-	GfuiLabelCreate(ScrHandle,
-			"Width:",
-			GFUI_FONT_MEDIUM,
-			Xpos, Ypos,
-			GFUI_ALIGN_HL_VB, 0);
-
-	WidthId = GfuiLabelCreate(ScrHandle,
-				  "",
-				  GFUI_FONT_MEDIUM_C,
-				  Xpos + DX, Ypos,
-				  GFUI_ALIGN_HL_VB, 20);
-
-	Ypos -= DY;
-
-	GfuiLabelCreate(ScrHandle,
-			"Pits:",
-			GFUI_FONT_MEDIUM,
-			Xpos, Ypos,
-			GFUI_ALIGN_HL_VB, 0);
-
-	PitsId = GfuiLabelCreate(ScrHandle,
-				 "",
-				 GFUI_FONT_MEDIUM_C,
-				 Xpos + DX, Ypos,
-				 GFUI_ALIGN_HL_VB, 20);
 
 	rmtsUpdateTrackInfo();
 
