@@ -94,6 +94,7 @@ dispInfo(void *cbinfo)
 {
     GfuiVisibilitySet(((tMnuCallbackInfo*)cbinfo)->screen, ((tMnuCallbackInfo*)cbinfo)->labelId, 1);
 }
+
 static void
 remInfo(void *cbinfo)
 {
@@ -324,7 +325,6 @@ GetHAlignment(std::string strAlignH)
 		align = 0x20;
 	}
 
-
 	return align;
 }
 
@@ -341,7 +341,7 @@ Color GetColor(unsigned int color)
 
 bool GetColorFromXML(void *param,const char *pControlName,const char *pField,Color &color)
 {
-	std::string strValue = GfParmGetStr(param,pControlName,pField,"");
+	const std::string strValue = GfParmGetStr(param,pControlName,pField,"");
 	if (strValue == "")
 		return false;
 
@@ -355,7 +355,7 @@ bool GetColorFromXML(void *param,const char *pControlName,const char *pField,Col
 bool 
 ReadBoolean(void *param,const char *pControlName,const char *pField)
 {
-	std::string strValue = GfParmGetStr(param, pControlName,pField,"yes");
+	const std::string strValue = GfParmGetStr(param, pControlName,pField,"yes");
 	if (strValue == "no")
 		return false;
 
@@ -365,8 +365,8 @@ ReadBoolean(void *param,const char *pControlName,const char *pField)
 bool
 GetControlValues(void *param,const char *pControlName,std::string &strText,std::string &strTip,int &x,int &y,int &textSize,int &alignment)
 {
-	std::string strControlName = pControlName;
-	strControlName = "dynamiccontrols/"+strControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
 
 	strText = GfParmGetStr(param, strControlName.c_str(), "text", "");
 	strTip = GfParmGetStr(param, strControlName.c_str(), "tip", "");
@@ -387,7 +387,6 @@ int
 CreateStaticImage(void *menuHandle,void *param,const char *pControlName)
 {
 	std::string strImage;
-	//int id;
 	int x,y,w,h;
 
 	strImage = GfParmGetStr(param, pControlName, "image", "");
@@ -413,8 +412,8 @@ int
 CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName)
 {
 	int labelId;
-	std::string strControlName = pControlName;
-	strControlName = "dynamiccontrols/"+strControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
 	
 	labelId = CreateStaticImage(menuHandle,param,strControlName.c_str());
 	return labelId;
@@ -461,8 +460,8 @@ int
 CreateLabelControl(void *menuHandle,void *param,const char *pControlName)
 {
     	int labelId;
-    	std::string strControlName = pControlName;
-    	strControlName = "dynamiccontrols/"+strControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
 
     	labelId = CreateLabel(menuHandle,param,strControlName.c_str());
     	return labelId;
@@ -484,11 +483,10 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 	textsize = GetFontSize(strTextsize);
 	std::string strAlignH = GfParmGetStr(param, pControlName, "alignH", "");
 	int alignH = GetHAlignment(strAlignH);
-
 	
 	width = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
 	if (width == 0)
-	    width =  GFUI_BTNSZ;
+	    width = GFUI_BTNSZ;
 
 	Color c,fc,pc;
 	bool bColor = GetColorFromXML(param,pControlName,"color",c);
@@ -508,64 +506,48 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 	imgY = (int)GfParmGetNum(param,pControlName,"imagey",NULL,0.0);
 	imgWidth = (int)GfParmGetNum(param,pControlName,"imagewidth",NULL,20.0);
 	imgHeight = (int)GfParmGetNum(param,pControlName,"imageheight",NULL,20.0);
-	
 
-
-
-    	tMnuCallbackInfo * cbinfo = NULL;
-
-    	if (strTip!="")
+    	if (!strTip.empty())
 	{
-    		cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+    		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
     		cbinfo->screen = menuHandle;
     		cbinfo->labelId = GfuiTipCreate(menuHandle, strTip.c_str(), strTip.length());
-
 	    	GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
-		id = GfuiButtonCreate(menuHandle,
-			   strText.c_str(),
-			   textsize,
-			   x, y, width, alignH, GFUI_MOUSE_UP,
-			   userdata, onpush,
-			   (void*)cbinfo, dispInfo,
-			   remInfo);
-		GfuiButtonShowBox(menuHandle,id,bShowbox);
-		GfuiButtonSetImage(menuHandle,id,imgX,imgY,imgWidth,imgHeight,
-			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str());
 
+		userDataOnFocus = (void*)cbinfo;
+		onFocus = dispInfo;
+		onFocusLost = remInfo;
 	}
-	else
-	{
-		id = GfuiButtonCreate(menuHandle,
-			   strText.c_str(),
-			   textsize,
-			   x, y, width, alignH, GFUI_MOUSE_UP,
-			   userdata, onpush,
-			   userDataOnFocus, onFocus,
-			   onFocusLost);
-		GfuiButtonShowBox(menuHandle,id,bShowbox);
-		GfuiButtonSetImage(menuHandle,id,imgX,imgY,imgWidth,imgHeight,
-			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str());
 
-    	}
+	id = GfuiButtonCreate(menuHandle,
+			      strText.c_str(),
+			      textsize,
+			      x, y, width, alignH, GFUI_MOUSE_UP,
+			      userdata, onpush,
+			      userDataOnFocus, onFocus,
+			      onFocusLost);
 
-		if (bColor)
-			GfuiButtonSetColor(menuHandle,id,c);
+	GfuiButtonShowBox(menuHandle,id,bShowbox);
+	GfuiButtonSetImage(menuHandle,id,imgX,imgY,imgWidth,imgHeight,
+			   strDisabledImage.c_str(),strEnabledImage.c_str(),
+			   strFocusedImage.c_str(),strPushedImage.c_str());
 
-		if (bFocusColor)
-			GfuiButtonSetFocusColor(menuHandle,id,fc);
+	if (bColor)
+		GfuiButtonSetColor(menuHandle,id,c);
 
-		if (bPushedColor)
-			GfuiButtonSetPushedColor(menuHandle,id,pc);
-
+	if (bFocusColor)
+		GfuiButtonSetFocusColor(menuHandle,id,fc);
 	
-    return id;
+	if (bPushedColor)
+		GfuiButtonSetPushedColor(menuHandle,id,pc);
+	
+	return id;
 }
 
 int 
 CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	std::string strTip,strText;
-	//int textsize;
 	int alignment;
 	int id = -1;
 	int x,y,w,h;
@@ -608,8 +590,8 @@ CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *
 int 
 CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-	std::string strControlName = pControlName;
-	strControlName = "dynamiccontrols/"+strControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
 
 	const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
 	if (strType == "textbutton")
@@ -617,7 +599,7 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
 	else if(strType == "imagebutton")
 		return CreateImageButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
 	else
-	    printf("Error: Unknown button type '%s'\n", strType.c_str());
+	    GfError("Error: Unknown button type '%s'\n", strType.c_str());
 
 	return -1;
 }
@@ -625,10 +607,10 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
 int 
 CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-	std::string strControlName = pControlName;
-	strControlName = "dynamiccontrols/"+strControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
 
-	std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
+	const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
 	if (strType != "editbox")
 		return -1;
 
@@ -729,7 +711,7 @@ CreateStaticControls(void *param,void *menuHandle)
 	for (int i=1;i<=nControls;i++)
 	{
 		std::string strType;
-		char buf[1024];
+		char buf[32];
 	    	sprintf(buf, "staticcontrols/%i",i);
 		strType = GfParmGetStr(param, buf, "type", "");
 	
@@ -747,7 +729,7 @@ CreateStaticControls(void *param,void *menuHandle)
 		}
 		else
 		{
-			printf("ERROR unknown static control type = %s\n",strType.c_str());
+			GfError("Errot: Unknown static control type '%s'\n", strType.c_str());
 		}
 	}
 
@@ -757,10 +739,10 @@ CreateStaticControls(void *param,void *menuHandle)
 
 
 void *
-LoadMenuXML(const char *pMenuPath)
+LoadMenuXML(const char *pszMenuPath)
 {
-	std::string strPath = pMenuPath;
-	strPath = "data/menu/"+strPath;
+	std::string strPath("data/menu/");
+	strPath += pszMenuPath;
 	void *param = NULL;
 	
 	char buf[1024];

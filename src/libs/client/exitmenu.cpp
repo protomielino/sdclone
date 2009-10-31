@@ -45,10 +45,13 @@ void * exitMenuInit(void *prevMenu, void *menuHandle)
 
     menuHandle = GfuiScreenCreate();
 
-     void *param = LoadMenuXML("quitscreen.xml");
+    void *param = LoadMenuXML("quitscreen.xml");
+
     CreateStaticControls(param,menuHandle);
     CreateButtonControl(menuHandle,param,"yesquit",NULL,endofprog);
     CreateButtonControl(menuHandle,param,"nobacktogame",prevMenu,GfuiScreenActivate);
+
+    GfParmReleaseHandle(param);
     
     GfuiMenuDefaultKeysAdd(menuHandle);
     GfuiAddKey(menuHandle, (unsigned char)27, "No, Back to Game", 

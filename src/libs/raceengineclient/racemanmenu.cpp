@@ -283,6 +283,8 @@ ReRacemanMenu(void)
 	CreateButtonControl(racemanMenuHdle,param2,"load",racemanMenuHdle,reLoadMenu);
     }
     
+    GfParmReleaseHandle(param2);
+    
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
     GfuiAddKey(racemanMenuHdle, 27, "Back to Main menu", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
@@ -319,8 +321,6 @@ ReNewTrackMenu(void)
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
     GfuiTitleCreate(newTrackMenuHdle, str, strlen(str));
 
-    GfuiMenuDefaultKeysAdd(newTrackMenuHdle);
-
     sprintf(buf, "Race Day #%d/%d on %s",
 	    (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1),
 	    GfParmGetEltNb(params, RM_SECT_TRACKS),
@@ -342,7 +342,8 @@ ReNewTrackMenu(void)
 			 "Abandon", "Abandon The Race",
 			 ReInfo->_reMenuScreen, GfuiScreenActivate);
 
-    GfuiAddKey(newTrackMenuHdle, 27,  "Abandon", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+    GfuiMenuDefaultKeysAdd(newTrackMenuHdle);
+    GfuiAddKey(newTrackMenuHdle, 27, "Abandon", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
     GfuiScreenActivate(newTrackMenuHdle);
 

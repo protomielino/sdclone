@@ -175,7 +175,6 @@ MouseCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
 
     scrHandle2 = GfuiScreenCreateEx(NULL, NULL, onActivate2, NULL, NULL, 1);
     GfuiTitleCreate(scrHandle2, "Mouse Calibration", 0);
-    GfuiMenuDefaultKeysAdd(scrHandle2);
 
     GfuiScreenAddBgImg(scrHandle2, "data/img/splash-mousecal.png");
 
@@ -190,6 +189,10 @@ MouseCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     
     GfuiButtonCreate(scrHandle2, "Reset", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 		     NULL, onActivate2, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+
+    GfuiMenuDefaultKeysAdd(scrHandle2);
+    GfuiAddKey(scrHandle2, 27, "Back", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(scrHandle2, 13, "Back", prevMenu, GfuiScreenActivate, NULL);
 
     return scrHandle2;
 }

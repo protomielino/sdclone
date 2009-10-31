@@ -493,7 +493,8 @@ GfuiScreenIsActive(void *screen)
 void
 GfuiScreenActivate(void *screen)
 {
-	if ((GfuiScreen) && (GfuiScreen->onDeactivate)) GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
+	if (GfuiScreen && GfuiScreen->onDeactivate) 
+		GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
 	
 	GfuiScreen = (tGfuiScreen*)screen;
 	
@@ -515,7 +516,8 @@ GfuiScreenActivate(void *screen)
 		glutDisplayFunc(GfuiDisplayNothing);
 	}
 	
-	if (GfuiScreen->onActivate) GfuiScreen->onActivate(GfuiScreen->userActData);
+	if (GfuiScreen->onActivate)
+		GfuiScreen->onActivate(GfuiScreen->userActData);
 	
 	if (GfuiScreen->onlyCallback == 0) 
 	{

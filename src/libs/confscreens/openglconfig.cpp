@@ -209,14 +209,14 @@ void * OpenGLMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"accept",NULL, saveOpenGLOption);
 	CreateButtonControl(scrHandle,param,"cancel",prevMenu, GfuiScreenActivate);
 
+	GfParmReleaseHandle(param);
+    
 	GfuiAddKey(scrHandle, 13, "Save", NULL, saveOpenGLOption, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Option in list", (void*)0, changeTextureCompressState, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Option in list", (void*)1, changeTextureCompressState, NULL);
-
-	readOpenGLCfg();
 
 	return scrHandle;
 }

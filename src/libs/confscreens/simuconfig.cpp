@@ -132,6 +132,8 @@ SimuMenuInit(void *prevMenu)
     CreateButtonControl(scrHandle,param,"accept",NULL,SaveSimuVersion);
     CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
+    GfParmReleaseHandle(param);
+    
     GfuiAddKey(scrHandle, 13, "Save", NULL, SaveSimuVersion, NULL);
     GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
@@ -139,7 +141,5 @@ SimuMenuInit(void *prevMenu)
     GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Version in list", (void*)0, ChangeSimuVersion, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Version in list", (void*)1, ChangeSimuVersion, NULL);
 
-    ReadSimuCfg();
-  
     return scrHandle;  
 }

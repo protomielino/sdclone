@@ -1050,7 +1050,9 @@ DriverMenuInit(void *prevMenu)
     CreateButtonControl(ScrHandle,param,"accept",NULL, SaveDrvList);
     CreateButtonControl(ScrHandle,param,"cancel",NULL, QuitDriverConfig);
 
-    /* Keybord shortcuts */
+    GfParmReleaseHandle(param);
+    
+    /* Keyboard shortcuts */
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save Drivers", NULL, SaveDrvList, NULL);
     GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel Selection", NULL, QuitDriverConfig, NULL);
     GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);

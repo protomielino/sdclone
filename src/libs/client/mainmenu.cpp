@@ -33,7 +33,7 @@ void *menuHandle = NULL;
 tModList *RacemanModLoaded = (tModList*)NULL;
 
 static void
-onActivatePlayerConfig(void * /* dummy */)
+PlayerConfigActivate(void * /* dummy */)
 {
     /* Here, we need to call OptionOptionInit each time the firing button
        is pressed, and not only once at the Main menu initialization,
@@ -81,14 +81,17 @@ MainMenuInit(void)
 
     //Add buttons and create based on xml
     CreateButtonControl(menuHandle,param,"race",ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
-    CreateButtonControl(menuHandle,param,"configure",NULL,onActivatePlayerConfig);
+    CreateButtonControl(menuHandle,param,"configure",NULL,PlayerConfigActivate);
     CreateButtonControl(menuHandle,param,"options",OptionOptionInit(menuHandle),GfuiScreenActivate);
     CreateButtonControl(menuHandle,param,"credits",menuHandle,CreditsScreenActivate);
-    CreateButtonControl(menuHandle,param,"quit",MainExitMenuInit(menuHandle), GfuiScreenActivate);
+    void* exitMenu = MainExitMenuInit(menuHandle);
+    CreateButtonControl(menuHandle,param,"quit",exitMenu, GfuiScreenActivate);
+
+    GfParmReleaseHandle(param);
 
     GfuiMenuDefaultKeysAdd(menuHandle);
     GfuiAddKey(menuHandle, (unsigned char)27, "Quit Game", 
-	       MainExitMenuInit(menuHandle), GfuiScreenActivate, NULL);
+	       exitMenu, GfuiScreenActivate, NULL);
 
     return 0;
 }

@@ -106,10 +106,10 @@ static tCmdDispInfo CmdDispInfo[] = {
     {                                  GEAR_MODE_GRID, 190 }
 };
 
-static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER] = {NULL};
-static float		JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER] = {0};
+static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER];
+static float		JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
 static float 		JoyAxisCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
-static int		JoyButtons[GFCTRL_JOY_NUMBER] = {0};
+static int		JoyButtons[GFCTRL_JOY_NUMBER];
 
 static float SteerSensVal;
 static float DeadZoneVal;
@@ -157,13 +157,28 @@ onDeadZoneChange(void * /* dummy */)
     
 }
 
+/* Quit current menu */
+static void
+onQuit(void *prevMenu)
+{
+    /* Release joysticks */
+    for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)
+	if (Joystick[jsInd]) {
+	    delete Joystick[jsInd];
+	    Joystick[jsInd] = 0;
+	}
+
+    /* Back to previous screen */
+    GfuiScreenActivate(prevMenu);
+}
+
 /* Save settings in the players preferences and go back to previous screen */
 static void
-onSave(void * /* dummy */)
+onSave(void *prevMenu)
 {
     ControlPutSettings();
 
-    GfuiScreenActivate(PrevScrHandle);
+    onQuit(prevMenu);
 }
 
 static void
@@ -397,7 +412,19 @@ onPush(void *vi)
 static void
 onActivate(void * /* dummy */)
 {
-    int	cmd;
+    // Create and test joysticks ; only keep the up and running ones.
+    for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {
+	if (!Joystick[jsInd])
+	    Joystick[jsInd] = new jsJoystick(jsInd);
+	if (Joystick[jsInd]->notWorking()) {
+	    /* don't configure the joystick */
+	    delete Joystick[jsInd];
+	    Joystick[jsInd] = 0;
+	} else {
+	  GfOut("Detected joystick #%d type '%s' %d axes\n", 
+		jsInd, Joystick[jsInd]->getName(), Joystick[jsInd]->getNumAxes());
+	}
+    }
 
     if (ReloadValues) {
 
@@ -405,7 +432,7 @@ onActivate(void * /* dummy */)
         ControlGetSettings();
 
 	/* For each control : */
-	for (cmd = 0; cmd < MaxCmd; cmd++) {
+	for (int cmd = 0; cmd < MaxCmd; cmd++) {
 
 	    /* Show / hide control editbox according to selected gear changing mode code */
 	    if (GearChangeMode & CmdDispInfo[cmd].gearChangeModeMask)
@@ -436,8 +463,7 @@ DevCalibrate(void *menu)
 void *
 ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
 {
-    int		x, x2, i;
-    int		jsInd;
+    int	x, x2, i;
 
     ReloadValues = 1;
 
@@ -456,23 +482,11 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 	return ScrHandle;
     }
 
-    /* Initialize joysticks layer */
-    for (jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {
-	if (Joystick[jsInd] == NULL) {
-	    Joystick[jsInd] = new jsJoystick(jsInd);
-	}
-    
-	if (Joystick[jsInd]->notWorking()) {
-	    /* don't configure the joystick */
-	    delete Joystick[jsInd];
-	    Joystick[jsInd] = NULL;
-	}
-	else {
-	  GfOut("Detected joystick #%d type '%s' %d axes\n", 
-		jsInd, Joystick[jsInd]->getName(), Joystick[jsInd]->getNumAxes());
-	}
-    }
-    
+    /* Initialize joysticks array */
+    for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++)
+	Joystick[jsInd] = 0;
+
+    /* Create screen */
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *param = LoadMenuXML("controlconfigmenu.xml");
@@ -509,8 +523,8 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
 
     /* Save button and associated keyboard shortcut */
-    CreateButtonControl(ScrHandle,param,"save",NULL,onSave);
-    GfuiAddKey(ScrHandle, 13 /* Return */, "Save", NULL, onSave, NULL);
+    CreateButtonControl(ScrHandle,param,"save",PrevScrHandle,onSave);
+    GfuiAddKey(ScrHandle, 13 /* Return */, "Save", PrevScrHandle, onSave, NULL);
 
     /* Mouse calibration screen access button */
     MouseCalButton = CreateButtonControl(ScrHandle,param,"mousecalibrate",MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
@@ -519,13 +533,15 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     JoyCalButton = CreateButtonControl(ScrHandle,param,"joycalibrate",JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
 
     /* Cancel button and associated keyboard shortcut */
-    GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    CreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+    CreateButtonControl(ScrHandle,param,"cancel",PrevScrHandle,onQuit);
+    GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel", PrevScrHandle, onQuit, NULL);
 
     /* General callbacks for keyboard keys and special keys */
     GfuiKeyEventRegister(ScrHandle, onKeyAction);
     GfuiSKeyEventRegister(ScrHandle, onSKeyAction);
 
+    GfParmReleaseHandle(param);
+    
     return ScrHandle;
 }
 

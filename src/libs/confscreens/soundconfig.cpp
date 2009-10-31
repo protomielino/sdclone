@@ -70,7 +70,7 @@ static void readSoundCfg(void)
 		}
 	}
 
-    VolumeValue = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
+	VolumeValue = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (VolumeValue>100.0f) {
 		VolumeValue = 100.0f;
 	} 
@@ -118,12 +118,11 @@ static void changeSoundState(void *vp)
     GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
 }
 
-// Volume
-/*
+/*// Volume
 static void changeVolume(void * )
 {
     char	*val;
-	char buf[1024];
+    char buf[256];
     val = GfuiEditboxGetString(scrHandle, VolumeValueId);
     sscanf(val, "%g", &VolumeValue);
     sprintf(buf, "%g", VolumeValue);
@@ -155,20 +154,18 @@ void * SoundMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
 	CreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
 
-
 	SoundOptionId = CreateLabelControl(scrHandle,param,"soundlabel");
 	CreateButtonControl(scrHandle,param,"accept",NULL,saveSoundOption);
 	CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
-
+	GfParmReleaseHandle(param);
+    
 	GfuiAddKey(scrHandle, 13, "Save", NULL, saveSoundOption, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
-
-	readSoundCfg();
 
 	return scrHandle;
 }

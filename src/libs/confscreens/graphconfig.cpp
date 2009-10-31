@@ -166,6 +166,8 @@ GraphMenuInit(void *prevMenu)
     CreateButtonControl(scrHandle, param, "accept", prevMenu, SaveGraphicOptions);
     CreateButtonControl(scrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
     
+    GfParmReleaseHandle(param);
+    
     GfuiAddKey(scrHandle, 13, "Save", prevMenu, SaveGraphicOptions, NULL);
     GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);

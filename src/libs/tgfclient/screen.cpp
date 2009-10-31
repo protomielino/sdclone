@@ -789,29 +789,26 @@ onActivate(void * /* dummy */)
     @param	precMenu	previous menu to return to
 */
 void *
-GfScrMenuInit(void *precMenu)
+GfScrMenuInit(void *prevMenu)
 {
-    sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-    paramHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	paramHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	
+	if (scrHandle)
+		return scrHandle;
 
-    if (scrHandle) return scrHandle;
-
-    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-     void *param = LoadMenuXML("screenconfigmenu.xml");
-     CreateStaticControls(param,scrHandle);
+	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+	void *param = LoadMenuXML("screenconfigmenu.xml");
+	CreateStaticControls(param,scrHandle);
 
 	CreateButtonControl(scrHandle,param,"resleftarrow",(void*)-1,ResPrevNext);
 	CreateButtonControl(scrHandle,param,"resrightarrow",(void*)1,ResPrevNext);
 	ResLabelId = CreateLabelControl(scrHandle,param,"reslabel");
 
-	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
-    GfuiAddKey(scrHandle, 13, "Apply Mode", NULL, GfScrReinit, NULL);
-    GfuiButtonCreate(scrHandle, "Apply", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, GfScrReinit, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    GfuiAddKey(scrHandle, 27, "Cancel", precMenu, GfuiScreenActivate, NULL);
-    GfuiButtonCreate(scrHandle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     precMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	GfuiButtonCreate(scrHandle, "Apply", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+			 NULL, GfScrReinit, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	GfuiButtonCreate(scrHandle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
+			 prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
 	CreateButtonControl(scrHandle,param,"depthleftarrow",(void*)-1,DepthPrevNext);
 	CreateButtonControl(scrHandle,param,"depthrightarrow",(void*)1,DepthPrevNext);
@@ -829,8 +826,17 @@ GfScrMenuInit(void *precMenu)
 	CreateButtonControl(scrHandle,param,"vmleftarrow",(void*)-1, VInitPrevNext);
 	CreateButtonControl(scrHandle,param,"vmrightarrow",(void*)1, VInitPrevNext);
 	VInitLabelId = CreateLabelControl(scrHandle,param,"vmlabel");
+	
+	GfParmReleaseHandle(param);
+    
+	GfuiAddKey(scrHandle, 13, "Apply Mode", NULL, GfScrReinit, NULL);
+	GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
-    return scrHandle;
+	return scrHandle;
 }
 
 
