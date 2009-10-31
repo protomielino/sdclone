@@ -4,7 +4,7 @@
     created     : Wed Mar 12 21:20:34 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: controlconfig.cpp,v 1.5 2003/11/23 20:21:11 torcs Exp $                                  
+    version     : $Id: controlconfig.cpp,v 1.5 19 Mar 2006 18:15:16  torcs Exp $                                  
 
  ***************************************************************************/
 
@@ -27,17 +27,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+#include <string>
 
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
+
 #include <plib/js.h>
 
 #include "controlconfig.h"
 #include "mouseconfig.h"
 #include "joystickconfig.h"
-#include <string>
 
 static void 	*ScrHandle = NULL;
 static void	*PrevScrHandle = NULL;
@@ -222,7 +223,7 @@ onKeyAction(unsigned char key, int /* modifier */, int state)
 {
     const char *name;
 
-    if (!InputWaited || (state == GFUI_KEY_UP)) {
+    if (!InputWaited || state == GFUI_KEY_UP) {
 	return 0;
     }
     if (key == 27) {
@@ -246,7 +247,7 @@ onSKeyAction(int key, int /* modifier */, int state)
 {
     const char *name;
 
-    if (!InputWaited || (state == GFUI_KEY_UP)) {
+    if (!InputWaited || state == GFUI_KEY_UP) {
 	return 0;
     }
     name = GfctrlGetNameByRef(GFCTRL_TYPE_SKEYBOARD, key);
@@ -503,18 +504,13 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     CreateLabelControl(ScrHandle,param,"Steer Sensitivity");
     SteerSensEditId = CreateEditControl(ScrHandle,param,"SteerSensitivityEdit",NULL,NULL,onSteerSensChange);
 
-
     /* Steer Dead Zone label and associated editbox */
     CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
     DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
 
     /* Save button and associated keyboard shortcut */
     CreateButtonControl(ScrHandle,param,"save",NULL,onSave);
-
-    /* Save button and associated keyboard shortcut */
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save", NULL, onSave, NULL);
-    GfuiButtonCreate(ScrHandle, "Save", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, onSave, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
     /* Mouse calibration screen access button */
     MouseCalButton = CreateButtonControl(ScrHandle,param,"mousecalibrate",MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
