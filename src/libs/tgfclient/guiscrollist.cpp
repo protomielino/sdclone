@@ -246,8 +246,7 @@ gfuiScrollListRemElt(tGfuiScrollList *scrollist, int index)
     @ingroup	gui
     @param	scr		Current screen
     @param	Id		Scroll list Id
-    @param	userData	address of the userData of the element to retrieve
-    @return	Name of the retrieved element
+    @return	selectElement   Index of the element to select
 		<br>NULL if Error
  */
 bool
@@ -255,7 +254,6 @@ GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
-
     
     object = gfuiGetObject(scr, Id);
     if (object == NULL) {
@@ -271,6 +269,9 @@ GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
 
     scrollist->selectedElt = selectElement;
     
+    if (scrollist->onSelect)
+	scrollist->onSelect(scrollist->userDataOnSelect);
+
     return true;
 }
 

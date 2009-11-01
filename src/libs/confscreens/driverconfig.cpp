@@ -969,15 +969,15 @@ onActivate(void * /* dummy */)
 {
     if (ReloadValues) {
 	  
-	    /* Load car/categories and players settings */
-	    GenCarsInfo();
-		GenDrvList();
+	/* Load car/categories and players settings */
+	GenCarsInfo();
+	GenDrvList();
+
+	/* Initialize current player and select it */
+	CurrPlayer = PlayersInfo.begin();
+	GfuiScrollListSetSelectedElement(ScrHandle, ScrollList, 0);
     }
 	
-	//Set default player
-     CurrPlayer = PlayersInfo.begin();
-
-	GfuiScrollListSetSelectedElement(ScrHandle,ScrollList,1);
     /* Display editable fields values */
     refreshEditVal();
 }
