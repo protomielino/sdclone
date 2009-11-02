@@ -313,6 +313,7 @@ Idle(void)
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_BUT;
 	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 	    glutPostRedisplay();
+	    updateButtonText();
 	    return;
 	}
     }
@@ -327,6 +328,7 @@ Idle(void)
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_AXIS;
 	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 	    glutPostRedisplay();
+	    updateButtonText();
 	    return;
 	}
     }
@@ -348,6 +350,7 @@ Idle(void)
 		    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 		    glutPostRedisplay();
 		    JoyButtons[index] = b;
+		    updateButtonText();
 		    return;
 		}
 	    }
@@ -365,6 +368,7 @@ Idle(void)
 	str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
 	GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
 	glutPostRedisplay();
+	updateButtonText();
 	return;
     }
 
