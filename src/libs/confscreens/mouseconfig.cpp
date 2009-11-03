@@ -146,9 +146,6 @@ IdleMouseInit(void)
 static void
 onActivate(void * /* dummy */)
 {
-    //int dummy;
-
-    //GfScrGetSize(&ScreenWidth, &ScreenHeight, &dummy, &dummy);
     CalState = 0;
     GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
@@ -182,6 +179,9 @@ MouseCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     CreateButtonControl(ScrHandle, menuXMLDescHdle, "backbutton", prevMenu, GfuiScreenActivate);
     CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, 27, "Back", prevMenu, GfuiScreenActivate, NULL);

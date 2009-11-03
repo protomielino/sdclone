@@ -32,12 +32,14 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include <tgfclient.h>
+
 #include "racescreens.h"
 
-static void		*scrHandle = NULL;
-static int		fileScrollList;
-static tRmFileSelect	*rmFs;
+static void		*ScrHandle = NULL;
+static int		FileScrollListId;
+static tRmFileSelect	*RmFs;
 static tFList		*FileList = NULL;
 static tFList		*FileSelected;
 
@@ -49,18 +51,18 @@ rmActivate(void * /* dummy */ )
 static void
 rmClickOnFile(void * /*dummy*/)
 {
-    GfuiScrollListGetSelectedElement(scrHandle, fileScrollList, (void**)&FileSelected);
+    GfuiScrollListGetSelectedElement(ScrHandle, FileScrollListId, (void**)&FileSelected);
 }
 
 static void
 rmSelect(void * /* dummy */ )
 {
     if (FileList) {
-	rmFs->select(FileSelected->name);
+	RmFs->select(FileSelected->name);
 	GfDirFreeList(FileList, NULL);
 	FileList = NULL;
     } else {
-	rmFs->select(NULL);
+	RmFs->select(NULL);
     }
 }
 
@@ -71,7 +73,7 @@ rmDeactivate(void * /* dummy */ )
 	GfDirFreeList(FileList, NULL);
 	FileList = NULL;
     }
-    GfuiScreenActivate(rmFs->prevScreen);
+    GfuiScreenActivate(RmFs->prevScreen);
 }
 
 
@@ -84,40 +86,49 @@ RmFileSelect(void *vs)
 {
     tFList	*FileCur;
 
-    rmFs = (tRmFileSelect*)vs;
+    RmFs = (tRmFileSelect*)vs;
 
-    if (scrHandle) {
-	GfuiScreenRelease(scrHandle);
+    if (ScrHandle) {
+	GfuiScreenRelease(ScrHandle);
     }
-    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmActivate, NULL, (tfuiCallback)NULL, 1);
-    GfuiScreenAddBgImg(scrHandle, "data/img/splash-filesel.png");
-    GfuiTitleCreate(scrHandle, rmFs->title, 0);
 
-    /* Scroll List containing the File list */
-    fileScrollList = GfuiScrollListCreate(scrHandle, GFUI_FONT_MEDIUM_C, 120, 80, GFUI_ALIGN_HC_VB,
-					  400, 310, GFUI_SB_RIGHT, NULL, rmClickOnFile);
+    // Create screen, load menu XML descriptor and create static controls.
+    ScrHandle = GfuiScreenCreateEx(NULL, NULL, rmActivate, NULL, NULL, 1);
 
-    FileList = GfDirGetList(rmFs->path);
+    void *menuXMLDescHdle = LoadMenuXML("fileselectmenu.xml");
+
+    CreateStaticControls(menuXMLDescHdle, ScrHandle);
+
+    // Create variable title label.
+    int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");
+    GfuiLabelSetText(ScrHandle, titleId, RmFs->title);
+    
+    /* Create and fill-in the Scroll List containing the File list */
+    FileScrollListId = CreateScrollListControl(ScrHandle, menuXMLDescHdle, "filescrolllist",
+					       NULL, rmClickOnFile);
+
+    FileList = GfDirGetList(RmFs->path);
     if (FileList == NULL) {
-	GfuiScreenActivate(rmFs->prevScreen);
+	GfuiScreenActivate(RmFs->prevScreen);
 	return;
     }
     FileSelected = FileList;
     FileCur = FileList;
     do {
 	FileCur = FileCur->next;
-	GfuiScrollListInsertElement(scrHandle, fileScrollList, FileCur->name, 1000, (void*)FileCur);
+	GfuiScrollListInsertElement(ScrHandle, FileScrollListId, FileCur->name, 1000, (void*)FileCur);
     } while (FileCur != FileList);
 
-    /* Bottom buttons */
-    GfuiButtonCreate(scrHandle, "Select", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmSelect, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    // Create Back and Reset buttons.
+    CreateButtonControl(ScrHandle, menuXMLDescHdle, "selectbutton", NULL, rmSelect);
+    CreateButtonControl(ScrHandle, menuXMLDescHdle, "cancelbutton", NULL, rmDeactivate);
 
-    GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmDeactivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
+    // Register keyboard shortcuts.
+    GfuiAddKey(ScrHandle, (unsigned char)27, "Cancel", NULL, rmDeactivate, NULL);
+    GfuiMenuDefaultKeysAdd(ScrHandle);
 
-    GfuiAddKey(scrHandle, (unsigned char)27, "Cancel", NULL, rmDeactivate, NULL);
-    GfuiMenuDefaultKeysAdd(scrHandle);
-
-    GfuiScreenActivate(scrHandle);
+    GfuiScreenActivate(ScrHandle);
 }

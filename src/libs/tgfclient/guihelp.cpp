@@ -58,17 +58,14 @@ GfuiHelpScreen(void *prevScreen)
     tGfuiKey	*curSKey;
     tGfuiScreen	*pscr = (tGfuiScreen*)prevScreen;
     
+    // Create screen, load menu XML descriptor and create static controls.
     scrHandle = GfuiScreenCreate();
     
-    GfuiLabelCreateEx(scrHandle,
-		      "Keys Definition",
-		      fgColor2,
-		      GFUI_FONT_BIG,
-		      320,
-		      440,
-		      GFUI_ALIGN_HC_VB,
-		      0);
+    void *menuXMLDescHdle = LoadMenuXML("helpmenu.xml");
 
+    CreateStaticControls(menuXMLDescHdle, scrHandle);
+
+    // Create 2 columns table for the keyboard shortcuts explainations
     x  = 30;
     dx = 80;
     x2 = 330;
@@ -77,13 +74,13 @@ GfuiHelpScreen(void *prevScreen)
     curSKey = pscr->userSpecKeys;
     curKey = pscr->userKeys;
     do {
-	if (curSKey != NULL) {
+	if (curSKey) {
 	    curSKey = curSKey->next;
 	    GfuiLabelCreateEx(scrHandle, curSKey->name, fgColor1, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB, 0);
 	    GfuiLabelCreateEx(scrHandle, curSKey->descr, fgColor2, GFUI_FONT_SMALL_C, x + dx, y, GFUI_ALIGN_HL_VB, 0);
 	}
 
-	if (curKey != NULL) {
+	if (curKey) {
 	    curKey = curKey->next;
 	    GfuiLabelCreateEx(scrHandle, curKey->name, fgColor1, GFUI_FONT_SMALL_C, x2, y, GFUI_ALIGN_HL_VB, 0);
 	    GfuiLabelCreateEx(scrHandle, curKey->descr, fgColor2, GFUI_FONT_SMALL_C, x2 + dx, y, GFUI_ALIGN_HL_VB, 0);
@@ -93,32 +90,26 @@ GfuiHelpScreen(void *prevScreen)
 	if (curKey == pscr->userKeys) curKey = (tGfuiKey*)NULL;
 	if (curSKey == pscr->userSpecKeys) curSKey = (tGfuiKey*)NULL;
 
-    } while ((curKey != NULL) || (curSKey != NULL));
+    } while (curKey || curSKey);
     
 
-    GfuiButtonCreate(scrHandle,
-		     "Back",
-		     GFUI_FONT_LARGE,
-		     320,
-		     40,
-		     GFUI_BTNSZ,
-		     GFUI_ALIGN_HC_VB,
-		     0,
-		     prevScreen,
-		     GfuiScreenActivate,
-		     NULL,
-		     (tfuiCallback)NULL,
-		     (tfuiCallback)NULL);
+    // Create Back button.
+    CreateButtonControl(scrHandle, menuXMLDescHdle, "backbutton", prevScreen, GfuiScreenActivate);
 
-    GfuiLabelCreateEx(scrHandle, VERSION, fgColor2, GFUI_FONT_SMALL_C, 320, 8, GFUI_ALIGN_HC_VB, 0);
+    // Create version label.
+    const int versionId = CreateLabelControl(scrHandle, menuXMLDescHdle, "versionlabel");
+    GfuiLabelSetText(scrHandle, versionId, VERSION);
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
+    // Add keyboard shortcuts.
     GfuiAddKey(scrHandle, (unsigned char)27, "", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_F1, "", prevScreen, GfuiScreenReplace, NULL);
     GfuiAddKey(scrHandle, (unsigned char)13, "", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddSKey(scrHandle, GLUT_KEY_F1, "", prevScreen, GfuiScreenReplace, NULL);
 
     GfuiMenuDefaultKeysAdd(scrHandle);
 
     GfuiScreenActivate(scrHandle);
-
 }
 

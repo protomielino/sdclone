@@ -260,6 +260,9 @@ JoyCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     CreateButtonControl(ScrHandle, menuXMLDescHdle, "backbutton", prevMenu, onBack);
     CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
     GfuiAddKey(ScrHandle, 27, "Back", prevMenu, onBack, NULL);
