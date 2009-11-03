@@ -21,31 +21,23 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+
 #include <tgfclient.h>
-#include <track.h>
-#include <robot.h>
-#include "driverconfig.h"
-#include <playerpref.h>
 
 #include "controlconfig.h"
 #include "joystickconfig.h"
 
-static void	*scrHandle2 = NULL;
 
-static tCmdInfo *Cmd;
-static int maxCmd;
+// Constants.
+static const int NbMaxCalAxis = 4;
+static const int NbCalSteps = 6;
 
-static char buf[1024];
+static const int CmdOffset = -1;
 
-static jsJoystick 	*Joystick[GFCTRL_JOY_NUMBER];
-static float 		JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
-static float 		JoyAxisCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
-static int   		JoyButtons[GFCTRL_JOY_NUMBER];
+// WARNING: These strings must match the names used for labels in the XML menu descriptor.
+static const char *LabName[] = { "steer", "throttle", "brake", "clutch" };
 
-#define NB_STEPS	6
-
-const int OFFSET_CMD	= -1;
-
+// TODO: Put these strings in joystickconfigmenu.xml for translation.
 static const char *Instructions[] = {
     "Center the joystick then press a button",
     "Steer left then press a button",
@@ -57,13 +49,28 @@ static const char *Instructions[] = {
     "Calibration failed"
 };
 
+// Current calibration step
 static int CalState;
+
+// Current command configuration to calibrate.
+static tCmdInfo *Cmd;
+static int MaxCmd;
+
+// Joystick info.
+static jsJoystick* Joystick[GFCTRL_JOY_NUMBER];
+static float       JoyAxis[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
+static float       JoyAxisCenter[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];
+static int         JoyButtons[GFCTRL_JOY_NUMBER];
+
+// Menu screen handle.
+static void *ScrHandle = NULL;
+
+// Screen controls Ids
 static int InstId;
 
-static const char *LabName[] = { "Steer", "Throttle", "Brake", "Clutch" };
-static int  LabAxisId[4];
-static int  LabMinId[4];
-static int  LabMaxId[4];
+static int LabAxisId[NbMaxCalAxis];
+static int LabMinId[NbMaxCalAxis];
+static int LabMaxId[NbMaxCalAxis];
 
 
 
@@ -87,14 +94,16 @@ static void advanceStep (void)
 {
     do {
 	CalState++;
-    } while (Cmd[CalState + OFFSET_CMD].ref.type != GFCTRL_TYPE_JOY_AXIS && CalState < NB_STEPS);
+    } while (Cmd[CalState + CmdOffset].ref.type != GFCTRL_TYPE_JOY_AXIS && CalState < NbCalSteps);
 }
 
 
 static void
 JoyCalAutomaton(void)
 {
-    static int axis;
+    static char buf[64];
+
+    int axis;
 
     switch (CalState) {
     case 0:
@@ -102,38 +111,38 @@ JoyCalAutomaton(void)
 	advanceStep();
 	break;
     case 1:
-	axis = Cmd[CalState + OFFSET_CMD].ref.index;
-	Cmd[CalState + OFFSET_CMD].min = JoyAxis[axis];
-	Cmd[CalState + OFFSET_CMD].max = JoyAxisCenter[axis];
-	Cmd[CalState + OFFSET_CMD].pow = 1.0;
+	axis = Cmd[CalState + CmdOffset].ref.index;
+	Cmd[CalState + CmdOffset].min = JoyAxis[axis];
+	Cmd[CalState + CmdOffset].max = JoyAxisCenter[axis];
+	Cmd[CalState + CmdOffset].pow = 1.0;
 	sprintf(buf, "%.2g", JoyAxis[axis]);
-	GfuiLabelSetText(scrHandle2, LabMinId[0], buf);
+	GfuiLabelSetText(ScrHandle, LabMinId[0], buf);
 	advanceStep();
 	break;
     case 2:
-	axis = Cmd[CalState + OFFSET_CMD].ref.index;
-	Cmd[CalState + OFFSET_CMD].min = JoyAxisCenter[axis];
-	Cmd[CalState + OFFSET_CMD].max = JoyAxis[axis];
-	Cmd[CalState + OFFSET_CMD].pow = 1.0;
+	axis = Cmd[CalState + CmdOffset].ref.index;
+	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
+	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
+	Cmd[CalState + CmdOffset].pow = 1.0;
 	sprintf(buf, "%.2g", JoyAxis[axis]);
-	GfuiLabelSetText(scrHandle2, LabMaxId[0], buf);
+	GfuiLabelSetText(ScrHandle, LabMaxId[0], buf);
 	advanceStep();
 	break;
     case 3:
     case 4:
     case 5:
-	axis = Cmd[CalState + OFFSET_CMD].ref.index;
-	Cmd[CalState + OFFSET_CMD].min = JoyAxisCenter[axis];
-	Cmd[CalState + OFFSET_CMD].max = JoyAxis[axis]*1.1;
-	Cmd[CalState + OFFSET_CMD].pow = 1.2;
+	axis = Cmd[CalState + CmdOffset].ref.index;
+	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
+	Cmd[CalState + CmdOffset].max = JoyAxis[axis]*1.1;
+	Cmd[CalState + CmdOffset].pow = 1.2;
 	sprintf(buf, "%.2g", JoyAxisCenter[axis]);
-	GfuiLabelSetText(scrHandle2, LabMinId[CalState - 2], buf);
+	GfuiLabelSetText(ScrHandle, LabMinId[CalState - 2], buf);
 	sprintf(buf, "%.2g", JoyAxis[axis]*1.1);
-	GfuiLabelSetText(scrHandle2, LabMaxId[CalState - 2], buf);
+	GfuiLabelSetText(ScrHandle, LabMaxId[CalState - 2], buf);
 	advanceStep();
 	break;
     }
-    GfuiLabelSetText(scrHandle2, InstId, Instructions[CalState]);
+    GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
 }
 
 
@@ -153,7 +162,7 @@ Idle2(void)
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Button fired */
 		    JoyCalAutomaton();
-		    if (CalState >= NB_STEPS) {
+		    if (CalState >= NbCalSteps) {
 			glutIdleFunc(0);
 		    }
 		    glutPostRedisplay();
@@ -165,8 +174,8 @@ Idle2(void)
 	}
     }
 
-	/* Let CPU take breath (and fans stay at low and quite speed) */
-	GfuiSleep(0.001);
+    /* Let CPU take breath (and fans stay at low and quite speed) */
+    GfuiSleep(0.001);
 }
 
 
@@ -188,7 +197,7 @@ onActivate(void * /* dummy */)
     }
 
     CalState = 0;
-    GfuiLabelSetText(scrHandle2, InstId, Instructions[CalState]);
+    GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     glutIdleFunc(Idle2);
     glutPostRedisplay();
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
@@ -197,19 +206,19 @@ onActivate(void * /* dummy */)
 	}
     }
 
-    for (i = 0; i < 4; i++) {
+    for (i = 0; i < NbMaxCalAxis; i++) {
 	if (i > 0) {
 	    step = i + 2;
 	} else {
 	    step = i + 1;
 	}
-	if (Cmd[step + OFFSET_CMD].ref.type == GFCTRL_TYPE_JOY_AXIS) {
-	    GfuiLabelSetText(scrHandle2, LabAxisId[i], GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, Cmd[step + OFFSET_CMD].ref.index));
+	if (Cmd[step + CmdOffset].ref.type == GFCTRL_TYPE_JOY_AXIS) {
+	    GfuiLabelSetText(ScrHandle, LabAxisId[i], GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, Cmd[step + CmdOffset].ref.index));
 	} else {
-	    GfuiLabelSetText(scrHandle2, LabAxisId[i], "---");
+	    GfuiLabelSetText(ScrHandle, LabAxisId[i], "---");
 	}
-	GfuiLabelSetText(scrHandle2, LabMinId[i], "");
- 	GfuiLabelSetText(scrHandle2, LabMaxId[i], "");
+	GfuiLabelSetText(ScrHandle, LabMinId[i], "");
+ 	GfuiLabelSetText(ScrHandle, LabMaxId[i], "");
     }
 }
 
@@ -217,47 +226,46 @@ onActivate(void * /* dummy */)
 void *
 JoyCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
 {
-    int x, y, dy, i, index;
+    int i;
+    char pszBuf[64];
 
     Cmd = cmd;
-    maxCmd = maxcmd;
+    MaxCmd = maxcmd;
 
-    if (scrHandle2) {
-	return scrHandle2;
+    if (ScrHandle) {
+	return ScrHandle;
     }
     
-    // Create screen and controls.
-    scrHandle2 = GfuiScreenCreateEx(NULL, NULL, onActivate, NULL, NULL, 1);
-    GfuiTitleCreate(scrHandle2, "Joystick Calibration", 0);
+    // Create screen, load menu XML descriptor and create static controls.
+    ScrHandle = GfuiScreenCreateEx(NULL, NULL, onActivate, NULL, NULL, 1);
 
-    GfuiScreenAddBgImg(scrHandle2, "data/img/splash-joycal.png");
+    void *menuXMLDescHdle = LoadMenuXML("joystickconfigmenu.xml");
 
-    x = 128;
-    y = 300;
-    dy = 50;
-    
-    for (i = 0; i < 4; i++) {
-	GfuiLabelCreate(scrHandle2, LabName[i], GFUI_FONT_LARGE, x, y, GFUI_ALIGN_HC_VC, 0);
-	LabAxisId[i] = GfuiLabelCreate(scrHandle2, "                ", GFUI_FONT_MEDIUM, 2 * x, y, GFUI_ALIGN_HC_VC, 0);
-	LabMinId[i] = GfuiLabelCreate(scrHandle2,  "                ", GFUI_FONT_MEDIUM, 3 * x, y, GFUI_ALIGN_HC_VC, 0);
-	LabMaxId[i] = GfuiLabelCreate(scrHandle2,  "                ", GFUI_FONT_MEDIUM, 4 * x, y, GFUI_ALIGN_HC_VC, 0);
-	y -= dy;
+    CreateStaticControls(menuXMLDescHdle, ScrHandle);
+
+    // Create joystick axis label controls (axis name, axis Id, axis min value, axis max value)
+    for (i = 0; i < NbMaxCalAxis; i++) {
+	sprintf(pszBuf, "%saxislabel", LabName[i]);
+	LabAxisId[i] = CreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
+	sprintf(pszBuf, "%sminlabel", LabName[i]);
+	LabMinId[i] = CreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
+	sprintf(pszBuf, "%smaxlabel", LabName[i]);
+	LabMaxId[i] = CreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
     }
 
-    InstId = GfuiLabelCreate(scrHandle2, Instructions[0], GFUI_FONT_MEDIUM, 320, 80, GFUI_ALIGN_HC_VB, 60);
-
-    GfuiButtonCreate(scrHandle2, "Back", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     prevMenu, onBack, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    // Create instruction variable label.
+    InstId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
-    GfuiButtonCreate(scrHandle2, "Reset", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, onActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    // Create Back and Reset buttons.
+    CreateButtonControl(ScrHandle, menuXMLDescHdle, "backbutton", prevMenu, onBack);
+    CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
     // Register keyboard shortcuts.
-    GfuiMenuDefaultKeysAdd(scrHandle2);
-    GfuiAddKey(scrHandle2, 27, "Back", prevMenu, onBack, NULL);
-    GfuiAddKey(scrHandle2, 13, "Back", prevMenu, onBack, NULL);
+    GfuiMenuDefaultKeysAdd(ScrHandle);
+    GfuiAddKey(ScrHandle, 27, "Back", prevMenu, onBack, NULL);
+    GfuiAddKey(ScrHandle, 13, "Back", prevMenu, onBack, NULL);
 
-    return scrHandle2;
+    return ScrHandle;
 }
 
 
