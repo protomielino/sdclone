@@ -26,7 +26,7 @@
 #include "mainmenu.h"
 #include "exitmenu.h"
 #include "optionmenu.h"
-#include "credits.h"
+#include "creditsmenu.h"
 
 
 void *menuHandle = NULL;

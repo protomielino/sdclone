@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : credits.cpp
+    file                 : creditsmenu.cpp
     created              : Tue Mar 3 12:00:00 CEST 2009
     copyright            : (C) 2009 by Jean-Philippe Meuret
     web                  : speed-dreams.sourceforge.net
@@ -22,7 +22,7 @@
 
 #include <tgfclient.h>
 
-// Max number of screen lines in a credit page.
+// Max number of screen lines in a credits page.
 static const unsigned MaxScreenLinesPerPage = 16;
 
 // Description of a columns in the credits XML file
@@ -77,12 +77,13 @@ static void creditsPageChange(void *vpcr)
     GfuiScreenRelease(prevPageScrHdle);
 }
 
-// Create a credit page screen for given chapter and starting line.
+// Create a credits page screen for given chapter and starting line.
 static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 {
     static const unsigned maxBufSize = 256;
     static char	buf[maxBufSize];
 
+    // TODO: Get 'colNameColor' property value from XML when available.
     static float colNameColor[4] = {1.0, 0.0, 1.0, 1.0};
 
     // Open and parse credits file
@@ -105,12 +106,17 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     if (startLineIndex >= nLinesInChapter)
 	return 0;
     
-    // Create screen, set title from chapter name, and set background image
+    // Create screen, load menu XML descriptor and create static controls.
     void* pageScrHdle = GfuiScreenCreate();
 
+    void *menuXMLDescHdle = LoadMenuXML("creditsmenu.xml");
+
+    CreateStaticControls(menuXMLDescHdle, pageScrHdle);
+
+    // Create title label from chapter name
     sprintf(buf, "Credits - %s", chapName);
-    GfuiTitleCreate(pageScrHdle, buf, strlen(buf));
-    GfuiScreenAddBgImg(pageScrHdle, "data/img/splash-dtm.png"); // TODO : special credits background image.
+    const int titleId = CreateLabelControl(pageScrHdle, menuXMLDescHdle, "title");
+    GfuiLabelSetText(pageScrHdle, titleId, buf);
     
     // Get columns info (names, width and line index) and display column titles
     // (each chapter line may need more than 1 screen line, given the column width sum ...)
@@ -122,9 +128,9 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     std::map<const char*, tColumnDesc> columns;
     std::vector<const char*> orderedColumnIds;
 
-    int x0 = 20;
+    int x0 = 20; // TODO: Get 'xLeft1stCol' property value from XML when available.
     int x = x0;
-    int y = 400;
+    int y = 400; // TODO: Get 'yBottom1stLine' property value from XML when available.
     int nScreenLinesPerLine = 1;
     sprintf(buf, "chapters/%d/columns", startChapterIndex);
     GfParmListSeekFirst(crHdle, buf);
@@ -132,12 +138,13 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     {
 	tColumnDesc column;
 	column.name = GfParmGetCurStr(crHdle, buf, "name", "<no name>");
-	column.width = GfParmGetCurNum(crHdle, buf, "width", 0, 20);
+	column.width = GfParmGetCurNum(crHdle, buf, "width", 0, 20); 
+	// TODO: Get 'xRightLastCol' property value from XML when available.
 	if (x >= 600+20) // Do we need 1 more screen line for the current credits line ?
 	{
-	    x0 += 10;
+	    x0 += 10; // TODO: Get 'xSubLineShift' property value from XML when available.
 	    x = x0;
-	    y -= 17;
+	    y -= 17; // TODO: Get 'ySubLineShift' property value from XML when available.
 	    nScreenLinesPerLine++;
 	} 
 	
@@ -158,8 +165,8 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     int nScreenLines = 0; 
     for (; nLineInd < nLinesInChapter && nLineInd - startLineIndex < maxLinesPerPage; nLineInd++)
     {
-	x0 = x = 20;
-	y -= 20;
+	x0 = x = 20; // TODO: Get 'xLeft1stCol' property value from XML when available.
+	y -= 20;// TODO: Get 'yLineShift' property value from XML when available.
 	sprintf(buf, "chapters/%d/lines/%d", startChapterIndex, nLineInd);
 	std::vector<const char*>::const_iterator colIdIter;
 	for (colIdIter = orderedColumnIds.begin(); colIdIter != orderedColumnIds.end(); colIdIter++)
@@ -167,9 +174,9 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	    const char* colValue = GfParmGetStr(crHdle, buf, *colIdIter, "");
 	    if (x >= 600+20) // Do we need 1 more screen line for the current credits line ?
 	    {
-		x0 += 10;
+		x0 += 10; // TODO: Get 'xSubLineShift' property value from XML when available.
 		x = x0;
-		y -= 17;
+		y -= 17; // TODO: Get 'ySubLineShift' property value from XML when available.
 		nScreenLines++;
 	    }
 	    GfuiLabelCreate(pageScrHdle, colValue, GFUI_FONT_MEDIUM_C,
@@ -182,7 +189,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     // Close credits file
     GfParmReleaseHandle(crHdle);
     
-    // Add "Previous page" button if not the first page.
+    // Create "Previous page" button if not the first page.
     if (startLineIndex > 0 || startChapterIndex > 0)
     {
 	PrevPageRequest.prevPageScrHdle = pageScrHdle;
@@ -196,18 +203,14 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	    PrevPageRequest.startChapterIndex = startChapterIndex - 1;
 	    PrevPageRequest.startLineIndex    = -1;
 	}
-	GfuiGrButtonCreate(pageScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
-			   "data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
-			   80, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&PrevPageRequest, creditsPageChange,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "previouspagearrow",
+			    (void*)&PrevPageRequest, creditsPageChange);
 	GfuiAddSKey(pageScrHdle, GLUT_KEY_PAGE_UP, "Previous page", 
 		    (void*)&PrevPageRequest, creditsPageChange, NULL);
     }
     
     // Add "Continue" button (credits screen exit).
-    GfuiButtonCreate(pageScrHdle, "Continue", GFUI_FONT_LARGE, 320, 40, 150, GFUI_ALIGN_HC_VB, 0,
-		     RetScrHdle, GfuiScreenReplace, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CreateButtonControl(pageScrHdle, menuXMLDescHdle, "backbutton", RetScrHdle, GfuiScreenReplace);
     
     // Add "Next page" button if not the last page.
     if (nLineInd < nLinesInChapter || startChapterIndex + 1 < nChapters) 
@@ -223,19 +226,18 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	    NextPageRequest.startChapterIndex = startChapterIndex + 1;
 	    NextPageRequest.startLineIndex    = 0;
 	}
-	GfuiGrButtonCreate(pageScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
-			   "data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
-			   540, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&NextPageRequest, creditsPageChange,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "nextpagearrow",
+			    (void*)&NextPageRequest, creditsPageChange);
 	GfuiAddSKey(pageScrHdle, GLUT_KEY_PAGE_DOWN, "Next Page", 
 		    (void*)&NextPageRequest, creditsPageChange, NULL);
     }
 
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
     // Add standard keyboard shortcuts.
-    GfuiAddKey(pageScrHdle, (unsigned char)27, "Exit Credits Screen", 
+    GfuiAddKey(pageScrHdle, (unsigned char)27, "Return to previous menu", 
 	       RetScrHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(pageScrHdle, (unsigned char)13, "Exit Credits Screen", 
+    GfuiAddKey(pageScrHdle, (unsigned char)13, "Return to previous menu", 
 	       RetScrHdle, GfuiScreenReplace, NULL);
     GfuiAddSKey(pageScrHdle, GLUT_KEY_F1, "Help", 
 		pageScrHdle, GfuiHelpScreen, NULL);

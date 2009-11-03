@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : credits.h
+    file                 : creditsmenu.h
     created              : Tue Mar 3 12:00:00 CEST 2009
     copyright            : (C) 2009 by Jean-Philippe Meuret
     web                  : speed-dreams.sourceforge.net
@@ -17,13 +17,13 @@
  ***************************************************************************/
  
 
-#ifndef _CREDITS_H_
-#define _CREDITS_H_
+#ifndef _CREDITSMENU_H_
+#define _CREDITSMENU_H_
 
 extern void CreditsScreenActivate(void *retScrHdle);
 
 
-#endif /* _CREDITS_H_ */ 
+#endif /* _CREDITSMENU_H_ */ 
 
 
 

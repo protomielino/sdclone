@@ -269,7 +269,7 @@ GfuiMenuBackQuitButtonCreateEx(void *scr, const char *text, const char *tip, voi
 }
 
 int 
-GetFontSize(std::string strTextsize)
+GetFontSize(const std::string& strTextsize)
 {
 	int tSize = GFUI_FONT_MEDIUM;
 
@@ -286,7 +286,7 @@ GetFontSize(std::string strTextsize)
 }
 
 int 
-GetAlignment(std::string strAlignH,std::string strAlignV)
+GetAlignment(const std::string& strAlignH, const std::string& strAlignV)
 {
 	
 	int align = GFUI_ALIGN_HL_VB;
@@ -308,7 +308,7 @@ GetAlignment(std::string strAlignH,std::string strAlignV)
 }
 
 int 
-GetHAlignment(std::string strAlignH)
+GetHAlignment(const std::string& strAlignH)
 {
 	int align = 0; //left
 
@@ -370,14 +370,16 @@ GetControlValues(void *param,const char *pControlName,std::string &strText,std::
 
 	strText = GfParmGetStr(param, strControlName.c_str(), "text", "");
 	strTip = GfParmGetStr(param, strControlName.c_str(), "tip", "");
+
 	x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
 	y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
-	std::string strTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
-	textSize = GetFontSize(strTextsize);
-	std::string strAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
-	std::string strAlignV = GfParmGetStr(param, strControlName.c_str(), "alignV", "");
-	alignment = GetAlignment(strAlignH,strAlignV);
-	
+
+	const char* pszTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
+	textSize = GetFontSize(pszTextsize);
+
+	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
+	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
+	alignment = GetAlignment(pszAlignH,pszAlignV);
 
 	return true;
 }
@@ -386,69 +388,58 @@ GetControlValues(void *param,const char *pControlName,std::string &strText,std::
 int 
 CreateStaticImage(void *menuHandle,void *param,const char *pControlName)
 {
-	std::string strImage;
-	int x,y,w,h;
+	const char* pszImage = GfParmGetStr(param, pControlName, "image", "");
 
-	strImage = GfParmGetStr(param, pControlName, "image", "");
+	const int x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
+	const int w = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
+	const int h = (int)GfParmGetNum(param,pControlName,"height",NULL,0.0);
 
-	x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
-	w = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
-	h = (int)GfParmGetNum(param,pControlName,"height",NULL,0.0);
-
-	return GfuiStaticImageCreate(menuHandle,x,y,w,h,strImage.c_str());
+	return GfuiStaticImageCreate(menuHandle,x,y,w,h,pszImage);
 }
 
 int 
 CreateBackgroundImage(void *menuHandle,void *param,const char *pControlName)
 {
-	std::string strImage;
-	strImage = GfParmGetStr(param, pControlName, "image", "");
-	GfuiScreenAddBgImg(menuHandle, strImage.c_str());
+	const char* pszImage = GfParmGetStr(param, pControlName, "image", "");
+	GfuiScreenAddBgImg(menuHandle, pszImage);
 	return 1;
 }
 
 int
 CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName)
 {
-	int labelId;
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
 	
-	labelId = CreateStaticImage(menuHandle,param,strControlName.c_str());
-	return labelId;
+	return CreateStaticImage(menuHandle,param,strControlName.c_str());
 }
 
 int 
 CreateLabel(void *menuHandle,void *param,const char *pControlName)
 {
 	const std::string strType = GfParmGetStr(param, pControlName, "type", "");
+
 	if (strType!="label")
 	{
 		GfError("Error: Control '%s' is not a label\n", pControlName);
 		return -1;
 	}
 	
-	std::string strText,strTip;
-	int textsize;
-	int alignment;
-	int labelId;
-	int x,y;
-
-	strText = GfParmGetStr(param, pControlName, "text", "");
-	x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
-	std::string strTextsize = GfParmGetStr(param, pControlName, "textsize", "");
-	textsize = GetFontSize(strTextsize);
-	std::string strAlignH = GfParmGetStr(param, pControlName, "alignH", "");
-	std::string strAlignV = GfParmGetStr(param, pControlName, "alignV", "");
-	alignment = GetAlignment(strAlignH,strAlignV);
+	const char* pszText = GfParmGetStr(param, pControlName, "text", "");
+	const int x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
+	const char* pszTextsize = GfParmGetStr(param, pControlName, "textsize", "");
+	const int textsize = GetFontSize(pszTextsize);
+	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
+	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
+	const int alignment = GetAlignment(pszAlignH,pszAlignV);
 	
+    	int labelId = GfuiLabelCreate(menuHandle, pszText, textsize, x, y, alignment, 32);
+
 	Color c;
-	bool bColor = GetColorFromXML(param,pControlName,"color",c);
+	const bool bColor = GetColorFromXML(param,pControlName,"color",c);
 
-
-    	labelId = GfuiLabelCreate(menuHandle, strText.c_str(), textsize, x, y, alignment, 32);
 	if (bColor)
 		GfuiLabelSetColor(menuHandle, labelId, c.GetPtr());
 
@@ -459,59 +450,22 @@ CreateLabel(void *menuHandle,void *param,const char *pControlName)
 int 
 CreateLabelControl(void *menuHandle,void *param,const char *pControlName)
 {
-    	int labelId;
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
 
-    	labelId = CreateLabel(menuHandle,param,strControlName.c_str());
-    	return labelId;
+    	return CreateLabel(menuHandle,param,strControlName.c_str());
 }
 
 int 
 CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-	std::string strText,strTip;
-	int textsize;
-	int id;
-	int x,y,width;
+	const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
 
-	strText = GfParmGetStr(param, pControlName, "text", "");
-	strTip = GfParmGetStr(param, pControlName, "tip", "");
-	x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
-	std::string strTextsize = GfParmGetStr(param, pControlName, "textsize", "");
-	textsize = GetFontSize(strTextsize);
-	std::string strAlignH = GfParmGetStr(param, pControlName, "alignH", "");
-	int alignH = GetHAlignment(strAlignH);
-	
-	width = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
-	if (width == 0)
-	    width = GFUI_BTNSZ;
-
-	Color c,fc,pc;
-	bool bColor = GetColorFromXML(param,pControlName,"color",c);
-	bool bFocusColor = GetColorFromXML(param,pControlName,"focuscolor",fc);
-	bool bPushedColor = GetColorFromXML(param,pControlName,"pushedcolor",pc);
-
-	bool bShowbox = ReadBoolean(param,pControlName,"showbox");
-
-	std::string strEnabledImage,strDisabledImage,strFocusedImage,strPushedImage;
-	strDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
-	strEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
-	strFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
-	strPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
-
-	int imgX,imgY,imgWidth,imgHeight;
-	imgX = (int)GfParmGetNum(param,pControlName,"imagex",NULL,0.0);
-	imgY = (int)GfParmGetNum(param,pControlName,"imagey",NULL,0.0);
-	imgWidth = (int)GfParmGetNum(param,pControlName,"imagewidth",NULL,20.0);
-	imgHeight = (int)GfParmGetNum(param,pControlName,"imageheight",NULL,20.0);
-
-    	if (!strTip.empty())
+    	if (strlen(pszTip) > 0)
 	{
     		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
     		cbinfo->screen = menuHandle;
-    		cbinfo->labelId = GfuiTipCreate(menuHandle, strTip.c_str(), strTip.length());
+    		cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
 	    	GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
 
 		userDataOnFocus = (void*)cbinfo;
@@ -519,18 +473,48 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 		onFocusLost = remInfo;
 	}
 
-	id = GfuiButtonCreate(menuHandle,
-			      strText.c_str(),
-			      textsize,
-			      x, y, width, alignH, GFUI_MOUSE_UP,
-			      userdata, onpush,
-			      userDataOnFocus, onFocus,
-			      onFocusLost);
+	const char* pszText = GfParmGetStr(param, pControlName, "text", "");
+	const int x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
+	const char* pszTextsize = GfParmGetStr(param, pControlName, "textsize", "");
+	const int textsize = GetFontSize(pszTextsize);
+	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
+	const int alignH = GetHAlignment(pszAlignH);
+	
+	int width = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
+	if (width == 0)
+	    width = GFUI_BTNSZ;
+
+	int id = GfuiButtonCreate(menuHandle,
+				  pszText,
+				  textsize,
+				  x, y, width, alignH, GFUI_MOUSE_UP,
+				  userdata, onpush,
+				  userDataOnFocus, onFocus,
+				  onFocusLost);
+
+	const bool bShowbox = ReadBoolean(param,pControlName,"showbox");
 
 	GfuiButtonShowBox(menuHandle,id,bShowbox);
+
+	const char* pszDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
+	const char* pszEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
+	const char* pszFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
+	const char* pszPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
+
+	const int imgX = (int)GfParmGetNum(param,pControlName,"imagex",NULL,0.0);
+	const int imgY = (int)GfParmGetNum(param,pControlName,"imagey",NULL,0.0);
+	const int imgWidth = (int)GfParmGetNum(param,pControlName,"imagewidth",NULL,20.0);
+	const int imgHeight = (int)GfParmGetNum(param,pControlName,"imageheight",NULL,20.0);
+
 	GfuiButtonSetImage(menuHandle,id,imgX,imgY,imgWidth,imgHeight,
-			   strDisabledImage.c_str(),strEnabledImage.c_str(),
-			   strFocusedImage.c_str(),strPushedImage.c_str());
+			   pszDisabledImage,pszEnabledImage,
+			   pszFocusedImage,pszPushedImage);
+
+	Color c,fc,pc;
+	const bool bColor = GetColorFromXML(param,pControlName,"color",c);
+	const bool bFocusColor = GetColorFromXML(param,pControlName,"focuscolor",fc);
+	const bool bPushedColor = GetColorFromXML(param,pControlName,"pushedcolor",pc);
 
 	if (bColor)
 		GfuiButtonSetColor(menuHandle,id,c);
@@ -547,38 +531,43 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 int 
 CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-	std::string strTip,strText;
-	int alignment;
-	int id = -1;
-	int x,y,w,h;
-	std::string strEnabledImage,strDisabledImage,strFocusedImage,strPushedImage;
+	const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
 
+    	if (strlen(pszTip) > 0)
+	{
+    		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+    		cbinfo->screen = menuHandle;
+    		cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+	    	GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
 
-	strTip = GfParmGetStr(param, pControlName, "tip", "");
-	strDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
-	strEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
-	strFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
-	strPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
+		userDataOnFocus = (void*)cbinfo;
+		onFocus = dispInfo;
+		onFocusLost = remInfo;
+	}
 
-	x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
-	w = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
-	h = (int)GfParmGetNum(param,pControlName,"height",NULL,0.0);
+	const char* pszDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
+	const char* pszEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
+	const char* pszFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
+	const char* pszPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
 
-	std::string strAlignH = GfParmGetStr(param, pControlName, "alignH", "");
-	std::string strAlignV = GfParmGetStr(param, pControlName, "alignV", "");
-	alignment = GetAlignment(strAlignH,strAlignV);
+	const int x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
+	//const int w = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
+	//const int h = (int)GfParmGetNum(param,pControlName,"height",NULL,0.0);
 
-	id = GfuiGrButtonCreate(menuHandle,
-		strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str(),
-		x,y,alignment,GFUI_MOUSE_UP
-		,userdata,
-		onpush,
-	    userDataOnFocus, 
-	    onFocus,
-		onFocusLost);
+	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
+	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
+	const int alignment = GetAlignment(pszAlignH,pszAlignV);
 
-	return id;
+	return GfuiGrButtonCreate(menuHandle,
+				  pszDisabledImage,pszEnabledImage,
+				  pszFocusedImage,pszPushedImage,
+				  x,y,alignment,GFUI_MOUSE_UP,
+				  userdata,
+				  onpush,
+				  userDataOnFocus, 
+				  onFocus,
+				  onFocusLost);
 }
 
 int 
@@ -607,6 +596,20 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
 int 
 CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
+	const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
+
+    	if (strlen(pszTip) > 0)
+	{
+    		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+    		cbinfo->screen = menuHandle;
+    		cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+	    	GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
+
+		userDataOnFocus = (void*)cbinfo;
+		onFocus = dispInfo;
+		onFocusLost = remInfo;
+	}
+
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
 
@@ -614,33 +617,27 @@ CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *us
 	if (strType != "editbox")
 		return -1;
 
-	int id = -1;
-	
-	std::string strText,strTip;
-	int textsize;
-	int x,y,width,maxlen;
-
-	strText = GfParmGetStr(param, strControlName.c_str(), "text", "");
-	x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
-	std::string strTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
-	textsize = GetFontSize(strTextsize);
+	const char* pszText = GfParmGetStr(param, strControlName.c_str(), "text", "");
+	const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
+	const char* pszTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
+	const int textsize = GetFontSize(pszTextsize);
 	std::string strAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
 
 	
-	width = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
+	int width = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
 	if (width == 0)
 	    width =  GFUI_BTNSZ;
 
-	maxlen = (int)GfParmGetNum(param,strControlName.c_str(),"maxlen",NULL,0.0);
+	const int maxlen = (int)GfParmGetNum(param,strControlName.c_str(),"maxlen",NULL,0.0);
+
+	int id = GfuiEditboxCreate(menuHandle,pszText, textsize,x,y,width,maxlen,
+				   userDataOnFocus,onFocus,onFocusLost);
 
 	Color c,fc;
+	const bool bColor = GetColorFromXML(param,pControlName,"color",c);
+	const bool bFocusColor = GetColorFromXML(param,pControlName,"focuscolor",fc);
 
-	bool bColor = GetColorFromXML(param,pControlName,"color",c);
-	bool bFocusColor = GetColorFromXML(param,pControlName,"focuscolor",fc);
-
-
-	id = GfuiEditboxCreate(menuHandle,strText.c_str(), textsize,x,y,width,maxlen,userDataOnFocus,onFocus,onFocusLost);
 	if (bColor)
 		GfuiEditboxSetColor(menuHandle,id,c);
 	
@@ -653,23 +650,27 @@ CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *us
 int 
 CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect)
 {
-	std::string strControlName = pControlName;
-	strControlName = "dynamiccontrols/"+strControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
 
 	std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
 	if (strType != "scrolllist")
 		return -1;
 
-	int x,y,w,h,textsize;
-	int scrollbarpos = GFUI_SB_NONE;
-	int alignment;
-
-	x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
-	w = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
-	h = (int)GfParmGetNum(param,strControlName.c_str(),"height",NULL,0.0);
+	const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
+	const int w = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
+	const int h = (int)GfParmGetNum(param,strControlName.c_str(),"height",NULL,0.0);
 	
+	const char* pszTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
+	const int textsize = GetFontSize(pszTextsize);
+
+	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
+	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
+	const int alignment = GetAlignment(pszAlignH,pszAlignV);
+
 	std::string strVal = GfParmGetStr(param,strControlName.c_str(),"scrollbarposition","none");
+	int scrollbarpos = GFUI_SB_NONE;
 	if (strVal == "none")
 		scrollbarpos = GFUI_SB_NONE;
 	else if (strVal =="left")
@@ -677,22 +678,12 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
 	else if (strVal == "right")
 		scrollbarpos = GFUI_SB_RIGHT;
 
-	std::string strTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
-	textsize = GetFontSize(strTextsize);
-
-
-	std::string strAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
-	std::string strAlignV = GfParmGetStr(param, strControlName.c_str(), "alignV", "");
-	alignment = GetAlignment(strAlignH,strAlignV);
+	int id = GfuiScrollListCreate(menuHandle, textsize,x,y,alignment,w,h,scrollbarpos,userdata,onSelect);
 
 	Color c,sc;
 	bool bColor = GetColorFromXML(param,pControlName,"color",c);
 	bool bSelectColor = GetColorFromXML(param,pControlName,"selectcolor",sc);
 	
-	int id = -1;
-
-	id = GfuiScrollListCreate(menuHandle, textsize,x,y,alignment,w,h,scrollbarpos,userdata,onSelect);
-
 	if (bColor)
 		GfuiScrollListSetColor(menuHandle,id,c);
 
@@ -743,11 +734,9 @@ LoadMenuXML(const char *pszMenuPath)
 {
 	std::string strPath("data/menu/");
 	strPath += pszMenuPath;
-	void *param = NULL;
 	
 	char buf[1024];
 	sprintf(buf, "%s%s", GetDataDir(),strPath.c_str());
-	param = GfParmReadFile(buf, GFPARM_RMODE_STD);
-	
-	return param;
+
+	return GfParmReadFile(buf, GFPARM_RMODE_STD);
 }
