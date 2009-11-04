@@ -27,8 +27,10 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include <tgfclient.h>
 #include <car.h>
+
 
 static void		*menuHandle = NULL;
 static int		fuelId;
@@ -42,8 +44,8 @@ rmUpdtFuel(void * /* dummy */)
     char	buf[32];
     
     val = GfuiEditboxGetString(menuHandle, fuelId);
-    rmCar->pitcmd.fuel = (tdble)strtol(val, (char **)NULL, 0);
-    sprintf(buf, "%f", rmCar->pitcmd.fuel);
+    rmCar->pitcmd.fuel = (tdble)strtod(val, (char **)NULL);
+    sprintf(buf, "%.1f", rmCar->pitcmd.fuel);
     GfuiEditboxSetString(menuHandle, fuelId, buf);
 }
 
@@ -81,55 +83,54 @@ void
 RmPitMenuStart(tCarElt *car, void *userdata, tfuiCallback callback)
 {
     char	buf[256];
-    int		y, x, dy;
 
     rmCar = car;
+    rmCallback = callback;
+    rmUserData = userdata;
 
     if (menuHandle) {
 	GfuiScreenRelease(menuHandle);
     }
-    menuHandle = GfuiMenuScreenCreate("Pit Stop Info");
 
-    x = 80;
-    y = 380;
-    sprintf(buf, "Driver: %s", car->_name);
-    GfuiLabelCreate(menuHandle, buf, GFUI_FONT_LARGE_C, x, y, GFUI_ALIGN_HL_VB, 0);
-    dy = GfuiFontHeight(GFUI_FONT_LARGE_C) + 5;
+    // Create screen, load menu XML descriptor and create static controls.
+    menuHandle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
 
-    y -= dy;
-    sprintf(buf, "Remaining Laps: %d", car->_remainingLaps);
-    GfuiLabelCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    void *menuXMLDescHdle = LoadMenuXML("pitmenu.xml");
 
-    y -= dy;
-    sprintf(buf, "Remaining Fuel: %.1f l", car->_fuel);
-    GfuiLabelCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    CreateStaticControls(menuXMLDescHdle, menuHandle);
 
-    y -= dy;
-    GfuiLabelCreate(menuHandle, "Fuel amount (liters):", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    // Create labels for driver name, remaining laps and remaining fuel.
+    int driverNameId = CreateLabelControl(menuHandle, menuXMLDescHdle, "drivernamelabel");
+    GfuiLabelSetText(menuHandle, driverNameId, car->_name);
 
-    sprintf(buf, "%d", (int)car->pitcmd.fuel);
-    fuelId = GfuiEditboxCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C,
-			       x + GfuiFontWidth(GFUI_FONT_MEDIUM_C, "Fuel amount (liters):") + 20, y,
-			       0, 10, NULL, (tfuiCallback)NULL, rmUpdtFuel);
+    int remainLapsId = CreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
+    sprintf(buf, "%d", car->_remainingLaps);
+    GfuiLabelSetText(menuHandle, remainLapsId, buf);
 
-    y -= dy;
-    GfuiLabelCreate(menuHandle, "Repair amount:", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    int remainFuelId = CreateLabelControl(menuHandle, menuXMLDescHdle, "remainingfuellabel");
+    sprintf(buf, "%.1f l", car->_fuel);
+    GfuiLabelSetText(menuHandle, remainFuelId, buf);
 
+    // Create edit boxes for fuel and repair amounts.
+    fuelId = CreateEditControl(menuHandle, menuXMLDescHdle, "fuelamountedit", NULL, NULL, rmUpdtFuel);
+    sprintf(buf, "%.1f", car->pitcmd.fuel);
+    GfuiEditboxSetString(menuHandle, fuelId, buf);
+
+    repairId = CreateEditControl(menuHandle, menuXMLDescHdle, "repairamountedit", NULL, NULL, rmUpdtRepair);
     sprintf(buf, "%d", (int)car->pitcmd.repair);
-    repairId = GfuiEditboxCreate(menuHandle, buf, GFUI_FONT_MEDIUM_C,
-				 x + GfuiFontWidth(GFUI_FONT_MEDIUM_C, "Fuel amount (liters):") + 20, y,
-				 0, 10, NULL, (tfuiCallback)NULL, rmUpdtRepair);
+    GfuiEditboxSetString(menuHandle, repairId, buf);
+
+    // Create Back and Reset buttons.
+    CreateButtonControl(menuHandle, menuXMLDescHdle, "repairbutton", NULL, rmRepair);
+    CreateButtonControl(menuHandle, menuXMLDescHdle, "stopgobutton", NULL, rmStopAndGo);
+
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
     
-    //GfuiMenuBackQuitButtonCreate(menuHandle, "Repair", "Return to race", userdata, callback);
-
-    GfuiButtonCreate(menuHandle, "Repair", GFUI_FONT_LARGE, 160, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmRepair, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    rmCallback = callback;
-    rmUserData = userdata;
-    GfuiButtonCreate(menuHandle, "Stop & Go", GFUI_FONT_LARGE, 480, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmStopAndGo, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+    // Register keyboard shortcuts.
+    GfuiMenuDefaultKeysAdd(menuHandle);
     GfuiAddSKey(menuHandle, GLUT_KEY_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
     GfuiAddSKey(menuHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+
     GfuiScreenActivate(menuHandle);
 }
