@@ -41,6 +41,106 @@ gfuiButtonInit(void)
 
 }
 
+int
+GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
+		   void *userDataOnPush, tfuiCallback onPush, 
+		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
+{
+    tGfuiGrButton	*button;
+    tGfuiObject		*object;
+    tGfuiScreen		*screen = (tGfuiScreen*)scr;
+    int			w, h;
+    
+    object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
+    object->widget = GFUI_GRBUTTON;
+    object->focusMode = GFUI_FOCUS_MOUSE_MOVE;
+    object->id = screen->curId++;
+    object->visible = 1;
+    
+    button = &(object->u.grbutton);
+    button->state = GFUI_BTN_RELEASED;
+    button->userDataOnPush = userDataOnPush;
+    button->onPush = onPush;
+    button->userDataOnFocus = userDataOnFocus;
+    button->onFocus = onFocus;
+    button->onFocusLost = onFocusLost;
+    button->mouseBehaviour = mouse;
+ 
+	
+
+
+    button->disabled = GfImgReadTex(disabled, w, h);
+    button->enabled = GfImgReadTex(enabled, w, h);
+    button->focused = GfImgReadTex(focused, w, h);
+    button->pushed = GfImgReadTex(pushed, w, h);
+
+    switch (align) {
+    case GFUI_ALIGN_HR_VB:
+	object->xmin = x - imageWidth;
+	object->xmax = x;
+	object->ymin = y;
+	object->ymax = y + imageHeight;
+	break;
+    case GFUI_ALIGN_HR_VC:
+	object->xmin = x - imageWidth;
+	object->xmax = x;
+	object->ymin = y - imageHeight / 2;
+	object->ymax = y + imageHeight / 2;
+	break;
+    case GFUI_ALIGN_HR_VT:
+	object->xmin = x - imageWidth;
+	object->xmax = x;
+	object->ymin = y - imageHeight;
+	object->ymax = y;
+	break;
+    case GFUI_ALIGN_HC_VB:
+	object->xmin = x - imageWidth / 2;
+	object->xmax = x + imageWidth / 2;
+	object->ymin = y;
+	object->ymax = y + imageHeight;
+	break;
+    case GFUI_ALIGN_HC_VC:
+	object->xmin = x - imageWidth / 2;
+	object->xmax = x + imageWidth / 2;
+	object->ymin = y - imageHeight / 2;
+	object->ymax = y + imageHeight / 2;
+	break;
+    case GFUI_ALIGN_HC_VT:
+	object->xmin = x - imageWidth / 2;
+	object->xmax = x + imageWidth / 2;
+	object->ymin = y - imageHeight;
+	object->ymax = y;
+	break;
+    case GFUI_ALIGN_HL_VB:
+	object->xmin = x;
+	object->xmax = x + imageWidth;
+	object->ymin = y;
+	object->ymax = y + imageHeight;
+	break;
+    case GFUI_ALIGN_HL_VC:
+	object->xmin = x;
+	object->xmax = x + imageWidth;
+	object->ymin = y - imageHeight / 2;
+	object->ymax = y + imageHeight / 2;
+	break;
+    case GFUI_ALIGN_HL_VT:
+	object->xmin = x;
+	object->xmax = x + imageWidth;
+	object->ymin = y - imageHeight;
+	object->ymax = y;
+	break;
+    default:
+	break;
+    }
+
+    button->width = imageWidth;
+    button->height = imageHeight;
+
+    gfuiAddObject(screen, object);
+    return object->id;
+}
+
 /** Add a graphical button to a screen.
     @ingroup	gui
     @param	scr		Screen

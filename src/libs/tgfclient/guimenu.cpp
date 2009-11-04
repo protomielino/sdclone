@@ -547,29 +547,47 @@ CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,v
 		onFocusLost = remInfo;
 	}
 
-	const char* pszDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
-	const char* pszEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
-	const char* pszFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
-	const char* pszPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
+    std::string strEnabledImage,strDisabledImage,strFocusedImage,strPushedImage;
+
+	strDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
+	strEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
+	strFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
+	strPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
 
 	const int x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
 	const int y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
-	//const int w = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
-	//const int h = (int)GfParmGetNum(param,pControlName,"height",NULL,0.0);
+	const int w = (int)GfParmGetNum(param,pControlName,"width",NULL,0.0);
+	const int h = (int)GfParmGetNum(param,pControlName,"height",NULL,0.0);
 
 	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
 	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
 	const int alignment = GetAlignment(pszAlignH,pszAlignV);
+	int id = -1;
 
-	return GfuiGrButtonCreate(menuHandle,
-				  pszDisabledImage,pszEnabledImage,
-				  pszFocusedImage,pszPushedImage,
-				  x,y,alignment,GFUI_MOUSE_UP,
-				  userdata,
-				  onpush,
-				  userDataOnFocus, 
-				  onFocus,
-				  onFocusLost);
+	if ((w ==0)&&(h==0))
+	{
+		id = GfuiGrButtonCreate(menuHandle,
+			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str(),
+			x,y,alignment,GFUI_MOUSE_UP
+			,userdata,
+			onpush,
+			userDataOnFocus, 
+			onFocus,
+			onFocusLost);
+	}
+	else
+	{
+		id = GfuiGrButtonCreateEx(menuHandle,
+			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str(),
+			x,y,w,h,alignment,GFUI_MOUSE_UP
+			,userdata,
+			onpush,
+			userDataOnFocus, 
+			onFocus,
+			onFocusLost);
+	}
+
+	return id;
 }
 
 int 

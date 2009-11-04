@@ -207,6 +207,10 @@ extern int GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabl
 			      int x, int y, int align, int mouse,
 			      void *userDataOnPush, tfuiCallback onPush, 
 			      void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
+		   void *userDataOnPush, tfuiCallback onPush, 
+		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
 extern void GfuiButtonSetText(void *scr, int id, const char *text);
 extern int GfuiButtonGetFocused(void);
