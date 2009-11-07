@@ -823,7 +823,7 @@ GfScrMenuInit(void *prevMenu)
 
 #ifdef WIN32
 	CreateLabelControl(scrHandle,param,"maxfreqlabel");
-	MaxFreqId = CreateEditControl(scrHandle,param,"freqedit",NULL,ChangeMaxFreq,NULL);
+	MaxFreqId = CreateEditControl(scrHandle,param,"freqedit",NULL,NULL,ChangeMaxFreq);
 #endif
 
 	CreateButtonControl(scrHandle,param,"vmleftarrow",(void*)-1, VInitPrevNext);
