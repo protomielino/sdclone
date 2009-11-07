@@ -46,38 +46,40 @@ singlePlayerMenuActivate(void * /* dummy */)
 
 /* Exit from Race engine */
 static void
-singlePLayerShutdown(void *precMenu)
+singlePLayerShutdown(void *prevMenu)
 {
-    GfuiScreenActivate(precMenu);
+    GfuiScreenActivate(prevMenu);
     ReShutdown();
 }
 
 
 /* Initialize the single player menu */
 void *
-ReSinglePlayerInit(void *precMenu)
+ReSinglePlayerInit(void *prevMenu)
 {
-    if (singlePlayerHandle) return singlePlayerHandle;
+    if (singlePlayerHandle) 
+	return singlePlayerHandle;
     
+    // Create screen, load menu XML descriptor and create static controls.
     singlePlayerHandle = GfuiScreenCreateEx((float*)NULL, 
 					    NULL, singlePlayerMenuActivate, 
 					    NULL, (tfuiCallback)NULL, 
 					    1);
+    void *menuXMLDescHdle = LoadMenuXML("singleplayermenu.xml");
+    CreateStaticControls(menuXMLDescHdle, singlePlayerHandle);
 
-    GfuiTitleCreate(singlePlayerHandle, "SELECT RACE", 0);
+    // Display the raceman buttons (1 for each race type)
+    ReAddRacemanListButton(singlePlayerHandle, menuXMLDescHdle);
 
-    GfuiScreenAddBgImg(singlePlayerHandle, "data/img/splash-single-player.png");
+    // Create Back button
+    CreateButtonControl(singlePlayerHandle, menuXMLDescHdle, "backbutton", prevMenu, singlePLayerShutdown);
 
-    /* Display the raceman button selection */
-    ReAddRacemanListButton(singlePlayerHandle);
-
+    // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(singlePlayerHandle);
+    GfuiAddKey(singlePlayerHandle, 27, "Back To Main", prevMenu, singlePLayerShutdown, NULL);
 
+    // Give the race engine the menu to come back to.
     ReStateInit(singlePlayerHandle);
 
-    GfuiMenuBackQuitButtonCreate(singlePlayerHandle,
-				 "Back", "Back to Main",
-				 precMenu, singlePLayerShutdown);
-    
     return singlePlayerHandle;
 }

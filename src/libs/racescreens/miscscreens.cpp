@@ -50,7 +50,7 @@ typedef struct {
 
 // Generic N state "quit race" screen creation and activation.
 static void *
-rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nQuitIndex)
+rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 {
     void *screenHdle = 0;
 	
@@ -74,8 +74,9 @@ rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, in
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Register keyboard shortcuts.
-    GfuiAddKey(screenHdle, 27, aButtons[nQuitIndex].tip, 
-	       aButtons[nQuitIndex].screen, GfuiScreenActivate, NULL);
+    GfuiMenuDefaultKeysAdd(screenHdle);
+    GfuiAddKey(screenHdle, 27, aButtons[nCancelIndex].tip, 
+	       aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
     GfuiAddSKey(screenHdle, GLUT_KEY_F1, "Help", screenHdle, GfuiHelpScreen, NULL);
     GfuiAddSKey(screenHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 

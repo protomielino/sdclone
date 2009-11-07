@@ -207,14 +207,14 @@ reSortRacemanList(tFList **racemanList)
 
 
 /* Load race managers selection menu */
-void ReAddRacemanListButton(void *menuHandle)
+void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle)
 {
 	tFList *racemanList;
 	tFList *racemanCur;
 
 	racemanList = GfDirGetListFiltered("config/raceman", "xml");
 	if (!racemanList) {
-		GfOut("No race manager available\n");
+		GfError("No race manager available\n");
 		return;
 	}
 
@@ -226,13 +226,15 @@ void ReAddRacemanListButton(void *menuHandle)
 
 	reSortRacemanList(&racemanList);
 
+	// Create 1 button for each race type.
+	// TODO: Use menuXMLDescHandle to get buttons layout info, colors, ...
 	racemanCur = racemanList;
 	do {
 		GfuiMenuButtonCreate(menuHandle,
-				racemanCur->dispName,
-				GfParmGetStr(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_DESCR, ""),
-				racemanCur->userData,
-				reSelectRaceman);
+				     racemanCur->dispName,
+				     GfParmGetStr(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_DESCR, ""),
+				     racemanCur->userData,
+				     reSelectRaceman);
 		racemanCur = racemanCur->next;
 	} while (racemanCur != racemanList);
 

@@ -37,7 +37,6 @@
 
 #include "racemanmenu.h"
 
-static float red[4]     = {1.0, 0.0, 0.0, 1.0};
 
 static void		*racemanMenuHdle = NULL;
 static void		*newTrackMenuHdle = NULL;
@@ -45,9 +44,6 @@ static tRmTrackSelect	ts;
 static tRmDrvSelect	ds;
 static tRmRaceParam	rp;
 static tRmFileSelect    fs;
-
-static char		path[1024];
-static char		buf[1024];
 
 
 static void reConfigRunState(void);
@@ -113,6 +109,7 @@ reConfigBackHookInit(void)
 static void
 reConfigRunState(void)
 {
+    char	path[256];
     int		i;
     int		curConf;
     const char	*conf;
@@ -212,6 +209,8 @@ reConfigureMenu(void * /* dummy */)
 static void
 reSelectLoadFile(char *filename)
 {
+    char buf[512];
+
     sprintf(buf, "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
     GfOut("Loading Saved File %s...\n", buf);
     ReInfo->results = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
@@ -222,6 +221,8 @@ reSelectLoadFile(char *filename)
 static void
 reLoadMenu(void *prevHandle)
 {
+    char buf[512];
+
     const char *str;
     void *params = ReInfo->params;
 
@@ -257,37 +258,43 @@ ReRacemanMenu(void)
     if (racemanMenuHdle) {
 	GfuiScreenRelease(racemanMenuHdle);
     }
+
+    // Create screen, load menu XML descriptor and create static controls.
     racemanMenuHdle = GfuiScreenCreateEx(NULL, 
 					 NULL, (tfuiCallback)NULL, 
 					 NULL, (tfuiCallback)NULL, 
 					 1);
+    void *menuXMLDescHdle = LoadMenuXML("racechoicemenu.xml");
+    CreateStaticControls(menuXMLDescHdle,racemanMenuHdle);
 
-    void *param2 = LoadMenuXML("racechoicemenu.xml");
-    CreateStaticControls(param2,racemanMenuHdle);
-
-
+    // Create variable title label.
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
     if (str) {
-	int id = CreateLabelControl(racemanMenuHdle,param2,"title");
+	int id = CreateLabelControl(racemanMenuHdle,menuXMLDescHdle,"title");
 	GfuiLabelSetText(racemanMenuHdle,id,str);
     }
 
-    CreateButtonControl(racemanMenuHdle,param2,"newrace",NULL,ReStartNewRace);
-    CreateButtonControl(racemanMenuHdle,param2,"configurerace",NULL,reConfigureMenu);
-    CreateButtonControl(racemanMenuHdle,param2,"configureplayers",NULL,rePlayerConfig);
+    // Create New race, Configure race, Configure players and Back buttons.
+    CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"newrace",NULL,ReStartNewRace);
+    CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"configurerace",NULL,reConfigureMenu);
+    CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"configureplayers",NULL,rePlayerConfig);
     
-    CreateButtonControl(racemanMenuHdle,param2,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);
+    CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);
 
 
+    // Create Load race button if we are in a Champ' like race type.
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-	CreateButtonControl(racemanMenuHdle,param2,"load",racemanMenuHdle,reLoadMenu);
+	CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"load",racemanMenuHdle,reLoadMenu);
     }
     
-    GfParmReleaseHandle(param2);
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
     
+    // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
     GfuiAddKey(racemanMenuHdle, 27, "Back to Main menu", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
+    // Activate screen.
     GfuiScreenActivate(racemanMenuHdle);
 
     return RM_ASYNC | RM_NEXT_STEP;
@@ -302,6 +309,8 @@ reStateManage(void * /* dummy */)
 int
 ReNewTrackMenu(void)
 {
+    char buf[128];
+
     const char	*str;
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
@@ -309,42 +318,47 @@ ReNewTrackMenu(void)
     if (newTrackMenuHdle) {
 	GfuiScreenRelease(newTrackMenuHdle);
     }
+
+    // Create screen, load menu XML descriptor and create static controls.
     newTrackMenuHdle = GfuiScreenCreateEx(NULL, 
 					  NULL, (tfuiCallback)NULL, 
 					  NULL, (tfuiCallback)NULL, 
 					  1);
+    void *menuXMLDescHdle = LoadMenuXML("newtrackmenu.xml");
+    CreateStaticControls(menuXMLDescHdle,newTrackMenuHdle);
 
+    // Create background image from race params.
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
     if (str) {
 	GfuiScreenAddBgImg(newTrackMenuHdle, str);
     }
-    str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-    GfuiTitleCreate(newTrackMenuHdle, str, strlen(str));
 
+    // Create variable title label from race params.
+    str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+    int titleId = CreateLabelControl(newTrackMenuHdle, menuXMLDescHdle, "titlelabel");
+    GfuiLabelSetText(newTrackMenuHdle, titleId, str);
+
+    // Create variable subtitle label from race params.
     sprintf(buf, "Race Day #%d/%d on %s",
 	    (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1),
 	    GfParmGetEltNb(params, RM_SECT_TRACKS),
 	    ReInfo->track->name);
+    int subTitleId = CreateLabelControl(newTrackMenuHdle, menuXMLDescHdle, "subtitlelabel");
+    GfuiLabelSetText(newTrackMenuHdle, subTitleId, buf);
 
-    GfuiLabelCreateEx(newTrackMenuHdle,
-		      buf,
-		      red,
-		      GFUI_FONT_MEDIUM_C,
-		      320, 420,
-		      GFUI_ALIGN_HC_VB, 50);
+    // Create Start and Abandon buttons.
+    CreateButtonControl(newTrackMenuHdle, menuXMLDescHdle, "startbutton", NULL, reStateManage);
+    CreateButtonControl(newTrackMenuHdle, menuXMLDescHdle, "abandonbutton", ReInfo->_reMenuScreen, GfuiScreenActivate);
 
-    GfuiMenuButtonCreate(newTrackMenuHdle,
-			 "Start Event", "Start The Current Race",
-			 NULL, reStateManage);
-
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
     
-    GfuiMenuButtonCreate(newTrackMenuHdle, 
-			 "Abandon", "Abandon The Race",
-			 ReInfo->_reMenuScreen, GfuiScreenActivate);
-
+    // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(newTrackMenuHdle);
+    GfuiAddKey(newTrackMenuHdle, 13, "Start Event", NULL, reStateManage, NULL);
     GfuiAddKey(newTrackMenuHdle, 27, "Abandon", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
+    // Activate screen.
     GfuiScreenActivate(newTrackMenuHdle);
 
     return RM_ASYNC | RM_NEXT_STEP;
