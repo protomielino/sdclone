@@ -557,6 +557,9 @@ GfScrReinit(void * /* dummy */)
     int		curArg;
 #endif
 
+    // Force current edit to loose focus (if one has it) and update associated variable.
+    GfuiUnSelectCurrent();
+
     saveParams();
 
 #ifdef WIN32
@@ -651,7 +654,7 @@ updateLabelText(void)
     sprintf(buf, "%d", curMaxFreq);
     GfuiEditboxSetString(scrHandle, MaxFreqId, buf);
 #endif
-	GfuiLabelSetText (scrHandle, VInitLabelId, VInit[curVInit]);
+    GfuiLabelSetText(scrHandle, VInitLabelId, VInit[curVInit]);
 }
 
 static void
@@ -829,7 +832,7 @@ GfScrMenuInit(void *prevMenu)
 	
 	GfParmReleaseHandle(param);
     
-	GfuiAddKey(scrHandle, 13, "Apply Mode", NULL, GfScrReinit, NULL);
+	GfuiAddKey(scrHandle, 13, "Apply", NULL, GfScrReinit, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);

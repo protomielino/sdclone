@@ -51,6 +51,9 @@ ExitGraphicOptions(void *prevMenu)
 static void
 SaveGraphicOptions(void *prevMenu)
 {
+    // Force current edit to loose focus (if one has it) and update associated variable.
+    GfuiUnSelectCurrent();
+
     sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
     void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     

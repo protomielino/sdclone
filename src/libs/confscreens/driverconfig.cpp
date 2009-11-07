@@ -775,6 +775,9 @@ SaveDrvList(void * /* dummy */)
 	return;
     }
 
+    // Force current edit to loose focus (if one has it) and update associated variable.
+    GfuiUnSelectCurrent();
+
     for (index = 1; index <= (int)PlayersInfo.size(); index++) {
         PutDrvSettings(index);
     }

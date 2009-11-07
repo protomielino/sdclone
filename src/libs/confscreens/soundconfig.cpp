@@ -92,6 +92,9 @@ static void readSoundCfg(void)
 // Save the choosen values in the corresponding parameter file.
 static void saveSoundOption(void *)
 {
+	// Force current edit to loose focus (if one has it) and update associated variable.
+	GfuiUnSelectCurrent();
+
 	char buf[1024];
 	sprintf(buf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);

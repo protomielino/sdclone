@@ -176,6 +176,9 @@ onQuit(void *prevMenu)
 static void
 onSave(void *prevMenu)
 {
+    // Force current edit to loose focus (if one has it) and update associated variable.
+    GfuiUnSelectCurrent();
+
     ControlPutSettings();
 
     onQuit(prevMenu);
