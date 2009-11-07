@@ -93,15 +93,18 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
     int			totLaps;
 
+
     rmScrHdle = GfuiScreenCreate();
-    sprintf(buf, "Practice Results");
-    GfuiTitleCreate(rmScrHdle, buf, strlen(buf));
+
+	void *param = LoadMenuXML("practiceresultsmenu.xml");
+    CreateStaticControls(param,rmScrHdle);
+
     sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
     sprintf(buf, "%s on track %s", GfParmGetStr(results, path, RM_ATTR_DRVNAME, ""), info->track->name);
-    GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_LARGE_C,
-		    320, 420, GFUI_ALIGN_HC_VB, 0);
-    GfuiScreenAddBgImg(rmScrHdle, "data/img/splash-result.png");
-    
+
+    const int messId = CreateLabelControl(rmScrHdle, param, "playertitle");
+    GfuiLabelSetText(rmScrHdle, messId, buf);
+ 
     const int offset = 90;
     
     const int xLap = offset + 30;
@@ -244,13 +247,14 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
 
     rmScrHdle = GfuiScreenCreate();
-    sprintf(buf, "Race Results");
-    GfuiTitleCreate(rmScrHdle, buf, strlen(buf));
+	void *param = LoadMenuXML("raceresultsmenu.xml");
+    CreateStaticControls(param,rmScrHdle);
+
     sprintf(buf, "%s", info->track->name);
-    GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_LARGE_C,
-		    320, 420, GFUI_ALIGN_HC_VB, 0);
-    GfuiScreenAddBgImg(rmScrHdle, "data/img/splash-result.png");
-    
+    const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+    GfuiLabelSetText(rmScrHdle, messId, buf);
+
+  
     const int xRank = 10;
     const int xDriver = 25;
     const int xType = 180;
@@ -427,12 +431,12 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
 
     rmScrHdle = GfuiScreenCreate();
-    sprintf(buf, "Qualification Results");
-    GfuiTitleCreate(rmScrHdle, buf, strlen(buf));
+	void *param = LoadMenuXML("qualifresultsmenu.xml");
+    CreateStaticControls(param,rmScrHdle);
+
     sprintf(buf, "%s", info->track->name);
-    GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_LARGE_C,
-		    320, 420, GFUI_ALIGN_HC_VB, 0);
-    GfuiScreenAddBgImg(rmScrHdle, "data/img/splash-result.png");
+    const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+    GfuiLabelSetText(rmScrHdle, messId, buf);
 
     const int offset  = 50;
     const int xRank   = offset + 30;
