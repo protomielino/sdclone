@@ -434,7 +434,6 @@ CreateLabel(void *menuHandle,void *param,const char *pControlName)
 	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
 	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
 	const int alignment = GetAlignment(pszAlignH,pszAlignV);
-	// Note: Defaul maxlen = 32 because if 0, strlen(pszText) will be used for ever.
 	const int maxlen = (int)GfParmGetNum(param,pControlName,"maxlen",NULL,32.0);
 	
     	int labelId = GfuiLabelCreate(menuHandle, pszText, textsize, x, y, alignment, maxlen);
