@@ -4,7 +4,7 @@
     created              : Thu May  2 22:02:51 CEST 2002
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: racemenu.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
+    version              : $Id: racemenu.cpp,v 1.2 20 Mar 2006 04:31:12 torcs Exp $
 
  ***************************************************************************/
 
@@ -30,23 +30,31 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include <tgfclient.h>
 #include <track.h>
 #include <car.h>
 #include <raceman.h>
 #include <robot.h>
+#include <graphic.h>
+
 #include "racescreens.h"
 
+
+// Constants.
+static const char *DispModeValues[] = { RM_VAL_VISIBLE, RM_VAL_INVISIBLE};
+
+// Global variables.
 static void		*scrHandle;
 static tRmRaceParam	*rp;
-static int		rmrpDistance;
-static int		rmrpLaps;
-static char		buf[256];
+
 static int		rmrpDistId;
 static int		rmrpLapsId;
-static int		rmDispModeEditId;
-static int		rmCurDispMode;
-static const char	*rmCurDispModeList[] = { RM_VAL_VISIBLE, RM_VAL_INVISIBLE};
+static int		rmrpDispModeId;
+
+static int		rmrpDistance;
+static int		rmrpLaps;
+static int		rmrpDispMode;
 
 
 static void
@@ -62,6 +70,7 @@ rmrpDeactivate(void *screen)
 static void
 rmrpUpdDist(void * /* dummy */)
 {
+    char	buf[32];
     char	*val;
 
     val = GfuiEditboxGetString(scrHandle, rmrpDistId);
@@ -79,6 +88,7 @@ rmrpUpdDist(void * /* dummy */)
 static void
 rmrpUpdLaps(void * /* dummy */)
 {
+    char	buf[32];
     char	*val;
 
     val = GfuiEditboxGetString(scrHandle, rmrpLapsId);
@@ -93,19 +103,25 @@ rmrpUpdLaps(void * /* dummy */)
     GfuiEditboxSetString(scrHandle, rmrpLapsId, buf);
 }
 
+void
+rmChangeDisplayMode(void * /* dummy */)
+{
+    rmrpDispMode = 1 - rmrpDispMode;
+    GfuiLabelSetText(scrHandle, rmrpDispModeId, DispModeValues[rmrpDispMode]);
+}
 
 static void
 rmrpValidate(void * /* dummy */)
 {
+    GfuiUnSelectCurrent();
+
     if (rp->confMask & RM_CONF_RACE_LEN) {
-	rmrpUpdDist(0);
-	rmrpUpdLaps(0);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_DISTANCE, "km", rmrpDistance);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_LAPS, (char*)NULL, rmrpLaps);
     }
 
     if (rp->confMask & RM_CONF_DISP_MODE) {
-	GfParmSetStr(rp->param, rp->title, RM_ATTR_DISPMODE, rmCurDispModeList[rmCurDispMode]);
+	GfParmSetStr(rp->param, rp->title, RM_ATTR_DISPMODE, DispModeValues[rmrpDispMode]);
     }
 
     rmrpDeactivate(rp->nextScreen);
@@ -114,91 +130,92 @@ rmrpValidate(void * /* dummy */)
 static void
 rmrpAddKeys(void)
 {
-    GfuiAddKey(scrHandle, 27, "Cancel Modifications", rp->prevScreen, rmrpDeactivate, NULL);
+    GfuiAddKey(scrHandle, 13, "Accept", NULL, rmrpValidate, NULL);
+    GfuiAddKey(scrHandle, 27, "Cancel", rp->prevScreen, rmrpDeactivate, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
     GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(scrHandle, 13, "Validate Modifications", NULL, rmrpValidate, NULL);
 }
-
-void
-rmChangeDisplayMode(void * /* dummy */)
-{
-    rmCurDispMode = 1 - rmCurDispMode;
-    GfuiLabelSetText(scrHandle, rmDispModeEditId, rmCurDispModeList[rmCurDispMode]);
-}
-
 
 void
 RmRaceParamMenu(void *vrp)
 {
-    int		y, x, x2, dy, dx;
+    char	buf[64];
 
     rp = (tRmRaceParam*)vrp;
 
-    sprintf(buf, "%s Options", rp->title);
-    scrHandle = GfuiMenuScreenCreate(buf);
-    GfuiScreenAddBgImg(scrHandle, "data/img/splash-raceopt.png");
-    
-    x = 80;
-    x2 = 240;
-    y = 380;
-    dx = 200;
-    dy = GfuiFontHeight(GFUI_FONT_LARGE) + 5;
+    // Create screen, load menu XML descriptor and create static controls.
+    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);   
+    void *menuXMLDescHdle = LoadMenuXML("racemenu.xml");
+    CreateStaticControls(menuXMLDescHdle,scrHandle);
 
-    if (rp->confMask & RM_CONF_RACE_LEN) {
-	GfuiLabelCreate(scrHandle, "Race Distance (km):", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
+    // Create variable title label.
+    int titleId = CreateLabelControl(scrHandle,menuXMLDescHdle,"title");
+    sprintf(buf, "%s Options", rp->title);
+    GfuiLabelSetText(scrHandle,titleId,buf);
+    
+    if (rp->confMask & RM_CONF_RACE_LEN) 
+    {
+	// Create Race distance label.
+	CreateLabelControl(scrHandle,menuXMLDescHdle,"racedistance");
+
+	// Create and initialize Race distance edit.
 	rmrpDistance = (int)GfParmGetNum(rp->param, rp->title, RM_ATTR_DISTANCE, "km", 0);
-	if (rmrpDistance == 0) {
+	if (rmrpDistance == 0) 
+	{
 	    strcpy(buf, "---");
 	    rmrpLaps = (int)GfParmGetNum(rp->param, rp->title, RM_ATTR_LAPS, NULL, 25);
-	} else {
+	} 
+	else 
+	{
 	    sprintf(buf, "%d", rmrpDistance);
 	    rmrpLaps = 0;
 	}
-	rmrpDistId = GfuiEditboxCreate(scrHandle, buf, GFUI_FONT_MEDIUM_C,
-				       x + dx, y,
-				       0, 8, NULL, (tfuiCallback)NULL, rmrpUpdDist);
 
-	y -= dy;
-	GfuiLabelCreate(scrHandle, "Laps:", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
-	if (rmrpLaps == 0) {
+	rmrpDistId = CreateEditControl(scrHandle,menuXMLDescHdle,"racedistanceedit",NULL,NULL,rmrpUpdDist);
+	GfuiEditboxSetString(scrHandle,rmrpDistId,buf);
+
+	// Create Laps label.
+	CreateLabelControl(scrHandle,menuXMLDescHdle,"laps");
+	
+	// Create and initialize Laps edit.
+	if (rmrpLaps == 0) 
+	{
 	    strcpy(buf, "---");
-	} else {
+	} 
+	else 
+	{
 	    sprintf(buf, "%d", rmrpLaps);
 	}
-	rmrpLapsId = GfuiEditboxCreate(scrHandle, buf, GFUI_FONT_MEDIUM_C,
-				       x + dx, y,
-				       0, 8, NULL, (tfuiCallback)NULL, rmrpUpdLaps);
-	y -= dy;
+
+	rmrpLapsId = CreateEditControl(scrHandle,menuXMLDescHdle,"lapsedit",NULL,NULL,rmrpUpdLaps);
+	GfuiEditboxSetString(scrHandle,rmrpLapsId,buf);
     }
 
-    if (rp->confMask & RM_CONF_DISP_MODE) {
-	GfuiLabelCreate(scrHandle, "Display:", GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB, 0);
-	GfuiGrButtonCreate(scrHandle, "data/img/arrow-left.png", "data/img/arrow-left.png",
-			   "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-			   x2, y, GFUI_ALIGN_HL_VB, 1,
-			   (void*)0, rmChangeDisplayMode,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
-	GfuiGrButtonCreate(scrHandle, "data/img/arrow-right.png", "data/img/arrow-right.png",
-			   "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-			   x2 + 150, y, GFUI_ALIGN_HL_VB, 1,
-			   (void*)1, rmChangeDisplayMode,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-	if (!strcmp(GfParmGetStr(rp->param, rp->title, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_INVISIBLE)) {
-	    rmCurDispMode = 1;
-	} else {
-	    rmCurDispMode = 0;
+    if (rp->confMask & RM_CONF_DISP_MODE) 
+    {
+	if (!strcmp(GfParmGetStr(rp->param, rp->title, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_INVISIBLE)) 
+	{
+	    rmrpDispMode = 1;
 	}
-	rmDispModeEditId = GfuiLabelCreate(scrHandle, rmCurDispModeList[rmCurDispMode], GFUI_FONT_MEDIUM_C, x2 + 35, y, GFUI_ALIGN_HL_VB, 20);
-	y -= dy;
+	else 
+	{
+	    rmrpDispMode = 0;
+	}
+
+	CreateButtonControl(scrHandle,menuXMLDescHdle,"displayleftarrow",(void*)0, rmChangeDisplayMode);
+	CreateButtonControl(scrHandle,menuXMLDescHdle,"displayrightarrow",(void*)1, rmChangeDisplayMode);
+	rmrpDispModeId = CreateLabelControl(scrHandle,menuXMLDescHdle,"display");
+	GfuiLabelSetText(scrHandle,rmrpDispModeId,DispModeValues[rmrpDispMode]);
     }
-
-    GfuiButtonCreate(scrHandle, "Accept", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     NULL, rmrpValidate, NULL, NULL, NULL);
-
-    GfuiButtonCreate(scrHandle, "Cancel", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-		     rp->prevScreen, rmrpDeactivate, NULL, NULL, NULL);
-
+	
+    // Create Accept and Cancel buttons
+    CreateButtonControl(scrHandle,menuXMLDescHdle,"accept",NULL,rmrpValidate);
+    CreateButtonControl(scrHandle,menuXMLDescHdle,"cancel",rp->prevScreen,rmrpDeactivate);
+    
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
+    // Register keyboard shortcuts.
     rmrpAddKeys();
     
     GfuiScreenActivate(scrHandle);
