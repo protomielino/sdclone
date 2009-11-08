@@ -566,10 +566,13 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
     const char		*race = info->_reRaceName;
 
     rmScrHdle = GfuiScreenCreate();
-    sprintf(buf, "%s Standings", race);
-    GfuiTitleCreate(rmScrHdle, buf, strlen(buf));
 
-    GfuiScreenAddBgImg(rmScrHdle, "data/img/splash-result.png");
+	void *param = LoadMenuXML("standingsmenu.xml");
+    CreateStaticControls(param,rmScrHdle);
+
+    sprintf(buf, "%s Standings", race);
+    const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+    GfuiLabelSetText(rmScrHdle, messId, buf);
 
     const int offset  = 50;
     const int xRank   = offset + 30;
