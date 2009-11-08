@@ -279,7 +279,7 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\credits.cpp"
+				RelativePath=".\creditsmenu.cpp"
 				>
 			</File>
 			<File
@@ -1246,7 +1246,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\credits.h"
+				RelativePath=".\creditsmenu.h"
 				>
 			</File>
 			<File
