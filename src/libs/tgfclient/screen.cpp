@@ -808,10 +808,8 @@ GfScrMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"resrightarrow",(void*)1,ResPrevNext);
 	ResLabelId = CreateLabelControl(scrHandle,param,"reslabel");
 
-	GfuiButtonCreate(scrHandle, "Apply", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-			 NULL, GfScrReinit, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-	GfuiButtonCreate(scrHandle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-			 prevMenu, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+    CreateButtonControl(scrHandle, param, "apply", NULL, GfScrReinit);
+    CreateButtonControl(scrHandle, param, "back", prevMenu, GfuiScreenActivate);
 
 	CreateButtonControl(scrHandle,param,"depthleftarrow",(void*)-1,DepthPrevNext);
 	CreateButtonControl(scrHandle,param,"depthrightarrow",(void*)1,DepthPrevNext);

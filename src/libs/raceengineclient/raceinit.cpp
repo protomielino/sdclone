@@ -230,11 +230,14 @@ void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle)
 	// TODO: Use menuXMLDescHandle to get buttons layout info, colors, ...
 	racemanCur = racemanList;
 	do {
+		CreateButtonControl(menuHandle,menuXMLDescHandle,racemanCur->dispName,racemanCur->userData,reSelectRaceman);
+		/*
 		GfuiMenuButtonCreate(menuHandle,
 				     racemanCur->dispName,
 				     GfParmGetStr(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_DESCR, ""),
 				     racemanCur->userData,
 				     reSelectRaceman);
+					 */
 		racemanCur = racemanCur->next;
 	} while (racemanCur != racemanList);
 

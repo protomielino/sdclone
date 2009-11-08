@@ -129,8 +129,9 @@ SimuMenuInit(void *prevMenu)
     CreateButtonControl(scrHandle,param,"simvrightarrow",(void*)1,ChangeSimuVersion);
 
     SimuVersionId = CreateLabelControl(scrHandle,param,"simulabel");
-    CreateButtonControl(scrHandle,param,"accept",NULL,SaveSimuVersion);
+    CreateButtonControl(scrHandle,param,"accept",prevMenu,SaveSimuVersion);
     CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+
 
     GfParmReleaseHandle(param);
     
