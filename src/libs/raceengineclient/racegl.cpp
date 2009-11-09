@@ -173,34 +173,14 @@ ReScreenInit(void)
 
     reScreenHandle = GfuiScreenCreateEx(bgcolor, 0, reScreenActivate, 0, 0, 0);
 
+    void *param = LoadMenuXML("raceglscreen.xml");
+    CreateStaticControls(param, reScreenHandle);
+
     reAddKeys();
 
-    reMsgId = GfuiLabelCreateEx(reScreenHandle,
-				"",
-				red,
-				GFUI_FONT_LARGE_C,
-				320,
-				400,
-				GFUI_ALIGN_HC_VB,
-				32);
-
-    rePauseId = GfuiLabelCreateEx(reScreenHandle,
-				  "P A U S E",
-				  red,
-				  GFUI_FONT_BIG_C,
-				  320,
-				  420,
-				  GFUI_ALIGN_HC_VB,
-				  0);
-
-    reBigMsgId = GfuiLabelCreateEx(reScreenHandle,
-				   "",
-				   red,
-				   GFUI_FONT_BIG_C,
-				   320,
-				   360,
-				   GFUI_ALIGN_HC_VB,
-				   32);
+	reMsgId = CreateLabelControl(reScreenHandle,param,"message");
+	rePauseId = CreateLabelControl(reScreenHandle,param,"pause");
+	reBigMsgId = CreateLabelControl(reScreenHandle,param,"bigmessage");
 
     GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
 
