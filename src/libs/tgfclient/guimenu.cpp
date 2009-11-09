@@ -273,35 +273,78 @@ GetFontSize(const std::string& strTextsize)
 {
 	int tSize = GFUI_FONT_MEDIUM;
 
-	if (strTextsize=="medium")
-		tSize = GFUI_FONT_MEDIUM;
+	if (strTextsize=="big")
+		tSize = GFUI_FONT_BIG;
 	else if (strTextsize=="large")
 		tSize = GFUI_FONT_LARGE;
+	else if (strTextsize=="medium")
+		tSize = GFUI_FONT_MEDIUM;
 	else if (strTextsize=="small")
 		tSize = GFUI_FONT_SMALL;
-	else if (strTextsize=="big")
-		tSize = GFUI_FONT_BIG;
+	else if (strTextsize=="big_c")
+		tSize = GFUI_FONT_BIG_C;
+	else if (strTextsize=="large_c")
+		tSize = GFUI_FONT_LARGE_C;
+	else if (strTextsize=="medium_c")
+		tSize = GFUI_FONT_MEDIUM_C;
+	else if (strTextsize=="small_c")
+		tSize = GFUI_FONT_SMALL_C;
+	else if (strTextsize=="digit")
+		tSize = GFUI_FONT_DIGIT;
 
 	return tSize;
 }
 
 int 
-GetAlignment(const std::string& strAlignH, const std::string& strAlignV)
+GetAlignment(const std::string& strAlH,const std::string& strAlV)
 {
-	
+
+	std::string strAlignH = strAlH;
+	std::string strAlignV = strAlV;
+
+	if (strAlignH == "")
+		strAlignH = "left";
+
+	if (strAlignV == "")
+		strAlignV = "bottom";
+
 	int align = GFUI_ALIGN_HL_VB;
-	if (strAlignH == "left")
+	if ((strAlignH == "left")&&(strAlignV == "bottom"))
 	{
 		
 		align = GFUI_ALIGN_HL_VB;
 	}
-	else if (strAlignH == "center")
+	else if ((strAlignH == "center")&&(strAlignV == "bottom"))
 	{
 		align = GFUI_ALIGN_HC_VB;
 	}
-	else if (strAlignH == "right")
+	else if ((strAlignH == "right")&&(strAlignV == "bottom"))
 	{
 		align = GFUI_ALIGN_HR_VB;
+	}
+	else if ((strAlignH == "left")&&(strAlignV == "center"))
+	{	
+		align = GFUI_ALIGN_HL_VC;
+	}
+	else if ((strAlignH == "center")&&(strAlignV == "center"))
+	{
+		align = GFUI_ALIGN_HC_VC;
+	}
+	else if ((strAlignH == "right")&&(strAlignV == "center"))
+	{
+		align = GFUI_ALIGN_HR_VC;
+	}
+	else if ((strAlignH == "left")&&(strAlignV == "top"))
+	{	
+		align = GFUI_ALIGN_HL_VT;
+	}
+	else if ((strAlignH == "center")&&(strAlignV == "top"))
+	{
+		align = GFUI_ALIGN_HC_VT;
+	}
+	else if ((strAlignH == "right")&&(strAlignV == "top"))
+	{
+		align = GFUI_ALIGN_HR_VT;
 	}
 
 	return align;
