@@ -990,8 +990,6 @@ DriverMenuInit(void *prevMenu)
 {
     static int	firstTime = 1;
 
-    void *param = LoadMenuXML("drivermenu.xml");
-
     /* Initialize cars and categories info if not already done */
     if (firstTime) {
 	firstTime = 0;
@@ -1006,69 +1004,63 @@ DriverMenuInit(void *prevMenu)
 	return ScrHandle;
     }
 
-    /* Create the screen */
+    /* Create the screen, load menu XML descriptor and create static controls */
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-
+    void *param = LoadMenuXML("drivermenu.xml");
     CreateStaticControls(param,ScrHandle);
 
-
-    std::string strText,strTip;
-    //int textsize;
-    //int alignment;
-
+    /* Player scroll list */
     ScrollList = CreateScrollListControl(ScrHandle,param,"playerscrolllist",NULL, onSelect);
 
-    /* New player button */
+    /* New, copy and delete player buttons */
     CreateButtonControl(ScrHandle,param,"new",NULL,NewPlayer);
-    /* Copy player button */
     CreateButtonControl(ScrHandle,param,"copy",NULL,CopyPlayer);
-    /* Delete player button */
     CreateButtonControl(ScrHandle,param,"delete",NULL,DeletePlayer);
-    /* Access to control screen button*/
+
+    /* Access to control screen button */
     CreateButtonControl(ScrHandle,param,"controls",NULL,ConfControls);
 
-    /* Player name label and associated editbox */
+    /* Player name editbox */
     NameEditId = CreateEditControl(ScrHandle,param,"nameedit",NULL,NULL,ChangeName);
 
     /* Player skill level and associated "combobox" (left arrow, label, right arrow) */
-    CreateButtonControl(ScrHandle,param,"levelleftarrow",NULL, ChangeLevel);
-    CreateButtonControl(ScrHandle,param,"levelrightarrow",NULL, ChangeLevel);
+    CreateButtonControl(ScrHandle,param,"levelleftarrow",(void*)0, ChangeLevel);
+    CreateButtonControl(ScrHandle,param,"levelrightarrow",(void*)1, ChangeLevel);
     SkillEditId = CreateLabelControl(ScrHandle,param,"skillstext");
 
+    /* Race and Pit number editboxes */
     RaceNumEditId = CreateEditControl(ScrHandle,param,"racenumedit",NULL,NULL,ChangeNum);
-
     PitsEditId = CreateEditControl(ScrHandle,param,"pitstopedit",NULL,NULL,ChangePits);
     
-    //Combobox like control
-    CreateButtonControl(ScrHandle,param,"gearleftarrow",NULL, ChangeGearChange);
-    CreateButtonControl(ScrHandle,param,"gearrightarrow",NULL, ChangeGearChange);
+    /* Gear changing mode and associated "combobox" (left arrow, label, right arrow) */
+    CreateButtonControl(ScrHandle,param,"gearleftarrow",(void*)0, ChangeGearChange);
+    CreateButtonControl(ScrHandle,param,"gearrightarrow",(void*)1, ChangeGearChange);
     GearChangeEditId = CreateLabelControl(ScrHandle,param,"geartext");
 
     /* Gear changing auto-reverse flag and associated "combobox" (left arrow, label, right arrow) */
-    //Combobox like control
     AutoReverseLabelId = CreateLabelControl(ScrHandle,param,"autoreversetext");
-
     AutoReverseLeftId = CreateButtonControl(ScrHandle,param,"autoleftarrow",(void*)-1, ChangeReverse);
     AutoReverseRightId = CreateButtonControl(ScrHandle,param,"autorightarrow",(void*)1, ChangeReverse);
     AutoReverseEditId = CreateLabelControl(ScrHandle,param,"autotext");
 
     /* Car category and associated "combobox" (left arrow, label, right arrow) */
-    //Combobox like control
-    CreateButtonControl(ScrHandle,param,"categoryleftarrow",NULL, ChangeCat);
-    CreateButtonControl(ScrHandle,param,"categoryrightarrow",NULL, ChangeCat);
+    CreateButtonControl(ScrHandle,param,"categoryleftarrow",(void*)0, ChangeCat);
+    CreateButtonControl(ScrHandle,param,"categoryrightarrow",(void*)1, ChangeCat);
     CatEditId = CreateLabelControl(ScrHandle,param,"categorylabel");
 
-    //Combobox like control
-    CreateButtonControl(ScrHandle,param,"carleftarrow",NULL, ChangeCar);
-    CreateButtonControl(ScrHandle,param,"carrightarrow",NULL, ChangeCar);
+    /* Car model and associated "combobox" (left arrow, label, right arrow) */
+    CreateButtonControl(ScrHandle,param,"carleftarrow",(void*)0, ChangeCar);
+    CreateButtonControl(ScrHandle,param,"carrightarrow",(void*)1, ChangeCar);
     CarEditId = CreateLabelControl(ScrHandle,param,"carlabel");
 
+    // Accept and Cancel buttons.
     CreateButtonControl(ScrHandle,param,"accept",NULL, SaveDrvList);
     CreateButtonControl(ScrHandle,param,"cancel",NULL, QuitDriverConfig);
 
+    // Close menu XML descriptor.
     GfParmReleaseHandle(param);
     
-    /* Keyboard shortcuts */
+    // Register keyboard shortcuts.
     GfuiAddKey(ScrHandle, 13 /* Return */, "Save Drivers", NULL, SaveDrvList, NULL);
     GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel Selection", NULL, QuitDriverConfig, NULL);
     GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
