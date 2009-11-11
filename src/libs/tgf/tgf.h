@@ -233,7 +233,7 @@ extern void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool
 #define GFPARM_WRITABLE		2	/**< Parameter file allowed to be saved on disk */
 
 /* parameter file read */
-#define GFPARM_RMODE_STD	0x01	/**< if handle already openned return it */
+#define GFPARM_RMODE_STD	0x01	/**< if handle already open, return it */
 #define GFPARM_RMODE_REREAD	0x02	/**< reread the parameters from file and release the previous ones */
 #define GFPARM_RMODE_CREAT	0x04	/**< Create the file if doesn't exist */
 #define GFPARM_RMODE_PRIVATE	0x08
