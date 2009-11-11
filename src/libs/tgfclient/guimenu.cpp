@@ -26,7 +26,10 @@
 
 #include <stdio.h>
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
+#include <string>
+#include <map>
+
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -34,7 +37,6 @@
 #include "tgfclient.h"
 #include "gui.h"
 #include "guimenu.h"
-#include <string>
 #include "gui.h"
 
 void
@@ -268,107 +270,118 @@ GfuiMenuBackQuitButtonCreateEx(void *scr, const char *text, const char *tip, voi
     return bId;
 }
 
+/***********************************************************************************
+ * Menu XML descriptor management
+*/
+
+// Font size map : Gives the integer size from the size name.
+typedef std::map<std::string, int> TMapFontSize;
+static const TMapFontSize::value_type AMapFontSize[] = 
+{ 
+    TMapFontSize::value_type("big",      GFUI_FONT_BIG),
+    TMapFontSize::value_type("large",    GFUI_FONT_LARGE),
+    TMapFontSize::value_type("medium",   GFUI_FONT_MEDIUM),
+    TMapFontSize::value_type("small",    GFUI_FONT_SMALL),
+
+    TMapFontSize::value_type("big_c",    GFUI_FONT_BIG_C),
+    TMapFontSize::value_type("large_c",  GFUI_FONT_LARGE_C),
+    TMapFontSize::value_type("medium_c", GFUI_FONT_MEDIUM_C),
+    TMapFontSize::value_type("small_c",  GFUI_FONT_SMALL_C),
+
+    TMapFontSize::value_type("digit",    GFUI_FONT_DIGIT),
+};
+
+static const TMapFontSize MapFontSize(AMapFontSize, AMapFontSize + sizeof(AMapFontSize) / sizeof(TMapFontSize::value_type)); 
+
 int 
-GetFontSize(const std::string& strTextsize)
+GetFontSize(const char* pszTextsize)
 {
-	int tSize = GFUI_FONT_MEDIUM;
-
-	if (strTextsize=="big")
-		tSize = GFUI_FONT_BIG;
-	else if (strTextsize=="large")
-		tSize = GFUI_FONT_LARGE;
-	else if (strTextsize=="medium")
-		tSize = GFUI_FONT_MEDIUM;
-	else if (strTextsize=="small")
-		tSize = GFUI_FONT_SMALL;
-	else if (strTextsize=="big_c")
-		tSize = GFUI_FONT_BIG_C;
-	else if (strTextsize=="large_c")
-		tSize = GFUI_FONT_LARGE_C;
-	else if (strTextsize=="medium_c")
-		tSize = GFUI_FONT_MEDIUM_C;
-	else if (strTextsize=="small_c")
-		tSize = GFUI_FONT_SMALL_C;
-	else if (strTextsize=="digit")
-		tSize = GFUI_FONT_DIGIT;
-
-	return tSize;
+    const TMapFontSize::const_iterator itFontSize = MapFontSize.find(pszTextsize);
+    
+    if (itFontSize != MapFontSize.end())
+	return (*itFontSize).second;
+    else
+	return GFUI_FONT_MEDIUM; // Default size.
 }
 
+// Alignment map : Gives the integer size from the size name.
+typedef std::map<std::string, int> TMapAlign;
+static const TMapAlign::value_type AMapAlign[] = 
+{ 
+    TMapAlign::value_type("left.bottom",   GFUI_ALIGN_HL_VB),
+    TMapAlign::value_type("center.bottom", GFUI_ALIGN_HC_VB),
+    TMapAlign::value_type("right.bottom",  GFUI_ALIGN_HR_VB),
+    TMapAlign::value_type("left.center",   GFUI_ALIGN_HL_VC),
+    TMapAlign::value_type("center.center", GFUI_ALIGN_HC_VC),
+    TMapAlign::value_type("right.center",  GFUI_ALIGN_HR_VC),
+    TMapAlign::value_type("left.top",      GFUI_ALIGN_HL_VT),
+    TMapAlign::value_type("center.top",    GFUI_ALIGN_HC_VT),
+    TMapAlign::value_type("right.top",     GFUI_ALIGN_HR_VT),
+};
+
+static const TMapAlign MapAlign(AMapAlign, AMapAlign + sizeof(AMapAlign) / sizeof(TMapAlign::value_type)); 
+
 int 
-GetAlignment(const std::string& strAlH,const std::string& strAlV)
+GetAlignment(const char* pszAlH, const char* pszAlV)
 {
-
-	std::string strAlignH = strAlH;
-	std::string strAlignV = strAlV;
-
-	if (strAlignH == "")
-		strAlignH = "left";
-
-	if (strAlignV == "")
-		strAlignV = "bottom";
-
-	int align = GFUI_ALIGN_HL_VB;
-	if ((strAlignH == "left")&&(strAlignV == "bottom"))
-	{
-		
-		align = GFUI_ALIGN_HL_VB;
-	}
-	else if ((strAlignH == "center")&&(strAlignV == "bottom"))
-	{
-		align = GFUI_ALIGN_HC_VB;
-	}
-	else if ((strAlignH == "right")&&(strAlignV == "bottom"))
-	{
-		align = GFUI_ALIGN_HR_VB;
-	}
-	else if ((strAlignH == "left")&&(strAlignV == "center"))
-	{	
-		align = GFUI_ALIGN_HL_VC;
-	}
-	else if ((strAlignH == "center")&&(strAlignV == "center"))
-	{
-		align = GFUI_ALIGN_HC_VC;
-	}
-	else if ((strAlignH == "right")&&(strAlignV == "center"))
-	{
-		align = GFUI_ALIGN_HR_VC;
-	}
-	else if ((strAlignH == "left")&&(strAlignV == "top"))
-	{	
-		align = GFUI_ALIGN_HL_VT;
-	}
-	else if ((strAlignH == "center")&&(strAlignV == "top"))
-	{
-		align = GFUI_ALIGN_HC_VT;
-	}
-	else if ((strAlignH == "right")&&(strAlignV == "top"))
-	{
-		align = GFUI_ALIGN_HR_VT;
-	}
-
-	return align;
+    std::string strAlign(pszAlH);
+    if (strlen(pszAlH) == 0)
+	strAlign += "left"; // Default horizontal alignment
+    strAlign += '.';
+    strAlign += pszAlV;
+    if (strlen(pszAlV) == 0)
+	strAlign += "bottom"; // Default horizontal alignment
+    
+    const TMapAlign::const_iterator itAlign = MapAlign.find(strAlign);
+    
+    if (itAlign != MapAlign.end())
+	return (*itAlign).second;
+    else
+	return GFUI_ALIGN_HL_VB; // Default alignment.
 }
 
+// Horizontal alignment map : Gives the integer value from the name.
+typedef std::map<std::string, int> TMapHorizAlign;
+static const TMapHorizAlign::value_type AMapHorizAlign[] = 
+{ 
+    TMapHorizAlign::value_type("left",   GFUI_ALIGN_HL_VB),
+    TMapHorizAlign::value_type("center", GFUI_ALIGN_HC_VB),
+    TMapHorizAlign::value_type("right",  GFUI_ALIGN_HR_VB),
+};
+
+static const TMapHorizAlign MapHorizAlign(AMapHorizAlign, AMapHorizAlign + sizeof(AMapHorizAlign) / sizeof(TMapHorizAlign::value_type)); 
+
 int 
-GetHAlignment(const std::string& strAlignH)
+GetHAlignment(const char* pszAlignH)
 {
-	int align = 0; //left
+    const TMapHorizAlign::const_iterator itHorizAlign = MapHorizAlign.find(pszAlignH);
+    
+    if (itHorizAlign != MapHorizAlign.end())
+	return (*itHorizAlign).second;
+    else
+	return 0; // Default horizontal alignement = left.
+}
 
-	if (strAlignH == "left")
-	{
-		align = 0;
-	}
-	else if (strAlignH == "center")
-	{
-		align = 0x10;
-	}
-	else if (strAlignH == "right")
-	{
-		align = 0x20;
-	}
+// Scrollbar position map : Gives the integer value from the name.
+typedef std::map<std::string, int> TMapScroolBarPos;
+static const TMapScroolBarPos::value_type AMapScroolBarPos[] = 
+{ 
+    TMapScroolBarPos::value_type("none",  GFUI_SB_NONE),
+    TMapScroolBarPos::value_type("left",  GFUI_SB_LEFT),
+    TMapScroolBarPos::value_type("right", GFUI_SB_RIGHT),
+};
 
-	return align;
+static const TMapScroolBarPos MapScroolBarPos(AMapScroolBarPos, AMapScroolBarPos + sizeof(AMapScroolBarPos) / sizeof(TMapScroolBarPos::value_type)); 
+
+int 
+GetScrollBarPosition(const char* pszPos)
+{
+    const TMapScroolBarPos::const_iterator itScroolBarPos = MapScroolBarPos.find(pszPos);
+    
+    if (itScroolBarPos != MapScroolBarPos.end())
+	return (*itScroolBarPos).second;
+    else
+	return GFUI_SB_NONE; // Default horizontal alignement = left.
 }
 
 Color GetColor(unsigned int color)
@@ -384,27 +397,31 @@ Color GetColor(unsigned int color)
 
 bool GetColorFromXML(void *param,const char *pControlName,const char *pField,Color &color)
 {
-	const std::string strValue = GfParmGetStr(param,pControlName,pField,"");
-	if (strValue == "")
+	const char* pszValue = GfParmGetStr(param,pControlName,pField,"");
+	if (strlen(pszValue) == 0)
 		return false;
 
-	unsigned int c = strtol(strValue.c_str(),NULL,0);
-	color = GetColor(c);
+	color = GetColor((unsigned int)strtol(pszValue, NULL, 0));
 
 	return true;
 }
 
 
 bool 
-ReadBoolean(void *param,const char *pControlName,const char *pField)
+ReadBoolean(void *param,const char *pControlName,const char *pField, bool bDefault)
 {
-	const std::string strValue = GfParmGetStr(param, pControlName,pField,"yes");
-	if (strValue == "no")
+	const char* pszValue = GfParmGetStr(param, pControlName, pField, "");
+	if (strlen(pszValue) == 0)
+		return bDefault;
+	else if (!strcmp(pszValue, "yes"))
+		return true;
+	else if (!strcmp(pszValue, "no"))
 		return false;
 
-	return true;
+	return bDefault;
 }
 
+/* Never used
 bool
 GetControlValues(void *param,const char *pControlName,std::string &strText,std::string &strTip,int &x,int &y,int &textSize,int &alignment)
 {
@@ -426,7 +443,7 @@ GetControlValues(void *param,const char *pControlName,std::string &strText,std::
 
 	return true;
 }
-
+*/
 
 int 
 CreateStaticImage(void *menuHandle,void *param,const char *pControlName)
@@ -461,11 +478,9 @@ CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName)
 int 
 CreateLabel(void *menuHandle,void *param,const char *pControlName)
 {
-	const std::string strType = GfParmGetStr(param, pControlName, "type", "");
-
-	if (strType!="label")
+	if (strcmp(GfParmGetStr(param, pControlName, "type", ""), "label"))
 	{
-		GfError("Error: Control '%s' is not a label\n", pControlName);
+		GfError("Error: Control '%s' is not a 'label'\n", pControlName);
 		return -1;
 	}
 	
@@ -537,7 +552,7 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 				  userDataOnFocus, onFocus,
 				  onFocusLost);
 
-	const bool bShowbox = ReadBoolean(param,pControlName,"showbox");
+	const bool bShowbox = ReadBoolean(param,pControlName,"showbox", true);
 
 	GfuiButtonShowBox(menuHandle,id,bShowbox);
 
@@ -589,12 +604,10 @@ CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,v
 		onFocusLost = remInfo;
 	}
 
-    std::string strEnabledImage,strDisabledImage,strFocusedImage,strPushedImage;
-
-	strDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
-	strEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
-	strFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
-	strPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
+	const char* pszDisabledImage = GfParmGetStr(param, pControlName, "disabledimage", "");
+	const char* pszEnabledImage = GfParmGetStr(param, pControlName, "enabledimage", "");
+	const char* pszFocusedImage = GfParmGetStr(param, pControlName, "focusedimage", "");
+	const char* pszPushedImage = GfParmGetStr(param, pControlName, "pushedimage", "");
 
 	const int x = (int)GfParmGetNum(param,pControlName,"x",NULL,0.0);
 	const int y = (int)GfParmGetNum(param,pControlName,"y",NULL,0.0);
@@ -604,29 +617,23 @@ CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,v
 	const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
 	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
 	const int alignment = GetAlignment(pszAlignH,pszAlignV);
-	int id = -1;
 
-	if ((w ==0)&&(h==0))
+	int id = -1;
+	if (w == 0 && h==0)
 	{
 		id = GfuiGrButtonCreate(menuHandle,
-			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str(),
-			x,y,alignment,GFUI_MOUSE_UP
-			,userdata,
-			onpush,
-			userDataOnFocus, 
-			onFocus,
-			onFocusLost);
+					pszDisabledImage,pszEnabledImage,pszFocusedImage,pszPushedImage,
+					x,y,alignment,GFUI_MOUSE_UP,
+					userdata,onpush,
+					userDataOnFocus,onFocus,onFocusLost);
 	}
 	else
 	{
 		id = GfuiGrButtonCreateEx(menuHandle,
-			strDisabledImage.c_str(),strEnabledImage.c_str(),strFocusedImage.c_str(),strPushedImage.c_str(),
-			x,y,w,h,alignment,GFUI_MOUSE_UP
-			,userdata,
-			onpush,
-			userDataOnFocus, 
-			onFocus,
-			onFocusLost);
+					  pszDisabledImage,pszEnabledImage,pszFocusedImage,pszPushedImage,
+					  x,y,w,h,alignment,GFUI_MOUSE_UP,
+					  userdata,onpush,
+					  userDataOnFocus,onFocus,onFocusLost);
 	}
 
 	return id;
@@ -644,13 +651,13 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
 
-	const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
-	if (strType == "textbutton")
+	const char* pszType = GfParmGetStr(param, strControlName.c_str(), "type", "");
+	if (!strcmp(pszType, "textbutton"))
 		return CreateTextButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
-	else if(strType == "imagebutton")
+	else if(!strcmp(pszType, "imagebutton"))
 		return CreateImageButtonControl(menuHandle,param,strControlName.c_str(),userdata,onpush,NULL,NULL,NULL);
 	else
-	    GfError("Error: Unknown button type '%s'\n", strType.c_str());
+	    GfError("Error: Unknown button type '%s'\n", pszType);
 
 	return -1;
 }
@@ -658,6 +665,16 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
 int 
 CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
+
+	const char* pszType = GfParmGetStr(param, strControlName.c_str(), "type", "");
+	if (strcmp(pszType, "editbox"))
+	{
+		GfError("Error: Control '%s' is not an 'editbox' \n", pControlName);
+		return -1;
+	}
+
 	const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
 
     	if (strlen(pszTip) > 0)
@@ -672,20 +689,11 @@ CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *us
 		onFocusLost = remInfo;
 	}
 
-	std::string strControlName("dynamiccontrols/");
-	strControlName += pControlName;
-
-	const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
-	if (strType != "editbox")
-		return -1;
-
 	const char* pszText = GfParmGetStr(param, strControlName.c_str(), "text", "");
 	const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
 	const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
 	const char* pszTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
 	const int textsize = GetFontSize(pszTextsize);
-	std::string strAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
-
 	
 	int width = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
 	if (width == 0)
@@ -715,9 +723,12 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
 
-	std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
-	if (strType != "scrolllist")
+	const char* pszType = GfParmGetStr(param, strControlName.c_str(), "type", "");
+	if (strcmp(pszType, "scrolllist"))
+	{
+		GfError("Error: Control '%s' is not a 'scrolllist' \n", pControlName);
 		return -1;
+	}
 
 	const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
 	const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
@@ -731,14 +742,8 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
 	const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
 	const int alignment = GetAlignment(pszAlignH,pszAlignV);
 
-	std::string strVal = GfParmGetStr(param,strControlName.c_str(),"scrollbarposition","none");
-	int scrollbarpos = GFUI_SB_NONE;
-	if (strVal == "none")
-		scrollbarpos = GFUI_SB_NONE;
-	else if (strVal =="left")
-		scrollbarpos = GFUI_SB_LEFT;
-	else if (strVal == "right")
-		scrollbarpos = GFUI_SB_RIGHT;
+	const char* pszScrollBarPos = GfParmGetStr(param,strControlName.c_str(),"scrollbarposition","none");
+	int scrollbarpos = GetScrollBarPosition(pszScrollBarPos);
 
 	int id = GfuiScrollListCreate(menuHandle, textsize,x,y,alignment,w,h,scrollbarpos,userdata,onSelect);
 
@@ -758,31 +763,28 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
 bool 
 CreateStaticControls(void *param,void *menuHandle)
 {
+	char buf[32];
 
-	int nControls = GfParmGetEltNb(param, "staticcontrols");
-
-	for (int i=1;i<=nControls;i++)
+	for (int i=1; i <= GfParmGetEltNb(param, "staticcontrols"); i++)
 	{
-		std::string strType;
-		char buf[32];
-	    	sprintf(buf, "staticcontrols/%i",i);
-		strType = GfParmGetStr(param, buf, "type", "");
+	    	sprintf(buf, "staticcontrols/%i", i);
+		const char* pszType = GfParmGetStr(param, buf, "type", "");
 	
-		if (strType == "label")
+		if (!strcmp(pszType, "label"))
 		{
-			/*int handle = */CreateLabel(menuHandle,param,buf);
+			CreateLabel(menuHandle,param,buf);
 		}
-		else if (strType == "staticimage")
+		else if (!strcmp(pszType, "staticimage"))
 		{
-			/*int handle = */CreateStaticImage(menuHandle,param,buf);
+			CreateStaticImage(menuHandle,param,buf);
 		}
-		else if (strType == "backgroundimage")
+		else if (!strcmp(pszType, "backgroundimage"))
 		{
 			CreateBackgroundImage(menuHandle,param,buf);
 		}
 		else
 		{
-			GfError("Errot: Unknown static control type '%s'\n", strType.c_str());
+			GfError("Errot: Unknown static control type '%s'\n", pszType);
 		}
 	}
 
@@ -798,7 +800,7 @@ LoadMenuXML(const char *pszMenuPath)
 	strPath += pszMenuPath;
 	
 	char buf[1024];
-	sprintf(buf, "%s%s", GetDataDir(),strPath.c_str());
+	sprintf(buf, "%s%s", GetDataDir(), strPath.c_str());
 
 	return GfParmReadFile(buf, GFPARM_RMODE_STD);
 }
