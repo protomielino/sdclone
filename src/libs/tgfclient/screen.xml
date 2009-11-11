@@ -152,8 +152,8 @@
       </section>
 
       <section name="tip">
-        <attnum name="red" val="0"/>
-        <attnum name="green" val="0"/>
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
         <attnum name="blue" val="0"/>
         <attnum name="alpha" val="1"/>
       </section>
