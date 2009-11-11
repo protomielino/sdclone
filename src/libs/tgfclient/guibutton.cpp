@@ -408,14 +408,14 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
     }
     label->align = align;
     switch(align&0xF0) {
-    case 0x00 /* LEFT */:
+    case GFUI_ALIGN_HL_VB /* LEFT */:
 	label->x = object->xmin = x;
 	label->y = y - 2 * gfuiFont[font]->getDescender();
 	object->ymin = y;
 	object->xmax = x + width;
 	object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	break;
-    case 0x10 /* CENTER */:
+    case GFUI_ALIGN_HC_VB /* CENTER */:
 	object->xmin = x - width / 2;
 	label->x = x - gfuiFont[font]->getWidth((const char *)text) / 2;
 	label->y = y - 2 * gfuiFont[font]->getDescender();
@@ -423,7 +423,7 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
 	object->xmax = x + width / 2;
 	object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	break;
-    case 0x20 /* RIGHT */:
+    case GFUI_ALIGN_HR_VB /* RIGHT */:
 	label->x = object->xmin = x - width;
 	label->y = y - 2 * gfuiFont[font]->getDescender();
 	object->ymin = y;

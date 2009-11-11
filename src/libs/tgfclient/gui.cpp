@@ -989,7 +989,7 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 	}
 
 	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
 	tex = (GLbyte*)GfImgReadPng(filename, &w, &h, screen_gamma);
 	if (!tex) {

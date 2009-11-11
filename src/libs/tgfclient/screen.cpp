@@ -320,19 +320,19 @@ void GfScrInit(int argc, char *argv[])
 	fullscreen = 0;
 #if !defined(FREEGLUT) && !defined(WIN32)
 	if (strcmp(fscr, GFSCR_VAL_YES) == 0) {	// Resize the screen
-		GfOut ("Freeglut not detected...\n");
+		GfOut ("Freeglut not detected :");
 		for (i = maxfreq; i > 59; i--) {
 			sprintf(buf, "%dx%d:%d@%d", winX, winY, depth, i);
-			GfOut("Trying %s video mode\n", buf);
+			GfOut("\n1 - Trying %s video mode : ", buf);
 			fglutGameModeString(buf);
 			if (fglutEnterGameMode()) {
-				GfTrace("OK for %s video mode\n", buf);
+				GfTrace("\nOK for %s video mode\n", buf);
 				usedFG = 1;
 				break;
 			}
 		}
 		if (!usedFG)
-		  GfError("Could not find any usable video mode\n");
+			GfError("\nCould not find any usable video mode\n");
 	}
 #endif
 
@@ -466,7 +466,7 @@ void GfScrInit(int argc, char *argv[])
 		glutSetIconTitle(buf);
 	}
 
-	if ((strcmp(fscr, GFSCR_VAL_YES) == 0) && (!fullscreen)) {
+	if (!strcmp(fscr, GFSCR_VAL_YES) && !fullscreen) {
 		/* glutVideoResize(0, 0, winX, winY); */
 		glutFullScreen();
 	}
@@ -563,24 +563,24 @@ GfScrReinit(void * /* dummy */)
     saveParams();
 
 #ifdef WIN32
-	snprintf(cmd, CMDSIZE, "%sspeed-dreams.exe", GetDataDir());
-	int i;
-	for (i = 0; i < CMDSIZE && cmd[i] != NULL; i++) {
-		if (cmd[i] == '/') {
-			cmd[i] = '\\';
-		}
+    snprintf(cmd, CMDSIZE, "%sspeed-dreams.exe", GetDataDir());
+    int i;
+    for (i = 0; i < CMDSIZE && cmd[i] != NULL; i++) {
+	if (cmd[i] == '/') {
+	    cmd[i] = '\\';
 	}
-	
-	char cmdarg[CMDSIZE];
-	strcpy(cmdarg, "speed-dreams.exe");
-	//snprintf(cmdarg, CMDSIZE, "speed-dreams.exe", GetDataDir());
-	for (i = 0; i < CMDSIZE && cmdarg[i] != NULL; i++) {
-		if (cmdarg[i] == '/') {
-			cmdarg[i] = '\\';
-		}
+    }
+    
+    char cmdarg[CMDSIZE];
+    strcpy(cmdarg, "speed-dreams.exe");
+    //snprintf(cmdarg, CMDSIZE, "speed-dreams.exe", GetDataDir());
+    for (i = 0; i < CMDSIZE && cmdarg[i] != NULL; i++) {
+	if (cmdarg[i] == '/') {
+	    cmdarg[i] = '\\';
 	}
-
-	retcode = execlp(cmd, cmdarg, (const char *)NULL);
+    }
+    
+    retcode = execlp(cmd, cmdarg, (const char *)NULL);
 #else
     GfScrShutdown();
 
@@ -808,8 +808,8 @@ GfScrMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"resrightarrow",(void*)1,ResPrevNext);
 	ResLabelId = CreateLabelControl(scrHandle,param,"reslabel");
 
-    CreateButtonControl(scrHandle, param, "apply", NULL, GfScrReinit);
-    CreateButtonControl(scrHandle, param, "back", prevMenu, GfuiScreenActivate);
+	CreateButtonControl(scrHandle, param, "apply", NULL, GfScrReinit);
+	CreateButtonControl(scrHandle, param, "back", prevMenu, GfuiScreenActivate);
 
 	CreateButtonControl(scrHandle,param,"depthleftarrow",(void*)-1,DepthPrevNext);
 	CreateButtonControl(scrHandle,param,"depthrightarrow",(void*)1,DepthPrevNext);
