@@ -74,6 +74,9 @@ ReSinglePlayerInit(void *prevMenu)
     // Create Back button
     CreateButtonControl(singlePlayerHandle, menuXMLDescHdle, "backbutton", prevMenu, singlePLayerShutdown);
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(singlePlayerHandle);
     GfuiAddKey(singlePlayerHandle, 27, "Back To Main", prevMenu, singlePLayerShutdown, NULL);

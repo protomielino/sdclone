@@ -42,10 +42,12 @@ static int	rePauseId;
 static int	reMsgId;
 static int	reBigMsgId;
 
-static float bgcolor[4] = {0.0, 0.0, 0.0, 0.0};
-static float white[4]   = {1.0, 1.0, 1.0, 1.0};
-static float red[4]     = {1.0, 0.0, 0.0, 1.0};
+static float black[4] = {0.0, 0.0, 0.0, 0.0};
 
+
+/**************************************************************************
+ * Normal race screen (3D animated scene mode = non "blind" mode)
+ */
 static void
 reDisplay(void)
 {
@@ -168,20 +170,26 @@ ReSetRaceBigMsg(const char *msg)
 void *
 ReScreenInit(void)
 {
-    
+    // Release screen if was initialized.
     ReScreenShutdown();
 
-    reScreenHandle = GfuiScreenCreateEx(bgcolor, 0, reScreenActivate, 0, 0, 0);
+    // Create screen, load menu XML descriptor and create static controls.
+    reScreenHandle = GfuiScreenCreateEx(black, 0, reScreenActivate, 0, 0, 0);
+    void *menuXMLDescHdle = LoadMenuXML("raceglscreen.xml");
+    CreateStaticControls(menuXMLDescHdle, reScreenHandle);
 
-    void *param = LoadMenuXML("raceglscreen.xml");
-    CreateStaticControls(param, reScreenHandle);
+    // Create Message, BigMessage and Pause labels.
+    reMsgId = CreateLabelControl(reScreenHandle, menuXMLDescHdle, "message");
+    rePauseId = CreateLabelControl(reScreenHandle, menuXMLDescHdle, "pause");
+    reBigMsgId = CreateLabelControl(reScreenHandle, menuXMLDescHdle, "bigmessage");
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
+    // Register keyboard shortcuts.
     reAddKeys();
 
-	reMsgId = CreateLabelControl(reScreenHandle,param,"message");
-	rePauseId = CreateLabelControl(reScreenHandle,param,"pause");
-	reBigMsgId = CreateLabelControl(reScreenHandle,param,"bigmessage");
-
+    // Hide the Pause label for the moment.
     GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
 
     return reScreenHandle;
@@ -226,20 +234,23 @@ ReHookShutdown(void)
     }
 }
 
-/**************************************************************************/
-
-/*
- * Result only screen
+/**************************************************************************
+ * Result only screen (blind mode)
  */
-#define LINES	21
+static const int NMaxResultLines = 21;
 
+static float	white[4]   = {1.0, 1.0, 1.0, 1.0};
+static float	red[4]     = {1.0, 0.0, 0.0, 1.0};
 static float	*reColor[] = {white, red};
 
 static void	*reResScreenHdle = 0;
+
 static int	reResTitleId;
-static int	reResMsgId[LINES];
-static int	reResMsgClr[LINES];
-static char	*reResMsg[LINES];
+static int	reResMsgId[NMaxResultLines];
+
+static int	reResMsgClr[NMaxResultLines];
+static char	*reResMsg[NMaxResultLines];
+
 static int	reCurLine;
 
 static void
@@ -280,7 +291,7 @@ reResScreenShutdown(void * /* dummy */)
 {
     int		i;
 
-    for (i = 1; i < LINES; i++) {
+    for (i = 1; i < NMaxResultLines; i++) {
 	FREEZ(reResMsg[i]);
     }
 }
@@ -291,33 +302,35 @@ ReResScreenInit(void)
     int		i;
     int		y, dy;
     const char	*img;
-    static const char	*title[3] = {"Practice", "Qualifications", "Race"};
+    static const char *title[3] = {"Practice", "Qualifications", "Race"};
 
     if (reResScreenHdle) {
 	GfuiScreenRelease(reResScreenHdle);
     }
 
-    reResScreenHdle = GfuiScreenCreateEx(bgcolor, 0, reResScreenActivate, 0, reResScreenShutdown, 0);
+    // Create screen, load menu XML descriptor and create static controls.
+    reResScreenHdle = GfuiScreenCreateEx(black, 0, reResScreenActivate, 0, reResScreenShutdown, 0);
+    void *menuXMLDescHdle = LoadMenuXML("raceblindscreen.xml");
+    CreateStaticControls(menuXMLDescHdle, reResScreenHdle);
 
-    GfuiTitleCreate(reResScreenHdle, title[ReInfo->s->_raceType], strlen(title[ReInfo->s->_raceType]));
+    // Create variable main title (race type/stage) label.
+    int mainTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "title");
+    GfuiLabelSetText(reResScreenHdle, mainTitleId, title[ReInfo->s->_raceType]);
 
+    // Create background image if any specified.
     img = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
     if (img) {
 	GfuiScreenAddBgImg(reResScreenHdle, img);
     }
     
-    reAddResKeys();
+    // Create variable subtitle (driver and race name, lap number) label.
+    reResTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "subtitle");
 
-    reResTitleId = GfuiLabelCreateEx(reResScreenHdle,
-				     "",
-				     red,
-				     GFUI_FONT_LARGE_C,
-				     320, 420,
-				     GFUI_ALIGN_HC_VB, 50);
-
+    // Create result lines (1 label for each).
+    // TODO: Get layout, color, ... info from menuXMLDescHdle when available.
     y = 400;
-    dy = 378 / LINES;
-    for (i = 0; i < LINES; i++) {
+    dy = 378 / NMaxResultLines;
+    for (i = 0; i < NMaxResultLines; i++) {
 	FREEZ(reResMsg[i]);
 	reResMsgClr[i] = 0;
 	reResMsgId[i] = GfuiLabelCreateEx(reResScreenHdle,
@@ -329,7 +342,15 @@ ReResScreenInit(void)
 	y -= dy;
     }
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(menuXMLDescHdle);
+    
+    // Register keyboard shortcuts.
+    reAddResKeys();
+
+    // Initialize current result line.
     reCurLine = 0;
+
     return reResScreenHdle;
 }
 
@@ -346,9 +367,9 @@ ReResScreenAddText(const char *text)
 {
     int		i;
 
-    if (reCurLine == LINES) {
+    if (reCurLine == NMaxResultLines) {
 	free(reResMsg[0]);
-	for (i = 1; i < LINES; i++) {
+	for (i = 1; i < NMaxResultLines; i++) {
 	    reResMsg[i - 1] = reResMsg[i];
 	    GfuiLabelSetText(reResScreenHdle, reResMsgId[i - 1], reResMsg[i]);
 	}
@@ -362,7 +383,7 @@ ReResScreenAddText(const char *text)
 void
 ReResScreenSetText(const char *text, int line, int clr)
 {
-    if (line < LINES) {
+    if (line < NMaxResultLines) {
 	FREEZ(reResMsg[line]);
 	reResMsg[line] = strdup(text);
 	if ((clr >= 0) && (clr < 2)) {
@@ -378,7 +399,7 @@ ReResScreenSetText(const char *text, int line, int clr)
 int
 ReResGetLines(void)
 {
-    return LINES;
+    return NMaxResultLines;
 }
 
 void
@@ -386,7 +407,7 @@ ReResEraseScreen(void)
 {
     int i;
 
-    for (i = 0; i < LINES; i++) {
+    for (i = 0; i < NMaxResultLines; i++) {
 	ReResScreenSetText("", i, 0);
     }
 }
@@ -395,7 +416,7 @@ ReResEraseScreen(void)
 void
 ReResScreenRemoveText(int line)
 {
-    if (line < LINES) {
+    if (line < NMaxResultLines) {
 	FREEZ(reResMsg[line]);
 	GfuiLabelSetText(reResScreenHdle, reResMsgId[line], "");
     }
