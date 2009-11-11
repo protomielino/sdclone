@@ -1076,11 +1076,11 @@ GfParmReadFile (const char *file, int mode)
 	    fclose (in);
 	    in = NULL;
 	}
+
+	GfOut("Loaded %s (%p)\n", file, parmHandle);
     }
 
     GF_TAILQ_INSERT_HEAD (&parmHandleList, parmHandle, linkHandle);
-
-    GfOut ("GfParmReadFile: Opening \"%s\" (%p)\n", file, parmHandle);
 
     return parmHandle;
 
