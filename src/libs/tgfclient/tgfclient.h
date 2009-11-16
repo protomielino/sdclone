@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:32:14 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: tgfclient.h,v 1.3.2.1 2008/08/16 14:12:08 berniw Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -17,9 +17,9 @@
  ***************************************************************************/
 
 /** @file   
-    	The Gaming Framework API (client part).
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: tgfclient.h,v 1.3.2.1 2008/08/16 14:12:08 berniw Exp $
+        The Gaming Framework API (client part).
+    @author     <a href=mailto:torcs@free.fr>Eric Espie</a>
+    @version    $Id$
 */
 
 
@@ -35,8 +35,8 @@
 class Color
 {
 public:
-	float red,green,blue,alpha;
-	float *GetPtr() { return (float*)this;}
+        float red,green,blue,alpha;
+        float *GetPtr() { return (float*)this;}
 };
  void GfInitClient(void);
 
@@ -63,48 +63,48 @@ extern void GfScrReinit(void*);
  *****************************/
 
 /* Widget type */
-#define GFUI_LABEL	0
-#define GFUI_BUTTON	1
-#define GFUI_GRBUTTON	2
-#define GFUI_SCROLLIST	3
-#define GFUI_SCROLLBAR	4
-#define GFUI_EDITBOX	5
+#define GFUI_LABEL      0
+#define GFUI_BUTTON     1
+#define GFUI_GRBUTTON   2
+#define GFUI_SCROLLIST  3
+#define GFUI_SCROLLBAR  4
+#define GFUI_EDITBOX    5
 
 /* Alignment */
-#define GFUI_ALIGN_HL_VB	0x00
-#define GFUI_ALIGN_HL_VC	0x01
-#define GFUI_ALIGN_HL_VT	0x02
-#define GFUI_ALIGN_HC_VB	0x10
-#define GFUI_ALIGN_HC_VC	0x11
-#define GFUI_ALIGN_HC_VT	0x12
-#define GFUI_ALIGN_HR_VB	0x20
-#define GFUI_ALIGN_HR_VC	0x21
-#define GFUI_ALIGN_HR_VT	0x22
+#define GFUI_ALIGN_HL_VB        0x00
+#define GFUI_ALIGN_HL_VC        0x01
+#define GFUI_ALIGN_HL_VT        0x02
+#define GFUI_ALIGN_HC_VB        0x10
+#define GFUI_ALIGN_HC_VC        0x11
+#define GFUI_ALIGN_HC_VT        0x12
+#define GFUI_ALIGN_HR_VB        0x20
+#define GFUI_ALIGN_HR_VC        0x21
+#define GFUI_ALIGN_HR_VT        0x22
 
 /* Mouse action */
-#define GFUI_MOUSE_UP	0
-#define GFUI_MOUSE_DOWN	1
+#define GFUI_MOUSE_UP   0
+#define GFUI_MOUSE_DOWN 1
 
 /* Keyboard action */
-#define GFUI_KEY_UP	0
-#define GFUI_KEY_DOWN	1
+#define GFUI_KEY_UP     0
+#define GFUI_KEY_DOWN   1
 
 /* Scroll Bar position */
-#define GFUI_SB_NONE	0
-#define GFUI_SB_RIGHT	1
-#define GFUI_SB_LEFT	2
-#define GFUI_SB_TOP	3
-#define GFUI_SB_BOTTOM	4
+#define GFUI_SB_NONE    0
+#define GFUI_SB_RIGHT   1
+#define GFUI_SB_LEFT    2
+#define GFUI_SB_TOP     3
+#define GFUI_SB_BOTTOM  4
 
 /* Scroll bar orientation */
-#define GFUI_HORI_SCROLLBAR	0
-#define GFUI_VERT_SCROLLBAR	1
+#define GFUI_HORI_SCROLLBAR     0
+#define GFUI_VERT_SCROLLBAR     1
 
 /** Scroll bar call-back information */
 typedef struct ScrollBarInfo
 {
-    int		pos;		/**< Current scroll bar position */
-    void	*userData;	/**< Associated user data */
+    int         pos;            /**< Current scroll bar position */
+    void        *userData;      /**< Associated user data */
 } tScrollBarInfo;
 
 typedef void (*tfuiCallback)(void * /* userdata */);
@@ -124,9 +124,9 @@ extern void GfuiIdle(void);
 /* Screen management */
 extern void *GfuiScreenCreate(void);
 extern void *GfuiScreenCreateEx(float *bgColor, 
-				void *userDataOnActivate, tfuiCallback onActivate, 
-				void *userDataOnDeactivate, tfuiCallback onDeactivate, 
-				int mouseAllowed);
+                                void *userDataOnActivate, tfuiCallback onActivate, 
+                                void *userDataOnDeactivate, tfuiCallback onDeactivate, 
+                                int mouseAllowed);
 extern void GfuiScreenRelease(void *screen);
 extern void GfuiScreenActivate(void *screen);
 extern int  GfuiScreenIsActive(void *screen);
@@ -149,9 +149,9 @@ extern void GfuiSleep(double delay);
 /* mouse */
 typedef struct MouseInfo
 {
-    int	X;
-    int	Y;
-    int	button[3];
+    int X;
+    int Y;
+    int button[3];
 } tMouseInfo;
 
 extern tMouseInfo *GfuiMouseInfo(void);
@@ -161,26 +161,26 @@ extern void GfuiMouseShow(void);
 extern void GfuiMouseSetHWPresent(void);
 
 /* all widgets */
-#define	GFUI_VISIBLE	1	/**< Object visibility flag  */
-#define	GFUI_INVISIBLE	0	/**< Object invisibility flag  */
+#define GFUI_VISIBLE    1       /**< Object visibility flag  */
+#define GFUI_INVISIBLE  0       /**< Object invisibility flag  */
 extern int GfuiVisibilitySet(void *scr, int id, int visible);
-#define	GFUI_DISABLE	1
-#define	GFUI_ENABLE	0
+#define GFUI_DISABLE    1
+#define GFUI_ENABLE     0
 extern int GfuiEnable(void *scr, int id, int flag);
 extern void GfuiUnSelectCurrent(void);
 
 /* labels */
-#define GFUI_FONT_BIG		0
-#define GFUI_FONT_LARGE		1
-#define GFUI_FONT_MEDIUM	2
-#define GFUI_FONT_SMALL		3
-#define GFUI_FONT_BIG_C		4
-#define GFUI_FONT_LARGE_C	5
-#define GFUI_FONT_MEDIUM_C	6
-#define GFUI_FONT_SMALL_C	7
-#define GFUI_FONT_DIGIT		8
+#define GFUI_FONT_BIG           0
+#define GFUI_FONT_LARGE         1
+#define GFUI_FONT_MEDIUM        2
+#define GFUI_FONT_SMALL         3
+#define GFUI_FONT_BIG_C         4
+#define GFUI_FONT_LARGE_C       5
+#define GFUI_FONT_MEDIUM_C      6
+#define GFUI_FONT_SMALL_C       7
+#define GFUI_FONT_DIGIT         8
 extern int GfuiLabelCreate(void *scr, const char *text, 
-			int font, int x, int y, int align, int maxlen);
+                        int font, int x, int y, int align, int maxlen);
 extern int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, int x, int y, int align, int maxlen);
 
 extern int GfuiTipCreate(void *scr, const char *text, int maxlen);
@@ -195,29 +195,29 @@ extern int  GfuiFontWidth(int font, const char *text);
 
 
 /* buttons */
-#define GFUI_BTNSZ	300
+#define GFUI_BTNSZ      300
 extern int GfuiButtonCreate(void *scr, const char *text, int font,
-			    int x, int y, int width, int align, int mouse,
-			    void *userDataOnPush, tfuiCallback onPush, 
-			    void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                            int x, int y, int width, int align, int mouse,
+                            void *userDataOnPush, tfuiCallback onPush, 
+                            void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern int GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
-				 void *userDataOnPush, tfuiCallback onPush, 
-				 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                                 void *userDataOnPush, tfuiCallback onPush, 
+                                 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern int GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
-			      int x, int y, int align, int mouse,
-			      void *userDataOnPush, tfuiCallback onPush, 
-			      void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                              int x, int y, int align, int mouse,
+                              void *userDataOnPush, tfuiCallback onPush, 
+                              void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
-		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
-		   void *userDataOnPush, tfuiCallback onPush, 
-		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
+                   void *userDataOnPush, tfuiCallback onPush, 
+                   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
 extern void GfuiButtonSetText(void *scr, int id, const char *text);
 extern int GfuiButtonGetFocused(void);
 
 /* Edit Box */
 extern int GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width, int maxlen,
-			     void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+                             void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern int GfuiEditboxGetFocused(void);
 extern char *GfuiEditboxGetString(void *scr, int id);
 extern void GfuiEditboxSetString(void *scr, int id, const char *text);
@@ -227,7 +227,7 @@ extern void GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor);
 
 /* Scrolling lists */
 extern int GfuiScrollListCreate(void *scr, int font, int x, int y, int align,
-				int width, int height, int scrollbar, void *userDataOnSelect, tfuiCallback onSelect);
+                                int width, int height, int scrollbar, void *userDataOnSelect, tfuiCallback onSelect);
 extern int GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData);
 extern int GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta);
 extern const char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
@@ -240,8 +240,8 @@ extern void GfuiScrollListSetColor(void *scr, int id,Color color);
 extern void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
 /* bars */
 extern int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
-			       int min, int max, int len, int start, 
-			       void *userData, tfuiSBCallback onScroll);
+                               int min, int max, int len, int start, 
+                               void *userData, tfuiSBCallback onScroll);
 extern void GfuiScrollBarPosSet(void *scr, int id, int min, int max, int len, int start);
 extern int GfuiScrollBarPosGet(void *scr, int id);
 
@@ -255,7 +255,7 @@ extern void GfuiStaticImageSet(void *scr, int id, const char *name);
 
 extern void *GfuiMenuScreenCreate(const char *title);
 extern void  GfuiMenuDefaultKeysAdd(void *scr);
-extern int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userdata, tfuiCallback onpush);
+extern int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userdata, const int style, tfuiCallback onpush);
 extern int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const char *tip, void *userdata, tfuiCallback onpush);
 
 
@@ -263,37 +263,37 @@ extern int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const ch
  * Control interface *
  *********************/
 
-#define GFCTRL_TYPE_NOT_AFFECTED	0
-#define GFCTRL_TYPE_JOY_AXIS		1
-#define GFCTRL_TYPE_JOY_BUT		2
-#define GFCTRL_TYPE_KEYBOARD		3
-#define GFCTRL_TYPE_MOUSE_BUT		4
-#define GFCTRL_TYPE_MOUSE_AXIS		5
-#define GFCTRL_TYPE_SKEYBOARD		6
+#define GFCTRL_TYPE_NOT_AFFECTED        0
+#define GFCTRL_TYPE_JOY_AXIS            1
+#define GFCTRL_TYPE_JOY_BUT             2
+#define GFCTRL_TYPE_KEYBOARD            3
+#define GFCTRL_TYPE_MOUSE_BUT           4
+#define GFCTRL_TYPE_MOUSE_AXIS          5
+#define GFCTRL_TYPE_SKEYBOARD           6
 
 typedef struct
 {
-    int		index;
-    int		type;
+    int         index;
+    int         type;
 } tCtrlRef;
 
 
-#define GFCTRL_JOY_UNTESTED	-1
-#define GFCTRL_JOY_NONE		0
-#define GFCTRL_JOY_PRESENT	1
+#define GFCTRL_JOY_UNTESTED     -1
+#define GFCTRL_JOY_NONE         0
+#define GFCTRL_JOY_PRESENT      1
 
-#define GFCTRL_JOY_NUMBER	8 /* Max number of managed joysticks */
-#define GFCTRL_JOY_MAX_BUTTONS	32	 /* Size of integer so don't change please */
-#define GFCTRL_JOY_MAX_AXES	_JS_MAX_AXES
+#define GFCTRL_JOY_NUMBER       8 /* Max number of managed joysticks */
+#define GFCTRL_JOY_MAX_BUTTONS  32       /* Size of integer so don't change please */
+#define GFCTRL_JOY_MAX_AXES     _JS_MAX_AXES
 
 /** Joystick Information Structure */
 typedef struct
 {
-    int		oldb[GFCTRL_JOY_NUMBER];
-    float	ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];	     /**< Axis values */
-    int		edgeup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from down (pressed) to up */
-    int		edgedn[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from up to down */
-    int		levelup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER]; /**< Button state (1 = up) */
+    int         oldb[GFCTRL_JOY_NUMBER];
+    float       ax[GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER];         /**< Axis values */
+    int         edgeup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from down (pressed) to up */
+    int         edgedn[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER];  /**< Button transition from up to down */
+    int         levelup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER]; /**< Button state (1 = up) */
 } tCtrlJoyInfo;
 
 extern tCtrlJoyInfo *GfctrlJoyInit(void);
@@ -305,10 +305,10 @@ extern void GfctrlJoyRelease(tCtrlJoyInfo *joyInfo);
 /** Mouse information structure */
 typedef struct
 {
-    int		edgeup[3];	/**< Button transition from down (pressed) to up */
-    int		edgedn[3];	/**< Button transition from up to down */
-    int		button[3];	/**< Button state (1 = up) */
-    float	ax[4];		/**< mouse axis position (mouse considered as a joystick) */
+    int         edgeup[3];      /**< Button transition from down (pressed) to up */
+    int         edgedn[3];      /**< Button transition from up to down */
+    int         button[3];      /**< Button state (1 = up) */
+    float       ax[4];          /**< mouse axis position (mouse considered as a joystick) */
 } tCtrlMouseInfo;
 
 extern tCtrlMouseInfo *GfctrlMouseInit(void);
