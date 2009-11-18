@@ -178,12 +178,12 @@ void grUpdateSmoke(double t)
 					// changing from fire to smoke
 					tmp->smoke->smokeTypeStep = 1;
 					tmp->smoke->setState(mstf1);
-				} else if (tmp->smoke->smokeTypeStep == 1) {
-					if (tmp->smoke->cur_life >= tmp->smoke->step1_max_life) {
-						// changing from fire to smoke
-						tmp->smoke->smokeTypeStep = 2;
-						tmp->smoke->setState(mst);
-					}
+				}
+			} else if (tmp->smoke->smokeTypeStep == 1) {
+				if (tmp->smoke->cur_life >= tmp->smoke->step1_max_life) {
+					// changing from fire to smoke
+					tmp->smoke->smokeTypeStep = 2;
+					tmp->smoke->setState(mst);
 				}
 			}
 		}
