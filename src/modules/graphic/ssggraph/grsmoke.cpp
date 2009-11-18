@@ -101,7 +101,7 @@ void grInitSmoke(int index)
     if (!mst) {
 		sprintf(buf, "data/textures;data/img;.");
 		mst = (ssgSimpleState*)grSsgLoadTexStateEx("smoke.rgb", buf, FALSE, FALSE);
-		if (mst!=NULL) {
+		if (mst != NULL) {
 			mst->disable(GL_LIGHTING);
 			mst->enable(GL_BLEND);
 			mst->disable(GL_CULL_FACE);
@@ -113,7 +113,7 @@ void grInitSmoke(int index)
     if (!mstf0) {
 		sprintf(buf, "data/textures;data/img;.");
 		mstf0 = (ssgSimpleState*)grSsgLoadTexStateEx("fire0.rgb", buf, FALSE, FALSE);
-		if (mst!=NULL) {
+		if (mstf0 != NULL) {
 			mstf0->disable(GL_LIGHTING);
 			mstf0->enable(GL_BLEND);
 			mstf0->disable(GL_CULL_FACE);
@@ -125,7 +125,7 @@ void grInitSmoke(int index)
     if (!mstf1) {
 		sprintf(buf, "data/textures;data/img;.");
 		mstf1 = (ssgSimpleState*)grSsgLoadTexStateEx("fire1.rgb", buf, FALSE, FALSE);
-		if (mst!=NULL) {
+		if (mstf1 != NULL) {
 			mstf1->disable(GL_LIGHTING);
 			mstf1->enable(GL_BLEND);
 			mstf1->disable(GL_CULL_FACE);
