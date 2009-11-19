@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:29:56 CEST 1999
     copyright            : (C) 1999, 2004 by Eric Espie, Bernhard Wymann
     email                : torcs@free.fr
-    version              : $Id: screen.cpp,v 1.23 2008/02/21 09:27:38 torcs Exp $
+    version              : $Id$
 ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file
     Screen management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: screen.cpp,v 1.23 2008/02/21 09:27:38 torcs Exp $
+    @version	$Id$
     @ingroup	screen
 */
 
@@ -534,7 +534,7 @@ saveParams(void)
 	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, bpp);
 	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, curMaxFreq);
 
-	GfParmSetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, VInit[curVInit]);
+	GfParmSetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, (char*)VInit[curVInit]);
 
 	if (curMode == 0) {
 		GfParmSetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, "yes");
@@ -808,8 +808,8 @@ GfScrMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"resrightarrow",(void*)1,ResPrevNext);
 	ResLabelId = CreateLabelControl(scrHandle,param,"reslabel");
 
-	CreateButtonControl(scrHandle, param, "apply", NULL, GfScrReinit);
-	CreateButtonControl(scrHandle, param, "back", prevMenu, GfuiScreenActivate);
+	CreateButtonControl(scrHandle, param, "accept", NULL, GfScrReinit);
+	CreateButtonControl(scrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
 
 	CreateButtonControl(scrHandle,param,"depthleftarrow",(void*)-1,DepthPrevNext);
 	CreateButtonControl(scrHandle,param,"depthrightarrow",(void*)1,DepthPrevNext);
@@ -830,7 +830,7 @@ GfScrMenuInit(void *prevMenu)
 	
 	GfParmReleaseHandle(param);
     
-	GfuiAddKey(scrHandle, 13, "Apply", NULL, GfScrReinit, NULL);
+	GfuiAddKey(scrHandle, 13, "Accept", NULL, GfScrReinit, NULL);
 	GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
 	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
