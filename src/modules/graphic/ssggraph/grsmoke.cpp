@@ -73,11 +73,14 @@ void grInitSmoke(int index)
     grSmokeDeltaT = (double)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKEDELTAT,
 										 (char*)NULL, DELTAT);
     grSmokeLife = (double)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKEDLIFE,
-									   (char*)NULL, MAX_SMOKE_LIFE);
+									   (char*)NULL, 2.0f);
 
     if (!grSmokeMaxNumber) {
 		return;
     }
+
+    if (grSmokeLife > MAX_SMOKE_LIFE)
+                grSmokeLife = MAX_SMOKE_LIFE;
 
     grFireDeltaT=grSmokeDeltaT*8;
 
