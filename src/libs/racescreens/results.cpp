@@ -4,7 +4,7 @@
     created              : Fri Apr 14 22:36:36 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: results.cpp,v 1.6 2005/07/21 21:27:14 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -21,22 +21,16 @@
     		This is a set of tools useful for race managers to display results.
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: results.cpp,v 1.6 2005/07/21 21:27:14 berniw Exp $
+    @version	$Id$
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cstring>
 #ifdef WIN32
 #include <windows.h>
 #endif
 #include <tgfclient.h>
-#include <osspec.h>
-#include <robottools.h>
-#include <robot.h>
 
-#include "driver.h"
 #include "racescreens.h"
+#include "driver.h"	//rmdGetDriverType
 
 static int	rmSaveId;
 static void	*rmScrHdle = NULL;
@@ -46,7 +40,7 @@ static void rmRaceResults(void *prevHdle, tRmInfo *info, int start);
 static void rmQualifResults(void *prevHdle, tRmInfo *info, int start);
 static void rmShowStandings(void *prevHdle, tRmInfo *info, int start);
 
-#define MAX_LINES	20
+#define MAX_LINES	20	//Max number of result lines ona screen
 
 typedef struct
 {
@@ -64,7 +58,7 @@ rmSaveRes(void *vInfo)
 {
     tRmInfo *info = (tRmInfo *)vInfo;
 
-    GfParmWriteFile(0, info->results, "Results");
+    GfParmWriteFile(0, info->results, (char*)"Results");
 
     GfuiVisibilitySet(rmScrHdle, rmSaveId, GFUI_INVISIBLE);
 }
@@ -100,7 +94,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     CreateStaticControls(param,rmScrHdle);
 
     sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
-    sprintf(buf, "%s on track %s", GfParmGetStr(results, path, RM_ATTR_DRVNAME, ""), info->track->name);
+    sprintf(buf, "%s on track %s", GfParmGetStr(results, path, RM_ATTR_DRVNAME, NULL), info->track->name);
 
     const int messId = CreateLabelControl(rmScrHdle, param, "playertitle");
     GfuiLabelSetText(rmScrHdle, messId, buf);
@@ -293,12 +287,12 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xRank, y, GFUI_ALIGN_HC_VB, 0);
 
-	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_FONT_MEDIUM_C,
+	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C,
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
-	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, maxBufSize);
+	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, maxBufSize);
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
-	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, ""), GFUI_FONT_MEDIUM_C,
+	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
 			xCar, y, GFUI_ALIGN_HL_VB, 0);
 
 	if (laps == totLaps) {
@@ -467,12 +461,12 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xRank, y, GFUI_ALIGN_HC_VB, 0);
 
-	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_FONT_MEDIUM_C,
+	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C,
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
-	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, maxBufSize);
+	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, maxBufSize);
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
-	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, ""), GFUI_FONT_MEDIUM_C,
+	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
 			xCar, y, GFUI_ALIGN_HL_VB, 0);
 
 	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), 0);
@@ -552,126 +546,149 @@ rmChgStandingScreen(void *vprc)
     GfuiScreenRelease(prevScr);
 }
 
+/** 
+ * rmShowStandings
+ * 
+ * Shows a results page, with optional prev/next results page buttons
+ * 
+ * @param prevHdle	handle for previous results page
+ * @param info	race results information
+ * @param start	page number
+*/
 static void
 rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 {
-    int			i;
-    int			y;
-    static const unsigned maxBufSize = 256;
-    static char		buf[maxBufSize];
-    static char		path[1024];
-    static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
-    int			nbCars;
-    void		*results = info->results;
-    const char		*race = info->_reRaceName;
+	int			i;
+	int			y;
+	static const unsigned maxBufSize = 256;
+	static char		buf[maxBufSize];
+	static char		path[1024];
+	static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
+	int			nbCars;
+	void		*results = info->results;
+	const char		*race = info->_reRaceName;
 
-    rmScrHdle = GfuiScreenCreate();
+	rmScrHdle = GfuiScreenCreate();
 
 	void *param = LoadMenuXML("standingsmenu.xml");
-    CreateStaticControls(param,rmScrHdle);
+	CreateStaticControls(param,rmScrHdle);
 
-    sprintf(buf, "%s Standings", race);
-    const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
-    GfuiLabelSetText(rmScrHdle, messId, buf);
+	//Set title
+	sprintf(buf, "%s Standings", race);
+	const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+	GfuiLabelSetText(rmScrHdle, messId, buf);
 
-    const int offset  = 50;
-    const int xRank   = offset + 30;
-    const int xDriver = offset + 60;
-    const int xType   = offset + 240;
-    const int xCar    = offset + 320;
-    const int xPoints = offset + 520;
-    
-    y = 400;
-    GfuiLabelCreateEx(rmScrHdle, "Rank",   fgcolor, GFUI_FONT_MEDIUM_C, xRank, y, GFUI_ALIGN_HC_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "Driver", fgcolor, GFUI_FONT_MEDIUM_C, xDriver+10, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "Type",   fgcolor, GFUI_FONT_MEDIUM_C, xType+10, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "Car",    fgcolor, GFUI_FONT_MEDIUM_C, xCar+10, y, GFUI_ALIGN_HL_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "Points", fgcolor, GFUI_FONT_MEDIUM_C, xPoints, y, GFUI_ALIGN_HR_VB, 0);
-    y -= 20;
-    
-    nbCars = (int)GfParmGetEltNb(results, RE_SECT_STANDINGS);
-    for (i = start; i < MIN(start + MAX_LINES, nbCars); i++) {
-	sprintf(path, "%s/%d", RE_SECT_STANDINGS, i + 1);
+	//Show header
+	const int offset  = 50;
+	const int xRank   = offset + 30;
+	const int xDriver = offset + 60;
+	const int xType   = offset + 240;
+	const int xCar    = offset + 320;
+	const int xPoints = offset + 520;
+	y = 400;
+	GfuiLabelCreateEx(rmScrHdle, "Rank",   fgcolor, GFUI_FONT_MEDIUM_C, xRank, y, GFUI_ALIGN_HC_VB, 0);
+	GfuiLabelCreateEx(rmScrHdle, "Driver", fgcolor, GFUI_FONT_MEDIUM_C, xDriver+10, y, GFUI_ALIGN_HL_VB, 0);
+	GfuiLabelCreateEx(rmScrHdle, "Type",   fgcolor, GFUI_FONT_MEDIUM_C, xType+10, y, GFUI_ALIGN_HL_VB, 0);
+	GfuiLabelCreateEx(rmScrHdle, "Car",    fgcolor, GFUI_FONT_MEDIUM_C, xCar+10, y, GFUI_ALIGN_HL_VB, 0);
+	GfuiLabelCreateEx(rmScrHdle, "Points", fgcolor, GFUI_FONT_MEDIUM_C, xPoints, y, GFUI_ALIGN_HR_VB, 0);
+	y -= 20;
 
-	sprintf(buf, "%d", i+1);
-	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
+	//List results line by line, paginated
+	nbCars = (int)GfParmGetEltNb(results, (char*)RE_SECT_STANDINGS);
+	for (i = start; i < MIN(start + MAX_LINES, nbCars); i++) {
+		sprintf(path, "%s/%d", RE_SECT_STANDINGS, i + 1);
+		
+		//Rank
+		sprintf(buf, "%d", i+1);
+		GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xRank, y, GFUI_ALIGN_HC_VB, 0);
 
-	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_FONT_MEDIUM_C,
+		//Driver name
+		GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C,
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
-	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, maxBufSize);
-	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
+	
+		//Driver type
+		rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, maxBufSize);
+		GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
-	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, ""), GFUI_FONT_MEDIUM_C,
+			
+		//Car
+		GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
 			xCar, y, GFUI_ALIGN_HL_VB, 0);
 
-	sprintf(buf, "%d", (int)GfParmGetNum(results, path, RE_ATTR_POINTS, NULL, 0));
-	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
+		//Points
+		sprintf(buf, "%d", (int)GfParmGetNum(results, path, RE_ATTR_POINTS, NULL, 0));
+		GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xPoints, y, GFUI_ALIGN_HR_VB, 0);
-	y -= 15;
-    }
+			
+		y -= 15;	//Next line
+	}//for i
 
+	//If not on first page, show 'previous results' button on the bottom left
+	if (start > 0) {
+		RmPrevRace.prevHdle = prevHdle;
+		RmPrevRace.info     = info;
+		RmPrevRace.start    = start - MAX_LINES;
+		GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
+			"data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
+			80, 40, GFUI_ALIGN_HL_VB, 1,
+			(void*)&RmPrevRace, rmChgStandingScreen,
+			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+		GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP,   "Previous Results", (void*)&RmPrevRace, rmChgStandingScreen, NULL);
+	}//if start
 
-    if (start > 0) {
-	RmPrevRace.prevHdle = prevHdle;
-	RmPrevRace.info     = info;
-	RmPrevRace.start    = start - MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
-			   "data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
-			   80, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmPrevRace, rmChgStandingScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP,   "Previous Results", (void*)&RmPrevRace, rmChgStandingScreen, NULL);
-    }
+	//Create 'continue' button in the bottom middle
+	GfuiButtonCreate(rmScrHdle, "Continue", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, 0,
+		prevHdle, GfuiScreenReplace,
+		NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiButtonCreate(rmScrHdle, "Continue", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, 0,
-		     prevHdle, GfuiScreenReplace,
-		     NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+	//Create 'save' button in the bottom right
 	rmSaveId = GfuiButtonCreate(rmScrHdle, "Save", GFUI_FONT_LARGE, 430, 40, 150,
-				    GFUI_ALIGN_HC_VB, 0, info, rmSaveRes, 
-				    NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+		GFUI_ALIGN_HC_VB, 0, info, rmSaveRes, 
+		NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    if (i < nbCars) {
-	RmNextRace.prevHdle = prevHdle;
-	RmNextRace.info     = info;
-	RmNextRace.start    = start + MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
-			   "data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
-			   540, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmNextRace, rmChgStandingScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_DOWN, "Next Results", (void*)&RmNextRace, rmChgStandingScreen, NULL);
-    }
+	//If there is a next page, show 'next results' button on the bottom extreme right
+	if (i < nbCars) {
+		RmNextRace.prevHdle = prevHdle;
+		RmNextRace.info     = info;
+		RmNextRace.start    = start + MAX_LINES;
+		GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
+			"data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
+			540, 40, GFUI_ALIGN_HL_VB, 1,
+			(void*)&RmNextRace, rmChgStandingScreen,
+			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+		GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_DOWN, "Next Results", (void*)&RmNextRace, rmChgStandingScreen, NULL);
+	}//if i
 
-    GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);//ESC, 'Cancel'
+	GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);//RETURN, 'Accept'
+	GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);//F12, 'Screenshot'
 
-    GfuiScreenActivate(rmScrHdle);
-}
+	GfuiScreenActivate(rmScrHdle);
+}//rmShowStandings
+
 
 void
 RmShowResults(void *prevHdle, tRmInfo *info)
 {
-    switch (info->s->_raceType) {
-    case RM_TYPE_PRACTICE:
-	rmPracticeResults(prevHdle, info, 0);
-	return;
+	switch (info->s->_raceType) {
+		case RM_TYPE_PRACTICE:
+			rmPracticeResults(prevHdle, info, 0);
+			break;
 
-    case RM_TYPE_RACE:
-	rmRaceResults(prevHdle, info, 0);
-	return;
+		case RM_TYPE_RACE:
+			rmRaceResults(prevHdle, info, 0);
+			break;
 
-    case RM_TYPE_QUALIF:
-	rmQualifResults(prevHdle, info, 0);
-	return;
-    }
-}
+		case RM_TYPE_QUALIF:
+			rmQualifResults(prevHdle, info, 0);
+			break;
+	}//switch raceType
+}//RmShowResults
 
 
 void
 RmShowStandings(void *prevHdle, tRmInfo *info)
 {
-    rmShowStandings(prevHdle, info, 0);
-}
+	rmShowStandings(prevHdle, info, 0);
+}//RmShowStandings
