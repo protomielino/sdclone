@@ -425,7 +425,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
 
     rmScrHdle = GfuiScreenCreate();
-	void *param = LoadMenuXML("qualifresultsmenu.xml");
+		void *param = LoadMenuXML("qualifsresultsmenu.xml");
     CreateStaticControls(param,rmScrHdle);
 
     sprintf(buf, "%s", info->track->name);
