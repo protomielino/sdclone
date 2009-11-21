@@ -90,13 +90,13 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 
     rmScrHdle = GfuiScreenCreate();
 
-	void *param = LoadMenuXML("practiceresultsmenu.xml");
-    CreateStaticControls(param,rmScrHdle);
+    void *menuXMLDescHdle = LoadMenuXML("practiceresultsmenu.xml");
+    CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
     sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
     sprintf(buf, "%s on track %s", GfParmGetStr(results, path, RM_ATTR_DRVNAME, NULL), info->track->name);
 
-    const int messId = CreateLabelControl(rmScrHdle, param, "playertitle");
+    const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "playertitle");
     GfuiLabelSetText(rmScrHdle, messId, buf);
  
     const int offset = 90;
@@ -155,57 +155,28 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	RmPrevRace.prevHdle = prevHdle;
 	RmPrevRace.info     = info;
 	RmPrevRace.start    = start - MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
-			   "data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
-			   80, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmPrevRace, rmChgPracticeScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
+			    (void*)&RmPrevRace, rmChgPracticeScreen);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP,   "Previous Results", (void*)&RmPrevRace, rmChgPracticeScreen, NULL);
     }
     
-
-    GfuiButtonCreate(rmScrHdle,
-		     "Continue",
-		     GFUI_FONT_LARGE,
-		     320,
-		     40,
-		     150,
-		     GFUI_ALIGN_HC_VB,
-		     0,
-		     prevHdle,
-		     GfuiScreenReplace,
-		     NULL,
-		     (tfuiCallback)NULL,
-		     (tfuiCallback)NULL);
-
-/*     rmSaveId = GfuiButtonCreate(rmScrHdle, */
-/* 				"Save", */
-/* 				GFUI_FONT_LARGE, */
-/* 				430, */
-/* 				40, */
-/* 				150, */
-/* 				GFUI_ALIGN_HC_VB, */
-/* 				0, */
-/* 				info, */
-/* 				rmSaveRes, */
-/* 				NULL, */
-/* 				(tfuiCallback)NULL, */
-/* 				(tfuiCallback)NULL); */
-
+    // Add "Continue" button
+    CreateButtonControl(rmScrHdle, menuXMLDescHdle, "continuebutton", prevHdle, GfuiScreenReplace);
+    
+    //Create 'save' button in the bottom right
+    //rmSaveId = CreateButtonControl(rmScrHdle, menuXMLDescHdle, "savebutton", info, rmSaveRes);
+    
     if (i < totLaps) {
 	RmNextRace.prevHdle = prevHdle;
 	RmNextRace.info     = info;
 	RmNextRace.start    = start + MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
-			   "data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
-			   540, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmNextRace, rmChgPracticeScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
+			    (void*)&RmNextRace, rmChgPracticeScreen);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_DOWN, "Next Results", (void*)&RmNextRace, rmChgPracticeScreen, NULL);
     }
 
-    GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddKey(rmScrHdle, (unsigned char)27, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddKey(rmScrHdle, (unsigned char)13, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddSKey(rmScrHdle, GLUT_KEY_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
     GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
@@ -241,11 +212,11 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
 
     rmScrHdle = GfuiScreenCreate();
-	void *param = LoadMenuXML("raceresultsmenu.xml");
-    CreateStaticControls(param,rmScrHdle);
+	void *menuXMLDescHdle = LoadMenuXML("raceresultsmenu.xml");
+    CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
     sprintf(buf, "%s", info->track->name);
-    const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+    const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
     GfuiLabelSetText(rmScrHdle, messId, buf);
 
   
@@ -341,57 +312,28 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 	RmPrevRace.prevHdle = prevHdle;
 	RmPrevRace.info     = info;
 	RmPrevRace.start    = start - MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
-			   "data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
-			   80, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmPrevRace, rmChgRaceScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
+			    (void*)&RmPrevRace, rmChgRaceScreen);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP,   "Previous Results", (void*)&RmPrevRace, rmChgRaceScreen, NULL);
     }
 
-    GfuiButtonCreate(rmScrHdle,
-		     "Continue",
-		     GFUI_FONT_LARGE,
-		     /* 210, */
-		     320,
-		     40,
-		     150,
-		     GFUI_ALIGN_HC_VB,
-		     0,
-		     prevHdle,
-		     GfuiScreenReplace,
-		     NULL,
-		     (tfuiCallback)NULL,
-		     (tfuiCallback)NULL);
-
-/*     rmSaveId = GfuiButtonCreate(rmScrHdle, */
-/* 				"Save", */
-/* 				GFUI_FONT_LARGE, */
-/* 				430, */
-/* 				40, */
-/* 				150, */
-/* 				GFUI_ALIGN_HC_VB, */
-/* 				0, */
-/* 				info, */
-/* 				rmSaveRes, */
-/* 				NULL, */
-/* 				(tfuiCallback)NULL, */
-/* 				(tfuiCallback)NULL); */
+    // Add "Continue" button
+    CreateButtonControl(rmScrHdle, menuXMLDescHdle, "continuebutton", prevHdle, GfuiScreenReplace);
+    
+    //Create 'save' button in the bottom right
+    //rmSaveId = CreateButtonControl(rmScrHdle, menuXMLDescHdle, "savebutton", info, rmSaveRes);
 
     if (i < nbCars) {
 	RmNextRace.prevHdle = prevHdle;
 	RmNextRace.info     = info;
 	RmNextRace.start    = start + MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
-			   "data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
-			   540, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmNextRace, rmChgRaceScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
+			    (void*)&RmNextRace, rmChgRaceScreen);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_DOWN, "Next Results", (void*)&RmNextRace, rmChgRaceScreen, NULL);
     }
 
-    GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddKey(rmScrHdle, (unsigned char)27, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddKey(rmScrHdle, (unsigned char)13, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddSKey(rmScrHdle, GLUT_KEY_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
     GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
@@ -425,11 +367,11 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
 
     rmScrHdle = GfuiScreenCreate();
-		void *param = LoadMenuXML("qualifsresultsmenu.xml");
-    CreateStaticControls(param,rmScrHdle);
+		void *menuXMLDescHdle = LoadMenuXML("qualifsresultsmenu.xml");
+    CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
     sprintf(buf, "%s", info->track->name);
-    const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+    const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
     GfuiLabelSetText(rmScrHdle, messId, buf);
 
     const int offset  = 50;
@@ -481,56 +423,29 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 	RmPrevRace.prevHdle = prevHdle;
 	RmPrevRace.info     = info;
 	RmPrevRace.start    = start - MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
-			   "data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
-			   80, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmPrevRace, rmChgQualifScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
+			    (void*)&RmPrevRace, rmChgQualifScreen);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP,   "Previous Results", (void*)&RmPrevRace, rmChgQualifScreen, NULL);
     }
 
-    GfuiButtonCreate(rmScrHdle,
-		     "Continue",
-		     GFUI_FONT_LARGE,
-		     320,
-		     40,
-		     150,
-		     GFUI_ALIGN_HC_VB,
-		     0,
-		     prevHdle,
-		     GfuiScreenReplace,
-		     NULL,
-		     (tfuiCallback)NULL,
-		     (tfuiCallback)NULL);
-
-/*     rmSaveId = GfuiButtonCreate(rmScrHdle, */
-/* 				"Save", */
-/* 				GFUI_FONT_LARGE, */
-/* 				430, */
-/* 				40, */
-/* 				150, */
-/* 				GFUI_ALIGN_HC_VB, */
-/* 				0, */
-/* 				info, */
-/* 				rmSaveRes, */
-/* 				NULL, */
-/* 				(tfuiCallback)NULL, */
-/* 				(tfuiCallback)NULL); */
+    // Add "Continue" button 
+    CreateButtonControl(rmScrHdle, menuXMLDescHdle, "continuebutton", prevHdle, GfuiScreenReplace);
+    
+    //Create 'save' button in the bottom right
+    //rmSaveId = CreateButtonControl(rmScrHdle, menuXMLDescHdle, "savebutton", info, rmSaveRes);
 
     if (i < nbCars) {
 	RmNextRace.prevHdle = prevHdle;
 	RmNextRace.info     = info;
 	RmNextRace.start    = start + MAX_LINES;
-	GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
-			   "data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
-			   540, 40, GFUI_ALIGN_HL_VB, 1,
-			   (void*)&RmNextRace, rmChgQualifScreen,
-			   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
+			    (void*)&RmNextRace, rmChgQualifScreen);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_DOWN, "Next Results", (void*)&RmNextRace, rmChgQualifScreen, NULL);
     }
 
-    GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddSKey(rmScrHdle, GLUT_KEY_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScrHdle, (unsigned char)27, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);
+    GfuiAddKey(rmScrHdle, (unsigned char)13, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(rmScrHdle);
@@ -570,12 +485,12 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 
 	rmScrHdle = GfuiScreenCreate();
 
-	void *param = LoadMenuXML("standingsmenu.xml");
-	CreateStaticControls(param,rmScrHdle);
+	void *menuXMLDescHdle = LoadMenuXML("standingsmenu.xml");
+	CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
 	//Set title
 	sprintf(buf, "%s Standings", race);
-	const int messId = CreateLabelControl(rmScrHdle, param, "racetitle");
+	const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
 	GfuiLabelSetText(rmScrHdle, messId, buf);
 
 	//Show header
@@ -629,39 +544,30 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		RmPrevRace.prevHdle = prevHdle;
 		RmPrevRace.info     = info;
 		RmPrevRace.start    = start - MAX_LINES;
-		GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-up.png", "data/img/arrow-up.png",
-			"data/img/arrow-up.png", "data/img/arrow-up-pushed.png",
-			80, 40, GFUI_ALIGN_HL_VB, 1,
-			(void*)&RmPrevRace, rmChgStandingScreen,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-		GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP,   "Previous Results", (void*)&RmPrevRace, rmChgStandingScreen, NULL);
+		CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
+				    (void*)&RmPrevRace, rmChgStandingScreen);
+		GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_UP, "Previous Results", (void*)&RmPrevRace, rmChgStandingScreen, NULL);
 	}//if start
 
-	//Create 'continue' button in the bottom middle
-	GfuiButtonCreate(rmScrHdle, "Continue", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, 0,
-		prevHdle, GfuiScreenReplace,
-		NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-
+	// Add "Continue" button in the bottom left
+	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "continuebutton", prevHdle, GfuiScreenReplace);
+    
 	//Create 'save' button in the bottom right
-	rmSaveId = GfuiButtonCreate(rmScrHdle, "Save", GFUI_FONT_LARGE, 430, 40, 150,
-		GFUI_ALIGN_HC_VB, 0, info, rmSaveRes, 
-		NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	rmSaveId = CreateButtonControl(rmScrHdle, menuXMLDescHdle, "savebutton", info, rmSaveRes);
 
 	//If there is a next page, show 'next results' button on the bottom extreme right
 	if (i < nbCars) {
 		RmNextRace.prevHdle = prevHdle;
 		RmNextRace.info     = info;
 		RmNextRace.start    = start + MAX_LINES;
-		GfuiGrButtonCreate(rmScrHdle, "data/img/arrow-down.png", "data/img/arrow-down.png",
-			"data/img/arrow-down.png", "data/img/arrow-down-pushed.png",
-			540, 40, GFUI_ALIGN_HL_VB, 1,
-			(void*)&RmNextRace, rmChgStandingScreen,
-			NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+		CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
+				    (void*)&RmNextRace, rmChgStandingScreen);
 		GfuiAddSKey(rmScrHdle, GLUT_KEY_PAGE_DOWN, "Next Results", (void*)&RmNextRace, rmChgStandingScreen, NULL);
 	}//if i
 
-	GfuiAddKey(rmScrHdle, (unsigned char)27, "", prevHdle, GfuiScreenReplace, NULL);//ESC, 'Cancel'
-	GfuiAddKey(rmScrHdle, (unsigned char)13, "", prevHdle, GfuiScreenReplace, NULL);//RETURN, 'Accept'
+	GfuiAddKey(rmScrHdle, (unsigned char)27, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);//ESC, 'Cancel'
+	GfuiAddKey(rmScrHdle, (unsigned char)13, "Return to previous menu", prevHdle, GfuiScreenReplace, NULL);//RETURN, 'Accept'
+	GfuiAddSKey(rmScrHdle, GLUT_KEY_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 	GfuiAddSKey(rmScrHdle, GLUT_KEY_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);//F12, 'Screenshot'
 
 	GfuiScreenActivate(rmScrHdle);
