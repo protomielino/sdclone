@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:18:21 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: guibutton.cpp,v 1.3 2005/02/01 15:55:55 berniw Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,19 +20,16 @@
 /** @file   
     		GUI Buttons Management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: guibutton.cpp,v 1.3 2005/02/01 15:55:55 berniw Exp $
+    @version	$Id$
     @ingroup	gui
 */
 
-#include <stdlib.h>
-#include <cstring>
 #ifdef WIN32
 #include <windows.h>
 #endif
 #include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
-
 
 
 void
@@ -296,29 +293,25 @@ GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int w
 		      void *userDataOnPush, tfuiCallback onPush, 
 		      void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-    int		id;
-    tGfuiButton	*button;
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
-    id = GfuiButtonCreate(scr, text, font, x, y, width, align, mouse, userDataOnPush, onPush, userDataOnFocus,
-			  onFocus, onFocusLost);
+	int id = GfuiButtonCreate(scr, text, font, x, y, width, align, mouse, userDataOnPush, onPush, userDataOnFocus,
+	onFocus, onFocusLost);
 
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    button = &(curObject->u.button);
-		    button->buttonType = GFUI_BTN_STATE;
-		}
-		return id;
-	    }
-	} while (curObject != screen->objects);
-    }
-    return id;
-}
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id) {
+				if (curObject->widget == GFUI_BUTTON) {
+					tGfuiButton	*button = &(curObject->u.button);
+					button->buttonType = GFUI_BTN_STATE;
+				}
+			return id;
+			}
+		} while (curObject != screen->objects);
+	}
+	return id;
+}//GfuiButtonStateCreate
 
 
 /** Add a button to a screen.
@@ -448,193 +441,176 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
 void
 GfuiButtonSetText(void *scr, int id, const char *text)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    gfuiSetLabelText(curObject, &(curObject->u.button.label), text);
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-}
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
+				int oldmax = curObject->xmax;
+				int oldmin = curObject->xmin;
+				gfuiSetLabelText(curObject, &(curObject->u.button.label), text);
+				curObject->xmax = oldmax;
+				curObject->xmin = oldmin;
+				return;
+			}
+		} while (curObject != screen->objects);
+	}
+}//GfuiButtonSetText
 
 
-
-void
-GfuiButtonShowBox(void *scr, int id,bool bShow)
-{
-
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    
-			curObject->u.button.bShowBox = bShow;
-
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-}
-
-
-
-/** Change the label of a button.
+/** Show/hide the framing box around a button.
     @ingroup	gui
     @param	scr	Screen
     @param	id	Button Id
-    @param	text	New label of the button
+    @param	bShow	True-Show frame, False-Dont show
  */
 void
-GfuiButtonSetColor(void *scr, int id,Color color)
+GfuiButtonShowBox(void *scr, int id, bool bShow)
 {
-
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.button.fgColor[1] = color;
-
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-}
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
+				int oldmax = curObject->xmax;
+				int oldmin = curObject->xmin;
+				curObject->u.button.bShowBox = bShow;
+				curObject->xmax = oldmax;
+				curObject->xmin = oldmin;
+				return;
+			}
+		} while (curObject != screen->objects);
+	}
+}//GfuiButtonShowBox
 
 
-void 
-GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile)
-{
-    GLuint disable = 0;
-    GLuint enable = 0;
-    GLuint focused = 0;
-    GLuint pushed = 0;
-
-    if (strlen(disableFile)!=0)
-    	disable = GfImgReadTex(disableFile);
-    if (strlen(enableFile)!=0)
-    	enable = GfImgReadTex(enableFile);
-    if (strlen(focusedFile)!=0)
-    	focused = GfImgReadTex(focusedFile);
-    if (strlen(pushedFile)!=0)
-    	pushed = GfImgReadTex(pushedFile);
-
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.button.disabled = disable;
-		    curObject->u.button.enabled = enable;
-		    curObject->u.button.focused = focused;
-		    curObject->u.button.pushed = pushed;
-		    curObject->u.button.imgX = x;
-		    curObject->u.button.imgY = y;
-	            curObject->u.button.imgWidth = w;
-	            curObject->u.button.imgHeight = h;
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-
-}
-
-
+/** Change the colour of a button.
+    @ingroup	gui
+    @param	scr	Screen
+    @param	id	Button Id
+    @param	color	New colour of the button
+ */
 void
-GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor)
+GfuiButtonSetColor(void *scr, int id, Color color)
 {
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
+				curObject->u.button.fgColor[1] = color;
+				return;
+			}
+		} while (curObject != screen->objects);
+	}
+}//GfuiButtonSetColor
 
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.button.fgFocusColor[1] = focuscolor;
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-}
 
+/** Define button images for different states.
+    @ingroup	gui
+    @param	scr	Screen
+    @param	id	Button Id
+    @param	x		X position on screen
+    @param	y		Y position on screen (0 = bottom)
+    @param	w		width of the button image
+    @param	h		height of the button image
+    @param	disableFile	file that holds the disabled button image version
+    @param	enableFile	file that holds the enabled button image version
+    @param	focusedFile	file that holds the focused button image version
+    @param	pushedFile	file that holds the pushed button image version
+*/
 void
-GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor)
+GfuiButtonSetImage(void *scr, int id, int x, int y, int w, int h,
+	const char *disableFile, const char *enableFile,
+	const char *focusedFile, const char *pushedFile)
 {
+	GLuint disable = 0;
+	GLuint enable = 0;
+	GLuint focused = 0;
+	GLuint pushed = 0;
 
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_BUTTON) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.button.fgFocusColor[2] = pushcolor;
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-}
+	if (strlen(disableFile) != 0)
+		disable = GfImgReadTex(disableFile);
+	if (strlen(enableFile) != 0)
+		enable = GfImgReadTex(enableFile);
+	if (strlen(focusedFile) != 0)
+		focused = GfImgReadTex(focusedFile);
+	if (strlen(pushedFile) != 0)
+		pushed = GfImgReadTex(pushedFile);
+
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
+				int oldmax = curObject->xmax;
+				int oldmin = curObject->xmin;
+				curObject->u.button.disabled = disable;
+				curObject->u.button.enabled = enable;
+				curObject->u.button.focused = focused;
+				curObject->u.button.pushed = pushed;
+				curObject->u.button.imgX = x;
+				curObject->u.button.imgY = y;
+				curObject->u.button.imgWidth = w;
+				curObject->u.button.imgHeight = h;
+				curObject->xmax = oldmax;
+				curObject->xmin = oldmin;
+				return;
+			}
+		} while (curObject != screen->objects);
+	}//if curObject
+}//GfuiButtonSetImage
+
+
+/** Change the focused colour of a button.
+    @ingroup	gui
+    @param	scr	Screen
+    @param	id	Button Id
+    @param	focuscolor	New focus colour of the button
+ */
+void
+GfuiButtonSetFocusColor(void *scr, int id, Color focuscolor)
+{
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
+				curObject->u.button.fgFocusColor[1] = focuscolor;
+				return;
+			}
+		} while (curObject != screen->objects);
+	}
+}//GfuiButtonSetFocusColor
+
+
+/** Change the pushed colour of a button.
+    @ingroup	gui
+    @param	scr	Screen
+    @param	id	Button Id
+    @param	pushcolor	New pushed colour of the button
+ */
+void
+GfuiButtonSetPushedColor(void *scr, int id, Color pushcolor)
+{
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiObject *curObject = screen->objects;
+	if (curObject != NULL) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
+				curObject->u.button.fgFocusColor[2] = pushcolor;
+				return;
+			}
+		} while (curObject != screen->objects);
+	}    
+}//GfuiButtonSetPushedColor
+
 
 /** Get the Id of the button focused in the current screen.
     @ingroup	gui
@@ -644,51 +620,48 @@ GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor)
 int
 GfuiButtonGetFocused(void)
 {
-    tGfuiObject *curObject;
-
-    if (GfuiScreen != NULL) {
-	curObject = GfuiScreen->objects;
-	if (curObject != NULL) {
-	    do {
-		curObject = curObject->next;
-		if (curObject->focus) {
-		    if (curObject->widget == GFUI_BUTTON) {
-			return curObject->id;
-		    }
-		    return -1;
+	if (GfuiScreen != NULL) {
+		tGfuiObject *curObject = GfuiScreen->objects;
+		if (curObject != NULL) {
+			do {
+				curObject = curObject->next;
+				if (curObject->focus) {
+					if (curObject->widget == GFUI_BUTTON) {
+						return curObject->id;
+					}
+				return -1;
+				}
+			} while (curObject != GfuiScreen->objects);
 		}
-	    } while (curObject != GfuiScreen->objects);
 	}
-    }
-    return -1;
+	return -1;
 }
 
+
+/** Actually draws the given button.
+    @ingroup	gui
+    @param	obj	button object to draw
+ */
 void
 gfuiDrawButton(tGfuiObject *obj)
 {
-    tGfuiLabel	*label;
-    tGfuiButton	*button;
-    Color fgColor;
-    Color bgColor;
+	Color fgColor;
+	Color bgColor;
 
+	tGfuiButton *button = &(obj->u.button);
+	if (obj->state == GFUI_DISABLE) {
+		button->state = GFUI_BTN_DISABLE;
+		}
+	if (obj->focus) {
+		fgColor = button->fgFocusColor[button->state];
+		bgColor = button->bgFocusColor[button->state];
+	} else {
+		fgColor = button->fgColor[button->state];
+		bgColor = button->bgColor[button->state];
+	}//if obj->focus
 
-    button = &(obj->u.button);
-    if (obj->state == GFUI_DISABLE) {
-	button->state = GFUI_BTN_DISABLE;
-    }
-    if (obj->focus) {
-	fgColor = button->fgFocusColor[button->state];
-	bgColor = button->bgFocusColor[button->state];
-    } else {
-	fgColor = button->fgColor[button->state];
-	bgColor = button->bgColor[button->state];
-    }
-
-
-	if (bgColor.alpha != 0.0) 
-	{
-		if (button->bShowBox)
-		{
+	if (bgColor.alpha != 0.0) {
+		if (button->bShowBox) {
 			glColor4fv(bgColor.GetPtr());
 			glBegin(GL_QUADS);
 			glVertex2i(obj->xmin, obj->ymin);
@@ -704,24 +677,22 @@ gfuiDrawButton(tGfuiObject *obj)
 			glVertex2i(obj->xmax, obj->ymin);
 			glVertex2i(obj->xmin, obj->ymin);
 			glEnd();	
-		}
+		}//if button->bShowBox
+	}//if bgColor
+
+	//Draw image if any	
+	GLuint img = 0;
+	if (obj->state == GFUI_DISABLE) {
+		img = button->disabled;
+	} else if (button->state == GFUI_BTN_PUSHED) {
+		img = button->pushed;
+	} else if (obj->focus) {
+		img = button->focused;
+	} else {
+		img = button->enabled;
 	}
 
-    	//Draw image if any	
-    	GLuint img = 0;
-
-    	if (obj->state == GFUI_DISABLE) {
-		img = button->disabled;
-    	} else if (button->state == GFUI_BTN_PUSHED) {
-		img = button->pushed;
-    	} else if (obj->focus) {
-		img = button->focused;
-    	} else {
-		img = button->enabled;
-    	}
-
-	if (img!=0)
-	{
+	if (img != 0)	{
 		int x1 = obj->xmin+ button->imgX;
 		int x2 = x1 + button->imgWidth;
 		int y1 = obj->ymin+ button->imgY;
@@ -730,54 +701,55 @@ gfuiDrawButton(tGfuiObject *obj)
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		//set color to mix with image
 		glColor3f(1.0,1.0,1.0);
-	
+
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
+
 		glBindTexture(GL_TEXTURE_2D,img);
 		glBegin(GL_QUADS);
-	
+
 		glTexCoord2f (0.0, 0.0);
 		glVertex2i(x1,y1);
-		
+
 		glTexCoord2f (0.0, 1.0);
 		glVertex2i(x1,y2);
-		
+
 		glTexCoord2f (1.0, 1.0);
 		glVertex2i(x2,y2);
-		
+
 		glTexCoord2f (1.0, 0.0);
 		glVertex2i(x2,y1);
-	
+
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	label = &(button->label);
-    	glColor4fv(fgColor.GetPtr());
-    	gfuiPrintString(label->x, label->y, label->font, label->text);
-}
+	tGfuiLabel *label = &(button->label);
+	glColor4fv(fgColor.GetPtr());
+  gfuiPrintString(label->x, label->y, label->font, label->text);
+}//gfuiDrawButton
 
+
+/** Actually draws the given graphical button.
+    @ingroup	gui
+    @param	obj	button object to draw
+ */
 void
 gfuiDrawGrButton(tGfuiObject *obj)
 {
-    //int sw, sh, vw, vh;
-    tGfuiGrButton	*button;
-    GLuint img;
-
-    button = &(obj->u.grbutton);
-    if (obj->state == GFUI_DISABLE) {
-	img = button->disabled;
-    } else if (button->state == GFUI_BTN_PUSHED) {
-	img = button->pushed;
-    } else if (obj->focus) {
-	img = button->focused;
-    } else {
-	img = button->enabled;
-    }
-
+	tGfuiGrButton *button = &(obj->u.grbutton);
+	GLuint img;
+	if (obj->state == GFUI_DISABLE) {
+		img = button->disabled;
+	} else if (button->state == GFUI_BTN_PUSHED) {
+		img = button->pushed;
+	} else if (obj->focus) {
+		img = button->focused;
+	} else {
+		img = button->enabled;
+	}
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	//set color to mix with image
@@ -806,185 +778,194 @@ gfuiDrawGrButton(tGfuiObject *obj)
 	glDisable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-
 /*
-    GfScrGetSize(&sw, &sh, &vw, &vh);
-    glRasterPos2i(obj->xmin, obj->ymin);
-    glPixelZoom((float)vw / (float)GfuiScreen->width, (float)vh / (float)GfuiScreen->height);
-    glDrawPixels(button->width, button->height, GL_RGBA, GL_UNSIGNED_BYTE, img);
+	int sw, sh, vw, vh;
+	GfScrGetSize(&sw, &sh, &vw, &vh);
+	glRasterPos2i(obj->xmin, obj->ymin);
+	glPixelZoom((float)vw / (float)GfuiScreen->width, (float)vh / (float)GfuiScreen->height);
+	glDrawPixels(button->width, button->height, GL_RGBA, GL_UNSIGNED_BYTE, img);
 */
-	
-}
+}//gfuiDrawGrButton
 
+
+/** Handles the graphical button action.
+    @ingroup	gui
+    @param	action	action
+ */
 void
-gfuiGrButtonAction(int action)
-{
-    tGfuiGrButton	*button;
+gfuiGrButtonAction(int action) {
+	tGfuiGrButton	*button = &(GfuiScreen->hasFocus->u.grbutton);
 
-    button = &(GfuiScreen->hasFocus->u.grbutton);
+	switch (button->buttonType) {
+		case GFUI_BTN_PUSH:
+			if (action == 2) { /* enter key */
+				if (button->onPush != NULL) {
+					button->onPush(button->userDataOnPush);
+				}
+			} else if (action == 1) { /* mouse up */
+				if (button->state != GFUI_BTN_RELEASED) {
+					button->state = GFUI_BTN_RELEASED;
+					if (button->mouseBehaviour == GFUI_MOUSE_UP) {
+						if (button->onPush != NULL) {
+							button->onPush(button->userDataOnPush);
+						}
+					}
+				}
+			} else { /* mouse down */
+				if (button->state != GFUI_BTN_PUSHED) {
+					button->state = GFUI_BTN_PUSHED;
+					if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
+						if (button->onPush != NULL) {
+							button->onPush(button->userDataOnPush);
+						}
+					}
+				}
+			}
+		break;	//GFUI_BTN_PUSH
 
-    switch (button->buttonType) {
-    case GFUI_BTN_PUSH:
-	if (action == 2) { /* enter key */
-	    if (button->onPush != NULL) {
-		button->onPush(button->userDataOnPush);
-	    }
-	} else if (action == 1) { /* mouse up */
-	    if (button->state != GFUI_BTN_RELEASED) {
-		button->state = GFUI_BTN_RELEASED;
-		if (button->mouseBehaviour == GFUI_MOUSE_UP) {
-		    if (button->onPush != NULL) {
-			button->onPush(button->userDataOnPush);
-		    }
-		}
-	    }
-	} else { /* mouse down */
-	    if (button->state != GFUI_BTN_PUSHED) {
-		button->state = GFUI_BTN_PUSHED;
-		if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
-		    if (button->onPush != NULL) {
-			button->onPush(button->userDataOnPush);
-		    }
-		}
-	    }
-	}
-	break;
-	
-    case GFUI_BTN_STATE:
-	if (action == 2) { /* enter key */
-	    if (button->state == GFUI_BTN_RELEASED) {
-		button->state = GFUI_BTN_PUSHED;
-		if (button->onPush != NULL) {
-		    button->onPush(button->userDataOnPush);
-		}
-	    } else {
-		button->state = GFUI_BTN_RELEASED;
-	    }
-	} else if (action == 1) { /* mouse up */
-	    if (button->mouseBehaviour == GFUI_MOUSE_UP) {
-		if (button->state == GFUI_BTN_RELEASED) {
-		    button->state = GFUI_BTN_PUSHED;
-		    if (button->onPush != NULL) {
-			button->onPush(button->userDataOnPush);
-		    }
-		} else {
-		    button->state = GFUI_BTN_RELEASED;
-		}
-	    }
-	} else { /* mouse down */
-	    if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
-		if (button->state == GFUI_BTN_RELEASED) {
-		    button->state = GFUI_BTN_PUSHED;
-		    if (button->onPush != NULL) {
-			button->onPush(button->userDataOnPush);
-		    }
-		} else {
-		    button->state = GFUI_BTN_RELEASED;
-		}
-	    }
-	}
-	break;
-    }
-}
+		case GFUI_BTN_STATE:
+			if (action == 2) { /* enter key */
+				if (button->state == GFUI_BTN_RELEASED) {
+					button->state = GFUI_BTN_PUSHED;
+					if (button->onPush != NULL) {
+						button->onPush(button->userDataOnPush);
+					}
+				} else {
+					button->state = GFUI_BTN_RELEASED;
+				}
+			} else if (action == 1) { /* mouse up */
+				if (button->mouseBehaviour == GFUI_MOUSE_UP) {
+					if (button->state == GFUI_BTN_RELEASED) {
+						button->state = GFUI_BTN_PUSHED;
+						if (button->onPush != NULL) {
+							button->onPush(button->userDataOnPush);
+						}
+					} else {
+						button->state = GFUI_BTN_RELEASED;
+					}
+				}
+			} else { /* mouse down */
+				if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
+					if (button->state == GFUI_BTN_RELEASED) {
+						button->state = GFUI_BTN_PUSHED;
+						if (button->onPush != NULL) {
+							button->onPush(button->userDataOnPush);
+						}
+					} else {
+						button->state = GFUI_BTN_RELEASED;
+					}
+				}
+			}
+		break;	//GFUI_BTN_STATE
+	}//switch
+}//guifGrButtonAction
 
+
+/** Handles the button action.
+    @ingroup	gui
+    @param	action	action
+ */
 void
 gfuiButtonAction(int action)
 {
-    tGfuiButton	*button;
+	tGfuiButton	*button = &(GfuiScreen->hasFocus->u.button);
 
-    button = &(GfuiScreen->hasFocus->u.button);
+	switch (button->buttonType) {
+		case GFUI_BTN_PUSH:
+			if (action == 2) { /* enter key */
+				if (button->onPush != NULL) {
+					button->onPush(button->userDataOnPush);
+				}
+			} else if (action == 1) { /* mouse up */
+				button->state = GFUI_BTN_RELEASED;
+				if (button->mouseBehaviour == GFUI_MOUSE_UP) {
+					if (button->onPush != NULL) {
+						button->onPush(button->userDataOnPush);
+					}
+				}
+			} else { /* mouse down */
+				button->state = GFUI_BTN_PUSHED;
+				if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
+					if (button->onPush != NULL) {
+						button->onPush(button->userDataOnPush);
+					}
+				}
+			}
+		break;	//GFUI_BTN_PUSH
 
-    switch (button->buttonType) {
-    case GFUI_BTN_PUSH:
-	if (action == 2) { /* enter key */
-	    if (button->onPush != NULL) {
-		button->onPush(button->userDataOnPush);
-	    }
-	} else if (action == 1) { /* mouse up */
-	    button->state = GFUI_BTN_RELEASED;
-	    if (button->mouseBehaviour == GFUI_MOUSE_UP) {
-		if (button->onPush != NULL) {
-		    button->onPush(button->userDataOnPush);
-		}
-	    }
-	} else { /* mouse down */
-	    button->state = GFUI_BTN_PUSHED;
-	    if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
-		if (button->onPush != NULL) {
-		    button->onPush(button->userDataOnPush);
-		}
-	    }
-	}
-	break;
-	
-    case GFUI_BTN_STATE:
-	if (action == 2) { /* enter key */
-	    if (button->state == GFUI_BTN_RELEASED) {
-		button->state = GFUI_BTN_PUSHED;
-		if (button->onPush != NULL) {
-		    button->onPush(button->userDataOnPush);
-		}
-	    } else {
-		button->state = GFUI_BTN_RELEASED;
-	    }
-	} else if (action == 1) { /* mouse up */
-	    if (button->mouseBehaviour == GFUI_MOUSE_UP) {
-		if (button->state == GFUI_BTN_RELEASED) {
-		    button->state = GFUI_BTN_PUSHED;
-		    if (button->onPush != NULL) {
-			button->onPush(button->userDataOnPush);
-		    }
-		} else {
-		    button->state = GFUI_BTN_RELEASED;
-		}
-	    }
-	} else { /* mouse down */
-	    if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
-		if (button->state == GFUI_BTN_RELEASED) {
-		    button->state = GFUI_BTN_PUSHED;
-		    if (button->onPush != NULL) {
-			button->onPush(button->userDataOnPush);
-		    }
-		} else {
-		    button->state = GFUI_BTN_RELEASED;
-		}
-	    }
-	}
-	break;
-    }
-}
+		case GFUI_BTN_STATE:
+			if (action == 2) { /* enter key */
+				if (button->state == GFUI_BTN_RELEASED) {
+					button->state = GFUI_BTN_PUSHED;
+					if (button->onPush != NULL) {
+						button->onPush(button->userDataOnPush);
+					}
+				} else {
+					button->state = GFUI_BTN_RELEASED;
+				}
+			} else if (action == 1) { /* mouse up */
+				if (button->mouseBehaviour == GFUI_MOUSE_UP) {
+					if (button->state == GFUI_BTN_RELEASED) {
+						button->state = GFUI_BTN_PUSHED;
+						if (button->onPush != NULL) {
+							button->onPush(button->userDataOnPush);
+						}
+					} else {
+						button->state = GFUI_BTN_RELEASED;
+					}
+				}
+			} else { /* mouse down */
+				if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
+					if (button->state == GFUI_BTN_RELEASED) {
+						button->state = GFUI_BTN_PUSHED;
+						if (button->onPush != NULL) {
+							button->onPush(button->userDataOnPush);
+						}
+					} else {
+						button->state = GFUI_BTN_RELEASED;
+					}
+				}
+			}
+		break;	//GFUI_BTN_STATE
+	}//switch
+}//gfuiButtonAction
 
+
+/** Releases all resources connected with a button.
+    @ingroup	gui
+    @param	obj	button object to release
+ */
 void
 gfuiReleaseButton(tGfuiObject *obj)
 {
-    tGfuiButton	*button;
-    tGfuiLabel	*label;
+	tGfuiButton *button = &(obj->u.button);;
 
-    button = &(obj->u.button);
+	GfImgFreeTex(button->disabled);
+	GfImgFreeTex(button->enabled);
+	GfImgFreeTex(button->focused);
+	GfImgFreeTex(button->pushed);
 
-    GfImgFreeTex(button->disabled);
-    GfImgFreeTex(button->enabled);
-    GfImgFreeTex(button->focused);
-    GfImgFreeTex(button->pushed);
-
-    label = &(button->label);
+	tGfuiLabel *label = &(button->label);
 
 	freez(button->userDataOnFocus);
-    free(label->text);
-    free(obj);
-}
+	free(label->text);
+	free(obj);
+}//gfuiReleaseButton
 
+
+/** Releases all resources connected with a graphical button.
+    @ingroup	gui
+    @param	obj	button object to release
+ */
 void
 gfuiReleaseGrButton(tGfuiObject *obj)
 {
-    tGfuiGrButton	*button;
-    
-    button = &(obj->u.grbutton);
+	tGfuiGrButton	*button = &(obj->u.grbutton);
 
-    GfImgFreeTex(button->disabled);
-    GfImgFreeTex(button->enabled);
-    GfImgFreeTex(button->focused);
-    GfImgFreeTex(button->pushed);
+	GfImgFreeTex(button->disabled);
+	GfImgFreeTex(button->enabled);
+	GfImgFreeTex(button->focused);
+	GfImgFreeTex(button->pushed);
 
-    free(obj);
-}
+	free(obj);
+}//gfuiReleaseGrButton
