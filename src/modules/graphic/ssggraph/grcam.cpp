@@ -1336,23 +1336,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
     
-    /* cam F2 = car inside with car (bonnet view) fixed to the car */
-    cam = new cGrCarCamInsideFixedCar(myscreen,
-				      id,
-				      1,	/* drawCurr */
-				      1,	/* drawBG  */
-				      67.5,	/* fovy */
-				      50.0,	/* fovymin */
-				      95.0,	/* fovymax */
-				      0.3,	/* near */
-				      600.0 * fovFactor,	/* far */
-				      300.0 * fovFactor,	/* fog */
-				      600.0 * fovFactor	/* fog */
-				      );
-    cam->add(&cams[c]);
-    id++;
-    
-    /* cam F2 = car inside with car (driver view)*/
+    /* cam F2 = inside, from the driver's eye (driver's view) */
     cam = new cGrCarCamInside(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1368,7 +1352,23 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F2 = car inside car (no car - road view) */
+    /* cam F2 = inside, from the board (bonnet view), fixed to the car */
+    cam = new cGrCarCamInsideFixedCar(myscreen,
+				      id,
+				      1,	/* drawCurr */
+				      1,	/* drawBG  */
+				      67.5,	/* fovy */
+				      50.0,	/* fovymin */
+				      95.0,	/* fovymax */
+				      0.3,	/* near */
+				      600.0 * fovFactor,	/* far */
+				      300.0 * fovFactor,	/* fog */
+				      600.0 * fovFactor	/* fog */
+				      );
+    cam->add(&cams[c]);
+    id++;
+    
+    /* cam F2 = ahead the windshield, from the bonnet (road view, car not visible) */
     cam = new cGrCarCamInsideFixedCar(myscreen,
 				      id,
 				      0,	/* drawCurr */
@@ -1384,7 +1384,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F2 = behind very near */
+    /* cam F2 = behind the car, very near */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1403,7 +1403,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
     
-    /* cam F2 = behind near */
+    /* cam F2 = behind the car, near */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1426,7 +1426,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
     
-    /* cam F3 = behind far */
+    /* cam F3 = behind the car, far */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1445,7 +1445,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F3 = car behind*/
+    /* cam F3 = car behind */
     cam = new cGrCarCamBehind2(myscreen,
 			       id,
 			       1,	/* drawCurr */
@@ -1462,7 +1462,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F3 = car behind*/
+    /* cam F3 = car behind */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1480,7 +1480,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F3 = car reverse*/
+    /* cam F3 = car reverse */
     cam = new cGrCarCamFront(myscreen,
 			     id,
 			     1,	/* drawCurr */
@@ -1501,7 +1501,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
 
-    /* cam F4 = car side 1*/
+    /* cam F4 = car side 1 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1520,7 +1520,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 2*/
+    /* cam F4 = car side 2 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1539,7 +1539,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 3*/
+    /* cam F4 = car side 3 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1558,7 +1558,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 4*/
+    /* cam F4 = car side 4 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1577,7 +1577,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 5*/
+    /* cam F4 = car side 5 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1596,7 +1596,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 6*/
+    /* cam F4 = car side 6 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1615,7 +1615,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 7*/
+    /* cam F4 = car side 7 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1634,7 +1634,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F4 = car side 8*/
+    /* cam F4 = car side 8 */
     cam = new cGrCarCamSide(myscreen,
 			    id,
 			    1,	/* drawCurr */
@@ -1657,7 +1657,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
 
-    /* cam F5 = car up 1*/
+    /* cam F5 = car up 1 */
     cam = new cGrCarCamUp(myscreen,
 			  id,
 			  1,	/* drawCurr */
@@ -1678,7 +1678,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F5 = car up 2*/
+    /* cam F5 = car up 2 */
     cam = new cGrCarCamUp(myscreen,
 			  id,
 			  1,	/* drawCurr */
@@ -1698,7 +1698,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F5 = car up 3*/
+    /* cam F5 = car up 3 */
     cam = new cGrCarCamUp(myscreen,
 			  id,
 			  1,	/* drawCurr */
@@ -1718,7 +1718,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
-    /* cam F5 = car up 4*/
+    /* cam F5 = car up 4 */
     cam = new cGrCarCamUp(myscreen,
 			  id,
 			  1,	/* drawCurr */
