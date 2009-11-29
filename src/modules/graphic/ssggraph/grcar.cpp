@@ -601,16 +601,19 @@ grInitCar(tCarElt *car)
 
 	GfOut("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
 
-	/* Set textures search path : 
+	/* Set textures search path : 0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common textures */
 	grFilePath = (char*)malloc(4096);
 	lg = 0;
+	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carName);
 	lg += sprintf(grFilePath + lg, "drivers/%s;", car->_modName);
 	lg += sprintf(grFilePath + lg, "cars/%s;", car->_carName);
 	lg += sprintf(grFilePath + lg, "data/textures");
+
+	GfOut("grFilePath(len=%d)='%s'\n", strlen(grFilePath), grFilePath);
 
 	grCarInfo[index].envSelector = (ssgStateSelector*)grEnvSelector->clone();
 	grCarInfo[index].envSelector->ref();
@@ -635,15 +638,17 @@ grInitCar(tCarElt *car)
 	DBG_SET_NAME(carBody, "LOD", index, 0);
 	LODSel->addKid(carBody);
 
-	/* Set textures/models search path : 
+	/* Set textures/models search path : 0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common models / textures */
-	sprintf(buf, "drivers/%s/%d/%s;drivers/%s/%d;drivers/%s/%s;drivers/%s;"
+	sprintf(buf, "%sdrivers/%s/%s;drivers/%s/%d/%s;drivers/%s/%d;drivers/%s/%s;drivers/%s;"
 		"cars/%s;data/objects;data/textures", 
+		GetLocalDir(), car->_modName, car->_carName, 
 		car->_modName, car->_driverIndex, car->_carName,
 		car->_modName, car->_driverIndex,
 		car->_modName, car->_carName,
 		car->_modName,
 		car->_carName);
+	GfOut("ssgModelPath(len=%d)='%s'\n", strlen(buf), buf);
 	ssgModelPath(buf);
 	ssgTexturePath(buf);
 	grTexturePath = strdup(buf);
