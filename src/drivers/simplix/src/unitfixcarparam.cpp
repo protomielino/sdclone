@@ -358,21 +358,23 @@ double TFixCarParam::CalcMaxSpeed
   double factor = 1.0;
   if (AbsCrv > AbsCrv1)
   {
-//    if (fabs(AbsCrv) > 1/45.0)
+	factor = 1.015; 
+/**/
     if (fabs(AbsCrv) > 1/50.0)
 	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
 	else if (!oDriver->oUseAccelOut)
 	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
-	else
-	  factor = 1.015;
+/**/	  
   }
   else
   {
 	factor = 0.985;
+/**/
     if (fabs(AbsCrv) > 1/45.0)
 	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
 	else
 	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
+/**/
   }
 /*
   if (TDriver::UseBrakeLimit)
