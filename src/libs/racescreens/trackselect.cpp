@@ -33,6 +33,7 @@
 
 #define DESC_LINE_LENGTH    21  //Line length for track description
 
+
 /* Tracks Categories */
 static tFList *CategoryList;
 static void *ScrHandle;
@@ -46,6 +47,9 @@ static int DescId;
 static int Desc2Id;
 static int PitsId;
 static tRmTrackSelect *TrackSelect;
+
+#define MAXPATHSIZE 256
+static char path[MAXPATHSIZE];
 
 
 static void
@@ -73,7 +77,8 @@ rmtsGetMapName(char* mapNameBuf, unsigned mapNameBufSize)
 }
 
 
-static void rmtsDeactivate(void *screen)
+static void
+rmtsDeactivate(void *screen)
 {
     GfuiScreenRelease(ScrHandle);
 
@@ -83,8 +88,9 @@ static void rmtsDeactivate(void *screen)
     }
 }
 
+
 /** 
- * WordWrap
+ * rmtsWordWrap
  * 
  * Cuts the input string into two, according to the line length given.
  * 
@@ -134,7 +140,7 @@ rmtsUpdateTrackInfo(void)
         return;
     }
 
-    /* Try and load track 3D model (never fails ?) */
+    /* Read the length of the track */
     trk = TrackSelect->trackItf.trkBuild(buf);
     if (!trk) {
         GfError("Could not load track 3D model\n");
@@ -183,7 +189,6 @@ rmtsUpdateTrackInfo(void)
 static char*
 rmtsGetTrackName(const char *category, const char *trackName)
 {
-    static char path[256];
     void *trackHandle;
     char *name;
 
@@ -210,7 +215,6 @@ rmtsGetTrackName(const char *category, const char *trackName)
 static char*
 rmtsGetCategoryName(const char *category)
 {
-    static char path[256];
     void *categoryHandle;
     char *name;
 
@@ -230,11 +234,9 @@ rmtsGetCategoryName(const char *category)
 
 
 /* Select next/previous track from currently selected track category */
-static void rmtsTrackPrevNext(void *vsel)
+static void
+rmtsTrackPrevNext(void *vsel)
 {
-	const unsigned maxPathSize = 256;
-	static char path[maxPathSize];
-
 	/* Get next/previous usable track
 		Note: Here, we assume there's at least one usable track in current category,
 		which is guaranteed by CategoryList initialization in RmTrackSelect,
@@ -256,17 +258,15 @@ static void rmtsTrackPrevNext(void *vsel)
 	/* Update GUI */
 	GfuiLabelSetText(ScrHandle, TrackLabelId, curTr->dispName);
 	//GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
-	GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
+	GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, MAXPATHSIZE));
 	rmtsUpdateTrackInfo();
 }//rmtsTrackPrevNext
 
 
 /* Select next/previous track category */
-static void rmtsTrackCatPrevNext(void *vsel)
+static void
+rmtsTrackCatPrevNext(void *vsel)
 {
-    const unsigned maxPathSize = 256;
-    static char path[maxPathSize];
-
     /* Get next/previous usable track category
        Note: Here, we assume there's at least one,
              which is guaranteed by CategoryList initialization in RmTrackSelect */
@@ -318,14 +318,14 @@ static void rmtsTrackCatPrevNext(void *vsel)
     GfuiLabelSetText(ScrHandle, CatLabelId, CategoryList->dispName);
     GfuiLabelSetText(ScrHandle, TrackLabelId, ((tFList*)curCat->userData)->dispName);
     //GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
-    GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
+    GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, MAXPATHSIZE));
     rmtsUpdateTrackInfo();
 }
 
 
-void rmtsSelect(void * /* dummy */)
+static void
+rmtsSelect(void * /* dummy */)
 {
-    static char path[256];
     int curTrkIdx;
 
     curTrkIdx = (int)GfParmGetNum(TrackSelect->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
@@ -337,7 +337,8 @@ void rmtsSelect(void * /* dummy */)
 }
 
 
-static void rmtsAddKeys(void)
+static void
+rmtsAddKeys(void)
 {
     GfuiAddKey(ScrHandle, 13, "Select Track", NULL, rmtsSelect, NULL);
     GfuiAddKey(ScrHandle, 27, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
@@ -358,9 +359,6 @@ static void rmtsAddKeys(void)
 void
 RmTrackSelect(void *vs)
 {
-    const unsigned maxPathSize = 256;
-    static char path[maxPathSize];
-
     const char *defaultTrack;
     const char *defaultCategory;
     tFList *curCat;
@@ -572,7 +570,7 @@ RmTrackSelect(void *vs)
     /* Create static preview/map for currently selected track */
     //MapId = CreateStaticImageControl(ScrHandle,param,"trackimage");
     //GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
-    GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
+    GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, MAXPATHSIZE));
 
     CreateButtonControl(ScrHandle,param,"accept",NULL,rmtsSelect);
     CreateButtonControl(ScrHandle,param,"back",TrackSelect->prevScreen,rmtsDeactivate);
