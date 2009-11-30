@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:33:01 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: racescreens.h,v 1.2 2003/06/24 21:02:24 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -25,10 +25,7 @@
 #ifndef __RACEMANTOOLS_H__
 #define __RACEMANTOOLS_H__
 
-#include <car.h>
 #include <raceman.h>
-#include <track.h>
-#include <simu.h>
 
 typedef struct
 {
@@ -68,7 +65,6 @@ typedef struct
 
 
 extern void RmTrackSelect(void * /* vs */);
-extern char *RmGetTrackName(const char * /* category */, const char * /* trackName */);
 
 extern void RmDriversSelect(void * /* vs */);
 extern void RmDriverSelect(void * /* vs */);

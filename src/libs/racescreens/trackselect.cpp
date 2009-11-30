@@ -23,19 +23,12 @@
 */
 
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cstring>
-#include <string>
-#include <sstream>
-#include <iterator>
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <portability.h>
+#include <sstream>
+#include <iterator>
 #include <tgfclient.h>
-#include <track.h>
-#include <raceman.h>
 #include "racescreens.h"
 
 #define DESC_LINE_LENGTH    21  //Line length for track description
@@ -55,20 +48,23 @@ static int PitsId;
 static tRmTrackSelect *TrackSelect;
 
 
-static void rmtsActivate(void * /* dummy */)
+static void
+rmtsActivate(void * /* dummy */)
 {
     /* call display function of graphic */
     //gfuiReleaseImage(MapId);
 }
 
 
-static void rmtsFreeLists(void *vl)
+static void
+rmtsFreeLists(void *vl)
 {
     GfDirFreeList((tFList*)(((tFList*)vl)->userData), NULL, true, true);
 }
 
 
-static char * rmtsGetMapName(char* mapNameBuf, unsigned mapNameBufSize)
+static char*
+rmtsGetMapName(char* mapNameBuf, unsigned mapNameBufSize)
 {
     snprintf(mapNameBuf, mapNameBufSize, "tracks/%s/%s/%s.png", CategoryList->name,
          ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
@@ -98,7 +94,7 @@ static void rmtsDeactivate(void *screen)
  * @param   length  Line length limit where wrapping should occur
  */
 static void
-WordWrap(const std::string str, std::string &str1, std::string &str2, unsigned int length)
+rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsigned int length)
 {
     //istream_iterator iterates through the container
     //using whitespaces as delimiters, so it is an ideal tool
@@ -116,10 +112,11 @@ WordWrap(const std::string str, std::string &str1, std::string &str2, unsigned i
     
     if(str.size() >= length)    //If input string was longer than required,
         str2 = str.substr(str1.size()); //put the rest in str2.
-}//WordWrap
+}//rmtsWordWrap
 
 
-static void rmtsUpdateTrackInfo(void)
+static void
+rmtsUpdateTrackInfo(void)
 {
     const unsigned bufSize = 256;
     static char buf[bufSize];
@@ -149,7 +146,7 @@ static void rmtsUpdateTrackInfo(void)
     std::string strDesc = GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, "");
 
     std::string str1, str2;
-    WordWrap(strDesc, str1, str2, DESC_LINE_LENGTH);
+    rmtsWordWrap(strDesc, str1, str2, DESC_LINE_LENGTH);
     GfuiLabelSetText(ScrHandle, DescId, str1.c_str());
     GfuiLabelSetText(ScrHandle, Desc2Id, str2.c_str());
 
@@ -183,8 +180,8 @@ static void rmtsUpdateTrackInfo(void)
     @return Long track name
     @ingroup    racemantools
  */
-char *
-RmGetTrackName(const char *category, const char *trackName)
+static char*
+rmtsGetTrackName(const char *category, const char *trackName)
 {
     static char path[256];
     void *trackHandle;
@@ -210,8 +207,8 @@ RmGetTrackName(const char *category, const char *trackName)
     @return category display name
     @ingroup    racemantools
 */
-char *
-RmGetCategoryName(const char *category)
+static char*
+rmtsGetCategoryName(const char *category)
 {
     static char path[256];
     void *categoryHandle;
@@ -235,35 +232,34 @@ RmGetCategoryName(const char *category)
 /* Select next/previous track from currently selected track category */
 static void rmtsTrackPrevNext(void *vsel)
 {
-    const unsigned maxPathSize = 256;
-    static char path[maxPathSize];
+	const unsigned maxPathSize = 256;
+	static char path[maxPathSize];
 
-    /* Get next/previous usable track
-       Note: Here, we assume there's at least one usable track in current category,
-             which is guaranteed by CategoryList initialization in RmTrackSelect,
-             and by rmtsTrackCatPrevNext */
-    tFList *curTr = (tFList*)(CategoryList->userData);
-    do {
-        
-        curTr = vsel ? curTr->next : curTr->prev;
-        
-        /* Try and get the track display name if not already done */
-        if (!curTr->dispName) {
-        curTr->dispName = RmGetTrackName(CategoryList->name, curTr->name);
-        if (!curTr->dispName || strlen(curTr->dispName) == 0) {
-            GfTrace("rmtsTrackPrevNext: No definition for track %s\n", curTr->name);
-        }
-        }
-        
-    } while (!curTr->dispName && curTr != (tFList*)(CategoryList->userData));
-    CategoryList->userData = (void*)curTr;
-    
-    /* Update GUI */
-    GfuiLabelSetText(ScrHandle, TrackLabelId, curTr->dispName);
-    //GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
-    GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
-    rmtsUpdateTrackInfo();
-}
+	/* Get next/previous usable track
+		Note: Here, we assume there's at least one usable track in current category,
+		which is guaranteed by CategoryList initialization in RmTrackSelect,
+		and by rmtsTrackCatPrevNext */
+	tFList *curTr = (tFList*)(CategoryList->userData);
+	do {
+		curTr = vsel ? curTr->next : curTr->prev;
+
+		/* Try and get the track display name if not already done */
+		if (!curTr->dispName) {
+			curTr->dispName = rmtsGetTrackName(CategoryList->name, curTr->name);
+			if (!curTr->dispName || strlen(curTr->dispName) == 0) {
+				GfTrace("rmtsTrackPrevNext: No definition for track %s\n", curTr->name);
+			}
+		}
+	} while (!curTr->dispName && curTr != (tFList*)(CategoryList->userData));
+	CategoryList->userData = (void*)curTr;
+
+	/* Update GUI */
+	GfuiLabelSetText(ScrHandle, TrackLabelId, curTr->dispName);
+	//GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+	GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, maxPathSize));
+	rmtsUpdateTrackInfo();
+}//rmtsTrackPrevNext
+
 
 /* Select next/previous track category */
 static void rmtsTrackCatPrevNext(void *vsel)
@@ -282,7 +278,7 @@ static void rmtsTrackCatPrevNext(void *vsel)
     
     /* Try and get the category display name if not already done */
     if (curCat->userData && !curCat->dispName) {
-        curCat->dispName = RmGetCategoryName(curCat->name);
+        curCat->dispName = rmtsGetCategoryName(curCat->name);
         if (!curCat->dispName || strlen(curCat->dispName) == 0) {
         GfTrace("rmtsTrackCatPrevNext: No definition for track category %s\n", curCat->name);
         }
@@ -297,7 +293,7 @@ static void rmtsTrackCatPrevNext(void *vsel)
     
         /* Try and get the track display name if not already done */
         if (!curTr->dispName) {
-            curTr->dispName = RmGetTrackName(curCat->name, curTr->name);
+            curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
             if (!curTr->dispName || strlen(curTr->dispName) == 0) {
             GfTrace("rmtsTrackCatPrevNext: No definition for track %s\n", curTr->name);
             }
@@ -438,7 +434,7 @@ RmTrackSelect(void *vs)
         if (curCat->userData && !strcmp(curCat->name, defaultCategory)) {
             
             /* Try and get the category display name, and exit loop if it failed */
-            curCat->dispName = RmGetCategoryName(curCat->name);
+            curCat->dispName = rmtsGetCategoryName(curCat->name);
             if (!curCat->dispName || strlen(curCat->dispName) == 0) {
             GfTrace("RmTrackSelect: No definition for default track category %s\n", 
                 curCat->name);
@@ -459,7 +455,7 @@ RmTrackSelect(void *vs)
                 if (!strcmp(curTr->name, defaultTrack)) {
                 
                 /* Try and get the track display name */
-                curTr->dispName = RmGetTrackName(curCat->name, curTr->name);
+                curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
                 if (!curTr->dispName || strlen(curTr->dispName) == 0)
                     GfTrace("RmTrackSelect: No definition for default track %s\n",
                         curTr->name);
@@ -499,7 +495,7 @@ RmTrackSelect(void *vs)
         
         /* Try and get the category display name if not already done */
         if (curCat->userData && !curCat->dispName) {
-            curCat->dispName = RmGetCategoryName(curCat->name);
+            curCat->dispName = rmtsGetCategoryName(curCat->name);
             if (!curCat->dispName || strlen(curCat->dispName) == 0) {
             GfTrace("RmTrackSelect: No definition for track category %s\n", curCat->name);
             }
@@ -518,7 +514,7 @@ RmTrackSelect(void *vs)
         
             /* Try and load the track file if we don't have yet the track disp name */
             if (!curTr->dispName) {
-                curTr->dispName = RmGetTrackName(curCat->name, curTr->name);
+                curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
                 if (!curTr->dispName || strlen(curTr->dispName) == 0)
                 GfTrace("RmTrackSelect: No definition for track %s\n", curTr->name);
             }
