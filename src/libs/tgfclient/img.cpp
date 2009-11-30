@@ -4,7 +4,7 @@
     created              : Tue Aug 17 20:13:08 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: img.cpp,v 1.5 2006/10/29 15:55:33 berniw Exp $
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,7 +20,7 @@
     		Images manipulation tools.
 		Load and store png images with easy interface.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: img.cpp,v 1.5 2006/10/29 15:55:33 berniw Exp $
+    @version	$Id$
     @ingroup	img		
 */
 
@@ -292,36 +292,12 @@ GfImgFreeTex(GLuint tex)
 GLuint
 GfImgReadTex(const char *filename)
 {
-	void *handle;
-	float screen_gamma;
-	GLbyte *tex;
 	int w, h;
-	GLuint retTex;
-
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
-	tex = (GLbyte*)GfImgReadPng(filename, &w, &h, screen_gamma);
-
-	if (!tex) {
-		GfParmReleaseHandle(handle);
-		return 0;
-	}
-
-	glGenTextures(1, &retTex);
-	glBindTexture(GL_TEXTURE_2D, retTex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
-
-	free(tex);
-
-	GfParmReleaseHandle(handle);
-	return retTex;
+	return GfImgReadTex(filename, w, h);
 }
 
 GLuint
-GfImgReadTex(const char *filename, int &width,int &height)
+GfImgReadTex(const char *filename, int &width, int &height)
 {
 	void *handle;
 	float screen_gamma;
