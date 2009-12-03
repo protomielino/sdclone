@@ -390,6 +390,10 @@ void TLane::CalcMaxSpeeds
 	  oTrack->Friction(P)*Factor,
   	  TrackRollAngle);
 
+    double TrackTurnangle = CalcTrackTurnangle(P, (P + 50) % N);
+    if (TrackTurnangle > 0.7)
+		Speed *= 0.75;
+
 	if (Speed < 5)
 		Speed = 5.0;
 
@@ -691,6 +695,19 @@ double TLane::CalcTrackRollangle(double TrackPos)
 {
   int P = oTrack->IndexFromPos(TrackPos);
   return atan2(oPathPoints[P].Norm().z, 1);
+}
+//==========================================================================*
+
+//==========================================================================*
+// Calculate Track Turnangle
+//--------------------------------------------------------------------------*
+double TLane::CalcTrackTurnangle(int P, int Q)
+{
+  double TotalCrv = 0;
+  while (P < Q)
+	TotalCrv += oPathPoints[P++].Crv;
+
+  return fabs(TotalCrv);
 }
 //==========================================================================*
 

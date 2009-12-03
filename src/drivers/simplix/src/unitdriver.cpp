@@ -1083,7 +1083,6 @@ void TDriver::Drive()
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
   double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
-
 //  cTimeSum[0] += RtDuration(StartTimeStamp);
 
   AvoidOtherCars(oLanePoint.Crv,Close,oLetPass); // General avoiding

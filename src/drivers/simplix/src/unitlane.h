@@ -151,6 +151,7 @@ class TLane
 	  (int Start, int Len) const;
 	double CalcEstimatedLapTime() const;
 	double CalcTrackRollangle(double TrackPos);
+	double CalcTrackTurnangle(int P, int Q);
 
   protected:
 	TTrackDescription* oTrack;                   // TORCS track data
