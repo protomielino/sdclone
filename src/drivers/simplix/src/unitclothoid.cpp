@@ -9,7 +9,7 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.02.13
+// Last changed : 2009.12.03
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -558,6 +558,7 @@ void TClothoidLane::OptimisePath
 	TPathPt* L4 = &oPathPoints[0];
 	TPathPt* L5 = &oPathPoints[Step];
 	TPathPt* L6 = &oPathPoints[2 * Step];
+	TPathPt* LFly;
 
 	// Go forwards
 	int	K = 3 * Step;
@@ -571,20 +572,25 @@ void TClothoidLane::OptimisePath
 	  L4 = L5;
 	  L5 = L6;
 	  L6 = &oPathPoints[K];
+	  LFly = L3;  
 
 	  int Index = (K + Count - 3 * Step) % Count;
+      double Factor = 1.016f;
 
-	  if (BumpMod == 2 && L3->FlyHeight > 0.1)
+	  if (LFly->FlyHeight > 0.035)
+	  {
+		Optimise(Factor/100, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+	  }
+	  else if (BumpMod == 2 && L3->FlyHeight > 0.1)
 	  {
 		//GfOut("OptimiseLine Index: %d\n",Index);
 		OptimiseLine(Index, Step, 0.1, L3, L2, L4);
 	  }
 	  else
 	  {
-//		Optimise(1.015, L3, L0, L1, L2, L4, L5, L6, BumpMod);
-		Optimise(1.016, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+		Optimise(Factor, L3, L0, L1, L2, L4, L5, L6, BumpMod);
 	  }
-
+      //K = (K + Step) % Count; 
       K += Step;
 	  if (K >= Count)
 		K = 0;
