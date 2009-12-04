@@ -29,6 +29,7 @@
 #include <sstream>
 #include <iterator>
 #include <tgfclient.h>
+#include <portability.h>
 #include "racescreens.h"
 
 #define DESC_LINE_LENGTH    21  //Line length for track description
