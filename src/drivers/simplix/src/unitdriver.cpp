@@ -3250,11 +3250,7 @@ void TDriver::SideBorderOuter(float Factor)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv(double Crv)
 {
-//  if ((this->*CalcCrvFoo) != NULL)
-//    return (this->*CalcCrvFoo)(Crv);
-//  else
-//    return Crv;
-	return 1.0;
+    return (this->*CalcCrvFoo)(Crv);
 }
 //==========================================================================*
 
@@ -3263,11 +3259,7 @@ double TDriver::CalcCrv(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin(double Crv)
 {
-//  if ((this->*CalcHairpinFoo) != NULL)
-//    return (this->*CalcHairpinFoo)(Crv);
-//  else
-//    return Crv;
-	return 1.0;
+    return (this->*CalcHairpinFoo)(Crv);
 }
 //==========================================================================*
 
@@ -3285,8 +3277,9 @@ double TDriver::CalcCrv_simplix(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_TRB1(double Crv)
 {
-  return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
   //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 
@@ -3295,8 +3288,9 @@ double TDriver::CalcCrv_simplix_TRB1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
 {
-  return MAX(0.75,MIN(3.0,75000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(3.0,75000.0 * Crv * Crv * Crv));
   //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 
@@ -3326,8 +3320,10 @@ double TDriver::CalcHairpin_simplix(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 {
-  return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
+  // return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
   //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
+
 }
 //==========================================================================*
 
@@ -3336,8 +3332,9 @@ double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_SC(double Crv)
 {
-  return MAX(1.0,MIN(2.5,140000.0 * Crv * Crv * Crv));
+  //return MAX(1.0,MIN(2.5,140000.0 * Crv * Crv * Crv));
   //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 
