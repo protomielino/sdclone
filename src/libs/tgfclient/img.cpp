@@ -44,16 +44,16 @@ static char buf[1024];
 
 int GetClosestPowerof2(int Size)
 {
-	int sizes[8] = {2,4,16,128,256,512,1024,2048 };
+	int sizes[7] = {2,4,16,128,256,512,1024};
 
-	for (int i=0;i<8;i++)
+	for (int i=0;i<7;i++)
 	{
 		if (Size<=sizes[i])
 			return sizes[i];
 	}
 
-	//Do not allow textures larger then this for memory usage reasons
-	return 2048;
+	//Do not allow textures larger then this for memory usage reasons and performance reasons
+	return 1024;
 }
 
 void
