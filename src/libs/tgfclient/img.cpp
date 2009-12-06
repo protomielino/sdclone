@@ -36,7 +36,7 @@
 #ifdef WIN32
 #include <direct.h>
 #endif
-#include "GL/Glu.h"
+#include "GL/glu.h"
 
 static char buf[1024];
 

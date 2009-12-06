@@ -32,6 +32,9 @@
 #include "gui.h"
 #include "guifont.h"
 
+static int g_tipX = 320;
+static int g_tipY = 15;
+
 void
 gfuiLabelInit(void)
 {
@@ -146,6 +149,13 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
     return GfuiLabelCreateEx(scr, text, &(GfuiColor[GFUI_LABELCOLOR][0]), font, x, y, align, maxlen);
 }
 
+void
+GfuiSetTipPosition(int x,int y)
+{
+	g_tipX = x;
+	g_tipY = y;
+}
+
 /** Add a Tip (generally associated with a button).
     @param	scr	Screen where to add the label
     @param	text	Text of the label
@@ -156,7 +166,7 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
 int
 GfuiTipCreate(void *scr, const char *text, int maxlen)
 {
-    return GfuiLabelCreateEx(scr, text, &(GfuiColor[GFUI_TIPCOLOR][0]), GFUI_FONT_SMALL, 320, 15, GFUI_ALIGN_HC_VB, maxlen);
+    return GfuiLabelCreateEx(scr, text, &(GfuiColor[GFUI_TIPCOLOR][0]), GFUI_FONT_SMALL, g_tipX,g_tipY, GFUI_ALIGN_HC_VB, maxlen);
 }
 
 /** Add a Title to the screen.

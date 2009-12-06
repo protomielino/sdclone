@@ -184,6 +184,7 @@ extern int GfuiLabelCreate(void *scr, const char *text,
                         int font, int x, int y, int align, int maxlen);
 extern int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, int x, int y, int align, int maxlen);
 
+extern void GfuiSetTipPosition(int x,int y);
 extern int GfuiTipCreate(void *scr, const char *text, int maxlen);
 extern int GfuiTitleCreate(void *scr, const char *text, int maxlen);
 
