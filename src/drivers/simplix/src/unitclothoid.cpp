@@ -9,7 +9,7 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.03
+// Last changed : 2009.12.06
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000

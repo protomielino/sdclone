@@ -9,7 +9,7 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.07.12
+// Last changed : 2009.12.06
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -112,8 +112,6 @@ double TFixCarParam::CalcAcceleration(
   double CD = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
-//  double Crv = (Crv0  + Crv1) * 0.5;
-//  double Crvz = (Crvz0 + Crvz1) * 0.5; 
   double Crv = (0.25*Crv0  + 0.75*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1); 
   if (Crvz > 0)
@@ -193,7 +191,10 @@ double	TFixCarParam::CalcBraking
   double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
 
-  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
+  //if (oCrvComp)
+    Crv *= oDriver->CalcCrv(fabs(Crv));
+  //else
+  //  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
 
   if (Crvz > 0)
 	Crvz = 0; 
@@ -280,7 +281,10 @@ double	TFixCarParam::CalcBrakingPit
   double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
 
-  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
+  //if (oCrvComp)
+    Crv *= oDriver->CalcCrv(fabs(Crv));
+  //else
+  //  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat  = G * sin(TrackRollAngle);
@@ -393,7 +397,6 @@ double TFixCarParam::CalcMaxSpeed
 
   double MuF = Friction * oTyreMuFront * CarParam.oScaleMu;
   double MuR = Friction * oTyreMuRear * CarParam.oScaleMu;
-  //Mu = MIN(MuF,MuR) /(( 3 + oTmpCarParam->oSkill)/4);
   Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
 
   Den = (AbsCrv - ScaleBump * CrvZ)
@@ -403,8 +406,9 @@ double TFixCarParam::CalcMaxSpeed
    Den = 0.00001;
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
-  if (fabs(AbsCrv) > 1/21.5)
-    Speed *= 0.90;                               // Filter hairpins
+//  if (fabs(AbsCrv) > 1/21.5)
+  if (fabs(AbsCrv) > 1/45.0)
+    Speed *= 0.89;                               // Filter hairpins
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
     Speed = 112;                                 
 

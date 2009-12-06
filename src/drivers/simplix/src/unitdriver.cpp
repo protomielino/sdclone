@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.07.26
+// Last changed : 2009.12.06
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -181,6 +181,7 @@ TDriver::TDriver(int Index):
   oFlyHeight(0.06f),
   oScaleSteer(1.0),
   oStayTogether(10.0),
+  oCrvComp(true),
   oAvoidScale(8.0),
   oAvoidWidth(1.5),
   oGoToPit(false),
@@ -828,6 +829,10 @@ void TDriver::InitTrack
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_STAY_TOGETHER,0,10);
   GfOut("#oStayTogether %g\n",oStayTogether);
 
+  oCrvComp = (int)
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CRV_COMP,0,1);
+  GfOut("#oCrvComp %g\n",oCrvComp);
+
   for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
     oBrakeCoeff[I] = oInitialBrakeCoeff;
 
@@ -1164,7 +1169,7 @@ void TDriver::Drive()
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
   //else
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
-  //GfOut("t:%.2f s v:(%.1f)%.1f km/h Z:%.3f RA:%.3f RAD:%.1f F:%.3f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz,TrackRollangle,1/oLanePoint.Crv,CalcCrv_simplix_SC(fabs(oLanePoint.Crv)),CalcHairpin_simplix_SC(fabs(oLanePoint.Crv)));
+  //GfOut("v:(%.1f)%.1f km/h RA:%.3f RAD:%.1f H:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,1/(oLanePoint.Crv*CalcCrv_simplix_SC(fabs(oLanePoint.Crv))),1/(oLanePoint.Crv*CalcHairpin_simplix_SC(fabs(oLanePoint.Crv))));
 }
 //==========================================================================*
 
@@ -3288,9 +3293,18 @@ double TDriver::CalcCrv_simplix_TRB1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
 {
+  if (oCrvComp)
+  {
+    if (Crv < 0.0025) 
+	  return 1.0;
+    else
+      return 1.25 * (1 + Crv);
+  }
+  else
+    return 1.0;
+
   //return MAX(0.75,MIN(3.0,75000.0 * Crv * Crv * Crv));
   //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
-  return 1.0;
 }
 //==========================================================================*
 
@@ -3334,7 +3348,12 @@ double TDriver::CalcHairpin_simplix_SC(double Crv)
 {
   //return MAX(1.0,MIN(2.5,140000.0 * Crv * Crv * Crv));
   //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
-  return 1.0;
+  if (oCrvComp)
+  {
+    return MAX(1.0,Crv * Crv * Crv);
+  }
+  else
+    return 1.0;
 }
 //==========================================================================*
 

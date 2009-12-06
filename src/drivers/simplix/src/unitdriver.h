@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.07.26
+// Last changed : 2009.12.06
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -229,6 +229,7 @@ private:
 	double oFlyHeight;                           // fly height
 	double oScaleSteer;                          // scale steering
 	double oStayTogether;			             // Dist in m.
+	bool oCrvComp;   			                 // Crv compensation
 	double oAvoidScale;			                 // scale avoiding 
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag

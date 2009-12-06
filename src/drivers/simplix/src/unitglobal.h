@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.07.26
+// Last changed : 2009.12.06
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -426,6 +426,7 @@ enum
 #define PRV_AVOID_SCALE		 "avoid scale"
 #define PRV_AVOID_WIDTH		 "avoid width"
 
+#define PRV_CRV_COMP		 "crv"
 #define PRV_STAY_TOGETHER	 "stay together"
 
 #define PRV_NO_AVOIDLENGTH	 "no avoid"
