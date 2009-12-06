@@ -872,7 +872,7 @@ void Driver::drive(tSituation *s)
 				car->_steerCmd = cmd_steer;
 				car->_gearCmd = cmd_gear;
 				car->_clutchCmd = cmd_clutch;
-				car->_lightCmd = cmd_light;
+				car->_lightCmd = (int)cmd_light;
 				return;
 			}
 		}
@@ -942,7 +942,7 @@ void Driver::drive(tSituation *s)
 	cmd_steer = car->_steerCmd;
 	cmd_clutch = car->_clutchCmd;
 	cmd_gear = car->_gearCmd;
-	cmd_light = car->_lightCmd;
+	cmd_light = (float)car->_lightCmd;
 }
 
 
