@@ -49,6 +49,7 @@ extern int GfImgWritePng(unsigned char *img, const char *filename, int width, in
 extern void GfImgFreeTex(GLuint tex);
 extern GLuint GfImgReadTex(const char *filename);
 extern GLuint GfImgReadTex(const char *filename,int &height,int &width);
+extern void GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLuint &texId);
 
 extern void GfScrInit(int argc, char *argv[]);
 extern void GfScrShutdown(void);

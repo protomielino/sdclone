@@ -203,6 +203,7 @@ GfuiDisplay(void)
 		glColor3f(GfuiColor[GFUI_BASECOLORBGIMAGE][0],GfuiColor[GFUI_BASECOLORBGIMAGE][1],GfuiColor[GFUI_BASECOLORBGIMAGE][2]);
 		glBindTexture(GL_TEXTURE_2D, GfuiScreen->bgImage);
 		glBegin(GL_QUADS);
+
 		glTexCoord2f(tx1, ty1); glVertex3f(0.0, 0.0, 0.0);
 		glTexCoord2f(tx1, ty2); glVertex3f(0.0, GfuiScreen->height, 0.0);
 		glTexCoord2f(tx2, ty2); glVertex3f(GfuiScreen->width, GfuiScreen->height, 0.0);
@@ -997,12 +998,10 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 		return;
 	}
 
-	glGenTextures(1, &screen->bgImage);
-	glBindTexture(GL_TEXTURE_2D, screen->bgImage);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
+	//Force Background image to power of 2
+	GfScaleImagePowerof2((unsigned char*)tex,w,h,GL_RGBA,screen->bgImage);
 	free(tex);
+
 	GfParmReleaseHandle(handle);
 }
 

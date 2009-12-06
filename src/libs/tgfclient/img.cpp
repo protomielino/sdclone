@@ -36,10 +36,80 @@
 #ifdef WIN32
 #include <direct.h>
 #endif
+#include "GL/Glu.h"
 
 static char buf[1024];
 
 #define PNG_BYTES_TO_CHECK 4
+
+
+
+unsigned char * 
+GfScaleImage(unsigned char *pSrcImg,int srcW,int srcH,int destW,int destH,GLenum format)
+{
+	unsigned char *pData = NULL;
+	gluScaleImage(format, srcW,srcH,GL_BYTE,pSrcImg,destW,destH,GL_BYTE,pData);
+
+	return pData;
+}
+
+int GetClosestPowerof2(int Size)
+{
+	int sizes[8] = {2,4,16,128,256,512,1024,2048 };
+
+	for (int i=0;i<8;i++)
+	{
+		if (Size<=sizes[i])
+			return sizes[i];
+	}
+
+	//Do not allow textures larger then this for memory usage reasons
+	return 2048;
+}
+
+void
+GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLuint &texId)
+{
+	int destH = 128;
+	int destW = 128;
+
+	destH = GetClosestPowerof2(srcH);
+	destW = GetClosestPowerof2(srcW);
+
+	if ((destH!=srcH)||(destW!=srcW))
+	{
+	
+		unsigned char *texData = NULL;
+		if (format == GL_RGB)
+		{
+			texData = new unsigned char[destW*destH*3];
+		}
+		else if(format == GL_RGBA)
+		{
+			texData = new unsigned char[destW*destH*4];
+
+		}
+
+		int r = gluScaleImage( format, srcW,srcH,GL_UNSIGNED_BYTE,(void*)pSrcImg,destW,destH,GL_UNSIGNED_BYTE,(void*)texData);
+		if (r!=0)
+			printf("Error trying to scale image\n");
+
+		glGenTextures(1, &texId);
+		glBindTexture(GL_TEXTURE_2D, texId);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0,  GL_RGBA, destW, destH, 0, format, GL_UNSIGNED_BYTE, (GLvoid *)(texData));
+		delete [] texData;
+	}
+	else
+	{
+		glGenTextures(1, &texId);
+		glBindTexture(GL_TEXTURE_2D, texId);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, destW, destH, 0, format, GL_UNSIGNED_BYTE, (GLvoid *)(pSrcImg));
+	}
+}
 
 /** Load an image from disk to a buffer in RGBA mode.
     @ingroup	img		
