@@ -42,17 +42,6 @@ static char buf[1024];
 
 #define PNG_BYTES_TO_CHECK 4
 
-
-
-unsigned char * 
-GfScaleImage(unsigned char *pSrcImg,int srcW,int srcH,int destW,int destH,GLenum format)
-{
-	unsigned char *pData = NULL;
-	gluScaleImage(format, srcW,srcH,GL_BYTE,pSrcImg,destW,destH,GL_BYTE,pData);
-
-	return pData;
-}
-
 int GetClosestPowerof2(int Size)
 {
 	int sizes[8] = {2,4,16,128,256,512,1024,2048 };
