@@ -237,10 +237,10 @@ typedef struct GfuiKey
 /* screen definition */
 typedef struct 
 {
-    float		width, height;
-    Color		bgColor;	/* RGBA */
-    GLuint		bgImage; /* Should always be 2^n x 2^p */
-    int			bgWidth, bgHeight; /* Original bg image size (may be not 2^n x 2^p) */
+    float		width, height; /* in menu/screen objects coordinate system */
+    Color		bgColor; /* RGBA */
+    GLuint		bgImage; /* Should always be 2^N x 2^P  (for low-end graphic hardwares) */
+    int			bgWidth, bgHeight; /* Original bg image size (may be not 2^N x 2^P) */
 
     /* sub-objects */
     tGfuiObject		*objects;

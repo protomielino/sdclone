@@ -42,18 +42,19 @@ static char buf[1024];
 
 #define PNG_BYTES_TO_CHECK 4
 
-int GetClosestPowerof2(int Size)
+int getClosestPowerof2(int size)
 {
-	int sizes[7] = {2,4,16,128,256,512,1024};
+	static const int nSizes = 7;
+	static const int sizes[nSizes] = { 2, 4, 16, 128, 256, 512, 1024 };
 
-	for (int i=0;i<7;i++)
+	for (int i = 0; i < nSizes; i++)
 	{
-		if (Size<=sizes[i])
+		if (size <= sizes[i])
 			return sizes[i];
 	}
 
-	//Do not allow textures larger then this for memory usage reasons and performance reasons
-	return 1024;
+	// Do not allow textures larger than this for memory usage and performance reasons
+	return sizes[nSizes - 1];
 }
 
 void
@@ -62,10 +63,10 @@ GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLui
 	int destH = 128;
 	int destW = 128;
 
-	destH = GetClosestPowerof2(srcH);
-	destW = GetClosestPowerof2(srcW);
+	destH = getClosestPowerof2(srcH);
+	destW = getClosestPowerof2(srcW);
 
-	if ((destH!=srcH)||(destW!=srcW))
+	if ( destH != srcH || destW != srcW)
 	{
 	
 		unsigned char *texData = NULL;
@@ -79,7 +80,7 @@ GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLui
 
 		}
 
-		int r = gluScaleImage( format, srcW,srcH,GL_UNSIGNED_BYTE,(void*)pSrcImg,destW,destH,GL_UNSIGNED_BYTE,(void*)texData);
+		int r = gluScaleImage(format, srcW,srcH,GL_UNSIGNED_BYTE,(void*)pSrcImg,destW,destH,GL_UNSIGNED_BYTE,(void*)texData);
 		if (r!=0)
 			printf("Error trying to scale image\n");
 
@@ -100,20 +101,19 @@ GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLui
 	}
 }
 
-/** Load an image from disk to a buffer in RGBA mode.
-=======/** Load an image from disk to a buffer in RGBA mode (if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support).
->>>>>>> .theirs    @ingroup	img		
+/** Load an image from disk to a buffer in RGBA mode (if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support).
+    @ingroup	img		
     @param	filename	name of the image to load
     @param	widthp		original width of the read image (left aligned in target buffer)
     @param	heightp		original height of the read image (top aligned in target buffer)
     @param	screen_gamma	gamma correction value
-    @param	quad_widthp	if not 0, pointer to 2^N width of the target image buffer
-    @param	quad_heightp	if not 0, pointer to 2^N height of the target image buffer
+    @param	pow2_widthp	if not 0, pointer to 2^N width of the target image buffer
+    @param	pow2_heightp	if not 0, pointer to 2^N height of the target image buffer
     @return	Pointer on the buffer containing the image
 		<br>NULL Error
  */
 unsigned char *
-GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma, int *quad_widthp, int *quad_heightp)
+GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma, int *pow2_widthp, int *pow2_heightp)
 {
 	unsigned char buf[PNG_BYTES_TO_CHECK];
 	FILE *fp;
@@ -176,25 +176,26 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	*widthp = (int)src_width;
 	*heightp = (int)src_height;
 	
-	// Compute target quad image buffer size if specified.
+	// Compute target 2^N x 2^P image buffer size if specified.
 	// Note: This 2^N x 2^P stuff is needed by some low-end OpenGL hardware/drivers
 	//       that don't support non  2^N x 2^P textures (or at extremely low frame rates).
-	if (quad_widthp && quad_heightp) {
+	if (pow2_widthp && pow2_heightp) {
 	    tgt_width = 2;
-	    tgt_height = 2;
 	    while(tgt_width < src_width) 
-		tgt_width  *= 2;
-	    //tgt_height = tgt_width;
+		tgt_width *= 2;
+	    tgt_height = 2;
 	    while(tgt_height < src_height) 
 		tgt_height *= 2;
-	    *quad_widthp = (int)tgt_width;
-	    *quad_heightp = (int)tgt_height;
+	    *pow2_widthp = (int)tgt_width;
+	    *pow2_heightp = (int)tgt_height;
 	} else {
 	    tgt_width = (int)src_width;
 	    tgt_height = (int)src_height;
 	}
 
-	if (bit_depth == 1 && color_type == PNG_COLOR_TYPE_GRAY) png_set_invert_mono(png_ptr);
+	if (bit_depth == 1 && color_type == PNG_COLOR_TYPE_GRAY) 
+	    png_set_invert_mono(png_ptr);
+
 	if (bit_depth == 16) {
 		png_set_swap(png_ptr);
 		png_set_strip_16(png_ptr);
@@ -233,7 +234,7 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	png_read_update_info(png_ptr, info_ptr);
 	src_rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 	tgt_rowbytes = src_rowbytes;
-	if (quad_widthp && quad_heightp) 
+	if (pow2_widthp && pow2_heightp) 
 	    tgt_rowbytes = tgt_width * src_rowbytes / src_width;
 	
 	// RGBA expected.
@@ -252,13 +253,15 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	}
 	
 	image_ptr = (unsigned char *)malloc(tgt_height * tgt_rowbytes);
+	//memset(image_ptr, 0x00, tgt_height * tgt_rowbytes); // Real 0-padding not needed ...
 	if (image_ptr == NULL) {
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return (unsigned char *)NULL;
 	}
 	
-	for (i = 0, cur_ptr = image_ptr + (tgt_height - 1) * tgt_rowbytes ; i < tgt_height; i++, cur_ptr -= tgt_rowbytes) {
+	for (i = 0, cur_ptr = image_ptr + (tgt_height - 1) * tgt_rowbytes ; 
+	     i < tgt_height; i++, cur_ptr -= tgt_rowbytes) {
 		row_pointers[i] = cur_ptr;
 	}
 	
@@ -290,7 +293,9 @@ GfImgWritePng(unsigned char *img, const char *filename, int width, int height)
 	png_uint_32 rowbytes;
 	int i;
 	unsigned char *cur_ptr;
-#if 0
+
+#define ReadGammaFromSettingsFile 0
+#if (ReadGammaFromSettingsFile)
     void		*handle;
 #endif
 	float		screen_gamma;
@@ -321,7 +326,7 @@ GfImgWritePng(unsigned char *img, const char *filename, int width, int height)
 	png_init_io(png_ptr, fp);
 	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB,
 			PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
-#if 0
+#if (ReadGammaFromSettingsFile)
     handle = GfParmReadFile(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
     GfParmReleaseHandle(handle);

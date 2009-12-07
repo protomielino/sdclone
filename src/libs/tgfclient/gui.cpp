@@ -193,18 +193,18 @@ GfuiDisplay(void)
 		// Get real 2^N x 2^P texture size (may have been 0 padded at load time
 		// if the original image was not 2^N x 2^P)
 		// This 2^N x 2^P stuff is needed by some low-end OpenGL hardware/drivers.
-		int bgQuadWidth = 1, bgQuadHeight = 1;
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &bgQuadWidth);
-		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &bgQuadHeight);
+		int bgPow2Width = 1, bgPow2Height = 1;
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, &bgPow2Width);
+		glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, &bgPow2Height);
 
 		// Compute the initial width of the right area and the height of the bottom area
 		// of the texture that will not be displayed
-		// (We display only the top left rectangle of the quad texture
+		// (We display only the top left rectangle of the 2^N x 2^P texture
 		//  that corresponds to the original image).
 		GLfloat tx1 = 0.0f;
-		GLfloat tx2 = GfuiScreen->bgWidth / (GLfloat)bgQuadWidth;
+		GLfloat tx2 = GfuiScreen->bgWidth / (GLfloat)bgPow2Width;
 
-		GLfloat ty1 = 1.0f-(GfuiScreen->bgHeight / (GLfloat)bgQuadHeight);
+		GLfloat ty1 = 1.0f - GfuiScreen->bgHeight / (GLfloat)bgPow2Height;
  		GLfloat ty2 = 1.0;
 
 		// Compute the width/height of the symetrical left/right / top/bottom
@@ -215,13 +215,13 @@ GfuiDisplay(void)
 
 		if (rfactor >= 1.0f) {
 			// If aspect ratio of view is smaller than image's one, "cut off" sides.
-			GLfloat tdx = (1.0f - 1.0f / rfactor) / 2.0f;
+			const GLfloat tdx = GfuiScreen->bgWidth * (rfactor - 1.0f) / bgPow2Width / 2.0f;
 			tx1 += tdx;
 			tx2 -= tdx;
 		} else {
 			// If aspect ratio of view is larger than image's one, 
 			// "cut off" top and bottom.
-			GLfloat tdy = (1.0f - rfactor) / 2.0f;
+			const GLfloat tdy = GfuiScreen->bgHeight * (1.0f / rfactor - 1.0f) / bgPow2Height / 2.0f;
 			ty1 += tdy;
 			ty2 -= tdy;
 		}
@@ -1011,7 +1011,7 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 	void *handle;
 	float screen_gamma;
 	GLbyte *tex;
-	int qw, qh;
+	int pow2Width, pow2Height;
 
 	if (screen->bgImage != 0) {
 		glDeleteTextures(1, &screen->bgImage);
@@ -1020,23 +1020,24 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
 	handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
-	// Note: Here, we save the original image size (may be not 2^n x 2^p)
-	//       in order to be able to hide padding pixels added in texture to enforce 2^n x 2^p.
-	tex = (GLbyte*)GfImgReadPng(filename, &screen->bgWidth, &screen->bgHeight, 
-				    screen_gamma, &qw, &qh);
 
+	// Note: Here, we save the original image size (may be not 2^N x 2^P)
+	//       in order to be able to hide padding pixels added in texture to enforce 2^N x 2^P.
+	tex = (GLbyte*)GfImgReadPng(filename, &screen->bgWidth, &screen->bgHeight, 
+				    screen_gamma, &pow2Width, &pow2Height);
 	if (!tex) {
 		GfParmReleaseHandle(handle);
 		return;
 	}
 
-	//Force Background image to power of 2
+	
 //	GfScaleImagePowerof2((unsigned char*)tex,w,h,GL_RGBA,screen->bgImage);
+
 	glGenTextures(1, &screen->bgImage);
 	glBindTexture(GL_TEXTURE_2D, screen->bgImage);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, qw, qh, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pow2Width, pow2Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
 	free(tex);
 
 	GfParmReleaseHandle(handle);
