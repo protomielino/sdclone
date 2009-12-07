@@ -613,8 +613,6 @@ grInitCar(tCarElt *car)
 	lg += sprintf(grFilePath + lg, "cars/%s;", car->_carName);
 	lg += sprintf(grFilePath + lg, "data/textures");
 
-	GfOut("grFilePath(len=%d)='%s'\n", strlen(grFilePath), grFilePath);
-
 	grCarInfo[index].envSelector = (ssgStateSelector*)grEnvSelector->clone();
 	grCarInfo[index].envSelector->ref();
 
@@ -648,7 +646,6 @@ grInitCar(tCarElt *car)
 		car->_modName, car->_carName,
 		car->_modName,
 		car->_carName);
-	GfOut("ssgModelPath(len=%d)='%s'\n", strlen(buf), buf);
 	ssgModelPath(buf);
 	ssgTexturePath(buf);
 	grTexturePath = strdup(buf);
