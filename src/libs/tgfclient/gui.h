@@ -239,7 +239,8 @@ typedef struct
 {
     float		width, height;
     Color		bgColor;	/* RGBA */
-    GLuint		bgImage;
+    GLuint		bgImage; /* Should always be 2^n x 2^p */
+    int			bgWidth, bgHeight; /* Original bg image size (may be not 2^n x 2^p) */
 
     /* sub-objects */
     tGfuiObject		*objects;

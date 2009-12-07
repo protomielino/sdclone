@@ -101,29 +101,32 @@ GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLui
 }
 
 /** Load an image from disk to a buffer in RGBA mode.
-    @ingroup	img		
+=======/** Load an image from disk to a buffer in RGBA mode (if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support).
+>>>>>>> .theirs    @ingroup	img		
     @param	filename	name of the image to load
-    @param	widthp		width of the read image
-    @param	heightp		height of the read image
+    @param	widthp		original width of the read image (left aligned in target buffer)
+    @param	heightp		original height of the read image (top aligned in target buffer)
     @param	screen_gamma	gamma correction value
+    @param	quad_widthp	if not 0, pointer to 2^N width of the target image buffer
+    @param	quad_heightp	if not 0, pointer to 2^N height of the target image buffer
     @return	Pointer on the buffer containing the image
 		<br>NULL Error
  */
 unsigned char *
-GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma)
+GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma, int *quad_widthp, int *quad_heightp)
 {
 	unsigned char buf[PNG_BYTES_TO_CHECK];
 	FILE *fp;
-	png_structp	png_ptr;
+	png_structp png_ptr;
 	png_infop info_ptr;
-	png_uint_32 width, height;
-	int	bit_depth, color_type, interlace_type;
+	png_uint_32 src_width, src_height;
+	png_uint_32 tgt_width, tgt_height;
+	int bit_depth, color_type, interlace_type;
 	
-	/*     png_color_16p	image_background; */
 	double gamma;
 	png_bytep *row_pointers;
 	unsigned char *image_ptr, *cur_ptr;
-	png_uint_32 rowbytes;
+	png_uint_32 src_rowbytes, tgt_rowbytes;
 	png_uint_32 i;
 	
 	if ((fp = fopen(filename, "rb")) == NULL) {
@@ -169,10 +172,28 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	png_init_io(png_ptr, fp);
 	png_set_sig_bytes(png_ptr, PNG_BYTES_TO_CHECK);
 	png_read_info(png_ptr, info_ptr);
-	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, NULL, NULL);
-	*widthp = (int)width;
-	*heightp = (int)height;
+	png_get_IHDR(png_ptr, info_ptr, &src_width, &src_height, &bit_depth, &color_type, &interlace_type, NULL, NULL);
+	*widthp = (int)src_width;
+	*heightp = (int)src_height;
 	
+	// Compute target quad image buffer size if specified.
+	// Note: This 2^N x 2^P stuff is needed by some low-end OpenGL hardware/drivers
+	//       that don't support non  2^N x 2^P textures (or at extremely low frame rates).
+	if (quad_widthp && quad_heightp) {
+	    tgt_width = 2;
+	    tgt_height = 2;
+	    while(tgt_width < src_width) 
+		tgt_width  *= 2;
+	    //tgt_height = tgt_width;
+	    while(tgt_height < src_height) 
+		tgt_height *= 2;
+	    *quad_widthp = (int)tgt_width;
+	    *quad_heightp = (int)tgt_height;
+	} else {
+	    tgt_width = (int)src_width;
+	    tgt_height = (int)src_height;
+	}
+
 	if (bit_depth == 1 && color_type == PNG_COLOR_TYPE_GRAY) png_set_invert_mono(png_ptr);
 	if (bit_depth == 16) {
 		png_set_swap(png_ptr);
@@ -210,42 +231,45 @@ GfImgReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	}
 	
 	png_read_update_info(png_ptr, info_ptr);
-	rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+	src_rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+	tgt_rowbytes = src_rowbytes;
+	if (quad_widthp && quad_heightp) 
+	    tgt_rowbytes = tgt_width * src_rowbytes / src_width;
 	
 	// RGBA expected.
-	if (rowbytes != (4 * width)) {
-		GfTrace("%s bad byte count... %lu instead of %lu\n", filename, (unsigned long)rowbytes, (unsigned long)(4 * width));
+	if (src_rowbytes != (4 * src_width)) {
+		GfTrace("%s bad byte count... %lu instead of %lu\n", filename, (unsigned long)src_rowbytes, (unsigned long)(4 * src_width));
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return (unsigned char *)NULL;
 	}
 	
-	row_pointers = (png_bytep*)malloc(height * sizeof(png_bytep));
+	row_pointers = (png_bytep*)malloc(tgt_height * sizeof(png_bytep));
 	if (row_pointers == NULL) {
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return (unsigned char *)NULL;
 	}
 	
-	image_ptr = (unsigned char *)malloc(height * rowbytes);
+	image_ptr = (unsigned char *)malloc(tgt_height * tgt_rowbytes);
 	if (image_ptr == NULL) {
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return (unsigned char *)NULL;
 	}
 	
-	for (i = 0, cur_ptr = image_ptr + (height - 1) * rowbytes ; i < height; i++, cur_ptr -= rowbytes) {
+	for (i = 0, cur_ptr = image_ptr + (tgt_height - 1) * tgt_rowbytes ; i < tgt_height; i++, cur_ptr -= tgt_rowbytes) {
 		row_pointers[i] = cur_ptr;
 	}
 	
 	png_read_image(png_ptr, row_pointers);
+
 	png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
 	free(row_pointers);
 	
 	fclose(fp);
 	return image_ptr;
 }
-
 
 /** Write a buffer to a png image on disk.
     @ingroup	img
@@ -366,7 +390,7 @@ GfImgReadTex(const char *filename, int &width, int &height)
 	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
 	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
-	tex = (GLbyte*)GfImgReadPng(filename, &width, &height, screen_gamma);
+	tex = (GLbyte*)GfImgReadPng(filename, &width, &height, screen_gamma, 0, 0);
 
 	if (!tex) {
 		GfParmReleaseHandle(handle);

@@ -44,7 +44,7 @@ public:
  * Screen Interface *
  ********************/
 
-extern unsigned char *GfImgReadPng(const char *filename, int *widthp, int *heightp, float gamma);
+extern unsigned char *GfImgReadPng(const char *filename, int *widthp, int *heightp, float gamma, int *quad_widthp, int *quad_heightp);
 extern int GfImgWritePng(unsigned char *img, const char *filename, int width, int height);
 extern void GfImgFreeTex(GLuint tex);
 extern GLuint GfImgReadTex(const char *filename);

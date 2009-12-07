@@ -91,7 +91,7 @@ bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
 
 	TRACE_GL("Load: grLoadPngTexture start");
 
-	tex = (GLubyte*)GfImgReadPng(fname, &w, &h, 2.0);
+	tex = (GLubyte*)GfImgReadPng(fname, &w, &h, 2.0, 0, 0);
 	if (!tex) {
 		return false;
     }

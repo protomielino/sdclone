@@ -56,7 +56,7 @@ void LoadElevation(tTrack *track, void *TrackHandle, char *imgFile)
 	tdble zmin, zmax;
 	tdble xmin, xmax, ymin, ymax;
 
-	ElvImage = GfImgReadPng(imgFile, &width, &height, 2.0);
+	ElvImage = GfImgReadPng(imgFile, &width, &height, 2.0, 0, 0);
 	if (!ElvImage) {
 		return;
 	}
