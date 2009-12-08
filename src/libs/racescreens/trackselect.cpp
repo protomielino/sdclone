@@ -40,7 +40,7 @@ static tFList *CategoryList;
 static void *ScrHandle;
 static int TrackLabelId;
 static int CatLabelId;
-//static int MapId;
+static int OutlineId;
 static int AuthorId;
 static int LengthId;
 static int WidthId;
@@ -57,7 +57,6 @@ static void
 rmtsActivate(void * /* dummy */)
 {
     /* call display function of graphic */
-    //gfuiReleaseImage(MapId);
 }
 
 
@@ -74,6 +73,16 @@ rmtsGetMapName(char* mapNameBuf, unsigned mapNameBufSize)
     snprintf(mapNameBuf, mapNameBufSize, "tracks/%s/%s/%s.png", CategoryList->name,
          ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
     mapNameBuf[mapNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
+    return mapNameBuf;
+}
+
+static char *
+rmtsGetOutlineName(char* mapNameBuf, unsigned mapNameBufSize)
+{
+    snprintf(mapNameBuf, mapNameBufSize, "tracks/%s/%s/outline.png", CategoryList->name,
+         ((tFList*)CategoryList->userData)->name);
+    mapNameBuf[mapNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
+	printf("Loading %s\n",mapNameBuf);
     return mapNameBuf;
 }
 
@@ -258,7 +267,7 @@ rmtsTrackPrevNext(void *vsel)
 
 	/* Update GUI */
 	GfuiLabelSetText(ScrHandle, TrackLabelId, curTr->dispName);
-	//GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+	GfuiStaticImageSet(ScrHandle, OutlineId, rmtsGetOutlineName(path, MAXPATHSIZE));
 	GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, MAXPATHSIZE));
 	rmtsUpdateTrackInfo();
 }//rmtsTrackPrevNext
@@ -318,7 +327,7 @@ rmtsTrackCatPrevNext(void *vsel)
     /* Update GUI */
     GfuiLabelSetText(ScrHandle, CatLabelId, CategoryList->dispName);
     GfuiLabelSetText(ScrHandle, TrackLabelId, ((tFList*)curCat->userData)->dispName);
-    //GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+    GfuiStaticImageSet(ScrHandle, OutlineId, rmtsGetOutlineName(path, MAXPATHSIZE));
     GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, MAXPATHSIZE));
     rmtsUpdateTrackInfo();
 }
@@ -569,8 +578,8 @@ RmTrackSelect(void *vs)
     GfuiLabelSetText(ScrHandle,TrackLabelId,((tFList*)CategoryList->userData)->dispName);
 
     /* Create static preview/map for currently selected track */
-    //MapId = CreateStaticImageControl(ScrHandle,param,"trackimage");
-    //GfuiStaticImageSet(ScrHandle, MapId, rmtsGetMapName(path, maxPathSize));
+    OutlineId = CreateStaticImageControl(ScrHandle,param,"trackimage");
+    GfuiStaticImageSet(ScrHandle, OutlineId, rmtsGetOutlineName(path, MAXPATHSIZE));
     GfuiScreenAddBgImg(ScrHandle,rmtsGetMapName(path, MAXPATHSIZE));
 
     CreateButtonControl(ScrHandle,param,"accept",NULL,rmtsSelect);
