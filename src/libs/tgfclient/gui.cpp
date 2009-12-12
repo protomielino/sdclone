@@ -463,9 +463,10 @@ gfuiMouse(int button, int state, int x, int y)
 		DelayRepeat = REPEAT1;
 		LastTimeClick = GfTimeClock();
 		if (state == GLUT_DOWN) {
+			// Hide/Show mouse pointer on right click (usefull for screen shots ;-)
 			if (button == GLUT_RIGHT_BUTTON) {
 				GfuiScreen->mouse = 0;
-				/* GfuiMouseVisible = 1 - GfuiMouseVisible; */
+				GfuiMouseVisible = 1 - GfuiMouseVisible;
 				gfuiUpdateFocus();
 			} else {
 				GfuiScreen->mouse = 1;
