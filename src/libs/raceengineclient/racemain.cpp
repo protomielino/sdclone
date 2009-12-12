@@ -112,7 +112,7 @@ ReRaceEventInit(void)
 {
 	void *params = ReInfo->params;
 
-	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
+	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 	ReInitTrack();
 	ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 	ReEventInitResults();
@@ -213,7 +213,7 @@ reRaceRealStart(void)
 	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF) ||
 	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1))
 	{
-		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
+		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 	}
 
 	for (i = 0; i < s->_ncars; i++) {
@@ -317,7 +317,7 @@ ReRaceStart(void)
 	if (ReInfo->s->_raceType == RM_TYPE_QUALIF) {
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
-			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
+			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 			RmLoadingScreenSetText("Preparing Starting Grid...");
 		} else {
 			RmShutdownLoadingScreen();
@@ -328,7 +328,7 @@ ReRaceStart(void)
 		GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 		GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
 	} else {
-		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-qrloading.png");
+		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 		RmLoadingScreenSetText("Preparing Starting Grid...");
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
