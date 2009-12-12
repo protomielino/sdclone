@@ -74,7 +74,7 @@ rmtsGetPreviewFileName(char* previewNameBuf, unsigned previewNameBufSize)
     previewNameBuf[previewNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
 	if (!ulFileExists(previewNameBuf))
 	{
-		snprintf(previewNameBuf,previewNameBufSize,"data/img/splash-qrtrk.png");
+		snprintf(previewNameBuf,previewNameBufSize,"data/img/splash-trackselect.png");
 
 	}
     return previewNameBuf;
