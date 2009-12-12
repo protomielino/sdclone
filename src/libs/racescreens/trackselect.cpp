@@ -72,6 +72,11 @@ rmtsGetPreviewFileName(char* previewNameBuf, unsigned previewNameBufSize)
     snprintf(previewNameBuf, previewNameBufSize, "tracks/%s/%s/%s.png", CategoryList->name,
 	     ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
     previewNameBuf[previewNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
+	if (!ulFileExists(previewNameBuf))
+	{
+		snprintf(previewNameBuf,previewNameBufSize,"data/img/splash-qrtrk.png");
+
+	}
     return previewNameBuf;
 }
 
@@ -81,6 +86,11 @@ rmtsGetOutlineFileName(char* outlineNameBuf, unsigned outlineNameBufSize)
     snprintf(outlineNameBuf, outlineNameBufSize, "tracks/%s/%s/outline.png", CategoryList->name,
 	     ((tFList*)CategoryList->userData)->name);
     outlineNameBuf[outlineNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
+	if (!ulFileExists(outlineNameBuf))
+	{
+		snprintf(outlineNameBuf,outlineNameBufSize,"data/img/transparent.png");
+
+	}
     return outlineNameBuf;
 }
 
