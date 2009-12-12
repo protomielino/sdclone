@@ -2,7 +2,7 @@
 <!-- 
     file          : aalborg.xml 
     created       : 28 Mar 2008 
-    last modified : 04 Dec 2009
+    last modified : 12 Dec 2009
     copyright     : (C) 2008-2009 Wolf-Dieter Beelitz
 -->
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -24,8 +24,9 @@
 		<attnum name="pit scale brake" val="1.0"/>
 		<attnum name="pit stop dist" val="1.5"/>
 		<attnum name="offset skill" val="0.0"/>
-		<attnum name="scale skill" val="1.000"/>
-		<attnum name="scale_mu" val="1.00"/>
+		<attnum name="scale skill" val="1.10"/>
+		<attnum name="scale_brake" val="1.00"/>
+		<attnum name="scale_mu" val="1.20"/>
 		<attnum name="scale bump" min="0" max="1" val="0.01"/>
 		<attnum name="scale bump outer" min="0" max="2" val="0.01"/>
 		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.03"/>

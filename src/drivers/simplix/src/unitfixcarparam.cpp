@@ -9,7 +9,7 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.06
+// Last changed : 2009.12.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -363,22 +363,24 @@ double TFixCarParam::CalcMaxSpeed
   if (AbsCrv > AbsCrv1)
   {
 	factor = 1.015; 
-/**/
+    AbsCrv *= oDriver->CalcCrv(AbsCrv);
+/*
     if (fabs(AbsCrv) > 1/50.0)
 	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
 	else if (!oDriver->oUseAccelOut)
 	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
-/**/	  
+*/	  
   }
   else
   {
 	factor = 0.985;
-/**/
+    AbsCrv *= oDriver->CalcCrv(AbsCrv);
+/*
     if (fabs(AbsCrv) > 1/45.0)
 	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
 	else
 	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
-/**/
+*/
   }
 /*
   if (TDriver::UseBrakeLimit)
@@ -386,7 +388,7 @@ double TFixCarParam::CalcMaxSpeed
     if (oStrategy->OutOfPitlane())
       factor *= 1.0 - MAX(0.0,TDriver::SpeedLimitScale * (AbsCrv - TDriver::SpeedLimitBase));
   }
-*//**/
+*/
   double Den;
 
   double ScaleBump;

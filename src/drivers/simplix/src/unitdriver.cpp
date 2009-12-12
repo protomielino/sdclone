@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.06
+// Last changed : 2009.12.12
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -3273,7 +3273,15 @@ double TDriver::CalcHairpin(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix(double Crv)
 {
-  return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+  if (oCrvComp)
+  {
+    if (Crv < 0.0025) 
+	  return 1.0;
+    else
+      return 1.25 * (1 + Crv);
+  }
+  else
+    return 1.0;
 }
 //==========================================================================*
 
@@ -3282,8 +3290,6 @@ double TDriver::CalcCrv_simplix(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_TRB1(double Crv)
 {
-  //return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
   return 1.0;
 }
 //==========================================================================*
@@ -3292,6 +3298,25 @@ double TDriver::CalcCrv_simplix_TRB1(double Crv)
 // simplix_sc
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
+{
+  double Offset = 1300;
+
+  if (oCrvComp)
+  {
+    if (Crv < 0.0085) 
+      return 1.0;
+	else
+      return ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
+  }
+  else
+    return 1.0;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_36GP
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_36GP(double Crv)
 {
   if (oCrvComp)
   {
@@ -3303,20 +3328,6 @@ double TDriver::CalcCrv_simplix_SC(double Crv)
   else
     return 1.0;
 
-  //return MAX(0.75,MIN(3.0,75000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_36GP
-//--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_36GP(double Crv)
-{
-  if (Qualification)
-    return MAX(1.00,MIN(2.8,5200.0 * Crv * Crv)); 
-  else
-    return MAX(1.00,MIN(3.2,7500.0 * Crv * Crv)); 
 }
 //==========================================================================*
 
@@ -3325,7 +3336,7 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix(double Crv)
 {
-  return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 
@@ -3334,10 +3345,7 @@ double TDriver::CalcHairpin_simplix(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 {
-  // return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
   return 1.0;
-
 }
 //==========================================================================*
 
@@ -3346,14 +3354,7 @@ double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_SC(double Crv)
 {
-  //return MAX(1.0,MIN(2.5,140000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
-  if (oCrvComp)
-  {
-    return MAX(1.0,Crv * Crv * Crv);
-  }
-  else
-    return 1.0;
+  return 1.0;
 }
 //==========================================================================*
 
@@ -3362,11 +3363,7 @@ double TDriver::CalcHairpin_simplix_SC(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_36GP(double Crv)
 {
-  //GfOut("HP\n");
-  if (Qualification)
-    return MAX(1.00,MIN(3.0,2300.0  * Crv * Crv)); 
-  else
-    return MAX(1.00,MIN(3.2,6000.0  * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 
