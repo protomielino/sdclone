@@ -8,7 +8,7 @@
       <attstr name="name" val="Quick Race"/>
       <attstr name="description" val="Quick Race"/>
       <attnum name="priority" val="10"/>
-      <attstr name="menu image" val="data/img/splash-qr.png"/>
+      <attstr name="menu image" val="data/img/splash-quickrace.png"/>
     </section>
 
     <section name="Tracks">

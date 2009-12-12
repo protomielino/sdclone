@@ -22,7 +22,7 @@
 		<attnum name="priority" val="30"/>
 		<attstr name="menu image" val="data/img/splash-dtm.png"/>
 		<attstr name="run image" val="data/img/splash-run-practice.png"/>
-		<attstr name="start image" val="data/img/splash-dtm.png"/>
+		<attstr name="start image" val="data/img/splash-dtmstart.png"/>
 	</section>
 	
 	<section name="Tracks">
