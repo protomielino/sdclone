@@ -10,13 +10,13 @@ a { color:#fff; }
 #navigation li { display:inline; margin: 0 0 0 48px; }
 #navigation a { text-decoration:none; }
 
-#content { width:900px; margin:0 0 0 48px; }
+#content { width:960px; margin:0 0 0 48px; }
 #content h1 { padding:24px 0 8px 0; margin:0; color:#fc0; 
 	font:20px/24px normal normal Verdana,"Bitstream Vera Sans","DejaVu Sans","Liberation Sans",Geneva,sans-serif; font-weight:bold; }
 #content p { padding:0; margin:0 0 8px 0; }
 #content ul { line-height:20px; margin:0; padding:0 0 0 16px; }
 #content ul li { text-align:left; font-weight:normal; margin:0 0 4px 0; padding:0;}
 
-#sourceforge { background:#ff8000 url(../pic/sf-bg.jpg) repeat-x; height:84px; text-align:center; width:auto; margin: 64px 0 0 0; overflow:hidden; }
-#header-image { background:#666 url(../pic/torcs-ng-bg.jpg) repeat-x; height:168px; width:auto; }
+#sourceforge { background:#ff8000 url(../pic/sf-bg.jpg) repeat-x; height:50px; text-align:center; width:auto; margin: 50px 0 0 0; overflow:hidden; }
+#header-image { background:#666 url(../pic/speed-dreams-header.jpg) repeat-x; height:160px; }
 
