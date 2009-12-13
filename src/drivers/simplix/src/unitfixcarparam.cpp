@@ -191,10 +191,7 @@ double	TFixCarParam::CalcBraking
   double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
 
-  //if (oCrvComp)
-    Crv *= oDriver->CalcCrv(fabs(Crv));
-  //else
-  //  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
+  Crv *= oDriver->CalcCrv(fabs(Crv));
 
   if (Crvz > 0)
 	Crvz = 0; 
@@ -281,10 +278,7 @@ double	TFixCarParam::CalcBrakingPit
   double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
 
-  //if (oCrvComp)
-    Crv *= oDriver->CalcCrv(fabs(Crv));
-  //else
-  //  Crv *= MAX(1.00,MIN(3.0,30.0 * fabs(Crv)));
+  Crv *= oDriver->CalcCrv(fabs(Crv));
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat  = G * sin(TrackRollAngle);
@@ -362,33 +356,16 @@ double TFixCarParam::CalcMaxSpeed
   double factor = 1.0;
   if (AbsCrv > AbsCrv1)
   {
-	factor = 1.015; 
+	if (oDriver->oUseAccelOut)
+	  factor = 1.015; 
     AbsCrv *= oDriver->CalcCrv(AbsCrv);
-/*
-    if (fabs(AbsCrv) > 1/50.0)
-	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
-	else if (!oDriver->oUseAccelOut)
-	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
-*/	  
   }
   else
   {
 	factor = 0.985;
     AbsCrv *= oDriver->CalcCrv(AbsCrv);
-/*
-    if (fabs(AbsCrv) > 1/45.0)
-	  AbsCrv *= oDriver->CalcHairpin(AbsCrv);
-	else
-	  AbsCrv *= oDriver->CalcCrv(AbsCrv);
-*/
   }
-/*
-  if (TDriver::UseBrakeLimit)
-  {
-    if (oStrategy->OutOfPitlane())
-      factor *= 1.0 - MAX(0.0,TDriver::SpeedLimitScale * (AbsCrv - TDriver::SpeedLimitBase));
-  }
-*/
+
   double Den;
 
   double ScaleBump;
@@ -408,7 +385,7 @@ double TFixCarParam::CalcMaxSpeed
    Den = 0.00001;
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
-//  if (fabs(AbsCrv) > 1/21.5)
+
   if (fabs(AbsCrv) > 1/45.0)
     Speed *= 0.89;                               // Filter hairpins
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)

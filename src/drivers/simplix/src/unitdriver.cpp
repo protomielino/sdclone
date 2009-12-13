@@ -3318,16 +3318,17 @@ double TDriver::CalcCrv_simplix_SC(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_36GP(double Crv)
 {
+  double Offset = 1300;
+
   if (oCrvComp)
   {
-    if (Crv < 0.0025) 
-	  return 1.0;
-    else
-      return 1.25 * (1 + Crv);
+    if (Crv < 0.0085) 
+      return 1.0;
+	else
+      return ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
   }
   else
     return 1.0;
-
 }
 //==========================================================================*
 
