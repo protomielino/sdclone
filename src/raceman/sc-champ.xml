@@ -204,76 +204,69 @@
 
   <section name="Drivers">
     <attnum name="maximum number" val="50"/>
-    <attstr name="focused module" val="hymie_sc1"/>
-    <attnum name="focused idx" val="1"/>
     <section name="1">
       <attnum name="idx" val="1"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="2">
-      <attnum name="idx" val="2"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attnum name="idx" val="1"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="3">
       <attnum name="idx" val="3"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="4">
       <attnum name="idx" val="4"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="5">
-      <attnum name="idx" val="5"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attnum name="idx" val="6"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="6">
-      <attnum name="idx" val="6"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attnum name="idx" val="5"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="7">
       <attnum name="idx" val="7"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="8">
       <attnum name="idx" val="8"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="9">
-      <attnum name="idx" val="9"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attnum name="idx" val="10"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="10">
-      <attnum name="idx" val="10"/>
-      <attstr name="module" val="hymie_sc1"/>
+      <attnum name="idx" val="9"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="11">
-      <attnum name="idx" val="1"/>
-      <attstr name="module" val="hymie_sc2"/>
+      <attnum name="idx" val="11"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="12">
-      <attnum name="idx" val="2"/>
-      <attstr name="module" val="hymie_sc2"/>
+      <attnum name="idx" val="12"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="13">
-      <attnum name="idx" val="3"/>
-      <attstr name="module" val="hymie_sc2"/>
-    </section>
-
-    <section name="14">
-      <attnum name="idx" val="4"/>
-      <attstr name="module" val="hymie_sc2"/>
+      <attnum name="idx" val="1"/>
+      <attstr name="module" val="human"/>
     </section>
 
   </section>
