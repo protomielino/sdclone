@@ -18,7 +18,7 @@
     <section name="index">
 
       <section name="0">
-        <attstr name="name" val="Eric"></attstr>
+        <attstr name="name" val="Matteo Conti"></attstr>
         <attstr name="desc" val="S: car1a"></attstr>
         <attstr name="team" val="simplix_trb1c1"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -30,7 +30,7 @@
       </section>
 
       <section name="1">
-        <attstr name="name" val="Christophe"></attstr>
+        <attstr name="name" val="Enzo De Rosa"></attstr>
         <attstr name="desc" val="S: car1b"></attstr>
         <attstr name="team" val="simplix_trb1c1"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -42,7 +42,7 @@
       </section>
 
       <section name="2">
-        <attstr name="name" val="Danny"></attstr>
+        <attstr name="name" val="Kumiko Imagawa"></attstr>
         <attstr name="desc" val="S: car2a"></attstr>
         <attstr name="team" val="simplix_trb1c2"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -54,7 +54,7 @@
       </section>
 
       <section name="3">
-        <attstr name="name" val="John"></attstr>
+        <attstr name="name" val="Takuya Nakamura"></attstr>
         <attstr name="desc" val="S: car2b"></attstr>
         <attstr name="team" val="simplix_trb1c2"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -66,7 +66,7 @@
       </section>
 
       <section name="4">
-        <attstr name="name" val="Stephan"></attstr>
+        <attstr name="name" val="Jin Li"></attstr>
         <attstr name="desc" val="S: car3a"></attstr>
         <attstr name="team" val="simplix_trb1c3"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -78,7 +78,7 @@
       </section>
 
       <section name="5">
-        <attstr name="name" val="Daniele"></attstr>
+        <attstr name="name" val="David Greene"></attstr>
         <attstr name="desc" val="S: car3b"></attstr>
         <attstr name="team" val="simplix_trb1c3"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -90,7 +90,7 @@
       </section>
 
       <section name="6">
-        <attstr name="name" val="Gabor"></attstr>
+        <attstr name="name" val="Nate Ross"></attstr>
         <attstr name="desc" val="S: car4a"></attstr>
         <attstr name="team" val="simplix_trb1c4"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -102,7 +102,7 @@
       </section>
 
       <section name="7">
-        <attstr name="name" val="Stanley"></attstr>
+        <attstr name="name" val="Rick Draney"></attstr>
         <attstr name="desc" val="S: car4b"></attstr>
         <attstr name="team" val="simplix_trb1c4"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -114,7 +114,7 @@
       </section>
 
       <section name="8">
-        <attstr name="name" val="Bernhard"></attstr>
+        <attstr name="name" val="Yuni Verstappen"></attstr>
         <attstr name="desc" val="S: car5a"></attstr>
         <attstr name="team" val="simplix_trb1c5"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -126,7 +126,7 @@
       </section>
 
       <section name="9">
-        <attstr name="name" val="Christos"></attstr>
+        <attstr name="name" val="Risto Pohjosmaki"></attstr>
         <attstr name="desc" val="S: car5b"></attstr>
         <attstr name="team" val="simplix_trb1c5"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -138,7 +138,7 @@
       </section>
 
       <section name="10">
-        <attstr name="name" val="Wolf-Dieter"></attstr>
+        <attstr name="name" val="Ainhoa Etxebarria"></attstr>
         <attstr name="desc" val="S: car6a"></attstr>
         <attstr name="team" val="simplix_trb1c6"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -150,7 +150,7 @@
       </section>
 
       <section name="11">
-        <attstr name="name" val="Juergen"></attstr>
+        <attstr name="name" val="Angel Rosado"></attstr>
         <attstr name="desc" val="S: car6b"></attstr>
         <attstr name="team" val="simplix_trb1c6"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -162,7 +162,7 @@
       </section>
 
       <section name="12">
-        <attstr name="name" val="Andrew"></attstr>
+        <attstr name="name" val="Harry Stoddart"></attstr>
         <attstr name="desc" val="S: car7a"></attstr>
         <attstr name="team" val="simplix_trb1c7"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
@@ -174,7 +174,7 @@
       </section>
 
       <section name="13">
-        <attstr name="name" val="Miguel"></attstr>
+        <attstr name="name" val="Allan McRae"></attstr>
         <attstr name="desc" val="S: car7b"></attstr>
         <attstr name="team" val="simplix_trb1c7"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>

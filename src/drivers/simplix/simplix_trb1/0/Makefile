@@ -16,7 +16,7 @@
 
 ROBOT       = simplix_trb1
 SHIPDIR     = drivers/${ROBOT}/0
-SHIP        = logo.rgb car1-trb1.rgb tex-wheel.rgb
+SHIP        = logo.rgb car1-trb1.rgb tex-wheel.rgb skill.xml
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
