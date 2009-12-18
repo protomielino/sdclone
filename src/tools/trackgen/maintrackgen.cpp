@@ -92,7 +92,7 @@ void usage(void)
 {
     fprintf(stderr, "Terrain generator for tracks $Revision: 1.5.2.1 $ \n");
     fprintf(stderr, "Usage: trackgen -c category -n name [-a] [-m] [-s] [-S] [-E <n> [-H <nb>]]\n");
-    fprintf(stderr, "       -c category    : track category (road, oval, dirt...)\n");
+    fprintf(stderr, "       -c category    : track category (road, speedway, dirt...)\n");
     fprintf(stderr, "       -n name        : track name\n");
     fprintf(stderr, "       -b             : draw bump track\n");
     fprintf(stderr, "       -B             : Don't use terrain border (relief supplied int clockwise, ext CC)\n");
