@@ -48,7 +48,7 @@ SOURCES     = ../src/unitmain.cpp \
 		../src/unitvec3d.cpp
 SHIPDIR     = drivers/${ROBOT}
 SHIP        = ${ROBOT}.xml default.xml logo.rgb 
-SHIPSUBDIRS = 0 1 2 3 4 5 6 7 8 9 10 tracks 36GP-alfa12c 36GP-alfatipo 36GP-autounion 36GP-bugatti 36GP-maserati 36GP-maserati6C34 36GP-mercedes
+SHIPSUBDIRS = 0 1 2 3 4 5 6 7 8 9 10 tracks 36GP-alfa12c 36GP-bugatti 36GP-maserati 36GP-maserati6C34 36GP-mercedes
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
 src-robots-simplix_36GP_PKGFILES = $(shell find * -maxdepth 0 -type f -print)
