@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.12
+// Last changed : 2009.12.16
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -1169,7 +1169,7 @@ void TDriver::Drive()
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
   //else
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
-  //GfOut("v:(%.1f)%.1f km/h RA:%.3f RAD:%.1f H:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,1/(oLanePoint.Crv*CalcCrv_simplix_SC(fabs(oLanePoint.Crv))),1/(oLanePoint.Crv*CalcHairpin_simplix_SC(fabs(oLanePoint.Crv))));
+  //GfOut("v:(%.1f)%.1f km/h R:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv);
 }
 //==========================================================================*
 
@@ -3273,6 +3273,18 @@ double TDriver::CalcHairpin(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix(double Crv)
 {
+  double Offset = 800;
+
+  if (oCrvComp)
+  {
+    if (Crv < 0.01) 
+      return 1.0;
+	else
+      return ((1+Crv) * (200 + Offset)/(1/Crv + Offset));
+  }
+  else
+    return 1.0;
+/*
   if (oCrvComp)
   {
     if (Crv < 0.0025) 
@@ -3282,6 +3294,7 @@ double TDriver::CalcCrv_simplix(double Crv)
   }
   else
     return 1.0;
+*/
 }
 //==========================================================================*
 
