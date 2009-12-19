@@ -216,7 +216,7 @@ rmtsGetTrackName(const char *category, const char *trackName)
     if (trackHandle) {
         name = strdup(GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_NAME, trackName));
     } else {
-        GfTrace("Could not read file %s\n", PathBuf);
+        GfError("Could not read file %s\n", PathBuf);
         return 0;
     }
 
@@ -242,7 +242,7 @@ rmtsGetCategoryName(const char *category)
     if (categoryHandle) {
         name = strdup(GfParmGetStr(categoryHandle, TRK_SECT_HDR, TRK_ATT_NAME, category));
     } else {
-        GfTrace("Could not read file %s\n", PathBuf);
+        GfError("Could not read file %s\n", PathBuf);
         return 0;
     }
 
@@ -267,7 +267,7 @@ rmtsTrackPrevNext(void *vsel)
 	if (!curTr->dispName) {
 	    curTr->dispName = rmtsGetTrackName(CategoryList->name, curTr->name);
 	    if (!curTr->dispName || strlen(curTr->dispName) == 0) {
-		GfTrace("rmtsTrackPrevNext: No definition for track %s\n", curTr->name);
+		GfError("rmtsTrackPrevNext: No definition for track %s\n", curTr->name);
 	    }
 	}
     } while (!curTr->dispName && curTr != (tFList*)(CategoryList->userData));
@@ -298,7 +298,7 @@ rmtsTrackCatPrevNext(void *vsel)
     if (curCat->userData && !curCat->dispName) {
         curCat->dispName = rmtsGetCategoryName(curCat->name);
         if (!curCat->dispName || strlen(curCat->dispName) == 0) {
-	    GfTrace("rmtsTrackCatPrevNext: No definition for track category %s\n", curCat->name);
+	    GfError("rmtsTrackCatPrevNext: No definition for track category %s\n", curCat->name);
         }
     }
     
@@ -313,7 +313,7 @@ rmtsTrackCatPrevNext(void *vsel)
         if (!curTr->dispName) {
             curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
             if (!curTr->dispName || strlen(curTr->dispName) == 0) {
-		GfTrace("rmtsTrackCatPrevNext: No definition for track %s\n", curTr->name);
+		GfError("rmtsTrackCatPrevNext: No definition for track %s\n", curTr->name);
             }
         }
 
@@ -394,7 +394,7 @@ RmTrackSelect(void *vs)
     /* Get the list of track category directories */
     CategoryList = GfDirGetList("tracks");
     if (!CategoryList) {
-        GfTrace("RmTrackSelect: No track category available\n");
+        GfError("RmTrackSelect: No track category available\n");
         return;
     }
 
@@ -414,7 +414,7 @@ RmTrackSelect(void *vs)
         
         /* Attach the track dir list to the category if not empty */
         if (!trList) {
-        GfTrace("RmTrackSelect: No track available in dir tracks/%s\n", curCat->name);
+            GfError("RmTrackSelect: No track available in dir tracks/%s\n", curCat->name);
         } else {
         //trList = trList->next; /* get the first one */
         
@@ -449,12 +449,11 @@ RmTrackSelect(void *vs)
         /* If current category is not empty and is the default one, */
         if (curCat->userData && !strcmp(curCat->name, defaultCategory)) {
             
-            /* Try and get the category display name, and exit loop if it failed */
+            /* Try and get the category display name, and exit from loop if it failed */
             curCat->dispName = rmtsGetCategoryName(curCat->name);
             if (!curCat->dispName || strlen(curCat->dispName) == 0) {
-            GfTrace("RmTrackSelect: No definition for default track category %s\n", 
-                curCat->name);
-            break;
+                GfError("RmTrackSelect: No definition for default track category %s\n", curCat->name);
+                break;
             }
             
             /* Now, we have the currently selected category */
@@ -473,8 +472,7 @@ RmTrackSelect(void *vs)
                 /* Try and get the track display name */
                 curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
                 if (!curTr->dispName || strlen(curTr->dispName) == 0)
-                    GfTrace("RmTrackSelect: No definition for default track %s\n",
-                        curTr->name);
+                    GfError("RmTrackSelect: No definition for default track %s\n", curTr->name);
                 
                 /* Now, we have the default selected track 
                    in the default selected category ; but beware,
@@ -486,7 +484,7 @@ RmTrackSelect(void *vs)
                 /* Next track dir*/
                 curTr = curTr->next;
                 
-            } while (curTr != trList);
+            } while (curTr != (tFList*)(curCat->userData));
             }
             
             /* Nothing more to do, whatever happened */
@@ -513,7 +511,7 @@ RmTrackSelect(void *vs)
         if (curCat->userData && !curCat->dispName) {
             curCat->dispName = rmtsGetCategoryName(curCat->name);
             if (!curCat->dispName || strlen(curCat->dispName) == 0) {
-            GfTrace("RmTrackSelect: No definition for track category %s\n", curCat->name);
+                GfError("RmTrackSelect: No definition for track category %s\n", curCat->name);
             }
         }
             
@@ -532,7 +530,7 @@ RmTrackSelect(void *vs)
             if (!curTr->dispName) {
                 curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
                 if (!curTr->dispName || strlen(curTr->dispName) == 0)
-                GfTrace("RmTrackSelect: No definition for track %s\n", curTr->name);
+                    GfError("RmTrackSelect: No definition for track %s\n", curTr->name);
             }
             if (curTr->dispName && strlen(curTr->dispName) > 0)
                 break;
@@ -546,7 +544,7 @@ RmTrackSelect(void *vs)
 
             /* If a track was really selected, exit loop */
             if (((tFList*)(CategoryList->userData))->dispName)
-            break;
+                break;
         }
         
         /* Next category dir */
