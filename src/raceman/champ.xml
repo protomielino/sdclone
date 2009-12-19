@@ -158,13 +158,13 @@
 		<attnum name="focused idx" val="7.000000"/>
 		
 		<section name="1">
-			<attnum name="idx" val="6"/>
-			<attstr name="module" val="berniw"/>
+			<attnum name="idx" val="8"/>
+			<attstr name="module" val="simplix_trb1"/>
 		</section>
 		
 		<section name="2">
-			<attnum name="idx" val="6"/>
-			<attstr name="module" val="olethros"/>
+			<attnum name="idx" val="9"/>
+			<attstr name="module" val="usr_trb1"/>
 		</section>
 		
 		<section name="3">
