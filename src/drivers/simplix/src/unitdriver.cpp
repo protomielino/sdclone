@@ -656,11 +656,11 @@ void TDriver::InitTrack
 
   // Adjust pitting ...
   Param.Pit.oUseFirstPit = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,1);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,0);
   GfOut("#oUseFirstPit %d\n",Param.Pit.oUseFirstPit);
 
   Param.Pit.oUseSmoothPit = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_SMOOTH,0,1);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_SMOOTH,0,0);
   GfOut("#oUseSmoothPit %d\n",Param.Pit.oUseSmoothPit);
 
   Param.Pit.oLaneEntryOffset =
@@ -1062,7 +1062,9 @@ void TDriver::Drive()
     oTestPitStop = 1;
   else
     oTestPitStop = 0;
-	if(!Qualification)
+*/
+/*
+  if(!Qualification)
   {
     if (CarLaps > 1)
       oTestPitStop = 1;
@@ -3333,7 +3335,7 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
 {
   double Offset = 1300;
 
-  if (oCrvComp)
+  if ((oCrvComp) && (!oGoToPit))
   {
     if (Crv < 0.0085) 
       return 1.0;

@@ -9,7 +9,7 @@
 //
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.07.12
+// Last changed : 2009.12.20
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -521,24 +521,30 @@ void TPitLane::MakePath
   if (oPitDist < 0)
     oPitDist += oTrack->Length();
 
+  float Factor = 1.00;
+
   // Set speed to allow to stop
   float Speed = 4.0;
+  if (TDriver::UseBrakeLimit)
+  {
+    Factor = 3.00;
+    Speed = 11.0;
+  }
+
   oPathPoints[Idx0].MaxSpeed = oPathPoints[Idx0].Speed = Speed;
   Idx1 = (Idx0 + NSEG - 1) % NSEG;
 
-  int N = 6;
-  float Delta = 0.75;
-  if (TDriver::UseBrakeLimit)
+  if (!TDriver::UseBrakeLimit)
   {
-	  N = N * 3;
-	  Delta = Delta / 3;
-  }
+    int N = 6;
+    float Delta = 0.75;
 
-  for (I = 0; I < N; I++)
-  {
-    Speed += Delta;
-    oPathPoints[Idx1].MaxSpeed = oPathPoints[Idx1].Speed = Speed;
-    Idx1 = (Idx1 + NSEG - 1) % NSEG;
+    for (I = 0; I < N; I++)
+    {
+      Speed += Delta;
+      oPathPoints[Idx1].MaxSpeed = oPathPoints[Idx1].Speed = Speed;
+      Idx1 = (Idx1 + NSEG - 1) % NSEG;
+    }
   }
 
   // Set speed to restart
@@ -549,7 +555,7 @@ void TPitLane::MakePath
   }
 
   // Calculate braking
-  PropagatePitBreaking(oPitStopPos,Param.oCarParam.oScaleMu);
+  PropagatePitBreaking(oPitStopPos,Factor * Param.oCarParam.oScaleMu);
 }
 //==========================================================================*
 
