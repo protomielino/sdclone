@@ -202,9 +202,13 @@ RmRaceParamMenu(void *vrp)
 	    rmrpDispMode = 0;
 	}
 
+	// Create Display mode label.
+	CreateLabelControl(scrHandle,menuXMLDescHdle,"display");
+
+	// Create and initialize Display mode combo-box-like control.
 	CreateButtonControl(scrHandle,menuXMLDescHdle,"displayleftarrow",(void*)0, rmChangeDisplayMode);
 	CreateButtonControl(scrHandle,menuXMLDescHdle,"displayrightarrow",(void*)1, rmChangeDisplayMode);
-	rmrpDispModeId = CreateLabelControl(scrHandle,menuXMLDescHdle,"display");
+	rmrpDispModeId = CreateLabelControl(scrHandle,menuXMLDescHdle,"displayedit");
 	GfuiLabelSetText(scrHandle,rmrpDispModeId,DispModeValues[rmrpDispMode]);
     }
 	
