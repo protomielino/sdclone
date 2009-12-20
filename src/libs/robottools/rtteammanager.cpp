@@ -621,8 +621,11 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 		- Car->_distRaced
 		- TrackLength * Car->_lapsBehindLeader; 
 
-	if (TeamDriver->RemainingDistance > TrackLength)
+	TeamDriver->LapsRemaining = Car->_remainingLaps;
+
+	if ((TeamDriver->RemainingDistance > TrackLength) && (TeamDriver->LapsRemaining > 0))
 	{                                              
+		// if (RtTMShowInfo) GfOut("TM: %s (Laps: %d) (Distance:%g>%g)\n",Car->info.name, TeamDriver->LapsRemaining, TeamDriver->RemainingDistance, TrackLength);
 		if (FuelPerM == 0.0)  
 			FuelConsum = 0.0008f;                      
 		else                       
@@ -635,6 +638,7 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 		if (Car->_fuel < FuelNeeded)   
 		{
 			if (RtTMShowInfo) GfOut("TM: %s pitstop by fuel (%d) (%g<%g)\n",Car->info.name,TeamIndex,Car->_fuel,FuelNeeded);
+			// if (RtTMShowInfo) GfOut("TM: %s (Laps: %d) (Distance:%g>%g)\n",Car->info.name, TeamDriver->LapsRemaining, TeamDriver->RemainingDistance, TrackLength);
 			GotoPit = true;    
 		}
 		else if (!PitSharing)           

@@ -15,6 +15,7 @@
 <params name="36GP-alfa12c" type="template">
 	<section name="simplix private">
 		<attnum name="pit test stop" min="0" max="1" val="0"/>
+		<attnum name="fuelper100km" val="85.0"/>
 
 		<attnum name="accel out" min="0" max="1" val="0"/>
 		<attnum name="brake limit" val="-8.0"/>

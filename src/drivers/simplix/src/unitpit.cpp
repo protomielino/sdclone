@@ -303,9 +303,9 @@ void TPitLane::MakePath
 	- PitInfo->width;                            //   track
 
   oCarParam.oScaleBrake =                        // Limit brake to be used
-	MIN(0.60f,CarParam.oScaleBrake);              //   in pitlane
+	MIN(0.60f,CarParam.oScaleBrake);             //   in pitlane
   oCarParam.oScaleMu =                           // Scale friction estimation
-	MIN(1.00f,CarParam.oScaleMu);                 //   of pitlane
+	MIN(1.00f,CarParam.oScaleMu);                //   of pitlane
 
   float Ratio = (float) 0.5 * 
 	  PitInfo->len / (fabs(PitInfo->driversPits->pos.toMiddle) - PitLaneOffset);

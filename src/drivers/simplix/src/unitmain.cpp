@@ -250,7 +250,6 @@ void SetUpSimplix_sc()
 {
   cRobotType = RTYPE_SIMPLIX_SC;
   SetParameters(NBBOTS, "sc996");
-//  TDriver::UseOldSkilling = true;                // Use old skilling
   TDriver::UseSCSkilling = true;                 // Use supercar skilling
 };
 //==========================================================================*
@@ -264,7 +263,6 @@ void SetUpSimplix_36GP()
   SetParameters(NBBOTS, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
-  //TDriver::UseBrakeLimit = false;
 };
 //==========================================================================*
 
