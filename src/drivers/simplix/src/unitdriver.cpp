@@ -1057,12 +1057,12 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 //--------------------------------------------------------------------------*
 void TDriver::Drive()
 {
-/*
+/** /
   if (CarLaps == 1 + oIndex)
     oTestPitStop = 1;
   else
     oTestPitStop = 0;
-*/
+/ **/
 /*
   if(!Qualification)
   {

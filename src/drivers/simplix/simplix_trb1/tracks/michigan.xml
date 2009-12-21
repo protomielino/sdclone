@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 <!-- 
-    file          : b-speedway.xml 
+    file          : michigan.xml 
     created       : 28 Mar 2008 
     last modified : 21 Dec 2009
     copyright     : (C) 2008-2009 Wolf-Dieter Beelitz
@@ -16,7 +16,7 @@
 		<attnum name="pit use smooth" min="0" max="1" val="1"/>
 		<attnum name="pitlane entry offset" min="-10" max="10" val="2.0"/>
 		<attnum name="pitlane exit offset" min="-10" max="10" val="3.0"/>
-		<attnum name="pit entry long" min="-2000" max="2000" val="-50.0"/>
+		<attnum name="pit entry long" min="-2000" max="2000" val="-120.0"/>
 		<attnum name="pit exit long" min="-2000" max="2000" val="0.0"/>
 		<attnum name="pit exit length" min="-2000" max="2000" val="0.0"/>
 		<attnum name="pit lat offset" min="-5" max="5" val="0.0"/>

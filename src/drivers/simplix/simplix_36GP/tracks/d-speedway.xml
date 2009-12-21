@@ -13,7 +13,7 @@
 <params name="" type="template" mode="mw">
 	<section name="simplix private">
 		<attnum name="pit use first" min="0" max="1" val="1"/>
-		<attnum name="pit use smooth" min="0" max="1" val="0"/>
+		<attnum name="pit use smooth" min="0" max="1" val="1"/>
 		<attnum name="pitlane entry offset" min="-10" max="10" val="2.0"/>
 		<attnum name="pitlane exit offset" min="-10" max="10" val="3.0"/>
 		<attnum name="pit entry long" min="-2000" max="2000" val="-50.0"/>

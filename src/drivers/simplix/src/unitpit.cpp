@@ -529,6 +529,11 @@ void TPitLane::MakePath
   {
     Factor = 3.00;
     Speed = 11.0;
+	if (FirstPit)
+	{
+      Factor = 1.00;
+      Speed = 4.0;
+	}
   }
 
   oPathPoints[Idx0].MaxSpeed = oPathPoints[Idx0].Speed = Speed;
