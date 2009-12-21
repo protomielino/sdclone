@@ -656,7 +656,7 @@ void TDriver::InitTrack
 
   // Adjust pitting ...
   Param.Pit.oUseFirstPit = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,0);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,1);
   GfOut("#oUseFirstPit %d\n",Param.Pit.oUseFirstPit);
 
   Param.Pit.oUseSmoothPit = (int)
