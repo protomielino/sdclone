@@ -100,6 +100,7 @@ class TDriver
 	void NewRace                                 // Start new Race 
 	  (PtCarElt Car, PSituation Situation);
 	void Drive();                                // Drive while racing
+	void DriveLast();                            // Reuse drive commands
 	int	PitCmd();                                // Handle pitstop
 	void EndRace();                              // Stop race
 	void Shutdown();                             // Cleanup
@@ -387,7 +388,8 @@ private:
 	float oSideBorderOuter;
 
 	static int NBBOTS;                           // Nbr of cars
-    static double CurrSimTime;                   // Current simulation time
+//    static double CurrSimTime;                   // Current simulation time
+    double CurrSimTime;                          // Current simulation time
 	static char const* MyBotName;                      // Name of this bot 
 	static char const* ROBOT_DIR;                      // Sub path to dll
 	static char const* SECT_PRIV;                      // Private section

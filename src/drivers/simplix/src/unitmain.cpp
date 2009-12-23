@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2009.02.26
+// Last changed : 2009.12.22
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
@@ -569,6 +569,7 @@ static void NewRace(int Index, tCarElt* Car, tSituation *S)
   cUnusedCount[Index-IndexOffset] = 0;
   
   cRobot[Index-IndexOffset]->NewRace(Car, S);
+  cRobot[Index-IndexOffset]->CurrSimTime = -10.0;
 }
 //==========================================================================*
 
@@ -587,8 +588,10 @@ static void NewRace(int Index, tCarElt* Car, tSituation *S)
 static void Drive(int Index, tCarElt* Car, tSituation *S)
 {
   //GfOut("#>>> TDriver::Drive\n");
-  //if (cRobot[Index-IndexOffset]->CurrSimTime != S->currentTime)
+  if (cRobot[Index-IndexOffset]->CurrSimTime < S->currentTime)
+//  if (cRobot[Index-IndexOffset]->CurrSimTime + 0.03 < S->currentTime)
   {
+    //GfOut("#Drive\n");
 	double StartTimeStamp = RtTimeStamp(); 
 
     cRobot[Index-IndexOffset]->CurrSimTime =     // Update current time
@@ -615,8 +618,12 @@ static void Drive(int Index, tCarElt* Car, tSituation *S)
 	cTickCount[Index-IndexOffset]++;
   	cTicks[Index-IndexOffset] += Duration;
   }
-//  else
-//    cUnusedCount++;
+  else
+  {
+    //GfOut("#DriveLast\n");
+    cUnusedCount[Index-IndexOffset]++;
+    cRobot[Index-IndexOffset]->DriveLast();      // Use last drive commands
+  }
   //GfOut("#<<< TDriver::Drive\n");
 }
 //==========================================================================*

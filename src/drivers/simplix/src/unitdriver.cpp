@@ -80,7 +80,7 @@
 // Statics
 //--------------------------------------------------------------------------*
 int TDriver::NBBOTS = MAX_NBBOTS;                  // Nbr of drivers/robots
-double TDriver::CurrSimTime = 0;                   // Current simulation time
+//double TDriver::CurrSimTime = 0;                   // Current simulation time
 char const* TDriver::MyBotName = "simplix";              // Name of this bot
 char const* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
 char const* TDriver::SECT_PRIV = "simplix private";      // Private section
@@ -748,7 +748,7 @@ void TDriver::InitTrack
 
   oSideScaleBrake = 
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_BRAKE,NULL,oSideScaleBrake);
-  GfOut("#Side Scale Brake%g\n",oSideScaleMu);
+  GfOut("#Side Scale Brake%g\n",oSideScaleBrake);
 
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,oAvoidScale);
@@ -1049,6 +1049,19 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 	cTimeSum[I] = 0.0;
 */
   //GfOut("#<<< TDriver::NewRace()\n");
+}
+//==========================================================================*
+
+//==========================================================================*
+// Drive
+//--------------------------------------------------------------------------*
+void TDriver::DriveLast()
+{
+  oCar->ctrl.accelCmd = (float) oAccel;
+  oCar->ctrl.brakeCmd = (float) oBrake;
+  oCar->ctrl.clutchCmd = (float) oClutch;
+  oCar->ctrl.gear = oGear;
+  oCar->ctrl.steer = (float) oSteer;
 }
 //==========================================================================*
 
