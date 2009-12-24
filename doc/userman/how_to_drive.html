@@ -1,9 +1,9 @@
 <!--
         file        : how_to_drive.html
         created     : Fri Aug  12 13:39:11 CET 2005
-        copyright   : (C) 2005 by Eric Espie
-        email       : torcs@free.fr
-        version     : $Id: how_to_drive.html,v 1.1 2006/10/06 00:19:22 berniw Exp $
+        copyright   : (C) 2005 Eric Espie, 2009 Jean-Philippe Meuret
+        web         : speed-dreams.sourceforge.net
+	version     : $Id: how_to_drive.html 1987 2009-12-22 19:31:21Z pouillot $
 
         Permission is granted to copy, distribute and/or modify this document
         under the terms of the GNU Free Documentation License, Version 1.2
@@ -15,83 +15,88 @@
 	<h1>I want to drive!</h1>
 	
 	<p>
-		Here is the manual for the players who want to drive in TORCS <b>1.3.0</b>.
+		Here is the manual for the players who want to drive in Speed Dreams <b>1.4.0</b>.
 	</p>
 	
 	<p>
-		First of all you should install and run TORCS, for that see the
-		<a href="http://torcs.org/sections.php?op=viewarticle&artid=3">installation manual</a>.
-		After that you can drive a car with a joystick or a steering wheel, or the mouse or keyboard.
-		To configure the player, go to the Player's Configuration menu.
+		First of all you should install and run Speed Dreams ; for that, please read see the
+		INSTALL file <a href="http://speed-dreams.svn.sourceforge.net/viewvc/speed-dreams/trunk">here</a>.
 	</p>
 	
 	<p>
-		<img src="images/torcs-1.jpg">
+		After that you'll be able to drive a car with a joystick, a steering wheel, or simply with the mouse and/or keyboard.
 	</p>
 	
 	<p>
-		<img src="images/torcs-3.jpg">
+		You first need to configure a "human player" in order to choose you car and control device(s) : 
+		go to the Player Configuration menu.
 	</p>
 	
 	<p>
-		To select a player to configure, click in the "Players" zone on a player's name 
-		or on "--- empty ---" if you want to create a new player. To delete a player, select it
-		then use the "delete" button.
+		<img src="images/welcome-playerconfig.jpg">
+	</p>
+	
+	<p>
+		To select a player to configure, click in the "Players" list box on one player's name. 
+		You can also :
+		<ul>
+			<li>create a new player through the New button under the list box (all default settings),</li>
+			<li>copy the selected one with the Copy button (all his settings will be copied, you'll then need to give him a new name),</li>
+			<li>delete the selected one with the Delete button.</li>
+		</ul>
 	</p> 
 	
 	<p>
-		<img src="images/torcs-2.jpg">
+		<img src="images/playerconfig-select.jpg">
 	</p>
 	
 	<p>
-		Here we have selected the player named "Player". In order to change its name,
-		click in the "name" field and edit it. If you do not want to come back later to change
-		the car create multiple players with different cars, this can safe quite some time.
+		Here, we have selected the player named "Player". 
 	</p>
 	
 	<p>
-		<img src="images/torcs-4.jpg">
+		To change his name, click in the "name" field and edit it with usual keys.
+	</p>
+		<img src="images/playerconfig-editname.jpg">
+	<p>
+		Tip: If you do not want to come back later to change the car / control settings,
+		create here multiple players with different cars / control settings ...
 	</p>
 	
 	<p>
 		This configuration screen is also used to:
 		<ul>
-			<li>select the player's car:
+			<li>Select the player's car:
 				<ol>
 					<li>First select the car's category you want:
 						<ul>
-							<li><b>Track-RWD-GrA</b>: Track rear wheel drive cars with more than 500 hp</li>
-							<li><b>Track-RWD-GrB</b>: Track rear wheel drive cars with less than 500 hp</li>
-							<li><b>Track-4WD-GrB</b>: Track all wheel drive cars with less than 500 hp</li>
-							<li><b>Track-FWD-GrB</b>: Track front wheel drive cars with less than 500 hp</li>
-							<li><b>Historic</b>: 60-70's cars</li>
-							<li><b>Nascar</b>: Nascar cars</li>
-							<li><b>Offroad-4WD-GrA</b>: Off-road all wheel drive cars (rally cars)</li>
-							<li><b>Offroad-RWD-GrA</b>: Off-road rear wheel drive cars</li>
+							<li><b>36 GP</b>: These terrible Grand-Prix cars of the thirties</li>
+							<li><b>Supercars</b>: The ones you dream of, in their unmodified version</li>
+							<li><b>TRB1</b>: The Speed Dreams setups of the well known GTs from Torcs</li>
+							<li><b>LS-GT1</b>: The future awesome Speed Dreams GT1 series</li>
 						</ul>
 					</li>
-					<li>Then select you car within the category.</li>
+					<li>Then select your car within the category.</li>
 				</ol>
 			</li>
-			<li>Select the transmission mode (automatic or manual)</li>
+			<li>Select the transmission mode (automatic, sequential or grid)</li>
+				<ul>
+					<li><b>automatic</b>: Just throttle down or brake, the computer takes car of the gears</li>
+					<li><b>sequential</b>: Shift up and down like in a F1 car</li>
+					<li><b>grid</b>: Enjoy the good old grid shifter, like grand father's</li>
+				</ul>
 			<li>Program the number of pit stops you want for the race, so the initial fuel amount is adjusted accordingly.</li>
 			<li>Change the player's skill level:
 				<ul>
-					<li><b>Rookie</b>: no dammage (0%)- high traction (+40%)</li>
-					<li><b>Amateur</b>: small damages (50%) - high traction (+35%)</li>
-					<li><b>Semi-Pro</b>: normal damages (80%) - medium traction (+30%)</li>
-					<li><b>Pro</b>: high damages (100%) - low traction (+0%)</li>
+					<li><b>Rookie</b>: No damages (0%),  high traction (+40%)</li>
+					<li><b>Amateur</b>: Small damages (50%),  high traction (+35%)</li>
+					<li><b>Semi-Pro</b>: Medium damages (80%), medium traction (+30%)</li>
+					<li><b>Pro</b>: High damages (100%), low traction (+0%)</li>
 				</ul>
 			</li>
 			<li>Select the auto reverse function (engage automatically the reverse gear when the car is stopped and you continue to brake).</li>
-			<li>Configure the controls</li>
+			<li>Configure the control device(s) (see below)</li>
 		</ul>
-	</p>
-	
-	
-	
-	<p>
-		The player's control configuration is explained on next screen.
 	</p>
 	
 	<!--pagebreak-->	
@@ -103,53 +108,81 @@
 	</p>
 	
 	<p>
-		<img src="images/torcs-6.jpg">
+		<img src="images/playerconfig-control.jpg">
 	</p>
 	
 	<p>
-		Now, click on the control you want to change
+		Now, click on the control you want to change ...
 	</p>
 	
 	<p>
-		<img src="images/torcs-7.jpg">
+		<img src="images/controlconfig-autoseq.jpg">
 	</p>
 	
 	<p>
-		And press the key you want to use to that control, or even move the mouse to use
-		the mouse to control the car
+		... and then press the keyboard key you want to use for that control, 
+		or a mouse button if you prefer, or even ... move the mouse
+		if that control have to be assigned to a mouse move event.
 	</p>
 	
 	<p>
-		<img src="images/torcs-8.jpg">
+		Tip: To unassign a given control, click on it and press the Escape key.
+	</p>
+	
 	</p>
 	
 	<p>
-		If your joystick is configured, you can also move the joystick to use it for that control.
+		<img src="images/controlconfig-mouseleft.jpg">
+	</p>
+	
+	<p>
+ 		You can also use a joystick, a gamepad, or even a wheel with/without pedals/gear lever ...
 		See <a href="http://atrey.karlin.mff.cuni.cz/~vojtech/joystick/">the Vojtech Pavlik's joystick
-		driver site</a> for more information on how you can have your joystick work under Linux.
+		driver site</a> for more information on how you can have your device work under Linux.
 		(see also <a href="http://www.icculus.org/lgfaq">Linux Gamers FAQ</a>).
 	</p>
 	
 	<p>
-		<img src="images/torcs-9.jpg">
+		The control configuration screen is a bit different if you choosed the grid shifting mode,
+		but it works the same way.
 	</p>
 	
 	<p>
-		Proceed with all the controls you want to configure (you can also use joystick buttons),
-		and calibrate the joystick. Beware, before you enter the calibration screen the axis
-		should be centred.
+		<img src="images/controlconfig-wheelright.jpg">
 	</p>
 	
 	<p>
-		<img src="images/torcs-10.jpg">
+		Tip: If your device was not plugged in (you forgot), just exit 
+		from the control configuration screen, plug it in, and then get back ...
+		This time it should work.
 	</p>
 	
 	<p>
-		Then follow the calibration instructions
+		Proceed with all the controls you want to configure (you can use device buttons, axes, ...).
 	</p>
 	
 	<p>
-		<img src="images/torcs-11.jpg">
+		Then you probably want to calibrate the relevant axes.
+	</p>
+	
+	<p>
+		<img src="images/controlconfig-calibrate.jpg">
+	</p>
+	
+	<p>
+		Just follow the calibration instructions on the screen.
+	</p>
+	
+	<p>
+		<img src="images/joystickconfig.jpg">
+	</p>
+	
+	<p>
+		The calibration screen is a bit different when you choosed the mouse.
+	</p>
+	
+	<p>
+		<img src="images/mouseconfig.jpg">
 	</p>
 	
 	<p>
@@ -159,15 +192,19 @@
 	</p>
 	
 	<p>
-		<img src="images/torcs-12.jpg">
+		You'll have to save your control settings before exiting (unless you want to cancel all through the Cancel button).
 	</p>
 	
 	<p>
-		You'll have to save the configuration before exiting
+		<img src="images/controlconfig-save.jpg">
 	</p>
 	
 	<p>
-		<img src="images/torcs-13.jpg">
+		And then save the players settings (or Cancel all of your changes through the Cancel button).
+	</p>
+	
+	<p>
+		<img src="images/playerconfig-accept.jpg">
 	</p>
 	
 	<!--pagebreak-->
@@ -178,43 +215,59 @@
 	</p>
 	
 	<p>
-		<img src="images/torcs-20.jpg">
+		<img src="images/welcome-options.jpg">
 	</p>
 	
 	<p>The Graphic parameters are located in the "Graphic" menu</p>
 	<p>
-		<img src="images/torcs-21.jpg">
+		<img src="images/options-graphic.jpg">
 	</p>
 	
 	<p>The following parameters are customisable:</p>
 	<ul>
-	<li><b>Visibility</b>: The depth of view factor (>0) can be reduced on less powerful systems or increased on more powerfull systems, you can go beyond 100%</li>
-	<li><b>Smoke</b>: The number of smokes per car (>=0) can be reduced on less powerful systems or increased on more powerfull systems</li>
-	<li><b>Skid Marks</b>: The number of skid marks per car (>=0) can be reduced on less powerful systems or increased on more powerful systems</li>
-	<li><b>LOD Factor</b>: The cars LOD (Level Of Detail) threshold (>=0.0) can be reduced on less powerful systems or increased on more powerfull systems</li>
+	<li><b>Visibility</b>: The depth of view factor (> 0), you can go beyond 100%</li>
+	<li><b>Smoke</b>: The number of smokes per car (>= 0)</li>
+	<li><b>Skid Marks</b>: The number of skid marks per car (>= 0)</li>
+	<li><b>LOD Factor</b>: The cars LOD (Level Of Detail) threshold (>= 0.0)</li>
 	</ul>
+	<p>As a general rule for all these parameters, greater values will need a more powerfull system : play a little to find the ones that fit best your hardware</p>
 	
 	<p>
-		<img src="images/torcs-22.jpg">
+		<img src="images/graphic-accept.jpg">
 	</p>
 	
 	<p>
-		The display configuration is done in the "Display" menu
+		The screen display configuration is done in the "Display" menu
 	</p>
 	
 	<p>
-		<img src="images/torcs-23.jpg">
+		<img src="images/options-display.jpg">
 	</p>
 	
 	<p>
-		You can adjust the screen resolution, the colour depth and the display mode
-		(windowed or fullscreen) then apply to validate the modifications. <b>Note:</b> If the program
-		does not start with the parameters you have chosen, don't panic, you just edit the
-		"config/screen.xml" file and reset the values to a more conservative choice.
+		You can adjust the screen / window resolution, the colour depth,
+		the display mode (windowed or fullscreen), the video initialization mode
+		("compatible" normally works, while best may produce odd graphic effects ...).
+	<p>
+		Use the Apply button to validate your changes. 
 	</p>
 	
 	<p>
-		<img src="images/torcs-24.jpg">
+		<b>Note:</b> If the program does not restart with the parameters you have chosen, 
+		don't panic, just edit the "screen.xml" file and reset the values 
+		to a more conservative choice (this file is normally located in ~/.speed-dreams/config under Unixes, or <My documents>/speed-dreams.settings/config under Windows).
+	</p>
+	
+	<p>
+		<b>Advanced:</b> Under Windows, you can also set the maximum screen refresh rate (Hz)
+		during the game : if your real hardware screen refresh rate is 75 Hz,
+		it's useless (no harm, only warm and noise ;-) to use a higher value
+		as your CPU will work for nothing. Under Linux, use your video driver configuration
+		tool and set the "Sync to VBlank" option to get the same effect.
+	</p>
+	
+	<p>
+		<img src="images/display-accept.jpg">
 	</p>
 	
 	<p>
