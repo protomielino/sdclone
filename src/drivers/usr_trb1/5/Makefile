@@ -16,7 +16,7 @@
 
 ROBOT       = usr_trb1
 SHIPDIR     = drivers/${ROBOT}/5
-SHIP        = car3-trb1.rgb wheel3d.png skill.xml
+SHIP        = car3-trb1.png wheel3d.png skill.xml
 SHIPSUBDIRS = 
 
 PKGSUBDIRS  = ${SHIPSUBDIRS}
