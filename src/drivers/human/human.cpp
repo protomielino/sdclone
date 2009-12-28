@@ -248,7 +248,7 @@ moduleInitialize(tModInfo *modInfo)
 		// Fill the module interfaces info : each driver is associated to 1 interface.
 		for (int i = 0; i < NbDrivers; i++) {
 	    sprintf(sstring, "Robots/index/%d", i+1);
-	    std::string driver(GfParmGetStr(drvInfo, sstring, "name", ""));
+	    std::string driver = GfParmGetStr(drvInfo, sstring, "name", "");
 	    if (driver.size() > 0) {
 				VecNames.push_back(driver); // Don't rely on GfParm allocated data
 				modInfo->name    = VecNames[i].c_str();	/* name of the module (short) */
