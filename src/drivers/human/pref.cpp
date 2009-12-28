@@ -42,16 +42,6 @@
 
 void	*PrefHdle;
 
-/* int	Transmission; */
-
-/* int	NbPitStopProg		= 0; */
-
-/* int	ParamAsr		= 0;	 anti-slip accel  */
-/* int	ParamAbs		= 1;	 anti-lock brake  */
-/* int	RelButNeutral		= 0; */
-/* int	SeqShftAllowNeutral	= 0; */
-/* int	AutoReverse		= 0; */
-
 tControlCmd	CmdControlRef[] = {
     {HM_ATT_UP_SHFT,    GFCTRL_TYPE_JOY_BUT,       0, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
     {HM_ATT_DN_SHFT,    GFCTRL_TYPE_JOY_BUT,       1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
@@ -118,11 +108,12 @@ HmReadPrefs(int index)
 
     sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
-    if (strcmp(prm, HM_VAL_AUTO) == 0) {
-	HCtx[idx]->Transmission = 0;
-    } else {
-	HCtx[idx]->Transmission = 1;
-    }
+    if (!strcmp(prm, HM_VAL_AUTO))
+        HCtx[idx]->Transmission = eTransAuto;
+    else if (!strcmp(prm, HM_VAL_SEQ))
+        HCtx[idx]->Transmission = eTransSeq;
+    else
+        HCtx[idx]->Transmission = eTransGrid;
 
     /* Parameters Settings */
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[HCtx[idx]->ParamAbs]);

@@ -28,6 +28,8 @@
 
 #include <vector>
 
+typedef enum { eTransAuto, eTransSeq, eTransGrid } eTransmission;
+
 typedef struct HumanContext
 {
     int		NbPitStops;
@@ -43,10 +45,10 @@ typedef struct HumanContext
     int		lap;
     float	prevLeftSteer;
     float	prevRightSteer;
-		float paccel;
-		float pbrake;
+    float	paccel;
+    float	pbrake;
     int		manual;
-    int		Transmission;
+    eTransmission		Transmission;
     int		NbPitStopProg;
     int		ParamAsr;
     int		ParamAbs;
@@ -54,7 +56,7 @@ typedef struct HumanContext
     int		SeqShftAllowNeutral;
     int		AutoReverse;
     int		drivetrain;
-		int   autoClutch;
+    int		autoClutch;
     tControlCmd	*CmdControl;
     int		MouseControlUsed;
     int		lightCmd;
