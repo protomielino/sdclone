@@ -63,6 +63,7 @@ static char *strndup(const char *str, int len)
 
 #define snprintf _snprintf
 #define vsnprintf _vsnprintf
+#define isnan _isnan
 
 // For MSVC 2005 and newer
 #if _MSC_VER >= 1400
