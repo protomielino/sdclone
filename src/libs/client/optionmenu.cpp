@@ -19,11 +19,14 @@
 
 #include <stdio.h>
 #include <tgfclient.h>
-#include "optionmenu.h"
+
 #include <graphconfig.h>
-#include <simuconfig.h>
-#include <soundconfig.h>
 #include <openglconfig.h>
+#include <soundconfig.h>
+#include <simuconfig.h>
+#include <aiconfig.h>
+
+#include "optionmenu.h"
 
 static void *optionHandle = NULL;
 
@@ -42,11 +45,12 @@ OptionOptionInit(void *prevMenu)
 
     CreateStaticControls(param,optionHandle);
     
-    CreateButtonControl(optionHandle,param,"graphic",GraphMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"display",GfScrMenuInit(optionHandle),GfuiScreenActivate);
-    CreateButtonControl(optionHandle,param,"simulation",SimuMenuInit(optionHandle),GfuiScreenActivate);
-    CreateButtonControl(optionHandle,param,"sound",SoundMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"graphic",GraphMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"opengl",OpenGLMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"sound",SoundMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"simulation",SimuMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"ai",AIMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"back",prevMenu,GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
