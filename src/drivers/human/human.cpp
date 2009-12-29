@@ -86,7 +86,8 @@ static double lastKeyUpdate = -10.0;
 static bool firstTime = false;
 
 // Human drivers names.
-static std::vector<std::string> vecNames;
+#define MAXPLAYERS 64
+static char Names[MAXPLAYERS][256];
 
 // Number of human drivers (initialized by moduleMaxInterfaces).
 static int nbDrivers = -1;
@@ -104,8 +105,6 @@ static void
 shutdown(const int index)
 {
 	int	idx = index - 1;
-
-	vecNames.erase(vecNames.begin() + idx);
 
 	free (HCtx[idx]);
 	HCtx[idx] = 0;
@@ -236,9 +235,6 @@ moduleInitialize(tModInfo *modInfo)
 	// Reset module interfaces info.
 	memset(modInfo, 0, nbDrivers*sizeof(tModInfo));
 
-	// Clear the local driver name vector
-	vecNames.clear();
-
 	// Open and load the human drivers params file
 	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
@@ -249,8 +245,9 @@ moduleInitialize(tModInfo *modInfo)
 			sprintf(sstring, "Robots/index/%d", i+1);
 			const std::string strDriverName = GfParmGetStr(drvInfo, sstring, "name", "");
 			if (strDriverName.size() > 0) {
-				vecNames.push_back(strDriverName); // Don't rely on GfParm allocated data
-				modInfo->name    = vecNames[i].c_str();	/* name of the module (short) */
+				memset((void*)&Names[i][0],0,256);
+				strncpy(&Names[i][0],strDriverName.c_str(),256);
+				modInfo->name    =  &Names[i][0];	/* name of the module (short) */
 				modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
 				modInfo->fctInit = InitFuncPt;	/* init function */
 				modInfo->gfId    = ROB_IDENT;	/* supported framework version */
@@ -276,7 +273,7 @@ moduleInitialize(tModInfo *modInfo)
 extern "C" int
 moduleTerminate()
 {
-	vecNames.clear();	//Free local copy of driver names
+
 	return 0;
 }//moduleTerminate
 
