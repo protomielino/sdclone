@@ -68,10 +68,10 @@
       </section>
 
       <section name="background pushed button">
-        <attnum name="red" val="0.25"/>
-        <attnum name="green" val="0.59"/>
-        <attnum name="blue" val="0.95"/>
-        <attnum name="alpha" val="0.25"/>
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="0"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="0"/>
       </section>
 
       <section name="background enabled button">
@@ -84,13 +84,13 @@
       <section name="background disabled button">
         <attnum name="red" val="0"/>
         <attnum name="green" val="0"/>
-        <attnum name="blue" val="0.1"/>
-        <attnum name="alpha" val="0.1"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="0"/>
       </section>
 
       <section name="focused button">
-        <attnum name="red" val="0"/>
-        <attnum name="green" val="0"/>
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="0.8"/>
         <attnum name="blue" val="0"/>
         <attnum name="alpha" val="1"/>
       </section>
@@ -139,7 +139,7 @@
 
       <section name="selected scroll list">
         <attnum name="red" val="1"/>
-        <attnum name="green" val="0"/>
+        <attnum name="green" val="0.8"/>
         <attnum name="blue" val="0"/>
         <attnum name="alpha" val="1"/>
       </section>
@@ -152,9 +152,9 @@
       </section>
 
       <section name="tip">
-        <attnum name="red" val="1"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="0"/>
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="0.8"/>
+        <attnum name="blue" val="1"/>
         <attnum name="alpha" val="1"/>
       </section>
 
@@ -175,50 +175,51 @@
       <section name="help key">
         <attnum name="red" val="1"/>
         <attnum name="green" val="1"/>
-        <attnum name="blue" val="0"/>
+        <attnum name="blue" val="1"/>
         <attnum name="alpha" val="1"/>
       </section>
 
       <section name="help description">
-        <attnum name="red" val="1.0"/>
-        <attnum name="green" val="1.0"/>
-        <attnum name="blue" val="1.0"/>
-        <attnum name="alpha" val="1.0"/>
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
       </section>
 
       <section name="driver config label color">
-        <attnum name="red" val="0.0"/>
-        <attnum name="green" val="1.0"/>
-        <attnum name="blue" val="0.0"/>
-	     <attnum name="alpha" val="1.0"/>
-      </section>
-      <section name="label color options">
-        <attnum name="red" val="0.0"/>
-        <attnum name="green" val="1.0"/>
-        <attnum name="blue" val="0.0"/>
-	     <attnum name="alpha" val="1.0"/>
-      </section> 
-      <section name="base color background image">
-	     <attnum name="red" val="1.0"/>
-	     <attnum name="green" val="1.0"/>
-	     <attnum name="blue" val="1.0"/>
-	     <attnum name="alpha" val="1.0"/>
-      </section>
-      
-      <section name="edit box color">
-        <attnum name="red" val="1.0"/>
-        <attnum name="green" val="1.0"/>
-        <attnum name="blue" val="1.0"/>
-        <attnum name="alpha" val="1.0"/>
-      </section>
-	  <!-- color of table headers in result view etc. -->
-      <section name="table header">
-        <attnum name="red" val="0.0"/>
-        <attnum name="green" val="0.8"/>
-        <attnum name="blue" val="1.0"/>
-        <attnum name="alpha" val="1.0"/>
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="1"/>
       </section>
 
+      <section name="label color options">
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
+      <section name="base color background image">
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
+      <section name="edit box color">
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
+      <section name="table header">
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="0.8"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
+      </section>
 
     </section>
 
