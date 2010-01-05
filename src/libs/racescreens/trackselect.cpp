@@ -32,7 +32,7 @@
 #include <portability.h>
 #include "racescreens.h"
 
-static const int DescLineLength = 21;  //Line length for track description
+static const int DescLineLength = 30;  //Line length for track description
 
 static const int MaxPathSize = 256;
 static char PathBuf[MaxPathSize];
