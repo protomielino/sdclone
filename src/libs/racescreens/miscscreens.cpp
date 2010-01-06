@@ -67,8 +67,21 @@ rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, in
 
     // Create specified buttons, left aligned.
     for (int nButInd = 0; nButInd < nButtons; nButInd++)
-        GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
+	{
+        int id = GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
                              aButtons[nButInd].screen, GFUI_ALIGN_HL_VB, GfuiScreenActivate);
+
+		GfuiButtonShowBox(screenHdle,id,false);
+	    Color c	,fc,pc;
+		c.red =1.0;c.green=1.0;c.blue=1.0;c.alpha=1.0;
+		fc.red =1.0;fc.green=0.8;fc.blue=0.0;fc.alpha=1.0;
+		pc.red =0.902;pc.green=0.1;pc.blue=0.2;pc.alpha=1.0;
+
+        GfuiButtonSetColor(screenHdle,id,c);
+        GfuiButtonSetFocusColor(screenHdle,id,fc);
+        GfuiButtonSetPushedColor(screenHdle,id,pc);
+
+	}
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
