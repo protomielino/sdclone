@@ -468,6 +468,16 @@ GfuiEnable(void *scr, int id, int flag)
     default:
 	return -1;
     }
+
+	if (curObject->widget == GFUI_BUTTON)
+	{
+		if (curObject->state == GFUI_DISABLE) 
+			curObject->u.button.state = GFUI_BTN_RELEASED;
+		else
+			curObject->u.button.state = GFUI_BTN_RELEASED;
+	}
+
+
     return 0;
 }
 

@@ -57,6 +57,7 @@ static int		FocDrvLabelId;
 static int		PickDrvTypLabelId;
 static int		PickDrvCarLabelId;
 static int		PickDrvCategoryLabelId;
+static int      AcceptId;
 static int		NbTotDrivers;
 static int		NbSelectedDrivers;
 static int		NbMaxSelectedDrivers;
@@ -272,6 +273,14 @@ rmdsSelectDeselect(void * /* dummy */ )
 
     // Update selected driver displayed info
     rmdsClickOnDriver(NULL);
+
+	//Don't allow user to Accept 0 drivers this would cause a crash
+	if (NbSelectedDrivers>0)
+		GfuiEnable(ScrHandle,AcceptId, GFUI_ENABLE);
+	else
+		GfuiEnable(ScrHandle,AcceptId, GFUI_DISABLE);
+
+
 }
 
 static void
@@ -463,7 +472,7 @@ RmDriversSelect(void *vs)
     PickDrvCarLabelId = CreateLabelControl(ScrHandle,param,"pickdrvcarlabel");
     
     // Accept and Cancel buttons
-    CreateButtonControl(ScrHandle,param,"accept",NULL,rmdsAccept);
+    AcceptId = CreateButtonControl(ScrHandle,param,"accept",NULL,rmdsAccept);
     CreateButtonControl(ScrHandle,param,"cancel",DrvSel->prevScreen,rmdsDeactivate);
 
     GfParmReleaseHandle(param);
