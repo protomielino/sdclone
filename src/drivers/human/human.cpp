@@ -987,6 +987,8 @@ getAutoClutch(int idx, int gear, int newgear, tCarElt *car)
 static void
 drive_mt(const int index, tCarElt* car, tSituation *s)
 {
+	int i;
+
 	const int idx = index - 1;
 	const tControlCmd *cmd = HCtx[idx]->CmdControl;
 
@@ -996,14 +998,17 @@ drive_mt(const int index, tCarElt* car, tSituation *s)
 	/* manual shift sequential */
 	if (HCtx[idx]->Transmission == eTransSeq)
 	{
+		/* Up shifting command */
 		if ((cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_UP_SHFT].val])
 			|| (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_UP_SHFT].val])
 			|| (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[cmd[CMD_UP_SHFT].val].edgeUp)
 			|| (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_SKEYBOARD && skeyInfo[cmd[CMD_UP_SHFT].val].edgeUp))
 		{
-			car->_gearCmd++;
+			if (HCtx[idx]->SeqShftAllowNeutral || car->_gearCmd > -1)
+				car->_gearCmd++;
 		}
 
+		/* Down shifting command */
 		if ((cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_DN_SHFT].val])
 			|| (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_DN_SHFT].val])
 			|| (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[cmd[CMD_DN_SHFT].val].edgeUp)
@@ -1012,12 +1017,23 @@ drive_mt(const int index, tCarElt* car, tSituation *s)
 			if (HCtx[idx]->SeqShftAllowNeutral || car->_gearCmd > 1)
 				car->_gearCmd--;
 		}
+
+		/* Reverse gear and Neutral gear commands */
+		for (i = CMD_GEAR_R; i <= CMD_GEAR_N; i++) {
+			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[i].val])
+				 || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[i].val])
+				 || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[cmd[i].val].edgeUp)
+				 || (cmd[i].type == GFCTRL_TYPE_SKEYBOARD && skeyInfo[cmd[i].val].edgeUp))
+			{
+				car->_gearCmd = i - CMD_GEAR_N;
+			}
+		}
 	}
 
 	/* manual shift direct */
 	else if (HCtx[idx]->Transmission == eTransGrid)
 	{
-		int i;
+		/* Go to neutral gear if any gear command released (edge down) */
 		if (HCtx[idx]->RelButNeutral) {
 			for (i = CMD_GEAR_R; i <= CMD_GEAR_6; i++) {
 				if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgedn[cmd[i].val])
@@ -1030,6 +1046,7 @@ drive_mt(const int index, tCarElt* car, tSituation *s)
 			}
 		}
 
+		/* Select the right gear if any gear command activated (edge up) */
 		for (i = CMD_GEAR_R; i <= CMD_GEAR_6; i++) {
 			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[i].val])
 				 || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[i].val])
