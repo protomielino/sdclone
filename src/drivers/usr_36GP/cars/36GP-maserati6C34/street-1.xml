@@ -29,6 +29,8 @@
 		<attnum name="base brake" val="29.00"/>
 		<attnum name="int margin" val="1.8"/>
 		<attnum name="ext margin" val="1.3"/>
+		<attnum name="pit offset" val="0.00"/>
+		<attnum name="pit shift" val="1.00"/>
 	</section>
 
 </params>

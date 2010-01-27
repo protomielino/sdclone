@@ -33,6 +33,8 @@
 	</section>
 
 	<section name="private">
+		<attnum name="pit offset" val="0.00"/>
+		<attnum name="pit shift" val="1.00"/>
 	</section>
 
 </params>

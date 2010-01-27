@@ -90,7 +90,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 			pMID[i].y *= sign;
 		}
 
-		double PitShift = GfParmGetNum( car->_carHandle, SECT_PRIVATE, "PitShift", (char *)NULL, 0.0 );
+		double PitShift = GfParmGetNum( car->_carHandle, SECT_PRIVATE, "pit shift", (char *)NULL, 0.0 );
 		pMID[3].y = (fabs(pitinfo->driversPits->pos.toMiddle)+PitShift+1.0)*sign;
 		splineMID = new Spline(NPOINTS, pMID);
 
@@ -242,17 +242,21 @@ void Pit::update()
 	if (mypit != NULL) {
 		if (isBetween(car->_distFromStartLine, 0)) {
 			if (getPitstop()) {
+				/*
 				if (!isBetween(car->_distFromStartLine, 1) ||
 				    (side == TR_LFT && car->_trkPos.toLeft < 0.0) ||
 				    (side == TR_RGT && car->_trkPos.toRight < 0.0))
 				{
+				*/
 					setInPit(true);
+					/*
 				}
 				else
 				{
 					setInPit(false);
 					setPitstop(false);
 				}
+				*/
 			}
 		} else {
 			setInPit(false);
