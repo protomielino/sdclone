@@ -27,6 +27,6 @@
 		<attnum name="scale bump" min="0" max="1" val="0.25"/>
 		<attnum name="scale bump outer" min="0" max="2" val="0.35"/>
 		<attnum name="offset skill" val="0.0"/>
-		<attnum name="scale skill" val="1.25"/>
+		<attnum name="scale skill" val="0.75"/>
 	</section>
 </params>

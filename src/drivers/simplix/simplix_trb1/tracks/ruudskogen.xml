@@ -29,6 +29,6 @@
 		<attnum name="scale bump outer" min="0" max="2" val="0.30"/>
 		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.05"/>
 		<attnum name="offset skill" val="0.00"/>
-		<attnum name="scale skill" val="1.25"/>
+		<attnum name="scale skill" val="1.0"/>
 	</section>
 </params>
