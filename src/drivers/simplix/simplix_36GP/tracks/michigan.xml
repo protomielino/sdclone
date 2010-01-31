@@ -24,6 +24,6 @@
 		<attnum name="pit scale brake" val="1.0"/>
 		<attnum name="pit stop dist" val="1.5"/>
 		<attnum name="offset skill" val="0.00"/>
-		<attnum name="scale skill" val="1.0"/>
+		<attnum name="scale skill" val="1.5"/>
 	</section>
 </params>
