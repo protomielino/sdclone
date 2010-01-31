@@ -230,6 +230,7 @@ void SetUpSimplix()
   cRobotType = RTYPE_SIMPLIX;
   SetParameters(NBBOTS, "car1-trb1");
   TDriver::AdvancedParameters = true;
+  TDriver::Learning = false; 
 };
 //==========================================================================*
 
@@ -251,6 +252,7 @@ void SetUpSimplix_sc()
   cRobotType = RTYPE_SIMPLIX_SC;
   SetParameters(NBBOTS, "sc996");
   TDriver::UseSCSkilling = true;                 // Use supercar skilling
+  TDriver::Learning = false; 
 };
 //==========================================================================*
 

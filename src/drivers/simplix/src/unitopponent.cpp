@@ -9,8 +9,8 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.07.12
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.01.30
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -367,7 +367,7 @@ bool TOpponent::Classify(
         oInfo.Flags |= F_CATCHING;               // Classify as catching
 
         double CatchOffset = RelPar.CalcY(T);    // Offset when Opp. is reached
-        CatchOffset = RelPar.CalcY(T);           // Offset when Opp. is reached
+        //CatchOffset = RelPar.CalcY(T);           // Offset when Opp. is reached
         oInfo.CatchTime = T;                     // Save time to catch
         oInfo.CatchSpeed =                       // Select estimate from distance
 	      (OpState.CarDistLong < 15)             // If near, relative to me
@@ -382,7 +382,8 @@ bool TOpponent::Classify(
 
         oInfo.CatchDecel = MAX(0, Decel);        // Save reasonable values only
 
-        if (fabs(CatchOffset) < OpState.MinDistLat + 0.5)
+//        if (fabs(CatchOffset) < OpState.MinDistLat + 0.5)
+        if (fabs(CatchOffset) < OpState.MinDistLat + 0.1)
 		{                                        // The offset will be to small
           oInfo.Flags |= F_COLLIDE;              // Classify as potential collision
 
@@ -408,7 +409,8 @@ bool TOpponent::Classify(
 
       Q.Set(OpState.CarAvgAccLong - MyMaxAccX,
 	    OpState.CarAvgVelLong - MyState.CarAvgVelLong,
-        OpState.CarDistLong - OpState.MinDistLong - 0.2 );
+//        OpState.CarDistLong - OpState.MinDistLong - 0.2 );
+        OpState.CarDistLong - OpState.MinDistLong);
 
       if(Q.SmallestNonNegativeRoot(T))           // Solution possible?
 	  {
@@ -474,7 +476,8 @@ bool TOpponent::Classify(
 			double RelSpd = (OpState.MinDistLong - OpState.CarDistLong) / T;
 			oInfo.Flags |= F_COLLIDE;
 			oInfo.CatchTime = T;
-			oInfo.CatchSpeed = OpVelLong - 3;
+//			oInfo.CatchSpeed = OpVelLong - 3;
+			oInfo.CatchSpeed = OpVelLong;
 			oInfo.CatchDecel = (MyState.Speed - (OpVelLong - RelSpd)) / T;
 		  }
 		}
@@ -493,7 +496,8 @@ bool TOpponent::Classify(
 			double RelSpd = (OpState.MinDistLong + OpState.CarDistLong) / T;
 			oInfo.Flags |= F_COLLIDE;
 			oInfo.CatchTime = T;
-			oInfo.CatchSpeed = OpVelLong - 3;
+//			oInfo.CatchSpeed = OpVelLong - 3;
+			oInfo.CatchSpeed = OpVelLong;
 			oInfo.CatchDecel = (MyState.Speed - (OpVelLong - RelSpd)) / T;
 		  }
 		}

@@ -10,8 +10,8 @@
 //
 // File         : unittrack.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.11.09
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2009.02.30
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000 
 //--------------------------------------------------------------------------*
@@ -246,6 +246,7 @@ void TTrackDescription::Execute()
 		Section->Seg = Segm;                     // Derived from segment
 		Section->WidthToLeft = Segm->width / 2;  // Save initial width to
 		Section->WidthToRight = Segm->width / 2; //   left and right side
+		Section->Friction = Segm->surface->kFriction;
 
 		segDist += StepLen;                      // calculate dist from start
         Station = Station + StepLen;             // and local position
@@ -266,6 +267,7 @@ void TTrackDescription::Execute()
 		Section->Seg = Segm;                     // Derived from segment
 		Section->WidthToLeft = Segm->width / 2;  // Save initial width to
 		Section->WidthToRight = Segm->width / 2; //   left and right side
+		Section->Friction = Segm->surface->kFriction;
 
 		segDist += StepLen;                      // calculate dist from start
         Station = Station + StepLen;             // and local position
@@ -282,12 +284,55 @@ void TTrackDescription::Execute()
 //==========================================================================*
 
 //==========================================================================*
+// Initial target speed[Index]
+//--------------------------------------------------------------------------*
+void TTrackDescription::InitialTargetSpeed(int Index, double TargetSpeed)
+{
+  oSections[Index].InitialTargetSpeed = TargetSpeed;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Initial target speed[Index]
+//--------------------------------------------------------------------------*
+double TTrackDescription::InitialTargetSpeed(int Index)
+{
+  return oSections[Index].InitialTargetSpeed;
+}
+//==========================================================================*
+
+//==========================================================================*
 // Friction of section[Index]
 //--------------------------------------------------------------------------*
 double TTrackDescription::Friction(int Index) const
 {
-  const tTrackSeg* Seg = oSections[Index].Seg;
-  return Seg->surface->kFriction;
+  return oSections[Index].Friction;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Learn Friction of section[Index]
+//--------------------------------------------------------------------------*
+double TTrackDescription::LearnFriction
+  (int Index, double Delta, double MinFriction)
+{
+  if (Delta > 0) 
+  {
+    for (int I = MIN(Index + 2,oCount - 1); (I > 0) && (I > Index - 3); I--)
+	{
+      oSections[I].Friction -= Delta;
+      oSections[I].Friction =
+	    MAX(oSections[I].Seg->surface->kFriction * MinFriction,oSections[I].Friction);
+	}
+    return oSections[Index].Friction;
+  }
+  else
+  {
+    oSections[Index].Friction -= Delta / 2;
+    oSections[Index].Friction =
+	  MIN(oSections[Index].Seg->surface->kFriction * 1.02,oSections[Index].Friction);
+    return oSections[Index].Friction;
+  }
 }
 //==========================================================================*
 

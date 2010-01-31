@@ -9,8 +9,8 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.16
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.01.30
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -94,6 +94,8 @@ float TDriver::BrakeLimitBase = 0.025f;            // Brake limit base
 float TDriver::BrakeLimitScale = 25;               // Brake limit scale
 float TDriver::SpeedLimitBase = 0.025f;            // Speed limit base
 float TDriver::SpeedLimitScale = 25;               // Speed limit scale
+bool  TDriver::FirstPropagation = true;            // Initialize
+bool  TDriver::Learning = true;                    // Initialize
 
 double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
@@ -183,7 +185,7 @@ TDriver::TDriver(int Index):
   oStayTogether(10.0),
   oCrvComp(true),
   oAvoidScale(8.0),
-  oAvoidWidth(1.5),
+  oAvoidWidth(0.5),
   oGoToPit(false),
 
   oDriveTrainType(cDT_RWD),
@@ -206,6 +208,8 @@ TDriver::TDriver(int Index):
   oLastAccel(1.0),
   oBrake(0),
   oLastBrake(0.0),
+  oLastPosIdx(0),
+  oLastLap(1),
   oClutch(0.5),
   oGear(0),
   oSteer(0),
@@ -1014,6 +1018,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   InitCarModells();                              // Initilize Car modells
   oStrategy->Init(this);                         // Init strategy
   oPitSharing = CheckPitSharing();               // Is pitsharing activated?
+  TDriver::FirstPropagation = true;              // Initialize
   FindRacinglines();                             // Find a good racingline
   TeamInfo();                                    // Find team info
 
@@ -1086,7 +1091,8 @@ void TDriver::Drive()
   if (oTestPitStop)                              // If defined, try
     oStrategy->TestPitStop();                    //   to stop in pit
 
-  Propagation();                                 // Propagation
+  Propagation(CarLaps);                          // Propagation
+  oLastLap = CarLaps;
 
   oAlone = true;                                 // Assume free way to race
   bool Close = false;                            // Assume free way to race
@@ -1591,9 +1597,9 @@ void TDriver::FlightControl()
 //==========================================================================*
 // Propagation
 //--------------------------------------------------------------------------*
-void TDriver::Propagation()
+void TDriver::Propagation(int lap)
 {
-  if (Param.Tmp.Needed())
+  if (Param.Tmp.Needed() || ((oLastLap > 0) && (oLastLap < 5) && (oLastLap != lap)))
   {
 	Param.Update();
 
@@ -1603,6 +1609,7 @@ void TDriver::Propagation()
 	  oRacingLine[I].PropagateBreaking(1);
       oRacingLine[I].PropagateAcceleration(1);
 	}
+    TDriver::FirstPropagation = false;
   }
 }
 //==========================================================================*
@@ -2317,6 +2324,29 @@ double TDriver::UnstuckSteerAngle
 //--------------------------------------------------------------------------*
 void TDriver::BrakingForceRegulator()
 {
+  if (TDriver::Learning)
+  {
+    Tdble Err = 0.0;
+    if(oLastBrake && oLastTargetSpeed)
+    {
+      double Pos = oTrackDesc.CalcPos(oCar);       // Get current pos on track
+      int PosIdx = oTrackDesc.IndexFromPos(Pos);
+      if (PosIdx != oLastPosIdx)
+	  {
+	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
+        Err = oCurrSpeed - TargetSpeed;
+	    if (fabs(Err) > 8.0)
+  	    {
+	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
+  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
+		  oLastPosIdx = PosIdx;
+	    }
+  	  }
+      oBrakeCoeff[oLastBrakeCoefIndex] += (float)(Err * 0.002);
+      oBrakeCoeff[oLastBrakeCoefIndex] = (float) MAX(0.5f,MIN(2.0,oBrakeCoeff[oLastBrakeCoefIndex]));
+    }
+  }
+
   double Diff = oCurrSpeed - oTargetSpeed;
 
   if (Diff > 0.0)
@@ -2352,7 +2382,7 @@ void TDriver::BrakingForceRegulator()
   oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
 
   oLastBrake = oBrake;
-  oLastTargetSpeed = 0;
+  oLastTargetSpeed = oTargetSpeed;
 }
 //==========================================================================*
 
@@ -2361,6 +2391,30 @@ void TDriver::BrakingForceRegulator()
 //--------------------------------------------------------------------------*
 void TDriver::BrakingForceRegulatorAvoid()
 {
+  if (TDriver::Learning)
+  {
+    Tdble Err = 0.0;
+    if(oLastBrake && oLastTargetSpeed)
+    {
+      double Pos = oTrackDesc.CalcPos(oCar);       // Get current pos on track
+      int PosIdx = oTrackDesc.IndexFromPos(Pos);
+      if (PosIdx != oLastPosIdx)
+	  {
+	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
+        Err = oCurrSpeed - TargetSpeed;
+	    if (fabs(Err) > 8.0)
+  	    {
+	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
+  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
+  		  oLastPosIdx = PosIdx;
+	    }
+	  }
+
+      oBrakeCoeff[oLastBrakeCoefIndex] += (float)(Err * 0.002);
+      oBrakeCoeff[oLastBrakeCoefIndex] = (float) MAX(0.5f,MIN(2.0,oBrakeCoeff[oLastBrakeCoefIndex]));
+	}
+  }
+
   double Diff = oCurrSpeed - oTargetSpeed;
 
   if (Diff > 0.0)
@@ -2390,7 +2444,7 @@ void TDriver::BrakingForceRegulatorAvoid()
   if (oMinDistLong < 10.0)
 	oBrake *= 1.1;
 
-  oLastTargetSpeed = 0;
+  oLastTargetSpeed = oTargetSpeed;
 }
 //==========================================================================*
 
@@ -2399,13 +2453,27 @@ void TDriver::BrakingForceRegulatorAvoid()
 //--------------------------------------------------------------------------*
 void TDriver::BrakingForceRegulatorTraffic()
 {
-  double Err = 0.0;
-  if(oLastBrake && oLastTargetSpeed)
+  if (TDriver::Learning)
   {
-    Err = oCurrSpeed - oLastTargetSpeed;
-    oBrakeCoeff[oLastBrakeCoefIndex] += Err * 0.001;
-	oLastBrake = 0;
-	oLastTargetSpeed = 0;
+    Tdble Err = 0.0;
+    if(oLastBrake && oLastTargetSpeed)
+    {
+      double Pos = oTrackDesc.CalcPos(oCar);       // Get current pos on track
+      int PosIdx = oTrackDesc.IndexFromPos(Pos);
+      if (PosIdx != oLastPosIdx)
+	  {
+	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
+        Err = oCurrSpeed - TargetSpeed;
+	    if (fabs(Err) > 8.0)
+  	    {
+	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
+  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.90);
+  		  oLastPosIdx = PosIdx;
+	    }
+	  }
+      oBrakeCoeff[oLastBrakeCoefIndex] += (float)(Err * 0.002);
+      oBrakeCoeff[oLastBrakeCoefIndex] = (float) MAX(0.5f,MIN(2.0,oBrakeCoeff[oLastBrakeCoefIndex]));
+    }
   }
 
   double Diff = oCurrSpeed - oTargetSpeed;
@@ -2431,6 +2499,7 @@ void TDriver::BrakingForceRegulatorTraffic()
   if (oMinDistLong < 10.0)
 	oBrake *= 1.1;
 
+  oLastTargetSpeed = oTargetSpeed;
 }
 //==========================================================================*
 
@@ -2462,7 +2531,8 @@ void TDriver::EvaluateCollisionFlags(
 
 	if (OppInfo.GotFlags(F_COLLIDE)
 	  && (OppInfo.CatchDecel > 12.5 * CarFriction))
-	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed * 0.9);
+//	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed * 0.9);
+	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed);
 
 	if (OppInfo.Flags & (F_COLLIDE | F_CATCHING))
 	  MinCatchTime = MIN(MinCatchTime, OppInfo.CatchTime);
@@ -2495,13 +2565,16 @@ void TDriver::EvaluateCollisionFlags(
 	OppInfo.AvoidLatchTime = MAX(0, OppInfo.AvoidLatchTime - oSituation->deltaTime);
 
 	double MaxSpdCrv = Param.Fix.CalcMaxSpeedCrv();
-	double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
-	double CatTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
-	double CacTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
+	//double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
+	double ColTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 2.4;
+	//double CatTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
+	double CatTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
+	//double CacTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
+	double CacTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
 	bool Catching =
-	  (OppInfo.CatchTime < ColTime && OppInfo.GotFlags(F_COLLIDE))
-	  || (OppInfo.CatchTime < CatTime && OppInfo.GotFlags(F_CATCHING))
-	  || (OppInfo.CatchAccTime < CacTime && OppInfo.GotFlags(F_CATCHING_ACC));
+	  ((OppInfo.CatchTime < ColTime) && OppInfo.GotFlags(F_COLLIDE))
+	  || ((OppInfo.CatchTime < CatTime) && OppInfo.GotFlags(F_CATCHING))
+	  || ((OppInfo.CatchAccTime < CacTime) && OppInfo.GotFlags(F_CATCHING_ACC));
 
 	if (!IgnoreTeamMate &&
 	  (OppInfo.AvoidLatchTime > 0 || Catching || OppInfo.GotFlags(F_DANGEROUS)))
@@ -2517,7 +2590,8 @@ void TDriver::EvaluateCollisionFlags(
 	  bool AvoidR = OppInfo.State.CarDistLat > 0 && SpaceL;
 
 	  if (Catching)
-	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
+//	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
+	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 1.0 : 0.5;
 
 	  if (fabs(Crv) < MaxSpdCrv)
 	  {
@@ -2849,7 +2923,8 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   }
 
   double TargetSpeed =                           // Adjust target speed
-	MIN(oTargetSpeed, Coll.TargetSpeed * 0.9);
+//	MIN(oTargetSpeed, Coll.TargetSpeed * 0.9);
+	MIN(oTargetSpeed, Coll.TargetSpeed);
 
   // Skilling from Andrew Sumner ...
   oTargetSpeed = CalcSkill(TargetSpeed);

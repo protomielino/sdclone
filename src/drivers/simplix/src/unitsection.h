@@ -6,12 +6,12 @@
 // Teile der Streckenbeschreibung
 // (C++-Portierung der Unit UnitTrack.pas)
 //
-// Datei    : unitsection.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitsection.h
+// Created      : 2007.11.17
+// Last changed : 2009.02.30
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000 
 //--------------------------------------------------------------------------*
 // Stellt Funktionen zur Streckenbeschreibung zur Verfügung
 //--------------------------------------------------------------------------*
@@ -81,6 +81,8 @@ class TSection
 	TVec3d Center;		                         // Centre
 	TVec3d ToRight; 	                         // To right
 	int PosIndex;                                // Position to section index
+	double Friction;                             // Friction learned
+	double InitialTargetSpeed;                   // Initial target speed
 };
 //==========================================================================*
 #endif // _UNITSECTION_H_

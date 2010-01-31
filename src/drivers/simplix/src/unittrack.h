@@ -6,12 +6,12 @@
 // Streckenbeschreibung
 // (C++-Portierung der Unit UnitTrack.pas)
 //
-// Datei    : unittrack.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unittrack.h
+// Created      : 2007.11.17
+// Last changed : 2009.02.30
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 2.00.000 
 //--------------------------------------------------------------------------*
 // Stellt Funktionen zur Streckenbeschreibung zur Verfügung
 //--------------------------------------------------------------------------*
@@ -99,6 +99,10 @@ class TTrackDescription
     void Execute();                              // Make description of track
 	double Friction(int Index) const;            // Friction of section[Index]
 	double ForwardAngle(double TrackPos) const;  // Angle
+    double LearnFriction
+      (int Index, double Delta, double MinFriction);
+    void InitialTargetSpeed(int Index, double TargetSpeed);
+    double InitialTargetSpeed(int Index);
 
 	int IndexFromPos                             // Get sections index from pos
 	  (double TrackPos) const;

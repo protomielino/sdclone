@@ -9,8 +9,8 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2009.12.06
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.01.30
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -128,7 +128,7 @@ class TDriver
       (double Target, double AvoidTarget); 
 	int PitSide();                               // Side of pitlane
 	double PrevGearRatio();                      // Get prev gear ratio
-	void Propagation();                          // Propagation
+	void Propagation(int lap);                   // Propagation
 	double Steering();                           // Steering
 	void TeamInfo();                             // Get team infos
 	void Turning();                              // Turn if needed
@@ -263,6 +263,8 @@ private:
 	double oLastAccel;                           // Last accel command
 	double oBrake;                               // Braking
 	double oLastBrake;                           // Last brake command
+	int oLastPosIdx;                             // Last brake position
+	int oLastLap;                                // Last lap
 	double oClutch;                              // Clutching
 	int oGear;                                   // Gear
 	double oSteer;                               // Steering
@@ -404,6 +406,8 @@ private:
 	static float BrakeLimitBase;
 	static float SpeedLimitScale;
 	static float SpeedLimitBase;
+	static bool FirstPropagation;
+	static bool Learning;
 
 	void ScaleSide(float FactorMu, float FactorBrake);
 	void SideBorderOuter(float Factor);

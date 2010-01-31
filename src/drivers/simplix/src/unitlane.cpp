@@ -400,6 +400,8 @@ void TLane::CalcMaxSpeeds
 	oPathPoints[P].MaxSpeed = Speed;
 	oPathPoints[P].Speed = Speed;
 	oPathPoints[P].AccSpd = Speed;
+	if (TDriver::FirstPropagation)
+	  oTrack->InitialTargetSpeed(P,Speed);
   }
 }
 //==========================================================================*

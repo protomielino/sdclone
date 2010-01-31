@@ -25,11 +25,11 @@
 	</section>
 	
 	<section name="Rear Left Suspension">
-		<attnum name="bellcrank" min="0.1" max="5" val="1.34"/>
+		<attnum name="bellcrank" min="0.1" max="5" val="1.3"/>
 	</section>
 
 	<section name="Rear Right Suspension">
-		<attnum name="bellcrank" min="0.1" max="5" val="1.34"/>
+		<attnum name="bellcrank" min="0.1" max="5" val="1.3"/>
 	</section>
 
 	<section name="private">
