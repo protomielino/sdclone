@@ -95,7 +95,7 @@ float TDriver::BrakeLimitScale = 25;               // Brake limit scale
 float TDriver::SpeedLimitBase = 0.025f;            // Speed limit base
 float TDriver::SpeedLimitScale = 25;               // Speed limit scale
 bool  TDriver::FirstPropagation = true;            // Initialize
-bool  TDriver::Learning = true;                    // Initialize
+bool  TDriver::Learning = false;                   // Initialize
 
 double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
@@ -1329,7 +1329,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1355,7 +1355,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1384,7 +1384,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1403,7 +1403,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1419,9 +1419,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
 	}
   }
@@ -1601,6 +1601,7 @@ void TDriver::Propagation(int lap)
 {
   if (Param.Tmp.Needed() || ((oLastLap > 0) && (oLastLap < 5) && (oLastLap != lap)))
   {
+	//GfOut("\n\n\nPropagation\n\n\n");
 	Param.Update();
 
 	for (int I = 0; I < NBRRL; I++)
@@ -3423,7 +3424,8 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
 {
   double Offset = 1300;
 
-  if ((oCrvComp) && (!oGoToPit))
+//  if ((oCrvComp) && (!oGoToPit))
+  if (oCrvComp)
   {
     if (Crv < 0.0085) 
       return 1.0;

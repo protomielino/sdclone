@@ -230,7 +230,6 @@ void SetUpSimplix()
   cRobotType = RTYPE_SIMPLIX;
   SetParameters(NBBOTS, "car1-trb1");
   TDriver::AdvancedParameters = true;
-  TDriver::Learning = false; 
 };
 //==========================================================================*
 
@@ -241,6 +240,7 @@ void SetUpSimplix_trb1()
 {
   cRobotType = RTYPE_SIMPLIX_TRB1;
   SetParameters(NBBOTS, "car1-trb1");
+  TDriver::Learning = true;
 };
 //==========================================================================*
 
@@ -252,7 +252,6 @@ void SetUpSimplix_sc()
   cRobotType = RTYPE_SIMPLIX_SC;
   SetParameters(NBBOTS, "sc996");
   TDriver::UseSCSkilling = true;                 // Use supercar skilling
-  TDriver::Learning = false; 
 };
 //==========================================================================*
 
@@ -265,6 +264,7 @@ void SetUpSimplix_36GP()
   SetParameters(NBBOTS, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
+  TDriver::Learning = true;
 };
 //==========================================================================*
 

@@ -143,7 +143,7 @@ void TClothoidLane::MakeSmoothPath(
   	  for (int I = 0; I < L; I++)
 	  {
 		OptimisePath(Step, Delta, Opts.BumpMod);
-	    CalcCurvaturesZ();
+		CalcCurvaturesZ();
 		CalcFwdAbsCrv(FwdRange);
 		CalcMaxSpeeds(Step);
 		PropagateBreaking(Step);
@@ -296,6 +296,8 @@ void TClothoidLane::AnalyseBumps(bool DumpInfo)
 //--------------------------------------------------------------------------*
 void TClothoidLane::SmoothBetween(int Step, double BumpMod)
 {
+  if (Step > 1)
+  {
   const int Count = oTrack->Count();
 
   // Smooth values between Steps
@@ -334,6 +336,38 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
 	  double Len2 = (P->CalcPt() - P2).len();
       Adjust(Crv1, Len1, Crv2, Len2, L1, P, L2, P1, P2, BumpMod);
 	}
+  }
+  }
+  else
+  {
+    const int Count = oTrack->Count();
+
+    // Smooth values between Steps
+    TPathPt* L0 = 0;
+    TPathPt* L1 = &oPathPoints[Count - 1];
+    TPathPt* L2 = &oPathPoints[0];
+    TPathPt* L3 = &oPathPoints[1];
+
+    int J = 2;
+    for (int I = 0; I < 3*Count; I++)
+    {
+	  L0 = L1;
+	  L1 = L2;
+	  L2 = L3;
+	  L3 = &oPathPoints[J];
+
+	  J++;
+	  if (J >= Count)
+	    J = 0;
+
+	  TVec3d P0 = L0->Point;
+	  TVec3d P1 = L1->Point;
+	  TVec3d P2 = L2->Point;
+	  TVec3d P3 = L3->Point;
+
+	  double T = L0->Offset + L1->Offset + L2->Offset;
+	  L1->Offset = T/3;
+    }
   }
 }
 //==========================================================================*
@@ -598,7 +632,7 @@ void TClothoidLane::OptimisePath
   }
 
   // Smooth values between Steps
-  if (Step > 1)
+  //if (Step > 1)
     SmoothBetween(Step,BumpMod);
 }
 //==========================================================================*

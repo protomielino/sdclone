@@ -2,8 +2,8 @@
 <!-- 
     file          : forza.xml
     created       : 28 Mar 2008 
-    last modified : 13 Dec 2009
-    copyright     : (C) 2008-2009 Wolf-Dieter Beelitz
+    last modified : 30 Jan 2010
+    copyright     : (C) 2008-2010 Wolf-Dieter Beelitz
 -->
 <!--    This program is free software; you can redistribute it and/or modify  -->
 <!--    it under the terms of the GNU General Public License as published by  -->
@@ -27,6 +27,7 @@
 		<attnum name="scale bump" min="0" max="1" val="0.001"/>
 		<attnum name="scale bump outer" min="0" max="2" val="0.001"/>
 		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.2"/>
+		<attnum name="avoid width" val="0.0"/>
 
 		<attnum name="pit use first" min="0" max="1" val="1"/>
 		<attnum name="pit use smooth" min="0" max="1" val="1"/>

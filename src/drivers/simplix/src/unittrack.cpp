@@ -324,15 +324,14 @@ double TTrackDescription::LearnFriction
       oSections[I].Friction =
 	    MAX(oSections[I].Seg->surface->kFriction * MinFriction,oSections[I].Friction);
 	}
-    return oSections[Index].Friction;
   }
   else
   {
     oSections[Index].Friction -= Delta / 2;
     oSections[Index].Friction =
 	  MIN(oSections[Index].Seg->surface->kFriction * 1.02,oSections[Index].Friction);
-    return oSections[Index].Friction;
   }
+  return oSections[Index].Friction;
 }
 //==========================================================================*
 
@@ -627,7 +626,7 @@ void TTrackDescription::InitTrack
 	NormalizeDir(Seg, DistFromStart - Seg->lgfromstart,	
 	  oSections[I].T, oSections[I].Center, oSections[I].ToRight);
   }}
-//  SmoothSides(0.22);
+  //SmoothSides(0.22);
   SmoothSides(1.0);
 }
 //==========================================================================*
