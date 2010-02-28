@@ -19,6 +19,7 @@
 #ifndef _GUI_H__
 #define _GUI_H__
 
+#include "tgfclient.h"
 #include "guifont.h"
 
 #define GFUI_COLORNB	26

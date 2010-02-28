@@ -16,13 +16,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-#include "tgfclient.h"
-#include <time.h>
-
 #include "gui.h"
+#include "tgfclient.h"
 
 extern void gfScreenInit(void);
 extern void gfMenuInit(void);

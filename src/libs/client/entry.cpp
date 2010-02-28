@@ -18,8 +18,7 @@
  ***************************************************************************/
 
 
-#include "client.h"
-#include "mainmenu.h"
+#include "tgfclient.h"
 #include "splash.h"
 
 /*
@@ -27,23 +26,23 @@
  *	GameEntry
  *
  * Description
- *	entry point of the game
+ *	Entry point of the game.
  *
  * Parameters
- *	none
+ *	None
  *
  * Return
- *	none
+ *	true on success, false in anything bad happened.
  *
  * Remarks
  *	
  */
-void
+bool
 GameEntry(void)
 {
-	// Initialize gaming framework.
+    // Initialize gaming framework.
     GfInitClient();
 
-	// Open the splash screen, load menus in "backgroud" and finally open the main menu.
-    SplashScreen();
+    // Open the splash screen, load menus in "backgroud" and finally open the main menu.
+    return SplashScreen();
 }

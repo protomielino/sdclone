@@ -240,28 +240,29 @@ static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
 
 /*
  * Function
- *	
+ *	SplashScreen
  *
  * Description
- *	
+ *	Display the splash screen and load the main menus in the background.
+ *      On mouse click or 7 second time-out, open the main menu.
  *
  * Parameters
- *	
+ *	None
  *
  * Return
- *	
+ *	true on success, false in anything bad happened.
  *
  * Remarks
  *	
  */
-int SplashScreen(void)
+bool SplashScreen(void)
 {
 	void	*handle;
 	float	screen_gamma;
 	//const char	*filename = "data/img/splash.png";
 	const char	*filename = "data/img/splash.jpg";
 	
-	if (s_texture != 0) 
+	if (s_texture) 
 	{
 		glDeleteTextures(1, &s_texture); 
 	}
@@ -276,7 +277,7 @@ int SplashScreen(void)
 	{
 		GfParmReleaseHandle(handle);
 		GfTrace("Couldn't load splash screen image %s\n", filename);
-		return -1;
+		return false;
 	}
 
 	glGenTextures(1, &s_texture);
@@ -294,6 +295,6 @@ int SplashScreen(void)
 	sdlMouseFunc(splashMouse);
 	sdlIdleFunc(splashIdle);
     
-	return 0;
+	return true;
 }
 

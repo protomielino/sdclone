@@ -1627,10 +1627,10 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 	fputs (line, fout);
     }    
 
-    GfOut ("GfParmWriteFile: %s file written\n", file);
-    
     fclose (fout);
   
+    GfOut ("Wrote %s (%p)\n", file, parmHandle);
+    
     return 0;
 }
 

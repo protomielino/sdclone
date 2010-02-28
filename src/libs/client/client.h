@@ -21,12 +21,7 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_
 
-#if _WIN32
-#include <windows.h>
-#endif
-
-
-extern void GameEntry(void);
+extern bool GameEntry(void);
 
 #endif /* _CLIENT_H_ */ 
 

@@ -133,10 +133,13 @@ main(int argc, char *argv[])
 		
 	GfScrInit(argc, argv);	 /* init screen */
 
-	GameEntry();             /* launch the game */
+	if (GameEntry())         /* launch the game */
+	{
+		sdlMainLoop();   /* Main event loop */
+		exit(0);
+	}
 
-	sdlMainLoop();           /* SDL event loop */
-
-	return 0;                /* just for the compiler, never reached */
+	GfError("\nExiting from Speed Dreams for some fatal reason (see above).\n");
+	exit(1);                 /* If we got here, something bad happened ... */          
 }
 

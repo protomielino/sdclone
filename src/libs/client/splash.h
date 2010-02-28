@@ -21,11 +21,7 @@
 #ifndef _SPLASH_H_
 #define _SPLASH_H_
 
-#if _WIN32
-#include <windows.h>
-#endif
-
-extern int SplashScreen(void);
+extern bool SplashScreen(void);
 
 
 #endif /* _SPLASH_H_ */ 
