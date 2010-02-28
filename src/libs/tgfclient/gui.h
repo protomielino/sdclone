@@ -219,7 +219,6 @@ typedef struct
 typedef struct
 {
 	void *scr;
-	GLuint progressbackground;
 	GLuint progressbarimage;
 	float min;
 	float max;
