@@ -12,7 +12,7 @@
 #ifndef MATH_FUNCTIONS_H
 #define MATH_FUNCTIONS_H
 
-#include <learning/real.h>
+#include "real.h"
 
 extern int ArgMin (int n, real* x);
 extern int ArgMax (int n, real* x);

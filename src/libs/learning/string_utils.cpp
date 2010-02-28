@@ -13,7 +13,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <learning/string_utils.h>
+#include "string_utils.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>

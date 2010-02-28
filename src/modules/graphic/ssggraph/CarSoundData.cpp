@@ -4,7 +4,7 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: CarSoundData.cpp,v 1.7 2006/01/05 22:35:44 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -244,11 +244,13 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
             &&((strcmp(s, TRK_VAL_GRASS)==0)
                ||(strcmp(s, TRK_VAL_SAND)==0)
                ||(strcmp(s, TRK_VAL_DIRT)==0)
+	       ||(strcmp(s, TRK_VAL_SNOW)==0)
                ||(strstr(s, "sand"))
                ||(strstr(s, "dirt"))
                ||(strstr(s, "grass"))
                ||(strstr(s, "gravel"))
                ||(strstr(s, "mud"))
+	       ||(strstr(s, "snow"))
                )) {
             out_of_road = true;
         }

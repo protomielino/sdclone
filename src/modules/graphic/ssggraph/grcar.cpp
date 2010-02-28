@@ -5,7 +5,7 @@
     created              : Mon Aug 21 18:24:02 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grcar.cpp,v 1.42.2.2 2008/08/24 19:26:46 berniw Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -18,34 +18,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <ctype.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <GL/glut.h>
-#include <plib/ssg.h>
 
-#include <tgfclient.h>
-#include <track.h>
-#include <car.h>
-#include <graphic.h>
 #include <robottools.h>
+#include <glfeatures.h>
 
-#include "grmain.h"
-#include "grshadow.h"
-#include "grskidmarks.h"
-#include "grsmoke.h"
 #include "grcar.h"
-#include "grcam.h"
-#include "grscene.h"
-#include "grboard.h"
-#include "grssgext.h"
+#include "grmain.h"
+#include "grshadow.h"	//ssgVtxTableShadow
+#include "grskidmarks.h"	//grDrawSkidmarks
+#include "grsmoke.h"	//grAddSmoke
+#include "grscene.h"	//CarsAnchor, ShadowAnchor
+#include "grboard.h"	//grInitBoardCar
 #include "grutil.h"
-#include "grcarlight.h"
+#include "grcarlight.h"	//grUpdateCarlight
 
 extern ssgEntity *grssgLoadAC3D ( const char *fname, const ssgLoaderOptions* options );
 extern ssgEntity *grssgCarLoadAC3D ( const char *fname, const ssgLoaderOptions* options,int index );
@@ -53,20 +41,6 @@ extern double carTrackRatioX;
 extern double carTrackRatioY;
 
 ssgBranch *CarsAnchorTmp = 0;
-
-class myLoaderOptions : public ssgLoaderOptions
-{
-public:
-	virtual void makeModelPath ( char* path, const char *fname ) const
-	{
-		ulFindFile ( path, model_dir, fname, NULL ) ;
-	}
-
-	virtual void makeTexturePath ( char* path, const char *fname ) const
-	{
-		ulFindFile ( path, texture_dir, fname, NULL ) ;
-	}
-} ;
 
 
 static int grCarIndex;

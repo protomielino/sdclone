@@ -4,7 +4,7 @@
     created              : Thu Aug 17 23:57:10 CEST 2000
     copyright            : (C) 2000-2003 by Eric Espie, Christos Dimitrakakis
     email                : torcs@free.fr, dimitrak@idiap.ch
-    version              : $Id: grsound.cpp,v 1.31 2007/11/18 09:13:16 torcs Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -18,15 +18,10 @@
  ***************************************************************************/
 
 
-#include <math.h>
-
-#include <tgfclient.h>
-#include <graphic.h>
-#include <car.h>
-
 #include "grsound.h"
+
 #include "grmain.h"
-#include "sound_defines.h"
+#include "grcam.h"
 #include "SoundInterface.h"
 #include "CarSoundData.h"
 
@@ -55,7 +50,7 @@ void grInitSound(tSituation* s, int ncars)
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	const char *optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, (char *)soundOpenALStr);
+	const char *optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOpenALStr);
 	float global_volume = GfParmGetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", 100.0f);
 	if (!strcmp(optionName, soundDisabledStr)) {
 		sound_mode = DISABLED;

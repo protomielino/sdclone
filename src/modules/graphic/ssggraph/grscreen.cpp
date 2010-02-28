@@ -4,7 +4,7 @@
     created     : Thu May 15 22:11:03 CEST 2003
     copyright   : (C) 2003 by Eric Espi�                       
     email       : eric.espie@torcs.org   
-    version     : $Id: grscreen.cpp,v 1.22 2006/09/05 23:05:52 berniw Exp $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,25 +17,19 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
-    @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: grscreen.cpp,v 1.22 2006/09/05 23:05:52 berniw Exp $
-*/
-
 #include <plib/ssg.h>
 
 #include <tgfclient.h>
-#include "grutil.h"
-#include "grmain.h"
-#include "grscene.h"
-#include "grshadow.h"
-#include "grskidmarks.h"
-#include "grcar.h"
-#include "grboard.h"
-#include "grcarlight.h"
 
 #include "grscreen.h"
+#include "grtrackmap.h"
+
+#include "grmain.h"
+#include "grscene.h"	//grDrawBackground, grDrawScene
+#include "grcar.h"	//grDrawCar
+#include "grboard.h"	//cGrBoard
+#include "grutil.h"
+#include "grrain.h"
 
 static char buf[1024];
 static char path[1024];
@@ -53,9 +47,9 @@ cGrScreen::cGrScreen(int myid)
 	board = NULL;
 	curCamHead = 0;
 	drawCurrent = 0;
-	active = 0;
-	selectNextFlag = 0;
-	selectPrevFlag = 0;
+	active = false;
+	selectNextFlag = false;
+	selectPrevFlag = false;
 	mirrorFlag = 1;
 	memset(cams, 0, sizeof(cams));
 	viewRatio = 1.33;
@@ -90,6 +84,13 @@ cGrScreen::~cGrScreen()
 	}
 }
 
+void
+cGrScreen::selectBoard(const long brd)
+{
+	board->selectBoard(brd);
+}
+
+
 int cGrScreen::isInScreen(int x, int y)
 {
 	if (!active) {
@@ -105,11 +106,6 @@ int cGrScreen::isInScreen(int x, int y)
 	}
 	
 	return 0;
-}
-
-void cGrScreen::setCurrentCar(tCarElt *newCurCar)
-{
-	curCar = newCurCar;
 }
 
 /* Set Screen size & position */
@@ -130,33 +126,7 @@ void cGrScreen::activate(int x, int y, int w, int h)
 		curCam->limitFov ();
 		curCam->setZoom (GR_ZOOM_DFLT);
 	}
-	active = 1;
-}
-
-void cGrScreen::desactivate(void)
-{
-	active = 0;
-}
-
-/* Set camera zoom value */
-void cGrScreen::setZoom(long zoom)
-{
-	curCam->setZoom(zoom);
-}
-
-void cGrScreen::selectNextCar(void)
-{
-	selectNextFlag = 1;
-}
-
-void cGrScreen::selectPrevCar(void)
-{
-	selectPrevFlag = 1;
-}
-
-void cGrScreen::selectBoard(long brd)
-{
-	board->selectBoard(brd);
+	active = true;
 }
 
 void cGrScreen::selectTrackMap()
@@ -249,6 +219,7 @@ comparCars(const void *car1, const void *car2)
 void cGrScreen::camDraw(tSituation *s)
 {
 	int i;
+	double speedcar;
 	
 	glDisable(GL_COLOR_MATERIAL);
 	
@@ -285,7 +256,12 @@ void cGrScreen::camDraw(tSituation *s)
 	START_PROFILE("grDrawScene*");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	grDrawScene();
+	if (mirrorFlag == 1)
+		speedcar = curCar->_speed_x;
+	else
+		speedcar = 0.0f;	
+	grDrawScene(speedcar, s);
+	//grDrawScene();
 	STOP_PROFILE("grDrawScene*");
 }
 
@@ -311,7 +287,7 @@ void cGrScreen::update(tSituation *s, float Fps)
 				break;
 			}
 		}
-		selectNextFlag = 0;
+		selectNextFlag = false;
 	}
 
 	if (selectPrevFlag) {
@@ -323,7 +299,7 @@ void cGrScreen::update(tSituation *s, float Fps)
 				break;
 			}
 		}
-		selectPrevFlag = 0;
+		selectPrevFlag = false;
 	}
 	if (carChanged) {
 		sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
@@ -440,9 +416,15 @@ void cGrScreen::initCams(tSituation *s)
 {
 	tdble fovFactor;
 	int i;
+	float skydynamic;
 	
 	fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
 	fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
+	skydynamic = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, (char*)NULL, 1.0);
+	if (skydynamic > 10000)
+	{
+		fovFactor = (skydynamic / 10);
+	}
 	
 	if (boardCam == NULL) {
 		boardCam = new cGrOrthoCamera(this,0, grWinw*600/grWinh, 0, 600);

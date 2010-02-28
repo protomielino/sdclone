@@ -209,6 +209,7 @@ FILE* SegLearn::getKarmaFilename(tTrack* track, tSituation *s, int driverindex)
 {
 	const int TBUFSIZE = 256;
 	char tbuf[TBUFSIZE];
+	char indexstr[32];
 	char* trackname = strrchr(track->filename, '/') + 1;
 	char* tracknameend = strchr(trackname, '.') - 1;
 
@@ -218,19 +219,21 @@ FILE* SegLearn::getKarmaFilename(tTrack* track, tSituation *s, int driverindex)
 	FILE* fd;
 	char buffer[sizeof(filename)];
 
+	RtGetCarindexString(driverindex, "bt", driverindex < 0 || driverindex >= 10, indexstr, 32);
+
 	switch (s->_raceType) {
 		case RM_TYPE_RACE:
-			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%d/race/%s.karma", driverindex, tbuf, s->_raceType == RM_TYPE_RACE);
+			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%s/race/%s.karma", indexstr, tbuf, s->_raceType == RM_TYPE_RACE);
 			if ( fd != NULL) {
 				return fd;
 			} // not found, try the next.
 		case RM_TYPE_QUALIF:
-			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%d/qualifying/%s.karma", driverindex, tbuf, s->_raceType == RM_TYPE_QUALIF);
+			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%s/qualifying/%s.karma", indexstr, tbuf, s->_raceType == RM_TYPE_QUALIF);
 			if ( fd != NULL) {
 				return fd;
 			} // not found, try the next.
 		case RM_TYPE_PRACTICE:
-			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%d/practice/%s.karma", driverindex, tbuf, s->_raceType == RM_TYPE_PRACTICE);
+			fd = tryKarmaFilename(buffer, sizeof(buffer), "%sdrivers/bt/%s/practice/%s.karma", indexstr, tbuf, s->_raceType == RM_TYPE_PRACTICE);
 			if ( fd != NULL) {
 				return fd;
 			} // not found, try the next.		
@@ -241,10 +244,10 @@ FILE* SegLearn::getKarmaFilename(tTrack* track, tSituation *s, int driverindex)
 }
 
 
-FILE* SegLearn::tryKarmaFilename(char* buffer, int size, const char *path, int driverindex, const char *tbuf, bool storelocalfilename)
+FILE* SegLearn::tryKarmaFilename(char* buffer, int size, const char *path, char *indexString, const char *tbuf, bool storelocalfilename)
 {
 	// First construct a path to the local directory ($HOME/...).
-	snprintf(buffer, size, path, GetLocalDir(), driverindex, tbuf);
+	snprintf(buffer, size, path, GetLocalDir(), indexString, tbuf);
 	if (storelocalfilename == true) {
 		strncpy(filename, buffer, sizeof(filename));
 	}
@@ -256,6 +259,6 @@ FILE* SegLearn::tryKarmaFilename(char* buffer, int size, const char *path, int d
 	}
 
 	// Not found, try the global path.
-	snprintf(buffer, size, path, GetDataDir(), driverindex, tbuf);
+	snprintf(buffer, size, path, GetDataDir(), indexString, tbuf);
 	return fopen(buffer, "rb");
 }

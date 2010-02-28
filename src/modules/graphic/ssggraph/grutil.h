@@ -4,7 +4,7 @@
     created              : Wed Nov  1 22:35:08 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grutil.h,v 1.11 2005/08/05 09:48:30 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -16,12 +16,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
 
 #ifndef _GRUTIL_H_
 #define _GRUTIL_H_
 
-#include <stdio.h>
+#include <cstdio>
 #include "grtexture.h"
 
 #if 1
@@ -47,23 +46,37 @@
  
 
 /* Vars to set before calling grSsgLoadTexCb */
-extern float	grGammaValue;
-extern int	grMipMap;
+extern float grGammaValue;
+extern int	 grMipMap;
 
 extern char *grFilePath;	/* Multiple path (: separated) used to search for files */
 extern char *grTexturePath;
 
 extern int grGetFilename(const char *filename, const char *filepath, char *buf);
-ssgState * grSsgEnvTexState(const char *img);
-extern ssgState *grSsgLoadTexState(const char *img);
-extern ssgState *grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap);
-extern bool grLoadPngTexture (const char *fname, ssgTextureInfo* info);
+class ssgState;
+extern ssgState* grSsgEnvTexState(const char *img);
+extern ssgState* grSsgLoadTexState(const char *img);
+extern ssgState* grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap);
 extern void grShutdownState(void);
 extern void grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn);
 extern void grWriteTimeBuf(char *buf, tdble sec, int sgn);
 extern float grGetHOT(float x, float y);
 
+inline float urandom() { return(((float)rand() / (1.0 + (float)RAND_MAX)));}
+
+class myLoaderOptions : public ssgLoaderOptions
+{
+public:
+	virtual void makeModelPath ( char* path, const char *fname ) const
+	{
+		ulFindFile ( path, model_dir, fname, NULL ) ;
+	}
+
+	virtual void makeTexturePath ( char* path, const char *fname ) const
+	{
+		ulFindFile ( path, texture_dir, fname, NULL ) ;
+	}
+} ;
+
+
 #endif /* _GRUTIL_H_ */ 
-
-
-

@@ -7,6 +7,6 @@ LIBRARY
 SECTIONS .data READ WRITE
 
 EXPORTS
-	ssggraph_moduleMaxInterfaces
-	ssggraph_moduleInitialize
-	ssggraph_moduleTerminate
+	moduleWelcome
+	moduleInitialize
+	moduleTerminate

@@ -25,12 +25,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+
 #include <tgfclient.h>
 #include <raceinit.h>
 #include <graphic.h>
 #include <glfeatures.h>
 #include "openglconfig.h"
-
+#include "gui.h"
 
 // Texture compression.
 static const char *textureCompressOptionList[] = {GR_ATT_TEXTURECOMPRESSION_DISABLED, GR_ATT_TEXTURECOMPRESSION_ENABLED};
@@ -186,6 +187,7 @@ void * OpenGLMenuInit(void *prevMenu)
 	}
 
 	prevHandle = prevMenu;
+
 	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
         void *param = LoadMenuXML("opengloptionsmenu.xml");
         CreateStaticControls(param,scrHandle);
@@ -210,13 +212,13 @@ void * OpenGLMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"cancel",prevMenu, GfuiScreenActivate);
 
 	GfParmReleaseHandle(param);
-    
-	GfuiAddKey(scrHandle, 13, "Save", NULL, saveOpenGLOption, NULL);
-	GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Take a Screen-Shot", NULL, GfuiScreenShot, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Decrease Texture Size Limit", (void*)-1, changeTextureSizeState, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Increase Texture Size Limit", (void*)1, changeTextureSizeState, NULL);
+
+	GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, saveOpenGLOption, NULL);
+	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", (void*)-1, changeTextureSizeState, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", (void*)1, changeTextureSizeState, NULL);
 	GfuiAddKey(scrHandle, ' ', "Toggle Texture Compression", (void*)1, changeTextureCompressState, NULL);
 
 	return scrHandle;

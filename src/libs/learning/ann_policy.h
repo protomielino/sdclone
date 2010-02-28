@@ -15,7 +15,7 @@
 #ifndef ANN_POLICY_H
 #define ANN_POLICY_H
 
-#include <learning/policy.h>
+#include "policy.h"
 /** 
 	A type of discrete action policy using a neural network for function approximation.
 	

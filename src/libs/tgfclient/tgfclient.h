@@ -23,33 +23,52 @@
 */
 
 
+#include <string>
+#include <vector>
 
 #ifndef __TGFCLIENT__H__
 #define __TGFCLIENT__H__
 
+#ifdef WIN32
+#  include <windows.h>
+//Disable some warnings
+#  pragma warning (disable:4244)
+#  pragma warning (disable:4996)
+#  pragma warning (disable:4305)
+#endif
+
+#ifdef __APPLE__
+#  include <OpenGL/gl.h>
+#  include <OpenGL/glu.h>
+#  include <js.h>
+#else
+#  include <GL/gl.h>
+#  include <GL/glu.h>
+#  include <plib/js.h>
+#endif
+#include <SDL/SDL_keysym.h>
+
 #include <tgf.h>
-#include <GL/glut.h>
-#include <plib/js.h>
+#include "sdlcallbacks.h"
+
 #include "screen_properties.h"
+
 
 class Color
 {
-public:
-        float red,green,blue,alpha;
-        float *GetPtr() { return (float*)this;}
+  public:
+    float red, green, blue, alpha;
+    float *GetPtr() { return (float*)this;}
 };
- void GfInitClient(void);
+
+struct RmInfo;
+typedef struct RmInfo tRmInfo;
+
+extern void GfInitClient(void);
 
 /******************** 
  * Screen Interface *
  ********************/
-
-extern unsigned char *GfImgReadPng(const char *filename, int *widthp, int *heightp, float gamma, int *pow2_widthp, int *pow2_heightp);
-extern int GfImgWritePng(unsigned char *img, const char *filename, int width, int height);
-extern void GfImgFreeTex(GLuint tex);
-extern GLuint GfImgReadTex(const char *filename);
-extern GLuint GfImgReadTex(const char *filename,int &height,int &width);
-extern void GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLuint &texId);
 
 extern void GfScrInit(int argc, char *argv[]);
 extern void GfScrShutdown(void);
@@ -70,6 +89,9 @@ extern void GfScrReinit(void*);
 #define GFUI_SCROLLIST  3
 #define GFUI_SCROLLBAR  4
 #define GFUI_EDITBOX    5
+#define GFUI_COMBOBOX	6
+#define GFUI_CHECKBOX	7
+#define GFUI_PROGRESSBAR 8
 
 /* Alignment */
 #define GFUI_ALIGN_HL_VB        0x00
@@ -101,6 +123,42 @@ extern void GfScrReinit(void*);
 #define GFUI_HORI_SCROLLBAR     0
 #define GFUI_VERT_SCROLLBAR     1
 
+// Some keyboard key / special key codes, to avoid SDLK constants everywhere.
+#define GFUIK_BACKSPACE	SDLK_BACKSPACE
+#define GFUIK_TAB	SDLK_TAB
+#define GFUIK_CLEAR	SDLK_CLEAR
+#define GFUIK_RETURN	SDLK_RETURN
+#define GFUIK_PAUSE	SDLK_PAUSE
+#define GFUIK_ESCAPE	SDLK_ESCAPE
+#define GFUIK_DELETE	SDLK_DELETE
+
+#define GFUIK_UP	SDLK_UP
+#define GFUIK_DOWN	SDLK_DOWN
+#define GFUIK_RIGHT	SDLK_RIGHT
+#define GFUIK_LEFT	SDLK_LEFT
+#define GFUIK_INSERT	SDLK_INSERT
+#define GFUIK_HOME	SDLK_HOME
+#define GFUIK_END	SDLK_END
+#define GFUIK_PAGEUP	SDLK_PAGEUP
+#define GFUIK_PAGEDOWN	SDLK_PAGEDOWN
+
+#define GFUIK_F1	SDLK_F1
+#define GFUIK_F2	SDLK_F2
+#define GFUIK_F3	SDLK_F3
+#define GFUIK_F4	SDLK_F4
+#define GFUIK_F5	SDLK_F5
+#define GFUIK_F6	SDLK_F6
+#define GFUIK_F7	SDLK_F7
+#define GFUIK_F8	SDLK_F8
+#define GFUIK_F9	SDLK_F9
+#define GFUIK_F10	SDLK_F10
+#define GFUIK_F11	SDLK_F11
+#define GFUIK_F12	SDLK_F12
+#define GFUIK_F13	SDLK_F13
+#define GFUIK_F14	SDLK_F14
+#define GFUIK_F15	SDLK_F15
+
+
 /** Scroll bar call-back information */
 typedef struct ScrollBarInfo
 {
@@ -108,19 +166,27 @@ typedef struct ScrollBarInfo
     void        *userData;      /**< Associated user data */
 } tScrollBarInfo;
 
+typedef struct ChoiceInfo
+{
+	unsigned int nPos;
+	std::vector<std::string> vecChoices;
+} tChoiceInfo;
+
 typedef void (*tfuiCallback)(void * /* userdata */);
 typedef void (*tfuiSBCallback)(tScrollBarInfo *);
-typedef int (*tfuiKeyCallback)(unsigned char key, int modifier, int state); /**< return 1 to prevent normal key computing */
+typedef int (*tfuiKeyCallback)(int unicode, int modifier, int state); /**< return 1 to prevent normal key computing */
 typedef int (*tfuiSKeyCallback)(int key, int modifier, int state);  /**< return 1 to prevent normal key computing */
+typedef void (*tfuiComboCallback)(tChoiceInfo * pInfo);
+typedef void (*tfuiCheckboxCallback)(bool bChecked);
 
 
-/* GLUT Callback functions                  */
-/* should be called explicitely if          */
-/* the corresponding GLUT Func is overriden */
-/* after a call to GfuiActivateScreen       */
+/* Event loop callback functions (should be called explicitely if the corresponding
+   SDL Func is overriden after a call to GfuiActivateScreen */
 extern void GfuiDisplay(void);
 extern void GfuiDisplayNothing(void);
+extern void (*GfuiIdleFunc(tRmInfo *info))(void);
 extern void GfuiIdle(void);
+extern void GfuiIdleMenu(void);
 
 /* Screen management */
 extern void *GfuiScreenCreate(void);
@@ -135,9 +201,10 @@ extern void GfuiScreenReplace(void *screen);
 extern void GfuiScreenDeactivate(void);
 extern void *GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);
 extern void GfuiHookRelease(void *hook);
-extern void GfuiAddKey(void *scr, unsigned char key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
-extern void GfuiRegisterKey(unsigned char key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+extern void GfuiAddKey(void *scr, int unicode, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+extern void GfuiRegisterKey(int unicode, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 extern void GfuiAddSKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+extern void GfuiSetKeyAutoRepeat(void *scr, int on);
 extern void GfuiHelpScreen(void *prevScreen);
 extern void GfuiScreenShot(void *notused);
 extern void GfuiScreenAddBgImg(void *scr, const char *filename);
@@ -146,6 +213,7 @@ extern void GfuiSKeyEventRegister(void *scr, tfuiSKeyCallback onSKeyAction);
 extern void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 extern void GfuiSKeyEventRegisterCurrent(tfuiSKeyCallback onSKeyAction);
 extern void GfuiSleep(double delay);
+extern int GfuiOpenGLExtensionSupported(const char* extension);
 
 /* mouse */
 typedef struct MouseInfo
@@ -159,6 +227,7 @@ extern tMouseInfo *GfuiMouseInfo(void);
 extern void GfuiMouseSetPos(int x, int y);
 extern void GfuiMouseHide(void);
 extern void GfuiMouseShow(void);
+extern void GfuiMouseToggleVisibility(void);
 extern void GfuiMouseSetHWPresent(void);
 
 /* all widgets */
@@ -182,14 +251,14 @@ extern void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_DIGIT         8
 extern int GfuiLabelCreate(void *scr, const char *text, 
                         int font, int x, int y, int align, int maxlen);
-extern int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColor, int font, int x, int y, int align, int maxlen);
+extern int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font, int x, int y, int align, int maxlen);
 
 extern void GfuiSetTipPosition(int x,int y);
 extern int GfuiTipCreate(void *scr, const char *text, int maxlen);
 extern int GfuiTitleCreate(void *scr, const char *text, int maxlen);
 
 extern void GfuiLabelSetText(void *scr, int id, const char *text);
-extern void GfuiLabelSetColor(void *scr, int id, const float *color);
+extern void GfuiLabelSetColor(void *scr, int id, const float * colorPtr);
 
 extern void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, int align);
 extern int  GfuiFontHeight(int font);
@@ -213,6 +282,29 @@ extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *ena
                    int x, int y, int imageWidth,int imageHeight,int align, int mouse,
                    void *userDataOnPush, tfuiCallback onPush, 
                    void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+extern int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,tfuiComboCallback onChange);
+extern int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,tfuiCheckboxCallback onChange);
+
+
+extern unsigned int GfuiComboboxAddText(void *scr, int id, const char *text);
+extern void GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index);
+
+extern int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value);
+
+
+extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
+		   void *userDataOnPush, tfuiCallback onPush, 
+		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+
+
+extern void GfuiButtonShowBox(void *scr, int id,bool bShow);
+extern void GfuiButtonSetColor(void *scr, int id,Color color);
+extern void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
+extern void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
+extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+extern void GfuiCheckboxSetChecked(void *scr, int id, bool bChecked);
+
 
 extern void GfuiButtonSetText(void *scr, int id, const char *text);
 extern int GfuiButtonGetFocused(void);
@@ -240,7 +332,9 @@ extern const char *GfuiScrollListGetElement(void *scr, int Id, int index, void *
 extern void GfuiScrollListShowElement(void *scr, int Id, int index);
 extern void GfuiScrollListSetColor(void *scr, int id,Color color);
 extern void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
-/* bars */
+
+
+/* scroll bars */
 extern int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
                                int min, int max, int len, int start, 
                                void *userData, tfuiSBCallback onScroll);
@@ -249,7 +343,10 @@ extern int GfuiScrollBarPosGet(void *scr, int id);
 
 /* Images */
 extern int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name);
+extern int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *name, int align);
 extern void GfuiStaticImageSet(void *scr, int id, const char *name);
+extern void GfuiStaticImageSetEx(void *scr, int id, const char *name,unsigned int index);
+extern void GfuiStaticImageSetActive(void *scr, int id, int index);
 
 /*****************************
  * Menu Management Interface *
@@ -259,6 +356,44 @@ extern void *GfuiMenuScreenCreate(const char *title);
 extern void  GfuiMenuDefaultKeysAdd(void *scr);
 extern int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userdata, const int style, tfuiCallback onpush);
 extern int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const char *tip, void *userdata, tfuiCallback onpush);
+
+/*******************************************
+ * New XML based Menu Management Interface *
+ *******************************************/
+
+extern void *LoadMenuXML(const char *pFilePath);
+extern bool CreateStaticControls(void *param,void *menuHandle);
+
+extern int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
+extern int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+extern int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
+extern int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
+extern int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+extern int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect);
+extern int CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,tfuiComboCallback onChange);
+extern int CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,tfuiCheckboxCallback onChange);
+extern int CreateProgressbarControl(void *menuHandle,void *param,const char *pControlName);
+
+extern void GfuiButtonShowBox(void *scr, int id,bool bShow);
+extern void GfuiButtonSetColor(void *scr, int id,Color color);
+extern void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
+extern void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
+extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+
+/*****************************
+ * Texture / image interface *
+ *****************************/
+
+// TODO: Add a GfTexReadImageFromFile for implicit source file format 
+// (would call GfTexReadPng/Jpeg ... according to the file extension,
+//  and probably also return the number of bytes per pixel)
+extern unsigned char *GfTexReadPng(const char *filename, int *widthp, int *heightp, float gamma, int *pow2_widthp, int *pow2_heightp);
+extern unsigned char *GfTexReadJpeg(const char *filename, int *widthp, int *heightp, float screen_gamma, int *pow2_widthp, int *pow2_heightp);
+
+extern int GfTexWritePng(unsigned char *img, const char *filename, int width, int height);
+extern void GfTexFreeTex(GLuint tex);
+extern GLuint GfTexReadTex(const char *filename);
+extern GLuint GfTexReadTex(const char *filename,int &height,int &width);
 
 
 /*********************
@@ -321,24 +456,6 @@ extern void GfctrlMouseInitCenter(void);
 extern tCtrlRef *GfctrlGetRefByName(const char *name);
 extern const char *GfctrlGetNameByRef(int type, int index);
 
-extern int GfuiGlutExtensionSupported(char const *str);
-
-extern void GfuiButtonShowBox(void *scr, int id,bool bShow);
-extern void GfuiButtonSetColor(void *scr, int id,Color color);
-extern void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
-extern void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
-extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
-
-
-extern void *LoadMenuXML(const char *pFilePath);
-extern bool CreateStaticControls(void *param,void *menuHandle);
-
-extern int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
-extern int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
-extern int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
-extern int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect);
 
 #endif /* __TGFCLIENT__H__ */
 

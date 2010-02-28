@@ -33,6 +33,7 @@
 #include <windows.h>
 #endif
 
+
 #include <tgfclient.h>
 
 #include "racescreens.h"
@@ -127,7 +128,7 @@ RmFileSelect(void *vs)
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Register keyboard shortcuts.
-    GfuiAddKey(ScrHandle, (unsigned char)27, "Cancel", NULL, rmDeactivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", NULL, rmDeactivate, NULL);
     GfuiMenuDefaultKeysAdd(ScrHandle);
 
     GfuiScreenActivate(ScrHandle);

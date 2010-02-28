@@ -2,7 +2,7 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Quick Race" type="param" mode="mw">
+<params name="Quick Race" type="param" mode="mw" version="1.13">
 
     <section name="Header">
       <attstr name="name" val="Quick Race"/>
@@ -47,7 +47,7 @@
   <section name="Drivers">
     <attnum name="maximum number" val="40"/>
     <attstr name="focused module" val="human"/>
-    <attnum name="focused idx" val="1"/>
+    <attnum name="focused idx" val="6"/>
     <section name="1">
       <attnum name="idx" val="1"/>
       <attstr name="module" val="usr_sc"/>

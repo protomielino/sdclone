@@ -2,9 +2,9 @@
 
     file        : human.h
     created     : Sat May 10 19:12:46 CEST 2003
-    copyright   : (C) 2003 by Eric Espi�                        
+    copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -27,47 +27,44 @@
 #define _HUMAN_H_
 
 #include <vector>
+#include <car.h>
 
 typedef enum { eTransAuto, eTransSeq, eTransGrid } eTransmission;
 
 typedef struct HumanContext
 {
-    int		NbPitStops;
-    int		LastPitStopLap;
-    int 	AutoReverseEngaged;
-    tdble	shiftThld[MAX_GEARS+1];
-    tdble	Gear;
-    tdble	distToStart;
-    float	clutchtime;
-    float	clutchdelay;
-    float	ABS;
-    float	AntiSlip;
-    int		lap;
-    float	prevLeftSteer;
-    float	prevRightSteer;
-    float	paccel;
-    float	pbrake;
-    int		manual;
-    eTransmission		Transmission;
-    int		NbPitStopProg;
-    int		ParamAsr;
-    int		ParamAbs;
-    int		RelButNeutral;
-    int		SeqShftAllowNeutral;
-    int		AutoReverse;
-    int		drivetrain;
-    int		autoClutch;
-    tControlCmd	*CmdControl;
-    int		MouseControlUsed;
-    int		lightCmd;
+    int			nbPitStops;
+    int			lastPitStopLap;
+    bool 		autoReverseEngaged;
+    tdble		shiftThld[MAX_GEARS+1];
+    tdble		gear;
+    tdble		distToStart;
+    float		clutchtime;
+    float		clutchdelay;
+    float		antiLock;
+    float		antiSlip;
+    int			lap;
+    float		prevLeftSteer;
+    float		prevRightSteer;
+    float		paccel;
+    float		pbrake;
+    bool		manual;
+    eTransmission	transmission;
+    int			nbPitStopProg;
+    bool		paramAsr;
+    bool		paramAbs;
+    bool		relButNeutral;
+    bool		seqShftAllowNeutral;
+    bool		autoReverse;
+    int			drivetrain;
+    int			autoClutch;
+    tControlCmd		*cmdControl;
+    bool		mouseControlUsed;
+    int			lightCmd;
 } tHumanContext;
-
 
 extern std::vector<tHumanContext*> HCtx;
 
 extern bool joyPresent;
 
 #endif /* _HUMAN_H_ */ 
-
-
-

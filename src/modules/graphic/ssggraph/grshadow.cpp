@@ -3,7 +3,7 @@
     file                 : grshadow.cpp
     created              : Fri Mar 22 23:16:44 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id: grshadow.cpp,v 1.14 2005/06/03 23:51:20 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

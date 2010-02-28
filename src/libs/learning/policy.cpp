@@ -12,13 +12,14 @@
  ***************************************************************************/
 
 #include <cstring>
-#include <learning/learn_debug.h>
-#include <learning/policy.h>
-#include <learning/MathFunctions.h>
+#include "learn_debug.h"
+#include "policy.h"
+#include "MathFunctions.h"
 #ifdef WIN32
 #include <float.h>
-#define isnan _isnan
 #endif // WIN32
+
+#include <portability.h>
 
 #undef POLICY_LOG
 

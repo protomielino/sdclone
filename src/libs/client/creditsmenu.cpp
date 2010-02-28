@@ -20,6 +20,7 @@
 #include <map>
 #include <vector>
 
+
 #include <tgfclient.h>
 
 // Max number of screen lines in a credits page.
@@ -205,7 +206,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	}
 	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "previouspagearrow",
 			    (void*)&PrevPageRequest, creditsPageChange);
-	GfuiAddSKey(pageScrHdle, GLUT_KEY_PAGE_UP, "Previous page", 
+	GfuiAddSKey(pageScrHdle, GFUIK_PAGEUP, "Previous page", 
 		    (void*)&PrevPageRequest, creditsPageChange, NULL);
     }
     
@@ -228,20 +229,20 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	}
 	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "nextpagearrow",
 			    (void*)&NextPageRequest, creditsPageChange);
-	GfuiAddSKey(pageScrHdle, GLUT_KEY_PAGE_DOWN, "Next Page", 
+	GfuiAddSKey(pageScrHdle, GFUIK_PAGEDOWN, "Next Page", 
 		    (void*)&NextPageRequest, creditsPageChange, NULL);
     }
 
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Add standard keyboard shortcuts.
-    GfuiAddKey(pageScrHdle, (unsigned char)27, "Return to previous menu", 
+    GfuiAddKey(pageScrHdle, GFUIK_ESCAPE, "Return to previous menu", 
 	       RetScrHdle, GfuiScreenReplace, NULL);
-    GfuiAddKey(pageScrHdle, (unsigned char)13, "Return to previous menu", 
+    GfuiAddKey(pageScrHdle, GFUIK_RETURN, "Return to previous menu", 
 	       RetScrHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(pageScrHdle, GLUT_KEY_F1, "Help", 
+    GfuiAddSKey(pageScrHdle, GFUIK_F1, "Help", 
 		pageScrHdle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(pageScrHdle, GLUT_KEY_F12, "Take a Screen Shot", 
+    GfuiAddSKey(pageScrHdle, GFUIK_F12, "Take a Screen Shot", 
 		NULL, GfuiScreenShot, NULL);
     
     return pageScrHdle;

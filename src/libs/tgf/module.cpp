@@ -139,7 +139,7 @@ GfModInfo(unsigned int gfid, const char *dllname, tModList **modlist)
     @ingroup	module
     @param	gfid	Mask for version checking
     @param	dir	Directory name where to find the DLLs
-    @param	level	if 0, load dir/*.so/dll ; if 1, load dir/(subdir)/(subdir).so/dll for any (subdir)
+    @param	level	if 0, load dir/ *.so/dll ; if 1, load dir/(subdir)/(subdir).so/dll for any (subdir)
     @param	modlist	List of module description structure where to add loaded modules info
     @return	>=0	Number of modules infoed
 		<br>-1 Error

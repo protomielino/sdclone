@@ -98,13 +98,17 @@ typedef struct RobotItf {
 
 #define ROB_VAL_HUMAN		"human"
 #define ROB_VAL_ROBOT		"robot"
-
 #define ROB_ATTR_LEVEL		"skill level"
+#define ROB_ATTR_FEATURES	"features"
 
 #define ROB_VAL_ROOKIE		"rookie"
 #define ROB_VAL_AMATEUR		"amateur"
 #define ROB_VAL_SEMI_PRO	"semi-pro"
 #define ROB_VAL_PRO		"pro"
+#define ROB_SECT_ARBITRARY	"Robots/arbitrary cars"
+
+#define ROB_VAL_FEATURE_PENALTIES	"penalties"
+#define ROB_VAL_FEATURE_TIMEDSESSION	"timed_session"
 
 #endif /* _ROBOTV1_H_ */ 
 

@@ -25,6 +25,8 @@
 #include <windows.h>
 #endif
 
+#include <tgfclient.h>
+
 extern void *menuHandle;
 extern tModList *RacemanModLoaded;
 

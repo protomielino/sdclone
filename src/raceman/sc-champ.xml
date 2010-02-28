@@ -47,7 +47,6 @@
   </section>
 
   <section name="Races">
-
     <section name="1">
       <attstr name="name" val="Qualifications"/>
     </section>
@@ -204,6 +203,7 @@
 
   <section name="Drivers">
     <attnum name="maximum number" val="50"/>
+
     <section name="1">
       <attnum name="idx" val="1"/>
       <attstr name="module" val="usr_sc"/>
@@ -268,7 +268,6 @@
       <attnum name="idx" val="1"/>
       <attstr name="module" val="human"/>
     </section>
-
   </section>
 
   <section name="Configuration">

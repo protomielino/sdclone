@@ -4,7 +4,7 @@
     created              : Fri Aug 29 00:58:00 CEST 2003
     copyright            : (C) 2003 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: grtrackmap.cpp,v 1.11 2005/06/03 23:51:20 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -23,9 +23,13 @@
 	To get reasonable efficiency, the track is first rendered into a texture. During the
 	game just the texture needs to be redrawn.
 */
+#include <SDL/SDL.h>
+#include <glfeatures.h>
+
+#include <raceman.h>	//tSituation
 
 #include "grtrackmap.h"
-#include <tgfclient.h>
+#include "grmain.h"	//grWinXXX
 
 // The resolution in [m] to analyse turns.
 const float cGrTrackMap::RESOLUTION = 5.0;
@@ -135,7 +139,7 @@ cGrTrackMap::cGrTrackMap()
 					rx = seg->vertex[TR_SR].x * cs - seg->vertex[TR_SR].y * ss - xc * cs + yc * ss + xc;
 					ry = seg->vertex[TR_SR].x * ss + seg->vertex[TR_SR].y * cs - xc * ss - yc * cs + yc;
 
-					// TODO: More effiecient checking.
+					// TODO: More efficient checking.
 					checkAndSetMinimum(track_min_x, lx);
 					checkAndSetMinimum(track_min_x, rx);
 					checkAndSetMinimum(track_min_y, ly);
@@ -215,8 +219,8 @@ cGrTrackMap::cGrTrackMap()
 		glLoadIdentity();
 
 		glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluOrtho2D(0.0, grWinw, 0.0, grWinh);
+		glLoadIdentity();
+		gluOrtho2D(0.0, grWinw, 0.0, grWinh);
 		glMatrixMode(GL_MODELVIEW);
 
 		// Now draw the track as quad strip. The reason for that is that drawing with
@@ -338,7 +342,9 @@ cGrTrackMap::cGrTrackMap()
 		// Check if the color buffer has alpha, if not fix the texture. Black gets
 		// replaced by transparent black, so don't draw black in the texture, you
 		// won't see anything.
-		if (glutGet(GLUT_WINDOW_ALPHA_SIZE) == 0) {
+		int alphasize;
+		SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE,&alphasize);
+		if (alphasize==0) {
 			// There is no alpha, so we fix it manually. Because we added a little border
 			// around the track map the first pixel should always contain the
 			// clearcolor.
@@ -733,20 +739,4 @@ void cGrTrackMap::initColors()
 	behindCarColor[1] = 0.0;
 	behindCarColor[2] = 1.0;
 	behindCarColor[3] = 1.0;
-}
-
-
-// Set the view mode 
-void cGrTrackMap::setViewMode(int vm) {
-    viewmode = vm;
-}
-		
-// Get The view mode
-int cGrTrackMap::getViewMode() {
-    return viewmode;
-}
-
-// Get the default view mode
-int cGrTrackMap::getDefaultViewMode() {
-    return TRACK_MAP_NORMAL_WITH_OPPONENTS;
 }

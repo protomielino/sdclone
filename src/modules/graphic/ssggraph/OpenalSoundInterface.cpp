@@ -4,7 +4,7 @@
     created              : Thu Apr 7 04:21 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id: OpenalSoundInterface.cpp,v 1.11 2006/01/05 09:53:37 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -163,7 +163,7 @@ OpenalSoundInterface::~OpenalSoundInterface()
 void OpenalSoundInterface::setNCars(int n_cars)
 {
 	engpri = new SoundPri[n_cars];
-	car_src = new SoundSource[n_cars];
+	car_src = new TorcsSoundSource[n_cars];
 }
 
 

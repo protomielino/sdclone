@@ -32,7 +32,9 @@ extern void ReStoreRaceResults(const char *race);
 extern int  ReDisplayResults(void);
 extern void ReDisplayStandings(void);
 extern void ReSavePracticeLap(tCarElt *car);
+extern void ReUpdatePracticeCurRes(tCarElt *car);
 extern void ReUpdateQualifCurRes(tCarElt *car);
+extern void ReUpdateRaceCurRes();
 extern void ReEventInitResults(void);
 extern void ReUpdateStandings();
 

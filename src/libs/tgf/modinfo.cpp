@@ -42,7 +42,7 @@ static const size_t SOFileExtLen = strlen(".so");
 /* Allocate the module interfaces info array */
 tModInfo *GfModInfoAllocate(int maxItf)
 {
-    tModInfo *array = (tModInfo*)calloc(maxItf, sizeof(tModInfo));
+    tModInfo *array = (tModInfo*)calloc(maxItf+1, sizeof(tModInfo));
     if (!array)
     {
         GfError("GfModInfoAllocate: Failed to allocate tModInfo array (maxItf=%d)\n", maxItf);
@@ -76,16 +76,24 @@ tModInfoNC *GfModInfoDuplicate(const tModInfo *constArray, int maxItf)
     int itfInd;
 
     // Allocate target array.
-    tModInfoNC *array = (tModInfoNC*)calloc(maxItf, sizeof(tModInfoNC));
+    tModInfoNC *array = (tModInfoNC*)calloc(maxItf + 1, sizeof(tModInfoNC));
     if (!constArray)
     {
         GfError("GfModInfoAllocate: Failed to allocate tModInfoNC array (maxItf=%d)\n", maxItf);
     }
 
     // Copy constArray to array (null name indicates non used interface = end of usefull array).
-    memset(array, 0, maxItf*sizeof(tModInfo));
-    for( itfInd = 0; itfInd < maxItf && constArray[itfInd].name; ++itfInd )
+    memset(array, 0, (maxItf+1)*sizeof(tModInfo));
+    for( itfInd = 0; itfInd < maxItf + 1; ++itfInd )
     {
+        if( !constArray[itfInd].name )
+	{
+		//Go to the last item of the list
+		if( itfInd >= maxItf )
+			break;
+		itfInd = maxItf - 1;
+		continue;
+	}
         array[itfInd].name    = constArray[itfInd].name ? strdup(constArray[itfInd].name) : 0;
         array[itfInd].desc    = constArray[itfInd].desc ? strdup(constArray[itfInd].desc) : 0;
         array[itfInd].fctInit = constArray[itfInd].fctInit;
@@ -107,6 +115,14 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
     {
 	for( itfInd = 0; itfInd < maxItf && array[itfInd].name; ++itfInd )
 	{
+       	    if( !array[itfInd].name )
+	    {
+	        //Go to the last item of the list
+	        if( itfInd >= maxItf )
+		    break;
+	        itfInd = maxItf - 1;
+	        continue;
+	    }
 	    if (array[itfInd].name)
 		free(array[itfInd].name);
 	    if (array[itfInd].desc)

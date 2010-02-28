@@ -84,12 +84,25 @@ SimAeroUpdate(tCar *car, tSituation *s)
     }
     car->airSpeed2 = airSpeed * airSpeed;
     tdble v2 = car->airSpeed2;
-    car->aero.drag = -SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0 + (tdble)car->dammage / 10000.0) * dragK * dragK;
 
-    hm = 1.5 * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);
+	// simulate ground effect drop off caused by non-frontal airflow (diffusor stops working etc.)
+	tdble speed = sqrt(car->DynGC.vel.x*car->DynGC.vel.x + car->DynGC.vel.y*car->DynGC.vel.y);
+	tdble cosa = 1.0f;
+	
+	if (speed > 1.0f) {
+		cosa = car->DynGC.vel.x/speed;
+	}
+	
+	if (cosa < 0.0f) {
+		cosa = 0.0f;
+	}
+			
+    car->aero.drag = -SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK;
+
+    hm = 1.5f * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);
     hm = hm*hm;
     hm = hm*hm;
-    hm = 2 * exp(-3.0*hm);
+    hm = 2 * exp(-3.0f*hm);
     car->aero.lift[0] = - car->aero.Clift[0] * v2 * hm;
     car->aero.lift[1] = - car->aero.Clift[1] * v2 * hm;
 }
@@ -108,8 +121,8 @@ SimWingConfig(tCar *car, int index)
     wing->staticPos.x = GfParmGetNum(hdle, WingSect[index], PRM_XPOS, (char*)NULL, 0);
     wing->staticPos.z = GfParmGetNum(hdle, WingSect[index], PRM_ZPOS, (char*)NULL, 0);
 
-	wing->Kx = -1.23 * area;
-    wing->Kz = 4.0 * wing->Kx;
+	wing->Kx = -1.23f * area;
+    wing->Kz = 4.0f * wing->Kx;
 
     if (index == 1) {
 		car->aero.Cd -= wing->Kx*sin(wing->angle);
@@ -131,11 +144,11 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         // the sinus of the angle of attack
         tdble sinaoa = sin(aoa);
 
-        if (car->DynGC.vel.x > 0.0) {
-            wing->forces.x = wing->Kx * vt2 * (1.0 + (tdble)car->dammage / 10000.0) * sinaoa;
+        if (car->DynGC.vel.x > 0.0f) {
+            wing->forces.x = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * sinaoa;
             wing->forces.z = wing->Kz * vt2 * sinaoa;
         } else {
-            wing->forces.x = wing->forces.z = 0;
+            wing->forces.x = wing->forces.z = 0.0f;
         }
     }
 }

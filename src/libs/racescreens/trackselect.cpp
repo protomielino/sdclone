@@ -23,13 +23,25 @@
 */
 
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <cstring>
+#include <sstream>
+#include <iterator>
 #ifdef WIN32
 #include <windows.h>
 #endif
 #include <sstream>
 #include <iterator>
+
+
+#include <sdlcallbacks.h>
+
 #include <tgfclient.h>
 #include <portability.h>
+#include <track.h>
+#include <raceman.h>
+
 #include "racescreens.h"
 
 static const int DescLineLength = 30;  //Line length for track description
@@ -106,7 +118,6 @@ rmtsDeactivate(void *screen)
     }
 }
 
-
 /** 
  * rmtsWordWrap
  * 
@@ -158,7 +169,7 @@ rmtsUpdateTrackInfo(void)
         return;
     }
 
-    /* Read the length of the track */
+    /* Try and load track 3D model (never fails ?) */
     trk = TrackSelect->trackItf.trkBuild(buf);
     if (!trk) {
         GfError("Could not load track 3D model\n");
@@ -350,6 +361,7 @@ rmtsSelect(void * /* dummy */)
     sprintf(PathBuf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
     GfParmSetStr(TrackSelect->param, PathBuf, RM_ATTR_CATEGORY, CategoryList->name);
     GfParmSetStr(TrackSelect->param, PathBuf, RM_ATTR_NAME, ((tFList*)CategoryList->userData)->name);
+    GfParmSetStr(TrackSelect->param, PathBuf, RM_ATTR_FULLNAME, ((tFList*)CategoryList->userData)->name);
 
     rmtsDeactivate(TrackSelect->nextScreen);
 }
@@ -358,14 +370,14 @@ rmtsSelect(void * /* dummy */)
 static void
 rmtsAddKeys(void)
 {
-    GfuiAddKey(ScrHandle, 13, "Select Track", NULL, rmtsSelect, NULL);
-    GfuiAddKey(ScrHandle, 27, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_LEFT, "Previous Track", (void*)0, rmtsTrackPrevNext, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_RIGHT, "Next Track", (void*)1, rmtsTrackPrevNext, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_UP, "Previous Track Category", (void*)0, rmtsTrackCatPrevNext, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_DOWN, "Next Track Category", (void*)1, rmtsTrackCatPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Select Track", NULL, rmtsSelect, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)0, rmtsTrackPrevNext, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)1, rmtsTrackPrevNext, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)0, rmtsTrackCatPrevNext, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)1, rmtsTrackCatPrevNext, NULL);
 }
 
 

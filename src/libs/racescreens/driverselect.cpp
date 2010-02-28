@@ -32,6 +32,9 @@
 #include <list>
 #include <vector>
 #include <algorithm>
+
+
+
 #include <tgfclient.h>
 #include <track.h>
 #include <car.h>
@@ -42,9 +45,6 @@
 
 // Uncomment to re-activate focus managment (what for ?)
 //#define FOCUS on
-
-static const float	RedColor[] = {1.0, 0.0, 0.0, 1.0};
-static const float	PurpleColor[] = {1.0, 0.0, 1.0, 1.0};
 
 static void		*ScrHandle;
 static tRmDrvSelect	*DrvSel;
@@ -280,16 +280,16 @@ rmdsSelectDeselect(void * /* dummy */ )
 	else
 		GfuiEnable(ScrHandle,AcceptId, GFUI_DISABLE);
 
-
+	GfuiDisplay();
 }
 
 static void
 rmdsAddKeys(void)
 {
-    GfuiAddKey(ScrHandle, 27, "Cancel Selection", DrvSel->prevScreen, rmdsDeactivate, NULL);
-    GfuiAddKey(ScrHandle, 13, "Accept Selection", NULL, rmdsAccept, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", DrvSel->prevScreen, rmdsDeactivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Accept Selection", NULL, rmdsAccept, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMove, NULL);
     GfuiAddKey(ScrHandle, '+', "Move Down", (void*)1, rmdsMove, NULL);
     GfuiAddKey(ScrHandle, ' ', "Select/Deselect", NULL, rmdsSelectDeselect, NULL);
@@ -379,7 +379,7 @@ RmDriversSelect(void *vs)
 		robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	    }
 	    if (!robhdle) {
-		GfOut("No driver '%s' selected because no readable '%s.xml' found\n", modName, modName);
+		GfOut("Warning: No driver '%s' selected because no readable '%s.xml' found\n", modName, modName);
 		break;
 	    }
 	    for (i = 0; i < curmod->modInfoSize; i++) {
@@ -414,10 +414,10 @@ RmDriversSelect(void *vs)
 			    }
 			    NbTotDrivers++;
 			} else {
-			    GfOut("Driver '%s' not selected because car '%s' is not readable\n", curmod->modInfo[i].name, carName);
+			    GfOut("Warning: Driver '%s' not selected because car '%s' is not readable\n", curmod->modInfo[i].name, carName);
 			}
 		    } else {
-			GfOut("Driver '%s' not selected because car '%s' is not present\n", curmod->modInfo[i].name, carName);
+			GfOut("Warning: Driver '%s' not selected because car '%s' is not present\n", curmod->modInfo[i].name, carName);
 		    }
 		}
 	    }

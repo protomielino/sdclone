@@ -25,9 +25,13 @@
 #endif
 #include <errno.h>
 
-#include <tgf.h>
 #include <time.h>
 #include <cstring>
+
+#include "tgf.h"
+
+#include "portability.h"
+
 
 extern void gfDirInit(void);
 extern void gfModInit(void);
@@ -202,6 +206,108 @@ int GfModFreeInfoList(tModList **modlist)
     return 0;
 }
 
+/**
+ * This function allocates memory and returns a pointer to it of size @p size.
+ * This pointer *must* be free'ed with the GfPoolFree function, or *must*
+ * be free'ed by destroying the whole memory pool with GfPoolFreePool.
+ * For a given pool, the first call to GfPoolMalloc must get *pool = 0.
+ *
+ * @param size The size of the pointer to allocate
+ * @param pool Pointer to a memory pool
+ * @return Newly created pointer of size @p size
+ */
+void* GfPoolMalloc(size_t size, tMemoryPool* pool)
+{
+	tMemoryPoolItem *data;
+	
+	if( !pool )
+		return 0;
+
+	/* Init tMemoryPool structure */
+	data = (tMemoryPoolItem*)malloc( sizeof(tMemoryPoolItem) + size );
+	data->prev = NULL;
+	data->next = *pool;
+	data->pool = pool;
+
+	/* Insert in front of the pool */
+	if( data->next )
+	{
+		data->next->pool = NULL; /* Zero pool: not first any more ... */
+		data->next->prev = data; /* ... and now has a previous item */
+	}
+	*pool = data;
+
+	return (void*)( data + 1 );
+}
+
+/**
+ * Free a pointer created with GfPoolMalloc.
+ *
+ * @param pointer Pointer created with GfPoolMalloc which must be free'ed.
+ */
+void GfPoolFree(void* pointer)
+{
+	tMemoryPoolItem *data = ((tMemoryPoolItem*)pointer)-1;
+
+	if( !pointer )
+		return;
+
+	if( data->next )
+		data->next->prev = data->prev;
+	if( data->prev )
+		data->prev->next = data->next;
+	else
+	{
+		/* Delete first from list, correct pool */
+		*data->pool = data->next;
+		if( data->next )
+			data->next->pool = data->pool;
+	}
+
+	free( data );
+}
+
+/**
+ * Free all the pointers in the memory pool
+ *
+ * @param pool The memory pool which must be free'ed.
+ */
+void GfPoolFreePool(tMemoryPool* pool)
+{
+	tMemoryPoolItem *cur;
+	tMemoryPoolItem *prev = NULL;
+
+	if( !pool )
+		return;
+
+	cur = *pool;
+
+	/* Zero the pool */
+	*pool = NULL;
+
+	while( cur )
+	{
+		prev = cur;
+		cur = cur->next;
+
+		free( prev );
+	}
+}
+
+/**
+ * Move all the pointers from one pool to another pool
+ *
+ * @param oldpool Old pool
+ * @param newpool New pool
+ */
+void GfPoolMove(tMemoryPool* oldpool, tMemoryPool* newpool)
+{
+	*newpool = *oldpool;
+	*oldpool = NULL;
+
+	if( *newpool )
+		(*newpool)->pool = newpool;
+}
 
 #ifdef WIN32
 #include <crtdbg.h>
@@ -411,48 +517,148 @@ char * GfTime2Str(tdble sec, int sgn)
 	return strdup(buf);
 }
 
+// Convert any path to an absolute one.
+#ifdef WIN32
+#define absolutePath _fullpath
+#else
+static char *absolutePath(char *absPath, const char *srcPath, int maxLength)
+{
+	// TODO : really compute an absolute path (if not heading / or ~, prepend cwd+/)
+	strcpy(absPath, srcPath);
 
+	return absPath;
+}
+#endif // WIN32
+
+/* Normalize a directory path (~ management, \ to / conversion, mandatory unique trailing /).
+   Warning: The returned path is allocated on the heap (malloc) and must be free'd by the caller. 
+*/
+static char* normalizeDirPath(const char* srcPath)
+{
+	static const size_t bufSize = 1024;
+	
+	// Allocate target buffer (must be freed by caller when useless).
+	char* absPath = (char *)malloc(bufSize);
+
+	// Some Linux addicted user may have escaped ...
+	// Build absolute path
+	if (srcPath[0] == '~')
+	{
+#ifdef WIN32
+		strcpy(absPath, getenv("USERPROFILE"));
+#else
+		strcpy(absPath, getenv("HOME"));
+#endif
+		const size_t i = strlen(absPath);
+		size_t j;
+		const size_t k = strlen(srcPath);
+		for (j = 1; j < k; ++j)
+			absPath[i+j-1] = srcPath[j];
+		absPath[i+k-1] = '\0';
+	}
+	else if (!absolutePath(absPath, srcPath, bufSize))
+	{
+		free(absPath);
+		absPath = 0;
+	}
+
+	if (absPath)
+	{
+#ifdef WIN32
+		// Replace '\' by '/' in pathes
+		size_t i;
+		for (i = 0; i < strlen(absPath); i++) {
+			if (absPath[i] == '\\') {
+				absPath[i] = '/';
+			}
+		}
+#endif
+
+		// Add a trailing '/' if not present.
+		if (absPath[strlen(absPath)-1] != '/')
+		{
+			if (strlen(absPath) < bufSize)
+				strncat(absPath, "/", 1);
+			else
+			{
+				free(absPath);
+				absPath = 0;
+			}
+		}
+	}
+
+	if (!absPath)
+		GfError("Warning: Path '%s' too long ; ignored when made absolute\n", srcPath);
+
+	return absPath;
+}
+
+
+/* Game run-time folders :
+   - localDir : User settings (should be ~/.speed-dreams of <My documents>/speed-dreams.settings)
+   - libDir   : Modules and shared libs installation folder (+ binaries under 'nixes)
+   - binDir   : Executables (and/or scripts under 'nixes) installation folder
+   - dataDir  : Static data (tracks, cars, textures, ...) installation folder
+*/
 static char *localDir = NULL;
 static char *libDir = NULL;
 static char *dataDir = NULL;
+static char *binDir = NULL;
 
-
-char * GetLocalDir(void)
+const char * GetLocalDir(void)
 {
 	return localDir;
 }
 
-
-void SetLocalDir(const char *buf)
+const char * SetLocalDir(const char *buf)
 {
-	localDir = strdup(buf);
-	GfOut("LocalDir='%s'\n", localDir);
+	if (localDir)
+		free(localDir);
+	localDir = normalizeDirPath(buf);
+	GfOut("User settings in %s\n", localDir);
+	return localDir;
 }
 
-
-char * GetLibDir(void)
+const char * GetLibDir(void)
 {
 	return libDir;
 }
 
-
-void SetLibDir(const char *buf)
+const char * SetLibDir(const char *buf)
 {
-	libDir = strdup(buf);
-	GfOut("LibDir='%s'\n", libDir);
+	if (libDir)
+		free(libDir);
+	libDir = normalizeDirPath(buf);
+	GfOut("Libraries in %s\n", libDir);
+	return libDir;
 }
 
-
-char * GetDataDir(void)
+const char * GetDataDir(void)
 {
 	return dataDir;
 }
 
-
-void SetDataDir(const char *buf)
+const char * SetDataDir(const char *buf)
 {
-	dataDir = strdup(buf);
-	GfOut("DataDir='%s'\n", dataDir);
+	if (dataDir)
+		free(dataDir);
+	dataDir = normalizeDirPath(buf);
+	GfOut("Data in %s\n", dataDir);
+	return dataDir;
+}
+
+const char * GetBinDir(void)
+{
+	return binDir;
+}
+
+const char * SetBinDir(const char *buf)
+{
+	if (binDir)
+		free(binDir);
+	binDir = normalizeDirPath(buf);
+	GfOut("Executables in %s\n", binDir);
+	return binDir;
 }
 
 
@@ -471,6 +677,7 @@ void SetSingleTextureMode (void)
 }
 
 
+// Nearest power of 2 integer
 int GfNearestPow2 (int x)
 {
 	int r;
@@ -489,19 +696,18 @@ int GfNearestPow2 (int x)
 	return (1 << r);
 }
 
-
+// Create a directory
 int GfCreateDir(const char *path)
 {
 	if (path == NULL) {
 		return GF_DIR_CREATION_FAILED;
 	}
 
-	const int BUFSIZE = 1024;
+	static const int BUFSIZE = 1024;
 	char buf[BUFSIZE];
 	strncpy(buf, path, BUFSIZE);
 
 #ifdef WIN32
-#define mkdir(x) _mkdir(x)
 
 	// Translate path.
 	const char DELIM = '\\';
@@ -513,22 +719,24 @@ int GfCreateDir(const char *path)
 	}
 	
 #else // WIN32
-#define mkdir(x) mkdir((x), S_IRWXU);
+
+// mkdir with u+rwx access grants by default
+#ifdef mkdir
+# undef mkdir
+#endif
+#define mkdir(x) mkdir((x), S_IRWXU)
 
 	const char DELIM = '/';
 
 #endif // WIN32
 
 	int err = mkdir(buf);
-	if (err == -1) {
-		if (errno == ENOENT) {
-			char *end = strrchr(buf, DELIM);
-			*end = '\0';
-			GfCreateDir(buf);
-			*end = DELIM;
-			err = mkdir(buf);
-
-		}
+	if (err == -1 && errno == ENOENT) {
+		char *end = strrchr(buf, DELIM);
+		*end = '\0';
+		GfCreateDir(buf);
+		*end = DELIM;
+		err = mkdir(buf);
 	}
 
 	if (err == -1 && errno != EEXIST) {

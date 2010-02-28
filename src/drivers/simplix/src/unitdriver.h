@@ -392,10 +392,10 @@ private:
 	static int NBBOTS;                           // Nbr of cars
 //    static double CurrSimTime;                   // Current simulation time
     double CurrSimTime;                          // Current simulation time
-	static char const* MyBotName;                      // Name of this bot 
-	static char const* ROBOT_DIR;                      // Sub path to dll
-	static char const* SECT_PRIV;                      // Private section
-	static char const* DEFAULTCARTYPE;                 // Default car type
+	static const char* MyBotName;                      // Name of this bot 
+	static const char* ROBOT_DIR;                      // Sub path to dll
+	static const char* SECT_PRIV;                      // Private section
+	static const char* DEFAULTCARTYPE;                 // Default car type
 
 	static bool AdvancedParameters;
     static bool UseOldSkilling;
@@ -422,11 +422,15 @@ private:
 	double CalcCrv_simplix_TRB1(double Crv);
 	double CalcCrv_simplix_SC(double Crv);
 	double CalcCrv_simplix_36GP(double Crv);
+	double CalcCrv_simplix_INDY(double Crv);
+	double CalcCrv_simplix_LS1(double Crv);
 
 	double CalcHairpin_simplix(double Crv);
 	double CalcHairpin_simplix_TRB1(double Crv);
 	double CalcHairpin_simplix_SC(double Crv);
 	double CalcHairpin_simplix_36GP(double Crv);
+	double CalcHairpin_simplix_INDY(double Crv);
+	double CalcHairpin_simplix_LS1(double Crv);
 
 	void UseFilterAccel(){oUseFilterAccel = true;};
 	void UseAccelOut(){oUseAccelOut = true;};

@@ -4,7 +4,7 @@
     created              : Mon Aug 21 20:09:40 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grscene.h,v 1.12 2004/11/26 15:37:47 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,13 +17,17 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef _GRSCENE_H_
 #define _GRSCENE_H_
+
+//TODO: What is this??? kilo
 #ifdef GUIONS
 #include <glib.h> 
-#endif /* GUIONS */
-#include <track.h>
+#endif //GUIONS
+
+#include <track.h>	//tTrack
+#include <raceman.h> // tSituation
+#include "grmultitexstate.h"
 
 
 extern int grWrldX;
@@ -41,27 +45,32 @@ extern ssgBranch *PitsAnchor;
 extern ssgBranch *SmokeAnchor;
 extern ssgBranch *SkidAnchor;
 extern ssgBranch *CarlightAnchor;
-
+extern ssgBranch *TrackLightAnchor;
 extern ssgBranch *ThePits;
 
-extern int grInitScene(void);
-extern int grLoadScene(tTrack *track);
-extern void grDrawScene(void);
-extern void grShutdownScene(void);
-extern void grCustomizePits(void);
-
-struct Camera;
-extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
-
 extern ssgStateSelector	*grEnvSelector;
-#include "grmultitexstate.h"
 extern grMultiTexState	*grEnvState;
 extern grMultiTexState	*grEnvShadowState;
 extern grMultiTexState	*grEnvShadowStateOnCars;
 
+class cGrCamera;
+class cGrBackgroundCam;
+
+//!Public interface
+extern int grInitScene(void);
+extern int grLoadScene(tTrack *track);
+extern void grDrawScene(float speedcar, tSituation *s);
+//extern void grDrawScene(void);
+extern void grShutdownScene(void);
+extern void grCustomizePits(void);
+extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
+extern void grUpdateTime(tSituation *s);
+
+//TODO: What is this??? kilo
 #ifdef GUIONS
-typedef struct DoV 
+class cDoV 
 {
+public:
   tdble FrontLevelGroupGlobal; /* the distance for the end of the front scene */
   tdble FrontLevelGroup1;      /* the distance for the end of the front scene for group type 1*/
   tdble FrontLevelGroup2;      /* the distance for the end of the front scene for group type 2*/
@@ -78,33 +87,29 @@ typedef struct DoV
   tdble RearLevelMap1;
   tdble RearLevelMap2;
   tdble RearLevelMap3;
-} DoV_t;
+};
 
-typedef struct hashMapElement 
+class cHashMapElement 
 {
-  char * name;
-  int    numberOfMapToApply;
-} hashMapElement_t;
+  char	*name;
+  int		numberOfMapToApply;
+};
 
-typedef  struct DistanceOfViewHashing
+class cDistanceOfViewHashing
 {
-  char * name;                 /* segment name */
-  GHashTable * ViewGroup;      /* all object to display group1+group2+group3 for this segment */
-  int ViewGroup_num;           /* number of object */
+public:
+  char				*name;				//segment name
+  GHashTable	*ViewGroup;		//all object to display group1+group2+group3 for this segment */
+  int ViewGroup_num;				//number of object */
   int ViewGroupMap1_num;
   int ViewGroupMap2_num;
   int ViewGroupMap3_num;
-} DistanceOfViewHashing_t;
+};
 
-extern DistanceOfViewHashing_t * SceneHashing;
-extern DoV_t * currentDistanceOfView;
-extern DoV_t  PlayableDistanceOfView;
-extern DoV_t  UnPlayableDistanceOfView;
-#endif /* GUIONS */
+extern cDistanceOfViewHashing_t *SceneHashing;
+extern cDoV	*currentDistanceOfView;
+extern cDoV	PlayableDistanceOfView;
+extern cDoV	UnPlayableDistanceOfView;
+#endif //GUIONS
 
-
-
-#endif /* _GRSCENE_H_ */ 
-
-
-
+#endif //_GRSCENE_H_

@@ -19,6 +19,7 @@
 
 #include "sim.h"
 
+static const char *gearname[MAX_GEARS] = {"r", "n", "1", "2", "3", "4", "5", "6", "7", "8"};
 
 void
 SimTransmissionConfig(tCar *car)
@@ -79,10 +80,7 @@ SimTransmissionConfig(tCar *car)
     trans->gearbox.gearMax = 0;
     //printf ("engine I %f\n", car->engine.I);
     for (i = MAX_GEARS - 1; i >= 0; i--) {
-		if (i<2)
-			sprintf(path, "%s/%s/%s", SECT_GEARBOX, ARR_GEARS, i==0 ? "r" : "n");
-		else
-			sprintf(path, "%s/%s/%d", SECT_GEARBOX, ARR_GEARS, i-1);
+		sprintf(path, "%s/%s/%s", SECT_GEARBOX, ARR_GEARS, gearname[i]);
 		gRatio = GfParmGetNum(hdle, path, PRM_RATIO, (char*)NULL, 0.0f);
 		if ((trans->gearbox.gearMax == 0) && (gRatio != 0.0f)) {
 			trans->gearbox.gearMax = i - 1;
@@ -257,7 +255,7 @@ SimTransmissionUpdate(tCar *car)
     switch(trans->type) {
     case TRANS_RWD:
 		differential = &(trans->differential[TRANS_REAR_DIFF]);
-		differential->in.Tq = (car->engine.responseTq + car->engine.Tq) * trans->curOverallRatio * transfer;
+		differential->in.Tq = (car->engine.Tq_response + car->engine.Tq) * trans->curOverallRatio * transfer;
 		SimDifferentialUpdate(car, differential, 1);
 		SimUpdateFreeWheels(car, 0);
 		/* 	printf("s0 %f - s1 %f (%f)	inTq %f -- Tq0 %f - Tq1 %f (%f)\n", */
@@ -267,7 +265,7 @@ SimTransmissionUpdate(tCar *car)
 		break;
     case TRANS_FWD:
 		differential = &(trans->differential[TRANS_FRONT_DIFF]);
-		differential->in.Tq = (car->engine.responseTq + car->engine.Tq) * trans->curOverallRatio * transfer;
+		differential->in.Tq = (car->engine.Tq_response + car->engine.Tq) * trans->curOverallRatio * transfer;
 		SimDifferentialUpdate(car, differential, 1);
 		SimUpdateFreeWheels(car, 1);
 		/* 	printf("s0 %f - s1 %f (%f)	inTq %f -- Tq0 %f - Tq1 %f (%f)\n", */
@@ -280,7 +278,7 @@ SimTransmissionUpdate(tCar *car)
 		differential0 = &(trans->differential[TRANS_FRONT_DIFF]);
 		differential1 = &(trans->differential[TRANS_REAR_DIFF]);
 
-		differential->in.Tq = (car->engine.responseTq + car->engine.Tq) * trans->curOverallRatio * transfer;
+		differential->in.Tq = (car->engine.Tq_response + car->engine.Tq) * trans->curOverallRatio * transfer;
 		differential->inAxis[0]->spinVel = (differential0->inAxis[0]->spinVel + differential0->inAxis[1]->spinVel) / 2.0f;
 		differential->inAxis[1]->spinVel = (differential1->inAxis[0]->spinVel + differential1->inAxis[1]->spinVel) / 2.0f;
 		differential->inAxis[0]->Tq = (differential0->inAxis[0]->Tq + differential0->inAxis[1]->Tq) / differential->ratio;

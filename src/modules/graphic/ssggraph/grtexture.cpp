@@ -3,7 +3,7 @@
     file                 : grtexture.cpp
     created              : Wed Jun 1 14:56:31 CET 2005
     copyright            : (C) 2005 by Bernhard Wymann
-    version              : $Id: grtexture.cpp,v 1.2 2007/11/06 20:43:32 torcs Exp $
+    version              : $Id: grtexture.cpp 1045 2009-07-03 09:53:06Z martkelder $
 
 ***************************************************************************/
 
@@ -22,9 +22,11 @@
 	they should obsolete parts of grutil.cpp.
 */
 
-#include "grtexture.h"
+#include <glfeatures.h>
 
-bool doMipMap(const char *tfname, int mipmap)
+#include "grutil.h"
+
+int doMipMap(const char *tfname, int mipmap)
 {
 	char *buf = (char *) malloc(strlen(tfname)+1);
 	strcpy(buf, tfname);
@@ -46,10 +48,10 @@ bool doMipMap(const char *tfname, int mipmap)
 		}
 	}
 
-	if (mipmap == TRUE) {
+	if (mipmap) {
 		// Check the shadow.
 		s = strrchr((char *)tfname, '/');
-		if (s == NULL) {
+		if (!s) {
 			s = (char *) tfname;
 		} else {
 			s++;
@@ -101,7 +103,6 @@ bool grLoadSGI(const char *fname, ssgTextureInfo* info)
 	return returnval;
 }
 
-
 // Register customized loader in plib.
 void grRegisterCustomSGILoader(void)
 {
@@ -110,8 +111,8 @@ void grRegisterCustomSGILoader(void)
 	ssgAddTextureFormat(".int", grLoadSGI);
 	ssgAddTextureFormat(".inta", grLoadSGI);
 	ssgAddTextureFormat(".bw", grLoadSGI);
+	ssgAddTextureFormat(".png", grLoadPngTexture);
 }
-
 
 grSGIHeader::grSGIHeader(const char *fname, ssgTextureInfo* info)
 {
@@ -133,9 +134,9 @@ grSGIHeader::grSGIHeader(const char *fname, ssgTextureInfo* info)
 	GLubyte *ptr = image;
 
 	unsigned char *rbuf = new unsigned char[sgihdr->xsize];
-	unsigned char *gbuf = (sgihdr->zsize>1) ? new unsigned char[sgihdr->xsize] : (unsigned char *) NULL ;
-	unsigned char *bbuf = (sgihdr->zsize>2) ? new unsigned char[sgihdr->xsize] : (unsigned char *) NULL ;
-	unsigned char *abuf = (sgihdr->zsize>3) ? new unsigned char[sgihdr->xsize] : (unsigned char *) NULL ;
+	unsigned char *gbuf = (sgihdr->zsize>1) ? new unsigned char[sgihdr->xsize] : 0 ;
+	unsigned char *bbuf = (sgihdr->zsize>2) ? new unsigned char[sgihdr->xsize] : 0 ;
+	unsigned char *abuf = (sgihdr->zsize>3) ? new unsigned char[sgihdr->xsize] : 0 ;
 
 	for (int y = 0 ; y < sgihdr->ysize ; y++) {
 		int x ;
@@ -193,22 +194,17 @@ grSGIHeader::grSGIHeader(const char *fname, ssgTextureInfo* info)
 	delete [] bbuf;
 	delete [] abuf;
 
-	if (info != NULL) {
+	if (info) {
 		info->width = sgihdr->xsize;
 		info->height = sgihdr->ysize;
 		info->depth = sgihdr->zsize;
 		info->alpha = (sgihdr->zsize == 2 || sgihdr->zsize == 4);
 	}
 
-	//printf("%s: ", jn);
-
-	bool result = grMakeMipMaps(image, sgihdr->xsize, sgihdr->ysize, sgihdr->zsize, mipmap);
-
-	loadSGI_bool= result ;
+	loadSGI_bool = grMakeMipMaps(image, sgihdr->xsize, sgihdr->ysize, sgihdr->zsize, mipmap);
 }
 
-
-bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, bool mipmap)
+bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 {
 	if (!((xsize & (xsize-1))==0) || !((ysize & (ysize-1))==0)) {
 		ulSetError ( UL_WARNING, "Map is not a power-of-two in size!" ) ;
@@ -291,29 +287,29 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, bool mipmap
 
 	GLint textureTargetFormat;
 	if (isCompressARBEnabled()) {
-		//printf("COMPRESSOR: ");
+		//GfTrace("COMPRESSOR: ");
 
 		switch (zsize) {
 			case 1:
 				textureTargetFormat = GL_COMPRESSED_LUMINANCE_ARB;
-				//printf("GL_COMPRESSED_LUMINANCE_ARB\n");
+				//GfTrace("GL_COMPRESSED_LUMINANCE_ARB\n");
 				break;
 			case 2:
 				textureTargetFormat = GL_COMPRESSED_LUMINANCE_ALPHA_ARB;
-				//printf("GL_COMPRESSED_LUMINANCE_ALPHA_ARB\n");
+				//GfTrace("GL_COMPRESSED_LUMINANCE_ALPHA_ARB\n");
 				break;
 			case 3:
 				textureTargetFormat = GL_COMPRESSED_RGB_ARB;
-				//printf("GL_COMPRESSED_RGB_ARB\n");
+				//GfTrace("GL_COMPRESSED_RGB_ARB\n");
 				break;
 			default:
 				textureTargetFormat = GL_COMPRESSED_RGBA_ARB;
-				//printf("GL_COMPRESSED_RGBA_ARB\n");
+				//GfTrace("GL_COMPRESSED_RGBA_ARB\n");
 				break;
 		}
 	} else {
 		textureTargetFormat = zsize;
-		//printf("NON COMPRESSOR\n");
+		//GfTrace("NON COMPRESSOR\n");
 	}
 
 	int tlimit = getUserTextureMaxSize();
@@ -373,9 +369,9 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, bool mipmap
 			if (compressed == GL_TRUE) {
 				int csize;
 				glGetTexLevelParameteriv(GL_TEXTURE_2D, map_level, GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &csize);
-				printf("compression ratio: %d to %d\n", csize, w*h*zsize);
+				GfTrace("compression ratio: %d to %d\n", csize, w*h*zsize);
 			} else {
-				printf("not compressed\n");
+				GfTrace("not compressed\n");
 			}*/
 		}
 
@@ -386,4 +382,40 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, bool mipmap
 	return true;
 }
 
+bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
+{
+	GLubyte *tex;
+	int w, h;
+	int mipmap = 1;
 
+	TRACE_GL("Load: loadPngTexture start");
+
+	tex = (GLubyte*)GfTexReadPng(fname, &w, &h, 2.0,0,0);
+	if (!tex) {
+		return false;
+	}
+
+	if (info) {
+		info -> width  = w;
+		info -> height = h;
+		info -> depth  = 4;
+		info -> alpha  = true;
+	}
+
+	TRACE_GL("Load: loadPngTexture stop");
+
+	// TODO: Check if tex is freed.
+	// 		 Check/fix potential problems related to malloc/delete mixture
+	//       (instead of malloc/free or new/delete).
+
+	mipmap = doMipMap(fname, mipmap);
+
+#ifdef WIN32
+	GLubyte* tex2 = new GLubyte[w*h*4];
+	memcpy(tex2, tex, w*h*4);
+	free(tex);
+	tex = tex2;
+#endif // WIN32
+	
+	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
+}

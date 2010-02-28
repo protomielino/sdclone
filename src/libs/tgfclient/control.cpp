@@ -4,7 +4,7 @@
     created     : Thu Mar  6 22:01:33 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: control.cpp,v 1.3 2003/11/11 16:36:22 torcs Exp $                                  
+    version     : $Id: control.cpp,v 1.3 20 Mar 2006 04:28:56 torcs Exp $                                  
 
  ***************************************************************************/
 
@@ -28,7 +28,15 @@
 #include <stdio.h>
 #include <cstring>
 
-#include <tgfclient.h>
+#ifdef __APPLE__
+#include <js.h>
+#else
+#include <plib/js.h>
+#endif
+
+
+
+#include "tgfclient.h"
 
 
 static const char *GfJoyBtn[] = {
@@ -61,7 +69,7 @@ static const char *GfJoyAxis[] = {
     "AXIS0-7", "AXIS1-7", "AXIS2-7", "AXIS3-7", "AXIS4-7", "AXIS5-7", "AXIS6-7", "AXIS7-7", "AXIS8-7", "AXIS9-7", "AXIS10-7", "AXIS11-7"
 };
 
-static const char *GfMouseBtn[] = {"MOUSE_LEFT_BTN", "MOUSE_MIDDLE_BTN", "MOUSE_RIGHT_BTN"}; /* glut order */
+static const char *GfMouseBtn[] = {"MOUSE_LEFT_BTN", "MOUSE_MIDDLE_BTN", "MOUSE_RIGHT_BTN"}; 
 
 static const char *GfMouseAxis[] = {"MOUSE_LEFT", "MOUSE_RIGHT", "MOUSE_UP", "MOUSE_DOWN"};
 
@@ -72,27 +80,28 @@ typedef struct
 } tgfKeyBinding;
 
 static tgfKeyBinding GfSKey[] = {
-    {"F1",		GLUT_KEY_F1},
-    {"F2",		GLUT_KEY_F2},
-    {"F3",		GLUT_KEY_F3},
-    {"F4",		GLUT_KEY_F4},
-    {"F5",		GLUT_KEY_F5},
-    {"F6",		GLUT_KEY_F6},
-    {"F7",		GLUT_KEY_F7},
-    {"F8",		GLUT_KEY_F8},
-    {"F9",		GLUT_KEY_F9},
-    {"F10",		GLUT_KEY_F10},
-    {"F11",		GLUT_KEY_F11},
-    {"F12",		GLUT_KEY_F12},
-    {"Left Arrow",	GLUT_KEY_LEFT},
-    {"Up Arrow",	GLUT_KEY_UP},
-    {"Right Arrow",	GLUT_KEY_RIGHT},
-    {"Down Arrow",	GLUT_KEY_DOWN},
-    {"Page Up",		GLUT_KEY_PAGE_UP},
-    {"Page Down",	GLUT_KEY_PAGE_DOWN},
-    {"Home",		GLUT_KEY_HOME},
-    {"End",		GLUT_KEY_END},
-    {"Insert",		GLUT_KEY_INSERT}
+    {"F1",		GFUIK_F1},
+    {"F2",		GFUIK_F2},
+    {"F3",		GFUIK_F3},
+    {"F4",		GFUIK_F4},
+    {"F5",		GFUIK_F5},
+    {"F6",		GFUIK_F6},
+    {"F7",		GFUIK_F7},
+    {"F8",		GFUIK_F8},
+    {"F9",		GFUIK_F9},
+    {"F10",		GFUIK_F10},
+    {"F11",		GFUIK_F11},
+    {"F12",		GFUIK_F12},
+    {"Left Arrow",	GFUIK_LEFT},
+    {"Up Arrow",	GFUIK_UP},
+    {"Right Arrow",	GFUIK_RIGHT},
+    {"Down Arrow",	GFUIK_DOWN},
+    {"Page Up",		GFUIK_PAGEUP},
+    {"Page Down",	GFUIK_PAGEDOWN},
+    {"Home",		GFUIK_HOME},
+    {"End",		GFUIK_END},
+    {"Insert",		GFUIK_INSERT}
+//    {"Del",		GFUIK_DEL}
 };
 
 static tgfKeyBinding GfKey[] = {
@@ -111,6 +120,7 @@ static int gfmaxSKey		= sizeof(GfSKey)	/ sizeof(GfSKey[0]);
 static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
 
 static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
+
 static jsJoystick *js[GFCTRL_JOY_NUMBER] = {NULL};
 
 

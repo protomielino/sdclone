@@ -138,7 +138,7 @@ float Pit::getPitOffset(float offset, float fromstart, int which)
 		if (getInPit() || (getPitstop() && isBetween(fromstart, 0))) 
 		{
 			fromstart = toSplineCoord(fromstart);
-			double newoffset;
+			//double newoffset;
 
 			switch (which) {
 				case PIT_MID:

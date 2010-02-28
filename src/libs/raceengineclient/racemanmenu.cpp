@@ -25,6 +25,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+
+#include "network.h"
 #include <tgfclient.h>
 #include <raceman.h>
 #include <racescreens.h>
@@ -36,6 +39,8 @@
 #include "racestate.h"
 
 #include "racemanmenu.h"
+#include "networkingmenu.h"
+
 
 
 static void		*racemanMenuHdle = NULL;
@@ -196,7 +201,12 @@ reConfigRunState(void)
     return;
 }
 
-static void
+void SetRacemanMenuHandle( void * handle)
+{
+	racemanMenuHdle = handle;
+}
+
+void
 reConfigureMenu(void * /* dummy */)
 {
     void *params = ReInfo->params;
@@ -204,6 +214,7 @@ reConfigureMenu(void * /* dummy */)
     /* Reset configuration automaton */
     GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
     reConfigRunState();
+
 }
 
 static void
@@ -213,8 +224,11 @@ reSelectLoadFile(char *filename)
 
     sprintf(buf, "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
     GfOut("Loading Saved File %s...\n", buf);
-    ReInfo->results = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    ReInfo->mainResults = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    ReInfo->results = ReInfo->mainResults;
     ReInfo->_reRaceName = ReInfo->_reName;
+    GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
+    GfParmSetVariable (ReInfo->params, "/", "humanInGroup", humanInGroup() ? 1 : 0);
     RmShowStandings(ReInfo->_reGameScreen, ReInfo);
 }
 
@@ -255,6 +269,33 @@ ReRacemanMenu(void)
     const char	*str;
     void	*params = ReInfo->params;
 
+    str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
+    if (strcmp(str,"Online Race")==0)
+    {
+		if (GetNetwork())
+		{
+			if (GetNetwork()->IsConnected())
+			{
+				if (IsClient())
+				{
+					reNetworkClientConnectMenu(NULL);
+					return RM_ASYNC | RM_NEXT_STEP;
+				}
+				else if (IsServer())
+				{
+					reNetworkHostMenu(NULL);
+					return RM_ASYNC | RM_NEXT_STEP;
+				}
+			}
+		}
+		else
+		{
+			reNetworkMenu(NULL);
+			return RM_ASYNC | RM_NEXT_STEP;
+		}
+
+    }
+
     if (racemanMenuHdle) {
 	GfuiScreenRelease(racemanMenuHdle);
     }
@@ -281,7 +322,6 @@ ReRacemanMenu(void)
     
     CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);
 
-
     // Create Load race button if we are in a Champ' like race type.
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
 	CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"load",racemanMenuHdle,reLoadMenu);
@@ -289,10 +329,9 @@ ReRacemanMenu(void)
     
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
-    
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
-    GfuiAddKey(racemanMenuHdle, 27, "Back to Main menu", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+    GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to Main menu", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
     // Activate screen.
     GfuiScreenActivate(racemanMenuHdle);
@@ -314,6 +353,7 @@ ReNewTrackMenu(void)
     const char	*str;
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
+    int		raceNumber = 0; // Never used ???
 
     if (newTrackMenuHdle) {
 	GfuiScreenRelease(newTrackMenuHdle);
@@ -340,9 +380,11 @@ ReNewTrackMenu(void)
 
     // Create variable subtitle label from race params.
     sprintf(buf, "Race Day #%d/%d on %s",
-	    (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1),
-	    GfParmGetEltNb(params, RM_SECT_TRACKS),
-	    ReInfo->track->name);
+    raceNumber,
+    (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) >= 0 ?
+    (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) :
+    GfParmGetEltNb(params, RM_SECT_TRACKS), 
+    ReInfo->track->name);
     int subTitleId = CreateLabelControl(newTrackMenuHdle, menuXMLDescHdle, "subtitlelabel");
     GfuiLabelSetText(newTrackMenuHdle, subTitleId, buf);
 
@@ -355,11 +397,12 @@ ReNewTrackMenu(void)
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(newTrackMenuHdle);
-    GfuiAddKey(newTrackMenuHdle, 13, "Start Event", NULL, reStateManage, NULL);
-    GfuiAddKey(newTrackMenuHdle, 27, "Abandon", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+    GfuiAddKey(newTrackMenuHdle, GFUIK_RETURN, "Start Event", NULL, reStateManage, NULL);
+    GfuiAddKey(newTrackMenuHdle, GFUIK_ESCAPE, "Abandon", ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
     // Activate screen.
     GfuiScreenActivate(newTrackMenuHdle);
 
     return RM_ASYNC | RM_NEXT_STEP;
 }
+

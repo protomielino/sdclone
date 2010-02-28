@@ -13,7 +13,6 @@
 //
 ////////////////////////////////////////////////////////////////////////////
 #include <iostream>
-#include <strstream>
 #include <iomanip>
 #include <math.h>
 #include <stdlib.h>
@@ -515,12 +514,7 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 {
  OUTPUT("initTrack(" << index << ")");
  char szSettings[100];
-#ifndef WIN32
- std::ostrstream os(szSettings, sizeof(szSettings));
- os << "drivers/K1999/" << index << "/settings.xml" << ends;
-#else
  sprintf(szSettings, "drivers/K1999/%d/settings.xml", index);
-#endif
  *carParmHandle = GfParmReadFile(szSettings, GFPARM_RMODE_STD);
  if (*carParmHandle)
   OUTPUT(szSettings << " read.");

@@ -4,7 +4,7 @@
     created              : Fri Aug 18 00:00:41 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grmain.h,v 1.18 2005/08/05 09:48:30 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,12 +17,11 @@
  *                                                                         *
  ***************************************************************************/
 
- 
 #ifndef _GRMAIN_H_
 #define _GRMAIN_H_
 
-#include <plib/ssg.h>
-#include <raceman.h>
+#include <plib/ssg.h>	//ssgContect
+#include <raceman.h>	//tSituation
 
 #ifdef WIN32
 #include <windows.h>
@@ -39,8 +38,8 @@ extern bool InStr(char *searchStr, char *str);
 #endif
 
 extern bool InitMultiTex();
-extern int grWinx, grWiny, grWinw, grWinh;
 
+extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;
 extern int grVectDispFlag[];
 extern int segIndice;
@@ -73,12 +72,4 @@ extern class cGrScreen *grScreens[];
 extern tdble grLodFactorValue;
 extern double grDeltaTime;
 
-inline float urandom() {
-	return (((float)rand()/(1.0+(float)RAND_MAX)));
-}
-
-
 #endif /* _GRMAIN_H_ */ 
-
-
-

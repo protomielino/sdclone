@@ -19,6 +19,8 @@
 
 
 #include <stdio.h>
+
+
 #include <tgfclient.h>
 #include "exitmenu.h"
 #include "mainmenu.h"
@@ -28,7 +30,6 @@ endofprog(void * /* dummy */)
 {
     STOP_ACTIVE_PROFILES();
     PRINT_PROFILE();
-/*     glutSetKeyRepeat(GLUT_KEY_REPEAT_ON); */
     GfScrShutdown();
     exit(0);
 }
@@ -54,8 +55,7 @@ void * exitMenuInit(void *prevMenu, void *menuHandle)
     GfParmReleaseHandle(param);
     
     GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddKey(menuHandle, (unsigned char)27, "No, Back to Game", 
-	       prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(menuHandle, GFUIK_ESCAPE, "No, Back to Game", prevMenu, GfuiScreenActivate, NULL);
 
     return menuHandle;
 }

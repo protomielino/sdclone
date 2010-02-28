@@ -4,7 +4,7 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id: SoundInterface.h,v 1.7 2005/11/18 00:20:32 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -233,7 +233,7 @@ class SoundInterface {
 
 	virtual void setGlobalGain(float g) 
 	{
-		global_gain = (g < 0.0 ? 0.0 : g > 1.0 ? 1.0 : g);
+		global_gain = (g < 0.0f ? 0.0f : g > 1.0f ? 1.0f : g);
 	}
 
 };
@@ -250,8 +250,8 @@ class PlibSoundInterface : public SoundInterface {
 	slScheduler* sched;
 	std::vector<TorcsSound*> sound_list;
 	SoundPri* engpri;
-	SoundSource* car_src;
-	SoundSource tyre_src[4];
+	TorcsSoundSource* car_src;
+	TorcsSoundSource tyre_src[4];
 	void DopplerShift (SoundChar* sound, float* p_src, float* u_src, float* p, float* u);
 	void SetMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap);
 public:
@@ -282,8 +282,8 @@ class OpenalSoundInterface : public SoundInterface {
 		float a; //amplitude modulation
 	} SoundChar;
  protected:
-	SoundSource* car_src;
-	SoundSource tyre_src[4];
+	TorcsSoundSource* car_src;
+	TorcsSoundSource tyre_src[4];
 	ALCcontext* cc;
 	ALCdevice* dev;
 	int OSI_MAX_BUFFERS;

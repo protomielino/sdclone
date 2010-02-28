@@ -32,6 +32,7 @@
 #include "guifont.h"
 
 
+
 void
 gfuiButtonInit(void)
 {
@@ -64,13 +65,10 @@ GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const
     button->onFocusLost = onFocusLost;
     button->mouseBehaviour = mouse;
  
-	
-
-
-    button->disabled = GfImgReadTex(disabled, w, h);
-    button->enabled = GfImgReadTex(enabled, w, h);
-    button->focused = GfImgReadTex(focused, w, h);
-    button->pushed = GfImgReadTex(pushed, w, h);
+    button->disabled = GfTexReadTex(disabled, w, h);
+    button->enabled = GfTexReadTex(enabled, w, h);
+    button->focused = GfTexReadTex(focused, w, h);
+    button->pushed = GfTexReadTex(pushed, w, h);
 
     switch (align) {
     case GFUI_ALIGN_HR_VB:
@@ -185,13 +183,10 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const c
     button->onFocusLost = onFocusLost;
     button->mouseBehaviour = mouse;
  
-	
-
-
-    button->disabled = GfImgReadTex(disabled, width, height);
-    button->enabled = GfImgReadTex(enabled, width, height);
-    button->focused = GfImgReadTex(focused, width, height);
-    button->pushed = GfImgReadTex(pushed, width, height);
+    button->disabled = GfTexReadTex(disabled, width, height);
+    button->enabled = GfTexReadTex(enabled, width, height);
+    button->focused = GfTexReadTex(focused, width, height);
+    button->pushed = GfTexReadTex(pushed, width, height);
 
     switch (align) {
     case GFUI_ALIGN_HR_VB:
@@ -298,7 +293,7 @@ GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int w
 
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id) {
@@ -371,12 +366,10 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
     button->buttonType = GFUI_BTN_PUSH;
     button->bShowBox = true;
 
-
     button->disabled = 0;
     button->enabled = 0;
     button->focused = 0;
     button->pushed = 0;
-
 
     button->bgColor[0] = GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
     button->bgColor[1] = GetColor(&(GfuiColor[GFUI_BGBTNENABLED][0]));
@@ -443,12 +436,12 @@ GfuiButtonSetText(void *scr, int id, const char *text)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
-				int oldmax = curObject->xmax;
-				int oldmin = curObject->xmin;
+				const int oldmax = curObject->xmax;
+				const int oldmin = curObject->xmin;
 				gfuiSetLabelText(curObject, &(curObject->u.button.label), text);
 				curObject->xmax = oldmax;
 				curObject->xmin = oldmin;
@@ -470,12 +463,12 @@ GfuiButtonShowBox(void *scr, int id, bool bShow)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
-				int oldmax = curObject->xmax;
-				int oldmin = curObject->xmin;
+				const int oldmax = curObject->xmax;
+				const int oldmin = curObject->xmin;
 				curObject->u.button.bShowBox = bShow;
 				curObject->xmax = oldmax;
 				curObject->xmin = oldmin;
@@ -497,7 +490,7 @@ GfuiButtonSetColor(void *scr, int id, Color color)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
@@ -533,22 +526,22 @@ GfuiButtonSetImage(void *scr, int id, int x, int y, int w, int h,
 	GLuint pushed = 0;
 
 	if (strlen(disableFile) != 0)
-		disable = GfImgReadTex(disableFile);
+		disable = GfTexReadTex(disableFile);
 	if (strlen(enableFile) != 0)
-		enable = GfImgReadTex(enableFile);
+		enable = GfTexReadTex(enableFile);
 	if (strlen(focusedFile) != 0)
-		focused = GfImgReadTex(focusedFile);
+		focused = GfTexReadTex(focusedFile);
 	if (strlen(pushedFile) != 0)
-		pushed = GfImgReadTex(pushedFile);
+		pushed = GfTexReadTex(pushedFile);
 
-	tGfuiScreen	*screen = (tGfuiScreen*)scr;
+	tGfuiScreen *screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
-				int oldmax = curObject->xmax;
-				int oldmin = curObject->xmin;
+				const int oldmax = curObject->xmax;
+				const int oldmin = curObject->xmin;
 				curObject->u.button.disabled = disable;
 				curObject->u.button.enabled = enable;
 				curObject->u.button.focused = focused;
@@ -577,7 +570,7 @@ GfuiButtonSetFocusColor(void *scr, int id, Color focuscolor)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
@@ -600,7 +593,7 @@ GfuiButtonSetPushedColor(void *scr, int id, Color pushcolor)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id && curObject->widget == GFUI_BUTTON) {
@@ -620,9 +613,9 @@ GfuiButtonSetPushedColor(void *scr, int id, Color pushcolor)
 int
 GfuiButtonGetFocused(void)
 {
-	if (GfuiScreen != NULL) {
+	if (GfuiScreen) {
 		tGfuiObject *curObject = GfuiScreen->objects;
-		if (curObject != NULL) {
+		if (curObject) {
 			do {
 				curObject = curObject->next;
 				if (curObject->focus) {
@@ -635,7 +628,7 @@ GfuiButtonGetFocused(void)
 		}
 	}
 	return -1;
-}
+}//GfuiButtonGetFocused
 
 
 /** Actually draws the given button.
@@ -647,6 +640,7 @@ gfuiDrawButton(tGfuiObject *obj)
 {
 	Color fgColor;
 	Color bgColor;
+
 
 	tGfuiButton *button = &(obj->u.button);
 	if (obj->state == GFUI_DISABLE) {
@@ -660,8 +654,11 @@ gfuiDrawButton(tGfuiObject *obj)
 		bgColor = button->bgColor[button->state];
 	}//if obj->focus
 
-	if (bgColor.alpha != 0.0) {
-		if (button->bShowBox) {
+
+	if (bgColor.alpha != 0.0) 
+	{
+		if (button->bShowBox)
+		{
 			glColor4fv(bgColor.GetPtr());
 			glBegin(GL_QUADS);
 			glVertex2i(obj->xmin, obj->ymin);
@@ -692,11 +689,11 @@ gfuiDrawButton(tGfuiObject *obj)
 		img = button->enabled;
 	}
 
-	if (img != 0)	{
-		int x1 = obj->xmin+ button->imgX;
-		int x2 = x1 + button->imgWidth;
-		int y1 = obj->ymin+ button->imgY;
-		int y2 = y1 + button->imgHeight;
+	if (img) {
+		const int x1 = obj->xmin+ button->imgX;
+		const int x2 = x1 + button->imgWidth;
+		const int y1 = obj->ymin+ button->imgY;
+		const int y2 = y1 + button->imgHeight;
 
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		//set color to mix with image
@@ -726,9 +723,10 @@ gfuiDrawButton(tGfuiObject *obj)
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
+
 	tGfuiLabel *label = &(button->label);
 	glColor4fv(fgColor.GetPtr());
-  gfuiPrintString(label->x, label->y, label->font, label->text);
+	gfuiPrintString(label->x, label->y, label->font, label->text);
 }//gfuiDrawButton
 
 
@@ -805,14 +803,14 @@ gfuiGrButtonAction(int action) {
 	switch (button->buttonType) {
 		case GFUI_BTN_PUSH:
 			if (action == 2) { /* enter key */
-				if (button->onPush != NULL) {
+				if (button->onPush) {
 					button->onPush(button->userDataOnPush);
 				}
 			} else if (action == 1) { /* mouse up */
 				if (button->state != GFUI_BTN_RELEASED) {
 					button->state = GFUI_BTN_RELEASED;
 					if (button->mouseBehaviour == GFUI_MOUSE_UP) {
-						if (button->onPush != NULL) {
+						if (button->onPush) {
 							button->onPush(button->userDataOnPush);
 						}
 					}
@@ -821,7 +819,7 @@ gfuiGrButtonAction(int action) {
 				if (button->state != GFUI_BTN_PUSHED) {
 					button->state = GFUI_BTN_PUSHED;
 					if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
-						if (button->onPush != NULL) {
+						if (button->onPush) {
 							button->onPush(button->userDataOnPush);
 						}
 					}
@@ -833,7 +831,7 @@ gfuiGrButtonAction(int action) {
 			if (action == 2) { /* enter key */
 				if (button->state == GFUI_BTN_RELEASED) {
 					button->state = GFUI_BTN_PUSHED;
-					if (button->onPush != NULL) {
+					if (button->onPush) {
 						button->onPush(button->userDataOnPush);
 					}
 				} else {
@@ -843,7 +841,7 @@ gfuiGrButtonAction(int action) {
 				if (button->mouseBehaviour == GFUI_MOUSE_UP) {
 					if (button->state == GFUI_BTN_RELEASED) {
 						button->state = GFUI_BTN_PUSHED;
-						if (button->onPush != NULL) {
+						if (button->onPush) {
 							button->onPush(button->userDataOnPush);
 						}
 					} else {
@@ -854,7 +852,7 @@ gfuiGrButtonAction(int action) {
 				if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
 					if (button->state == GFUI_BTN_RELEASED) {
 						button->state = GFUI_BTN_PUSHED;
-						if (button->onPush != NULL) {
+						if (button->onPush) {
 							button->onPush(button->userDataOnPush);
 						}
 					} else {
@@ -884,20 +882,20 @@ gfuiButtonAction(int action)
 	switch (button->buttonType) {
 		case GFUI_BTN_PUSH:
 			if (action == 2) { /* enter key */
-				if (button->onPush != NULL) {
+				if (button->onPush) {
 					button->onPush(button->userDataOnPush);
 				}
 			} else if (action == 1) { /* mouse up */
 				button->state = GFUI_BTN_RELEASED;
 				if (button->mouseBehaviour == GFUI_MOUSE_UP) {
-					if (button->onPush != NULL) {
+					if (button->onPush) {
 						button->onPush(button->userDataOnPush);
 					}
 				}
 			} else { /* mouse down */
 				button->state = GFUI_BTN_PUSHED;
 				if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
-					if (button->onPush != NULL) {
+					if (button->onPush) {
 						button->onPush(button->userDataOnPush);
 					}
 				}
@@ -908,7 +906,7 @@ gfuiButtonAction(int action)
 			if (action == 2) { /* enter key */
 				if (button->state == GFUI_BTN_RELEASED) {
 					button->state = GFUI_BTN_PUSHED;
-					if (button->onPush != NULL) {
+					if (button->onPush) {
 						button->onPush(button->userDataOnPush);
 					}
 				} else {
@@ -918,7 +916,7 @@ gfuiButtonAction(int action)
 				if (button->mouseBehaviour == GFUI_MOUSE_UP) {
 					if (button->state == GFUI_BTN_RELEASED) {
 						button->state = GFUI_BTN_PUSHED;
-						if (button->onPush != NULL) {
+						if (button->onPush) {
 							button->onPush(button->userDataOnPush);
 						}
 					} else {
@@ -929,7 +927,7 @@ gfuiButtonAction(int action)
 				if (button->mouseBehaviour == GFUI_MOUSE_DOWN) {
 					if (button->state == GFUI_BTN_RELEASED) {
 						button->state = GFUI_BTN_PUSHED;
-						if (button->onPush != NULL) {
+						if (button->onPush) {
 							button->onPush(button->userDataOnPush);
 						}
 					} else {
@@ -951,10 +949,10 @@ gfuiReleaseButton(tGfuiObject *obj)
 {
 	tGfuiButton *button = &(obj->u.button);;
 
-	GfImgFreeTex(button->disabled);
-	GfImgFreeTex(button->enabled);
-	GfImgFreeTex(button->focused);
-	GfImgFreeTex(button->pushed);
+	GfTexFreeTex(button->disabled);
+	GfTexFreeTex(button->enabled);
+	GfTexFreeTex(button->focused);
+	GfTexFreeTex(button->pushed);
 
 	tGfuiLabel *label = &(button->label);
 
@@ -973,10 +971,10 @@ gfuiReleaseGrButton(tGfuiObject *obj)
 {
 	tGfuiGrButton	*button = &(obj->u.grbutton);
 
-	GfImgFreeTex(button->disabled);
-	GfImgFreeTex(button->enabled);
-	GfImgFreeTex(button->focused);
-	GfImgFreeTex(button->pushed);
+	GfTexFreeTex(button->disabled);
+	GfTexFreeTex(button->enabled);
+	GfTexFreeTex(button->focused);
+	GfTexFreeTex(button->pushed);
 
 	free(obj);
 }//gfuiReleaseGrButton

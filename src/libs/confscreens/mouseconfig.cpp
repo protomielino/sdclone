@@ -4,7 +4,7 @@
     created     : Thu Mar 13 21:27:03 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: mouseconfig.cpp,v 1.5 2003/11/08 16:37:18 torcs Exp $                                  
+    version     : $Id: mouseconfig.cpp,v 1.5 19 Mar 2006 18:15:16 torcs Exp $                                  
 
  ***************************************************************************/
 
@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+
 
 #include <tgfclient.h>
 
@@ -52,9 +53,19 @@ static tCtrlMouseInfo MouseInfo;
 // Menu screen handle.
 static void *ScrHandle = NULL;
 
+// Next menu screen handle.
+static void* NextMenuHandle = NULL;
+
 // Screen controls Ids
 static int InstId;
 
+
+static void
+onNext(void * /* dummy */)
+{
+    /* Back to previous screen */
+    GfuiScreenActivate(NextMenuHandle);
+}
 
 static int
 GetNextAxis(void)
@@ -107,10 +118,10 @@ MouseCalAutomaton(void)
     CalState = GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	glutIdleFunc(Idle2);
+	sdlIdleFunc(Idle2);
     } else {
-	glutIdleFunc(0);
-	glutPostRedisplay();
+	sdlIdleFunc(0);
+	sdlPostRedisplay();
     }
 }
 
@@ -140,7 +151,7 @@ IdleMouseInit(void)
     memset(&MouseInfo, 0, sizeof(MouseInfo));
     GfctrlMouseGetCurrent(&MouseInfo);
     GfctrlMouseInitCenter();
-    glutIdleFunc(Idle2);
+    sdlIdleFunc(Idle2);
 }
 
 static void
@@ -150,16 +161,17 @@ onActivate(void * /* dummy */)
     GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	glutIdleFunc(IdleMouseInit);
+	sdlIdleFunc(IdleMouseInit);
 	GfctrlMouseCenter();
     }
 }
 
 void *
-MouseCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
+MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
 {
     Cmd = cmd;
     MaxCmd = maxcmd;
+    NextMenuHandle = nextMenu;
     
     if (ScrHandle) {
 	return ScrHandle;
@@ -176,7 +188,7 @@ MouseCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     InstId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
     // Create Back and Reset buttons.
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "backbutton", prevMenu, GfuiScreenActivate);
+    CreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
     CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
     // Close menu XML descriptor.
@@ -184,8 +196,8 @@ MouseCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
-    GfuiAddKey(ScrHandle, 27, "Back", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddKey(ScrHandle, 13, "Back", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Next", NULL, onNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Next", NULL, onNext, NULL);
 
     return ScrHandle;
 }

@@ -1,0 +1,14 @@
+INCLUDE("../../cmake/macros.cmake")
+
+ADD_SUBDIRECTORY(txml)
+ADD_SUBDIRECTORY(tgf)
+ADD_SUBDIRECTORY(tgfclient)
+ADD_SUBDIRECTORY(robottools)
+ADD_SUBDIRECTORY(racescreens)
+ADD_SUBDIRECTORY(confscreens)
+ADD_SUBDIRECTORY(raceengineclient)
+ADD_SUBDIRECTORY(client)
+ADD_SUBDIRECTORY(learning)
+ADD_SUBDIRECTORY(math)
+ADD_SUBDIRECTORY(portability)
+

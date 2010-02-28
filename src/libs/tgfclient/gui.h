@@ -53,13 +53,15 @@ extern float	GfuiColor[GFUI_COLORNB][4];
 
 #define GFUI_IMAGE		200
 
+#define MAX_STATIC_IMAGES 5
+
 Color GetColor(float *color);
 
 typedef struct
 {
     char	*text;		/* text */
-    Color bgColor;	/* RGBA */
-    Color fgColor;
+    Color       bgColor;	/* RGBA */
+    Color       fgColor;
     GfuiFontClass	*font;		/* ttf font */
     int		x, y;		/* label position */
     int		align;
@@ -193,7 +195,43 @@ typedef struct
 
 typedef struct
 {
-    GLuint		texture;
+    int labelId;
+	void *scr;
+	tChoiceInfo *pChoices;
+
+    Color    fgColor[3];
+    int			comboType;
+    tfuiComboCallback onChange;
+} tGfuiCombobox;
+
+typedef struct
+{
+    int labelId;
+	void *scr;
+    Color    fgColor[3];
+	int checkId;
+	int uncheckId;
+
+    tfuiCheckboxCallback onChange;
+} tGfuiCheckbox;
+
+typedef struct
+{
+	void *scr;
+	GLuint progressbackground;
+	GLuint progressbarimage;
+	float min;
+	float max;
+	float value;
+
+} tGfuiProgressbar;
+
+
+
+typedef struct
+{
+	unsigned int activeimage;
+	GLuint	texture[MAX_STATIC_IMAGES];
 } tGfuiImage;
 
 typedef struct GfuiObject
@@ -215,6 +253,9 @@ typedef struct GfuiObject
 	tGfuiScrollBar	scrollbar;
 	tGfuiEditbox	editbox;
 	tGfuiImage	image;
+	tGfuiCombobox combobox;
+	tGfuiCheckbox checkbox;
+	tGfuiProgressbar progressbar;
     } u;
     struct GfuiObject	*next;
     struct GfuiObject	*prev;
@@ -223,10 +264,10 @@ typedef struct GfuiObject
 /* Keyboard key assignment */
 typedef struct GfuiKey
 {
-    unsigned char	key;
+    int			key; // SDL key sym code (0 for non special keys)
+    int			unicode; // SDL unicode (0 for special keys)
     char		*name;
     char		*descr;
-    int			specialkey;
     int			modifier;
     void		*userData;
     tfuiCallback	onPress;
@@ -295,8 +336,22 @@ extern tGfuiObject *gfuiGetObject(void *scr, int id);
 
 extern void gfuiSetLabelText(tGfuiObject *object, tGfuiLabel *label, const char *text);
 
+extern void GfuiComboboxSetPosition(void *scr, int id, unsigned int pos);
+extern unsigned int GfuiComboboxGetPosition(void *scr, int id);
+extern unsigned int GfuiComboboxAddText(void *scr, int id, const char *text);
+extern void GfuiComboboxSetTextColor(void *scr, int id, Color color);
+
+
+
+extern void gfuiDrawProgressbar(tGfuiObject *obj);
 extern void gfuiDrawLabel(tGfuiObject *obj);
 extern void gfuiDrawButton(tGfuiObject *obj);
+extern void gfuiDrawCombobox(tGfuiObject *obj);
+void gfuiDrawCheckbox(tGfuiObject *obj);
+
+
+
+
 extern void gfuiButtonAction(int action);
 extern void gfuiDrawGrButton(tGfuiObject *obj);
 extern void gfuiGrButtonAction(int action);
@@ -304,6 +359,8 @@ extern void gfuiDrawScrollist(tGfuiObject *obj);
 extern void gfuiScrollListAction(int mouse);
 extern void gfuiDrawEditbox(tGfuiObject *obj);
 extern void gfuiEditboxAction(int action);
+extern void gfuiDrawProgressbar(tGfuiObject *obj);
+
 
 extern void gfuiInit(void);
 extern void gfuiButtonInit(void);
@@ -311,6 +368,8 @@ extern void gfuiHelpInit(void);
 extern void gfuiLabelInit(void);
 extern void gfuiObjectInit(void);
 extern void gfuiEditboxInit(void);
+extern void gfuiComboboxInit(void);
+
 
 extern void gfuiReleaseLabel(tGfuiObject *obj);
 extern void gfuiReleaseButton(tGfuiObject *obj);
@@ -318,10 +377,14 @@ extern void gfuiReleaseGrButton(tGfuiObject *obj);
 extern void gfuiReleaseScrollist(tGfuiObject *curObject);
 extern void gfuiReleaseScrollbar(tGfuiObject *curObject);
 extern void gfuiReleaseEditbox(tGfuiObject *curObject);
+extern void gfuiReleaseCombobox(tGfuiObject *obj);
+extern void gfuiReleaseCheckbox(tGfuiObject *obj);
+extern void gfuiReleaseProgressbar(tGfuiObject *obj);
+
 
 extern void gfuiLoadFonts(void);
 
-extern void gfuiEditboxKey(tGfuiObject *obj, int key, int modifier);
+extern void gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier);
 
 
 extern void gfuiScrollListNextElt (tGfuiObject *object);
@@ -330,7 +393,7 @@ extern void gfuiScrollListPrevElt (tGfuiObject *object);
 extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);
 
-
+extern float GfuiColor[GFUI_COLORNB][4];
 #endif /* _GUI_H__ */ 
 
 

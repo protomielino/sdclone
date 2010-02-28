@@ -1,26 +1,26 @@
-Summary: TORCS NG - Simplix Robots
-Name: TORCS-NG-robots-simplix
+Summary: Speed Dreams - Simplix Robots
+Name: speed-dreams-robots-simplix
 Version: @VERSION@
 Release: 1
 Epoch: 4
-Source:  torcs-ng-%{version}-src.tgz
-Source1: torcs-ng-%{version}-src-robots-simplix.tgz
+Source:  speed-dreams-%{version}-src.tgz
+Source1: speed-dreams-%{version}-src-robots-simplix.tgz
 Group: Amusements/Games
 BuildRoot: %{_tmppath}/%{name}-buildroot
 Copyright: GPL
 BuildArch: i386
-URL: http://www.torcs-ng.org
+URL: http://speed-dreams.sourceforge.net
 Packager: Xavier Bertaux <bertauxx@yahoo.fr>
-Requires: torcs-ng
+Requires: speed-dreams
 
 %description
 Simplix Robots for TORCS NG
 by Wolf-Dieter Beelitz <wdb@wdbee.de>
 
 %prep
-%setup -n torcs-ng-@VERSION@
-%setup -T -D -b 1 -n torcs-ng-@VERSION@
-cd $RPM_BUILD_DIR/torcs-ng-@VERSION@/src/drivers
+%setup -n speed-dreams-@VERSION@
+%setup -T -D -b 1 -n speed-dreams-@VERSION@
+cd $RPM_BUILD_DIR/speed-dreams-@VERSION@/src/drivers
 rm -rf human
 
 %build
@@ -30,13 +30,13 @@ make
 
 %install
 make install DESTDIR=%{_tmppath}/%{name}-ship
-cd %{_tmppath}/%{name}-ship/%{_prefix}/share/games/torcs-ng
-mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
-cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/share/games/torcs-ng
+cd %{_tmppath}/%{name}-ship/%{_prefix}/share/games/speed-dreams
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/share/games/speed-dreams
+cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/share/games/speed-dreams
 cd -
-cd %{_tmppath}/%{name}-ship/%{_prefix}/lib/torcs-ng
-mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/torcs-ng
-cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/lib/torcs-ng
+cd %{_tmppath}/%{name}-ship/%{_prefix}/lib/speed-dreams
+mkdir -p $RPM_BUILD_ROOT/%{_prefix}/lib/speed-dreams
+cp -r drivers $RPM_BUILD_ROOT/%{_prefix}/lib/speed-dreams
 cd -
 rm -rf %{_tmppath}/%{name}-ship
 
@@ -45,8 +45,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%{_prefix}/share/games/torcs-ng/*
-%{_prefix}/lib/torcs-ng/*
+%{_prefix}/share/games/speed-dreams/*
+%{_prefix}/lib/speed-dreams/*
 
 %changelog
 * Wed Sep 17 2008 Xavier Bertaux <bertauxx@yahoo.fr> 1.4.0

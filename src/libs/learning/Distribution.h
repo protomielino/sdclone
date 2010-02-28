@@ -13,7 +13,7 @@
 #ifndef DISTRIBUTION_H
 #define DISTRIBUTION_H
 
-#include <learning/real.h>
+#include "real.h"
 #include <cmath>
 #include <iostream>
 

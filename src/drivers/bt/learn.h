@@ -55,7 +55,7 @@ class SegLearn {
 
 		void writeKarma();
 		FILE* getKarmaFilename(tTrack* t, tSituation *s, int driverindex);
-		FILE* tryKarmaFilename(char* buffer, int size, const char *path, int driverindex, const char *tbuf, bool storelocalfilename);
+		FILE* tryKarmaFilename(char* buffer, int size, const char *path, char *indexString, const char *tbuf, bool storelocalfilename);
 		bool readKarma(tTrack* track, tSituation *s, float *radius, int *uid, int driverindex);
 };
 

@@ -4,7 +4,7 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: TorcsSound.h,v 1.3 2005/11/18 00:20:32 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -26,9 +26,17 @@
 
 #include <plib/sg.h>
 #include <plib/sl.h>
+
+#ifdef __APPLE__
+#include"al.h"
+#include"alc.h"
+#include"alut.h"
+#else
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
+#endif
+
 #include "sound_defines.h"
 
 class SoundInterface;
@@ -136,7 +144,7 @@ public:
  * principle possible to implement multiple listeners, something which
  * should be extremely useful for same-computer multiplayer games.
  */
-class SoundSource {
+class TorcsSoundSource {
 public:
 	sgVec3 p_lis; ///< listener position for this source
 	sgVec3 u_lis; ///< listener velocity for this source
@@ -145,7 +153,7 @@ public:
 	float a; ///< Environmental attenuation
     float f; ///< Environmental frequency shift
     float lp; ///< Environmental filtering
-	SoundSource();
+	TorcsSoundSource();
 	void update();
 	void setSource(sgVec3 p, sgVec3 u);
 	void setListener (sgVec3 p, sgVec3 u);

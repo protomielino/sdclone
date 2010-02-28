@@ -45,12 +45,12 @@
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
-// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
+// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
+// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
 //
-// Im übrigen gilt für die Nutzung und/oder Weitergabe die
+// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spätere Version.
+// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

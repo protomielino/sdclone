@@ -69,7 +69,7 @@ extern void RmTrackSelect(void * /* vs */);
 extern void RmDriversSelect(void * /* vs */);
 extern void RmDriverSelect(void * /* vs */);
 
-extern void RmPitMenuStart(tCarElt * /* car */, void * /* userdata */, tfuiCallback /* callback */);
+extern void RmPitMenuStart(tSituation * /*s*/, tCarElt * /* car */, void * /* userdata */, tfuiCallback /* callback */);
 
 extern void RmLoadingScreenStart(const char * /* text */, const char * /* bgimg */);
 extern void RmLoadingScreenSetText(const char * /* text */);
@@ -92,6 +92,13 @@ extern void *RmFourStateScreen(const char *title,
 			       const char *label3, const char *tip3, void *screen3,
 			       const char *label4, const char *tip4, void *screen4);
 
+extern void *RmFiveStateScreen(char const *title,
+			       char const *label1, char const *tip1, void *screen1,
+			       char const *label2, char const *tip2, void *screen2,
+			       char const *label3, char const *tip3, void *screen3,
+			       char const *label4, char const *tip4, void *screen4,
+			       char const *label5, char const *tip5, void *screen5);
+
 extern void RmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr);
 
 
@@ -100,6 +107,8 @@ extern void RmRaceParamMenu(void *vrp);
 extern void RmShowStandings(void *prevHdle, tRmInfo *info);
 
 extern void RmFileSelect(void *vs);
+
+extern int RmGetFeaturesList( void* param );
 
 #endif /* __RACEMANTOOLS_H__ */
 

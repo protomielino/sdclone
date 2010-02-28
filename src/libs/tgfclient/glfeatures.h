@@ -28,13 +28,30 @@ to another part eventually.
 #ifndef _GRFEATURES_H_
 #define _GRFEATURES_H_
 
+#ifdef _WIN32
+	#ifndef DLLEXPORT
+		#define DLLEXPORT __declspec(dllexport)
+	#endif
+#pragma warning (disable: 4251)
+#else
+       #ifndef DLLEXPORT
+               #define DLLEXPORT
+       #endif
+#endif
+
 #ifdef WIN32
 #include <windows.h>
 #include <GL/gl.h>
 #include "GL/glext.h"
-#else
+#endif //WIN32
+
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#endif //__APPLE__
+
+#ifdef LINUX
 #include <GL/gl.h>
-#endif // WIN32
+#endif 
 
 #include "tgfclient.h"
 #include <graphic.h>
@@ -47,8 +64,8 @@ extern bool isCompressARBAvailable(void);
 extern bool isCompressARBEnabled(void);
 extern void updateCompressARBEnabled(void);
 
-extern int getUserTextureMaxSize(void);
-extern int getGLTextureMaxSize(void);
+extern DLLEXPORT int getUserTextureMaxSize(void);
+extern DLLEXPORT int getGLTextureMaxSize(void);
 extern void updateUserTextureMaxSize(void);
 
 #endif // _GRFEATURES_H_

@@ -55,7 +55,10 @@ simuInit(int /* index */, void *pt)
     sim->config   = SimConfig;
     sim->reconfig = SimReConfig;
     sim->update   = SimUpdate;
+    sim->singleupdate   = SimUpdateSingleCar;
     sim->shutdown = SimShutdown;
+	sim->updatesimcartable = UpdateSimCarTable;
+	sim->getsimcartable = GetSimCarTable;
     
     return 0;
 }

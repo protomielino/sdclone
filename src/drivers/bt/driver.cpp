@@ -86,19 +86,22 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
 	const int BUFSIZE = 256;
 	char buffer[BUFSIZE];
+	char indexstr[32];
 	// Load a custom setup if one is available.
 	// Get a pointer to the first char of the track filename.
 	char* trackname = strrchr(track->filename, '/') + 1;
 
+	RtGetCarindexString(INDEX, "bt", INDEX < 0 || INDEX >= 10, indexstr, 32);
+
 	switch (s->_raceType) {
 		case RM_TYPE_PRACTICE:
-			snprintf(buffer, BUFSIZE, "drivers/bt/%d/practice/%s", INDEX, trackname);
+			snprintf(buffer, BUFSIZE, "drivers/bt/%s/practice/%s", indexstr, trackname);
 			break;
 		case RM_TYPE_QUALIF:
-			snprintf(buffer, BUFSIZE, "drivers/bt/%d/qualifying/%s", INDEX, trackname);
+			snprintf(buffer, BUFSIZE, "drivers/bt/%s/qualifying/%s", indexstr, trackname);
 			break;
 		case RM_TYPE_RACE:
-			snprintf(buffer, BUFSIZE, "drivers/bt/%d/race/%s", INDEX, trackname);
+			snprintf(buffer, BUFSIZE, "drivers/bt/%s/race/%s", indexstr, trackname);
 			break;
 		default:
 			break;
@@ -106,7 +109,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
 
 	*carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
 	if (*carParmHandle == NULL) {
-		snprintf(buffer, BUFSIZE, "drivers/bt/%d/default.xml", INDEX);
+		snprintf(buffer, BUFSIZE, "drivers/bt/%s/default.xml", indexstr);
 		*carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     }
 

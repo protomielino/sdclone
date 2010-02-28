@@ -41,6 +41,7 @@
 
 #define BT_SECT_PRIV "bt private"
 #define BT_ATT_FUELPERLAP "fuelperlap"
+#define BT_ATT_FUELPERSECOND "fuelpersecond"
 #define BT_ATT_MUFACTOR "mufactor"
 #define BT_ATT_PITTIME "pittime"
 #define BT_ATT_BESTLAP "bestlap"

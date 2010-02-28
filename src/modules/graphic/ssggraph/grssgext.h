@@ -1,10 +1,11 @@
 /***************************************************************************
 
     file                 : grssgext.h
+		* This file contains the divergences from PLIB.
     created              : Wed Aug 30 01:35:45 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grssgext.h,v 1.7 2005/06/03 23:51:20 berniw Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -17,17 +18,10 @@
  *                                                                         *
  ***************************************************************************/
  
-/** @file    
-    		This file contains the divergences from PLIB.
-		I derived PLIB objects to adapt them to my needs.
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: grssgext.h,v 1.7 2005/06/03 23:51:20 berniw Exp $
-*/
-
 #ifndef _GRSSGEXT_H_
 #define _GRSSGEXT_H_
 
-#include "grtexture.h"
+#include "grtexture.h"	//doMipMap
 
 /*
  * An ssgBranch with pre and post draw callbacks.
@@ -37,14 +31,11 @@
  */
 class ssgBranchCb : public ssgBranch
 {
-
- protected:
-
+protected:
   ssgCallback  preDrawCB;
   ssgCallback postDrawCB;
 
- public:
-
+public:
   ssgBranchCb(void):ssgBranch() {
     preDrawCB = NULL;
     postDrawCB = NULL;
@@ -98,9 +89,4 @@ class ssgLoaderOptionsEx : public ssgLoaderOptions {
 		}
 };
 
-
-
 #endif /* _GRSSGEXT_H_ */ 
-
-
-

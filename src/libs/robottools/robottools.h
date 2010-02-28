@@ -179,7 +179,15 @@ extern void RtTelemStopMonitoring(void);
 extern void RtTelemUpdate(double time);
 extern void RtTelemShutdown(void);
 
-#endif /* _ROBOTTOOLS_H_ */ 
+/**
+ * A utility function used to get the string of a index number, or the string of the carname.
+ *
+ * @param index The index of the robot
+ * @param bot_dname The dll name (or so name) of the robot
+ * @param extended TRUE if the car is an extended one; FALSE otherwise
+ * @param result The resulting char* string. If must be already allocated. The contents of the parameter will be changed.
+ * @param resultLength The length of the result array
+ */
+extern void RtGetCarindexString( int index, const char *bot_dname, char careerMode, char *result, int resultLength );
 
-
-
+#endif /* _ROBOTTOOLS_H_ */

@@ -69,7 +69,8 @@ GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font
     tGfuiLabel	*label;
     tGfuiObject	*object;
     int 	width;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    int     height;
+	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 
     Color fgColor = GetColor((float*)fgColorPtr);
     
@@ -90,30 +91,83 @@ GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font
 
     label->font = gfuiFont[font];
     width = gfuiFont[font]->getWidth((const char *)text);
-    label->align = align;
-    switch(align&0xF0) {
-    case 0x00 /* LEFT */:
+	height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
+    
+	label->align = align;
+    switch(align) {
+	case GFUI_ALIGN_HL_VB:
 	label->x = object->xmin = x;
 	label->y = y - gfuiFont[font]->getDescender();
 	object->ymin = y;
 	object->xmax = x + width;
 	object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	break;
-    case 0x10 /* CENTER */:
+
+	case GFUI_ALIGN_HL_VC:
+	label->x = object->xmin = x;
+	label->y = y - height/2;
+	object->ymin = y - height/2;
+	object->xmax = x + width;
+	object->ymax = y + height/2;
+	break;
+
+	case GFUI_ALIGN_HL_VT:
+	label->x = object->xmin = x;
+	label->y = y ;
+	object->ymin = y;
+	object->xmax = x + width;
+	object->ymax = y + height;
+	break;
+
+	case GFUI_ALIGN_HC_VB:
 	label->x =  object->xmin = x - width / 2;
 	label->y = y - gfuiFont[font]->getDescender();
 	object->ymin = y;
 	object->xmax = x + width / 2;
 	object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	break;
-    case 0x20 /* RIGHT */:
+
+	case GFUI_ALIGN_HC_VC:
+	label->x =  object->xmin = x - width / 2;
+	label->y = y - height/2;
+	object->ymin = y - height/2;
+	object->xmax = x + width / 2;
+	object->ymax = y + height /2;
+	break;
+
+	case GFUI_ALIGN_HC_VT:
+	label->x =  object->xmin = x - width / 2;
+	label->y = y ;
+	object->ymin = y;
+	object->xmax = x + width / 2;
+	object->ymax = y+ height;
+	break;
+
+	case GFUI_ALIGN_HR_VB:
 	label->x = object->xmin = x - width;
 	label->y = y - gfuiFont[font]->getDescender();
 	object->ymin = y;
 	object->xmax = x;
 	object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	break;
-    }
+
+	case GFUI_ALIGN_HR_VC:
+	label->x = object->xmin = x - width;
+	label->y = y - height/2;
+	object->ymin = y - height/2;
+	object->xmax = x;
+	object->ymax = y + height/2;
+	break;
+
+	case GFUI_ALIGN_HR_VT:
+	label->x = object->xmin = x - width;
+	label->y = y ;
+	object->ymin = y;
+	object->xmax = x;
+	object->ymax = y + height;
+	break;
+
+	}
 
     gfuiAddObject(screen, object);
 
@@ -245,7 +299,7 @@ GfuiLabelSetText(void *scr, int id, const char *text)
     @see	GfuiAddLabel
  */
 void
-GfuiLabelSetColor(void *scr, int id, const float * colorPtr)
+GfuiLabelSetColor(void *scr, int id, const float* colorPtr)
 {
     Color color = GetColor((float*)colorPtr);
     tGfuiObject *curObject;

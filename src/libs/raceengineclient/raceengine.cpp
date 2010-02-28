@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "network.h"
 #include <tgfclient.h>
 #include <robot.h>
 #include <raceman.h>
@@ -35,10 +36,13 @@
 #include "racegl.h"
 #include "raceinit.h"
 #include "raceresults.h"
+#include "racesimusimu.h"
 
 #include "raceengine.h"
 
+
 static char	buf[1024];
+static char	bestLapChanged = FALSE;
 static double	msgDisp;
 static double	bigMsgDisp;
 
@@ -53,6 +57,7 @@ ReUpdtPitTime(tCarElt *car)
 {
 	tSituation *s = ReInfo->s;
 	tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
+	tCarPenalty *penalty;
 	int i;
 
 	switch (car->_pitStopType) {
@@ -68,8 +73,12 @@ ReUpdtPitTime(tCarElt *car)
 			}
 			break;
 		case RM_PIT_STOPANDGO:
-			info->totalPitTime = 0.0;
-			car->_scheduledEventTime = s->currentTime;
+			penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
+			if (penalty && penalty->penalty == RM_PENALTY_10SEC_STOPANDGO)
+				info->totalPitTime = 10.0;
+			else
+				info->totalPitTime = 0.0;
+			car->_scheduledEventTime = s->currentTime + info->totalPitTime; 
 			break;
 	}
 }
@@ -111,11 +120,43 @@ ReRaceBigMsgSet(const char *msg, double life)
 	bigMsgDisp = ReInfo->_reCurTime + life;
 }
 
+static void
+ReAddPenalty(tCarElt *car, int penalty)
+{
+	tCarPenalty *newPenalty;
+
+	if (! (ReInfo->s->_features & RM_FEATURE_PENALTIES) )
+		return;	/* Penalties not enabled this race: do not add penalty */
+	
+	if (penalty == RM_PENALTY_DRIVETHROUGH)
+		sprintf(buf, "%s DRIVETHROUGH PENALTY", car->_name);
+	else if (penalty == RM_PENALTY_STOPANDGO)
+		sprintf(buf, "%s STOP&GO PENALTY", car->_name);
+	else if (penalty == RM_PENALTY_10SEC_STOPANDGO)
+		sprintf(buf, "%s 10 SEC STOP&GO PENALTY", car->_name);
+	else if (penalty == RM_PENALTY_DISQUALIFIED)
+		sprintf(buf, "%s DISQUALIFIED", car->_name);
+
+	ReRaceMsgSet(buf, 5);
+
+	/* If disqualified, remove the car from the track */
+	if (penalty == RM_PENALTY_DISQUALIFIED)
+	{
+		car->_state |= RM_CAR_STATE_ELIMINATED;
+		return;
+	}
+
+	newPenalty = (tCarPenalty*)calloc(1, sizeof(tCarPenalty));
+	newPenalty->penalty = penalty;
+	newPenalty->lapToClear = car->_laps + 5;
+	GF_TAILQ_INSERT_TAIL(&(car->_penaltyList), newPenalty, link);
+}
 
 static void
 ReManage(tCarElt *car)
 {
 	int i, pitok;
+	int xx;
 	tTrackSeg *sseg;
 	tdble wseg;
 	static float color[] = {0.0, 0.0, 1.0, 1.0};
@@ -212,13 +253,30 @@ ReManage(tCarElt *car)
 					if (car->robot->rbPitCmd(car->robot->index, car, s) == ROB_PIT_MENU) {
 						// the pit cmd is modified by menu.
 						ReStop();
-						RmPitMenuStart(car, (void*)car, ReUpdtPitCmd);
+						RmPitMenuStart(s, car, (void*)car, ReUpdtPitCmd);
 					} else {
 						ReUpdtPitTime(car);
 					}
 				}
 			}
 		}
+	}
+
+	/* Check if it is in a new sector */
+	while (true)
+	{
+		if (car->_currentSector < ReInfo->track->numberOfSectors - 1 && car->_laps > 0 && info->lapFlag == 0)
+		{
+			/* Must pass at least one sector before the finish */
+			if (RtGetDistFromStart(car) > ReInfo->track->sectors[car->_currentSector])
+			{
+				/* It is in a new sector. Update split time */
+				car->_curSplitTime[car->_currentSector] = car->_curLapTime;
+				++car->_currentSector;
+				continue;
+			}
+		}
+		break;
 	}
 	
 	/* Start Line Crossing */
@@ -227,7 +285,19 @@ ReManage(tCarElt *car)
 		if (info->lapFlag == 0) {
 		if ((car->_state & RM_CAR_STATE_FINISH) == 0) {
 			car->_laps++;
+
+			if (GetNetwork())
+				GetNetwork()->SendLapStatusPacket(car);
+
 			car->_remainingLaps--;
+			if (car->_pos == 1 && s->currentTime < s->_totTime && s->_raceType == RM_TYPE_RACE)
+			{
+				/* First car passed finish time before the time ends: increase the number of laps for everyone */
+				for (xx = 0; xx < s->_ncars; ++xx)
+					++ReInfo->s->cars[xx]->_remainingLaps;
+				++s->_totLaps;
+			}
+			car->_currentSector = 0;
 			if (car->_laps > 1) {
 			car->_lastLapTime = s->currentTime - info->sTime;
 			car->_curTime += car->_lastLapTime;
@@ -236,13 +306,37 @@ ReManage(tCarElt *car)
 			}
 			if ((car->_lastLapTime < car->_bestLapTime) || (car->_bestLapTime == 0)) {
 				car->_bestLapTime = car->_lastLapTime;
+				memcpy(car->_bestSplitTime, car->_curSplitTime, sizeof(double)*(ReInfo->track->numberOfSectors - 1) );
+				if (s->_raceType != RM_TYPE_RACE && s->_ncars > 1)
+				{
+					/* Best lap time is made better. Update times behind leader */
+					bestLapChanged = TRUE;
+					car->_timeBehindLeader = car->_bestLapTime - s->cars[0]->_bestLapTime;
+					if (car->_pos > 1)
+					{
+						car->_timeBehindPrev = car->_bestLapTime - s->cars[car->_pos - 1]->_bestLapTime;
+					}
+					else
+					{
+						/* New best time for the leader: update the differences */
+						for (xx = 1; xx < s->_ncars; ++xx)
+						{
+							if (s->cars[xx]->_bestLapTime > 0.0f)
+								s->cars[xx]->_timeBehindLeader = s->cars[xx]->_bestLapTime - car->_bestLapTime;
+						}
+					}
+					if (car->_pos + 1 < s->_ncars && s->cars[car->_pos+1]->_bestLapTime > 0.0f)
+						car->_timeBeforeNext = s->cars[car->_pos + 1]->_bestLapTime - car->_bestLapTime;
+					else
+						car->_timeBeforeNext = 0;
+				}
 			}
-			if (car->_pos != 1) {
+			if (car->_pos != 1 && s->_raceType == RM_TYPE_RACE) {
 				car->_timeBehindLeader = car->_curTime - s->cars[0]->_curTime;
 				car->_lapsBehindLeader = s->cars[0]->_laps - car->_laps;
 				car->_timeBehindPrev = car->_curTime - s->cars[car->_pos - 2]->_curTime;
 				s->cars[car->_pos - 2]->_timeBeforeNext = car->_timeBehindPrev;
-			} else {
+			} else if (s->_raceType == RM_TYPE_RACE) {
 				car->_timeBehindLeader = 0;
 				car->_lapsBehindLeader = 0;
 				car->_timeBehindPrev = 0;
@@ -250,43 +344,66 @@ ReManage(tCarElt *car)
 			info->sTime = s->currentTime;
 			switch (ReInfo->s->_raceType) {
 			case RM_TYPE_PRACTICE:
-				if (ReInfo->_displayMode == RM_DISP_MODE_NONE) {
-				ReInfo->_refreshDisplay = 1;
-				char *t1, *t2;
-				t1 = GfTime2Str(car->_lastLapTime, 0);
-				t2 = GfTime2Str(car->_bestLapTime, 0);
-				sprintf(buf,"lap: %02d   time: %s  best: %s  top spd: %.2f    min spd: %.2f    damage: %d",
-					car->_laps - 1, t1, t2,
-					info->topSpd * 3.6, info->botSpd * 3.6, car->_dammage);
-				ReResScreenAddText(buf);
-				free(t1);
-				free(t2);
+				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {
+					ReInfo->_refreshDisplay = 1;
+					char *t1, *t2;
+					t1 = GfTime2Str(car->_lastLapTime, 0);
+					t2 = GfTime2Str(car->_bestLapTime, 0);
+					sprintf(buf,"lap: %02d   time: %s  best: %s  top spd: %.2f    min spd: %.2f    damage: %d",
+						car->_laps - 1, t1, t2,
+						info->topSpd * 3.6, info->botSpd * 3.6, car->_dammage);
+					ReResScreenAddText(buf);
+					free(t1);
+					free(t2);
 				}
 				/* save the lap result */
-				ReSavePracticeLap(car);
+				if (s->_ncars == 1)
+					ReSavePracticeLap(car);
 				break;
 				
 			case RM_TYPE_QUALIF:
-				if (ReInfo->_displayMode == RM_DISP_MODE_NONE) {
-				ReUpdateQualifCurRes(car);
+				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {
+					ReUpdateQualifCurRes(car);
 				}
 				break;
+			case RM_TYPE_RACE:
+				if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
+					ReUpdateRaceCurRes();
+				break;
 			}
-			} else {
-			if ((ReInfo->_displayMode == RM_DISP_MODE_NONE) && (ReInfo->s->_raceType == RM_TYPE_QUALIF)) {
-				ReUpdateQualifCurRes(car);
+		} else {
+			if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
+			{
+				switch(s->_raceType)
+				{
+				case RM_TYPE_PRACTICE:
+					ReUpdatePracticeCurRes(car);
+					break;
+				case RM_TYPE_QUALIF:
+					ReUpdateQualifCurRes(car);
+					break;
+				case RM_TYPE_RACE:
+					ReUpdateRaceCurRes();
+					break;
+				default:
+					break;
+				}
 			}
-			}
+		}	
 	
 			info->topSpd = car->_speed_x;
 			info->botSpd = car->_speed_x;
-			if ((car->_remainingLaps < 0) || (s->_raceState == RM_RACE_FINISHING)) {
+			if ((car->_remainingLaps < 0 && s->currentTime > s->_totTime) || (s->_raceState == RM_RACE_FINISHING)) {
 			car->_state |= RM_CAR_STATE_FINISH;
 			s->_raceState = RM_RACE_FINISHING;
 			if (ReInfo->s->_raceType == RM_TYPE_RACE) {
 				if (car->_pos == 1) {
 				sprintf(buf, "Winner %s", car->_name);
 				ReRaceBigMsgSet(buf, 10);
+				if (GetServer())
+					{
+					GetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
+					}
 				} else {
 				const char *numSuffix = "th";
 				if (abs(12 - car->_pos) > 1) { /* leave suffix as 'th' for 11 to 13 */
@@ -332,12 +449,15 @@ ReManage(tCarElt *car)
 	car->_distFromStartLine = car->_trkPos.seg->lgfromstart +
 	(car->_trkPos.seg->type == TR_STR ? car->_trkPos.toStart : car->_trkPos.toStart * car->_trkPos.seg->radius);
 	car->_distRaced = (car->_laps - 1) * ReInfo->track->length + car->_distFromStartLine;
+
+
 }
 
 static void 
 ReSortCars(void)
 {
     int		i,j;
+    int		xx;
     tCarElt	*car;
     int		allfinish;
     tSituation	*s = ReInfo->s;
@@ -353,12 +473,40 @@ ReSortCars(void)
 	while (j > 0) {
 	    if ((s->cars[j]->_state & RM_CAR_STATE_FINISH) == 0) {
 		allfinish = 0;
-		if (s->cars[j]->_distRaced > s->cars[j-1]->_distRaced) {
+		if ((ReInfo->s->_raceType == RM_TYPE_RACE && s->cars[j]->_distRaced > s->cars[j-1]->_distRaced) ||
+		    (ReInfo->s->_raceType != RM_TYPE_RACE && s->cars[j]->_bestLapTime > 0.0f && ( s->cars[j]->_bestLapTime < s->cars[j-1]->_bestLapTime ||
+		                                                                                  s->cars[j-1]->_bestLapTime <= 0.0f))) {
 		    car = s->cars[j];
 		    s->cars[j] = s->cars[j-1];
 		    s->cars[j-1] = car;
 		    s->cars[j]->_pos = j+1;
 		    s->cars[j-1]->_pos = j;
+		    if (s->_raceType != RM_TYPE_RACE)
+		    {
+		    	if (j-1 > 0)
+			{
+			    s->cars[j-1]->_timeBehindPrev = s->cars[j-1]->_bestLapTime - s->cars[j-2]->_bestLapTime;
+			}
+			else
+			{
+			    s->cars[j-1]->_timeBehindPrev = 0;
+			    for (xx = 1; xx < s->_ncars; ++xx)
+			    {
+			    	/* New leader */
+				if (s->cars[xx]->_bestLapTime > 0.0f)
+			    	    s->cars[xx]->_timeBehindLeader = s->cars[xx]->_bestLapTime - s->cars[0]->_bestLapTime;
+			    }
+			}
+			if (s->cars[j]->_bestLapTime)
+			    s->cars[j-1]->_timeBeforeNext = s->cars[j-1]->_bestLapTime - s->cars[j]->_bestLapTime;
+			else
+			    s->cars[j-1]->_timeBeforeNext = 0;
+			s->cars[j]->_timeBehindPrev = s->cars[j]->_bestLapTime - s->cars[j-1]->_bestLapTime;
+			if (j+1 < s->_ncars && s->cars[j+1]->_bestLapTime > 0.0f)
+			    s->cars[j]->_timeBeforeNext = s->cars[j]->_bestLapTime - s->cars[j+1]->_bestLapTime;
+			else
+			    s->cars[j]->_timeBeforeNext = 0;
+		    }
 		    j--;
 		    continue;
 		}
@@ -407,7 +555,7 @@ ReRaceRules(tCarElt *car)
     if (penalty) {
 	if (car->_laps > penalty->lapToClear) {
 	    /* too late to clear the penalty, out of race */
-	    car->_state |= RM_CAR_STATE_ELIMINATED;
+	    ReAddPenalty(car, RM_PENALTY_DISQUALIFIED);
 	    return;
 	}
 	switch (penalty->penalty) {
@@ -416,6 +564,9 @@ ReRaceRules(tCarElt *car)
 	    break;
 	case RM_PENALTY_STOPANDGO:
 	    sprintf(car->ctrl.msg[3], "Stop And Go Penalty");
+	    break;
+	case RM_PENALTY_10SEC_STOPANDGO:
+	    sprintf(car->ctrl.msg[3], "10 Sec Stop And Go Penalty");
 	    break;
 	default:
 	    *(car->ctrl.msg[3]) = 0;
@@ -437,6 +588,7 @@ ReRaceRules(tCarElt *car)
 		    rules->ruleState |= RM_PNST_DRIVETHROUGH;
 		    break;
 		case RM_PENALTY_STOPANDGO:
+		case RM_PENALTY_10SEC_STOPANDGO:
 		    sprintf(buf, "%s STOP&GO PENALTY CLEANING", car->_name);
 		    ReRaceMsgSet(buf, 5);
 		    rules->ruleState |= RM_PNST_STOPANDGO;
@@ -474,12 +626,7 @@ ReRaceRules(tCarElt *car)
 	    /* went out of the pit lane illegally... */
 	    /* it's a new stop and go... */
 	    if (!(rules->ruleState & RM_PNST_STNGO)) {
-		sprintf(buf, "%s STOP&GO PENALTY", car->_name);
-		ReRaceMsgSet(buf, 5);
-		penalty = (tCarPenalty*)calloc(1, sizeof(tCarPenalty));
-		penalty->penalty = RM_PENALTY_STOPANDGO;
-		penalty->lapToClear = car->_laps + 5;
-		GF_TAILQ_INSERT_TAIL(&(car->_penaltyList), penalty, link);
+	    	ReAddPenalty(car, RM_PENALTY_STOPANDGO);
 		rules->ruleState = RM_PNST_STNGO;
 	    }
 	}
@@ -489,31 +636,173 @@ ReRaceRules(tCarElt *car)
 	/* entrered the pits not from the pit entry... */
 	/* it's a new stop and go... */
 	if (!(rules->ruleState & RM_PNST_STNGO)) {
-	    sprintf(buf, "%s STOP&GO PENALTY", car->_name);
-	    ReRaceMsgSet(buf, 5);
-	    penalty = (tCarPenalty*)calloc(1, sizeof(tCarPenalty));
-	    penalty->penalty = RM_PENALTY_STOPANDGO;
-	    penalty->lapToClear = car->_laps + 5;
-	    GF_TAILQ_INSERT_TAIL(&(car->_penaltyList), penalty, link);
+	    ReAddPenalty(car, RM_PENALTY_STOPANDGO);
 	    rules->ruleState = RM_PNST_STNGO;
 	}
     }
 
     if (seg->raceInfo & TR_SPEEDLIMIT) {
 	if (!(rules->ruleState & (RM_PNST_SPD | RM_PNST_STNGO)) && (car->_speed_x > track->pits.speedLimit)) {
-	    sprintf(buf, "%s DRIVE THROUGH PENALTY", car->_name);
-	    ReRaceMsgSet(buf, 5);
 	    rules->ruleState |= RM_PNST_SPD;
-	    penalty = (tCarPenalty*)calloc(1, sizeof(tCarPenalty));
-	    penalty->penalty = RM_PENALTY_DRIVETHROUGH;
-	    penalty->lapToClear = car->_laps + 5;
-	    GF_TAILQ_INSERT_TAIL(&(car->_penaltyList), penalty, link);
+	    ReAddPenalty(car, RM_PENALTY_DRIVETHROUGH);
 	}
     }
 
 
 }
 
+static void
+SetNetworkCarPhysics(double timeDelta,CarControlsData *pCt)
+{
+	tDynPt *pDynCG = NULL;
+	pDynCG = ReInfo->_reSimItf.getsimcartable(pCt->startRank);
+
+	double errX = pDynCG->pos.x-pCt->DynGCg.pos.x;
+	double errY = pDynCG->pos.y-pCt->DynGCg.pos.y;
+	double errZ = pDynCG->pos.z-pCt->DynGCg.pos.z;
+
+	int idx = GetNetwork()->GetCarIndex(pCt->startRank,ReInfo->s);
+	//Car controls (steering,gas,brake, gear
+	tCarElt *pCar = ReInfo->s->cars[idx];
+	pCar->ctrl.accelCmd = pCt->throttle;
+	pCar->ctrl.brakeCmd = pCt->brake;
+	pCar->ctrl.clutchCmd = pCt->clutch;
+	pCar->ctrl.gear = pCt->gear;
+	pCar->ctrl.steer = pCt->steering;
+
+	pDynCG->pos = pCt->DynGCg.pos;
+	pDynCG->acc = pCt->DynGCg.acc;
+	pDynCG->vel = pCt->DynGCg.vel;
+
+	double step = 0.0;
+	if (timeDelta>0.0)
+	{
+		//predict car position
+		while(timeDelta>0.0)
+		{
+			if (timeDelta>RCM_MAX_DT_SIMU)
+			{
+				step = RCM_MAX_DT_SIMU;
+			}
+			else
+				step = timeDelta;
+
+			timeDelta-=step;
+			ReInfo->_reSimItf.singleupdate(pCt->startRank,step,ReInfo->s);
+		}
+	}
+
+	//printf("Network position error is %lf %lf %lf and delta is %lf\n",errX,errY,errZ,timeDelta);
+
+	//Car physics
+//	ReInfo->_reSimItf.updatesimcartable(pCt->DynGCg,pCt->startRank);
+
+}
+
+static void
+SetNetworkCarStatus(CarStatus *pStatus)
+{
+	int idx = GetNetwork()->GetCarIndex(pStatus->startRank,ReInfo->s);
+
+	tCarElt *pCar = ReInfo->s->cars[idx];
+
+	if (pStatus->dammage > 0.0)
+		pCar->priv.dammage = pStatus->dammage;
+	if (pStatus->fuel >0.0)
+		pCar->priv.fuel = pStatus->fuel;
+	if (pStatus->topSpeed >0.0)
+		pCar->race.topSpeed = pStatus->topSpeed;
+
+	pCar->pub.state = pStatus->state;
+	
+
+}
+
+static void
+SetNetworkLapStatus(LapStatus *pStatus)
+{
+	int idx = GetNetwork()->GetCarIndex(pStatus->startRank,ReInfo->s);
+
+	tCarElt *pCar = ReInfo->s->cars[idx];
+	pCar->race.bestLapTime = pStatus->bestLapTime;
+	*pCar->race.bestSplitTime = (double)pStatus->bestSplitTime;
+	pCar->race.laps = pStatus->laps;
+	GfOut("Setting lap status\n");
+}
+
+static void
+NetworkPlayStep()
+{
+	tSituation *s = ReInfo->s;
+
+	//Do network updates if needed
+	//CarControlsData *pControls = NULL;
+	int numCars = 0;
+	double time = 0.0f;
+	
+	MutexData *pNData = GetNetwork()->LockNetworkData();
+
+	numCars = pNData->m_vecCarCtrls.size();
+	if (numCars>0)
+	{
+		for (int i=0;i<numCars;i++)
+		{
+			double timeDelta = s->currentTime-pNData->m_vecCarCtrls[i].time;
+			if (timeDelta>=0)
+			{
+				SetNetworkCarPhysics(timeDelta,&pNData->m_vecCarCtrls[i]);
+			}
+			else if (timeDelta<=-1.0)
+			{
+				GfOut("ignoring physics packet delta is %lf \n",timeDelta);
+			}
+		}
+	}
+
+	GetNetwork()->SetCurrentTime(s->currentTime);
+	pNData->m_vecCarCtrls.clear();
+
+	//do car status updates if needed
+	CarStatus *pStatus = NULL;
+	numCars = pNData->m_vecCarStatus.size();
+	time = 0.0f;
+
+	if (numCars>0)
+	{
+		for (int i=0;i<numCars;i++)
+		{
+			double delta = s->currentTime-pNData->m_vecCarStatus[i].time;
+			if (delta>=0)
+				SetNetworkCarStatus(&pNData->m_vecCarStatus[i]);
+		}
+	}
+
+	std::vector<CarControlsData>::iterator p = pNData->m_vecCarCtrls.begin();
+	while(p!=pNData->m_vecCarCtrls.end())
+	{
+		if(p->time<s->currentTime)
+			p = pNData->m_vecCarCtrls.erase(p);
+		else 
+			p++;
+	}
+
+	//do lap status updates if needed
+	LapStatus *pLapStatus = NULL;
+	numCars = 0;
+	time = 0.0f;
+	numCars = pNData->m_vecLapStatus.size();
+	if (numCars>0)
+	{
+		for (int i=0;i<numCars;i++)
+		{
+			SetNetworkLapStatus(&pNData->m_vecLapStatus[i]);
+		}
+	}
+
+	pNData->m_vecLapStatus.clear();
+
+	GetNetwork()->UnlockNetworkData();
+}
 
 static void
 ReOneStep(double deltaTimeIncrement)
@@ -522,16 +811,37 @@ ReOneStep(double deltaTimeIncrement)
 	tRobotItf *robot;
 	tSituation *s = ReInfo->s;
 
+	if (GetNetwork())
+	{
+		//Resync clock in case computer falls behind
+		if (s->currentTime<0.0)
+		{
+			double time = GfTimeClock()-GetNetwork()->GetRaceStartTime();
+			s->currentTime = time;
+		}
+
+		if (s->currentTime<-2.0)
+		{
+			int wait = fabs(s->currentTime);
+			char buf[255];
+			sprintf(buf,"Race will start in %i seconds",wait);
+			ReRaceBigMsgSet(buf, 1.0);
+		}
+	}
+
 	if (floor(s->currentTime) == -2.0) {
 		ReRaceBigMsgSet("Ready", 1.0);
 	} else if (floor(s->currentTime) == -1.0) {
 		ReRaceBigMsgSet("Set", 1.0);
 	} else if (floor(s->currentTime) == 0.0) {
 		ReRaceBigMsgSet("Go", 1.0);
+		if (s->currentTime==0.0)
+			GfOut("Start time is %lf\n",GfTimeClock());
 	}
 
 	ReInfo->_reCurTime += deltaTimeIncrement * ReInfo->_reTimeMult; /* "Real" time */
 	s->currentTime += deltaTimeIncrement; /* Simulated time */
+
 
 	if (s->currentTime < 0) {
 		/* no simu yet */
@@ -562,15 +872,34 @@ ReOneStep(double deltaTimeIncrement)
 	}
 	STOP_PROFILE("rbDrive*");
 
+
+	if (GetNetwork())
+	{
+		NetworkPlayStep();
+	}
+
 	START_PROFILE("_reSimItf.update*");
 	ReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
 	for (i = 0; i < s->_ncars; i++) {
 		ReManage(s->cars[i]);
 	}
 	STOP_PROFILE("_reSimItf.update*");
+	
+
 
 	ReRaceMsgUpdate();
 	ReSortCars();
+
+	/* Update screens if a best lap changed */
+	if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars > 1 && bestLapChanged)
+	{
+		GfOut( "UPDATE\n" );
+		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+			ReUpdatePracticeCurRes(ReInfo->s->cars[0]);
+		else if (ReInfo->s->_raceType == RM_TYPE_QUALIF)
+			ReUpdateQualifCurRes(ReInfo->s->cars[0]);
+	}
+	bestLapChanged = FALSE;
 }
 
 void
@@ -605,7 +934,7 @@ reCapture(void)
     glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 
     sprintf(buf, "%s/torcs-%4.4d-%8.8d.png", capture->outputBase, capture->currentCapture, capture->currentFrame++);
-    GfImgWritePng(img, buf, vw, vh);
+    GfTexWritePng(img, buf, vw, vh);
     free(img);
 }
 
@@ -629,9 +958,13 @@ ReUpdate(void)
 	}
 	STOP_PROFILE("ReOneStep*");
 
+	//Send car physics to network if needed
+	if (GetNetwork())
+		GetNetwork()->SendCarControlsPacket(ReInfo->s);
+
 	GfuiDisplay();
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
-	glutPostRedisplay();	/* Callback -> reDisplay */
+	sdlPostRedisplay();	/* Callback -> reDisplay */
 	break;
 	
     case RM_DISP_MODE_NONE:
@@ -639,7 +972,16 @@ ReUpdate(void)
 	if (ReInfo->_refreshDisplay) {
 	    GfuiDisplay();
 	}
-	glutPostRedisplay();	/* Callback -> reDisplay */
+	sdlPostRedisplay();	/* Callback -> reDisplay */
+	break;
+
+    case RM_DISP_MODE_SIMU_SIMU:
+    	ReSimuSimu();
+	ReSortCars();
+	if (ReInfo->_refreshDisplay) {
+	    GfuiDisplay();
+	}
+	sdlPostRedisplay();
 	break;
 
     case RM_DISP_MODE_CAPTURE:
@@ -652,7 +994,7 @@ ReUpdate(void)
 	GfuiDisplay();
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
 	reCapture();
-	glutPostRedisplay();	/* Callback -> reDisplay */
+	sdlPostRedisplay();	/* Callback -> reDisplay */
 	break;
 	
     }

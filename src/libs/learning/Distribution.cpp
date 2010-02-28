@@ -12,7 +12,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
-#include <learning/Distribution.h>
+#include "Distribution.h"
 
 static const float PI = 3.1415927f;
 

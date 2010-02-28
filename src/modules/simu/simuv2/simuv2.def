@@ -10,4 +10,7 @@ EXPORTS
 	moduleWelcome
 	moduleInitialize
 	moduleTerminate
+	UpdateSimCarTable
+	GetSimCarTable
+	SimUpdateSingleCar
 

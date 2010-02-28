@@ -3,7 +3,7 @@
     file        : grcarlight.h
     created     : Sun Oct 26 15:15:11 CET 2003
     copyright   : (C) 2003 by Christophe Guionneau                      
-    version     : $Id: grcarlight.h,v 1.4.2.1 2008/08/24 17:07:23 berniw Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -16,13 +16,13 @@
  *                                                                         *
  ***************************************************************************/
  
-/** @file    
-    		
-    @version	$Id: grcarlight.h,v 1.4.2.1 2008/08/24 17:07:23 berniw Exp $
-*/
-
 #ifndef _GRCARLIGHT_H_
 #define _GRCARLIGHT_H_
+
+#include <plib/ssg.h>	//ssgVtxTable
+
+#include <car.h>	//tCarElt
+
 
 class ssgVtxTableCarlight : public ssgVtxTable
 {
@@ -33,20 +33,20 @@ protected:
   double factor;
     
   virtual void copy_from ( ssgVtxTableCarlight *src, int clone_flags ) ;
+
 public:
-  virtual ssgBase *clone ( int clone_flags = 0 ) ;
   ssgVtxTableCarlight () ;
-  ssgVtxTableCarlight ( ssgVertexArray   *vtx,
-			double s, sgVec3 p);
-  int setSize (double s) { size=s ; return 0; }
+  ssgVtxTableCarlight ( ssgVertexArray   *vtx, double s, sgVec3 p);
+  virtual ~ssgVtxTableCarlight (void);
+
+  virtual ssgBase *clone ( int clone_flags = 0 ) ;
+  int setSize (double s) { size = (float)s ; return 0; }
   void setOnOff (int s) { on=s ; }
   int isOnOff () { return(on) ; }
   sgVec3 * getPos() { return(&pos);}
   void setFactor(double f){factor=f;}
-
   void draw_geometry();
   
-
   virtual void drawHighlight ( sgVec4 colour ){ssgVtxTable::drawHighlight(colour);} 
   virtual void drawHighlight ( sgVec4 colour, int i ){ssgVtxTable::drawHighlight(colour,i);} 
 
@@ -67,16 +67,11 @@ public:
   int  getNumLines ()  {return ssgVtxTable::getNumLines();}
   void getLine ( int n, short *v1, short *v2 )  { ssgVtxTable::getLine(n,v1,v2);}
 
-
-  virtual ~ssgVtxTableCarlight (void);
-
   virtual const char *getTypeName(void)  { return ssgVtxTable::getTypeName();}
 
   virtual void print ( FILE *fd = stderr, char *indent = "", int how_much = 2) { ssgVtxTable::print(fd,indent,how_much);}
   virtual int load ( FILE *fd )  {return  ssgVtxTable::load(fd);}
   virtual int save ( FILE *fd )  {return  ssgVtxTable::save(fd);}
-
-
 };
 
 #define MAX_NUMBER_LIGHT 4+4+4+2
@@ -92,24 +87,23 @@ public:
 #define LIGHT_TYPE_REAR2		4
 #define LIGHT_TYPE_BRAKE		5
 #define LIGHT_TYPE_BRAKE2		6
-#define LIGHT_TYPE_REVERSE		7
-#define LIGHT_NO_TYPE			0
+#define LIGHT_TYPE_REVERSE	7
+#define LIGHT_NO_TYPE				0
 
-typedef struct tgrCarlight_t
+class tgrCarlight
 {
-  ssgVtxTableCarlight * lightArray[MAX_NUMBER_LIGHT];
-  ssgVtxTableCarlight * lightCurr[MAX_NUMBER_LIGHT];
-  int                  lightType[MAX_NUMBER_LIGHT];
-  int numberCarlight;
-  ssgBranch *lightAnchor;
-}tgrCarlight;
+public:
+  ssgVtxTableCarlight	*lightArray[MAX_NUMBER_LIGHT];
+  ssgVtxTableCarlight	*lightCurr[MAX_NUMBER_LIGHT];
+  int									lightType[MAX_NUMBER_LIGHT];
+  int									numberCarlight;
+  ssgBranch						*lightAnchor;
+};
 
 extern void grInitCarlight(int index); /* number of cars*/
 extern void grAddCarlight(tCarElt *car, int type, sgVec3 pos, double size);
 extern void grLinkCarlights(tCarElt *car);
-
 extern void grUpdateCarlight(tCarElt *car, class cGrPerspCamera *curCam, int dispflag);
-extern void grShudownCarlight(void);
+extern void grShutdownCarlight(void);
 
-
-#endif /* _GRCARLIGHT_H_ */ 
+#endif	//_GRCARLIGHT_H_

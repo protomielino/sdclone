@@ -4,7 +4,7 @@
     created              : Wed Nov  1 21:33:22 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grutil.cpp,v 1.23 2005/08/05 09:48:30 berniw Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -17,22 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <cstring>
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <GL/glut.h>
+
 #include <plib/ssg.h>
 
 #include <tgfclient.h>
 
 #include "grutil.h"
-#include "grmultitexstate.h"
 #include "grscene.h"
 #include "grtexture.h"
 
@@ -83,46 +76,6 @@ int grGetFilename(const char *filename, const char *filepath, char *buf)
 }
 
 
-bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
-{
-	GLubyte *tex;
-	int w, h;
-	int mipmap = 1;
-
-	TRACE_GL("Load: grLoadPngTexture start");
-
-	tex = (GLubyte*)GfImgReadPng(fname, &w, &h, 2.0, 0, 0);
-	if (!tex) {
-		return false;
-    }
-
-	if (info) {
-		info -> width  = w;
-		info -> height = h;
-		info -> depth  = 4;
-		info -> alpha  = true;
-    }
-
-	TRACE_GL("Load: grLoadPngTexture stop");
-
-	// TODO: Check if tex is freed.
-	// 		 Check/fix potential problems related to malloc/delete mixture
-	//       (instead of malloc/free or new/delete).
-
-	mipmap = doMipMap(fname, mipmap);
-
-#ifdef WIN32
-	GLubyte* tex2 = new GLubyte[w*h*4];
-	memcpy(tex2, tex, w*h*4);
-	free(tex);
-	tex = tex2;
-#endif // WIN32
-	
-	return grMakeMipMaps(tex, w, h, 4, mipmap);
-}
-
-
-
 typedef struct stlist
 {
     struct stlist	*next;
@@ -157,7 +110,7 @@ void grShutdownState(void)
 	curr = stateList;
 	while (curr != NULL) {
 		next = curr->next;
-		//printf("Still in list : %s\n", curr->name);
+		//GfTrace("Still in list : %s\n", curr->name);
 		free(curr->name);
 		//ssgDeRefDelete(curr->state);
 		free(curr);

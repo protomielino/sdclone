@@ -484,7 +484,7 @@ int RtTeamManagerIndex(CarElt* const Car, tTrack* const Track, tSituation* Situa
 		{
 			if (TeamDriver->Car == Car)
 				return TeamDriver->Count;
-
+			
 			TeamDriver = TeamDriver->Next;
 		}
 	}
@@ -590,12 +590,12 @@ bool RtTeamNeedPitStop(const int TeamIndex, const float FuelPerM, const int Repa
 		return false;
 
 	tTeamDriver* TeamDriver = RtTeamDriverGet(TeamIndex);
-	if (TeamDriver == NULL)  
-		return false;	
+	if (TeamDriver == NULL)
+		return false;
 
-	CarElt* Car = TeamDriver->Car; 
-	if (Car == NULL)  
-		return false;	
+	CarElt* Car = TeamDriver->Car;
+	if (Car == NULL)
+		return false;
 
 	if (Car->_pit == NULL)  
 		return false;	

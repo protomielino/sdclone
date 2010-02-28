@@ -29,6 +29,7 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
@@ -324,7 +325,7 @@ gfuiEditboxRecalcCursor(tGfuiObject *obj)
 
 
 void
-gfuiEditboxKey(tGfuiObject *obj, int key, int modifier)
+gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier)
 {
     tGfuiEditbox	*editbox;
     tGfuiLabel		*label;
@@ -335,72 +336,84 @@ gfuiEditboxKey(tGfuiObject *obj, int key, int modifier)
 	return;
     }
 
+    //printf("gfuiEditboxKey(k=%d, u=%d, m=%04x)\n", key, unicode, modifier);
+
     editbox = &(obj->u.editbox);
     label = &(editbox->label);
 
-    switch (modifier) {
-    case 0:
-    case GLUT_ACTIVE_SHIFT:
-	switch (key) {
-	case 256 + GLUT_KEY_RIGHT:
+	if (!(modifier & (KMOD_CTRL|KMOD_ALT)))
+	{
+	  // Process special keys.
+	  switch (key) 
+	  {
+	  case GFUIK_RIGHT:
 	    editbox->cursorIdx++;
-	    if (editbox->cursorIdx > (int)strlen(label->text)) {
+	    if (editbox->cursorIdx > (int)strlen(label->text)) 
+	    {
 		editbox->cursorIdx--;
 	    }
 	    break;
-	case 256 + GLUT_KEY_LEFT:
+	  case GFUIK_LEFT:
 	    editbox->cursorIdx--;
-	    if (editbox->cursorIdx < 0) {
+	    if (editbox->cursorIdx < 0) 
+	    {
 		editbox->cursorIdx = 0;
 	    }
 	    break;
-	case 256 + GLUT_KEY_HOME:
+	  case GFUIK_HOME:
 	    editbox->cursorIdx = 0;
 	    break;
-	case 256 + GLUT_KEY_END:
+	  case GFUIK_END:
 	    editbox->cursorIdx = (int)strlen(label->text);
 	    break;
-	case 0x7F : /* DEL */
-	    if (editbox->cursorIdx < (int)strlen(label->text)) {
+	  }
+
+	  // Process non special edition keys.
+	  switch (unicode) 
+	  {
+	  case GFUIK_DELETE:
+	    if (editbox->cursorIdx < (int)strlen(label->text)) 
+	    {
 		p1 = &(label->text[editbox->cursorIdx]);
 		p2 = &(label->text[editbox->cursorIdx+1]);
-		while ( *p1 != '\0' ) {
+		while ( *p1 != '\0' ) 
+		{
 		    *p1++ = *p2++;
 		}
 	    }
 	    break;
-	case '\b' : /* Backspace */
-	    if (editbox->cursorIdx > 0) {
+	  case GFUIK_BACKSPACE:
+	    if (editbox->cursorIdx > 0) 
+	    {
 		p1 = &(label->text[editbox->cursorIdx-1]);
 		p2 = &(label->text[editbox->cursorIdx]);
-		while ( *p1 != '\0' ) {
+		while ( *p1 != '\0' ) 
+		{
 		    *p1++ = *p2++;
 		}
 		editbox->cursorIdx--;
 	    }
-	    break;	
-	}
-	if (key >= ' ' && key < 127) {
-	    if ((int)strlen(label->text) < label->maxlen) {
+	    break;
+	  }
+
+	  // Process normal char keys
+	  if (unicode >= ' ' && unicode < 127) 
+	  {
+	    if ((int)strlen(label->text) < label->maxlen) 
+	    {
 		i2 = (int)strlen(label->text) + 1;
 		i1 = i2 - 1;
-		while (i2 > editbox->cursorIdx) {
+		while (i2 > editbox->cursorIdx) 
+		{
 		    label->text[i2] = label->text[i1];
 		    i1--;
 		    i2--;
 		}
-		label->text[editbox->cursorIdx] = key;
+		label->text[editbox->cursorIdx] = unicode;
 		editbox->cursorIdx++;
 	    }
+	  }
 	}
-	break;
-	
-    case GLUT_ACTIVE_CTRL:
-	break;
-
-    case GLUT_ACTIVE_ALT:
-	break;
-    }
 
     gfuiEditboxRecalcCursor(obj);
 }

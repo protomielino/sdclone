@@ -178,7 +178,9 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
 {
  // Do we need to refuel?
  int remainlaps = car->_remainingLaps;//-car->_lapsBehindLeader;
- //int this_pit_dammage = PitDamage;
+#ifndef TORCS_NG
+ int this_pit_dammage = PitDamage;
+#endif //TORCS_NG
 
  if (!car->_pit)
   return false;

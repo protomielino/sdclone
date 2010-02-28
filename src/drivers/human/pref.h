@@ -4,7 +4,7 @@
     created              : Sat Apr 29 16:52:41 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: pref.h,v 1.12 2003/11/23 20:21:11 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,11 +17,10 @@
  *                                                                         *
  ***************************************************************************/
  
-
-
 #ifndef _PREF_H_
 #define _PREF_H_
 
+#include <string>
 
 typedef struct {
     const char	*name;		/* Name of the control */
@@ -43,12 +42,8 @@ typedef struct {
 } tControlCmd;
 
 extern void	*PrefHdle;
-
-
-extern const int nbCmdControl;
-
-
-extern const char *Yn[];
+extern const int NbCmdControl;
+extern const std::string Yn[];
 
 #define	CMD_UP_SHFT	0
 #define	CMD_DN_SHFT	1
@@ -70,11 +65,8 @@ extern const char *Yn[];
 #define CMD_CLUTCH	17
 #define CMD_SPDLIM	18
 
+#define CMDCOUNT 18
 
-extern void HmReadPrefs(int index);
-
+extern void HmReadPrefs(const int index);
 
 #endif /* _PREF_H_ */ 
-
-
-

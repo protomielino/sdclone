@@ -25,6 +25,8 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+
+
 #include <tgfclient.h>
 #include <raceman.h>
 
@@ -79,7 +81,7 @@ ReSinglePlayerInit(void *prevMenu)
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(singlePlayerHandle);
-    GfuiAddKey(singlePlayerHandle, 27, "Back To Main", prevMenu, singlePLayerShutdown, NULL);
+    GfuiAddKey(singlePlayerHandle, GFUIK_ESCAPE, "Back To Main", prevMenu, singlePLayerShutdown, NULL);
 
     // Give the race engine the menu to come back to.
     ReStateInit(singlePlayerHandle);

@@ -43,9 +43,6 @@ typedef struct
     tdble packers;     /* packer size (min susp. travel) */
 } tSpring;
 
-typedef enum SuspensionType {
-    Ideal, Simple, Wishbone
-} eSuspensionType;
 
 typedef struct Suspension
 {
@@ -55,10 +52,6 @@ typedef struct Suspension
     tdble x; /* suspension travel */
     tdble v; /* suspension travel speed */
 
-    eSuspensionType type;
-    t3Dd dynamic_angles;
-    t3Dd link;
-
     tdble force;        /* generated force */
     int    state;        /* indicate the state of the suspension */
 #define SIM_SUSP_COMP   1  	/* the suspension is fully compressed */
@@ -66,7 +59,6 @@ typedef struct Suspension
 
 } tSuspension;
 
-#define PRM_SUSPENSION_TYPE "suspension type"
 
 #endif /* _SUSP_H__ */ 
 

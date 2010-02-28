@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+        kilo2008.xml
+        
+        Copyright 2009 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
+        Based on work by Bernhard Wymann and Andrew Sumner.
+        Copyright: (C) 2002 Andrew Sumner (firechief@bluewin.ch)
+        
+        This program is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
+        
+        This program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+        
+        You should have received a copy of the GNU General Public License
+        along with this program; if not, write to the Free Software
+        Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+        MA 02110-1301, USA.
+ 
+        $Id$
+ 
+-->
+
+<!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
+
+<params name="kilo2008" type="robotdef">
+  <section name="Robots">
+    <section name="index">
+
+      <section name="1">
+        <attstr name="name" val="Kilo 1"></attstr>
+        <attstr name="desc" val="The Highlander"></attstr>
+        <attstr name="team" val="Team Alba 2008"></attstr>
+        <attstr name="author" val="Gabor Kmetyko"></attstr>
+        <attstr name="car name" val="car1-trb1"></attstr>
+        <attnum name="race number" val="71"></attnum>
+        <attnum name="red" val="0.8"></attnum>
+        <attnum name="green" val="0.8"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+        <attstr name="skill level" val="semi-pro"/>
+      </section>
+
+      <section name="2">
+        <attstr name="name" val="Kilo 2"></attstr>
+        <attstr name="desc" val="The Islander"></attstr>
+        <attstr name="team" val="Team Alba 2008"></attstr>
+        <attstr name="author" val="Gabor Kmetyko"></attstr>
+        <attstr name="car name" val="car1-trb1"></attstr>
+        <attnum name="race number" val="72"></attnum>
+        <attnum name="red" val="0.8"></attnum>
+        <attnum name="green" val="0.8"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+        <attstr name="skill level" val="semi-pro"/>
+      </section>
+    </section>
+  </section>
+</params>

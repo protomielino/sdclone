@@ -27,6 +27,7 @@
 #define isnan _isnan
 #endif
 
+#include "portability.h"
 #include <tgf.h>
 #include <robottools.h>
 #include "sim.h"
@@ -433,7 +434,7 @@ SimInit(int nbcars, tTrack* track)
 {
     SimNbCars = nbcars;
     SimCarTable = (tCar*)calloc(nbcars, sizeof(tCar));
-    SimCarCollideInit();
+    SimCarCollideInit(track);
 }
 
 void
@@ -451,5 +452,103 @@ SimShutdown(void)
 	free(SimCarTable);
 	SimCarTable = 0;
     }
+}
+
+/* Used for network games to update client physics */
+void 
+UpdateSimCarTable(tDynPt DynGCG,int index)
+{
+	tCar *pCar = SimCarTable;
+	pCar[index].DynGCg = DynGCG;
+}
+
+/* Used for network games get current physics values*/
+tDynPt * 
+GetSimCarTable(int index)
+{
+	tCar *pCar = SimCarTable;
+	return &pCar[index].DynGCg;
+}
+
+
+void
+SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
+{
+	int i;
+	//int ncar;
+	tCarElt *carElt;
+	tCar *car;
+	
+	SimDeltaTime = deltaTime;
+	SimCarTable[index].collision = 0;
+	SimCarTable[index].blocked = 0;
+	
+	car = &(SimCarTable[index]);
+	carElt = car->carElt;
+	
+
+	CHECK(car);
+	ctrlCheck(car);
+	CHECK(car);
+	SimSteerUpdate(car);
+	CHECK(car);
+	SimGearboxUpdate(car);
+	CHECK(car);
+	SimEngineUpdateTq(car);
+	CHECK(car);
+	
+	SimCarUpdateWheelPos(car);
+	CHECK(car);
+	SimBrakeSystemUpdate(car);
+	CHECK(car);
+	SimAeroUpdate(car, s);
+	CHECK(car);
+	for (i = 0; i < 2; i++){
+		SimWingUpdate(car, i, s);
+	}
+	CHECK(car);
+	for (i = 0; i < 4; i++){
+		SimWheelUpdateRide(car, i);
+	}
+	CHECK(car);
+	for (i = 0; i < 2; i++){
+		SimAxleUpdate(car, i);
+	}
+	CHECK(car);
+	for (i = 0; i < 4; i++){
+		SimWheelUpdateForce(car, i);
+	}
+	CHECK(car);
+	SimTransmissionUpdate(car);
+	CHECK(car);
+	SimWheelUpdateRotation(car);
+	CHECK(car);
+	SimCarUpdate(car, s);
+	CHECK(car);
+	
+	
+	car = &(SimCarTable[index]);
+	CHECK(car);
+	carElt = car->carElt;
+
+	/* copy back the data to carElt */
+
+	carElt->pub.DynGC = car->DynGC;
+	carElt->pub.DynGCg = car->DynGCg;
+	sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
+			RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+	carElt->_trkPos = car->trkPos;
+	for (i = 0; i < 4; i++) {
+		carElt->priv.wheel[i].relPos = car->wheel[i].relPos;
+		carElt->_wheelSeg(i) = car->wheel[i].trkPos.seg;
+		carElt->_brakeTemp(i) = car->wheel[i].brake.temp;
+		carElt->pub.corner[i] = car->corner[i].pos;
+	}
+	carElt->_gear = car->transmission.gearbox.gear;
+	carElt->_enginerpm = car->engine.rads;
+	carElt->_fuel = car->fuel;
+	carElt->priv.collision |= car->collision;
+	carElt->_dammage = car->dammage;
+
 }
 

@@ -56,7 +56,7 @@ void LoadElevation(tTrack *track, void *TrackHandle, char *imgFile)
 	tdble zmin, zmax;
 	tdble xmin, xmax, ymin, ymax;
 
-	ElvImage = GfImgReadPng(imgFile, &width, &height, 2.0, 0, 0);
+	ElvImage = GfTexReadPng(imgFile, &width, &height, 2.0, 0, 0);
 	if (!ElvImage) {
 		return;
 	}
@@ -212,5 +212,5 @@ void SaveElevation(tTrack *track, void *TrackHandle, char *imgFile, char *meshFi
 	}
 
 	printf("\n");
-	GfImgWritePng(ElvImage, imgFile, width, height);
+	GfTexWritePng(ElvImage, imgFile, width, height);
 }

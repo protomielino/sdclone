@@ -38,7 +38,7 @@
 #ifndef _UNITVEC3D_H_
 #define _UNITVEC3D_H_
 
-#include <tmath/v3_t.h>
+#include <v3_t.h>
 #include <tgf.h>
 
 #include "unitglobal.h"

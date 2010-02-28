@@ -18,7 +18,7 @@
  
      For further information visit http://plib.sourceforge.net
 
-     $Id: grloadac.cpp,v 1.20 2005/07/21 21:27:15 berniw Exp $
+     $Id$
 */
 
 #include <plib/ssg.h>
@@ -26,11 +26,9 @@
 
 #include "grssgext.h"
 #include "grvtxtable.h"
-#include "grmultitexstate.h"
 #include "grmain.h"
-#include "grtexture.h"
-int inGroup=0;
 
+int inGroup=0;
 
 #define FGETS(buf, len, file) gzgets(file, buf, len)
 #define FGETC(file) gzgetc(file)

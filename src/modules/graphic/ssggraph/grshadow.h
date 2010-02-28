@@ -1,9 +1,15 @@
+#ifndef _GRSHADOW_H_
+#define _GRSHADOW_H_
+
+#include <plib/ssg.h>	//ssgXXX
+
 class ssgVtxTableShadow : public ssgVtxTable
 {
 protected:
   float factor;
   float unit;
   virtual void copy_from ( ssgVtxTableShadow *src, int clone_flags ) ;
+	
 public:
   virtual ssgBase *clone ( int clone_flags = 0 ) ;
   ssgVtxTableShadow (float f, float u) ;
@@ -37,14 +43,11 @@ public:
   int  getNumLines ()  {return ssgVtxTable::getNumLines();}
   void getLine ( int n, short *v1, short *v2 )  { ssgVtxTable::getLine(n,v1,v2);}
 
-
   virtual ~ssgVtxTableShadow (void);
-
   virtual const char *getTypeName(void)  { return ssgVtxTable::getTypeName();}
-
   virtual void print ( FILE *fd = stderr, char *indent = "", int how_much = 2) { ssgVtxTable::print(fd,indent,how_much);}
   virtual int load ( FILE *fd )  {return  ssgVtxTable::load(fd);}
   virtual int save ( FILE *fd )  {return  ssgVtxTable::save(fd);}
-
-
 };
+
+#endif	//_GRSHADOW_H_

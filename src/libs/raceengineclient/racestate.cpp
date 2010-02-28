@@ -2,7 +2,7 @@
 
     file        : racestate.cpp
     created     : Sat Nov 16 12:00:42 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: racestate.cpp,v 1.5 2005/08/17 20:48:39 berniw Exp $                                  
 
@@ -24,7 +24,7 @@
 */
 
 /* The Race Engine State Automaton */
-
+#include "network.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <tgfclient.h>
@@ -41,6 +41,35 @@
 #include "racestate.h"
 
 static void *mainMenu;
+
+
+bool
+WaitForNetwork()
+{
+	if (!GetNetwork())
+		return false;
+
+	//If network race wait for other players and start when the server says too
+	if (GetClient())
+	{
+		GetClient()->SendReadyToStartPacket();
+		ReInfo->s->currentTime = GetClient()->WaitForRaceStart();
+		printf("Client beginning race in %lf seconds!\n",ReInfo->s->currentTime);
+		return false;
+	}
+	else if (GetServer())
+	{
+		if (GetServer()->ClientsReadyToRace())
+		{
+			ReInfo->s->currentTime = GetServer()->WaitForRaceStart();
+			printf("Server beginning race in %lf seconds!\n",ReInfo->s->currentTime);
+			return false;
+		}
+	}
+
+
+	return true;
+}
 
 /* State Automaton Init */
 void
@@ -80,17 +109,43 @@ ReStateManage(void)
 			case RE_STATE_PRE_RACE:
 				GfOut("RaceEngine: state = RE_STATE_PRE_RACE\n");
 				mode = RePreRace();
-				if (mode & RM_NEXT_STEP) {
+				if (mode & RM_NEXT_RACE) {
+					if (mode & RM_NEXT_STEP) {
+						ReInfo->_reState = RE_STATE_EVENT_SHUTDOWN;
+					}
+				} else if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_RACE_START;
 				}
 				break;
 
 			case RE_STATE_RACE_START:
 				GfOut("RaceEngine: state = RE_STATE_RACE_START\n");
+
 				mode = ReRaceStart();
-				if (mode & RM_NEXT_STEP) {
-					ReInfo->_reState = RE_STATE_RACE;
+				if (GetNetwork())
+				{
+					GetNetwork()->RaceInit(ReInfo->s);
+					GetNetwork()->SetRaceActive(true);
 				}
+					
+
+				if (mode & RM_NEXT_STEP) {
+					ReInfo->_reState = RE_STATE_NETWORK_WAIT;
+				}
+				break;
+
+			case RE_STATE_NETWORK_WAIT:
+					if (!WaitForNetwork())
+						ReInfo->_reState = RE_STATE_RACE;
+
+					if (GetNetwork())
+					{
+						ReSetRaceBigMsg("Waiting for other players");
+						GfuiDisplay();
+						ReInfo->_reGraphicItf.refresh(ReInfo->s);
+						sdlPostRedisplay();	/* Callback -> reDisplay */
+					}
+	
 				break;
 
 			case RE_STATE_RACE:
@@ -101,6 +156,14 @@ ReStateManage(void)
 				} else if (mode & RM_END_RACE) {
 					/* interrupt by player */
 					ReInfo->_reState = RE_STATE_RACE_STOP;
+				}
+				
+				if (GetNetwork())
+				{
+					if (GetNetwork()->FinishRace(ReInfo->s->currentTime))
+					{
+						ReInfo->_reState = RE_STATE_RACE_END;
+					}
 				}
 				break;
 
@@ -116,6 +179,11 @@ ReStateManage(void)
 			case RE_STATE_RACE_END:
 				GfOut("RaceEngine: state = RE_STATE_RACE_END\n");
 				mode = ReRaceEnd();
+				if (GetNetwork())
+				{
+					GetNetwork()->RaceDone();
+				}
+
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_POST_RACE;
 				} else if (mode & RM_NEXT_RACE) {
@@ -135,6 +203,7 @@ ReStateManage(void)
 
 			case RE_STATE_EVENT_SHUTDOWN:
 				GfOut("RaceEngine: state = RE_STATE_EVENT_SHUTDOWN\n");
+
 				mode = ReEventShutdown();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_SHUTDOWN;

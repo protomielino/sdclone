@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE params SYSTEM "params.dtd">
+
+
+<params name="Career">
+  <section name="Header">
+    <attstr name="name" val="Career"/>
+    <attstr name="description" val="Career"/>
+    <attnum name="priority" val="31"/>
+    <attstr name="menu image" val="data/img/splash-dtm.png"/>
+    <attstr name="run image" val="data/img/splash-run-practice.png"/>
+    <attstr name="start image" val="data/img/splash-dtm.png"/>
+    <section name="Subfiles">
+      <attstr name="has subfiles" val="yes"/>
+      <attstr name="first subfile" val="career_supercars.xmls"/>
+    </section>
+
+  </section>
+
+  <section name="Tracks">
+    <attnum name="maximum number" val="6"/>
+  </section>
+
+  <section name="Names">
+    <section name="First Name">
+      <section name="1">
+        <attstr name="name" val="Harken"/>
+      </section>
+
+      <section name="2">
+        <attstr name="name" val="Gewild"/>
+      </section>
+
+      <section name="3">
+        <attstr name="name" val="Getart"/>
+      </section>
+
+      <section name="4">
+        <attstr name="name" val="Hemels"/>
+      </section>
+
+      <section name="5">
+        <attstr name="name" val="Glanst"/>
+      </section>
+
+      <section name="6">
+        <attstr name="name" val="Geuzen"/>
+      </section>
+
+      <section name="7">
+        <attstr name="name" val="Dunkte"/>
+      </section>
+
+      <section name="8">
+        <attstr name="name" val="Floers"/>
+      </section>
+
+      <section name="9">
+        <attstr name="name" val="Harsen"/>
+      </section>
+
+      <section name="10">
+        <attstr name="name" val="Hamers"/>
+      </section>
+
+      <section name="11">
+        <attstr name="name" val="Halzen"/>
+      </section>
+
+      <section name="12">
+        <attstr name="name" val="Hand"/>
+      </section>
+
+      <section name="13">
+        <attstr name="name" val="Duiven"/>
+      </section>
+
+    </section>
+
+    <section name="Last Name">
+      <section name="1">
+        <attstr name="name" val="Heraut"/>
+      </section>
+
+      <section name="2">
+        <attstr name="name" val="Franje"/>
+      </section>
+
+      <section name="3">
+        <attstr name="name" val="Duvels"/>
+      </section>
+
+      <section name="4">
+        <attstr name="name" val="Fregat"/>
+      </section>
+
+      <section name="5">
+        <attstr name="name" val="Hespen"/>
+      </section>
+
+      <section name="6">
+        <attstr name="name" val="Durfal"/>
+      </section>
+
+      <section name="7">
+        <attstr name="name" val="Hamels"/>
+      </section>
+
+      <section name="8">
+        <attstr name="name" val="Dwazer"/>
+      </section>
+
+      <section name="9">
+        <attstr name="name" val="Hevige"/>
+      </section>
+
+      <section name="10">
+        <attstr name="name" val="Hakbos"/>
+      </section>
+
+      <section name="11">
+        <attstr name="name" val="Hertog"/>
+      </section>
+
+      <section name="12">
+        <attstr name="name" val="Huis"/>
+      </section>
+
+      <section name="13">
+        <attstr name="name" val="Joker"/>
+      </section>
+
+      <section name="14">
+        <attstr name="name" val="Lenig"/>
+      </section>
+
+      <section name="15">
+        <attstr name="name" val="Maling"/>
+      </section>
+
+      <section name="16">
+        <attstr name="name" val="Mapjes"/>
+      </section>
+
+      <section name="17">
+        <attstr name="name" val="Harpen"/>
+      </section>
+
+    </section>
+
+  </section>
+
+  <section name="Drivers">
+    <attnum name="maximum number" val="50"/>
+    <attstr name="focused module" val="inferno"/>
+    <attnum name="focused idx" val="7"/>
+    <section name="1">
+      <attnum name="idx" val="1"/>
+      <attstr name="module" val="human"/>
+    </section>
+
+    <section name="2">
+      <attnum name="idx" val="2"/>
+      <attstr name="module" val="hymie"/>
+    </section>
+
+    <section name="3">
+      <attnum name="idx" val="3"/>
+      <attstr name="module" val="hymie"/>
+    </section>
+
+    <section name="4">
+      <attnum name="idx" val="4"/>
+      <attstr name="module" val="hymie"/>
+    </section>
+
+  </section>
+
+  <section name="Configuration">
+    <attnum name="current configuration" val="2"/>
+    <section name="1">
+      <attstr name="type" val="drivers select"/>
+    </section>
+
+  </section>
+
+  <section name="RaceConfig">
+    <section name="Cars">
+      <attnum name="maximum number" val="15"/>
+    </section>
+
+  </section>
+
+  <section name="Classes">
+    <section name="1">
+      <attstr name="subfile" val="career_supercars.xmls"/>
+      <attstr name="subfile suffix" val="supercars"/>
+      <attnum name="number of groups" val="2"/>
+      <section name="Tracks">
+        <attnum name="minimum number" val="4"/>
+        <attnum name="maximum number" val="6"/>
+      </section>
+
+    </section>
+
+    <section name="2">
+      <attstr name="subfile" val="career_touring.xmls"/>
+      <attstr name="subfile suffix" val="touring"/>
+      <attnum name="number of groups" val="1"/>
+      <section name="Tracks">
+        <attnum name="minimum number" val="4"/>
+        <attnum name="maximum number" val="6"/>
+      </section>
+
+    </section>
+
+  </section>
+
+</params>

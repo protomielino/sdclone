@@ -4,9 +4,9 @@
     created              : Mon Nov 13 21:25:19 CET 2000
     copyright            : (C) 2000 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: maintexmapper.cpp,v 1.1 2003/08/20 05:52:47 torcs Exp $
+    version              : $Id: maintexmapper.cpp,v 1.1 19 Mar 2006 21:44:44 torcs Exp $
 
- ***************************************************************************/
+ **************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -25,12 +25,14 @@
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
+
 #include <getopt.h>
 #include <math.h>
 #include <plib/ssg.h>
-#include <GL/glut.h>
+#include <SDL/SDL.h>
 
-#include <tgfclient.h>
+#include "sdlcallbacks.h"
+#include "tgfclient.h"
 
 const char	*InputFileName = NULL;
 const char	*OutputFileName = NULL;
@@ -157,7 +159,7 @@ void saveSkin(void)
     glReadBuffer(GL_FRONT);
     glReadPixels(0, 0, ImgSize, ImgSize, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 
-    GfImgWritePng(img, SkinFileName, ImgSize, ImgSize);
+    GfTexWritePng(img, SkinFileName, ImgSize, ImgSize);
 
     free(img);
 }
@@ -211,31 +213,45 @@ Display(void)
 	exit(0);
 	break;
     }
-    glutSwapBuffers();
-    glutPostRedisplay();
+   sdlSwapBuffers();
+   sdlPostRedisplay();
 }
 
 
 void init_graphics ()
 {
-    int   fake_argc = 1 ;
     char *fake_argv[3] ;
     fake_argv[0] = strdup("TexMapper") ;
     fake_argv[1] = strdup("Texture Auto Mapper") ;
     fake_argv[2] = NULL ;
 
     /*
-      Initialise GLUT
+          Initialise SDL
     */
 
-    glutInitWindowPosition(0, 0);
-    glutInitWindowSize(ImgSize, ImgSize);
-    glutInit(&fake_argc, fake_argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-    glutCreateWindow(fake_argv[1]);
+    if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
+        printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+        return;
+    }
+
+    sdlInitCallbacks();
+    atexit(SDL_Quit);
+
+    SDL_WM_SetCaption("texmapper",NULL);
+
+    SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
+    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
+    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+    SDL_SetVideoMode( ImgSize, ImgSize, 24, SDL_OPENGL);
+    sdlInitWindowPosition(0, 0);
+    sdlInitWindowSize(ImgSize, ImgSize);
+
  
     /* Callbacks */
-    glutDisplayFunc(Display);
+    sdlDisplayFunc(Display);
     
     /*
       Initialise SSG
@@ -248,13 +264,13 @@ void init_graphics ()
     glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glutSwapBuffers();
+    sdlSwapBuffers();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glutSwapBuffers();
+    sdlSwapBuffers();
 
     load_database();
 
-    glutMainLoop();
+    sdlMainLoop();
 
     free(fake_argv[0]);
     free(fake_argv[1]);

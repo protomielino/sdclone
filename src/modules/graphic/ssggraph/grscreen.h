@@ -4,7 +4,7 @@
     created     : Thu May 15 22:11:19 CEST 2003
     copyright   : (C) 2003 by Eric Espié
     email       : eric.espie@torcs.org 
-    version     : $Id: grscreen.h,v 1.13 2006/05/01 21:37:05 berniw Exp $
+    version     : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -16,13 +16,13 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #ifndef _GRSCREEN_H_
 #define _GRSCREEN_H_
 
-#include <car.h>
-#include "grcam.h"
-#include "grboard.h"
+#include <car.h>			//tCarElt
+#include "grcam.h"		//Cameras
+
+class cGrBoard;
 
 class cGrScreen {
 	protected:
@@ -47,10 +47,9 @@ class cGrScreen {
 		int scrx, scry, scrw, scrh;
 		float viewRatio;
 	
-		int active;								// Is the screen activated.
-	
-		int selectNextFlag;
-		int selectPrevFlag;
+		bool active;								// Is the screen activated.
+		bool selectNextFlag;
+		bool selectPrevFlag;
 		int mirrorFlag;
 	
 		void loadParams(tSituation *s);			// Load from parameters files.
@@ -60,40 +59,36 @@ class cGrScreen {
 		~cGrScreen();
 	
 		void activate(int x, int y, int w, int h);
-		void desactivate(void);
-		void setZoom(long zoom);
+		inline void deactivate(void) { active = false; }
+		inline void setZoom(const long zoom) { curCam->setZoom(zoom); }
 		int  isInScreen(int x, int y);
 		void update(tSituation *s, float Fps);
 		void camDraw(tSituation *s);
 		void updateCurrent(tSituation *s);
 
 		void selectCamera(long cam);
-		void selectBoard(long brd);	
+		void selectBoard(const long brd);
 		void selectTrackMap();
 	
-		void setCurrentCar(tCarElt *newCurCar);
+		inline void setCurrentCar(tCarElt *newCurCar) { curCar = newCurCar; }
+
 		void initCams(tSituation *s);
 		void initBoard(void);
 	
-		void selectNextCar(void);
-		void selectPrevCar(void);
+		inline void selectNextCar(void) { selectNextFlag = true; }
+		inline void selectPrevCar(void) {	selectPrevFlag = true; }
 		void switchMirror(void);
 	
-		tCarElt *getCurrentCar(void) { return curCar; }
-		cGrCamera* getCurCamera(void) { return curCam; }
-		float getViewRatio(void) { return viewRatio; }
-		int getCurCamHead(void) { return curCamHead; }
-		int isActive(void) { return active; }
-		int getId(void) { return id; }
-		int getScrX (void) { return scrx; }
-		int getScrY (void) { return scry; }
-		int getScrW (void) { return scrw; }
-		int getScrH (void) { return scrh; }
+		inline tCarElt *getCurrentCar(void) { return curCar; }
+		inline cGrCamera* getCurCamera(void) { return curCam; }
+		inline float getViewRatio(void) { return viewRatio; }
+		inline int getCurCamHead(void) { return curCamHead; }
+		inline bool isActive(void) { return active; }
+		inline int getId(void) { return id; }
+		inline int getScrX (void) { return scrx; }
+		inline int getScrY (void) { return scry; }
+		inline int getScrW (void) { return scrw; }
+		inline int getScrH (void) { return scrh; }
 };
 
-
-#endif /* _GRSCREEN_H_ */
-
-
-
-
+#endif //_GRSCREEN_H_

@@ -34,6 +34,7 @@ extern void ReStartNewRace(void * /* dummy */);
 extern void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle);
 extern int  ReInitCars(void);
 extern int  ReInitTrack(void);
+extern void ReInitGraphics(void);
 extern void ReRaceCleanup(void);
 extern void ReRaceCleanDrivers(void);
 extern char *ReGetCurrentRaceName(void);

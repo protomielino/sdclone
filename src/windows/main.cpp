@@ -4,7 +4,7 @@
     created              : Sat Sep  2 10:40:47 CEST 2000
     copyright            : (C) 2000 by Patrice & Eric Espie
     email                : torcs@free.fr
-    version              : $Id: main.cpp,v 1.9 2005/09/19 19:02:22 berniw Exp $
+    version              : $Id: main.cpp,v 1.9 20 Mar 2006 04:24:27 berniw Exp $
 
  ***************************************************************************/
 
@@ -17,12 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 
+#include "../../config.h"
+
 #ifdef WIN32
 #include <windows.h>
+#include <direct.h>
 #include <shlobj.h>
 #include <stdlib.h>
 #endif
-#include <GL/glut.h>
+
 #include <tgfclient.h>
 #include <client.h>
 #include <portability.h>
@@ -32,75 +35,123 @@
 static void
 init_args(int argc, char **argv)
 {
+    const char *localdir = 0;
+    const char *libdir = 0;
+    const char *datadir = 0;
+    const char *bindir = 0;
     int i;
-    i = 1;
-    while (i < argc) {
-	if (!strncmp(argv[i], "-s", 2) || !strncmp(argv[i], "/s", 2)) {
-	    i++;
-	    SetSingleTextureMode ();
-	} else
-	    i++;	// Ignore bad args
-    }
 
     static const int BUFSIZE = MAX_PATH;
     char buf[BUFSIZE];
-    strncpy(buf, argv[0], BUFSIZE);
-    buf[BUFSIZE-1] = '\0';    // Guarantee zero termination for next operation.
-    char *end = strrchr(buf, '\\');
 
-    // Did we find the last '\' and do we get a complete path?
-    if (end && buf[1] == ':') {
-	end++;
-	*(end) = '\0';
-	// replace '\' with '/'
-	for (i = 0; i < BUFSIZE && buf[i] != '\0'; i++) {
-	    if (buf[i] == '\\')
-		buf[i] = '/';
-	}
+    i = 1;
+    while (i < argc)
+    {
+	// -l or /l option : User settings dir (named "local dir")
+	if (!strncmp(argv[i], "-l", 2) || !strncmp(argv[i], "/l", 2))
+        {
+  	    if (++i < argc)
+	        localdir = SetLocalDir(argv[i]);
+        }
+        // -L or /L option : Libraries dir (root dir of the tree where loadable modules are installed)
+        else if (!strncmp(argv[i], "-L", 2) || !strncmp(argv[i], "/L", 2))
+        {
+	    if (++i < argc)
+	        libdir = SetLibDir(argv[i]);
+        }
+        // -D or /D option : Data dir (root dir of the data tree)
+        else if (!strncmp(argv[i], "-D", 2) || !strncmp(argv[i], "/D", 2))
+        {
+            if (++i < argc)
+                datadir = SetDataDir(argv[i]);
+        }
+        // -B or /B option : Binaries dir (the dir where Speed Dreams exe and DLLs are installed)
+        else if (!strncmp(argv[i], "-B", 2) || !strncmp(argv[i], "/B", 2))
+        {
+            if (++i < argc)
+                bindir = SetBinDir(argv[i]);
+        }
+        // -s or /s option : Single texture mode (= disable multi-texturing)
+        else if (!strncmp(argv[i], "-s", 2) || !strncmp(argv[i], "/s", 2))
+        {
+            SetSingleTextureMode ();
+        }
+        // -m or /m option : Allow the hardware mouse cursor
+        else if (!strncmp(argv[i], "-m", 2) || !strncmp(argv[i], "/m", 2))
+        {
+           GfuiMouseSetHWPresent();
+        }
+        // Next arg (even if current not recognized).
+        i++;
+    }
 
-	SetDataDir(buf);
-	SetLibDir("");
-    } else {
-	if (_fullpath(buf, argv[0], BUFSIZE) &&
-	    (strcmp(argv[0], "speed-dreams") == 0 ||
-	     strcmp(argv[0], "speed-dreams.exe") == 0)
-	   )
+    // If any of the Speed-Dreams dirs not run-time specified / empty, 
+    // use associated compile-time variable TORCS_XXDIR to get default value
+    if (!(localdir && strlen(localdir)))
+    {
+      // Interpret a heading '~' in TORCS_LOCALDIR as the <My documents> folder path
+      // (to give the user an easy access to advanced settings).
+      if (strlen(TORCS_LOCALDIR) > 1 && TORCS_LOCALDIR[0] == '~' 
+	  && (TORCS_LOCALDIR[1] == '/' || TORCS_LOCALDIR[1] == '\\'))
+      {
+	LPITEMIDLIST pidl;
+	if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
+	    && SHGetPathFromIDList(pidl, buf))
 	{
-	    end = strrchr(buf, '\\');
-	    end++;
-	    *(end) = '\0';
-	    // replace '\' with '/'
-	    for (i = 0; i < BUFSIZE && buf[i] != '\0'; i++) {
-		if (buf[i] == '\\')
-		    buf[i] = '/';
-	    }
-	    SetDataDir(buf);
-	    SetLibDir("");
-	} else {
-	    printf("Run speed-dreams.exe either from the GUI or from the directory which contains speed-dreams.exe\n");
-	    exit(1);
-	}
-    }
-    
-    // Set LocalDir to the user settings dir for Speed Dreams 
-    // (in My documents, to give access to the user for advanced settings).
-    LPITEMIDLIST pidl;
-    if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
-	&& SHGetPathFromIDList(pidl, buf))
-    {
-	for (i = 0; i < BUFSIZE && buf[i]; i++)
-	    if (buf[i] == '\\')
-		buf[i] = '/';
-	if (buf[0] && buf[strlen(buf)-1] != '/')
+	  if (buf[0] && buf[strlen(buf)-1] != '/')
 	    strcat(buf, "/");
-	strcat(buf, "speed-dreams.settings/");
-	SetLocalDir(buf);
+	  strcat(buf, TORCS_LOCALDIR+2);
+	  for (i = 0; i < BUFSIZE && buf[i]; i++)
+	    if (buf[i] == '\\')
+	      buf[i] = '/';
+	  localdir = SetLocalDir(buf);
+	}
+	else
+	{
+	  printf("Could not get user's My documents folder path\n");
+	  exit(1);
+	}
+      }
+      else
+	localdir = SetLocalDir(TORCS_LOCALDIR);
     }
-    else
+
+	//Default paths
+	TCHAR szDir[MAX_PATH];
+	GetCurrentDirectory(MAX_PATH,szDir);
+	GfOut("Current Dir %s\n",szDir);
+	std::string strDefault = szDir;
+	std::string strEnd = strDefault.substr(strDefault.size()-4,4);
+	if (strEnd == "\\bin")
+		strDefault = strDefault.substr(0,strDefault.size()-4);
+
+	std::string strBinDir = strDefault+"\\bin";
+	std::string strLibDir = strDefault+"\\lib";
+	std::string strDataDir = strDefault+"\\share";
+
+    if (!(libdir && strlen(libdir)))
+		libdir = SetLibDir(strLibDir.c_str());
+    if (!(bindir && strlen(bindir)))
+		bindir = SetBinDir(strBinDir.c_str());
+    if (!(datadir && strlen(datadir)))
+		datadir = SetDataDir(strDataDir.c_str());
+
+
+    // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
+    if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
+ 	|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
     {
-	printf("Could not get user's My documents folder path\n");
+ 	GfTrace("TORCS_LOCALDIR : '%s'\n", GetLocalDir());
+	GfTrace("TORCS_LIBDIR   : '%s'\n", GetLibDir());
+	GfTrace("TORCS_BINDIR   : '%s'\n", GetBinDir());
+	GfTrace("TORCS_DATADIR  : '%s'\n", GetDataDir());
+	GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
 	exit(1);
     }
+
+    // If "data dir" specified in any way, cd to it.
+    if (datadir && strlen(datadir))
+ 	chdir(datadir);
 }
 
 /*
@@ -108,7 +159,7 @@ init_args(int argc, char **argv)
  *    main
  *
  * Description
- *    Win32 entry point of Speed Dreams
+ *    Win32 entry point of the game
  *
  * Parameters
  *
@@ -124,14 +175,15 @@ main(int argc, char *argv[])
 {
     init_args(argc, argv);
 
-    WindowsSpecInit();	     /* init specific windows functions */
+    GfFileSetup();          /* Update user settings files from an old version */
+    WindowsSpecInit();      /* init specific windows functions */
 
-    GfScrInit(argc, argv);   /* init screen */
+    GfScrInit(argc, argv);  /* init screen */
 
-    GameEntry();	     /* launch the game */
+    GameEntry();            /* launch the game */
 
-    glutMainLoop();	     /* event loop of GLUT */
+    sdlMainLoop();          /* event loop of sdl */
 
-    return 0;	             /* just for the compiler, never reached */
+    return 0;	            /* just for the compiler, never reached */
 }
 

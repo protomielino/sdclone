@@ -22,8 +22,6 @@
     @version	$Id: tgf.h,v 1.41.2.1 2008/05/26 20:28:08 berniw Exp $
 */
 
-
-
 #ifndef __TGF__H__
 #define __TGF__H__
 
@@ -79,7 +77,7 @@ const tdble G = 9.80665f; /**< m/s/s */
 #define RPM2RADS(x) ((x)*.104719755)		/**< RPM to Radian/s conversion */
 #define RAD2DEG(x)  ((x)*(180.0/PI))		/**< Radian to degree conversion */
 #define DEG2RAD(x)  ((x)*(PI/180.0))		/**< Degree to radian conversion */
-#define FEET2M(x)   ((x)*0.304801)			/**< Feet to meter conversion */
+#define FEET2M(x)   ((x)*0.304801)		/**< Feet to meter conversion */
 #define SIGN(x)     ((x) < 0 ? -1.0 : 1.0)	/**< Sign of the expression */
 
 /** Angle normalization between 0 and 2 * PI */
@@ -153,6 +151,23 @@ typedef struct
     t3Dd M; /**< Moments */
 } tForces;
 
+/** Memory pools (allocate as many items, deallocate all at once at the end) */
+typedef struct MemoryPoolItem tMemoryPoolItem;
+typedef tMemoryPoolItem* tMemoryPool;
+
+typedef struct MemoryPoolItem
+{
+	struct MemoryPoolItem *prev;
+	struct MemoryPoolItem *next;
+	tMemoryPool *pool; /* NULL if not the first item, pointer to the pool otherwise */
+} tMemoryPoolItem;
+
+typedef tMemoryPoolItem* tMemoryPool;
+
+void* GfPoolMalloc(size_t size, tMemoryPool* pool);
+void GfPoolFree(void *pointer);
+void GfPoolFreePool(tMemoryPool* pool);
+void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 
 // <esppat>
 #ifdef WIN32
@@ -238,12 +253,16 @@ extern void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool
 #define GFPARM_RMODE_CREAT	0x04	/**< Create the file if doesn't exist */
 #define GFPARM_RMODE_PRIVATE	0x08
 
+extern void * GfParmReadFileLocal(const char *file, int mode);
 extern void *GfParmReadFile(const char *file, int mode);
 /* parameter file write */
+extern int GfParmWriteFileLocal(const char *file, void* handle, const char *name);
 extern int GfParmWriteFile(const char *file, void* handle, const char *name);
 
 extern char *GfParmGetName(void *handle);
 extern char *GfParmGetFileName(void *handle);
+extern int GfParmGetMajorVersion(void *handle);
+extern int GfParmGetMinorVersion(void *handle);
 
 /* set the dtd and header values */
 extern void GfParmSetDTD (void *parmHandle, char *dtd, char*header);
@@ -268,7 +287,15 @@ extern int GfParmSetNum(void *handle, const char *path, const char *key, const c
 /* set num parameter value */
 extern int GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 
-
+/* is formula */
+extern int GfParmIsFormula(void *handle, char const *path, char const *key);
+/* get formula */
+extern char* GfParmGetFormula(void *hanlde, char const *path, char const *key);
+extern char* GfParmGetCurFormula(void *hanlde, char const *path, char const *key);
+/* set formula */
+extern int GfParmSetFormula(void* hanlde, char const *path, char const *key, char const *formula);
+extern int GfParmSetCurFormula(void* hanlde, char const *path, char const *key, char const *formula);
+ 
 /* clean all the parameters of a set */
 extern void GfParmClean(void *handle);
 /* clean the parms and release the handle without updating the file */
@@ -297,11 +324,16 @@ extern int GfParmListRemoveElt(void *handle, const char *path, const char *key);
 extern int GfParmListRenameElt(void *handle, const char *path, const char *oldKey, const char *newKey);
 extern int GfParmListClean(void *handle, const char *path);
 
+extern void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val);
+extern void GfParmRemoveVariable(void *handle, char const *path, char const *key);
+extern tdble GfParmGetVariable(void *handle, char const *path, char const *key);
+
 /******************* 
  * Trace Interface *
  *******************/
 
 #ifdef WIN32
+
 #define GfTrace	printf
 #define GfFatal printf
 
@@ -368,17 +400,26 @@ typedef struct
 extern tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
 extern void gfMeanReset(tdble v, tMeanVal *pvt);
 
+/* Run-time dirs accessors */
+extern const char *GetLocalDir(void);
+extern const char *SetLocalDir(const char *buf);
+extern const char *GetLibDir(void);
+extern const char *SetLibDir(const char *buf);
+extern const char *GetDataDir(void);
+extern const char *SetDataDir(const char *buf);
+extern const char *GetBinDir(void);
+extern const char *SetBinDir(const char *buf);
+
 /* MISC */
-extern char *GetLocalDir(void);
-extern void SetLocalDir(const char *buf);
-extern char *GetLibDir(void);
-extern void SetLibDir(const char *buf);
-extern char *GetDataDir(void);
-extern void SetDataDir(const char *buf);
 extern int GetSingleTextureMode (void);
 extern void SetSingleTextureMode (void);
+
 extern int GfNearestPow2 (int x);
+
 extern int GfCreateDir(const char *path);
+
+/* Startup file setup */
+extern void GfFileSetup();
 
 /*
  * Copyright (c) 1991, 1993
@@ -596,6 +637,15 @@ void *GfHashGetNext(void *hash);
 
 #define GF_DIR_CREATION_FAILED 0
 #define GF_DIR_CREATED 1
+
+/* Formula's */
+
+void* GfFormParseFormulaString(const char *string);
+void* GfFormParseFormulaStringNew(const char *string);
+tdble GfFormCalcFunc(void *cmd, void *parmHandle, char*path);
+char GfFormCalcFuncNew(void *cmd, void *parmHandle, char const* path, char *boolean, int *integer, tdble *number, char ** string);
+void GfFormFreeCommand(void *cmd);
+void GfFormFreeCommandNew(void *cmd);
 
 #endif /* __TGF__H__ */
 

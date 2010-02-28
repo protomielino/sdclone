@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
-#include <learning/learn_debug.h>
+#include "learn_debug.h"
 
 /** 
 	\file string_utils.h

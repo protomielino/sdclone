@@ -30,6 +30,8 @@
 
 #include <tgfclient.h>
 #include <car.h>
+#include <raceman.h>
+
 
 
 static void		*menuHandle = NULL;
@@ -79,8 +81,17 @@ rmRepair(void* /* dummy */)
 }
 
 
+/**
+ * This function shows the pit menu and let the user fill in the amount
+ * of fuel he wants and the number of damage he want to repair
+ *
+ * @param s The current situation
+ * @param car The current car
+ * @param userdata The parameter for the @p callback callback function
+ * @param callback The function which is called after the user made a decision
+ */
 void
-RmPitMenuStart(tCarElt *car, void *userdata, tfuiCallback callback)
+RmPitMenuStart(tSituation *s, tCarElt *car, void *userdata, tfuiCallback callback)
 {
     char	buf[256];
 
@@ -129,8 +140,8 @@ RmPitMenuStart(tCarElt *car, void *userdata, tfuiCallback callback)
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddSKey(menuHandle, GLUT_KEY_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(menuHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(menuHandle, GFUIK_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(menuHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(menuHandle);
 }

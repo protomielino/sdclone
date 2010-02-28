@@ -22,7 +22,7 @@
 
 #include <math.h>
 #include <stdio.h>
-#include <cstring>
+#include <string.h>
 #ifdef WIN32
 #include <float.h>
 #define isnan _isnan
@@ -48,6 +48,10 @@ extern void SimAxleUpdate(tCar *car, int index);
 extern void SimCarConfig(tCar *car);
 extern void SimCarUpdate(tCar *car, tSituation*);
 extern void SimCarUpdate2(tCar *car, tSituation*);
+extern tdble SimCarDynamicEnergy(tCar* car);
+extern tdble SimCarEnergy(tCar* car);
+extern void SimCarLimitDynamicEnergy(tCar* car, tdble E_limit);
+extern void SimCarLimitEnergy(tCar* car, tdble E_limit);
 
 extern void SimSuspCheckIn(tSuspension *susp);
 extern void SimSuspUpdate(tSuspension *susp);
@@ -75,6 +79,8 @@ extern void SimWingConfig(tCar *car, int index);
 extern void SimWingUpdate(tCar *car, int index, tSituation *s);
 
 extern void SimCarUpdateWheelPos(tCar *car);
+extern void SimCarUpdateCornerPos(tCar *car);
+
 
 extern void SimTransmissionConfig(tCar *car);
 extern void SimTransmissionUpdate(tCar *car);
@@ -95,6 +101,7 @@ extern void SimCarCollideConfig(tCar *car);
 extern void SimCarCollideShutdown(int nbcars);
 extern void SimCarCollideInit(void);
 extern void SimCarCollideAddDeformation(tCar* car, sgVec3 pos, sgVec3 force);
+
 extern void NaiveRotate (t3Dd v, t3Dd u, t3Dd* v0);
 extern void NaiveInverseRotate (t3Dd v, t3Dd u, t3Dd* v0);
 extern void QuatToEuler (sgVec3 hpr, const sgQuat quat);
@@ -145,6 +152,28 @@ inline void sg2t3 (sgVec3& v, t3Dd& p)
 	p.y = v[SG_Y];
 	p.z = v[SG_Z];
 }
+
+/// If a src vector is in local coordinates,
+/// transform it via q to global coordinates
+inline void QuatRotate(t3Dd& src, sgQuat& q, t3Dd& dst)
+{
+    sgVec3 V;
+    t2sg3(src, V);
+    sgRotateCoordQuat(V, q);
+    sg2t3(V, dst);
+}
+
+/// If a src vector is in global coordinates,
+/// transform it via q to local coordinates
+inline void QuatInverseRotate(t3Dd& src, sgQuat& q, t3Dd& dst)
+{
+    sgVec3 V;
+    t2sg3(src, V);
+    sgRotateVecQuat(V, q);
+    sg2t3(V, dst);
+}
+
+
 
 #define SIM_VECT_COLL	12
 #define SIM_VECT_SPD	13

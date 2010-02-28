@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:53 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: simu.cpp,v 1.24 2006/09/02 17:53:21 olethros Exp $
+    version              : $Id: simu.cpp,v 1.29 2009/02/15 13:03:18 olethros Exp $
 
 ***************************************************************************/
 
@@ -152,8 +152,14 @@ SimConfig(tCarElt *carElt, tRmInfo* ReInfo)
     SimCarConfig(car);
 
     SimCarCollideConfig(car);
+
+    //    carElt->_yaw = 0.0;
+    //    carElt->_roll = 0.0;
+    //    carElt->_pitch = 0.0;
+
     sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
 					RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+
 
 	sgEulerToQuat (car->posQuat, -RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_pitch), RAD2DEG(carElt->_roll));
 	sgQuatToMatrix (car->posMat, car->posQuat);
@@ -298,7 +304,7 @@ RemoveCar(tCar *car, tSituation *s)
 
     trkPos.type = TR_LPOS_SEGMENT;
     RtTrackLocal2Global(&trkPos, &(car->restPos.pos.x), &(car->restPos.pos.y), trkFlag);
-    car->restPos.pos.z = RtTrackHeightL(&trkPos) + carElt->_statGC_z;
+    car->restPos.pos.z = RtTrackHeightL(&trkPos) + 0.1 + carElt->_statGC_z;
     car->restPos.pos.az = RtTrackSideTgAngleL(&trkPos);
     car->restPos.pos.ax = 0;
     car->restPos.pos.ay = 0;
@@ -374,9 +380,9 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 
 		if (!(s->_raceState & RM_RACE_PRESTART)) {
 
-				SimCarUpdateWheelPos(car);
+            SimCarUpdateWheelPos(car);
 			CHECK(car);
-				SimBrakeSystemUpdate(car);
+            SimBrakeSystemUpdate(car);
 			CHECK(car);
 				SimAeroUpdate(car, s);
 			CHECK(car);
@@ -396,7 +402,21 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 				SimWheelUpdateForce(car, i);
 			}
 			CHECK(car);
-		}
+            /* } else {
+            
+            SimCarUpdateWheelPos(car);
+            CHECK(car);
+            for (i = 0; i < 4; i++){
+                SimWheelUpdateRide(car, i);
+            }
+            CHECK(car);
+            for (i = 0; i < 4; i++){
+                SimWheelUpdateForce(car, i);
+            }
+            CHECK(car);
+            SimCarUpdate(car, s);
+            CHECK(car);*/
+        }
 		SimTransmissionUpdate(car);
 		CHECK(car);
 
@@ -405,7 +425,9 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 			CHECK(car);
 				SimCarUpdate(car, s);
 			CHECK(car);
-		}
+		} else {
+            SimReConfig(carElt); // damages to 0
+        }
     }
 
     SimCarCollideCars(s);
@@ -440,13 +462,20 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 		carElt->pub.posMat[1][3] =  SG_ZERO ;
 		carElt->pub.posMat[2][3] =  SG_ZERO ;
 		carElt->pub.posMat[3][3] =  SG_ONE ;
+
+        carElt->_yaw = car->DynGC.pos.az;
+        carElt->_roll = car->DynGC.pos.ax;
+        carElt->_pitch = car->DynGC.pos.ay;
+
 #endif
 		carElt->_trkPos = car->trkPos;
 		for (i = 0; i < 4; i++) {
 			carElt->priv.wheel[i].relPos = car->wheel[i].relPos;
+            //carElt->priv.wheel[i].visible_z = RtTrackHeightL_smooth(&car->wheel[i].trkPos); //- car->DynGCg.pos.z;
 			carElt->_wheelSeg(i) = car->wheel[i].trkPos.seg;
 			carElt->_brakeTemp(i) = car->wheel[i].brake.temp;
 			carElt->pub.corner[i] = car->corner[i].pos;
+
 		}
 		carElt->_gear = car->transmission.gearbox.gear;
 		carElt->_enginerpm = car->engine.rads;

@@ -4,7 +4,7 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id: TorcsSound.cpp,v 1.8 2005/11/18 00:20:32 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -186,7 +186,7 @@ void PlibTorcsSound::update()
 }
 
 /// Create a sound source
-SoundSource::SoundSource()
+TorcsSoundSource::TorcsSoundSource()
 {
 	a = 0.0;
 	f = 1.0;
@@ -198,7 +198,7 @@ SoundSource::SoundSource()
  * At the moment this
  */
 
-void SoundSource::update()
+void TorcsSoundSource::update()
 {
 	// Get relative speed/position vector
 	sgVec3 u;
@@ -259,7 +259,7 @@ void SoundSource::update()
 
 /** Set source position and velocity.
  */
-void SoundSource::setSource(sgVec3 p, sgVec3 u)
+void TorcsSoundSource::setSource(sgVec3 p, sgVec3 u)
 {
 	for (int i=0; i<3; i++) {
 		p_src[i] = p[i];
@@ -269,7 +269,7 @@ void SoundSource::setSource(sgVec3 p, sgVec3 u)
 
 /** Set listener position and velocity.
  */
-void SoundSource::setListener (sgVec3 p, sgVec3 u)
+void TorcsSoundSource::setListener (sgVec3 p, sgVec3 u)
 {
 	for (int i=0; i<3; i++) {
 		p_lis[i] = p[i];
@@ -330,7 +330,12 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 	ALenum format;
 	ALboolean srcloop;
 
+//TODO figure out why apple header is differnt
+#ifdef __APPLE__
+	alutLoadWAVFile((ALbyte *) filename, &format, &wave, &size, &freq);
+#else
 	alutLoadWAVFile((ALbyte *) filename, &format, &wave, &size, &freq, &srcloop);
+#endif
 	error = alGetError();
 	if (error != AL_NO_ERROR) {
 		printf("OpenAL Error: %d, could not load %s\n", error, filename);

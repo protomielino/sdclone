@@ -37,17 +37,13 @@
 
 #define NBBOTS 10
 
-static const char* botname[NBBOTS] = {
-	"bt 1", "bt 2", "bt 3", "bt 4", "bt 5",
-	"bt 6", "bt 7", "bt 8", "bt 9", "bt 10"
-};
+static char const* botname[NBBOTS+1] = {"bt 1", "bt 2", "bt 3", "bt 4", "bt 5",
+								"bt 6", "bt 7", "bt 8", "bt 9", "bt 10", "bt"};
+static char const* botdesc[NBBOTS+1] = {"bt 1", "bt 2", "bt 3", "bt 4", "bt 5",
+								"bt 6", "bt 7", "bt 8", "bt 9", "bt 10", "bt"};
 
-static const char* botdesc[NBBOTS] = {
-	"bt 1", "bt 2", "bt 3", "bt 4", "bt 5",
-	"bt 6", "bt 7", "bt 8", "bt 9", "bt 10"
-};
-
-static Driver *driver[NBBOTS];
+static Driver **driver;
+static int driverAlloc = 0;
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void newRace(int index, tCarElt* car, tSituation *s);
@@ -66,12 +62,16 @@ extern "C" int bt(tModInfo *modInfo)
 	// Clear all structures.
 	memset(modInfo, 0, 10*sizeof(tModInfo));
 
-	for (i = 0; i < NBBOTS; i++) {
-		modInfo[i].name    = botname[i];	// name of the module (short).
-		modInfo[i].desc    = botdesc[i];	// Description of the module (can be long).
-		modInfo[i].fctInit = InitFuncPt;			// Init function.
-		modInfo[i].gfId    = ROB_IDENT;				// Supported framework version.
-		modInfo[i].index   = i;						// Indices from 0 to 9.
+	for (i = 0; i < 11; i++) 
+	{
+		if (i < NBBOTS || i == 10) 
+		{
+			modInfo[i].name    = botname[i];  			// name of the module (short).
+			modInfo[i].desc    = botdesc[i];			// Description of the module (can be long).
+			modInfo[i].fctInit = InitFuncPt;			// Init function.
+			modInfo[i].gfId    = ROB_IDENT;				// Supported framework version.
+			modInfo[i].index   = i;						// Indices from 0 to 9.
+		}
 	}
 	return 0;
 }
@@ -81,6 +81,21 @@ extern "C" int bt(tModInfo *modInfo)
 static int InitFuncPt(int index, void *pt)
 {
 	tRobotItf *itf = (tRobotItf *)pt;
+	int xx;
+	Driver **copy;
+
+	// Make sure driver has enought momory allocated
+	if (driverAlloc <= index) {
+		copy = new Driver*[index+1];
+		for (xx = 0; xx < driverAlloc; ++xx)
+			copy[xx] = driver[xx];
+		for (xx = driverAlloc; xx <= index; ++xx)
+			copy[xx] = NULL;
+		if (driverAlloc > 0)
+			delete[]driver;
+		driver = copy;
+		driverAlloc = index + 1;
+	}
 
 	// Create robot instance for index.
 	driver[index] = new Driver(index);
@@ -133,6 +148,28 @@ static void endRace(int index, tCarElt *car, tSituation *s)
 // Called before the module is unloaded.
 static void shutdown(int index)
 {
+	int xx, yy;
+	Driver **copy;
+
 	delete driver[index];
+	driver[index] = NULL;
+
+	for (yy = driverAlloc - 1; yy >= 0; --yy) {
+		if (driver[yy]) {
+			if (yy == driverAlloc - 1)
+				break;
+			copy = new Driver*[yy+1];
+			for (xx = 0; xx <= yy; ++xx)
+				copy[xx] = driver[xx];
+			delete []driver;
+			driver = copy;
+			driverAlloc = yy+1;
+			break;
+		} else if (yy == 0) {
+			delete []driver;
+			driverAlloc = 0;
+			break;
+		}
+	}
 }
 

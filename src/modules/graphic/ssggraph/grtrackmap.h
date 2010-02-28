@@ -4,7 +4,7 @@
     created              : Fri Aug 29 00:57:00 CEST 2003
     copyright            : (C) 2003 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: grtrackmap.h,v 1.8 2005/08/05 09:48:30 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -27,24 +27,28 @@
 #ifndef _GRTRACKMAP_H_
 #define _GRTRACKMAP_H_
 
-#include <car.h>
-#include <raceman.h>
+#ifdef WIN32
+#include <windows.h>
+#endif //WIN32
+
+#ifdef __APPLE__
+#include<OpenGL/gl.h>
+#include<OpenGL/glu.h>
+#else
 #include <GL/gl.h>
-#include <GL/glut.h>
 #include <GL/glu.h>
+#endif
 
 #ifndef WIN32
 #include <unistd.h>
 #endif
-#include <math.h>
-#include <glfeatures.h>
 
-#define TRACK_MAP_NONE							(1<<0)
-#define TRACK_MAP_NORMAL						(1<<1)
-#define TRACK_MAP_NORMAL_WITH_OPPONENTS			(1<<2)
-#define TRACK_MAP_PAN							(1<<3)
-#define TRACK_MAP_PAN_WITH_OPPONENTS			(1<<4)
-#define TRACK_MAP_PAN_ALIGNED					(1<<5)
+#define TRACK_MAP_NONE												(1<<0)
+#define TRACK_MAP_NORMAL											(1<<1)
+#define TRACK_MAP_NORMAL_WITH_OPPONENTS				(1<<2)
+#define TRACK_MAP_PAN													(1<<3)
+#define TRACK_MAP_PAN_WITH_OPPONENTS					(1<<4)
+#define TRACK_MAP_PAN_ALIGNED									(1<<5)
 #define TRACK_MAP_PAN_ALIGNED_WITH_OPPONENTS	(1<<6)
 
 // Must equal the biggest TRACK_MAP_*
@@ -53,9 +57,6 @@
 // Pointer to the track data found in grscene.cpp.
 #include <track.h>
 extern tTrack *grTrack;
-
-// Include to access window dimensions.
-#include "grmain.h"
 
 class cGrTrackMap
 {
@@ -80,14 +81,9 @@ class cGrTrackMap
 			int Winh
 		);
 
-		// Set the view mode 
-		void setViewMode(int vm);
-		
-		// Get The view mode
-		int getViewMode();
-
-		// Get the default view mode
-		int getDefaultViewMode();
+		inline void setViewMode(const int vm) { viewmode = vm; }
+		inline int getViewMode() const { return viewmode; }
+		inline int getDefaultViewMode() const { return TRACK_MAP_NORMAL_WITH_OPPONENTS; }
 
 	private:
 		// The resolution in [m] to analyse turns.
@@ -157,4 +153,3 @@ class cGrTrackMap
 };
 
 #endif // _GRTRACKMAP_H_
-

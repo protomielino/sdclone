@@ -3,7 +3,7 @@
     file                 : grvtxtable.cpp
     created              : Fri Mar 22 23:16:44 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id: grvtxtable.cpp,v 1.15 2005/09/19 19:00:57 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,21 +17,25 @@
  ***************************************************************************/
 
 #include <plib/ssg.h>
-#include "grvtxtable.h"
-#include "grmain.h"
-#include "grcam.h"
-#include "grshadow.h"
-#include "grskidmarks.h"
-#ifdef DMALLOC
-#include "dmalloc.h"
-#endif
+
 #ifdef WIN32
 #include <GL/glext.h>
 #endif
-#include "grscene.h"
-#include "grcar.h"
-#include "grutil.h"
+#ifdef __APPLE__
+#include <OpenGL/glu.h>
+#else
 #include <GL/glu.h>
+#endif
+
+#include "grvtxtable.h"
+#include "grmain.h"
+#include "grscene.h"	//grEnvState
+#include "grcar.h"		//grCarInfo
+#include "grutil.h"
+
+#ifdef DMALLOC
+#include "dmalloc.h"
+#endif
 
 /* from grloadac.cpp (beuark!) */
 extern double shad_xmax;

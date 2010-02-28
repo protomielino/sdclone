@@ -10,9 +10,9 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <learning/ANN.h>
-#include <learning/string_utils.h>
-#include <learning/Distribution.h>
+#include "ANN.h"
+#include "string_utils.h"
+#include "Distribution.h"
 
 
 #undef ANN_DBUG

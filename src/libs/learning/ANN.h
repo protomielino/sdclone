@@ -17,10 +17,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <learning/learn_debug.h>
-#include <learning/string_utils.h>
-#include <learning/List.h>
-#include <learning/real.h>
+#include "learn_debug.h"
+#include "string_utils.h"
+#include "List.h"
+#include "real.h"
 
 /** \file ANN.h
     \brief A neural network implementation.

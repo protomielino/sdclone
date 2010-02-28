@@ -59,7 +59,7 @@ typedef vector<Complex *> ComplexList;
 typedef map<DtObjectRef, Object *> ObjectList;
 typedef set<Encounter> ProxList;
 
-#ifdef WIN32
+#if defined( WIN32) || (__APPLE__)
 #define uint unsigned int
 #endif
 

@@ -48,7 +48,7 @@ gfuiObjectInit(void)
 	g_mouseW = (int)GfParmGetNum(param, pszSec,"width", (char*)NULL, 20.0);
 
 	const char* pszImage = GfParmGetStr(param, pszSec, "image", "data/img/mouse.png");
-	g_mouseImage = GfImgReadTex(pszImage);
+	g_mouseImage = GfTexReadTex(pszImage);
 }
 
 void 
@@ -165,6 +165,18 @@ GfuiDraw(tGfuiObject *obj)
 	case GFUI_IMAGE:
 	    gfuiDrawImage(obj);
 	    break;
+
+	case GFUI_COMBOBOX:
+		gfuiDrawCombobox(obj);
+		break;
+
+	case GFUI_CHECKBOX:
+		gfuiDrawCheckbox(obj);
+		break;
+
+	case GFUI_PROGRESSBAR:
+		gfuiDrawProgressbar(obj);
+		break;
 	}
     }
 }
@@ -434,6 +446,7 @@ GfuiVisibilitySet(void *scr, int id, int visible)
 	break;
     case GFUI_INVISIBLE:
 	curObject->visible = GFUI_INVISIBLE;
+	curObject->focus = 0;
 	break;
     default:
 	return -1;
@@ -458,6 +471,7 @@ GfuiEnable(void *scr, int id, int flag)
     if (curObject == NULL) {
 	return -1;
     }
+
     switch(flag) {
     case GFUI_ENABLE:
 	curObject->state = GFUI_ENABLE;
@@ -568,8 +582,22 @@ gfuiReleaseObject(tGfuiObject *curObject)
     case GFUI_EDITBOX:
 	gfuiReleaseEditbox(curObject);
 	break;
+
     case GFUI_IMAGE:
 	gfuiReleaseImage(curObject);
 	break;
+
+    case GFUI_COMBOBOX:
+	gfuiReleaseCombobox(curObject);
+	break;
+
+	case GFUI_CHECKBOX:
+	gfuiReleaseCheckbox(curObject);
+	break;
+
+	case GFUI_PROGRESSBAR:
+	gfuiReleaseProgressbar(curObject);
+	break;
+
     }
 }

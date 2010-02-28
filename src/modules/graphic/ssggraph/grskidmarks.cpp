@@ -1,11 +1,11 @@
 /***************************************************************************
 
-    file                 : grskidmarks.cpp
-    created              : Fri Mar 22 23:17:24 CET 2002
-    copyright            : (C) 2001-2005 by Christophe Guionneau
-                                            Christos Dimitrakakis
-                                            Bernhard Wymann
-    version              : $Id: grskidmarks.cpp,v 1.30 2005/12/25 01:22:06 olethros Exp $
+    file			: grskidmarks.cpp
+    created		: Fri Mar 22 23:17:24 CET 2002
+    copyright	: (C) 2001-2005 by Christophe Guionneau
+                                 Christos Dimitrakakis
+                                 Bernhard Wymann
+    version		: $Id$
 
  ***************************************************************************/
 
@@ -18,32 +18,17 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <math.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <ctype.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <GL/glut.h>
+
 #include <plib/ssg.h>
 
-#include <tgfclient.h>
-#include <track.h>
-#include <car.h>
-#include <graphic.h>
-#include <robottools.h>
-
-#include "grmain.h"
-#include "grshadow.h"
 #include "grskidmarks.h"
-#include "grcar.h"
-#include "grcam.h"
-#include "grscene.h"
-#include "grboard.h"
-#include "grssgext.h"
-#include "grutil.h"
+#include "grmain.h"		//grHandle, grNbCars
+#include "grshadow.h"	//ssgVtxTableShadow
+#include "grcar.h"		//grCarInfo
+#include "grscene.h"	//SkidAnchor
 
 #ifdef DMALLOC
 #include "dmalloc.h"
@@ -51,18 +36,22 @@
 
 static ssgSimpleState *skidState = NULL;
 
-int grSkidMaxStripByWheel;
-int grSkidMaxPointByStrip;
-double grSkidDeltaT;
+static int grSkidMaxStripByWheel;
+static int grSkidMaxPointByStrip;
+static double grSkidDeltaT;
+static sgVec3 nrm;
+static ssgNormalArray *shd_nrm;
 
-/** initialize the skidmak structure for a car*/
-void grInitSkidmarks(tCarElt *car)
+
+/**
+ * grInitSkidmarks
+ * Initializes the skidmark structure for a car
+ *
+ * @param car - the car to setup the skidmarks for
+ */
+void
+grInitSkidmarks(const tCarElt *car)
 {
-	int i;
-	int k;
-	ssgNormalArray *shd_nrm;
-	sgVec3 nrm;
-
 	grSkidMaxStripByWheel = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL,
 							(char*)NULL, MAXSTRIP_BYWHEEL);
 	grSkidMaxPointByStrip = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXPOINTBYSTRIP,
@@ -70,102 +59,238 @@ void grInitSkidmarks(tCarElt *car)
 	grSkidDeltaT = (double)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKIDDELTAT,
 					(char*)NULL, DELTATSTRIP);
 
-	if (!grSkidMaxStripByWheel) {
-		return;
-	}
+	if(grSkidMaxStripByWheel) {
+		shd_nrm = new ssgNormalArray(1);
+		nrm[0] = nrm[1] = 0.0;
+		nrm[2] = 1.0;
+		shd_nrm->add(nrm);
 
-	shd_nrm = new ssgNormalArray(1);
-	nrm[0] = nrm[1] = 0.0;
-	nrm[2] = 1.0;
-	shd_nrm->add(nrm);
+		if (skidState == NULL) {
+			skidState = new ssgSimpleState();
+			if (skidState) {
+				skidState->disable(GL_LIGHTING);
+				skidState->enable(GL_BLEND);
+				skidState->enable(GL_CULL_FACE);
+				// add texture
+				skidState->enable(GL_TEXTURE_2D);
+				skidState->setColourMaterial(GL_AMBIENT_AND_DIFFUSE);
+				skidState->setTexture ("data/textures/grey-tracks.rgb", TRUE, TRUE, TRUE);
+			}//if skidState
+		}//if skidState NULL
 
-	if (skidState == NULL) {
-		skidState = new ssgSimpleState();
-		if (skidState) {
-			skidState->disable(GL_LIGHTING);
-			skidState->enable(GL_BLEND);
-			skidState->enable(GL_CULL_FACE);
-			// add texture
-			skidState->enable(GL_TEXTURE_2D);
-			skidState->setColourMaterial(GL_AMBIENT_AND_DIFFUSE);
-			skidState->setTexture ("data/textures/grey-tracks.rgb", TRUE, TRUE, TRUE);
-		}
-	}
+		grCarInfo[car->index].skidmarks = new cGrSkidmarks;
+	}//if grSkidMaxStripByWheel
+}//grInitSkidmarks
 
-	grCarInfo[car->index].skidmarks = (tgrSkidmarks *)malloc(sizeof(tgrSkidmarks));
-	for (i = 0; i<4; i++) {
-		grCarInfo[car->index].skidmarks->strips[i].vtx   = (ssgVertexArray **)malloc(grSkidMaxStripByWheel * sizeof(ssgVertexArray *));
-		grCarInfo[car->index].skidmarks->strips[i].tex   = (ssgTexCoordArray **)malloc(grSkidMaxStripByWheel * sizeof(ssgTexCoordArray *));
 
-		grCarInfo[car->index].skidmarks->strips[i].vta   = (ssgVtxTableShadow **)malloc(grSkidMaxStripByWheel
-											* sizeof(ssgVtxTableShadow *));
-		grCarInfo[car->index].skidmarks->strips[i].clr   = ( ssgColourArray **)malloc(grSkidMaxStripByWheel
-											* sizeof( ssgColourArray *));
+/**
+ * grUpdateSkidmarks
+ * Updates the skidmarks for a car, if neccessary.
+ *
+ * @param car	the car with skidmarks
+ * @param t time limits
+ */
+void
+grUpdateSkidmarks(const tCarElt *car, const double t)
+{
+	if(grSkidMaxStripByWheel) {
+		grCarInfo[car->index].skidmarks->Update(car, t);
+	}//if grSkidMaxStripByWheel
+}//grUpdateSkidmarks
 
-		grCarInfo[car->index].skidmarks->strips[i].smooth_colour[0]=0.0;
-		grCarInfo[car->index].skidmarks->strips[i].smooth_colour[1]=0.0;
-		grCarInfo[car->index].skidmarks->strips[i].smooth_colour[2]=0.0;
-		grCarInfo[car->index].skidmarks->strips[i].smooth_colour[3]=0.0;
 
-		grCarInfo[car->index].skidmarks->strips[i].state = (int *)malloc(grSkidMaxStripByWheel * sizeof(int));
-		grCarInfo[car->index].skidmarks->strips[i].size  = (int *)malloc(grSkidMaxStripByWheel * sizeof(int));
+/**
+ * grShutdownSkidmarks
+ * Removes all the skidmark informations of a car
+ */
+void
+grShutdownSkidmarks(void)
+{
+	GfOut("-- grShutdownSkidmarks\n");
 
-		for (k = 0; k < grSkidMaxStripByWheel; k++) {
-			grCarInfo[car->index].skidmarks->strips[i].state[k] = SKID_UNUSED;
-			grCarInfo[car->index].skidmarks->strips[i].vtx[k] = new ssgVertexArray(grSkidMaxPointByStrip + 1);
-			grCarInfo[car->index].skidmarks->strips[i].tex[k] = new ssgTexCoordArray(grSkidMaxPointByStrip + 1);
-			grCarInfo[car->index].skidmarks->strips[i].clr[k] = new ssgColourArray(grSkidMaxPointByStrip + 1);
+	if(grSkidMaxStripByWheel) {
+		SkidAnchor->removeAllKids();
+		for(int i = 0; i < grNbCars; i++) {
+			delete grCarInfo[i].skidmarks;
+			grCarInfo[i].skidmarks = NULL;
+		}//for i
+		skidState = NULL;
+	}//if grSkidMaxStripByWheel
+}//grShutdownSkidmarks
 
-			grCarInfo[car->index].skidmarks->strips[i].vta[k] =
-				new ssgVtxTableShadow
-				(GL_TRIANGLE_STRIP,
-				grCarInfo[car->index].skidmarks->strips[i].vtx[k],
-				shd_nrm,
-				grCarInfo[car->index].skidmarks->strips[i].tex[k],
-				grCarInfo[car->index].skidmarks->strips[i].clr[k]
-				);
-			grCarInfo[car->index].skidmarks->strips[i].vta[k]->setCullFace(0);
-			grCarInfo[car->index].skidmarks->strips[i].vta[k]->setState(skidState);
-			grCarInfo[car->index].skidmarks->strips[i].timeStrip = 0;
-			SkidAnchor->addKid(grCarInfo[car->index].skidmarks->strips[i].vta[k]);
-		}
-		// no skid is in use
-		grCarInfo[car->index].skidmarks->strips[i].running_skid = 0;
-		// the next skid to used is the first one
-		grCarInfo[car->index].skidmarks->strips[i].next_skid = 0;
-		// there was no skid for this wheel during the next shot
-		grCarInfo[car->index].skidmarks->strips[i].last_state_of_skid = 0;
-		grCarInfo[car->index].skidmarks->strips[i].tex_state = 0.0;
-	}
+
+/**
+ * grDrawSkidmarks - does nothing now.
+ *
+ * @param car The car to draw skidmarks for
+ */
+void
+grDrawSkidmarks(const tCarElt *car)
+{
+    /* nothing to do */
 }
 
 
-/** update if necessary the skidmarks for a car */
-void grUpdateSkidmarks(tCarElt *car, double t)
+/**
+ * @class cGrSkidStrip
+ * cGrSkidStrip class, has info about a skidmark strip
+ */
+
+/**
+ * Constructor
+ * Builds up all the arrays that hold the skids.
+ */
+cGrSkidStrip::cGrSkidStrip()
 {
-	int i = 0;
-	sgVec3 vtx;
-	sgVec3 *tvtx;
-	sgVec2 *tclist;
-	sgVec2 TxVtx;
-	ssgVertexArray *basevtx = NULL;
+	vtx = new ssgVertexArray *[grSkidMaxStripByWheel];
+	tex = new ssgTexCoordArray *[grSkidMaxStripByWheel];
+	vta = new ssgVtxTableShadow *[grSkidMaxStripByWheel];
+	clr = new ssgColourArray *[grSkidMaxStripByWheel];
+
+	smooth_colour[0]=0.0;
+	smooth_colour[1]=0.0;
+	smooth_colour[2]=0.0;
+	smooth_colour[3]=0.0;
+
+	state = new int[grSkidMaxStripByWheel];
+	size  = new int[grSkidMaxStripByWheel];
+
+	for(int k = 0; k < grSkidMaxStripByWheel; k++) {
+		state[k] = SKID_UNUSED;
+		vtx[k] = new ssgVertexArray(grSkidMaxPointByStrip + 1);
+		tex[k] = new ssgTexCoordArray(grSkidMaxPointByStrip + 1);
+		clr[k] = new ssgColourArray(grSkidMaxPointByStrip + 1);
+		vta[k] = new ssgVtxTableShadow(GL_TRIANGLE_STRIP, vtx[k], shd_nrm, tex[k], clr[k]);
+		vta[k]->setCullFace(0);
+		vta[k]->setState(skidState);
+		timeStrip = 0;
+		SkidAnchor->addKid(vta[k]);
+	}//for k
+	
+	running_skid = 0;	// no skid is in use
+	next_skid = 0;	// the next skid to used is the first one
+	last_state_of_skid = false;	// there was no skid for this wheel during the next shot
+	tex_state = 0.0;
+}//cGrSkidStrip::cGrSkidStrip
+
+
+/**
+ * Destructor
+ */
+cGrSkidStrip::~cGrSkidStrip()
+{
+	delete [] vtx;
+	delete [] vta;
+	delete [] tex;
+	delete [] state;
+	delete [] size;
+	delete [] clr;
+}//~cGrSkidStrip
+
+
+/**
+ * Begin
+ * Begins a new skid or continues the last one.
+ * 
+ * @param tvtx
+ * @param tclist
+ * @param sgVec4
+ * @param t			Time constraints
+ */
+void
+cGrSkidStrip::Begin(sgVec3 *tvtx, sgVec2 *tclist, sgVec4 *cur_clr, const double t)
+{
+	if(last_state_of_skid == false) {
+		/* begin case */
+		last_state_of_skid = true;
+		/* start a new one */
+		running_skid = next_skid;
+		if(state[running_skid] != SKID_UNUSED) {
+			vtx[running_skid]->removeAll();
+			tex[running_skid]->removeAll();
+			clr[running_skid]->removeAll();
+			tex_state = 0.0;
+		}//if state != SKID_UNUSED
+
+		tex_state = 0.0;
+		state[running_skid] = SKID_BEGIN;
+
+		vtx[running_skid]->add(tvtx[0]);
+		vtx[running_skid]->add(tvtx[1]);
+		tex[running_skid]->add(tclist[0]);
+		tex[running_skid]->add(tclist[1]);
+		clr[running_skid]->add(*cur_clr);
+		clr[running_skid]->add(*cur_clr);
+
+		vta[running_skid]->recalcBSphere();
+		size[running_skid] = 2;
+		timeStrip = t;
+		vta[running_skid]->setCullFace(TRUE);
+	} else {
+		/* continue case */
+		vtx[running_skid]->add(tvtx[0]);
+		vtx[running_skid]->add(tvtx[1]);
+		tex[running_skid]->add(tclist[0]);
+		tex[running_skid]->add(tclist[1]);
+		clr[running_skid]->add(*cur_clr);
+		clr[running_skid]->add(*cur_clr);
+
+		size[running_skid] += 2;
+		if(state[running_skid] == SKID_BEGIN)	{
+			state[running_skid] = SKID_RUNNING;
+			/*SkidAnchor->addKid(vta[running_skid]);*/
+		}//if state == SKID_BEGIN
+		vta[running_skid]->recalcBSphere();
+		timeStrip=t;
+	}//begin or continue skid
+}//cGrSkidStrip::BeginOrContinue
+
+
+/**
+ * End
+ * This is the end of a skid or there is nothing to do.
+ * 
+ */
+void
+cGrSkidStrip::End()
+{
+	if(last_state_of_skid == true) {
+		/* end the running skid */
+		state[running_skid] = SKID_STOPPED;
+		vta[running_skid]->recalcBSphere();
+		last_state_of_skid = false;
+
+		next_skid += 1;
+		if (next_skid >= grSkidMaxStripByWheel) {
+			next_skid = 0;
+			/* reset the next skid vertexArray */
+			vtx[next_skid]->removeAll();
+			tex[running_skid]->removeAll();
+			clr[next_skid]->removeAll();
+		}//if next_skid >= grSkidMaxStripByWheel
+	}//if last_state_of_skid == true
+}//cGrSkidStrip::End
+
+
+/**
+ * Update
+ *
+ * @param car The car to update the skidmarks for
+ * @param t Time constraints
+ */
+void
+cGrSkidmarks::Update(const tCarElt* car, const double t)
+{
 	sgVec4 cur_clr;
-	ssgTexCoordArray* texcoords = NULL;
-	tdble skid_sensitivity = 0.75f;
-
-	if (!grSkidMaxStripByWheel) {
-		return;
-	}
-
 	cur_clr[0] = cur_clr[1] = cur_clr[2] = 1.0f;
 
-	for (i = 0; i < 4; i++) {
-
+	for(int i = 0; i < 4; i++) {
 		tdble sling_mud = 1.0f;
-
-		if (car->priv.wheel[i].seg) { // sanity check
+		tdble skid_sensitivity = 0.75f;
+		
+		if(car->priv.wheel[i].seg) { // sanity check
 			const char* s = car->priv.wheel[i].seg->surface->material;
-			if (strstr(s, "sand")) {
+			if(strstr(s, "sand")) {
 				cur_clr[0] = 0.8f;
 				cur_clr[1] = 0.6f;
 				cur_clr[2] = 0.35f;
@@ -196,195 +321,99 @@ void grUpdateSkidmarks(tCarElt *car, double t)
 				cur_clr[1] = 0.0f;
 				cur_clr[2] = 0.0f;
 				skid_sensitivity = 0.5f;
-			}
-		}
+			}//if strstr(s, some_material)
+		}//if car->priv.wheel
 
-		if (car->_skid[i] > 0.1f) {
+		if(car->_skid[i] > 0.1f) {
 			cur_clr[3] = tanh(skid_sensitivity*car->_skid[i]);
 		} else {
 			cur_clr[3] = 0.0f;
-		}
+		}//if car->skid
 
-		for (int c = 0; c < 3; c++) {
-			tdble tmp = grCarInfo[car->index].skidmarks->strips[i].smooth_colour[c];
-			grCarInfo[car->index].skidmarks->strips[i].smooth_colour[c] = 0.9f*tmp + 0.1f*cur_clr[c];
+		for(int c = 0; c < 3; c++) {
+			tdble tmp = strips[i].smooth_colour[c];
+			strips[i].smooth_colour[c] = 0.9f*tmp + 0.1f*cur_clr[c];
 			cur_clr[c] = tmp;
-		}
+		}//for c
 
-		if ((t - grCarInfo[car->index].skidmarks->strips[i].timeStrip) < grSkidDeltaT) {
+		if((t - strips[i].timeStrip) < grSkidDeltaT) {
 			continue;
-		}
+		}//if t -...
 
-		if ((car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y) > 1.0f) {
-	    	if (cur_clr[3] > 0.1f) {
-                
-				basevtx = new ssgVertexArray(4 * 2 + 1);
-				tdble sling_left = 0.0f;
-				tdble sling_right = 0.0f;                
-				sling_right = sling_mud;
-				sling_left = -sling_mud;
+		if((car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y) > 1.0f) {
+			if (cur_clr[3] > 0.1f) {
+				ssgVertexArray *basevtx = new ssgVertexArray(4 * 2 + 1);
+				tdble sling_left = -sling_mud;
+				tdble sling_right = sling_mud; 
 
-                // TO-DO: Temporary fix, trying to make sure that
-                // skids are above the road surface. This is needed
-                // because the wheel position depends on the current
-                // physical model road height, which is not exactly
-                // the same as the gfx road height, even if it is so
-                // on average, because the physical model adds some
-                // sinewave to the road height to simulate uneveness
-                // of the track.  A better fix would be to add a
-                // routine grTrackHeightL(tTrkLocPos *p), similar to 
-                // TrTrackHeightL(), but which aim to give the height
-                // of the graphical track.
-                tdble z_adjust = 0.95;
-                tdble contact_z = car->priv.wheel[i].relPos.z - car->_wheelRadius(i)*z_adjust; 
+				// TO-DO: Temporary fix, trying to make sure that
+				// skids are above the road surface. This is needed
+				// because the wheel position depends on the current
+				// physical model road height, which is not exactly
+				// the same as the gfx road height, even if it is so
+				// on average, because the physical model adds some
+				// sinewave to the road height to simulate uneveness
+				// of the track.  A better fix would be to add a
+				// routine grTrackHeightL(tTrkLocPos *p), similar to 
+				// TrTrackHeightL(), but which aim to give the height
+				// of the graphical track.
+				tdble z_adjust = 0.95;
+				tdble contact_z = car->priv.wheel[i].relPos.z - car->_wheelRadius(i)*z_adjust; 
 
-
+				//One side
+				sgVec3 vtx;
 				vtx[0] = car->priv.wheel[i].relPos.x - car->_tireHeight(i);
 				// Because of backface culling the winding of the triangles matters.
 				if (car->_speed_x > 0.0f) {
 					vtx[1] = car->priv.wheel[i].relPos.y + (sling_right + 1.0)*car->_tireWidth(i) / 2.0;
 				} else {
 					vtx[1] = car->priv.wheel[i].relPos.y + (sling_left - 1.0)* car->_tireWidth(i) / 2.0;
-				}
+				}//if car->_speed
 				vtx[2] = contact_z;
 				basevtx->add(vtx);
 
-				vtx[0] = car->priv.wheel[i].relPos.x - car->_tireHeight(i);
+				//Other side
+				//vtx[0] = car->priv.wheel[i].relPos.x - car->_tireHeight(i);
 				// Because of backface culling the winding of the triangles matters.
 				if (car->_speed_x > 0.0f) {
 					vtx[1] = car->priv.wheel[i].relPos.y + (sling_left - 1.0)* car->_tireWidth(i) / 2.0;
 				} else {
 					vtx[1] = car->priv.wheel[i].relPos.y + (sling_right + 1.0)*car->_tireWidth(i) / 2.0;
 				}
-				vtx[2] = contact_z;
+				//vtx[2] = contact_z;
 				basevtx->add(vtx);
-
-				texcoords = new ssgTexCoordArray();
-
-				TxVtx[0] = grCarInfo[car->index].skidmarks->strips[i].tex_state;
-
-				TxVtx[1] = 0.75f + sling_right*0.25f;
+				
+				ssgTexCoordArray *texcoords = new ssgTexCoordArray();
+				sgVec2 TxVtx;
+				TxVtx[0] = strips[i].tex_state;
+				TxVtx[1] = 0.75f + sling_right * 0.25f;
 				texcoords->add(TxVtx);
 
-				TxVtx[1] =  0.25f+sling_left*0.25f;
+				TxVtx[1] = 0.25f + sling_left * 0.25f;
 				texcoords->add(TxVtx);
 
+				//should get it from somewhere else really.
+				//I could also account for radius, but that's a bit of an overkill.
+				float dt = 0.01f;
+				strips[i].tex_state += dt*car->_wheelSpinVel(i);
 
-				float dt = 0.01f; // should get it from somewhere else really. I could also account for radius, but that's a bit of an overkill.
-				grCarInfo[car->index].skidmarks->strips[i].tex_state += dt*car->_wheelSpinVel(i);
+				sgVec3 *tvtx;
+				sgVec2 *tclist;
+				base = new ssgVtxTable(GL_TRIANGLE_STRIP, basevtx, NULL, texcoords, NULL);
+				base->transform(grCarInfo[car->index].carPos);
+				base->getVertexList((void**)&tvtx);
+				base->getTexCoordList((void**)&tclist);
 
-				grCarInfo[car->index].skidmarks->base = new ssgVtxTable(GL_TRIANGLE_STRIP, basevtx, NULL, texcoords, NULL);
-				grCarInfo[car->index].skidmarks->base->transform(grCarInfo[car->index].carPos);
-				grCarInfo[car->index].skidmarks->base->getVertexList((void**)&tvtx);
-				grCarInfo[car->index].skidmarks->base->getTexCoordList((void**)&tclist);
-				/** this is the begining of a skid or the continue
-					of the last one */
-				if (grCarInfo[car->index].skidmarks->strips[i].last_state_of_skid == 0) {
-					/* begin case */
-					grCarInfo[car->index].skidmarks->strips[i].last_state_of_skid = 1;
-					/* start a new one */
-					grCarInfo[car->index].skidmarks->strips[i].running_skid = grCarInfo[car->index].skidmarks->strips[i].next_skid;
-					if (grCarInfo[car->index].skidmarks->strips[i].state[grCarInfo[car->index].skidmarks->strips[i].running_skid] != SKID_UNUSED) {
-						grCarInfo[car->index].skidmarks->strips[i].vtx[grCarInfo[car->index].skidmarks->strips[i].running_skid]->removeAll();
-						grCarInfo[car->index].skidmarks->strips[i].tex[grCarInfo[car->index].skidmarks->strips[i].running_skid]->removeAll();
-						grCarInfo[car->index].skidmarks->strips[i].clr[grCarInfo[car->index].skidmarks->strips[i].running_skid]->removeAll();
-						grCarInfo[car->index].skidmarks->strips[i].tex_state = 0.0;
-						//printf("clearing [%d] %d\n",i,grCarInfo[car->index].skidmarks->strips[i].running_skid);
-					}
-
-					grCarInfo[car->index].skidmarks->strips[i].tex_state = 0.0;
-					grCarInfo[car->index].skidmarks->strips[i].state[grCarInfo[car->index].skidmarks->strips[i].running_skid] = SKID_BEGIN;
-
-					grCarInfo[car->index].skidmarks->strips[i].vtx[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tvtx[0]);
-					grCarInfo[car->index].skidmarks->strips[i].vtx[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tvtx[1]);
-					grCarInfo[car->index].skidmarks->strips[i].tex[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tclist[0]);
-					grCarInfo[car->index].skidmarks->strips[i].tex[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tclist[1]);
-					grCarInfo[car->index].skidmarks->strips[i].clr[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(cur_clr);
-					grCarInfo[car->index].skidmarks->strips[i].clr[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(cur_clr);
-
-					//printf("begin [%d] skid %d x = %.2f y = %.2f \n",i,grCarInfo[car->index].skidmarks->strips[i].running_skid,tvtx[0][0],tvtx[0][1]);
-					grCarInfo[car->index].skidmarks->strips[i].vta[grCarInfo[car->index].skidmarks->strips[i].running_skid]->recalcBSphere();
-					grCarInfo[car->index].skidmarks->strips[i].size[grCarInfo[car->index].skidmarks->strips[i].running_skid] = 2;
-					grCarInfo[car->index].skidmarks->strips[i].timeStrip=t;
-					grCarInfo[car->index].skidmarks->strips[i].vta[grCarInfo[car->index].skidmarks->strips[i].running_skid]->setCullFace(TRUE);
-				} else {
-					/* continue case */
-					grCarInfo[car->index].skidmarks->strips[i].vtx[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tvtx[0]);
-					grCarInfo[car->index].skidmarks->strips[i].vtx[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tvtx[1]);
-					grCarInfo[car->index].skidmarks->strips[i].tex[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tclist[0]);
-					grCarInfo[car->index].skidmarks->strips[i].tex[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(tclist[1]);
-					grCarInfo[car->index].skidmarks->strips[i].clr[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(cur_clr);
-					grCarInfo[car->index].skidmarks->strips[i].clr[grCarInfo[car->index].skidmarks->strips[i].running_skid]->add(cur_clr);
-
-					//printf("continue [%d] x = %.2f y = %.2f \n",i,tvtx[0][0],tvtx[0][1]);
-					grCarInfo[car->index].skidmarks->strips[i].size[grCarInfo[car->index].skidmarks->strips[i].running_skid] += 2;
-					if ( grCarInfo[car->index].skidmarks->strips[i].state[grCarInfo[car->index].skidmarks->strips[i].running_skid] == SKID_BEGIN)
-					{
-						grCarInfo[car->index].skidmarks->strips[i].state[grCarInfo[car->index].skidmarks->strips[i].running_skid] = SKID_RUNNING;
-						/*SkidAnchor->addKid(grCarInfo[car->index].skidmarks->strips[i].vta[grCarInfo[car->index].skidmarks->strips[i].running_skid]);*/
-					}
-					grCarInfo[car->index].skidmarks->strips[i].vta[grCarInfo[car->index].skidmarks->strips[i].running_skid]->recalcBSphere();
-					grCarInfo[car->index].skidmarks->strips[i].timeStrip=t;
-				}
+				strips[i].Begin(tvtx, tclist, &cur_clr, t);
+				
 				basevtx->removeAll();
-				delete grCarInfo[car->index].skidmarks->base;
+				delete base;
+			//end if (cur_clr[3] > 0.1f)
 			} else {
-				/** this is the end of a skid or there is nothing to do */
-				if (grCarInfo[car->index].skidmarks->strips[i].last_state_of_skid != 0) {
-					/* end the running skid */
-					grCarInfo[car->index].skidmarks->strips[i].state[grCarInfo[car->index].skidmarks->strips[i].running_skid] = SKID_STOPPED;
-					grCarInfo[car->index].skidmarks->strips[i].vta[grCarInfo[car->index].skidmarks->strips[i].running_skid]->recalcBSphere();
-					grCarInfo[car->index].skidmarks->strips[i].last_state_of_skid = 0;
-					//printf("end skid [%d] %d\n",i,grCarInfo[car->index].skidmarks->strips[i].running_skid);
-
-					grCarInfo[car->index].skidmarks->strips[i].next_skid += 1;
-					if (grCarInfo[car->index].skidmarks->strips[i].next_skid >= grSkidMaxStripByWheel) {
-						grCarInfo[car->index].skidmarks->strips[i].next_skid = 0;
-						/* reset the next skid vertexArray */
-						grCarInfo[car->index].skidmarks->strips[i].vtx[grCarInfo[car->index].skidmarks->strips[i].next_skid]->removeAll();
-						grCarInfo[car->index].skidmarks->strips[i].tex[grCarInfo[car->index].skidmarks->strips[i].running_skid]->removeAll();
-						grCarInfo[car->index].skidmarks->strips[i].clr[grCarInfo[car->index].skidmarks->strips[i].next_skid]->removeAll();
-						//printf("remove all in skid [%d] %d\n",i,grCarInfo[car->index].skidmarks->strips[i].next_skid);
-					}
-				}
-	    	}
-		}
-    }
-}
+				strips[i].End();
+			}//else cur_clr[3] > 0.1f
+		}//if car->_speed
+	}//for i
+}//cGrSkidmarks::Update
 
 
-/** remove the skidmarks information for a car */
-void grShutdownSkidmarks (void)
-{
-	int i;
-	int z;
-
-	GfOut("-- grShutdownSkidmarks\n");
-
-	if (!grSkidMaxStripByWheel) {
-		return;
-	}
-
-	SkidAnchor->removeAllKids();
-	for (z = 0; z < grNbCars; z++) {
-		for (i = 0; i<4; i++) {
-			free(grCarInfo[z].skidmarks->strips[i].vtx);
-			free(grCarInfo[z].skidmarks->strips[i].vta);
-			free(grCarInfo[z].skidmarks->strips[i].tex);
-			free(grCarInfo[z].skidmarks->strips[i].state);
-			free(grCarInfo[z].skidmarks->strips[i].size);
-			free(grCarInfo[z].skidmarks->strips[i].clr);
-		}
-		free(grCarInfo[z].skidmarks);
-		grCarInfo[z].skidmarks = NULL;
-	}
-	skidState = NULL;
-}
-
-
-void grDrawSkidmarks (tCarElt *car)
-{
-    /* nothing to do */
-  
-  
-}

@@ -1,4 +1,4 @@
-/***************************************************************************
+/**************************************************************************
 
     file        : racemain.cpp
     created     : Sat Nov 16 12:13:31 CET 2002
@@ -22,29 +22,51 @@
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id: racemain.cpp,v 1.13 2005/08/17 20:48:39 berniw Exp $
 */
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "network.h"
+#include <portability.h>
 #include <tgfclient.h>
-#include <raceman.h>
 #include <robot.h>
 #include <racescreens.h>
 #include <exitmenu.h>
 
+#include "racecareer.h"
 #include "raceengine.h"
 #include "raceinit.h"
 #include "racegl.h"
 #include "raceresults.h"
 #include "racestate.h"
 #include "racemanmenu.h"
+//#include "raceweatherupdate.h"
 
 #include "teammanager.h"
 
 #include "racemain.h"
 
+
 static char buf[1024];
 static char path[1024];
 static char path2[1024];
+
+
+//Utility
+
+/** 
+ * humanInGroup
+ * Checks if there is a human-driven car between the racing cars.
+ * 
+ * @return True if there is a human.
+ */
+char
+humanInGroup()
+{
+	if (GfParmListSeekFirst(ReInfo->params, RM_SECT_DRIVERS) == 0) {
+		do {
+			if (strcmp (GfParmGetCurStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_MODULE, ""), "human") == 0)
+				return TRUE;
+		} while (GfParmListSeekNext(ReInfo->params, RM_SECT_DRIVERS) == 0);
+	}
+	return FALSE;
+}//humanInGroup
 
 
 /***************************************************************/
@@ -85,13 +107,27 @@ AbortRaceHookActivate(void * /* dummy */)
 
 	ReInfo->_reSimItf.shutdown();
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
-		ReInfo->_reGraphicItf.shutdowncars();
+		if (ReInfo->_reGraphicItf.shutdowncars)
+			ReInfo->_reGraphicItf.shutdowncars();
 	}
-	ReInfo->_reGraphicItf.shutdowntrack();
+
+	if (ReInfo->_reGraphicItf.shutdowntrack)
+		ReInfo->_reGraphicItf.shutdowntrack();
 	ReRaceCleanDrivers();
+
+	if (GetNetwork())
+	{
+		GetNetwork()->Disconnect();
+	}
+
 
 	FREEZ(ReInfo->_reCarInfo);
 	/* Return to race menu */
+	if (ReInfo->params != ReInfo->mainParams)
+	{
+		GfParmReleaseHandle (ReInfo->params);
+		ReInfo->params = ReInfo->mainParams;
+	}
 	ReInfo->_reState = RE_STATE_CONFIG;
 }
 
@@ -106,15 +142,65 @@ AbortRaceHookInit(void)
 
 	return AbortRaceHookHandle;
 }
+static void	*SkipSessionHookHandle = 0;
+
+static void
+SkipSessionHookActivate(void * /* dummy */)
+{
+	GfuiScreenActivate(ReInfo->_reGameScreen);
+	ReInfo->_reState = RE_STATE_RACE_END;
+}
+
+static void *
+SkipSessionHookInit(void)
+{
+	if (SkipSessionHookHandle) {
+		return SkipSessionHookHandle;
+	}
+
+	SkipSessionHookHandle = GfuiHookCreate(0, SkipSessionHookActivate);
+
+	return SkipSessionHookHandle;
+}
 
 int
 ReRaceEventInit(void)
 {
+	void *mainParams = ReInfo->mainParams;
 	void *params = ReInfo->params;
+	const char *raceName;
+	
+	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
+	/* Look if it is neccesiary to open another file */
+	if (strcmp(GfParmGetStr(mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0) {
+		/* Close previous params */
+		if (params != mainParams)
+			GfParmReleaseHandle(params);
+
+		/* Read the new params */
+		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
+		printf( "ReInfo->mainResults->curfile = %s\n", GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ) );
+		if (!params)
+			printf( "WARNING: params wasn't read correctly!!!\n" );
+		params = ReInfo->params;
+
+		/* Close previous results */
+		if (ReInfo->results != ReInfo->mainResults) {
+			GfParmWriteFile(NULL, ReInfo->results, NULL);
+			GfParmReleaseHandle(ReInfo->results);
+		}
+
+		/* Read the new results */
+		ReInfo->results = GfParmReadFile( GfParmGetStr( params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
+		if (!ReInfo->results)
+			printf( "WARNING: results wasn't read correctly!!!\n" );
+	}
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
+	
 	ReInitTrack();
-	ReInfo->_reGraphicItf.inittrack(ReInfo->track);
+	if( ReInfo->_reGraphicItf.inittrack )
+		ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 	ReEventInitResults();
 
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
@@ -133,11 +219,34 @@ RePreRace(void)
 	const char *raceType;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
+	int curRaceIdx;
 
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
+	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
+	GfParmRemoveVariable (ReInfo->params, "/", "eventNb");
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", humanInGroup() ? 1 : 0);
+	GfParmSetVariable (ReInfo->params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
 	if (!raceName) {
 		return RM_QUIT;
 	}
+
+	if (strcmp(GfParmGetStr(params, raceName, RM_ATTR_ENABLED, RM_VAL_YES), RM_VAL_NO) == 0) {
+		printf( "||||++|||| NOT ENABLED!\n" );
+		curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+		if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
+			printf( "||||++|||| NOT LAST RACE!\n" );
+			curRaceIdx++;
+			GfOut("Race Nb %d\n", curRaceIdx);
+			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, curRaceIdx);
+	
+			return RM_SYNC | RM_NEXT_RACE;
+		}
+	
+		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+		return RM_SYNC | RM_NEXT_RACE | RM_NEXT_STEP;
+	}
+
+	ReInfo->s->_features = RmGetFeaturesList(params);
 
 	dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, 0);
 	if (dist < 0.001) {
@@ -145,7 +254,22 @@ RePreRace(void)
 	} else {
 		ReInfo->s->_totLaps = ((int)(dist / ReInfo->track->length)) + 1;
 	}
+	ReInfo->s->_totTime = GfParmGetNum(params, raceName, RM_ATTR_SESSIONTIME, NULL, -60.0f);
 	ReInfo->s->_maxDammage = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DMG, NULL, 10000);
+	ReInfo->s->_extraLaps = ReInfo->s->_totLaps;
+
+	if (ReInfo->s->_totTime > 0.0f && ( ReInfo->s->_features & RM_FEATURE_TIMEDSESSION ) == 0 )
+	{
+		/* Timed session not supported: add 2 km for every minute */
+		ReInfo->s->_totLaps += (int)floor(ReInfo->s->_totTime * 2000.0f / ReInfo->track->length + 0.5f);
+		ReInfo->s->_totTime = -60.0f;
+	}
+
+	if (ReInfo->s->_totTime <= 0.0f)
+	{
+		ReInfo->s->_totTime = -60.0f;	/* Make sure that if no time is set, the set is far below zero */
+		ReInfo->s->_extraLaps = 0;
+	}
 
 	raceType = GfParmGetStr(params, raceName, RM_ATTR_TYPE, RM_VAL_RACE);
 	if (!strcmp(raceType, RM_VAL_RACE)) {
@@ -154,6 +278,13 @@ RePreRace(void)
 		ReInfo->s->_raceType = RM_TYPE_QUALIF;
 	} else if (!strcmp(raceType, RM_VAL_PRACTICE)) {
 		ReInfo->s->_raceType = RM_TYPE_PRACTICE;
+	}
+
+	if (ReInfo->s->_raceType != RM_TYPE_RACE && ReInfo->s->_extraLaps > 0)
+	{
+		/* During timed practice or qualification, there are no extra laps */
+		ReInfo->s->_extraLaps = 0;
+		ReInfo->s->_totLaps = 0;
 	}
 
 	ReInfo->s->_raceState = 0;
@@ -179,8 +310,10 @@ reRaceRealStart(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	tSituation *s = ReInfo->s;
+	tMemoryPool oldPool = NULL;
 	void* carHdle;
 
+	//Load simulation engine
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
 	sprintf(buf, "Loading simulation engine (%s) ...", dllname);
 	RmLoadingScreenSetText(buf);
@@ -189,6 +322,16 @@ reRaceRealStart(void)
 		return RM_QUIT;
 	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);
 
+	//Check if there is a human on the driver list
+	foundHuman = humanInGroup() ? 2 : 0;
+
+	//Set _displayMode here because then robot->rbNewTrack isn't called. This is a lot faster for simusimu
+	if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0 && foundHuman == 0)
+		ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
+	else
+		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
+
+	//Initialize & place cars
 	if (ReInitCars()) {
 		return RM_QUIT;
 	}
@@ -196,42 +339,65 @@ reRaceRealStart(void)
 	/* Blind mode or not */
 	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
 	ReInfo->_reGameScreen = ReScreenInit();
-	foundHuman = 0;
+	//foundHuman = 0;
+
+	//Check if there is a human in the current race
 	for (i = 0; i < s->_ncars; i++) {
 		if (s->cars[i]->_driverType == RM_DRV_HUMAN) {
 			foundHuman = 1;
 			break;
-		}
-	}
-	if (!foundHuman) {
+		}//if human
+	}//for i
+
+	if (foundHuman != 1) { /* No human in current race */
 		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_INVISIBLE)) {
 			ReInfo->_displayMode = RM_DISP_MODE_NONE;
 			ReInfo->_reGameScreen = ReResScreenInit();
+		} else if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0) {
+			if (foundHuman == 2) { /* Human in driver list, but not in current race */
+				if (ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) {
+					ReInfo->_displayMode = RM_DISP_MODE_NONE;
+					ReInfo->_reGameScreen = ReResScreenInit();
+				} /* Else: normally visible */
+			} else {
+				ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
+				ReInfo->_reGameScreen = ReResScreenInit();
+			}//if foundHuman == 2
 		}
-	}
+	}//if foundHuman != 1
 
-	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF) ||
-	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1))
-	{
+	//If not a qualy, nor a practice and has results, load race splash
+	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) ||
+	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)) {
 		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 	}
 
+	//Load drivers for the race
 	for (i = 0; i < s->_ncars; i++) {
 		sprintf(buf, "cars/%s/%s.xml", s->cars[i]->_carName, s->cars[i]->_carName);
 		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		sprintf(buf, "Loading driver %s (%s) ...", s->cars[i]->_name, GfParmGetName(carHdle));
 		RmLoadingScreenSetText(buf);
-		robot = s->cars[i]->robot;
-		robot->rbNewRace(robot->index, s->cars[i], s);
-	}
+		if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) { //Tell robots they are to start a new race
+			robot = s->cars[i]->robot;
+			GfPoolMove( &s->cars[i]->_newRaceMemPool, &oldPool );
+			robot->rbNewRace(robot->index, s->cars[i], s);
+			GfPoolFreePool( &oldPool );
+		}//if ! simusimu
+	}//for i
 	carInfo = ReInfo->_reCarInfo;
 	RtTeamManagerStart();
+
+	/* Initialize graphical module */
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL || ReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
+		ReInitGraphics();
 
 	ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
 	for (i = 0; i < s->_ncars; i++) {
 		carInfo[i].prevTrkPos = s->cars[i]->_trkPos;
 	}
 
+	//All cars start with max brakes on
 	RmLoadingScreenSetText("Running Prestart ...");
 	for (i = 0; i < s->_ncars; i++) {
 		memset(&(s->cars[i]->ctrl), 0, sizeof(tCarCtrl));
@@ -244,25 +410,27 @@ reRaceRealStart(void)
 	if (ReInfo->_displayMode != RM_DISP_MODE_NORMAL) {
 		if (ReInfo->s->_raceType == RM_TYPE_QUALIF) {
 			ReUpdateQualifCurRes(s->cars[0]);
+		} else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && s->_ncars > 1) {
+			ReUpdatePracticeCurRes(s->cars[0]);
 		} else {
 			sprintf(buf, "%s on %s", s->cars[0]->_name, ReInfo->track->name);
 			ReResScreenSetTitle(buf);
 		}
-	}
+	}//if displayMode != normal
 
 	ReInfo->_reTimeMult = 1.0;
 	ReInfo->_reLastTime = -1.0;
-	ReInfo->s->currentTime = -2.0;
+	ReInfo->s->currentTime = -2.0;	//we start 2 seconds before the start
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
-
 	ReInfo->s->_raceState = RM_RACE_STARTING;
 
 	GfScrGetSize(&sw, &sh, &vw, &vh);
-	ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
+	if (ReInfo->_reGraphicItf.initview)
+		ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
 
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		RmLoadingScreenSetText("Loading cars ...");
-		ReInfo->_reGraphicItf.initcars(s);
+		ReInfo->_reGraphicItf.initcars(s); /* At this stage, the graphical module must be already loaded */
 	}
 
 	RmLoadingScreenSetText("Ready.");
@@ -270,7 +438,8 @@ reRaceRealStart(void)
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 
 	return RM_SYNC | RM_NEXT_STEP;
-}
+}//reRaceRealStart
+
 
 /***************************************************************/
 /* START RACE HOOK */
@@ -314,7 +483,7 @@ ReRaceStart(void)
 
 	/* Drivers starting order */
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
-	if (ReInfo->s->_raceType == RM_TYPE_QUALIF) {
+	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) && ReInfo->s->_totTime < 0.0f) {
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
 			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
@@ -327,6 +496,9 @@ ReRaceStart(void)
 		sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, 1);
 		GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 		GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
+		GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
+		//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(params, path, ROB_ATTR_NAME, "none"));
+		//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(params, path, ROB_ATTR_CAR, ""));
 	} else {
 		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 		RmLoadingScreenSetText("Preparing Starting Grid...");
@@ -346,6 +518,9 @@ ReRaceStart(void)
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, i);
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
+				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+				//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(results, path, ROB_ATTR_NAME, "<none>"));
+				//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(results, path, ROB_ATTR_CAR, ""));
 			}
 		} else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER)) {
 			/* Starting grid in the reversed arrival order of the previous race */
@@ -361,6 +536,9 @@ ReRaceStart(void)
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, i);
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
+				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+				//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(results, path, ROB_ATTR_NAME, "<none>"));
+				//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(results, path, ROB_ATTR_CAR, ""));
 			}
 		} else {
 			/* Starting grid in the drivers list order */
@@ -372,9 +550,13 @@ ReRaceStart(void)
 				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, i);
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
+				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
+				//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(params, path, ROB_ATTR_NAME, "<none>"));
+				//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(params, path, ROB_ATTR_CAR, ""));
 			}
 		}
 	}
+	//ReWeatherUpdate();
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {
 		RmShutdownLoadingScreen();
@@ -443,7 +625,8 @@ static void	*StopScrHandle = 0;
 static void
 QuitHookActivate(void * /* dummy */)
 {
-	if (StopScrHandle) {
+	if (StopScrHandle) 
+	{
 		GfuiScreenActivate(ExitMenuInit(StopScrHandle));
 	}
 }
@@ -451,7 +634,8 @@ QuitHookActivate(void * /* dummy */)
 static void *
 QuitHookInit(void)
 {
-	if (QuitHookHandle) {
+	if (QuitHookHandle) 
+	{
 		return QuitHookHandle;
 	}
 
@@ -465,21 +649,43 @@ ReRaceStop(void)
 {
 	void	*params = ReInfo->params;
 
-	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) {
-		StopScrHandle = RmTriStateScreen("Race Stopped",
-					"Abandon Race", "Abort current race", AbortRaceHookInit(),
-					"Resume Race", "Return to Race", BackToRaceHookInit(),
-					"Quit Game", "Quit the game", QuitHookInit());
-	} else {
-		StopScrHandle = RmFourStateScreen("Race Stopped",
-					"Restart Race", "Restart the current race", RestartRaceHookInit(),
-					"Abandon Race", "Abort current race", AbortRaceHookInit(),
-					"Resume Race", "Return to Race", BackToRaceHookInit(),
-					"Quit Game", "Quit the game", QuitHookInit());
+	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
+	{
+		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES) == 0) 
+		{
+			StopScrHandle = RmFourStateScreen("Race Stopped",
+						"Abandon Race", "Abort current race", AbortRaceHookInit(),
+						"Resume Race", "Return to Race", BackToRaceHookInit(),
+						"Skip Session", "Skip Session", SkipSessionHookInit(),
+						"Quit Game", "Quit the game", QuitHookInit());
+		} else 
+		{
+			StopScrHandle = RmTriStateScreen("Race Stopped",
+						"Abandon Race", "Abort current race", AbortRaceHookInit(),
+						"Resume Race", "Return to Race", BackToRaceHookInit(),
+						"Quit Game", "Quit the game", QuitHookInit());
+		}
+	} else 
+	{
+		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)==0) 
+		{
+			StopScrHandle = RmFiveStateScreen("Race Stopped",
+						"Restart Race", "Restart the current race", RestartRaceHookInit(),
+						"Abandon Race", "Abort current race", AbortRaceHookInit(),
+						"Resume Race", "Return to Race", BackToRaceHookInit(),
+						"Skip Session", "Skip Session", SkipSessionHookInit(),
+						"Quit Game", "Quit the game", QuitHookInit());
+		} else 
+		{
+			StopScrHandle = RmFourStateScreen("Race Stopped",
+						"Restart Race", "Restart the current race", RestartRaceHookInit(),
+						"Abandon Race", "Abort current race", AbortRaceHookInit(),
+						"Resume Race", "Return to Race", BackToRaceHookInit(),
+						"Quit Game", "Quit the game", QuitHookInit());
+		}
 	}
 	return RM_ASYNC | RM_NEXT_STEP;
 }
-
 
 int
 ReRaceEnd(void)
@@ -490,10 +696,12 @@ ReRaceEnd(void)
 
 	ReRaceCleanup();
 
-	if (ReInfo->s->_raceType == RM_TYPE_QUALIF) {
+	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) && !(ReInfo->s->_features & RM_FEATURE_TIMEDSESSION)) 
+	{
 		curDrvIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		curDrvIdx++;
-		if (curDrvIdx > GfParmGetEltNb(params, RM_SECT_DRIVERS)) {
+		if (curDrvIdx > GfParmGetEltNb(params, RM_SECT_DRIVERS)) 
+		{
 			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 			return ReDisplayResults();
 		}
@@ -534,28 +742,83 @@ ReEventShutdown(void)
 {
 	int curTrkIdx;
 	void *params = ReInfo->params;
-	int nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
+	int nbTrk;
 	int ret = 0;
 	void *results = ReInfo->results;
+	int curRaceIdx;
+	char lastRaceOfRound;
+	char careerMode = FALSE;
+	char first = TRUE;
 
-	ReInfo->_reGraphicItf.shutdowntrack();
+	if (ReInfo->_reGraphicItf.shutdowntrack)
+		ReInfo->_reGraphicItf.shutdowntrack();
 
-	int curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
-	curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+	do {
+		nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
+		lastRaceOfRound = TRUE;
+		curRaceIdx =(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+		curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 
-	if (curRaceIdx == 1) {
-		if (curTrkIdx < nbTrk) {
-			// Next track.
-			curTrkIdx++;
-		} else if (curTrkIdx >= nbTrk) {
-			// Back to the beginning.
-			curTrkIdx = 1;
+		if (curRaceIdx == 1) {
+			if (curTrkIdx < nbTrk) {
+				// Next track.
+				curTrkIdx++;
+			} else if (curTrkIdx >= nbTrk) {
+				// Back to the beginning.
+				curTrkIdx = 1;
+			}
 		}
-	}
 
-	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, curTrkIdx);
+		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, curTrkIdx);
 
-	if (curTrkIdx != 1) {
+		if (strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0) {
+			careerMode = TRUE;
+			lastRaceOfRound = strcmp(GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_YES), RM_VAL_YES) == 0;
+	
+			GfParmSetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE,
+			GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, ""));
+			GfParmWriteFile(NULL, ReInfo->mainResults, NULL);
+			/* Check if the next competition has a free weekend */
+			if( !first ) {
+				/* Close old params */
+				GfParmWriteFile( NULL, results, NULL );
+				GfParmReleaseHandle( results );
+				GfParmReleaseHandle( params );
+			}//if !first
+			/* Open params of next race */
+			params = GfParmReadFile( GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
+			if( !params )
+				break;
+			results = GfParmReadFile( GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
+			if( !results ) {
+				GfParmReleaseHandle( results );
+				break;
+			}
+	
+			if (lastRaceOfRound && curTrkIdx == 1) {
+				ReCareerNextSeason();
+			}
+			if ((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1) == 1) {
+				GfParmListClean(results, RE_SECT_STANDINGS);
+				GfParmWriteFile(NULL, results, NULL);
+			}
+	
+			/* Check if it is free */
+			snprintf( buf, 1024, "%s/%d", RM_SECT_TRACKS, (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1) );
+			if( !strcmp(GfParmGetStr(params, buf, RM_ATTR_NAME, "free"), "free") == 0) {
+				/* Not a free weekend */
+				GfParmReleaseHandle( results );
+				GfParmReleaseHandle( params );
+				break;
+			}
+			first = FALSE;
+		} else {
+			/* Normal case: no subfiles, so free weekends possible, so nothing to check */
+			break;
+		}
+	} while( true );
+	
+	if (curTrkIdx != 1 || careerMode) {
 		ret =  RM_NEXT_RACE;
 	} else {
 		ret =  RM_NEXT_STEP;

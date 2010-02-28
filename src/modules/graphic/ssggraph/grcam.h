@@ -4,7 +4,7 @@
     created              : Mon Aug 21 20:55:02 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grcam.h,v 1.28 2006/02/22 09:45:30 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,9 +20,10 @@
 #ifndef _GRCAM_H_
 #define _GRCAM_H_
 
-#include <track.h>
-#include <car.h>
-#include <raceman.h>
+#include <plib/ssg.h>	//GLuint
+#include <car.h>			//tCarElt
+#include <raceman.h>	//tSituation
+
 #ifdef WIN32
 #include <float.h>
 #endif
@@ -48,6 +49,7 @@ class cGrCamera
     sgVec3 eye;
     sgVec3 center;
     sgVec3 up;
+		int Speed;
     class cGrScreen	*screen;	/* screen where the camera is attached */
     
  public:
@@ -270,9 +272,6 @@ class cGrCarCamMirror : public cGrPerspCamera
 #define GR_ZOOM_MIN 	3
 #define GR_ZOOM_DFLT    4
 
-void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fovFactor);
+extern void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fovFactor);
 
 #endif /* _GRCAM_H_ */ 
-
-
-

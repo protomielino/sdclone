@@ -12,7 +12,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <learning/ann_policy.h>
+#include "ann_policy.h"
 
 ANN_Policy::ANN_Policy (int n_states, int n_actions, int n_hidden, real alpha, real gamma, real lambda, bool eligibility, bool softmax, real randomness, real init_eval, bool separate_actions) : DiscretePolicy (n_states, n_actions, alpha, gamma, lambda, softmax, randomness, init_eval)
 {

@@ -31,6 +31,7 @@
 #include "simuconfig.h"
 #include <portability.h>
 
+#include "gui.h"
 
 /* list of available simulation engine */
 static const char *simuVersionList[] = {"simuv2", "simuv3"};
@@ -122,7 +123,7 @@ SimuMenuInit(void *prevMenu)
 
     scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-	void *param = LoadMenuXML("simulationmenu.xml");
+    void *param = LoadMenuXML("simulationmenu.xml");
     CreateStaticControls(param,scrHandle);
 
     CreateButtonControl(scrHandle,param,"simvleftarrow",(void*)-1,ChangeSimuVersion);
@@ -135,12 +136,12 @@ SimuMenuInit(void *prevMenu)
 
     GfParmReleaseHandle(param);
     
-    GfuiAddKey(scrHandle, 13, "Save", NULL, SaveSimuVersion, NULL);
-    GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Version in list", (void*)0, ChangeSimuVersion, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Version in list", (void*)1, ChangeSimuVersion, NULL);
+    GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, SaveSimuVersion, NULL);
+    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)0, ChangeSimuVersion, NULL);
+    GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, ChangeSimuVersion, NULL);
 
     return scrHandle;  
 }

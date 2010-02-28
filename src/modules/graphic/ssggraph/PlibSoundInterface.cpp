@@ -4,7 +4,7 @@
     created              : Thu Apr 7 04:21 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: PlibSoundInterface.cpp,v 1.8 2005/11/18 00:20:32 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -59,7 +59,7 @@ PlibSoundInterface::~PlibSoundInterface()
 void PlibSoundInterface::setNCars(int n_cars)
 {
 	engpri = new SoundPri[n_cars];
-	car_src = new SoundSource[n_cars];
+	car_src = new TorcsSoundSource[n_cars];
 }
 
 slScheduler* PlibSoundInterface::getScheduler()

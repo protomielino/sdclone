@@ -86,7 +86,7 @@ RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag)
 	    CosA = cos(seg->angle[TR_ZS]);
 	    SinA = sin(seg->angle[TR_ZS]);
 	    /* Jussi Pajala: must be divided by two to get middle of the track ! */
-	    tr = p->toMiddle + seg->startWidth / 2.0; 
+	    tr = p->toMiddle + seg->startWidth / 2.0f; 
 	    *X = seg->vertex[TR_SR].x + p->toStart * CosA - tr * SinA;
 	    *Y = seg->vertex[TR_SR].y + p->toStart * SinA + tr * CosA;
 	    break;
@@ -263,7 +263,7 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
 	    /* rectangular to polar */
 	    x = X - seg->center.x;
 	    y = Y - seg->center.y;
-	    a2 = seg->arc / 2.0;
+	    a2 = seg->arc / 2.0f;
 	    theta = atan2(y, x) - (seg->angle[TR_CS] + a2);
 	    NORM_PI_PI(theta);
 	    p->seg = seg;
@@ -285,7 +285,7 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
 	    
 	    x = X - seg->center.x;
 	    y = Y - seg->center.y;
-	    a2 = seg->arc / 2.0;
+	    a2 = seg->arc / 2.0f;
 	    theta = seg->angle[TR_CS] - a2 - atan2(y, x);
 	    NORM_PI_PI(theta);
 	    p->seg = seg;
@@ -338,32 +338,32 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
 	    curWidth = RtTrackGetWidth(sseg, p->toStart);
 	    p->toRight +=  curWidth;
 	    p->toLeft -= seg->width;
-	    p->toMiddle += (seg->width + curWidth) / 2.0;
+	    p->toMiddle += (seg->width + curWidth) / 2.0f;
 	    if ((p->toRight < 0) && (sseg->rside != NULL)) {
 		p->toLeft -= curWidth;
-		p->toMiddle += curWidth / 2.0;
+		p->toMiddle += curWidth / 2.0f;
 		seg = sseg;
 		sseg = seg->rside;
 		curWidth = RtTrackGetWidth(sseg, p->toStart);
 		p->seg = sseg;
 		p->toRight +=  curWidth;
-		p->toMiddle += curWidth / 2.0;
+		p->toMiddle += curWidth / 2.0f;
 	    }
 	} else if ((p->toLeft < 0) && (seg->lside != NULL)) {
 	    sseg = seg->lside;
 	    p->seg = sseg;
 	    curWidth = RtTrackGetWidth(sseg, p->toStart);
 	    p->toRight += -seg->width;
-	    p->toMiddle -= (seg->width + curWidth) / 2.0;
+	    p->toMiddle -= (seg->width + curWidth) / 2.0f;
 	    p->toLeft += curWidth;
 	    if ((p->toLeft < 0) && (sseg->lside != NULL)) {
 		p->toRight -= curWidth;
-		p->toMiddle -= curWidth / 2.0;
+		p->toMiddle -= curWidth / 2.0f;
 		seg = sseg;
 		sseg = seg->lside;
 		curWidth = RtTrackGetWidth(sseg, p->toStart);
 		p->seg = sseg;
-		p->toMiddle -= curWidth / 2.0;
+		p->toMiddle -= curWidth / 2.0f;
 		p->toLeft += curWidth;
 	    }	
 	}
@@ -535,7 +535,7 @@ RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm)
 	    norm->x = X - seg->center.x;
 	    norm->y = Y - seg->center.y;
 	}
-	lg = 1.0 / sqrt(norm->x * norm->x + norm->y * norm->y);
+	lg = 1.0f / sqrt(norm->x * norm->x + norm->y * norm->y);
 	norm->x *= lg;
 	norm->y *= lg;
 	break;
@@ -547,7 +547,7 @@ RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm)
 	    norm->x = X - seg->center.x;
 	    norm->y = Y - seg->center.y;
 	}
-	lg = 1.0 / sqrt(norm->x * norm->x + norm->y * norm->y);
+	lg = 1.0f / sqrt(norm->x * norm->x + norm->y * norm->y);
 	norm->x *= lg;
 	norm->y *= lg;
 	break;
@@ -634,9 +634,9 @@ RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
     norm->z = v1.x * v2.y - v2.x * v1.y;
     lg = sqrt(norm->x * norm->x + norm->y * norm->y + norm->z * norm->z);
     if (lg == 0.0) {
-	lg = 1.0;
+	lg = 1.0f;
     } else {
-	lg = 1.0 / lg;
+	lg = 1.0f / lg;
     }
     norm->x *= lg;
     norm->y *= lg;

@@ -28,118 +28,7 @@
 #include <tgf.h>
 #include <os.h>
 
-// Static link for ssggraph.
-extern "C" int ssggraph_moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut*);
-extern "C" int ssggraph_moduleInitialize(tModInfo *modInfo);
 
-
-/*
-* Function
-*	modLoadSsggraph
-*
-* Description
-*	Load statically the ssggraph module (can't be loaded dynamically)
-*
-* Parameters
-*	sopath  path of the DLL file to load
-*	modlist	list of module interfaces description structure
-*
-* Return
-*	0	Ok
-*	-1	error
-*
-* Remarks
-*	
-*/
-static int
-modLoadSsggraph(const char *soPath, tModList **modlist)
-{
-    HMODULE	 handle;
-    tModList	*curMod;
-    int		 initSts = 0;	/* returned status */
-    char         soName[256];
-    char         soDir[1024];
-    char*        lastSlash;
-    
-    /* Try and avoid loading the same module twice (WARNING: Only checks soPath equality !) */
-    if ((curMod = GfModIsInList(soPath, *modlist)) != 0)
-    {
-      GfOut("Module %s already loaded\n", soPath);
-      GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
-      return initSts;
-    }
-
-    if ((curMod = (tModList*)calloc(1, sizeof(tModList))) != 0)
-    {
-	/* Determine the shared library / DLL name and load dir */
-	strcpy(soDir, soPath);
-	lastSlash = strrchr(soDir, '/');
-	if (lastSlash)
-	{
-	    strcpy(soName, lastSlash+1);
-	    *lastSlash = 0;
-	}
-	else
-	{
-	    strcpy(soName, soPath);
-	    *soDir = 0;
-	}
-	soName[strlen(soName) - 4] = 0; /* cut so file extension */
-
-	/* Welcome the module : exchange informations with it */
-	/* 1) Prepare information to give to the module */
-	tModWelcomeIn welcomeIn;
-	welcomeIn.itfVerMajor = 1;
-	welcomeIn.itfVerMinor = 0;
-	welcomeIn.name = soName;
-	
-	/* 2) Prepare a place for the module-given information */
-	tModWelcomeOut welcomeOut;
-	
-	/* 3) Call the welcome function */
-	initSts = ssggraph_moduleWelcome(&welcomeIn, &welcomeOut);  
-	
-	/* 4) Save information given by the module */
-	curMod->modInfoSize = welcomeOut.maxNbItf;
-
-	/* Allocate module interfaces info array according to the size we got */
-	tModInfo* constModInfo;
-	if ((constModInfo = GfModInfoAllocate(curMod->modInfoSize)) != 0)
-	{
-	    /* Call the module entry point, to initialize the interfaces info array */
-	    if (ssggraph_moduleInitialize(constModInfo) == 0)
-	    {
-		/* Duplicate strings in each interface, in case the module gave us static data ! */
-		if ((curMod->modInfo = GfModInfoDuplicate(constModInfo, curMod->modInfoSize)) != 0) 
-		{
-		    curMod->handle = 0; // Mark this module as not unloadable.
-		    curMod->sopath = strdup(soPath);
-		    GfModAddInList(curMod, modlist, /* priosort */ 0); // Really don't sort / prio ?
-		    /* Free the module info data returned by the module (we have a copy) */
-		    GfModInfoFree(constModInfo, curMod->modInfoSize);
-
-		    GfOut("Statically initialized windows module %s\n", soPath);
-		}
-	    }
-	    else
-	    {
-	      GfError("windowsModLoad: Module init function failed %s\n", soPath);
-	      initSts = -1;
-	    }
-	} 
-	else
-	{
-	  initSts = -1;
-	}
-    } 
-    else
-    {
-      GfError("windowsModLoad: Failed to allocate tModList for module %s\n", soPath);
-      initSts = -1;
-    }
-
-    return initSts;
-} 
 
 /*
 * Function
@@ -178,7 +67,6 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 
     GfOut("Loading module %s\n", soPath);
     
-    /* ssggraph is statically linked under Windows ... */
     char fname[256];
     const char* lastSlash = strrchr(soPath, '/');
     if (lastSlash) 
@@ -186,30 +74,28 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
     else
 	strcpy(fname, soPath);
     fname[strlen(fname) - 4] = 0; /* cut .dll */
-    if (strcmp(fname, "ssggraph") == 0)
-      return modLoadSsggraph(soPath, modlist);
 
     /* Load the DLL */
     handle = LoadLibrary( soPath ); 
     if (handle) 
     {
         if (GfModInitialize(handle, soPath, GfIdAny, &curMod) == 0)
-	{
-	    if (curMod) /* Retained against GfIdAny */
-		// Add the loaded module at the head of the list (no sort by priority).
-		GfModAddInList(curMod, modlist, /* priosort */ 0);
-	}
-	else 
-	{
-	    FreeLibrary(handle);
-	    GfError("windowsModLoad: Module init function failed %s\n", soPath);
-	    return -1;
-	}
+		{
+			if (curMod) /* Retained against GfIdAny */
+			// Add the loaded module at the head of the list (no sort by priority).
+			GfModAddInList(curMod, modlist, /* priosort */ 0);
+		}
+		else 
+		{
+			FreeLibrary(handle);
+			GfError("windowsModLoad: Module init function failed %s\n", soPath);
+			return -1;
+		}
     }
     else
     {
-	GfError("windowsModLoad: ...  can't open dll %s\n", soPath);
-	return -1;
+		GfError("windowsModLoad: ...  can't open dll %s\n", soPath);
+		return -1;
     }
       
     GfOut("Module %s loaded\n",soPath);
@@ -504,7 +390,6 @@ windowsModUnloadList(tModList **modlist)
     {
 	nextMod = curMod->next;
 
-	 // Don't terminate/unload ssgraph, as it was loaded statically
 	if (curMod->handle)
 	{
 	    termSts = GfModTerminate(curMod->handle, curMod->sopath);
@@ -686,7 +571,18 @@ windowsSetAffinity(void)
 #ifndef ULONG_PTR
     typedef unsigned long ULONG_PTR;
 #endif
-
+	
+	#ifndef ULONG_PTR
+	typedef unsigned long ULONG_PTR;
+	#endif
+	
+	#ifndef PDWORD_PTR
+	#ifndef DWORD_PTR
+	typedef ULONG_PTR DWORD_PTR;
+	#endif
+	typedef DWORD_PTR *PDWORD_PTR;
+	#endif
+	 
 #ifndef PDWORD_PTR
 #ifndef DWORD_PTR
     typedef ULONG_PTR DWORD_PTR;

@@ -4,7 +4,7 @@
     created              : Sat Apr 29 16:51:03 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: pref.cpp,v 1.19 2003/11/23 20:21:11 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,27 +20,14 @@
 /** @file   
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: pref.cpp,v 1.19 2003/11/23 20:21:11 torcs Exp $
+    @version	$Id$
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cstring>
-#include <math.h>
-
 #include <tgfclient.h>
-
-#include <track.h>
-#include <car.h>
-#include <raceman.h>
-#include <robottools.h>
-#include <robot.h>
 #include <playerpref.h>
 
 #include "pref.h"
 #include "human.h"
-
-void	*PrefHdle;
 
 tControlCmd	CmdControlRef[] = {
     {HM_ATT_UP_SHFT,    GFCTRL_TYPE_JOY_BUT,       0, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
@@ -65,7 +52,7 @@ tControlCmd	CmdControlRef[] = {
     {HM_ATT_SPDLIM_CMD,  GFCTRL_TYPE_NOT_AFFECTED, -1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0}
 };
 
-const int nbCmdControl = sizeof(CmdControlRef) / sizeof(CmdControlRef[0]);
+const int NbCmdControl = sizeof(CmdControlRef) / sizeof(CmdControlRef[0]);
 
 typedef struct
 {
@@ -81,142 +68,128 @@ static tCtrl	controlList[] = {
 };
 static const int nbControl = sizeof(controlList) / sizeof(controlList[0]);
 
-
-const char *Yn[] = {HM_VAL_YES, HM_VAL_NO};
-
-/* int MouseControlUsed = 0; */
+const std::string Yn[] = {HM_VAL_YES, HM_VAL_NO};
 
 void
-HmReadPrefs(int index)
+HmReadPrefs(const int index)
 {
     const char	*prm;
     const char	*defaultSettings;
     char	sstring[1024];
-    int		cmd;
-    float	tmp;
     tCtrlRef	*ref;
-    int		i;
-    int		idx = index - 1;
+    const int	idx = index - 1;
     tControlCmd	*cmdCtrl;
 
-    HCtx[idx]->CmdControl = (tControlCmd *) calloc (nbCmdControl, sizeof (tControlCmd));
-    cmdCtrl = HCtx[idx]->CmdControl;
-    memcpy(cmdCtrl, CmdControlRef, nbCmdControl * sizeof (tControlCmd));
+    cmdCtrl = HCtx[idx]->cmdControl = (tControlCmd *) calloc (NbCmdControl, sizeof (tControlCmd));
+    memcpy(cmdCtrl, CmdControlRef, NbCmdControl * sizeof (tControlCmd));
 
     sprintf(sstring, "%s%s", GetLocalDir(), HM_PREF_FILE);
     PrefHdle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
     sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
     if (!strcmp(prm, HM_VAL_AUTO))
-        HCtx[idx]->Transmission = eTransAuto;
+        HCtx[idx]->transmission = eTransAuto;
     else if (!strcmp(prm, HM_VAL_SEQ))
-        HCtx[idx]->Transmission = eTransSeq;
+        HCtx[idx]->transmission = eTransSeq;
     else
-        HCtx[idx]->Transmission = eTransGrid;
+        HCtx[idx]->transmission = eTransGrid;
 
     /* Parameters Settings */
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[HCtx[idx]->ParamAbs]);
-    if (strcmp(prm, Yn[0]) == 0) {
-	HCtx[idx]->ParamAbs = 1;
-    } else {
-	HCtx[idx]->ParamAbs = 0;
-    }
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[HCtx[idx]->ParamAsr]);
-    if (strcmp(prm, Yn[0]) == 0) {
-	HCtx[idx]->ParamAsr = 1;
-    } else {
-	HCtx[idx]->ParamAsr = 0;
-    }
-
+    //ABS on/off
+    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[HCtx[idx]->paramAbs].c_str());
+    HCtx[idx]->paramAbs = (prm == Yn[0]);
+    
+    //ASR on/off
+    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[HCtx[idx]->paramAsr].c_str());
+    HCtx[idx]->paramAsr = (prm == Yn[0]);
+    
+    //Controls
     prm = GfParmGetStr(PrefHdle, HM_SECT_PREF, HM_ATT_CONTROL, controlList[2].parmName);
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_CONTROL, prm);
+    int i;
     for (i = 0; i < nbControl; i++) {
-	if (!strcmp(prm, controlList[i].parmName)) {
+        if (!strcmp(prm, controlList[i].parmName))
 	    break;
-	}
-    }
-    if (i == nbControl) {
-	i = 2;
-    }
-    if ((i == 0) && !joyPresent) {
-	i = 2;
-    }
-
+    }//for i
+	
+    if (i == nbControl)
+        i = 2;
+    
+    if (i == 0 && !joyPresent)
+        i = 2;
+    
     defaultSettings = controlList[i].settings;
-
+    
     /* Command Settings */
-    for (cmd = 0; cmd < nbCmdControl; cmd++) {
-	prm = GfctrlGetNameByRef(cmdCtrl[cmd].type, cmdCtrl[cmd].val);
+    GfOut("Command settings :\n");
+    for (int cmd = 0; cmd < NbCmdControl; cmd++) {
+        prm = GfctrlGetNameByRef(cmdCtrl[cmd].type, cmdCtrl[cmd].val);
 	prm = GfParmGetStr(PrefHdle, defaultSettings, cmdCtrl[cmd].name, prm);
 	prm = GfParmGetStr(PrefHdle, sstring, cmdCtrl[cmd].name, prm);
-	if (!prm || (strlen(prm) == 0)) {
+	if (!prm || strlen(prm) == 0) {
 	    cmdCtrl[cmd].type = GFCTRL_TYPE_NOT_AFFECTED;
-	    GfOut("%s -> NONE (-1)\n", cmdCtrl[cmd].name);
+	    GfOut("  %s\t: None (-1)\n", cmdCtrl[cmd].name);
 	    continue;
 	}
+		
 	ref = GfctrlGetRefByName(prm);
 	cmdCtrl[cmd].type = ref->type;
 	cmdCtrl[cmd].val = ref->index;
-	GfOut("%s -> %s\n", cmdCtrl[cmd].name, prm);
-
+	GfOut("  %s\t: %s\n", cmdCtrl[cmd].name, prm);
+	
+	/* min value < max value */
 	if (cmdCtrl[cmd].minName) {
 	    cmdCtrl[cmd].min = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].minName, (char*)NULL, (tdble)cmdCtrl[cmd].min);
 	    cmdCtrl[cmd].min = cmdCtrl[cmd].minVal = (float)GfParmGetNum(PrefHdle, sstring, cmdCtrl[cmd].minName, (char*)NULL, (tdble)cmdCtrl[cmd].min);
-	}
+	}//if minName
+	
+	/* max value > min value */
 	if (cmdCtrl[cmd].maxName) {
 	    cmdCtrl[cmd].max = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].maxName, (char*)NULL, (tdble)cmdCtrl[cmd].max);
 	    cmdCtrl[cmd].max = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].maxName, (char*)NULL, (tdble)cmdCtrl[cmd].max);
-	}	
+	}//if maxName
+	
+	/* 0 < sensitivity */
 	if (cmdCtrl[cmd].sensName) {
 	    cmdCtrl[cmd].sens = 1.0f / (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].sensName, (char*)NULL, 1.0 / (tdble)cmdCtrl[cmd].sens);
 	    cmdCtrl[cmd].sens = 1.0f / (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].sensName, (char*)NULL, 1.0 / (tdble)cmdCtrl[cmd].sens);
-	}	
+	}//if sensName
+	
+	/* 0 < power (1 = linear) */
 	if (cmdCtrl[cmd].powName) {
 	    cmdCtrl[cmd].pow = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].powName, (char*)NULL, (tdble)cmdCtrl[cmd].pow);
 	    cmdCtrl[cmd].pow = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].powName, (char*)NULL, (tdble)cmdCtrl[cmd].pow);
-	}
+	}//if powName
+
+	/* 0 < sensitivity to car speed */
 	if (cmdCtrl[cmd].spdSensName) {
 	    cmdCtrl[cmd].spdSens = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].spdSensName, (char*)NULL, (tdble)cmdCtrl[cmd].spdSens);
 	    cmdCtrl[cmd].spdSens = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].spdSensName, (char*)NULL, (tdble)cmdCtrl[cmd].spdSens);
 	    cmdCtrl[cmd].spdSens = cmdCtrl[cmd].spdSens / 100.0;
-	}
+	}//if spdSendName
+
+	/* 0 =< dead zone < max value - min value */
 	if (cmdCtrl[cmd].deadZoneName) {
 	    cmdCtrl[cmd].deadZone = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].deadZoneName, (char*)NULL, (tdble)cmdCtrl[cmd].deadZone);
 	    cmdCtrl[cmd].deadZone = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].deadZoneName, (char*)NULL, (tdble)cmdCtrl[cmd].deadZone);
-	}
-	if (cmdCtrl[cmd].min > cmdCtrl[cmd].max) {
-	    tmp = cmdCtrl[cmd].min;
-	    cmdCtrl[cmd].min = cmdCtrl[cmd].max;
-	    cmdCtrl[cmd].max = tmp;
-	}
+	}//if deadZoneName
+	
+	if (cmdCtrl[cmd].min > cmdCtrl[cmd].max)
+	    std::swap(cmdCtrl[cmd].min, cmdCtrl[cmd].max);
+	
 	cmdCtrl[cmd].deadZone = (cmdCtrl[cmd].max - cmdCtrl[cmd].min) * cmdCtrl[cmd].deadZone;
-	if (cmdCtrl[cmd].type == GFCTRL_TYPE_MOUSE_AXIS) {
-	    HCtx[idx]->MouseControlUsed = 1;
-	}
-    }
+	if (cmdCtrl[cmd].type == GFCTRL_TYPE_MOUSE_AXIS)
+	    HCtx[idx]->mouseControlUsed = 1;
+    }//for cmd
 
-    prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_REL_BUT_NEUTRAL, Yn[HCtx[idx]->RelButNeutral]);
+    prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_REL_BUT_NEUTRAL, Yn[HCtx[idx]->relButNeutral].c_str());
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_REL_BUT_NEUTRAL, prm);
-    if (strcmp(prm, Yn[0]) == 0) {
-	HCtx[idx]->RelButNeutral = 1;
-    } else {
-	HCtx[idx]->RelButNeutral = 0;
-    }
-
-    prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, Yn[HCtx[idx]->SeqShftAllowNeutral]);
+    HCtx[idx]->relButNeutral = (prm == Yn[0]);
+    
+    prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, Yn[HCtx[idx]->seqShftAllowNeutral].c_str());
     prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, prm);
-    if (strcmp(prm, Yn[0]) == 0) {
-	HCtx[idx]->SeqShftAllowNeutral = 1;
-    } else {
-	HCtx[idx]->SeqShftAllowNeutral = 0;
-    }
-
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->AutoReverse]);
-    if (strcmp(prm, Yn[0]) == 0) {
-	HCtx[idx]->AutoReverse = 1;
-    } else {
-	HCtx[idx]->AutoReverse = 0;
-    }
-}
-
+    HCtx[idx]->seqShftAllowNeutral = (prm == Yn[0]);
+    
+    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->autoReverse].c_str());
+    HCtx[idx]->autoReverse = (prm == Yn[0]);
+}//HmReadPrefs

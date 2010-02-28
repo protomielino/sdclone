@@ -18,8 +18,10 @@ EXPORTS
 	GfDirGetListFiltered
 	GfDirFreeList
 	GfParmReadFile
+	GfParmReadFileLocal
 	GfParmSetDTD
 	GfParmWriteFile
+	GfParmWriteFileLocal
 	GfParmGetName
 	GfParmGetStr
 	GfParmGetStrNC
@@ -51,6 +53,10 @@ EXPORTS
 	GfTimeClock
 	gfMean
 	gfMeanReset
+	GfPoolMalloc
+	GfPoolFree
+	GfPoolFreePool
+	GfPoolMove
 	_tgf_win_malloc
 	_tgf_win_calloc
 	_tgf_win_realloc
@@ -66,10 +72,15 @@ EXPORTS
 	GfHashCreate
 	GetLibDir
 	SetLibDir
+	GetBinDir
+	SetBinDir
+	GfFileSetup
 	SetSingleTextureMode
 	GetSingleTextureMode
 	GfNearestPow2
 	GfCreateDir
+	GfParmGetMinorVersion
+	GfParmGetMajorVersion
 	GfModIsInList
 	GfModAddInList
 	GfModMoveToListHead
@@ -79,3 +90,9 @@ EXPORTS
 	GfModInfoFreeNC
 	GfModInitialize
 	GfModTerminate
+	GfParmGetVariable
+	GfParmSetVariable
+	GfParmRemoveVariable
+	GfParmIsFormula
+	GfParmGetCurFormula
+	GfParmSetFormula

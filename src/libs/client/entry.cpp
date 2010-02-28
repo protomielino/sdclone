@@ -19,9 +19,6 @@
 
 
 #include "client.h"
-#include <tgfclient.h>
-#include <plib/ssg.h>
-
 #include "mainmenu.h"
 #include "splash.h"
 
@@ -44,11 +41,9 @@
 void
 GameEntry(void)
 {
-    ssgInit();
-
+	// Initialize gaming framework.
     GfInitClient();
 
-    MainMenuInit();
-    
+	// Open the splash screen, load menus in "backgroud" and finally open the main menu.
     SplashScreen();
 }

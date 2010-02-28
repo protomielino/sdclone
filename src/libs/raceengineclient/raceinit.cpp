@@ -33,16 +33,18 @@
 #include <robot.h>
 #include <racescreens.h>
 #include <robottools.h>
+#include <graphic.h>
 #include <portability.h>
 #include <string>
 #include <map>
-#include <portability.h>
 
 #include "raceengine.h"
 #include "racemain.h"
 #include "racestate.h"
 #include "racegl.h"
 #include "raceresults.h"
+#include "racecareer.h"
+#include "raceweather.h"
 
 #include "teammanager.h"
 
@@ -54,6 +56,7 @@ static tModList *reEventModList = 0;
 tModList *ReRaceModList = 0;
 static char buf[1024];
 static char path[1024];
+//static char path2[1024];
 
 typedef struct 
 {
@@ -86,11 +89,8 @@ ReInit(void)
 	if (GfModLoad(0, key, &reEventModList)) return;
 	reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reTrackItf);
 
-	GfOut("Loading Graphic Engine...\n");
-	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
-	sprintf(key, "%smodules/graphic/%s.%s", GetLibDir (), dllname, DLLEXT);
-	if (GfModLoad(0, key, &reEventModList)) return;
-	reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reGraphicItf);
+	/* The graphic modules isn't loaded at this moment, so make sure _reGraphicItf equals NULL */
+	memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf));
 
 	capture = &(ReInfo->movieCapture);
 	if (strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE, "no"), "no") == 0){
@@ -116,11 +116,21 @@ void ReShutdown(void)
 
 		GfModUnloadList(&reEventModList);
 
-		if (ReInfo->results) {
-	    	GfParmReleaseHandle(ReInfo->results);
+		memset( &ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf) );
+
+		if (ReInfo->results) 
+		{
+	    		if (ReInfo->mainResults != ReInfo->results)
+				GfParmReleaseHandle(ReInfo->mainResults);
+	    			GfParmReleaseHandle(ReInfo->results);
 		}
 		if (ReInfo->_reParam) {
 			GfParmReleaseHandle(ReInfo->_reParam);
+		}
+		if (ReInfo->params != ReInfo->mainParams) 
+		{
+			GfParmReleaseHandle(ReInfo->params);
+			ReInfo->params = ReInfo->mainParams;
 		}
 		FREEZ(ReInfo->s);
 		FREEZ(ReInfo->carList);
@@ -134,7 +144,10 @@ void ReShutdown(void)
 void
 ReStartNewRace(void * /* dummy */)
 {
-	ReInitResults();
+	if (strcmp(GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_NO) == 0)
+		ReInitResults();
+	else
+		ReCareerNew();
 	ReStateManage();
 }
 
@@ -145,6 +158,7 @@ static void reSelectRaceman(void *params)
 	char *s, *e, *m;
 
 	ReInfo->params = params;
+	ReInfo->mainParams = params;
 	FREEZ(ReInfo->_reFilename);
 
 	s = GfParmGetFileName(params);
@@ -167,6 +181,16 @@ reRegisterRaceman(tFList *racemanCur)
 {
 	sprintf(buf, "%sconfig/raceman/%s", GetLocalDir(), racemanCur->name);
 	racemanCur->userData = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	if (!racemanCur->userData) {
+		sprintf(buf, "config/raceman/%s", racemanCur->name);
+		racemanCur->userData = GfParmReadFile(buf, GFPARM_RMODE_STD);
+		sprintf(buf, "%sconfig/raceman/%s", GetLocalDir(), racemanCur->name);
+		if (racemanCur->userData) {
+			GfParmWriteFile(buf, racemanCur->userData, NULL);
+			GfParmReleaseHandle(racemanCur->userData);
+			racemanCur->userData = GfParmReadFile(buf, GFPARM_RMODE_STD);
+		}
+	}
 	racemanCur->dispName = GfParmGetStrNC(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_NAME, 0);
 }
 
@@ -468,6 +492,227 @@ initPits(void)
 	}
 }
 
+/**
+ * Function to load a car.
+ *
+ * @param carindex The index whichs will be used as car->index for the car.
+ * @param listindex The listindex in RM_SECT_DRIVERS_RACING
+ * @param modindex The index of the mod; must be MAX_MOD_ITF if normal_carname is FALSE.
+ * @param robotIdx The index of the robot.
+ * @param normal_carname If this member is TRUE, the car is threathed as an ordenairy car;
+ *                       if this member is FALSE, then the car is used which is given in the xml-file, and there is no restriction of
+ *                       the number of instances.
+ * @param cardllname The dllname of the car
+ * @return A pointer to the newly created car if successfull; NULL otherwise
+ */
+static tCarElt* loadSingleCar( int carindex, int listindex, int modindex, int robotIdx, char normal_carname, char const *cardllname )
+{
+	tCarElt *elt;
+	tMemoryPool oldPool;
+	char path[256];
+	char path2[256];
+	char buf[256];
+	char const *str;
+	char const *category;
+	tModInfoNC *curModInfo;
+	tRobotItf *curRobot;
+	void *robhdle;
+	void *cathdle;
+	void *carhdle;
+	void *handle;
+	int k;
+	int xx;
+	char isHuman;
+
+	/* good robot found */
+	if (normal_carname) {
+		curModInfo = &((*(ReInfo->modList))->modInfo[modindex]);
+		GfOut("Driver's name: %s\n", curModInfo->name);
+	} else {
+		curModInfo = &((*(ReInfo->modList))->modInfo[modindex]);
+		GfOut("Driver's name: %s\n", curModInfo->name);
+		robotIdx += curModInfo->index;
+	}
+	
+	isHuman = strcmp( cardllname, "human" ) == 0;
+
+	/* Retrieve the driver interface (function pointers) */
+	curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
+	/* ... and initialize the driver */
+	if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) {
+		curModInfo->fctInit(robotIdx, (void*)(curRobot));
+	} else {
+		curRobot->rbNewTrack = NULL;
+		curRobot->rbNewRace  = NULL;
+		curRobot->rbDrive    = NULL;
+		curRobot->rbPitCmd   = NULL;
+		curRobot->rbEndRace  = NULL;
+		curRobot->rbShutdown = NULL;
+		curRobot->index      = 0;
+	}
+	/* Retrieve and load the driver type XML file :
+	   1) from user settings dir (local dir)
+	   2) from installed data dir */
+	sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), cardllname, cardllname);
+	robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	if (!robhdle) {
+		sprintf(buf, "drivers/%s/%s.xml", cardllname, cardllname);
+		robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	}
+
+	if (normal_carname)
+		sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
+	else if (isHuman)
+		sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx - curModInfo->index);
+	else
+		sprintf(path, "%s", ROB_SECT_ARBITRARY);
+	/* Load car/driver info (in race engine data structure) */
+	if (robhdle != NULL)
+	{
+		elt = &(ReInfo->carList[carindex]);
+		GF_TAILQ_INIT(&(elt->_penaltyList));
+
+		std::string strDType = GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT);
+		if (strDType == ROB_VAL_ROBOT){
+			elt->_driverType = RM_DRV_ROBOT;
+			elt->_networkPlayer = 0;
+		} 
+		else if (strDType == ROB_VAL_HUMAN)
+		{
+			elt->_driverType = RM_DRV_HUMAN;
+			std::string strNetPlayer = GfParmGetStr(robhdle, path, "networkrace","no");
+			if (strNetPlayer == "yes")
+				elt->_networkPlayer = 1;
+			else
+				elt->_networkPlayer = 0;
+		}
+
+		
+
+
+		elt->index = carindex;
+		elt->robot = curRobot;
+		elt->_paramsHandle = robhdle;
+		elt->_driverIndex = robotIdx;
+		if (normal_carname)
+			elt->_moduleIndex = robotIdx;
+		else
+			elt->_moduleIndex = robotIdx - curModInfo->index;
+		strncpy(elt->_modName, cardllname, MAX_NAME_LEN - 1);
+		elt->_modName[MAX_NAME_LEN - 1] = 0;
+
+		//sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
+		snprintf( path2, 256, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, elt->_modName, normal_carname ? 0 : 1, elt->_moduleIndex );
+		if (normal_carname || elt->_driverType == RM_DRV_HUMAN)
+			strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
+		else
+			strncpy(elt->_name, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
+		elt->_name[MAX_NAME_LEN - 1] = 0;
+		strncpy(elt->_teamname, GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none"), MAX_NAME_LEN - 1);
+		elt->_teamname[MAX_NAME_LEN - 1] = 0;
+		elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, 0.0f);
+	
+		if (normal_carname)
+			strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
+		else
+			strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
+		elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
+		elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
+		if (!normal_carname)
+			elt->_raceNumber += elt->_moduleIndex;
+		elt->_skillLevel = 0;
+		str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
+		for(k = 0; k < (int)(sizeof(level_str)/sizeof(char*)); k++) {
+			if (strcmp(level_str[k], str) == 0) {
+				elt->_skillLevel = k;
+				break;
+			}
+		}
+		elt->_startRank  = carindex;
+		elt->_pos        = carindex+1;
+		elt->_remainingLaps = ReInfo->s->_totLaps;
+
+		elt->_newTrackMemPool = NULL;
+		elt->_newRaceMemPool = NULL;
+		elt->_endRaceMemPool = NULL;
+		elt->_shutdownMemPool = NULL;
+
+		/* Retrieve and load car specs : merge car default specs,
+		   category specs and driver modifications (=> handle) */
+		/* Read Car model specifications */
+		sprintf(buf, "cars/%s/%s.xml", elt->_carName, elt->_carName);
+		GfOut("Car file: %s\n", buf);
+		carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+		category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
+		sprintf(buf, "Loading/merging %s specs for %s ...\n", elt->_carName, curModInfo->name);
+		GfOut(buf);
+		if (category) {
+			strncpy(elt->_category, category, MAX_NAME_LEN - 1);
+			elt->_category[MAX_NAME_LEN - 1] = 0;
+			/* Read Car Category specifications */
+			sprintf(buf, "categories/%s.xml", category);
+			GfOut("Category file: %s\n", buf);
+			cathdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+			if (GfParmCheckHandle(cathdle, carhdle)) {
+				GfTrace("Car %s NOT in Category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+				return NULL;
+			}
+			carhdle = GfParmMergeHandles(cathdle, carhdle,
+			                             GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+			sprintf (buf, "%sdrivers/curcarnames.xml", GetLocalDir());
+			handle = GfParmReadFile (buf, GFPARM_RMODE_CREAT);
+			if (handle) {
+				sprintf (path, "drivers/%s/%d", cardllname, elt->_driverIndex);
+				GfParmSetStr (handle, path, "car name", elt->_carName);
+				GfParmWriteFile (0, handle, "Car names");
+				GfParmReleaseHandle (handle);
+			} else {
+				printf( "====== Not readed correctly\n" );
+			}
+			if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU)
+			{
+				GfPoolMove( &elt->_newTrackMemPool, &oldPool );
+				curRobot->rbNewTrack(elt->_driverIndex, ReInfo->track, carhdle, &handle, ReInfo->s);
+				GfPoolFreePool( &oldPool );
+			}
+			else
+				handle = NULL;
+			if (handle != NULL) {
+				if (GfParmCheckHandle(carhdle, handle)) {
+					GfTrace("Bad Car parameters for driver %s\n", elt->_name);
+					return NULL;
+				}
+				handle = GfParmMergeHandles(carhdle, handle,
+				                            GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+			} else {
+				handle = carhdle;
+			}
+			elt->_carHandle = handle;
+			//GfParmWriteFile("/tmp/toto.xml", handle, 0);
+			
+			/* Initialize sectors */
+			elt->_currentSector = 0;
+			elt->_curSplitTime = (double*)malloc( sizeof(double) * ( ReInfo->track->numberOfSectors - 1 ) );
+			elt->_bestSplitTime = (double*)malloc( sizeof(double) * ( ReInfo->track->numberOfSectors - 1 ) );
+			for (xx = 0; xx < ReInfo->track->numberOfSectors - 1; ++xx)
+			{
+				elt->_curSplitTime[xx] = -1.0f;
+				elt->_bestSplitTime[xx] = -1.0f;
+			}
+		} else {
+			elt->_category[ 0 ] = '\0';
+			GfTrace("Bad Car category for driver %s\n", elt->_name);
+			return NULL;
+		}
+
+		return elt;
+	} else {
+		GfTrace("Pb No description file for driver %s\n", cardllname);
+	}
+	return NULL;
+}
+
+
 /** Initialize the cars for a race.
     The car are positionned on the starting grid.
     @return	0 Ok
@@ -478,19 +723,12 @@ ReInitCars(void)
 {
 	int nCars;
 	int index;
-	int i, j, k;
+	int i, j;
 	const char *cardllname;
 	int robotIdx;
-	tModInfoNC *curModInfo;
-	tRobotItf *curRobot;
-	void *handle;
-	const char *category;
-	void *cathdle;
-	void *carhdle;
 	void *robhdle;
 	tCarElt *elt;
 	const char *focused;
-	const char *str;
 	int focusedIdx;
 	void *params = ReInfo->params;
 
@@ -507,7 +745,8 @@ ReInitCars(void)
 	index = 0;
 
 	/* For each car/driver : */
-	for (i = 1; i < nCars + 1; i++) {
+	for (i = 1; i < nCars + 1; i++) 
+	{
 
 		/* Get the name of the module (= shared library) of the driver type */
 		sprintf(path, "%s/%d", RM_SECT_DRIVERS_RACING, i);
@@ -516,134 +755,68 @@ ReInitCars(void)
 		sprintf(path, "%sdrivers/%s/%s.%s", GetLibDir (), cardllname, cardllname, DLLEXT);
 
 		/* Load the driver type shared library */
-		if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) {
+		if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
+		{
 			GfError("Failed to load %s driver\n", path);
 			break;
 		}
 
 		/* Search for the index of the racing driver in the list of interfaces 
 		   of the module */
-		for (j = 0; j < (*(ReInfo->modList))->modInfoSize; j++) {
-
-			if ((*(ReInfo->modList))->modInfo[j].name
-			    && (*(ReInfo->modList))->modInfo[j].index == robotIdx) {
-
-				/* We have the right driver */
-				curModInfo = &((*(ReInfo->modList))->modInfo[j]);
-				GfOut("Driver's name: %s\n", curModInfo->name);
-				/* Retrieve the driver interface (function pointers) */
-				curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
-				/* ... and initialize the driver */
-				curModInfo->fctInit(robotIdx, (void*)(curRobot));
-				/* Retrieve and load the driver type XML file :
-				   1) from user settings dir (local dir)
-				   2) from installed data dir */
-				sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), cardllname, cardllname);
-				robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-				if (!robhdle) {
-					sprintf(buf, "drivers/%s/%s.xml", cardllname, cardllname);
-					robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+		elt = NULL;
+		sprintf(path, "%s/%d", RM_SECT_DRIVERS_RACING, i);
+		if ((int)GfParmGetNum(ReInfo->params, path, RM_ATTR_EXTENDED, NULL, 0) == 0) 
+		{
+			/* Search for the index of the racing driver in the list of interfaces
+			   of the module */
+			for (j = 0; j < (*(ReInfo->modList))->modInfoSize; j++) 
+			{
+				if ((*(ReInfo->modList))->modInfo[j].name && (*(ReInfo->modList))->modInfo[j].index == robotIdx) 
+				{
+					/* We have the right driver */
+					elt = loadSingleCar( index, i, j, robotIdx, TRUE, cardllname );
+					if (!elt)
+						GfTrace("Pb No description file for driver %s (1)\n", cardllname);
 				}
-				/* Load car/driver info (in race engine data structure) */
-				if (robhdle) {
-					elt = &(ReInfo->carList[index]);
-					GF_TAILQ_INIT(&(elt->_penaltyList));
-
-					elt->index = index;
-					elt->robot = curRobot;
-					elt->_paramsHandle = robhdle;
-					elt->_driverIndex = robotIdx;
-					strncpy(elt->_modName, cardllname, MAX_NAME_LEN - 1);
-					elt->_modName[MAX_NAME_LEN - 1] = 0;
-
-					sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-					strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<none>"), MAX_NAME_LEN - 1);
-					elt->_name[MAX_NAME_LEN - 1] = 0;
-					strncpy(elt->_teamname, GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "<none>"), MAX_NAME_LEN - 1);
-					elt->_teamname[MAX_NAME_LEN - 1] = 0;
-					
-					strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
-					elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
-					elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
-					if (strcmp(GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT), ROB_VAL_ROBOT)) {
-						elt->_driverType = RM_DRV_HUMAN;
-					} else {
-						elt->_driverType = RM_DRV_ROBOT;
-					}
-					elt->_skillLevel = 0;
-					str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
-					for(k = 0; k < (int)(sizeof(level_str)/sizeof(char*)); k++) {
-						if (strcmp(level_str[k], str) == 0) {
-							elt->_skillLevel = k;
-							break;
-						}
-					}
-					elt->_startRank  = index;
-					elt->_pos        = index+1;
-					elt->_remainingLaps = ReInfo->s->_totLaps;
-
-					/* Retrieve and load car specs : merge car default specs,
-					   category specs and driver modifications (=> handle) */
-					/* Read Car model specifications */
-					sprintf(buf, "cars/%s/%s.xml", elt->_carName, elt->_carName);
-					GfOut("Car file: %s\n", buf);
-					carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-					category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-					sprintf(buf, "Loading/merging %s specs for %s ...\n", elt->_carName, curModInfo->name);
-					GfOut(buf);
-					if (category) {
-						strncpy(elt->_category, category, MAX_NAME_LEN - 1);
-						elt->_category[MAX_NAME_LEN - 1] = '\0';
-
-						/* Read Car Category specifications */
-						sprintf(buf, "categories/%s.xml", category);
-						GfOut("Category file: %s\n", buf);
-						cathdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-						if (GfParmCheckHandle(cathdle, carhdle)) {
-							GfError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
-							break;
-						}
-						carhdle = GfParmMergeHandles(cathdle, carhdle,
-										GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
-										curRobot->rbNewTrack(robotIdx, ReInfo->track, carhdle, &handle, ReInfo->s);
-						if (handle) {
-							if (GfParmCheckHandle(carhdle, handle)) {
-								GfError("Bad car parameters for driver %s\n", elt->_name);
-								break;
-							}
-							handle = GfParmMergeHandles(carhdle, handle,
-										GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
-						} else {
-							handle = carhdle;
-						}
-						elt->_carHandle = handle;
-						//GfParmWriteFile("/tmp/toto.xml", handle, 0);
-					} else {
-						elt->_category[0] = '\0';
-						GfError("Bad car category for driver %s\n", elt->_name);
-						break;
-					}
-					index ++;
-				} else {
-					GfError("No description file for driver %s\n", cardllname);
-				}
-				break;
 			}
+		} else 
+		{
+			printf( "Loading driver %s\n", cardllname );
+			sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), cardllname, cardllname);
+			robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+			if (!robhdle) 
+			{
+				sprintf(buf, "drivers/%s/%s.xml", cardllname, cardllname);
+				robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+			}
+			if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
+				                 GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ||
+			    strcmp( cardllname, "human" ) == 0 ) ) /* It does have a field named car in ARBETRAIRY */
+				elt = loadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, cardllname );
+			else
+				GfTrace( "Pb: No description for driver %s (2)\n", cardllname );
+
 		}
-    }
+
+		if (elt)
+			++index;
+    	}
 
 	nCars = index; /* real number of cars */
-	if (nCars == 0) {
+	if (nCars == 0) 
+	{
 		GfError("No driver for that race ; exiting ...\n");
 		return -1;
-	} else {
+	} else 
+	{
 		GfOut("%d driver(s) ready to race\n", nCars);
 	}
 
 	ReInfo->s->_ncars = nCars;
 	FREEZ(ReInfo->s->cars);
 	ReInfo->s->cars = (tCarElt **)calloc(nCars, sizeof(tCarElt *));
-	for (i = 0; i < nCars; i++) {
+	for (i = 0; i < nCars; i++) 
+	{
 		ReInfo->s->cars[i] = &(ReInfo->carList[i]);
 	}
 
@@ -677,6 +850,10 @@ reDumpTrack(tTrack *track, int verbose)
     sprintf(buf, "  by %s (%.2f m long, %.2f m wide) ...", 
 			track->author, track->length, track->width);
     RmLoadingScreenSetText(buf);
+    sprintf(buf, ">>> Track Length  %.2f m", track->length);
+    RmLoadingScreenSetText(buf);
+    sprintf(buf, ">>> Track Width   %.2f m", track->width);
+    RmLoadingScreenSetText(buf);
 
     GfOut("++++++++++++ Track ++++++++++++\n");
     GfOut("Name     = %s\n", track->name);
@@ -689,7 +866,8 @@ reDumpTrack(tTrack *track, int verbose)
     GfOut("XSize    = %f\n", track->max.x);
     GfOut("YSize    = %f\n", track->max.y);
     GfOut("ZSize    = %f\n", track->max.z);
-    switch (track->pits.type) {
+    switch (track->pits.type) 
+	{
     case TR_PIT_NONE:
 	GfOut("Pits     = none\n");
 	break;
@@ -700,8 +878,10 @@ reDumpTrack(tTrack *track, int verbose)
 	GfOut("Pits     = present on separate path\n");
 	break;
     }
-    if (verbose) {
-	for (i = 0, seg = track->seg->next; i < track->nseg; i++, seg = seg->next) {
+    if (verbose) 
+    {
+	for (i = 0, seg = track->seg->next; i < track->nseg; i++, seg = seg->next) 
+	{
 	    GfOut("	segment %d -------------- \n", seg->id);
 #ifdef DEBUG
 	    GfOut("        type    %s\n", stype[seg->type]);
@@ -750,29 +930,71 @@ int
 ReInitTrack(void)
 {
     const char	*trackName;
-    const char	*catName;
-    int		curTrkIdx;
+	const char	*catName;
+	const char 	*raceName;
+
+    int	curTrkIdx;
+	int	cloud;
+	int	Timeday;
+	//int	rain;
+
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
+	
+    raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 
     curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
     sprintf(buf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
     trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
     if (!trackName)
-	return -1;
+		return -1;
 
     catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
     if (!catName) 
-	return -1;
+		return -1;
 
     sprintf(buf, "Loading track %s ...", trackName);
     RmLoadingScreenSetText(buf);
 
-    sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
-    ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
-    reDumpTrack(ReInfo->track, 0);
+	Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
+	cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
 
-    return 0;
+	printf("Race Name = %s\n", raceName);
+	sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
+    	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
+
+	ReInfo->track->weather = cloud;
+	ReInfo->track->Timeday = Timeday;
+	
+    reDumpTrack(ReInfo->track, 0.0);
+
+	ReStartWeather();
+    	return 0;
+}
+
+/**
+ * This functions initialized the graphics.
+ * This function must be called after the cars are loaded and the track is loaded.
+ * The track will be unloaded if the event end. The graphics module is keps open
+ * if more then one race is driven
+ */
+void ReInitGraphics()
+{
+	char const *dllname;
+	char key[256];
+
+	/* Check if the module is already loaded */
+	if( ReInfo->_reGraphicItf.refresh != 0 )
+		return; /* Module is already loaded: don't load again */
+		
+	/* Load the graphic module */
+	GfOut("Loading Graphic Engine...\n");
+	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
+	sprintf(key, "%smodules/graphic/%s.%s", GetLibDir (), dllname, DLLEXT);
+	if (GfModLoad(0, key, &reEventModList)) return;
+	reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reGraphicItf);
+
+	ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 }
 
 void
@@ -780,8 +1002,12 @@ ReRaceCleanup(void)
 {
 	ReInfo->_reGameScreen = ReHookInit();
 	ReInfo->_reSimItf.shutdown();
-	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
-		ReInfo->_reGraphicItf.shutdowncars();
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) 
+	{
+		if (ReInfo->_reGraphicItf.shutdowncars)
+			ReInfo->_reGraphicItf.shutdowncars();
+		else
+			GfOut( "WARNING: normal race display but graphical module not loaded!\n" );
 	}
 	ReStoreRaceResults(ReInfo->_reRaceName);
 	ReRaceCleanDrivers();
@@ -794,15 +1020,22 @@ ReRaceCleanDrivers(void)
 	int i;
 	tRobotItf *robot;
 	int nCars;
+	tMemoryPool oldPool = NULL;
 
 	nCars = ReInfo->s->_ncars;
-	for (i = 0; i < nCars; i++) {
+	for (i = 0; i < nCars; i++) 
+	{
 		robot = ReInfo->s->cars[i]->robot;
-		if (robot->rbShutdown) {
+		GfPoolMove( &ReInfo->s->cars[i]->_shutdownMemPool, &oldPool );
+		if (robot->rbShutdown && ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) 
+		{
 			robot->rbShutdown(robot->index);
 		}
+		GfPoolFreePool( &oldPool );
 		GfParmReleaseHandle(ReInfo->s->cars[i]->_paramsHandle);
 		free(robot);
+		free(ReInfo->s->cars[i]->_curSplitTime);
+		free(ReInfo->s->cars[i]->_bestSplitTime);
 	}
 	RtTeamManagerRelease();
 

@@ -4,7 +4,7 @@
     created              : Mon Aug 21 20:55:32 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: grcam.cpp,v 1.50 2007/11/06 20:43:31 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,32 +17,27 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <memory.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
+
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+#else
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include <plib/ssg.h>
+#endif
 
 #include <robottools.h>
-#include <graphic.h>
+#include <glfeatures.h>
 #include "grcam.h"
-#include "grscreen.h"
-#include "grscene.h"
-#include "grshadow.h"
-#include "grskidmarks.h"
-#include "grsmoke.h"
-#include "grcar.h"
 #include "grmain.h"
-#include "grutil.h"
-#include <tgfclient.h>
+#include "grscreen.h"	//cGrScreen
+#include "grscene.h"	//grWrldX
+#include "grutil.h"		//grGetHOT
 
 static char path[1024];
-
 
 float
 cGrCamera::getDist2 (tCarElt *car)
@@ -242,7 +237,7 @@ void cGrBackgroundCam::update(cGrCamera *curCam)
 // * 0 = No dynamic behaviour : like a CamInsideFixed (apart from the position)
 // * 1 = Torcs's one : strange rotation of the camera around speed vector axis
 // * 2 = Use attenuated car yaw to translate camera center (by Andrew)
-#define CamInsideDynamicBehaviour 0
+#define CamInsideDynamicBehaviour 2
 
 class cGrCarCamInside : public cGrPerspCamera
 {
@@ -320,6 +315,10 @@ class cGrCarCamInside : public cGrPerspCamera
 	speed[0] = car->pub.DynGCg.vel.x;
 	speed[1] = car->pub.DynGCg.vel.y;
 	speed[2] = car->pub.DynGCg.vel.z;
+
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
     }
 };
 
@@ -498,9 +497,56 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
 	speed[0] =car->pub.DynGCg.vel.x;
 	speed[1] =car->pub.DynGCg.vel.y;
 	speed[2] =car->pub.DynGCg.vel.z;
-    }
+
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
+	}
 };
 
+class cGrCarCamBehindFixedCar : public cGrPerspCamera
+{
+ public:
+    cGrCarCamBehindFixedCar(class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
+			    float myfovy, float myfovymin, float myfovymax,
+			    float myfnear, float myffar = 1500.0,
+			    float myfogstart = 1400.0, float myfogend = 1500.0)
+	: cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
+			 myfovy, myfovymin, myfovymax,
+			 myfnear, myffar, myfogstart, myfogend) {
+    }
+
+    void update(tCarElt *car, tSituation *s) 
+    {
+	sgVec3 P, p;
+	
+	p[0] = car->_bonnetPos_x - 6.0f;
+	p[1] = car->_bonnetPos_y;
+	p[2] = car->_bonnetPos_z + 1.0f;
+	sgXformPnt3(p, car->_posMat);
+	
+	eye[0] = p[0];
+	eye[1] = p[1];
+	eye[2] = p[2];
+
+	P[0] = car->_bonnetPos_x + 30.0;
+	P[1] = car->_bonnetPos_y;
+	P[2] = car->_bonnetPos_z;
+	sgXformPnt3(P, car->_posMat);
+
+	center[0] = P[0];
+	center[1] = P[1];
+	center[2] = P[2];
+
+	up[0] = car->_posMat[2][0];
+	up[1] = car->_posMat[2][1];
+	up[2] = car->_posMat[2][2];
+
+	speed[0] =car->pub.DynGCg.vel.x;
+	speed[1] =car->pub.DynGCg.vel.y;
+	speed[2] =car->pub.DynGCg.vel.z;
+    }
+};
 
 class cGrCarCamBehind : public cGrPerspCamera
 {
@@ -558,6 +604,10 @@ class cGrCarCamBehind : public cGrPerspCamera
 	speed[1] = car->pub.DynGCg.vel.y;
 	speed[2] = car->pub.DynGCg.vel.z;
 
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
+
     }
 };
 
@@ -614,6 +664,9 @@ class cGrCarCamBehind2 : public cGrPerspCamera
 	speed[1] = car->pub.DynGCg.vel.y;
 	speed[2] = car->pub.DynGCg.vel.z;
 
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
     }
 };
 
@@ -652,6 +705,10 @@ class cGrCarCamFront : public cGrPerspCamera
 	speed[0] = car->pub.DynGCg.vel.x;
 	speed[1] = car->pub.DynGCg.vel.y;
 	speed[2] = car->pub.DynGCg.vel.z;
+
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
 
     }
 };
@@ -696,6 +753,10 @@ protected:
 	speed[0] = car->pub.DynGCg.vel.x;
 	speed[1] = car->pub.DynGCg.vel.y;
 	speed[2] = car->pub.DynGCg.vel.z;
+
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], Speed);
 
     }
 };
@@ -755,6 +816,10 @@ class cGrCarCamUp : public cGrPerspCamera
 	speed[0] = car->pub.DynGCg.vel.x;
 	speed[1] = car->pub.DynGCg.vel.y;
 	speed[2] = car->pub.DynGCg.vel.z;
+
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], Speed);
 
     }
 };
@@ -824,6 +889,10 @@ class cGrCarCamCenter : public cGrPerspCamera
 	speed[1] = 0;
 	speed[2] = 0;
 
+	Speed = car->_speed_x * 3.6;
+
+	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
+
     }
 };
 
@@ -849,6 +918,8 @@ class cGrCarCamLookAt : public cGrPerspCamera
 	center[0] = centerx;
 	center[1] = centery;
 	center[2] = centerz;
+
+	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
 	
 	switch (axis) {
 	case 0:
@@ -935,6 +1006,8 @@ class cGrCarCamRoadNoZoom : public cGrPerspCamera
 	speed[0] = 0.0;
 	speed[1] = 0.0;
 	speed[2] = 0.0;
+
+	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
     }
 };
 
@@ -1038,6 +1111,8 @@ class cGrCarCamRoadFly : public cGrPerspCamera
         center[1] = (car->_pos_Y);
         center[2] = (car->_pos_Z);
 
+		//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
+
         // avoid going under the scene
         height = grGetHOT(eye[0], eye[1]) + 1.0;
         if (eye[2] < height) {
@@ -1129,6 +1204,8 @@ class cGrCarCamRoadZoom : public cGrPerspCamera
 	speed[0] = 0.0;
 	speed[1] = 0.0;
 	speed[2] = 0.0;
+
+	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
     }
 };
 
@@ -1335,7 +1412,24 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     /* F2 */
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
-    
+
+    /* cam F2 = just outside the car; camera fixed to car */
+    cam = new cGrCarCamBehindFixedCar(myscreen,
+				      id,
+				      1,	/* drawCurr */
+				      1,	/* drawBG  */
+				      67.5,	/* fovy */
+				      50.0,	/* fovymin */
+				      95.0,	/* fovymax */
+				      0.3,	/* near */
+				      600.0 * fovFactor,	/* far */
+				      300.0 * fovFactor,	/* fog */
+				      600.0 * fovFactor	/* fog */
+				      );
+    cam->add(&cams[c]);
+    id++;
+
+
     /* cam F2 = inside, from the driver's eye (driver's view) */
     cam = new cGrCarCamInside(myscreen,
 			      id,
@@ -1663,7 +1757,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  1,	/* drawCurr */
 			  1,	/* drawBG  */
 			  //12.0,	/* fovy */
-			  20.5,	/* fovy */
+			  37.5,	/* fovy */
 			  1.0,	/* fovymin */
 			  90.0,	/* fovymax */
 			  //300.0,	/* distz */
@@ -1684,7 +1778,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  1,	/* drawCurr */
 			  1,	/* drawBG  */
 			  //12.0,	/* fovy */
-			  20.5,	/* fovy */
+			  37.5,	/* fovy */
 			  1.0,	/* fovymin */
 			  90.0,	/* fovymax */
 			  //300.0,	/* distz */
@@ -1704,7 +1798,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  1,	/* drawCurr */
 			  1,	/* drawBG  */
 			  //12.0,	/* fovy */
-			  20.5,	/* fovy */
+			  37.5,	/* fovy */
 			  1.0,	/* fovymin */
 			  90.0,	/* fovymax */
 			  //300.0,	/* distz */
@@ -1724,7 +1818,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  1,	/* drawCurr */
 			  1,	/* drawBG  */
 			  //12.0,	/* fovy */
-			  20.5,	/* fovy */
+			  37.5,	/* fovy */
 			  1.0,	/* fovymin */
 			  90.0,	/* fovymax */
 			  //300.0,	/* distz */

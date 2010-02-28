@@ -3,7 +3,7 @@
     file                 : grvtxtable.h
     created              : Fri Mar 22 23:16:44 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id: grvtxtable.h,v 1.5 2005/02/01 19:08:19 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -44,6 +44,7 @@
 
 #ifndef _GRVTXTABLE_H_
 #define _GRVTXTABLE_H_
+#include <plib/ssg.h>		//ssgXXX
 #include "grmultitexstate.h"
 
 #define LEVELC  -1     /* a normal map in LEVEL0 and an env map in LEVEL1 for cars
@@ -173,5 +174,4 @@ public:
   virtual int save ( FILE *fd )  {return  ssgVtxTable::save(fd);}
 };
 
-
-#endif /* _GRVTXTABLE_H_*/
+#endif //_GRVTXTABLE_H_

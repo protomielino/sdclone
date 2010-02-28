@@ -1,0 +1,31 @@
+INCLUDE(../../../cmake/macros.cmake)
+
+#PROJECT(tgf)
+
+ADD_OSSPEC_INCLUDEDIR()
+ADD_TORCSLIB_INCLUDEDIR(txml portability)
+
+SET(TGF_HEADERS os.h tgf.h modinfo.h)
+SET(TGF_SOURCES directory.cpp filesetup.cpp formula.cpp hash.cpp module.cpp modinfo.cpp os.cpp
+	        params.cpp profiler.cpp tgf.cpp trace.cpp ${TGF_HEADERS})
+
+IF(UNIX)
+	ADD_LIBRARY(tgf SHARED ${TGF_SOURCES})
+ENDIF(UNIX)
+IF(WIN32)
+	ADD_LIBRARY(tgf SHARED ${TGF_SOURCES} tgf.def)
+ENDIF(WIN32)
+
+IF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
+	ADD_LIBRARY(tgf_static STATIC ${TGF_SOURCES})
+ENDIF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
+
+ADD_TORCSLIB_LIBRARY(tgf txml)
+
+IF(WIN32)
+	TORCS_INSTALL_FILES(BIN TARGETS tgf)
+ELSE(WIN32)
+	TORCS_INSTALL_FILES(LIB lib TARGETS tgf)
+ENDIF(WIN32)
+TORCS_INSTALL_FILES(INCLUDE FILES ${TGF_HEADERS})
+

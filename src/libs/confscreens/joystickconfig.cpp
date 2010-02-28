@@ -4,7 +4,7 @@
     created              : Wed Mar 21 21:46:11 CET 2001
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: joystickconfig.cpp,v 1.5 2003/11/08 16:37:18 torcs Exp $
+    version              : $Id: joystickconfig.cpp,v 1.5 19 Mar 2006 18:15:16 torcs Exp $
 
  ***************************************************************************/
 
@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+
 
 #include <tgfclient.h>
 
@@ -65,6 +66,9 @@ static int         JoyButtons[GFCTRL_JOY_NUMBER];
 // Menu screen handle.
 static void *ScrHandle = NULL;
 
+// Next menu screen handle.
+static void* NextMenuHandle = NULL;
+
 // Screen controls Ids
 static int InstId;
 
@@ -75,7 +79,7 @@ static int LabMaxId[NbMaxCalAxis];
 
 
 static void
-onBack(void *prevMenu)
+onNext(void * /* dummy */)
 {
     int index;
 
@@ -87,7 +91,7 @@ onBack(void *prevMenu)
 	}
 
     /* Back to previous screen */
-    GfuiScreenActivate(prevMenu);
+    GfuiScreenActivate(NextMenuHandle);
 }
 
 static void advanceStep (void)
@@ -163,9 +167,9 @@ Idle2(void)
 		    /* Button fired */
 		    JoyCalAutomaton();
 		    if (CalState >= NbCalSteps) {
-			glutIdleFunc(0);
+			sdlIdleFunc(0);
 		    }
-		    glutPostRedisplay();
+		    sdlPostRedisplay();
 		    JoyButtons[index] = b;
 		    return;
 		}
@@ -198,8 +202,8 @@ onActivate(void * /* dummy */)
 
     CalState = 0;
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
-    glutIdleFunc(Idle2);
-    glutPostRedisplay();
+    sdlIdleFunc(Idle2);
+    sdlPostRedisplay();
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (Joystick[index]) {
 	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]); /* initial value */
@@ -224,13 +228,14 @@ onActivate(void * /* dummy */)
 
 
 void *
-JoyCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
+JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
 {
     int i;
     char pszBuf[64];
 
     Cmd = cmd;
     MaxCmd = maxcmd;
+    NextMenuHandle = nextMenu;
 
     if (ScrHandle) {
 	return ScrHandle;
@@ -257,7 +262,7 @@ JoyCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     InstId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
     // Create Back and Reset buttons.
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "backbutton", prevMenu, onBack);
+    CreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
     CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
     // Close menu XML descriptor.
@@ -265,8 +270,8 @@ JoyCalMenuInit(void *prevMenu, tCmdInfo *cmd, int maxcmd)
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(ScrHandle);
-    GfuiAddKey(ScrHandle, 27, "Back", prevMenu, onBack, NULL);
-    GfuiAddKey(ScrHandle, 13, "Back", prevMenu, onBack, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Next", NULL, onNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Next", NULL, onNext, NULL);
 
     return ScrHandle;
 }

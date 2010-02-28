@@ -3,7 +3,7 @@
     file                 : grtexture.h
     created              : Wed Jun 1 14:56:31 CET 2005
     copyright            : (C) 2005 by Bernhard Wymann
-    version              : $Id: grtexture.h,v 1.2.2.1 2008/08/16 14:12:08 berniw Exp $
+    version              : $Id: grtexture.h 1045 2009-07-03 09:53:06Z martkelder $
 
 ***************************************************************************/
 
@@ -25,13 +25,14 @@
 #ifndef _GRTEXTURE_H_
 #define _GRTEXTURE_H_
 
-#include <stdio.h>
-#include <plib/ssg.h>
-#include <glfeatures.h>
-#include "grloadsgi.h"
+#include <plib/ssg.h>	// ssgXXX
+#include <tgfclient.h>
+#include "loadsgi.h"	// ssgSGIHeader
 
-bool doMipMap(const char *tfname, int mipmap);
 
+extern int doMipMap(const char *tfname, int mipmap);
+
+extern bool grMakeMipMaps(GLubyte *image, int xsize, int ysize, int zsize, int mipmap);
 
 // This state does currently not manage anything!
 // TODO: manage shared textures, obsolete grutil.cpp parts.
@@ -57,14 +58,10 @@ class grManagedState : public ssgSimpleState {
 // Managed state factory.
 inline grManagedState* grStateFactory(void) { return new grManagedState(); }
 
-// Prototype for mipmap generation.
-bool grMakeMipMaps(GLubyte *image, int xsize, int ysize, int zsize, bool mipmap);
-
-// Prototype for SGI texture loading function.
-bool grLoadSGI(const char *fname, ssgTextureInfo* info);
-
 // Register customized loader in plib.
-void grRegisterCustomSGILoader(void);
+extern void grRegisterCustomSGILoader(void);
+
+extern bool grLoadPngTexture(const char *fname, ssgTextureInfo* info);
 
 // SGI loader class to call customized ssgMakeMipMaps. This is necessary because
 // of plib architecture which does not allow to customize the mipmap
@@ -74,6 +71,4 @@ class grSGIHeader : public ssgSGIHeader {
 		grSGIHeader(const char *fname, ssgTextureInfo* info);
 };
 
-
-
-#endif // _GRTEXTURE_H_
+#endif // _MK_TEXTURE_H_

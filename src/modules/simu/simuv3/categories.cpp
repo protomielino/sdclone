@@ -2,9 +2,9 @@
 
     file        : categories.cpp
     created     : Sun Dec 15 11:12:56 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
-    version     : $Id: categories.cpp,v 1.19 2005/04/04 14:56:21 olethros Exp $                                  
+    version     : $Id: categories.cpp,v 1.20 2008/03/28 15:06:15 olethros Exp $                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: categories.cpp,v 1.19 2005/04/04 14:56:21 olethros Exp $
+    @version	$Id: categories.cpp,v 1.20 2008/03/28 15:06:15 olethros Exp $
 */
 
 #include <stdio.h>

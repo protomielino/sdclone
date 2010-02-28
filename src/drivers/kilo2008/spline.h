@@ -1,0 +1,49 @@
+/*
+ *      spline.h
+ *      
+ *      Copyright 2009 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
+ *      Based on work by Bernhard Wymann and Andrew Sumner.
+ *      
+ *      This program is free software; you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation; either version 2 of the License, or
+ *      (at your option) any later version.
+ *      
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *      
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program; if not, write to the Free Software
+ *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *      MA 02110-1301, USA.
+ * 
+ *      $Id$
+ * 
+ */
+
+#ifndef _SPLINE_H_
+#define _SPLINE_H_
+
+class SplinePoint {
+	public:
+		float x;	// x coordinate.
+		float y;	// y coordinate.
+		float s;	// slope.
+};
+
+
+class Spline {
+	public:
+		Spline(int dim, SplinePoint *s);
+
+		float evaluate(float z);
+
+	private:
+		SplinePoint *s;
+		int dim;
+};
+
+#endif // _SPLINE_H_
+

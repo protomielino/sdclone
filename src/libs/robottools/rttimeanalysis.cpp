@@ -53,6 +53,8 @@ bool RtInitTimer()
 	  //printf("Resolution for Performance Counter: %g nanosec\n\n\n",TicksPerSec/1000000000.0); 
 	  return true;
   }
+#else
+  return false;
 #endif
   return false;
 }

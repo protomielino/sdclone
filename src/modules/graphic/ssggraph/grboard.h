@@ -20,7 +20,11 @@
 #ifndef _GRBOARD_H_
 #define _GRBOARD_H_
 
-#include "grtrackmap.h"
+#include <car.h>			//tCarElt
+#include <raceman.h>	//tSituation
+
+class cGrTrackMap;
+
 #include <string>
 #include <vector>
 
@@ -56,7 +60,9 @@ class cGrBoard
 		// Track overview object
 		cGrTrackMap *trackMap;
 
-		void grMakeThreeLetterNames(const tSituation *s);
+    bool grGetSplitTime(tSituation *s, tCarElt *car, bool gap_inrace, double &time, int *laps_different, float **color);
+    void grGetLapsTime(tSituation *s, tCarElt *car, char* result, char const** label) const;
+    void grMakeThreeLetterNames(const tSituation *s);
 		
  public:
     cGrBoard(int myid);
@@ -67,7 +73,7 @@ class cGrBoard
     void selectBoard(int brd);
     void dispGaph(tCarElt *car);
     void initBoardCar(tCarElt *car);
-		cGrTrackMap *getTrackMap() { return trackMap; }
+		inline cGrTrackMap *getTrackMap() { return trackMap; }
 
     void refreshBoard(tSituation *s, float Fps, int forceArcade, tCarElt *curr);
     void loadDefaults(tCarElt *curCar);

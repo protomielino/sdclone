@@ -53,16 +53,15 @@ SimAeroConfig(tCar *car)
     //printf ("%f %f\n", GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0), GfParmGetNum(hdle, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0));
     //printf ("cl: %f\n", car->aero.Clift[0]+car->aero.Clift[1]);
     car->aero.Cd += car->aero.SCx2;
-    car->aero.rot_front[0] = 0.0;
-    car->aero.rot_front[1] = 0.0;
-    car->aero.rot_front[2] = 0.0;
-    car->aero.rot_lateral[0] = 0.0;
-    car->aero.rot_lateral[1] = 0.0;
-    car->aero.rot_lateral[2] = 0.0;
-    car->aero.rot_vertical[0] = 0.0;
-    car->aero.rot_vertical[1] = 0.0;
-    car->aero.rot_vertical[2] = 0.0;
-
+    car->aero.rot_front[0] = 0.0f;
+    car->aero.rot_front[1] = 0.0f;
+    car->aero.rot_front[2] = 0.0f;
+    car->aero.rot_lateral[0] = 0.0f;
+    car->aero.rot_lateral[1] = 0.0f;
+    car->aero.rot_lateral[2] = -1.0f;
+    car->aero.rot_vertical[0] = 0.0f;
+    car->aero.rot_vertical[1] = 0.0f;
+    car->aero.rot_vertical[2] = 0.0f;
 }
 
 
@@ -72,11 +71,11 @@ SimAeroUpdate(tCar *car, tSituation *s)
     //tdble	hm;
     int		i;	    
     tdble	airSpeed;
-    tdble	dragK = 1.0;
+    tdble	dragK = 1.0f;
 
     airSpeed = car->DynGC.vel.x;
 
-    if (airSpeed > 10.0) {
+    if (airSpeed > 10.0f) {
 	tdble x = car->DynGC.pos.x;
 	tdble y = car->DynGC.pos.y;
 	//	tdble x = car->DynGC.pos.x + cos(yaw)*wing->staticPos.x;
@@ -129,22 +128,23 @@ SimAeroUpdate(tCar *car, tSituation *s)
     // Also, no torque is produced since the effect can be
     // quite dramatic. Interesting idea to make all drags produce
     // torque when the car is damaged.
-    car->aero.Mx = car->aero.drag * dmg_coef * car->aero.rot_front[0];
-    car->aero.My = car->aero.drag * dmg_coef * car->aero.rot_front[1];
-    car->aero.Mz = car->aero.drag * dmg_coef * car->aero.rot_front[2];
+    tdble dmg_coef2 = 1;
+    car->aero.Mx = car->aero.drag * dmg_coef2 * car->aero.rot_front[0];
+    car->aero.My = car->aero.drag * dmg_coef2 * car->aero.rot_front[1];
+    car->aero.Mz = car->aero.drag * dmg_coef2 * car->aero.rot_front[2];
 
 
     v2 = car->DynGC.vel.y;
     car->aero.lateral_drag = -SIGN(v2)*v2*v2*0.7;
-    car->aero.Mx += car->aero.lateral_drag * dmg_coef * car->aero.rot_lateral[0];
-    car->aero.My += car->aero.lateral_drag * dmg_coef * car->aero.rot_lateral[1];
-    car->aero.Mz += car->aero.lateral_drag * dmg_coef * car->aero.rot_lateral[2];
+    car->aero.Mx += car->aero.lateral_drag * dmg_coef2 * car->aero.rot_lateral[0];
+    car->aero.My += car->aero.lateral_drag * dmg_coef2 * car->aero.rot_lateral[1];
+    car->aero.Mz += car->aero.lateral_drag * dmg_coef2 * car->aero.rot_lateral[2];
 
     v2 = car->DynGC.vel.z;
     car->aero.vertical_drag = -SIGN(v2)*v2*v2*1.5;
-    car->aero.Mx += car->aero.vertical_drag * dmg_coef * car->aero.rot_vertical[0];
-    car->aero.My += car->aero.vertical_drag * dmg_coef * car->aero.rot_vertical[1];
-    car->aero.Mz += car->aero.vertical_drag * dmg_coef * car->aero.rot_vertical[2];
+    car->aero.Mx += car->aero.vertical_drag * dmg_coef2 * car->aero.rot_vertical[0];
+    car->aero.My += car->aero.vertical_drag * dmg_coef2 * car->aero.rot_vertical[1];
+    car->aero.Mz += car->aero.vertical_drag * dmg_coef2 * car->aero.rot_vertical[2];
 
 
 
@@ -315,7 +315,7 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
             break;
         case OPTIMAL:
             wing->forces.x = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0f) * (1.0f - cosaoa);
-            wing->forces.x = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0f) * sinaoa;
+            wing->forces.z = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0f) * sinaoa;
             break;
 	default:
             fprintf (stderr, "Unimplemented option %d for aeroflow model\n", car->options->aeroflow_model);

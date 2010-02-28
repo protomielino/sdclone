@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:05:26 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: brake.cpp,v 1.19 2005/04/04 14:56:21 olethros Exp $
+    version              : $Id: brake.cpp,v 1.20 2008/03/28 15:06:15 olethros Exp $
 
  ***************************************************************************/
 

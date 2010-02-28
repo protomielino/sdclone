@@ -29,12 +29,11 @@
 #include <cstring>
 #include <string>
 
+
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
-
-#include <plib/js.h>
 
 #include "controlconfig.h"
 #include "mouseconfig.h"
@@ -43,9 +42,6 @@
 static void 	*ScrHandle = NULL;
 static void	*PrevScrHandle = NULL;
 static void	*PrefHdle = NULL;
-
-static int	MouseCalButton;
-static int	JoyCalButton;
 
 static tCtrlMouseInfo	MouseInfo;
 static char	CurrentSection[256];
@@ -118,10 +114,16 @@ static char buf[1024];
 
 static int SteerSensEditId;
 static int DeadZoneEditId;
+static int CalibrateButtonId;
+
 static tGearChangeMode GearChangeMode;
 
 static int ReloadValues = 1;
 
+static int AcceptMouseClicks = 1;
+
+static int MouseCalNeeded;
+static int JoyCalNeeded;
 
 static void
 onSteerSensChange(void * /* dummy */)
@@ -187,28 +189,29 @@ onSave(void *prevMenu)
 static void
 updateButtonText(void)
 {
-    int		i;
+    int		cmdInd;
     const char	*str;
-    int		displayMouseCal = GFUI_INVISIBLE;
-    int		displayJoyCal = GFUI_INVISIBLE;
+
+    /* No calibration needed for the moment (but let's check this ...) */
+    MouseCalNeeded = 0;
+    JoyCalNeeded   = 0;
 
     /* For each control: */
-    for (i = 0; i < MaxCmd; i++) {
+    for (cmdInd = 0; cmdInd < MaxCmd; cmdInd++) {
 
 	/* Update associated editbox according to detected input device action */
-	str = GfctrlGetNameByRef(Cmd[i].ref.type, Cmd[i].ref.index);
+	str = GfctrlGetNameByRef(Cmd[cmdInd].ref.type, Cmd[cmdInd].ref.index);
 	if (str) {
-	    GfuiButtonSetText (ScrHandle, Cmd[i].Id, str);
+	    GfuiButtonSetText (ScrHandle, Cmd[cmdInd].Id, str);
 	} else {
-	    GfuiButtonSetText (ScrHandle, Cmd[i].Id, "---");
+	    GfuiButtonSetText (ScrHandle, Cmd[cmdInd].Id, "---");
 	}
 
-	/* According to detected action, set the visibility of the mouse or joystick
-	   calibration button */
-	if (Cmd[i].ref.type == GFCTRL_TYPE_MOUSE_AXIS) {
-	    displayMouseCal = GFUI_VISIBLE;
-	} else if (Cmd[i].ref.type == GFCTRL_TYPE_JOY_AXIS) {
-	    displayJoyCal = GFUI_VISIBLE;
+	/* According to detected action, update the "calibration needed" flags */
+	if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_MOUSE_AXIS) {
+	    MouseCalNeeded = 1;
+	} else if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_JOY_AXIS) {
+	    JoyCalNeeded = 1;
 	}
     }
 
@@ -220,10 +223,10 @@ updateButtonText(void)
     sprintf(buf, "%f", DeadZoneVal);
     GfuiEditboxSetString(ScrHandle, DeadZoneEditId, buf);
 
-    /* Show / hide mouse / joystick calibration button(s),
+    /* Show / hide mouse / joystick calibration button,
        according to the detected input device actions */
-    GfuiVisibilitySet(ScrHandle, MouseCalButton, displayMouseCal);
-    GfuiVisibilitySet(ScrHandle, JoyCalButton, displayJoyCal);
+    GfuiVisibilitySet(ScrHandle, CalibrateButtonId, 
+		      MouseCalNeeded|JoyCalNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
 }
 
 static void
@@ -237,24 +240,24 @@ static int CurrentCmd;
 static int InputWaited = 0;
 
 static int
-onKeyAction(unsigned char key, int /* modifier */, int state)
+onKeyAction(int unicode, int /* modifier */, int state)
 {
-    const char *name;
-
     if (!InputWaited || state == GFUI_KEY_UP) {
 	return 0;
     }
-    if (key == 27) {
+    if (unicode == 27) {
 	/* escape */
 	Cmd[CurrentCmd].ref.index = -1;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
+	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, "");
     } else {
-	name = GfctrlGetNameByRef(GFCTRL_TYPE_KEYBOARD, (int)key);
-	Cmd[CurrentCmd].ref.index = (int)key;
+	const char* name = GfctrlGetNameByRef(GFCTRL_TYPE_KEYBOARD, unicode);
+	Cmd[CurrentCmd].ref.index = unicode;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_KEYBOARD;
+	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
     }
 
-    glutIdleFunc(0);
+    sdlIdleFunc(0);
     InputWaited = 0;
     updateButtonText();
     return 1;
@@ -263,16 +266,14 @@ onKeyAction(unsigned char key, int /* modifier */, int state)
 static int
 onSKeyAction(int key, int /* modifier */, int state)
 {
-    const char *name;
-
     if (!InputWaited || state == GFUI_KEY_UP) {
 	return 0;
     }
-    name = GfctrlGetNameByRef(GFCTRL_TYPE_SKEYBOARD, key);
-    Cmd[CurrentCmd].ref.index = key;
+    const char* name = GfctrlGetNameByRef(GFCTRL_TYPE_SKEYBOARD, key);
+	Cmd[CurrentCmd].ref.index = key;
     Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_SKEYBOARD;
 
-    glutIdleFunc(0);
+    sdlIdleFunc(0);
     InputWaited = 0;
     updateButtonText();
     return 1;
@@ -294,9 +295,17 @@ getMovedAxis(void)
     return Index;
 }
 
-/* GLUT idle function : For collecting input devices actions */
+/* Game event loop idle function : For collecting input devices actions */
 static void
-Idle(void)
+IdleAcceptMouseClicks(void)
+{
+    AcceptMouseClicks = 1;
+    sdlIdleFunc(0);
+}
+
+/* Game event loop idle function : For collecting input devices actions */
+static void
+IdleWaitForInput(void)
 {
     int		mask;
     int		b, i;
@@ -309,13 +318,14 @@ Idle(void)
     /* Check for a mouse button pressed */
     for (i = 0; i < 3; i++) {
 	if (MouseInfo.edgedn[i]) {
-	    glutIdleFunc(0);
+	    AcceptMouseClicks = 0;
+	    sdlIdleFunc(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_BUT, i);
 	    Cmd[CurrentCmd].ref.index = i;
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_BUT;
 	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	    glutPostRedisplay();
+	    sdlPostRedisplay();
 	    updateButtonText();
 	    return;
 	}
@@ -324,13 +334,13 @@ Idle(void)
     /* Check for a mouse axis moved */
     for (i = 0; i < 4; i++) {
 	if (MouseInfo.ax[i] > 20.0) {
-	    glutIdleFunc(0);
+	    sdlIdleFunc(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_AXIS, i);
 	    Cmd[CurrentCmd].ref.index = i;
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_AXIS;
 	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	    glutPostRedisplay();
+	    sdlPostRedisplay();
 	    updateButtonText();
 	    return;
 	}
@@ -345,13 +355,13 @@ Idle(void)
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Button i fired */
-		    glutIdleFunc(0);
+		    sdlIdleFunc(0);
 		    InputWaited = 0;
 		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + 32 * index);
 		    Cmd[CurrentCmd].ref.index = i + 32 * index;
 		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_BUT;
 		    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-		    glutPostRedisplay();
+		    sdlPostRedisplay();
 		    JoyButtons[index] = b;
 		    updateButtonText();
 		    return;
@@ -364,19 +374,19 @@ Idle(void)
     /* detect joystick movement */
     axis = getMovedAxis();
     if (axis != -1) {
-	glutIdleFunc(0);
+	sdlIdleFunc(0);
 	InputWaited = 0;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
 	Cmd[CurrentCmd].ref.index = axis;
 	str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
 	GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	glutPostRedisplay();
+	sdlPostRedisplay();
 	updateButtonText();
 	return;
     }
 
-	/* Let CPU take breath (and fans stay at low and quiet speed) */
-	GfuiSleep(0.001);
+    /* Let CPU take breath (and fans stay at low and quiet speed) */
+    GfuiSleep(0.001);
 }
 
 /* Push button callback for each command button : activate input devices action collection loop */
@@ -385,7 +395,13 @@ onPush(void *vi)
 {
     int		index;    
     long	i = (long)vi;
-    
+
+    /* Do nothing if mouse button clicks are to be refused */
+    if (!AcceptMouseClicks) {
+	AcceptMouseClicks = 1;
+	return;
+    }
+
     /* Selected given command as the currently awaited one */
     CurrentCmd = i;
 
@@ -397,28 +413,29 @@ onPush(void *vi)
     Cmd[i].ref.type = GFCTRL_TYPE_NOT_AFFECTED;
 
     /* State that a keyboard action is awaited */
-    if (Cmd[CurrentCmd].keyboardPossible) {
+    if (Cmd[CurrentCmd].keyboardPossible)
 	InputWaited = 1;
-    }
 
     /* Read initial mouse status */
-    glutIdleFunc(Idle);
     GfctrlMouseInitCenter();
     memset(&MouseInfo, 0, sizeof(MouseInfo));
     GfctrlMouseGetCurrent(&MouseInfo);
 
     /* Read initial joysticks status */
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (Joystick[index]) {
+    for (index = 0; index < GFCTRL_JOY_NUMBER; index++)
+	if (Joystick[index])
 	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
-	}
-    }
     memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
+
+    /* Now, wait for input device actions */
+    sdlIdleFunc(IdleWaitForInput);
 }
 
 static void
 onActivate(void * /* dummy */)
 {
+    int	cmdInd;
+
     // Create and test joysticks ; only keep the up and running ones.
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {
 	if (!Joystick[jsInd])
@@ -456,13 +473,50 @@ onActivate(void * /* dummy */)
     }
     
     updateButtonText();
+
+    AcceptMouseClicks = 1;
+
+    // Initialize mouse and joystick/gamepad/wheel calibration flags
+    // according to current control settings.
+    MouseCalNeeded = 0;
+    JoyCalNeeded = 0;
+    for (cmdInd = 0; cmdInd < MaxCmd; cmdInd++) {
+	if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_MOUSE_AXIS) {
+	    MouseCalNeeded = 1;
+	} else if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_JOY_AXIS) {
+	    JoyCalNeeded = 1;
+	}
+    }
+
+    /* Show / hide mouse / joystick calibration button,
+       according to the loaded input device actions */
+    GfuiVisibilitySet(ScrHandle, CalibrateButtonId, 
+		      MouseCalNeeded|JoyCalNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
 }
 
 static void
-DevCalibrate(void *menu)
+DevCalibrate(void * /* dummy */)
 {
+    void* firstCalMenu = 0;
+
+    // No need to reload command settings from preference on return
     ReloadValues = 0;
-    GfuiScreenActivate(menu);
+
+    // Create calibration "wizard" (1 menu for each device to calibrate
+    if (MouseCalNeeded) {
+	if (JoyCalNeeded) {
+	    void* nextCalMenu = JoyCalMenuInit(ScrHandle, Cmd, MaxCmd);
+	    firstCalMenu = MouseCalMenuInit(nextCalMenu, Cmd, MaxCmd);
+	} else {
+	    firstCalMenu = MouseCalMenuInit(ScrHandle, Cmd, MaxCmd);
+	}
+    } else if (JoyCalNeeded) {
+	firstCalMenu = JoyCalMenuInit(ScrHandle, Cmd, MaxCmd);
+    }
+	 
+    // Activate first wizard screen
+    if (firstCalMenu)
+	GfuiScreenActivate(firstCalMenu);
 }
 
 
@@ -531,17 +585,14 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 
     /* Save button and associated keyboard shortcut */
     CreateButtonControl(ScrHandle,param,"save",PrevScrHandle,onSave);
-    GfuiAddKey(ScrHandle, 13 /* Return */, "Save", PrevScrHandle, onSave, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN /* Return */, "Save", PrevScrHandle, onSave, NULL);
 
     /* Mouse calibration screen access button */
-    MouseCalButton = CreateButtonControl(ScrHandle,param,"mousecalibrate",MouseCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
-
-    /* Joystick/joypad/wheel calibration screen access button */
-    JoyCalButton = CreateButtonControl(ScrHandle,param,"joycalibrate",JoyCalMenuInit(ScrHandle, Cmd, MaxCmd), DevCalibrate);
+    CalibrateButtonId = CreateButtonControl(ScrHandle,param,"calibrate",NULL, DevCalibrate);
 
     /* Cancel button and associated keyboard shortcut */
     CreateButtonControl(ScrHandle,param,"cancel",PrevScrHandle,onQuit);
-    GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel", PrevScrHandle, onQuit, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", PrevScrHandle, onQuit, NULL);
 
     /* General callbacks for keyboard keys and special keys */
     GfuiKeyEventRegister(ScrHandle, onKeyAction);
@@ -607,8 +658,10 @@ void ControlGetSettings(void *prefHdle, unsigned index)
 /* From global vars (Cmd, SteerSensVal, DeadZoneVal) to parms (prefHdle) */
 void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
 {
-    int		iCmd;
-    const char	*str;
+    int iCmd;
+    const char* str;
+    const char* pszReverseCmd;
+    const char* pszNeutralCmd;
 
     /* If handle on preferences not given, get current */
     if (!prefHdle)
@@ -622,23 +675,28 @@ void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChan
     if (gearChangeMode == GEAR_MODE_NONE)
         gearChangeMode = GearChangeMode;
 
-    /* Allow neutral gear in sequential mode if no reverse gear command defined */
+    /* Allow neutral gear in sequential mode if nor reverse nor neutral gear command defined */
+    pszReverseCmd = GfctrlGetNameByRef(Cmd[ICmdReverseGear].ref.type, Cmd[ICmdReverseGear].ref.index);
+    pszNeutralCmd = GfctrlGetNameByRef(Cmd[ICmdNeutralGear].ref.type, Cmd[ICmdNeutralGear].ref.index);
     if (gearChangeMode == GEAR_MODE_SEQ
-	&& !GfctrlGetNameByRef(Cmd[ICmdReverseGear].ref.type, Cmd[ICmdReverseGear].ref.index))
+	&& (!pszReverseCmd || !strcmp(pszReverseCmd, "-")
+	    || !pszNeutralCmd || !strcmp(pszNeutralCmd, "-")))
 	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_YES);
     else
 	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_NO);
 
     /* Release gear lever goes neutral in grid mode if no neutral gear command defined */
     if (gearChangeMode == GEAR_MODE_GRID
-	&& !GfctrlGetNameByRef(Cmd[ICmdNeutralGear].ref.type, Cmd[ICmdNeutralGear].ref.index))
+	&& (!pszNeutralCmd || !strcmp(pszNeutralCmd, "-")))
 	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_REL_BUT_NEUTRAL, HM_VAL_YES);
     else
 	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_REL_BUT_NEUTRAL, HM_VAL_NO);
 
+    /* Steer sensitivity and dead zone */
     GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
     GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
 
+    /* Name, min, max and power, for each possible command */
     for (iCmd = 0; iCmd < MaxCmd; iCmd++) {
 	str = GfctrlGetNameByRef(Cmd[iCmd].ref.type, Cmd[iCmd].ref.index);
 	if (str) {

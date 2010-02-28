@@ -2,9 +2,9 @@
 
     file        : soundconfig.cpp
     created     : Thu Dec 12 15:12:07 CET 2004
-    copyright   : (C) 2004 Eric Espié, Bernhard Wymann, baseed on simuconfig.cpp
+    copyright   : (C) 2004 Eric Espiï¿½, Bernhard Wymann, baseed on simuconfig.cpp
     email       : berniw@bluewin.ch
-    version     : $Id: soundconfig.cpp,v 1.6 2005/08/05 09:03:39 berniw Exp $
+    version     : $Id: soundconfig.cpp,v 1.6 20 Mar 2006 04:31:12 berniw Exp $
 
  ***************************************************************************/
 
@@ -25,11 +25,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
+
 #include <tgfclient.h>
 #include <raceinit.h>
 #include <graphic.h>
 
 #include "soundconfig.h"
+#include "gui.h"
 
 static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
 
@@ -175,12 +177,12 @@ void * SoundMenuInit(void *prevMenu)
 
 	GfParmReleaseHandle(param);
     
-	GfuiAddKey(scrHandle, 13, "Save", NULL, saveSoundOption, NULL);
-	GfuiAddKey(scrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, saveSoundOption, NULL);
+	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
 
 	return scrHandle;
 }

@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.01.30
+// Last changed : 2010.02.08
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
@@ -60,7 +60,7 @@
 //--------------------------------------------------------------------------*
 //#undef SPEED_DREAMS
 
-#include <tmath/v2_t.h>
+#include <v2_t.h>
 #include <tgf.h>
 #include <robottools.h>
 #include <timeanalysis.h>
@@ -81,10 +81,10 @@
 //--------------------------------------------------------------------------*
 int TDriver::NBBOTS = MAX_NBBOTS;                  // Nbr of drivers/robots
 //double TDriver::CurrSimTime = 0;                   // Current simulation time
-char const* TDriver::MyBotName = "simplix";              // Name of this bot
-char const* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
-char const* TDriver::SECT_PRIV = "simplix private";      // Private section
-char const* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
+const char* TDriver::MyBotName = "simplix";              // Name of this bot
+const char* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
+const char* TDriver::SECT_PRIV = "simplix private";      // Private section
+const char* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
@@ -99,7 +99,7 @@ bool  TDriver::Learning = false;                   // Initialize
 
 double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
-static char const *WheelSect[4] =                        // TORCS defined sections
+static const char *WheelSect[4] =                        // TORCS defined sections
 {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
 //static double (TDriver::*CalcCrv)(double Crv);
@@ -436,12 +436,12 @@ void TDriver::InitTrack
   oSkillGlobal = oSkill = oDecelAdjustPerc = oDriverAggression = 0.0;
 
   // Initialize race type array
-  char const* RaceType[] =
+  const char* RaceType[] =
     {"practice", "qualify", "race"};
 
   // Initialize the base param path
-  char const* BaseParamPath = TDriver::ROBOT_DIR;
-  char* PathFilename = PathFilenameBuffer;
+  const char* BaseParamPath = TDriver::ROBOT_DIR;
+  const char* PathFilename = PathFilenameBuffer;
 
   // Global skilling from Andrew Sumner ...
   // Check if skilling is enabled
@@ -1108,6 +1108,7 @@ void TDriver::Drive()
   GetPosInfo(Pos,oLanePoint);                    // Get info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
+
   double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
 //  cTimeSum[0] += RtDuration(StartTimeStamp);
 
@@ -2955,6 +2956,11 @@ double TDriver::FilterStart(double Speed)
     double Offset = 0.01;
     Speed *= MAX(0.6,(1.0 - (oCar->race.pos - 1) * Offset));
   }
+
+  // For unknown trakcs do not limit speed to much
+  if(!oStrategy->GoToPit() && (Speed < 12.0))
+    Speed = 12.0;
+
   return Speed;
 }
 //==========================================================================*
@@ -3399,6 +3405,26 @@ double TDriver::CalcCrv_simplix_TRB1(double Crv)
 //==========================================================================*
 
 //==========================================================================*
+// simplix_INDY
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_INDY(double Crv)
+{
+  return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_LS1
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_LS1(double Crv)
+{
+  return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
 // simplix_sc
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_SC(double Crv)
@@ -3431,6 +3457,13 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
       return 1.0;
 	else
       return ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
+/*
+	{
+      double Value = ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
+	  GfOut("%.5f\n",Value);
+	  return MIN(1.25,Value);
+	}
+*/
   }
   else
     return 1.0;
@@ -3452,6 +3485,26 @@ double TDriver::CalcHairpin_simplix(double Crv)
 double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 {
   return 1.0;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_INDY
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix_INDY(double Crv)
+{
+  return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_LS1
+//--------------------------------------------------------------------------*
+double TDriver::CalcHairpin_simplix_LS1(double Crv)
+{
+  return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
+  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
 }
 //==========================================================================*
 

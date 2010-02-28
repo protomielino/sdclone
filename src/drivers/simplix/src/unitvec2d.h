@@ -36,7 +36,7 @@
 #ifndef _UNITVEC2D_H_
 #define _UNITVEC2D_H_
 
-#include <tmath/v2_t.h>
+#include <v2_t.h>
 #include <tgf.h>
 
 #include "unitglobal.h"

@@ -4,7 +4,7 @@
     created     : Sat Nov 16 18:22:00 CET 2002
     copyright   : (C) 2002 by Eric Espié                        
     email       : eric.espie@torcs.org   
-    version     : $Id: racegl.cpp,v 1.7 2004/04/05 18:25:00 olethros Exp $                                  
+    version     : $Id: racegl.cpp,v 1.7 20 Mar 2006 04:30:18 olethros Exp $                                  
 
  ***************************************************************************/
 
@@ -24,6 +24,7 @@
 */
 #include <stdlib.h>
 #include <stdio.h>
+
 
 #include <tgfclient.h>
 #include <raceman.h>
@@ -49,6 +50,12 @@ static float black[4] = {0.0, 0.0, 0.0, 0.0};
  * Normal race screen (3D animated scene mode = non "blind" mode)
  */
 static void
+reIdle(void)
+{
+    // Do nothing.
+}
+
+static void
 reDisplay(void)
 {
     ReStateManage();
@@ -57,12 +64,16 @@ reDisplay(void)
 static void
 reScreenActivate(void * /* dummy */)
 {
-    glutDisplayFunc(reDisplay);
+    // Set a real idle function (other than 0) doing nothing, 
+    // otherwise sdlMainLoop will replace it by a SDL_Delay(1ms)
+    sdlIdleFunc(reIdle);
+
+    sdlDisplayFunc(reDisplay);
 
     if ((ReInfo->s->_raceState & RM_RACE_PAUSED) == 0) {
 	ReStart(); 			/* resynchro */
     }
-    glutPostRedisplay();
+    sdlPostRedisplay();
 }
 
 static void
@@ -93,8 +104,9 @@ reMovieCapture(void * /* dummy */)
 {
    tRmMovieCapture	*capture = &(ReInfo->movieCapture);
 
-    if (!capture->enabled || (ReInfo->_displayMode == RM_DISP_MODE_NONE)) {
-	GfOut("Video Capture Mode Not Enabled\n");
+    if (!capture->enabled || ReInfo->_displayMode == RM_DISP_MODE_NONE || ReInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
+    {
+	GfOut("Warning: Video capture mode not enabled\n");
 	return;
     }
     
@@ -113,27 +125,30 @@ reMovieCapture(void * /* dummy */)
 
 }
 
-
+static void
+reHideShowMouseCursor(void * /* dummy */)
+{
+    GfuiMouseToggleVisibility();
+}
 
 static void
 reAddKeys(void)
 {
-    GfuiAddSKey(reScreenHandle, GLUT_KEY_F1,        "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(reScreenHandle, GLUT_KEY_F12,       "Screen Shot", NULL, GfuiScreenShot, NULL);
-
+    GfuiAddSKey(reScreenHandle, GFUIK_F1,        "Help", reScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(reScreenHandle, GFUIK_F12,       "Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiAddKey(reScreenHandle, '-', "Slow Time",         (void*)0, ReTimeMod, NULL);
     GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, ReTimeMod, NULL);
     GfuiAddKey(reScreenHandle, '.', "Real Time",         (void*)2, ReTimeMod, NULL);
     GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
-    GfuiAddKey(reScreenHandle, 27,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
+    GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
     /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
     GfuiAddKey(reScreenHandle, ' ', "Skip Pre Start",    (void*)0, reSkipPreStart, NULL);
 #ifdef DEBUG
     //GfuiAddKey(reScreenHandle, '0', "One step simulation",    (void*)1, reOneStep, NULL);
 #endif
     GfuiAddKey(reScreenHandle, 'c', "Movie Capture",      (void*)0, reMovieCapture, NULL);
-    
+    GfuiAddKey(reScreenHandle, 'o', "Hide / Show mouse cursor",      (void*)0, reHideShowMouseCursor, NULL);
 }
 
 
@@ -256,19 +271,23 @@ static int	reCurLine;
 static void
 reAddResKeys(void)
 {
-    GfuiAddSKey(reResScreenHdle, GLUT_KEY_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(reResScreenHdle, GLUT_KEY_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(reResScreenHdle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(reResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reResScreenHdle, 27,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
+    GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
     /* GfuiAddKey(reResScreenHdle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
 }
 
 static void
 reResScreenActivate(void * /* dummy */)
 {
-    glutDisplayFunc(reDisplay);
+    // Set a real idle function (other than 0) doing nothing, 
+    // otherwise sdlMainLoop will replace it by a SDL_Delay(1ms)
+    sdlIdleFunc(reIdle);
+
+    sdlDisplayFunc(reDisplay);
     GfuiDisplay();
-    glutPostRedisplay();
+    sdlPostRedisplay();
 }
 
 
@@ -276,7 +295,7 @@ static void
 reContDisplay(void)
 {
     GfuiDisplay();
-    glutPostRedisplay();
+    sdlPostRedisplay();
 }
 
 
@@ -434,10 +453,10 @@ ReResShowCont(void)
 		     0, 0, reResCont,
 		     NULL, (tfuiCallback)NULL,
 		     (tfuiCallback)NULL);
-    GfuiAddKey(reResScreenHdle, 13,  "Continue", 0, reResCont, NULL);
-    GfuiAddKey(reResScreenHdle, 27,  "Continue", 0, reResCont, NULL);
+    GfuiAddKey(reResScreenHdle, GFUIK_RETURN,  "Continue", 0, reResCont, NULL);
+    GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, reResCont, NULL);
 
-    glutDisplayFunc(reContDisplay);
-    glutPostRedisplay();
+    sdlDisplayFunc(reContDisplay);
+    sdlPostRedisplay();
 }
 

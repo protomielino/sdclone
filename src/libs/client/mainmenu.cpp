@@ -19,6 +19,7 @@
 
 
 #include <stdio.h>
+
 #include <tgfclient.h>
 #include <singleplayer.h>
 #include <driverconfig.h>
@@ -29,17 +30,18 @@
 #include "creditsmenu.h"
 
 
-void *menuHandle = NULL;
-tModList *RacemanModLoaded = (tModList*)NULL;
+void *MenuHandle = 0;
+
+tModList *RacemanModLoaded = 0;
 
 static void
 PlayerConfigActivate(void * /* dummy */)
 {
-    /* Here, we need to call OptionOptionInit each time the firing button
+   /* Here, we need to call OptionOptionInit each time the firing button
        is pressed, and not only once at the Main menu initialization,
        because the previous menu has to be saved (ESC, Back) and because it can be this menu,
        as well as the Raceman menu */
-    GfuiScreenActivate(DriverMenuInit(menuHandle));
+    GfuiScreenActivate(DriverMenuInit(MenuHandle));
 }
 
 static void
@@ -55,7 +57,7 @@ MainMenuActivate(void * /* dummy */)
  *	MainMenuInit
  *
  * Description
- *	init the main menus
+ *	init the main menu
  *
  * Parameters
  *	none
@@ -70,43 +72,47 @@ MainMenuActivate(void * /* dummy */)
 int
 MainMenuInit(void)
 {
-    menuHandle = GfuiScreenCreateEx((float*)NULL, 
+    // Initialize only once.
+    if (MenuHandle)
+        return 0;
+
+    MenuHandle = GfuiScreenCreateEx((float*)NULL, 
 				    NULL, MainMenuActivate, 
 				    NULL, (tfuiCallback)NULL, 
 				    1);
 
-    void *param = LoadMenuXML("welcomemenu.xml");
+    void *menuDescHdle = LoadMenuXML("welcomemenu.xml");
 
-    CreateStaticControls(param,menuHandle);
+    CreateStaticControls(menuDescHdle,MenuHandle);
 
     //Add buttons and create based on xml
-    CreateButtonControl(menuHandle,param,"race",ReSinglePlayerInit(menuHandle), GfuiScreenActivate);
-    CreateButtonControl(menuHandle,param,"configure",NULL,PlayerConfigActivate);
-    CreateButtonControl(menuHandle,param,"options",OptionOptionInit(menuHandle),GfuiScreenActivate);
-    CreateButtonControl(menuHandle,param,"credits",menuHandle,CreditsScreenActivate);
-    void* exitMenu = MainExitMenuInit(menuHandle);
-    CreateButtonControl(menuHandle,param,"quit",exitMenu, GfuiScreenActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "race", ReSinglePlayerInit(MenuHandle), GfuiScreenActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, PlayerConfigActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "options",OptionOptionInit(MenuHandle), GfuiScreenActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "credits", MenuHandle, CreditsScreenActivate);
+    void* exitMenu = MainExitMenuInit(MenuHandle);
+    CreateButtonControl(MenuHandle, menuDescHdle, "quit", exitMenu, GfuiScreenActivate);
 
-    GfParmReleaseHandle(param);
+    GfParmReleaseHandle(menuDescHdle);
 
-    GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddKey(menuHandle, (unsigned char)27, "Quit Game", 
-	       exitMenu, GfuiScreenActivate, NULL);
+    GfuiMenuDefaultKeysAdd(MenuHandle);
+    GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit Game", exitMenu, GfuiScreenActivate, NULL);
 
     return 0;
 }
+
 /*
  * Function
- *	
+ *	MainMenuRun
  *
  * Description
- *	
+ *	Activate the main menu
  *
  * Parameters
- *	
+ *	none
  *
  * Return
- *	
+ *	0 ok -1 nok
  *
  * Remarks
  *	
@@ -114,6 +120,6 @@ MainMenuInit(void)
 int
 MainMenuRun(void)
 {
-    GfuiScreenActivate(menuHandle);
+    GfuiScreenActivate(MenuHandle);
     return 0;
 }

@@ -3,7 +3,7 @@
     file                 : grcarlight.cpp
     created              : Fri Mar 22 23:16:44 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id: grcarlight.cpp,v 1.8.2.3 2008/08/28 23:24:54 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,34 +20,17 @@
 // Control nbr of draws: Set to 4
 // Deleted unused code
 
-#include <math.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <stdio.h>
-#include <ctype.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <GL/glut.h>
+
 #include <plib/ssg.h>
 
-#include <tgfclient.h>
-#include <track.h>
-#include <car.h>
-#include <graphic.h>
-#include <robottools.h>
-
-#include "grmain.h"
-#include "grshadow.h"
-#include "grskidmarks.h"
-#include "grsmoke.h"
-#include "grcar.h"
-#include "grcam.h"
-#include "grscene.h"
-#include "grboard.h"
-#include "grssgext.h"
-#include "grutil.h"
 #include "grcarlight.h"
+#include "grmain.h"
+#include "grcar.h"		//grCarInfo
+#include "grscene.h"	//CarlightAnchor
+#include "grutil.h"
 
 #ifdef DMALLOC
 #include "dmalloc.h"
@@ -322,7 +305,7 @@ void grInitCarlight(int index)
 }
 
 
-void grShudownCarlight(void)
+void grShutdownCarlight(void)
 {
 	CarlightAnchor->removeAllKids();
 	CarlightCleanupAnchor->removeAllKids();

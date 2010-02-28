@@ -24,7 +24,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <cstring>
+
 #include <tgfclient.h>
 #include <robot.h>
 #include <portability.h>
@@ -130,15 +130,14 @@ AIMenuInit(void *prevMenu)
     CreateButtonControl(ScrHandle,param,"accept",prevMenu,SaveSkillLevel);
     CreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
-
     GfParmReleaseHandle(param);
     
-    GfuiAddKey(ScrHandle, 13, "Save", NULL, SaveSkillLevel, NULL);
-    GfuiAddKey(ScrHandle, 27, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_RIGHT, "Next Skill Level", (void*)+1, ChangeSkillLevel, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, SaveSkillLevel, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_RIGHT, "Next Skill Level", (void*)+1, ChangeSkillLevel, NULL);
 
     return ScrHandle;  
 }

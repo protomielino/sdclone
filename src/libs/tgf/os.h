@@ -47,7 +47,7 @@ typedef struct {
 } tGfOs;
 
 #ifdef WIN32
-#ifdef TGF_EXPORTS
+#ifdef tgf_EXPORTS
 __declspec(dllexport)
 #else // TGF_EXPORTS
 __declspec(dllimport)

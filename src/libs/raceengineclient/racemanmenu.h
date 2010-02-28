@@ -28,6 +28,8 @@
 
 extern int ReRacemanMenu(void);
 extern int ReNewTrackMenu(void);
+extern void reConfigureMenu(void * /* dummy */);
+extern void SetRacemanMenuHandle( void * handle);
 
 #endif /* _RACEMANMENU_H_ */ 
 

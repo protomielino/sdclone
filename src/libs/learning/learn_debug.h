@@ -1,7 +1,7 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include <learning/real.h>
+#include "real.h"
 
 #ifdef _MSC_VER
 #define Serror   printf("# ERROR (%s:  %d) ", __FILE__, __LINE__); printf

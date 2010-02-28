@@ -1,5 +1,32 @@
+/*
+ *      grsmoke.h
+ *      
+ *			Created              : Fri Mar 22 23:17:54 CET 2002
+ *			Copyright: (C) 2001 by Christophe Guionneau
+ *      
+ *      This program is free software; you can redistribute it and/or modify
+ *      it under the terms of the GNU General Public License as published by
+ *      the Free Software Foundation; either version 2 of the License, or
+ *      (at your option) any later version.
+ *      
+ *      This program is distributed in the hope that it will be useful,
+ *      but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *      GNU General Public License for more details.
+ *      
+ *      You should have received a copy of the GNU General Public License
+ *      along with this program; if not, write to the Free Software
+ *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ *      MA 02110-1301, USA.
+ * 
+ * 			$Id$
+ * 
+ */
+
 #ifndef _GRSMOKE_H_
 #define _GRSMOKE_H_
+
+#include <list>
 
 #define SMOKE_INIT_SIZE 0.2f
 #define MAX_SMOKE_LIFE  120
@@ -11,6 +38,7 @@
 #define V_EXPANSION 0.4f
 #define SMOKE_TYPE_TIRE   1
 #define SMOKE_TYPE_ENGINE 2
+#define RAIN 0
 
 class ssgVtxTableSmoke : public ssgVtxTable
 {
@@ -18,6 +46,7 @@ protected:
   virtual void copy_from ( ssgVtxTableSmoke *src, int clone_flags ) ;
   
 public:
+	inline bool isAlive() const {return cur_life < max_life;}
   double max_life;
   double step0_max_life;
   double step1_max_life;
@@ -71,27 +100,23 @@ public:
   virtual int save ( FILE *fd )  {return  ssgVtxTable::save(fd);}
 };
 
-typedef struct tgrSmoke_st
+
+class cSmokeDef;
+
+class cGrSmoke
 {
-  ssgVtxTableSmoke * smoke;
-  tgrSmoke_st * next ;
-}tgrSmoke;
-
-typedef struct 
-{
-  tgrSmoke * smokeList;
-  int number;
-}tgrSmokeManager;
+public:
+	bool Add(tCarElt* car, const int i, const double t, int smokeType,
+		const cSmokeDef *sd);
+	void Update(const double t);
+	
+  ssgVtxTableSmoke *smoke;
+};
 
 
-extern void grInitSmoke(int index);
-extern void grAddSmoke(tCarElt *car, double t);
-extern void grUpdateSmoke(double t);
-extern void grShutdownSmoke ();
+extern void grInitSmoke(const int index);
+extern void grAddSmoke(tCarElt *car, const double t);
+extern void grUpdateSmoke(const double t);
+extern void grShutdownSmoke();
 
-extern int grSmokeMaxNumber;
-extern double grSmokeDeltaT;
-extern double grSmokeLife;
-
-
-#endif /* _GRSMOKE_H_*/
+#endif //_GRSMOKE_H_

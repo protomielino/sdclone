@@ -31,8 +31,9 @@
 #endif
 #endif
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "version.h"
 #endif
+
 #include "tgfclient.h"
 #include "gui.h"
 
@@ -104,9 +105,9 @@ GfuiHelpScreen(void *prevScreen)
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Add keyboard shortcuts.
-    GfuiAddKey(scrHandle, (unsigned char)27, "", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddKey(scrHandle, (unsigned char)13, "", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddSKey(scrHandle, GLUT_KEY_F1, "", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddKey(scrHandle, GFUIK_RETURN, "", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddSKey(scrHandle, GFUIK_F1, "", prevScreen, GfuiScreenReplace, NULL);
 
     GfuiMenuDefaultKeysAdd(scrHandle);
 

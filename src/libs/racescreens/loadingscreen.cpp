@@ -59,7 +59,7 @@ rmDeativate(void * /* dummy */)
 void
 RmLoadingScreenStart(const char *title, const char *bgimg)
 {
-    int		i;
+    int unsigned i;
     int		y;
 
     if (GfuiScreenIsActive(MenuHandle)) {

@@ -22,13 +22,13 @@
 #define HAVE_CONFIG_H
 #endif
 #endif
-
 #include <stdio.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
+#include "version.h"
 #endif
-
+#include <SDL/SDL.h>
 #include <tgfclient.h>
 
 #include "splash.h"
@@ -38,11 +38,12 @@ static int s_imgWidth, s_imgHeight; // Real image size (from image file).
 static int s_imgPow2Width, s_imgPow2Height; // Smallest possible containing 2^N x 2^P.
 static GLuint s_texture = 0;
 static int SplashDisplaying;
+static int SplashTimedOut;
 static char buf[1024];
 
 /*
  * Function
- *	splashKey
+ *	splashClose
  *
  * Description
  *	Close the splash screen and start main menu
@@ -56,7 +57,7 @@ static char buf[1024];
  * Remarks
  *	
  */
-static void splashKey( unsigned char /* key */, int /* x */, int /* y */)
+static void splashClose()
 {
 	SplashDisplaying = 0;
 	glDeleteTextures(1, &s_texture);
@@ -66,7 +67,33 @@ static void splashKey( unsigned char /* key */, int /* x */, int /* y */)
 
 /*
  * Function
+ *	splashIdle
+ *
+ * Description
+ *	Called by main loop when nothing to do : 
+ *  check if spash screen must be closed and close it if so.
+ *
+ * Parameters
  *	
+ *
+ * Return
+ *	
+ *
+ * Remarks
+ *	
+ */
+static void splashIdle()
+{
+	// A kind of background main menus loading (as it may me a bit long).
+	MainMenuInit();
+
+	if (SplashTimedOut)
+		splashClose();
+}
+
+/*
+ * Function
+ *	splashKey
  *
  * Description
  *	
@@ -80,14 +107,32 @@ static void splashKey( unsigned char /* key */, int /* x */, int /* y */)
  * Remarks
  *	
  */
+static void splashKey(int /* unicode */, int /* modifiers */, int /* x */, int /* y */)
+{
+	splashClose();
+}
+
+/*
+ * Function
+ *	splashTimer
+ *
+ * Description
+ *	End of splash timer callback : can't close spash screen itself, as not run under the control
+ *  of the thread that created it
+ *
+ * Parameters
+ *	None
+ *
+ * Return
+ *	None
+ *
+ * Remarks
+ *	
+ */
 static void splashTimer(int /* value */)
 {
-	if (SplashDisplaying) {
-		SplashDisplaying = 0;
-		glDeleteTextures(1, &s_texture);
-		s_texture = 0;
-		MainMenuRun();
-	}
+	if (SplashDisplaying) 
+		SplashTimedOut = 1;
 }
 	
 
@@ -112,6 +157,7 @@ static void splashDisplay( void )
 	int ScrW, ScrH, ViewW, ViewH;
 	
 	SplashDisplaying = 1;
+	SplashTimedOut = 0;
 		
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
@@ -177,19 +223,17 @@ static void splashDisplay( void )
 	gluOrtho2D(0, 640, 0, 480);
 	
 	static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
-	GfuiPrintString(VERSION, grWhite, GFUI_FONT_SMALL_C, 640-8, 8, GFUI_ALIGN_HR_VB);
+	GfuiPrintString(VERSION_LONG, grWhite, GFUI_FONT_SMALL_C, 640-8, 8, GFUI_ALIGN_HR_VB);
 #endif
 
-	glutSwapBuffers();
+	sdlSwapBuffers();
 }
 
 static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
 {
-	if (s == GLUT_UP) {
-		SplashDisplaying = 0;
-		glDeleteTextures(1, &s_texture);
-		s_texture = 0;
-		MainMenuRun();
+	if (s == SDL_RELEASED) 
+	{
+		splashClose();
 	}
 }
 
@@ -214,7 +258,8 @@ int SplashScreen(void)
 {
 	void	*handle;
 	float	screen_gamma;
-	const char	*filename = "data/img/splash.png";
+	//const char	*filename = "data/img/splash.png";
+	const char	*filename = "data/img/splash.jpg";
 	
 	if (s_texture != 0) 
 	{
@@ -224,7 +269,9 @@ int SplashScreen(void)
 	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
 	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);	
-	GLbyte *tex = (GLbyte*)GfImgReadPng(filename, &s_imgWidth, &s_imgHeight, screen_gamma, &s_imgPow2Width, &s_imgPow2Height);
+	// TODO: Add a new GfTexRead function for implicit image format (use file extension to decide)
+  //GLbyte *tex = (GLbyte*)GfTexReadPng(filename, &s_imgWidth, &s_imgHeight, screen_gamma, &s_imgPow2Width, &s_imgPow2Height);
+	GLbyte *tex = (GLbyte*)GfTexReadJpeg(filename, &s_imgWidth, &s_imgHeight, screen_gamma, &s_imgPow2Width, &s_imgPow2Height);
 	if (!tex) 
 	{
 		GfParmReleaseHandle(handle);
@@ -236,14 +283,16 @@ int SplashScreen(void)
 	glBindTexture(GL_TEXTURE_2D, s_texture);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s_imgPow2Width, s_imgPow2Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s_imgWidth, s_imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, s_imgWidth, s_imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
 	free(tex);
 	
-	glutDisplayFunc(splashDisplay);
-	glutKeyboardFunc(splashKey);
-	glutSpecialFunc((void (*)(int key, int x, int y))NULL);
-	glutTimerFunc(7000, splashTimer, 0);
-	glutMouseFunc(splashMouse);
+	sdlDisplayFunc(splashDisplay);
+	sdlKeyboardFunc(splashKey);
+	sdlSpecialFunc(0);
+	sdlTimeDelayedFunc(7000, splashTimer);
+	sdlMouseFunc(splashMouse);
+	sdlIdleFunc(splashIdle);
     
 	return 0;
 }

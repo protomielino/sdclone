@@ -4,14 +4,14 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: CarSoundData.h,v 1.2 2005/07/02 14:01:33 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
 #ifndef CAR_SOUND_DATA_H
 #define CAR_SOUND_DATA_H
 
-#include <vector>
+//#include <vector>
 
 #include "QSoundChar.h"
 

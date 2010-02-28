@@ -33,7 +33,10 @@ typedef void (*tfSimInit)(int, tTrack*);
 typedef void (*tfSimConfig)(tCarElt*, struct RmInfo*);
 typedef void (*tfSimReConfig)(tCarElt*);
 typedef void (*tfSimUpdate)(struct Situation*, double, int);
+typedef void (*tfSimSingleUpdate)(int index,double deltaTime, struct Situation* s);
 typedef void (*tfSimShutdown)(void);
+typedef void (*tfUpdateSimCarTable)(tDynPt DynGCG,int index);
+typedef tDynPt* (*tfGetSimCarTable)(int index);
 
 typedef struct
 {
@@ -41,7 +44,11 @@ typedef struct
     tfSimConfig   config;
     tfSimReConfig reconfig;
     tfSimUpdate   update;
+	tfSimSingleUpdate   singleupdate;
     tfSimShutdown shutdown;
+	tfUpdateSimCarTable updatesimcartable;
+	tfGetSimCarTable getsimcartable;
+
 } tSimItf;
 
 

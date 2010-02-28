@@ -21,11 +21,12 @@
 #include <stdlib.h>
 #include <cstring>
 #include <deque>
-#include <string>
+
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
 #include <playerpref.h>
+#include <gui.h>
 
 #include "controlconfig.h"
 #include "driverconfig.h"
@@ -373,6 +374,7 @@ GenCarsInfo(void)
 	    curCar = (tCarInfo*)calloc(1, sizeof(tCarInfo));
 	    curCar->info.name = strdup(curFile->name);
 	    curCar->info.dispname = GfParmGetName(carparam);
+
 	    /* search for the category */
 	    const char *str = GfParmGetStr(carparam, SECT_CAR, PRM_CATEGORY, "");
 	    curCat = GF_TAILQ_FIRST(&CatsInfoList);
@@ -463,9 +465,10 @@ PutDrvSettings(unsigned index)
     GfParmSetNum(PrefHdle, drvSectionPath, HM_ATT_NBPITS, (char*)NULL, (tdble)player->nbPitStops());
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_AUTOREVERSE, Yn[player->autoReverse()]);
     
-    /* Allow neutral gear in sequential mode if no reverse gear command defined */
+    /* Allow neutral gear in sequential mode if nor reverse nor neutral gear command defined */
     if (player->gearChangeMode() == GEAR_MODE_SEQ
-	&& !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_R, "-"), "-"))
+	&& (!strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_R, "-"), "-")
+	    || !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_N, "-"), "-")))
         GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_YES);
     else
         GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_NO);
@@ -1023,12 +1026,12 @@ DriverMenuInit(void *prevMenu)
     /* Player name editbox */
     NameEditId = CreateEditControl(ScrHandle,param,"nameedit",NULL,NULL,ChangeName);
 
-    /* Player skill level and associated "combobox" (left arrow, label, right arrow) */
+    /* Player skill level "combobox" (left arrow, label, right arrow) */
     CreateButtonControl(ScrHandle,param,"levelleftarrow",(void*)0, ChangeLevel);
     CreateButtonControl(ScrHandle,param,"levelrightarrow",(void*)1, ChangeLevel);
     SkillEditId = CreateLabelControl(ScrHandle,param,"skillstext");
 
-    /* Race and Pit number editboxes */
+    /* Races and pits numbers editboxes */
     RaceNumEditId = CreateEditControl(ScrHandle,param,"racenumedit",NULL,NULL,ChangeNum);
     PitsEditId = CreateEditControl(ScrHandle,param,"pitstopedit",NULL,NULL,ChangePits);
     
@@ -1061,14 +1064,14 @@ DriverMenuInit(void *prevMenu)
     GfParmReleaseHandle(param);
     
     // Register keyboard shortcuts.
-    GfuiAddKey(ScrHandle, 13 /* Return */, "Save Drivers", NULL, SaveDrvList, NULL);
-    GfuiAddKey(ScrHandle, 27 /* Escape */, "Cancel Selection", NULL, QuitDriverConfig, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_UP, "Previous Car Category", (void*)0, ChangeCat, NULL);
-    GfuiAddSKey(ScrHandle, GLUT_KEY_DOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
+    GfuiAddKey(ScrHandle,  GFUIK_RETURN, "Save Drivers", NULL, SaveDrvList, NULL);
+    GfuiAddKey(ScrHandle,  GFUIK_ESCAPE, "Cancel Selection", NULL, QuitDriverConfig, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_UP, "Previous Car Category", (void*)0, ChangeCat, NULL);
+    GfuiAddSKey(ScrHandle, GFUIK_DOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
 
     return ScrHandle;
 }

@@ -28,6 +28,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="1">
@@ -40,6 +41,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
 	  
@@ -53,6 +55,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="3">
@@ -65,6 +68,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="4">
@@ -77,6 +81,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="5">
@@ -89,6 +94,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="6">
@@ -101,6 +107,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="7">
@@ -113,6 +120,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="8">
@@ -125,6 +133,7 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
 	  
 	  <section name="9">
@@ -137,7 +146,35 @@
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
 		  <attnum name="blue" val="1.0"/>
+		  <attstr name="features" val="timed_session"></attstr>
 	  </section>
+    </section>
+    <section name="arbitrary cars">
+      <attstr name="team" val="berniw"></attstr>
+      <attstr name="author" val="Bernhard Wymann"></attstr>
+      <attnum name="race number" val="71"></attnum>
+      <attnum name="red" val="1.0"></attnum>
+      <attnum name="green" val="0.0"></attnum>
+      <attnum name="blue" val="1.0"></attnum>
+      <attstr name="features" val="timed_session"></attstr>
+
+      <section name="cars">
+        <section name="1">
+	  <attstr name="car name" val="cg-nascar-rwd" />
+	</section>
+	<section name="2">
+	  <sttstr name="car name" val="155-DTM" />
+	</section>
+	<section name="3">
+	  <attstr name="car name" val="mclaren-f1" />
+	</section>
+	<section name="4">
+	  <attstr name="car name" val="clkdtm" />
+	</section>
+	<section name="5">
+	  <attstr name="car name" val="xj-220" />
+	</section>
+      </section>
     </section>
   </section>
 </params>

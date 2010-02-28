@@ -29,7 +29,7 @@
 #define _TRACKV1_H_
 
 #include <tgf.h>
-#include <tmath/linalg_t.h>
+#include <linalg_t.h>
 
 #define TRK_IDENT	0	/* from 0x01 to 0xFF */
 
@@ -41,6 +41,10 @@
 #define TRK_ATT_SURF	"surface"
 #define TRK_ATT_NAME	"name"
 #define TRK_ATT_VERSION	"version"
+#define TRK_ATT_SKY		"sky version"
+#define TRK_ATT_RAINPROB "Rain"
+#define TRK_ATT_PROBLRAIN "Little Rain"
+#define TRK_ATT_PROBRAIN "Normal Rain"
 #define TRK_ATT_AUTHOR	"author"
 #define TRK_ATT_DESCR	"description"
 #define TRK_ATT_CAT     "category"
@@ -48,12 +52,34 @@
 #define TRK_SECT_GRAPH	"Graphic"
 
 #define TRK_ATT_3DDESC	"3d description"
+#define TRK_ATT_3DDESC2 "3d description rain"
+#define TRK_ATT_3DDESC3 "3d description night"
+#define TRK_ATT_3DDESC4 "3d description rain+night"
 #define TRK_ATT_BKGRND	"background image"
 #define TRK_ATT_BKGRND2	"background image2"
 #define TRK_ATT_BGTYPE	"background type"
 #define TRK_ATT_BGCLR_R	"background color R"
 #define TRK_ATT_BGCLR_G	"background color G"
 #define TRK_ATT_BGCLR_B	"background color B"
+#define TRK_ATT_HOUR	"Hour"
+#define TRK_ATT_SUN_H	"Sun horizontal"
+#define TRK_ATT_CLOUDTYPE	"Cloud Type"
+#define TRK_ATT_RAIN	"Rain"
+
+#define TRK_SECT_TRACKLIGHTS	"Track Lights"
+#define TRK_ATT_ROLE    "role"
+#define TRK_SECT_TOPLEFT	"topleft"
+#define TRK_SECT_BOTTOMRIGHT	"bottomright"
+#define TRK_ATT_X	"x"
+#define TRK_ATT_Y	"y"
+#define TRK_ATT_Z	"z"
+#define TRK_ATT_TEXTURE_ON	"texture on"
+#define TRK_ATT_TEXTURE_OFF	"texture off"
+#define TRK_ATT_INDEX	"index"
+#define TRK_ATT_RED	"red"
+#define TRK_ATT_GREEN	"green"
+#define TRK_ATT_BLUE	"blue"
+
 #define TRK_LST_ENV	"Environment Mapping"
 #define TRK_ATT_ENVNAME	"env map image"
 #define TRK_ATT_SPEC_R	"specular color R"
@@ -107,6 +133,8 @@
 #define TRK_ATT_ROUGHTWL "roughness wavelength"
 #define TRK_ATT_DAMMAGE  "dammage"
 #define TRK_ATT_REBOUND  "rebound"
+#define TRK_ATT_FRICTION2 "friction rain"
+#define TRK_ATT_ROLLRES2  "rolling resistance rain"
 #define TRK_ATT_TEXTURE  "texture name"
 #define TRK_ATT_BUMPNAME "bump name"
 #define TRK_ATT_TEXTYPE  "texture type"
@@ -208,6 +236,9 @@
 #define TRK_VAL_GRASS		"grass"
 #define TRK_VAL_SAND		"sand"
 #define TRK_VAL_DIRT		"dirt"
+#define TRK_VAL_MUD		"mud"
+#define TRK_VAL_ICE		"ice"
+#define TRK_VAL_SNOW		"snow"
 #define TRK_VAL_BARRIER		"barrier"
 
 #define TRK_VAL_LINEAR		"linear"
@@ -215,6 +246,9 @@
 
 #define TRK_VAL_TANGENT		"tangent"
 #define TRK_VAL_LEVEL		"level"
+
+#define TRK_SECT_SECTORS	"Sectors"
+#define TRK_ATT_SECTOR_DFS	"distance from start"
 
 /** road camera */
 typedef struct RoadCam
@@ -239,8 +273,10 @@ typedef struct trackSurface {
     const char *material;	/**< Type of material used */
 
     tdble kFriction;		/**< Coefficient of friction */
+    tdble kFriction2;		/**< Coefficient of friction rain*/
     tdble kRebound;		/**< Coefficient of energy restitution */
     tdble kRollRes;		/**< Rolling resistance */
+    tdble kRollRes2;		/**< Rolling resistance rain*/
     tdble kRoughness;		/**< Roughtness in m of the surface (wave height) */
     tdble kRoughWaveLen;	/**< Wave length in m of the surface */
     tdble kDammage;		/**< Dammages in case of collision */
@@ -479,15 +515,44 @@ typedef struct
     tdble	vSpace;
 } tTurnMarksInfo;
 
+typedef struct GraphicLightInfo
+{
+    t3Dd topleft;
+    t3Dd bottomright;
+    char *onTexture;
+    char *offTexture;
+    int index;
+#define GR_TRACKLIGHT_START_RED 1
+#define GR_TRACKLIGHT_START_GREEN 2
+#define GR_TRACKLIGHT_START_GREENSTART 3
+#define GR_TRACKLIGHT_START_YELLOW 4
+#define GR_TRACKLIGHT_POST_YELLOW 5
+#define GR_TRACKLIGHT_POST_GREEN 6
+#define GR_TRACKLIGHT_POST_RED 7
+#define GR_TRACKLIGHT_POST_BLUE 8
+#define GR_TRACKLIGHT_POST_WHITE 9
+#define GR_TRACKLIGHT_PIT_RED 10
+#define GR_TRACKLIGHT_PIT_GREEN 11
+#define GR_TRACKLIGHT_PIT_BLUE 12
+    int role;
+    tdble red;
+    tdble green;
+    tdble blue;
+} tGraphicLightInfo;
+
 typedef struct 
 {
     const char		*background;
     const char		*background2;
     int			bgtype;
     float		bgColor[3];
+    float		sunpos1;
+    float		sunpos2;
     int			envnb;
     const char		**env;
     tTurnMarksInfo	turnMarksInfo;
+    int			nb_lights;
+    tGraphicLightInfo	*lights;
 } tTrackGraphicInfo;
 
 /** Track structure
@@ -501,8 +566,15 @@ typedef struct
     void	  *params;	/**< Parameters handle */
     char	  *internalname; /**< Internal name of the track */
     const char	  *category;	/**< Category of the track */
+    int		  weather;	/**< Cloud number */
+    int		  Timeday;   /**< time */
+    int		  Rain;
+    int		  rainprob;
+	int		  rainlprob; /** Probability little rain */
+	int		  probrain;	 /** Probability normal rain */
     int		  nseg;		/**< Number of segments */
     int		  version;	/**< Version of the track type */
+    int		  skyversion;   /**< Version Sky */
     tdble	  length;	/**< main track length */
     tdble	  width;	/**< main track width */
     tTrackPitInfo pits;		/**< Pits information */
@@ -512,6 +584,9 @@ typedef struct
     t3Dd		min;
     t3Dd		max;
     tTrackGraphicInfo	graphic;
+
+    int		numberOfSectors;	/**< Number of section. Every section is used for calculating split times */
+    double	*sectors;		/**< sectors[i] is the distance from start where sector i+1 ends and sector i starts */
 } tTrack;
 
 

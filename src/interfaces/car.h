@@ -79,6 +79,7 @@ typedef struct {
     int		raceNumber;		/**< Car's race number */
     int		startRank;		/**< Car's starting position */
     int		driverType;		/**< Driver type */
+	int     networkplayer;  /* Network player */
     int		skillLevel;		/**< Driver's skill level (0=rookie -> 3=pro) */
     tdble	iconColor[3];		/**< Car color in leaders board */
     t3Dd	dimension;		/**< Car's mesures */
@@ -96,6 +97,7 @@ typedef struct {
 #define _carName	info.carName			/**< short cut to tInitCar#carName */
 #define _category	info.category			/**< short cut to tInitCar#category */
 #define _driverType	info.driverType			/**< short cut to tInitCar#driverType */
+#define _networkPlayer info.networkplayer   /**< short cut to tInitCar#networkplayer*/
 #define _skillLevel	info.skillLevel			/**< short cut to tInitCar#skillLevel */
 #define _raceNumber	info.raceNumber			/**< short cut to tInitCar#raceNumber */
 #define _startRank	info.startRank			/**< short cut to tInitCar#startRank */
@@ -126,6 +128,8 @@ typedef struct {
 
 #define RM_PENALTY_DRIVETHROUGH	1
 #define RM_PENALTY_STOPANDGO	2
+#define RM_PENALTY_10SEC_STOPANDGO	3
+#define RM_PENALTY_DISQUALIFIED	4
 
 /** One penalty */
 typedef struct CarPenalty
@@ -140,8 +144,10 @@ GF_TAILQ_HEAD(CarPenaltyHead, struct CarPenalty);
 /** Race Administrative info */
 typedef struct {
     double		bestLapTime;
+    double*		bestSplitTime;
     double		deltaBestLapTime;
     double		curLapTime;
+    double*		curSplitTime;
     double		lastLapTime;
     double		curTime;
     tdble		topSpeed;
@@ -155,6 +161,7 @@ typedef struct {
     double		timeBeforeNext;
     tdble		distRaced;
     tdble		distFromStartLine;
+    int			currentSector;
     double		scheduledEventTime;
     tTrackOwnPit 	*pit;
     int			event;
@@ -162,8 +169,10 @@ typedef struct {
 } tCarRaceInfo;
 /* structure access */
 #define _bestLapTime		race.bestLapTime
+#define _bestSplitTime		race.bestSplitTime
 #define _deltaBestLapTime	race.deltaBestLapTime
 #define _curLapTime		race.curLapTime
+#define _curSplitTime		race.curSplitTime
 #define _curTime		race.curTime
 #define _lastLapTime		race.lastLapTime
 #define _topSpeed		race.topSpeed
@@ -177,6 +186,7 @@ typedef struct {
 #define _timeBeforeNext		race.timeBeforeNext
 #define _distRaced		race.distRaced
 #define _distFromStartLine	race.distFromStartLine
+#define _currentSector		race.currentSector
 #define _pit			race.pit
 #define _scheduledEventTime	race.scheduledEventTime
 #define _event			race.event
@@ -279,11 +289,23 @@ typedef struct tCollisionState_ {
 	sgVec3 force;
 } tCollisionState;
 
+typedef struct MemoryPoolItem tMemoryPoolItem;
+typedef tMemoryPoolItem* tMemoryPool;
+
+typedef struct MemPoolCar 
+{
+	tMemoryPool newTrack;
+	tMemoryPool newRace;
+	tMemoryPool endRace;
+	tMemoryPool shutdown;
+} tMemPoolCar;
+
 /** Data known only by the driver */
 typedef struct {
     void	*paramsHandle;	/**< accessible parameters for modules */
     void	*carHandle;	/**< parameters for car caracteristics */
     int		driverIndex;	/**< index when multiple drivers are in the same dll */
+	int	moduleIndex;	/**< index which is the same as the one in the files */
     char	modName[MAX_NAME_LEN];	/**< dll name */
     tWheelState	wheel[4];
     tPosd	corner[4];	/**< car's corners position */
@@ -310,11 +332,14 @@ typedef struct {
     int		dammage;
     int		debug;
 	tCollisionState collision_state; /**< collision state */
+    tMemPoolCar	memoryPool;
+    tdble       driveSkill;           /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
 } tPrivCar;
 /* structure access */
 #define _fuelTotal priv.fuel_consumption_total
 #define _fuelInstant priv.fuel_consumption_instant
 #define _driverIndex	priv.driverIndex
+#define _moduleIndex	priv.moduleIndex
 #define _paramsHandle	priv.paramsHandle
 #define _carHandle	priv.carHandle
 #define _modName	priv.modName
@@ -334,6 +359,12 @@ typedef struct {
 #define _skid		priv.skid
 #define _reaction	priv.reaction
 #define _dammage	priv.dammage
+#define _driveSkill	priv.driveSkill
+
+#define _newTrackMemPool	priv.memoryPool.shutdown
+#define _newRaceMemPool		priv.memoryPool.newRace
+#define _endRaceMemPool		priv.memoryPool.endRace
+#define _shutdownMemPool	priv.memoryPool.shutdown
 
 /** Info returned by driver during the race */
 typedef struct {

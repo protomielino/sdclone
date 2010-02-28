@@ -33,7 +33,6 @@
 #endif
 #include <math.h>
 #include <plib/ssg.h>
-#include <GL/glut.h>
 
 #include <tgfclient.h>
 #include <track.h>
@@ -459,7 +458,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 	sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, map);
 
 	printf("Processing object map %s\n", buf);
-	MapImage = GfImgReadPng(buf, &width, &height, 2.0, 0, 0);
+	MapImage = GfTexReadPng(buf, &width, &height, 2.0, 0, 0);
 	if (!MapImage) {
 	    return;
 	}

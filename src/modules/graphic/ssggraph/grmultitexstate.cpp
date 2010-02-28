@@ -3,7 +3,7 @@
     file                 : grmultitexstate.cpp
     created              : Fri Mar 22 23:16:44 CET 2002
     copyright            : (C) 2001 by Christophe Guionneau
-    version              : $Id: grmultitexstate.cpp,v 1.4 2004/11/26 15:37:47 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,12 +17,19 @@
  ***************************************************************************/
 
 #include <plib/ssg.h>
+
+#ifdef WIN32
+#include <GL/gl.h>
+#include <GL/glext.h>
+////// Multitexturing Info
+extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB ;
+#endif
+
 #include "grmultitexstate.h"
 
 #ifdef DMALLOC
 #include "dmalloc.h"
 #endif
-#include "grmain.h"
 
 void grMultiTexState::apply (int unit)
 {

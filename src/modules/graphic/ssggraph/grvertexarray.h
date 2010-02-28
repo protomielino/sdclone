@@ -1,3 +1,8 @@
+#ifndef _GRVTXARRAY_H
+#define _GRVTXARRAY_H
+
+#include <plib/ssg.h>	//ssgXXX
+
 class ssgGrVtxArray : public ssgVtxArray
 {
 protected:
@@ -35,11 +40,13 @@ public:
                              return (getNumIndices()<=0) ?
 				      &_ssgIndex0 : indices->get(i);}
 
-  virtual ~ssgVtxArray (void) ;
+  virtual ~ssgGrVtxArray (void) ;
 
-  virtual char *getTypeName(void) { return ssgVtxArray::getTypeName();}
+  virtual const char *getTypeName(void) { return ssgVtxArray::getTypeName();}
 
   virtual void print ( FILE *fd = stderr, char *indent = "", int how_much = 2 ) { ssgVtxArray::print(fd,indent,how_much);}
   virtual int load ( FILE *fd ) {return  ssgVtxArray::load(fd);}
   virtual int save ( FILE *fd ) {return  ssgVtxArray::save(fd);}
 } ;
+
+#endif //_GRVTXARRAY_H

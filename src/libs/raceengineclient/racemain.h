@@ -26,6 +26,7 @@
 #ifndef _RACEMAIN_H_
 #define _RACEMAIN_H_
 
+char        humanInGroup();
 extern int  ReRaceEventInit(void);
 extern int  RePreRace(void);
 extern int  ReRaceStart(void);

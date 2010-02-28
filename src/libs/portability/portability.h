@@ -22,6 +22,9 @@
 
 #include <stdlib.h>
 #include <cstring>
+#ifdef WIN32
+#include <direct.h>
+#endif
 
 #ifdef WIN32
 #ifndef HAVE_CONFIG_H
@@ -58,12 +61,22 @@ static char *strndup(const char *str, int len)
 
 #endif
 
+#ifdef __APPLE__
+#define isnan(x) ((x) != (x))
+#endif
+
 // Posix functions special names with MS compilers.
 #if defined(WIN32)
 
+#define isnan _isnan
+
 #define snprintf _snprintf
+
+//MSVC 2008 already has this
+#if _MSC_VER <= 1400
 #define vsnprintf _vsnprintf
 #define isnan _isnan
+#endif
 
 // For MSVC 2005 and newer
 #if _MSC_VER >= 1400
@@ -75,6 +88,10 @@ static char *strndup(const char *str, int len)
 #define strnicmp _strnicmp
 #define chdir _chdir
 #define getcwd _getcwd
+#ifdef mkdir
+#undef mkdir
+#endif
+#define mkdir(x) _mkdir(x)
 #endif
 
 #endif

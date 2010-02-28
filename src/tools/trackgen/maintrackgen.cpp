@@ -38,8 +38,8 @@
 #include <math.h>
 #include <plib/ul.h>
 #include <plib/ssg.h>
-#include <GL/glut.h>
 
+#include <SDL/SDL.h>
 #include <tgfclient.h>
 #include <track.h>
 
@@ -284,9 +284,18 @@ main(int argc, char **argv)
 
     init_args(argc, argv);
 
+    if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
+        printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+        return 0;
+	}
+	
 
-    glutInit(&argc, argv);
-    glutCreateWindow(argv[1]);
+
+    sdlInitCallbacks();
+    atexit(SDL_Quit);
+
+	SDL_WM_SetCaption(argv[1],NULL);
+
 
     ssgInit();
     

@@ -4,7 +4,7 @@
     created              : Tue Mar  6 23:15:19 CET 2001
     copyright            : (C) 2000 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: relief.cpp,v 1.6 2003/05/18 20:41:32 torcs Exp $
+    version              : $Id: relief.cpp,v 1.6 2006 18:15:18 torcs Exp $
 
  ***************************************************************************/
 
@@ -34,7 +34,6 @@
 #endif
 #include <math.h>
 #include <plib/ssg.h>
-#include <GL/glut.h>
 
 #include <tgfclient.h>
 #include <track.h>

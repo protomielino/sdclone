@@ -23,6 +23,7 @@
     @ingroup	screen
 */
 
+#include "network.h"
 #include <stdio.h>
 #include <cstring>
 #ifdef WIN32
@@ -35,7 +36,6 @@
 #include "config.h"
 #endif
 
-#include <GL/glut.h>
 #include <math.h>
 #ifndef WIN32
 #include <unistd.h>
@@ -43,15 +43,20 @@
 #include <process.h>
 #endif /* WIN32 */
 
-#include <tgfclient.h>
+#include <SDL/SDL.h>
+#include "tgfclient.h"
 #include <portability.h>
 #include "gui.h"
-#include "fg_gm.h"
+
 #include "glfeatures.h"
 
-//#ifndef WIN32
-//#define USE_RANDR_EXT
-//#endif // WIN32
+#ifdef HAVE_CONFIG_H
+#include "version.h"
+#endif
+
+#if defined(WIN32) || defined(__APPLE__)
+#undef USE_RANDR_EXT
+#endif // WIN32
 
 #ifdef USE_RANDR_EXT
 #include <GL/glx.h>
@@ -68,13 +73,9 @@ static int GfViewHeight;
 static int GfScrCenX;
 static int GfScrCenY;
 
+SDL_Surface *screenSurface = NULL;
 static void	*scrHandle = NULL;
 static char 	buf[1024];
-
-static int usedGM = 0;
-#if !defined(FREEGLUT) && !defined(WIN32)
-static int usedFG = 0;
-#endif
 
 /* Default list of resolutions in case no RANDR_EXT (Windows)
    or something went wrong during resolution detection */
@@ -119,7 +120,6 @@ static const char *DefRes[] =
 	"1792x1344",
 	"1800x1440",
 	"1920x1200" };
-
 static const int NbDefRes = sizeof(DefRes) / sizeof(DefRes[0]);
 
 #ifdef USE_RANDR_EXT
@@ -178,6 +178,7 @@ gfScreenInit(void)
 			int i, j, nsize;
 			XRRScreenSize *sizes = XRRConfigSizes(screenconfig, &nsize);
 
+			GfOut("X Supported resolutions :");
 			if (nsize > 0) {
 				// Force 320x200, 640x480, 800x600 to be available to the user,
 				// even if X did not report about.
@@ -187,6 +188,7 @@ gfScreenInit(void)
 				int add_modes = sizeof(check_resx)/sizeof(check_resx[0]);
 
 				for (i = 0; i < nsize; i++) {
+					GfOut(" %dx%d", sizes[i].width, sizes[i].height);
 					for (j = 0; j < 3; j++) {
 						if (!mode_in_list[j] && sizes[i].width == check_resx[j]) {
 							if (sizes[i].height == check_resy[j]) {
@@ -197,6 +199,7 @@ gfScreenInit(void)
 						}
 					}
 				}
+				GfOut("\n");
 
 				// Build the mode list, adding "forced" resolutions at the end if necessary.
 				const int bufsize = 20;
@@ -254,7 +257,10 @@ gfScreenInit(void)
 
 				nbRes = nsize + add_modes;
 
+			} else {
+				GfOut(" None !");
 			}
+			GfOut("\n");
 
 			XRRFreeScreenConfigInfo(screenconfig);
 		}
@@ -263,8 +269,8 @@ gfScreenInit(void)
 
 	if (Res == NULL || nbRes == 0) {
 		// We failed to get a handle to the display, so fill in some defaults.
-		GfError("Failed to initialize resolutions for display '%s' ; using defaults", 
-				XDisplayName(displayname));
+		GfOut("Failed to initialize resolutions for display '%s' ; using defaults", 
+			  XDisplayName(displayname));
 		nbRes = NbDefRes;
 		Res = (char **) malloc(sizeof(char *)*nbRes);
 		int i;
@@ -292,16 +298,17 @@ static void Reshape(int width, int height)
 
 void GfScrInit(int argc, char *argv[])
 {
-    int		Window;
     int		xw, yw;
     int		winX, winY;
     void	*handle;
     const char	*fscr;
     const char	*vinit;
-    int		fullscreen;
-    int		maxfreq;
-    int		i, depth;
+    SDL_Surface *icon;
 
+    int		maxfreq;
+    int		depth;
+
+    // Get graphical settings from config file.
     sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
     handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     xw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, 640);
@@ -310,170 +317,181 @@ void GfScrInit(int argc, char *argv[])
     winY = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, yw);
     depth = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, 32);
     maxfreq = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, 160);
+
+    fscr = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
+
+    vinit = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
+
+    // Initialize SDL.
+    if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
+        printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+        return;
+    }
+
+	NetworkInit();
+
+    // Initialize game interface to SDL.
+    sdlInitCallbacks();
+    atexit(SDL_Quit);
+
+	// Set window/icon captions
+	sprintf(buf, "Speed Dreams %s", VERSION_LONG);
+	SDL_WM_SetCaption(buf, buf);
+
+	// Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
+	// as BMP doesn't support transparency).
+	sprintf(buf, "%sdata/icons/icon.bmp", GetDataDir());
+	if ((icon = SDL_LoadBMP(buf)))
+	{
+	    SDL_SetColorKey(icon, SDL_SRCCOLORKEY, SDL_MapRGB(icon->format, 0, 0, 0));
+	    SDL_WM_SetIcon(icon, 0);
+	    SDL_FreeSurface(icon);
+	}
+
+	// Set full screen mode if required.
+	int videomode = SDL_OPENGL;
+	if (strcmp(fscr,"yes")==0)
+		videomode |= SDL_FULLSCREEN;
+ 
+	// Video initialization with best possible settings.
+	screenSurface = 0;
+	if (strcmp(vinit, GFSCR_VAL_VINIT_BEST) == 0) 
+	{
+		// TODO: Check for better than default multi-sampling level
+		//       through SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, level);
+		// Could not get it automatically detected till now.
+
+		/* Set the minimum requirements for the OpenGL window */
+		SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
+		SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
+		SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
+
+		// Try to get "best" videomode with default anti-aliasing support :
+		// 24 bit z-buffer with alpha channel.
+		SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
+		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
+		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
+		screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+
+		// Failed : try without anti-aliasing.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : try with anti-aliasing, but without alpha channel.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
+			SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : try without anti-aliasing, and without alpha channel.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : try 16 bit z-buffer and back with alpha channel and anti-aliasing.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
+			SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
+			SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : try without anti-aliasing.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : try with anti-aliasing, but without alpha channel.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
+			SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : try without anti-aliasing, and without alpha channel.
+		if (!screenSurface)
+		{
+			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
+			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		}
+
+		// Failed : Give up but say why.
+		if (!screenSurface)
+		{
+		  GfTrace("The minimum display requirements are not fulfilled.\n");
+		  GfTrace("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
+		}
+	}
+
+	// Video initialization with generic compatible settings.
+	if (!screenSurface)
+	{
+		GfTrace("Trying generic video initialization with requested resolution, fallback.\n\n");
+		screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+	}
+
+	// Failed : Try with a lower fallback resolution that should be supported everywhere ...
+	if (!screenSurface)
+	{
+	  GfError("Unable to get compatible video mode with requested resolution\n\n");
+		sscanf(DefRes[0], "%dx%d", &winX, &winY);
+		GfTrace("Trying generic video initialization with fallback resolution %dx%d.\n\n",
+				winX, winY);
+		screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+	}
+
+	// Failed : No way ... no more ideas !
+	if (!screenSurface)
+	{
+		GfFatal("Unable to get any compatible video mode (fallback resolution not supported)\n\n");
+		exit(1);
+	}
+
+	// Save view geometry and screen center.
     GfViewWidth = xw;
     GfViewHeight = yw;
     GfScrCenX = xw / 2;
     GfScrCenY = yw / 2;
 
-	// The fullscreen hack must be run before glutInit, such that glut gets the right screen size, etc.
-	fscr = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
-	fullscreen = 0;
-#if !defined(FREEGLUT) && !defined(WIN32)
-	if (strcmp(fscr, GFSCR_VAL_YES) == 0) {	// Resize the screen
-		GfOut ("Freeglut not detected :");
-		for (i = maxfreq; i > 59; i--) {
-			sprintf(buf, "%dx%d:%d@%d", winX, winY, depth, i);
-			GfOut("\n1 - Trying %s video mode : ", buf);
-			fglutGameModeString(buf);
-			if (fglutEnterGameMode()) {
-				GfTrace("\nOK for %s video mode\n", buf);
-				usedFG = 1;
-				break;
-			}
-		}
-		if (!usedFG)
-			GfError("\nCould not find any usable video mode\n");
-	}
-#endif
-
-	vinit = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
-
-	glutInit(&argc, argv);
-
-	// Depending on "video mode init" settings, try to get the best mode or try to get a mode in a safe way...
-	// This is a workaround for driver/glut/glx bug, which lies about the capabilites of the visual.
+	// Report video mode finally obtained.
+	int glAlpha, glDepth, glDblBuff, glMSamp, glMSampLevel;
+	SDL_GL_GetAttribute( SDL_GL_ALPHA_SIZE, &glAlpha );
+	SDL_GL_GetAttribute( SDL_GL_DEPTH_SIZE, &glDepth );
+	SDL_GL_GetAttribute( SDL_GL_DOUBLEBUFFER, &glDblBuff );
+	SDL_GL_GetAttribute( SDL_GL_MULTISAMPLEBUFFERS, &glMSamp );
+	SDL_GL_GetAttribute( SDL_GL_MULTISAMPLESAMPLES, &glMSampLevel );
 
 	GfTrace("Visual Properties Report\n");
 	GfTrace("------------------------\n");
+ 	GfTrace("Resolution    : %dx%dx%d\n", winX, winY, depth);
+ 	GfTrace("Double-buffer : %s", glDblBuff ? "Yes" : "No\n");
+	if (glDblBuff)
+		GfTrace(" (%d bits)\n", glDepth);
+ 	GfTrace("Alpha-channel : %s\n", glAlpha ? "Yes" : "No");
+ 	GfTrace("Anti-aliasing : %s", glMSamp ? "Yes" : "No\n");
+	if (glMSamp)
+		GfTrace(" (multi-sampling level %d)\n", glMSampLevel);
 
-	if (strcmp(vinit, GFSCR_VAL_VINIT_BEST) == 0) {
+	/* Give an initial size and position*/
+	sdlPostRedisplay();
+	sdlInitWindowPosition(0, 0);
+	sdlInitWindowSize(winX, winY);
+	Reshape(winX,winY);
+	sdlReshapeFunc( Reshape );
 
-		// Try to get "best" videomode, z-buffer >= 24bit, visual with alpha channel,
-		// antialiasing support.
-
-		int visualDepthBits = 24;
-		bool visualSupportsMultisample = true;
-		bool visualSupportsAlpha = true;
-
-		glutInitDisplayString("rgba double depth>=24 samples alpha");
-
-		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
-			// Failed, try without antialiasing support.
-			visualDepthBits = 24;
-			visualSupportsMultisample = false;
-			visualSupportsAlpha = true;
-			glutInitDisplayString("rgba double depth>=24 alpha");
-		}
-
-		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
-			// Failed, try without alpha channel.
-			visualDepthBits = 24;
-			visualSupportsMultisample = true;
-			visualSupportsAlpha = false;
-			glutInitDisplayString("rgb double depth>=24 samples");
-		}
-
-		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
-			// Failed, try without antialiasing and alpha support.
-			visualDepthBits = 24;
-			visualSupportsMultisample = false;
-			visualSupportsAlpha = false;
-			glutInitDisplayString("rgb double depth>=24");
-		}
-
-		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
-			// Failed, try without 24 bit z-Buffer and without antialiasing.
-			visualDepthBits = 16;
-			visualSupportsMultisample = false;
-			visualSupportsAlpha = true;
-			glutInitDisplayString("rgba double depth>=16 alpha");
-		}
-
-		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
-			// Failed, try without 24 bit z-Buffer, without antialiasing and without alpha.
-			visualDepthBits = 16;
-			visualSupportsMultisample = false;
-			visualSupportsAlpha = false;
-			glutInitDisplayString("rgb double depth>=16");
-		}
-
-		if (!glutGet(GLUT_DISPLAY_MODE_POSSIBLE)) {
-			// All failed.
-			GfTrace("The minimum display requirements are not fulfilled.\n");
-			GfTrace("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
-			// Try fallback as last resort.
-			GfTrace("Trying generic initialization, fallback.\n");
-			glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-		} else {
-			// We have got a mode, report the properties.
-			GfTrace("View size: %dx%d\n", winX, winY);
-			GfTrace("z-buffer depth: %d (%s)\n", visualDepthBits, visualDepthBits < 24 ? "bad" : "good");
-			GfTrace("multisampling : %s\n", visualSupportsMultisample ? "available" : "no");
-			GfTrace("alpha bits    : %s\n", visualSupportsAlpha ? "available" : "no");
-			if (visualDepthBits < 24) {
-				// Show a hint if the z-buffer depth is not optimal.
-				GfTrace("The z-buffer resolution is below 24 bit, you will experience rendering\n");
-				GfTrace("artefacts. Try to improve the setup of your graphics board or look\n");
-				GfTrace("for an alternate driver.\n");
-			}
-		}
-	} else {
-		// Compatibility mode.
-		glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-		GfTrace("View size: %dx%d\n", winX, winY);
-		GfTrace("Compatibility mode, other properties unknown.\n");
-	}
-
-
-	if (strcmp(fscr, GFSCR_VAL_YES) == 0) {
-		for (i = maxfreq; i > 59; i--) {
-			sprintf(buf, "%dx%d:%d@%d", winX, winY, depth, i);
-			glutGameModeString(buf);
-			GfOut("2 - Trying %s video mode\n", buf);
-			if (glutGameModeGet(GLUT_GAME_MODE_POSSIBLE)) {
-				GfOut("2- %s video mode available\n", buf);
-				glutEnterGameMode();
-				if (glutGameModeGet(GLUT_GAME_MODE_DISPLAY_CHANGED)) {
-					GfOut("OK for %s video mode\n", buf);
-					usedGM = 1;
-					fullscreen = 1;
-					break;
-				} else {
-					glutLeaveGameMode();
-				}
-			}
-		}
-		if (!usedGM)
-		  GfError("Could not find any usable video mode\n");
-
-	}
-
-	if (!fullscreen) {
-		/* Give an initial size and position so user doesn't have to place window */
-		glutInitWindowPosition(0, 0);
-		glutInitWindowSize(winX, winY);
-
-		/* Create the window (with a smart versioned title) */
-		sprintf(buf, "Speed Dreams %s", VERSION);
-		Window = glutCreateWindow(buf);
-		if (!Window) {
-			GfError("Error, couldn't open window\n");
-			GfScrShutdown();
-			exit(1);
-		}
-
-		/* Set a versioned title for iconified window */
-		glutSetIconTitle(buf);
-	}
-
-	if (!strcmp(fscr, GFSCR_VAL_YES) && !fullscreen) {
-		/* glutVideoResize(0, 0, winX, winY); */
-		glutFullScreen();
-	}
-
-    GfParmReleaseHandle(handle);
-
-    glutReshapeFunc( Reshape );
+	GfParmReleaseHandle(handle);
 
 	checkGLFeatures();
 }
@@ -484,15 +502,6 @@ void GfScrInit(int argc, char *argv[])
 */
 void GfScrShutdown(void)
 {
-    if (usedGM) {
-	glutLeaveGameMode();
-    }
-#if !defined(FREEGLUT) && !defined(WIN32)
-    if (usedFG) {
-	fglutLeaveGameMode();
-    }
-#endif
-
 #ifdef USE_RANDR_EXT
 	int i;
 	for (i = 0; i < nbRes; i++) {
@@ -519,6 +528,7 @@ void GfScrGetSize(int *scrw, int *scrh, int *vieww, int *viewh)
     *viewh = GfViewHeight;
 }
 
+// Save graphical settings to XML file.
 static void
 saveParams(void)
 {
@@ -544,7 +554,35 @@ saveParams(void)
 	GfParmWriteFile(NULL, paramHdle, "Screen");
 }
 
+// In-place convert internal file or dir path to an OS compatible path
+void makeOSPath(char* path)
+{
+#ifdef WIN32
+  size_t i;
+  for (i = 0; i < strlen(path); i++)
+	if (path[i] == '/')
+	  path[i] = '\\';
+#endif //WIN32 
+}
 
+
+// Build a new path string compatible with current OS and usable as a command line arg.
+char* buildPathArg(const char *path)
+{
+#ifdef WIN32
+  char *osPath = (char*)malloc(strlen(path)+3);
+  sprintf(osPath, "\"%s", path);
+  if (osPath[strlen(osPath)-1] == '/')
+    osPath[strlen(osPath)-1] = 0; // Remove trailing '/' for command line
+  strcat(osPath, "\"");
+#else
+  char *osPath = strdup(path);
+#endif //WIN32 
+  makeOSPath(osPath);
+  return osPath;
+}
+
+// Re-init screen to take new graphical settings into account (implies process restart).
 void
 GfScrReinit(void * /* dummy */)
 {
@@ -552,96 +590,99 @@ GfScrReinit(void * /* dummy */)
     static const int CMDSIZE = 1024;
     char cmd[CMDSIZE];
 
-#ifndef WIN32
-    const char	*arg[8];
-    int		curArg;
-#endif
+    char** args;
+    int	i, nArgs;
+    int	argInd;
 
     // Force current edit to loose focus (if one has it) and update associated variable.
     GfuiUnSelectCurrent();
 
+    // Save graphical settings.
     saveParams();
 
-#ifdef WIN32
-    snprintf(cmd, CMDSIZE, "%sspeed-dreams.exe", GetDataDir());
-    int i;
-    for (i = 0; i < CMDSIZE && cmd[i] != NULL; i++) {
-	if (cmd[i] == '/') {
-	    cmd[i] = '\\';
-	}
-    }
-    
-    char cmdarg[CMDSIZE];
-    strcpy(cmdarg, "speed-dreams.exe");
-    //snprintf(cmdarg, CMDSIZE, "speed-dreams.exe", GetDataDir());
-    for (i = 0; i < CMDSIZE && cmdarg[i] != NULL; i++) {
-	if (cmdarg[i] == '/') {
-	    cmdarg[i] = '\\';
-	}
-    }
-    
-    retcode = execlp(cmd, cmdarg, (const char *)NULL);
-#else
+    // Release screen allocated resources.
     GfScrShutdown();
 
-    sprintf (cmd, "%sspeed-dreams-bin", GetLibDir ());
-    memset (arg, 0, sizeof (arg));
-    curArg = 0;
-    if (GfuiMouseHW) {
-	arg[curArg++] = "-m";
-    }
-    
-    if (strlen(GetLocalDir ())) {
-	arg[curArg++] = "-l";
-	arg[curArg++] = GetLocalDir ();
-    }
-
-    if (strlen(GetLibDir ())) {
-	arg[curArg++] = "-L";
-	arg[curArg++] = GetLibDir ();
-    }
-
-    if (strlen(GetDataDir ())) {
-	arg[curArg++] = "-D";
-	arg[curArg++] = GetDataDir ();
-    }
-
-    switch (curArg) {
-    case 0:
-	retcode = execlp (cmd, cmd, (const char *)NULL);
-	break;
-    case 1:
-	retcode = execlp (cmd, cmd, arg[0], (const char *)NULL);
-	break;
-    case 2:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], (const char *)NULL);
-	break;
-    case 3:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], arg[2], (const char *)NULL);
-	break;
-    case 4:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], arg[2], arg[3], (const char *)NULL);
-	break;
-    case 5:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], arg[2], arg[3], arg[4], (const char *)NULL);
-	break;
-    case 6:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], (const char *)NULL);
-	break;
-    case 7:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], (const char *)NULL);
-	break;
-    case 8:
-	retcode = execlp (cmd, cmd, arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], (const char *)NULL);
-	break;
-    }
-
-
+    // Command name.
+    sprintf(cmd, "%sspeed-dreams", GetBinDir());
+#ifdef WIN32
+    strcat(cmd, ".exe");
 #endif
-    if (retcode) {
-	perror(cmd);
-	exit(1);
+    makeOSPath(cmd);
+
+    // Compute number of args.
+    nArgs = 1; // Executable is always the first arg.
+    
+    if (GfuiMouseHW)
+	  nArgs += 1;
+    if (GetLocalDir() && strlen(GetLocalDir()))
+	  nArgs += 2;
+    if (GetBinDir() && strlen(GetBinDir()))
+	  nArgs += 2;
+    if (GetLibDir() && strlen(GetLibDir()))
+	  nArgs += 2;
+    if (GetDataDir() && strlen(GetDataDir()))
+	  nArgs += 2;
+
+    nArgs++; // Last arg must be a null pointer.
+
+    // Allocate args array.
+    args = (char**)malloc(sizeof(char*)*nArgs);
+	
+    // First arg is the executable path-name.
+    argInd = 0;
+    args[argInd++] = buildPathArg(cmd);
+
+    // Then add subsequent args.
+    if (GfuiMouseHW)
+        args[argInd++] = strdup("-m");
+    
+    if (GetLocalDir() && strlen(GetLocalDir()))
+    {
+        args[argInd++] = strdup("-l");
+	args[argInd++] = buildPathArg(GetLocalDir());
     }
+
+    if (GetBinDir() && strlen(GetBinDir()))
+    {
+        args[argInd++] = strdup("-B");
+	args[argInd++] = buildPathArg(GetBinDir());
+    }
+	
+    if (GetLibDir() && strlen(GetLibDir()))
+    {
+        args[argInd++] = strdup("-L");
+	args[argInd++] = buildPathArg(GetLibDir());
+    }
+	
+    if (GetDataDir() && strlen(GetDataDir()))
+    {
+        args[argInd++] = strdup("-D");
+	args[argInd++] = buildPathArg(GetDataDir ());
+    }
+	
+    // Finally, last null arg.
+    args[argInd++] = 0;
+	  
+    // Exec the command : restart the game (simply replacing current process)
+    GfOut("Restarting ");
+    for (i = 0; i < nArgs && args[i]; i++)
+        printf("%s%s ", args[i], nArgs < nArgs-2 ? " " : "");
+    GfOut(" ...\n\n");
+    retcode = execvp (cmd, args);
+
+    // If successfull, we never get here ... but if failed ...
+    GfOut("Failed to restart Speed Dreams through command line '");
+    for (i = 0; i < nArgs && args[i]; i++)
+    {
+        GfOut("%s%s ", args[i], nArgs < nArgs-2 ? " " : "");
+	free(args[i]);
+    }
+    GfOut("' (exit code %d)\n", retcode);
+    free(args);
+    
+    perror("Speed Dreams");
+    exit(1);
 }
 
 static void
@@ -827,22 +868,17 @@ GfScrMenuInit(void *prevMenu)
 	CreateButtonControl(scrHandle,param,"vmleftarrow",(void*)-1, VInitPrevNext);
 	CreateButtonControl(scrHandle,param,"vmrightarrow",(void*)1, VInitPrevNext);
 	VInitLabelId = CreateLabelControl(scrHandle,param,"vmlabel");
-	
 	GfParmReleaseHandle(param);
+
+	GfuiAddKey(scrHandle, GFUIK_RETURN, "Accept", NULL, GfScrReinit, NULL);
+	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     
-	GfuiAddKey(scrHandle, 13, "Accept", NULL, GfScrReinit, NULL);
-	GfuiAddKey(scrHandle, 27, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddSKey(scrHandle, GLUT_KEY_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
 	return scrHandle;
 }
 
 
-
-int GfuiGlutExtensionSupported(char const *str)
-{
-    return glutExtensionSupported(str);
-}

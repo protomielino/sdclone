@@ -4,7 +4,7 @@
     created              : Thu Aug 17 23:19:19 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: ssggraph.cpp,v 1.12 2005/02/01 19:08:19 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,11 +20,15 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <GL/gl.h>
 
-#include <tgfclient.h>
+#if defined(__APPLE__)
+#include <OpenGL/gl.h>
+#else
+#include <GL/gl.h>
+#endif
 
 #include "grmain.h"
+#include "grtexture.h"
 
 #ifdef DMALLOC
 #include "dmalloc.h"
@@ -65,12 +69,8 @@ graphInit(int /* idx */, void *pt)
  * Remarks
  *	MUST be called before moduleInitialize()
  */
-// We need a unique global name for static link under Windows.
-#ifdef WIN32
-extern "C" int ssggraph_moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
-#else
 extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
-#endif
+
 {
     welcomeOut->maxNbItf = 1;
 
@@ -95,11 +95,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
  *	
  */
 // We need a unique global name for static link under Windows.
-#ifdef WIN32
-extern "C" int ssggraph_moduleInitialize(tModInfo *modInfo)
-#else
 extern "C" int moduleInitialize(tModInfo *modInfo)
-#endif
 {
     modInfo->name = "ssggraph";		        		/* name of the module (short) */
     modInfo->desc = "The Graphic Library using PLIB ssg";	/* description of the module (can be long) */
@@ -107,8 +103,16 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
     modInfo->gfId = 1;						/* v 1  */
     modInfo->index = 0;
 
+    ssgInit();
+
+	//Setup image loaders
+	grRegisterCustomSGILoader();
+
     return 0;
 }
+
+
+
 
 /*
  * Function
@@ -128,11 +132,7 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
  *	
  */
 // We need a unique global name for static link under Windows.
-#ifdef WIN32
-extern "C" int ssggraph_moduleTerminate()
-#else
 extern "C" int moduleTerminate()
-#endif
 {
     return 0;
 }

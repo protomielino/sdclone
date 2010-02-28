@@ -17,8 +17,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
-#include <learning/ANN.h>
-#include <learning/Distribution.h>
+#include "ANN.h"
+#include "Distribution.h"
 
 /*! 
   \class DiscretePolicy

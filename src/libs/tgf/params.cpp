@@ -36,10 +36,11 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include "tgf.h"
-
 #include <assert.h>
+#include <errno.h>
 
+#include "tgf.h"
+#include "portability.h"
 
 #define LINE_SZ		1024
 
@@ -55,6 +56,8 @@ GF_TAILQ_HEAD (withinHead, struct within);
 
 #define P_NUM 0
 #define P_STR 1
+#define P_VAR 2  /* Variable */
+#define P_FORM 3 /* Formula */
 
 /** Parameter header structure */
 struct param
@@ -63,6 +66,7 @@ struct param
     char				*fullName;	/**< Name of the parameter including the full section name ('/' separated) */
     char				*value;		/**< Value of the parameter */
     tdble				valnum;
+    void				*formula;
     int					type;
     char				*unit;		/* for output only */
     tdble				min;
@@ -101,6 +105,9 @@ struct parmHeader
     struct section			*rootSection;	/**< List of sections at the first level */
     void				*paramHash;	/**< Hash table for parameter access */
     void				*sectionHash;	/**< Hash table for section access */
+    int					major;          /**< Major version number of the file */
+    int					minor;          /**< Minor version number of the file */
+    void                                *variableHash;  /**< Hash table for variables used in functions */
 };
 
 #define PARM_HANDLE_FLAG_PRIVATE	0x01
@@ -148,6 +155,7 @@ static void parmReleaseHandle (struct parmHandle *parmHandle);
 static void parmReleaseHeader (struct parmHeader *conf);
 static struct section *getParent (struct parmHeader *conf, const char *sectionName);
 static void cleanUnusedSection (struct parmHeader *conf, struct section *section);
+static FILE *safeFOpen(const char *fileName, const char *mode);
 
 
 /** Configuration initialization.
@@ -183,7 +191,11 @@ getFullName (const char *sectionName, const char *paramName)
 	
 	fullName = (char *) malloc (strlen (sectionName) + strlen (paramName) + 2);
 	if (!fullName) {
-		GfError ("getFullName: malloc (%lu) failed", (unsigned long)(strlen (sectionName) + strlen (paramName) + 2));
+#ifdef WIN32
+		GfError ("getFullName: malloc (%03Iu) failed", strlen (sectionName) + strlen (paramName) + 2);
+#else //WIN32
+		GfError ("getFullName: malloc (%zu) failed", strlen (sectionName) + strlen (paramName) + 2);
+#endif //WIN32
 		return NULL;
 	}
 	sprintf (fullName, "%s/%s", sectionName, paramName);
@@ -284,6 +296,9 @@ removeParam (struct parmHeader *conf, struct section *section, struct param *par
 		freez(within->val);
 		free(within);
 	}
+        if (param->type == P_FORM)
+		GfFormFreeCommandNew(param->formula);
+	param->formula = NULL;
 
 	freez (param->name);
     freez (param->fullName);
@@ -308,7 +323,11 @@ addParam (struct parmHeader *conf, struct section *section, const char *paramNam
 	
 	param = (struct param *) calloc (1, sizeof (struct param));
 	if (!param) {
-		GfError ("addParam: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct param));
+#ifdef WIN32
+		GfError ("addParam: calloc (1, %03Iu) failed\n", sizeof (struct param));
+#else //WIN32
+		GfError ("addParam: calloc (1, %zu) failed\n", sizeof (struct param));
+#endif //WIN32
 		goto bailout;
 	}
 
@@ -428,7 +447,11 @@ addSection (struct parmHeader *conf, const char *sectionName)
 
 	section = (struct section *) calloc (1, sizeof (struct section));
 	if (!section) {
-		GfError ("addSection: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct section));
+#ifdef WIN32
+		GfError ("addSection: calloc (1, 03Iu) failed\n", sizeof (struct section));
+#else //WIN32
+		GfError ("addSection: calloc (1, %zu) failed\n", sizeof (struct section));
+#endif //WIN32
 		return NULL;
 	}
 
@@ -494,7 +517,11 @@ createParmHeader (const char *file)
 
     conf = (struct parmHeader *) calloc (1, sizeof (struct parmHeader));
     if (!conf) {
-	GfError ("gfParmReadFile: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHeader));
+#ifdef WIN32
+	GfError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHeader));
+#else //WIN32
+	GfError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHeader));
+#endif //WIN32
 	return NULL;
     }
 
@@ -502,7 +529,11 @@ createParmHeader (const char *file)
 
     conf->rootSection = (struct section *) calloc (1, sizeof (struct section));
     if (!conf->rootSection) {
-	GfError ("gfParmReadFile: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct section));
+#ifdef WIN32
+	GfError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct section));
+#else //WIN32
+	GfError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct section));
+#endif //WIN32
 	goto bailout;
     }
     GF_TAILQ_INIT (&(conf->rootSection->paramList));
@@ -525,6 +556,12 @@ createParmHeader (const char *file)
 	GfError ("gfParmReadFile: strdup (%s) failed\n", file);
 	goto bailout;
     }
+    conf->variableHash = GfHashCreate(GF_HASH_TYPE_STR);
+    if (!conf->variableHash) 
+    {
+	GfError ("gfParmReadFile: GfHashCreate (variableHash) failed\n");
+	goto bailout;
+    }
 
     return conf;
 
@@ -535,6 +572,9 @@ createParmHeader (const char *file)
     }
     if (conf->sectionHash) {
 	GfHashRelease (conf->sectionHash, NULL);
+    }
+    if (conf->variableHash) {
+    	GfHashRelease (conf->variableHash, free);
     }
     freez (conf->filename);
     freez (conf);
@@ -590,6 +630,7 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 
 	int	nAtts;
 	int	len;
+	int	index;
 	const char **p;
 	const char *s1, *s2;
 	char *fullName;
@@ -601,97 +642,142 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 	char *within;
 	char *sa, *sb;
 
-	if (parmHandle->flag & PARM_HANDLE_FLAG_PARSE_ERROR) {
+	if (parmHandle->flag & PARM_HANDLE_FLAG_PARSE_ERROR) 
+	{
 		// parse error occured, ignore.
 		return;
 	}
 
 	p = atts;
-	while (*p) {
+	while (*p) 
+	{
 		++p;
 	}
 
 	nAtts = (p - atts) >> 1;
-	if (nAtts > 1) {
+	if (nAtts > 1) 
+	{
 		qsort ((void *)atts, nAtts, sizeof(char *) * 2, myStrcmp);
 	}
 
-	if (!strcmp(name, "params")) {
-
+	if (!strcmp(name, "params")) 
+	{
 		parmHandle->curSection = conf->rootSection;
 		parmHandle->curSection->fullName = strdup ("");
 
-		if (!parmHandle->curSection->fullName) {
+		if (!parmHandle->curSection->fullName) 
+		{
 			GfError ("xmlStartElement: strdup (\"\") failed\n");
 			goto bailout;
 		}
 
-		while (*atts) {
+		while (*atts) 
+		{
 			s1 = *atts++;
 			s2 = *atts++;
-			if (!strcmp(s1, "name")) {
+			if (!strcmp(s1, "name")) 
+			{
 				FREEZ (conf->name);
 				conf->name = strdup(s2);
-				if (!conf->name) {
+				if (!conf->name) 
+				{
 					GfError ("xmlStartElement: strdup (\"%s\") failed\n", s2);
 					goto bailout;
 				}
-				break;
+				//break;
+			}
+			if (strcmp(s1, "version") == 0)
+			{
+				conf->major = 0;
+				conf->minor = 0;
+				index = 0;
+				while (s2[index] != '\0' && s2[index] != '.')
+				{
+					if (s2[index] >= '0' && s2[index] <= '9')
+					{
+						conf->major *= 10;
+						conf->major += s2[index] - '0';
+					}
+					++index;
+				}
+				if (s2[index] != '\0')
+					++index;
+				while (s2[index] != '\0')
+				{
+					if (s2[index] >= '0' && s2[index] <= '9')
+					{
+						conf->minor *= 10;
+						conf->minor += s2[index] - '0';
+					}
+					++index;
+				}
 			}
 		}
 
-		if (!conf->name) {
+		if (!conf->name) 
+		{
 			GfOut ("xmlStartElement: Syntax error, missing \"name\" field in params definition\n");
 			goto bailout;
 		}
 
-    } else if (!strcmp(name, "section")) {
+    	} else if (!strcmp(name, "section")) 
+    	{
 
-		if (!parmHandle->curSection) {
+		if (!parmHandle->curSection) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"params\" tag\n");
 			goto bailout;
 		}
 
 		shortName = NULL;
 
-		while (*atts) {
+		while (*atts) 
+		{
 			s1 = *atts++;
 			s2 = *atts++;
-			if (!strcmp(s1, "name")) {
+			if (!strcmp(s1, "name")) 
+			{
 				shortName = s2;
 				break;
 			}
 		}
 
-		if (!shortName) {
+		if (!shortName) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"name\" field in section definition\n");
 			goto bailout;
 		}
 
-		if (strlen(parmHandle->curSection->fullName)) {
+		if (strlen(parmHandle->curSection->fullName)) 
+		{
 			len = strlen (shortName) + strlen (parmHandle->curSection->fullName) + 2;
 			fullName = (char *) malloc (len);
-			if (!fullName) {
+			if (!fullName) 
+			{
 				GfError ("xmlStartElement: malloc (%d) failed\n", len);
 				goto bailout;
 			}
 		    sprintf (fullName, "%s/%s", parmHandle->curSection->fullName, shortName);
-		} else {
+		} else 
+		{
 			fullName = strdup (shortName);
 		}
 
 		parmHandle->curSection = addSection(conf, fullName);
 		free(fullName);
 
-		if (!parmHandle->curSection) {
+		if (!parmHandle->curSection) 
+		{
 			GfError ("xmlStartElement: addSection failed\n");
 			goto bailout;
 		}
 
-	} else if (!strcmp(name, "attnum")) {
+	} else if (!strcmp(name, "attnum")) 
+	{
 
-		if ((!parmHandle->curSection) || (!strlen (parmHandle->curSection->fullName))) {
-	    	GfError ("xmlStartElement: Syntax error, missing \"section\" tag\n");
+		if ((!parmHandle->curSection) || (!strlen (parmHandle->curSection->fullName))) 
+		{
+	    		GfError ("xmlStartElement: Syntax error, missing \"section\" tag\n");
 			goto bailout;
 		}
 
@@ -699,42 +785,53 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 		val = NULL;
 		min = max = unit = NULL;
 
-		while (*atts) {
+		while (*atts) 
+		{
 			s1 = *atts++;
 			s2 = *atts++;
-			if (!strcmp(s1, "name")) {
+			if (!strcmp(s1, "name")) 
+			{
 				shortName = s2;
-			} else if (!strcmp(s1, "val")) {
+			} else if (!strcmp(s1, "val")) 
+			{
 				val = s2;
-			} else if (!strcmp(s1, "min")) {
+			} else if (!strcmp(s1, "min"))
+			{
 				min = s2;
-			} else if (!strcmp(s1, "max")) {
+			} else if (!strcmp(s1, "max")) 
+			{
 				max = s2;
-			} else if (!strcmp(s1, "unit")) {
+			} else if (!strcmp(s1, "unit")) 
+			{
 				unit = s2;
 			}
 		}
 
-		if (!shortName) {
+		if (!shortName) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"name\" field in %s definition\n", name);
 			goto bailout;
 		}
 
-		if (!val) {
+		if (!val) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"val\" field in %s definition\n", name);
 			goto bailout;
 		}
 
-		if (!min) {
+		if (!min) 
+		{
 			min = val;
 		}
 
-		if (!max) {
+		if (!max) 
+		{
 			max = val;
 		}
 
 		curParam = addParam (conf, parmHandle->curSection, shortName, val);
-		if (!curParam) {
+		if (!curParam) 
+		{
 			GfError ("xmlStartElement: addParam failed\n");
 			goto bailout;
 		}
@@ -744,24 +841,29 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 		curParam->min    = getValNumFromStr (min);
 		curParam->max    = getValNumFromStr (max);
 
-		if (curParam->min > curParam->valnum) {
+		if (curParam->min > curParam->valnum) 
+		{
 			curParam->min = curParam->valnum;
 		}
 
-		if (curParam->max < curParam->valnum) {
+		if (curParam->max < curParam->valnum) 
+		{
 			curParam->max = curParam->valnum;
 		}
 
-		if (unit) {
+		if (unit) 
+		{
 			curParam->unit = strdup (unit);
 			curParam->valnum = GfParmUnit2SI ((char*)unit, curParam->valnum);
 			curParam->min = GfParmUnit2SI ((char*)unit, curParam->min);
 			curParam->max = GfParmUnit2SI ((char*)unit, curParam->max);
 		}
 
-    } else if (!strcmp(name, "attstr")) {
+    	} else if (!strcmp(name, "attstr")) 
+    	{
 
-		if ((!parmHandle->curSection) || (!strlen (parmHandle->curSection->fullName))) {
+		if ((!parmHandle->curSection) || (!strlen (parmHandle->curSection->fullName))) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"section\" tag\n");
 			goto bailout;
 		}
@@ -770,39 +872,48 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 		val = NULL;
 		within = NULL;
 
-		while (*atts) {
+		while (*atts) 
+		{
 			s1 = *atts++;
 			s2 = *atts++;
-			if (!strcmp(s1, "name")) {
+			if (!strcmp(s1, "name")) 
+			{
 				shortName = s2;
-			} else if (!strcmp(s1, "val")) {
+			} else if (!strcmp(s1, "val")) 
+			{
 				val = s2;
-			} else if (!strcmp(s1, "in")) {
+			} else if (!strcmp(s1, "in")) 
+			{
 				within = (char *)s2;
 			}
 		}
 
-		if (!shortName) {
+		if (!shortName) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"name\" field in %s definition\n", name);
 			goto bailout;
 		}
 
-		if (!val) {
+		if (!val) 
+		{
 			GfError ("xmlStartElement: Syntax error, missing \"val\" field in %s definition\n", name);
 			goto bailout;
 		}
 
 		curParam = addParam (conf, parmHandle->curSection, shortName, val);
-		if (!curParam) {
+		if (!curParam) 
+		{
 			GfError ("xmlStartElement: addParam failed\n");
 			goto bailout;
 		}
 
 		curParam->type = P_STR;
-		if (within) {
+		if (within) 
+		{
 			sa = within;
 			sb = strchr (sa, ',');
-			while (sb) {
+			while (sb) 
+			{
 				*sb = 0;
 				addWithin (curParam, sa);
 				sa = sb + 1;
@@ -810,9 +921,56 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 			}
 			addWithin (curParam, sa);
 		}
+    	} else if (strcmp(name, "attform") == 0) 
+    	{
+    	
+		if ((!parmHandle->curSection) || (!strlen (parmHandle->curSection->fullName))) 
+		{
+			GfError ("xmlStartElement: Syntax error, missing \"section\" tag\n");
+			goto bailout;
+		}
 
-    }
+		shortName = NULL;
+		val = NULL;
+		within = NULL;
 
+		while (*atts) 
+		{
+			s1 = *atts++;
+			s2 = *atts++;
+			if (!strcmp(s1, "name")) 
+			{
+				shortName = s2;
+			} else if (!strcmp(s1, "val")) 
+			{
+				val = s2;
+			}
+		}
+
+		if (!shortName) 
+		{
+			GfError ("xmlStartElement: Syntax error, missing \"name\" field in %s definition\n", name);
+			goto bailout;
+		}
+
+		if (!val) 
+		{
+			GfError ("xmlStartElement: Syntax error, missing \"val\" field in %s definition\n", name);
+			goto bailout;
+		}
+
+		curParam = addParam (conf, parmHandle->curSection, shortName, val);
+		if (!curParam) 
+		{
+			GfError ("xmlStartElement: addParam failed\n");
+			goto bailout;
+		}
+
+		curParam->type = P_FORM;
+		curParam->formula = GfFormParseFormulaStringNew(val);
+		//curParam->formula = GfFormParseFormulaString(val);
+     	}
+ 
     return;
 
  bailout:
@@ -960,7 +1118,11 @@ GfParmReadBuf (char *buffer)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-	GfError ("gfParmReadBuf: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHandle));
+#ifdef WIN32
+	GfError ("gfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
+#else //WIN32
+	GfError ("gfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
+#endif //WIN32
 	goto bailout;
     }
 
@@ -992,6 +1154,21 @@ GfParmReadBuf (char *buffer)
     }
 
     return NULL;
+}
+
+
+
+
+void * 
+GfParmReadFileLocal(const char *file, int mode)
+{
+	//use local dir
+	char buf[255];
+	sprintf(buf, "%s%s", GetLocalDir(),file);
+	
+	void *pResult = GfParmReadFile(buf,mode);
+
+	return pResult;
 }
 
 /** Read a configuration file.
@@ -1033,7 +1210,11 @@ GfParmReadFile (const char *file, int mode)
     /* Handle creation */
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
-	GfError ("gfParmReadFile: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHandle));
+#ifdef WIN32
+	GfError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
+#else //WIN32
+	GfError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
+#endif //WIN32
 	goto bailout;
     }
 
@@ -1130,20 +1311,22 @@ static char* handleEntities(char *s, const char* val)
 static int
 xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 {
-    struct parmOutput	*outCtrl = &(parmHandle->outCtrl);
-    struct parmHeader	*conf = parmHandle->conf;
-    struct section	*curSection;
-    struct param	*curParam;
-    struct within	*curWithin;
-    char		*s, *t;
+    	struct parmOutput	*outCtrl = &(parmHandle->outCtrl);
+    	struct parmHeader	*conf = parmHandle->conf;
+    	struct section		*curSection;
+   	struct param		*curParam;
+   	struct within		*curWithin;
+   	char			*s, *t;
 
-    while (1) {
-	switch (outCtrl->state) {
+    	while (1) 
+	{
+	switch (outCtrl->state) 
+	{
 	case 0:
 	    sprintf (buffer, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
 	    outCtrl->indent = (char *) malloc (LINE_SZ);
 	    if (!outCtrl->indent) {
-		GfError ("xmlGetOuputLine: malloc (%d) failed\n", LINE_SZ);
+		GfError ("xmlGetOutputLine: malloc (%d) failed\n", LINE_SZ);
 		return 0;
 	    }
 	    outCtrl->state = 1;
@@ -1163,7 +1346,10 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 
 	case 2:			/* Start Params */
 	    outCtrl->curSection = parmHandle->conf->rootSection;
-	    sprintf (buffer, "\n<params name=\"%s\">\n", parmHandle->conf->name);
+	    if (conf->major > 0 || conf->minor > 0)
+	    	sprintf (buffer, "\n<params name=\"%s\" version=\"%d.%d\">\n", parmHandle->conf->name, conf->major, conf->minor);
+	    else
+	    	sprintf (buffer, "\n<params name=\"%s\">\n", parmHandle->conf->name);
 	    curSection = GF_TAILQ_FIRST (&(outCtrl->curSection->subSectionList));
 	    if (curSection) {
 		outCtrl->curSection = curSection;
@@ -1183,9 +1369,11 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 	case 4:			/* Parse section attributes list */
 		outCtrl->curParam = GF_TAILQ_FIRST (&(outCtrl->curSection->paramList));
 		s = strrchr (outCtrl->curSection->fullName, '/');
-		if (!s) {
+		if (!s) 
+		{
 			s = outCtrl->curSection->fullName;
-		} else {
+		} else 
+		{
 			s++;
 		}
 		
@@ -1199,63 +1387,84 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 		return 1;
 
 	case 5:			/* Parse one attribute */
-	    if (!outCtrl->curParam) {
+	    if (!outCtrl->curParam) 
+		{
 			outCtrl->state = 6;
 			break;
 		}
+            else if (outCtrl->curParam->type == P_FORM) 
+	    {
+	    	curParam = outCtrl->curParam;
+		s = buffer;
+		s += sprintf (s, "%s<attform name=\"%s\"", outCtrl->indent, curParam->name);
 
+		s += sprintf(s, " val=\"");
+		s = handleEntities(s, curParam->value);
+		s += sprintf (s, "\"/>\n");
+		outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
+
+		return 1;
+	    } else if (outCtrl->curParam->type == P_STR) 
+	    {
 		curParam = outCtrl->curParam;
-		if (curParam->type == P_STR) {
-			s = buffer;
-			s += sprintf (s, "%s<attstr name=\"%s\"", outCtrl->indent, curParam->name);
-			curWithin = GF_TAILQ_FIRST (&(curParam->withinList));
-			if (curWithin) {
-				s += sprintf (s, " in=\"%s", curWithin->val);
-				while ((curWithin = GF_TAILQ_NEXT (curWithin, linkWithin)) != NULL) {
-					s += sprintf (s, ",%s", curWithin->val);
-				}
-				s += sprintf (s, "\"");
-			}
+		s = buffer;
+		s += sprintf (s, "%s<attstr name=\"%s\"", outCtrl->indent, curParam->name);
+		curWithin = GF_TAILQ_FIRST (&(curParam->withinList));
+		if (curWithin) 
+		{
+		    s += sprintf (s, " in=\"%s", curWithin->val);
+		    while ((curWithin = GF_TAILQ_NEXT (curWithin, linkWithin)) != NULL) 
+		    {
+			s += sprintf (s, ",%s", curWithin->val);
+		    }
+		    s += sprintf (s, "\"");
+		}
 
-			s += sprintf(s, " val=\"");
-			s = handleEntities(s, curParam->value);
-			s += sprintf (s, "\"/>\n");
+		s += sprintf(s, " val=\"");
+		s = handleEntities(s, curParam->value);
+		s += sprintf (s, "\"/>\n");
 
-			outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
-			return 1;			
-	    } else {
+		outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
+		return 1;			
+	    } else //outCtrl->curParam->type == P_NUM
+		{
+			curParam = outCtrl->curParam;
 
 			s = buffer;
 			s += sprintf (s, "%s<attnum name=\"%s\"", outCtrl->indent, curParam->name);
-			if (curParam->unit) {
-				if ((curParam->min != curParam->valnum) || (curParam->max != curParam->valnum)) {
-					s += sprintf (s, " min=\"%g\" max=\"%g\"", 
-						GfParmSI2Unit (curParam->unit, curParam->min),
-						GfParmSI2Unit (curParam->unit, curParam->max));
-				}
-				s += sprintf (s, " unit=\"%s\" val=\"%g\"/>\n",
-					curParam->unit, GfParmSI2Unit (curParam->unit, curParam->valnum));
-			} else {
-				if ((curParam->min != curParam->valnum) || (curParam->max != curParam->valnum)) {
-					s += sprintf (s, " min=\"%g\" max=\"%g\"", 
-						curParam->min, curParam->max);
-				}
-				s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
+			if (curParam->unit)
+			{
+			    if ((curParam->min != curParam->valnum) || (curParam->max != curParam->valnum)) 
+			    {
+				s += sprintf (s, " min=\"%g\" max=\"%g\"", 
+					GfParmSI2Unit (curParam->unit, curParam->min),
+					GfParmSI2Unit (curParam->unit, curParam->max));
+			    }
+			    s += sprintf (s, " unit=\"%s\" val=\"%g\"/>\n",
+				curParam->unit, GfParmSI2Unit (curParam->unit, curParam->valnum));
+			} else 
+			{
+			    if ((curParam->min != curParam->valnum) || (curParam->max != curParam->valnum)) 
+			    {
+				s += sprintf (s, " min=\"%g\" max=\"%g\"", 
+					curParam->min, curParam->max);
+			    }
+			    s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
 			}
-	
 			outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
 			return 1;
-	    }
+	    	  }
 
 	case 6:			/* Parse sub-section list */
-	    curSection = GF_TAILQ_FIRST (&(outCtrl->curSection->subSectionList));
-	    if (curSection) {
-		outCtrl->curSection = curSection;
-		outCtrl->state = 4;
-		break;
-	    }
-	    outCtrl->state = 7;
-	    break;
+	    	curSection = GF_TAILQ_FIRST (&(outCtrl->curSection->subSectionList));
+	   	 if (curSection) 
+		{
+			outCtrl->curSection = curSection;
+			outCtrl->state = 4;
+			break;
+	   	 }
+	    	outCtrl->state = 7;
+	    	break;
 
 	case 7:			/* End Section */
 	    *(outCtrl->indent + strlen (outCtrl->indent) - 2) = 0;
@@ -1264,23 +1473,26 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 	    return 1;
 
 	case 8:			/* Parse next section at the same level */
-	    curSection = GF_TAILQ_NEXT (outCtrl->curSection, linkSection);
-	    if (curSection) {
+	    	curSection = GF_TAILQ_NEXT (outCtrl->curSection, linkSection);
+	    	if (curSection) 
+		{
 		outCtrl->curSection = curSection;
 		outCtrl->state = 4;
 		break;
-	    }
-	    curSection = outCtrl->curSection->parent;
-	    *(outCtrl->indent + strlen (outCtrl->indent) - 2) = 0;
-	    if (curSection->parent) {
-		outCtrl->curSection = curSection;
-		sprintf (buffer, "%s</section>\n\n", outCtrl->indent);
-		return 1;
-	    }
-	    outCtrl->state = 3;
-	    break;
+	    	}
+	   	 curSection = outCtrl->curSection->parent;
+	    	*(outCtrl->indent + strlen (outCtrl->indent) - 2) = 0;
+	   	 if (curSection->parent) 
+		{
+			outCtrl->curSection = curSection;
+			sprintf (buffer, "%s</section>\n\n", outCtrl->indent);
+			return 1;
+	    	}
+	   	 outCtrl->state = 3;
+	   	 break;
 	case 9:
 	    return 0;
+	
 	}
     }
 }
@@ -1356,6 +1568,16 @@ GfParmSetDTD (void *parmHandle, char *dtd, char*header)
 }
 
 
+int
+GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
+{
+	//use local dir
+	char buf[255];
+	sprintf(buf, "%s%s", GetLocalDir(),file);
+
+	return GfParmWriteFile(buf,parmHandle,name);
+}
+
 /** Write a configuration file.
     @ingroup	conf
     @param	parmHandle	Configuration handle
@@ -1372,8 +1594,7 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
     char		line[LINE_SZ];
     FILE		*fout;
 
-    conf = handle->conf;
-
+ 
     if (handle->magic != PARM_MAGIC) {
 	GfFatal ("gfParmWriteFile: bad handle (%p)\n", parmHandle);
 	return 1;
@@ -1386,9 +1607,10 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 	    return 1;
 	}
     }
-    fout = fopen (file, "wb");
+    
+    fout = safeFOpen(file, "wb");
     if (!fout) {
-	GfError ("gfParmSetStr: fopen (%s, \"wb\") failed\n", file);
+	GfError ("gfParmWriteFile: fopen (%s, \"wb\") failed\n", file);
 	return 1;
     }
 
@@ -1489,6 +1711,10 @@ static void parmReleaseHeader(struct parmHeader *conf)
 
 	if (conf->sectionHash) {
 		GfHashRelease (conf->sectionHash, NULL);
+	}
+	if (conf->variableHash) 
+	{
+		GfHashRelease (conf->variableHash, free);
 	}
 
 	freez (conf->rootSection->fullName);
@@ -1730,6 +1956,44 @@ GfParmGetName (void *handle)
     }
 
     return conf->name;
+}
+
+/** Get the pararmeters name
+    @ingroup	paramsdata
+    @param	handle	Handle on the parameters
+    @return	major version number
+*/
+int
+GfParmGetMajorVersion (void *handle)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetMajorVersion: bad handle (%p)\n", parmHandle);
+	return 0;
+    }
+
+    return conf->major;
+}
+
+/** Get the pararmeters name
+    @ingroup	paramsdata
+    @param	handle	Handle on the parameters
+    @return	Name
+*/
+int
+GfParmGetMinorVersion (void *handle)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetMinorVersion: bad handle (%p)\n", parmHandle);
+	return 0;
+    }
+
+    return conf->minor;
 }
 
 
@@ -2064,7 +2328,8 @@ GfParmGetStr (void *parmHandle, const char *path, const char *key, const char *d
 	struct param *param;
 	struct parmHandle *handle = (struct parmHandle *)parmHandle;
 	struct parmHeader *conf;
-	char *val;
+	char const *val;
+	char *ncval;
 
 	conf = handle->conf;
 
@@ -2074,11 +2339,19 @@ GfParmGetStr (void *parmHandle, const char *path, const char *key, const char *d
 	}
 
 	param = getParamByName (conf, path, key, 0);
-	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR)) {
+	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) {
 		return deflt;
 	}
 
-	val = param->value;
+	if (param->type == P_FORM)
+	{
+		ncval = NULL;
+		GfFormCalcFuncNew( param->formula, handle, path, NULL, NULL, NULL, &ncval);
+		val = ncval ? ncval : deflt;
+	} else
+	{
+		val = param->value;
+	}
 
 	return val;
 }
@@ -2112,12 +2385,22 @@ GfParmGetStrNC (void *parmHandle, const char *path, const char *key, char *deflt
 	}
 
 	param = getParamByName (conf, path, key, 0);
-	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR)) {
+	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) 
+	{
 		return deflt;
 	}
+	
+	if (param->type == P_FORM) 
+	{
+		val = deflt;
+		//GfFormCalcFuncNew( param->formula, handle, NULL, NULL, NULL, NULL, &val );	
+		GfFormCalcFuncNew( param->formula, handle, path, NULL, NULL, NULL, &val );
+	} else 
+	{
+		val = param->value;
+	}
 
-	val = param->value;
-
+//	val = param->value;
 	return val;
 }
 
@@ -2138,6 +2421,8 @@ GfParmGetCurStr (void *handle, const char *path, const char *key, const char *de
     struct parmHeader	*conf = parmHandle->conf;
     struct section	*section;
     struct param	*param;
+    char const *val;
+    char *ncval;
 
     if (parmHandle->magic != PARM_MAGIC) {
 	GfFatal ("GfParmGetCurStr: bad handle (%p)\n", parmHandle);
@@ -2149,11 +2434,21 @@ GfParmGetCurStr (void *handle, const char *path, const char *key, const char *de
     }
 
     param = getParamByName (conf, section->curSubSection->fullName, key, 0);
-    if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR)) {
+    if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) {
 	return deflt;
     }
 
-    return param->value;
+    if (param->type == P_FORM)
+    {
+	ncval = NULL;
+	GfFormCalcFuncNew( param->formula, handle, path, NULL, NULL, NULL, &ncval);
+	val = ncval ? ncval : deflt;
+    } else
+    {
+        val = param->value;
+    }
+
+    return val;
 }
 
 /** Get a string parameter in a config file.
@@ -2173,6 +2468,7 @@ GfParmGetCurStrNC (void *handle, const char *path, const char *key, char *deflt)
     struct parmHeader	*conf = parmHandle->conf;
     struct section	*section;
     struct param	*param;
+    char *val;
 
     if (parmHandle->magic != PARM_MAGIC) {
 	GfFatal ("GfParmGetCurStr: bad handle (%p)\n", parmHandle);
@@ -2184,11 +2480,21 @@ GfParmGetCurStrNC (void *handle, const char *path, const char *key, char *deflt)
     }
 
     param = getParamByName (conf, section->curSubSection->fullName, key, 0);
-    if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR)) {
+    if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) 
+    {
 	return deflt;
     }
 
-    return param->value;
+    if (param->type == P_FORM) 
+    {
+        val = deflt;
+    //GfFormCalcFuncNew( param->formula, handle, NULL, NULL, NULL, NULL, &val );    
+	GfFormCalcFuncNew( param->formula, handle, path, NULL, NULL, NULL, &val );
+    } else 
+    {
+        val = param->value;
+    }
+    return val;
 }
 
 /** Get a numerical parameter in a config file.
@@ -2201,26 +2507,39 @@ GfParmGetCurStrNC (void *handle, const char *path, const char *key, char *deflt)
     @return	parameter value
  */
 tdble
-GfParmGetNum (void *handle, const char *path, const char *key, const char *unit, tdble deflt)
+GfParmGetNum (void *handle, char const *path, const char *key, const char *unit, tdble deflt)
 {
 	struct parmHandle	*parmHandle = (struct parmHandle *)handle;
 	struct parmHeader	*conf = parmHandle->conf;
 	struct param	*param;
+        tdble                val;
 
-	if (parmHandle->magic != PARM_MAGIC) {
+	if (parmHandle->magic != PARM_MAGIC) 
+	{
 		GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
 		return deflt;
 	}
 
 	param = getParamByName (conf, path, key, 0);
-	if (!param ||  (param->type != P_NUM)) {
+    if (!param ||  (param->type != P_NUM && param->type != P_FORM)) 
+    {
 		return deflt;
-	}
+    }
+    if (param->type == P_FORM) 
+    {
+         val = deflt;
+	 //GfFormCalcFuncNew( param->formula, parmHandle, NULL, NULL, NULL, &val, NULL );        
+	 GfFormCalcFuncNew( param->formula, parmHandle, path, NULL, NULL, &val, NULL );
+    } else 
+    {
+         val = param->valnum;
+    }
 
-	if (unit) {
-		return GfParmSI2Unit(unit, param->valnum);
+	if (unit) 
+	{
+		return GfParmSI2Unit(unit, val);
 	}
-	return  param->valnum;
+    return val;
 }
 
 
@@ -2241,6 +2560,7 @@ GfParmGetCurNum (void *handle, const char *path, const char *key, const char *un
     struct parmHeader	*conf = parmHandle->conf;
     struct section	*section;
     struct param	*param;
+    tdble val;
 
     if (parmHandle->magic != PARM_MAGIC) {
 	GfFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
@@ -2252,15 +2572,119 @@ GfParmGetCurNum (void *handle, const char *path, const char *key, const char *un
     }
 
     param = getParamByName (conf, section->curSubSection->fullName, key, 0);
-    if (!param || (param->type != P_NUM)) {
+    if (!param || (param->type != P_NUM && param->type != P_FORM)) 
+    {
 	return deflt;
     }
 
-    if (unit) {
-	return GfParmSI2Unit(unit, param->valnum);
+    if (param->type == P_FORM) {
+    	val = deflt;
+    	GfFormCalcFuncNew( param->formula, parmHandle, section->curSubSection->fullName, NULL, NULL, &val, NULL );
+    } else {
+    	val = param->valnum;
     }
-    return  param->valnum;
+
+    if (unit) {
+	return GfParmSI2Unit(unit, val);
+    }
+    return  val;
 }
+
+/** This function returns TRUE if the entry is a formula, and FALSE otherwise
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name
+    @return     0 if the entry is a formula; 1 otherwise
+ */
+int
+GfParmIsFormula (void *handle, char const *path, char const *key)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*section;
+    struct param	*param;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+	return -1;
+    }
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return -1;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, 0);
+    if (!param) {
+	return -1;
+    }
+
+    return param->type == P_FORM ? 0 : -1;
+}
+
+/** Get a formula parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @return	parameter value; NULL on error
+ */
+char*
+GfParmGetFormula (void *handle, char const *path, char const *key)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*section;
+    struct param	*param;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+	return NULL;
+    }
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return NULL;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, 0);
+    if (!param || param->type != P_FORM) {
+	return NULL;
+    }
+
+    return param->value;
+}
+
+/** Get a formula parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @return	parameter value; NULL on error
+ */
+char*
+GfParmGetCurFormula (void *handle, char const *path, char const *key)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*section;
+    struct param	*param;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+	return NULL;
+    }
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return NULL;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, 0);
+    if (!param || (param->type != P_NUM && param->type != P_FORM)) {
+	return NULL;
+    }
+
+    return param->value;
+}
+
 
 
 /** Set a string parameter in a config file.
@@ -2369,19 +2793,22 @@ GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, 
 	struct parmHeader	*conf = parmHandle->conf;
 	struct param	*param;
 	
-	if (parmHandle->magic != PARM_MAGIC) {
+	if (parmHandle->magic != PARM_MAGIC) 
+	{
 		GfFatal ("GfParmSetNum: bad handle (%p)\n", parmHandle);
 		return -1;
 	}
 	
 	param = getParamByName (conf, path, key, PARAM_CREATE);
-	if (!param) {
+	if (!param) 
+	{
 		return -11;
 	}
 
 	param->type = P_NUM;
 	FREEZ (param->unit);
-	if (unit) {
+	if (unit) 
+	{
 		param->unit = strdup (unit);
 	}
 	
@@ -2481,7 +2908,189 @@ GfParmSetCurNum(void *handle, const char *path, const char *key, const char *uni
     return 0;
 }
 
+/** Set a formula parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	val	value to set	
+    @return	0	ok
+    		<br>-1	error
+    @warning	The key is created is necessary
+ */
+int
+GfParmSetFormula (void *handle, char const *path, char const *key, char const *val)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct param	*param;
 
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmSetFormula: bad handle (%p)\n", parmHandle);
+	return -1;
+    }
+
+    if (!val || !strlen (val)) {
+	/* Remove the entry */
+	removeParamByName (conf, path, key);
+	return 0;
+    }
+  
+    param = getParamByName (conf, path, key, PARAM_CREATE);
+    if (!param) {
+	return -1;
+    }
+    param->type = P_FORM;
+    param->formula = GfFormParseFormulaStringNew (val);
+    freez (param->value);
+    param->value = strdup (val);
+    if (!param->value) {
+	GfError ("gfParmSetFormula: strdup (%s) failed\n", val);
+	removeParamByName (conf, path, key);
+	return -1;
+    }
+
+    return 0;
+}
+
+/** Set a formula parameter in a config file.
+    @ingroup	paramslist
+    @param	handle	handle of parameters	
+    @param	path	path of param
+    @param	key	key name	
+    @param	val	value to set	
+    @return	0	ok
+    		<br>-1	error
+    @warning	The key is created is necessary
+ */
+int
+GfParmSetCurFormula(void *handle, char const *path, char const *key, char *val)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    struct section	*section;
+    struct param	*param;
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmSetCurFormula: bad handle (%p)\n", parmHandle);
+	return -1;
+    }
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if ((!section) || (!section->curSubSection)) {
+	return -1;
+    }
+
+    param = getParamByName (conf, section->curSubSection->fullName, key, PARAM_CREATE);
+    if (!param) {
+	return -1;
+    }
+    param->type = P_FORM;
+    param->formula = GfFormParseFormulaStringNew (val);
+    freez (param->value);
+    param->value = strdup (val);
+    if (!param->value) {
+	GfError ("gfParmSetCurFormula: strdup (%s) failed\n", val);
+	removeParamByName (conf, path, key);
+	return -1;
+    }
+
+    return 0;
+}
+
+tdble GfParmGetVariable(void *handle, char const *path, char const *key)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    char *pathdup = (char*)malloc( strlen( path ) + strlen( key ) + 3 );
+    char *str;
+    tdble *val;
+    strcpy( pathdup, path );
+    if( pathdup[ 0 ] == '/' )
+    	memmove( pathdup, pathdup + sizeof( char ), sizeof( char ) * strlen( pathdup ) );
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+	return 0.0f;
+    }
+
+    do {
+        strcat( pathdup, "/" );
+	strcat( pathdup, key );
+        val = (tdble*)GfHashGetStr(conf->variableHash, pathdup);
+	str = strrchr(pathdup, '/');
+	if (!str)
+	    break;
+	*str = '\0';
+	str = strrchr(pathdup, '/');
+	if (!str) {
+	    if (pathdup[0] == '\0')
+	        break;
+	    else
+	        str = pathdup;
+	}
+	*str = '\0';
+    } while( val == NULL );
+
+    free(pathdup);
+
+    if (val)
+        return *val;
+    else
+        return 0.0f;
+}
+
+void GfParmRemoveVariable(void *handle, char const *path, char const *key)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    char *pathdup = (char*)malloc( strlen( path ) + strlen( key ) + 3 );
+    void *val;
+
+    strcpy( pathdup, path );
+    if( pathdup[ 0 ] == '/' )
+    	memmove( pathdup, pathdup + sizeof( char ), sizeof( char ) * strlen( pathdup ) );
+    if( pathdup[ strlen( path ) - 1 ] != '/' )
+        strcat( pathdup, "/" );
+    strcat( pathdup, key );
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+	return;
+    }
+ 
+    val = GfHashGetStr(conf->variableHash, pathdup);
+    GfHashRemStr(conf->variableHash, pathdup);
+    free(pathdup);
+
+    if (val)
+    	free(val);
+}
+
+void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val)
+{
+    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
+    struct parmHeader	*conf = parmHandle->conf;
+    char *pathdup = (char*)malloc( strlen( path ) + strlen( key ) + 3 );
+
+    tdble *val_ptr;
+    strcpy( pathdup, path );
+    if( pathdup[ 0 ] == '/' )
+    	memmove( pathdup, pathdup + sizeof( char ), sizeof( char ) * strlen( pathdup ) );
+    if( pathdup[ strlen( path ) - 1 ] != '/' )
+        strcat( pathdup, "/" );
+    strcat( pathdup, key );
+
+    if (parmHandle->magic != PARM_MAGIC) {
+	GfFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+	return;
+    }
+ 
+    val_ptr = (tdble*)malloc( sizeof(tdble) );
+    *val_ptr = val;
+    GfHashAddStr(conf->variableHash, pathdup, (void*)val_ptr);
+    val_ptr = (tdble*)GfHashGetStr(conf->variableHash, pathdup );
+    free(pathdup);
+}
 
 /** Check a parameter set against another.
     @ingroup	paramsfile
@@ -2718,7 +3327,11 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     /* Handle creation */
     parmHandleOut = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandleOut) {
-	GfError ("gfParmReadBuf: calloc (1, %lu) failed\n", (unsigned long)sizeof (struct parmHandle));
+#ifdef WIN32
+	GfError ("gfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
+#else //WIN32
+	GfError ("gfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
+#endif //WIN32
 	parmReleaseHeader (confOut);
 	return NULL;
     }
@@ -2842,4 +3455,54 @@ GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *m
     return 0;
 }
 
- 
+
+/*
+ * 
+ * name: safeFOpen
+ * Safely opens a file (useful for writing a file).
+ * If the directory where the file should reside does not exists,
+ * it creates each directory on the given path, step by step.
+ * 
+ * Note: needs <errno.h> and <sys/stat.h>
+ * 
+ * @param fileName: full path of the file to be opened (for writing)
+ * @param mode: open mode
+ * @return: FILE *, handler for the file just opened. NULL if failed.
+ */
+
+// mkdir with u+rwx access rights by default
+#ifndef WIN32
+# ifdef mkdir
+#  undef mkdir
+# endif
+# define mkdir(x) mkdir((x), S_IRWXU)
+#endif
+
+FILE *
+safeFOpen(const char *fileName, const char *mode)
+{
+    // Try first normal fopen (very likely to work well => if OK, nothing more to do)
+    FILE* file = fopen(fileName, mode);
+    if (file)
+	return file;
+   
+    // Otherwise, try and create parent dirs in case it is the cause of the error :
+    // - search the fileName for directory level separators (\\ or /) and create each directory.
+    // - directories' permissions are set to 700=u+rwx on UNIX-like systems.
+    // - the only error we silently ignore from mkdir is when the dir already exists.
+    char *mname = strdup(fileName);
+    for(int i = 0; mname[i] != '\0'; i++) {
+	if(i > 0 && (mname[i] == '\\' || mname[i] == '/')) {
+	    const char slash = mname[i];
+	    mname[i] = '\0';
+	    if(mkdir(mname) == -1 && errno != EEXIST) {
+		return NULL;
+	    }
+	    
+	    mname[i] = slash;
+	}//if i
+    }//for i
+
+    free(mname);
+    return fopen(fileName, mode);
+}//safeFOpen

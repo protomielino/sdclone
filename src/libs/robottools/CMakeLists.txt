@@ -1,0 +1,33 @@
+INCLUDE(../../../cmake/macros.cmake)
+
+#PROJECT(robottools)
+
+ADD_INTERFACE_INCLUDEDIR()
+ADD_OSSPEC_INCLUDEDIR()
+ADD_TORCSLIB_INCLUDEDIR(portability tgf math)
+INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
+
+SET(ROBOTTOOLS_SOURCES rtteammanager.cpp rttelem.cpp rttimeanalysis.cpp
+	rttrack.cpp rtutil.cpp timeanalysis.h)
+
+
+IF(UNIX)
+	ADD_LIBRARY(robottools SHARED ${ROBOTTOOLS_SOURCES})
+ENDIF(UNIX)
+
+IF(WIN32)
+	ADD_LIBRARY(robottools SHARED ${ROBOTTOOLS_SOURCES} robotools.def)
+ENDIF(WIN32)
+
+
+ADD_PLIB_LIBRARY(robottools sg ul)
+ADD_TORCSLIB_LIBRARY(robottools tgf)
+
+IF(WIN32)
+	TORCS_INSTALL_FILES(BIN TARGETS robottools)
+ELSE(WIN32)
+	TORCS_INSTALL_FILES(LIB lib TARGETS robottools)
+ENDIF(WIN32)
+TORCS_INSTALL_FILES(INCLUDE FILES robottools.h)
+TORCS_INSTALL_FILES(INCLUDE FILES teammanager.h)
+

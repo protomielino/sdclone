@@ -18,6 +18,8 @@
  ***************************************************************************/
 
 #include <stdio.h>
+
+
 #include <tgfclient.h>
 
 #include <graphconfig.h>
@@ -34,12 +36,9 @@ void *
 OptionOptionInit(void *prevMenu)
 {
     if (optionHandle) 
-	return optionHandle;
+		return optionHandle;
 
-    optionHandle = GfuiScreenCreateEx((float*)NULL, 
-					    NULL, NULL, 
-					    NULL, (tfuiCallback)NULL, 
-					    1);
+    optionHandle = GfuiScreenCreateEx((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);
 
     void *param = LoadMenuXML("optionsmenu.xml");
 
@@ -56,7 +55,7 @@ OptionOptionInit(void *prevMenu)
     GfParmReleaseHandle(param);
 
     GfuiMenuDefaultKeysAdd(optionHandle);
-    GfuiAddKey(optionHandle, 27, "Back", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(optionHandle, GFUIK_ESCAPE, "Back", prevMenu, GfuiScreenActivate, NULL);
 
     return optionHandle;
 }
