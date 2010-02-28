@@ -88,7 +88,6 @@ bool CarMenuSettings::Init(void* pMenu,const char *pszCar)
 	
 	GfuiComboboxSetSelectedIndex(m_pMenuHandle,carCatId,carIndex);
 
-	CreateButtonControl(m_pMenuHandle,param,"garage",NULL,NULL);
 	CreateButtonControl(m_pMenuHandle,param,"accept",NULL,onAcceptCB);
     CreateButtonControl(m_pMenuHandle,param,"cancel",NULL,onCancelCB);
 
