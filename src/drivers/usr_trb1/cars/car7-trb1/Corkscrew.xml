@@ -29,6 +29,8 @@
 		<attnum name="base speed" val="17.4"/>
 		<attnum name="base brake" val="27"/>
 		<attnum name="increase corner inverse" val="0.22"/>
+		<attnum name="pit offset" val="80"/>
+		<attnum name="pit shift" val="1"/>
 	</section>
 
 </params>

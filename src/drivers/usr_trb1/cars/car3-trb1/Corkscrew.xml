@@ -28,6 +28,8 @@
 		<attnum name="bump caution" val="0.7"/>
 		<attnum name="base brake" val="33"/>
 		<attnum name="increase corner inverse" val="0.023"/>
+		<attnum name="pit offset" val="80"/>
+		<attnum name="pit shift" val="1"/>
 	</section>
 
 </params>

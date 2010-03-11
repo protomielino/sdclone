@@ -29,6 +29,8 @@
 		<attnum name="bump caution" val="1.6"/>
 		<attnum name="slope factor" val="0.4"/>
 		<attnum name="skid correction" val="2.2"/>
+		<attnum name="pit offset" val="80"/>
+		<attnum name="pit shift" val="1"/>
 	</section>
 
 </params>

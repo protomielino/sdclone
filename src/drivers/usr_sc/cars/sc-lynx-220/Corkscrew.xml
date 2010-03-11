@@ -19,6 +19,8 @@
 	<section name="private">
 		<attnum name="bump caution" val="1.5"/>
 		<attnum name="base brake" val="18"/>
+		<attnum name="pit offset" val="80"/>
+		<attnum name="pit shift" val="1"/>
 	</section>
 
 </params>
