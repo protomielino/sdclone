@@ -215,8 +215,8 @@ rmrpValidate(void * /* dummy */)
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_DISTANCE, "km", rmrpDistance);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_LAPS, (char*)NULL, rmrpLaps);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_SESSIONTIME, "s", (tdble)rmrpSessionTime);
-	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, rmrpWeather);
-	GfParmSetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, rmrpTimeOfDay);
+	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, rmrpWeather + 1);
+	GfParmSetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, rmrpTimeOfDay + 1);
     }
 
     if (rp->confMask & RM_CONF_DISP_MODE) {
@@ -321,7 +321,7 @@ RmRaceParamMenu(void *vrp)
     }
 
     // Create and initialize Time of day combo box (2 arrow buttons and a variable label).
-    rmrpTimeOfDay = (int)GfParmGetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, 0);
+    rmrpTimeOfDay = ((int)GfParmGetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, 0) - 1);
 
     CreateButtonControl(scrHandle,menuXMLDescHdle,"timeofdayleftarrow",(void*)-1, rmChangeTime);
     CreateButtonControl(scrHandle,menuXMLDescHdle,"timeofdayrightarrow",(void*)1, rmChangeTime);
@@ -330,7 +330,7 @@ RmRaceParamMenu(void *vrp)
     GfuiLabelSetText(scrHandle,rmrpTimeOfDayId,TimeOfDayValues[rmrpTimeOfDay]);
     
     // Create and initialize Weather combo box (2 arrow buttons and a variable label).
-    rmrpWeather = (int)GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, 0);
+    rmrpWeather = ((int)GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, 0) - 1);
     
     CreateButtonControl(scrHandle,menuXMLDescHdle,"weatherleftarrow",(void*)-1, rmChangeWeather);
     CreateButtonControl(scrHandle,menuXMLDescHdle,"weatherrightarrow",(void*)1, rmChangeWeather);
