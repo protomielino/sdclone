@@ -8,7 +8,7 @@ SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp cardata.cpp  correct.cpp  driver.cpp
 	spline.h  strategy.h)
 
 SET(ROBOT_SHIP)
-SET(ROBOT_SHIPSUBDIRS 1 2 3 4 5 6 7 8 9 10 sc-996 sc-ciclon-300 sc-f360 sc-gt4 sc-lynx-220 sc-nsx svg)
+SET(ROBOT_SHIPSUBDIRS 1 2 3 4 5 6 7 8 9 10 sc-boxer-96 sc-spirit-300 sc-cavallo-360 sc-fmc-gt4 sc-lynx-220 sc-murasama-nsx svg)
 
 ROBOT(NAME ${ROBOT_NAME} SOURCES ${ROBOT_SOURCES} SHIP ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
