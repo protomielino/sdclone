@@ -23,7 +23,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-996"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-996"></attstr>
+        <attstr name="car name" val="sc-boxer-96"></attstr>
         <attnum name="race number" val="7"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
@@ -35,7 +35,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-996"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-996"></attstr>
+        <attstr name="car name" val="sc-boxer-96"></attstr>
         <attnum name="race number" val="8"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
@@ -47,7 +47,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-spirit"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-ciclon-300"></attstr>
+        <attstr name="car name" val="sc-spirit-300"></attstr>
         <attnum name="race number" val="18"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -59,7 +59,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-spirit"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-ciclon-300"></attstr>
+        <attstr name="car name" val="sc-spirit-300"></attstr>
         <attnum name="race number" val="20"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -71,7 +71,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-f360"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-f360"></attstr>
+        <attstr name="car name" val="sc-cavallo-360"></attstr>
         <attnum name="race number" val="11"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -83,7 +83,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-f360"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-f360"></attstr>
+        <attstr name="car name" val="sc-cavallo-360"></attstr>
         <attnum name="race number" val="34"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.5"></attnum>
@@ -95,7 +95,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-gt4"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-gt4"></attstr>
+        <attstr name="car name" val="sc-fmc-gt4"></attstr>
         <attnum name="race number" val="25"></attnum>
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -107,7 +107,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-gt4"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="sc-gt4"></attstr>
+        <attstr name="car name" val="sc-fmc-gt4"></attstr>
         <attnum name="race number" val="40"></attnum>
         <attnum name="red" val="0.7"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -143,7 +143,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-nsx"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-nsx"></attstr>
+        <attstr name="car name" val="sc-murasama-nsx"></attstr>
         <attnum name="race number" val="12"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -155,7 +155,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="usr-nsx"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-nsx"></attstr>
+        <attstr name="car name" val="sc-murasama-nsx"></attstr>
         <attnum name="race number" val="13"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>

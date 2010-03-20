@@ -22,7 +22,7 @@
         <attstr name="desc" val="SC: 96A"></attstr>
         <attstr name="team" val="simplix_sc96A"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-996"></attstr>
+        <attstr name="car name" val="sc-boxer-96"></attstr>
         <attnum name="race number" val="996"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -34,7 +34,7 @@
         <attstr name="desc" val="SC: 96B"></attstr>
         <attstr name="team" val="simplix_sc96A"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-996"></attstr>
+        <attstr name="car name" val="sc-boxer-96"></attstr>
         <attnum name="race number" val="997"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -46,7 +46,7 @@
         <attstr name="desc" val="SC: SpiritA"></attstr>
         <attstr name="team" val="simplix_scspirit"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-ciclon-300"></attstr>
+        <attstr name="car name" val="sc-spirit-300"></attstr>
         <attnum name="race number" val="110"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -58,7 +58,7 @@
         <attstr name="desc" val="SC: spiritB"></attstr>
         <attstr name="team" val="simplix_scspirit"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-ciclon-300"></attstr>
+        <attstr name="car name" val="sc-spirit-300"></attstr>
         <attnum name="race number" val="44"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -70,7 +70,7 @@
         <attstr name="desc" val="SC: c360A"></attstr>
         <attstr name="team" val="simplix_scc360"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-f360"></attstr>
+        <attstr name="car name" val="sc-cavallo-360"></attstr>
         <attnum name="race number" val="62"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.3"></attnum>
@@ -82,7 +82,7 @@
         <attstr name="desc" val="SC: c360B"></attstr>
         <attstr name="team" val="simplix_scc360"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-f360"></attstr>
+        <attstr name="car name" val="sc-cavallo-360"></attstr>
         <attnum name="race number" val="63"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.3"></attnum>
@@ -94,7 +94,7 @@
         <attstr name="desc" val="SC: gt4A"></attstr>
         <attstr name="team" val="simplix_scgt4"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-gt4"></attstr>
+        <attstr name="car name" val="sc-fmc-gt4"></attstr>
         <attnum name="race number" val="23"></attnum>
         <attnum name="red" val="0.5"></attnum>
         <attnum name="green" val="0.8"></attnum>
@@ -106,7 +106,7 @@
         <attstr name="desc" val="SC: gt4B"></attstr>
         <attstr name="team" val="simplix_scgt4"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-gt4"></attstr>
+        <attstr name="car name" val="sc-fmc-gt4"></attstr>
         <attnum name="race number" val="24"></attnum>
         <attnum name="red" val="0.5"></attnum>
         <attnum name="green" val="0.8"></attnum>
@@ -142,7 +142,7 @@
         <attstr name="desc" val="SCB: 96A"></attstr>
         <attstr name="team" val="simplix_sc96B"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-996"></attstr>
+        <attstr name="car name" val="sc-boxer-96"></attstr>
         <attnum name="race number" val="51"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.3"></attnum>
@@ -154,7 +154,7 @@
         <attstr name="desc" val="SCB: 96B"></attstr>
         <attstr name="team" val="simplix_sc96B"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-996"></attstr>
+        <attstr name="car name" val="sc-boxer-96"></attstr>
         <attnum name="race number" val="52"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.3"></attnum>
@@ -166,7 +166,7 @@
      <attstr name="desc" val="SCB: NSXA"></attstr>
      <attstr name="team" val="simplix_scNSX"></attstr>
      <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-     <attstr name="car name" val="sc-nsx"></attstr>
+     <attstr name="car name" val="sc-murasama-nsx"></attstr>
      <attnum name="race number" val="97"></attnum>
      <attnum name="red" val="0.0"></attnum>
      <attnum name="green" val="0.0"></attnum>
@@ -178,7 +178,7 @@
         <attstr name="desc" val="SCB: NSXB"></attstr>
         <attstr name="team" val="simplix_scNSX"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="sc-nsx"></attstr>
+        <attstr name="car name" val="sc-murasama-nsx"></attstr>
         <attnum name="race number" val="98"></attnum>
         <attnum name="red" val="0.0"></attnum>
         <attnum name="green" val="0.0"></attnum>
