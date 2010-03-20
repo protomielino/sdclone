@@ -9,7 +9,7 @@ SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp driver.cpp opponent.cpp spline.cpp pit.cpp
 	strategy.cpp cardata.cpp raceline.cpp)
 
 SET(ROBOT_SHIP logo.rgb)
-SET(ROBOT_SHIPSUBDIRS cars 1 2 3 4 5 6 7 8 9 10)
+SET(ROBOT_SHIPSUBDIRS cars 1 2 3 4 5 6 7 8 9 10 11 12)
 
 ROBOT(NAME ${ROBOT_NAME} INTERFACE ${ROBOT_INTERFACE}
 	SOURCES ${ROBOT_SOURCES} SHIP ${ROBOT_SHIP}
