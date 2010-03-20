@@ -99,7 +99,7 @@ ROBOT_DATA(NAME simplix_36GP SHIPPREFIX simplix_36GP
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
 SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 12 13
-                      sc-996 sc-ciclon-300 sc-f360 sc-gt4 sc-lynx-220 sc-nsx
+                      sc-boxer-96 sc-spirit-300 sc-cavallo-360 sc-fmc-gt4 sc-lynx-220 sc-murasama-nsx
                       tracks)
 
 ROBOT_DATA(NAME simplix_sc SHIPPREFIX simplix_sc
