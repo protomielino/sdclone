@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="36GP-bugatti" type="template">
+<params name="36gp-ettore-t59" type="template">
 	<section name="simplix private">
 		<attnum name="border outer" min="0.0" max="3.0" val="0.25"/>
 		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.2"/>

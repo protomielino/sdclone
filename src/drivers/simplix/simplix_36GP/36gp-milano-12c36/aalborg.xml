@@ -12,12 +12,12 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="36GP-bugatti" type="template">
+<params name="36gp-milano-12c36" type="template">
 	<section name="simplix private">
-		<attnum name="qualy brake" min="0" max="1" val="1.00"/>
-		<attnum name="qualy mu" min="0" max="2" val="1.00"/>
+		<attnum name="qualy brake" min="0" max="1" val="1.10"/>
+		<attnum name="qualy mu" min="0" max="2" val="0.93"/>
 		<attnum name="scale brake" min="0" max="1" val="1.00"/>
-		<attnum name="scale mu" min="0" max="2" val="1.00"/>
+		<attnum name="scale mu" min="0" max="2" val="0.90"/>
 	</section>
 </params>
 

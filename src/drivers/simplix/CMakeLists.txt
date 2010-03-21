@@ -92,7 +92,7 @@ ROBOT_DATA(NAME simplix_indy SHIPPREFIX simplix_indy
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
 SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 9
-                      36GP-alfa12c 36GP-bugatti 36GP-maserati 36GP-maserati6C34 36GP-mercedes
+		      36gp-ettore-t59 36gp-milano-12c36 36gp-silber-w25b 36gp-tridenti-6c34 36gp-tridenti-v8ri
                       tracks)
 
 ROBOT_DATA(NAME simplix_36GP SHIPPREFIX simplix_36GP

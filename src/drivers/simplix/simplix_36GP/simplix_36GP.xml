@@ -23,7 +23,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Mercedes"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attstr name="car name" val="36gp-silber-w25b"></attstr>
         <attnum name="race number" val="6"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
@@ -35,7 +35,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Scuderia Ferrari"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-alfa12c"></attstr>
+        <attstr name="car name" val="36gp-milano-12c36"></attstr>
         <attnum name="race number" val="19"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -47,7 +47,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Mercedes"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attstr name="car name" val="36gp-silber-w25b"></attstr>
         <attnum name="race number" val="8"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -59,7 +59,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Mercedes"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attstr name="car name" val="36gp-silber-w25b"></attstr>
         <attnum name="race number" val="7"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -71,7 +71,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Scuderia Torino"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-maserati"></attstr>
+        <attstr name="car name" val="36gp-tridenti-v8ri"></attstr>
         <attnum name="race number" val="33"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.5"></attnum>
@@ -83,7 +83,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Scuderia Torino"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-maserati6C34"></attstr>
+        <attstr name="car name" val="36gp-tridenti-6c34"></attstr>
         <attnum name="race number" val="35"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.5"></attnum>
@@ -95,7 +95,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Scuderia Maremmana"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-maserati6C34"></attstr>
+        <attstr name="car name" val="36gp-tridenti-6c34"></attstr>
         <attnum name="race number" val="57"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.5"></attnum>
@@ -107,7 +107,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Scuderia Maremmana"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-maserati6C34"></attstr>
+        <attstr name="car name" val="36gp-tridenti-6c34"></attstr>
         <attnum name="race number" val="58"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.5"></attnum>
@@ -119,7 +119,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Ettore Bugatti"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-bugatti"></attstr>
+        <attstr name="car name" val="36gp-ettore-t59"></attstr>
         <attnum name="race number" val="24"></attnum>
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -131,7 +131,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Private 5"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-bugatti"></attstr>
+        <attstr name="car name" val="36gp-ettore-t59"></attstr>
         <attnum name="race number" val="44"></attnum>
         <attnum name="red" val="0.7"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -143,7 +143,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="36 Mercedes"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="36GP-mercedes"></attstr>
+        <attstr name="car name" val="36gp-silber-w25b"></attstr>
         <attnum name="race number" val="10"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>

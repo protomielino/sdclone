@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-    file          : alpine-1.xml
+    file          : aalborg.xml
     created       : 19 Dec 2008 
     last modified : 26 Jul 2009
     copyright     : (C) 2008-2009 Wolf-Dieter Beelitz
@@ -12,11 +12,11 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="36GP-mercedes" type="template">
+<params name="36gp-tridenti-v8ri" type="template">
 	<section name="simplix private">
-		<attnum name="qualy brake" min="0" max="1" val="0.90"/>
+		<attnum name="qualy brake" min="0" max="1" val="1.00"/>
 		<attnum name="qualy mu" min="0" max="2" val="0.90"/>
-		<attnum name="scale brake" min="0" max="1" val="0.78"/>
+		<attnum name="scale brake" min="0" max="1" val="1.00"/>
 		<attnum name="scale mu" min="0" max="2" val="0.85"/>
 	</section>
 </params>
