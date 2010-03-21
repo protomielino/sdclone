@@ -106,7 +106,7 @@ initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
     switch (pits->type) {
     case TR_PIT_ON_TRACK_SIDE:
 	pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
-	pits->driversPitsNb = pits->nPitSeg; // pits->driversPitsNb = pits->nMaxPits;
+	pits->driversPitsNb = pits->nPitSeg; 
 	curPos.type = TR_LPOS_MAIN;
 
 	segName = GfParmGetStr(TrackHandle, path2, TRK_ATT_BUILDINGS_START, NULL);
@@ -130,12 +130,11 @@ initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
 	if (pitBuildingsStart == NULL)
 		pitBuildingsStart = pits->pitStart;
 
-//	curMainSeg = pits->pitStart->prev;
 	curMainSeg = pitBuildingsStart->prev;
 	changeSeg = 1;
 	toStart = 0;
 	i = 0;
-	while (i < pits->nPitSeg) { // while (i < pits->nMaxPits) {
+	while (i < pits->nPitSeg) { 
 	    if (changeSeg) {
 		changeSeg = 0;
 		offset = 0;
@@ -256,7 +255,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     printf("version   = %d\n", Track->version);
     printf("length    = %f\n", Track->length);
     printf("width     = %f\n", Track->width);
-    printf("pits      = %d\n", Track->pits.nMaxPits);
+    printf("pits max  = %d\n", Track->pits.nMaxPits);
+    printf("pits      = %d\n", Track->pits.nPitSeg);
     printf("XSize     = %f\n", Track->max.x);
     printf("YSize     = %f\n", Track->max.y);
     printf("ZSize     = %f\n", Track->max.z);

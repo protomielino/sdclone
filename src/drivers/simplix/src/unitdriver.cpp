@@ -357,10 +357,8 @@ TDriver::TDriver(int Index):
 TDriver::~TDriver()
 {
 //  GfOut("#TDriver::~TDriver() >>>\n");
-//  for (int I = 0; I < oNbrCars; I++)
-//    delete oOpponents[I];
   delete [] oOpponents; 
-
+  
   if (oStrategy != NULL)
     delete oStrategy;
   if (oSysFooStuckX != NULL)
@@ -456,8 +454,8 @@ void TDriver::InitTrack
     SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
 	  "skilling", "enable", (char *) NULL, 0.0)));
     GfOut("#SkillEnabled %d\n",SkillEnabled);
-    oTeamEnabled = (int)
-  	  GfParmGetNum(SkillHandle,"team","enable",0,(float)oTeamEnabled);
+    oTeamEnabled =
+  	  GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
     GfOut("#oTeamEnabled %d\n",oTeamEnabled);
   }
 
@@ -535,7 +533,7 @@ void TDriver::InitTrack
 
   oMaxPressure = GfParmGetNum(CarHandle          // Maximal möglicher
     , "Brake System", MAXPRESSURE                //   Bremsdruck
-    , (char*) NULL, oMaxPressure);
+    , (char*) NULL, (float) oMaxPressure);
   GfOut("#oMaxPressure       = %.1f\n",oMaxPressure);
 
   oBrakeScale *= MAX(1.0,INITIAL_BRAKE_PRESSURE / oMaxPressure);
@@ -718,13 +716,13 @@ void TDriver::InitTrack
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE,NULL,0.85f);
   if(Qualification)
     Param.oCarParam.oScaleBrake = 
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE_Q,NULL,Param.oCarParam.oScaleBrake);
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE_Q,NULL,(float) Param.oCarParam.oScaleBrake);
   GfOut("#Scale Brake: %g\n",Param.oCarParam.oScaleBrake);
 
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
   Param.oCarParam.oScaleBump =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMP,NULL,Param.oCarParam.oScaleBump);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMP,NULL,(float) Param.oCarParam.oScaleBump);
   Param.oCarParam.oScaleBumpLeft =
     Param.oCarParam.oScaleBump;
   Param.oCarParam.oScaleBumpRight =
@@ -736,14 +734,14 @@ void TDriver::InitTrack
   GfOut("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
 
   Param.oCarParam.oScaleMu = ScaleMu *
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU,NULL,Param.oCarParam.oScaleMu);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU,NULL,(float) Param.oCarParam.oScaleMu);
   if(Qualification)
     Param.oCarParam.oScaleMu = 
-  	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU_Q,NULL,Param.oCarParam.oScaleMu);
+  	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU_Q,NULL,(float) Param.oCarParam.oScaleMu);
   GfOut("#Scale Mu: %g\n",Param.oCarParam.oScaleMu);
 
   Param.oCarParam.oScaleMinMu =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MIN_MU,NULL,Param.oCarParam.oScaleMinMu);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MIN_MU,NULL,(float) Param.oCarParam.oScaleMinMu);
   GfOut("#Scale Min Mu %g\n",Param.oCarParam.oScaleMinMu);
 
   oSideScaleMu = 
@@ -755,7 +753,7 @@ void TDriver::InitTrack
   GfOut("#Side Scale Brake%g\n",oSideScaleBrake);
 
   oAvoidScale =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,oAvoidScale);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,(float) oAvoidScale);
   GfOut("#oAvoidScale %g\n",oAvoidScale);
 
   if (oTrack->width < 11)
@@ -768,12 +766,12 @@ void TDriver::InitTrack
     oAvoidWidth = 1.25;
 
   oAvoidWidth =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_WIDTH,0,oAvoidWidth);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_WIDTH,0,(float) oAvoidWidth);
   GfOut("#oAvoidWidth %g\n",oAvoidWidth);
 
   oLookAhead = Param.Fix.oLength;
   oLookAhead =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LOOKAHEAD,0,oLookAhead);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LOOKAHEAD,0,(float) oLookAhead);
   GfOut("#oLookAhead %g\n",oLookAhead);
 
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
@@ -785,23 +783,23 @@ void TDriver::InitTrack
   if (TDriver::AdvancedParameters)
   {
     Param.Fix.oBorderInner =
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_INNER,0,Param.Fix.oBorderInner);
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_INNER,0,(float) Param.Fix.oBorderInner);
     GfOut("#Border Inner: %g\n",Param.Fix.oBorderInner);
 
     Param.Fix.oBorderOuter =
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_OUTER,0,Param.Fix.oBorderOuter);
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_OUTER,0,(float) Param.Fix.oBorderOuter);
     GfOut("#Border Outer: %g\n",Param.Fix.oBorderOuter);
 
     Param.Fix.oMaxBorderInner =
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_MAX_BORDER_INNER,0,Param.Fix.oMaxBorderInner);
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_MAX_BORDER_INNER,0,(float) Param.Fix.oMaxBorderInner);
     GfOut("#Max Border Inner: %g\n",Param.Fix.oMaxBorderInner);
 
     Param.Fix.oBorderScale =
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_SCALE,0,Param.Fix.oBorderScale);
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BORDER_SCALE,0,(float) Param.Fix.oBorderScale);
     GfOut("#Border Scale: %g\n",Param.Fix.oBorderScale);
 
     oFlyHeight =
-      GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_FLY_HEIGHT,"m",oFlyHeight);
+      GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_FLY_HEIGHT,"m",(float) oFlyHeight);
     GfOut("#FLY_HEIGHT %g\n",oFlyHeight);
 
     oLookAhead =
@@ -817,7 +815,7 @@ void TDriver::InitTrack
     GfOut("#OmegaAheadFactor %g\n",oOmegaAheadFactor);
 
 	oInitialBrakeCoeff = oBrakeCoeff[0];
-	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_INIT_BRAKE,0,oBrakeCoeff[0]);
+	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_INIT_BRAKE,0,(float) oBrakeCoeff[0]);
     GfOut("#oInitialBrakeCoeff %g\n",oInitialBrakeCoeff);
   }
 
@@ -826,15 +824,15 @@ void TDriver::InitTrack
   GfOut("#LookAheadFactor %g\n",oLookAheadFactor);
 
   oScaleSteer =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_STEER,0,oScaleSteer);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_STEER,0,(float) oScaleSteer);
   GfOut("#oScaleSteer %g\n",oScaleSteer);
 
   oStayTogether =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_STAY_TOGETHER,0,10);
   GfOut("#oStayTogether %g\n",oStayTogether);
 
-  oCrvComp = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CRV_COMP,0,1);
+  oCrvComp =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CRV_COMP,0,1) != 0;
   GfOut("#oCrvComp %g\n",oCrvComp);
 
   for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
@@ -872,8 +870,8 @@ void TDriver::InitTrack
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CLUTCH_RELEASE,0,(float)oClutchRelease);
   GfOut("#oClutchRelease %g\n",oClutchRelease);
 
-  oTeamEnabled = (int)
-    GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,(float)oTeamEnabled);
+  oTeamEnabled =
+    GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,(float)oTeamEnabled) != 0;
   GfOut("#oTeamEnabled %d\n",oTeamEnabled);
   // ... Adjust driving
 
@@ -887,9 +885,9 @@ void TDriver::InitTrack
   }
   else
   {
-    oSkillOffset = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, oSkillOffset)));
+    oSkillOffset = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"offset skill", (char *) NULL, (float) oSkillOffset)));
     GfOut("#SkillOffset: %g\n", oSkillOffset);
-    oSkillScale = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, oSkillScale)));
+    oSkillScale = MAX(0.0,MIN(10.0,GfParmGetNum(Handle,TDriver::SECT_PRIV,"scale skill", (char *) NULL, (float) oSkillScale)));
     GfOut("#SkillScale: %g\n", oSkillScale);
 
     oLookAhead = oLookAhead / (1+oSkillGlobal/24);
@@ -951,7 +949,7 @@ void TDriver::InitTrack
   // Create pitting strategy
   oStrategy = new TSimpleStrategy();
   oStrategy->oDriver = this;
-  oStrategy->oMaxFuel = oMaxFuel;
+  oStrategy->oMaxFuel = (float) oMaxFuel;
   Param.Fix.oStrategy = oStrategy; 
 
   // Setup initial fuel for race ...
@@ -1542,7 +1540,7 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   if (WheelSeg(REAR_RGT) != WheelSeg(REAR_LFT))
   {
     float MinFriction = MIN(WheelSegFriction(REAR_RGT),WheelSegFriction(REAR_LFT));
-	oSideReduction = MIN(1.0,MinFriction / CarFriction);
+	oSideReduction = (float) MIN(1.0,MinFriction / CarFriction);
 	//GfOut("SideReduction: %g\n",oSideReduction);
   }
 }
@@ -2336,7 +2334,7 @@ void TDriver::BrakingForceRegulator()
       if (PosIdx != oLastPosIdx)
 	  {
 	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
-        Err = oCurrSpeed - TargetSpeed;
+        Err = (float) (oCurrSpeed - TargetSpeed);
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
@@ -2403,7 +2401,7 @@ void TDriver::BrakingForceRegulatorAvoid()
       if (PosIdx != oLastPosIdx)
 	  {
 	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
-        Err = oCurrSpeed - TargetSpeed;
+        Err = (float) (oCurrSpeed - TargetSpeed);
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
@@ -2465,7 +2463,7 @@ void TDriver::BrakingForceRegulatorTraffic()
       if (PosIdx != oLastPosIdx)
 	  {
 	    double TargetSpeed = oTrackDesc.InitialTargetSpeed(PosIdx);
-        Err = oCurrSpeed - TargetSpeed;
+        Err = (float) (oCurrSpeed - TargetSpeed);
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
@@ -2533,7 +2531,6 @@ void TDriver::EvaluateCollisionFlags(
 
 	if (OppInfo.GotFlags(F_COLLIDE)
 	  && (OppInfo.CatchDecel > 12.5 * CarFriction))
-//	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed * 0.9);
 	  Coll.TargetSpeed = MIN(Coll.TargetSpeed, OppInfo.CatchSpeed);
 
 	if (OppInfo.Flags & (F_COLLIDE | F_CATCHING))
@@ -2925,7 +2922,6 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   }
 
   double TargetSpeed =                           // Adjust target speed
-//	MIN(oTargetSpeed, Coll.TargetSpeed * 0.9);
 	MIN(oTargetSpeed, Coll.TargetSpeed);
 
   // Skilling from Andrew Sumner ...
@@ -3052,9 +3048,9 @@ double TDriver::FilterSkillBrake(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterBrakeSpeed(double Brake)
 {
-	float WF = Param.Tmp.oMass * G / Param.Fix.oCa;
+	float WF = (float) (Param.Tmp.oMass * G / Param.Fix.oCa);
 	float F2 = WF + 10000;
-	float F1 = WF + oCurrSpeed * oCurrSpeed;
+	float F1 = (float) (WF + oCurrSpeed * oCurrSpeed);
 	return Brake * F1/F2;
 }
 //==========================================================================*
@@ -3114,7 +3110,7 @@ double TDriver::FilterTCL(double Accel)
   double Slip = Spin * Wr - CarSpeedLong;        // Calculate slip
   if (Slip > oTclSlip)                           // Decrease accel if needed
   {
-	float MinAccel = 0.2 * Accel;
+	float MinAccel = (float) (0.2 * Accel);
 	Accel -= MIN(Accel, (Slip - oTclSlip)/oTclRange);
 	Accel = MAX(MinAccel,Accel);
   }

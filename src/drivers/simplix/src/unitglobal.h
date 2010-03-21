@@ -9,8 +9,8 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2009.12.06
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.03.13
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 2.00.000
 //--------------------------------------------------------------------------*
@@ -36,6 +36,7 @@
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
 
+#define SPEED_DREAMS
 //#undef SPEED_DREAMS
 
 // The great question, ...

@@ -798,9 +798,11 @@ WindowsSpecInit(void)
     GfOs.dirGetList = windowsDirGetList;
     GfOs.dirGetListFiltered = windowsDirGetListFiltered;
     GfOs.timeClock = windowsTimeClock;
-
+//>>> Multithreading-Issue:
+// Windows XP/windows 7 and ATI Radenon: card no problems without this!
     // Workaround for Vista jerky rendering on multicore CPUs.
     int nMajor, nMinor, nBits;
     if (windowsGetOSInfo(&nMajor, &nMinor, &nBits) && nMajor >= 6)
 	windowsSetAffinity();
+//<<<
 }

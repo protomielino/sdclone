@@ -297,7 +297,7 @@ main(int argc, char **argv)
 	SDL_WM_SetCaption(argv[1],NULL);
 
 
-    ssgInit();
+    //ssgInit();
     
 #ifndef WIN32
     LinuxSpecInit();
@@ -319,10 +319,16 @@ Generate(void)
 	const char *trackdllname;
 	const char *extName;
 	const char *libdir = GetLibDir();
+	const char *datadir = GetDataDir();
 	FILE *outfd = NULL;
 
-	if (!libdir)
-		libdir = "";
+	// Tested for windows only
+	if (!libdir) 
+		libdir = "../lib/";
+
+	// Tested for windows only
+	if (!datadir)
+		datadir = "../share/";
 
 	// Get the trackgen paramaters.
 	sprintf(buf, "%s", CFG_FILE);
@@ -339,7 +345,7 @@ Generate(void)
 	}
 
 	// This is the track definition.
-	sprintf(trackdef, "tracks/%s/%s/%s.xml", TrackCategory, TrackName, TrackName);
+	sprintf(trackdef, "%stracks/%s/%s/%s.xml", datadir, TrackCategory, TrackName, TrackName);
 	TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
 	if (!TrackHandle) {
 		fprintf(stderr, "Cannot find %s\n", trackdef);
@@ -351,7 +357,7 @@ Generate(void)
 
 	if (!JustCalculate) {
 		// Get the output file radix.
-		sprintf(buf2, "tracks/%s/%s/%s", Track->category, Track->internalname, Track->internalname);
+		sprintf(buf2, "%stracks/%s/%s/%s", datadir, Track->category, Track->internalname, Track->internalname);
 		OutputFileName = strdup(buf2);
 
 		// Number of goups for the complete track.

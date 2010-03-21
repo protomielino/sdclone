@@ -132,7 +132,7 @@ bool TSimpleStrategy::IsPitFree()
 bool TSimpleStrategy::NeedPitStop()
 {
 #ifdef SPEED_DREAMS
-  double FuelConsum;                             // Fuel consumption per m
+  float FuelConsum;                              // Fuel consumption per m
   if (oFuelPerM == 0.0)                          // If still undefined
     FuelConsum = oExpectedFuelPerM;              //   use estimated value
   else                                           // If known
@@ -352,13 +352,13 @@ double TSimpleStrategy::SetFuelAtRaceStart
 
   oStartFuel =            
 	GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Tankinhalt beim Start
-	PRV_START_FUEL,(char*) NULL,oStartFuel);          
+	PRV_START_FUEL,(char*) NULL,(float) oStartFuel);          
   GfOut("#oStartFuel (private) = %.1f\n",oStartFuel);
 
   if ((!TDriver::Qualification)                  // Fürs Rennen 
 	  && (oStartFuel > 0))
   {
-    oLastFuel = oStartFuel;                      // volltanken
+    oLastFuel = (float) oStartFuel;              // volltanken
     GfParmSetNum(*CarSettings,SECT_CAR,PRM_FUEL, // Gewünschte Tankfüllung
       (char*) NULL, oLastFuel);                  //   an TORCS melden
     return oLastFuel;    

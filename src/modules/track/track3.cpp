@@ -114,7 +114,7 @@ AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
     curSurf->kRollRes      = GfParmGetNum(TrackHandle, path, TRK_ATT_ROLLRES, (char*)NULL, 0.001f);
     curSurf->kRollRes2     = GfParmGetNum(TrackHandle, path, TRK_ATT_ROLLRES2, (char*)NULL, 0.001f);
     curSurf->kRoughness    = GfParmGetNum(TrackHandle, path, TRK_ATT_ROUGHT, (char*)NULL, 0.0f) /  2.0f;
-    curSurf->kRoughWaveLen = 2.0 * PI / GfParmGetNum(TrackHandle, path, TRK_ATT_ROUGHTWL, (char*)NULL, 1.0f);
+    curSurf->kRoughWaveLen = (tdble)(2.0 * PI / GfParmGetNum(TrackHandle, path, TRK_ATT_ROUGHTWL, (char*)NULL, 1.0f));
     curSurf->kDammage      = GfParmGetNum(TrackHandle, path, TRK_ATT_DAMMAGE, (char*)NULL, 10.0f);
     curSurf->kRebound      = GfParmGetNum(TrackHandle, path, TRK_ATT_REBOUND, (char*)NULL, 1.0f);
 
@@ -314,7 +314,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 
 		switch(side) {
 		case 1:
-		    curBorder->radius = curSeg->radiusl - bw / 2.0;
+		    curBorder->radius = (tdble)(curSeg->radiusl - bw / 2.0);
 		    curBorder->radiusr = curSeg->radiusl;
 		    curBorder->radiusl = curSeg->radiusl - bw;
 		    curBorder->arc = curSeg->arc;
@@ -337,7 +337,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curBorder->Kyl = 0;
 
 		    /* to find the boundary */
-		    al = (curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0;
+		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -351,7 +351,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    break;
 
 		case 0:
-		    curBorder->radius = curSeg->radiusr + bw / 2.0;
+		    curBorder->radius = (tdble)(curSeg->radiusr + bw / 2.0);
 		    curBorder->radiusl = curSeg->radiusr;
 		    curBorder->radiusr = curSeg->radiusr + bw;
 		    curBorder->arc = curSeg->arc;
@@ -374,7 +374,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curBorder->Kyl = 0;
 
 		    /* to find the boundary */
-		    al = (curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0;
+		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -395,7 +395,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 
 		switch(side) {
 		case 1:
-		    curBorder->radius = curSeg->radiusl + bw / 2.0;
+		    curBorder->radius = (tdble)(curSeg->radiusl + bw / 2.0);
 		    curBorder->radiusr = curSeg->radiusl;
 		    curBorder->radiusl = curSeg->radiusl + bw;
 		    curBorder->arc = curSeg->arc;
@@ -418,7 +418,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curBorder->Kyl = 0;
 
 		    /* to find the boundary */
-		    al = (curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0;
+		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -432,7 +432,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    break;
 
 		case 0:
-		    curBorder->radius = curSeg->radiusr - bw / 2.0;
+		    curBorder->radius = (tdble)(curSeg->radiusr - bw / 2.0);
 		    curBorder->radiusl = curSeg->radiusr;
 		    curBorder->radiusr = curSeg->radiusr - bw;
 		    curBorder->arc = curSeg->arc;
@@ -455,7 +455,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curBorder->Kyl = 0;
 
 		    /* to find the boundary */
-		    al = (curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0;
+		    al = (tdble)((curBorder->angle[TR_ZE] - curBorder->angle[TR_ZS])/36.0);
 		    alfl = curBorder->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -547,7 +547,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 
 		switch(side) {
 		case 1:
-		    curSide->radius = curSeg->radiusl - sw / 2.0;
+		    curSide->radius = (tdble)(curSeg->radiusl - sw / 2.0);
 		    curSide->radiusr = curSeg->radiusl;
 		    curSide->radiusl = curSeg->radiusl - maxWidth;
 		    curSide->arc = curSeg->arc;
@@ -570,7 +570,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curSide->Kyl = (ew - sw) / curSide->arc;
 
 		    /* to find the boundary */
-		    al = (curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0;
+		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -584,7 +584,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    break;
 
 		case 0:
-		    curSide->radius = curSeg->radiusr + sw / 2.0;
+		    curSide->radius = (tdble)(curSeg->radiusr + sw / 2.0);
 		    curSide->radiusl = curSeg->radiusr;
 		    curSide->radiusr = curSeg->radiusr + maxWidth;
 		    curSide->arc = curSeg->arc;
@@ -607,7 +607,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curSide->Kyl = (ew - sw) / curSide->arc;
 
 		    /* to find the boundary */
-		    al = (curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0;
+		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -628,7 +628,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 
 		switch(side) {
 		case 1:
-		    curSide->radius = curSeg->radiusl + sw / 2.0;
+		    curSide->radius = (tdble)(curSeg->radiusl + sw / 2.0);
 		    curSide->radiusr = curSeg->radiusl;
 		    curSide->radiusl = curSeg->radiusl + maxWidth;
 		    curSide->arc = curSeg->arc;
@@ -651,7 +651,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curSide->Kyl = (ew - sw) / curSide->arc;
 
 		    /* to find the boundary */
-		    al = (curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0;
+		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -665,7 +665,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    break;
 
 		case 0:
-		    curSide->radius = curSeg->radiusr - sw / 2.0;
+		    curSide->radius = (tdble)(curSeg->radiusr - sw / 2.0);
 		    curSide->radiusl = curSeg->radiusr;
 		    curSide->radiusr = curSeg->radiusr - maxWidth;
 		    curSide->arc = curSeg->arc;
@@ -688,7 +688,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 		    curSide->Kyl = (ew - sw) / curSide->arc;
 
 		    /* to find the boundary */
-		    al = (curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0;
+		    al = (tdble)((curSide->angle[TR_ZE] - curSide->angle[TR_ZS])/36.0);
 		    alfl = curSide->angle[TR_ZS];
 
 		    for (j = 0; j < 36; j++) {
@@ -814,7 +814,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
     type = 0;
     
     width = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, (char*)NULL, 15.0);
-    wi2 = width / 2.0;
+    wi2 = (tdble)(width / 2.0);
 
     grade = -100000.0;
     root = (tTrackSeg*)NULL;
@@ -906,14 +906,14 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			radiusend = GfParmGetCurNum(TrackHandle, path, TRK_ATT_RADIUSEND, (char*)NULL, radius);
 			arc = GfParmGetCurNum(TrackHandle, path, TRK_ATT_ARC, (char*)NULL, 0);
 			type = TR_LFT;
-			length = (radius + radiusend) / 2.0 * arc;
+			length = (tdble)((radius + radiusend) / 2.0 * arc);
 		} else if (strcmp(segtype, TRK_VAL_RGT) == 0) {
 			/* right curve */
 			radius = GfParmGetCurNum(TrackHandle, path, TRK_ATT_RADIUS, (char*)NULL, 0);
 			radiusend = GfParmGetCurNum(TrackHandle, path, TRK_ATT_RADIUSEND, (char*)NULL, radius);
 			arc = GfParmGetCurNum(TrackHandle, path, TRK_ATT_ARC, (char*)NULL, 0);
 			type = TR_RGT;
-			length = (radius + radiusend) / 2.0 * arc;
+			length = (tdble)((radius + radiusend) / 2.0 * arc);
 		}
 
 		segName = GfParmListGetCurEltName(TrackHandle, path);
@@ -930,23 +930,23 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 		if (zs != -100000.0) {
 			zsr = zsl = zs;
 		} else {
-			zs = (zsl + zsr) / 2.0;
+			zs = (tdble)((zsl + zsr) / 2.0);
 		}
 		if (ze != -100000.0) {
 			zer = zel = ze;
 		} else if (grade != -100000.0) {
 			ze = zs + length * grade;
 		} else {
-			ze = (zel + zer) / 2.0;
+			ze = (tdble)((zel + zer) / 2.0);
 		}
 		bankings = atan2(zsl - zsr, width);
 		bankinge = atan2(zel - zer, width);
 		bankings = GfParmGetCurNum(TrackHandle, path, TRK_ATT_BKS, (char*)NULL, bankings);
 		bankinge = GfParmGetCurNum(TrackHandle, path, TRK_ATT_BKE, (char*)NULL, bankinge);
-		dz = tan(bankings) * width / 2.0;
+		dz = (tdble)(tan(bankings) * width / 2.0);
 		zsl = zs + dz;
 		zsr = zs - dz;
-		dz = tan(bankinge) * width / 2.0;
+		dz = (tdble)(tan(bankinge) * width / 2.0);
 		zel = ze + dz;
 		zer = ze - dz;
 
@@ -992,11 +992,11 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 		T1l = stgtl * length;
 		T2l = etgtl * length;
 		tl = 0.0;
-		dtl = 1.0 / (tdble)steps;
+		dtl = (tdble)(1.0 / steps);
 		T1r = stgtr * length;
 		T2r = etgtr * length;
 		tr = 0.0;
-		dtr = 1.0 / (tdble)steps;
+		dtr = (tdble)(1.0 / steps);
 
 		curStep = 0;
 		curzel = zsl;
@@ -1129,7 +1129,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			curSeg->center.y = ceny;
 
 			curSeg->angle[TR_ZS] = alf;
-			curSeg->angle[TR_CS] = alf - PI / 2.0;
+			curSeg->angle[TR_CS] = (tdble)(alf - PI / 2.0);
 			alf += curArc;
 			curSeg->angle[TR_ZE] = alf;
 
@@ -1164,7 +1164,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			curSeg->Kyl = 0;
 
 			/* to find the boundary */
-			al = (curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0;
+			al = (tdble)((curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0);
 			alfl = curSeg->angle[TR_ZS];
 
 			for (j = 0; j < 36; j++) {
@@ -1195,7 +1195,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			curSeg->center.y = ceny;
 
 			curSeg->angle[TR_ZS] = alf;
-			curSeg->angle[TR_CS] = alf + PI / 2.0;
+			curSeg->angle[TR_CS] = (tdble)(alf + PI / 2.0);
 			alf -= curSeg->arc;
 			curSeg->angle[TR_ZE] = alf;
 
@@ -1230,7 +1230,7 @@ CreateSegRing3(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg 
 			curSeg->Kyl = 0;
 
 			/* to find the boundaries */
-			al = (curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0;
+			al = (tdble)((curSeg->angle[TR_ZE] - curSeg->angle[TR_ZS])/36.0);
 			alfl = curSeg->angle[TR_ZS];
 
 			for (j = 0; j < 36; j++) {
@@ -1435,6 +1435,8 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    pits->nMaxPits = (int)((- pitStart->lgfromstart + pitEnd->lgfromstart +
 					     pitEnd->length + pits->len / 2.0) / pits->len);
 	}
+	pits->nMaxPits = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nMaxPits));
+	pits->nPitSeg = pits->nMaxPits;
 	pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
 
 	//mSeg = pits->pitStart->prev;
@@ -1473,17 +1475,17 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 		}
 	    }
 	    pits->driversPits[i].pos.seg = mSeg;
-	    pits->driversPits[i].pos.toStart = toStart + pits->len / 2.0;
+	    pits->driversPits[i].pos.toStart = (tdble)(toStart + pits->len / 2.0);
 	    switch (pits->side) {
 	    case TR_RGT:
-		pits->driversPits[i].pos.toRight  = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
+		pits->driversPits[i].pos.toRight  = (tdble)(-offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0);
 		pits->driversPits[i].pos.toLeft   = mSeg->width - pits->driversPits[i].pos.toRight;
-		pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toRight;
+		pits->driversPits[i].pos.toMiddle = (tdble)(mSeg->width / 2.0 - pits->driversPits[i].pos.toRight);
 		break;
 	    case TR_LFT:
-		pits->driversPits[i].pos.toLeft   = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
+		pits->driversPits[i].pos.toLeft   = (tdble)(-offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0);
 		pits->driversPits[i].pos.toRight  = mSeg->width - pits->driversPits[i].pos.toLeft;
-		pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toLeft;
+		pits->driversPits[i].pos.toMiddle = (tdble)(mSeg->width / 2.0 - pits->driversPits[i].pos.toLeft);
 		break;
 	    }
 	    toStart += pits->len;
@@ -1493,7 +1495,8 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    }
 	    i++;
 	}
-	pits->nPitSeg = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble)pits->nMaxPits));
+	pits->nMaxPits = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble)pits->nMaxPits));
+	pits->nPitSeg = pits->nMaxPits;
 	//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg);
 
 	for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
