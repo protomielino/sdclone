@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-    file                 : car7-trb1.xml
+    file                 : trb1-zaxxon-rb.xml
     created              : Sat Mar  3 18:46:37 CET 2001
     copyright            : (C) 2001 by Eric Espié, 2006 Bernhard Wymann
     email                : berniw@bluewin.ch
@@ -11,7 +11,7 @@
 <!--    the Free Software Foundation; either version 2 of the License, or     -->
 <!--    (at your option) any later version.                                   -->
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
-<params name="car7-trb1" type="template">
+<params name="trb1-zaxxon-rb" type="template">
 	
 	<section name="Car">
 		<attnum name="initial fuel" unit="l" min="1.0" max="86.0" val="86.0"/>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
-	file                 : car5-trb1.xml
+	file                 : trb1-silber-rblk.xml
 	created              : Tue Oct 9 16:51:21 
 	copyright            : (C) 2007 Eric Espié, Berhard Wymann
 	email                : berniw@bluewin.ch
@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="car5-trb1" type="template">
+<params name="trb1-silber-rblk" type="template">
 	<section name="Car">
 		<attnum name="initial fuel" min="1.0" max="87.0" unit="l" val="87.0"/>
 	</section>

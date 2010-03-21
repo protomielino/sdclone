@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- car1-trb1 setup for Wheel-2 track-->
+<!-- trb1-cavallo-360rb setup for Wheel-2 track-->
 
 <!--
         This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="car1-trb1" type="template">
+<params name="trb1-cavallo-360rb" type="template">
 
     <section name="Car">
         <attnum name="initial fuel" unit="l" min="1.0" max="94.0" val="40.0"/>

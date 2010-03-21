@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-	file                 : car1-trb1.xml
+	file                 : trb1-cavallo-360rb.xml
 	created              : Thu Sep 21 20:37:54 CET 2006
 	copyright            : (C) 2006 by Bernhard Wymann
 	email                : berniw@bluewin.ch
@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 	
-<params name="car1-trb1" type="template">
+<params name="trb1-cavallo-360rb" type="template">
 	
 	<section name="Car">
 		<attnum name="initial fuel" unit="l" min="1.0" max="94.0" val="94.0"/>

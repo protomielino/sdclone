@@ -78,7 +78,7 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} INTERFACE ${ROBOT_INTERFACE} SOURCES ${ROBOT_SOU
 # The data associated to the ubiquitous robot module and its clones.
 SET(ROBOT_SHIP logo.rgb readme.txt)
 
-SET(ROBOT_SHIPSUBDIRS 0 car1-trb1 tracks)
+SET(ROBOT_SHIPSUBDIRS 0 trb1-cavallo-360rb tracks)
 ROBOT_DATA(NAME ${ROBOT_NAME} SHIPPREFIX src 
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
@@ -114,7 +114,8 @@ ROBOT_DATA(NAME simplix_ls1 SHIPPREFIX simplix_ls1
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
 SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13
-                      car1-trb1 car2-trb1 car3-trb1 car4-trb1 car5-trb1 car6-trb1 car7-trb1
+                      trb1-boxer-trbrs trb1-sector-rb1 trb1-spirit-rb1lt
+		      trb1-cavallo-360rb trb1-silber-rblk trb1-taipan-rb1 trb1-zaxxon-rb
                       tracks)
 
 ROBOT_DATA(NAME simplix_trb1 SHIPPREFIX simplix_trb1

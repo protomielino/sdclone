@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- 
+    file          : e-track-4.xml 
+    created       : 28 Mar 2008
+    last modified : 03 Dec 2009
+    copyright     : (C) 2008-2009 Wolf-Dieter Beelitz; Jürgen Schüssler
+-->
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+<!DOCTYPE params SYSTEM "../../../src/libs/tgf/params.dtd">
+<params name="trb1-silber-rblk" type="template" mode="mw">
+	<section name="Rear Differential">
+		<attnum name="ratio" min="0" max="10" val="4.0"/>
+	</section>
+</params>
+

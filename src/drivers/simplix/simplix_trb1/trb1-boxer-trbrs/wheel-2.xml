@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- 
+    file          : wheel-2.xml 
+    created       : 28 Mar 2008
+    last modified : 28 Nov 2009
+    copyright     : (C) 2008-2009 Wolf-Dieter Beelitz; Jürgen Schüssler
+-->
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+<!DOCTYPE params SYSTEM "../../../src/libs/tgf/params.dtd">
+<params name="trb1-boxer-trbrs" type="template" mode="mw">
+	<section name="Front Wing">
+		<attnum name="angle" unit="deg" min="0" max="12" val="9"/>
+	</section>
+	<section name="Rear Wing">
+		<attnum name="angle" unit="deg" min="0" max="18" val="13"/>
+	</section>
+	<section name="Rear Differential">
+		<attnum name="ratio" min="0" max="10" val="3.15"/>
+	</section>
+	<section name="Rear Anti-Roll Bar">
+		<attnum name="spring" unit="lbs/in" min="0" max="5000" val="1500"/>
+	</section>
+	<section name="Rear Right Suspension">
+		<attnum name="spring" unit="lbs/in" min="0" max="10000" val="4500"/>
+	</section>
+	<section name="Rear Left Suspension">
+		<attnum name="spring" unit="lbs/in" min="0" max="10000" val="4500"/>
+	</section>
+</params>

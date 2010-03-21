@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
-    file                 : car4-trb1.xml
+    file                 : trb1-taipan-rb1.xml
     created              : Thu Oct 11 13:15:57 CET 2007
     copyright            : (C) 2007 by Eric Espié, Bernhard Wymann
     email                : berniw@bluewin.ch
@@ -14,7 +14,7 @@
 <!--    (at your option) any later version.                                   -->
 <!DOCTYPE params SYSTEM "../../../../src/libs/tgf/params.dtd">
 
-<params name="car4-trb1" type="template">
+<params name="trb1-taipan-rb1" type="template">
 
   <section name="Car">
     <attnum name="initial fuel" unit="l" min="1.0" max="95.0" val="95.0"/>

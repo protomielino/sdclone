@@ -37,7 +37,7 @@
         <attstr name="desc" val="The Highlander"></attstr>
         <attstr name="team" val="Team Alba 2008"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
-        <attstr name="car name" val="car1-trb1"></attstr>
+        <attstr name="car name" val="trb1-cavallo-360rb"></attstr>
         <attnum name="race number" val="71"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
@@ -50,7 +50,7 @@
         <attstr name="desc" val="The Islander"></attstr>
         <attstr name="team" val="Team Alba 2008"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
-        <attstr name="car name" val="car1-trb1"></attstr>
+        <attstr name="car name" val="trb1-cavallo-360rb"></attstr>
         <attnum name="race number" val="72"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>

@@ -23,7 +23,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Aisha Racing Concern"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car1-trb1"></attstr>
+        <attstr name="car name" val="trb1-cavallo-360rb"></attstr>
         <attnum name="race number" val="18"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
@@ -35,7 +35,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Aisha Racing Concern"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car1-trb1"></attstr>
+        <attstr name="car name" val="trb1-cavallo-360rb"></attstr>
         <attnum name="race number" val="24"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
@@ -47,7 +47,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Anime Age Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car2-trb1"></attstr>
+        <attstr name="car name" val="trb1-boxer-trbrs"></attstr>
         <attnum name="race number" val="12"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -59,7 +59,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Anime Age Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car2-trb1"></attstr>
+        <attstr name="car name" val="trb1-boxer-trbrs"></attstr>
         <attnum name="race number" val="2"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
@@ -71,7 +71,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="ProjectDiskie and Yukiho Speed"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car3-trb1"></attstr>
+        <attstr name="car name" val="trb1-spirit-rb1lt"></attstr>
         <attnum name="race number" val="3"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -83,7 +83,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="ProjectDiskie and Yukiho Speed"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car3-trb1"></attstr>
+        <attstr name="car name" val="trb1-spirit-rb1lt"></attstr>
         <attnum name="race number" val="666"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.5"></attnum>
@@ -95,7 +95,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Uguu Technocraft"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car4-trb1"></attstr>
+        <attstr name="car name" val="trb1-taipan-rb1"></attstr>
         <attnum name="race number" val="20"></attnum>
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -107,7 +107,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Uguu Technocraft"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car4-trb1"></attstr>
+        <attstr name="car name" val="trb1-taipan-rb1"></attstr>
         <attnum name="race number" val="58"></attnum>
         <attnum name="red" val="0.7"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -119,7 +119,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Lovely BEAM"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car5-trb1"></attstr>
+        <attstr name="car name" val="trb1-silber-rblk"></attstr>
         <attnum name="race number" val="28"></attnum>
         <attnum name="red" val="0.7"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -131,7 +131,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Lovely BEAM"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="car5-trb1"></attstr>
+        <attstr name="car name" val="trb1-silber-rblk"></attstr>
         <attnum name="race number" val="13"></attnum>
         <attnum name="red" val="0.7"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -143,7 +143,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="MARCH RACING with Haruna"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="car6-trb1"></attstr>
+        <attstr name="car name" val="trb1-sector-rb1"></attstr>
         <attnum name="race number" val="6"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -155,7 +155,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="MARCH RACING with Haruna"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="car6-trb1"></attstr>
+        <attstr name="car name" val="trb1-sector-rb1"></attstr>
         <attnum name="race number" val="25"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -167,7 +167,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="USR"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="car7-trb1"></attstr>
+        <attstr name="car name" val="trb1-zaxxon-rb"></attstr>
         <attnum name="race number" val="77"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
@@ -179,7 +179,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="USR"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="car7-trb1"></attstr>
+        <attstr name="car name" val="trb1-zaxxon-rb"></attstr>
         <attnum name="race number" val="78"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>

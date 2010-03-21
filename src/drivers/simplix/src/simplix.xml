@@ -22,7 +22,7 @@
         <attstr name="desc" val="simplix: car1"></attstr>
         <attstr name="team" val="simplix"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="car1-trb1"></attstr>
+        <attstr name="car name" val="trb1-cavallo-360rb"></attstr>
         <attnum name="race number" val="1"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.3"></attnum>

@@ -50,7 +50,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 3"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car1-trb1"/>
+		  <attstr name="car name" val="trb1-cavallo-360rb"/>
 		  <attnum name="race number" val="140"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
@@ -63,7 +63,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 4"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car2-trb1"/>
+		  <attstr name="car name" val="trb1-boxer-trbrs"/>
 		  <attnum name="race number" val="141"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
@@ -76,7 +76,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 5"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car3-trb1"/>
+		  <attstr name="car name" val="trb1-spirit-rb1lt"/>
 		  <attnum name="race number" val="142"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
@@ -89,7 +89,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 6"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car4-trb1"/>
+		  <attstr name="car name" val="trb1-taipan-rb1"/>
 		  <attnum name="race number" val="143"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
@@ -102,7 +102,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 7"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car5-trb1"/>
+		  <attstr name="car name" val="trb1-silber-rblk"/>
 		  <attnum name="race number" val="144"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
@@ -115,7 +115,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 8"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car6-trb1"/>
+		  <attstr name="car name" val="trb1-sector-rb1"/>
 		  <attnum name="race number" val="145"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
@@ -128,7 +128,7 @@
 		  <attstr name="team" val="berniw"/>
 		  <attstr name="desc" val="Berni's first Bot 9"/>
 		  <attstr name="author" val="Bernhard Wymann"/>
-		  <attstr name="car name" val="car7-trb1"/>
+		  <attstr name="car name" val="trb1-zaxxon-rb"/>
 		  <attnum name="race number" val="146"/>
 		  <attnum name="red" val="0.0"/>
 		  <attnum name="green" val="1.0"/>
