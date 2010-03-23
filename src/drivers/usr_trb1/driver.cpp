@@ -3072,33 +3072,35 @@ void Driver::update(tSituation *s)
           break;
         }
 
-        if (opponent[i].getCarPtr()->_pit->pos.seg == car->_pit->pos.seg)
-        {
-          // sharing a pit
-          if (opitpos == PIT_FRONT)
+		if (opponent[i].getCarPtr()->_pit != NULL)
+		{
+          if (opponent[i].getCarPtr()->_pit->pos.seg == car->_pit->pos.seg)
           {
-            double pitloc = pit->getNPitLoc( PIT_MID );
-            double myfrompit = pitloc - car->_distFromStartLine;
-            double opfrompit = pitloc - opponent[i].getCarPtr()->_distFromStartLine;
-            if (myfrompit < 0.0) myfrompit += track->length;
-            if (opfrompit < 0.0) opfrompit += track->length;
-
-            // work out who's closest to the pit & therefore should go in front
-            if (opfrompit > myfrompit)
+            // sharing a pit
+            if (opitpos == PIT_FRONT)
             {
-              pitpos = PIT_FRONT;
+              double pitloc = pit->getNPitLoc( PIT_MID );
+              double myfrompit = pitloc - car->_distFromStartLine;
+              double opfrompit = pitloc - opponent[i].getCarPtr()->_distFromStartLine;
+              if (myfrompit < 0.0) myfrompit += track->length;
+              if (opfrompit < 0.0) opfrompit += track->length;
+
+              // work out who's closest to the pit & therefore should go in front
+              if (opfrompit > myfrompit)
+              {
+                pitpos = PIT_FRONT;
+              }
+              else
+              {
+                pitpos = PIT_BACK; // go in behind other car
+              }
             }
             else
             {
-              pitpos = PIT_BACK; // go in behind other car
+              pitpos = PIT_FRONT; // stop at end of pit space to leave room
             }
           }
-          else
-          {
-            pitpos = PIT_FRONT; // stop at end of pit space to leave room
-          }
-        }
-
+		}
         break;
       }
     }
