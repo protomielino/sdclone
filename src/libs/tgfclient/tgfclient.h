@@ -282,7 +282,7 @@ extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *ena
                    int x, int y, int imageWidth,int imageHeight,int align, int mouse,
                    void *userDataOnPush, tfuiCallback onPush, 
                    void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,tfuiComboCallback onChange);
+extern int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,tfuiComboCallback onChange);
 extern int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,tfuiCheckboxCallback onChange);
 
 

@@ -734,8 +734,9 @@ CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,tfui
 	if (width == 0)
 	    width = 200;
 
+    const char* pszText = GfParmGetStr(param, strControlName.c_str(), "text", "");
 
-	id = GfuiComboboxCreate(menuHandle,textsize,x,y,width,align ,0,onChange);
+	id = GfuiComboboxCreate(menuHandle,textsize,x,y,width,align,0,pszText,onChange);
 
 	Color c;
 	bool bColor = GetColorFromXML(param,pControlName,"color",c);
@@ -791,32 +792,38 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
 bool 
 CreateStaticControls(void *param,void *menuHandle)
 {
-        char buf[32];
+	if (param==NULL)
+	{
+		GfError("ERROR:  XML menu is not loaded");
+		return false;
+	}
 
-        for (int i=1; i <= GfParmGetEltNb(param, "staticcontrols"); i++)
-        {
-                sprintf(buf, "staticcontrols/%i", i);
-                const char* pszType = GfParmGetStr(param, buf, "type", "");
-        
-                if (!strcmp(pszType, "label"))
-                {
-                        CreateLabel(menuHandle,param,buf);
-                }
-                else if (!strcmp(pszType, "staticimage"))
-                {
-                        CreateStaticImage(menuHandle,param,buf);
-                }
-                else if (!strcmp(pszType, "backgroundimage"))
-                {
-                        CreateBackgroundImage(menuHandle,param,buf);
-                }
-                else
-                {
-                        GfError("Errot: Unknown static control type '%s'\n", pszType);
-                }
-        }
+    char buf[32];
 
-        return true;
+    for (int i=1; i <= GfParmGetEltNb(param, "staticcontrols"); i++)
+    {
+            sprintf(buf, "staticcontrols/%i", i);
+            const char* pszType = GfParmGetStr(param, buf, "type", "");
+    
+            if (!strcmp(pszType, "label"))
+            {
+                    CreateLabel(menuHandle,param,buf);
+            }
+            else if (!strcmp(pszType, "staticimage"))
+            {
+                    CreateStaticImage(menuHandle,param,buf);
+            }
+            else if (!strcmp(pszType, "backgroundimage"))
+            {
+                    CreateBackgroundImage(menuHandle,param,buf);
+            }
+            else
+            {
+                    GfError("Errot: Unknown static control type '%s'\n", pszType);
+            }
+    }
+
+    return true;
 }
 
 

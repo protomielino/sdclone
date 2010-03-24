@@ -64,11 +64,12 @@ bool CarMenuSettings::Init(void* pMenu,const char *pszCar)
 					 NULL, (tfuiCallback)NULL, 
 					 1);
 
-    void *param = LoadMenuXML("carsettingsmenu.xml");
+    void *param = LoadMenuXML("carselectionmenu.xml");
     CreateStaticControls(param,m_pMenuHandle);
     
-	int carCatId = CreateComboboxControl(m_pMenuHandle,param,"carcombo",CarPickCB);
-	int carImageId = CreateStaticImageControl(m_pMenuHandle,param,"carimage");
+	int carCatId = CreateComboboxControl(m_pMenuHandle,param,"modelcombo",CarPickCB);
+	int skinId = CreateComboboxControl(m_pMenuHandle,param,"skincombo",NULL);
+	int carImageId = CreateStaticImageControl(m_pMenuHandle,param,"carpreviewimage");
 	int progressId = CreateProgressbarControl(m_pMenuHandle,param,"topspeedprogress");
 	int accelerationId = CreateProgressbarControl(m_pMenuHandle,param,"accelerationprogress");
 	int handlingId = CreateProgressbarControl(m_pMenuHandle,param,"handlingprogress");

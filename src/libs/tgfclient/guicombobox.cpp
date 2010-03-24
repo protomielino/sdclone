@@ -82,7 +82,7 @@ gfuiRightArrow(void *idv)
 }
 
 int
-GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,
+GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,
 				  tfuiComboCallback onChange)
 {
     tGfuiCombobox	*combobox;
@@ -171,7 +171,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int s
 	int xmax = object->xmax;
 	int xmin = object->xmin;
 
-	combobox->labelId = GfuiLabelCreate(scr,"",font,xm,ym,GFUI_ALIGN_HC_VC,99);
+	combobox->labelId = GfuiLabelCreate(scr,pszText,font,xm,ym,GFUI_ALIGN_HC_VC,99);
 
 
     GfuiGrButtonCreate(scr, "data/img/arrow-left.png", "data/img/arrow-left.png",

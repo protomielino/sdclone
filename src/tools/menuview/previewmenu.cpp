@@ -58,15 +58,14 @@ int ReadControl(void *param,std::string strType,const char *pControlName)
 	else if (strType == "combobox")
 	{
 		int id = CreateComboboxControl(menuHandle,param,pControlName,NULL);
-		//Add some place holder text
-		GfuiComboboxAddText(menuHandle,id,"1");
-		GfuiComboboxAddText(menuHandle,id,"2");
 		return id;
 	}
 	else if (strType == "scrolllist")
 		return CreateScrollListControl(menuHandle,param,pControlName,0,NULL);
 	else if (strType == "checkbox")
 		return  CreateCheckboxControl(menuHandle,param,pControlName,NULL);
+	else if (strType == "progressbar")
+		return  CreateProgressbarControl(menuHandle,param,pControlName);
 
 	return -1;
 }
@@ -104,10 +103,12 @@ LoadMenuScreen()
 				    1);
 
 	void *param = GfParmReadFile(g_strFile.c_str(), GFPARM_RMODE_REREAD);
+	if (param == NULL)
+		param = GfParmReadFileLocal(g_strFile.c_str(), GFPARM_RMODE_REREAD);
 
     CreateStaticControls(param,menuHandle);
 	ShowDynamicControls(param);
-    GfuiAddSKey(menuHandle, GFUIK_F1, "reload", NULL, ReloadMenuScreen, NULL);
+    GfuiAddSKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
     GfuiAddKey(menuHandle, 'Q', "Quit", 0, endofprog, NULL);
     GfuiAddKey(menuHandle, 'q', "Quit", 0, endofprog, NULL);
     GfParmReleaseHandle(param);
