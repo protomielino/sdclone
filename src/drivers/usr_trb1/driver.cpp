@@ -924,7 +924,7 @@ void Driver::drive(tSituation *s)
   {
     double skid = (car->_skid[0]+car->_skid[1]+car->_skid[2]+car->_skid[3])/2;
     fprintf(stderr,"%d%c%c%c s%.2f k%.2f ss%.2f cl%.3f g%d->%d brk%.3f acc%.2f dec%.2f coll%.1f",mode,((mode==mode_avoiding)?'A':' '),(avoidmode==avoidleft?'L':(avoidmode==avoidright?'R':' ')),(mode==mode_correcting?'c':' '),car->_steerCmd,rldata->ksteer,stucksteer,correctlimit,car->_gear,car->_gearCmd,car->_brakeCmd,car->_accelCmd,rldata->decel,collision);
-    fprintf(stderr," spd%.1f|k%.1f|a%.1f/%.1f|t%.1f angle=%.2f/%.2f/%.2f yr=%.2f skid=%.2f acxy=%.2f/%.2f slip=%.3f/%.3f %.3f/%.3f\n",(double)currentspeed,(double)rldata->speed,(double)rldata->avspeed,(double)rldata->slowavspeed,(double)getTrueSpeed(),angle,speedangle,rldata->rlangle,car->_yaw_rate,skid,car->_accel_x,car->_accel_y,nextCRinverse,rldata->mInverse,car->_wheelSpinVel(FRNT_RGT)*car->_wheelRadius(FRNT_RGT)-car->_speed_x,car->_wheelSpinVel(FRNT_LFT)*car->_wheelRadius(FRNT_LFT)-car->_speed_x,car->_wheelSpinVel(REAR_RGT)*car->_wheelRadius(REAR_RGT)-car->_speed_x,car->_wheelSpinVel(REAR_LFT)*car->_wheelRadius(REAR_LFT)-car->_speed_x);fflush(stderr);
+    fprintf(stderr," spd%.1f|k%.1f|a%.1f/%.1f|t%.1f angle=%.2f/%.2f/%.2f yr=%.2f skid=%.2f acxy=%.2f/%.2f inv%.3f/%.3f slip=%.3f/%.3f %.3f/%.3f\n",(double)currentspeed,(double)rldata->speed,(double)rldata->avspeed,(double)rldata->slowavspeed,(double)getTrueSpeed(),angle,speedangle,rldata->rlangle,car->_yaw_rate,skid,car->_accel_x,car->_accel_y,nextCRinverse,rldata->mInverse,car->_wheelSpinVel(FRNT_RGT)*car->_wheelRadius(FRNT_RGT)-car->_speed_x,car->_wheelSpinVel(FRNT_LFT)*car->_wheelRadius(FRNT_LFT)-car->_speed_x,car->_wheelSpinVel(REAR_RGT)*car->_wheelRadius(REAR_RGT)-car->_speed_x,car->_wheelSpinVel(REAR_LFT)*car->_wheelRadius(REAR_LFT)-car->_speed_x);fflush(stderr);
   }
 
   laststeer = car->_steerCmd;
@@ -3072,35 +3072,36 @@ void Driver::update(tSituation *s)
           break;
         }
 
-		if (opponent[i].getCarPtr()->_pit != NULL)
-		{
-          if (opponent[i].getCarPtr()->_pit->pos.seg == car->_pit->pos.seg)
-          {
-            // sharing a pit
-            if (opitpos == PIT_FRONT)
-            {
-              double pitloc = pit->getNPitLoc( PIT_MID );
-              double myfrompit = pitloc - car->_distFromStartLine;
-              double opfrompit = pitloc - opponent[i].getCarPtr()->_distFromStartLine;
-              if (myfrompit < 0.0) myfrompit += track->length;
-              if (opfrompit < 0.0) opfrompit += track->length;
+        if (!opponent[i].getCarPtr()->_pit) // This sometimes happens (Ticket #90) !
+          break;
 
-              // work out who's closest to the pit & therefore should go in front
-              if (opfrompit > myfrompit)
-              {
-                pitpos = PIT_FRONT;
-              }
-              else
-              {
-                pitpos = PIT_BACK; // go in behind other car
-              }
+        if (opponent[i].getCarPtr()->_pit->pos.seg == car->_pit->pos.seg)
+        {
+          // sharing a pit
+          if (opitpos == PIT_FRONT)
+          {
+            double pitloc = pit->getNPitLoc( PIT_MID );
+            double myfrompit = pitloc - car->_distFromStartLine;
+            double opfrompit = pitloc - opponent[i].getCarPtr()->_distFromStartLine;
+            if (myfrompit < 0.0) myfrompit += track->length;
+            if (opfrompit < 0.0) opfrompit += track->length;
+            
+            // work out who's closest to the pit & therefore should go in front
+            if (opfrompit > myfrompit)
+            {
+              pitpos = PIT_FRONT;
             }
             else
             {
-              pitpos = PIT_FRONT; // stop at end of pit space to leave room
+              pitpos = PIT_BACK; // go in behind other car
             }
           }
-		}
+          else
+          {
+            pitpos = PIT_FRONT; // stop at end of pit space to leave room
+          }
+        }
+
         break;
       }
     }
