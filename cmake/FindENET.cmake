@@ -62,8 +62,15 @@ ENDIF(${ENET_INCLUDE_DIR} MATCHES ".framework")
 
 SET(ENET_FOUND "NO")
 IF (ENET_LIBRARY)
+    #If ENET_INCLUDE_DIR points to /usr/include/enet while enet.h is in /usr/include/enet/enet.h,
+    #then #include <time.h> will cause /usr/include/enet/time.h be loaded instead of /usr/include/time.h, which causes compiler errors.
+    #We warn the user if the wrong include is possibly used
+    IF(NOT EXISTS "${ENET_INCLUDE_DIR}/enet/enet.h")
+        MESSAGE(WARNING " The file ${ENET_INCLUDE_DIR}/enet/enet.h does not exists. Make sure ENET_INCLUDE_DIR points to the directory containing \"enet/enet.h\" and not to the directory containing \"enet.h\". ENET_INCLUDE_DIR currently has value \"${ENET_INCLUDE_DIR}\"")
+    ENDIF(NOT EXISTS "${ENET_INCLUDE_DIR}/enet/enet.h")
     SET(ENET_FOUND "YES")
     #MESSAGE(STATUS "Found ENET: ${ENET_LIBRARY}")
 ENDIF(ENET_LIBRARY)
+
 
 #MARK_AS_ADVANCED(ENET_INCLUDE_DIR ENET_LIBRARY)

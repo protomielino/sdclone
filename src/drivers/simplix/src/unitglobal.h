@@ -36,7 +36,9 @@
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
 
+#ifndef SPEED_DREAMS
 #define SPEED_DREAMS
+#endif //SPEED_DREAMS
 //#undef SPEED_DREAMS
 
 // The great question, ...

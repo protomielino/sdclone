@@ -2,7 +2,7 @@ INCLUDE(../../../cmake/macros.cmake)
 PROJECT(trackgen)
 
 SET(TRACKGEN_SOURCES ac3d.cpp easymesh.cpp elevation.cpp maintrackgen.cpp
-	             objects.cpp relief.cpp track.cpp util.cpp
+	             objects.cpp relief.cpp track.cpp util.cpp edge2.cpp point2.cpp
 	             ac3d.h easymesh.h elevation.h objects.h relief.h trackgen.h util.h
 		     )
 

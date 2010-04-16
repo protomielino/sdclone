@@ -163,16 +163,28 @@ char undefined[] = "undefined";
 //--------------------------------------------------------------------------*
 //static char const** BotDesc = defaultBotDesc;
 
-static TDriver *cRobot[MAXNBBOTS];
 static TCommonData gCommonData;
-static double cTicks[MAXNBBOTS];
-static double cMinTicks[MAXNBBOTS];
-static double cMaxTicks[MAXNBBOTS];
-static int cTickCount[MAXNBBOTS];
-static int cLongSteps[MAXNBBOTS];
-static int cCriticalSteps[MAXNBBOTS];
-static int cUnusedCount[MAXNBBOTS];
 static int cRobotType;
+
+typedef struct stInstanceInfo
+{
+	TDriver *cRobot;
+	double cTicks;
+	double cMinTicks;
+	double cMaxTicks;
+	int cTickCount;
+	int cLongSteps;
+	int cCriticalSteps;
+	int cUnusedCount;
+} tInstanceInfo;
+
+#ifdef ROB_SECT_ARBITRARY
+static tInstanceInfo *cInstances;
+static int cInstancesCount;
+#else //ROB_SECT_ARBITRARY
+static tInstanceInfo cInstances[MAXNBBOTS];
+#endif //ROB_SECT_ARBITRARY
+
 //==========================================================================*
 
 //==========================================================================*
@@ -416,6 +428,25 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
   GfOut("\n#Initialize from %s ...\n",RobPathXML);
   GfOut("#NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 
+#ifdef ROB_SECT_ARBITRARY
+  // Clear all structures.
+  memset(ModInfo, 0, (NBBOTS+1)*sizeof(tModInfo));
+
+  int I;
+  for (I = 0; I < TDriver::NBBOTS; I++) 
+  {
+    ModInfo[I].name = &DriverNames[I*DRIVERLEN]; // Tell customisable name
+    ModInfo[I].desc = &DriverDescs[I*DRIVERLEN]; // Tell customisable desc.
+    ModInfo[I].fctInit = InitFuncPt;             // Common used functions
+    ModInfo[I].gfId = ROB_IDENT;                 // Robot identity
+    ModInfo[I].index = I+IndexOffset;            // Drivers index
+  }
+  ModInfo[NBBOTS].name = RobName;
+  ModInfo[NBBOTS].desc = RobName;
+  ModInfo[NBBOTS].fctInit = InitFuncPt;
+  ModInfo[NBBOTS].gfId = ROB_IDENT;
+  ModInfo[NBBOTS].index = NBBOTS+IndexOffset;
+#else //ROB_SECT_ARBITRARY
   // Clear all structures.
   memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
 
@@ -428,6 +459,7 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
     ModInfo[I].gfId = ROB_IDENT;                 // Robot identity
     ModInfo[I].index = I+IndexOffset;            // Drivers index
   }
+#endif //ROB_SECT_ARBITRARY
 
   GfOut("# ... Initialized\n\n");
 
@@ -512,6 +544,8 @@ extern "C" int simplixShut()
 static int InitFuncPt(int Index, void *Pt)
 {
   tRobotItf *Itf = (tRobotItf *)Pt;              // Get typed pointer
+  int xx;
+  tInstanceInfo *copy;
 
   Itf->rbNewTrack = InitTrack;                   // Store function pointers 
   Itf->rbNewRace  = NewRace;
@@ -521,60 +555,75 @@ static int InitFuncPt(int Index, void *Pt)
   Itf->rbShutdown = Shutdown;
   Itf->index      = Index;                       // Store index
 
-  cRobot[Index-IndexOffset] =                    // Create a driver
+#ifdef ROB_SECT_ARBITRARY
+  //Make sure enough data is allocated
+  if (cInstancesCount <= Index-IndexOffset) {
+    copy = new tInstanceInfo[Index-IndexOffset+1];
+    for (xx = 0; xx < cInstancesCount; ++xx)
+      copy[xx] = cInstances[xx];
+    for (xx = cInstancesCount; xx < Index-IndexOffset+1; ++xx)
+      copy[xx].cRobot = NULL;
+    if (cInstancesCount > 0)
+      delete []cInstances;
+    cInstances = copy;
+    cInstancesCount = Index-IndexOffset+1;
+  }
+#endif
+
+  cInstances[Index-IndexOffset].cRobot =                    // Create a driver
 	  new TDriver(Index-IndexOffset);
-  cRobot[Index-IndexOffset]->SetBotName          // Store customized name
+  cInstances[Index-IndexOffset].cRobot->SetBotName          // Store customized name
 	  (RobotSettings,                            // Robot's xml-file
 	  &DriverNames[(Index-IndexOffset)*DRIVERLEN]);// not drivers xml-file!  
 
   if (cRobotType == RTYPE_SIMPLIX)
   {
 	  GfOut("#cRobotType == RTYPE_SIMPLIX\n");
-    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix;
-    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
-    cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
-    cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_TRB1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_TRB1\n");
-    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_TRB1;
-    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_TRB1;
-    cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
-    cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_TRB1;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_TRB1;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_SC)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_SC\n");
-    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
-    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_SC;
-    cRobot[Index-IndexOffset]->ScaleSide(0.90f,0.95f);
-    cRobot[Index-IndexOffset]->SideBorderOuter(0.30f);
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_SC;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.90f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.30f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_36GP)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_36GP\n");
-    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
-    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_36GP;
-    cRobot[Index-IndexOffset]->ScaleSide(0.85f,0.85f);
-    cRobot[Index-IndexOffset]->SideBorderOuter(0.75f);
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_36GP;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.85f,0.85f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
     //cRobot[Index-IndexOffset]->UseFilterAccel();
   }
   else if (cRobotType == RTYPE_SIMPLIX_INDY)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_INDY\n");
-    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_INDY;
-    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_INDY;
-    cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
-    cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_INDY;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_INDY;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_LS1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_LS1\n");
-    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_LS1;
-    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_LS1;
-    cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
-    cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_LS1;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_LS1;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
 
   return 0;
@@ -589,8 +638,8 @@ static void InitTrack(int Index,
   tTrack* Track,void *CarHandle,void **CarParmHandle, tSituation *S)
 {
   // Init common used data
-  cRobot[Index-IndexOffset]->SetCommonData(&gCommonData);    
-  cRobot[Index-IndexOffset]->InitTrack(Track,CarHandle,CarParmHandle, S);
+  cInstances[Index-IndexOffset].cRobot->SetCommonData(&gCommonData);    
+  cInstances[Index-IndexOffset].cRobot->InitTrack(Track,CarHandle,CarParmHandle, S);
 }
 //==========================================================================*
 
@@ -603,16 +652,16 @@ static void NewRace(int Index, tCarElt* Car, tSituation *S)
 #ifdef SPEED_DREAMS
   RtInitTimer(); // Check existance of Performance Counter Hardware
 #endif
-  cTicks[Index-IndexOffset] = 0.0;               // Initialize counters
-  cMinTicks[Index-IndexOffset] = FLT_MAX;        // and time data 
-  cMaxTicks[Index-IndexOffset] = 0.0;
-  cTickCount[Index-IndexOffset] = 0;
-  cLongSteps[Index-IndexOffset] = 0;
-  cCriticalSteps[Index-IndexOffset] = 0;
-  cUnusedCount[Index-IndexOffset] = 0;
+  cInstances[Index-IndexOffset].cTicks = 0.0;               // Initialize counters
+  cInstances[Index-IndexOffset].cMinTicks = FLT_MAX;        // and time data 
+  cInstances[Index-IndexOffset].cMaxTicks = 0.0;
+  cInstances[Index-IndexOffset].cTickCount = 0;
+  cInstances[Index-IndexOffset].cLongSteps = 0;
+  cInstances[Index-IndexOffset].cCriticalSteps = 0;
+  cInstances[Index-IndexOffset].cUnusedCount = 0;
   
-  cRobot[Index-IndexOffset]->NewRace(Car, S);
-  cRobot[Index-IndexOffset]->CurrSimTime = -10.0;
+  cInstances[Index-IndexOffset].cRobot->NewRace(Car, S);
+  cInstances[Index-IndexOffset].cRobot->CurrSimTime = -10.0;
 }
 //==========================================================================*
 
@@ -631,41 +680,41 @@ static void NewRace(int Index, tCarElt* Car, tSituation *S)
 static void Drive(int Index, tCarElt* Car, tSituation *S)
 {
   //GfOut("#>>> TDriver::Drive\n");
-  if (cRobot[Index-IndexOffset]->CurrSimTime < S->currentTime)
-//  if (cRobot[Index-IndexOffset]->CurrSimTime + 0.03 < S->currentTime)
+  if (cInstances[Index-IndexOffset].cRobot->CurrSimTime < S->currentTime)
+//  if (cInstances[Index-IndexOffset].cRobot->CurrSimTime + 0.03 < S->currentTime)
   {
     //GfOut("#Drive\n");
 	double StartTimeStamp = RtTimeStamp(); 
 
-    cRobot[Index-IndexOffset]->CurrSimTime =     // Update current time
+    cInstances[Index-IndexOffset].cRobot->CurrSimTime =     // Update current time
 		S->currentTime; 
-    cRobot[Index-IndexOffset]->Update(Car,S);    // Update info about opp.
-    if (cRobot[Index-IndexOffset]->IsStuck())    // Check if we are stuck  
-  	  cRobot[Index-IndexOffset]->Unstuck();      //   Unstuck 
+    cInstances[Index-IndexOffset].cRobot->Update(Car,S);    // Update info about opp.
+    if (cInstances[Index-IndexOffset].cRobot->IsStuck())    // Check if we are stuck  
+  	  cInstances[Index-IndexOffset].cRobot->Unstuck();      //   Unstuck 
 	else                                         // or
-	  cRobot[Index-IndexOffset]->Drive();        //   Drive
+	  cInstances[Index-IndexOffset].cRobot->Drive();        //   Drive
 
 	double Duration = RtDuration(StartTimeStamp);
 
-	if (cTickCount[Index-IndexOffset] > 0)       // Collect used time 
+	if (cInstances[Index-IndexOffset].cTickCount > 0)       // Collect used time 
 	{
 	  if (Duration > 1.0)
-        cLongSteps[Index-IndexOffset]++;
+        cInstances[Index-IndexOffset].cLongSteps++;
 	  if (Duration > 2.0)
-        cCriticalSteps[Index-IndexOffset]++;
-	  if (cMinTicks[Index-IndexOffset] > Duration)
-	    cMinTicks[Index-IndexOffset] = Duration;
-	  if (cMaxTicks[Index-IndexOffset] < Duration)
-	    cMaxTicks[Index-IndexOffset] = Duration;
+        cInstances[Index-IndexOffset].cCriticalSteps++;
+	  if (cInstances[Index-IndexOffset].cMinTicks > Duration)
+	    cInstances[Index-IndexOffset].cMinTicks = Duration;
+	  if (cInstances[Index-IndexOffset].cMaxTicks < Duration)
+	    cInstances[Index-IndexOffset].cMaxTicks = Duration;
 	}
-	cTickCount[Index-IndexOffset]++;
-  	cTicks[Index-IndexOffset] += Duration;
+	cInstances[Index-IndexOffset].cTickCount++;
+  	cInstances[Index-IndexOffset].cTicks += Duration;
   }
   else
   {
     //GfOut("#DriveLast\n");
-    cUnusedCount[Index-IndexOffset]++;
-    cRobot[Index-IndexOffset]->DriveLast();      // Use last drive commands
+    cInstances[Index-IndexOffset].cUnusedCount++;
+    cInstances[Index-IndexOffset].cRobot->DriveLast();      // Use last drive commands
   }
   //GfOut("#<<< TDriver::Drive\n");
 }
@@ -680,7 +729,7 @@ static int PitCmd(int Index, tCarElt* Car, tSituation *S)
   // Dummy: use parameters
   if ((Index < 0) || (Car == NULL) || (S == NULL))
     printf("PitCmd\n");
-  return cRobot[Index-IndexOffset]->PitCmd();
+  return cInstances[Index-IndexOffset].cRobot->PitCmd();
 }
 //==========================================================================*
 
@@ -695,7 +744,7 @@ static void EndRace(int Index, tCarElt *Car, tSituation *S)
 	  Index = 0;
 
   printf("EndRace\n");
-  cRobot[Index-IndexOffset]->EndRace();
+  cInstances[Index-IndexOffset].cRobot->EndRace();
 }
 //==========================================================================*
 
@@ -705,19 +754,56 @@ static void EndRace(int Index, tCarElt *Car, tSituation *S)
 //--------------------------------------------------------------------------*
 static void Shutdown(int Index)
 {
+#ifdef ROB_SECT_ARBITRARY
+  int count;
+  int xx;
+  tInstanceInfo *copy;
+#endif //ROB_SECT_ARBITRARY
+
   GfOut("\n\n#Clock\n");
-  GfOut("#Total Time used: %g sec\n",cTicks[Index-IndexOffset]/1000.0);
-  GfOut("#Min   Time used: %g msec\n",cMinTicks[Index-IndexOffset]);
-  GfOut("#Max   Time used: %g msec\n",cMaxTicks[Index-IndexOffset]);
-  GfOut("#Mean  Time used: %g msec\n",cTicks[Index-IndexOffset]/cTickCount[Index-IndexOffset]);
-  GfOut("#Long Time Steps: %d\n",cLongSteps[Index-IndexOffset]);
-  GfOut("#Critical Steps : %d\n",cCriticalSteps[Index-IndexOffset]);
-  GfOut("#Unused Steps   : %d\n",cUnusedCount[Index-IndexOffset]);
+  GfOut("#Total Time used: %g sec\n",cInstances[Index-IndexOffset].cTicks/1000.0);
+  GfOut("#Min   Time used: %g msec\n",cInstances[Index-IndexOffset].cMinTicks);
+  GfOut("#Max   Time used: %g msec\n",cInstances[Index-IndexOffset].cMaxTicks);
+  GfOut("#Mean  Time used: %g msec\n",cInstances[Index-IndexOffset].cTicks/cInstances[Index-IndexOffset].cTickCount);
+  GfOut("#Long Time Steps: %d\n",cInstances[Index-IndexOffset].cLongSteps);
+  GfOut("#Critical Steps : %d\n",cInstances[Index-IndexOffset].cCriticalSteps);
+  GfOut("#Unused Steps   : %d\n",cInstances[Index-IndexOffset].cUnusedCount);
   
   GfOut("\n\n#");
 
-  cRobot[Index-IndexOffset]->Shutdown();
-  delete cRobot[Index-IndexOffset];
+  cInstances[Index-IndexOffset].cRobot->Shutdown();
+  delete cInstances[Index-IndexOffset].cRobot;
+  cInstances[Index-IndexOffset].cRobot = NULL;
+
+#ifdef ROB_SECT_ARBITRARY
+  //Check if this was the highest index
+  if (cInstancesCount == Index-IndexOffset+1)
+  {
+    //Now make the cInstances array smaller
+    //Count the number of robots which are still in the array
+    count = 0;
+    for (xx = 0; xx < Index-IndexOffset+1; ++xx)
+    {
+      if (cInstances[xx].cRobot)
+        count = xx+1;
+    }
+
+    if (count>0)
+    {
+      //We have robots left: make a new array
+      copy = new tInstanceInfo[count];
+      for (xx = 0; xx < count; ++xx)
+        copy[xx] = cInstances[xx];
+    }
+    else
+    {
+      copy = NULL;
+    }
+    delete []cInstances;
+    cInstances = copy;
+    cInstancesCount = count;
+  }
+#endif //ROB_SECT_ARBITRARY
 }
 //==========================================================================*
 

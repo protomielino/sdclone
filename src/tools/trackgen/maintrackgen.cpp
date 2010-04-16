@@ -39,6 +39,8 @@
 #include <plib/ul.h>
 #include <plib/ssg.h>
 
+#include <config.h>
+
 #include <SDL/SDL.h>
 #include <tgfclient.h>
 #include <track.h>
@@ -126,6 +128,8 @@ void init_args(int argc, char **argv)
     TrackName = NULL;
     TrackCategory = NULL;
     saveElevation = -1;
+
+    SetLibDir(TORCS_LIBDIR);
 
 #ifndef WIN32
     while (1) {
