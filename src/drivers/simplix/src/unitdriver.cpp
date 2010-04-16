@@ -499,14 +499,9 @@ void TDriver::InitTrack
 	GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
     SkillHandle = GfParmReadFile
 	  (PathFilename, GFPARM_RMODE_REREAD);
-#ifdef _driveSkill
-    oSkillDriver = oCar->_driveSkill;
-#else
-    oSkillDriver = 0.0f;
-#endif //_driveSkill
     if (SkillHandle)
     {
-      oSkillDriver = GfParmGetNum(SkillHandle,"skill","level",0,oSkillDriver);
+      oSkillDriver = GfParmGetNum(SkillHandle,"skill","level",0,0.0);
       oSkillDriver = MIN(1.0, MAX(0.0, oSkillDriver));
       GfOut("#oSkillDriver: %g\n", oSkillDriver);
 

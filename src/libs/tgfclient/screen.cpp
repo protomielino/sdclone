@@ -64,11 +64,6 @@
 #include <X11/Xatom.h>
 #include <X11/keysym.h>
 #include <X11/extensions/Xrandr.h>
-
-//Set HAS_RANDR_1_2 if we have xrandr version 1.2 or higher
-#if RANDR_MAJOR > 1 || (RANDR_MAJOR == 1 && RANDR_MINOR >= 2)
-#define HAS_RANDR_1_2 1
-#endif
 #endif // USE_RANDR_EXT
 
 static int GfScrWidth;
@@ -178,19 +173,7 @@ gfScreenInit(void)
 		int screen = DefaultScreen(display);
     	Window root = RootWindow(display, screen);
 
-	//Default: we cannot find the screenconfig
-	XRRScreenConfiguration *screenconfig = NULL;
-#if HAS_RANDR_1_2
-	//If we have randr 1.2, we can query xrandr is actually enabled. On older versions, we will just assume that
-	if (XRRQueryVersion (display, NULL, NULL))
-	{
-#endif
-		//Load the screenconfig
-		screenconfig = XRRGetScreenInfo (display, root);
-#if HAS_RANDR_1_2
-	}
-#endif
-
+		XRRScreenConfiguration *screenconfig = XRRGetScreenInfo (display, root);
 		if (screenconfig) {
 			int i, j, nsize;
 			XRRScreenSize *sizes = XRRConfigSizes(screenconfig, &nsize);
