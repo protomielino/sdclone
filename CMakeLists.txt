@@ -98,7 +98,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doxygen_config.cmake
-	       ${CMAKE_CURRENT_SOURCE_DIR}/doxygen_config @ONLY)
+	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
 TORCS_INSTALL_FILES(DATA . FILES credits.xml)
 
