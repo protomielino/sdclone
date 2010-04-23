@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "../../config.h"
+#include <config.h>
 
 #ifdef WIN32
 #include <windows.h>
