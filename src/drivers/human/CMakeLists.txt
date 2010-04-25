@@ -5,7 +5,7 @@ SET(ROBOT_NAME "human")
 SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp pref.cpp human.h pref.h)
 
 SET(ROBOT_SHIP logo.rgb)
-SET(ROBOT_SHIP_SUBDIR cars tracks)
+SET(ROBOT_SHIPSUBDIRS cars tracks)
 
 FILE(GLOB files_xml *.xml)
 
