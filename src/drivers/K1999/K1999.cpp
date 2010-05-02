@@ -762,11 +762,11 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
    Skid = 0.9;
   if (Skid < -0.9)
    Skid = -0.9;
-  car->_steerCmd += asin(Skid) / car->_steerLock;
+  car->_steerCmd += (float)(asin(Skid) / car->_steerLock);
 
   double yr = speed * TargetCurvature;
   double diff = car->_yaw_rate - yr;
-  car->_steerCmd -= (SteerSkid * (1 + fDirt) * (100 / (speed + 100)) * diff) / car->_steerLock;
+  car->_steerCmd -= (float)((SteerSkid * (1 + fDirt) * (100 / (speed + 100)) * diff) / car->_steerLock);
  }
 
  //
@@ -780,9 +780,9 @@ void CK1999Data::Drive(tCarElt* car, tSituation *s)
   x = 1;
 
  if (x > 0)
-  car->_accelCmd = Min(x, TractionHelp);
+  car->_accelCmd = (float)Min(x, TractionHelp);
  else
-  car->_brakeCmd = Min(-10 * x, ABS);
+  car->_brakeCmd = (float)Min(-10 * x, ABS);
  
  if (car->_speed_x > 30 && fabs(Error) * car->_speed_x > 60)
   car->_accelCmd = 0;

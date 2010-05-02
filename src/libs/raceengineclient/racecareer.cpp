@@ -252,7 +252,7 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 			GfParmListSeekFirst(ReInfo->params, RM_SECT_FIRSTNAME);
 		if( GfParmListSeekNext(ReInfo->params, RM_SECT_LASTNAME) != 0 )
 			GfParmListSeekFirst(ReInfo->params, RM_SECT_LASTNAME);
-		GfParmSetNum(curParam, path2, RM_ATTR_SKILLLEVEL, NULL, ReCareerNewSkill( GfParmGetEltNb( ReInfo->params, RM_SECT_CLASSES ), (tdble)classNb ) );
+		GfParmSetNum(curParam, path2, RM_ATTR_SKILLLEVEL, NULL, (tdble) ReCareerNewSkill( GfParmGetEltNb( ReInfo->params, RM_SECT_CLASSES ), classNb ) );
 	
 		/* Add a driver to the result section */
 		snprintf( buf, 1024, "%s/%s/%d/%d/%s", RE_SECT_CLASSPOINTS, "hymie", 1, xx, GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) );
@@ -373,8 +373,8 @@ static void* ReCareerNewGroup( const char *filename, void *param, const char *gr
 	GfParmSetStr( subparam, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_NO );
 	GfParmSetNum( subparam, RM_SECT_TRACKS, RM_ATTR_TOTALNUM, NULL, (tdble)totalTracks );
 	snprintf( buf, 1024, "%s/%s/%s", RM_SECT_CLASSES, GfParmListGetCurEltName( ReInfo->params, RM_SECT_CLASSES ), RM_SECT_TRACKS );
-	GfParmSetNum( subparam, RM_SECT_TRACKS, RM_ATTR_MINNUM, NULL, (int)GfParmGetNum( ReInfo->params, buf, RM_ATTR_MINNUM, NULL, (tdble)1 ) );
-	GfParmSetNum( subparam, RM_SECT_TRACKS, RM_ATTR_MAXNUM, NULL, (int)GfParmGetNum( ReInfo->params, buf, RM_ATTR_MAXNUM, NULL, (tdble)totalTracks ) );
+	GfParmSetNum( subparam, RM_SECT_TRACKS, RM_ATTR_MINNUM, NULL, (float)((int)GfParmGetNum( ReInfo->params, buf, RM_ATTR_MINNUM, NULL, (tdble)1 )) );
+	GfParmSetNum( subparam, RM_SECT_TRACKS, RM_ATTR_MAXNUM, NULL, (float)((int)GfParmGetNum( ReInfo->params, buf, RM_ATTR_MAXNUM, NULL, (tdble)totalTracks )) );
 
 	return subparam;
 }

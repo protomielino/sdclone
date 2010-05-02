@@ -55,7 +55,7 @@ damperForce(tSuspension *susp)
     v = susp->v;
 
     if (fabs(v) > 10.0) {
-        v = SIGN(v) * 10.0;
+        v = (float)(SIGN(v) * 10.0);
     }
     
     if (v < 0) {

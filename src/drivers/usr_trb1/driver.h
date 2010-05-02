@@ -66,8 +66,8 @@ class Driver {
 		tCarElt *getCarPtr() { return car; }
 		tTrack *getTrackPtr() { return track; }
 		float getSpeed() { return mycardata->getSpeedInTrackDirection(); /*speed;*/ }
-		float getSpeedDeltaX() { return mycardata->getSpeedDeltaX(); }
-		float getSpeedDeltaY() { return mycardata->getSpeedDeltaY(); }
+		float getSpeedDeltaX() { return (float)mycardata->getSpeedDeltaX(); }
+		float getSpeedDeltaY() { return (float)mycardata->getSpeedDeltaY(); }
 		float getTrueSpeed() { return car->_speed_x; /* mycardata->getTrueSpeed(); */ }
 		float evalTrueSpeed() { truespeed = mycardata->getTrueSpeed(); return truespeed; }
 		float getNextLeft() { return car->_trkPos.toLeft + (car->_trkPos.toLeft - prevleft); }
@@ -108,7 +108,7 @@ class Driver {
 		bool canOvertake( Opponent *o, double *mincatchdist, bool outside, bool lenient );
 		double getFollowDistance();
 
-		double filterTeam(double accel);
+		float filterTeam(float accel);
 		float filterOverlap(float accel);
 		float filterBColl(float brake);
 		float filterABS(float brake);

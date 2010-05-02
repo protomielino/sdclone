@@ -48,7 +48,7 @@ static tdble damperForce(tSuspension *susp)
 	v = susp->v;
 	
 	if (fabs(v) > 10.0f) {
-		v = SIGN(v) * 10.0f;
+		v = (float)(SIGN(v) * 10.0);
 	}
 	
 	if (v < 0.0f) {
@@ -66,7 +66,7 @@ static tdble damperForce(tSuspension *susp)
 		f = (dampdef->C2 * av + dampdef->b2);
 	}
 	
-	f *= SIGN(v);
+	f *= (float)(SIGN(v));
 	
 	return f;
 }

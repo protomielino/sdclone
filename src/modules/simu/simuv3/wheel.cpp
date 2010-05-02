@@ -91,12 +91,12 @@ SimWheelConfig(tCar *car, int index)
 		wheel->relPos.ax = wheel->staticPos.ax;
     }
     
-    wheel->lfMin = MIN(0.9, wheel->lfMin);
-    wheel->lfMax = MAX(1.1, wheel->lfMax);
+    wheel->lfMin = MIN(0.9f, wheel->lfMin);
+    wheel->lfMax = MAX(1.1f, wheel->lfMax);
     
-    RFactor = MIN(1.0, RFactor);
-    RFactor = MAX(0.1, RFactor);
-    EFactor = MIN(1.0, EFactor);
+    RFactor = MIN(1.0f, RFactor);
+    RFactor = MAX(0.1f, RFactor);
+    EFactor = MIN(1.0f, EFactor);
 
     patchLen = wheel->weight0 / (tirewidth * pressure);
 
@@ -107,7 +107,7 @@ SimWheelConfig(tCar *car, int index)
     else
 	    wheel->radius = rimdiam / 2.0f + tirewidth * tireratio;
 
-    wheel->tireSpringRate = wheel->weight0 / (wheel->radius * (1.0 - cos(asin(patchLen / (2.0f * wheel->radius)))));
+    wheel->tireSpringRate = (float)(wheel->weight0 / (wheel->radius * (1.0 - cos(asin(patchLen / (2.0f * wheel->radius))))));
     wheel->relPos.x = wheel->staticPos.x = car->axle[index/2].xpos;
     wheel->relPos.y = wheel->staticPos.y;
     wheel->relPos.z = wheel->radius - wheel->susp.spring.x0;
@@ -118,7 +118,7 @@ SimWheelConfig(tCar *car, int index)
     SimSuspConfig(hdle, SuspSect[index], &(wheel->susp), wheel->weight0, x0);
     SimBrakeConfig(hdle, BrkSect[index], &(wheel->brake));
     
-    carElt->_rimRadius(index) = rimdiam / 2.0;
+    carElt->_rimRadius(index) = rimdiam / 2.0f;
     if (tireheight > 0.0)
 	    carElt->_tireHeight(index) = tireheight;
     else
@@ -128,11 +128,11 @@ SimWheelConfig(tCar *car, int index)
     carElt->_wheelRadius(index) = wheel->radius;
 
     wheel->Ca = Ca;
-    wheel->mfC = 2.0 - asin(RFactor) * 2.0 / PI;
+    wheel->mfC = (float)(2.0 - asin(RFactor) * 2.0 / PI);
     wheel->mfB = Ca / wheel->mfC;
     wheel->mfE = EFactor;
     
-    wheel->lfK = log((1.0 - wheel->lfMin) / (wheel->lfMax - wheel->lfMin));
+    wheel->lfK = (float)log((1.0 - wheel->lfMin) / (wheel->lfMax - wheel->lfMin));
     wheel->spinVel = 0.0;
     wheel->feedBack.I += wheel->I;
     wheel->feedBack.spinVel = 0;
@@ -361,7 +361,7 @@ SimWheelUpdateForce(tCar *car, int index)
 			// to the track plane. We assume other reaction forces
 			// proportional, but things break down when car is 
 			// tilted a lot with respect to the track plane.
-			tdble invrel_normal = 1.0/rel_normal.z;
+			tdble invrel_normal = 1.0f/rel_normal.z;
 			if (invrel_normal>= 4.0) {
 				invrel_normal = 4.0;
 			} else if (invrel_normal<=-4.0) {
@@ -429,7 +429,7 @@ SimWheelUpdateForce(tCar *car, int index)
 
 	BEGIN_PROFILE(timer_friction);
     tdble relative_speed = sqrt(wvx*wvx + wvy*wvy);
-    tdble camber_gain = +0.1;
+    tdble camber_gain = +0.1f;
     tdble camber_shift = camber_gain * rel_normal.x;
     if ((wheel->state & SIM_SUSP_EXT) != 0) {
 	    sx = sy = sa = 0;
@@ -479,7 +479,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_reaction[index] = 0.0f;
     }
     
-    stmp = MIN(s, 1.5);
+    stmp = MIN(s, 1.5f);
 
     /* MAGIC FORMULA */
     Bx = wheel->mfB * stmp;
@@ -498,21 +498,21 @@ SimWheelUpdateForce(tCar *car, int index)
 	{
 		tdble Bx = wheel->mfB * (sa);// + camber_shift);
         //printf ("%f %f\n", sa, camber_shift);
-		car->carElt->_wheelFy(index) =  cos(sa)*wheel->mfT * sin(wheel->mfC * atan(Bx * (1 - wheel->mfE) + wheel->mfE * atan(Bx))) * (1.0 + stmp * simSkidFactor[car->carElt->_skillLevel]) * static_grip;
+		car->carElt->_wheelFy(index) =  (tdble)(cos(sa)*wheel->mfT * sin(wheel->mfC * atan(Bx * (1 - wheel->mfE) + wheel->mfE * atan(Bx))) * (1.0 + stmp * simSkidFactor[car->carElt->_skillLevel]) * static_grip);
 	}
 	END_PROFILE(timer_friction);
 
 	BEGIN_PROFILE(timer_temperature);
 	if (car->options->tyre_temperature) {
     	// heat transfer function with air
-		tdble htrf = (0.002 + fabs(absolute_speed)*0.0005)*SimDeltaTime;
+		tdble htrf = (tdble)((0.002 + fabs(absolute_speed)*0.0005)*SimDeltaTime);
 		tdble T_current = wheel->T_current;
 		tdble T_operating = wheel->T_operating;
 		tdble T_range = wheel->T_range;
 		tdble mfT;
 		// friction heat transfer
-		T_current += 0.00003*((fabs(relative_speed)+0.1*fabs(wrl))*reaction_force)*SimDeltaTime;
-		T_current = T_current * (1.0-htrf) + htrf * 25.0;	
+		T_current += (tdble)(0.00003*((fabs(relative_speed)+0.1*fabs(wrl))*reaction_force)*SimDeltaTime);
+		T_current = (tdble)(T_current * (1.0-htrf) + htrf * 25.0);	
 		tdble dist = (T_current - T_operating)/T_range;
 		//mfT = 100.0f * exp(-0.5f*(dist*dist))/T_range;
 		mfT = 0.85f + 3.0f * exp(-0.5f*(dist*dist))/T_range;
@@ -527,7 +527,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		tdble adherence = wheel->Ca * 500.0f; 
 		tdble melt = (exp (2.0f*(wheel->T_current - compound_melt_point)/compound_melt_point)) * car->options->tyre_damage;
 		tdble removal = exp (2.0f*(F - adherence)/adherence);
-		tdble wheel_damage = 0.001f* melt * relative_speed * removal / (2.0f * M_PI * wheel->radius * wheel->width * wheel->Ca);
+		tdble wheel_damage = (tdble)(0.001 * melt * relative_speed * removal / (2.0 * M_PI * wheel->radius * wheel->width * wheel->Ca));
 
 		if (wheel_damage>0.01f) {
 			wheel_damage = 0.01f;
@@ -586,7 +586,7 @@ SimWheelUpdateForce(tCar *car, int index)
 		tdble ds = wheel->s_old-s;
 		tdble EF = wheel->Em * ds;
 		tdble dF = wheel->F_old - EF;
-		wheel->Em += 0.1 * dF*ds;
+		wheel->Em += (float)(0.1 * dF*ds);
 		wheel->F_old = Ftot;
 		wheel->s_old = s;
 	}
@@ -666,7 +666,7 @@ SimWheelUpdateRotation(tCar *car)
 		wheel = &(car->wheel[i]);
 		wheel->spinVel = wheel->in.spinVel;
 	
-		RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
+		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
 	
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
 		car->carElt->_wheelSpinVel(i) = wheel->spinVel;
@@ -691,7 +691,7 @@ SimUpdateFreeWheels(tCar *car, int axlenb)
 		ndot = SimDeltaTime * wheel->spinTq / I;
 		wheel->spinVel -= ndot;
 
-		BrTq = - SIGN(wheel->spinVel) * wheel->brake.Tq;
+		BrTq = (float)(- SIGN(wheel->spinVel) * wheel->brake.Tq);
 		ndot = SimDeltaTime * BrTq / I;
 
 		if (fabs(ndot) > fabs(wheel->spinVel)) {

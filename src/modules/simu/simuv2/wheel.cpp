@@ -92,7 +92,7 @@ SimWheelConfig(tCar *car, int index)
 	carElt->_brakeDiskRadius(index) = wheel->brake.radius;
 	carElt->_wheelRadius(index) = wheel->radius;
 
-	wheel->mfC = 2.0f - asin(RFactor) * 2.0f / PI;
+	wheel->mfC = (tdble)(2.0 - asin(RFactor) * 2.0 / PI);
 	wheel->mfB = Ca / wheel->mfC;
 	wheel->mfE = EFactor;
 
@@ -198,7 +198,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 	} else {
 		sa = atan2(wheel->bodyVel.y, wheel->bodyVel.x) - waz;
 	}
-	NORM_PI_PI(sa);
+	FLOAT_NORM_PI_PI(sa);
 
 	wrl = wheel->spinVel * wheel->radius;
 	if ((wheel->state & SIM_SUSP_EXT) != 0) {
@@ -245,8 +245,8 @@ void SimWheelUpdateForce(tCar *car, int index)
 		Fn -= F * sy / s;
 	}
 
-	RELAXATION2(Fn, wheel->preFn, 50.0f);
-	RELAXATION2(Ft, wheel->preFt, 50.0f);
+	FLOAT_RELAXATION2(Fn, wheel->preFn, 50.0f);
+	FLOAT_RELAXATION2(Ft, wheel->preFt, 50.0f);
 
 	wheel->relPos.az = waz;
 
@@ -276,10 +276,10 @@ SimWheelUpdateRotation(tCar *car)
 		wheel = &(car->wheel[i]);
 		wheel->spinVel = wheel->in.spinVel;
 
-		RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
+		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
 
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
-		NORM_PI_PI(wheel->relPos.ay);
+		FLOAT_NORM_PI_PI(wheel->relPos.ay);
 		car->carElt->_wheelSpinVel(i) = wheel->spinVel;
 	}
 }
@@ -302,7 +302,7 @@ SimUpdateFreeWheels(tCar *car, int axlenb)
 		ndot = SimDeltaTime * wheel->spinTq / I;
 		wheel->spinVel -= ndot;
 
-		BrTq = - SIGN(wheel->spinVel) * wheel->brake.Tq;
+		BrTq = (tdble)(- SIGN(wheel->spinVel) * wheel->brake.Tq);
 		ndot = SimDeltaTime * BrTq / I;
 
 		if (fabs(ndot) > fabs(wheel->spinVel)) {

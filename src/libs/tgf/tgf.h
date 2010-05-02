@@ -94,6 +94,13 @@ do {						\
 	while ((x) < -PI) { (x) += 2*PI; } 	\
 } while (0)
 
+/** Angle normalization between -PI and PI */
+#define FLOAT_NORM_PI_PI(x) 				\
+do {						\
+	while ((x) > PI) { (x) -= (tdble) (2*PI); }	\
+	while ((x) < -PI) { (x) += (tdble) (2*PI); } 	\
+} while (0)
+
 
 #ifndef DIST
 /** Distance between two points */

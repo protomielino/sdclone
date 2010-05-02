@@ -19,7 +19,7 @@
 
 #include "driver.h"
 
-const float Driver::MAX_UNSTUCK_ANGLE = 15.0f/180.0f*PI;	// [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
+const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0/180.0*PI);// [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
 const float Driver::UNSTUCK_TIME_LIMIT = 2.0f;				// [s] We try to get unstuck after this time.
 const float Driver::MAX_UNSTUCK_SPEED = 5.0f;				// [m/s] Below this speed we consider being stuck.
 const float Driver::MIN_UNSTUCK_DIST = 3.0f;				// [m] If we are closer to the middle we assume to be not stuck.
@@ -247,9 +247,9 @@ void Driver::computeRadius(float *radius)
 					arc += s->arc;
 					s = s->next;
 				}
-				lastturnarc = arc/(PI/2.0f);
+				lastturnarc = (float)(arc/(PI/2.0));
 			}
-			radius[currentseg->id] = (currentseg->radius + currentseg->width/2.0)/lastturnarc;
+			radius[currentseg->id] = (float)((currentseg->radius + currentseg->width/2.0)/lastturnarc);
 		}
 		currentseg = currentseg->next;
 	} while (currentseg != startseg);
@@ -275,7 +275,7 @@ float Driver::getAllowedSpeed(tTrackSeg *segment)
 	) {
 		r += dr;
 	}*/
-	r = MAX(1.0, r);
+	r = MAX(1.0f, r);
 
 	return sqrt((mu*G*r)/(1.0f - MIN(1.0f, r*CA*mu/mass)));
 }
@@ -389,7 +389,7 @@ float Driver::getSteer()
 
 	targetAngle = atan2(target.y - car->_pos_Y, target.x - car->_pos_X);
 	targetAngle -= car->_yaw;
-	NORM_PI_PI(targetAngle);
+	FLOAT_NORM_PI_PI(targetAngle);
 	return targetAngle / car->_steerLock;
 }
 
@@ -447,7 +447,7 @@ vec2f Driver::getTargetPoint()
 		// Usual lookahead.
 		lookahead = LOOKAHEAD_CONST + car->_speed_x*LOOKAHEAD_FACTOR;
 		// Prevent "snap back" of lookahead on harsh braking.
-		float cmplookahead = oldlookahead - car->_speed_x*RCM_MAX_DT_ROBOTS;
+		float cmplookahead = (float)(oldlookahead - car->_speed_x*RCM_MAX_DT_ROBOTS);
 		if (lookahead < cmplookahead) {
 			lookahead = cmplookahead;
 		}
@@ -608,7 +608,7 @@ float Driver::getOffset()
 			}
 
 			// Because we are inside we can go to the border.
-			float maxoff = (o->getCarPtr()->_trkPos.seg->width - car->_dimension_y)/2.0-BORDER_OVERTAKE_MARGIN;
+			float maxoff = (float)((o->getCarPtr()->_trkPos.seg->width - car->_dimension_y)/2.0-BORDER_OVERTAKE_MARGIN);
 			if (lenleft > lenright) {
 				if (myoffset < maxoff) {
 					myoffset += OVERTAKE_OFFSET_INC*incfactor;
@@ -645,7 +645,7 @@ void Driver::update(tSituation *s)
 
 	// Update the local data rest.
 	speedangle = mycardata->getTrackangle() - atan2(car->_speed_Y, car->_speed_X);
-	NORM_PI_PI(speedangle);
+	FLOAT_NORM_PI_PI(speedangle);
 	mass = CARMASS + car->_fuel;
 	currentspeedsqr = car->_speed_x*car->_speed_x;
 	opponents->update(s, this);
@@ -844,7 +844,7 @@ float Driver::filterSColl(float steer)
 			/* compute angle between cars */
 			tCarElt *ocar = o->getCarPtr();
 			float diffangle = ocar->_yaw - car->_yaw;
-			NORM_PI_PI(diffangle);
+			FLOAT_NORM_PI_PI(diffangle);
 			// We are near and heading toward the car.
 			if (diffangle*o->getSideDist() < 0.0f) {
 				const float c = SIDECOLL_MARGIN/2.0f;

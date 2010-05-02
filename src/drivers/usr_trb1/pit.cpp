@@ -51,7 +51,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		pMID[6].x = pitinfo->pitExit->lgfromstart;
 
 		double PitEndOffset = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_END_OFFSET, (char *)NULL, 0.0 );
-		pMID[6].x += PitEndOffset;
+		pMID[6].x += (float)PitEndOffset;
 
 		pitentry = pMID[0].x;
 		pitexit = pMID[6].x;
@@ -68,7 +68,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		// Fix broken pit exit.
 		if (pMID[6].x < pMID[5].x) {
 			//fprintf(stderr,"bt: Pitexit broken on track %s.\n", track->name);fflush(stderr);
-			pMID[6].x = pMID[5].x + 50.0;
+			pMID[6].x = pMID[5].x + 50.0f;
 		}
 
 		// Fix point for first pit if necessary.
@@ -82,7 +82,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		}
 
 		side = pitinfo->side;
-		float sign = (side == TR_LFT) ? 1.0 : -1.0;
+		float sign = (side == TR_LFT) ? 1.0f : -1.0f;
 		pMID[0].y = 0.0;
 		pMID[6].y = 0.0;
 		for (i = 1; i < NPOINTS - 1; i++) {
@@ -91,16 +91,16 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		}
 
 		double PitShift = GfParmGetNum( car->_carHandle, SECT_PRIVATE, "pit shift", (char *)NULL, 0.0 );
-		pMID[3].y = (fabs(pitinfo->driversPits->pos.toMiddle)+PitShift+1.0)*sign;
+		pMID[3].y = (float)((fabs(pitinfo->driversPits->pos.toMiddle)+PitShift+1.0)*sign);
 		splineMID = new Spline(NPOINTS, pMID);
 
 		memcpy(pFRONT, pMID, sizeof(pMID));
 		memcpy(pBACK, pMID, sizeof(pMID));
 
-		pBACK[3].x -= car->_dimension_x/2 + 0.1;
+		pBACK[3].x -= (float)(car->_dimension_x/2 + 0.1);
 		pBACK[2].x -= 1.2f;
 
-		pFRONT[3].x += car->_dimension_x/2 + 0.1;
+		pFRONT[3].x += (float)(car->_dimension_x/2 + 0.1);
 		pFRONT[4].x += 1.0f;
 
 		splineFRONT = new Spline(NPOINTS, pFRONT);

@@ -43,7 +43,7 @@ SimSteerUpdate(tCar *car)
 	stdelta = steer - car->steer.steer;
 
 	if ((fabs(stdelta) / SimDeltaTime) > car->steer.maxSpeed) {
-		steer = SIGN(stdelta) * car->steer.maxSpeed * SimDeltaTime + car->steer.steer;
+		steer = (float)(SIGN(stdelta) * car->steer.maxSpeed * SimDeltaTime + car->steer.steer);
 	}
 
 	car->steer.steer = steer;

@@ -551,7 +551,7 @@ Driver::calcSteer(float targetAngle, int rl, float racesteer)
     {
       // limit how far we can steer against raceline 
       double limit = (90.0 - MAX(40.0, MIN(60.0, car->_speed_x))) / (50 + fabs(angle) * fabs(angle) * 3);
-      steer = MAX(racesteer - limit, MIN(racesteer + limit, steer));
+      steer = (float)MAX(racesteer - limit, MIN(racesteer + limit, steer));
     }
 
   return steer;
@@ -735,7 +735,7 @@ Driver::getTargetPoint()
         (float) (LOOKAHEAD_CONST + ((speed * (speed / 7)) * 0.15)));
 #endif
       // Prevent "snap back" of lookahead on harsh braking.
-      float cmplookahead = oldlookahead - car->_speed_x * RCM_MAX_DT_ROBOTS;
+      float cmplookahead = (float)(oldlookahead - car->_speed_x * RCM_MAX_DT_ROBOTS);
       lookahead = MAX(cmplookahead, lookahead);
     }
 

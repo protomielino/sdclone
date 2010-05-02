@@ -1744,7 +1744,7 @@ groups(void)
 	    r_node[node[n].new_numb].x    = node[n].x;
 	    r_node[node[n].new_numb].y    = node[n].y;
 	    if ((node[n].mark == 0) || (node[n].mark == 100000)) {
-		r_node[node[n].new_numb].z = GetElevation(node[n].x, node[n].y, node[n].z);
+		r_node[node[n].new_numb].z = GetElevation((tdble)node[n].x, (tdble)node[n].y, (tdble)node[n].z);
 	    } else {
 		r_node[node[n].new_numb].z = node[n].z;
 	    }
@@ -2247,8 +2247,8 @@ GenerateTerrain(tTrack *track, void *TrackHandle, char *outfile, FILE *AllFd, in
 	sprintf(buf, "%s/%s", TRK_SECT_SURFACES, mat);
     }
     TexName = GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE, "grass.rgb");
-    TexSize = GfParmGetNum(TrackHandle, buf, TRK_ATT_TEXSIZE, (char*)NULL, 20.0);
-    TexRand = GfParmGetNum(TrackHandle, buf, TRK_ATT_SURFRAND, (char*)NULL, TexSize / 10.0);
+    TexSize = GfParmGetNum(TrackHandle, buf, TRK_ATT_TEXSIZE, (char*)NULL, 20.0f);
+    TexRand = GfParmGetNum(TrackHandle, buf, TRK_ATT_SURFRAND, (char*)NULL, (tdble)(TexSize / 10.0));
 
     FileName = GfParmGetStr(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_RELIEF, NULL);
     if (FileName) {

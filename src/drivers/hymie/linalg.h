@@ -21,7 +21,7 @@
 #define _LINALG_H_
 
 inline float sign(float d) {
- return (d >= 0.0) ? 1.0 : -1.0;
+ return (d >= 0.0) ? 1.0f : -1.0f;
 }
 
 

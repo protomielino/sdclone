@@ -26,9 +26,9 @@ void SingleCardata::update()
 	speed = getSpeed(car, trackangle);
 	evalTrueSpeed();
 	angle = trackangle - car->_yaw;
-	NORM_PI_PI(angle);
-	width = MAX(car->_dimension_y, fabs(car->_dimension_x*sin(angle) + car->_dimension_y*cos(angle))) + 0.1;
-	length = MAX(car->_dimension_x, fabs(car->_dimension_y*sin(angle) + car->_dimension_x*cos(angle))) + 0.1;
+	FLOAT_NORM_PI_PI(angle);
+	width = (tdble)(MAX(car->_dimension_y, fabs(car->_dimension_x*sin(angle) + car->_dimension_y*cos(angle))) + 0.1);
+	length = (tdble)(MAX(car->_dimension_x, fabs(car->_dimension_y*sin(angle) + car->_dimension_x*cos(angle))) + 0.1);
 
 
 	for (int i=0; i<4; i++)
@@ -124,7 +124,7 @@ void SingleCardata::evalTrueSpeed()
 	double avglength = lengthlft/2 + lengthrgt/2;
 	double change = MIN(1.0, MAX(0.85, ourlength / avglength));
 
-	truespeed *= change;
+	truespeed *= (tdble)change;
 }
 
 // compute speed component parallel to the track.
@@ -135,7 +135,7 @@ float SingleCardata::getSpeed(tCarElt *car, float ltrackangle)
 	speed.y = car->_speed_Y;
 	dir.x = cos(ltrackangle);
 	dir.y = sin(ltrackangle);
-	return speed*dir;
+	return (tdble)(speed*dir);
 }
 
 void SingleCardata::init( CarElt *pcar )

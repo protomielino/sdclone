@@ -265,7 +265,7 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
 	    y = Y - seg->center.y;
 	    a2 = seg->arc / 2.0f;
 	    theta = atan2(y, x) - (seg->angle[TR_CS] + a2);
-	    NORM_PI_PI(theta);
+	    FLOAT_NORM_PI_PI(theta);
 	    p->seg = seg;
 	    p->toStart = theta + a2;
 	    p->toRight = seg->radiusr - sqrt(x*x + y*y);
@@ -287,7 +287,7 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
 	    y = Y - seg->center.y;
 	    a2 = seg->arc / 2.0f;
 	    theta = seg->angle[TR_CS] - a2 - atan2(y, x);
-	    NORM_PI_PI(theta);
+	    FLOAT_NORM_PI_PI(theta);
 	    p->seg = seg;
 	    p->toStart = theta + a2;
 	    p->toRight = sqrt(x*x + y*y) - seg->radiusr;
@@ -306,7 +306,7 @@ RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int typ
     
     /* The track is of constant width */
     /* This is subject to change */
-    p->toMiddle = p->toRight - seg->width / 2.0;
+    p->toMiddle = p->toRight - seg->width / 2.0f;
     p->toLeft = seg->width - p->toRight;
 
     /* Consider all the track with the sides */

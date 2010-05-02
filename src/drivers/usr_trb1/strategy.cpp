@@ -124,8 +124,8 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s, Opponents *opp, int 
    {
     if (inpit)
     {
-     float mytime = (car->_distFromStartLine / track->length) * car->_lastLapTime + (car->_laps - ocar->_laps) * car->_bestLapTime;
-     float othertime = (ocar->_distFromStartLine / track->length) * ocar->_bestLapTime;
+     float mytime = (float)((car->_distFromStartLine / track->length) * car->_lastLapTime + (car->_laps - ocar->_laps) * car->_bestLapTime);
+     float othertime = float((ocar->_distFromStartLine / track->length) * ocar->_bestLapTime);
      lead = mytime - othertime;
      if (lead < 25.0)
       // lets accept that this car is past us & calculate vs the next one
@@ -141,17 +141,17 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s, Opponents *opp, int 
   if (O)
   {
    // how far behind is it?
-   float mytime = (car->_distFromStartLine / track->length) * car->_lastLapTime + (car->_laps - Ocar->_laps) * car->_bestLapTime;
-   float othertime = (Ocar->_distFromStartLine / track->length) * Ocar->_bestLapTime;
+   float mytime = float((car->_distFromStartLine / track->length) * car->_lastLapTime + (car->_laps - Ocar->_laps) * car->_bestLapTime);
+   float othertime = float((Ocar->_distFromStartLine / track->length) * Ocar->_bestLapTime);
 
    lead = mytime - othertime;
 
    // how much damage is it safe to fix?
    int safe_damage = 0;
    if (car->_state == RM_CAR_STATE_PIT)
-    lead -= 15.0f + ((track->pits.len * track->pits.nMaxPits) / 20.0) * 0.30;
+    lead -= float(15.0 + ((track->pits.len * track->pits.nMaxPits) / 20.0) * 0.30);
    else
-    lead -= 15.0f + (track->pits.len * track->pits.nMaxPits) / 20.0;
+    lead -= float(15.0 + (track->pits.len * track->pits.nMaxPits) / 20.0);
 
    if (pit_reason == REASON_NONE)
     lead -= 20.0f;

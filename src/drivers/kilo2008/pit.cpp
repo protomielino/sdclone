@@ -67,7 +67,7 @@ Pit::Pit(tSituation * s, Driver * driver, float pitoffset)
       if(p[6].x < p[5].x)
         {
           //printf("bt: Pitexit broken on track %s.\n", track->name);
-          p[6].x = p[5].x + 50.0;
+          p[6].x = p[5].x + 50.0f;
         }
 
       // Fix point for first pit if necessary.
@@ -82,7 +82,7 @@ Pit::Pit(tSituation * s, Driver * driver, float pitoffset)
           p[5].x = p[4].x;
         }
 
-      float sign = (pitinfo->side == TR_LFT) ? 1.0 : -1.0;
+      float sign = (float)((pitinfo->side == TR_LFT) ? 1.0 : -1.0);
       p[0].y = 0.0;
       p[6].y = 0.0;
       for(int i = 1; i < NPOINTS - 1; i++)
@@ -91,7 +91,7 @@ Pit::Pit(tSituation * s, Driver * driver, float pitoffset)
           p[i].y *= sign;
         }
 
-      p[3].y = fabs(pitinfo->driversPits->pos.toMiddle + 1.0) * sign;
+      p[3].y = (float)(fabs(pitinfo->driversPits->pos.toMiddle + 1.0) * sign);
       spline = new Spline(NPOINTS, p);
     }
 }

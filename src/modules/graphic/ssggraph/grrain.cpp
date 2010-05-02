@@ -43,16 +43,16 @@ static float rainpos[MAX_RAIN_SLICE];
 #define SG_MPS_TO_KT        1.9438444924406046432
 
 #define DFL_MIN_LIGHT 0.35
-sgVec3 cGrRain::min_light = {DFL_MIN_LIGHT, DFL_MIN_LIGHT, DFL_MIN_LIGHT};
+sgVec3 cGrRain::min_light = {(float)DFL_MIN_LIGHT, (float)DFL_MIN_LIGHT, (float)DFL_MIN_LIGHT};
 
 float cGrRain::streak_period_max = DFL_STREAK_PERIOD_MAX;
-float cGrRain::streak_period_change_per_kms = DFL_STREAK_PERIOD_CHANGE_KMS;
+float cGrRain::streak_period_change_per_kms = (float)DFL_STREAK_PERIOD_CHANGE_KMS;
 float cGrRain::streak_period_min = DFL_STREAK_PERIOD_MIN;
-float cGrRain::streak_length_min = DFL_STREAK_LENGTH_MIN;
-float cGrRain::streak_length_change_per_kms = DFL_STREAK_LENGTH_CHANGE_KMS;
-float cGrRain::streak_bright_nearmost_layer = DFL_STREAK_BRIGHT_NEARMOST_LAYER;
-float cGrRain::streak_bright_farmost_layer = DFL_STREAK_BRIGHT_FARMOST_LAYER;
-float cGrRain::streak_length_max = DFL_STREAK_LENGTH_MAX;
+float cGrRain::streak_length_min = (float)DFL_STREAK_LENGTH_MIN;
+float cGrRain::streak_length_change_per_kms = (float)DFL_STREAK_LENGTH_CHANGE_KMS;
+float cGrRain::streak_bright_nearmost_layer = (float)DFL_STREAK_BRIGHT_NEARMOST_LAYER;
+float cGrRain::streak_bright_farmost_layer = (float)DFL_STREAK_BRIGHT_FARMOST_LAYER;
+float cGrRain::streak_length_max = (float)DFL_STREAK_LENGTH_MAX;
 float cGrRain::cone_base_radius = DFL_CONE_BASE_RADIUS;
 float cGrRain::cone_height = DFL_CONE_HEIGHT;
 int cGrRain::streak_count_max = DFL_STREAK_COUNT_MAX;
@@ -70,7 +70,7 @@ cGrRain::cGrRain() :
 	fov_height(55.0)
 {
 	for(int i = 0; i < MAX_RAIN_SLICE ; i++)
-		rainpos[i] = ssgaRandom();
+		rainpos[i] = (float)ssgaRandom();
 }
 
 
@@ -87,10 +87,10 @@ cGrRain::DrawCone2(float baseRadius, float height, int slices, bool down, double
 	sgAddVec3( light, fog_color, min_light );
 	float da = SG_PI * 2.0f / (float) slices;
 	// low number = faster
-	float speedf = streak_period_max - speed * streak_period_change_per_kms;
+	float speedf = (float)(streak_period_max - speed * streak_period_change_per_kms);
 	if( speedf < streak_period_min )
 		speedf = streak_period_min;
-	float lenf = streak_length_min + speed * streak_length_change_per_kms;
+	float lenf = (float)(streak_length_min + speed * streak_length_change_per_kms);
 	if( lenf > streak_length_max )
 		lenf = streak_length_max;
     float t = fmod((float) elapsed_time, speedf) / speedf;
@@ -165,13 +165,13 @@ cGrRain::drawRain(double pitch, double roll, double heading, double hspeed, doub
 
 	double raindrop_speed_kts = (5.0 + rain_norm * 15.0) * SG_MPH_TO_MPS * SG_MPS_TO_KT;
 
-	float angle = atanf(hspeed / raindrop_speed_kts) * SG_RADIANS_TO_DEGREES;
+	float angle = (float)(atan(hspeed / raindrop_speed_kts) * SG_RADIANS_TO_DEGREES);
 	glPushMatrix();
 
 	// the cone rotate with hspeed
-	angle = -pitch - angle;
-	glRotatef(roll, 0.0, 0.0, 1.0);
-	glRotatef(heading, 0.0, 1.0, 0.0);
+	angle = (float)(-pitch - angle);
+	glRotatef((float)roll, 0.0, 0.0, 1.0);
+	glRotatef((float)heading, 0.0, 1.0, 0.0);
 	glRotatef(angle, 1.0, 0.0, 0.0);
 
 	// up cone

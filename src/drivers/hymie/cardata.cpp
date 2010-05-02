@@ -25,9 +25,9 @@ void SingleCardata::update()
 	trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
 	speed = getSpeed(car, trackangle);
 	angle = trackangle - car->_yaw;
-	NORM_PI_PI(angle);
-	width = MAX(car->_dimension_y, fabs(car->_dimension_x*sin(angle) + car->_dimension_y*cos(angle))) + 0.1;
-	length = MAX(car->_dimension_x, fabs(car->_dimension_y*sin(angle) + car->_dimension_x*cos(angle))) + 0.1;
+	FLOAT_NORM_PI_PI(angle);
+	width = (float)(MAX(car->_dimension_y, fabs(car->_dimension_x*sin(angle) + car->_dimension_y*cos(angle))) + 0.1);
+	length = (float)(MAX(car->_dimension_x, fabs(car->_dimension_y*sin(angle) + car->_dimension_x*cos(angle))) + 0.1);
 }
 
 

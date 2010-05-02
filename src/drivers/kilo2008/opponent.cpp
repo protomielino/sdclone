@@ -177,7 +177,7 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
   if((m_car->race.laps > mycar->race.laps) || is_quicker_teammate(mycar))
     {
       if(is_state(OPP_BACK | OPP_SIDE))
-        m_overlaptimer += s->deltaTime;
+        m_overlaptimer += (float)s->deltaTime;
       else if(is_state(OPP_FRONT))
         m_overlaptimer = LAP_BACK_TIME_PENALTY;
       else
@@ -187,10 +187,10 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
               if(is_state(OPP_FRONT_FAST))
                 m_overlaptimer = MIN(0.0f, m_overlaptimer);
               else
-                m_overlaptimer -= s->deltaTime;
+                m_overlaptimer -= (float)s->deltaTime;
             }
           else
-            m_overlaptimer += s->deltaTime;
+            m_overlaptimer += (float)s->deltaTime;
         }
     }
   else

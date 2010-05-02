@@ -112,7 +112,7 @@ void CarSoundData::calculateAttenuation (tCarElt* car)
 /// Calculate characteristics of the engine sound.
 void CarSoundData::calculateEngineSound (tCarElt* car)
 {
-    float mpitch = base_frequency * (float)(car->_enginerpm) / 600.0;
+    float mpitch = (tdble)(base_frequency * car->_enginerpm / 600.0);
     engine.f = mpitch;
     engine.a = 1.0f;
     if (car->_state & RM_CAR_STATE_NO_SIMU) {
@@ -127,7 +127,7 @@ void CarSoundData::calculateEngineSound (tCarElt* car)
     float gear_ratio = car->_gearRatio[car->_gear + car->_gearOffset];
     axle.a = 0.2f*(tanh(100.0f*(fabs(pre_axle - mpitch))));
     axle.f = (pre_axle + mpitch)*0.05f*fabs(gear_ratio);
-    pre_axle = (pre_axle + mpitch)*.5;
+    pre_axle = (pre_axle + mpitch)*0.5f;
 
     if (turbo_on) {
         float turbo_target = 0.1f;
@@ -140,11 +140,11 @@ void CarSoundData::calculateEngineSound (tCarElt* car)
         turbo.a += 0.1f * (turbo_target_vol - turbo.a) * (0.1f + smooth_accel);
         float turbo_target_pitch = turbo_target * car->_enginerpm / 600.0f;
         turbo.f += turbo_ilag * (turbo_target_pitch - turbo.f) * (smooth_accel);
-        turbo.f -= turbo.f * 0.01f * (1.0-smooth_accel);//.99f;
+        turbo.f -= (tdble)(turbo.f * 0.01 * (1.0-smooth_accel));//.99f;
     } else {
         turbo.a = 0.0;
     }
-    smooth_accel = smooth_accel*0.5f + 0.5*(car->ctrl.accelCmd*.99f+0.01f);
+    smooth_accel = (tdble)(smooth_accel*0.5 + 0.5*(car->ctrl.accelCmd*.99+0.01));
 
     // engine filter proportional to revcor2.
     // when accel = 0, lp \in [0.0, 0.25]
@@ -171,8 +171,8 @@ void CarSoundData::calculateBackfireSound (tCarElt* car)
     if ((car->priv.smoke>0.0)&&(engine_backfire.a<0.5)) {
         engine_backfire.a += .25f*car->priv.smoke;
     }
-    engine_backfire.f = ((float)(car->_enginerpm) / 600.0);
-    engine_backfire.a *= (.9*.5+.5*exp(-engine_backfire.f));
+    engine_backfire.f = (tdble)(car->_enginerpm / 600.0);
+    engine_backfire.a *= (tdble)(.9*.5+.5*exp(-engine_backfire.f));
 }
 
 void CarSoundData::calculateTyreSound(tCarElt* car)
@@ -230,7 +230,7 @@ void CarSoundData::calculateTyreSound(tCarElt* car)
         } else {
             s = car->priv.wheel[i].seg->surface->material;
             roughness = car->priv.wheel[i].seg->surface->kRoughness;
-            roughnessFreq = 2.0f*EX_PI * car->priv.wheel[i].seg->surface->kRoughWaveLen;
+            roughnessFreq = (tdble)(2.0*EX_PI * car->priv.wheel[i].seg->surface->kRoughWaveLen);
             if (roughnessFreq>2.0f) {
                 roughnessFreq = 2.0f + tanh(roughnessFreq-2.0f);
             }
@@ -349,8 +349,8 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
     int collision  = car->priv.collision;
     if (collision) {
         if (collision & 1) {
-            skid_metal.a = sqrt(car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y)*0.01;
-            skid_metal.f = .5+0.5*skid_metal.a;
+            skid_metal.a = (tdble)(sqrt(car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y)*0.01);
+            skid_metal.f = (tdble)(.5+0.5*skid_metal.a);
             drag_collision.f = skid_metal.f;
         } else {
             skid_metal.a = 0;

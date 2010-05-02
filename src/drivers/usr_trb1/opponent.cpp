@@ -106,8 +106,8 @@ void Opponent::update(tSituation *s, Driver *driver, int DebugMsg)
 		}
 		else
 			team = TEAM_FOE;
-		deltamult = 1.0 / s->deltaTime;
-		brakemargin = driver->getBrakeMargin();
+		deltamult = (float)(1.0 / s->deltaTime);
+		brakemargin = (float)driver->getBrakeMargin();
 	}
 
 	// If the car is out of the simulation ignore it.
@@ -138,11 +138,11 @@ void Opponent::update(tSituation *s, Driver *driver, int DebugMsg)
 	nextleft = car->_trkPos.toLeft + (car->_trkPos.toLeft - prevleft);
 	prevspeedangle = speedangle;
 	speedangle = (float) -(cardata->getTrackangle() - atan2(car->_speed_Y, car->_speed_X));
-	NORM_PI_PI(speedangle);
+	FLOAT_NORM_PI_PI(speedangle);
 
 	float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
 	angle = trackangle - car->_yaw;
-	NORM_PI_PI(angle);
+	FLOAT_NORM_PI_PI(angle);
 	angle = -angle;
 	
 	// Is opponent in relevant range -BACKCOLLDIST..FRONTCOLLDIST m.
@@ -203,10 +203,10 @@ fprintf(stderr," FRONTSLOW\n");
 				distance = GetCloseDistance( distance, mycar );
 			}
 
-			catchdist = mspeed*distance/(mspeed - ospeed);
+			catchdist = (float)(mspeed*distance/(mspeed - ospeed));
 			//catchdist = driver->getSpeed()*distance/(driver->getSpeed() - getSpeed());
 			//t_impact = MAX(0.0, (distance+0.5) / (mspeed - ospeed));
-			t_impact = MAX(0.0, (distance) / (mspeed - ospeed));
+			t_impact = (float)MAX(0.0, (distance) / (mspeed - ospeed));
 
 			if ((s->currentTime > 3.0 || t_impact < 0.7))
 			{
@@ -233,7 +233,7 @@ fprintf(stderr," FRONTSLOW\n");
 					// BT collision method - sorta kinda
 					float cardist = car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
 					sidedist = cardist;
-					cardist = sepdist - fabs(getWidth()/2.0f) - mycar->_dimension_y/2.0f;
+					cardist = (float)(sepdist - fabs(getWidth()/2.0f) - mycar->_dimension_y/2.0);
 					//double deduction = t_impact / MAX(1.0, distance);
 					if (cardist < SIDE_MARGIN) { 
 if (DebugMsg & debug_brake)

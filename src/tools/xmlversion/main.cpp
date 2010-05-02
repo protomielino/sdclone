@@ -93,8 +93,8 @@ static int process( const char* xmlVersion, char* dataLocation, char* userLocati
 
 	GfParmSetStr( versionHandle, path, "Data location", strip_destdir( dataLocation, destdir ) );
 	GfParmSetStr( versionHandle, path, "Local location", userLocation );
-	GfParmSetNum( versionHandle, path, "Major version", NULL, GfParmGetMajorVersion( xmlHandle ) );
-	GfParmSetNum( versionHandle, path, "Minor version", NULL, GfParmGetMinorVersion( xmlHandle ) );
+	GfParmSetNum( versionHandle, path, "Major version", NULL, (tdble)GfParmGetMajorVersion( xmlHandle ) );
+	GfParmSetNum( versionHandle, path, "Minor version", NULL, (tdble)GfParmGetMinorVersion( xmlHandle ) );
 
 	free( pathStart );
 	free( path );

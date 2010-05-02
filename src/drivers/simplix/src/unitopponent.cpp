@@ -231,7 +231,7 @@ void TOpponent::Update(
     if ((RelPos > MinDistBack)                   // Opponent is near
 	  && (RelPos < 5))                           // and not in front
     {
-      MinDistBack = RelPos;
+      MinDistBack = (tdble) RelPos;
     }
 
     double T = -RelPos/oInfo.State.TrackVelLong; // Time to start out of pit

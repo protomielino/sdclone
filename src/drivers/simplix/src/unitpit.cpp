@@ -307,8 +307,8 @@ void TPitLane::MakePath
   oCarParam.oScaleMu =                           // Scale friction estimation
 	MIN(1.00f,CarParam.oScaleMu);                //   of pitlane
 
-  float Ratio = (float) 0.5 * 
-	  PitInfo->len / (fabs(PitInfo->driversPits->pos.toMiddle) - PitLaneOffset);
+  float Ratio = (float) (0.5 * 
+	  PitInfo->len / (fabs(PitInfo->driversPits->pos.toMiddle) - PitLaneOffset));
 
   // Compute pit spline points along the track defined by TORCS
   X[0] = PitInfo->pitEntry->lgfromstart          // Start of Pitlane defined by TORCS
@@ -560,7 +560,7 @@ void TPitLane::MakePath
   }
 
   // Calculate braking
-  PropagatePitBreaking(oPitStopPos,Factor * Param.oCarParam.oScaleMu);
+  PropagatePitBreaking((tdble) oPitStopPos,(tdble)(Factor * Param.oCarParam.oScaleMu));
 }
 //==========================================================================*
 

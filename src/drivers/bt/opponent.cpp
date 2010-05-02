@@ -145,7 +145,7 @@ void Opponent::updateOverlapTimer(tSituation *s, tCarElt *mycar)
 {
 	if (car->race.laps > mycar->race.laps) {
 		if (getState() & (OPP_BACK | OPP_SIDE)) {
-			overlaptimer += s->deltaTime;
+			overlaptimer += (float)s->deltaTime;
 		} else if (getState() & OPP_FRONT) {
 			overlaptimer = LAP_BACK_TIME_PENALTY;
 		} else {
@@ -153,10 +153,10 @@ void Opponent::updateOverlapTimer(tSituation *s, tCarElt *mycar)
 				if (getState() & OPP_FRONT_FAST) {
 					overlaptimer = MIN(0.0f, overlaptimer);
 				} else {
-					overlaptimer -= s->deltaTime;
+					overlaptimer -= (float)s->deltaTime;
 				}
 			} else {
-				overlaptimer += s->deltaTime;
+				overlaptimer += (float)s->deltaTime;
 			}
 		}
 	} else {

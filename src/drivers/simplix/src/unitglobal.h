@@ -36,7 +36,9 @@
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
 
+#ifndef SPEED_DREAMS
 #define SPEED_DREAMS
+#endif
 //#undef SPEED_DREAMS
 
 // The great question, ...
@@ -346,11 +348,13 @@ enum
 #define DIRCHANGED(X,Y,Z) ((X < Z) && (Y >= Z) || (X > Z) && (Y <= Z))
 #define XX2Y(X,Y) (X*X/(2*Y))
 
+#ifndef FLOAT_NORM_PI_PI
 #define FLOAT_NORM_PI_PI(x) 				\
 { \
 	while ((x) > PI) { (x) -= (float)(2*PI); } \
 	while ((x) < -PI) { (x) += (float)(2*PI); } \
 }
+#endif
 
 #define DOUBLE_NORM_PI_PI(x) 				\
 { \
