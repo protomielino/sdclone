@@ -3335,7 +3335,7 @@ bool Driver::isStuck()
          (car->_trkPos.toRight < 1.0 && car->_trkPos.toMiddle < rldata->offset - 2 && angle < -0.7)))
     {
       // yes, we're stuck
-      stuck_timer = (float)last_stuck_time = (float)simtime;
+      stuck_timer = last_stuck_time = (float)simtime;
       setMode( mode_correcting );
 
       stuck = STUCK_REVERSE;
