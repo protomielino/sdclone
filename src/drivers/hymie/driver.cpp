@@ -5904,7 +5904,7 @@ v2d Driver::getTargetPoint()
   }
 
   if ((avoiding & AVOID_FRONT) && !(avoiding & AVOID_SIDE))
-   offset = (float)myoffset = (float)MAX(-seg->width * 0.5f + 0.2f, MIN(seg->width*0.5f-0.2f, offset));
+   offset = myoffset = (float)MAX(-seg->width * 0.5f + 0.2f, MIN(seg->width*0.5f-0.2f, offset));
  }
 
  oldlookahead = (float)(lookahead * factor);
@@ -5932,11 +5932,11 @@ v2d Driver::getTargetPoint()
       ((track->pits.side == TR_LFT && nextoffset > offset) ||
        (track->pits.side == TR_RGT && nextoffset < offset)))
   {
-   offset = (float)myoffset = (float)nextoffset;
+   offset = myoffset = (float)nextoffset;
   }
   else
   {
-   nextoffset = (float)myoffset = (float)offset;
+   nextoffset = myoffset = (float)offset;
   }
  }
 
