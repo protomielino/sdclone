@@ -105,22 +105,21 @@ EXPORTS
 	isCompressARBAvailable;
 	isCompressARBEnabled
 	updateCompressARBEnabled
-	GfelInitCallbacks
-	GfelSetKeyboardDownFunc
-	GfelSetKeyboardUpFunc
-	GfelSetMouseButtonFunc
-	GfelSetMouseMotionFunc
-	GfelSetMousePassiveMotionFunc
-	GfelSetIdleFunc
-	GfelSetDisplayFunc
-	GfelSetReshapeFunc
-	GfelSetTimeDelayedFunc
+	GfelInitialize
+	GfelSetKeyboardDownCB
+	GfelSetKeyboardUpCB
+	GfelSetMouseButtonCB
+	GfelSetMouseMotionCB
+	GfelSetMousePassiveMotionCB
+	GfelSetIdleCB
+	GfelSetDisplayCB
+	GfelSetReshapeCB
+	GfelSetTimerCB
 	GfuiInitWindowPosition
 	GfuiInitWindowSize
 	GfuiSwapBuffers
 	GfelPostRedisplay
 	GfelForceRedisplay
-	GfuiLeaveGameMode
 	LoadMenuXML
 	CreateStaticControls
 	CreateButtonControl
