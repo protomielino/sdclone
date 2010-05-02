@@ -331,7 +331,7 @@ void GfScrInit(int argc, char *argv[])
 	NetworkInit();
 
     // Initialize game interface to SDL.
-    sdlInitCallbacks();
+    GfelInitialize();
     atexit(SDL_Quit);
 
 	// Set window/icon captions
@@ -485,11 +485,11 @@ void GfScrInit(int argc, char *argv[])
 		GfTrace(" (multi-sampling level %d)\n", glMSampLevel);
 
 	/* Give an initial size and position*/
-	sdlPostRedisplay();
-	sdlInitWindowPosition(0, 0);
-	sdlInitWindowSize(winX, winY);
+	GfelPostRedisplay();
+	GfuiInitWindowPosition(0, 0);
+	GfuiInitWindowSize(winX, winY);
 	Reshape(winX,winY);
-	sdlReshapeFunc( Reshape );
+	GfelSetReshapeCB( Reshape );
 
 	GfParmReleaseHandle(handle);
 
@@ -872,10 +872,10 @@ GfScrMenuInit(void *prevMenu)
 
 	GfuiAddKey(scrHandle, GFUIK_RETURN, "Accept", NULL, GfScrReinit, NULL);
 	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
+	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     
 
 	return scrHandle;

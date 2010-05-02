@@ -287,15 +287,12 @@ main(int argc, char **argv)
     if ( SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0 ) {
         printf("Couldn't initialize SDL: %s\n", SDL_GetError());
         return 0;
-	}
-	
+    }
 
-
-    sdlInitCallbacks();
+    GfelInitialize();
     atexit(SDL_Quit);
 
-	SDL_WM_SetCaption(argv[1],NULL);
-
+    SDL_WM_SetCaption(argv[1],NULL);
 
     //ssgInit();
     

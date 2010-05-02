@@ -167,9 +167,9 @@ Idle2(void)
 		    /* Button fired */
 		    JoyCalAutomaton();
 		    if (CalState >= NbCalSteps) {
-			sdlIdleFunc(0);
+			GfelSetIdleCB(0);
 		    }
-		    sdlPostRedisplay();
+		    GfelPostRedisplay();
 		    JoyButtons[index] = b;
 		    return;
 		}
@@ -202,8 +202,8 @@ onActivate(void * /* dummy */)
 
     CalState = 0;
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
-    sdlIdleFunc(Idle2);
-    sdlPostRedisplay();
+    GfelSetIdleCB(Idle2);
+    GfelPostRedisplay();
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (Joystick[index]) {
 	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]); /* initial value */

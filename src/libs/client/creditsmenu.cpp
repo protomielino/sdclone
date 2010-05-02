@@ -206,7 +206,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	}
 	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "previouspagearrow",
 			    (void*)&PrevPageRequest, creditsPageChange);
-	GfuiAddSKey(pageScrHdle, GFUIK_PAGEUP, "Previous page", 
+	GfuiAddKey(pageScrHdle, GFUIK_PAGEUP, "Previous page", 
 		    (void*)&PrevPageRequest, creditsPageChange, NULL);
     }
     
@@ -229,7 +229,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	}
 	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "nextpagearrow",
 			    (void*)&NextPageRequest, creditsPageChange);
-	GfuiAddSKey(pageScrHdle, GFUIK_PAGEDOWN, "Next Page", 
+	GfuiAddKey(pageScrHdle, GFUIK_PAGEDOWN, "Next Page", 
 		    (void*)&NextPageRequest, creditsPageChange, NULL);
     }
 
@@ -240,9 +240,9 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	       RetScrHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(pageScrHdle, GFUIK_RETURN, "Return to previous menu", 
 	       RetScrHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(pageScrHdle, GFUIK_F1, "Help", 
+    GfuiAddKey(pageScrHdle, GFUIK_F1, "Help", 
 		pageScrHdle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(pageScrHdle, GFUIK_F12, "Take a Screen Shot", 
+    GfuiAddKey(pageScrHdle, GFUIK_F12, "Take a Screen Shot", 
 		NULL, GfuiScreenShot, NULL);
     
     return pageScrHdle;

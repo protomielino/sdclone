@@ -134,10 +134,10 @@ AIMenuInit(void *prevMenu)
     
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, SaveSkillLevel, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_RIGHT, "Next Skill Level", (void*)+1, ChangeSkillLevel, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Skill Level", (void*)+1, ChangeSkillLevel, NULL);
 
     return ScrHandle;  
 }

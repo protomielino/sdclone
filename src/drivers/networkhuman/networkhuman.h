@@ -27,7 +27,9 @@
 #define _NETWORKHUMAN_H_
 
 #include <vector>
-#include <string>
+
+#include <car.h>
+
 
 typedef struct HumanContext
 {

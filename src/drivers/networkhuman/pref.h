@@ -70,7 +70,6 @@ extern const char *Yn[];
 #define CMD_CLUTCH	17
 #define CMD_SPDLIM	18
 
-#define CMDCOUNT 18
 extern void HmReadPrefs(int index);
 
 

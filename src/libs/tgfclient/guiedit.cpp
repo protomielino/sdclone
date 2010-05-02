@@ -325,7 +325,7 @@ gfuiEditboxRecalcCursor(tGfuiObject *obj)
 
 
 void
-gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier)
+gfuiEditboxKey(tGfuiObject *obj, int key, int modifier)
 {
     tGfuiEditbox	*editbox;
     tGfuiLabel		*label;
@@ -336,16 +336,16 @@ gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier)
 	return;
     }
 
-    //printf("gfuiEditboxKey(k=%d, u=%d, m=%04x)\n", key, unicode, modifier);
+    //printf("gfuiEditboxKey(k=%d, m=%04x)\n", key, modifier);
 
     editbox = &(obj->u.editbox);
     label = &(editbox->label);
 
 	if (!(modifier & (KMOD_CTRL|KMOD_ALT)))
 	{
-	  // Process special keys.
 	  switch (key) 
 	  {
+	  // Move keys.
 	  case GFUIK_RIGHT:
 	    editbox->cursorIdx++;
 	    if (editbox->cursorIdx > (int)strlen(label->text)) 
@@ -366,20 +366,15 @@ gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier)
 	  case GFUIK_END:
 	    editbox->cursorIdx = (int)strlen(label->text);
 	    break;
-	  }
 
-	  // Process non special edition keys.
-	  switch (unicode) 
-	  {
+	  // Edition keys
 	  case GFUIK_DELETE:
 	    if (editbox->cursorIdx < (int)strlen(label->text)) 
 	    {
 		p1 = &(label->text[editbox->cursorIdx]);
 		p2 = &(label->text[editbox->cursorIdx+1]);
 		while ( *p1 != '\0' ) 
-		{
 		    *p1++ = *p2++;
-		}
 	    }
 	    break;
 	  case GFUIK_BACKSPACE:
@@ -388,29 +383,28 @@ gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier)
 		p1 = &(label->text[editbox->cursorIdx-1]);
 		p2 = &(label->text[editbox->cursorIdx]);
 		while ( *p1 != '\0' ) 
-		{
 		    *p1++ = *p2++;
-		}
 		editbox->cursorIdx--;
 	    }
 	    break;
-	  }
-
-	  // Process normal char keys
-	  if (unicode >= ' ' && unicode < 127) 
-	  {
-	    if ((int)strlen(label->text) < label->maxlen) 
+		
+	  default:
+	    // Normal char keys
+	    if (key >= ' ' && key < 127) 
 	    {
-		i2 = (int)strlen(label->text) + 1;
-		i1 = i2 - 1;
-		while (i2 > editbox->cursorIdx) 
-		{
-		    label->text[i2] = label->text[i1];
-		    i1--;
-		    i2--;
-		}
-		label->text[editbox->cursorIdx] = unicode;
-		editbox->cursorIdx++;
+	      if ((int)strlen(label->text) < label->maxlen) 
+	      {
+		    i2 = (int)strlen(label->text) + 1;
+		    i1 = i2 - 1;
+		    while (i2 > editbox->cursorIdx) 
+		    {
+		        label->text[i2] = label->text[i1];
+		        i1--;
+		        i2--;
+		    }
+		    label->text[editbox->cursorIdx] = key;
+		    editbox->cursorIdx++;
+	      }
 	    }
 	  }
 	}

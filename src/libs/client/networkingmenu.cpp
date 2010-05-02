@@ -334,7 +334,7 @@ UpdateNetworkPlayers()
 	
 
 	pNetwork->SetRefreshDisplay(false);
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 
 	if (IsClient())
 	{	
@@ -436,7 +436,7 @@ GufiHostServerIdle(void)
 		}
 
 
-		sdlPostRedisplay();
+		GfelPostRedisplay();
 	}
 }
 
@@ -456,7 +456,7 @@ GufiClientIdle(void)
 		{
 			//Update the screen
 			UpdateNetworkPlayers();
-			sdlPostRedisplay();
+			GfelPostRedisplay();
 
 
 		}
@@ -473,7 +473,7 @@ GufiClientIdle(void)
 		}
 
 
-		sdlPostRedisplay();
+		GfelPostRedisplay();
 	}
 }
 
@@ -523,7 +523,7 @@ void NetworkDisplay(void)
 
 static void OnActivateNetworkClient(void *)
 {
-	sdlIdleFunc(GufiClientIdle);
+	GfelSetIdleCB(GufiClientIdle);
 }
 
 
@@ -533,7 +533,7 @@ static void OnActivateNetworkHost(void *)
 	ReInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(ReInfo->params);
 	ReInfo->_reName = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	sdlIdleFunc(GufiHostServerIdle);	
+	GfelSetIdleCB(GufiHostServerIdle);	
 	GetServer()->SetRefreshDisplay(true);
 }
 
@@ -668,7 +668,7 @@ void ShowWaitingToConnectScreen()
 
 	GfuiTitleCreate(racemanMenuHdle, "Trying to Connect to Server...", 30);
 	GfuiScreenActivate(racemanMenuHdle);
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 
 }
 
@@ -748,7 +748,7 @@ reNetworkClientConnectMenu(void * /* dummy */)
 
 	UpdateNetworkPlayers();
 	GfuiScreenActivate(racemanMenuHdle);
-	sdlIdleFunc(GufiClientIdle);
+	GfelSetIdleCB(GufiClientIdle);
 
 
 }
@@ -901,7 +901,7 @@ void ServerPrepareStartNetworkRace(void *pVoid)
 	GetServer()->SendPrepareToRacePacket();
 
 	//restore the idle function
-	sdlIdleFunc(GfuiIdle);
+	GfelSetIdleCB(GfuiIdle);
 	ReStartNewRace(pVoid);
 }
 

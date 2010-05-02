@@ -118,10 +118,10 @@ MouseCalAutomaton(void)
     CalState = GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	sdlIdleFunc(Idle2);
+	GfelSetIdleCB(Idle2);
     } else {
-	sdlIdleFunc(0);
-	sdlPostRedisplay();
+	GfelSetIdleCB(0);
+	GfelPostRedisplay();
     }
 }
 
@@ -151,7 +151,7 @@ IdleMouseInit(void)
     memset(&MouseInfo, 0, sizeof(MouseInfo));
     GfctrlMouseGetCurrent(&MouseInfo);
     GfctrlMouseInitCenter();
-    sdlIdleFunc(Idle2);
+    GfelSetIdleCB(Idle2);
 }
 
 static void
@@ -161,7 +161,7 @@ onActivate(void * /* dummy */)
     GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	sdlIdleFunc(IdleMouseInit);
+	GfelSetIdleCB(IdleMouseInit);
 	GfctrlMouseCenter();
     }
 }

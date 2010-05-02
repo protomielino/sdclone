@@ -179,10 +179,10 @@ void * SoundMenuInit(void *prevMenu)
     
 	GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, saveSoundOption, NULL);
 	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
 
 	return scrHandle;
 }

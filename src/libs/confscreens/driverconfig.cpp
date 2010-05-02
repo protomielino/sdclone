@@ -1066,12 +1066,12 @@ DriverMenuInit(void *prevMenu)
     // Register keyboard shortcuts.
     GfuiAddKey(ScrHandle,  GFUIK_RETURN, "Save Drivers", NULL, SaveDrvList, NULL);
     GfuiAddKey(ScrHandle,  GFUIK_ESCAPE, "Cancel Selection", NULL, QuitDriverConfig, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_UP, "Previous Car Category", (void*)0, ChangeCat, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_DOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Car", (void*)0, ChangeCar, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Car", (void*)1, ChangeCar, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Car Category", (void*)0, ChangeCat, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Car Category", (void*)1, ChangeCat, NULL);
 
     return ScrHandle;
 }

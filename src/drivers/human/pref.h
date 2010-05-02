@@ -65,8 +65,6 @@ extern const std::string Yn[];
 #define CMD_CLUTCH	17
 #define CMD_SPDLIM	18
 
-#define CMDCOUNT 18
-
 extern void HmReadPrefs(const int index);
 
 #endif /* _PREF_H_ */ 

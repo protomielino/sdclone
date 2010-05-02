@@ -31,7 +31,7 @@
 
 #ifdef WIN32
 #  include <windows.h>
-//Disable some warnings
+//Disable some MSVC warnings
 #  pragma warning (disable:4244)
 #  pragma warning (disable:4996)
 #  pragma warning (disable:4305)
@@ -49,7 +49,6 @@
 #include <SDL/SDL_keysym.h>
 
 #include <tgf.h>
-#include "sdlcallbacks.h"
 
 #include "screen_properties.h"
 
@@ -126,6 +125,7 @@ extern void GfScrReinit(void*);
 // Some keyboard key / special key codes, to avoid SDLK constants everywhere.
 #define GFUIK_BACKSPACE	SDLK_BACKSPACE
 #define GFUIK_TAB	SDLK_TAB
+#define GFUIK_SPACE	SDLK_SPACE
 #define GFUIK_CLEAR	SDLK_CLEAR
 #define GFUIK_RETURN	SDLK_RETURN
 #define GFUIK_PAUSE	SDLK_PAUSE
@@ -158,6 +158,10 @@ extern void GfScrReinit(void*);
 #define GFUIK_F14	SDLK_F14
 #define GFUIK_F15	SDLK_F15
 
+// Add needed other GFUIK_* here or above.
+
+#define GFUIK_MAX	SDLK_LAST
+
 
 /** Scroll bar call-back information */
 typedef struct ScrollBarInfo
@@ -174,17 +178,16 @@ typedef struct ChoiceInfo
 
 typedef void (*tfuiCallback)(void * /* userdata */);
 typedef void (*tfuiSBCallback)(tScrollBarInfo *);
-typedef int (*tfuiKeyCallback)(int unicode, int modifier, int state); /**< return 1 to prevent normal key computing */
-typedef int (*tfuiSKeyCallback)(int key, int modifier, int state);  /**< return 1 to prevent normal key computing */
+typedef int (*tfuiKeyCallback)(int key, int modifier, int state);  /**< return 1 to prevent normal key computing */
 typedef void (*tfuiComboCallback)(tChoiceInfo * pInfo);
 typedef void (*tfuiCheckboxCallback)(bool bChecked);
 
 
 /* Event loop callback functions (should be called explicitely if the corresponding
-   SDL Func is overriden after a call to GfuiActivateScreen */
+   event loop callback is overriden after a call to GfuiActivateScreen */
 extern void GfuiDisplay(void);
 extern void GfuiDisplayNothing(void);
-extern void (*GfuiIdleFunc(tRmInfo *info))(void);
+extern void (*tfuiIdleCB(tRmInfo *info))(void);
 extern void GfuiIdle(void);
 extern void GfuiIdleMenu(void);
 
@@ -201,21 +204,21 @@ extern void GfuiScreenReplace(void *screen);
 extern void GfuiScreenDeactivate(void);
 extern void *GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);
 extern void GfuiHookRelease(void *hook);
-extern void GfuiAddKey(void *scr, int unicode, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
-extern void GfuiRegisterKey(int unicode, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
-extern void GfuiAddSKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+extern void GfuiAddKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+extern void GfuiRegisterKey(int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 extern void GfuiSetKeyAutoRepeat(void *scr, int on);
 extern void GfuiHelpScreen(void *prevScreen);
 extern void GfuiScreenShot(void *notused);
 extern void GfuiScreenAddBgImg(void *scr, const char *filename);
 extern void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
-extern void GfuiSKeyEventRegister(void *scr, tfuiSKeyCallback onSKeyAction);
 extern void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
-extern void GfuiSKeyEventRegisterCurrent(tfuiSKeyCallback onSKeyAction);
 extern void GfuiSleep(double delay);
 extern int GfuiOpenGLExtensionSupported(const char* extension);
+extern void GfuiInitWindowPosition(int x, int y);
+extern void GfuiInitWindowSize(int x, int y);
+extern void GfuiSwapBuffers(void);
 
-/* mouse */
+/* Mouse management */
 typedef struct MouseInfo
 {
     int X;
@@ -230,7 +233,8 @@ extern void GfuiMouseShow(void);
 extern void GfuiMouseToggleVisibility(void);
 extern void GfuiMouseSetHWPresent(void);
 
-/* all widgets */
+
+/* All widgets */
 #define GFUI_VISIBLE    1       /**< Object visibility flag  */
 #define GFUI_INVISIBLE  0       /**< Object invisibility flag  */
 extern int GfuiVisibilitySet(void *scr, int id, int visible);
@@ -239,7 +243,7 @@ extern int GfuiVisibilitySet(void *scr, int id, int visible);
 extern int GfuiEnable(void *scr, int id, int flag);
 extern void GfuiUnSelectCurrent(void);
 
-/* labels */
+/* Labels */
 #define GFUI_FONT_BIG           0
 #define GFUI_FONT_LARGE         1
 #define GFUI_FONT_MEDIUM        2
@@ -265,7 +269,7 @@ extern int  GfuiFontHeight(int font);
 extern int  GfuiFontWidth(int font, const char *text);
 
 
-/* buttons */
+/* Buttons */
 #define GFUI_BTNSZ      300
 extern int GfuiButtonCreate(void *scr, const char *text, int font,
                             int x, int y, int width, int align, int mouse,
@@ -309,7 +313,7 @@ extern void GfuiCheckboxSetChecked(void *scr, int id, bool bChecked);
 extern void GfuiButtonSetText(void *scr, int id, const char *text);
 extern int GfuiButtonGetFocused(void);
 
-/* Edit Box */
+/* Edit Boxes */
 extern int GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width, int maxlen,
                              void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern int GfuiEditboxGetFocused(void);
@@ -334,7 +338,7 @@ extern void GfuiScrollListSetColor(void *scr, int id,Color color);
 extern void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
 
 
-/* scroll bars */
+/* Scroll bars */
 extern int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
                                int min, int max, int len, int start, 
                                void *userData, tfuiSBCallback onScroll);
@@ -406,7 +410,6 @@ extern GLuint GfTexReadTex(const char *filename,int &height,int &width);
 #define GFCTRL_TYPE_KEYBOARD            3
 #define GFCTRL_TYPE_MOUSE_BUT           4
 #define GFCTRL_TYPE_MOUSE_AXIS          5
-#define GFCTRL_TYPE_SKEYBOARD           6
 
 typedef struct
 {
@@ -456,6 +459,35 @@ extern void GfctrlMouseInitCenter(void);
 extern tCtrlRef *GfctrlGetRefByName(const char *name);
 extern const char *GfctrlGetNameByRef(int type, int index);
 
+
+/************************
+ * Event loop interface *
+ ************************/
+
+// Callbacks initialization
+extern void GfelInitialize();
+
+// Specific callbacks setup
+extern void GfelSetKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y));
+extern void GfelSetKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y));
+
+extern void GfelSetMouseButtonCB(void (*func)(int button, int state, int x, int y));
+extern void GfelSetMouseMotionCB(void (*func)(int x, int y));
+extern void GfelSetMousePassiveMotionCB(void (*func)(int x, int y));
+
+extern void GfelSetIdleCB(void (*func)(void));
+
+extern void GfelSetDisplayCB(void (*func)(void));
+extern void GfelSetReshapeCB(void (*func)(int width, int height));
+
+extern void GfelSetTimerCB(unsigned int millis, void (*func)(int value));
+
+// Event loop management
+extern void GfelPostRedisplay(void);
+extern void GfelForceRedisplay();
+
+// The event loop itself (never returns)
+extern void GfelMainLoop(void);
 
 #endif /* __TGFCLIENT__H__ */
 

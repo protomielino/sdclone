@@ -108,7 +108,7 @@ LoadMenuScreen()
 
     CreateStaticControls(param,menuHandle);
 	ShowDynamicControls(param);
-    GfuiAddSKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
+    GfuiAddKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
     GfuiAddKey(menuHandle, 'Q', "Quit", 0, endofprog, NULL);
     GfuiAddKey(menuHandle, 'q', "Quit", 0, endofprog, NULL);
     GfParmReleaseHandle(param);

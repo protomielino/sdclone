@@ -107,7 +107,7 @@ static void splashIdle()
  * Remarks
  *	
  */
-static void splashKey(int /* unicode */, int /* modifiers */, int /* x */, int /* y */)
+static void splashKey(int /* key */, int /* modifiers */, int /* x */, int /* y */)
 {
 	splashClose();
 }
@@ -226,7 +226,7 @@ static void splashDisplay( void )
 	GfuiPrintString(VERSION_LONG, grWhite, GFUI_FONT_SMALL_C, 640-8, 8, GFUI_ALIGN_HR_VB);
 #endif
 
-	sdlSwapBuffers();
+	GfuiSwapBuffers();
 }
 
 static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
@@ -288,12 +288,11 @@ bool SplashScreen(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, s_imgWidth, s_imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
 	free(tex);
 	
-	sdlDisplayFunc(splashDisplay);
-	sdlKeyboardFunc(splashKey);
-	sdlSpecialFunc(0);
-	sdlTimeDelayedFunc(7000, splashTimer);
-	sdlMouseFunc(splashMouse);
-	sdlIdleFunc(splashIdle);
+	GfelSetDisplayCB(splashDisplay);
+	GfelSetKeyboardDownCB(splashKey);
+	GfelSetTimerCB(7000, splashTimer);
+	GfelSetMouseButtonCB(splashMouse);
+	GfelSetIdleCB(splashIdle);
     
 	return true;
 }

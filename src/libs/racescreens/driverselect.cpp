@@ -288,8 +288,8 @@ rmdsAddKeys(void)
 {
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", DrvSel->prevScreen, rmdsDeactivate, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Accept Selection", NULL, rmdsAccept, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMove, NULL);
     GfuiAddKey(ScrHandle, '+', "Move Down", (void*)1, rmdsMove, NULL);
     GfuiAddKey(ScrHandle, ' ', "Select/Deselect", NULL, rmdsSelectDeselect, NULL);

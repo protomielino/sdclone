@@ -215,10 +215,10 @@ void * OpenGLMenuInit(void *prevMenu)
 
 	GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, saveOpenGLOption, NULL);
 	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", (void*)-1, changeTextureSizeState, NULL);
-	GfuiAddSKey(scrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", (void*)1, changeTextureSizeState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+	GfuiAddKey(scrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", (void*)-1, changeTextureSizeState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", (void*)1, changeTextureSizeState, NULL);
 	GfuiAddKey(scrHandle, ' ', "Toggle Texture Compression", (void*)1, changeTextureCompressState, NULL);
 
 	return scrHandle;

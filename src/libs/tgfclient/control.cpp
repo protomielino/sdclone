@@ -79,7 +79,12 @@ typedef struct
     int		val;
 } tgfKeyBinding;
 
-static tgfKeyBinding GfSKey[] = {
+static tgfKeyBinding GfKey[] = {
+    {"Backspace", GFUIK_BACKSPACE},
+    {"Tab",		GFUIK_TAB},
+    {"Enter",	GFUIK_RETURN},
+    {"Esc",		GFUIK_ESCAPE},
+    {"Space",	GFUIK_SPACE},
     {"F1",		GFUIK_F1},
     {"F2",		GFUIK_F2},
     {"F3",		GFUIK_F3},
@@ -104,19 +109,10 @@ static tgfKeyBinding GfSKey[] = {
 //    {"Del",		GFUIK_DEL}
 };
 
-static tgfKeyBinding GfKey[] = {
-    {"backspace", 8},
-    {"tab",       9},
-    {"enter",     13},
-    {"esc",       27},
-    {"space",     ' '}
-};
-
 static int gfmaxJoyButton	= sizeof(GfJoyBtn)	/ sizeof(GfJoyBtn[0]);
 static int gfmaxJoyAxis		= sizeof(GfJoyAxis)	/ sizeof(GfJoyAxis[0]);
 static int gfmaxMouseButton	= sizeof(GfMouseBtn)	/ sizeof(GfMouseBtn[0]);
 static int gfmaxMouseAxis	= sizeof(GfMouseAxis)	/ sizeof(GfMouseAxis[0]);
-static int gfmaxSKey		= sizeof(GfSKey)	/ sizeof(GfSKey[0]);
 static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
 
 static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
@@ -166,13 +162,6 @@ GfctrlGetRefByName(const char *name)
 	if (strcmp(name, GfMouseAxis[i]) == 0) {
 	    ref.index = i;
 	    ref.type = GFCTRL_TYPE_MOUSE_AXIS;
-	    return &ref;
-	}
-    }
-    for (i = 0; i < gfmaxSKey; i++) {
-	if (strcmp(name, GfSKey[i].descr) == 0) {
-	    ref.index = GfSKey[i].val;
-	    ref.type = GFCTRL_TYPE_SKEYBOARD;
 	    return &ref;
 	}
     }
@@ -230,14 +219,6 @@ GfctrlGetNameByRef(int type, int index)
 	} else {
 	    return NULL;
 	}
-	break;
-    case GFCTRL_TYPE_SKEYBOARD:
-	for (i = 0; i < gfmaxSKey; i++) {
-	    if (index == GfSKey[i].val) {
-		return GfSKey[i].descr;
-	    }
-	}
-	return NULL;
 	break;
     case GFCTRL_TYPE_KEYBOARD:
 	for (i = 0; i < gfmaxKey; i++) {

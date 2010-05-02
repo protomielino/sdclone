@@ -281,7 +281,7 @@ main(int argc, char *argv[])
 	SetDataDir("c:/users/gavin/sd-game/share/");
 	ShowMenu(g_strMenuFile.c_str());
 
-    sdlMainLoop();          /* event loop of sdl */
+    GfelMainLoop();          /* event loop */
 
     return 0;	            /* just for the compiler, never reached */
 }

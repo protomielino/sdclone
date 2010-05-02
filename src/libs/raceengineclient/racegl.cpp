@@ -65,15 +65,15 @@ static void
 reScreenActivate(void * /* dummy */)
 {
     // Set a real idle function (other than 0) doing nothing, 
-    // otherwise sdlMainLoop will replace it by a SDL_Delay(1ms)
-    sdlIdleFunc(reIdle);
+    // otherwise GfelMainLoop will replace it by 1ms idle wait
+    GfelSetIdleCB(reIdle);
 
-    sdlDisplayFunc(reDisplay);
+    GfelSetDisplayCB(reDisplay);
 
     if ((ReInfo->s->_raceState & RM_RACE_PAUSED) == 0) {
 	ReStart(); 			/* resynchro */
     }
-    sdlPostRedisplay();
+    GfelPostRedisplay();
 }
 
 static void
@@ -134,8 +134,8 @@ reHideShowMouseCursor(void * /* dummy */)
 static void
 reAddKeys(void)
 {
-    GfuiAddSKey(reScreenHandle, GFUIK_F1,        "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(reScreenHandle, GFUIK_F12,       "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(reScreenHandle, GFUIK_F1,        "Help", reScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(reScreenHandle, GFUIK_F12,       "Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiAddKey(reScreenHandle, '-', "Slow Time",         (void*)0, ReTimeMod, NULL);
     GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, ReTimeMod, NULL);
@@ -271,8 +271,8 @@ static int	reCurLine;
 static void
 reAddResKeys(void)
 {
-    GfuiAddSKey(reResScreenHdle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(reResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(reResScreenHdle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(reResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
     /* GfuiAddKey(reResScreenHdle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
@@ -282,12 +282,12 @@ static void
 reResScreenActivate(void * /* dummy */)
 {
     // Set a real idle function (other than 0) doing nothing, 
-    // otherwise sdlMainLoop will replace it by a SDL_Delay(1ms)
-    sdlIdleFunc(reIdle);
+    // otherwise GfelMainLoop will replace it by a 1ms idle wait
+    GfelSetIdleCB(reIdle);
 
-    sdlDisplayFunc(reDisplay);
+    GfelSetDisplayCB(reDisplay);
     GfuiDisplay();
-    sdlPostRedisplay();
+    GfelPostRedisplay();
 }
 
 
@@ -295,7 +295,7 @@ static void
 reContDisplay(void)
 {
     GfuiDisplay();
-    sdlPostRedisplay();
+    GfelPostRedisplay();
 }
 
 
@@ -456,7 +456,7 @@ ReResShowCont(void)
     GfuiAddKey(reResScreenHdle, GFUIK_RETURN,  "Continue", 0, reResCont, NULL);
     GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, reResCont, NULL);
 
-    sdlDisplayFunc(reContDisplay);
-    sdlPostRedisplay();
+    GfelSetDisplayCB(reContDisplay);
+    GfelPostRedisplay();
 }
 

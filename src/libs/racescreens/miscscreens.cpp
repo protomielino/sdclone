@@ -90,8 +90,8 @@ rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, in
     GfuiMenuDefaultKeysAdd(screenHdle);
     GfuiAddKey(screenHdle, GFUIK_ESCAPE, aButtons[nCancelIndex].tip, 
                aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
-    GfuiAddSKey(screenHdle, GFUIK_F1, "Help", screenHdle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(screenHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(screenHdle, GFUIK_F1, "Help", screenHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(screenHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     // Activate the created screen.
     GfuiScreenActivate(screenHdle);
@@ -206,8 +206,8 @@ RmFiveStateScreen(char const *title,
 			 GFUI_ALIGN_HL_VB,GfuiScreenActivate);
 
     GfuiAddKey(fiveStateHdle, GFUIK_ESCAPE, tip5, screen5, GfuiScreenActivate, NULL);
-    GfuiAddSKey(fiveStateHdle, GFUIK_F1, "Help", fiveStateHdle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(fiveStateHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(fiveStateHdle, GFUIK_F1, "Help", fiveStateHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(fiveStateHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(fiveStateHdle);
 
@@ -337,7 +337,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             // Create Previous page button and associated keyboard shortcut if needed.
             CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
                                 (void*)&prevStartRace, rmChgStartScreen);
-            GfuiAddSKey(rmScrHdle, GFUIK_PAGEUP, "Previous drivers", 
+            GfuiAddKey(rmScrHdle, GFUIK_PAGEUP, "Previous drivers", 
                         (void*)&prevStartRace, rmChgStartScreen, NULL);
         }
                 
@@ -350,7 +350,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             // Create Next page button and associated keyboard shortcut if needed.
             CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
                                 (void*)&nextStartRace, rmChgStartScreen);
-            GfuiAddSKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Drivers", 
+            GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Drivers", 
                         (void*)&nextStartRace, rmChgStartScreen, NULL);
         }
     }
@@ -365,8 +365,8 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
     // Register keyboard shortcuts.
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Start", startScr, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Abandon", abortScr, GfuiScreenReplace, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
         
     // Activate the created screen.
     GfuiScreenActivate(rmScrHdle);

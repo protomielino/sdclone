@@ -23,19 +23,14 @@
 */
 
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <sstream>
 #include <iterator>
 #ifdef WIN32
 #include <windows.h>
 #endif
-#include <sstream>
-#include <iterator>
-
-
-#include <sdlcallbacks.h>
 
 #include <tgfclient.h>
 #include <portability.h>
@@ -372,12 +367,12 @@ rmtsAddKeys(void)
 {
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Select Track", NULL, rmtsSelect, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)0, rmtsTrackPrevNext, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)1, rmtsTrackPrevNext, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)0, rmtsTrackCatPrevNext, NULL);
-    GfuiAddSKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)1, rmtsTrackCatPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)0, rmtsTrackPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)1, rmtsTrackPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)0, rmtsTrackCatPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)1, rmtsTrackCatPrevNext, NULL);
 }
 
 

@@ -26,7 +26,6 @@ EXPORTS
 	GfuiScreenReplace
 	GfuiScreenDeactivate
 	GfuiAddKey
-	GfuiAddSKey
 	GfuiHelpScreen
 	GfuiScreenShot
 	GfuiScreenAddBgImg
@@ -87,10 +86,8 @@ EXPORTS
 	GfuiScreenIsActive
 	GfuiHookRelease
 	GfuiHookCreate
-	GfuiSKeyEventRegister
 	GfuiKeyEventRegister
 	GfuiKeyEventRegisterCurrent
-	GfuiSKeyEventRegisterCurrent
 	GfctrlGetRefByName
 	GfctrlGetNameByRef
 	GfctrlMouseInit
@@ -104,31 +101,26 @@ EXPORTS
 	GfuiOpenGLExtensionSupported
 	GfuiSleep
 	GfuiSetKeyAutoRepeat
-	sdlMainLoop
-	sdlInitCallbacks
+	GfelMainLoop
 	isCompressARBAvailable;
 	isCompressARBEnabled
 	updateCompressARBEnabled
-	sdlInitCallbacks
-	sdlKeyboardFunc
-	sdlSpecialFunc
-	sdlKeyboardUpFunc
-	sdlSpecialUpFunc
-	sdlMouseFunc
-	sdlMotionFunc
-	sdlPassiveMotionFunc
-	sdlIdleFunc
-	sdlDisplayFunc
-	sdlReshapeFunc
-	sdlTimeDelayedFunc
-	sdlInitWindowPosition
-	sdlInitWindowSize
-	sdlSwapBuffers
-	sdlPostRedisplay
-	sdlForceRedisplay
-	sdlSetCursor
-	sdlWarpPointer
-	sdlLeaveGameMode
+	GfelInitCallbacks
+	GfelSetKeyboardDownFunc
+	GfelSetKeyboardUpFunc
+	GfelSetMouseButtonFunc
+	GfelSetMouseMotionFunc
+	GfelSetMousePassiveMotionFunc
+	GfelSetIdleFunc
+	GfelSetDisplayFunc
+	GfelSetReshapeFunc
+	GfelSetTimeDelayedFunc
+	GfuiInitWindowPosition
+	GfuiInitWindowSize
+	GfuiSwapBuffers
+	GfelPostRedisplay
+	GfelForceRedisplay
+	GfuiLeaveGameMode
 	LoadMenuXML
 	CreateStaticControls
 	CreateButtonControl

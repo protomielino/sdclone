@@ -15,8 +15,8 @@ SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
                       guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
                       tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
 		      guilabel.cpp guiobject.cpp guiscrollist.cpp guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp
-		      screen.cpp sdlcallbacks.cpp glfeatures.h gui.h screen_properties.h 
-		      guimenu.h sdlcallbacks.h tgfclient.h guifont.h )
+		      screen.cpp guieventloop.cpp glfeatures.h gui.h screen_properties.h 
+		      guimenu.h tgfclient.h guifont.h )
 
 #disable developer warning
 IF (COMMAND cmake_policy)

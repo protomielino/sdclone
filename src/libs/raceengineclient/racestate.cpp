@@ -143,7 +143,7 @@ ReStateManage(void)
 						ReSetRaceBigMsg("Waiting for other players");
 						GfuiDisplay();
 						ReInfo->_reGraphicItf.refresh(ReInfo->s);
-						sdlPostRedisplay();	/* Callback -> reDisplay */
+						GfelPostRedisplay();	/* Callback -> reDisplay */
 					}
 	
 				break;

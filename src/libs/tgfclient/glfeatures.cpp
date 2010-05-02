@@ -26,9 +26,10 @@
 	to another part eventually.
 */
 
-#include "glfeatures.h"
 #include <SDL/SDL.h>
-#include "sdlcallbacks.h"
+
+#include "glfeatures.h"
+
 
 /** Report if a given OpenGL extension is supported
 

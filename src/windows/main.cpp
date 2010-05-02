@@ -32,6 +32,7 @@
 
 #include "windowsspec.h"
 
+
 static void
 init_args(int argc, char **argv)
 {
@@ -182,7 +183,7 @@ main(int argc, char *argv[])
 
     if (GameEntry())         /* launch the game */
     {
-	sdlMainLoop();   /* Main event loop */
+	GfelMainLoop();   /* Main event loop */
 	exit(0);
     }
     

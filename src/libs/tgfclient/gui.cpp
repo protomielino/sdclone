@@ -26,16 +26,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <cstring>
+#include <string>
 #include <time.h>
 
 #include <SDL/SDL.h>
-#include "tgfclient.h"
-#include "gui.h"
-#include <string>
 
 #include <raceman.h>
 
 #include <portability.h>
+
+#include "tgfclient.h"
+#include "gui.h"
+
 
 tGfuiScreen	*GfuiScreen;	/* current screen */
 static int	GfuiMouseVisible = 1;
@@ -51,8 +53,9 @@ static int	ScrW, ScrH, ViewW, ViewH;
 
 static tdble DelayRepeat;
 static double LastTimeClick;
-#define REPEAT1	1.0
-#define REPEAT2 0.2
+
+static const tdble REPEAT1 = 1.0;
+static const tdble REPEAT2 = 0.2;
 
 
 static void
@@ -86,7 +89,7 @@ gfuiColorInit(void)
 	
 	/* Remove the X11/Windows cursor  */
 	if (!GfuiMouseHW) {
-		sdlSetCursor(/*on=*/0);
+		SDL_ShowCursor(SDL_DISABLE);
 	}
 	
 	GfuiMouseVisible = 1;
@@ -103,8 +106,6 @@ gfuiInit(void)
 	gfuiObjectInit();
 	gfuiColorInit();
 	gfuiLoadFonts();
-
-
 }
 
 Color 
@@ -120,8 +121,9 @@ GetColor(float *color)
 }
 
 
-/** Dummy display function for sdl.
-    Declare this function to sdl if nothing is to be displayed by the redisplay mechanism.
+/** Dummy display function for the event loop.
+    Declare this function to the event loop if nothing is to be displayed
+	by the redisplay mechanism.
      @ingroup	gui
 */
 
@@ -130,13 +132,13 @@ GfuiDisplayNothing(void)
 {
 }
 
-/** Idle function for the GUI to be called during Idle loop of sdl.
+/** Idle function for the GUI to be called during idle loops of the event loop.
      @ingroup	gui
   */
 void
 GfuiIdle(void)
 {
-	double		curtime = GfTimeClock();
+	double curtime = GfTimeClock();
 	
 	if ((curtime - LastTimeClick) > DelayRepeat) {
 		DelayRepeat = REPEAT2;
@@ -145,12 +147,12 @@ GfuiIdle(void)
 			/* button down */
 			gfuiUpdateFocus();
 			gfuiMouseAction((void*)0);
-			sdlPostRedisplay();
+			GfelPostRedisplay();
 		}
 	}
 }
 
-/** Display function for the GUI to be called during redisplay of sdl.
+/** Display callback for the GUI event loop.
      @ingroup	gui
  */
 void
@@ -260,7 +262,7 @@ GfuiDisplay(void)
 		GfuiDrawCursor();
 
 	glDisable(GL_BLEND);
-	sdlSwapBuffers();
+	GfuiSwapBuffers();
 }
 
 /** Hide the mouse cursor
@@ -305,13 +307,13 @@ GfuiMouseSetHWPresent(void)
 }
 
 static void
-gfuiKeyboard(int unicode, int modifier, int /* x */, int /* y */)
+gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 {
 	tGfuiKey	*curKey;
 	tGfuiObject	*obj;
 	
 	/* user preempt key */
-	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(unicode, modifier, GFUI_KEY_DOWN)) 
+	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_DOWN)) 
 	{
 		return;
 	}
@@ -322,9 +324,10 @@ gfuiKeyboard(int unicode, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-			if (curKey->unicode == unicode && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0))
+			if (curKey->key == key && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0))
 			{
-				if (curKey->onPress) curKey->onPress(curKey->userData);
+				if (curKey->onPress)
+					curKey->onPress(curKey->userData);
 				break;
 			}
 		} while (curKey != GfuiScreen->userKeys);
@@ -336,60 +339,20 @@ gfuiKeyboard(int unicode, int modifier, int /* x */, int /* y */)
 		switch (obj->widget) 
 		{
 			case GFUI_EDITBOX:
-				gfuiEditboxKey(obj, 0, unicode, modifier);
+				gfuiEditboxKey(obj, key, modifier);
 				break;
 		}
 	}
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 }
 
 static void
-gfuiSpecial(int key, int modifier, int /* x */, int /* y */)
-{
-	tGfuiKey	*curKey;
-	tGfuiObject	*obj;
-	
-	/* user preempt key */
-	if (GfuiScreen->onSKeyAction && GfuiScreen->onSKeyAction(key, modifier, GFUI_KEY_DOWN)) 
-	{
-		return;
-	}
-	
-	/* now see the user's defined keys */
-	if (GfuiScreen->userSpecKeys)
-	{
-		curKey = GfuiScreen->userSpecKeys;
-		do 
-		{
-			curKey = curKey->next;
-			if (curKey->key == key && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0)) 
-			{
-				if (curKey->onPress) curKey->onPress(curKey->userData);
-				break;
-			}
-		} while (curKey != GfuiScreen->userSpecKeys);
-	}
-
-	obj = GfuiScreen->hasFocus;
-	if (obj) 
-	{
-		switch (obj->widget) 
-		{
-		case GFUI_EDITBOX:
-			gfuiEditboxKey(obj, key, 0, modifier);
-			break;
-		}
-	}
-	sdlPostRedisplay();
-}
-
-static void
-gfuiKeyboardUp(int unicode, int modifier, int /* x */, int /* y */)
+gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 {
 	tGfuiKey	*curKey;
 	
 	/* user preempt key */
-	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(unicode, modifier, GFUI_KEY_UP)) 
+	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_UP)) 
 	{
 		return;
 	}
@@ -401,44 +364,16 @@ gfuiKeyboardUp(int unicode, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-			if (curKey->unicode == unicode && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0)) 
+			if (curKey->key == key && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0)) 
 			{
-				if (curKey->onRelease) curKey->onRelease(curKey->userData);
+				if (curKey->onRelease)
+					curKey->onRelease(curKey->userData);
 				break;
 			}
 		} while (curKey != GfuiScreen->userKeys);
 	}
 	
-	sdlPostRedisplay();
-}
-
-static void
-gfuiSpecialUp(int key, int modifier, int /* x */, int /* y */)
-{
-	tGfuiKey	*curKey;
-	
-	/* user preempt key */
-	if (GfuiScreen->onSKeyAction && GfuiScreen->onSKeyAction(key, modifier, GFUI_KEY_UP)) 
-	{
-		return;
-	}
-	
-	/* now see the user's defined keys */
-	if (GfuiScreen->userSpecKeys) 
-	{
-		curKey = GfuiScreen->userSpecKeys;
-		do 
-		{
-			curKey = curKey->next;
-			if (curKey->key == key && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0)) 
-			{
-				if (curKey->onRelease) curKey->onRelease(curKey->userData);
-				break;
-			}
-		} while (curKey != GfuiScreen->userSpecKeys);
-	}
-	
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 }
 
 /** Get the mouse information (position and buttons)
@@ -458,12 +393,12 @@ tMouseInfo *GfuiMouseInfo(void)
 */
 void GfuiMouseSetPos(int x, int y)
 {
-	sdlWarpPointer(x, y);
+	SDL_WarpMouse(x,y);
 }
 
 
 static void
-gfuiMouse(int button, int state, int x, int y)
+gfuiMouseButton(int button, int state, int x, int y)
 {
 	/* Consider only left, middle and right buttons */
 	if (button >= 1 && button <= 3) 
@@ -487,28 +422,28 @@ gfuiMouse(int button, int state, int x, int y)
 			gfuiUpdateFocus();
 			gfuiMouseAction((void*)1);
 		}
-		sdlPostRedisplay();
+		GfelPostRedisplay();
 	}
 }
 
 static void
-gfuiMotion(int x, int y)
+gfuiMouseMotion(int x, int y)
 {
 	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	gfuiUpdateFocus();
 	gfuiMouseAction((void*)(1 - GfuiScreen->mouse));
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 	DelayRepeat = REPEAT1;
 }
 
 static void
-gfuiPassiveMotion(int x, int y)
+gfuiMousePassiveMotion(int x, int y)
 {
 	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	gfuiUpdateFocus();
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 }
 
 /** Tell if the screen is active or not.
@@ -535,14 +470,12 @@ GfuiScreenActivate(void *screen)
 	
 	GfuiScreen = (tGfuiScreen*)screen;
 	
-  	sdlKeyboardFunc(gfuiKeyboard);
-	sdlSpecialFunc(gfuiSpecial);
-	sdlKeyboardUpFunc(gfuiKeyboardUp);
-	sdlSpecialUpFunc(gfuiSpecialUp);
-   	sdlMouseFunc(gfuiMouse);
-	sdlMotionFunc(gfuiMotion);
-	sdlPassiveMotionFunc(gfuiPassiveMotion);
-	sdlIdleFunc(0);
+  	GfelSetKeyboardDownCB(gfuiKeyboardDown);
+	GfelSetKeyboardUpCB(gfuiKeyboardUp);
+   	GfelSetMouseButtonCB(gfuiMouseButton);
+	GfelSetMouseMotionCB(gfuiMouseMotion);
+	GfelSetMousePassiveMotionCB(gfuiMousePassiveMotion);
+	GfelSetIdleCB(0);
 
 	if (GfuiScreen->keyAutoRepeat)
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -555,11 +488,11 @@ GfuiScreenActivate(void *screen)
 		{
 			gfuiSelectNext(NULL);
 		}
-		sdlDisplayFunc(GfuiDisplay);
+		GfelSetDisplayCB(GfuiDisplay);
 	} 
 	else 
 	{
-		sdlDisplayFunc(GfuiDisplayNothing);
+		GfelSetDisplayCB(GfuiDisplayNothing);
 	}
 	
 	if (GfuiScreen->onActivate)
@@ -568,7 +501,7 @@ GfuiScreenActivate(void *screen)
 	if (GfuiScreen->onlyCallback == 0) 
 	{
 		GfuiDisplay();
-		sdlPostRedisplay();
+		GfelPostRedisplay();
 	}
 }
 
@@ -598,15 +531,13 @@ GfuiScreenDeactivate(void)
 	
 	GfuiScreen = (tGfuiScreen*)NULL;
 	
-  	sdlKeyboardFunc(0);
-  	sdlSpecialFunc(0);
- 	sdlKeyboardUpFunc(0);
- 	sdlSpecialUpFunc(0);
-	sdlMouseFunc(0);
-  	sdlMotionFunc(0);
-	sdlPassiveMotionFunc(0);
- 	sdlIdleFunc(0);
- 	sdlDisplayFunc(GfuiDisplayNothing);
+  	GfelSetKeyboardDownCB(0);
+ 	GfelSetKeyboardUpCB(0);
+	GfelSetMouseButtonCB(0);
+  	GfelSetMouseMotionCB(0);
+	GfelSetMousePassiveMotionCB(0);
+ 	GfelSetIdleCB(0);
+ 	GfelSetDisplayCB(GfuiDisplayNothing);
 }
 
 /** Create a new screen.
@@ -723,16 +654,6 @@ GfuiScreenRelease(void *scr)
 			curKey = nextKey;
 		} while (curKey != screen->userKeys);
 	}
-	curKey = screen->userSpecKeys;
-	if (curKey != NULL) {
-		do {
-			nextKey = curKey->next;
-			free(curKey->name);
-			free(curKey->descr);
-			free(curKey);
-			curKey = nextKey;
-		} while (curKey != screen->userSpecKeys);
-	}
 	free(screen);
 }
 
@@ -776,127 +697,71 @@ GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction)
 
 
 void
-GfuiSKeyEventRegister(void *scr, tfuiSKeyCallback onSKeyAction)
-{
-	tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	
-	screen->onSKeyAction = onSKeyAction;
-}
-
-void
 GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction)
 {
 	GfuiScreen->onKeyAction = onKeyAction;
 }
 
 
-void
-GfuiSKeyEventRegisterCurrent(tfuiSKeyCallback onSKeyAction)
-{
-	GfuiScreen->onSKeyAction = onSKeyAction;
-}
-
-
-/** Add a Keyboard callback to a screen.
-    @ingroup	gui
-    @param	scr		Screen
-    @param	unicode		Key unicode (only 7 low bits considered, i.e. ASCII code)
-    @param	descr		Description for help screen
-    @param	userData	Parameter to the callback function
-    @param	onKeyPressed	Callback function
-    @param	onKeyReleased	Callback function
- */
-void
-GfuiAddKey(void *scr, int unicode, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
-{
-	tGfuiKey	*curKey;
-	tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	char	buf[16];
-	
-	curKey = (tGfuiKey*)calloc(1, sizeof(tGfuiKey));
-	curKey->unicode = unicode;
-	curKey->userData = userData;
-	curKey->onPress = onKeyPressed;
-
-	if (descr == NULL) {
-		curKey->descr = strdup("");
-	} else {
-		curKey->descr = strdup(descr);
-	}
-
-	switch(unicode){
-		case 8:
-			curKey->name = strdup("backspace");
-			break;
-		case 9:
-			curKey->name = strdup("tab");
-			break;
-		case 13:
-			curKey->name = strdup("enter");
-			break;
-		case 27:
-			curKey->name = strdup("esc");
-			break;
-		case ' ':
-			curKey->name = strdup("space");
-			break;
-		default:
-			sprintf(buf, "%c", (char)(unicode & 0x007F));
-			curKey->name = strdup(buf);
-			break;
-	}
-	
-	if (screen->userKeys == NULL) {
-		screen->userKeys = curKey;
-		curKey->next = curKey;
-	} else {
-		curKey->next = screen->userKeys->next;
-		screen->userKeys->next = curKey;
-	}
-}
-
 /** Add a Keyboard callback to the current screen.
     @ingroup	gui
-    @param	unicode		Key unicode (only 7 low bits considered, i.e. ASCII code)
+    @param	key		Key code (SDL key sym, including ASCII codes, like 'a' or '_'
+	                          see tgfclient::GFUIK_* constants for special keys)
     @param	descr		Description for help screen
     @param	userData	Parameter to the callback function
     @param	onKeyPressed	Callback function called when the specified key is pressed
     @param	onKeyReleased	Callback function
  */
 void
-GfuiRegisterKey(int unicode, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+GfuiRegisterKey(int key, const char *descr, void *userData,
+				tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
-	GfuiAddKey(GfuiScreen, unicode, descr, userData, onKeyPressed, onKeyReleased);
+	GfuiAddKey(GfuiScreen, key, descr, userData, onKeyPressed, onKeyReleased);
 }
 
-/** Add a Special Keyboard shortcut to the screen.
-    (see glut for normal and special keys)
+/** Add a Keyboard shortcut to the screen (Wanring: no onKeyRelease support for special keys tgfclient::GFUIK_*).
     @ingroup	gui
-    @param	scr		Screen
-    @param	key		Key code (sdl value)
+    @param	scr		Target screen
+    @param	key		Key code : the ASCII code when possible (for 'a', '_', '[' ...), or else the tgfclient::GFUIK_* value for special keys) ; Always in [0, GFUIK_MAX]
     @param	descr		Description for help screen
     @param	userData	Parameter to the callback function
     @param	onKeyPressed	Callback function
     @param	onKeyReleased	Callback function
  */
 void
-GfuiAddSKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+GfuiAddKey(void *scr, int key, const char *descr, void *userData,
+		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
 	tGfuiKey	*curKey;
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	
+	char	buf[32];
+
+	// Allocate a key entry for the key list
 	curKey = (tGfuiKey*)calloc(1, sizeof(tGfuiKey));
 	curKey->key = key;
 	curKey->userData = userData;
 	curKey->onPress = onKeyPressed;
+	curKey->onRelease = onKeyReleased;
 
-	if (descr == NULL) {
-		curKey->descr = strdup("");
-	} else {
-		curKey->descr = strdup(descr);
-	}
+	// Set the key description and name.
+	curKey->descr = descr ? strdup(descr) : strdup("");
 
 	switch(key) {
+		case GFUIK_BACKSPACE:
+			curKey->name = strdup("Backspace");
+			break;
+		case GFUIK_TAB:
+			curKey->name = strdup("Tab");
+			break;
+		case GFUIK_RETURN:
+			curKey->name = strdup("Enter");
+			break;
+		case GFUIK_ESCAPE:
+			curKey->name = strdup("Escape");
+			break;
+		case GFUIK_SPACE:
+			curKey->name = strdup("Space");
+			break;
 		case GFUIK_F1:
 			curKey->name = strdup("F1");
 			break;
@@ -960,19 +825,32 @@ GfuiAddSKey(void *scr, int key, const char *descr, void *userData, tfuiCallback 
 		case GFUIK_INSERT:
 			curKey->name = strdup("Insert");
 			break;
+		case GFUIK_DELETE:
+			curKey->name = strdup("Delete");
+			break;
+		case GFUIK_CLEAR:
+			curKey->name = strdup("Clear");
+			break;
+		case GFUIK_PAUSE:
+			curKey->name = strdup("Pause");
+			break;
 		default:
-			curKey->name = strdup("<Unknown SKey>");
+			if (key >= ' ' && key < 127)
+				sprintf(buf, "%c", (char)key);
+			else
+				sprintf(buf, "0x%X", key);
+			curKey->name = strdup(buf);
+			break;
 	}
-	
-	
-	if (screen->userSpecKeys == NULL) {
-		screen->userSpecKeys = curKey;
+
+	// Add the new key entry in the key list.
+	if (screen->userKeys == NULL) {
 		curKey->next = curKey;
 	} else {
-		curKey->next = screen->userSpecKeys->next;
-		screen->userSpecKeys->next = curKey;
-		screen->userSpecKeys = curKey;
+		curKey->next = screen->userKeys->next;
+		screen->userKeys->next = curKey;
 	}
+	screen->userKeys = curKey;
 }
 
 /** Enable/disable the key auto-repeat for the given screen.
@@ -1085,3 +963,38 @@ GfuiSleep(double delay)
 {
   SDL_Delay(delay*1000); // ms.
 }
+
+/** Initialize window position
+    
+    @ingroup	gui
+*/
+
+void 
+GfuiInitWindowPosition(int x, int y)
+{
+
+}
+
+/** Initialize window size
+    
+    @ingroup	gui
+*/
+
+void 
+GfuiInitWindowSize(int x, int y)
+{
+
+}
+
+
+/** Swap display buffers (double buffering)
+    
+    @ingroup	gui
+*/
+
+void 
+GfuiSwapBuffers(void)
+{
+	SDL_GL_SwapBuffers();
+}
+

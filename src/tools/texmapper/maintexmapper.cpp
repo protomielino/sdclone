@@ -31,8 +31,8 @@
 #include <plib/ssg.h>
 #include <SDL/SDL.h>
 
-#include "sdlcallbacks.h"
 #include "tgfclient.h"
+
 
 const char	*InputFileName = NULL;
 const char	*OutputFileName = NULL;
@@ -213,8 +213,8 @@ Display(void)
 	exit(0);
 	break;
     }
-   sdlSwapBuffers();
-   sdlPostRedisplay();
+   GfuiSwapBuffers();
+   GfelPostRedisplay();
 }
 
 
@@ -234,10 +234,10 @@ void init_graphics ()
         return;
     }
 
-    sdlInitCallbacks();
+    GfelInitialize();
     atexit(SDL_Quit);
 
-    SDL_WM_SetCaption("texmapper",NULL);
+    SDL_WM_SetCaption("texmapper", NULL);
 
     SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
     SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
@@ -246,12 +246,12 @@ void init_graphics ()
     SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     SDL_SetVideoMode( ImgSize, ImgSize, 24, SDL_OPENGL);
-    sdlInitWindowPosition(0, 0);
-    sdlInitWindowSize(ImgSize, ImgSize);
+    GfuiInitWindowPosition(0, 0);
+    GfuiInitWindowSize(ImgSize, ImgSize);
 
  
     /* Callbacks */
-    sdlDisplayFunc(Display);
+    GfelSetDisplayCB(Display);
     
     /*
       Initialise SSG
@@ -264,13 +264,13 @@ void init_graphics ()
     glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    sdlSwapBuffers();
+    GfuiSwapBuffers();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    sdlSwapBuffers();
+    GfuiSwapBuffers();
 
     load_database();
 
-    sdlMainLoop();
+    GfelMainLoop();
 
     free(fake_argv[0]);
     free(fake_argv[1]);

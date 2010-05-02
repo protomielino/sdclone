@@ -140,8 +140,8 @@ RmPitMenuStart(tSituation *s, tCarElt *car, void *userdata, tfuiCallback callbac
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddSKey(menuHandle, GFUIK_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(menuHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(menuHandle, GFUIK_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(menuHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(menuHandle);
 }

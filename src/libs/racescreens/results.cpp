@@ -158,7 +158,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	RmPrevRace.start    = start - MAX_LINES;
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
 			    (void*)&RmPrevRace, rmChgPracticeScreen);
-	GfuiAddSKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgPracticeScreen, NULL);
+	GfuiAddKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgPracticeScreen, NULL);
     }
     
     // Add "Continue" button
@@ -173,13 +173,13 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	RmNextRace.start    = start + MAX_LINES;
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
 			    (void*)&RmNextRace, rmChgPracticeScreen);
-	GfuiAddSKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgPracticeScreen, NULL);
+	GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgPracticeScreen, NULL);
     }
 
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
     GfuiScreenActivate(rmScrHdle);
 }
@@ -318,7 +318,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 	RmPrevRace.start    = start - MAX_LINES;
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
 			    (void*)&RmPrevRace, rmChgRaceScreen);
-			GfuiAddSKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgRaceScreen, NULL);
+			GfuiAddKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgRaceScreen, NULL);
 		}//if start
 
     // Add "Continue" button
@@ -334,14 +334,14 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 	RmNextRace.start    = start + MAX_LINES;
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
 			    (void*)&RmNextRace, rmChgRaceScreen);
-			GfuiAddSKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgRaceScreen, NULL);
+			GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgRaceScreen, NULL);
     }//if i
 
 		//Link key handlers
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
 		//Show!
     GfuiScreenActivate(rmScrHdle);
@@ -433,7 +433,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 	RmPrevRace.start    = start - MAX_LINES;
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
 			    (void*)&RmPrevRace, rmChgQualifScreen);
-	GfuiAddSKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgQualifScreen, NULL);
+	GfuiAddKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgQualifScreen, NULL);
     }
 
     // Add "Continue" button 
@@ -448,13 +448,13 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 	RmNextRace.start    = start + MAX_LINES;
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
 			    (void*)&RmNextRace, rmChgQualifScreen);
-	GfuiAddSKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgQualifScreen, NULL);
+	GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgQualifScreen, NULL);
     }
 
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
     GfuiScreenActivate(rmScrHdle);
 }
@@ -554,7 +554,7 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		RmPrevRace.start    = start - MAX_LINES;
 		CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
 				    (void*)&RmPrevRace, rmChgStandingScreen);
-		GfuiAddSKey(rmScrHdle, GFUIK_PAGEUP, "Previous Results", (void*)&RmPrevRace, rmChgStandingScreen, NULL);
+		GfuiAddKey(rmScrHdle, GFUIK_PAGEUP, "Previous Results", (void*)&RmPrevRace, rmChgStandingScreen, NULL);
 	}//if start
 
 	// Add "Continue" button in the bottom left
@@ -572,13 +572,13 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		RmNextRace.start    = start + MAX_LINES;
 		CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
 				    (void*)&RmNextRace, rmChgStandingScreen);
-		GfuiAddSKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgStandingScreen, NULL);
+		GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgStandingScreen, NULL);
 	}//if i
 
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_ESCAPE, "Continue", prevHdle, GfuiScreenReplace, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(rmScrHdle);
 }//rmShowStandings

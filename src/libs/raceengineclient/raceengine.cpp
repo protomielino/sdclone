@@ -964,7 +964,7 @@ ReUpdate(void)
 
 	GfuiDisplay();
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
-	sdlPostRedisplay();	/* Callback -> reDisplay */
+	GfelPostRedisplay();	/* Callback -> reDisplay */
 	break;
 	
     case RM_DISP_MODE_NONE:
@@ -972,7 +972,7 @@ ReUpdate(void)
 	if (ReInfo->_refreshDisplay) {
 	    GfuiDisplay();
 	}
-	sdlPostRedisplay();	/* Callback -> reDisplay */
+	GfelPostRedisplay();	/* Callback -> reDisplay */
 	break;
 
     case RM_DISP_MODE_SIMU_SIMU:
@@ -981,7 +981,7 @@ ReUpdate(void)
 	if (ReInfo->_refreshDisplay) {
 	    GfuiDisplay();
 	}
-	sdlPostRedisplay();
+	GfelPostRedisplay();
 	break;
 
     case RM_DISP_MODE_CAPTURE:
@@ -994,7 +994,7 @@ ReUpdate(void)
 	GfuiDisplay();
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
 	reCapture();
-	sdlPostRedisplay();	/* Callback -> reDisplay */
+	GfelPostRedisplay();	/* Callback -> reDisplay */
 	break;
 	
     }

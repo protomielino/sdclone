@@ -111,10 +111,7 @@ typedef struct
 typedef struct
 {
     unsigned int	state;
-    //unsigned char	*disabled;
-    //unsigned char	*enabled;
-    //unsigned char	*focused;
-    //unsigned char	*pushed;
+
     //Texture handles
     GLuint disabled;
     GLuint enabled;
@@ -264,8 +261,7 @@ typedef struct GfuiObject
 /* Keyboard key assignment */
 typedef struct GfuiKey
 {
-    int			key; // SDL key sym code (0 for non special keys)
-    int			unicode; // SDL unicode (0 for special keys)
+    int			key; // SDL key sym code
     char		*name;
     char		*descr;
     int			modifier;
@@ -290,15 +286,13 @@ typedef struct
 
     /* users keys definition */
     tGfuiKey		*userKeys;
-    tGfuiKey		*userSpecKeys;
     void		*userActData;
     tfuiCallback	onActivate;
     void		*userDeactData;
     tfuiCallback	onDeactivate;
 
-    /* key callback functions */
+    /* key callback function */
     tfuiKeyCallback	onKeyAction;
-    tfuiSKeyCallback	onSKeyAction;
 
     /* key auto-repeat mode */
     int			keyAutoRepeat;
@@ -384,7 +378,7 @@ extern void gfuiReleaseProgressbar(tGfuiObject *obj);
 
 extern void gfuiLoadFonts(void);
 
-extern void gfuiEditboxKey(tGfuiObject *obj, int key, int unicode, int modifier);
+extern void gfuiEditboxKey(tGfuiObject *obj, int key, int modifier);
 
 
 extern void gfuiScrollListNextElt (tGfuiObject *object);

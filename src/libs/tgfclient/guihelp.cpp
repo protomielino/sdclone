@@ -54,9 +54,6 @@ gfuiHelpInit(void)
 void
 GfuiHelpScreen(void *prevScreen)
 {
-    int		x, x2, dx, y;
-    tGfuiKey	*curKey;
-    tGfuiKey	*curSKey;
     tGfuiScreen	*pscr = (tGfuiScreen*)prevScreen;
     
     // Create screen, load menu XML descriptor and create static controls.
@@ -67,31 +64,64 @@ GfuiHelpScreen(void *prevScreen)
     CreateStaticControls(menuXMLDescHdle, scrHandle);
 
     // Create 2 columns table for the keyboard shortcuts explainations
-    x  = 30;
-    dx = 80;
-    x2 = 330;
-    y  = 380;
+    const int dx = 80;
+    const int xs  = 30;
+    const int dy  = -12;
+    int ys  = 380;
+    const int xn = 330;
+    int yn  = 380;
     
-    curSKey = pscr->userSpecKeys;
-    curKey = pscr->userKeys;
+    tGfuiKey *curKey = pscr->userKeys;
     do {
-	if (curSKey) {
-	    curSKey = curSKey->next;
-	    GfuiLabelCreateEx(scrHandle, curSKey->name, fgColor1, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB, 0);
-	    GfuiLabelCreateEx(scrHandle, curSKey->descr, fgColor2, GFUI_FONT_SMALL_C, x + dx, y, GFUI_ALIGN_HL_VB, 0);
-	}
+		if (curKey) {
+			curKey = curKey->next;
+			switch(curKey->key) {
+				case GFUIK_BACKSPACE:
+				case GFUIK_F1:
+				case GFUIK_F2:
+				case GFUIK_F3:
+				case GFUIK_F4:
+				case GFUIK_F5:
+				case GFUIK_F6:
+				case GFUIK_F7:
+				case GFUIK_F8:
+				case GFUIK_F9:
+				case GFUIK_F10:
+				case GFUIK_F11:
+				case GFUIK_F12:
+				case GFUIK_LEFT:
+				case GFUIK_UP:
+				case GFUIK_RIGHT:
+				case GFUIK_DOWN:
+				case GFUIK_PAGEUP:
+				case GFUIK_PAGEDOWN:
+				case GFUIK_HOME:
+				case GFUIK_END:
+				case GFUIK_INSERT:
+				case GFUIK_DELETE:
+				case GFUIK_CLEAR:
+				case GFUIK_PAUSE:
+					GfuiLabelCreateEx(scrHandle, curKey->name, fgColor1, GFUI_FONT_SMALL_C,
+									  xs, ys, GFUI_ALIGN_HL_VB, 0);
+					GfuiLabelCreateEx(scrHandle, curKey->descr, fgColor2, GFUI_FONT_SMALL_C,
+									  xs + dx, ys, GFUI_ALIGN_HL_VB, 0);
+					ys += dy;
+					break;
 
-	if (curKey) {
-	    curKey = curKey->next;
-	    GfuiLabelCreateEx(scrHandle, curKey->name, fgColor1, GFUI_FONT_SMALL_C, x2, y, GFUI_ALIGN_HL_VB, 0);
-	    GfuiLabelCreateEx(scrHandle, curKey->descr, fgColor2, GFUI_FONT_SMALL_C, x2 + dx, y, GFUI_ALIGN_HL_VB, 0);
-	}
-	y -= 12;
+				default:
+					GfuiLabelCreateEx(scrHandle, curKey->name, fgColor1, GFUI_FONT_SMALL_C,
+									  xn, yn, GFUI_ALIGN_HL_VB, 0);
+					GfuiLabelCreateEx(scrHandle, curKey->descr, fgColor2, GFUI_FONT_SMALL_C,
+									  xn + dx, yn, GFUI_ALIGN_HL_VB, 0);
+					yn += dy;
+					break;
+			}
+		}
 	
-	if (curKey == pscr->userKeys) curKey = (tGfuiKey*)NULL;
-	if (curSKey == pscr->userSpecKeys) curSKey = (tGfuiKey*)NULL;
+		if (curKey == pscr->userKeys)
+			curKey = (tGfuiKey*)NULL;
 
-    } while (curKey || curSKey);
+    } while (curKey);
     
 
     // Create Back button.
@@ -107,7 +137,7 @@ GfuiHelpScreen(void *prevScreen)
     // Add keyboard shortcuts.
     GfuiAddKey(scrHandle, GFUIK_ESCAPE, "", prevScreen, GfuiScreenReplace, NULL);
     GfuiAddKey(scrHandle, GFUIK_RETURN, "", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddSKey(scrHandle, GFUIK_F1, "", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddKey(scrHandle, GFUIK_F1, "", prevScreen, GfuiScreenReplace, NULL);
 
     GfuiMenuDefaultKeysAdd(scrHandle);
 

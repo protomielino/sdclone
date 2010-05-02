@@ -23,8 +23,8 @@
     @version	$Id: pref.cpp,v 1.19 2003/11/23 20:21:11 torcs Exp $
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <math.h>
 
@@ -39,6 +39,7 @@
 
 #include "pref.h"
 #include "networkhuman.h"
+
 
 void	*PrefHdle;
 

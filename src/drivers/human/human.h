@@ -27,9 +27,13 @@
 #define _HUMAN_H_
 
 #include <vector>
+
 #include <car.h>
 
+
 typedef enum { eTransAuto, eTransSeq, eTransGrid } eTransmission;
+
+typedef enum { eRWD, eFWD, e4WD } eDriveTrain;
 
 typedef struct HumanContext
 {
@@ -56,7 +60,7 @@ typedef struct HumanContext
     bool		relButNeutral;
     bool		seqShftAllowNeutral;
     bool		autoReverse;
-    int			drivetrain;
+    eDriveTrain	driveTrain;
     int			autoClutch;
     tControlCmd		*cmdControl;
     bool		mouseControlUsed;

@@ -231,8 +231,8 @@ rmrpAddKeys(void)
 {
     GfuiAddKey(scrHandle, GFUIK_RETURN, "Accept", NULL, rmrpValidate, NULL);
     GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", rp->prevScreen, rmrpDeactivate, NULL);
-    GfuiAddSKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-    GfuiAddSKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 }
 
 void
