@@ -23,7 +23,6 @@
     @version	$Id$
 */
 
-
 #include <map>
 #include <string>
 
@@ -74,13 +73,17 @@ typedef struct
 	int edgeUp;
 } tKeyInfo;
 
+// Keyboard map for all players
+// (key code => index of the associated command in keyInfo / lastReadKeyState).
 typedef std::map<int,int> tKeyMap;
 static tKeyMap mapKeys;
-static int keyindex = 0;
+static int keyIndex = 0;
 
-static tKeyInfo keyInfo[0x1000];
+// Last read state for each possible player command key.
+static int lastReadKeyState[GFUIK_MAX+1];
 
-static int currentKey[0x1000];
+// Up-to-date info for each possible player command key (state, edge up, edge down)
+static tKeyInfo keyInfo[GFUIK_MAX+1];
 
 static bool firstTime = false;
 static tdble lastKeyUpdate = -10.0;
@@ -94,7 +97,7 @@ static std::vector<std::string> VecNames;
 static int NbDrivers = -1;
 
 #ifdef _WIN32
-/* should be present in mswindows */
+/* Must be present under MS Windows */
 BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
 {
     return TRUE;
@@ -406,7 +409,7 @@ newrace(int index, tCarElt* car, tSituation *s)
 			HCtx[idx]->shiftThld[i] = car->_enginerpmRedLine * car->_wheelRadius(2) * 0.85 / car->_gearRatio[i];
 			GfOut("Gear %d: Spd %f\n", i, HCtx[idx]->shiftThld[i] * 3.6);
 		} else {
-	    HCtx[idx]->shiftThld[i] = 10000.0;
+			HCtx[idx]->shiftThld[i] = 10000.0;
 		}
 	}//for i
 
@@ -417,7 +420,7 @@ newrace(int index, tCarElt* car, tSituation *s)
 
 	// Initialize key state table
 	memset(keyInfo, 0, sizeof(keyInfo));
-	memset(currentKey, 0, sizeof(currentKey));
+	memset(lastReadKeyState, 0, sizeof(lastReadKeyState));
 
 #ifndef WIN32
 #ifdef TELEMETRY
@@ -452,15 +455,15 @@ newrace(int index, tCarElt* car, tSituation *s)
 	else
 		HCtx[idx]->autoClutch = false;
 
-	// Setup Keyboard map
+	// Setup Keyboard map (key code => index of the associated command in keyInfo / lastReadKeyState).
 	for (int i = 0; i < NbCmdControl; i++)
 	{
 		if (cmd[i].type == GFCTRL_TYPE_KEYBOARD)
 		{
 			if (mapKeys.find(cmd[i].val) == mapKeys.end())
 			{
-				mapKeys[cmd[i].val] = keyindex;
-				keyindex++;
+				mapKeys[cmd[i].val] = keyIndex;
+				keyIndex++;
 			}
 		}//KEYBOARD
 		
@@ -477,14 +480,14 @@ lookUpKeyMap(int key)
 	if (p != mapKeys.end())
 		return p->second;
 
-	return 0;
+	return -1;
 }
 
 static void
 updateKeys(void)
 {
 	int i;
-	int key;
+	int nKeyInd;
 	int idx;
 	tControlCmd *cmd;
 
@@ -493,21 +496,21 @@ updateKeys(void)
 			cmd = HCtx[idx]->cmdControl;
 			for (i = 0; i < NbCmdControl; i++) {
 				if (cmd[i].type == GFCTRL_TYPE_KEYBOARD) {
-					key = lookUpKeyMap(cmd[i].val);
-					if (currentKey[key] == GFUI_KEY_DOWN) {
-						if (keyInfo[key].state == GFUI_KEY_UP) {
-							keyInfo[key].edgeDn = 1;
+					nKeyInd = lookUpKeyMap(cmd[i].val);
+					if (lastReadKeyState[nKeyInd] == GFUI_KEY_DOWN) {
+						if (keyInfo[nKeyInd].state == GFUI_KEY_UP) {
+							keyInfo[nKeyInd].edgeDn = 1;
 						} else {
-							keyInfo[key].edgeDn = 0;
+							keyInfo[nKeyInd].edgeDn = 0;
 						}
 					} else {
-						if (keyInfo[key].state == GFUI_KEY_DOWN) {
-							keyInfo[key].edgeUp = 1;
+						if (keyInfo[nKeyInd].state == GFUI_KEY_DOWN) {
+							keyInfo[nKeyInd].edgeUp = 1;
 						} else {
-							keyInfo[key].edgeUp = 0;
+							keyInfo[nKeyInd].edgeUp = 0;
 						}
 					}
-					keyInfo[key].state = currentKey[key];
+					keyInfo[nKeyInd].state = lastReadKeyState[nKeyInd];
 				}
 			}
 		}
@@ -518,7 +521,10 @@ updateKeys(void)
 static int
 onKeyAction(int key, int modifier, int state)
 {
-	currentKey[lookUpKeyMap(key)] = state;
+	// Update key state only if the key is assigned to a player command.
+	const int nKeyInd = lookUpKeyMap(key);
+	if (nKeyInd >= 0)
+		lastReadKeyState[lookUpKeyMap(key)] = state;
 
 	return 0;
 }//onKeyAction
@@ -534,6 +540,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	tdble throttle;
 	tdble leftSteer;
 	tdble rightSteer;
+	tdble sensFrac, speedFrac;
 	int scrw, scrh, dummy;
 	
 	const int idx = index - 1;
@@ -652,14 +659,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = joyInfo->levelup[cmd[CMD_LEFTSTEER].val];
 			}
 			if (ax0 == 0) {
-				HCtx[idx]->prevLeftSteer = leftSteer = 0;
+				leftSteer = 0;
 			} else {
 				ax0 = 2 * ax0 - 1;
 				leftSteer = HCtx[idx]->prevLeftSteer + ax0 * cmd[CMD_LEFTSTEER].sens * s->deltaTime / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 10.0);
 				if (leftSteer > 1.0) leftSteer = 1.0;
 				if (leftSteer < 0.0) leftSteer = 0.0;
-				HCtx[idx]->prevLeftSteer = leftSteer;
 			}
+			HCtx[idx]->prevLeftSteer = leftSteer;
 			break;
 		default:
 			leftSteer = 0;
@@ -697,14 +704,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = joyInfo->levelup[cmd[CMD_RIGHTSTEER].val];
 			}
 			if (ax0 == 0) {
-				HCtx[idx]->prevRightSteer = rightSteer = 0;
+				rightSteer = 0;
 			} else {
 				ax0 = 2 * ax0 - 1;
 				rightSteer = HCtx[idx]->prevRightSteer - ax0 * cmd[CMD_RIGHTSTEER].sens * s->deltaTime/ (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 10.0);
 				if (rightSteer > 0.0) rightSteer = 0.0;
 				if (rightSteer < -1.0) rightSteer = -1.0;
-				HCtx[idx]->prevRightSteer = rightSteer;
 			}
+			HCtx[idx]->prevRightSteer = rightSteer;
 			break;
 		default:
 			rightSteer = 0;
@@ -1247,7 +1254,7 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 				keyInfo[key].state = GFUI_KEY_UP;
 				keyInfo[key].edgeDn = 0;
 				keyInfo[key].edgeUp = 0;
-				currentKey[key] = GFUI_KEY_UP;
+				lastReadKeyState[key] = GFUI_KEY_UP;
 			}
 		}//for i
 	}//if HCtx

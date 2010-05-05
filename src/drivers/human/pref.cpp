@@ -133,8 +133,8 @@ HmReadPrefs(const int index)
 	}
 		
 	ref = GfctrlGetRefByName(prm);
-	cmdCtrl[cmd].type = ref->type;
-	cmdCtrl[cmd].val = ref->index;
+	cmdCtrl[cmd].type = ref->type; // GFCTRL_TYPE_XX
+	cmdCtrl[cmd].val = ref->index; // Index for joy. axis, buttons ; 1-bytes ASCII code for keys.
 	GfOut("  %s\t: %s\n", cmdCtrl[cmd].name, prm);
 	
 	/* min value < max value */
