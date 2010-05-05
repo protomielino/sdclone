@@ -215,21 +215,22 @@ GfelForceRedisplay()
 // (and then, we can get it on KEYUP event, that ALWAYS come after a KEYDOWN event).
 // The unicode is stored in a map that grows each time 1 new key sym + modifiers combination
 // is typed ; we never clears this map, but assume not that many such combinations
-// will be typed in a game session (could theorically go up to 2^21 combinations, though ;-)
+// will be typed in a game session (could theorically go up to 2^23 combinations, though ;-)
 // Known issues (TODO): No support for Caps and NumLock keys ... don't use them !
 static int
 translateKeySym(const SDL_keysym& sdlKeySym)
 {
 	int keyUnicode;
 	
-	const Uint32 keyId = ((Uint32)sdlKeySym.sym) | (((Uint32)sdlKeySym.mod) << 16);
+	const Uint32 keyId = ((Uint32)sdlKeySym.sym & 0x1FF) | (((Uint32)sdlKeySym.mod) << 9);
 	
     const std::map<Uint32, Uint16>::const_iterator itUnicode = g_keyUnicode.find(keyId);
     
     if (itUnicode == g_keyUnicode.end())
 	{
-		keyUnicode = sdlKeySym.unicode ? sdlKeySym.unicode : sdlKeySym.sym;
-        g_keyUnicode[keyId] = keyUnicode;
+		// Truncate unicodes above GFUIK_MAX
+		keyUnicode = sdlKeySym.unicode ? (sdlKeySym.unicode & GFUIK_MAX) : sdlKeySym.sym;
+		g_keyUnicode[keyId] = keyUnicode;
 		//GfOut("New key 0x%08X (%d)\n", keyId, g_keyUnicode.size());
 	}
 	else

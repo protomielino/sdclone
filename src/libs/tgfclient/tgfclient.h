@@ -160,7 +160,12 @@ extern void GfScrReinit(void*);
 
 // Add needed other GFUIK_* here or above.
 
-#define GFUIK_MAX	SDLK_LAST
+// Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
+#define GFUIK_MAX	0x1FF
+
+#if (GFUIK_MAX < SDLK_LAST)
+# error SDLK_MAX has grown too much, please increase GFUIK_MAX to the least greater power of 2 minus 1.
+#endif
 
 
 /** Scroll bar call-back information */
