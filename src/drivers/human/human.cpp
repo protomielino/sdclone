@@ -23,6 +23,10 @@
     @version	$Id$
 */
 
+// Comment out the following line to get back to the old "binary control command
+// steering smoother code".
+#define JEPZ_BINCTRL_STEERING
+
 #include <map>
 #include <string>
 
@@ -540,7 +544,9 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	tdble throttle;
 	tdble leftSteer;
 	tdble rightSteer;
+#ifdef JEPZ_BINCTRL_STEERING
 	tdble sensFrac, speedFrac;
+#endif
 	int scrw, scrh, dummy;
 	
 	const int idx = index - 1;
@@ -658,6 +664,19 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			} else {
 				ax0 = joyInfo->levelup[cmd[CMD_LEFTSTEER].val];
 			}
+#ifdef JEPZ_BINCTRL_STEERING
+			if (ax0 == 0) {
+				leftSteer = HCtx[idx]->prevLeftSteer - s->deltaTime * 5.0;
+			} else {
+				ax0 = 2 * ax0 - 1;
+				sensFrac = (cmd[CMD_LEFTSTEER].sens != 0.0) ? 10.0 / cmd[CMD_LEFTSTEER].sens : 1.0;
+				speedFrac = fabs(car->_speed_x * cmd[CMD_LEFTSTEER].spdSens * 100.0);
+				if (speedFrac < 1.0) speedFrac = 1.0;
+				leftSteer = HCtx[idx]->prevLeftSteer + s->deltaTime * ax0 * sensFrac / speedFrac;
+			}
+			if (leftSteer > 1.0) leftSteer = 1.0;
+			if (leftSteer < 0.0) leftSteer = 0.0;
+#else
 			if (ax0 == 0) {
 				leftSteer = 0;
 			} else {
@@ -666,6 +685,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				if (leftSteer > 1.0) leftSteer = 1.0;
 				if (leftSteer < 0.0) leftSteer = 0.0;
 			}
+#endif			
 			HCtx[idx]->prevLeftSteer = leftSteer;
 			break;
 		default:
@@ -703,6 +723,19 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			} else {
 				ax0 = joyInfo->levelup[cmd[CMD_RIGHTSTEER].val];
 			}
+#ifdef JEPZ_BINCTRL_STEERING
+			if (ax0 == 0) {
+				rightSteer = HCtx[idx]->prevRightSteer + s->deltaTime * 5.0;
+			} else {
+				ax0 = 2 * ax0 - 1;
+				sensFrac = (cmd[CMD_RIGHTSTEER].sens != 0.0) ? 10.0 / cmd[CMD_RIGHTSTEER].sens : 1.0;
+				speedFrac = fabs(car->_speed_x * cmd[CMD_RIGHTSTEER].spdSens * 100.0);
+				if (speedFrac < 1.0) speedFrac = 1.0;
+				rightSteer = HCtx[idx]->prevRightSteer - s->deltaTime * ax0 * sensFrac / speedFrac;
+			}
+			if (rightSteer > 0.0) rightSteer = 0.0;
+			if (rightSteer < -1.0) rightSteer = -1.0;
+#else
 			if (ax0 == 0) {
 				rightSteer = 0;
 			} else {
@@ -711,6 +744,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				if (rightSteer > 0.0) rightSteer = 0.0;
 				if (rightSteer < -1.0) rightSteer = -1.0;
 			}
+#endif
 			HCtx[idx]->prevRightSteer = rightSteer;
 			break;
 		default:
