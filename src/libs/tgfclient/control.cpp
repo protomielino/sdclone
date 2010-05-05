@@ -83,7 +83,7 @@ static tgfKeyBinding GfKey[] = {
     {"Backspace", GFUIK_BACKSPACE},
     {"Tab",		GFUIK_TAB},
     {"Enter",	GFUIK_RETURN},
-    {"Esc",		GFUIK_ESCAPE},
+    {"Escape",	GFUIK_ESCAPE},
     {"Space",	GFUIK_SPACE},
     {"F1",		GFUIK_F1},
     {"F2",		GFUIK_F2},
@@ -106,7 +106,7 @@ static tgfKeyBinding GfKey[] = {
     {"Home",		GFUIK_HOME},
     {"End",		GFUIK_END},
     {"Insert",		GFUIK_INSERT}
-//    {"Del",		GFUIK_DEL}
+//    {"Delele",		GFUIK_DEL}
 };
 
 static int gfmaxJoyButton	= sizeof(GfJoyBtn)	/ sizeof(GfJoyBtn[0]);
