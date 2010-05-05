@@ -46,10 +46,10 @@ static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
 #define NB_LBOARDS	5	//# of leaderboard states
 #define NB_DEBUG	3
 
-static int	Winx	= 0;
-static int	Winw	= 800;
-static int	Winy	= 0;
-static int	Winh	= 600;
+static const int	Winx	= 0;
+static       int	Winw	= 800;
+static const int	Winy	= 0;
+static const int	Winh	= 600;
 
 static char	path[1024];
 
@@ -187,27 +187,25 @@ cGrBoard::grDispDebug(float fps, tCarElt *car)
 void
 cGrBoard::grDispGGraph(tCarElt *car)
 {
-	tdble X1, Y1, X2, Y2, xc, yc;
-	int xx;
+	// Draw the static blue thin cross and vertical segment.
+	static const tdble X1 = (tdble)(Winx + Winw - 100);
+	static const tdble Y1 = (tdble)(Winy + 100);
+	static const tdble XC = (tdble)(Winx + Winw - 30);
+	static const tdble YC = (tdble)(Y1 - 50);
 
-	X1 = (tdble)(Winx + Winw - 100);
-	Y1 = (tdble)(Winy + 100);
-	xc = (tdble)(Winx + Winw - 30);
-	yc = (tdble)(Y1 - 50);
-
-	X2 = -car->_DynGC.acc.y / 9.81f * 25.0f + X1;
-	Y2 = car->_DynGC.acc.x / 9.81f * 25.0f + Y1;
 	glBegin(GL_LINES);
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glVertex2f(X1-50, Y1);
 	glVertex2f(X1+50, Y1);
 	glVertex2f(X1, Y1-50);
 	glVertex2f(X1, Y1+50);
-	glVertex2f(xc, yc);
-	glVertex2f(xc, yc+100);
+	glVertex2f(XC, YC);
+	glVertex2f(XC, YC+100);
 	glEnd();
 
-	const tdble THNSS = 2.0f;
+	// Draw the throttle gauge (vertical thick segment, starting in X1,Y1,
+	// going upwards, length proportional to the throttle command).
+	static const tdble THNSS = 2.0f;
 
 	glBegin(GL_QUADS);
 	glColor4f(0.0, 0.0, 1.0, 1.0);
@@ -216,30 +214,49 @@ cGrBoard::grDispGGraph(tCarElt *car)
 	glVertex2f(X1 + THNSS, Y1 + car->ctrl.accelCmd * 50.0f);
 	glVertex2f(X1 - THNSS, Y1 + car->ctrl.accelCmd * 50.0f);
 
-	for (xx = 0; xx < 4; ++xx) 
+	// Draw the brake gauge (vertical thick segment, starting in X1,Y1,
+	// going downward, length proportional to the brake command,
+	// red if at least one wheel is blocking/blocked, blue otherwise).
+	// a) Detect wheel blocking, and change current color to red if so.
+	for (int xx = 0; xx < 4; ++xx) 
 	{
 		if (car->_wheelSpinVel(xx) < car->_speed_x - 5.0f)
+		{
 			glColor4f(1.0, 0.0, 0.0, 1.0);
+			break;
+		}
 	}
 
+	// b) Draw the gauge.
 	glVertex2f(X1 - THNSS, Y1);
 	glVertex2f(X1 + THNSS, Y1);
 	glVertex2f(X1 + THNSS, Y1 - car->ctrl.brakeCmd * 50.0f);
 	glVertex2f(X1 - THNSS, Y1 - car->ctrl.brakeCmd * 50.0f);
 
+	// Back to normal blue color.
 	glColor4f(0.0, 0.0, 1.0, 1.0);
 
+	// Draw the steer gauge (horizontal thick segment, starting in X1,Y1,
+	// going left or right according to the direction,
+	// length proportional to the steer command).
 	glVertex2f(X1, Y1 - THNSS);
 	glVertex2f(X1, Y1 + THNSS);
 	glVertex2f(X1 - car->ctrl.steer * 100.0f, Y1 + THNSS);
 	glVertex2f(X1 - car->ctrl.steer * 100.0f, Y1 - THNSS);
 
-	glVertex2f(xc - THNSS, yc);
-	glVertex2f(xc + THNSS, yc);
-	glVertex2f(xc + THNSS, yc + car->ctrl.clutchCmd * 100.0f);
-	glVertex2f(xc - THNSS, yc + car->ctrl.clutchCmd * 100.0f);
+	// Draw the clutch gauge (vertical thick segment, starting in xc, yc,
+	// going upwards, length proportional to the clutch command).
+	glVertex2f(XC - THNSS, YC);
+	glVertex2f(XC + THNSS, YC);
+	glVertex2f(XC + THNSS, YC + car->ctrl.clutchCmd * 100.0f);
+	glVertex2f(XC - THNSS, YC + car->ctrl.clutchCmd * 100.0f);
 
 	glEnd();
+
+	// Draw the acceleration gauge (thin segment, starting in X1, Y1,
+	// going in the direction of the acceleration vector).
+	const tdble X2 = -car->_DynGC.acc.y / 9.81f * 25.0f + X1;
+	const tdble Y2 = car->_DynGC.acc.x / 9.81f * 25.0f + Y1;
 
 	glBegin(GL_LINES);
 	glColor4f(1.0, 0.0, 0.0, 1.0);
