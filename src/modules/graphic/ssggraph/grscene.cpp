@@ -501,9 +501,9 @@ grLoadScene(tTrack *track)
 	printf("Rain = %d\n", RainBool);
 
 	//acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
-	if ((grTrack->Timeday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
+	/*if ((grTrack->Timeday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
 		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC3, "track.ac");
-	else
+	else*/
 		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
   	GfOut("ACname = %s\n", acname);
 	if (strlen(acname) == 0) 
