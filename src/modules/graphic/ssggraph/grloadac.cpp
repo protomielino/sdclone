@@ -117,6 +117,7 @@ static int do_surf     ( char *s ) ;
 static int do_mat      ( char *s ) ;
 static int do_refs     ( char *s ) ;
 static int do_kids     ( char *s ) ;
+static int do_ignore   ( char *s ) ;
 
 static int do_obj_world ( char *s ) ;
 static int do_obj_poly  ( char *s ) ;
@@ -203,6 +204,7 @@ static Tag object_tags [] =
   { "numvert" , do_numvert  },
   { "numsurf" , do_numsurf  },
   { "kids"    , do_kids     },
+  { "crease"  , do_ignore   },
   { NULL, NULL }
 } ;
 
@@ -1071,6 +1073,11 @@ static int do_kids ( char *s )
 	numMapLevel=1;
 	mapLevel=LEVEL0;
 	return PARSE_POP ;
+}
+
+static int do_ignore( char *s )
+{
+	return PARSE_CONT ;
 }
 
 
