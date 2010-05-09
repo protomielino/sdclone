@@ -97,14 +97,14 @@ void ReTrackUpdate(void)
 			}
 			case 2:
 			{
-				curSurf->kFriction     = curSurf->kFriction2 - 0.05f;
+				curSurf->kFriction     = curSurf->kFriction2 * 0.8f;
     				curSurf->kRollRes      = curSurf->kRollRes2;;
 				printf("Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
 				break;
 			}
 			case 3:
 			{
-				curSurf->kFriction     = curSurf->kFriction2 - 0.08f;
+				curSurf->kFriction     = curSurf->kFriction2 * 0.6f;
     				curSurf->kRollRes      = curSurf->kRollRes2;
 				printf("Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
 				break;
