@@ -41,6 +41,46 @@
 #include "raceengine.h"
 
 
+// Small event log system for ReUpdate/ReOneStep dispatching analysis.
+#define LogEvents 0
+
+#if (LogEvents)
+# define DeclareEventType(name) \
+	static int nLast##name = 0; \
+	static int nPrev##name = 0; \
+	static double tLast##name = 0.0; \
+	static double tPrev##name = 0.0;
+#else
+# define DeclareEventType(name)
+#endif
+
+#if (LogEvents)
+# define SignalEvent(name) \
+	nLast##name++; \
+	tLast##name = GfTimeClock();
+#else
+# define SignalEvent(name)
+#endif
+
+#if (LogEvents)
+# define PrintEvent(name, header, footer)	 \
+	if (header) GfOut(header); \
+	if (tPrev##name == 0.0) tPrev##name = tLast##name; \
+	GfOut("%s %2d %5.1f ", #name, nLast##name - nPrev##name, (tLast##name - tPrev##name)*1000); \
+	nPrev##name = nLast##name; \
+	tPrev##name = tLast##name; \
+	if (footer) GfOut(footer);
+#else
+# define PrintEvent(name, header, footer)
+#endif
+
+//DeclareEventType(Update);
+//DeclareEventType(OneStep);
+DeclareEventType(Robots);
+DeclareEventType(Simu);
+DeclareEventType(Graphic);
+
+
 static char	buf[1024];
 static char	bestLapChanged = FALSE;
 static double	msgDisp;
@@ -811,6 +851,8 @@ ReOneStep(double deltaTimeIncrement)
 	tRobotItf *robot;
 	tSituation *s = ReInfo->s;
 
+	//SignalEvent(OneStep);
+
 	if (GetNetwork())
 	{
 		//Resync clock in case computer falls behind
@@ -854,6 +896,7 @@ ReOneStep(double deltaTimeIncrement)
 
 	START_PROFILE("rbDrive*");
 	if ((s->currentTime - ReInfo->_reLastTime) >= RCM_MAX_DT_ROBOTS) {
+		SignalEvent(Robots);
 		s->deltaTime = s->currentTime - ReInfo->_reLastTime;
 		for (i = 0; i < s->_ncars; i++) {
 			if ((s->cars[i]->_state & RM_CAR_STATE_NO_SIMU) == 0) {
@@ -878,6 +921,7 @@ ReOneStep(double deltaTimeIncrement)
 		NetworkPlayStep();
 	}
 
+	SignalEvent(Simu);
 	START_PROFILE("_reSimItf.update*");
 	ReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
 	for (i = 0; i < s->_ncars; i++) {
@@ -952,6 +996,7 @@ ReUpdate(void)
     case RM_DISP_MODE_NORMAL:
 	t = GfTimeClock();
 
+	//SignalEvent(Update);
 	START_PROFILE("ReOneStep*");
 	while (ReInfo->_reRunning && ((t - ReInfo->_reCurTime) > RCM_MAX_DT_SIMU)) {
 	    ReOneStep(RCM_MAX_DT_SIMU);
@@ -963,8 +1008,15 @@ ReUpdate(void)
 		GetNetwork()->SendCarControlsPacket(ReInfo->s);
 
 	GfuiDisplay();
+	SignalEvent(Graphic);
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
 	GfelPostRedisplay();	/* Callback -> reDisplay */
+	
+	//PrintEvent(Update, "Events: ", 0);
+	//PrintEvent(OneStep, 0, 0);
+	PrintEvent(Robots, "Events: ", 0);
+	PrintEvent(Simu, 0, 0);
+	PrintEvent(Graphic, 0, "\n");
 	break;
 	
     case RM_DISP_MODE_NONE:
