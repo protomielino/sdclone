@@ -24,26 +24,334 @@
 #include "tgfclient.h"
 
 
-// Globals
-// * Callback functions
-static void (*g_keyboardDownCB)(int key, int modifiers, int x, int y);
-static void (*g_keyboardUpCB)(int key, int modifiers, int x, int y);
+/** The event loop class
+    
+     @ingroup	gui
+*/
 
-static void (*g_mouseButtonCB)(int button, int state, int x, int y);
-static void (*g_mouseMotionCB)(int x, int y);
-static void (*g_MousePassiveMotionCB)(int x, int y);
+class EventLoop
+{
+  public: // Member functions.
 
-static void (*g_idleCB)(void);
+	//! Constructor
+	EventLoop();
 
-static void (*g_timerCB)(int value);
+	//! The real event loop function.
+	void operator()(void);
 
-static void (*g_displayCB)(void);
-static void (*g_reshapeCB)(int width, int height);
+	//! Set the "key pressed" callback function.
+	void setKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y));
 
-// * Variables
-static bool g_bReDisplay; // Flag to say if a redisplay is necessary.
-//Uint16 g_keyUnicode[SDLK_LAST]; // Unicode for each possible SDL key sym
-static std::map<Uint32, Uint16> g_keyUnicode; // Unicode for each typed SDL key sym + modifier
+	//! Set the "key realeased" callback function.
+	void setKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y));
+
+	//! Set the "mouse button pressed" callback function.
+	void setMouseButtonCB(void (*func)(int button, int state, int x, int y));
+
+	//! Set the "mouse motion with button pressed" callback function.
+	void setMouseMotionCB(void (*func)(int x, int y));
+
+	//! Set the "mouse motion without button pressed" callback function.
+	void setMousePassiveMotionCB(void (*func)(int x, int y));
+
+	//! Set the "idle" callback function (run at the end of _every_ event loop).
+	void setIdleCB(void (*func)(void));
+
+	//! Set a timer callback function with given delay.
+	void setTimerCB(unsigned int millis, void (*func)(int value));
+
+	//! Set the "redisplay/refresh" callback function. 
+	void setDisplayCB(void (*func)(void));
+
+	//! Set the "reshape" callback function with given new screen/window geometry.
+	void setReshapeCB(void (*func)(int width, int height));
+
+	//! Post a "redisplay/refresh" event to the event loop. 
+	void postReDisplay(void);
+
+	//! Force a call to the "redisplay/refresh" callback function. 
+	void forceReDisplay();
+
+  private: // Member functions.
+
+	//! Translation function from SDL key to unicode if possible (or SDL key sym otherwise)
+	int translateKeySym(const SDL_keysym& sdlKeySym);
+
+	//! Call the timer callback function (time has come).
+	void callTimerCB(int value);
+
+	//! SDL-callable wrapper for the timer callback function.
+	static Uint32 wrapTimerCB(Uint32 interval, void *param);
+
+  private: // Member data.
+	
+	// Callback functions
+	void (*_keyboardDownCB)(int key, int modifiers, int x, int y);
+	void (*_keyboardUpCB)(int key, int modifiers, int x, int y);
+	
+	void (*_mouseButtonCB)(int button, int state, int x, int y);
+	void (*_mouseMotionCB)(int x, int y);
+	void (*_mousePassiveMotionCB)(int x, int y);
+	
+	void (*_idleCB)(void);
+	
+	void (*_timerCB)(int value);
+	
+	void (*_displayCB)(void);
+	void (*_reshapeCB)(int width, int height);
+
+	// Variables
+	bool _bReDisplay; // Flag to say if a redisplay is necessary.
+	std::map<Uint32, Uint16> _mapUnicodes; // Unicode for each typed SDL key sym + modifier
+};
+
+/** Accessor to the EventLoop singleton
+	
+	Implemented that way in order to guarantee everything static is initialized
+	before being first used.
+
+	Example of classic implementation that doesn't work with some compilers
+	like ... kakuri ? (but known to work with Linux GCC 4.4, MSVC 2005, MSVC 2008):
+	
+	static std::map<Uint32, Uint16> g_mapUnicodes;
+	int getKeyUnicode(const SDL_keysym& sdlKeySym)
+	{
+	    // Here, nothing in C++ guarantees that the map constructor has been called.
+	    const std::map<Uint32, Uint16>::const_iterator itUnicode =
+		    g_mapUnicodes.find(sdlKeySym.keysym);
+
+		...
+	}
+
+     @ingroup	gui
+*/
+
+static EventLoop& 
+gfelEventLoop()
+{
+	static EventLoop eventLoop;
+	return eventLoop;
+}
+
+
+// Constructor
+EventLoop::EventLoop()
+{
+	_displayCB = 0;
+	_reshapeCB = 0;
+	_keyboardDownCB = 0;
+	_mouseButtonCB = 0;
+	_mouseMotionCB = 0;
+	_mousePassiveMotionCB = 0;
+	_idleCB = 0;
+	_timerCB = 0;
+	_keyboardUpCB = 0;
+
+	_bReDisplay = false;
+	
+	SDL_EnableUNICODE(/*enable=*/1); // For keyboard "key press" event key code translation
+}
+
+void EventLoop::setKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y))
+{
+	_keyboardDownCB = func;
+}
+
+void EventLoop::setKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y))
+{
+	_keyboardUpCB = func;
+}
+
+void EventLoop::setMouseButtonCB(void (*func)(int button, int state, int x, int y))
+{
+	_mouseButtonCB = func;
+}
+
+void EventLoop::setMouseMotionCB(void (*func)(int x, int y))
+{
+	_mouseMotionCB = func;
+}
+
+void EventLoop::setMousePassiveMotionCB(void (*func)(int x, int y))
+{
+	_mousePassiveMotionCB = func;
+}
+
+void EventLoop::setIdleCB(void (*func)(void))
+{
+	_idleCB = func;
+}
+
+Uint32 EventLoop::wrapTimerCB(Uint32 interval, void *param)
+{
+	gfelEventLoop().callTimerCB(1);
+
+	//Returning zero will prevent callback from happening again
+	return 0;
+}
+
+void EventLoop::setTimerCB(unsigned int millis, void (*func)(int value))
+{
+	_timerCB = func;
+	SDL_AddTimer(millis, EventLoop::wrapTimerCB, (void *)1);
+}
+
+void EventLoop::callTimerCB(int value)
+{
+	if (_timerCB)
+		_timerCB(value);
+}
+
+void EventLoop::setDisplayCB(void (*func)(void))
+{
+	_displayCB = func;
+}
+
+void EventLoop::setReshapeCB(void (*func)(int width, int height))
+{
+	_reshapeCB = func;
+}
+
+void EventLoop::postReDisplay(void)
+{
+	_bReDisplay = true;
+}
+
+void EventLoop::forceReDisplay()
+{
+	if (_displayCB)
+		_displayCB();
+}
+
+// Translation function from SDL key to unicode if possible (or SDL key sym otherwise)
+// As the unicode is not available on KEYUP events, we store it on KEYDOWN event,
+// (and then, we can get it on KEYUP event, that ALWAYS come after a KEYDOWN event).
+// The unicode is stored in a map that grows each time 1 new key sym + modifiers combination
+// is typed ; we never clears this map, but assume not that many such combinations
+// will be typed in a game session (could theorically go up to 2^23 combinations, though ;-)
+// Known issues (TODO): No support for Caps and NumLock keys ... don't use them !
+int EventLoop::translateKeySym(const SDL_keysym& sdlKeySym)
+{
+	int keyUnicode;
+	
+	const Uint32 keyId = ((Uint32)sdlKeySym.sym & 0x1FF) | (((Uint32)sdlKeySym.mod) << 9);
+	
+    const std::map<Uint32, Uint16>::const_iterator itUnicode = _mapUnicodes.find(keyId);
+    
+    if (itUnicode == _mapUnicodes.end())
+	{
+		// Truncate unicodes above GFUIK_MAX (no need for more).
+		keyUnicode = sdlKeySym.unicode ? (sdlKeySym.unicode & GFUIK_MAX) : sdlKeySym.sym;
+		_mapUnicodes[keyId] = keyUnicode;
+		//GfOut("EventLoop: New key id=0x%08X, unicode=%d (%d)\n", keyId, keyUnicode, _mapUnicodes.size());
+	}
+	else
+		keyUnicode = (*itUnicode).second;
+
+	return keyUnicode;
+}
+
+
+// The main event management / re-display loop
+void EventLoop::operator()(void)
+{
+	SDL_Event event; // Event structure
+	
+	// Check for events
+	while(true)
+	{  	
+		// Loop until there are no events left on the queue
+		while (SDL_PollEvent(&event))
+		{
+		    // Process the appropiate event type
+			switch(event.type)
+			{  
+				case SDL_KEYDOWN:
+					
+					if (_keyboardDownCB)
+					{
+						int x,y;
+						SDL_GetMouseState(&x, &y);
+						_keyboardDownCB(translateKeySym(event.key.keysym),
+										event.key.keysym.mod, x, y);
+
+						//GfOut("EventLoop: KeyDown(k=%d, m=%x)\n", 
+						//	  event.key.keysym.sym, event.key.keysym.mod);
+					}
+					break;
+				
+				case SDL_KEYUP:
+					
+					if (_keyboardUpCB)
+					{
+						int x,y;
+						SDL_GetMouseState(&x, &y);
+						_keyboardUpCB(translateKeySym(event.key.keysym),
+									  event.key.keysym.mod, x, y);
+					}
+					break;
+
+				case SDL_MOUSEMOTION:
+
+					if (event.motion.state == 0)
+					{
+						if (_mousePassiveMotionCB)
+							_mousePassiveMotionCB(event.motion.x, event.motion.y);
+					}
+					else
+					{
+						if (_mouseMotionCB)
+							_mouseMotionCB(event.motion.x, event.motion.y);
+					}
+					break;
+
+				
+				case SDL_MOUSEBUTTONDOWN:
+
+					if (_mouseButtonCB)
+						_mouseButtonCB(event.button.button, event.button.state,
+										event.button.x, event.button.y);
+					break;
+
+				case SDL_MOUSEBUTTONUP:
+
+					if (_mouseButtonCB)
+						_mouseButtonCB(event.button.button, event.button.state,
+										event.button.x, event.button.y);
+					break;
+
+				case SDL_QUIT:
+					
+					exit(0);
+					break;
+				
+				case SDL_VIDEOEXPOSE:
+
+					if (_displayCB)
+						_displayCB();
+					break;
+			}
+		}
+
+		// Refresh display if needed
+		if (_bReDisplay)
+		{
+			_bReDisplay = false;
+			if (_displayCB)
+				_displayCB();
+		}
+
+		// Call Idle callback if any
+		if (_idleCB)
+			_idleCB();
+
+		// ... otherwise let CPU take breath (and fans stay at low and quiet speed)
+		else
+			SDL_Delay(1); // ms.
+	}
+
+
+}
 
 /** Initialize the event loop management layer
     
@@ -53,21 +361,6 @@ static std::map<Uint32, Uint16> g_keyUnicode; // Unicode for each typed SDL key 
 void 
 GfelInitialize()
 {
-	g_displayCB = 0;
-	g_reshapeCB = 0;
-	g_keyboardDownCB = 0;
-	g_mouseButtonCB = 0;
-	g_mouseMotionCB = 0;
-	g_MousePassiveMotionCB = 0;
-	g_idleCB = 0;
-	g_timerCB = 0;
-	g_keyboardUpCB = 0;
-
-	g_bReDisplay = false;
-
-	SDL_EnableUNICODE(/*enable=*/1); /* For keyboard "key press" event key code translation */
-	for (int keySym = 0; keySym < SDLK_LAST; keySym++)
-		g_keyUnicode[keySym] = 0;
 }
 
 /** Set the call-back for "key pressed" events
@@ -78,7 +371,7 @@ GfelInitialize()
 void 
 GfelSetKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y))
 {
-	g_keyboardDownCB = func;
+	gfelEventLoop().setKeyboardDownCB(func);
 }
 
 /** Set the call-back for "key released" events
@@ -89,7 +382,7 @@ GfelSetKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y))
 void 
 GfelSetKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y))
 {
-	g_keyboardUpCB = func;
+	gfelEventLoop().setKeyboardUpCB(func);
 }
 
 
@@ -101,7 +394,7 @@ GfelSetKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y))
 void 
 GfelSetMouseButtonCB(void (*func)(int button, int state, int x, int y))
 {
-	g_mouseButtonCB = func;
+	gfelEventLoop().setMouseButtonCB(func);
 }
 
 /** Set the call-back for "mouse move while button pressing" events
@@ -112,7 +405,7 @@ GfelSetMouseButtonCB(void (*func)(int button, int state, int x, int y))
 void 
 GfelSetMouseMotionCB(void (*func)(int x, int y))
 {
-	g_mouseMotionCB = func;
+	gfelEventLoop().setMouseMotionCB(func);
 }
 
 /** Set the call-back for "mouse move without button pressing" events
@@ -123,7 +416,7 @@ GfelSetMouseMotionCB(void (*func)(int x, int y))
 void 
 GfelSetMousePassiveMotionCB(void (*func)(int x, int y))
 {
-	g_MousePassiveMotionCB = func;
+	gfelEventLoop().setMousePassiveMotionCB(func);
 }
 
 /** Set the function to be called when nothing to do
@@ -134,22 +427,7 @@ GfelSetMousePassiveMotionCB(void (*func)(int x, int y))
 void 
 GfelSetIdleCB(void (*func)(void))
 {
-	g_idleCB = func;
-}
-
-/** SDL wrapper function for a timed-out call-back function (see GfelSetTimeDelayedCB).
-    
-     @ingroup	gui
-*/
-
-static Uint32 
-wrapTimerCB(Uint32 interval, void *param)
-{
-	if (g_timerCB)
-	  g_timerCB(1);
-
-	//Returning zero will prevent callback from happening again
-	return 0;
+	gfelEventLoop().setIdleCB(func);
 }
 
 /** Initialize a timer and the associated time-out call-back function
@@ -160,8 +438,7 @@ wrapTimerCB(Uint32 interval, void *param)
 void 
 GfelSetTimerCB(unsigned int millis, void (*func)(int value))
 {
-	g_timerCB = func;
-	SDL_AddTimer(millis, wrapTimerCB, (void *)1);
+	gfelEventLoop().setTimerCB(millis, func);
 }
 
 /** Set the function to call for re-displaying the screen
@@ -172,7 +449,7 @@ GfelSetTimerCB(unsigned int millis, void (*func)(int value))
 void 
 GfelSetDisplayCB(void (*func)(void))
 {
-	g_displayCB = func;
+	gfelEventLoop().setDisplayCB(func);
 }
 
 /** Set the function to call for re-shaping
@@ -183,7 +460,7 @@ GfelSetDisplayCB(void (*func)(void))
 void 
 GfelSetReshapeCB(void (*func)(int width, int height))
 {
-	g_reshapeCB = func;
+	gfelEventLoop().setReshapeCB(func);
 }
 
 /** State that a redisplay is to be done in next main loop
@@ -194,7 +471,7 @@ GfelSetReshapeCB(void (*func)(int width, int height))
 void 
 GfelPostRedisplay(void)
 {
-	g_bReDisplay = true;
+	gfelEventLoop().postReDisplay();
 }
 
 /** Force a redisplay now, without waiting for the main loop to do so
@@ -205,38 +482,7 @@ GfelPostRedisplay(void)
 void 
 GfelForceRedisplay()
 {
-	if (g_displayCB)
-		g_displayCB();
-}
-
-
-// Translation function from SDL key to unicode if possible (of SDL key sym otherwise)
-// As the unicode is not available on KEYUP events, we store it on KEYDOWN event,
-// (and then, we can get it on KEYUP event, that ALWAYS come after a KEYDOWN event).
-// The unicode is stored in a map that grows each time 1 new key sym + modifiers combination
-// is typed ; we never clears this map, but assume not that many such combinations
-// will be typed in a game session (could theorically go up to 2^23 combinations, though ;-)
-// Known issues (TODO): No support for Caps and NumLock keys ... don't use them !
-static int
-translateKeySym(const SDL_keysym& sdlKeySym)
-{
-	int keyUnicode;
-	
-	const Uint32 keyId = ((Uint32)sdlKeySym.sym & 0x1FF) | (((Uint32)sdlKeySym.mod) << 9);
-	
-    const std::map<Uint32, Uint16>::const_iterator itUnicode = g_keyUnicode.find(keyId);
-    
-    if (itUnicode == g_keyUnicode.end())
-	{
-		// Truncate unicodes above GFUIK_MAX
-		keyUnicode = sdlKeySym.unicode ? (sdlKeySym.unicode & GFUIK_MAX) : sdlKeySym.sym;
-		g_keyUnicode[keyId] = keyUnicode;
-		//GfOut("New key 0x%08X (%d)\n", keyId, g_keyUnicode.size());
-	}
-	else
-		keyUnicode = (*itUnicode).second;
-
-	return keyUnicode;
+	gfelEventLoop().forceReDisplay();
 }
 
 
@@ -248,114 +494,6 @@ translateKeySym(const SDL_keysym& sdlKeySym)
 void 
 GfelMainLoop(void)
 {
-	SDL_Event event; /* Event structure */
-	
-	/* Check for events */
-	while(true)
-	{  	
-		/* Loop until there are no events left on the queue */
-		while (SDL_PollEvent(&event))
-		{
-		    /* Process the appropiate event type */
-			switch(event.type)
-			{  
-				case SDL_KEYDOWN:
-					
-					if (g_keyboardDownCB)
-					{
-						int x,y;
-						SDL_GetMouseState(&x, &y);
-						g_keyboardDownCB(translateKeySym(event.key.keysym),
-										 event.key.keysym.mod, x, y);
-
-						//GfOut("GfelMainLoop: KeyDown(k=%d, m=%x)\n", 
-						//	  event.key.keysym.sym, event.key.keysym.mod);
-					}
-					break;
-				
-				case SDL_KEYUP:
-					
-					if (g_keyboardUpCB)
-					{
-						int x,y;
-						SDL_GetMouseState(&x, &y);
-						g_keyboardUpCB(translateKeySym(event.key.keysym),
-									   event.key.keysym.mod, x, y);
-					}
-					break;
-
-				case SDL_MOUSEMOTION:
-
-					if (event.motion.state == 0)
-					{
-						if (g_MousePassiveMotionCB)
-						{
-							g_MousePassiveMotionCB(event.motion.x, event.motion.y);
-						}
-					}
-					else
-					{
-						if (g_mouseMotionCB)
-						{
-							g_mouseMotionCB(event.motion.x, event.motion.y);
-						}
-					}
-					break;
-
-				
-				case SDL_MOUSEBUTTONDOWN:
-
-					if (g_mouseButtonCB)
-					{
-						g_mouseButtonCB(event.button.button, event.button.state,
-										event.button.x, event.button.y);
-					}
-					break;
-
-				case SDL_MOUSEBUTTONUP:
-
-					if (g_mouseButtonCB)
-					{
-						g_mouseButtonCB(event.button.button, event.button.state,
-										event.button.x, event.button.y);
-					}
-
-					break;
-
-				case SDL_QUIT:
-					
-					exit(0);
-					break;
-				
-				case SDL_VIDEOEXPOSE:
-
-					if (g_displayCB)
-					{
-						g_displayCB();
-					}
-					break;
-			}
-		}
-
-		// Refresh display if needed
-		if (g_bReDisplay)
-		{
-			g_bReDisplay = false;
-			if (g_displayCB)
-			{
-				g_displayCB();
-			}
-		}
-
-		// Call Idle callback if any
-		if (g_idleCB)
-			g_idleCB();
-
-		// ... otherwise let CPU take breath (and fans stay at low and quiet speed)
-		else
-			SDL_Delay(1); // ms.
-	}
-
-
+	gfelEventLoop()();
 }
 
