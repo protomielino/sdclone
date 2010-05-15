@@ -32,6 +32,7 @@ Client::Client()
 	m_pServer = NULL;
 	m_pClient = NULL;
 	m_pHost = NULL;
+	m_eClientAccepted = PROCESSINGCLIENT;
 
 }
 
@@ -46,12 +47,15 @@ Client::~Client()
 
  void Client::Disconnect()
  {
+	m_bConnected = false;
+
 	ResetNetwork();
 	SetClient(false);
  }
 
 void Client::ResetNetwork()
 {
+
 	if (m_pClient == NULL)
 		return;
 
@@ -111,7 +115,7 @@ void Client::ResetNetwork()
 
 }
 
-bool Client::ConnectToServer(const char *pAddress,int port, const char *pClientName)
+bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 {
 	m_bTimeSynced = false;
 	m_bPrepareToRace = false;
@@ -191,16 +195,30 @@ bool Client::ConnectToServer(const char *pAddress,int port, const char *pClientN
 	m_address.host = m_pClient->address.host;
 	m_address.port = m_pClient->address.port;
 	m_bConnected = true;
-	return true;
     }
     else
     {
 	m_bConnected = false;
 	ResetNetwork();
-	return false;
     }
 
+	m_eClientAccepted = PROCESSINGCLIENT;
+	SendDriverInfoPacket(pDriver);
 
+	//Wait for server to accept or reject 
+	while(m_eClientAccepted == PROCESSINGCLIENT)
+	{
+		SDL_Delay(50);
+	}
+
+	if (m_eClientAccepted == CLIENTREJECTED)
+	{
+		m_bConnected = false;
+		ResetNetwork();
+		return false;
+	}
+
+	return m_bConnected;
 }
 
 bool Client::IsConnected()
@@ -299,7 +317,6 @@ void Client::SendServerTimeRequest()
                                               ENET_PACKET_FLAG_UNSEQUENCED);
 
 	int result = enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket);
-	assert(result ==0);
 
 }
 
@@ -328,10 +345,23 @@ void Client::ReadStartTimePacket(ENetPacket *pPacket)
 	
 }
 
+void Client::ReadPlayerRejectedPacket(ENetPacket *pPacket)
+{
+	m_eClientAccepted = CLIENTREJECTED;
+	GfOut ("Server reject connection.\n");
+}
 
+void Client::ReadPlayerAcceptedPacket(ENetPacket *pPacket)
+{
+	m_eClientAccepted = CLIENTACCEPTED;
+	GfOut ("Server accepted connection.\n");
+}
 
 bool Client::listenHost(ENetHost * pHost)
 {
+	if (pHost == NULL)
+		return false;
+
 	bool bHasPacket = false;
 
 	ENetEvent event;
@@ -433,7 +463,12 @@ void Client::ReadPacket(ENetEvent event)
 		case ALLDRIVERREADY_PACKET:
 			ReadAllDriverReadyPacket(event.packet);
 			break;
-
+		case PLAYERREJECTED_PACKET:
+			ReadPlayerRejectedPacket(event.packet);
+			break;
+		case PLAYERACCEPTED_PACKET:
+			ReadPlayerAcceptedPacket(event.packet);
+			break;
 	default:
 			assert(false);
 			GfOut ("A packet of length %u containing %s was received from %s on channel %u.\n",

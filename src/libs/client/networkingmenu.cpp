@@ -701,14 +701,14 @@ reNetworkClientConnectMenu(void * /* dummy */)
 		GetHumanDriver(driver,1);
 		driver.client = true;
 		strcpy(driver.name,g_strDriver.c_str());
-		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,driver.name))
+		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
 		{
 			//failed so back to connect menu
 			reNetworkClientMenu(NULL);
 			return;
 		}
 
-		GetClient()->SendDriverInfoPacket(&driver);
+		//GetClient()->SendDriverInfoPacket(&driver);
 	}
 
 	void *params = ReInfo->params;

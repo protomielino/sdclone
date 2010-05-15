@@ -79,10 +79,13 @@
 #define FINISHTIME_PACKET 14
 #define DRIVERREADY_PACKET 15
 #define ALLDRIVERREADY_PACKET 16
+#define PLAYERREJECTED_PACKET 17
+#define PLAYERACCEPTED_PACKET 18
 
 #include <track.h>
 #include <raceman.h>
 
+typedef enum EnumClientAccepted { PROCESSINGCLIENT,CLIENTREJECTED,CLIENTACCEPTED };
 //Use a structure to pass as a network ENetPacket sent 
 //Packed / Compressed to reduce internet bandwidth requirements
 struct CarControlsPacked
@@ -428,7 +431,7 @@ public:
 	virtual void ResetNetwork();
 	virtual bool IsConnected();
 
-	bool ConnectToServer(const char *pAddress,int port,const char *pClientName);
+	bool ConnectToServer(const char *pAddress,int port, Driver *pDriver);
 	virtual bool listen();
 
 	//Packets
@@ -464,6 +467,9 @@ protected:
 	void ReadFinishTimePacket(ENetPacket *pPacket);
 	void ReadAllDriverReadyPacket(ENetPacket *pPacket);
 	void ReadWeatherPacket(ENetPacket *pPacket);
+	void ReadPlayerRejectedPacket(ENetPacket *pPacket);
+	void ReadPlayerAcceptedPacket(ENetPacket *pPacket);
+
 	void ConnectToDriver(Driver driver);
 
 	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
@@ -475,7 +481,7 @@ protected:
 	double m_lag;
 	double m_servertimedifference;
 	double m_packetsendtime;
-
+	EnumClientAccepted m_eClientAccepted;
 
 
 	ENetHost * m_pClient;
@@ -506,6 +512,8 @@ public:
 	void SendTimePacket(ENetPacket *pPacket, ENetPeer * pPeer);
 	void SendFinishTimePacket();
 	void SendWeatherPacket();
+	bool SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason);
+	bool SendPlayerAcceptedPacket(ENetPeer * pPeer);
 	void SendDriversReadyPacket();
 	void PingClients();
 	virtual void SetDriverReady(bool bReady);

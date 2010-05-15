@@ -187,7 +187,7 @@ void Server::SendStartTimePacket(int &startTime)
                                               datasize, 
                                               ENET_PACKET_FLAG_RELIABLE);
 
-	BroadcastPacket(pPacket,1);
+	BroadcastPacket(pPacket,RELIABLECHANNEL);
 
 	delete [] pData;
 	GfOut("Server Start time is %lf\n",m_racestarttime);
@@ -474,6 +474,58 @@ void Server::RemoveDriver(ENetEvent event)
 
 }
 
+bool Server::SendPlayerAcceptedPacket(ENetPeer * pPeer)
+{
+
+	//Send to client requesting connection
+	unsigned char  packetId = PLAYERACCEPTED_PACKET;
+	int datasize = 1;
+
+	unsigned char *pData = new unsigned char[datasize];
+	unsigned char *pDataSpot = pData;
+	memcpy(pDataSpot,&packetId,1);	
+
+	ENetPacket * pPacket = enet_packet_create (pData, 
+                                              datasize, 
+                                              ENET_PACKET_FLAG_RELIABLE);
+
+	delete [] pData;
+ 
+	if (enet_peer_send (pPeer, RELIABLECHANNEL, pPacket)==0)
+		return true;
+
+	return false;
+}
+
+bool Server::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
+{
+	unsigned int l = strReason.length();
+	
+	//Send to client requesting connection
+	unsigned char  packetId = PLAYERREJECTED_PACKET;
+	int datasize = sizeof(l)+l+1;
+
+	unsigned char *pData = new unsigned char[datasize];
+	unsigned char *pDataSpot = pData;
+	memcpy(pDataSpot,&packetId,1);	
+	pDataSpot++;
+	memcpy(pDataSpot,&l,sizeof(l));
+	pDataSpot+=sizeof(l);
+	memcpy(pDataSpot,strReason.c_str(),l);
+	pDataSpot+=l;
+
+	ENetPacket * pPacket = enet_packet_create (pData, 
+                                              datasize, 
+                                              ENET_PACKET_FLAG_RELIABLE);
+
+	delete [] pData;
+ 
+	if (enet_peer_send (pPeer, RELIABLECHANNEL, pPacket)==0)
+		return true;
+
+	return false;
+}
+
 void Server::SendDriversReadyPacket()
 {
 	
@@ -503,7 +555,7 @@ void Server::SendDriversReadyPacket()
 
 	delete [] pData;
  
-	BroadcastPacket(pPacket,1);
+	BroadcastPacket(pPacket,RELIABLECHANNEL);
 	m_bRefreshDisplay = true;
 
 }
@@ -524,7 +576,7 @@ void Server::SendRaceSetupPacket()
 
 	delete [] pData;
  
-	BroadcastPacket(pPacket,1);
+	BroadcastPacket(pPacket,RELIABLECHANNEL);
 
 	SetRaceInfoChanged(true);
 
@@ -560,18 +612,29 @@ void Server::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
     GfOut ("Client Player Info connected from %s\n",hostName); 
 
 	memcpy(&driver,&pPacket->data[1],sizeof(Driver));
+
+	//Make sure player name is unique otherwise disconnect player
+	ServerMutexData *pSData = LockServerData();
+	for(unsigned int i=0;i<pSData->m_vecNetworkPlayers.size();i++)
+	{
+		if (strcmp(driver.name,pSData->m_vecNetworkPlayers[i].name)==0)
+		{
+			SendPlayerRejectedPacket(pPeer,"Player name already used.  Please choose a different name.");
+			UnlockServerData();
+			return;
+		}
+	}
+	UnlockServerData();
+
 	driver.address.host = pPeer->address.host;
 	driver.hostPort = pPeer->address.port;
 
+	SendPlayerAcceptedPacket(pPeer);
 	UpdateDriver(driver);
 
+
+
 	GfOut("Reading Driver Info Packet:  Driver: %s,Car: %s\n",driver.name,driver.car);
-
-
-
-	//Send this info to all clients
-//	BroadcastPacket(pPacket);
-
 
 }
 
@@ -607,7 +670,7 @@ void Server::SendWeatherPacket()
                                               ENET_PACKET_FLAG_RELIABLE);
 
 
-		BroadcastPacket(pWeatherPacket,1);
+		BroadcastPacket(pWeatherPacket,RELIABLECHANNEL);
 
 }
 
@@ -691,7 +754,7 @@ void Server::SendFilePacket(const char *pszFile)
                                               datasize, 
                                               ENET_PACKET_FLAG_RELIABLE);
 	
-	BroadcastPacket(pPacket,1);
+	BroadcastPacket(pPacket,RELIABLECHANNEL);
 
 
 }
@@ -865,6 +928,7 @@ void Server::ReadPacket(ENetEvent event)
 			break;
 		case DRIVERREADY_PACKET:
 			ReadDriverReadyPacket(event.packet);
+			break;
 
 	default:
 			GfOut ("A packet of length %u containing %s was received from %s on channel %u.\n",
@@ -900,7 +964,7 @@ void Server::SendFinishTimePacket()
 	ENetPacket * pPacket = enet_packet_create (pDataStart, 
                                               packetSize, 
                                               ENET_PACKET_FLAG_RELIABLE);
-	BroadcastPacket(pPacket,1);
+	BroadcastPacket(pPacket,RELIABLECHANNEL);
 }
 
 void Server::SendPrepareToRacePacket()
@@ -926,7 +990,7 @@ void Server::SendPrepareToRacePacket()
                                               1, 
                                               ENET_PACKET_FLAG_RELIABLE);
 
-	BroadcastPacket(pPacket,1);
+	BroadcastPacket(pPacket,RELIABLECHANNEL);
 }
 
 void Server::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
