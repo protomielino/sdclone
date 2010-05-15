@@ -114,7 +114,6 @@ bool HostMenuSettings::Init(void* pMenu)
 
 	GfuiComboboxSetSelectedIndex(m_pMenuHandle,humanHostId,0);
 
-	CreateButtonControl(m_pMenuHandle,param,"race setup",pPrevMenu,reConfigureMenu);
     CreateButtonControl(m_pMenuHandle,param,"accept",NULL,onAcceptCB);
     CreateButtonControl(m_pMenuHandle,param,"cancel",NULL,onCancelCB);
 

@@ -60,23 +60,24 @@ should also allow choosing ip address and track choice and etc
 #include "carsettingsmenu.h"
 #include "carinfo.h"
 
-int readystatus[MAXNETWORKPLAYERS];
-int playerNames[MAXNETWORKPLAYERS];
-int carNames[MAXNETWORKPLAYERS];
+int g_readystatus[MAXNETWORKPLAYERS];
+int g_playerNames[MAXNETWORKPLAYERS];
+int g_carNames[MAXNETWORKPLAYERS];
 
-int trackHd;
-int lapsHd;
-int catHd;
-int OutlineId;
+int g_trackHd;
+int g_lapsHd;
+int g_catHd;
+int g_OutlineId;
 
-int CarSetupButtonId;
-int HostSettingsButtonId;
-int DisconnectButtonId;
-int CancelButtonId;
-int ReadyCheckboxId;
+int g_CarSetupButtonId;
+int g_HostSettingsButtonId;
+int g_DisconnectButtonId;
+int g_CancelButtonId;
+int g_ReadyCheckboxId;
+int g_RaceSetupId;
 
-static int IPEditId;
-static int NameId;
+static int g_IPEditId;
+static int g_NameId;
 
 
 static char		buf[1024];
@@ -103,9 +104,9 @@ void GetHumanDriver(Driver &driver,int index);
 void SetReadyStatus(int index,bool bStatus)
 {
 	if (bStatus)
-		GfuiStaticImageSetActive(racemanMenuHdle,readystatus[index],1);
+		GfuiStaticImageSetActive(racemanMenuHdle,g_readystatus[index],1);
 	else
-		GfuiStaticImageSetActive(racemanMenuHdle,readystatus[index],0);
+		GfuiStaticImageSetActive(racemanMenuHdle,g_readystatus[index],0);
 }
 
 void EnableMenuHostButtons(bool bChecked)
@@ -113,15 +114,18 @@ void EnableMenuHostButtons(bool bChecked)
 	//Disable/enable menu selections
 	if (bChecked)
 	{
-		GfuiEnable(racemanMenuHdle, CarSetupButtonId,GFUI_DISABLE);
-		GfuiEnable(racemanMenuHdle, HostSettingsButtonId,GFUI_DISABLE);		
-		GfuiEnable(racemanMenuHdle, CancelButtonId,GFUI_DISABLE);
+		GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,GFUI_DISABLE);
+		GfuiEnable(racemanMenuHdle, g_HostSettingsButtonId,GFUI_DISABLE);		
+		GfuiEnable(racemanMenuHdle, g_CancelButtonId,GFUI_DISABLE);
+		GfuiEnable(racemanMenuHdle, g_RaceSetupId,GFUI_DISABLE);
+		
 	}
 	else
 	{
-		GfuiEnable(racemanMenuHdle, CarSetupButtonId,GFUI_ENABLE);
-		GfuiEnable(racemanMenuHdle, HostSettingsButtonId,GFUI_ENABLE);
-		GfuiEnable(racemanMenuHdle, CancelButtonId,GFUI_ENABLE);
+		GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,GFUI_ENABLE);
+		GfuiEnable(racemanMenuHdle, g_HostSettingsButtonId,GFUI_ENABLE);
+		GfuiEnable(racemanMenuHdle, g_CancelButtonId,GFUI_ENABLE);
+		GfuiEnable(racemanMenuHdle, g_RaceSetupId,GFUI_ENABLE);
 	}
 
 }
@@ -138,13 +142,13 @@ void EnableMenuClientButtons(bool bChecked)
 	//Disable/enable menu selections
 	if (bChecked)
 	{
-		GfuiEnable(racemanMenuHdle, CarSetupButtonId,GFUI_DISABLE);
-		GfuiEnable(racemanMenuHdle, DisconnectButtonId,GFUI_DISABLE);
+		GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,GFUI_DISABLE);
+		GfuiEnable(racemanMenuHdle, g_DisconnectButtonId,GFUI_DISABLE);
 	}
 	else
 	{
-		GfuiEnable(racemanMenuHdle, CarSetupButtonId,GFUI_ENABLE);
-		GfuiEnable(racemanMenuHdle, DisconnectButtonId,GFUI_ENABLE);
+		GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,GFUI_ENABLE);
+		GfuiEnable(racemanMenuHdle, g_DisconnectButtonId,GFUI_ENABLE);
 	}
 }
 
@@ -229,17 +233,17 @@ UpdateNetworkPlayers()
 	std::string strTrackName = GetTrackName(strCategory.c_str(),strTrackPath.c_str());
 
 	sprintf(buf, "%s", strTrackName.c_str());
-	GfuiLabelSetText(racemanMenuHdle,trackHd,buf);
+	GfuiLabelSetText(racemanMenuHdle,g_trackHd,buf);
 	
 	int laps = (int)GfParmGetNum(ReInfo->params, ReInfo->_reName,"laps", "",0);
 	sprintf(buf, "%i", laps);
-	GfuiLabelSetText(racemanMenuHdle,lapsHd,buf);
+	GfuiLabelSetText(racemanMenuHdle,g_lapsHd,buf);
 
 
 	std::string strCarCat;
 	bool bCollisions;
 	GetNetwork()->GetHostSettings(strCarCat,bCollisions);
-	GfuiLabelSetText(racemanMenuHdle,catHd,strCarCat.c_str());
+	GfuiLabelSetText(racemanMenuHdle,g_catHd,strCarCat.c_str());
 
 	//fill in player data
 	int nCars = GfParmGetEltNb(ReInfo->params, RM_SECT_DRIVERS);
@@ -248,7 +252,7 @@ UpdateNetworkPlayers()
 	char    robpath[256];
 
 	GfuiScreenAddBgImg(racemanMenuHdle,GetTrackImagePath(strCategory.c_str(),strTrackPath.c_str()).c_str());
-	GfuiStaticImageSet(racemanMenuHdle, OutlineId,GetOutlineFileName(strCategory.c_str(),strTrackPath.c_str()).c_str());
+	GfuiStaticImageSet(racemanMenuHdle, g_OutlineId,GetOutlineFileName(strCategory.c_str(),strTrackPath.c_str()).c_str());
 
 	float *pColor = &green[0];
 
@@ -301,7 +305,7 @@ UpdateNetworkPlayers()
 			pColor = &green[0];
 			g_strCar = strRealCar;
 			//Make sure checkbox matches ready state
-			GfuiCheckboxSetChecked(racemanMenuHdle, ReadyCheckboxId, bReady);
+			GfuiCheckboxSetChecked(racemanMenuHdle, g_ReadyCheckboxId, bReady);
 			if (GetClient())
 				EnableMenuClientButtons(bReady);
 			else
@@ -312,22 +316,22 @@ UpdateNetworkPlayers()
 
 
 
-		GfuiVisibilitySet(racemanMenuHdle,readystatus[i-1],true);
-		GfuiStaticImageSetActive(racemanMenuHdle,readystatus[i-1],readyindex);
-		GfuiLabelSetColor(racemanMenuHdle, playerNames[i-1], pColor);
-		GfuiLabelSetText(racemanMenuHdle,playerNames[i-1],name);
+		GfuiVisibilitySet(racemanMenuHdle,g_readystatus[i-1],true);
+		GfuiStaticImageSetActive(racemanMenuHdle,g_readystatus[i-1],readyindex);
+		GfuiLabelSetColor(racemanMenuHdle, g_playerNames[i-1], pColor);
+		GfuiLabelSetText(racemanMenuHdle,g_playerNames[i-1],name);
 
-		GfuiLabelSetColor(racemanMenuHdle, carNames[i-1], pColor);
-		GfuiLabelSetText(racemanMenuHdle,carNames[i-1],strRealCar.c_str());
+		GfuiLabelSetColor(racemanMenuHdle, g_carNames[i-1], pColor);
+		GfuiLabelSetText(racemanMenuHdle,g_carNames[i-1],strRealCar.c_str());
 		GfParmReleaseHandle(pMod);
 	}
 
 	//Clear out
 	for (int i=nCars;i<MAXNETWORKPLAYERS;i++)
 	{
-		GfuiVisibilitySet(racemanMenuHdle,readystatus[i],false);
-		GfuiLabelSetText(racemanMenuHdle,playerNames[i],"");
-		GfuiLabelSetText(racemanMenuHdle,carNames[i],"");
+		GfuiVisibilitySet(racemanMenuHdle,g_readystatus[i],false);
+		GfuiLabelSetText(racemanMenuHdle,g_playerNames[i],"");
+		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
 	}
 
 
@@ -361,7 +365,7 @@ UpdateNetworkPlayers()
 static void
 reNetworkClientDisconnect(void * /* dummy */)
 {
-	printf("Disconnecting from server\n");
+	GfOut("Disconnecting from server\n");
 	if (GetClient())
 		GetClient()->Disconnect();
 
@@ -529,6 +533,14 @@ static void OnActivateNetworkClient(void *)
 
 static void OnActivateNetworkHost(void *)
 {
+	MutexData *pNData = GetNetwork()->LockNetworkData();
+	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
+	{
+		pNData->m_vecReadyStatus[i] = false;
+	};
+
+	GetNetwork()->UnlockNetworkData();
+
 	GetServer()->SetRaceInfoChanged(true);
 	ReInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(ReInfo->params);
@@ -573,7 +585,7 @@ reNetworkHostMenu(void * /* dummy */)
 	{
 	   SetServer(true);
 	   SetClient(false);
-	   if (!GetServer()->Start(TORCSNGPORT))
+	   if (!GetServer()->Start(SPEEDDREAMSPORT))
 	   {
  		SetServer(false);
 		return;
@@ -609,33 +621,34 @@ reNetworkHostMenu(void * /* dummy */)
 	NetworkRaceInfo();
 
 
-    trackHd = CreateLabelControl(racemanMenuHdle,mparam,"trackname");
+    g_trackHd = CreateLabelControl(racemanMenuHdle,mparam,"trackname");
 
-	lapsHd = CreateLabelControl(racemanMenuHdle,mparam,"lapcountname");
-	catHd = CreateLabelControl(racemanMenuHdle,mparam,"carcatname");
+	g_lapsHd = CreateLabelControl(racemanMenuHdle,mparam,"lapcountname");
+	g_catHd = CreateLabelControl(racemanMenuHdle,mparam,"carcatname");
     
-	OutlineId = CreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
+	g_OutlineId = CreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
 	//Show players
     for (int i = 0; i < MAXNETWORKPLAYERS; i++) 
 	{
 	    char buf[1024];
 	    sprintf(buf,"ready%i",i);
-	    readystatus[i] = CreateStaticImageControl(racemanMenuHdle,mparam,buf);
-		GfuiVisibilitySet(racemanMenuHdle,readystatus[i],false);
+	    g_readystatus[i] = CreateStaticImageControl(racemanMenuHdle,mparam,buf);
+		GfuiVisibilitySet(racemanMenuHdle,g_readystatus[i],false);
 	    sprintf(buf,"driver%i",i);
-	    playerNames[i] = CreateLabelControl(racemanMenuHdle,mparam,buf);
-		GfuiLabelSetText(racemanMenuHdle,playerNames[i],"");
+	    g_playerNames[i] = CreateLabelControl(racemanMenuHdle,mparam,buf);
+		GfuiLabelSetText(racemanMenuHdle,g_playerNames[i],"");
 	    sprintf(buf,"car%i",i);
-	    carNames[i] =  CreateLabelControl(racemanMenuHdle,mparam,buf);
-		GfuiLabelSetText(racemanMenuHdle,carNames[i],"");
+	    g_carNames[i] =  CreateLabelControl(racemanMenuHdle,mparam,buf);
+		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
     }
 
-	ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onHostPlayerReady);
-	HostSettingsButtonId = CreateButtonControl(racemanMenuHdle,mparam,"race settings",racemanMenuHdle,reNetworkHostSettingsMenu);
-	CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
+	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onHostPlayerReady);
+	g_HostSettingsButtonId = CreateButtonControl(racemanMenuHdle,mparam,"networkhostsettings",racemanMenuHdle,reNetworkHostSettingsMenu);
+	g_RaceSetupId = CreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,reConfigureMenu);
+	g_CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
 
 	CreateButtonControl(racemanMenuHdle,mparam,"start race",NULL,ServerPrepareStartNetworkRace);
-	CancelButtonId = CreateButtonControl(racemanMenuHdle,mparam,"cancel",NULL,reNetworkServerDisconnect);
+	g_CancelButtonId = CreateButtonControl(racemanMenuHdle,mparam,"cancel",NULL,reNetworkServerDisconnect);
 
     GfParmReleaseHandle(mparam);
 	UpdateNetworkPlayers();
@@ -688,7 +701,7 @@ reNetworkClientConnectMenu(void * /* dummy */)
 		GetHumanDriver(driver,1);
 		driver.client = true;
 		strcpy(driver.name,g_strDriver.c_str());
-		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),TORCSNGPORT,driver.name))
+		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,driver.name))
 		{
 			//failed so back to connect menu
 			reNetworkClientMenu(NULL);
@@ -716,32 +729,32 @@ reNetworkClientConnectMenu(void * /* dummy */)
 
 	SetRacemanMenuHandle(racemanMenuHdle);
 
-	trackHd = CreateLabelControl(racemanMenuHdle,mparam,"trackname");
+	g_trackHd = CreateLabelControl(racemanMenuHdle,mparam,"trackname");
 
-	lapsHd = CreateLabelControl(racemanMenuHdle,mparam,"lapcountname");
-	catHd = CreateLabelControl(racemanMenuHdle,mparam,"carcatname");
+	g_lapsHd = CreateLabelControl(racemanMenuHdle,mparam,"lapcountname");
+	g_catHd = CreateLabelControl(racemanMenuHdle,mparam,"carcatname");
 
-	OutlineId = CreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
+	g_OutlineId = CreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
 	//Show players
 	for (int i = 0; i < MAXNETWORKPLAYERS; i++) 
 	{
 		char buf[1024];
 		sprintf(buf,"ready%i",i);
-		readystatus[i] = CreateStaticImageControl(racemanMenuHdle,mparam,buf);
-		GfuiVisibilitySet(racemanMenuHdle,readystatus[i],false);
+		g_readystatus[i] = CreateStaticImageControl(racemanMenuHdle,mparam,buf);
+		GfuiVisibilitySet(racemanMenuHdle,g_readystatus[i],false);
 
 		sprintf(buf,"driver%i",i);
-		playerNames[i] = CreateLabelControl(racemanMenuHdle,mparam,buf);
-		GfuiLabelSetText(racemanMenuHdle,playerNames[i],"");
+		g_playerNames[i] = CreateLabelControl(racemanMenuHdle,mparam,buf);
+		GfuiLabelSetText(racemanMenuHdle,g_playerNames[i],"");
 		sprintf(buf,"car%i",i);
-		carNames[i] =  CreateLabelControl(racemanMenuHdle,mparam,buf);
-		GfuiLabelSetText(racemanMenuHdle,carNames[i],"");
+		g_carNames[i] =  CreateLabelControl(racemanMenuHdle,mparam,buf);
+		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
 	}
 
-	ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onClientPlayerReady);
-	CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
+	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onClientPlayerReady);
+	g_CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
 
-	DisconnectButtonId = CreateButtonControl(racemanMenuHdle,mparam,"disconnect",NULL,reNetworkClientDisconnect);
+	g_DisconnectButtonId = CreateButtonControl(racemanMenuHdle,mparam,"disconnect",NULL,reNetworkClientDisconnect);
 
 
 	GfParmReleaseHandle(mparam);
@@ -756,9 +769,9 @@ reNetworkClientConnectMenu(void * /* dummy */)
 static void 
 ChangeName(void * /*dummy*/)
 {
-    	char	*val;
+   	char	*val;
 
-    	val = GfuiEditboxGetString(racemanMenuHdle, NameId);
+   	val = GfuiEditboxGetString(racemanMenuHdle, g_NameId);
 	if (val!=NULL)
 		g_strDriver = val;
 	
@@ -767,9 +780,9 @@ ChangeName(void * /*dummy*/)
 static void
 ChangeIP(void * /* dummy */)
 {
-    	char	*val;
+   	char	*val;
 
-    	val = GfuiEditboxGetString(racemanMenuHdle, IPEditId);
+   	val = GfuiEditboxGetString(racemanMenuHdle, g_IPEditId);
 	if (val!=NULL)
 		g_strHostIP = val;
 }
@@ -831,7 +844,7 @@ void reNetworkClientMenu(void * /* dummy */)
 	
 	
 	GfuiLabelCreate(racemanMenuHdle, "IP Address:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-	IPEditId = GfuiEditboxCreate(racemanMenuHdle, "", GFUI_FONT_MEDIUM_C,
+	g_IPEditId = GfuiEditboxCreate(racemanMenuHdle, "", GFUI_FONT_MEDIUM_C,
 					x2+10, y, 180, 16, NULL, (tfuiCallback)NULL, ChangeIP);
 
 	y-=dy;
@@ -839,7 +852,7 @@ void reNetworkClientMenu(void * /* dummy */)
 	char namebuf[255];
 	sprintf(namebuf,"%s",g_strDriver.c_str());
 	GfuiLabelCreate(racemanMenuHdle, "Name:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-	NameId = GfuiEditboxCreate(racemanMenuHdle, namebuf, GFUI_FONT_MEDIUM_C, x2+10, y, 180,16,NULL,(tfuiCallback)NULL,ChangeName);
+	g_NameId = GfuiEditboxCreate(racemanMenuHdle, namebuf, GFUI_FONT_MEDIUM_C, x2+10, y, 180,16,NULL,(tfuiCallback)NULL,ChangeName);
 
 	GfuiButtonCreate(racemanMenuHdle, "Connect", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 	NULL, reNetworkClientConnectMenu, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);

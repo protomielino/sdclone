@@ -142,7 +142,7 @@ bool Client::ConnectToServer(const char *pAddress,int port, const char *pClientN
     ENetAddress caddress;
     caddress.host = ENET_HOST_ANY;
     /* Bind the server to port*/
-    caddress.port = TORCSNGPEERPORT;
+    caddress.port = SPEEDDREAMSPEERPORT;
 
     m_pHost = enet_host_create (&caddress /* create a peer host */,
                 MAXNETWORKPLAYERS, 
