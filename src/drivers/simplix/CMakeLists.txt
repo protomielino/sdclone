@@ -82,11 +82,7 @@ SET(ROBOT_SHIPSUBDIRS 0 trb1-cavallo-360rb tracks)
 ROBOT_DATA(NAME ${ROBOT_NAME} SHIPPREFIX src 
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
-SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24
-		      25 26 27 28 29
-                      indycar01 indycar02 indycar03 indycar04 indycar05 indycar06 indycar07
-					  indycar08 indycar09 indycar10 indycar11 indycar12 indycar13 indycar14
-                      indycar15 tracks)
+SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 9 indycar01 tracks)
 
 ROBOT_DATA(NAME simplix_indy SHIPPREFIX simplix_indy
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
