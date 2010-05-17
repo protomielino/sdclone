@@ -290,6 +290,17 @@ void SetUpSimplix_ls1()
 //==========================================================================*
 
 //==========================================================================*
+// Schismatic entry point for simplix_gp1600
+//--------------------------------------------------------------------------*
+void SetUpSimplix_gp1600()
+{
+	cRobotType = RTYPE_SIMPLIX_GP1600;
+	SetParameters(NBBOTS, "gp1600");
+	//TDriver::UseSCSkilling = true; 
+};
+//==========================================================================*
+
+//==========================================================================*
 // Handle module entry for Speed Dreams Interface V1.00 (new fixed name scheme)
 //--------------------------------------------------------------------------*
 int moduleWelcomeV1_00
@@ -373,6 +384,8 @@ int moduleWelcomeV1_00
 	else if (strncmp(RobName,"simplix_INDY",strlen("simplix_INDY")) == 0)
 		SetUpSimplix_indy();
 	else if (strncmp(RobName,"simplix_LS1",strlen("simplix_LS1")) == 0)
+		SetUpSimplix_ls1();
+	else if (strncmp(RobName,"simplix_gp1600",strlen("simplix_gp1600")) == 0)
 		SetUpSimplix_ls1();
 	else 
 		SetUpSimplix();
@@ -575,6 +588,14 @@ static int InitFuncPt(int Index, void *Pt)
     cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_LS1;
     cRobot[Index-IndexOffset]->ScaleSide(0.95f,0.95f);
     cRobot[Index-IndexOffset]->SideBorderOuter(0.20f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_GP1600)
+  {
+    GfOut("#cRobotType == RTYPE_SIMPLIX_GP1600\n");
+    cRobot[Index-IndexOffset]->CalcCrvFoo = &TDriver::CalcCrv_simplix_GP1600;
+    cRobot[Index-IndexOffset]->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_GP1600;
+    cRobot[Index-IndexOffset]->ScaleSide(0.85f,0.85f);
+    cRobot[Index-IndexOffset]->SideBorderOuter(0.75f);
   }
 
   return 0;
@@ -831,6 +852,20 @@ extern "C" int simplix_ls1(tModInfo *ModInfo)
 	  return -1;
 
   SetParameters(10, "ls1-ciclon-rgt");
+  return simplixEntryPoint(ModInfo,RobotSettings);
+};
+//==========================================================================*
+
+//==========================================================================*
+// Schismatic entry point for simplix_gp1600
+//--------------------------------------------------------------------------*
+extern "C" int simplix_gp1600(tModInfo *ModInfo)
+{
+  void *RobotSettings = GetFileHandle("simplix_gp1600");
+  if (!RobotSettings)
+	  return -1;
+
+  SetParameters(10, "gp1600");
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*

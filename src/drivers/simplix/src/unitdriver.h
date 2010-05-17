@@ -424,6 +424,7 @@ private:
 	double CalcCrv_simplix_36GP(double Crv);
 	double CalcCrv_simplix_INDY(double Crv);
 	double CalcCrv_simplix_LS1(double Crv);
+	double CalcCrv_simplix_GP1600(double Crv);
 
 	double CalcHairpin_simplix(double Crv);
 	double CalcHairpin_simplix_TRB1(double Crv);
@@ -431,6 +432,7 @@ private:
 	double CalcHairpin_simplix_36GP(double Crv);
 	double CalcHairpin_simplix_INDY(double Crv);
 	double CalcHairpin_simplix_LS1(double Crv);
+	double CalcHairpin_simplix_GP1600(double Crv);
 
 	void UseFilterAccel(){oUseFilterAccel = true;};
 	void UseAccelOut(){oUseAccelOut = true;};

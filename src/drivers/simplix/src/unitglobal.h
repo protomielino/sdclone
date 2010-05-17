@@ -98,6 +98,7 @@
 #define RTYPE_SIMPLIX_36GP 3                     // Robot type simplix_36GP
 #define RTYPE_SIMPLIX_INDY 4					 // Robot type simplix_indy
 #define RTYPE_SIMPLIX_LS1  5					 // Robot type simplix_ls1
+#define RTYPE_SIMPLIX_GP1600 6					 // Robot type simplix_gp1600
 //==========================================================================*
 
 //==========================================================================*
