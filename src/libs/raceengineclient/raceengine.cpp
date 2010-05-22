@@ -66,7 +66,7 @@
 # define PrintEvent(name, header, footer)	 \
 	if (header) GfOut(header); \
 	if (tPrev##name == 0.0) tPrev##name = tLast##name; \
-	GfOut("%s %2d %5.1f ", #name, nLast##name - nPrev##name, (tLast##name - tPrev##name)*1000); \
+	GfOut("%s %2d %7.3f ", #name, nLast##name - nPrev##name, (tLast##name - tPrev##name)*1000); \
 	nPrev##name = nLast##name; \
 	tPrev##name = tLast##name; \
 	if (footer) GfOut(footer);
@@ -74,8 +74,6 @@
 # define PrintEvent(name, header, footer)
 #endif
 
-//DeclareEventType(Update);
-//DeclareEventType(OneStep);
 DeclareEventType(Robots);
 DeclareEventType(Simu);
 DeclareEventType(Graphic);
@@ -851,8 +849,6 @@ ReOneStep(double deltaTimeIncrement)
 	tRobotItf *robot;
 	tSituation *s = ReInfo->s;
 
-	//SignalEvent(OneStep);
-
 	if (GetNetwork())
 	{
 		//Resync clock in case computer falls behind
@@ -904,7 +900,7 @@ ReOneStep(double deltaTimeIncrement)
 				robot->rbDrive(robot->index, s->cars[i], s);
 			}
 			else if (! (s->cars[i]->_state & RM_CAR_STATE_ENDRACE_CALLED ) && ( s->cars[i]->_state & RM_CAR_STATE_OUT ) == RM_CAR_STATE_OUT )
-			{ // ^^ No simu, look if it is out
+			{ // No simu, look if it is out
 				robot = s->cars[i]->robot;
 				if (robot->rbEndRace)
 					robot->rbEndRace(robot->index, s->cars[i], s);
@@ -996,7 +992,6 @@ ReUpdate(void)
     case RM_DISP_MODE_NORMAL:
 	t = GfTimeClock();
 
-	//SignalEvent(Update);
 	START_PROFILE("ReOneStep*");
 	while (ReInfo->_reRunning && ((t - ReInfo->_reCurTime) > RCM_MAX_DT_SIMU)) {
 	    ReOneStep(RCM_MAX_DT_SIMU);
@@ -1012,8 +1007,6 @@ ReUpdate(void)
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
 	GfelPostRedisplay();	/* Callback -> reDisplay */
 	
-	//PrintEvent(Update, "Events: ", 0);
-	//PrintEvent(OneStep, 0, 0);
 	PrintEvent(Robots, "Events: ", 0);
 	PrintEvent(Simu, 0, 0);
 	PrintEvent(Graphic, 0, "\n");
@@ -1021,6 +1014,8 @@ ReUpdate(void)
 	
     case RM_DISP_MODE_NONE:
 	ReOneStep(RCM_MAX_DT_SIMU);
+	PrintEvent(Robots, "Events: ", 0);
+	PrintEvent(Simu, 0, "\n");
 	if (ReInfo->_refreshDisplay) {
 	    GfuiDisplay();
 	}
