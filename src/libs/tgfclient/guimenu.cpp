@@ -661,19 +661,20 @@ CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *us
                 return -1;
         }
 
-        const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
+// TODO : Add real support for tips (the onFocus/onFocusLost system is already used
+//        for user input management)
+//         const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
+//         if (strlen(pszTip) > 0)
+//         {
+//                 tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+//                 cbinfo->screen = menuHandle;
+//                 cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+//                 GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
 
-        if (strlen(pszTip) > 0)
-        {
-                tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
-                cbinfo->screen = menuHandle;
-                cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
-                GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
-
-                userDataOnFocus = (void*)cbinfo;
-                onFocus = dispInfo;
-                onFocusLost = remInfo;
-        }
+//                 userDataOnFocus = (void*)cbinfo;
+//                 onFocus = dispInfo;
+//                 onFocusLost = remInfo;
+//         }
 
         const char* pszText = GfParmGetStr(param, strControlName.c_str(), "text", "");
         const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
