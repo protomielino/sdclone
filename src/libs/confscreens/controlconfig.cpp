@@ -109,11 +109,14 @@ static int		JoyButtons[GFCTRL_JOY_NUMBER];
 
 static float SteerSensVal;
 static float DeadZoneVal;
+static float SteerSpeedSensVal;
 
 static char buf[1024];
 
 static int SteerSensEditId;
+static int DeadZoneLabelId;
 static int DeadZoneEditId;
+static int SteerSpeedSensEditId;
 static int CalibrateButtonId;
 
 static tGearChangeMode GearChangeMode;
@@ -133,9 +136,11 @@ onSteerSensChange(void * /* dummy */)
 
     val = GfuiEditboxGetString(ScrHandle, SteerSensEditId);
     if (sscanf(val, "%f", &fv) == 1) {
-	sprintf(buf, "%f", fv);
-	SteerSensVal = fv;
+	if (fv <= 0.0)
+	    fv = 1.0e-6;
+	sprintf(buf, "%6.4f", fv);
 	GfuiEditboxSetString(ScrHandle, SteerSensEditId, buf);
+	SteerSensVal = fv;
     } else {
 	GfuiEditboxSetString(ScrHandle, SteerSensEditId, "");
     }
@@ -150,11 +155,34 @@ onDeadZoneChange(void * /* dummy */)
 
     val = GfuiEditboxGetString(ScrHandle, DeadZoneEditId);
     if (sscanf(val, "%f", &fv) == 1) {
-	sprintf(buf, "%f", fv);
-	DeadZoneVal = fv;
+	if (fv < 0.0)
+	    fv = 0.0;
+	else if (fv > 1.0)
+		fv = 1.0;
+	sprintf(buf, "%6.4f", fv);
 	GfuiEditboxSetString(ScrHandle, DeadZoneEditId, buf);
+	DeadZoneVal = fv;
     } else {
 	GfuiEditboxSetString(ScrHandle, SteerSensEditId, "");
+    }
+    
+}
+
+static void
+onSteerSpeedSensChange(void * /* dummy */)
+{
+    char	*val;
+    float	fv;
+
+    val = GfuiEditboxGetString(ScrHandle, SteerSpeedSensEditId);
+    if (sscanf(val, "%f", &fv) == 1) {
+	if (fv < 0.0)
+	    fv = 0.0;
+	sprintf(buf, "%6.4f", fv);
+	GfuiEditboxSetString(ScrHandle, SteerSpeedSensEditId, buf);
+	SteerSpeedSensVal = fv;
+    } else {
+	GfuiEditboxSetString(ScrHandle, SteerSpeedSensEditId, "");
     }
     
 }
@@ -192,7 +220,7 @@ updateButtonText(void)
     int		cmdInd;
     const char	*str;
 
-    /* No calibration needed for the moment (but let's check this ...) */
+    /* No calibration / no dead zone needed for the moment (but let's check this ...) */
     MouseCalNeeded = 0;
     JoyCalNeeded   = 0;
 
@@ -215,18 +243,40 @@ updateButtonText(void)
 	}
     }
 
+	/* According to detected action, update the "dead zone needed" flag */
+    int deadZoneNeeded = 1;
+	if ((Cmd[0].ref.type == GFCTRL_TYPE_KEYBOARD
+			|| Cmd[0].ref.type == GFCTRL_TYPE_JOY_BUT
+			|| Cmd[0].ref.type == GFCTRL_TYPE_MOUSE_BUT)
+		&& (Cmd[1].ref.type == GFCTRL_TYPE_KEYBOARD
+			|| Cmd[1].ref.type == GFCTRL_TYPE_JOY_BUT
+			|| Cmd[1].ref.type == GFCTRL_TYPE_MOUSE_BUT)) {
+	    deadZoneNeeded = 0;
+	}
+
     /* Update Steer Sensibility editbox */
-    sprintf(buf, "%f", SteerSensVal);
+    sprintf(buf, "%6.4f", SteerSensVal);
     GfuiEditboxSetString(ScrHandle, SteerSensEditId, buf);
 
     /* Update Steer Dead Zone editbox */
-    sprintf(buf, "%f", DeadZoneVal);
+    sprintf(buf, "%6.4f", DeadZoneVal);
     GfuiEditboxSetString(ScrHandle, DeadZoneEditId, buf);
+
+    /* Update Steer Speed Sensitivity editbox */
+    sprintf(buf, "%6.4f", SteerSpeedSensVal);
+    GfuiEditboxSetString(ScrHandle, SteerSpeedSensEditId, buf);
 
     /* Show / hide mouse / joystick calibration button,
        according to the detected input device actions */
     GfuiVisibilitySet(ScrHandle, CalibrateButtonId, 
 		      MouseCalNeeded|JoyCalNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
+	
+    /* Show / hide dead zone label /editbox,
+       according to the detected input device actions */
+    GfuiVisibilitySet(ScrHandle, DeadZoneLabelId, 
+		      deadZoneNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
+    GfuiVisibilitySet(ScrHandle, DeadZoneEditId, 
+		      deadZoneNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
 }
 
 static void
@@ -442,7 +492,7 @@ onActivate(void * /* dummy */)
 	/* For each control : */
 	for (int cmd = 0; cmd < MaxCmd; cmd++) {
 
-	    /* Show / hide control editbox according to selected gear changing mode code */
+	    /* Show / hide control editboxes according to selected gear changing mode code */
 	    if (GearChangeMode & CmdDispInfo[cmd].gearChangeModeMask)
 	    {
 	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].labelId, GFUI_VISIBLE);
@@ -459,23 +509,6 @@ onActivate(void * /* dummy */)
     updateButtonText();
 
     AcceptMouseClicks = 1;
-
-    // Initialize mouse and joystick/gamepad/wheel calibration flags
-    // according to current control settings.
-    MouseCalNeeded = 0;
-    JoyCalNeeded = 0;
-    for (cmdInd = 0; cmdInd < MaxCmd; cmdInd++) {
-	if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_MOUSE_AXIS) {
-	    MouseCalNeeded = 1;
-	} else if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_JOY_AXIS) {
-	    JoyCalNeeded = 1;
-	}
-    }
-
-    /* Show / hide mouse / joystick calibration button,
-       according to the loaded input device actions */
-    GfuiVisibilitySet(ScrHandle, CalibrateButtonId, 
-		      MouseCalNeeded|JoyCalNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
 }
 
 static void
@@ -561,11 +594,15 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     
     /* Steer Sensibility label and associated editbox */
     CreateLabelControl(ScrHandle,param,"Steer Sensitivity");
-    SteerSensEditId = CreateEditControl(ScrHandle,param,"SteerSensitivityEdit",NULL,NULL,onSteerSensChange);
+    SteerSensEditId = CreateEditControl(ScrHandle,param,"Steer Sensitivity Edit",NULL,NULL,onSteerSensChange);
 
     /* Steer Dead Zone label and associated editbox */
-    CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
+    DeadZoneLabelId = CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
     DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
+
+    /* Steer Speed Sensibility label and associated editbox */
+    CreateLabelControl(ScrHandle,param,"Steer Speed Sensitivity");
+    SteerSpeedSensEditId = CreateEditControl(ScrHandle,param,"Steer Speed Sensitivity Edit",NULL,NULL,onSteerSpeedSensChange);
 
     /* Save button and associated keyboard shortcut */
     CreateButtonControl(ScrHandle,param,"save",PrevScrHandle,onSave);
@@ -632,10 +669,22 @@ void ControlGetSettings(void *prefHdle, unsigned index)
     /* Load also Steer sensibility (default from mouse prefs) */
     SteerSensVal = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_SENS, NULL, 0);
     SteerSensVal = GfParmGetNum(prefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
+	if (SteerSensVal <= 0.0)
+	    SteerSensVal = 1.0e-6;
 
     /* Load also Dead zone (default from mouse prefs) */
     DeadZoneVal = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_DEAD, NULL, 0);
     DeadZoneVal = GfParmGetNum(prefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
+	if (DeadZoneVal < 0.0)
+	    DeadZoneVal = 0.0;
+	else if (DeadZoneVal > 1.0)
+		DeadZoneVal = 1.0;
+	
+    /* Load also Steer speed sensibility (default from mouse prefs) */
+    SteerSpeedSensVal = GfParmGetNum(prefHdle, HM_SECT_MOUSEPREF, HM_ATT_STEER_SPD, NULL, 0);
+    SteerSpeedSensVal = GfParmGetNum(prefHdle, CurrentSection, HM_ATT_STEER_SPD, NULL, SteerSpeedSensVal);
+	if (SteerSpeedSensVal < 0.0)
+	    SteerSpeedSensVal = 0.0;
 }
 
 /* From global vars (Cmd, SteerSensVal, DeadZoneVal) to parms (prefHdle) */
@@ -678,6 +727,7 @@ void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChan
     /* Steer sensitivity and dead zone */
     GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_SENS, NULL, SteerSensVal);
     GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_DEAD, NULL, DeadZoneVal);
+    GfParmSetNum(prefHdle, CurrentSection, HM_ATT_STEER_SPD,  NULL, SteerSpeedSensVal);
 
     /* Name, min, max and power, for each possible command */
     for (iCmd = 0; iCmd < MaxCmd; iCmd++) {

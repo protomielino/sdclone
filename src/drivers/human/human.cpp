@@ -23,9 +23,15 @@
     @version	$Id$
 */
 
-// Comment out the following line to get back to the old "binary control command
-// steering smoother code".
-#define JEPZ_BINCTRL_STEERING
+// Flags for selecting the "binary control steering code" variant :
+// * Old variant
+#define OLD 0
+// * Jepz variant
+#define JEPZ 1
+// * JPM variant
+#define JPM 2
+// * if neither JEPZ or JPM variant are selected, the old code is used.
+#define BINCTRL_STEERING JPM
 
 #include <map>
 #include <string>
@@ -459,6 +465,11 @@ newrace(int index, tCarElt* car, tSituation *s)
 	else
 		HCtx[idx]->autoClutch = false;
 
+	//GfOut("SteerCmd : Left : sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
+	//	  cmd[CMD_LEFTSTEER].sens, cmd[CMD_LEFTSTEER].spdSens, cmd[CMD_LEFTSTEER].deadZone);
+	//GfOut("SteerCmd : Right: sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
+	//	  cmd[CMD_RIGHTSTEER].sens, cmd[CMD_RIGHTSTEER].spdSens, cmd[CMD_RIGHTSTEER].deadZone);
+
 	// Setup Keyboard map (key code => index of the associated command in keyInfo / lastReadKeyState).
 	for (int i = 0; i < NbCmdControl; i++)
 	{
@@ -544,7 +555,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	tdble throttle;
 	tdble leftSteer;
 	tdble rightSteer;
-#ifdef JEPZ_BINCTRL_STEERING
+#if (BINCTRL_STEERING == JEPZ || BINCTRL_STEERING == JPM)
 	tdble sensFrac, speedFrac;
 #endif
 	int scrw, scrh, dummy;
@@ -642,7 +653,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			} else if (ax0 < cmd[CMD_LEFTSTEER].min) {
 				ax0 = cmd[CMD_LEFTSTEER].min;
 			}
-			leftSteer = -SIGN(ax0) * cmd[CMD_LEFTSTEER].pow * pow(fabs(ax0), cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x);
+			leftSteer = -SIGN(ax0) * cmd[CMD_LEFTSTEER].pow * pow(fabs(ax0), 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 100.0);
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_LEFTSTEER].val] - cmd[CMD_LEFTSTEER].deadZone;
@@ -652,7 +663,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_LEFTSTEER].min;
 			}
 			ax0 = ax0 * cmd[CMD_LEFTSTEER].pow;
-			leftSteer = pow(fabs(ax0), cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 10.0);
+			leftSteer = pow(fabs(ax0), 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0f + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 1000.0);
 			break;
 		case GFCTRL_TYPE_KEYBOARD:
 		case GFCTRL_TYPE_JOY_BUT:
@@ -664,24 +675,36 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			} else {
 				ax0 = joyInfo->levelup[cmd[CMD_LEFTSTEER].val];
 			}
-#ifdef JEPZ_BINCTRL_STEERING
+#if (BINCTRL_STEERING == JEPZ)
 			if (ax0 == 0) {
 				leftSteer = HCtx[idx]->prevLeftSteer - s->deltaTime * 5.0;
 			} else {
 				ax0 = 2 * ax0 - 1;
-				sensFrac = (cmd[CMD_LEFTSTEER].sens != 0.0) ? 10.0 / cmd[CMD_LEFTSTEER].sens : 1.0;
-				speedFrac = fabs(car->_speed_x * cmd[CMD_LEFTSTEER].spdSens * 100.0);
+				sensFrac = 10.0 * cmd[CMD_LEFTSTEER].sens;
+				speedFrac = fabs(car->_speed_x * cmd[CMD_LEFTSTEER].spdSens);
 				if (speedFrac < 1.0) speedFrac = 1.0;
 				leftSteer = HCtx[idx]->prevLeftSteer + s->deltaTime * ax0 * sensFrac / speedFrac;
 			}
 			if (leftSteer > 1.0) leftSteer = 1.0;
 			if (leftSteer < 0.0) leftSteer = 0.0;
+#elif (BINCTRL_STEERING == JPM)
+			// ax should be 0 or 1 here (to be checked) => -1 (zero steer) or +1 (full steer left).
+			ax0 = 2 * ax0 - 1;
+			sensFrac = 1.0 + (3.5 - 1.5 * ax0) * cmd[CMD_LEFTSTEER].sens;
+			speedFrac = 1.0 + car->_speed_x * car->_speed_x * cmd[CMD_LEFTSTEER].spdSens / 300.0;
+			leftSteer = HCtx[idx]->prevLeftSteer + s->deltaTime * ax0 * sensFrac / speedFrac;
+			//GfOut("Left : ax=%4.1f, ws=%4.2f, ss=%4.2f, prev=%5.2f, new=%5.2f (spd=%6.2f)\n",
+			//	  ax0, sensFrac, speedFrac, HCtx[idx]->prevLeftSteer, leftSteer, car->_speed_x);
+			if (leftSteer > 1.0)
+				leftSteer = 1.0;
+			else if (leftSteer < 0.0)
+				leftSteer = 0.0;
 #else
 			if (ax0 == 0) {
 				leftSteer = 0;
 			} else {
 				ax0 = 2 * ax0 - 1;
-				leftSteer = HCtx[idx]->prevLeftSteer + ax0 * cmd[CMD_LEFTSTEER].sens * s->deltaTime / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 10.0);
+				leftSteer = HCtx[idx]->prevLeftSteer + ax0 * s->deltaTime / cmd[CMD_LEFTSTEER].sens / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 1000.0);
 				if (leftSteer > 1.0) leftSteer = 1.0;
 				if (leftSteer < 0.0) leftSteer = 0.0;
 			}
@@ -701,7 +724,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			} else if (ax0 < cmd[CMD_RIGHTSTEER].min) {
 				ax0 = cmd[CMD_RIGHTSTEER].min;
 			}
-			rightSteer = -SIGN(ax0) * cmd[CMD_RIGHTSTEER].pow * pow(fabs(ax0), cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x);
+			rightSteer = -SIGN(ax0) * cmd[CMD_RIGHTSTEER].pow * pow(fabs(ax0), 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 100.0);
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_RIGHTSTEER].val] - cmd[CMD_RIGHTSTEER].deadZone;
@@ -711,7 +734,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_RIGHTSTEER].min;
 			}
 			ax0 = ax0 * cmd[CMD_RIGHTSTEER].pow;
-			rightSteer = - pow(fabs(ax0), cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 10.0);
+			rightSteer = - pow(fabs(ax0), 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0f + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 1000.0);
 			break;
 		case GFCTRL_TYPE_KEYBOARD:
 		case GFCTRL_TYPE_JOY_BUT:
@@ -723,24 +746,36 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			} else {
 				ax0 = joyInfo->levelup[cmd[CMD_RIGHTSTEER].val];
 			}
-#ifdef JEPZ_BINCTRL_STEERING
+#if (BINCTRL_STEERING == JEPZ)
 			if (ax0 == 0) {
 				rightSteer = HCtx[idx]->prevRightSteer + s->deltaTime * 5.0;
 			} else {
 				ax0 = 2 * ax0 - 1;
-				sensFrac = (cmd[CMD_RIGHTSTEER].sens != 0.0) ? 10.0 / cmd[CMD_RIGHTSTEER].sens : 1.0;
-				speedFrac = fabs(car->_speed_x * cmd[CMD_RIGHTSTEER].spdSens * 100.0);
+				sensFrac = 10.0 * cmd[CMD_RIGHTSTEER].sens;
+				speedFrac = fabs(car->_speed_x * cmd[CMD_RIGHTSTEER].spdSens);
 				if (speedFrac < 1.0) speedFrac = 1.0;
 				rightSteer = HCtx[idx]->prevRightSteer - s->deltaTime * ax0 * sensFrac / speedFrac;
 			}
 			if (rightSteer > 0.0) rightSteer = 0.0;
 			if (rightSteer < -1.0) rightSteer = -1.0;
+#elif (BINCTRL_STEERING == JPM)
+			// ax should be 0 or 1 here (to be checked) => -1 (zero steer) or +1 (full steer left).
+			ax0 = 2 * ax0 - 1;
+			sensFrac = 1.0 + (3.5 - 1.5 * ax0) * cmd[CMD_RIGHTSTEER].sens;
+			speedFrac = 1.0 + car->_speed_x * car->_speed_x * cmd[CMD_RIGHTSTEER].spdSens / 300.0;
+			rightSteer = HCtx[idx]->prevRightSteer - s->deltaTime * ax0 * sensFrac / speedFrac;
+			//GfOut("Right: ax=%4.1f, ws=%4.2f, ss=%4.2f, prev=%5.2f, new=%5.2f (spd=%6.2f)\n",
+			//	  ax0, sensFrac, speedFrac, HCtx[idx]->prevRightSteer, rightSteer, car->_speed_x);
+			if (rightSteer < -1.0)
+				rightSteer = -1.0;
+			else if (rightSteer > 0.0)
+				rightSteer = 0.0;
 #else
 			if (ax0 == 0) {
 				rightSteer = 0;
 			} else {
 				ax0 = 2 * ax0 - 1;
-				rightSteer = HCtx[idx]->prevRightSteer - ax0 * cmd[CMD_RIGHTSTEER].sens * s->deltaTime/ (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 10.0);
+				rightSteer = HCtx[idx]->prevRightSteer - ax0 * s->deltaTime / cmd[CMD_RIGHTSTEER].sens / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 1000.0);
 				if (rightSteer > 0.0) rightSteer = 0.0;
 				if (rightSteer < -1.0) rightSteer = -1.0;
 			}
@@ -766,7 +801,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			car->_brakeCmd = fabs(cmd[CMD_BRAKE].pow *
 						pow(fabs((brake - cmd[CMD_BRAKE].minVal) /
 							(cmd[CMD_BRAKE].max - cmd[CMD_BRAKE].min)),
-						cmd[CMD_BRAKE].sens));
+						1.0f / cmd[CMD_BRAKE].sens));
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_BRAKE].val] - cmd[CMD_BRAKE].deadZone;
@@ -776,7 +811,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_BRAKE].min;
 			}
 			ax0 = ax0 * cmd[CMD_BRAKE].pow;
-			car->_brakeCmd =  pow(fabs(ax0), cmd[CMD_BRAKE].sens) / (1.0 + cmd[CMD_BRAKE].spdSens * car->_speed_x / 10.0);
+			car->_brakeCmd =  pow(fabs(ax0), 1.0f / cmd[CMD_BRAKE].sens) / (1.0 + cmd[CMD_BRAKE].spdSens * car->_speed_x / 1000.0);
 			break;
 		case GFCTRL_TYPE_JOY_BUT:
 			car->_brakeCmd = joyInfo->levelup[cmd[CMD_BRAKE].val];
@@ -803,7 +838,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			car->_clutchCmd = fabs(cmd[CMD_CLUTCH].pow *
 						pow(fabs((clutch - cmd[CMD_CLUTCH].minVal) /
 							(cmd[CMD_CLUTCH].max - cmd[CMD_CLUTCH].min)),
-						cmd[CMD_CLUTCH].sens));
+						1.0f / cmd[CMD_CLUTCH].sens));
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_CLUTCH].val] - cmd[CMD_CLUTCH].deadZone;
@@ -813,7 +848,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_CLUTCH].min;
 			}
 			ax0 = ax0 * cmd[CMD_CLUTCH].pow;
-			car->_clutchCmd =  pow(fabs(ax0), cmd[CMD_CLUTCH].sens) / (1.0 + cmd[CMD_CLUTCH].spdSens * car->_speed_x / 10.0);
+			car->_clutchCmd =  pow(fabs(ax0), 1.0f / cmd[CMD_CLUTCH].sens) / (1.0 + cmd[CMD_CLUTCH].spdSens * car->_speed_x / 1000.0);
 			break;
 		case GFCTRL_TYPE_JOY_BUT:
 			car->_clutchCmd = joyInfo->levelup[cmd[CMD_CLUTCH].val];
@@ -844,7 +879,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			car->_accelCmd = fabs(cmd[CMD_THROTTLE].pow *
 						pow(fabs((throttle - cmd[CMD_THROTTLE].minVal) /
 								(cmd[CMD_THROTTLE].max - cmd[CMD_THROTTLE].min)),
-							cmd[CMD_THROTTLE].sens));
+							1.0f / cmd[CMD_THROTTLE].sens));
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_THROTTLE].val] - cmd[CMD_THROTTLE].deadZone;
@@ -854,7 +889,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_THROTTLE].min;
 			}
 			ax0 = ax0 * cmd[CMD_THROTTLE].pow;
-			car->_accelCmd =  pow(fabs(ax0), cmd[CMD_THROTTLE].sens) / (1.0 + cmd[CMD_THROTTLE].spdSens * car->_speed_x / 10.0);
+			car->_accelCmd =  pow(fabs(ax0), 1.0f / cmd[CMD_THROTTLE].sens) / (1.0 + cmd[CMD_THROTTLE].spdSens * car->_speed_x / 1000.0);
 			if (isnan (car->_accelCmd)) {
 				car->_accelCmd = 0;
 			}

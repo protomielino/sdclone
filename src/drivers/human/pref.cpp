@@ -73,123 +73,133 @@ const std::string Yn[] = {HM_VAL_YES, HM_VAL_NO};
 void
 HmReadPrefs(const int index)
 {
-    const char	*prm;
-    const char	*defaultSettings;
-    char	sstring[1024];
-    tCtrlRef	*ref;
-    const int	idx = index - 1;
-    tControlCmd	*cmdCtrl;
+	const char	*prm;
+	const char	*defaultSettings;
+	char	sstring[1024];
+	tCtrlRef	*ref;
+	const int	idx = index - 1;
+	tControlCmd	*cmdCtrl;
 
-    cmdCtrl = HCtx[idx]->cmdControl = (tControlCmd *) calloc (NbCmdControl, sizeof (tControlCmd));
-    memcpy(cmdCtrl, CmdControlRef, NbCmdControl * sizeof (tControlCmd));
+	cmdCtrl = HCtx[idx]->cmdControl = (tControlCmd *) calloc (NbCmdControl, sizeof (tControlCmd));
+	memcpy(cmdCtrl, CmdControlRef, NbCmdControl * sizeof (tControlCmd));
 
-    sprintf(sstring, "%s%s", GetLocalDir(), HM_PREF_FILE);
-    PrefHdle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-    sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
-    if (!strcmp(prm, HM_VAL_AUTO))
-        HCtx[idx]->transmission = eTransAuto;
-    else if (!strcmp(prm, HM_VAL_SEQ))
-        HCtx[idx]->transmission = eTransSeq;
-    else
-        HCtx[idx]->transmission = eTransGrid;
+	sprintf(sstring, "%s%s", GetLocalDir(), HM_PREF_FILE);
+	PrefHdle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
+	if (!strcmp(prm, HM_VAL_AUTO))
+		HCtx[idx]->transmission = eTransAuto;
+	else if (!strcmp(prm, HM_VAL_SEQ))
+		HCtx[idx]->transmission = eTransSeq;
+	else
+		HCtx[idx]->transmission = eTransGrid;
 
-    /* Parameters Settings */
-    //ABS on/off
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[HCtx[idx]->paramAbs].c_str());
-    HCtx[idx]->paramAbs = (prm == Yn[0]);
-    
-    //ASR on/off
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[HCtx[idx]->paramAsr].c_str());
-    HCtx[idx]->paramAsr = (prm == Yn[0]);
-    
-    //Controls
-    prm = GfParmGetStr(PrefHdle, HM_SECT_PREF, HM_ATT_CONTROL, controlList[2].parmName);
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_CONTROL, prm);
-    int i;
-    for (i = 0; i < nbControl; i++) {
-        if (!strcmp(prm, controlList[i].parmName))
-	    break;
-    }//for i
+	/* Parameters Settings */
+	//ABS on/off
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[HCtx[idx]->paramAbs].c_str());
+	HCtx[idx]->paramAbs = (prm == Yn[0]);
 	
-    if (i == nbControl)
-        i = 2;
-    
-    if (i == 0 && !joyPresent)
-        i = 2;
-    
-    defaultSettings = controlList[i].settings;
-    
-    /* Command Settings */
-    GfOut("Command settings :\n");
-    for (int cmd = 0; cmd < NbCmdControl; cmd++) {
-        prm = GfctrlGetNameByRef(cmdCtrl[cmd].type, cmdCtrl[cmd].val);
-	prm = GfParmGetStr(PrefHdle, defaultSettings, cmdCtrl[cmd].name, prm);
-	prm = GfParmGetStr(PrefHdle, sstring, cmdCtrl[cmd].name, prm);
-	if (!prm || strlen(prm) == 0) {
-	    cmdCtrl[cmd].type = GFCTRL_TYPE_NOT_AFFECTED;
-	    GfOut("  %s\t: None (-1)\n", cmdCtrl[cmd].name);
-	    continue;
-	}
+	//ASR on/off
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[HCtx[idx]->paramAsr].c_str());
+	HCtx[idx]->paramAsr = (prm == Yn[0]);
+	
+	//Controls
+	prm = GfParmGetStr(PrefHdle, HM_SECT_PREF, HM_ATT_CONTROL, controlList[2].parmName);
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_CONTROL, prm);
+	int i;
+	for (i = 0; i < nbControl; i++) {
+		if (!strcmp(prm, controlList[i].parmName))
+			break;
+	}//for i
+	
+	if (i == nbControl)
+		i = 2;
+	
+	if (i == 0 && !joyPresent)
+		i = 2;
+	
+	defaultSettings = controlList[i].settings;
+	
+	/* Command Settings */
+	GfOut("Command settings :\n");
+	for (int cmd = 0; cmd < NbCmdControl; cmd++) {
 		
-	ref = GfctrlGetRefByName(prm);
-	cmdCtrl[cmd].type = ref->type; // GFCTRL_TYPE_XX
-	cmdCtrl[cmd].val = ref->index; // Index for joy. axis, buttons ; 1-bytes ASCII code for keys.
-	GfOut("  %s\t: %s\n", cmdCtrl[cmd].name, prm);
+		prm = GfctrlGetNameByRef(cmdCtrl[cmd].type, cmdCtrl[cmd].val);
+		prm = GfParmGetStr(PrefHdle, defaultSettings, cmdCtrl[cmd].name, prm);
+		prm = GfParmGetStr(PrefHdle, sstring, cmdCtrl[cmd].name, prm);
+		if (!prm || strlen(prm) == 0) {
+			cmdCtrl[cmd].type = GFCTRL_TYPE_NOT_AFFECTED;
+			GfOut("  %s\t: None (-1)\n", cmdCtrl[cmd].name);
+			continue;
+		}
+		
+		ref = GfctrlGetRefByName(prm);
+		cmdCtrl[cmd].type = ref->type; // GFCTRL_TYPE_XX
+		cmdCtrl[cmd].val = ref->index; // Index for joy. axis, buttons ; 1-bytes ASCII code for keys.
+		GfOut("  %s\t: %s\n", cmdCtrl[cmd].name, prm);
 	
-	/* min value < max value */
-	if (cmdCtrl[cmd].minName) {
-	    cmdCtrl[cmd].min = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].minName, (char*)NULL, (tdble)cmdCtrl[cmd].min);
-	    cmdCtrl[cmd].min = cmdCtrl[cmd].minVal = (float)GfParmGetNum(PrefHdle, sstring, cmdCtrl[cmd].minName, (char*)NULL, (tdble)cmdCtrl[cmd].min);
-	}//if minName
+		/* min value < max value */
+		if (cmdCtrl[cmd].minName) {
+			cmdCtrl[cmd].min = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].minName, (char*)NULL, (tdble)cmdCtrl[cmd].min);
+			cmdCtrl[cmd].min = cmdCtrl[cmd].minVal = (float)GfParmGetNum(PrefHdle, sstring, cmdCtrl[cmd].minName, (char*)NULL, (tdble)cmdCtrl[cmd].min);
+		}//if minName
 	
-	/* max value > min value */
-	if (cmdCtrl[cmd].maxName) {
-	    cmdCtrl[cmd].max = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].maxName, (char*)NULL, (tdble)cmdCtrl[cmd].max);
-	    cmdCtrl[cmd].max = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].maxName, (char*)NULL, (tdble)cmdCtrl[cmd].max);
-	}//if maxName
+		/* max value > min value */
+		if (cmdCtrl[cmd].maxName) {
+			cmdCtrl[cmd].max = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].maxName, (char*)NULL, (tdble)cmdCtrl[cmd].max);
+			cmdCtrl[cmd].max = (float)GfParmGetNum(PrefHdle, sstring,		 cmdCtrl[cmd].maxName, (char*)NULL, (tdble)cmdCtrl[cmd].max);
+		}//if maxName
 	
-	/* 0 < sensitivity */
-	if (cmdCtrl[cmd].sensName) {
-	    cmdCtrl[cmd].sens = 1.0f / (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].sensName, (char*)NULL, 1.0 / (tdble)cmdCtrl[cmd].sens);
-	    cmdCtrl[cmd].sens = 1.0f / (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].sensName, (char*)NULL, 1.0 / (tdble)cmdCtrl[cmd].sens);
-	}//if sensName
+		/* 0 < sensitivity */
+		if (cmdCtrl[cmd].sensName) {
+			cmdCtrl[cmd].sens = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].sensName, (char*)NULL, (tdble)cmdCtrl[cmd].sens);
+			cmdCtrl[cmd].sens = (float)GfParmGetNum(PrefHdle, sstring,		 cmdCtrl[cmd].sensName, (char*)NULL, (tdble)cmdCtrl[cmd].sens);
+			if (cmdCtrl[cmd].sens <= 0.0)
+				cmdCtrl[cmd].sens = 1.0e-6;
+		}//if sensName
 	
-	/* 0 < power (1 = linear) */
-	if (cmdCtrl[cmd].powName) {
-	    cmdCtrl[cmd].pow = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].powName, (char*)NULL, (tdble)cmdCtrl[cmd].pow);
-	    cmdCtrl[cmd].pow = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].powName, (char*)NULL, (tdble)cmdCtrl[cmd].pow);
-	}//if powName
+		/* 0 < power (1 = linear) */
+		if (cmdCtrl[cmd].powName) {
+			cmdCtrl[cmd].pow = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].powName, (char*)NULL, (tdble)cmdCtrl[cmd].pow);
+			cmdCtrl[cmd].pow = (float)GfParmGetNum(PrefHdle, sstring,		 cmdCtrl[cmd].powName, (char*)NULL, (tdble)cmdCtrl[cmd].pow);
+		}//if powName
 
-	/* 0 < sensitivity to car speed */
-	if (cmdCtrl[cmd].spdSensName) {
-	    cmdCtrl[cmd].spdSens = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].spdSensName, (char*)NULL, (tdble)cmdCtrl[cmd].spdSens);
-	    cmdCtrl[cmd].spdSens = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].spdSensName, (char*)NULL, (tdble)cmdCtrl[cmd].spdSens);
-	    cmdCtrl[cmd].spdSens = cmdCtrl[cmd].spdSens / 100.0;
-	}//if spdSendName
+		/* 0 <= sensitivity to car speed */
+		if (cmdCtrl[cmd].spdSensName) {
+			cmdCtrl[cmd].spdSens = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].spdSensName, (char*)NULL, (tdble)cmdCtrl[cmd].spdSens);
+			cmdCtrl[cmd].spdSens = (float)GfParmGetNum(PrefHdle, sstring,		 cmdCtrl[cmd].spdSensName, (char*)NULL, (tdble)cmdCtrl[cmd].spdSens);
+			if (cmdCtrl[cmd].spdSens < 0.0)
+				cmdCtrl[cmd].spdSens = 0.0;
+		}//if spdSendName
 
-	/* 0 =< dead zone < max value - min value */
-	if (cmdCtrl[cmd].deadZoneName) {
-	    cmdCtrl[cmd].deadZone = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].deadZoneName, (char*)NULL, (tdble)cmdCtrl[cmd].deadZone);
-	    cmdCtrl[cmd].deadZone = (float)GfParmGetNum(PrefHdle, sstring,         cmdCtrl[cmd].deadZoneName, (char*)NULL, (tdble)cmdCtrl[cmd].deadZone);
-	}//if deadZoneName
+		/* 0 =< dead zone < max value - min value (not used for on/off controls like keyboard / mouse buttons / joystick buttons) */
+		if (cmdCtrl[cmd].deadZoneName) {
+			cmdCtrl[cmd].deadZone = (float)GfParmGetNum(PrefHdle, defaultSettings, cmdCtrl[cmd].deadZoneName, (char*)NULL, (tdble)cmdCtrl[cmd].deadZone);
+			cmdCtrl[cmd].deadZone = (float)GfParmGetNum(PrefHdle, sstring,		 cmdCtrl[cmd].deadZoneName, (char*)NULL, (tdble)cmdCtrl[cmd].deadZone);
+			if (cmdCtrl[cmd].deadZone < 0.0)
+				cmdCtrl[cmd].deadZone = 0.0;
+			else if (cmdCtrl[cmd].deadZone > 1.0)
+				cmdCtrl[cmd].deadZone = 1.0;
+		}//if deadZoneName
 	
-	if (cmdCtrl[cmd].min > cmdCtrl[cmd].max)
-	    std::swap(cmdCtrl[cmd].min, cmdCtrl[cmd].max);
+		if (cmdCtrl[cmd].min > cmdCtrl[cmd].max)
+			std::swap(cmdCtrl[cmd].min, cmdCtrl[cmd].max);
 	
-	cmdCtrl[cmd].deadZone = (cmdCtrl[cmd].max - cmdCtrl[cmd].min) * cmdCtrl[cmd].deadZone;
-	if (cmdCtrl[cmd].type == GFCTRL_TYPE_MOUSE_AXIS)
-	    HCtx[idx]->mouseControlUsed = 1;
-    }//for cmd
+		cmdCtrl[cmd].deadZone = (cmdCtrl[cmd].max - cmdCtrl[cmd].min) * cmdCtrl[cmd].deadZone;
+		
+		if (cmdCtrl[cmd].type == GFCTRL_TYPE_MOUSE_AXIS)
+			HCtx[idx]->mouseControlUsed = 1;
+		
+	}//for cmd
 
-    prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_REL_BUT_NEUTRAL, Yn[HCtx[idx]->relButNeutral].c_str());
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_REL_BUT_NEUTRAL, prm);
-    HCtx[idx]->relButNeutral = (prm == Yn[0]);
-    
-    prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, Yn[HCtx[idx]->seqShftAllowNeutral].c_str());
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, prm);
-    HCtx[idx]->seqShftAllowNeutral = (prm == Yn[0]);
-    
-    prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->autoReverse].c_str());
-    HCtx[idx]->autoReverse = (prm == Yn[0]);
+	prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_REL_BUT_NEUTRAL, Yn[HCtx[idx]->relButNeutral].c_str());
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_REL_BUT_NEUTRAL, prm);
+	HCtx[idx]->relButNeutral = (prm == Yn[0]);
+	
+	prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, Yn[HCtx[idx]->seqShftAllowNeutral].c_str());
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, prm);
+	HCtx[idx]->seqShftAllowNeutral = (prm == Yn[0]);
+	
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->autoReverse].c_str());
+	HCtx[idx]->autoReverse = (prm == Yn[0]);
 }//HmReadPrefs
