@@ -85,7 +85,8 @@
 #include <track.h>
 #include <raceman.h>
 
-typedef enum EnumClientAccepted { PROCESSINGCLIENT,CLIENTREJECTED,CLIENTACCEPTED };
+enum EnumClientAccepted { PROCESSINGCLIENT,CLIENTREJECTED,CLIENTACCEPTED };
+
 //Use a structure to pass as a network ENetPacket sent 
 //Packed / Compressed to reduce internet bandwidth requirements
 struct CarControlsPacked
