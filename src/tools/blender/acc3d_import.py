@@ -176,7 +176,7 @@ class AC3DImport:
 
 	def __init__(self, filename):
 		
-		inform('Speed Dreams / Torcs ACC file importer version 0.1')
+		inform('Speed Dreams / Torcs ACC file importer version 1.0')
 
 		global errmsg
 
