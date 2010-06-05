@@ -378,9 +378,12 @@ class AC3DImport:
 			flags = lines[i].split()[1][2:]
 			flag = lines[i].split()[1]
 			tristrip = False
+			trifan = False
 			if ((flag=='0x14')|(flag=='0x24')|(flag=='0x34')):
 				tristrip = True
-				
+
+			if flag =='0x30':
+                                trifan = True;
 			
 			if len(flags) > 1:
 				flaghigh = int(flags[0])
@@ -421,6 +424,8 @@ class AC3DImport:
 				rfs -= 1
 				i += 1
 
+
+                                
 			#handle triangle strip convert into triangles
 			if tristrip==True:
 				index = 0
@@ -484,8 +489,35 @@ class AC3DImport:
 						faces.append(facet)
 						fuvs.append(fuvt)
 						fuvs2.append(fuvt2)
-
 					
+                        elif trifan==True:
+                                index = 1
+				while index<refs-2:
+					facet = []
+					fuvt = []
+					fuvt2 = []
+					facet.append(face[0])
+					uv = fuv[0];
+					fuvt.append(uv)
+					if len(fuv2)>0:
+						uv2 = fuv2[0];
+						fuvt2.append(uv2)
+						
+					facet.append(face[index])
+					uv = fuv[index];
+					fuvt.append(uv)
+					if len(fuv2)>0:
+						uv2 = fuv2[index];
+						fuvt2.append(uv2)
+						
+					facet.append(face[index+1])
+					uv = fuv[index+1];
+					fuvt.append(uv)			
+					if len(fuv2)>0:
+						uv2 = fuv2[index+1];
+						fuvt2.append(uv2)					
+						
+                                        index+=2
 					
 			elif flaglow: # it's a line or closed line, not a polygon
 				while len(face) >= 2:
@@ -496,6 +528,7 @@ class AC3DImport:
 				if flaglow == 1 and edges: # closed line
 					face = [edges[-1][-1], edges[0][0]]
 					edges.append(face)
+
 
 			else: # polygon
 
@@ -851,7 +884,7 @@ class AC3DImport:
 								basetex.setType('Image')
 								map1=Texture.MapTo.COL|Texture.MapTo.ALPHA
 								basetex.image = img
-								bl_textures[iname] = basetex;
+								bl_textures[iname] = basetex
 							
 							basetex = bl_textures[iname]
 							m1.setTexture(0,basetex,Texture.TexCo.UV,map1)
@@ -864,6 +897,9 @@ class AC3DImport:
 								map2=Texture.MapTo.COL
 								basetex2.image = img2
 								bl_textures[iname2] = basetex2					
+							else:
+								map2=Texture.MapTo.COL							
+								
 							basetex2 = bl_textures[iname2]					
 							m1.setTexture(1,basetex2,Texture.TexCo.UV,map2)
 										
