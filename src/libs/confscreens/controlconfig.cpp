@@ -468,8 +468,6 @@ onPush(void *vi)
 static void
 onActivate(void * /* dummy */)
 {
-    int	cmdInd;
-
     // Create and test joysticks ; only keep the up and running ones.
     for (int jsInd = 0; jsInd < GFCTRL_JOY_NUMBER; jsInd++) {
 	if (!Joystick[jsInd])
@@ -490,18 +488,18 @@ onActivate(void * /* dummy */)
         ControlGetSettings();
 
 	/* For each control : */
-	for (int cmd = 0; cmd < MaxCmd; cmd++) {
+	for (int cmdInd = 0; cmdInd < MaxCmd; cmdInd++) {
 
 	    /* Show / hide control editboxes according to selected gear changing mode code */
-	    if (GearChangeMode & CmdDispInfo[cmd].gearChangeModeMask)
+	    if (GearChangeMode & CmdDispInfo[cmdInd].gearChangeModeMask)
 	    {
-	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].labelId, GFUI_VISIBLE);
-	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].Id, GFUI_VISIBLE);
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmdInd].labelId, GFUI_VISIBLE);
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmdInd].Id, GFUI_VISIBLE);
 	    }
 	    else
 	    {
-	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].labelId, GFUI_INVISIBLE);
-	        GfuiVisibilitySet(ScrHandle, Cmd[cmd].Id, GFUI_INVISIBLE);
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmdInd].labelId, GFUI_INVISIBLE);
+	        GfuiVisibilitySet(ScrHandle, Cmd[cmdInd].Id, GFUI_INVISIBLE);
 	    }
 	}
     }
