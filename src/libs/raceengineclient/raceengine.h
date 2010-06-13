@@ -26,7 +26,11 @@
 #ifndef _RACEENGINE_H_
 #define _RACEENGINE_H_
 
-
+#ifdef ReMultiThreaded
+extern void ReInitUpdater();
+extern void ReInitCarGraphics();
+extern void ReShutdownUpdater();
+#endif // ReMultiThreaded
 
 extern void ReStart(void);
 extern void ReStop(void);

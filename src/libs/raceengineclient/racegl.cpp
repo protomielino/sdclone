@@ -2,7 +2,7 @@
 
     file        : racegl.cpp
     created     : Sat Nov 16 18:22:00 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espiï¿½                        
     email       : eric.espie@torcs.org   
     version     : $Id: racegl.cpp,v 1.7 20 Mar 2006 04:30:18 olethros Exp $                                  
 
@@ -70,9 +70,11 @@ reScreenActivate(void * /* dummy */)
 
     GfelSetDisplayCB(reDisplay);
 
+	// Resync race engine if it is not paused or stopped
     if ((ReInfo->s->_raceState & RM_RACE_PAUSED) == 0) {
 	ReStart(); 			/* resynchro */
     }
+
     GfelPostRedisplay();
 }
 
@@ -80,11 +82,15 @@ static void
 ReBoardInfo(void * /* vboard */)
 {
     if (ReInfo->s->_raceState & RM_RACE_PAUSED) {
+#ifndef ReMultiThreaded
 	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
+#endif
 	ReStart();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
     } else {
+#ifndef ReMultiThreaded
 	ReInfo->s->_raceState |= RM_RACE_PAUSED;
+#endif
 	ReStop();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 1);
     }
@@ -102,7 +108,7 @@ reSkipPreStart(void * /* dummy */)
 static void
 reMovieCapture(void * /* dummy */)
 {
-   tRmMovieCapture	*capture = &(ReInfo->movieCapture);
+	tRmMovieCapture	*capture = &(ReInfo->movieCapture);
 
     if (!capture->enabled || ReInfo->_displayMode == RM_DISP_MODE_NONE || ReInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
     {
@@ -157,13 +163,21 @@ ReSetRaceMsg(const char *msg)
 {
     static char *curMsg = 0;
 
-    if (curMsg) free(curMsg);
+#ifdef ReMultiThreaded
+	// If nothing to change, don't change anything.
+	if ((!curMsg && !msg) || (curMsg && msg && !strcmp(curMsg, msg)))
+		return;
+#endif
+	
+	// Otherwise, set the new text for the label.
+    if (curMsg)
+		free(curMsg);
     if (msg) {
-	curMsg = strdup(msg);
-	GfuiLabelSetText(reScreenHandle, reMsgId, curMsg);
+		curMsg = strdup(msg);
+		GfuiLabelSetText(reScreenHandle, reMsgId, curMsg);
     } else {
-	curMsg = 0;
-	GfuiLabelSetText(reScreenHandle, reMsgId, "");
+		curMsg = 0;
+		GfuiLabelSetText(reScreenHandle, reMsgId, "");
     }
 }
 
@@ -172,13 +186,20 @@ ReSetRaceBigMsg(const char *msg)
 {
     static char *curMsg = 0;
     
-    if (curMsg) free(curMsg);
+#ifdef ReMultiThreaded
+	// If nothing to change, don't change anything.
+	if ((!curMsg && !msg) || (curMsg && msg && !strcmp(curMsg, msg)))
+		return;
+#endif
+	
+    if (curMsg)
+		free(curMsg);
     if (msg) {
-	curMsg = strdup(msg);
-	GfuiLabelSetText(reScreenHandle, reBigMsgId, curMsg);
+		curMsg = strdup(msg);
+		GfuiLabelSetText(reScreenHandle, reBigMsgId, curMsg);
     } else {
-	curMsg = 0;
-	GfuiLabelSetText(reScreenHandle, reBigMsgId, "");
+		curMsg = 0;
+		GfuiLabelSetText(reScreenHandle, reBigMsgId, "");
     }
 }
 

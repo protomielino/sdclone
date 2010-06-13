@@ -22,92 +22,123 @@
     @version	$Id: simuconfig.cpp,v 1.4 2006/10/06 20:44:51 berniw Exp $
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+
+#include <raceman.h>
+#include <portability.h>
 #include <tgfclient.h>
 #include <raceinit.h>
 
 #include "simuconfig.h"
-#include <portability.h>
 
 #include "gui.h"
 
-/* list of available simulation engine */
-static const char *simuVersionList[] = {"simuv2", "simuv3"};
-static const int nbVersions = sizeof(simuVersionList) / sizeof(simuVersionList[0]);
-static int curVersion = 0;
 
-/* gui label id */
+/* list of available simulation engine */
+static const char *SimuVersionList[] = {RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V3};
+static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
+static int CurSimuVersion = 0;
+
+/* list of available multi-threading schemes */
+static const char *MultiThreadSchemeList[] = {RM_VAL_AUTO, RM_VAL_ON, RM_VAL_OFF};
+static const int NbMultiThreadSchemes = sizeof(MultiThreadSchemeList) / sizeof(MultiThreadSchemeList[0]);
+
+#ifdef ReMultiThreaded
+static int CurMultiThreadScheme = 0;
+#else
+static int CurMultiThreadScheme = 2;
+#endif
+
+/* gui label ids */
 static int SimuVersionId;
+static int MultiThreadSchemeId;
 
 /* gui screen handles */
-static void	*scrHandle = NULL;
-static void	*prevHandle = NULL;
+static void	*ScrHandle = NULL;
+static void	*PrevScrHandle = NULL;
 
 
-static void ReadSimuCfg(void)
+static void loadSimuCfg(void)
 {
-	const char *versionName;
+	const char *simuVersionName;
+	const char *multiThreadSchemeName;
 	int i;
 
 	char buf[1024];
 	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	versionName = GfParmGetStr(paramHandle, "Modules", "simu", simuVersionList[0]);
-
-	for (i = 0; i < nbVersions; i++) {
-		if (strcmp(versionName, simuVersionList[i]) == 0) {
-			curVersion = i;
+	
+	simuVersionName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[0]);
+	for (i = 0; i < NbSimuVersions; i++) {
+		if (strcmp(simuVersionName, SimuVersionList[i]) == 0) {
+			CurSimuVersion = i;
 			break;
 		}
 	}
 
+#ifdef ReMultiThreaded
+
+	multiThreadSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[0]);
+	for (i = 0; i < NbMultiThreadSchemes; i++) {
+		if (strcmp(multiThreadSchemeName, MultiThreadSchemeList[i]) == 0) {
+			CurMultiThreadScheme = i;
+			break;
+		}
+	}
+
+#endif
+	
 	GfParmReleaseHandle(paramHandle);
 
-	GfuiLabelSetText(scrHandle, SimuVersionId, simuVersionList[curVersion]);
+	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
+	GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
 }
 
 
 /* Save the choosen values in the corresponding parameter file */
-static void SaveSimuVersion(void * /* dummy */)
+static void storeSimuCfg(void * /* dummy */)
 {
 	char buf[1024];
 	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	GfParmSetStr(paramHandle, "Modules", "simu", simuVersionList[curVersion]);
+	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[CurSimuVersion]);
+	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[CurMultiThreadScheme]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
 	
 	/* return to previous screen */
-	GfuiScreenActivate(prevHandle);
+	GfuiScreenActivate(PrevScrHandle);
 	return;
 }
 
 /* change the simulation version */
 static void
-ChangeSimuVersion(void *vp)
+onChangeSimuVersion(void *vp)
 {
-    if (vp == 0) {
-	curVersion--;
-	if (curVersion < 0) {
-	    curVersion = nbVersions - 1;
-	}
-    } else {
-	curVersion++;
-	if (curVersion == nbVersions) {
-	    curVersion = 0;
-	}
-    }
-    GfuiLabelSetText(scrHandle, SimuVersionId, simuVersionList[curVersion]);
+	CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
+	
+    GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
+}
+
+
+/* change the multi-threading scheme */
+static void
+onChangeMultiThreadScheme(void *vp)
+{
+	CurMultiThreadScheme =
+		(CurMultiThreadScheme + NbMultiThreadSchemes + (int)(long)vp) % NbMultiThreadSchemes;
+	
+    GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
 }
 
 
 static void onActivate(void * /* dummy */)
 {
-    ReadSimuCfg();
+    loadSimuCfg();
 }
 
 
@@ -116,32 +147,43 @@ void *
 SimuMenuInit(void *prevMenu)
 {
     /* screen already created */
-    if (scrHandle) {
-	return scrHandle;
+    if (ScrHandle) {
+	return ScrHandle;
     }
-    prevHandle = prevMenu;
+    PrevScrHandle = prevMenu;
 
-    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void *param = LoadMenuXML("simulationmenu.xml");
-    CreateStaticControls(param,scrHandle);
+    void *menuDescHdle = LoadMenuXML("simulationmenu.xml");
+    CreateStaticControls(menuDescHdle, ScrHandle);
 
-    CreateButtonControl(scrHandle,param,"simvleftarrow",(void*)-1,ChangeSimuVersion);
-    CreateButtonControl(scrHandle,param,"simvrightarrow",(void*)1,ChangeSimuVersion);
+    SimuVersionId = CreateLabelControl(ScrHandle,menuDescHdle,"simulabel");
+    CreateButtonControl(ScrHandle, menuDescHdle, "simuleftarrow", (void*)-1, onChangeSimuVersion);
+    CreateButtonControl(ScrHandle, menuDescHdle, "simurightarrow", (void*)1, onChangeSimuVersion);
 
-    SimuVersionId = CreateLabelControl(scrHandle,param,"simulabel");
-    CreateButtonControl(scrHandle,param,"accept",prevMenu,SaveSimuVersion);
-    CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+    MultiThreadSchemeId = CreateLabelControl(ScrHandle, menuDescHdle, "mthreadlabel");
+
+#ifdef ReMultiThreaded
+    CreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", (void*)-1, onChangeMultiThreadScheme);
+    CreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", (void*)1, onChangeMultiThreadScheme);
+#endif
+	
+    CreateButtonControl(ScrHandle, menuDescHdle, "accept", PrevScrHandle, storeSimuCfg);
+    CreateButtonControl(ScrHandle, menuDescHdle, "cancel", PrevScrHandle, GfuiScreenActivate);
 
 
-    GfParmReleaseHandle(param);
+    GfParmReleaseHandle(menuDescHdle);
     
-    GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, SaveSimuVersion, NULL);
-    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)0, ChangeSimuVersion, NULL);
-    GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, ChangeSimuVersion, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, storeSimuCfg, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", PrevScrHandle, GfuiScreenActivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous simu engine version", (void*)-1, onChangeSimuVersion, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next simu engine version", (void*)1, onChangeSimuVersion, NULL);
+#ifdef ReMultiThreaded
+    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous multi-threading scheme", (void*)-1, onChangeMultiThreadScheme, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next multi-threading scheme", (void*)1, onChangeMultiThreadScheme, NULL);
+#endif
 
-    return scrHandle;  
+    return ScrHandle;  
 }

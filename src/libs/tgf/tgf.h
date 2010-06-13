@@ -407,6 +407,9 @@ typedef struct
 extern tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
 extern void gfMeanReset(tdble v, tMeanVal *pvt);
 
+/* Get the actual number of CPUs / cores */
+extern int GfGetNumberOfCPUs();
+
 /* Run-time dirs accessors */
 extern const char *GetLocalDir(void);
 extern const char *SetLocalDir(const char *buf);

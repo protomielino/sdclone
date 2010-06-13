@@ -22,6 +22,12 @@
 #else
 #include <sys/stat.h>
 #include <sys/types.h>
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#else
+#include <unistd.h>
+#endif
 #endif
 #include <errno.h>
 
@@ -746,3 +752,61 @@ int GfCreateDir(const char *path)
 	}
 }
 
+/* Get the actual number of CPUs / cores
+
+   TODO: Be careful about fake CPUs like those displayed by hyperthreaded processors ...
+*/
+int GfGetNumberOfCPUs()
+{
+	int nCPUs = 0;
+	
+// Windows
+#if defined(WIN32)
+
+	SYSTEM_INFO sysinfo;
+	GetSystemInfo(&sysinfo);
+
+	nCPUs = sysinfo.dwNumberOfProcessors;
+
+// MacOS X, FreeBSD, OpenBSD, NetBSD, etc.:
+#elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+
+	nt mib[4];
+	size_t len; 
+
+	// Set the mib for hw.ncpu
+
+	// Get the number of CPUs from the system
+	// 1) Try HW_AVAILCPU first.
+	mib[0] = CTL_HW;
+	mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
+	sysctl(mib, 2, &nCPUs, &len, NULL, 0);
+
+	if (nCPUs < 1) 
+	{
+		// 2) Try alternatively HW_NCPU.
+		mib[1] = HW_NCPU;
+		sysctl(mib, 2, &nCPUs, &len, NULL, 0);
+	}
+
+// Linux, Solaris, AIX
+#elif defined(linux) || defined(__linux__)
+
+	nCPUs = sysconf(_SC_NPROCESSORS_ONLN);
+
+#else
+
+#warning "Unsupported OS"
+
+#endif // WIN32
+
+	if (nCPUs < 1)
+	{
+		GfOut("Could not get the number of CPUs here ; assuming only 1\n");
+		nCPUs = 1;
+	}
+	else
+		GfOut("Detected %d CPUs\n", nCPUs);
+
+	return nCPUs;
+}

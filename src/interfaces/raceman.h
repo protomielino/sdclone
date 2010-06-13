@@ -35,6 +35,9 @@
 
 #define RCM_IDENT 0
 
+// Comment-out to inhibit multi-threaded race engine (get back to old nearly unmodified code).
+#define ReMultiThreaded 1
+
 struct RmInfo;
 
 typedef int (*tfRmRunState) (struct RmInfo *);
@@ -158,11 +161,17 @@ typedef struct
 #define RM_DISP_MODE_SIMU_SIMU	3
     int			displayMode;
     int			refreshDisplay;
+#ifdef ReMultiThreaded
+    tCarElt		*inPitMenuCar;
+	char		*message;
+    double		messageEnd;
+	char		*bigMessage;
+    double		bigMessageEnd;
+#endif
 } tRaceEngineInfo;
 
 #define _reState	raceEngineInfo.state
 #define _reParam	raceEngineInfo.param
-#define _reRacemanItf	raceEngineInfo.itf.racemanItf
 #define _reTrackItf	raceEngineInfo.itf.trackItf
 #define _reGraphicItf	raceEngineInfo.itf.graphicItf
 #define _reSimItf	raceEngineInfo.itf.simItf
@@ -178,6 +187,13 @@ typedef struct
 #define _reLastTime	raceEngineInfo.lastTime
 #define _displayMode	raceEngineInfo.displayMode
 #define _refreshDisplay	raceEngineInfo.refreshDisplay
+#ifdef ReMultiThreaded
+# define _reInPitMenuCar	raceEngineInfo.inPitMenuCar
+# define _reMessage	raceEngineInfo.message
+# define _reMessageEnd	raceEngineInfo.messageEnd
+# define _reBigMessage	raceEngineInfo.bigMessage
+# define _reBigMessageEnd	raceEngineInfo.bigMessageEnd
+#endif
 
 #define RM_PNST_DRIVETHROUGH	0x00000001
 #define RM_PNST_STOPANDGO	0x00000002
@@ -323,13 +339,16 @@ typedef struct RmInfo
 #define RM_VAL_INVISIBLE	"results only"
 #define RM_VAL_SIMUSIMU		"simulation simulation"
 
+/* Movie capture */
 
 #define RM_SECT_MOVIE_CAPTURE	"Movie Capture"
 
 #define RM_ATT_CAPTURE_ENABLE	"enable capture"
 #define RM_ATT_CAPTURE_FPS	"fps"
 #define RM_ATT_CAPTURE_OUT_DIR	"output directory"
+
 #define RM_SECT_SUBFILES	"Header/Subfiles"
+
 #define RM_ATTR_HASSUBFILES	"has subfiles"
 #define RM_ATTR_FIRSTSUBFILE	"first subfile"
 #define RM_ATTR_SUFFIX		"suffix"
@@ -339,6 +358,7 @@ typedef struct RmInfo
 #define RM_ATTR_PREVSUBFILE	"prev subfile"
 #define RM_ATTR_RESULTSUBFILE	"result subfile"
 #define RM_ATTR_SUBFILE		"subfile"
+
 #define RM_SECT_ENDOFSEASON	"End-Of-Season"
 #define RM_SECT_ENDOFSEASON_CLASSPOINTS	"End-Of-Season/Class Points"
 
@@ -346,7 +366,30 @@ typedef struct RmInfo
 #define RM_SECT_LASTNAME	"Names/Last Name"
 #define RM_SECT_DRIVERINFO	"Driver Info"
 
-/* RESULTS */
+/* Race Engine modules */
+
+#define RM_SECT_MODULES	"Modules"
+
+#define RM_ATTR_MOD_TRACK		"track"
+#define RM_ATTR_MOD_SIMU		"simu"
+#define RM_ATTR_MOD_GRAPHIC		"graphic"
+
+#define RM_VAL_MOD_SIMU_V2		"simuv2"
+#define RM_VAL_MOD_SIMU_V3		"simuv3"
+#define RM_VAL_MOD_TRACK		"track"
+#define RM_VAL_MOD_SSGRAPH		"ssggraph"
+
+/* Race Engine itself */
+
+#define RM_SECT_RACE_ENGINE	"Race Engine"
+
+#define RM_ATTR_MULTI_THREADING		"multi-threading"
+
+#define RM_VAL_AUTO		"auto"
+#define RM_VAL_ON		"on"
+#define RM_VAL_OFF		"off"
+
+/* Results */
 
 #define RE_SECT_HEADER		"Header"
 #define RE_ATTR_DATE		"date"

@@ -23,9 +23,16 @@
     @version	$Id: raceengine.cpp,v 1.19 2007/11/06 20:43:32 torcs Exp $
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include "network.h"
+#include <cstdlib>
+#include <cstdio>
+
+#ifdef ReMultiThreaded
+#include <SDL.h>
+#include <SDL_thread.h>
+#endif
+
+#include <portability.h>
+#include <network.h>
 #include <tgfclient.h>
 #include <robot.h>
 #include <raceman.h>
@@ -74,9 +81,9 @@
 # define PrintEvent(name, header, footer)
 #endif
 
-DeclareEventType(Robots);
+DeclareEventType(Bots);
 DeclareEventType(Simu);
-DeclareEventType(Graphic);
+DeclareEventType(Graph);
 
 
 static char	buf[1024];
@@ -85,6 +92,87 @@ static double	msgDisp;
 static double	bigMsgDisp;
 
 tRmInfo	*ReInfo = 0;
+
+#ifdef ReMultiThreaded //==========================================================
+
+#include "SDL/SDL.h"
+#include "SDL/SDL_thread.h"
+
+class reSituationUpdater
+{
+public:
+	
+	//! Constructor.
+	reSituationUpdater(tRmInfo* pReInfo);
+
+	//! Destructor.
+	~reSituationUpdater();
+
+	//! Stop (pause) the updater if it is running (return its exit status).
+	void stop();
+	
+	//! (Re)start (after a stop) the updater if it is not running.
+	void start();
+	
+	//! Terminate the updater (return its exit status ; wait for the thread to return).
+	int terminate();
+	
+	//! Get the situation for the previous step
+	tRmInfo* getPreviousStep();
+	
+	//! Start computing the situation for the current step
+	void computeCurrentStep();
+
+private:
+
+	//! Reserve exclusive access on the race engine data.
+	bool lockData(const char* pszLocker);
+	
+	//! Release exclusive access on the race engine data.
+	bool unlockData(const char* pszLocker);
+	
+	//! Copy (after allocating if pTarget is null) the source situation into the target (deep copy for RW data, shallow copy for RO data).
+	tRmInfo* deliverSituation(tRmInfo*& pTarget, const tRmInfo* pSource);
+	
+	//! Allocate and initialize a situation (set constants from source).
+	tRmInfo* initSituation(const tRmInfo* pSource);
+	
+	//! Free the given situation
+	void freeSituation(tRmInfo*& pSituation);
+	
+	//! The thread function.
+	int threadLoop();
+	
+	//! The C wrapper on the thread function.
+	friend int reSituationUpdaterThreadLoop(void *);
+	
+private:
+
+	//! Initial number of drivers racing
+	int _nInitDrivers;
+
+	//! The previous step of the situation
+	tRmInfo* _pPrevReInfo;
+
+	//! The current step of the situation
+	tRmInfo* _pCurrReInfo;
+
+	//! The mutex to protect the situation data
+	SDL_mutex* _pDataMutex;
+
+	//! The situation updater thread
+	SDL_Thread* _pUpdateThread;
+
+	//! True if the updater is actually threaded (may be not the case)
+	bool _bThreaded;
+
+	//! Flag to set in order to terminate the updater.
+	bool _bTerminate;
+};
+
+static reSituationUpdater* situationUpdater = 0;
+#endif // ReMultiThreaded ========================================================
+
 
 static void ReRaceRules(tCarElt *car);
 
@@ -128,9 +216,101 @@ ReUpdtPitCmd(void *pvcar)
 	tCarElt *car = (tCarElt*)pvcar;
 
 	ReUpdtPitTime(car);
-	//ReStart(); /* resynchro */
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
+
+#ifdef ReMultiThreaded // ==================================================
+
+/* Prepare to open the pit menu when back in the main thread */
+static void
+rePreparePit(tCarElt *car)
+{
+	ReInfo->_reInPitMenuCar = car;
+	ReInfo->_reRunning = 0;
+}
+
+
+static void
+reRaceMsgUpdate(tRmInfo* pReInfo)
+{
+	if (pReInfo->_reMessage)
+	{
+		ReSetRaceMsg(pReInfo->_reMessage);
+		//free(pReInfo->_reMessage);
+		//pReInfo->_reMessage = 0;
+	}		
+	else //if (pReInfo->_reCurTime > pReInfo->_reMessageEnd)
+		ReSetRaceMsg(0);
+	
+	if (pReInfo->_reBigMessage)
+	{
+		ReSetRaceMsg(pReInfo->_reBigMessage);
+		//free(pReInfo->_reBigMessage);
+		//pReInfo->_reBigMessage = 0;
+	}		
+	else //if (pReInfo->_reCurTime > pReInfo->_reBigMessageEnd)
+		ReSetRaceBigMsg(0);
+}
+
+static void
+ReRaceMsgUpdate()
+{
+	reRaceMsgUpdate(ReInfo);
+}
+
+static void
+reRaceMsgManage(tRmInfo* pReInfo)
+{
+	if (pReInfo->_reMessage && pReInfo->_reCurTime > pReInfo->_reMessageEnd)
+	{
+		free(pReInfo->_reMessage);
+		pReInfo->_reMessage = 0;
+	}
+	
+	if (pReInfo->_reBigMessage && pReInfo->_reCurTime > pReInfo->_reBigMessageEnd)
+	{
+		free(pReInfo->_reBigMessage);
+		pReInfo->_reBigMessage = 0;
+	}
+}
+
+static void
+reRaceMsgSet(tRmInfo* pReInfo, const char *msg, double life)
+{
+    if (pReInfo->_reMessage)
+		free(pReInfo->_reMessage);
+    if (msg)
+		pReInfo->_reMessage = strdup(msg);
+    else
+		pReInfo->_reMessage = 0;
+	pReInfo->_reMessageEnd = pReInfo->_reCurTime + life;
+}
+
+static void
+ReRaceMsgSet(const char *msg, double life)
+{
+	reRaceMsgSet(ReInfo, msg, life);
+}
+
+static void
+reRaceBigMsgSet(tRmInfo* pReInfo, const char *msg, double life)
+{
+    if (pReInfo->_reBigMessage)
+		free(pReInfo->_reBigMessage);
+    if (msg)
+		pReInfo->_reBigMessage = strdup(msg);
+    else
+		pReInfo->_reBigMessage = 0;
+	pReInfo->_reBigMessageEnd = pReInfo->_reCurTime + life;
+}
+
+static void
+ReRaceBigMsgSet(const char *msg, double life)
+{
+	reRaceBigMsgSet(ReInfo, msg, life);
+}
+
+#else // ReMultiThreaded ==================================================
 
 static void
 ReRaceMsgUpdate(void)
@@ -157,6 +337,8 @@ ReRaceBigMsgSet(const char *msg, double life)
 	ReSetRaceBigMsg(msg);
 	bigMsgDisp = ReInfo->_reCurTime + life;
 }
+
+#endif // ReMultiThreaded
 
 static void
 ReAddPenalty(tCarElt *car, int penalty)
@@ -290,8 +472,14 @@ ReManage(tCarElt *car)
 					ReRaceMsgSet(buf, 5);
 					if (car->robot->rbPitCmd(car->robot->index, car, s) == ROB_PIT_MENU) {
 						// the pit cmd is modified by menu.
+#ifdef ReMultiThreaded
+						rePreparePit(car);
+#else
+						// Question: And what if 2 (human) drivers want to pit at the same time ?
+						// Answer: IIUC, only one will get the menu ; as for the other ... ?
 						ReStop();
 						RmPitMenuStart(s, car, (void*)car, ReUpdtPitCmd);
+#endif
 					} else {
 						ReUpdtPitTime(car);
 					}
@@ -459,7 +647,7 @@ ReManage(tCarElt *car)
 					break;
 					}
 				}
-				sprintf(buf, "%s Finished %d%s", car->_name, car->_pos, numSuffix);
+				sprintf(buf, "%s finished %d%s", car->_name, car->_pos, numSuffix);
 				ReRaceMsgSet(buf, 5);
 				}
 			}
@@ -487,8 +675,6 @@ ReManage(tCarElt *car)
 	car->_distFromStartLine = car->_trkPos.seg->lgfromstart +
 	(car->_trkPos.seg->type == TR_STR ? car->_trkPos.toStart : car->_trkPos.toStart * car->_trkPos.seg->radius);
 	car->_distRaced = (car->_laps - 1) * ReInfo->track->length + car->_distFromStartLine;
-
-
 }
 
 static void 
@@ -700,6 +886,7 @@ SetNetworkCarPhysics(double timeDelta,CarControlsData *pCt)
 	double errZ = pDynCG->pos.z-pCt->DynGCg.pos.z;
 
 	int idx = GetNetwork()->GetCarIndex(pCt->startRank,ReInfo->s);
+	
 	//Car controls (steering,gas,brake, gear
 	tCarElt *pCar = ReInfo->s->cars[idx];
 	pCar->ctrl.accelCmd = pCt->throttle;
@@ -765,7 +952,7 @@ SetNetworkLapStatus(LapStatus *pStatus)
 	pCar->race.bestLapTime = pStatus->bestLapTime;
 	*pCar->race.bestSplitTime = (double)pStatus->bestSplitTime;
 	pCar->race.laps = pStatus->laps;
-	GfOut("Setting lap status\n");
+	GfOut("Setting network lap status\n");
 }
 
 static void
@@ -786,13 +973,13 @@ NetworkPlayStep()
 		for (int i=0;i<numCars;i++)
 		{
 			double timeDelta = s->currentTime-pNData->m_vecCarCtrls[i].time;
-			if (timeDelta>=0)
+			if (timeDelta >= 0)
 			{
 				SetNetworkCarPhysics(timeDelta,&pNData->m_vecCarCtrls[i]);
 			}
-			else if (timeDelta<=-1.0)
+			else if (timeDelta <= -1.0)
 			{
-				GfOut("ignoring physics packet delta is %lf \n",timeDelta);
+				GfOut("Ignoring physics packet (delta is %lf)\n", timeDelta);
 			}
 		}
 	}
@@ -849,20 +1036,22 @@ ReOneStep(double deltaTimeIncrement)
 	tRobotItf *robot;
 	tSituation *s = ReInfo->s;
 
+#ifdef ReMultiThreaded
+	// Race messages life cycle management.
+	reRaceMsgManage(ReInfo);
+#endif
+	
 	if (GetNetwork())
 	{
-		//Resync clock in case computer falls behind
-		if (s->currentTime<0.0)
+		// Resync clock in case computer falls behind
+		if (s->currentTime < 0.0)
 		{
-			double time = GfTimeClock()-GetNetwork()->GetRaceStartTime();
-			s->currentTime = time;
+			s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
 		}
 
-		if (s->currentTime<-2.0)
+		if (s->currentTime < -2.0)
 		{
-			int wait = fabs(s->currentTime);
-			char buf[255];
-			sprintf(buf,"Race will start in %i seconds",wait);
+			sprintf(buf,"Race will start in %i seconds", -s->currentTime);
 			ReRaceBigMsgSet(buf, 1.0);
 		}
 	}
@@ -874,7 +1063,7 @@ ReOneStep(double deltaTimeIncrement)
 	} else if (floor(s->currentTime) == 0.0) {
 		ReRaceBigMsgSet("Go", 1.0);
 		if (s->currentTime==0.0)
-			GfOut("Start time is %lf\n",GfTimeClock());
+			GfOut("Race start time is %lf\n", GfTimeClock());
 	}
 
 	ReInfo->_reCurTime += deltaTimeIncrement * ReInfo->_reTimeMult; /* "Real" time */
@@ -892,7 +1081,7 @@ ReOneStep(double deltaTimeIncrement)
 
 	START_PROFILE("rbDrive*");
 	if ((s->currentTime - ReInfo->_reLastTime) >= RCM_MAX_DT_ROBOTS) {
-		SignalEvent(Robots);
+		SignalEvent(Bots);
 		s->deltaTime = s->currentTime - ReInfo->_reLastTime;
 		for (i = 0; i < s->_ncars; i++) {
 			if ((s->cars[i]->_state & RM_CAR_STATE_NO_SIMU) == 0) {
@@ -925,15 +1114,11 @@ ReOneStep(double deltaTimeIncrement)
 	}
 	STOP_PROFILE("_reSimItf.update*");
 	
-
-
-	ReRaceMsgUpdate();
 	ReSortCars();
 
 	/* Update screens if a best lap changed */
 	if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars > 1 && bestLapChanged)
 	{
-		GfOut( "UPDATE\n" );
 		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 			ReUpdatePracticeCurRes(ReInfo->s->cars[0]);
 		else if (ReInfo->s->_raceType == RM_TYPE_QUALIF)
@@ -942,18 +1127,55 @@ ReOneStep(double deltaTimeIncrement)
 	bestLapChanged = FALSE;
 }
 
+#ifdef ReMultiThreaded
+
+void ReInitUpdater()
+{
+	ReInfo->_reRunning = 0;
+ 	if (!situationUpdater)
+ 		situationUpdater = new reSituationUpdater(ReInfo);
+}
+
+void ReInitCarGraphics(void)
+{
+	tRmInfo* pPrevReInfo = situationUpdater->getPreviousStep();
+	pPrevReInfo->_reGraphicItf.initcars(pPrevReInfo->s);
+}
+
+#endif // ReMultiThreaded
+
 void
 ReStart(void)
 {
+#ifdef ReMultiThreaded
+	situationUpdater->start();
+#else // ReMultiThreaded
     ReInfo->_reRunning = 1;
     ReInfo->_reCurTime = GfTimeClock() - RCM_MAX_DT_SIMU;
+#endif // ReMultiThreaded
 }
 
 void
 ReStop(void)
 {
+#ifdef ReMultiThreaded
+	situationUpdater->stop();
+#else
     ReInfo->_reRunning = 0;
+#endif // ReMultiThreaded
 }
+
+#ifdef ReMultiThreaded
+void ReShutdownUpdater()
+{
+	// Destroy the situation updater.
+ 	if (situationUpdater)
+	{
+		delete situationUpdater;
+		situationUpdater = 0;
+	}
+}
+#endif // ReMultiThreaded
 
 static void
 reCapture(void)
@@ -978,6 +1200,7 @@ reCapture(void)
     free(img);
 }
 
+#ifndef ReMultiThreaded
 
 int
 ReUpdate(void)
@@ -1003,18 +1226,18 @@ ReUpdate(void)
 		GetNetwork()->SendCarControlsPacket(ReInfo->s);
 
 	GfuiDisplay();
-	SignalEvent(Graphic);
+	SignalEvent(Graph);
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
 	GfelPostRedisplay();	/* Callback -> reDisplay */
 	
-	PrintEvent(Robots, "Events: ", 0);
+	PrintEvent(Bots, "Events: ", 0);
 	PrintEvent(Simu, 0, 0);
-	PrintEvent(Graphic, 0, "\n");
+	PrintEvent(Graph, 0, "\n");
 	break;
 	
     case RM_DISP_MODE_NONE:
 	ReOneStep(RCM_MAX_DT_SIMU);
-	PrintEvent(Robots, "Events: ", 0);
+	PrintEvent(Bots, "Events: ", 0);
 	PrintEvent(Simu, 0, "\n");
 	if (ReInfo->_refreshDisplay) {
 	    GfuiDisplay();
@@ -1050,6 +1273,8 @@ ReUpdate(void)
     return RM_ASYNC;
 }
 
+#endif // ReMultiThreaded
+
 void
 ReTimeMod (void *vcmd)
 {
@@ -1076,3 +1301,593 @@ ReTimeMod (void *vcmd)
     sprintf(buf, "Time x%.2f", 1.0 / ReInfo->_reTimeMult);
     ReRaceMsgSet(buf, 5);
 }
+
+// Multi-threaded ReUpdate ===============================================================
+
+#ifdef ReMultiThreaded
+
+int reSituationUpdaterThreadLoop(void *pUpdater)
+{
+	return static_cast<reSituationUpdater*>(pUpdater)->threadLoop();
+}
+
+int reSituationUpdater::threadLoop()
+{
+	// Wait delay for each loop, from bRunning value (index 0 = false, 1 = true).
+	static const double KWaitDelayMS[2] = { 1.0, RCM_MAX_DT_SIMU * 1000 / 10 };
+
+	// Termination flag.
+	bool bEnd = false;
+
+	// Local state (false = paused, true = simulating).
+	bool bRunning = false;
+
+	// Current real time.
+	double realTime;
+	
+	GfOut("SituationUpdater thread is started.\n");
+	
+	do
+	{
+		// Let's make current step the next one (update).
+		// 1) Lock the race engine data.
+		lockData("reSituationUpdater::threadLoop");
+
+		// 2) Check if time to terminate has come.
+		if (_bTerminate)
+			
+			bEnd = true;
+		
+		// 3) If not time to terminate, and running, do the update job.
+		else if (_pCurrReInfo->_reRunning)
+		{
+			if (!bRunning)
+			{
+				bRunning = true;
+				GfOut("SituationUpdater thread is running.\n");
+			}
+			
+			PrintEvent(Bots, "Updater:", 0);
+			PrintEvent(Simu, 0, "\n");
+
+			realTime = GfTimeClock();
+		
+			START_PROFILE("ReOneStep*");
+		
+			while (_pCurrReInfo->_reRunning
+				   && ((realTime - _pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
+			{
+				// One simu + may be robots step
+				ReOneStep(RCM_MAX_DT_SIMU);
+			}
+		
+			STOP_PROFILE("ReOneStep*");
+		
+			// Send car physics to network if needed
+			if (GetNetwork())
+				GetNetwork()->SendCarControlsPacket(_pCurrReInfo->s);
+		}
+		
+		// 3) If not time to terminate, and not running, do nothing.
+		else
+		{
+			if (bRunning)
+			{
+				bRunning = false;
+				GfOut("SituationUpdater thread is paused.\n");
+			}
+		}
+			
+		// 4) Unlock the race engine data.
+		unlockData("reSituationUpdater::threadLoop");
+		
+		// 5) Let the CPU take breath if possible (but after unlocking data !).
+		SDL_Delay(KWaitDelayMS[(int)bRunning]);
+	}
+	while (!bEnd);
+
+	GfOut("SituationUpdater thread has been terminated.\n");
+	
+	return 0;
+}
+
+reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
+{
+	// Save the race engine info (state + situation) pointer for the current step.
+	_pCurrReInfo = pReInfo;
+	_nInitDrivers = _pCurrReInfo->s->_ncars;
+
+	// No dedicated thread if only 1 CPU/core.
+	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
+	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	const char* pszMultiThreadScheme =
+		GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, RM_VAL_AUTO);
+
+	if (!strcmp(pszMultiThreadScheme, RM_VAL_OFF))
+		_bThreaded = false;
+	else if (!strcmp(pszMultiThreadScheme, RM_VAL_ON))
+		_bThreaded = true;
+	else // Can't be anything else than RM_VAL_AUTO
+		_bThreaded = GfGetNumberOfCPUs() > 1;
+
+	GfParmReleaseHandle(paramHandle);
+
+	_bTerminate = false;
+
+	if (_bThreaded)
+	{
+		// Initialize the race engine info (state + situation) pointer for the previous step.
+		_pPrevReInfo = initSituation(_pCurrReInfo);
+
+		// Create the data mutex.
+		_pDataMutex = SDL_CreateMutex();
+		
+		// Create and start the updater thread.
+		_pUpdateThread = SDL_CreateThread(reSituationUpdaterThreadLoop, this);
+	}
+	else
+	{
+		_pPrevReInfo = 0;
+		_pDataMutex = 0;
+		_pUpdateThread = 0;
+	}
+}
+
+reSituationUpdater::~reSituationUpdater()
+{
+	terminate(); // In case not already done.
+
+	if (_bThreaded)
+	{
+		if (_pDataMutex)
+			SDL_DestroyMutex(_pDataMutex);
+		
+		if (_pPrevReInfo)
+			freeSituation(_pPrevReInfo);
+	}
+}
+
+bool reSituationUpdater::lockData(const char* pszLocker)
+{
+	if (!_bThreaded)
+		return true;
+	
+	const bool bStatus = SDL_mutexP(_pDataMutex) == 0;
+	if (!bStatus)
+		GfOut("%s : Failed to lock data mutex\n", pszLocker);
+
+	return bStatus;
+}
+	
+bool reSituationUpdater::unlockData(const char* pszLocker)
+{
+	if (!_bThreaded)
+		return true;
+	
+	const bool bStatus = SDL_mutexV(_pDataMutex) == 0;
+	if (!bStatus)
+		GfOut("%s : Failed to unlock data mutex\n", pszLocker);
+
+	return bStatus;
+}
+
+
+void reSituationUpdater::start()
+{
+	GfOut("Unpausing race engine.\n");
+
+	// Lock the race engine data.
+	lockData("reSituationUpdater::start");
+
+	// Set the running flags.
+    _pCurrReInfo->_reRunning = 1;
+	_pCurrReInfo->s->_raceState &= ~RM_RACE_PAUSED;
+
+	// Resynchronize simulation time.
+    _pCurrReInfo->_reCurTime = GfTimeClock() - RCM_MAX_DT_SIMU;
+	
+	// Unlock the race engine data.
+	unlockData("reSituationUpdater::start");
+}
+
+void reSituationUpdater::stop()
+{
+	GfOut("Pausing race engine.\n");
+
+	// Lock the race engine data.
+	lockData("reSituationUpdater::stop");
+
+	// Reset the running flags.
+	_pCurrReInfo->_reRunning = 0;
+	_pCurrReInfo->s->_raceState |= RM_RACE_PAUSED;
+		
+	// Unlock the race engine data.
+	unlockData("reSituationUpdater::stop");
+}
+
+int reSituationUpdater::terminate()
+{
+	int status = 0;
+	
+	GfOut("Terminating race engine.\n");
+
+	// Lock the race engine data.
+	lockData("reSituationUpdater::terminate");
+
+	// Set the death flag.
+    _bTerminate = true;
+	
+	// Unlock the race engine data.
+	unlockData("reSituationUpdater::terminate");
+	
+	// Wait for the thread to gracefully terminate if any.
+	if (_bThreaded)
+	{
+		SDL_WaitThread(_pUpdateThread, &status);
+		_pUpdateThread = 0;
+ 	}
+
+	return status;
+}
+
+void reSituationUpdater::freeSituation(tRmInfo*& pSituation)
+{
+	if (pSituation)
+	{
+		// carList
+		if (pSituation->carList)
+		{
+			for (int nCarInd = 0; nCarInd < _nInitDrivers; nCarInd++)
+			{
+				tCarElt* pTgtCar = &pSituation->carList[nCarInd];
+		
+				tCarPenalty *penalty;
+				while ((penalty = GF_TAILQ_FIRST(&(pTgtCar->_penaltyList)))
+					   != GF_TAILQ_END(&(pTgtCar->_penaltyList)))
+				{
+					GF_TAILQ_REMOVE (&(pTgtCar->_penaltyList), penalty, link);
+					free(penalty);
+				}
+				free(pTgtCar->_curSplitTime);
+				free(pTgtCar->_bestSplitTime);
+			}
+		
+			free(pSituation->carList);
+		}
+		
+		// s
+		if (pSituation->s)
+			free(pSituation->s);
+
+		// rules
+		if (pSituation->rules)
+			free(pSituation->rules);
+
+		// raceEngineInfo
+		if (pSituation->_reMessage)
+			free(pSituation->_reMessage);
+		if (pSituation->_reBigMessage)
+			free(pSituation->_reBigMessage);
+		if (pSituation->_reCarInfo)
+			free(pSituation->_reCarInfo);
+		
+		free(pSituation);
+		pSituation = 0;
+	}
+}
+
+tRmInfo* reSituationUpdater::initSituation(const tRmInfo* pSource)
+{
+	tRmInfo* pTarget;
+
+	// Allocate main structure (level 0).
+	pTarget = (tRmInfo *)calloc(1, sizeof(tRmInfo));
+
+	// Allocate variable level 1 structures.
+	pTarget->carList = (tCarElt*)calloc(_nInitDrivers, sizeof(tCarElt));
+	pTarget->s = (tSituation *)calloc(1, sizeof(tSituation));
+	pTarget->rules = (tRmCarRules*)calloc(_nInitDrivers, sizeof(tRmCarRules));
+
+	// Assign level 1 constants.
+	pTarget->track = pSource->track; // Only read during the race.
+	pTarget->params = pSource->params; // Never read/written during the race.
+	pTarget->mainParams = pSource->mainParams; // Never read/written during the race.
+	pTarget->results = pSource->results; // Never read/written during the race.
+	pTarget->mainResults = pSource->mainResults; // Never read/written during the race.
+	pTarget->modList = pSource->modList; // Not used / written by updater.
+	pTarget->movieCapture = pSource->movieCapture; // Not used by updater.
+
+	// Assign level 2 constants in carList field.
+	for (int nCarInd = 0; nCarInd < _nInitDrivers; nCarInd++)
+	{
+		tCarElt* pTgtCar = &pTarget->carList[nCarInd];
+		tCarElt* pSrcCar = &pSource->carList[nCarInd];
+
+		pTgtCar->_curSplitTime = (double*)malloc(sizeof(double) * (pSource->track->numberOfSectors - 1));
+		pTgtCar->_bestSplitTime = (double*)malloc(sizeof(double) * (pSource->track->numberOfSectors - 1));
+
+		memcpy(&pTgtCar->info, &pSrcCar->info, sizeof(tInitCar)); // Not changed + only read during the race.
+		memcpy(&pTgtCar->priv, &pSrcCar->priv, sizeof(tPrivCar)); // Partly only read during the race ; other copied in vars below.
+		pTgtCar->robot = pSrcCar->robot; // Not changed + only read during the race.
+	}
+
+	// Allocate level 2 structures in s field.
+	pTarget->s->cars = (tCarElt **)calloc(_nInitDrivers, sizeof(tCarElt *));
+
+	// Allocate level 2 structures in raceEngineInfo field.
+	pTarget->_reCarInfo = (tReCarInfo*)calloc(_nInitDrivers, sizeof(tReCarInfo));
+		
+	// Assign level 2 constants in raceEngineInfo field.
+	pTarget->_reParam = pSource->_reParam; // Not used / written by updater.
+	pTarget->_reTrackItf = pSource->_reTrackItf; // Not used / written by updater.
+	pTarget->_reGraphicItf = pSource->_reGraphicItf; // Not used / written by updater.
+	pTarget->_reSimItf = pSource->_reSimItf; // Not used / written by updater.
+	pTarget->_reGameScreen = pSource->_reGameScreen; // Nor changed nor shared during the race.
+	pTarget->_reMenuScreen = pSource->_reMenuScreen; // Nor changed nor shared during the race.
+	pTarget->_reFilename = pSource->_reFilename; // Not used during the race.
+	pTarget->_reName = pSource->_reName; // Not changed + only read during the race.
+	pTarget->_reRaceName = pSource->_reRaceName; // Not changed + only read during the race.
+
+	return pTarget;
+}
+
+tRmInfo* reSituationUpdater::deliverSituation(tRmInfo*& pTarget, const tRmInfo* pSource)
+{
+	tCarElt* pTgtCar;
+	tCarElt* pSrcCar;
+
+	// Copy variable data from source to target.
+	// 1) pSource->carList
+	for (int nCarInd = 0; nCarInd < _nInitDrivers; nCarInd++)
+	{
+		pTgtCar = &pTarget->carList[nCarInd];
+		pSrcCar = &pSource->carList[nCarInd];
+		
+		pTgtCar->index = pSrcCar->index;
+		memcpy(&pTgtCar->pub, &pSrcCar->pub, sizeof(tPublicCar));
+
+		// race
+		double* pBestSplitTime = pTgtCar->_bestSplitTime;
+		double* pCurSplitTime = pTgtCar->_curSplitTime;
+		memcpy(&pTgtCar->race, &pSrcCar->race, sizeof(tCarRaceInfo));
+		pTgtCar->_bestSplitTime = pBestSplitTime;
+		memcpy(pTgtCar->_bestSplitTime, pSrcCar->_bestSplitTime,
+			   sizeof(double) * (pSource->track->numberOfSectors - 1));
+		pTgtCar->_curSplitTime = pCurSplitTime;
+		memcpy(pTgtCar->_curSplitTime, pSrcCar->_curSplitTime,
+			   sizeof(double) * (pSource->track->numberOfSectors - 1));
+
+		// Clear target penalty list, and then copy the source one into it.
+		tCarPenalty *penalty;
+        while ((penalty = GF_TAILQ_FIRST(&(pTgtCar->_penaltyList)))
+			   != GF_TAILQ_END(&(pTgtCar->_penaltyList)))
+		{
+			GF_TAILQ_REMOVE (&(pTgtCar->_penaltyList), penalty, link);
+			free(penalty);
+        }
+		GF_TAILQ_INIT(&(pTgtCar->_penaltyList));
+		penalty = GF_TAILQ_FIRST(&(pSrcCar->_penaltyList));
+        while (penalty)
+		{
+			tCarPenalty *newPenalty = (tCarPenalty*)calloc(1, sizeof(tCarPenalty));
+			newPenalty->penalty = penalty->penalty;
+			newPenalty->lapToClear = penalty->lapToClear;
+			GF_TAILQ_INSERT_TAIL(&(pTgtCar->_penaltyList), newPenalty, link);
+			penalty = GF_TAILQ_NEXT(penalty, link);
+		}
+
+		// priv
+		memcpy(&pTgtCar->priv.wheel[0], &pSrcCar->priv.wheel[0], 4*sizeof(tWheelState));
+		memcpy(&pTgtCar->priv.corner[0], &pSrcCar->priv.corner[0], 4*sizeof(tPosd));
+		pTgtCar->_gear = pSrcCar->_gear;
+		pTgtCar->_fuel = pSrcCar->_fuel;
+		pTgtCar->_fuelTotal = pSrcCar->_fuelTotal;
+		pTgtCar->_fuelInstant = pSrcCar->_fuelInstant;
+		pTgtCar->_enginerpm = pSrcCar->_enginerpm;
+		memcpy(&pTgtCar->priv.skid[0], &pSrcCar->priv.skid[0], 4*sizeof(tdble));
+		memcpy(&pTgtCar->priv.reaction[0], &pSrcCar->priv.reaction[0], 4*sizeof(tdble));
+		pTgtCar->_collision = pSrcCar->_collision;
+		pTgtCar->_smoke = pSrcCar->_smoke;
+		pTgtCar->_normal = pSrcCar->_normal;
+		pTgtCar->_coll2Pos = pSrcCar->_coll2Pos;
+		pTgtCar->_dammage = pSrcCar->_dammage;
+		//pTgtCar->_debug = pSrcCar->_debug; // Ever used anywhere ?
+		pTgtCar->priv.collision_state = pSrcCar->priv.collision_state;
+		//pTgtCar->_memoryPool = pSrcCar->_; // ???? Memory pool copy ??????
+
+		// ctrl
+		memcpy(&pTgtCar->ctrl, &pSrcCar->ctrl, sizeof(tCarCtrl));
+
+		// pitcmd
+		memcpy(&pTgtCar->pitcmd, &pSrcCar->pitcmd, sizeof(tCarPitCmd));
+
+		// next : ever used anywhere ?
+		//struct CarElt	*next;
+	}
+	
+	// 2) pSource->s
+	pTarget->s->raceInfo = pSource->s->raceInfo;
+	pTarget->s->deltaTime = pSource->s->deltaTime;
+	pTarget->s->currentTime = pSource->s->currentTime;
+	pTarget->s->nbPlayers = pSource->s->nbPlayers;
+	for (int nCarInd = 0; nCarInd < _nInitDrivers; nCarInd++)
+	{
+		pTarget->s->cars[nCarInd] =
+			pTarget->carList + (pSource->s->cars[nCarInd] - pSource->carList);
+	}
+	
+	// 3) pSource->rules (1 int per driver)
+	memcpy(pTarget->rules, pSource->rules, _nInitDrivers*sizeof(tRmCarRules));
+	
+	// 4) pSource->raceEngineInfo
+	pTarget->_reState = pSource->_reState;
+	memcpy(pTarget->_reCarInfo, pSource->_reCarInfo, _nInitDrivers*sizeof(tReCarInfo));
+	pTarget->_reCurTime = pSource->_reCurTime;
+	pTarget->_reTimeMult = pSource->_reTimeMult;
+	pTarget->_reRunning = pSource->_reRunning;
+	pTarget->_reLastTime = pSource->_reLastTime;
+	pTarget->_displayMode = pSource->_displayMode;
+	pTarget->_refreshDisplay = pSource->_refreshDisplay;
+	if (pTarget->_reMessage)
+	{
+		free(pTarget->_reMessage);
+		pTarget->_reMessage = 0;
+	}
+	if (pSource->_reMessage)
+	{
+		free(pTarget->_reMessage);
+		pTarget->_reMessage = strdup(pSource->_reMessage);
+	}
+	pTarget->_reMessageEnd = pSource->_reMessageEnd;
+	if (pTarget->_reBigMessage)
+	{
+		free(pTarget->_reBigMessage);
+		pTarget->_reBigMessage = 0;
+	}
+	if (pSource->_reBigMessage)
+	{
+		free(pTarget->_reBigMessage);
+		pTarget->_reBigMessage = strdup(pSource->_reBigMessage);
+	}
+	pTarget->_reBigMessageEnd = pSource->_reBigMessageEnd;
+
+	if (pSource->_reInPitMenuCar)
+		pTarget->_reInPitMenuCar =
+			pTarget->carList + (pSource->_reInPitMenuCar - pSource->carList);
+
+	return pTarget;
+}
+
+
+tRmInfo* reSituationUpdater::getPreviousStep()
+{
+	if (!_bThreaded)
+		
+		// No multi-threading : no need to really copy.
+		_pPrevReInfo = _pCurrReInfo;
+
+	else
+	{
+		// Lock the race engine data.
+		if (!lockData("reSituationUpdater::getPreviousStep"))
+			return 0;
+
+		// Get the situation data.
+		deliverSituation(_pPrevReInfo, _pCurrReInfo);
+	
+		// Unlock the race engine data.
+		if (!unlockData("reSituationUpdater::getPreviousStep"))
+			return 0;
+	}
+
+	return _pPrevReInfo;
+}
+
+void reSituationUpdater::computeCurrentStep()
+{
+	// Nothing to do if actually threaded :
+	// the updater thread is already doing the job on his side.
+	if (!_bThreaded)
+	{
+		const double t = GfTimeClock();
+		
+		START_PROFILE("ReOneStep*");
+		
+		while (_pCurrReInfo->_reRunning && ((t - _pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
+			
+			ReOneStep(RCM_MAX_DT_SIMU);
+		
+		STOP_PROFILE("ReOneStep*");
+		
+		// Send car physics to network if needed
+		if (GetNetwork())
+			GetNetwork()->SendCarControlsPacket(_pCurrReInfo->s);
+	}
+}
+
+int
+ReUpdate(void)
+{
+	tRmInfo* pPrevReInfo;
+	
+    START_PROFILE("ReUpdate");
+    ReInfo->_refreshDisplay = 0;
+    switch (ReInfo->_displayMode)
+	{
+		case RM_DISP_MODE_NORMAL:
+
+			PrintEvent(Graph, "Main", "\n");
+
+			// Get the situation for the previous step.
+			pPrevReInfo = situationUpdater->getPreviousStep();
+
+			// Start computing the situation for the current step.
+			situationUpdater->computeCurrentStep();
+			
+			// Next screen will be the pit menu if one human driver is in pit. 
+			if (pPrevReInfo->_reInPitMenuCar)
+
+				RmPitMenuStart(pPrevReInfo->s, pPrevReInfo->_reInPitMenuCar,
+							   (void*)pPrevReInfo->_reInPitMenuCar, ReUpdtPitCmd);
+
+			// Update racing messages for the user
+			reRaceMsgUpdate(pPrevReInfo);
+	
+			GfuiDisplay();
+			
+			SignalEvent(Graph);
+			
+			pPrevReInfo->_reGraphicItf.refresh(pPrevReInfo->s);
+			
+			GfelPostRedisplay();	/* Callback -> reDisplay */
+			break;
+	
+		case RM_DISP_MODE_NONE:
+			
+			ReOneStep(RCM_MAX_DT_SIMU);
+			
+			reRaceMsgUpdate(ReInfo);
+			
+			PrintEvent(Bots, "Main: ", 0);
+			PrintEvent(Simu, 0, "\n");
+			if (ReInfo->_refreshDisplay)
+				GfuiDisplay();
+			GfelPostRedisplay();	/* Callback -> reDisplay */
+			break;
+
+		case RM_DISP_MODE_SIMU_SIMU:
+			
+			ReSimuSimu();
+			ReSortCars();
+			if (ReInfo->_refreshDisplay)
+				GfuiDisplay();
+			GfelPostRedisplay();
+			break;
+
+		case RM_DISP_MODE_CAPTURE:
+		{
+			tRmMovieCapture	*capture = &(ReInfo->movieCapture);
+			while ((ReInfo->_reCurTime - capture->lastFrame) < capture->deltaFrame)
+			{
+				ReOneStep(capture->deltaSimu);
+				
+				reRaceMsgUpdate(ReInfo);
+			}
+
+			capture->lastFrame = ReInfo->_reCurTime;
+	
+			GfuiDisplay();
+			ReInfo->_reGraphicItf.refresh(ReInfo->s);
+			reCapture();
+			GfelPostRedisplay();	/* Callback -> reDisplay */
+			break;
+		}
+	
+    }
+    STOP_PROFILE("ReUpdate");
+
+    return RM_ASYNC;
+}
+
+#endif // ReMultiThreaded
+

@@ -151,10 +151,10 @@ ReStateManage(void)
 			case RE_STATE_RACE:
 				mode = ReUpdate();
 				if (ReInfo->s->_raceState == RM_RACE_ENDED) {
-					/* race finished */
+					/* Race is finished */
 					ReInfo->_reState = RE_STATE_RACE_END;
 				} else if (mode & RM_END_RACE) {
-					/* interrupt by player */
+					/* Race was interrupted (paused) by the player */
 					ReInfo->_reState = RE_STATE_RACE_STOP;
 				}
 				
@@ -169,7 +169,7 @@ ReStateManage(void)
 
 			case RE_STATE_RACE_STOP:
 				GfOut("RaceEngine: state = RE_STATE_RACE_STOP\n");
-				/* Interrupted by player */
+				/* Race was interrupted (paused) by the player */
 				mode = ReRaceStop();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_RACE_END;

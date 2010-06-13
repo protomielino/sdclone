@@ -850,10 +850,6 @@ reDumpTrack(tTrack *track, int verbose)
     sprintf(buf, "  by %s (%.2f m long, %.2f m wide) ...", 
 			track->author, track->length, track->width);
     RmLoadingScreenSetText(buf);
-    sprintf(buf, ">>> Track Length  %.2f m", track->length);
-    RmLoadingScreenSetText(buf);
-    sprintf(buf, ">>> Track Width   %.2f m", track->width);
-    RmLoadingScreenSetText(buf);
 
     GfOut("++++++++++++ Track ++++++++++++\n");
     GfOut("Name     = %s\n", track->name);

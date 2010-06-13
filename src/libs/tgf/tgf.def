@@ -51,6 +51,7 @@ EXPORTS
 	GfParmGetFileName
 	GfTime2Str
 	GfTimeClock
+	GfGetNumberOfCPUs
 	gfMean
 	gfMeanReset
 	GfPoolMalloc

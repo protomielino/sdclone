@@ -105,6 +105,10 @@ AbortRaceHookActivate(void * /* dummy */)
 {
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 
+#ifdef ReMultiThreaded
+	ReShutdownUpdater();
+#endif
+
 	ReInfo->_reSimItf.shutdown();
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		if (ReInfo->_reGraphicItf.shutdowncars)
@@ -120,8 +124,8 @@ AbortRaceHookActivate(void * /* dummy */)
 		GetNetwork()->Disconnect();
 	}
 
-
 	FREEZ(ReInfo->_reCarInfo);
+	
 	/* Return to race menu */
 	if (ReInfo->params != ReInfo->mainParams)
 	{
@@ -428,9 +432,23 @@ reRaceRealStart(void)
 	if (ReInfo->_reGraphicItf.initview)
 		ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
 
+#ifdef ReMultiThreaded
+	ReInfo->_reInPitMenuCar = 0;
+	ReInfo->_reMessage = 0;
+	ReInfo->_reMessageEnd = 0.0;
+	ReInfo->_reBigMessage = 0;
+	ReInfo->_reBigMessageEnd = 0.0;
+	
+	ReInitUpdater();
+#endif
+	
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		RmLoadingScreenSetText("Loading cars ...");
+#ifdef ReMultiThreaded
+		ReInitCarGraphics();
+#else
 		ReInfo->_reGraphicItf.initcars(s); /* At this stage, the graphical module must be already loaded */
+#endif
 	}
 
 	RmLoadingScreenSetText("Ready.");
@@ -576,6 +594,9 @@ static void
 BackToRaceHookActivate(void * /* dummy */)
 {
 	ReInfo->_reState = RE_STATE_RACE;
+#ifdef ReMultiThreaded
+	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
+#endif
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
 
@@ -600,7 +621,13 @@ static void
 RestartRaceHookActivate(void * /* dummy */)
 {
 	ReRaceCleanup();
+	
 	ReInfo->_reState = RE_STATE_PRE_RACE;
+
+#ifdef ReMultiThreaded
+	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
+#endif
+
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
 
@@ -649,9 +676,13 @@ ReRaceStop(void)
 {
 	void	*params = ReInfo->params;
 
+#ifdef ReMultiThreaded
+	ReStop();
+#endif
+
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
 	{
-		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES) == 0) 
+		if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 		{
 			StopScrHandle = RmFourStateScreen("Race Stopped",
 						"Abandon Race", "Abort current race", AbortRaceHookInit(),
@@ -667,7 +698,7 @@ ReRaceStop(void)
 		}
 	} else 
 	{
-		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)==0) 
+		if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 		{
 			StopScrHandle = RmFiveStateScreen("Race Stopped",
 						"Restart Race", "Restart the current race", RestartRaceHookInit(),
@@ -693,6 +724,10 @@ ReRaceEnd(void)
 	int curDrvIdx;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
+
+#ifdef ReMultiThreaded
+	ReShutdownUpdater();
+#endif
 
 	ReRaceCleanup();
 
@@ -720,8 +755,6 @@ RePostRace(void)
 	void *results = ReInfo->results;
 	void *params = ReInfo->params;
 
-	//ReUpdateStandings();
-
 	curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 	if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
 		curRaceIdx++;
@@ -732,7 +765,9 @@ RePostRace(void)
 	}
 
 	ReUpdateStandings();
+	
 	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+	
 	return RM_SYNC | RM_NEXT_STEP;
 }
 

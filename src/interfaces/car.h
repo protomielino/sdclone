@@ -288,6 +288,10 @@ typedef struct tCollisionState_ {
 	sgVec3 pos;
 	sgVec3 force;
 } tCollisionState;
+/* structure access */
+#define _collCount	priv.collision_state.collision_count
+#define _collPos	priv.collision_state.pos
+#define _collForce	priv.collision_state.force
 
 typedef struct MemoryPoolItem tMemoryPoolItem;
 typedef tMemoryPoolItem* tMemoryPool;
@@ -328,10 +332,10 @@ typedef struct {
     int		collision;
 	float   smoke;
     t3Dd	normal;
-    t3Dd	collpos;        /**< Collision position, useful for sound*/
+    t3Dd	collpos;        /**< Collision position, useful for sound ; Simu V2 only */
     int		dammage;
     int		debug;
-	tCollisionState collision_state; /**< collision state */
+	tCollisionState collision_state; /**< collision state ; Simu V3 only  */
     tMemPoolCar	memoryPool;
     tdble       driveSkill;           /**< Skill level for robots: 0.0 means as fast as possible; 10.0 means at a slower speed so players can easier win */
 } tPrivCar;
@@ -360,8 +364,12 @@ typedef struct {
 #define _reaction	priv.reaction
 #define _dammage	priv.dammage
 #define _driveSkill	priv.driveSkill
+#define _collision	priv.collision
+#define _smoke		priv.smoke
+#define _normal		priv.normal
+#define _coll2Pos	priv.collpos
 
-#define _newTrackMemPool	priv.memoryPool.shutdown
+#define _newTrackMemPool	priv.memoryPool.newTrack
 #define _newRaceMemPool		priv.memoryPool.newRace
 #define _endRaceMemPool		priv.memoryPool.endRace
 #define _shutdownMemPool	priv.memoryPool.shutdown
