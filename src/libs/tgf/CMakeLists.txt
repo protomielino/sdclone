@@ -7,7 +7,7 @@ ADD_TORCSLIB_INCLUDEDIR(txml portability)
 
 SET(TGF_HEADERS os.h tgf.h modinfo.h)
 SET(TGF_SOURCES directory.cpp filesetup.cpp formula.cpp hash.cpp module.cpp modinfo.cpp os.cpp
-	        params.cpp profiler.cpp tgf.cpp trace.cpp ${TGF_HEADERS})
+	        params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp ${TGF_HEADERS})
 
 IF(UNIX)
 	ADD_LIBRARY(tgf SHARED ${TGF_SOURCES})

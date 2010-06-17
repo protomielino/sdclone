@@ -1134,6 +1134,8 @@ void ReInitUpdater()
 	ReInfo->_reRunning = 0;
  	if (!situationUpdater)
  		situationUpdater = new reSituationUpdater(ReInfo);
+
+	GfssConfigureEventLog("graphics", 10000, 0.0);
 }
 
 void ReInitCarGraphics(void)
@@ -1148,6 +1150,7 @@ void
 ReStart(void)
 {
 #ifdef ReMultiThreaded
+	GfssBeginSession();
 	situationUpdater->start();
 #else // ReMultiThreaded
     ReInfo->_reRunning = 1;
@@ -1160,6 +1163,7 @@ ReStop(void)
 {
 #ifdef ReMultiThreaded
 	situationUpdater->stop();
+	GfssEndSession();
 #else
     ReInfo->_reRunning = 0;
 #endif // ReMultiThreaded
@@ -1174,6 +1178,7 @@ void ReShutdownUpdater()
 		delete situationUpdater;
 		situationUpdater = 0;
 	}
+	GfssPrintReport("schedule.csv", 1.0e-4);
 }
 #endif // ReMultiThreaded
 
@@ -1837,7 +1842,9 @@ ReUpdate(void)
 			
 			SignalEvent(Graph);
 			
+			GfssBeginEvent("graphics");
 			pPrevReInfo->_reGraphicItf.refresh(pPrevReInfo->s);
+			GfssEndEvent("graphics");
 			
 			GfelPostRedisplay();	/* Callback -> reDisplay */
 			break;

@@ -574,7 +574,9 @@ struct {								\
 } while (0)
 
 
-/* author      : Henrik Enqvist IB (henqvist@abo.fi) */
+/**********************************************
+ * Profiler definitions.
+   \author Henrik Enqvist IB (henqvist@abo.fi) */
 #ifdef PROFILER
 
 #include <vector>
@@ -620,11 +622,28 @@ class Profiler {
 };
 
 #else /* PROFILER */
+
 #define START_PROFILE(a)
 #define STOP_PROFILE(a)
 #define STOP_ACTIVE_PROFILES()
 #define PRINT_PROFILE()
+
 #endif
+
+/**********************************************************
+ * ScheduleSpy definitions.
+   \author J.P. Meuret (jpmeuret@free.fr)     
+   A tool to study the way some special code sections
+   (named "events) in the program are actually scheduled
+   at a fine grain level (see schedulespy.cpp for details). */
+
+extern void GfssConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
+extern void GfssBeginSession();
+extern void GfssBeginEvent(const char* pszLogName);
+extern void GfssEndEvent(const char* pszLogName);
+extern void GfssEndSession();
+extern void GfssPrintReport(const char* pszFileName, double fTimeResolution);
+
 
 /*******************/
 /*   Hash Tables   */

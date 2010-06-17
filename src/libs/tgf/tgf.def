@@ -97,3 +97,9 @@ EXPORTS
 	GfParmIsFormula
 	GfParmGetCurFormula
 	GfParmSetFormula
+	GfssConfigureEventLog
+	GfssBeginSession
+	GfssBeginEvent
+	GfssEndEvent
+	GfssEndSession
+	GfssPrintReport
