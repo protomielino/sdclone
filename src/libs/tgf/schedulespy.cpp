@@ -20,18 +20,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef SCHEDULE_SPY
-
-//#include <algorithm>
-#include <iostream>
-//#include <iomanip>
-
 #include <cstring>
+//#include <iostream>
+#include <vector>
+#include <map>
 
 #include "tgf.h"
 
-#include <vector>
-#include <map>
+
+#ifdef SCHEDULE_SPY
 
 class GfScheduleEventLog
 {
