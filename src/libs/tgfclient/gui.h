@@ -22,6 +22,7 @@
 #include "tgfclient.h"
 #include "guifont.h"
 
+
 #define GFUI_COLORNB	26
 extern float	GfuiColor[GFUI_COLORNB][4];
 
@@ -56,7 +57,7 @@ extern float	GfuiColor[GFUI_COLORNB][4];
 
 #define MAX_STATIC_IMAGES 5
 
-Color GetColor(float *color);
+Color GetColor(const float* color);
 
 typedef struct
 {
@@ -330,21 +331,11 @@ extern tGfuiObject *gfuiGetObject(void *scr, int id);
 
 extern void gfuiSetLabelText(tGfuiObject *object, tGfuiLabel *label, const char *text);
 
-extern void GfuiComboboxSetPosition(void *scr, int id, unsigned int pos);
-extern unsigned int GfuiComboboxGetPosition(void *scr, int id);
-extern unsigned int GfuiComboboxAddText(void *scr, int id, const char *text);
-extern void GfuiComboboxSetTextColor(void *scr, int id, Color color);
-
-
-
 extern void gfuiDrawProgressbar(tGfuiObject *obj);
 extern void gfuiDrawLabel(tGfuiObject *obj);
 extern void gfuiDrawButton(tGfuiObject *obj);
 extern void gfuiDrawCombobox(tGfuiObject *obj);
 void gfuiDrawCheckbox(tGfuiObject *obj);
-
-
-
 
 extern void gfuiButtonAction(int action);
 extern void gfuiDrawGrButton(tGfuiObject *obj);
@@ -380,7 +371,6 @@ extern void gfuiLoadFonts(void);
 
 extern void gfuiEditboxKey(tGfuiObject *obj, int key, int modifier);
 
-
 extern void gfuiScrollListNextElt (tGfuiObject *object);
 extern void gfuiScrollListPrevElt (tGfuiObject *object);
 
@@ -388,6 +378,7 @@ extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);
 
 extern float GfuiColor[GFUI_COLORNB][4];
+
 #endif /* _GUI_H__ */ 
 
 

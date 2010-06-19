@@ -25,7 +25,10 @@
 #ifndef _OPENGLCONFIG_H_
 #define _OPENGLCONFIG_H_
 
-extern void *OpenGLMenuInit(void *prevMenu);
+#include "confscreens.h"
+
+
+CONFSCREENS_API void *OpenGLMenuInit(void *prevMenu);
 
 
 #endif // _OPENGLCONFIG_H_

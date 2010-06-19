@@ -25,30 +25,37 @@
 #ifndef __TGF__H__
 #define __TGF__H__
 
-#include <stdio.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
+#include <cstring>
 #ifndef WIN32
 #include <sys/param.h>
 #include <assert.h>
-#endif /* WIN32 */
-#include <stdlib.h>
-#ifdef WIN32
-#include <limits.h>
-#include <windows.h>
 #endif
-#include <stdarg.h>
-#include <cstring>
-#include <math.h>
+#include <cmath>
+
 #include <osspec.h>
-#include "modinfo.h"
+
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef TGF_DLL
+#  define TGF_API __declspec(dllexport)
+# else
+#  define TGF_API __declspec(dllimport)
+# endif
+#else
+# define TGF_API
+#endif
+
+#include "modinfo.h" // Don't move this include line : needs TGF_API definition.
 
 
-/* typedef double tdble; */
 /** Floating point type used everywhere.
     @ingroup definitions
 */
 typedef float tdble;
-
-extern void GfInit(void);
+/* typedef double tdble; */
 
 /** Maximum between two values */
 #ifndef MAX
@@ -158,7 +165,16 @@ typedef struct
     t3Dd M; /**< Moments */
 } tForces;
 
-/** Memory pools (allocate as many items, deallocate all at once at the end) */
+/***********************************
+ * Gaming framework initialization *
+ ***********************************/
+TGF_API void GfInit(void);
+
+/************************************************************************
+ * Memory pools                                                         *
+ * Allocate as many items as needed, deallocate all at once at the end) *
+ ************************************************************************/
+
 typedef struct MemoryPoolItem tMemoryPoolItem;
 typedef tMemoryPoolItem* tMemoryPool;
 
@@ -171,13 +187,18 @@ typedef struct MemoryPoolItem
 
 typedef tMemoryPoolItem* tMemoryPool;
 
-void* GfPoolMalloc(size_t size, tMemoryPool* pool);
-void GfPoolFree(void *pointer);
-void GfPoolFreePool(tMemoryPool* pool);
-void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
+TGF_API void* GfPoolMalloc(size_t size, tMemoryPool* pool);
+TGF_API void GfPoolFree(void *pointer);
+TGF_API void GfPoolFreePool(tMemoryPool* pool);
+TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
+
+/*********************************
+ * Memory debug tools            *
+ *********************************/
 
 // <esppat>
 #ifdef WIN32
+
 #define malloc _tgf_win_malloc
 #define calloc _tgf_win_calloc
 #define realloc _tgf_win_realloc
@@ -187,11 +208,12 @@ void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
 #endif
 #define strdup _tgf_win_strdup
 #define _strdup _tgf_win_strdup
-extern void * _tgf_win_malloc(size_t size);
-extern void * _tgf_win_calloc(size_t num, size_t size);
-extern void * _tgf_win_realloc(void * memblock, size_t size);
-extern void _tgf_win_free(void * memblock);
-extern char * _tgf_win_strdup(const char * str);
+TGF_API void * _tgf_win_malloc(size_t size);
+TGF_API void * _tgf_win_calloc(size_t num, size_t size);
+TGF_API void * _tgf_win_realloc(void * memblock, size_t size);
+TGF_API void _tgf_win_free(void * memblock);
+TGF_API char * _tgf_win_strdup(const char * str);
+
 #endif // WIN32
 // </esppat>
 
@@ -202,14 +224,14 @@ extern char * _tgf_win_strdup(const char * str);
 /* Gaming Framework Id value for "no filtering on GFId" */
 #define GfIdAny		UINT_MAX
 
-extern tModList *GfModIsInList(const char *dllname, tModList *modlist);
-extern void GfModAddInList(tModList *mod, tModList **modlist, int priosort);
-extern void GfModMoveToListHead(tModList *mod, tModList **modlist);
-extern int GfModLoad(unsigned int gfid, const char *dllname, tModList **modlist);
-extern int GfModUnloadList(tModList **modlist);
-extern int GfModInfo(unsigned int gfid, const char *filename, tModList **modlist);
-extern int GfModInfoDir(unsigned int gfid, const char *dir, int level, tModList **modlist);
-extern int GfModFreeInfoList(tModList **modlist);
+TGF_API tModList *GfModIsInList(const char *dllname, tModList *modlist);
+TGF_API void GfModAddInList(tModList *mod, tModList **modlist, int priosort);
+TGF_API void GfModMoveToListHead(tModList *mod, tModList **modlist);
+TGF_API int GfModLoad(unsigned int gfid, const char *dllname, tModList **modlist);
+TGF_API int GfModUnloadList(tModList **modlist);
+TGF_API int GfModInfo(unsigned int gfid, const char *filename, tModList **modlist);
+TGF_API int GfModInfoDir(unsigned int gfid, const char *dir, int level, tModList **modlist);
+TGF_API int GfModFreeInfoList(tModList **modlist);
 
 
 /************************
@@ -228,10 +250,10 @@ typedef struct FList
     void		*userData;	/**< User data */
 } tFList;
 
-extern tFList *GfDirGetList(const char *dir);
-extern tFList *GfDirGetListFiltered(const char *dir, const char *suffix);
+TGF_API tFList *GfDirGetList(const char *dir);
+TGF_API tFList *GfDirGetListFiltered(const char *dir, const char *suffix);
 typedef void (*tfDirfreeUserData)(void*);	/**< Function to call for releasing the user data associated with file entry */
-extern void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool freename = false, bool freedispname = false);
+TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool freename = false, bool freedispname = false);
 
 
 /**********************************
@@ -260,80 +282,80 @@ extern void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool
 #define GFPARM_RMODE_CREAT	0x04	/**< Create the file if doesn't exist */
 #define GFPARM_RMODE_PRIVATE	0x08
 
-extern void * GfParmReadFileLocal(const char *file, int mode);
-extern void *GfParmReadFile(const char *file, int mode);
+TGF_API void * GfParmReadFileLocal(const char *file, int mode);
+TGF_API void *GfParmReadFile(const char *file, int mode);
 /* parameter file write */
-extern int GfParmWriteFileLocal(const char *file, void* handle, const char *name);
-extern int GfParmWriteFile(const char *file, void* handle, const char *name);
+TGF_API int GfParmWriteFileLocal(const char *file, void* handle, const char *name);
+TGF_API int GfParmWriteFile(const char *file, void* handle, const char *name);
 
-extern char *GfParmGetName(void *handle);
-extern char *GfParmGetFileName(void *handle);
-extern int GfParmGetMajorVersion(void *handle);
-extern int GfParmGetMinorVersion(void *handle);
+TGF_API char *GfParmGetName(void *handle);
+TGF_API char *GfParmGetFileName(void *handle);
+TGF_API int GfParmGetMajorVersion(void *handle);
+TGF_API int GfParmGetMinorVersion(void *handle);
 
 /* set the dtd and header values */
-extern void GfParmSetDTD (void *parmHandle, char *dtd, char*header);
+TGF_API void GfParmSetDTD (void *parmHandle, char *dtd, char*header);
 
 /* get string parameter value */
-extern const char *GfParmGetStr(void *handle, const char *path, const char *key, const char *deflt);
-extern char *GfParmGetStrNC(void *handle, const char *path, const char *key, char *deflt);
+TGF_API const char *GfParmGetStr(void *handle, const char *path, const char *key, const char *deflt);
+TGF_API char *GfParmGetStrNC(void *handle, const char *path, const char *key, char *deflt);
 /* get string parameter value */
-extern const char *GfParmGetCurStr(void *handle, const char *path, const char *key, const char *deflt);
-extern char *GfParmGetCurStrNC(void *handle, const char *path, const char *key, char *deflt);
+TGF_API const char *GfParmGetCurStr(void *handle, const char *path, const char *key, const char *deflt);
+TGF_API char *GfParmGetCurStrNC(void *handle, const char *path, const char *key, char *deflt);
 /* set string parameter value */
-extern int GfParmSetStr(void *handle, const char *path, const char *key, const char *val);
+TGF_API int GfParmSetStr(void *handle, const char *path, const char *key, const char *val);
 /* set string parameter value */
-extern int GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val);
+TGF_API int GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val);
 
 /* get num parameter value */
-extern tdble GfParmGetNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
+TGF_API tdble GfParmGetNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* get num parameter value */
-extern tdble GfParmGetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
+TGF_API tdble GfParmGetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble deflt);
 /* set num parameter value */
-extern int GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
+TGF_API int GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 /* set num parameter value */
-extern int GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
+TGF_API int GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val);
 
 /* is formula */
-extern int GfParmIsFormula(void *handle, char const *path, char const *key);
+TGF_API int GfParmIsFormula(void *handle, char const *path, char const *key);
 /* get formula */
-extern char* GfParmGetFormula(void *hanlde, char const *path, char const *key);
-extern char* GfParmGetCurFormula(void *hanlde, char const *path, char const *key);
+TGF_API char* GfParmGetFormula(void *hanlde, char const *path, char const *key);
+TGF_API char* GfParmGetCurFormula(void *hanlde, char const *path, char const *key);
 /* set formula */
-extern int GfParmSetFormula(void* hanlde, char const *path, char const *key, char const *formula);
-extern int GfParmSetCurFormula(void* hanlde, char const *path, char const *key, char const *formula);
+TGF_API int GfParmSetFormula(void* hanlde, char const *path, char const *key, char const *formula);
+TGF_API int GfParmSetCurFormula(void* hanlde, char const *path, char const *key, char const *formula);
  
 /* clean all the parameters of a set */
-extern void GfParmClean(void *handle);
+TGF_API void GfParmClean(void *handle);
 /* clean the parms and release the handle without updating the file */
-extern void GfParmReleaseHandle(void *handle);
+TGF_API void GfParmReleaseHandle(void *handle);
 
 /* Convert a value in "units" into SI */
-extern tdble GfParmUnit2SI(const char *unit, tdble val);
+TGF_API tdble GfParmUnit2SI(const char *unit, tdble val);
 /* convert a value in SI to "units" */
-extern tdble GfParmSI2Unit(const char *unit, tdble val);
+TGF_API tdble GfParmSI2Unit(const char *unit, tdble val);
 
 /* compare and merge different handles */
-extern int GfParmCheckHandle(void *ref, void *tgt);
+TGF_API int GfParmCheckHandle(void *ref, void *tgt);
 #define GFPARM_MMODE_SRC	1 /**< use ref and modify existing parameters with tgt */
 #define GFPARM_MMODE_DST	2 /**< use tgt and verify ref parameters */
 #define GFPARM_MMODE_RELSRC	4 /**< release ref after the merge */
 #define GFPARM_MMODE_RELDST	8 /**< release tgt after the merge */
-extern void *GfParmMergeHandles(void *ref, void *tgt, int mode);
-extern int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
+TGF_API void *GfParmMergeHandles(void *ref, void *tgt, int mode);
+TGF_API int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
 
 
-extern int GfParmGetEltNb(void *handle, const char *path);
-extern int GfParmListSeekFirst(void *handle, const char *path);
-extern int GfParmListSeekNext(void *handle, const char *path);
-extern char *GfParmListGetCurEltName(void *handle, const char *path);
-extern int GfParmListRemoveElt(void *handle, const char *path, const char *key);
-extern int GfParmListRenameElt(void *handle, const char *path, const char *oldKey, const char *newKey);
-extern int GfParmListClean(void *handle, const char *path);
+TGF_API int GfParmGetEltNb(void *handle, const char *path);
+TGF_API int GfParmListSeekFirst(void *handle, const char *path);
+TGF_API int GfParmListSeekNext(void *handle, const char *path);
+TGF_API char *GfParmListGetCurEltName(void *handle, const char *path);
+TGF_API int GfParmListRemoveElt(void *handle, const char *path, const char *key);
+TGF_API int GfParmListRenameElt(void *handle, const char *path, const char *oldKey, const char *newKey);
+TGF_API int GfParmListClean(void *handle, const char *path);
 
-extern void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val);
-extern void GfParmRemoveVariable(void *handle, char const *path, char const *key);
-extern tdble GfParmGetVariable(void *handle, char const *path, char const *key);
+TGF_API void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val);
+TGF_API void GfParmRemoveVariable(void *handle, char const *path, char const *key);
+TGF_API tdble GfParmGetVariable(void *handle, char const *path, char const *key);
 
 /******************* 
  * Trace Interface *
@@ -392,8 +414,9 @@ GfOut(const char *fmt, ...)
 /******************* 
  * Time  Interface *
  *******************/
-extern double GfTimeClock(void);
-extern char *GfGetTimeStr(void);
+TGF_API double GfTimeClock(void);
+TGF_API char *GfGetTimeStr(void);
+TGF_API char *GfTime2Str(tdble sec, int sgn);
 
 /* Mean values */
 #define GF_MEAN_MAX_VAL	5
@@ -404,32 +427,37 @@ typedef struct
     tdble	val[GF_MEAN_MAX_VAL+1];
 } tMeanVal;
 
-extern tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
-extern void gfMeanReset(tdble v, tMeanVal *pvt);
+TGF_API tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
+TGF_API void gfMeanReset(tdble v, tMeanVal *pvt);
 
 /* Get the actual number of CPUs / cores */
-extern int GfGetNumberOfCPUs();
+TGF_API int GfGetNumberOfCPUs();
 
 /* Run-time dirs accessors */
-extern const char *GetLocalDir(void);
-extern const char *SetLocalDir(const char *buf);
-extern const char *GetLibDir(void);
-extern const char *SetLibDir(const char *buf);
-extern const char *GetDataDir(void);
-extern const char *SetDataDir(const char *buf);
-extern const char *GetBinDir(void);
-extern const char *SetBinDir(const char *buf);
+TGF_API const char *GetLocalDir(void);
+TGF_API const char *SetLocalDir(const char *buf);
+TGF_API const char *GetLibDir(void);
+TGF_API const char *SetLibDir(const char *buf);
+TGF_API const char *GetDataDir(void);
+TGF_API const char *SetDataDir(const char *buf);
+TGF_API const char *GetBinDir(void);
+TGF_API const char *SetBinDir(const char *buf);
 
 /* MISC */
-extern int GetSingleTextureMode (void);
-extern void SetSingleTextureMode (void);
+TGF_API int GetSingleTextureMode (void);
+TGF_API void SetSingleTextureMode (void);
 
-extern int GfNearestPow2 (int x);
+TGF_API int GfNearestPow2 (int x);
 
-extern int GfCreateDir(const char *path);
+TGF_API int GfCreateDir(const char *path);
 
 /* Startup file setup */
-extern void GfFileSetup();
+TGF_API void GfFileSetup();
+
+
+/***************************
+ * Tail queue definitions. *
+ ***************************/
 
 /*
  * Copyright (c) 1991, 1993
@@ -466,9 +494,6 @@ extern void GfFileSetup();
  *	@(#)queue.h	8.5 (Berkeley) 8/20/94
  */
 
-/*
- * Tail queue definitions.
- */
 /** Head type definition
     @ingroup tailq */
 #define GF_TAILQ_HEAD(name, type)					\
@@ -574,9 +599,11 @@ struct {								\
 } while (0)
 
 
-/**********************************************
- * Profiler definitions.
-   \author Henrik Enqvist IB (henqvist@abo.fi) */
+/**************************************************************************
+ * Profiler definitions.                                                  *
+ * A simple high-level profiler for non-threaded non-recursive functions. *
+ * \author Henrik Enqvist IB (henqvist@abo.fi)                            *
+ **************************************************************************/
 #ifdef PROFILER
 
 #include <vector>
@@ -601,7 +628,6 @@ class ProfileInstance {
   std::map<ProfileInstance *, void *> mapChildren;
 };
 
-/** A simple high-level profiler for non-threaded non-recursive functions. */
 class Profiler {
  protected:
   Profiler();
@@ -630,19 +656,20 @@ class Profiler {
 
 #endif
 
-/**********************************************************
- * ScheduleSpy definitions.
-   \author J.P. Meuret (jpmeuret@free.fr)     
-   A tool to study the way some special code sections
-   (named "events) in the program are actually scheduled
-   at a fine grain level (see schedulespy.cpp for details). */
+/**************************************************************
+ * ScheduleSpy definitions.                                   *
+ *   \author J.P. Meuret (jpmeuret@free.fr)                   *
+ *   A tool to study the way some special code sections       *
+ *   (named "events) in the program are actually scheduled    *
+ *   at a fine grain level (see schedulespy.cpp for details). *
+ **************************************************************/
 
-extern void GfssConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
-extern void GfssBeginSession();
-extern void GfssBeginEvent(const char* pszLogName);
-extern void GfssEndEvent(const char* pszLogName);
-extern void GfssEndSession();
-extern void GfssPrintReport(const char* pszFileName, double fTimeResolution);
+TGF_API void GfssConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
+TGF_API void GfssBeginSession();
+TGF_API void GfssBeginEvent(const char* pszLogName);
+TGF_API void GfssEndEvent(const char* pszLogName);
+TGF_API void GfssEndSession();
+TGF_API void GfssPrintReport(const char* pszFileName, double fTimeResolution);
 
 
 /*******************/
@@ -653,28 +680,31 @@ extern void GfssPrintReport(const char* pszFileName, double fTimeResolution);
 
 typedef void (*tfHashFree)(void*);	/**< Function to call for releasing the user data associated with hash table */
 
-void *GfHashCreate(int type);
-int GfHashAddStr(void *hash, const char *key, void *data);
-void *GfHashRemStr(void *hash, char *key);
-void *GfHashGetStr(void *hash, const char *key);
-void GfHashAddBuf(void *hash, char *key, size_t sz, void *data);
-void *GfHashRemBuf(void *hash, char *key, size_t sz);
-void *GfHashGetBuf(void *hash, char *key, size_t sz);
-void GfHashRelease(void *hash, tfHashFree hashFree);
-void *GfHashGetFirst(void *hash);
-void *GfHashGetNext(void *hash);
+TGF_API void *GfHashCreate(int type);
+TGF_API int GfHashAddStr(void *hash, const char *key, void *data);
+TGF_API void *GfHashRemStr(void *hash, char *key);
+TGF_API void *GfHashGetStr(void *hash, const char *key);
+TGF_API void GfHashAddBuf(void *hash, char *key, size_t sz, void *data);
+TGF_API void *GfHashRemBuf(void *hash, char *key, size_t sz);
+TGF_API void *GfHashGetBuf(void *hash, char *key, size_t sz);
+TGF_API void GfHashRelease(void *hash, tfHashFree hashFree);
+TGF_API void *GfHashGetFirst(void *hash);
+TGF_API void *GfHashGetNext(void *hash);
 
 #define GF_DIR_CREATION_FAILED 0
 #define GF_DIR_CREATED 1
 
-/* Formula's */
 
-void* GfFormParseFormulaString(const char *string);
-void* GfFormParseFormulaStringNew(const char *string);
-tdble GfFormCalcFunc(void *cmd, void *parmHandle, char*path);
-char GfFormCalcFuncNew(void *cmd, void *parmHandle, char const* path, char *boolean, int *integer, tdble *number, char ** string);
-void GfFormFreeCommand(void *cmd);
-void GfFormFreeCommandNew(void *cmd);
+/*******************/
+/*   Formulas      */
+/*******************/
+
+TGF_API void* GfFormParseFormulaString(const char *string);
+TGF_API void* GfFormParseFormulaStringNew(const char *string);
+TGF_API tdble GfFormCalcFunc(void *cmd, void *parmHandle, char*path);
+TGF_API char GfFormCalcFuncNew(void *cmd, void *parmHandle, char const* path, char *boolean, int *integer, tdble *number, char ** string);
+TGF_API void GfFormFreeCommand(void *cmd);
+TGF_API void GfFormFreeCommandNew(void *cmd);
 
 #endif /* __TGF__H__ */
 

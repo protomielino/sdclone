@@ -26,9 +26,21 @@ $Id: xmlparse.h,v 1.1.1.1 2001/06/24 18:29:53 torcs Exp $
 extern "C" {
 #endif
 
-#ifndef XMLPARSEAPI
-#define XMLPARSEAPI /* as nothing */
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef TXML_DLL
+#  define TXML_API __declspec(dllexport)
+# else
+#  define TXML_API __declspec(dllimport)
+# endif
+#else
+# define TXML_API
 #endif
+
+#ifndef XMLPARSEAPI
+#define XMLPARSEAPI TXML_API
+#endif
+
 
 typedef void *XML_Parser;
 

@@ -12,19 +12,21 @@
 #ifndef MATH_FUNCTIONS_H
 #define MATH_FUNCTIONS_H
 
+#include "learning.h"
 #include "real.h"
 
-extern int ArgMin (int n, real* x);
-extern int ArgMax (int n, real* x);
-extern real SmoothMaxGamma (real f1, real f2, real lambda, real c);
-extern real SmoothMaxPNorm (real f1, real f2, real p);
-extern void SoftMax (int n, real* Q, real* p, real beta);
-extern void SoftMin (int n, real* Q, real* p, real beta);
-extern void Normalise (real* src, real* dst, int n_elements);
-extern real EuclideanNorm (real* a, real* b, int n);
-extern real SquareNorm (real* a, real* b, int n);
-extern real LNorm (real* a, real* b, int n, real p);
-extern real Sum (real* a, int n);
+
+LEARNING_API int ArgMin (int n, real* x);
+LEARNING_API int ArgMax (int n, real* x);
+LEARNING_API real SmoothMaxGamma (real f1, real f2, real lambda, real c);
+LEARNING_API real SmoothMaxPNorm (real f1, real f2, real p);
+LEARNING_API void SoftMax (int n, real* Q, real* p, real beta);
+LEARNING_API void SoftMin (int n, real* Q, real* p, real beta);
+LEARNING_API void Normalise (real* src, real* dst, int n_elements);
+LEARNING_API real EuclideanNorm (real* a, real* b, int n);
+LEARNING_API real SquareNorm (real* a, real* b, int n);
+LEARNING_API real LNorm (real* a, real* b, int n, real p);
+LEARNING_API real Sum (real* a, int n);
 
 template<class T>
 inline const T sign(const T& x)

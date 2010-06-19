@@ -13,16 +13,19 @@
 #ifndef DISTRIBUTION_H
 #define DISTRIBUTION_H
 
-#include "real.h"
 #include <cmath>
 #include <iostream>
 
-void setRandomSeed(unsigned int seed);
-real urandom();
-real urandom(real min, real max);
+#include "learning.h"
+#include "real.h"
+
+
+LEARNING_API void setRandomSeed(unsigned int seed);
+LEARNING_API real urandom();
+LEARNING_API real urandom(real min, real max);
 
 /// Probability distribution
-class Distribution {
+class LEARNING_API Distribution {
  public:
 	Distribution() {}
 	virtual ~Distribution() {}
@@ -32,7 +35,7 @@ class Distribution {
 
 /// \brief Parametric distribution.
 /// For distribution simply defined via moments-related parameters.
-class ParametricDistribution : public Distribution {
+class LEARNING_API ParametricDistribution : public Distribution {
 public:
 	ParametricDistribution() {}
 	virtual ~ParametricDistribution() {}
@@ -42,7 +45,7 @@ public:
 
 
 /// Discrete probability distribution
-class DiscreteDistribution : public Distribution {
+class LEARNING_API DiscreteDistribution : public Distribution {
 public:
 	int n_outcomes; ///< number of possible outcomes
 	real* p; ///< probabilities of outcomes
@@ -55,7 +58,7 @@ public:
 };
 
 /// Gaussian probability distribution
-class NormalDistribution : public ParametricDistribution {
+class LEARNING_API NormalDistribution : public ParametricDistribution {
 private:
 	bool cache;
 	real normal_x, normal_y, normal_rho;
@@ -79,7 +82,7 @@ public:
 };
 
 /// Uniform probability distribution
-class UniformDistribution : public ParametricDistribution {
+class LEARNING_API UniformDistribution : public ParametricDistribution {
 public:
 	real m; ///< mean
 	real s; ///< standard deviation
@@ -101,7 +104,7 @@ public:
 
 
 /// Laplacian probability distribution
-class LaplacianDistribution : public ParametricDistribution {
+class LEARNING_API LaplacianDistribution : public ParametricDistribution {
 public:
 	real l; ///< lambda
 	real m; ///< mean
@@ -127,7 +130,7 @@ public:
 };
 
 /// Exponential probability distribution
-class ExponentialDistribution : public ParametricDistribution {
+class LEARNING_API ExponentialDistribution : public ParametricDistribution {
 public:
 	real l; ///< lambda
 	real m; ///< mean
@@ -152,19 +155,19 @@ public:
 };
 
 /// Multinomial gaussian probability distribution
-class MultinomialGaussian : public Distribution {
-public:
-	int d; ///< number of dimensions
-	MultinomialGaussian() {d=1;}
-	/// create a multinomial with \c d dimensions
-	MultinomialGaussian(int d)
-	{
-		this->d = d;
-	}
-	virtual ~MultinomialGaussian() {}
-	virtual real generate();
-	virtual real pdf(real x);
-};
+// class LEARNING_API MultinomialGaussian : public Distribution {
+// public:
+// 	int d; ///< number of dimensions
+// 	MultinomialGaussian() {d=1;}
+// 	/// create a multinomial with \c d dimensions
+// 	MultinomialGaussian(int d)
+// 	{
+// 		this->d = d;
+// 	}
+// 	virtual ~MultinomialGaussian() {}
+// 	virtual real generate();
+// 	virtual real pdf(real x);
+// };
 
 
 #endif

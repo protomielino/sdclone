@@ -1,10 +1,9 @@
 /***************************************************************************
 
-    file        : singleplayer.h
-    created     : Sat Nov 16 09:48:11 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id: singleplayer.h,v 1.3 2004/04/05 18:25:00 olethros Exp $                                  
+    file                 : networkingmenu.h
+    created              : July 2009
+    copyright            : (C) 2009 Brian Gavin
+    web                  : speed-dreams.sourceforge.net
 
  ***************************************************************************/
 
@@ -16,22 +15,16 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: singleplayer.h,v 1.3 2004/04/05 18:25:00 olethros Exp $
-*/
 
-#ifndef _SINGLEPLAYER_H_
-#define _SINGLEPLAYER_H_
+#ifndef _NETWORKINGMENU_H_
+#define _NETWORKINGMENU_H_
 
-#include "raceengineclient.h"
+void ReLoadQuickRace();
+void ServerPrepareStartNetworkRace(void *pVoid);
 
+void reNetworkClientConnectMenu(void *pVoid);
+void reNetworkMenu(void * /* dummy */);
+void reNetworkHostMenu(void * /* dummy */);
+void reNetworkClientMenu(void * /* dummy */);
 
-RACEENGINECLIENT_API void *ReSinglePlayerInit(void *precMenu);
-
-#endif /* _SINGLEPLAYER_H_ */ 
-
-
-
+#endif // _NETWORKINGMENU_H_

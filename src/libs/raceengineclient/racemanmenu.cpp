@@ -23,11 +23,10 @@
     @version	$Id: racemanmenu.cpp,v 1.5 2004/08/11 17:44:06 torcs Exp $
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 
-
-#include "network.h"
+#include <network.h>
 #include <tgfclient.h>
 #include <raceman.h>
 #include <racescreens.h>
@@ -201,13 +200,13 @@ reConfigRunState(void)
     return;
 }
 
-void SetRacemanMenuHandle( void * handle)
+void ReSetRacemanMenuHandle( void * handle)
 {
 	racemanMenuHdle = handle;
 }
 
 void
-reConfigureMenu(void * /* dummy */)
+ReConfigureMenu(void * /* dummy */)
 {
     void *params = ReInfo->params;
 
@@ -317,7 +316,7 @@ ReRacemanMenu(void)
 
     // Create New race, Configure race, Configure players and Back buttons.
     CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"newrace",NULL,ReStartNewRace);
-    CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"configurerace",NULL,reConfigureMenu);
+    CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"configurerace",NULL,ReConfigureMenu);
     CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"configureplayers",NULL,rePlayerConfig);
     
     CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"backtomain",ReInfo->_reMenuScreen,GfuiScreenActivate);

@@ -25,24 +25,13 @@ It should NOT check if the features are really working, that is subject
 to another part eventually.
 */
 
-#ifndef _GRFEATURES_H_
-#define _GRFEATURES_H_
-
-#ifdef _WIN32
-	#ifndef DLLEXPORT
-		#define DLLEXPORT __declspec(dllexport)
-	#endif
-#pragma warning (disable: 4251)
-#else
-       #ifndef DLLEXPORT
-               #define DLLEXPORT
-       #endif
-#endif
+#ifndef _GLFEATURES_H_
+#define _GLFEATURES_H_
 
 #ifdef WIN32
 #include <windows.h>
 #include <GL/gl.h>
-#include "GL/glext.h"
+#include <GL/glext.h>
 #endif //WIN32
 
 #ifdef __APPLE__
@@ -53,20 +42,13 @@ to another part eventually.
 #include <GL/gl.h>
 #endif 
 
-#include "tgfclient.h"
 #include <graphic.h>
 
+#include "tgfclient.h"
+
+
 // Initialize
-extern void checkGLFeatures(void);
+extern void gfglCheckGLFeatures(void);
 
-// GL_ARB_texture_compression
-extern bool isCompressARBAvailable(void);
-extern bool isCompressARBEnabled(void);
-extern void updateCompressARBEnabled(void);
-
-extern DLLEXPORT int getUserTextureMaxSize(void);
-extern DLLEXPORT int getGLTextureMaxSize(void);
-extern void updateUserTextureMaxSize(void);
-
-#endif // _GRFEATURES_H_
+#endif // _GLFEATURES_H_
 

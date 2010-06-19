@@ -23,9 +23,8 @@
     @version	$Id: singleplayer.cpp,v 1.4 2004/04/05 18:25:00 olethros Exp $
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-
+#include <cstdlib>
+#include <cstdio>
 
 #include <tgfclient.h>
 #include <raceman.h>
@@ -34,6 +33,7 @@
 #include "racemain.h"
 #include "raceinit.h"
 #include "racestate.h"
+#include "singleplayer.h"
 
 static void *singlePlayerHandle = NULL;
 

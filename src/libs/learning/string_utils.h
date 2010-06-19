@@ -16,9 +16,11 @@
 #ifndef STRING_UTILS_INC
 #define STRING_UTILS_INC
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
+
+#include "learning.h"
 #include "learn_debug.h"
 
 /** 
@@ -40,35 +42,35 @@ typedef struct StringBuffer_ {
 } StringBuffer;
 
 /// Make a new stringbuffer
-extern StringBuffer* NewStringBuffer (int length);
+LEARNING_API StringBuffer* NewStringBuffer (int length);
 
 /// Given a pointer to a stringbuffer pointer, free it and clear it
-extern void FreeStringBuffer (StringBuffer** s);
+LEARNING_API void FreeStringBuffer (StringBuffer** s);
 
-extern StringBuffer* SetStringBufferLength (StringBuffer* s, unsigned int l);
+LEARNING_API StringBuffer* SetStringBufferLength (StringBuffer* s, unsigned int l);
 
 /** Returns the name of a file without leading pathname.
     (It's not a new string, but a pointer in the given string)
  */
-extern char *strBaseName(char *filename);
+LEARNING_API char *strBaseName(char *filename);
 
 /** Returns a fresh copy of the name of a file without suffix.
     (Trailing chars after c) You have to free the memory!
 */
-extern char *strRemoveSuffix(char *filename, char c='.');
+LEARNING_API char *strRemoveSuffix(char *filename, char c='.');
 
 /** Returns the concatenation #n# strings.
     The strings are the parameters given after #n#;
     You have to free the memory!
 */
-extern char *strConcat(int n, ...);
+LEARNING_API char *strConcat(int n, ...);
 
 /** Prints a message */
-extern void message(const char* msg, ...);
+LEARNING_API void message(const char* msg, ...);
 /** Reads a string dynamically */
-extern StringBuffer* read_string (FILE* f, StringBuffer* s);
+LEARNING_API StringBuffer* read_string (FILE* f, StringBuffer* s);
 /** copies a string */
-extern char* string_copy (char* c);
+LEARNING_API char* string_copy (char* c);
 //@}
 
 

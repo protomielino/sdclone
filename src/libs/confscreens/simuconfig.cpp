@@ -29,7 +29,6 @@
 #include <raceman.h>
 #include <portability.h>
 #include <tgfclient.h>
-#include <raceinit.h>
 
 #include "simuconfig.h"
 

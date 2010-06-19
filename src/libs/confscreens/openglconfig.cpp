@@ -27,7 +27,6 @@
 #include <cstring>
 
 #include <tgfclient.h>
-#include <raceinit.h>
 #include <graphic.h>
 #include <glfeatures.h>
 #include "openglconfig.h"
@@ -69,13 +68,13 @@ static void readOpenGLCfg(void)
 			break;
 		}
 	}
-	if (isCompressARBAvailable()) {
+	if (GfglIsCompressARBAvailable()) {
 		GfuiLabelSetText(scrHandle, TextureCompressOptionId, textureCompressOptionList[curOptionTextComp]);
 	}
 
 	// Read texture sizing parameters.
 	int maxsizenb = 0;
-	int sizelimit = getGLTextureMaxSize();
+	int sizelimit = GfglGetGLTextureMaxSize();
 	int tsize = (int) GfParmGetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURESIZE, (char*)NULL, (tdble) sizelimit);
 	bool found = false;
 
@@ -132,8 +131,8 @@ static void saveOpenGLOption(void *)
 
 	// Return to previous screen.
 	GfuiScreenActivate(prevHandle);
-	updateCompressARBEnabled();
-	updateUserTextureMaxSize();
+	GfglUpdateCompressARBEnabled();
+	GfglUpdateUserTextureMaxSize();
 	return;
 }
 
@@ -194,7 +193,7 @@ void * OpenGLMenuInit(void *prevMenu)
 
 
 	// Texture compression.
-	if (isCompressARBAvailable()) {
+	if (GfglIsCompressARBAvailable()) {
                 CreateButtonControl(scrHandle,param,"compressleftarrow",(void*)-1, changeTextureCompressState);
                 CreateButtonControl(scrHandle,param,"compressrightarrow",(void*)1, changeTextureCompressState);
 		TextureCompressOptionId = CreateLabelControl(scrHandle,param,"compressiontext");

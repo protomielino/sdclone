@@ -93,6 +93,12 @@ static double	bigMsgDisp;
 
 tRmInfo	*ReInfo = 0;
 
+tRmInfo* ReGetSituation()
+{
+	return ReInfo;
+}
+
+
 #ifdef ReMultiThreaded //==========================================================
 
 #include "SDL/SDL.h"

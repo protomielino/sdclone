@@ -13,14 +13,18 @@
 #ifndef ANN_H
 #define ANN_H
 
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cmath>
+
 #include "learn_debug.h"
 #include "string_utils.h"
 #include "List.h"
 #include "real.h"
+
+#include "learning.h"
+
 
 /** \file ANN.h
     \brief A neural network implementation.

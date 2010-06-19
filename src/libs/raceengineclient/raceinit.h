@@ -26,11 +26,12 @@
 #ifndef _RACEINIT_H_
 #define _RACEINIT_H_
 
-#define RACE_ENG_CFG	"config/raceengine.xml"
+#include "raceengineclient.h"
+
 
 extern void ReInit(void);
 extern void ReShutdown(void);
-extern void ReStartNewRace(void * /* dummy */);
+RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
 extern void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle);
 extern int  ReInitCars(void);
 extern int  ReInitTrack(void);

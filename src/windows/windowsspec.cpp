@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 
-#include <stddef.h>
+#include <cstddef>
 #include <sys/types.h>
 #include <time.h>
 #include <direct.h>
@@ -87,7 +87,7 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 		}
 		else 
 		{
-			FreeLibrary(handle);
+			FreeLibrary(SOHandle(handle));
 			GfError("windowsModLoad: Module init function failed %s\n", soPath);
 			return -1;
 		}
@@ -163,7 +163,7 @@ windowsModInfo(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 	}
 	
 	/* Unload the DLL */
-	FreeLibrary(handle);
+	FreeLibrary(SOHandle(handle));
     } 
     else
     {
@@ -237,7 +237,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		    }
 		    else 
 		    {
-		        FreeLibrary(handle);
+		        FreeLibrary(SOHandle(handle));
 			modnb = -1;
 			break;
 		    }
@@ -317,7 +317,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 		{
 		    /* Load the DLL */
 		    GfOut("Querying module %s\n", soPath);
-		    handle = LoadLibrary( soPath );
+		    handle = (tSOHandle)LoadLibrary( soPath );
 		    if (handle)
 		    {
 			/* Initialize the module */
@@ -341,7 +341,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 			}
 
 			/* Close the DLL */
-			FreeLibrary(handle);
+			FreeLibrary(SOHandle(handle));
 		    } 
 		    else 
 		    {
@@ -396,7 +396,7 @@ windowsModUnloadList(tModList **modlist)
 	    if (termSts)
 		unloadSts = termSts;
 
-	    FreeLibrary(curMod->handle);
+	    FreeLibrary(SOHandle(curMod->handle));
 	}
 	GfOut("Unloaded module %s\n", curMod->sopath);
 

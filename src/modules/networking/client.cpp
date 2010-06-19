@@ -674,3 +674,12 @@ void Client::ConnectToClients()
 	}
 
 }
+
+void Client::SetLocalDrivers()
+{
+	m_setLocalDrivers.clear();
+	m_driverIdx = GetDriverIdx();
+	m_setLocalDrivers.insert(m_driverIdx-1);
+	printf("Adding Human start rank: %i\n",m_driverIdx-1);
+}
+

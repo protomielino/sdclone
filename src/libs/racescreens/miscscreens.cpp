@@ -23,7 +23,7 @@
     @version    $Id$
 */
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <tgfclient.h>
 #include <robot.h>

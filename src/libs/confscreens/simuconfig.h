@@ -25,8 +25,10 @@
 #ifndef _SIMUCONFIG_H_
 #define _SIMUCONFIG_H_
 
-extern void *SimuMenuInit(void *prevMenu);
+#include "confscreens.h"
 
+
+CONFSCREENS_API void *SimuMenuInit(void *prevMenu);
 
 #endif /* _SIMUCONFIG_H_ */ 
 

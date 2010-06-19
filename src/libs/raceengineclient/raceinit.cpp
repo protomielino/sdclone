@@ -38,6 +38,9 @@
 #include <string>
 #include <map>
 
+#include "teammanager.h"
+#include "racescreens.h"
+
 #include "raceengine.h"
 #include "racemain.h"
 #include "racestate.h"
@@ -45,8 +48,6 @@
 #include "raceresults.h"
 #include "racecareer.h"
 #include "raceweather.h"
-
-#include "teammanager.h"
 
 #include "raceinit.h"
 

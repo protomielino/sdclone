@@ -35,6 +35,9 @@
 #include <track.h>                               // TR_PIT_MAXCARPERPIT = 4
 #include <raceman.h>                             // tSituation
 
+#include "robottools.h"
+
+
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // Teammanager
 // Robot developer API:
@@ -43,62 +46,63 @@
 //
 // Utility functions
 //
-bool RtIsTeamMate                                // Check wether Car0 is Teammate of Car1
+ROBOTTOOLS_API bool RtIsTeamMate                   // Check wether Car0 is Teammate of Car1
 	(const CarElt* Car0, const CarElt* Car1);
 
 //
 // Teammanager related functions for use by robots
 //
-short int RtTeamManagerGetMajorVersion();        // Get major version of used team manager data blocks
-short int RtTeamManagerGetMinorVersion();        // Get minor version of used team manager data blocks
+ROBOTTOOLS_API short int RtTeamManagerGetMajorVersion(); // Get major version of used team manager data blocks
+ROBOTTOOLS_API short int RtTeamManagerGetMinorVersion(); // Get minor version of used team manager data blocks
 
-extern void RtTeamManagerShowInfo();             // Switch on team manager info output 
-extern void RtTeamManagerLaps(int Laps);         // Nbr of laps to add for MinLaps 
+ROBOTTOOLS_API void RtTeamManagerShowInfo();     // Switch on team manager info output 
+ROBOTTOOLS_API void RtTeamManagerLaps(int Laps); // Nbr of laps to add for MinLaps 
 
-extern bool RtTeamManagerInit();                 // Initialize team manager (is called by RtTeamManagerIndex
+ROBOTTOOLS_API bool RtTeamManagerInit();         // Initialize team manager (is called by RtTeamManagerIndex
                                                  // and RtTeamManagerDump implicitly)
 
-extern int RtTeamManagerIndex(                   // Add a Teammate to it's team (at NewRace)
+ROBOTTOOLS_API int RtTeamManagerIndex(           // Add a Teammate to it's team (at NewRace)
 	CarElt* const Car,                           // -> teammate's car 
 	tTrack* const Track,                         // -> track
 	tSituation* Situation);                      // -> situaion
                                                  // <- TeamIndex as handle for the subsequent calls
 
-extern void RtTeamManagerRelease();              // Release team manager at Shutdown
+ROBOTTOOLS_API void RtTeamManagerRelease();              // Release team manager at Shutdown
 
-extern void RtTeamManagerDump(int DumpMode = 0); // For tests: Dump content to console
-                                                 // -> DumpMode = 2, dump allways
-                                                 // -> DumpMode = 1, dump only after last driver has been added
-                                                 // -> DumpMode = 0, dump only after last driver has been added if more than 1 driver is used
+ROBOTTOOLS_API void RtTeamManagerDump(int DumpMode = 0); // For tests: Dump content to console
+                                                         // -> DumpMode = 2, dump allways
+                                                         // -> DumpMode = 1, dump only after last driver has been added
+                                                         // -> DumpMode = 0, dump only after last driver has been added if more than 1 driver is used
 
-extern void RtTeamManagerStart();                // Start team manager, needed to start if not all robots use it 
+ROBOTTOOLS_API void RtTeamManagerStart();                // Start team manager, needed to start if not all robots use it 
 
 //
 // Team related functions for use by robots
 //
-extern bool RtTeamAllocatePit(                   // Try to allocate the pit for use of this teammate 
+ROBOTTOOLS_API bool RtTeamAllocatePit(   // Try to allocate the pit for use of this teammate 
 	const int TeamIndex);
 
-extern bool RtTeamIsPitFree(                     // Check wether the pit to use is available
+ROBOTTOOLS_API bool RtTeamIsPitFree(     // Check wether the pit to use is available
 	const int TeamIndex);
 
-extern bool RtTeamNeedPitStop(                   // Check wether this teammate should got to pit for refueling 
-	const int TeamIndex,                         // (depends from the fuel of all other teammates using the same pit)
-	float FuelPerM,                              // Fuel consumption per m
-	int RepairWanted);                           // Damage to repair at next pitstop
+ROBOTTOOLS_API bool RtTeamNeedPitStop(   // Check wether this teammate should got to pit for refueling 
+	const int TeamIndex,                 // (depends from the fuel of all other teammates using the same pit)
+	float FuelPerM,                      // Fuel consumption per m
+	int RepairWanted);                   // Damage to repair at next pitstop
 
-extern void RtTeamReleasePit(                    // Release the pit
+ROBOTTOOLS_API void RtTeamReleasePit(    // Release the pit
 	const int TeamIndex);
 
-extern int RtTeamUpdate(                         // Get nbr of laps all other teammates using the same pit can still race 
-	const int TeamIndex, const int FuelForLaps); // -> Nbr of laps the driver has fuel for
-                                                 // <- Min nbr of laps all other teammates using the same pit have fuel for
+ROBOTTOOLS_API int RtTeamUpdate(    // Get nbr of laps all other teammates using the same pit can still race 
+	const int TeamIndex,
+	const int FuelForLaps);         // -> Nbr of laps the driver has fuel for
+                                    // <- Min nbr of laps all other teammates using the same pit have fuel for
 
 //
 // Team driver related functions for use by robots
 //
-extern float RtTeamDriverRemainingDistance       // Get the remaining distance to race
-	(const int TeamIndex);						 // Depends on beeing overlapped or not
+ROBOTTOOLS_API float RtTeamDriverRemainingDistance( // Get the remaining distance to race
+	const int TeamIndex);                           // Depends on beeing overlapped or not
 
 //
 // End of robot developer API

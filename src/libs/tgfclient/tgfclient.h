@@ -53,29 +53,34 @@
 #include "screen_properties.h"
 
 
-class Color
-{
-  public:
-    float red, green, blue, alpha;
-    float *GetPtr() { return (float*)this;}
-};
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef TGFCLIENT_DLL
+#  define TGFCLIENT_API __declspec(dllexport)
+# else
+#  define TGFCLIENT_API __declspec(dllimport)
+# endif
+#else
+# define TGFCLIENT_API
+#endif
 
-struct RmInfo;
-typedef struct RmInfo tRmInfo;
 
-extern void GfInitClient(void);
+/******************** 
+ * Initialization   *
+ ********************/
+
+TGFCLIENT_API void GfInitClient(void);
+
 
 /******************** 
  * Screen Interface *
  ********************/
 
-extern void GfScrInit(int argc, char *argv[]);
-extern void GfScrShutdown(void);
-extern void *GfScrMenuInit(void *precMenu);
-extern char *GfTime2Str(tdble sec, int sgn);
-extern void GfScrGetSize(int *ScrW, int *ScrH, int *ViewW, int *ViewH);
-extern void GfScrReinit(void*);
-
+TGFCLIENT_API void GfScrInit(int argc, char *argv[]);
+TGFCLIENT_API void GfScrShutdown(void);
+TGFCLIENT_API void *GfScrMenuInit(void *precMenu);
+TGFCLIENT_API void GfScrGetSize(int *ScrW, int *ScrH, int *ViewW, int *ViewH);
+TGFCLIENT_API void GfScrReinit(void*);
 
 /*****************************
  * GUI interface (low-level) *
@@ -190,38 +195,50 @@ typedef void (*tfuiCheckboxCallback)(bool bChecked);
 
 /* Event loop callback functions (should be called explicitely if the corresponding
    event loop callback is overriden after a call to GfuiActivateScreen */
-extern void GfuiDisplay(void);
-extern void GfuiDisplayNothing(void);
-extern void (*tfuiIdleCB(tRmInfo *info))(void);
-extern void GfuiIdle(void);
-extern void GfuiIdleMenu(void);
+TGFCLIENT_API void GfuiDisplay(void);
+TGFCLIENT_API void GfuiDisplayNothing(void);
+TGFCLIENT_API void GfuiIdle(void);
+TGFCLIENT_API void GfuiIdleMenu(void);
+
+struct RmInfo;
+typedef struct RmInfo tRmInfo;
+TGFCLIENT_API void (*tfuiIdleCB(tRmInfo *info))(void);
 
 /* Screen management */
-extern void *GfuiScreenCreate(void);
-extern void *GfuiScreenCreateEx(float *bgColor, 
+TGFCLIENT_API void *GfuiScreenCreate(void);
+TGFCLIENT_API void *GfuiScreenCreateEx(float *bgColor, 
                                 void *userDataOnActivate, tfuiCallback onActivate, 
                                 void *userDataOnDeactivate, tfuiCallback onDeactivate, 
                                 int mouseAllowed);
-extern void GfuiScreenRelease(void *screen);
-extern void GfuiScreenActivate(void *screen);
-extern int  GfuiScreenIsActive(void *screen);
-extern void GfuiScreenReplace(void *screen);
-extern void GfuiScreenDeactivate(void);
-extern void *GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);
-extern void GfuiHookRelease(void *hook);
-extern void GfuiAddKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
-extern void GfuiRegisterKey(int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
-extern void GfuiSetKeyAutoRepeat(void *scr, int on);
-extern void GfuiHelpScreen(void *prevScreen);
-extern void GfuiScreenShot(void *notused);
-extern void GfuiScreenAddBgImg(void *scr, const char *filename);
-extern void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
-extern void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
-extern void GfuiSleep(double delay);
-extern int GfuiOpenGLExtensionSupported(const char* extension);
-extern void GfuiInitWindowPosition(int x, int y);
-extern void GfuiInitWindowSize(int x, int y);
-extern void GfuiSwapBuffers(void);
+TGFCLIENT_API void GfuiScreenRelease(void *screen);
+TGFCLIENT_API void GfuiScreenActivate(void *screen);
+TGFCLIENT_API int  GfuiScreenIsActive(void *screen);
+TGFCLIENT_API void GfuiScreenReplace(void *screen);
+TGFCLIENT_API void GfuiScreenDeactivate(void);
+TGFCLIENT_API void *GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);
+TGFCLIENT_API void GfuiHookRelease(void *hook);
+TGFCLIENT_API void GfuiAddKey(void *scr, int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+TGFCLIENT_API void GfuiRegisterKey(int key, const char *descr, void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+TGFCLIENT_API void GfuiSetKeyAutoRepeat(void *scr, int on);
+TGFCLIENT_API void GfuiHelpScreen(void *prevScreen);
+TGFCLIENT_API void GfuiScreenShot(void *notused);
+TGFCLIENT_API void GfuiScreenAddBgImg(void *scr, const char *filename);
+TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
+TGFCLIENT_API void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
+TGFCLIENT_API void GfuiSleep(double delay);
+TGFCLIENT_API void GfuiInitWindowPosition(int x, int y);
+TGFCLIENT_API void GfuiInitWindowSize(int x, int y);
+TGFCLIENT_API void GfuiSwapBuffers(void);
+
+class TGFCLIENT_API GfuiMenuScreen
+{
+public:
+	GfuiMenuScreen() { m_pMenuHandle = 0; }
+	void* GetMenuHandle() { return m_pMenuHandle; }
+	void RunMenu() { GfuiScreenActivate(m_pMenuHandle); }
+protected:
+	void* m_pMenuHandle;
+};
 
 /* Mouse management */
 typedef struct MouseInfo
@@ -231,22 +248,22 @@ typedef struct MouseInfo
     int button[3];
 } tMouseInfo;
 
-extern tMouseInfo *GfuiMouseInfo(void);
-extern void GfuiMouseSetPos(int x, int y);
-extern void GfuiMouseHide(void);
-extern void GfuiMouseShow(void);
-extern void GfuiMouseToggleVisibility(void);
-extern void GfuiMouseSetHWPresent(void);
+TGFCLIENT_API tMouseInfo *GfuiMouseInfo(void);
+TGFCLIENT_API void GfuiMouseSetPos(int x, int y);
+TGFCLIENT_API void GfuiMouseHide(void);
+TGFCLIENT_API void GfuiMouseShow(void);
+TGFCLIENT_API void GfuiMouseToggleVisibility(void);
+TGFCLIENT_API void GfuiMouseSetHWPresent(void);
 
 
 /* All widgets */
 #define GFUI_VISIBLE    1       /**< Object visibility flag  */
 #define GFUI_INVISIBLE  0       /**< Object invisibility flag  */
-extern int GfuiVisibilitySet(void *scr, int id, int visible);
+TGFCLIENT_API int GfuiVisibilitySet(void *scr, int id, int visible);
 #define GFUI_DISABLE    1
 #define GFUI_ENABLE     0
-extern int GfuiEnable(void *scr, int id, int flag);
-extern void GfuiUnSelectCurrent(void);
+TGFCLIENT_API int GfuiEnable(void *scr, int id, int flag);
+TGFCLIENT_API void GfuiUnSelectCurrent(void);
 
 /* Labels */
 #define GFUI_FONT_BIG           0
@@ -258,136 +275,146 @@ extern void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_MEDIUM_C      6
 #define GFUI_FONT_SMALL_C       7
 #define GFUI_FONT_DIGIT         8
-extern int GfuiLabelCreate(void *scr, const char *text, 
+TGFCLIENT_API int GfuiLabelCreate(void *scr, const char *text, 
                         int font, int x, int y, int align, int maxlen);
-extern int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font, int x, int y, int align, int maxlen);
+TGFCLIENT_API int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font, int x, int y, int align, int maxlen);
 
-extern void GfuiSetTipPosition(int x,int y);
-extern int GfuiTipCreate(void *scr, const char *text, int maxlen);
-extern int GfuiTitleCreate(void *scr, const char *text, int maxlen);
+TGFCLIENT_API void GfuiSetTipPosition(int x,int y);
+TGFCLIENT_API int GfuiTipCreate(void *scr, const char *text, int maxlen);
+TGFCLIENT_API int GfuiTitleCreate(void *scr, const char *text, int maxlen);
 
-extern void GfuiLabelSetText(void *scr, int id, const char *text);
-extern void GfuiLabelSetColor(void *scr, int id, const float * colorPtr);
+TGFCLIENT_API void GfuiLabelSetText(void *scr, int id, const char *text);
+TGFCLIENT_API void GfuiLabelSetColor(void *scr, int id, const float * colorPtr);
 
-extern void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, int align);
-extern int  GfuiFontHeight(int font);
-extern int  GfuiFontWidth(int font, const char *text);
+TGFCLIENT_API void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, int align);
+TGFCLIENT_API int  GfuiFontHeight(int font);
+TGFCLIENT_API int  GfuiFontWidth(int font, const char *text);
 
 
 /* Buttons */
 #define GFUI_BTNSZ      300
-extern int GfuiButtonCreate(void *scr, const char *text, int font,
+TGFCLIENT_API int GfuiButtonCreate(void *scr, const char *text, int font,
                             int x, int y, int width, int align, int mouse,
                             void *userDataOnPush, tfuiCallback onPush, 
                             void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
+TGFCLIENT_API int GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
                                  void *userDataOnPush, tfuiCallback onPush, 
                                  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+TGFCLIENT_API int GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
                               int x, int y, int align, int mouse,
                               void *userDataOnPush, tfuiCallback onPush, 
                               void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
                    int x, int y, int imageWidth,int imageHeight,int align, int mouse,
                    void *userDataOnPush, tfuiCallback onPush, 
                    void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,tfuiComboCallback onChange);
-extern int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,tfuiCheckboxCallback onChange);
+TGFCLIENT_API int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,tfuiComboCallback onChange);
+TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,tfuiCheckboxCallback onChange);
 
 
-extern unsigned int GfuiComboboxAddText(void *scr, int id, const char *text);
-extern void GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index);
+class TGFCLIENT_API Color
+{
+  public:
+    float red, green, blue, alpha;
+    const float *GetPtr() const { return (float*)this; }
+};
 
-extern int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value);
+TGFCLIENT_API unsigned int GfuiComboboxAddText(void *scr, int id, const char *text);
+TGFCLIENT_API void GfuiComboboxSetTextColor(void *scr, int id, const Color& color);
+TGFCLIENT_API void GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index);
+TGFCLIENT_API void GfuiComboboxSetPosition(void *scr, int id, unsigned int pos);
+TGFCLIENT_API unsigned int GfuiComboboxGetPosition(void *scr, int id);
+
+TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value);
 
 
-extern int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
 		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
 		   void *userDataOnPush, tfuiCallback onPush, 
 		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
 
-extern void GfuiButtonShowBox(void *scr, int id,bool bShow);
-extern void GfuiButtonSetColor(void *scr, int id,Color color);
-extern void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
-extern void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
-extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
-extern void GfuiCheckboxSetChecked(void *scr, int id, bool bChecked);
+TGFCLIENT_API void GfuiButtonShowBox(void *scr, int id,bool bShow);
+TGFCLIENT_API void GfuiButtonSetColor(void *scr, int id, Color color);
+TGFCLIENT_API void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
+TGFCLIENT_API void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
+TGFCLIENT_API void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+TGFCLIENT_API void GfuiCheckboxSetChecked(void *scr, int id, bool bChecked);
 
 
-extern void GfuiButtonSetText(void *scr, int id, const char *text);
-extern int GfuiButtonGetFocused(void);
+TGFCLIENT_API void GfuiButtonSetText(void *scr, int id, const char *text);
+TGFCLIENT_API int GfuiButtonGetFocused(void);
 
 /* Edit Boxes */
-extern int GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width, int maxlen,
+TGFCLIENT_API int GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width, int maxlen,
                              void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int GfuiEditboxGetFocused(void);
-extern char *GfuiEditboxGetString(void *scr, int id);
-extern void GfuiEditboxSetString(void *scr, int id, const char *text);
-extern void GfuiEditboxSetColor(void *scr, int id,Color color);
-extern void GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor);
+TGFCLIENT_API int GfuiEditboxGetFocused(void);
+TGFCLIENT_API char *GfuiEditboxGetString(void *scr, int id);
+TGFCLIENT_API void GfuiEditboxSetString(void *scr, int id, const char *text);
+TGFCLIENT_API void GfuiEditboxSetColor(void *scr, int id,Color color);
+TGFCLIENT_API void GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor);
 
 
 /* Scrolling lists */
-extern int GfuiScrollListCreate(void *scr, int font, int x, int y, int align,
+TGFCLIENT_API int GfuiScrollListCreate(void *scr, int font, int x, int y, int align,
                                 int width, int height, int scrollbar, void *userDataOnSelect, tfuiCallback onSelect);
-extern int GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData);
-extern int GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta);
-extern const char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
-extern const char *GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData);
-extern const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
-extern bool GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement);
-extern const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
-extern void GfuiScrollListShowElement(void *scr, int Id, int index);
-extern void GfuiScrollListSetColor(void *scr, int id,Color color);
-extern void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
+TGFCLIENT_API int GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData);
+TGFCLIENT_API int GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta);
+TGFCLIENT_API const char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
+TGFCLIENT_API const char *GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData);
+TGFCLIENT_API const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
+TGFCLIENT_API bool GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement);
+TGFCLIENT_API const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
+TGFCLIENT_API void GfuiScrollListShowElement(void *scr, int Id, int index);
+TGFCLIENT_API void GfuiScrollListSetColor(void *scr, int id,Color color);
+TGFCLIENT_API void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
 
 
 /* Scroll bars */
-extern int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
+TGFCLIENT_API int GfuiScrollBarCreate(void *scr, int x, int y, int align, int width, int orientation,
                                int min, int max, int len, int start, 
                                void *userData, tfuiSBCallback onScroll);
-extern void GfuiScrollBarPosSet(void *scr, int id, int min, int max, int len, int start);
-extern int GfuiScrollBarPosGet(void *scr, int id);
+TGFCLIENT_API void GfuiScrollBarPosSet(void *scr, int id, int min, int max, int len, int start);
+TGFCLIENT_API int GfuiScrollBarPosGet(void *scr, int id);
 
 /* Images */
-extern int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name);
-extern int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *name, int align);
-extern void GfuiStaticImageSet(void *scr, int id, const char *name);
-extern void GfuiStaticImageSetEx(void *scr, int id, const char *name,unsigned int index);
-extern void GfuiStaticImageSetActive(void *scr, int id, int index);
+TGFCLIENT_API int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name);
+TGFCLIENT_API int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *name, int align);
+TGFCLIENT_API void GfuiStaticImageSet(void *scr, int id, const char *name);
+TGFCLIENT_API void GfuiStaticImageSetEx(void *scr, int id, const char *name,unsigned int index);
+TGFCLIENT_API void GfuiStaticImageSetActive(void *scr, int id, int index);
 
 /*****************************
  * Menu Management Interface *
  *****************************/
 
-extern void *GfuiMenuScreenCreate(const char *title);
-extern void  GfuiMenuDefaultKeysAdd(void *scr);
-extern int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userdata, const int style, tfuiCallback onpush);
-extern int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const char *tip, void *userdata, tfuiCallback onpush);
+TGFCLIENT_API void *GfuiMenuScreenCreate(const char *title);
+TGFCLIENT_API void  GfuiMenuDefaultKeysAdd(void *scr);
+TGFCLIENT_API int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userdata, const int style, tfuiCallback onpush);
+TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const char *tip, void *userdata, tfuiCallback onpush);
 
 /*******************************************
  * New XML based Menu Management Interface *
  *******************************************/
 
-extern void *LoadMenuXML(const char *pFilePath);
-extern bool CreateStaticControls(void *param,void *menuHandle);
+TGFCLIENT_API void *LoadMenuXML(const char *pFilePath);
+TGFCLIENT_API bool CreateStaticControls(void *param,void *menuHandle);
 
-extern int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
-extern int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
-extern int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
-extern int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-extern int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect);
-extern int CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,tfuiComboCallback onChange);
-extern int CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,tfuiCheckboxCallback onChange);
-extern int CreateProgressbarControl(void *menuHandle,void *param,const char *pControlName);
+TGFCLIENT_API int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
+TGFCLIENT_API int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
+TGFCLIENT_API int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
+TGFCLIENT_API int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect);
+TGFCLIENT_API int CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,tfuiComboCallback onChange);
+TGFCLIENT_API int CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,tfuiCheckboxCallback onChange);
+TGFCLIENT_API int CreateProgressbarControl(void *menuHandle,void *param,const char *pControlName);
 
-extern void GfuiButtonShowBox(void *scr, int id,bool bShow);
-extern void GfuiButtonSetColor(void *scr, int id,Color color);
-extern void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
-extern void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
-extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+TGFCLIENT_API void GfuiButtonShowBox(void *scr, int id,bool bShow);
+TGFCLIENT_API void GfuiButtonSetColor(void *scr, int id,Color color);
+TGFCLIENT_API void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
+TGFCLIENT_API void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
+TGFCLIENT_API void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
 
 /*****************************
  * Texture / image interface *
@@ -396,13 +423,13 @@ extern void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const ch
 // TODO: Add a GfTexReadImageFromFile for implicit source file format 
 // (would call GfTexReadPng/Jpeg ... according to the file extension,
 //  and probably also return the number of bytes per pixel)
-extern unsigned char *GfTexReadPng(const char *filename, int *widthp, int *heightp, float gamma, int *pow2_widthp, int *pow2_heightp);
-extern unsigned char *GfTexReadJpeg(const char *filename, int *widthp, int *heightp, float screen_gamma, int *pow2_widthp, int *pow2_heightp);
+TGFCLIENT_API unsigned char *GfTexReadPng(const char *filename, int *widthp, int *heightp, float gamma, int *pow2_widthp, int *pow2_heightp);
+TGFCLIENT_API unsigned char *GfTexReadJpeg(const char *filename, int *widthp, int *heightp, float screen_gamma, int *pow2_widthp, int *pow2_heightp);
 
-extern int GfTexWritePng(unsigned char *img, const char *filename, int width, int height);
-extern void GfTexFreeTex(GLuint tex);
-extern GLuint GfTexReadTex(const char *filename);
-extern GLuint GfTexReadTex(const char *filename,int &height,int &width);
+TGFCLIENT_API int GfTexWritePng(unsigned char *img, const char *filename, int width, int height);
+TGFCLIENT_API void GfTexFreeTex(GLuint tex);
+TGFCLIENT_API GLuint GfTexReadTex(const char *filename);
+TGFCLIENT_API GLuint GfTexReadTex(const char *filename,int &height,int &width);
 
 
 /*********************
@@ -441,10 +468,10 @@ typedef struct
     int         levelup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER]; /**< Button state (1 = up) */
 } tCtrlJoyInfo;
 
-extern tCtrlJoyInfo *GfctrlJoyInit(void);
-extern int GfctrlJoyIsPresent(void);
-extern int GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo);
-extern void GfctrlJoyRelease(tCtrlJoyInfo *joyInfo);
+TGFCLIENT_API tCtrlJoyInfo *GfctrlJoyInit(void);
+TGFCLIENT_API int GfctrlJoyIsPresent(void);
+TGFCLIENT_API int GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo);
+TGFCLIENT_API void GfctrlJoyRelease(tCtrlJoyInfo *joyInfo);
 
 
 /** Mouse information structure */
@@ -456,13 +483,13 @@ typedef struct
     float       ax[4];          /**< mouse axis position (mouse considered as a joystick) */
 } tCtrlMouseInfo;
 
-extern tCtrlMouseInfo *GfctrlMouseInit(void);
-extern int GfctrlMouseGetCurrent(tCtrlMouseInfo *mouseInfo);
-extern void GfctrlMouseRelease(tCtrlMouseInfo *mouseInfo);
-extern void GfctrlMouseCenter(void);
-extern void GfctrlMouseInitCenter(void);
-extern tCtrlRef *GfctrlGetRefByName(const char *name);
-extern const char *GfctrlGetNameByRef(int type, int index);
+TGFCLIENT_API tCtrlMouseInfo *GfctrlMouseInit(void);
+TGFCLIENT_API int GfctrlMouseGetCurrent(tCtrlMouseInfo *mouseInfo);
+TGFCLIENT_API void GfctrlMouseRelease(tCtrlMouseInfo *mouseInfo);
+TGFCLIENT_API void GfctrlMouseCenter(void);
+TGFCLIENT_API void GfctrlMouseInitCenter(void);
+TGFCLIENT_API tCtrlRef *GfctrlGetRefByName(const char *name);
+TGFCLIENT_API const char *GfctrlGetNameByRef(int type, int index);
 
 
 /************************
@@ -470,29 +497,45 @@ extern const char *GfctrlGetNameByRef(int type, int index);
  ************************/
 
 // Callbacks initialization
-extern void GfelInitialize();
+TGFCLIENT_API void GfelInitialize();
 
 // Specific callbacks setup
-extern void GfelSetKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y));
-extern void GfelSetKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y));
+TGFCLIENT_API void GfelSetKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y));
+TGFCLIENT_API void GfelSetKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y));
 
-extern void GfelSetMouseButtonCB(void (*func)(int button, int state, int x, int y));
-extern void GfelSetMouseMotionCB(void (*func)(int x, int y));
-extern void GfelSetMousePassiveMotionCB(void (*func)(int x, int y));
+TGFCLIENT_API void GfelSetMouseButtonCB(void (*func)(int button, int state, int x, int y));
+TGFCLIENT_API void GfelSetMouseMotionCB(void (*func)(int x, int y));
+TGFCLIENT_API void GfelSetMousePassiveMotionCB(void (*func)(int x, int y));
 
-extern void GfelSetIdleCB(void (*func)(void));
+TGFCLIENT_API void GfelSetIdleCB(void (*func)(void));
 
-extern void GfelSetDisplayCB(void (*func)(void));
-extern void GfelSetReshapeCB(void (*func)(int width, int height));
+TGFCLIENT_API void GfelSetDisplayCB(void (*func)(void));
+TGFCLIENT_API void GfelSetReshapeCB(void (*func)(int width, int height));
 
-extern void GfelSetTimerCB(unsigned int millis, void (*func)(int value));
+TGFCLIENT_API void GfelSetTimerCB(unsigned int millis, void (*func)(int value));
 
 // Event loop management
-extern void GfelPostRedisplay(void);
-extern void GfelForceRedisplay();
+TGFCLIENT_API void GfelPostRedisplay(void);
+TGFCLIENT_API void GfelForceRedisplay();
 
 // The event loop itself (never returns)
-extern void GfelMainLoop(void);
+TGFCLIENT_API void GfelMainLoop(void);
+
+/*******************************
+ * Graphics features interface *
+ *******************************/
+
+TGFCLIENT_API int GfglIsOpenGLExtensionSupported(const char* extension);
+
+// GL_ARB_texture_compression
+TGFCLIENT_API bool GfglIsCompressARBAvailable(void);
+TGFCLIENT_API bool GfglIsCompressARBEnabled(void);
+TGFCLIENT_API void GfglUpdateCompressARBEnabled(void);
+
+// Texture max size
+TGFCLIENT_API int GfglGetUserTextureMaxSize(void);
+TGFCLIENT_API int GfglGetGLTextureMaxSize(void);
+TGFCLIENT_API void GfglUpdateUserTextureMaxSize(void);
 
 #endif /* __TGFCLIENT__H__ */
 

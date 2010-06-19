@@ -24,8 +24,8 @@
     @version	$Id: racemenu.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #ifdef WIN32
 #include <windows.h>

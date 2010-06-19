@@ -26,8 +26,11 @@
 #ifndef _MOUSECONFIG_H_
 #define _MOUSECONFIG_H_
 
+#include "confscreens.h"
+
+
 /* nextMenu : the menu to go to when "next" button is pressed */
-extern void *MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
+CONFSCREENS_API void *MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
 #endif /* _MOUSECONFIG_H_ */ 
 

@@ -7,6 +7,18 @@
 #ifndef _XML_H_
 #define _XML_H_
 
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef TXML_DLL
+#  define TXML_API __declspec(dllexport)
+# else
+#  define TXML_API __declspec(dllimport)
+# endif
+#else
+# define TXML_API
+#endif
+
+
 typedef struct xmlAttribute {
     char		*name;
     char		*value;
@@ -23,16 +35,16 @@ typedef struct xmlElement {
     struct xmlElement	*up;		/* upper element */
 } txmlElement;    
 
-extern txmlElement *xmlInsertElt(txmlElement *curElt, const char *name, const char **atts);
-extern txmlElement *xmlReadFile(const char *file);
-extern int          xmlWriteFile(const char *file, txmlElement *startElt, char *dtd);
-extern char        *xmlGetAttr(txmlElement *curElt, char *attrname);
-extern txmlElement *xmlNextElt(txmlElement *startElt);
-extern txmlElement *xmlSubElt(txmlElement *startElt);
-extern txmlElement *xmlWalkElt(txmlElement *startElt);
-extern txmlElement *xmlWalkSubElt(txmlElement *startElt, txmlElement *topElt);
-extern txmlElement *xmlFindNextElt(txmlElement *startElt, char *name);
-extern txmlElement *xmlFindEltAttr(txmlElement *startElt, char *name, char *attrname, char *attrvalue);
+TXML_API txmlElement *xmlInsertElt(txmlElement *curElt, const char *name, const char **atts);
+TXML_API txmlElement *xmlReadFile(const char *file);
+TXML_API int          xmlWriteFile(const char *file, txmlElement *startElt, char *dtd);
+TXML_API char        *xmlGetAttr(txmlElement *curElt, char *attrname);
+TXML_API txmlElement *xmlNextElt(txmlElement *startElt);
+TXML_API txmlElement *xmlSubElt(txmlElement *startElt);
+TXML_API txmlElement *xmlWalkElt(txmlElement *startElt);
+TXML_API txmlElement *xmlWalkSubElt(txmlElement *startElt, txmlElement *topElt);
+TXML_API txmlElement *xmlFindNextElt(txmlElement *startElt, char *name);
+TXML_API txmlElement *xmlFindEltAttr(txmlElement *startElt, char *name, char *attrname, char *attrvalue);
 
 #endif /* _XML_H_ */ 
 

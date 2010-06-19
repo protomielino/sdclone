@@ -25,7 +25,9 @@
 #ifndef _SOUNDCONFIG_H_
 #define _SOUNDCONFIG_H_
 
-extern void *SoundMenuInit(void *prevMenu);
+#include "confscreens.h"
 
+
+CONFSCREENS_API void *SoundMenuInit(void *prevMenu);
 
 #endif // _SOUNDCONFIG_H_

@@ -18,10 +18,11 @@
  ***************************************************************************/
 
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <tgfclient.h>
 #include <singleplayer.h>
+#include <racemain.h>
 #include <driverconfig.h>
 
 #include "mainmenu.h"
@@ -98,6 +99,9 @@ MainMenuInit(void)
     GfuiMenuDefaultKeysAdd(MenuHandle);
     GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit Game", exitMenu, GfuiScreenActivate, NULL);
 
+	// Register the ExitMenu init func in the race engine.
+	ReSetExitMenuInitFunc(ExitMenuInit);
+	
     return 0;
 }
 

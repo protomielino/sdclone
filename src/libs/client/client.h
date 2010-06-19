@@ -21,7 +21,18 @@
 #ifndef _CLIENT_H_
 #define _CLIENT_H_
 
-extern bool GameEntry(void);
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef CLIENT_DLL
+#  define CLIENT_API __declspec(dllexport)
+# else
+#  define CLIENT_API __declspec(dllimport)
+# endif
+#else
+# define CLIENT_API
+#endif
+
+CLIENT_API bool MenuEntry(void);
 
 #endif /* _CLIENT_H_ */ 
 

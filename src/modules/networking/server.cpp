@@ -16,10 +16,10 @@
  *                                                                         *
  ********************************* ******************************************/
 #include <cstdio>
+#include <SDL/SDL.h>
 
 #include "network.h"
 #include "robotxml.h" 
-#include <SDL/SDL.h>
 
 
 Server::Server()
@@ -1006,3 +1006,22 @@ void Server::SetFinishTime(double time)
 	UnlockNetworkData();
 	SendFinishTimePacket();
 }
+
+int Server::NumberofPlayers()
+{ 
+	int n = LockServerData()->m_vecNetworkPlayers.size();
+	UnlockServerData();
+	return n;
+}
+
+ServerMutexData * Server::LockServerData() 
+{
+	m_ServerData.Lock();
+	return & m_ServerData;
+}
+
+void Server::UnlockServerData()
+{
+	m_ServerData.Unlock();
+}
+

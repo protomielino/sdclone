@@ -35,14 +35,16 @@
 #include "sys/time.h"
 #endif
 
+#include "robottools.h"
+
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 // Time Analysis
 // Robot developer API:
 //
-extern bool RtInitTimer();						// Check performance counter hardware
-extern double RtTimerFrequency();				// Get timer frequency in Hz
-extern double RtTimeStamp();					// Get time stamp in msec
-extern double RtDuration(double StartTimeStamp);// Calculate duration between time stamps
+ROBOTTOOLS_API bool RtInitTimer();						// Check performance counter hardware
+ROBOTTOOLS_API double RtTimerFrequency();				// Get timer frequency in Hz
+ROBOTTOOLS_API double RtTimeStamp();					// Get time stamp in msec
+ROBOTTOOLS_API double RtDuration(double StartTimeStamp);// Calculate duration between time stamps
 //
 // End of robot developer API
 //<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

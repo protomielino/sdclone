@@ -25,12 +25,14 @@
 */
 
 #include <cstring>
-#include <stdlib.h>
+#include <cstdlib>
 #ifdef WIN32
 #include <windows.h>
 #endif
 #include <tgfclient.h>
 #include <car.h>
+
+#include "racescreens.h"
 
 
 static const	unsigned NbTextLines = 23;

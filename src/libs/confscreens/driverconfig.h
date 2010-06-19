@@ -16,15 +16,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-
 
 #ifndef _DRIVERCONFIG_H_
 #define _DRIVERCONFIG_H_
 
-extern void *DriverMenuInit(void *prevMenu);
+#include "confscreens.h"
+
+
+CONFSCREENS_API void *DriverMenuInit(void *prevMenu);
 
 #endif /* _DRIVERCONFIG_H_ */ 
-
-
-

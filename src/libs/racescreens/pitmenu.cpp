@@ -23,7 +23,7 @@
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id: pitmenu.cpp,v 1.4 2005/08/11 19:43:35 berniw Exp $
 */
-#include <stdlib.h>
+#include <cstdlib>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -32,6 +32,7 @@
 #include <car.h>
 #include <raceman.h>
 
+#include "racescreens.h"
 
 
 static void		*menuHandle = NULL;

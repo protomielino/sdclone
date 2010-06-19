@@ -30,25 +30,24 @@
 #error Hey ! Where is _WIN32 ??
 #endif
 
-#include <windows.h>
+//#include <windows.h>
 #include <cstring>
-#ifdef _WIN32
+#ifdef WIN32
 //#	pragma warning( disable : 4514 4100 4130 4611 4115 4189 4505 4127 4244 4701 4706 4711 4702)
 #	define uint unsigned int
 #	define uchar unsigned char
 #	define execlp _execlp
 #	define strncasecmp strnicmp
 #	define strcasecmp stricmp
-#	undef WINGDIAPI
-#	define WINGDIAPI __declspec( dllexport )
-#	undef APIENTRY
-#	define APIENTRY __stdcall
-#	undef CALLBACK
-#	define CALLBACK __stdcall
-#	undef XMLPARSEAPI
-#	define XMLPARSEAPI __declspec( dllexport )
-#else // !WIN32
-#endif // _WIN32
+//#	undef WINGDIAPI
+//#	define WINGDIAPI __declspec( dllexport )
+//#	undef APIENTRY
+//#	define APIENTRY __stdcall
+//#	undef CALLBACK
+//#	define CALLBACK __stdcall
+//#	undef XMLPARSEAPI
+//#	define XMLPARSEAPI __declspec( dllexport )
+#endif // WIN32
 
 #define M_PI (3.1415926535897932384626433832795)
 

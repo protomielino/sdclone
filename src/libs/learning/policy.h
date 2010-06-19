@@ -17,6 +17,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+
+#include "learning.h"
 #include "ANN.h"
 #include "Distribution.h"
 
@@ -141,7 +143,7 @@ enum LearningMethod {QLearning, Sarsa, ForcedLearning, ELearning};
 /// Types of confidence distributions.
 enum ConfidenceDistribution {SINGULAR, BOUNDED, GAUSSIAN, LAPLACIAN};
 
-class DiscretePolicy
+class LEARNING_API DiscretePolicy
 {
 protected:
 

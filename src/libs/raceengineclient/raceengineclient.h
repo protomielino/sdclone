@@ -1,10 +1,9 @@
 /***************************************************************************
 
-    file        : singleplayer.h
-    created     : Sat Nov 16 09:48:11 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id: singleplayer.h,v 1.3 2004/04/05 18:25:00 olethros Exp $                                  
+    file        : raceengineclient.h
+    copyright   : (C) 2010 by Jean-Philippe Meuret                        
+    email       : pouillot@users.sourceforge.net   
+    version     : $Id: raceengineclient.h,v 1.1 2010/06/10 18:25:00 pouillot Exp $                                  
 
  ***************************************************************************/
 
@@ -19,19 +18,22 @@
  
 /** @file    
     		
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: singleplayer.h,v 1.3 2004/04/05 18:25:00 olethros Exp $
+    @author	<a href=mailto:pouillot@users.sourceforge.net>Jean-Philippe Meuret</a>
+    @version    $Id: raceengineclient.h,v 1.1 2010/06/10 18:25:00 pouillot Exp $
 */
 
-#ifndef _SINGLEPLAYER_H_
-#define _SINGLEPLAYER_H_
+#ifndef _RACEENGINECLIENT_H_
+#define _RACEENGINECLIENT_H_
 
-#include "raceengineclient.h"
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef RACEENGINECLIENT_DLL
+#  define RACEENGINECLIENT_API __declspec(dllexport)
+# else
+#  define RACEENGINECLIENT_API __declspec(dllimport)
+# endif
+#else
+# define RACEENGINECLIENT_API
+#endif
 
-
-RACEENGINECLIENT_API void *ReSinglePlayerInit(void *precMenu);
-
-#endif /* _SINGLEPLAYER_H_ */ 
-
-
-
+#endif /* _RACEENGINECLIENT_H_ */ 

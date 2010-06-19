@@ -41,6 +41,12 @@ should also allow choosing ip address and track choice and etc
 #include <raceman.h>
 #include <racescreens.h>
 #include <driverconfig.h>
+#include <playerpref.h>
+#include <robot.h>
+#include <hostsettingsmenu.h>
+#include <carsettingsmenu.h>
+#include <carinfo.h>
+#include <network.h>
 
 #include "raceengine.h"
 #include "racemain.h"
@@ -51,14 +57,8 @@ should also allow choosing ip address and track choice and etc
 #include "racemanmenu.h"
 #include "networkingmenu.h"
 
-#include "network.h"
-
-#include "playerpref.h"
-#include "robot.h"
 #include "racemanmenu.h"
-#include "hostsettingsmenu.h"
-#include "carsettingsmenu.h"
-#include "carinfo.h"
+
 
 int g_readystatus[MAXNETWORKPLAYERS];
 int g_playerNames[MAXNETWORKPLAYERS];
@@ -95,8 +95,8 @@ static float white[] = {1.0, 1.0, 1.0, 1.0};
 
 static std::string g_strHostIP = "127.0.0.1";
 
-HostMenuSettings g_HostMenu;
-CarMenuSettings g_CarMenu;
+HostSettingsMenu g_HostMenu;
+CarSettingsMenu g_CarMenu;
 
 void GetHumanDriver(Driver &driver,int index);
 
@@ -369,7 +369,7 @@ reNetworkClientDisconnect(void * /* dummy */)
 	if (GetClient())
 		GetClient()->Disconnect();
 
-	GfuiScreenActivate(ReInfo->_reMenuScreen);
+	GfuiScreenActivate(ReGetSituation()->_reMenuScreen);
 
 }
 
@@ -566,6 +566,8 @@ reCarSettingsMenu(void *pMenu)
 
 	g_CarMenu.Init(pMenu,g_strCar.c_str());
 
+	ReSetRacemanMenuHandle(g_CarMenu.GetMenuHandle());
+
 	g_CarMenu.RunMenu();
 }
 
@@ -573,6 +575,9 @@ static void
 reNetworkHostSettingsMenu(void *pMenu)
 {
 	g_HostMenu.Init(pMenu);
+	
+	ReSetRacemanMenuHandle(g_HostMenu.GetMenuHandle());
+
 	g_HostMenu.RunMenu();
 }
 
@@ -615,7 +620,7 @@ reNetworkHostMenu(void * /* dummy */)
 	vecCat.push_back("All Cars");
 
 
-	SetRacemanMenuHandle(racemanMenuHdle);
+	ReSetRacemanMenuHandle(racemanMenuHdle);
 
 
 	NetworkRaceInfo();
@@ -644,7 +649,7 @@ reNetworkHostMenu(void * /* dummy */)
 
 	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onHostPlayerReady);
 	g_HostSettingsButtonId = CreateButtonControl(racemanMenuHdle,mparam,"networkhostsettings",racemanMenuHdle,reNetworkHostSettingsMenu);
-	g_RaceSetupId = CreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,reConfigureMenu);
+	g_RaceSetupId = CreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,ReConfigureMenu);
 	g_CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
 
 	CreateButtonControl(racemanMenuHdle,mparam,"start race",NULL,ServerPrepareStartNetworkRace);
@@ -727,7 +732,7 @@ reNetworkClientConnectMenu(void * /* dummy */)
 
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
-	SetRacemanMenuHandle(racemanMenuHdle);
+	ReSetRacemanMenuHandle(racemanMenuHdle);
 
 	g_trackHd = CreateLabelControl(racemanMenuHdle,mparam,"trackname");
 
@@ -939,4 +944,3 @@ void GetHumanDriver(Driver &driver,int index)
 	strncpy(driver.module,NETWORKROBOT,64);
 	GfParmReleaseHandle(params);
 }
-

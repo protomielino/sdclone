@@ -253,7 +253,7 @@ GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index)
 }
 
 void
-GfuiComboboxSetTextColor(void *scr, int id, Color color)
+GfuiComboboxSetTextColor(void *scr, int id, const Color& color)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;

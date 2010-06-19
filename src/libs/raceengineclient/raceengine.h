@@ -26,6 +26,9 @@
 #ifndef _RACEENGINE_H_
 #define _RACEENGINE_H_
 
+#include "raceengineclient.h"
+
+
 #ifdef ReMultiThreaded
 extern void ReInitUpdater();
 extern void ReInitCarGraphics();
@@ -38,6 +41,8 @@ extern int  ReUpdate(void);
 extern void ReTimeMod (void *vcmd);
 
 extern tRmInfo	*ReInfo;
+
+RACEENGINECLIENT_API tRmInfo* ReGetSituation();
 
 #endif /* _RACEENGINE_H_ */ 
 

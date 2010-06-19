@@ -25,8 +25,10 @@
 #ifndef _AICONFIG_H_
 #define _AICONFIG_H_
 
-extern void *AIMenuInit(void *prevMenu);
+#include "confscreens.h"
 
+
+CONFSCREENS_API void *AIMenuInit(void *prevMenu);
 
 #endif /* _AICONFIG_H_ */ 
 

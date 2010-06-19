@@ -22,12 +22,11 @@
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id: racemain.cpp,v 1.13 2005/08/17 20:48:39 berniw Exp $
 */
-#include "network.h"
+#include <network.h>
 #include <portability.h>
 #include <tgfclient.h>
 #include <robot.h>
 #include <racescreens.h>
-#include <exitmenu.h>
 
 #include "racecareer.h"
 #include "raceengine.h"
@@ -649,12 +648,19 @@ RestartRaceHookInit(void)
 static void	*QuitHookHandle = 0;
 static void	*StopScrHandle = 0;
 
+static tMenuInitFunc ExitMenuInitFunc = 0;
+
+void ReSetExitMenuInitFunc(tMenuInitFunc func)
+{
+	ExitMenuInitFunc = func;
+}
+
 static void
 QuitHookActivate(void * /* dummy */)
 {
 	if (StopScrHandle) 
 	{
-		GfuiScreenActivate(ExitMenuInit(StopScrHandle));
+		GfuiScreenActivate(ExitMenuInitFunc(StopScrHandle));
 	}
 }
 

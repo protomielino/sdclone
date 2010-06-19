@@ -23,8 +23,7 @@
     @ingroup	screen
 */
 
-#include "network.h"
-#include <stdio.h>
+#include <cstdio>
 #include <cstring>
 #ifdef WIN32
 #include <windows.h>
@@ -36,23 +35,12 @@
 #include "config.h"
 #endif
 
-#include <math.h>
+#include <cmath>
 #ifndef WIN32
 #include <unistd.h>
 #else
 #include <process.h>
 #endif /* WIN32 */
-
-#include <SDL/SDL.h>
-#include "tgfclient.h"
-#include <portability.h>
-#include "gui.h"
-
-#include "glfeatures.h"
-
-#ifdef HAVE_CONFIG_H
-#include "version.h"
-#endif
 
 #if defined(WIN32) || defined(__APPLE__)
 #undef USE_RANDR_EXT
@@ -65,6 +53,18 @@
 #include <X11/keysym.h>
 #include <X11/extensions/Xrandr.h>
 #endif // USE_RANDR_EXT
+
+#include <SDL/SDL.h>
+#include <portability.h>
+
+#include "tgfclient.h"
+#include "gui.h"
+
+#include "glfeatures.h"
+
+#ifdef HAVE_CONFIG_H
+#include "version.h"
+#endif
 
 static int GfScrWidth;
 static int GfScrHeight;
@@ -328,8 +328,6 @@ void GfScrInit(int argc, char *argv[])
         return;
     }
 
-	NetworkInit();
-
     // Initialize game interface to SDL.
     GfelInitialize();
     atexit(SDL_Quit);
@@ -493,7 +491,7 @@ void GfScrInit(int argc, char *argv[])
 
 	GfParmReleaseHandle(handle);
 
-	checkGLFeatures();
+	gfglCheckGLFeatures();
 }
 
 /** Shutdown the screen

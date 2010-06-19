@@ -26,8 +26,11 @@
 #ifndef _JOYSTICKCONFIG_H_
 #define _JOYSTICKCONFIG_H_
 
+#include "confscreens.h"
+
+
 /* nextMenu : the menu to go to when "next" button is pressed */
-extern void *JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
+CONFSCREENS_API void *JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
 #endif /* _JOYSTICKCONFIG_H_ */ 
 

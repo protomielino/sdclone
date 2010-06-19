@@ -32,11 +32,17 @@ based on the server values.
 
 // Warning this code is VERY rough and unfinished
 
+// TODO: Make a real SD module (dynamically loadable, like simuvx, human, ssggraph ...).
+
+
 #include <cstdio>
+#include <SDL/SDL.h>
+#include <SDL/SDL_thread.h>
 
 #include "network.h"
-#include <SDL/SDL.h>
 
+
+bool g_bInit = false;
 
 bool g_bClient = false;
 bool g_bServer = false;
@@ -44,6 +50,123 @@ Server g_server;
 Client g_client;
 SDL_TimerID g_timerId;
 
+
+MutexData::MutexData()
+{
+	m_networkMutex =  SDL_CreateMutex();
+}
+
+MutexData::~MutexData()
+{
+	SDL_DestroyMutex ( m_networkMutex );
+}
+	
+void MutexData::Lock() 
+{
+	SDL_mutexP ( m_networkMutex );
+}
+
+void MutexData::Unlock() 
+{
+	SDL_mutexV ( m_networkMutex );
+}
+
+void MutexData::Init()
+{
+	m_vecCarCtrls.clear();
+	m_vecCarStatus.clear();
+	m_vecLapStatus.clear();
+	m_finishTime = 0.0f;
+}
+
+//============================================================
+
+void ServerMutexData::Init()
+{
+	m_vecNetworkPlayers.clear();
+}
+
+ServerMutexData::ServerMutexData()
+{
+	m_networkMutex=  SDL_CreateMutex();
+}
+
+ServerMutexData::~ServerMutexData()
+{
+	SDL_DestroyMutex (m_networkMutex );
+}
+	
+void ServerMutexData::Lock() 
+{
+	SDL_mutexP ( m_networkMutex );
+}
+
+void ServerMutexData::Unlock() 
+{
+	SDL_mutexV ( m_networkMutex );
+}
+
+//============================================================
+
+Network::Network()
+{
+	m_strClass = "network";
+	m_bRaceInfoChanged = false;
+	m_bRefreshDisplay = false;
+	
+	m_sendCtrlTime = 0.0;
+	m_sendCarDataTime = 0.0;
+	m_pHost = NULL;
+	m_currentTime = 0.0;
+}
+
+Network::~Network()
+{
+}
+
+void Network::RaceInit(tSituation *s)
+{
+	m_sendCtrlTime = 0.0;
+	m_sendCarDataTime = 0.0;
+	m_timePhysics = 0.0;
+	m_currentTime = 0.0;
+
+	m_mapRanks.clear();
+	for (int i = 0; i < s->_ncars; i++) 
+	{
+		tCarElt *pCar = s->cars[i];
+		m_mapRanks[i] = pCar->info.startRank;
+	}
+		
+	m_NetworkData.Init();
+
+}
+
+void Network::RaceDone()
+{
+	m_bRaceActive = false;
+	m_bBeginRace = false;
+	m_bPrepareToRace = false;
+	m_bRaceInfoChanged = false;
+	m_bTimeSynced = false;
+	m_sendCtrlTime = 0.0;
+	m_sendCarDataTime = 0.0;
+	m_timePhysics = -2.0;
+
+	m_mapRanks.clear();
+
+}
+
+
+int Network::GetDriverStartRank(int idx) 
+{
+	std::map<int,int>::iterator p;
+	p = m_mapRanks.find(idx);
+
+	return p->second;
+}
+
+//============================================================
 
 Driver::Driver()
 {
@@ -64,8 +187,13 @@ Driver::Driver()
 	memset(type,0,sizeof(type));
 }
 
+bool NetworkInit();
+
 Network *GetNetwork()
 {
+	if (!g_bInit)
+		NetworkInit();
+
 	if (g_bServer)
 		return &g_server;
 
@@ -171,8 +299,62 @@ int Network::GetPlayerCarIndex(tSituation *s)
 	return i;
 }
 
+void Network::ClearLocalDrivers()
+{
+	m_setLocalDrivers.clear();
+}
 
-int	 Network::GetDriverIdx()
+void Network::SetDriverName(char *pName)
+{
+	m_strDriverName = pName;
+	printf("\nSetting driver name: %s\n", m_strDriverName.c_str());
+}
+
+const char *Network::GetDriverName()
+{
+	return m_strDriverName.c_str();
+}
+
+void Network::SetLocalDrivers()
+{
+}
+
+void Network::SetCarInfo(const char *pszName)
+{
+}
+
+bool Network::FinishRace(double time) 
+{
+	MutexData *pNData = LockNetworkData();
+	double finishTime = pNData->m_finishTime;
+	UnlockNetworkData();
+
+	if (finishTime<=0.0)
+		return false;
+
+	if (time<finishTime)
+		return false;
+
+	GfOut("Finishing network race\n");
+	return true;	
+}
+
+MutexData * Network::LockNetworkData() 
+{
+	m_NetworkData.Lock();
+	return & m_NetworkData;
+}
+
+void Network::UnlockNetworkData()
+{
+	m_NetworkData.Unlock();
+}
+
+void Network::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
+{
+}
+
+int	Network::GetDriverIdx()
 {
 
 	int nhidx = GetNetworkHumanIdx();
@@ -573,9 +755,7 @@ void Network::ReadCarControlsPacket(ENetPacket *pPacket)
 	UnlockNetworkData();
 }
 
-
-
-
+//==========================================================
 
 Uint32 network_callbackfunc(Uint32 interval, void *param)
 {
@@ -589,12 +769,13 @@ Uint32 network_callbackfunc(Uint32 interval, void *param)
 
 bool NetworkInit()
 {
-    // Initialize SDL.
-    if ( SDL_Init(SDL_INIT_TIMER) < 0 ) {
-        GfOut("Couldn't initialize SDL: %s\n", SDL_GetError());
-        return false;
-    }
+	// Initialize SDL.
+	if ( SDL_Init(SDL_INIT_TIMER) < 0 ) {
+		GfOut("NetworkInit : Couldn't initialize SDL: %s\n", SDL_GetError());
+		return false;
+	}
 
+	g_bInit = true;
 
 	return true;
 }

@@ -26,11 +26,14 @@
 #ifndef _CONTROLCONFIG_H_
 #define _CONTROLCONFIG_H_
 
+#include "confscreens.h"
+
+
 /* Gear change mode */
 typedef enum { GEAR_MODE_NONE = 0, GEAR_MODE_AUTO = 1, 
 	       GEAR_MODE_SEQ  = 2, GEAR_MODE_GRID = 4 } tGearChangeMode;
 
-extern void *ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
+CONFSCREENS_API void *ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
 
 /* Load control settings for player of given index (the current one if 0) 
    from preferences (if given parm handle is null, use current) */

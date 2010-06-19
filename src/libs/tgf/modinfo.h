@@ -26,10 +26,6 @@
 #ifndef __MODINFO__H__
 #define __MODINFO__H__
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 /** Maximum number of interfaces in one "legacy" module 
     (no limit for "Unlimited Number of Interfaces" modules)
     @see	ModList
@@ -88,11 +84,14 @@ typedef struct ModInfoNC {
 } tModInfoNC;
 
 /** Shared library handle type */
-#ifndef WIN32
 typedef void* tSOHandle;
+
+#ifdef WIN32
+#define SOHandle(h) ((HMODULE)(h))
 #else
-typedef HMODULE tSOHandle;
+#define SOHandle(h) ((void*)(h))
 #endif
+
 
 /** list of module interfaces */
 typedef struct ModList {
@@ -120,22 +119,22 @@ typedef int (*tfModInfoTerminate)(void);	/* last function called in the module *
  ********************************************/
 
 /* Allocate the module interfaces info array */
-extern tModInfo *GfModInfoAllocate(int maxItf);
+TGF_API tModInfo *GfModInfoAllocate(int maxItf);
 
 /* Free the module interfaces info array */
-extern void GfModInfoFree(tModInfo *array, int maxItf);
+TGF_API void GfModInfoFree(tModInfo *array, int maxItf);
 
 /* Free the module interfaces info array */
-extern void GfModInfoFreeNC(tModInfoNC *array, int maxItf);
+TGF_API void GfModInfoFreeNC(tModInfoNC *array, int maxItf);
 
 /* Duplicate a module interfaces info array from a const one to a non-const one */
-extern tModInfoNC* GfModInfoDuplicate(const tModInfo *source, int maxItf);
+TGF_API tModInfoNC* GfModInfoDuplicate(const tModInfo *source, int maxItf);
 
 /* Initialize the module with given handle and library file path */
-extern int GfModInitialize(tSOHandle soHandle, const char *soPath, 
-			   unsigned int gfid, tModList **mod);
+TGF_API int GfModInitialize(tSOHandle soHandle, const char *soPath, 
+							unsigned int gfid, tModList **mod);
 
 /* Terminate the module with given handle and library file path */
-extern int GfModTerminate(tSOHandle soHandle, const char *soPath);
+TGF_API int GfModTerminate(tSOHandle soHandle, const char *soPath);
 
 #endif /* __MODINFO__H__ */

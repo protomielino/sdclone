@@ -31,8 +31,6 @@
        #endif
 #endif
 
-
-
 #include <string>
 #include <vector>
 #include <set>
@@ -43,8 +41,6 @@
 #else
 #include <enet/enet.h>
 #endif
-
-#include <SDL/SDL_thread.h>
 
 #define MAXNETWORKPLAYERS 8
 //Port used for network play
@@ -171,37 +167,18 @@ struct CarSetup
 	//TODO
 };
 
+struct SDL_mutex;
+
 //Put data here that is read by the network thread and the main thread
 class DLLEXPORT MutexData
 {
 public:
-	MutexData()
-	{
-		m_networkMutex=  SDL_CreateMutex();
-	}
-	virtual ~MutexData()
-	{
-		SDL_DestroyMutex (m_networkMutex );
-	}
-	
-	void Lock() 
-	{
-		SDL_mutexP ( m_networkMutex );
-	}
+	MutexData();
+	virtual ~MutexData();
 
-	void Unlock() 
-	{
-		SDL_mutexV ( m_networkMutex );
-	}
-
-	void Init()
-	{
-		m_vecCarCtrls.clear();
-		m_vecCarStatus.clear();
-		m_vecLapStatus.clear();
-		m_finishTime = 0.0f;
-
-	}
+	void Lock();
+	void Unlock();
+	void Init();
 
 	SDL_mutex *m_networkMutex;
 	std::vector<CarControlsData> m_vecCarCtrls;
@@ -215,29 +192,12 @@ public:
 class DLLEXPORT ServerMutexData 
 {
 public:
-	void Init()
-	{
-		m_vecNetworkPlayers.clear();
-	}
-
-	ServerMutexData()
-	{
-		m_networkMutex=  SDL_CreateMutex();
-	}
-	virtual ~ServerMutexData()
-	{
-		SDL_DestroyMutex (m_networkMutex );
-	}
+	void Init();
+	ServerMutexData();
+	virtual ~ServerMutexData();
 	
-	void Lock() 
-	{
-		SDL_mutexP ( m_networkMutex );
-	}
-
-	void Unlock() 
-	{
-		SDL_mutexV ( m_networkMutex );
-	}
+	void Lock();
+	void Unlock();
 	
 	SDL_mutex *m_networkMutex;
 	std::vector<Driver> m_vecNetworkPlayers;
@@ -246,22 +206,9 @@ public:
 class DLLEXPORT Network
 {
 public:
-	Network()
-	{
-		m_strClass = "network";
-		m_bRaceInfoChanged = false;
-		m_bRefreshDisplay = false;
-		
-		m_sendCtrlTime = 0.0;
-		m_sendCarDataTime = 0.0;
-		m_pHost = NULL;
-		m_currentTime = 0.0;
-	}
+	Network();
 
-	virtual ~Network()
-	{
-	}
-
+	virtual ~Network();
 
 	void SetCurrentTime(double time) {m_currentTime = time;}
 	bool IsServerMode(); 
@@ -278,48 +225,11 @@ public:
 	virtual bool IsConnected() { return false;}
 	virtual bool IsRaceActive() { return m_bRaceActive;}
 	virtual void SetRaceActive(bool bStatus) {m_bRaceActive = bStatus;}
-	virtual void RaceInit(tSituation *s)
-	{
-		m_sendCtrlTime = 0.0;
-		m_sendCarDataTime = 0.0;
-		m_timePhysics = 0.0;
-		m_currentTime = 0.0;
 
-		m_mapRanks.clear();
-		for (int i = 0; i < s->_ncars; i++) 
-		{
-			tCarElt *pCar = s->cars[i];
-			m_mapRanks[i] = pCar->info.startRank;
-		}
-		
-		m_NetworkData.Init();
-
-	}
-
-	virtual void RaceDone()
-	{
-		m_bRaceActive = false;
-		m_bBeginRace = false;
-		m_bPrepareToRace = false;
-		m_bRaceInfoChanged = false;
-		m_bTimeSynced = false;
-		m_sendCtrlTime = 0.0;
-		m_sendCarDataTime = 0.0;
-		m_timePhysics = -2.0;
-
-		m_mapRanks.clear();
-
-	};
-
-
-	int GetDriverStartRank(int idx) 
-	{
-		std::map<int,int>::iterator p;
-		p = m_mapRanks.find(idx);
-
-		return p->second;
-	}
-
+	virtual void RaceInit(tSituation *s);
+	virtual void RaceDone();
+	int GetDriverStartRank(int idx);
+	
 	virtual bool listen(){ return false;};
 
 	virtual void Disconnect() {};
@@ -341,53 +251,25 @@ public:
 	void WriteDriverData(Driver player,int index,void *param);
 	int GetPlayerCarIndex(tSituation *s);
 
-	void ClearLocalDrivers(){m_setLocalDrivers.clear();}
+	void ClearLocalDrivers();
 
-	void SetDriverName(char *pName)
-	{
-		m_strDriverName = pName;
-	printf("\nSetting driver name: %s\n",m_strDriverName.c_str());
-	}
-	const char *GetDriverName(){return m_strDriverName.c_str();}
-	virtual void SetLocalDrivers(){};
+	void SetDriverName(char *pName);
+	const char *GetDriverName();
+	virtual void SetLocalDrivers();
 	void GetHostSettings(std::string &strCarCat,bool &bCollisions);
-	virtual void SetCarInfo(const char *pszName) {};
+	virtual void SetCarInfo(const char *pszName);
 
-	virtual bool FinishRace(double time) 
-	{
-		MutexData *pNData = LockNetworkData();
-		double finishTime = pNData->m_finishTime;
-		UnlockNetworkData();
+	virtual bool FinishRace(double time) ;
 
-		if (finishTime<=0.0)
-			return false;
-
-		if (time<finishTime)
-			return false;
-
-		GfOut("Finishing network race\n");
-		return true;	
-	}
-
-
-	MutexData * LockNetworkData() 
-	{
-		m_NetworkData.Lock();
-		return & m_NetworkData;
-	}
-
-	void UnlockNetworkData()
-	{
-		m_NetworkData.Unlock();
-	}
-
+	MutexData * LockNetworkData() ;
+	void UnlockNetworkData();
 
 protected:
 	std::string m_strDriverName;
 
 
 	ENetHost * m_pHost;
-	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel){};
+	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
 
 	int m_driverIdx;
 	bool m_bBeginRace;
@@ -446,13 +328,7 @@ public:
 	bool TimeSynced(){return m_bTimeSynced;}
 	int  LookUpDriverIdx() { return m_driverIdx;}
 	bool listenHost(ENetHost * pHost);
-	virtual void SetLocalDrivers()
-	{
-		m_setLocalDrivers.clear();
-		m_driverIdx = GetDriverIdx();
-		m_setLocalDrivers.insert(m_driverIdx-1);
-		printf("Adding Human start rank: %i\n",m_driverIdx-1);
-	};
+	virtual void SetLocalDrivers();
 	
 	void ConnectToClients();
 	void SetCarInfo(const char *pszName);
@@ -476,8 +352,6 @@ protected:
 	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
 
 	bool m_bConnected;
-
-
 
 	double m_lag;
 	double m_servertimedifference;
@@ -526,11 +400,7 @@ public:
 
 	void UpdateDriver(Driver & player);
 
-	int  NumberofPlayers() { 
-		int n = LockServerData()->m_vecNetworkPlayers.size();
-		UnlockServerData();
-		return n;
-	};
+	int  NumberofPlayers();
 	Driver GetPlayer(int i);
 	void ClearDrivers();
 	void RemoveDriver(ENetEvent event);
@@ -543,17 +413,9 @@ public:
 	void SetFinishTime(double time);
 	void RemovePlayerFromRace(unsigned int idx);
 
-	ServerMutexData * LockServerData() 
-	{
-		m_ServerData.Lock();
-		return & m_ServerData;
-	}
-
-	void UnlockServerData()
-	{
-		m_ServerData.Unlock();
-	}
-
+	ServerMutexData * LockServerData();
+	void UnlockServerData();
+	
 protected:
 	void GenerateDriversForXML();
 	//Packets
@@ -582,7 +444,6 @@ extern DLLEXPORT void SetClient(bool bStatus);
 extern DLLEXPORT bool IsServer();
 extern DLLEXPORT bool IsClient();
 
-extern DLLEXPORT bool NetworkInit();
 extern DLLEXPORT Server *GetServer();
 extern DLLEXPORT Client *GetClient();
 extern DLLEXPORT Network *GetNetwork();

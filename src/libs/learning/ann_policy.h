@@ -15,7 +15,10 @@
 #ifndef ANN_POLICY_H
 #define ANN_POLICY_H
 
+#include "learning.h"
 #include "policy.h"
+
+
 /** 
 	A type of discrete action policy using a neural network for function approximation.
 	
@@ -32,7 +35,7 @@
 	Note that using Q-learning with eligibility traces in this class
 	can result in divergence theoretically.
 */
-class ANN_Policy : public DiscretePolicy
+class LEARNING_API ANN_Policy : public DiscretePolicy
 {
 protected:
 	ANN* J; ///< Evaluation network

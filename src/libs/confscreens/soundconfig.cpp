@@ -27,7 +27,6 @@
 #include <cstring>
 
 #include <tgfclient.h>
-#include <raceinit.h>
 #include <graphic.h>
 
 #include "soundconfig.h"

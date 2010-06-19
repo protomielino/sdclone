@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    file                 : networkingmenu.h
-    created              : July 2009
-    copyright            : (C) 2009 Brian Gavin
-    web                  : speed-dreams.sourceforge.net
+    file        : learning.h
+    copyright   : (C) 2010 by Jean-Philippe Meuret                        
+    email       : pouillot@users.sourceforge.net   
+    version     : $Id: learning.h,v 1.1 2010/06/10 18:25:00 pouillot Exp $                                  
 
  ***************************************************************************/
 
@@ -15,19 +15,25 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+/** @file    
+    		
+    @author	<a href=mailto:pouillot@users.sourceforge.net>Jean-Philippe Meuret</a>
+    @version    $Id: learning.h,v 1.1 2010/06/10 18:25:00 pouillot Exp $
+*/
 
-#ifndef _NETWORKINGMENU_H_
-#define _NETWORKINGMENU_H_
+#ifndef _LEARNING_H_
+#define _LEARNING_H_
 
-#include <string>
-#include <vector>
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef LEARNING_DLL
+#  define LEARNING_API __declspec(dllexport)
+# else
+#  define LEARNING_API __declspec(dllimport)
+# endif
+#else
+# define LEARNING_API
+#endif
 
-void ReLoadQuickRace();
-void ServerPrepareStartNetworkRace(void *pVoid);
-
-void reNetworkClientConnectMenu(void *pVoid);
-void reNetworkMenu(void * /* dummy */);
-void reNetworkHostMenu(void * /* dummy */);
-void reNetworkClientMenu(void * /* dummy */);
-
-#endif // _NETWORKINGMENU_H_
+#endif /* _LEARNING_H_ */ 

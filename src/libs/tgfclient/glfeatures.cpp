@@ -38,9 +38,7 @@
     Note: Copied from freeGLUT 2.4.0
 */
 
-// TODO: Really make this function exported by tgfclient.
-
-int GfuiOpenGLExtensionSupported(const char* extension)
+int GfglIsOpenGLExtensionSupported(const char* extension)
 {
   const char *extensions, *start;
   const int len = strlen(extension);
@@ -82,13 +80,14 @@ static bool compressARBEnabled;
 void checkCompressARBAvailable(bool &result)
 {
 	// Query if the extension is available at the runtime system (true, if > 0).
-	int compressARB = GfuiOpenGLExtensionSupported("GL_ARB_texture_compression");
-
+	int compressARB = GfglIsOpenGLExtensionSupported("GL_ARB_texture_compression");
+	
 	// Check if at least one internal format is vailable. This is a workaround for
 	// driver problems and not a bugfix. According to the specification OpenGL should
 	// choose an uncompressed alternate format if it can't provide the requested
 	// compressed one... but it does not on all cards/drivers.
-	if (compressARB) {
+	if (compressARB) 
+	{
 		int numformats;
 		glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, &numformats);
 		if (numformats == 0) 
@@ -103,7 +102,7 @@ void checkCompressARBAvailable(bool &result)
 
 void checkCompressARBEnabled(bool &result)
 {
-	if (!isCompressARBAvailable()) 
+	if (!GfglIsCompressARBAvailable()) 
 	{
 		// Feature not available, do not use it.
 		result = false;
@@ -118,33 +117,26 @@ void checkCompressARBEnabled(bool &result)
 		void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 		const char *optionName = GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION, GR_ATT_TEXTURECOMPRESSION_DISABLED);
 
-		if (strcmp(optionName, tcEnabledStr) != 0) 
-		{
-			result = false;
-		} 
-		else 
-		{
-			result = true;
-		}
+		result = strcmp(optionName, tcEnabledStr) == 0;
 		GfParmReleaseHandle(paramHandle);
 	}
 }
 
 
-void updateCompressARBEnabled(void)
+void GfglUpdateCompressARBEnabled(void)
 {
 	checkCompressARBEnabled(compressARBEnabled);
 }
 
 
 // GL_ARB_texture_compression
-bool isCompressARBAvailable(void)
+bool GfglIsCompressARBAvailable(void)
 {
 	return compressARBAvailable;
 }
 
 
-bool isCompressARBEnabled(void) 
+bool GfglIsCompressARBEnabled(void) 
 {
 	return compressARBEnabled;
 }
@@ -157,7 +149,7 @@ static int glTextureMaxSize;
 static int userTextureMaxSize;
 
 
-void getGLTextureMaxSize(int &result)
+void GfglGetGLTextureMaxSize(int &result)
 {
 	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
 	if (result > 16384) 
@@ -167,7 +159,7 @@ void getGLTextureMaxSize(int &result)
 }
 
 
-void getUserTextureMaxSize(int &result)
+void GfglGetUserTextureMaxSize(int &result)
 {
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
@@ -181,30 +173,28 @@ void getUserTextureMaxSize(int &result)
 }
 
 
-void updateUserTextureMaxSize(void)
+void GfglUpdateUserTextureMaxSize(void)
 {
-	getUserTextureMaxSize(userTextureMaxSize);
+	GfglGetUserTextureMaxSize(userTextureMaxSize);
 }
 
-int getGLTextureMaxSize(void)
+int GfglGetGLTextureMaxSize(void)
 {
 	return glTextureMaxSize;
 }
 
 
-int getUserTextureMaxSize(void)
+int GfglGetUserTextureMaxSize(void)
 {
 	return userTextureMaxSize;
 }
 
 
 // Initialize
-void checkGLFeatures(void) {
+void gfglCheckGLFeatures(void) 
+{
 	checkCompressARBAvailable(compressARBAvailable);
 	checkCompressARBEnabled(compressARBEnabled);
-	getGLTextureMaxSize(glTextureMaxSize);
-	getUserTextureMaxSize(userTextureMaxSize);
+	GfglGetGLTextureMaxSize(glTextureMaxSize);
+	GfglGetUserTextureMaxSize(userTextureMaxSize);
 }
-
-
-

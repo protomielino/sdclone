@@ -12,9 +12,12 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
+
+#include "learning.h"
+
 
 /// A list item
 typedef struct ListItem {
@@ -45,36 +48,36 @@ typedef struct List {
 
 
 /// Create a new list
-LIST* List(void);
+LEARNING_API LIST* List(void);
 /// Get the size of the list
-int ListSize(LIST* list);
+LEARNING_API int ListSize(LIST* list);
 /// Append an item to the list
-LISTITEM* ListAppend(LIST* list, void* p);
+LEARNING_API LISTITEM* ListAppend(LIST* list, void* p);
 /// Append an item to the list with free hook
-LISTITEM* ListAppend(LIST* list, void* p, void (*free_obj) (void* obj));
+LEARNING_API LISTITEM* ListAppend(LIST* list, void* p, void (*free_obj) (void* obj));
 /// Move to the first list item
-LISTITEM* FirstListItem(LIST* list);
+LEARNING_API LISTITEM* FirstListItem(LIST* list);
 /// Move to the last list item
-LISTITEM* LastListItem(LIST* list);
+LEARNING_API LISTITEM* LastListItem(LIST* list);
 /// Advance one item
-LISTITEM* NextListItem(LIST* list);
+LEARNING_API LISTITEM* NextListItem(LIST* list);
 /// Remove the topmost item of the list (also frees obj memory)
-int PopItem(LIST* list);
+LEARNING_API int PopItem(LIST* list);
 /// Clear the list
-int ClearList(LIST* list);
+LEARNING_API int ClearList(LIST* list);
 /// Finds the LISTITEM pointer corresponding to the data
-LISTITEM* FindItem (LIST* list, void* ptr);
+LEARNING_API LISTITEM* FindItem (LIST* list, void* ptr);
 /// Get the nth item of the list
-LISTITEM* GetItem (LIST* list, int n);
+LEARNING_API LISTITEM* GetItem (LIST* list, int n);
 
-LISTITEM* ListItem(void* ptr, void (*free_obj) (void* obj));
-LISTITEM* GetNextItem(LISTITEM* ptr);
-LISTITEM* GetPrevItem(LISTITEM* ptr);
-LISTITEM* LinkNext(LISTITEM* src, void* ptr, void (*free_obj) (void* obj));
-LISTITEM* LinkPrev(LISTITEM* src, void* ptr, void (*free_obj) (void* obj));
-int FreeListItem(LIST* list, LISTITEM* ptr);
-int RemoveListItem(LIST* list, LISTITEM* ptr);
+LEARNING_API LISTITEM* ListItem(void* ptr, void (*free_obj) (void* obj));
+LEARNING_API LISTITEM* GetNextItem(LISTITEM* ptr);
+LEARNING_API LISTITEM* GetPrevItem(LISTITEM* ptr);
+LEARNING_API LISTITEM* LinkNext(LISTITEM* src, void* ptr, void (*free_obj) (void* obj));
+LEARNING_API LISTITEM* LinkPrev(LISTITEM* src, void* ptr, void (*free_obj) (void* obj));
+LEARNING_API int FreeListItem(LIST* list, LISTITEM* ptr);
+LEARNING_API int RemoveListItem(LIST* list, LISTITEM* ptr);
 
-LISTITEM* ListLinearSearchRetrieve (struct List* list, void* ptr);
+LEARNING_API LISTITEM* ListLinearSearchRetrieve (struct List* list, void* ptr);
 
 #endif

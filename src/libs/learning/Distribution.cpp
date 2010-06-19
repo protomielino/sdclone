@@ -9,10 +9,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
+
 #include "Distribution.h"
+
 
 static const float PI = 3.1415927f;
 
@@ -20,6 +23,7 @@ void setRandomSeed(unsigned int seed)
 {
 	srand(seed);
 }
+
 real urandom()
 {
 	real x;

@@ -19,17 +19,16 @@ SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
 		      guimenu.h tgfclient.h guifont.h )
 
 #disable developer warning
-IF (COMMAND cmake_policy)
+IF (COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0003 NEW)
-ENDIF(COMMAND cmake_policy)
-
-IF(UNIX)
-	ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
-ENDIF(UNIX)
+ENDIF(COMMAND CMAKE_POLICY)
 
 IF(WIN32)
-	ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES} tgfclient.def)
+	# DLL export stuff under Windows (to avoid .def file)
+	ADD_DEFINITIONS(-DTGFCLIENT_DLL)
 ENDIF(WIN32)
+
+ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
 
 ADD_PLIB_LIBRARY(tgfclient ssg ul sg sl ssg ssgaux)
 ADD_TORCSLIB_LIBRARY(tgfclient tgf networking)
@@ -54,6 +53,10 @@ IF(UNIX)
 		ADD_XRANDR_LIBRARY(tgfclient)
 	ENDIF(OPTION_XRANDR)
 ENDIF(UNIX)
+
+IF(WIN32)
+	ADD_DEFINITIONS(-DTGFCLIENT_DLL)
+ENDIF(WIN32)
 
 IF(UNIX)
 	TORCS_INSTALL_FILES(LIB lib TARGETS tgfclient)

@@ -35,6 +35,8 @@
 
 #define RCM_IDENT 0
 
+#define RACE_ENG_CFG	"config/raceengine.xml"
+
 // Comment-out to inhibit multi-threaded race engine (get back to old nearly unmodified code).
 #define ReMultiThreaded 1
 

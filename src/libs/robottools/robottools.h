@@ -29,7 +29,19 @@
 #include <car.h>
 #include <track.h>
 
-#define RELAXATION2(target, prev, rate) 			\
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef ROBOTTOOLS_DLL
+#  define ROBOTTOOLS_API __declspec(dllexport)
+# else
+#  define ROBOTTOOLS_API __declspec(dllimport)
+# endif
+#else
+# define ROBOTTOOLS_API
+#endif
+
+
+#define RELAXATION2(target, prev, rate)			\
 do {								\
     tdble __tmp__;						\
     __tmp__ = target;						\
@@ -57,12 +69,13 @@ do {								\
     prev = (target);						\
 } while (0)
 
-/*
- * Track Utilities
- */
+
+/*******************
+ * Track Utilities *
+ *******************/
 
 /* for variable width segments */
-extern tdble RtTrackGetWidth(tTrackSeg *seg, tdble toStart);
+ROBOTTOOLS_API tdble RtTrackGetWidth(tTrackSeg *seg, tdble toStart);
 
 /*
  * Convert a Local position (segment, toRight, toStart)
@@ -75,7 +88,7 @@ extern tdble RtTrackGetWidth(tTrackSeg *seg, tdble toStart);
  * and a length in meters for straights.
  *
  */
-extern void RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag);
+ROBOTTOOLS_API void RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag);
 
 /*
  * Convert a Global (segment, X, Y) position into a Local one (segment, toRight, toStart)
@@ -88,8 +101,7 @@ extern void RtTrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y, int flag);
  * The sides parameters is to indicate wether to use the track sides (1) or not (0) in
  * the toRight computation.
  */
-extern void RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int type);
-
+ROBOTTOOLS_API void RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int type);
 
 /*
  * Returns the absolute height in meters of the road
@@ -112,15 +124,13 @@ extern void RtTrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos
     track side
 
  */
-extern tdble RtTrackHeightL(tTrkLocPos *p);
-
+ROBOTTOOLS_API tdble RtTrackHeightL(tTrkLocPos *p);
 
 /*
  * Returns the absolute height in meters of the road
  * at the Global position (segment, X, Y)
  */
-extern tdble RtTrackHeightG(tTrackSeg *seg, tdble X, tdble Y);
-
+ROBOTTOOLS_API tdble RtTrackHeightG(tTrackSeg *seg, tdble X, tdble Y);
 
 /*
  * Give the normal vector of the border of the track
@@ -135,8 +145,7 @@ extern tdble RtTrackHeightG(tTrackSeg *seg, tdble X, tdble Y);
  *
  * The vector is normalized.
  */
-extern void RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm);
-
+ROBOTTOOLS_API void RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd *norm);
 
 /*
  * Used to get the tangent angle for a track position
@@ -144,8 +153,7 @@ extern void RtTrackSideNormalG(tTrackSeg *seg, tdble X, tdble Y, int side, t3Dd 
  *
  * the angle 0 is parallel to the first segment start.
  */
-extern tdble RtTrackSideTgAngleL(tTrkLocPos *p);
-
+ROBOTTOOLS_API tdble RtTrackSideTgAngleL(tTrkLocPos *p);
 
 /*
  * Used to get the normal vector of the road itself (pointing
@@ -156,12 +164,17 @@ extern tdble RtTrackSideTgAngleL(tTrkLocPos *p);
  *
  * The vector is normalized.
  */
-extern void RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm);
+ROBOTTOOLS_API void RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm);
 
-extern int RtDistToPit(struct CarElt *car, tTrack *track, tdble *dL, tdble *dW);
+/** Get the current segment
+ */
+ROBOTTOOLS_API tTrackSeg *RtTrackGetSeg(tTrkLocPos *p);
 
-extern tdble RtGetDistFromStart(tCarElt *car);
-extern tdble RtGetDistFromStart2(tTrkLocPos *p);
+ROBOTTOOLS_API int RtDistToPit(struct CarElt *car, tTrack *track, tdble *dL, tdble *dW);
+
+ROBOTTOOLS_API tdble RtGetDistFromStart(tCarElt *car);
+ROBOTTOOLS_API tdble RtGetDistFromStart2(tTrkLocPos *p);
+
 
 /****************
  * Telemetry    *
@@ -172,13 +185,7 @@ extern tdble RtGetDistFromStart2(tTrkLocPos *p);
     @param	ymax	Maximum value for Y.
     @return	None
  */
-extern void RtTelemInit(tdble ymin, tdble ymax);
-
-/** Get the current segment
- */
-tTrackSeg *RtTrackGetSeg(tTrkLocPos *p);
-
-
+ROBOTTOOLS_API void RtTelemInit(tdble ymin, tdble ymax);
 
 /** Create a new telemetry channel.
     @param	name	Name of the channel.
@@ -187,11 +194,16 @@ tTrackSeg *RtTrackGetSeg(tTrkLocPos *p);
     @param	max	Maximum value of this variable.
     @return	None
  */
-extern void RtTelemNewChannel(const char * name, tdble * var, tdble min, tdble max);
-extern void RtTelemStartMonitoring(const char * filename);
-extern void RtTelemStopMonitoring(void);
-extern void RtTelemUpdate(double time);
-extern void RtTelemShutdown(void);
+ROBOTTOOLS_API void RtTelemNewChannel(const char * name, tdble * var, tdble min, tdble max);
+ROBOTTOOLS_API void RtTelemStartMonitoring(const char * filename);
+ROBOTTOOLS_API void RtTelemStopMonitoring(void);
+ROBOTTOOLS_API void RtTelemUpdate(double time);
+ROBOTTOOLS_API void RtTelemShutdown(void);
+
+
+/********************
+ * Miscellaneous    *
+ ********************/
 
 /**
  * A utility function used to get the string of a index number, or the string of the carname.
@@ -202,6 +214,7 @@ extern void RtTelemShutdown(void);
  * @param result The resulting char* string. If must be already allocated. The contents of the parameter will be changed.
  * @param resultLength The length of the result array
  */
-extern void RtGetCarindexString( int index, const char *bot_dname, char careerMode, char *result, int resultLength );
+ROBOTTOOLS_API void RtGetCarindexString(int index, const char *bot_dname, char careerMode,
+										char *result, int resultLength);
 
 #endif /* _ROBOTTOOLS_H_ */

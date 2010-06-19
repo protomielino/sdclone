@@ -24,17 +24,20 @@
 
 #include <cstring>
 
-#include "modinfo.h"
+#ifdef WIN32
+#include <windows.h>
+#include <direct.h>
+#else
+#include <dlfcn.h>
+#endif
+
 #include "tgf.h" // To get malloc/calloc/free replacements under Windows
 
-
 #ifdef WIN32
-#include <direct.h>
 #define dlsym   GetProcAddress
 #define dlerror GetLastError
 static const size_t SOFileExtLen = strlen(".dll");
 #else
-#include <dlfcn.h>
 static const size_t SOFileExtLen = strlen(".so");
 #endif
 
@@ -193,7 +196,7 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
 
     /* Welcome the module : exchange informations with it :
        1) Call the dedicated module function if present */
-    if ((fModInfoWelcome = (tfModInfoWelcome)dlsym(soHandle, GfModInfoWelcomeFuncName)) != 0) 
+    if ((fModInfoWelcome = (tfModInfoWelcome)dlsym(SOHandle(soHandle), GfModInfoWelcomeFuncName)) != 0) 
     {
         /* Prepare information to give to the module */
 	tModWelcomeIn welcomeIn;
@@ -225,10 +228,10 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
     /* Get module initialization function if welcome succeeded :
        1) Try the new sheme (fixed name) */
     if (initSts == 0
-	&& (fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, GfModInfoInitializeFuncName)) == 0)
+	&& (fModInfoInit = (tfModInfoInitialize)dlsym(SOHandle(soHandle), GfModInfoInitializeFuncName)) == 0)
     {
 	/* 2) Backward compatibility (dll name) */
-	fModInfoInit = (tfModInfoInitialize)dlsym(soHandle, soName);
+	fModInfoInit = (tfModInfoInitialize)dlsym(SOHandle(soHandle), soName);
     }
 
     /* Call module initialization function if welcome succeeded and init function found */
@@ -283,7 +286,7 @@ int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, t
     if (initSts == 0 && retained)
     {
         GfOut("Initialized module %s (maxItf=%d)\n", soPath, (*mod)->modInfoSize);
-	(*mod)->handle = soHandle;
+	(*mod)->handle = (tSOHandle)soHandle;
 	(*mod)->sopath = strdup(soPath);
     }
     else
@@ -320,7 +323,7 @@ int GfModTerminate(tSOHandle soHandle, const char *soPath)
     
     /* Get the module termination function if any :
        1) Try the new sheme (fixed name) */
-    if ((fModInfoTerm = (tfModInfoTerminate)dlsym(soHandle, GfModInfoTerminateFuncName)) == 0)
+    if ((fModInfoTerm = (tfModInfoTerminate)dlsym(SOHandle(soHandle), GfModInfoTerminateFuncName)) == 0)
     {
 	/* 2) Backward compatibility (dll name + "Shut") */
 	char soName[256];
@@ -330,7 +333,7 @@ int GfModTerminate(tSOHandle soHandle, const char *soPath)
 	else
 	    strcpy(soName, soPath);
 	strcpy(&soName[strlen(soName) - SOFileExtLen], "Shut"); /* cut so file ext */
-	fModInfoTerm = (tfModInfoTerminate)dlsym(soHandle, soName);
+	fModInfoTerm = (tfModInfoTerminate)dlsym(SOHandle(soHandle), soName);
     }
 
     /* Call the module termination function if any */

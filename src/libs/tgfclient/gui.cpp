@@ -23,11 +23,11 @@
     @ingroup	gui
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <string>
-#include <time.h>
+#include <ctime>
 
 #include <SDL/SDL.h>
 
@@ -109,7 +109,7 @@ gfuiInit(void)
 }
 
 Color 
-GetColor(float *color)
+GetColor(const float* color)
 {
      Color c;
      c.red = color[0];

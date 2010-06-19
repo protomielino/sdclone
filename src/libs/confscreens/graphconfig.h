@@ -26,7 +26,10 @@
 #ifndef _GRAPHCONFIG_H_
 #define _GRAPHCONFIG_H_
 
-extern void *GraphMenuInit(void *prevMenu);
+#include "confscreens.h"
+
+
+CONFSCREENS_API void *GraphMenuInit(void *prevMenu);
 
 #endif /* _GRAPHCONFIG_H_ */ 
 

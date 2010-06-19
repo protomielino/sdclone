@@ -18,7 +18,9 @@
  ***************************************************************************/
 
 
-#include "tgfclient.h"
+#include <tgfclient.h>
+
+#include "client.h"
 #include "splash.h"
 
 /*
@@ -38,7 +40,7 @@
  *	
  */
 bool
-GameEntry(void)
+MenuEntry(void)
 {
     // Initialize gaming framework.
     GfInitClient();

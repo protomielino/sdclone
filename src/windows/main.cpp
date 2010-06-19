@@ -181,7 +181,7 @@ main(int argc, char *argv[])
 
     GfScrInit(argc, argv);  /* init screen */
 
-    if (GameEntry())         /* launch the game */
+    if (MenuEntry())         /* launch the game */
     {
 	GfelMainLoop();   /* Main event loop */
 	exit(0);

@@ -36,6 +36,8 @@
 #include <config.h>
 #endif
 
+#include "stlexports.h"
+
 // Missing strndup, define it here (for FreeBSD).
 // TODO: Move it into library.
 // strndup code provided by Thierry Thomas.

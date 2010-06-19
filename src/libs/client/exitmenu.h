@@ -21,12 +21,11 @@
 #ifndef _EXITMENU_H_
 #define _EXITMENU_H_
 
-#if _WIN32
-#include <windows.h>
-#endif
+#include "client.h"
 
-extern void *ExitMenuInit(void *menu);
-extern void *MainExitMenuInit(void *mainMenu);
+
+CLIENT_API void* ExitMenuInit(void *menu);
+CLIENT_API void* MainExitMenuInit(void *mainMenu);
 
 #endif /* _EXITMENU_H_ */ 
 

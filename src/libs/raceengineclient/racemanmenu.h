@@ -26,10 +26,13 @@
 #ifndef _RACEMANMENU_H_
 #define _RACEMANMENU_H_
 
-extern int ReRacemanMenu(void);
-extern int ReNewTrackMenu(void);
-extern void reConfigureMenu(void * /* dummy */);
-extern void SetRacemanMenuHandle( void * handle);
+#include "raceengineclient.h"
+
+
+RACEENGINECLIENT_API int ReRacemanMenu(void);
+RACEENGINECLIENT_API int ReNewTrackMenu(void);
+RACEENGINECLIENT_API void ReConfigureMenu(void * /* dummy */);
+RACEENGINECLIENT_API void ReSetRacemanMenuHandle( void * handle);
 
 #endif /* _RACEMANMENU_H_ */ 
 

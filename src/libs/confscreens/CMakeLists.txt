@@ -2,44 +2,47 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(confscreens)
 
-SET(CONFSCREENS_HEADERS confscreens.h  controlconfig.h  driverconfig.h
-	                graphconfig.h  joystickconfig.h  mouseconfig.h
-			openglconfig.h simuconfig.h  soundconfig.h
-			aiconfig.h)
+SET(CONFSCREENS_HEADERS confscreens.h controlconfig.h driverconfig.h
+	                    graphconfig.h joystickconfig.h mouseconfig.h
+	                    openglconfig.h simuconfig.h soundconfig.h aiconfig.h
+	                    carsettingsmenu.h hostsettingsmenu.h)
+
 SET(CONFSCREENS_SOURCES controlconfig.cpp driverconfig.cpp graphconfig.cpp
                         joystickconfig.cpp mouseconfig.cpp openglconfig.cpp
                         simuconfig.cpp soundconfig.cpp aiconfig.cpp
-			${CONFSCREENS_HEADERS})
+	                    carsettingsmenu.cpp hostsettingsmenu.cpp
+	                    ${CONFSCREENS_HEADERS})
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(tgf tgfclient math portability raceengineclient)
+ADD_TORCSLIB_INCLUDEDIR(tgf tgfclient networking math portability)
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
 
 IF(WIN32)
-	include_directories(src/windows/include)
+	INCLUDE_DIRECTORIES(src/windows/include)
 ENDIF(WIN32)
 
-
-IF(UNIX)
-	#disable developer warning
-	IF (COMMAND cmake_policy)
-		cmake_policy(SET CMP0003 NEW)
-	endif(COMMAND cmake_policy)
-	ADD_LIBRARY(confscreens SHARED ${CONFSCREENS_SOURCES})
-ENDIF(UNIX)
 IF(WIN32)
-	ADD_LIBRARY(confscreens STATIC ${CONFSCREENS_SOURCES})
+	# DLL export stuff under Windows (to avoid .def file)
+	ADD_DEFINITIONS(-DCONFSCREENS_DLL)
 ENDIF(WIN32)
 
-ADD_TORCSLIB_LIBRARY(confscreens tgf tgfclient)
+# Disable developer warning
+IF (COMMAND CMAKE_POLICY)
+	CMAKE_POLICY(SET CMP0003 NEW)
+ENDIF(COMMAND CMAKE_POLICY)
 
+ADD_LIBRARY(confscreens SHARED ${CONFSCREENS_SOURCES})
+
+ADD_TORCSLIB_LIBRARY(confscreens tgf tgfclient networking)
 
 ADD_PLIB_LIBRARY(confscreens ul)
 
-
-IF(UNIX)
+IF(WIN32)
+	TORCS_INSTALL_FILES(BIN TARGETS confscreens)
+ELSE(WIN32)
 	TORCS_INSTALL_FILES(LIB lib TARGETS confscreens)
-ENDIF(UNIX)
+ENDIF(WIN32)
+
 TORCS_INSTALL_FILES(INCLUDE FILES ${CONFSCREENS_HEADERS})
 
