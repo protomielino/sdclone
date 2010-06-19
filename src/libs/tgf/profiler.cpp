@@ -16,14 +16,49 @@
 
 #ifdef PROFILER
 
+#include <cstring>
+
+#include <vector>
+#include <map>
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
 
-#include <cstring>
-
 #include "tgf.h"
 
+
+class ProfileInstance {
+ public:
+  ProfileInstance(const char * pname);
+  ~ProfileInstance();
+  char name[256];
+  int calls;
+  int openCalls;
+  double totalTime;
+  double addTime;
+  double subTime;
+  double tmpStart;
+  std::map<ProfileInstance *, void *> mapChildren;
+};
+
+class Profiler {
+ protected:
+  Profiler();
+ public:
+  ~Profiler();
+  static Profiler * getInstance();
+  void startProfile(const char * pname);
+  void stopProfile();
+  void stopActiveProfiles();
+  void printReport();
+ private:
+  static Profiler * profiler;
+  ProfileInstance * curProfile;
+  double fStartTime;
+  std::vector<ProfileInstance *> vecProfiles;
+  std::vector<ProfileInstance *> stkProfiles;
+  std::map<ProfileInstance *, void *> mapWarning;
+};
 
 //////////////////////////////////////////////////////////
 
@@ -123,7 +158,7 @@ bool instanceLess(const ProfileInstance * p1, const ProfileInstance * p2) {
 
 #define TRUNC(a) ( (a) < 0.001 ? 0.0 : (a) )
 
-void Profiler::printProfile() {
+void Profiler::printReport() {
   double total = GfTimeClock() - fStartTime;
   std::cerr << "****************** PROFILE ***********************" << std::endl;
   std::cerr << "Total : " << total << std::endl;
@@ -161,6 +196,29 @@ void Profiler::printProfile() {
   for (; warniter != warnend; ++warniter) {
     std::cerr << "Warning: Profile " << (*warniter).first->name << " may be to short" << std::endl;
   }
+}
+
+// C interface functions //-----------------------------------------------------------------
+
+void GfProfStartProfile(const char* pszName)
+{
+	Profiler::getInstance()->startProfile(pszName);
+}
+
+void GfProfStopProfile(const char* pszName)
+{
+	// TODO: Why pszName if not used ????
+	Profiler::getInstance()->stopProfile();
+}
+
+void GfProfStopActiveProfiles()
+{
+	Profiler::getInstance()->stopActiveProfiles();
+}
+
+void GfProfPrintReport()
+{
+	Profiler::getInstance()->printReport();
 }
 
 #endif /* PROFILER */

@@ -303,7 +303,7 @@ refresh(tSituation *s)
 {
     int			i;
 
-    START_PROFILE("refresh");
+    GfProfStartProfile("refresh");
 
     nFrame++;
     nTotalFrame++;
@@ -319,14 +319,14 @@ refresh(tSituation *s)
 
     TRACE_GL("refresh: start");
 
-    START_PROFILE("grRefreshSound*");
+    GfProfStartProfile("grRefreshSound*");
     grRefreshSound(s, grScreens[0]->getCurCamera());
-    STOP_PROFILE("grRefreshSound*");
+    GfProfStopProfile("grRefreshSound*");
 
-    START_PROFILE("grDrawBackground/glClear");
+    GfProfStartProfile("grDrawBackground/glClear");
     glDepthFunc(GL_LEQUAL);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    STOP_PROFILE("grDrawBackground/glClear");
+    GfProfStopProfile("grDrawBackground/glClear");
 
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 	grScreens[i]->update(s, grFps);
@@ -335,7 +335,7 @@ refresh(tSituation *s)
     grUpdateSmoke(s->currentTime);
     grTrackLightUpdate(s);
 
-    STOP_PROFILE("refresh");
+    GfProfStopProfile("refresh");
     return 0;
 }
 

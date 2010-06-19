@@ -28,8 +28,8 @@
 static void 
 endofprog(void * /* dummy */)
 {
-    STOP_ACTIVE_PROFILES();
-    PRINT_PROFILE();
+    GfProfStopActiveProfiles();
+    GfProfPrintReport();
     GfScrShutdown();
     exit(0);
 }

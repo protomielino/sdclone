@@ -1085,7 +1085,7 @@ ReOneStep(double deltaTimeIncrement)
 		ReInfo->_reLastTime = 0.0;
 	}
 
-	START_PROFILE("rbDrive*");
+	GfProfStartProfile("rbDrive*");
 	if ((s->currentTime - ReInfo->_reLastTime) >= RCM_MAX_DT_ROBOTS) {
 		SignalEvent(Bots);
 		s->deltaTime = s->currentTime - ReInfo->_reLastTime;
@@ -1104,7 +1104,7 @@ ReOneStep(double deltaTimeIncrement)
 		}
 		ReInfo->_reLastTime = s->currentTime;
 	}
-	STOP_PROFILE("rbDrive*");
+	GfProfStopProfile("rbDrive*");
 
 
 	if (GetNetwork())
@@ -1113,12 +1113,12 @@ ReOneStep(double deltaTimeIncrement)
 	}
 
 	SignalEvent(Simu);
-	START_PROFILE("_reSimItf.update*");
+	GfProfStartProfile("_reSimItf.update*");
 	ReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
 	for (i = 0; i < s->_ncars; i++) {
 		ReManage(s->cars[i]);
 	}
-	STOP_PROFILE("_reSimItf.update*");
+	GfProfStopProfile("_reSimItf.update*");
 	
 	ReSortCars();
 
@@ -1141,7 +1141,7 @@ void ReInitUpdater()
  	if (!situationUpdater)
  		situationUpdater = new reSituationUpdater(ReInfo);
 
-	GfssConfigureEventLog("graphics", 10000, 0.0);
+	GfSchedConfigureEventLog("graphics", 10000, 0.0);
 }
 
 void ReInitCarGraphics(void)
@@ -1156,7 +1156,7 @@ void
 ReStart(void)
 {
 #ifdef ReMultiThreaded
-	GfssBeginSession();
+	GfSchedBeginSession();
 	situationUpdater->start();
 #else // ReMultiThreaded
     ReInfo->_reRunning = 1;
@@ -1169,7 +1169,7 @@ ReStop(void)
 {
 #ifdef ReMultiThreaded
 	situationUpdater->stop();
-	GfssEndSession();
+	GfSchedEndSession();
 #else
     ReInfo->_reRunning = 0;
 #endif // ReMultiThreaded
@@ -1184,7 +1184,7 @@ void ReShutdownUpdater()
 		delete situationUpdater;
 		situationUpdater = 0;
 	}
-	GfssPrintReport("schedule.csv", 1.0e-4);
+	GfSchedPrintReport("schedule.csv", 1.0e-4);
 }
 #endif // ReMultiThreaded
 
@@ -1220,17 +1220,17 @@ ReUpdate(void)
     tRmMovieCapture	*capture;
     
 
-    START_PROFILE("ReUpdate");
+    GfProfStartProfile("ReUpdate");
     ReInfo->_refreshDisplay = 0;
     switch (ReInfo->_displayMode) {
     case RM_DISP_MODE_NORMAL:
 	t = GfTimeClock();
 
-	START_PROFILE("ReOneStep*");
+	GfProfStartProfile("ReOneStep*");
 	while (ReInfo->_reRunning && ((t - ReInfo->_reCurTime) > RCM_MAX_DT_SIMU)) {
 	    ReOneStep(RCM_MAX_DT_SIMU);
 	}
-	STOP_PROFILE("ReOneStep*");
+	GfProfStopProfile("ReOneStep*");
 
 	//Send car physics to network if needed
 	if (GetNetwork())
@@ -1279,7 +1279,7 @@ ReUpdate(void)
 	break;
 	
     }
-    STOP_PROFILE("ReUpdate");
+    GfProfStopProfile("ReUpdate");
 
     return RM_ASYNC;
 }
@@ -1363,7 +1363,7 @@ int reSituationUpdater::threadLoop()
 
 			realTime = GfTimeClock();
 		
-			START_PROFILE("ReOneStep*");
+			GfProfStartProfile("ReOneStep*");
 		
 			while (_pCurrReInfo->_reRunning
 				   && ((realTime - _pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
@@ -1372,7 +1372,7 @@ int reSituationUpdater::threadLoop()
 				ReOneStep(RCM_MAX_DT_SIMU);
 			}
 		
-			STOP_PROFILE("ReOneStep*");
+			GfProfStopProfile("ReOneStep*");
 		
 			// Send car physics to network if needed
 			if (GetNetwork())
@@ -1802,13 +1802,13 @@ void reSituationUpdater::computeCurrentStep()
 	{
 		const double t = GfTimeClock();
 		
-		START_PROFILE("ReOneStep*");
+		GfProfStartProfile("ReOneStep*");
 		
 		while (_pCurrReInfo->_reRunning && ((t - _pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
 			
 			ReOneStep(RCM_MAX_DT_SIMU);
 		
-		STOP_PROFILE("ReOneStep*");
+		GfProfStopProfile("ReOneStep*");
 		
 		// Send car physics to network if needed
 		if (GetNetwork())
@@ -1821,7 +1821,7 @@ ReUpdate(void)
 {
 	tRmInfo* pPrevReInfo;
 	
-    START_PROFILE("ReUpdate");
+    GfProfStartProfile("ReUpdate");
     ReInfo->_refreshDisplay = 0;
     switch (ReInfo->_displayMode)
 	{
@@ -1848,9 +1848,9 @@ ReUpdate(void)
 			
 			SignalEvent(Graph);
 			
-			GfssBeginEvent("graphics");
+			GfSchedBeginEvent("graphics");
 			pPrevReInfo->_reGraphicItf.refresh(pPrevReInfo->s);
-			GfssEndEvent("graphics");
+			GfSchedEndEvent("graphics");
 			
 			GfelPostRedisplay();	/* Callback -> reDisplay */
 			break;
@@ -1897,7 +1897,7 @@ ReUpdate(void)
 		}
 	
     }
-    STOP_PROFILE("ReUpdate");
+    GfProfStopProfile("ReUpdate");
 
     return RM_ASYNC;
 }

@@ -606,55 +606,20 @@ struct {								\
  **************************************************************************/
 #ifdef PROFILER
 
-#include <vector>
-#include <map>
+TGF_API void GfProfStartProfile(const char* pszName);
+TGF_API void GfProfStopProfile(const char* pszName);
+TGF_API void GfProfStopActiveProfiles();
+TGF_API void GfProfPrintReport();
 
-#define START_PROFILE(name) Profiler::getInstance()->startProfile(name)
-#define STOP_PROFILE(name) Profiler::getInstance()->stopProfile()
-#define STOP_ACTIVE_PROFILES() Profiler::getInstance()->stopActiveProfiles()
-#define PRINT_PROFILE() Profiler::getInstance()->printProfile()
+#else // PROFILER
 
-class ProfileInstance {
- public:
-  ProfileInstance(const char * pname);
-  ~ProfileInstance();
-  char name[256];
-  int calls;
-  int openCalls;
-  double totalTime;
-  double addTime;
-  double subTime;
-  double tmpStart;
-  std::map<ProfileInstance *, void *> mapChildren;
-};
+#define GfProfStartProfile(pszName)
+#define GfProfStopProfile(pszName)
+#define GfProfStopActiveProfiles()
+#define GfProfPrintReport()
 
-class Profiler {
- protected:
-  Profiler();
- public:
-  ~Profiler();
-  static Profiler * getInstance();
-  void startProfile(const char * pname);
-  void stopProfile();
-  void stopActiveProfiles();
-  void printProfile();
- private:
-  static Profiler * profiler;
-  ProfileInstance * curProfile;
-  double fStartTime;
-  std::vector<ProfileInstance *> vecProfiles;
-  std::vector<ProfileInstance *> stkProfiles;
-  std::map<ProfileInstance *, void *> mapWarning;
-};
+#endif // PROFILER
 
-#else /* PROFILER */
-
-#define START_PROFILE(a)
-#define STOP_PROFILE(a)
-#define STOP_ACTIVE_PROFILES()
-#define PRINT_PROFILE()
-
-#endif
 
 /**************************************************************
  * ScheduleSpy definitions.                                   *
@@ -664,12 +629,25 @@ class Profiler {
  *   at a fine grain level (see schedulespy.cpp for details). *
  **************************************************************/
 
-TGF_API void GfssConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
-TGF_API void GfssBeginSession();
-TGF_API void GfssBeginEvent(const char* pszLogName);
-TGF_API void GfssEndEvent(const char* pszLogName);
-TGF_API void GfssEndSession();
-TGF_API void GfssPrintReport(const char* pszFileName, double fTimeResolution);
+#ifdef SCHEDULE_SPY
+
+TGF_API void GfSchedConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
+TGF_API void GfSchedBeginSession();
+TGF_API void GfSchedBeginEvent(const char* pszLogName);
+TGF_API void GfSchedEndEvent(const char* pszLogName);
+TGF_API void GfSchedEndSession();
+TGF_API void GfSchedPrintReport(const char* pszFileName, double fTimeResolution);
+
+#else // SCHEDULE_SPY
+
+#define GfSchedConfigureEventLog(pszLogName, nMaxEvents, dIgnoreDelay)
+#define GfSchedBeginSession()
+#define GfSchedBeginEvent(pszLogName)
+#define GfSchedEndEvent(pszLogName)
+#define GfSchedEndSession()
+#define GfSchedPrintReport(pszFileName, fTimeResolution)
+
+#endif // SCHEDULE_SPY
 
 
 /*******************/

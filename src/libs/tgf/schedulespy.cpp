@@ -3,7 +3,7 @@
     file        : schedulespy.cpp
     author      : Jean-Philippe Meuret (jpmeuret@free.fr)
 
-    A tool to study the way some special code sections (named "events)
+    A tool to study the way some special code sections (named "events" here)
     in the program are actually scheduled at a fine grain level.
     Absolute time and duration are logged in memory each time declared sections
     are executed.
@@ -20,14 +20,14 @@
  *                                                                         *
  ***************************************************************************/
 
+#ifdef SCHEDULE_SPY
+
 //#include <iostream>
 #include <vector>
 #include <map>
 
 #include "tgf.h"
 
-
-#ifdef SCHEDULE_SPY
 
 class GfScheduleEventLog
 {
@@ -176,9 +176,6 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
 	// Not yet implemented.
 }
 
-#endif // SCHEDULE_SPY
-
-
 // C interface functions //-----------------------------------------------------------------
 
 /* Configure an event log before using it (can be called more than once to change settings)
@@ -186,53 +183,43 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
    \param pszLogName   Name/id
    \param nMaxEvents   Maximum number of events to be logged (other ignored)
    \param dIgnoreDelay Delay (s) before taking Begin/EndEvent into account (from BeginSession time) */
-void GfssConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay)
+void GfSchedConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay)
 {
-#ifdef SCHEDULE_SPY
 	GfScheduleSpy::self()->configureEventLog(pszLogName, nMaxEvents, dIgnoreDelay);
-#endif // SCHEDULE_SPY
 }
 
 /* Start a new spying session
    @ingroup schedulespy
    \precondition All event logs must be configured at least once before) */
-void GfssBeginSession()
+void GfSchedBeginSession()
 {
-#ifdef SCHEDULE_SPY
 	GfScheduleSpy::self()->beginSession();
-#endif // SCHEDULE_SPY
 }
 
 /* Log the beginning of an event (enter the associated code section)
    @ingroup schedulespy
    \precondition BeginSession
    \param pszLogName   Name/id                                        */
-void GfssBeginEvent(const char* pszLogName)
+void GfSchedBeginEvent(const char* pszLogName)
 {
-#ifdef SCHEDULE_SPY
 	GfScheduleSpy::self()->beginEvent(pszLogName);
-#endif // SCHEDULE_SPY
 }
 
 /* Log the end of an event (exit from the associated code section)
    @ingroup schedulespy
    \precondition BeginEvent(pszLogName)
    \param pszLogName   Name/id                                        */
-void GfssEndEvent(const char* pszLogName)
+void GfSchedEndEvent(const char* pszLogName)
 {
-#ifdef SCHEDULE_SPY
 	GfScheduleSpy::self()->endEvent(pszLogName);
-#endif // SCHEDULE_SPY
 }
 
 /* Terminate the current spying session
    @ingroup schedulespy
    \precondition BeginSession             */
-void GfssEndSession()
+void GfSchedEndSession()
 {
-#ifdef SCHEDULE_SPY
 	GfScheduleSpy::self()->endSession();
-#endif // SCHEDULE_SPY
 }
 
 /* Print a table log (2 columns for each event log : start time and duration)
@@ -241,9 +228,9 @@ void GfssEndSession()
    \param fTimeResolution  Time resolution to use
                            (minimum delay between 2 event starts)
    \precondition EndSession                                                     */
-void GfssPrintReport(const char* pszFileName, double fTimeResolution)
+void GfSchedPrintReport(const char* pszFileName, double fTimeResolution)
 {
-#ifdef SCHEDULE_SPY
 	GfScheduleSpy::self()->printReport(pszFileName, fTimeResolution);
-#endif // SCHEDULE_SPY
 }
+
+#endif // SCHEDULE_SPY

@@ -223,9 +223,9 @@ void cGrScreen::camDraw(tSituation *s)
 	
 	glDisable(GL_COLOR_MATERIAL);
 	
-	START_PROFILE("dispCam->update*");
+	GfProfStartProfile("dispCam->update*");
 	dispCam->update(curCar, s);
-	STOP_PROFILE("dispCam->update*");
+	GfProfStopProfile("dispCam->update*");
 	
 	if (dispCam->getDrawBackground()) {
 		glDisable(GL_LIGHTING);
@@ -235,11 +235,11 @@ void cGrScreen::camDraw(tSituation *s)
 	}
 	glEnable(GL_DEPTH_TEST);
 	
-	START_PROFILE("dispCam->action*");
+	GfProfStartProfile("dispCam->action*");
 	dispCam->action();
-	STOP_PROFILE("dispCam->action*");
+	GfProfStopProfile("dispCam->action*");
 	
-	START_PROFILE("grDrawCar*");
+	GfProfStartProfile("grDrawCar*");
 	glFogf(GL_FOG_START, dispCam->getFogStart());
 	glFogf(GL_FOG_END, dispCam->getFogEnd());
 	glEnable(GL_FOG);
@@ -251,9 +251,9 @@ void cGrScreen::camDraw(tSituation *s)
 	for (i = 0; i < s->_ncars; i++) {
 		grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
 	} 
-	STOP_PROFILE("grDrawCar*");
+	GfProfStopProfile("grDrawCar*");
 	
-	START_PROFILE("grDrawScene*");
+	GfProfStartProfile("grDrawScene*");
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (mirrorFlag == 1)
@@ -262,7 +262,7 @@ void cGrScreen::camDraw(tSituation *s)
 		speedcar = 0.0f;	
 	grDrawScene(speedcar, s);
 	//grDrawScene();
-	STOP_PROFILE("grDrawScene*");
+	GfProfStopProfile("grDrawScene*");
 }
 
 
@@ -339,18 +339,18 @@ void cGrScreen::update(tSituation *s, float Fps)
 		glViewport (scrx, scry, scrw, scrh);
 	}
 	
-	START_PROFILE("boardCam*");
+	GfProfStartProfile("boardCam*");
 	boardCam->action();
-	STOP_PROFILE("boardCam*");
+	GfProfStopProfile("boardCam*");
 	
-	START_PROFILE("grDisp**");
+	GfProfStartProfile("grDisp**");
 	glDisable(GL_TEXTURE_2D);
 	
 	TRACE_GL("cGrScreen::update glDisable(GL_DEPTH_TEST)");
 	board->refreshBoard(s, Fps, 0, curCar);
 	TRACE_GL("cGrScreen::update display boards");
 	
-	STOP_PROFILE("grDisp**");
+	GfProfStopProfile("grDisp**");
 }
 
 void cGrScreen::loadParams(tSituation *s)
