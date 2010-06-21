@@ -75,9 +75,16 @@ tdble CalculateTorque2 (tEngine* engine, tdble rads)
 		}
 	}
 
-	tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
-	tdble Tq = (float)((1.0-alpha) * curve->data[i].Tq + alpha * curve->data[i+1].Tq);
+	tdble Tq;
 
+	// To make Christos happy:
+	if ((rads < rpm_min) || (rads > rpm_max)) 
+		Tq = CalculateTorque (engine, rads);
+	else
+	{
+	  tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
+	  Tq = (float)((1.0-alpha) * curve->data[i].Tq + alpha * curve->data[i+1].Tq);
+	}
   	//SimTicks2 += RtDuration(StartTimeStamp);
 
 	return Tq;
