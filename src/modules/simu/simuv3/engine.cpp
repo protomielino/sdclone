@@ -204,9 +204,7 @@ SimEngineUpdateTq(tCar *car)
 		engine->Tq = 0.0f;
 		engine->rads = engine->tickover;
 	} else {
-		tdble Tq_max1 = CalculateTorque(engine, engine->rads);
-		tdble Tq_max2 = CalculateTorque2(engine, engine->rads);
-		tdble Tq_max = (tdble)((Tq_max1 + Tq_max2) / 2.0);
+		tdble Tq_max = CalculateTorque2(engine, engine->rads);
 		tdble alpha = car->ctrl->accelCmd;
         if (alpha < 1) {
             //tdble da = 1 /(1 - alpha); // flow
