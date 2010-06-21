@@ -83,6 +83,7 @@ const tdble G = 9.80665f; /**< m/s/s */
 #define RADS2RPM(x) ((x)*9.549296585)		/**< Radian/s to RPM conversion */
 #define RPM2RADS(x) ((x)*.104719755)		/**< RPM to Radian/s conversion */
 #define RAD2DEG(x)  ((x)*(180.0/PI))		/**< Radian to degree conversion */
+#define FLOAT_RAD2DEG(x)  ((x)*(float)(180.0/PI))/**< Radian to degree conversion */
 #define DEG2RAD(x)  ((x)*(PI/180.0))		/**< Degree to radian conversion */
 #define FEET2M(x)   ((x)*0.304801)		/**< Feet to meter conversion */
 #define SIGN(x)     ((x) < 0 ? -1.0 : 1.0)	/**< Sign of the expression */
