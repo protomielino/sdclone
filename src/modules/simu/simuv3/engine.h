@@ -52,6 +52,7 @@ typedef struct
 	tdble       pressure;
 	tdble       exhaust_pressure;
 	tdble       exhaust_refract;
+	int         lastInterval; /* interval of torque characteristic used at last call to CalculateTorque2 */
 } tEngine;
 
 #endif /* _ENGINE_H_ */ 

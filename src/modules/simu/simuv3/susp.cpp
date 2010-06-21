@@ -73,7 +73,7 @@ damperForce(tSuspension *susp)
         f = (dampdef->C2 * av + dampdef->b2);
     }
 
-    f *= SIGN(v) * susp->damper.efficiency;
+    f *= (float)(SIGN(v) * susp->damper.efficiency);
 
     return f;
 }
@@ -131,7 +131,7 @@ SimSuspCheckIn(tSuspension *susp)
     case Wishbone:
         {
             //tdble link_u = asin(((susp->x - .5*susp->spring.x0)/susp->spring.bellcrank)/susp->link.y);
-            tdble link_u = asin(((susp->x - .2*susp->spring.x0)/susp->spring.bellcrank)/susp->link.y);
+            tdble link_u = (float)(asin(((susp->x - .2*susp->spring.x0)/susp->spring.bellcrank)/susp->link.y));
             tdble x1 = susp->link.y * cos(link_u);
             tdble y1 = susp->link.y * sin(link_u);
             tdble r1 = susp->link.z;
@@ -143,7 +143,7 @@ SimSuspCheckIn(tSuspension *susp)
             tdble d2 =(dx*dx+dy*dy);
             tdble d = sqrt(d2);
             if ((d<r0+r1)||(d>fabs(r0-r1))) {
-                tdble a = (r0*r0-r1*r1+d2)/(2.0*d);
+                tdble a = (float)((r0*r0-r1*r1+d2)/(2.0*d));
                 tdble h = sqrt (r0*r0-a*a);
                 tdble x2 = x0 + a*(x1-x0)/d;
                 tdble y2 = y0 + a*(x1-y0)/d;

@@ -184,7 +184,7 @@ SimWheelUpdateRide(tCar *car, int index)
     {
 		sgQuat Q;
 		sgCopyQuat (Q, car->posQuat);
-		sgPreRotQuat (Q, RAD2DEG(wheel->relPos.ax), 1.0f, 0.0f, 0.0f);
+		sgPreRotQuat (Q, FLOAT_RAD2DEG(wheel->relPos.ax), 1.0f, 0.0f, 0.0f);
 		sgVec3 P = {normal.x, normal.y, normal.z};
 		sgRotateVecQuat (P, Q);
 		sg2t3 (P, rel_normal);
@@ -314,8 +314,8 @@ SimWheelUpdateForce(tCar *car, int index)
 	} else {
 		sgQuat Q;
 		sgCopyQuat (Q, car->posQuat);
-		sgPreRotQuat (Q, RAD2DEG(wheel->relPos.ax), 1.0f, 0.0f, 0.0f);
-		sgPreRotQuat (Q, RAD2DEG(waz), 0.0f, 0.0f, 1.0f);
+		sgPreRotQuat (Q, FLOAT_RAD2DEG(wheel->relPos.ax), 1.0f, 0.0f, 0.0f);
+		sgPreRotQuat (Q, FLOAT_RAD2DEG(waz), 0.0f, 0.0f, 1.0f);
 		sgVec3 P = {normal.x, normal.y, normal.z};
 		sgRotateVecQuat (P, Q);
 		sg2t3 (P, rel_normal);
@@ -491,7 +491,7 @@ SimWheelUpdateForce(tCar *car, int index)
     mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * reaction_force / wheel->opLoad));
     //mu = wheel->mu;
     
-	tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction;
+	tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction/0.7f;
 
     F = dynamic_grip * static_grip;
     // This is the steering torque

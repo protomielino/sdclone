@@ -34,7 +34,7 @@ void SimCarCollideAddDeformation(tCar* car, sgVec3 pos, sgVec3 force)
     if (sgLengthVec3(collision_state->force) < sgLengthVec3(force)) {
         for (int i=0; i<3; i++) {
             collision_state->pos[i] = pos[i];// + k*collision_state->pos[i])/(k+1.0);
-            collision_state->force[i] = 0.0001*force[i];// + k*collision_state->force[i])/(k+1.0);
+            collision_state->force[i] = (float)(0.0001*force[i]);// + k*collision_state->force[i])/(k+1.0);
             //printf ("F:%f\n", collision_state->force[i]);
         }
     }
@@ -84,7 +84,7 @@ SimCarCollideZ(tCar *car)
     tdble       dotProd;
     tWheel      *wheel;
     bool upside_down = false;
-    tdble corner_factor = 0.9; // how much to shrink the bounding box
+    tdble corner_factor = 0.9f; // how much to shrink the bounding box
 
     if (car->collide_timer < 10.0) {
         car->collide_timer += SimDeltaTime;
@@ -94,7 +94,7 @@ SimCarCollideZ(tCar *car)
         return;
     }
 
-    tdble energy_restitution = 0.99;
+    tdble energy_restitution = 0.99f;
     tdble E_prev = SimCarEnergy(car);
     bool collide = false;
     // Get normal N
@@ -110,12 +110,12 @@ SimCarCollideZ(tCar *car)
         car->upside_down_timer = 0.0f;
     } else {
         upside_down = true;
-        car->upside_down_timer += 0.01*SimDeltaTime;
+        car->upside_down_timer += (float)(0.01*SimDeltaTime);
     }
 
-    tdble gc_height_difference = MIN(0.0, car->DynGCg.pos.z - RtTrackHeightL(&(car->trkPos)));
+    tdble gc_height_difference = (float)MIN(0.0, car->DynGCg.pos.z - RtTrackHeightL(&(car->trkPos)));
     // Go through all corners and check for collision.
-    tdble min_height_difference = MIN(0.0, gc_height_difference);
+    tdble min_height_difference = (float)MIN(0.0, gc_height_difference);
     for (i = 0; i < 4; i++) {
         wheel = &(car->wheel[i]);
         // We only need to check for body collision with the floor if
@@ -232,7 +232,7 @@ SimCarCollideZ(tCar *car)
                 forces.x = - dotProd * nx;
                 forces.y = - dotProd * ny;
                 forces.z = - dotProd * nz;
-                tdble dP3 = dotProd * mu / (0.001 + vQ);
+                tdble dP3 = (float)(dotProd * mu / (0.001 + vQ));
                 t3Dd friction;
                 friction.x = vQx * dP3;
                 friction.y = vQy * dP3;
@@ -296,7 +296,7 @@ SimCarCollideZ(tCar *car)
                 tdble My = - impulse[SG_Z] * v[SG_X] + impulse[SG_X] * v[SG_Z];
                 tdble Mz = - impulse[SG_X] * v[SG_Y] + impulse[SG_Y] * v[SG_X];
                 // Add moments to rotational inertia
-                tdble rot_mom_scale = 0.25*car->mass;
+                tdble rot_mom_scale = 0.25f*car->mass;
 #ifdef DEBUG_COLLIDE_Z
                 printf ("          J = (%f %f %f)\n",
                         car->rot_mom[SG_X],
@@ -309,7 +309,7 @@ SimCarCollideZ(tCar *car)
           for (int i=0; i<3; i++) {
               if (fabs(car->rot_mom[i]) >500.0) {
                   //printf ("rot_mom: %f\n", (car->rot_mom[i]));
-                    car->rot_mom[i] = 250*SIGN(car->rot_mom[i]);
+                    car->rot_mom[i] = (float)(250*SIGN(car->rot_mom[i]));
                 }
             }
 #ifdef DEBUG_COLLIDE_Z
@@ -350,16 +350,16 @@ SimCarCollideZ(tCar *car)
                 // should be this way..
                 if (dotProd <-5.0) {
                     // if it's hard, do a damage thing
-                    static tdble WHEEL_ROT_DAMAGE = 0.001;
-                    static tdble WHEEL_BENT_DAMAGE = 0.01;
-                    static tdble WHEEL_DAMAGE_LIMIT = 0.25;
-                    static tdble SUSP_DAMAGE_CONST = 1.0;
-                    static tdble SUSP_DAMAGE = 0.1;
+                    static tdble WHEEL_ROT_DAMAGE = 0.001f;
+                    static tdble WHEEL_BENT_DAMAGE = 0.01f;
+                    static tdble WHEEL_DAMAGE_LIMIT = 0.25f;
+                    static tdble SUSP_DAMAGE_CONST = 1.0f;
+                    static tdble SUSP_DAMAGE = 0.1f;
                     car->collision |= 16;
                     wheel->rotational_damage_x -= dotProd*WHEEL_ROT_DAMAGE*urandom();
                     wheel->rotational_damage_z -= dotProd*WHEEL_ROT_DAMAGE*urandom();
-                    wheel->bent_damage_x += WHEEL_BENT_DAMAGE*(urandom()-0.5);
-                    wheel->bent_damage_z += WHEEL_BENT_DAMAGE*(urandom()-0.5);
+                    wheel->bent_damage_x += (float)(WHEEL_BENT_DAMAGE*(urandom()-0.5));
+                    wheel->bent_damage_z += (float)(WHEEL_BENT_DAMAGE*(urandom()-0.5));
                     if (wheel->rotational_damage_x > WHEEL_DAMAGE_LIMIT) {
                         wheel->rotational_damage_x = WHEEL_DAMAGE_LIMIT;
                     }
@@ -436,7 +436,7 @@ SimCarCollideXYScene(tCar *car)
         return;
     }
 
-    tdble energy_restitution = 0.999;
+    tdble energy_restitution = 0.999f;
 
     corner = &(car->corner[0]);
     for (i = 0; i < 4; i++, corner++) {
@@ -475,7 +475,7 @@ SimCarCollideXYScene(tCar *car)
         initDotProd = nx * corner->vel.x + ny * corner->vel.y;
         //printf("%f = (%f %f)'(%f %f)\n", initDotProd, nx, ny, corner->vel.x, corner->vel.y);
         // Compute dmgDotProd (base value for later damage) with a heuristic.
-        tdble absvel = MAX(1.0, sqrt(car->DynGCg.vel.x*car->DynGCg.vel.x + car->DynGCg.vel.y*car->DynGCg.vel.y));
+        tdble absvel = (float)MAX(1.0, sqrt(car->DynGCg.vel.x*car->DynGCg.vel.x + car->DynGCg.vel.y*car->DynGCg.vel.y));
         tdble GCgnormvel = car->DynGCg.vel.x*nx + car->DynGCg.vel.y*ny;
         tdble cosa = GCgnormvel/absvel;
         tdble dmgDotProd = GCgnormvel*cosa;
@@ -533,9 +533,9 @@ SimCarCollideXYScene(tCar *car)
 
             // propagate damages
             if ((car->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
-                dmgDotProd = dmgDotProd*dmgDotProd*0.5
+                dmgDotProd = (float)(dmgDotProd*dmgDotProd*0.5
                     + friction_impulse_x*friction_impulse_x
-                    + friction_impulse_y*friction_impulse_y;
+                    + friction_impulse_y*friction_impulse_y);
                 dmg = curBarrier->surface->kDammage * dmgDotProd * simDammageFactor[car->carElt->_skillLevel];
                 car->dammage += (int)dmg;
             }
@@ -571,7 +571,7 @@ SimCarCollideXYScene(tCar *car)
             tdble My = - impulse[SG_Z] * v[SG_X] + impulse[SG_X] * v[SG_Z];
             tdble Mz = - impulse[SG_X] * v[SG_Y] + impulse[SG_Y] * v[SG_X];
             // Add moments to rotational inertia
-            tdble rot_mom_scale = 0.25*car->mass;// * SimDeltaTime;
+            tdble rot_mom_scale = 0.25f*car->mass;// * SimDeltaTime;
             car->rot_mom[SG_X] -= rot_mom_scale * Mx;// * car->Iinv.x;
             car->rot_mom[SG_Y] -= rot_mom_scale * My;// * car->Iinv.y;
             car->rot_mom[SG_Z] -= rot_mom_scale * Mz; //* car->Iinv.z;
@@ -580,7 +580,7 @@ SimCarCollideXYScene(tCar *car)
             for (int i=0; i<3; i++) {
                 if (fabs(car->rot_mom[i]) > 2000.0) {
                     //printf ("rot_mom: %f\n", (car->rot_mom[i]));
-                    car->rot_mom[i] = 2000*SIGN(car->rot_mom[i]);
+                    car->rot_mom[i] = (float)(2000*SIGN(car->rot_mom[i]));
                 }
             }
             // transform velocity to global frame
@@ -827,7 +827,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
     sgVec2 tmpv;
     
-    sgScaleVec2(tmpv, n, MIN(distpab, 0.05));
+    sgScaleVec2(tmpv, n, MIN(distpab, 0.05f));
     // No "for" loop here because of subtle difference AddVec/SubVec. 
     if (car[0]->blocked == 0 && !(car[0]->carElt->_state & RM_CAR_STATE_NO_SIMU)) {
         sgAddVec2((float*)&(car[0]->DynGCg.pos), tmpv);
@@ -900,7 +900,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
         static float VELMAX = 3.0f;
         if (fabs(car[i]->VelColl.az) > VELMAX) {
-            car[i]->VelColl.az = SIGN(car[i]->VelColl.az) * VELMAX;
+            car[i]->VelColl.az = (float)(SIGN(car[i]->VelColl.az) * VELMAX);
         }
 
         sgCopyVec2((float*)&(car[i]->VelColl.x), v2a);
@@ -908,8 +908,8 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
         // Move the car for the collision lib.
         tCarElt *carElt = car[i]->carElt;
         sgMakeCoordMat4(carElt->pub.posMat, car[i]->DynGCg.pos.x, car[i]->DynGCg.pos.y,
-                        car[i]->DynGCg.pos.z - carElt->_statGC_z, RAD2DEG(carElt->_yaw),
-                        RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+                        car[i]->DynGCg.pos.z - carElt->_statGC_z, (float)RAD2DEG(carElt->_yaw),
+                        (float)RAD2DEG(carElt->_roll), (float)RAD2DEG(carElt->_pitch));
         dtSelectObject(car[i]);
         dtLoadIdentity();
         dtTranslate(-carElt->_statGC_x, -carElt->_statGC_y, 0.0f);

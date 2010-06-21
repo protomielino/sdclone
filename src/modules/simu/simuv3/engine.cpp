@@ -18,13 +18,16 @@
  ***************************************************************************/
 
 #include "sim.h"
+#include "timeanalysis.h"
 
 tdble CalculateTorque (tEngine* engine, tdble rads)
 {
+	//double StartTimeStamp = RtTimeStamp(); 
+
 	tEngineCurve *curve = &(engine->curve);
 	tdble Tq = curve->data[0].Tq;
 	tdble Tmax = curve->data[0].Tq;
-	tdble Tmin = curve->data[0].Tq * 0.5;
+	tdble Tmin = curve->data[0].Tq * 0.5f;
 	tdble rpm_max = curve->data[0].rads;
 	tdble rpm_min = -1.0;
 	tdble alpha = 0.0;
@@ -39,7 +42,44 @@ tdble CalculateTorque (tEngine* engine, tdble rads)
 		}
 	}
 	alpha = (rads - rpm_min) / (rpm_max - rpm_min);
-	Tq = (1.0-alpha) * Tmin + alpha * Tmax;
+	Tq = (float)((1.0-alpha) * Tmin + alpha * Tmax);
+
+  	//SimTicks += RtDuration(StartTimeStamp);
+
+	return Tq;
+}
+
+tdble CalculateTorque2 (tEngine* engine, tdble rads)
+{
+	//double StartTimeStamp = RtTimeStamp(); 
+
+	tEngineCurve *curve = &(engine->curve);
+
+	int i = engine->lastInterval;
+
+	tdble rpm_min = curve->data[i].rads;
+	tdble rpm_max = curve->data[i+1].rads;
+
+	if (rads > rpm_max) { 
+		if (i < curve->nbPts) {
+			rpm_min = rpm_max;
+			engine->lastInterval = ++i;
+			rpm_max = curve->data[i+1].rads;
+		}
+	}
+	else if (rads < rpm_min) { 
+		if (i > 0) {
+			rpm_max = rpm_min;
+			engine->lastInterval = --i;
+			rpm_min = curve->data[i].rads;
+		}
+	}
+
+	tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
+	tdble Tq = (float)((1.0-alpha) * curve->data[i].Tq + alpha * curve->data[i+1].Tq);
+
+  	//SimTicks2 += RtDuration(StartTimeStamp);
+
 	return Tq;
 }
 
@@ -58,6 +98,7 @@ SimEngineConfig(tCar *car)
     } *edesc;
 
 
+	car->engine.lastInterval = 0; // Initialize interval
     car->engine.revsLimiter = GfParmGetNum(hdle, SECT_ENGINE, PRM_REVSLIM, (char*)NULL, 800);
     car->carElt->_enginerpmRedLine = car->engine.revsLimiter;
     car->engine.revsMax     = GfParmGetNum(hdle, SECT_ENGINE, PRM_REVSMAX, (char*)NULL, 1000);
@@ -124,7 +165,8 @@ SimEngineConfig(tCar *car)
 	// TEST TORQUE FUNCTION
 	for (float rads=1.0; rads<car->engine.revsMax; rads+=1.0) {
 		float Tq = CalculateTorque(&(car->engine), rads);
-		printf ("%f %f #TORQUE\n", 30.0*rads/M_PI, Tq);
+		float Tq2 = CalculateTorque2(&(car->engine), rads);
+		printf ("%f %f %f %d #TORQUE\n", 30.0*rads/M_PI, Tq, Tq2, SimLastInterval);
 	}
 #endif
     free(edesc);
@@ -162,7 +204,9 @@ SimEngineUpdateTq(tCar *car)
 		engine->Tq = 0.0f;
 		engine->rads = engine->tickover;
 	} else {
-		tdble Tq_max = CalculateTorque(engine, engine->rads);
+		tdble Tq_max1 = CalculateTorque(engine, engine->rads);
+		tdble Tq_max2 = CalculateTorque2(engine, engine->rads);
+		tdble Tq_max = (tdble)((Tq_max1 + Tq_max2) / 2.0);
 		tdble alpha = car->ctrl->accelCmd;
         if (alpha < 1) {
             //tdble da = 1 /(1 - alpha); // flow
@@ -185,7 +229,7 @@ SimEngineUpdateTq(tCar *car)
 		tdble cons = Tq_cur * 0.75f;
 
 		if (cons > 0) {
-			car->fuel -= cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime;
+			car->fuel -= (float)(cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime);
 		}
 		if (car->fuel <= 0.0) {
 			car->fuel = 0.0;
@@ -225,14 +269,14 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
     }
 #endif
 
-    freerads = engine->rads;
+	freerads = engine->rads;
 	freerads +=engine->Tq / (  engine->I) * SimDeltaTime;
 	if (freerads > engine->revsMax) {
 	  freerads = engine->revsMax;
         }
 	tdble dp = engine->pressure;
-	engine->pressure = engine->pressure*.9 + .1*engine->Tq;
-	dp = (0.01*fabs(engine->pressure - dp));
+	engine->pressure = (float)(engine->pressure*.9 + .1*engine->Tq);
+	dp = (float)(0.01*fabs(engine->pressure - dp));
 	dp = fabs(dp);
 	tdble rth = urandom();
 	if (dp>rth) {
@@ -241,7 +285,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 	engine->exhaust_pressure*=.9f;
 
 	
-	car->carElt->priv.smoke += 5.0*engine->exhaust_pressure;
+	car->carElt->priv.smoke += 5.0f*engine->exhaust_pressure;
 	car->carElt->priv.smoke *= exp(-0.0001f * engine->rads);
 #if 0
 	if (engine->exhaust_pressure>(engine->exhaust_refract)) {
@@ -268,14 +312,14 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 
 	if (sdI>1.0) sdI = 1.0;
     
-	engine->I_joint = engine->I_joint*(1.0-alpha) +  alpha*trans->curI;
+	engine->I_joint = (float)(engine->I_joint*(1.0-alpha) +  alpha*trans->curI);
 
     if ((clutch->transferValue > 0.01) && (trans->gearbox.gear)) {
 
 		transfer = clutch->transferValue * clutch->transferValue * clutch->transferValue * clutch->transferValue;
 
-		ttq = dI* tanh(0.01*(axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer) -engine->rads))*100.0;
-		engine->rads = (1.0-sdI) * (axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer)) + sdI *(engine->rads + ((ttq)*SimDeltaTime)/(engine->I));
+		ttq = (float)(dI* tanh(0.01*(axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer) -engine->rads))*100.0);
+		engine->rads = (float)((1.0-sdI) * (axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer)) + sdI *(engine->rads + ((ttq)*SimDeltaTime)/(engine->I)));
 		if (engine->rads < 0.0) {
 			engine->rads = 0;
             engine->Tq = 0.0;
@@ -302,4 +346,6 @@ void
 SimEngineShutdown(tCar *car)
 {
     free(car->engine.curve.data);
+    //GfOut("#Total Time CalculateTorque  used: %g sec\n",SimTicks/1000.0);
+    //GfOut("#Total Time CalculateTorque2 used: %g sec\n",SimTicks2/1000.0);
 }

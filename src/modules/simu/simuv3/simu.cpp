@@ -50,6 +50,9 @@ static int SimNbCars = 0;
 static double simu_total_time = 0.0f;
 static double simu_init_time = 0.0f;
 
+double SimTicks = 0.0;  // Time measurement of CalculateTorque 
+double SimTicks2 = 0.0; // Time measurement of CalculateTorque2
+
 t3Dd vectStart[16];
 t3Dd vectEnd[16];
 
@@ -103,9 +106,9 @@ ctrlCheck(tCar *car)
 		}
     } else if (car->carElt->_state & RM_CAR_STATE_FINISH) {
 		/* when the finish line is passed, continue at "slow" pace */
-		car->ctrl->accelCmd = MIN(car->ctrl->accelCmd, 0.20);
+		car->ctrl->accelCmd = (float)MIN(car->ctrl->accelCmd, 0.20);
 		if (car->DynGC.vel.x > 30.0) {
-			car->ctrl->brakeCmd = MAX(car->ctrl->brakeCmd, 0.05);
+			car->ctrl->brakeCmd = (float)MAX(car->ctrl->brakeCmd, 0.05);
 		}
     }
 
@@ -131,7 +134,7 @@ ctrlCheck(tCar *car)
 		car->ctrl->steer = -1.0;
     }
 
-    clutch->transferValue = 1.0 - car->ctrl->clutchCmd;
+    clutch->transferValue = (float)(1.0 - car->ctrl->clutchCmd);
 }
 
 /* Initial configuration */
@@ -158,10 +161,10 @@ SimConfig(tCarElt *carElt, tRmInfo* ReInfo)
     //    carElt->_pitch = 0.0;
 
     sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
-					RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+					(float)RAD2DEG(carElt->_yaw), (float)RAD2DEG(carElt->_roll), (float)RAD2DEG(carElt->_pitch));
 
 
-	sgEulerToQuat (car->posQuat, -RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_pitch), RAD2DEG(carElt->_roll));
+	sgEulerToQuat (car->posQuat, (float)-RAD2DEG(carElt->_yaw), (float)RAD2DEG(carElt->_pitch), (float)RAD2DEG(carElt->_roll));
 	sgQuatToMatrix (car->posMat, car->posQuat);
 
 	simu_total_time = 0.0f;
@@ -219,13 +222,13 @@ RemoveCar(tCar *car, tSituation *s)
 		carElt->_roll += car->restPos.vel.ax * SimDeltaTime;
 		carElt->_pitch += car->restPos.vel.ay * SimDeltaTime;
 		sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
-						RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+						(float)RAD2DEG(carElt->_yaw), (float)RAD2DEG(carElt->_roll), (float)RAD2DEG(carElt->_pitch));
 
 		if (carElt->_pos_Z > (car->restPos.pos.z + PULL_Z_OFFSET)) {
 			carElt->_state &= ~RM_CAR_STATE_PULLUP;
 			carElt->_state |= RM_CAR_STATE_PULLSIDE;
 
-			travelTime = DIST(car->restPos.pos.x, car->restPos.pos.y, carElt->_pos_X, carElt->_pos_Y) / PULL_SPD;
+			travelTime = (float)(DIST(car->restPos.pos.x, car->restPos.pos.y, carElt->_pos_X, carElt->_pos_Y) / PULL_SPD);
 			car->restPos.vel.x = (car->restPos.pos.x - carElt->_pos_X) / travelTime;
 			car->restPos.vel.y = (car->restPos.pos.y - carElt->_pos_Y) / travelTime;
 		}
@@ -237,7 +240,7 @@ RemoveCar(tCar *car, tSituation *s)
 		carElt->_pos_X += car->restPos.vel.x * SimDeltaTime;
 		carElt->_pos_Y += car->restPos.vel.y * SimDeltaTime;
 		sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
-						RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+						(float)RAD2DEG(carElt->_yaw), (float)RAD2DEG(carElt->_roll), (float)RAD2DEG(carElt->_pitch));
 
 		if ((fabs(car->restPos.pos.x - carElt->_pos_X) < 0.5) && (fabs(car->restPos.pos.y - carElt->_pos_Y) < 0.5)) {
 			carElt->_state &= ~RM_CAR_STATE_PULLSIDE;
@@ -249,7 +252,7 @@ RemoveCar(tCar *car, tSituation *s)
     if (carElt->_state & RM_CAR_STATE_PULLDN) {
 		carElt->_pos_Z -= car->restPos.vel.z * SimDeltaTime;
 		sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
-						RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+						(float)RAD2DEG(carElt->_yaw), (float)RAD2DEG(carElt->_roll), (float)RAD2DEG(carElt->_pitch));
 
 		if (carElt->_pos_Z < car->restPos.pos.z) {
 			carElt->_state &= ~RM_CAR_STATE_PULLDN;
@@ -304,21 +307,21 @@ RemoveCar(tCar *car, tSituation *s)
 
     trkPos.type = TR_LPOS_SEGMENT;
     RtTrackLocal2Global(&trkPos, &(car->restPos.pos.x), &(car->restPos.pos.y), trkFlag);
-    car->restPos.pos.z = RtTrackHeightL(&trkPos) + 0.1 + carElt->_statGC_z;
+    car->restPos.pos.z = RtTrackHeightL(&trkPos) + 0.1f + carElt->_statGC_z;
     car->restPos.pos.az = RtTrackSideTgAngleL(&trkPos);
     car->restPos.pos.ax = 0;
     car->restPos.pos.ay = 0;
 
     car->restPos.vel.z = PULL_SPD;
-    travelTime = (car->restPos.pos.z + PULL_Z_OFFSET - carElt->_pos_Z) / car->restPos.vel.z;
+    travelTime = (float)((car->restPos.pos.z + PULL_Z_OFFSET - carElt->_pos_Z) / car->restPos.vel.z);
     dang = car->restPos.pos.az - carElt->_yaw;
-    NORM_PI_PI(dang);
+    FLOAT_NORM_PI_PI(dang);
     car->restPos.vel.az = dang / travelTime;
     dang = car->restPos.pos.ax - carElt->_roll;
-    NORM_PI_PI(dang);
+    FLOAT_NORM_PI_PI(dang);
     car->restPos.vel.ax = dang / travelTime;
     dang = car->restPos.pos.ay - carElt->_pitch;
-    NORM_PI_PI(dang);
+    FLOAT_NORM_PI_PI(dang);
     car->restPos.vel.ay = dang / travelTime;
 
 }
@@ -336,7 +339,7 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 	static const float UPSIDE_DOWN_TIMEOUT = 5.0f;
 
 	double timestamp_start = GfTimeClock();
-    SimDeltaTime = deltaTime;
+    SimDeltaTime = (float)deltaTime;
     SimTelemetry = 0;//telemetry;
     for (ncar = 0; ncar < s->_ncars; ncar++) {
 		SimCarTable[ncar].collision = 0;
