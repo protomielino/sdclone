@@ -70,9 +70,9 @@ double RtTimeStamp()
 {
 #ifdef WIN32
 	ULONGLONG TickCount; 
-//	DWORD_PTR oldmask = ::SetThreadAffinityMask(::GetCurrentThread(), 0);
+	DWORD_PTR oldmask = ::SetThreadAffinityMask(::GetCurrentThread(), 0);
 	QueryPerformanceCounter((LARGE_INTEGER*)&TickCount); 
-//	::SetThreadAffinityMask(::GetCurrentThread(), oldmask);
+	::SetThreadAffinityMask(::GetCurrentThread(), oldmask);
 	return (1000.0 * TickCount)/RtTicksPerSec;
 #else
 	struct timeval tv;
