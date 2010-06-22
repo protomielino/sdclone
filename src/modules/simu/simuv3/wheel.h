@@ -114,6 +114,7 @@ typedef struct
 	tdble   s_old;
 	tdble   F_old;
 
+    t3Dd   	normal;	   	
 
 } tWheel;
 

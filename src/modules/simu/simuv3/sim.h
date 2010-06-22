@@ -124,6 +124,7 @@ extern tdble simSkidFactor[];
 
 extern double SimTicks;
 extern double SimTicks2;
+extern double SimTicksRtTrackSurfaceNormalL;
 
 /// return a number drawn uniformly from [0,1]
 inline float urandom() {

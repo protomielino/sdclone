@@ -22,7 +22,7 @@
 
 tdble CalculateTorque (tEngine* engine, tdble rads)
 {
-	//double StartTimeStamp = RtTimeStamp(); 
+	double StartTimeStamp = RtTimeStamp(); // Profiling test
 
 	tEngineCurve *curve = &(engine->curve);
 	tdble Tq = curve->data[0].Tq;
@@ -44,14 +44,54 @@ tdble CalculateTorque (tEngine* engine, tdble rads)
 	alpha = (rads - rpm_min) / (rpm_max - rpm_min);
 	Tq = (float)((1.0-alpha) * Tmin + alpha * Tmax);
 
-  	//SimTicks += RtDuration(StartTimeStamp);
+  	SimTicks += RtDuration(StartTimeStamp); // Profiling test
 
 	return Tq;
 }
 
 tdble CalculateTorque2 (tEngine* engine, tdble rads)
 {
-	//double StartTimeStamp = RtTimeStamp(); 
+	tEngineCurve *curve = &(engine->curve);
+
+	int i = engine->lastInterval;
+
+	tdble rpm_min = curve->data[i].rads;
+	tdble rpm_max = curve->data[i+1].rads;
+
+	if (rads > rpm_max) { 
+		if (i < curve->nbPts) {
+			rpm_min = rpm_max;
+			engine->lastInterval = ++i;
+			rpm_max = curve->data[i+1].rads;
+		}
+	}
+	else if (rads < rpm_min) { 
+		if (i > 0) {
+			rpm_max = rpm_min;
+			engine->lastInterval = --i;
+			rpm_min = curve->data[i].rads;
+		}
+	}
+
+	// In case of large changes of rads
+	if ((rads < rpm_min) || (rads > rpm_max)) 
+		return CalculateTorque2 (engine, rads);
+	else {
+	  tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
+	  return (float)((1.0-alpha) * curve->data[i].Tq + alpha * curve->data[i+1].Tq);
+	}
+}
+
+/*
+  For profiling tests:
+
+  Call CalculateTorque3 instead of CalculateTorque2 
+  to get the times without overlapping 
+  caused by recursive calls to CalculateTorque2 */
+
+tdble CalculateTorque3 (tEngine* engine, tdble rads)
+{
+	double StartTimeStamp = RtTimeStamp(); // Profiling test
 
 	tEngineCurve *curve = &(engine->curve);
 
@@ -77,15 +117,15 @@ tdble CalculateTorque2 (tEngine* engine, tdble rads)
 
 	tdble Tq;
 
-	// To make Christos happy:
+	// In case of large changes of rads
 	if ((rads < rpm_min) || (rads > rpm_max)) 
-		Tq = CalculateTorque (engine, rads);
-	else
-	{
+		Tq = CalculateTorque2 (engine, rads);
+	else {
 	  tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
 	  Tq = (float)((1.0-alpha) * curve->data[i].Tq + alpha * curve->data[i+1].Tq);
 	}
-  	//SimTicks2 += RtDuration(StartTimeStamp);
+
+  	SimTicks2 += RtDuration(StartTimeStamp); // Profiling test
 
 	return Tq;
 }
@@ -173,7 +213,7 @@ SimEngineConfig(tCar *car)
 	for (float rads=1.0; rads<car->engine.revsMax; rads+=1.0) {
 		float Tq = CalculateTorque(&(car->engine), rads);
 		float Tq2 = CalculateTorque2(&(car->engine), rads);
-		printf ("%f %f %f %d #TORQUE\n", 30.0*rads/M_PI, Tq, Tq2, SimLastInterval);
+		printf ("%f %f %f %d #TORQUE\n", 30.0*rads/M_PI, Tq, Tq2, engine->lastInterval);
 	}
 #endif
     free(edesc);
@@ -211,7 +251,8 @@ SimEngineUpdateTq(tCar *car)
 		engine->Tq = 0.0f;
 		engine->rads = engine->tickover;
 	} else {
-		tdble Tq_max = CalculateTorque2(engine, engine->rads);
+		// tdble Tq_max = CalculateTorque2(engine, engine->rads); // Use this for release
+		tdble Tq_max = CalculateTorque3(engine, engine->rads);  // Use this for profiling tests
 		tdble alpha = car->ctrl->accelCmd;
         if (alpha < 1) {
             //tdble da = 1 /(1 - alpha); // flow
@@ -352,5 +393,5 @@ SimEngineShutdown(tCar *car)
 {
     free(car->engine.curve.data);
     //GfOut("#Total Time CalculateTorque  used: %g sec\n",SimTicks/1000.0);
-    //GfOut("#Total Time CalculateTorque2 used: %g sec\n",SimTicks2/1000.0);
+    GfOut("#Total Time CalculateTorque2 used: %g sec\n",SimTicks2/1000.0);  // Profiling test
 }

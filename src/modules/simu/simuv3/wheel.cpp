@@ -181,6 +181,7 @@ SimWheelUpdateRide(tCar *car, int index)
     t3Dd rel_normal;
     // Find normal of track.
     RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+    wheel->normal = normal; 
     {
 		sgQuat Q;
 		sgCopyQuat (Q, car->posQuat);
@@ -303,7 +304,9 @@ SimWheelUpdateForce(tCar *car, int index)
 
 	BEGIN_PROFILE(timer_coordinate_transform);
     
-    RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+    //RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+	normal = wheel->normal; 
+
     
     // now rel_normal.x is the effective camber angle
 	if (USE_QUATERNIONS==0) {
@@ -491,7 +494,8 @@ SimWheelUpdateForce(tCar *car, int index)
     mu = wheel->mu * (wheel->lfMin + (wheel->lfMax - wheel->lfMin) * exp(wheel->lfK * reaction_force / wheel->opLoad));
     //mu = wheel->mu;
     
-	tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction/0.7f;
+	tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction;
+	//tdble static_grip = wheel->condition * reaction_force * mu * wheel->trkPos.seg->surface->kFriction/0.7f;
 
     F = dynamic_grip * static_grip;
     // This is the steering torque

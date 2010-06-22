@@ -18,6 +18,8 @@
  ***************************************************************************/
 
 #include "sim.h"
+#include "timeanalysis.h"
+
 extern tRmInfo ReInfo;
 
 #define CAR_DAMMAGE     0.1
@@ -56,7 +58,8 @@ void SimCarCollideZ(tCar *car)
         wheel = &(car->wheel[i]);
         if (wheel->state & SIM_SUSP_COMP) {
             car->DynGCg.pos.z += wheel->susp.spring.packers - wheel->rideHeight;
-            RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+            //RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+		    normal = wheelNormal[i]; 
             dotProd = (car->DynGCg.vel.x * normal.x + car->DynGCg.vel.y * normal.y + car->DynGCg.vel.z * normal.z) * wheel->trkPos.seg->surface->kRebound;
             if (dotProd < 0) {
                 if (dotProd < CRASH_THRESHOLD) {
@@ -98,8 +101,9 @@ SimCarCollideZ(tCar *car)
     tdble E_prev = SimCarEnergy(car);
     bool collide = false;
     // Get normal N
-    RtTrackSurfaceNormalL(&(car->trkPos), &car_normal);
-    
+    //RtTrackSurfaceNormalL(&(car->trkPos), &car_normal);
+    car_normal = car->normal; // Use precalculated values
+
     // Get normal N_q in local coordinate system
     QuatInverseRotate(car_normal, car->posQuat, rel_car_normal);
 
@@ -170,7 +174,9 @@ SimCarCollideZ(tCar *car)
 
 
             // get the track normal n_g for the wheel
-            RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+            //RtTrackSurfaceNormalL(&(wheel->trkPos), &normal);
+		    normal = wheel->normal; 
+
             // transform it to local coordinates: n = q' n_g q
             QuatInverseRotate (normal, car->posQuat, rel_normal);
 

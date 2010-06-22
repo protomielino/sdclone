@@ -30,6 +30,7 @@
 #include <tgf.h>
 #include <robottools.h>
 #include "sim.h"
+#include "timeanalysis.h"
 
 extern double timer_coordinate_transform;
 extern double timer_reaction;
@@ -52,6 +53,7 @@ static double simu_init_time = 0.0f;
 
 double SimTicks = 0.0;  // Time measurement of CalculateTorque 
 double SimTicks2 = 0.0; // Time measurement of CalculateTorque2
+double SimTicksRtTrackSurfaceNormalL = 0.0; // Time measurement of RtTrackSurfaceNormalL
 
 t3Dd vectStart[16];
 t3Dd vectEnd[16];
@@ -141,6 +143,8 @@ ctrlCheck(tCar *car)
 void
 SimConfig(tCarElt *carElt, tRmInfo* ReInfo)
 {
+	RtInitTimer();
+
     tCar *car = &(SimCarTable[carElt->index]);
 
     memset(car, 0, sizeof(tCar));
@@ -367,9 +371,6 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 			car->ctrl->gear = 0;
 		}
 	
-
-
-
 		CHECK(car);
 		ctrlCheck(car);
 		CHECK(car);
@@ -385,7 +386,8 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 
             SimCarUpdateWheelPos(car);
 			CHECK(car);
-            SimBrakeSystemUpdate(car);
+
+			SimBrakeSystemUpdate(car);
 			CHECK(car);
 				SimAeroUpdate(car, s);
 			CHECK(car);
@@ -544,5 +546,6 @@ SimShutdown(void)
 		free(SimCarTable);
 		SimCarTable = 0;
     }
+    GfOut("#Total Time RtTrackSurfaceNormalL used: %g sec\n",SimTicksRtTrackSurfaceNormalL/1000.0);  // Profiling test
 }
 
