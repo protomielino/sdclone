@@ -22,9 +22,11 @@
 
 #ifdef SCHEDULE_SPY
 
-//#include <iostream>
 #include <vector>
 #include <map>
+#include <fstream>
+
+#include <portability.h>
 
 #include "tgf.h"
 
@@ -37,6 +39,9 @@ class GfScheduleEventLog
 	void reinit(double dZeroTime);
 	void beginEvent();
 	void endEvent();
+	unsigned nbEvents() const { return _vecDurations.size(); };
+	float startTime(unsigned nEventInd) const { return _vecStartTimes[nEventInd]; };
+	float duration(unsigned nEventInd) const { return _vecDurations[nEventInd]; };
  private:
 	double _dZeroTime;
 	double _dIgnoreDelay;
@@ -75,7 +80,7 @@ GfScheduleEventLog::GfScheduleEventLog(unsigned nMaxEvents, double dIgnoreDelay)
 // 
 void GfScheduleEventLog::configure(unsigned nMaxEvents, double dIgnoreDelay)
 {
-	_nMaxEvents = nMaxEvents;
+	_nMaxEvents = nMaxEvents <= _vecStartTimes.max_size() ? nMaxEvents : _vecStartTimes.max_size();
 	_dIgnoreDelay = dIgnoreDelay;
 }
 
@@ -90,23 +95,31 @@ void GfScheduleEventLog::reinit(double dZeroTime)
 // Precondition : reinit()
 void GfScheduleEventLog::beginEvent()
 {
-	const double dNowTime = GfTimeClock();
-	if (dNowTime >= _dZeroTime + _dIgnoreDelay)
-		_vecStartTimes.push_back((float)(dNowTime - _dZeroTime));
+	// Ignore events after the _nMaxEvents'th (to avoid vector resize, which is slow).
+	if (_vecStartTimes.size() < _vecStartTimes.capacity())
+	{
+		const double dNowTime = GfTimeClock();
+		if (dNowTime >= _dZeroTime + _dIgnoreDelay)
+			_vecStartTimes.push_back((float)(dNowTime - _dZeroTime));
+	}
 }
 
 // Precondition : beginEvent()
 void GfScheduleEventLog::endEvent()
 {
-	const double dNowTime = GfTimeClock();
-	if (dNowTime >= _dZeroTime + _dIgnoreDelay)
-		_vecDurations.push_back((float)(dNowTime - _dZeroTime)
-								- _vecStartTimes[_vecStartTimes.size() - 1]);
+	// Ignore events after the _nMaxEvents'th (to avoid vector resize, which is slow).
+	if (_vecStartTimes.size() < _vecStartTimes.capacity())
+	{
+		const double dNowTime = GfTimeClock();
+		if (dNowTime >= _dZeroTime + _dIgnoreDelay)
+			_vecDurations.push_back((float)(dNowTime - _dZeroTime)
+									- _vecStartTimes[_vecStartTimes.size() - 1]);
+	}
 }
 
 // GfScheduleSpy class implementation //-------------------------------------------------------
 
-GfScheduleSpy* GfScheduleSpy::_pSelf = NULL;
+GfScheduleSpy* GfScheduleSpy::_pSelf = 0;
 
 GfScheduleSpy::GfScheduleSpy()
 {
@@ -125,7 +138,6 @@ GfScheduleSpy* GfScheduleSpy::self()
 	return _pSelf;
 }
 
-// Precondition : beginEvent()
 void GfScheduleSpy::configureEventLog(const char* pszLogName,
 									  unsigned nMaxEvents, double dIgnoreDelay)
 {
@@ -173,7 +185,122 @@ void GfScheduleSpy::endSession()
 // Precondition : endSession()
 void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
 {
-	// Not yet implemented.
+	// Output file :
+	// a) Build absolute path (mandatory storage under GetLocalDir()/debug folder.
+	static char pszFilePathName[512];
+	snprintf(pszFilePathName, 512, "%sdebug/%s", GetLocalDir(), pszFileName);
+	pszFilePathName[511] = 0; // Ensure last char is \0 (MS doesn't do).
+
+	// b) Create parent dir(s) if needed.
+	char *pDirNameSep = strrchr(pszFilePathName, '/');
+	*pDirNameSep = '\0';
+	GfCreateDir(pszFilePathName);
+	*pDirNameSep = '/';
+
+	// c) Finally open in write mode.
+	std::ofstream outFStream(pszFilePathName);
+	if (!outFStream)
+	{
+		GfError("Could not open %s for writing report\n", pszFilePathName);
+		return;
+	}
+	
+	static const char* pszEventFormat = "\t%6.4f\t%6.4f"; // Min. length = 14 chars through sprintf.
+	static const unsigned nEventStringMaxSize = 32; // More than the 14 chars above, as sprintf can produce more. 
+	static const unsigned nLineBufSize = nEventStringMaxSize*_mapEventLogs.size(); 
+	char* pszLineBuf = new char[nLineBufSize];
+	
+	// Initialize the next event index for each log (kind of a cursor in each log).
+	std::map<const char*, unsigned> mapNextEventInd;
+	std::map<const char*, GfScheduleEventLog*>::const_iterator itLog;
+	for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
+	{
+		const char* pszLogName = (*itLog).first;
+		mapNextEventInd[pszLogName] = 0;
+	}
+
+	// Print columns header.
+	for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
+	{
+		const char* pszLogName = (*itLog).first;
+		snprintf(pszLineBuf + strlen(pszLineBuf), nEventStringMaxSize, "\t%s\t", pszLogName);
+		pszLineBuf[nLineBufSize-1] = 0; // Ensure last char is \0 (MS doesn't do).
+	}
+	outFStream << pszLineBuf << std::endl;
+	
+	snprintf(pszLineBuf, 5, "Time");
+	for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
+	{
+		const char* pszLogName = (*itLog).first;
+		snprintf(pszLineBuf + strlen(pszLineBuf), nEventStringMaxSize, "\tStart\tDuration");
+		pszLineBuf[nLineBufSize-1] = 0; // Ensure last char is \0 (MS doesn't do).
+	}
+	outFStream << pszLineBuf << std::endl;
+	
+	// For each time step (fTimeResolution), print events info.
+	double dRelTime = 0.0;
+	bool bEventAreLeft = true;
+	while (bEventAreLeft)
+	{
+
+		bool bEventAreLeftInStep = true;
+		while (bEventAreLeftInStep)
+		{
+			unsigned nbProcessedEvents = 0;
+			snprintf(pszLineBuf, 10, "%6.3f", dRelTime);
+			for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
+			{
+				const char* pszLogName = (*itLog).first;
+				const GfScheduleEventLog* pEventLog = (*itLog).second;
+				const unsigned& nEventInd = mapNextEventInd[pszLogName];
+				if (nEventInd < pEventLog->nbEvents()
+					&& pEventLog->startTime(nEventInd) >= dRelTime
+					&& pEventLog->startTime(nEventInd) < dRelTime + fTimeResolution)
+				{
+					snprintf(pszLineBuf + strlen(pszLineBuf), nEventStringMaxSize, pszEventFormat,
+							 pEventLog->startTime(nEventInd), pEventLog->duration(nEventInd));
+					pszLineBuf[nLineBufSize-1] = 0; // Ensure last char is \0 (MS doesn't do).
+					mapNextEventInd[pszLogName]++; // Event processed.
+					nbProcessedEvents++;
+				}
+				else
+				{
+					strncat(pszLineBuf, "\t\t", 2);
+				}
+			}
+			
+			// Print report line if any was produced,
+			// and check if any event left to process in this time step.
+			if (nbProcessedEvents > 0)
+			{
+				outFStream << pszLineBuf << std::endl;
+			}
+			else
+			{
+				bEventAreLeftInStep = false;
+			}
+		}
+
+		// Check if any event left to process.
+		bEventAreLeft = false;
+		for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
+		{
+			const char* pszLogName = (*itLog).first;
+			const GfScheduleEventLog* pEventLog = (*itLog).second;
+			if (mapNextEventInd[pszLogName] < pEventLog->nbEvents())
+			{
+				bEventAreLeft = true;
+				break;
+			}
+		}
+				
+		// Next time step.
+		dRelTime += fTimeResolution;
+	}
+
+	outFStream.close();
+	
+	delete [] pszLineBuf;
 }
 
 // C interface functions //-----------------------------------------------------------------

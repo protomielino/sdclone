@@ -1184,7 +1184,8 @@ void ReShutdownUpdater()
 		delete situationUpdater;
 		situationUpdater = 0;
 	}
-	GfSchedPrintReport("schedule.csv", 1.0e-4);
+	GfSchedEndSession();
+	GfSchedPrintReport("schedule.csv", 1.0e-3);
 }
 #endif // ReMultiThreaded
 

@@ -3485,7 +3485,8 @@ safeFOpen(const char *fileName, const char *mode)
     FILE* file = fopen(fileName, mode);
     if (file)
 	return file;
-   
+
+	// TODO: Make things simpler by using GfCreateDir (takes care of parent dirs).
     // Otherwise, try and create parent dirs in case it is the cause of the error :
     // - search the fileName for directory level separators (\\ or /) and create each directory.
     // - directories' permissions are set to 700=u+rwx on UNIX-like systems.

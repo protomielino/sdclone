@@ -709,20 +709,18 @@ int GfCreateDir(const char *path)
 		return GF_DIR_CREATION_FAILED;
 	}
 
-	static const int BUFSIZE = 1024;
-	char buf[BUFSIZE];
-	strncpy(buf, path, BUFSIZE);
+	static const int nPathBufSize = 1024;
+	char buf[nPathBufSize];
+	strncpy(buf, path, nPathBufSize);
 
 #ifdef WIN32
 
 	// Translate path.
-	const char DELIM = '\\';
+	static const char cPathSeparator = '\\';
 	int i;
-	for (i = 0; i < BUFSIZE && buf[i] != '\0'; i++) {
-		if (buf[i] == '/') {
-			buf[i] = DELIM;
-		}
-	}
+	for (i = 0; i < nPathBufSize && buf[i] != '\0'; i++)
+		if (buf[i] == '/')
+			buf[i] = cPathSeparator;
 	
 #else // WIN32
 
@@ -732,29 +730,33 @@ int GfCreateDir(const char *path)
 #endif
 #define mkdir(x) mkdir((x), S_IRWXU)
 
-	const char DELIM = '/';
+	static const char cPathSeparator = '/';
 
 #endif // WIN32
 
+	// Try to create the requested folder.
 	int err = mkdir(buf);
-	if (err == -1 && errno == ENOENT) {
-		char *end = strrchr(buf, DELIM);
+
+	// If this fails, try and create the parent one (recursive), and the retry.
+	if (err == -1 && errno == ENOENT)
+	{
+		// Try the parent one (recursive).
+		char *end = strrchr(buf, cPathSeparator);
 		*end = '\0';
 		GfCreateDir(buf);
-		*end = DELIM;
+
+		// Retry.
+		*end = cPathSeparator;
 		err = mkdir(buf);
 	}
-
-	if (err == -1 && errno != EEXIST) {
-		return GF_DIR_CREATION_FAILED;
-	} else {
-		return GF_DIR_CREATED;
-	}
+	
+	return (err == -1 && errno != EEXIST) ? GF_DIR_CREATION_FAILED : GF_DIR_CREATED;
 }
 
 /* Get the actual number of CPUs / cores
 
    TODO: Be careful about fake CPUs like those displayed by hyperthreaded processors ...
+   TODO: Test under pltaforms other than Windows, Linux, Solaris, AIX (mainly BDS and MacOS X).
 */
 int GfGetNumberOfCPUs()
 {
@@ -768,7 +770,7 @@ int GfGetNumberOfCPUs()
 
 	nCPUs = sysinfo.dwNumberOfProcessors;
 
-// MacOS X, FreeBSD, OpenBSD, NetBSD, etc.:
+// MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
 #elif defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 
 	nt mib[4];
