@@ -24,7 +24,10 @@
 
 #include <vector>
 #include <map>
+#include <sstream>
 #include <fstream>
+#include <iomanip>
+#include <locale>
 
 #include <portability.h>
 
@@ -53,20 +56,23 @@ class GfScheduleEventLog
 class GfScheduleSpy
 {
  protected:
-	GfScheduleSpy();
+	GfScheduleSpy(const char* pszName, std::map<std::string, GfScheduleSpy*>& mapSpies);
  public:
 	~GfScheduleSpy();
-	static GfScheduleSpy* self();
+	static GfScheduleSpy* self(const char* pszName);
 	void configureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
 	void beginSession();
 	void beginEvent(const char* pszLogName);
 	void endEvent(const char* pszLogName);
 	void endSession();
-	void printReport(const char* pszFileName, double fTimeResolution);
+	void printReport(const char* pszFileName, double fTimeResolution,
+					 double fDurationUnit, double fDurationResolution);
  private:
-	static GfScheduleSpy* _pSelf;
+	const char* _pszName;
+	std::map<std::string, GfScheduleSpy*>& _rmapSpies;
 	double _dZeroTime;
-	std::map<const char*, GfScheduleEventLog*> _mapEventLogs;
+	typedef std::map<std::string, GfScheduleEventLog*> MapEventLogs;
+	MapEventLogs _mapEventLogs;
 };
 
 // GfScheduleEventLog class implementation //-------------------------------------------------
@@ -119,23 +125,24 @@ void GfScheduleEventLog::endEvent()
 
 // GfScheduleSpy class implementation //-------------------------------------------------------
 
-GfScheduleSpy* GfScheduleSpy::_pSelf = 0;
-
-GfScheduleSpy::GfScheduleSpy()
+GfScheduleSpy::GfScheduleSpy(const char* pszName,
+							 std::map<std::string, GfScheduleSpy*>& mapSpies)
+: _pszName(pszName), _rmapSpies(mapSpies)
 {
 }
 
 GfScheduleSpy::~GfScheduleSpy()
 {
-	_pSelf = 0;
+	_rmapSpies.erase(_pszName);
 }
 
-GfScheduleSpy* GfScheduleSpy::self()
+GfScheduleSpy* GfScheduleSpy::self(const char* pszName)
 {
-	if (!_pSelf)
-		_pSelf = new GfScheduleSpy();
+	static std::map<std::string, GfScheduleSpy*> mapSpies;
+	if (mapSpies.find(pszName) == mapSpies.end())
+		mapSpies[pszName] = new GfScheduleSpy(pszName, mapSpies);
 
-	return _pSelf;
+	return mapSpies[pszName];
 }
 
 void GfScheduleSpy::configureEventLog(const char* pszLogName,
@@ -153,7 +160,7 @@ void GfScheduleSpy::beginSession()
 	GfOut("Beginning schedule spy session\n");
 	
 	_dZeroTime = GfTimeClock();
-	std::map<const char*, GfScheduleEventLog*>::iterator iterLogs;
+	MapEventLogs::iterator iterLogs;
 	for (iterLogs = _mapEventLogs.begin(); iterLogs != _mapEventLogs.end(); iterLogs++)
 		(*iterLogs).second->reinit(_dZeroTime);
 }
@@ -183,89 +190,95 @@ void GfScheduleSpy::endSession()
 }
 
 // Precondition : endSession()
-void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
+void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
+								double fDurationUnit, double fDurationResolution)
 {
 	// Output file :
 	// a) Build absolute path (mandatory storage under GetLocalDir()/debug folder.
-	static char pszFilePathName[512];
-	snprintf(pszFilePathName, 512, "%sdebug/%s", GetLocalDir(), pszFileName);
-	pszFilePathName[511] = 0; // Ensure last char is \0 (MS doesn't do).
+	std::ostringstream ossFilePathName;
+	ossFilePathName << GetLocalDir() << "debug/" << pszFileName;
+	GfOut("Writing schedule spy report to %s\n", ossFilePathName.str().c_str());
 
 	// b) Create parent dir(s) if needed.
-	char *pDirNameSep = strrchr(pszFilePathName, '/');
-	*pDirNameSep = '\0';
-	GfCreateDir(pszFilePathName);
-	*pDirNameSep = '/';
+	const std::size_t nLastSlashPos = ossFilePathName.str().rfind('/');
+	const std::string strDirPathName(ossFilePathName.str().substr(0, nLastSlashPos));
+	GfCreateDir(strDirPathName.c_str());
 
 	// c) Finally open in write mode.
-	std::ofstream outFStream(pszFilePathName);
+	std::ofstream outFStream(ossFilePathName.str().c_str());
 	if (!outFStream)
 	{
-		GfError("Could not open %s for writing report\n", pszFilePathName);
+		GfError("Could not open %s for writing report\n", ossFilePathName.str().c_str());
 		return;
 	}
-	
-	static const char* pszEventFormat = "\t%6.4f\t%6.4f"; // Min. length = 14 chars through sprintf.
-	static const unsigned nEventStringMaxSize = 32; // More than the 14 chars above, as sprintf can produce more. 
-	static const unsigned nLineBufSize = nEventStringMaxSize*_mapEventLogs.size(); 
-	char* pszLineBuf = new char[nLineBufSize];
-	
-	// Initialize the next event index for each log (kind of a cursor in each log).
-	std::map<const char*, unsigned> mapNextEventInd;
-	std::map<const char*, GfScheduleEventLog*>::const_iterator itLog;
+		
+	// Initialize the next event index for each log (a kind of cursor inside each log).
+	std::map<std::string, unsigned> mapNextEventInd;
+	MapEventLogs::const_iterator itLog;
 	for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
 	{
-		const char* pszLogName = (*itLog).first;
-		mapNextEventInd[pszLogName] = 0;
+		const std::string& strLogName = (*itLog).first;
+		mapNextEventInd[strLogName] = 0;
 	}
 
-	// Print columns header.
+	// Print columns header (1st line : name of each event log).
+	std::ostringstream ossStepLine;
 	for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
 	{
-		const char* pszLogName = (*itLog).first;
-		snprintf(pszLineBuf + strlen(pszLineBuf), nEventStringMaxSize, "\t%s\t", pszLogName);
-		pszLineBuf[nLineBufSize-1] = 0; // Ensure last char is \0 (MS doesn't do).
+		const std::string& strLogName = (*itLog).first;
+		ossStepLine << '\t' << strLogName << '\t';
 	}
-	outFStream << pszLineBuf << std::endl;
-	
-	snprintf(pszLineBuf, 5, "Time");
+	outFStream << ossStepLine.str() << std::endl;
+
+	// Print columns header (2nd line : Contents description for each column).
+	ossStepLine.str("");
+	ossStepLine.imbue(std::locale("")); // Set stream locale to the OS-level-defined one.
+	ossStepLine << "Time";
 	for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
 	{
-		const char* pszLogName = (*itLog).first;
-		snprintf(pszLineBuf + strlen(pszLineBuf), nEventStringMaxSize, "\tStart\tDuration");
-		pszLineBuf[nLineBufSize-1] = 0; // Ensure last char is \0 (MS doesn't do).
+		const std::string& strLogName = (*itLog).first;
+		ossStepLine << "\tStart\tDuration";
 	}
-	outFStream << pszLineBuf << std::endl;
+	outFStream << ossStepLine.str() << std::endl;
 	
 	// For each time step (fTimeResolution), print events info.
+	const int nTimePrecision = (int)ceil(-log10(fTimeResolution));
+	const int nDurationPrecision = (int)ceil(-log10(fDurationResolution / fDurationUnit));
 	double dRelTime = 0.0;
 	bool bEventAreLeft = true;
+	ossStepLine << std::fixed;
 	while (bEventAreLeft)
 	{
-
+		// As many lines per step as necessary to print all avents inside.
 		bool bEventAreLeftInStep = true;
 		while (bEventAreLeftInStep)
 		{
 			unsigned nbProcessedEvents = 0;
-			snprintf(pszLineBuf, 10, "%6.3f", dRelTime);
+			ossStepLine.str("");
+
+			// 1st column = step start time.
+			ossStepLine << std::setprecision(nTimePrecision) << dRelTime;
+			ossStepLine << std::setprecision(nDurationPrecision);
 			for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
 			{
-				const char* pszLogName = (*itLog).first;
+				// Then 2 columns per event : relative start time and duration of the event.
+				const std::string& strLogName = (*itLog).first;
 				const GfScheduleEventLog* pEventLog = (*itLog).second;
-				const unsigned& nEventInd = mapNextEventInd[pszLogName];
+				const unsigned& nEventInd = mapNextEventInd[strLogName];
 				if (nEventInd < pEventLog->nbEvents()
 					&& pEventLog->startTime(nEventInd) >= dRelTime
 					&& pEventLog->startTime(nEventInd) < dRelTime + fTimeResolution)
 				{
-					snprintf(pszLineBuf + strlen(pszLineBuf), nEventStringMaxSize, pszEventFormat,
-							 pEventLog->startTime(nEventInd), pEventLog->duration(nEventInd));
-					pszLineBuf[nLineBufSize-1] = 0; // Ensure last char is \0 (MS doesn't do).
-					mapNextEventInd[pszLogName]++; // Event processed.
+					ossStepLine << '\t'
+								<< (pEventLog->startTime(nEventInd) - dRelTime) / fDurationUnit
+								<< '\t'
+								<< pEventLog->duration(nEventInd) / fDurationUnit;
+					mapNextEventInd[strLogName]++; // Event processed.
 					nbProcessedEvents++;
 				}
 				else
 				{
-					strncat(pszLineBuf, "\t\t", 2);
+					ossStepLine << "\t\t";
 				}
 			}
 			
@@ -273,7 +286,7 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
 			// and check if any event left to process in this time step.
 			if (nbProcessedEvents > 0)
 			{
-				outFStream << pszLineBuf << std::endl;
+				outFStream << ossStepLine.str() << std::endl;
 			}
 			else
 			{
@@ -285,9 +298,9 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
 		bEventAreLeft = false;
 		for (itLog = _mapEventLogs.begin(); itLog != _mapEventLogs.end(); itLog++)
 		{
-			const char* pszLogName = (*itLog).first;
+			const std::string& strLogName = (*itLog).first;
 			const GfScheduleEventLog* pEventLog = (*itLog).second;
-			if (mapNextEventInd[pszLogName] < pEventLog->nbEvents())
+			if (mapNextEventInd[strLogName] < pEventLog->nbEvents())
 			{
 				bEventAreLeft = true;
 				break;
@@ -299,8 +312,6 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
 	}
 
 	outFStream.close();
-	
-	delete [] pszLineBuf;
 }
 
 // C interface functions //-----------------------------------------------------------------
@@ -310,54 +321,64 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution)
    \param pszLogName   Name/id
    \param nMaxEvents   Maximum number of events to be logged (other ignored)
    \param dIgnoreDelay Delay (s) before taking Begin/EndEvent into account (from BeginSession time) */
-void GfSchedConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay)
+void GfSchedConfigureEventLog(const char* pszSpyName, const char* pszLogName,
+							  unsigned nMaxEvents, double dIgnoreDelay)
 {
-	GfScheduleSpy::self()->configureEventLog(pszLogName, nMaxEvents, dIgnoreDelay);
+	GfScheduleSpy::self(pszSpyName)->configureEventLog(pszLogName, nMaxEvents, dIgnoreDelay);
 }
 
 /* Start a new spying session
    @ingroup schedulespy
    \precondition All event logs must be configured at least once before) */
-void GfSchedBeginSession()
+void GfSchedBeginSession(const char* pszSpyName)
 {
-	GfScheduleSpy::self()->beginSession();
+	GfScheduleSpy::self(pszSpyName)->beginSession();
 }
 
 /* Log the beginning of an event (enter the associated code section)
    @ingroup schedulespy
    \precondition BeginSession
    \param pszLogName   Name/id                                        */
-void GfSchedBeginEvent(const char* pszLogName)
+void GfSchedBeginEvent(const char* pszSpyName, const char* pszLogName)
 {
-	GfScheduleSpy::self()->beginEvent(pszLogName);
+	GfScheduleSpy::self(pszSpyName)->beginEvent(pszLogName);
 }
 
 /* Log the end of an event (exit from the associated code section)
    @ingroup schedulespy
    \precondition BeginEvent(pszLogName)
    \param pszLogName   Name/id                                        */
-void GfSchedEndEvent(const char* pszLogName)
+void GfSchedEndEvent(const char* pszSpyName, const char* pszLogName)
 {
-	GfScheduleSpy::self()->endEvent(pszLogName);
+	GfScheduleSpy::self(pszSpyName)->endEvent(pszLogName);
 }
 
 /* Terminate the current spying session
    @ingroup schedulespy
    \precondition BeginSession             */
-void GfSchedEndSession()
+void GfSchedEndSession(const char* pszSpyName)
 {
-	GfScheduleSpy::self()->endSession();
+	GfScheduleSpy::self(pszSpyName)->endSession();
 }
 
-/* Print a table log (2 columns for each event log : start time and duration)
+/* Print a table log :
+   * each time step (duration = fTimeResolution) is displayed on as many lines
+     as necessary to log all the events that occured during the step
+   * 1st column = step start time, in seconds since the call to BeginSession
+   * 2 columns for each event log : start time (relative to the step start) and duration
    @ingroup schedulespy
-   \param pszFileName      Target text file for the log
-   \param fTimeResolution  Time resolution to use
-                           (minimum delay between 2 event starts)
+   \param pszFileName          Target text file for the log
+   \param fTimeResolution      Resolution to use for time = duration of 1 step
+   \param fDurationUnit        Unit to use for durations (1 = 1s, 1.0e-3 = 1ms ...)
+   \param fDurationResolution  Resolution to use for durations (must divide fDurationUnit)
    \precondition EndSession                                                     */
-void GfSchedPrintReport(const char* pszFileName, double fTimeResolution)
+void GfSchedPrintReport(const char* pszSpyName, const char* pszFileName,
+						double fTimeResolution,	double fDurationUnit, double fDurationResolution)
 {
-	GfScheduleSpy::self()->printReport(pszFileName, fTimeResolution);
+	std::ostringstream ossFileName;
+	ossFileName << pszSpyName << '-' << pszFileName;
+	GfScheduleSpy::self(pszSpyName)->printReport(ossFileName.str().c_str(), fTimeResolution,
+												 fDurationUnit, fDurationResolution);
 }
 
 #endif // SCHEDULE_SPY

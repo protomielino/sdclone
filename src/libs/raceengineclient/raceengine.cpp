@@ -48,44 +48,6 @@
 #include "raceengine.h"
 
 
-// Small event log system for ReUpdate/ReOneStep dispatching analysis.
-#define LogEvents 0
-
-#if (LogEvents)
-# define DeclareEventType(name) \
-	static int nLast##name = 0; \
-	static int nPrev##name = 0; \
-	static double tLast##name = 0.0; \
-	static double tPrev##name = 0.0;
-#else
-# define DeclareEventType(name)
-#endif
-
-#if (LogEvents)
-# define SignalEvent(name) \
-	nLast##name++; \
-	tLast##name = GfTimeClock();
-#else
-# define SignalEvent(name)
-#endif
-
-#if (LogEvents)
-# define PrintEvent(name, header, footer)	 \
-	if (header) GfOut(header); \
-	if (tPrev##name == 0.0) tPrev##name = tLast##name; \
-	GfOut("%s %2d %7.3f ", #name, nLast##name - nPrev##name, (tLast##name - tPrev##name)*1000); \
-	nPrev##name = nLast##name; \
-	tPrev##name = tLast##name; \
-	if (footer) GfOut(footer);
-#else
-# define PrintEvent(name, header, footer)
-#endif
-
-DeclareEventType(Bots);
-DeclareEventType(Simu);
-DeclareEventType(Graph);
-
-
 static char	buf[1024];
 static char	bestLapChanged = FALSE;
 static double	msgDisp;
@@ -1086,8 +1048,8 @@ ReOneStep(double deltaTimeIncrement)
 	}
 
 	GfProfStartProfile("rbDrive*");
+	GfSchedBeginEvent("raceengine", "robots");
 	if ((s->currentTime - ReInfo->_reLastTime) >= RCM_MAX_DT_ROBOTS) {
-		SignalEvent(Bots);
 		s->deltaTime = s->currentTime - ReInfo->_reLastTime;
 		for (i = 0; i < s->_ncars; i++) {
 			if ((s->cars[i]->_state & RM_CAR_STATE_NO_SIMU) == 0) {
@@ -1104,6 +1066,7 @@ ReOneStep(double deltaTimeIncrement)
 		}
 		ReInfo->_reLastTime = s->currentTime;
 	}
+	GfSchedEndEvent("raceengine", "robots");
 	GfProfStopProfile("rbDrive*");
 
 
@@ -1112,12 +1075,13 @@ ReOneStep(double deltaTimeIncrement)
 		NetworkPlayStep();
 	}
 
-	SignalEvent(Simu);
 	GfProfStartProfile("_reSimItf.update*");
+	GfSchedBeginEvent("raceengine", "physics");
 	ReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
 	for (i = 0; i < s->_ncars; i++) {
 		ReManage(s->cars[i]);
 	}
+	GfSchedEndEvent("raceengine", "physics");
 	GfProfStopProfile("_reSimItf.update*");
 	
 	ReSortCars();
@@ -1141,7 +1105,11 @@ void ReInitUpdater()
  	if (!situationUpdater)
  		situationUpdater = new reSituationUpdater(ReInfo);
 
-	GfSchedConfigureEventLog("graphics", 10000, 0.0);
+	// Configure schedule spy          (nMaxEv, ignoreDelay)
+	GfSchedConfigureEventLog("raceengine", "graphics", 10000, 0.0);
+	GfSchedConfigureEventLog("raceengine", "situCopy", 10000, 0.0);
+	GfSchedConfigureEventLog("raceengine", "robots",   10000, 0.0);
+	GfSchedConfigureEventLog("raceengine", "physics",  10000, 0.0);
 }
 
 void ReInitCarGraphics(void)
@@ -1156,7 +1124,7 @@ void
 ReStart(void)
 {
 #ifdef ReMultiThreaded
-	GfSchedBeginSession();
+	GfSchedBeginSession("raceengine");
 	situationUpdater->start();
 #else // ReMultiThreaded
     ReInfo->_reRunning = 1;
@@ -1169,9 +1137,9 @@ ReStop(void)
 {
 #ifdef ReMultiThreaded
 	situationUpdater->stop();
-	GfSchedEndSession();
+	GfSchedEndSession("raceengine");
 #else
-    ReInfo->_reRunning = 0;
+	ReInfo->_reRunning = 0;
 #endif // ReMultiThreaded
 }
 
@@ -1184,8 +1152,10 @@ void ReShutdownUpdater()
 		delete situationUpdater;
 		situationUpdater = 0;
 	}
-	GfSchedEndSession();
-	GfSchedPrintReport("schedule.csv", 1.0e-3);
+
+	GfSchedEndSession("raceengine");
+	//                                          (timeResol, durUnit, durResol)
+	GfSchedPrintReport("raceengine", "schedule.csv", 1.0e-3, 1.0e-3, 1.0e-6);
 }
 #endif // ReMultiThreaded
 
@@ -1207,7 +1177,7 @@ reCapture(void)
     glReadBuffer(GL_FRONT);
     glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 
-    sprintf(buf, "%s/torcs-%4.4d-%8.8d.png", capture->outputBase, capture->currentCapture, capture->currentFrame++);
+    sprintf(buf, "%s/sd-%4.4d-%8.8d.png", capture->outputBase, capture->currentCapture, capture->currentFrame++);
     GfTexWritePng(img, buf, vw, vh);
     free(img);
 }
@@ -1238,19 +1208,12 @@ ReUpdate(void)
 		GetNetwork()->SendCarControlsPacket(ReInfo->s);
 
 	GfuiDisplay();
-	SignalEvent(Graph);
 	ReInfo->_reGraphicItf.refresh(ReInfo->s);
 	GfelPostRedisplay();	/* Callback -> reDisplay */
-	
-	PrintEvent(Bots, "Events: ", 0);
-	PrintEvent(Simu, 0, 0);
-	PrintEvent(Graph, 0, "\n");
 	break;
 	
     case RM_DISP_MODE_NONE:
 	ReOneStep(RCM_MAX_DT_SIMU);
-	PrintEvent(Bots, "Events: ", 0);
-	PrintEvent(Simu, 0, "\n");
 	if (ReInfo->_refreshDisplay) {
 	    GfuiDisplay();
 	}
@@ -1359,9 +1322,6 @@ int reSituationUpdater::threadLoop()
 				GfOut("SituationUpdater thread is running.\n");
 			}
 			
-			PrintEvent(Bots, "Updater:", 0);
-			PrintEvent(Simu, 0, "\n");
-
 			realTime = GfTimeClock();
 		
 			GfProfStartProfile("ReOneStep*");
@@ -1828,10 +1788,10 @@ ReUpdate(void)
 	{
 		case RM_DISP_MODE_NORMAL:
 
-			PrintEvent(Graph, "Main", "\n");
-
 			// Get the situation for the previous step.
+			GfSchedBeginEvent("raceengine", "situCopy");
 			pPrevReInfo = situationUpdater->getPreviousStep();
+			GfSchedEndEvent("raceengine", "situCopy");
 
 			// Start computing the situation for the current step.
 			situationUpdater->computeCurrentStep();
@@ -1847,11 +1807,9 @@ ReUpdate(void)
 	
 			GfuiDisplay();
 			
-			SignalEvent(Graph);
-			
-			GfSchedBeginEvent("graphics");
+			GfSchedBeginEvent("raceengine", "graphics");
 			pPrevReInfo->_reGraphicItf.refresh(pPrevReInfo->s);
-			GfSchedEndEvent("graphics");
+			GfSchedEndEvent("raceengine", "graphics");
 			
 			GfelPostRedisplay();	/* Callback -> reDisplay */
 			break;
@@ -1862,8 +1820,6 @@ ReUpdate(void)
 			
 			reRaceMsgUpdate(ReInfo);
 			
-			PrintEvent(Bots, "Main: ", 0);
-			PrintEvent(Simu, 0, "\n");
 			if (ReInfo->_refreshDisplay)
 				GfuiDisplay();
 			GfelPostRedisplay();	/* Callback -> reDisplay */

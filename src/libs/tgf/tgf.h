@@ -85,7 +85,6 @@ const tdble G = 9.80665f; /**< m/s/s */
 #define RAD2DEG(x)  ((x)*(180.0/PI))		/**< Radian to degree conversion */
 #define FLOAT_RAD2DEG(x)  ((x)*(float)(180.0/PI))/**< Radian to degree conversion */
 #define DEG2RAD(x)  ((x)*(PI/180.0))		/**< Degree to radian conversion */
-#define FLOAT_DEG2RAD(x)  ((x)*(float)(PI/180.0))/**< Degree to radian conversion */
 #define FEET2M(x)   ((x)*0.304801)		/**< Feet to meter conversion */
 #define SIGN(x)     ((x) < 0 ? -1.0 : 1.0)	/**< Sign of the expression */
 
@@ -628,26 +627,31 @@ TGF_API void GfProfPrintReport();
  *   \author J.P. Meuret (jpmeuret@free.fr)                   *
  *   A tool to study the way some special code sections       *
  *   (named "events) in the program are actually scheduled    *
- *   at a fine grain level (see schedulespy.cpp for details). *
+ *   at a fine grain level (see schedulespy.cpp for details   *
+ *   and raceengine.cpp for an example of how to use it).     *
  **************************************************************/
 
 #ifdef SCHEDULE_SPY
 
-TGF_API void GfSchedConfigureEventLog(const char* pszLogName, unsigned nMaxEvents, double dIgnoreDelay);
-TGF_API void GfSchedBeginSession();
-TGF_API void GfSchedBeginEvent(const char* pszLogName);
-TGF_API void GfSchedEndEvent(const char* pszLogName);
-TGF_API void GfSchedEndSession();
-TGF_API void GfSchedPrintReport(const char* pszFileName, double fTimeResolution);
+TGF_API void GfSchedConfigureEventLog(const char* pszSpyName, const char* pszLogName,
+									  unsigned nMaxEvents, double dIgnoreDelay);
+TGF_API void GfSchedBeginSession(const char* pszSpyName);
+TGF_API void GfSchedBeginEvent(const char* pszSpyName, const char* pszLogName);
+TGF_API void GfSchedEndEvent(const char* pszSpyName, const char* pszLogName);
+TGF_API void GfSchedEndSession(const char* pszSpyName);
+TGF_API void GfSchedPrintReport(const char* pszSpyName, const char* pszFileName,
+								double fTimeResolution,
+								double fDurationUnit, double fDurationResolution);
 
 #else // SCHEDULE_SPY
 
-#define GfSchedConfigureEventLog(pszLogName, nMaxEvents, dIgnoreDelay)
-#define GfSchedBeginSession()
-#define GfSchedBeginEvent(pszLogName)
-#define GfSchedEndEvent(pszLogName)
-#define GfSchedEndSession()
-#define GfSchedPrintReport(pszFileName, fTimeResolution)
+#define GfSchedConfigureEventLog(pszSpyName, pszLogName, nMaxEvents, dIgnoreDelay)
+#define GfSchedBeginSession(pszSpyName)
+#define GfSchedBeginEvent(pszSpyName, pszLogName)
+#define GfSchedEndEvent(pszSpyName, pszLogName)
+#define GfSchedEndSession(pszSpyName)
+#define GfSchedPrintReport(pszSpyName, pszFileName, \
+						   fTimeResolution, fDurationUnit, fDurationResolution)
 
 #endif // SCHEDULE_SPY
 
