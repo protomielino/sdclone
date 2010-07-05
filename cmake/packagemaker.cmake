@@ -55,7 +55,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
 IF(UNIX)
 
     SET(PACKAGERS_BINARY "DEB" CACHE STRING "CPack binary package generators to use (separated with ';', among DEB, RPM, STGZ, TGZ, TBZ2, TZ, ZIP)")
-    SET(PACKAGERS_SOURCE "" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
+    SET(PACKAGERS_SOURCE "TBZ2" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
 
     # 9.10 ubuntu depends
     SET(CPACK_DEBIAN_PACKAGE_DEPENDS "freeglut3, libalut0(>=1.1.0-1),libc6(>=2.7),libgcc1(>=1:4.1.1),libgl1-mesa-glx | libgl1,libglu1-mesa | libglu1,libice6(>=1:1.0.0),libopenal1(>=1:1.3.253),libpng12-0(>=1.2.13-4),libsm6,libstdc++6(>=4.2.1),libx11-6,libxext6,libxi6(>=2:1.1.3-1ubuntu1),libxmu6,libxrandr2,libxrender1,libxt6,libxxf86vm1,plib1.8.4c2(>=1.2.4),zlib1g(>=1:1.1.4)")
@@ -75,7 +75,7 @@ IF(WIN32)
     SET(EXECUTABLE_PATHNAME "$INSTDIR\\\\bin\\\\${EXECUTABLE_NAME}.exe")
 
     SET(PACKAGERS_BINARY "NSIS" CACHE STRING "CPack binary package generators to use (separated with ';', among NSIS, CygwinBinary, STGZ, TGZ, TBZ2, TZ, ZIP)")
-    SET(PACKAGERS_SOURCE "" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
+    SET(PACKAGERS_SOURCE "ZIP" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
 
     SET(CPACK_PACKAGE_FILE_NAME "${PACKAGE_FILE_PREFIX}-${CPACK_PACKAGE_VERSION}-win32-setup")
     SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
@@ -111,12 +111,16 @@ IF(WIN32)
 
     # Source package specific settings.
     LIST(APPEND CPACK_SOURCE_IGNORE_FILES 
+                "/VTune/"
                 "/Release/" "/Debug/" "/RelWithDebInfo/" "/MinSizeRel/"
                 "/release/" "/debug/" "/relwithdebinfo/" "/minsizerel/"
                 "\\\\.sln$" "\\\\.suo$" "\\\\.ncb$" "\\\\.vcproj*")
 
-    # Add the PACKAGE_SRC project in the MSVC solution (does not work).
-    #ADD_CUSTOM_TARGET(PACKAGE_SRC COMMAND ${CMAKE_CPACK_COMMAND} -C \$(OutDir) --config ./CPackSourceConfig.cmake)
+    # Add the PACKAGE_SRC project in the MSVC solution
+    # (CMake 2.6 or 2.8 fails to do this itself).
+    ADD_CUSTOM_TARGET(PACKAGE_SRC)
+    ADD_CUSTOM_COMMAND(TARGET PACKAGE_SRC
+                       COMMAND ${CMAKE_CPACK_COMMAND} -C $(OutDir) --config ./CPackSourceConfig.cmake)
 
 ENDIF(WIN32)
 
@@ -125,7 +129,7 @@ ENDIF(WIN32)
 IF(APPLE)
 
     SET(PACKAGERS_BINARY "DragNDrop" CACHE STRING "CPack binary package generators to use (separated with ';', among Bundle, DragNDrop, PackageMaker, OSXX11, STGZ, TGZ, TBZ2, TZ, ZIP)")
-    SET(PACKAGERS_SOURCE "" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
+    SET(PACKAGERS_SOURCE "TBZ2" CACHE STRING "CPack source package generators to use (separated with ';', among TGZ, TBZ2, TZ, ZIP)")
 
     # Source package specific settings.
     LIST(APPEND CPACK_SOURCE_IGNORE_FILES "Makefile$")
