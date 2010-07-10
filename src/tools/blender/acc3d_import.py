@@ -383,7 +383,7 @@ class AC3DImport:
 				tristrip = True
 
 			if flag =='0x30':
-                                trifan = True;
+               trifan = True;
 			
 			if len(flags) > 1:
 				flaghigh = int(flags[0])
@@ -467,7 +467,9 @@ class AC3DImport:
 							fuvt2.append(uv2)
 						
 						facet.append(face[index+2])
+				
 						uv = fuv[index+2];
+						
 						fuvt.append(uv)
 						if len(fuv2)>0:
 							uv2 = fuv2[index+2];
@@ -492,32 +494,32 @@ class AC3DImport:
 					
                         elif trifan==True:
                                 index = 1
-				while index<refs-2:
-					facet = []
-					fuvt = []
-					fuvt2 = []
-					facet.append(face[0])
-					uv = fuv[0];
-					fuvt.append(uv)
-					if len(fuv2)>0:
-						uv2 = fuv2[0];
-						fuvt2.append(uv2)
+						while index<refs-2:
+							facet = []
+							fuvt = []
+							fuvt2 = []
+							facet.append(face[0])
+							uv = fuv[0];
+							fuvt.append(uv)
+							if len(fuv2)>0:
+								uv2 = fuv2[0];
+								fuvt2.append(uv2)
+								
+							facet.append(face[index])
+							uv = fuv[index];
+							fuvt.append(uv)
+							if len(fuv2)>0:
+								uv2 = fuv2[index];
+								fuvt2.append(uv2)
+								
+							facet.append(face[index+1])
+							uv = fuv[index+1];
+							fuvt.append(uv)			
+							if len(fuv2)>0:
+								uv2 = fuv2[index+1];
+								fuvt2.append(uv2)					
 						
-					facet.append(face[index])
-					uv = fuv[index];
-					fuvt.append(uv)
-					if len(fuv2)>0:
-						uv2 = fuv2[index];
-						fuvt2.append(uv2)
-						
-					facet.append(face[index+1])
-					uv = fuv[index+1];
-					fuvt.append(uv)			
-					if len(fuv2)>0:
-						uv2 = fuv2[index+1];
-						fuvt2.append(uv2)					
-						
-                                        index+=2
+                            index+=2
 					
 			elif flaglow: # it's a line or closed line, not a polygon
 				while len(face) >= 2:
