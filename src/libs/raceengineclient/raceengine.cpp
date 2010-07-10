@@ -1019,7 +1019,8 @@ ReOneStep(double deltaTimeIncrement)
 
 		if (s->currentTime < -2.0)
 		{
-			sprintf(buf,"Race will start in %i seconds", -s->currentTime);
+			int t = -s->currentTime;
+			sprintf(buf,"Race will start in %i seconds", t);
 			ReRaceBigMsgSet(buf, 1.0);
 		}
 	}

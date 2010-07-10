@@ -124,6 +124,9 @@ ReStateManage(void)
 				mode = ReRaceStart();
 				if (GetNetwork())
 				{
+					float f = GfTimeClock();
+					float rs = GetNetwork()->GetRaceStartTime();
+					ReInfo->s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
 					GetNetwork()->RaceInit(ReInfo->s);
 					GetNetwork()->SetRaceActive(true);
 				}
@@ -136,7 +139,11 @@ ReStateManage(void)
 
 			case RE_STATE_NETWORK_WAIT:
 					if (!WaitForNetwork())
+					{
 						ReInfo->_reState = RE_STATE_RACE;
+						ReSetRaceBigMsg("");
+						break;
+					}
 
 					if (GetNetwork())
 					{
