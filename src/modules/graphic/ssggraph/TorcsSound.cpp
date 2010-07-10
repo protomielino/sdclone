@@ -17,6 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <SDL.h>
+
 #include "TorcsSound.h"
 #include "SoundInterface.h"
 
@@ -26,11 +28,13 @@ void TorcsSound::setVolume(float vol)
 {
 	this->volume = vol;
 }
+
 /// Set the pitch \note Effect not consistent across backends
 void TorcsSound::setPitch(float pitch)
 {
 	this->pitch = pitch;
 }
+
 /// Set the filter \note Effect not consistent across backends
 void TorcsSound::setLPFilter(float lp)
 {
@@ -88,7 +92,6 @@ PlibTorcsSound::PlibTorcsSound(slScheduler* sched,
 	paused = false;
 }
 
-
 /// Destructor.
 PlibTorcsSound::~PlibTorcsSound()
 {
@@ -125,11 +128,13 @@ void PlibTorcsSound::setVolume(float vol)
         sample->adjustVolume (vol);
     }
 }
+
 /// Start the sample
 void PlibTorcsSound::play()
 {
 	start();
 }
+
 /// Start the sample
 void PlibTorcsSound::start()
 {
@@ -144,6 +149,7 @@ void PlibTorcsSound::start()
 		sched->playSample (sample);
 	}
 }
+
 /// Stop the sample
 void PlibTorcsSound::stop()
 {
@@ -152,19 +158,20 @@ void PlibTorcsSound::stop()
 		sched->stopSample (sample);
 	}
 }
+
 /// Resume a paused sample.
 void PlibTorcsSound::resume()
 {
 	sched->resumeSample (sample);
 	paused = false;
 }
+
 /// Pause a sample
 void PlibTorcsSound::pause()
 {
 	sched->pauseSample (sample);
 	paused = true;
 }
-
 
 
 /** Update the plib sounds.
@@ -256,7 +263,6 @@ void TorcsSoundSource::update()
 
 }
 
-
 /** Set source position and velocity.
  */
 void TorcsSoundSource::setSource(sgVec3 p, sgVec3 u)
@@ -276,7 +282,6 @@ void TorcsSoundSource::setListener (sgVec3 p, sgVec3 u)
 		u_lis[i] = u[i];
 	}
 }
-
 
 /** Create a new torcs sound
  * 
@@ -309,7 +314,7 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 		zeroes[i] = 0.0f;
 	}
 
-	//printf("SOUND, create source: %s -> %s\n", filename, (static_pool == true) ? "static" : "dynamic");
+	GfOut("OpenAL : Creating %s source from %s\n", static_pool ? "static" : "dynamic", filename);
 
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
@@ -324,13 +329,76 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 		return;
 	}
 
+#if 1
+	//=============================================================================
+	SDL_AudioSpec wavspec;
+	Uint32 wavlen;
+	Uint8 *wavbuf;
+	if (!SDL_LoadWAV(filename, &wavspec, &wavbuf, &wavlen))
+	{
+		if (alIsBuffer(buffer))
+			alDeleteBuffers(1, &buffer);
+		GfError("OpenAL Error: Could not load %s (%s)\n", filename, SDL_GetError());
+		is_enabled = false;
+		return;
+	}
+
+	if (wavspec.channels > 1)
+	{
+		if (alIsBuffer(buffer))
+			alDeleteBuffers(1, &buffer);
+		GfError("OpenAL Error: Unsupported stereo sample %s\n", filename);
+		is_enabled = false;
+		return;
+	}
+
+	// Map WAV header to OpenAL format
+	ALenum format;
+	switch(wavspec.format)
+	{
+		case AUDIO_U8:
+		case AUDIO_S8:
+			format = AL_FORMAT_MONO8;
+			break;
+		case AUDIO_U16:
+		case AUDIO_S16:
+			format = AL_FORMAT_MONO16;
+			break;
+		default:
+			SDL_FreeWAV(wavbuf);
+			if (alIsBuffer(buffer))
+				alDeleteBuffers(1, &buffer);
+			GfError("OpenAL Error: Unsupported WAV format %d for %s (not among U8, S8, U16, S16)\n",
+					wavspec.format, filename);
+			is_enabled = false;
+			return;
+	}
+
+	alBufferData(buffer, format, wavbuf, wavlen, wavspec.freq);
+	error = alGetError();
+	if (error != AL_NO_ERROR)
+	{
+		GfError("OpenAL Error: %d, alBufferData %s\n", error, filename);
+		SDL_FreeWAV(wavbuf);
+		if (alIsBuffer(buffer)) {
+			alDeleteBuffers(1, &buffer);
+			alGetError();
+		}
+		is_enabled = false;
+		return;
+	}
+	
+	SDL_FreeWAV(wavbuf);
+	//=============================================================================
+
+#else
+
+	//=============================================================================
 	ALvoid *wave = NULL;
 	ALsizei size;
 	ALsizei freq;
-	ALenum format;
 	ALboolean srcloop;
-
-//TODO figure out why apple header is differnt
+//TODO figure out why apple header is different
 #ifdef __APPLE__
 	alutLoadWAVFile((ALbyte *) filename, &format, &wave, &size, &freq);
 #else
@@ -364,6 +432,9 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 	if (error != AL_NO_ERROR) {
 		printf("OpenAL Error: %d, alutUnloadWAV %s\n", error, filename);
 	}
+	//===============================================================================
+	
+#endif
 	
 	if (!static_pool) {
 		is_enabled = true;

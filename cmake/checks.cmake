@@ -116,15 +116,6 @@ MACRO(CHECK_PACKAGES)
 		MESSAGE(STATUS "Looking for library OpenAL - NOT found")
 	ENDIF(OPENAL_FOUND)
 
-	Find_Package(ALUT)
-
-	IF(ALUT_FOUND)
-		SET(HAVE_LIBALUT 1)
-		MESSAGE(STATUS "Looking for library ALUT - found")
-	ELSE(ALUT_FOUND)
-		MESSAGE(STATUS "Looking for library ALUT - NOT found")
-	ENDIF(ALUT_FOUND)
-
 	Find_Package(ENET)
 
 	IF(ENET_FOUND)

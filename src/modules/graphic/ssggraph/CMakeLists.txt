@@ -1,7 +1,6 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 Find_Package(OpenAL)
-Find_Package(ALUT)
 
 SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h 
 		     OpenalSoundInterface.cpp PlibSoundInterface.cpp
@@ -53,10 +52,6 @@ ADD_TORCSLIB_LIBRARY(ssggraph tgf tgfclient robottools)
 IF(OPENAL_FOUND)
 	TARGET_LINK_LIBRARIES(ssggraph ${OPENAL_LIBRARY})
 ENDIF(OPENAL_FOUND)
-
-IF(ALUT_FOUND)
-	TARGET_LINK_LIBRARIES(ssggraph ${ALUT_LIBRARY})
-ENDIF(ALUT_FOUND)
 
 IF(OPENGL_FOUND)
 	TARGET_LINK_LIBRARIES(ssggraph ${OPENGL_LIBRARY})

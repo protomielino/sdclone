@@ -36,7 +36,6 @@ ADD_TORCSLIB_LIBRARY(client confscreens tgfclient raceengineclient racescreens t
 ADD_OPENGL_LIBRARY(client)
 ADD_SDL_LIBRARY(client)
 ADD_OPENAL_LIBRARY(client)
-ADD_ALUT_LIBRARY(client)
 
 IF(WIN32)
 	#joystick library
