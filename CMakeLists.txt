@@ -1,10 +1,10 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
 
+# Speed Dreams project
+PROJECT(speed-dreams)
+
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
-
-# Speed Dreams project
-project (speed-dreams)
 
 # 3rd Party Dependency Stuff
 IF(WIN32)
