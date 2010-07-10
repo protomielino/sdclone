@@ -18,7 +18,7 @@ SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 
-INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
+ADD_SDL_INCLUDEDIR()
 
 IF(WIN32)
 	include_directories(src/windows/include)
@@ -46,6 +46,7 @@ IF(UNIX)
 ENDIF(UNIX)
 
 ADD_PLIB_LIBRARY(ssggraph ssg ul sg sl ssg ssgaux)
+ADD_SDL_LIBRARY(ssggraph)
 
 ADD_TORCSLIB_LIBRARY(ssggraph tgf tgfclient robottools)
 
