@@ -329,8 +329,6 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 		return;
 	}
 
-#if 1
-	//=============================================================================
 	SDL_AudioSpec wavspec;
 	Uint32 wavlen;
 	Uint8 *wavbuf;
@@ -389,52 +387,6 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 	}
 	
 	SDL_FreeWAV(wavbuf);
-	//=============================================================================
-
-#else
-
-	//=============================================================================
-	ALvoid *wave = NULL;
-	ALsizei size;
-	ALsizei freq;
-	ALboolean srcloop;
-//TODO figure out why apple header is different
-#ifdef __APPLE__
-	alutLoadWAVFile((ALbyte *) filename, &format, &wave, &size, &freq);
-#else
-	alutLoadWAVFile((ALbyte *) filename, &format, &wave, &size, &freq, &srcloop);
-#endif
-	error = alGetError();
-	if (error != AL_NO_ERROR) {
-		printf("OpenAL Error: %d, could not load %s\n", error, filename);
-		if (alIsBuffer(buffer)) {
-			alDeleteBuffers(1, &buffer);
-			alGetError();
-		}
-		is_enabled = false;
-		return;
-	}
-	
-	alBufferData (buffer, format, wave, size, freq);
-	error = alGetError();
-	if (error != AL_NO_ERROR) {
-		printf("OpenAL Error: %d, alBufferData %s\n", error, filename);
-		if (alIsBuffer(buffer)) {
-			alDeleteBuffers(1, &buffer);
-			alGetError();
-		}
-		is_enabled = false;
-		return;
-	}
-
-	alutUnloadWAV(format, wave, size, freq);
-	error = alGetError();
-	if (error != AL_NO_ERROR) {
-		printf("OpenAL Error: %d, alutUnloadWAV %s\n", error, filename);
-	}
-	//===============================================================================
-	
-#endif
 	
 	if (!static_pool) {
 		is_enabled = true;
