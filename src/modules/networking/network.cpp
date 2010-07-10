@@ -130,6 +130,7 @@ void Network::RaceInit(tSituation *s)
 	m_sendCarDataTime = 0.0;
 	m_timePhysics = 0.0;
 	m_currentTime = 0.0;
+	
 
 	m_mapRanks.clear();
 	for (int i = 0; i < s->_ncars; i++) 
@@ -466,8 +467,14 @@ void Network::SendCarStatusPacket(tSituation *s,bool bForce)
 	if (s->currentTime<0.0)
 		return;
 
+	//Clock error fix it
+	if (s->currentTime<m_sendCtrlTime)
+	{
+		m_sendCarDataTime=s->currentTime-CAR_DATA_UPDATE;
+	}
+
 	//Send carinfo packet when enough time has passed(CAR_DATA_UPDATE)
-	if (((m_sendCarDataTime+CAR_DATA_UPDATE)>s->currentTime)&&(!bForce))
+	if (((m_sendCarDataTime+CAR_DATA_UPDATE)>=s->currentTime)&&(!bForce))
 	{
 		return;
 	}
@@ -532,10 +539,16 @@ void Network::SendCarControlsPacket(tSituation *s)
 	if (s->currentTime<0.0)
 		return;
 
+	//Clock error fix it
+	if (s->currentTime<m_sendCtrlTime)
+	{
+		m_sendCtrlTime=s->currentTime-CAR_CONTROL_UPDATE;
+	}
+
 	SendCarStatusPacket(s,false);
 
 	//Send carinfo packet when enough time has passed(CAR_CONTROL_UPDATE)
-	if ((m_sendCtrlTime+CAR_CONTROL_UPDATE)>s->currentTime)
+	if ((m_sendCtrlTime+CAR_CONTROL_UPDATE)>=s->currentTime)
 	{
 		return;
 	}
@@ -566,6 +579,7 @@ void Network::SendCarControlsPacket(tSituation *s)
 
 	}
 	time = s->currentTime;
+
 	m_sendCtrlTime = s->currentTime;
 
 
