@@ -11,7 +11,7 @@ SET(CPACK_RESOURCE_FILE_LICENSE "${SOURCE_DIR}/COPYING")
 SET(CPACK_RESOURCE_FILE_README "${SOURCE_DIR}/README")
 
 SET(EXECUTABLE_NAME "speed-dreams")
-SET(CPACK_PACKAGE_EXECUTABLES "${EXECUTABLE_NAME};Speed Dreams")
+SET(CPACK_PACKAGE_EXECUTABLES "${EXECUTABLE_NAME};Start ${CPACK_PACKAGE_NAME}")
 
 # Version settings.
 # * the short way.
@@ -72,6 +72,9 @@ ENDIF(UNIX)
 # (NSIS must be installed on your computer for this to work)
 IF(WIN32)
 
+    # General note: There is a bug in NSI that does not handle full unix paths properly.
+    # Make sure there is at least one set of four (4) backlasshes.
+
     SET(EXECUTABLE_PATHNAME "$INSTDIR\\\\bin\\\\${EXECUTABLE_NAME}.exe")
 
     SET(PACKAGERS_BINARY "NSIS" CACHE STRING "CPack binary package generators to use (separated with ';', among NSIS, CygwinBinary, STGZ, TGZ, TBZ2, TZ, ZIP)")
@@ -81,12 +84,15 @@ IF(WIN32)
     SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
     SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_NSIS_DISPLAY_NAME}")
 
-    # There is a bug in NSI that does not handle full unix paths properly. Make
-     # sure there is at least one set of four (4) backlasshes.
+	# Icon for the generated installer/uninstaller files.
     SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
-    #SET(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico)
+    #SET(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
+    SET(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}\\\\installer\\\\windows\\\\header.bmp)
     
-    SET(CPACK_NSIS_MENU_LINKS "${CPACK_PACKAGE_CONTACT}" "Homepage for ${CPACK_PACKAGE_NAME}")
+	# Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
+    SET(CPACK_NSIS_MENU_LINKS 
+           "${CPACK_PACKAGE_CONTACT}" "Project Homepage")
+           #"$INSTDIR\\\\share\\\\doc\\\\userman\\\\how_to_drive.html" "User manual")
 
     # Icon in the add/remove control panel. Must be an .exe file 
     Set(CPACK_NSIS_INSTALLED_ICON_NAME "${EXECUTABLE_PATHNAME}")
