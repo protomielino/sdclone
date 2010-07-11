@@ -313,6 +313,8 @@ typedef struct RmInfo
 #define RM_ATTR_LAPS		"laps"
 #define RM_ATTR_SESSIONTIME	"sessiontime"
 #define RM_ATTR_WEATHER		"weather"
+#define RM_ATTR_WEATHER_CLOUDS	"weather clouds"
+#define RM_ATTR_WEATHER_RAIN    "weather rain"
 #define RM_ATTR_TIME		"Time"
 #define RM_ATTR_QUAL_LAPS	"Qualification laps"
 #define RM_ATTR_POLE		"pole position side"
@@ -340,6 +342,11 @@ typedef struct RmInfo
 #define RM_VAL_VISIBLE		"normal"
 #define RM_VAL_INVISIBLE	"results only"
 #define RM_VAL_SIMUSIMU		"simulation simulation"
+
+#define RM_VAL_NO_CLOUDS	"no clouds"
+#define RM_VAL_SCARCE_CLOUDS	"scarce clouds"
+#define RM_VAL_MORE_CLOUDS	"more clouds"
+#define RM_VAL_OVERCAST_CLOUDS	"overcast clouds"
 
 /* Movie capture */
 

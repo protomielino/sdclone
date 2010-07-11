@@ -41,13 +41,30 @@
 
 #include "racescreens.h"
 
+#define CLOUD_VAL_NO 0
+#define CLOUD_VAL_SCARCE 1
+#define CLOUD_VAL_MORE 2
+#define CLOUD_VAL_OVERCAST 3
+ 
+typedef struct WeatherOption
+{
+	const char* name;
+	float rain; // l/m2/h
+	int clouds;
+} tWeatherOption;
 
 // Constants.
 static const char *DispModeValues[] = { RM_VAL_VISIBLE, RM_VAL_INVISIBLE};
 
-static const int NWeatherValues = 7;
-static const char *WeatherValues[NWeatherValues] = 
-    {"Clear sky", "Scarce Clouds", "More Clouds", "Overcast Sky", "Drizzle", "Rain", "Hard Rain"};
+static const tWeatherOption WeatherValues[] = { { "Clear sky", 0.0f, CLOUD_VAL_NO },
+                                                { "Scarce Clouds", 0.0f, CLOUD_VAL_SCARCE },
+						{ "More Clouds", 0.0f, CLOUD_VAL_MORE },
+						{ "Overcast Sky", 0.0f, CLOUD_VAL_OVERCAST },
+						{ "Drizzle", 1.0f, CLOUD_VAL_OVERCAST },
+						{ "Rain", 5.0f, CLOUD_VAL_OVERCAST },
+						{ "Heavy Rain", 20.0f, CLOUD_VAL_OVERCAST } };
+
+static const int NWeatherValues = sizeof( WeatherValues ) / sizeof( tWeatherOption );
 
 static const int NTimeOfDayValues = 4;
 static const char *TimeOfDayValues[NTimeOfDayValues] = {"Night", "Dawn", "Morning", "Noon"};
@@ -201,7 +218,7 @@ static void rmChangeWeather(void *vp)
 {
     const long delta = (long)vp;
     rmrpWeather = (rmrpWeather + NWeatherValues + delta) % NWeatherValues;
-    GfuiLabelSetText(scrHandle, rmrpWeatherId, WeatherValues[rmrpWeather]);;
+    GfuiLabelSetText(scrHandle, rmrpWeatherId, WeatherValues[rmrpWeather].name);
 }
 
 
@@ -215,7 +232,24 @@ rmrpValidate(void * /* dummy */)
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_DISTANCE, "km", rmrpDistance);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_LAPS, (char*)NULL, rmrpLaps);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_SESSIONTIME, "s", (tdble)rmrpSessionTime);
-	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, rmrpWeather + 1);
+	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, rmrpWeather + 1); //TODO: delete this line
+	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", WeatherValues[rmrpWeather].rain);
+	switch( WeatherValues[rmrpWeather ].clouds )
+	{
+	case CLOUD_VAL_SCARCE:
+		GfParmSetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_SCARCE_CLOUDS );
+		break;
+	case CLOUD_VAL_MORE:
+		GfParmSetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_MORE_CLOUDS );
+		break;
+	case CLOUD_VAL_OVERCAST:
+		GfParmSetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_OVERCAST_CLOUDS );
+		break;
+	case CLOUD_VAL_NO:
+	default:
+		GfParmSetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS );
+		break;
+	}
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, rmrpTimeOfDay + 1);
     }
 
@@ -239,6 +273,7 @@ void
 RmRaceParamMenu(void *vrp)
 {
     char	buf[64];
+    int         xx;
 
     rp = (tRmRaceParam*)vrp;
 
@@ -329,14 +364,49 @@ RmRaceParamMenu(void *vrp)
     rmrpTimeOfDayId = CreateLabelControl(scrHandle,menuXMLDescHdle,"timeofdayedit");
     GfuiLabelSetText(scrHandle,rmrpTimeOfDayId,TimeOfDayValues[rmrpTimeOfDay]);
     
-    // Create and initialize Weather combo box (2 arrow buttons and a variable label).
-    rmrpWeather = ((int)GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, 0) - 1);
+    //Read rmrpWeather from file. We first look to the value nearest to the rain
+    rmrpWeather = 0;
+    for( xx = 1; xx < NWeatherValues; ++xx )
+    {
+    	//First check if rain is nearer then the current value
+    	if( fabs( WeatherValues[ xx          ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) <
+	    fabs( WeatherValues[ rmrpWeather ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) )
+	{
+		rmrpWeather = xx;
+	}
+    	else if( fabs( WeatherValues[ xx          ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) <
+	         fabs( WeatherValues[ rmrpWeather ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) )
+	{
+		//Rain is equal far off, look if we have a match in the cloud type
+		switch( WeatherValues[ xx ].clouds )
+		{
+		case CLOUD_VAL_SCARCE:
+			if( strcmp( RM_VAL_SCARCE_CLOUDS, GfParmGetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS ) ) == 0 )
+				rmrpWeather = xx;
+			break;
+		case CLOUD_VAL_MORE:
+			if( strcmp( RM_VAL_MORE_CLOUDS, GfParmGetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS ) ) == 0 )
+				rmrpWeather = xx;
+			break;
+		case CLOUD_VAL_OVERCAST:
+			if( strcmp( RM_VAL_OVERCAST_CLOUDS, GfParmGetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS ) ) == 0 )
+				rmrpWeather = xx;
+			break;
+		case CLOUD_VAL_NO:
+		default:
+			if( strcmp( RM_VAL_NO_CLOUDS, GfParmGetStr(rp->param, rp->title, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS ) ) == 0 )
+				rmrpWeather = xx;
+			break;
+		}
+	}
+	
+    }
     
     CreateButtonControl(scrHandle,menuXMLDescHdle,"weatherleftarrow",(void*)-1, rmChangeWeather);
     CreateButtonControl(scrHandle,menuXMLDescHdle,"weatherrightarrow",(void*)1, rmChangeWeather);
 
     rmrpWeatherId = CreateLabelControl(scrHandle,menuXMLDescHdle,"weatheredit");
-    GfuiLabelSetText(scrHandle,rmrpWeatherId,WeatherValues[rmrpWeather]);
+    GfuiLabelSetText(scrHandle,rmrpWeatherId,WeatherValues[rmrpWeather].name);
     
     if (rp->confMask & RM_CONF_DISP_MODE) 
     {
