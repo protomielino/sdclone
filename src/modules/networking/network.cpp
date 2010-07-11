@@ -468,13 +468,13 @@ void Network::SendCarStatusPacket(tSituation *s,bool bForce)
 		return;
 
 	//Clock error fix it
-	if (s->currentTime<m_sendCtrlTime)
+	if (s->currentTime<m_sendCarDataTime)
 	{
 		m_sendCarDataTime=s->currentTime-CAR_DATA_UPDATE;
 	}
 
 	//Send carinfo packet when enough time has passed(CAR_DATA_UPDATE)
-	if (((m_sendCarDataTime+CAR_DATA_UPDATE)>=s->currentTime)&&(!bForce))
+	if (((m_sendCarDataTime+CAR_DATA_UPDATE)>s->currentTime)&&(!bForce))
 	{
 		return;
 	}
@@ -548,7 +548,7 @@ void Network::SendCarControlsPacket(tSituation *s)
 	SendCarStatusPacket(s,false);
 
 	//Send carinfo packet when enough time has passed(CAR_CONTROL_UPDATE)
-	if ((m_sendCtrlTime+CAR_CONTROL_UPDATE)>=s->currentTime)
+	if ((m_sendCtrlTime+CAR_CONTROL_UPDATE)>s->currentTime)
 	{
 		return;
 	}
@@ -685,6 +685,12 @@ void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 				{
 					pNData->m_vecCarStatus[i] = status;
 				}
+				else
+				{
+					float delta = pNData->m_vecCarStatus[i].time - status.time;
+					GfOut("Rejected car status from startRank %i\n",status.startRank);
+				}
+				GfOut("Recieved car status from startRank %i\n",status.startRank);
 			}
 		}
 
@@ -695,6 +701,7 @@ void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 	}
 
 	UnlockNetworkData();
+	
 
 
 }
@@ -756,6 +763,11 @@ void Network::ReadCarControlsPacket(ENetPacket *pPacket)
 				if (pNData->m_vecCarCtrls[i].time < ctrl.time)
 				{
 					pNData->m_vecCarCtrls[i] = ctrl;
+				}
+				else
+				{
+					float delta = pNData->m_vecCarCtrls[i].time - ctrl.time;
+					GfOut("Rejected car control from startRank %i\n",ctrl.startRank);
 				}
 			}
 		}
