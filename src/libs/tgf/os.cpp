@@ -52,3 +52,29 @@ GfTimeClock(void)
 	return 0;
     }
 }
+
+/* Retrieve the actual number of CPUs in the system
+*  Note that a core is considered here as a "CPU", and an Intel hyper-threaded processor
+*  will report twice as many "CPUs" as actual cores ...
+*/
+unsigned GfGetNumberOfCPUs()
+{
+    if (GfOs.sysGetNumberOfCPUs) {
+	return GfOs.sysGetNumberOfCPUs();
+    } else {
+	return 0;
+    }
+}
+
+/* Force the current thread to run on the specified CPU.
+*   @param nCPUId the index in [0, # of actual CPUs on the system [ (any other value will actually reset the thread affinity to the "system" affinity mask, meaning no special processor / core assignement)
+*   @return true if any error occured, false otherwise
+ */
+bool GfSetThreadAffinity(int nCPUId)
+{
+    if (GfOs.sysSetThreadAffinity) {
+	return GfOs.sysSetThreadAffinity(nCPUId);
+    } else {
+	return false;
+    }
+}

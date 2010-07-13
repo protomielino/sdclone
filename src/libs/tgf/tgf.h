@@ -432,14 +432,20 @@ typedef struct
 TGF_API tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
 TGF_API void gfMeanReset(tdble v, tMeanVal *pvt);
 
-/* Get the actual number of CPUs / cores */
-TGF_API int GfGetNumberOfCPUs();
+/********************
+ * System Interface *
+ ********************/
+TGF_API unsigned GfGetNumberOfCPUs();
+
+enum { GfAffinityAnyCPU = -1 };
+TGF_API bool GfSetThreadAffinity(int nCPUId);
 
 /* Run-time dirs accessors */
 TGF_API const char *GetLocalDir(void);
 TGF_API const char *SetLocalDir(const char *buf);
 TGF_API const char *GetLibDir(void);
 TGF_API const char *SetLibDir(const char *buf);
+
 TGF_API const char *GetDataDir(void);
 TGF_API const char *SetDataDir(const char *buf);
 TGF_API const char *GetBinDir(void);

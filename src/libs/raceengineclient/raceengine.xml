@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
-<params name="" type="template" mode="mw" version="1.1">
+<params name="" type="template" mode="mw" version="1.2">
 
   <section name="Modules">
     <attstr name="track" val="track"/>
@@ -30,6 +30,7 @@
 
   <section name="Race Engine">
     <attstr name="multi-threading" in="auto,on,off" val="off"/>
+    <attstr name="thread affinity" in="on,off" val="off"/>
   </section>
 
 </params>

@@ -66,6 +66,11 @@ tRmInfo* ReGetSituation()
 #include "SDL/SDL.h"
 #include "SDL/SDL_thread.h"
 
+// Index of the CPU to use for thread affinity if any and if there are at least 2 ones.
+static const int NGraphicsCPUId = 0;
+static const int NUpdaterCPUId = 1;
+
+// The situation updater thread class.
 class reSituationUpdater
 {
 public:
@@ -133,6 +138,9 @@ private:
 
 	//! True if the updater is actually threaded (may be not the case)
 	bool _bThreaded;
+
+	//! True if thread affinity has to be applied (even in case !_bThreaded)
+	bool _bThreadAffinity;
 
 	//! Flag to set in order to terminate the updater.
 	bool _bTerminate;
@@ -1301,6 +1309,11 @@ int reSituationUpdater::threadLoop()
 	// Current real time.
 	double realTime;
 	
+	// Apply thread affinity to the current = situation updater thread if specified.
+	// Note: No need to reset the affinity, as the thread is just born.
+	if (_bThreadAffinity)
+		GfSetThreadAffinity(NUpdaterCPUId);
+
 	GfOut("SituationUpdater thread is started.\n");
 	
 	do
@@ -1370,7 +1383,8 @@ reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
 	_pCurrReInfo = pReInfo;
 	_nInitDrivers = _pCurrReInfo->s->_ncars;
 
-	// No dedicated thread if only 1 CPU/core.
+	// Determine if we have a dedicated separate thread or not
+	// (according to the user settings, and the actual number of CPUs).
 	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszMultiThreadScheme =
@@ -1383,8 +1397,19 @@ reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
 	else // Can't be anything else than RM_VAL_AUTO
 		_bThreaded = GfGetNumberOfCPUs() > 1;
 
+	// Determine if we apply some thread affinity or not (according to the user settings).
+	const char* pszThreadAffinityScheme =
+		GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, RM_VAL_OFF);
+	_bThreadAffinity = strcmp(pszThreadAffinityScheme, RM_VAL_ON) == 0;
+
 	GfParmReleaseHandle(paramHandle);
 
+	// Apply thread affinity to the current = main = graphics thread
+	// (and don't forget to reset it when specified :
+	//  user settings may have changed since last race).
+	GfSetThreadAffinity(_bThreadAffinity ? NGraphicsCPUId : GfAffinityAnyCPU);
+
+	// Initialize termination flag.
 	_bTerminate = false;
 
 	if (_bThreaded)
@@ -1404,6 +1429,9 @@ reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
 		_pDataMutex = 0;
 		_pUpdateThread = 0;
 	}
+
+	GfOut("SituationUpdater initialized (%sseparate thread, CPU affinity %s).\n",
+	      (_bThreaded ? "" : "no "), (_bThreadAffinity ? "On" : "Off"));
 }
 
 reSituationUpdater::~reSituationUpdater()

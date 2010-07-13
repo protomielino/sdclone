@@ -44,25 +44,33 @@ static int CurSimuVersion = 0;
 static const char *MultiThreadSchemeList[] = {RM_VAL_AUTO, RM_VAL_ON, RM_VAL_OFF};
 static const int NbMultiThreadSchemes = sizeof(MultiThreadSchemeList) / sizeof(MultiThreadSchemeList[0]);
 
+/* list of available thread affinity schemes */
+static const char *ThreadAffinitySchemeList[] = {RM_VAL_ON, RM_VAL_OFF};
+static const int NbThreadAffinitySchemes = sizeof(ThreadAffinitySchemeList) / sizeof(ThreadAffinitySchemeList[0]);
+
 #ifdef ReMultiThreaded
-static int CurMultiThreadScheme = 0;
+static int CurMultiThreadScheme = 0;    // Auto
+static int CurThreadAffinityScheme = 0; // On
 #else
-static int CurMultiThreadScheme = 2;
+static int CurMultiThreadScheme = 2;    // Off
+static int CurThreadAffinityScheme = 1; // Off
 #endif
 
 /* gui label ids */
 static int SimuVersionId;
 static int MultiThreadSchemeId;
+static int ThreadAffinitySchemeId;
 
 /* gui screen handles */
-static void	*ScrHandle = NULL;
-static void	*PrevScrHandle = NULL;
+static void *ScrHandle = NULL;
+static void *PrevScrHandle = NULL;
 
 
 static void loadSimuCfg(void)
 {
 	const char *simuVersionName;
 	const char *multiThreadSchemeName;
+	const char *threadAffinitySchemeName;
 	int i;
 
 	char buf[1024];
@@ -88,12 +96,21 @@ static void loadSimuCfg(void)
 		}
 	}
 
+	threadAffinitySchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, ThreadAffinitySchemeList[0]);
+	for (i = 0; i < NbThreadAffinitySchemes; i++) {
+		if (strcmp(threadAffinitySchemeName, ThreadAffinitySchemeList[i]) == 0) {
+			CurThreadAffinityScheme = i;
+			break;
+		}
+	}
+
 #endif
 	
 	GfParmReleaseHandle(paramHandle);
 
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
 	GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
+	GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 }
 
 
@@ -106,6 +123,7 @@ static void storeSimuCfg(void * /* dummy */)
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[CurSimuVersion]);
 	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[CurMultiThreadScheme]);
+	GfParmSetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 	GfParmWriteFile(NULL, paramHandle, "raceengine");
 	GfParmReleaseHandle(paramHandle);
 	
@@ -114,24 +132,35 @@ static void storeSimuCfg(void * /* dummy */)
 	return;
 }
 
-/* change the simulation version */
+/* Change the simulation version */
 static void
 onChangeSimuVersion(void *vp)
 {
 	CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
 	
-    GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
+	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
 }
 
 
-/* change the multi-threading scheme */
+/* Change the multi-threading scheme */
 static void
 onChangeMultiThreadScheme(void *vp)
 {
 	CurMultiThreadScheme =
 		(CurMultiThreadScheme + NbMultiThreadSchemes + (int)(long)vp) % NbMultiThreadSchemes;
 	
-    GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
+	GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
+}
+
+
+/* Change the thread affinity scheme */
+static void
+onChangeThreadAffinityScheme(void *vp)
+{
+	CurThreadAffinityScheme =
+		(CurThreadAffinityScheme + NbThreadAffinitySchemes + (int)(long)vp) % NbThreadAffinitySchemes;
+	
+	GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 }
 
 
@@ -165,6 +194,13 @@ SimuMenuInit(void *prevMenu)
 #ifdef ReMultiThreaded
     CreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", (void*)-1, onChangeMultiThreadScheme);
     CreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", (void*)1, onChangeMultiThreadScheme);
+#endif
+
+    ThreadAffinitySchemeId = CreateLabelControl(ScrHandle, menuDescHdle, "threadafflabel");
+
+#ifdef ReMultiThreaded
+    CreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", (void*)-1, onChangeThreadAffinityScheme);
+    CreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", (void*)1, onChangeThreadAffinityScheme);
 #endif
 	
     CreateButtonControl(ScrHandle, menuDescHdle, "accept", PrevScrHandle, storeSimuCfg);

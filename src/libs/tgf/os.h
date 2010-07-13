@@ -28,11 +28,17 @@ typedef int (*tfModUnloadList)(tModList **);
 typedef int (*tfModGetInfo)(unsigned int, const char*, tModList **);
 typedef int (*tfModGetInfoDir)(unsigned int, const char*, int, tModList **);
 typedef int (*tfModFreeInfoList)(tModList **);
+
 /* directory interface */
 typedef tFList *(*tfDirGetList)(const char *);
 typedef tFList *(*tfDirGetListFiltered)(const char *, const char *);
+
 /* time interface */
 typedef double (*tfTimeClock)(void);
+
+/* System interface */
+typedef unsigned (*tfSysGetNumberOfCPUs)(void);
+typedef bool (*tfSysSetThreadAffinity)(int nCPUId);
 
 typedef struct {
     tfModLoad			modLoad;
@@ -44,15 +50,10 @@ typedef struct {
     tfDirGetList		dirGetList;
     tfDirGetListFiltered	dirGetListFiltered;
     tfTimeClock			timeClock;
+    tfSysSetThreadAffinity	sysSetThreadAffinity;
+    tfSysGetNumberOfCPUs	sysGetNumberOfCPUs;
 } tGfOs;
 
-#ifdef WIN32
-#ifdef tgf_EXPORTS
-__declspec(dllexport)
-#else // TGF_EXPORTS
-__declspec(dllimport)
-#endif // TGF_EXPORTS
-#endif // WIN32
-extern tGfOs GfOs;
+TGF_API extern tGfOs GfOs;
 
 #endif /* _OS__H_ */

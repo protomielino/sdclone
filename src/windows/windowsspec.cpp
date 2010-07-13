@@ -29,7 +29,6 @@
 #include <os.h>
 
 
-
 /*
 * Function
 *	windowsModLoad
@@ -553,58 +552,6 @@ windowsTimeClock(void)
 
 /*
 * Function
-*	windowsSetAffinity
-*
-* Description
-*	Restrict game executable to one CPU core/processor.
-*	This avoids jerky rendering, especially under Vista.
-*
-* Parameters
-*	none
-*
-* Return
-*	none
-*/
-static void
-windowsSetAffinity(void)
-{
-#ifndef ULONG_PTR
-    typedef unsigned long ULONG_PTR;
-#endif
-	
-	#ifndef ULONG_PTR
-	typedef unsigned long ULONG_PTR;
-	#endif
-	
-	#ifndef PDWORD_PTR
-	#ifndef DWORD_PTR
-	typedef ULONG_PTR DWORD_PTR;
-	#endif
-	typedef DWORD_PTR *PDWORD_PTR;
-	#endif
-	 
-#ifndef PDWORD_PTR
-#ifndef DWORD_PTR
-    typedef ULONG_PTR DWORD_PTR;
-#endif
-    typedef DWORD_PTR *PDWORD_PTR;
-#endif
-
-    HANDLE hProcess = GetCurrentProcess();
-    ULONG_PTR ProcAM, SysAM;
-
-    GetProcessAffinityMask( hProcess, (PDWORD_PTR) &ProcAM, (PDWORD_PTR) &SysAM );
-    if (ProcAM > 1)
-    {
-	ProcAM = 1;
-	GfOut("Setting process affinity mask to 1");
-	SetProcessAffinityMask( hProcess, ProcAM );
-    }
-}
-
-
-/*
-* Function
 *	windowsGetOSInfo
 *
 * Description
@@ -771,25 +718,140 @@ windowsGetOSInfo(int* pnMajor, int* pnMinor, int* pnBits)
 
 /*
 * Function
-*	WindowsSpecInit
+*	windowsGetNumberOfCPUs
 *
 * Description
-*	Init the specific windows functions
+*	Retrieve the actual number of CPUs in the system
+*       Note that a core is considered here as a "CPU", and an Intel hyper-threaded processor
+*       will report twice as many "CPUs" as actual cores ...
 *
 * Parameters
-*	none
+*	None
 *
 * Return
-*	none
+*	The number of CPUs in the system
 *
 * Remarks
 *	
+*/
+static unsigned 
+windowsGetNumberOfCPUs()
+{
+    static unsigned nCPUs = 0;
+
+	if (nCPUs == 0)
+	{
+		SYSTEM_INFO sysinfo;
+		GetSystemInfo(&sysinfo);
+
+		nCPUs = sysinfo.dwNumberOfProcessors;
+		
+		if (nCPUs < 1)
+		{
+			GfOut("Could not get the number of CPUs here ; assuming only 1\n");
+			nCPUs = 1;
+		}
+		else
+			GfOut("Detected %u CPUs\n", nCPUs);
+	}
+
+    return nCPUs;
+}
+
+/*
+* Function
+*    windowsSetThreadAffinity
+*
+* Description
+*    Force the current thread to run on the specified CPU.
+*
+* Parameters
+*    nCPUId : the index in [0, # of actual CPUs on the system [ (any other value will actually reset the thread affinity to the "system" affinity mask, meaning no special CPU assignement)
+*
+* Return
+*    true if any error occured, false otherwise
+*
+* Remarks
+*    
+*/
+static bool
+windowsSetThreadAffinity(int nCPUId)
+{
+	// Get the system affinity mask : it is what we want for the thread
+	// (1 bit for all the cores available in the system)
+	// Note: We don't care about the process affinity mask here.
+	DWORD_PTR nProcessMask, nSystemMask;
+	GetProcessAffinityMask(GetCurrentProcess(), &nProcessMask, &nSystemMask);
+
+	// Determine the affinity mask to set
+	ULONGLONG nThreadAffinityMask;
+	if (nCPUId == GfAffinityAnyCPU)
+	{
+		// No special affinity on any processor => set "system" affinity mask.
+		nThreadAffinityMask = nSystemMask;
+	}
+	else
+	{
+		// Affinity on a specified CPU => compute its mask (1 bit in the "system" mask).
+		int nCPUIndex = -1;
+		int nBitIndex = 0;
+		while (nBitIndex < sizeof(nSystemMask)*8 && nCPUIndex < nCPUId)
+		{
+			if (nSystemMask & 1)
+				nCPUIndex++;
+			nSystemMask >>= 1;
+			nBitIndex++;
+		}
+		nBitIndex--;
+		if (nCPUIndex != nCPUId)
+		{
+			GfError("Target CPU %d not found (erroneous id specified ?)\n", nCPUId);
+			return false;
+		}
+
+		// We've got it.
+		nThreadAffinityMask = (1 << nBitIndex);
+	}
+	
+	// Get the handle for the current thread.
+    HANDLE hCurrThread = GetCurrentThread();
+    GfOut("Current thread handle is 0x%X\n", hCurrThread);
+
+    // Set the affinity mask for the current thread ("stick" it to the target core).
+    if (SetThreadAffinityMask(hCurrThread, (DWORD_PTR)nThreadAffinityMask) == 0)
+    {
+        GfError("Failed to set current thread (handle=0x%X) affinity mask to 0x%X)\n",
+                hCurrThread, nThreadAffinityMask);
+        return false;
+    }
+    else
+        GfOut("Affinity mask set to 0x%X for current thread (handle=0x%X)\n",
+              nThreadAffinityMask, hCurrThread);
+
+    return true;
+}
+
+/*
+* Function
+*    WindowsSpecInit
+*
+* Description
+*    Init the specific windows functions
+*
+* Parameters
+*    none
+*
+* Return
+*    none
+*
+* Remarks
+*    
 */
 void
 WindowsSpecInit(void)
 {
     memset(&GfOs, 0, sizeof(GfOs));
-	
+    
     GfOs.modLoad = windowsModLoad;
     GfOs.modLoadDir = windowsModLoadDir;
     GfOs.modUnloadList = windowsModUnloadList;
@@ -798,11 +860,6 @@ WindowsSpecInit(void)
     GfOs.dirGetList = windowsDirGetList;
     GfOs.dirGetListFiltered = windowsDirGetListFiltered;
     GfOs.timeClock = windowsTimeClock;
-//>>> Multithreading-Issue:
-// Windows XP/windows 7 and ATI Radenon: card no problems without this!
-    // Workaround for Vista jerky rendering on multicore CPUs.
-    int nMajor, nMinor, nBits;
-    if (windowsGetOSInfo(&nMajor, &nMinor, &nBits) && nMajor >= 6)
-	windowsSetAffinity();
-//<<<
+    GfOs.sysGetNumberOfCPUs = windowsGetNumberOfCPUs;
+    GfOs.sysSetThreadAffinity = windowsSetThreadAffinity;
 }

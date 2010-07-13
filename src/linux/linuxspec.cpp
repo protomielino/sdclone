@@ -18,13 +18,25 @@
  ***************************************************************************/
 
 
-#include <stddef.h>
+#include <cstddef>
 #include <sys/types.h>
 #include <dirent.h>
 #include <dlfcn.h>
 #include <time.h>
 #include <sys/time.h>
 #include <unistd.h>
+
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+#include <sys/param.h>
+#include <sys/sysctl.h>
+#if defined(__APPLE__) 
+#include <Carbon/Carbon.h> /* Carbon APIs for Multiprocessing */
+#endif
+#else
+// Define _GNU_SOURCE in order to have access to pthread_set/getaffinity_np
+//#define _GNU_SOURCE
+//#include <pthread.h>
+#endif
 
 #include <tgf.h>
 
@@ -551,26 +563,171 @@ linuxTimeClock(void)
     struct timeval tv;
 
     gettimeofday(&tv, 0);
-    return (double)(tv.tv_sec + tv.tv_usec * 1e-6);
 
+    return (double)(tv.tv_sec + tv.tv_usec * 1e-6);
 }
 
 
 /*
+* Function
+*	linuxGetNumberOfCPUs
+*
+* Description
+*	Retrieve the actual number of CPUs in the system
+*       Note that a core is considered here as a "CPU", and an Intel hyper-threaded processor
+*       will report twice as many "CPUs" as actual cores ...
+*
+* Parameters
+*	None
+*
+* Return
+*	The number of CPUs in the system
+*
+* Remarks
+*       WARNING: Not tested under platforms other than Linux : Mac OS X, BSD, Solaris, AIX.
+*	
+*/
+unsigned linuxGetNumberOfCPUs()
+{
+	static unsigned nCPUs = 0;
+
+	if (nCPUs == 0)
+	{
+	
+// MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+
+		nt mib[4];
+		size_t len; 
+
+		// Set the mib for hw.ncpu
+
+		// Get the number of CPUs from the system
+		// 1) Try HW_AVAILCPU first.
+		mib[0] = CTL_HW;
+		mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
+		sysctl(mib, 2, &nCPUs, &len, NULL, 0);
+
+		if (nCPUs < 1) 
+		{
+			// 2) Try alternatively HW_NCPU.
+			mib[1] = HW_NCPU;
+			sysctl(mib, 2, &nCPUs, &len, NULL, 0);
+		}
+
+// Linux, Solaris, AIX
+#elif defined(linux) || defined(__linux__)
+
+		nCPUs = (unsigned)sysconf(_SC_NPROCESSORS_ONLN);
+
+// Anything else ... not supported.
+#else
+
+#warning "Unsupported Linux OS"
+
+#endif
+
+		if (nCPUs < 1)
+		{
+			GfOut("Could not get the number of CPUs here ; assuming only 1\n");
+			nCPUs = 1;
+		}
+		else
+			GfOut("Detected %d CPUs\n", nCPUs);
+	}
+
+	return nCPUs;
+}
+
+/*
+* Function
+*    linuxSetThreadAffinity
+*
+* Description
+*    Force the current thread to run on the specified CPU.
+*
+* Parameters
+*    nCPUId : the index in [0, # of actual CPUs on the system [ (any other value will actually reset the thread affinity to the "system" affinity mask, meaning no special CPU assignement)
+*
+* Return
+*    true if any error occured, false otherwise
+*
+* Remarks
+*    
+*/
+bool
+linuxSetThreadAffinity(int nCPUId)
+{
+#if 0
+// MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
+#if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
+
+    GfOut("Warning: Thread affinity not yet implemented on Mac OS X or BSD.\n");
+    return false;
+
+// Linux, Solaris, AIX ... with NPTL (Native POSIX Threads Library)
+#elif defined(linux) || defined(__linux__)
+
+	// Get the handle for the current thread.
+    pthread_t hCurrThread = pthread_self();
+    GfOut("Current pthread handle is 0x%X\n", hCurrThread);
+
+	// Determine the affinity mask to set for the current thread.
+	cpu_set_t nThreadAffinityMask;
+	CPU_ZERO(&nThreadAffinityMask);
+	if (nCPUId == GfAffinityAnyCore)
+	{
+		// No special affinity on any CPU => set "system" affinity mask
+		// (1 bit for each installed CPU).
+		for (int nCPUIndex = 0; nCPUIndex < linuxGetNumberOfCPUs(); nCPUIndex++)
+			CPU_SET(nCPUIndex, &nThreadAffinityMask);
+	}
+	else
+	{	
+		// Affinity on a specified CPU => compute its mask.
+		CPU_SET(nCPUId, &nThreadAffinityMask);
+	}
+	
+    // Set the affinity mask for the current thread ("stick" it to the target core).
+	if (pthread_setaffinity_np(hCurrThread, sizeof(nThreadAffinityMask), &nThreadAffinityMask))
+    {
+        GfError("Failed to set current pthread (handle=0x%X) affinity mask to 0x%X)\n",
+                hCurrThread, nThreadAffinityMask);
+        return false;
+    }
+    else
+        GfOut("Affinity mask set to 0x%X for current pthread (handle=0x%X)\n",
+              nThreadAffinityMask, hCurrThread);
+
+    return true;
+
+// Anything else ... not supported.
+#else
+
+#warning "linuxspec.cpp::linuxSetThreadAffinity : Unsupported Linux OS"
+    GfOut("Warning: Thread affinity not yet implemented on this unknown Unix.\n");
+    return false;
+
+#endif
+#endif
+    return true; // Temporary empty and silent implementation.
+}
+
+/*
  * Function
- *	LinuxSpecInit
+ *    LinuxSpecInit
  *
  * Description
- *	Init the specific linux functions
+ *    Initialize the specific linux functions
  *
  * Parameters
- *	none
+ *    none
  *
  * Return
- *	none
+ *    none
  *
  * Remarks
- *	
+ *    
  */
 void
 LinuxSpecInit(void)
@@ -585,5 +742,7 @@ LinuxSpecInit(void)
     GfOs.dirGetList = linuxDirGetList;
     GfOs.dirGetListFiltered = linuxDirGetListFiltered;
     GfOs.timeClock = linuxTimeClock;
+    GfOs.sysGetNumberOfCPUs = linuxGetNumberOfCPUs;
+    GfOs.sysSetThreadAffinity = linuxSetThreadAffinity;
 }
 
