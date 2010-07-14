@@ -19,6 +19,10 @@
 
 
 #include <cstddef>
+#include <string>
+#include <sstream>
+#include <cerrno>
+
 #include <sys/types.h>
 #include <dirent.h>
 #include <dlfcn.h>
@@ -30,12 +34,14 @@
 #include <sys/param.h>
 #include <sys/sysctl.h>
 #if defined(__APPLE__) 
-#include <Carbon/Carbon.h> /* Carbon APIs for Multiprocessing */
+//#include <Carbon/Carbon.h> /* Carbon APIs for Multiprocessing (TODO) */
 #endif
 #else
 // Define _GNU_SOURCE in order to have access to pthread_set/getaffinity_np
-//#define _GNU_SOURCE
-//#include <pthread.h>
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <pthread.h>
 #endif
 
 #include <tgf.h>
@@ -655,32 +661,46 @@ unsigned linuxGetNumberOfCPUs()
 * Remarks
 *    
 */
+std::string cpuSet2String(const cpu_set_t* pCPUSet)
+{
+	std::ostringstream ossCPUSet;
+	for (int nCPUIndex = 0; nCPUIndex < CPU_SETSIZE; nCPUIndex++)
+		if (CPU_ISSET(nCPUIndex, pCPUSet))
+		{
+			if (ossCPUSet.tellp() > 0)
+				ossCPUSet << ',';
+			ossCPUSet << nCPUIndex;
+		}
+	
+	return ossCPUSet.str();
+}
+
 bool
 linuxSetThreadAffinity(int nCPUId)
 {
-#if 0
 // MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 
     GfOut("Warning: Thread affinity not yet implemented on Mac OS X or BSD.\n");
-    return false;
+	// TODO.
 
 // Linux, Solaris, AIX ... with NPTL (Native POSIX Threads Library)
 #elif defined(linux) || defined(__linux__)
 
 	// Get the handle for the current thread.
     pthread_t hCurrThread = pthread_self();
-    GfOut("Current pthread handle is 0x%X\n", hCurrThread);
 
 	// Determine the affinity mask to set for the current thread.
 	cpu_set_t nThreadAffinityMask;
 	CPU_ZERO(&nThreadAffinityMask);
-	if (nCPUId == GfAffinityAnyCore)
+	if (nCPUId == GfAffinityAnyCPU)
 	{
 		// No special affinity on any CPU => set "system" affinity mask
 		// (1 bit for each installed CPU).
 		for (int nCPUIndex = 0; nCPUIndex < linuxGetNumberOfCPUs(); nCPUIndex++)
+		{
 			CPU_SET(nCPUIndex, &nThreadAffinityMask);
+		}
 	}
 	else
 	{	
@@ -691,13 +711,13 @@ linuxSetThreadAffinity(int nCPUId)
     // Set the affinity mask for the current thread ("stick" it to the target core).
 	if (pthread_setaffinity_np(hCurrThread, sizeof(nThreadAffinityMask), &nThreadAffinityMask))
     {
-        GfError("Failed to set current pthread (handle=0x%X) affinity mask to 0x%X)\n",
-                hCurrThread, nThreadAffinityMask);
+        GfError("Failed to set current pthread (handle=0x%X) affinity on CPU(s) %s (%s)\n",
+                hCurrThread, cpuSet2String(&nThreadAffinityMask).c_str(), strerror(errno));
         return false;
     }
     else
-        GfOut("Affinity mask set to 0x%X for current pthread (handle=0x%X)\n",
-              nThreadAffinityMask, hCurrThread);
+        GfOut("Affinity set on CPU(s) %s for current pthread (handle=0x%X)\n",
+              cpuSet2String(&nThreadAffinityMask).c_str(), hCurrThread);
 
     return true;
 
@@ -706,11 +726,10 @@ linuxSetThreadAffinity(int nCPUId)
 
 #warning "linuxspec.cpp::linuxSetThreadAffinity : Unsupported Linux OS"
     GfOut("Warning: Thread affinity not yet implemented on this unknown Unix.\n");
-    return false;
 
 #endif
-#endif
-    return true; // Temporary empty and silent implementation.
+
+	return false;
 }
 
 /*
