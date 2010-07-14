@@ -348,11 +348,6 @@ typedef struct RmInfo
 #define RM_VAL_MORE_CLOUDS	"more clouds"
 #define RM_VAL_OVERCAST_CLOUDS	"overcast clouds"
 
-#define RM_VAL_NO_CLOUDS	"no clouds"
-#define RM_VAL_SCARCE_CLOUDS	"scarce clouds"
-#define RM_VAL_MORE_CLOUDS	"more clouds"
-#define RM_VAL_OVERCAST_CLOUDS	"overcast clouds"
-
 /* Movie capture */
 
 #define RM_SECT_MOVIE_CAPTURE	"Movie Capture"
