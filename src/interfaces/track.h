@@ -570,8 +570,8 @@ typedef struct
     int		  Timeday;   /**< time */
     int		  Rain;
     int		  rainprob;
-	int		  rainlprob; /** Probability little rain */
-	int		  probrain;	 /** Probability normal rain */
+    int		  rainlprob; /** Probability little rain */
+    int		  probrain;	 /** Probability normal rain */
     int		  nseg;		/**< Number of segments */
     int		  version;	/**< Version of the track type */
     int		  skyversion;   /**< Version Sky */
