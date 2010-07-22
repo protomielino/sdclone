@@ -55,7 +55,7 @@
     </section>
 	
 	<section name="9">
-      <attstr name="name" val="michigan"/>
+      <attstr name="name" val="manton"/>
       <attstr name="category" val="speedway"/>
     </section>
 
@@ -270,27 +270,6 @@
       <attnum name="idx" val="10"/>
       <attstr name="module" val="simplix_indy"/>
     </section>
-
-    <section name="11">
-      <attnum name="idx" val="11"/>
-      <attstr name="module" val="simplix_indy"/>
-    </section>
-
-    <section name="12">
-      <attnum name="idx" val="12"/>
-      <attstr name="module" val="simplix_indy"/>
-    </section>
-
-    <section name="13">
-      <attnum name="idx" val="13"/>
-      <attstr name="module" val="simplix_indy"/>
-    </section>
-
-    <section name="14">
-      <attnum name="idx" val="14"/>
-      <attstr name="module" val="simplix_indy"/>
-    </section>
-
   </section>
 
   <section name="Configuration">

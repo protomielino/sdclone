@@ -927,13 +927,13 @@ int
 ReInitTrack(void)
 {
     const char	*trackName;
-	const char	*catName;
-	const char 	*raceName;
+    const char	*catName;
+    const char 	*raceName;
 
     int	curTrkIdx;
-	int	cloud;
-	int	Timeday;
-	//int	rain;
+    int	cloud;
+    int	Timeday;
+    //int	rain;
 
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
@@ -953,20 +953,33 @@ ReInitTrack(void)
     sprintf(buf, "Loading track %s ...", trackName);
     RmLoadingScreenSetText(buf);
 
-	Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
-	cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
+    Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
+    cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
 
-	printf("Race Name = %s\n", raceName);
-	sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
-    	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
+    printf("Race Name = %s\n", raceName);
+    sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
+    ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
-	ReInfo->track->weather = cloud;
-	ReInfo->track->Timeday = Timeday;
+    ReInfo->track->weather = cloud;
+    ReInfo->track->Timeday = Timeday;
 	
     reDumpTrack(ReInfo->track, 0.0);
 
-	ReStartWeather();
-    	return 0;
+    ReStartWeather();
+
+    //DEBUG WEATHER - Verification function update friction
+    #ifdef DEBUG
+    	tTrack *track = ReInfo->track;
+    	tTrackSurface *curSurf;
+    	curSurf = track->surfaces;
+    	do
+    	{
+		printf("Raceinit Function Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+		curSurf = curSurf->next;
+    	} while ( curSurf != 0);
+    #endif
+   // End Function DEBUG TRACE Variable kFriction
+    return 0;
 }
 
 /**

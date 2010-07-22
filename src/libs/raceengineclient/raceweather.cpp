@@ -13,13 +13,13 @@
 void ReStartWeather(void)
 {
 	int	cloud;
-	int Timeday;
+	int 	Timeday;
 	int	rain;
-	int problrain;
-	int probrain;
+	int 	problrain;
+	int 	probrain;
 	int	rainbool;
 	int	resul;
-	int resul2;
+	int 	resul2;
 	tTrack *track = ReInfo->track;
 
 	srand((unsigned)time(NULL));
@@ -73,6 +73,7 @@ void ReStartWeather(void)
 		}
 	else
 		track->Rain = 0;
+		ReTrackUpdate();
 }
 
 // Update Track Physic
@@ -92,32 +93,40 @@ void ReTrackUpdate(void)
 			{
 				curSurf->kFriction     = curSurf->kFriction2;
     				curSurf->kRollRes      = curSurf->kRollRes2;
-				printf("Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+				#ifdef DEBUG
+					printf("ReTrackUpdate Function Friction = %f - RollRes = %f Little Rain\n", curSurf->kFriction, curSurf->kRollRes);
+				#endif
 				break;
 			}
 			case 2:
 			{
-				curSurf->kFriction     = curSurf->kFriction2 * 0.8f;
-    				curSurf->kRollRes      = curSurf->kRollRes2;;
-				printf("Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+				curSurf->kFriction     = curSurf->kFriction2 * 0.9f;
+    				curSurf->kRollRes      = curSurf->kRollRes2;
+				#ifdef DEBUG
+					printf("ReTrackUpdate Function Friction = %f - RollRes = %f Normal Rain\n", curSurf->kFriction, curSurf->kRollRes);
+				#endif
 				break;
 			}
 			case 3:
 			{
-				curSurf->kFriction     = curSurf->kFriction2 * 0.6f;
+				curSurf->kFriction     = curSurf->kFriction2 * 0.7f;
     				curSurf->kRollRes      = curSurf->kRollRes2;
-				printf("Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+				#ifdef DEBUG
+					printf("ReTrackUpdate Function Friction = %f - RollRes = %f Heavy Rain\n", curSurf->kFriction, curSurf->kRollRes);
+				#endif
 				break;
 			}
 			default:
 			{
 				curSurf->kFriction     = curSurf->kFriction;
     				curSurf->kRollRes      = curSurf->kRollRes;
-				printf("Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+				#ifdef DEBUG
+					printf("ReTrackUpdate Function Friction = %f - RollRes = %f No Rain\n", curSurf->kFriction, curSurf->kRollRes);
+				#endif				
 				break;
 			}
 		}							
 		
 		curSurf = curSurf->next;
-	} while ( curSurf->next != 0);
+	} while ( curSurf != 0);
 }

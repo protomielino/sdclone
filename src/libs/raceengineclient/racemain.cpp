@@ -493,7 +493,17 @@ ReRaceStart(void)
 	const char *raceName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
-
+	
+	#ifdef DEBUG
+		tTrack *track = ReInfo->track;
+    		tTrackSurface *curSurf;
+    		curSurf = track->surfaces;
+    		do
+    		{
+			printf("Raceinit Function Friction = %f - RollRes = %f No Rain\n", curSurf->kFriction, curSurf->kRollRes);
+			curSurf = curSurf->next;
+    		} while ( curSurf != 0);
+	#endif
 
 	FREEZ(ReInfo->_reCarInfo);
 	ReInfo->_reCarInfo = (tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));

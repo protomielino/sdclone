@@ -109,6 +109,10 @@ AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
     curSurf->kRoughWaveLen = (tdble)(2.0 * PI / GfParmGetNum(TrackHandle, path, TRK_ATT_ROUGHTWL, (char*)NULL, 1.0f));
     curSurf->kDammage      = GfParmGetNum(TrackHandle, path, TRK_ATT_DAMMAGE, (char*)NULL, 10.0f);
     curSurf->kRebound      = GfParmGetNum(TrackHandle, path, TRK_ATT_REBOUND, (char*)NULL, 0.5f);
+    
+    #ifdef DEBUG
+	printf("track loader kFriction : %f - kFriction2 : %f\n", curSurf->kFriction, curSurf->kFriction2);
+    #endif    
 
     curSurf->next = theTrack->surfaces;
     theTrack->surfaces = curSurf;
