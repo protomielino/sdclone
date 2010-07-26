@@ -226,7 +226,7 @@ grInitScene(void)
 		
 		//Add the Sun itself
 		//ssgaCelestialBody *bodies[MAX_BODIES] = { NULL };
-        bodies[SUN] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), skydynamic, true);
+        	bodies[SUN] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), skydynamic, true);
 		GLfloat	sunpos1 = 0.0f;
 		GLfloat	sunpos2 = 0.0f;
 		int cloudtype = 0;
@@ -1090,11 +1090,11 @@ grUpdateTime(tSituation *s)
 
 	/* Update */
 	sd = sd + 0.25f;
-	if (sd > 359.9)
-		sd = 0.0;
+	if (sd > 359.9f)
+		sd = 0.0f;
 	sd2 = sd2 + 0.25f;
-	if (sd2 > 359.9)
-		sd2 = 0.0;
+	if (sd2 > 359.9f)
+		sd2 = 0.0f;
 	
 	bodies[SUN]->setDeclination ( sd * SGD_DEGREES_TO_RADIANS);
 	bodies[MOON]->setDeclination (	sd2 * SGD_DEGREES_TO_RADIANS );
@@ -1135,5 +1135,5 @@ grUpdateTime(tSituation *s)
 	scene_specular[0] = base_specular[0] * (float)scene_brightness;
 	scene_specular[1] = base_specular[1] * (float)scene_brightness;
 	scene_specular[2] = base_specular[2] * (float)scene_brightness;
-    scene_specular[3] = 1.0;
+    	scene_specular[3] = 1.0;
 }
