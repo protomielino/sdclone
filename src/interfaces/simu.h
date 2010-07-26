@@ -40,12 +40,12 @@ typedef tDynPt* (*tfGetSimCarTable)(int index);
 
 typedef struct
 {
-    tfSimInit	  init;
-    tfSimConfig   config;
-    tfSimReConfig reconfig;
-    tfSimUpdate   update;
+    	tfSimInit	  init;
+    	tfSimConfig   config;
+    	tfSimReConfig reconfig;
+    	tfSimUpdate   update;
 	tfSimSingleUpdate   singleupdate;
-    tfSimShutdown shutdown;
+    	tfSimShutdown shutdown;
 	tfUpdateSimCarTable updatesimcartable;
 	tfGetSimCarTable getsimcartable;
 

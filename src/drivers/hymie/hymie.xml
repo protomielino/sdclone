@@ -28,6 +28,7 @@
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.7"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="2">
@@ -40,6 +41,7 @@
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.7"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="3">
@@ -52,6 +54,7 @@
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.7"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="4">
@@ -64,6 +67,7 @@
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.7"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="5">
@@ -76,6 +80,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="1.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="6">
@@ -88,6 +93,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="1.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="7">
@@ -100,6 +106,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="1.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="8">
@@ -112,6 +119,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="1.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="9">
@@ -124,6 +132,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="1.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
 
       <section name="10">
@@ -136,6 +145,7 @@
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="1.0"></attnum>
         <attnum name="blue" val="1.0"></attnum>
+	<attstr name="features" val="timed_session"></attstr>
       </section>
     </section>
 
@@ -146,6 +156,7 @@
       <attnum name="red" val="1.0"></attnum>
       <attnum name="green" val="1.0"></attnum>
       <attnum name="blue" val="1.0"></attnum>
+      <attstr name="features" val="timed_session"></attstr>
       <section name="cars">
         <section name="1">
           <attstr name="car name" val="sc-boxer-96" />

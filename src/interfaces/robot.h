@@ -109,6 +109,7 @@ typedef struct RobotItf {
 
 #define ROB_VAL_FEATURE_PENALTIES	"penalties"
 #define ROB_VAL_FEATURE_TIMEDSESSION	"timed_session"
+#define ROB_VAL_FEATURE_WEATHER		"weather"
 
 #endif /* _ROBOTV1_H_ */ 
 

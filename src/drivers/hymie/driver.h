@@ -41,6 +41,7 @@
 
 #define HYMIE_SECT_PRIV "hymie"
 #define HYMIE_ATT_FUELPERLAP "fuelperlap"
+#define HYMIE_ATT_FUELPERSECOND "fuelpersecond"
 #define HYMIE_ATT_MUFACTOR "mufactor"
 
 class Opponents;

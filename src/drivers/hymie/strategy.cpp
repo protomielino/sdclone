@@ -25,7 +25,7 @@
 #include "strategy.h"
 
 const float SimpleStrategy::MAX_FUEL_PER_METER = 0.0008f; // [kg/m] fuel consumtion.
-
+const float SimpleStrategy::MAX_FUEL_PER_SECOND = 2.7f/60.0f;	// [kg/s] fuel consumtion.
 
 SimpleStrategy::SimpleStrategy() :
  fuelchecked(false),
@@ -48,10 +48,13 @@ SimpleStrategy::~SimpleStrategy()
 void SimpleStrategy::setFuelAtRaceStart(tTrack* t, void **carParmHandle, tSituation *s)
 {
  // Load and set parameters.
- float fuel = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, HYMIE_ATT_FUELPERLAP, (char*) NULL, t->length*MAX_FUEL_PER_METER);
+ float fuel = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, HYMIE_ATT_FUELPERSECOND, (char*) NULL, MAX_FUEL_PER_SECOND);
+ expectedfuelpersecond = fuel;
+ fuel = GfParmGetNum(*carParmHandle, HYMIE_SECT_PRIV, HYMIE_ATT_FUELPERLAP, (char*) NULL, t->length*MAX_FUEL_PER_METER);
  expectedfuelperlap = fuel;
  maxfuel = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, (char*) NULL, 100.0);
  fuel *= (s->_totLaps + 1.0);
+ fuel += expectedfuelpersecond * MAX(s->_totTime,0);
  lastfuel = MIN(fuel, maxfuel);
  if (s->_raceType == RM_TYPE_PRACTICE)
   lastfuel = maxfuel;
@@ -180,6 +183,12 @@ bool SimpleStrategy::needPitstop(tCarElt* car, tSituation *s, Opponents *opp)
  if (laps > 0) 
  {
   float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;
+  if (s->_totTime > s->currentTime)
+  {
+	if (car->_laps > 2)
+		laps += (int)ceil( ( s->_totTime - s->currentTime ) / car->_bestLapTime + 0.3f );
+	// For the case car->laps <= 2, the old laps only makes a stronger constraight, so no read to calculate it
+  }				
   if (car->_fuel < 1.5*cmpfuel &&
       car->_fuel < laps*cmpfuel)
   {
@@ -252,6 +261,18 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
 {
  float fuel;
  float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;
+ int laps = car->_remainingLaps;
+ if (s->_totTime > s->currentTime)
+ {
+ 	if (car->_laps > 2)
+		laps += ( s->_totTime - s->currentTime ) / car->_bestLapTime;
+ }
+ else
+ {
+ 	// It has a pit stop in the first two laps. Normally we don't want to refuel.
+	// This will cause for at least sufficient fuel.
+	laps += 5;
+ }
  fuel = MAX(MIN((car->_remainingLaps+1.5)*cmpfuel - car->_fuel, car->_tank - car->_fuel), 0.0);
  imaxfuel =  GfParmGetNum(car->_carHandle, HYMIE_SECT_PRIV, "MaxFuel", (char*) NULL, fuel);
  if (imaxfuel > 0.0)
@@ -268,8 +289,12 @@ int SimpleStrategy::pitRepair(tCarElt* car, tSituation *s, Opponents *opp)
  pit_damage = 0;
  if (car->_dammage > PIT_DAMMAGE || car->_remainingLaps-car->_lapsBehindLeader > 40)
  {
-  float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;
-  float fuel = MAX(MIN((car->_remainingLaps+1.0)*cmpfuel, car->_tank), 0.0);
+  float laps = car->_remainingLaps + 1.0f;
+  if (car->_laps > 2 && s->_totTime > s->currentTime)
+	laps += ceil( ( s->_totTime - s->currentTime ) / car->_bestLapTime + 0.3f );
+  float cmpfuel = (fuelperlap == 0.0) ? expectedfuelperlap : fuelperlap;  
+  float fuel = MAX(MIN(laps*cmpfuel - car->_fuel, car->_tank), 0.0);
+
   if (fuel < car->_tank-15.0)
    dammage = MIN(car->_dammage, dammage);
   else
