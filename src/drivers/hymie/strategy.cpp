@@ -266,12 +266,12 @@ float SimpleStrategy::pitRefuel(tCarElt* car, tSituation *s)
  {
  	if (car->_laps > 2)
 		laps += ( s->_totTime - s->currentTime ) / car->_bestLapTime;
- }
- else
- {
- 	// It has a pit stop in the first two laps. Normally we don't want to refuel.
-	// This will cause for at least sufficient fuel.
-	laps += 5;
+  	else
+ 	{
+ 		// It has a pit stop in the first two laps. Normally we don't want to refuel.
+		// This will cause for at least sufficient fuel.
+		laps += 1;
+ 	}
  }
  fuel = MAX(MIN((car->_remainingLaps+1.5)*cmpfuel - car->_fuel, car->_tank - car->_fuel), 0.0);
  imaxfuel =  GfParmGetNum(car->_carHandle, HYMIE_SECT_PRIV, "MaxFuel", (char*) NULL, fuel);
