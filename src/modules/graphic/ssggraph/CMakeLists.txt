@@ -5,6 +5,8 @@ Find_Package(OpenAL)
 SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h 
 		     OpenalSoundInterface.cpp PlibSoundInterface.cpp
 		     SoundInterface.cpp SoundInterface.h TorcsSound.cpp TorcsSound.h 
+		     grCelestialBody.cpp grCloudLayer.cpp grSky.cpp grSky.h
+		     grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
 		     grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
                      grcarlight.cpp grcarlight.h grloadac.cpp grmain.cpp grmain.h 
 		     grmultitexstate.cpp grmultitexstate.h

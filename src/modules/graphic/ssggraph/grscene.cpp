@@ -26,7 +26,6 @@
 
 #include <plib/ssg.h>
 #include <plib/ssgAux.h>
-#include <plib/ssgaSky.h>
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
 
@@ -36,6 +35,7 @@
 #include "grutil.h"
 #include "grssgext.h"
 #include "grrain.h"
+#include "grSky.h"
 
 #define MAX_BODIES	2
 #define MAX_CLOUDS	3
@@ -87,10 +87,11 @@ static GLuint BackgroundList2;
 static GLuint BackgroundTex2;
 
 static ssgRoot *TheBackground = NULL;
-static ssgaSky *Sky = NULL;
+static grSky *Sky = NULL;
 static ssgTransform *TheSun = NULL;
 
-static ssgaCelestialBody *bodies[MAX_BODIES] = { NULL };
+static grCelestialBody *bodies[MAX_BODIES] = { NULL };
+static grMoon *Moon = NULL;
 
 static sgdVec3 *star_data = NULL;
 static sgdVec3 *planet_data = NULL;
@@ -212,16 +213,16 @@ grInitScene(void)
 		star_data = new sgdVec3[NSTARS];
 		for(int i= 0; i < NSTARS; i++) 
 		{
-			star_data[i][0] = ssgaRandom() * SGD_PI;
-			star_data[i][1] = ssgaRandom() * SGD_PI;
-			star_data[i][2] = ssgaRandom();
+			star_data[i][0] = grRandom() * SGD_PI;
+			star_data[i][1] = grRandom() * SGD_PI;
+			star_data[i][2] = grRandom();
 		}//for i
 
 		//No planets
 		//sgdVec3 *planet_data = NULL;
 
 		//Build the sky
-		Sky	= new ssgaSky;
+		Sky	= new grSky;
 		Sky->build(skydynamic, skydynamic, NPLANETS, planet_data, NSTARS, star_data);
 		
 		//Add the Sun itself
@@ -269,7 +270,7 @@ grInitScene(void)
 		bodies[SUN]->setRightAscension ( sunpos2 * SGD_DEGREES_TO_RADIANS);
 
 		//Add the Moon
-		bodies[MOON] = Sky->addBody ( "data/textures/moon.rgba", NULL, (2500 / div), skydynamic);
+		bodies[MOON] = Sky->addBody ( "data/textures/moon.rgba",NULL, (2500 / div), skydynamic);
 		if ( sd < 0 )
 			sd2 = 3.0 + (rand() % 25);
 		else
@@ -303,7 +304,7 @@ grInitScene(void)
 
 		printf("Cloud = %d", cloudtype);
 
-		ssgaCloudLayer *clouds[MAX_CLOUDS] = { NULL };
+		grCloudLayer *clouds[MAX_CLOUDS] = { NULL };
 		sprintf(buf, "data/textures/scattered%d.rgba", cloudtype);//scattered1, scattered2, etc
 		if (RainBool > 0)
 			clouds[0] = Sky->addCloud(buf, skydynamic, 650, 400 * div, 400 * div);
