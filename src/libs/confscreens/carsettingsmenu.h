@@ -28,7 +28,7 @@ class CONFSCREENS_API CarSettingsMenu : public GfuiMenuScreen
 {
 public:
 
-	CarSettingsMenu(){};
+	CarSettingsMenu();
 	bool Init(void *pPrevMenu,const char *pzaCar);
 	void Activate(void* p);
 protected:
@@ -36,7 +36,7 @@ protected:
 	static void onActCB(void *p);
 	static void onAcceptCB(void *p);
 	static void onCancelCB(void *p);
-	static void CarPickCB(tChoiceInfo * pInfo);
+	static void CarPickCB(tComboBoxInfo * pInfo);
 
 	static std::string m_strCar;
 };

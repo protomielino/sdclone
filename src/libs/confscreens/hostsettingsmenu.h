@@ -27,20 +27,21 @@
 class CONFSCREENS_API HostSettingsMenu : public GfuiMenuScreen
 {
 public:
-
-	HostSettingsMenu(){ m_bCollisions = true;};
+	HostSettingsMenu();
 	bool Init(void *pPrevMenu);
 	void Activate(void* p);
+	
 protected:
 	//callback functions must be static
 	static void onActCB(void *p);
 	static void onAcceptCB(void *p);
 	static void onCancelCB(void *p);
-	static void CarControlCB(tChoiceInfo * pInfo);
-	static void CarCollideCB(tChoiceInfo * pInfo);
-	static void humanhostCB(tChoiceInfo *pChoices);
+	static void CarControlCB(tComboBoxInfo * pInfo);
+	static void CarCollideCB(tComboBoxInfo * pInfo);
+	static void humanHostCB(tComboBoxInfo *pChoices);
 	static void onPlayerReady(void *p);
 
+protected:
 	static  std::string m_strCarCat;
 	static bool m_bCollisions;
 	static bool m_bHumanHost;

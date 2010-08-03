@@ -30,30 +30,30 @@ This file deals with network host settings
 static void *pPrevMenu = NULL;
 
 std::string HostSettingsMenu::m_strCarCat;
-bool HostSettingsMenu::m_bCollisions;
-bool HostSettingsMenu::m_bHumanHost;
+bool HostSettingsMenu::m_bCollisions = true;
+bool HostSettingsMenu::m_bHumanHost = true;
 
 
 void HostSettingsMenu::onActCB(void *p)
 {
 }
 
-void HostSettingsMenu::CarControlCB(tChoiceInfo *pChoices)
+void HostSettingsMenu::CarControlCB(tComboBoxInfo *pInfo)
 {
-	m_strCarCat = pChoices->vecChoices[pChoices->nPos];
+	m_strCarCat = pInfo->vecChoices[pInfo->nPos];
 }
 
-void HostSettingsMenu::CarCollideCB(tChoiceInfo *pChoices)
+void HostSettingsMenu::CarCollideCB(tComboBoxInfo *pInfo)
 {
-	if (pChoices->vecChoices[pChoices->nPos] == "Off")
+	if (pInfo->vecChoices[pInfo->nPos] == "Off")
 		m_bCollisions = false;
 	else
 		m_bCollisions = true;
 
 }
-void HostSettingsMenu::humanhostCB(tChoiceInfo *pChoices)
+void HostSettingsMenu::humanHostCB(tComboBoxInfo *pInfo)
 {
-	if (pChoices->vecChoices[pChoices->nPos] == "Yes")
+	if (pInfo->vecChoices[pInfo->nPos] == "Yes")
 		m_bHumanHost = true;
 	else
 		m_bHumanHost = false;
@@ -76,49 +76,53 @@ void HostSettingsMenu::onCancelCB(void *p)
 	GfuiScreenActivate(pPrevMenu);
 }
 
+HostSettingsMenu::HostSettingsMenu()
+: GfuiMenuScreen("hostsettingsmenu.xml")
+{
+}
+
 bool HostSettingsMenu::Init(void* pMenu)
 {
 	GetNetwork()->GetHostSettings(m_strCarCat,m_bCollisions);
 
 	pPrevMenu = pMenu;
 
-	m_pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActCB, 
-					 NULL, (tfuiCallback)NULL, 
-					 1);
+	void* pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActCB, 
+										   NULL, (tfuiCallback)NULL, 
+										   1);
+	SetMenuHandle(pMenuHandle);
 
-    void *param = LoadMenuXML("hostsettingsmenu.xml");
-    CreateStaticControls(param,m_pMenuHandle);
+    OpenXMLDescriptor();
     
-	int carCatId = CreateComboboxControl(m_pMenuHandle,param,"carcatcombobox",CarControlCB);
-	std::vector<std::string> vecCategories;
-	GetCarInfo()->GetCategories(vecCategories);
+    CreateStaticControls();
+
+	int carCatId = CreateComboboxControl("carcatcombobox",NULL,CarControlCB);
+	const std::vector<std::string> vecCategories = CarInfo::self()->GetCategoryNames();
 	
 	int CatIndex = 0;
 	for (unsigned int i=0;i<vecCategories.size();i++)
 	{
-		GfuiComboboxAddText(m_pMenuHandle,carCatId,vecCategories[i].c_str());
+		GfuiComboboxAddText(pMenuHandle,carCatId,vecCategories[i].c_str());
 		if (m_strCarCat == vecCategories[i])
 			CatIndex = i;
 	}
 
-	GfuiComboboxSetSelectedIndex(m_pMenuHandle,carCatId,CatIndex);
+	GfuiComboboxSetSelectedIndex(pMenuHandle,carCatId,CatIndex);
 
-	int collId = CreateComboboxControl(m_pMenuHandle,param,"carcollidecombobox",CarCollideCB);
-	GfuiComboboxAddText(m_pMenuHandle,collId,"On");
-	GfuiComboboxAddText(m_pMenuHandle,collId,"Off");
+	int collId = CreateComboboxControl("carcollidecombobox",NULL,CarCollideCB);
+	GfuiComboboxAddText(pMenuHandle,collId,"On");
+	GfuiComboboxAddText(pMenuHandle,collId,"Off");
 
-	int humanHostId = CreateComboboxControl(m_pMenuHandle,param,"hosthumanplayercombobox",humanhostCB);
-	GfuiComboboxAddText(m_pMenuHandle,humanHostId,"Yes");
-	GfuiComboboxAddText(m_pMenuHandle,humanHostId,"No");
+	int humanHostId = CreateComboboxControl("hosthumanplayercombobox",NULL,humanHostCB);
+	GfuiComboboxAddText(pMenuHandle,humanHostId,"Yes");
+	GfuiComboboxAddText(pMenuHandle,humanHostId,"No");
 
-	GfuiComboboxSetSelectedIndex(m_pMenuHandle,humanHostId,0);
+	GfuiComboboxSetSelectedIndex(pMenuHandle,humanHostId,0);
 
-    CreateButtonControl(m_pMenuHandle,param,"accept",NULL,onAcceptCB);
-    CreateButtonControl(m_pMenuHandle,param,"cancel",NULL,onCancelCB);
+    CreateButtonControl("accept",NULL,onAcceptCB);
+    CreateButtonControl("cancel",NULL,onCancelCB);
 
-    GfParmReleaseHandle(param);
-
-    GfuiScreenActivate(m_pMenuHandle);
+    CloseXMLDescriptor();
 
 	return true;
 }

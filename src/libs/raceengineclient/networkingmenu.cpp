@@ -130,11 +130,11 @@ void EnableMenuHostButtons(bool bChecked)
 
 }
 
-void onHostPlayerReady(bool bChecked)
+void onHostPlayerReady(tCheckBoxInfo* pInfo)
 {
-	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,bChecked);
-	GetNetwork()->SetDriverReady(bChecked);
-	EnableMenuHostButtons(bChecked);
+	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
+	GetNetwork()->SetDriverReady(pInfo->bChecked);
+	EnableMenuHostButtons(pInfo->bChecked);
 }
 
 void EnableMenuClientButtons(bool bChecked)
@@ -152,11 +152,11 @@ void EnableMenuClientButtons(bool bChecked)
 	}
 }
 
-void onClientPlayerReady(bool bChecked)
+void onClientPlayerReady(tCheckBoxInfo* pInfo)
 {
-	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,bChecked);
-	GetNetwork()->SetDriverReady(bChecked);
-	EnableMenuClientButtons(bChecked);
+	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
+	GetNetwork()->SetDriverReady(pInfo->bChecked);
+	EnableMenuClientButtons(pInfo->bChecked);
 }
 
 std::string 
@@ -285,7 +285,7 @@ UpdateNetworkPlayers()
 		const char* name = GfParmGetStr(pMod, ppname, RM_ATTR_NAME, "");
 
 		const char* car = GfParmGetStr(pMod, ppname, "car name", "");
-		std::string strRealCar = GetCarInfo()->GetRealCarName(car);
+		std::string strRealCar = CarInfo::self()->GetCarRealName(car);
 
 		int readyindex = 0;
 		MutexData *pNData = GetNetwork()->LockNetworkData();
@@ -383,8 +383,8 @@ void CheckDriversCategory()
 	if (strCarCat =="All")
 		return;
 
-	std::vector<std::string> vecCars;
-	GetCarInfo()->GetCarsInCategory(strCarCat.c_str(),vecCars);
+	const std::vector<std::string> vecCars =
+		CarInfo::self()->GetCarNamesInCategory(strCarCat);
 
 	//Make sure all cars are in the correct category or force change of car
 	Driver *pDrivers = NULL;
@@ -394,8 +394,8 @@ void CheckDriversCategory()
 	count = pSData->m_vecNetworkPlayers.size();
 	for (unsigned int i=0;i<count;i++)
 	{
-		CarData * pData = GetCarInfo()->GetCarData(pSData->m_vecNetworkPlayers[i].car);
-		if (pData->strCategory!=strCarCat)
+		CarData * pData = CarInfo::self()->GetCarData(pSData->m_vecNetworkPlayers[i].car);
+		if (pData->strCategoryName!=strCarCat)
 		{
 			//Pick first car in categroy
 			strncpy(pSData->m_vecNetworkPlayers[i].car,vecCars[0].c_str(),64);
@@ -615,8 +615,7 @@ reNetworkHostMenu(void * /* dummy */)
  
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
-	std::vector<std::string> vecCat;
-	GetCarInfo()->GetCategories(vecCat);
+	std::vector<std::string> vecCat = CarInfo::self()->GetCategoryNames();
 	vecCat.push_back("All Cars");
 
 
@@ -647,7 +646,7 @@ reNetworkHostMenu(void * /* dummy */)
 		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
     }
 
-	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onHostPlayerReady);
+	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",NULL,onHostPlayerReady);
 	g_HostSettingsButtonId = CreateButtonControl(racemanMenuHdle,mparam,"networkhostsettings",racemanMenuHdle,reNetworkHostSettingsMenu);
 	g_RaceSetupId = CreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,ReConfigureMenu);
 	g_CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
@@ -756,7 +755,7 @@ reNetworkClientConnectMenu(void * /* dummy */)
 		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
 	}
 
-	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",onClientPlayerReady);
+	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",NULL,onClientPlayerReady);
 	g_CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
 
 	g_DisconnectButtonId = CreateButtonControl(racemanMenuHdle,mparam,"disconnect",NULL,reNetworkClientDisconnect);

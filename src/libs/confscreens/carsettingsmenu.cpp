@@ -35,14 +35,14 @@ void CarSettingsMenu::onActCB(void *P)
 
 }
 
-void CarSettingsMenu::CarPickCB(tChoiceInfo *pChoices)
+void CarSettingsMenu::CarPickCB(tComboBoxInfo *pInfo)
 {
-	m_strCar = pChoices->vecChoices[pChoices->nPos];
+	m_strCar = pInfo->vecChoices[pInfo->nPos];
 }
 
 void CarSettingsMenu::onAcceptCB(void *p)
 {
-	CarData *pData = GetCarInfo()->GetCarDataFromRealName(m_strCar.c_str());
+	CarData *pData = CarInfo::self()->GetCarDataFromRealName(m_strCar);
 	GetNetwork()->SetCarInfo(pData->strName.c_str());
 	GfuiScreenActivate(pPrevMenu);
 }
@@ -52,6 +52,11 @@ void CarSettingsMenu::onCancelCB(void *p)
 	GfuiScreenActivate(pPrevMenu);
 }
 
+CarSettingsMenu::CarSettingsMenu()
+: GfuiMenuScreen("carselectionmenu.xml")
+{
+}
+
 bool CarSettingsMenu::Init(void* pMenu,const char *pszCar)
 {
 	std::string strCarCat;
@@ -59,41 +64,41 @@ bool CarSettingsMenu::Init(void* pMenu,const char *pszCar)
 	GetNetwork()->GetHostSettings(strCarCat,bCollisions);
 	pPrevMenu = pMenu;
 
-	m_pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActCB, 
-					 NULL, (tfuiCallback)NULL, 
-					 1);
+	void* pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActCB, 
+										   NULL, (tfuiCallback)NULL, 
+										   1);
+	SetMenuHandle(pMenuHandle);
 
-    void *param = LoadMenuXML("carselectionmenu.xml");
-    CreateStaticControls(param,m_pMenuHandle);
+    OpenXMLDescriptor();
     
-	int carCatId = CreateComboboxControl(m_pMenuHandle,param,"modelcombo",CarPickCB);
-	int skinId = CreateComboboxControl(m_pMenuHandle,param,"skincombo",NULL);
-	int carImageId = CreateStaticImageControl(m_pMenuHandle,param,"carpreviewimage");
-	int progressId = CreateProgressbarControl(m_pMenuHandle,param,"topspeedprogress");
-	int accelerationId = CreateProgressbarControl(m_pMenuHandle,param,"accelerationprogress");
-	int handlingId = CreateProgressbarControl(m_pMenuHandle,param,"handlingprogress");
-	int brakingId = CreateProgressbarControl(m_pMenuHandle,param,"brakingprogress");
+    CreateStaticControls();
+    
+	int carCatId = CreateComboboxControl("modelcombo",NULL,CarPickCB);
+	int skinId = CreateComboboxControl("skincombo",NULL,NULL);
+	int carImageId = CreateStaticImageControl("carpreviewimage");
+	int progressId = CreateProgressbarControl("topspeedprogress");
+	int accelerationId = CreateProgressbarControl("accelerationprogress");
+	int handlingId = CreateProgressbarControl("handlingprogress");
+	int brakingId = CreateProgressbarControl("brakingprogress");
 
-	std::vector<std::string> vecCars;	
-	GetCarInfo()->GetCarsInCategoryRealName(strCarCat.c_str(),vecCars);
+	const std::vector<std::string> vecCarRealNames =
+		CarInfo::self()->GetCarRealNamesInCategory(strCarCat);
 	
 	m_strCar = pszCar;
 	int carIndex = 0;
-	for (unsigned i=0;i<vecCars.size();i++)
+	for (unsigned i=0;i<vecCarRealNames.size();i++)
 	{
-		GfuiComboboxAddText(m_pMenuHandle,carCatId,vecCars[i].c_str());
-		if (vecCars[i] == m_strCar)
+		GfuiComboboxAddText(pMenuHandle,carCatId,vecCarRealNames[i].c_str());
+		if (vecCarRealNames[i] == m_strCar)
 			carIndex = i;
 	}
 	
-	GfuiComboboxSetSelectedIndex(m_pMenuHandle,carCatId,carIndex);
+	GfuiComboboxSetSelectedIndex(pMenuHandle,carCatId,carIndex);
 
-	CreateButtonControl(m_pMenuHandle,param,"accept",NULL,onAcceptCB);
-    CreateButtonControl(m_pMenuHandle,param,"cancel",NULL,onCancelCB);
+	CreateButtonControl("accept",NULL,onAcceptCB);
+    CreateButtonControl("cancel",NULL,onCancelCB);
 
-    GfParmReleaseHandle(param);
-
-    GfuiScreenActivate(m_pMenuHandle);
-
+    OpenXMLDescriptor();
+    
 	return true;
 }
