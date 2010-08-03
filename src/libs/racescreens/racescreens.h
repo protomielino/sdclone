@@ -52,7 +52,7 @@ typedef struct
     void        *param;
     void        *prevScreen;	/* Race manager screen to go back */
     void        *nextScreen;	/* Race manager screen to go after select */
-} tRmDrvSelect;
+} tRmDriverSelect;
 
 typedef struct
 {

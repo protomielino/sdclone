@@ -26,6 +26,11 @@
 
 #include <tgf.h>
 
+#include <string>
+#include <vector>
+//#include <map>
+
+
 // Driver description
 typedef struct rmdDrvElt
 {
@@ -34,14 +39,27 @@ typedef struct rmdDrvElt
     char	*name;		// Driver name
     int		isSelected;	// Selected for race ?
     int		isHuman;	// Human driver ?
+    char	*carName;		// Car (folder) name
+    char	*skinName;		// Skin name
     void	*carParmHdle;	// Handle to the car XML params file
     GF_TAILQ_ENTRY(struct rmdDrvElt)	link;
 } trmdDrvElt;
 
+// Some consts.
+extern const char* rmdStdSkinName;
+
+
 extern void rmdGetDriverType(const char* moduleName, char* driverType, size_t maxSize);
 extern int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
-				   const char* anyCarCat, const char* anyDrvTyp);
+								   const char* anyCarCat, const char* anyDrvTyp);
 
+extern void rmdGetCarSkinsInFolder(const trmdDrvElt *pDriver, const char* pszFolderPath,
+								   std::vector<std::string>& lstSkinNames,
+								   std::vector<std::string>& lstPreviewFiles);
+
+extern void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver,
+									   std::vector<std::string>& lstSkinNames,
+									   std::vector<std::string>& lstPreviewFiles);
 
 #endif /* __DRIVER_H__ */
 

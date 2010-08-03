@@ -290,6 +290,7 @@ typedef struct RmInfo
 
 #define RM_ATTR_MODULE		"module"
 #define RM_ATTR_IDX		"idx"
+#define RM_ATTR_SKIN		"skin"
 #define RM_ATTR_EXTENDED	"extended"
 #define RM_ATTR_SKILLLEVEL	"skill level"
 #define RM_ATTR_FOCUSED		"focused module"

@@ -45,7 +45,7 @@
 static void		*racemanMenuHdle = NULL;
 static void		*newTrackMenuHdle = NULL;
 static tRmTrackSelect	ts;
-static tRmDrvSelect	ds;
+static tRmDriverSelect	ds;
 static tRmRaceParam	rp;
 static tRmFileSelect    fs;
 

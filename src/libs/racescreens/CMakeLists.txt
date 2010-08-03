@@ -2,9 +2,10 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(racescreens)
 
-SET(RACESCREENS_SOURCES driverselect.cpp fileselect.cpp loadingscreen.cpp miscscreens.cpp 
+SET(RACESCREENS_SOURCES carselect.cpp driverselect.cpp fileselect.cpp
+                        loadingscreen.cpp miscscreens.cpp 
                         pitmenu.cpp racemenu.cpp results.cpp trackselect.cpp
-			driver.cpp util.cpp driver.h racescreens.h)
+                        driver.cpp util.cpp driver.h racescreens.h)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()

@@ -24,106 +24,157 @@
 */
 
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <cstring>
 #include <sys/stat.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
 #include <string>
-#include <list>
+#include <sstream>
 #include <vector>
+#include <map>
 #include <algorithm>
-
-
 
 #include <tgfclient.h>
 #include <track.h>
 #include <car.h>
 #include <raceman.h>
 #include <robot.h>
+
 #include "racescreens.h"
 #include "driver.h"
+#include "carselect.h"
+
 
 // Uncomment to re-activate focus managment (what for ?)
 //#define FOCUS on
 
 static void		*ScrHandle;
-static tRmDrvSelect	*DrvSel;
-static int		SelectedScrollList, UnSelectedScrollList;
-static int		CarCatEditId;
-static int		DrvTypEditId;
+static tRmDriverSelect	*MenuData;
+static int		CompetitorsScrollList, CandidatesScrollList;
+static int		SelectButtonId, DeselectButtonId;
+static int		CarCategoryEditId;
+static int		DriverTypeEditId;
+static int		SkinEditId;
+static int		SkinLeftButtonId, SkinRightButtonId;
+static int		CarImageId;
 #ifdef FOCUS
-static int		FocDrvLabelId;
+static int		FocusedDriverLabelId;
 #endif
-static int		PickDrvTypLabelId;
-static int		PickDrvCarLabelId;
-static int		PickDrvCategoryLabelId;
-static int      AcceptId;
+static int		PickedDriverTypeLabelId;
+static int		PickedDriverCarLabelId;
+static int		PickedDriverCarCategoryLabelId;
+
+static int      NextButtonId;
+static int      ChangeCarButtonId;
+
+static RmCarSelectMenu CarSelectMenu;
+
 static int		NbTotDrivers;
 static int		NbSelectedDrivers;
 static int		NbMaxSelectedDrivers;
 
 // Car category list
-static const char* AnyCarCat = "--- All ---";
-static std::vector<std::string> CarCatList;
-static size_t CurCarCatIndex = 0;
+static const char* AnyCarCategory = "--- All ---";
+static std::vector<std::string> CarCategoryList;
+static size_t CurCarCategoryIndex = 0;
 
 // Driver type list
-static const char* AnyDrvTyp = "--- All ---";
-static std::vector<std::string> DrvTypList;
-static size_t CurDrvTypIndex = 0;
+static const char* AnyDriverType = "--- All ---";
+static std::vector<std::string> DriverTypeList;
+static size_t CurDriverTypeIndex = 0;
+
+// Skin name and preview file lists
+static std::vector<std::string> SkinNameList;
+static std::vector<std::string> PreviewFileList;
+static size_t CurSkinIndex = 0;
 
 // Driver full list
-GF_TAILQ_HEAD(DrvListHead, trmdDrvElt);
-static tDrvListHead DrvList;
-
+GF_TAILQ_HEAD(DriverListHead, trmdDrvElt);
+static tDriverListHead DriverList;
 
 // Local functions.
-static void rmdsFreeDrvList(void);
-static void rmdsFilterDrvScrollList(const char* carCat, const char* drvTyp);
+static void rmdsCleanup(void);
+static void rmdsFilterDriverScrollList(const char* carCat, const char* driverType);
+static trmdDrvElt* rmdsGetHighlightedDriver();
+static bool rmdsIsAnyCompetitorHighlighted();
 
 
 // Screen activation call-back.
 static void
 rmdsActivate(void * /* notused */)
 {
+// 	if (rmdsIsAnyCompetitorHighlighted())
+// 		GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_INVISIBLE);
+// 	GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_INVISIBLE);
 }
 
 // Screen de-activation call-back.
 static void
-rmdsDeactivate(void *screen)
+rmdsDeactivate(void *nextScreenHdle)
 {
-    rmdsFreeDrvList();    
+    rmdsCleanup();    
     GfuiScreenRelease(ScrHandle);
     
-    if (screen) {
-	GfuiScreenActivate(screen);
-    }
+    if (nextScreenHdle)
+	GfuiScreenActivate(nextScreenHdle);
 }
 
 static void
-rmdsChangeCarCat(void *vp)
+rmdsChangeCarCategory(void *vp)
 {
-    if (vp)
-	CurCarCatIndex = (CurCarCatIndex + 1) % CarCatList.size();
-    else
- 	CurCarCatIndex = (CurCarCatIndex + CarCatList.size() - 1) % CarCatList.size();
+	CurCarCategoryIndex =
+		(CurCarCategoryIndex + CarCategoryList.size() + (int)(long)vp) % CarCategoryList.size();
 
-    GfuiLabelSetText(ScrHandle, CarCatEditId, CarCatList[CurCarCatIndex].c_str());
+    GfuiLabelSetText(ScrHandle, CarCategoryEditId, CarCategoryList[CurCarCategoryIndex].c_str());
 
-    rmdsFilterDrvScrollList(CarCatList[CurCarCatIndex].c_str(), DrvTypList[CurDrvTypIndex].c_str());
+    rmdsFilterDriverScrollList(CarCategoryList[CurCarCategoryIndex].c_str(),
+							   DriverTypeList[CurDriverTypeIndex].c_str());
+
+	if (rmdsIsAnyCompetitorHighlighted())
+		GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_VISIBLE);
 }
 
 static void
-rmdsChangeDrvTyp(void *vp)
+rmdsChangeDriverType(void *vp)
 {
-    if (vp)
-	CurDrvTypIndex = (CurDrvTypIndex + 1) % DrvTypList.size();
-    else
- 	CurDrvTypIndex = (CurDrvTypIndex + DrvTypList.size() - 1) % DrvTypList.size();
+ 	CurDriverTypeIndex =
+		(CurDriverTypeIndex + DriverTypeList.size() + (int)(long)vp) % DriverTypeList.size();
 
-    GfuiLabelSetText(ScrHandle, DrvTypEditId, DrvTypList[CurDrvTypIndex].c_str());
+    GfuiLabelSetText(ScrHandle, DriverTypeEditId, DriverTypeList[CurDriverTypeIndex].c_str());
 
-    rmdsFilterDrvScrollList(CarCatList[CurCarCatIndex].c_str(), DrvTypList[CurDrvTypIndex].c_str());
+    rmdsFilterDriverScrollList(CarCategoryList[CurCarCategoryIndex].c_str(),
+							   DriverTypeList[CurDriverTypeIndex].c_str());
+
+	if (rmdsIsAnyCompetitorHighlighted())
+		GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_VISIBLE);
+}
+
+static void
+rmdsChangeSkin(void *vp)
+{
+	if (SkinNameList.empty())
+		return;
+
+	// Update GUI.
+ 	CurSkinIndex = (CurSkinIndex + SkinNameList.size() + (int)(long)vp) % SkinNameList.size();
+
+    GfuiLabelSetText(ScrHandle, SkinEditId, SkinNameList[CurSkinIndex].c_str());
+
+	// Load associated preview image (or "no preview panel" if none available).
+	struct stat st;
+	if (!stat(PreviewFileList[CurSkinIndex].c_str(), &st))
+		GfuiStaticImageSet(ScrHandle, CarImageId, PreviewFileList[CurSkinIndex].c_str());
+	else
+		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
+
+	// Update highlighted driver skin.
+	trmdDrvElt *pDriver = rmdsGetHighlightedDriver();
+	if (pDriver)
+	{
+		if (pDriver->skinName)
+			free(pDriver->skinName);
+		pDriver->skinName = strdup(SkinNameList[CurSkinIndex].c_str());
+	}
 }
 
 #ifdef FOCUS
@@ -133,40 +184,65 @@ rmdsSetFocus(void * /* dummy */)
     const char	*name;
     trmdDrvElt	*curDrv;
 
-    name = GfuiScrollListGetSelectedElement(ScrHandle, SelectedScrollList, (void**)&curDrv);
+    name = GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollList, (void**)&curDrv);
     if (name) {
-	GfParmSetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, curDrv->moduleName);
-	GfParmSetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, curDrv->interfaceIndex);
-	GfuiLabelSetText(ScrHandle, FocDrvLabelId, curDrv->name);
+	GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED,
+				 curDrv->moduleName);
+	GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX,
+				 (char*)NULL, curDrv->interfaceIndex);
+	GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, curDrv->name);
     }
 }
 #endif
 
 static void
-rmdsAccept(void * /* dummy */)
+rmdsNextMenu(void * /* dummy */)
 {
     char         drvSec[256];
     const char	*name;
     trmdDrvElt	*curDrv;
     int		index;
     
-    GfParmListClean(DrvSel->param, RM_SECT_DRIVERS);
-    name = GfuiScrollListExtractElement(ScrHandle, SelectedScrollList, 0, (void**)&curDrv);
+    GfParmListClean(MenuData->param, RM_SECT_DRIVERS);
+    name = GfuiScrollListExtractElement(ScrHandle, CompetitorsScrollList, 0, (void**)&curDrv);
     index = 1;
     while (name) {
 	sprintf(drvSec, "%s/%d", RM_SECT_DRIVERS, index);
-	GfParmSetNum(DrvSel->param, drvSec, RM_ATTR_IDX, (char*)NULL, curDrv->interfaceIndex);
-	GfParmSetStr(DrvSel->param, drvSec, RM_ATTR_MODULE, curDrv->moduleName);
+	GfParmSetNum(MenuData->param, drvSec, RM_ATTR_IDX, (char*)NULL, curDrv->interfaceIndex);
+	GfParmSetStr(MenuData->param, drvSec, RM_ATTR_MODULE, curDrv->moduleName);
+	GfOut("rmdsNextMenu : drv %s, idx=%d, mod=%s, skin=%s (was %s)\n",
+		  drvSec, curDrv->interfaceIndex, curDrv->moduleName,
+		  curDrv->skinName ? curDrv->skinName : "<null>",
+		  GfParmGetStr(MenuData->param, drvSec, RM_ATTR_SKIN, 0)
+		  ? GfParmGetStr(MenuData->param, drvSec, RM_ATTR_SKIN, 0) : "<null>");
+	if ((curDrv->skinName && strcmp(curDrv->skinName, rmdStdSkinName))
+		|| GfParmGetStr(MenuData->param, drvSec, RM_ATTR_SKIN, 0))
+		GfParmSetStr(MenuData->param, drvSec, RM_ATTR_SKIN, curDrv->skinName);
 	index++;
-	name = GfuiScrollListExtractElement(ScrHandle, SelectedScrollList, 0, (void**)&curDrv);
+	name = GfuiScrollListExtractElement(ScrHandle, CompetitorsScrollList, 0, (void**)&curDrv);
     }
-    rmdsDeactivate(DrvSel->nextScreen);
+    rmdsDeactivate(MenuData->nextScreen);
 }
 
 static void
-rmdsMove(void *vd)
+rmdsPreviousMenu(void *screen)
 {
-    GfuiScrollListMoveSelectedElement(ScrHandle, SelectedScrollList, (long)vd);
+	rmdsDeactivate(screen);
+}
+
+static void
+rmdsCarSelectMenu(void *pPreviousMenu)
+{
+	const trmdDrvElt *pDriver = rmdsGetHighlightedDriver();
+
+	if (pDriver)
+		CarSelectMenu.RunMenu(pDriver);
+}
+
+static void
+rmdsMoveDriver(void *vd)
+{
+    GfuiScrollListMoveSelectedElement(ScrHandle, CompetitorsScrollList, (long)vd);
 }
 
 static void
@@ -175,20 +251,90 @@ rmdsClickOnDriver(void * /* dummy */)
     static const unsigned maxBufSize = 64;
     char         buf[maxBufSize];
     const char	*name;
-    trmdDrvElt	*curDrv;
+	trmdDrvElt	*curDrv;
 
-    name = GfuiScrollListGetSelectedElement(ScrHandle, SelectedScrollList, (void**)&curDrv);
-    if (!name) {
-	name = GfuiScrollListGetSelectedElement(ScrHandle, UnSelectedScrollList, (void**)&curDrv);
-    }
-    
+	// Determine which list and which driver were clicked on.
+    if ((name = GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollList, (void**)&curDrv)))
+	{
+		GfuiVisibilitySet(ScrHandle, SelectButtonId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, DeselectButtonId, GFUI_VISIBLE);
+		GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_VISIBLE);
+		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_VISIBLE);
+		GfuiVisibilitySet(ScrHandle, CarImageId, GFUI_VISIBLE);
+	}
+    else if ((name = GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollList, (void**)&curDrv)))
+	{
+		GfuiVisibilitySet(ScrHandle, SelectButtonId, GFUI_VISIBLE);
+		GfuiVisibilitySet(ScrHandle, DeselectButtonId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_VISIBLE);
+		GfuiVisibilitySet(ScrHandle, CarImageId, GFUI_VISIBLE);
+	}
+    else
+	{
+		GfuiVisibilitySet(ScrHandle, SelectButtonId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, DeselectButtonId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_INVISIBLE);
+		GfuiVisibilitySet(ScrHandle, CarImageId, GFUI_INVISIBLE);
+	}
+
     // Get selected driver infos
-    if (name) {
-	rmdGetDriverType(curDrv->moduleName, buf, maxBufSize);
-	GfuiLabelSetText(ScrHandle, PickDrvTypLabelId, buf);
-	GfuiLabelSetText(ScrHandle, PickDrvCarLabelId, GfParmGetName(curDrv->carParmHdle));
-	GfuiLabelSetText(ScrHandle, PickDrvCategoryLabelId, GfParmGetStr(curDrv->carParmHdle, SECT_CAR, PRM_CATEGORY, ""));
+    if (name)
+	{
+		rmdGetDriverType(curDrv->moduleName, buf, maxBufSize);
+		GfuiLabelSetText(ScrHandle, PickedDriverTypeLabelId, buf);
+		GfuiLabelSetText(ScrHandle, PickedDriverCarLabelId, GfParmGetName(curDrv->carParmHdle));
+		GfuiLabelSetText(ScrHandle, PickedDriverCarCategoryLabelId,
+						 GfParmGetStr(curDrv->carParmHdle, SECT_CAR, PRM_CATEGORY, ""));
+		
+		// Get really available skins and previews for the driver's car.
+		rmdGetCarSkinsInSearchPath(curDrv, SkinNameList, PreviewFileList);
+		
+		// Set currently selected skin for this driver.
+		CurSkinIndex = 0;
+		if (curDrv->skinName && strcmp(curDrv->skinName, rmdStdSkinName))
+		{
+			std::vector<std::string>::const_iterator iterSkin =
+				std::find(SkinNameList.begin(), SkinNameList.end(), curDrv->skinName);
+			if (iterSkin != SkinNameList.end())
+				CurSkinIndex = iterSkin - SkinNameList.begin();
+		}
+		GfuiLabelSetText(ScrHandle, SkinEditId, SkinNameList[CurSkinIndex].c_str());
+		
+		// Load associated preview image (or "no preview" image if none available).
+		struct stat st;
+		if (!stat(PreviewFileList[CurSkinIndex].c_str(), &st))
+			GfuiStaticImageSet(ScrHandle, CarImageId, PreviewFileList[CurSkinIndex].c_str());
+		else
+			GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
     }
+}
+
+static trmdDrvElt*
+rmdsGetHighlightedDriver()
+{
+	trmdDrvElt *curDrv;
+	
+	const char *name =
+		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollList, (void**)&curDrv);
+    if (!name)
+		name = GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollList, (void**)&curDrv);
+    if (!name)
+		curDrv = 0;
+
+	return curDrv;
+}
+
+static bool
+rmdsIsAnyCompetitorHighlighted()
+{
+	trmdDrvElt	*curDrv;
+
+    const char* name =
+		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollList, (void**)&curDrv);
+
+	return name != 0;
 }
 
 static void
@@ -199,16 +345,16 @@ rmdsSelectDeselect(void * /* dummy */ )
     trmdDrvElt	*curDrv;
     int		sel;
 
-    // If the selected driver is in the Unselected scroll-list,
+    // If the selected driver is in the Candidate scroll-list,
     // and if the max number of selected drivers has not been reached,
-    // remove the driver from the Unselected scroll-list, and add him to the Selected scroll-list
+    // remove the driver from the NotSelected scroll-list, and add him to the Selected scroll-list
     sel = 0;
     name = 0;
     if (NbSelectedDrivers < NbMaxSelectedDrivers) {
-	src = UnSelectedScrollList;
+	src = CandidatesScrollList;
 	name = GfuiScrollListExtractSelectedElement(ScrHandle, src, (void**)&curDrv);
 	if (name) {
-	    dst = SelectedScrollList;
+	    dst = CompetitorsScrollList;
 	    GfuiScrollListInsertElement(ScrHandle, dst, name, NbTotDrivers, (void*)curDrv);
 	    NbSelectedDrivers++;
 	    curDrv->isSelected = 1; // Now selected.
@@ -220,11 +366,11 @@ rmdsSelectDeselect(void * /* dummy */ )
     // (if it matches the Unselected scroll-list filtering criteria)
     if (!name) {
 	sel = 1;
-	src = SelectedScrollList;
+	src = CompetitorsScrollList;
 	name = GfuiScrollListExtractSelectedElement(ScrHandle, src, (void**)&curDrv);
 	if (name) {
-	    if (rmdDriverMatchesFilters(curDrv, CarCatList[CurCarCatIndex].c_str(), DrvTypList[CurDrvTypIndex].c_str(), AnyCarCat, AnyDrvTyp)) {
-		dst = UnSelectedScrollList;
+	    if (rmdDriverMatchesFilters(curDrv, CarCategoryList[CurCarCategoryIndex].c_str(), DriverTypeList[CurDriverTypeIndex].c_str(), AnyCarCategory, AnyDriverType)) {
+		dst = CandidatesScrollList;
 		if (curDrv->isHuman) {
 		    GfuiScrollListInsertElement(ScrHandle, dst, name, 0, (void*)curDrv);
 		} else {
@@ -238,35 +384,35 @@ rmdsSelectDeselect(void * /* dummy */ )
 	}
     }
 
-    // Focused driver management
-    const char *modName = GfParmGetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-    int robotIdx = (int)GfParmGetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
+    // Focused driver management (inhibited for the moment : what is it useful for ?)
+    const char *modName = GfParmGetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
+    int robotIdx = (int)GfParmGetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
     if (sel) {
-	modName = GfParmGetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-	robotIdx = (int)GfParmGetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
+	modName = GfParmGetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
+	robotIdx = (int)GfParmGetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
 	if (curDrv->interfaceIndex == robotIdx && !strcmp(curDrv->moduleName, modName)) {
 	    /* the focused element was deselected : select a new one */
-	    name = GfuiScrollListGetElement(ScrHandle, SelectedScrollList, 0, (void**)&curDrv);
+	    name = GfuiScrollListGetElement(ScrHandle, CompetitorsScrollList, 0, (void**)&curDrv);
 	    if (name) {
-		GfParmSetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, curDrv->moduleName);
-		GfParmSetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, curDrv->interfaceIndex);
+		GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, curDrv->moduleName);
+		GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, curDrv->interfaceIndex);
 #ifdef FOCUS
-		GfuiLabelSetText(ScrHandle, FocDrvLabelId, curDrv->name);
+		GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, curDrv->name);
 #endif
 	    } else {
-		GfParmSetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-		GfParmSetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
+		GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
+		GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
 #ifdef FOCUS
-		GfuiLabelSetText(ScrHandle, FocDrvLabelId, "");
+		GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, "");
 #endif
 	    }
 	}
     } else {
 	if (strlen(modName) == 0 || curDrv->isHuman) {
-	    GfParmSetStr(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, curDrv->moduleName);
-	    GfParmSetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, curDrv->interfaceIndex);
+	    GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, curDrv->moduleName);
+	    GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, curDrv->interfaceIndex);
 #ifdef FOCUS
-	    GfuiLabelSetText(ScrHandle, FocDrvLabelId, curDrv->name);
+	    GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, curDrv->name);
 #endif
 	}
     }
@@ -274,11 +420,8 @@ rmdsSelectDeselect(void * /* dummy */ )
     // Update selected driver displayed info
     rmdsClickOnDriver(NULL);
 
-	//Don't allow user to Accept 0 drivers this would cause a crash
-	if (NbSelectedDrivers>0)
-		GfuiEnable(ScrHandle,AcceptId, GFUI_ENABLE);
-	else
-		GfuiEnable(ScrHandle,AcceptId, GFUI_DISABLE);
+	// Don't allow user to Accept 0 drivers this would cause a crash
+	GfuiEnable(ScrHandle,NextButtonId, NbSelectedDrivers > 0 ? GFUI_ENABLE : GFUI_DISABLE);
 
 	GfuiDisplay();
 }
@@ -286,12 +429,12 @@ rmdsSelectDeselect(void * /* dummy */ )
 static void
 rmdsAddKeys(void)
 {
-    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", DrvSel->prevScreen, rmdsDeactivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Accept Selection", NULL, rmdsAccept, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Previous menu", MenuData->prevScreen, rmdsPreviousMenu, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Next menu", NULL, rmdsNextMenu, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMove, NULL);
-    GfuiAddKey(ScrHandle, '+', "Move Down", (void*)1, rmdsMove, NULL);
+    GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMoveDriver, NULL);
+    GfuiAddKey(ScrHandle, '+', "Move Down", (void*)1, rmdsMoveDriver, NULL);
     GfuiAddKey(ScrHandle, ' ', "Select/Deselect", NULL, rmdsSelectDeselect, NULL);
 #ifdef FOCUS
     GfuiAddKey(ScrHandle, 'f', "Set Focus", NULL, rmdsSetFocus, NULL);
@@ -299,7 +442,7 @@ rmdsAddKeys(void)
 }
 
 /** Interactive Drivers list selection
-    @param	vs	Pointer on tRmDrvSelect structure (cast to void)
+    @param	vs	Pointer on tRmDriverSelect structure (casted to void*)
     @warning	The race manager params are modified but not saved.
  */
 void
@@ -315,6 +458,7 @@ RmDriversSelect(void *vs)
     char        path[256];
     char	*sp;
     const char	*moduleName;
+    const char	*skinName;
     int		i, index;
     trmdDrvElt	*curDrv;
     int		nDrivers, robotIdx;
@@ -326,41 +470,54 @@ RmDriversSelect(void *vs)
     const char* initCarCat;
 
     // Initialize drivers selection
-    DrvSel = (tRmDrvSelect*)vs;
+    MenuData = (tRmDriverSelect*)vs;
 
     // Create screen, background image and title
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmdsActivate, NULL, (tfuiCallback)NULL, 1);
     
-    void *param = LoadMenuXML("driverselectmenu.xml");
-    CreateStaticControls(param,ScrHandle);
+    void *menuDescHdle = LoadMenuXML("driverselectmenu.xml");
+    CreateStaticControls(menuDescHdle,ScrHandle);
 
-    SelectedScrollList = CreateScrollListControl(ScrHandle,param,"selectedscrolllist",NULL,rmdsClickOnDriver);
-    UnSelectedScrollList = CreateScrollListControl(ScrHandle,param,"notselectedscrolllist",NULL,rmdsClickOnDriver);
+    CompetitorsScrollList = CreateScrollListControl(ScrHandle,menuDescHdle,"competitorsscrolllist",NULL,rmdsClickOnDriver);
+    CandidatesScrollList = CreateScrollListControl(ScrHandle,menuDescHdle,"candidatesscrolllist",NULL,rmdsClickOnDriver);
 
-    CreateButtonControl(ScrHandle,param,"carleftarrow",(void*)0,rmdsChangeCarCat);
-    CreateButtonControl(ScrHandle,param,"carrightarrow",(void*)1,rmdsChangeCarCat);
-    CarCatEditId = CreateLabelControl(ScrHandle,param,"cartext");
+	
+    // Car category filtering "combobox" (left arrow, label, right arrow)
+    CreateButtonControl(ScrHandle,menuDescHdle,"carcategoryleftarrow",(void*)-1,rmdsChangeCarCategory);
+    CreateButtonControl(ScrHandle,menuDescHdle,"carcategoryrightarrow",(void*)1,rmdsChangeCarCategory);
+    CarCategoryEditId = CreateLabelControl(ScrHandle,menuDescHdle,"carcategorytext");
     
-
-    // Driver type and associated "combobox" (left arrow, label, right arrow)
-    CreateButtonControl(ScrHandle,param,"drvleftarrow",(void*)0,rmdsChangeDrvTyp);
-    CreateButtonControl(ScrHandle,param,"drvrightarrow",(void*)1,rmdsChangeDrvTyp);
-    DrvTypEditId = CreateLabelControl(ScrHandle,param,"drvtext");
+    // Driver type filtering "combobox" (left arrow, label, right arrow)
+    CreateButtonControl(ScrHandle,menuDescHdle,"drivertypeleftarrow",(void*)-1,rmdsChangeDriverType);
+    CreateButtonControl(ScrHandle,menuDescHdle,"drivertyperightarrow",(void*)1,rmdsChangeDriverType);
+    DriverTypeEditId = CreateLabelControl(ScrHandle,menuDescHdle,"drivertypetext");
 
     // Scroll-lists manipulation buttons
-    CreateButtonControl(ScrHandle,param,"moveup",(void*)-1,rmdsMove);
-    CreateButtonControl(ScrHandle,param,"movedown",(void*)1,rmdsMove);
+    CreateButtonControl(ScrHandle,menuDescHdle,"moveupbutton",(void*)-1,rmdsMoveDriver);
+    CreateButtonControl(ScrHandle,menuDescHdle,"movedownbutton",(void*)1,rmdsMoveDriver);
+	
+    SelectButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"selectbutton",0,rmdsSelectDeselect);
+    DeselectButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"deselectbutton",0,rmdsSelectDeselect);
+	GfuiVisibilitySet(ScrHandle, SelectButtonId, GFUI_INVISIBLE);
+	GfuiVisibilitySet(ScrHandle, DeselectButtonId, GFUI_INVISIBLE);
 
-    CreateButtonControl(ScrHandle,param,"select",(void*)0,rmdsSelectDeselect);
+    // Skin selection "combobox" (left arrow, label, right arrow)
+    SkinLeftButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"skinleftarrow",(void*)-1,rmdsChangeSkin);
+    SkinRightButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"skinrightarrow",(void*)1,rmdsChangeSkin);
+    SkinEditId = CreateLabelControl(ScrHandle,menuDescHdle,"skintext");
+
+    // Car preview image
+    CarImageId = CreateStaticImageControl(ScrHandle, menuDescHdle, "carpreviewimage");
+    GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 
     // Load driver full list, driver type list and driven car category list
-    GF_TAILQ_INIT(&DrvList);
+    GF_TAILQ_INIT(&DriverList);
 
-    CarCatList.push_back(AnyCarCat);
-    DrvTypList.push_back(AnyDrvTyp);
+    CarCategoryList.push_back(AnyCarCategory);
+    DriverTypeList.push_back(AnyDriverType);
 
     list = 0;
-    sprintf(buf, "%sdrivers", GetLibDir ());
+    sprintf(buf, "%sdrivers", GetLibDir());
     GfModInfoDir(CAR_IDENT, buf, 1, &list);
 
     NbTotDrivers = 0;
@@ -379,7 +536,7 @@ RmDriversSelect(void *vs)
 		robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	    }
 	    if (!robhdle) {
-		GfOut("Warning: No driver '%s' selected because no readable '%s.xml' found\n", modName, modName);
+		GfError("Warning: No driver '%s' selected because no readable '%s.xml' found\n", modName, modName);
 		break;
 	    }
 	    for (i = 0; i < curmod->modInfoSize; i++) {
@@ -394,30 +551,31 @@ RmDriversSelect(void *vs)
 			    curDrv = (trmdDrvElt*)calloc(1, sizeof(trmdDrvElt));
 			    curDrv->interfaceIndex = curmod->modInfo[i].index;
 			    curDrv->moduleName = strdup(modName);
+			    curDrv->carName = strdup(carName);
+			    curDrv->skinName = 0; // Initialized later if needed from race params.
 			    curDrv->name = strdup(curmod->modInfo[i].name);
 			    curDrv->carParmHdle = carhdle;
 			    const char* carCat = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, "");
-			    if (std::find(CarCatList.begin(), CarCatList.end(), carCat) == CarCatList.end()) {
-				CarCatList.push_back(carCat);
+			    if (std::find(CarCategoryList.begin(), CarCategoryList.end(), carCat) == CarCategoryList.end()) {
+				CarCategoryList.push_back(carCat);
 			    }
 			    rmdGetDriverType(modName, drvType, drvTypeMaxSize);
-			    if (std::find(DrvTypList.begin(), DrvTypList.end(), drvType) == DrvTypList.end()) {
-			      DrvTypList.push_back(drvType);
+			    if (std::find(DriverTypeList.begin(), DriverTypeList.end(), drvType) == DriverTypeList.end()) {
+			      DriverTypeList.push_back(drvType);
 			    }
 			    
+				curDrv->isHuman = human ? 1 : 0;
 			    if (human) {
-				curDrv->isHuman = 1;
-				GF_TAILQ_INSERT_HEAD(&DrvList, curDrv, link);
+				GF_TAILQ_INSERT_HEAD(&DriverList, curDrv, link);
 			    } else {
-				curDrv->isHuman = 0;
-				GF_TAILQ_INSERT_TAIL(&DrvList, curDrv, link);
+				GF_TAILQ_INSERT_TAIL(&DriverList, curDrv, link);
 			    }
 			    NbTotDrivers++;
 			} else {
-			    GfOut("Warning: Driver '%s' not selected because car '%s' is not readable\n", curmod->modInfo[i].name, carName);
+			    GfError("Warning: Driver '%s' not selected because car '%s' is not readable\n", curmod->modInfo[i].name, carName);
 			}
 		    } else {
-			GfOut("Warning: Driver '%s' not selected because car '%s' is not present\n", curmod->modInfo[i].name, carName);
+			GfError("Warning: Driver '%s' not selected because car '%s' is not present\n", curmod->modInfo[i].name, carName);
 		    }
 		}
 	    }
@@ -428,26 +586,30 @@ RmDriversSelect(void *vs)
 
     GfModFreeInfoList(&list);
 
-    // Load selected drivers scroll-list from file
-    // and initialize unselected scrolllist car category filter criteria to the car category
+    // Load Competitors scroll-list from file
+    // and initialize Candidates scroll-list car category filter criteria to the car category
     // of the last selected human driver or else to the first selected robot. 
     NbSelectedDrivers = 0;
-    NbMaxSelectedDrivers = (int)GfParmGetNum(DrvSel->param, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 0);
-    nDrivers = GfParmGetEltNb(DrvSel->param, RM_SECT_DRIVERS);
+    NbMaxSelectedDrivers = (int)GfParmGetNum(MenuData->param,
+											 RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 0);
+    nDrivers = GfParmGetEltNb(MenuData->param, RM_SECT_DRIVERS);
     initCarCat = 0;
     index = 1;
     for (i = 1; i < nDrivers+1; i++) {
 	sprintf(path, "%s/%d", RM_SECT_DRIVERS, i);
-	moduleName = GfParmGetStr(DrvSel->param, path, RM_ATTR_MODULE, "");
-	robotIdx = (int)GfParmGetNum(DrvSel->param, path, RM_ATTR_IDX, (char*)NULL, 0);
-	if ((curDrv = GF_TAILQ_FIRST(&DrvList))) {
+	moduleName = GfParmGetStr(MenuData->param, path, RM_ATTR_MODULE, "");
+	robotIdx = (int)GfParmGetNum(MenuData->param, path, RM_ATTR_IDX, (char*)NULL, 0);
+	skinName = GfParmGetStr(MenuData->param, path, RM_ATTR_SKIN, rmdStdSkinName);
+	if ((curDrv = GF_TAILQ_FIRST(&DriverList))) {
 	    do {
 		if (curDrv->interfaceIndex == robotIdx && !strcmp(curDrv->moduleName, moduleName)) {
 		    if (NbSelectedDrivers < NbMaxSelectedDrivers) {
-			GfuiScrollListInsertElement(ScrHandle, SelectedScrollList, curDrv->name, index, (void*)curDrv);
+			GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollList, curDrv->name, index, (void*)curDrv);
 			if (!initCarCat || !strcmp(moduleName, "human"))
 			    initCarCat = GfParmGetStr(curDrv->carParmHdle, SECT_CAR, PRM_CATEGORY, "");
 			curDrv->isSelected = index++;
+			if (skinName && strcmp(skinName, rmdStdSkinName))
+				curDrv->skinName = strdup(skinName);
 			NbSelectedDrivers++;
 		    }
 		    break;
@@ -456,27 +618,32 @@ RmDriversSelect(void *vs)
 	}
     }
 
-    // Initialize unselected scroll-list filter criteria and fill-in the scroll-list.
-    CurDrvTypIndex = 0;
+    // Initialize Candidates scroll-list filter criteria and fill-in the scroll-list.
+    CurDriverTypeIndex = 0;
     if (!initCarCat)
-	initCarCat = AnyCarCat;
-    CurCarCatIndex = std::find(CarCatList.begin(), CarCatList.end(), initCarCat) - CarCatList.begin();
-    CurCarCatIndex = CurCarCatIndex % CarCatList.size();
-    rmdsFilterDrvScrollList(initCarCat, AnyDrvTyp);
-    GfuiLabelSetText(ScrHandle, DrvTypEditId, AnyDrvTyp);
-    GfuiLabelSetText(ScrHandle, CarCatEditId, initCarCat);
+	initCarCat = AnyCarCategory;
+    CurCarCategoryIndex = std::find(CarCategoryList.begin(), CarCategoryList.end(), initCarCat) - CarCategoryList.begin();
+    CurCarCategoryIndex = CurCarCategoryIndex % CarCategoryList.size();
+    rmdsFilterDriverScrollList(initCarCat, AnyDriverType);
+    GfuiLabelSetText(ScrHandle, DriverTypeEditId, AnyDriverType);
+    GfuiLabelSetText(ScrHandle, CarCategoryEditId, initCarCat);
 
     // Picked Driver Info
-    PickDrvTypLabelId = CreateLabelControl(ScrHandle,param,"pickdrvtyplabel");
-    PickDrvCategoryLabelId = CreateLabelControl(ScrHandle,param,"pickdrvcatlabel");
-    PickDrvCarLabelId = CreateLabelControl(ScrHandle,param,"pickdrvcarlabel");
+    PickedDriverTypeLabelId = CreateLabelControl(ScrHandle,menuDescHdle,"pickeddrivertypelabel");
+    PickedDriverCarCategoryLabelId = CreateLabelControl(ScrHandle,menuDescHdle,"pickeddrivercarcategorylabel");
+    PickedDriverCarLabelId = CreateLabelControl(ScrHandle,menuDescHdle,"pickeddrivercarlabel");
     
-    // Accept and Cancel buttons
-    AcceptId = CreateButtonControl(ScrHandle,param,"accept",NULL,rmdsAccept);
-    CreateButtonControl(ScrHandle,param,"cancel",DrvSel->prevScreen,rmdsDeactivate);
+    // Next, Previous and Change Car buttons
+    NextButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"nextmenubutton",NULL,rmdsNextMenu);
+    CreateButtonControl(ScrHandle,menuDescHdle,"previousmenubutton",MenuData->prevScreen,rmdsPreviousMenu);
+    ChangeCarButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"carselectbutton",ScrHandle,rmdsCarSelectMenu);
+	GfuiVisibilitySet(ScrHandle, ChangeCarButtonId, GFUI_INVISIBLE);
 
-    GfParmReleaseHandle(param);
+    GfParmReleaseHandle(menuDescHdle);
 
+	// Initialize the Car selection menu.
+	CarSelectMenu.Init(ScrHandle);
+	
     // Keyboard shortcuts
     GfuiMenuDefaultKeysAdd(ScrHandle);
     rmdsAddKeys();
@@ -486,39 +653,46 @@ RmDriversSelect(void *vs)
 
 
 static void
-rmdsFreeDrvList(void)
+rmdsCleanup(void)
 {
-    trmdDrvElt	*cur;
+    trmdDrvElt *curDrv;
 
-    CarCatList.clear();
-    DrvTypList.clear();
+    CarCategoryList.clear();
+    DriverTypeList.clear();
+    SkinNameList.clear();
+    PreviewFileList.clear();
 
-    while ((cur = GF_TAILQ_FIRST(&DrvList))) {
-	GF_TAILQ_REMOVE(&DrvList, cur, link);
-	free(cur->name);
-	free(cur->moduleName);
-	GfParmReleaseHandle(cur->carParmHdle);
-	free(cur);
+    while ((curDrv = GF_TAILQ_FIRST(&DriverList))) {
+	GF_TAILQ_REMOVE(&DriverList, curDrv, link);
+	free(curDrv->name);
+	free(curDrv->moduleName);
+	free(curDrv->carName);
+	if (curDrv->skinName)
+	    free(curDrv->skinName);
+	GfParmReleaseHandle(curDrv->carParmHdle);
+	free(curDrv);
     }
 }
 
 static void
-rmdsFilterDrvScrollList(const char* carCat, const char* drvTyp)
+rmdsFilterDriverScrollList(const char* carCategory, const char* driverType)
 {
     trmdDrvElt	*curDrv;
 
     // Empty the unselected scroll-list
-    while (GfuiScrollListExtractElement(ScrHandle, UnSelectedScrollList, 0, (void**)&curDrv));
+    GfuiScrollListClear(ScrHandle, CandidatesScrollList);
 
     // Fill it with drivers that match the filter criteria
-    curDrv = GF_TAILQ_FIRST(&DrvList);
+    curDrv = GF_TAILQ_FIRST(&DriverList);
     if (curDrv) {
 	do {
-	    if (!curDrv->isSelected && rmdDriverMatchesFilters(curDrv, carCat, drvTyp, AnyCarCat, AnyDrvTyp))
-		GfuiScrollListInsertElement(ScrHandle, UnSelectedScrollList, curDrv->name, NbTotDrivers, (void*)curDrv);
+	    if (!curDrv->isSelected && rmdDriverMatchesFilters(curDrv, carCategory, driverType,
+														   AnyCarCategory, AnyDriverType))
+		GfuiScrollListInsertElement(ScrHandle, CandidatesScrollList, curDrv->name,
+									NbTotDrivers, (void*)curDrv);
 	} while ((curDrv = GF_TAILQ_NEXT(curDrv, link)));
     }
 
     // Show first element if any
-    GfuiScrollListShowElement(ScrHandle, UnSelectedScrollList, 0);
+    GfuiScrollListShowElement(ScrHandle, CandidatesScrollList, 0);
 }
