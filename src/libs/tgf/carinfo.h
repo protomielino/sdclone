@@ -25,44 +25,57 @@
 
 #include "tgf.h"
 
+/* Singleton holding information on available cars and categories */
+
+
 class TGF_API CarData
 {
 public:
-	std::string strName;
-	std::string strCategory;
-	std::string strRealCarName;
-	std::string strXMLPath;
+	std::string strName; // XML file / folder name (ex: "sc-boxer-96")
+	std::string strRealName; // User friendly name (ex: "SC Boxer 96").
+	std::string strCategoryName; // Category name (ex: "LS-GT1").
+	std::string strXMLPath; // Path-name of the car XML file.
 };
 
 // Export STL needed container types (needed with MSVC compilers).
+// WARNING: It's quite complicated and dangerous to export STL containers (other than the vector)
+//          accross DLL boundaries under Ruin'dows ... that's why we do it only for the vector.
 #ifdef WIN32
 ExportSTLVector(TGF_API, std::string);
 ExportSTLVector(TGF_API, CarData);
-//ExportSTLSet(TGF_API, std::string);
-//ExportSTLMap(TGF_API, std::string, int);
 #endif
 
 class TGF_API CarInfo
 {
 public:
+
+	// Accessor to the unique instance of the singleton.
+	static CarInfo* self();
+	
+	std::vector<std::string> GetCategoryNames() const;
+
+	CarData* GetCarData(const std::string& strCarName) const;
+	std::string GetCarRealName(const std::string& strCarName) const;
+	CarData* GetCarDataFromRealName(const std::string& strCarRealName) const;
+
+	std::vector<CarData> GetCarsInCategory(const std::string& strCatName = "All") const;
+	std::vector<std::string> GetCarNamesInCategory(const std::string& strCatName = "All") const;
+	std::vector<std::string> GetCarRealNamesInCategory(const std::string& strCatName = "All") const;
+	
+	void print() const;
+
+protected:
+
+	// Protected constructor : clients can not use it.
 	CarInfo();
-	std::string GetRealCarName(const char* pszName);
-	void GetCarsInCategory(const char* pszCat, std::vector<std::string>& vecCars);
-	void GetCarsInCategoryRealName(const char *pszCat, std::vector<std::string>& vecCars);
-	void GetCategories(std::vector<std::string>& vecCats);
-	CarData* GetCarData(const char* pszName);
-	CarData* GetCarDataFromRealName(const char* pszRealName);
+	
 protected:
-	void Init();
-	bool m_bInit;
-protected:
+
+	// The singleton itself.
+	static CarInfo* m_pSelf;
+
+	// Its private data.
 	struct PrivateData* m_priv;
-	//std::vector<CarData> m_vecCarData;
-	//std::map<std::string, int> m_mapCarName;
-	//std::set<std::string> m_setCarCat;
 };
-
-
-TGF_API CarInfo* GetCarInfo();
 
 #endif /* __CARINFO__H__ */
