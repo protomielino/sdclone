@@ -57,13 +57,13 @@ int ReadControl(void *param,std::string strType,const char *pControlName)
 		return CreateStaticImageControl(menuHandle,param,pControlName);
 	else if (strType == "combobox")
 	{
-		int id = CreateComboboxControl(menuHandle,param,pControlName,NULL);
+		int id = CreateComboboxControl(menuHandle,param,pControlName,0,NULL);
 		return id;
 	}
 	else if (strType == "scrolllist")
 		return CreateScrollListControl(menuHandle,param,pControlName,0,NULL);
 	else if (strType == "checkbox")
-		return  CreateCheckboxControl(menuHandle,param,pControlName,NULL);
+		return  CreateCheckboxControl(menuHandle,param,pControlName,0,NULL);
 	else if (strType == "progressbar")
 		return  CreateProgressbarControl(menuHandle,param,pControlName);
 
