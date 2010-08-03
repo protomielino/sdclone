@@ -24,12 +24,13 @@
     @ingroup	gui
 */
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
@@ -460,6 +461,29 @@ GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData)
     free(elt);
     
     return name;
+}
+
+
+void
+GfuiScrollListClear(void *scr, int id)
+{
+    tGfuiObject	*object;
+    tGfuiScrollList *scrollist;
+    tGfuiListElement *elt;
+    
+    object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST) {
+		return;
+    }
+	
+    scrollist = &(object->u.scrollist);
+
+    while ((elt = gfuiScrollListRemElt(scrollist, 0))) {
+		free(elt);
+    }
+	
+	scrollist->nbElts = 0;
+    scrollist->selectedElt = -1;
 }
 
 
