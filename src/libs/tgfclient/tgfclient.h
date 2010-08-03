@@ -180,17 +180,27 @@ typedef struct ScrollBarInfo
     void        *userData;      /**< Associated user data */
 } tScrollBarInfo;
 
-typedef struct ChoiceInfo
+/** Combo-box call-back information */
+typedef struct ComboBoxInfo
 {
-	unsigned int nPos;
-	std::vector<std::string> vecChoices;
-} tChoiceInfo;
+	unsigned int nPos;                    /**< Currently selected choice */
+	std::vector<std::string> vecChoices;  /**< Possible choices */
+    void *userData;                       /**< Associated user data */
+} tComboBoxInfo;
 
-typedef void (*tfuiCallback)(void * /* userdata */);
+
+/** Check-box call-back information */
+typedef struct CheckBoxInfo
+{
+    bool         bChecked;      /**< Check-box state */
+    void        *userData;      /**< Associated user data */
+} tCheckBoxInfo;
+
+typedef void (*tfuiCallback)(void * /* userData */);
 typedef void (*tfuiSBCallback)(tScrollBarInfo *);
 typedef int (*tfuiKeyCallback)(int key, int modifier, int state);  /**< return 1 to prevent normal key computing */
-typedef void (*tfuiComboCallback)(tChoiceInfo * pInfo);
-typedef void (*tfuiCheckboxCallback)(bool bChecked);
+typedef void (*tfuiComboboxCallback)(tComboBoxInfo *);
+typedef void (*tfuiCheckboxCallback)(tCheckBoxInfo *);
 
 
 /* Event loop callback functions (should be called explicitely if the corresponding
@@ -230,14 +240,56 @@ TGFCLIENT_API void GfuiInitWindowPosition(int x, int y);
 TGFCLIENT_API void GfuiInitWindowSize(int x, int y);
 TGFCLIENT_API void GfuiSwapBuffers(void);
 
+// Export STL needed container types (needed with MSVC compilers).
+#ifdef WIN32
+ExportSTLVector(TGFCLIENT_API, std::string);
+#endif
+
 class TGFCLIENT_API GfuiMenuScreen
 {
 public:
-	GfuiMenuScreen() { m_pMenuHandle = 0; }
-	void* GetMenuHandle() { return m_pMenuHandle; }
-	void RunMenu() { GfuiScreenActivate(m_pMenuHandle); }
-protected:
-	void* m_pMenuHandle;
+	GfuiMenuScreen(const char* pszXMLDescFile);
+	virtual ~GfuiMenuScreen();
+
+	void CreateMenu();
+	void CreateMenuEx(float *bgColor, 
+					  void *userDataOnActivate, tfuiCallback onActivate, 
+					  void *userDataOnDeactivate, tfuiCallback onDeactivate, 
+					  int mouseAllowed);
+	void SetMenuHandle(void* hdle);
+	void* GetMenuHandle() const;
+	void SetPreviousMenuHandle(void* hdle);
+	void* GetPreviousMenuHandle() const;
+
+	bool OpenXMLDescriptor();
+
+	bool CreateStaticControls();
+
+	int CreateButtonControl(const char *pszName, void *userData, tfuiCallback onPush);
+	int CreateButtonControlEx(const char *pszName, void *userData, tfuiCallback onPush,
+							  void *userDataOnFocus, tfuiCallback onFocus,
+							  tfuiCallback onFocusLost);
+	int CreateStaticImageControl(const char *pszName);
+	int CreateLabelControl(const char *pszName);
+	int CreateEditControl(const char *pszName, void *userDataOnFocus, tfuiCallback onFocus,
+						  tfuiCallback onFocusLost);
+	int CreateScrollListControl(const char *pszName,void *userData, tfuiCallback onSelect);
+	int CreateComboboxControl(const char *pszName, void *userData, tfuiComboboxCallback onChange);
+	int CreateCheckboxControl(const char *pszName, void *userData, tfuiCheckboxCallback onChange);
+	int CreateProgressbarControl(const char *pszName);
+	
+	int GetDynamicControlId(const char *pszName) const;
+
+	void AddDefaultShortcuts();
+	void AddShortcut(int key, const char *descr, void *userData,
+					 tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+	
+	bool CloseXMLDescriptor();
+	
+	void RunMenu();
+
+private:
+	struct gfuiMenuPrivateData* m_priv;
 };
 
 /* Mouse management */
@@ -308,8 +360,8 @@ TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const ch
                    int x, int y, int imageWidth,int imageHeight,int align, int mouse,
                    void *userDataOnPush, tfuiCallback onPush, 
                    void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,tfuiComboCallback onChange);
-TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,tfuiCheckboxCallback onChange);
+TGFCLIENT_API int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,void* userData,tfuiComboboxCallback onChange);
+TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,void* userData,tfuiCheckboxCallback onChange);
 
 
 class TGFCLIENT_API Color
@@ -324,6 +376,8 @@ TGFCLIENT_API void GfuiComboboxSetTextColor(void *scr, int id, const Color& colo
 TGFCLIENT_API void GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index);
 TGFCLIENT_API void GfuiComboboxSetPosition(void *scr, int id, unsigned int pos);
 TGFCLIENT_API unsigned int GfuiComboboxGetPosition(void *scr, int id);
+TGFCLIENT_API const char* GfuiComboboxGetText(void *scr, int id);
+TGFCLIENT_API void GfuiComboboxClear(void *scr, int id);
 
 TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value);
 
@@ -362,6 +416,7 @@ TGFCLIENT_API int GfuiScrollListInsertElement(void *scr, int Id, const char *ele
 TGFCLIENT_API int GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta);
 TGFCLIENT_API const char *GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData);
 TGFCLIENT_API const char *GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData);
+TGFCLIENT_API void GfuiScrollListClear(void *scr, int Id);
 TGFCLIENT_API const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
 TGFCLIENT_API bool GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement);
 TGFCLIENT_API const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
@@ -390,8 +445,8 @@ TGFCLIENT_API void GfuiStaticImageSetActive(void *scr, int id, int index);
 
 TGFCLIENT_API void *GfuiMenuScreenCreate(const char *title);
 TGFCLIENT_API void  GfuiMenuDefaultKeysAdd(void *scr);
-TGFCLIENT_API int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userdata, const int style, tfuiCallback onpush);
-TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const char *tip, void *userdata, tfuiCallback onpush);
+TGFCLIENT_API int   GfuiMenuButtonCreate(void *menu, const char *text, const char *tip, void *userData, const int style, tfuiCallback onpush);
+TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, const char *tip, void *userData, tfuiCallback onpush);
 
 /*******************************************
  * New XML based Menu Management Interface *
@@ -400,14 +455,14 @@ TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, c
 TGFCLIENT_API void *LoadMenuXML(const char *pFilePath);
 TGFCLIENT_API bool CreateStaticControls(void *param,void *menuHandle);
 
-TGFCLIENT_API int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush);
-TGFCLIENT_API int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onPush);
+TGFCLIENT_API int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onPush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 TGFCLIENT_API int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
 TGFCLIENT_API int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
 TGFCLIENT_API int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userdata, tfuiCallback onSelect);
-TGFCLIENT_API int CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,tfuiComboCallback onChange);
-TGFCLIENT_API int CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,tfuiCheckboxCallback onChange);
+TGFCLIENT_API int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onSelect);
+TGFCLIENT_API int CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiComboboxCallback onChange);
+TGFCLIENT_API int CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiCheckboxCallback onChange);
 TGFCLIENT_API int CreateProgressbarControl(void *menuHandle,void *param,const char *pControlName);
 
 TGFCLIENT_API void GfuiButtonShowBox(void *scr, int id,bool bShow);

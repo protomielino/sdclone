@@ -196,17 +196,19 @@ typedef struct
 {
     int labelId;
 	void *scr;
-	tChoiceInfo *pChoices;
+	tComboBoxInfo *pInfo;
 
     Color    fgColor[3];
     int			comboType;
-    tfuiComboCallback onChange;
+    tfuiComboboxCallback onChange;
 } tGfuiCombobox;
 
 typedef struct
 {
     int labelId;
 	void *scr;
+	tCheckBoxInfo *pInfo;
+
     Color    fgColor[3];
 	int checkId;
 	int uncheckId;

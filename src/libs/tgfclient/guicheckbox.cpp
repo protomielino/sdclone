@@ -46,9 +46,8 @@ gfuiChecked(void *idv)
 
 	checkbox = &(object->u.checkbox);
 
-	
 	if (checkbox->onChange)
-		checkbox->onChange(false);
+		checkbox->onChange(checkbox->pInfo);
 
 }
 
@@ -67,15 +66,14 @@ gfuiUnchecked(void *idv)
 
 	checkbox = &(object->u.checkbox);
 
-	
 	if (checkbox->onChange)
-		checkbox->onChange(true);
+		checkbox->onChange(checkbox->pInfo);
 
 }
 
 int 
 GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,
-				   tfuiCheckboxCallback onChange)
+				   void* userData, tfuiCheckboxCallback onChange)
 {
     tGfuiCheckbox	*Checkbox;
     tGfuiObject		*object;
@@ -89,6 +87,9 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imagehe
 
 	Checkbox = &(object->u.checkbox);
 	Checkbox->onChange = onChange;
+	Checkbox->pInfo = new tCheckBoxInfo;
+	Checkbox->pInfo->bChecked = bChecked;
+	Checkbox->pInfo->userData = userData;
 	Checkbox->scr = scr;
 
 	int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
@@ -223,16 +224,9 @@ GfuiCheckboxSetChecked(void *scr, int id, bool bChecked)
 		if (curObject->widget == GFUI_CHECKBOX)
 		{
 			tGfuiCheckbox *Check = &(curObject->u.checkbox);
-			if (bChecked)
-			{
-				GfuiVisibilitySet(scr,Check->checkId,true);
-				GfuiVisibilitySet(scr,Check->uncheckId,false);
-			}
-			else
-			{
-				GfuiVisibilitySet(scr,Check->checkId,false);
-				GfuiVisibilitySet(scr,Check->uncheckId,true);
-			}
+			Check->pInfo->bChecked = bChecked;
+			GfuiVisibilitySet(scr,Check->checkId,bChecked);
+			GfuiVisibilitySet(scr,Check->uncheckId,!bChecked);
 		}
 		return;
 	    }
