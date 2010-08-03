@@ -237,7 +237,7 @@ void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle)
 	tFList *racemanList;
 	tFList *racemanCur;
 
-	racemanList = GfDirGetListFiltered("config/raceman", "xml");
+	racemanList = GfDirGetListFiltered("config/raceman", "", ".xml");
 	if (!racemanList) {
 		GfError("No race manager available\n");
 		return;
