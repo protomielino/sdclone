@@ -510,20 +510,20 @@ linuxDirGetList(const char *dir)
  *	list of directory entries
  */
 static tFList *
-linuxDirGetListFiltered(const char *dir, const char *suffix)
+linuxDirGetListFiltered(const char *dir, const char *prefix, const char *suffix)
 {
 	DIR	*dp;
 	struct dirent *ep;
 	tFList *flist = (tFList*)NULL;
 	tFList *curf;
-	int	suffixLg;
+    int	prefixLg, suffixLg;
 	int	fnameLg;
 
-	if ((suffix == NULL) || (strlen(suffix) == 0)) {
+    if ((!prefix || strlen(prefix) == 0) && (!suffix || strlen(suffix) == 0))
 		return linuxDirGetList(dir);
-	}
 
-	suffixLg = strlen(suffix);
+    suffixLg = suffix ? strlen(suffix) : 0;
+    prefixLg = prefix ? strlen(prefix) : 0;
 
 	/* open the current directory */
 	dp = opendir(dir);
@@ -531,9 +531,14 @@ linuxDirGetListFiltered(const char *dir, const char *suffix)
 		/* some files in it */
 		while ((ep = readdir(dp)) != 0) {
 			fnameLg = strlen(ep->d_name);
-			if ((fnameLg > suffixLg) && (strcmp(ep->d_name + fnameLg - suffixLg, suffix) == 0)) {
+			if ((!prefix || (fnameLg > prefixLg
+							 && strncmp(ep->d_name, prefix, prefixLg) == 0))
+				&& (!suffix || (fnameLg > suffixLg
+								&& strncmp(ep->d_name + fnameLg - suffixLg, suffix, suffixLg) == 0))) {
 				curf = (tFList*)calloc(1, sizeof(tFList));
 				curf->name = strdup(ep->d_name);
+				curf->dispName = 0;
+				curf->userData = 0;
 				if (flist == (tFList*)NULL) {
 					curf->next = curf;
 					curf->prev = curf;

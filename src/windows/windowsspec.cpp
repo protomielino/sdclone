@@ -477,35 +477,42 @@ windowsDirGetList(const char *dir)
 *	Get a list of entries in a directory
 *
 * Parameters
-*	directory name
+*	dir : directory name
+*	prefix : file name prefix to match (may be NULL)
+*	suffix : file name suffix to match (may be NULL)
 *
 * Return
 *	list of directory entries
 */
 static tFList *
-windowsDirGetListFiltered(const char *dir, const char *suffix)
+windowsDirGetListFiltered(const char *dir, const char *prefix, const char *suffix)
 {
-    tFList	*flist = NULL;
-    tFList	*curf;
-    int		suffixLg;
-    int		fnameLg;
+    tFList *flist = NULL;
+    tFList *curf;
+    int	prefixLg, suffixLg;
+    int fnameLg;
 
-    if ((suffix == NULL) || (strlen(suffix) == 0))
+    if ((!prefix || strlen(prefix) == 0) && (!suffix || strlen(suffix) == 0))
 	return windowsDirGetList(dir);
 
-    suffixLg = strlen(suffix);
+    suffixLg = suffix ? strlen(suffix) : 0;
+    prefixLg = prefix ? strlen(prefix) : 0;
 	
     _finddata_t FData;
-    char Dir_name[ 1024 ];
-    sprintf( Dir_name, "%s\\*.*", dir );
-    GfOut("trying dir %s\n",dir);
-    long Dirent = _findfirst( Dir_name, &FData );
-    if ( Dirent != -1 ) {
+    char Dir_name[1024];
+    sprintf(Dir_name, "%s\\*.*", dir);
+    long Dirent = _findfirst(Dir_name, &FData);
+    if (Dirent != -1) {
 	do {
 	    fnameLg = strlen(FData.name);
-	    if ((fnameLg > suffixLg) && (strcmp(FData.name + fnameLg - suffixLg, suffix) == 0)) {
+	    if ((!prefix || (fnameLg > prefixLg
+						 && strncmp(FData.name, prefix, prefixLg) == 0))
+			&& (!suffix || (fnameLg > suffixLg
+							&& strncmp(FData.name + fnameLg - suffixLg, suffix, suffixLg) == 0))) {
 		curf = (tFList*)calloc(1, sizeof(tFList));
 		curf->name = strdup(FData.name);
+		curf->dispName = 0;
+		curf->userData = 0;
 		if (flist == (tFList*)NULL) {
 		    curf->next = curf;
 		    curf->prev = curf;
@@ -515,12 +522,14 @@ windowsDirGetListFiltered(const char *dir, const char *suffix)
 		    if (_stricmp(curf->name, flist->name) > 0) {
 			do {
 			    flist = flist->next;
-			} while ((stricmp(curf->name, flist->name) > 0) && (stricmp(flist->name, flist->prev->name) > 0));
+			} while (stricmp(curf->name, flist->name) > 0
+					 && stricmp(flist->name, flist->prev->name) > 0);
 			flist = flist->prev;
 		    } else {
 			do {
 			    flist = flist->prev;
-			} while ((stricmp(curf->name, flist->name) < 0) && (stricmp(flist->name, flist->next->name) < 0));
+			} while (stricmp(curf->name, flist->name) < 0
+					 && stricmp(flist->name, flist->next->name) < 0);
 		    }
 		    curf->next = flist->next;
 		    flist->next = curf;
@@ -529,7 +538,7 @@ windowsDirGetListFiltered(const char *dir, const char *suffix)
 		    flist = curf;
 		}
 	    }
-	} while ( _findnext( Dirent, &FData ) != -1 );
+	} while (_findnext( Dirent, &FData ) != -1);
     }
     
     return flist;

@@ -240,7 +240,7 @@ TGF_API int GfModFreeInfoList(tModList **modlist);
  * Directory management *
  ************************/
 
-/** List of (DLL) files for a Directory 
+/** List of files for a Directory 
     @see	GfDirGetList
 */
 typedef struct FList 
@@ -253,9 +253,9 @@ typedef struct FList
 } tFList;
 
 TGF_API tFList *GfDirGetList(const char *dir);
-TGF_API tFList *GfDirGetListFiltered(const char *dir, const char *suffix);
+TGF_API tFList *GfDirGetListFiltered(const char *dir, const char *prefix, const char *suffix);
 typedef void (*tfDirfreeUserData)(void*);	/**< Function to call for releasing the user data associated with file entry */
-TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserDatabool, bool freename = false, bool freedispname = false);
+TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freeName = false, bool freeDispName = false);
 
 
 /**********************************

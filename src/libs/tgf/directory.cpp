@@ -54,10 +54,10 @@ tFList * GfDirGetList(const char *dir)
     @param	dir	directory name
     @return	The list of files
  */
-tFList * GfDirGetListFiltered(const char *dir, const char *suffix)
+tFList * GfDirGetListFiltered(const char *dir, const char *prefix, const char *suffix)
 {
 	if (GfOs.dirGetListFiltered) {
-		return GfOs.dirGetListFiltered(dir, suffix);
+		return GfOs.dirGetListFiltered(dir, prefix, suffix);
 	} else {
 		return (tFList*)NULL;
 	}
@@ -69,23 +69,21 @@ tFList * GfDirGetListFiltered(const char *dir, const char *suffix)
     @param	freeUserData	User function used to free the user data
     @return	none
 */
-void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freename, bool freedispname)
+void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freeName, bool freeDispName)
 {
-	//tFList *cur;
-
 	if (list) {
 		// The list contains at least one element, checked above.
 		tFList *rl = list;
 		do {
 			tFList *tmp = rl;
 			rl = rl->next;
-			if ((freeUserData) && (tmp->userData)) {
+			if (freeUserData && tmp->userData) {
 				freeUserData(tmp->userData);
 			}
-			if (freename) {
+			if (freeName) {
 				freez(tmp->name);
 			}
-			if (freedispname) {
+			if (freeDispName) {
 				freez(tmp->dispName);
 			}
 			free(tmp);
@@ -93,26 +91,5 @@ void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freename, 
 	}
 
 	list = NULL;
-
-
-/*
-	while (list) {
-		if (list->next == list) {
-			if ((freeUserData) && (list->userData)) {
-				freeUserData(list->userData);
-			}
-			free(list);
-			list = NULL;
-		} else {
-			cur = list->next;
-			list->next = cur->next;
-			cur->next->prev = list;
-			if ((freeUserData) && (cur->userData)) {
-				freeUserData(cur->userData);
-			}
-			free(cur);
-		}
-	}
-*/
 }
 
