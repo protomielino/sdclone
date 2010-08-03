@@ -990,6 +990,7 @@ void* GfuiMenuScreen::GetPreviousMenuHandle() const
 bool GfuiMenuScreen::OpenXMLDescriptor()
 {
     m_priv->xmlDescParmHdle = LoadMenuXML(m_priv->strXMLDescFileName.c_str());
+	return m_priv->xmlDescParmHdle != 0;
 }
 
 bool GfuiMenuScreen::CloseXMLDescriptor()
@@ -998,7 +999,9 @@ bool GfuiMenuScreen::CloseXMLDescriptor()
 	{
 		GfParmReleaseHandle(m_priv->xmlDescParmHdle);
 		m_priv->xmlDescParmHdle = 0;
+		return true;
 	}
+	return false;
 }
 
 bool GfuiMenuScreen::CreateStaticControls()

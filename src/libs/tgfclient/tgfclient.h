@@ -240,11 +240,6 @@ TGFCLIENT_API void GfuiInitWindowPosition(int x, int y);
 TGFCLIENT_API void GfuiInitWindowSize(int x, int y);
 TGFCLIENT_API void GfuiSwapBuffers(void);
 
-// Export STL needed container types (needed with MSVC compilers).
-#ifdef WIN32
-ExportSTLVector(TGFCLIENT_API, std::string);
-#endif
-
 class TGFCLIENT_API GfuiMenuScreen
 {
 public:
