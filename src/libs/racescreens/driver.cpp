@@ -36,12 +36,14 @@
 				  
 // Some consts.
 const char* rmdStdSkinName = "standard";
-static const char* pszSkinFileExt = ".png";
-static const char* pszPreviewFileSuffix = "-preview.png";
 
-static const char* apszExcludedSkinFileSuffixes[] =
-{ "-rpm.png", "-speed.png", pszPreviewFileSuffix };
-static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
+// Temporary workaround for MS shit : moved to driverselect.cpp
+// static const char* pszSkinFileExt = ".png";
+// static const char* pszPreviewFileSuffix = "-preview.png";
+
+// static const char* apszExcludedSkinFileSuffixes[] =
+// { "-rpm.png", "-speed.png", pszPreviewFileSuffix };
+// static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
 
 
 int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
@@ -76,6 +78,8 @@ void rmdGetDriverType(const char* moduleName, char* driverType, size_t maxSize)
     }
 }
 
+// Temporary workaround for MS shit : moved to driverselect.cpp
+#if 0
 void rmdGetCarSkinsInFolder(const trmdDrvElt *pDriver, const char* pszFolderPath,
 							std::vector<std::string>& lstSkinNames,
 							std::vector<std::string>& lstPreviewFiles)
@@ -147,7 +151,6 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver,
 								std::vector<std::string>& lstSkinNames,
 								std::vector<std::string>& lstPreviewFiles)
 {
-	tFList *pSkinFileList, *pCurSkinFile;
 	std::ostringstream ossDirPath;
 	std::string strPreviewName;
 
@@ -230,4 +233,4 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver,
 		}
 	}
 }
-
+#endif
