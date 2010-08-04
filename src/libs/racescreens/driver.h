@@ -53,13 +53,13 @@ extern void rmdGetDriverType(const char* moduleName, char* driverType, size_t ma
 extern int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
 								   const char* anyCarCat, const char* anyDrvTyp);
 
-/* extern void rmdGetCarSkinsInFolder(const trmdDrvElt *pDriver, const char* pszFolderPath, */
-/* 								   std::vector<std::string>& lstSkinNames, */
-/* 								   std::vector<std::string>& lstPreviewFiles); */
+extern void rmdGetCarSkinsInFolder(const trmdDrvElt *pDriver, const char* pszFolderPath,
+								   std::vector<std::string>& lstSkinNames,
+								   std::vector<std::string>& lstPreviewFiles);
 
-/* extern void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, */
-/* 									   std::vector<std::string>& lstSkinNames, */
-/* 									   std::vector<std::string>& lstPreviewFiles); */
+extern void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver,
+									   std::vector<std::string>& lstSkinNames,
+									   std::vector<std::string>& lstPreviewFiles);
 
 #endif /* __DRIVER_H__ */
 

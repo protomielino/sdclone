@@ -37,13 +37,12 @@
 // Some consts.
 const char* rmdStdSkinName = "standard";
 
-// Temporary workaround for MS shit : moved to driverselect.cpp
-// static const char* pszSkinFileExt = ".png";
-// static const char* pszPreviewFileSuffix = "-preview.png";
+static const char* pszSkinFileExt = ".png";
+static const char* pszPreviewFileSuffix = "-preview.png";
 
-// static const char* apszExcludedSkinFileSuffixes[] =
-// { "-rpm.png", "-speed.png", pszPreviewFileSuffix };
-// static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
+static const char* apszExcludedSkinFileSuffixes[] =
+{ "-rpm.png", "-speed.png", pszPreviewFileSuffix };
+static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
 
 
 int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
@@ -58,7 +57,7 @@ void rmdGetDriverType(const char* moduleName, char* driverType, size_t maxSize)
     char* pos;
 
     strncpy(driverType, moduleName, maxSize);
-    driverType[maxSize-1] = 0; // Guarantee 0 termination
+    driverType[maxSize-1] = 0; // Ensure 0 termination
 
     // Parse module name for last '_' char : 
     // assumed to be the separator between type and instance name for ubiquitous robots (ex: simplix)
@@ -78,8 +77,6 @@ void rmdGetDriverType(const char* moduleName, char* driverType, size_t maxSize)
     }
 }
 
-// Temporary workaround for MS shit : moved to driverselect.cpp
-#if 0
 void rmdGetCarSkinsInFolder(const trmdDrvElt *pDriver, const char* pszFolderPath,
 							std::vector<std::string>& lstSkinNames,
 							std::vector<std::string>& lstPreviewFiles)
@@ -233,4 +230,3 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver,
 		}
 	}
 }
-#endif
