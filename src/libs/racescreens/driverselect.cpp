@@ -641,8 +641,10 @@ RmDriversSelect(void *vs)
 
     GfParmReleaseHandle(menuDescHdle);
 
-	// Initialize the Car selection menu.
-	CarSelectMenu.Init(ScrHandle);
+	// Initialize the Car selection menu if not already done,
+	// and reset its return menu .
+	CarSelectMenu.Initialize();
+	CarSelectMenu.SetPreviousMenuHandle(ScrHandle);
 	
     // Keyboard shortcuts
     GfuiMenuDefaultKeysAdd(ScrHandle);

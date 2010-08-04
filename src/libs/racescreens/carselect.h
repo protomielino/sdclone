@@ -31,7 +31,7 @@ class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
 public:
 
 	RmCarSelectMenu();
-	bool Init(void* pPrevMenuHdle);
+	bool Initialize();
 	void RunMenu(const trmdDrvElt* pDriver);
 	
 	void resetCarCategoryComboBox(const std::string& strSelectedCategoryName = "");

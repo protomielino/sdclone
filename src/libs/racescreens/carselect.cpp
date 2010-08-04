@@ -179,14 +179,15 @@ void RmCarSelectMenu::RunMenu(const trmdDrvElt* pDriver)
 	GfuiMenuScreen::RunMenu();
 }
 
-bool RmCarSelectMenu::Init(void* pPrevMenuHdle)
+bool RmCarSelectMenu::Initialize()
 {
 	//GfOut("RmCarSelectMenu::Init\n");
 	//CarInfo::self()->print();
 
-	// Save target previous menu.
-	SetPreviousMenuHandle(pPrevMenuHdle);
-
+	// Can only be initialized once.
+	if (GetMenuHandle())
+		return true;
+	
 	// Create the menu and all its controls.
 	CreateMenuEx(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
 
