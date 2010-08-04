@@ -26,6 +26,7 @@
 
 #ifdef _MSC_VER
 #pragma warning(disable:4786) // identifier was truncated to '255'
+#pragma warning(disable:4996) // std::_Copy_opt was declared as disaproved because unsafe
 #endif // _MSC_VER
 
 #include "BBoxTree.h"
