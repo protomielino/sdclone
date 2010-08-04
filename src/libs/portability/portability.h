@@ -20,7 +20,7 @@
 #ifndef _SD_PORTABILITY_H_
 #define _SD_PORTABILITY_H_
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>
 #ifdef WIN32
 #include <direct.h>
@@ -36,8 +36,6 @@
 #include <config.h>
 #endif
 
-#include "stlexports.h"
-
 // Missing strndup, define it here (for FreeBSD).
 // TODO: Move it into library.
 // strndup code provided by Thierry Thomas.
@@ -45,20 +43,17 @@
 
 static char *strndup(const char *str, int len)
 {
-	char *ret;
+	if (!str || len < 0)
+		return 0;
 
-	if ((str == NULL || len < 0)) {
-		return (NULL);
-	}
-
-	ret = (char *) malloc(len + 1);
-	if (ret == NULL) {
-		return (NULL);
-	}
+	char* ret;
+	if (!(ret = (char*)malloc(len + 1)))
+		return 0;
 
 	memcpy(ret, str, len);
 	ret[len] = '\0';
-	return (ret);
+
+	return ret;
 }
 
 #endif

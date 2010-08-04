@@ -21,8 +21,6 @@
 #include <string>
 #include <vector>
 
-#include <portability.h>
-
 #include "tgf.h"
 
 /* Singleton holding information on available cars and categories */
@@ -36,14 +34,6 @@ public:
 	std::string strCategoryName; // Category name (ex: "LS-GT1").
 	std::string strXMLPath; // Path-name of the car XML file.
 };
-
-// Export STL needed container types (needed with MSVC compilers).
-// WARNING: It's quite complicated and dangerous to export STL containers (other than the vector)
-//          accross DLL boundaries under Ruin'dows ... that's why we do it only for the vector.
-#ifdef WIN32
-ExportSTLVector(TGF_API, std::string);
-ExportSTLVector(TGF_API, CarData);
-#endif
 
 class TGF_API CarInfo
 {
