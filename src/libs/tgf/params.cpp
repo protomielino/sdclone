@@ -1229,7 +1229,7 @@ GfParmReadFile (const char *file, int mode)
     if (mode & GFPARM_RMODE_REREAD) {
 	in = fopen (file, "r");
 	if (!in && ((mode & GFPARM_RMODE_CREAT) == 0)) {
-	    GfOut ("gfParmReadFile: fopen \"%s\" failed\n", file);
+	    GfOut ("Failed to load \"%s\" (fopen failed)\n", file);
 	    goto bailout;
 	}
 
