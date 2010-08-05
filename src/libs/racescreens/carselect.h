@@ -19,11 +19,14 @@
 #ifndef _CARSELECT_H_
 #define _CARSELECT_H_
 
+#include <map>
+
 #include <carinfo.h>
 #include <tgfclient.h>
 
-#include "driver.h"
 #include "racescreens.h"
+
+struct rmdDrvElt;
 
 
 class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
@@ -31,22 +34,30 @@ class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
 public:
 
 	RmCarSelectMenu();
-	bool Initialize();
-	void RunMenu(const trmdDrvElt* pDriver);
+	void RunMenu(trmdDrvElt* pDriver);
 	
 	void resetCarCategoryComboBox(const std::string& strSelectedCategoryName = "");
 	void resetCarModelComboBox(const std::string& strCategoryName,
 							   const std::string& strSelectedRealCarName = "");
+	void resetCarDataSheet(const std::string& strSelectedCarName);
 	void resetCarSkinComboBox(const std::string& strRealCarName,
 							  const std::string& strSelectedSkinName = "");
+	void resetCarPreviewImage(const std::string& strSelectedSkinName = "");
 	
 protected:
 	
-	const trmdDrvElt* getDriver() const;
-	void setDriver(const trmdDrvElt* pDriver);
+	bool Initialize();
+
+	const struct rmdDrvElt* getDriver() const;
+	struct rmdDrvElt* getDriver();
+	void setDriver(struct rmdDrvElt* pDriver);
 
 	const CarData* getSelectedCarModel() const;
+	const char* getSelectedCarSkin() const;
 
+	void setSelectedCarParamsHandle(void* hdle);
+	void* getSelectedCarParamsHandle() const;
+	
 	// Control callback functions (must be static).
 	static void onActivateCB(void *pCarSelectMenu);
 	static void onChangeCategory(tComboBoxInfo *pInfo);
@@ -59,7 +70,16 @@ protected:
 private:
 
 	// The target driver.
-	const trmdDrvElt* m_pDriver;
+	struct rmdDrvElt* _pDriver;
+
+	// Currently selected car params handle.
+	void* _hCarParams;
+	
+	// Skin names and associated preview files
+	std::vector<std::string> _vecSkinNames;
+	std::map<std::string, std::string> _mapPreviewFiles;
+	size_t _nCurSkinIndex;
+
 };
 
 #endif //_CARSELECT_H_

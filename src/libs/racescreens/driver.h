@@ -24,11 +24,11 @@
 #ifndef __DRIVER_H__
 #define __DRIVER_H__
 
-#include <tgf.h>
-
 #include <string>
 #include <vector>
-//#include <map>
+#include <map>
+
+#include <tgf.h>
 
 
 // Driver description
@@ -45,21 +45,25 @@ typedef struct rmdDrvElt
     GF_TAILQ_ENTRY(struct rmdDrvElt)	link;
 } trmdDrvElt;
 
-// Some consts.
+//! Standard skin name.
 extern const char* rmdStdSkinName;
 
-
+//! Determine the driver type from its module name.
 extern void rmdGetDriverType(const char* moduleName, char* driverType, size_t maxSize);
+
+//! Tell if the given driven matches the giver filters on type and car category. 
 extern int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
 								   const char* anyCarCat, const char* anyDrvTyp);
 
-extern void rmdGetCarSkinsInFolder(const trmdDrvElt *pDriver, const char* pszFolderPath,
-								   std::vector<std::string>& lstSkinNames,
-								   std::vector<std::string>& lstPreviewFiles);
+//! Retrieve the skins and associated preview images found in the given folder for the given car.
+extern void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
+								   std::vector<std::string>& vecSkinNames,
+								   std::map<std::string, std::string>& mapPreviewFiles);
 
-extern void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver,
-									   std::vector<std::string>& lstSkinNames,
-									   std::vector<std::string>& lstPreviewFiles);
+//! Retrieve the skins and associated preview images found in the search path for the given driver (use pszForcedCarName in place of pDriver->carName if not null).
+extern void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForcedCarName,
+									   std::vector<std::string>& vecSkinNames,
+									   std::map<std::string, std::string>& mapPreviewFiles);
 
 #endif /* __DRIVER_H__ */
 
