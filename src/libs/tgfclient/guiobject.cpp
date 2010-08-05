@@ -483,14 +483,24 @@ GfuiEnable(void *scr, int id, int flag)
 	return -1;
     }
 
-	if (curObject->widget == GFUI_BUTTON)
+	switch (curObject->widget)
 	{
-		if (curObject->state == GFUI_DISABLE) 
-			curObject->u.button.state = GFUI_BTN_RELEASED;
-		else
-			curObject->u.button.state = GFUI_BTN_RELEASED;
-	}
+		case GFUI_BUTTON:
+			if (curObject->state == GFUI_DISABLE) 
+				curObject->u.button.state = GFUI_BTN_DISABLE;
+			else
+				curObject->u.button.state = GFUI_BTN_RELEASED;
+			break;
 
+		case GFUI_COMBOBOX:
+			GfuiEnable(scr, curObject->u.combobox.leftButtonId, flag);
+			GfuiEnable(scr, curObject->u.combobox.rightButtonId, flag);
+			GfuiEnable(scr, curObject->u.combobox.labelId, flag);
+			break;
+
+		default:
+			break;
+	}
 
     return 0;
 }

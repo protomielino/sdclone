@@ -166,25 +166,27 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	break;
     }
 
-	//Create text
+	// Create label control.
 	int xm = object->xmin + (object->xmax-object->xmin)/2;
 	int ym = object->ymin + (object->ymax-object->ymin)/2;
-	int xmax = object->xmax;
-	int xmin = object->xmin;
 
 	combobox->labelId = GfuiLabelCreate(scr, pszText, font, xm, ym, GFUI_ALIGN_HC_VC, 99);
 
-    GfuiGrButtonCreate(scr, "data/img/arrow-left.png", "data/img/arrow-left.png",
-			       "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-			       	xmin, ym, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-				   (void*)(object->id), gfuiLeftArrow,
-			       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	// Create the left arrow button control.
+    combobox->leftButtonId =
+		GfuiGrButtonCreate(scr, "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
+						   "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
+						   object->xmin, ym, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
+						   (void*)(object->id), gfuiLeftArrow,
+						   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
-    GfuiGrButtonCreate(scr, "data/img/arrow-right.png", "data/img/arrow-right.png",
-			       "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-			       xmax,ym, GFUI_ALIGN_HR_VC, GFUI_MOUSE_UP,
-				   (void*)(object->id), gfuiRightArrow,
-			       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	// Create the right arrow button control.
+    combobox->rightButtonId =
+		GfuiGrButtonCreate(scr, "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
+						   "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
+						   object->xmax, ym, GFUI_ALIGN_HR_VC, GFUI_MOUSE_UP,
+						   (void*)(object->id), gfuiRightArrow,
+						   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 
     gfuiAddObject(screen, object);
 	

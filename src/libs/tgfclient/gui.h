@@ -62,12 +62,12 @@ Color GetColor(const float* color);
 typedef struct
 {
     char	*text;		/* text */
-    Color       bgColor;	/* RGBA */
-    Color       fgColor;
+    Color	bgColor;	/* RGBA */
+    Color	fgColor;
     GfuiFontClass	*font;		/* ttf font */
-    int		x, y;		/* label position */
-    int		align;
-    int		maxlen;
+    int	x, y;		/* label position */
+    int	align;
+    int	maxlen;
 } tGfuiLabel;
 
 /* button state */
@@ -195,11 +195,12 @@ typedef struct
 typedef struct
 {
     int labelId;
+    int leftButtonId, rightButtonId;
 	void *scr;
 	tComboBoxInfo *pInfo;
 
-    Color    fgColor[3];
-    int			comboType;
+    Color fgColor[3];
+    int	comboType;
     tfuiComboboxCallback onChange;
 } tGfuiCombobox;
 
@@ -209,7 +210,7 @@ typedef struct
 	void *scr;
 	tCheckBoxInfo *pInfo;
 
-    Color    fgColor[3];
+    Color fgColor[3];
 	int checkId;
 	int uncheckId;
 
