@@ -356,7 +356,8 @@ RmRaceParamMenu(void *vrp)
     }
 
     // Create and initialize Time of day combo box (2 arrow buttons and a variable label).
-    rmrpTimeOfDay = ((int)GfParmGetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, 0) - 1);
+    rmrpTimeOfDay =
+		(int)GfParmGetNum(rp->param, rp->title, RM_ATTR_TIME, NULL, NTimeOfDayValues) - 1;
 
     CreateButtonControl(scrHandle,menuXMLDescHdle,"timeofdayleftarrow",(void*)-1, rmChangeTime);
     CreateButtonControl(scrHandle,menuXMLDescHdle,"timeofdayrightarrow",(void*)1, rmChangeTime);
