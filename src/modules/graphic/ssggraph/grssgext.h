@@ -1,7 +1,6 @@
 /***************************************************************************
 
     file                 : grssgext.h
-		* This file contains the divergences from PLIB.
     created              : Wed Aug 30 01:35:45 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
@@ -21,7 +20,8 @@
 #ifndef _GRSSGEXT_H_
 #define _GRSSGEXT_H_
 
-#include "grtexture.h"	//doMipMap
+
+/* This file contains divergences from PLIB (but see also grloadac). */
 
 /*
  * An ssgBranch with pre and post draw callbacks.
@@ -67,26 +67,5 @@ public:
 
 };
 
-
-/* Use the texture name to select options like mipmap */
-class ssgLoaderOptionsEx : public ssgLoaderOptions {
-	public:
-		ssgLoaderOptionsEx():ssgLoaderOptions() {}
-
-		ssgTexture* createTexture(char* tfname, int wrapu = TRUE, int wrapv = TRUE, int mipmap = TRUE) {
-			mipmap = doMipMap(tfname, mipmap);
-			return ssgLoaderOptions::createTexture(tfname, wrapu, wrapv, mipmap) ;
-		}
-
-		virtual void makeModelPath ( char* path, const char *fname ) const
-		{
-			ulFindFile ( path, model_dir, fname, NULL ) ;
-		}
-
-		virtual void makeTexturePath ( char* path, const char *fname ) const
-		{
-			ulFindFile ( path, texture_dir, fname, NULL ) ;
-		}
-};
 
 #endif /* _GRSSGEXT_H_ */ 

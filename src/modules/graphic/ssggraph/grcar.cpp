@@ -32,16 +32,12 @@
 #include "grsmoke.h"	//grAddSmoke
 #include "grscene.h"	//CarsAnchor, ShadowAnchor
 #include "grboard.h"	//grInitBoardCar
+#include "grloadac.h"
 #include "grutil.h"
 #include "grcarlight.h"	//grUpdateCarlight
 
-extern ssgEntity *grssgLoadAC3D ( const char *fname, const ssgLoaderOptions* options );
-extern ssgEntity *grssgCarLoadAC3D ( const char *fname, const ssgLoaderOptions* options,int index );
-extern double carTrackRatioX;
-extern double carTrackRatioY;
 
 ssgBranch *CarsAnchorTmp = 0;
-
 
 static int grCarIndex;
 
@@ -233,7 +229,7 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 
 	// Create wheels for 4 speeds (stillstanding - fast --> motion blur, look at the texture).
 	// Note: These hard-coded values should really be read from the car's XML file
-        char wheel_file_name[32];
+	char wheel_file_name[32];
 	for (j = 0; j < 4; j++) {
 
 	    ssgBranch *whl_branch = new ssgBranch;
@@ -425,7 +421,8 @@ grInitShadow(tCarElt *car)
 	/* vertices */
 #define MULT	1.1
 	vtx[2] = 0.0;
-	for (i = 0, x = car->_dimension_x * MULT / 2.0; i < GR_SHADOW_POINTS / 2; i++, x -= car->_dimension_x * MULT / (float)(GR_SHADOW_POINTS - 2) * 2.0) {
+	for (i = 0, x = car->_dimension_x * MULT / 2.0; i < GR_SHADOW_POINTS / 2;
+		 i++, x -= car->_dimension_x * MULT / (float)(GR_SHADOW_POINTS - 2) * 2.0) {
 		/*vtx[0] = x;
 		vtx[1] = car->_dimension_y * MULT / 2.0;
 		shd_vtx->add(vtx);
@@ -449,8 +446,7 @@ grInitShadow(tCarElt *car)
 		shd_vtx->add(vtx);
 		tex[1] = 1.0;
 		shd_tex->add(tex);
-
-	};
+	}
 
 	grCarInfo[car->index].shadowBase = new ssgVtxTableShadow(GL_TRIANGLE_STRIP, shd_vtx, shd_nrm, shd_tex, shd_clr);
 	grMipMap = 0;
@@ -516,25 +512,44 @@ grInitCar(tCarElt *car)
 	const char *param;
 	int lg;
 	char path[256];
-	myLoaderOptions options;
+	grssgLoaderOptions options;
 	sgVec3 lightPos;
 	int lightNum;
 	const char *lightType;
 	int lightTypeNum;
+	bool bTemplate;
 
+	TRACE_GL("loadcar: start");
 
 	if (!CarsAnchorTmp) {
 		CarsAnchorTmp = new ssgBranch();
 	}
 
-	grInitBoardCar(car);
-
-	TRACE_GL("loadcar: start");
-
-	ssgSetCurrentOptions ( &options ) ;
-
 	grCarIndex = index = car->index;	/* current car's index */
 	handle = car->_carHandle;
+
+	/* Load car template 3D model name if any (needed also by grInitBoardCar => must precede) */
+	strncpy(car->_carTemplate, GfParmGetStr(car->_carHandle, path, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
+	car->_carTemplate[MAX_NAME_LEN - 1] = 0;
+
+	/* Initialize board */
+	grInitBoardCar(car);
+
+	/* Set texture mapping if we are using an alternative skin or a master 3D model */
+	bTemplate = strlen(car->_carTemplate) != 0;
+	
+	std::string strSrcTexName(bTemplate ? car->_carTemplate : car->_carName);
+	std::string strTgtTexName(strlen(car->_carSkin) != 0 ? car->_carSkin : car->_carName);
+	if (strSrcTexName != strTgtTexName)
+	{
+		strSrcTexName += ".png";
+		strTgtTexName += ".png";
+		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
+	}
+	GfOut("grInitCar(%s, %s) : tpl='%s', skin='%s'\n",
+		  car->_name, car->_carName, car->_carTemplate, car->_carSkin);
+
+	grssgSetCurrentOptions(&options);
 
 	/* Load visual attributes */
 	car->_exhaustNb = GfParmGetEltNb(handle, SECT_EXHAUST);
@@ -580,11 +595,19 @@ grInitCar(tCarElt *car)
 	grFilePath = (char*)malloc(4096);
 	lg = 0;
 	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carTemplate);
 	lg += sprintf(grFilePath + lg, "drivers/%s;", car->_modName);
 	lg += sprintf(grFilePath + lg, "cars/%s;", car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "cars/%s;", car->_carTemplate);
 	lg += sprintf(grFilePath + lg, "data/textures");
 
 	grCarInfo[index].envSelector = (ssgStateSelector*)grEnvSelector->clone();
@@ -612,21 +635,29 @@ grInitCar(tCarElt *car)
 
 	/* Set textures/models search path : 0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common models / textures */
-	sprintf(buf, "%sdrivers/%s/%s;drivers/%s/%d/%s;drivers/%s/%d;drivers/%s/%s;drivers/%s;"
-		"cars/%s;data/objects;data/textures", 
-		GetLocalDir(), car->_modName, car->_carName, 
-		car->_modName, car->_driverIndex, car->_carName,
-		car->_modName, car->_driverIndex,
-		car->_modName, car->_carName,
-		car->_modName,
-		car->_carName);
+	lg = 0;
+	lg += sprintf(buf + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
+	if (bTemplate)
+		lg += sprintf(buf + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
+	lg += sprintf(buf + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
+	if (bTemplate)
+		lg += sprintf(buf + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
+	lg += sprintf(buf + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
+	lg += sprintf(buf + lg, "drivers/%s/%s;", car->_modName, car->_carName);
+	if (bTemplate)
+		lg += sprintf(buf + lg, "drivers/%s/%s;", car->_modName, car->_carTemplate);
+	lg += sprintf(buf + lg, "drivers/%s;", car->_modName);
+	lg += sprintf(buf + lg, "cars/%s;", car->_carName);
+	if (bTemplate)
+		lg += sprintf(buf + lg, "cars/%s;", car->_carTemplate);
+	lg += sprintf(buf + lg, "data/objects;");
+	lg += sprintf(buf + lg, "data/textures");
 	ssgModelPath(buf);
 	ssgTexturePath(buf);
-	grTexturePath = strdup(buf);
 
 	/* loading raw car level 0*/
 	selIndex = 0; 	/* current selector index */
-	sprintf(buf, "%s.ac", car->_carName); /* default car name */
+	sprintf(buf, "%s.ac", bTemplate ? car->_carTemplate : car->_carName); /* default car 3D model file */
 	sprintf(path, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
 	param = GfParmGetStr(handle, path, PRM_CAR, buf);
 	grCarInfo[index].LODThreshold[selIndex] = GfParmGetNum(handle, path, PRM_THRESHOLD, NULL, 0.0);
@@ -850,7 +881,6 @@ grInitCar(tCarElt *car)
     
     //grCarInfo[index].carTransform->print(stdout, "-", 1);
 
-	FREEZ(grTexturePath);
 	FREEZ(grFilePath);
 
 	TRACE_GL("loadcar: end");

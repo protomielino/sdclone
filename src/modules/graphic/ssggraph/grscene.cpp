@@ -32,6 +32,7 @@
 #include "grscene.h"
 #include "grmain.h"
 #include "grcam.h"	//cGrBackgroundCam
+#include "grloadac.h"
 #include "grutil.h"
 #include "grssgext.h"
 #include "grrain.h"
@@ -121,8 +122,6 @@ static const double sqrt_m_log01 = sqrt( m_log01 );
 static char buf[1024];
 static void initBackground(void);
 static void grDrawRain(void);
-
-extern ssgEntity *grssgLoadAC3D(const char *fname, const ssgLoaderOptions* options);
 
 
 //Must have
@@ -428,7 +427,7 @@ grInitScene(void)
 }//grInitScene
 
 
-static ssgLoaderOptionsEx	options;
+static grssgLoaderOptions	options(/*bDoMipMap*/true);
 
 int
 grLoadScene(tTrack *track)
@@ -441,7 +440,7 @@ grLoadScene(tTrack *track)
 		InitMultiTex();
 	}
 
-	ssgSetCurrentOptions(&options);
+	grssgSetCurrentOptions(&options);
 
 	if(grHandle == NULL) {
 		sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);

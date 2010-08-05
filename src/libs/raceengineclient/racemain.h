@@ -32,7 +32,7 @@ typedef void* (*tMenuInitFunc)(void*);
 
 RACEENGINECLIENT_API void ReSetExitMenuInitFunc(tMenuInitFunc func);
 
-char        humanInGroup();
+extern bool ReHumanInGroup();
 extern int  ReRaceEventInit(void);
 extern int  RePreRace(void);
 extern int  ReRaceStart(void);

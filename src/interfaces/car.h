@@ -79,7 +79,7 @@ typedef struct {
     int		raceNumber;		/**< Car's race number */
     int		startRank;		/**< Car's starting position */
     int		driverType;		/**< Driver type */
-	int     networkplayer;  /* Network player */
+    int		networkplayer;		/**< Network player */
     int		skillLevel;		/**< Driver's skill level (0=rookie -> 3=pro) */
     tdble	iconColor[3];		/**< Car color in leaders board */
     t3Dd	dimension;		/**< Car's mesures */
@@ -90,6 +90,8 @@ typedef struct {
     t3Dd	statGC;			/**< Static pos of GC (should be the origin of car axis) */
     tWheelSpec	wheel[4];		/**< Wheels specifications */
     tVisualAttributes visualAttr; 	/**< Visual attributes */
+    char	carTemplate[MAX_NAME_LEN];	/**< Car master model object (file) name */
+    char	carSkin[MAX_NAME_LEN];	/**< Car skin (= texture file) name if not the default one */
 } tInitCar;
 /* structure access short cuts */
 #define _name		info.name			/**< short cut to tInitCar#name */
@@ -121,6 +123,8 @@ typedef struct {
 #define _exhaustNb	info.visualAttr.exhaustNb	/**< short cut to tVisualAttributes#exhaustNb */
 #define _exhaustPos	info.visualAttr.exhaustPos	/**< short cut to tVisualAttributes#exhaustPos */
 #define _exhaustPower	info.visualAttr.exhaustPower	/**< short cut to tVisualAttributes#exhaustPower */
+#define _carTemplate	info.carTemplate	 	/**< short cut to tInitCar#carTemplate */
+#define _carSkin	info.carSkin			/**< short cut to tInitCar#carSkin */
 
 #define RM_DRV_HUMAN	1
 #define RM_DRV_ROBOT	2
@@ -569,6 +573,7 @@ typedef struct CarElt
 #define PRM_THRESHOLD		"threshold"
 #define PRM_CAR			"car"
 #define PRM_WHEELSON		"wheels"
+#define PRM_TEMPLATE		"template"
 #define PRM_ENV			"env"
 #define PRM_BONNET		"bonnet"
 #define PRM_WHEEL_TEXTURE	"wheel texture"

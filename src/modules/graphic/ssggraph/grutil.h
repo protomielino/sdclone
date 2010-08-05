@@ -50,7 +50,6 @@ extern float grGammaValue;
 extern int	 grMipMap;
 
 extern char *grFilePath;	/* Multiple path (: separated) used to search for files */
-extern char *grTexturePath;
 
 extern int grGetFilename(const char *filename, const char *filepath, char *buf);
 class ssgState;
@@ -63,20 +62,5 @@ extern void grWriteTimeBuf(char *buf, tdble sec, int sgn);
 extern float grGetHOT(float x, float y);
 
 inline float urandom() { return(((float)rand() / (1.0 + (float)RAND_MAX)));}
-
-class myLoaderOptions : public ssgLoaderOptions
-{
-public:
-	virtual void makeModelPath ( char* path, const char *fname ) const
-	{
-		ulFindFile ( path, model_dir, fname, NULL ) ;
-	}
-
-	virtual void makeTexturePath ( char* path, const char *fname ) const
-	{
-		ulFindFile ( path, texture_dir, fname, NULL ) ;
-	}
-} ;
-
 
 #endif /* _GRUTIL_H_ */ 

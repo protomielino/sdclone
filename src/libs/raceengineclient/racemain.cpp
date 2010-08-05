@@ -50,22 +50,22 @@ static char path2[1024];
 //Utility
 
 /** 
- * humanInGroup
- * Checks if there is a human-driven car between the racing cars.
+ * ReHumanInGroup
+ * Checks if there is a human-driven car among the racing cars.
  * 
  * @return True if there is a human.
  */
-char
-humanInGroup()
+bool
+ReHumanInGroup()
 {
 	if (GfParmListSeekFirst(ReInfo->params, RM_SECT_DRIVERS) == 0) {
 		do {
 			if (strcmp (GfParmGetCurStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_MODULE, ""), "human") == 0)
-				return TRUE;
+				return true;
 		} while (GfParmListSeekNext(ReInfo->params, RM_SECT_DRIVERS) == 0);
 	}
-	return FALSE;
-}//humanInGroup
+	return false;
+}//ReHumanInGroup
 
 
 /***************************************************************/
@@ -227,7 +227,7 @@ RePreRace(void)
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
 	GfParmRemoveVariable (ReInfo->params, "/", "eventNb");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", humanInGroup() ? 1 : 0);
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
 	GfParmSetVariable (ReInfo->params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
 	if (!raceName) {
 		return RM_QUIT;
@@ -326,7 +326,7 @@ reRaceRealStart(void)
 	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);
 
 	//Check if there is a human on the driver list
-	foundHuman = humanInGroup() ? 2 : 0;
+	foundHuman = ReHumanInGroup() ? 2 : 0;
 
 	//Set _displayMode here because then robot->rbNewTrack isn't called. This is a lot faster for simusimu
 	if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0 && foundHuman == 0)
@@ -369,7 +369,7 @@ reRaceRealStart(void)
 		}
 	}//if foundHuman != 1
 
-	//If not a qualy, nor a practice and has results, load race splash
+	//If neither a qualification, nor a practice and has results, load race splash
 	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) ||
 	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)) {
 		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
@@ -510,11 +510,12 @@ ReRaceStart(void)
 
 	/* Drivers starting order */
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
-	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) && ReInfo->s->_totTime < 0.0f) {
+	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+		&& ReInfo->s->_totTime < 0.0f) {
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
 			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
-			RmLoadingScreenSetText("Preparing Starting Grid...");
+			RmLoadingScreenSetText("Preparing Starting Grid ...");
 		} else {
 			RmShutdownLoadingScreen();
 		}
@@ -526,13 +527,16 @@ ReRaceStart(void)
 		GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
 		//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(params, path, ROB_ATTR_NAME, "none"));
 		//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(params, path, ROB_ATTR_CAR, ""));
+		const char* pszSkinName = GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0);
+		if (pszSkinName && strlen(pszSkinName) > 0)
+			GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 	} else {
 		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
-		RmLoadingScreenSetText("Preparing Starting Grid...");
+		RmLoadingScreenSetText("Preparing Starting Grid ...");
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER)) {
-			/* Starting grid in the arrival of the previous race */
+			/* Starting grid in the arrival order of the previous race */
 			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 			nCars = MIN(nCars, maxCars);
@@ -546,8 +550,12 @@ ReRaceStart(void)
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+				// TODO (D30) : Copy human ROB_ATTR_CAR (no more in human.xml).
 				//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(results, path, ROB_ATTR_NAME, "<none>"));
 				//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(results, path, ROB_ATTR_CAR, ""));
+				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0);
+				if (pszSkinName && strlen(pszSkinName) > 0)
+					GfParmSetStr(results, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
 		} else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER)) {
 			/* Starting grid in the reversed arrival order of the previous race */
@@ -564,8 +572,12 @@ ReRaceStart(void)
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+				// TODO (D30) : Copy human ROB_ATTR_CAR (no more in human.xml).
 				//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(results, path, ROB_ATTR_NAME, "<none>"));
 				//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(results, path, ROB_ATTR_CAR, ""));
+				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0);
+				if (pszSkinName && strlen(pszSkinName) > 0)
+					GfParmSetStr(results, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
 		} else {
 			/* Starting grid in the drivers list order */
@@ -578,8 +590,23 @@ ReRaceStart(void)
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
+				// TODO (D30) : Copy human ROB_ATTR_CAR (no more in human.xml).
 				//GfParmSetStr(params, path2, ROB_ATTR_NAME, GfParmGetStr(params, path, ROB_ATTR_NAME, "<none>"));
 				//GfParmSetStr(params, path2, ROB_ATTR_CAR, GfParmGetStr(params, path, ROB_ATTR_CAR, ""));
+				// Pb : Incoherence avec raceinit !!!!!!!!!!!!
+				const char* pszSkinName = GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0);
+				if (pszSkinName && strlen(pszSkinName) > 0)
+					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
+				GfTrace("RaceMain: File '%s', path '%s', path2 '%s'\n",
+						GfParmGetFileName(params), path, path2);
+//  				GfTrace("Driverx #%d : module='%s', skin='%s'\n",
+//  						GfParmGetNum(params, path, RM_ATTR_IDX, NULL, -1),
+//  						GfParmGetStr(params, path, RM_ATTR_MODULE, ""),
+//  						GfParmGetStr(params, path, RM_ATTR_SKINNAME, ""));
+				GfTrace("RaceMain: Driver #%d : ",
+						GfParmGetNum(params, path, RM_ATTR_IDX, NULL, -1));
+				GfTrace("module='%s', ", GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
+				GfTrace("skin='%s'\n", GfParmGetStr(params, path, RM_ATTR_SKINNAME, ""));
 			}
 		}
 	}

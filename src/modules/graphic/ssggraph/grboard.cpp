@@ -17,21 +17,22 @@
  *                                                                         *
  ***************************************************************************/
 
-
+#include <algorithm>	//remove
+#include <sstream>
 #include <iostream>
 
 #include <plib/ssg.h>
 #include <glfeatures.h>
 
-#include "grboard.h"
 #include <robottools.h>	//RELAXATION
+
+#include "grboard.h"
 #include "grmain.h"	//grWinX, grHandle, grMaxDamage
 #include "grtrackmap.h"	//cGrTrackMap
 #include "grcar.h"	//grCarInfo
 #include "grutil.h"	//grWriteTime
+#include "grloadac.h" //grssgSetCurrentOptions
 
-#include <algorithm>	//remove
-#include <sstream>
 using namespace std;
 
 static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
@@ -1142,13 +1143,15 @@ void grInitBoardCar(tCarElt *car)
 	int			index;
 	void		*handle;
 	const char	*param;
-	myLoaderOptions	options ;
+	grssgLoaderOptions	options;
 	tgrCarInfo		*carInfo;
 	tgrCarInstrument	*curInst;
 	tdble		xSz, ySz, xpos, ypos;
 	tdble		needlexSz, needleySz;
+	int lg;
+	const bool bTemplate = strlen(car->_carTemplate) != 0;
 	
-	ssgSetCurrentOptions ( &options ) ;
+	grssgSetCurrentOptions ( &options ) ;
 	
 	index = car->index;	/* current car's index */
 	carInfo = &grCarInfo[index];
@@ -1157,12 +1160,32 @@ void grInitBoardCar(tCarElt *car)
 	/* Tachometer */
 	curInst = &(carInfo->instrument[0]);
 	
+	/* Set tachometer textures search path : 0) driver level specified, in the user settings
+	   1) driver level specified, 2) car level specified, 3) common textures */
+	param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.png");
+	grFilePath = (char*)malloc(4096);
+	lg = 0;
+	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
+	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
+	lg += sprintf(grFilePath + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
+	lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carTemplate);
+	lg += sprintf(grFilePath + lg, "drivers/%s;", car->_modName);
+	lg += sprintf(grFilePath + lg, "cars/%s;", car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "cars/%s;", car->_carTemplate);
+	lg += sprintf(grFilePath + lg, "data/textures");
+
 	/* Load the Tachometer texture */
-	param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.rgb");
-	sprintf(buf, "drivers/%s/%d;drivers/%s;cars/%s;data/textures", car->_modName, car->_driverIndex, car->_modName, car->_carName);
-	grFilePath = strdup(buf);
 	curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
-	free(grFilePath);
+	
+	FREEZ(grFilePath);
+	
 	cleanup[nstate] = curInst->texture;
 	nstate++;
 	

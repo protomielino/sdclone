@@ -21,12 +21,16 @@
      $Id$
 */
 
-#include <plib/ssg.h>
 #include <zlib.h>
+#include <plib/ssg.h>
 
+#include "grutil.h"
+#include "grloadac.h"
 #include "grssgext.h"
 #include "grvtxtable.h"
 #include "grmain.h"
+#include "grtexture.h"	//doMipMap
+
 
 int inGroup=0;
 
@@ -82,7 +86,7 @@ static int              indexCar;
 
 static int		isaWindow;
 
-static ssgLoaderOptions	*current_options  = NULL ;
+static grssgLoaderOptions	*current_options  = NULL ;
 static _ssgMaterial	*current_material = NULL ;
 static sgVec4		*current_colour   = NULL ;
 static ssgBranch	*current_branch   = NULL ;
@@ -239,7 +243,7 @@ static int do_obj_world ( char * ) { return OBJ_WORLD ; }
 static int do_obj_poly  ( char * ) { return OBJ_POLY  ; }
 static int do_obj_group ( char * ) { return OBJ_GROUP ; }
 static int do_obj_light ( char * ) { return OBJ_LIGHT ; }
-static ssgEntity *myssgLoadAC ( const char *fname, const ssgLoaderOptions* options );
+static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* options );
 
 
 static int last_num_kids    = -1 ;
@@ -247,16 +251,6 @@ static int current_flags    = -1 ;
 
 static ssgState *get_state ( _ssgMaterial *mat )
 {
-#ifdef EEE_PAS_COMPRIS
-#warning: HELLO ---------------------
-  if (current_tfname != NULL) {
-    ssgState *st = current_options -> createState ( current_tfname ) ;
-    /* printf("creating texture : %s\n",current_tfname); */
-    if ( st != NULL )
-      return st ;
-  }
-#endif
-
   //ssgSimpleState *st = new ssgSimpleState () ;
   grManagedState *st = grStateFactory();
 
@@ -511,89 +505,136 @@ static int do_texture  ( char *s )
   else
   {
     if ((p=strstr(s," base"))!=NULL)
+    {
+      *p='\0';
+      numMapLevel=1;
+      mapLevel=LEVEL0;
+      delete [] current_tbase ;
+      delete [] current_tfname ;
+      delete [] current_ttiled ;
+      current_ttiled = 0;
+      delete [] current_tskids ;
+      current_tskids = 0;
+      delete [] current_tshad ;
+      current_tshad = 0;
+      skip_quotes ( &s ) ;
+      if (current_options->textureMapping())
       {
-	*p='\0';
-	numMapLevel=1;
-	mapLevel=LEVEL0;
-	delete [] current_tbase ;
-	delete [] current_tfname ;
-	delete [] current_ttiled ;
-	current_ttiled = 0;
-	delete [] current_tskids ;
-	current_tskids = 0;
-	delete [] current_tshad ;
-	current_tshad = 0;
-	skip_quotes ( &s ) ;
-	current_tbase = new char [ strlen(s)+1 ] ;
-	current_tfname = new char [ strlen(s)+1 ] ;
-	strcpy ( current_tbase, s ) ;
-	strcpy ( current_tfname, s ) ;
+        const char* pszNewTex = current_options->mapTexture( s );
+	    current_tbase = new char [ strlen(pszNewTex)+1 ] ;
+	    strcpy ( current_tbase, pszNewTex ) ;
+	    current_tfname = new char [ strlen(pszNewTex)+1 ] ;
+	    strcpy ( current_tfname, pszNewTex ) ;
       }
+      else
+      {
+        current_tbase = new char [ strlen(s)+1 ] ;
+        current_tfname = new char [ strlen(s)+1 ] ;
+        strcpy ( current_tbase, s ) ;
+        strcpy ( current_tfname, s ) ;
+      }
+    }
     else  if ((p=strstr(s," tiled"))!=NULL)
+    {
+      *p='\0';
+      delete [] current_ttiled ;
+      current_ttiled=0;
+      delete [] current_tskids ;
+      current_tskids = 0;
+      delete [] current_tshad ;
+      current_tshad = 0;
+      if (!strstr(s,NOTEXTURE))
       {
-	*p='\0';
-	delete [] current_ttiled ;
-	current_ttiled=0;
-	delete [] current_tskids ;
-	current_tskids = 0;
-	delete [] current_tshad ;
-	current_tshad = 0;
-	if (!strstr(s,NOTEXTURE))
-	  {
-	    numMapLevel++;;
-	    mapLevel|=LEVEL1;
-	    skip_quotes ( &s ) ;
-	    current_ttiled = new char [ strlen(s)+1 ] ;
-	    strcpy ( current_ttiled, s ) ;
-	  }
+        numMapLevel++;;
+        mapLevel|=LEVEL1;
+        skip_quotes ( &s ) ;
+        if (current_options->textureMapping())
+        {
+          const char* pszNewTex = current_options->mapTexture( s );
+          current_ttiled = new char [ strlen(pszNewTex)+1 ] ;
+          strcpy ( current_ttiled, pszNewTex ) ;
+        }
+        else
+        {
+          current_ttiled = new char [ strlen(s)+1 ] ;
+          strcpy ( current_ttiled, s ) ;
+        }
       }
+    }
     else  if ((p=strstr(s," skids"))!=NULL)
+    {
+      *p='\0';
+      delete [] current_tskids ;
+      current_tskids = 0;
+      delete [] current_tshad ;
+      current_tshad = 0;
+      if (!strstr(s,NOTEXTURE))
       {
-	*p='\0';
-	delete [] current_tskids ;
-	current_tskids = 0;
-	delete [] current_tshad ;
-	current_tshad = 0;
-	if (!strstr(s,NOTEXTURE))
-	  {
-	    numMapLevel++;;
-	    mapLevel|=LEVEL2;
-	    skip_quotes ( &s ) ;
-	    current_tskids = new char [ strlen(s)+1 ] ;
-	    strcpy ( current_tskids, s ) ;
-	  }
+        numMapLevel++;;
+        mapLevel|=LEVEL2;
+        skip_quotes ( &s ) ;
+        if (current_options->textureMapping())
+        {
+          const char* pszNewTex = current_options->mapTexture( s );
+          current_tskids = new char [ strlen(pszNewTex)+1 ] ;
+          strcpy ( current_tskids, pszNewTex ) ;
+        }
+        else
+        {
+          current_tskids = new char [ strlen(s)+1 ] ;
+          strcpy ( current_tskids, s ) ;
+        }
       }
+    }
     else  if ((p=strstr(s," shad"))!=NULL)
+    {
+      *p='\0';
+      delete [] current_tshad ;
+      current_tshad = 0;
+      if (!strstr(s,NOTEXTURE))
       {
-	*p='\0';
-	delete [] current_tshad ;
-	current_tshad = 0;
-	if (!strstr(s,NOTEXTURE))
-	  {
-	    numMapLevel++;;
-	    mapLevel|=LEVEL3;
-	    skip_quotes ( &s ) ;
-	    current_tshad = new char [ strlen(s)+1 ] ;
-	    strcpy ( current_tshad, s ) ;
-	  }
+        numMapLevel++;;
+        mapLevel|=LEVEL3;
+        skip_quotes ( &s ) ;
+        if (current_options->textureMapping())
+        {
+          const char* pszNewTex = current_options->mapTexture( s );
+          current_tshad = new char [ strlen(pszNewTex)+1 ] ;
+          strcpy ( current_tshad, pszNewTex ) ;
+        }
+        else
+        {
+          current_tshad = new char [ strlen(s)+1 ] ;
+          strcpy ( current_tshad, s ) ;
+        }
       }
+    }
     else
+    {
+      skip_quotes ( &s ) ;
+      numMapLevel=1;
+      mapLevel=LEVEL0;
+      delete [] current_tfname ;
+      delete [] current_tbase ;
+      current_tbase = 0;
+      delete [] current_ttiled ;
+      current_ttiled = 0;
+      delete [] current_tskids ;
+      current_tskids = 0;
+      delete [] current_tshad ;
+      current_tshad = 0;
+      if (current_options->textureMapping())
       {
-	skip_quotes ( &s ) ;
-	numMapLevel=1;
-	mapLevel=LEVEL0;
-	delete [] current_tfname ;
-	delete [] current_tbase ;
-	current_tbase = 0;
-	delete [] current_ttiled ;
-	current_ttiled = 0;
-	delete [] current_tskids ;
-	current_tskids = 0;
-	delete [] current_tshad ;
-	current_tshad = 0;
-	current_tfname = new char [ strlen(s)+1 ] ;
-	strcpy ( current_tfname, s ) ;
+        const char* pszNewTex = current_options->mapTexture( s );
+        current_tfname = new char [ strlen(pszNewTex)+1 ] ;
+        strcpy ( current_tfname, pszNewTex ) ;
       }
+      else
+      {
+        current_tfname = new char [ strlen(s)+1 ] ;
+        strcpy ( current_tfname, s ) ;
+      }
+    }
   }
 
   return PARSE_CONT ;
@@ -1080,7 +1121,6 @@ static int do_ignore( char *s )
 	return PARSE_CONT ;
 }
 
-
 void myssgFlatten(ssgEntity *obj)
 {
 
@@ -1105,7 +1145,7 @@ void myssgFlatten(ssgEntity *obj)
 
 }
 
-ssgEntity *grssgCarLoadAC3D ( const char *fname, const ssgLoaderOptions* options,int index )
+ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* options,int index )
 {
 
   isacar=TRUE;
@@ -1139,7 +1179,7 @@ ssgEntity *grssgCarLoadAC3D ( const char *fname, const ssgLoaderOptions* options
 
 }
 
-ssgEntity *grssgLoadAC3D ( const char *fname, const ssgLoaderOptions* options )
+ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options )
 {
   isacar=FALSE;
   usegroup=FALSE;
@@ -1176,18 +1216,15 @@ ssgEntity *grssgLoadAC3D ( const char *fname, const ssgLoaderOptions* options )
 }
 
 /*
-  Original function for backwards compatibility...
+  Original function for backwards compatibility... (except for ssgLoaderOptions => grssgLoaderOptions)
 */
-static ssgEntity *myssgLoadAC ( const char *fname, const ssgLoaderOptions* options )
+static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* options )
 {
 
   if (maxTextureUnits==0)
     {
       InitMultiTex();
     }
-
-  ssgSetCurrentOptions ( (ssgLoaderOptions*)options ) ;
-  current_options = ssgGetCurrentOptions () ;
 
   char filename [ 1024 ] ;
   current_options -> makeModelPath ( filename, fname ) ;
@@ -1262,3 +1299,53 @@ static ssgEntity *myssgLoadAC ( const char *fname, const ssgLoaderOptions* optio
 
 }
 
+// grssgLoaderOptions implementation =========================================
+
+grssgLoaderOptions::grssgLoaderOptions(bool bTextureMipMap)
+: ssgLoaderOptions(), _bTextureMipMap(bTextureMipMap), _bTextureMapping(false)
+{
+}
+	
+void grssgLoaderOptions::makeModelPath(char* path, const char *fname) const
+{
+	ulFindFile(path, model_dir, fname, NULL) ;
+}
+
+void grssgLoaderOptions::makeTexturePath(char* path, const char *fname) const
+{
+	ulFindFile(path, texture_dir, fname, NULL) ;
+}
+
+ssgTexture* grssgLoaderOptions::createTexture(char* tfname, int wrapu, int wrapv, int mipmap)
+{
+	return ssgLoaderOptions::createTexture(tfname, wrapu, wrapv,
+										   _bTextureMipMap ? doMipMap(tfname, mipmap) : mipmap) ;
+}
+
+void grssgLoaderOptions::addTextureMapping(const char* pszSrcFileName, const char* pszTgtFileName)
+{
+	_mapTextures[pszSrcFileName] = pszTgtFileName;
+	_bTextureMapping = true;
+	GfTrace("grssgLoaderOptions::addTextureMapping(%s, %s)\n", pszSrcFileName, pszTgtFileName);
+}
+
+bool grssgLoaderOptions::textureMapping() const
+{
+	return _bTextureMapping;
+}
+	
+const char* grssgLoaderOptions::mapTexture(const char* pszSrcFileName) const
+{
+	const std::map<std::string, std::string>::const_iterator iterTex =
+		_mapTextures.find(pszSrcFileName);
+// 	GfTrace("grssgLoaderOptions::mapTexture(%s) : %s\n",
+// 			pszSrcFileName,
+// 			iterTex != _mapTextures.end() ? iterTex->second.c_str() : pszSrcFileName);
+	return iterTex != _mapTextures.end() ? iterTex->second.c_str() : pszSrcFileName;
+}
+
+void grssgSetCurrentOptions(grssgLoaderOptions* options)
+{
+	ssgSetCurrentOptions(options);
+	current_options = static_cast<grssgLoaderOptions*>(ssgGetCurrentOptions());
+}

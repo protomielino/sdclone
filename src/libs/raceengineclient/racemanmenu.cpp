@@ -227,7 +227,7 @@ reSelectLoadFile(char *filename)
     ReInfo->results = ReInfo->mainResults;
     ReInfo->_reRaceName = ReInfo->_reName;
     GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-    GfParmSetVariable (ReInfo->params, "/", "humanInGroup", humanInGroup() ? 1 : 0);
+    GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
     RmShowStandings(ReInfo->_reGameScreen, ReInfo);
 }
 
