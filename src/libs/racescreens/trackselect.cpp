@@ -593,8 +593,8 @@ RmTrackSelect(void *vs)
     GfuiStaticImageSet(ScrHandle, OutlineId, rmtsGetOutlineFileName(PathBuf, MaxPathSize));
     GfuiScreenAddBgImg(ScrHandle, rmtsGetPreviewFileName(PathBuf, MaxPathSize));
 
-    CreateButtonControl(ScrHandle,param,"accept",NULL,rmtsSelect);
-    CreateButtonControl(ScrHandle,param,"back",TrackSelect->prevScreen,rmtsDeactivate);
+    CreateButtonControl(ScrHandle,param,"nextbutton",NULL,rmtsSelect);
+    CreateButtonControl(ScrHandle,param,"previousbutton",TrackSelect->prevScreen,rmtsDeactivate);
 
     DescId = CreateLabelControl(ScrHandle,param,"descriptionlabel");
     Desc2Id = CreateLabelControl(ScrHandle,param,"descriptionlabel2");

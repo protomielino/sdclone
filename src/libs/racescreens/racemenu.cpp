@@ -430,8 +430,8 @@ RmRaceParamMenu(void *vrp)
     }
 	
     // Create Accept and Cancel buttons
-    CreateButtonControl(scrHandle,menuXMLDescHdle,"accept",NULL,rmrpValidate);
-    CreateButtonControl(scrHandle,menuXMLDescHdle,"cancel",rp->prevScreen,rmrpDeactivate);
+    CreateButtonControl(scrHandle,menuXMLDescHdle,"nextbutton",NULL,rmrpValidate);
+    CreateButtonControl(scrHandle,menuXMLDescHdle,"previousbutton",rp->prevScreen,rmrpDeactivate);
     
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
