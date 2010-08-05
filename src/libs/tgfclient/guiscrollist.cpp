@@ -673,13 +673,6 @@ gfuiDrawScrollist(tGfuiObject *obj)
 	index = 0;
 	elt = scrollist->elts;
 	if (elt != NULL) {
-		if (scrollist->nbElts < 100) {
-			sprintf(buf, " 00 ");
-		} else {
-			sprintf(buf, " 000 ");
-		}
-		w = scrollist->font->getWidth((const char *)buf);
-
 		do {
 			elt = elt->next;
 			if (index < scrollist->firstVisible) {
@@ -696,9 +689,7 @@ gfuiDrawScrollist(tGfuiObject *obj)
 				break;
 			}
 			y -= h;
-			sprintf(buf, " %d", index);
-			gfuiPrintString(x, y, scrollist->font, buf);
-			gfuiPrintString(x + w, y, scrollist->font, elt->label);
+			gfuiPrintString(x+5, y, scrollist->font, elt->label);
 		} while (elt != scrollist->elts);
 	}
 
