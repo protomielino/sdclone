@@ -22,7 +22,7 @@
         <attstr name="desc" val="Indy01_A"></attstr>
         <attstr name="team" val="simplix_indy01"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="901"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -34,7 +34,7 @@
         <attstr name="desc" val="Indy01_B"></attstr>
         <attstr name="team" val="simplix_indy01"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="902"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -46,7 +46,7 @@
         <attstr name="desc" val="Indy02_A"></attstr>
         <attstr name="team" val="simplix_indy02"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="903"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -58,7 +58,7 @@
         <attstr name="desc" val="Indy02_B"></attstr>
         <attstr name="team" val="simplix_indy02"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="904"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -71,7 +71,7 @@
         <attstr name="desc" val="Indy03_A"></attstr>
         <attstr name="team" val="simplix_indy03"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="905"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -83,7 +83,7 @@
         <attstr name="desc" val="Indy03_B"></attstr>
         <attstr name="team" val="simplix_indy03"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="906"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -95,7 +95,7 @@
         <attstr name="desc" val="Indy04_A"></attstr>
         <attstr name="team" val="simplix_indy04"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="906"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -107,7 +107,7 @@
         <attstr name="desc" val="Indy04_B"></attstr>
         <attstr name="team" val="simplix_indy04"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="907"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -119,7 +119,7 @@
         <attstr name="desc" val="Indy05_A"></attstr>
         <attstr name="team" val="simplix_indy05"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="908"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -131,7 +131,7 @@
         <attstr name="desc" val="Indy05_B"></attstr>
         <attstr name="team" val="simplix_indy05"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="indycar01"></attstr>
+        <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="909"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
