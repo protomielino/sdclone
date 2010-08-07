@@ -405,6 +405,9 @@ grInitShadow(tCarElt *car)
 	ssgTexCoordArray	*shd_tex = new ssgTexCoordArray(GR_SHADOW_POINTS+1);
 
 	sprintf(buf, "cars/%s;", car->_carName);
+	if (strlen(car->_carTemplate) > 0) // Add the master model path if we are using a template.
+		sprintf(buf + strlen(buf), "cars/%s;", car->_carTemplate);
+		
 	grFilePath = buf;
 
 	shdTexName = GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_SHADOW_TEXTURE, "");
@@ -497,6 +500,14 @@ void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt)
 
 
 void 
+grPreInitCar(tCarElt *car)
+{
+	strncpy(car->_carTemplate,
+			GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
+	car->_carTemplate[MAX_NAME_LEN - 1] = 0;
+}
+
+void 
 grInitCar(tCarElt *car)
 {
 	char buf[4096];
@@ -527,10 +538,6 @@ grInitCar(tCarElt *car)
 
 	grCarIndex = index = car->index;	/* current car's index */
 	handle = car->_carHandle;
-
-	/* Load car template 3D model name if any (needed also by grInitBoardCar => must precede) */
-	strncpy(car->_carTemplate, GfParmGetStr(car->_carHandle, path, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
-	car->_carTemplate[MAX_NAME_LEN - 1] = 0;
 
 	/* Initialize board */
 	grInitBoardCar(car);

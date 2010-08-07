@@ -66,8 +66,7 @@ int grGetFilename(const char *filename, const char *filepath, char *buf)
 		}
 	}
 	if (!found) {
-		GfOut("File %s not found\n", filename);
-		GfOut("File Path was %s\n", filepath);
+		GfError("File %s not found in search path %s\n", filename, filepath);
 		return 0;
 	}
 

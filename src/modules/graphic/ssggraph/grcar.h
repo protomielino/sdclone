@@ -90,9 +90,12 @@ public:
 
 extern tgrCarInfo	*grCarInfo;
 
+// grPreInitCar must be called once for each car before the first call to any other car function
+extern void grPreInitCar(tCarElt *car);
+
+extern void grInitShadow(tCarElt *car);
 extern void grInitCar(tCarElt *car);
 extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, double curTime, class cGrPerspCamera *curCam);
-extern void grInitShadow(tCarElt *car);
 extern void grInitCommonState(void);
 extern void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt);
 #endif /* _GRCAR_H_ */ 

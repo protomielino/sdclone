@@ -367,6 +367,8 @@ initCars(tSituation *s)
 
 	for (i = 0; i < s->_ncars; i++) {
 		elt = s->cars[i];
+		/* Car pre-initialization */
+		grPreInitCar(elt);
 		/* Shadow init (Should be done before the cars for display order) */
 		grInitShadow(elt);
 		/* Skidmarks init */
