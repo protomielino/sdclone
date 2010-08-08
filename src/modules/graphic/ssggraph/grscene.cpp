@@ -226,7 +226,7 @@ grInitScene(void)
 		
 		//Add the Sun itself
 		//ssgaCelestialBody *bodies[MAX_BODIES] = { NULL };
-        	bodies[SUN] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), skydynamic, true);
+        bodies[SUN] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), skydynamic, true);
 		GLfloat	sunpos1 = 0.0f;
 		GLfloat	sunpos2 = 0.0f;
 		int cloudtype = 0;
@@ -281,9 +281,6 @@ grInitScene(void)
 
 		//Add clouds
 
-		if (RainBool > 0)
-			cloudtype = 8;
-
 		if(Timeday > 0) 
 		{
 			switch (grTrack->weather) 
@@ -301,6 +298,9 @@ grInitScene(void)
 		else
 			cloudtype = grTrack->weather;
 
+		if (RainBool > 0)
+			cloudtype = 8;
+
 		printf("Cloud = %d", cloudtype);
 
 		grCloudLayer *clouds[MAX_CLOUDS] = { NULL };
@@ -312,7 +312,7 @@ grInitScene(void)
 		clouds[0]->setSpeed(60);
 		clouds[0]->setDirection(45);
     
-		/*clouds[1] = Sky->addCloud ("data/textures/scattered.png", 20000, 2500, 400, 400);
+		/*clouds[1] = Sky->addCloud ("data/textures/scattered1.rgba", skydynamic, skydynamic-2000, 400 * div, 400 * div);
 		clouds[1] -> setSpeed (20);
 		clouds[1] -> setDirection (45);
     

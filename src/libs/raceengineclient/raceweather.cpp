@@ -13,13 +13,13 @@
 void ReStartWeather(void)
 {
 	int	cloud;
-	int 	Timeday;
+	int Timeday;
 	int	rain;
-	int 	problrain;
-	int 	probrain;
+	int problrain;
+	int probrain;
 	int	rainbool;
 	int	resul;
-	int 	resul2;
+	int resul2;
 	tTrack *track = ReInfo->track;
 
 	srand((unsigned)time(NULL));
