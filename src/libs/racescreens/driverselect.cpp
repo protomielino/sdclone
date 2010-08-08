@@ -436,10 +436,10 @@ rmdsSelectDeselect(void * /* dummy */ )
     // Update selected driver displayed info
     rmdsClickOnDriver(NULL);
 
-	// Don't allow user to Accept 0 drivers this would cause a crash
-	GfuiEnable(ScrHandle,NextButtonId, NbSelectedDrivers > 0 ? GFUI_ENABLE : GFUI_DISABLE);
-
-	GfuiDisplay();
+    // Don't allow user to Accept 0 drivers this would cause a crash
+    GfuiEnable(ScrHandle, NextButtonId, NbSelectedDrivers > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+    
+    GfuiDisplay();
 }
 
 static void
@@ -514,7 +514,7 @@ RmDriversSelect(void *vs)
 	
     SelectButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"selectbutton",0,rmdsSelectDeselect);
     DeselectButtonId = CreateButtonControl(ScrHandle,menuDescHdle,"deselectbutton",0,rmdsSelectDeselect);
-	GfuiEnable(ScrHandle, SelectButtonId, GFUI_ENABLE);
+	GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 	GfuiEnable(ScrHandle, DeselectButtonId, GFUI_DISABLE);
 
     // Skin selection "combobox" (left arrow, label, right arrow)
