@@ -207,6 +207,7 @@ static void
 rmdsNextMenu(void * /* dummy */)
 {
     char         drvSec[256];
+    char         buffer[256];
     const char	*name;
     trmdDrvElt	*curDrv;
     int		index;
@@ -223,8 +224,16 @@ rmdsNextMenu(void * /* dummy */)
 		GfParmSetNum(MenuData->param, drvSec, RM_ATTR_IDX, (char*)NULL, curDrv->interfaceIndex);
 		GfParmSetStr(MenuData->param, drvSec, RM_ATTR_MODULE, curDrv->moduleName);
 		if (curDrv->carName && curDrv->isHuman)
-			GfParmSetStr(MenuData->param, drvSec, RM_ATTR_CARNAME, curDrv->carName);
+		{
 			// TODO: Save chosen car as the default/prefered one in human.xml ?
+			GfParmSetNum(MenuData->param, drvSec, RM_ATTR_EXTENDED, NULL, 1); /* Set extended */
+			sprintf( buffer, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, curDrv->moduleName, 1 /*extended*/, curDrv->interfaceIndex );
+			GfParmSetStr(MenuData->param, buffer, RM_ATTR_CARNAME, curDrv->carName);
+		}
+		else
+		{
+			GfParmSetNum(MenuData->param, drvSec, RM_ATTR_EXTENDED, NULL, 0); /*No extended for robots yet in driverconfig*/
+		}
 		if ((curDrv->skinName && strcmp(curDrv->skinName, rmdStdSkinName))
 			|| GfParmGetStr(MenuData->param, drvSec, RM_ATTR_SKINNAME, 0))
 			GfParmSetStr(MenuData->param, drvSec, RM_ATTR_SKINNAME, curDrv->skinName);
@@ -481,6 +490,7 @@ RmDriversSelect(void *vs)
     void	*robhdle;
     struct stat st;
     const char	*carName;
+    int		extended;
     void	*carhdle;
     int		human;
     const char* initCarCat;
@@ -622,7 +632,7 @@ RmDriversSelect(void *vs)
 		moduleName = GfParmGetStr(MenuData->param, path, RM_ATTR_MODULE, "");
 		robotIdx = (int)GfParmGetNum(MenuData->param, path, RM_ATTR_IDX, (char*)NULL, 0);
 		skinName = GfParmGetStr(MenuData->param, path, RM_ATTR_SKINNAME, rmdStdSkinName);
-		carName = GfParmGetStr(MenuData->param, path, RM_ATTR_CARNAME, 0);
+		extended = GfParmGetNum(MenuData->param, path, RM_ATTR_EXTENDED, NULL, 0);
 
 		// Try and retrieve this driver in the full drivers list
 		if ((curDrv = GF_TAILQ_FIRST(&DriverList))) {
@@ -645,8 +655,10 @@ RmDriversSelect(void *vs)
 							initCarCat = GfParmGetStr(curDrv->carParmHdle, SECT_CAR, PRM_CATEGORY, "");
 
 						// Get the chosen car for the race if any specified (human only).
-						if (curDrv->isHuman && carName)
+						if (curDrv->isHuman && extended)
 						{
+							sprintf(path, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, moduleName, extended, robotIdx);
+							carName = GfParmGetStr(MenuData->param, path, RM_ATTR_CARNAME, 0);
 							sprintf(path, "cars/%s/%s.xml", carName, carName);
 							if (!stat(path, &st)) {
 								carhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
