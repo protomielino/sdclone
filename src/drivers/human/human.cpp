@@ -122,10 +122,6 @@ shutdown(const int index)
 
 	VecNames.erase(VecNames.begin() + idx);
 
-	// ??????? Why this ???????????
-	if (index > NbDrivers)
-		idx -= NbDrivers + 1;
-
 	free (HCtx[idx]);
 	HCtx[idx] = 0;
 
@@ -151,10 +147,6 @@ shutdown(const int index)
 static int
 InitFuncPt(int index, void *pt)
 {
-	// ??????? Why this ???????????
-	if (index > NbDrivers)
-		index -= NbDrivers + 1;
-
 	tRobotItf *itf = (tRobotItf *)pt;
 	const int idx = index - 1;
 
@@ -318,13 +310,7 @@ static void
 initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s)
 {
 	char trackname[256];
-	bool otherCar = false;
 
-	// ??????? Why this ???????????
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		otherCar = true;
-	}
 	const int idx = index - 1;
 
 	curTrack = track;
@@ -340,14 +326,12 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 		? GfParmGetStrNC(drvInfo, sstring, "car name", NULL)
 		: "";
 
-	if (otherCar) {
-		sprintf(sstring, "%sdrivers/curcarnames.xml", GetLocalDir());
-		void *curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-		if (curCars) {
-			sprintf(sstring, "drivers/human/%d", index + NbDrivers + 1);
-			carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
-		}//if curCars
-	}//if otherCar
+	sprintf(sstring, "%sdrivers/curcarnames.xml", GetLocalDir());
+	void *curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	if (curCars) {
+		sprintf(sstring, "drivers/human/%d", index + NbDrivers + 1);
+		carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
+	}//if curCars
 
 	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GetLocalDir(), carname.c_str());
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
@@ -408,9 +392,6 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 void
 newrace(int index, tCarElt* car, tSituation *s)
 {
-	// ??????? Why this ???????????
-	if (index > NbDrivers)
-		index -= NbDrivers + 1;
 	const int idx = index - 1;
 
 	// Initialize engine RPM shifting threshold table for automatic shifting mode.
@@ -1111,9 +1092,6 @@ getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
 static void
 drive_mt(int index, tCarElt* car, tSituation *s)
 {
-	// ??????? Why this ???????????
-	if (index > NbDrivers)
-		index -= NbDrivers + 1;
 	const int idx = index - 1;
 
 	tControlCmd *cmd = HCtx[idx]->cmdControl;
@@ -1203,9 +1181,6 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 static void
 drive_at(int index, tCarElt* car, tSituation *s)
 {
-	// ??????? Why this ???????????
-	if (index > NbDrivers)
-		index -= NbDrivers + 1;
 	const int idx = index - 1;
 
 	tControlCmd *cmd = HCtx[idx]->cmdControl;
@@ -1298,9 +1273,6 @@ drive_at(int index, tCarElt* car, tSituation *s)
 static int
 pitcmd(int index, tCarElt* car, tSituation *s)
 {
-	// ??????? Why this ???????????
-	if (index > NbDrivers)
-		index -= NbDrivers + 1;
 	const int idx = index - 1;
 
 	HCtx[idx]->nbPitStops++;

@@ -160,11 +160,6 @@ InitFuncPt(int index, void *pt)
 	tRobotItf *itf = (tRobotItf *)pt;
 	int idx = index - 1;
 
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		idx -= NbDrivers + 1;
-	}
-
 	if (masterPlayer == -1) {
 		masterPlayer = index;
 	}
@@ -374,14 +369,7 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 	char trackname[256];
 	tdble fuel;
 	int idx = index - 1;
-	char otherCar = FALSE;
 	void *curCars;
-
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		idx -= NbDrivers + 1;
-		otherCar = TRUE;
-	}
 
 	curTrack = track;
 	s1 = strrchr(track->filename, '/') + 1;
@@ -396,16 +384,14 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 	if (DrvInfo != NULL) {
 		carname = strdup(GfParmGetStr(DrvInfo, sstring, "car name", ""));
 	}
-	if (otherCar) {
-		sprintf(sstring, "%sdrivers/curcarnames.xml", GetLocalDir());
-		curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
-		if (curCars) {
-			sprintf(sstring, "drivers/networkhuman/%d", index + NbDrivers + 1);
-			oldcarname = carname;
-			carname = strdup(GfParmGetStr(curCars, sstring, "car name", oldcarname ));
-			if( oldcarname )
-				free (oldcarname);
-		}
+	sprintf(sstring, "%sdrivers/curcarnames.xml", GetLocalDir());
+	curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
+	if (curCars) {
+		sprintf(sstring, "drivers/networkhuman/%d", index + NbDrivers + 1);
+		oldcarname = carname;
+		carname = strdup(GfParmGetStr(curCars, sstring, "car name", oldcarname ));
+		if( oldcarname )
+			free (oldcarname);
 	}
 
 	sprintf(sstring, "%sdrivers/networkhuman/tracks/%s/car-%s-%d.xml", GetLocalDir(), trackname, carname, index);
@@ -474,10 +460,6 @@ void newrace(int index, tCarElt* car, tSituation *s)
 {
 	int i;
 	int idx = index - 1;
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		idx -= NbDrivers + 1;
-	}
 
 	for (i = 0; i < MAX_GEARS; i++) {
 		if (car->_gearRatio[i] != 0) {
@@ -1102,11 +1084,6 @@ static void drive_mt(int index, tCarElt* car, tSituation *s)
 	int idx = index - 1;
 	tControlCmd	*cmd;
 
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		idx -= NbDrivers + 1;
-	}
-
 	cmd = HCtx[idx]->CmdControl;
 
 	common_drive(index, car, s);
@@ -1174,11 +1151,6 @@ static void drive_at(int index, tCarElt* car, tSituation *s)
 	int gear, i;
 	int idx = index - 1;
 	tControlCmd	*cmd;
-
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		idx -= NbDrivers + 1;
-	}
 
 	if (GetNetwork())
 	{
@@ -1280,10 +1252,6 @@ static int pitcmd(int index, tCarElt* car, tSituation *s)
 	tdble f1, f2;
 	tdble ns;
 	int idx = index - 1;
-	if (index > NbDrivers) {
-		index -= NbDrivers + 1;
-		idx -= NbDrivers + 1;
-	}
 
 	HCtx[idx]->NbPitStops++;
 	f1 = car->_tank - car->_fuel;

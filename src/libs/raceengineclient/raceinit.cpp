@@ -509,7 +509,7 @@ initPits(void)
  * @param cardllname The dllname of the driver
  * @return A pointer to the newly created car if successfull; NULL otherwise
  */
-static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int robotIdx, char normal_carname, char const *cardllname )
+static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int relativeRobotIdx, char normal_carname, char const *cardllname )
 {
 	tCarElt *elt;
 	tMemoryPool oldPool;
@@ -527,15 +527,16 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 	int k;
 	int xx;
 	char isHuman;
+	int robotIdx = relativeRobotIdx;
 
 	/* good robot found */
 	curModInfo = &((*(ReInfo->modList))->modInfo[modindex]);
 	GfOut("Driver's name: %s\n", curModInfo->name);
-	if (!normal_carname) {
+
+	isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
+
+	if (!normal_carname && !isHuman) /*Extended is forced for humans, so no need to increase robotIdx*/
 		robotIdx += curModInfo->index;
-	}
-	
-	isHuman = strcmp( cardllname, "human" ) == 0;
 
 	/* Retrieve the driver interface (function pointers) */
 	curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
@@ -561,10 +562,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	}
 
-	if (normal_carname)
+	if (normal_carname || isHuman)
 		sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-	else if (isHuman)
-		sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx - curModInfo->index);
 	else
 		sprintf(path, "%s", ROB_SECT_ARBITRARY);
 	
@@ -590,10 +589,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		elt->robot = curRobot;
 		elt->_paramsHandle = robhdle;
 		elt->_driverIndex = robotIdx;
-		if (normal_carname)
-			elt->_moduleIndex = robotIdx;
-		else
-			elt->_moduleIndex = robotIdx - curModInfo->index;
+		elt->_moduleIndex = relativeRobotIdx;
 		strncpy(elt->_modName, cardllname, MAX_NAME_LEN - 1);
 		elt->_modName[MAX_NAME_LEN - 1] = 0;
 
@@ -609,7 +605,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, 0.0f);
 
 		// TODO (D30) : Get human _carName from race info in any case (no more from human.xml).
-		if (normal_carname)
+		if (normal_carname) /* Even if we get a normal_carname for humans we use it despite of forced extended mode*/
 			strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
 		else
 			strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_CARNAME, ""), MAX_NAME_LEN - 1);
@@ -626,7 +622,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		}
 
 		elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
-		if (!normal_carname)
+		if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) /* Increase racenumber if neccesairy */
 			elt->_raceNumber += elt->_moduleIndex;
 		elt->_skillLevel = 0;
 		str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
@@ -667,6 +663,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 			}
 			carhdle = GfParmMergeHandles(cathdle, carhdle,
 			                             GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
+			/* The code below stores the carnames to a separate xml-file such that at newTrack it is known which car is used.
+			 * TODO: find a better method for this */
 			sprintf (buf, "%sdrivers/curcarnames.xml", GetLocalDir());
 			handle = GfParmReadFile(buf, GFPARM_RMODE_CREAT);
 			if (handle) {
@@ -794,7 +792,7 @@ ReInitCars(void)
 			}
 			if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
 				                 GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ||
-			    strcmp( robotModuleName, "human" ) == 0 ) ) /* It does have a field named car in ARBITRARY */
+			    strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) ) /* It does have a field named car in ARBITRARY */
 				elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
 			else
 				GfError("Pb: No description for driver %s (2)\n", robotModuleName );
