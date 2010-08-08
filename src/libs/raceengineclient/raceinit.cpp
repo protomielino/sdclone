@@ -790,10 +790,18 @@ ReInitCars(void)
 				sprintf(buf, "drivers/%s/%s.xml", robotModuleName, robotModuleName);
 				robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 			}
-			if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
-				                 GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ||
-			    strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) ) /* It does have a field named car in ARBITRARY */
+			if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
+			{
+				/* Human driver */
+				printf( "robotModuleName (1): %s\n", robotModuleName );
+				elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->modList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
+			}
+			else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
+				                      GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
+			{
+				printf( "robotModuleName: %s\n", robotModuleName );
 				elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
+			}
 			else
 				GfError("Pb: No description for driver %s (2)\n", robotModuleName );
 
