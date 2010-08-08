@@ -299,7 +299,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 
     char Dir_name[ 1024 ];
     sprintf( Dir_name, "%s\\*.*", dir );
-    GfOut("trying dir info %s\n",dir);
+    GfOut("Listing module directory %s for info. only\n", dir);
     long Dirent = _findfirst( Dir_name, &FData );
     if ( Dirent != -1 )
     {
@@ -436,7 +436,7 @@ windowsDirGetList(const char *dir)
     _finddata_t FData;
     char Dir_name[ 1024 ];
     sprintf( Dir_name, "%s\\*.*", dir );
-    GfOut("trying dir %s\n",dir);
+    GfOut("Listing directory %s\n",dir);
     long Dirent = _findfirst( Dir_name, &FData );
     if ( Dirent != -1 ) {
 	do {
