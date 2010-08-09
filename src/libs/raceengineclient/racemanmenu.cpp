@@ -352,7 +352,8 @@ ReNewTrackMenu(void)
     const char	*str;
     void	*params = ReInfo->params;
     void	*results = ReInfo->results;
-    int		raceNumber = 0; // Never used ???
+    int		raceNumber;
+    int         xx;
 
     if (newTrackMenuHdle) {
 	GfuiScreenRelease(newTrackMenuHdle);
