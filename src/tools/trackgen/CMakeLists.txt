@@ -36,6 +36,7 @@ ADD_PNG_LIBRARY(sd-trackgen)
 ADD_SDL_LIBRARY(sd-trackgen)
 
 ADD_PLIB_LIBRARY(sd-trackgen sg ssg ul)
+ADD_DL_LIBRARY(sd-trackgen)
 
 TORCS_INSTALL_FILES(BIN TARGETS sd-trackgen)
 

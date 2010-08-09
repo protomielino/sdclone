@@ -33,6 +33,7 @@ ADD_PNG_LIBRARY(sd-menuview)
 ADD_SDL_LIBRARY(sd-menuview)
 
 ADD_PLIB_LIBRARY(sd-menuview sg ssg ul)
+ADD_DL_LIBRARY(sd-menuview)
 
 TORCS_INSTALL_FILES(BIN TARGETS sd-menuview)
 

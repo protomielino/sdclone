@@ -17,7 +17,7 @@ ADD_EXECUTABLE(speed-dreams ${TORCS_SOURCES})
 ADD_TORCSLIB_LIBRARY(speed-dreams client confscreens learning raceengineclient racescreens tgf tgfclient)
 
 ADD_PLIB_LIBRARY(speed-dreams sg ssg ul)
-TARGET_LINK_LIBRARIES(speed-dreams dl)
+ADD_DL_LIBRARY(speed-dreams)
 
 TORCS_INSTALL_FILES(BIN TARGETS speed-dreams)
 TORCS_INSTALL_FILES(INCLUDE FILES osspec.h)
