@@ -14,18 +14,18 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="Touringcar Championship" type="param" mode="mw" version="0.1">
+<params name="LS1 Championship" type="param" mode="mw" version="0.1">
 
   <section name="Header">
-    <attstr name="name" val="Touringcar Championship"/>
-    <attstr name="description" val="Touringcar Championship"/>
+    <attstr name="name" val="LS1 Championship"/>
+    <attstr name="description" val="LS1 Championship"/>
     <attnum name="priority" val="30"/>
     <attstr name="menu image" val="data/img/splash-dtm.png"/>
     <attstr name="run image" val="data/img/splash-run-practice.png"/>
     <attstr name="start image" val="data/img/splash-dtm.png"/>
     <section name="Subfiles">
       <attstr name="is subfile" val="yes" />
-      <attstr name="suffix" val="touring" />
+      <attstr name="suffix" val="ls1" />
       <attstr name="parent file" val="career.xml" />
       <attstr name="next subfile" val="career_supercars.xmls" />
       <attstr name="next suffix" val="supercars" />
@@ -100,75 +100,75 @@
   <section name="Teams">
     <section name="1">
       <attstr name="name" val="Team I" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-archer-r9" />
     </section>
     <section name="2">
       <attstr name="name" val="Team II" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-cavallo-570s1" />
     </section>
     <section name="3">
       <attstr name="name" val="Team III" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-newcastle-fury" />
     </section>
     <section name="4">
       <attstr name="name" val="Team IV" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-taipan-ltsr" />
     </section>
     <section name="5">
       <attstr name="name" val="Team V" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-toro-rgt" />
     </section>
     <section name="6">
       <attstr name="name" val="Team VI" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-vulture-v6r" />
     </section>
     <section name="7">
       <attstr name="name" val="Team VII" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-zentek-z7r" />
     </section>
     <section name="8">
       <attstr name="name" val="Team VIII" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-archer-r9" />
     </section>
     <section name="9">
       <attstr name="name" val="Team IX" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-cavallo-570s1" />
     </section>
     <section name="10">
       <attstr name="name" val="Team X" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-newcastle-fury" />
     </section>
     <section name="11">
       <attstr name="name" val="Team XI" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-taipan-ltsr" />
     </section>
     <section name="12">
       <attstr name="name" val="Team XII" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-toro-rgt" />
     </section>
     <section name="13">
       <attstr name="name" val="Team XIII" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-vulture-v6r" />
     </section>
     <section name="14">
       <attstr name="name" val="Team XIV" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-zentek-z7r" />
     </section>
     <section name="15">
       <attstr name="name" val="Team XV" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-archer-r9" />
     </section>
     <section name="16">
       <attstr name="name" val="Team XVI" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-cavallo-570s1" />
     </section>
     <section name="17">
       <attstr name="name" val="Team XVII" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-newcastle-fury" />
     </section>
     <section name="18">
       <attstr name="name" val="Team XVIII" />
-      <attstr name="car name" val="sc-lynx-220" />
+      <attstr name="car name" val="ls1-taipan-ltsr" />
     </section>
   </section>
 
@@ -245,7 +245,7 @@
 	<attform name="points" val="1/2*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
       <section name="2">
-        <attstr name="suffix" val="touring" />
+        <attstr name="suffix" val="ls1" />
 	<attform name="points" val="3/10*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
     </section>
@@ -302,7 +302,7 @@
 	<attform name="points" val="1/2*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
       <section name="2">
-        <attstr name="suffix" val="touring" />
+        <attstr name="suffix" val="ls1" />
 	<attform name="points" val="5/10*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
     </section>
@@ -359,7 +359,7 @@
 	<attform name="points" val="1/2*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
       <section name="2">
-        <attstr name="suffix" val="touring" />
+        <attstr name="suffix" val="ls1" />
 	<attform name="points" val="5/10*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
     </section>

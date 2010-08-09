@@ -204,8 +204,8 @@
     </section>
 
     <section name="2">
-      <attstr name="subfile" val="career_touring.xmls"/>
-      <attstr name="subfile suffix" val="touring"/>
+      <attstr name="subfile" val="career_ls1.xmls"/>
+      <attstr name="subfile suffix" val="ls1"/>
       <attnum name="number of groups" val="1"/>
       <section name="Tracks">
         <attnum name="minimum number" val="4"/>

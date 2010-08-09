@@ -27,8 +27,8 @@
       <attstr name="is subfile" val="yes" />
       <attstr name="suffix" val="supercars" />
       <attstr name="parent file" val="career.xml" />
-      <attstr name="next subfile" val="career_touring.xmls" />
-      <attstr name="next suffix" val="touring" />
+      <attstr name="next subfile" val="career_ls1.xmls" />
+      <attstr name="next suffix" val="ls1" />
       <attstr name="islast" val="no" />
     </section>
   </section>
@@ -245,7 +245,7 @@
 	<attform name="points" val="1/5*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
       <section name="2">
-        <attstr name="suffix" val="touring" />
+        <attstr name="suffix" val="ls1" />
 	<attform name="points" val="1/10*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
     </section>
@@ -302,7 +302,7 @@
 	<attform name="points" val="1/4*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
       <section name="2">
-        <attstr name="suffix" val="touring" />
+        <attstr name="suffix" val="ls1" />
 	<attform name="points" val="1/8*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
     </section>
@@ -359,7 +359,7 @@
 	<attform name="points" val="1/10*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
       <section name="2">
-        <attstr name="suffix" val="touring" />
+        <attstr name="suffix" val="ls1" />
 	<attform name="points" val="1/7*(1-(pos-1)/(cars-1 \/ 1))" />
       </section>
     </section>
