@@ -377,6 +377,15 @@ ReNewTrackMenu(void)
     int titleId = CreateLabelControl(newTrackMenuHdle, menuXMLDescHdle, "titlelabel");
     GfuiLabelSetText(newTrackMenuHdle, titleId, str);
 
+    // Calculate which race of the series this is
+    raceNumber = 1;
+    for (xx = 1; xx < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++xx) 
+    {
+        sprintf(buf, "%s/%d", RM_SECT_TRACKS, xx);
+        if (!strcmp( GfParmGetStr(ReInfo->params, buf, RM_ATTR_NAME, "free"), "free") == 0)
+            ++raceNumber;
+    }
+
     // Create variable subtitle label from race params.
     sprintf(buf, "Race Day #%d/%d on %s",
     raceNumber,
