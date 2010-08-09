@@ -382,6 +382,9 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
     // setup files we have to find it out:
 
     char SectionBuffer[256];                     // Buffer
+#ifdef SPEED_DREAMS
+    char indexstr[32];
+#endif //SPEED_DREAMS
     snprintf(SectionBuffer,BUFLEN,               // Build name of
         "%s/%s/%d"                               // section from
 	    ,ROB_SECT_ROBOTS,ROB_LIST_INDEX,oIndex); // Index of own driver
@@ -393,6 +396,12 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
       , ROB_ATTR_CAR, DEFAULTCARTYPE);           // section, default car type
 
 	oBotName = Value;                            // Get pointer to drivers name
+
+#ifdef SPEED_DREAMS //Speed dreams has a trick to find out the oCarType
+    RtGetCarindexString(oIndex, "simplix", oIndex < 1 || oIndex > 1 /*FIXME: this 1 equals the number of normals cars in simplix.xml*/, indexstr, 32);
+    if( oIndex < 1 || oIndex > 1 ) /*See FIXME above*/
+    	oCarType = strdup( indexstr ); /* FIXME: memory leak: strdup isn't released */
+#endif //SPEED_DREAMS
 
 	oTeamName = GfParmGetStr                     // Get pointer to
       (RobotSettings                             // drivers team name
