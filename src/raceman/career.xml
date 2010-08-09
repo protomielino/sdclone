@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Career">
+<params name="Career" version="1.0">
   <section name="Header">
     <attstr name="name" val="Career"/>
     <attstr name="description" val="Career"/>
