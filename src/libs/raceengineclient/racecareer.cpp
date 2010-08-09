@@ -239,11 +239,11 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 		/* Now it is certain that a bot should be added: no humans at this point */
 		sprintf( buf, "%s/%d", RM_SECT_DRIVERS, xx + 1 );
 		path2 = strdup( buf );
-		GfParmSetStr(curParam, path2, RM_ATTR_MODULE, "hymie");
+		GfParmSetStr(curParam, path2, RM_ATTR_MODULE, "simplix");
 		GfParmSetNum(curParam, path2, RM_ATTR_IDX, NULL, (tdble)xx);
 		GfParmSetNum(curParam, path2, RM_ATTR_EXTENDED, NULL, 1);
 		free( path2 );
-		sprintf( buf, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, "hymie", 1, xx );
+		sprintf( buf, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, "simplix", 1, xx );
 		path2 = strdup( buf );
 		snprintf( buf, 1024, "%s %s", GfParmGetCurStr(ReInfo->params, RM_SECT_FIRSTNAME, RM_ATTR_NAME, "Foo"),
 		                              GfParmGetCurStr(ReInfo->params, RM_SECT_LASTNAME, RM_ATTR_NAME, "Bar") );
@@ -255,7 +255,7 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 		GfParmSetNum(curParam, path2, RM_ATTR_SKILLLEVEL, NULL, (tdble) ReCareerNewSkill( GfParmGetEltNb( ReInfo->params, RM_SECT_CLASSES ), classNb ) );
 	
 		/* Add a driver to the result section */
-		snprintf( buf, 1024, "%s/%s/%d/%d/%s", RE_SECT_CLASSPOINTS, "hymie", 1, xx, GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) );
+		snprintf( buf, 1024, "%s/%s/%d/%d/%s", RE_SECT_CLASSPOINTS, "simplix", 1, xx, GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) );
 		GfParmSetNum( curResult, buf, RE_ATTR_POINTS, NULL, 1.0f );
 
 		free(path2);
