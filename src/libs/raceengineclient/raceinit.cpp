@@ -518,6 +518,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 	char buf[256];
 	char const *str;
 	char const *category;
+	char const *teamname;
 	tModInfoNC *curModInfo;
 	tRobotItf *curRobot;
 	void *robhdle;
@@ -600,8 +601,12 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		else
 			strncpy(elt->_name, GfParmGetStr(ReInfo->params, path2, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
 		elt->_name[MAX_NAME_LEN - 1] = 0;
-		strncpy(elt->_teamname, GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none"), MAX_NAME_LEN - 1);
+
+		teamname = GfParmGetStr(robhdle, path, ROB_ATTR_TEAM, "none");
+		teamname = GfParmGetStr(ReInfo->params, path2, ROB_ATTR_TEAM, teamname ); //Use the name in params if it has a team name
+		strncpy(elt->_teamname, teamname, MAX_NAME_LEN - 1);
 		elt->_teamname[MAX_NAME_LEN - 1] = 0;
+
 		elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, 0.0f);
 
 		// TODO (D30) : Get human _carName from race info in any case (no more from human.xml).
