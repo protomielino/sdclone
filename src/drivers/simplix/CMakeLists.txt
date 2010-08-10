@@ -78,7 +78,9 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} INTERFACE ${ROBOT_INTERFACE} SOURCES ${ROBOT_SOU
 # The data associated to the ubiquitous robot module and its clones.
 SET(ROBOT_SHIP logo.rgb readme.txt)
 
-SET(ROBOT_SHIPSUBDIRS 0 trb1-cavallo-360rb tracks)
+SET(ROBOT_SHIPSUBDIRS 0 trb1-cavallo-360rb tracks
+	              ls1-archer-r9 ls1-cavallo-570s1 ls1-newcastle-fury ls1-taipan-ltsr ls1-toro-rgt ls1-vulture-v6r ls1-zentek-z7r
+                      sc-boxer-96 sc-cavallo-360 sc-fmc-gt4 sc-lynx-220 sc-murasama-nsx sc-spirit-300)
 ROBOT_DATA(NAME ${ROBOT_NAME} SHIPPREFIX src 
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
