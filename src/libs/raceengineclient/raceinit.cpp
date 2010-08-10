@@ -607,7 +607,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		strncpy(elt->_teamname, teamname, MAX_NAME_LEN - 1);
 		elt->_teamname[MAX_NAME_LEN - 1] = 0;
 
-		elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, 0.0f);
+		elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, -1.0f);
 
 		// TODO (D30) : Get human _carName from race info in any case (no more from human.xml).
 		if (normal_carname) /* Even if we get a normal_carname for humans we use it despite of forced extended mode*/
