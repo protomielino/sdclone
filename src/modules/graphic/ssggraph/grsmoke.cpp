@@ -307,8 +307,8 @@ grShutdownSmoke()
 					//~ tmp = smokeList->erase(tmp);
 				//~ }
 			smokeList->clear();
-			delete timeSmoke;
-			delete timeFire;
+			delete [] timeSmoke;
+			delete [] timeFire;
 			delete smokeList;
 			
 			timeSmoke = NULL;

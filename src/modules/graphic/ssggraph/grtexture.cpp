@@ -130,7 +130,7 @@ grSGIHeader::grSGIHeader(const char *fname, ssgTextureInfo* info)
 		return;
 	}
 
-	GLubyte *image = new GLubyte [sgihdr->xsize*sgihdr->ysize*sgihdr->zsize];
+	GLubyte *image = (GLubyte*)malloc( sizeof(GLubyte) * sgihdr->xsize*sgihdr->ysize*sgihdr->zsize );
 	GLubyte *ptr = image;
 
 	unsigned char *rbuf = new unsigned char[sgihdr->xsize];
@@ -243,7 +243,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 			h2 = 1;
 		}
 
-		texels[l2] = new GLubyte[w2*h2*zsize];
+		texels[l2] = (GLubyte*)malloc( sizeof(GLubyte) * w2*h2*zsize );
 
 		for (int x2 = 0; x2 < w2; x2++) {
 			for (int y2 = 0; y2 < h2; y2++) {
@@ -330,7 +330,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 		}
 
 		if (ww == 0) {
-			delete [] texels[0];
+			free( texels[0] );
 			xsize >>= 1;
 			ysize >>= 1;
 			for (int l = 0; texels [l] != NULL; l++) {
@@ -376,7 +376,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 		}
 
 		map_level++ ;
-		delete [] texels[i];
+		free( texels[i] );
 	}
 
 	return true;
