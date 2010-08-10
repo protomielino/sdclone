@@ -235,7 +235,8 @@ TDriver::TDriver(int Index):
   oClutchRange(0.82),
   oClutchRelease(0.5),
   oCurrSpeed(0),
-  // oGearEff
+  // oGearEff,
+  oExtended(0),
   oIndex(0),
   oLastGear(0),
   oLetPass(false),
@@ -332,6 +333,7 @@ TDriver::TDriver(int Index):
 //  GfOut("#TDriver::TDriver() >>>\n");
   int I;
   oIndex = Index;                                // Save own index
+  oExtended = ( Index < 0 || Index >= NBBOTS ) ? 1 : 0; //Determine if it is extended or not
 
   // Motion survey
   oSysFooStuckX = new TSysFoo(1,128);            // Ringbuffer for X
@@ -359,6 +361,8 @@ TDriver::~TDriver()
 //  GfOut("#TDriver::~TDriver() >>>\n");
   delete [] oOpponents; 
   
+  if (oCarType != NULL)
+    delete oCarType;
   if (oStrategy != NULL)
     delete oStrategy;
   if (oSysFooStuckX != NULL)
@@ -381,6 +385,10 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
     // in the teams xml file and to load depending
     // setup files we have to find it out:
 
+    if (oCarType)
+    	free (oCarType);
+    oCarType = NULL;
+
     char SectionBuffer[256];                     // Buffer
 #ifdef SPEED_DREAMS
     char indexstr[32];
@@ -390,17 +398,17 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
 	    ,ROB_SECT_ROBOTS,ROB_LIST_INDEX,oIndex); // Index of own driver
     char* Section = SectionBuffer;
 
-	oCarType = GfParmGetStr                      // Get pointer to
+	oCarType = strdup(GfParmGetStr           // Get pointer to
       (RobotSettings                             // car type
       , Section                                  // defined in corresponding
-      , ROB_ATTR_CAR, DEFAULTCARTYPE);           // section, default car type
+      , ROB_ATTR_CAR, DEFAULTCARTYPE));           // section, default car type
 
 	oBotName = Value;                            // Get pointer to drivers name
 
 #ifdef SPEED_DREAMS //Speed dreams has a trick to find out the oCarType
-    RtGetCarindexString(oIndex, "simplix", oIndex < 1 || oIndex > 1 /*FIXME: this 1 equals the number of normals cars in simplix.xml*/, indexstr, 32);
-    if( oIndex < 1 || oIndex > 1 ) /*See FIXME above*/
-    	oCarType = strdup( indexstr ); /* FIXME: memory leak: strdup isn't released */
+    RtGetCarindexString(oIndex, "simplix", oExtended, indexstr, 32);
+    if( oExtended )
+    	oCarType = strdup( indexstr );
 #endif //SPEED_DREAMS
 
 	oTeamName = GfParmGetStr                     // Get pointer to

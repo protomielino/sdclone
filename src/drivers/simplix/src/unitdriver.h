@@ -284,13 +284,14 @@ private:
 	double oInitialBrakeCoeff;
 	PtCarElt oCar;                               // TORCS data for own car
     float oSteerAngle;                           // Angle to steer
-    const char* oCarType;                        // Type name of own car
+    char* oCarType;                              // Type name of own car
 	double oClutchMax;
 	double oClutchDelta;
 	double oClutchRange;
 	double oClutchRelease;
 	double oCurrSpeed;                           // Currend speed
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
+	int oExtended;                               // Information if this robot is extended (oExtended = 1) or not (oExtended = 0).
 	int oIndex;                                  // index of own driver
 	int oLastGear;                               // Last gear
     bool oLetPass;                               // Let opoonent pass
