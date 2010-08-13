@@ -65,10 +65,10 @@ GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const
     button->onFocusLost = onFocusLost;
     button->mouseBehaviour = mouse;
  
-    button->disabled = GfTexReadTex(disabled, w, h);
-    button->enabled = GfTexReadTex(enabled, w, h);
-    button->focused = GfTexReadTex(focused, w, h);
-    button->pushed = GfTexReadTex(pushed, w, h);
+    button->disabled = GfTexReadTexture(disabled, &w, &h);
+    button->enabled = GfTexReadTexture(enabled, &w, &h);
+    button->focused = GfTexReadTexture(focused, &w, &h);
+    button->pushed = GfTexReadTexture(pushed, &w, &h);
 
     switch (align) {
     case GFUI_ALIGN_HR_VB:
@@ -183,10 +183,10 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const c
     button->onFocusLost = onFocusLost;
     button->mouseBehaviour = mouse;
  
-    button->disabled = GfTexReadTex(disabled, width, height);
-    button->enabled = GfTexReadTex(enabled, width, height);
-    button->focused = GfTexReadTex(focused, width, height);
-    button->pushed = GfTexReadTex(pushed, width, height);
+    button->disabled = GfTexReadTexture(disabled, &width, &height);
+    button->enabled = GfTexReadTexture(enabled, &width, &height);
+    button->focused = GfTexReadTexture(focused, &width, &height);
+    button->pushed = GfTexReadTexture(pushed, &width, &height);
 
     switch (align) {
     case GFUI_ALIGN_HR_VB:
@@ -526,13 +526,13 @@ GfuiButtonSetImage(void *scr, int id, int x, int y, int w, int h,
 	GLuint pushed = 0;
 
 	if (strlen(disableFile) != 0)
-		disable = GfTexReadTex(disableFile);
+		disable = GfTexReadTexture(disableFile);
 	if (strlen(enableFile) != 0)
-		enable = GfTexReadTex(enableFile);
+		enable = GfTexReadTexture(enableFile);
 	if (strlen(focusedFile) != 0)
-		focused = GfTexReadTex(focusedFile);
+		focused = GfTexReadTexture(focusedFile);
 	if (strlen(pushedFile) != 0)
-		pushed = GfTexReadTex(pushedFile);
+		pushed = GfTexReadTexture(pushedFile);
 
 	tGfuiScreen *screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
@@ -949,10 +949,10 @@ gfuiReleaseButton(tGfuiObject *obj)
 {
 	tGfuiButton *button = &(obj->u.button);;
 
-	GfTexFreeTex(button->disabled);
-	GfTexFreeTex(button->enabled);
-	GfTexFreeTex(button->focused);
-	GfTexFreeTex(button->pushed);
+	GfTexFreeTexture(button->disabled);
+	GfTexFreeTexture(button->enabled);
+	GfTexFreeTexture(button->focused);
+	GfTexFreeTexture(button->pushed);
 
 	tGfuiLabel *label = &(button->label);
 
@@ -971,10 +971,10 @@ gfuiReleaseGrButton(tGfuiObject *obj)
 {
 	tGfuiGrButton	*button = &(obj->u.grbutton);
 
-	GfTexFreeTex(button->disabled);
-	GfTexFreeTex(button->enabled);
-	GfTexFreeTex(button->focused);
-	GfTexFreeTex(button->pushed);
+	GfTexFreeTexture(button->disabled);
+	GfTexFreeTexture(button->enabled);
+	GfTexFreeTexture(button->focused);
+	GfTexFreeTexture(button->pushed);
 
 	free(obj);
 }//gfuiReleaseGrButton

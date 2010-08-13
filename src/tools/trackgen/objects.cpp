@@ -458,7 +458,7 @@ GenerateObjects(tTrack *track, void *TrackHandle, void *CfgHandle, FILE *save_fd
 	sprintf(buf, "tracks/%s/%s/%s", track->category, track->internalname, map);
 
 	printf("Processing object map %s\n", buf);
-	MapImage = GfTexReadPng(buf, &width, &height, 2.0, 0, 0);
+	MapImage = GfTexReadImageFromPNG(buf, 2.0, &width, &height, 0, 0);
 	if (!MapImage) {
 	    return;
 	}

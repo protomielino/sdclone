@@ -24,36 +24,27 @@
     @ingroup	img		
 */
 
+#include <cstdlib>
+#include <cstdio>
+
 #ifdef WIN32
 #include <windows.h>
-
+#include <direct.h>
 #define XMD_H
 #endif
 
-#include "png.h"
-
-#include "tgfclient.h"
-#include <stdlib.h>
-#include <stdio.h>
-
-
+#include <GL/glu.h>
+#include <png.h>
 extern "C"
 {
     #include <jpeglib.h>
 }
 
-#ifdef WIN32
-#include <direct.h>
-#endif
-#include "GL/glu.h"
+#include "tgfclient.h"
 
 
 
-static char buf[1024];
-
-#define PNG_BYTES_TO_CHECK 4
-
-int getClosestPowerof2(int size)
+int gfTexGetClosestPowerof2(int size)
 {
 	static const int nSizes = 7;
 	static const int sizes[nSizes] = { 2, 4, 16, 128, 256, 512, 1024 };
@@ -68,14 +59,15 @@ int getClosestPowerof2(int size)
 	return sizes[nSizes - 1];
 }
 
+#ifdef Useful
 void
-GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLuint &texId)
+GfTexScaleImagePowerof2(unsigned char *pSrcImg, int srcW, int srcH, GLenum format, GLuint &texId)
 {
 	int destH = 128;
 	int destW = 128;
 
-	destH = getClosestPowerof2(srcH);
-	destW = getClosestPowerof2(srcW);
+	destH = gfTexGetClosestPowerof2(srcH);
+	destW = gfTexGetClosestPowerof2(srcW);
 
 	if ( destH != srcH || destW != srcW)
 	{
@@ -93,7 +85,7 @@ GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLui
 
 		int r = gluScaleImage(format, srcW,srcH,GL_UNSIGNED_BYTE,(void*)pSrcImg,destW,destH,GL_UNSIGNED_BYTE,(void*)texData);
 		if (r!=0)
-			printf("Error trying to scale image\n");
+			GfError("GfTexScaleImagePowerof2 : Error trying to scale image\n");
 
 		glGenTextures(1, &texId);
 		glBindTexture(GL_TEXTURE_2D, texId);
@@ -111,22 +103,26 @@ GfScaleImagePowerof2(unsigned char *pSrcImg,int srcW,int srcH,GLenum format,GLui
 		glTexImage2D(GL_TEXTURE_2D, 0, format, destW, destH, 0, format, GL_UNSIGNED_BYTE, (GLvoid *)(pSrcImg));
 	}
 }
+#endif
 
 /** Load a PNG image from disk to a buffer in RGBA mode (if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support).
     @ingroup	img		
     @param	filename	name of the image to load
-    @param	widthp		original width of the read image (left aligned in target buffer)
-    @param	heightp		original height of the read image (top aligned in target buffer)
     @param	screen_gamma	gamma correction value
-    @param	pow2_widthp	if not 0, pointer to 2^N width of the target image buffer
-    @param	pow2_heightp	if not 0, pointer to 2^N height of the target image buffer
+    @param	pWidth		original width of the read image (left aligned in target buffer)
+    @param	pHeight		original height of the read image (top aligned in target buffer)
+    @param	pPow2Width	if not 0, pointer to 2^N width of the target image buffer
+    @param	pPow2Height	if not 0, pointer to 2^N height of the target image buffer
     @return	Pointer on the buffer containing the image
 		<br>NULL Error
  */
 unsigned char *
-GfTexReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma, int *pow2_widthp, int *pow2_heightp)
+GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int *pHeight,
+					  int *pPow2Width, int *pPow2Height)
 {
-	unsigned char buf[PNG_BYTES_TO_CHECK];
+	static const int nPNGBytesToCheck = 4;
+
+	unsigned char buf[nPNGBytesToCheck];
 	FILE *fp;
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -141,25 +137,25 @@ GfTexReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	png_uint_32 i;
 	
 	if ((fp = fopen(filename, "rb")) == NULL) {
-		GfTrace("Can't open file %s for reading\n", filename);
+		GfError("GfTexReadImageFromPNG(%s) : Can't open file for reading\n", filename);
 		return (unsigned char *)NULL;
 	}
 	
-	if (fread(buf, 1, PNG_BYTES_TO_CHECK, fp) != PNG_BYTES_TO_CHECK) {
-		GfTrace("Can't read file %s\n", filename);
+	if (fread(buf, 1, nPNGBytesToCheck, fp) != nPNGBytesToCheck) {
+		GfError("GfTexReadImageFromPNG(%s) : Can't read file\n", filename);
 		fclose(fp);
 		return (unsigned char *)NULL;
 	}
 	
-	if (png_sig_cmp(buf, (png_size_t)0, PNG_BYTES_TO_CHECK) != 0) {
-		GfTrace("File %s not in png format\n", filename);
+	if (png_sig_cmp(buf, (png_size_t)0, nPNGBytesToCheck) != 0) {
+		GfError("GfTexReadImageFromPNG(%s) : File not in png format\n", filename);
 		fclose(fp);
 		return (unsigned char *)NULL;
 	}
 	
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, (png_error_ptr)NULL, (png_error_ptr)NULL);
 	if (png_ptr == NULL) {
-		GfTrace("Img Failed to create read_struct\n");
+		GfError("GfTexReadImageFromPNG(%s) : Failed to create read_struct\n", filename);
 		fclose(fp);
 		return (unsigned char *)NULL;
 	}
@@ -181,24 +177,24 @@ GfTexReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	}
 	
 	png_init_io(png_ptr, fp);
-	png_set_sig_bytes(png_ptr, PNG_BYTES_TO_CHECK);
+	png_set_sig_bytes(png_ptr, nPNGBytesToCheck);
 	png_read_info(png_ptr, info_ptr);
 	png_get_IHDR(png_ptr, info_ptr, &src_width, &src_height, &bit_depth, &color_type, &interlace_type, NULL, NULL);
-	*widthp = (int)src_width;
-	*heightp = (int)src_height;
+	*pWidth = (int)src_width;
+	*pHeight = (int)src_height;
 	
 	// Compute target 2^N x 2^P image buffer size if specified.
 	// Note: This 2^N x 2^P stuff is needed by some low-end OpenGL hardware/drivers
 	//       that don't support non  2^N x 2^P textures (or at extremely low frame rates).
-	if (pow2_widthp && pow2_heightp) {
+	if (pPow2Width && pPow2Height) {
 	    tgt_width = 2;
 	    while(tgt_width < src_width) 
 		tgt_width *= 2;
 	    tgt_height = 2;
 	    while(tgt_height < src_height) 
 		tgt_height *= 2;
-	    *pow2_widthp = (int)tgt_width;
-	    *pow2_heightp = (int)tgt_height;
+	    *pPow2Width = (int)tgt_width;
+	    *pPow2Height = (int)tgt_height;
 	} else {
 	    tgt_width = (int)src_width;
 	    tgt_height = (int)src_height;
@@ -245,12 +241,13 @@ GfTexReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	png_read_update_info(png_ptr, info_ptr);
 	src_rowbytes = png_get_rowbytes(png_ptr, info_ptr);
 	tgt_rowbytes = src_rowbytes;
-	if (pow2_widthp && pow2_heightp) 
+	if (pPow2Width && pPow2Height) 
 	    tgt_rowbytes = tgt_width * src_rowbytes / src_width;
 	
 	// RGBA expected.
 	if (src_rowbytes != (4 * src_width)) {
-		GfTrace("%s bad byte count... %lu instead of %lu\n", filename, (unsigned long)src_rowbytes, (unsigned long)(4 * src_width));
+		GfError("GfTexReadImageFromPNG(%s) : Bad byte count (%lu instead of %lu)\n", 
+            filename, (unsigned long)src_rowbytes, (unsigned long)(4 * src_width));
 		fclose(fp);
 		png_destroy_read_struct(&png_ptr, (png_infopp)NULL, (png_infopp)NULL);
 		return (unsigned char *)NULL;
@@ -285,6 +282,188 @@ GfTexReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 	return image_ptr;
 }
 
+/** Load a JPEG image from disk to a buffer in RGBA 8888 mode 
+    TODO: if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support.
+    @ingroup	img		
+    @param	filename	 name of the image to load
+    @param	screen_gamma gamma correction value
+    @param	pWidth		 original width of the read image (left aligned in target buffer)
+    @param	pHeight		 original height of the read image (top aligned in target buffer)
+    @param	pPow2Width	 if not 0, pointer to 2^N width of the target image buffer
+                         WARNING: Not yet implemented ; = *pWidth
+    @param	pPow2Height	 if not 0, pointer to 2^N height of the target image buffer
+                         WARNING: Not yet implemented ; = *pHeight
+    @return	Pointer to the buffer RGBA 8888 containing the image
+		<br>NULL Error
+ */
+struct gfTexJPEGErrorManager {
+	struct jpeg_error_mgr pub;	/* "public" fields */
+
+	jmp_buf setjmp_buffer;	/* for return to caller */
+};
+
+/*
+ * Here's the routine that will replace the standard error_exit method:
+ */
+
+METHODDEF(void)
+gfTexJPEGErrorExit (j_common_ptr cinfo)
+{
+	/* cinfo->err really points to a jpeg_error_mgr, so coerce pointer */
+	struct gfTexJPEGErrorManager* pErrMgr =
+		(struct gfTexJPEGErrorManager*)cinfo->err;
+	
+	/* Always display the message. */
+	/* We could postpone this until after returning, if we chose. */
+	(*cinfo->err->output_message) (cinfo);
+	
+	/* Return control to the setjmp point */
+	longjmp(pErrMgr->setjmp_buffer, 1);
+}
+
+unsigned char *
+GfTexReadImageFromJPEG(const char *filename, float screen_gamma, int *pWidth, int *pHeight, 
+					   int *pPow2Width, int *pPow2Height)
+{
+	unsigned char *pBuffer = NULL;
+
+	// Try and open the source image file.
+	FILE* infile;
+	if ((infile = fopen(filename, "rb")) == NULL) 
+	{
+		fprintf(stderr, "GfTexReadImageFromJPEG(%s) : Can't open file\n", filename);
+		return 0;
+	}
+
+	// Initialize the error handler associated to the JPEG image decompressor.
+	struct jpeg_decompress_struct cinfo;
+	struct gfTexJPEGErrorManager jerr;
+
+	cinfo.err = jpeg_std_error(&jerr.pub);
+	jerr.pub.error_exit = gfTexJPEGErrorExit;
+
+	if (setjmp(jerr.setjmp_buffer)) 
+	{
+		jpeg_destroy_decompress(&cinfo);
+		fclose(infile);
+		return 0;
+	}
+
+	// Initialize the JPEG image decompressor for 24 bit RGB output.
+	jpeg_create_decompress(&cinfo);
+	jpeg_stdio_src(&cinfo, infile);
+	(void)jpeg_read_header(&cinfo, TRUE);
+
+	cinfo.out_color_space = JCS_RGB;
+	cinfo.quantize_colors = FALSE;
+	jpeg_calc_output_dimensions(&cinfo);
+	
+	// Load and check image dimensions.
+	(void)jpeg_start_decompress(&cinfo);
+	const unsigned nPixelsWide = cinfo.output_width;
+	const unsigned nPixelsHigh = cinfo.output_height;
+	const unsigned nSrcBytesPerPixel = cinfo.output_components;
+	//GfTrace("GfTexReadImageFromJPEG(%s) : %ux%ux%u\n",
+	//		filename, nPixelsWide, nPixelsHigh, nSrcBytesPerPixel);
+
+	if (nSrcBytesPerPixel != 3)
+	{
+		(void)jpeg_finish_decompress(&cinfo);
+		jpeg_destroy_decompress(&cinfo);
+		fclose(infile);
+		fprintf(stderr, "GfTexReadImageFromJPEG(%s) : Unsupported %u bytes per pixel JPEG image\n",
+				filename, nSrcBytesPerPixel);
+		return 0;
+	}
+
+	// Allocate the image buffer (4 bytes per pixel as we add the alpha channel).
+	const unsigned nTgtBytesPerPixel = 4;
+	unsigned char *aTgtImageBuffer =
+		(unsigned char*)malloc(nPixelsHigh * nPixelsWide * nTgtBytesPerPixel);
+
+	// Allocate the line buffer for the decompressor.
+	JSAMPARRAY aSrcLineBuffer =
+		(*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE,
+								   nPixelsWide * nSrcBytesPerPixel, 1);
+
+	// Load lines into the image buffer, and add the alpha channel to each pixel.
+	JSAMPLE* aSrcPixelData;
+	unsigned char* pTgtPixelData =
+		aTgtImageBuffer + (nPixelsHigh - 1) * nPixelsWide * nTgtBytesPerPixel;
+	while (cinfo.output_scanline < cinfo.output_height) 
+	{
+		(void)jpeg_read_scanlines(&cinfo, aSrcLineBuffer, 1);
+		
+		for (unsigned nPixelIndex = 0; nPixelIndex < nPixelsWide; nPixelIndex++)
+		{
+			aSrcPixelData = &(aSrcLineBuffer[0][nPixelIndex * nSrcBytesPerPixel]);
+			*pTgtPixelData++ = aSrcPixelData[0]; // Red channel.
+			*pTgtPixelData++ = aSrcPixelData[1]; // Green channel.
+			*pTgtPixelData++ = aSrcPixelData[2]; // Blue channel.
+			*pTgtPixelData++ = 255; // No alpha channel in JPEG files.
+		}
+
+		// Next line in target image buffer (reversed because of OpenGL / JPEG conventions).
+		pTgtPixelData -= 2 * nTgtBytesPerPixel * nPixelsWide;
+	}
+	
+	// Close the JPEG image decompressor and source file.
+	(void)jpeg_finish_decompress(&cinfo);
+	jpeg_destroy_decompress(&cinfo);
+	fclose(infile);
+
+	// Store the real image dimensions.
+	*pWidth = (int)nPixelsWide;
+	*pHeight = (int)nPixelsHigh;
+
+	// Store the closest power-of-2 image dimensions.
+	// WARNING: For the moment, no real power of 2 management ; may fail on low end hardwares.
+	if (pPow2Width)
+		*pPow2Width = *pWidth;
+	if (pPow2Height)
+		*pPow2Height = *pHeight;
+
+	//return pBuffer;
+	return aTgtImageBuffer;
+}
+
+/** Load a PNG or JPEG image from disk to a buffer in RGBA mode (if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support).
+    WARNING: 2^N x 2^P enforcement not yet implemented for JPEG images.
+    @ingroup	img		
+    @param	filename	name of the image to load
+    @param	screen_gamma	gamma correction value
+    @param	pWidth		if not 0, pointer to original width of the read image (left aligned in target buffer)
+    @param	pHeight		if not 0, pointer to original height of the read image (top aligned in target buffer)
+    @param	pPow2Width	if not 0, pointer to 2^N width of the target image buffer
+    @param	pPow2Height	if not 0, pointer to 2^N height of the target image buffer
+    @return	Pointer on the buffer containing the image
+		<br>NULL Error
+ */
+unsigned char *
+GfTexReadImageFromFile(const char *filename, float screen_gamma, int *pWidth, int *pHeight,
+					   int *pPow2Width, int *pPow2Height)
+{
+	unsigned char* pImageBuffer = 0;
+	
+	if (strstr(filename, ".png") || strstr(filename, ".PNG"))
+	{
+	    pImageBuffer = GfTexReadImageFromPNG(filename, screen_gamma, pWidth, pHeight,
+											 pPow2Width, pPow2Height);
+	}
+	else if (strstr(filename, ".jpg") || strstr(filename, ".JPG")
+		 || strstr(filename, ".jpeg") || strstr(filename, ".JPEG"))
+	{
+	    pImageBuffer = GfTexReadImageFromJPEG(filename, screen_gamma, pWidth, pHeight,
+											  pPow2Width, pPow2Height);
+	}
+	else
+	{
+		GfError("Could not read image from %s : only JPEG / PNG are supported\n", filename);
+	}
+
+	return pImageBuffer;
+}
+
 /** Write a buffer to a png image on disk.
     @ingroup	img
     @param	img		image data (RGB)
@@ -295,7 +474,7 @@ GfTexReadPng(const char *filename, int *widthp, int *heightp, float screen_gamma
 		<br>-1 Error
  */
 int
-GfTexWritePng(unsigned char *img, const char *filename, int width, int height)
+GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int height)
 {
 	FILE *fp;
 	png_structp	png_ptr;
@@ -313,7 +492,7 @@ GfTexWritePng(unsigned char *img, const char *filename, int width, int height)
 	
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {
-		GfTrace("Can't open file %s for writing\n", filename);
+		GfError("GfTexWriteImageToPNG(%s) : Can't open file for writing\n", filename);
 		return -1;
 	}
 	
@@ -370,164 +549,68 @@ GfTexWritePng(unsigned char *img, const char *filename, int width, int height)
 	return 0;
 }
 
+/** Read a PNG RGBA 8888 / JPEG RGB 888 image into a RGBA 888 OpenGL 2D texture.
+    @ingroup	img
+    @param	filename	file name of the image
+    @param	pWidth	read image original width (pixels)
+    @param	pHeight	read image original height (pixels)
+    @param	pPow2Width	read texture total width (pixels, as the closest greater or equal power of 2 width value)
+    @param	pPow2Height	read texture total height (pixels, as the closest greater or equal power of 2 height value)
+    @return	None.
+ */
+GLuint
+GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
+				 int* pPow2Width, int* pPow2Height)
+{
+	// Get screen gamma value from graphics params.
+	char buf[256];
+	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	void *handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
+	const float screen_gamma =
+		(float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
+	GfParmReleaseHandle(handle);
+
+	// Load the image buffer from the file (JPEG 888 / PNG 8888)
+	int nWidth, nHeight;
+	GLbyte *pImageBuffer =
+		(GLbyte*)GfTexReadImageFromFile(filename, screen_gamma, &nWidth, &nHeight,
+										pPow2Width, pPow2Height);
+	if (!pImageBuffer)
+		return 0;
+
+	// Generate the OpenGL texture from the image buffer.
+	GLuint glTexId;
+	glGenTextures(1, &glTexId);
+	glBindTexture(GL_TEXTURE_2D, glTexId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+				 pPow2Width ? *pPow2Width : nWidth, pPow2Height ? *pPow2Height : nHeight,
+				 0, GL_RGBA, GL_UNSIGNED_BYTE, pImageBuffer);
+
+	// Free the image buffer.
+	free(pImageBuffer);
+
+	//GfTrace("GfTexReadTexture(%s) : id=%u (%dx%d =>%dx%d)\n", filename, glTexId, nWidth, nHeight,
+	//		pPow2Width ? *pPow2Width : nWidth, pPow2Height ? *pPow2Height : nHeight);
+
+	// Set the output dimensions if requested.
+	if (pWidth)
+		*pWidth = nWidth;
+	if (pHeight)
+		*pHeight = nHeight;
+
+	return glTexId;
+}
+
 /** Free the texture
     @ingroup	img
     @param	tex	texture to free
     @return	none
 */
 void
-GfTexFreeTex(GLuint tex)
+GfTexFreeTexture(GLuint glTexId)
 {
-	if (tex != 0) {
-		glDeleteTextures(1, &tex);
-	}
+	if (glTexId)
+		glDeleteTextures(1, &glTexId);
 }
-
-/** Read a png image into a texture.
-    @ingroup	img
-    @param	filename	file name of the image
-    @return	None.
- */
-GLuint
-GfTexReadTex(const char *filename)
-{
-	int w, h;
-	return GfTexReadTex(filename, w, h);
-}
-
-GLuint
-GfTexReadTex(const char *filename, int &width, int &height)
-{
-	void *handle;
-	float screen_gamma;
-	GLbyte *tex;
-	GLuint retTex;
-
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
-	tex = (GLbyte*)GfTexReadPng(filename, &width, &height, screen_gamma, 0, 0);
-
-	if (!tex) {
-		GfParmReleaseHandle(handle);
-		return 0;
-	}
-
-	glGenTextures(1, &retTex);
-	glBindTexture(GL_TEXTURE_2D, retTex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
-
-	free(tex);
-
-	GfParmReleaseHandle(handle);
-	return retTex;
-}
-
-/** Load an JPEG image from disk to a buffer in RGBA mode (if specified, enforce 2^N x 2^P size for the target buffer, to suit with low-end OpenGL hardwares/drivers poor texture support).
-    @ingroup	img		
-    @param	filename	name of the image to load
-    @param	widthp		original width of the read image (left aligned in target buffer)
-    @param	heightp		original height of the read image (top aligned in target buffer)
-    @param	screen_gamma	gamma correction value
-    @param	pow2_widthp	if not 0, pointer to 2^N width of the target image buffer
-                                WARNING: Not yet implemented ; = *widthp
-    @param	pow2_heightp	if not 0, pointer to 2^N height of the target image buffer
-                                WARNING: Not yet implemented ; = *heightp
-    @return	Pointer on the buffer containing the image
-		<br>NULL Error
- */
-struct my_error_mgr {
-  struct jpeg_error_mgr pub;	/* "public" fields */
-
-  jmp_buf setjmp_buffer;	/* for return to caller */
-};
-
-typedef struct my_error_mgr * my_error_ptr;
-
-/*
- * Here's the routine that will replace the standard error_exit method:
- */
-
-METHODDEF(void)
-my_error_exit (j_common_ptr cinfo)
-{
-  /* cinfo->err really points to a my_error_mgr struct, so coerce pointer */
-  my_error_ptr myerr = (my_error_ptr) cinfo->err;
-
-  /* Always display the message. */
-  /* We could postpone this until after returning, if we chose. */
-  (*cinfo->err->output_message) (cinfo);
-
-  /* Return control to the setjmp point */
-  longjmp(myerr->setjmp_buffer, 1);
-}
-
-unsigned char *
-GfTexReadJpeg(const char *filename, int *widthp, int *heightp, float screen_gamma, 
-	      int *pow2_widthp, int *pow2_heightp)
-{
-  unsigned char *pBuffer = NULL;
-  struct jpeg_decompress_struct cinfo;
-
-  struct my_error_mgr jerr;
-
-  FILE * infile;		/* source file */
-  JSAMPARRAY buffer;		/* Output row buffer */
-  int row_stride;		/* physical row width in output buffer */
-
-  if ((infile = fopen(filename, "rb")) == NULL) 
-  {
-    fprintf(stderr, "can't open %s\n", filename);
-    return 0;
-  }
-
-  cinfo.err = jpeg_std_error(&jerr.pub);
-  jerr.pub.error_exit = my_error_exit;
-
-  if (setjmp(jerr.setjmp_buffer)) 
-  {
-    jpeg_destroy_decompress(&cinfo);
-    fclose(infile);
-    return 0;
-  }
-
-  /* Now we can initialize the JPEG decompression object. */
-  jpeg_create_decompress(&cinfo);
-
-  jpeg_stdio_src(&cinfo, infile);
-
-  (void) jpeg_read_header(&cinfo, TRUE);
-
-  (void) jpeg_start_decompress(&cinfo);
-  row_stride = cinfo.output_width * cinfo.output_components;
-  buffer = (*cinfo.mem->alloc_sarray)
-		((j_common_ptr) &cinfo, JPOOL_IMAGE, row_stride, 1);
-
-  pBuffer = (unsigned char*)malloc(cinfo.output_height*cinfo.output_width*3);
-  memset(pBuffer,0,cinfo.output_height*cinfo.output_width*3);
-
-  *heightp = cinfo.output_height;
-  *widthp = cinfo.output_width;
-
-  unsigned char *pLine = pBuffer +row_stride*(cinfo.output_height-1);
-
-  while (cinfo.output_scanline < cinfo.output_height) 
-  {
-    (void) jpeg_read_scanlines(&cinfo, buffer, 1);
-	memcpy(pLine,buffer[0],row_stride);
-	pLine-=row_stride;
-  }
-
-  (void) jpeg_finish_decompress(&cinfo);
-  jpeg_destroy_decompress(&cinfo);
-  fclose(infile);
-
-  // WARNING: For the moment, no real power of 2 management ; may fail on low end hardwares.
-  *pow2_widthp = *widthp;
-  *pow2_heightp = *heightp;
-
-  return pBuffer;
-}
-

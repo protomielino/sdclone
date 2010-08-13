@@ -638,8 +638,7 @@ gfuiDrawScrollist(tGfuiObject *obj)
 	tGfuiListElement	*elt;
 	Color			fgColor;
 	Color			bgColor;
-	char		buf[256];
-	int			w, h, x, y;
+	int			h, x, y;
 	int			index;
 
 	scrollist = &(obj->u.scrollist);

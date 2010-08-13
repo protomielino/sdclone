@@ -24,7 +24,7 @@
     @ingroup	gui
 */
 
-#include <stdlib.h>
+#include <cstdlib>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -40,10 +40,10 @@
     @param	y	Position of the bottom of the image on the screen
     @param	w	Width of the image on the screen
     @param	h	Height of the image on the screen
-    @param	name	Filename on the image (png)
+    @param	name	Filename on the image (PNG or JPEG)
     @return	Image Id
 		<br>-1 Error
-    @warning	the image must be sqare and its size must be a power of 2.
+    @warning	the image must be a square and its size must be a power of 2.
 */
 int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name)
 {
@@ -63,7 +63,7 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 		image->texture[i] = 0;
 
 	image->activeimage = 0;
-	image->texture[0] = GfTexReadTex(name);
+	image->texture[0] = GfTexReadTexture(name);
 
 	if (!image->texture) {
 		free(object);
@@ -92,7 +92,7 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 	@param align image alignment
     @return	Image Id
 		<br>-1 Error
-    @warning	the image must be sqare and its size must be a power of 2.
+    @warning	the image must be a square and its size must be a power of 2.
 */
 int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *name, int align)
 {
@@ -111,7 +111,7 @@ int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *n
 		image->texture[i] = 0;
 
 	image->activeimage = 0;
-	image->texture[0] = GfTexReadTex(name);
+	image->texture[0] = GfTexReadTexture(name);
 
 	if (!image->texture) {
 		free(object);
@@ -185,13 +185,14 @@ int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *n
 
 /** Replace an image by another one.
     @ingroup	gui
-    @param	scr	Screen where to add the label
+    @param	scr	Screen where tthe image is displayed
     @param	id	Image Id
-    @param	name	Filename on the image (png)
+    @param	name	Filename of the image (PNG or JPEG)
+    @param	index	Target index for the texture (defaults to 0)
     @return	none
-    @warning	the image must be sqare and its size must be a power of 2.
+    @warning	the image must be a square and its size must be a power of 2.
 */
-void GfuiStaticImageSet(void *scr, int id, const char *name)
+void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index)
 {
 	tGfuiObject *curObject;
 	tGfuiScreen *screen = (tGfuiScreen*)scr;
@@ -204,38 +205,8 @@ void GfuiStaticImageSet(void *scr, int id, const char *name)
 			if (curObject->id == id) {
 				if (curObject->widget == GFUI_IMAGE) {
 					image = &(curObject->u.image);
-					GfTexFreeTex(image->texture[0]);
-					image->texture[0] = GfTexReadTex(name);
-				}
-			return;
-			}
-		} while (curObject != screen->objects);
-	}
-}
-
-/** Replace an image by another one.
-    @ingroup	gui
-    @param	scr	Screen where to add the label
-    @param	id	Image Id
-    @param	name	Filename on the image (png)
-    @return	none
-    @warning	the image must be sqare and its size must be a power of 2.
-*/
-void GfuiStaticImageSetEx(void *scr, int id, const char *name,unsigned int index)
-{
-	tGfuiObject *curObject;
-	tGfuiScreen *screen = (tGfuiScreen*)scr;
-	tGfuiImage *image;
-
-	curObject = screen->objects;
-	if (curObject != NULL) {
-		do {
-			curObject = curObject->next;
-			if (curObject->id == id) {
-				if (curObject->widget == GFUI_IMAGE) {
-					image = &(curObject->u.image);
-					GfTexFreeTex(image->texture[index]);
-					image->texture[index] = GfTexReadTex(name);
+					GfTexFreeTexture(image->texture[index]);
+					image->texture[index] = GfTexReadTexture(name);
 				}
 			return;
 			}
@@ -272,7 +243,7 @@ gfuiReleaseImage(tGfuiObject *obj)
 	image = &(obj->u.image);
 
 	for (int i=0;i<MAX_STATIC_IMAGES;i++)
-		GfTexFreeTex(image->texture[i]);
+		GfTexFreeTexture(image->texture[i]);
 
 	free(obj);
 }
@@ -291,13 +262,13 @@ gfuiDrawImage(tGfuiObject *obj)
 
     glBegin(GL_TRIANGLE_STRIP);
     {
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+	glColor4f(1.0, 0.0, 1.0, 1.0);
 	glTexCoord2f(0.0, 0.0); glVertex2f(obj->xmin, obj->ymin);
 	glTexCoord2f(0.0, 1.0); glVertex2f(obj->xmin, obj->ymax);
 	glTexCoord2f(1.0, 0.0); glVertex2f(obj->xmax, obj->ymin);
 	glTexCoord2f(1.0, 1.0); glVertex2f(obj->xmax, obj->ymax);
     }
     glEnd();
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
 }

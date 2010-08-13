@@ -48,7 +48,7 @@ gfuiObjectInit(void)
 	g_mouseW = (int)GfParmGetNum(param, pszSec,"width", (char*)NULL, 20.0);
 
 	const char* pszImage = GfParmGetStr(param, pszSec, "image", "data/img/mouse.png");
-	g_mouseImage = GfTexReadTex(pszImage);
+	g_mouseImage = GfTexReadTexture(pszImage);
 }
 
 void 

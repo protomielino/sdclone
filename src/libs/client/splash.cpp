@@ -173,7 +173,7 @@ static void splashDisplay( void )
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 		
-	if (s_texture != 0) 
+	if (s_texture) 
 	{
 		// Prepare texture display.
 		glEnable(GL_TEXTURE_2D);
@@ -232,9 +232,7 @@ static void splashDisplay( void )
 static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
 {
 	if (s == SDL_RELEASED) 
-	{
 		splashClose();
-	}
 }
 
 
@@ -257,37 +255,21 @@ static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
  */
 bool SplashScreen(void)
 {
-	void	*handle;
-	float	screen_gamma;
-	//const char	*filename = "data/img/splash.png";
-	const char	*filename = "data/img/splash.jpg";
-	
+	// Free splash texture if was loaded already.
 	if (s_texture) 
-	{
-		glDeleteTextures(1, &s_texture); 
-	}
-	
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-	handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);	
-	// TODO: Add a new GfTexRead function for implicit image format (use file extension to decide)
-  //GLbyte *tex = (GLbyte*)GfTexReadPng(filename, &s_imgWidth, &s_imgHeight, screen_gamma, &s_imgPow2Width, &s_imgPow2Height);
-	GLbyte *tex = (GLbyte*)GfTexReadJpeg(filename, &s_imgWidth, &s_imgHeight, screen_gamma, &s_imgPow2Width, &s_imgPow2Height);
-	if (!tex) 
-	{
-		GfParmReleaseHandle(handle);
-		GfTrace("Couldn't load splash screen image %s\n", filename);
-		return false;
-	}
+		GfTexFreeTexture(s_texture); 
 
-	glGenTextures(1, &s_texture);
-	glBindTexture(GL_TEXTURE_2D, s_texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, s_imgWidth, s_imgHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, s_imgWidth, s_imgHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
-	free(tex);
+	// Get screen gamma from graphics configuration.
+	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	void* handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	float screen_gamma =
+		(float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
 	
+	// Load splash texture from file.
+	s_texture = GfTexReadTexture("data/img/splash.jpg",
+								 &s_imgWidth, &s_imgHeight, &s_imgPow2Width, &s_imgPow2Height);
+
+	// Setup event loop callbacks.
 	GfelSetDisplayCB(splashDisplay);
 	GfelSetKeyboardDownCB(splashKey);
 	GfelSetTimerCB(7000, splashTimer);

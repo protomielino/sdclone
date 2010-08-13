@@ -24,7 +24,7 @@
 */
 
 
-#include <stdio.h>
+#include <cstdio>
 #include <cstring>
 #include <cstdlib>
 #include <string>
@@ -33,7 +33,6 @@
 #ifdef WIN32
 #include <windows.h>
 #endif
-
 
 #include "tgfclient.h"
 #include "gui.h"
@@ -430,18 +429,18 @@ CreateStaticImage(void *menuHandle,void *param,const char *pControlName)
         const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
         const int alignment = GetAlignment(pszAlignH,pszAlignV);
 
-		int id = GfuiStaticImageCreateEx(menuHandle,x,y,w,h,pszImage,alignment);
+        int id = GfuiStaticImageCreateEx(menuHandle,x,y,w,h,pszImage,alignment);
 
-		for (int i=2;i<=MAX_STATIC_IMAGES;i++)
-		{
-			char buffer[256];
-			sprintf(buffer,"image%i",i);
-			std::string strImage = GfParmGetStr(param, pControlName, buffer, "");
-			if (strImage.size()>0)
-				GfuiStaticImageSetEx(menuHandle,id,strImage.c_str(),i-1);
-		}
+        char buffer[256];
+        for (int i=2; i<= MAX_STATIC_IMAGES;i++)
+        {
+                sprintf(buffer, "image%i", i);
+                const char* pszIndexedImage = GfParmGetStr(param, pControlName, buffer, 0);
+                if (pszIndexedImage && strlen(pszIndexedImage) > 0)
+                        GfuiStaticImageSet(menuHandle, id, pszIndexedImage, i-1);
+        }
 
-		return id;
+        return id;
 }
 
 int 

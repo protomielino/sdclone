@@ -430,8 +430,7 @@ TGFCLIENT_API int GfuiScrollBarPosGet(void *scr, int id);
 /* Images */
 TGFCLIENT_API int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name);
 TGFCLIENT_API int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *name, int align);
-TGFCLIENT_API void GfuiStaticImageSet(void *scr, int id, const char *name);
-TGFCLIENT_API void GfuiStaticImageSetEx(void *scr, int id, const char *name,unsigned int index);
+TGFCLIENT_API void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index = 0);
 TGFCLIENT_API void GfuiStaticImageSetActive(void *scr, int id, int index);
 
 /*****************************
@@ -470,16 +469,14 @@ TGFCLIENT_API void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,c
  * Texture / image interface *
  *****************************/
 
-// TODO: Add a GfTexReadImageFromFile for implicit source file format 
-// (would call GfTexReadPng/Jpeg ... according to the file extension,
-//  and probably also return the number of bytes per pixel)
-TGFCLIENT_API unsigned char *GfTexReadPng(const char *filename, int *widthp, int *heightp, float gamma, int *pow2_widthp, int *pow2_heightp);
-TGFCLIENT_API unsigned char *GfTexReadJpeg(const char *filename, int *widthp, int *heightp, float screen_gamma, int *pow2_widthp, int *pow2_heightp);
+TGFCLIENT_API unsigned char *GfTexReadImageFromFile(const char *filename, float screen_gamma, int *pWidth, int *pHeight, int *pPow2Width = 0, int *pPow2Height = 0);
+TGFCLIENT_API unsigned char *GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int *pHeight, int *pPow2Width = 0, int *pPow2Height = 0);
+TGFCLIENT_API unsigned char *GfTexReadImageFromJPEG(const char *filename, float screen_gamma, int *pWidth, int *pHeight, int *pPow2Width = 0, int *pPow2Height = 0);
 
-TGFCLIENT_API int GfTexWritePng(unsigned char *img, const char *filename, int width, int height);
-TGFCLIENT_API void GfTexFreeTex(GLuint tex);
-TGFCLIENT_API GLuint GfTexReadTex(const char *filename);
-TGFCLIENT_API GLuint GfTexReadTex(const char *filename,int &height,int &width);
+TGFCLIENT_API int GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int height);
+TGFCLIENT_API void GfTexFreeTexture(GLuint glTexId);
+TGFCLIENT_API GLuint GfTexReadTexture(const char *filename, int* pWidth = 0, int* pHeight = 0,
+									  int *pPow2Width = 0, int *pPow2Height = 0);
 
 
 /*********************

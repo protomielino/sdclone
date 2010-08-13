@@ -51,7 +51,7 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *psz
 
 	progress = &(object->u.progressbar);
 
-	progress->progressbarimage = GfTexReadTex(progressbarimg);
+	progress->progressbarimage = GfTexReadTexture(progressbarimg);
 	if (!progress->progressbarimage) {
 		free(object);
 		return -1;
@@ -132,7 +132,7 @@ gfuiReleaseProgressbar(tGfuiObject *obj)
 	tGfuiProgressbar *progress;
 
 	progress = &(obj->u.progressbar);
-	GfTexFreeTex(progress->progressbarimage);
+	GfTexFreeTexture(progress->progressbarimage);
 
 	free(obj);
 }

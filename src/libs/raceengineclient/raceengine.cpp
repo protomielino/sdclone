@@ -1187,7 +1187,7 @@ reCapture(void)
     glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 
     sprintf(buf, "%s/sd-%4.4d-%8.8d.png", capture->outputBase, capture->currentCapture, capture->currentFrame++);
-    GfTexWritePng(img, buf, vw, vh);
+    GfTexWriteImageToPNG(img, buf, vw, vh);
     free(img);
 }
 

@@ -159,7 +159,7 @@ void saveSkin(void)
     glReadBuffer(GL_FRONT);
     glReadPixels(0, 0, ImgSize, ImgSize, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
 
-    GfTexWritePng(img, SkinFileName, ImgSize, ImgSize);
+    GfTexWriteImageToPNG(img, SkinFileName, ImgSize, ImgSize);
 
     free(img);
 }

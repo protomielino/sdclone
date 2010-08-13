@@ -903,7 +903,7 @@ GfuiScreenShot(void * /* notused */)
 			stm->tm_hour,
 			stm->tm_min,
 			stm->tm_sec);
-		GfTexWritePng(img, buf, vw, vh);
+		GfTexWriteImageToPNG(img, buf, vw, vh);
 		
 		free(img);
 	}
@@ -912,45 +912,24 @@ GfuiScreenShot(void * /* notused */)
 /** Add an image background to a screen.
     @ingroup	gui
     @param	scr		Screen
-    @param	filename	file name of the bg image
+    @param	filename	file name of the bg image (PNG or JPEG)
     @return	None.
  */
 void
 GfuiScreenAddBgImg(void *scr, const char *filename)
 {
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	void *handle;
-	float screen_gamma;
-	GLbyte *tex;
 	int pow2Width, pow2Height;
-
-	if (screen->bgImage != 0) {
-		glDeleteTextures(1, &screen->bgImage);
+	
+	if (screen->bgImage) {
+		GfTexFreeTexture(screen->bgImage);
 	}
-
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-	handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-	screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
 
 	// Note: Here, we save the original image size (may be not 2^N x 2^P)
 	//       in order to be able to hide padding pixels added in texture to enforce 2^N x 2^P.
-	tex = (GLbyte*)GfTexReadPng(filename, &screen->bgWidth, &screen->bgHeight, 
-				    screen_gamma, &pow2Width, &pow2Height);
-	// TODO: Enable implicit image format (PNG or JPEG), with a new GfTexRead
-	//tex = (GLbyte*)GfTexReadJpeg(filename, &w, &h, screen_gamma);
-	if (!tex) {
-		GfParmReleaseHandle(handle);
-		return;
-	}
-
-	glGenTextures(1, &screen->bgImage);
-	glBindTexture(GL_TEXTURE_2D, screen->bgImage);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pow2Width, pow2Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *)(tex));
-	free(tex);
-
-	GfParmReleaseHandle(handle);
+	//       and we request this 2^N x 2^P enforcment by passing &pow2Width and &pow2Height.
+	screen->bgImage =
+		GfTexReadTexture(filename, &screen->bgWidth, &screen->bgHeight, &pow2Width, &pow2Height);
 }
 
 /** Passive wait (no CPU use) for the current thread.

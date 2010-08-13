@@ -38,7 +38,7 @@
 const char* rmdStdSkinName = "standard";
 
 static const char* pszSkinFileExt = ".png";
-static const char* pszPreviewFileSuffix = "-preview.png";
+static const char* pszPreviewFileSuffix = "-preview.jpg";
 
 static const char* apszExcludedSkinFileSuffixes[] =
 { "-rpm.png", "-speed.png", pszPreviewFileSuffix };
