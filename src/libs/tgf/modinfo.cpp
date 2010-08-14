@@ -23,6 +23,7 @@
 */
 
 #include <cstring>
+#include <limits.h>
 
 #ifdef WIN32
 #include <windows.h>

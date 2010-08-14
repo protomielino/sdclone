@@ -22,6 +22,7 @@
 #include <string>
 #include <sstream>
 #include <cerrno>
+#include <limits.h>
 
 #include <sys/types.h>
 #include <dirent.h>
