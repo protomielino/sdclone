@@ -404,18 +404,20 @@ bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
 
 	TRACE_GL("Load: loadPngTexture stop");
 
-	// TODO: Check if tex is freed.
-	// 		 Check/fix potential problems related to malloc/delete mixture
-	//       (instead of malloc/free or new/delete).
+	// TODO: Check if tex is freed => yes, it is in grMakeMipMaps through "free(texel[i])".
+	//       Check/fix potential problems related to malloc/delete mixture
+	//       (instead of malloc/free or new/delete). => done below
 
 	mipmap = doMipMap(fname, mipmap);
 
-#ifdef WIN32
-	GLubyte* tex2 = new GLubyte[w*h*4];
-	memcpy(tex2, tex, w*h*4);
-	free(tex);
-	tex = tex2;
-#endif // WIN32
+// Don't know why this code, but it allocates with new something that is later freed
+// with free in grMakeMipMaps ... so I comment it out. 
+// #ifdef WIN32
+// 	GLubyte* tex2 = new GLubyte[w*h*4];
+// 	memcpy(tex2, tex, w*h*4);
+// 	free(tex);
+// 	tex = tex2;
+// #endif // WIN32
 	
 	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
 }
