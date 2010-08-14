@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <cstring>
+#include <climits>
 #include <cmath>
 
 #include <osspec.h>
