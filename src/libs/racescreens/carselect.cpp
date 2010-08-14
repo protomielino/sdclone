@@ -191,8 +191,8 @@ void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelectedCat
 	// Select the requested category in the combo-box.
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nCategoryComboId, nCurrentCategoryIndex);
 
-	//GfOut("resetCarCategoryComboBox(%s) : cur=%d\n",
-	//	  strSelectedCategoryName.c_str(), nCurrentCategoryIndex);
+	GfLogDebug("resetCarCategoryComboBox(%s) : cur=%d\n",
+		   strSelectedCategoryName.c_str(), nCurrentCategoryIndex);
 }
 
 void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
@@ -222,9 +222,9 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
 	// Select the right car in the combo-box.
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nModelComboId, nCurrentCarIndexInCategory);
 
-	//GfOut("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
-	//	  strCategoryName.c_str(), strSelectedCarRealName.c_str(),
-	//	  nCurrentCarIndexInCategory, vecCarsInCat.size());
+	GfLogDebug("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
+		   strCategoryName.c_str(), strSelectedCarRealName.c_str(),
+		   nCurrentCarIndexInCategory, vecCarsInCat.size());
 }
 
 void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelectedCarName)
@@ -347,7 +347,7 @@ void RmCarSelectMenu::RunMenu(trmdDrvElt* pDriver)
 
 bool RmCarSelectMenu::Initialize()
 {
-	//GfOut("RmCarSelectMenu::Init\n");
+	GfLogDebug("RmCarSelectMenu::Init\n");
 	//CarInfo::self()->print();
 
 	// Create the menu and all its controls.

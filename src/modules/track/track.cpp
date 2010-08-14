@@ -176,7 +176,7 @@ GetTrackHeader(void *TrackHandle)
     }
 
     graphic->nb_lights = GfParmGetEltNb(TrackHandle, TRK_SECT_TRACKLIGHTS );
-    printf( "Number of lights: %d\n", graphic->nb_lights );
+    GfLogDebug( "Number of lights: %d\n", graphic->nb_lights );
     if (graphic->nb_lights > 0 )
         graphic->lights = (tGraphicLightInfo*)malloc( sizeof( tGraphicLightInfo ) * graphic->nb_lights );
     for (i = 0; i < graphic->nb_lights; ++i)

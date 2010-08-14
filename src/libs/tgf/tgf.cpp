@@ -33,6 +33,7 @@
 #include "portability.h"
 
 
+extern void gfTraceInit(void);
 extern void gfDirInit(void);
 extern void gfModInit(void);
 extern void gfOsInit(void);
@@ -410,6 +411,7 @@ char * _tgf_win_strdup(const char * str)
 
 void GfInit(void)
 {
+	gfTraceInit();
 	gfDirInit();
 	gfModInit();
 	gfOsInit();

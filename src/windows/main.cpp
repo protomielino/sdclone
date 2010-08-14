@@ -23,9 +23,10 @@
 #include <windows.h>
 #include <direct.h>
 #include <shlobj.h>
-#include <stdlib.h>
+#include <cstdlib>
 #endif
 
+#include <tgf.h>
 #include <tgfclient.h>
 #include <client.h>
 #include <portability.h>
@@ -82,6 +83,25 @@ init_args(int argc, char **argv)
         {
            GfuiMouseSetHWPresent();
         }
+        // -t option : Trace level threashold (only #ifdef TRACE_OUT)
+        else if (!strncmp(argv[i], "-t", 2))
+        {
+            int nTraceLevel;
+            if (++i < argc && sscanf(argv[i], "%d", &nTraceLevel) == 1)
+                GfLogSetLevelThreshold(nTraceLevel);
+        }
+        // -r option : Trace stream (only #ifdef TRACE_OUT)
+        else if (!strncmp(argv[i], "-r", 2))
+        {
+            if (++i < argc)
+                if (!strncmp(argv[i], "stderr", 6))
+                    GfLogSetStream(stderr);
+                else if (!strncmp(argv[i], "stdout", 6))
+                    GfLogSetStream(stdout);
+                else
+                    GfLogSetStream(fopen(argv[i], "w"));
+        }
+
         // Next arg (even if current not recognized).
         i++;
     }
@@ -93,66 +113,66 @@ init_args(int argc, char **argv)
       // Interpret a heading '~' in TORCS_LOCALDIR as the <My documents> folder path
       // (to give the user an easy access to advanced settings).
       if (strlen(TORCS_LOCALDIR) > 1 && TORCS_LOCALDIR[0] == '~' 
-	  && (TORCS_LOCALDIR[1] == '/' || TORCS_LOCALDIR[1] == '\\'))
+          && (TORCS_LOCALDIR[1] == '/' || TORCS_LOCALDIR[1] == '\\'))
       {
-	LPITEMIDLIST pidl;
-	if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
-	    && SHGetPathFromIDList(pidl, buf))
-	{
-	  if (buf[0] && buf[strlen(buf)-1] != '/')
-	    strcat(buf, "/");
-	  strcat(buf, TORCS_LOCALDIR+2);
-	  for (i = 0; i < BUFSIZE && buf[i]; i++)
-	    if (buf[i] == '\\')
-	      buf[i] = '/';
-	  localdir = SetLocalDir(buf);
-	}
-	else
-	{
-	  printf("Could not get user's My documents folder path\n");
-	  exit(1);
-	}
+        LPITEMIDLIST pidl;
+        if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
+            && SHGetPathFromIDList(pidl, buf))
+        {
+          if (buf[0] && buf[strlen(buf)-1] != '/')
+            strcat(buf, "/");
+          strcat(buf, TORCS_LOCALDIR+2);
+          for (i = 0; i < BUFSIZE && buf[i]; i++)
+            if (buf[i] == '\\')
+              buf[i] = '/';
+          localdir = SetLocalDir(buf);
+        }
+        else
+        {
+          printf("Could not get user's My documents folder path\n");
+          exit(1);
+        }
       }
       else
-	localdir = SetLocalDir(TORCS_LOCALDIR);
+        localdir = SetLocalDir(TORCS_LOCALDIR);
     }
 
-	//Default paths
-	TCHAR szDir[MAX_PATH];
-	GetCurrentDirectory(MAX_PATH,szDir);
-	GfOut("Current Dir %s\n",szDir);
-	std::string strDefault = szDir;
-	std::string strEnd = strDefault.substr(strDefault.size()-4,4);
-	if (strEnd == "\\bin")
-		strDefault = strDefault.substr(0,strDefault.size()-4);
+        //Default paths
+        TCHAR szDir[MAX_PATH];
+        GetCurrentDirectory(MAX_PATH,szDir);
+        GfOut("Current Dir %s\n",szDir);
+        std::string strDefault = szDir;
+        std::string strEnd = strDefault.substr(strDefault.size()-4,4);
+        if (strEnd == "\\bin")
+                strDefault = strDefault.substr(0,strDefault.size()-4);
 
-	std::string strBinDir = strDefault+"\\bin";
-	std::string strLibDir = strDefault+"\\lib";
-	std::string strDataDir = strDefault+"\\share";
+        std::string strBinDir = strDefault+"\\bin";
+        std::string strLibDir = strDefault+"\\lib";
+        std::string strDataDir = strDefault+"\\share";
 
     if (!(libdir && strlen(libdir)))
-		libdir = SetLibDir(strLibDir.c_str());
+                libdir = SetLibDir(strLibDir.c_str());
     if (!(bindir && strlen(bindir)))
-		bindir = SetBinDir(strBinDir.c_str());
+                bindir = SetBinDir(strBinDir.c_str());
     if (!(datadir && strlen(datadir)))
-		datadir = SetDataDir(strDataDir.c_str());
+                datadir = SetDataDir(strDataDir.c_str());
 
 
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
- 	|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
+         || !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
     {
- 	GfTrace("TORCS_LOCALDIR : '%s'\n", GetLocalDir());
-	GfTrace("TORCS_LIBDIR   : '%s'\n", GetLibDir());
-	GfTrace("TORCS_BINDIR   : '%s'\n", GetBinDir());
-	GfTrace("TORCS_DATADIR  : '%s'\n", GetDataDir());
-	GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
-	exit(1);
+        GfTrace("TORCS_LOCALDIR : '%s'\n", GetLocalDir());
+        GfTrace("TORCS_LIBDIR   : '%s'\n", GetLibDir());
+        GfTrace("TORCS_BINDIR   : '%s'\n", GetBinDir());
+        GfTrace("TORCS_DATADIR  : '%s'\n", GetDataDir());
+        GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
+        exit(1);
     }
 
     // If "data dir" specified in any way, cd to it.
     if (datadir && strlen(datadir))
- 	chdir(datadir);
+         chdir(datadir);
 }
 
 /*
@@ -174,7 +194,9 @@ init_args(int argc, char **argv)
 int
 main(int argc, char *argv[])
 {
-    init_args(argc, argv);
+    GfInit();
+
+        init_args(argc, argv);
 
     GfFileSetup();          /* Update user settings files from an old version */
     WindowsSpecInit();      /* init specific windows functions */
@@ -183,11 +205,11 @@ main(int argc, char *argv[])
 
     if (MenuEntry())         /* launch the game */
     {
-	GfelMainLoop();   /* Main event loop */
-	exit(0);
+        GfelMainLoop();   /* Main event loop */
+        exit(0);
     }
     
-    GfError("\nExiting from Speed Dreams for some fatal reason (see above).\n");
+    GfLogFatal("Exiting from Speed Dreams for some fatal reason (see above).\n");
     exit(1);                 /* If we got here, something bad happened ... */          
 }
 

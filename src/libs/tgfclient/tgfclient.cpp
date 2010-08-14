@@ -25,7 +25,6 @@ extern void gfMenuInit(void);
 void
 GfInitClient(void)
 {
-    GfInit();
     gfuiInit();
     gfMenuInit();
     gfScreenInit();

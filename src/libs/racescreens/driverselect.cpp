@@ -598,11 +598,11 @@ RmDriversSelect(void *vs)
 							}
 							NbTotDrivers++;
 						} else {
-							GfError("Ignoring '%s' (%s #%d) because '%s' is not readable\n",
+							GfLogWarning("Ignoring '%s' (%s #%d) because '%s' is not readable\n",
 									curmod->modInfo[i].name, modName, i, path);
 						}
 					} else {
-						GfError("Ignoring '%s' (%s #%d) because '%s' was not found\n",
+						GfLogWarning("Ignoring '%s' (%s #%d) because '%s' was not found\n",
 								curmod->modInfo[i].name, modName, i, path);
 					}
 				}

@@ -293,7 +293,7 @@ UpdateNetworkPlayers()
 		GetNetwork()->UnlockNetworkData();
 
 		if (bReady)
-			readyindex = 1;
+			readyindex = 1;	
 		else
 			bEveryoneReadyToRace = false;
 

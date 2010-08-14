@@ -29,10 +29,6 @@
 #include <cstdlib>
 #include <cstdarg>
 #include <cstring>
-#ifndef WIN32
-#include <sys/param.h>
-#include <assert.h>
-#endif
 #include <cmath>
 
 #include <osspec.h>
@@ -359,59 +355,53 @@ TGF_API void GfParmSetVariable(void *handle, char const *path, char const *key, 
 TGF_API void GfParmRemoveVariable(void *handle, char const *path, char const *key);
 TGF_API tdble GfParmGetVariable(void *handle, char const *path, char const *key);
 
-/******************* 
- * Trace Interface *
- *******************/
+/********************************************************************************
+ * Log/Trace Interface                                                          *
+ *  - Write formated string messages at run-time to the log stream,             *
+ *  - Messages are given an integer "level" = "criticity",                      *
+ *    (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)              *
+ *  - Messages are actually logged into the stream only if their level          *
+ *    is lower than the current threshold,                                      *
+ *  - Default stream is stderr, but it can be changed at run-time to any FILE*, *
+ *  - Default level threshold is #defined at compile time through TRACE_LEVEL,  *
+ *    but it can be changed at run-time to any other level.                     *
+ ********************************************************************************/
 
-#ifdef WIN32
+TGF_API void GfLogFatal(const char *pszFmt, ...);
 
-#define GfTrace	printf
-#define GfFatal printf
+#ifdef TRACE_OUT
 
-#else
+TGF_API void GfLogError(const char *pszFmt, ...);
+TGF_API void GfLogWarning(const char *pszFmt, ...);
+TGF_API void GfLogInfo(const char *pszFmt, ...);
+TGF_API void GfLogTrace(const char *pszFmt, ...);
+TGF_API void GfLogDebug(const char *pszFmt, ...);
 
-#define GfTrace printf
+TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...);
+TGF_API void GfLogSetStream(FILE* fStream);
+TGF_API void GfLogSetLevelThreshold(int nLevel);
 
-static inline void
-GfFatal(const char *fmt, ...)
-{
-    va_list ap;
-    va_start(ap, fmt);
-    vprintf(fmt, ap);
-    va_end(ap);
-    /* GfScrShutdown(); */
-    assert (0);
-    exit (1);
-}
-#endif //WIN32
+#else // TRACE_OUT
 
-#define GfError printf
+static inline void GfLogNothing(const char *pszFmt, ...) {};
 
-#if !(_DEBUG || DEBUG)
+#define GfLogError GfLogNothing
+#define GfLogWarning GfLogNothing
+#define GfLogInfo GfLogNothing
+#define GfLogTrace GfLogNothing
+#define GfLogDebug GfLogNothing
 
-#ifdef WIN32
+static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
+#define GfLogSetStream(fStream)
+#define GfLogSetLevelThreshold(nLevel)
 
-#define GfOut printf
+#endif // TRACE_OUT
 
-#else
-
-/** Console output
-    @param	s	string to display
-    @param	args	printf args
-    @fn	 GfOut(s, args...)
- */
-static inline void
-GfOut(const char *fmt, ...)
-{
-}
-
-#endif /* WIN32 */
-
-#else /* _DEBUG || DEBUG */
-
-#define GfOut printf
-
-#endif /* _DEBUG || DEBUG */
+// Backward compatibility.
+#define GfFatal GfLogFatal
+#define GfError GfLogError
+#define GfOut   GfLogInfo
+#define GfTrace GfLogTrace
 
 /******************* 
  * Time  Interface *
