@@ -23,7 +23,6 @@
 */
 
 #include <cstring>
-#include <limits.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -37,11 +36,9 @@
 #ifdef WIN32
 #define dlsym   GetProcAddress
 #define dlerror GetLastError
-static const size_t SOFileExtLen = strlen(".dll");
-#else
-static const size_t SOFileExtLen = strlen(".so");
 #endif
 
+static const size_t SOFileExtLen = strlen("."DLLEXT);
 
 /* Allocate the module interfaces info array */
 tModInfo *GfModInfoAllocate(int maxItf)
