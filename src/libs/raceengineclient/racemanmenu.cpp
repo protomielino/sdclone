@@ -30,7 +30,7 @@
 #include <tgfclient.h>
 #include <raceman.h>
 #include <racescreens.h>
-#include <driverconfig.h>
+#include <playerconfig.h>
 
 #include "raceengine.h"
 #include "racemain.h"
@@ -259,7 +259,7 @@ rePlayerConfig(void * /* dummy */)
        is pressed, and not only once at the Raceman menu initialization,
        because the previous menu has to be saved (ESC, Back) and because it can be this menu,
        as well as the Main menu */
-    GfuiScreenActivate(DriverMenuInit(racemanMenuHdle));
+    GfuiScreenActivate(PlayerConfigMenuInit(racemanMenuHdle));
 }
 
 int

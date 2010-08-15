@@ -23,7 +23,7 @@
 #include <tgfclient.h>
 #include <singleplayer.h>
 #include <racemain.h>
-#include <driverconfig.h>
+#include <playerconfig.h>
 
 #include "mainmenu.h"
 #include "exitmenu.h"
@@ -42,7 +42,7 @@ PlayerConfigActivate(void * /* dummy */)
        is pressed, and not only once at the Main menu initialization,
        because the previous menu has to be saved (ESC, Back) and because it can be this menu,
        as well as the Raceman menu */
-    GfuiScreenActivate(DriverMenuInit(MenuHandle));
+    GfuiScreenActivate(PlayerConfigMenuInit(MenuHandle));
 }
 
 static void
@@ -82,7 +82,7 @@ MainMenuInit(void)
 				    NULL, (tfuiCallback)NULL, 
 				    1);
 
-    void *menuDescHdle = LoadMenuXML("welcomemenu.xml");
+    void *menuDescHdle = LoadMenuXML("mainmenu.xml");
 
     CreateStaticControls(menuDescHdle,MenuHandle);
 
@@ -97,10 +97,10 @@ MainMenuInit(void)
     GfParmReleaseHandle(menuDescHdle);
 
     GfuiMenuDefaultKeysAdd(MenuHandle);
-    GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit Game", exitMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit the game", exitMenu, GfuiScreenActivate, NULL);
 
-	// Register the ExitMenu init func in the race engine.
-	ReSetExitMenuInitFunc(ExitMenuInit);
+    // Register the ExitMenu init func in the race engine.
+    ReSetExitMenuInitFunc(ExitMenuInit);
 	
     return 0;
 }

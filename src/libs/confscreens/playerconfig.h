@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : driverconfig.h
+    file                 : playerconfig.h
     created              : Wed Apr 26 22:20:10 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: driverconfig.h,v 1.2 2003/06/24 21:02:23 torcs Exp $
+    version              : $Id: playerconfig.h,v 1.2 2003/06/24 21:02:23 torcs Exp $
 
  ***************************************************************************/
 
@@ -17,12 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _DRIVERCONFIG_H_
-#define _DRIVERCONFIG_H_
+#ifndef _PLAYERCONFIG_H_
+#define _PLAYERCONFIG_H_
 
 #include "confscreens.h"
 
 
-CONFSCREENS_API void *DriverMenuInit(void *prevMenu);
+CONFSCREENS_API void *PlayerConfigMenuInit(void *prevMenu);
 
-#endif /* _DRIVERCONFIG_H_ */ 
+#endif /* _PLAYERCONFIG_H_ */ 

@@ -18,12 +18,14 @@
  ***************************************************************************/
 
 
-#include <stdio.h>
+#include <cstdio>
 
 
 #include <tgfclient.h>
+
 #include "exitmenu.h"
 #include "mainmenu.h"
+
 
 static void 
 endofprog(void * /* dummy */)
@@ -46,7 +48,7 @@ void * exitMenuInit(void *prevMenu, void *menuHandle)
 
     menuHandle = GfuiScreenCreate();
 
-    void *param = LoadMenuXML("quitscreen.xml");
+    void *param = LoadMenuXML("exitmenu.xml");
 
     CreateStaticControls(param,menuHandle);
     CreateButtonControl(menuHandle,param,"yesquit",NULL,endofprog);

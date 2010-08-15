@@ -2,12 +2,12 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(confscreens)
 
-SET(CONFSCREENS_HEADERS confscreens.h controlconfig.h driverconfig.h
+SET(CONFSCREENS_HEADERS confscreens.h controlconfig.h playerconfig.h
 	                    graphconfig.h joystickconfig.h mouseconfig.h
 	                    openglconfig.h simuconfig.h soundconfig.h aiconfig.h
 	                    carsettingsmenu.h hostsettingsmenu.h)
 
-SET(CONFSCREENS_SOURCES controlconfig.cpp driverconfig.cpp graphconfig.cpp
+SET(CONFSCREENS_SOURCES controlconfig.cpp playerconfig.cpp graphconfig.cpp
                         joystickconfig.cpp mouseconfig.cpp openglconfig.cpp
                         simuconfig.cpp soundconfig.cpp aiconfig.cpp
 	                    carsettingsmenu.cpp hostsettingsmenu.cpp

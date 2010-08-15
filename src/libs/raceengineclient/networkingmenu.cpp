@@ -40,7 +40,7 @@ should also allow choosing ip address and track choice and etc
 #include <tgfclient.h>
 #include <raceman.h>
 #include <racescreens.h>
-#include <driverconfig.h>
+#include <playerconfig.h>
 #include <playerpref.h>
 #include <robot.h>
 #include <hostsettingsmenu.h>
