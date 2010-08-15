@@ -191,8 +191,8 @@ void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelectedCat
 	// Select the requested category in the combo-box.
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nCategoryComboId, nCurrentCategoryIndex);
 
-	GfLogDebug("resetCarCategoryComboBox(%s) : cur=%d\n",
-		   strSelectedCategoryName.c_str(), nCurrentCategoryIndex);
+	//GfLogDebug("resetCarCategoryComboBox(%s) : cur=%d\n",
+	//		   strSelectedCategoryName.c_str(), nCurrentCategoryIndex);
 }
 
 void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
@@ -222,18 +222,15 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
 	// Select the right car in the combo-box.
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nModelComboId, nCurrentCarIndexInCategory);
 
-	GfLogDebug("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
-		   strCategoryName.c_str(), strSelectedCarRealName.c_str(),
-		   nCurrentCarIndexInCategory, vecCarsInCat.size());
+	//GfLogDebug("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
+	//		   strCategoryName.c_str(), strSelectedCarRealName.c_str(),
+	//		   nCurrentCarIndexInCategory, vecCarsInCat.size());
 }
 
 void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelectedCarName)
 {
 	// TODO : Merge params with category / user settings ?
 
-	// Close old car params.
-	GfParmReleaseHandle(getSelectedCarParamsHandle());
-	
 	// Open new car params.
 	std::ostringstream ossCarXMLFileName;
 	ossCarXMLFileName << "cars/" << strSelectedCarName << '/' << strSelectedCarName << ".xml";
@@ -347,7 +344,6 @@ void RmCarSelectMenu::RunMenu(trmdDrvElt* pDriver)
 
 bool RmCarSelectMenu::Initialize()
 {
-	GfLogDebug("RmCarSelectMenu::Init\n");
 	//CarInfo::self()->print();
 
 	// Create the menu and all its controls.
@@ -403,6 +399,15 @@ void RmCarSelectMenu::setDriver(trmdDrvElt* pDriver)
 
 void RmCarSelectMenu::setSelectedCarParamsHandle(void* hdle)
 {
+	if (!hdle)
+		return;
+	
+	// Close old car params if not null and not the current driver's one
+	// (and if it really changes).
+	if (_hCarParams && _hCarParams != _pDriver->carParmHdle && _hCarParams != hdle)
+		GfParmReleaseHandle(_hCarParams);
+
+	// Store the new one.
 	_hCarParams = hdle;
 }
 

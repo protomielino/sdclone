@@ -41,7 +41,7 @@ static const char* pszSkinFileExt = ".png";
 static const char* pszPreviewFileSuffix = "-preview.jpg";
 
 static const char* apszExcludedSkinFileSuffixes[] =
-{ "-rpm.png", "-speed.png", pszPreviewFileSuffix };
+{ "-rpm.png", "-speed.png" , "-int.png" };
 static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
 
 
@@ -86,7 +86,7 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 	//struct stat st;
 	tFList *pSkinFileList, *pCurSkinFile;
 
-	//GfOut("rmdGetCarSkinsInFolder(%s) :\n", pszFolderPath);
+	//GfLogDebug("rmdGetCarSkinsInFolder(%s) :\n", pszFolderPath);
 
 	pCurSkinFile = pSkinFileList =
 		GfDirGetListFiltered(pszFolderPath, pszCarName, pszSkinFileExt);
@@ -133,10 +133,10 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 
 				struct stat st;
 				if (stat(ossPreviewName.str().c_str(), &st))
-					GfError("No preview file %s found for '%s' skin\n",
-							ossPreviewName.str().c_str(), strSkinName.c_str());
+					GfLogWarning("No preview file %s found for '%s' skin\n",
+								 ossPreviewName.str().c_str(), strSkinName.c_str());
 
-				//GfOut("* found skin=%s, preview=%s\n",
+				//GfLogDebug("* found skin=%s, preview=%s\n",
 				//	  strSkinName.c_str(), ossPreviewName.str().c_str());
 			}
 				
@@ -153,7 +153,7 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForced
 	std::ostringstream ossDirPath;
 	std::string strPreviewName;
 
-	//GfOut("rmdGetCarSkinsInSearchPath : module=%s, idx=%d, car=%s ...\n",
+	//GfLogDebug("rmdGetCarSkinsInSearchPath : module=%s, idx=%d, car=%s ...\n",
 	//	  pDriver->moduleName, pDriver->interfaceIndex, pszCarName);
 
 	// Clear the skin and preview lists.
@@ -214,8 +214,8 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForced
 	// (that way, the skin list will never be empty, and that's safer)
 	else
 	{
-		GfError("No skin found for '%s/%d/%s' : adding dummy '%s' one\n",
-				pDriver->moduleName, pDriver->interfaceIndex, pszCarName, rmdStdSkinName);
+		GfLogWarning("No skin found for '%s/%d/%s' : adding dummy '%s' one\n",
+					 pDriver->moduleName, pDriver->interfaceIndex, pszCarName, rmdStdSkinName);
 		
 		// Skin.
 		vecSkinNames.push_back(rmdStdSkinName);
@@ -228,8 +228,8 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForced
 
 		struct stat st;
 		if (stat(ossPreviewName.str().c_str(), &st))
-			GfError("No preview file %s found for '%s' skin\n",
-					ossPreviewName.str().c_str(), rmdStdSkinName);
+			GfLogWarning("No preview file %s found for '%s' skin\n",
+						 ossPreviewName.str().c_str(), rmdStdSkinName);
 	}
 	
 }

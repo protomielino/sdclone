@@ -206,18 +206,17 @@ rmdsSetFocus(void * /* dummy */)
 static void
 rmdsNextMenu(void * /* dummy */)
 {
-    char         drvSec[256];
-    char         buffer[256];
+    char         drvSec[32];
+    char         drvInfoSec[64];
     const char	*name;
     trmdDrvElt	*curDrv;
-    int		index;
 
 	// Clear the race starting grid.
     GfParmListClean(MenuData->param, RM_SECT_DRIVERS);
 
 	// And then rebuild it from the current Competitors scroll list state
 	// (for each competitor, module name, interface index, car name if human, skin name if any).
-    index = 1;
+    int index = 1;
     while ((name = GfuiScrollListExtractElement(ScrHandle, CompetitorsScrollListId,
 												0, (void**)&curDrv))) {
 		sprintf(drvSec, "%s/%d", RM_SECT_DRIVERS, index);
@@ -225,14 +224,27 @@ rmdsNextMenu(void * /* dummy */)
 		GfParmSetStr(MenuData->param, drvSec, RM_ATTR_MODULE, curDrv->moduleName);
 		if (curDrv->carName && curDrv->isHuman)
 		{
-			// TODO: Save chosen car as the default/prefered one in human.xml ?
 			GfParmSetNum(MenuData->param, drvSec, RM_ATTR_EXTENDED, NULL, 1); /* Set extended */
-			sprintf( buffer, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, curDrv->moduleName, 1 /*extended*/, curDrv->interfaceIndex );
-			GfParmSetStr(MenuData->param, buffer, RM_ATTR_CARNAME, curDrv->carName);
+			sprintf(drvInfoSec, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, curDrv->moduleName,
+					1 /*extended*/, curDrv->interfaceIndex );
+			GfParmSetStr(MenuData->param, drvInfoSec, RM_ATTR_CARNAME, curDrv->carName);
+
+			// Save also the chosen car as the default one for this human driver
+			// (may be needed later for races where it is not specified in <race>.xml)
+			char robParamsPath[256];
+			sprintf(robParamsPath, "%sdrivers/%s/%s.xml",
+					GetLocalDir(), curDrv->moduleName, curDrv->moduleName);
+			void* robHdle = GfParmReadFile(robParamsPath, GFPARM_RMODE_STD);
+			char robSec[32];
+			sprintf(robSec, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, curDrv->interfaceIndex);
+			GfParmSetStr(robHdle, robSec, ROB_ATTR_CAR, curDrv->carName);
+			GfParmWriteFile(NULL, robHdle, curDrv->moduleName);
+			GfParmReleaseHandle(robHdle);
 		}
 		else
 		{
-			GfParmSetNum(MenuData->param, drvSec, RM_ATTR_EXTENDED, NULL, 0); /*No extended for robots yet in driverconfig*/
+			/* Not extended for robots yet in driverconfig */
+			GfParmSetNum(MenuData->param, drvSec, RM_ATTR_EXTENDED, NULL, 0);
 		}
 		if ((curDrv->skinName && strcmp(curDrv->skinName, rmdStdSkinName))
 			|| GfParmGetStr(MenuData->param, drvSec, RM_ATTR_SKINNAME, 0))
@@ -562,7 +574,8 @@ RmDriversSelect(void *vs)
 				robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 			}
 			if (!robhdle) {
-				GfError("No driver '%s' selected because no readable '%s.xml' found\n", modName, modName);
+				GfLogError("No driver '%s' selected because no readable '%s.xml' found\n",
+						   modName, modName);
 				break;
 			}
 			for (i = 0; i < curmod->modInfoSize; i++) {
@@ -577,7 +590,7 @@ RmDriversSelect(void *vs)
 							curDrv = (trmdDrvElt*)calloc(1, sizeof(trmdDrvElt));
 							curDrv->interfaceIndex = curmod->modInfo[i].index;
 							curDrv->moduleName = strdup(modName);
-							curDrv->carName = strdup(carName);
+							curDrv->carName = strdup(carName); // Default one if not specified in race file.
 							curDrv->skinName = 0; // Initialized later if needed from race params.
 							curDrv->name = strdup(curmod->modInfo[i].name);
 							curDrv->carParmHdle = carhdle;
@@ -670,14 +683,14 @@ RmDriversSelect(void *vs)
 										free(curDrv->carName);
 									curDrv->carName = strdup(carName);
 								} else {
-									GfError("Falling back to default car '%s' "
-											"for %s because '%s' is not readable\n",
-											curDrv->carName, curDrv->name, path);
+									GfLogError("Falling back to default car '%s' "
+											   "for %s because '%s' is not readable\n",
+											   curDrv->carName, curDrv->name, path);
 								}
 							} else {
-								GfError("Falling back to default car '%s' "
-										"for %s because '%s' was not found\n",
-										curDrv->carName, curDrv->name, path);
+								GfLogError("Falling back to default car '%s' "
+										   "for %s because '%s' was not found\n",
+										   curDrv->carName, curDrv->name, path);
 							}
 						}
 

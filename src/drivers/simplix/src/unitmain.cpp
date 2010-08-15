@@ -321,7 +321,8 @@ int moduleWelcomeV1_00
     memset(DriverNames, 0, MAXNBBOTS*DRIVERLEN);
     memset(DriverDescs, 0, MAXNBBOTS*DRIVERLEN);
 
-	GfOut("\n#Interface Version: %d.%d\n",
+	GfOut("\n");
+	GfOut("#Interface Version: %d.%d\n",
 		welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 
 	// Get filehandle for robot's xml-file
@@ -330,7 +331,7 @@ int moduleWelcomeV1_00
 	if (RobotSettings)
 	{
 		GfOut("#Robot name      : %s\n",RobName);
- 	    GfOut("#Robot directory : %s\n",RobPathDir);
+ 		GfOut("#Robot directory : %s\n",RobPathDir);
 		GfOut("#Robot XML-file  : %s\n",RobPathXML);
 
 		char Buffer[BUFSIZE];
@@ -422,8 +423,9 @@ extern "C" int moduleWelcome
           return moduleWelcomeV1_00(welcomeIn, welcomeOut);
 	}
 
-    GfOut("\n#Unhandled Interface Version: %d.%d\n",
-  		welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
+	GfOut("\n");
+	GfOut("#Unhandled Interface Version: %d.%d\n",
+  	      welcomeIn->itfVerMajor,welcomeIn->itfVerMinor);
 	welcomeOut->maxNbItf = 0;
 	return -1;
 }
@@ -438,7 +440,8 @@ extern "C" int moduleWelcome
 //--------------------------------------------------------------------------*
 extern "C" int moduleInitialize(tModInfo *ModInfo)
 {
-  GfOut("\n#Initialize from %s ...\n",RobPathXML);
+  GfOut("\n");
+  GfOut("#Initialize from %s ...\n",RobPathXML);
   GfOut("#NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 
 #ifdef ROB_SECT_ARBITRARY
@@ -485,7 +488,8 @@ extern "C" int moduleInitialize(tModInfo *ModInfo)
 //--------------------------------------------------------------------------*
 extern "C" int moduleTerminate()
 {
-  GfOut("\n#Terminated %s\n",RobName);
+  GfOut("\n");
+  GfOut("#Terminated %s\n",RobName);
 	
   return 0;
 }
@@ -496,7 +500,8 @@ extern "C" int moduleTerminate()
 //--------------------------------------------------------------------------*
 int simplixEntryPoint(tModInfo *ModInfo, void *RobotSettings)
 {
-    GfOut("\n#Torcs backward compatibility scheme used\n");
+    GfOut("\n");
+    GfOut("#Torcs backward compatibility scheme used\n");
     NBBOTS = MIN(10,NBBOTS);
 
     memset(ModInfo, 0, NBBOTS*sizeof(tModInfo));
@@ -781,7 +786,9 @@ static void Shutdown(int Index)
   tInstanceInfo *copy;
 #endif //ROB_SECT_ARBITRARY
 
-  GfOut("\n\n#Clock\n");
+  GfOut("\n");
+  GfOut("\n");
+  GfOut("#Clock\n");
   GfOut("#Total Time used: %g sec\n",cInstances[Index-IndexOffset].cTicks/1000.0);
   GfOut("#Min   Time used: %g msec\n",cInstances[Index-IndexOffset].cMinTicks);
   GfOut("#Max   Time used: %g msec\n",cInstances[Index-IndexOffset].cMaxTicks);
@@ -789,8 +796,8 @@ static void Shutdown(int Index)
   GfOut("#Long Time Steps: %d\n",cInstances[Index-IndexOffset].cLongSteps);
   GfOut("#Critical Steps : %d\n",cInstances[Index-IndexOffset].cCriticalSteps);
   GfOut("#Unused Steps   : %d\n",cInstances[Index-IndexOffset].cUnusedCount);
-  
-  GfOut("\n\n#");
+  GfOut("\n");
+  GfOut("\n");
 
   cInstances[Index-IndexOffset].cRobot->Shutdown();
   delete cInstances[Index-IndexOffset].cRobot;

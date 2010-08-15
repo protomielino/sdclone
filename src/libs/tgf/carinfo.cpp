@@ -72,8 +72,8 @@ CarInfo::CarInfo()
 			ossCarFileName << "cars/" << pszCarName << '/' << pszCarName << ".xml";
 			carParmHdle = GfParmReadFile(ossCarFileName.str().c_str(), GFPARM_RMODE_STD);
 			if (!carParmHdle) {
-				GfError("CarInfo : Ignoring car %s (failed to read from %s)\n",
-						pszCarName, ossCarFileName.str().c_str());
+				GfLogWarning("CarInfo : Ignoring car %s (failed to read from %s)\n",
+							 pszCarName, ossCarFileName.str().c_str());
 				continue;
 			}
 
@@ -182,19 +182,19 @@ CarData* CarInfo::GetCarData(const std::string& strCarName) const
 
 void CarInfo::print() const
 {
-	GfOut("CarInfo : %d cars, %d categories\n",
-		  m_priv->vecCars.size(), m_priv->setCategoryNames.size());
+	GfLogDebug("CarInfo : %d cars, %d categories\n",
+			   m_priv->vecCars.size(), m_priv->setCategoryNames.size());
 	std::set<std::string>::const_iterator iterCat;
 	for (iterCat = m_priv->setCategoryNames.begin();
 		 iterCat != m_priv->setCategoryNames.end(); iterCat++)
 	{
-		GfOut("  %s category :\n", iterCat->c_str());
+		GfLogDebug("  %s category :\n", iterCat->c_str());
 		const std::vector<CarData> vecCarsInCat = GetCarsInCategory(iterCat->c_str());
 		std::vector<CarData>::const_iterator iterCar;
 		for (iterCar = vecCarsInCat.begin(); iterCar != vecCarsInCat.end(); iterCar++)
 		{
-			GfOut("    %s (%s) : %s\n",
-				  iterCar->strRealName.c_str(), iterCar->strName.c_str(), iterCar->strXMLPath.c_str());
+			GfLogDebug("    %s (%s) : %s\n", iterCar->strRealName.c_str(),
+					   iterCar->strName.c_str(), iterCar->strXMLPath.c_str());
 		}
 	}
 }

@@ -181,7 +181,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 // Module entry point (new fixed name scheme).
 extern "C" int moduleInitialize(tModInfo *modInfo)
 {
-	GfOut("\n\n\nInitialize from %s ...\n",pathXml);
+	GfOut("\n\n");
+	GfOut("Initialize from %s ...\n",pathXml);
 	GfOut("NBBOTS: %d (of %d)\n",NBBOTS,MAXNBBOTS);
 	int i;
 
