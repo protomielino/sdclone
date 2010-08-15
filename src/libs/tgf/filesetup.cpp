@@ -51,7 +51,7 @@ static int GfFileSetupCopyFile( const char* dataLocation, const char* localLocat
 		return -1;
 	}
 
-	GfOut("Updating %s\n", localLocation);
+	GfLogTrace("Updating %s\n", localLocation);
 
 	while( !feof( in ) )
 	{
@@ -200,7 +200,7 @@ void GfFileSetup()
 		absLocalLocation = (char*)malloc( sizeof(char)*(strlen(GetLocalDir())+strlen(localLocation)+3) );
 		sprintf( absLocalLocation, "%s%s", GetLocalDir(), localLocation );
 
-		GfOut("Checking %s : new release is %d.%d, ", localLocation, major, minor);
+		GfLogTrace("Checking %s : user settings version ", localLocation);
 
 		// Search for its old major and minor version numbers in the user settings.
 		if( GfParmListSeekFirst( localVersionHandle, "versions" ) == 0 )
@@ -213,14 +213,16 @@ void GfFileSetup()
 					const int locMinor = (int)GfParmGetCurNum( localVersionHandle, "versions", "Minor version", NULL, 0 );
 					const int locMajor = (int)GfParmGetCurNum( localVersionHandle, "versions", "Major version", NULL, 0 );
 
-					GfOut("old release %d.%d => ", locMajor, locMinor);
+					GfLogTrace("%d.%d is ", locMajor, locMinor);
+
 					if( locMajor != major || locMinor < minor)
 					{
-						GfOut("updating ...\n");
+						GfLogTrace("obsolete (installed one is %d.%d) => updating ...\n",
+								   major, minor);
 						GfFileSetupCopy( dataLocation, absLocalLocation, major, minor, localVersionHandle, -1 );
 					}
 					else
-					    GfOut("up-to-date.\n");
+					    GfLogTrace("up-to-date.\n");
 
 					break;
 				}
@@ -232,7 +234,7 @@ void GfFileSetup()
 			index = 0;
 			while( count[index] )
 				++index;
-			GfOut("no yet referenced => installing ...\n");
+			GfLogTrace("not found => installing ...\n");
 			GfFileSetupCopy( dataLocation, absLocalLocation, major, minor, localVersionHandle, index );
 			count[index] = TRUE;
 		}

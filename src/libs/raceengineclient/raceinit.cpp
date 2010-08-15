@@ -408,7 +408,7 @@ initPits(void)
 	}	
 
 	for (teamsIterator = teams.begin(); teamsIterator != teams.end(); ++teamsIterator) {
-		printf("----------------- %s\t%d\n", (teamsIterator->first).c_str(), teamsIterator->second); 
+		GfLogDebug("----------------- %s\t%d\n", (teamsIterator->first).c_str(), teamsIterator->second); 
 	}
 	*/
 
@@ -798,13 +798,13 @@ ReInitCars(void)
 			if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
 			{
 				/* Human driver */
-				printf( "robotModuleName (1): %s\n", robotModuleName );
+				GfLogDebug( "robotModuleName (1): %s\n", robotModuleName );
 				elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->modList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
 			}
 			else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
 				                      GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
 			{
-				printf( "robotModuleName: %s\n", robotModuleName );
+				GfLogDebug( "robotModuleName: %s\n", robotModuleName );
 				elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
 			}
 			else
@@ -970,7 +970,7 @@ ReInitTrack(void)
     Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
     cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
 
-    printf("Race Name = %s\n", raceName);
+    GfLogDebug("Race Name = %s\n", raceName);
     sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
     ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
@@ -988,7 +988,7 @@ ReInitTrack(void)
     	curSurf = track->surfaces;
     	do
     	{
-		printf("Raceinit Function Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+		GfLogDebug("Raceinit Function Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
 		curSurf = curSurf->next;
     	} while ( curSurf != 0);
     #endif
