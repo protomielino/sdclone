@@ -41,8 +41,6 @@
 #include "tgf.h"
 
 
-#ifdef TRACE_OUT
-
 // Log levels.
 enum { gfLogFatal = 0, gfLogError, gfLogWarning, gfLogInfo, gfLogTrace, gfLogDebug };
 
@@ -58,7 +56,6 @@ static int gfLogLevelThreshold = -1;
 // Flag indicating if the last logged line ended with a new-line.
 static bool gfLogNeedLineHeader = true;
 
-#endif // TRACE_OUT
 
 void
 gfTraceInit(void)
