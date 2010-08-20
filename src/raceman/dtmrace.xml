@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Challenge Race">
+<params name="Challenge Race" version="1.0">
   <section name="Header">
     <attstr name="name" val="Challenge Race"/>
     <attstr name="description" val="Multiple races"/>

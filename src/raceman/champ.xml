@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Championship">
+<params name="Championship" version="1.0">
   <section name="Header">
     <attstr name="name" val="Championship"/>
     <attstr name="description" val="Championship"/>

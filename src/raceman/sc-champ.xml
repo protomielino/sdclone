@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Supercar Championship">
+<params name="Supercar Championship" version="1.0">
   <section name="Header">
     <attstr name="name" val="Supercar Championship"/>
     <attstr name="description" val="Championship"/>
