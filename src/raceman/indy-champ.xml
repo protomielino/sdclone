@@ -2,9 +2,9 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Indycar Championship" version="1.0">
+<params name="MPA1 Championship" version="1.1">
   <section name="Header">
-    <attstr name="name" val="Indycar Championship"/>
+    <attstr name="name" val="MPA1 Championship"/>
     <attstr name="description" val="Championship"/>
     <attnum name="priority" val="50"/>
     <attstr name="menu image" val="data/img/splash-dtm.png"/>
