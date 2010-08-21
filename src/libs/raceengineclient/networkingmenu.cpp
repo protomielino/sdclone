@@ -19,8 +19,8 @@
 
 /*
 This file deals with the networking menus.  
-Server sees a list of players and the client sees a list of other players
-should also allow choosing ip address and track choice and etc
+Server sees a list of players and the client sees a list of other players.
+Should also allow choosing IP address, track, etc ...
 */
 
 #include <cstdlib>
@@ -48,7 +48,7 @@ should also allow choosing ip address and track choice and etc
 #include <carinfo.h>
 #include <network.h>
 
-#include "raceengine.h"
+#include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
 #include "racestate.h"
@@ -369,7 +369,7 @@ reNetworkClientDisconnect(void * /* dummy */)
 	if (GetClient())
 		GetClient()->Disconnect();
 
-	GfuiScreenActivate(ReGetSituation()->_reMenuScreen);
+	GfuiScreenActivate(ReSituation()->_reMenuScreen);
 
 }
 

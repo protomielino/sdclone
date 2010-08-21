@@ -1,15 +1,35 @@
+/**************************************************************************
+
+    file        : racesimusimu.cpp
+    copyright   : (C) 2007 by Mart Kelder                 
+    web         : http://speed-dreams.sourceforge.net   
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+/** @file   
+    		Simulation simulation
+*/
+
+#include <tgf.h>
 #include <raceman.h>
 
-#include "raceengine.h"
+#include "racesituation.h"
 
 #include "racesimusimu.h"
 
-#ifndef PI
-#define PI 3.415926535
-#endif
 
 /* The idea of SimuSimu is that the result is simulated.
- * For that, a couple of parameters are used:
+ * For that, various parameters are used:
  *
  * - Car parameters, as stated in the xml-file of the car (or default parameters). The car parameters can be overruled by robot setup files;
  * - Track parameters, as stated in the track xml-file (or default parameters if there is noting in the xml-file);
@@ -20,7 +40,7 @@
  * The parameters are:
  *   CARS:
  *     - Top speed (m/s)
- *     - Time to accelrate from 0 to 250/9 m/s (=100 km/u) (s)
+ *     - Time to accelerate from 0 to 250/9 m/s (=100 km/u) (s)
  *   TRACK:
  *     - % accelerate in one lap [0,1]
  *     - % brake in one lap [0,1]

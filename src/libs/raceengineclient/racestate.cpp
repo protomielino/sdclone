@@ -24,16 +24,18 @@
 */
 
 /* The Race Engine State Automaton */
-#include "network.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
+
 #include <tgfclient.h>
+#include <network.h>
 #include <raceman.h>
 #include <racescreens.h>
 
+#include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
-#include "raceengine.h"
+#include "raceupdate.h"
 #include "racegl.h"
 #include "raceresults.h"
 #include "racemanmenu.h"

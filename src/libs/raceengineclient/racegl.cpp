@@ -2,7 +2,7 @@
 
     file        : racegl.cpp
     created     : Sat Nov 16 18:22:00 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                        
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
     version     : $Id: racegl.cpp,v 1.7 20 Mar 2006 04:30:18 olethros Exp $                                  
 
@@ -22,20 +22,22 @@
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id: racegl.cpp,v 1.7 2004/04/05 18:25:00 olethros Exp $
 */
-#include <stdlib.h>
-#include <stdio.h>
-
+#include <cstdlib>
+#include <cstdio>
 
 #include <tgfclient.h>
 #include <raceman.h>
 #include <robot.h>
 
+#include "racesituation.h"
+#include "racemessage.h"
 #include "racemain.h"
 #include "raceinit.h"
 #include "racestate.h"
-#include "raceengine.h"
+#include "raceupdate.h"
 
 #include "racegl.h"
+
 
 static void	*reScreenHandle = 0;
 static void	*reHookHandle = 0;
@@ -82,15 +84,9 @@ static void
 ReBoardInfo(void * /* vboard */)
 {
     if (ReInfo->s->_raceState & RM_RACE_PAUSED) {
-#ifndef ReMultiThreaded
-	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
-#endif
 	ReStart();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
     } else {
-#ifndef ReMultiThreaded
-	ReInfo->s->_raceState |= RM_RACE_PAUSED;
-#endif
 	ReStop();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 1);
     }
@@ -103,6 +99,34 @@ reSkipPreStart(void * /* dummy */)
 	ReInfo->s->currentTime = -1.0;
 	ReInfo->_reLastTime = -1.0;
     }
+}
+
+static void
+reTimeMod (void *vcmd)
+{
+	char buf[32];
+    long cmd = (long)vcmd;
+    
+    switch ((int)cmd) {
+    case 0:
+	ReInfo->_reTimeMult *= 2.0;
+	if (ReInfo->_reTimeMult > 64.0) {
+	    ReInfo->_reTimeMult = 64.0;
+	}
+	break;
+    case 1:
+	ReInfo->_reTimeMult *= 0.5;
+	if (ReInfo->_reTimeMult < 0.25) {
+	    ReInfo->_reTimeMult = 0.25;
+	}
+	break;
+    case 2:
+    default:
+	ReInfo->_reTimeMult = 1.0;
+	break;
+    }
+    sprintf(buf, "Time x%.2f", 1.0 / ReInfo->_reTimeMult);
+    ReRaceMsgSet(ReInfo, buf, 5); // TODO: Thread-safe access to ReInfo in multi-threaded mode !
 }
 
 static void
@@ -143,14 +167,15 @@ reAddKeys(void)
     GfuiAddKey(reScreenHandle, GFUIK_F1,        "Help", reScreenHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_F12,       "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reScreenHandle, '-', "Slow Time",         (void*)0, ReTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, ReTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '.', "Real Time",         (void*)2, ReTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '-', "Slow Time",         (void*)0, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '.', "Real Time",         (void*)2, reTimeMod, NULL);
     GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
     /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
     GfuiAddKey(reScreenHandle, ' ', "Skip Pre Start",    (void*)0, reSkipPreStart, NULL);
 #ifdef DEBUG
+	// WARNING: Certainly won't work with multi-threading On/Auto ...
     //GfuiAddKey(reScreenHandle, '0', "One step simulation",    (void*)1, reOneStep, NULL);
 #endif
     GfuiAddKey(reScreenHandle, 'c', "Movie Capture",      (void*)0, reMovieCapture, NULL);
@@ -163,12 +188,10 @@ ReSetRaceMsg(const char *msg)
 {
     static char *curMsg = 0;
 
-#ifdef ReMultiThreaded
 	// If nothing to change, don't change anything.
 	if ((!curMsg && !msg) || (curMsg && msg && !strcmp(curMsg, msg)))
 		return;
-#endif
-	
+
 	// Otherwise, set the new text for the label.
     if (curMsg)
 		free(curMsg);
@@ -186,11 +209,9 @@ ReSetRaceBigMsg(const char *msg)
 {
     static char *curMsg = 0;
     
-#ifdef ReMultiThreaded
 	// If nothing to change, don't change anything.
 	if ((!curMsg && !msg) || (curMsg && msg && !strcmp(curMsg, msg)))
 		return;
-#endif
 	
     if (curMsg)
 		free(curMsg);

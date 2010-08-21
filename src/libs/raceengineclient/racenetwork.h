@@ -1,8 +1,8 @@
-/**************************************************************************
+/***************************************************************************
 
-    file        : racesimusimu.cpp
-    copyright   : (C) 2007 by Mart Kelder                 
-    web         : http://speed-dreams.sourceforge.net   
+    file        : racenetwork.h
+    copyright   : (C) 2009 by Brian Gavin 
+    web         : www.speed-dreams.org 
     version     : $Id$
 
  ***************************************************************************/
@@ -15,15 +15,19 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-/** @file   
-    		Simulation simulation
+ 
+/** @file    
+    		
+    @author	    Brian Gavin
+    @version	$Id$
 */
 
-#ifndef _RACESIMUSIMU_H
-#define _RACESIMUSIMU_H
+#ifndef _RACENETWORK_H_
+#define _RACENETWORK_H_
 
-void ReSimuSimu();
+extern void ReNetworkOneStep();
 
-#endif //_RACESIMUSIMU_H
+#endif /* _RACENETWORK_H_ */ 
+
+
 

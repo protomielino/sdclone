@@ -37,9 +37,6 @@
 
 #define RACE_ENG_CFG	"config/raceengine.xml"
 
-// Comment-out to inhibit multi-threaded race engine (get back to old nearly unmodified code).
-#define ReMultiThreaded 1
-
 struct RmInfo;
 
 typedef int (*tfRmRunState) (struct RmInfo *);
@@ -163,13 +160,11 @@ typedef struct
 #define RM_DISP_MODE_SIMU_SIMU	3
     int			displayMode;
     int			refreshDisplay;
-#ifdef ReMultiThreaded
     tCarElt		*inPitMenuCar;
 	char		*message;
     double		messageEnd;
 	char		*bigMessage;
     double		bigMessageEnd;
-#endif
 } tRaceEngineInfo;
 
 #define _reState	raceEngineInfo.state
@@ -189,13 +184,11 @@ typedef struct
 #define _reLastTime	raceEngineInfo.lastTime
 #define _displayMode	raceEngineInfo.displayMode
 #define _refreshDisplay	raceEngineInfo.refreshDisplay
-#ifdef ReMultiThreaded
-# define _reInPitMenuCar	raceEngineInfo.inPitMenuCar
-# define _reMessage	raceEngineInfo.message
-# define _reMessageEnd	raceEngineInfo.messageEnd
-# define _reBigMessage	raceEngineInfo.bigMessage
-# define _reBigMessageEnd	raceEngineInfo.bigMessageEnd
-#endif
+#define _reInPitMenuCar	raceEngineInfo.inPitMenuCar
+#define _reMessage	raceEngineInfo.message
+#define _reMessageEnd	raceEngineInfo.messageEnd
+#define _reBigMessage	raceEngineInfo.bigMessage
+#define _reBigMessageEnd	raceEngineInfo.bigMessageEnd
 
 #define RM_PNST_DRIVETHROUGH	0x00000001
 #define RM_PNST_STOPANDGO	0x00000002

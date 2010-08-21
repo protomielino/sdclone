@@ -48,13 +48,8 @@ static const int NbMultiThreadSchemes = sizeof(MultiThreadSchemeList) / sizeof(M
 static const char *ThreadAffinitySchemeList[] = {RM_VAL_ON, RM_VAL_OFF};
 static const int NbThreadAffinitySchemes = sizeof(ThreadAffinitySchemeList) / sizeof(ThreadAffinitySchemeList[0]);
 
-#ifdef ReMultiThreaded
 static int CurMultiThreadScheme = 0;    // Auto
 static int CurThreadAffinityScheme = 0; // On
-#else
-static int CurMultiThreadScheme = 2;    // Off
-static int CurThreadAffinityScheme = 1; // Off
-#endif
 
 /* gui label ids */
 static int SimuVersionId;
@@ -86,8 +81,6 @@ static void loadSimuCfg(void)
 		}
 	}
 
-#ifdef ReMultiThreaded
-
 	multiThreadSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[0]);
 	for (i = 0; i < NbMultiThreadSchemes; i++) {
 		if (strcmp(multiThreadSchemeName, MultiThreadSchemeList[i]) == 0) {
@@ -104,8 +97,6 @@ static void loadSimuCfg(void)
 		}
 	}
 
-#endif
-	
 	GfParmReleaseHandle(paramHandle);
 
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
@@ -191,17 +182,13 @@ SimuMenuInit(void *prevMenu)
 
     MultiThreadSchemeId = CreateLabelControl(ScrHandle, menuDescHdle, "mthreadlabel");
 
-#ifdef ReMultiThreaded
     CreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", (void*)-1, onChangeMultiThreadScheme);
     CreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", (void*)1, onChangeMultiThreadScheme);
-#endif
 
     ThreadAffinitySchemeId = CreateLabelControl(ScrHandle, menuDescHdle, "threadafflabel");
 
-#ifdef ReMultiThreaded
     CreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", (void*)-1, onChangeThreadAffinityScheme);
     CreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", (void*)1, onChangeThreadAffinityScheme);
-#endif
 	
     CreateButtonControl(ScrHandle, menuDescHdle, "accept", PrevScrHandle, storeSimuCfg);
     CreateButtonControl(ScrHandle, menuDescHdle, "cancel", PrevScrHandle, GfuiScreenActivate);
@@ -215,10 +202,8 @@ SimuMenuInit(void *prevMenu)
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous simu engine version", (void*)-1, onChangeSimuVersion, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next simu engine version", (void*)1, onChangeSimuVersion, NULL);
-#ifdef ReMultiThreaded
     GfuiAddKey(ScrHandle, GFUIK_UP, "Previous multi-threading scheme", (void*)-1, onChangeMultiThreadScheme, NULL);
     GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next multi-threading scheme", (void*)1, onChangeMultiThreadScheme, NULL);
-#endif
 
     return ScrHandle;  
 }

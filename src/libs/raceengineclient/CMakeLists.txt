@@ -2,12 +2,15 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(raceengineclient)
 
-SET(RACEENGINECLIENT_SOURCES racecareer.cpp raceengine.cpp racegl.cpp raceinit.cpp racemain.cpp
+SET(RACEENGINECLIENT_SOURCES racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
+							 racemessage.cpp racegl.cpp raceinit.cpp racemain.cpp
 							 raceweather.cpp racemanmenu.cpp raceresults.cpp racesimusimu.cpp 
-							 racestate.cpp singleplayer.cpp networkingmenu.cpp
-							 raceengineclient.h racecareer.h raceweather.h raceengine.h racegl.h raceinit.h 
-							 racemanmenu.h raceresults.h racesimusimu.h 
-							 racestate.h singleplayer.h networkingmenu.h)
+							 racestate.cpp racesituation.cpp singleplayer.cpp networkingmenu.cpp
+							 raceengineclient.h 
+							 racecareer.h raceupdate.h racenetwork.h racecars.h
+							 racemessage.h racegl.h raceinit.h 
+							 raceweather.h racemanmenu.h raceresults.h racesimusimu.h 
+							 racestate.h racesituation.h singleplayer.h networkingmenu.h)
 
 ADD_TORCS_DEFINITIONS()
 

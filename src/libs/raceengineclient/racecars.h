@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : raceengine.h
+    file        : racecars.h
     created     : Sat Nov 23 09:35:21 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id: raceengine.h,v 1.4 2004/04/05 18:25:00 olethros Exp $                                  
+    version     : $Id: racecars.h,v 1.4 2004/04/05 18:25:00 olethros Exp $                                  
 
  ***************************************************************************/
 
@@ -20,31 +20,21 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: raceengine.h,v 1.4 2004/04/05 18:25:00 olethros Exp $
+    @version	$Id: racecars.h,v 1.4 2004/04/05 18:25:00 olethros Exp $
 */
 
-#ifndef _RACEENGINE_H_
-#define _RACEENGINE_H_
+#ifndef _RACECARS_H_
+#define _RACECARS_H_
 
-#include "raceengineclient.h"
+#include <car.h>
 
+extern void ReCarsUpdateCarPitCmd(void *pvcar);
+extern void ReCarsPrepareCarPit(tCarElt *car);
 
-#ifdef ReMultiThreaded
-extern void ReInitUpdater();
-extern void ReInitCarGraphics();
-extern void ReShutdownUpdater();
-#endif // ReMultiThreaded
+extern void ReCarsManageCar(tCarElt *car, bool& bestLapChanged);
+extern void ReCarsSortCars(void);
 
-extern void ReStart(void);
-extern void ReStop(void);
-extern int  ReUpdate(void);
-extern void ReTimeMod (void *vcmd);
-
-extern tRmInfo	*ReInfo;
-
-RACEENGINECLIENT_API tRmInfo* ReGetSituation();
-
-#endif /* _RACEENGINE_H_ */ 
+#endif /* _RACECARS_H_ */ 
 
 
 

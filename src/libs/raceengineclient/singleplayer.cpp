@@ -29,7 +29,7 @@
 #include <tgfclient.h>
 #include <raceman.h>
 
-#include "raceengine.h"
+#include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
 #include "racestate.h"

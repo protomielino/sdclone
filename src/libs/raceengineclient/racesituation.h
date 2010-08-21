@@ -1,8 +1,8 @@
-/**************************************************************************
+/***************************************************************************
 
-    file        : racesimusimu.cpp
-    copyright   : (C) 2007 by Mart Kelder                 
-    web         : http://speed-dreams.sourceforge.net   
+    file        : racesituation.h
+    copyright   : (C) 2010 by Jean-Philippe Meuret
+    web         : www.speed-dreams.org 
     version     : $Id$
 
  ***************************************************************************/
@@ -15,15 +15,30 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-/** @file   
-    		Simulation simulation
+ 
+/** @file    
+    		
+    @author	    Jean-Philippe Meuret
+    @version	$Id$
 */
 
-#ifndef _RACESIMUSIMU_H
-#define _RACESIMUSIMU_H
+#ifndef _RACESITUATION_H_
+#define _RACESITUATION_H_
 
-void ReSimuSimu();
+#include "raceengineclient.h"
 
-#endif //_RACESIMUSIMU_H
+#include "raceman.h"
+
+// The race situation data structure.
+extern tRmInfo *ReInfo;
+
+RACEENGINECLIENT_API tRmInfo* ReSituation();
+
+extern tRmInfo* ReSituationAllocInit(const tRmInfo* pSource);
+extern tRmInfo* ReSituationCopy(tRmInfo*& pTarget, const tRmInfo* pSource);
+extern void ReSituationFreez(tRmInfo*& pSituation);
+
+#endif /* _RACESITUATION_H_ */ 
+
+
 

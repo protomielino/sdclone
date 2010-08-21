@@ -32,7 +32,7 @@
 #include <racescreens.h>
 #include <playerconfig.h>
 
-#include "raceengine.h"
+#include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
 #include "racestate.h"

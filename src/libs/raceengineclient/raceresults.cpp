@@ -23,7 +23,7 @@
     @version	$Id: raceresults.cpp,v 1.9.2.1 2008/05/31 15:55:36 berniw Exp $
 */
 
-#include <time.h>
+#include <ctime>
 #include <vector>
 #include <algorithm>
 #include <string>
@@ -33,10 +33,11 @@
 #include <racescreens.h>
 #include <robot.h>
 
+#include "racesituation.h"
 #include "racegl.h"
-#include "raceengine.h"
 #include "racestate.h"
 #include "raceresults.h"
+
 
 static char buf[1024];
 static char path[1024];

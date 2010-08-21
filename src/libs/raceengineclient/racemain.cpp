@@ -28,9 +28,10 @@
 #include <robot.h>
 #include <racescreens.h>
 
+#include "racesituation.h"
 #include "racecareer.h"
-#include "raceengine.h"
 #include "raceinit.h"
+#include "raceupdate.h"
 #include "racegl.h"
 #include "raceresults.h"
 #include "racestate.h"
@@ -104,9 +105,7 @@ AbortRaceHookActivate(void * /* dummy */)
 {
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 
-#ifdef ReMultiThreaded
 	ReShutdownUpdater();
-#endif
 
 	ReInfo->_reSimItf.shutdown();
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
@@ -431,7 +430,6 @@ reRaceRealStart(void)
 	if (ReInfo->_reGraphicItf.initview)
 		ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
 
-#ifdef ReMultiThreaded
 	ReInfo->_reInPitMenuCar = 0;
 	ReInfo->_reMessage = 0;
 	ReInfo->_reMessageEnd = 0.0;
@@ -439,15 +437,10 @@ reRaceRealStart(void)
 	ReInfo->_reBigMessageEnd = 0.0;
 	
 	ReInitUpdater();
-#endif
 	
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		RmLoadingScreenSetText("Loading cars ...");
-#ifdef ReMultiThreaded
 		ReInitCarGraphics();
-#else
-		ReInfo->_reGraphicItf.initcars(s); /* At this stage, the graphical module must be already loaded */
-#endif
 	}
 
 	RmLoadingScreenSetText("Ready.");
@@ -630,9 +623,7 @@ static void
 BackToRaceHookActivate(void * /* dummy */)
 {
 	ReInfo->_reState = RE_STATE_RACE;
-#ifdef ReMultiThreaded
 	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
-#endif
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
 
@@ -659,10 +650,7 @@ RestartRaceHookActivate(void * /* dummy */)
 	ReRaceCleanup();
 	
 	ReInfo->_reState = RE_STATE_PRE_RACE;
-
-#ifdef ReMultiThreaded
 	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
-#endif
 
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
@@ -719,9 +707,7 @@ ReRaceStop(void)
 {
 	void	*params = ReInfo->params;
 
-#ifdef ReMultiThreaded
 	ReStop();
-#endif
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
 	{
@@ -768,9 +754,7 @@ ReRaceEnd(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 
-#ifdef ReMultiThreaded
 	ReShutdownUpdater();
-#endif
 
 	ReRaceCleanup();
 

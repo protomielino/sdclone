@@ -3,6 +3,7 @@
     file        : racecareer.cpp
     copyright   : (C) 2007 by Mart Kelder                 
     web         : http://speed-dreams.sourceforge.net   
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -18,7 +19,8 @@
 /** @file   
     		Career race management 
 */
-#include <time.h>
+
+#include <ctime>
 
 #include <portability.h>
 #include <tgf.h>
@@ -26,8 +28,9 @@
 #include <raceman.h>
 #include <robot.h>
 
+#include "racesituation.h"
 #include "racecareer.h"
-#include "raceengine.h"
+
 
 static char buf[1024];
 
