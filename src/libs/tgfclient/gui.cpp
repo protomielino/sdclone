@@ -871,41 +871,30 @@ GfuiSetKeyAutoRepeat(void *scr, int on)
 void
 GfuiScreenShot(void * /* notused */)
 {
-	unsigned char *img;
-	char buf[1024];
-	struct tm *stm;
-	time_t t;
-	int sw, sh, vw, vh;
-	char path[1024];
-	
-	snprintf(path, 1024, "%sscreenshots", GetLocalDir());
+	char path[512];
+	snprintf(path, sizeof(path), "%sscreenshots", GetLocalDir());
+
 	// Ensure that screenshot directory exists.
 	if (GfCreateDir(path) == GF_DIR_CREATED) {
-	
-		GfScrGetSize(&sw, &sh, &vw, &vh);
-		img = (unsigned char*)malloc(vw * vh * 3);
-		if (img == NULL) {
-			return;
+		
+		int viewW, viewH;
+		unsigned char* img = GfScrCapture(&viewW, &viewH);
+		if (img) {
+			time_t t = time(NULL);
+			struct tm *stm = localtime(&t);
+			char buf[512];
+			snprintf(buf, sizeof(buf), "%s/sd-%4d%02d%02d%02d%02d%02d.png",
+					 path,
+					 stm->tm_year+1900,
+					 stm->tm_mon+1,
+					 stm->tm_mday,
+					 stm->tm_hour,
+					 stm->tm_min,
+					 stm->tm_sec);
+			GfTexWriteImageToPNG(img, buf, viewW, viewH);
+			
+			free(img);
 		}
-		
-		glPixelStorei(GL_PACK_ROW_LENGTH, 0);
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
-		glReadBuffer(GL_FRONT);
-		glReadPixels((sw-vw)/2, (sh-vh)/2, vw, vh, GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
-		
-		t = time(NULL);
-		stm = localtime(&t);
-		snprintf(buf, 1024, "%s/sd-%4d%02d%02d%02d%02d%02d.png",
-			path,
-			stm->tm_year+1900,
-			stm->tm_mon+1,
-			stm->tm_mday,
-			stm->tm_hour,
-			stm->tm_min,
-			stm->tm_sec);
-		GfTexWriteImageToPNG(img, buf, vw, vh);
-		
-		free(img);
 	}
 }
 
@@ -951,7 +940,6 @@ GfuiSleep(double delay)
 void 
 GfuiInitWindowPosition(int x, int y)
 {
-
 }
 
 /** Initialize window size
@@ -962,7 +950,6 @@ GfuiInitWindowPosition(int x, int y)
 void 
 GfuiInitWindowSize(int x, int y)
 {
-
 }
 
 

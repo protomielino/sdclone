@@ -518,12 +518,35 @@ void GfScrShutdown(void)
     @param	viewh	address of viewport height
     @return	none
  */
-void GfScrGetSize(int *scrw, int *scrh, int *vieww, int *viewh)
+void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH)
 {
-    *scrw = GfScrWidth;
-    *scrh = GfScrHeight;
-    *vieww = GfViewWidth;
-    *viewh = GfViewHeight;
+    *scrW = GfScrWidth;
+    *scrH = GfScrHeight;
+    *viewW = GfViewWidth;
+    *viewH = GfViewHeight;
+}
+
+/** Capture screen pixels into an RGB buffer (caller must free the here-allocated buffer).
+    @ingroup	screen
+    @return	none
+ */
+unsigned char* GfScrCapture(int* viewW, int *viewH)
+{
+    unsigned char *img;
+    int sW, sH;
+	
+    GfScrGetSize(&sW, &sH, viewW, viewH);
+    img = (unsigned char*)malloc((*viewW) * (*viewH) * 3);
+    if (img)
+	{
+		glPixelStorei(GL_PACK_ROW_LENGTH, 0);
+		glPixelStorei(GL_PACK_ALIGNMENT, 1);
+		glReadBuffer(GL_FRONT);
+		glReadPixels((sW-(*viewW))/2, (sH-(*viewH))/2, *viewW, *viewH,
+					 GL_RGB, GL_UNSIGNED_BYTE, (GLvoid*)img);
+    }
+
+	return img;
 }
 
 // Save graphical settings to XML file.

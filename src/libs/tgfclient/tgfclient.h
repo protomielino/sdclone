@@ -79,7 +79,8 @@ TGFCLIENT_API void GfInitClient(void);
 TGFCLIENT_API void GfScrInit(int argc, char *argv[]);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void *GfScrMenuInit(void *precMenu);
-TGFCLIENT_API void GfScrGetSize(int *ScrW, int *ScrH, int *ViewW, int *ViewH);
+TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
+TGFCLIENT_API unsigned char* GfScrCapture(int* viewW, int *viewH);
 TGFCLIENT_API void GfScrReinit(void*);
 
 /*****************************
