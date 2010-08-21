@@ -22,9 +22,11 @@
     @version	$Id$
 */
 
+#include <tgfclient.h>
 #include <network.h>
 
 #include "racesituation.h"
+#include "racegl.h"
 #include "racenetwork.h"
 
 
@@ -181,3 +183,48 @@ ReNetworkOneStep()
 
 	GetNetwork()->UnlockNetworkData();
 }
+
+int
+ReNetworkWaitReady()
+{
+	bool bWaitFinished = false;
+	
+	if (!GetNetwork())
+		bWaitFinished = true;
+
+	// If network race wait for other players and start when the server says too
+	else if (GetClient())
+	{
+		GetClient()->SendReadyToStartPacket();
+		ReInfo->s->currentTime = GetClient()->WaitForRaceStart();
+		GfLogInfo("Client beginning race in %lf seconds!\n", ReInfo->s->currentTime);
+		bWaitFinished = true;
+	}
+	
+	else if (GetServer())
+	{
+		if (GetServer()->ClientsReadyToRace())
+		{
+			ReInfo->s->currentTime = GetServer()->WaitForRaceStart();
+			GfLogInfo("Server beginning race in %lf seconds!\n", ReInfo->s->currentTime);
+			bWaitFinished = true;
+		}
+	}
+
+	int mode = RM_SYNC;
+	if (bWaitFinished)
+	{
+		ReSetRaceBigMsg("");
+		mode |= RM_NEXT_STEP;
+	}
+	else
+	{
+		ReSetRaceBigMsg("Waiting for online players");
+		GfuiDisplay();
+		ReInfo->_reGraphicItf.refresh(ReInfo->s);
+		GfelPostRedisplay();	/* Callback -> reDisplay */
+	}
+
+	return mode;
+}
+

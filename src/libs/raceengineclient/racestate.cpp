@@ -2,7 +2,7 @@
 
     file        : racestate.cpp
     created     : Sat Nov 16 12:00:42 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                        
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
     version     : $Id: racestate.cpp,v 1.5 2005/08/17 20:48:39 berniw Exp $                                  
 
@@ -28,13 +28,13 @@
 #include <cstdio>
 
 #include <tgfclient.h>
-#include <network.h>
 #include <raceman.h>
 #include <racescreens.h>
 
 #include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
+#include "racenetwork.h"
 #include "raceupdate.h"
 #include "racegl.h"
 #include "raceresults.h"
@@ -44,34 +44,6 @@
 
 static void *mainMenu;
 
-
-bool
-WaitForNetwork()
-{
-	if (!GetNetwork())
-		return false;
-
-	//If network race wait for other players and start when the server says too
-	if (GetClient())
-	{
-		GetClient()->SendReadyToStartPacket();
-		ReInfo->s->currentTime = GetClient()->WaitForRaceStart();
-		printf("Client beginning race in %lf seconds!\n",ReInfo->s->currentTime);
-		return false;
-	}
-	else if (GetServer())
-	{
-		if (GetServer()->ClientsReadyToRace())
-		{
-			ReInfo->s->currentTime = GetServer()->WaitForRaceStart();
-			printf("Server beginning race in %lf seconds!\n",ReInfo->s->currentTime);
-			return false;
-		}
-	}
-
-
-	return true;
-}
 
 /* State Automaton Init */
 void
@@ -124,37 +96,17 @@ ReStateManage(void)
 				GfOut("RaceEngine: state = RE_STATE_RACE_START\n");
 
 				mode = ReRaceStart();
-				if (GetNetwork())
-				{
-					float f = GfTimeClock();
-					float rs = GetNetwork()->GetRaceStartTime();
-					ReInfo->s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
-					GetNetwork()->RaceInit(ReInfo->s);
-					GetNetwork()->SetRaceActive(true);
-				}
-					
-
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_NETWORK_WAIT;
 				}
 				break;
 
 			case RE_STATE_NETWORK_WAIT:
-					if (!WaitForNetwork())
-					{
-						ReInfo->_reState = RE_STATE_RACE;
-						ReSetRaceBigMsg("");
-						break;
-					}
-
-					if (GetNetwork())
-					{
-						ReSetRaceBigMsg("Waiting for other players");
-						GfuiDisplay();
-						ReInfo->_reGraphicItf.refresh(ReInfo->s);
-						GfelPostRedisplay();	/* Callback -> reDisplay */
-					}
-	
+				mode = ReNetworkWaitReady();
+				if (mode & RM_NEXT_STEP) {
+					/* Not an online race, or else all online players ready */
+					ReInfo->_reState = RE_STATE_RACE;
+				}
 				break;
 
 			case RE_STATE_RACE:
@@ -165,14 +117,6 @@ ReStateManage(void)
 				} else if (mode & RM_END_RACE) {
 					/* Race was interrupted (paused) by the player */
 					ReInfo->_reState = RE_STATE_RACE_STOP;
-				}
-				
-				if (GetNetwork())
-				{
-					if (GetNetwork()->FinishRace(ReInfo->s->currentTime))
-					{
-						ReInfo->_reState = RE_STATE_RACE_END;
-					}
 				}
 				break;
 
@@ -188,11 +132,6 @@ ReStateManage(void)
 			case RE_STATE_RACE_END:
 				GfOut("RaceEngine: state = RE_STATE_RACE_END\n");
 				mode = ReRaceEnd();
-				if (GetNetwork())
-				{
-					GetNetwork()->RaceDone();
-				}
-
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_POST_RACE;
 				} else if (mode & RM_NEXT_RACE) {

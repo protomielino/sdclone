@@ -678,6 +678,11 @@ ReUpdate(void)
 		}
 	
     }
+
+	// Check for end of online race.
+	if (GetNetwork() && GetNetwork()->FinishRace(ReInfo->s->currentTime))
+		ReInfo->s->_raceState = RM_RACE_ENDED;
+	
     GfProfStopProfile("ReUpdate");
 
     return RM_ASYNC;

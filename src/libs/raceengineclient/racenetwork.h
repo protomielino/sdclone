@@ -26,6 +26,7 @@
 #define _RACENETWORK_H_
 
 extern void ReNetworkOneStep();
+extern int ReNetworkWaitReady();
 
 #endif /* _RACENETWORK_H_ */ 
 
