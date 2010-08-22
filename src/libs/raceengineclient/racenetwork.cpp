@@ -22,8 +22,8 @@
     @version	$Id$
 */
 
-#include <tgfclient.h>
 #include <network.h>
+#include <tgfclient.h>
 
 #include "racesituation.h"
 #include "racegl.h"
