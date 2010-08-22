@@ -18,18 +18,18 @@
  ***************************************************************************/
 
 
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <ctime>
+#include <cmath>
 
 #include <raceman.h>
 #include <tgf.h>
 #include <track.h>
 #include "trackinc.h"
 
-const tdble DEGPRAD = 180.0 / PI;   /* degrees per radian */
+static const tdble DEGPRAD = (tdble)(180.0 / PI);   /* degrees per radian */
 
 static tTrack	*theTrack = NULL;
 static tRoadCam *theCamList;

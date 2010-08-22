@@ -23,7 +23,6 @@
 #include <deque>
 
 #include <tgfclient.h>
-//#include <track.h>
 #include <robot.h>
 #include <playerpref.h>
 #include <gui.h>
@@ -497,7 +496,6 @@ GenPlayerList(void)
     const char *driver;
     int skilllevel;
     const char *str;
-    int found;
     int racenumber;
     float color[4];
     

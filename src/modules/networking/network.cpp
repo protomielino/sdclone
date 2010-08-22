@@ -687,7 +687,6 @@ void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 				}
 				else
 				{
-					float delta = pNData->m_vecCarStatus[i].time - status.time;
 					GfOut("Rejected car status from startRank %i\n",status.startRank);
 				}
 				GfOut("Recieved car status from startRank %i\n",status.startRank);
@@ -766,7 +765,6 @@ void Network::ReadCarControlsPacket(ENetPacket *pPacket)
 				}
 				else
 				{
-					float delta = pNData->m_vecCarCtrls[i].time - ctrl.time;
 					GfOut("Rejected car control from startRank %i\n",ctrl.startRank);
 				}
 			}
