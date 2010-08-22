@@ -461,7 +461,8 @@ grInitShadow(tCarElt *car)
 
 }
 
-void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt)
+void
+grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt)
 {
 	//showEntityType (l);
 	if (l->isAKindOf (ssgTypeBranch())) {
@@ -494,6 +495,22 @@ void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt)
 			// use sigma as a random number generator (!)
 			v[i][2] += (force[2]+0.02*sin(2.0*r + 10.0*sigma))*f;
 			//printf ("(%f %f %f)\n", v[i][0], v[i][1], v[i][2]);
+		}
+	}
+}
+
+void
+grPropagateDamage (tSituation *s)
+{
+	for (int i = 0; i < s->_ncars; i++) {
+		tCarElt* car = s->cars[i];
+		if (car->priv.collision_state.collision_count > 0) {
+			tCollisionState* collision_state = &car->priv.collision_state;
+			grPropagateDamage(grCarInfo[car->index].carEntity,
+							  collision_state->pos, collision_state->force, 0);
+			// WIP #132 (D13) : Try and move collision event acknowledgement
+			// from the graphics engine to the race engine (needed for multi-threading).
+			//collision_state->collision_count = 0;
 		}
 	}
 }
@@ -952,11 +969,16 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 	TRACE_GL("cggrDrawCar: start");
 
 	index = car->index;
-	if (car->priv.collision_state.collision_count > 0) {
-		tCollisionState* collision_state = &car->priv.collision_state;
-		grPropagateDamage (grCarInfo[index].carEntity, collision_state->pos, collision_state->force, 0);
-		collision_state->collision_count = 0;
-	}
+
+	// WIP #132 (D13) : Moved car collision damage propagation to grMain::refresh.
+	// Because it has to be done only once per graphics update, whereas grDrawCar
+	// is called once for each car and for each screen.
+	// 	if (car->priv.collision_state.collision_count > 0) {
+	// 		tCollisionState* collision_state = &car->priv.collision_state;
+	// 		grPropagateDamage (grCarInfo[index].carEntity,
+	// 						   collision_state->pos, collision_state->force, 0);
+	// 		collision_state->collision_count = 0;
+	// 	}
 	
 	grCarInfo[index].distFromStart=grGetDistToStart(car);
 	grCarInfo[index].envAngle=RAD2DEG(car->_yaw);

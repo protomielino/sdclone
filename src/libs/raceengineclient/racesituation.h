@@ -36,6 +36,7 @@ RACEENGINECLIENT_API tRmInfo* ReSituation();
 
 extern tRmInfo* ReSituationAllocInit(const tRmInfo* pSource);
 extern tRmInfo* ReSituationCopy(tRmInfo*& pTarget, const tRmInfo* pSource);
+extern void ReSituationAcknowlegdeEvents(tRmInfo* pSituation);
 extern void ReSituationFreez(tRmInfo*& pSituation);
 
 #endif /* _RACESITUATION_H_ */ 

@@ -31,6 +31,7 @@ const int OpenalSoundInterface::OSI_MIN_DYNAMIC_SOURCES = 4;
 
 OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels): SoundInterface (sampling_rate, n_channels)
 {
+	int error;
 	car_src = NULL;
 
 	ALfloat far_away[] = { 0.0f, 0.0f,  1000.0f };
@@ -38,6 +39,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	ALfloat front[]  = { 0.0f, 0.0f,  1.0f, 0.0f, 1.0f, 0.0f };
 	dev = alcOpenDevice( NULL );
 	if( dev == NULL ) {
+		GfLogError("OpenAL: Could not open device (alcOpenDevice failed)\n");
 		throw ("Could not open device");
 	}
 	
@@ -46,6 +48,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	cc = alcCreateContext( dev, NULL);
 	if(cc == NULL) {
 		alcCloseDevice( dev );
+		GfLogError("OpenAL: Could not create context (alcCreateContext failed)\n");
 		throw ("Could not create context.");
 	}
 
@@ -70,11 +73,14 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	for (clear = 0; clear < sources; clear++) {
 		if (alIsSource(sourcelist[clear])) {
 			alDeleteSources(1, &sourcelist[clear]);
-			if (alGetError() != AL_NO_ERROR) {
-				printf("Error in probing OpenAL sources.\n");
+			error = alGetError();
+			if (error != AL_NO_ERROR) {
+				GfLogError("OpenAL: Failed to delete source #%d while probing sources"
+						   " (Error %d from alDeleteSources).\n", clear, error);
 			}
 		} else {
-			printf("Error in probing OpenAL sources.\n");
+			GfLogError("OpenAL: Unusable source #%d while probing sources"
+					   " (alGenSources silently failed).\n", clear);
 		}
 	}
 
@@ -94,24 +100,30 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	for (clear = 0; clear < buffers; clear++) {
 		if (alIsBuffer(bufferlist[clear])) {
 			alDeleteBuffers(1, &bufferlist[clear]);
-			if (alGetError() != AL_NO_ERROR) {
-				printf("Error in probing OpenAL buffers.\n");
+			error = alGetError();
+			if (error != AL_NO_ERROR) {
+				GfLogError("OpenAL: Failed to delete buffer #%d while probing buffers"
+						   " (Error %d from alDeleteBuffers).\n", clear, error);
 			}
 		} else {
-			printf("Error in probing OpenAL buffers.\n");
+			GfLogError("OpenAL: Unusable buffer #%d while probing buffers"
+					   " (alGenBuffers silently failed).\n", clear);
 		}
 	}
 
 	OSI_MAX_BUFFERS = buffers;
 
-	printf("OpenAL backend info:\n  Vendor: %s\n  Renderer: %s\n  Version: %s\n", alGetString(AL_VENDOR), alGetString(AL_RENDERER), alGetString(AL_VERSION));
-	printf("  Available sources: %d%s\n", OSI_MAX_SOURCES, (sources >= MAX_SOURCES) ? " or more" : "");
-	printf("  Available buffers: %d%s\n", OSI_MAX_BUFFERS, (buffers >= MAX_SOURCES) ? " or more" : "");
+	GfLogInfo("OpenAL backend info:\n");
+	GfLogInfo("  Vendor: %s\n", alGetString(AL_VENDOR));
+	GfLogInfo("  Renderer: %s\n", alGetString(AL_RENDERER));
+	GfLogInfo("  Version: %s\n", alGetString(AL_VERSION));
+	GfLogInfo("  Available sources: %d%s\n", OSI_MAX_SOURCES, (sources >= MAX_SOURCES) ? " or more" : "");
+	GfLogInfo("  Available buffers: %d%s\n", OSI_MAX_BUFFERS, (buffers >= MAX_SOURCES) ? " or more" : "");
 	
 	alDistanceModel ( AL_INVERSE_DISTANCE );
-	int error = alGetError();
+	error = alGetError();
 	if (error != AL_NO_ERROR) {
-		printf("OpenAL Error: %d alDistanceModel\n", error);
+		GfLogError("OpenAL: Error %d from alDistanceModel\n", error);
 	}
 
 	alDopplerFactor (1.0f);
@@ -119,7 +131,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	alDopplerVelocity (SPEED_OF_SOUND);
 	error = alGetError();
 	if (error != AL_NO_ERROR) {
-		printf("OpenAL Error: %d alDopplerX\n", error);
+		GfLogError("OpenAL: Error %d from alDopplerX\n", error);
 	}
 
 
@@ -128,7 +140,7 @@ OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels):
 	alListenerfv(AL_ORIENTATION, front );
 	error = alGetError();
 	if (error != AL_NO_ERROR) {
-		printf("OpenAL Error: %d alListenerfv\n", error);
+		GfLogError("OpenAL : Error %d from alListenerfv\n", error);
 	}
 	
 	engpri = NULL;
@@ -368,10 +380,10 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 
 void OpenalSoundInterface::initSharedSourcePool(void)
 {
-	int nbdynsources = OSI_MAX_SOURCES - n_static_sources_in_use;
+	const int nbdynsources = OSI_MAX_SOURCES - n_static_sources_in_use;
 	sourcepool = new SharedSourcePool(nbdynsources);
-	printf("  #static sources: %d\n", n_static_sources_in_use);
-	printf("  #dyn sources   : %d\n", sourcepool->getNbSources());
+	GfLogInfo("  Static sources : %d\n", n_static_sources_in_use);
+	GfLogInfo("  Dynamic sources: %d\n", sourcepool->getNbSources());
 }
 
 

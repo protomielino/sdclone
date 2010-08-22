@@ -282,7 +282,10 @@ void cGrScreen::update(tSituation *s, float Fps)
 		for (i = 0; i < (s->_ncars - 1); i++) {
 			if (curCar == s->cars[i]) {
 				curCar = s->cars[i + 1];
-				curCar->priv.collision = 0;
+				// WIP #132 (D13) : Try and move collision event acknowledgement
+				// from the graphics engine to the race engine (needed for multi-threading).
+				// BTW, it was only useful here if sound was disabled (see grRefreshSound).
+				//curCar->priv.collision = 0;
 				carChanged = 1;
 				break;
 			}
@@ -294,7 +297,10 @@ void cGrScreen::update(tSituation *s, float Fps)
 		for (i = 1; i < s->_ncars; i++) {
 			if (curCar == s->cars[i]) {
 				curCar = s->cars[i - 1];
-				curCar->priv.collision = 0;
+				// WIP #132 (D13) : Try and move collision event acknowledgement
+				// from the graphics engine to the race engine (needed for multi-threading).
+				// BTW, it was only useful here if sound was disabled (see grRefreshSound).
+				//curCar->priv.collision = 0;
 				carChanged = 1;
 				break;
 			}

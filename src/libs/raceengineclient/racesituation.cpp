@@ -224,6 +224,19 @@ tRmInfo* ReSituationCopy(tRmInfo*& pTarget, const tRmInfo* pSource)
 	return pTarget;
 }
 
+void ReSituationAcknowlegdeEvents(tRmInfo* pSituation)
+{
+	// Acknowlegde collision events for each car.
+	for (int nCarInd = 0; nCarInd < pSituation->s->_ncars; nCarInd++)
+	{
+		tCarElt* pCar = pSituation->s->cars[nCarInd];
+		pCar->priv.collision = 0;
+		// Note: This one is Simu V3 only, and not used actually
+		// (WIP on collision code issues ; see simuv3/collide.cpp).
+		pCar->priv.collision_state.collision_count = 0;
+	}
+}
+
 void ReSituationFreez(tRmInfo*& pSituation)
 {
 	if (pSituation)

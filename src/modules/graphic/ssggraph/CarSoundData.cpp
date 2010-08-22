@@ -369,7 +369,10 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
              &&(skid_metal.a >drag_collision.a))) {
             crash = true;
         }
-        car->priv.collision = 0;
+		
+		// WIP #132 (D13) : Try and move collision event acknowledgement
+		// from the graphics engine to the race engine (needed for multi-threading).
+        //car->priv.collision = 0;
     }
 
     drag_collision.a = 0.9f*drag_collision.a + skid_metal.a;

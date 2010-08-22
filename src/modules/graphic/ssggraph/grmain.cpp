@@ -323,6 +323,11 @@ refresh(tSituation *s)
     grRefreshSound(s, grScreens[0]->getCurCamera());
     GfProfStopProfile("grRefreshSound*");
 
+	// WIP #132 (D13) : Moved car collision damage propagation from grcar::grDrawCar.
+	// Because it has to be done only once per graphics update, whereas grDrawCar
+	// is called once for each car and for each screen.
+	grPropagateDamage(s);
+	
     GfProfStartProfile("grDrawBackground/glClear");
     glDepthFunc(GL_LEQUAL);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -502,8 +507,8 @@ shutdownTrack(void)
 	}
 }
 
-/*void bendCar (int index, sgVec3 poc, sgVec3 force, int cnt)
-{
-	if (grCarInfo) 
-		grPropagateDamage (grCarInfo[index].carEntity, poc, force, cnt);
-}*/
+// void bendCar (int index, sgVec3 poc, sgVec3 force, int cnt)
+// {
+// 	if (grCarInfo) 
+// 		grPropagateDamage (grCarInfo[index].carEntity, poc, force, cnt);
+// }

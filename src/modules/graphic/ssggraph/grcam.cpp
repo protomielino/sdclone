@@ -1350,6 +1350,9 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 			}
 		    }
 
+			// WIP #132 (D13) note : If sound is not disabled, car->priv.collision 
+			// already equals to 0 (see grRefreshSound, where it is forced to 0).
+			// This means we probably have a bug here ...
 		    if (car->priv.collision) {
 			schedView[car->index].prio += grNbCars;
 			event = 1;
@@ -1385,9 +1388,13 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 		    lastEventTime = s->currentTime;
 		    lastViewTime = s->currentTime;
 
-		    for (i = 0; i < grNbCars; i++) {
-			s->cars[i]->priv.collision = 0;
-		    }
+			// WIP #132 (D13) : Try and move collision event acknowledgement
+			// from the graphics engine to the race engine (needed for multi-threading).
+			// Note : If sound is not disabled, car->priv.collision already equals to 0
+			// (see grRefreshSound, where it is forced to 0).
+		    //for (i = 0; i < grNbCars; i++) {
+			//s->cars[i]->priv.collision = 0;
+		    //}
 		}
 	    }
 	}

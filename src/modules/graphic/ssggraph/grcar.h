@@ -97,5 +97,6 @@ extern void grInitShadow(tCarElt *car);
 extern void grInitCar(tCarElt *car);
 extern void grDrawCar(tSituation *, tCarElt*, tCarElt *, int, int, double curTime, class cGrPerspCamera *curCam);
 extern void grInitCommonState(void);
-extern void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt);
+//extern void grPropagateDamage (ssgEntity* l, sgVec3 poc, sgVec3 force, int cnt);
+extern void grPropagateDamage (tSituation *);
 #endif /* _GRCAR_H_ */ 
