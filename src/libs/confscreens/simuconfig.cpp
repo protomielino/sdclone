@@ -2,9 +2,9 @@
 
     file        : simuconfig.cpp
     created     : Wed Nov  3 21:48:26 CET 2004
-    copyright   : (C) 2004 by Eric Espi�                       
+    copyright   : (C) 2004 by Eric Espie                       
     email       : eric.espie@free.fr  
-    version     : $Id: simuconfig.cpp,v 1.4 2006/10/06 20:44:51 berniw Exp $                                  
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,9 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
-    @version	$Id: simuconfig.cpp,v 1.4 2006/10/06 20:44:51 berniw Exp $
+/** @file
+    		Simutation option menu
+    @version	$Id$
 */
 
 #include <cstdio>
@@ -36,9 +36,11 @@
 
 
 /* list of available simulation engine */
-static const char *SimuVersionList[] = {RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V3};
+static const char *SimuVersionList[] =
+	{RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3};
+static const char *SimuVersionDispNameList[] = 	{"V2.0", "V2.1", "V3.0"};
 static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
-static int CurSimuVersion = 0;
+static int CurSimuVersion = 1;
 
 /* list of available multi-threading schemes */
 static const char *MultiThreadSchemeList[] = {RM_VAL_AUTO, RM_VAL_ON, RM_VAL_OFF};
@@ -73,7 +75,7 @@ static void loadSimuCfg(void)
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	
-	simuVersionName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[0]);
+	simuVersionName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[1]);
 	for (i = 0; i < NbSimuVersions; i++) {
 		if (strcmp(simuVersionName, SimuVersionList[i]) == 0) {
 			CurSimuVersion = i;
@@ -99,7 +101,7 @@ static void loadSimuCfg(void)
 
 	GfParmReleaseHandle(paramHandle);
 
-	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
+	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
 	GfuiLabelSetText(ScrHandle, MultiThreadSchemeId, MultiThreadSchemeList[CurMultiThreadScheme]);
 	GfuiLabelSetText(ScrHandle, ThreadAffinitySchemeId, ThreadAffinitySchemeList[CurThreadAffinityScheme]);
 }
@@ -129,7 +131,7 @@ onChangeSimuVersion(void *vp)
 {
 	CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
 	
-	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionList[CurSimuVersion]);
+	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
 }
 
 

@@ -379,6 +379,7 @@ typedef struct RmInfo
 #define RM_ATTR_MOD_GRAPHIC		"graphic"
 
 #define RM_VAL_MOD_SIMU_V2		"simuv2"
+#define RM_VAL_MOD_SIMU_V2_1	"simuv2.1"
 #define RM_VAL_MOD_SIMU_V3		"simuv3"
 #define RM_VAL_MOD_TRACK		"track"
 #define RM_VAL_MOD_SSGRAPH		"ssggraph"
