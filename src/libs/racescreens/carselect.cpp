@@ -49,16 +49,14 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	const char* pszCurSkinName =
 		pMenu->getDriver()->skinName ? pMenu->getDriver()->skinName : rmdStdSkinName;
 	
-	// TODO.
-	// Load specs from the current car XML file.
-
 	// Initialize the GUI contents.
+	GfuiLabelSetText(pMenu->GetMenuHandle(), pMenu->GetDynamicControlId("drivernamelabel"),
+					 pMenu->getDriver()->name);
 	pMenu->resetCarCategoryComboBox(pCurCar->strCategoryName);
 	pMenu->resetCarModelComboBox(pCurCar->strCategoryName, pCurCar->strRealName);
 	pMenu->resetCarDataSheet(pCurCar->strName);
 	pMenu->resetCarSkinComboBox(pCurCar->strRealName, pszCurSkinName);
 	pMenu->resetCarPreviewImage(pszCurSkinName);
-	// TODO : display car specs values (progress bars and raw figures).
 }
 
 const CarData* RmCarSelectMenu::getSelectedCarModel() const
@@ -354,6 +352,7 @@ bool RmCarSelectMenu::Initialize()
     
     CreateStaticControls();
     
+	CreateLabelControl("drivernamelabel");
 	CreateComboboxControl("categorycombo", this, onChangeCategory);
 	CreateComboboxControl("modelcombo", this, onChangeModel);
 	CreateComboboxControl("skincombo", this, onChangeSkin);
