@@ -267,7 +267,18 @@ void EventLoop::operator()(void)
 			switch(event.type)
 			{  
 				case SDL_KEYDOWN:
-					
+#ifndef WIN32
+					// Hard-coded Alt+Enter shortcut, to enable the user to quit/re-enter
+					// the full-screen mode ; as in SDL full screen mode, events never traverse
+					// the Window Manager, we need this trick for the user to enjoy
+					// its WM keyboard shortcuts (didn't find any other way yet).
+					if (event.key.keysym.sym == SDLK_RETURN	&& SDL_GetModState() & KMOD_ALT)
+					{
+						if (!SDL_WM_ToggleFullScreen(gfScrGetScreenSurface()))
+							GfLogError("SDL_WM_ToggleFullScreen failed\n");
+					}
+					else
+#endif
 					if (_keyboardDownCB)
 					{
 						int x,y;

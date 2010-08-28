@@ -382,7 +382,7 @@ extern void gfuiScrollListPrevElt (tGfuiObject *object);
 extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);
 
-extern float GfuiColor[GFUI_COLORNB][4];
+extern SDL_Surface* gfScrGetScreenSurface();
 
 #endif /* _GUI_H__ */ 
 

@@ -47,6 +47,7 @@
 #  include <plib/js.h>
 #endif
 #include <SDL/SDL_keysym.h>
+#include <SDL/SDL_video.h>
 
 #include <tgf.h>
 
@@ -80,6 +81,7 @@ TGFCLIENT_API void GfScrInit(int argc, char *argv[]);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void *GfScrMenuInit(void *precMenu);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
+SDL_Surface* gfScrGetScreenSurface();
 TGFCLIENT_API unsigned char* GfScrCapture(int* viewW, int *viewH);
 TGFCLIENT_API void GfScrReinit(void*);
 

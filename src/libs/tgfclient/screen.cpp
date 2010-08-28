@@ -73,7 +73,7 @@ static int GfViewHeight;
 static int GfScrCenX;
 static int GfScrCenY;
 
-SDL_Surface *screenSurface = NULL;
+SDL_Surface *ScreenSurface = NULL;
 static void	*scrHandle = NULL;
 static char 	buf[1024];
 
@@ -352,7 +352,7 @@ void GfScrInit(int argc, char *argv[])
 		videomode |= SDL_FULLSCREEN;
  
 	// Video initialization with best possible settings.
-	screenSurface = 0;
+	ScreenSurface = 0;
 	if (strcmp(vinit, GFSCR_VAL_VINIT_BEST) == 0) 
 	{
 		// TODO: Check for better than default multi-sampling level
@@ -370,63 +370,63 @@ void GfScrInit(int argc, char *argv[])
 		SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
 		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
 		SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
-		screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 
 		// Failed : try without anti-aliasing.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : try with anti-aliasing, but without alpha channel.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
 			SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : try without anti-aliasing, and without alpha channel.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : try 16 bit z-buffer and back with alpha channel and anti-aliasing.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
 			SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
 			SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : try without anti-aliasing.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : try with anti-aliasing, but without alpha channel.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 1 );
 			SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 0 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : try without anti-aliasing, and without alpha channel.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 			SDL_GL_SetAttribute( SDL_GL_MULTISAMPLEBUFFERS, 0 );
-			screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+			ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 		}
 
 		// Failed : Give up but say why.
-		if (!screenSurface)
+		if (!ScreenSurface)
 		{
 		  GfTrace("The minimum display requirements are not fulfilled.\n");
 		  GfTrace("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
@@ -434,24 +434,24 @@ void GfScrInit(int argc, char *argv[])
 	}
 
 	// Video initialization with generic compatible settings.
-	if (!screenSurface)
+	if (!ScreenSurface)
 	{
 		GfTrace("Trying generic video initialization with requested resolution, fallback.\n\n");
-		screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 	}
 
 	// Failed : Try with a lower fallback resolution that should be supported everywhere ...
-	if (!screenSurface)
+	if (!ScreenSurface)
 	{
 	  GfError("Unable to get compatible video mode with requested resolution\n\n");
 		sscanf(DefRes[0], "%dx%d", &winX, &winY);
 		GfTrace("Trying generic video initialization with fallback resolution %dx%d.\n\n",
 				winX, winY);
-		screenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
+		ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 	}
 
 	// Failed : No way ... no more ideas !
-	if (!screenSurface)
+	if (!ScreenSurface)
 	{
 		GfFatal("Unable to get any compatible video mode (fallback resolution not supported)\n\n");
 		exit(1);
@@ -547,6 +547,11 @@ unsigned char* GfScrCapture(int* viewW, int *viewH)
     }
 
 	return img;
+}
+
+SDL_Surface* gfScrGetScreenSurface()
+{
+	return ScreenSurface;
 }
 
 // Save graphical settings to XML file.
