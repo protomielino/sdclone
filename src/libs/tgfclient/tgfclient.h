@@ -429,9 +429,10 @@ TGFCLIENT_API void GfuiScrollBarPosSet(void *scr, int id, int min, int max, int 
 TGFCLIENT_API int GfuiScrollBarPosGet(void *scr, int id);
 
 /* Images */
-TGFCLIENT_API int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name);
-TGFCLIENT_API int GfuiStaticImageCreateEx(void *scr, int x, int y, int w, int h, const char *name, int align);
-TGFCLIENT_API void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index = 0);
+TGFCLIENT_API int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name,
+										int align = GFUI_ALIGN_HL_VB, bool canDeform = true);
+TGFCLIENT_API void GfuiStaticImageSet(void *scr, int id, const char *name,
+									  unsigned index = 0, bool canDeform = true);
 TGFCLIENT_API void GfuiStaticImageSetActive(void *scr, int id, int index);
 
 /*****************************
@@ -584,6 +585,10 @@ TGFCLIENT_API void GfglUpdateCompressARBEnabled(void);
 TGFCLIENT_API int GfglGetUserTextureMaxSize(void);
 TGFCLIENT_API int GfglGetGLTextureMaxSize(void);
 TGFCLIENT_API void GfglUpdateUserTextureMaxSize(void);
+
+// Texture non-power-of-2 support
+TGFCLIENT_API bool GfglIsTextureRectangleARBAvailable(void); // In case mipmapping NOT needed.
+TGFCLIENT_API bool GfglIsTextureNonPowerOf2ARBAvailable(void); // In case mipmapping needed.
 
 #endif /* __TGFCLIENT__H__ */
 

@@ -97,7 +97,7 @@ typedef struct
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
     
-    int  imgX,imgY;
+    int imgX,imgY;
     int imgWidth,imgHeight;
 
     //if skin used
@@ -231,6 +231,8 @@ typedef struct
 
 typedef struct
 {
+    int srcWidth, srcHeight; // Dimensions of the source image file (pixels).
+	bool canDeform;
 	unsigned int activeimage;
 	GLuint	texture[MAX_STATIC_IMAGES];
 } tGfuiImage;

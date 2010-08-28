@@ -171,7 +171,8 @@ rmdsChangeSkin(void *vp)
 	// Load associated preview image (or "no preview panel" if none available).
 	struct stat st;
 	if (!stat(MapSkins2PreviewFiles[pszCurSkinName].c_str(), &st))
-		GfuiStaticImageSet(ScrHandle, CarImageId, MapSkins2PreviewFiles[pszCurSkinName].c_str());
+		GfuiStaticImageSet(ScrHandle, CarImageId, MapSkins2PreviewFiles[pszCurSkinName].c_str(),
+						   /* index= */ 0, /* canDeform= */false);
 	else
 		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 
@@ -343,7 +344,8 @@ rmdsClickOnDriver(void * /* dummy */)
 		// Load associated preview image (or "no preview" image if none available).
 		struct stat st;
 		if (!stat(MapSkins2PreviewFiles[pszCurSkinName].c_str(), &st))
-			GfuiStaticImageSet(ScrHandle, CarImageId, MapSkins2PreviewFiles[pszCurSkinName].c_str());
+			GfuiStaticImageSet(ScrHandle, CarImageId, MapSkins2PreviewFiles[pszCurSkinName].c_str(),
+							   /* index= */ 0, /* canDeform= */false);
 		else
 			GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
     }

@@ -402,14 +402,13 @@ bool GetColorFromXML(void *param,const char *pControlName,const char *pField,Col
 
 
 bool 
-ReadBoolean(void *param,const char *pControlName,const char *pField, bool bDefault)
+ReadBoolean(void *param,const char *pControlName,const char *pszFieldName, bool bDefault)
 {
-        const char* pszValue = GfParmGetStr(param, pControlName, pField, "");
-        if (strlen(pszValue) == 0)
-                return bDefault;
-        else if (!strcmp(pszValue, "yes"))
+        const char* pszValue = GfParmGetStr(param, pControlName, pszFieldName, 0);
+        if (pszValue)
+			if (!strcmp(pszValue, "yes") || !strcmp(pszValue, "true"))
                 return true;
-        else if (!strcmp(pszValue, "no"))
+			else if (!strcmp(pszValue, "no") || !strcmp(pszValue, "false"))
                 return false;
 
         return bDefault;
@@ -428,16 +427,19 @@ CreateStaticImage(void *menuHandle,void *param,const char *pControlName)
         const char* pszAlignH = GfParmGetStr(param, pControlName, "alignH", "");
         const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
         const int alignment = GetAlignment(pszAlignH,pszAlignV);
+		const bool canDeform = ReadBoolean(param, pControlName, "canDeform", true);
 
-        int id = GfuiStaticImageCreateEx(menuHandle,x,y,w,h,pszImage,alignment);
+        int id = GfuiStaticImageCreate(menuHandle,x,y,w,h,pszImage,alignment,canDeform);
 
-        char buffer[256];
+        char pszImageFieldName[32];
         for (int i=2; i<= MAX_STATIC_IMAGES;i++)
         {
-                sprintf(buffer, "image%i", i);
-                const char* pszIndexedImage = GfParmGetStr(param, pControlName, buffer, 0);
-                if (pszIndexedImage && strlen(pszIndexedImage) > 0)
-                        GfuiStaticImageSet(menuHandle, id, pszIndexedImage, i-1);
+                sprintf(pszImageFieldName, "image%i", i);
+                const char* pszFileName = GfParmGetStr(param, pControlName, pszImageFieldName, 0);
+                if (pszFileName)
+					GfuiStaticImageSet(menuHandle, id, pszFileName, i-1, canDeform);
+				else
+					break; // Assume indexed image list has no hole inside.
         }
 
         return id;

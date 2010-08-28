@@ -31,7 +31,7 @@
 #include "glfeatures.h"
 
 
-/** Report if a given OpenGL extension is supported
+/** Report if a given OpenGL extension is supported (1) or not (0)
 
     Warning: Should not be called before any successfull call to SDL_SetVideoMode()
 
@@ -73,8 +73,8 @@ int GfglIsOpenGLExtensionSupported(const char* extension)
 */
 
 
-static bool compressARBAvailable;
-static bool compressARBEnabled;
+static bool bCompressARBAvailable;
+static bool bCompressARBEnabled;
 
 // Feature checks, GL_ARB_texture_compression.
 void checkCompressARBAvailable(bool &result)
@@ -96,7 +96,7 @@ void checkCompressARBAvailable(bool &result)
 		}
 	}
 
-	result = (compressARB > 0) ? true : false;
+	result = compressARB != 0;
 }
 
 
@@ -125,28 +125,28 @@ void checkCompressARBEnabled(bool &result)
 
 void GfglUpdateCompressARBEnabled(void)
 {
-	checkCompressARBEnabled(compressARBEnabled);
+	checkCompressARBEnabled(bCompressARBEnabled);
 }
 
 
 // GL_ARB_texture_compression
 bool GfglIsCompressARBAvailable(void)
 {
-	return compressARBAvailable;
+	return bCompressARBAvailable;
 }
 
 
 bool GfglIsCompressARBEnabled(void) 
 {
-	return compressARBEnabled;
+	return bCompressARBEnabled;
 }
 
 
 /*
 	----------------------- Texture downsizing.
 */
-static int glTextureMaxSize;
-static int userTextureMaxSize;
+static int nGLTextureMaxSize;
+static int nUserTextureMaxSize;
 
 
 void GfglGetGLTextureMaxSize(int &result)
@@ -164,10 +164,10 @@ void GfglGetUserTextureMaxSize(int &result)
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	result = (int) GfParmGetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURESIZE, (char*)NULL, (tdble) glTextureMaxSize);
-	if (result > glTextureMaxSize) 
+	result = (int) GfParmGetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURESIZE, (char*)NULL, (tdble) nGLTextureMaxSize);
+	if (result > nGLTextureMaxSize) 
 	{
-		result = glTextureMaxSize;
+		result = nGLTextureMaxSize;
 	}
 	GfParmReleaseHandle(paramHandle);
 }
@@ -175,26 +175,61 @@ void GfglGetUserTextureMaxSize(int &result)
 
 void GfglUpdateUserTextureMaxSize(void)
 {
-	GfglGetUserTextureMaxSize(userTextureMaxSize);
+	GfglGetUserTextureMaxSize(nUserTextureMaxSize);
 }
 
 int GfglGetGLTextureMaxSize(void)
 {
-	return glTextureMaxSize;
+	return nGLTextureMaxSize;
 }
 
 
 int GfglGetUserTextureMaxSize(void)
 {
-	return userTextureMaxSize;
+	return nUserTextureMaxSize;
 }
 
 
-// Initialize
+/*
+	----------------------- Non-power of 2 size texture support.
+*/
+static bool bTextureRectangleARBAvailable;
+static bool bTextureNonPowerOf2ARBAvailable;
+
+// Feature checks, GL_ARB_texture_rectangle.
+void checkTextureRectangleARBAvailable(bool &result)
+{
+	// Query if the extension is available at the runtime system (true, if not 0).
+	result = GfglIsOpenGLExtensionSupported("GL_ARB_texture_rectangle") != 0;
+}
+
+// Feature checks, GL_ARB_texture_rectangle.
+void checkTextureNonPowerOf2ARBAvailable(bool &result)
+{
+	// Query if the extension is available at the runtime system (true if not 0).
+	result = GfglIsOpenGLExtensionSupported("GL_ARB_texture_non_power_of_two") != 0;
+}
+
+bool GfglIsTextureRectangleARBAvailable(void)
+{
+	return bTextureRectangleARBAvailable;
+}
+
+bool GfglIsTextureNonPowerOf2ARBAvailable(void)
+{
+	return bTextureNonPowerOf2ARBAvailable;
+}
+
+/*
+	----------------------- Initialization.
+*/
+
 void gfglCheckGLFeatures(void) 
 {
-	checkCompressARBAvailable(compressARBAvailable);
-	checkCompressARBEnabled(compressARBEnabled);
-	GfglGetGLTextureMaxSize(glTextureMaxSize);
-	GfglGetUserTextureMaxSize(userTextureMaxSize);
+	checkCompressARBAvailable(bCompressARBAvailable);
+	checkCompressARBEnabled(bCompressARBEnabled);
+	GfglGetGLTextureMaxSize(nGLTextureMaxSize);
+	GfglGetUserTextureMaxSize(nUserTextureMaxSize);
+	checkTextureRectangleARBAvailable(bTextureRectangleARBAvailable);
+	checkTextureNonPowerOf2ARBAvailable(bTextureNonPowerOf2ARBAvailable);
 }

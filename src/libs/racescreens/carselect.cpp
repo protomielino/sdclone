@@ -324,7 +324,8 @@ void RmCarSelectMenu::resetCarPreviewImage(const std::string& strSelectedSkinNam
 	struct stat st;
 	if (iterPreviewFile != _mapPreviewFiles.end()
 		&& !stat(iterPreviewFile->second.c_str(), &st))
-		GfuiStaticImageSet(GetMenuHandle(), nCarImageId, iterPreviewFile->second.c_str());
+		GfuiStaticImageSet(GetMenuHandle(), nCarImageId, iterPreviewFile->second.c_str(),
+						   /* index= */ 0, /* canDeform= */false);
 	else
 		GfuiStaticImageSet(GetMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
 }
