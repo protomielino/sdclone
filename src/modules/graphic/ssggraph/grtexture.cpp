@@ -28,8 +28,7 @@
 
 int doMipMap(const char *tfname, int mipmap)
 {
-	char *buf = (char *) malloc(strlen(tfname)+1);
-	strcpy(buf, tfname);
+	char *buf = strdup(tfname);
 
 	// find the filename extension.
 	char *s = strrchr(buf, '.');
@@ -40,23 +39,21 @@ int doMipMap(const char *tfname, int mipmap)
 	// search for the texture parameters.
 	s = strrchr(buf, '_');
 
-	// no mipmap for "_n" and "shadow".
-	if (s) {
-		// check the "_n".
-		if (strncmp(s, "_n", 4) == 0) {
-			mipmap = FALSE;
-		}
+	// 1) no mipmap for "*_n".
+	if (s && s[1] == 'n') {
+		mipmap = FALSE;
 	}
 
+	// 1) no mipmap for "*shadow*".
 	if (mipmap) {
 		// Check the shadow.
 		s = strrchr((char *)tfname, '/');
 		if (!s) {
-			s = (char *) tfname;
+			s = (char*)tfname;
 		} else {
 			s++;
 		}
-		if (strstr(s, "shadow") != NULL) {
+		if (strstr(s, "shadow")) {
 			mipmap = FALSE;
 		}
 	}
