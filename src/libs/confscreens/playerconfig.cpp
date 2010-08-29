@@ -31,10 +31,10 @@
 #include "playerconfig.h"
 
 
-static const int   MAX_PLAYER_NAME_LEN	= 16;
-static const char *PLAYER_NAME_PROMPT		= "-- Enter name --";
-static const char *NO_PLAYER			= "-- No one --";
-static const char *HumanDriverModuleName	= "human";
+static const char *PlayerNamePrompt	= "-- Enter name --";
+static const char *NoPlayer = "-- No one --";
+static const char *HumanDriverModuleName  = "human";
+static const char *DefaultCarName  = "sc-lynx-220";
 
 static const char *SkillLevelString[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 static const int NbSkillLevels = sizeof(SkillLevelString) / sizeof(SkillLevelString[0]);
@@ -73,7 +73,8 @@ struct tPlayerInfo
 public:
 
   tPlayerInfo(const char *name = HumanDriverModuleName, const char *dispname = 0,
-			  int racenumber = 0, int skilllevel = 0, float *color = 0, 
+			  const char *defcarname = 0, int racenumber = 0, int skilllevel = 0,
+			  float *color = 0, 
 			  tGearChangeMode gearchangemode = GEAR_MODE_AUTO, int autoreverse = 0, 
 			  int nbpitstops = 0) 
   {
@@ -81,6 +82,8 @@ public:
 	setName(name);
 	_info.dispname = 0;
 	setDispName(dispname);
+	_defcarname = 0;
+	setDefaultCarName(defcarname);
 	_racenumber = racenumber; 
 	_gearchangemode = gearchangemode; 
 	_nbpitstops = nbpitstops; 
@@ -98,6 +101,8 @@ public:
 	setName(src._info.name);
 	_info.dispname = 0;
 	setDispName(src._info.dispname);
+	_defcarname = 0;
+	setDefaultCarName(src._defcarname);
 	_racenumber = src._racenumber; 
 	_gearchangemode = src._gearchangemode; 
 	_nbpitstops = src._nbpitstops; 
@@ -111,6 +116,7 @@ public:
 
   const char *name()  const { return _info.name; };
   const char *dispName()  const { return _info.dispname; }
+  const char *defaultCarName()  const { return _defcarname; }
   int raceNumber() const { return _racenumber; }
   tGearChangeMode gearChangeMode() const { return _gearchangemode; }
   int nbPitStops() const { return _nbpitstops; }
@@ -132,9 +138,18 @@ public:
     if (_info.dispname)
 	    delete[] _info.dispname;
 	if (!dispname || strlen(dispname) == 0)
-	  dispname = NO_PLAYER;
+	  dispname = NoPlayer;
 	_info.dispname = new char[strlen(dispname)+1];
 	strcpy(_info.dispname, dispname); // Can't use strdup : free crashes in destructor !?
+  }
+  void setDefaultCarName(const char *defcarname)
+  {
+    if (_defcarname)
+	    delete[] _defcarname;
+	if (!defcarname || strlen(defcarname) == 0)
+	  defcarname = DefaultCarName;
+	_defcarname = new char[strlen(defcarname)+1];
+	strcpy(_defcarname, defcarname); // Can't use strdup : free crashes in destructor !?
   }
   void setRaceNumber(int raceNumber) { _racenumber = raceNumber; }
   void setGearChangeMode(tGearChangeMode gearChangeMode) { _gearchangemode = gearChangeMode; }
@@ -148,6 +163,8 @@ public:
 	  delete[] _info.dispname;
 	if (_info.name)
 	  delete[] _info.name;
+    if (_defcarname)
+	  delete[] _defcarname;
   }
 
   // Gear change mode enum to string conversion
@@ -169,6 +186,7 @@ public:
 private:
 
   tInfo			_info;
+  char*			_defcarname;
   int				_racenumber;
   tGearChangeMode	_gearchangemode;
   int				_nbpitstops;
@@ -221,10 +239,10 @@ refreshEditVal(void)
 
     } else {
 
-        if (strcmp((*CurrPlayer)->dispName(), NO_PLAYER)) {
+        if (strcmp((*CurrPlayer)->dispName(), NoPlayer)) {
 	    GfuiEditboxSetString(ScrHandle, NameEditId, (*CurrPlayer)->dispName());
 	} else {
-	    GfuiEditboxSetString(ScrHandle, NameEditId, PLAYER_NAME_PROMPT);
+	    GfuiEditboxSetString(ScrHandle, NameEditId, PlayerNamePrompt);
 	}
 	GfuiEnable(ScrHandle, NameEditId, GFUI_ENABLE);
 
@@ -302,6 +320,7 @@ PutPlayerSettings(unsigned index)
     // Human driver params
     sprintf(drvSectionPath, "%s/%s/%u", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_NAME, player->dispName());
+    GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CAR, player->defaultCarName());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RACENUM, (char*)NULL, player->raceNumber());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RED, (char*)NULL, player->color(0));
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_GREEN, (char*)NULL, player->color(1));
@@ -485,7 +504,7 @@ ConfControls(void * /* dummy */ )
     }
 }
 
-/* Load human driver (=player) info list (PlayersInfo) from preferences and human drivers files ;
+/* Load human driver (= player) info list (PlayersInfo) from preferences and human drivers files ;
    load associated scroll list */
 static int
 GenPlayerList(void)
@@ -494,6 +513,7 @@ GenPlayerList(void)
     int i;
     int j;
     const char *driver;
+    const char *defaultCar;
     int skilllevel;
     const char *str;
     int racenumber;
@@ -526,6 +546,7 @@ GenPlayerList(void)
 		    break;
 		}
 	    }
+	    defaultCar  = GfParmGetStr(PlayerHdle, sstring, ROB_ATTR_CAR, 0);
 	    racenumber  = (int)GfParmGetNum(PlayerHdle, sstring, ROB_ATTR_RACENUM, (char*)NULL, 0);
 	    color[0]    = (float)GfParmGetNum(PlayerHdle, sstring, ROB_ATTR_RED, (char*)NULL, 1.0);
 	    color[1]    = (float)GfParmGetNum(PlayerHdle, sstring, ROB_ATTR_GREEN, (char*)NULL, 1.0);;
@@ -533,6 +554,7 @@ GenPlayerList(void)
 	    color[3]    = 1.0;
 	    PlayersInfo.push_back(new tPlayerInfo(HumanDriverModuleName, // Driver module name
 						  driver,  // Player (display) name
+						  defaultCar, // Default car name.
 						  racenumber, // Race number
 						  skilllevel, // skill level
 						  color)); // Colors
@@ -631,7 +653,7 @@ ChangeName(void * /* dummy */)
 
     if (CurrPlayer != PlayersInfo.end()) {
         val = GfuiEditboxGetString(ScrHandle, NameEditId);
-        (*CurrPlayer)->setDispName(strcmp(val, PLAYER_NAME_PROMPT) ? val : NO_PLAYER);
+        (*CurrPlayer)->setDispName(strcmp(val, PlayerNamePrompt) ? val : NoPlayer);
     }
 
     UpdtScrollList();
