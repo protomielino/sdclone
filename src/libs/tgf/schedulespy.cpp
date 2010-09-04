@@ -202,7 +202,7 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
 	// b) Create parent dir(s) if needed.
 	const std::size_t nLastSlashPos = ossFilePathName.str().rfind('/');
 	const std::string strDirPathName(ossFilePathName.str().substr(0, nLastSlashPos));
-	GfCreateDir(strDirPathName.c_str());
+	GfDirCreate(strDirPathName.c_str());
 
 	// c) Finally open in write mode.
 	std::ofstream outFStream(ossFilePathName.str().c_str());

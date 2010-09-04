@@ -208,7 +208,7 @@ typedef struct RmMovieCapture
     double	deltaSimu;
     double	deltaFrame;
     double	lastFrame;
-    const char	*outputBase;
+    char	*outputBase;
     int		currentCapture;
     int		currentFrame;
 } tRmMovieCapture;

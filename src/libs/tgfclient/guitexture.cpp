@@ -543,6 +543,11 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
     void		*handle;
 #endif
 	float		screen_gamma;
+
+	if (!img) {
+		GfError("GfTexWriteImageToPNG(%s) : Null image buffer pointer\n", filename);
+		return -1;
+	}
 	
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {

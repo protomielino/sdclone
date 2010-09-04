@@ -871,30 +871,24 @@ GfuiSetKeyAutoRepeat(void *scr, int on)
 void
 GfuiScreenShot(void * /* notused */)
 {
-	char path[512];
+	char path[256];
 	snprintf(path, sizeof(path), "%sscreenshots", GetLocalDir());
 
 	// Ensure that screenshot directory exists.
-	if (GfCreateDir(path) == GF_DIR_CREATED) {
-		
-		int viewW, viewH;
-		unsigned char* img = GfScrCapture(&viewW, &viewH);
-		if (img) {
-			time_t t = time(NULL);
-			struct tm *stm = localtime(&t);
-			char buf[512];
-			snprintf(buf, sizeof(buf), "%s/sd-%4d%02d%02d%02d%02d%02d.png",
-					 path,
-					 stm->tm_year+1900,
-					 stm->tm_mon+1,
-					 stm->tm_mday,
-					 stm->tm_hour,
-					 stm->tm_min,
-					 stm->tm_sec);
-			GfTexWriteImageToPNG(img, buf, viewW, viewH);
-			
-			free(img);
-		}
+	if (GfDirCreate(path) == GF_DIR_CREATED)
+	{
+		time_t t = time(NULL);
+		struct tm *stm = localtime(&t);
+		char buf[sizeof(path)+64];
+		snprintf(buf, sizeof(buf), "%s/sd-%4d%02d%02d%02d%02d%02d.png",
+				 path,
+				 stm->tm_year+1900,
+				 stm->tm_mon+1,
+				 stm->tm_mday,
+				 stm->tm_hour,
+				 stm->tm_min,
+				 stm->tm_sec);
+		GfScrCaptureAsPNG(buf);
 	}
 }
 

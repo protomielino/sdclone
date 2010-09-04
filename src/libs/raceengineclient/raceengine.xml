@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
-<params name="" type="template" mode="mw" version="1.2">
+<params name="" type="template" mode="mw" version="1.3">
 
   <section name="Modules">
     <attstr name="track" val="track"/>
@@ -25,7 +25,7 @@
   <section name="Movie Capture">
     <attstr name="enable capture" in="yes,no" val="no"/>
     <attnum name="fps" val="25"/>
-    <attstr name="output directory" val="/home/torcs/captures"/>
+    <attstr name="output directory" val="captures"/>
   </section>
 
   <section name="Race Engine">

@@ -528,6 +528,8 @@ void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH)
 
 /** Capture screen pixels into an RGB buffer (caller must free the here-allocated buffer).
     @ingroup	screen
+    @param	scrw	address of screen with
+    @param	scrh	address of screen height
     @return	none
  */
 unsigned char* GfScrCapture(int* viewW, int *viewH)
@@ -549,6 +551,44 @@ unsigned char* GfScrCapture(int* viewW, int *viewH)
 	return img;
 }
 
+/** Capture screen pixels into a PNG file
+    @ingroup	screen
+    @param	filename	filename of the png file
+    @return	0 Ok
+		<br>-1 Error
+ */
+int GfScrCaptureAsPNG(const char *filename)
+{
+	int viewW, viewH;
+
+	// Capture screen to an RGB image (in memory) (and measure elapsed time).
+	const double dCaptureBeginTime = GfTimeClock();
+
+	unsigned char* img = GfScrCapture(&viewW, &viewH);
+
+	const double dCaptureEndTime = GfTimeClock();
+
+	const double dCaptureDuration = dCaptureEndTime - dCaptureBeginTime;
+	
+	// Write RGB image to the PNG file (and measure elapsed time).
+	const int nStatus = GfTexWriteImageToPNG(img, filename, viewW, viewH);
+
+	const double dFileWriteDuration = GfTimeClock() - dCaptureEndTime;
+
+	// Free the image buffer.
+	if (img)
+		free(img);
+
+	if (!nStatus)
+		GfLogDebug("Captured screen to %s (capture=%.3f s, PNG=%.3f s)\n",
+				   filename, dCaptureDuration, dFileWriteDuration);
+	else
+		GfLogError("Failed to capture screen to %s\n", filename);
+
+	return nStatus;
+}
+
+// Accessor to the SDL screen surface.
 SDL_Surface* gfScrGetScreenSurface()
 {
 	return ScreenSurface;

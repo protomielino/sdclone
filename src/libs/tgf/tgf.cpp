@@ -703,7 +703,7 @@ int GfNearestPow2 (int x)
     @param	dir	full directory path-name
     @return	GF_DIR_CREATED on success, GF_DIR_CREATION_FAILED otherwise.
  */
-int GfCreateDir(const char *path)
+int GfDirCreate(const char *path)
 {
 	if (path == NULL) {
 		return GF_DIR_CREATION_FAILED;
@@ -743,7 +743,7 @@ int GfCreateDir(const char *path)
 		// Try the parent one (recursive).
 		char *end = strrchr(buf, cPathSeparator);
 		*end = '\0';
-		GfCreateDir(buf);
+		GfDirCreate(buf);
 
 		// Retry.
 		*end = cPathSeparator;

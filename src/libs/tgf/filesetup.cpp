@@ -21,10 +21,8 @@
     @ingroup	tgf
 */
 
-#include <stdio.h>
-#ifndef WIN32
+#include <cstdio>
 #include <sys/stat.h>
-#endif //!WIN32
 
 #include "tgf.h"
 #include "portability.h"
@@ -32,6 +30,7 @@
 #ifndef TRUE
 #define TRUE 1
 #endif //TRUE
+
 #ifndef FALSE
 #define FALSE 0
 #endif //FALSE
@@ -51,7 +50,7 @@ static int GfFileSetupCopyFile( const char* dataLocation, const char* localLocat
 		return -1;
 	}
 
-	GfLogTrace("Updating %s\n", localLocation);
+	GfLogDebug("Updating %s\n", localLocation);
 
 	while( !feof( in ) )
 	{
@@ -90,7 +89,7 @@ static void GfFileSetupCopy( char* dataLocation, char* localLocation, int major,
 	if (lastSlash)
 	{
 	  *lastSlash = '\0';
-	  GfCreateDir( stringBuf );
+	  GfDirCreate( stringBuf );
 	}
 
 	// Copy the source file to its target place.
@@ -133,6 +132,7 @@ void GfFileSetup()
 	int found;
 	int major;
 	int minor;
+	struct stat st;
 
 	filenameLength = strlen(GetDataDir()) + 12 + 40;
 	filename = (char*)malloc( sizeof(char) * filenameLength );
@@ -151,7 +151,7 @@ void GfFileSetup()
 		filename = (char*)malloc( sizeof(char) * filenameLength );
 	}
 
-	GfCreateDir( GetLocalDir() );
+	GfDirCreate( GetLocalDir() );
 
 	sprintf( filename, "%sversion.xml", GetLocalDir() );
 	localVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_CREAT );
@@ -222,14 +222,23 @@ void GfFileSetup()
 						GfFileSetupCopy( dataLocation, absLocalLocation, major, minor, localVersionHandle, -1 );
 					}
 					else
-					    GfLogTrace("up-to-date.\n");
-
+					{
+					    GfLogTrace("up-to-date");
+						if (stat(absLocalLocation, &st))
+						{
+							GfLogTrace(", but the file is not there => installing ...\n");
+							GfFileSetupCopy( dataLocation, absLocalLocation, major, minor, localVersionHandle, -1 );
+						}
+						else
+							GfLogTrace(".\n");
+					}
+					
 					break;
 				}
 			} while( GfParmListSeekNext( localVersionHandle, "versions" ) == 0 );
 		}
 
-		if( !found )
+		if( !found)
 		{
 			index = 0;
 			while( count[index] )

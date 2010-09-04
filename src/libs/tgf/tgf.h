@@ -249,6 +249,7 @@ typedef struct FList
     void		*userData;	/**< User data */
 } tFList;
 
+TGF_API int GfDirCreate(const char *path);
 TGF_API tFList *GfDirGetList(const char *dir);
 TGF_API tFList *GfDirGetListFiltered(const char *dir, const char *prefix, const char *suffix);
 typedef void (*tfDirfreeUserData)(void*);	/**< Function to call for releasing the user data associated with file entry */
@@ -447,8 +448,6 @@ TGF_API int GetSingleTextureMode (void);
 TGF_API void SetSingleTextureMode (void);
 
 TGF_API int GfNearestPow2 (int x);
-
-TGF_API int GfCreateDir(const char *path);
 
 /* Startup file setup */
 TGF_API void GfFileSetup();

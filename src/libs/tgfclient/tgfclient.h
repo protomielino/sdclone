@@ -82,7 +82,8 @@ TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void *GfScrMenuInit(void *precMenu);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
 SDL_Surface* gfScrGetScreenSurface();
-TGFCLIENT_API unsigned char* GfScrCapture(int* viewW, int *viewH);
+TGFCLIENT_API unsigned char* GfScrCaptureAsImage(int* viewW, int *viewH);
+TGFCLIENT_API int GfScrCaptureAsPNG(const char *filename);
 TGFCLIENT_API void GfScrReinit(void*);
 
 /*****************************

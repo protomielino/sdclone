@@ -2,7 +2,7 @@
 
     file        : raceinit.cpp
     created     : Sat Nov 16 10:34:35 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                       
+    copyright   : (C) 2002 by Eric Espie                       
     email       : eric.espie@torcs.org   
     version     : $Id: raceinit.cpp,v 1.18 2006/10/12 22:20:59 berniw Exp $                                  
 
@@ -85,7 +85,7 @@ ReInit(void)
 
 	ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
-	GfOut("Loading Track Loader ...\n");
+	GfLogInfo("Loading Track Loader ...\n");
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
 	sprintf(key, "%smodules/track/%s.%s", GetLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, key, &reEventModList)) return;
@@ -95,14 +95,23 @@ ReInit(void)
 	memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf));
 
 	capture = &(ReInfo->movieCapture);
-	if (strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE, "no"), "no") == 0){
+	if (!strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE, "no"), "no")){
 		capture->enabled = 0;
+		capture->outputBase = 0;
+		GfLogInfo("Movie capture disabled");
 	} else {
 		capture->enabled = 1;
 		capture->state = 0;
-		capture->deltaFrame = 1.0 / GfParmGetNum(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 1.0);
-		capture->outputBase = GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_OUT_DIR, "/tmp");
+		capture->deltaFrame = 1.0 / GfParmGetNum(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 25.0);
 		capture->deltaSimu = RCM_MAX_DT_SIMU;
+		char pszDefOutputBase[256];
+		sprintf(pszDefOutputBase, "%s%s",
+				GetLocalDir(), GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE,
+											RM_ATT_CAPTURE_OUT_DIR, "captures"));
+		capture->outputBase = strdup(pszDefOutputBase);
+		GfDirCreate(pszDefOutputBase); // In case not already done.
+		GfLogInfo("Movie capture enabled (%.0f FPS, PNG frames in %s)\n", 
+				  1.0 / capture->deltaFrame, capture->outputBase);
 	}
 
 	ReInfo->_reGameScreen = ReHookInit();
@@ -134,10 +143,13 @@ void ReShutdown(void)
 			GfParmReleaseHandle(ReInfo->params);
 			ReInfo->params = ReInfo->mainParams;
 		}
-		FREEZ(ReInfo->s);
-		FREEZ(ReInfo->carList);
-		FREEZ(ReInfo->rules);
-		FREEZ(ReInfo->_reFilename);
+		if (ReInfo->movieCapture.outputBase)
+			free(ReInfo->movieCapture.outputBase);
+		free(ReInfo->s);
+		free(ReInfo->carList);
+		free(ReInfo->rules);
+		free(ReInfo->_reFilename);
+		
 		FREEZ(ReInfo);
     }
 }
@@ -419,7 +431,7 @@ initPits(void)
 	} else if (carsPerPit > TR_PIT_MAXCARPERPIT) {
 		carsPerPit = TR_PIT_MAXCARPERPIT;
 	}
-	GfOut("Cars per pit: %d\n", carsPerPit);
+	GfLogInfo("Cars per pit: %d\n", carsPerPit);
 
 	switch (ReInfo->track->pits.type) {
 		case TR_PIT_ON_TRACK_SIDE:
@@ -479,9 +491,9 @@ initPits(void)
 				tTrackOwnPit *pit = &(pits->driversPits[i]);
 				for (j = 0; j < pit->freeCarIndex; j++) {
 					if (j == 0) {
-						GfOut("Pit %d, Team: %s, ", i, pit->car[j]->_teamname); 
+						GfLogTrace("Pit %d, Team: %s, ", i, pit->car[j]->_teamname); 
 					}
-					GfOut("%d: %s ", j, pit->car[j]->_name);
+					GfLogTrace("%d: %s ", j, pit->car[j]->_name);
 				}
 				if (j > 0) {
 					GfOut("\n");
@@ -532,7 +544,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
 	/* good robot found */
 	curModInfo = &((*(ReInfo->modList))->modInfo[modindex]);
-	GfOut("Driver's name: %s\n", curModInfo->name);
+	GfLogInfo("Driver's name: %s\n", curModInfo->name);
 
 	isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
 
@@ -618,7 +630,6 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		
 		// Load alternative car skin file name from race info (if specified).
 		sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
-		GfTrace("RaceInit: File '%s', path3 '%s'\n", GfParmGetFileName(ReInfo->params), path2);
 		const char* pszSkinName = GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, "");
 		if (strlen(pszSkinName) > 0)
 		{
@@ -646,7 +657,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		elt->_endRaceMemPool = NULL;
 		elt->_shutdownMemPool = NULL;
 
-		GfTrace("RaceInit : Driver #%d : module='%s', name='%s', car='%s', cat='%s', skin='%s'\n",
+		GfLogTrace("Driver #%d : module='%s', name='%s', car='%s', cat='%s', skin='%s'\n",
 				carindex, elt->_modName, elt->_name, elt->_carName,
 				elt->_category, elt->_carSkin);
 	
@@ -656,14 +667,14 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 		sprintf(buf, "cars/%s/%s.xml", elt->_carName, elt->_carName);
 		carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 		category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-		GfOut("Loading/merging %s specs for %s ...\n", elt->_carName, curModInfo->name);
+		GfLogTrace("Loading/merging %s specs for %s ...\n", elt->_carName, curModInfo->name);
 		if (category) {
 			strncpy(elt->_category, category, MAX_NAME_LEN - 1);
 			elt->_category[MAX_NAME_LEN - 1] = 0;
 			/* Read Car Category specifications */
 			cathdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 			if (GfParmCheckHandle(cathdle, carhdle)) {
-				GfError("Car %s NOT in Category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+				GfLogError("Car %s NOT in Category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
 				return NULL;
 			}
 			carhdle = GfParmMergeHandles(cathdle, carhdle,
@@ -688,7 +699,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 				handle = NULL;
 			if (handle) {
 				if (GfParmCheckHandle(carhdle, handle)) {
-					GfError("Bad Car parameters for driver %s\n", elt->_name);
+					GfLogError("Bad Car parameters for driver %s\n", elt->_name);
 					return NULL;
 				}
 				handle = GfParmMergeHandles(carhdle, handle,
@@ -709,13 +720,13 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 			}
 		} else {
 			elt->_category[ 0 ] = '\0';
-			GfTrace("Bad Car category for driver %s\n", elt->_name);
+			GfLogError("Bad Car category for driver %s\n", elt->_name);
 			return NULL;
 		}
 
 		return elt;
 	} else {
-		GfTrace("Pb No description file for driver %s\n", cardllname);
+		GfLogError("No description file for driver %s\n", cardllname);
 	}
 	return NULL;
 }
@@ -763,7 +774,7 @@ ReInitCars(void)
 		/* Load the driver type shared library */
 		if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
 		{
-			GfError("Failed to load %s driver\n", path);
+			GfLogError("Failed to load %s driver\n", path);
 			break;
 		}
 
@@ -787,7 +798,7 @@ ReInitCars(void)
 		}
 		else 
 		{
-			GfTrace("Loading driver %s\n", robotModuleName );
+			GfLogTrace("Loading driver %s\n", robotModuleName );
 			sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), robotModuleName, robotModuleName);
 			robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 			if (!robhdle) 
@@ -798,17 +809,15 @@ ReInitCars(void)
 			if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
 			{
 				/* Human driver */
-				GfLogDebug( "robotModuleName (1): %s\n", robotModuleName );
 				elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->modList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
 			}
 			else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
 				                      GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
 			{
-				GfLogDebug( "robotModuleName: %s\n", robotModuleName );
 				elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
 			}
 			else
-				GfError("Pb: No description for driver %s (2)\n", robotModuleName );
+				GfLogError("Pb: No description for driver %s (2)\n", robotModuleName );
 
 		}
 
@@ -819,12 +828,12 @@ ReInitCars(void)
 	nCars = index; /* real number of cars */
 	if (nCars == 0) 
 	{
-		GfError("No driver for that race ; exiting ...\n");
+		GfLogError("No driver for that race ; exiting ...\n");
 		return -1;
 	}
 	else 
 	{
-		GfOut("%d driver(s) ready to race\n", nCars);
+		GfLogInfo("%d driver(s) ready to race\n", nCars);
 	}
 
 	ReInfo->s->_ncars = nCars;
@@ -880,51 +889,51 @@ reDumpTrack(tTrack *track, int verbose)
     switch (track->pits.type) 
 	{
     case TR_PIT_NONE:
-	GfOut("Pits     = none\n");
+	GfLogInfo("Pits     = none\n");
 	break;
     case TR_PIT_ON_TRACK_SIDE:
-	GfOut("Pits     = present on track side\n");
+	GfLogInfo("Pits     = present on track side\n");
 	break;
     case TR_PIT_ON_SEPARATE_PATH:
-	GfOut("Pits     = present on separate path\n");
+	GfLogInfo("Pits     = present on separate path\n");
 	break;
     }
     if (verbose) 
     {
 	for (i = 0, seg = track->seg->next; i < track->nseg; i++, seg = seg->next) 
 	{
-	    GfOut("	segment %d -------------- \n", seg->id);
+	    GfLogTrace("	segment %d -------------- \n", seg->id);
 #ifdef DEBUG
-	    GfOut("        type    %s\n", stype[seg->type]);
+	    GfLogTrace("        type    %s\n", stype[seg->type]);
 #endif
-	    GfOut("        length  %f\n", seg->length);
-	    GfOut("	radius  %f\n", seg->radius);
-	    GfOut("	arc	%f   Zs %f   Ze %f   Zcs %f\n", RAD2DEG(seg->arc),
+	    GfLogTrace("        length  %f\n", seg->length);
+	    GfLogTrace("	radius  %f\n", seg->radius);
+	    GfLogTrace("	arc	%f   Zs %f   Ze %f   Zcs %f\n", RAD2DEG(seg->arc),
 		   RAD2DEG(seg->angle[TR_ZS]),
 		   RAD2DEG(seg->angle[TR_ZE]),
 		   RAD2DEG(seg->angle[TR_CS]));
-	    GfOut("	Za	%f\n", RAD2DEG(seg->angle[TR_ZS]));
-	    GfOut("	vertices: %-8.8f %-8.8f %-8.8f ++++ ",
+	    GfLogTrace("	Za	%f\n", RAD2DEG(seg->angle[TR_ZS]));
+	    GfLogTrace("	vertices: %-8.8f %-8.8f %-8.8f ++++ ",
 		   seg->vertex[TR_SR].x,
 		   seg->vertex[TR_SR].y,
 		   seg->vertex[TR_SR].z);
-	    GfOut("%-8.8f %-8.8f %-8.8f\n",
+	    GfLogTrace("%-8.8f %-8.8f %-8.8f\n",
 		   seg->vertex[TR_SL].x,
 		   seg->vertex[TR_SL].y,
 		   seg->vertex[TR_SL].z);
-	    GfOut("	vertices: %-8.8f %-8.8f %-8.8f ++++ ",
+	    GfLogTrace("	vertices: %-8.8f %-8.8f %-8.8f ++++ ",
 		   seg->vertex[TR_ER].x,
 		   seg->vertex[TR_ER].y,
 		   seg->vertex[TR_ER].z);
-	    GfOut("%-8.8f %-8.8f %-8.8f\n",
+	    GfLogTrace("%-8.8f %-8.8f %-8.8f\n",
 		   seg->vertex[TR_EL].x,
 		   seg->vertex[TR_EL].y,
 		   seg->vertex[TR_EL].z);
-	    GfOut("	prev    %d\n", seg->prev->id);
-	    GfOut("	next    %d\n", seg->next->id);
+	    GfLogTrace("	prev    %d\n", seg->prev->id);
+	    GfLogTrace("	next    %d\n", seg->next->id);
 	}
-	GfOut("From Last To First\n");
-	GfOut("Dx = %-8.8f  Dy = %-8.8f Dz = %-8.8f\n",
+	GfLogTrace("From Last To First\n");
+	GfLogTrace("Dx = %-8.8f  Dy = %-8.8f Dz = %-8.8f\n",
 	       track->seg->next->vertex[TR_SR].x - track->seg->vertex[TR_ER].x,
 	       track->seg->next->vertex[TR_SR].y - track->seg->vertex[TR_ER].y,
 	       track->seg->next->vertex[TR_SR].z - track->seg->vertex[TR_ER].z);
@@ -970,7 +979,7 @@ ReInitTrack(void)
     Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
     cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
 
-    GfLogDebug("Race Name = %s\n", raceName);
+    GfLogDebug("Race Name is '%s'\n", raceName);
     sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
     ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
@@ -988,8 +997,8 @@ ReInitTrack(void)
     	curSurf = track->surfaces;
     	do
     	{
-		GfLogDebug("Raceinit Function Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
-		curSurf = curSurf->next;
+			GfLogDebug("ReInitTrack: Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+			curSurf = curSurf->next;
     	} while ( curSurf != 0);
     #endif
    // End Function DEBUG TRACE Variable kFriction
@@ -1012,7 +1021,7 @@ void ReInitGraphics()
 		return; /* Module is already loaded: don't load again */
 		
 	/* Load the graphic module */
-	GfOut("Loading Graphic Engine...\n");
+	GfLogInfo("Loading Graphic Engine...\n");
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
 	sprintf(key, "%smodules/graphic/%s.%s", GetLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, key, &reEventModList)) return;
@@ -1031,7 +1040,7 @@ ReRaceCleanup(void)
 		if (ReInfo->_reGraphicItf.shutdowncars)
 			ReInfo->_reGraphicItf.shutdowncars();
 		else
-			GfError("WARNING: normal race display but graphical module not loaded !\n" );
+			GfLogError("WARNING: normal race display but graphical module not loaded !\n" );
 	}
 	ReStoreRaceResults(ReInfo->_reRaceName);
 	ReRaceCleanDrivers();

@@ -136,19 +136,19 @@ reMovieCapture(void * /* dummy */)
 
     if (!capture->enabled || ReInfo->_displayMode == RM_DISP_MODE_NONE || ReInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
     {
-	GfOut("Warning: Video capture mode not enabled\n");
+	GfLogWarning("Movie capture is not enabled : command ignored\n");
 	return;
     }
     
     capture->state = 1 - capture->state;
     if (capture->state) {
-	GfOut("Video Capture Mode On\n");
+	GfOut("Starting movie capture\n");
 	capture->currentFrame = 0;
 	capture->currentCapture++;
 	capture->lastFrame = GfTimeClock() - capture->deltaFrame;
 	ReInfo->_displayMode = RM_DISP_MODE_CAPTURE;
     } else {
-	GfOut("Video Capture Mode Off\n");
+	GfOut("Stopping movie capture\n");
 	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
 	ReStart();
     }
@@ -164,22 +164,22 @@ reHideShowMouseCursor(void * /* dummy */)
 static void
 reAddKeys(void)
 {
-    GfuiAddKey(reScreenHandle, GFUIK_F1,        "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(reScreenHandle, GFUIK_F12,       "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(reScreenHandle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(reScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reScreenHandle, '-', "Slow Time",         (void*)0, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '-', "Slow down Time",    (void*)0, reTimeMod, NULL);
     GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, reTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '.', "Real Time",         (void*)2, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '.', "Restore Real Time", (void*)2, reTimeMod, NULL);
     GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
     /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
-    GfuiAddKey(reScreenHandle, ' ', "Skip Pre Start",    (void*)0, reSkipPreStart, NULL);
+    GfuiAddKey(reScreenHandle, ' ', "Skip Pre-start",    (void*)0, reSkipPreStart, NULL);
 #ifdef DEBUG
 	// WARNING: Certainly won't work with multi-threading On/Auto ...
     //GfuiAddKey(reScreenHandle, '0', "One step simulation",    (void*)1, reOneStep, NULL);
 #endif
-    GfuiAddKey(reScreenHandle, 'c', "Movie Capture",      (void*)0, reMovieCapture, NULL);
-    GfuiAddKey(reScreenHandle, 'o', "Hide / Show mouse cursor",      (void*)0, reHideShowMouseCursor, NULL);
+    GfuiAddKey(reScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, reMovieCapture, NULL);
+    GfuiAddKey(reScreenHandle, 'o', "Hide / Show mouse cursor",   (void*)0, reHideShowMouseCursor, NULL);
 }
 
 
