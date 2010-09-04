@@ -43,7 +43,7 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${PACKAGE_FILE_PREFIX}-${CPACK_PACKAGE_VERSI
 
 SET(CPACK_SOURCE_IGNORE_FILES
     "installer/" "doc/design/" "doc/develdoc" "doc/website/"
-    "/\\\\.svn/" "\\\\.bak$" "#.*#$" "~$" "\\\\.~.*" "\\\\.xcf$" "\\\\.xcf\\\\.bz2$" 
+    "/\\\\.svn/" "\\\\.bak$" "#.*#$" "~$" "\\\\.~.*" "\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$" 
     "_CPack_Packages/" "/\\\\.dir/" "/CMakeFiles/" 
     "cmake_install\\\\.cmake$" "CPackConfig\\\\.cmake$" "CPackSourceConfig\\\\.cmake$"
     "CMakeCache\\\\.txt$" "install_manifest\\\\.txt$" "xmlversion_loc\\\\.txt$" 
