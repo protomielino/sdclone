@@ -129,7 +129,7 @@ GfuiHelpScreen(void *prevScreen)
 
     // Create version label.
     const int versionId = CreateLabelControl(scrHandle, menuXMLDescHdle, "versionlabel");
-    GfuiLabelSetText(scrHandle, versionId, VERSION);
+    GfuiLabelSetText(scrHandle, versionId, VERSION_LONG);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
