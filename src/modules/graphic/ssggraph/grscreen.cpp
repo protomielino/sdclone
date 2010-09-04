@@ -261,13 +261,12 @@ void cGrScreen::camDraw(tSituation *s)
 	else
 		speedcar = 0.0f;	
 	grDrawScene(speedcar, s);
-	//grDrawScene();
 	GfProfStopProfile("grDrawScene*");
 }
 
 
 /* Update screen display */
-void cGrScreen::update(tSituation *s, float Fps)
+void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 {
 	int i;
 	ssgLight *light;
@@ -353,7 +352,8 @@ void cGrScreen::update(tSituation *s, float Fps)
 	glDisable(GL_TEXTURE_2D);
 	
 	TRACE_GL("cGrScreen::update glDisable(GL_DEPTH_TEST)");
-	board->refreshBoard(s, Fps, 0, curCar);
+	board->refreshBoard(s, instFps, avgFps, false, curCar,
+						grNbActiveScreens > 1 && grGetCurrentScreen() == this);
 	TRACE_GL("cGrScreen::update display boards");
 	
 	GfProfStopProfile("grDisp**");

@@ -62,7 +62,7 @@ class cGrScreen {
 		inline void deactivate(void) { active = false; }
 		inline void setZoom(const long zoom) { curCam->setZoom(zoom); }
 		int  isInScreen(int x, int y);
-		void update(tSituation *s, float Fps);
+		void update(tSituation *s, float instFps, float avgFps);
 		void camDraw(tSituation *s);
 		void updateCurrent(tSituation *s);
 

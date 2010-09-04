@@ -148,19 +148,19 @@ cGrBoard::selectBoard(int val)
  * 1 - Display the FPS only
  * 2 - Display FPS, the segment the car is on, car's distance from startline, current camera
  * 
- * @param fps Frame per second value to display
+ * @param instFps Instant frame rate value to display
+ * @param avgFps Average frame rate value to display
  * @param car The current car
  */
 void
-cGrBoard::grDispDebug(float fps, tCarElt *car)
+cGrBoard::grDispDebug(float instFps, float avgFps, tCarElt *car)
 {
 	char buf[256];
-	int  x, y;
-	x = Winx + Winw - 100;
-	y = Winy + Winh - 15;
+	int x = Winx + Winw - 100;
+	int y = Winy + Winh - 15;
 	
-	//Display frame per second
-	sprintf(buf, "FPS: %.1f", fps);
+	//Display frame rates (instant and average)
+	sprintf(buf, "FPS: %.1f(%.1f)", instFps, avgFps);
 	GfuiPrintString(buf, grWhite, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
 
 	if(debugFlag == 2) {	//Only display detailed information in Debug Mode 2
@@ -301,20 +301,25 @@ cGrBoard::grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdb
 }
 
 void 
-cGrBoard::grDispMisc(tCarElt *car)
+cGrBoard::grDispMisc(bool bCurrentScreen)
 {
-	float *clr;
-	
-	if (car->_fuel < 5.0f) {
-		clr = grRed;
-	} else {
-		clr = grWhite;
+	if (bCurrentScreen)
+	{
+		// Draw the current screen indicator (only in split screen mode)
+		// (a green-filled square on the bottom right corner of the screen).
+		static const float h = 10.0f;
+		const float w = h; // * Winh / Winw;
+		const float x = Winx + Winw - w - 5; // * Winh / Winw;
+		const float y = Winy + 5;
+		
+		glBegin(GL_QUADS);
+		glColor4f(0.0, 1.0, 0.0, 1.0);
+		glVertex2f(x,     y);
+		glVertex2f(x + w, y);
+		glVertex2f(x + w, y + h);
+		glVertex2f(x,     y + h);
+		glEnd();
 	}
-
-	tdble fw = Winw/800.0f;
-
-	grDrawGauge(545.0f*fw, 20.0f*fw, 80.0f, clr, grBlack, car->_fuel / car->_tank, "F");
-	grDrawGauge(560.0f*fw, 20.0f*fw, 80.0f, grRed, grGreen, (tdble)(car->_dammage) / grMaxDammage, "D");
 }
 
 void
@@ -863,7 +868,17 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
 	}
 	
 	if (counterFlag == 1){
-		grDispMisc(car);
+		float *clr;
+		if (car->_fuel < 5.0f) {
+			clr = grRed;
+		} else {
+			clr = grWhite;
+		}
+		
+		const tdble fw = Winw/800.0f;
+		
+		grDrawGauge(545.0f*fw, 20.0f*fw, 80.0f, clr, grBlack, car->_fuel / car->_tank, "F");
+		grDrawGauge(560.0f*fw, 20.0f*fw, 80.0f, grRed, grGreen, (tdble)(car->_dammage) / grMaxDammage, "D");
 	}
 }
 
@@ -1116,19 +1131,27 @@ void cGrBoard::grGetLapsTime(tSituation *s, tCarElt *car, char* result, char con
 	}
 }
 
-void cGrBoard::refreshBoard(tSituation *s, float Fps, int forceArcade, tCarElt *curr)
+void cGrBoard::refreshBoard(tSituation *s, float instFps, float avgFps,
+							bool forceArcade, tCarElt *currCar, bool isCurrScreen)
 {
+	grDispMisc(isCurrScreen);
+	
 	if (arcadeFlag || forceArcade) {
-		grDispArcade(curr, s);
+		grDispArcade(currCar, s);
 	} else {
-		if (debugFlag) grDispDebug(Fps, curr);
-		if (GFlag) grDispGGraph(curr);
-		if (boardFlag) grDispCarBoard(curr, s);
-		if (leaderFlag)	grDispLeaderBoard(curr, s);
-		if (counterFlag) grDispCounterBoard2(curr);
+		if (debugFlag)
+			grDispDebug(instFps, avgFps, currCar);
+		if (GFlag)
+			grDispGGraph(currCar);
+		if (boardFlag)
+			grDispCarBoard(currCar, s);
+		if (leaderFlag)
+			grDispLeaderBoard(currCar, s);
+		if (counterFlag)
+			grDispCounterBoard2(currCar);
 	}
-
-	trackMap->display(curr, s, Winx, Winy, Winw, Winh);
+	
+	trackMap->display(currCar, s, Winx, Winy, Winw, Winh);
 }
 
 

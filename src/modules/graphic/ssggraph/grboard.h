@@ -40,25 +40,25 @@ class cGrBoard
     int counterFlag;
     int GFlag;
     int arcadeFlag;
-		std::vector<std::string> sShortNames;
+    std::vector<std::string> sShortNames;
 		
  private:
-    void grDispDebug(float fps, tCarElt *car);
+    void grDispDebug(float instFps, float avgFps, tCarElt *car);
     void grDispGGraph(tCarElt *car);
     void grDispCarBoard1(tCarElt *car, tSituation *s);
-    void grDispMisc(tCarElt *car);
+    void grDispMisc(bool bCurrentScreen);
     void grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdble val, const char *title);
     void grDispCarBoard2(tCarElt *car, tSituation *s);
     void grDispCarBoard(tCarElt *car, tSituation *s);
     void grDispCounterBoard(tCarElt *car);
     void grDispLeaderBoard(const tCarElt *car, const tSituation *s);
     void grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const;
-		void grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s);
+    void grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s);
     void grDispCounterBoard2(tCarElt *car);
     void grDispArcade(tCarElt *car, tSituation *s);
-		std::string grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation *s, const bool isLeader) const;
-		// Track overview object
-		cGrTrackMap *trackMap;
+    std::string grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation *s, const bool isLeader) const;
+    // Track overview object
+    cGrTrackMap *trackMap;
 
     bool grGetSplitTime(tSituation *s, tCarElt *car, bool gap_inrace, double &time, int *laps_different, float **color);
     void grGetLapsTime(tSituation *s, tCarElt *car, char* result, char const** label) const;
@@ -66,16 +66,16 @@ class cGrBoard
 		
  public:
     cGrBoard(int myid);
-		~cGrBoard();
+    ~cGrBoard();
 
     void initBoard(void);
     void shutdown(void);
     void selectBoard(int brd);
-    void dispGaph(tCarElt *car);
     void initBoardCar(tCarElt *car);
-		inline cGrTrackMap *getTrackMap() { return trackMap; }
+    inline cGrTrackMap *getTrackMap() { return trackMap; }
 
-    void refreshBoard(tSituation *s, float Fps, int forceArcade, tCarElt *curr);
+    void refreshBoard(tSituation *s, float instFps, float avgFps,
+					  bool forceArcade, tCarElt *currCar, bool isCurrScreen);
     void loadDefaults(tCarElt *curCar);
 };
 

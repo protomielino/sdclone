@@ -524,10 +524,9 @@ grLoadScene(tTrack *track)
 
 void
 grDrawScene(float speedcar, tSituation *s) 
-//grDrawScene(void)
-{	
-	TRACE_GL("refresh: ssgCullAndDraw start");    
-	if ((skydynamic >= SKYDYNAMIC_THR) && (grTrack->skyversion > 0)) 
+{
+	const bool bDrawSky = skydynamic >= SKYDYNAMIC_THR && grTrack->skyversion > 0;
+	if (bDrawSky) 
 	{
 		if(TimeDyn == 1) {grUpdateTime(s);}		
 				
@@ -549,11 +548,14 @@ grDrawScene(float speedcar, tSituation *s)
 		ssgGetLight(0) -> setColour( GL_AMBIENT, scene_ambiant);
 		ssgGetLight(0) -> setColour( GL_DIFFUSE, scene_diffuse);
 		ssgGetLight(0) -> setColour( GL_SPECULAR, scene_specular);
-
-		TRACE_GL("refresh: ssgCullAndDraw start");
-		ssgCullAndDraw(TheScene);
-		TRACE_GL("refresh: ssgCullAndDraw");
-
+	}
+	
+	TRACE_GL("refresh: ssgCullAndDraw start");
+	ssgCullAndDraw(TheScene);
+	TRACE_GL("refresh: ssgCullAndDraw");
+	
+	if (bDrawSky) 
+	{
 		Sky->postDraw(skydynamic);
 		if(RainBool > 0)
 		{
@@ -561,12 +563,6 @@ grDrawScene(float speedcar, tSituation *s)
 		}
 	
 	} 
-	else 
-	{	//if (skydynamic==0 | grTrack->version < 5)
-		TRACE_GL("refresh: ssgCullAndDraw start");
-		ssgCullAndDraw(TheScene);
-		TRACE_GL("refresh: ssgCullAndDraw");
-	}
 }//grDrawScene
 
 

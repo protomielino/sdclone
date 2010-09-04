@@ -27,14 +27,15 @@
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#endif
 
+
+#ifdef WIN32
 ////// Multitexturing Info
 extern PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB ;
 extern PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB;
 extern PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
-
-extern bool InStr(char *searchStr, char *str);
 #endif
 
 extern bool InitMultiTex();
@@ -62,14 +63,21 @@ extern void shutdownTrack(void);
 extern int maxTextureUnits;
 extern tdble grMaxDammage;
 
+// Number of active screens.
+extern int grNbActiveScreens;
+
 extern class cGrScreen *grScreens[];
+extern class cGrScreen* grGetCurrentScreen(void);
+
 
 #define GR_SPLIT_ADD	0
 #define GR_SPLIT_REM	1
 
+#define GR_NEXT_SCREEN	0
+#define GR_PREV_SCREEN	1
+
 #define GR_NB_MAX_SCREEN 4
 
 extern tdble grLodFactorValue;
-extern double grDeltaTime;
 
 #endif /* _GRMAIN_H_ */ 

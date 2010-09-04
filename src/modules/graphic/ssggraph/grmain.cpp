@@ -21,7 +21,6 @@
 #include <windows.h>
 #endif
 
-
 #include <plib/ssg.h>
 #include <glfeatures.h>
 #include <robot.h>	//ROB_SECT_ARBITRARY
@@ -39,14 +38,8 @@
 #include "grboard.h"
 #include "grtracklight.h"
 
+
 int maxTextureUnits = 0;
-static double OldTime;
-static int nFrame;
-static int nTotalFrame;
-static int nSeconds;
-float grFps;
-double grCurTime;
-double grDeltaTime;
 int segIndice = 0;
 
 tdble grMaxDammage = 10000.0;
@@ -57,16 +50,28 @@ void *grTrackHandle = NULL;
 
 int grWinx, grWiny, grWinw, grWinh;
 
-static float grMouseRatioX, grMouseRatioY;
-
 tgrCarInfo *grCarInfo;
 ssgContext grContext;
 class cGrScreen *grScreens[GR_NB_MAX_SCREEN] = {NULL, NULL, NULL, NULL};
-int grNbScreen = 1;
 tdble grLodFactorValue = 1.0;
 
+// FPS indicator variables.
+static float grInstFps; // Instant frame rate (average along a 1 second shifting window).
+static float grAvgFps; // Average frame rate (since the beginning of the race).
+static double dFPSPrevTime;
+static int nFPSFrames;
+static int nFPSTotalFrames;
+static int nFPSTotalSeconds;
 
-static char buf[1024];
+// Mouse coords graphics backend to screen ratios.
+static float fMouseRatioX, fMouseRatioY;
+
+// Number of active screens.
+int grNbActiveScreens = 1;
+
+// Current screen index.
+static int nCurrentScreenIndex = 0;
+
 
 #ifdef WIN32
 #include <GL/glext.h>
@@ -108,33 +113,45 @@ bool InitMultiTex(void)
 }
 
 
-static void grAdaptScreenSize(void)
+static void
+grAdaptScreenSize(void)
 {
-    switch (grNbScreen) {
-    case 0:
-    case 1:
-	grScreens[0]->activate(grWinx, grWiny, grWinw, grWinh);
-	grScreens[1]->deactivate();
-	grScreens[2]->deactivate();
-	grScreens[3]->deactivate();
-	break;
-    case 2:
-	grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2);
-	grScreens[1]->activate(grWinx, grWiny,              grWinw, grWinh / 2);
-	grScreens[2]->deactivate();
-	grScreens[3]->deactivate();
-	break;
-    case 3:
-	grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
-	grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
-	grScreens[2]->activate(grWinx + grWinw / 4, grWiny,              grWinw / 2, grWinh / 2);
-	grScreens[3]->deactivate();
-	break;
-    case 4:
-	grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
-	grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
-	grScreens[2]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2);
-	grScreens[3]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2);
+    switch (grNbActiveScreens)
+	{
+		case 0:
+		case 1:
+			// Full window.
+			grScreens[0]->activate(grWinx, grWiny, grWinw, grWinh);
+			grScreens[1]->deactivate();
+			grScreens[2]->deactivate();
+			grScreens[3]->deactivate();
+			break;
+		case 2:
+			// Top half of the window
+			grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2);
+			// Bottom half of the window
+			grScreens[1]->activate(grWinx, grWiny,              grWinw, grWinh / 2);
+			grScreens[2]->deactivate();
+			grScreens[3]->deactivate();
+			break;
+		case 3:
+			// Top left quarter of the window
+			grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
+			// Top right quarter of the window
+			grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
+			// Bottom half of the window
+			grScreens[2]->activate(grWinx,              grWiny,              grWinw,     grWinh / 2);
+			grScreens[3]->deactivate();
+			break;
+		case 4:
+			// Top left quarter of the window
+			grScreens[0]->activate(grWinx,              grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
+			// Top right quarter of the window
+			grScreens[1]->activate(grWinx + grWinw / 2, grWiny + grWinh / 2, grWinw / 2, grWinh / 2);
+			// Bottom left quarter of the window
+			grScreens[2]->activate(grWinx,              grWiny,              grWinw / 2, grWinh / 2);
+			// Bottom right quarter of the window
+			grScreens[3]->activate(grWinx + grWinw / 2, grWiny,              grWinw / 2, grWinh / 2);
 	break;
     }
 }
@@ -142,90 +159,98 @@ static void grAdaptScreenSize(void)
 static void
 grSplitScreen(void *vp)
 {
+	// Change the number of active screens as specified.
     long p = (long)vp;
 
     switch (p) {
-    case GR_SPLIT_ADD:
-	grNbScreen++;
-	if (grNbScreen > GR_NB_MAX_SCREEN) {
-	    grNbScreen = GR_NB_MAX_SCREEN;
-	}
-	break;
-    case GR_SPLIT_REM:
-	grNbScreen--;
-	if (grNbScreen < 1) {
-	    grNbScreen = 1;
-	}
-	break;
+		case GR_SPLIT_ADD:
+			if (grNbActiveScreens < GR_NB_MAX_SCREEN)
+				grNbActiveScreens++;
+			break;
+		case GR_SPLIT_REM:
+			if (grNbActiveScreens > 1)
+				grNbActiveScreens--;
+			break;
     }
-    GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, grNbScreen);
+
+	// Ensure current screen index stays in the righ range.
+	if (nCurrentScreenIndex >= grNbActiveScreens)
+		nCurrentScreenIndex = grNbActiveScreens - 1;
+
+	// Save nb of active screens to user settings.
+    GfParmSetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, grNbActiveScreens);
     GfParmWriteFile(NULL, grHandle, "Graph");
     grAdaptScreenSize();
 }
 
-static class cGrScreen *
-grGetcurrentScreen(void)
+static void
+grChangeScreen(void *vp)
 {
-    tMouseInfo	*mouse;
-    int		i;
-    int		x, y;
+    long p = (long)vp;
 
-    mouse = GfuiMouseInfo();
-    x = (int)(mouse->X * grMouseRatioX);
-    y = (int)(mouse->Y * grMouseRatioY);
-    for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	if (grScreens[i]->isInScreen(x, y)) {
-	    return grScreens[i];
-	}
+    switch (p) {
+		case GR_NEXT_SCREEN:
+			nCurrentScreenIndex = (nCurrentScreenIndex + 1) % grNbActiveScreens;
+			break;
+		case GR_PREV_SCREEN:
+			nCurrentScreenIndex = (nCurrentScreenIndex - 1 + grNbActiveScreens) % grNbActiveScreens;
+			break;
     }
-    return grScreens[0];
+	GfLogInfo("Changing current screen to #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
+}
+
+class cGrScreen *
+grGetCurrentScreen(void)
+{
+    return grScreens[nCurrentScreenIndex];
 }
 
 static void
 grSetZoom(void *vp)
 {
-    grGetcurrentScreen()->setZoom((long)vp);
+    grGetCurrentScreen()->setZoom((long)vp);
 }
 
 static void
 grSelectCamera(void *vp)
 {
-    grGetcurrentScreen()->selectCamera((long)vp);
+    grGetCurrentScreen()->selectCamera((long)vp);
 }
 
 static void
 grSelectBoard(void *vp)
 {
-    grGetcurrentScreen()->selectBoard((long)vp);
+    grGetCurrentScreen()->selectBoard((long)vp);
 }
 
 static void
 grSelectTrackMap(void * /* vp */)
 {
-    grGetcurrentScreen()->selectTrackMap();
+    grGetCurrentScreen()->selectTrackMap();
 }
 
 static void
 grPrevCar(void * /* dummy */)
 {
-    grGetcurrentScreen()->selectPrevCar();
+    grGetCurrentScreen()->selectPrevCar();
 }
 
 static void
 grNextCar(void * /* dummy */)
 {
-    grGetcurrentScreen()->selectNextCar();
+    grGetCurrentScreen()->selectNextCar();
 }
 
 static void
 grSwitchMirror(void * /* dummy */)
 {
-    grGetcurrentScreen()->switchMirror();
+    grGetCurrentScreen()->switchMirror();
 }
 
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
+	char buf[256];
     int i;
 
     if (maxTextureUnits==0)
@@ -238,14 +263,15 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     grWinw = width;
     grWinh = height;
 
-    grMouseRatioX = width / 640.0;
-    grMouseRatioY = height / 480.0;
+    fMouseRatioX = width / 640.0;
+    fMouseRatioY = height / 480.0;
 
-    OldTime = GfTimeClock();
-    nFrame = 0;
-    nTotalFrame = 0;
-    nSeconds = 0;
-    grFps = 0;
+    dFPSPrevTime = GfTimeClock();
+    nFPSFrames = 0;
+    nFPSTotalFrames = 0;
+    nFPSTotalSeconds = 0;
+    grInstFps = 0;
+    grAvgFps = 0;
 
     if (!grHandle)
     {
@@ -275,20 +301,23 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_F10,      "Follow Car Zoomed", (void*)8, grSelectCamera, NULL);
     GfuiAddKey(screen, GFUIK_F11,      "TV Director View",  (void*)9, grSelectCamera, NULL);
 
-    GfuiAddKey(screen, '5',            "FPS Counter",       (void*)3, grSelectBoard, NULL);
+    GfuiAddKey(screen, '5',            "Debug Info",        (void*)3, grSelectBoard, NULL);
     GfuiAddKey(screen, '4',            "G/Cmd Graph",       (void*)4, grSelectBoard, NULL);
     GfuiAddKey(screen, '3',            "Leaders Board",     (void*)2, grSelectBoard, NULL);
     GfuiAddKey(screen, '2',            "Driver Counters",   (void*)1, grSelectBoard, NULL);
     GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);
     GfuiAddKey(screen, '9',            "Mirror",            (void*)0, grSwitchMirror, NULL);
     GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);
-    GfuiAddKey(screen,  '>',           "Zoom In",           (void*)GR_ZOOM_IN,	grSetZoom, NULL);
-    GfuiAddKey(screen,  '<',           "Zoom Out",          (void*)GR_ZOOM_OUT,	grSetZoom, NULL);
-    GfuiAddKey(screen, '[',            "Split Screen",   (void*)GR_SPLIT_ADD, grSplitScreen, NULL);
-    GfuiAddKey(screen, ']',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
+    GfuiAddKey(screen, '>',            "Zoom In",           (void*)GR_ZOOM_IN,	grSetZoom, NULL);
+    GfuiAddKey(screen, '<',            "Zoom Out",          (void*)GR_ZOOM_OUT,	grSetZoom, NULL);
+    GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, grSplitScreen, NULL);
+    GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
+    GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",     (void*)0, grSelectTrackMap, NULL);
 
     grAdaptScreenSize();
+
+	GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
     grInitScene();
 
@@ -301,26 +330,27 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 int
 refresh(tSituation *s)
 {
-    int			i;
+    int	i;
 
     GfProfStartProfile("refresh");
 
-    nFrame++;
-    nTotalFrame++;
-    grCurTime = GfTimeClock();
-    grDeltaTime = grCurTime - OldTime;
-    if ((grCurTime - OldTime) > 1.0) {
-	/* The Frames Per Second (FPS) display is refreshed every second */
-	grFps = (tdble)nFrame / (grCurTime - OldTime);
-	nFrame = 0;
-	++nSeconds;
-	OldTime = grCurTime;
+	// Compute FPS indicators every second.
+    nFPSFrames++;
+    nFPSTotalFrames++;
+    const double dCurTime = GfTimeClock();
+	const double dDeltaTime = dCurTime - dFPSPrevTime;
+    if (dDeltaTime > 1.0) {
+		++nFPSTotalSeconds;
+		grInstFps = nFPSFrames / dDeltaTime;
+		nFPSFrames = 0;
+		dFPSPrevTime = dCurTime;
+		grAvgFps = (tdble)nFPSTotalFrames / nFPSTotalSeconds;
     }
 
     TRACE_GL("refresh: start");
 
     GfProfStartProfile("grRefreshSound*");
-    grRefreshSound(s, grScreens[0]->getCurCamera());
+    grRefreshSound(s, grGetCurrentScreen()->getCurCamera());
     GfProfStopProfile("grRefreshSound*");
 
 	// WIP #132 (D13) : Moved car collision damage propagation from grcar::grDrawCar.
@@ -333,8 +363,8 @@ refresh(tSituation *s)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     GfProfStopProfile("grDrawBackground/glClear");
 
-    for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	grScreens[i]->update(s, grFps);
+    for (i = 0; i < grNbActiveScreens; i++) {
+		grScreens[i]->update(s, grInstFps, grAvgFps);
     }
 
     grUpdateSmoke(s->currentTime);
@@ -347,6 +377,7 @@ refresh(tSituation *s)
 int
 initCars(tSituation *s)
 {
+	char buf[256];
     char	idx[16];
     int		index;
     int		i;
@@ -380,7 +411,7 @@ initCars(tSituation *s)
 		grInitSkidmarks(elt);
 	}
 
-    grNbScreen = 0;
+    grNbActiveScreens = 0;
     for (i = 0; i < s->_ncars; i++) {
 	elt = s->cars[i];
 	index = elt->index;
@@ -404,16 +435,14 @@ initCars(tSituation *s)
 	grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
 	grCarInfo[index].iconColor[3] = 1.0;
 	grInitCar(elt);
-	if ((elt->_driverType == RM_DRV_HUMAN) && (grNbScreen < GR_NB_MAX_SCREEN) &&(elt->_networkPlayer == 0)) 
+	if ((elt->_driverType == RM_DRV_HUMAN) && (grNbActiveScreens < GR_NB_MAX_SCREEN) &&(elt->_networkPlayer == 0)) 
 	{
-	    grScreens[grNbScreen]->setCurrentCar(elt);
-	    grNbScreen++;
+	    grScreens[grNbActiveScreens]->setCurrentCar(elt);
+	    grNbActiveScreens++;
 	}
     }
 
-    if (grNbScreen == 0) {
-	grNbScreen = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
-    }
+	grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
 
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 	grScreens[i]->initCams(s);
@@ -467,8 +496,10 @@ shutdownCars(void)
 		grScreens[i]->setCurrentCar(NULL);
 	}
 
-	if (nSeconds > 0)
-		printf( "Average FPS: %.2f\n", (double)nTotalFrame/((double)nSeconds+GfTimeClock()-OldTime) );}
+	if (nFPSTotalSeconds > 0)
+		GfLogTrace("Average FPS: %.2f\n",
+				   (double)nFPSTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - dFPSPrevTime));
+}
 
 int
 initTrack(tTrack *track)
@@ -480,7 +511,7 @@ initTrack(tTrack *track)
 	grContext.makeCurrent();
 
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	if (grNbScreen)
+	if (grNbActiveScreens > 0)
 		grLoadScene(track);
 
 	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
@@ -500,7 +531,7 @@ shutdownTrack(void)
 	grShutdownState();
 
 	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-		if (grScreens[i] != NULL) {
+		if (grScreens[i]) {
 			delete grScreens[i];
 			grScreens[i] = NULL;
 		}
