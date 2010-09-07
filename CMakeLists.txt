@@ -93,13 +93,13 @@ ELSE(NEED_SVN_REV)
 	SET(VERSION_LONG "${VERSION}")
 ENDIF(NEED_SVN_REV)
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmake
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/version.h.cmake
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/doxygen_config.cmake
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygen_config.cmake
 	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
 TORCS_INSTALL_FILES(DATA . FILES credits.xml)
@@ -110,5 +110,18 @@ ADD_SUBDIRECTORY(cmake)
 
 INSTALL_TORCSNG_CMAKE()
 
+# Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.
+TORCS_GENERATE_CLOBBER_SCRIPT()
+
+# Add an unistall target.
+CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake" 
+               "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" IMMEDIATE @ONLY)
+IF(WIN32)
+	ADD_CUSTOM_TARGET(UNINSTALL "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
+ELSE(WIN32)
+	ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
+ENDIF(WIN32)
+
+# Configure CPack.
 INCLUDE(cmake/packagemaker.cmake)
 
