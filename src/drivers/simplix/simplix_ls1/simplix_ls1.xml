@@ -19,169 +19,169 @@
 			<section name="0">
 				<attstr name="name" val="Felipe Hernandez"></attstr>
 				<attstr name="desc" val="One of Spain's rising sportcar racing stars"></attstr>
-				<attstr name="team" val="simplix_r9"></attstr>
+				<attstr name="team" val="Archer Racing Team Uguu"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-archer-r9"></attstr>
 				<attnum name="race number" val="41"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.9"></attnum>
+				<attnum name="blue" val="0.7"></attnum>
 			</section>
 
 			<section name="1">
 				<attstr name="name" val="Christoph Ehrhoff"></attstr>
 				<attstr name="desc" val="German racing star who won't move to F1 because the LS1s are too fun"></attstr>
-				<attstr name="team" val="simplix_r9"></attstr>
+				<attstr name="team" val="Archer Racing Team Uguu"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-archer-r9"></attstr>
 				<attnum name="race number" val="42"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.9"></attnum>
+				<attnum name="blue" val="0.7"></attnum>
 			</section>
 
 			<section name="2">
 				<attstr name="name" val="Jeffrey Doughty"></attstr>
 				<attstr name="desc" val="Amazing cook, amazing driver... almost"></attstr>
-				<attstr name="team" val="simplix_vulture"></attstr>
+				<attstr name="team" val="Vulture Heart Racing"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-vulture-v6r"></attstr>
 				<attnum name="race number" val="43"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.9"></attnum>
+				<attnum name="blue" val="0.1"></attnum>
 			</section>
 
 			<section name="3">
 				<attstr name="name" val="Billy Martinson"></attstr>
 				<attstr name="desc" val="Big American guy with big skills"></attstr>
-				<attstr name="team" val="simplix_vulture"></attstr>
+				<attstr name="team" val="Vulture Heart Racing"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-vulture-v6r"></attstr>
 				<attnum name="race number" val="44"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.9"></attnum>
+				<attnum name="blue" val="0.1"></attnum>
 			</section>
 
 			<section name="4">
 				<attstr name="name" val="Kaoru Takeda"></attstr>
 				<attstr name="desc" val="Cold and almost emotionless kid"></attstr>
-				<attstr name="team" val="simplix_ciclon"></attstr>
+				<attstr name="team" val="Japanese Toro Drivers Club"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-toro-rgt"></attstr>
 				<attnum name="race number" val="45"></attnum>
-				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="red" val="0.6"></attnum>
+				<attnum name="green" val="0.6"></attnum>
+				<attnum name="blue" val="0.6"></attnum>
 			</section>
 
 			<section name="5">
 				<attstr name="name" val="Yukie Tsuchikami"></attstr>
 				<attstr name="desc" val="Former Japanese pop idol, surprisingly skilled but mistake prone"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-				<attstr name="team" val="simplix_ciclon"></attstr>
+				<attstr name="team" val="Japanese Toro Drivers Club"></attstr>
 				<attstr name="car name" val="ls1-toro-rgt"></attstr>
 				<attnum name="race number" val="46"></attnum>
-				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="red" val="0.6"></attnum>
+				<attnum name="green" val="0.6"></attnum>
+				<attnum name="blue" val="0.6"></attnum>
 			</section>
 
 			<section name="6">
-				<attstr name="name" val="Mitchell Similian"></attstr>
-				<attstr name="desc" val="Nicknamed 'The Haitian Fighter' by AmericanLDS fans"></attstr>
-				<attstr name="team" val="simplix_cavallo"></attstr>
+				<attstr name="name" val="Emma Pergusa"></attstr>
+				<attstr name="desc" val="Borderline crazy and highly enthusiastic driver"></attstr>
+				<attstr name="team" val="Scuderia Pergusa"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-cavallo-570s1"></attstr>
 				<attnum name="race number" val="47"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.5"></attnum>
+				<attnum name="blue" val="0.15"></attnum>
 			</section>
 
 			<section name="7">
-				<attstr name="name" val="Rafiel Martinez"></attstr>
-				<attstr name="desc" val="Latino racer fire burnin up the race track, ooo oh ohhh"></attstr>
-				<attstr name="team" val="simplix_cavallo"></attstr>
+				<attstr name="name" val="Sophia de la Sarthe"></attstr>
+				<attstr name="desc" val="France's finest girl-racer"></attstr>
+				<attstr name="team" val="Scuderia Pergusa"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-cavallo-570s1"></attstr>
 				<attnum name="race number" val="48"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.5"></attnum>
+				<attnum name="blue" val="0.15"></attnum>
 			</section>
 
 			<section name="8">
 				<attstr name="name" val="Micheal Brettmans"></attstr>
 				<attstr name="desc" val="Aggressive and relentless competitor"></attstr>
-				<attstr name="team" val="simplix_zentek"></attstr>
+				<attstr name="team" val="Telemachi Racing Team"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-zentek-z7r"></attstr>
 				<attnum name="race number" val="49"></attnum>
-				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="red" val="0.0"></attnum>
+				<attnum name="green" val="0.9"></attnum>
+				<attnum name="blue" val="0.8"></attnum>
 			</section>
 
 			<section name="9">
 				<attstr name="name" val="Audrey Sanchez"></attstr>
 				<attstr name="desc" val="Straying from the footsteps of her deceased father to set her own legend"></attstr>
-				<attstr name="team" val="simplix_zentek"></attstr>
+				<attstr name="team" val="Telemachi Racing Team"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-zentek-z7r"></attstr>
 				<attnum name="race number" val="50"></attnum>
-				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="red" val="0.0"></attnum>
+				<attnum name="green" val="0.9"></attnum>
+				<attnum name="blue" val="0.8"></attnum>
 			</section>
 			
 			<section name="10">
 				<attstr name="name" val="Maxim Sirois"></attstr>
 				<attstr name="desc" val="Canadian sensation, heroic and almost too brave for his own good"></attstr>
-				<attstr name="team" val="simplix_newcastle"></attstr>
+				<attstr name="team" val="Newcastle Cars"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-newcastle-fury"></attstr>
 				<attnum name="race number" val="47"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="1.0"></attnum>
+				<attnum name="blue" val="0.0"></attnum>
 			</section>
 
 			<section name="11">
 				<attstr name="name" val="Mikhaila Frabrovsky"></attstr>
 				<attstr name="desc" val="One of Poland's finest racers, could be a rising star"></attstr>
-				<attstr name="team" val="simplix_newcastle"></attstr>
+				<attstr name="team" val="Newcastle Cars"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-newcastle-fury"></attstr>
 				<attnum name="race number" val="48"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="1.0"></attnum>
+				<attnum name="blue" val="0.0"></attnum>
 			</section>
 
 			<section name="12">
 				<attstr name="name" val="Xavier Bertaux"></attstr>
 				<attstr name="desc" val="Drives GT cars because he's bored of F1"></attstr>
-				<attstr name="team" val="simplix_taipan"></attstr>
+				<attstr name="team" val="Free French Racers team Orcana"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-taipan-ltsr"></attstr>
 				<attnum name="race number" val="49"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.1"></attnum>
+				<attnum name="blue" val="0.1"></attnum>
 			</section>
 
 			<section name="13">
 				<attstr name="name" val="Jean-Phillipe Meuret"></attstr>
 				<attstr name="desc" val="SpeedDreams project manager"></attstr>
-				<attstr name="team" val="simplix_taipan"></attstr>
+				<attstr name="team" val="Free French Racers team Orcana"></attstr>
 				<attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
 				<attstr name="car name" val="ls1-taipan-ltsr"></attstr>
 				<attnum name="race number" val="50"></attnum>
 				<attnum name="red" val="1.0"></attnum>
-				<attnum name="green" val="0.3"></attnum>
-				<attnum name="blue" val="0.3"></attnum>
+				<attnum name="green" val="0.1"></attnum>
+				<attnum name="blue" val="0.1"></attnum>
 			</section>
 		</section>
 	</section>
