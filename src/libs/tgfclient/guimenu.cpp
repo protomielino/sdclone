@@ -467,7 +467,7 @@ CreateLabel(void *menuHandle,void *param,const char *pControlName)
 {
         if (strcmp(GfParmGetStr(param, pControlName, "type", ""), "label"))
         {
-                GfError("Error: Control '%s' is not a 'label'\n", pControlName);
+                GfLogError("Failed to create label control '%s' : not a 'label'\n", pControlName);
                 return -1;
         }
         
@@ -644,7 +644,8 @@ CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void
         else if(!strcmp(pszType, "imagebutton"))
                 return CreateImageButtonControl(menuHandle,param,strControlName.c_str(),userData,onpush,NULL,NULL,NULL);
         else
-            GfError("Error: Unknown button type '%s' for Control %s\n", pszType,pControlName);
+            GfLogError("Failed to create button control '%s' of unknown type '%s'\n",
+					   pControlName, pszType);
 
         return -1;
 }
@@ -658,7 +659,7 @@ CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *us
         const char* pszType = GfParmGetStr(param, strControlName.c_str(), "type", "");
         if (strcmp(pszType, "editbox"))
         {
-                GfError("Error: Control '%s' is not an 'editbox' \n", pControlName);
+                GfLogError("Failed to create control '%s' : not an 'editbox' \n", pControlName);
                 return -1;
         }
 
@@ -757,7 +758,7 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
         const char* pszType = GfParmGetStr(param, strControlName.c_str(), "type", "");
         if (strcmp(pszType, "scrolllist"))
         {
-                GfError("Error: Control '%s' is not a 'scrolllist' \n", pControlName);
+                GfLogError("Failed to create control '%s' : not a 'scrolllist' \n", pControlName);
                 return -1;
         }
 
@@ -792,11 +793,11 @@ CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,vo
 }
 
 bool 
-CreateStaticControls(void *param,void *menuHandle)
+CreateStaticControls(void *param, void *menuHandle)
 {
 	if (param==NULL)
 	{
-		GfError("ERROR: XML menu is not loaded");
+		GfLogError("Failed to create static controls (XML menu descriptor not yet loaded)\n");
 		return false;
 	}
 
@@ -821,7 +822,8 @@ CreateStaticControls(void *param,void *menuHandle)
             }
             else
             {
-                    GfError("Errot: Unknown static control type '%s'\n", pszType);
+                    GfLogWarning("Failed to create static control '%s' of unknown type '%s'\n",
+								 pszType);
             }
     }
 
@@ -1030,7 +1032,7 @@ int GfuiMenuScreen::CreateButtonControl(const char *pszName, void *userData, tfu
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateButtonControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create button control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1053,7 +1055,7 @@ int GfuiMenuScreen::CreateButtonControlEx(const char *pszName, void *userDataOnP
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateButtonControlEx(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create(ex) button control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1072,7 +1074,7 @@ int GfuiMenuScreen::CreateStaticImageControl(const char *pszName)
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateStaticImageControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create static image control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1091,7 +1093,7 @@ int GfuiMenuScreen::CreateLabelControl(const char *pszName)
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateLabelControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create label control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1113,7 +1115,7 @@ int GfuiMenuScreen::CreateEditControl(const char *pszName,
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateEditControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create edit control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1134,7 +1136,7 @@ int GfuiMenuScreen::CreateScrollListControl(const char *pszName,
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateScrollListControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create scroll-list control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1155,7 +1157,7 @@ int GfuiMenuScreen::CreateComboboxControl(const char *pszName,
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateComboboxControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create combo-box control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1176,7 +1178,7 @@ int GfuiMenuScreen::CreateCheckboxControl(const char *pszName,
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateCheckboxControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create check-box control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
@@ -1195,7 +1197,7 @@ int GfuiMenuScreen::CreateProgressbarControl(const char *pszName)
 		return nCtrlId;
 	}
 
-	GfError("GfuiMenuScreen::CreateProgressbarControl(%s) : Duplicate name\n", pszName);
+	GfLogError("Failed to create progress-bar control '%s' : duplicate name\n", pszName);
 	return -1;
 }
 
