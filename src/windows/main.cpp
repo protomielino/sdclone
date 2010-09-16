@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "../../config.h"
+#include <config.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -37,16 +37,16 @@
 static void
 init_args(int argc, char **argv)
 {
+	// Determine and store run-time install root dir.
+	GfInitInstallDir(argv[0]);
+
+	// Parse command line args.
+    int i = 1;
     const char *localdir = 0;
     const char *libdir = 0;
     const char *datadir = 0;
     const char *bindir = 0;
-    int i;
 
-    static const int BUFSIZE = MAX_PATH;
-    char buf[BUFSIZE];
-
-    i = 1;
     while (i < argc)
     {
 	// -l or /l option : User settings dir (named "local dir")
@@ -67,12 +67,6 @@ init_args(int argc, char **argv)
             if (++i < argc)
                 datadir = SetDataDir(argv[i]);
         }
-        // -B or /B option : Binaries dir (the dir where Speed Dreams exe and DLLs are installed)
-        else if (!strncmp(argv[i], "-B", 2) || !strncmp(argv[i], "/B", 2))
-        {
-            if (++i < argc)
-                bindir = SetBinDir(argv[i]);
-        }
         // -s or /s option : Single texture mode (= disable multi-texturing)
         else if (!strncmp(argv[i], "-s", 2) || !strncmp(argv[i], "/s", 2))
         {
@@ -83,7 +77,7 @@ init_args(int argc, char **argv)
         {
            GfuiMouseSetHWPresent();
         }
-        // -t option : Trace level threashold (only #ifdef TRACE_OUT)
+        // -t option : Trace level threshold (only #ifdef TRACE_OUT)
         else if (!strncmp(argv[i], "-t", 2))
         {
             int nTraceLevel;
@@ -109,55 +103,14 @@ init_args(int argc, char **argv)
     // If any of the Speed-Dreams dirs not run-time specified / empty, 
     // use associated compile-time variable TORCS_XXDIR to get default value
     if (!(localdir && strlen(localdir)))
-    {
-      // Interpret a heading '~' in TORCS_LOCALDIR as the <My documents> folder path
-      // (to give the user an easy access to advanced settings).
-      if (strlen(TORCS_LOCALDIR) > 1 && TORCS_LOCALDIR[0] == '~' 
-          && (TORCS_LOCALDIR[1] == '/' || TORCS_LOCALDIR[1] == '\\'))
-      {
-        LPITEMIDLIST pidl;
-        if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
-            && SHGetPathFromIDList(pidl, buf))
-        {
-          if (buf[0] && buf[strlen(buf)-1] != '/')
-            strcat(buf, "/");
-          strcat(buf, TORCS_LOCALDIR+2);
-          for (i = 0; i < BUFSIZE && buf[i]; i++)
-            if (buf[i] == '\\')
-              buf[i] = '/';
-          localdir = SetLocalDir(buf);
-        }
-        else
-        {
-          printf("Could not get user's My documents folder path\n");
-          exit(1);
-        }
-      }
-      else
-        localdir = SetLocalDir(TORCS_LOCALDIR);
-    }
-
-        //Default paths
-        TCHAR szDir[MAX_PATH];
-        GetCurrentDirectory(MAX_PATH,szDir);
-        GfOut("Current Dir %s\n",szDir);
-        std::string strDefault = szDir;
-        std::string strEnd = strDefault.substr(strDefault.size()-4,4);
-        if (strEnd == "\\bin")
-                strDefault = strDefault.substr(0,strDefault.size()-4);
-
-        std::string strBinDir = strDefault+"\\bin";
-        std::string strLibDir = strDefault+"\\lib";
-        std::string strDataDir = strDefault+"\\share";
-
-    if (!(libdir && strlen(libdir)))
-                libdir = SetLibDir(strLibDir.c_str());
+		localdir = SetLocalDir(TORCS_LOCALDIR);
+	if (!(libdir && strlen(libdir)))
+		libdir = SetLibDir(TORCS_LIBDIR);
     if (!(bindir && strlen(bindir)))
-                bindir = SetBinDir(strBinDir.c_str());
+		bindir = SetBinDir(TORCS_BINDIR);
     if (!(datadir && strlen(datadir)))
-                datadir = SetDataDir(strDataDir.c_str());
-
-
+		datadir = SetDataDir(TORCS_DATADIR);
+	
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
          || !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
@@ -196,7 +149,7 @@ main(int argc, char *argv[])
 {
     GfInit();
 
-        init_args(argc, argv);
+	init_args(argc, argv);
 
     GfFileSetup();          /* Update user settings files from an old version */
     WindowsSpecInit();      /* init specific windows functions */

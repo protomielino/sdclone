@@ -32,6 +32,10 @@
 static void
 init_args(int argc, char **argv)
 {
+	// Initialize run-time detected installation dir.
+	GfInitInstallDir(argv[0]);
+	
+	// Parse command line args.
     const char *localdir = 0;
     const char *libdir = 0;
     const char *datadir = 0;
@@ -73,7 +77,7 @@ init_args(int argc, char **argv)
         {
             GfuiMouseSetHWPresent();
         }
-        // -t option : Trace level threashold (only #ifdef TRACE_OUT)
+        // -t option : Trace level threshold (only #ifdef TRACE_OUT)
         else if (!strncmp(argv[i], "-t", 2))
         {
             int nTraceLevel;

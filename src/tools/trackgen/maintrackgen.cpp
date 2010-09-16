@@ -40,6 +40,7 @@
 #include <plib/ssg.h>
 
 #include <SDL/SDL.h>
+#include <config.h>
 #include <tgfclient.h>
 #include <track.h>
 
@@ -114,10 +115,14 @@ void usage(void)
 
 void init_args(int argc, char **argv)
 {
+	// Determine and store run-time install root dir.
+	GfInitInstallDir(argv[0]);
+	
 #ifdef WIN32
     int i=0;
 #else
     int	c;    
+	char* libDir = 0;
 #endif
     TrackOnly = 1;
 	JustCalculate = 0;
@@ -198,8 +203,7 @@ void init_args(int argc, char **argv)
 	    UseBorder = 0;
 	    break;
 	case 'L':
-	    sprintf(buf, "%s/", optarg);
-	    SetLibDir(buf);
+	    libDir = strdup(optarg);
 	    break;
 	default:
 	    usage();
@@ -207,7 +211,18 @@ void init_args(int argc, char **argv)
 	    break;
 	}
     }
+
+	// Initialize run-time libs path.
+	if (libDir)
+	{
+		SetLibDir(libDir);
+		free(libDir);
+	}
+	else
+		SetLibDir(TORCS_LIBDIR);
+	
 #else
+	
     i = 1;
     while (i < argc) {
 	if (strncmp(argv[i], "-h", 2) == 0) {
@@ -265,7 +280,16 @@ void init_args(int argc, char **argv)
 	}
 	i++;
     }
+	
+	// Initialize run-time libs path.
+	SetLibDir(TORCS_LIBDIR);
+	
 #endif
+
+	// Initialize other run-time pathes.
+	SetBinDir(TORCS_BINDIR);
+	SetDataDir(TORCS_DATADIR);
+	SetLocalDir(TORCS_LOCALDIR);
 
     if (!TrackName || !TrackCategory) {
 	usage();
@@ -281,6 +305,7 @@ extern void WindowsSpecInit(void);
 int
 main(int argc, char **argv)
 {
+    //GfInit(); Not useful here (apart if we want the trace system)
 
     init_args(argc, argv);
 
@@ -325,7 +350,7 @@ Generate(void)
 
 	// Tested for windows only
 	if (!datadir)
-		datadir = "../share/";
+		datadir = "../data/";
 
 	// Get the trackgen paramaters.
 	sprintf(buf, "%s", CFG_FILE);

@@ -433,23 +433,28 @@ enum { GfAffinityAnyCPU = -1 };
 TGF_API bool GfSetThreadAffinity(int nCPUId);
 
 /* Run-time dirs accessors */
-TGF_API const char *GetLocalDir(void);
-TGF_API const char *SetLocalDir(const char *buf);
-TGF_API const char *GetLibDir(void);
-TGF_API const char *SetLibDir(const char *buf);
+TGF_API void GfInitInstallDir(const char *pszExecutablePath);
+TGF_API const char* GfGetInstallDir();
 
-TGF_API const char *GetDataDir(void);
-TGF_API const char *SetDataDir(const char *buf);
-TGF_API const char *GetBinDir(void);
-TGF_API const char *SetBinDir(const char *buf);
+TGF_API const char *GetLocalDir();
+TGF_API const char *SetLocalDir(const char *pszPath);
+
+TGF_API const char *GetLibDir();
+TGF_API const char *SetLibDir(const char *pszPath);
+
+TGF_API const char *GetDataDir();
+TGF_API const char *SetDataDir(const char *pszPath);
+
+TGF_API const char *GetBinDir();
+TGF_API const char *SetBinDir(const char *pszPath);
 
 /* MISC */
-TGF_API int GetSingleTextureMode (void);
-TGF_API void SetSingleTextureMode (void);
+TGF_API int GetSingleTextureMode();
+TGF_API void SetSingleTextureMode();
 
-TGF_API int GfNearestPow2 (int x);
+TGF_API int GfNearestPow2(int x);
 
-/* Startup file setup */
+/* Settings files run-time setup */
 TGF_API void GfFileSetup();
 
 

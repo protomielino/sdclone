@@ -41,7 +41,6 @@
 
 std::string g_strMenuFile;
 
-#ifdef WIN32
 static void
 init_args(int argc, char **argv)
 {
@@ -49,16 +48,18 @@ init_args(int argc, char **argv)
     const char *libdir = 0;
     const char *datadir = 0;
     const char *bindir = 0;
-    int i;
 
-    static const int BUFSIZE = MAX_PATH;
-    char buf[BUFSIZE];
+	// Determine and store run-time install root dir.
+	GfInitInstallDir(argv[0]);
 
-    i = 1;
+	// Parse command line args.
+#ifdef WIN32
+
+    int i = 1;
     while (i < argc)
     {
-	// -l or /l option : User settings dir (named "local dir")
-	if (!strncmp(argv[i], "-l", 2) || !strncmp(argv[i], "/l", 2))
+		// -l or /l option : User settings dir (named "local dir")
+		if (!strncmp(argv[i], "-l", 2) || !strncmp(argv[i], "/l", 2))
         {
   	    if (++i < argc)
 	        localdir = SetLocalDir(argv[i]);
@@ -91,91 +92,18 @@ init_args(int argc, char **argv)
         {
            GfuiMouseSetHWPresent();
         }
-	else
-	{
-		g_strMenuFile = argv[i];
-	}
+		else
+		{
+			g_strMenuFile = argv[i];
+		}
+		
         // Next arg (even if current not recognized).
         i++;
     }
 
-    // If any of the Speed-Dreams dirs not run-time specified / empty, 
-    // use associated compile-time variable TORCS_XXDIR to get default value
-    if (!(localdir && strlen(localdir)))
-    {
-      // Interpret a heading '~' in TORCS_LOCALDIR as the <My documents> folder path
-      // (to give the user an easy access to advanced settings).
-      if (strlen(TORCS_LOCALDIR) > 1 && TORCS_LOCALDIR[0] == '~' 
-	  && (TORCS_LOCALDIR[1] == '/' || TORCS_LOCALDIR[1] == '\\'))
-      {
-	LPITEMIDLIST pidl;
-	if (SUCCEEDED(SHGetSpecialFolderLocation(NULL, CSIDL_PERSONAL, &pidl))
-	    && SHGetPathFromIDList(pidl, buf))
-	{
-	  if (buf[0] && buf[strlen(buf)-1] != '/')
-	    strcat(buf, "/");
-	  strcat(buf, TORCS_LOCALDIR+2);
-	  for (i = 0; i < BUFSIZE && buf[i]; i++)
-	    if (buf[i] == '\\')
-	      buf[i] = '/';
-	  localdir = SetLocalDir(buf);
-	}
-	else
-	{
-	  printf("Could not get user's My documents folder path\n");
-	  exit(1);
-	}
-      }
-      else
-	localdir = SetLocalDir(TORCS_LOCALDIR);
-    }
-
-		//Default paths
-	TCHAR szDir[MAX_PATH];
-	GetCurrentDirectory(MAX_PATH,szDir);
-	GfOut("Current Dir %s\n",szDir);
-	std::string strDefault = szDir;
-	std::string strEnd = strDefault.substr(strDefault.size()-4,4);
-	if (strEnd == "\\bin")
-		strDefault = strDefault.substr(0,strDefault.size()-4);
-
-	std::string strBinDir = strDefault+"\\bin";
-	std::string strLibDir = strDefault+"\\lib";
-	std::string strDataDir = strDefault+"\\share";
-
-    if (!(libdir && strlen(libdir)))
-		libdir = SetLibDir(strLibDir.c_str());
-    if (!(bindir && strlen(bindir)))
-		bindir = SetBinDir(strBinDir.c_str());
-    if (!(datadir && strlen(datadir)))
-		datadir = SetDataDir(strDataDir.c_str());
-
-    // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
-    if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
- 	|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
-    {
- 	GfTrace("TORCS_LOCALDIR : '%s'\n", TORCS_LOCALDIR);
-	GfTrace("TORCS_LIBDIR   : '%s'\n", TORCS_LIBDIR);
-	GfTrace("TORCS_BINDIR   : '%s'\n", TORCS_BINDIR);
-	GfTrace("TORCS_DATADIR  : '%s'\n", TORCS_DATADIR);
-	GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
-	exit(1);
-    }
-
-    // If "data dir" specified in any way, cd to it.
-    if (datadir && strlen(datadir))
- 	chdir(datadir);
-}
 #else
-static void
-init_args(int argc, char **argv)
-{
-	const char *localdir = 0;
-	const char *libdir = 0;
-	const char *datadir = 0;
-	const char *bindir = 0;
 
-	int i = 1;
+    int i = 1;
 	while (i < argc) 
 	{
 		// -l option : User settings dir (named "local dir")
@@ -220,35 +148,35 @@ init_args(int argc, char **argv)
 		// Next arg (even if current not recognized).
 		i++;
 	}
-
-	// If any of the game dirs not run-time specified / empty, 
-	// use associated compile-time variable TORCS_XXDIR to get default value
-	if (!(localdir && strlen(localdir)))
+#endif
+	
+    // If any of the Speed-Dreams dirs not run-time specified / empty, 
+    // use associated compile-time variable TORCS_XXDIR to get default value
+    if (!(localdir && strlen(localdir)))
 		localdir = SetLocalDir(TORCS_LOCALDIR);
 	if (!(libdir && strlen(libdir)))
 		libdir = SetLibDir(TORCS_LIBDIR);
-	if (!(bindir && strlen(bindir)))
+    if (!(bindir && strlen(bindir)))
 		bindir = SetBinDir(TORCS_BINDIR);
-	if (!(datadir && strlen(datadir)))
+    if (!(datadir && strlen(datadir)))
 		datadir = SetDataDir(TORCS_DATADIR);
-
-	// Check if ALL the game dirs have a usable value, and exit if not.
-	if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
-		|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
-	{
+	
+    // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
+    if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
+ 	|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
+    {
 		GfTrace("TORCS_LOCALDIR : '%s'\n", TORCS_LOCALDIR);
 		GfTrace("TORCS_LIBDIR   : '%s'\n", TORCS_LIBDIR);
 		GfTrace("TORCS_BINDIR   : '%s'\n", TORCS_BINDIR);
 		GfTrace("TORCS_DATADIR  : '%s'\n", TORCS_DATADIR);
 		GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
 		exit(1);
-	}
+    }
 
-	// If "data dir" specified in any way, cd to it.
-	if (datadir && strlen(datadir))
+    // If "data dir" specified in any way, cd to it.
+    if (datadir && strlen(datadir))
 		chdir(datadir);
 }
-#endif
 
 void ShowMenu(const char *pMenuFile)
 {
@@ -260,6 +188,8 @@ void ShowMenu(const char *pMenuFile)
 int
 main(int argc, char *argv[])
 {
+    //GfInit(); Not useful here (apart if we want the trace system)
+
     init_args(argc, argv);
 
     GfFileSetup();          /* Update user settings files from an old version */
@@ -274,11 +204,10 @@ main(int argc, char *argv[])
 
 	if (g_strMenuFile == "")
 	{
-		printf("No menu file specified\nUSEAGE\nsd-menuview menufile.xml\n");
+		printf("No menu file specified\nUSAGE\nsd-menuview menufile.xml\n");
 		return 0;
 	}
 
-	SetDataDir("c:/users/gavin/sd-game/share/");
 	ShowMenu(g_strMenuFile.c_str());
 
     GfelMainLoop();          /* event loop */
