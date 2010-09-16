@@ -3,6 +3,8 @@ INCLUDE(InstallRequiredSystemLibraries)
 ##########################################################################################
 # Settings that are common to all target systems.
 
+SET(INTERNAL_NAME "speed-dreams")
+
 SET(CPACK_PACKAGE_NAME "Speed Dreams")
 SET(CPACK_PACKAGE_VENDOR "the Speed Dreams team")
 SET(CPACK_PACKAGE_CONTACT "http:\\\\\\\\www.speed-dreams.org")
@@ -10,7 +12,7 @@ SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Speed Dreams (an Open Motorsport Sim) is 
 SET(CPACK_RESOURCE_FILE_LICENSE "${SOURCE_DIR}/COPYING")
 SET(CPACK_RESOURCE_FILE_README "${SOURCE_DIR}/README")
 
-SET(EXECUTABLE_NAME "speed-dreams")
+SET(EXECUTABLE_NAME "${INTERNAL_NAME}")
 SET(CPACK_PACKAGE_EXECUTABLES "${EXECUTABLE_NAME};Start ${CPACK_PACKAGE_NAME}")
 
 # Version settings.
@@ -27,7 +29,7 @@ SET(CPACK_PACKAGE_VERSION "${VERSION_LONG}")
 #ENDIF(NOT SVN_FIND_REV_FAILED)
 
 # Binary package settings.
-SET(PACKAGE_FILE_PREFIX "speed-dreams")
+SET(PACKAGE_FILE_PREFIX "${INTERNAL_NAME}")
 #SET(CPACK_OUTPUT_CONFIG_FILE "/home/andy/vtk/CMake-bin/CPackConfig.cmake")
 #SET(CPACK_PACKAGE_DESCRIPTION_FILE "/home/andy/vtk/CMake/Copyright.txt")
 
@@ -74,6 +76,8 @@ IF(WIN32)
 
     # General note: There is a bug in NSI that does not handle full unix paths properly.
     # Make sure there is at least one set of four (4) backlasshes.
+
+	SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${INTERNAL_NAME}-${VERSION_LONG}")
 
     SET(EXECUTABLE_PATHNAME "$INSTDIR\\\\bin\\\\${EXECUTABLE_NAME}.exe")
 
@@ -123,7 +127,7 @@ IF(WIN32)
                 "\\\\.sln$" "\\\\.suo$" "\\\\.ncb$" "\\\\.vcproj*")
 
     # Add the PACKAGE_SRC project in the MSVC solution
-    # (CMake 2.6 or 2.8 fails to do this itself).
+    # (CMake 2.6 and 2.8 fail to do this itself).
     ADD_CUSTOM_TARGET(PACKAGE_SRC)
     ADD_CUSTOM_COMMAND(TARGET PACKAGE_SRC
                        COMMAND ${CMAKE_CPACK_COMMAND} -C $(OutDir) --config ./CPackSourceConfig.cmake)
