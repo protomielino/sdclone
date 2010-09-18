@@ -949,61 +949,58 @@ reDumpTrack(const tTrack *track, int verbose)
 int
 ReInitTrack(void)
 {
-    const char  *trackName;
-    const char  *catName;
-    const char  *raceName;
+  const char  *trackName;
+  const char  *catName;
+  const char  *raceName;
 
-    int curTrkIdx;
-    int cloud;
-    int Timeday;
-    //int rain;
+  //int rain;
 
-    void  *params = ReInfo->params;
-    void  *results = ReInfo->results;
+  void  *params = ReInfo->params;
+  void  *results = ReInfo->results;
   
-    raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
+  raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 
-    curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
-    sprintf(buf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-    trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
-    if (!trackName)
+  int curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+  sprintf(buf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
+  trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
+  if (!trackName)
     return -1;
 
-    catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
-    if (!catName) 
+  catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
+  if (!catName) 
     return -1;
 
-    sprintf(buf, "Loading track %s ...", trackName);
-    RmLoadingScreenSetText(buf);
+  GfLogDebug("Race Name is '%s'\n", raceName);
+  sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
+  ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
-    Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
-    cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
+  sprintf(buf, "Loading track %s", ReInfo->track->name);
+  RmLoadingScreenSetText(buf);
 
-    GfLogDebug("Race Name is '%s'\n", raceName);
-    sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
-    ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
+  int Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
+  int cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
 
-    ReInfo->track->weather = cloud;
-    ReInfo->track->Timeday = Timeday;
-  
-    reDumpTrack(ReInfo->track, 0.0);
+  ReInfo->track->Timeday = Timeday;
+  ReInfo->track->weather = cloud;
 
-    ReStartWeather();
+  reDumpTrack(ReInfo->track, 0.0);
 
-    //DEBUG WEATHER - Verification function update friction
-    #ifdef DEBUG
-      tTrack *track = ReInfo->track;
-      tTrackSurface *curSurf;
-      curSurf = track->surfaces;
-      do
-      {
-      GfLogDebug("ReInitTrack: Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
-      curSurf = curSurf->next;
-      } while ( curSurf != 0);
-    #endif
-   // End Function DEBUG TRACE Variable kFriction
-    return 0;
-}
+  ReStartWeather();
+
+  //DEBUG WEATHER - Verification function update friction
+#ifdef DEBUG
+  tTrack *track = ReInfo->track;
+  tTrackSurface *curSurf;
+  curSurf = track->surfaces;
+  do {
+    GfLogDebug("ReInitTrack: Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
+    curSurf = curSurf->next;
+    } while ( curSurf != 0);
+#endif
+  // End Function DEBUG TRACE Variable kFriction
+  return 0;
+}//ReInitTrack
+
 
 /**
  * This functions initialized the graphics.
