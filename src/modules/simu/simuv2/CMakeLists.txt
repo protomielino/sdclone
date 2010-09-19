@@ -1,6 +1,6 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-ADD_TORCSLIB_INCLUDEDIR(portability)
+ADD_SDLIB_INCLUDEDIR(portability)
 
 INCLUDE_DIRECTORIES(../simuv2.1/SOLID-2.0/include)
 
@@ -14,7 +14,7 @@ SET(SIMUV2_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(math tgf robottools)
+ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 
 IF(WIN32)
 	ADD_LIBRARY(simuv2 SHARED ${SIMUV2_SOURCES} simuv2.def)
@@ -26,7 +26,7 @@ IF(UNIX)
 	SET_TARGET_PROPERTIES(simuv2 PROPERTIES PREFIX "")
 ENDIF(UNIX)
 
-ADD_TORCSLIB_LIBRARY(simuv2 tgf robottools solid)
+ADD_SDLIB_LIBRARY(simuv2 tgf robottools solid)
 
-TORCS_INSTALL_FILES(LIB modules/simu TARGETS simuv2)
+SD_INSTALL_FILES(LIB modules/simu TARGETS simuv2)
 

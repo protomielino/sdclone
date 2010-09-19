@@ -101,24 +101,24 @@ init_args(int argc, char **argv)
     }
 
     // If any of the Speed-Dreams dirs not run-time specified / empty, 
-    // use associated compile-time variable TORCS_XXDIR to get default value
+    // use associated compile-time variable SD_XXDIR to get default value
     if (!(localdir && strlen(localdir)))
-		localdir = SetLocalDir(TORCS_LOCALDIR);
+		localdir = SetLocalDir(SD_LOCALDIR);
 	if (!(libdir && strlen(libdir)))
-		libdir = SetLibDir(TORCS_LIBDIR);
+		libdir = SetLibDir(SD_LIBDIR);
     if (!(bindir && strlen(bindir)))
-		bindir = SetBinDir(TORCS_BINDIR);
+		bindir = SetBinDir(SD_BINDIR);
     if (!(datadir && strlen(datadir)))
-		datadir = SetDataDir(TORCS_DATADIR);
+		datadir = SetDataDir(SD_DATADIR);
 	
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
          || !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
     {
-        GfTrace("TORCS_LOCALDIR : '%s'\n", GetLocalDir());
-        GfTrace("TORCS_LIBDIR   : '%s'\n", GetLibDir());
-        GfTrace("TORCS_BINDIR   : '%s'\n", GetBinDir());
-        GfTrace("TORCS_DATADIR  : '%s'\n", GetDataDir());
+        GfTrace("SD_LOCALDIR : '%s'\n", GetLocalDir());
+        GfTrace("SD_LIBDIR   : '%s'\n", GetLibDir());
+        GfTrace("SD_BINDIR   : '%s'\n", GetBinDir());
+        GfTrace("SD_DATADIR  : '%s'\n", GetDataDir());
         GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
         exit(1);
     }

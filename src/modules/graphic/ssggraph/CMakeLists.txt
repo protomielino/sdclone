@@ -27,7 +27,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 
-ADD_TORCSLIB_INCLUDEDIR(client math tgf tgfclient robottools)
+ADD_SDLIB_INCLUDEDIR(client math tgf tgfclient robottools)
 ADD_OPENAL_INCLUDEDIR()
 
 IF(COMMAND CMAKE_POLICY)
@@ -50,7 +50,7 @@ ENDIF(UNIX)
 ADD_PLIB_LIBRARY(ssggraph ssg ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(ssggraph)
 
-ADD_TORCSLIB_LIBRARY(ssggraph tgf tgfclient robottools)
+ADD_SDLIB_LIBRARY(ssggraph tgf tgfclient robottools)
 
 IF(OPENAL_FOUND)
 	TARGET_LINK_LIBRARIES(ssggraph ${OPENAL_LIBRARY})
@@ -61,7 +61,7 @@ IF(OPENGL_FOUND)
 ENDIF(OPENGL_FOUND)
 
 
-TORCS_INSTALL_FILES(DATA config USER config FILES graph.xml sound.xml)
-TORCS_INSTALL_FILES(LIB modules/graphic TARGETS ssggraph)
+SD_INSTALL_FILES(DATA config USER config FILES graph.xml sound.xml)
+SD_INSTALL_FILES(LIB modules/graphic TARGETS ssggraph)
 
 

@@ -5,7 +5,7 @@ SET(TRACK_SOURCES track.cpp track3.cpp track4.cpp trackitf.cpp trackutil.cpp)
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(math tgf robottools)
+ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 
 IF(WIN32)
 	ADD_LIBRARY(track SHARED ${TRACK_SOURCES} track.def)
@@ -18,6 +18,6 @@ IF(UNIX)
 ENDIF(UNIX)
 
 ADD_PLIB_LIBRARY(track ul sg)
-ADD_TORCSLIB_LIBRARY(track tgf robottools)
+ADD_SDLIB_LIBRARY(track tgf robottools)
 
-TORCS_INSTALL_FILES(LIB modules/track TARGETS track)
+SD_INSTALL_FILES(LIB modules/track TARGETS track)

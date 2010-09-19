@@ -3,7 +3,7 @@ PROJECT(sd-menuview)
 
 SET(MENUVIEW_SOURCES main.cpp previewmenu.cpp)
 
-ADD_TORCSLIB_INCLUDEDIR(client robottools tgf tgfclient math portability)
+ADD_SDLIB_INCLUDEDIR(client robottools tgf tgfclient math portability)
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 ADD_INTERFACE_INCLUDEDIR()
@@ -22,7 +22,7 @@ IF (WIN32)
 ENDIF(WIN32)
 
 
-ADD_TORCSLIB_LIBRARY(sd-menuview robottools tgf tgfclient client)
+ADD_SDLIB_LIBRARY(sd-menuview robottools tgf tgfclient client)
 
 
 IF(OPENGL_FOUND)
@@ -35,5 +35,5 @@ ADD_SDL_LIBRARY(sd-menuview)
 ADD_PLIB_LIBRARY(sd-menuview sg ssg ul)
 ADD_DL_LIBRARY(sd-menuview)
 
-TORCS_INSTALL_FILES(BIN TARGETS sd-menuview)
+SD_INSTALL_FILES(BIN TARGETS sd-menuview)
 

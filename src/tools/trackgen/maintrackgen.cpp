@@ -219,7 +219,7 @@ void init_args(int argc, char **argv)
 		free(libDir);
 	}
 	else
-		SetLibDir(TORCS_LIBDIR);
+		SetLibDir(SD_LIBDIR);
 	
 #else
 	
@@ -282,14 +282,14 @@ void init_args(int argc, char **argv)
     }
 	
 	// Initialize run-time libs path.
-	SetLibDir(TORCS_LIBDIR);
+	SetLibDir(SD_LIBDIR);
 	
 #endif
 
 	// Initialize other run-time pathes.
-	SetBinDir(TORCS_BINDIR);
-	SetDataDir(TORCS_DATADIR);
-	SetLocalDir(TORCS_LOCALDIR);
+	SetBinDir(SD_BINDIR);
+	SetDataDir(SD_DATADIR);
+	SetLocalDir(SD_LOCALDIR);
 
     if (!TrackName || !TrackCategory) {
 	usage();

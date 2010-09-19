@@ -660,15 +660,15 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	*pLastPathSep = 0;
 	gfInstallDir = makeRunTimeDirPath(pszPath);
 
-	// If the path to the folder where the executable is stored ends with TORCS_BINDIR,
-	// then the install dir path ends right at the beginning of TORCS_BINDIR.
-	char* pBinDir = strstr(gfInstallDir, TORCS_BINDIR);
-	if (pBinDir - gfInstallDir == strlen(gfInstallDir) - strlen(TORCS_BINDIR))
+	// If the path to the folder where the executable is stored ends with SD_BINDIR,
+	// then the install dir path ends right at the beginning of SD_BINDIR.
+	char* pBinDir = strstr(gfInstallDir, SD_BINDIR);
+	if (pBinDir - gfInstallDir == strlen(gfInstallDir) - strlen(SD_BINDIR))
 	{
 		*pBinDir = 0;
 	}	
 	// Otherwise, let's consider the install dir is the current dir
-	// (quite strange : the executable is not in TORCS_BINDIR ? When can this happen ?).
+	// (quite strange : the executable is not in SD_BINDIR ? When can this happen ?).
 	else
 	{
 		getcwd(pszPath, 512);

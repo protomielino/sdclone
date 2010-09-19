@@ -2,19 +2,19 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(networking)
 
-SET(TORCSNETWORK_SOURCES network.h network.cpp server.cpp client.cpp robotxml.cpp robotxml.h)
+SET(SD_NETWORK_SOURCES network.h network.cpp server.cpp client.cpp robotxml.cpp robotxml.h)
 
 #disable developer warning
 if (COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-ADD_LIBRARY(networking SHARED ${TORCSNETWORK_SOURCES})
+ADD_LIBRARY(networking SHARED ${SD_NETWORK_SOURCES})
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(networking portability tgf math)
+ADD_SDLIB_INCLUDEDIR(networking portability tgf math)
 
 ADD_PLIB_INCLUDEDIR()
 ADD_ENET_INCLUDEDIR()
@@ -27,10 +27,10 @@ IF(WIN32)
 ENDIF(WIN32)
 
 
-ADD_TORCSLIB_LIBRARY(networking tgf)
+ADD_SDLIB_LIBRARY(networking tgf)
 
 IF(WIN32)
-	TORCS_INSTALL_FILES(BIN TARGETS networking)
+	SD_INSTALL_FILES(BIN TARGETS networking)
 ELSE(WIN32)
-	TORCS_INSTALL_FILES(LIB lib TARGETS networking)
+	SD_INSTALL_FILES(LIB lib TARGETS networking)
 ENDIF(WIN32)

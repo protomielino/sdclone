@@ -14,7 +14,7 @@ ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(confscreens tgf tgfclient raceengineclient racescreens math)
+ADD_SDLIB_INCLUDEDIR(confscreens tgf tgfclient raceengineclient racescreens math)
 ADD_SDL_INCLUDEDIR()
 ADD_ENET_INCLUDEDIR()
 
@@ -31,7 +31,7 @@ ENDIF(WIN32)
 ADD_LIBRARY(client SHARED ${CLIENT_SOURCES})
 
 #ADD_PLIB_LIBRARY(client ssg ul sg sl ssg ssgaux)
-ADD_TORCSLIB_LIBRARY(client confscreens tgfclient raceengineclient racescreens track ssggraph robottools)
+ADD_SDLIB_LIBRARY(client confscreens tgfclient raceengineclient racescreens track ssggraph robottools)
 
 ADD_OPENGL_LIBRARY(client)
 ADD_SDL_LIBRARY(client)
@@ -43,9 +43,9 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(WIN32)
-	TORCS_INSTALL_FILES(BIN TARGETS client)
+	SD_INSTALL_FILES(BIN TARGETS client)
 ELSE(WIN32)
-	TORCS_INSTALL_FILES(LIB lib TARGETS client)
+	SD_INSTALL_FILES(LIB lib TARGETS client)
 ENDIF(WIN32)
-TORCS_INSTALL_FILES(INCLUDE FILES client.h exitmenu.h)
+SD_INSTALL_FILES(INCLUDE FILES client.h exitmenu.h)
 

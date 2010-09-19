@@ -5,7 +5,7 @@ PROJECT(texmapper)
 SET(TEXMAPPER_SOURCES maintexmapper.cpp ssgSaveAC.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(tgf tgfclient)
+ADD_SDLIB_INCLUDEDIR(tgf tgfclient)
 ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 
@@ -18,7 +18,7 @@ ADD_EXECUTABLE(sd-texmapper ${TEXMAPPER_SOURCES})
 
 ADD_PLIB_LIBRARY(sd-texmapper sg ssg ul)
 
-ADD_TORCSLIB_LIBRARY(sd-texmapper tgf tgfclient)
+ADD_SDLIB_LIBRARY(sd-texmapper tgf tgfclient)
 
 
 ADD_PNG_LIBRARY(sd-texmapper)
@@ -27,5 +27,5 @@ IF(UNIX)
 	ADD_XRANDR_LIBRARY(sd-texmapper)
 ENDIF(UNIX)
 
-TORCS_INSTALL_FILES(BIN TARGETS sd-texmapper)
+SD_INSTALL_FILES(BIN TARGETS sd-texmapper)
 

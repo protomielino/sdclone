@@ -5,7 +5,7 @@ INCLUDE(../../../cmake/macros.cmake)
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 
-ADD_TORCSLIB_INCLUDEDIR(tgf math portability client networking)
+ADD_SDLIB_INCLUDEDIR(tgf math portability client networking)
 ADD_SDL_INCLUDEDIR()
 ADD_JPEG_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
@@ -31,7 +31,7 @@ ENDIF(WIN32)
 ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
 
 ADD_PLIB_LIBRARY(tgfclient ssg ul sg sl ssg ssgaux)
-ADD_TORCSLIB_LIBRARY(tgfclient tgf networking)
+ADD_SDLIB_LIBRARY(tgfclient tgf networking)
 
 ADD_PNG_LIBRARY(tgfclient)
 ADD_JPEG_LIBRARY(tgfclient)
@@ -59,13 +59,13 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(UNIX)
-	TORCS_INSTALL_FILES(LIB lib TARGETS tgfclient)
+	SD_INSTALL_FILES(LIB lib TARGETS tgfclient)
 ELSE(UNIX)
-	TORCS_INSTALL_FILES(BIN TARGETS tgfclient)
+	SD_INSTALL_FILES(BIN TARGETS tgfclient)
 ENDIF(UNIX)
 
 
-TORCS_INSTALL_FILES(DATA config USER config FILES screen.xml)
+SD_INSTALL_FILES(DATA config USER config FILES screen.xml)
 
-TORCS_INSTALL_FILES(INCLUDE FILES glfeatures.h screen_properties.h tgfclient.h)
+SD_INSTALL_FILES(INCLUDE FILES glfeatures.h screen_properties.h tgfclient.h)
 

@@ -2,7 +2,7 @@ ADD_SUBDIRECTORY(SOLID-2.0)
 
 INCLUDE(../../../../cmake/macros.cmake)
 
-ADD_TORCSLIB_INCLUDEDIR(portability)
+ADD_SDLIB_INCLUDEDIR(portability)
 
 #SOLID-source: it doesn't do the subdirectory first
 SET(SOLID_SOURCES SOLID-2.0/src/Transform.cpp SOLID-2.0/src/Convex.cpp
@@ -38,7 +38,7 @@ SET(SIMUV2.1_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(math tgf robottools)
+ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 INCLUDE_DIRECTORIES(SOLID-2.0/include)
 
 IF(WIN32)
@@ -51,7 +51,7 @@ IF(UNIX)
 	SET_TARGET_PROPERTIES(simuv2.1 PROPERTIES PREFIX "")
 ENDIF(UNIX)
 
-ADD_TORCSLIB_LIBRARY(simuv2.1 tgf robottools solid)
+ADD_SDLIB_LIBRARY(simuv2.1 tgf robottools solid)
 
-TORCS_INSTALL_FILES(LIB modules/simu TARGETS simuv2.1)
+SD_INSTALL_FILES(LIB modules/simu TARGETS simuv2.1)
 

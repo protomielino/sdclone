@@ -8,7 +8,7 @@ SET(LEARNING_SOURCES ANN.cpp Distribution.cpp List.cpp MathFunctions.cpp
                      ann_policy.cpp policy.cpp string_utils.cpp
 		     ${LEARNING_HEADERS})
 
-ADD_TORCSLIB_INCLUDEDIR(portability)
+ADD_SDLIB_INCLUDEDIR(portability)
 
 # Disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -23,10 +23,10 @@ ENDIF(WIN32)
 ADD_LIBRARY(learning SHARED ${LEARNING_SOURCES})
 
 IF(WIN32)
-	TORCS_INSTALL_FILES(BIN TARGETS learning)
+	SD_INSTALL_FILES(BIN TARGETS learning)
 ELSE(WIN32)
-	TORCS_INSTALL_FILES(LIB lib TARGETS learning)
+	SD_INSTALL_FILES(LIB lib TARGETS learning)
 ENDIF(WIN32)
 
-TORCS_INSTALL_FILES(INCLUDE learning FILES ${LEARNING_HEADERS})
+SD_INSTALL_FILES(INCLUDE learning FILES ${LEARNING_HEADERS})
 

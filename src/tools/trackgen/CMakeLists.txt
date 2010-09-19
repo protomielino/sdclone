@@ -6,7 +6,7 @@ SET(TRACKGEN_SOURCES ac3d.cpp easymesh.cpp elevation.cpp maintrackgen.cpp
 	             ac3d.h easymesh.h elevation.h objects.h relief.h trackgen.h util.h
 		     )
 
-ADD_TORCSLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
+ADD_SDLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 ADD_INTERFACE_INCLUDEDIR()
@@ -25,7 +25,7 @@ IF (WIN32)
 ENDIF(WIN32)
 
 
-ADD_TORCSLIB_LIBRARY(sd-trackgen robottools tgf tgfclient client)
+ADD_SDLIB_LIBRARY(sd-trackgen robottools tgf tgfclient client)
 
 
 IF(OPENGL_FOUND)
@@ -38,5 +38,5 @@ ADD_SDL_LIBRARY(sd-trackgen)
 ADD_PLIB_LIBRARY(sd-trackgen sg ssg ul)
 ADD_DL_LIBRARY(sd-trackgen)
 
-TORCS_INSTALL_FILES(BIN TARGETS sd-trackgen)
+SD_INSTALL_FILES(BIN TARGETS sd-trackgen)
 

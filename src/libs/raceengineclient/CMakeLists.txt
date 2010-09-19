@@ -12,12 +12,12 @@ SET(RACEENGINECLIENT_SOURCES racecareer.cpp raceupdate.cpp racenetwork.cpp racec
 							 raceweather.h racemanmenu.h raceresults.h racesimusimu.h 
 							 racestate.h racesituation.h singleplayer.h networkingmenu.h)
 
-ADD_TORCS_DEFINITIONS()
+ADD_SD_DEFINITIONS()
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 
-ADD_TORCSLIB_INCLUDEDIR(confscreens math portability racescreens robottools 
+ADD_SDLIB_INCLUDEDIR(confscreens math portability racescreens robottools 
 						tgf tgfclient networking)
 
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
@@ -34,15 +34,15 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_LIBRARY(raceengineclient SHARED ${RACEENGINECLIENT_SOURCES})
 
-ADD_TORCSLIB_LIBRARY(raceengineclient confscreens racescreens robottools tgf tgfclient networking)
+ADD_SDLIB_LIBRARY(raceengineclient confscreens racescreens robottools tgf tgfclient networking)
 
 IF(WIN32)
-	TORCS_INSTALL_FILES(BIN TARGETS raceengineclient)
+	SD_INSTALL_FILES(BIN TARGETS raceengineclient)
 ELSE(WIN32)
-	TORCS_INSTALL_FILES(LIB lib TARGETS raceengineclient)
+	SD_INSTALL_FILES(LIB lib TARGETS raceengineclient)
 ENDIF(WIN32)
 
-TORCS_INSTALL_FILES(DATA config USER config FILES raceengine.xml)
+SD_INSTALL_FILES(DATA config USER config FILES raceengine.xml)
 
-TORCS_INSTALL_FILES(INCLUDE FILES raceinit.h singleplayer.h)
+SD_INSTALL_FILES(INCLUDE FILES raceinit.h singleplayer.h)
 

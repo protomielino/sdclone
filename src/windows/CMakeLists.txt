@@ -3,27 +3,27 @@ PROJECT(speed-dreams)
 
 ADD_PLIB_INCLUDEDIR()
 
-SET(TORCS_SOURCES main.cpp windowsspec.cpp speed-dreams.rc ../../data/data/icons/icon.ico)
+SET(SD_SOURCES main.cpp windowsspec.cpp speed-dreams.rc ../../data/data/icons/icon.ico)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_TORCSLIB_INCLUDEDIR(client tgf tgfclient portability)
+ADD_SDLIB_INCLUDEDIR(client tgf tgfclient portability)
 
 #disable developer warning
 if (COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-ADD_EXECUTABLE(speed-dreams ${TORCS_SOURCES})
+ADD_EXECUTABLE(speed-dreams ${SD_SOURCES})
 
 include_directories(../libs)
-ADD_TORCSLIB_LIBRARY(speed-dreams client tgf ssggraph)
+ADD_SDLIB_LIBRARY(speed-dreams client tgf ssggraph)
 
 ADD_PLIB_LIBRARY(speed-dreams sg ssg ul)
 
-TORCS_INSTALL_FILES(INCLUDE FILES osspec.h)
+SD_INSTALL_FILES(INCLUDE FILES osspec.h)
 
-TORCS_INSTALL_FILES(BIN TARGETS speed-dreams)
+SD_INSTALL_FILES(BIN TARGETS speed-dreams)
 
 # Install OpenAL and SDL DLLs close to Speed Dreams executable
 FIND_PACKAGE(OpenAL)
@@ -36,4 +36,4 @@ GET_FILENAME_COMPONENT(SDLLIBPATH ${SDL_LIBRARY} PATH)
 GET_FILENAME_COMPONENT(SDLLIBNAME ${SDL_LIBRARY} NAME_WE)
 SET(SDLDLLPATHNAME ${SDLLIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDLLIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
-TORCS_INSTALL_FILES(BIN FILES ${OPENALDLLPATHNAME} ${SDLDLLPATHNAME})
+SD_INSTALL_FILES(BIN FILES ${OPENALDLLPATHNAME} ${SDLDLLPATHNAME})

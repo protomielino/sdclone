@@ -142,8 +142,8 @@
 /* #undef inline */
 #endif
 
-#define TORCS_DATADIR "${TORCS_DATADIR}/"
-#define TORCS_LIBDIR "${TORCS_LIBDIR}/"
-#define TORCS_BINDIR "${TORCS_BINDIR}/"
-#define TORCS_LOCALDIR "${TORCS_LOCALDIR}/"
+#define SD_DATADIR "${SD_DATADIR}/"
+#define SD_LIBDIR "${SD_LIBDIR}/"
+#define SD_BINDIR "${SD_BINDIR}/"
+#define SD_LOCALDIR "${SD_LOCALDIR}/"
 

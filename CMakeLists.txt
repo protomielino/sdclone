@@ -102,16 +102,16 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.cmake
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygen_config.cmake
 	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
-TORCS_INSTALL_FILES(DATA . FILES credits.xml)
+SD_INSTALL_FILES(DATA . FILES credits.xml)
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(cmake)
 
-INSTALL_TORCSNG_CMAKE()
+INSTALL_SD_CMAKE()
 
 # Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.
-TORCS_GENERATE_CLOBBER_SCRIPT()
+SD_GENERATE_CLOBBER_SCRIPT()
 
 # Add an unistall target.
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake" 
