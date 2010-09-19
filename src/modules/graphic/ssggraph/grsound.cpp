@@ -38,15 +38,15 @@ enum SoundMode {DISABLED, OPENAL_MODE, PLIB_MODE};
 
 static enum SoundMode sound_mode = OPENAL_MODE;
 
+static const char *soundDisabledStr = GR_ATT_SOUND_STATE_DISABLED;
+static const char *soundOpenALStr = GR_ATT_SOUND_STATE_OPENAL;
+static const char *soundPlibStr = GR_ATT_SOUND_STATE_PLIB;
 
 void grInitSound(tSituation* s, int ncars)
 {
 	char	buf[256];
 
 	// Check if we want sound (sound.xml).
-	const char *soundDisabledStr = GR_ATT_SOUND_STATE_DISABLED;
-	const char *soundOpenALStr = GR_ATT_SOUND_STATE_OPENAL;
-	const char *soundPlibStr = GR_ATT_SOUND_STATE_PLIB;
 	char fnbuf[1024];
 	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
@@ -59,10 +59,10 @@ void grInitSound(tSituation* s, int ncars)
 	} else if (!strcmp(optionName, soundPlibStr)) {
 		sound_mode = PLIB_MODE;
 	}
+	GfLogInfo("Initializing sound engine (%s)\n", optionName);
 	GfParmReleaseHandle(paramHandle);
 	paramHandle = NULL;
 
-	GfLogInfo("Initializing sound engine (%s)\n", optionName);
 
 	// WIP #132 (D13) : see grRefreshSound.
 	//lastUpdated = -1000.0;
