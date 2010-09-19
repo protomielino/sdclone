@@ -637,6 +637,8 @@ static void	*RestartRaceHookHandle = 0;
 static void
 RestartRaceHookActivate(void * /* dummy */)
 {
+	ReShutdownUpdater();
+
 	ReRaceCleanup();
 	
 	ReInfo->_reState = RE_STATE_PRE_RACE;
