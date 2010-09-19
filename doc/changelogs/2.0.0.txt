@@ -1,0 +1,88 @@
+Speed Dreams changes since 1.4.0
+
+Here are the summarized changes since 1.4.0
+(More details for associated milestones 2.0.0 and 1.4.1 here : 
+ http://sourceforge.net/apps/trac/speed-dreams/report/6)
+
+Dxx ids refer to tasks "specified" and listed here :
+http://sourceforge.net/apps/trac/speed-dreams/wiki/BigFeatureList
+
+... among the planned ones for 2.0.0 :
+http://sourceforge.net/apps/trac/speed-dreams/wiki/ActualFeaturePlanFor20
+
+More technical details about the work in progress for some tasks here :
+http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
+
+2.0.0 Alpha 1 -----------------------------------------------------------------------------
+
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a1@2720.
+
+Tracks:
+* A32, A16, A17, A19, A22, A24 : HQ texture rework + renaming + localization
+  for Alpine-1 (=> Allondaz), GTrack3 (=> Charmey), Manton (=> Michigan Speedway),
+  ETrack6 (=> Espie), ERoad (=> Prenzlau)
+* Texture improvements + localization : Aalborg, Forza, Forza, Migrants, Ruudskogen, 
+  Corkscrew, Olethros Road, Wheel1
+* Texture improvements : GTrack1, Brondehach
+* new Goldstone Sand (Silverstone Arena) track
+* many new work-in-progress tracks (won't be all in 2.0.0, only release grade ones)
+
+Cars:
+* T01 : Work in progress LS1 setups rework
+* A10 : Work in progress LS1 liveries HQ rework
+* A05, A06, A08 : Improved visual realism / HQ for SC Cavallo 360
+* A14 : Work in progress Rally car set (draft-level physical setups)
+* A42 : Work in progress MP5 (was GP 1600) car set
+* improved car model file/folder names consistency
+
+Robots:
+* D16 : Adapted Simplix and USR to the new Career mode
+* Simplix improvements
+
+Menus:
+* D30 : Player Config and sons :
+  - removed player car choice (becomes a race-time choice)
+  - added customizable steering speed sensitivity
+* D29, D30 : Driver Select and sons (D29 & D30) :
+  - added skin selection and preview (may only remain for human players in the future)
+    Note: Only one car has previews for the moment : SC Lynx 220.
+  - added "Car Selection and Settings" menu behind the "Change car" button,
+    with skin selection and preview + quick car data sheet
+    (work in progress : hard coded constant Overall ratings)
+* Options : added options to customize Simulation and Graphic features
+
+Race engine / screen:
+* Display average frame rate in the race screen
+* Spit screen mode (multiplayer) : 
+  - 'TAB' key switches to active screen,
+  - sound follows the active screen selection consistently,
+  - wider 3rd screen in 3-way split screen,
+  - split screen configuration is now saved / restored between races.
+* D13 : Dual-threaded race engine with CPU affinity 
+  (can be toggled on/off in the Options / Simulation menu)
+  First tests show FPS gains mainly when many opponents on medium to high end configurations,
+  but CPU affinity seems to be very usefull under Windows XP (nearly no use with Linux 2.6).
+* D19 : Rain simulation (visual effects + work in progress grip management)
+* Customizable weather / time of day for the sky dome
+
+Simulation engines:
+* D48 : Work in progress Simu v2.1 (same a Simu V2 for the moment)
+* Simu V3 won't be adopted as the official physics engine : we'll improve Simu V2
+  into Simu V2.1 in the short 2.x term, while targetting at a brand new Simu V4
+  in the medium term.
+
+Other:
+* D04 : CMake build system
+* D03 : Replaced GLUT by SDL
+* D16 : New "Career" race mode
+* D17, D26 : Work in progress network/online race mode
+* Improved keyboard steering behaviour (+ customizable sensitivity)
+* D05 : Added JPEG image support for car and tracks previews in menus.
+* D06 : Removed compile time dependency on ALUT
+* Moved Windows build to modern DLL interface (no more .def files)
+* D11 : Support for multiple cars with saùe 3D model .acc/.ac file
+* D08 : Work-in-progress code profiling 
+  (see http://sourceforge.net/apps/trac/speed-dreams/wiki/CodeProfiling)
+
+
+Known issues : see http://sourceforge.net/apps/trac/speed-dreams/report/2 (version 2.0.0 alpha1).
