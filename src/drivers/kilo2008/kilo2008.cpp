@@ -29,6 +29,8 @@
 
 #include "kdriver.h"
 
+#include <robot.h>  //ROB_IDENT
+
 #define NBBOTS 2
 
 static char* botname[NBBOTS] = {(char*)"Kilo 1", (char*)"Kilo 2"};

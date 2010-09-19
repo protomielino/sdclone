@@ -26,7 +26,7 @@
 #ifndef _KDRIVER_H_
 #define _KDRIVER_H_
 
-#include "driver.h"
+#include "driver.h" //class Driver
 #include <string>
 
 class KDriver: public Driver
@@ -37,18 +37,21 @@ public:
 
   //Callback for TORCS
   void drive(tSituation * s);
+  int pitCommand(tSituation * s);
   void initTrack(tTrack * t, void *carHandle, void **carParmHandle,
           tSituation * s);
-  string bot;   //to make it possible to differentiate between Kilo & Dots
+  void newRace(tCarElt * car, tSituation * s);
+  std::string bot;   //to make it possible to differentiate between Kilo & Dots
   
 protected:
   //inherited from Driver
   bool isStuck();
   void update(tSituation * s);
-  float filterBrakeSpeed(float brake);
-  float filterBColl(float brake);
-  float filterOverlap(float accel);
-  float getOffset();
+  double filterBrakeSpeed(double brake);
+  double filterBColl(double brake);
+  double filterOverlap(double accel);
+  double getOffset();
+  void calcSpeed();
   void setAvoidRight() {avoidmode |= AVOIDRIGHT;}
   void setAvoidLeft() {avoidmode |= AVOIDLEFT;}
   bool oppTooFarOnSide(tCarElt *ocar);
@@ -57,19 +60,15 @@ protected:
   Opponent * get_overlapping_opp();
   Opponent * get_takeover_opp();
   Opponent * get_sidecoll_opp();
-  float filter_overlapped_offset(Opponent *o);
-  float filter_takeover_offset(Opponent *o);
-  float filter_sidecoll_offset(Opponent *o, const double);
+  double filter_overlapped_offset(Opponent *o);
+  double filter_takeover_offset(Opponent *o);
+  double filter_sidecoll_offset(Opponent *o, const double);
   Opponent * get_opp_by_state(const int state);
-  inline bool opp_is_on_right(Opponent *o) {
-    return (car->_trkPos.toMiddle > o->getCarPtr()->_trkPos.toMiddle)
-        ? true
-        : false;
-    }
+  inline bool opp_is_on_right(Opponent *o);
   void check_pit_status(tSituation *s);
     
   //'own' variables
-  float m_mincatchdist;
+  double m_mincatchdist;
   double m_rgtinc;
   double m_lftinc;
   double m_maxoffset;

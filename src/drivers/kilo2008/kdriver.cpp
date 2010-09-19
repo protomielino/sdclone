@@ -27,11 +27,24 @@
 //#define DEBUG
 
 #include <iostream>
+#include <string>
+
+#include "opponent.h"
+#include "strategy.h"
+#include "pit.h"
+#include "raceline.h"
+#include "util.h"
+
+#include <robottools.h> //Rt*
+#include <robot.h>  //ROB_PIT_IM
+
+//#define DEBUG
+
+//"I AM DEATH, NOT TAXES.  *I* TURN UP ONLY ONCE."  --  Death
 
 static int
   pitstatus[128] = { 0 };
-//static float colour[] = {1.0, 0.0, 0.0, 0.0};
-//"I AM DEATH, NOT TAXES.  *I* TURN UP ONLY ONCE."  --  Death
+static double colour[] = {1.0, 0.0, 0.0, 0.0};
 
 
 KDriver::KDriver(int index):Driver(index)
@@ -47,14 +60,16 @@ KDriver::drive(tSituation * s)
 {
   memset(&car->ctrl, 0, sizeof(tCarCtrl));
   update(s);
-
+  //~ sprintf(car->_msgCmd[0], "%d", (int)(car->_distFromStartLine));
+  //~ memcpy(car->_msgColorCmd, colour, sizeof(car->_msgColorCmd));
+  
   if(isStuck())
     {
       car->_steerCmd = -mycardata->getCarAngle() / car->_steerLock;
       car->_gearCmd = -1;   // Reverse gear.
-      car->_accelCmd = 1.0f;    // 100% accelerator pedal.
-      car->_brakeCmd = 0.0f;    // No brakes.
-      car->_clutchCmd = 0.0f;   // Full clutch (gearbox connected with engine).
+      car->_accelCmd = 1.0;    // 100% accelerator pedal.
+      car->_brakeCmd = 0.0;    // No brakes.
+      car->_clutchCmd = 0.0;   // Full clutch (gearbox connected with engine).
     }
   else
     {
@@ -63,13 +78,13 @@ KDriver::drive(tSituation * s)
       calcSpeed();
       car->_brakeCmd = 
         filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
-      if(car->_brakeCmd == 0.0f)
+      if(car->_brakeCmd == 0.0)
         {
           car->_accelCmd = filterTCL(filterTrk(filterOverlap(getAccel())));
         }
       else
         {
-          car->_accelCmd = 0.0f;
+          car->_accelCmd = 0.0;
         }
       car->_clutchCmd = getClutch();
     }
@@ -88,9 +103,9 @@ KDriver::isStuck()
 {
   bool ret = false;
   
-  if(fabs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
+  if(abs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
         car->_speed_x < MAX_UNSTUCK_SPEED &&
-        fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST)
+        abs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST)
     {
       if(stuckCounter > MAX_UNSTUCK_COUNT
         && car->_trkPos.toMiddle * mycardata->getCarAngle() < 0.0)
@@ -106,37 +121,37 @@ KDriver::isStuck()
 
 
 // Reduces the brake value such that it fits the speed (more downforce -> more braking).
-float
-KDriver::filterBrakeSpeed(float brake)
+double
+KDriver::filterBrakeSpeed(double brake)
 {
-  float weight = mass * G;
-  float maxForce = weight + CA * MAX_SPEED * MAX_SPEED;
-  float force = weight + CA * currentspeedsqr;
+  double weight = mass * G;
+  double maxForce = weight + CA * MAX_SPEED * MAX_SPEED;
+  double force = weight + CA * currentspeedsqr;
   return brake * force / maxForce;
 }
 
 
 // Compute offset to normal target point for overtaking or let pass an opponent.
-float
+double
 KDriver::getOffset()
 {
-  m_mincatchdist = 500.0f;
+  m_mincatchdist = 500.0;
   Opponent *o = NULL;
   
   myoffset = car->_trkPos.toMiddle;
   avoidmode = 0;
-  avoidlftoffset = MAX(myoffset, car->_trkPos.seg->width / 2.0f - 1.5f);
-  avoidrgtoffset = MIN(myoffset, -(car->_trkPos.seg->width / 2.0f - 1.5f));
+  avoidlftoffset = MAX(myoffset, car->_trkPos.seg->width / 2.0 - 1.5);
+  avoidrgtoffset = MIN(myoffset, -(car->_trkPos.seg->width / 2.0 - 1.5));
 
   // Increment speed dependent.
-  m_rInverse = raceline.getRInverse();
-  double incspeed = MIN(60.0, MAX(45.0, getSpeed())) - 20.0;
-  double incfactor = (MAX_INC_FACTOR - MIN(fabs(incspeed) / MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (12.0f + MAX(0.0, (CA-1.9) * 14));
+  m_rInverse = raceline->getRInverse();
+  double incspeed = MIN(60.0, MAX(45.0, getSpeed())) - 18.0;
+  double incfactor = (MAX_INC_FACTOR - MIN(abs(incspeed) / MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0))) * (12.0 + MAX(0.0, (CA-1.9) * 14));
   m_rgtinc = incfactor * MIN(1.3, MAX(0.4, 1.0 + m_rInverse * (m_rInverse < 0.0 ? 20 : 80)));
   m_lftinc = incfactor * MIN(1.3, MAX(0.4, 1.0 - m_rInverse * (m_rInverse > 0.0 ? 20 : 80)));
   
-  int offlft = (myoffset > car->_trkPos.seg->width / 2 - 1.5);
-  int offrgt = (myoffset < -(car->_trkPos.seg->width / 2 - 1.5));
+  int offlft = (myoffset > car->_trkPos.seg->width / 2 - 1.0);
+  int offrgt = (myoffset < -(car->_trkPos.seg->width / 2 - 1.0));
   
   if (offlft)
     myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 2;
@@ -185,7 +200,7 @@ KDriver::getOffset()
 
   
   // no-one to avoid, work back towards raceline
-  if(mode != NORMAL && fabs(myoffset - raceoffset) > 1.0)
+  if(mode != NORMAL && abs(myoffset - raceoffset) > 1.0)
     {
       if (myoffset > raceoffset + OVERTAKE_OFFSET_INC * m_rgtinc / 4)
         myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 4;
@@ -193,7 +208,7 @@ KDriver::getOffset()
         myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 4;
     } // if mode
     
-  if(simtime > 2.0f)
+  if(simtime > 2.0)
     {
       if(myoffset > raceoffset)
         myoffset =
@@ -228,14 +243,14 @@ Opponent *
 KDriver::get_overlapping_opp()
 {
   Opponent *ret = NULL;
-  float mindist = -1000.0f;
+  double mindist = -1000.0;
   
   for(list<Opponent>::iterator it = opponents->begin();
         it != opponents->end();
         it++)
     {
       tCarElt *ocar = it->getCarPtr();
-      float opp_distance = it->getDistance();
+      double opp_distance = it->getDistance();
       
       if(
         (//if teammate has more laps under his belt,
@@ -277,25 +292,25 @@ KDriver::get_overlapping_opp()
  * of the overlapping opponent.
  * 
  * @param Opponent *o: the opponent we should let go
- * @return: float, new offset. Equals member 'myoffset'
+ * @return: double, new offset. Equals member 'myoffset'
  * 
  */
-float
+double
 KDriver::filter_overlapped_offset(Opponent *o)
 {
-  float w = car->_trkPos.seg->width / WIDTHDIV - BORDER_OVERTAKE_MARGIN;
+  double w = car->_trkPos.seg->width / WIDTHDIV - BORDER_OVERTAKE_MARGIN;
   
   if(opp_is_on_right(o))
     {
       if(myoffset < w)
-        myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 2;
+        myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 1;//2;
     }
   else
     {
       if(myoffset > -w)
-        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 2;
+        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 1;//2;
     }
-  setMode(OVERLAPPED);
+  setMode(BEING_OVERLAPPED);
 
   myoffset = MIN(avoidlftoffset, MAX(avoidrgtoffset, myoffset));
   return myoffset;
@@ -307,11 +322,11 @@ KDriver::filter_overlapped_offset(Opponent *o)
  * 
  * If there is an opponent overlapping us, reduce accelerator.
  *
- * @param float accel: original acceleration value
- * @return: float, possibly reduced acceleration value
+ * @param double accel: original acceleration value
+ * @return: double, possibly reduced acceleration value
  */
-float
-KDriver::filterOverlap(float accel)
+double
+KDriver::filterOverlap(double accel)
 {
   return (get_opp_by_state(OPP_LETPASS) ? MIN(accel, LET_OVERTAKE_FACTOR) : accel);
 }
@@ -342,8 +357,8 @@ bool
 KDriver::oppTooFarOnSide(tCarElt *ocar)
 {
   bool ret = false;
-  if(fabs(ocar->_trkPos.toMiddle) > car->_trkPos.seg->width / 2 + 3.0
-    && fabs(car->_trkPos.toMiddle - ocar->_trkPos.toMiddle) >= 5.0)
+  if(abs(ocar->_trkPos.toMiddle) > car->_trkPos.seg->width / 2 + 3.0
+    && abs(car->_trkPos.toMiddle - ocar->_trkPos.toMiddle) >= 5.0)
     ret = true;
   return ret;
 }
@@ -362,7 +377,7 @@ KDriver::get_takeover_opp()
 {
   Opponent *ret = NULL;
 
-  m_mincatchdist = MAX(30.0, 1500.0 - fabs(m_rInverse) * 10000);
+  m_mincatchdist = MAX(30.0, 1500.0 - abs(m_rInverse) * 10000);
   int otry_success = 0;
   
   for(int otry = 0; otry <= 1; otry++)
@@ -392,11 +407,11 @@ KDriver::get_takeover_opp()
               double distance = it->getDistance() * otry_factor;  //how far ahead is he
               double speed = MIN(avoidspeed, getSpeed() + MAX(0.0, 10.0 - distance));
               double ospeed = it->getSpeed();   //opponent's speed
-              float catchdist = (float) MIN(speed * distance / (speed - ospeed),
+              double catchdist = MIN(speed * distance / (speed - ospeed),
                                 distance * CATCH_FACTOR) * otry_factor;   //when will we reach the opponent
 
               //if we are close enough, check again with avoidance speed taken into account
-              if(catchdist < m_mincatchdist && distance < fabs(speed - ospeed) * 2)
+              if(catchdist < m_mincatchdist && distance < abs(speed - ospeed) * 2)
                 {
                   m_mincatchdist = catchdist;
                   ret = &(*it); //This is the guy we need to take over
@@ -414,22 +429,22 @@ KDriver::get_takeover_opp()
   return ret;
 }
 
-float
+double
 KDriver::filter_takeover_offset(Opponent *o)
 {
   setMode(AVOIDING);
   tCarElt *ocar = o->getCarPtr();
 
   // Compute the opponent's distance to the middle.
-  float otm = ocar->_trkPos.toMiddle;
-  float sidemargin = o->getWidth() + getWidth() + 1.0f;
-  float sidedist = fabs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
+  double otm = ocar->_trkPos.toMiddle;
+  double sidemargin = o->getWidth() + getWidth() + 1.0;
+  double sidedist = abs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
 
   // avoid more if on the outside of opponent on a bend.
   // Stops us from cutting in too much and colliding...
   if ((otm < -(ocar->_trkPos.seg->width - 5.0) && m_rInverse < 0.0) ||
       (otm > (ocar->_trkPos.seg->width - 5.0) && m_rInverse > 0.0))
-    sidemargin += fabs(m_rInverse) * 150;
+    sidemargin += abs(m_rInverse) * 150;
       
   if (otm > (ocar->_trkPos.seg->width - 5.0) ||
      (car->_trkPos.toLeft > ocar->_trkPos.toLeft &&
@@ -451,9 +466,9 @@ KDriver::filter_takeover_offset(Opponent *o)
       // the inside of the expected turn.
       // Try to find out the characteristic of the track up to catchdist.
       tTrackSeg *seg = car->_trkPos.seg;
-      float length = getDistToSegEnd();
-      float oldlen, seglen = length;
-      float lenright = 0.0f, lenleft = 0.0f;
+      double length = getDistToSegEnd();
+      double oldlen, seglen = length;
+      double lenright = 0.0, lenleft = 0.0;
       m_mincatchdist = MIN(m_mincatchdist, DISTCUTOFF);
 
       do
@@ -478,7 +493,7 @@ KDriver::filter_takeover_offset(Opponent *o)
       while(oldlen < m_mincatchdist);
 
       // If we are on a straight look for the next turn.
-      if(lenleft == 0.0f && lenright == 0.0f)
+      if(lenleft == 0.0 && lenright == 0.0)
         {
           while(seg->type == TR_STR)
             {
@@ -486,9 +501,9 @@ KDriver::filter_takeover_offset(Opponent *o)
             }
           // Assume: left or right if not straight.
           if(seg->type == TR_LFT)
-            lenleft = 1.0f;
+            lenleft = 1.0;
           else
-            lenright = 1.0f;
+            lenright = 1.0;
         }
 
       // Because we are inside we can go to the border.
@@ -497,7 +512,7 @@ KDriver::filter_takeover_offset(Opponent *o)
         {
             // avoid more if on the outside of opponent on a bend.  Stops us
             // from cutting in too much and colliding...
-            sidemargin += fabs(m_rInverse) * 150;
+            sidemargin += abs(m_rInverse) * 150;
         }
       
       if(sidedist < sidemargin || o->is_state(OPP_COLL))
@@ -548,19 +563,19 @@ KDriver::get_sidecoll_opp()
   return ret;
 }
 
-float
+double
 KDriver::filter_sidecoll_offset(Opponent *o,
     const double incfactor)
 {
-  float myToLeft = car->_trkPos.toLeft;
-  float oppToLeft = o->getCarPtr()->_trkPos.toLeft;
-  float sidedist = fabs(oppToLeft - myToLeft);
-  float sidemargin = o->getWidth() + getWidth() + 2.0f;
+  double myToLeft = car->_trkPos.toLeft;
+  double oppToLeft = o->getCarPtr()->_trkPos.toLeft;
+  double sidedist = abs(oppToLeft - myToLeft);
+  double sidemargin = o->getWidth() + getWidth() + 2.0;
   // avoid more if on the outside of opponent on a bend.
   // Stops us from cutting in too much and colliding...
   if((opp_is_on_right(o) && m_rInverse < 0.0)
     || (!opp_is_on_right(o) && m_rInverse > 0.0))
-    sidemargin += fabs(m_rInverse) * 150;
+    sidemargin += abs(m_rInverse) * 150;
 
   if(opp_is_on_right(o))
     sidemargin -= MIN(0.0, m_rInverse * 100);
@@ -573,9 +588,9 @@ KDriver::filter_sidecoll_offset(Opponent *o,
       double sdiff = 3.0 - (sidemargin - sidedist) / sidemargin;
       
       if(opp_is_on_right(o))    //He is on the right, we must move to the left
-        myoffset += (float)(OVERTAKE_OFFSET_INC * m_lftinc * MAX(0.2f, MIN(1.0f, sdiff)));
+        myoffset += OVERTAKE_OFFSET_INC * m_lftinc * MAX(0.2, MIN(1.0, sdiff));
       else              //He is on the left, we must move to the right
-        myoffset -= (float)(OVERTAKE_OFFSET_INC * m_rgtinc * MAX(0.2f, MIN(1.0f, sdiff)));
+        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc * MAX(0.2, MIN(1.0, sdiff));
     }
   else if(sidedist > sidemargin + 3.0)
     {
@@ -651,6 +666,8 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
   // Init fuel.
   strategy->setFuelAtRaceStart(t, carParmHandle, s, INDEX);
 
+  raceline = new LRaceLine;
+
   // Load and set parameters.
   MU_FACTOR = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_MUFACTOR,
          (char *) NULL, 0.69f);
@@ -675,19 +692,10 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
                 (char *) NULL, 10.0);
   PitOffset = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "PitOffset",
                 (char *) NULL, 10.0);
-  /*double SecurityRadius = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_SECRADIUS,
-                (char *) NULL, 100.0);*/
+  brakedelay = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "BrakeDelay",
+                (char *) NULL, 10.0);
 
-  raceline.setMinCornerInverse(MinCornerInverse);
-  raceline.setAvoidSpeedAdjust(AvoidSpeed);
-  raceline.setCornerSpeed(CornerSpeed);
-  raceline.setCornerAccel(CornerAccel);
-  raceline.setBrakeDelay(brakedelay);
-  raceline.setIntMargin(IntMargin);
-  raceline.setExtMargin(ExtMargin);
-  //raceline.setSecurityRadius(SecurityRadius);
-
-  raceline.InitTrack(track, s);
+  raceline->InitTrack(track, carParmHandle, s);
 }
 
 // Update my private data every timestep.
@@ -701,7 +709,7 @@ KDriver::update(tSituation * s)
       cardata->update();
     }
   // Update the local data rest.
-  speedangle = (float) -(mycardata->getTrackangle() -
+  speedangle = -(mycardata->getTrackangle() -
          atan2(car->_speed_Y, car->_speed_X));
   NORM_PI_PI(speedangle);
   mass = CARMASS + car->_fuel;
@@ -714,7 +722,7 @@ KDriver::update(tSituation * s)
   pit->update();
   simtime = s->currentTime;
 
-  float trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
+  double trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
   angle = trackangle - car->_yaw;
   NORM_PI_PI(angle);
   angle = -angle;
@@ -741,7 +749,7 @@ KDriver::check_pit_status(tSituation *s)
         {
           if((car->_distFromStartLine < pit->getNPitEntry() //and we are not in the pit range
                 || car->_distFromStartLine > pit->getNPitEnd())
-                || car->_fuel < 5.0f) //or we are very low on fuel
+                || car->_fuel < 5.0) //or we are very low on fuel
             {
               pit->setPitstop(strategy->needPitstop()); //then we can plan a pit, if needed.
             }
@@ -762,7 +770,7 @@ KDriver::check_pit_status(tSituation *s)
                   if(pitstatus[idx] == 1
                     || ((pitstatus[idx]
                         || (ocar-> _fuel < car->_fuel - 1.0 && car->_dammage < 5000))
-                    && fabs(car->_trkPos.toMiddle) <= car->_trkPos.seg->width / 2))
+                    && abs(car->_trkPos.toMiddle) <= car->_trkPos.seg->width / 2))
                     {
                       pit->setPitstop(false);
                       pitstatus[carindex] = 0;
@@ -780,28 +788,115 @@ KDriver::check_pit_status(tSituation *s)
 
 
 // Brake filter for collision avoidance.
-float
-KDriver::filterBColl(float brake)
+double
+KDriver::filterBColl(double brake)
 {
   if(simtime < 1.5)
     return brake;
 
-  float mu = car->_trkPos.seg->surface->kFriction;
+  double mu = car->_trkPos.seg->surface->kFriction;
   for(list<Opponent>::iterator it = opponents->begin();
         it != opponents->end();
         it++)
     {
       if(it->is_state(OPP_COLL))
         {
-          float ospeed = it->getSpeed();
+          double ospeed = it->getSpeed();
           if(brakedist(ospeed, mu)
             + MIN(1.0, 0.5 + MAX(0.0,(getSpeed() - ospeed) / 4))
             > it->getDistance())
             {
-              accelcmd = 0.0f;
-              return 1.0f;
+              accelcmd = 0.0;
+              return 1.0;
             }
         }
     }
   return brake;
 }
+
+// Set pitstop commands.
+int
+KDriver::pitCommand(tSituation * s)
+{
+  car->_pitRepair = strategy->pitRepair();
+  car->_pitFuel = strategy->pitRefuel();
+  // This should be the only place where the pit stop is set to false!
+  pit->setPitstop(false);
+  return ROB_PIT_IM;        // return immediately.
+}
+
+void
+KDriver::newRace(tCarElt * car, tSituation * s)
+{
+  strategy->setCar(car);
+  Driver::newRace(car, s);
+}
+
+void
+KDriver::calcSpeed()
+{
+  accelcmd = brakecmd = 0.0;
+  double speed;
+
+  switch(mode)
+    {
+      case AVOIDING:
+      case BEING_OVERLAPPED:
+        speed = avoidspeed;
+        break;
+        
+      case CORRECTING:
+        speed = racespeed -
+                (racespeed - avoidspeed) * MAX(0.0, (correcttimer - simtime) / 7.0);
+        break;
+            
+      default:
+        speed = racespeed;
+    }//switch mode
+    
+  //HACK kilo - breaking points for Alpine-2
+  //~ if(
+    //~ BetweenLoose(car->_distFromStartLine, 2753, 2940) //after tunnel
+    //~ )
+    //~ {
+      //~ speed *= 0.9;
+    //~ }
+  //HACK kilo - breaking points for Dirt-3
+  //~ if(
+    //~ BetweenLoose(car->_distFromStartLine, 75, 105) ||       //pit exit
+    //~ BetweenLoose(car->_distFromStartLine, 400, 440) ||      //curve 6
+    //~ BetweenLoose(car->_distFromStartLine, 625, 635) ||      //straight 10
+    //~ BetweenLoose(car->_distFromStartLine, 665, 675) ||      //straight 10
+    //~ BetweenLoose(car->_distFromStartLine, 840, 870) ||      //straight 12
+    //~ BetweenLoose(car->_distFromStartLine, 1097, 1136) ||    //curve 15
+    //~ BetweenLoose(car->_distFromStartLine, 1390, 1419) ||    //straight 17
+    //~ BetweenLoose(car->_distFromStartLine, 1455, 1465) ||    //curve 18
+    //~ BetweenLoose(car->_distFromStartLine, 1510, 1550) ||    //curve 19
+    //~ BetweenLoose(car->_distFromStartLine, 1760, 1820) ||    //s1
+    //~ BetweenLoose(car->_distFromStartLine, 1891, 1944)       //s2
+    //~ )
+    //~ {
+      //~ speed *= 0.4;
+//~ #ifdef DEBUG
+      //~ cerr << "!";
+//~ #endif
+    //~ }
+#ifdef DEBUG
+  cerr << (int)(car->_distFromStartLine) << " " << car->_trkPos.seg->name << endl;
+#endif
+  //End HACK kilo
+  
+  double x = (10 + car->_speed_x) * (speed - car->_speed_x) / 200;
+
+  if(x > 0)
+    accelcmd = x;
+  else
+    brakecmd = MIN(1.0, -(MAX(10.0, brakedelay * 0.7)) * x);
+}//calcSpeed
+
+inline bool
+KDriver::opp_is_on_right(Opponent *o) {
+    return (car->_trkPos.toMiddle > o->getCarPtr()->_trkPos.toMiddle)
+        ? true
+        : false;
+    }

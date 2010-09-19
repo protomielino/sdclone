@@ -28,24 +28,23 @@
     each other (for that is the class Opponents/Opponent responsible).
 */
 
-#ifndef _BT_CARDATA_H_
-#define _BT_CARDATA_H_
+#ifndef _CARDATA_H_
+#define _CARDATA_H_
 
-#include <raceman.h>
-#include <list>
-
-#include "linalg.h"
+#include <car.h>        //tCarElt
+#include <raceman.h>    //tSituation
+#include <list>         //std::list
 
 class SingleCardata
 {
 public:
-  void init(const CarElt * car);
+  void init(const tCarElt * car);
 
-  inline float getSpeedInTrackDirection() const { return speed; }
-  inline float getWidthOnTrack() const { return width; }
-  inline float getLengthOnTrack() const { return length; }
-  inline float getTrackangle() const { return trackangle; }
-  inline float getCarAngle() const { return angle; }
+  inline double getSpeedInTrackDirection() const { return speed; }
+  inline double getWidthOnTrack() const { return width; }
+  inline double getLengthOnTrack() const { return length; }
+  inline double getTrackangle() const { return trackangle; }
+  inline double getCarAngle() const { return angle; }
   inline bool thisCar(const tCarElt * car) const { return (car == this->car); }
   inline tPosd *getCorner1() { return corner1; }
   inline tPosd *getCorner2() { return corner2; }
@@ -55,13 +54,13 @@ public:
   //void operator() (void) {this->update();}
   
 protected:
-  static float getSpeed(const tCarElt * car, const float trackangle);
+  static double getSpeed(const tCarElt * car, const double trackangle);
 
-  float speed;          // speed in direction of the track.
-  float width;          // the cars needed width on the track.
-  float length;         // the cars needed length on the track.
-  float trackangle;     // Track angle at the opponents position.
-  float angle;          // The angle of the car relative to the track tangent.
+  double speed;          // speed in direction of the track.
+  double width;          // the cars needed width on the track.
+  double length;         // the cars needed length on the track.
+  double trackangle;     // Track angle at the opponents position.
+  double angle;          // The angle of the car relative to the track tangent.
 
   tPosd corner1[4];
   tPosd corner2[4];
@@ -85,4 +84,4 @@ protected:
   std::list<SingleCardata> *data; // List with car data.
 };
 
-#endif // _BT_CARDATA_H_
+#endif // _CARDATA_H_

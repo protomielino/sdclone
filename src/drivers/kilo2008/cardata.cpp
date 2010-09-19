@@ -24,10 +24,10 @@
  */
 
 #include "cardata.h"
-#include <robottools.h>
+#include "linalg.h"     //v2d
+#include <robottools.h> //Rt*
 
-#include <algorithm>
-using namespace std;
+#include <algorithm>    //for_each, find
 
 void
 SingleCardata::update()
@@ -38,11 +38,11 @@ SingleCardata::update()
   NORM_PI_PI(angle);
   width =
     MAX(car->_dimension_y,
-    fabs(car->_dimension_x * sin(angle) +
+    abs(car->_dimension_x * sin(angle) +
          car->_dimension_y * cos(angle))) + 0.1;
   length =
     MAX(car->_dimension_x,
-    fabs(car->_dimension_y * sin(angle) +
+    abs(car->_dimension_y * sin(angle) +
          car->_dimension_x * cos(angle))) + 0.1;
 
   for(int i = 0; i < 4; i++)
@@ -63,8 +63,8 @@ SingleCardata::update()
 
 
 // compute speed component parallel to the track.
-float
-SingleCardata::getSpeed(const tCarElt * car, const float ltrackangle)
+double
+SingleCardata::getSpeed(const tCarElt * car, const double ltrackangle)
 {
   v2d speed(car->_speed_X, car->_speed_Y);
   v2d dir(cos(ltrackangle), sin(ltrackangle));
@@ -88,8 +88,8 @@ SingleCardata::init(const CarElt * pcar)
 
 Cardata::Cardata(tSituation * s)
 {
-  data = new list<SingleCardata>(s->_ncars);
-  list<SingleCardata>::iterator it = data->begin();
+  data = new std::list<SingleCardata>(s->_ncars);
+  std::list<SingleCardata>::iterator it = data->begin();
   for(int i = 0; it != data->end(); it++, i++)
     {
       it->init(s->cars[i]);
@@ -108,7 +108,7 @@ static inline void Cupdate(SingleCardata &a) {a.update();}
 void
 Cardata::update() const
 {
-  for_each(data->begin(), data->end(), Cupdate);
+  std::for_each(data->begin(), data->end(), Cupdate);
 }//update
 
 
@@ -120,7 +120,7 @@ Cardata::findCar(const tCarElt * car) const
 {
   SingleCardata *ret = NULL;
 
-  list<SingleCardata>::iterator it = find(data->begin(), data->end(), car);
+  std::list<SingleCardata>::iterator it = std::find(data->begin(), data->end(), car);
   if(it != data->end())
     ret = &(*it);
     

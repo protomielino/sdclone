@@ -26,35 +26,39 @@
 #ifndef _PIT_H_
 #define _PIT_H_
 
-#include "driver.h"
+#include <track.h>      //tTrack
+#include <raceman.h>    //tSituation
 #include "spline.h"
+
+class Driver;
 
 class Pit
 {
 public:
-  Pit(tSituation * s, Driver * driver, float PitOffset);
+  Pit(const tSituation * s, Driver * driver, const double PitOffset);
    ~Pit();
 
-  void setPitstop(bool pitstop);
-  bool getPitstop() {return pitstop;}
-  void setInPit(bool inpitlane) {this->inpitlane = inpitlane;}
-  bool getInPit() {return inpitlane;}
+  void setPitstop(const bool pitstop);
+  inline bool getPitstop() const {return pitstop;}
+  inline void setInPit(const bool inpitlane) {this->inpitlane = inpitlane;}
+  inline bool getInPit() const {return inpitlane;}
 
-  float getPitOffset(float offset, float fromstart);
+  double getPitOffset(const double offset, double fromstart);
 
-  bool isBetween(float fromstart);
-  bool isTimeout(float distance);
+  bool isBetween(const double fromstart) const;
+  bool isTimeout(const double distance);
 
-  float getNPitStart() {return p[1].x;}
-  float getNPitLoc()   {return p[3].x;}
-  float getNPitEnd()   {return p[5].x;}
-  float getNPitEntry() {return p[0].x;}
+  inline double getNPitStart() const {return p[1].x;}
+  inline double getNPitLoc()   const {return p[3].x;}
+  inline double getNPitEnd()   const {return p[5].x;}
+  inline double getNPitEntry() const {return p[0].x;}
 
-  float toSplineCoord(float x);
+  double toSplineCoord(double x) const;
 
-  float getSpeedlimitSqr() {return speedlimitsqr;}
-  float getSpeedlimit() {return speedlimit;}
-  float getSpeedLimitBrake(float speedsqr);
+  inline double getSpeedlimitSqr() const {return speedlimitsqr;}
+  inline double getSpeedlimit() const {return speedlimit;}
+  inline double getSpeedLimitBrake(const double speedsqr) const
+    {return (speedsqr - speedlimitsqr) / (pitspeedlimitsqr - speedlimitsqr);}
 
   void update();
 
@@ -71,16 +75,16 @@ private:
 
   bool pitstop;         // Pitstop planned.
   bool inpitlane;       // We are still in the pit lane.
-  float pitentry;       // Distance to start line of the pit entry.
-  float pitexit;        // Distance to the start line of the pit exit.
+  double pitentry;      // Distance to start line of the pit entry.
+  double pitexit;       // Distance to the start line of the pit exit.
 
-  float speedlimitsqr;      // Pit speed limit squared.
-  float speedlimit;     // Pit speed limit.
-  float pitspeedlimitsqr;   // The original speedlimit squared.
+  double speedlimitsqr;     // Pit speed limit squared.
+  double speedlimit;        // Pit speed limit.
+  double pitspeedlimitsqr;  // The original speedlimit squared.
 
-  float pittimer;       // Timer for pit timeouts.
+  double pittimer;       // Timer for pit timeouts.
 
-  static const float SPEED_LIMIT_MARGIN;
+  static const double SPEED_LIMIT_MARGIN;
 };
 
 #endif // _PIT_H_

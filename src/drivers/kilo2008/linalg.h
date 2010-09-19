@@ -26,37 +26,34 @@
 #ifndef _LINALG_H_
 #define _LINALG_H_
 
-inline float sign(float d) {
- return (d >= 0.0) ? 1.0f : -1.0f;
-}
-
+#include <math.h>    //sqrt
 
 class v2d {
  public:
   /* constructors */
   v2d() {}
   v2d(const v2d &src) { this->x = src.x; this->y = src.y; }
-  v2d(float x, float y) { this->x = x; this->y = y; }
+  v2d(double x, double y) { this->x = x; this->y = y; }
 
   /* operators */
   v2d& operator=(const v2d &src);         /* assignment */
   v2d operator+(const v2d &src) const;    /* addition */
   v2d operator-(void) const;              /* negation */
   v2d operator-(const v2d &src) const;    /* subtraction */
-  v2d operator*(const float s) const;     /* multiply with scalar */
-  float operator*(const v2d &src) const;  /* dot product */
-  friend v2d operator*(const float s, const v2d & src);
+  v2d operator*(const double s) const;    /* multiply with scalar */
+  double operator*(const v2d &src) const; /* dot product */
+  friend v2d operator*(const double s, const v2d & src);
 
   /* methods */
-  float len(void) const;
+  double len(void) const;
   void normalize(void);
-  float dist(const v2d &p) const;
-  float cosalpha(const v2d &p2, const v2d &center) const;
-  v2d rotate(const v2d &c, float arc) const;
+  double dist(const v2d &p) const;
+  double cosalpha(const v2d &p2, const v2d &center) const;
+  v2d rotate(const v2d &c, double arc) const;
 
   /* data */
-  float x;
-  float y;
+  double x;
+  double y;
 };
 
 
@@ -89,28 +86,28 @@ inline v2d v2d::operator-(const v2d &src) const
 
 
 /* scalar product */
-inline float v2d::operator*(const v2d &src) const
+inline double v2d::operator*(const v2d &src) const
 {
     return src.x*x + src.y*y;
 }
 
 
-/* multiply vector with scalar (v2d*float) */
-inline v2d v2d::operator*(const float s) const
+/* multiply vector with scalar (v2d*double) */
+inline v2d v2d::operator*(const double s) const
 {
     return v2d(s*x, s*y);
 }
 
 
-/* multiply scalar with vector (float*v2d) */
-inline v2d operator*(const float s, const v2d & src)
+/* multiply scalar with vector (double*v2d) */
+inline v2d operator*(const double s, const v2d & src)
 {
     return v2d(s*src.x, s*src.y);
 }
 
 
 /* compute cosine of the angle between vectors *this-c and p2-c */
-inline float v2d::cosalpha(const v2d &p2, const v2d &c) const
+inline double v2d::cosalpha(const v2d &p2, const v2d &c) const
 {
  v2d l1 = *this-c;
  v2d l2 = p2 - c;
@@ -119,23 +116,23 @@ inline float v2d::cosalpha(const v2d &p2, const v2d &c) const
 
 
 /* rotate vector arc radians around center c */
-inline v2d v2d::rotate(const v2d &c, float arc) const
+inline v2d v2d::rotate(const v2d &c, double arc) const
 {
  v2d d = *this-c;
- float sina = sin(arc), cosa = cos(arc);
+ double sina = sin(arc), cosa = cos(arc);
  return c + v2d(d.x*cosa-d.y*sina, d.x*sina+d.y*cosa);
 }
 
 
 /* compute the length of the vector */
-inline float v2d::len(void) const
+inline double v2d::len(void) const
 {
  return sqrt(x*x+y*y);
 }
 
 
 /* distance between *this and p */
-inline float v2d::dist(const v2d &p) const
+inline double v2d::dist(const v2d &p) const
 { 
  return sqrt((p.x-x)*(p.x-x)+(p.y-y)*(p.y-y));
 }
@@ -144,7 +141,7 @@ inline float v2d::dist(const v2d &p) const
 /* normalize the vector */
 inline void v2d::normalize(void)
 {
- float l = this->len();
+ double l = this->len();
  x /= l; y /= l;
 }
 
@@ -153,14 +150,14 @@ class Straight {
     public:
         /* constructors */
         Straight() {}
-        Straight(float x, float y, float dx, float dy)
+        Straight(double x, double y, double dx, double dy)
             {  p.x = x; p.y = y; d.x = dx; d.y = dy; d.normalize(); }
         Straight(const v2d &anchor, const v2d &dir)
             { p = anchor; d = dir; d.normalize(); }
 
         /* methods */
         v2d intersect(const Straight &s) const;
-        float dist(const v2d &p) const; 
+        double dist(const v2d &p) const; 
 
         /* data */
         v2d p;          /* point on the straight */
@@ -171,13 +168,13 @@ class Straight {
 /* intersection point of *this and s */
 inline v2d Straight::intersect(const Straight &s) const
 {
-    float t = -(d.x*(s.p.y-p.y)+d.y*(p.x-s.p.x))/(d.x*s.d.y-d.y*s.d.x);
+    double t = -(d.x*(s.p.y-p.y)+d.y*(p.x-s.p.x))/(d.x*s.d.y-d.y*s.d.x);
     return s.p + s.d*t;  
 }
 
 
 /* distance of point s from straight *this */
-inline float Straight::dist(const v2d &s) const
+inline double Straight::dist(const v2d &s) const
 {
     v2d d1 = s - p;
     v2d d3 = d1 - d*d1*d;

@@ -46,7 +46,7 @@ public:
     void update();
     bool needPitstop() const;
     int pitRepair() const;
-    float pitRefuel();
+    double pitRefuel();
     void setFuelAtRaceStart(const tTrack * const t,
                         void ** const carParmHandle,
                         const tSituation * const s,
@@ -59,8 +59,8 @@ protected:
     inline int laps_to_go() const
         {return m_car->_remainingLaps - m_car->_lapsBehindLeader;}
     void updateFuelStrategy();
-    void computeBestNumberOfPits(const float tankCapacity,
-                                const float requiredFuel,
+    void computeBestNumberOfPits(const double tankCapacity,
+                                const double requiredFuel,
                                 const int remainingLaps,
                                 const bool preRace);
 
@@ -68,20 +68,20 @@ protected:
     int m_laps;
     std::deque<int> *m_last_damages;
     int m_remainingstops;
-    float m_fuelperstint;
-    float m_pittime;      // Expected additional time for pit stop.
-    float m_bestlap;      // Best possible lap, empty tank and alone.
-    float m_worstlap;     // Worst possible lap, full tank and alone.
+    double m_fuelperstint;
+    double m_pittime;      // Expected additional time for pit stop.
+    double m_bestlap;      // Best possible lap, empty tank and alone.
+    double m_worstlap;     // Worst possible lap, full tank and alone.
     bool m_fuelchecked;       // Fuel statistics updated.
-    float m_fuelperlap;       // The maximum amount of fuel we needed for a lap.
-    float m_lastpitfuel;      // Amount refueled, special case when we refuel.
-    float m_lastfuel;         // the fuel available when we cross the start lane.
-    float m_expectedfuelperlap;   // Expected fuel per lap (may be very inaccurate).
-    float m_fuelsum;          // all the fuel used.
+    double m_fuelperlap;       // The maximum amount of fuel we needed for a lap.
+    double m_lastpitfuel;      // Amount refueled, special case when we refuel.
+    double m_lastfuel;         // the fuel available when we cross the start lane.
+    double m_expectedfuelperlap;   // Expected fuel per lap (may be very inaccurate).
+    double m_fuelsum;          // all the fuel used.
 
-    static const float MAX_FUEL_PER_METER;    // [kg/m] fuel consumtion.
+    static const double MAX_FUEL_PER_METER;    // [kg/m] fuel consumtion.
     static const int PIT_DAMAGE; // If damage > we request a pit stop.
-    static const float SAFE_LAPS;   //Can go this # of laps before req. refuel.
+    static const double SAFE_LAPS;   //Can go this # of laps before req. refuel.
     static const int LAST_LAPS; //Store this count of last laps' damage datae
 };
 

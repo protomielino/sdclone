@@ -25,27 +25,30 @@
 
 #include "opponent.h"
 
+#include <iostream>
+#include <algorithm>
 #include "driver.h"
+#include "util.h"   //Between
 
 // class variables and constants.
 tTrack *
   Opponent::m_track;
-const float
-  Opponent::FRONTCOLLDIST = 200.0f; // [m] distance on the track to check other cars.
-const float
-  Opponent::BACKCOLLDIST = 50.0f;   // [m] distance on the track to check other cars.
-const float
-  Opponent::LENGTH_MARGIN = 1.0f;   // [m] safety margin.
-const float
-  Opponent::SIDE_MARGIN = 1.0f; // [m] safety margin.
-const float
-  Opponent::EXACT_DIST = 12.0f; // [m] if the estimated distance is smaller, compute it more accurate
-const float
-  Opponent::LAP_BACK_TIME_PENALTY = -30.0f; // [s]
-const float
-  Opponent::OVERLAP_WAIT_TIME = 5.0f;   // [s] overlaptimer must reach this time before we let the opponent pass.
-const float
-  Opponent::SPEED_PASS_MARGIN = 5.0f;   // [m/s] avoid overlapping opponents to stuck behind me.
+const double
+  Opponent::FRONTCOLLDIST = 200.0; // [m] distance on the track ahead to check other cars.
+const double
+  Opponent::BACKCOLLDIST = -50.0;  // [m] distance on the track behind to check other cars.
+const double
+  Opponent::LENGTH_MARGIN = 1.0;   // [m] safety margin.
+const double
+  Opponent::SIDE_MARGIN = 1.0; // [m] safety margin.
+const double
+  Opponent::EXACT_DIST = 12.0; // [m] if the estimated distance is smaller, compute it more accurate
+const double
+  Opponent::LAP_BACK_TIME_PENALTY = -30.0; // [s]
+const double
+  Opponent::OVERLAP_WAIT_TIME = 5.0;   // [s] overlaptimer must reach this time before we let the opponent pass.
+const double
+  Opponent::SPEED_PASS_MARGIN = 5.0;   // [m/s] avoid overlapping opponents to stuck behind me.
 
 
 //Constructor
@@ -70,20 +73,20 @@ Opponent::update(tSituation *s, Driver *driver)
 
   // Updating distance along the middle.
   tCarElt *mycar = driver->getCarPtr();
-  float oppToStart = m_car->_trkPos.seg->lgfromstart + getDistToSegStart();
+  double oppToStart = m_car->_trkPos.seg->lgfromstart + getDistToSegStart();
   m_distance = oppToStart - mycar->_distFromStartLine;
-  if(m_distance > m_track->length / 2.0f)
+  if(m_distance > m_track->length / 2.0)
       m_distance -= m_track->length;
-  else if(m_distance < -m_track->length / 2.0f)
+  else if(m_distance < -m_track->length / 2.0)
       m_distance += m_track->length;
 
-  float SIDECOLLDIST = MAX(m_car->_dimension_x, mycar->_dimension_x);
+  const double SIDECOLLDIST = MAX(m_car->_dimension_x, mycar->_dimension_x);
 
-  // Is opponent in relevant range -BACKCOLLDIST..FRONTCOLLDIST?
-  if(m_distance > -BACKCOLLDIST && m_distance < FRONTCOLLDIST)
+  // Is opponent in relevant range BACKCOLLDIST..FRONTCOLLDIST?
+  if(BetweenStrict(m_distance, BACKCOLLDIST, FRONTCOLLDIST))
     {
       // Is opponent aside?
-      if(m_distance > -SIDECOLLDIST && m_distance < SIDECOLLDIST)
+      if(BetweenStrict(m_distance, -SIDECOLLDIST, SIDECOLLDIST))
         {
           m_sidedist = m_car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
           m_state |= OPP_SIDE;
@@ -97,7 +100,7 @@ Opponent::update(tSituation *s, Driver *driver)
           if(is_quicker_teammate(mycar))
             m_state |= OPP_FRONT_FOLLOW;
 
-          m_distance -= MAX(m_car->_dimension_x, mycar->_dimension_x);
+          m_distance -= SIDECOLLDIST;
           m_distance -= LENGTH_MARGIN;
 
           // If the distance is small we compute it more accurate.
@@ -110,11 +113,11 @@ Opponent::update(tSituation *s, Driver *driver)
                       mycar->_corner_y(FRNT_RGT) -
                       mycar->_corner_y(FRNT_LFT));
 
-              float mindist = FLT_MAX;
+              double mindist = FLT_MAX;
               for(int i = 0; i < 4; i++)
                 {
                   vec2f corner(m_car->_corner_x(i), m_car->_corner_y(i));
-                  float dist = carFrontLine.dist(corner);
+                  double dist = carFrontLine.dist(corner);
                   mindist = MIN(dist, mindist);
                 }
               m_distance = MIN(m_distance, mindist);
@@ -124,8 +127,8 @@ Opponent::update(tSituation *s, Driver *driver)
             driver->getSpeed() * m_distance / (driver->getSpeed() - getSpeed());
 
           m_sidedist = m_car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
-          float cardist = fabs(m_sidedist) - fabs(getWidth() / 2.0f) -
-            mycar->_dimension_y / 2.0f;
+          double cardist = abs(m_sidedist) - abs(getWidth() / 2.0) -
+            mycar->_dimension_y / 2.0;
           if(cardist < SIDE_MARGIN)
             m_state |= OPP_COLL;
         }
@@ -135,7 +138,7 @@ Opponent::update(tSituation *s, Driver *driver)
         {
           m_catchdist = driver->getSpeed() * m_distance / (getSpeed() - driver->getSpeed());
           m_state |= OPP_BACK;
-          m_distance -= MAX(m_car->_dimension_x, mycar->_dimension_x);
+          m_distance -= SIDECOLLDIST;
           m_distance -= LENGTH_MARGIN;
         }
       // Opponent is in front and faster.
@@ -144,7 +147,7 @@ Opponent::update(tSituation *s, Driver *driver)
           m_state |= OPP_FRONT_FAST;
           if(is_quicker_teammate(mycar))
             m_state |= OPP_FRONT_FOLLOW;
-          m_distance -= MAX(m_car->_dimension_x, mycar->_dimension_x);
+          m_distance -= SIDECOLLDIST;
           if (m_distance < 20.0 - (getSpeed() - driver->getSpeed()) * 4)
             m_state |= OPP_FRONT;
         }
@@ -160,14 +163,14 @@ Opponent::update(tSituation *s, Driver *driver)
 
 
 // Compute the length to the start of the segment.
-float
-Opponent::getDistToSegStart()
+double
+Opponent::getDistToSegStart() const
 {
-  if(m_car->_trkPos.seg->type == TR_STR)
-    return m_car->_trkPos.toStart;
-  else
-    return m_car->_trkPos.toStart * m_car->_trkPos.seg->radius;
-}
+  double ret = (m_car->_trkPos.seg->type == TR_STR)
+    ? m_car->_trkPos.toStart
+    : m_car->_trkPos.toStart * m_car->_trkPos.seg->radius;
+  return ret;
+}//getDistToSegStart
 
 
 // Update overlaptimers of opponents.
@@ -177,20 +180,20 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
   if((m_car->race.laps > mycar->race.laps) || is_quicker_teammate(mycar))
     {
       if(is_state(OPP_BACK | OPP_SIDE))
-        m_overlaptimer += (float)s->deltaTime;
+        m_overlaptimer += s->deltaTime;
       else if(is_state(OPP_FRONT))
         m_overlaptimer = LAP_BACK_TIME_PENALTY;
       else
         {
-          if(m_overlaptimer > 0.0f)
+          if(m_overlaptimer > 0.0)
             {
               if(is_state(OPP_FRONT_FAST))
-                m_overlaptimer = MIN(0.0f, m_overlaptimer);
+                m_overlaptimer = MIN(0.0, m_overlaptimer);
               else
-                m_overlaptimer -= (float)s->deltaTime;
+                m_overlaptimer -= s->deltaTime;
             }
           else
-            m_overlaptimer += (float)s->deltaTime;
+            m_overlaptimer += s->deltaTime;
         }
     }
   else
@@ -198,37 +201,43 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
 }
 
 
-/*
- *
- * name: is_quicker_teammate
+/**
+ * is_quicker_teammate
  *
  * Returns true, if the other car is our teammate
  * and has significantly less damage
  * (defined in Driver::TEAM_DAMAGE_CHANGE_LEAD)
  *
- * @param: tCarElt *, pointer to the other car
- * @return: bool
+ * @param mycar pointer to the other car
+ * @return true, if the opponent is our teammate
  */
 bool
 Opponent::is_quicker_teammate(tCarElt * const mycar)
 {
   return (is_teammate()
     && (mycar->_dammage - m_car->_dammage > Driver::TEAM_DAMAGE_CHANGE_LEAD));
-}
+}//is_quicker_teammate
 
 
-// Constructor
-// Initialize the list of opponents.
-// Don't store our own car as opponent.
-Opponents::Opponents(tSituation * s, Driver * driver, Cardata * c)
+/** 
+ * Constructor
+ * Initializes the list of opponents.
+ * Checks and doesn't store out own car as an opponent.
+ * 
+ * @param s Situation provided by TORCS
+ * @param driver Our own robot
+ * @param c Opponent car data
+ */
+Opponents::Opponents(tSituation *s, Driver *driver, Cardata *c)
 {
   m_opps = new list<Opponent>;
+  const tCarElt *ownCar = driver->getCarPtr();
   
   //Step through all the cars
   for(int i = 0; i < s->_ncars; i++)
     {
       //If it is not our own car
-      if(s->cars[i] != driver->getCarPtr())
+      if(s->cars[i] != ownCar)
         {
           //Create and set up new opponent
           Opponent opp(
@@ -237,53 +246,52 @@ Opponents::Opponents(tSituation * s, Driver * driver, Cardata * c)
             i //index
             ); 
           m_opps->push_back(opp);   //Store it in list
-        }
-    }
+        }//if s->cars[i]
+    }//for i
+    
   Opponent::setTrackPtr(driver->getTrackPtr());
-}
+}//Opponents::Opponents
 
 
-// Updates all opponents' own data
+/** 
+ * update
+ * Makes every opponent update its own data.
+ * 
+ * @param   s   Situation provided by TORCS
+ * @param   driver  Our own robot
+ */
 void
-Opponents::update(tSituation * s, Driver * driver)
+Opponents::update(tSituation *s, Driver *driver)
 {
+  //for_each(begin(), end(), update);
   for(list<Opponent>::iterator it = begin(); it != end(); it++)
     it->update(s, driver);
-}
+}//update
 
 
-// Search the opponents for our teammate,
-// based on teammate name given in config
+//for find()
+inline bool operator==(const Opponent& o, const std::string s)
+    { return !s.compare(o.getCarPtr()->_name); }
+/** 
+ * setTeamMate
+ * Search the opponent list for our own teammate,
+ * based on the teammate name given in the config as "teammate".
+ * 
+ * @param car Our own car, to read its config
+ */
 void
 Opponents::setTeamMate(const tCarElt *car)
 {
-  // Set team mate.
-  string teammate;
-  try
-    {
-      teammate =
-        GfParmGetStr(car->_carHandle, BT_SECT_PRIV, BT_ATT_TEAMMATE, "");
-  
-      if(!teammate.empty())
-        {  
-          for(list<Opponent>::iterator it = begin(); it != end(); it++)
-            {
-              if(it->getCarPtr()->_name == teammate)
-                {
-                  it->markAsTeamMate();
-                  break;        // Name should be unique, so we can stop.
-                }
-            }//for it
-        }//if teammate
-    }
-  catch(...)
-    {
-     // cerr << "BONG" << endl;
-    //      teammate.assign("");
-    }
+  string teammate(
+    GfParmGetStr(car->_paramsHandle, BT_SECT_PRIV, BT_ATT_TEAMMATE, ""));
+
+  list<Opponent>::iterator found = find(begin(), end(), teammate);
+  if(found != end())
+    found->markAsTeamMate();
 }//setTeamMate
 
 
+#if 0
 void
 TeamTacticsMatrix(tCarElt *car_A, tCarElt *car_B, int *order_A, int *order_B)
 {
@@ -305,8 +313,8 @@ TeamTacticsMatrix(tCarElt *car_A, tCarElt *car_B, int *order_A, int *order_B)
     //For easier handling, f_: front, b_: behind
     int f_laps = car_front->_laps;
     int b_laps = car_behind->_laps;
-    //int f_damage = car_front->_dammage;
-    //int b_damage = car_behind->_dammage;
+    int f_damage = car_front->_dammage;
+    int b_damage = car_behind->_dammage;
     
     
     if(b_laps > f_laps) //Case 1,2,3
@@ -324,3 +332,4 @@ TeamTacticsMatrix(tCarElt *car_A, tCarElt *car_B, int *order_A, int *order_B)
           }
       }    
 }
+#endif

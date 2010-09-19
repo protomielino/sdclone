@@ -26,24 +26,26 @@
 #ifndef _OPPONENT_H_
 #define _OPPONENT_H_
 
+#include <car.h>        //tCarElt
+#include <raceman.h>    //tSituation
 #include "cardata.h"
 #include <list>
 #include <string>
 using namespace std;
 
-#define OPP_IGNORE      0
-#define OPP_FRONT       (1<<0)
-#define OPP_BACK        (1<<1)
-#define OPP_SIDE        (1<<2)
-#define OPP_COLL        (1<<3)
-#define OPP_LETPASS     (1<<4)
-#define OPP_FRONT_FAST  (1<<5)
+class Driver;
+
+#define OPP_IGNORE          0
+#define OPP_FRONT           (1<<0)
+#define OPP_BACK            (1<<1)
+#define OPP_SIDE            (1<<2)
+#define OPP_COLL            (1<<3)
+#define OPP_LETPASS         (1<<4)
+#define OPP_FRONT_FAST      (1<<5)
 #define OPP_FRONT_FOLLOW    (1<<6)
 
 
-class Driver;
-
-// Opponent maintains the data for one opponent RELATIVE to the drivers car.
+// Opponent maintains the data for one opponent RELATIVE to the driver's car.
 class Opponent
 {
 public:
@@ -51,30 +53,30 @@ public:
 
   static void setTrackPtr(tTrack * const track) {Opponent::m_track = track;}
 
-  tCarElt *getCarPtr() {return m_car;}
-  float getDistance() {return m_distance;}
-  float getWidth() {return m_cardata->getWidthOnTrack();}
-  float getSpeed() {return m_cardata->getSpeedInTrackDirection();}
-  int getIndex() {return m_index;}
+  tCarElt *getCarPtr() const {return m_car;}
+  double getDistance() const {return m_distance;}
+  double getWidth() const {return m_cardata->getWidthOnTrack();}
+  double getSpeed() const {return m_cardata->getSpeedInTrackDirection();}
+  int getIndex() const {return m_index;}
   
-  bool is_state(const int state) {return bool(m_state & state);}
-  bool is_teammate() {return m_teammate;}
+  inline bool is_state(const int state) const {return bool(m_state & state);}
+  inline bool is_teammate() const {return m_teammate;}
   bool is_quicker_teammate(tCarElt * const mycar);
 
-  void markAsTeamMate() {m_teammate = true;}
-  void update(tSituation * s, Driver * driver);
+  inline void markAsTeamMate() {m_teammate = true;}
+  void update(tSituation *s, Driver *driver);
 
 private:
-  float getDistToSegStart();
+  double getDistToSegStart() const;
   void updateOverlapTimer(tSituation * const s, tCarElt * const mycar);
 
-  float m_distance;         // approximation of the real distance, negative if the opponent is behind.
-  float m_brakedistance;    // distance minus opponent car length
-  float m_catchdist;        // distance needed to catch the opponent (linear estimate).
-  float m_sidedist;         // approx distance of center of gravity of the cars.
+  double m_distance;         // approximation of the real distance, negative if the opponent is behind.
+  double m_brakedistance;    // distance minus opponent car length
+  double m_catchdist;        // distance needed to catch the opponent (linear estimate).
+  double m_sidedist;         // approx distance of center of gravity of the cars.
   int m_state;              // State variable to characterize the relation to the opponent, e. g. opponent is behind.
   int m_index;
-  float m_overlaptimer;
+  double m_overlaptimer;
 
   tCarElt *m_car;
   SingleCardata *m_cardata; // Pointer to global data about this opponent.
@@ -84,14 +86,14 @@ private:
   static tTrack *m_track;
 
   // constants.
-  static const float FRONTCOLLDIST;
-  static const float BACKCOLLDIST;
-  static const float LENGTH_MARGIN;
-  static const float SIDE_MARGIN;
-  static const float EXACT_DIST;
-  static const float LAP_BACK_TIME_PENALTY;
-  static const float OVERLAP_WAIT_TIME;
-  static const float SPEED_PASS_MARGIN;
+  static const double FRONTCOLLDIST;
+  static const double BACKCOLLDIST;
+  static const double LENGTH_MARGIN;
+  static const double SIDE_MARGIN;
+  static const double EXACT_DIST;
+  static const double LAP_BACK_TIME_PENALTY;
+  static const double OVERLAP_WAIT_TIME;
+  static const double SPEED_PASS_MARGIN;
 };
 
 

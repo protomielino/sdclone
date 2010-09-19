@@ -1,8 +1,7 @@
 /*
- *      spline.h
+ *      util.h
  *      
- *      Copyright 2009 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
- *      Based on work by Bernhard Wymann and Andrew Sumner.
+ *      Copyright 2008 kilo aka Gabor Kmetyko <kg.kilo@gmail.com>
  *      
  *      This program is free software; you can redistribute it and/or modify
  *      it under the terms of the GNU General Public License as published by
@@ -16,34 +15,15 @@
  *      
  *      You should have received a copy of the GNU General Public License
  *      along with this program; if not, write to the Free Software
- *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- *      MA 02110-1301, USA.
- * 
- *      $Id$
- * 
+ *      Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  */
 
-#ifndef _SPLINE_H_
-#define _SPLINE_H_
+#ifndef _UTIL_H_
+#define _UTIL_H_
 
-class SplinePoint {
-  public:
-    double x; // x coordinate.
-    double y; // y coordinate.
-    double s; // slope.
-};
+extern double Mag(const double x, const double y);
+extern bool BetweenStrict(const double val, const double min, const double max);
+extern bool BetweenLoose(const double val, const double min, const double max);
+extern double sign(const double d);
 
-
-class Spline {
-  public:
-    Spline(int dim, SplinePoint *s);
-
-    double evaluate(double z);
-
-  private:
-    SplinePoint *s;
-    int dim;
-};
-
-#endif // _SPLINE_H_
-
+#endif  //_UTIL_H_
