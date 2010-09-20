@@ -35,6 +35,7 @@
 #include "raceline.h"
 #include "util.h"
 
+#include <portability.h> //snprintf under MSVC
 #include <robottools.h> //Rt*
 #include <robot.h>  //ROB_PIT_IM
 
