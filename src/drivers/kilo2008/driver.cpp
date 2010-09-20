@@ -72,7 +72,7 @@ const double
 const double
   Driver::PIT_MU = 0.4;    // [-] Friction of pit concrete.
 const double
-  Driver::MAX_SPEED = 97.22;    // [m/s] Speed to compute the percentage of brake to apply., 350 km/h
+  Driver::MAX_SPEED = 350.0 / 3.6;    // [m/s] Speed to compute the percentage of brake to apply., 350 km/h
 const double
   Driver::CLUTCH_SPEED = 5.0;  // [m/s]
 const double
@@ -109,11 +109,10 @@ Driver::~Driver()
   delete opponents;
   delete pit;
   delete strategy;
-  if(cardata != NULL)
-    {
-      delete cardata;
-      cardata = NULL;
-    }
+  if(cardata != NULL) {
+    delete cardata;
+    cardata = NULL;
+  }
 }
 
 
@@ -155,15 +154,15 @@ Driver::newRace(tCarElt * car, tSituation * s)
   setMode(CORRECTING);
   lastmode = CORRECTING;
 
-  for(carindex = 0; carindex < s->_ncars; carindex++)
-    {
-      if(s->cars[carindex] == car)
-        break;
-    }
+  for(carindex = 0; carindex < s->_ncars; carindex++) {
+    if(s->cars[carindex] == car)
+      break;
+  }
 
   raceline->setCar(car);
   raceline->NewRace();
-}
+}//newRace
+
 
 void
 Driver::calcSpeed()
@@ -196,49 +195,29 @@ Driver::drive(tSituation * s)
 
   //pit->setPitstop(true);
 
-  if(isStuck())
-    {
-      car->_steerCmd = -mycardata->getCarAngle() / car->_steerLock;
-      car->_gearCmd = -1;   // Reverse gear.
-      car->_accelCmd = 1.0;    // 100% accelerator pedal.
-      car->_brakeCmd = 0.0;    // No brakes.
-      car->_clutchCmd = 0.0;   // Full clutch (gearbox connected with engine).
-    }
-  else
-    {
-      car->_steerCmd = getSteer(s);
-      car->_gearCmd = getGear();
-      calcSpeed();
-      car->_brakeCmd = 
-        filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
-      if(car->_brakeCmd == 0.0)
-        {
-          car->_accelCmd = filterTCL(filterTrk(filterOverlap(getAccel())));
-        }
-      else
-        {
-          car->_accelCmd = 0.0;
-        }
-      car->_clutchCmd = getClutch();
-
-    }
+  if(isStuck()) {
+    car->_steerCmd = -mycardata->getCarAngle() / car->_steerLock;
+    car->_gearCmd = -1;   // Reverse gear.
+    car->_accelCmd = 1.0;    // 100% accelerator pedal.
+    car->_brakeCmd = 0.0;    // No brakes.
+    car->_clutchCmd = 0.0;   // Full clutch (gearbox connected with engine).
+  }
+  else {
+    car->_steerCmd = getSteer(s);
+    car->_gearCmd = getGear();
+    calcSpeed();
+    car->_brakeCmd = 
+      filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
+    if(car->_brakeCmd == 0.0)
+      car->_accelCmd = filterTCL(filterTrk(filterOverlap(getAccel())));
+    else
+      car->_accelCmd = 0.0;
+    car->_clutchCmd = getClutch();
+  }
 
   laststeer = car->_steerCmd;
   lastmode = mode;
-}
-
-
-// Set pitstop commands.
-/*int
-Driver::pitCommand(tSituation * s)
-{
-  //car->_pitRepair = strategy->pitRepair(car, s);
-  //car->_pitFuel = strategy->pitRefuel(car, s);
-  // This should be the only place where the pit stop is set to false!
-  pit->setPitstop(false);
-  return ROB_PIT_IM;        // return immediately.
-}
-*/
+}//drive
 
 
 // End of the current race.
@@ -384,30 +363,7 @@ Driver::getSteer(tSituation *s)
   targetAngle = atan2(racetarget.y - car->_pos_Y, racetarget.x - car->_pos_X);
   // uncomment the following if we want to use BT steering rather than K1999
   // racesteer = calcSteer( targetAngle, 1 );
-  //kilo HACK
-  #if 0
-  if((strcmp(car->_trkPos.seg->name, "straight 16") == 0) //corner before long curve
-    //~ || (strcmp(car->_trkPos.seg->name, "curve 24") == 0)
-    //~ || (strcmp(car->_trkPos.seg->name, "172") == 0)
-    //|| (strcmp(car->_trkPos.seg->name, "180") == 0)
-    )
-    {
-      racesteer = calcSteer(targetAngle, 1, racesteer);
-    }
-  #endif
-  
-  //kilo HACK
-  #if 0
-  if((strcmp(car->_trkPos.seg->name, "170") == 0)
-    || (strcmp(car->_trkPos.seg->name, "171") == 0)
-    || (strcmp(car->_trkPos.seg->name, "172") == 0)
-    )
-    {
-      racesteer -= car->_trkPos.seg->width / 2.0 - 1.0;
-      racesteer = MIN(racesteer, car->_trkPos.seg->width);
-    }
-  #endif
-  
+
   if(mode == AVOIDING &&
      (!avoidmode
       || (avoidmode == AVOIDRIGHT && raceoffset >= myoffset && raceoffset < avoidlftoffset)
@@ -1005,65 +961,63 @@ Driver::filterABS(double brake)
 
 // TCL filter for accelerator pedal.
 double
-Driver::filterTCL(double accel)
+Driver::filterTCL(const double accel)
 {
-  if(simtime < 3.0)
-    return accel;
+  double ret = accel;
+  
+  if(simtime >= 3.0) {
+    ret = MIN(1.0, accel);
+    double accel1 = ret, accel2 = ret, accel3 = ret;
 
-  accel = MIN(1.0, accel);
-  double accel1 = accel, accel2 = accel, accel3 = accel;
-
-  if(car->_speed_x > 10.0)
-    {
+    if(car->_speed_x > 10.0) {
       tTrackSeg *seg = car->_trkPos.seg;
       tTrackSeg *wseg0 = car->_wheelSeg(0);
       tTrackSeg *wseg1 = car->_wheelSeg(1);
       int count = 0;
 
-      if((wseg0->surface->kRoughness >
-        MAX(0.02, seg->surface->kRoughness * 1.2)
+      if(
+        wseg0->surface->kRoughness > MAX(0.02, seg->surface->kRoughness * 1.2)
         || wseg0->surface->kFriction < seg->surface->kFriction * 0.8
-        || wseg0->surface->kRollRes > MAX(0.005,
-                        seg->surface->kRollRes * 1.2)))
+        || wseg0->surface->kRollRes > MAX(0.005, seg->surface->kRollRes * 1.2))
         count++;
-        
-      if((wseg1->surface->kRoughness >
-        MAX(0.02, seg->surface->kRoughness * 1.2)
+          
+      if(
+        wseg1->surface->kRoughness > MAX(0.02, seg->surface->kRoughness * 1.2)
         || wseg1->surface->kFriction < seg->surface->kFriction * 0.8
-        || wseg1->surface->kRollRes > MAX(0.005,
-                        seg->surface->kRollRes * 1.2)))
+        || wseg1->surface->kRollRes > MAX(0.005, seg->surface->kRollRes * 1.2))
         count++;
 
-      if(count)
-        {
-          if(mode != NORMAL &&
-            ((seg->type == TR_RGT && seg->radius <= 200.0
+      if(count) {
+        if(mode != NORMAL
+          && ((seg->type == TR_RGT && seg->radius <= 200.0
             && car->_trkPos.toLeft < 3.0)
             || (seg->type == TR_LFT && seg->radius <= 200.0
             && car->_trkPos.toRight < 3.0)))
-            count++;
-      
+          count++;
+        
           accel1 = MAX(0.0, MIN(accel1, (1.0 - (0.25 * count)) -
                             MAX(0.0, (getSpeed() - car->_speed_x) / 10.0)));
-        }
+          }//if count
 
       if(abs(angle) > 1.0)
         accel1 = MIN(accel1, 1.0 - (abs(angle) - 1.0) * 1.3);
-    }
+      }//if car->_speed_x
 
-  if(abs(car->_steerCmd) > 0.02)
-    {
+    if(abs(car->_steerCmd) > 0.02) {
       double decel = ((abs(car->_steerCmd) - 0.02) *
-        (1.0 + abs(car->_steerCmd)) * 0.7);
+          (1.0 + abs(car->_steerCmd)) * 0.7);
       accel2 = MIN(accel2, MAX(0.45, 1.0 - decel));
-    }
+    }//if car->_steerCmd
 
-  double slip = (this->*GET_DRIVEN_WHEEL_SPEED) () - car->_speed_x;
-  if(slip > TCL_SLIP)
+    double slip = (this->*GET_DRIVEN_WHEEL_SPEED) () - car->_speed_x;
+    if(slip > TCL_SLIP)
       accel3 = accel3 - MIN(accel3, (slip - TCL_SLIP) / TCL_RANGE);
 
-  return MIN(accel1, MIN(accel2, accel3));
-}
+    ret = MIN(accel1, MIN(accel2, accel3));
+  }//if simtime
+  
+  return ret;
+}//filterTCL
 
 
 // Traction Control (TCL) setup.
@@ -1121,8 +1075,6 @@ Driver::filterTCL_4WD()
 double
 Driver::filterTrk(double accel)
 {
-  //return accel; //???
-
   tTrackSeg *seg = car->_trkPos.seg;
 
   if(car->_speed_x < MAX_UNSTUCK_SPEED ||   // Too slow.
@@ -1154,7 +1106,7 @@ Driver::filterTrk(double accel)
             return accel;
         }
     }
-}
+}//filterTrk
 
 
 // Compute the needed distance to brake.

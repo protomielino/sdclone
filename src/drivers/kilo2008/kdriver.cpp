@@ -64,38 +64,31 @@ KDriver::drive(tSituation * s)
   //~ sprintf(car->_msgCmd[0], "%d", (int)(car->_distFromStartLine));
   //~ memcpy(car->_msgColorCmd, colour, sizeof(car->_msgColorCmd));
   
-  if(isStuck())
-    {
-      car->_steerCmd = -mycardata->getCarAngle() / car->_steerLock;
-      car->_gearCmd = -1;   // Reverse gear.
-      car->_accelCmd = 1.0;    // 100% accelerator pedal.
-      car->_brakeCmd = 0.0;    // No brakes.
-      car->_clutchCmd = 0.0;   // Full clutch (gearbox connected with engine).
-    }
-  else
-    {
-      car->_steerCmd = getSteer(s);
-      car->_gearCmd = getGear();
-      calcSpeed();
-      car->_brakeCmd = 
-        filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
-      if(car->_brakeCmd == 0.0)
-        {
-          car->_accelCmd = filterTCL(filterTrk(filterOverlap(getAccel())));
-        }
-      else
-        {
-          car->_accelCmd = 0.0;
-        }
-      car->_clutchCmd = getClutch();
-    }
+  if(isStuck()) {
+    car->_steerCmd = -mycardata->getCarAngle() / car->_steerLock;
+    car->_gearCmd = -1;   // Reverse gear.
+    car->_accelCmd = 1.0;    // 100% accelerator pedal.
+    car->_brakeCmd = 0.0;    // No brakes.
+    car->_clutchCmd = 0.0;   // Full clutch (gearbox connected with engine).
+  } else {
+    car->_steerCmd = getSteer(s);
+    car->_gearCmd = getGear();
+    calcSpeed();
+    car->_brakeCmd = 
+      filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
+    if(car->_brakeCmd == 0.0)
+      car->_accelCmd = filterTCL(filterTrk(filterOverlap(getAccel())));
+    else
+      car->_accelCmd = 0.0;
+    car->_clutchCmd = getClutch();
+  }//if isStuck
 
   //sprintf(car->_msgCmd[0], "%s", "yeppeee");
   //memcpy(car->_msgColorCmd, colour, sizeof(car->_msgColorCmd));
 
   laststeer = car->_steerCmd;
   lastmode = mode;
-}
+}//drive
 
 
 // Check if I'm stuck.
@@ -106,19 +99,18 @@ KDriver::isStuck()
   
   if(abs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
         car->_speed_x < MAX_UNSTUCK_SPEED &&
-        abs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST)
-    {
-      if(stuckCounter > MAX_UNSTUCK_COUNT
-        && car->_trkPos.toMiddle * mycardata->getCarAngle() < 0.0)
-          ret = true;
-      else
-          stuckCounter++;
-    }
-  else
-      stuckCounter = 0;
+        abs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST) {
+    if(stuckCounter > MAX_UNSTUCK_COUNT
+      && car->_trkPos.toMiddle * mycardata->getCarAngle() < 0.0)
+        ret = true;
+    else
+        stuckCounter++;
+  } else {
+    stuckCounter = 0;
+  }
   
   return ret;
-}
+}//isStuck
 
 
 // Reduces the brake value such that it fits the speed (more downforce -> more braking).
@@ -151,8 +143,8 @@ KDriver::getOffset()
   m_rgtinc = incfactor * MIN(1.3, MAX(0.4, 1.0 + m_rInverse * (m_rInverse < 0.0 ? 20 : 80)));
   m_lftinc = incfactor * MIN(1.3, MAX(0.4, 1.0 - m_rInverse * (m_rInverse > 0.0 ? 20 : 80)));
   
-  int offlft = (myoffset > car->_trkPos.seg->width / 2 - 1.0);
-  int offrgt = (myoffset < -(car->_trkPos.seg->width / 2 - 1.0));
+  int offlft = myoffset > car->_trkPos.seg->width / 2 - 1.0;
+  int offrgt = myoffset < -(car->_trkPos.seg->width / 2 - 1.0);
   
   if (offlft)
     myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 2;
@@ -162,8 +154,9 @@ KDriver::getOffset()
   avoidlftoffset = MAX(avoidlftoffset, myoffset - OVERTAKE_OFFSET_INC * m_rgtinc * (offlft ? 6 : 2));
   avoidrgtoffset = MIN(avoidrgtoffset, myoffset + OVERTAKE_OFFSET_INC * m_lftinc * (offrgt ? 6 : 2));
   
-  m_maxoffset = track->width / 2 - (car->_dimension_y); // limit to the left
-  m_minoffset = -(track->width / 2 - (car->_dimension_y)); // limit to the right
+  m_maxoffset = track->width / 2 - car->_dimension_y; // limit to the left
+  //m_minoffset = -(track->width / 2 - car->_dimension_y); // limit to the right
+  m_minoffset = -m_maxoffset; // limit to the right
 
   if (myoffset < m_minoffset) // we're already outside right limit, bring us back towards track
     {
@@ -201,27 +194,23 @@ KDriver::getOffset()
 
   
   // no-one to avoid, work back towards raceline
-  if(mode != NORMAL && abs(myoffset - raceoffset) > 1.0)
-    {
-      if (myoffset > raceoffset + OVERTAKE_OFFSET_INC * m_rgtinc / 4)
-        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 4;
-      else if (myoffset < raceoffset + OVERTAKE_OFFSET_INC * m_lftinc / 4)
-        myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 4;
-    } // if mode
+  if(mode != NORMAL && abs(myoffset - raceoffset) > 1.0) {
+    if (myoffset > raceoffset + OVERTAKE_OFFSET_INC * m_rgtinc / 4)
+      myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 4;
+    else if (myoffset < raceoffset + OVERTAKE_OFFSET_INC * m_lftinc / 4)
+      myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 4;
+  } // if mode
     
-  if(simtime > 2.0)
-    {
-      if(myoffset > raceoffset)
-        myoffset =
-            MAX(raceoffset, myoffset - OVERTAKE_OFFSET_INC * incfactor / 2);
-      else
-        myoffset =
-            MIN(raceoffset, myoffset + OVERTAKE_OFFSET_INC * incfactor / 2);
-    } // if simtime
+  if(simtime > 2.0) {
+    if(myoffset > raceoffset)
+      myoffset = MAX(raceoffset, myoffset - OVERTAKE_OFFSET_INC * incfactor / 2);
+    else
+      myoffset = MIN(raceoffset, myoffset + OVERTAKE_OFFSET_INC * incfactor / 2);
+  } // if simtime
 
   myoffset = MIN(m_maxoffset, MAX(m_minoffset, myoffset));
   return myoffset;
-}
+}//getOffset
 
 
 /*
@@ -266,24 +255,23 @@ KDriver::get_overlapping_opp()
         )
         {
           // Behind, larger distances are smaller ("more negative").
-          if(opp_distance > mindist)
-            {
-              mindist = opp_distance;
-              ret = &(*it);
-            }
+          if(opp_distance > mindist) {
+            mindist = opp_distance;
+            ret = &(*it);
+          }
         } // if teammate
       else if(it->is_state(OPP_LETPASS))
         {
           // Behind, larger distances are smaller ("more negative").
-          if(opp_distance > mindist)
-            {
-              mindist = opp_distance;
-              ret = &(*it);
-            }
+          if(opp_distance > mindist) {
+            mindist = opp_distance;
+            ret = &(*it);
+          }
         } // else if
     } // for i
   return ret;
-}
+}//get_overlapping_opp
+
 
 /*
  * 
@@ -855,41 +843,9 @@ KDriver::calcSpeed()
         speed = racespeed;
     }//switch mode
     
-  //HACK kilo - breaking points for Alpine-2
-  //~ if(
-    //~ BetweenLoose(car->_distFromStartLine, 2753, 2940) //after tunnel
-    //~ )
-    //~ {
-      //~ speed *= 0.9;
-    //~ }
-  //HACK kilo - breaking points for Dirt-3
-  //~ if(
-    //~ BetweenLoose(car->_distFromStartLine, 75, 105) ||       //pit exit
-    //~ BetweenLoose(car->_distFromStartLine, 400, 440) ||      //curve 6
-    //~ BetweenLoose(car->_distFromStartLine, 625, 635) ||      //straight 10
-    //~ BetweenLoose(car->_distFromStartLine, 665, 675) ||      //straight 10
-    //~ BetweenLoose(car->_distFromStartLine, 840, 870) ||      //straight 12
-    //~ BetweenLoose(car->_distFromStartLine, 1097, 1136) ||    //curve 15
-    //~ BetweenLoose(car->_distFromStartLine, 1390, 1419) ||    //straight 17
-    //~ BetweenLoose(car->_distFromStartLine, 1455, 1465) ||    //curve 18
-    //~ BetweenLoose(car->_distFromStartLine, 1510, 1550) ||    //curve 19
-    //~ BetweenLoose(car->_distFromStartLine, 1760, 1820) ||    //s1
-    //~ BetweenLoose(car->_distFromStartLine, 1891, 1944)       //s2
-    //~ )
-    //~ {
-      //~ speed *= 0.4;
-//~ #ifdef DEBUG
-      //~ cerr << "!";
-//~ #endif
-    //~ }
-#ifdef DEBUG
-  cerr << (int)(car->_distFromStartLine) << " " << car->_trkPos.seg->name << endl;
-#endif
-  //End HACK kilo
-  
   double x = (10 + car->_speed_x) * (speed - car->_speed_x) / 200;
 
-  if(x > 0)
+  if(x > 0.0)
     accelcmd = x;
   else
     brakecmd = MIN(1.0, -(MAX(10.0, brakedelay * 0.7)) * x);

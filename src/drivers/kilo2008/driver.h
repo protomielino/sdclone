@@ -110,7 +110,7 @@ protected:
   virtual double filterBrakeSpeed(double brake);
   double filterTurnSpeed(double brake);
 
-  double filterTCL(double accel);
+  double filterTCL(const double accel);
   void initTCLfilter();
   double filterTCL_RWD();
   double filterTCL_FWD();

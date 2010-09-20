@@ -164,55 +164,6 @@ LRaceLine::SplitTrack(const tTrack * const ptrack, const int rl, const tSituatio
                           break;
                     }//if pits.type
 
-#if 0
-                  //kilo HACK Street-1
-                  //No wandering in pit line during the race
-                  if(1 && //s->_raceType == RM_TYPE_RACE &&
-                    ((strcmp(psegCurrent->name, "curve 34") == 0)
-                    || (strcmp(psegCurrent->name, "final straigth") == 0)
-                    || (side == TR_SIDE_RGT && strcmp(psegCurrent->name, "start") == 0)
-                    || (side == TR_SIDE_RGT && strcmp(psegCurrent->name, "pit end") == 0)
-                    || (side == TR_SIDE_RGT && strcmp(psegCurrent->name, "pit exit") == 0)
-                    )) {
-                    break;
-                  } //can enter pit lane on a qualy or practice
-#endif
-#if 0
-                  else if((s->_raceType == RM_TYPE_QUALIF || s->_raceType == RM_TYPE_PRACTICE) &&
-                    ((strcmp(psegCurrent->name, "curve 34") == 0)
-                    || (strcmp(psegCurrent->name, "final straigth") == 0)
-                    )) {
-                    break;
-                  }
-#endif
-                  //end kilo HACK Street-1
-#if 0
-                  //Aalborg HACK kilo
-                  if(
-                    (strcmp(psegCurrent->name, "140") == 0) //evil double left-hander
-                    //|| (strcmp(psegCurrent->name, "171") == 0) //turn before back straight
-                    || (strcmp(psegCurrent->name, "172") == 0)
-                    || (strcmp(psegCurrent->name, "180") == 0)
-                    //|| (strcmp(psegCurrent->name, "210") == 0) //turn ending back straigth
-                    || (strcmp(psegCurrent->name, "220") == 0)
-                    || (strcmp(psegCurrent->name, "230") == 0)
-                    )
-                    {
-                      //fprintf(stderr, "%s %d\n", psegCurrent->name, i);
-                      break;
-                    }
-                  //end HACK kilo
-
-                  if((strcmp(psegCurrent->name, "turn22") == 0) //corner before long curve
-                    || (strcmp(psegCurrent->name, "turn23") == 0)
-                    || (strcmp(psegCurrent->name, "segment24") == 0)
-                    || (strcmp(psegCurrent->name, "turn25") == 0)
-                    )
-                    {
-                      break;
-                    }
-#endif
-
                   //Phew, we CAN use the side
                   //TODO: check not to leave the track completely if TRB rules change...
                   double dSideWidth = MIN(psegSide->startWidth, psegSide->endWidth);
