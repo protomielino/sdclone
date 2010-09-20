@@ -191,6 +191,11 @@ MACRO(ROBOT_MODULE)
 		cmake_policy(SET CMP0003 NEW)
 	endif(COMMAND cmake_policy)
 
+	IF(WIN32)
+		# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+	    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+	ENDIF(WIN32)
+
 	ADD_LIBRARY(${ROBOTNAME} SHARED ${SOURCES})
 	IF(UNIX)
 		SET_TARGET_PROPERTIES(${ROBOTNAME} PROPERTIES PREFIX "")

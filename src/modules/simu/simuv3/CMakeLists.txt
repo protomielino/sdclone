@@ -12,6 +12,11 @@ ADD_SDLIB_INCLUDEDIR(math tgf robottools portability)
 INCLUDE_DIRECTORIES(../simuv2.1/SOLID-2.0/include)
 
 IF(WIN32)
+	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+ENDIF(WIN32)
+
+IF(WIN32)
 	ADD_LIBRARY(simuv3 SHARED ${SIMUV3_SOURCES} simuv3.def)
 ELSE(WIN32)
 	ADD_LIBRARY(simuv3 SHARED ${SIMUV3_SOURCES})

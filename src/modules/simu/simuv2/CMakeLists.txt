@@ -17,6 +17,11 @@ ADD_PLIB_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 
 IF(WIN32)
+	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+ENDIF(WIN32)
+
+IF(WIN32)
 	ADD_LIBRARY(simuv2 SHARED ${SIMUV2_SOURCES} simuv2.def)
 ELSE(WIN32)
 	ADD_LIBRARY(simuv2 SHARED ${SIMUV2_SOURCES})

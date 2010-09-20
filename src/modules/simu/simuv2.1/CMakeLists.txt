@@ -22,11 +22,10 @@ IF(UNIX)
 		COMPILE_FLAGS -fPIC)
 ENDIF(UNIX)
 
-#ELSE(UNIX)
-#	ADD_LIBRARY(SOLID-2.0/src/solid ${SOLID_SOURCES})
-#	SET_TARGET_PROPERTIES(SOLID-2.0/src/solid PROPERTIES COMPILE_FLAGS -fPIC)
-#ENDIF(UNIX)
-
+IF(WIN32)
+	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+ENDIF(WIN32)
 
 SET(SIMUV2.1_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
                    collide.cpp differential.cpp engine.cpp simu.cpp simuitf.cpp

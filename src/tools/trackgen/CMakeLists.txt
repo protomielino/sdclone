@@ -16,6 +16,11 @@ if (COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
+IF(WIN32)
+	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+    SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+ENDIF(WIN32)
+
 IF(UNIX)
 	ADD_EXECUTABLE(sd-trackgen ${TRACKGEN_SOURCES} ../../linux/linuxspec.cpp)
 ENDIF(UNIX)
