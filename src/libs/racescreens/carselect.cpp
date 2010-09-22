@@ -32,6 +32,8 @@
 
 void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 {
+	//GfLogDebug("RmCarSelectMenu::onActivateCB\n");
+
 	// Get the RmCarSelectMenu instance.
 	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
 
@@ -330,6 +332,8 @@ void RmCarSelectMenu::resetCarPreviewImage(const std::string& strSelectedSkinNam
 
 void RmCarSelectMenu::RunMenu(trmdDrvElt* pDriver)
 {
+	//GfLogDebug("RmCarSelectMenu::RunMenu\n");
+
 	// Initialize if not already done.
 	if (!GetMenuHandle())
 		Initialize();
@@ -343,7 +347,9 @@ void RmCarSelectMenu::RunMenu(trmdDrvElt* pDriver)
 
 bool RmCarSelectMenu::Initialize()
 {
-	//CarInfo::self()->print();
+	//GfLogDebug("RmCarSelectMenu::Initialize\n");
+
+	CarInfo::self()->print();
 
 	// Create the menu and all its controls.
 	CreateMenuEx(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
@@ -395,6 +401,7 @@ trmdDrvElt* RmCarSelectMenu::getDriver()
 void RmCarSelectMenu::setDriver(trmdDrvElt* pDriver)
 {
 	_pDriver = pDriver;
+	_hCarParams = 0; // No newly selected car for the moment.
 }
 
 void RmCarSelectMenu::setSelectedCarParamsHandle(void* hdle)

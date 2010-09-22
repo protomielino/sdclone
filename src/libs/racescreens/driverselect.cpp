@@ -111,6 +111,8 @@ static void rmdsClickOnDriver(void * /* dummy */);
 static void
 rmdsActivate(void * /* notused */)
 {
+	//GfLogDebug("rmdsActivate\n");
+
     // Update selected driver displayed info
     rmdsClickOnDriver(NULL);
 }
@@ -119,6 +121,8 @@ rmdsActivate(void * /* notused */)
 static void
 rmdsDeactivate(void *nextScreenHdle)
 {
+	//GfLogDebug("rmdsDeactivate\n");
+
     rmdsCleanup();    
     GfuiScreenRelease(ScrHandle);
     
@@ -267,6 +271,8 @@ rmdsPreviousMenu(void *screen)
 static void
 rmdsCarSelectMenu(void *pPreviousMenu)
 {
+	//GfLogDebug("rmdsCarSelectMenu\n");
+
 	trmdDrvElt *pDriver = rmdsGetHighlightedDriver();
 
 	if (pDriver)
@@ -509,6 +515,8 @@ RmDriversSelect(void *vs)
     int		human;
     const char* initCarCat;
 
+	//GfLogDebug("RmDriversSelect\n");
+	
     // Initialize drivers selection
     MenuData = (tRmDriverSelect*)vs;
 
@@ -596,6 +604,7 @@ RmDriversSelect(void *vs)
 							curDrv->skinName = 0; // Initialized later if needed from race params.
 							curDrv->name = strdup(curmod->modInfo[i].name);
 							curDrv->carParmHdle = carhdle;
+							//GfLogDebug("Candidate %s : %s on %s\n", modName, curDrv->name, carName);
 							const char* carCat = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, "");
 							if (std::find(VecCarCategories.begin(), VecCarCategories.end(), carCat) == VecCarCategories.end()) {
 								VecCarCategories.push_back(carCat);
@@ -639,6 +648,7 @@ RmDriversSelect(void *vs)
     NbMaxSelectedDrivers =
 		(int)GfParmGetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 0);
     nDrivers = GfParmGetEltNb(MenuData->param, RM_SECT_DRIVERS);
+	//GfLogDebug("Competitors : n=%d (max=%d)\n", nDrivers, NbMaxSelectedDrivers);
     initCarCat = 0;
     index = 1;
     for (i = 1; i < nDrivers+1; i++) {
@@ -649,6 +659,8 @@ RmDriversSelect(void *vs)
 		skinName = GfParmGetStr(MenuData->param, path, RM_ATTR_SKINNAME, rmdStdSkinName);
 		extended = GfParmGetNum(MenuData->param, path, RM_ATTR_EXTENDED, NULL, 0);
 
+		//GfLogDebug("Competitor #%d : ext=%d, itf %d\n", i, extended, robotIdx);
+
 		// Try and retrieve this driver in the full drivers list
 		if ((curDrv = GF_TAILQ_FIRST(&DriverList))) {
 			do {
@@ -656,6 +668,8 @@ RmDriversSelect(void *vs)
 					// We've got it : if we can keep it for the race
 					// (there is a threshold on the number of competitors) :
 					if (NbSelectedDrivers < NbMaxSelectedDrivers) {
+
+						//GfLogDebug("  Name = %s\n", curDrv->name);
 
 						// The driver is selected for the race !
 						curDrv->isSelected = index++;
@@ -672,12 +686,14 @@ RmDriversSelect(void *vs)
 						// Get the chosen car for the race if any specified (human only).
 						if (curDrv->isHuman && extended)
 						{
+							//GfLogDebug("  Extended && Human\n");
 							sprintf(path, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, moduleName, extended, robotIdx);
 							carName = GfParmGetStr(MenuData->param, path, RM_ATTR_CARNAME, 0);
 							sprintf(path, "cars/%s/%s.xml", carName, carName);
 							if (!stat(path, &st)) {
 								carhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
 								if (carhdle) {
+									//GfLogDebug("  Car XML OK : %s\n", path);
 									if (curDrv->carParmHdle)
 										GfParmReleaseHandle(curDrv->carParmHdle);
 									curDrv->carParmHdle = carhdle;
