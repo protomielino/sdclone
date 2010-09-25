@@ -2,16 +2,20 @@
 // unitmain.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.0
 //--------------------------------------------------------------------------*
 // Interface to TORCS
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2009.12.22
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.09.25
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000 
+// Version      : 2.00.001 
+//--------------------------------------------------------------------------*
+// V2.00.01 (Speed Dreams - Career mode):
+// Uses new Speed Dreams Interfaces and was extended to use career mode
+// - Still work in progress
 //--------------------------------------------------------------------------*
 // V2.00 (Speed Dreams):
 // Uses new Speed Dreams Interfaces
@@ -178,6 +182,7 @@ typedef struct stInstanceInfo
 	int cUnusedCount;
 } tInstanceInfo;
 
+//#undef ROB_SECT_ARBITRARY
 #ifdef ROB_SECT_ARBITRARY
 static tInstanceInfo *cInstances;
 static int cInstancesCount;
@@ -562,8 +567,6 @@ extern "C" int simplixShut()
 static int InitFuncPt(int Index, void *Pt)
 {
   tRobotItf *Itf = (tRobotItf *)Pt;              // Get typed pointer
-  int xx;
-  tInstanceInfo *copy;
 
   Itf->rbNewTrack = InitTrack;                   // Store function pointers 
   Itf->rbNewRace  = NewRace;
@@ -574,6 +577,9 @@ static int InitFuncPt(int Index, void *Pt)
   Itf->index      = Index;                       // Store index
 
 #ifdef ROB_SECT_ARBITRARY
+  int xx;
+  tInstanceInfo *copy;
+
   //Make sure enough data is allocated
   if (cInstancesCount <= Index-IndexOffset) {
     copy = new tInstanceInfo[Index-IndexOffset+1];

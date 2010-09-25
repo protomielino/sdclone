@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.02.08
+// Last changed : 2010.09.25
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 2.00.001
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -58,6 +58,12 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
+// THIS VERSION WAS MODIFIED TO BE USED WITH SD CAREER MODE
+// This results in some issues while using it with windows!
+// Known bugs:
+// Heap corruption -> do not used delete for oCarType, use free (oCarType)
+// 
+//--------------------------------------------------------------------------*
 //#undef SPEED_DREAMS
 
 #include <v2_t.h>
@@ -80,11 +86,11 @@
 // Statics
 //--------------------------------------------------------------------------*
 int TDriver::NBBOTS = MAX_NBBOTS;                  // Nbr of drivers/robots
-//double TDriver::CurrSimTime = 0;                   // Current simulation time
-const char* TDriver::MyBotName = "simplix";              // Name of this bot
-const char* TDriver::ROBOT_DIR = "drivers/simplix";      // Sub path to dll
-const char* TDriver::SECT_PRIV = "simplix private";      // Private section
-const char* TDriver::DEFAULTCARTYPE  = "car1-trb1";      // Default car type
+//double TDriver::CurrSimTime = 0;                 // Current simulation time
+const char* TDriver::MyBotName = "simplix";        // Name of this bot
+const char* TDriver::ROBOT_DIR = "drivers/simplix";// Sub path to dll
+const char* TDriver::SECT_PRIV = "simplix private";// Private section
+const char* TDriver::DEFAULTCARTYPE  = "car1-trb1";// Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
@@ -99,7 +105,7 @@ bool  TDriver::Learning = false;                   // Initialize
 
 double TDriver::LengthMargin;                      // safety margin long.
 bool TDriver::Qualification;                       // Global flag
-static const char *WheelSect[4] =                        // TORCS defined sections
+static const char *WheelSect[4] =                  // TORCS defined sections
 {SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL, SECT_REARRGTWHEEL, SECT_REARLFTWHEEL};
 
 //static double (TDriver::*CalcCrv)(double Crv);
@@ -333,7 +339,8 @@ TDriver::TDriver(int Index):
 //  GfOut("#TDriver::TDriver() >>>\n");
   int I;
   oIndex = Index;                                // Save own index
-  oExtended = ( Index < 0 || Index >= NBBOTS ) ? 1 : 0; //Determine if it is extended or not
+  oExtended =                                    // Determine if it 
+	  ( Index < 0 || Index >= NBBOTS ) ? 1 : 0;  //   is extended or not
 
   // Motion survey
   oSysFooStuckX = new TSysFoo(1,128);            // Ringbuffer for X
@@ -362,7 +369,9 @@ TDriver::~TDriver()
   delete [] oOpponents; 
   
   if (oCarType != NULL)
-    delete oCarType;
+//    delete oCarType; // CAUSES HEAP CORRUPTION ASSERTION
+   	free(oCarType);
+
   if (oStrategy != NULL)
     delete oStrategy;
   if (oSysFooStuckX != NULL)
@@ -385,7 +394,8 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
     // in the teams xml file and to load depending
     // setup files we have to find it out:
 
-    if (oCarType)
+    // Needed for Career mode?
+	if (oCarType)                                
     	free (oCarType);
     oCarType = NULL;
 
@@ -398,18 +408,26 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
 	    ,ROB_SECT_ROBOTS,ROB_LIST_INDEX,oIndex); // Index of own driver
     char* Section = SectionBuffer;
 
-	oCarType = strdup(GfParmGetStr           // Get pointer to
-      (RobotSettings                             // car type
-      , Section                                  // defined in corresponding
-      , ROB_ATTR_CAR, DEFAULTCARTYPE));           // section, default car type
 
-	oBotName = Value;                            // Get pointer to drivers name
-
-#ifdef SPEED_DREAMS //Speed dreams has a trick to find out the oCarType
+#ifdef SPEED_DREAMS 
+	// Modified to avoid memory leaks
+	// Speed dreams has a trick to find out the oCarType
     RtGetCarindexString(oIndex, "simplix", oExtended, indexstr, 32);
     if( oExtended )
-    	oCarType = strdup( indexstr );
+      oCarType = strdup( indexstr );
+	else // avoid empty car type
+  	  oCarType = strdup(GfParmGetStr             // Get pointer to
+        (RobotSettings                           // car type
+        , Section                                // defined in corresponding
+        , ROB_ATTR_CAR, DEFAULTCARTYPE));        // section, default car type
+#else // IF NOT SPEED_DREAMS use simplix way to do it
+	oCarType = strdup(GfParmGetStr               // Get pointer to
+      (RobotSettings                             // car type
+      , Section                                  // defined in corresponding
+      , ROB_ATTR_CAR, DEFAULTCARTYPE));          // section, default car type
 #endif //SPEED_DREAMS
+
+	oBotName = Value;                            // Get pointer to drivers name
 
 	oTeamName = GfParmGetStr                     // Get pointer to
       (RobotSettings                             // drivers team name
