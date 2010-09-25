@@ -1,18 +1,25 @@
+/***************************************************************************
+                 main.cpp -- Versionned settings XML files installation
+                             -------------------                                         
+    created              : 2009
+    author               : Mart Kelder
+    web                  : http://speed-dreams.sourceforge.net   
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 #include <tgf.h>
+#include <portability.h>
 
-#ifndef TRUE
-#define TRUE 1
-#endif //TRUE
 
-#ifndef FALSE
-#define FALSE 0
-#endif //FALSE
-
-#ifdef WIN32
-#define snprintf _snprintf
-#endif
-
-static char* strip_destdir( char *filename, char const *destdir )
+static const char* strip_destdir(const char *filename, const char *destdir )
 {
 	int xx;
 	int destdir_length;
@@ -31,82 +38,74 @@ static char* strip_destdir( char *filename, char const *destdir )
 	return &filename[ destdir_length ];
 }
 
-// Uncomment to get debug traces in findIndex.
-#define DEBUG_FINDINDEX
-#ifdef DEBUG_FINDINDEX
-#define trace printf
-#else
-#define trace
-#endif
-
 static int findIndex( void *versionHandle, const char* dataLocation,
-					  const char* userLocation, char* path, bool dataOnly )
+					  const char* userLocation, const char* path, bool dataOnly )
 {
 	int nbIndices = GfParmGetEltNb( versionHandle, path ) + 1;
-	char *indices = (char*)malloc( sizeof(char) * nbIndices );
+	bool *indices = (bool*)malloc( sizeof(bool) * nbIndices );
 	int curIndex;
 
-	trace("findIndex(h=%p, d=%s, u=%s, p=%s, dataonly=%d) : n=%d\n",
-		  versionHandle, dataLocation, userLocation, path, dataOnly, nbIndices-1);
+	GfLogDebug("findIndex(h=%p, d=%s, u=%s, p=%s, dataonly=%d) : n=%d\n",
+			   versionHandle, dataLocation, userLocation, path, dataOnly, nbIndices-1);
 	
-	memset( indices, FALSE, nbIndices );
+	memset( indices, false, nbIndices );
 
 	if( GfParmListSeekFirst( versionHandle, path ) == 0 )
 	{
 		do
 		{
 			curIndex = atoi( GfParmListGetCurEltName( versionHandle, path ) );
-			trace("  Examining index %d : ", curIndex);
+			GfLogDebug("  Examining index %d : ", curIndex);
 			
 			if( curIndex >= 0 && curIndex < nbIndices )
-				indices[ curIndex ] = TRUE;
+				indices[ curIndex ] = true;
 
 			if( strcmp( GfParmGetCurStr( versionHandle, path, "Data location", "" ), dataLocation ) == 0 &&
 			    ( dataOnly || strcmp( GfParmGetCurStr( versionHandle, path, "Local location", "" ), userLocation ) == 0 ) )
 			{
-				trace("yes.\n");
+				GfLogDebug("yes.\n");
 				free( indices );
 				return curIndex;
 			}
-			trace("no.\n");
+			GfLogDebug("no.\n");
 		} while( GfParmListSeekNext( versionHandle, path ) == 0 );
 	}
 
 	curIndex = 0;
 	while( indices[ curIndex ] )
 		++curIndex;
-	trace("  New = %d.\n", curIndex);
+	GfLogDebug("  New = %d.\n", curIndex);
 
 	free( indices );
 
 	return curIndex;
 }
 
-static int process( const char* versionFile, char* dataLocation, char* userLocation, char const* destdir )
+static int process( const char* versionFile, const char* dataLocation,
+					const char* userLocation, const char * destdir )
 {
 	void *versionHandle;
 	void *xmlHandle;
 	int index;
 	char *path;
-	char *pathStart = strdup( "versions" );
-	char* actualDataLoc;
+	const char* actualDataLoc;
 	int majorVer, minorVer;
 
 	xmlHandle = GfParmReadFile( dataLocation, GFPARM_RMODE_STD );
 	if( !xmlHandle )
 	{
-		fprintf( stderr, "xmlversion: Cannot open xml-file \"%s\".\n", dataLocation );
+		fprintf( stderr, "xmlversion: Can't open \"%s\".\n", dataLocation );
 		return 1;
 	}
 
 	versionHandle = GfParmReadFile( versionFile, GFPARM_RMODE_CREAT );
 	if( !versionHandle )
 	{
-		fprintf( stderr, "xmlversion: Cannot open or create xml-file \"%s\".\n", versionFile );
+		fprintf( stderr, "xmlversion: Can't open or create \"%s\".\n", versionFile );
 		return 1;
 	}
 
-	index = findIndex( versionHandle, dataLocation, userLocation, pathStart, false );
+	index = findIndex( versionHandle, dataLocation, userLocation,  "versions", false );
 	actualDataLoc = strip_destdir( dataLocation, destdir );
 	majorVer = GfParmGetMajorVersion( xmlHandle );
 	minorVer = GfParmGetMinorVersion( xmlHandle );
@@ -119,7 +118,6 @@ static int process( const char* versionFile, char* dataLocation, char* userLocat
 	GfParmSetNum( versionHandle, path, "Major version", NULL, (tdble)majorVer);
 	GfParmSetNum( versionHandle, path, "Minor version", NULL, (tdble)minorVer);
 
-	free( pathStart );
 	free( path );
 
 	GfParmWriteFile( NULL, versionHandle, "versions" );
@@ -127,29 +125,28 @@ static int process( const char* versionFile, char* dataLocation, char* userLocat
 	GfParmReleaseHandle( versionHandle );
 	GfParmReleaseHandle( xmlHandle );
 
-	fprintf(stderr, "xmlversion: updated %s (file #%d %s (version %d.%d) => %s).\n",
+	fprintf(stderr, "xmlversion: Updated %s (file #%d %s (version %d.%d) => %s).\n",
 			versionFile, index, actualDataLoc, majorVer, minorVer, userLocation);
 
 	return 0;
 }
 
-static int add_directory( const char* versionFile, char* directoryName, char const* destdir )
+static int add_directory( const char* versionFile, const char* directoryName, const char *destdir )
 {
 	void *versionHandle;
 	char *path;
-	char *pathStart = strdup( "directories" );
 	int index;
-	char* actualDataLoc;
+	const char* actualDataLoc;
 
 	versionHandle = GfParmReadFile( versionFile, GFPARM_RMODE_STD );
 	if( !versionHandle )
 	{
 		GfParmReleaseHandle( versionHandle );
-		fprintf( stderr, "xmlversion: Cannot open or create xml-file \"%s\".\n", versionFile );
+		fprintf( stderr, "xmlversion: Can't open or create \"%s\".\n", versionFile );
 		return 1;
 	}
 
-	index = findIndex( versionHandle, directoryName, "", pathStart, true );
+	index = findIndex( versionHandle, directoryName, "", "directories", true );
 	actualDataLoc = strip_destdir( directoryName, destdir );
 
 	path = (char*)malloc( sizeof(char) * 31 );
@@ -157,24 +154,23 @@ static int add_directory( const char* versionFile, char* directoryName, char con
 
 	GfParmSetStr( versionHandle, path, "Data location", actualDataLoc);
 
-	free( pathStart );
 	free( path );
 
 	GfParmWriteFile( NULL, versionHandle, "versions" );
 	
 	GfParmReleaseHandle( versionHandle );
 
-	fprintf(stderr, "xmlversion: updated %s (directory %s).\n", versionFile, actualDataLoc);
+	fprintf(stderr, "xmlversion: Updated %s (directory %s).\n", versionFile, actualDataLoc);
 
 	return 0;
 }
 
 int main( int argc, char **argv )
 {
-	char *versionfile;
-	char *dataLocation;
-	char *userLocation;
-	char const *destdir;
+	const char *versionfile;
+	const char *dataLocation;
+	const char *userLocation;
+	const char *destdir;
 	int ret;
 
 	if( argc <= 3 )
@@ -193,14 +189,20 @@ int main( int argc, char **argv )
 		return 1; //Not enough arguments
 	}
 
-	if( argc > 4 )
-		fprintf( stderr, "Warning: too many arguments in xmlversion. Ignoring extra arguments\n" );
+	// Uncomment to get debug traces.
+    //GfInit(); 
 
-	versionfile = strdup( argv[1] );
-	dataLocation = strdup( argv[2] );
-	userLocation = strdup( argv[3] );
+	if( argc > 4 )
+		fprintf( stderr, "Warning: Too many arguments (should be 3). Ignoring extra ones.\n" );
+
+	versionfile = argv[1];
+	dataLocation = argv[2];
+	userLocation = argv[3];
 	destdir = getenv( "DESTDIR" );
-	fprintf(stderr, "xmlversion: DESTDIR=%s\n", destdir ? destdir : "<undefined>");
+	GfLogDebug("xmlversion: DESTDIR='%s'\n", destdir ? destdir : "<undefined>");
+	GfLogDebug("xmlversion: versionfile='%s'\n", versionfile);
+	GfLogDebug("xmlversion: dataLocation='%s'\n", dataLocation);
+	GfLogDebug("xmlversion: userLocation='%s'\n", userLocation);
 	
 	if( strcmp( versionfile, "-d" ) == 0 )
 		ret = add_directory( dataLocation, userLocation, destdir );
@@ -210,10 +212,6 @@ int main( int argc, char **argv )
 		ret = add_directory( versionfile, dataLocation, destdir );
 	else
 		ret = process( versionfile, dataLocation, userLocation, destdir );
-
-	free( versionfile );
-	free( dataLocation );
-	free( userLocation );
 
 	exit( ret );
 }

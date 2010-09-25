@@ -3,7 +3,7 @@ PROJECT(xmlversion)
 
 SET(XMLVERSION_SOURCES main.cpp)
 
-ADD_SDLIB_INCLUDEDIR(tgf)
+ADD_SDLIB_INCLUDEDIR(tgf portability)
 ADD_OSSPEC_INCLUDEDIR()
 
 IF (COMMAND cmake_policy)
