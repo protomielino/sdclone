@@ -9,10 +9,10 @@
 //
 // File         : unitlane.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.05.16
+// Last changed : 2010.09.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 2.00.001
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -429,6 +429,7 @@ void TLane::PropagateBreaking
 	  if (fabs(K) > 0.0001)
 	    Dist = 2 * asin(0.5 * Dist * K) / K;
 	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+	  double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
 
 	  double U = oFixCarParam.CalcBraking(
         oCarParam,
@@ -439,7 +440,8 @@ void TLane::PropagateBreaking
 		oPathPoints[Q].Speed,
 		Dist,
 		oTrack->Friction(P),
-		TrackRollAngle);
+		TrackRollAngle,
+		TrackTiltAngle);
 
 	  if (oPathPoints[P].Speed > U)
 		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
@@ -477,6 +479,7 @@ void TLane::PropagatePitBreaking
 	  if (fabs(K) > 0.0001)
 	    Dist = 2 * asin(0.5 * Dist * K) / K;
 	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+	  double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
 
 	  double Factor = 1.0 - MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
 	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit);
@@ -490,7 +493,8 @@ void TLane::PropagatePitBreaking
 		oPathPoints[Q].Speed,
 		Dist,
 		Friction,
-		TrackRollAngle);
+		TrackRollAngle,
+		TrackTiltAngle);
 
 	  if (oPathPoints[P].Speed > U)
 		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;

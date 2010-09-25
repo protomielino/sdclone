@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.12
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.09.25
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 2.00.001
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -170,12 +170,17 @@ double	TFixCarParam::CalcBraking
   double Speed,                                  // Speed
   double Dist,                                   // Distance P0 P1
   double Friction,                               // Friction
-  double TrackRollAngle) const                   // Track roll angle
+  double TrackRollAngle,                         // Track roll angle
+  double TrackTiltAngle) const                   // Track tilt angle
 {
   if (Speed > 180/3.6)
     Friction *= 0.90;
   else
     Friction *= 0.95;
+
+  double Crv = (0.3*Crv0 + 0.9*Crv1);
+  double Crvz = -(0.25*Crvz0 + 0.75*Crvz1);
+
   double Mu = Friction * oTyreMu;
   double Mu_F = Mu;
   double Mu_R = Mu;
@@ -188,17 +193,14 @@ double	TFixCarParam::CalcBraking
   double Cd = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
-  double Crv = (0.3*Crv0 + 0.9*Crv1);
-  double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
-
   Crv *= oDriver->CalcCrv(fabs(Crv));
 
   if (Crvz > 0)
 	Crvz = 0; 
 
-  double Gdown = G * cos(TrackRollAngle);
-  double Glat  = G * sin(TrackRollAngle);
-  double Gtan  = 0;	
+  double Gdown = G * cos(TrackRollAngle) * cos(TrackTiltAngle);
+  double Glat  = fabs(G * sin(TrackRollAngle));
+  double Gtan  = G * sin(TrackTiltAngle);
 
   double V = Speed;
   double U = V;
@@ -214,12 +216,12 @@ double	TFixCarParam::CalcBraking
 	double Ffrnt = oCaFrontWing * AvgV2;
 	double Frear = oCaRearWing * AvgV2;
 
-	Froad = Fdown * Mu + Ffrnt * Mu_F + Frear * Mu_R;
+	Froad = 0.95 * Fdown * Mu + Ffrnt * Mu_F + Frear * Mu_R;
 
 	double Flat  = oTmpCarParam->oMass * Glat;
 	double Ftan  = oTmpCarParam->oMass * Gtan - Cd * AvgV2;
 
-	double Flatroad = fabs(oTmpCarParam->oMass * AvgV2 * Crv - Flat);
+	double Flatroad = MAX(0.0,oTmpCarParam->oMass * AvgV2 * fabs(Crv) - Flat);
 	if (Flatroad > Froad)
 	  Flatroad = Froad;
 

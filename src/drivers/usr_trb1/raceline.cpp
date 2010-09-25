@@ -333,7 +333,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  SteerMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_STEER_MOD, (char *)NULL, 0.0f );
  MaxSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MAX_STEER_TIME, (char *)NULL, 1.5f );
  MinSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MIN_STEER_TIME, (char *)NULL, 1.0f );
- RaceLineDebug = (bool) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_RACELINE_DEBUG, (char *)NULL, 0.0f );
+ RaceLineDebug = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_RACELINE_DEBUG, (char *)NULL, 0.0f ) > 0;
  AccelCurveDampen =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_ACCEL_CURVE, (char *)NULL, 1.0f );
  BrakeCurveDampen =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_CURVE, (char *)NULL, 1.0f );
  AccelCurveLimit =  GfParmGetNum( carhandle, SECT_PRIVATE, PRV_ACCEL_CURVE_LIMIT, (char *)NULL, 1.0f );
@@ -900,7 +900,7 @@ void LRaceLine::CalcZCurvature(int rl)
  {
   tTrackSeg *seg = SRL[rl].tSegment[SRL[rl].tDivSeg[i]];
   
-  SRL[rl].tz[i] = RtTrackHeightG(seg, SRL[rl].tx[i], SRL[rl].ty[i]);
+  SRL[rl].tz[i] = RtTrackHeightG(seg, (tdble) SRL[rl].tx[i], (tdble) SRL[rl].ty[i]);
 
   int next = (i + 1) % Divs;
   int prev = (i - 1 + Divs) % Divs;
@@ -913,8 +913,8 @@ void LRaceLine::CalcZCurvature(int rl)
   int j = ((i-1)+Divs) % Divs;
 
   vec2f pi, pj;
-  pi.x = SRL[rl].tx[i]; pi.y = SRL[rl].ty[i];
-  pj.x = SRL[rl].tx[j]; pj.y = SRL[rl].ty[j];
+  pi.x = (tdble) SRL[rl].tx[i]; pi.y = (tdble) SRL[rl].ty[i];
+  pj.x = (tdble) SRL[rl].tx[j]; pj.y = (tdble) SRL[rl].ty[j];
 
   SRL[rl].tzd[i] = (SRL[rl].tz[i] - SRL[rl].tz[j]) / PointDist(&pi, &pj);
  }
@@ -1465,8 +1465,8 @@ void LRaceLine::GetRLSteerPoint( vec2f *rt, double *offset, double time )
    count++;
   }
 
-  rt->x = SRL[SRLidx].tx[next];
-  rt->y = SRL[SRLidx].ty[next];
+  rt->x = (tdble) SRL[SRLidx].tx[next];
+  rt->y = (tdble) SRL[SRLidx].ty[next];
   *offset = -(SRL[SRLidx].tLane[next] * seg->width - seg->width/2);
  }
 }
@@ -1518,8 +1518,8 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
    count++;
   }
 
-  rt->x = offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next];
-  rt->y = offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next];
+  rt->x = (tdble) (offlane * SRL[SRLidx].txRight[next] + (1 - offlane) * SRL[SRLidx].txLeft[next]);
+  rt->y = (tdble) (offlane * SRL[SRLidx].tyRight[next] + (1 - offlane) * SRL[SRLidx].tyLeft[next]);
  }
  else
  {
@@ -1541,8 +1541,8 @@ void LRaceLine::GetSteerPoint( double lookahead, vec2f *rt, double offset, doubl
    }
    dist += thisdist;
  
-   rt->x = txNext;
-   rt->y = tyNext;
+   rt->x = (tdble) txNext;
+   rt->y = (tdble) tyNext;
   
    if (dist >= lookahead)
    {
@@ -2238,8 +2238,8 @@ void LRaceLine::GetPoint( double offset, vec2f *rt, double *mInverse )
 
  if (rt)
  {
-  rt->x = txNext;
-  rt->y = tyNext;
+  rt->x = (tdble) txNext;
+  rt->y = (tdble) tyNext;
  }
 
  if (mInverse)
