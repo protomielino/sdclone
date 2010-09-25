@@ -4,7 +4,7 @@
     created              : Mon Apr 10 18:04:38 CEST 2000
     copyright            : (C) 2000 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: preferences.xml,v 1.16 2003/11/08 16:37:17 torcs Exp $                                  
+    version              : $Id: preferences.xml,v 1.16 2003/11/08 16:37:17 torcs $
 -->
 
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
 
-<params mode="mw" type="template" name="Player Pref">
+<params mode="mw" type="template" name="Player Pref" version="1.0">
 
   <section name="joystick">
     <attstr name="up shift"   val="BTN1-0"/>
@@ -117,25 +117,27 @@
 	<attstr name="ASR on" in="yes,no" val="yes"/>	
 	<attnum name="programmed pit stops" val="0"/>
         <attnum name="steer sensitivity" val="0.6"/>
-        <attnum name="steer dead zone" val="0.004"/>
+        <attnum name="steer dead zone" val="0.0"/>
         <attstr name="left steer" val="MOUSE_LEFT"/>
         <attnum name="left steer min" val="0"/>
-        <attnum name="left steer max" val="317"/>
-        <attnum name="left steer power" val="0.00315457"/>
+        <attnum name="left steer max" val="319"/>
+        <attnum name="left steer power" val="0.00315"/>
         <attstr name="right steer" val="MOUSE_RIGHT"/>
         <attnum name="right steer min" val="0"/>
-        <attnum name="right steer max" val="312"/>
-        <attnum name="right steer power" val="0.00320513"/>
-        <attstr name="throttle" val="f"/>
+        <attnum name="right steer max" val="319"/>
+        <attnum name="right steer power" val="0.00315"/>
+        <attstr name="throttle" val="Up Arrow"/>
         <attnum name="throttle min" val="0"/>
         <attnum name="throttle max" val="1"/>
         <attnum name="throttle power" val="0"/>
-        <attstr name="brake" val="v"/>
+        <attstr name="brake" val="Down Arrow"/>
         <attnum name="brake min" val="0"/>
         <attnum name="brake max" val="1"/>
         <attnum name="brake power" val="0"/>
-        <attstr name="ABS cmd" val="c"/>
-        <attstr name="ASR cmd" val="d"/>
+        <attstr name="ABS cmd" val="a"/>
+        <attstr name="ASR cmd" val="t"/>
+        <attstr name="Speed Limiter" val="s"/>
+        <attstr name="Light1 cmd" val="l"/>
       </section>
 
     </section>
