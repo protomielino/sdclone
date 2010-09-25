@@ -38,11 +38,11 @@ SingleCardata::update()
   NORM_PI_PI(angle);
   width =
     MAX(car->_dimension_y,
-    abs(car->_dimension_x * sin(angle) +
+    fabs(car->_dimension_x * sin(angle) +
          car->_dimension_y * cos(angle))) + 0.1;
   length =
     MAX(car->_dimension_x,
-    abs(car->_dimension_y * sin(angle) +
+    fabs(car->_dimension_y * sin(angle) +
          car->_dimension_x * cos(angle))) + 0.1;
 
   for(int i = 0; i < 4; i++)

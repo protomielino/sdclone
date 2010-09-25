@@ -266,9 +266,9 @@ Driver::getAccel()
   if(car->_gear > 0)
     {
       accelcmd = MIN(1.0, accelcmd);
-      if(abs(angle) > 0.8 && getSpeed() > 10.0)
+      if(fabs(angle) > 0.8 && getSpeed() > 10.0)
         accelcmd =
-          MAX(0.0, MIN(accelcmd, 1.0 - getSpeed() / 100.0 * abs(angle)));
+          MAX(0.0, MIN(accelcmd, 1.0 - getSpeed() / 100.0 * fabs(angle)));
       ret = accelcmd;
     }//if car->_gear
     
@@ -376,9 +376,9 @@ Driver::getSteer(tSituation *s)
 
   if(mode == CORRECTING &&
       (lastmode == NORMAL ||
-      (abs(angle) < 0.2f && abs(racesteer) < 0.4f
-      && abs(laststeer - racesteer) < 0.05
-      && ((abs(car->_trkPos.toMiddle) < car->_trkPos.seg->width / 2 - 1.0)
+      (fabs(angle) < 0.2f && fabs(racesteer) < 0.4f
+      && fabs(laststeer - racesteer) < 0.05
+      && ((fabs(car->_trkPos.toMiddle) < car->_trkPos.seg->width / 2 - 1.0)
       || car->_speed_x < 10.0) && raceline->isOnLine())))
     {
       // we're CORRECTING & are now close enough to the raceline to
@@ -402,7 +402,7 @@ Driver::getSteer(tSituation *s)
       else
         steer = smoothSteering(correctSteering(avoidsteer, racesteer));
 
-      if(abs(angle) >= 1.6)
+      if(fabs(angle) >= 1.6)
         {
           if(steer > 0.0)
             steer = 1.0;
@@ -438,7 +438,7 @@ Driver::calcSteer(double targetAngle, int rl, double racesteer)
 {
   double rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3])
                     - MAX(car->_skid[0], car->_skid[1]))
-                    + MAX(car->_skid[2], car->_skid[3]) * abs(angle) * 0.9;
+                    + MAX(car->_skid[2], car->_skid[3]) * fabs(angle) * 0.9;
 
   double angle_correction = 0.0;
   double factor = (rl ? 1.4f : (mode == CORRECTING ? 1.1f : 1.2f));
@@ -455,7 +455,7 @@ Driver::calcSteer(double targetAngle, int rl, double racesteer)
       double speedsteer = (80.0 - MIN(70.0, MAX(40.0, getSpeed()))) /
             ((185.0 * MIN(1.0, car->_steerLock / 0.785)) +
             (185.0 * (MIN(1.3, MAX(1.0, 1.0 + rearskid))) - 185.0));
-      if(abs(steer_direction) > speedsteer)
+      if(fabs(steer_direction) > speedsteer)
         {
         steer_direction = MAX(-speedsteer, MIN(speedsteer, steer_direction));
         }       
@@ -488,7 +488,7 @@ Driver::calcSteer(double targetAngle, int rl, double racesteer)
     
   lastNSasteer = steer;
   
-  if(abs(angle) > abs(speedangle))
+  if(fabs(angle) > fabs(speedangle))
     {           
       //steer into the skid
       double sa = MAX(-0.3, MIN(0.3, speedangle / 3));
@@ -497,20 +497,20 @@ Driver::calcSteer(double targetAngle, int rl, double racesteer)
       steer += anglediff * 0.7;
     }            
     
-  if(abs(angle) > 1.2)
+  if(fabs(angle) > 1.2)
     {
       steer = sign(steer);
     }
-  else if(abs(car->_trkPos.toMiddle) - car->_trkPos.seg->width / 2 > 2.0)
+  else if(fabs(car->_trkPos.toMiddle) - car->_trkPos.seg->width / 2 > 2.0)
     steer = MIN(1.0,
           MAX(-1.0, steer * (1.0 +
-                   (abs(car->_trkPos.toMiddle) -
-                    car->_trkPos.seg->width / 2) / 14 + abs(angle) / 2)));
+                   (fabs(car->_trkPos.toMiddle) -
+                    car->_trkPos.seg->width / 2) / 14 + fabs(angle) / 2)));
 
   if (mode != PITTING)
     {
       // limit how far we can steer against raceline 
-      double limit = (90.0 - MAX(40.0, MIN(60.0, car->_speed_x))) / (50 + abs(angle) * abs(angle) * 3);
+      double limit = (90.0 - MAX(40.0, MIN(60.0, car->_speed_x))) / (50 + fabs(angle) * fabs(angle) * 3);
       steer = MAX(racesteer - limit, MIN(racesteer + limit, steer));
     }
 
@@ -527,7 +527,7 @@ Driver::correctSteering(double avoidsteer, double racesteer)
   //double changelimit = MIN(1.0, raceline->correctLimit());
   double changelimit = MIN(raceline->correctLimit(),
         (((120.0 - getSpeed()) / 6000)
-        * (0.5 + MIN(abs(avoidsteer), abs(racesteer)) / 10)));
+        * (0.5 + MIN(fabs(avoidsteer), fabs(racesteer)) / 10)));
 
   if(mode == CORRECTING && simtime > 2.0)
     {
@@ -555,7 +555,7 @@ Driver::correctSteering(double avoidsteer, double racesteer)
       speed -= car->_accel_x / 10;
       speed = MAX(55.0, MIN(150.0, speed + (speed * speed / 55.0)));
       double rInverse = raceline->getRInverse() *
-            (car->_accel_x < 0.0 ? 1.0 + abs(car->_accel_x) / 10.0 : 1.0);
+            (car->_accel_x < 0.0 ? 1.0 + fabs(car->_accel_x) / 10.0 : 1.0);
       double correctspeed = 0.5;
       if((rInverse > 0.0 && racesteer > steer) || (rInverse < 0.0 && racesteer < steer))
         correctspeed += rInverse * 110.0;
@@ -591,8 +591,8 @@ Driver::smoothSteering(double steercmd)
         - 25)) / 300) * 1.2) / 0.785;
   //double rearskid = MAX(0.0, MAX(car->_skid[2], car->_skid[3]) - MAX(car->_skid[0], car->_skid[1]));
 
-  if(abs(steercmd) < abs(laststeer)
-     && abs(steercmd) <= abs(laststeer - steercmd))
+  if(fabs(steercmd) < fabs(laststeer)
+     && fabs(steercmd) <= fabs(laststeer - steercmd))
     speedfactor *= 2;
 
   steercmd = MAX(laststeer - speedfactor,
@@ -640,7 +640,7 @@ Driver::getClutch()
                              car->_gearOffset];
               double wr = car->_wheelRadius(2);
               speedr = (CLUTCH_SPEED +
-                        MAX(0.0, car->_speed_x)) / abs(wr * omega);
+                        MAX(0.0, car->_speed_x)) / fabs(wr * omega);
               double clutchr = MAX(0.0,
                   (1.0 - speedr * 2.0 * drpm /
                    car->_enginerpmRedLine)) *
@@ -781,9 +781,9 @@ Driver::isStuck()
 {
   bool ret = false;
   
-  if(abs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
+  if(fabs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
         car->_speed_x < MAX_UNSTUCK_SPEED &&
-        abs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST)
+        fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST)
     {
       if(stuckCounter > MAX_UNSTUCK_COUNT
         && car->_trkPos.toMiddle * mycardata->getCarAngle() < 0.0)
@@ -948,7 +948,7 @@ Driver::filterABS(double brake)
       slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
     }
   slip *=
-    1.0 + MAX(rearskid, MAX(abs(car->_yaw_rate) / 5, abs(angle) / 6));
+    1.0 + MAX(rearskid, MAX(fabs(car->_yaw_rate) / 5, fabs(angle) / 6));
   slip = car->_speed_x - slip / 4.0;
   
   if(slip > ABS_SLIP)
@@ -999,13 +999,13 @@ Driver::filterTCL(const double accel)
                             MAX(0.0, (getSpeed() - car->_speed_x) / 10.0)));
           }//if count
 
-      if(abs(angle) > 1.0)
-        accel1 = MIN(accel1, 1.0 - (abs(angle) - 1.0) * 1.3);
+      if(fabs(angle) > 1.0)
+        accel1 = MIN(accel1, 1.0 - (fabs(angle) - 1.0) * 1.3);
       }//if car->_speed_x
 
-    if(abs(car->_steerCmd) > 0.02) {
-      double decel = ((abs(car->_steerCmd) - 0.02) *
-          (1.0 + abs(car->_steerCmd)) * 0.7);
+    if(fabs(car->_steerCmd) > 0.02) {
+      double decel = ((fabs(car->_steerCmd) - 0.02) *
+          (1.0 + fabs(car->_steerCmd)) * 0.7);
       accel2 = MIN(accel2, MAX(0.45, 1.0 - decel));
     }//if car->_steerCmd
 
@@ -1084,7 +1084,7 @@ Driver::filterTrk(double accel)
 
   if(seg->type == TR_STR)
     {
-      double tm = abs(car->_trkPos.toMiddle);
+      double tm = fabs(car->_trkPos.toMiddle);
       double w = (seg->width - car->_dimension_y) / 2.0;
       if(tm > w)
         return 0.0;
@@ -1098,7 +1098,7 @@ Driver::filterTrk(double accel)
         return accel;
       else
         {
-          double tm = abs(car->_trkPos.toMiddle);
+          double tm = fabs(car->_trkPos.toMiddle);
           double w = seg->width / WIDTHDIV;
           if(tm > w)
             return 0.0;

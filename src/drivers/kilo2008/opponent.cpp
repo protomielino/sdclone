@@ -127,7 +127,7 @@ Opponent::update(tSituation *s, Driver *driver)
             driver->getSpeed() * m_distance / (driver->getSpeed() - getSpeed());
 
           m_sidedist = m_car->_trkPos.toMiddle - mycar->_trkPos.toMiddle;
-          double cardist = abs(m_sidedist) - abs(getWidth() / 2.0) -
+          double cardist = fabs(m_sidedist) - fabs(getWidth() / 2.0) -
             mycar->_dimension_y / 2.0;
           if(cardist < SIDE_MARGIN)
             m_state |= OPP_COLL;

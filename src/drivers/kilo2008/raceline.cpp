@@ -413,8 +413,8 @@ LRaceLine::Smooth(const int Step, const int rl)
         {
           if(ri0 * ri1 > 0)
             {
-              double ac1 = abs(ri0);
-              double ac2 = abs(ri1);
+              double ac1 = fabs(ri0);
+              double ac2 = fabs(ri1);
 
               if(ac1 < ac2) //curve increasing
                 ri0 += 0.11 * (ri1 - ri0);
@@ -531,7 +531,7 @@ LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSi
           m_Seg[i].tRInverse = rInverse;
 
           double MaxSpeed = 10000.0;
-          double dAbsInverse = abs(rInverse);
+          double dAbsInverse = fabs(rInverse);
           if(dAbsInverse > m_dMinCornerInverse * 1.01)
             MaxSpeed = sqrt(TireAccel / (dAbsInverse - m_dMinCornerInverse));
 
@@ -541,7 +541,7 @@ LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSi
               double camber = m_Seg[i].dCamber;
 
               if(camber < -0.02)  //bad camber. slow us down.
-                MaxSpeed -= MIN(MaxSpeed/4, abs(camber) * 20);
+                MaxSpeed -= MIN(MaxSpeed/4, fabs(camber) * 20);
               else if(camber > 0.02)  //good camber, speed us up.
                 MaxSpeed += camber * 10;
             }//if dAbsInverse
@@ -567,7 +567,7 @@ LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSi
             double Speed = (m_Seg[i].tSpeed[rl] + m_Seg[prev].tSpeed[rl]) / 2;
 
             double LatA = m_Seg[i].tSpeed[rl] * m_Seg[i].tSpeed[rl] *
-                (abs(m_Seg[prev].tRInverse) + abs(m_Seg[i].tRInverse)) / 2;
+                (fabs(m_Seg[prev].tRInverse) + fabs(m_Seg[i].tRInverse)) / 2;
 
             double TanA = TireAccel * TireAccel +
                 m_dMinCornerInverse * Speed * Speed - LatA * LatA;
@@ -646,23 +646,23 @@ LRaceLine::GetRaceLineData(const tSituation * const s,
   double toMiddle = m_pCar->_trkPos.toMiddle;
   if((m_Seg[Next].tRInverse > 0.0 && toMiddle < 0.0) ||
      (m_Seg[Next].tRInverse < 0.0 && toMiddle > 0.0))
-    *lookahead *= MIN(4.0, 1.5 + abs(toMiddle * 0.3));
+    *lookahead *= MIN(4.0, 1.5 + fabs(toMiddle * 0.3));
   else
-    *lookahead *= MAX(0.7, 1.5 - abs(toMiddle * 0.2));
+    *lookahead *= MAX(0.7, 1.5 - fabs(toMiddle * 0.2));
 
   if((m_Seg[Next].tRInverse < 0.0 && toMiddle > 0.0) ||
      (m_Seg[Next].tRInverse > 0.0 && toMiddle < 0.0))
     {
       *lookahead *= MAX(1.0, MIN(3.6, 1.0 +
-                    (MIN(2.6, abs(toMiddle) / (pSeg->width / 2)) /
-                    2) * (1.0 + abs(m_Seg[Next].tRInverse) * 65.0 +
+                    (MIN(2.6, fabs(toMiddle) / (pSeg->width / 2)) /
+                    2) * (1.0 + fabs(m_Seg[Next].tRInverse) * 65.0 +
                     m_pCar->_speed_x / 120.0)));
     }
   else if((m_Seg[Next].tRInverse < 0.0 && m_pCar->_trkPos.toRight < 5.0) ||
       (m_Seg[Next].tRInverse > 0.0 && m_pCar->_trkPos.toLeft < 5.0))
     {
       *lookahead *= MAX(0.8, MIN(1.0, 1.0 -
-        abs(m_Seg[Next].tRInverse) * 200.0 * ((5.0 -
+        fabs(m_Seg[Next].tRInverse) * 200.0 * ((5.0 -
         MIN(m_pCar->_trkPos.toRight, m_pCar->_trkPos.toLeft)) / 5.0)));
     }
 
@@ -701,7 +701,7 @@ LRaceLine::GetRaceLineData(const tSituation * const s,
        || (m_Seg[Next].tRInverse < -0.001 && m_Seg[Next].tLane > m_Seg[Index].tLane
        && m_pCar->_trkPos.toLeft > m_Seg[Next].tLane * m_dWidth + 1.0))
     {
-      *avspeed *= MAX(0.7, 1.0 - abs(m_Seg[Next].tRInverse) * 100);
+      *avspeed *= MAX(0.7, 1.0 - fabs(m_Seg[Next].tRInverse) * 100);
     }
 
 
@@ -712,7 +712,7 @@ LRaceLine::GetRaceLineData(const tSituation * const s,
   // Find target curveture (for the inside wheel)
   //
   double TargetCurvature = (1 - c0) * m_Seg[Next].tRInverse + c0 * m_Seg[Index].tRInverse;
-  if(abs(TargetCurvature) > 0.01)
+  if(fabs(TargetCurvature) > 0.01)
     {
       double r = 1 / TargetCurvature;
       if(r > 0)
@@ -791,7 +791,7 @@ LRaceLine::GetRaceLineData(const tSituation * const s,
   NORM_PI_PI(angle);
   angle = -angle;
 
-  if(abs(angle) > 1.0)
+  if(fabs(angle) > 1.0)
     {
       if((angle > 0.0 && steer > 0.0) || (angle < 0.0 && steer < 0.0))
         steer = -steer;
@@ -799,7 +799,7 @@ LRaceLine::GetRaceLineData(const tSituation * const s,
 
   //We're facing the wrong way.
   //Set it to full steer in whatever direction for now ...
-  if(abs(angle) > 1.6)
+  if(fabs(angle) > 1.6)
     steer = sign(steer);
 
   *racesteer = steer;
@@ -811,7 +811,7 @@ LRaceLine::isOnLine() const
   bool ret = false;
 
   double lane2left = m_Seg[Next].tLane * m_dWidth;
-  if(abs(m_pCar->_trkPos.toLeft - lane2left) <
+  if(fabs(m_pCar->_trkPos.toLeft - lane2left) <
      MAX(0.1, 1.0 - (m_pCar->_speed_x * (m_pCar->_speed_x / 10)) / 600))
     ret = true;
 
@@ -861,13 +861,13 @@ LRaceLine::correctLimit(void) const
   double nlane2left = m_Seg[Next].tLane * m_dWidth;
   if((m_Seg[Next].tRInverse > 0.001 && toLeft < nlane2left - 2.0)
     || (m_Seg[Next].tRInverse < -0.001 && toLeft > nlane2left + 2.0))
-    return MAX(0.2, MIN(1.0, 1.0 - abs(m_Seg[Next].tRInverse) * 100.0));
+    return MAX(0.2, MIN(1.0, 1.0 - fabs(m_Seg[Next].tRInverse) * 100.0));
 
   int nnext = (Next + (int)(m_pCar->_speed_x / 3)) % m_cDivs;
   double nnlane2left = m_Seg[nnext].tLane * m_dWidth;
   if((m_Seg[nnext].tRInverse > 0.001 && toLeft < nnlane2left - 2.0)
     || (m_Seg[nnext].tRInverse < -0.001 && toLeft > nnlane2left + 2.0))
-    return MAX(0.3, MIN(1.0, 1.0 - abs(m_Seg[nnext].tRInverse) * 40.0));
+    return MAX(0.3, MIN(1.0, 1.0 - fabs(m_Seg[nnext].tRInverse) * 40.0));
 
   // ok, we're not inside the racing line.  Check and see if we're outside it and turning
   // into a corner, in which case we want to correct more to try and get closer to the
@@ -878,7 +878,7 @@ LRaceLine::correctLimit(void) const
       || (m_Seg[Next].tRInverse < -0.001
         && m_Seg[Next].tLane >= m_Seg[This].tLane
         && toLeft < nlane2left - 2.0))
-    return MAX(1.0, MIN(1.5, 1.0 + abs(m_Seg[Next].tRInverse)));
+    return MAX(1.0, MIN(1.5, 1.0 + fabs(m_Seg[Next].tRInverse)));
 
   return 1.0;
 }

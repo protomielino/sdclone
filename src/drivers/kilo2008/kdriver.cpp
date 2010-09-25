@@ -97,9 +97,9 @@ KDriver::isStuck()
 {
   bool ret = false;
   
-  if(abs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
+  if(fabs(mycardata->getCarAngle()) > MAX_UNSTUCK_ANGLE &&
         car->_speed_x < MAX_UNSTUCK_SPEED &&
-        abs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST) {
+        fabs(car->_trkPos.toMiddle) > MIN_UNSTUCK_DIST) {
     if(stuckCounter > MAX_UNSTUCK_COUNT
       && car->_trkPos.toMiddle * mycardata->getCarAngle() < 0.0)
         ret = true;
@@ -139,7 +139,7 @@ KDriver::getOffset()
   // Increment speed dependent.
   m_rInverse = raceline->getRInverse();
   double incspeed = MIN(60.0, MAX(45.0, getSpeed())) - 18.0;
-  double incfactor = (MAX_INC_FACTOR - MIN(abs(incspeed) / MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0))) * (12.0 + MAX(0.0, (CA-1.9) * 14));
+  double incfactor = (MAX_INC_FACTOR - MIN(fabs(incspeed) / MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0))) * (12.0 + MAX(0.0, (CA-1.9) * 14));
   m_rgtinc = incfactor * MIN(1.3, MAX(0.4, 1.0 + m_rInverse * (m_rInverse < 0.0 ? 20 : 80)));
   m_lftinc = incfactor * MIN(1.3, MAX(0.4, 1.0 - m_rInverse * (m_rInverse > 0.0 ? 20 : 80)));
   
@@ -194,7 +194,7 @@ KDriver::getOffset()
 
   
   // no-one to avoid, work back towards raceline
-  if(mode != NORMAL && abs(myoffset - raceoffset) > 1.0) {
+  if(mode != NORMAL && fabs(myoffset - raceoffset) > 1.0) {
     if (myoffset > raceoffset + OVERTAKE_OFFSET_INC * m_rgtinc / 4)
       myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 4;
     else if (myoffset < raceoffset + OVERTAKE_OFFSET_INC * m_lftinc / 4)
@@ -346,8 +346,8 @@ bool
 KDriver::oppTooFarOnSide(tCarElt *ocar)
 {
   bool ret = false;
-  if(abs(ocar->_trkPos.toMiddle) > car->_trkPos.seg->width / 2 + 3.0
-    && abs(car->_trkPos.toMiddle - ocar->_trkPos.toMiddle) >= 5.0)
+  if(fabs(ocar->_trkPos.toMiddle) > car->_trkPos.seg->width / 2 + 3.0
+    && fabs(car->_trkPos.toMiddle - ocar->_trkPos.toMiddle) >= 5.0)
     ret = true;
   return ret;
 }
@@ -366,7 +366,7 @@ KDriver::get_takeover_opp()
 {
   Opponent *ret = NULL;
 
-  m_mincatchdist = MAX(30.0, 1500.0 - abs(m_rInverse) * 10000);
+  m_mincatchdist = MAX(30.0, 1500.0 - fabs(m_rInverse) * 10000);
   int otry_success = 0;
   
   for(int otry = 0; otry <= 1; otry++)
@@ -400,7 +400,7 @@ KDriver::get_takeover_opp()
                                 distance * CATCH_FACTOR) * otry_factor;   //when will we reach the opponent
 
               //if we are close enough, check again with avoidance speed taken into account
-              if(catchdist < m_mincatchdist && distance < abs(speed - ospeed) * 2)
+              if(catchdist < m_mincatchdist && distance < fabs(speed - ospeed) * 2)
                 {
                   m_mincatchdist = catchdist;
                   ret = &(*it); //This is the guy we need to take over
@@ -427,13 +427,13 @@ KDriver::filter_takeover_offset(Opponent *o)
   // Compute the opponent's distance to the middle.
   double otm = ocar->_trkPos.toMiddle;
   double sidemargin = o->getWidth() + getWidth() + 1.0;
-  double sidedist = abs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
+  double sidedist = fabs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
 
   // avoid more if on the outside of opponent on a bend.
   // Stops us from cutting in too much and colliding...
   if ((otm < -(ocar->_trkPos.seg->width - 5.0) && m_rInverse < 0.0) ||
       (otm > (ocar->_trkPos.seg->width - 5.0) && m_rInverse > 0.0))
-    sidemargin += abs(m_rInverse) * 150;
+    sidemargin += fabs(m_rInverse) * 150;
       
   if (otm > (ocar->_trkPos.seg->width - 5.0) ||
      (car->_trkPos.toLeft > ocar->_trkPos.toLeft &&
@@ -501,7 +501,7 @@ KDriver::filter_takeover_offset(Opponent *o)
         {
             // avoid more if on the outside of opponent on a bend.  Stops us
             // from cutting in too much and colliding...
-            sidemargin += abs(m_rInverse) * 150;
+            sidemargin += fabs(m_rInverse) * 150;
         }
       
       if(sidedist < sidemargin || o->is_state(OPP_COLL))
@@ -558,13 +558,13 @@ KDriver::filter_sidecoll_offset(Opponent *o,
 {
   double myToLeft = car->_trkPos.toLeft;
   double oppToLeft = o->getCarPtr()->_trkPos.toLeft;
-  double sidedist = abs(oppToLeft - myToLeft);
+  double sidedist = fabs(oppToLeft - myToLeft);
   double sidemargin = o->getWidth() + getWidth() + 2.0;
   // avoid more if on the outside of opponent on a bend.
   // Stops us from cutting in too much and colliding...
   if((opp_is_on_right(o) && m_rInverse < 0.0)
     || (!opp_is_on_right(o) && m_rInverse > 0.0))
-    sidemargin += abs(m_rInverse) * 150;
+    sidemargin += fabs(m_rInverse) * 150;
 
   if(opp_is_on_right(o))
     sidemargin -= MIN(0.0, m_rInverse * 100);
@@ -759,7 +759,7 @@ KDriver::check_pit_status(tSituation *s)
                   if(pitstatus[idx] == 1
                     || ((pitstatus[idx]
                         || (ocar-> _fuel < car->_fuel - 1.0 && car->_dammage < 5000))
-                    && abs(car->_trkPos.toMiddle) <= car->_trkPos.seg->width / 2))
+                    && fabs(car->_trkPos.toMiddle) <= car->_trkPos.seg->width / 2))
                     {
                       pit->setPitstop(false);
                       pitstatus[carindex] = 0;

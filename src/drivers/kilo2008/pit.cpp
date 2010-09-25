@@ -89,11 +89,11 @@ Pit::Pit(const tSituation * s, Driver * driver, const double pitoffset)
       p[6].y = 0.0;
       for(int i = 1; i < NPOINTS - 1; i++)
         {
-          p[i].y = abs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width;
+          p[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width;
           p[i].y *= sign;
         }
 
-      p[3].y = abs(pitinfo->driversPits->pos.toMiddle + 1.0) * sign;
+      p[3].y = fabs(pitinfo->driversPits->pos.toMiddle + 1.0) * sign;
       spline = new Spline(NPOINTS, p);
     }
 }
