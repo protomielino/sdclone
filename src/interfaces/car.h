@@ -214,7 +214,10 @@ typedef struct {
 				   - RM_CAR_STATE_NO_SIMU
 				   - RM_CAR_STATE_BROKEN
 				   - RM_CAR_STATE_OUTOFGAS
-				*/
+				   - RM_CAR_STATE_ELIMINATED
+				   - RM_CAR_STATE_ENDRACE_CALLED
+				   - RM_CAR_STATE_SIMU_NO_MOVE
+*/
 #define RM_CAR_STATE_FINISH	 	0x00000100				/**< Car having passed the finish line */
 #define RM_CAR_STATE_PIT	 	0x00000001				/**< Car currently stopped in pits */
 #define RM_CAR_STATE_DNF	 	0x00000002				/**< Car did not finish */

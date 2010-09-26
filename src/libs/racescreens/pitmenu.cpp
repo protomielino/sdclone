@@ -39,6 +39,8 @@ static void		*menuHandle = NULL;
 static int		fuelId;
 static int		repairId;
 static tCarElt		*rmCar;
+static tfuiCallback rmCallback;
+
 
 static void
 rmUpdtFuel(void * /* dummy */)
@@ -64,21 +66,18 @@ rmUpdtRepair(void * /* dummy */)
     GfuiEditboxSetString(menuHandle, repairId, buf);
 }
 
-static tfuiCallback rmCallback;
-static void *rmUserData;
-
 static void
 rmStopAndGo(void * /* dummy */)
 {
     rmCar->_pitStopType = RM_PIT_STOPANDGO;
-    rmCallback(rmUserData);
+    rmCallback(rmCar);
 }
 
 static void
 rmRepair(void* /* dummy */)
 {
-   rmCar->_pitStopType = RM_PIT_REPAIR;
-   rmCallback(rmUserData);
+	rmCar->_pitStopType = RM_PIT_REPAIR;
+	rmCallback(rmCar);
 }
 
 
@@ -86,19 +85,16 @@ rmRepair(void* /* dummy */)
  * This function shows the pit menu and let the user fill in the amount
  * of fuel he wants and the number of damage he want to repair
  *
- * @param s The current situation
- * @param car The current car
- * @param userdata The parameter for the @p callback callback function
+ * @param car The current car (pitcmd is modified on user decisions)
  * @param callback The function which is called after the user made a decision
  */
 void
-RmPitMenuStart(tSituation *s, tCarElt *car, void *userdata, tfuiCallback callback)
+RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 {
     char	buf[256];
 
     rmCar = car;
     rmCallback = callback;
-    rmUserData = userdata;
 
     if (menuHandle) {
 	GfuiScreenRelease(menuHandle);

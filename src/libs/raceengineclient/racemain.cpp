@@ -80,7 +80,7 @@ AbandonRaceHookActivate(void * /* vforce */)
 	// Shutdown current event.
 	ReEventShutdown();
 
-	/* Return to race menu */
+	// Return to race menu
 	ReInfo->_reState = RE_STATE_CONFIG;
 
 	GfuiScreenActivate(ReInfo->_reGameScreen);
@@ -105,7 +105,7 @@ AbortRaceHookActivate(void * /* dummy */)
 {
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 
-	ReShutdownUpdater();
+	ReShutdownUpdaters();
 
 	ReInfo->_reSimItf.shutdown();
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
@@ -124,7 +124,7 @@ AbortRaceHookActivate(void * /* dummy */)
 
 	FREEZ(ReInfo->_reCarInfo);
 	
-	/* Return to race menu */
+	// Return to race menu
 	if (ReInfo->params != ReInfo->mainParams)
 	{
 		GfParmReleaseHandle (ReInfo->params);
@@ -181,9 +181,9 @@ ReRaceEventInit(void)
 
 		/* Read the new params */
 		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-		printf( "ReInfo->mainResults->curfile = %s\n", GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ) );
+		GfLogDebug( "ReInfo->mainResults->curfile = %s\n", GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ) );
 		if (!params)
-			printf( "WARNING: params wasn't read correctly!!!\n" );
+			GfLogWarning( "Params weren't read correctly !!!\n" );
 		params = ReInfo->params;
 
 		/* Close previous results */
@@ -195,7 +195,7 @@ ReRaceEventInit(void)
 		/* Read the new results */
 		ReInfo->results = GfParmReadFile( GfParmGetStr( params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
 		if (!ReInfo->results)
-			printf( "WARNING: results wasn't read correctly!!!\n" );
+			GfLogWarning( "Results weren't read correctly !!!\n" );
 	}
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
@@ -439,7 +439,7 @@ reRaceRealStart(void)
 	ReInfo->_reBigMessage = 0;
 	ReInfo->_reBigMessageEnd = 0.0;
 	
-	ReInitUpdater();
+	ReInitUpdaters();
 	
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		RmLoadingScreenSetText("Loading cars ...");
@@ -613,7 +613,7 @@ static void
 BackToRaceHookActivate(void * /* dummy */)
 {
 	ReInfo->_reState = RE_STATE_RACE;
-	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
+
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
 
@@ -637,12 +637,11 @@ static void	*RestartRaceHookHandle = 0;
 static void
 RestartRaceHookActivate(void * /* dummy */)
 {
-	ReShutdownUpdater();
+	ReShutdownUpdaters();
 
 	ReRaceCleanup();
 	
 	ReInfo->_reState = RE_STATE_PRE_RACE;
-	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
 
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
@@ -746,7 +745,7 @@ ReRaceEnd(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 
-	ReShutdownUpdater();
+	ReShutdownUpdaters();
 
 	ReRaceCleanup();
 

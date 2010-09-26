@@ -27,8 +27,7 @@
 
 extern void ReNetworkOneStep();
 extern int ReNetworkWaitReady();
+extern void ReNetworkCheckEndOfRace();
+
 
 #endif /* _RACENETWORK_H_ */ 
-
-
-

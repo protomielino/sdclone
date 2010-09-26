@@ -28,9 +28,7 @@
 
 #include <car.h>
 
-extern void ReCarsUpdateCarPitCmd(void *pvcar);
-extern void ReCarsPrepareCarPit(tCarElt *car);
-
+extern void ReCarsUpdateCarPitTime(tCarElt *car);
 extern void ReCarsManageCar(tCarElt *car, bool& bestLapChanged);
 extern void ReCarsSortCars(void);
 

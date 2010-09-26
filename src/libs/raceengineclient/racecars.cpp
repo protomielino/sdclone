@@ -34,19 +34,23 @@
 
 #include "racesituation.h"
 #include "racemessage.h"
+#include "raceupdate.h"
 #include "raceresults.h"
 #include "racegl.h"
 #include "racecars.h"
 
 
 /* Compute Pit stop time */
-static void
-reCarsUpdateCarPitTime(tCarElt *car)
+void
+ReCarsUpdateCarPitTime(tCarElt *car)
 {
 	tSituation *s = ReInfo->s;
 	tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
 	tCarPenalty *penalty;
 	int i;
+
+	//GfLogDebug("ReCarsUpdateCarPitTime(%s) : typ=%d, fuel=%f, rep=%d\n",
+	//		   car->_name, car->_pitStopType, car->_pitFuel, car->_pitRepair);
 
 	switch (car->_pitStopType) {
 		case RM_PIT_REPAIR:
@@ -59,6 +63,8 @@ reCarsUpdateCarPitTime(tCarElt *car)
 				car->_tyreT_mid(i) = 50.0;
 				car->_tyreT_out(i) = 50.0;
 			}
+			GfLogInfo("%s in repair pit stop for %.1f s (refueled %.1f l, repaired %d).\n",
+					  car->_name, info->totalPitTime, car->_pitFuel, car->_pitRepair);
 			break;
 		case RM_PIT_STOPANDGO:
 			penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
@@ -67,26 +73,27 @@ reCarsUpdateCarPitTime(tCarElt *car)
 			else
 				info->totalPitTime = 0.0;
 			car->_scheduledEventTime = s->currentTime + info->totalPitTime; 
+	
+			GfLogInfo("%s in stop&go pit stop for %.1f s.\n", car->_name, info->totalPitTime);
 			break;
 	}
 }
 
-/* Return from interactive pit information */
-void
-ReCarsUpdateCarPitCmd(void *pvcar)
-{
-	tCarElt *car = (tCarElt*)pvcar;
 
-	reCarsUpdateCarPitTime(car);
-	GfuiScreenActivate(ReInfo->_reGameScreen);
-}
-
-/* Prepare to open the pit menu when back in the main thread */
-void
-ReCarsPrepareCarPit(tCarElt *car)
+/* Prepare to open the pit menu when back in the main updater (thread) */
+static void
+reCarsSchedulePitMenu(tCarElt *car)
 {
+	// Do nothing if one car is already scheduled for the pit menu
+	// (this one will have to wait for the current one exiting from the menu)
+	if (ReInfo->_reInPitMenuCar)
+	{
+		GfLogInfo("%s would like to pit, but the pit menu is already in use\n", car->_name);
+		return;
+	}
+
+	// Otherwise, "post" a pit menu request for this car.
 	ReInfo->_reInPitMenuCar = car;
-	ReInfo->_reRunning = 0;
 }
 
 
@@ -206,7 +213,7 @@ reCarsRaceRules(tCarElt *car)
 	    /* the car stopped in pits */
 	    if (car->_state & RM_CAR_STATE_PIT) {
 		if (rules->ruleState & RM_PNST_DRIVETHROUGH) {
-		    /* it's not more a drive through */
+		    /* it's no more a drive through */
 		    rules->ruleState &= ~RM_PNST_DRIVETHROUGH;
 		} else if (rules->ruleState & RM_PNST_STOPANDGO) {
 		    rules->ruleState |= RM_PNST_STOPANDGO_OK;
@@ -258,7 +265,7 @@ void
 ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 {
 	char msg[128];
-	int i, pitok;
+	int i;
 	int xx;
 	tTrackSeg *sseg;
 	tdble wseg;
@@ -266,12 +273,13 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 	tSituation *s = ReInfo->s;
 	
 	tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
-	
+
+	// Update top speeds.
 	if (car->_speed_x > car->_topSpeed) {
 		car->_topSpeed = car->_speed_x;
 	}
 
-	// For practice and qualif.
+	// (practice and qualification only).
 	if (car->_speed_x > info->topSpd) {
 		info->topSpd = car->_speed_x;
 	}
@@ -279,8 +287,10 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 		info->botSpd = car->_speed_x;
 	}
 	
-	// Pitstop.
+	// Pitstop management.
 	if (car->_pit) {
+
+		// If the driver can ask for a pit, update control messages whether slot occupied or not.
 		if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED) {
 			// Pit already occupied?
 			if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE) {
@@ -290,17 +300,27 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 			}
 			memcpy(car->ctrl.msgColor, color, sizeof(car->ctrl.msgColor));
 		}
-		
+
+		// If pitting, check if pitting delay over, and end up with pitting process if so.
 		if (car->_state & RM_CAR_STATE_PIT) {
 			car->ctrl.raceCmd &= ~RM_CMD_PIT_ASKED; // clear the flag.
-			if (car->_scheduledEventTime < s->currentTime) {
-				car->_state &= ~RM_CAR_STATE_PIT;
-				car->_pit->pitCarIndex = TR_PIT_STATE_FREE;
-				sprintf(msg, "%s pit stop %.1fs", car->_name, info->totalPitTime);
-				ReRaceMsgSet(ReInfo, msg, 5);
-			} else {
-				sprintf(car->ctrl.msg[2], "in pits %.1fs", s->currentTime - info->startPitTime);
+			// Note: Due to asynchronous behaviour of the main updater and the situation updater,
+			//       we have to wait for car->_scheduledEventTime being set to smthg > 0.
+			if (car->_scheduledEventTime > 0.0) {
+				if (car->_scheduledEventTime < s->currentTime) {
+					car->_state &= ~RM_CAR_STATE_PIT;
+					car->_pit->pitCarIndex = TR_PIT_STATE_FREE;
+					sprintf(msg, "%s pit stop %.1f s", car->_name, info->totalPitTime);
+					ReRaceMsgSet(ReInfo, msg, 5);
+					GfLogInfo("%s exiting pit (%.1f s elapsed).\n", car->_name, info->totalPitTime);
+				} else {
+					sprintf(car->ctrl.msg[2], "In pits %.1f s",
+							s->currentTime - info->startPitTime);
+				}
 			}
+			
+		// If the driver asks for a pit, check if the car is in the right conditions
+		// (position, speed, ...) and start up pitting process if so.
 		} else if ((car->ctrl.raceCmd & RM_CMD_PIT_ASKED) &&
 					car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
 				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage))
@@ -317,7 +337,6 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 			}
 		
 			if ((lgFromStart > car->_pit->lmin) && (lgFromStart < car->_pit->lmax)) {
-				pitok = 0;
 				int side;
 				tdble toBorder;
 				if (ReInfo->track->pits.side == TR_RGT) {
@@ -335,14 +354,11 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					wseg += RtTrackGetWidth(sseg, car->_trkPos.toStart);
 				}
 				if (((toBorder + wseg) < (ReInfo->track->pits.width - car->_dimension_y / 2.0)) &&
-					(fabs(car->_speed_x) < 1.0) &&
-					(fabs(car->_speed_y) < 1.0))
+					(fabs(car->_speed_x) < 1.0) && (fabs(car->_speed_y) < 1.0))
 				{
-					pitok = 1;
-				}
-				
-				if (pitok) {
+					// All conditions fullfilled => enter pitting process
 					car->_state |= RM_CAR_STATE_PIT;
+					car->_scheduledEventTime = 0.0; // Pit will really start when set to smthg > 0.
 					car->_nbPitStops++;
 					for (i = 0; i < car->_pit->freeCarIndex; i++) {
 						if (car->_pit->car[i] == car) {
@@ -353,11 +369,12 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					info->startPitTime = s->currentTime;
 					sprintf(msg, "%s in pits", car->_name);
 					ReRaceMsgSet(ReInfo, msg, 5);
+					GfLogInfo("%s entering in pit slot.\n", car->_name);
 					if (car->robot->rbPitCmd(car->robot->index, car, s) == ROB_PIT_MENU) {
 						// the pit cmd is modified by menu.
-						ReCarsPrepareCarPit(car);
+						reCarsSchedulePitMenu(car);
 					} else {
-						reCarsUpdateCarPitTime(car);
+						ReCarsUpdateCarPitTime(car);
 					}
 				}
 			}

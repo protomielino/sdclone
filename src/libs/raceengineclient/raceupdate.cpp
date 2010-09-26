@@ -51,7 +51,7 @@ static const int NGraphicsCPUId = 0;
 static const int NUpdaterCPUId = 1;
 
 
-// The situation updater class.
+// The situation updater class ==========================================================
 class reSituationUpdater
 {
 public:
@@ -74,8 +74,14 @@ public:
 	//! Get the situation for the previous step
 	tRmInfo* getPreviousStep();
 	
+	//! Compute 1 situation update step.
+	void runOneStep(double deltaTimeIncrement);
+
 	//! Start computing the situation for the current step
 	void computeCurrentStep();
+
+	//! Update pit command for the given car (back from a pit menu).
+	void updateCarPitCmd(int nCarIndex, const tCarPitCmd *pPitCmd);
 
 	//! Acknowledge the situation events (simu / graphics synchronization).
 	void acknowledgeEvents();
@@ -130,18 +136,18 @@ private:
 	bool _bTerminate;
 };
 
+// The situation updater instance (intialized in ReInitUpdaters).
 static reSituationUpdater* situationUpdater = 0;
 
 
-void
-reOneStep(double deltaTimeIncrement)
+void reSituationUpdater::runOneStep(double deltaTimeIncrement)
 {
 	int i;
 	tRobotItf *robot;
-	tSituation *s = ReInfo->s;
+	tSituation *s = _pCurrReInfo->s;
 
 	// Race messages life cycle management.
-	ReRaceMsgManage(ReInfo);
+	ReRaceMsgManage(_pCurrReInfo);
 	
 	if (GetNetwork())
 	{
@@ -156,37 +162,37 @@ reOneStep(double deltaTimeIncrement)
 			char msg[32];
 			int t = -s->currentTime;
 			sprintf(msg,"Race will start in %i seconds", t);
-			ReRaceMsgSetBig(ReInfo, msg, 1.0);
+			ReRaceMsgSetBig(_pCurrReInfo, msg, 1.0);
 		}
 	}
 
 	if (floor(s->currentTime) == -2.0) {
-		ReRaceMsgSetBig(ReInfo, "Ready", 1.0);
+		ReRaceMsgSetBig(_pCurrReInfo, "Ready", 1.0);
 	} else if (floor(s->currentTime) == -1.0) {
-		ReRaceMsgSetBig(ReInfo, "Set", 1.0);
+		ReRaceMsgSetBig(_pCurrReInfo, "Set", 1.0);
 	} else if (floor(s->currentTime) == 0.0) {
-		ReRaceMsgSetBig(ReInfo, "Go", 1.0);
+		ReRaceMsgSetBig(_pCurrReInfo, "Go", 1.0);
 		if (s->currentTime==0.0)
 			GfOut("Race start time is %lf\n", GfTimeClock());
 	}
 
-	ReInfo->_reCurTime += deltaTimeIncrement * ReInfo->_reTimeMult; /* "Real" time */
+	_pCurrReInfo->_reCurTime += deltaTimeIncrement * _pCurrReInfo->_reTimeMult; /* "Real" time */
 	s->currentTime += deltaTimeIncrement; /* Simulated time */
 
 
 	if (s->currentTime < 0) {
 		/* no simu yet */
-		ReInfo->s->_raceState = RM_RACE_PRESTART;
-	} else if (ReInfo->s->_raceState == RM_RACE_PRESTART) {
-		ReInfo->s->_raceState = RM_RACE_RUNNING;
+		_pCurrReInfo->s->_raceState = RM_RACE_PRESTART;
+	} else if (_pCurrReInfo->s->_raceState == RM_RACE_PRESTART) {
+		_pCurrReInfo->s->_raceState = RM_RACE_RUNNING;
 		s->currentTime = 0.0; /* resynchronize */
-		ReInfo->_reLastTime = 0.0;
+		_pCurrReInfo->_reLastTime = 0.0;
 	}
 
 	GfProfStartProfile("rbDrive*");
 	GfSchedBeginEvent("raceupdate", "robots");
-	if ((s->currentTime - ReInfo->_reLastTime) >= RCM_MAX_DT_ROBOTS) {
-		s->deltaTime = s->currentTime - ReInfo->_reLastTime;
+	if ((s->currentTime - _pCurrReInfo->_reLastTime) >= RCM_MAX_DT_ROBOTS) {
+		s->deltaTime = s->currentTime - _pCurrReInfo->_reLastTime;
 		for (i = 0; i < s->_ncars; i++) {
 			if ((s->cars[i]->_state & RM_CAR_STATE_NO_SIMU) == 0) {
 				robot = s->cars[i]->robot;
@@ -200,7 +206,7 @@ reOneStep(double deltaTimeIncrement)
 				s->cars[i]->_state |= RM_CAR_STATE_ENDRACE_CALLED;
 			}
 		}
-		ReInfo->_reLastTime = s->currentTime;
+		_pCurrReInfo->_reLastTime = s->currentTime;
 	}
 	GfSchedEndEvent("raceupdate", "robots");
 	GfProfStopProfile("rbDrive*");
@@ -213,7 +219,7 @@ reOneStep(double deltaTimeIncrement)
 
 	GfProfStartProfile("_reSimItf.update*");
 	GfSchedBeginEvent("raceupdate", "physics");
-	ReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
+	_pCurrReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
 	bool bestLapChanged = false;
 	for (i = 0; i < s->_ncars; i++) {
 		ReCarsManageCar(s->cars[i], bestLapChanged);
@@ -224,74 +230,14 @@ reOneStep(double deltaTimeIncrement)
 	ReCarsSortCars();
 
 	/* Update screens if a best lap changed */
-	if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars > 1 && bestLapChanged)
+	if (_pCurrReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars > 1 && bestLapChanged)
 	{
-		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-			ReUpdatePracticeCurRes(ReInfo->s->cars[0]);
-		else if (ReInfo->s->_raceType == RM_TYPE_QUALIF)
-			ReUpdateQualifCurRes(ReInfo->s->cars[0]);
+		if (_pCurrReInfo->s->_raceType == RM_TYPE_PRACTICE)
+			ReUpdatePracticeCurRes(_pCurrReInfo->s->cars[0]);
+		else if (_pCurrReInfo->s->_raceType == RM_TYPE_QUALIF)
+			ReUpdateQualifCurRes(_pCurrReInfo->s->cars[0]);
 	}
 }
-
-void ReInitUpdater()
-{
-	ReInfo->_reRunning = 0;
- 	if (!situationUpdater)
- 		situationUpdater = new reSituationUpdater(ReInfo);
-
-	// Configure schedule spy                        (nMaxEv, ignoreDelay)
-	GfSchedConfigureEventLog("raceupdate", "graphics", 10000, 0.0);
-	GfSchedConfigureEventLog("raceupdate", "situCopy", 10000, 0.0);
-	GfSchedConfigureEventLog("raceupdate", "robots",   10000, 0.0);
-	GfSchedConfigureEventLog("raceupdate", "physics",  10000, 0.0);
-}
-
-void ReInitCarGraphics(void)
-{
-	tRmInfo* pPrevReInfo = situationUpdater->getPreviousStep();
-	pPrevReInfo->_reGraphicItf.initcars(pPrevReInfo->s);
-}
-
-void
-ReStart(void)
-{
-	GfSchedBeginSession("raceupdate");
-	situationUpdater->start();
-}
-
-void
-ReStop(void)
-{
-	situationUpdater->stop();
-	GfSchedEndSession("raceupdate");
-}
-
-void ReShutdownUpdater()
-{
-	// Destroy the situation updater.
- 	if (situationUpdater)
-	{
-		delete situationUpdater;
-		situationUpdater = 0;
-	}
-
-	GfSchedEndSession("raceupdate");
-	//                                          (timeResol, durUnit, durResol)
-	GfSchedPrintReport("raceupdate", "schedule.csv", 1.0e-3, 1.0e-3, 1.0e-6);
-}
-
-static void
-reCapture(void)
-{
-	char filename[256];
-    tRmMovieCapture	*capture = &(ReInfo->movieCapture);
-    
-    sprintf(filename, "%s/sd-%4.4d-%8.8d.png", capture->outputBase,
-			capture->currentCapture, capture->currentFrame++);
-    GfScrCaptureAsPNG(filename);
-}
-
-// Multi-threaded ReUpdate ===============================================================
 
 int reSituationUpdaterThreadLoop(void *pUpdater)
 {
@@ -347,7 +293,7 @@ int reSituationUpdater::threadLoop()
 				   && ((realTime - _pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
 			{
 				// One simu + may be robots step
-				reOneStep(RCM_MAX_DT_SIMU);
+				runOneStep(RCM_MAX_DT_SIMU);
 			}
 		
 			GfProfStopProfile("reOneStep*");
@@ -487,14 +433,14 @@ bool reSituationUpdater::unlockData(const char* pszLocker)
 
 void reSituationUpdater::start()
 {
-	GfOut("Unpausing race engine.\n");
+	GfOut("Starting race engine.\n");
 
 	// Lock the race engine data.
 	lockData("reSituationUpdater::start");
 
 	// Set the running flags.
     _pCurrReInfo->_reRunning = 1;
-	_pCurrReInfo->s->_raceState &= ~RM_RACE_PAUSED;
+	//_pCurrReInfo->s->_raceState &= ~RM_RACE_PAUSED;
 
 	// Resynchronize simulation time.
     _pCurrReInfo->_reCurTime = GfTimeClock() - RCM_MAX_DT_SIMU;
@@ -505,14 +451,14 @@ void reSituationUpdater::start()
 
 void reSituationUpdater::stop()
 {
-	GfOut("Pausing race engine.\n");
+	GfOut("Stopping race engine.\n");
 
 	// Lock the race engine data.
 	lockData("reSituationUpdater::stop");
 
 	// Reset the running flags.
 	_pCurrReInfo->_reRunning = 0;
-	_pCurrReInfo->s->_raceState |= RM_RACE_PAUSED;
+	//_pCurrReInfo->s->_raceState |= RM_RACE_PAUSED;
 		
 	// Unlock the race engine data.
 	unlockData("reSituationUpdater::stop");
@@ -560,7 +506,7 @@ tRmInfo* reSituationUpdater::deliverSituation(tRmInfo*& pTarget, const tRmInfo* 
 
 void reSituationUpdater::acknowledgeEvents()
 {
-	ReSituationAcknowlegdeEvents(_pCurrReInfo);
+	ReSituationAcknowlegdeEvents(_pCurrReInfo, _pPrevReInfo);
 }
 
 tRmInfo* reSituationUpdater::getPreviousStep()
@@ -579,11 +525,6 @@ tRmInfo* reSituationUpdater::getPreviousStep()
 		// Get the situation data.
 		deliverSituation(_pPrevReInfo, _pCurrReInfo);
 
-		// Acknowledge the collision events generated by the simu. engine
-		// since the last graphics update : we know now that they are about to be processed
-		// by the graphics engine (they have just been saved in _pPrevReInfo).
-		acknowledgeEvents();
-		
 		// Unlock the race engine data.
 		if (!unlockData("reSituationUpdater::getPreviousStep"))
 			return 0;
@@ -592,6 +533,8 @@ tRmInfo* reSituationUpdater::getPreviousStep()
 	return _pPrevReInfo;
 }
 
+// This member function decorates the situation updater as a normal function,
+// thus hiding the possible separate thread behind to the main updater. 
 void reSituationUpdater::computeCurrentStep()
 {
 	// Nothing to do if actually threaded :
@@ -600,25 +543,22 @@ void reSituationUpdater::computeCurrentStep()
 	{
 		GfProfStartProfile("reOneStep*");
 			
-#define NewCaptureScheme
-#ifdef NewCaptureScheme
 		if (_pCurrReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
 		{
 			tRmMovieCapture	*capture = &(_pCurrReInfo->movieCapture);
 			while ((_pCurrReInfo->_reCurTime - capture->lastFrame) < capture->deltaFrame)
 
-				reOneStep(capture->deltaSimu);
+				runOneStep(capture->deltaSimu);
 
 			capture->lastFrame = _pCurrReInfo->_reCurTime;
 		}
 		else
-#endif
 		{
 			const double t = GfTimeClock();
 		
 			while (_pCurrReInfo->_reRunning && ((t - _pCurrReInfo->_reCurTime) > RCM_MAX_DT_SIMU))
 				
-				reOneStep(RCM_MAX_DT_SIMU);
+				runOneStep(RCM_MAX_DT_SIMU);
 		}
 
 		GfProfStopProfile("reOneStep*");
@@ -629,68 +569,189 @@ void reSituationUpdater::computeCurrentStep()
 	}
 }
 
-int
-ReUpdate(void)
+void reSituationUpdater::updateCarPitCmd(int nCarIndex, const tCarPitCmd *pPitCmd)
 {
-	tRmInfo* pPrevReInfo;
+	if (_bThreaded)
+	{
+		// Lock the race engine data.
+		if (!lockData("reSituationUpdater::updateCarPitCmd"))
+			return;
+	}
+	
+	// Retrieve the car in pCurrSituation corresponding to pPrevCar
+	// (beware: they may have been moved in pCurrSituation->s->cars
+	//          since pPrevSituation was built).
+	//GfLogDebug("reSituationUpdater::updateCarPitCmd(i=%d)\n", nCarIndex);
+	tCarElt* pCurrCar = 0;
+	for (int nCarInd = 0; nCarInd < _pCurrReInfo->s->_ncars; nCarInd++)
+	{
+		//GfLogDebug("  Examining car #%d : d=%s, i=%d\n", nCarInd,
+		//		   _pCurrReInfo->s->cars[nCarInd]->_name,
+		//		   _pCurrReInfo->s->cars[nCarInd]->index);
+		if (_pCurrReInfo->s->cars[nCarInd]->index == nCarIndex)
+		{
+			// Found : update its pit command information from pit menu data.
+			pCurrCar = _pCurrReInfo->s->cars[nCarInd];
+			//GfLogDebug("reSituationUpdater::updateCarPitCmd : Found index=%d\n", pCurrCar->index);
+			pCurrCar->_pitFuel = pPitCmd->fuel;
+			pCurrCar->_pitRepair = pPitCmd->repair;
+			pCurrCar->_pitStopType = pPitCmd->stopType;
+			break;
+		}
+	}
+	
+	// Compute and set pit time.
+	if (pCurrCar)
+		ReCarsUpdateCarPitTime(pCurrCar);
+	else
+		GfLogError("Failed to retrieve car with index %d when computing pit time\n", nCarIndex);
+	
+	if (_bThreaded)
+	{
+		// Unlock the race engine data.
+		if (!unlockData("reSituationUpdater::updateCarPitCmd"))
+			return;
+	}
+}
+// The main updater class ============================================================
+class reMainUpdater
+{
+public:
+	
+	//! Constructor.
+	reMainUpdater(reSituationUpdater* pSituUpdater);
+
+	//! Initialize the graphics engine about cars.
+	void initCarGraphics(void);
+
+	//! Return from pit menu
+	void onBackFromPitMenu(tCarElt *car);
+
+	//! Capture currently displayed screen frame to a PNG file.
+	void captureScreen(void);
+	
+	//! The real updating funtion.
+	int operator()(void);
+
+private:
+
+	//! The last step situation got from the situationUpdater.
+	tRmInfo* _pReInfo;
+
+	//! The associated situation updater.
+	reSituationUpdater* _pSituationUpdater;	
+};
+
+// The main updater instance (intialized in ReInitUpdaters).
+static reMainUpdater* mainUpdater = 0;
+
+
+// Return from pit menu (onDeactivate pit menu callback)
+static void reOnBackFromPitMenu(void *pvcar)
+{
+	mainUpdater->onBackFromPitMenu((tCarElt*)pvcar);
+}
+
+reMainUpdater::reMainUpdater(reSituationUpdater* pSituUpdater)
+: _pReInfo(0), _pSituationUpdater(pSituUpdater)
+{
+}
+
+void reMainUpdater::initCarGraphics(void)
+{
+	_pReInfo = _pSituationUpdater->getPreviousStep();
+	_pReInfo->_reGraphicItf.initcars(_pReInfo->s);
+}
+
+void reMainUpdater::captureScreen(void)
+{
+	char filename[256];
+    tRmMovieCapture	*capture = &(_pReInfo->movieCapture);
+    
+    sprintf(filename, "%s/sd-%4.4d-%8.8d.png", capture->outputBase,
+			capture->currentCapture, capture->currentFrame++);
+    GfScrCaptureAsPNG(filename);
+}
+
+
+void reMainUpdater::onBackFromPitMenu(tCarElt *car)
+{
+	_pSituationUpdater->updateCarPitCmd(car->index, &car->pitcmd);
+
+	GfuiScreenActivate(_pReInfo->_reGameScreen);
+}
+
+int reMainUpdater::operator()(void)
+{
+	// Note: In reMainUpdater, we should not read/write ReInfo (only _pReInfo).
+	//       But this is not _yet_ the case for _displayMode and _refreshDisplay,
+	//       as long as we don't have finished the planned race engine code cleanup.
 	
     GfProfStartProfile("ReUpdate");
+	
     ReInfo->_refreshDisplay = 0;
-    switch (ReInfo->_displayMode)
+	
+	switch (ReInfo->_displayMode)
 	{
-		case RM_DISP_MODE_NORMAL:
-#ifdef NewCaptureScheme
 		case RM_DISP_MODE_CAPTURE:
 
-			if (ReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
-				// Do the frame capture.
-				// Moved here, right before situationUpdater->getPreviousStep,
-				// as we can only capture the already displayed time,
-				// (because the one generated by _reGraphicItf.refresh will be displayed
-				//  _after_ ReUpdate returns : see guieventloop.cpp::GfefPostReDisplay)
-				reCapture();
-#endif
+			// Do the frame capture.
+			// Moved here, right before situationUpdater->getPreviousStep,
+			// as we can only capture the already displayed time,
+			// (because the one generated by _reGraphicItf.refresh will be displayed
+			//  _after_ ReUpdate returns : see guieventloop.cpp::GfefPostReDisplay)
+			captureScreen();
+
+		case RM_DISP_MODE_NORMAL:
+
 			// Get the situation for the previous step.
 			GfSchedBeginEvent("raceupdate", "situCopy");
-			pPrevReInfo = situationUpdater->getPreviousStep();
+			_pReInfo = situationUpdater->getPreviousStep();
 			GfSchedEndEvent("raceupdate", "situCopy");
 
 			// Compute the situation for the current step (mono-threaded race engine)
 			// or do nothing (dual-threaded race engine : the updater thread does the job itself).
-			situationUpdater->computeCurrentStep();
+			_pSituationUpdater->computeCurrentStep();
 			
-#ifdef NewCaptureScheme
-			if (ReInfo->_displayMode != RM_DISP_MODE_CAPTURE)
-#endif
-			// Next screen will be the pit menu if one human driver is in pit. 
-			if (pPrevReInfo->_reInPitMenuCar)
+			// If one (human) driver is in pit, switch to the display loop to the pit menu.
+			if (_pReInfo->_reInPitMenuCar) // Does this really work in capture mode ?
+			{
+				//if (ReInfo->_displayMode != RM_DISP_MODE_CAPTURE) {
+				
+				// First, stop the race engine.
+				ReStop();
 
-				RmPitMenuStart(pPrevReInfo->s, pPrevReInfo->_reInPitMenuCar,
-							   (void*)pPrevReInfo->_reInPitMenuCar, ReCarsUpdateCarPitCmd);
+				// Then open the pit menu (will return in ReCarsUpdateCarPitCmd).
+				RmPitMenuStart(_pReInfo->_reInPitMenuCar, reOnBackFromPitMenu);
+			}
+			else
+			{
+				// Update the graphics (display the current frame).
+				GfSchedBeginEvent("raceupdate", "graphics");
+				_pReInfo->_reGraphicItf.refresh(_pReInfo->s);
+				GfSchedEndEvent("raceupdate", "graphics");
+				
+				// Update on-screen racing messages for the user.
+				ReRaceMsgUpdate(_pReInfo);
 
-			// Update racing messages for the user
-			ReRaceMsgUpdate(pPrevReInfo);
-	
-			GfuiDisplay();
+				// And display them if any.
+				GfuiDisplay();
+			}
 
-			// Update the graphics (display the current frame).
-			GfSchedBeginEvent("raceupdate", "graphics");
-			pPrevReInfo->_reGraphicItf.refresh(pPrevReInfo->s);
-			GfSchedEndEvent("raceupdate", "graphics");
-			
-			// Acknowledge the collision events generated by the simu. engine
+			// Acknowledge the collision and human pit events occurred
 			// since the last graphics update : we know now that they all have been processed
-			// by the graphics engine.
-			situationUpdater->acknowledgeEvents();
+			// or at least being processed by the graphics engine / menu system
+			// (the main thread's job).
+			_pSituationUpdater->acknowledgeEvents();
 			
 			GfelPostRedisplay();	/* Callback -> reDisplay */
 			break;
 	
 		case RM_DISP_MODE_NONE:
 			
-			reOneStep(RCM_MAX_DT_SIMU);
+			_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
 			
-			ReRaceMsgUpdate(ReInfo);
+			ReRaceMsgUpdate(_pReInfo);
 			
 			if (ReInfo->_refreshDisplay)
 				GfuiDisplay();
@@ -705,46 +766,76 @@ ReUpdate(void)
 				GfuiDisplay();
 			GfelPostRedisplay();
 			break;
-
-#ifndef NewCaptureScheme
-		case RM_DISP_MODE_CAPTURE:
-		{
-			tRmMovieCapture	*capture = &(ReInfo->movieCapture);
-			while ((ReInfo->_reCurTime - capture->lastFrame) < capture->deltaFrame)
-			{
-				reOneStep(capture->deltaSimu);
-				
-				ReRaceMsgUpdate(ReInfo);
-			}
-
-			capture->lastFrame = ReInfo->_reCurTime;
-	
-			GfuiDisplay();
-			
-			// Update the graphics (display the current frame).
-			ReInfo->_reGraphicItf.refresh(ReInfo->s);
-
-			// Do the frame capture.
-			reCapture();
-
-			// Acknowledge the collision events generated by the simu. engine
-			// since the last graphics update : we know now that they all have been processed
-			// by the graphics engine.
-			situationUpdater->acknowledgeEvents();
-			
-			GfelPostRedisplay();	/* Callback -> reDisplay */
-			break;
-		}
-#endif // #ifndef NewCaptureScheme
-	
     }
 
-	// Check for end of online race.
-	if (GetNetwork() && GetNetwork()->FinishRace(ReInfo->s->currentTime))
-		ReInfo->s->_raceState = RM_RACE_ENDED;
-	
-    GfProfStopProfile("ReUpdate");
+	ReNetworkCheckEndOfRace();
+
+	GfProfStopProfile("ReUpdate");
 
     return RM_ASYNC;
+}
+
+// Public C API of raceupdate =========================================================
+
+void ReInitUpdaters()
+{
+	ReInfo->_reRunning = 0;
+
+ 	if (!situationUpdater)
+ 		situationUpdater = new reSituationUpdater(ReInfo);
+
+ 	if (!mainUpdater)
+ 		mainUpdater = new reMainUpdater(situationUpdater);
+
+	// Configure schedule spy                        (nMaxEv, ignoreDelay)
+	GfSchedConfigureEventLog("raceupdate", "graphics", 10000, 0.0);
+	GfSchedConfigureEventLog("raceupdate", "situCopy", 10000, 0.0);
+	GfSchedConfigureEventLog("raceupdate", "robots",   10000, 0.0);
+	GfSchedConfigureEventLog("raceupdate", "physics",  10000, 0.0);
+}
+
+void ReInitCarGraphics(void)
+{
+	mainUpdater->initCarGraphics();
+}
+
+void ReStart(void)
+{
+	GfSchedBeginSession("raceupdate");
+	situationUpdater->start();
+}
+
+#ifdef DEBUG
+void ReOneStep(double dt)
+{
+	situationUpdater->runOneStep(dt);
+}
+#endif
+
+int ReUpdate(void)
+{
+	return (*mainUpdater)();
+}
+
+void ReStop(void)
+{
+	situationUpdater->stop();
+	GfSchedEndSession("raceupdate");
+}
+
+void ReShutdownUpdaters()
+{
+	// Destroy the situation updater.
+	delete situationUpdater;
+	situationUpdater = 0;
+	
+	// Destroy the main updater.
+	delete mainUpdater;
+	mainUpdater = 0;
+
+	// Close schedule spy session and print the report.
+	GfSchedEndSession("raceupdate");
+	//                                          (timeResol, durUnit, durResol)
+	GfSchedPrintReport("raceupdate", "schedule.csv", 1.0e-3, 1.0e-3, 1.0e-6);
 }
 

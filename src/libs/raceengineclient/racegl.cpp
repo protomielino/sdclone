@@ -73,7 +73,7 @@ reScreenActivate(void * /* dummy */)
     GfelSetDisplayCB(reDisplay);
 
 	// Resync race engine if it is not paused or stopped
-    if ((ReInfo->s->_raceState & RM_RACE_PAUSED) == 0) {
+    if (!(ReInfo->s->_raceState & RM_RACE_PAUSED)) {
 	ReStart(); 			/* resynchro */
     }
 
@@ -84,9 +84,11 @@ static void
 ReBoardInfo(void * /* vboard */)
 {
     if (ReInfo->s->_raceState & RM_RACE_PAUSED) {
+	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
 	ReStart();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
     } else {
+	ReInfo->s->_raceState |= RM_RACE_PAUSED;
 	ReStop();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 1);
     }

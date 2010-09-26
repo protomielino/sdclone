@@ -160,7 +160,7 @@ typedef struct
 #define RM_DISP_MODE_SIMU_SIMU	3
     int			displayMode;
     int			refreshDisplay;
-    tCarElt		*inPitMenuCar;
+    tCarElt		*inPitMenuCar; // The car entering the pit menu.
 	char		*message;
     double		messageEnd;
 	char		*bigMessage;

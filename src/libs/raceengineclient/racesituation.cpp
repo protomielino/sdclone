@@ -27,6 +27,7 @@
 #include <robot.h>
 #include <raceman.h>
 
+#include "racecars.h"
 #include "racesituation.h"
 
 
@@ -217,23 +218,40 @@ tRmInfo* ReSituationCopy(tRmInfo*& pTarget, const tRmInfo* pSource)
 	}
 	pTarget->_reBigMessageEnd = pSource->_reBigMessageEnd;
 
+	//GfLogDebug("ReSituationCopy: pTarget=%p, pSource=%p (pit=%p))\n",
+	//		   pTarget, pSource, pSource->_reInPitMenuCar);
+
 	if (pSource->_reInPitMenuCar)
+	{
+		//GfLogDebug("ReSituationCopy: Pit menu request forwarded.\n");
 		pTarget->_reInPitMenuCar =
 			pTarget->carList + (pSource->_reInPitMenuCar - pSource->carList);
+	}
+	else
+		pTarget->_reInPitMenuCar = 0;
 
 	return pTarget;
 }
 
-void ReSituationAcknowlegdeEvents(tRmInfo* pSituation)
+void ReSituationAcknowlegdeEvents(tRmInfo* pCurrSituation, const tRmInfo* pPrevSituation)
 {
 	// Acknowlegde collision events for each car.
-	for (int nCarInd = 0; nCarInd < pSituation->s->_ncars; nCarInd++)
+	for (int nCarInd = 0; nCarInd < pCurrSituation->s->_ncars; nCarInd++)
 	{
-		tCarElt* pCar = pSituation->s->cars[nCarInd];
+		tCarElt* pCar = pCurrSituation->s->cars[nCarInd];
 		pCar->priv.collision = 0;
-		// Note: This one is Simu V3 only, and not used actually
+		
+		// Note: This one is only for SimuV3, and not yet used actually
 		// (WIP on collision code issues ; see simuv3/collide.cpp).
 		pCar->priv.collision_state.collision_count = 0;
+	}
+
+	// Acknowlegde human pit event if any (update the car pit command in current situation
+	// with the one modified by the Pit menu in previous situation).
+	if (pPrevSituation->_reInPitMenuCar)
+	{
+		//GfLogDebug("ReSituationAcknowlegdeEvents: Pit menu request cleared.\n");
+		pCurrSituation->_reInPitMenuCar = 0;
 	}
 }
 

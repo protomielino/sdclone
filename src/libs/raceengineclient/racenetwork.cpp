@@ -228,3 +228,10 @@ ReNetworkWaitReady()
 	return mode;
 }
 
+void
+ReNetworkCheckEndOfRace()
+{
+	// Check for end of online race.
+	if (GetNetwork() && GetNetwork()->FinishRace(ReInfo->s->currentTime))
+		ReInfo->s->_raceState = RM_RACE_ENDED;
+}

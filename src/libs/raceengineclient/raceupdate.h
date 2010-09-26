@@ -26,15 +26,16 @@
 #ifndef _RACEUPDATE_H_
 #define _RACEUPDATE_H_
 
-extern void ReInitUpdater();
+extern void ReInitUpdaters();
 extern void ReInitCarGraphics();
-extern void ReShutdownUpdater();
+extern void ReShutdownUpdaters();
 
 extern void ReStart(void);
 extern void ReStop(void);
 extern int  ReUpdate(void);
+
 #ifdef DEBUG
-//extern int  reOneStep(double dt);
+extern void ReOneStep(double dt);
 #endif
 
 #endif /* _RACEUPDATE_H_ */ 

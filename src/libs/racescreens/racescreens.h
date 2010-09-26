@@ -39,7 +39,7 @@
 #endif
 
 
-typedef struct
+typedef struct RmTrackSelect
 {
     void        *param;		/* Race manager parameters where to set the selected track */
     void        *prevScreen;	/* Race manager screen to go back */
@@ -47,14 +47,14 @@ typedef struct
     tTrackItf	trackItf;	/* Track module interface */
 } tRmTrackSelect;
 
-typedef struct
+typedef struct RmDriverSelect
 {
     void        *param;
     void        *prevScreen;	/* Race manager screen to go back */
     void        *nextScreen;	/* Race manager screen to go after select */
 } tRmDriverSelect;
 
-typedef struct
+typedef struct RmRaceParam
 {
     void        	*param;
     void        	*prevScreen;
@@ -67,7 +67,7 @@ typedef struct
 
 typedef void (*tfSelectFile) (char *);
 
-typedef struct
+typedef struct RmFileSelect
 {
     const char		*title;
     const char		*path;
@@ -75,13 +75,12 @@ typedef struct
     tfSelectFile	select;
 } tRmFileSelect;
 
-
 RACESCREENS_API void RmTrackSelect(void * /* vs */);
 
 RACESCREENS_API void RmDriversSelect(void * /* vs */);
 extern void RmDriverSelect(void * /* vs */);
 
-RACESCREENS_API void RmPitMenuStart(tSituation * /*s*/, tCarElt * /* car */, void * /* userdata */, tfuiCallback /* callback */);
+RACESCREENS_API void RmPitMenuStart(tCarElt * /* car */, tfuiCallback /* callback */);
 
 RACESCREENS_API void RmLoadingScreenStart(const char * /* text */, const char * /* bgimg */);
 RACESCREENS_API void RmLoadingScreenSetText(const char * /* text */);

@@ -621,7 +621,6 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
     elt->_driveSkill = GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKILLLEVEL, NULL, -1.0f);
 
-    // TODO (D30) : Get human _carName from race info in any case (no more from human.xml).
     if (normal_carname) /* Even if we get a normal_carname for humans we use it despite of forced extended mode*/
       strncpy(elt->_carName, GfParmGetStr(robhdle, path, ROB_ATTR_CAR, ""), MAX_NAME_LEN - 1);
     else
@@ -634,11 +633,11 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     if (strlen(pszSkinName) > 0)
     {
       snprintf(elt->_carSkin, MAX_NAME_LEN - 1, "%s-%s", elt->_carName, pszSkinName);
-      elt->_carSkin[MAX_NAME_LEN - 1] = 0; /* Texture file name (no ext) */
+      elt->_carSkin[MAX_NAME_LEN - 1] = 0; // Texture file name (no ext)
     }
 
     elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
-    if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) /* Increase racenumber if neccesairy */
+    if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) // Increase racenumber if needed
       elt->_raceNumber += elt->_moduleIndex;
     elt->_skillLevel = 0;
     str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
@@ -792,7 +791,7 @@ ReInitCars(void)
           /* We have the right driver : load it */
           elt = reLoadSingleCar( index, i, j, robotIdx, TRUE, robotModuleName );
           if (!elt)
-            GfError("Pb No description file for driver %s (1)\n", robotModuleName);
+            GfLogError("No description file for driver %s (1)\n", robotModuleName);
         }
       }
     }
@@ -817,7 +816,7 @@ ReInitCars(void)
         elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
       }
       else
-        GfLogError("Pb: No description for driver %s (2)\n", robotModuleName );
+        GfLogError("No description for driver %s (2)\n", robotModuleName );
 
     }
 
@@ -843,6 +842,7 @@ ReInitCars(void)
   {
     ReInfo->s->cars[i] = &(ReInfo->carList[i]);
   }
+  ReInfo->_reInPitMenuCar = 0;
 
   // TODO: reconsider splitting the call into one for cars, track and maybe other objects.
   // I stuff for now anything into one call because collision detection works with the same
