@@ -39,50 +39,51 @@ public:
    ~Pit();
 
   void setPitstop(const bool pitstop);
-  inline bool getPitstop() const {return pitstop;}
-  inline void setInPit(const bool inpitlane) {this->inpitlane = inpitlane;}
-  inline bool getInPit() const {return inpitlane;}
+  inline bool getPitstop() const {return m_pitstop;}
+  inline void setInPit(const bool inpitlane) {m_inpitlane = inpitlane;}
+  inline bool getInPit() const {return m_inpitlane;}
 
   double getPitOffset(const double offset, double fromstart);
 
   bool isBetween(const double fromstart) const;
   bool isTimeout(const double distance);
 
-  inline double getNPitStart() const {return p[1].x;}
-  inline double getNPitLoc()   const {return p[3].x;}
-  inline double getNPitEnd()   const {return p[5].x;}
-  inline double getNPitEntry() const {return p[0].x;}
+  inline double getNPitStart() const {return m_p[1].x;}
+  inline double getNPitLoc()   const {return m_p[3].x;}
+  inline double getNPitEnd()   const {return m_p[5].x;}
+  inline double getNPitEntry() const {return m_p[0].x;}
 
   double toSplineCoord(double x) const;
 
-  inline double getSpeedlimitSqr() const {return speedlimitsqr;}
-  inline double getSpeedlimit() const {return speedlimit;}
+  inline double getSpeedlimitSqr() const {return m_speedlimitsqr;}
+  inline double getSpeedlimit() const {return m_speedlimit;}
   inline double getSpeedLimitBrake(const double speedsqr) const
-    {return (speedsqr - speedlimitsqr) / (pitspeedlimitsqr - speedlimitsqr);}
+    {return (speedsqr - m_speedlimitsqr)
+      / (m_pitspeedlimitsqr - m_speedlimitsqr);}
 
   void update();
 
 private:
-  tTrack * track;
-  tCarElt *car;
-  tTrackOwnPit *mypit;      // Pointer to my pit.
-  tTrackPitInfo *pitinfo;   // General pit info.
+  tTrack *m_track;
+  tCarElt *m_car;
+  tTrackOwnPit *m_mypit;    // Pointer to my pit.
+  tTrackPitInfo *m_pitinfo; // General pit info.
 
   enum
   { NPOINTS = 7 };
-  SplinePoint p[NPOINTS];   // Spline points.
-  Spline *spline;       // Spline.
+  SplinePoint m_p[NPOINTS];   // Spline points.
+  Spline *m_spline;       // Spline.
 
-  bool pitstop;         // Pitstop planned.
-  bool inpitlane;       // We are still in the pit lane.
-  double pitentry;      // Distance to start line of the pit entry.
-  double pitexit;       // Distance to the start line of the pit exit.
+  bool m_pitstop;         // Pitstop planned.
+  bool m_inpitlane;       // We are still in the pit lane.
+  double m_pitentry;      // Distance to start line of the pit entry.
+  double m_pitexit;       // Distance to the start line of the pit exit.
 
-  double speedlimitsqr;     // Pit speed limit squared.
-  double speedlimit;        // Pit speed limit.
-  double pitspeedlimitsqr;  // The original speedlimit squared.
+  double m_speedlimitsqr;     // Pit speed limit squared.
+  double m_speedlimit;        // Pit speed limit.
+  double m_pitspeedlimitsqr;  // The original speedlimit squared.
 
-  double pittimer;       // Timer for pit timeouts.
+  double m_pittimer;       // Timer for pit timeouts.
 
   static const double SPEED_LIMIT_MARGIN;
 };

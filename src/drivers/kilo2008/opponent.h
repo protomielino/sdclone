@@ -59,9 +59,11 @@ public:
   double getSpeed() const {return m_cardata->getSpeedInTrackDirection();}
   int getIndex() const {return m_index;}
   
-  inline bool is_state(const int state) const {return bool(m_state & state);}
-  inline bool is_teammate() const {return m_teammate;}
-  bool is_quicker_teammate(tCarElt * const mycar);
+  inline bool isState(const int state) const {return bool(m_state & state);}
+  inline bool isTeammate() const {return m_teammate;}
+  bool isQuickerTeammate(tCarElt * const mycar);
+  inline bool isOnRight(const double dMiddle)
+    {return (dMiddle > m_car->_trkPos.toMiddle) ? true : false;}
 
   inline void markAsTeamMate() {m_teammate = true;}
   void update(tSituation *s, Driver *driver);
@@ -107,6 +109,8 @@ public:
 
   void update(tSituation *s, Driver *driver);
   void setTeamMate(const tCarElt *car);
+  Opponent *getOppByState(const int state);
+  
   inline list<Opponent>::iterator begin() {return m_opps->begin();}
   inline list<Opponent>::iterator end() {return m_opps->end();}
   

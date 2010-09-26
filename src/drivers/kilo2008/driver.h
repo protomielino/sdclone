@@ -40,7 +40,6 @@
 #define BT_ATT_BESTLAP "bestlap"
 #define BT_ATT_WORSTLAP "worstlap"
 #define BT_ATT_TEAMMATE "teammate"
-#define BT_ATT_SECRADIUS "securityradius"
 
 
 class Opponents;

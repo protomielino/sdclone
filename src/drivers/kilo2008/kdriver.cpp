@@ -55,7 +55,12 @@ KDriver::KDriver(int index):Driver(index)
   m_rInverse = 0.0;
 }
 
-// Drive during race.
+
+/**
+ * Drive during the race.
+ * 
+ * @param[in] s Situation provided by the sim.
+ */
 void
 KDriver::drive(tSituation * s)
 {
@@ -91,7 +96,11 @@ KDriver::drive(tSituation * s)
 }//drive
 
 
-// Check if I'm stuck.
+/**
+ * Checks if I'm stuck.
+ * 
+ * @return true if stuck
+ */
 bool
 KDriver::isStuck()
 {
@@ -113,7 +122,13 @@ KDriver::isStuck()
 }//isStuck
 
 
-// Reduces the brake value such that it fits the speed (more downforce -> more braking).
+/**
+ * Reduces the brake value such that it fits the speed
+ * (more downforce -> more braking).
+ * 
+ * @param[in] brake Original braking value
+ * @return  Modified braking value
+ */
 double
 KDriver::filterBrakeSpeed(double brake)
 {
@@ -121,7 +136,7 @@ KDriver::filterBrakeSpeed(double brake)
   double maxForce = weight + CA * MAX_SPEED * MAX_SPEED;
   double force = weight + CA * currentspeedsqr;
   return brake * force / maxForce;
-}
+}//filterBrakeSpeed
 
 
 // Compute offset to normal target point for overtaking or let pass an opponent.
@@ -176,21 +191,21 @@ KDriver::getOffset()
     }
 
   //Check for side collision
-  o = get_sidecoll_opp();
+  o = getSidecollOpp();
   if(o != NULL)
-    return filter_sidecoll_offset(o, incfactor);
+    return filterSidecollOffset(o, incfactor);
     
     
   // If we have someone to take over, let's try it
-  o = get_takeover_opp();
+  o = getTakeoverOpp();
   if(o != NULL)
-    return filter_takeover_offset(o);
+    return filterTakeoverOffset(o);
 
   
   // If there is someone overlapping, move out of the way
-  o = get_overlapping_opp();
+  o = getOverlappingOpp();
   if(o != NULL)
-    return filter_overlapped_offset(o);
+    return filterOverlappedOffset(o);
 
   
   // no-one to avoid, work back towards raceline
@@ -213,10 +228,7 @@ KDriver::getOffset()
 }//getOffset
 
 
-/*
- * 
- * name: get_overlapping_opp
- * 
+/**
  * Decide if there is a car behind overlapping us.
  * 
  * A1) Teammate behind with more laps should overtake.
@@ -226,121 +238,93 @@ KDriver::getOffset()
  *      than TEAM_DAMAGE_CHANGE_LEAD.
  * B) Let other, overlapping opponents get by.
 
- * @param: -
- * @return: Opponent *, overlapping car pointer or NULL
+ * @return  overlapping car pointer or NULL
  */
 Opponent *
-KDriver::get_overlapping_opp()
+KDriver::getOverlappingOpp()
 {
   Opponent *ret = NULL;
   double mindist = -1000.0;
   
   for(list<Opponent>::iterator it = opponents->begin();
         it != opponents->end();
-        it++)
-    {
-      tCarElt *ocar = it->getCarPtr();
-      double opp_distance = it->getDistance();
+        it++) {
+    tCarElt *ocar = it->getCarPtr();
+    double oppDistance = it->getDistance();
       
-      if(
-        (//if teammate has more laps under his belt,
-            (it->is_teammate() && ocar->race.laps > car->race.laps)
-            || //or teammate is less damaged, let him go
-            it->is_quicker_teammate(car)
-        )
-        &&  //if close enough
-            (opp_distance > -TEAM_REAR_DIST)
-        &&
-            (opp_distance < -car->_dimension_x)
-        )
-        {
-          // Behind, larger distances are smaller ("more negative").
-          if(opp_distance > mindist) {
-            mindist = opp_distance;
-            ret = &(*it);
-          }
-        } // if teammate
-      else if(it->is_state(OPP_LETPASS))
-        {
-          // Behind, larger distances are smaller ("more negative").
-          if(opp_distance > mindist) {
-            mindist = opp_distance;
-            ret = &(*it);
-          }
-        } // else if
-    } // for i
+    if((//if teammate has more laps under his belt,
+      (it->isTeammate() && ocar->race.laps > car->race.laps)
+      || //or teammate is less damaged, let him go
+      it->isQuickerTeammate(car))
+      && (oppDistance > -TEAM_REAR_DIST)  //if close enough
+      && (oppDistance < -car->_dimension_x)) {
+      // Behind, larger distances are smaller ("more negative").
+      if(oppDistance > mindist) {
+        mindist = oppDistance;
+        ret = &(*it);
+      }
+    } else if(it->isState(OPP_LETPASS)) {
+      // Behind, larger distances are smaller ("more negative").
+      if(oppDistance > mindist) {
+        mindist = oppDistance;
+        ret = &(*it);
+      }
+    } // else if
+  } // for i
+  
   return ret;
-}//get_overlapping_opp
+}//getOverlappingOpp
 
 
-/*
- * 
- * name: filter_overlapped_offset
- *
+/**
  * Modifies the member 'myoffset' so that the car moves out of the way
  * of the overlapping opponent.
  * 
- * @param Opponent *o: the opponent we should let go
- * @return: double, new offset. Equals member 'myoffset'
+ * @param [in] o: the opponent we should let go
+ * @return    new offset. Equals member 'myoffset'
  * 
  */
 double
-KDriver::filter_overlapped_offset(Opponent *o)
+KDriver::filterOverlappedOffset(Opponent *o)
 {
   double w = car->_trkPos.seg->width / WIDTHDIV - BORDER_OVERTAKE_MARGIN;
   
-  if(opp_is_on_right(o))
-    {
-      if(myoffset < w)
-        myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 1;//2;
-    }
-  else
-    {
-      if(myoffset > -w)
-        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 1;//2;
-    }
+  if(o->isOnRight(car->_trkPos.toMiddle)) {
+    if(myoffset < w)
+      myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 1;//2;
+  } else {
+    if(myoffset > -w)
+      myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 1;//2;
+  }
   setMode(BEING_OVERLAPPED);
 
   myoffset = MIN(avoidlftoffset, MAX(avoidrgtoffset, myoffset));
   return myoffset;
-}
+}//filterOverlappedOffset
 
-/*
- * 
- * name: filterOverlap
- * 
+
+/** 
  * If there is an opponent overlapping us, reduce accelerator.
  *
- * @param double accel: original acceleration value
- * @return: double, possibly reduced acceleration value
+ * @param [in]  accel: original acceleration value
+ * @return      possibly reduced acceleration value
  */
 double
 KDriver::filterOverlap(double accel)
 {
-  return (get_opp_by_state(OPP_LETPASS) ? MIN(accel, LET_OVERTAKE_FACTOR) : accel);
-}
+  return (opponents->getOppByState(OPP_LETPASS)
+    ? MIN(accel, LET_OVERTAKE_FACTOR)
+    : accel);
+}//filterOverlap
 
-Opponent *
-KDriver::get_opp_by_state(const int state)
-{
-  Opponent *ret = NULL;
-  for(list<Opponent>::iterator it = opponents->begin();
-        it != opponents->end();
-        it++)
-    {
-      if(it->is_state(state))
-        {
-          ret = &(*it);
-          break;
-        }
-    }
-  return ret;
-}
 
-/*
+/**
  * If opponent is too much on either side of the track,
  * (doesn't occupy center part of the segment)
  * and we are 5+ metres far
+ * 
+ * @param [in]  ocar  the opponent car
+ * @return      true if the opp. is too far on either side
 */
 bool
 KDriver::oppTooFarOnSide(tCarElt *ocar)
@@ -350,76 +334,76 @@ KDriver::oppTooFarOnSide(tCarElt *ocar)
     && fabs(car->_trkPos.toMiddle - ocar->_trkPos.toMiddle) >= 5.0)
     ret = true;
   return ret;
-}
+}//oppTooFarOnSide
 
-/*
- * 
- * name: get_takeover_opp
- * 
+
+/**
  * Decide if there is a car ahead we can take over.
  * 
- * @param: -
- * @return: Opponent *, overlapping car pointer or NULL
+ * @return  Overlap car pointer or NULL
  */
 Opponent*
-KDriver::get_takeover_opp()
+KDriver::getTakeoverOpp()
 {
   Opponent *ret = NULL;
 
   m_mincatchdist = MAX(30.0, 1500.0 - fabs(m_rInverse) * 10000);
-  int otry_success = 0;
+  int otrySuccess = 0;
   
-  for(int otry = 0; otry <= 1; otry++)
-    {
-      for(list<Opponent>::iterator it = opponents->begin();
-            it != opponents->end();
-            it++)
-        {
-          tCarElt *ocar = it->getCarPtr();
+  for(int otry = 0; otry <= 1; otry++) {
+    for(list<Opponent>::iterator it = opponents->begin();
+        it != opponents->end();
+        it++) {
+      tCarElt *ocar = it->getCarPtr();
 
-          // If opponent is clearly ahead of us, we don't care
-          if(it->is_state(OPP_FRONT_FOLLOW))
-            continue;
+      // If opponent is clearly ahead of us, we don't care
+      if(it->isState(OPP_FRONT_FOLLOW))
+        continue;
 
-          if(oppTooFarOnSide(ocar))
-            continue;
+      if(oppTooFarOnSide(ocar))
+        continue;
 
-          // If opponent is in pit, let him be ;)
-          if(ocar->_state > RM_CAR_STATE_PIT)
-            continue;
+      // If opponent is in pit, let him be ;)
+      if(ocar->_state > RM_CAR_STATE_PIT)
+        continue;
 
-          // If opponent is ahead, and is not a quicker teammate of ours
-          if((it->is_state(OPP_FRONT))
-            && !it->is_quicker_teammate(car))
-            {
-              double otry_factor = (otry ? (0.2 + (1.0 - ((currentsimtime - avoidtime) / 7.0)) * 0.8) : 1.0);
-              double distance = it->getDistance() * otry_factor;  //how far ahead is he
-              double speed = MIN(avoidspeed, getSpeed() + MAX(0.0, 10.0 - distance));
-              double ospeed = it->getSpeed();   //opponent's speed
-              double catchdist = MIN(speed * distance / (speed - ospeed),
-                                distance * CATCH_FACTOR) * otry_factor;   //when will we reach the opponent
+      // If opponent is ahead, and is not a quicker teammate of ours
+      if((it->isState(OPP_FRONT))
+          && !it->isQuickerTeammate(car)) {
+        double otry_factor = (otry ? (0.2 + (1.0 - ((currentsimtime - avoidtime) / 7.0)) * 0.8) : 1.0);
+        double distance = it->getDistance() * otry_factor;  //how far ahead is he
+        double speed = MIN(avoidspeed, getSpeed() + MAX(0.0, 10.0 - distance));
+        double ospeed = it->getSpeed();   //opponent's speed
+        double catchdist = MIN(speed * distance / (speed - ospeed),
+                          distance * CATCH_FACTOR) * otry_factor;   //when will we reach the opponent
 
-              //if we are close enough, check again with avoidance speed taken into account
-              if(catchdist < m_mincatchdist && distance < fabs(speed - ospeed) * 2)
-                {
-                  m_mincatchdist = catchdist;
-                  ret = &(*it); //This is the guy we need to take over
-                  otry_success = otry;
-                }
-            }
-        } //for it
-      if (ret) break;
-      if (mode != AVOIDING) break;
-    } //for otry
+        //if we are close enough, check again with avoidance speed taken into account
+        if(catchdist < m_mincatchdist && distance < fabs(speed - ospeed) * 2) {
+          m_mincatchdist = catchdist;
+          ret = &(*it); //This is the guy we need to take over
+          otrySuccess = otry;
+        }
+      }//if it state
+    } //for it
+    if (ret) break;
+    if (mode != AVOIDING) break;
+  } //for otry
 
-  if(ret != NULL && otry_success == 0)
+  if(ret != NULL && otrySuccess == 0)
     avoidtime = currentsimtime;
 
   return ret;
-}
+}//getTakeoverOpp
 
+
+/**
+ * Change offset value if  we are to overtake a car.
+ *
+ * @param [in]  o the opponent
+ * @return      new offset
+ */
 double
-KDriver::filter_takeover_offset(Opponent *o)
+KDriver::filterTakeoverOffset(Opponent *o)
 {
   setMode(AVOIDING);
   tCarElt *ocar = o->getCarPtr();
@@ -435,166 +419,154 @@ KDriver::filter_takeover_offset(Opponent *o)
       (otm > (ocar->_trkPos.seg->width - 5.0) && m_rInverse > 0.0))
     sidemargin += fabs(m_rInverse) * 150;
       
-  if (otm > (ocar->_trkPos.seg->width - 5.0) ||
-     (car->_trkPos.toLeft > ocar->_trkPos.toLeft &&
-      (sidedist < sidemargin || o->is_state(OPP_COLL))))
-    {
-      myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc;
-      setAvoidLeft();
+  if (otm > (ocar->_trkPos.seg->width - 5.0)
+      || (car->_trkPos.toLeft > ocar->_trkPos.toLeft
+      && (sidedist < sidemargin || o->isState(OPP_COLL)))) {
+    myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc;
+    setAvoidLeft();
+  } else if (otm < -(ocar->_trkPos.seg->width - 5.0)
+      || (car->_trkPos.toLeft < ocar->_trkPos.toLeft
+      && (sidedist < sidemargin || o->isState(OPP_COLL)))) {
+    myoffset += OVERTAKE_OFFSET_INC * m_lftinc;
+    setAvoidRight();
+  } else {
+    // If the opponent is near the middle we try to move the offset toward
+    // the inside of the expected turn.
+    // Try to find out the characteristic of the track up to catchdist.
+    tTrackSeg *seg = car->_trkPos.seg;
+    double length = getDistToSegEnd();
+    double oldlen, seglen = length;
+    double lenright = 0.0, lenleft = 0.0;
+    m_mincatchdist = MIN(m_mincatchdist, DISTCUTOFF);
+
+    do {
+      switch(seg->type) {
+        case TR_LFT:
+          lenleft += seglen;
+          break;
+        case TR_RGT:
+          lenright += seglen;
+          break;
+        default:
+          // Do nothing.
+          break;
+      }//switch seg->type
+      seg = seg->next;
+      seglen = seg->length;
+      oldlen = length;
+      length += seglen;
+    } while(oldlen < m_mincatchdist);
+
+    // If we are on a straight look for the next turn.
+    if(lenleft == 0.0 && lenright == 0.0) {
+      while(seg->type == TR_STR)
+        seg = seg->next;
+        
+      // Assume: left or right if not straight.
+      if(seg->type == TR_LFT)
+        lenleft = 1.0;
+      else
+        lenright = 1.0;
+    }//if lenleft/lenright == 0
+
+    // Because we are inside we can go to the limit.
+    if ((lenleft > lenright && m_rInverse < 0.0) ||
+       (lenleft <= lenright && m_rInverse > 0.0)) {
+        // avoid more if on the outside of opponent on a bend.  Stops us
+        // from cutting in too much and colliding...
+        sidemargin += fabs(m_rInverse) * 150;
     }
-  else if (otm < -(ocar->_trkPos.seg->width - 5.0) ||
-          (car->_trkPos.toLeft < ocar->_trkPos.toLeft &&
-           (sidedist < sidemargin || o->is_state(OPP_COLL))))
-    {
-      myoffset += OVERTAKE_OFFSET_INC * m_lftinc;
-      setAvoidRight();
-    }
-  else
-    {
-      // If the opponent is near the middle we try to move the offset toward
-      // the inside of the expected turn.
-      // Try to find out the characteristic of the track up to catchdist.
-      tTrackSeg *seg = car->_trkPos.seg;
-      double length = getDistToSegEnd();
-      double oldlen, seglen = length;
-      double lenright = 0.0, lenleft = 0.0;
-      m_mincatchdist = MIN(m_mincatchdist, DISTCUTOFF);
-
-      do
-        {
-          switch(seg->type)
-            {
-              case TR_LFT:
-                lenleft += seglen;
-                break;
-              case TR_RGT:
-                lenright += seglen;
-                break;
-              default:
-                // Do nothing.
-                break;
-            }
-          seg = seg->next;
-          seglen = seg->length;
-          oldlen = length;
-          length += seglen;
-        }
-      while(oldlen < m_mincatchdist);
-
-      // If we are on a straight look for the next turn.
-      if(lenleft == 0.0 && lenright == 0.0)
-        {
-          while(seg->type == TR_STR)
-            {
-              seg = seg->next;
-            }
-          // Assume: left or right if not straight.
-          if(seg->type == TR_LFT)
-            lenleft = 1.0;
-          else
-            lenright = 1.0;
-        }
-
-      // Because we are inside we can go to the border.
-      if ((lenleft > lenright && m_rInverse < 0.0) ||
-         (lenleft <= lenright && m_rInverse > 0.0))
-        {
-            // avoid more if on the outside of opponent on a bend.  Stops us
-            // from cutting in too much and colliding...
-            sidemargin += fabs(m_rInverse) * 150;
-        }
       
-      if(sidedist < sidemargin || o->is_state(OPP_COLL))
-        {
-          if(lenleft > lenright)
-            {
-              myoffset += OVERTAKE_OFFSET_INC * m_lftinc;// * 0.7;
-              setAvoidRight();
-            }
-          else
-            {
-               myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc;// * 0.7;
-              setAvoidLeft();
-            }//if lenleft
-        }//if sidedist
-    }//if opp near middle
+    if(sidedist < sidemargin || o->isState(OPP_COLL)) {
+      if(lenleft > lenright) {
+        myoffset += OVERTAKE_OFFSET_INC * m_lftinc;// * 0.7;
+        setAvoidRight();
+      } else {
+        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc;// * 0.7;
+        setAvoidLeft();
+      }//if lenleft > lenright
+    }//if sidedist
+  }//if opp near middle
         
   myoffset = MIN(avoidlftoffset, MAX(avoidrgtoffset, myoffset));
   myoffset = MIN(m_maxoffset, MAX(m_minoffset, myoffset));
   return myoffset;
-}//filter_takeover_offset
+}//filterTakeoverOffset
 
 
+/**
+ * Decide if there is a car on the side we are to collide with...
+ * 
+ * @return  Side collision car pointer or NULL
+ */
 Opponent *
-KDriver::get_sidecoll_opp()
+KDriver::getSidecollOpp()
 {
   Opponent *ret = NULL;
   for(list<Opponent>::iterator it = opponents->begin();
         it != opponents->end();
-        it++)
-    {
-      tCarElt *ocar = it->getCarPtr();
+        it++) {
+    tCarElt *ocar = it->getCarPtr();
 
-      if(ocar->_state > RM_CAR_STATE_PIT)   //Dont care for opponents in the pit
-        continue;
+    if(ocar->_state > RM_CAR_STATE_PIT)   //Dont care for opponents in the pit
+      continue;
 
-      if(oppTooFarOnSide(ocar))
-        continue;
+    if(oppTooFarOnSide(ocar))
+      continue;
 
-      if(it->is_state(OPP_SIDE))   //If opponent is on our side
-        {
-          setMode(AVOIDING);
-          ret = &(*it);
-          break;
-        } //if OPP_SIDE
-    } //for it
+    if(it->isState(OPP_SIDE)) {  //If opponent is on our side
+      setMode(AVOIDING);
+      ret = &(*it);
+      break;
+    } //if OPP_SIDE
+  } //for it
   
   return ret;
-}
+}//getSidecollOpp
+
 
 double
-KDriver::filter_sidecoll_offset(Opponent *o,
-    const double incfactor)
+KDriver::filterSidecollOffset(Opponent *o, const double incfactor)
 {
   double myToLeft = car->_trkPos.toLeft;
   double oppToLeft = o->getCarPtr()->_trkPos.toLeft;
   double sidedist = fabs(oppToLeft - myToLeft);
   double sidemargin = o->getWidth() + getWidth() + 2.0;
+  
+  bool oppOnRight = o->isOnRight(car->_trkPos.toMiddle);
   // avoid more if on the outside of opponent on a bend.
   // Stops us from cutting in too much and colliding...
-  if((opp_is_on_right(o) && m_rInverse < 0.0)
-    || (!opp_is_on_right(o) && m_rInverse > 0.0))
+  if((oppOnRight && m_rInverse < 0.0)
+    || (!oppOnRight && m_rInverse > 0.0))
     sidemargin += fabs(m_rInverse) * 150;
 
-  if(opp_is_on_right(o))
+  if(oppOnRight)
     sidemargin -= MIN(0.0, m_rInverse * 100);
   else
     sidemargin += MAX(0.0, m_rInverse * 100);
   sidedist = MIN(sidedist, sidemargin);
 
-  if(sidedist < sidemargin)
-    {
-      double sdiff = 3.0 - (sidemargin - sidedist) / sidemargin;
-      
-      if(opp_is_on_right(o))    //He is on the right, we must move to the left
-        myoffset += OVERTAKE_OFFSET_INC * m_lftinc * MAX(0.2, MIN(1.0, sdiff));
-      else              //He is on the left, we must move to the right
-        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc * MAX(0.2, MIN(1.0, sdiff));
-    }
-  else if(sidedist > sidemargin + 3.0)
-    {
-      if(raceoffset > myoffset + OVERTAKE_OFFSET_INC * incfactor)
-        myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 4;
-      else if (raceoffset < myoffset - OVERTAKE_OFFSET_INC * incfactor)
-        myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 4;
-    }
+  if(sidedist < sidemargin) {
+    double sdiff = 3.0 - (sidemargin - sidedist) / sidemargin;
+    
+    if(oppOnRight)    //He is on the right, we must move to the left
+      myoffset += OVERTAKE_OFFSET_INC * m_lftinc * MAX(0.2, MIN(1.0, sdiff));
+    else              //He is on the left, we must move to the right
+      myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc * MAX(0.2, MIN(1.0, sdiff));
+  } else if(sidedist > sidemargin + 3.0) {
+    if(raceoffset > myoffset + OVERTAKE_OFFSET_INC * incfactor)
+      myoffset += OVERTAKE_OFFSET_INC * m_lftinc / 4;
+    else if (raceoffset < myoffset - OVERTAKE_OFFSET_INC * incfactor)
+      myoffset -= OVERTAKE_OFFSET_INC * m_rgtinc / 4;
+  }
 
-  opp_is_on_right(o) ? setAvoidRight() : setAvoidLeft();
+  oppOnRight ? setAvoidRight() : setAvoidLeft();
   avoidmode |= AVOIDSIDE;
 
   myoffset = MIN(m_maxoffset, MAX(m_minoffset, myoffset));
   return myoffset;
-}
+}//filterSidecollOffset
+
 
 void
 KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
@@ -650,6 +622,7 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
         *carParmHandle = newhandle;
     }
 
+
   // Create a pit stop strategy object.
   strategy = new KStrategy();
   // Init fuel.
@@ -661,53 +634,35 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
   MU_FACTOR = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_MUFACTOR,
          (char *) NULL, 0.69f);
 
-  double MinCornerInverse =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "MinCornerInverse",
-         (char *) NULL, 0.002);
-  double CornerSpeed =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "CornerSpeed",
-         (char *) NULL, 15.0);
-  double AvoidSpeed =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "AvoidSpeedAdjust",
-         (char *) NULL, 2.0);
-  double CornerAccel =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "CornerAccel",
-         (char *) NULL, 1.0);
-  double IntMargin = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "IntMargin",
-                  (char *) NULL, 1.0);
-  double ExtMargin = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "ExtMargin",
-                  (char *) NULL, 2.0);
-  brakedelay = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "BrakeDelay",
-                (char *) NULL, 10.0);
   PitOffset = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "PitOffset",
                 (char *) NULL, 10.0);
-  brakedelay = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "BrakeDelay",
-                (char *) NULL, 10.0);
-
   raceline->InitTrack(track, carParmHandle, s);
 }
 
-// Update my private data every timestep.
+/**
+ * Update own private data on every timestep.
+ * 
+ * @param [in]  s situation provided by the sim
+ */
 void
 KDriver::update(tSituation * s)
 {
   // Update global car data (shared by all instances) just once per timestep.
-  if(currentsimtime != s->currentTime)
-    {
-      currentsimtime = s->currentTime;
-      cardata->update();
-    }
-  // Update the local data rest.
+  if(currentsimtime != s->currentTime) {
+    currentsimtime = s->currentTime;
+    cardata->update();
+  }
+  // Update the rest of local data
   speedangle = -(mycardata->getTrackangle() -
          atan2(car->_speed_Y, car->_speed_X));
   NORM_PI_PI(speedangle);
   mass = CARMASS + car->_fuel;
-  currentspeedsqr = car->_speed_x * car->_speed_x;
+  currentspeedsqr = pow(car->_speed_x, 2);
   
   opponents->update(s, this);
   strategy->update();
   
-  check_pit_status(s);
+  checkPitStatus(s);
   pit->update();
   simtime = s->currentTime;
 
@@ -715,21 +670,17 @@ KDriver::update(tSituation * s)
   angle = trackangle - car->_yaw;
   NORM_PI_PI(angle);
   angle = -angle;
-}
+}//update
 
-/*
- * 
- * name: check_pit_status
- * 
+/**
  * Checks if we need to plan a pitstop.
  * If yes, checks availability of the pit,
  * is it free or occupied by teammate.
  * 
- * @param
- * @return
+ * @param [in]  s Situation provided by the sim
  */
 void
-KDriver::check_pit_status(tSituation *s)
+KDriver::checkPitStatus(tSituation *s)
 {
   //If our car is still in the race
   if(car->_state <= RM_CAR_STATE_PIT)
@@ -753,7 +704,7 @@ KDriver::check_pit_status(tSituation *s)
             {
               tCarElt *ocar = it->getCarPtr();
               //If the other car is our teammate, still in the race
-              if(it->is_teammate() && ocar->_state <= RM_CAR_STATE_PIT)
+              if(it->isTeammate() && ocar->_state <= RM_CAR_STATE_PIT)
                 {
                   int idx = it->getIndex();
                   if(pitstatus[idx] == 1
@@ -773,35 +724,40 @@ KDriver::check_pit_status(tSituation *s)
     }
   else
     pitstatus[carindex] = 0;
-}
+}//checkPitStatus
 
 
-// Brake filter for collision avoidance.
+/**
+ * Brake filter for collision avoidance.
+ * If there is an opponent we are to collide, brake brake brake!
+ * 
+ * @param [in]  brake Original brake value
+ * @return  Possibly modified brake value
+ */
 double
-KDriver::filterBColl(double brake)
+KDriver::filterBColl(const double brake)
 {
-  if(simtime < 1.5)
-    return brake;
+  double ret = brake;
+  
+  if(simtime >= 1.5) {
+    double mu = car->_trkPos.seg->surface->kFriction;
+    for(list<Opponent>::iterator it = opponents->begin();
+          it != opponents->end();
+          it++) {
+      if(it->isState(OPP_COLL)) { //Endangered species
+        double ospeed = it->getSpeed();
+        if(brakedist(ospeed, mu) + MIN(1.0, 0.5 + MAX(0.0,(getSpeed() - ospeed) / 4))
+            > it->getDistance()) {  //Damn, too close, brake hard!!!
+          accelcmd = 0.0;
+          ret = 1.0;
+          break;
+        }//if brakedist
+      }//if state OPP_COLL
+    }//for it
+    
+  return ret;
+}//filterBColl
 
-  double mu = car->_trkPos.seg->surface->kFriction;
-  for(list<Opponent>::iterator it = opponents->begin();
-        it != opponents->end();
-        it++)
-    {
-      if(it->is_state(OPP_COLL))
-        {
-          double ospeed = it->getSpeed();
-          if(brakedist(ospeed, mu)
-            + MIN(1.0, 0.5 + MAX(0.0,(getSpeed() - ospeed) / 4))
-            > it->getDistance())
-            {
-              accelcmd = 0.0;
-              return 1.0;
-            }
-        }
-    }
-  return brake;
-}
 
 // Set pitstop commands.
 int
@@ -812,14 +768,16 @@ KDriver::pitCommand(tSituation * s)
   // This should be the only place where the pit stop is set to false!
   pit->setPitstop(false);
   return ROB_PIT_IM;        // return immediately.
-}
+}//pitCommand
+
 
 void
 KDriver::newRace(tCarElt * car, tSituation * s)
 {
   strategy->setCar(car);
   Driver::newRace(car, s);
-}
+}//newRace
+
 
 void
 KDriver::calcSpeed()
@@ -851,9 +809,3 @@ KDriver::calcSpeed()
     brakecmd = MIN(1.0, -(MAX(10.0, brakedelay * 0.7)) * x);
 }//calcSpeed
 
-inline bool
-KDriver::opp_is_on_right(Opponent *o) {
-    return (car->_trkPos.toMiddle > o->getCarPtr()->_trkPos.toMiddle)
-        ? true
-        : false;
-    }

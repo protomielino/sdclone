@@ -33,91 +33,78 @@ const double
 
 Pit::Pit(const tSituation * s, Driver * driver, const double pitoffset)
 {
-  track = driver->getTrackPtr();
-  car = driver->getCarPtr();
-  mypit = driver->getCarPtr()->_pit;
-  pitinfo = &track->pits;
-  pitstop = inpitlane = false;
-  pittimer = 0.0;
+  m_track = driver->getTrackPtr();
+  m_car = driver->getCarPtr();
+  m_mypit = driver->getCarPtr()->_pit;
+  m_pitinfo = &m_track->pits;
+  m_pitstop = m_inpitlane = false;
+  m_pittimer = 0.0;
 
-  if(mypit != NULL)
-    {
-      speedlimit = pitinfo->speedLimit - SPEED_LIMIT_MARGIN;
-      speedlimitsqr = speedlimit * speedlimit;
-      pitspeedlimitsqr = pitinfo->speedLimit * pitinfo->speedLimit;
+  if(m_mypit != NULL) {
+    m_speedlimit = m_pitinfo->speedLimit - SPEED_LIMIT_MARGIN;
+    m_speedlimitsqr = pow(m_speedlimit, 2);
+    m_pitspeedlimitsqr = pow(m_pitinfo->speedLimit, 2);
 
-      // Compute pit spline points along the track.
-      p[3].x = mypit->pos.seg->lgfromstart + mypit->pos.toStart;
-      p[2].x = p[3].x - pitinfo->len;
-      p[4].x = p[3].x + pitinfo->len;
-      p[0].x = pitinfo->pitEntry->lgfromstart + pitoffset;
-      p[1].x = pitinfo->pitStart->lgfromstart;
-      p[5].x = pitinfo->pitStart->lgfromstart + pitinfo->nMaxPits * pitinfo->len;
-      p[6].x = pitinfo->pitExit->lgfromstart;
+    // Compute pit spline points along the track.
+    m_p[3].x = m_mypit->pos.seg->lgfromstart + m_mypit->pos.toStart;
+    m_p[2].x = m_p[3].x - m_pitinfo->len;
+    m_p[4].x = m_p[3].x + m_pitinfo->len;
+    m_p[0].x = m_pitinfo->pitEntry->lgfromstart + pitoffset;
+    m_p[1].x = m_pitinfo->pitStart->lgfromstart;
+    m_p[5].x = m_pitinfo->pitStart->lgfromstart + m_pitinfo->nMaxPits * m_pitinfo->len;
+    m_p[6].x = m_pitinfo->pitExit->lgfromstart;
 
-      pitentry = p[0].x;
-      pitexit = p[6].x;
+    m_pitentry = m_p[0].x;
+    m_pitexit = m_p[6].x;
 
-      // Normalizing spline segments to >= 0.0.
-      for(int i = 0; i < NPOINTS; i++)
-        {
-          p[i].s = 0.0;
-          p[i].x = toSplineCoord(p[i].x);
-        }
+    // Normalizing spline segments to >= 0.0.
+    for(int i = 0; i < NPOINTS; i++) {
+      m_p[i].s = 0.0;
+      m_p[i].x = toSplineCoord(m_p[i].x);
+    }//for i
 
-      // Fix broken pit exit.
-      if(p[6].x < p[5].x)
-        {
-          //printf("bt: Pitexit broken on track %s.\n", track->name);
-          p[6].x = p[5].x + 50.0;
-        }
+    // Fix broken pit exit.
+    if(m_p[6].x < m_p[5].x)
+      m_p[6].x = m_p[5].x + 50.0;
 
-      // Fix point for first pit if necessary.
-      if(p[1].x > p[2].x)
-        {
-          p[1].x = p[2].x;
-        }
+    // Fix point for first pit if necessary.
+    if(m_p[1].x > m_p[2].x)
+      m_p[1].x = m_p[2].x;
 
-      // Fix point for last pit if necessary.
-      if(p[4].x > p[5].x)
-        {
-          p[5].x = p[4].x;
-        }
+    // Fix point for last pit if necessary.
+    if(m_p[4].x > m_p[5].x)
+      m_p[5].x = m_p[4].x;
 
-      double sign = (pitinfo->side == TR_LFT) ? 1.0 : -1.0;
-      p[0].y = 0.0;
-      p[6].y = 0.0;
-      for(int i = 1; i < NPOINTS - 1; i++)
-        {
-          p[i].y = fabs(pitinfo->driversPits->pos.toMiddle) - pitinfo->width;
-          p[i].y *= sign;
-        }
+    double sign = (m_pitinfo->side == TR_LFT) ? 1.0 : -1.0;
+    m_p[0].y = 0.0;
+    m_p[6].y = 0.0;
+    for(int i = 1; i < NPOINTS - 1; i++) {
+      m_p[i].y = fabs(m_pitinfo->driversPits->pos.toMiddle) - m_pitinfo->width;
+      m_p[i].y *= sign;
+    }//for i
 
-      p[3].y = fabs(pitinfo->driversPits->pos.toMiddle + 1.0) * sign;
-      spline = new Spline(NPOINTS, p);
-    }
-}
+    m_p[3].y = fabs(m_pitinfo->driversPits->pos.toMiddle + 1.0) * sign;
+    m_spline = new Spline(NPOINTS, m_p);
+  }//if pit not null
+}//Pit::Pit
 
 
 Pit::~Pit()
 {
-  if(mypit != NULL)
-    {
-      delete spline;
-    }
-}
+  if(m_mypit != NULL)
+    delete m_spline;
+}//Pit::~Pit
 
 
 // Transforms track coordinates to spline parameter coordinates.
 double
-Pit::toSplineCoord(double x) const
+Pit::toSplineCoord(const double x) const
 {
-  x -= pitentry;
-  while(x < 0.0)
-    {
-      x += track->length;
-    }
-  return x;
+  double ret = x - m_pitentry;
+  while(ret < 0.0)
+    ret += m_track->length;
+  
+  return ret;
 }//toSplineCoord
 
 
@@ -125,69 +112,51 @@ Pit::toSplineCoord(double x) const
 double
 Pit::getPitOffset(const double offset, double fromstart)
 {
-  if(mypit != NULL)
-    {
-      if(getInPit() || (getPitstop() && isBetween(fromstart)))
-        {
-          fromstart = toSplineCoord(fromstart);
-          return spline->evaluate(fromstart);
-        }
+  if(m_mypit != NULL) {
+    if(getInPit() || (getPitstop() && isBetween(fromstart))) {
+      fromstart = toSplineCoord(fromstart);
+      return m_spline->evaluate(fromstart);
     }
+  }
   return offset;
-}
+}//getPitOffset
 
 
 // Sets the pitstop flag if we are not in the pit range.
 void
 Pit::setPitstop(bool pitstop)
 {
-  if(mypit != NULL)
-    {
-      double fromstart = car->_distFromStartLine;
+  if(m_mypit != NULL) {
+    double fromstart = m_car->_distFromStartLine;
 
-      if(!isBetween(fromstart))
-        {
-          this->pitstop = pitstop;
-        }
-      else
-        {
-          if(!pitstop)
-            {
-              this->pitstop = pitstop;
-              pittimer = 0.0;
-            }
-        }
+    if(!isBetween(fromstart)) {
+      m_pitstop = pitstop;
+    } else {
+      if(!pitstop) {
+        m_pitstop = pitstop;
+        m_pittimer = 0.0;
+      }
     }
-}
+  }
+}//setPitstop
 
 
 // Check if the argument fromstart is in the range of the pit.
 bool
 Pit::isBetween(const double fromstart) const
 {
-  if(pitentry <= pitexit)
-    {
-      if(fromstart >= pitentry && fromstart <= pitexit)
-        {
-          return true;
-        }
-      else
-        {
-          return false;
-        }
-    }
-  else
-    {
-      // Warning: TORCS reports sometimes negative values for "fromstart"!
-      if(fromstart <= pitexit || fromstart >= pitentry)
-        {
-          return true;
-        }
-      else
-        {
-          return false;
-        }
-    }
+  bool ret = false;
+  
+  if(m_pitentry <= m_pitexit) {
+    if(fromstart >= m_pitentry && fromstart <= m_pitexit)
+      ret = true;
+  } else {
+    // Warning: TORCS reports sometimes negative values for "fromstart"!
+    if(fromstart <= m_pitexit || fromstart >= m_pitentry)
+      ret = true;
+  }//if pitentry <= pitexit
+  
+  return ret;
 }//isBetween
 
 
@@ -197,24 +166,19 @@ Pit::isBetween(const double fromstart) const
 bool
 Pit::isTimeout(const double distance)
 {
-  if(car->_speed_x > 1.0 || distance > 3.0 || !getPitstop())
-    {
-      pittimer = 0.0;
-      return false;
+  bool ret = false;
+  
+  if(m_car->_speed_x > 1.0 || distance > 3.0 || !getPitstop()) {
+    m_pittimer = 0.0;
+  } else {
+    m_pittimer += RCM_MAX_DT_ROBOTS;
+    if(m_pittimer > 3.0) {
+      m_pittimer = 0.0;
+      ret = true;
     }
-  else
-    {
-      pittimer += RCM_MAX_DT_ROBOTS;
-      if(pittimer > 3.0)
-        {
-          pittimer = 0.0;
-          return true;
-        }
-      else
-        {
-          return false;
-        }
-    }
+  }
+  
+  return ret;
 }//isTimeout
 
 
@@ -222,23 +186,15 @@ Pit::isTimeout(const double distance)
 void
 Pit::update()
 {
-  if(mypit != NULL)
-    {
-      if(isBetween(car->_distFromStartLine))
-        {
-          if(getPitstop())
-            {
-              setInPit(true);
-            }
-        }
-      else
-        {
-          setInPit(false);
-        }
-
+  if(m_mypit != NULL) {
+    if(isBetween(m_car->_distFromStartLine)) {
       if(getPitstop())
-        {
-          car->_raceCmd = RM_CMD_PIT_ASKED;
-        }
+        setInPit(true);
+    } else {
+      setInPit(false);
     }
+
+    if(getPitstop())
+      m_car->_raceCmd = RM_CMD_PIT_ASKED;
+  }
 }//update

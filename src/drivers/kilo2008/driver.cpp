@@ -762,10 +762,10 @@ Driver::getTargetPoint()
           raceline->GetPoint(offset, lookahead, &rt);
           double dx = t.x - car->_pos_X;
           double dy = t.y - car->_pos_Y;
-          double dist1 = sqrt(dx * dx + dy * dy);
+          double dist1 = Mag(dx, dy);
           dx = rt.x - car->_pos_X;
           dy = rt.y - car->_pos_Y;
-          double dist2 = sqrt(dx * dx + dy * dy);
+          double dist2 = Mag(dx, dy);
           if(dist2 > dist1)
             t = rt;
         }
@@ -1116,6 +1116,6 @@ Driver::brakedist(double allowedspeed, double mu)
   double c = mu * G;
   double d = (CA * mu + CW) / mass;
   double v1sqr = currentspeedsqr;
-  double v2sqr = allowedspeed * allowedspeed;
+  double v2sqr = pow(allowedspeed, 2);
   return -log((c + v2sqr * d) / (c + v1sqr * d)) / (2.0 * d);
 }

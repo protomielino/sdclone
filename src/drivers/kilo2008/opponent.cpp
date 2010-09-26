@@ -97,7 +97,7 @@ Opponent::update(tSituation *s, Driver *driver)
         {
           m_state |= OPP_FRONT;
 
-          if(is_quicker_teammate(mycar))
+          if(isQuickerTeammate(mycar))
             m_state |= OPP_FRONT_FOLLOW;
 
           m_distance -= SIDECOLLDIST;
@@ -145,7 +145,7 @@ Opponent::update(tSituation *s, Driver *driver)
       else if(m_distance > SIDECOLLDIST && getSpeed() > driver->getSpeed())
         {
           m_state |= OPP_FRONT_FAST;
-          if(is_quicker_teammate(mycar))
+          if(isQuickerTeammate(mycar))
             m_state |= OPP_FRONT_FOLLOW;
           m_distance -= SIDECOLLDIST;
           if (m_distance < 20.0 - (getSpeed() - driver->getSpeed()) * 4)
@@ -177,17 +177,17 @@ Opponent::getDistToSegStart() const
 void
 Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
 {
-  if((m_car->race.laps > mycar->race.laps) || is_quicker_teammate(mycar))
+  if((m_car->race.laps > mycar->race.laps) || isQuickerTeammate(mycar))
     {
-      if(is_state(OPP_BACK | OPP_SIDE))
+      if(isState(OPP_BACK | OPP_SIDE))
         m_overlaptimer += s->deltaTime;
-      else if(is_state(OPP_FRONT))
+      else if(isState(OPP_FRONT))
         m_overlaptimer = LAP_BACK_TIME_PENALTY;
       else
         {
           if(m_overlaptimer > 0.0)
             {
-              if(is_state(OPP_FRONT_FAST))
+              if(isState(OPP_FRONT_FAST))
                 m_overlaptimer = MIN(0.0, m_overlaptimer);
               else
                 m_overlaptimer -= s->deltaTime;
@@ -202,8 +202,6 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
 
 
 /**
- * is_quicker_teammate
- *
  * Returns true, if the other car is our teammate
  * and has significantly less damage
  * (defined in Driver::TEAM_DAMAGE_CHANGE_LEAD)
@@ -212,11 +210,11 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
  * @return true, if the opponent is our teammate
  */
 bool
-Opponent::is_quicker_teammate(tCarElt * const mycar)
+Opponent::isQuickerTeammate(tCarElt * const mycar)
 {
-  return (is_teammate()
+  return (isTeammate()
     && (mycar->_dammage - m_car->_dammage > Driver::TEAM_DAMAGE_CHANGE_LEAD));
-}//is_quicker_teammate
+}//isQuickerTeammate
 
 
 /** 
@@ -291,45 +289,21 @@ Opponents::setTeamMate(const tCarElt *car)
 }//setTeamMate
 
 
-#if 0
-void
-TeamTacticsMatrix(tCarElt *car_A, tCarElt *car_B, int *order_A, int *order_B)
+/** 
+ * Searches the first opponent with the given state.
+ *
+ * @param [in]  state: we only care for an opponent in this state
+ * @return      pointer to the opponent we've found, or NULL
+ */
+Opponent *
+Opponents::getOppByState(const int state)
 {
-    tCarElt *car_front;
-    tCarElt *car_behind;
-    
-    //Decide which car is ahead
-    if(car_A->_distRaced >= car_B->_distRaced)
-      {
-        car_front = car_A;
-        car_behind = car_B;
-      }
-    else
-      {
-        car_front = car_B;
-        car_behind = car_A;
-      }
-    
-    //For easier handling, f_: front, b_: behind
-    int f_laps = car_front->_laps;
-    int b_laps = car_behind->_laps;
-    int f_damage = car_front->_dammage;
-    int b_damage = car_behind->_dammage;
-    
-    
-    if(b_laps > f_laps) //Case 1,2,3
-      {
-        
-      }
-    else
-      {
-        if(b_laps == f_laps)    //Case 4,5,6
-          {
-          }
-        else    //Case 7,8,9
-          {
-            
-          }
-      }    
-}
-#endif
+  Opponent *ret = NULL;
+  for(list<Opponent>::iterator it = begin(); it != end(); it++) {
+    if(it->isState(state)) {
+      ret = &(*it);
+      break;
+    }
+  }//for it
+  return ret;
+}//getOppByState

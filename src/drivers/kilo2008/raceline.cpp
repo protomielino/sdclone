@@ -498,7 +498,7 @@ LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSi
                   (char *) NULL, 2.0);
   m_dBrakeDelay = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "BrakeDelay",
                 (char *) NULL, 10.0);
-  m_dSecurityRadius = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_SECRADIUS,
+  m_dSecurityRadius = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "securityradius",
                 (char *) NULL, 100.0);
 
   // split track

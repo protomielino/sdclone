@@ -57,15 +57,13 @@ protected:
   bool oppTooFarOnSide(tCarElt *ocar);
   
   //'own' utilities
-  Opponent * get_overlapping_opp();
-  Opponent * get_takeover_opp();
-  Opponent * get_sidecoll_opp();
-  double filter_overlapped_offset(Opponent *o);
-  double filter_takeover_offset(Opponent *o);
-  double filter_sidecoll_offset(Opponent *o, const double);
-  Opponent * get_opp_by_state(const int state);
-  inline bool opp_is_on_right(Opponent *o);
-  void check_pit_status(tSituation *s);
+  Opponent * getOverlappingOpp();
+  Opponent * getTakeoverOpp();
+  Opponent * getSidecollOpp();
+  double filterOverlappedOffset(Opponent *o);
+  double filterTakeoverOffset(Opponent *o);
+  double filterSidecollOffset(Opponent *o, const double);
+  void checkPitStatus(tSituation *s);
     
   //'own' variables
   double m_mincatchdist;
