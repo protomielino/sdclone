@@ -600,20 +600,17 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		GfParmWriteFile(NULL, PrefHdle, "Human");
 	}
 
-	sprintf(car->_msgCmd[0], "%s %s", (HCtx[idx]->paramAbs ? "ABS" : ""), (HCtx[idx]->paramAsr ? "ASR" : ""));
+	sprintf(car->_msgCmd[0], "%s %s", (HCtx[idx]->paramAbs ? "ABS" : ""), (HCtx[idx]->paramAsr ? "TCS" : ""));
 	memcpy(car->_msgColorCmd, color, sizeof(car->_msgColorCmd));
 
-	if ((cmd[CMD_SPDLIM].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_SPDLIM].val] == 1)
+	if ((cmd[CMD_SPDLIM].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_SPDLIM].val])
 	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_SPDLIM].val])
-	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_SPDLIM].val)].state == GFUI_KEY_DOWN))
+	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_SPDLIM].val)].edgeUp))
 	{
-		speedLimiter = true;
-		sprintf(car->_msgCmd[1], "Speed Limiter On");
-	} else {
-		speedLimiter = false;
-		sprintf(car->_msgCmd[1], "Speed Limiter Off");
+		speedLimiter = !speedLimiter;
 	}
 
+	sprintf(car->_msgCmd[1], "Speed Limiter %s", (speedLimiter ? "On" : "Off"));
 
 	if ((cmd[CMD_LIGHT1].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_LIGHT1].val])
 	    || (cmd[CMD_LIGHT1].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_LIGHT1].val])
