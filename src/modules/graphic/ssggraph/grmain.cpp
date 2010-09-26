@@ -127,10 +127,19 @@ grAdaptScreenSize(void)
 			grScreens[3]->deactivate();
 			break;
 		case 2:
-			// Top half of the window
-			grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2);
-			// Bottom half of the window
-			grScreens[1]->activate(grWinx, grWiny,              grWinw, grWinh / 2);
+			// Check which way to split, incase of wide screen/2 monitor setup.
+			if (grWinw >= 2 * grWinh) {
+				// Left half of the window
+				grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh);
+				// Rigth half of the window
+				grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh);
+			} else {
+				// Top half of the window
+				grScreens[0]->activate(grWinx, grWiny + grWinh / 2, grWinw, grWinh / 2);
+				// Bottom half of the window
+				grScreens[1]->activate(grWinx, grWiny,              grWinw, grWinh / 2);
+			}
+
 			grScreens[2]->deactivate();
 			grScreens[3]->deactivate();
 			break;
