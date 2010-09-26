@@ -574,6 +574,7 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
 {
   track = t;
 
+  
   // Load a custom setup if one is available.
   const int BUFSIZE = 256;
   char buffer[BUFSIZE];
@@ -754,7 +755,8 @@ KDriver::filterBColl(const double brake)
         }//if brakedist
       }//if state OPP_COLL
     }//for it
-    
+  }//if simtime
+      
   return ret;
 }//filterBColl
 
