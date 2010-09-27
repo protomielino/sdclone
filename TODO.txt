@@ -1,0 +1,161 @@
+Top TODO list (some may be included in 1.5.0, some others not):
+---------------------------------------------------------------
+Foreword: Have a look first at trunk TODO : here, only sdl-port specific things.
+
+Cars:
+- move RGB files to PNG for lower disk footprint
+- create textures for nascar-* (Eckhard)
+- improve damage management (see Andrews ideas in the the devel list,
+  under the title "Thoughts on collision damage").
+- fix to high wheel inertia on many (if not all) models.
+  See the devel list post "Low speeds".
+
+Tracks:
+- move preview images to JPEG for lower disk footprint
+
+Menus:
+- enable intuitive double-click for "Select/Unselect" action in the scroll-lists
+  of the driver select menu
+- new menu for human driver car setup : may be only a reduced set of parameters
+  would be accessible first, with default values for others ; some thinking work
+  about which go in this set wand which don't.
+- Go on with Brian's XML menu infrastructure :
+  * move new guimenu.h/cpp functions Create*, Get*, Load*, Read*
+    to a new dedicated source file (guixml.h/cpp ?)
+  * rename these functions to be consistent with Gfui API (add a GfuiXML prefix ?)
+  * add support for keyboard shorcut XML description
+    (with defaults like for F1, F12 ... and also customizable ones).
+  * add support for dynamic background image.
+  * add support for menu specific property/value in the XML file, 
+    to remove hard-coded constants from the menu C++ code
+    (Ex: x, y positions for non-always there controls ... see creditsmenu.cpp)
+  * move the whole thing to a GfuiXMLMenuDescriptor class, for nice access
+    to menu properties, controls, objects ... by their name or index (in the XML file)
+
+Robots:
+-
+
+Program: 
+- Simu V3 : integrate Christos' improvements from Torcs CVS HEAD :
+   * 1. Discovered that corner velocities are not correctly calculated
+     2. Stabilised CollideZ() code - removed corner velocity from calculation
+        of reaction forces.
+   * updated the viscous coupler so that it is symmetric (July 2009)
+   * Changed some things in the rolling resistance calculation (July 2009).
+     Now it works as advertised, i.e. sand is sticky!
+- network gaming - work in progress (Brian)
+- More GCC 4.3 compatibility (Mart, Jean-Philippe)
+- fix game crudely exiting in several situations where an error message to the user
+  (or simply skipping the requested action) would be preferable :
+  * start a race with no driver
+  * start a race that uses a driver that is no more in the install tree
+  * start a race on a track that is no more in the install tree
+    (by skipping the "Configure Race" step)
+- enable the user to save race configuration (track, drivers and cars)
+  for any race type, and to reload it later from the associated XML file list
+- just load ssggraph once to avoid weird crashes when going back to the options
+  menu and coming back to the race (just the Linux version was affected, and even
+  this just under special conditions, the Windows version does not work the same
+  way concerning this) - Back-port from Torcs r1-3-1 branch
+- as we want to increase the details (cars, tracks, ...), think about better and deeper
+  management of the level of detail, filtering-out objects that are not in the focus
+  of the camera (if not already done somewhere ?), from a "high" level for close objects
+  to a "low" level for very far objects, with 1 ou 2 intermediate distance levels.
+  As an example, use the auto-generated 3D wheel model for low levels (decrease its details),
+  and the designer-shipped one for high level (increase its details : more round wheels).
+- replay feature - Work in progress by Adam Skoblinski
+- break the 1-1 link between human drivers and their driven car = enable human driver
+  to choose their car when choosing the opponents = in race configuration ; beware of
+  the career mode where human module interfaces are used in a non-obvious way
+  (look at thread "Driver select bug in sdl-port" in the devel list for Mart's
+   explainations about it, and how the above can be done in a simple way).
+
+Other:
+- finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run. 
+  Plib is the biggest source of headaches. CMake integration still unfinished in that way.
+- get rid of the Windows .def files stuff (through MS dllimport/dllexport macros)
+  for defining shared libraries interface, except for the robots, for which these files
+  are automatcally generated in the sdl-port branch (through a CMake macro).
+- fix Windows main.cpp::init_args setting local dir twice if command line specified
+  (the default value in <My documents> should only be set if not command line specified)
+- think about how to integrate Haruna's fictious racing teams backstories in the game
+  (ex: LS1 in 'LS1 team "backstories" (for fun)' devel list post)
+
+TODO for 1.5.0 or after (some are current on sdl-port and career branches)
+--------------------------------------------------------------------------
+
+Tracks:
+- move all track dirs that are directly under data/tracks to data/tracks/road, dirt, ...
+  in the repo, and update CMakeLists.txt
+
+Cars:
+- move textures to PNG for saving disk space / download time
+- create / setup new LMP1 car set (Andrew)
+- setup new Indy car set (converted by Xavier from GP4 game)
+- complete / setup F1 car set (including Formula One by Andrew Sumner,
+  F1-torcs by Vincente Marti, and models converted by Xavier from GP4 game)
+  BUT: what about Manfariel's F1 2009 models?
+- get rid of real car manufacturer names (replace by fictious but user-firendly ones)
+- get rid of real brands / logos (replace by fictious / GPL / FAL ones, but beware of the logos
+  often being non GPL/FAL-like licensed) 
+- add petrol, bewy and mf1 to SuperCars set, as proposed by Wolf-Dieter
+  BUT: There are still no front-engined cars!!
+- check in the Pacejka book to see if the way mu is computed from tire load
+  (= tire load sensitivity) is OK (simu V2 / wheel.cpp / SimWheelUpdateForce function)
+- setup / test new LS1 car set (Haruna, Andrew)
+- ALL CARS: Check competitive balancing of all carsets once physics engine is switched over to
+  simuv3 rather than v2; should be done on a regular basis.
+- ALL CARS: create LOD models to reduce graphical stress in big-grid races or on low-spec CPUs
+  (or worse, both :/)
+- rework the current stock car model to the newer model 'Car of Tommorrow'
+- Hillclimb car with over 800 bhp?
+  BUT: Is it fun?
+- increase volume of backfire sound and gear shift sound
+
+Robots:
+- setup USR and Simplix robots for reworked 4WD carset.
+- setup USR and Simplix robots for new LMP1 carset.
+- setup USR and Simplix robots for new Indy carset.
+- setup USR and Simplix robots for completed F1 carset.
+
+Menus:
+- adjust the credits file (remove GLUT)
+- add options in the Open GL menu to enable/disable multi-sampling
+  and change the "multi-sampling level (?)".
+- Smart 3D view showing the selected car when choosing it
+
+
+Program:
+- improve command key management in human.cpp (there's 2 arrays indexed
+  by the unicode of the keys (!), whereas we only use no more that 25
+  different keys ; for the moment, these arrays were limited to 4096 items,
+  but this is probably not sufficient in Japan or China ...
+  => we must find a better indexing of these array, to use the really needed
+     minimum number of key entries in these arrays (may be with some king of
+     indirection ?)
+- Support for 3rd party robots, cars and track. 3rd party robot builders 
+  should be able to use our CMake macro's, so we need to make some changes
+  to these macros and install them in such way that a robot can find it
+  during compilation.
+- fix trackgen not being built.
+- Implement simple memory leak detection by overriding malloc, calloc, realloc, strdup,
+  free, new, delete ... etc in order to save informations about the caller
+  in the allocated block (use macros to override and __LINE__, __FILE__ ...
+  to collect infos about the called ... but there's the new/delete difficult case).
+- introduce human driver assistance features, like Line Assist System (LAS)
+  and Instructor's Braking System (IBS) ;
+  also improve human skill level management in order to prevent rookie players
+  from winning too easily (by limiting car capabilities, and particularly removing
+  the extra-grip and replace it by driving assistance) and to scale driver assistance
+  availability / capabilities ;
+  add also something for preventing you from smashing into the back of the car in front
+  (see Haruna's detailed post on the subject and associated thread http://sourceforge.net/mailarchive/forum.php?thread_name=e17477d90904182050lc339f5cy6b4908ed8dc1723%40mail.gmail.com&forum_name=speed-dreams-devel)
+- introduce AI vs AI duel tournament mode for casual robot programmers (similar to 
+  R-TYPE FINAL's 'VS AI' mode); with varying car types, tracks, and robot competence
+- Add co-driver/navigator signals and sounds for dirt and certain road tracks to be
+  used in rallying game modes
+
+Other:
+- regularly merge-in changes from trunk
+-
+
