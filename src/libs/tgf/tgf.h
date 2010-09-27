@@ -256,6 +256,13 @@ typedef void (*tfDirfreeUserData)(void*);	/**< Function to call for releasing th
 TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freeName = false, bool freeDispName = false);
 
 
+/**************************************
+ * Directory and file path management *
+ **************************************/
+
+TGF_API bool GfPathIsAbsolute(const char *path);
+TGF_API char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen);
+
 /**********************************
  *  Interface For Parameter Files *
  **********************************/

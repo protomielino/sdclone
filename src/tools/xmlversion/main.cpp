@@ -15,27 +15,31 @@
  *                                                                         *
  ***************************************************************************/
 
+/* TODO : Clarify the use of DESTDIR environment variable
+          and see if the added "dataDir" command line arg can replace it
+*/
+
 #include <tgf.h>
 #include <portability.h>
 
 
-static const char* strip_destdir(const char *filename, const char *destdir )
+static const char* strip_destdir(const char *filename, const char *destDir )
 {
 	int xx;
-	int destdir_length;
+	int destDir_length;
 
-	if( !destdir )
+	if( !destDir )
 		return filename;
 	if( !filename )
 		return NULL;
 
-	destdir_length = strlen( destdir );
+	destDir_length = strlen( destDir );
 
-	for( xx = 0; xx < destdir_length; ++xx )
-		if( destdir[ xx ] != filename[ xx ] )
+	for( xx = 0; xx < destDir_length; ++xx )
+		if( destDir[ xx ] != filename[ xx ] )
 			return filename;
 
-	return &filename[ destdir_length ];
+	return &filename[ destDir_length ];
 }
 
 static int findIndex( void *versionHandle, const char* dataLocation,
@@ -82,19 +86,40 @@ static int findIndex( void *versionHandle, const char* dataLocation,
 }
 
 static int process( const char* versionFile, const char* dataLocation,
-					const char* userLocation, const char * destdir )
+					const char* userLocation, const char* destDir, const char* dataDir )
 {
 	void *versionHandle;
 	void *xmlHandle;
 	int index;
 	char *path;
 	const char* actualDataLoc;
+	char *absDataLocation;
 	int majorVer, minorVer;
 
-	xmlHandle = GfParmReadFile( dataLocation, GFPARM_RMODE_STD );
+	// If dataLocation is not absolute, use dataDir to make it such.
+	if (!GfPathIsAbsolute(dataLocation))
+	{
+		if (dataDir && strlen(dataDir) > 0)
+		{
+			const char cLastChar = dataDir[strlen(dataDir) - 1];
+			absDataLocation = (char*)malloc( sizeof(char) * (strlen(dataDir) + strlen(dataLocation) + 2));
+			sprintf(absDataLocation, "%s%s%s", dataDir,
+					(cLastChar == '/' || cLastChar == '\\') ? "" : "/", dataLocation);
+		}
+		else
+		{
+			fprintf( stderr, "xmlversion: No dataDir specified, whereas a relative file pathname \"%s\".\n",
+					 dataLocation );
+			return 1;
+		}
+	}
+	else
+		absDataLocation = strdup(dataLocation);
+	
+	xmlHandle = GfParmReadFile( absDataLocation, GFPARM_RMODE_STD );
 	if( !xmlHandle )
 	{
-		fprintf( stderr, "xmlversion: Can't open \"%s\".\n", dataLocation );
+		fprintf( stderr, "xmlversion: Can't open \"%s\".\n", absDataLocation );
 		return 1;
 	}
 
@@ -106,19 +131,21 @@ static int process( const char* versionFile, const char* dataLocation,
 	}
 
 	index = findIndex( versionHandle, dataLocation, userLocation,  "versions", false );
-	actualDataLoc = strip_destdir( dataLocation, destdir );
+	actualDataLoc = strip_destdir( dataLocation, destDir ); // TODO: Is is really usefull ? Comment needed.
 	majorVer = GfParmGetMajorVersion( xmlHandle );
 	minorVer = GfParmGetMinorVersion( xmlHandle );
 	
 	path = (char*)malloc( sizeof(char) * 31 );
 	snprintf( path, 30, "versions/%d", index );
 
+	// Note : Data location is set to a relative path is specified such, absolute otherwise.
 	GfParmSetStr( versionHandle, path, "Data location", actualDataLoc);
 	GfParmSetStr( versionHandle, path, "Local location", userLocation );
 	GfParmSetNum( versionHandle, path, "Major version", NULL, (tdble)majorVer);
 	GfParmSetNum( versionHandle, path, "Minor version", NULL, (tdble)minorVer);
 
 	free( path );
+	free(absDataLocation);
 
 	GfParmWriteFile( NULL, versionHandle, "versions" );
 	
@@ -131,12 +158,12 @@ static int process( const char* versionFile, const char* dataLocation,
 	return 0;
 }
 
-static int add_directory( const char* versionFile, const char* directoryName, const char *destdir )
+static int add_directory( const char* versionFile, const char* directoryName, const char *destDir )
 {
 	void *versionHandle;
 	char *path;
 	int index;
-	const char* actualDataLoc;
+	const char* actualDirName;
 
 	versionHandle = GfParmReadFile( versionFile, GFPARM_RMODE_STD );
 	if( !versionHandle )
@@ -147,12 +174,12 @@ static int add_directory( const char* versionFile, const char* directoryName, co
 	}
 
 	index = findIndex( versionHandle, directoryName, "", "directories", true );
-	actualDataLoc = strip_destdir( directoryName, destdir );
+	actualDirName = strip_destdir( directoryName, destDir );
 
 	path = (char*)malloc( sizeof(char) * 31 );
 	snprintf( path, 30, "directories/%d", index );
 
-	GfParmSetStr( versionHandle, path, "Data location", actualDataLoc);
+	GfParmSetStr( versionHandle, path, "Data location", actualDirName);
 
 	free( path );
 
@@ -160,7 +187,7 @@ static int add_directory( const char* versionFile, const char* directoryName, co
 	
 	GfParmReleaseHandle( versionHandle );
 
-	fprintf(stderr, "xmlversion: Updated %s (directory %s).\n", versionFile, actualDataLoc);
+	fprintf(stderr, "xmlversion: Updated %s (directory %s).\n", versionFile, actualDirName);
 
 	return 0;
 }
@@ -170,14 +197,16 @@ int main( int argc, char **argv )
 	const char *versionfile;
 	const char *dataLocation;
 	const char *userLocation;
-	const char *destdir;
+	const char *dataDir;
+	const char *destDir;
 	int ret;
 
 	if( argc <= 3 )
 	{
-		fprintf( stderr, "Usage: xmlversion version-file data-location local-location\n\n" );
+		fprintf( stderr, "Usage: xmlversion version-file data-location local-location [datadir]\n\n" );
 		fprintf( stderr, "   version-file: The location of the version.xml file\n" );
-		fprintf( stderr, "   data-location: Full path and filename to the location of installed xml-file\n" );
+		fprintf( stderr, "   data-location: Path and filename to the location of installed xml-file\n" );
+		fprintf( stderr, "                   (relative to datadir if specified, otherwise absolute)\n\n" );
 		fprintf( stderr, "   local-location: path and filename to the location of the local xml-file\n" );
 		fprintf( stderr, "                   (relative to the users local directory)\n\n" );
 		fprintf( stderr, "Usage: xmlversion -d version-file local-location\n\n" );
@@ -192,26 +221,28 @@ int main( int argc, char **argv )
 	// Uncomment to get debug traces.
     //GfInit(); 
 
-	if( argc > 4 )
-		fprintf( stderr, "Warning: Too many arguments (should be 3). Ignoring extra ones.\n" );
+	if( argc > 5 )
+		fprintf( stderr, "Warning: Too many arguments (should be 3 or 4). Ignoring extra ones.\n" );
 
 	versionfile = argv[1];
 	dataLocation = argv[2];
 	userLocation = argv[3];
-	destdir = getenv( "DESTDIR" );
-	GfLogDebug("xmlversion: DESTDIR='%s'\n", destdir ? destdir : "<undefined>");
+	dataDir = argc > 4 ? argv[4] : 0;
+	destDir = getenv( "DESTDIR" );
+	GfLogDebug("xmlversion: DESTDIR='%s'\n", destDir ? destDir : "<undefined>");
 	GfLogDebug("xmlversion: versionfile='%s'\n", versionfile);
 	GfLogDebug("xmlversion: dataLocation='%s'\n", dataLocation);
 	GfLogDebug("xmlversion: userLocation='%s'\n", userLocation);
+	GfLogDebug("xmlversion: dataDir='%s'\n", dataDir ? dataDir : "<not specified>");
 	
 	if( strcmp( versionfile, "-d" ) == 0 )
-		ret = add_directory( dataLocation, userLocation, destdir );
+		ret = add_directory( dataLocation, userLocation, destDir );
 	else if( strcmp( dataLocation, "-d" ) == 0 )
-		ret = add_directory( versionfile, userLocation, destdir );
+		ret = add_directory( versionfile, userLocation, destDir );
 	else if( strcmp( userLocation, "-d" ) == 0 )
-		ret = add_directory( versionfile, dataLocation, destdir );
+		ret = add_directory( versionfile, dataLocation, destDir );
 	else
-		ret = process( versionfile, dataLocation, userLocation, destdir );
+		ret = process( versionfile, dataLocation, userLocation, destDir, dataDir );
 
 	exit( ret );
 }

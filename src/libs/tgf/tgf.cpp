@@ -521,8 +521,22 @@ char* GfTime2Str(tdble sec, int sgn)
 	return strdup(buf);
 }
 
+// Determine if a dir or file path is absolute or not.
+bool GfPathIsAbsolute(const char *pszPath)
+{
+	return pszPath != 0 && strlen(pszPath) > 0
+#ifdef WIN32
+		   && (pszPath[0] == '/'  // Leading '/'
+			   || pszPath[0] == '\\' // Leading '\'
+			   || (strlen(pszPath) > 2 && pszPath[1] == ':'
+				   && (pszPath[2] == '/' || pszPath[2] == '\\'))); // Leading 'x:/' or 'x:\'
+#else
+	       && pszPath[0] == '/' ; // Leading '/'
+#endif
+}
+
 // Normalize a directory path in-place : \ to / conversion + mandatory unique trailing /.
-static char* normalizeDirPath(char* pszPath, size_t nMaxPathSize)
+char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen)
 {
 #ifdef WIN32
 	// Replace '\' by '/'
@@ -534,7 +548,7 @@ static char* normalizeDirPath(char* pszPath, size_t nMaxPathSize)
 
 	// Add a trailing '/' if not present.
 	if (pszPath[strlen(pszPath)-1] != '/')
-		if (strlen(pszPath) < nMaxPathSize - 1)
+		if (strlen(pszPath) < nMaxPathLen - 1)
 			strcat(pszPath, "/");
 		else
 			GfLogFatal("Path '%s' too long ; could not normalize\n", pszPath);
@@ -627,7 +641,7 @@ static char* makeRunTimeDirPath(const char* srcPath)
 
 	// Fix \ and add a trailing / is needed.
 	if (tgtPath)
-		normalizeDirPath(tgtPath, bufSize);
+		GfPathNormalizeDir(tgtPath, bufSize - 1);
 
 	if (!tgtPath)
 		GfLogFatal("Path '%s' too long ; could not make as a run-time path\n", srcPath);
