@@ -2,7 +2,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Non-Championship Race" version="1.0">
+<params name="Non-Championship Race" version="1.1">
   <section name="Header">
     <attstr name="name" val="Non-Championship Race"/>
     <attstr name="description" val="Non-Championship Race"/>
@@ -15,7 +15,7 @@
   <section name="Tracks">
     <attnum name="maximum number" val="1"/>
     <section name="1">
-      <attstr name="name" val="michigan"/>
+      <attstr name="name" val="manton"/>
       <attstr name="category" val="speedway"/>
     </section>
 
