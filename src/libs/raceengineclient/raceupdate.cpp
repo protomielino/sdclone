@@ -94,9 +94,6 @@ private:
 	//! Release exclusive access on the race engine data.
 	bool unlockData(const char* pszLocker);
 	
-	//! Copy (after allocating if pTarget is null) the source situation into the target (deep copy for RW data, shallow copy for RO data).
-	tRmInfo* deliverSituation(tRmInfo*& pTarget, const tRmInfo* pSource);
-	
 	//! Allocate and initialize a situation (set constants from source).
 	tRmInfo* initSituation(const tRmInfo* pSource);
 	
@@ -499,11 +496,6 @@ tRmInfo* reSituationUpdater::initSituation(const tRmInfo* pSource)
 	return ReSituationAllocInit(pSource);
 }
 
-tRmInfo* reSituationUpdater::deliverSituation(tRmInfo*& pTarget, const tRmInfo* pSource)
-{
-	return ReSituationCopy(pTarget, pSource);
-}
-
 void reSituationUpdater::acknowledgeEvents()
 {
 	ReSituationAcknowlegdeEvents(_pCurrReInfo, _pPrevReInfo);
@@ -523,7 +515,7 @@ tRmInfo* reSituationUpdater::getPreviousStep()
 			return 0;
 
 		// Get the situation data.
-		deliverSituation(_pPrevReInfo, _pCurrReInfo);
+		ReSituationCopy(_pPrevReInfo, _pCurrReInfo);
 
 		// Unlock the race engine data.
 		if (!unlockData("reSituationUpdater::getPreviousStep"))
@@ -653,13 +645,12 @@ static void reOnBackFromPitMenu(void *pvcar)
 }
 
 reMainUpdater::reMainUpdater(reSituationUpdater* pSituUpdater)
-: _pReInfo(0), _pSituationUpdater(pSituUpdater)
+: _pReInfo(pSituUpdater->getPreviousStep()), _pSituationUpdater(pSituUpdater)
 {
 }
 
 void reMainUpdater::initCarGraphics(void)
 {
-	_pReInfo = _pSituationUpdater->getPreviousStep();
 	_pReInfo->_reGraphicItf.initcars(_pReInfo->s);
 }
 
