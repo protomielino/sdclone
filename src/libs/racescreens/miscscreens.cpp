@@ -294,21 +294,22 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
         curRow = 0;
         nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
                 
-        for (i = start; i < MIN(start + NMaxLines, nCars); i++) {
+        for (i = start; i < MIN(start + NMaxLines, nCars); i++)
+		{
             /* Find starting driver's name */
             sprintf(path, "%s/%d", RM_SECT_DRIVERS_RACING, i + 1);
             name = GfParmGetStr(info->params, path, RM_ATTR_MODULE, "");
             robotIdx = (int)GfParmGetNum(info->params, path, RM_ATTR_IDX, NULL, 0);
-	    extended = GfParmGetNum(info->params, path, RM_ATTR_EXTENDED, NULL, 0);
+            extended = GfParmGetNum(info->params, path, RM_ATTR_EXTENDED, NULL, 0);
             carName = NULL;
 
-	    if( extended )
-	    {
-	         sprintf(path, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, name, extended, robotIdx);
-		 carName = GfParmGetStr(info->params, path, RM_ATTR_CARNAME, NULL);
-	    }
-	    else
-	    {
+            if( extended )
+            {
+                sprintf(path, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, name, extended, robotIdx);
+                carName = GfParmGetStr(info->params, path, RM_ATTR_CARNAME, NULL);
+            }
+            else
+            {
                 sprintf(path, "%sdrivers/%s/%s.xml", GetLocalDir(), name, name);
                 robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
                 if (!robhdle) {
@@ -320,12 +321,11 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
                     sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
                     name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<none>");
                     carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "");
-                    GfParmReleaseHandle(robhdle);
                 }
-	    }
+            }
 
-	    if( carName )
-	    {
+            if( carName )
+            {
                 sprintf(path, "cars/%s/%s.xml", carName, carName);
                 carHdle = GfParmReadFile(path, GFPARM_RMODE_STD);
                 carName = GfParmGetName(carHdle);
@@ -339,8 +339,11 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 
             curRow = (curRow + 1) % rows;
             y -= 15;
+
+			// Release robhdle only when no more need for read strings (like carname).
+			if (robhdle)
+				GfParmReleaseHandle(robhdle);
         }
-                
                 
         if (start > 0) {
             prevStartRace.startScr = startScr;
