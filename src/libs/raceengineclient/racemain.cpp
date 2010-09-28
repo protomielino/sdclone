@@ -173,7 +173,8 @@ ReRaceEventInit(void)
 	const char *raceName;
 	
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
-	/* Look if it is neccesiary to open another file */
+	
+	/* Look if it is necessary to open another file */
 	if (strcmp(GfParmGetStr(mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0) {
 		/* Close previous params */
 		if (params != mainParams)
@@ -181,7 +182,8 @@ ReRaceEventInit(void)
 
 		/* Read the new params */
 		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-		GfLogDebug( "ReInfo->mainResults->curfile = %s\n", GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ) );
+		GfLogDebug( "ReInfo->mainResults : curfile = %s\n",
+					GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ) );
 		if (!params)
 			GfLogWarning( "Params weren't read correctly !!!\n" );
 		params = ReInfo->params;

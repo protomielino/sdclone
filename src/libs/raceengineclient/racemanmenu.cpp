@@ -217,12 +217,12 @@ ReConfigureMenu(void * /* dummy */)
 }
 
 static void
-reSelectLoadFile(char *filename)
+reSelectResultsFile(char *filename)
 {
     char buf[512];
 
     sprintf(buf, "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
-    GfOut("Loading Saved File %s...\n", buf);
+    GfLogInfo("Loading saved race from %s ...\n", buf);
     ReInfo->mainResults = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     ReInfo->results = ReInfo->mainResults;
     ReInfo->_reRaceName = ReInfo->_reName;
@@ -232,7 +232,7 @@ reSelectLoadFile(char *filename)
 }
 
 static void
-reLoadMenu(void *prevHandle)
+reFileSelectMenu(void *prevHandle)
 {
     char buf[512];
 
@@ -240,7 +240,7 @@ reLoadMenu(void *prevHandle)
     void *params = ReInfo->params;
 
     fs.prevScreen = prevHandle;
-    fs.select = reSelectLoadFile;
+    fs.select = reSelectResultsFile;
 
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
     if (str) {
@@ -323,7 +323,7 @@ ReRacemanMenu(void)
 
     // Create Load race button if we are in a Champ' like race type.
     if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-	CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"load",racemanMenuHdle,reLoadMenu);
+	CreateButtonControl(racemanMenuHdle,menuXMLDescHdle,"load",racemanMenuHdle,reFileSelectMenu);
     }
     
     // Close menu XML descriptor.
