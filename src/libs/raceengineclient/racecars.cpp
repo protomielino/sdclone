@@ -466,8 +466,8 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {
 					ReInfo->_refreshDisplay = 1;
 					char *t1, *t2;
-					t1 = GfTime2Str(car->_lastLapTime, 0);
-					t2 = GfTime2Str(car->_bestLapTime, 0);
+					t1 = GfTime2Str(car->_lastLapTime, "  ", false, 2);
+					t2 = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 					sprintf(msg,"lap: %02d   time: %s  best: %s  top spd: %.2f    min spd: %.2f    damage: %d",
 						car->_laps - 1, t1, t2,
 						info->topSpd * 3.6, info->botSpd * 3.6, car->_dammage);
