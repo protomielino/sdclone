@@ -549,6 +549,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	{
 		if (HCtx[idx]->mouseControlUsed) {
 			GfuiMouseShow();
+			GfctrlMouseCenter();
 			GfctrlMouseInitCenter();
 		}
 		GfuiKeyEventRegisterCurrent(onKeyAction);

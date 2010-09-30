@@ -394,6 +394,8 @@ tMouseInfo *GfuiMouseInfo(void)
 void GfuiMouseSetPos(int x, int y)
 {
 	SDL_WarpMouse(x,y);
+	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
+	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 }
 
 
