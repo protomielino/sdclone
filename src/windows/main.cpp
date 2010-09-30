@@ -149,10 +149,11 @@ main(int argc, char *argv[])
 {
     GfInit();
 
-	init_args(argc, argv);
+    init_args(argc, argv);
 
-    GfFileSetup();          /* Update user settings files from an old version */
     WindowsSpecInit();      /* init specific windows functions */
+
+    GfFileSetup();          /* Update user settings files from installed ones */
 
     GfScrInit(argc, argv);  /* init screen */
 

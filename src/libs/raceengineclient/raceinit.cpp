@@ -98,7 +98,7 @@ ReInit(void)
   if (!strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE, "no"), "no")){
     capture->enabled = 0;
     capture->outputBase = 0;
-    GfLogInfo("Movie capture disabled");
+    GfLogInfo("Movie capture disabled\n");
   } else {
     capture->enabled = 1;
     capture->state = 0;
@@ -111,7 +111,7 @@ ReInit(void)
     capture->outputBase = strdup(pszDefOutputBase);
     GfDirCreate(pszDefOutputBase); // In case not already done.
     GfLogInfo("Movie capture enabled (%.0f FPS, PNG frames in %s)\n", 
-          1.0 / capture->deltaFrame, capture->outputBase);
+			  1.0 / capture->deltaFrame, capture->outputBase);
   }
 
   ReInfo->_reGameScreen = ReHookInit();

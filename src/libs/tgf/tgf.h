@@ -260,7 +260,7 @@ TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool fr
  * Directory and file path management *
  **************************************/
 
-TGF_API bool GfPathIsAbsolute(const char *path);
+TGF_API bool GfPathIsAbsolute(const char *pszPath);
 TGF_API char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen);
 
 /**********************************
@@ -367,6 +367,8 @@ TGF_API tdble GfParmGetVariable(void *handle, char const *path, char const *key)
 /********************************************************************************
  * Log/Trace Interface                                                          *
  *  - Write formated string messages at run-time to the log stream,             *
+ *    with automatic prepending of current time and trace level                 *
+ *    (Ex: 12:27.35.267 Debug  My formated message)                             *
  *  - Messages are given an integer "level" = "criticity",                      *
  *    (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)              *
  *  - Messages are actually logged into the stream only if their level          *
@@ -416,8 +418,7 @@ static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
  * Time  Interface *
  *******************/
 TGF_API double GfTimeClock(void);
-TGF_API char *GfGetTimeStr(void);
-TGF_API char *GfTime2Str(tdble sec, int sgn);
+TGF_API char *GfTime2Str(double sec, const char* plus="", bool zeros=true, int prec=3);
 
 /* Mean values */
 #define GF_MEAN_MAX_VAL	5

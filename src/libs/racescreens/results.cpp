@@ -128,12 +128,12 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xLap, y, GFUI_ALIGN_HC_VB, 0);
 
 	/* Time */
-	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), 0);;
+	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), "  ", false, 2);;
 	GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C, xTime, y, GFUI_ALIGN_HL_VB, 0);
 	free(str);
 
 	/* Best Lap Time */
-	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), 0);;
+	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);;
 	GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C, xBest, y, GFUI_ALIGN_HL_VB, 0);
 	free(str);
 
@@ -290,7 +290,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
       xCar, y, GFUI_ALIGN_HL_VB, 0);
 
       //Best lap
-      str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), 0);
+      str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);
       GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,  xBest, y, GFUI_ALIGN_HR_VB, 0);
       free(str);
 
@@ -420,7 +420,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
 			xCar, y, GFUI_ALIGN_HL_VB, 0);
 
-	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), 0);
+	str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);
 	GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,
 			xTime, y, GFUI_ALIGN_HR_VB, 0);
 	free(str);

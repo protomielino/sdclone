@@ -446,14 +446,14 @@ ReUpdateQualifCurRes(tCarElt *car)
 			sprintf(path, "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i);
 			if (!printed) {
 				if ((car->_bestLapTime != 0.0) && (car->_bestLapTime < GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0))) {
-					tmp_str = GfTime2Str(car->_bestLapTime, 0);
+					tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 					sprintf(buf, "%d - %s - %s (%s)", i, tmp_str, car->_name, carName);
 					free(tmp_str);
 					ReResScreenSetText(buf, i - 1, 1);
 					printed = 1;
 				}
 			}
-			tmp_str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), 0);
+			tmp_str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);
 			sprintf(buf, "%d - %s - %s (%s)", i + printed, tmp_str, GfParmGetStr(results, path, RE_ATTR_NAME, ""),
 			                                  GfParmGetStr(results, path, RE_ATTR_CAR, ""));
 			free (tmp_str);
@@ -461,7 +461,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 		}
 	
 		if (!printed) {
-			tmp_str = GfTime2Str(car->_bestLapTime, 0);
+			tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 			sprintf(buf, "%d - %s - %s (%s)", i, tmp_str, car->_name, carName);
 			free(tmp_str);
 			ReResScreenSetText(buf, i - 1, 1);
@@ -500,11 +500,11 @@ ReUpdateQualifCurRes(tCarElt *car)
 				sprintf(buf, "%d -      --:-- - %s (%s)", xx + 1, car->_name, carName);
 			} else {
 				if (xx == 0) {
-					tmp_str = GfTime2Str(car->_bestLapTime, FALSE);
+					tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 					sprintf(buf, "%d -  %s - %s (%s)", xx + 1, tmp_str, car->_name, carName);
 					free(tmp_str);
 				} else {
-					tmp_str = GfTime2Str(car->_bestLapTime - ReInfo->s->cars[0]->_bestLapTime, TRUE);
+					tmp_str = GfTime2Str(car->_bestLapTime - ReInfo->s->cars[0]->_bestLapTime, "+", false, 2);
 					sprintf(buf, "%d -  %s - %s (%s)", xx + 1, tmp_str, car->_name, carName);
 					free(tmp_str);
 				}
@@ -561,7 +561,7 @@ ReUpdateRaceCurRes()
 	    } else {
 	        if (car->_lapsBehindLeader == 0)
 		{
-		    tmp_str = GfTime2Str(car->_timeBehindLeader, 0);
+		    tmp_str = GfTime2Str(car->_timeBehindLeader, "  ", false, 2);
 		    sprintf(buf, "%d -  %s - %s (%s)", xx + 1, tmp_str, car->_name, carName);
 		    free(tmp_str);
 		}

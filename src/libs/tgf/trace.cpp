@@ -86,17 +86,19 @@ void GfLogSetStream(FILE* fStream)
         // Trace date and time.
 		time_t t = time(NULL);
 		struct tm *stm = localtime(&t);
-		fprintf(gfLogStream, "Info\t%4d/%02d/%02d %02d:%02d:%02d\n",
-				stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
+		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+		fprintf(gfLogStream, "%s Info    %4d/%02d/%02d %02d:%02d:%02d\n",
+				pszClock, stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
 				stm->tm_hour, stm->tm_min, stm->tm_sec);
 		
 		// Trace current trace level threshold.
-		fprintf(gfLogStream, "Info\tCurrent trace level threshold : ");
+		fprintf(gfLogStream, "%s Info\tCurrent trace level threshold : ", pszClock);
 		if (gfLogLevelThreshold >= gfLogFatal && gfLogLevelThreshold <= gfLogDebug)
 			fprintf(gfLogStream, "%s\n", gfLogLevelNames[gfLogLevelThreshold]);
 		else
-			fprintf(gfLogStream, "%d\n", gfLogLevelThreshold);
+			fprintf(gfLogStream, "Level%d\n", gfLogLevelThreshold);
 		fflush(gfLogStream);
+		free(pszClock);
     }
 }
 
@@ -107,7 +109,9 @@ void GfLogSetLevelThreshold(int nLevel)
     // Trace new trace level threshold.
     if (gfLogStream)
     {
-		fprintf(gfLogStream, "Info\tNew trace level threshold : ");
+		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+		fprintf(gfLogStream, "%s Info    New trace level threshold : ", pszClock);
+		free(pszClock);
 		if (gfLogLevelThreshold >= gfLogFatal && gfLogLevelThreshold <= gfLogDebug)
 			fprintf(gfLogStream, "%s\n", gfLogLevelNames[gfLogLevelThreshold]);
 		else
@@ -124,7 +128,11 @@ void GfLogFatal(const char *pszFmt, ...)
     if (gfLogLevelThreshold >= gfLogFatal)
     {
 		if (gfLogNeedLineHeader)
-            fprintf(gfLogStream, "Fatal\t");
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Fatal   ", pszClock);
+			free(pszClock);
+		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
         vfprintf(gfLogStream, pszFmt, vaArgs);
@@ -146,7 +154,11 @@ TGF_API void GfLogError(const char *pszFmt, ...)
     if (gfLogLevelThreshold >= gfLogError)
     {
         if (gfLogNeedLineHeader)
-            fprintf(gfLogStream, "Error\t");
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Error   ", pszClock);
+			free(pszClock);
+		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
         vfprintf(gfLogStream, pszFmt, vaArgs);
@@ -161,7 +173,11 @@ TGF_API void GfLogWarning(const char *pszFmt, ...)
     if (gfLogLevelThreshold >= gfLogWarning)
     {
         if (gfLogNeedLineHeader)
-            fprintf(gfLogStream, "Warning\t");
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Warning ", pszClock);
+			free(pszClock);
+		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
         vfprintf(gfLogStream, pszFmt, vaArgs);
@@ -176,7 +192,11 @@ TGF_API void GfLogInfo(const char *pszFmt, ...)
     if (gfLogLevelThreshold >= gfLogInfo)
     {
         if (gfLogNeedLineHeader)
-            fprintf(gfLogStream, "Info\t");
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Info    ", pszClock);
+			free(pszClock);
+		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
         vfprintf(gfLogStream, pszFmt, vaArgs);
@@ -191,7 +211,11 @@ TGF_API void GfLogTrace(const char *pszFmt, ...)
     if (gfLogLevelThreshold >= gfLogTrace)
     {
         if (gfLogNeedLineHeader)
-            fprintf(gfLogStream, "Trace\t");
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Trace   ", pszClock);
+			free(pszClock);
+		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
         vfprintf(gfLogStream, pszFmt, vaArgs);
@@ -206,7 +230,11 @@ TGF_API void GfLogDebug(const char *pszFmt, ...)
     if (gfLogLevelThreshold >= gfLogDebug)
     {
         if (gfLogNeedLineHeader)
-            fprintf(gfLogStream, "Debug\t");
+		{
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+            fprintf(gfLogStream, "%s Debug   ", pszClock);
+			free(pszClock);
+		}
         va_list vaArgs;
         va_start(vaArgs, pszFmt);
         vfprintf(gfLogStream, pszFmt, vaArgs);
@@ -220,15 +248,14 @@ TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= nLevel)
     {
-        if (nLevel >= gfLogFatal && nLevel <= gfLogDebug)
+		if (gfLogNeedLineHeader)
 		{
-			if (gfLogNeedLineHeader)
-				fprintf(gfLogStream, "%s\t", gfLogLevelNames[nLevel]);
-		}
-		else
-		{
-			if (gfLogNeedLineHeader)
-				fprintf(gfLogStream, "Level%d\t", nLevel);
+			char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+			if (nLevel >= gfLogFatal && nLevel <= gfLogDebug)
+				fprintf(gfLogStream, "%s %.7s ", gfLogLevelNames[nLevel], pszClock);
+			else
+				fprintf(gfLogStream, "%s Level%d ", nLevel, pszClock);
+			free(pszClock);
 		}
 		va_list vaArgs;
 		va_start(vaArgs, pszFmt);

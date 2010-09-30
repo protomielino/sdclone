@@ -62,12 +62,12 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
     /* Try and avoid loading the same module twice (WARNING: Only checks soPath equality !) */
     if ((curMod = GfModIsInList(soPath, *modlist)) != 0)
     {
-      GfOut("Module %s already loaded\n", soPath);
+      GfLogTrace("Module %s already loaded\n", soPath);
       GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
       return 0;
     }
 
-    GfOut("Loading module %s\n", soPath);
+    GfLogTrace("Loading module %s\n", soPath);
     
     char fname[256];
     const char* lastSlash = strrchr(soPath, '/');
@@ -90,17 +90,17 @@ windowsModLoad(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 		else 
 		{
 			FreeLibrary(SOHandle(handle));
-			GfError("windowsModLoad: Module init function failed %s\n", soPath);
+			GfLogError("windowsModLoad: Module init function failed %s\n", soPath);
 			return -1;
 		}
     }
     else
     {
-		GfError("windowsModLoad: ...  can't open dll %s\n", soPath);
+		GfLogError("windowsModLoad: ...  can't open dll %s\n", soPath);
 		return -1;
     }
       
-    GfOut("Module %s loaded\n",soPath);
+    GfLogInfo("Module %s loaded\n",soPath);
     return 0;
 }
 
@@ -135,12 +135,12 @@ windowsModInfo(unsigned int /* gfid */, const char *soPath, tModList **modlist)
     /* Try and avoid loading the same module twice (WARNING: Only checks soPath equality !) */
     if ((curMod = GfModIsInList(soPath, *modlist)) != 0)
     {
-      GfOut("Module %s already loaded\n", soPath);
+      GfLogTrace("Module %s already loaded\n", soPath);
       GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
       return infoSts;
     }
 
-    GfOut("Querying module %s\n", soPath);
+    GfLogTrace("Querying module %s\n", soPath);
 
     /* Load the DLL */
     handle = LoadLibrary( soPath );
@@ -160,7 +160,7 @@ windowsModInfo(unsigned int /* gfid */, const char *soPath, tModList **modlist)
 	}
 	else 
 	{
-	    GfOut("windowsModInfo: Module init function failed %s\n", soPath);
+	    GfLogError("windowsModInfo: Module init function failed %s\n", soPath);
 	    infoSts = -1;
 	}
 	
@@ -169,8 +169,8 @@ windowsModInfo(unsigned int /* gfid */, const char *soPath, tModList **modlist)
     } 
     else
     {
-	GfError("windowsModInfo: ...  %d\n", GetLastError());
-	infoSts = -1;
+		GfLogError("windowsModInfo: ...  %d\n", GetLastError());
+		infoSts = -1;
     }
     
     return infoSts;
@@ -224,7 +224,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 	    if (!GfModIsInList(soPath, *modlist))
 	    {
 		/* Load the DLL */
-		GfOut("Loading module %s\n", soPath);
+		GfLogTrace("Loading module %s\n", soPath);
 	        handle = LoadLibrary( soPath );
 		if (handle)
 		{
@@ -246,7 +246,7 @@ windowsModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		} 
 		else
 		{
-		    GfError("windowsModLoadDir: ...  %s\n", GetLastError());
+		    GfLogError("windowsModLoadDir: ...  %s\n", GetLastError());
 		    modnb = -1;
 		    break;
 		}
@@ -299,7 +299,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 
     char Dir_name[ 1024 ];
     sprintf( Dir_name, "%s\\*.*", dir );
-    GfOut("Listing module directory %s for info. only\n", dir);
+    GfLogTrace("Listing module directory %s for info. only\n", dir);
     long Dirent = _findfirst( Dir_name, &FData );
     if ( Dirent != -1 )
     {
@@ -318,7 +318,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 		if (!GfModIsInList(soPath, *modlist))
 		{
 		    /* Load the DLL */
-		    GfOut("Querying module %s\n", soPath);
+		    GfLogTrace("Querying module %s\n", soPath);
 		    handle = (tSOHandle)LoadLibrary( soPath );
 		    if (handle)
 		    {
@@ -337,7 +337,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 			} 
 			else
 			{
-			    GfOut("windowsModInfo: Module init function failed %s\n", soPath);
+			    GfLogError("windowsModInfo: Module init function failed %s\n", soPath);
 			    modnb = -1;
 			    break;
 			}
@@ -347,7 +347,7 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 		    } 
 		    else 
 		    {
-		        GfTrace("windowsModInfoDir: ...  can't open dll %s\n", soPath);
+		        GfLogError("windowsModInfoDir: ...  can't open dll %s\n", soPath);
 		    }
 		}
 	    }
@@ -400,7 +400,7 @@ windowsModUnloadList(tModList **modlist)
 
 	    FreeLibrary(SOHandle(curMod->handle));
 	}
-	GfOut("Unloaded module %s\n", curMod->sopath);
+	GfLogTrace("Unloaded module %s\n", curMod->sopath);
 
 	GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
 	free(curMod->sopath);
@@ -436,7 +436,7 @@ windowsDirGetList(const char *dir)
     _finddata_t FData;
     char Dir_name[ 1024 ];
     sprintf( Dir_name, "%s\\*.*", dir );
-    GfOut("Listing directory %s\n",dir);
+    GfLogDebug("Listing directory %s\n",dir);
     long Dirent = _findfirst( Dir_name, &FData );
     if ( Dirent != -1 ) {
 	do {
@@ -547,19 +547,48 @@ windowsDirGetListFiltered(const char *dir, const char *prefix, const char *suffi
     return flist;
 }
 
+
+// Performance counters update frequency (never changes while Windows is up and running).
+static LARGE_INTEGER PerformanceFrequency;
+
+// Initial "time" (actually the number of seconds since the system has been up).
+static double InitTime = -1.0;
+
+/*
+* Function
+*	windowsTimeClock
+*
+* Description
+*	Return the number of seconds since the game is running (resolution 1 micro-second).
+*
+* Parameters
+*	None
+*
+* Return
+*	The number of seconds since the game is running
+*
+*/
 static double
 windowsTimeClock(void)
 {
-    LARGE_INTEGER Frequency;
-    if ( !QueryPerformanceFrequency( &Frequency ) )
-	return( 0 );
+    LARGE_INTEGER counter;
+	if ( !QueryPerformanceCounter( &counter ) )
+	{
+		GfLogError("Failed to QueryPerformanceCounter : %s\n", GetLastError());
+		return 0.0;
+	}
 
-    LARGE_INTEGER Counter;
-    if ( !QueryPerformanceCounter( &Counter ) )
-	return( 0 );
+	// Initialize initial time if not already done.
+	if (InitTime < 0)
+	{
+		// Initialize PerformanceFrequency (never changes while Windows is up and running).
+		if (!QueryPerformanceFrequency( &PerformanceFrequency ) )
+			GfLogError("Failed to QueryPerformanceFrequency : %s\n", GetLastError());
+		
+		InitTime = (double)counter.QuadPart / (double)PerformanceFrequency.QuadPart;
+	}
 
-    double D = (double)Counter.QuadPart / (double)Frequency.QuadPart;
-    return( D );
+    return ((double)counter.QuadPart / (double)PerformanceFrequency.QuadPart) - InitTime;
 }
 
 /*
@@ -594,8 +623,8 @@ windowsGetOSInfo(int* pnMajor, int* pnMinor, int* pnBits)
     
     if (!GetVersionEx((OSVERSIONINFO*)&osvi))
     {
-	GfOut("Error: Could not get Windows OS version info");
-	return false;
+		GfLogError("Error: Could not get Windows OS version info");
+		return false;
     }
 
     // Call GetNativeSystemInfo if supported or GetSystemInfo otherwise.
@@ -723,7 +752,7 @@ windowsGetOSInfo(int* pnMajor, int* pnMinor, int* pnBits)
 	}
     }
 
-    GfOut("Detected %s (%d.%d)\n", pszVerSionString, *pnMajor, *pnMinor);
+    GfLogInfo("Detected %s (%d.%d)\n", pszVerSionString, *pnMajor, *pnMinor);
 
     return true;
 }
@@ -760,11 +789,11 @@ windowsGetNumberOfCPUs()
 		
 		if (nCPUs < 1)
 		{
-			GfOut("Could not get the number of CPUs here ; assuming only 1\n");
+			GfLogWarning("Could not get the number of CPUs here ; assuming only 1\n");
 			nCPUs = 1;
 		}
 		else
-			GfOut("Detected %u CPUs\n", nCPUs);
+			GfLogInfo("Detected %u CPUs\n", nCPUs);
 	}
 
     return nCPUs;
@@ -817,7 +846,7 @@ windowsSetThreadAffinity(int nCPUId)
 		nBitIndex--;
 		if (nCPUIndex != nCPUId)
 		{
-			GfError("Target CPU %d not found (erroneous id specified ?)\n", nCPUId);
+			GfLogError("Target CPU %d not found (erroneous id specified ?)\n", nCPUId);
 			return false;
 		}
 
@@ -827,18 +856,18 @@ windowsSetThreadAffinity(int nCPUId)
 	
 	// Get the handle for the current thread.
     HANDLE hCurrThread = GetCurrentThread();
-    GfOut("Current thread handle is 0x%X\n", hCurrThread);
+    GfLogTrace("Current thread handle is 0x%X\n", hCurrThread);
 
     // Set the affinity mask for the current thread ("stick" it to the target core).
     if (SetThreadAffinityMask(hCurrThread, (DWORD_PTR)nThreadAffinityMask) == 0)
     {
-        GfError("Failed to set current thread (handle=0x%X) affinity mask to 0x%X)\n",
-                hCurrThread, nThreadAffinityMask);
+        GfLogError("Failed to set current thread (handle=0x%X) affinity mask to 0x%X)\n",
+				   hCurrThread, nThreadAffinityMask);
         return false;
     }
     else
-        GfOut("Affinity mask set to 0x%X for current thread (handle=0x%X)\n",
-              nThreadAffinityMask, hCurrThread);
+        GfLogTrace("Affinity mask set to 0x%X for current thread (handle=0x%X)\n",
+				   nThreadAffinityMask, hCurrThread);
 
     return true;
 }
@@ -862,6 +891,7 @@ windowsSetThreadAffinity(int nCPUId)
 void
 WindowsSpecInit(void)
 {
+	// Initialize OSSpec interface.
     memset(&GfOs, 0, sizeof(GfOs));
     
     GfOs.modLoad = windowsModLoad;

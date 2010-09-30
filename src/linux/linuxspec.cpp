@@ -568,6 +568,23 @@ linuxDirGetListFiltered(const char *dir, const char *prefix, const char *suffix)
 	return flist;
 }
 
+// Initial "time" (actually the number of seconds since the system has been up).
+static double InitTime = -1.0;
+
+/*
+* Function
+*	linuxTimeClock
+*
+* Description
+*	Return the number of seconds since the game is running (resolution 1 micro-second).
+*
+* Parameters
+*	None
+*
+* Return
+*	The number of seconds since the game is running
+*
+*/
 static double
 linuxTimeClock(void)
 {
@@ -575,7 +592,10 @@ linuxTimeClock(void)
 
     gettimeofday(&tv, 0);
 
-    return (double)(tv.tv_sec + tv.tv_usec * 1e-6);
+	if (InitTime < 0)
+		InitTime = (double)(tv.tv_sec + tv.tv_usec * 1e-6);
+	
+    return (double)(tv.tv_sec + tv.tv_usec * 1e-6) - InitTime;
 }
 
 

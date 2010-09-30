@@ -459,66 +459,50 @@ tdble gfMean(tdble v, tMeanVal *pvt, int n, int w)
 }
 
 
-static char bufstr[1024];
-
-char * GfGetTimeStr(void)
-{
-	struct tm *stm;
-	time_t t;
-
-	t = time(NULL);
-	stm = localtime(&t);
-	sprintf(bufstr, "%4d%02d%02d%02d%02d%02d",
-		stm->tm_year+1900,
-		stm->tm_mon+1,
-		stm->tm_mday,
-		stm->tm_hour,
-		stm->tm_min,
-		stm->tm_sec);
-
-	return bufstr;
-}
-
-
 /** Convert a time in seconds (float) to an ascii string.
     @ingroup	screen
     @param	sec	Time to convert
-    @param	sgn	Flag to indicate if the sign (+) is to be displayed for positive values of time.
+    @param	plus	String to display as the positive sign (+) for positive values of time.
+    @param	zeros	Flag to indicate if heading zeros are to be displayed or not.
+    @param	prec	Numer of figures to display after the decimal point (< 2 forced to 1).
     @return	Time string.
     @warning	The returned string has to be freed by the caller.
  */
-char* GfTime2Str(tdble sec, int sgn)
+char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 {
-	char buf[256];
-	const char* sign = (sec < 0.0 ? "-" : (sgn ? "+" : "  ") );
-
-	if (sec < 0.0) {
+	char* buf = (char*)malloc(256*sizeof(char));
+	
+	const char* sign = (sec < 0.0) ? "-" : (plus ? plus : "");
+	if (sec < 0.0)
 		sec = -sec;
-		sign = "-";
-	} else {
-		if (sgn) {
-			sign = "+";
-		} else {
-			sign = "  ";
-		}
-	}
 
-	int h = (int)(sec / 3600.0);
+	// Hours.
+	const int h = (int)(sec / 3600.0);
 	sec -= 3600 * h;
-	int m = (int)(sec / 60.0);
-	sec -= 60 * m;
-	int s = (int)(sec);
-	sec -= s;
-	int c = (int)floor((sec) * 100.0);
 
-	if (h) {
-		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%2.2d", sign,h,m,s,c);
+	// Minutes.
+	const int m = (int)(sec / 60.0);
+	sec -= 60 * m;
+
+	// Seconds.
+	const int s = (int)sec;
+	sec -= s;
+
+	// Fractions of the second (limited resolution).
+	int mult = 10;
+	int digits = prec;
+	while (digits-- > 1)
+		mult *= 10;
+	const int f = (int)floor(sec * mult);
+
+	if (h || zeros) {
+		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%0.*d", sign, h, m, s, prec, f);
 	} else if (m) {
-		(void)sprintf(buf, "   %s%2.2d:%2.2d.%2.2d", sign,m,s,c);
+		(void)sprintf(buf, "   %s%2.2d:%2.2d.%0.*d", sign, m, s, prec, f);
 	} else {
-		(void)sprintf(buf, "      %s%2.2d.%2.2d", sign,s,c);
+		(void)sprintf(buf, "      %s%2.2d.%0.*d", sign, s, prec, f);
 	}
-	return strdup(buf);
+	return buf;
 }
 
 // Determine if a dir or file path is absolute or not.

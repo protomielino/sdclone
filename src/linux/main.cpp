@@ -151,10 +151,10 @@ main(int argc, char *argv[])
 
     init_args(argc, argv);
 
-    GfFileSetup();           /* Update user settings files from an old version */
-
     LinuxSpecInit();         /* init specific linux functions */
         
+    GfFileSetup();           /* Update user settings files from installed ones */
+
     GfScrInit(argc, argv);     /* init screen */
 
     if (MenuEntry())         /* launch the game */
