@@ -49,6 +49,10 @@ static int
 static double colour[] = {1.0, 0.0, 0.0, 0.0};
 #define DEFAULTCARTYPE "trb1-cavallo-360rb"
 
+#define SLOW_TRACK_LIMIT 2.4
+#define FAST_TRACK_LIMIT 4.0
+
+
 KDriver::KDriver(int index):Driver(index)
 {
   m_rgtinc = m_lftinc = 0.0;
@@ -578,15 +582,18 @@ KDriver::filterSidecollOffset(Opponent *o, const double incfactor)
  * Initialize the robot on a track.
  * For this reason it looks up any setup files.
  * 
- * Setup files are in this director path:
+ * Setup files are in a directory path like:
  * drivers/kilo
- *          |- default.xml  (skill)
+ *          |- default.xml  (skill enable)
  *          tracks
  *          | |-<trackname>.xml   (track-specific parameters)
  *          |
  *          |
  *          <carname>
- *            |-<trackname>.xml   (setup for given track)
+ *            |-<trackname>.xml   (setup for the given track)
+ *            |-def-slow.xml      (setup for undefined, slow tracks)
+ *            |-def-norm.xml      (setup for undefined, normal tracks)
+ *            |-def-fast.xml      (setup for undefined, fast tracks)
  * 
  * @param [in]  t the track
  * @param [out] carHandle
@@ -613,9 +620,9 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
   if(carParmHandle)
     cout << "default xml loaded" << endl;
 #endif
-  buf.str(string());
     
   //Try to load the track-based informations
+  buf.str(string());
   buf << botPath.str() << "tracks/" << trackname;
   void *newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
 #ifdef DEBUG
@@ -623,20 +630,8 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
   if(newhandle)
     cout << "track-based xml loaded" << endl;
 #endif  
-  buf.str(string());
   
-  //Merge the above two setups
-  if(newhandle) {
-    //If there is a default setup loaded, merge settings with custom track setup
-    if(*carParmHandle)
-      *carParmHandle =
-        GfParmMergeHandles(*carParmHandle, newhandle,
-               (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
-                GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
-    //Otherwise no need to merge
-    else
-      *carParmHandle = newhandle;
-  }//if newhandle
+  mergeCarSetups(*carParmHandle, newhandle);
 #ifdef DEBUG
   cout << "merge #1" << endl;
 #endif  
@@ -653,6 +648,7 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
 #endif  
 
   //Load setup tailored for car+track
+  buf.str(string());
   buf << botPath.str() << m_carType << "/" << trackname;
   newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
 #ifdef DEBUG
@@ -661,6 +657,12 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
     cout << "car+track xml loaded" << endl;
 #endif  
 
+  //If there is no tailored setup, let's load a default one
+  // based on the track charateristics.
+  if(!newhandle)
+    newhandle = loadDefaultSetup();
+    
+  //~ mergeCarSetups(*carParmHandle, newhandle);
   //Merge the above two setups
   if(newhandle) {
     //If there is a default setup loaded, merge settings with custom track setup
@@ -678,29 +680,6 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
 #endif  
 
 
-  //If there was no car+track setup,
-  //decide the character of the track and choose 1 of 3 default setups.
-  double dLength = 0.0;
-  double dCurves = 0.0;
-  tTrackSeg *pSeg = track->seg;
-  do {
-    if(pSeg->type == TR_STR)
-      dLength += pSeg->length;
-    else {
-      dLength += pSeg->radius * pSeg->arc;
-      dCurves += RAD2DEG(pSeg->arc);
-    }
-
-    pSeg = pSeg->next;
-  } while(pSeg != track->seg);
-#ifdef DEBUG
-  cout << "Track " << track->name
-    << " length: " << dLength
-    << " curves: " << dCurves
-    << " ratio: " << dLength / dCurves
-    << endl;
-#endif  
-  
   // Create a pit stop strategy object.
   strategy = new KStrategy();
   // Init fuel.
@@ -865,21 +844,20 @@ KDriver::calcSpeed()
   accelcmd = brakecmd = 0.0;
   double speed;
 
-  switch(mode)
-    {
-      case AVOIDING:
-      case BEING_OVERLAPPED:
-        speed = avoidspeed;
-        break;
-        
-      case CORRECTING:
-        speed = racespeed -
-                (racespeed - avoidspeed) * MAX(0.0, (correcttimer - simtime) / 7.0);
-        break;
-            
-      default:
-        speed = racespeed;
-    }//switch mode
+  switch(mode) {
+    case AVOIDING:
+    case BEING_OVERLAPPED:
+      speed = avoidspeed;
+      break;
+      
+    case CORRECTING:
+      speed = racespeed -
+              (racespeed - avoidspeed) * MAX(0.0, (correcttimer - simtime) / 7.0);
+      break;
+          
+    default:
+      speed = racespeed;
+  }//switch mode
     
   double x = (10 + car->_speed_x) * (speed - car->_speed_x) / 200;
 
@@ -889,3 +867,80 @@ KDriver::calcSpeed()
     brakecmd = MIN(1.0, -(MAX(10.0, brakedelay * 0.7)) * x);
 }//calcSpeed
 
+
+/**
+ * Decides the character of the track
+ * and chooses 1 of 3 default setups.
+ * Loads the appropriate setup file and
+ * returns it's handler.
+ * 
+ * @return  Handler to the loaded default setup
+ */
+void *
+KDriver::loadDefaultSetup() const
+{
+  void *ret = NULL;
+  
+  double dLength = 0.0;
+  double dCurves = 0.0;
+  
+  //Count length and degrees of all turns
+  tTrackSeg *pSeg = track->seg;
+  do {
+    if(pSeg->type == TR_STR)
+      dLength += pSeg->length;
+    else {
+      dLength += pSeg->radius * pSeg->arc;
+      dCurves += RAD2DEG(pSeg->arc);
+    }
+
+    pSeg = pSeg->next;
+  } while(pSeg != track->seg);
+  
+  double dRatio = dLength / dCurves;
+  
+#ifdef DEBUG
+  cout << "Track " << track->name
+    << " length: " << dLength
+    << " curves: " << dCurves
+    << " ratio: " << dRatio
+    << endl;
+#endif  
+
+  stringstream buf;
+  buf << "drivers/" << bot << "/" << m_carType;
+
+  if(dRatio < SLOW_TRACK_LIMIT) {
+    //Slow track
+    buf << "/def-slow.xml";
+  } else if (dRatio < FAST_TRACK_LIMIT) {
+    //Normal track
+    buf << "/def-norm.xml";
+  } else {
+    //Fast track
+    buf << "/def-fast.xml";
+  }//if dRatio
+
+  ret = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+#ifdef DEBUG
+  cout << "Decision of setup: " << buf.str() << endl;
+  if(ret)
+    cout << "Def-XXX xml loaded" << endl;
+#endif  
+
+  return ret;
+}//loadDefaultSetup
+
+void
+KDriver::mergeCarSetups(void *oldHandle, void *newHandle)
+{
+  if(newHandle) {
+    if(oldHandle)
+      oldHandle = GfParmMergeHandles(oldHandle, newHandle,
+          (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
+          GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
+    //Otherwise no need to merge
+    else
+      oldHandle = newHandle;
+  }//if newHandle
+}//mergeCarSetups

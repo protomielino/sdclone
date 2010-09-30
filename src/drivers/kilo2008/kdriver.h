@@ -64,6 +64,8 @@ protected:
   double filterTakeoverOffset(Opponent *o);
   double filterSidecollOffset(Opponent *o, const double);
   void checkPitStatus(tSituation *s);
+  void * loadDefaultSetup() const;
+  void  mergeCarSetups(void *oldHandle, void *newHandle);
     
   //'own' variables
   double m_mincatchdist;
