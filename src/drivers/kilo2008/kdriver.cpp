@@ -24,10 +24,10 @@
  */
 
 #include "kdriver.h"
-//#define DEBUG
 
 #include <iostream>
 #include <string>
+#include <sstream>
 
 #include "opponent.h"
 #include "strategy.h"
@@ -39,14 +39,15 @@
 #include <robottools.h> //Rt*
 #include <robot.h>  //ROB_PIT_IM
 
-//#define DEBUG
+#define DEBUG
 
 //"I AM DEATH, NOT TAXES.  *I* TURN UP ONLY ONCE."  --  Death
+//Fear was theirs, not yers.
 
 static int
   pitstatus[128] = { 0 };
 static double colour[] = {1.0, 0.0, 0.0, 0.0};
-
+#define DEFAULTCARTYPE "trb1-cavallo-360rb"
 
 KDriver::KDriver(int index):Driver(index)
 {
@@ -69,27 +70,32 @@ KDriver::drive(tSituation * s)
   //~ sprintf(car->_msgCmd[0], "%d", (int)(car->_distFromStartLine));
   //~ memcpy(car->_msgColorCmd, colour, sizeof(car->_msgColorCmd));
   
+  string sMsg;
   if(isStuck()) {
     car->_steerCmd = -mycardata->getCarAngle() / car->_steerLock;
     car->_gearCmd = -1;   // Reverse gear.
     car->_accelCmd = 1.0;    // 100% accelerator pedal.
     car->_brakeCmd = 0.0;    // No brakes.
     car->_clutchCmd = 0.0;   // Full clutch (gearbox connected with engine).
+    sMsg = "Truagh :(";
   } else {
     car->_steerCmd = getSteer(s);
     car->_gearCmd = getGear();
     calcSpeed();
     car->_brakeCmd = 
       filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
-    if(car->_brakeCmd == 0.0)
+    if(car->_brakeCmd == 0.0) {
       car->_accelCmd = filterTCL(filterTrk(filterOverlap(getAccel())));
-    else
+      sMsg = "Thig comhla ruinn!";
+    } else {
       car->_accelCmd = 0.0;
+      sMsg = "Sguir!";
+    }
     car->_clutchCmd = getClutch();
   }//if isStuck
 
-  //sprintf(car->_msgCmd[0], "%s", "yeppeee");
-  //memcpy(car->_msgColorCmd, colour, sizeof(car->_msgColorCmd));
+  sprintf(car->_msgCmd[0], "%s", sMsg.c_str());
+  memcpy(car->_msgColorCmd, colour, sizeof(car->_msgColorCmd));
 
   laststeer = car->_steerCmd;
   lastmode = mode;
@@ -568,62 +574,133 @@ KDriver::filterSidecollOffset(Opponent *o, const double incfactor)
 }//filterSidecollOffset
 
 
+/**
+ * Initialize the robot on a track.
+ * For this reason it looks up any setup files.
+ * 
+ * Setup files are in this director path:
+ * drivers/kilo
+ *          |- default.xml  (skill)
+ *          tracks
+ *          | |-<trackname>.xml   (track-specific parameters)
+ *          |
+ *          |
+ *          <carname>
+ *            |-<trackname>.xml   (setup for given track)
+ * 
+ * @param [in]  t the track
+ * @param [out] carHandle
+ * @param [out] carParmHandle
+ * @param [in]  s Situation provided by the sim
+ */
 void
 KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
           tSituation * s)
 {
   track = t;
 
-  
-  // Load a custom setup if one is available.
-  const int BUFSIZE = 256;
-  char buffer[BUFSIZE];
+  //Load a custom setup if one is available.
   char *trackname = strrchr(track->filename, '/') + 1;    //Ptr to the track filename
+  stringstream buf;
+  stringstream botPath;
 
-  //Load default setup
-  snprintf(buffer, BUFSIZE, "drivers/%s/%d/default.xml", bot.c_str(), INDEX);
-  *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
+  //Try to load the default setup
+  botPath << "drivers/" << bot << "/"; //<< INDEX << "/";
+  buf << botPath.str() << "default.xml";
+  *carParmHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+#ifdef DEBUG
+  cout << "Default: " << buf.str() << endl;
+  if(carParmHandle)
+    cout << "default xml loaded" << endl;
+#endif
+  buf.str(string());
     
-  //Load custom practice/qualifying/race setup
-  switch (s->_raceType)
-    {
-    case RM_TYPE_PRACTICE:
-      snprintf(buffer, BUFSIZE, "drivers/%s/%d/practice/%s",
-        bot.c_str(), INDEX, trackname);
-      break;
-    case RM_TYPE_QUALIF:
-      snprintf(buffer, BUFSIZE, "drivers/%s/%d/qualifying/%s",
-        bot.c_str(), INDEX, trackname);
-      break;
-    case RM_TYPE_RACE:
-      snprintf(buffer, BUFSIZE, "drivers/%s/%d/race/%s",
-        bot.c_str(), INDEX, trackname);
-      break;
-    default:
-      break;
-    }
-
-  void *newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-  if(!newhandle)    //If no separate practice/qualy/race setup, load track based setup
-    {
-      snprintf(buffer, BUFSIZE, "drivers/%s/%d/%s", bot.c_str(), INDEX, trackname);
-      newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
-    }
-    
+  //Try to load the track-based informations
+  buf << botPath.str() << "tracks/" << trackname;
+  void *newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+#ifdef DEBUG
+  cout << "track-based: " << buf.str() << endl;
   if(newhandle)
-    {
-      //If there is a default setup, merge settings with custom track setup
-      if(*carParmHandle)
-        *carParmHandle =
-          GfParmMergeHandles(*carParmHandle, newhandle,
-                 (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
-                  GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
-      //Otherwise no need to merge
-      else
-        *carParmHandle = newhandle;
+    cout << "track-based xml loaded" << endl;
+#endif  
+  buf.str(string());
+  
+  //Merge the above two setups
+  if(newhandle) {
+    //If there is a default setup loaded, merge settings with custom track setup
+    if(*carParmHandle)
+      *carParmHandle =
+        GfParmMergeHandles(*carParmHandle, newhandle,
+               (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
+                GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
+    //Otherwise no need to merge
+    else
+      *carParmHandle = newhandle;
+  }//if newhandle
+#ifdef DEBUG
+  cout << "merge #1" << endl;
+#endif  
+  
+  //Discover somehow the name of the car used
+  if(m_carType.empty()) {
+    stringstream ssSection;
+    ssSection << ROB_SECT_ROBOTS << "/" << ROB_LIST_INDEX << "/" << INDEX;
+    m_carType = GfParmGetStr(carHandle, ssSection.str().c_str(),
+        ROB_ATTR_CAR, DEFAULTCARTYPE);
+  }//if carType empty
+#ifdef DEBUG
+  cout << "Cartype: " << m_carType << endl;
+#endif  
+
+  //Load setup tailored for car+track
+  buf << botPath.str() << m_carType << "/" << trackname;
+  newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+#ifdef DEBUG
+  cout << "custom setup: " << buf.str() << endl;
+  if(newhandle)
+    cout << "car+track xml loaded" << endl;
+#endif  
+
+  //Merge the above two setups
+  if(newhandle) {
+    //If there is a default setup loaded, merge settings with custom track setup
+    if(*carParmHandle)
+      *carParmHandle =
+        GfParmMergeHandles(*carParmHandle, newhandle,
+               (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
+                GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
+    //Otherwise no need to merge
+    else
+      *carParmHandle = newhandle;
+  }//if newhandle
+#ifdef DEBUG
+  cout << "merge #2" << endl;
+#endif  
+
+
+  //If there was no car+track setup,
+  //decide the character of the track and choose 1 of 3 default setups.
+  double dLength = 0.0;
+  double dCurves = 0.0;
+  tTrackSeg *pSeg = track->seg;
+  do {
+    if(pSeg->type == TR_STR)
+      dLength += pSeg->length;
+    else {
+      dLength += pSeg->radius * pSeg->arc;
+      dCurves += RAD2DEG(pSeg->arc);
     }
 
-
+    pSeg = pSeg->next;
+  } while(pSeg != track->seg);
+#ifdef DEBUG
+  cout << "Track " << track->name
+    << " length: " << dLength
+    << " curves: " << dCurves
+    << " ratio: " << dLength / dCurves
+    << endl;
+#endif  
+  
   // Create a pit stop strategy object.
   strategy = new KStrategy();
   // Init fuel.
@@ -638,7 +715,8 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
   PitOffset = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "PitOffset",
                 (char *) NULL, 10.0);
   raceline->InitTrack(track, carParmHandle, s);
-}
+}//initTrack
+
 
 /**
  * Update own private data on every timestep.

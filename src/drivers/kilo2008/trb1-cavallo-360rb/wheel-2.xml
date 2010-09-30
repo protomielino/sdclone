@@ -23,7 +23,7 @@
 <params name="trb1-cavallo-360rb" type="template">
 
     <section name="Car">
-        <attnum name="initial fuel" unit="l" min="1.0" max="94.0" val="30.0"/>
+        <attnum name="initial fuel" unit="l" min="1.0" max="94.0" val="40.0"/>
     </section>
     
     <!-- Wings -->
@@ -169,12 +169,8 @@
     <attnum name="BrakeDelay" val="12.0"/>
     <attnum name="AvoidSpeedAdjust" val="2.0"/>
     <attnum name="ExtMargin" val="1.9"/>
-    <attnum name="IntMargin" val="0.1"/>
+    <attnum name="IntMargin" val="0.2"/>
     <attnum name="MinCornerInverse" val="0.003"/>
-<!--
-    <attnum name="PitOffset" val="0.0"/>
--->
-    <attstr name="teammate" val="Kilo 2"/>
   </section>
 
 </params>

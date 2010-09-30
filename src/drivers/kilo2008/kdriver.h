@@ -72,6 +72,7 @@ protected:
   double m_maxoffset;
   double m_minoffset;
   double m_rInverse;
+  std::string m_carType;
 };
 
 #endif // _KDRIVER_H_

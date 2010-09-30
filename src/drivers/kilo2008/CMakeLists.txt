@@ -7,7 +7,7 @@ SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp driver.cpp opponent.cpp driver.h pit.cpp str
 		spline.h raceline.cpp raceline.h kdriver.cpp kdriver.h util.h util.cpp)
 
 SET(ROBOT_SHIP logo.rgb)
-SET(ROBOT_SHIPSUBDIRS 1 2)
+SET(ROBOT_SHIPSUBDIRS 1 2 tracks trb1-cavallo-360rb)
 
 ROBOT(NAME ${ROBOT_NAME} SOURCES ${ROBOT_SOURCES} SHIP ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
