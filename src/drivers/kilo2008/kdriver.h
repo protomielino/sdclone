@@ -52,8 +52,8 @@ protected:
   double filterOverlap(double accel);
   double getOffset();
   void calcSpeed();
-  void setAvoidRight() {avoidmode |= AVOIDRIGHT;}
-  void setAvoidLeft() {avoidmode |= AVOIDLEFT;}
+  void setAvoidRight() {m_avoidmode |= AVOIDRIGHT;}
+  void setAvoidLeft() {m_avoidmode |= AVOIDLEFT;}
   bool oppTooFarOnSide(tCarElt *ocar);
   
   //'own' utilities

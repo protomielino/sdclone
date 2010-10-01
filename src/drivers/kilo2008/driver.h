@@ -67,9 +67,9 @@ public:
   virtual int pitCommand(tSituation * s) = 0;
   void endRace(tSituation * s);
 
-  tCarElt *getCarPtr()  { return car;}
-  tTrack *getTrackPtr() { return track;}
-  double getSpeed()     { return mycardata->getSpeedInTrackDirection(); }
+  tCarElt *getCarPtr()  { return m_car;}
+  tTrack *getTrackPtr() { return m_track;}
+  double getSpeed()     { return m_mycardata->getSpeedInTrackDirection(); }
 
   static const int TEAM_DAMAGE_CHANGE_LEAD; //Used in opponent.cpp too
 
@@ -94,9 +94,9 @@ protected:
   double brakedist(double allowedspeed, double mu);
   double smoothSteering(double steercmd);
   double correctSteering(double avoidsteer, double racesteer);
-  double calcSteer(double targetAngle, int rl, double racesteer);
+  double calcSteer(double targetAngle, int rl);
   void setMode(int newmode);
-  double getWidth()      { return mycardata->getWidthOnTrack();}
+  double getWidth()      { return m_mycardata->getWidthOnTrack();}
   virtual void calcSpeed();
   virtual void setAvoidRight() = 0;
   virtual void setAvoidLeft() = 0;
@@ -121,48 +121,50 @@ protected:
   void initTireMu();
 
   // Per robot global data.
-  int mode;
-  int avoidmode;
-  int lastmode;
-  int stuckCounter;
-  double speedangle;     // the angle of the speed vector relative to trackangle, > 0.0 points to right.
-  double angle;
-  double mass;           // Mass of car + fuel.
-  double myoffset;       // Offset to the track middle.
-  double laststeer;
-  double lastNSasteer;
-  tCarElt *car;         // Pointer to tCarElt struct.
-  LRaceLine *raceline;
+  int m_mode;
+  int m_avoidmode;
+  int m_lastmode;
+  int m_stuckCounter;
+  double m_speedangle;  // the angle of the speed vector relative to trackangle, > 0.0 points to right.
+  double m_angle;
+  double m_mass;        // Mass of car + fuel.
+  double m_myoffset;    // Offset to the track middle.
+  double m_laststeer;
+  double m_lastNSasteer;
+  
+  tCarElt *m_car;         // Pointer to tCarElt struct.
+  LRaceLine *m_raceline;
+  Opponents *m_opponents; // The container for opponents.
+  Pit *m_pit;             // Pointer to the pit instance.
+  KStrategy *m_strategy;  // Pit stop strategy.
+  tTrack *m_track;        // Track variables.
 
-  Opponents *opponents;     // The container for opponents.
-  Pit *pit;         // Pointer to the pit instance.
-  KStrategy *strategy;   // Pit stop strategy.
+  static Cardata *m_cardata;  // Data about all cars shared by all instances.
+  SingleCardata *m_mycardata; // Pointer to "global" data about my car.
+  
+  static double m_currentSimTime; // Store time to avoid useless updates.
 
-  static Cardata *cardata;  // Data about all cars shared by all instances.
-  SingleCardata *mycardata; // Pointer to "global" data about my car.
-  static double currentsimtime; // Store time to avoid useless updates.
+  double m_simTime;         // how long since the race started
+  double m_avoidTime;       // how long since we began avoiding
+  double m_correctTimer;    // how long we've been correcting
+  double m_correctLimit;    // level of divergence with raceline steering
+  double m_brakeDelay;
+  double m_currentSpeedSqr; // Square of the current speed_x.
+  double m_clutchTime;      // Clutch timer.
+  double m_oldLookahead;    // Lookahead for steering in the previous step.
+  double m_raceSteer;       // steer command to get to raceline
+  double m_rLookahead;      // how far ahead on the track we look for steering
+  double m_raceOffset;      // offset from middle of track towards which raceline is steering
+  double m_avoidLftOffset;  // closest opponent on the left
+  double m_avoidRgtOffset;  // closest opponent on the right
+  double m_raceSpeed;       // how fast raceline code says we should be going
+  double m_avoidSpeed;      // how fast we should go if avoiding
+  double m_accelCmd;
+  double m_brakeCmd;
+  double m_pitOffset;
+  v2d    m_raceTarget;      // the 2d point the raceline is driving at.
 
-  double simtime;           // how long since the race started
-  double avoidtime;         // how long since we began avoiding
-  double correcttimer;      // how long we've been correcting
-  double correctlimit;      // level of divergence with raceline steering
-  double brakedelay;
-  double currentspeedsqr;    // Square of the current speed_x.
-  double clutchtime;         // Clutch timer.
-  double oldlookahead;       // Lookahead for steering in the previous step.
-  double racesteer;          // steer command to get to raceline
-  double rlookahead;         // how far ahead on the track we look for steering
-  double raceoffset;         // offset from middle of track towards which raceline is steering
-  double avoidlftoffset;     // closest opponent on the left
-  double avoidrgtoffset;     // closest opponent on the right
-  double racespeed;          // how fast raceline code says we should be going
-  double avoidspeed;         // how fast we should go if avoiding
-  double accelcmd;
-  double brakecmd;
-  double PitOffset;
-  v2d racetarget;           // the 2d point the raceline is driving at.
-
-  int carindex;
+  int m_carIndex;
 
   // Data that should stay constant after first initialization.
   int MAX_UNSTUCK_COUNT;
@@ -201,12 +203,8 @@ protected:
   static const double DISTCUTOFF;
   static const double MAX_INC_FACTOR;
   static const double CATCH_FACTOR;
-
   static const double TEAM_REAR_DIST;
   static const double LET_OVERTAKE_FACTOR;
-
-  // Track variables.
-  tTrack *track;
 };
 
 #endif // _DRIVER_H_
