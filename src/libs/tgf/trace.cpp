@@ -79,7 +79,7 @@ void GfLogSetStream(FILE* fStream)
     }
     else
 		fprintf(gfLogStream ? gfLogStream : stderr, 
-				"Error\tGfLogSetStream : %s", strerror(errno));
+				"Error   GfLogSetStream : %s", strerror(errno));
 	
     if (gfLogStream)
     {
@@ -92,7 +92,7 @@ void GfLogSetStream(FILE* fStream)
 				stm->tm_hour, stm->tm_min, stm->tm_sec);
 		
 		// Trace current trace level threshold.
-		fprintf(gfLogStream, "%s Info\tCurrent trace level threshold : ", pszClock);
+		fprintf(gfLogStream, "%s Info    Current trace level threshold : ", pszClock);
 		if (gfLogLevelThreshold >= gfLogFatal && gfLogLevelThreshold <= gfLogDebug)
 			fprintf(gfLogStream, "%s\n", gfLogLevelNames[gfLogLevelThreshold]);
 		else
