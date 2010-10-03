@@ -232,7 +232,7 @@ rmrpValidate(void * /* dummy */)
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_DISTANCE, "km", rmrpDistance);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_LAPS, (char*)NULL, rmrpLaps);
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_SESSIONTIME, "s", (tdble)rmrpSessionTime);
-	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, rmrpWeather + 1); //TODO: delete this line
+	//GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER, NULL, rmrpWeather + 1); //TODO: delete this line
 	GfParmSetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", WeatherValues[rmrpWeather].rain);
 	switch( WeatherValues[rmrpWeather ].clouds )
 	{
@@ -375,7 +375,7 @@ RmRaceParamMenu(void *vrp)
 	{
 		rmrpWeather = xx;
 	}
-    	else if( fabs( WeatherValues[ xx          ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) <
+    	if( fabs( WeatherValues[ xx          ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) ==
 	         fabs( WeatherValues[ rmrpWeather ].rain - GfParmGetNum(rp->param, rp->title, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0.0f ) ) )
 	{
 		//Rain is equal far off, look if we have a match in the cloud type

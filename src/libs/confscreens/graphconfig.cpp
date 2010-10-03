@@ -51,10 +51,6 @@ static int 	SkyDomeValueIndex = 0;
 static int	DynamicTimeOptionId;
 static int	DynamicTimeOptionValue = 0;
 
-
-//static int	RainDensityOptionId;
-//static int	RainDensityValueIndex = 0;
-
 static const int SkyDomeSizeValues[] = {0, 12000, 20000, 40000, 80000};
 static const int NbSkyDomeValues = sizeof(SkyDomeSizeValues) / sizeof(SkyDomeSizeValues[0]);
 //static const int RainDensityValues[] = {0, 100, 200, 300};
