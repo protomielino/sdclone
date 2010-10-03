@@ -164,10 +164,12 @@ typedef struct
     t3Dd M; /**< Moments */
 } tForces;
 
-/***********************************
- * Gaming framework initialization *
- ***********************************/
+/******************************
+ * Gaming framework managment *
+ ******************************/
 TGF_API void GfInit(void);
+TGF_API void GfRestart(bool bHardwareMouse = false, bool bSingleTexturing = false);
+
 
 /************************************************************************
  * Memory pools                                                         *
@@ -262,6 +264,7 @@ TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool fr
 
 TGF_API bool GfPathIsAbsolute(const char *pszPath);
 TGF_API char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen);
+TGF_API char* GfPathMakeOSCompatible(char* path);
 
 /**********************************
  *  Interface For Parameter Files *
@@ -420,6 +423,11 @@ static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
 TGF_API double GfTimeClock(void);
 TGF_API char *GfTime2Str(double sec, const char* plus="", bool zeros=true, int prec=3);
 
+/******************
+ * Miscellaneous. *
+ ******************/
+TGF_API int GfNearestPow2(int x);
+
 /* Mean values */
 #define GF_MEAN_MAX_VAL	5
 
@@ -456,13 +464,9 @@ TGF_API const char *SetDataDir(const char *pszPath);
 TGF_API const char *GetBinDir();
 TGF_API const char *SetBinDir(const char *pszPath);
 
-/* MISC */
-TGF_API int GetSingleTextureMode();
-TGF_API void SetSingleTextureMode();
-
-TGF_API int GfNearestPow2(int x);
-
-/* Settings files run-time setup */
+/************************************************
+ * User settings files run-time update/install. *
+ ************************************************/
 TGF_API void GfFileSetup();
 
 

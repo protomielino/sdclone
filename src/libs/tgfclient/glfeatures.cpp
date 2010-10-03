@@ -191,6 +191,24 @@ int GfglGetUserTextureMaxSize(void)
 
 
 /*
+	----------------------- Multi-texturing (anti-aliasing) support.
+*/
+static bool bMultiTexturingEnabled = true;
+
+
+bool GfglIsMultiTexturingEnabled()
+{
+	return bMultiTexturingEnabled;
+}
+
+
+void GfglEnableMultiTexturing(bool bEnable)
+{
+	bMultiTexturingEnabled = bEnable;
+}
+
+
+/*
 	----------------------- Non-power of 2 size texture support.
 */
 static bool bTextureRectangleARBAvailable;

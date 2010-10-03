@@ -22,12 +22,11 @@
     @version    $Id$
 */
 
+#ifndef __TGFCLIENT__H__
+#define __TGFCLIENT__H__
 
 #include <string>
 #include <vector>
-
-#ifndef __TGFCLIENT__H__
-#define __TGFCLIENT__H__
 
 #ifdef WIN32
 #  include <windows.h>
@@ -47,11 +46,10 @@
 #  include <plib/js.h>
 #endif
 #include <SDL/SDL_keysym.h>
-#include <SDL/SDL_video.h>
 
 #include <tgf.h>
 
-#include "screen_properties.h"
+#include "guiscreen.h"
 
 
 // DLL exported symbols declarator for Windows.
@@ -77,14 +75,22 @@ TGFCLIENT_API void GfInitClient(void);
  * Screen Interface *
  ********************/
 
+typedef struct ScreenSize
+{
+    int width;  // Width in pixels.
+    int height; // Height in pixels.
+} tScreenSize;
+
 TGFCLIENT_API void GfScrInit(int argc, char *argv[]);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void *GfScrMenuInit(void *precMenu);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
-SDL_Surface* gfScrGetScreenSurface();
 TGFCLIENT_API unsigned char* GfScrCaptureAsImage(int* viewW, int *viewH);
 TGFCLIENT_API int GfScrCaptureAsPNG(const char *filename);
 TGFCLIENT_API void GfScrReinit(void*);
+
+TGFCLIENT_API int* GfScrGetPossibleColorDepths(int* pnDepths);
+TGFCLIENT_API tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSizes);
 
 /*****************************
  * GUI interface (low-level) *
@@ -592,6 +598,11 @@ TGFCLIENT_API void GfglUpdateUserTextureMaxSize(void);
 // Texture non-power-of-2 support
 TGFCLIENT_API bool GfglIsTextureRectangleARBAvailable(void); // In case mipmapping NOT needed.
 TGFCLIENT_API bool GfglIsTextureNonPowerOf2ARBAvailable(void); // In case mipmapping needed.
+
+// Multi-texturing support
+TGFCLIENT_API bool GfglIsMultiTexturingEnabled();
+TGFCLIENT_API void GfglEnableMultiTexturing(bool bEnable = true);
+
 
 #endif /* __TGFCLIENT__H__ */
 

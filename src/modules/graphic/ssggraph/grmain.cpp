@@ -86,7 +86,7 @@ PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 // desc: sets up OpenGL for multitexturing support
 bool InitMultiTex(void)
 {
-	if (GetSingleTextureMode ()) {
+	if (!GfglIsMultiTexturingEnabled()) {
 		maxTextureUnits = 1;
 		return true;
     } else {

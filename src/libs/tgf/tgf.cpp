@@ -30,6 +30,8 @@
 #include <ctime>
 #include <cstring>
 
+#include <SDL/SDL.h>
+
 #include "tgf.h"
 
 #include "portability.h"
@@ -410,7 +412,29 @@ char * _tgf_win_strdup(const char * str)
 }
 #endif // WIN32
 
+// Build a new path string compatible with current OS and usable as a command line arg.
+static char* gfPathBuildCommandLineArg(const char *path)
+{
+#ifdef WIN32
+  char *osPath = (char*)malloc(strlen(path)+3);
+  sprintf(osPath, "\"%s", path);
+  if (osPath[strlen(osPath)-1] == '/')
+    osPath[strlen(osPath)-1] = 0; // Remove trailing '/' for command line
+  strcat(osPath, "\"");
+#else
+  char *osPath = strdup(path);
+#endif //WIN32
+  
+  GfPathMakeOSCompatible(osPath);
+  
+  return osPath;
+}
 
+
+/** Initialize the gaming framework.
+    @ingroup	tgf
+    @return	None
+ */
 void GfInit(void)
 {
 	gfTraceInit();
@@ -418,8 +442,111 @@ void GfInit(void)
 	gfModInit();
 	gfOsInit();
 	gfParamInit();
+
+	// Initialize SDL subsystems usefull for TGF.
+	if (SDL_Init(SDL_INIT_TIMER) < 0)
+		GfLogFatal("Couldn't initialize SDL(timer) (%s)\n", SDL_GetError());
 }
 
+
+/** Restart the gaming framework (restart the current process).
+    @ingroup	tgf
+    @param	sec	Time to convert
+    @param	plus	String to display as the positive sign (+) for positive values of time.
+    @return	None
+    @warning	Never returns (retart the process).
+ */
+void GfRestart(bool bHardwareMouse, bool bMultiTexturing)
+{
+    int retcode = 0;
+    static const int CMDSIZE = 1024;
+    char cmd[CMDSIZE];
+
+    char** args;
+    int	i, nArgs;
+    int	argInd;
+
+    // Command name.
+    sprintf(cmd, "%sspeed-dreams", GetBinDir());
+#ifdef WIN32
+    strcat(cmd, ".exe");
+#endif
+    GfPathMakeOSCompatible(cmd);
+
+    // Compute number of args.
+    nArgs = 1; // Executable is always the first arg.
+    
+    if (bHardwareMouse)
+	  nArgs += 1;
+    if (!bMultiTexturing)
+	  nArgs += 1;
+    if (GetLocalDir() && strlen(GetLocalDir()))
+	  nArgs += 2;
+    if (GetBinDir() && strlen(GetBinDir()))
+	  nArgs += 2;
+    if (GetLibDir() && strlen(GetLibDir()))
+	  nArgs += 2;
+    if (GetDataDir() && strlen(GetDataDir()))
+	  nArgs += 2;
+
+    nArgs++; // Last arg must be a null pointer.
+
+    // Allocate args array.
+    args = (char**)malloc(sizeof(char*)*nArgs);
+	
+    // First arg is the executable path-name.
+    argInd = 0;
+    args[argInd++] = gfPathBuildCommandLineArg(cmd);
+
+    // Then add subsequent args.
+    if (bHardwareMouse)
+        args[argInd++] = strdup("-m");
+    
+    if (!bMultiTexturing)
+        args[argInd++] = strdup("-s");
+    
+    if (GetLocalDir() && strlen(GetLocalDir()))
+    {
+        args[argInd++] = strdup("-l");
+		args[argInd++] = gfPathBuildCommandLineArg(GetLocalDir());
+    }
+
+    if (GetBinDir() && strlen(GetBinDir()))
+    {
+        args[argInd++] = strdup("-B");
+		args[argInd++] = gfPathBuildCommandLineArg(GetBinDir());
+    }
+	
+    if (GetLibDir() && strlen(GetLibDir()))
+    {
+        args[argInd++] = strdup("-L");
+		args[argInd++] = gfPathBuildCommandLineArg(GetLibDir());
+    }
+	
+    if (GetDataDir() && strlen(GetDataDir()))
+    {
+        args[argInd++] = strdup("-D");
+		args[argInd++] = gfPathBuildCommandLineArg(GetDataDir ());
+    }
+	
+    // Finally, last null arg.
+    args[argInd] = 0;
+	  
+    // Exec the command : restart the game (simply replacing current process)
+    GfLogInfo("Restarting ");
+    for (i = 0; args[i]; i++)
+        GfLogInfo("%s ", args[i]);
+    GfLogInfo("...\n");
+    retcode = execvp(cmd, args);
+
+    // If successfull, we never get here ... but if failed ...
+    GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
+    for (i = 0; args[i]; i++)
+		free(args[i]);
+    free(args);
+    
+    exit(1);
+}
 
 void gfMeanReset(tdble v, tMeanVal *pvt)
 {
@@ -460,7 +587,7 @@ tdble gfMean(tdble v, tMeanVal *pvt, int n, int w)
 
 
 /** Convert a time in seconds (float) to an ascii string.
-    @ingroup	screen
+    @ingroup	tgf
     @param	sec	Time to convert
     @param	plus	String to display as the positive sign (+) for positive values of time.
     @param	zeros	Flag to indicate if heading zeros are to be displayed or not.
@@ -503,6 +630,23 @@ char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 		(void)sprintf(buf, "      %s%2.2d.%0.*d", sign, s, prec, f);
 	}
 	return buf;
+}
+
+/** In-place convert internal file or dir path to an OS compatible path
+    @ingroup	tgf
+    @param	path	The path to convert
+    @return	The converted path.
+*/
+// In-place convert internal file or dir path to an OS compatible path
+char* GfPathMakeOSCompatible(char* path)
+{
+#ifdef WIN32
+  size_t i;
+  for (i = 0; i < strlen(path); i++)
+	if (path[i] == '/')
+	  path[i] = '\\';
+#endif //WIN32
+  return path;
 }
 
 // Determine if a dir or file path is absolute or not.
@@ -730,21 +874,6 @@ const char* SetBinDir(const char *pszPath)
 	gfBinDir = makeRunTimeDirPath(pszPath);
 	GfLogInfo("Executables in %s (from %s)\n", gfBinDir, pszPath);
 	return gfBinDir;
-}
-
-
-static int singleTextureMode = 0;
-
-
-int GetSingleTextureMode (void)
-{
-	return singleTextureMode;
-}
-
-
-void SetSingleTextureMode (void)
-{
-	singleTextureMode = 1;
 }
 
 

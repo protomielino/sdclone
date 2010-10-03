@@ -28,6 +28,7 @@ typedef struct
 } tMnuCallbackInfo;
 
 
+extern void gfMenuInit(void);
 
 #endif /* __MENU__H__ */ 
 

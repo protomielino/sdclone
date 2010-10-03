@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : screen_properties.h
+    file        : guiscreen.h
     created     : Sat Apr 19 23:37:41 CEST 2003
-    copyright   : (C) 2003 by Eric Espi�                        
+    copyright   : (C) 2003 by Eric Espie                        
     email       : eric.espie@torcs.org   
-    version     : $Id: screen_properties.h,v 1.4 2005/02/01 15:55:55 berniw Exp $                                  
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -20,11 +20,14 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: screen_properties.h,v 1.4 2005/02/01 15:55:55 berniw Exp $
+    @version	$Id$
 */
 
-#ifndef _SCREEN_PROPERTIES_H_
-#define _SCREEN_PROPERTIES_H_
+#ifndef _GUISCREEN_H_
+#define _GUISCREEN_H_
+
+#include <SDL/SDL_video.h>
+
 
 #define GFSCR_CONF_FILE		"config/screen.xml"
 
@@ -83,7 +86,9 @@
 #define GFSCR_ATTR_ALPHA	"alpha"
 
 
-#endif /* _SCREEN_PROPERTIES_H_ */ 
+SDL_Surface* gfScrGetScreenSurface();
+
+#endif /* _GUISCREEN_H_ */ 
 
 
 

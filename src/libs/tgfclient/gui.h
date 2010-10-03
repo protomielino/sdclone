@@ -382,8 +382,6 @@ extern void gfuiScrollListPrevElt (tGfuiObject *object);
 extern void gfuiReleaseImage(tGfuiObject *obj);
 extern void gfuiDrawImage(tGfuiObject *obj);
 
-extern SDL_Surface* gfScrGetScreenSurface();
-
 #endif /* _GUI_H__ */ 
 
 

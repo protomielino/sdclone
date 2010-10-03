@@ -14,9 +14,10 @@ ADD_PLIB_INCLUDEDIR()
 SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
                       guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
                       tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
-		      guilabel.cpp guiobject.cpp guiscrollist.cpp guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp
-		      screen.cpp guieventloop.cpp glfeatures.h gui.h screen_properties.h 
-		      guimenu.h tgfclient.h guifont.h )
+                      guilabel.cpp guiobject.cpp guiscrollist.cpp 
+                      guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp
+                      guiscreen.cpp guieventloop.cpp 
+                      glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h )
 
 #disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -71,5 +72,5 @@ ENDIF(UNIX)
 
 SD_INSTALL_FILES(DATA config USER config FILES screen.xml)
 
-SD_INSTALL_FILES(INCLUDE FILES glfeatures.h screen_properties.h tgfclient.h)
+SD_INSTALL_FILES(INCLUDE FILES glfeatures.h guiscreen.h tgfclient.h)
 

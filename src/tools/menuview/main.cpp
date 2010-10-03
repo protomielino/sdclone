@@ -53,56 +53,6 @@ init_args(int argc, char **argv)
 	GfInitInstallDir(argv[0]);
 
 	// Parse command line args.
-#ifdef WIN32
-
-    int i = 1;
-    while (i < argc)
-    {
-		// -l or /l option : User settings dir (named "local dir")
-		if (!strncmp(argv[i], "-l", 2) || !strncmp(argv[i], "/l", 2))
-        {
-  	    if (++i < argc)
-	        localdir = SetLocalDir(argv[i]);
-        }
-        // -L or /L option : Libraries dir (root dir of the tree where loadable modules are installed)
-        else if (!strncmp(argv[i], "-L", 2) || !strncmp(argv[i], "/L", 2))
-        {
-	    if (++i < argc)
-	        libdir = SetLibDir(argv[i]);
-        }
-        // -D or /D option : Data dir (root dir of the data tree)
-        else if (!strncmp(argv[i], "-D", 2) || !strncmp(argv[i], "/D", 2))
-        {
-            if (++i < argc)
-                datadir = SetDataDir(argv[i]);
-        }
-        // -B or /B option : Binaries dir (the dir where Speed Dreams exe and DLLs are installed)
-        else if (!strncmp(argv[i], "-B", 2) || !strncmp(argv[i], "/B", 2))
-        {
-            if (++i < argc)
-                bindir = SetBinDir(argv[i]);
-        }
-        // -s or /s option : Single texture mode (= disable multi-texturing)
-        else if (!strncmp(argv[i], "-s", 2) || !strncmp(argv[i], "/s", 2))
-        {
-            SetSingleTextureMode ();
-        }
-        // -m or /m option : Allow the hardware mouse cursor
-        else if (!strncmp(argv[i], "-m", 2) || !strncmp(argv[i], "/m", 2))
-        {
-           GfuiMouseSetHWPresent();
-        }
-		else
-		{
-			g_strMenuFile = argv[i];
-		}
-		
-        // Next arg (even if current not recognized).
-        i++;
-    }
-
-#else
-
     int i = 1;
 	while (i < argc) 
 	{
@@ -133,7 +83,7 @@ init_args(int argc, char **argv)
 		// -s option : Single texture mode (= disable multi-texturing)
 		else if (!strncmp(argv[i], "-s", 2))
 		{
-			SetSingleTextureMode ();
+			GfglEnableMultiTexturing(false);
 		}
 		// -m option : Allow the hardware mouse cursor
 		else if (!strncmp(argv[i], "-m", 2))
@@ -148,7 +98,6 @@ init_args(int argc, char **argv)
 		// Next arg (even if current not recognized).
 		i++;
 	}
-#endif
 	
     // If any of the Speed-Dreams dirs not run-time specified / empty, 
     // use associated compile-time variable SD_XXDIR to get default value

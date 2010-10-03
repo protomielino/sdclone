@@ -70,7 +70,7 @@ init_args(int argc, char **argv)
         // -s option : Single texture mode (= disable multi-texturing)
         else if (!strncmp(argv[i], "-s", 2))
         {
-            SetSingleTextureMode ();
+            GfglEnableMultiTexturing(false);
         }
         // -m option : Allow the hardware mouse cursor
         else if (!strncmp(argv[i], "-m", 2))

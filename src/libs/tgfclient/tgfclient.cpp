@@ -17,15 +17,10 @@
  ***************************************************************************/
 
 #include "gui.h"
-#include "tgfclient.h"
+#include "guimenu.h"
 
-extern void gfScreenInit(void);
-extern void gfMenuInit(void);
-
-void
-GfInitClient(void)
+void GfInitClient(void)
 {
     gfuiInit();
     gfMenuInit();
-    gfScreenInit();
 }
