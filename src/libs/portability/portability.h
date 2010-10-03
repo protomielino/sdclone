@@ -24,6 +24,7 @@
 #include <cstring>
 #ifdef WIN32
 #include <direct.h>
+#include <process.h>
 #endif
 
 #ifdef WIN32
@@ -89,6 +90,7 @@ static char *strndup(const char *str, int len)
 #undef mkdir
 #endif
 #define mkdir(x) _mkdir(x)
+#define execvp _execvp
 #endif
 
 #endif

@@ -682,14 +682,6 @@ saveParams(void)
 void
 GfScrReinit(void * /* dummy */)
 {
-    int retcode = 0;
-    static const int CMDSIZE = 1024;
-    char cmd[CMDSIZE];
-
-    char** args;
-    int	i, nArgs;
-    int	argInd;
-
     // Force current edit to loose focus (if one has it) and update associated variable.
     GfuiUnSelectCurrent();
 
