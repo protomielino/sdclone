@@ -63,7 +63,7 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 				car->_tyreT_mid(i) = 50.0;
 				car->_tyreT_out(i) = 50.0;
 			}
-			GfLogInfo("%s in repair pit stop for %.1f s (refueled %.1f l, repaired %d).\n",
+			GfLogInfo("%s in repair pit stop for %.1f s (refueling by %.1f l, repairing by %d).\n",
 					  car->_name, info->totalPitTime, car->_pitFuel, car->_pitRepair);
 			break;
 		case RM_PIT_STOPANDGO:
@@ -72,8 +72,13 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 				info->totalPitTime = 10.0;
 			else
 				info->totalPitTime = 0.0;
-			car->_scheduledEventTime = s->currentTime + info->totalPitTime; 
-	
+			car->_scheduledEventTime = s->currentTime + info->totalPitTime;
+
+			// Prevent car->_state & RM_CAR_STATE_PIT from being true for a too short delay,
+			// in order for the penalty management to detect it.
+			if (car->_scheduledEventTime < s->currentTime + RCM_MAX_DT_SIMU)
+				car->_scheduledEventTime += RCM_MAX_DT_SIMU;
+														 
 			GfLogInfo("%s in stop&go pit stop for %.1f s.\n", car->_name, info->totalPitTime);
 			break;
 	}
@@ -88,7 +93,7 @@ reCarsSchedulePitMenu(tCarElt *car)
 	// (this one will have to wait for the current one exiting from the menu)
 	if (ReInfo->_reInPitMenuCar)
 	{
-		GfLogInfo("%s would like to pit, but the pit menu is already in use\n", car->_name);
+		GfLogInfo("%s would like to pit, but the pit menu is already in use.\n", car->_name);
 		return;
 	}
 
@@ -103,17 +108,14 @@ reCarsAddPenalty(tCarElt *car, int penalty)
 	char msg[64];
 	tCarPenalty *newPenalty;
 
-	if (! (ReInfo->s->_features & RM_FEATURE_PENALTIES) )
-		return;	/* Penalties not enabled this race: do not add penalty */
-	
 	if (penalty == RM_PENALTY_DRIVETHROUGH)
-		sprintf(msg, "%s DRIVETHROUGH PENALTY", car->_name);
+		sprintf(msg, "%s Driver Through penalty", car->_name);
 	else if (penalty == RM_PENALTY_STOPANDGO)
-		sprintf(msg, "%s STOP&GO PENALTY", car->_name);
+		sprintf(msg, "%s Stop and Go penalty", car->_name);
 	else if (penalty == RM_PENALTY_10SEC_STOPANDGO)
-		sprintf(msg, "%s 10 SEC STOP&GO PENALTY", car->_name);
+		sprintf(msg, "%s 10s Stop and Go penalty", car->_name);
 	else if (penalty == RM_PENALTY_DISQUALIFIED)
-		sprintf(msg, "%s DISQUALIFIED", car->_name);
+		sprintf(msg, "%s disqualified", car->_name);
 
 	ReRaceMsgSet(ReInfo, msg, 5);
 
@@ -124,15 +126,26 @@ reCarsAddPenalty(tCarElt *car, int penalty)
 		return;
 	}
 
+	// Add the penalty in the list.
 	newPenalty = (tCarPenalty*)calloc(1, sizeof(tCarPenalty));
 	newPenalty->penalty = penalty;
 	newPenalty->lapToClear = car->_laps + 5;
 	GF_TAILQ_INSERT_TAIL(&(car->_penaltyList), newPenalty, link);
+	//GfLogDebug("reCarsAddPenalty(car #%d) : Added penalty %p\n", car->index, newPenalty);
+}
+
+static void
+reCarsRemovePenalty(tCarElt *car, tCarPenalty *penalty)
+{
+	GF_TAILQ_REMOVE(&(car->_penaltyList), penalty, link);
+	//GfLogDebug("reCarsRemovePenalty(car #%d) : Removed penalty %p\n",
+	//		   car->index, penalty);
+	FREEZ(penalty);
 }
 
 /* Compute the race rules and penalties */
 static void
-reCarsRaceRules(tCarElt *car)
+reCarsApplyRaceRules(tCarElt *car)
 {
 	char msg[64];
     tCarPenalty		*penalty;
@@ -141,12 +154,13 @@ reCarsRaceRules(tCarElt *car)
     tTrackSeg		*seg = RtTrackGetSeg(&(car->_trkPos));
     tReCarInfo		*info = &(ReInfo->_reCarInfo[car->index]);
     tTrackSeg		*prevSeg = RtTrackGetSeg(&(info->prevTrkPos));
-    static const float	color[] = {0.0, 0.0, 1.0, 1.0};
+    static const float	ctrlMsgColor[] = {0.0, 0.0, 1.0, 1.0};
 
 	// DNF cars which need too much time for the current lap, this is mainly to avoid
 	// that a "hanging" driver can stop the quali from finishing.
-	// Allowed time is longest pitstop possible + time for tracklength with speed??? (currently fixed 10 [m/s]).
-	// for simplicity. Human driver is an exception to this rule, to allow explorers
+	// Allowed time is longest pitstop possible + time for tracklength with speed???
+	// (currently fixed 10 [m/s]).
+	// For simplicity. Human driver is an exception to this rule, to allow explorers
 	// to enjoy the landscape.
 	// Also - don't remove cars that are currently being repaired in pits
 	// TODO: Make it configurable.
@@ -155,109 +169,142 @@ reCarsRaceRules(tCarElt *car)
 	    (car->_driverType != RM_DRV_HUMAN))
 	{
 		car->_state |= RM_CAR_STATE_ELIMINATED;
+		GfLogInfo("%s eliminated (too long to finish the lap).\n", car->_name);
 	    return;
 	}
 
-	if (car->_skillLevel < 3) {
-	/* only for the pros */
-	return;
-    }
+	// Stop here (no more rules) if not in "Pro" skill level.
+	if (car->_skillLevel < 3)
+		return;
 
+	// Stop here (no more rules) if "penalties" feature not enables for this race.
+	if (! (ReInfo->s->_features & RM_FEATURE_PENALTIES) )
+		return;
+	
+	// Otherwise, update control board and do the referee job.
+	// 1) Update control board message about the current penalty if any.
+	//    TODO: Optimization : Add penalty->timeStamp and car->ctrl.timeStamp fields
+	//          to avoid doing this again and again as long as the penalty is not cleared
+	//          whereas it's only needed when the penalty reaches the _penaltyList head.
 	penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
     if (penalty) {
-	if (car->_laps > penalty->lapToClear) {
-	    /* too late to clear the penalty, out of race */
-	    reCarsAddPenalty(car, RM_PENALTY_DISQUALIFIED);
-	    return;
-	}
-	switch (penalty->penalty) {
-	case RM_PENALTY_DRIVETHROUGH:
-	    sprintf(car->ctrl.msg[3], "Drive Through Penalty");
-	    break;
-	case RM_PENALTY_STOPANDGO:
-	    sprintf(car->ctrl.msg[3], "Stop And Go Penalty");
-	    break;
-	case RM_PENALTY_10SEC_STOPANDGO:
-	    sprintf(car->ctrl.msg[3], "10 Sec Stop And Go Penalty");
-	    break;
-	default:
-	    *(car->ctrl.msg[3]) = 0;
-	    break;
-	}
-	memcpy(car->ctrl.msgColor, color, sizeof(car->ctrl.msgColor));
-    }
-    
-
-    if (prevSeg->raceInfo & TR_PITSTART) {
-	/* just entered the pit lane */
-	if (seg->raceInfo & TR_PIT) {
-	    /* may be a penalty can be cleaned up */
-	    if (penalty) {
 		switch (penalty->penalty) {
-		case RM_PENALTY_DRIVETHROUGH:
-		    sprintf(msg, "%s DRIVE THROUGH PENALTY CLEANING", car->_name);
-		    ReRaceMsgSet(ReInfo, msg, 5);
-		    rules->ruleState |= RM_PNST_DRIVETHROUGH;
-		    break;
-		case RM_PENALTY_STOPANDGO:
-		case RM_PENALTY_10SEC_STOPANDGO:
-		    sprintf(msg, "%s STOP&GO PENALTY CLEANING", car->_name);
-		    ReRaceMsgSet(ReInfo, msg, 5);
-		    rules->ruleState |= RM_PNST_STOPANDGO;
-		    break;
+			case RM_PENALTY_DRIVETHROUGH:
+				sprintf(car->ctrl.msg[3], "Drive Through Penalty");
+				break;
+			case RM_PENALTY_STOPANDGO:
+				sprintf(car->ctrl.msg[3], "Stop And Go Penalty");
+				break;
+			case RM_PENALTY_10SEC_STOPANDGO:
+				sprintf(car->ctrl.msg[3], "10s Stop And Go Penalty");
+				break;
+			default:
+				*(car->ctrl.msg[3]) = 0;
+				break;
 		}
-	    }
+		memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
+    } else {
+		// No penalty => no message.
+		*(car->ctrl.msg[3]) = 0;
 	}
+    
+	// 2) Check if not too late for the 1st penalty if any.
+    if (penalty) {
+		if (car->_laps > penalty->lapToClear) {
+			// The penalty was not "executed" : too late to clear => disqualified (out of race)
+			reCarsAddPenalty(car, RM_PENALTY_DISQUALIFIED);
+			GfLogInfo("%s disqualified (penalty not executed after 5 laps).\n", car->_name);
+			return;
+		}
+	}
+
+	// 3) Check if we can hopefuly clear the penalty because just entered the pit lane.
+	//    (means that we enter the clearing process, but that it may fail ; nothing sure)
+    if (prevSeg->raceInfo & TR_PITSTART) {
+
+		//if (seg->raceInfo & TR_PIT)
+		//	GfLogDebug("%s crossed pit lane entry.\n", car->_name);
+		if (penalty) {
+			// just entered the pit lane
+			if (seg->raceInfo & TR_PIT) {
+				switch (penalty->penalty) {
+					case RM_PENALTY_DRIVETHROUGH:
+						sprintf(msg, "%s Drive Through penalty clearing", car->_name);
+						ReRaceMsgSet(ReInfo, msg, 5);
+						rules->ruleState |= RM_PNST_DRIVETHROUGH;
+						GfLogInfo("%s might get its Drive Through Penalty cleared.\n", car->_name);
+						break;
+					case RM_PENALTY_STOPANDGO:
+					case RM_PENALTY_10SEC_STOPANDGO:
+						sprintf(msg, "%s Stop and Go penalty clearing", car->_name);
+						ReRaceMsgSet(ReInfo, msg, 5);
+						rules->ruleState |= RM_PNST_STOPANDGO;
+						GfLogInfo("%s might get its Stop And Go Penalty cleared.\n", car->_name);
+						break;
+				}
+			}
+		}
+		
+	// 4) If in pit lane for more than 1 segment :
     } else if (prevSeg->raceInfo & TR_PIT) {
-	if (seg->raceInfo & TR_PIT) {
-	    /* the car stopped in pits */
-	    if (car->_state & RM_CAR_STATE_PIT) {
-		if (rules->ruleState & RM_PNST_DRIVETHROUGH) {
-		    /* it's no more a drive through */
-		    rules->ruleState &= ~RM_PNST_DRIVETHROUGH;
-		} else if (rules->ruleState & RM_PNST_STOPANDGO) {
-		    rules->ruleState |= RM_PNST_STOPANDGO_OK;
+		
+		if (seg->raceInfo & TR_PIT) {
+			// 4a) Check if we can go on with clearing the penalty because stopped in pit.
+			if (car->_state & RM_CAR_STATE_PIT) {
+				//GfLogDebug("%s is pitting.\n", car->_name);
+				if (rules->ruleState & RM_PNST_STOPANDGO && car->_pitStopType == RM_PIT_STOPANDGO) {
+					GfLogInfo("%s Stop and Go accepted.\n", car->_name);
+					rules->ruleState |= RM_PNST_STOPANDGO_OK; // Stop and Go really done.
+				}
+			}
+		} else if (seg->raceInfo & TR_PITEND) {
+			//GfLogDebug("%s crossing pit lane exit.\n", car->_name);
+			// 4b) Check if the penalty can really and finally be removed because exiting pit lane
+			//     and everything went well in the clearing process til then.
+			if (rules->ruleState & (RM_PNST_DRIVETHROUGH | RM_PNST_STOPANDGO_OK)) {
+				sprintf(msg, "%s penalty cleared", car->_name);
+				ReRaceMsgSet(ReInfo, msg, 5);
+				penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
+				reCarsRemovePenalty(car, penalty);
+				GfLogInfo("%s %s penalty cleared.\n", car->_name,
+						  (rules->ruleState & RM_PNST_DRIVETHROUGH) ? "Drive Through" : "Stop And Go");
+			}
+			rules->ruleState = 0;
+		} else {
+			// 4c) Exiting pit lane the wrong way : add new stop and go penalty if possible.
+			//GfLogDebug("%s exiting pit lane by a side (bad).\n", car->_name);
+			if (!(rules->ruleState & RM_PNST_STOPANDGO)) {
+				reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
+				rules->ruleState = RM_PNST_STOPANDGO;
+				GfLogInfo("%s got a Stop And Go penalty (went out the pits at a wrong place).\n",
+						  car->_name);
+			}
 		}
-	    } else {
-                if(rules->ruleState & RM_PNST_STOPANDGO_OK && car->_pitStopType != RM_PIT_STOPANDGO) {
-		    rules->ruleState &= ~ ( RM_PNST_STOPANDGO | RM_PNST_STOPANDGO_OK );
-		}
-	    }
-	} else if (seg->raceInfo & TR_PITEND) {
-	    /* went out of the pit lane, check if the current penalty is cleared */
-	    if (rules->ruleState & (RM_PNST_DRIVETHROUGH | RM_PNST_STOPANDGO_OK)) {
-		/* clear the penalty */
-		sprintf(msg, "%s penalty cleared", car->_name);
-		ReRaceMsgSet(ReInfo, msg, 5);
-		penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
-		GF_TAILQ_REMOVE(&(car->_penaltyList), penalty, link);
-		FREEZ(penalty);
-	    }
-	    rules->ruleState = 0;
-	} else {
-	    /* went out of the pit lane illegally... */
-	    /* it's a new stop and go... */
-	    if (!(rules->ruleState & RM_PNST_STNGO)) {
-	    	reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
-		rules->ruleState = RM_PNST_STNGO;
-	    }
-	}
+		
+	// 5) Still crossing pit lane exit (probably a long PITEND segment) : Nothing bad.
     } else if (seg->raceInfo & TR_PITEND) {
-	rules->ruleState = 0;
+
+		rules->ruleState = 0;
+		
+	// 6) Entering the pits at a wrong place, add new stop and go penalty if possible.
     } else if (seg->raceInfo & TR_PIT) {
-	/* entrered the pits not from the pit entry... */
-	/* it's a new stop and go... */
-	if (!(rules->ruleState & RM_PNST_STNGO)) {
-	    reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
-	    rules->ruleState = RM_PNST_STNGO;
-	}
+		//GfLogDebug("%s entering pit lane by a side (bad).\n", car->_name);
+		if (!(rules->ruleState & RM_PNST_STOPANDGO)) {
+			reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
+			rules->ruleState = RM_PNST_STOPANDGO;
+			GfLogInfo("%s got a Stop And Go penalty (went in the pits at a wrong place).\n",
+					  car->_name);
+		}
     }
 
+	// 7) If too fast in a speed limited section, add new drive through penalty if possible.
     if (seg->raceInfo & TR_SPEEDLIMIT) {
-	if (!(rules->ruleState & (RM_PNST_SPD | RM_PNST_STNGO)) && (car->_speed_x > track->pits.speedLimit)) {
-	    rules->ruleState |= RM_PNST_SPD;
-	    reCarsAddPenalty(car, RM_PENALTY_DRIVETHROUGH);
-	}
+		if (!(rules->ruleState & (RM_PNST_OVERSPEED | RM_PNST_STOPANDGO))
+			&& car->_speed_x > track->pits.speedLimit) {
+			rules->ruleState |= RM_PNST_OVERSPEED;
+			reCarsAddPenalty(car, RM_PENALTY_DRIVETHROUGH);
+			GfLogInfo("%s got a Drive Through penalty (too fast in the pits).\n", car->_name);
+		}
     }
 }
 
@@ -269,7 +316,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 	int xx;
 	tTrackSeg *sseg;
 	tdble wseg;
-	static const float color[] = {0.0, 0.0, 1.0, 1.0};
+	static const float ctrlMsgColor[] = {0.0, 0.0, 1.0, 1.0};
 	tSituation *s = ReInfo->s;
 	
 	tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
@@ -298,7 +345,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 			} else {
 				sprintf(car->ctrl.msg[2], "Pit Occupied");
 			}
-			memcpy(car->ctrl.msgColor, color, sizeof(car->ctrl.msgColor));
+			memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
 		}
 
 		// If pitting, check if pitting delay over, and end up with pitting process if so.
@@ -561,8 +608,11 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 		info->lapFlag++;
 	}
 	}
-	reCarsRaceRules(car);
-	
+
+	// Apply race rules (penalties if enabled).
+	reCarsApplyRaceRules(car);
+
+	// Update misc car info.
 	info->prevTrkPos = car->_trkPos;
 	car->_curLapTime = s->currentTime - info->sTime;
 	car->_distFromStartLine = car->_trkPos.seg->lgfromstart +

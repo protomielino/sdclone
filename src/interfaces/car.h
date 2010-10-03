@@ -177,8 +177,8 @@ typedef struct {
 #define _deltaBestLapTime	race.deltaBestLapTime
 #define _curLapTime		race.curLapTime
 #define _curSplitTime		race.curSplitTime
-#define _curTime		race.curTime
 #define _lastLapTime		race.lastLapTime
+#define _curTime		race.curTime
 #define _topSpeed		race.topSpeed
 #define _laps			race.laps
 #define _nbPitStops		race.nbPitStops

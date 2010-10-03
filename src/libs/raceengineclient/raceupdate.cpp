@@ -163,19 +163,22 @@ void reSituationUpdater::runOneStep(double deltaTimeIncrement)
 		}
 	}
 
-	if (floor(s->currentTime) == -2.0) {
+	if (s->currentTime >= -2.0 && s->currentTime < deltaTimeIncrement-2.0) {
 		ReRaceMsgSetBig(_pCurrReInfo, "Ready", 1.0);
-	} else if (floor(s->currentTime) == -1.0) {
+		//if (s->currentTime == -2.0)
+			GfLogInfo("Ready.\n");
+	} else if (s->currentTime >= -1.0 && s->currentTime < deltaTimeIncrement-1.0) {
 		ReRaceMsgSetBig(_pCurrReInfo, "Set", 1.0);
-	} else if (floor(s->currentTime) == 0.0) {
+		//if (s->currentTime == -1.0)
+			GfLogInfo("Set.\n");
+	} else if (s->currentTime >= 0.0 && s->currentTime < deltaTimeIncrement) {
 		ReRaceMsgSetBig(_pCurrReInfo, "Go", 1.0);
-		if (s->currentTime==0.0)
-			GfOut("Race start time is %lf\n", GfTimeClock());
+		//if (s->currentTime == 0.0)
+			GfLogInfo("Go.\n");
 	}
 
 	_pCurrReInfo->_reCurTime += deltaTimeIncrement * _pCurrReInfo->_reTimeMult; /* "Real" time */
 	s->currentTime += deltaTimeIncrement; /* Simulated time */
-
 
 	if (s->currentTime < 0) {
 		/* no simu yet */
@@ -577,14 +580,10 @@ void reSituationUpdater::updateCarPitCmd(int nCarIndex, const tCarPitCmd *pPitCm
 	tCarElt* pCurrCar = 0;
 	for (int nCarInd = 0; nCarInd < _pCurrReInfo->s->_ncars; nCarInd++)
 	{
-		//GfLogDebug("  Examining car #%d : d=%s, i=%d\n", nCarInd,
-		//		   _pCurrReInfo->s->cars[nCarInd]->_name,
-		//		   _pCurrReInfo->s->cars[nCarInd]->index);
 		if (_pCurrReInfo->s->cars[nCarInd]->index == nCarIndex)
 		{
 			// Found : update its pit command information from pit menu data.
 			pCurrCar = _pCurrReInfo->s->cars[nCarInd];
-			//GfLogDebug("reSituationUpdater::updateCarPitCmd : Found index=%d\n", pCurrCar->index);
 			pCurrCar->_pitFuel = pPitCmd->fuel;
 			pCurrCar->_pitRepair = pPitCmd->repair;
 			pCurrCar->_pitStopType = pPitCmd->stopType;
