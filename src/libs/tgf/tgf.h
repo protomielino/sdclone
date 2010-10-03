@@ -392,6 +392,7 @@ TGF_API void GfLogTrace(const char *pszFmt, ...);
 TGF_API void GfLogDebug(const char *pszFmt, ...);
 
 TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...);
+TGF_API void GfLogSetFile(const char* pszFileName);
 TGF_API void GfLogSetStream(FILE* fStream);
 TGF_API void GfLogSetLevelThreshold(int nLevel);
 
@@ -406,6 +407,7 @@ static inline void GfLogNothing(const char *pszFmt, ...) {};
 #define GfLogDebug GfLogNothing
 
 static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
+#define GfLogSetFile(pszFileName)
 #define GfLogSetStream(fStream)
 #define GfLogSetLevelThreshold(nLevel)
 

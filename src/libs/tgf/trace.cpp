@@ -67,10 +67,16 @@ gfTraceInit(void)
 
 #ifdef TRACE_OUT
 
-void GfLogSetStream(FILE* fStream)
+TGF_API void GfLogSetStream(FILE* fStream)
 {
     if (fStream)
     {
+		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+		fprintf(gfLogStream ? gfLogStream : stderr,
+				"%s Info    New trace stream : %p\n", pszClock, fStream);
+		free(pszClock);
+		fflush(gfLogStream ? gfLogStream : stderr);
+
 		// Close previous stream if needed.
 		if (gfLogStream && gfLogStream != stderr && gfLogStream != stdout)
 			fclose(gfLogStream);
@@ -78,8 +84,14 @@ void GfLogSetStream(FILE* fStream)
 		gfLogStream = fStream;
     }
     else
+	{
+		const int nErrNo = errno;
+		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
 		fprintf(gfLogStream ? gfLogStream : stderr, 
-				"Error   GfLogSetStream : %s", strerror(errno));
+				"%s Error   GfLogSetStream : Null stream (%s)\n", pszClock, strerror(nErrNo));
+		free(pszClock);
+		fflush(gfLogStream ? gfLogStream : stderr);
+	}
 	
     if (gfLogStream)
     {
@@ -102,7 +114,32 @@ void GfLogSetStream(FILE* fStream)
     }
 }
 
-void GfLogSetLevelThreshold(int nLevel)
+TGF_API void GfLogSetFile(const char* pszFileName)
+{
+	FILE* fStream = fopen(pszFileName, "w");
+    if (fStream)
+	{
+		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+		fprintf(gfLogStream ? gfLogStream : stderr,
+				"%s Info    New trace file : %s\n", pszClock, pszFileName);
+		free(pszClock);
+		fflush(gfLogStream ? gfLogStream : stderr);
+		
+		GfLogSetStream(fStream);
+	}
+	else
+	{
+		const int nErrNo = errno;
+		char* pszClock = GfTime2Str(GfTimeClock(), 0, true, 3);
+		fprintf(gfLogStream ? gfLogStream : stderr, 
+				"%s Error   GfLogSetFile(%s) : Failed to open file for writing (%s)\n",
+				pszClock, pszFileName, strerror(nErrNo));
+		free(pszClock);
+		fflush(gfLogStream ? gfLogStream : stderr);
+	}
+}
+
+TGF_API void GfLogSetLevelThreshold(int nLevel)
 {
     gfLogLevelThreshold = nLevel;
 
@@ -122,7 +159,7 @@ void GfLogSetLevelThreshold(int nLevel)
 
 #endif // TRACE_OUT
 
-void GfLogFatal(const char *pszFmt, ...)
+TGF_API void GfLogFatal(const char *pszFmt, ...)
 {
 #ifdef TRACE_OUT
     if (gfLogLevelThreshold >= gfLogFatal)

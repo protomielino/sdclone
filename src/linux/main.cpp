@@ -93,7 +93,7 @@ init_args(int argc, char **argv)
                 else if (!strncmp(argv[i], "stdout", 6))
                     GfLogSetStream(stdout);
                 else
-                    GfLogSetStream(fopen(argv[i], "w"));
+                    GfLogSetFile(argv[i]);
         }
 
         // Next arg (even if current not recognized).
