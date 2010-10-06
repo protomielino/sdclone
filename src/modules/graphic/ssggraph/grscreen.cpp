@@ -118,6 +118,16 @@ void cGrScreen::activate(int x, int y, int w, int h)
 	scrw = w;
 	scrh = h;
 	
+	if (boardCam) {
+		// Boards assume a fixed geometry of 800x600
+		int overscan = (((float) scrw * 600 / (float) scrh) - 800) / 2;
+
+		if (overscan < 0) overscan = 0;
+
+		delete boardCam;
+		boardCam = new cGrOrthoCamera(this, -overscan, 800 + overscan, 0, 600);
+	}
+
 	if (mirrorCam) {
 		mirrorCam->setViewport (scrx, scry, scrw, scrh);
 		mirrorCam->setPos (scrx + scrw / 4, scry +  5 * scrh / 6 - scrh / 10, scrw / 2, scrh / 6);
@@ -433,7 +443,12 @@ void cGrScreen::initCams(tSituation *s)
 	}
 	
 	if (boardCam == NULL) {
-		boardCam = new cGrOrthoCamera(this,0, grWinw*600/grWinh, 0, 600);
+		// Boards assume a fixed geometry of 800x600
+		int overscan = (((float) scrw * 600 / (float) scrh) - 800) / 2;
+
+		if (overscan < 0) overscan = 0;
+
+		boardCam = new cGrOrthoCamera(this, -overscan, 800 + overscan, 0, 600);
 	}
 	
 	if (bgCam == NULL) {

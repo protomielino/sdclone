@@ -48,7 +48,7 @@ static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
 #define NB_DEBUG  3
 
 static const int  Winx  = 0;
-static       int  Winw  = 800;
+static const int  Winw  = 800;
 static const int  Winy  = 0;
 static const int  Winh  = 600;
 
@@ -64,7 +64,6 @@ static string st; //This is the line we will display in the bottom
 cGrBoard::cGrBoard (int myid) {
   id = myid;
   trackMap = NULL;
-  Winw = grWinw*600/grWinh;
 }
 
 
