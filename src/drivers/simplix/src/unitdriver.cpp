@@ -612,8 +612,8 @@ void TDriver::InitTrack
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
   Handle = TUtils::MergeParamFile(Handle,Buf);
-  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__BRAKE,NULL,1.0f);
-  double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__MU,NULL,1.0f);
+  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__BRAKE,NULL,0.8f);
+  double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__MU,NULL,0.95f);
 
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
@@ -1636,6 +1636,9 @@ void TDriver::Propagation(int lap)
   if (Param.Tmp.Needed() || ((oLastLap > 0) && (oLastLap < 5) && (oLastLap != lap)))
   {
 	//GfOut("\n\n\nPropagation\n\n\n");
+    if (oLastLap > 5)
+      TDriver::Learning = false;
+
 	Param.Update();
 
 	for (int I = 0; I < NBRRL; I++)
@@ -2373,7 +2376,8 @@ void TDriver::BrakingForceRegulator()
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
-  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
+//  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
+  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
 		  oLastPosIdx = PosIdx;
 	    }
   	  }
@@ -2440,7 +2444,8 @@ void TDriver::BrakingForceRegulatorAvoid()
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
-  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
+//  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
+  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
   		  oLastPosIdx = PosIdx;
 	    }
 	  }
@@ -3379,6 +3384,15 @@ void TDriver::SideBorderOuter(float Factor)
 //==========================================================================*
 
 //==========================================================================*
+// Calculate the friction
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction(const double Crv)
+{
+    return (this->*CalcFrictionFoo)(Crv);
+}
+//==========================================================================*
+
+//==========================================================================*
 // Calculate the crv
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv(double Crv)
@@ -3574,6 +3588,40 @@ double TDriver::CalcHairpin_simplix_SC(double Crv)
 double TDriver::CalcHairpin_simplix_36GP(double Crv)
 {
   return 1.0;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction_simplix(const double Crv)
+{
+  return 1.0;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction_simplix_TRB1(const double Crv)
+{
+  double AbsCrv = fabs(Crv);
+  double FrictionFactor = 0.95;
+
+  if (AbsCrv > 0.05)
+    FrictionFactor = 0.4;
+  else if (AbsCrv > 0.04)
+    FrictionFactor = 0.6;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.7;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.8;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.85;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.9;
+
+  return FrictionFactor;
 }
 //==========================================================================*
 

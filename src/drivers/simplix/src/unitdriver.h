@@ -413,11 +413,16 @@ private:
 	void ScaleSide(float FactorMu, float FactorBrake);
 	void SideBorderOuter(float Factor);
 
+	double CalcFriction(const double Crv);
 	double CalcCrv(double Crv);
 	double CalcHairpin(double Crv);
 
+	double (TDriver::*CalcFrictionFoo)(const double Crv);
 	double (TDriver::*CalcCrvFoo)(double Crv);
 	double (TDriver::*CalcHairpinFoo)(double Crv);
+
+	double CalcFriction_simplix(double Crv);
+	double CalcFriction_simplix_TRB1(double Crv);
 
 	double CalcCrv_simplix(double Crv);
 	double CalcCrv_simplix_TRB1(double Crv);

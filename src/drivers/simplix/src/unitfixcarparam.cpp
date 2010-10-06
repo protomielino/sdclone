@@ -159,9 +159,34 @@ double TFixCarParam::CalcAcceleration(
 //==========================================================================*
 
 //==========================================================================*
+// Calculate usable friction based on crv
+//--------------------------------------------------------------------------*
+double AdjustFriction(const double Crv)
+{
+  double AbsCrv = fabs(Crv);
+  double FrictionFactor = 0.95;
+
+  if (AbsCrv > 0.05)
+    FrictionFactor = 0.4;
+  else if (AbsCrv > 0.04)
+    FrictionFactor = 0.6;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.7;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.8;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.85;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.9;
+
+  return FrictionFactor;
+}
+//==========================================================================*
+
+//==========================================================================*
 // Calculate decceleration
 //--------------------------------------------------------------------------*
-double	TFixCarParam::CalcBraking
+double TFixCarParam::CalcBraking
   (TCarParam& CarParam,                          // Lane specific parameters
   double Crv0,                                   // Curvature in xy at P0
   double Crvz0,                                  // Curvature in z at P0
@@ -180,6 +205,8 @@ double	TFixCarParam::CalcBraking
 
   double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = -(0.25*Crvz0 + 0.75*Crvz1);
+  //Friction *= AdjustFriction(Crv);
+  Friction *= oDriver->CalcFriction(Crv);
 
   double Mu = Friction * oTyreMu;
   double Mu_F = Mu;
@@ -265,6 +292,12 @@ double	TFixCarParam::CalcBrakingPit
     Friction *= 0.90;
   else
     Friction *= 0.95;
+
+  double Crv = (0.3*Crv0 + 0.9*Crv1);
+  double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
+  //Friction *= AdjustFriction(Crv);
+  Friction *= oDriver->CalcFriction(Crv);
+
   double Mu = Friction * oTyreMu;
   double Mu_F = Mu;
   double Mu_R = Mu;
@@ -276,9 +309,6 @@ double	TFixCarParam::CalcBrakingPit
   // From TORCS:
   double Cd = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
-
-  double Crv = (0.3*Crv0 + 0.9*Crv1);
-  double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
 
   Crv *= oDriver->CalcCrv(fabs(Crv));
 
@@ -367,6 +397,8 @@ double TFixCarParam::CalcMaxSpeed
 	factor = 0.985;
     AbsCrv *= oDriver->CalcCrv(AbsCrv);
   }
+  //Friction *= AdjustFriction(AbsCrv);
+  Friction *= oDriver->CalcFriction(AbsCrv);
 
   double Den;
 
@@ -393,8 +425,8 @@ double TFixCarParam::CalcMaxSpeed
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
     Speed = 112;                                 
 
-  if (Speed < 13.0)
-	  Speed =  13.0;
+  if (Speed < 11.0)
+	  Speed =  11.0;
 
   return Speed;
 }

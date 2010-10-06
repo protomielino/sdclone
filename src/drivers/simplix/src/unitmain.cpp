@@ -8,10 +8,10 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2010.09.25
+// Last changed : 2010.10.05
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.001 
+// Version      : 2.00.002 
 //--------------------------------------------------------------------------*
 // V2.00.01 (Speed Dreams - Career mode):
 // Uses new Speed Dreams Interfaces and was extended to use career mode
@@ -603,6 +603,7 @@ static int InitFuncPt(int Index, void *Pt)
   if (cRobotType == RTYPE_SIMPLIX)
   {
 	  GfOut("#cRobotType == RTYPE_SIMPLIX\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
@@ -611,6 +612,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_TRB1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_TRB1\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
@@ -619,6 +621,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_SC)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_SC\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_SC;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.90f,0.95f);
@@ -627,6 +630,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_36GP)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_36GP\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_36GP;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.85f,0.85f);
@@ -636,6 +640,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_INDY)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_INDY\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_INDY;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_INDY;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
@@ -644,6 +649,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_LS1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_LS1\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_LS1;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_LS1;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
@@ -652,6 +658,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_GP1600)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_GP1600\n");
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_GP1600;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_GP1600;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.85f,0.85f);
