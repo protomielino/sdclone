@@ -83,14 +83,13 @@ typedef struct ScreenSize
 
 TGFCLIENT_API void GfScrInit(int argc, char *argv[]);
 TGFCLIENT_API void GfScrShutdown(void);
-TGFCLIENT_API void *GfScrMenuInit(void *precMenu);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
 TGFCLIENT_API unsigned char* GfScrCaptureAsImage(int* viewW, int *viewH);
 TGFCLIENT_API int GfScrCaptureAsPNG(const char *filename);
-TGFCLIENT_API void GfScrReinit(void*);
 
 TGFCLIENT_API int* GfScrGetPossibleColorDepths(int* pnDepths);
 TGFCLIENT_API tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSizes);
+TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 
 /*****************************
  * GUI interface (low-level) *
@@ -311,6 +310,7 @@ TGFCLIENT_API void GfuiMouseHide(void);
 TGFCLIENT_API void GfuiMouseShow(void);
 TGFCLIENT_API void GfuiMouseToggleVisibility(void);
 TGFCLIENT_API void GfuiMouseSetHWPresent(void);
+TGFCLIENT_API bool GfuiMouseIsHWPresent(void);
 
 
 /* All widgets */

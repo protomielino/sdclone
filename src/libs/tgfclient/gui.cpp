@@ -306,6 +306,17 @@ GfuiMouseSetHWPresent(void)
     GfuiMouseHW = 1;
 }
 
+/** Query if the hardware mouse pointer is activated
+    @ingroup	ctrl
+    @return	<tt>0 ... </tt>Ok
+		<br><tt>-1 .. </tt>Error
+*/
+bool
+GfuiMouseIsHWPresent(void)
+{
+    return GfuiMouseHW != 0;
+}
+
 static void
 gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 {

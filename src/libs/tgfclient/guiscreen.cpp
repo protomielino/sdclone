@@ -23,26 +23,29 @@
     @ingroup	screen
 */
 
-#include <cstdio>
-#include <cstring>
 #ifdef WIN32
-#include <windows.h>
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif
 #endif
-#ifdef HAVE_CONFIG_H
-#include "config.h"
+
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#ifdef WIN32
+#include <windows.h>
+#include <process.h>
+#else
+#include <unistd.h>
 #endif
 
-#include <cmath>
-#ifndef WIN32
-#include <unistd.h>
-#else
-#include <process.h>
-#endif /* WIN32 */
-
 #include <SDL/SDL.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#include "version.h"
+#endif
+
 #include <portability.h>
 
 #include "tgfclient.h"
@@ -50,10 +53,7 @@
 
 #include "glfeatures.h"
 
-#ifdef HAVE_CONFIG_H
-#include "version.h"
-#endif
-
+// The screen properties.
 static int GfScrWidth;
 static int GfScrHeight;
 static int GfViewWidth;
@@ -61,8 +61,8 @@ static int GfViewHeight;
 static int GfScrCenX;
 static int GfScrCenY;
 
+// The screen surface.
 SDL_Surface *ScreenSurface = NULL;
-static void	*scrHandle = NULL;
 
 /* Default list of screen sizes ("resolutions") in case
    something went wrong during hardware / driver capabilities detection */
@@ -111,35 +111,17 @@ static tScreenSize ADefScreenSizes[] =
 };
 static const int NDefScreenSizes = sizeof(ADefScreenSizes) / sizeof(ADefScreenSizes[0]);
 
-static tScreenSize* AScreenSizes = 0;
-static int NScreenSizes = 0;
-
-static const char* ADisplayModes[] = { "Full-screen", "Windowed" };
-static const int NDisplayModes = sizeof(ADisplayModes) / sizeof(ADisplayModes[0]);
-
-static const char* AVideoInitModes[] = { "Compatible", "Best possible" };
-static const int NVideoInitModes = sizeof(AVideoInitModes) / sizeof(AVideoInitModes[0]);
-
-static int* AColorDepths = 0;
-static int NColorDepths = 0;
-
-static int NCurScreenSize = 0;
-static int NCurDisplayMode = 0;
-static int NCurColorDepth = 0;
-static int NCurVideoInitMode = 0;
-
-static int	NCurMaxFreq = 75;
-
-static int ScreenSizeLabelId;
-static int ColorDepthLabelId;
-static int DisplayModeLabelId;
-static int VideoInitModeLabelId;
-#ifdef WIN32
-static int MaxFreqEditId;
-#endif
-
-static void	*paramHdle;
-
+/** Get the default / fallback screen / windows sizes (pixels).
+    @ingroup	screen
+    @param	pnSizes	Address of number of default sizes (output).
+    @return	Array of detected possible sizes (static data, never free).
+ */
+tScreenSize* GfScrGetDefaultSizes(int* pnSizes)
+{
+	*pnSizes = NDefScreenSizes;
+	
+	return ADefScreenSizes;
+}
 
 /** Get the possible screen / windows sizes (pixels) for the given color depth and display mode.
     @ingroup	screen
@@ -147,6 +129,7 @@ static void	*paramHdle;
     @param	bFullScreen	Requested display mode : full-screeen mode if true, windowed otherwise.
     @param	pnSizes	Address of number of detected possible sizes (output) (-1 if any size is possible).
     @return	Array of detected possible sizes (allocated on the heap, must use free at the end), or 0 if no detected possible size, or -1 if any size is possible.
+	@note   The vertical refresh rate is not taken into account as a parameter for detection here, due to SDL API not supporting this ; fortunately, when selecting a given video mode, SDL ensures to (silently) select a safe refresh rate for the selected mode, which may be of some importantce especially in full-screen modes.
  */
 tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSizes)
 {
@@ -365,11 +348,6 @@ void GfScrInit(int argc, char *argv[])
 	//GfLogTrace("  Total video memory    : %u Kb\n", sdlVideoInfo->video_mem);
 	GfLogTrace("Maximum pixel depth : %d bits\n", sdlVideoInfo->vfmt->BitsPerPixel);
 
-	// Query supported color depths.
-	if (AColorDepths)
-		free(AColorDepths);
-	AColorDepths = GfScrGetPossibleColorDepths(&NColorDepths);
-	
 	// Get graphical settings from config file.
     sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
     handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
@@ -557,17 +535,6 @@ void GfScrInit(int argc, char *argv[])
 */
 void GfScrShutdown(void)
 {
-	if (AColorDepths)
-	{
-		free(AColorDepths);
-		AColorDepths = 0;
-	}
-	
-	if (AScreenSizes && AScreenSizes != ADefScreenSizes)
-	{
-		free(AScreenSizes);
-		AScreenSizes = 0;
-	}
 }
 
 
@@ -654,271 +621,3 @@ SDL_Surface* gfScrGetScreenSurface()
 {
 	return ScreenSurface;
 }
-
-// Save graphical settings to XML file.
-static void
-saveParams(void)
-{
-	const int w = AScreenSizes[NCurScreenSize].width;
-	const int h = AScreenSizes[NCurScreenSize].height;
-	
-	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, w);
-	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, h);
-	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, w);
-	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, h);
-	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, AColorDepths[NCurColorDepth]);
-	GfParmSetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, NCurMaxFreq);
-
-	const char* pszVInitMode =
-		(NCurVideoInitMode == 0) ? GFSCR_VAL_VINIT_COMPATIBLE : GFSCR_VAL_VINIT_BEST;
-	GfParmSetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, pszVInitMode);
-
-	GfParmSetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, NCurDisplayMode == 0 ? "yes" : "no");
-	
-	GfParmWriteFile(NULL, paramHdle, "Screen");
-}
-
-// Re-init screen to take new graphical settings into account (implies process restart).
-void
-GfScrReinit(void * /* dummy */)
-{
-    // Force current edit to loose focus (if one has it) and update associated variable.
-    GfuiUnSelectCurrent();
-
-    // Save graphical settings.
-    saveParams();
-
-    // Release screen allocated resources.
-    GfScrShutdown();
-
-    // Restart the game.
-	GfRestart(GfuiMouseHW != 0, GfglIsMultiTexturingEnabled());
-}
-
-static void
-updateLabelText(void)
-{
-	char buf[32];
-	
-	sprintf(buf, "%dx%d", AScreenSizes[NCurScreenSize].width, AScreenSizes[NCurScreenSize].height);
-    GfuiLabelSetText(scrHandle, ScreenSizeLabelId, buf);
-	
-	sprintf(buf, "%d", AColorDepths[NCurColorDepth]);
-    GfuiLabelSetText(scrHandle, ColorDepthLabelId, buf);
-	
-    GfuiLabelSetText(scrHandle, DisplayModeLabelId, ADisplayModes[NCurDisplayMode]);
-	
-#ifdef WIN32
-    sprintf(buf, "%d", NCurMaxFreq);
-    GfuiEditboxSetString(scrHandle, MaxFreqEditId, buf);
-#endif
-	
-    GfuiLabelSetText(scrHandle, VideoInitModeLabelId, AVideoInitModes[NCurVideoInitMode]);
-}
-
-static void
-ResPrevNext(void *vdelta)
-{
-    NCurScreenSize = (NCurScreenSize + (int)(long)vdelta + NScreenSizes) % NScreenSizes;
-
-    updateLabelText();
-}
-
-static void
-updateScreenSizes(int nCurrWidth, int nCurrHeight)
-{
-	// Query possible screen sizes for the current display mode and color depth.
-	if (AScreenSizes && AScreenSizes != ADefScreenSizes)
-		free(AScreenSizes);
-	AScreenSizes = GfScrGetPossibleSizes(AColorDepths[NCurColorDepth],
-										 NCurDisplayMode == 0, &NScreenSizes);
-
-	// If any size is possible :-) or none :-(, use default hard coded list (temporary).
-	if (AScreenSizes == (tScreenSize*)-1 || AScreenSizes == 0)
-	{
-		AScreenSizes = ADefScreenSizes;
-		NScreenSizes = NDefScreenSizes;
-	}
-
-	// Try and find the closest screen size to the current choice in the new list.
-	// 1) Is there an exact match ?
-	NCurScreenSize = -1;
-	for (int nSizeInd = 0; nSizeInd < NScreenSizes; nSizeInd++)
-	{
-		if (nCurrWidth == AScreenSizes[nSizeInd].width
-			&& nCurrHeight == AScreenSizes[nSizeInd].height)
-		{
-			NCurScreenSize = nSizeInd;
-			break;
-		}
-	}
-
-	// 2) Is there an approximative match ?
-	if (NCurScreenSize < 0)
-	{
-		for (int nSizeInd = 0; nSizeInd < NScreenSizes; nSizeInd++)
-		{
-			if (nCurrWidth <= AScreenSizes[nSizeInd].width
-				&& nCurrHeight <= AScreenSizes[nSizeInd].height)
-			{
-				NCurScreenSize = nSizeInd;
-				break;
-			}
-		}
-	}
-
-	// 3) Not found : the closest is the biggest.
-	if (NCurScreenSize < 0)
-		NCurScreenSize = NScreenSizes - 1;
-}
-
-static void
-DepthPrevNext(void *vdelta)
-{
-    NCurColorDepth = (NCurColorDepth + (int)(long)vdelta + NColorDepths) % NColorDepths;
-
-	updateScreenSizes(AScreenSizes[NCurScreenSize].width, AScreenSizes[NCurScreenSize].height);
-	
-    updateLabelText();
-}
-
-static void
-ModePrevNext(void *vdelta)
-{
-    NCurDisplayMode = (NCurDisplayMode + (int)(long)vdelta + NDisplayModes) % NDisplayModes;
-
-	updateScreenSizes(AScreenSizes[NCurScreenSize].width, AScreenSizes[NCurScreenSize].height);
-	
-    updateLabelText();
-}
-
-
-static void
-VInitPrevNext(void *vdelta)
-{
-    NCurVideoInitMode = (NCurVideoInitMode + (int)(long)vdelta + NVideoInitModes) % NVideoInitModes;
-
-	updateLabelText();
-}
-
-
-static void
-loadParams(void)
-{
-	int w, h, bpp;
-	int i;
-
-	// Color depth (bits per pixel).
-	bpp = (int)GfParmGetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_BPP, NULL, AColorDepths[NColorDepths-1]);
-	NCurColorDepth = NColorDepths-1; // Defaults to max possible supported value.
-	for (i = 0; i < NColorDepths; i++) {
-		if (bpp <= AColorDepths[i]) {
-			NCurColorDepth = i;
-			break;
-		}
-	}
-
-	// Display mode : Full-screen or Windowed.
-	if (!strcmp("yes", GfParmGetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, "no"))) {
-		NCurDisplayMode = 0;
-	} else {
-		NCurDisplayMode = 1;
-	}
-
-	// Screen / window size.
-	w = (int)GfParmGetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_X, NULL, 640);
-	h = (int)GfParmGetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_Y, NULL, 480);
-	
-	updateScreenSizes(w, h);
-
-	// Video initialization mode : Compatible or Best.
-	NCurVideoInitMode = 0;
-	const char *tmp = GfParmGetStr(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
-	if (strcmp(GFSCR_VAL_VINIT_COMPATIBLE, tmp) == 0) {
-		NCurVideoInitMode = 0;
-	} else {
-		NCurVideoInitMode = 1;
-	}
-
-	// Max. refresh rate (Hz).
-	NCurMaxFreq = (int)GfParmGetNum(paramHdle, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, NCurMaxFreq);
-}
-
-#ifdef WIN32
-static void
-ChangeMaxFreq(void * /* dummy */)
-{
-	char buf[32];
-    char	*val;
-    
-    val = GfuiEditboxGetString(scrHandle, MaxFreqEditId);
-    NCurMaxFreq = (int)strtol(val, (char **)NULL, 0);
-    sprintf(buf, "%d", NCurMaxFreq);
-    GfuiEditboxSetString(scrHandle, MaxFreqEditId, buf);
-}
-#endif
-
-static void
-onActivate(void * /* dummy */)
-{
-    loadParams();
-    updateLabelText();
-}
-
-
-/** Create and activate the video options menu screen.
-    @ingroup	screen
-    @param	precMenu	previous menu to return to
-*/
-void *
-GfScrMenuInit(void *prevMenu)
-{
-	char buf[512];
-
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
-	paramHdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	
-	if (scrHandle)
-		return scrHandle;
-
-	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-	void *param = LoadMenuXML("screenconfigmenu.xml");
-	CreateStaticControls(param,scrHandle);
-
-	CreateButtonControl(scrHandle,param,"resleftarrow",(void*)-1,ResPrevNext);
-	CreateButtonControl(scrHandle,param,"resrightarrow",(void*)1,ResPrevNext);
-	ScreenSizeLabelId = CreateLabelControl(scrHandle,param,"reslabel");
-
-	CreateButtonControl(scrHandle, param, "accept", NULL, GfScrReinit);
-	CreateButtonControl(scrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
-
-	CreateButtonControl(scrHandle,param,"depthleftarrow",(void*)-1,DepthPrevNext);
-	CreateButtonControl(scrHandle,param,"depthrightarrow",(void*)1,DepthPrevNext);
-	ColorDepthLabelId = CreateLabelControl(scrHandle,param,"depthlabel");
-
-	CreateButtonControl(scrHandle,param,"displeftarrow",(void*)-1,ModePrevNext);
-	CreateButtonControl(scrHandle,param,"disprightarrow",(void*)1,ModePrevNext);
-	DisplayModeLabelId = CreateLabelControl(scrHandle,param,"displabel");
-
-#ifdef WIN32
-	CreateLabelControl(scrHandle,param,"maxfreqlabel");
-	MaxFreqEditId = CreateEditControl(scrHandle,param,"freqedit",NULL,NULL,ChangeMaxFreq);
-#endif
-
-	CreateButtonControl(scrHandle,param,"vmleftarrow",(void*)-1, VInitPrevNext);
-	CreateButtonControl(scrHandle,param,"vmrightarrow",(void*)1, VInitPrevNext);
-	VideoInitModeLabelId = CreateLabelControl(scrHandle,param,"vmlabel");
-	GfParmReleaseHandle(param);
-
-	GfuiAddKey(scrHandle, GFUIK_RETURN, "Accept", NULL, GfScrReinit, NULL);
-	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Resolution", (void*)-1, ResPrevNext, NULL);
-	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Resolution", (void*)1, ResPrevNext, NULL);
-	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    
-
-	return scrHandle;
-}
-
-

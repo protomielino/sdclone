@@ -22,6 +22,7 @@
 
 #include <tgfclient.h>
 
+#include <displayconfig.h>
 #include <graphconfig.h>
 #include <openglconfig.h>
 #include <soundconfig.h>
@@ -44,7 +45,7 @@ OptionOptionInit(void *prevMenu)
 
     CreateStaticControls(param,optionHandle);
     
-    CreateButtonControl(optionHandle,param,"display",GfScrMenuInit(optionHandle),GfuiScreenActivate);
+    CreateButtonControl(optionHandle,param,"display",DisplayMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"graphic",GraphMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"opengl",OpenGLMenuInit(optionHandle),GfuiScreenActivate);
     CreateButtonControl(optionHandle,param,"sound",SoundMenuInit(optionHandle),GfuiScreenActivate);
