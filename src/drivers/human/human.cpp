@@ -1118,14 +1118,22 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 				car->_gearCmd--;
 		}
 
-		/* Reverse gear and Neutral gear commands */
-		for (int i = CMD_GEAR_R; i <= CMD_GEAR_N; i++) {
-			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[i].val])
-			    || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[i].val])
-			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].edgeUp))
-			{
-				car->_gearCmd = i - CMD_GEAR_N;
-			}
+		/* Neutral gear command */
+		if ((cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_N].val])
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_N].val])
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_N].val)].edgeUp))
+		{
+			car->_gearCmd = 0;
+		}
+
+		/* Reverse gear command */
+		if ((cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_R].val])
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_R].val])
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_R].val)].edgeUp))
+		{
+			/* Only allow Reverse to be selected at low speed (~40kmph) or from neutral */
+			if (car->_speed_x < 10 || car->_gear == 0) 
+				car->_gearCmd = -1;
 		}
 	}
 
