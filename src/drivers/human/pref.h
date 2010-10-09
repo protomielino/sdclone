@@ -64,6 +64,7 @@ extern const std::string Yn[];
 #define CMD_LIGHT1	16
 #define CMD_CLUTCH	17
 #define CMD_SPDLIM	18
+#define CMD_EBRAKE	19
 
 extern void HmReadPrefs(const int index);
 

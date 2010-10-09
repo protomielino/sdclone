@@ -24,8 +24,8 @@
 */
 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <string>
 
@@ -39,11 +39,11 @@
 #include "mouseconfig.h"
 #include "joystickconfig.h"
 
-static void 	*ScrHandle = NULL;
+static void *ScrHandle = NULL;
 static void	*PrevScrHandle = NULL;
 static void	*PrefHdle = NULL;
 
-static tCtrlMouseInfo	MouseInfo;
+static tCtrlMouseInfo MouseInfo;
 static char	CurrentSection[256];
 
 /* Control command information */
@@ -66,7 +66,8 @@ static tCmdInfo Cmd[] = {
     {HM_ATT_GEAR_3,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {HM_ATT_GEAR_4,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
     {HM_ATT_GEAR_5,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+    {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1}
 };
 
 static const int MaxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
@@ -77,29 +78,29 @@ static const int ICmdNeutralGear = 10;
 typedef struct tCmdDispInfo
 {
     unsigned gearChangeModeMask;
-    int      y;
 } tCmdDispInfo;
 
 static tCmdDispInfo CmdDispInfo[] = {
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 400 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 370 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 340 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 310 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 280 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 250 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 220 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 190 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 160 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 400 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID, 370 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ,                  340 },
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ,                  310 },
-    {                                  GEAR_MODE_GRID, 340 },
-    {                                  GEAR_MODE_GRID, 310 },
-    {                                  GEAR_MODE_GRID, 280 },
-    {                                  GEAR_MODE_GRID, 250 },
-    {                                  GEAR_MODE_GRID, 220 },
-    {                                  GEAR_MODE_GRID, 190 }
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // LEFTSTEER,
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // RIGHTSTEER
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // THROTTLE, 
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // BRAKE,    
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // CLUTCH,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // ABS_CMD,  
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // ASR_CMD,  
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // SPDLIM_CMD
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // LIGHT1_CMD
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // GEAR_R,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }, // GEAR_N,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ,                 }, // DN_SHFT,  
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ,                 }, // UP_SHFT,  
+    {                                  GEAR_MODE_GRID }, // GEAR_1,   
+    {                                  GEAR_MODE_GRID }, // GEAR_2,   
+    {                                  GEAR_MODE_GRID }, // GEAR_3,   
+    {                                  GEAR_MODE_GRID }, // GEAR_4,   
+    {                                  GEAR_MODE_GRID }, // GEAR_5,   
+    {                                  GEAR_MODE_GRID }, // GEAR_6,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID }	 // EBRAKE_CMD
 };
 
 static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER];
@@ -539,7 +540,7 @@ DevCalibrate(void * /* dummy */)
 void *
 ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode)
 {
-    int	x, x2, i;
+    int	i;
 
     ReloadValues = 1;
 
@@ -571,24 +572,14 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     /* Default keyboard shortcuts */
     GfuiMenuDefaultKeysAdd(ScrHandle);
 
-    /* Screen coordinates for labels, buttons, ... */
-    x = 10;
-    x2 = 210;
-
     /* For each control (in Cmd array), create the associated label and editbox */
     for (i = 0; i < MaxCmd; i++) 
     {
-	std::string strCmd = Cmd[i].name;
-	Cmd[i].labelId = CreateLabelControl(ScrHandle,param,strCmd.c_str());
-	std::string strCmdEdit = strCmd+" button";
+	Cmd[i].labelId = CreateLabelControl(ScrHandle,param,Cmd[i].name);
+	std::string strCmdEdit(Cmd[i].name);
+	strCmdEdit += " button";
 	Cmd[i].Id = CreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
-	
-	/* If first column done, change to the second */
-	if (i == MaxCmd / 2 - 1) {
-	    x = 320;
-	    x2 = 220;
 	}
-    }
     
     /* Steer Sensibility label and associated editbox */
     CreateLabelControl(ScrHandle,param,"Steer Sensitivity");

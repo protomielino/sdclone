@@ -397,6 +397,7 @@ typedef struct {
     int		lightCmd;    /**< Lights command */
 #define RM_LIGHT_HEAD1		0x00000001	/**< head light 1 */
 #define RM_LIGHT_HEAD2		0x00000002	/**< head light 2 */
+    int		ebrakeCmd;   /**< Parking/Emergency Brake command */
 } tCarCtrl;
 #define _steerCmd	ctrl.steer
 #define _accelCmd	ctrl.accelCmd
@@ -407,6 +408,7 @@ typedef struct {
 #define _msgCmd		ctrl.msg
 #define _msgColorCmd	ctrl.msgColor
 #define _lightCmd	ctrl.lightCmd
+#define _ebrakeCmd	ctrl.ebrakeCmd
 
 struct RobotItf;
 

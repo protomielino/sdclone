@@ -851,6 +851,18 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	if (car->_clutchCmd != 0.0f)
 		HCtx[idx]->autoClutch = false;
 
+	// Ebrake here so that it can override the clutch control
+	if ((cmd[CMD_EBRAKE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_EBRAKE].val])
+	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_EBRAKE].val])
+	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_EBRAKE].val)].state == GFUI_KEY_DOWN))
+	{
+		car->_ebrakeCmd = 1;
+		if (HCtx[idx]->autoClutch)
+			car->_clutchCmd = 1;
+	} else {
+		car->_ebrakeCmd = 0;
+	}
+
 	switch (cmd[CMD_THROTTLE].type) {
 		case GFCTRL_TYPE_JOY_AXIS:
 			throttle = joyInfo->ax[cmd[CMD_THROTTLE].val];

@@ -63,4 +63,8 @@ SimBrakeSystemUpdate(tCar *car)
     ctrl *= brkSyst->coeff;
     car->wheel[FRNT_RGT].brake.pressure = car->wheel[FRNT_LFT].brake.pressure = ctrl * brkSyst->rep;
     car->wheel[REAR_RGT].brake.pressure = car->wheel[REAR_LFT].brake.pressure = ctrl * (1 - brkSyst->rep);
+
+    if (car->ctrl->ebrakeCmd > 0) {
+        car->wheel[REAR_RGT].brake.pressure = car->wheel[REAR_LFT].brake.pressure = brkSyst->coeff;
+    }
 }

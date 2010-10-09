@@ -460,7 +460,7 @@ void grUpdateCarlight(tCarElt *car,class cGrPerspCamera *curCam, int disp)
 			switch (theCarslight[car->index].lightType[i]) {
 				case LIGHT_TYPE_BRAKE:
 				case LIGHT_TYPE_BRAKE2:
-					if (car->_brakeCmd>0) 
+					if (car->_brakeCmd>0 || car->_ebrakeCmd>0) 
 						DoDraw = true;
 					break;
 				case LIGHT_TYPE_FRONT:
