@@ -641,6 +641,8 @@ initBackground(void) {
 	grFilePath = buf;
 	grGammaValue = 1.8;
 	grMipMap = 0;
+	bool UseEnvPng = false;   // Avoid chrash with missing env.rgb files (i.e. Wheel-1)
+	bool DoNotUseEnv = false; // Avoid chrash with missing env.png
 
 	const tTrackGraphicInfo *graphic = &grTrack->graphic;
 	glClearColor(graphic->bgColor[0], graphic->bgColor[1], graphic->bgColor[2], 1.0);
@@ -909,15 +911,35 @@ initBackground(void) {
 	for (i = 0; i < graphic->envnb; i++) {
 		GfOut("Loading Environment Mapping Image %s\n", graphic->env[i]);
 		envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
+        // Avoid chrash with missing env.rgb files (i.e. Wheel-1)
+		if (envst == NULL) {
+		    GfOut("Try env.png instead\n");
+			envst = (ssgSimpleState*)grSsgLoadTexState("env.png");
+			if (envst == NULL) {
+				GfOut("This will stop displaying graphics!\n");
+				DoNotUseEnv = true;
+				break;
+			}
+			else
+				UseEnvPng = true;
+		}
 		envst->enable(GL_BLEND);
 		grEnvSelector->setStep(i, envst);
 		envst->deRef();
   }//for i
 
   grEnvSelector->selectStep(0); //mandatory !!!
-	grEnvState=(grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
-	grEnvShadowState=(grMultiTexState*)grSsgEnvTexState("envshadow.png");
-	if (grEnvShadowState == NULL) {
+  // Avoid chrash with missing env.rgb files (i.e. Wheel-1)
+  if (UseEnvPng)
+	grEnvState=(grMultiTexState*)grSsgEnvTexState("env.png");
+  else {
+    if (DoNotUseEnv)
+		GfOut("No env.png found!\n");
+	else
+	    grEnvState=(grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
+  }
+  grEnvShadowState=(grMultiTexState*)grSsgEnvTexState("envshadow.png");
+  if (grEnvShadowState == NULL) {
 		ulSetError ( UL_WARNING, "grscene:initBackground Failed to open envshadow.png for reading") ;
 		ulSetError ( UL_WARNING, "        mandatory for top env mapping ") ;
 		ulSetError ( UL_WARNING, "        should be in the .xml !! ") ;
@@ -925,7 +947,7 @@ initBackground(void) {
 		ulSetError ( UL_WARNING, "        c'est pas classe comme sortie, mais ca evite un crash ") ;
 		GfScrShutdown();
 		exit(-1);
-	}//if grEnvShadowState
+  }//if grEnvShadowState
     
   grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.png");
   if(grEnvShadowStateOnCars == NULL)
