@@ -69,7 +69,7 @@ static float color[] = {0.0, 0.0, 1.0, 1.0};
 bool joyPresent = false;
 static tCtrlJoyInfo	*joyInfo = NULL;
 static tCtrlMouseInfo	*mouseInfo = NULL;
-static int masterPlayer = -1;
+static int ControlsUpdaterIndex = -1;
 
 std::vector<tHumanContext*> HCtx;
 
@@ -98,7 +98,7 @@ static tKeyInfo keyInfo[GFUIK_MAX+1];
 static bool firstTime = false;
 static tdble lastKeyUpdate = -10.0;
 
-void	*PrefHdle = NULL;
+void *PrefHdle = NULL;
 
 // Human drivers names.
 static std::vector<std::string> VecNames;
@@ -150,9 +150,12 @@ InitFuncPt(int index, void *pt)
 	tRobotItf *itf = (tRobotItf *)pt;
 	const int idx = index - 1;
 
-	if (masterPlayer == -1)
-		masterPlayer = index;
+	// Choose this driver as the one who will exclusively read the controls state
+	// (if no other was choosen in this race).
+	if (ControlsUpdaterIndex < 0)
+		ControlsUpdaterIndex = index;
 
+	// Initialize mouse and joystick controls backend if not already done.
 	if (!firstTime) {
 		firstTime = true;
 		joyInfo = GfctrlJoyInit();
@@ -569,8 +572,9 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		car->_raceCmd = RM_CMD_PIT_ASKED;
 	}
 
-	// Update the controls only once per period for all the players
-	if (lastKeyUpdate != s->currentTime) {
+	// Update the controls at most once per "robots time slice" (RCM_MAX_DT_ROBOTS s)
+	// (i.e. keyboard/joystick/mouse values read for all players simultaneously).
+	if (lastKeyUpdate != s->currentTime && index == ControlsUpdaterIndex) {
 		updateKeys();
 
 		if (joyPresent) {
