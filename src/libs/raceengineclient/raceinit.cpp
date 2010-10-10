@@ -952,6 +952,7 @@ ReInitTrack(void)
   const char  *trackName;
   const char  *catName;
   const char  *raceName;
+  const char  *cloudA;
 
   //int rain;
 
@@ -977,11 +978,56 @@ ReInitTrack(void)
   sprintf(buf, "Loading track %s", ReInfo->track->name);
   RmLoadingScreenSetText(buf);
 
+  int rain = 0;
+  int cloud = 0;
   int Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
-  int cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
+  //int cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
+  int weather_rain = GfParmGetNum(params, raceName, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0 );
+  switch (weather_rain)
+  {
+  case 1:  
+	  rain = 1;
+	  break;  
+  case 5:	  
+	  rain = 2;
+	  break;
+  case 20:
+	  rain = 3;
+	  break;
+  default:
+	  rain = 0;
+	  break;
+  }
+
+  cloudA = GfParmGetStr(params, raceName, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS );
+  //printf("CloudA = %s", cloudA);
+  
+  if( strcmp( "clear sky", cloudA) == 0)
+  {
+	cloud = 1;
+	//printf(" Cloud type = %d", cloud);
+  }
+  else if( strcmp( "scarce clouds", cloudA) == 0)
+  {
+	cloud = 2;
+	//printf(" Cloud type = %d", cloud);
+  }
+  else if( strcmp( "more clouds", cloudA) == 0)
+  {
+	cloud = 3;
+	//printf(" Cloud type = %d", cloud);
+  }
+  else if( strcmp( "overcast clouds", cloudA) == 0)
+  {
+	cloud = 4;
+	//printf(" Cloud type = %d", cloud);
+  }
+
+  int cloud1 = cloud + rain;
+  //printf (" Cloud init = %d", cloud1);
 
   ReInfo->track->Timeday = Timeday;
-  ReInfo->track->weather = cloud;
+  ReInfo->track->weather = cloud1;
 
   reDumpTrack(ReInfo->track, 0.0);
 

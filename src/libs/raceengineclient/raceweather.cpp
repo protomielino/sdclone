@@ -64,7 +64,7 @@ void ReStartWeather(void)
 		track->weather = cloud; // cloud = random cloud
 
 		resul = 1 + (int)(rand()/(float)RAND_MAX * 99); // probability rain, if result < rain, so it rain
-		printf("Result =  %d - Rain = %d\n", resul, rain);
+		//printf("Result =  %d - Rain = %d\n", resul, rain);
 		if (resul < rain)
 		{
 			problrain = track->rainlprob;
@@ -74,17 +74,17 @@ void ReStartWeather(void)
 			if (resul2 < (problrain + 1)) // if result2 < probability little rain, so rain = little rain
 			{
 				rainbool = RAIN_VAL_LITTLE;
-				printf("RainBool = %d\n", rainbool);
+				//printf("RainBool = %d\n", rainbool);
 			}
 			else if (resul2 < (probrain +1)) // if result2 < probability normal rain, so rain = normal rain
 			{
 				rainbool = RAIN_VAL_NORMAL;
-				printf("RainBool = %d\n", rainbool);
+				//printf("RainBool = %d\n", rainbool);
 			}
 			else // result2 > probability normal rain so rain = Heavy rain
 			{
 				rainbool = RAIN_VAL_HEAVY;
-				printf("RainBool = %d\n", rainbool);
+				//printf("RainBool = %d\n", rainbool);
 			}
 		}
 		else
