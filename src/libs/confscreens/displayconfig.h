@@ -24,6 +24,9 @@
 
 #include "confscreens.h"
 
+// Comment-out to activate max. refresh rate settings.
+#define NoMaxRefreshRate 1
+
 
 class DisplayMenu : public GfuiMenuScreen
 {
@@ -39,8 +42,9 @@ public:
 	void setColorDepthIndex(int nIndex);
 	void setScreenSizeIndex(int nIndex);
 	void setVideoInitMode(EVideoInitMode eMode);
-	void setMaxRefreshRate(int nMaxRefreshRate);
-	
+#ifndef NoMaxRefreshRate
+	void setMaxRefreshRateIndex(int nIndex);
+#endif	
 	void storeSettings() const;
 	void loadSettings();
 
@@ -57,7 +61,9 @@ protected:
 	static void onChangeColorDepth(tComboBoxInfo *pInfo);
 	static void onChangeDisplayMode(tComboBoxInfo *pInfo);
 	static void onChangeVideoInitMode(tComboBoxInfo *pInfo);
-	static void onChangeMaxRefreshRate(void *pDisplayMenu);
+#ifndef NoMaxRefreshRate
+	static void onChangeMaxRefreshRate(tComboBoxInfo *pInfo);
+#endif	
 
 	static void onGarage(void *pDisplayMenu);
 	static void onAccept(void *pDisplayMenu);
@@ -86,8 +92,10 @@ private:
 	//! Currently selected video init. mode.
 	EVideoInitMode _eVideoInitMode;
 
+#ifndef NoMaxRefreshRate
 	//! Currently selected max. refresh rate (Hz).
 	int _nMaxRefreshRate;
+#endif	
 };
 
 CONFSCREENS_API void* DisplayMenuInit(void* pPreviousMenu);

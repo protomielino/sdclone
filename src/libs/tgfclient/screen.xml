@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
 
-<params name="Screen" version="0.522">
+<params name="Screen" version="1.0">
   <section name="Screen Properties">
     <attnum name="x" val="800"/>
     <attnum name="y" val="600"/>
@@ -25,7 +25,6 @@
     <attnum name="gamma" val="2"/>
     <attnum name="window width" val="800"/>
     <attnum name="window height" val="600"/>
-    <attnum name="maximum refresh frequency" val="75"/>
     <attstr name="video mode init" val="compatible"/>
   </section>
 

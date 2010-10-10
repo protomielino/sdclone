@@ -24,6 +24,7 @@
 */
 
 #include <cstdlib>
+#include <sstream>
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_thread.h>
@@ -45,6 +46,9 @@
 #include "racecars.h"
 #include "raceupdate.h"
 
+
+// Comment-out to activate FPS limiter.
+#define NoFPSLimiter 1
 
 // Index of the CPU to use for thread affinity if any and if there are at least 2 ones.
 static const int NGraphicsCPUId = 0;
@@ -156,25 +160,21 @@ void reSituationUpdater::runOneStep(double deltaTimeIncrement)
 
 		if (s->currentTime < -2.0)
 		{
-			char msg[32];
-			int t = -s->currentTime;
-			sprintf(msg,"Race will start in %i seconds", t);
-			ReRaceMsgSetBig(_pCurrReInfo, msg, 1.0);
+			std::ostringstream ossMsg;
+			ossMsg << "Race will start in " << -(int)s->currentTime << " seconds";
+			ReRaceMsgSetBig(_pCurrReInfo, ossMsg.str().c_str(), 1.0);
 		}
 	}
 
-	if (s->currentTime >= -2.0 && s->currentTime < deltaTimeIncrement-2.0) {
+	if (s->currentTime >= -2.0 && s->currentTime < deltaTimeIncrement - 2.0) {
 		ReRaceMsgSetBig(_pCurrReInfo, "Ready", 1.0);
-		//if (s->currentTime == -2.0)
-			GfLogInfo("Ready.\n");
-	} else if (s->currentTime >= -1.0 && s->currentTime < deltaTimeIncrement-1.0) {
+		GfLogInfo("Ready.\n");
+	} else if (s->currentTime >= -1.0 && s->currentTime < deltaTimeIncrement - 1.0) {
 		ReRaceMsgSetBig(_pCurrReInfo, "Set", 1.0);
-		//if (s->currentTime == -1.0)
-			GfLogInfo("Set.\n");
+		GfLogInfo("Set.\n");
 	} else if (s->currentTime >= 0.0 && s->currentTime < deltaTimeIncrement) {
 		ReRaceMsgSetBig(_pCurrReInfo, "Go", 1.0);
-		//if (s->currentTime == 0.0)
-			GfLogInfo("Go.\n");
+		GfLogInfo("Go.\n");
 	}
 
 	_pCurrReInfo->_reCurTime += deltaTimeIncrement * _pCurrReInfo->_reTimeMult; /* "Real" time */
@@ -334,9 +334,10 @@ reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
 
 	// Determine if we have a dedicated separate thread or not
 	// (according to the user settings, and the actual number of CPUs).
-	char path[512];
-	snprintf(path, 512, "%s%s", GetLocalDir(), RACE_ENG_CFG);
-	void *paramHandle = GfParmReadFile(path, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	std::ostringstream ossConfFile;
+	ossConfFile << GetLocalDir() << RACE_ENG_CFG;
+	void *paramHandle =
+		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszMultiThreadScheme =
 		GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, RM_VAL_AUTO);
 
@@ -630,7 +631,15 @@ private:
 	tRmInfo* _pReInfo;
 
 	//! The associated situation updater.
-	reSituationUpdater* _pSituationUpdater;	
+	reSituationUpdater* _pSituationUpdater;
+
+#ifndef NoFPSLimiter
+	//! Forced max. graphics update rate (Hz) (0 means no maximum).
+	double _dMaxRate;
+
+	//! Last time a real graphics update was done (only used if _dMaxRate).
+	double _dLastTime;
+#endif
 };
 
 // The main updater instance (intialized in ReInitUpdaters).
@@ -646,6 +655,21 @@ static void reOnBackFromPitMenu(void *pvcar)
 reMainUpdater::reMainUpdater(reSituationUpdater* pSituUpdater)
 : _pReInfo(pSituUpdater->getPreviousStep()), _pSituationUpdater(pSituUpdater)
 {
+#ifndef NoFPSLimiter
+	// Get the max. refresh rate from screen config params file.
+	std::ostringstream ossConfFile;
+	ossConfFile << GetLocalDir() << GFSCR_CONF_FILE;
+	void* hScrConfParams = GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD);
+	_dLastTime = 0.0;
+	_dMaxRate =
+		GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, 0.0);
+	if (_dMaxRate)
+		GfLogInfo("FPS limiter is on (%d Hz).\n", (int)_dMaxRate);
+	else
+		GfLogInfo("FPS limiter is off.\n");
+	
+	GfParmReleaseHandle(hScrConfParams);
+#endif
 }
 
 void reMainUpdater::initCarGraphics(void)
@@ -679,20 +703,46 @@ int reMainUpdater::operator()(void)
 	
     GfProfStartProfile("ReUpdate");
 	
-    ReInfo->_refreshDisplay = 0;
-	
 	switch (ReInfo->_displayMode)
 	{
 		case RM_DISP_MODE_CAPTURE:
+		case RM_DISP_MODE_NORMAL:
 
-			// Do the frame capture.
+			ReInfo->_refreshDisplay = 1;
+			
+#ifndef NoFPSLimiter
+			// Auto FPS limitation if specified.
+			if (_dMaxRate > 0)
+			{
+				// If too early to refresh graphics, do nothing more than wait a little.
+				const double dCurrentTime = GfTimeClock();
+				if (dCurrentTime < _dLastTime + 1.0 / _dMaxRate)
+				{
+					// Wait a little, to let the CPU take breath.
+					// Note : Theorical resolution is 1ms, but actual one is from far more
+					//        (10-15ms under Windows, even worse under Linux ?)
+					//        which explains a lower than expected actual FPS mean.
+					GfuiSleep(0.001);
+
+					// Only giving back control to the scheduler gives good results
+					// as for the actual mean FPS, but keeps the CPU 100 % (not very cool).
+					//GfuiSleep(0.0);
+			
+					break;
+				}
+
+				// Otherwise, last update time is now : go on with graphics update.
+				_dLastTime = dCurrentTime;
+			}
+#endif
+
+			// Do the frame capture if specified.
 			// Moved here, right before situationUpdater->getPreviousStep,
 			// as we can only capture the already displayed time,
 			// (because the one generated by _reGraphicItf.refresh will be displayed
 			//  _after_ ReUpdate returns : see guieventloop.cpp::GfefPostReDisplay)
-			captureScreen();
-
-		case RM_DISP_MODE_NORMAL:
+			if (ReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
+				captureScreen();
 
 			// Get the situation for the previous step.
 			GfSchedBeginEvent("raceupdate", "situCopy");
@@ -723,9 +773,6 @@ int reMainUpdater::operator()(void)
 				
 				// Update on-screen racing messages for the user.
 				ReRaceMsgUpdate(_pReInfo);
-
-				// And display them if any.
-				GfuiDisplay();
 			}
 
 			// Acknowledge the collision and human pit events occurred
@@ -734,32 +781,38 @@ int reMainUpdater::operator()(void)
 			// (the main thread's job).
 			_pSituationUpdater->acknowledgeEvents();
 			
-			GfelPostRedisplay();	/* Callback -> reDisplay */
 			break;
 	
 		case RM_DISP_MODE_NONE:
 			
+			ReInfo->_refreshDisplay = 0;
+	
 			_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
 			
 			ReRaceMsgUpdate(_pReInfo);
 			
-			if (ReInfo->_refreshDisplay)
-				GfuiDisplay();
-			GfelPostRedisplay();	/* Callback -> reDisplay */
 			break;
 
 		case RM_DISP_MODE_SIMU_SIMU:
 			
+			ReInfo->_refreshDisplay = 0;
+
 			ReSimuSimu();
+
 			ReCarsSortCars();
-			if (ReInfo->_refreshDisplay)
-				GfuiDisplay();
-			GfelPostRedisplay();
+
 			break;
     }
 
 	ReNetworkCheckEndOfRace();
 
+	// Display new frame.
+	if (ReInfo->_refreshDisplay)
+		GfuiDisplay();
+	
+	// Schedule next call by the event loop (through reDisplay).
+	GfelPostRedisplay();
+			
 	GfProfStopProfile("ReUpdate");
 
     return RM_ASYNC;

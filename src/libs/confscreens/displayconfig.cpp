@@ -28,6 +28,10 @@
 // Some consts.
 static const char* ADisplayModes[DisplayMenu::nDisplayModes] = { "Full-screen", "Windowed" };
 static const char* AVideoInitModes[DisplayMenu::nVideoInitModes] = { "Compatible", "Best possible" };
+#ifndef NoMaxRefreshRate
+static const int AMaxRefreshRates[] = { 0, 30, 40, 50, 60, 75, 85, 100, 120, 150, 200 };
+static const int NMaxRefreshRates = sizeof(AMaxRefreshRates) / sizeof(AMaxRefreshRates[0]);
+#endif	
 
 // The unique DisplayMenu instance.
 static DisplayMenu* PDisplayMenu = 0;
@@ -36,8 +40,6 @@ static DisplayMenu* PDisplayMenu = 0;
 // Call-backs ================================================================
 void DisplayMenu::onActivate(void *pDisplayMenu)
 {
-	//GfLogDebug("DisplayMenu::onActivate\n");
-
 	// Get the DisplayMenu instance.
 	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
 
@@ -80,26 +82,15 @@ void DisplayMenu::onChangeVideoInitMode(tComboBoxInfo *pInfo)
 	pMenu->setVideoInitMode((EVideoInitMode)pInfo->nPos);
 }
 
-void DisplayMenu::onChangeMaxRefreshRate(void *pDisplayMenu)
+#ifndef NoMaxRefreshRate
+void DisplayMenu::onChangeMaxRefreshRate(tComboBoxInfo *pInfo)
 {
  	// Get the DisplayMenu instance from call-back user data.
-	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
+	DisplayMenu* pMenu = static_cast<DisplayMenu*>(pInfo->userData);
 
-	// Get current text from the edit control
-    const char* pszRefRate =
-		GfuiEditboxGetString(pMenu->GetMenuHandle(),
-							 pMenu->GetDynamicControlId("MaxRefreshRateEdit"));
-
-	// Try and convert it to a valid max refresh rate.
-	std::istringstream issMaxRefRate(pszRefRate);
-	int nMaxRefreshRate;
-    issMaxRefRate >> nMaxRefreshRate;
-
-	// If succeeded, save it as the new max refresh rate, otherwise, request for reset.
-	if (!issMaxRefRate.good())
-		nMaxRefreshRate = -1;
-	pMenu->setMaxRefreshRate(nMaxRefreshRate);
+	pMenu->setMaxRefreshRateIndex(pInfo->nPos);
 }
+#endif	
 
 // Re-init screen to take new graphical settings into account (implies process restart).
 void DisplayMenu::onAccept(void *pDisplayMenu)
@@ -152,10 +143,17 @@ void DisplayMenu::updateControls()
 	nControlId = GetDynamicControlId("VideoInitModeCombo");
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nControlId, _eVideoInitMode);
 
-	nControlId = GetDynamicControlId("MaxRefreshRateEdit");
-	std::ostringstream ossMaxRefRate;
-	ossMaxRefRate << _nMaxRefreshRate;
-	GfuiEditboxSetString(GetMenuHandle(), nControlId, ossMaxRefRate.str().c_str());
+#ifndef NoMaxRefreshRate
+	nControlId = GetDynamicControlId("MaxRefreshRateCombo");
+	int nMaxRefRateIndex = 0; // Defaults to None.
+	for (int nMaxRefRateInd = 0; nMaxRefRateInd < NMaxRefreshRates; nMaxRefRateInd++)
+		if (_nMaxRefreshRate <= AMaxRefreshRates[nMaxRefRateInd])
+		{
+			nMaxRefRateIndex = nMaxRefRateInd;
+			break;
+		}
+	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nControlId, nMaxRefRateIndex);
+#endif	
 }
 
 void DisplayMenu::loadSettings()
@@ -193,10 +191,12 @@ void DisplayMenu::loadSettings()
 	_eVideoInitMode =
 		strcmp(GFSCR_VAL_VINIT_COMPATIBLE, pszVideoInitMode) ? eBestPossible : eCompatible;
 
+#ifndef NoMaxRefreshRate
 	// Max. refresh rate (Hz).
 	_nMaxRefreshRate =
-		(int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, 60);
-
+		(int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, 0);
+#endif	
+	
 	// Release screen config params file.
 	GfParmReleaseHandle(hScrConfParams);
 }
@@ -216,7 +216,9 @@ void DisplayMenu::storeSettings() const
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, _nColorDepth);
+#ifndef NoMaxRefreshRate
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, _nMaxRefreshRate);
+#endif	
 
 	const char* pszVInitMode =
 		(_eVideoInitMode == eCompatible) ? GFSCR_VAL_VINIT_COMPATIBLE : GFSCR_VAL_VINIT_BEST;
@@ -316,17 +318,12 @@ void DisplayMenu::setVideoInitMode(EVideoInitMode eMode)
 	_eVideoInitMode = eMode;
 }
 
-void DisplayMenu::setMaxRefreshRate(int nMaxRefreshRate)
+#ifndef NoMaxRefreshRate
+void DisplayMenu::setMaxRefreshRateIndex(int nIndex)
 {
-	// Negative value means : "reset to previous".
-	if (nMaxRefreshRate > 0)
-		_nMaxRefreshRate = nMaxRefreshRate;
-	
-	std::ostringstream ossMaxRefRate;
-	ossMaxRefRate << _nMaxRefreshRate;
-	GfuiEditboxSetString(GetMenuHandle(), GetDynamicControlId("MaxRefreshRateEdit"),
-						 ossMaxRefRate.str().c_str());
+	_nMaxRefreshRate = AMaxRefreshRates[nIndex];
 }
+#endif	
 
 DisplayMenu::DisplayMenu()
 : GfuiMenuScreen("displayconfigmenu.xml")
@@ -342,7 +339,9 @@ DisplayMenu::DisplayMenu()
 	_nScreenWidth = 800;
 	_nScreenHeight = 600;
 	_eVideoInitMode = eCompatible;
-	_nMaxRefreshRate = 60;
+#ifndef NoMaxRefreshRate
+	_nMaxRefreshRate = 0;
+#endif	
 }
 
 bool DisplayMenu::initialize(void *pPreviousMenu)
@@ -368,14 +367,10 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	const int nDisplayModeComboId =
 		CreateComboboxControl("DisplayModeCombo", this, onChangeDisplayMode);
 
-	// Temporary inhibited Max refresh rate parameter.
-	// TODO. Given that SDL doesn't support vertical refresh rate selection
-	// (it "automaticaly" takes care of this), the idea I have is to implement
-	// this as a simple passive wait (with dynamic delay) in ReUpdate.
-#if 0
-	CreateLabelControl("MaxRefreshRateLabel");
-	CreateEditControl("MaxRefreshRateEdit", this, 0, onChangeMaxRefreshRate);
-#endif
+#ifndef NoMaxRefreshRate
+	const int nMaxRefRateComboId =
+		CreateComboboxControl("MaxRefreshRateCombo", this, onChangeMaxRefreshRate);
+#endif	
 
 	const int nVideoInitComboId =
 		CreateComboboxControl("VideoInitModeCombo", this, onChangeVideoInitMode);
@@ -413,6 +408,20 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 		GfuiComboboxAddText(GetMenuHandle(), nVideoInitComboId, AVideoInitModes[nVidInitModeInd]);
 
 	// 4) Screen sizes : not constant, as depends on selected color depth and display mode.
+
+#ifndef NoMaxRefreshRate
+	// 5) Max refresh rate combo.
+	std::ostringstream ossMaxRefRate;
+	for (int nRefRateInd = 0; nRefRateInd < NMaxRefreshRates; nRefRateInd++)
+	{
+		ossMaxRefRate.str("");
+		if (AMaxRefreshRates[nRefRateInd] != 0)
+			ossMaxRefRate << AMaxRefreshRates[nRefRateInd];
+		else
+			ossMaxRefRate << "None";
+		GfuiComboboxAddText(GetMenuHandle(), nMaxRefRateComboId, ossMaxRefRate.str().c_str());
+	}
+#endif	
 
 	return true;
 }
