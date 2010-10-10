@@ -543,6 +543,7 @@ typedef struct CarElt
 #define PRM_BRKAREA		"piston area"
 #define PRM_BRKREP		"front-rear brake repartition"
 #define PRM_BRKPRESS		"max pressure"
+#define PRM_EBRKPRESS		"emergency brake pressure"
 
 #define PRM_CX			"Cx"
 #define PRM_FCL			"front Clift"
