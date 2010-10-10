@@ -334,7 +334,8 @@ TDriver::TDriver(int Index):
   oUseAccelOut(false),
   oSideScaleMu(0.97f),
   oSideScaleBrake(0.97f),
-  oSideBorderOuter(0.2f)
+  oSideBorderOuter(0.2f),
+  oXXX(1.0)
 {
 //  GfOut("#TDriver::TDriver() >>>\n");
   int I;
@@ -1224,7 +1225,7 @@ void TDriver::Drive()
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
   //else
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
-  //GfOut("v:(%.1f)%.1f km/h R:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv);
+  //GfOut("v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv);
 }
 //==========================================================================*
 
@@ -3606,22 +3607,63 @@ double TDriver::CalcFriction_simplix(const double Crv)
 double TDriver::CalcFriction_simplix_TRB1(const double Crv)
 {
   double AbsCrv = fabs(Crv);
-  double FrictionFactor = 0.95;
 
-  if (AbsCrv > 0.05)
+  if (AbsCrv > 1/12.0)
+	oXXX = 0.60;
+  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
+	oXXX = 0.65;
+  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
+	oXXX = 0.75;
+  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
+	oXXX = 0.83;
+  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
+	oXXX = 0.90;
+  else
+	oXXX = MIN(1.0,oXXX+0.0003);
+
+  double FrictionFactor = 0.95;
+/**/
+  if (AbsCrv > 0.10)
+    FrictionFactor = 0.46;
+  else if (AbsCrv > 0.05)
+    FrictionFactor = 0.55;
+  else if (AbsCrv > 0.045)
+    FrictionFactor = 0.74;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.83;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.92;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.93;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.95;
+/**/
+/*/
+  if (AbsCrv > 0.10)
+    FrictionFactor = 0.15;
+  else if (AbsCrv > 0.09)
+    FrictionFactor = 0.2;
+  else if (AbsCrv > 0.08)
+    FrictionFactor = 0.25;
+  else if (AbsCrv > 0.07)
+    FrictionFactor = 0.3;
+  else if (AbsCrv > 0.06)
+    FrictionFactor = 0.35;
+  else if (AbsCrv > 0.05)
     FrictionFactor = 0.4;
   else if (AbsCrv > 0.04)
-    FrictionFactor = 0.6;
+    FrictionFactor = 0.55;
   else if (AbsCrv > 0.03)
-    FrictionFactor = 0.7;
+    FrictionFactor = 0.65;
   else if (AbsCrv > 0.02)
     FrictionFactor = 0.8;
   else if (AbsCrv > 0.01)
     FrictionFactor = 0.85;
   else if (AbsCrv > 0.005)
     FrictionFactor = 0.9;
+/*/
 
-  return FrictionFactor;
+  return FrictionFactor * oXXX;
 }
 //==========================================================================*
 

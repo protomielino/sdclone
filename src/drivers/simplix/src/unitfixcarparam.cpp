@@ -166,7 +166,10 @@ double AdjustFriction(const double Crv)
   double AbsCrv = fabs(Crv);
   double FrictionFactor = 0.95;
 
-  if (AbsCrv > 0.05)
+
+  if (AbsCrv > 0.06)
+    FrictionFactor = 0.2;
+  else if (AbsCrv > 0.05)
     FrictionFactor = 0.4;
   else if (AbsCrv > 0.04)
     FrictionFactor = 0.6;
@@ -178,7 +181,30 @@ double AdjustFriction(const double Crv)
     FrictionFactor = 0.85;
   else if (AbsCrv > 0.005)
     FrictionFactor = 0.9;
-
+/*
+  if (AbsCrv > 0.10)
+    FrictionFactor = 0.15;
+  else if (AbsCrv > 0.09)
+    FrictionFactor = 0.2;
+  else if (AbsCrv > 0.08)
+    FrictionFactor = 0.25;
+  else if (AbsCrv > 0.07)
+    FrictionFactor = 0.3;
+  else if (AbsCrv > 0.06)
+    FrictionFactor = 0.35;
+  else if (AbsCrv > 0.05)
+    FrictionFactor = 0.4;
+  else if (AbsCrv > 0.04)
+    FrictionFactor = 0.55;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.65;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.8;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.85;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.9;
+*/
   return FrictionFactor;
 }
 //==========================================================================*

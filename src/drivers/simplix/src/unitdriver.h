@@ -389,6 +389,7 @@ private:
 	float oSideScaleMu;
 	float oSideScaleBrake;
 	float oSideBorderOuter;
+	double oXXX;
 
 	static int NBBOTS;                           // Nbr of cars
 //    static double CurrSimTime;                   // Current simulation time
