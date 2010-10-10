@@ -185,6 +185,30 @@
         <attnum name="blue" val="0.3"></attnum>
       </section>
 
+      <section name="14">
+        <attstr name="name" val="T. Foden"></attstr>
+        <attstr name="desc" val="S: car8a"></attstr>
+        <attstr name="team" val="simplix_trb1c8"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="trb1-vieringe-5rb"></attstr>
+        <attnum name="race number" val="54"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.3"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+      </section>
+
+      <section name="15">
+        <attstr name="name" val="S. ChonChon"></attstr>
+        <attstr name="desc" val="S: car8b"></attstr>
+        <attstr name="team" val="simplix_trb1c8"></attstr>
+        <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
+        <attstr name="car name" val="trb1-vieringe-5rb"></attstr>
+        <attnum name="race number" val="54"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.3"></attnum>
+        <attnum name="blue" val="0.3"></attnum>
+      </section>
+
     </section>
   </section>
 </params>
