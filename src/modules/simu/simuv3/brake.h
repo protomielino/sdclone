@@ -34,6 +34,7 @@ typedef struct
 {
     tdble	rep;	/* front/rear repartition */ 
     tdble	coeff;
+    tdble   ebrake_pressure;
 } tBrakeSyst;
 
 
