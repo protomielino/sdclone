@@ -25,13 +25,13 @@
 
 #include "pit.h"
 
-#include "driver.h"
+#include "kdriver.h"
 
 const double
   Pit::SPEED_LIMIT_MARGIN = 0.5;    // [m/s] safety margin to avoid pit speeding.
 
 
-Pit::Pit(const tSituation * s, Driver * driver, const double pitoffset)
+Pit::Pit(const tSituation * s, KDriver * driver, const double pitoffset)
 {
   m_track = driver->getTrackPtr();
   m_car = driver->getCarPtr();

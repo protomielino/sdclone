@@ -28,7 +28,7 @@
 #include <algorithm>    //for_each
 #include "linalg.h"     //v2d
 #include "util.h"       //Mag, sign, Between*
-#include "driver.h"     //BT_SECT...
+#include "kdriver.h"     //KILO_SECT...
 
 ////////////////////////////////////////////////////////////////////////////
 // Parameters
@@ -481,25 +481,21 @@ void
 LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSituation *s)
 {
   m_dMinCornerInverse =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "MinCornerInverse",
-         (char *) NULL, 0.002);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_MINCORNER, NULL, 0.002);
   m_dCornerSpeed =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "CornerSpeed",
-         (char *) NULL, 15.0);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_CORNERSP, NULL, 15.0);
   m_dAvoidSpeedAdjust =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "AvoidSpeedAdjust",
-         (char *) NULL, 2.0);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_AVOIDSP, NULL, 2.0);
   m_dCornerAccel =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "CornerAccel",
-         (char *) NULL, 1.0);
-  m_dIntMargin = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "IntMargin",
-                  (char *) NULL, 1.0);
-  m_dExtMargin = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "ExtMargin",
-                  (char *) NULL, 2.0);
-  m_dBrakeDelay = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "BrakeDelay",
-                (char *) NULL, 10.0);
-  m_dSecurityRadius = GfParmGetNum(*carParmHandle, BT_SECT_PRIV, "securityradius",
-                (char *) NULL, 100.0);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_CORNERACC, NULL, 1.0);
+  m_dIntMargin =
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_INTMARG, NULL, 1.0);
+  m_dExtMargin =
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_EXTMARG, NULL, 2.0);
+  m_dBrakeDelay =
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_BRDELAY, NULL, 10.0);
+  m_dSecurityRadius =
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_SECRAD, NULL, 100.0);
 
   // split track
   for(int rl = LINE_MID; rl <= LINE_RL; rl++)

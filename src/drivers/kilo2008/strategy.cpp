@@ -25,7 +25,7 @@
 
 #include "strategy.h"
 
-#include "driver.h" //BT_ATT, BT_SECT
+#include "kdriver.h" //KILO_ATT, KILO_SECT
 
 #define MAXFUEL_FOR_THIS_RACE 60.0
 //#define STRAT_DEBUG
@@ -68,16 +68,16 @@ KStrategy::setFuelAtRaceStart(const tTrack * const t,
 {
   // Load and set parameters.
   const double fuel =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_FUELPERLAP,
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_FUELPERLAP,
          NULL, t->length * MAX_FUEL_PER_METER);
   m_expectedfuelperlap = fuel;
   // Pittime is pittime without refuel.
   m_pittime =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_PITTIME, NULL, 25.0);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_PITTIME, NULL, 25.0);
   m_bestlap =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_BESTLAP, NULL, 87.0);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_BESTLAP, NULL, 87.0);
   m_worstlap =
-    GfParmGetNum(*carParmHandle, BT_SECT_PRIV, BT_ATT_WORSTLAP, NULL, 87.0);
+    GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_WORSTLAP, NULL, 87.0);
   //Fuel tank capacity
   const double maxfuel =
     GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0);

@@ -27,7 +27,7 @@
 
 #include <iostream>
 #include <algorithm>
-#include "driver.h"
+#include "kdriver.h"
 #include "util.h"   //Between
 
 // class variables and constants.
@@ -62,7 +62,7 @@ Opponent::Opponent(tCarElt *car, SingleCardata * cardata, int index)
 
 
 void
-Opponent::update(tSituation *s, Driver *driver)
+Opponent::update(tSituation *s, KDriver *driver)
 {
   // Init state of opponent to ignore.
   m_state = OPP_IGNORE;
@@ -204,7 +204,7 @@ Opponent::updateOverlapTimer(tSituation * const s, tCarElt * const mycar)
 /**
  * Returns true, if the other car is our teammate
  * and has significantly less damage
- * (defined in Driver::TEAM_DAMAGE_CHANGE_LEAD)
+ * (defined in KDriver::TEAM_DAMAGE_CHANGE_LEAD)
  *
  * @param mycar pointer to the other car
  * @return true, if the opponent is our teammate
@@ -213,7 +213,7 @@ bool
 Opponent::isQuickerTeammate(tCarElt * const mycar)
 {
   return (isTeammate()
-    && (mycar->_dammage - m_car->_dammage > Driver::TEAM_DAMAGE_CHANGE_LEAD));
+    && (mycar->_dammage - m_car->_dammage > KDriver::TEAM_DAMAGE_CHANGE_LEAD));
 }//isQuickerTeammate
 
 
@@ -226,7 +226,7 @@ Opponent::isQuickerTeammate(tCarElt * const mycar)
  * @param driver Our own robot
  * @param c Opponent car data
  */
-Opponents::Opponents(tSituation *s, Driver *driver, Cardata *c)
+Opponents::Opponents(tSituation *s, KDriver *driver, Cardata *c)
 {
   m_opps = new list<Opponent>;
   const tCarElt *ownCar = driver->getCarPtr();
@@ -259,7 +259,7 @@ Opponents::Opponents(tSituation *s, Driver *driver, Cardata *c)
  * @param   driver  Our own robot
  */
 void
-Opponents::update(tSituation *s, Driver *driver)
+Opponents::update(tSituation *s, KDriver *driver)
 {
   //for_each(begin(), end(), update);
   for(list<Opponent>::iterator it = begin(); it != end(); it++)
@@ -281,7 +281,7 @@ void
 Opponents::setTeamMate(const tCarElt *car)
 {
   string teammate(
-    GfParmGetStr(car->_paramsHandle, BT_SECT_PRIV, BT_ATT_TEAMMATE, ""));
+    GfParmGetStr(car->_paramsHandle, KILO_SECT_PRIV, KILO_ATT_TEAMMATE, ""));
 
   list<Opponent>::iterator found = find(begin(), end(), teammate);
   if(found != end())

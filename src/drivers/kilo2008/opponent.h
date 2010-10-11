@@ -33,7 +33,7 @@
 #include <string>
 using namespace std;
 
-class Driver;
+class KDriver;
 
 #define OPP_IGNORE          0
 #define OPP_FRONT           (1<<0)
@@ -66,7 +66,7 @@ public:
     {return (dMiddle > m_car->_trkPos.toMiddle) ? true : false;}
 
   inline void markAsTeamMate() {m_teammate = true;}
-  void update(tSituation *s, Driver *driver);
+  void update(tSituation *s, KDriver *driver);
 
 private:
   double getDistToSegStart() const;
@@ -104,10 +104,10 @@ private:
 class Opponents
 {
 public:
-  Opponents(tSituation *s, Driver *driver, Cardata *cardata);
+  Opponents(tSituation *s, KDriver *driver, Cardata *cardata);
   ~Opponents() {delete m_opps;}
 
-  void update(tSituation *s, Driver *driver);
+  void update(tSituation *s, KDriver *driver);
   void setTeamMate(const tCarElt *car);
   Opponent *getOppByState(const int state);
   

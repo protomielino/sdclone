@@ -26,16 +26,17 @@
 #ifndef _PIT_H_
 #define _PIT_H_
 
-#include <track.h>      //tTrack
+//#include <track.h>      //tTrack
 #include <raceman.h>    //tSituation
 #include "spline.h"
 
-class Driver;
+class KDriver;
+//class tTrack;
 
 class Pit
 {
 public:
-  Pit(const tSituation * s, Driver * driver, const double PitOffset);
+  Pit(const tSituation * s, KDriver * driver, const double PitOffset);
    ~Pit();
 
   void setPitstop(const bool pitstop);
