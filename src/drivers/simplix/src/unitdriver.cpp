@@ -3465,8 +3465,7 @@ double TDriver::CalcCrv_simplix_INDY(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcCrv_simplix_GP1600(double Crv)
 {
-  return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 
@@ -3569,8 +3568,7 @@ double TDriver::CalcHairpin_simplix_LS1(double Crv)
 //--------------------------------------------------------------------------*
 double TDriver::CalcHairpin_simplix_GP1600(double Crv)
 {
-  return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
+  return 1.0;
 }
 //==========================================================================*
 

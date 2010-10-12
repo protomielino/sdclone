@@ -313,6 +313,9 @@ void SetUpSimplix_gp1600()
 {
 	cRobotType = RTYPE_SIMPLIX_GP1600;
 	SetParameters(NBBOTS, "gp1600");
+    TDriver::AdvancedParameters = true;
+    TDriver::UseBrakeLimit = true;
+    TDriver::Learning = true;
 	//TDriver::UseSCSkilling = true; 
 };
 //==========================================================================*
@@ -404,7 +407,7 @@ int moduleWelcomeV1_00
 	else if (strncmp(RobName,"simplix_LS1",strlen("simplix_LS1")) == 0)
 		SetUpSimplix_ls1();
 	else if (strncmp(RobName,"simplix_gp1600",strlen("simplix_gp1600")) == 0)
-		SetUpSimplix_ls1();
+		SetUpSimplix_gp1600();
 	else 
 		SetUpSimplix();
 
@@ -661,8 +664,8 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_GP1600;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_GP1600;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.85f,0.85f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
 
   return 0;
@@ -972,6 +975,8 @@ extern "C" int simplix_gp1600(tModInfo *ModInfo)
 	  return -1;
 
   SetParameters(10, "gp1600");
+  TDriver::AdvancedParameters = true;
+  TDriver::UseBrakeLimit = true;
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*
