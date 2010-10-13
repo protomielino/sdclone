@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     file          : simplix_gp1600.xml
-    created       : 16 May 2009
-    last modified : 16 May 2009
-    copyright     : (C) 2009 Wolf-Dieter Beelitz
+    created       : 12 Oct 2010
+    last modified : 12 Oct 2010
+    copyright     : (C) 2010 Wolf-Dieter Beelitz
 -->
 
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -41,7 +41,7 @@
         <attnum name="blue" val="1.0"></attnum>
       </section>
 	  
-	  <section name="2">
+      <section name="2">
         <attstr name="name" val="gp1600_C"></attstr>
         <attstr name="desc" val="gp1600_C"></attstr>
         <attstr name="team" val="simplix_gp1600A"></attstr>
@@ -53,7 +53,7 @@
         <attnum name="blue" val="1.0"></attnum>
       </section>
 	  
-	  <section name="3">
+	<section name="3">
         <attstr name="name" val="gp1600_D"></attstr>
         <attstr name="desc" val="gp1600_D"></attstr>
         <attstr name="team" val="simplix_gp1600A"></attstr>
@@ -65,7 +65,7 @@
         <attnum name="blue" val="1.0"></attnum>
       </section>
 	  
-	  <section name="4">
+	<section name="4">
         <attstr name="name" val="gp1600_E"></attstr>
         <attstr name="desc" val="gp1600_E"></attstr>
         <attstr name="team" val="simplix_gp1600B"></attstr>
@@ -77,7 +77,7 @@
         <attnum name="blue" val="1.0"></attnum>
       </section>
 	  
-	  <section name="5">
+	<section name="5">
         <attstr name="name" val="gp1600_F"></attstr>
         <attstr name="desc" val="gp1600_F"></attstr>
         <attstr name="team" val="simplix_gp1600B"></attstr>
@@ -88,8 +88,7 @@
         <attnum name="green" val="0.4"></attnum>
         <attnum name="blue" val="1.0"></attnum>
       </section>
-<!--
--->
+
     </section>
   </section>
 </params>
