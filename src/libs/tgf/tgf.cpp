@@ -21,12 +21,10 @@
 #include <direct.h>
 #include <shlobj.h>
 #else
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h> // getcwd
 #endif
-#include <errno.h>
 
+#include <cerrno>
 #include <ctime>
 #include <cstring>
 
@@ -894,59 +892,4 @@ int GfNearestPow2 (int x)
 	r--;
 
 	return (1 << r);
-}
-
-/** Create a directory and the parents if needed
-    @ingroup	dir
-    @param	dir	full directory path-name
-    @return	GF_DIR_CREATED on success, GF_DIR_CREATION_FAILED otherwise.
- */
-int GfDirCreate(const char *path)
-{
-	if (path == NULL) {
-		return GF_DIR_CREATION_FAILED;
-	}
-
-	static const int nPathBufSize = 1024;
-	char buf[nPathBufSize];
-	strncpy(buf, path, nPathBufSize);
-
-#ifdef WIN32
-
-	// Translate path.
-	static const char cPathSeparator = '\\';
-	int i;
-	for (i = 0; i < nPathBufSize && buf[i] != '\0'; i++)
-		if (buf[i] == '/')
-			buf[i] = cPathSeparator;
-	
-#else // WIN32
-
-// mkdir with u+rwx access grants by default
-#ifdef mkdir
-# undef mkdir
-#endif
-#define mkdir(x) mkdir((x), S_IRWXU)
-
-	static const char cPathSeparator = '/';
-
-#endif // WIN32
-
-	// Try to create the requested folder.
-	int err = mkdir(buf);
-
-	// If this fails, try and create the parent one (recursive), and the retry.
-	if (err == -1 && errno == ENOENT)
-	{
-		// Try the parent one (recursive).
-		char *end = strrchr(buf, cPathSeparator);
-		*end = '\0';
-		GfDirCreate(buf);
-
-		// Retry.
-		*end = cPathSeparator;
-		err = mkdir(buf);
-	}
-	
-	return (err == -1 && errno != EEXIST) ? GF_DIR_CREATION_FAILED : GF_DIR_CREATED;
 }

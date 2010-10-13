@@ -29,93 +29,10 @@
 #include "portability.h"
 
 
-static int gfFileSetupCopyFile( const char* dataLocation, const char* localLocation )
-{
-	FILE *in;
-	FILE *out;
-	char buf[1024];
-	size_t size;
-	int errnum;
-	int res = 0;
-	
-	if( ( in = fopen( dataLocation, "rb" ) ) == NULL )
-	{
-		errnum = errno; // Get errno before it is overwritten by some system call.
-		GfLogError("Could not open %s in 'rb' mode when copying it to %s (%s).\n",
-				   dataLocation, localLocation, strerror(errnum));
-		return -1;
-	}
-	if( ( out = fopen( localLocation, "wb" ) ) == NULL )
-	{
-		errnum = errno; // Get errno before it is overwritten by some system call.
-		GfLogError("Could not open %s in 'w' mode when creating it from %s (%s).\n",
-				   localLocation, dataLocation, strerror(errnum));
-		fclose( in );
-		return -1;
-	}
-
-	GfLogDebug("Updating %s\n", localLocation);
-
-	while( !feof( in ) )
-	{
-		size = fread( buf, 1, 1024, in );
-		if( size > 0 )
-		{
-			fwrite( buf, 1, size, out );
-			if( ferror( out ) )
-			{
-				errnum = errno; // Get errno before it is overwritten by some system call.
-				GfLogError("Failed to write data to %s when creating it from %s (%s).\n",
-						   localLocation, dataLocation, strerror(errnum));
-				res = -1;
-				break;
-			}
-		}
-		else if( ferror( in ) )
-		{
-			errnum = errno; // Get errno before it is overwritten by some system call.
-			GfLogError("Failed to read data from %s when copying it to %s (%s).\n",
-					   dataLocation, localLocation, strerror(errnum));
-			res = -1;
-			break;
-		}
-	}
-
-	fclose( in );
-	fclose( out );
-
-#ifndef WIN32
-	chmod( localLocation, 0640 );
-#endif //!WIN32
-
-	return res;
-}
-
 static void gfFileSetupCopy( char* dataLocation, char* localLocation, int major, int minor, void *localHandle, int count )
 {
-	static const size_t maxBufSizeSize = 1024;
-	char stringBuf[maxBufSizeSize];
-
-	// Create the target local directory (and parents) if not already done
-	// (first, we have to deduce its path from the target file path-name).
-	strncpy(stringBuf, localLocation, strlen(localLocation)+1);
-#ifdef WIN32
-	int i;
-	for (i = 0; i < maxBufSizeSize && stringBuf[i] != '\0'; i++) {
-		if (stringBuf[i] == '\\') {
-			stringBuf[i] = '/';
-		}
-	}
-#endif
-	char *lastSlash = strrchr(stringBuf, '/');
-	if (lastSlash)
-	{
-	  *lastSlash = '\0';
-	  GfDirCreate( stringBuf );
-	}
-
 	// Copy the source file to its target place.
-	if( gfFileSetupCopyFile( dataLocation, localLocation ) != 0 )
+	if( !GfFileCopy( dataLocation, localLocation ) )
 		return;
 
 	// Update local version.xml file.
@@ -130,11 +47,12 @@ static void gfFileSetupCopy( char* dataLocation, char* localLocation, int major,
 		}
 		else
 		{
-			snprintf( stringBuf, 30, "versions/%d", count );
-			GfParmSetStr( localHandle, stringBuf, "Data location", dataLocation );
-			GfParmSetStr( localHandle, stringBuf, "Local location", localLocation );
-			GfParmSetNum( localHandle, stringBuf, "Major version", NULL, (tdble)major );
-			GfParmSetNum( localHandle, stringBuf, "Minor version", NULL, (tdble)minor );
+			char buf[32];
+			snprintf( buf, 30, "versions/%d", count );
+			GfParmSetStr( localHandle, buf, "Data location", dataLocation );
+			GfParmSetStr( localHandle, buf, "Local location", localLocation );
+			GfParmSetNum( localHandle, buf, "Major version", NULL, (tdble)major );
+			GfParmSetNum( localHandle, buf, "Minor version", NULL, (tdble)minor );
 		}
 	}
 }

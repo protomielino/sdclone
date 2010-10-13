@@ -258,6 +258,13 @@ typedef void (*tfDirfreeUserData)(void*);	/**< Function to call for releasing th
 TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool freeName = false, bool freeDispName = false);
 
 
+/************************
+ * File management      *
+ ************************/
+
+TGF_API bool GfFileExists(const char* pszName);
+TGF_API bool GfFileCopy(const char* pszSrcName, const char* pszTgtName);
+
 /**************************************
  * Directory and file path management *
  **************************************/
