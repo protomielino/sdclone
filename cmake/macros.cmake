@@ -922,7 +922,7 @@ MACRO(ADD_SD_DEFINITIONS)
 
 	ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
 
-	SET(OPTION_DEBUG false CACHE BOOL "Enable traces into the console or log file")
+	SET(OPTION_DEBUG true CACHE BOOL "Enable traces into the console or log file")
 
 	SET(OPTION_TRACE_LEVEL "5" CACHE STRING "Trace level integer threshold, only if OPTION_DEBUG (traces with higher level are not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)")
 
