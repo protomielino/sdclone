@@ -77,7 +77,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 		return false;
 	}
 
-	GfLogDebug("Updating %s\n", pszTgtName);
+	GfLogDebug("Copying %s to %s\n", pszSrcName, pszTgtName);
 
 	while( !feof( in ) )
 	{
@@ -111,6 +111,6 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	chmod( pszTgtName, 0640 );
 #endif //!WIN32
 
-	return false;
+	return true;
 }
 
