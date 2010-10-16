@@ -2,17 +2,17 @@
 // unitfixcarparam.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Unchanged parameters of car
 // Unveränderliche Parameter des Fahrzeugs
 //
 // File         : unitfixcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2010.09.25
+// Last changed : 2010.10.16
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.001
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
@@ -115,6 +115,8 @@ class TFixCarParam
 	double oWidth;                               // Width of car (m)
 
 	double oPitBrakeDist;
+	double oPitMinEntrySpeed;                    // Min speed while entry to pitlane
+	double oPitMinExitSpeed;                     // Min speed while exit of pitlane
     PSimpleStrategy oStrategy;                   // Pit strategy
 
 };

@@ -2,17 +2,17 @@
 // unitclothoid.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Lane clothoide like
 // Fahrspur clothoidenï¿½hnlich
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2009.12.06
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.10.16
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -717,7 +717,7 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int K = 0;
   fwrite(&K,sizeof(int),1,F);
 
-  int Version = 110;
+  int Version = 111;
   fwrite(&Version,sizeof(int),1,F);
 
   int N = oTrack->Count();

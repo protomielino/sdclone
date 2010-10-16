@@ -149,9 +149,9 @@ int SimpleStrategy::calcRepair(tCarElt* car, tSituation *s, Opponents *opp, int 
    // how much damage is it safe to fix?
    int safe_damage = 0;
    if (car->_state == RM_CAR_STATE_PIT)
-    lead -= 15.0f + ((track->pits.len * track->pits.nMaxPits) / 20.0) * 0.30;
+    lead -= 15.0f + ((track->pits.len * track->pits.nPitSeg) / 20.0) * 0.30;
    else
-    lead -= 15.0f + (track->pits.len * track->pits.nMaxPits) / 20.0;
+    lead -= 15.0f + (track->pits.len * track->pits.nPitSeg) / 20.0;
 
    if (pit_reason == REASON_NONE)
     lead -= 20.0f;

@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2010.01.30
+// Last changed : 2010.10.16
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -403,6 +403,7 @@ private:
     static bool UseOldSkilling;
     static bool UseSCSkilling;
 	static bool UseBrakeLimit;
+	static bool UseGPBrakeLimit;
 	static float BrakeLimit;
 	static float BrakeLimitScale;
 	static float BrakeLimitBase;
@@ -429,7 +430,7 @@ private:
 	double CalcCrv_simplix_TRB1(double Crv);
 	double CalcCrv_simplix_SC(double Crv);
 	double CalcCrv_simplix_36GP(double Crv);
-	double CalcCrv_simplix_INDY(double Crv);
+	double CalcCrv_simplix_MPA1(double Crv);
 	double CalcCrv_simplix_LS1(double Crv);
 	double CalcCrv_simplix_GP1600(double Crv);
 
@@ -437,7 +438,7 @@ private:
 	double CalcHairpin_simplix_TRB1(double Crv);
 	double CalcHairpin_simplix_SC(double Crv);
 	double CalcHairpin_simplix_36GP(double Crv);
-	double CalcHairpin_simplix_INDY(double Crv);
+	double CalcHairpin_simplix_MPA1(double Crv);
 	double CalcHairpin_simplix_LS1(double Crv);
 	double CalcHairpin_simplix_GP1600(double Crv);
 

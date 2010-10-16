@@ -981,14 +981,11 @@ grCustomizePits(void)
 
 	tTrackPitInfo *pits = &(grTrack->pits);
 	/* draw the pit identification */
-	
-	if ((pits->nPitSeg < 1) && (pits->nMaxPits > 1)) 
-		pits->nPitSeg = pits->nMaxPits;              
 
 	switch (pits->type) {
 		case TR_PIT_ON_TRACK_SIDE:
-			for(int i = 0; i < pits->nPitSeg; i++) {
-				GfOut("Pit Nbr: %d\n", i);        
+			for(int i = 0; i < pits->nMaxPits; i++) {
+				//GfOut("Pit Nbr: %d\n", i);        
 				ssgVertexArray *pit_vtx = new ssgVertexArray(4);
 				ssgTexCoordArray *pit_tex = new ssgTexCoordArray(4);
 				ssgColourArray *pit_clr = new ssgColourArray(1);
@@ -1013,7 +1010,7 @@ grCustomizePits(void)
 				} else {
 					sprintf(buf, "data/textures;data/img;.");
 				}//if pits->driverPits[i].car[0]
-			
+
 				ssgState *st = grSsgLoadTexStateEx("logo.rgb", buf, FALSE, FALSE);
 				((ssgSimpleState*)st)->setShininess(50);
 			

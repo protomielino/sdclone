@@ -5,7 +5,7 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(ROBOT_NAME "simplix")
 
 SET(ROBOT_INTERFACE LEGACY WELCOME
-		    simplix_gp1600 simplix_indy simplix_trb1a simplix_trb1b simplix_sca simplix_scb simplix_36GP simplix_ls1 
+		    simplix_gp1600 simplix_mpa1 simplix_trb1a simplix_trb1b simplix_sca simplix_scb simplix_36GP simplix_ls1 
 		     my_simplix_0 my_simplix_1 my_simplix_2 my_simplix_3 my_simplix_4
 		    my_simplix_5 my_simplix_6 my_simplix_7 my_simplix_8 my_simplix_9)
 
@@ -70,7 +70,7 @@ SET(ROBOT_SOURCES
 	src/unitvec3d.h
 )
 
-SET(ROBOT_CLONES simplix_indy simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_gp1600)
+SET(ROBOT_CLONES simplix_mpa1 simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_gp1600)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME} INTERFACE ${ROBOT_INTERFACE} SOURCES ${ROBOT_SOURCES}
 	     CLONENAMES ${ROBOT_CLONES})
@@ -86,7 +86,7 @@ ROBOT_DATA(NAME ${ROBOT_NAME} SHIPPREFIX src
 
 SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 9 mpa1-murasama tracks)
 
-ROBOT_DATA(NAME simplix_indy SHIPPREFIX simplix_indy
+ROBOT_DATA(NAME simplix_mpa1 SHIPPREFIX simplix_mpa1
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
 SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 6 7 8 9

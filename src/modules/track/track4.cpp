@@ -1461,15 +1461,16 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	pits->type     = TR_PIT_ON_TRACK_SIDE;
 	pits->nPitSeg  = 0;
 	if (pitStart->lgfromstart > pitEnd->lgfromstart) {
-	    pits->nMaxPits = (int)((theTrack->length - pitStart->lgfromstart +
+	    pits->nPitSeg = (int)((theTrack->length - pitStart->lgfromstart +
 				    pitEnd->lgfromstart + pitEnd->length + pits->len / 2.0) / pits->len);
 	} else {
-	    pits->nMaxPits = (int)((pitEnd->lgfromstart + pitEnd->length
+	    pits->nPitSeg = (int)((pitEnd->lgfromstart + pitEnd->length
 				    - pitStart->lgfromstart + pits->len / 2.0) / pits->len);
 	}
-	pits->nMaxPits = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nMaxPits));
-	pits->nPitSeg = pits->nMaxPits;
-	pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
+	pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
+	pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
+	GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
+	GfOut("pits->nMaxPits: %d\n",pits->nMaxPits); 
 
 	//mSeg = pitStart->prev;
 	if (pitBuildingsStart == NULL)
@@ -1478,7 +1479,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	changeSeg = 1;
 	toStart = 0;
 	i = 0; 
-	while (i < pits->nMaxPits) {
+	while (i < pits->nPitSeg) {
 	    pits->driversPits[i].pos.type = TR_LPOS_MAIN;
 	    if (changeSeg) {
 		changeSeg = 0;
@@ -1528,8 +1529,6 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	    }
 	    i++;
 	}
-	//pits->nPitSeg = MIN(pits->nMaxPits,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nMaxPits));
-	//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
 
 	for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
 	    curSeg2 = NULL;
@@ -1538,6 +1537,7 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 		curSeg = mSeg->rside;
 		curSeg2 = curSeg->rside;
 		if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
+ 		    GfOut("mSeg: %s PitBuilding R\n",mSeg->name); 
 		    mSeg->barrier[0]->style = TR_PITBUILDING;
 		}
 		break;
@@ -1545,22 +1545,26 @@ ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 		curSeg = mSeg->lside;
 		curSeg2 = curSeg->lside;
         if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
+ 		    GfOut("mSeg: %s PitBuilding L\n",mSeg->name); 
 		    mSeg->barrier[1]->style = TR_PITBUILDING;
 		}
 		break;
 	    }
 	    if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
 		curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+		GfOut("mSeg: %s SL\n",mSeg->name); 
 		if (curSeg2) {
 		    curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
 		}
 	    } else if (mSeg == pitStart->prev) {
 		curSeg->raceInfo |= TR_PITSTART;
+		GfOut("mSeg: %s PitStart\n",mSeg->name); 
 		if (curSeg2) {
 		    curSeg2->raceInfo |= TR_PITSTART;
 		}
 	    } else if (mSeg == pitEnd->next) {
 		curSeg->raceInfo |= TR_PITEND;
+		GfOut("mSeg: %s PitEnd\n",mSeg->name); 
 		if (curSeg2) {
 		    curSeg2->raceInfo |= TR_PITEND;
 		}

@@ -105,7 +105,7 @@ initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits)
 
     switch (pits->type) {
     case TR_PIT_ON_TRACK_SIDE:
-	pits->driversPits = (tTrackOwnPit*)calloc(pits->nMaxPits, sizeof(tTrackOwnPit));
+	pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
 	pits->driversPitsNb = pits->nPitSeg; 
 	curPos.type = TR_LPOS_MAIN;
 
@@ -255,8 +255,8 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
     printf("version   = %d\n", Track->version);
     printf("length    = %f\n", Track->length);
     printf("width     = %f\n", Track->width);
-    printf("pits max  = %d\n", Track->pits.nMaxPits);
-    printf("pits      = %d\n", Track->pits.nPitSeg);
+    printf("pits segs = %d\n", Track->pits.nPitSeg);
+    printf("pits      = %d\n", Track->pits.nMaxPits);
     printf("XSize     = %f\n", Track->max.x);
     printf("YSize     = %f\n", Track->max.y);
     printf("ZSize     = %f\n", Track->max.z);

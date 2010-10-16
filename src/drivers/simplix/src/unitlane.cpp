@@ -499,7 +499,7 @@ void TLane::PropagatePitBreaking
 	  if (oPathPoints[P].Speed > U)
 		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
 
-	  //GfOut("I:%d P:%d Q:%d ID:%d F:%g U:%g S:%g\n",I,P,Q,ID,Factor,U,oPathPoints[P].Speed);
+	  //GfOut("I:%d P:%d Q:%d F:%g U:%g S:%g\n",I,P,Q,Factor,U,oPathPoints[P].Speed);
 
 	  if (oPathPoints[P].FlyHeight > 0.1)
 		oPathPoints[P].Speed = oPathPoints[Q].Speed;

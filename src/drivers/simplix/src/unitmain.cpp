@@ -2,16 +2,16 @@
 // unitmain.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0/2.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Interface to TORCS
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2010.10.05
+// Last changed : 2010.10.16
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.002 
+// Version      : 3.00.000 
 //--------------------------------------------------------------------------*
 // V2.00.01 (Speed Dreams - Career mode):
 // Uses new Speed Dreams Interfaces and was extended to use career mode
@@ -251,11 +251,11 @@ void SetUpSimplix()
 //==========================================================================*
 
 //==========================================================================*
-// Schismatic entry point for simplix_indy
+// Schismatic entry point for simplix_mpa1
 //--------------------------------------------------------------------------*
-void SetUpSimplix_indy()
+void SetUpSimplix_mpa1()
 {
-	cRobotType = RTYPE_SIMPLIX_INDY;
+	cRobotType = RTYPE_SIMPLIX_MPA1;
 	SetParameters(NBBOTS, "indycar01");
     TDriver::AdvancedParameters = true;
     TDriver::UseBrakeLimit = true;
@@ -294,6 +294,7 @@ void SetUpSimplix_36GP()
   SetParameters(NBBOTS, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
+  TDriver::UseGPBrakeLimit = true;
   TDriver::Learning = true;
 };
 //==========================================================================*
@@ -405,8 +406,8 @@ int moduleWelcomeV1_00
 		SetUpSimplix_sc();
 	else if (strncmp(RobName,"simplix_36GP",strlen("simplix_36GP")) == 0)
 		SetUpSimplix_36GP();
-	else if (strncmp(RobName,"simplix_indy",strlen("simplix_indy")) == 0)
-		SetUpSimplix_indy();
+	else if (strncmp(RobName,"simplix_mpa1",strlen("simplix_mpa1")) == 0)
+		SetUpSimplix_mpa1();
 	else if (strncmp(RobName,"simplix_LS1",strlen("simplix_LS1")) == 0)
 		SetUpSimplix_ls1();
 	else if (strncmp(RobName,"simplix_gp1600",strlen("simplix_gp1600")) == 0)
@@ -643,13 +644,13 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
     //cRobot[Index-IndexOffset]->UseFilterAccel();
   }
-  else if (cRobotType == RTYPE_SIMPLIX_INDY)
+  else if (cRobotType == RTYPE_SIMPLIX_MPA1)
   {
-    GfOut("#cRobotType == RTYPE_SIMPLIX_INDY\n");
+    GfOut("#cRobotType == RTYPE_SIMPLIX_MPA1\n");
 //    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
-    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_INDY;
-    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_INDY;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_MPA1;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_MPA1;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
@@ -870,11 +871,11 @@ extern "C" int simplix(tModInfo *ModInfo)
 //==========================================================================*
 
 //==========================================================================*
-// Schismatic entry point for simplix_indy
+// Schismatic entry point for simplix_mpa1
 //--------------------------------------------------------------------------*
-extern "C" int simplix_indy(tModInfo *ModInfo)
+extern "C" int simplix_mpa1(tModInfo *ModInfo)
 {
-  void *RobotSettings = GetFileHandle("simplix_indy");
+  void *RobotSettings = GetFileHandle("simplix_mpa1");
   if (!RobotSettings)
 	  return -1;
 
@@ -951,6 +952,7 @@ extern "C" int simplix_36GP(tModInfo *ModInfo)
   SetParameters(10, "36GP-alfa12c");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
+  TDriver::UseGPBrakeLimit = true;
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*

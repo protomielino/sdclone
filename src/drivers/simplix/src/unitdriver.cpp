@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.09.25
+// Last changed : 2010.10.16
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.001
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -95,6 +95,7 @@ bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
+bool  TDriver::UseGPBrakeLimit = false;            // Use brake limit for GP36
 float TDriver::BrakeLimit = -6;                    // Brake limit
 float TDriver::BrakeLimitBase = 0.025f;            // Brake limit base
 float TDriver::BrakeLimitScale = 25;               // Brake limit scale
@@ -613,7 +614,7 @@ void TDriver::InitTrack
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
   Handle = TUtils::MergeParamFile(Handle,Buf);
-  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__BRAKE,NULL,0.8f);
+  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__BRAKE,NULL,0.80f);
   double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__MU,NULL,0.95f);
 
   // Override params for car type with params of track
@@ -673,7 +674,7 @@ void TDriver::InitTrack
   Param.Fix.oLength =
 	GfParmGetNum(Handle,SECT_CAR,PRM_LEN,0,4.5);
 
-  if (TDriver::UseBrakeLimit)
+  if ((TDriver::UseBrakeLimit) || (TDriver::UseGPBrakeLimit))
   {
     TDriver::BrakeLimit = 
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BRAKE_LIMIT,0,(float) TDriver::BrakeLimit);
@@ -741,6 +742,14 @@ void TDriver::InitTrack
   Param.Fix.oPitBrakeDist =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_BRAKE_DIST,0,150.0);
   GfOut("#oPitBrakeDist %g\n",Param.Fix.oPitBrakeDist);
+
+  Param.Fix.oPitMinEntrySpeed =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINENTRYSPEED,0,24.5);
+  GfOut("#oPitMinEntrySpeed %g\n",Param.Fix.oPitMinEntrySpeed);
+
+  Param.Fix.oPitMinExitSpeed =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINEXITSPEED,0,24.5);
+  GfOut("#oPitMinExitSpeed %g\n",Param.Fix.oPitMinExitSpeed);
 
   oTestPitStop = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_TEST_STOP,0,0);
@@ -1364,7 +1373,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1390,7 +1399,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1419,7 +1428,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1438,7 +1447,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1454,9 +1463,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
 	}
   }
@@ -1957,7 +1966,7 @@ void TDriver::InitAdaptiveShiftLevels()
   for (I = 0; I < MAX_GEARS; I++)
   {
     oShift[I] = 2000.0;
-    if (TDriver::UseBrakeLimit)
+    if (TDriver::UseGPBrakeLimit)
 	  oGearEff[I] = 0.95;
 	else
 	  oGearEff[I] = 0.95;
@@ -2024,7 +2033,7 @@ void TDriver::InitAdaptiveShiftLevels()
 
   int J;
   for (J = 0; J < CarGearNbr; J++)
-    if (TDriver::UseBrakeLimit)
+    if (TDriver::UseGPBrakeLimit)
       oShift[J] = RevsLimiter * 0.90; //0.87;
 	else
       oShift[J] = RevsLimiter * 0.974;
@@ -3451,9 +3460,9 @@ double TDriver::CalcCrv_simplix_TRB1(double Crv)
 //==========================================================================*
 
 //==========================================================================*
-// simplix_INDY
+// simplix_MPA1
 //--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_INDY(double Crv)
+double TDriver::CalcCrv_simplix_MPA1(double Crv)
 {
   return 1.0;
 }
@@ -3543,9 +3552,9 @@ double TDriver::CalcHairpin_simplix_TRB1(double Crv)
 //==========================================================================*
 
 //==========================================================================*
-// simplix_INDY
+// simplix_MPA1
 //--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_INDY(double Crv)
+double TDriver::CalcHairpin_simplix_MPA1(double Crv)
 {
   return 1.0;
 }

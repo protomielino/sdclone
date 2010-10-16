@@ -2,17 +2,17 @@
 // unitglobal.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Global data types and definitions
 // Globale Datentypen und Definitionen
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2010.03.13
+// Last changed : 2010.10.16
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -96,7 +96,7 @@
 #define RTYPE_SIMPLIX_TRB1 1                     // Robot type simplix_trb1
 #define RTYPE_SIMPLIX_SC 2                       // Robot type simplix_sc
 #define RTYPE_SIMPLIX_36GP 3                     // Robot type simplix_36GP
-#define RTYPE_SIMPLIX_INDY 4					 // Robot type simplix_indy
+#define RTYPE_SIMPLIX_MPA1 4					 // Robot type simplix_mpa1
 #define RTYPE_SIMPLIX_LS1  5					 // Robot type simplix_ls1
 #define RTYPE_SIMPLIX_GP1600 6					 // Robot type simplix_gp1600
 //==========================================================================*
@@ -409,6 +409,8 @@ enum
 #define PRV_PIT_SCALE_BRAKE  "pit scale brake" 
 #define PRV_PIT_STOP_DIST    "pit stop dist"
 #define PRV_PIT_BRAKE_DIST   "pit brake dist"
+#define PRV_PIT_MINENTRYSPEED "pit min entry speed"
+#define PRV_PIT_MINEXITSPEED "pit min exit speed"
 #define PRV_PIT_TEST_STOP    "pit test stop" 
 
 #define PRV_BUMP_MODE        "bump mode"          // bump detection model

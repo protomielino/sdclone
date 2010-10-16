@@ -45,9 +45,7 @@ Pit::Pit(tSituation *s, Driver *driver, float pitoffset)
 		pMID[4].x = pMID[3].x + pitinfo->len;
 		pMID[0].x = pitinfo->pitEntry->lgfromstart + pitoffset;
 		pMID[1].x = pitinfo->pitEntry->lgfromstart + pitinfo->pitEntry->length;
-		//pMID[5].x = pitinfo->pitEnd->lgfromstart + pitinfo->len/2.0f;
-		//pMID[5].x = pMID[3].x + (pitinfo->nMaxPits - car->index) * pitinfo->len;
-		pMID[5].x = pitinfo->pitStart->lgfromstart + pitinfo->nMaxPits * pitinfo->len;
+		pMID[5].x = pitinfo->pitStart->lgfromstart + pitinfo->nPitSeg * pitinfo->len; // Use nPitSeg to respect the pit speed limit on Migrants e.a.
 		pMID[6].x = pitinfo->pitExit->lgfromstart;
 
 		double PitEndOffset = GfParmGetNum( car->_carHandle, SECT_PRIVATE, PRV_PIT_END_OFFSET, (char *)NULL, 0.0 );

@@ -491,6 +491,9 @@ void TTrackDescription::InitTrack
 	  if (PSide == NULL)                         // If NULL no side
 		continue;                                //   go to next segment
 
+	  //if (PSide->raceInfo & TR_SPEEDLIMIT) 
+	  //  GfOut("%s SL\n",Seg->name);
+
 	  double ExtraW = 0;                         // Initialize add. width
 	  double ExtraWpit = 0;                      // Initialize add. width
 	  bool Done = false;                         // Reset flag

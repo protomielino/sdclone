@@ -2,17 +2,17 @@
 // unitpit.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Pit ans pitlane
 // Box und Boxengasse
 //
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.12.20
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2010.10.16
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -320,7 +320,7 @@ void TPitLane::MakePath
 	- F[Index] * Ratio * Param.Pit.oLaneEntryOffset;
   X[4] = X[3] + PitInfo->len                     // Leave own pit here
 	+ F[Index] * Ratio * Param.Pit.oLaneExitOffset;
-  X[5] = X[1] + PitInfo->nMaxPits * PitInfo->len;// End of speed limit
+  X[5] = X[1] + PitInfo->nPitSeg * PitInfo->len; // End of speed limit
   X[6] = PitInfo->pitExit->lgfromstart           // End of pitlane defind by TORCS
 	+ PitInfo->pitExit->length                   //   and own offset alog track
 	+ Param.Pit.oExitLong;
@@ -420,6 +420,9 @@ void TPitLane::MakePath
 	  oPathPoints[I].CalcPt();                   //   from offset
   }
 
+  int IdxStart;
+  int IdxEnd;
+
   if (Param.Pit.oUseSmoothPit > 0)               // Smooth path at pit entry
   {
 	if (FirstPit)
@@ -439,15 +442,33 @@ void TPitLane::MakePath
 	  SavePointsToFile(Filename);
       GfOut("... SmoothPitPath\n");
 	}
-    // Find section with different path at start (different offsets)
-    Idx0 = oTrack->IndexFromPos(oPitEntryPos);
-    while (Dist(oPathPoints[Idx0].Point,BasePath->PathPoints(Idx0).Point) > 0.01)
-      Idx0 = (Idx0 + NSEG - 1) % NSEG;
 
-    // Find section with different path at end (different offsets)
+    // Find section with nearly same path at start (offset differences small)
+    Idx0 = oTrack->IndexFromPos(oPitEntryPos);
+	double Delta;
+	int count = 4;
+    do 
+	{ 
+      Idx0 = (Idx0 + NSEG - 1) % NSEG;
+	  Delta = Dist(oPathPoints[Idx0].Point,BasePath->PathPoints(Idx0).Point);
+	  if (Delta < 0.01)
+	    count--;
+	}
+    while ((Delta > 0.01) || (count > 0));
+    IdxStart = Idx0;
+
+    // Find section with nearly same path at end (offset differences small)
     Idx1 = oTrack->IndexFromPos(oPitExitPos);
-    while (Dist(oPathPoints[Idx1].Point,BasePath->PathPoints(Idx1).Point) > 0.01)
+	count = 4;
+    do 
+	{ 
       Idx1 = (Idx1 + 1) % NSEG;
+	  Delta = Dist(oPathPoints[Idx1].Point,BasePath->PathPoints(Idx1).Point);
+	  if (Delta < 0.01)
+	    count--;
+	}
+    while ((Delta > 0.01) || (count > 0));
+    IdxEnd = Idx0;
   }
 
   // Save the positions of the new pit entry and pit exit
@@ -525,7 +546,7 @@ void TPitLane::MakePath
 
   // Set speed to allow to stop
   float Speed = 4.0;
-  if (TDriver::UseBrakeLimit)
+  if (TDriver::UseGPBrakeLimit)
   {
     Factor = 3.00;
     Speed = 11.0;
@@ -539,7 +560,7 @@ void TPitLane::MakePath
   oPathPoints[Idx0].MaxSpeed = oPathPoints[Idx0].Speed = Speed;
   Idx1 = (Idx0 + NSEG - 1) % NSEG;
 
-  if (!TDriver::UseBrakeLimit)
+  if (!TDriver::UseGPBrakeLimit)
   {
     int N = 6;
     float Delta = 0.75;
@@ -561,6 +582,48 @@ void TPitLane::MakePath
 
   // Calculate braking
   PropagatePitBreaking((tdble) oPitStopPos,(tdble)(Factor * Param.oCarParam.oScaleMu));
+
+  if (Param.Pit.oUseSmoothPit > 0) 
+  {
+    // Overwrite speed calculations before speed limit
+    if (FirstPit)
+	{
+      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 20);
+      if (Idx1 < 0)
+		  Idx1 += NSEG;
+      Idx1 = Idx1 % NSEG;
+	}
+	else
+	{
+      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 5);
+      if (Idx1 < 0)
+		  Idx1 += NSEG;
+      Idx1 = Idx1 % NSEG;
+	}
+
+    // Set min speed before pit lane
+    for (I = IdxStart; I != Idx1; I = (I + 1) % NSEG)
+    {
+      double Speed = MAX(oPathPoints[I].Speed,Param.Fix.oPitMinEntrySpeed);
+      oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = Speed;
+	}
+
+    // Overwrite speed calculations in pitlane after pit
+    Idx0 = (oTrack->IndexFromPos(oPitEndPos) + 1) % NSEG;
+    for (I = oStopIdx + 5; I != Idx0; I = (I + 1) % NSEG)
+    {
+      oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = PitInfo->speedLimit - 0.5;
+	}
+
+    // Overwrite speed calculations after speed limit
+    Idx0 = (oTrack->IndexFromPos(oPitEndPos) + 1) % NSEG;
+    // Set min speed after pit lane
+    for (I = Idx0; I != IdxEnd; I = (I + 1) % NSEG)
+    {
+      double Speed = MAX(Param.Fix.oPitMinExitSpeed,oPathPoints[I].Speed);
+      oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = Speed;
+	}
+  }
 }
 //==========================================================================*
 

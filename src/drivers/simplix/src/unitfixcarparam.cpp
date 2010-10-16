@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.09.25
+// Last changed : 2010.10.16
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.001
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -72,6 +72,8 @@ TFixCarParam::TFixCarParam():
   oTyreMuRear(0),
   oWidth(2.0),
   oPitBrakeDist(150.0),
+  oPitMinEntrySpeed(24.5f),
+  oPitMinExitSpeed(24.5f),
   oStrategy(NULL)
 {
 }
@@ -155,57 +157,6 @@ double TFixCarParam::CalcAcceleration(
 	OldV = V;
   }
   return V;
-}
-//==========================================================================*
-
-//==========================================================================*
-// Calculate usable friction based on crv
-//--------------------------------------------------------------------------*
-double AdjustFriction(const double Crv)
-{
-  double AbsCrv = fabs(Crv);
-  double FrictionFactor = 0.95;
-
-
-  if (AbsCrv > 0.06)
-    FrictionFactor = 0.2;
-  else if (AbsCrv > 0.05)
-    FrictionFactor = 0.4;
-  else if (AbsCrv > 0.04)
-    FrictionFactor = 0.6;
-  else if (AbsCrv > 0.03)
-    FrictionFactor = 0.7;
-  else if (AbsCrv > 0.02)
-    FrictionFactor = 0.8;
-  else if (AbsCrv > 0.01)
-    FrictionFactor = 0.85;
-  else if (AbsCrv > 0.005)
-    FrictionFactor = 0.9;
-/*
-  if (AbsCrv > 0.10)
-    FrictionFactor = 0.15;
-  else if (AbsCrv > 0.09)
-    FrictionFactor = 0.2;
-  else if (AbsCrv > 0.08)
-    FrictionFactor = 0.25;
-  else if (AbsCrv > 0.07)
-    FrictionFactor = 0.3;
-  else if (AbsCrv > 0.06)
-    FrictionFactor = 0.35;
-  else if (AbsCrv > 0.05)
-    FrictionFactor = 0.4;
-  else if (AbsCrv > 0.04)
-    FrictionFactor = 0.55;
-  else if (AbsCrv > 0.03)
-    FrictionFactor = 0.65;
-  else if (AbsCrv > 0.02)
-    FrictionFactor = 0.8;
-  else if (AbsCrv > 0.01)
-    FrictionFactor = 0.85;
-  else if (AbsCrv > 0.005)
-    FrictionFactor = 0.9;
-*/
-  return FrictionFactor;
 }
 //==========================================================================*
 

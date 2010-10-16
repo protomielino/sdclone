@@ -51,7 +51,7 @@ Pit::Pit(const tSituation * s, KDriver * driver, const double pitoffset)
     m_p[4].x = m_p[3].x + m_pitinfo->len;
     m_p[0].x = m_pitinfo->pitEntry->lgfromstart + pitoffset;
     m_p[1].x = m_pitinfo->pitStart->lgfromstart;
-    m_p[5].x = m_pitinfo->pitStart->lgfromstart + m_pitinfo->nMaxPits * m_pitinfo->len;
+    m_p[5].x = m_pitinfo->pitStart->lgfromstart + m_pitinfo->nPitSeg * m_pitinfo->len; // Use nPitSeg to respect the pit speed limit on Migrants e.a.
     m_p[6].x = m_pitinfo->pitExit->lgfromstart;
 
     m_pitentry = m_p[0].x;
