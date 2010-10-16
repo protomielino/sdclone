@@ -212,7 +212,7 @@ static void ReCalculateClassPoints(char const *race)
 	do {
 		snprintf( path2, 1024, "%s/%s", race, RM_SECT_CLASSPOINTS );
 		if (GfParmListSeekFirst( ReInfo->params, path2 ) != 0) {
-			printf( "First not found (path2 = %s)\n", path2 );
+			GfLogDebug( "First not found (path2 = %s)\n", path2 );
 			continue;
 		}
 		do {
@@ -225,8 +225,8 @@ static void ReCalculateClassPoints(char const *race)
 			points = GfParmGetNum (ReInfo->results, path, RE_ATTR_POINTS, NULL, 0);
 			GfParmSetVariable (ReInfo->params, buf, "pos", rank);
 			GfParmSetVariable (ReInfo->params, buf, "cars", count);
-			printf( "pos = %d; count = %d\n", rank, count);
-			printf( "GfParmGetNum (..., %s, %s, NULL, 0)\n", buf, RM_ATTR_POINTS );
+			GfLogDebug( "pos = %d; count = %d\n", rank, count);
+			GfLogDebug( "GfParmGetNum (..., %s, %s, NULL, 0)\n", buf, RM_ATTR_POINTS );
 			points += ( GfParmGetNum (ReInfo->params, buf, RM_ATTR_POINTS, NULL, 0) /
 			            GfParmGetNum (ReInfo->params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, 1) );
 			GfParmRemoveVariable (ReInfo->params, buf, "pos");

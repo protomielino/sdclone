@@ -62,7 +62,7 @@ ReStateManage(void)
 	do {
 		switch (ReInfo->_reState) {
 			case RE_STATE_CONFIG:
-				GfOut("RaceEngine: state = RE_STATE_CONFIG\n");
+				GfLogInfo("%s now in CONFIG state\n", ReInfo->_reName);
 				/* Display the race specific menu */
 				mode = ReRacemanMenu();
 				if (mode & RM_NEXT_STEP) {
@@ -71,7 +71,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_EVENT_INIT:
-				GfOut("RaceEngine: state = RE_STATE_EVENT_INIT\n");
+				GfLogInfo("%s now in EVENT_INIT state\n", ReInfo->_reName);
 				/* Load the event description (track and drivers list) */
 				mode = ReRaceEventInit();
 				if (mode & RM_NEXT_STEP) {
@@ -80,7 +80,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_PRE_RACE:
-				GfOut("RaceEngine: state = RE_STATE_PRE_RACE\n");
+				GfLogInfo("%s now in PRE_RACE state\n", ReInfo->_reName);
 				mode = RePreRace();
 				if (mode & RM_NEXT_RACE) {
 					if (mode & RM_NEXT_STEP) {
@@ -92,7 +92,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_RACE_START:
-				GfOut("RaceEngine: state = RE_STATE_RACE_START\n");
+				GfLogInfo("%s now in RACE_START state\n", ReInfo->_reName);
 
 				mode = ReRaceStart();
 				if (mode & RM_NEXT_STEP) {
@@ -120,7 +120,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_RACE_STOP:
-				GfOut("RaceEngine: state = RE_STATE_RACE_STOP\n");
+				GfLogInfo("%s now in RACE_STOP state\n", ReInfo->_reName);
 				/* Race was interrupted (paused) by the player */
 				mode = ReRaceStop();
 				if (mode & RM_NEXT_STEP) {
@@ -129,7 +129,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_RACE_END:
-				GfOut("RaceEngine: state = RE_STATE_RACE_END\n");
+				GfLogInfo("%s now in RACE_END state\n", ReInfo->_reName);
 				mode = ReRaceEnd();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_POST_RACE;
@@ -139,7 +139,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_POST_RACE:
-				GfOut("RaceEngine: state = RE_STATE_POST_RACE\n");
+				GfLogInfo("%s now in POST_RACE state\n", ReInfo->_reName);
 				mode = RePostRace();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_EVENT_SHUTDOWN;
@@ -149,7 +149,7 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_EVENT_SHUTDOWN:
-				GfOut("RaceEngine: state = RE_STATE_EVENT_SHUTDOWN\n");
+				GfLogInfo("%s now in EVENT_SHUTDOWN state\n", ReInfo->_reName);
 
 				mode = ReEventShutdown();
 				if (mode & RM_NEXT_STEP) {
@@ -161,7 +161,7 @@ ReStateManage(void)
 
 			case RE_STATE_SHUTDOWN:
 			case RE_STATE_ERROR:
-				GfOut("RaceEngine: state = RE_STATE_SHUTDOWN\n");
+				GfLogInfo("%s now in SHUTDOWN state\n", ReInfo->_reName);
 				/* Back to race menu */
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;
