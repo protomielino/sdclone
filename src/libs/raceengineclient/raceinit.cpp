@@ -56,7 +56,12 @@
 static const char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 
 static tModList *reEventModList = 0;
+
 tModList *ReRaceModList = 0;
+
+tFList *ReRacemanList;
+
+
 static char buf[1024];
 static char path[1024];
 
@@ -167,14 +172,17 @@ ReStartNewRace(void * /* dummy */)
 
 
 /* Launch a race manager */
-static void reSelectRaceman(void *params)
+static void reSelectRaceman(void *pRaceman)
 {
   char *s, *e, *m;
 
-  GfTrace("Selecting %s race type\n", GfParmGetName(params));
+  void* params = ((tFList*)pRaceman)->userData;
   
   ReInfo->params = params;
   ReInfo->mainParams = params;
+  ReInfo->_reName = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+
+  // Set new file name.
   FREEZ(ReInfo->_reFilename);
 
   s = GfParmGetFileName(params);
@@ -183,11 +191,12 @@ static void reSelectRaceman(void *params)
   }
 
   e = strstr(s, PARAMEXT);
-  //This line doesn't compile with MSVC
-  //ReInfo->_reFilename = strndup(s, e-s+1);
-  ReInfo->_reFilename = strdup(s);
+  ReInfo->_reFilename = strdup(s); // "strndup(s, e-s+1)" doesn't compile with MSVC.
   ReInfo->_reFilename[e-s] = '\0';
-  ReInfo->_reName = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
+
+  GfLogTrace("%s selected\n", GfParmGetName(params));
+
+  // Enter CONFIG state.
   ReStateApply(RE_STATE_CONFIG);
 }
 
@@ -208,6 +217,24 @@ reRegisterRaceman(tFList *racemanCur)
     }
   }
   racemanCur->dispName = GfParmGetStrNC(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_NAME, 0);
+}
+
+// Update the given raceman infos.
+void
+ReUpdateRaceman(const char* pszFileName, void* params)
+{
+	tFList *racemanCur;
+	racemanCur = ReRacemanList;
+	do {
+		if (strcmp(pszFileName, racemanCur->name))
+		{
+			racemanCur->userData = params;
+			break;
+		}
+		racemanCur = racemanCur->next;
+	} while (racemanCur != ReRacemanList);
+	
+	GfLogError("Failed to update params pointer for %s\n", pszFileName);
 }
 
 /* Sort race managers by priority */
@@ -249,47 +276,33 @@ reSortRacemanList(tFList **racemanList)
 /* Load race managers selection menu */
 void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle)
 {
-  tFList *racemanList;
   tFList *racemanCur;
 
-  racemanList = GfDirGetListFiltered("config/raceman", "", ".xml");
-  if (!racemanList) {
+  // Create racemans list from <user settings>/config/raceman/*.xml folder
+  ReRacemanList = GfDirGetListFiltered("config/raceman", "", PARAMEXT);
+  if (!ReRacemanList) {
     GfError("No race manager available\n");
     return;
   }
 
-  racemanCur = racemanList;
+  // Complete the raceman list : load the race configuration for each raceman.
+  racemanCur = ReRacemanList;
   do {
     reRegisterRaceman(racemanCur);
     racemanCur = racemanCur->next;
-  } while (racemanCur != racemanList);
+  } while (racemanCur != ReRacemanList);
 
-  reSortRacemanList(&racemanList);
+  // Sort the raceman list by priority.
+  reSortRacemanList(&ReRacemanList);
 
-  // Create 1 button for each race type.
+  // Create 1 button for each raceman (= race type).
   // TODO: Use menuXMLDescHandle to get buttons layout info, colors, ...
-  racemanCur = racemanList;
+  racemanCur = ReRacemanList;
   do {
-    CreateButtonControl(menuHandle,menuXMLDescHandle,racemanCur->dispName,racemanCur->userData,reSelectRaceman);
-    /*
-    GfuiMenuButtonCreate(menuHandle,
-             racemanCur->dispName,
-             GfParmGetStr(racemanCur->userData, RM_SECT_HEADER, RM_ATTR_DESCR, ""),
-             racemanCur->userData,
-             reSelectRaceman);
-           */
+    CreateButtonControl(menuHandle, menuXMLDescHandle, racemanCur->dispName,
+						racemanCur, reSelectRaceman);
     racemanCur = racemanCur->next;
-  } while (racemanCur != racemanList);
-
-  // The list contains at least one element, checked above.
-  tFList *rl = racemanList;
-  do {
-    tFList *tmp = rl;
-    rl = rl->next;
-    // Do not free userData and dispName, is in use.
-    freez(tmp->name);
-    free(tmp);
-  } while (rl != racemanList);
+  } while (racemanCur != ReRacemanList);
 }
 
 

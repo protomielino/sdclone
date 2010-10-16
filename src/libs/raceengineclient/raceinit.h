@@ -32,6 +32,7 @@
 extern void ReInit(void);
 extern void ReShutdown(void);
 RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
+extern void ReUpdateRaceman(const char* pszFileName, void* params);
 extern void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle);
 extern int  ReInitCars(void);
 extern int  ReInitTrack(void);

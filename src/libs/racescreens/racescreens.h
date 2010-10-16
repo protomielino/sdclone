@@ -65,7 +65,9 @@ typedef struct RmRaceParam
 #define RM_CONF_DISP_MODE	0x00000002
 } tRmRaceParam;
 
-typedef void (*tfSelectFile) (char *);
+typedef void (*tfSelectFile) (const char *);
+
+enum RmFileSelectMode { RmFSModeLoad, RmFSModeSave };
 
 typedef struct RmFileSelect
 {
@@ -73,6 +75,7 @@ typedef struct RmFileSelect
     const char		*path;
     void        	*prevScreen;
     tfSelectFile	select;
+	RmFileSelectMode mode;
 } tRmFileSelect;
 
 RACESCREENS_API void RmTrackSelect(void * /* vs */);
@@ -117,7 +120,7 @@ RACESCREENS_API void RmRaceParamMenu(void *vrp);
 
 RACESCREENS_API void RmShowStandings(void *prevHdle, tRmInfo *info);
 
-RACESCREENS_API void RmFileSelect(void *vs);
+RACESCREENS_API void* RmFileSelect(void *vs);
 
 RACESCREENS_API int RmGetFeaturesList( void* param );
 

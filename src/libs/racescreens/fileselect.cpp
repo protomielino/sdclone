@@ -2,33 +2,32 @@
 
     file        : fileselect.cpp
     created     : Sun Feb 16 13:09:23 CET 2003
-    copyright   : (C) 2003 by Eric Espi�                        
+    copyright   : (C) 2003 by Eric Espie                       
     email       : eric.espie@torcs.org   
-    version     : $Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $                                  
-
+    version     : $Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs $
  ***************************************************************************/
 
 /***************************************************************************
- *                                                                         *
+ *																		 *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *                                                                         *
+ *   the Free Software Foundation; either version 2 of the License, or	 *
+ *   (at your option) any later version.								   *
+ *																		 *
  ***************************************************************************/
 
 /** @file   
-    		Files manipulation screens.
-    @ingroup	racemantools
-    @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
+			Files open/save menu screens.
+	@ingroup	racemantools
+	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
+	@version	$Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
 */
 
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cstring>
-#include <sys/stat.h>
+//#include <sys/stat.h>
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -39,97 +38,132 @@
 #include "racescreens.h"
 
 static void		*ScrHandle = NULL;
-static int		FileScrollListId;
+
+static int		FilesScrollListId;
+static int		FileNameEditId;
+static int		LoadButtonId;
+static int		SaveButtonId;
+
 static tRmFileSelect	*RmFs;
 static tFList		*FileList = NULL;
 static tFList		*FileSelected;
 
 static void
-rmActivate(void * /* dummy */ )
+rmOnActivate(void * /* dummy */ )
+{
+	// Fill-in the Scroll List with the names of the files in the specified folder.
+	GfuiScrollListClear(ScrHandle, FilesScrollListId);
+	
+	FileList = GfDirGetList(RmFs->path);
+	if (FileList)
+	{
+		tFList	*fileCur;
+
+		FileSelected = FileList;
+		fileCur = FileList;
+		do {
+			fileCur = fileCur->next;
+			GfuiScrollListInsertElement(ScrHandle, FilesScrollListId, fileCur->name, 1000, (void*)fileCur);
+		} while (fileCur != FileList);
+	}
+
+	// Clear the file name edit box.
+    GfuiEditboxSetString(ScrHandle, FileNameEditId, "");
+
+	// Show/Hide Load/Save buttons according to the file selection mode.
+	GfuiVisibilitySet(ScrHandle, LoadButtonId, 
+					  RmFs->mode == RmFSModeLoad ? GFUI_VISIBLE : GFUI_INVISIBLE);
+	GfuiVisibilitySet(ScrHandle, SaveButtonId, 
+					  RmFs->mode == RmFSModeSave ? GFUI_VISIBLE : GFUI_INVISIBLE);
+
+	// Inhibit file name control editbox if only loading.
+	GfuiEnable(ScrHandle, FileNameEditId,
+			   RmFs->mode == RmFSModeLoad ? GFUI_DISABLE : GFUI_ENABLE);
+}
+
+static void
+rmOnClickOnFile(void * /*dummy*/)
+{
+	GfuiScrollListGetSelectedElement(ScrHandle, FilesScrollListId, (void**)&FileSelected);
+    GfuiEditboxSetString(ScrHandle, FileNameEditId, FileSelected->name);
+}
+
+static void
+rmOnChangeFileName(void * /* dummy */)
 {
 }
 
 static void
-rmClickOnFile(void * /*dummy*/)
+rmOnDeactivate(void * /* dummy */ )
 {
-    GfuiScrollListGetSelectedElement(ScrHandle, FileScrollListId, (void**)&FileSelected);
+    // Force current edit to loose focus (if one has it) and update associated variable.
+    GfuiUnSelectCurrent();
+
+	// Free allocated memory for the folder file list.
+	if (FileList) {
+		GfDirFreeList(FileList, NULL);
+		FileList = NULL;
+	}
+
+	// Fire the return screen
+	GfuiScreenActivate(RmFs->prevScreen);
 }
 
 static void
-rmSelect(void * /* dummy */ )
+rmOnSelect(void * /* dummy */ )
 {
-    if (FileList) {
-	RmFs->select(FileSelected->name);
-	GfDirFreeList(FileList, NULL);
-	FileList = NULL;
-    } else {
-	RmFs->select(NULL);
-    }
-}
+    char* pszFileName = GfuiEditboxGetString(ScrHandle, FileNameEditId);
 
-static void
-rmDeactivate(void * /* dummy */ )
-{
-    if (FileList) {
-	GfDirFreeList(FileList, NULL);
-	FileList = NULL;
-    }
-    GfuiScreenActivate(RmFs->prevScreen);
+	if (pszFileName && strlen(pszFileName) > 0)
+	{
+		RmFs->select(pszFileName);
+		rmOnDeactivate(0);
+	}
 }
-
 
 /** File selection
-    @param	vs	Pointer on tRmFileSelect structure (cast to void)
-    @return	none
+	@param	pFileSelect	Pointer on tRmFileSelect structure (cast to void)
+	@return	none
 */
-void
-RmFileSelect(void *vs)
+void*
+RmFileSelect(void *pFileSelect)
 {
-    tFList	*FileCur;
+	RmFs = (tRmFileSelect*)pFileSelect;
 
-    RmFs = (tRmFileSelect*)vs;
+	if (ScrHandle) {
+		return ScrHandle;
+	}
 
-    if (ScrHandle) {
-	GfuiScreenRelease(ScrHandle);
-    }
+	// Create screen, load menu XML descriptor and create static controls.
+	ScrHandle = GfuiScreenCreateEx(NULL, NULL, rmOnActivate, NULL, NULL, 1);
 
-    // Create screen, load menu XML descriptor and create static controls.
-    ScrHandle = GfuiScreenCreateEx(NULL, NULL, rmActivate, NULL, NULL, 1);
+	void *menuXMLDescHdle = LoadMenuXML("fileselectmenu.xml");
 
-    void *menuXMLDescHdle = LoadMenuXML("fileselectmenu.xml");
+	CreateStaticControls(menuXMLDescHdle, ScrHandle);
 
-    CreateStaticControls(menuXMLDescHdle, ScrHandle);
+	// Create variable title label.
+	const int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "TitleLabel");
+	GfuiLabelSetText(ScrHandle, titleId, RmFs->title);
+	
+	// Create the Scroll List containing the File list
+	FilesScrollListId = CreateScrollListControl(ScrHandle, menuXMLDescHdle, "FilesScrollList",
+											   NULL, rmOnClickOnFile);
 
-    // Create variable title label.
-    int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");
-    GfuiLabelSetText(ScrHandle, titleId, RmFs->title);
-    
-    /* Create and fill-in the Scroll List containing the File list */
-    FileScrollListId = CreateScrollListControl(ScrHandle, menuXMLDescHdle, "filescrolllist",
-					       NULL, rmClickOnFile);
+	// Create the filename edit box
+    FileNameEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "SelectedFileNameEdit",
+									   NULL, NULL, rmOnChangeFileName);
 
-    FileList = GfDirGetList(RmFs->path);
-    if (FileList == NULL) {
-	GfuiScreenActivate(RmFs->prevScreen);
-	return;
-    }
-    FileSelected = FileList;
-    FileCur = FileList;
-    do {
-	FileCur = FileCur->next;
-	GfuiScrollListInsertElement(ScrHandle, FileScrollListId, FileCur->name, 1000, (void*)FileCur);
-    } while (FileCur != FileList);
+	// Create Load/Save and Cancel buttons.
+	LoadButtonId = CreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadButton", NULL, rmOnSelect);
+	SaveButtonId = CreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveButton", NULL, rmOnSelect);
+	CreateButtonControl(ScrHandle, menuXMLDescHdle, "CancelButton", NULL, rmOnDeactivate);
 
-    // Create Back and Reset buttons.
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "selectbutton", NULL, rmSelect);
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "cancelbutton", NULL, rmDeactivate);
+	// Close menu XML descriptor.
+	GfParmReleaseHandle(menuXMLDescHdle);
+	
+	// Register keyboard shortcuts.
+	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", NULL, rmOnDeactivate, NULL);
+	GfuiMenuDefaultKeysAdd(ScrHandle);
 
-    // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
-    
-    // Register keyboard shortcuts.
-    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", NULL, rmDeactivate, NULL);
-    GfuiMenuDefaultKeysAdd(ScrHandle);
-
-    GfuiScreenActivate(ScrHandle);
+	return ScrHandle;
 }
