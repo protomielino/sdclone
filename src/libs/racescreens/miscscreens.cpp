@@ -302,6 +302,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             robotIdx = (int)GfParmGetNum(info->params, path, RM_ATTR_IDX, NULL, 0);
             extended = GfParmGetNum(info->params, path, RM_ATTR_EXTENDED, NULL, 0);
             carName = NULL;
+            robhdle = NULL;
 
             if( extended )
             {
@@ -312,12 +313,14 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             {
                 sprintf(path, "%sdrivers/%s/%s.xml", GetLocalDir(), name, name);
                 robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
-                if (!robhdle) {
+                if (!robhdle)
+				{
                     sprintf(path, "drivers/%s/%s.xml", name, name);
                     robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
                 }
   
-                if (robhdle) {
+                if (robhdle)
+				{
                     sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
                     name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<none>");
                     carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "");
