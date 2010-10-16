@@ -40,6 +40,19 @@
 #include "racemanmenu.h"
 #include "networkingmenu.h"
 
+// VC++ 2005 or newer ...
+#if defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++ 2005
+#undef snprintf 
+#define snprintf _snprintf_s
+#endif
+// ... VC++ 2005 or newer
+
+// VC++ 6.0 ...
+#if defined(WIN32) && !defined(snprintf_s) 
+#undef snprintf 
+#define snprintf _snprintf 
+#endif
+
 
 // Raceman menu.
 static void	*RacemanMenuHdle = NULL;
