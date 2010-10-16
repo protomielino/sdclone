@@ -805,7 +805,9 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  glBindTexture(GL_TEXTURE_2D, curInst->texture->getTextureHandle());
+  if (curInst->texture) {
+    glBindTexture(GL_TEXTURE_2D, curInst->texture->getTextureHandle());
+  }
   glCallList(curInst->CounterList);
   glBindTexture(GL_TEXTURE_2D, 0);
   
@@ -840,7 +842,9 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
   glEnable(GL_TEXTURE_2D);
   glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-  glBindTexture(GL_TEXTURE_2D, curInst->texture->getTextureHandle());
+  if (curInst->texture) {
+    glBindTexture(GL_TEXTURE_2D, curInst->texture->getTextureHandle());
+  }
   glCallList(curInst->CounterList);
   glBindTexture(GL_TEXTURE_2D, 0);
   
@@ -1206,6 +1210,9 @@ void grInitBoardCar(tCarElt *car)
 
   /* Load the Tachometer texture */
   curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
+  if (curInst->texture == 0) {
+    curInst->texture = (ssgSimpleState*)grSsgLoadTexState("rpm8000.png");
+  }
   
   FREEZ(grFilePath);
   
@@ -1264,7 +1271,12 @@ void grInitBoardCar(tCarElt *car)
   param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_SPEEDO_TEX, "speed360.rgb");
   sprintf(buf, "drivers/%s/%d;drivers/%s;cars/%s;data/textures", car->_modName, car->_driverIndex, car->_modName, car->_carName);
   grFilePath = strdup(buf);
+
   curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
+  if (curInst->texture == 0) {
+    curInst->texture = (ssgSimpleState*)grSsgLoadTexState("speed360.rgb");
+  }
+
   free(grFilePath);
   cleanup[nstate] = curInst->texture;
   nstate++;
