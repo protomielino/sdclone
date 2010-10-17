@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:06:07 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: carstruct.h,v 1.16 2006/02/20 20:15:15 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

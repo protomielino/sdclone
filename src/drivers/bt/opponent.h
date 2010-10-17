@@ -4,7 +4,7 @@
     created              : Thu Apr 22 01:20:19 CET 2003
     copyright            : (C) 2003-2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: opponent.h,v 1.8 2006/03/06 22:43:50 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

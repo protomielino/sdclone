@@ -4,7 +4,7 @@
     created              : Sun Jan 30 22:59:28 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: replay.h,v 1.3 2004/10/07 17:05:04 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

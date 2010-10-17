@@ -4,7 +4,7 @@
     created     : Sat Dec  26 12:00:00 CET 2009
 	copyright   : (C) 2009 The Speed Dreams Team
 	web         : speed-dreams.sourceforge.net
-    version     : $Id: aiconfig.cpp 2063 2009/12/26 12:00:00 pouillot $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 
 /** @file
     		
-    @version	$Id: aiconfig.cpp 2063 2009/12/26 12:00:00 pouillot $
+    @version	$Id$
 */
 
 #include <stdio.h>

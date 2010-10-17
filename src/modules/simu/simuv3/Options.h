@@ -1,5 +1,5 @@
 /* -*- Mode: C++; -*- */
-/* VER: $Id: Options.h,v 1.4 2007/05/02 08:09:51 olethros Exp $ */
+/* VER: $Id$ */
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

@@ -1,5 +1,5 @@
 /* -*- Mode: C++; -*- */
-/* VER: $Id: Distribution.h,v 1.3 2005/08/05 09:02:58 berniw Exp $*/
+/* VER: $Id$*/
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:32:45 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: trace.cpp,v 1.7 2005/02/01 15:55:54 berniw Exp $
+    version              : $Id$
                                   
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file
     Allow the trace in the file <tt>trace.txt</tt>
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: trace.cpp,v 1.7 2005/02/01 15:55:54 berniw Exp $
+    @version	$Id$
     @ingroup	trace
 */
 

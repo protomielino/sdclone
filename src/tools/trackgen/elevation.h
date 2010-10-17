@@ -4,7 +4,7 @@
     created              : Mon May 20 23:11:14 CEST 2002
     copyright            : (C) 2001 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: elevation.h,v 1.3 2002/09/06 19:17:20 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: elevation.h,v 1.3 2002/09/06 19:17:20 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _ELEVATION_H_

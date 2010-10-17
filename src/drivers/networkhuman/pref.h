@@ -4,7 +4,7 @@
     created              : Sat Apr 29 16:52:41 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: pref.h,v 1.12 2003/11/23 20:21:11 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

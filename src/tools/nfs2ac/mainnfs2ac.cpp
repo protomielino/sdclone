@@ -3,7 +3,7 @@
     file        : main.cpp
     created     : Tue Jul 29 19:45:27 CEST 2003
     copyright   : (C) 2003 by Christophe Guionneau                       
-    version     : $Id: mainnfs2ac.cpp,v 1.4 2005/02/01 14:54:58 berniw Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 

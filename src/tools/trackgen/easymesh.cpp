@@ -5,7 +5,7 @@
     Original Location    : http://www-dinma.univ.trieste.it/~nirftc/research/easymesh/easymesh.html
     modified             : Eric Espie (eric.espie@torcs.org)
     copyright            : Bojan NICENO & Eric Espie (parts)
-    version              : $Id: easymesh.cpp,v 1.11 2005/06/30 22:23:45 berniw Exp $
+    version              : $Id$
 
  ************************************************************************************************/
 

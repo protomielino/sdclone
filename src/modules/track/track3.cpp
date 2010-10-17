@@ -4,7 +4,7 @@
     created              : Fri Aug 31 20:32:33 /etc/localtime 2001
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: track3.cpp,v 1.22 2005/07/19 19:55:55 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

@@ -3,7 +3,7 @@
     file        : ac3dload.cpp
     created     : Fri Apr 18 23:00:28 CEST 2003
     copyright   : (C) 2003 by Christophe Guionneau                        
-    version     : $Id: ac3dload.cpp,v 1.13 2005/02/01 14:54:57 berniw Exp $                                  
+    version     : $Id$                                  
 
 ***************************************************************************/
 
@@ -19,7 +19,7 @@
 /** @file   
     		
 @author	Christophe Guionneau
-@version	$Id: ac3dload.cpp,v 1.13 2005/02/01 14:54:57 berniw Exp $
+@version	$Id$
 */
 
 #include <stdio.h>

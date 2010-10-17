@@ -3,7 +3,7 @@
     file                 : grloadsgi.h
     created              : Wed Jun 1 14:56:31 CET 2005
     copyright            : (C) 2005 by Bernhard Wymann
-    version              : $Id: loadsgi.h 1045 2009-07-03 09:53:06Z martkelder $
+    version              : $Id$
 
 ***************************************************************************/
 

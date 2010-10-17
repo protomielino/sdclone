@@ -4,7 +4,7 @@
     created     : Fri Jun 3 12:52:07 CET 2004
     copyright   : (C) 2005 Bernhard Wymann
     email       : berniw@bluewin.ch
-    version     : $Id: openglconfig.cpp,v 1.2.2.1 2008/08/23 11:02:47 berniw Exp $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 
 /** @file
 
-    @version	$Id: openglconfig.cpp,v 1.2.2.1 2008/08/23 11:02:47 berniw Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:06:33 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: differential.cpp,v 1.12 2008/06/05 07:09:11 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

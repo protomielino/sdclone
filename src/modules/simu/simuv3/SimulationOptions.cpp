@@ -1,5 +1,5 @@
 /* -*- Mode: C++; -*- */
-/* VER: $Id: SimulationOptions.cpp,v 1.12 2007/12/01 11:52:15 olethros Exp $ */
+/* VER: $Id$ */
 // copyright (c) 2005 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

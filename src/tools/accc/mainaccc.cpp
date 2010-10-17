@@ -3,7 +3,7 @@
     file        : accc.cpp
     created     : Fri Apr 18 23:10:53 CEST 2003
     copyright   : (C) 2003 by Christophe Guionneau
-    version     : $Id: mainaccc.cpp,v 1.4 2003/11/08 16:37:18 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 /** @file   
     		
     @author	Christophe Guionneau
-    @version	$Id: mainaccc.cpp,v 1.4 2003/11/08 16:37:18 torcs Exp $
+    @version	$Id$
 */
 
 

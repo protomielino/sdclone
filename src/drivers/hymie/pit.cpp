@@ -4,7 +4,7 @@
     created              : Thu Mai 15 2:43:00 CET 2003
     copyright            : (C) 2003-2004 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: pit.cpp,v 1.8 2005/02/01 18:33:34 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

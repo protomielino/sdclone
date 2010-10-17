@@ -4,7 +4,7 @@
     created              : Sat Dec 23 09:27:43 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: maintrackgen.cpp,v 1.5.2.1 2008/08/18 22:14:30 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: maintrackgen.cpp,v 1.5.2.1 2008/08/18 22:14:30 berniw Exp $
+    @version	$Id$
 */
 #include <stdio.h>
 #include <stdlib.h>

@@ -4,7 +4,7 @@
     created              : Sun Feb 25 00:34:46 /etc/localtime 2001
     copyright            : (C) 2000 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: loadingscreen.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -21,7 +21,7 @@
     		This is a Loading... screen management.
     @ingroup	racemantools		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: loadingscreen.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
+    @version	$Id$
 */
 
 #include <cstring>

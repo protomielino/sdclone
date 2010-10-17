@@ -4,7 +4,7 @@
     created              : Sun Jan 30 12:02:05 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: simu.h,v 1.7 2005/07/19 19:55:52 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

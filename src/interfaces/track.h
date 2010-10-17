@@ -4,7 +4,7 @@
     created              : Sun Jan 30 23:00:06 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: track.h,v 1.22 2006/02/20 20:19:04 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file
     		This is the track structure.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: track.h,v 1.22 2006/02/20 20:19:04 berniw Exp $
+    @version	$Id$
     @ingroup	trackstruct
 */
 

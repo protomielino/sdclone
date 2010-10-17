@@ -4,7 +4,7 @@
     created              : Wed May 29 22:20:24 CEST 2002
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: util.cpp,v 1.3 2003/05/18 20:41:33 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: util.cpp,v 1.3 2003/05/18 20:41:33 torcs Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

@@ -1,7 +1,7 @@
 /*
  * xml.h -- Interface file for XML 
  *
- * @(#) $Id: xml.h,v 1.1.1.1 2001/06/24 18:29:48 torcs Exp $
+ * @(#) $Id$
  */
  
 #ifndef _XML_H_

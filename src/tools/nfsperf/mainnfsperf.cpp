@@ -3,7 +3,7 @@
     created     : Tue Aug  5 23:20:23 CEST 2003
     copyright   : (C) 2003 by Eric Espié                        
     email       : eric.espie@torcs.org   
-    version     : $Id: mainnfsperf.cpp,v 1.2 2005/02/01 15:08:12 berniw Exp $                                  
+    version     : $Id$                                  
  ***************************************************************************/
 /***************************************************************************
  *                                                                         *
@@ -15,7 +15,7 @@
  ***************************************************************************/
 /** @file   
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: mainnfsperf.cpp,v 1.2 2005/02/01 15:08:12 berniw Exp $
+    @version	$Id$
 */
 #ifdef WIN32
 #include <windows.h>

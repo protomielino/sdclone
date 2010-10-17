@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: xmltok.h,v 1.2 2001/09/15 10:14:27 torcs Exp $
+$Id$
 */
 
 #ifndef XmlTok_INCLUDED

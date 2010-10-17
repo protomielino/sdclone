@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:06:55 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: engine.cpp,v 1.26 2008/06/05 07:09:11 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

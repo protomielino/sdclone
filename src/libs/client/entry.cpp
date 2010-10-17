@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:41:55 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: entry.cpp,v 1.4 2005/02/01 15:55:51 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

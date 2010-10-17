@@ -4,7 +4,7 @@
     created              : Sat Sep  2 10:40:47 CEST 2000
     copyright            : (C) 2000 by Patrice & Eric Espie
     email                : torcs@free.fr
-    version              : $Id: main.cpp,v 1.9 20 Mar 2006 04:24:27 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

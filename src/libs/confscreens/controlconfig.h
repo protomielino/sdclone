@@ -4,7 +4,7 @@
     created     : Wed Mar 12 22:09:01 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: controlconfig.h,v 1.4 2008/03/27 21:26:51 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: controlconfig.h,v 1.3 2003/11/08 16:37:18 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _CONTROLCONFIG_H_

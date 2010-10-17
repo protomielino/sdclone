@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:16:38 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: networkhuman.cpp,v 1.45.2.2 2008/06/01 07:42:14 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: networkhuman.cpp,v 1.45.2.2 2008/06/01 07:42:14 berniw Exp $
+    @version	$Id$
 */
 
 #include "network.h"

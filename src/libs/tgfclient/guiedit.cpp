@@ -4,7 +4,7 @@
     created              : Mon Apr 24 10:23:28 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: guiedit.cpp,v 1.2 2003/06/24 21:02:25 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		GUI Edit Box Management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: guiedit.cpp,v 1.2 2003/06/24 21:02:25 torcs Exp $
+    @version	$Id$
     @ingroup	gui
 */
 

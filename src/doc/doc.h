@@ -4,7 +4,7 @@
     created              : Sat Jul 27 14:24:31 CEST 2002
     copyright            : (C) 2001 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: torcsdoc.h,v 1.3 2003/06/24 21:01:54 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: torcsdoc.h,v 1.3 2003/06/24 21:01:54 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _SD_DOC_H_

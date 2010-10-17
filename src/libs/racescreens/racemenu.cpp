@@ -4,7 +4,7 @@
     created              : Thu May  2 22:02:51 CEST 2002
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: racemenu.cpp,v 1.2 20 Mar 2006 04:31:12 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -21,7 +21,7 @@
     		This is the race options menu.
     @ingroup	racemantools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: racemenu.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
+    @version	$Id$
 */
 
 #include <cstdlib>

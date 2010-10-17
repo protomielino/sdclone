@@ -4,7 +4,7 @@
     created              : Mon Aug 23 22:11:37 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: guiscrollbar.cpp,v 1.3 2003/10/19 18:59:38 torcs Exp $                                  
+    version              : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		GUI scrollbar management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: guiscrollbar.cpp,v 1.3 2003/10/19 18:59:38 torcs Exp $
+    @version	$Id$
     @ingroup	gui
 */
 

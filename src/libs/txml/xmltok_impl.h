@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: xmltok_impl.h,v 1.1.1.1 2001/06/24 18:30:00 torcs Exp $
+$Id$
 */
 
 enum {

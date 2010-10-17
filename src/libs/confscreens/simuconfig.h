@@ -4,7 +4,7 @@
     created     : Wed Nov  3 21:48:57 CET 2004
     copyright   : (C) 2004 by Eric Espié                        
     email       : eric.espie@free.fr 
-    version     : $Id: simuconfig.h,v 1.1 2004/11/03 22:46:10 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
  
 /** @file    
     		
-    @version	$Id: simuconfig.h,v 1.1 2004/11/03 22:46:10 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _SIMUCONFIG_H_

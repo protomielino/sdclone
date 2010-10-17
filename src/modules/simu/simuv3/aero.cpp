@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:04:50 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: aero.cpp,v 1.25 2007/12/01 11:52:15 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

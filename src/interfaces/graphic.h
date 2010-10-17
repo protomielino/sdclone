@@ -4,7 +4,7 @@
     created              : Sun Jan 30 22:58:45 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: graphic.h,v 1.14 2005/06/05 10:47:31 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created              : Wed Mar 21 21:50:23 CET 2001
     copyright            : (C) 2001 by Eric Espi�
     email                : Eric.Espie@torcs.org
-    version              : $Id: playerpref.h,v 1.10 2004/10/07 17:05:04 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: playerpref.h,v 1.10 2004/10/07 17:05:04 olethros Exp $
+    @version	$Id$
 */
 
 #ifndef _PLAYERPREF_H_

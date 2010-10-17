@@ -1,4 +1,4 @@
-/* $Id: nametab.h,v 1.1.1.1 2001/06/24 18:29:47 torcs Exp $ */
+/* $Id$ */
 static const unsigned namingBitmap[] = {
 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 0x00000000, 0x00000000, 0x00000000, 0x00000000,

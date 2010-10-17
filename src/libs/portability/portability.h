@@ -4,7 +4,7 @@
     created     : Fri Jul 8 15:19:34 CET 2005
     copyright   : (C) 2005 Bernhard Wymann
     email       : berniw@bluewin.ch
-    version     : $Id: portability.h,v 1.2 2005/08/05 09:05:59 berniw Exp $
+    version     : $Id$
 
  ***************************************************************************/
 

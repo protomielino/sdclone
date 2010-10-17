@@ -3,7 +3,7 @@
     file                 : glfeatures.h
     created              : Wed Jun 1 14:56:31 CET 2005
     copyright            : (C) 2005 by Bernhard Wymann
-    version              : $Id: glfeatures.h,v 1.2 2005/08/05 09:26:39 berniw Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created     : Sun Dec 15 11:12:56 CET 2002
     copyright   : (C) 2002 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: categories.cpp,v 1.20 2008/03/28 15:06:15 olethros Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: categories.cpp,v 1.20 2008/03/28 15:06:15 olethros Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

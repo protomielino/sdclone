@@ -4,7 +4,7 @@
     created              : Sun Jun  9 16:30:25 CEST 2002
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: graphconfig.cpp,v 1.5 2005/07/21 21:27:14 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: graphconfig.cpp,v 1.5 2005/07/21 21:27:14 berniw Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

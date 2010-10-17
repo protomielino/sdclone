@@ -3,7 +3,7 @@
     file                 : correct.h
     created              : Thu Mai 15 2:41:00 CET 2003
     copyright            : (C) 2007 Andrew Sumner
-    version              : $Id: correct.h,v 1.5 2004/09/22 23:20:01 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

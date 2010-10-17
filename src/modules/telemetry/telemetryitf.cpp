@@ -4,7 +4,7 @@
     created              : Mon Feb 28 21:18:49 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: telemetryitf.cpp,v 1.3 2002/10/13 22:03:38 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

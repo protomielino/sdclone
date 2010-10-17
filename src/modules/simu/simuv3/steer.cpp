@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:08:20 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: steer.cpp,v 1.21 2005/08/30 15:29:51 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

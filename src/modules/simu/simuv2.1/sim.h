@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:42 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: sim.h,v 1.15 2005/07/19 19:55:55 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

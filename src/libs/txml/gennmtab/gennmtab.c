@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: gennmtab.c,v 1.2 2003/11/08 16:37:18 torcs Exp $
+$Id$
 */
 
 #include <string.h>

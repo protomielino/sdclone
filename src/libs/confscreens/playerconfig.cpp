@@ -4,7 +4,7 @@
     created              : Wed Apr 26 20:05:12 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: playerconfig.cpp,v 1.8 2008/03/27 21:26:51 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

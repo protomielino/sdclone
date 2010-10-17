@@ -4,7 +4,7 @@
     created     : Thu Mar 13 21:27:03 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: mouseconfig.cpp,v 1.5 19 Mar 2006 18:15:16 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 

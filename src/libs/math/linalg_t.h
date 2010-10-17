@@ -4,7 +4,7 @@
     created              : Mo Mar 11 13:51:00 CET 2002
     copyright            : (C) 2002-2005 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: linalg_t.h,v 1.2 2005/08/05 09:04:53 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

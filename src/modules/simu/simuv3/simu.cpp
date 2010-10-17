@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:53 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: simu.cpp,v 1.29 2009/02/15 13:03:18 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created     : Sat Nov 23 09:05:23 CET 2002
     copyright   : (C) 2002 by Eric Espie 
     email       : eric.espie@torcs.org 
-    version     : $Id: racecars.cpp,v 1.19 2007/11/06 20:43:32 torcs Exp $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: racecars.cpp,v 1.19 2007/11/06 20:43:32 torcs Exp $
+    @version	$Id$
 */
 
 #include <cstdlib>

@@ -3,7 +3,7 @@
     file                 : opponent.h
     created              : Thu Apr 22 01:20:19 CET 2003
     copyright            : (C) 2007 Andrew Sumner, 2003-2004 Bernhard Wymann
-    version              : $Id: opponent.h,v 1.7 2004/09/23 14:04:17 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

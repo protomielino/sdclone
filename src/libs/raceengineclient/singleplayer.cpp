@@ -4,7 +4,7 @@
     created     : Sat Nov 16 09:36:29 CET 2002
     copyright   : (C) 2002 by Eric Espié                        
     email       : eric.espie@torcs.org   
-    version     : $Id: singleplayer.cpp,v 1.4 2004/04/05 18:25:00 olethros Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: singleplayer.cpp,v 1.4 2004/04/05 18:25:00 olethros Exp $
+    @version	$Id$
 */
 
 #include <cstdlib>

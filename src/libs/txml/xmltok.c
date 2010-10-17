@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: xmltok.c,v 1.7 2006/10/29 15:55:33 berniw Exp $
+$Id$
 */
 
 #include "xmldef.h"

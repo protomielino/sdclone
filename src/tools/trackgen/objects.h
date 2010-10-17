@@ -4,7 +4,7 @@
     created              : Fri May 24 20:10:22 CEST 2002
     copyright            : (C) 2001 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: objects.h,v 1.3 2003/09/01 06:28:44 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: objects.h,v 1.3 2003/09/01 06:28:44 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _OBJECTS_H_

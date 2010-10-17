@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:09:06 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: wheel.cpp,v 1.26 2007/10/30 21:45:23 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

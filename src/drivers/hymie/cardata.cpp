@@ -4,7 +4,7 @@
     created              : Thu Sep 23 12:31:37 CET 2004
     copyright            : (C) 2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: cardata.cpp,v 1.1 2004/09/23 14:04:17 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

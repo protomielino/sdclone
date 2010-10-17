@@ -3,7 +3,7 @@
     file        : accc.h
     created     : Fri Apr 18 23:09:53 CEST 2003
     copyright   : (C) 2003 by Christophe Guionneau
-    version     : $Id: accc.h,v 1.7 2004/02/06 23:08:54 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 /** @file    
     		
     @author	Christophe Guionneau
-    @version	$Id: accc.h,v 1.7 2004/02/06 23:08:54 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _ACCC_H_

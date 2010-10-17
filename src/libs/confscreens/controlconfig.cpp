@@ -4,7 +4,7 @@
     created     : Wed Mar 12 21:20:34 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: controlconfig.cpp,v 1.5 19 Mar 2006 18:15:16  torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: controlconfig.cpp,v 1.6 2008/03/27 21:26:51 torcs Exp $
+    @version	$Id$
 */
 
 

@@ -4,7 +4,7 @@
     created              : Sun Jan 30 22:57:40 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: trackinc.h,v 1.4 2002/05/19 12:16:37 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

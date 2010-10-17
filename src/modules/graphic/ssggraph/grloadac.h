@@ -3,7 +3,7 @@
     file                 : grloadac.h
     copyright            : (C) 2000 by Eric Espie
     web                  : www.speed-dreams.org
-    version              : $Id: grloadac.h 2264 2010-02-27 15:57:11Z pouillot $
+    version              : $Id$
 
  ***************************************************************************/
 

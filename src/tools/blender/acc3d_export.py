@@ -69,7 +69,7 @@ Notes:<br>
     Start mesh object names (OB: field) with "=" or "$" to prevent them from being split (meshes with multiple textures or both textured and non textured faces are split unless this trick is used or the "no split" option is set.
 """
 
-# $Id: ac3d_export.py 14530 2008-04-23 14:04:05Z campbellbarton $
+# $Id$
 #
 # --------------------------------------------------------------------------
 # AC3DExport version 2.44

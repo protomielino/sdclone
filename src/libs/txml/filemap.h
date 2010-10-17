@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: filemap.h,v 1.1.1.1 2001/06/24 18:29:45 torcs Exp $
+$Id$
 */
 
 

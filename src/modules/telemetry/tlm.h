@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:10:19 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: tlm.h,v 1.2 2002/11/30 19:00:57 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

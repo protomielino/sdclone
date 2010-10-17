@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:42:38 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: mainmenu.cpp,v 1.4.2.1 2008/08/16 23:59:54 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

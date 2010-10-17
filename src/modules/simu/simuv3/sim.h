@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:42 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: sim.h,v 1.20 2005/09/13 13:17:38 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

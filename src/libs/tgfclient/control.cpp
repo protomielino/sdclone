@@ -4,7 +4,7 @@
     created     : Thu Mar  6 22:01:33 CET 2003
     copyright   : (C) 2003 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: control.cpp,v 1.3 20 Mar 2006 04:28:56 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		Human control (joystick, mouse and keyboard).
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: control.cpp,v 1.3 2003/11/11 16:36:22 torcs Exp $
+    @version	$Id$
     @ingroup	ctrl
 */
 

@@ -4,7 +4,7 @@
     created     : Sat Nov 16 12:13:31 CET 2002
     copyright   : (C) 2002 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: racemain.cpp,v 1.13 2005/08/17 20:48:39 berniw Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: racemain.cpp,v 1.13 2005/08/17 20:48:39 berniw Exp $
+    @version	$Id$
 */
 #include <network.h>
 #include <portability.h>
@@ -557,7 +557,7 @@ ReRaceStart(void)
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
 				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0);
 				if (pszSkinName && strlen(pszSkinName) > 0)
-					GfParmSetStr(results, path2, RM_ATTR_SKINNAME, pszSkinName);
+					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
 		} else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER)) {
 			/* Starting grid in the reversed arrival order of the previous race */
@@ -576,7 +576,7 @@ ReRaceStart(void)
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
 				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0);
 				if (pszSkinName && strlen(pszSkinName) > 0)
-					GfParmSetStr(results, path2, RM_ATTR_SKINNAME, pszSkinName);
+					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
 		} else {
 			/* Starting grid in the drivers list order */

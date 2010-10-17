@@ -4,7 +4,7 @@
 	created              : Mon May 20 22:31:09 CEST 2002
 	copyright            : (C) 2001 by Eric Espie
 	email                : eric.espie@torcs.org
-	version              : $Id: elevation.cpp,v 1.9.2.1 2008/08/19 19:21:16 berniw Exp $
+	version              : $Id$
 
 ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
 			
 	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-	@version	$Id: elevation.cpp,v 1.9.2.1 2008/08/19 19:21:16 berniw Exp $
+	@version	$Id$
  */
 
 

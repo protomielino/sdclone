@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:42:22 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: exitmenu.h,v 1.3 2006/10/05 21:25:55 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

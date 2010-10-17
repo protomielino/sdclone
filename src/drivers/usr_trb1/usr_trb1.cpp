@@ -4,7 +4,7 @@
     created              : Wed Jan 8 18:31:16 CET 2003
     copyright            : (C) 2002-2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: usr_trb1.cpp,v 1.1 2008/02/11 00:53:10 andrew Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

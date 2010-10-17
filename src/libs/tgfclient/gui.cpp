@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:01:33 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: gui.cpp,v 1.7.2.2 2008/08/17 02:45:03 berniw Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file
     		This API is used to manage all the menu screens.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: gui.cpp,v 1.7.2.2 2008/08/17 02:45:03 berniw Exp $
+    @version	$Id$
     @ingroup	gui
 */
 

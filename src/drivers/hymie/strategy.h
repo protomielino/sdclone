@@ -4,7 +4,7 @@
     created              : Wed Sep 22 15:31:51 CET 2004
     copyright            : (C) 2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: strategy.h,v 1.2 2004/11/14 22:47:13 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

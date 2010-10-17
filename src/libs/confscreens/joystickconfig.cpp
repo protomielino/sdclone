@@ -4,7 +4,7 @@
     created              : Wed Mar 21 21:46:11 CET 2001
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: joystickconfig.cpp,v 1.5 19 Mar 2006 18:15:16 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

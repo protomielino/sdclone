@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:06:19 CET 2000
     copyright            : (C) 2000-2005 by Eric Espie, Bernhard Wymann
     email                : torcs@free.fr
-    version              : $Id: collide.cpp,v 1.32 2006/02/20 20:15:15 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:50:46 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: xml.cpp,v 1.4 2003/11/08 16:37:18 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

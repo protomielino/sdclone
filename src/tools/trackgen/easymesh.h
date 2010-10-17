@@ -4,7 +4,7 @@
     created              : Sun Feb 25 22:50:07 /etc/localtime 2001
     copyright            : Bojan NICENO & Eric Espié
     email                : niceno@univ.trieste.it Eric.Espie@torcs.org
-    version              : $Id: easymesh.h,v 1.3 2002/06/09 20:48:59 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: easymesh.h,v 1.3 2002/06/09 20:48:59 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _EASYMESH_H_

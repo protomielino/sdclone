@@ -4,7 +4,7 @@
     created              : Mon Feb 28 22:38:31 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: rttelem.cpp,v 1.8 2005/02/01 15:55:53 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -21,7 +21,7 @@
     		This is a collection of useful functions for using telemetry in a robot.
 		You can see an example of telemetry usage in the human driver.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: rttelem.cpp,v 1.8 2005/02/01 15:55:53 berniw Exp $
+    @version	$Id$
     @ingroup	robottools
 */
 

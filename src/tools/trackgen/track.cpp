@@ -4,7 +4,7 @@
     created      : Sun Dec 24 12:14:18 CET 2000
     copyright    : (C) 2000 by Eric Espie
     email        : eric.espie@torcs.org
-    version      : $Id: track.cpp,v 1.22 2006/10/29 15:55:33 berniw Exp $
+    version      : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: track.cpp,v 1.22 2006/10/29 15:55:33 berniw Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

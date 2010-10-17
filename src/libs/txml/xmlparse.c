@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: xmlparse.c,v 1.5 2003/03/08 17:58:32 torcs Exp $
+$Id$
 */
 
 #include <stdlib.h>

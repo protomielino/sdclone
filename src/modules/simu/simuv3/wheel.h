@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:09:18 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: wheel.h,v 1.20 2006/09/02 17:53:21 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

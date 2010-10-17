@@ -1,5 +1,5 @@
 /* -*- Mode: C++; -*- */
-/* VER: $Id: ANN.cpp,v 1.4.2.1 2008/05/30 22:18:32 berniw Exp $ */
+/* VER: $Id$ */
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

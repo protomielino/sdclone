@@ -4,7 +4,7 @@
     created              : Fri Aug 13 21:58:55 CEST 1999
     copyright            : (C) 1999 by                          
     email                : torcs@free.fr   
-    version              : $Id: directory.cpp,v 1.7 2005/02/01 15:55:54 berniw Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file
     		This is used for directory manipulation.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: directory.cpp,v 1.7 2005/02/01 15:55:54 berniw Exp $
+    @version	$Id$
     @ingroup	dir
 */
 

@@ -4,7 +4,7 @@
     created     : Sat Dec 14 16:40:15 CET 2002
     copyright   : (C) 2002 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: hash.cpp,v 1.4.2.2 2008/06/01 07:43:24 berniw Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		This is the hash computation API.
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: hash.cpp,v 1.4.2.2 2008/06/01 07:43:24 berniw Exp $
+    @version	$Id$
     @ingroup	hash
 */
 

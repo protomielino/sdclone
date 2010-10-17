@@ -4,7 +4,7 @@
     created              : Sun Jan 30 22:55:09 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: track0.cpp,v 1.4 2002/10/13 22:03:38 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

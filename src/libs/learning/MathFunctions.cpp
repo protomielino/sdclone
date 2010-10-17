@@ -1,5 +1,5 @@
 // -*- Mode: c++ -*-
-/* VER: $Id: MathFunctions.cpp,v 1.4 2007/11/06 20:43:32 torcs Exp $ */
+/* VER: $Id$ */
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

@@ -4,7 +4,7 @@
     created              : Sat Jun  1 18:03:02 CEST 2002
     copyright            : (C) 2001 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: relief.h,v 1.1 2002/06/02 12:05:14 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: relief.h,v 1.1 2002/06/02 12:05:14 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _RELIEF_H_

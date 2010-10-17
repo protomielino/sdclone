@@ -4,7 +4,7 @@
     created     : Sun Feb 16 13:09:23 CET 2003
     copyright   : (C) 2003 by Eric Espie                       
     email       : eric.espie@torcs.org   
-    version     : $Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs $
+    version     : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,22 +20,14 @@
 			Files open/save menu screens.
 	@ingroup	racemantools
 	@author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-	@version	$Id: fileselect.cpp,v 1.2 2003/06/24 21:02:24 torcs Exp $
+	@version	$Id$
 */
-
-
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-//#include <sys/stat.h>
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 
 #include <tgfclient.h>
 
 #include "racescreens.h"
+
 
 static void		*ScrHandle = NULL;
 

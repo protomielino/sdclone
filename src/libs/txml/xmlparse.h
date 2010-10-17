@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: xmlparse.h,v 1.1.1.1 2001/06/24 18:29:53 torcs Exp $
+$Id$
 */
 
 #ifndef XmlParse_INCLUDED

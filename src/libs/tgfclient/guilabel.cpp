@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:22:12 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: guilabel.cpp,v 1.2 2003/06/24 21:02:25 torcs Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file   
     		GUI labels management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: guilabel.cpp,v 1.2 2003/06/24 21:02:25 torcs Exp $
+    @version	$Id$
     @ingroup	gui
 */
 

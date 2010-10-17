@@ -4,7 +4,7 @@
     created     : Thu Dec  4 20:16:09 CET 2003
     copyright   : (C) 2003 by Eric Espié                        
     email       : eric.espie@torcs.org   
-    version     : $Id: png2jpg.c,v 1.1 2003/12/06 16:36:24 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   PNG to JPEG converter
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: png2jpg.c,v 1.1 2003/12/06 16:36:24 torcs Exp $
+    @version	$Id$
 */
 
 #ifdef WIN32

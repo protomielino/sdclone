@@ -4,7 +4,7 @@
     created              : Thu Dec 20 01:21:49 CET 2002
     copyright            : (C) 2002-2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: driver.cpp,v 1.16.2.1 2008/05/26 20:28:07 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

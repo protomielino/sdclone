@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:54:47 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: osspec.h,v 1.3 2003/03/23 19:43:13 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

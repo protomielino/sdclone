@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:32:14 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: tgf.h,v 1.41.2.1 2008/05/26 20:28:08 berniw Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file   
     	The Gaming Framework API.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: tgf.h,v 1.41.2.1 2008/05/26 20:28:08 berniw Exp $
+    @version	$Id$
 */
 
 #ifndef __TGF__H__

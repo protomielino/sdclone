@@ -4,7 +4,7 @@
     created              : Thu Dec 20 01:20:19 CET 2002
     copyright            : (C) 2002-2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: driver.h,v 1.1 2008/02/11 00:52:01 andrew Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

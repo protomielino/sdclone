@@ -3,7 +3,7 @@
     file                 : glfeatures.cpp
     created              : Wed Jun 1 14:56:31 CET 2005
     copyright            : (C) 2005 by Bernhard Wymann
-    version              : $Id: glfeatures.cpp,v 1.2 19 Mar 2006 20:37:46 berniw Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:05:09 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: axle.cpp,v 1.22 2009/01/21 09:07:40 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

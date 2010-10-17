@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:49:03 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: splash.cpp,v 1.4.2.2 2008/08/16 14:58:51 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

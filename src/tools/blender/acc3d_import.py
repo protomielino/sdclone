@@ -38,7 +38,7 @@ paths from the .ac file, the .ac file's dir and the default textures dir path
 users can configure (see config options above).
 """
 
-# $Id: acd3d_import.py,v 1.20 2007/02/13 17:37:32 ianwill Exp $
+# $Id$
 #
 # --------------------------------------------------------------------------
 # AC3DImport version 2.43 Feb 12, 2007

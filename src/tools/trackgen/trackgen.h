@@ -4,7 +4,7 @@
     created              : Sun Dec 24 16:00:03 CET 2000
     copyright            : (C) 2000 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: trackgen.h,v 1.7 2005/07/19 19:55:57 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: trackgen.h,v 1.7 2005/07/19 19:55:57 berniw Exp $
+    @version	$Id$
 */
 
 #ifndef _TRACKGEN_H_

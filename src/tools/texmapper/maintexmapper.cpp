@@ -4,7 +4,7 @@
     created              : Mon Nov 13 21:25:19 CET 2000
     copyright            : (C) 2000 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: maintexmapper.cpp,v 1.1 19 Mar 2006 21:44:44 torcs Exp $
+    version              : $Id$
 
  **************************************************************************/
 

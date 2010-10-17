@@ -4,7 +4,7 @@
     created              : Wed Mai 14 19:53:00 CET 2003
     copyright            : (C) 2003-2004 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: spline.h,v 1.1 2008/02/11 00:53:10 andrew Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created     : Sat Nov 16 18:22:00 CET 2002
     copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id: racegl.cpp,v 1.7 20 Mar 2006 04:30:18 olethros Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: racegl.cpp,v 1.7 2004/04/05 18:25:00 olethros Exp $
+    @version	$Id$
 */
 #include <cstdlib>
 #include <cstdio>

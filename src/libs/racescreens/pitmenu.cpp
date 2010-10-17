@@ -4,7 +4,7 @@
     created              : Mon Apr 24 18:16:37 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: pitmenu.cpp,v 1.4 2005/08/11 19:43:35 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -21,7 +21,7 @@
     		Pit menu command
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: pitmenu.cpp,v 1.4 2005/08/11 19:43:35 berniw Exp $
+    @version	$Id$
 */
 #include <cstdlib>
 #ifdef WIN32

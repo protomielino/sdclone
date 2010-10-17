@@ -4,7 +4,7 @@
     created              : Sat Apr 29 16:51:03 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: pref.cpp,v 1.19 2003/11/23 20:21:11 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: pref.cpp,v 1.19 2003/11/23 20:21:11 torcs Exp $
+    @version	$Id$
 */
 
 #include <cstdlib>

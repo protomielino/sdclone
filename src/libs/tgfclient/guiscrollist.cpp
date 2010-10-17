@@ -4,7 +4,7 @@
     created              : Mon Aug 23 19:22:49 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: guiscrollist.cpp,v 1.4 2005/07/19 19:55:54 berniw Exp $                                  
+    version              : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		GUI scroll-list management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: guiscrollist.cpp,v 1.4 2005/07/19 19:55:54 berniw Exp $
+    @version	$Id$
     @ingroup	gui
 */
 

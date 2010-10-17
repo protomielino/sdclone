@@ -19,7 +19,7 @@
 /** @file
     		This is used for file manipulations.
     @author	Mart Kelder, Jean-Philippe Meuret
-    @version	$Id: directory.cpp,v 1.7 2005/02/01 15:55:54 berniw $
+    @version	$Id$
     @ingroup	file
 */
 

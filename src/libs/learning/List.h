@@ -1,5 +1,5 @@
 /* -*- Mode: C++; -*- */
-/* VER: $Id: List.h,v 1.2 2005/07/19 23:50:02 olethros Exp $ */
+/* VER: $Id$ */
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
 /***************************************************************************
  *                                                                         *

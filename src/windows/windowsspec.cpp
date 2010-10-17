@@ -4,7 +4,7 @@
     created              : Sat Sep  2 10:45:39 CEST 2000
     copyright            : (C) 2000 by Patrice & Eric Espie
     email                : torcs@free.fr
-    version              : $Id: windowsspec.cpp,v 1.12 2005/08/05 10:34:47 berniw Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created     : Thu Jan  2 12:43:10 CET 2003
     copyright   : (C) 2002 by Eric Espi�                        
     email       : eric.espie@torcs.org   
-    version     : $Id: raceresults.cpp,v 1.9.2.1 2008/05/31 15:55:36 berniw Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: raceresults.cpp,v 1.9.2.1 2008/05/31 15:55:36 berniw Exp $
+    @version	$Id$
 */
 
 #include <ctime>

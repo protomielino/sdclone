@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:08:04 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: simuitf.cpp,v 1.23 2005/04/04 14:56:37 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

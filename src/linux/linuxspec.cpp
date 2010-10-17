@@ -4,7 +4,7 @@
     created              : Sat Mar 18 23:54:05 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: linuxspec.cpp,v 1.13 2005/08/05 09:28:32 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

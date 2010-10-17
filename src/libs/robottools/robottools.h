@@ -4,7 +4,7 @@
     created              : Mon Feb 28 22:31:13 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: robottools.h,v 1.6 2003/11/23 20:21:11 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		Robots Tools
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: robottools.h,v 1.6 2003/11/23 20:21:11 torcs Exp $
+    @version	$Id$
 */
 
 #ifndef _ROBOTTOOLS_H_

@@ -4,7 +4,7 @@
     created              : Mon Aug 16 20:40:44 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: driverselect.cpp,v 1.5 2005/02/01 15:55:52 berniw Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -20,7 +20,7 @@
     		This is a set of tools useful for race managers.
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: driverselect.cpp,v 1.5 2005/02/01 15:55:52 berniw Exp $
+    @version	$Id$
 */
 
 

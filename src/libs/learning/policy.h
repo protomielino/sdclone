@@ -1,6 +1,6 @@
 // -*- Mode: c++ -*-
 // copyright (c) 2004 by Christos Dimitrakakis <dimitrak@idiap.ch>
-// $Id: policy.h,v 1.4 2005/08/05 09:02:58 berniw Exp $
+// $Id$
 
 
 /***************************************************************************

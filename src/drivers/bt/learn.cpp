@@ -4,7 +4,7 @@
     created              : Wed Aug 28 16:36:00 CET 2004
     copyright            : (C) 2004 by Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: learn.cpp,v 1.3 2006/03/06 22:43:50 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

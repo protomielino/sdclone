@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:04:59 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: aero.h,v 1.19 2005/12/15 02:21:37 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

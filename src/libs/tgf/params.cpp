@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:27:57 CEST 1999
     copyright            : (C) 1999 by Eric Espie
     email                : torcs@free.fr   
-    version              : $Id: params.cpp,v 1.30.2.2 2008/06/01 07:43:24 berniw Exp $
+    version              : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file
     		This is the parameters manipulation API.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: params.cpp,v 1.30.2.2 2008/06/01 07:43:24 berniw Exp $
+    @version	$Id$
     @ingroup	params
 */
 

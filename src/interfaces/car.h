@@ -4,7 +4,7 @@
     created              : Sun Jan 30 12:00:15 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: car.h,v 1.38 2008/03/24 15:24:01 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file
     		This is the car structure.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: car.h,v 1.38 2008/03/24 15:24:01 torcs Exp $
+    @version	$Id$
     @ingroup	carstruct
     @note	Short cuts are to be used with the carElt structure.
 */

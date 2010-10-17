@@ -4,7 +4,7 @@
     created     : Thu Dec 12 15:12:07 CET 2004
     copyright   : (C) 2004 Eric Espi�, Bernhard Wymann, baseed on simuconfig.cpp
     email       : berniw@bluewin.ch
-    version     : $Id: soundconfig.cpp,v 1.6 20 Mar 2006 04:31:12 berniw Exp $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 
 /** @file   
     		
-    @version	$Id: soundconfig.cpp,v 1.6 2005/08/05 09:03:39 berniw Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

@@ -4,7 +4,7 @@
     created     : Sat Nov 16 12:14:57 CET 2002
     copyright   : (C) 2002 by Eric Espié                        
     email       : eric.espie@torcs.org   
-    version     : $Id: racemain.h,v 1.3 2004/04/05 18:25:00 olethros Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: racemain.h,v 1.3 2004/04/05 18:25:00 olethros Exp $
+    @version	$Id$
 */
 
 #ifndef _RACEMAIN_H_

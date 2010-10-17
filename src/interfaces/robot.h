@@ -4,7 +4,7 @@
     created              : Sun Jan 30 22:59:40 CET 2000, 2002
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: robot.h,v 1.10 2006/02/20 20:18:07 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: robot.h,v 1.10 2006/02/20 20:18:07 berniw Exp $
+    @version	$Id$
     @ingroup	robotmodint
 */
 

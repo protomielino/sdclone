@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:20:37 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: guihelp.cpp,v 1.3 2004/02/28 08:39:13 torcs Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -19,7 +19,7 @@
 /** @file   
     		GUI help screen management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: guihelp.cpp,v 1.3 2004/02/28 08:39:13 torcs Exp $
+    @version	$Id$
     @ingroup	gui
 */
 

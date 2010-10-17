@@ -4,7 +4,7 @@
     created              : Sun Jan 30 22:59:17 CET 2000
     copyright            : (C) 2000,2002 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: raceman.h,v 1.28 2006/02/20 20:17:43 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file
     		This is the race information structures.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: raceman.h,v 1.28 2006/02/20 20:17:43 berniw Exp $
+    @version	$Id$
     @ingroup	raceinfo
 */
  

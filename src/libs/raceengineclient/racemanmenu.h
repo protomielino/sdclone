@@ -4,7 +4,7 @@
     created     : Fri Jan  3 22:25:02 CET 2003
     copyright   : (C) 2003 by Eric Espié                        
     email       : eric.espie@torcs.org   
-    version     : $Id: racemanmenu.h,v 1.3 2004/04/05 18:25:00 olethros Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: racemanmenu.h,v 1.3 2004/04/05 18:25:00 olethros Exp $
+    @version	$Id$
 */
 
 #ifndef _RACEMANMENU_H_

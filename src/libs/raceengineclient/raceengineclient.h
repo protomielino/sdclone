@@ -3,7 +3,7 @@
     file        : raceengineclient.h
     copyright   : (C) 2010 by Jean-Philippe Meuret                        
     email       : pouillot@users.sourceforge.net   
-    version     : $Id: raceengineclient.h,v 1.1 2010/06/10 18:25:00 pouillot Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 /** @file    
     		
     @author	<a href=mailto:pouillot@users.sourceforge.net>Jean-Philippe Meuret</a>
-    @version    $Id: raceengineclient.h,v 1.1 2010/06/10 18:25:00 pouillot Exp $
+    @version    $Id$
 */
 
 #ifndef _RACEENGINECLIENT_H_

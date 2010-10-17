@@ -4,7 +4,7 @@
     created              : Fri Aug 13 22:26:42 CEST 1999
     copyright            : (C) 1999 by Eric Espie                         
     email                : torcs@free.fr   
-    version              : $Id: os.cpp,v 1.5 2002/10/13 22:03:37 torcs Exp $                                  
+    version              : $Id$                                  
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,7 +18,7 @@
 
 /** @file
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: os.cpp,v 1.5 2002/10/13 22:03:37 torcs Exp $
+    @version	$Id$
     @ingroup OS
 */
 #ifdef WIN32

@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: utf8tab.h,v 1.1.1.1 2001/06/24 18:29:47 torcs Exp $
+$Id$
 */
 
 

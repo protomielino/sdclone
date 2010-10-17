@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: hashtable.c,v 1.4 2003/01/23 18:38:47 torcs Exp $
+$Id$
 */
 
 #include <stdlib.h>

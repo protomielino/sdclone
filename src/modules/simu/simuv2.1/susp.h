@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:08:53 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: susp.h,v 1.6 2005/03/31 16:01:01 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

@@ -4,7 +4,7 @@
     created              : Wed May 29 22:11:21 CEST 2002
     copyright            : (C) 2001 by Eric Espie
     email                : eric.espie@torcs.org
-    version              : $Id: ac3d.cpp,v 1.1 2002/06/02 12:05:14 torcs Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: ac3d.cpp,v 1.1 2002/06/02 12:05:14 torcs Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

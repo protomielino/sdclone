@@ -4,7 +4,7 @@
     created     : Sat Nov 16 10:34:35 CET 2002
     copyright   : (C) 2002 by Eric Espie                       
     email       : eric.espie@torcs.org   
-    version     : $Id: raceinit.cpp,v 1.18 2006/10/12 22:20:59 berniw Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file   
         
     @author <a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version  $Id: raceinit.cpp,v 1.18 2006/10/12 22:20:59 berniw Exp $
+    @version  $Id$
 */
 
 

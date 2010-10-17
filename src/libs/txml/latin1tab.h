@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: latin1tab.h,v 1.1.1.1 2001/06/24 18:29:46 torcs Exp $
+$Id$
 */
 
 /* 0x80 */ BT_OTHER, BT_OTHER, BT_OTHER, BT_OTHER,

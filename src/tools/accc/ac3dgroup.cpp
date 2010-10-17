@@ -3,7 +3,7 @@
     file        : ac3dgroup.cpp
     created     : Fri Apr 18 23:11:36 CEST 2003
     copyright   : (C) 2003 by Christophe Guionneau
-    version     : $Id: ac3dgroup.cpp,v 1.6 2004/01/18 16:04:47 torcs Exp $                                  
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 /** @file   
     		
     @author	Christophe Guionneau
-    @version	$Id: ac3dgroup.cpp,v 1.6 2004/01/18 16:04:47 torcs Exp $
+    @version	$Id$
 */
 
 #include <stdio.h>

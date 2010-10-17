@@ -4,7 +4,7 @@
     created              : Mon Apr 16 16:04:36 CEST 2001
     copyright            : (C) 2001 by Eric Espié
     email                : Eric.Espie@torcs.org
-    version              : $Id: transmission.h,v 1.19 2005/04/04 14:56:37 olethros Exp $
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,7 +20,7 @@
 /** @file    
     		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id: transmission.h,v 1.19 2005/04/04 14:56:37 olethros Exp $
+    @version	$Id$
 */
 
 #ifndef _TRANSMISSION_H_

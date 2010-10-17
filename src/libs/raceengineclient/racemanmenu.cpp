@@ -4,7 +4,7 @@
     created     : Fri Jan  3 22:24:41 CET 2003
     copyright   : (C) 2003 by Eric Espie                        
     email       : eric.espie@torcs.org   
-    version     : $Id: racemanmenu.cpp,v 1.5 2004/08/11 17:44:06 torcs $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -20,17 +20,17 @@
 /** @file   
     		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
-    @version	$Id: racemanmenu.cpp,v 1.5 2004/08/11 17:44:06 torcs $
+    @version	$Id$
 */
 
 #include <cstdlib>
 #include <cstdio>
 
-#include <network.h>
-#include <tgfclient.h>
 #include <raceman.h>
-#include <racescreens.h>
+#include <tgfclient.h>
 #include <playerconfig.h>
+#include <racescreens.h>
+#include <network.h>
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -40,6 +40,8 @@
 #include "racemanmenu.h"
 #include "networkingmenu.h"
 
+
+// TODO: Move this MSVC stuff to portability.h, in order we can "enjoy" it everywhere.
 // VC++ 2005 or newer ...
 #if defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++ 2005
 #undef snprintf 
@@ -147,7 +149,7 @@ reConfigRunState(void)
 		return;
 	}
 	
-	sprintf(path, "%s/%d", RM_SECT_CONF, curConf);
+	snprintf(path, sizeof(path), "%s/%d", RM_SECT_CONF, curConf);
 	conf = GfParmGetStr(params, path, RM_ATTR_TYPE, 0);
 	if (!conf) {
 		GfLogError("No %s here (%s) !\n", RM_ATTR_TYPE, path);
@@ -191,10 +193,10 @@ reConfigRunState(void)
 		rp.title = GfParmGetStr(params, path, RM_ATTR_RACE, "Race");
 		/* Select options to configure */
 		rp.confMask = 0;
-		sprintf(path, "%s/%d/%s", RM_SECT_CONF, curConf, RM_SECT_OPTIONS);
+		snprintf(path, sizeof(path), "%s/%d/%s", RM_SECT_CONF, curConf, RM_SECT_OPTIONS);
 		numOpt = GfParmGetEltNb(params, path);
 		for (i = 1; i < numOpt + 1; i++) {
-			sprintf(path, "%s/%d/%s/%d", RM_SECT_CONF, curConf, RM_SECT_OPTIONS, i);
+			snprintf(path, sizeof(path), "%s/%d/%s/%d", RM_SECT_CONF, curConf, RM_SECT_OPTIONS, i);
 			opt = GfParmGetStr(params, path, RM_ATTR_TYPE, "");
 			if (!strcmp(opt, RM_VAL_CONFRACELEN)) {
 				/* Configure race length */
@@ -234,7 +236,7 @@ reLoadRaceFromResultsFile(const char *filename)
 {
 	char buf[256];
 
-	sprintf(buf, "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
+	snprintf(buf, sizeof(buf), "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
 	GfLogInfo("Loading saved race from %s ...\n", buf);
 
 	// Update race data.
@@ -253,14 +255,14 @@ static void
 reLoadRaceFromConfigFile(const char *filename)
 {
 	char pszSelFilePathName[256];
-	sprintf(pszSelFilePathName, "%sconfig/raceman/%s/%s",
-			GetLocalDir(), ReInfo->_reFilename, filename);
+	snprintf(pszSelFilePathName, sizeof(pszSelFilePathName), "%sconfig/raceman/%s/%s",
+			 GetLocalDir(), ReInfo->_reFilename, filename);
 	GfLogInfo("Loading saved race from %s ...\n", pszSelFilePathName);
 
 	// Replace the main race file by the selected one.
 	char pszMainFilePathName[256];
-	sprintf(pszMainFilePathName, "%sconfig/raceman/%s%s",
-			GetLocalDir(), ReInfo->_reFilename, PARAMEXT);
+	snprintf(pszMainFilePathName, sizeof(pszMainFilePathName), "%sconfig/raceman/%s%s",
+			 GetLocalDir(), ReInfo->_reFilename, PARAMEXT);
 	if (!GfFileCopy(pszSelFilePathName, pszMainFilePathName))
 	{
 		GfLogError("Failed to load selected race file %s", pszSelFilePathName);
@@ -278,7 +280,7 @@ reLoadRaceFromConfigFile(const char *filename)
 
 	// Update raceman info (the params pointer changed).
 	char pszFileName[64];
-	sprintf(pszFileName, "%s%s", ReInfo->_reFilename, PARAMEXT);
+	snprintf(pszFileName, sizeof(pszFileName), "%s%s", ReInfo->_reFilename, PARAMEXT);
 	ReUpdateRaceman(pszFileName, ReInfo->params);
 }
 
@@ -287,12 +289,12 @@ reSaveRaceToConfigFile(const char *filename)
 {
 	// Note: No need to write the main file here, already done at the end of race configuration.
 	char pszMainFilePathName[256];
-	sprintf(pszMainFilePathName, "%sconfig/raceman/%s%s",
-			GetLocalDir(), ReInfo->_reFilename, PARAMEXT);
+	snprintf(pszMainFilePathName, sizeof(pszMainFilePathName), "%sconfig/raceman/%s%s",
+			 GetLocalDir(), ReInfo->_reFilename, PARAMEXT);
 
 	// Add .xml extension if not there.
 	char pszSelFilePathName[256];
-	sprintf(pszSelFilePathName, "%sconfig/raceman/%s/%s",
+	snprintf(pszSelFilePathName, sizeof(pszSelFilePathName), "%sconfig/raceman/%s/%s",
 			GetLocalDir(), ReInfo->_reFilename, filename);
 	const char* pszFileExt = strrchr(pszSelFilePathName, '.');
 	if (!pszFileExt || strcmp(pszFileExt, PARAMEXT))
@@ -366,7 +368,8 @@ reOnSaveRaceToFile(void *pPrevMenu)
 	fs.mode = RmFSModeSave;
 
 	char pszDirPath[256];
-	snprintf(pszDirPath, 256, "%sconfig/raceman/%s", GetLocalDir(), ReInfo->_reFilename);
+	snprintf(pszDirPath, sizeof(pszDirPath), "%sconfig/raceman/%s",
+			 GetLocalDir(), ReInfo->_reFilename);
 	fs.path = pszDirPath;
 
 	fs.select = reSaveRaceToConfigFile;
@@ -540,18 +543,18 @@ ReNewTrackMenu(void)
 	raceNumber = 1;
 	for (xx = 1; xx < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++xx) 
 	{
-		sprintf(buf, "%s/%d", RM_SECT_TRACKS, xx);
+		snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, xx);
 		if (!strcmp( GfParmGetStr(ReInfo->params, buf, RM_ATTR_NAME, "free"), "free") == 0)
 			++raceNumber;
 	}
 
 	// Create variable subtitle label from race params.
-	sprintf(buf, "Race Day #%d/%d on %s",
-			raceNumber,
-			(int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) >= 0 ?
-			(int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) :
-			GfParmGetEltNb(params, RM_SECT_TRACKS), 
-			ReInfo->track->name);
+	snprintf(buf, sizeof(buf), "Race Day #%d/%d on %s",
+			 raceNumber,
+			 (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) >= 0 ?
+			 (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) :
+			 GfParmGetEltNb(params, RM_SECT_TRACKS), 
+			 ReInfo->track->name);
 	int subTitleId = CreateLabelControl(NewTrackMenuHdle, menuXMLDescHdle, "subtitlelabel");
 	GfuiLabelSetText(NewTrackMenuHdle, subTitleId, buf);
 

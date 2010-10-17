@@ -4,7 +4,7 @@
     created     : Thu Dec 12 15:11:55 CET 2004
     copyright   : (C) 2004 Bernhard Wymann
     email       : berniw@bluewin.ch
-    version     : $Id: soundconfig.h,v 1.1 2005/02/01 15:58:23 berniw Exp $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -19,7 +19,7 @@
 
 /** @file
 
-    @version	$Id: soundconfig.h,v 1.1 2005/02/01 15:58:23 berniw Exp $
+    @version	$Id$
 */
 
 #ifndef _SOUNDCONFIG_H_

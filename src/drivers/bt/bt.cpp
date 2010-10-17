@@ -4,7 +4,7 @@
     created              : Wed Jan 8 18:31:16 CET 2003
     copyright            : (C) 2002-2004 Bernhard Wymann
     email                : berniw@bluewin.ch
-    version              : $Id: bt.cpp,v 1.5.2.1 2008/05/26 20:28:07 berniw Exp $
+    version              : $Id$
 
  ***************************************************************************/
 

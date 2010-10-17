@@ -4,7 +4,7 @@
     created              : Sun Mar 19 00:07:19 CET 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: transmission.cpp,v 1.22 2005/09/15 13:50:51 olethros Exp $
+    version              : $Id$
 
 ***************************************************************************/
 

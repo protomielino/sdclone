@@ -16,7 +16,7 @@ Portions created by James Clark are Copyright (C) 1998
 James Clark. All Rights Reserved.
 
 Contributor(s):
-$Id: xmltok_impl.c,v 1.4 2002/10/13 22:03:37 torcs Exp $
+$Id$
 */
 
 #ifndef IS_INVALID_CHAR
