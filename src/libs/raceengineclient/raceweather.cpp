@@ -48,23 +48,27 @@ void ReStartWeather(void)
 	int resul2;
 	tTrack *track = ReInfo->track;
 
+	 // TODO: Move this inside TGF initialization, or so (in order to have it done only once).
 	srand((unsigned)time(NULL));
+	
 	cloud = track->weather;
 	Timeday = track->Timeday;
 
 	if (Timeday > 0)
 	{
+		GfLogDebug("ReStartWeather : Using loaded rain params\n");
 		rainbool = track->weather;
 		rainbool = rainbool - 4;
 	}
 	else
 	{
+		GfLogDebug("ReStartWeather : Using random rain params\n");
 		rain = track->rainprob;
 		cloud = 1 + (int)(rand()/(float)RAND_MAX * 7); //random cloud on Track when championship or career
 		track->weather = cloud; // cloud = random cloud
 
 		resul = 1 + (int)(rand()/(float)RAND_MAX * 99); // probability rain, if result < rain, so it rain
-		//printf("Result =  %d - Rain = %d\n", resul, rain);
+		//GfLogDebug("Result =  %d - Rain = %d\n", resul, rain);
 		if (resul < rain)
 		{
 			problrain = track->rainlprob;
@@ -74,17 +78,17 @@ void ReStartWeather(void)
 			if (resul2 < (problrain + 1)) // if result2 < probability little rain, so rain = little rain
 			{
 				rainbool = RAIN_VAL_LITTLE;
-				//printf("RainBool = %d\n", rainbool);
+				//GfLogDebug("RainBool = %d\n", rainbool);
 			}
 			else if (resul2 < (probrain +1)) // if result2 < probability normal rain, so rain = normal rain
 			{
 				rainbool = RAIN_VAL_NORMAL;
-				//printf("RainBool = %d\n", rainbool);
+				//GfLogDebug("RainBool = %d\n", rainbool);
 			}
 			else // result2 > probability normal rain so rain = Heavy rain
 			{
 				rainbool = RAIN_VAL_HEAVY;
-				//printf("RainBool = %d\n", rainbool);
+   			//GfLogDebug("RainBool = %d\n", rainbool);
 			}
 		}
 		else
@@ -93,23 +97,24 @@ void ReStartWeather(void)
 	}
 
 	if (rainbool > 0)
-		{
-			track->Rain = rainbool;
-	    	ReTrackUpdate();
-		}
+		track->Rain = rainbool;
 	else
 		track->Rain = 0;
-		ReTrackUpdate();
+	
+	ReTrackUpdate();
 }
 
 // Update Track Physic
 void ReTrackUpdate(void)
 {
-	int rain;
 	tTrack *track = ReInfo->track;
-	tTrackSurface *curSurf;
+	int rain = track->Rain;
 
-	rain = track->Rain;
+	GfLogDebug("ReTrackUpdate : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
+			   track->Timeday, track->weather, track->Rain, track->rainprob, track->rainlprob);
+	GfLogDebug("ReTrackUpdate : kFriction, kRollRes for each track surface :\n");
+
+	tTrackSurface *curSurf;
 	curSurf = track->surfaces;
 	do
 	{
@@ -118,41 +123,33 @@ void ReTrackUpdate(void)
 			case 1:
 			{
 				curSurf->kFriction     = curSurf->kFriction2;
-    				curSurf->kRollRes      = curSurf->kRollRes2;
-				#ifdef DEBUG
-					printf("ReTrackUpdate Function Friction = %f - RollRes = %f Little Rain\n", curSurf->kFriction, curSurf->kRollRes);
-				#endif
+				curSurf->kRollRes      = curSurf->kRollRes2;
 				break;
 			}
 			case 2:
 			{
 				curSurf->kFriction     = curSurf->kFriction2 * 0.9f;
-    				curSurf->kRollRes      = curSurf->kRollRes2;
-				#ifdef DEBUG
-					printf("ReTrackUpdate Function Friction = %f - RollRes = %f Normal Rain\n", curSurf->kFriction, curSurf->kRollRes);
-				#endif
+				curSurf->kRollRes      = curSurf->kRollRes2;
 				break;
 			}
 			case 3:
 			{
 				curSurf->kFriction     = curSurf->kFriction2 * 0.7f;
-    				curSurf->kRollRes      = curSurf->kRollRes2;
-				#ifdef DEBUG
-					printf("ReTrackUpdate Function Friction = %f - RollRes = %f Heavy Rain\n", curSurf->kFriction, curSurf->kRollRes);
-				#endif
+				curSurf->kRollRes      = curSurf->kRollRes2;
 				break;
 			}
 			default:
 			{
 				curSurf->kFriction     = curSurf->kFriction;
-    				curSurf->kRollRes      = curSurf->kRollRes;
-				#ifdef DEBUG
-					printf("ReTrackUpdate Function Friction = %f - RollRes = %f No Rain\n", curSurf->kFriction, curSurf->kRollRes);
-				#endif				
+				curSurf->kRollRes      = curSurf->kRollRes;
 				break;
 			}
 		}							
 		
+		GfLogDebug("                   %.4f, %.4f   %s\n",
+				   curSurf->kFriction, curSurf->kRollRes, curSurf->material);
+
 		curSurf = curSurf->next;
-	} while ( curSurf != 0);
+
+	} while ( curSurf );
 }

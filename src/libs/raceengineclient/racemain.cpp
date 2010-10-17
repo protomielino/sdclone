@@ -500,17 +500,20 @@ ReRaceStart(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	
-	#ifdef DEBUG
-		tTrack *track = ReInfo->track;
-    		tTrackSurface *curSurf;
-    		curSurf = track->surfaces;
-    		do
-    		{
-			GfLogDebug("Raceinit Function Friction = %f - RollRes = %f No Rain\n",
-					   curSurf->kFriction, curSurf->kRollRes);
-			curSurf = curSurf->next;
-    		} while ( curSurf != 0);
-	#endif
+#ifdef DEBUG
+	tTrack *track = ReInfo->track;
+	GfLogDebug("ReRaceStart : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
+			   track->Timeday, track->weather, track->Rain, track->rainprob, track->rainlprob);
+	GfLogDebug("ReRaceStart : kFriction, kRollRes for each track surface :\n");
+	tTrackSurface *curSurf;
+	curSurf = track->surfaces;
+	do
+	{
+		GfLogDebug("                   %.4f, %.4f   %s\n",
+				   curSurf->kFriction, curSurf->kRollRes, curSurf->material);
+		curSurf = curSurf->next;
+	} while (curSurf);
+#endif
 
 	FREEZ(ReInfo->_reCarInfo);
 	ReInfo->_reCarInfo = (tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
@@ -518,7 +521,11 @@ ReRaceStart(void)
 	/* Drivers starting order */
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-		&& ReInfo->s->_totTime < 0.0f) {
+		&& ReInfo->s->_totTime < 0.0f)
+	{
+		GfLogInfo("Starting %s %s session\n",
+				  ReInfo->_reName, ReInfo->s->_raceType == RM_TYPE_PRACTICE ? "practice" : "qualification");
+		
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
 			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
@@ -535,13 +542,19 @@ ReRaceStart(void)
 		const char* pszSkinName = GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0);
 		if (pszSkinName && strlen(pszSkinName) > 0)
 			GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
-	} else {
+	}
+	else
+	{
 		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
 		RmLoadingScreenSetText("Preparing Starting Grid ...");
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
-		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER)) {
-			/* Starting grid in the arrival order of the previous race */
+		
+		/* Starting grid in the arrival order of the previous race */
+		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER))
+		{
+			GfLogInfo("Starting %s : Starting grid in the order of the last race\n", ReInfo->_reName);
+			
 			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 			nCars = MIN(nCars, maxCars);
@@ -559,8 +572,13 @@ ReRaceStart(void)
 				if (pszSkinName && strlen(pszSkinName) > 0)
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
-		} else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER)) {
-			/* Starting grid in the reversed arrival order of the previous race */
+		}
+		
+		/* Starting grid in the reversed arrival order of the previous race */
+		else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER))
+		{
+			GfLogInfo("Starting %s : Starting grid in the reverse order of the last race\n", ReInfo->_reName);
+
 			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 			nCars = MIN(nCars, maxCars);
@@ -578,8 +596,13 @@ ReRaceStart(void)
 				if (pszSkinName && strlen(pszSkinName) > 0)
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
-		} else {
-			/* Starting grid in the drivers list order */
+		}
+
+		/* Starting grid in the drivers list order */
+		else
+		{
+			GfLogInfo("Starting %s : Starting grid in the order of the driver list\n", ReInfo->_reName);
+
 			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 			nCars = MIN(nCars, maxCars);
@@ -595,6 +618,7 @@ ReRaceStart(void)
 			}
 		}
 	}
+	
 	//ReWeatherUpdate();
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {

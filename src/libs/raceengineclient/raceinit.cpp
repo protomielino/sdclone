@@ -738,7 +738,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
     return elt;
   } else {
-    GfLogError("No description file for driver %s\n", cardllname);
+    GfLogError("No description file for robot %s\n", cardllname);
   }
   return NULL;
 }
@@ -786,7 +786,7 @@ ReInitCars(void)
     /* Load the driver type shared library */
     if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
     {
-      GfLogError("Failed to load %s driver\n", path);
+      GfLogError("Failed to load robot module %s\n", path);
       break;
     }
 
@@ -804,13 +804,13 @@ ReInitCars(void)
           /* We have the right driver : load it */
           elt = reLoadSingleCar( index, i, j, robotIdx, TRUE, robotModuleName );
           if (!elt)
-            GfLogError("No description file for driver %s (1)\n", robotModuleName);
+            GfLogError("No descriptor file for robot %s (1)\n", robotModuleName);
         }
       }
     }
     else 
     {
-      GfLogTrace("Loading driver %s\n", robotModuleName );
+      GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
       sprintf(buf, "%sdrivers/%s/%s.xml", GetLocalDir(), robotModuleName, robotModuleName);
       robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
       if (!robhdle) 
@@ -829,7 +829,7 @@ ReInitCars(void)
         elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
       }
       else
-        GfLogError("No description for driver %s (2)\n", robotModuleName );
+        GfLogError("No descriptor for robot %s (2)\n", robotModuleName );
 
     }
 
@@ -882,17 +882,17 @@ reDumpTrack(const tTrack *track, int verbose)
       track->author, track->length, track->width);
   RmLoadingScreenSetText(buf);
 
-  GfOut("++++++++++++ Track ++++++++++++\n");
-  GfOut("Name     = %s\n", track->name);
-  GfOut("Author   = %s\n", track->author);
-  GfOut("Filename = %s\n", track->filename);
-  GfOut("NSeg     = %d\n", track->nseg);
-  GfOut("Version  = %d\n", track->version);
-  GfOut("Length   = %f\n", track->length);
-  GfOut("Width    = %f\n", track->width);
-  GfOut("XSize    = %f\n", track->max.x);
-  GfOut("YSize    = %f\n", track->max.y);
-  GfOut("ZSize    = %f\n", track->max.z);
+  GfLogInfo("++++++++++++ Track ++++++++++++\n");
+  GfLogInfo("Name     = %s\n", track->name);
+  GfLogInfo("Author   = %s\n", track->author);
+  GfLogInfo("Filename = %s\n", track->filename);
+  GfLogInfo("NSeg     = %d\n", track->nseg);
+  GfLogInfo("Version  = %d\n", track->version);
+  GfLogInfo("Length   = %f\n", track->length);
+  GfLogInfo("Width    = %f\n", track->width);
+  GfLogInfo("XSize    = %f\n", track->max.x);
+  GfLogInfo("YSize    = %f\n", track->max.y);
+  GfLogInfo("ZSize    = %f\n", track->max.z);
   
   switch (track->pits.type) {
     case TR_PIT_NONE:
@@ -908,6 +908,9 @@ reDumpTrack(const tTrack *track, int verbose)
       break;
     }//switch pits.type
     
+  GfLogInfo("TimeOfDay= %d\n", track->Timeday);
+  GfLogInfo("Weather  = %d\n", track->weather);
+
   if (verbose) {
     int i;
     tTrackSeg *seg;
@@ -966,8 +969,6 @@ ReInitTrack(void)
   const char  *catName;
   const char  *raceName;
   const char  *cloudA;
-
-  //int rain;
 
   void  *params = ReInfo->params;
   void  *results = ReInfo->results;
@@ -1048,15 +1049,23 @@ ReInitTrack(void)
 
   //DEBUG WEATHER - Verification function update friction
 #ifdef DEBUG
-  tTrack *track = ReInfo->track;
-  tTrackSurface *curSurf;
-  curSurf = track->surfaces;
-  do {
-    GfLogDebug("ReInitTrack: Friction = %f - RollRes = %f\n", curSurf->kFriction, curSurf->kRollRes);
-    curSurf = curSurf->next;
-    } while ( curSurf != 0);
+// No use since already done in that ReTrackUpdate is always called by ReStartWeather. 
+//   tTrack *track = ReInfo->track;
+//   GfLogDebug("ReInitTrack : Track params : clouds=%d, rain=%d l/m2/h\n",
+// 			 cloudA, weather_rain);
+//   GfLogDebug("ReInitTrack : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
+// 			 track->Timeday, track->weather, track->Rain, track->rainprob, track->rainlprob);
+//   GfLogDebug("ReInitTrack : kFriction, kRollRes for each track surface :\n");
+//   tTrackSurface *curSurf;
+//   curSurf = track->surfaces;
+//   do {
+// 	  GfLogDebug("                   %.4f, %.4f   %s\n",
+// 				 curSurf->kFriction, curSurf->kRollRes, curSurf->material);
+// 	  curSurf = curSurf->next;
+//   } while ( curSurf );
 #endif
   // End Function DEBUG TRACE Variable kFriction
+  
   return 0;
 }//ReInitTrack
 
