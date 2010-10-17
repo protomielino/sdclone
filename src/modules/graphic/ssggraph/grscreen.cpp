@@ -119,13 +119,13 @@ void cGrScreen::activate(int x, int y, int w, int h)
 	scrh = h;
 	
 	if (boardCam) {
-		// Boards assume a fixed geometry of 800x600
-		int overscan = (((float) scrw * 600 / (float) scrh) - 800) / 2;
-
-		if (overscan < 0) overscan = 0;
+		int fake_width = (float) scrw * 600 / (float) scrh;
+		if (fake_width < 800)
+			fake_width = 800;
 
 		delete boardCam;
-		boardCam = new cGrOrthoCamera(this, -overscan, 800 + overscan, 0, 600);
+		boardCam = new cGrOrthoCamera(this, 0, fake_width, 0, 600);
+		board->setWidth(fake_width);
 	}
 
 	if (mirrorCam) {
@@ -443,12 +443,12 @@ void cGrScreen::initCams(tSituation *s)
 	}
 	
 	if (boardCam == NULL) {
-		// Boards assume a fixed geometry of 800x600
-		int overscan = (((float) scrw * 600 / (float) scrh) - 800) / 2;
+		int fake_width = (float) scrw * 600 / (float) scrh;
+		if (fake_width < 800)
+			fake_width = 800;
 
-		if (overscan < 0) overscan = 0;
-
-		boardCam = new cGrOrthoCamera(this, -overscan, 800 + overscan, 0, 600);
+		boardCam = new cGrOrthoCamera(this, 0, fake_width, 0, 600);
+		board->setWidth(fake_width);
 	}
 	
 	if (bgCam == NULL) {

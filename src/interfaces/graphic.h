@@ -55,6 +55,8 @@
 #define GR_ATT_DEBUG		"debug info"
 #define GR_ATT_GGRAPH		"G graph"
 #define GR_ATT_ARCADE		"arcade"
+#define GR_ATT_BOARDWIDTH	"board width"
+#define GR_ATT_SPEEDORISE	"speedometer vertical position"
 #define GR_ATT_NBLEADER		"Max leaders entries"
 
 #define GR_SCT_TVDIR		"TV Director View"

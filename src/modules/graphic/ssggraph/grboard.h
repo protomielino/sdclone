@@ -40,6 +40,11 @@ class cGrBoard
     int counterFlag;
     int GFlag;
     int arcadeFlag;
+    int boardWidth;
+    int leftAnchor;
+    int centerAnchor;
+    int rightAnchor;
+    int speedoRise;
     std::vector<std::string> sShortNames;
 		
  private:
@@ -71,6 +76,7 @@ class cGrBoard
     void initBoard(void);
     void shutdown(void);
     void selectBoard(int brd);
+    void setWidth(int width);
     void initBoardCar(tCarElt *car);
     inline cGrTrackMap *getTrackMap() { return trackMap; }
 
