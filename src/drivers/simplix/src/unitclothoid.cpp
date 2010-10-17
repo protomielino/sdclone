@@ -673,6 +673,17 @@ bool TClothoidLane::SaveToFile(const char* Filename)
 //==========================================================================*
 
 //==========================================================================*
+// Called for every track change or new race.
+//--------------------------------------------------------------------------*
+int TClothoidLane::GetWeather()
+{
+  const TSection& Sec = (*oTrack)[0];
+  tTrackSeg* Seg = Sec.Seg; 
+  return (int) (100000 * Seg->surface->kFriction);
+};
+//==========================================================================*
+
+//==========================================================================*
 // Save path points
 //--------------------------------------------------------------------------*
 bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
@@ -684,12 +695,26 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   int K;
   fread(&K,sizeof(int),1,F);
   if (K > 0)
+  {
+    fclose(F);
     return false;
+  }
 
   int Version;
   fread(&Version,sizeof(int),1,F);
-  if (Version < 110)
+  if (Version < 112)
+  {
+    fclose(F);
     return false;
+  }
+
+  int Weather;
+  fread(&Weather,sizeof(int),1,F);
+  if (Weather != GetWeather())
+  {
+    fclose(F);
+    return false;
+  }
 
   int N;
   fread(&N,sizeof(int),1,F);
@@ -717,8 +742,11 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int K = 0;
   fwrite(&K,sizeof(int),1,F);
 
-  int Version = 111;
+  int Version = 112;
   fwrite(&Version,sizeof(int),1,F);
+
+  int Weather = GetWeather();
+  fwrite(&Weather,sizeof(int),1,F);
 
   int N = oTrack->Count();
   fwrite(&N,sizeof(int),1,F);

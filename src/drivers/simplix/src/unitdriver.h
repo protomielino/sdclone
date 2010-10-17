@@ -390,6 +390,7 @@ private:
 	float oSideScaleBrake;
 	float oSideBorderOuter;
 	double oXXX;
+	bool oRain;
 
 	static int NBBOTS;                           // Nbr of cars
 //    static double CurrSimTime;                   // Current simulation time
@@ -402,6 +403,7 @@ private:
 	static bool AdvancedParameters;
     static bool UseOldSkilling;
     static bool UseSCSkilling;
+    static bool UseMPA1Skilling;
 	static bool UseBrakeLimit;
 	static bool UseGPBrakeLimit;
 	static float BrakeLimit;
@@ -415,13 +417,25 @@ private:
 	void ScaleSide(float FactorMu, float FactorBrake);
 	void SideBorderOuter(float Factor);
 
+	void AdjustBrakes(PCarHandle Handle);
+	void AdjustDriving(PCarHandle Handle, double ScaleBrake, double ScaleMu);
+	void AdjustPitting(PCarHandle Handle);
+    void AdjustSkilling(PCarHandle Handle);
+    void GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
+
+	void CalcSkilling();
 	double CalcFriction(const double Crv);
 	double CalcCrv(double Crv);
 	double CalcHairpin(double Crv);
 
+	void (TDriver::*CalcSkillingFoo)();
 	double (TDriver::*CalcFrictionFoo)(const double Crv);
 	double (TDriver::*CalcCrvFoo)(double Crv);
 	double (TDriver::*CalcHairpinFoo)(double Crv);
+
+	void CalcSkilling_simplix();
+	void CalcSkilling_simplix_MPA1();
+	void CalcSkilling_simplix_SC();
 
 	double CalcFriction_simplix(double Crv);
 	double CalcFriction_simplix_TRB1(double Crv);

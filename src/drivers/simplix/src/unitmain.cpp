@@ -260,6 +260,7 @@ void SetUpSimplix_mpa1()
     TDriver::AdvancedParameters = true;
     TDriver::UseBrakeLimit = true;
     TDriver::Learning = true;
+    TDriver::UseMPA1Skilling = true;            
 };
 //==========================================================================*
 
@@ -610,6 +611,7 @@ static int InitFuncPt(int Index, void *Pt)
   if (cRobotType == RTYPE_SIMPLIX)
   {
 	  GfOut("#cRobotType == RTYPE_SIMPLIX\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix;
@@ -619,6 +621,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_TRB1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_TRB1\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_TRB1;
@@ -628,6 +631,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_SC)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_SC\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_SC;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_SC;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_SC;
@@ -637,6 +641,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_36GP)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_36GP\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_36GP;
@@ -647,7 +652,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_MPA1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_MPA1\n");
-//    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_MPA1;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_MPA1;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_MPA1;
@@ -657,6 +662,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_LS1)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_LS1\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_LS1;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_LS1;
@@ -666,6 +672,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_GP1600)
   {
     GfOut("#cRobotType == RTYPE_SIMPLIX_GP1600\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_GP1600;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_GP1600;
@@ -880,6 +887,10 @@ extern "C" int simplix_mpa1(tModInfo *ModInfo)
 	  return -1;
 
   SetParameters(10, "indycar01");
+  TDriver::AdvancedParameters = true;
+  TDriver::UseBrakeLimit = true;
+  TDriver::Learning = true;
+  TDriver::UseMPA1Skilling = true;            
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
 //==========================================================================*

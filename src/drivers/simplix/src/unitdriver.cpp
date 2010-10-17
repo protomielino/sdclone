@@ -94,6 +94,7 @@ const char* TDriver::DEFAULTCARTYPE  = "car1-trb1";// Default car type
 bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
+bool  TDriver::UseMPA1Skilling = false;            // Use mpa1 car skilling
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 bool  TDriver::UseGPBrakeLimit = false;            // Use brake limit for GP36
 float TDriver::BrakeLimit = -6;                    // Brake limit
@@ -449,231 +450,10 @@ void TDriver::SetBotName(void* RobotSettings, char* Value)
 //==========================================================================*
 
 //==========================================================================*
-// Called for every track change or new race.
+// Adjust brakes
 //--------------------------------------------------------------------------*
-void TDriver::InitTrack
-  (PTrack Track, PCarHandle CarHandle,
-  PCarSettings *CarSettings, PSituation Situation)
+void TDriver::AdjustBrakes(PCarHandle Handle)
 {
-  GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
-
-  oTrack = Track;                                // save pointers
-#ifdef SPEED_DREAMS
-  if (TrackLength < 2000)
-	RtTeamManagerLaps(3);
-  else if (TrackLength < 3000)
-	RtTeamManagerLaps(2);
-#else
-#endif
-
-  oSituation = Situation;
-
-  oSkillGlobal = oSkill = oDecelAdjustPerc = oDriverAggression = 0.0;
-
-  // Initialize race type array
-  const char* RaceType[] =
-    {"practice", "qualify", "race"};
-
-  // Initialize the base param path
-  const char* BaseParamPath = TDriver::ROBOT_DIR;
-  const char* PathFilename = PathFilenameBuffer;
-
-  // Global skilling from Andrew Sumner ...
-  // Check if skilling is enabled
-  int SkillEnabled = 0;
-  snprintf(PathFilenameBuffer, BUFLEN,           // In default.xml
-    "%s/default.xml", BaseParamPath);            // of the robot
-  GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
-  void* SkillHandle = GfParmReadFile
-	(PathFilename, GFPARM_RMODE_REREAD);
-  if (SkillHandle)
-  {
-    SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
-	  "skilling", "enable", (char *) NULL, 0.0)));
-    GfOut("#SkillEnabled %d\n",SkillEnabled);
-    oTeamEnabled =
-  	  GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
-    GfOut("#oTeamEnabled %d\n",oTeamEnabled);
-  }
-
-  if (SkillEnabled > 0)                          // If skilling is enabled
-  {                                              // Get Skill level
-	oSkilling = true;                            // of TORCS-Installation
-    GfOut("#Skilling: On\n");
-
-	void* SkillHandle = NULL;
-
-    snprintf(PathFilenameBuffer, BUFLEN,
-	  "%sconfig/raceman/extra/skill.xml",GetLocalDir());
-    GfOut("#skill.xml: %s\n", PathFilename);
-    SkillHandle = GfParmReadFile
-	  (PathFilename, GFPARM_RMODE_REREAD);
-    if (SkillHandle)
-    {
-      oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
-		  "skill", "level", (char *) NULL, 10.0)));
-	  GfOut("#LocalDir: SkillGlobal: %g\n", oSkillGlobal);
-    }
-	else
-	{
-      snprintf(PathFilenameBuffer, BUFLEN,
-	    "%sconfig/raceman/extra/skill.xml",GetDataDir());
-      GfOut("#skill.xml: %s\n", PathFilename);
-      SkillHandle = GfParmReadFile
-	    (PathFilename, GFPARM_RMODE_REREAD);
-      if (SkillHandle)
-      {
-        oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
-		  "skill", "level", (char *) NULL, 10.0)));
-		GfOut("#DataDir: SkillGlobal: %g\n", oSkillGlobal);
-	  }
-    }
-
-    // Get individual skilling
-    //int SkillEnabled = 0;
-    snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
-      BaseParamPath,oIndex);
-	GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
-    SkillHandle = GfParmReadFile
-	  (PathFilename, GFPARM_RMODE_REREAD);
-    if (SkillHandle)
-    {
-      oSkillDriver = GfParmGetNum(SkillHandle,"skill","level",0,0.0);
-      oSkillDriver = MIN(1.0, MAX(0.0, oSkillDriver));
-      GfOut("#oSkillDriver: %g\n", oSkillDriver);
-
-      oDriverAggression = 
-	    GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
-      GfOut("#oDriverAggression: %g\n", oDriverAggression);
-    }
-  }
-  else
-  {
-	oSkilling = false;
-    GfOut("#Skilling: Off\n");
-  }
-  // ... Global skilling from Andrew Sumner
-
-  // Get the name of the track
-  strncpy(TrackNameBuffer,                       // Copy name of track file
-    strrchr(oTrack->filename, '/') + 1,          // from path and filename
-	sizeof(TrackNameBuffer));                    // regarding length of buffer
-  *strrchr(TrackNameBuffer, '.') = '\0';         // Truncate at point
-  oTrackName = TrackNameBuffer;                  // Set pointer to buffer
-
-  // Read/merge car parms
-  // First all params out of the common files
-  oMaxFuel = GfParmGetNum(CarHandle              // Maximal möglicher
-    , SECT_CAR, PRM_TANK                         //   Tankinhalt
-    , (char*) NULL, 100.0);
-  GfOut("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
-
-  oMaxPressure = GfParmGetNum(CarHandle          // Maximal möglicher
-    , "Brake System", MAXPRESSURE                //   Bremsdruck
-    , (char*) NULL, (float) oMaxPressure);
-  GfOut("#oMaxPressure       = %.1f\n",oMaxPressure);
-
-  oBrakeScale *= MAX(1.0,INITIAL_BRAKE_PRESSURE / oMaxPressure);
-  GfOut("#oBrakeScale       = %.3f\n",oBrakeScale);
-  oBrakeForceMax *= oBrakeScale/INITIAL_BRAKE_SCALE;
-  GfOut("#oBrakeForceMax    = %.3f\n",oBrakeForceMax);
-
-  // Next Params out of the own files
-  PCarHandle Handle = NULL;                      // Start with an "empty file"
-  char Buf[1024];                                // Multi purpose buffer
-
-  // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
-  snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
-    BaseParamPath,oCarType);
-  GfOut("#Default params for car type: %s\n", Buf);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
-
-  snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/tracks/%s.trk",
-    BaseParamPath,oTrackName);
-  oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
-  snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),"%s/tracks/%s.trq",
-    BaseParamPath,oTrackName);
-  oTrackLoadQualify = TrackLoadQualifyBuffer;    // Set pointer to buffer
-  snprintf(TrackLoadLeftBuffer,sizeof(TrackLoadLeftBuffer),"%s/tracks/%s.trl",
-    BaseParamPath,oTrackName);
-  oTrackLoadLeft = TrackLoadLeftBuffer;          // Set pointer to buffer
-  snprintf(TrackLoadRightBuffer,sizeof(TrackLoadRightBuffer),"%s/tracks/%s.trr",
-    BaseParamPath,oTrackName);
-  oTrackLoadRight = TrackLoadRightBuffer;        // Set pointer to buffer
-  snprintf(PitLoadBuffer,sizeof(PitLoadBuffer),"%s/tracks/%s.tpk",
-    BaseParamPath,oTrackName);
-  oPitLoad[0] = PitLoadBuffer;                   // Set pointer to buffer
-  snprintf(PitLoadLeftBuffer,sizeof(PitLoadLeftBuffer),"%s/tracks/%s.tpl",
-    BaseParamPath,oTrackName);
-  oPitLoad[1] = PitLoadLeftBuffer;               // Set pointer to buffer
-  snprintf(PitLoadRightBuffer,sizeof(PitLoadRightBuffer),"%s/tracks/%s.tpr",
-    BaseParamPath,oTrackName);
-  oPitLoad[2] = PitLoadRightBuffer;              // Set pointer to buffer
-
-  // Override params for track (Pitting) 
-  snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
-    BaseParamPath,oTrackName);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
-  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__BRAKE,NULL,0.80f);
-  double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__MU,NULL,0.95f);
-
-  // Override params for car type with params of track
-  snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
-    BaseParamPath,oCarType,oTrackName);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
-
-  // Override params for car type on track with params of specific race type
-  snprintf(Buf,sizeof(Buf),"%s/%s/%s-%s.xml",
-    BaseParamPath,oCarType,oTrackName,RaceType[oSituation->_raceType]);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
-
-  // Override params for car type on track with driver on track
-  snprintf(Buf,sizeof(Buf),"%s/%d/%s.xml",
-    BaseParamPath,oIndex,oTrackName);
-//  Handle = TUtils::MergeParamFile(Handle,Buf);
-
-  // Override params for driver on track with params of specific race type
-  snprintf(Buf,sizeof(Buf),"%s/%d/%s-%s.xml",
-    BaseParamPath,oIndex,oTrackName,RaceType[oSituation->_raceType]);
-  Handle = TUtils::MergeParamFile(Handle,Buf);
-
-  // Setup the car param handle to be returned
-  *CarSettings = Handle;
-
-  // Get the private parameters now.
-  TDriver::LengthMargin =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LENGTH_MARGIN,0,LENGTH_MARGIN);
-  GfOut("#LengthMargin %.2f\n",TDriver::LengthMargin);
-
-  // Check test flag:
-  const char* ForceLane = GfParmGetStr(Handle,
-	TDriver::SECT_PRIV,PRV_FORCE_LANE,"F");    
-  
-  if (strcmp(ForceLane,"L") == 0)
-	oTestLane = -1;
-  else if (strcmp(ForceLane,"R") == 0)
-	oTestLane = 1;
-  else 
-	oTestLane = 0;
-
-  int TestQualification =
-	(int) GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_QUALIFICATION,0,0);
-  if ((oSituation->_raceType == RM_TYPE_QUALIF)
-	|| (TestQualification > 0))
-  {
-    if ((oSituation->_raceType == RM_TYPE_PRACTICE)
-      || (oSituation->_raceType == RM_TYPE_QUALIF))
-	{
-	  Qualification = true;
-	  GfOut("#Qualification = True\n");
-	  NBRRL = 1;
-	}
-  }
-
-  // Get car's length
-  Param.Fix.oLength =
-	GfParmGetNum(Handle,SECT_CAR,PRM_LEN,0,4.5);
-
   if ((TDriver::UseBrakeLimit) || (TDriver::UseGPBrakeLimit))
   {
     TDriver::BrakeLimit = 
@@ -692,71 +472,14 @@ void TDriver::InitTrack
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SPEED_LIMIT_SCALE,0,(float) TDriver::SpeedLimitScale);
     GfOut("#SpeedLimitScale %g\n",TDriver::SpeedLimitScale);
   }
+};
+//==========================================================================*
 
-  // Adjust pitting ...
-  Param.Pit.oUseFirstPit = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,1);
-  GfOut("#oUseFirstPit %d\n",Param.Pit.oUseFirstPit);
-
-  Param.Pit.oUseSmoothPit = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_SMOOTH,0,0);
-  GfOut("#oUseSmoothPit %d\n",Param.Pit.oUseSmoothPit);
-
-  Param.Pit.oLaneEntryOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_ENTRY,0,3.0f);
-  GfOut("#oLaneEntryOffset %g\n",Param.Pit.oLaneEntryOffset);
-
-  Param.Pit.oLaneExitOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_EXIT,0,5.0f);
-  GfOut("#oLaneExitOffset %g\n",Param.Pit.oLaneExitOffset);
-
-  Param.Pit.oEntryLong =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_ENTRY_LONG,0,0);
-  GfOut("#oEntryLong %g\n",Param.Pit.oEntryLong);
-
-  Param.Pit.oExitLong =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LONG,0,0);
-  GfOut("#oExitLong %g\n",Param.Pit.oExitLong);
-
-  Param.Pit.oExitLength =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LEN,0,0);
-  GfOut("#oExitLength %g\n",Param.Pit.oExitLength);
-
-  Param.Pit.oLatOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LAT_OFFS,0,0.0);
-  GfOut("#Lateral Pit Offset %f\n",Param.Pit.oLatOffset);
-
-  Param.Pit.oLongOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LONG_OFFS,0,0.0);
-  GfOut("#Longitudinal Pit  Offset %f\n",Param.Pit.oLongOffset);
-
-  Param.oCarParam.oScaleBrakePit =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_SCALE_BRAKE,0,
-	(float) MIN(1.0,Param.oCarParam.oScaleBrake));
-  GfOut("#ScaleBrakePit %g\n",Param.oCarParam.oScaleBrakePit);
-
-  Param.Pit.oStoppingDist =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_STOP_DIST,0,1.5);
-  GfOut("#oStoppingDist %g\n",Param.Pit.oStoppingDist);
-
-  Param.Fix.oPitBrakeDist =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_BRAKE_DIST,0,150.0);
-  GfOut("#oPitBrakeDist %g\n",Param.Fix.oPitBrakeDist);
-
-  Param.Fix.oPitMinEntrySpeed =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINENTRYSPEED,0,24.5);
-  GfOut("#oPitMinEntrySpeed %g\n",Param.Fix.oPitMinEntrySpeed);
-
-  Param.Fix.oPitMinExitSpeed =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINEXITSPEED,0,24.5);
-  GfOut("#oPitMinExitSpeed %g\n",Param.Fix.oPitMinExitSpeed);
-
-  oTestPitStop = (int)
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_TEST_STOP,0,0);
-  GfOut("#TestPitStop %d\n",oTestPitStop);
-  // ... Adjust pitting
-
-  // Adjust driving ...
+//==========================================================================*
+// Adjust driving
+//--------------------------------------------------------------------------*
+void TDriver::AdjustDriving(PCarHandle Handle, double ScaleBrake, double ScaleMu)
+{
   Param.oCarParam.oScaleBrake = ScaleBrake *
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE,NULL,0.85f);
   if(Qualification)
@@ -919,7 +642,84 @@ void TDriver::InitTrack
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,(float)oTeamEnabled) != 0;
   GfOut("#oTeamEnabled %d\n",oTeamEnabled);
   // ... Adjust driving
+};
+//==========================================================================*
 
+//==========================================================================*
+// Adjust pitting
+//--------------------------------------------------------------------------*
+void TDriver::AdjustPitting(PCarHandle Handle)
+{
+  // Adjust pitting ...
+  Param.Pit.oUseFirstPit = (int)
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_FIRST,0,1);
+  GfOut("#oUseFirstPit %d\n",Param.Pit.oUseFirstPit);
+
+  Param.Pit.oUseSmoothPit = (int)
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_USE_SMOOTH,0,0);
+  GfOut("#oUseSmoothPit %d\n",Param.Pit.oUseSmoothPit);
+
+  Param.Pit.oLaneEntryOffset =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_ENTRY,0,3.0f);
+  GfOut("#oLaneEntryOffset %g\n",Param.Pit.oLaneEntryOffset);
+
+  Param.Pit.oLaneExitOffset =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_EXIT,0,5.0f);
+  GfOut("#oLaneExitOffset %g\n",Param.Pit.oLaneExitOffset);
+
+  Param.Pit.oEntryLong =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_ENTRY_LONG,0,0);
+  GfOut("#oEntryLong %g\n",Param.Pit.oEntryLong);
+
+  Param.Pit.oExitLong =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LONG,0,0);
+  GfOut("#oExitLong %g\n",Param.Pit.oExitLong);
+
+  Param.Pit.oExitLength =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_EXIT_LEN,0,0);
+  GfOut("#oExitLength %g\n",Param.Pit.oExitLength);
+
+  Param.Pit.oLatOffset =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LAT_OFFS,0,0.0);
+  GfOut("#Lateral Pit Offset %f\n",Param.Pit.oLatOffset);
+
+  Param.Pit.oLongOffset =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LONG_OFFS,0,0.0);
+  GfOut("#Longitudinal Pit  Offset %f\n",Param.Pit.oLongOffset);
+
+  Param.oCarParam.oScaleBrakePit =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_SCALE_BRAKE,0,
+	(float) MIN(1.0,Param.oCarParam.oScaleBrake));
+  GfOut("#ScaleBrakePit %g\n",Param.oCarParam.oScaleBrakePit);
+
+  Param.Pit.oStoppingDist =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_STOP_DIST,0,1.5);
+  GfOut("#oStoppingDist %g\n",Param.Pit.oStoppingDist);
+
+  Param.Fix.oPitBrakeDist =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_BRAKE_DIST,0,150.0);
+  GfOut("#oPitBrakeDist %g\n",Param.Fix.oPitBrakeDist);
+
+  Param.Fix.oPitMinEntrySpeed =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINENTRYSPEED,0,24.5);
+  GfOut("#oPitMinEntrySpeed %g\n",Param.Fix.oPitMinEntrySpeed);
+
+  Param.Fix.oPitMinExitSpeed =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_MINEXITSPEED,0,24.5);
+  GfOut("#oPitMinExitSpeed %g\n",Param.Fix.oPitMinExitSpeed);
+
+  oTestPitStop = (int)
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_TEST_STOP,0,0);
+  GfOut("#TestPitStop %d\n",oTestPitStop);
+  // ... Adjust pitting
+};
+//==========================================================================*
+
+//==========================================================================*
+// Adjust skilling depending on the car types to drive
+//--------------------------------------------------------------------------*
+void TDriver::AdjustSkilling(PCarHandle Handle)
+{
   // Adjust skilling ...
   if ((oSkill < 0) || (!oSkilling))
   {
@@ -938,32 +738,7 @@ void TDriver::InitTrack
     oLookAhead = oLookAhead / (1+oSkillGlobal/24);
     oLookAheadFactor = oLookAheadFactor / (1+oSkillGlobal/24);
 
-	if (UseOldSkilling)
-	{
-      // Scaling to match hymies
-	  oSkill = 
-		-0.0000455 * oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal
-		+0.0014 * oSkillGlobal*oSkillGlobal*oSkillGlobal*oSkillGlobal
-		-0.0145 * oSkillGlobal*oSkillGlobal*oSkillGlobal
-		+0.0512 * oSkillGlobal*oSkillGlobal
-		+0.0978 * oSkillGlobal
-		+ oSkillOffset + oSkillDriver;
-	}
-	else if (UseSCSkilling)
-	{
-      // Scaling to match usr_sc
-	  oSkillScale = oSkillScale/50.0;
-	  oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
-	  oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
-	}
-	else
-	{
-      // Scaling 
-	  oSkillScale = oSkillScale/50.0;
-	  oSkillDriver = oSkillDriver / (5.0 * ((50.0 - oSkillGlobal)/40.0));
-	  oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
-	  oSkillMax = oSkillScale * 24 + oSkillOffset;
-	}
+	CalcSkilling();
 
 	if (Qualification)
 	{
@@ -976,6 +751,249 @@ void TDriver::InitTrack
 		oSkill,oSkillGlobal,oSkillDriver,oLookAhead,oLookAheadFactor,Param.Tmp.oSkill);
   }
   // ... Adjust skilling
+};
+//==========================================================================*
+
+//==========================================================================*
+// Get skilling parameters
+//--------------------------------------------------------------------------*
+void TDriver::GetSkillingParameters
+  (const char* BaseParamPath, const char* PathFilename)
+{
+  // Global skilling from Andrew Sumner ...
+  // Check if skilling is enabled
+  int SkillEnabled = 0;
+  snprintf(PathFilenameBuffer, BUFLEN,           // In default.xml
+    "%s/default.xml", BaseParamPath);            // of the robot
+  GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
+  void* SkillHandle = GfParmReadFile
+	(PathFilename, GFPARM_RMODE_REREAD);
+  if (SkillHandle)
+  {
+    SkillEnabled = (int) MAX(0,MIN(1,(int) GfParmGetNum(SkillHandle,
+	  "skilling", "enable", (char *) NULL, 0.0)));
+    GfOut("#SkillEnabled %d\n",SkillEnabled);
+    oTeamEnabled =
+  	  GfParmGetNum(SkillHandle,"team","enable",0,(float) oTeamEnabled) != 0;
+    GfOut("#oTeamEnabled %d\n",oTeamEnabled);
+  }
+
+  if (SkillEnabled > 0)                          // If skilling is enabled
+  {                                              // Get Skill level
+	oSkilling = true;                            // of TORCS-Installation
+    GfOut("#Skilling: On\n");
+
+	void* SkillHandle = NULL;
+
+    snprintf(PathFilenameBuffer, BUFLEN,
+	  "%sconfig/raceman/extra/skill.xml",GetLocalDir());
+    GfOut("#skill.xml: %s\n", PathFilename);
+    SkillHandle = GfParmReadFile
+	  (PathFilename, GFPARM_RMODE_REREAD);
+    if (SkillHandle)
+    {
+      oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
+		  "skill", "level", (char *) NULL, 10.0)));
+	  GfOut("#LocalDir: SkillGlobal: %g\n", oSkillGlobal);
+    }
+	else
+	{
+      snprintf(PathFilenameBuffer, BUFLEN,
+	    "%sconfig/raceman/extra/skill.xml",GetDataDir());
+      GfOut("#skill.xml: %s\n", PathFilename);
+      SkillHandle = GfParmReadFile
+	    (PathFilename, GFPARM_RMODE_REREAD);
+      if (SkillHandle)
+      {
+        oSkillGlobal = MAX(0.0,MIN(10.0,GfParmGetNum(SkillHandle,
+		  "skill", "level", (char *) NULL, 10.0)));
+		GfOut("#DataDir: SkillGlobal: %g\n", oSkillGlobal);
+	  }
+    }
+
+    // Get individual skilling
+    //int SkillEnabled = 0;
+    snprintf(PathFilenameBuffer,BUFLEN,"%s/%d/skill.xml",
+      BaseParamPath,oIndex);
+	GfOut("#PathFilename: %s\n", PathFilenameBuffer); // itself
+    SkillHandle = GfParmReadFile
+	  (PathFilename, GFPARM_RMODE_REREAD);
+    if (SkillHandle)
+    {
+      oSkillDriver = GfParmGetNum(SkillHandle,"skill","level",0,0.0);
+      oSkillDriver = MIN(1.0, MAX(0.0, oSkillDriver));
+      GfOut("#oSkillDriver: %g\n", oSkillDriver);
+
+      oDriverAggression = 
+	    GfParmGetNum(SkillHandle, "skill", "aggression", (char *)NULL, 0.0);
+      GfOut("#oDriverAggression: %g\n", oDriverAggression);
+    }
+  }
+  else
+  {
+	oSkilling = false;
+    GfOut("#Skilling: Off\n");
+  }
+  // ... Global skilling from Andrew Sumner
+};
+//==========================================================================*
+
+//==========================================================================*
+// Called for every track change or new race.
+//--------------------------------------------------------------------------*
+void TDriver::InitTrack
+  (PTrack Track, PCarHandle CarHandle,
+  PCarSettings *CarSettings, PSituation Situation)
+{
+  GfOut("#\n\n\n#TDriver::InitTrack >>> \n\n\n");
+
+  oTrack = Track;                                // save pointers
+#ifdef SPEED_DREAMS
+  if (TrackLength < 2000)
+	RtTeamManagerLaps(3);
+  else if (TrackLength < 3000)
+	RtTeamManagerLaps(2);
+#else
+#endif
+
+  oSituation = Situation;
+
+  oSkillGlobal = oSkill = oDecelAdjustPerc = oDriverAggression = 0.0;
+
+  // Initialize race type array
+  const char* RaceType[] =
+    {"practice", "qualify", "race"};
+
+  // Initialize the base param path
+  const char* BaseParamPath = TDriver::ROBOT_DIR;
+  const char* PathFilename = PathFilenameBuffer;
+
+  GetSkillingParameters(BaseParamPath,PathFilename);
+
+  // Get the name of the track
+  strncpy(TrackNameBuffer,                       // Copy name of track file
+    strrchr(oTrack->filename, '/') + 1,          // from path and filename
+	sizeof(TrackNameBuffer));                    // regarding length of buffer
+  *strrchr(TrackNameBuffer, '.') = '\0';         // Truncate at point
+  oTrackName = TrackNameBuffer;                  // Set pointer to buffer
+
+  // Read/merge car parms
+  // First all params out of the common files
+  oMaxFuel = GfParmGetNum(CarHandle              // Maximal möglicher
+    , SECT_CAR, PRM_TANK                         //   Tankinhalt
+    , (char*) NULL, 100.0);
+  GfOut("#oMaxFuel (TORCS)   = %.1f\n",oMaxFuel);
+
+  oMaxPressure = GfParmGetNum(CarHandle          // Maximal möglicher
+    , "Brake System", MAXPRESSURE                //   Bremsdruck
+    , (char*) NULL, (float) oMaxPressure);
+  GfOut("#oMaxPressure       = %.1f\n",oMaxPressure);
+
+  oBrakeScale *= MAX(1.0,INITIAL_BRAKE_PRESSURE / oMaxPressure);
+  GfOut("#oBrakeScale       = %.3f\n",oBrakeScale);
+  oBrakeForceMax *= oBrakeScale/INITIAL_BRAKE_SCALE;
+  GfOut("#oBrakeForceMax    = %.3f\n",oBrakeForceMax);
+
+  // Next Params out of the own files
+  PCarHandle Handle = NULL;                      // Start with an "empty file"
+  char Buf[1024];                                // Multi purpose buffer
+
+  // Default params for car type (e.g. .../ROBOT_DIR/sc-petrol/default.xml)
+  snprintf(Buf,sizeof(Buf),"%s/%s/default.xml",
+    BaseParamPath,oCarType);
+  GfOut("#Default params for car type: %s\n", Buf);
+  Handle = TUtils::MergeParamFile(Handle,Buf);
+
+  snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/tracks/%s.trk",
+    BaseParamPath,oTrackName);
+  oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
+  snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),"%s/tracks/%s.trq",
+    BaseParamPath,oTrackName);
+  oTrackLoadQualify = TrackLoadQualifyBuffer;    // Set pointer to buffer
+  snprintf(TrackLoadLeftBuffer,sizeof(TrackLoadLeftBuffer),"%s/tracks/%s.trl",
+    BaseParamPath,oTrackName);
+  oTrackLoadLeft = TrackLoadLeftBuffer;          // Set pointer to buffer
+  snprintf(TrackLoadRightBuffer,sizeof(TrackLoadRightBuffer),"%s/tracks/%s.trr",
+    BaseParamPath,oTrackName);
+  oTrackLoadRight = TrackLoadRightBuffer;        // Set pointer to buffer
+  snprintf(PitLoadBuffer,sizeof(PitLoadBuffer),"%s/tracks/%s.tpk",
+    BaseParamPath,oTrackName);
+  oPitLoad[0] = PitLoadBuffer;                   // Set pointer to buffer
+  snprintf(PitLoadLeftBuffer,sizeof(PitLoadLeftBuffer),"%s/tracks/%s.tpl",
+    BaseParamPath,oTrackName);
+  oPitLoad[1] = PitLoadLeftBuffer;               // Set pointer to buffer
+  snprintf(PitLoadRightBuffer,sizeof(PitLoadRightBuffer),"%s/tracks/%s.tpr",
+    BaseParamPath,oTrackName);
+  oPitLoad[2] = PitLoadRightBuffer;              // Set pointer to buffer
+
+  // Override params for track (Pitting) 
+  snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
+    BaseParamPath,oTrackName);
+  Handle = TUtils::MergeParamFile(Handle,Buf);
+  double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__BRAKE,NULL,0.80f);
+  double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE__MU,NULL,0.95f);
+
+  // Override params for car type with params of track
+  snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
+    BaseParamPath,oCarType,oTrackName);
+  Handle = TUtils::MergeParamFile(Handle,Buf);
+
+  // Override params for car type on track with params of specific race type
+  snprintf(Buf,sizeof(Buf),"%s/%s/%s-%s.xml",
+    BaseParamPath,oCarType,oTrackName,RaceType[oSituation->_raceType]);
+  Handle = TUtils::MergeParamFile(Handle,Buf);
+
+  // Override params for car type on track with driver on track
+  snprintf(Buf,sizeof(Buf),"%s/%d/%s.xml",
+    BaseParamPath,oIndex,oTrackName);
+//  Handle = TUtils::MergeParamFile(Handle,Buf);
+
+  // Override params for driver on track with params of specific race type
+  snprintf(Buf,sizeof(Buf),"%s/%d/%s-%s.xml",
+    BaseParamPath,oIndex,oTrackName,RaceType[oSituation->_raceType]);
+  Handle = TUtils::MergeParamFile(Handle,Buf);
+
+  // Setup the car param handle to be returned
+  *CarSettings = Handle;
+
+  // Get the private parameters now.
+  TDriver::LengthMargin =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LENGTH_MARGIN,0,LENGTH_MARGIN);
+  GfOut("#LengthMargin %.2f\n",TDriver::LengthMargin);
+
+  // Check test flag:
+  const char* ForceLane = GfParmGetStr(Handle,
+	TDriver::SECT_PRIV,PRV_FORCE_LANE,"F");    
+  
+  if (strcmp(ForceLane,"L") == 0)
+	oTestLane = -1;
+  else if (strcmp(ForceLane,"R") == 0)
+	oTestLane = 1;
+  else 
+	oTestLane = 0;
+
+  int TestQualification =
+	(int) GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_QUALIFICATION,0,0);
+  if ((oSituation->_raceType == RM_TYPE_QUALIF)
+	|| (TestQualification > 0))
+  {
+    if ((oSituation->_raceType == RM_TYPE_PRACTICE)
+      || (oSituation->_raceType == RM_TYPE_QUALIF))
+	{
+	  Qualification = true;
+	  GfOut("#Qualification = True\n");
+	  NBRRL = 1;
+	}
+  }
+
+  // Get car's length
+  Param.Fix.oLength =
+	GfParmGetNum(Handle,SECT_CAR,PRM_LEN,0,4.5);
+
+  AdjustBrakes(Handle);
+  AdjustPitting(Handle);
+  AdjustDriving(Handle,ScaleBrake,ScaleMu);
+  AdjustSkilling(Handle);
 
   // Find side and sections of pits ...
   TTrackDescription::PitSideMod PitSideMod;      // Data for track description
@@ -1013,6 +1031,11 @@ void TDriver::InitTrack
 	  (oTrack,CarSettings,oSituation,Fuel);      //   strategy
   GfOut("#oFuelNeeded: %.1f\n",oFuelNeeded);
   // ... Setup initial fuel for race
+
+  tTrackSeg* Seg = oTrack->seg; 
+  oRain = Seg->surface->kFriction < 0.9;
+  if (oRain)
+	  UseFilterAccel();
 
   GfOut("#\n\n\n#<<< TDriver::InitTrack\n\n\n");
 }
@@ -1373,7 +1396,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1399,7 +1422,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1428,7 +1451,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1447,7 +1470,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1463,9 +1486,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
 	}
   }
@@ -3110,27 +3133,39 @@ double TDriver::FilterBrakeSpeed(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterAccel(double Accel)
 {
-  if (DistanceRaced < 50)                        // Not at start
-	return Accel;
+  if (DistanceRaced < 50)                        // At start
+  {
+    if(fabs(CarSpeedLong) < 0.001)               // Only if driving faster
+	  return Accel;
 
-  if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
-	return Accel;
+    if (fabs(oDriftAngle) > 0.1)
+      return MIN(Accel, oLastAccel + 0.00005);
 
-  //if (fabs(oDriftAngle) > 0.3)
-  //  return MIN(Accel, oLastAccel + 0.01);
+    return MIN(Accel,oLastAccel + 0.0005);
+  }
+  else
+  {
+    if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
+	  return Accel;
 
-  return MIN(Accel,oLastAccel + 0.05);
+    if (fabs(oDriftAngle) > 0.1)
+      return MIN(Accel, oLastAccel + 0.0001);
+
+    return MIN(Accel,oLastAccel + 0.001);
+  }
 }
 //==========================================================================*
-
 
 //==========================================================================*
 // Filter Traction Control
 //--------------------------------------------------------------------------*
 double TDriver::FilterTCL(double Accel)
 {
-  if (DistanceRaced < 50)                        // Not at start
-	return Accel;
+  if (!oRain)
+  {
+    if (DistanceRaced < 50)                      // Not at start
+      return Accel;
+  }
 
   if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
 	return Accel;
@@ -3158,6 +3193,9 @@ double TDriver::FilterTCL(double Accel)
   Wr /= Count;                                   // and radius
 
   double Slip = Spin * Wr - CarSpeedLong;        // Calculate slip
+  if (oRain) 
+	  Slip *= 3;
+
   if (Slip > oTclSlip)                           // Decrease accel if needed
   {
 	float MinAccel = (float) (0.2 * Accel);
@@ -3390,6 +3428,15 @@ void TDriver::ScaleSide(float FactorMu, float FactorBrake)
 void TDriver::SideBorderOuter(float Factor)
 {
   oSideBorderOuter = Factor;
+}
+//==========================================================================*
+
+//==========================================================================*
+// Calculate the skilling
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling()
+{
+    (this->*CalcSkillingFoo)();
 }
 //==========================================================================*
 
@@ -3669,6 +3716,40 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
 /*/
 
   return FrictionFactor * oXXX;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_GP36
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling_simplix()
+{
+	oSkillScale = oSkillScale/50.0;
+	oSkillDriver = oSkillDriver / (5.0 * ((50.0 - oSkillGlobal)/40.0));
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
+	oSkillMax = oSkillScale * 24 + oSkillOffset;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_MPA1
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling_simplix_MPA1()
+{
+	oSkillGlobal = oSkillGlobal/10.0;
+	oSkillDriver = oSkillDriver/3.0;
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_SC
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling_simplix_SC()
+{
+	oSkillScale = oSkillScale/50.0;
+	oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) * (1.0 + oSkillDriver) + oSkillOffset;
 }
 //==========================================================================*
 

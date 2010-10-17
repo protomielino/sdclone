@@ -168,8 +168,11 @@ reCarsApplyRaceRules(tCarElt *car)
 	    !(car->_state & RM_CAR_STATE_PIT) &&
 	    (car->_driverType != RM_DRV_HUMAN))
 	{
-		car->_state |= RM_CAR_STATE_ELIMINATED;
-		GfLogInfo("%s eliminated (too long to finish the lap).\n", car->_name);
+		if (!(car->_state & RM_CAR_STATE_ELIMINATED))
+		{
+			car->_state |= RM_CAR_STATE_ELIMINATED;
+			GfLogInfo("%s eliminated (too long to finish the lap).\n", car->_name);
+		}
 	    return;
 	}
 
