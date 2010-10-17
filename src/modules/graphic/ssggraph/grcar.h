@@ -44,6 +44,7 @@ public:
 	tdble		prevVal;
 	tdble		rawPrev;
 	int			digital;
+	float		needleColor[4];
 };
 
 

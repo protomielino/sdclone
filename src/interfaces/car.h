@@ -648,6 +648,11 @@ typedef struct CarElt
 #define PRM_SPEEDO_MAXANG	"speedometer max angle"
 #define PRM_SPEEDO_DIGITAL      "speedometer digital"
 
+#define PRM_NEEDLE_RED		"needle red"
+#define PRM_NEEDLE_GREEN	"needle green"
+#define PRM_NEEDLE_BLUE		"needle blue"
+#define PRM_NEEDLE_ALPHA	"needle alpha"
+
 #define PRM_WHEEL_3D            "3d wheel"
 #define PRM_FRONT_WHEEL_3D      "3d front wheel"
 #define PRM_REAR_WHEEL_3D       "3d rear wheel"

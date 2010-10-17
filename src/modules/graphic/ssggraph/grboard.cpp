@@ -867,7 +867,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
     snprintf(buf, sizeof(buf), "%s", car->_gear == 0 ? "N" : "R");
   else
     snprintf(buf, sizeof(buf), "%d", car->_gear);
-  GfuiPrintString(buf, grRed, GFUI_FONT_LARGE_C,
+  GfuiPrintString(buf, curInst->needleColor, GFUI_FONT_LARGE_C,
       (int)curInst->digitXCenter, (int)curInst->digitYCenter, GFUI_ALIGN_HC_VB);
   
   glTranslatef(-centerAnchor, -BOTTOM_ANCHOR, 0);
@@ -904,7 +904,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   if (curInst->digital) {
     // Do not add "%3d" or something, because the digital font DOES NOT SUPPORT BLANKS!!!!
     snprintf(buf, sizeof(buf), "%d", abs((int)(car->_speed_x * 3.6)));
-    GfuiPrintString(buf, grRed, GFUI_FONT_LARGE_C,
+    GfuiPrintString(buf, curInst->needleColor, GFUI_FONT_LARGE_C,
       (int)curInst->digitXCenter, (int)curInst->digitYCenter, GFUI_ALIGN_HC_VB);
   }
 
@@ -1280,6 +1280,12 @@ void grInitBoardCar(tCarElt *car)
   curInst->maxAngle = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_MAXANG, "deg", -45) - curInst->minAngle;
   curInst->monitored = &(car->_enginerpm);
   curInst->prevVal = curInst->minAngle;
+
+  /* Get colour to use for needle, default is Red */
+  curInst->needleColor[0] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_RED, (char*)NULL, 1.0);
+  curInst->needleColor[1] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_GREEN, (char*)NULL, 0.0);
+  curInst->needleColor[2] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_BLUE, (char*)NULL, 0.0);
+  curInst->needleColor[3] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_ALPHA, (char*)NULL, 1.0);
   
   curInst->CounterList = glGenLists(1);
   glNewList(curInst->CounterList, GL_COMPILE);
@@ -1298,7 +1304,7 @@ void grInitBoardCar(tCarElt *car)
   glNewList(curInst->needleList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
   {
-    glColor4f(1.0, 0.0, 0.0, 1.0);
+    glColor4f(curInst->needleColor[0], curInst->needleColor[1], curInst->needleColor[2], curInst->needleColor[3]);
     glVertex2f(0, -needleySz);
     glVertex2f(0, needleySz);
     glVertex2f(needlexSz, -needleySz / 2.0);
@@ -1347,6 +1353,12 @@ void grInitBoardCar(tCarElt *car)
     curInst->digital = 1;
   }
   
+  /* Get colour to use for needle, default is Red */
+  curInst->needleColor[0] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_RED, (char*)NULL, 1.0);
+  curInst->needleColor[1] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_GREEN, (char*)NULL, 0.0);
+  curInst->needleColor[2] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_BLUE, (char*)NULL, 0.0);
+  curInst->needleColor[3] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_ALPHA, (char*)NULL, 1.0);
+  
   curInst->CounterList = glGenLists(1);
   glNewList(curInst->CounterList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
@@ -1364,7 +1376,7 @@ void grInitBoardCar(tCarElt *car)
   glNewList(curInst->needleList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
   {
-    glColor4f(1.0, 0.0, 0.0, 1.0);
+    glColor4f(curInst->needleColor[0], curInst->needleColor[1], curInst->needleColor[2], curInst->needleColor[3]);
     glVertex2f(0, -needleySz);
     glVertex2f(0, needleySz);
     glVertex2f(needlexSz, -needleySz / 2.0);
