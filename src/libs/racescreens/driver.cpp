@@ -41,7 +41,7 @@ static const char* pszSkinFileExt = ".png";
 static const char* pszPreviewFileSuffix = "-preview.jpg";
 
 static const char* apszExcludedSkinFileSuffixes[] =
-{ "-rpm.png", "-speed.png" , "-int.png" };
+{ "rpm.png", "speed.png", "int.png" };
 static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
 
 
