@@ -621,6 +621,9 @@ grInitCar(tCarElt *car)
 	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
 	if (bTemplate)
 		lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
+	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+	if (bTemplate)
+		lg += sprintf(grFilePath + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carTemplate);
 	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
 	if (bTemplate)
 		lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
@@ -663,6 +666,9 @@ grInitCar(tCarElt *car)
 	lg += sprintf(buf + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
 	if (bTemplate)
 		lg += sprintf(buf + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
+	lg += sprintf(buf + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+	if (bTemplate)
+		lg += sprintf(buf + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carTemplate);
 	lg += sprintf(buf + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
 	if (bTemplate)
 		lg += sprintf(buf + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
