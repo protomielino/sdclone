@@ -26,12 +26,10 @@
 #ifndef _PIT_H_
 #define _PIT_H_
 
-//#include <track.h>      //tTrack
 #include <raceman.h>    //tSituation
 #include "spline.h"
 
 class KDriver;
-//class tTrack;
 
 class Pit
 {
