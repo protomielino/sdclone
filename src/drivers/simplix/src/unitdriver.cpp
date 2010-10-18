@@ -2106,8 +2106,8 @@ void TDriver::InitAdaptiveShiftLevels()
 
   }
   
-  //for (J = 1; J < oLastGear; J++)
-  //  GfOut("#%d: Rpm: %g(%g)\n",J,oShift[J]*RpmFactor,oShift[J]);
+  for (J = 1; J < oLastGear; J++)
+    GfOut("#%d: Rpm: %g(%g)\n",J,oShift[J]*RpmFactor,oShift[J]);
 
   free(DataPoints);
   free(Edesc);
