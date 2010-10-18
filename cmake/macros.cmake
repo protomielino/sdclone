@@ -920,7 +920,8 @@ MACRO(ADD_SD_DEFINITIONS)
 		ENDIF(CONFIGH_INCLUDE_DIR)
 	ENDIF(HAVE_CONFIG_H)
 
-	ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
+	# CMake options.
+	SET(OPTION_OFFICIAL_ONLY false CACHE BOOL "Build / install only officially released contents)")
 
 	SET(OPTION_DEBUG true CACHE BOOL "Enable traces into the console or log file")
 
@@ -930,15 +931,16 @@ MACRO(ADD_SD_DEFINITIONS)
 	
 	SET(OPTION_SCHEDULE_SPY false CACHE BOOL "Enable fine grained scheduling spy")
 	
-	#Put Linux spec here
 	IF(UNIX)
 		SET(OPTION_XRANDR true CACHE BOOL "XrandR")	
 		SET(OPTION_GLEXTPROTOTYPES true CACHE BOOL "Enable prototypes in glext.h")
 	ENDIF(UNIX)
 
-	#Put Windows spec here
+	# Compiler definitions.
+	ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
+
 	IF(WIN32)
-	#suppress meaningless warning for MSVC
+		#suppress meaningless warning for MSVC
 		ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
 	ENDIF(WIN32)
 
