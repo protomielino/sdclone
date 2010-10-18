@@ -25,6 +25,7 @@
 #include <glfeatures.h>
 
 #include <robottools.h> //RELAXATION
+#include <portability.h> // snprintf
 
 #include "grboard.h"
 #include "grmain.h" //grWinX, grHandle, grMaxDamage

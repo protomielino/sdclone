@@ -27,7 +27,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 
-ADD_SDLIB_INCLUDEDIR(client math tgf tgfclient robottools)
+ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
 ADD_OPENAL_INCLUDEDIR()
 
 IF(COMMAND CMAKE_POLICY)
