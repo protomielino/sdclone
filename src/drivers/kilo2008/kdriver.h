@@ -57,6 +57,9 @@ class LRaceLine;
 #define KILO_ATT_BRDELAY    "BrakeDelay"
 #define KILO_ATT_SECRAD     "SecurityRadius"
 #define KILO_ATT_PITOFFSET  "PitOffset"
+#define KILO_SECT_SKILL     "Skill"
+#define KILO_SKILL_LEVEL    "Level"
+#define KILO_SKILL_AGGRO    "Aggression"
 
 
 enum { NORMAL = 1, AVOIDING, CORRECTING, PITTING, BEING_OVERLAPPED };
@@ -90,6 +93,7 @@ protected:
   void initCw();
   void initTireMu();
   void initTCLFilter();
+  double initSkill(tSituation * s);
   
   //Driving aids
   double filterTCL_RWD();
@@ -194,7 +198,14 @@ protected:
   double m_rInverse;
   std::string m_carType;
   int m_carIndex;
-
+  
+  //Skilling
+  double m_skill;
+  double m_filterBrakeSkill;
+  double m_filterAccelSkill;
+  double m_filterLookaheadSkill;
+  double m_filterSideSkill;
+  
   // Data that should stay constant after first initialization.
   int MAX_UNSTUCK_COUNT;
   int INDEX;

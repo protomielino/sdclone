@@ -38,7 +38,7 @@
 #include <robottools.h> //Rt*
 #include <robot.h>  //ROB_PIT_IM
 
-#define DEBUG
+//#define DEBUG
 
 //"I AM DEATH, NOT TAXES.  *I* TURN UP ONLY ONCE."  --  Death
 //Fear was theirs, not yers.
@@ -660,11 +660,13 @@ void
 KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
           tSituation * s)
 {
-  m_track = t;
+  initSkill(s);
+  
+  stringstream buf;
 
   //Load a custom setup if one is available.
+  m_track = t;
   char *trackname = strrchr(m_track->filename, '/') + 1;    //Ptr to the track filename
-  stringstream buf;
   stringstream botPath;
 
   //Try to load the default setup
@@ -735,14 +737,6 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
   cout << "merge #2" << endl;
 #endif  
 
-
-  // Create a pit stop strategy object.
-  m_strategy = new KStrategy();
-  // Init fuel.
-  m_strategy->setFuelAtRaceStart(t, carParmHandle, s, INDEX);
-
-  m_raceline = new LRaceLine;
-
   // Load and set parameters.
   MU_FACTOR =
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_MUFACTOR, NULL, 0.69f);
@@ -750,8 +744,15 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_PITOFFSET, NULL, 10.0);
   m_brakeDelay =
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_BRDELAY, NULL, 10.0);
-  
-  m_raceline->InitTrack(m_track, carParmHandle, s);
+
+  // Create a pit stop strategy object.
+  m_strategy = new KStrategy();
+  // Init fuel.
+  m_strategy->setFuelAtRaceStart(t, carParmHandle, s, INDEX);
+
+  m_raceline = new LRaceLine;
+  //m_raceline->setSkill(m_skill);  
+  m_raceline->InitTrack(m_track, carParmHandle, s, m_filterSideSkill);
 }//initTrack
 
 
@@ -1237,7 +1238,9 @@ KDriver::brakeDist(double allowedspeed, double mu)
   double d = (CA * mu + CW) / m_mass;
   double v1sqr = m_currentSpeedSqr;
   double v2sqr = pow(allowedspeed, 2);
-  return -log((c + v2sqr * d) / (c + v1sqr * d)) / (2.0 * d);
+  double ret = -log((c + v2sqr * d) / (c + v1sqr * d)) / (2.0 * d);
+  ret /= m_filterBrakeSkill;
+  return ret;
 }//brakeDist
 
 
@@ -1576,6 +1579,8 @@ KDriver::getTargetPoint()
     lookahead = MAX(cmplookahead, lookahead);
   }//if getInPit
 
+  lookahead *= m_filterLookaheadSkill;
+
   m_oldLookahead = lookahead;
 
   // Search for the segment containing the target point.
@@ -1692,6 +1697,7 @@ KDriver::getAccel()
     if(fabs(m_angle) > 0.8 && getSpeed() > 10.0)
       m_accelCmd = MAX(0.0, MIN(m_accelCmd, 1.0 - getSpeed() / 100.0 * fabs(m_angle)));
     ret = m_accelCmd;
+    ret *= (m_car->_gear > 1) ? m_filterAccelSkill : 1.0;
   }//if m_car->_gear
     
   return ret;
@@ -1707,10 +1713,15 @@ KDriver::getAccel()
 double
 KDriver::getBrake()
 {
-  double ret = (m_car->_speed_x < -MAX_UNSTUCK_SPEED)
-    ? 1.0           //Car drives backward, brake
-    : m_brakeCmd;   //Car drives forward, normal braking.
-    
+  double ret;
+  
+  if(m_car->_speed_x < -MAX_UNSTUCK_SPEED) {
+    ret = 1.0;  //Car drives backward, brake
+  } else {
+    ret = m_brakeCmd;   //Car drives forward, normal braking.
+    //ret *= m_filterBrakeSkill;  //Brake earlier if less skilled
+  }
+  
   return ret;
 }//getBrake
 
@@ -1791,3 +1802,68 @@ KDriver::getClutch()
     }
   }
 }//getClutch
+
+
+/** 
+ * initSkill
+ * Reads the global and the driver-specific skill values.
+ * 
+ * @return The accumulated skill value
+ */
+double
+KDriver::initSkill(tSituation * s)
+{
+  double globalSkill = m_skill = 0.0;
+  m_filterBrakeSkill = 1.0;
+  m_filterAccelSkill = 1.0;
+  m_filterLookaheadSkill = 1.0;
+  m_filterSideSkill = 1.0;
+  
+  if(s->_raceType != RM_TYPE_PRACTICE) {
+    stringstream buf;
+    // load the global skill level, range 0 - 10
+    buf << GetLocalDir() << "config/raceman/extra/skill.xml";
+    void *skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_REREAD);
+    if(!skillHandle) {
+      buf.str(string());
+      buf << GetDataDir() << "config/raceman/extra/skill.xml";
+      skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_REREAD);
+    }//if !skillHandle
+    
+    if(skillHandle) {
+      globalSkill = GfParmGetNum(skillHandle, KILO_SECT_SKILL, KILO_SKILL_LEVEL, NULL, 10.0);
+      globalSkill = MIN(10.0, MAX(0.0, globalSkill));
+    }
+
+    //load the driver skill level, range 0 - 1
+    double driverSkill = 0.0;
+    buf.str(string());
+    buf << "drivers/" << bot << "/" << INDEX << "/skill.xml";
+    skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
+    if(skillHandle) {
+      driverSkill = GfParmGetNum(skillHandle, KILO_SECT_SKILL, KILO_SKILL_LEVEL, NULL, 0.0);
+      //driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+      driverSkill = MIN(1.0, MAX(0.0, driverSkill));
+    }
+
+    //limits: 0.0 - 24.0
+    m_skill = (globalSkill + driverSkill * 2.0) * (1.0 + driverSkill);
+
+    //Set up different handicap values
+    m_filterBrakeSkill = MAX(0.85, 1.0 - m_skill / 24.0 * 0.15);
+    m_filterAccelSkill = MAX(0.80, 1.0 - m_skill / 24.0 * 0.20);
+    m_filterLookaheadSkill = 1.0 / (1.0 + m_skill / 24.0);
+    m_filterSideSkill = 1.0 + m_skill / 24.0;
+  }//if not practice
+  
+#ifdef DEBUG
+  cout << "Skill: " << m_skill
+    << ", brake: " << m_filterBrakeSkill
+    << ", accel: " << m_filterAccelSkill
+    << ", lookA: " << m_filterLookaheadSkill
+    << ", sides: " << m_filterSideSkill
+    << endl;
+#endif
+
+  return m_skill;
+}//initSkill

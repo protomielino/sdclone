@@ -84,7 +84,7 @@ public:
   
   inline void setCar(tCarElt * const car) {m_pCar = car;}
   
-  void InitTrack(const tTrack * const track, void **carParmHandle, const tSituation *s);
+  void InitTrack(const tTrack * const track, void **carParmHandle, const tSituation *s, const double filterSideSkill);
   void NewRace();
   void GetRaceLineData(const tSituation * const s, v2d * target,
                 double *speed, double *avspeed, double *raceoffset,

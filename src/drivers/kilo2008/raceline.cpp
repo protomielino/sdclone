@@ -478,7 +478,8 @@ LRaceLine::Interpolate(int Step, int rl)
 
 
 void
-LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSituation *s)
+LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle,
+    const tSituation *s, const double filterSideSkill)
 {
   m_dMinCornerInverse =
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_MINCORNER, NULL, 0.002);
@@ -497,6 +498,11 @@ LRaceLine::InitTrack(const tTrack * const track, void **carParmHandle, const tSi
   m_dSecurityRadius =
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_SECRAD, NULL, 100.0);
 
+  if(s->_raceType != RM_TYPE_PRACTICE) {
+    m_dExtMargin *= filterSideSkill;
+    m_dIntMargin *= filterSideSkill;
+  }//if not practice
+  
   // split track
   for(int rl = LINE_MID; rl <= LINE_RL; rl++)
     {
