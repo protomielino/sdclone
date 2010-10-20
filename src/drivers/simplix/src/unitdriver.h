@@ -9,12 +9,12 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2010.10.16
+// Last changed : 2010.10.20
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
 //--------------------------------------------------------------------------*
-// Teile diese Unit basieren auf diversen Header-Dateien von TORCS
+// Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
 //    Copyright: (C) 2000 by Eric Espie
 //    eMail    : torcs@free.fr
@@ -424,6 +424,7 @@ private:
     void AdjustSkilling(PCarHandle Handle);
     void GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
     void SetPathAndFilenameForRacinglines();
+	int GetWeather();
 
 	void CalcSkilling();
 	double CalcFriction(const double Crv);

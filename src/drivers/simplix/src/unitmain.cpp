@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2010.10.16
+// Last changed : 2010.10.20
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000 
@@ -307,8 +307,8 @@ void SetUpSimplix_ls1()
 {
 	cRobotType = RTYPE_SIMPLIX_LS1;
 	SetParameters(NBBOTS, "ls1-ciclon-rgt");
+    TDriver::AdvancedParameters = true;
     TDriver::UseBrakeLimit = true;
-	//TDriver::UseSCSkilling = true; 
 };
 //==========================================================================*
 
@@ -979,6 +979,7 @@ extern "C" int simplix_ls1(tModInfo *ModInfo)
 	  return -1;
 
   SetParameters(10, "ls1-ciclon-rgt");
+  TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
