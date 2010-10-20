@@ -320,7 +320,7 @@ double	TFixCarParam::CalcBrakingPit
 	double Acc = CarParam.oScaleBrakePit * Ftanroad 
 	  / oTmpCarParam->oMass;
 
-	if (TDriver::UseBrakeLimit)
+	if (TDriver::UseGPBrakeLimit)
 	  Acc = MAX(Acc,TDriver::BrakeLimit/2);
 
 	double Inner = MAX(0, V * V - 2 * Acc * Dist);

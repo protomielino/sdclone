@@ -124,6 +124,7 @@ static const char *WheelSect[4] =                  // TORCS defined sections
 // R: Avoid to right
 //--------------------------------------------------------------------------*
 #define BUFLEN 256
+static char PathToWriteToBuffer[BUFLEN];         // for path we write to
 static char PathFilenameBuffer[BUFLEN];          // for path and filename
 static char TrackNameBuffer[BUFLEN];             // for track name
 static char TrackLoadQualifyBuffer[BUFLEN];      // for track filename Q
@@ -839,6 +840,52 @@ void TDriver::GetSkillingParameters
 //==========================================================================*
 
 //==========================================================================*
+// Set path and filenames for racinglines
+//--------------------------------------------------------------------------*
+void TDriver::SetPathAndFilenameForRacinglines()
+{
+  const char* PathToWriteTo = GetLocalDir();
+
+  snprintf(PathToWriteToBuffer,sizeof(TrackLoadBuffer),
+	"%sdrivers/simplix_common/racinglines/%s/%s",
+    PathToWriteTo,MyBotName,oCarType);
+  oPathToWriteTo = PathToWriteToBuffer;
+  if (GfDirCreate(oPathToWriteTo) == GF_DIR_CREATION_FAILED)
+  {
+	  GfOut("#Unable to create path for racinglines: >%s<",oPathToWriteTo);
+  };
+
+  snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/%s.trk",
+    oPathToWriteTo,oTrackName);
+  oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
+
+  snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),"%s/%s.trq",
+    oPathToWriteTo,oTrackName);
+  oTrackLoadQualify = TrackLoadQualifyBuffer;    // Set pointer to buffer
+
+  snprintf(TrackLoadLeftBuffer,sizeof(TrackLoadLeftBuffer),"%s/%s.trl",
+    oPathToWriteTo,oTrackName);
+  oTrackLoadLeft = TrackLoadLeftBuffer;          // Set pointer to buffer
+
+  snprintf(TrackLoadRightBuffer,sizeof(TrackLoadRightBuffer),"%s/%s.trr",
+    oPathToWriteTo,oTrackName);
+  oTrackLoadRight = TrackLoadRightBuffer;        // Set pointer to buffer
+
+  snprintf(PitLoadBuffer,sizeof(PitLoadBuffer),"%s/%s.tpk",
+    oPathToWriteTo,oTrackName);
+  oPitLoad[0] = PitLoadBuffer;                   // Set pointer to buffer
+
+  snprintf(PitLoadLeftBuffer,sizeof(PitLoadLeftBuffer),"%s/%s.tpl",
+    oPathToWriteTo,oTrackName);
+  oPitLoad[1] = PitLoadLeftBuffer;               // Set pointer to buffer
+
+  snprintf(PitLoadRightBuffer,sizeof(PitLoadRightBuffer),"%s/%s.tpr",
+    oPathToWriteTo,oTrackName);
+  oPitLoad[2] = PitLoadRightBuffer;              // Set pointer to buffer
+};
+//==========================================================================*
+
+//==========================================================================*
 // Called for every track change or new race.
 //--------------------------------------------------------------------------*
 void TDriver::InitTrack
@@ -877,6 +924,8 @@ void TDriver::InitTrack
   *strrchr(TrackNameBuffer, '.') = '\0';         // Truncate at point
   oTrackName = TrackNameBuffer;                  // Set pointer to buffer
 
+  SetPathAndFilenameForRacinglines();
+
   // Read/merge car parms
   // First all params out of the common files
   oMaxFuel = GfParmGetNum(CarHandle              // Maximal möglicher
@@ -903,28 +952,6 @@ void TDriver::InitTrack
     BaseParamPath,oCarType);
   GfOut("#Default params for car type: %s\n", Buf);
   Handle = TUtils::MergeParamFile(Handle,Buf);
-
-  snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/tracks/%s.trk",
-    BaseParamPath,oTrackName);
-  oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
-  snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),"%s/tracks/%s.trq",
-    BaseParamPath,oTrackName);
-  oTrackLoadQualify = TrackLoadQualifyBuffer;    // Set pointer to buffer
-  snprintf(TrackLoadLeftBuffer,sizeof(TrackLoadLeftBuffer),"%s/tracks/%s.trl",
-    BaseParamPath,oTrackName);
-  oTrackLoadLeft = TrackLoadLeftBuffer;          // Set pointer to buffer
-  snprintf(TrackLoadRightBuffer,sizeof(TrackLoadRightBuffer),"%s/tracks/%s.trr",
-    BaseParamPath,oTrackName);
-  oTrackLoadRight = TrackLoadRightBuffer;        // Set pointer to buffer
-  snprintf(PitLoadBuffer,sizeof(PitLoadBuffer),"%s/tracks/%s.tpk",
-    BaseParamPath,oTrackName);
-  oPitLoad[0] = PitLoadBuffer;                   // Set pointer to buffer
-  snprintf(PitLoadLeftBuffer,sizeof(PitLoadLeftBuffer),"%s/tracks/%s.tpl",
-    BaseParamPath,oTrackName);
-  oPitLoad[1] = PitLoadLeftBuffer;               // Set pointer to buffer
-  snprintf(PitLoadRightBuffer,sizeof(PitLoadRightBuffer),"%s/tracks/%s.tpr",
-    BaseParamPath,oTrackName);
-  oPitLoad[2] = PitLoadRightBuffer;              // Set pointer to buffer
 
   // Override params for track (Pitting) 
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",

@@ -1437,8 +1437,8 @@ ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext)
 	}
 	pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
 	pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
-	GfOut("pits->nPitSeg: %d\n",pits->nPitSeg);
-	GfOut("pits->nMaxPits: %d\n",pits->nMaxPits);
+	//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg);
+	//GfOut("pits->nMaxPits: %d\n",pits->nMaxPits);
 
 	//mSeg = pits->pitStart->prev;
 	if (pitBuildingsStart == NULL)

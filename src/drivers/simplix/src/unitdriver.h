@@ -325,6 +325,7 @@ private:
 	char* oTrackLoadLeft;                        // Name of track to drive on
 	char* oTrackLoadRight;                       // Name of track to drive on
 	char* oPitLoad[3];                           // Name of track to drive on
+	char* oPathToWriteTo;                        // Path we can write to
 	PTrack oTrack;                               // TORCS data fpr track
 	double oTolerance;                           // Tolerable offset difference
     TLanePoint oLanePoint;                       // Information to Point
@@ -422,6 +423,7 @@ private:
 	void AdjustPitting(PCarHandle Handle);
     void AdjustSkilling(PCarHandle Handle);
     void GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
+    void SetPathAndFilenameForRacinglines();
 
 	void CalcSkilling();
 	double CalcFriction(const double Crv);
