@@ -5,7 +5,7 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(ROBOT_NAME "simplix")
 
 SET(ROBOT_INTERFACE LEGACY WELCOME
-		    simplix_gp1600 simplix_mpa1 simplix_trb1a simplix_trb1b simplix_sca simplix_scb simplix_36GP simplix_ls1 
+		    simplix_mp5 simplix_mpa1 simplix_trb1a simplix_trb1b simplix_sca simplix_scb simplix_36GP simplix_ls1 
 		     my_simplix_0 my_simplix_1 my_simplix_2 my_simplix_3 my_simplix_4
 		    my_simplix_5 my_simplix_6 my_simplix_7 my_simplix_8 my_simplix_9)
 
@@ -73,12 +73,12 @@ SET(ROBOT_SOURCES
 # Official-only simplix instances.
 IF(OPTION_OFFICIAL_ONLY)
 
-	SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_gp1600)
+	SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_mp5)
 
 # Official and work-in-progress / unofficial simplix instances.
 ELSE()
 
-	SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_gp1600
+	SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_mp5
 					 simplix_mpa1 )
 
 ENDIF()
@@ -133,9 +133,9 @@ ROBOT_DATA(NAME simplix_trb1 SHIPPREFIX simplix_trb1
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
 # MP5
-SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 gp1600 tracks)
+SET(ROBOT_SHIPSUBDIRS 0 1 2 3 4 5 mp5-fmc tracks)
 
-ROBOT_DATA(NAME simplix_gp1600 SHIPPREFIX simplix_gp1600
+ROBOT_DATA(NAME simplix_mp5 SHIPPREFIX simplix_mp5
            SHIPFILES ${ROBOT_SHIP} SHIPSUBDIRS ${ROBOT_SHIPSUBDIRS})
 
 

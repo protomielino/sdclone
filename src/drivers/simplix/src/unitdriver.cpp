@@ -3543,9 +3543,9 @@ double TDriver::CalcCrv_simplix_MPA1(double Crv)
 //==========================================================================*
 
 //==========================================================================*
-// simplix_GP1600
+// simplix_MP5
 //--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_GP1600(double Crv)
+double TDriver::CalcCrv_simplix_MP5(double Crv)
 {
   return 1.0;
 }
@@ -3645,9 +3645,9 @@ double TDriver::CalcHairpin_simplix_LS1(double Crv)
 //==========================================================================*
 
 //==========================================================================*
-// simplix_GP1600
+// simplix_MP5
 //--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_GP1600(double Crv)
+double TDriver::CalcHairpin_simplix_MP5(double Crv)
 {
   return 1.0;
 }
