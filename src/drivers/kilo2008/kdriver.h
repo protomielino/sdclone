@@ -132,7 +132,7 @@ protected:
   double getWidth() { return m_mycardata->getWidthOnTrack();}
   void checkPitStatus(tSituation *s);
   void * loadDefaultSetup() const;
-  void mergeCarSetups(void *oldHandle, void *newHandle);
+  void mergeCarSetups(void **oldHandle, void *newHandle);
 
   //Opponent handling  
   Opponent * getOverlappingOpp();

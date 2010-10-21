@@ -676,7 +676,7 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
 #ifdef DEBUG
   cout << "Default: " << buf.str() << endl;
   if(carParmHandle)
-    cout << "default xml loaded" << endl;
+    cout << "default xml loaded, carParmHandle: " << *carParmHandle << endl;
 #endif
     
   //Try to load the track-based informations
@@ -686,12 +686,14 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
 #ifdef DEBUG
   cout << "track-based: " << buf.str() << endl;
   if(newhandle)
-    cout << "track-based xml loaded" << endl;
+    cout << "track-based xml loaded, newhandle: " << newhandle << endl;
+  else
+    cout << "no track-based xml present" << endl;
 #endif  
   
-  mergeCarSetups(*carParmHandle, newhandle);
+  mergeCarSetups(carParmHandle, newhandle);
 #ifdef DEBUG
-  cout << "merge #1" << endl;
+  cout << "merge #1, carParmHandle: " << *carParmHandle << " newhandle: " << newhandle << endl;
 #endif  
   
   //Discover somehow the name of the car used
@@ -712,27 +714,24 @@ KDriver::initTrack(tTrack * t, void *carHandle, void **carParmHandle,
 #ifdef DEBUG
   cout << "custom setup: " << buf.str() << endl;
   if(newhandle)
-    cout << "car+track xml loaded" << endl;
+    cout << "car+track xml loaded, newhandle: " << newhandle << endl;
+  else
+    cout << "no car+track xml present" << endl;
 #endif  
 
   //If there is no tailored setup, let's load a default one
   // based on the track charateristics.
   if(!newhandle)
     newhandle = loadDefaultSetup();
+#ifdef DEBUG
+  if(newhandle)
+    cout << "default setup xml loaded, newhandle: " << newhandle << endl;
+  else
+    cout << "no default setup loaded???" << endl;
+#endif  
     
-  //~ mergeCarSetups(*carParmHandle, newhandle);
   //Merge the above two setups
-  if(newhandle) {
-    //If there is a default setup loaded, merge settings with custom track setup
-    if(*carParmHandle)
-      *carParmHandle =
-        GfParmMergeHandles(*carParmHandle, newhandle,
-               (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
-                GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
-    //Otherwise no need to merge
-    else
-      *carParmHandle = newhandle;
-  }//if newhandle
+  mergeCarSetups(carParmHandle, newhandle);
 #ifdef DEBUG
   cout << "merge #2" << endl;
 #endif  
@@ -1031,16 +1030,16 @@ KDriver::loadDefaultSetup() const
 
 
 void
-KDriver::mergeCarSetups(void *oldHandle, void *newHandle)
+KDriver::mergeCarSetups(void **oldHandle, void *newHandle)
 {
   if(newHandle) {
-    if(oldHandle)
-      oldHandle = GfParmMergeHandles(oldHandle, newHandle,
+    if(*oldHandle)
+      *oldHandle = GfParmMergeHandles(*oldHandle, newHandle,
           (GFPARM_MMODE_SRC | GFPARM_MMODE_DST |
           GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST));
     //Otherwise no need to merge
     else
-      oldHandle = newHandle;
+      *oldHandle = newHandle;
   }//if newHandle
 }//mergeCarSetups
 
@@ -1842,7 +1841,7 @@ KDriver::initSkill(tSituation * s)
     skillHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
     if(skillHandle) {
       driverSkill = GfParmGetNum(skillHandle, KILO_SECT_SKILL, KILO_SKILL_LEVEL, NULL, 0.0);
-      //driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, (char *)NULL, 0.0);
+      //driver_aggression = GfParmGetNum(skillHandle, SECT_SKILL, PRV_SKILL_AGGRO, NULL, 0.0);
       driverSkill = MIN(1.0, MAX(0.0, driverSkill));
     }
 
