@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.10.20
+// Last changed : 2010.10.21
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -267,6 +267,8 @@ TDriver::TDriver(int Index):
   oTargetSpeed(0.0),
   oTclRange(10.0),
   oTclSlip(1.6),
+  oTclFactor(3.0),
+  oTclAccel(0.01),
   oSPEED_DREAMS(true),
   oTrackName(NULL),
   oTrackLoad(NULL),
@@ -333,7 +335,11 @@ TDriver::TDriver(int Index):
   oSideScaleMu(0.97f),
   oSideScaleBrake(0.97f),
   oSideBorderOuter(0.2f),
-  oXXX(1.0)
+  oXXX(1.0),
+  oRain(false),
+  oRainIntensity(0.0),
+  oWeatherCode(120000),
+  oDryCode(120000)
 {
 //  GfOut("#TDriver::TDriver() >>>\n");
   int I;
@@ -557,6 +563,8 @@ void TDriver::AdjustDriving(
 
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
 	  UseAccelOut();
+  if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_FILTER,0,0) != 0)
+	  UseFilterAccel();
 
   oOmegaAhead = Param.Fix.oLength;
   oInitialBrakeCoeff = oBrakeCoeff[0];
@@ -640,6 +648,16 @@ void TDriver::AdjustDriving(
 	(float)oTclSlip);
   GfOut("#oTclSlip %g\n",oTclSlip);
 
+  oTclFactor=
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_FACTOR,0,
+	(float)oTclFactor);
+  GfOut("#oTclFactor %g\n",oTclFactor);
+
+  oTclAccel=
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_ACCEL,0,
+	(float)oTclAccel);
+  GfOut("#oTclAccel %g\n",oTclAccel);
+
   oAbsDelta =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ABS_DELTA,0,
 	(float)oAbsDelta);
@@ -674,6 +692,11 @@ void TDriver::AdjustDriving(
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,
 	(float)oTeamEnabled) != 0;
   GfOut("#oTeamEnabled %d\n",oTeamEnabled);
+
+  oDryCode = (int)
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_WEATHER_DRY,0,
+	(float)oDryCode);
+  GfOut("#oDryCode %d\n",oDryCode);
   // ... Adjust driving
 };
 //==========================================================================*
@@ -879,7 +902,6 @@ void TDriver::GetSkillingParameters
 void TDriver::SetPathAndFilenameForRacinglines()
 {
   const char* PathToWriteTo = GetLocalDir();
-  int Weather = GetWeather();
 
   snprintf(PathToWriteToBuffer,sizeof(TrackLoadBuffer),
 	"%sdrivers/simplix_common/racinglines/%s/%s",
@@ -891,31 +913,31 @@ void TDriver::SetPathAndFilenameForRacinglines()
   };
 
   snprintf(TrackLoadBuffer,sizeof(TrackLoadBuffer),"%s/%d-%s.trk",
-    oPathToWriteTo,Weather,oTrackName);
+    oPathToWriteTo,oWeatherCode,oTrackName);
   oTrackLoad = TrackLoadBuffer;                  // Set pointer to buffer
 
   snprintf(TrackLoadQualifyBuffer,sizeof(TrackLoadQualifyBuffer),
-	"%s/%d-%s.trq",oPathToWriteTo,Weather,oTrackName);
+	"%s/%d-%s.trq",oPathToWriteTo,oWeatherCode,oTrackName);
   oTrackLoadQualify = TrackLoadQualifyBuffer;    // Set pointer to buffer
 
   snprintf(TrackLoadLeftBuffer,sizeof(TrackLoadLeftBuffer),"%s/%d-%s.trl",
-    oPathToWriteTo,Weather,oTrackName);
+    oPathToWriteTo,oWeatherCode,oTrackName);
   oTrackLoadLeft = TrackLoadLeftBuffer;          // Set pointer to buffer
 
   snprintf(TrackLoadRightBuffer,sizeof(TrackLoadRightBuffer),"%s/%d-%s.trr",
-    oPathToWriteTo,Weather,oTrackName);
+    oPathToWriteTo,oWeatherCode,oTrackName);
   oTrackLoadRight = TrackLoadRightBuffer;        // Set pointer to buffer
 
   snprintf(PitLoadBuffer,sizeof(PitLoadBuffer),"%s/%d-%s.tpk",
-    oPathToWriteTo,Weather,oTrackName);
+    oPathToWriteTo,oWeatherCode,oTrackName);
   oPitLoad[0] = PitLoadBuffer;                   // Set pointer to buffer
 
   snprintf(PitLoadLeftBuffer,sizeof(PitLoadLeftBuffer),"%s/%d-%s.tpl",
-    oPathToWriteTo,Weather,oTrackName);
+    oPathToWriteTo,oWeatherCode,oTrackName);
   oPitLoad[1] = PitLoadLeftBuffer;               // Set pointer to buffer
 
   snprintf(PitLoadRightBuffer,sizeof(PitLoadRightBuffer),"%s/%d-%s.tpr",
-    oPathToWriteTo,Weather,oTrackName);
+    oPathToWriteTo,oWeatherCode,oTrackName);
   oPitLoad[2] = PitLoadRightBuffer;              // Set pointer to buffer
 };
 //==========================================================================*
@@ -1095,10 +1117,7 @@ void TDriver::InitTrack
   GfOut("#oFuelNeeded: %.1f\n",oFuelNeeded);
   // ... Setup initial fuel for race
 
-  tTrackSeg* Seg = oTrack->seg; 
-  oRain = Seg->surface->kFriction < 0.9;
-  if (oRain)
-	  UseFilterAccel();
+  Meteorology();
 
   GfOut("#\n\n\n#<<< TDriver::InitTrack\n\n\n");
 }
@@ -2012,10 +2031,31 @@ void TDriver::Turning()
       double rpm = CarRpm;
       oClutch = (850 - rpm) / 400;
       if(CarSpeedLong < 0.05)
-        oClutch = 0.5;
+        oClutch = oClutchMax;
 
       oClutch = MAX(0, MIN(oClutch, 0.9));       // Normalize
     }
+  }
+}
+//==========================================================================*
+
+//==========================================================================*
+// Meteorology
+//--------------------------------------------------------------------------*
+void TDriver::Meteorology()
+{
+  oWeatherCode = GetWeather();
+  if (oWeatherCode < oDryCode)
+  {
+	  oRain = true;
+	  oRainIntensity = oDryCode / oWeatherCode - 1.0;
+	  oTclAccel /= 1 + 12.5 * oRainIntensity;
+	  UseFilterAccel();
+  }
+  else
+  {
+	  oRain = false;
+	  oRainIntensity = 0.0;
   }
 }
 //==========================================================================*
@@ -3228,9 +3268,9 @@ double TDriver::FilterAccel(double Accel)
 	  return Accel;
 
     if (fabs(oDriftAngle) > 0.1)
-      return MIN(Accel, oLastAccel + 0.00005);
+      return MIN(Accel, oLastAccel + oTclAccel/20.0);
 
-    return MIN(Accel,oLastAccel + 0.0005);
+    return MIN(Accel,oLastAccel + oTclAccel/2);
   }
   else
   {
@@ -3238,9 +3278,9 @@ double TDriver::FilterAccel(double Accel)
 	  return Accel;
 
     if (fabs(oDriftAngle) > 0.1)
-      return MIN(Accel, oLastAccel + 0.0001);
+      return MIN(Accel, oLastAccel + oTclAccel/10);
 
-    return MIN(Accel,oLastAccel + 0.001);
+    return MIN(Accel,oLastAccel + oTclAccel);
   }
 }
 //==========================================================================*
@@ -3265,25 +3305,33 @@ double TDriver::FilterTCL(double Accel)
 
   if(HasDriveTrainFront)                         // If front wheels
   {                                              //   are impellers
-	Spin += WheelSpinVel(FRNT_LFT);              // Summarize spin
-	Spin += WheelSpinVel(FRNT_RGT);              // of both wheels
+    double WSL = WheelSpinVel(FRNT_LFT);         // Get spin velocity
+    double WSR = WheelSpinVel(FRNT_RGT);
+	if (WSL > WSR)                               // Depending on max
+	  Spin += 2 * WSL + WSR;                     // calc weighted spin
+	else
+	  Spin += WSL + 2 * WSR;                     
 	Wr += WheelRad(FRNT_LFT)+WheelRad(FRNT_RGT); // measure radius
-	Count += 2;                                  // and count both
+	Count += 3;                                  // and count weights
   }
 
   if(HasDriveTrainRear)                          // If rear wheels
   {                                              //   are impellers
-	Spin += WheelSpinVel(REAR_LFT);              // Summarize spin
-	Spin += WheelSpinVel(REAR_RGT);              // of both wheels
-	Wr += WheelRad(REAR_LFT)+WheelRad(REAR_RGT); // measure radius
-	Count += 2;                                  // and count both
+    double WSL = WheelSpinVel(REAR_LFT);
+    double WSR = WheelSpinVel(REAR_RGT);
+	if (WSL > WSR)
+	  Spin += 2 * WSL + WSR;
+	else
+	  Spin += WSL + 2 * WSR;
+	Wr += WheelRad(REAR_LFT)+WheelRad(REAR_RGT); 
+	Count += 3;                                  
   }
   Spin /= Count;                                 // Calculate spin
   Wr /= Count;                                   // and radius
 
   double Slip = Spin * Wr - CarSpeedLong;        // Calculate slip
   if (oRain) 
-	  Slip *= 3;
+	  Slip *= oTclFactor * (oRainIntensity + 1);
 
   if (Slip > oTclSlip)                           // Decrease accel if needed
   {

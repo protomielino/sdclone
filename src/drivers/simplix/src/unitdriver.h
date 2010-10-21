@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2010.10.20
+// Last changed : 2010.10.21
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -318,6 +318,8 @@ private:
     double oTargetSpeed;                         // Target speed for speed controller
 	double oTclRange;                            // TCL range
 	double oTclSlip;                             // Max TCL slip
+	double oTclFactor;                           // TCL scale 
+	double oTclAccel;                            // TCL acceleration
 	bool oSPEED_DREAMS;
 	char* oTrackName;                            // Name of track to drive on
 	char* oTrackLoad;                            // Name of track to drive on
@@ -392,9 +394,11 @@ private:
 	float oSideBorderOuter;
 	double oXXX;
 	bool oRain;
+	double oRainIntensity;
+	int oWeatherCode;                            // Track specific weather
+	int oDryCode;                                // Track specific dry weather
 
 	static int NBBOTS;                           // Nbr of cars
-//    static double CurrSimTime;                   // Current simulation time
     double CurrSimTime;                          // Current simulation time
 	static const char* MyBotName;                      // Name of this bot 
 	static const char* ROBOT_DIR;                      // Sub path to dll
@@ -424,6 +428,7 @@ private:
     void AdjustSkilling(PCarHandle Handle);
     void GetSkillingParameters(const char* BaseParamPath, const char* PathFilename);
     void SetPathAndFilenameForRacinglines();
+    void Meteorology();
 	int GetWeather();
 
 	void CalcSkilling();

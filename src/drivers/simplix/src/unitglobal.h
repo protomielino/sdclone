@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2010.10.16
+// Last changed : 2010.10.21
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -324,7 +324,7 @@ enum
 #define PrevGear (oCar->_gear - 1)
 #define RemainingLaps (oCar->_remainingLaps)
 #define TrackLength (oTrack->length)
-#define TreadClutch (oClutch = 0.5)
+#define TreadClutch (oClutch = oClutchMax)
 #define NextRpm (oShift[oCar->_gear])
 #define IsFullThrottle ((oAccel >= 1.0) && (oBrake <= 0.0))
 #define SteerLock (oCar->_steerLock)
@@ -380,6 +380,7 @@ enum
 // ... Internal parameters
 
 // Parameters of this robot ...
+#define PRV_ACCEL_FILTER     "accel filter"
 #define PRV_ACCEL_OUT        "accel out"
 #define PRV_FORCE_LANE       "force lane"         // Force lane for tests
 #define PRV_SKILL            "skill"              // Car specific skilling
@@ -461,6 +462,8 @@ enum
 
 #define PRV_TCL_RANGE        "tcl range"         // default 10.0    
 #define PRV_TCL_SLIP         "tcl slip"          // default 1.6    
+#define PRV_TCL_FACTOR       "tcl factor"        // default 3.0    
+#define PRV_TCL_ACCEL        "tcl accel"         // default 0.01    
 
 #define PRV_ABS_DELTA        "abs delta"         // default 1.1    
 #define PRV_ABS_SCALE        "abs scale"         // default 0.5    
@@ -471,6 +474,8 @@ enum
 #define PRV_CLUTCH_RELEASE   "clutch release"    // default 0.4
 
 #define PRV_TEAM_ENABLE      "team enable"       // default 1
+
+#define PRV_WEATHER_DRY      "dry code"          // default 1.0    
 // ... Parameters of this robot
 
 // Parameter candidates ...
