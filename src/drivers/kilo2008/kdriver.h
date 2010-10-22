@@ -23,16 +23,16 @@
  * 
  */
 
-#ifndef _KDRIVER_H_
-#define _KDRIVER_H_
+#ifndef SRC_DRIVERS_KILO2008_KDRIVER_H_
+#define SRC_DRIVERS_KILO2008_KDRIVER_H_
 
-#include "cardata.h"
-#include "linalg.h"     //v2d
-
-#include <car.h>        //tCarElt
-#include <raceman.h>    //tSituation
+#include <car.h>  // tCarElt
+#include <raceman.h>  // tSituation
 
 #include <string>
+
+#include "src/drivers/kilo2008/cardata.h"
+#include "src/drivers/kilo2008/linalg.h"  // v2d
 
 class Opponents;
 class Opponent;
@@ -40,7 +40,7 @@ class Pit;
 class KStrategy;
 class LRaceLine;
 
-//Custom setup features
+// Custom setup features
 #define KILO_SECT_PRIV      "KiloPrivate"
 #define KILO_ATT_FUELPERLAP "FuelPerLap"
 #define KILO_ATT_MUFACTOR   "MuFactor"
@@ -67,35 +67,34 @@ enum { TEAM_FRIEND = 1, TEAM_FOE };
 enum { AVOIDLEFT = 1, AVOIDRIGHT = 2, AVOIDSIDE = 4 };
 
 
-class KDriver
-{
-public:
-  KDriver(int index);
+class KDriver {
+ public:
+  explicit KDriver(int index);
   virtual ~KDriver();
 
-  //Callback functions for the sim
+  // Callback functions for the sim
   void drive(tSituation * s);
   int pitCommand(tSituation * s);
   void initTrack(tTrack * t, void *carHandle, void **carParmHandle,
-          tSituation * s);
+                  tSituation * s);
   void newRace(tCarElt * car, tSituation * s);
   void endRace(tSituation * s);
-  std::string bot;   //to make it possible to differentiate between Kilo & Dots
+  std::string bot;  // to make it possible to differentiate between Kilo & Dots
 
-  //Used by Opponents
+  // Used by Opponents
   tCarElt *getCarPtr()  { return m_car;}
   tTrack *getTrackPtr() { return m_track;}
   double getSpeed()     { return m_mycardata->getSpeedInTrackDirection(); }
-  
-protected:
-  //Initialize
+
+ protected:
+  // Initialize
   void initCa();
   void initCw();
   void initTireMu();
   void initTCLFilter();
   double initSkill(tSituation * s);
-  
-  //Driving aids
+
+  // Driving aids
   double filterTCL_RWD();
   double filterTCL_FWD();
   double filterTCL_4WD();
@@ -104,15 +103,15 @@ protected:
   double brakeDist(double allowedspeed, double mu);
   double filterABS(double brake);
   double filterBPit(double brake);
-  
-  //Steering
+
+  // Steering
   double getSteer(tSituation * s);
-  double calcSteer(double targetAngle, int rl);  
+  double calcSteer(double targetAngle, int rl);
   double correctSteering(double avoidsteer, double racesteer);
   double smoothSteering(double steercmd);
   vec2f getTargetPoint();
-  
-  //'own' utilities
+
+  // 'own' utilities
   void update(tSituation * s);
   double filterBrakeSpeed(double brake);
   double filterBColl(double brake);
@@ -134,38 +133,39 @@ protected:
   void * loadDefaultSetup() const;
   void mergeCarSetups(void **oldHandle, void *newHandle);
 
-  //Opponent handling  
+  // Opponent handling
   Opponent * getOverlappingOpp();
   Opponent * getTakeoverOpp();
   Opponent * getSidecollOpp();
   double filterOverlappedOffset(Opponent *o);
   double filterTakeoverOffset(Opponent *o);
   double filterSidecollOffset(Opponent *o, const double);
-  
-  
+
+
   // Constants.
   enum { NORMAL = 1, AVOIDING, CORRECTING, PITTING, OVERLAPPED };
   enum { TEAM_FRIEND = 1, TEAM_FOE };
   enum { AVOIDLEFT = 1, AVOIDRIGHT = 2, AVOIDSIDE = 4 };
 
-  tCarElt *m_car;         // Pointer to tCarElt struct.
+  tCarElt *m_car;           // Pointer to tCarElt struct.
   LRaceLine *m_raceline;
-  Opponents *m_opponents; // The container for opponents.
-  Pit *m_pit;             // Pointer to the pit instance.
-  KStrategy *m_strategy;  // Pit stop strategy.
-  tTrack *m_track;        // Track variables.
+  Opponents *m_opponents;   // The container for opponents.
+  Pit *m_pit;               // Pointer to the pit instance.
+  KStrategy *m_strategy;    // Pit stop strategy.
+  tTrack *m_track;          // Track variables.
 
-  static Cardata *m_cardata;  // Data about all cars shared by all instances.
-  SingleCardata *m_mycardata; // Pointer to "global" data about my car.
-  
-  static double m_currentSimTime; // Store time to avoid useless updates.
+  static Cardata *m_cardata;    // Data about all cars shared by all instances.
+  SingleCardata *m_mycardata;   // Pointer to "global" data about my car.
 
-  //Per robot global data
+  static double m_currentSimTime;   // Store time to avoid useless updates.
+
+  // Per robot global data
   int m_mode;
   int m_avoidmode;
   int m_lastmode;
   int m_stuckCounter;
-  double m_speedangle;  // the angle of the speed vector relative to trackangle, > 0.0 points to right.
+  double m_speedangle;  // the angle of the speed vector
+                        //  relative to trackangle, > 0.0 points to right.
   double m_angle;
   double m_mass;        // Mass of car + fuel.
   double m_myoffset;    // Offset to the track middle.
@@ -175,13 +175,14 @@ protected:
   double m_avoidTime;       // how long since we began avoiding
   double m_correctTimer;    // how long we've been correcting
   double m_correctLimit;    // level of divergence with raceline steering
-  double m_brakeDelay;      
-  double m_currentSpeedSqr; // Square of the current speed_x.
+  double m_brakeDelay;
+  double m_currentSpeedSqr;   // Square of the current speed_x.
   double m_clutchTime;      // Clutch timer.
   double m_oldLookahead;    // Lookahead for steering in the previous step.
   double m_raceSteer;       // steer command to get to raceline
   double m_rLookahead;      // how far ahead on the track we look for steering
-  double m_raceOffset;      // offset from middle of track towards which raceline is steering
+  double m_raceOffset;      // offset from middle of track towards which
+                            //  raceline is steering
   double m_avoidLftOffset;  // closest opponent on the left
   double m_avoidRgtOffset;  // closest opponent on the right
   double m_raceSpeed;       // how fast raceline code says we should be going
@@ -198,14 +199,14 @@ protected:
   double m_rInverse;
   std::string m_carType;
   int m_carIndex;
-  
-  //Skilling
+
+  // Skilling
   double m_skill;
   double m_filterBrakeSkill;
   double m_filterAccelSkill;
   double m_filterLookaheadSkill;
   double m_filterSideSkill;
-  
+
   // Data that should stay constant after first initialization.
   int MAX_UNSTUCK_COUNT;
   int INDEX;
@@ -215,7 +216,7 @@ protected:
   double TIREMU;             // Friction coefficient of tires.
   double OVERTAKE_OFFSET_INC;    // [m/timestep]
   double MU_FACTOR;          // [-]
-  double (KDriver::*GET_DRIVEN_WHEEL_SPEED) ();
+  double (KDriver::*GET_DRIVEN_WHEEL_SPEED)();
 
   // Class constants.
   static const double MAX_UNSTUCK_ANGLE;
@@ -245,8 +246,9 @@ protected:
   static const double CATCH_FACTOR;
   static const double TEAM_REAR_DIST;
   static const double LET_OVERTAKE_FACTOR;
-public:
-  static const int TEAM_DAMAGE_CHANGE_LEAD; //Used in opponent.cpp too
+
+ public:
+  static const int TEAM_DAMAGE_CHANGE_LEAD;   // Used in opponent.cpp too
 };
 
-#endif // _KDRIVER_H_
+#endif  // SRC_DRIVERS_KILO2008_KDRIVER_H_
