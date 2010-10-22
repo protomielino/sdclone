@@ -50,9 +50,9 @@ static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
 
 // Boards work on a OrthoCam with fixed height of 600, width flows
 // with split screen(s) and can be limited to 'board width' % of screen
-#define TOP_ANCHOR	600
-#define BOTTOM_ANCHOR	0
-#define DEFAULT_WIDTH	800
+#define TOP_ANCHOR  600
+#define BOTTOM_ANCHOR 0
+#define DEFAULT_WIDTH 800
 
 static char path[1024];
 
@@ -62,6 +62,8 @@ static double iTimer = 0.0;
 static int iStringStart = 0;
 static string st; //This is the line we will display in the bottom
   
+#define BUFSIZE 256
+
 
 cGrBoard::cGrBoard (int myid) {
   id = myid;
@@ -108,11 +110,11 @@ cGrBoard::loadDefaults(tCarElt *curCar)
   }
 
   if (boardWidth < 0 || boardWidth > 100)
-	  boardWidth = 100;
+    boardWidth = 100;
   this->setWidth(DEFAULT_WIDTH);
 
   if (speedoRise < 0 || speedoRise > 100)
-	  speedoRise = 0;
+    speedoRise = 0;
 }
 
 void
@@ -175,7 +177,7 @@ cGrBoard::selectBoard(int val)
 void
 cGrBoard::grDispDebug(float instFps, float avgFps, tCarElt *car)
 {
-  char buf[256];
+  char buf[BUFSIZE];
   int x, y, dy;
 
   x = rightAnchor - 100;
@@ -353,7 +355,7 @@ void
 cGrBoard::grDispCarBoard1(tCarElt *car, tSituation *s)
 {
   int  x, x2, y;
-  char buf[256];
+  char buf[BUFSIZE];
   char const* lapsTimeLabel;
   float *clr;
   int dy, dy2, dx;
@@ -439,7 +441,7 @@ void
 cGrBoard::grDispCarBoard2(tCarElt *car, tSituation *s)
 {
   int  x, x2, x3, y;
-  char buf[256];
+  char buf[BUFSIZE];
   char const *lapsTimeLabel;
   float *clr;
   double time;
@@ -678,7 +680,7 @@ void
 cGrBoard::grDispCounterBoard(tCarElt *car)
 {
   int  x, y;
-  char buf[256];
+  char buf[BUFSIZE];
   
   grDispEngineLeds (car, centerAnchor,  BOTTOM_ANCHOR + MAX(GfuiFontHeight(GFUI_FONT_BIG_C), GfuiFontHeight(GFUI_FONT_DIGIT)), ALIGN_CENTER, 1);
   
@@ -722,7 +724,7 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
     }
   else
     { //Static leaderboard
-    char buf[256];
+    char buf[BUFSIZE];
 
     int current = 0;  //Position of the currently displayed car
     for(int i = 0; i < s->_ncars; i++) {
@@ -955,7 +957,7 @@ cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
 {
   int  x, y;
   int  dy;
-  char buf[256];
+  char buf[BUFSIZE];
   float *clr;
 
 #define XM  15
@@ -1013,7 +1015,7 @@ cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
 }
 
 /**
- * This function calculates if the split time must be displaded, and if so what the
+ * This function calculates if the split time must be displayed, and if so what the
  * split time is.
  *
  * @param s[in] A pointer to the current situation
@@ -1139,17 +1141,19 @@ bool cGrBoard::grGetSplitTime(tSituation *s, tCarElt *car, bool gap_inrace, doub
  *
  * @param s[in] The current situation
  * @param car[in] The current car
- * @param result[out] An already existing string which will contain the text
+ * @param result[out] An already existing string of len BUFSIZE which will contain the text
  * @param label[out] The label (Lap: or Time: ) If zero, then the label is added to @p result.
  */
-void cGrBoard::grGetLapsTime(tSituation *s, tCarElt *car, char* result, char const **label) const
+void cGrBoard::grGetLapsTime(tSituation *s, tCarElt *car,
+                              char* result, char const **label) const
 {
-  char time = TRUE;
+  bool time = true;
   double cur_left;
   char const *loc_label;
 
+  // Don't show time data if race haven't started yet or is already finished
   if (s->_totTime < 0.0f || (s->_totTime < s->currentTime && s->_extraLaps > 0) )
-    time = FALSE;
+    time = false;
   
   if (label)
   {
@@ -1161,9 +1165,10 @@ void cGrBoard::grGetLapsTime(tSituation *s, tCarElt *car, char* result, char con
     loc_label = time ? "Time: " : "Lap: ";
   }
 
+  // Show only lap counts before start or after race
   if (!time)
   {
-    snprintf(result, sizeof(result), "%s%d/%d", loc_label, car->_laps, s->_totLaps );
+    snprintf(result, BUFSIZE, "%s%d/%d", loc_label, car->_laps, s->_totLaps );
   }
   else 
   {
@@ -1173,7 +1178,7 @@ void cGrBoard::grGetLapsTime(tSituation *s, tCarElt *car, char* result, char con
     if (cur_left < 0.0f)
       cur_left = 0.0f;
 
-    snprintf(result, sizeof(result), "%s%d:%02d:%02d", loc_label, (int)floor( cur_left / 3600.0f ), (int)floor( cur_left / 60.0f ) % 60, (int)floor( cur_left ) % 60 );
+    snprintf(result, BUFSIZE, "%s%d:%02d:%02d", loc_label, (int)floor( cur_left / 3600.0f ), (int)floor( cur_left / 60.0f ) % 60, (int)floor( cur_left ) % 60 );
   }
 }
 
@@ -1227,10 +1232,10 @@ void grInitBoardCar(tCarElt *car)
   handle = car->_carHandle;
   
   /* Set tachometer/speedometer textures search path :
-	 1) driver level specified, in the user settings,
+   1) driver level specified, in the user settings,
      2) driver level specified,
-	 3) car level specified,
-	 4) common textures */
+   3) car level specified,
+   4) common textures */
   param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.png");
   grFilePath = (char*)malloc(4096);
   lg = 0;
@@ -1424,7 +1429,7 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
       iStart = iStart % (s->_ncars + 1);  //Limit: number of cars + one separator line
     }
     
-  char buf[256];
+  char buf[BUFSIZE];
 
   int current = 0;  //Position of the currently displayed car
   for(int i = 0; i < s->_ncars; i++) {
@@ -1613,7 +1618,7 @@ string
 cGrBoard::grGenerateLeaderBoardEntry(const tCarElt* car, const tSituation* s, const bool isLeader) const
 {
   string ret;
-  char buf[256];
+  char buf[BUFSIZE];
   
   //Display driver time / time behind leader / laps behind leader
   if(car->_state & RM_CAR_STATE_DNF)  {
