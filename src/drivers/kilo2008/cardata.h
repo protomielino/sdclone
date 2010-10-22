@@ -28,16 +28,15 @@
     each other (for that is the class Opponents/Opponent responsible).
 */
 
-#ifndef _CARDATA_H_
-#define _CARDATA_H_
+#ifndef SRC_DRIVERS_KILO2008_CARDATA_H_
+#define SRC_DRIVERS_KILO2008_CARDATA_H_
 
-#include <car.h>        //tCarElt
-#include <raceman.h>    //tSituation
-#include <list>         //std::list
+#include <car.h>        // tCarElt
+#include <raceman.h>    // tSituation
+#include <list>         // std::list
 
-class SingleCardata
-{
-public:
+class SingleCardata {
+ public:
   void init(const tCarElt * car);
 
   inline double getSpeedInTrackDirection() const { return speed; }
@@ -51,9 +50,9 @@ public:
   inline tPosd *getLastSpeed() { return lastspeed;}
 
   void update();
-  //void operator() (void) {this->update();}
-  
-protected:
+  // void operator() (void) {this->update();}
+
+ protected:
   static double getSpeed(const tCarElt * car, const double trackangle);
 
   double speed;          // speed in direction of the track.
@@ -70,18 +69,17 @@ protected:
 };
 
 
-// TODO: use singleton pattern.
-class Cardata
-{
-public:
-  Cardata(tSituation * s);
+// TODO(kilo): use singleton pattern.
+class Cardata {
+ public:
+  explicit Cardata(tSituation * s);
   ~Cardata();
 
   void update() const;
   SingleCardata *findCar(const tCarElt * car) const;
 
-protected:
-  std::list<SingleCardata> *data; // List with car data.
+ protected:
+  std::list<SingleCardata> *data;  // List with car data.
 };
 
-#endif // _CARDATA_H_
+#endif  // SRC_DRIVERS_KILO2008_CARDATA_H_
