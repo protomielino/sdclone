@@ -29,10 +29,15 @@
 #include <robottools.h>  // Rt*
 #include <robot.h>  // ROB_PIT_IM
 
-#include <iostream>  // NOLINT(readability/streams), used for logging only
 #include <sstream>
 #include <list>
 #include <string>
+
+// #define DEBUG
+#ifdef DEBUG
+#include <iostream>  // NOLINT(readability/streams), used for logging only
+using ::std::cout;
+#endif
 
 #include "src/drivers/kilo2008/opponent.h"
 #include "src/drivers/kilo2008/strategy.h"
@@ -40,7 +45,9 @@
 #include "src/drivers/kilo2008/raceline.h"
 #include "src/drivers/kilo2008/util.h"
 
-// #define DEBUG
+using ::std::string;
+using ::std::stringstream;
+using ::std::list;
 
 // "I AM DEATH, NOT TAXES.  *I* TURN UP ONLY ONCE."  --  Death
 // Fear was theirs, not yers.
@@ -781,7 +788,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   // Create a pit stop strategy object.
   m_strategy = new KStrategy();
   // Init fuel.
-  m_strategy->setFuelAtRaceStart(t, carParmHandle, s, INDEX);
+  m_strategy->SetFuelAtRaceStart(t, carParmHandle, s, INDEX);
 
   m_raceline = new LRaceLine;
   // m_raceline->setSkill(m_skill);
@@ -809,7 +816,7 @@ void KDriver::update(tSituation * s) {
   m_currentSpeedSqr = pow(m_car->_speed_x, 2);
 
   m_opponents->update(s, this);
-  m_strategy->update();
+  m_strategy->Update();
 
   checkPitStatus(s);
   m_pit->update();
@@ -837,7 +844,7 @@ void KDriver::checkPitStatus(tSituation *s) {
       if ((m_car->_distFromStartLine < m_pit->getNPitEntry()
                 || m_car->_distFromStartLine > m_pit->getNPitEnd())
                 || m_car->_fuel < 5.0) {
-          m_pit->setPitstop(m_strategy->needPitstop());
+          m_pit->setPitstop(m_strategy->NeedPitstop());
       }
     }  // if no pit planned
 
@@ -906,8 +913,8 @@ double KDriver::filterBColl(const double brake) {
 
 // Set pitstop commands.
 int KDriver::pitCommand(tSituation * s) {
-  m_car->_pitRepair = m_strategy->pitRepair();
-  m_car->_pitFuel = m_strategy->pitRefuel();
+  m_car->_pitRepair = m_strategy->PitRepair();
+  m_car->_pitFuel = m_strategy->PitRefuel();
   // This should be the only place where the pit stop is set to false!
   m_pit->setPitstop(false);
   return ROB_PIT_IM;        // return immediately.
@@ -915,7 +922,7 @@ int KDriver::pitCommand(tSituation * s) {
 
 
 void KDriver::newRace(tCarElt * car, tSituation * s) {
-  m_strategy->setCar(car);
+  m_strategy->set_car(car);
 
   double deltaTime = static_cast<double>(RCM_MAX_DT_ROBOTS);
   MAX_UNSTUCK_COUNT = static_cast<int>(UNSTUCK_TIME_LIMIT / deltaTime);
