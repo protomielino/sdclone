@@ -588,9 +588,14 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 void
 RmShowResults(void *prevHdle, tRmInfo *info)
 {
+    int nCars;
+    char buffer[512];
+
     switch (info->s->_raceType) {
     case RM_TYPE_PRACTICE:
-	if (info->s->_ncars == 1)
+        snprintf( buffer, 512, "%s/%s", info->track->name, RE_SECT_DRIVERS );
+        nCars = GfParmGetEltNb( info->results, buffer );
+	if (nCars == 1)
 	    rmPracticeResults(prevHdle, info, 0);
 	else
 	    rmQualifResults(prevHdle, info, 0);
