@@ -639,12 +639,11 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_CARNAME, ""), MAX_NAME_LEN - 1);
     elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
     
-    // Load custom car skin name and targets from race info (if specified).
+    // Load custom skin name and targets from race info (if specified).
     snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
-    const char* pszSkinName = GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, "");
-    if (strlen(pszSkinName) > 0)
+    if (GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, 0))
     {
-      strncpy(elt->_skinName, pszSkinName, MAX_NAME_LEN - 1);
+      strncpy(elt->_skinName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, ""), MAX_NAME_LEN - 1);
       elt->_skinName[MAX_NAME_LEN - 1] = 0; // Texture name
     }
 	elt->_skinTargets = (int)GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
@@ -670,8 +669,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     elt->_endRaceMemPool = NULL;
     elt->_shutdownMemPool = NULL;
 
-    GfLogTrace("Driver #%d : module='%s', name='%s', car='%s', cat='%s', skin='%s' on %x\n",
-			   carindex, elt->_modName, elt->_name, elt->_carName,
+    GfLogTrace("Driver #%d(%d) : module='%s', name='%s', car='%s', cat='%s', skin='%s' on %x\n",
+			   carindex, listindex, elt->_modName, elt->_name, elt->_carName,
 			   elt->_category, elt->_skinName, elt->_skinTargets);
   
     /* Retrieve and load car specs : merge car default specs,
@@ -687,18 +686,20 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       /* Read Car Category specifications */
       cathdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
       if (GfParmCheckHandle(cathdle, carhdle)) {
-        GfLogError("Car %s NOT in Category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+        GfLogError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
         return NULL;
       }
       carhdle = GfParmMergeHandles(cathdle, carhdle,
                                    GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
-      /* The code below stores the carnames to a separate xml-file such that at newTrack it is known which car is used.
-       * TODO: find a better method for this */
+	  
+      /* The code below stores the carnames to a separate xml-file
+		 such that at newTrack it is known which car is used.
+		 TODO: find a better method for this */
       sprintf (buf, "%sdrivers/curcarnames.xml", GetLocalDir());
       handle = GfParmReadFile(buf, GFPARM_RMODE_CREAT);
       if (handle) {
         sprintf (path, "drivers/%s/%d", cardllname, elt->_driverIndex);
-        GfParmSetStr (handle, path, "car name", elt->_carName);
+        GfParmSetStr (handle, path, RM_ATTR_CARNAME, elt->_carName);
         GfParmWriteFile (0, handle, "Car names");
         GfParmReleaseHandle (handle);
       }
