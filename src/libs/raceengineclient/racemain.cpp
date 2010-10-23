@@ -640,10 +640,10 @@ ReRaceStart(void)
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL,
 							 GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL,
-							 GfParmGetNum(results, path, RM_ATTR_SKINTARGETS, NULL, 0));
-				if (GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0))
+							 GfParmGetNum(params, path, RM_ATTR_SKINTARGETS, NULL, 0));
+				if (GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0))
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME,
-								 GfParmGetStr(results, path, RM_ATTR_SKINNAME, ""));
+								 GfParmGetStr(params, path, RM_ATTR_SKINNAME, ""));
 			}
 		}
 	}
