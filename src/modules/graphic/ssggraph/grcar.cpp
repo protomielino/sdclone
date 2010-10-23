@@ -1,4 +1,3 @@
-
 /***************************************************************************
 
     file                 : grcar.cpp
@@ -22,8 +21,9 @@
 #include <windows.h>
 #endif
 
-#include <robottools.h>
+#include <portability.h> // snprintf
 #include <glfeatures.h>
+#include <robottools.h> //RELAXATION
 
 #include "grcar.h"
 #include "grmain.h"
@@ -237,8 +237,8 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 	    // Load speed-dependant 3D wheel model if available
 	    ssgEntity *whl3d = 0;
 	    if (wheel_mod_name && strlen(wheel_mod_name)) {
-		sprintf(wheel_file_name, "%s%d.acc", wheel_mod_name, j);
-		whl3d = grssgCarLoadAC3D(wheel_file_name, NULL, car->index);
+			snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
+			whl3d = grssgCarLoadAC3D(wheel_file_name, NULL, car->index);
 	    }
 
 	    // If we have a 3D wheel, use it, otherwise use auto- generated wheel...
@@ -404,9 +404,9 @@ grInitShadow(tCarElt *car)
 	ssgNormalArray	*shd_nrm = new ssgNormalArray(1);
 	ssgTexCoordArray	*shd_tex = new ssgTexCoordArray(GR_SHADOW_POINTS+1);
 
-	sprintf(buf, "cars/%s;", car->_carName);
-	if (strlen(car->_carTemplate) > 0) // Add the master model path if we are using a template.
-		sprintf(buf + strlen(buf), "cars/%s;", car->_carTemplate);
+	snprintf(buf, 256, "cars/%s;", car->_carName);
+	if (strlen(car->_masterModel) > 0) // Add the master model path if we are using a template.
+		snprintf(buf + strlen(buf), 256 - strlen(buf), "cars/%s;", car->_masterModel);
 		
 	grFilePath = buf;
 
@@ -519,15 +519,17 @@ grPropagateDamage (tSituation *s)
 void 
 grPreInitCar(tCarElt *car)
 {
-	strncpy(car->_carTemplate,
+	strncpy(car->_masterModel,
 			GfParmGetStr(car->_carHandle, SECT_GROBJECTS, PRM_TEMPLATE, ""), MAX_NAME_LEN - 1);
-	car->_carTemplate[MAX_NAME_LEN - 1] = 0;
+	car->_masterModel[MAX_NAME_LEN - 1] = 0;
 }
 
 void 
 grInitCar(tCarElt *car)
 {
-	char buf[4096];
+	static const char* pszTexFileExt = ".png";
+	static const int nMaxTexPathSize = 4096;
+	char buf[nMaxTexPathSize];
 	int index;
 	int selIndex;
 	ssgEntity *carEntity;
@@ -545,7 +547,6 @@ grInitCar(tCarElt *car)
 	int lightNum;
 	const char *lightType;
 	int lightTypeNum;
-	bool bTemplate;
 
 	TRACE_GL("loadcar: start");
 
@@ -559,19 +560,41 @@ grInitCar(tCarElt *car)
 	/* Initialize board */
 	grInitBoardCar(car);
 
-	/* Set texture mapping if we are using an alternative skin or a master 3D model */
-	bTemplate = strlen(car->_carTemplate) != 0;
+	/* Schedule texture mapping if we are using a custom skin and/or a master 3D model */
+	const bool bMasterModel = strlen(car->_masterModel) != 0;
+	const bool bCustomSkin = strlen(car->_skinName) != 0;
+
+	GfLogTrace("Loading graphics for %s (driver:%s, skin:%s.%x, master model:%s)\n",
+			   car->_carName, car->_name,
+			   bCustomSkin ? car->_skinName : "standard", car->_skinTargets,
+			   bMasterModel ? car->_masterModel : "self");
 	
-	std::string strSrcTexName(bTemplate ? car->_carTemplate : car->_carName);
-	std::string strTgtTexName(strlen(car->_carSkin) != 0 ? car->_carSkin : car->_carName);
+	/* 1) Whole livery */
+	std::string strSrcTexName(bMasterModel ? car->_masterModel : car->_carName);
+	std::string strTgtTexName(car->_carName);
+	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_WHOLE_LIVERY)
+	{
+		strTgtTexName += '-';
+		strTgtTexName += car->_skinName;
+	}
+
 	if (strSrcTexName != strTgtTexName)
 	{
-		strSrcTexName += ".png";
-		strTgtTexName += ".png";
+		strSrcTexName += pszTexFileExt;
+		strTgtTexName += pszTexFileExt;
 		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
+		GfLogDebug("Using skinned livery %s\n", strTgtTexName.c_str());
 	}
-	GfOut("grInitCar(%s, %s) : tpl='%s', skin='%s'\n",
-		  car->_name, car->_carName, car->_carTemplate, car->_carSkin);
+
+	/* 2) 3D wheels if present */
+	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_3D_WHEELS)
+	{
+		strSrcTexName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/.acc contents
+		strTgtTexName = strSrcTexName + '-' + car->_skinName + pszTexFileExt;
+		strSrcTexName += pszTexFileExt;
+		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
+		GfLogDebug("Using skinned 3D wheels %s\n", strTgtTexName.c_str());
+	}
 
 	grssgSetCurrentOptions(&options);
 
@@ -580,16 +603,16 @@ grInitCar(tCarElt *car)
 	car->_exhaustNb = MIN(car->_exhaustNb, 2);
 	car->_exhaustPower = GfParmGetNum(handle, SECT_EXHAUST, PRM_POWER, NULL, 1.0);
 	for (i = 0; i < car->_exhaustNb; i++) {
-		sprintf(path, "%s/%d", SECT_EXHAUST, i + 1);
+		snprintf(path, 256, "%s/%d", SECT_EXHAUST, i + 1);
 		car->_exhaustPos[i].x = GfParmGetNum(handle, path, PRM_XPOS, NULL, -car->_dimension_x / 2.0);
 		car->_exhaustPos[i].y = -GfParmGetNum(handle, path, PRM_YPOS, NULL, car->_dimension_y / 2.0);
 		car->_exhaustPos[i].z = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0.1);
 	}
 
-	sprintf(path, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
+	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_LIGHT);
 	lightNum = GfParmGetEltNb(handle, path);
 	for (i = 0; i < lightNum; i++) {
-		sprintf(path, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
+		snprintf(path, 256, "%s/%s/%d", SECT_GROBJECTS, SECT_LIGHT, i + 1);
 		lightPos[0] = GfParmGetNum(handle, path, PRM_XPOS, NULL, 0);
 		lightPos[1] = GfParmGetNum(handle, path, PRM_YPOS, NULL, 0);
 		lightPos[2] = GfParmGetNum(handle, path, PRM_ZPOS, NULL, 0);
@@ -616,26 +639,45 @@ grInitCar(tCarElt *car)
 
 	/* Set textures search path : 0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common textures */
-	grFilePath = (char*)malloc(4096);
+	grFilePath = (char*)malloc(nMaxTexPathSize);
 	lg = 0;
-	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
-	if (bTemplate)
-		lg += sprintf(grFilePath + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
-	lg += sprintf(grFilePath + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
-	if (bTemplate)
-		lg += sprintf(grFilePath + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carTemplate);
-	lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
-	if (bTemplate)
-		lg += sprintf(grFilePath + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
-	lg += sprintf(grFilePath + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
-	lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carName);
-	if (bTemplate)
-		lg += sprintf(grFilePath + lg, "drivers/%s/%s;", car->_modName, car->_carTemplate);
-	lg += sprintf(grFilePath + lg, "drivers/%s;", car->_modName);
-	lg += sprintf(grFilePath + lg, "cars/%s;", car->_carName);
-	if (bTemplate)
-		lg += sprintf(grFilePath + lg, "cars/%s;", car->_carTemplate);
-	lg += sprintf(grFilePath + lg, "data/textures");
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+				   GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+					   GetLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+	
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+				   GetLocalDir(), car->_modName, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+					   GetLocalDir(), car->_modName, car->_masterModel);
+	
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
+				   GetLocalDir(), car->_modName);
+	
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+				   car->_modName, car->_driverIndex, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+					   car->_modName, car->_driverIndex, car->_masterModel);
+	
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d;",
+				   car->_modName, car->_driverIndex);
+	
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+				   car->_modName, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+					   car->_modName, car->_masterModel);
+
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
+
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+	if (bMasterModel)
+		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "data/textures");
 
 	grCarInfo[index].envSelector = (ssgStateSelector*)grEnvSelector->clone();
 	grCarInfo[index].envSelector->ref();
@@ -647,7 +689,7 @@ grInitCar(tCarElt *car)
 	/* Level of details */
 	grCarInfo[index].LODSelector = LODSel = new ssgSelector;
 	grCarInfo[index].carTransform->addKid(LODSel);
-	sprintf(path, "%s/%s", SECT_GROBJECTS, LST_RANGES);
+	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_RANGES);
 	nranges = GfParmGetEltNb(handle, path) + 1;
 	if (nranges < 2) {
 		GfOut("Error not enough levels of detail\n");
@@ -663,32 +705,54 @@ grInitCar(tCarElt *car)
 	/* Set textures/models search path : 0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common models / textures */
 	lg = 0;
-	lg += sprintf(buf + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
-	if (bTemplate)
-		lg += sprintf(buf + lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
-	lg += sprintf(buf + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
-	if (bTemplate)
-		lg += sprintf(buf + lg, "%sdrivers/%s/%d/%s;", GetLocalDir(), car->_modName, car->_driverIndex, car->_carTemplate);
-	lg += sprintf(buf + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
-	if (bTemplate)
-		lg += sprintf(buf + lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
-	lg += sprintf(buf + lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
-	lg += sprintf(buf + lg, "drivers/%s/%s;", car->_modName, car->_carName);
-	if (bTemplate)
-		lg += sprintf(buf + lg, "drivers/%s/%s;", car->_modName, car->_carTemplate);
-	lg += sprintf(buf + lg, "drivers/%s;", car->_modName);
-	lg += sprintf(buf + lg, "cars/%s;", car->_carName);
-	if (bTemplate)
-		lg += sprintf(buf + lg, "cars/%s;", car->_carTemplate);
-	lg += sprintf(buf + lg, "data/objects;");
-	lg += sprintf(buf + lg, "data/textures");
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+				   GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+					   GetLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+				   GetLocalDir(), car->_modName, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+					   GetLocalDir(), car->_modName, car->_masterModel);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
+				   GetLocalDir(), car->_modName);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+				   car->_modName, car->_driverIndex, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+					   car->_modName, car->_driverIndex, car->_masterModel);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d;",
+				   car->_modName, car->_driverIndex);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+				   car->_modName, car->_carName);
+	if (bMasterModel)
+		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+					   car->_modName, car->_masterModel);
+
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
+
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+	if (bMasterModel)
+		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/objects;");
+
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "data/textures");
+
 	ssgModelPath(buf);
 	ssgTexturePath(buf);
 
 	/* loading raw car level 0*/
 	selIndex = 0; 	/* current selector index */
-	sprintf(buf, "%s.ac", bTemplate ? car->_carTemplate : car->_carName); /* default car 3D model file */
-	sprintf(path, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
+	snprintf(buf, nMaxTexPathSize, "%s.ac",
+			 bMasterModel ? car->_masterModel : car->_carName); /* default car 3D model file */
+	snprintf(path, 256, "%s/%s/1", SECT_GROBJECTS, LST_RANGES);
 	param = GfParmGetStr(handle, path, PRM_CAR, buf);
 	grCarInfo[index].LODThreshold[selIndex] = GfParmGetNum(handle, path, PRM_THRESHOLD, NULL, 0.0);
 	carEntity = grssgCarLoadAC3D(param, NULL, index);
@@ -762,7 +826,7 @@ grInitCar(tCarElt *car)
 	/* Other LODs */
 	for (i = 2; i < nranges; i++) {
 		carBody = new ssgBranch;
-		sprintf(buf, "%s/%s/%d", SECT_GROBJECTS, LST_RANGES, i);
+		snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_RANGES, i);
 		param = GfParmGetStr(handle, buf, PRM_CAR, "");
 		grCarInfo[index].LODThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_THRESHOLD, NULL, 0.0);
 		/* carEntity = ssgLoad(param); */
@@ -783,7 +847,7 @@ grInitCar(tCarElt *car)
 	LODSel->select(grCarInfo[index].LODSelectMask[0]);
 
 	/* add Steering Wheel 0 (if one exists) */
-	sprintf(path, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
+	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, SECT_STEERWHEEL);
 	param = GfParmGetStr(handle, path, PRM_SW_MODEL, NULL);
 	if (param)
 	{
@@ -851,7 +915,7 @@ grInitCar(tCarElt *car)
 	}
 
 	// separate driver models for animation according to steering wheel angle ...
-	sprintf(path, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
+	snprintf(path, 256, "%s/%s", SECT_GROBJECTS, LST_DRIVER);
 	nranges = GfParmGetEltNb(handle, path) + 1;
 	grCarInfo[index].nDRM = nranges - 1;
 	grCarInfo[index].DRMSelector = NULL;
@@ -873,7 +937,7 @@ grInitCar(tCarElt *car)
 			ssgTransform *driverLoc = new ssgTransform;
 			sgCoord driverpos;
 
-			sprintf(buf, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
+			snprintf(buf, nMaxTexPathSize, "%s/%s/%d", SECT_GROBJECTS, LST_DRIVER, i);
 			param = GfParmGetStr(handle, buf, PRM_DRIVERMODEL, "");
 			grCarInfo[index].DRMThreshold[selIndex] = GfParmGetNum(handle, buf, PRM_DRIVERSTEER, NULL, 0.0);
 

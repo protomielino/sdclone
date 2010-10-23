@@ -90,10 +90,24 @@ typedef struct {
     t3Dd	statGC;			/**< Static pos of GC (should be the origin of car axis) */
     tWheelSpec	wheel[4];		/**< Wheels specifications */
     tVisualAttributes visualAttr; 	/**< Visual attributes */
-    char	carTemplate[MAX_NAME_LEN];	/**< Car master model object (file) name */
-    char	carSkin[MAX_NAME_LEN];	/**< Car skin (= texture file) name if not the default one */
+    char	masterModel[MAX_NAME_LEN];	/**< Master 3D model car name (the exact folder name) */
+    char	skinName[MAX_NAME_LEN];	/**< Custom skin name, if any */
+    int		skinTargets;	    	/**< Target objects for the custom skinning
+				   <br>The possible targets are :
+				   - RM_CAR_SKIN_TARGET_WHOLE_LIVERY
+				   - RM_CAR_SKIN_TARGET_3D_WHEELS
+				   - RM_CAR_SKIN_TARGET_INTERIOR
+				   - RM_CAR_SKIN_TARGET_BOARD
+				   - RM_CAR_SKIN_TARGET_PIT_DOOR
+*/
+#define RM_CAR_SKIN_TARGET_WHOLE_LIVERY	 	0x00000001	/**< The whole car external livery */
+#define RM_CAR_SKIN_TARGET_3D_WHEELS 	0x00000002	/**< The 3D wheels */
+#define RM_CAR_SKIN_TARGET_INTERIOR	 	0x00000010	/**< The car interior */
+#define RM_CAR_SKIN_TARGET_BOARD 	0x00000020	/**< The interior instrument board */
+#define RM_CAR_SKIN_TARGET_PIT_DOOR 	0x00000100	/**< The pit door logo */
 } tInitCar;
-/* structure access short cuts */
+
+/* structure access shortcuts */
 #define _name		info.name			/**< short cut to tInitCar#name */
 #define _teamname	info.teamname		/**< short cut to tInitCar#teamname */
 #define _carName	info.carName			/**< short cut to tInitCar#carName */
@@ -123,8 +137,9 @@ typedef struct {
 #define _exhaustNb	info.visualAttr.exhaustNb	/**< short cut to tVisualAttributes#exhaustNb */
 #define _exhaustPos	info.visualAttr.exhaustPos	/**< short cut to tVisualAttributes#exhaustPos */
 #define _exhaustPower	info.visualAttr.exhaustPower	/**< short cut to tVisualAttributes#exhaustPower */
-#define _carTemplate	info.carTemplate	 	/**< short cut to tInitCar#carTemplate */
-#define _carSkin	info.carSkin			/**< short cut to tInitCar#carSkin */
+#define _masterModel	info.masterModel	 	/**< short cut to tInitCar#masterModel */
+#define _skinName	info.skinName			/**< short cut to tInitCar#skinName */
+#define _skinTargets	info.skinTargets		/**< short cut to tInitCar#skinTargets */
 
 #define RM_DRV_HUMAN	1
 #define RM_DRV_ROBOT	2

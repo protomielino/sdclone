@@ -4,8 +4,7 @@
     created     : Sat Nov 16 10:34:35 CET 2002
     copyright   : (C) 2002 by Eric Espie                       
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
-
+    version     : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -640,15 +639,17 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       strncpy(elt->_carName, GfParmGetStr(ReInfo->params, path2, RM_ATTR_CARNAME, ""), MAX_NAME_LEN - 1);
     elt->_carName[MAX_NAME_LEN - 1] = 0; /* XML file name */
     
-    // Load alternative car skin file name from race info (if specified).
-    sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
+    // Load custom car skin name and targets from race info (if specified).
+    snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, listindex);
     const char* pszSkinName = GfParmGetStr(ReInfo->params, path2, RM_ATTR_SKINNAME, "");
     if (strlen(pszSkinName) > 0)
     {
-      snprintf(elt->_carSkin, MAX_NAME_LEN - 1, "%s-%s", elt->_carName, pszSkinName);
-      elt->_carSkin[MAX_NAME_LEN - 1] = 0; // Texture file name (no ext)
+      strncpy(elt->_skinName, pszSkinName, MAX_NAME_LEN - 1);
+      elt->_skinName[MAX_NAME_LEN - 1] = 0; // Texture name
     }
-
+	elt->_skinTargets = (int)GfParmGetNum(ReInfo->params, path2, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
+	
+    // Load other data from robot descriptor.
     elt->_raceNumber = (int)GfParmGetNum(robhdle, path, ROB_ATTR_RACENUM, (char*)NULL, 0);
     if (!normal_carname && elt->_driverType != RM_DRV_HUMAN) // Increase racenumber if needed
       elt->_raceNumber += elt->_moduleIndex;
@@ -669,9 +670,9 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     elt->_endRaceMemPool = NULL;
     elt->_shutdownMemPool = NULL;
 
-    GfLogTrace("Driver #%d : module='%s', name='%s', car='%s', cat='%s', skin='%s'\n",
-        carindex, elt->_modName, elt->_name, elt->_carName,
-        elt->_category, elt->_carSkin);
+    GfLogTrace("Driver #%d : module='%s', name='%s', car='%s', cat='%s', skin='%s' on %x\n",
+			   carindex, elt->_modName, elt->_name, elt->_carName,
+			   elt->_category, elt->_skinName, elt->_skinTargets);
   
     /* Retrieve and load car specs : merge car default specs,
        category specs and driver modifications (=> handle) */

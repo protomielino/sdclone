@@ -54,11 +54,12 @@ protected:
 
 	const CarData* getSelectedCarModel() const;
 	const char* getSelectedCarSkin() const;
+	int getSelectedCarSkinTargets() const;
 
 	void setSelectedCarParamsHandle(void* hdle);
 	void* getSelectedCarParamsHandle() const;
 	
-	// Control callback functions (must be static).
+	// Control callback functions (have to be static, as used as tgfclient controls callbacks).
 	static void onActivateCB(void *pCarSelectMenu);
 	static void onChangeCategory(tComboBoxInfo *pInfo);
 	static void onChangeModel(tComboBoxInfo *pInfo);
@@ -75,8 +76,9 @@ private:
 	// Currently selected car params handle.
 	void* _hCarParams;
 	
-	// Skin names and associated preview files
+	// Skin names and targets + associated skinned livery preview files
 	std::vector<std::string> _vecSkinNames;
+	std::map<std::string, int> _mapSkinTargets;
 	std::map<std::string, std::string> _mapPreviewFiles;
 	size_t _nCurSkinIndex;
 

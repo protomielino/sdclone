@@ -200,7 +200,7 @@ grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap)
 	const char *s;
 	grManagedState *st; 
 
-	// remove the directory
+	// remove the directory path
 	s = strrchr(img, '/');
 	if (s == NULL) {
 		s = img;
@@ -209,7 +209,7 @@ grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap)
 	}
 
 	if (!grGetFilename(s, filepath, buf)) {
-		GfOut("File %s not found\n", s);
+		GfLogWarning("Texture file %s not found in search path %s\n", s, filepath);
 		return NULL;
 	}
 

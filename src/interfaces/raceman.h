@@ -284,6 +284,7 @@ typedef struct RmInfo
 #define RM_ATTR_IDX		"idx"
 #define RM_ATTR_CARNAME	"car name"
 #define RM_ATTR_SKINNAME	"skin name"
+#define RM_ATTR_SKINTARGETS	"skin targets"
 #define RM_ATTR_EXTENDED	"extended"
 #define RM_ATTR_SKILLLEVEL	"skill level"
 #define RM_ATTR_FOCUSED		"focused module"

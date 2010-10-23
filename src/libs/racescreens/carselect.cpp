@@ -21,6 +21,7 @@
 
 #include <sys/stat.h>
 #include <algorithm>
+#include <string>
 #include <sstream>
 
 #include <carinfo.h>
@@ -41,8 +42,7 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	// (use the 1st one from the 1st category if none).
 	CarData* pCurCar = CarInfo::self()->GetCarData(pMenu->getDriver()->carName);
 	if (!pCurCar)
-		pCurCar =
-			&CarInfo::self()->GetCarsInCategory(CarInfo::self()->GetCategoryNames()[0])[0];
+		pCurCar = &CarInfo::self()->GetCarsInCategory(CarInfo::self()->GetCategoryNames()[0])[0];
 
 	// Store current car params handle.
 	pMenu->setSelectedCarParamsHandle(pMenu->getDriver()->carParmHdle);
@@ -75,6 +75,18 @@ const CarData* RmCarSelectMenu::getSelectedCarModel() const
 const char* RmCarSelectMenu::getSelectedCarSkin() const
 {
 	return GfuiComboboxGetText(GetMenuHandle(), GetDynamicControlId("skincombo"));
+}
+
+int RmCarSelectMenu::getSelectedCarSkinTargets() const
+{
+	int nSkinTargets = 0;
+	
+	const std::map<std::string, int>::const_iterator itSkinTargets =
+		_mapSkinTargets.find(getSelectedCarSkin());
+	if (itSkinTargets != _mapSkinTargets.end())
+		nSkinTargets = itSkinTargets->second;
+	
+	return nSkinTargets;
 }
 
 void RmCarSelectMenu::onChangeCategory(tComboBoxInfo *pInfo)
@@ -132,6 +144,7 @@ void RmCarSelectMenu::onAcceptCB(void *pCarSelectMenu)
 			free(pMenu->getDriver()->skinName);
 		pMenu->getDriver()->skinName = strdup(pszNewCarSkin);
 	}
+	pMenu->getDriver()->skinTargets = pMenu->getSelectedCarSkinTargets();
 	
 	// Save car choice into the driver structure (only human drivers can change it).
 	if (pMenu->getDriver()->isHuman)
@@ -295,7 +308,8 @@ void RmCarSelectMenu::resetCarSkinComboBox(const std::string& strCarRealName,
 	// Get really available skins and previews for this car and current driver.
 	const char* pszCarName =
 		CarInfo::self()->GetCarDataFromRealName(strCarRealName)->strName.c_str();
-	rmdGetCarSkinsInSearchPath(getDriver(), pszCarName, _vecSkinNames, _mapPreviewFiles);
+	rmdGetCarSkinsInSearchPath(getDriver(), pszCarName,
+							   _vecSkinNames, _mapSkinTargets, _mapPreviewFiles);
 		
 	// Load the skin list in the combo-box (and determine the selected skin index).
 	GfuiComboboxClear(GetMenuHandle(), nSkinComboId);

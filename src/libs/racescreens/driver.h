@@ -40,7 +40,8 @@ typedef struct rmdDrvElt
     int		isSelected;	// Selected for race ?
     int		isHuman;	// Human driver ?
     char	*carName;		// Car (folder) name
-    char	*skinName;		// Skin name
+	int		skinTargets;	// Skin targets bit-field (see car.h for possible values)   
+    char	*skinName;		// Skin name (or 0 if standard skin)
     void	*carParmHdle;	// Handle to the car XML params file
     GF_TAILQ_ENTRY(struct rmdDrvElt)	link;
 } trmdDrvElt;
@@ -58,11 +59,13 @@ extern int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, co
 //! Retrieve the skins and associated preview images found in the given folder for the given car.
 extern void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 								   std::vector<std::string>& vecSkinNames,
+								   std::map<std::string, int>& mapSkinTargets,
 								   std::map<std::string, std::string>& mapPreviewFiles);
 
 //! Retrieve the skins and associated preview images found in the search path for the given driver (use pszForcedCarName in place of pDriver->carName if not null).
 extern void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForcedCarName,
 									   std::vector<std::string>& vecSkinNames,
+									   std::map<std::string, int>& mapSkinTargets,
 									   std::map<std::string, std::string>& mapPreviewFiles);
 
 #endif /* __DRIVER_H__ */

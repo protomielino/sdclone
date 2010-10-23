@@ -499,7 +499,8 @@ ReRaceStart(void)
 	const char *raceName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
-	
+
+	// Some debug traces about weather/rain parameters.
 #ifdef DEBUG
 	tTrack *track = ReInfo->track;
 	GfLogDebug("ReRaceStart : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
@@ -515,17 +516,19 @@ ReRaceStart(void)
 	} while (curSurf);
 #endif
 
+	// Reallocate car info for the race.
 	FREEZ(ReInfo->_reCarInfo);
 	ReInfo->_reCarInfo = (tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
 
-	/* Drivers starting order */
+	// Drivers starting order
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& ReInfo->s->_totTime < 0.0f)
 	{
 		GfLogInfo("Starting %s %s session\n",
 				  ReInfo->_reName, ReInfo->s->_raceType == RM_TYPE_PRACTICE ? "practice" : "qualification");
-		
+
+		// Race loading screen
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
 			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
@@ -534,13 +537,16 @@ ReRaceStart(void)
 			RmShutdownLoadingScreen();
 		}
 
+		// Propagate competitor drivers info to the real race starting grid
 		sprintf(path, "%s/%d", RM_SECT_DRIVERS, i);
 		sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, 1);
 		GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 		GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
 		GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
-		const char* pszSkinName = GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0);
-		if (pszSkinName && strlen(pszSkinName) > 0)
+		const int nSkinTgts = (int)GfParmGetNum(params, path, RM_ATTR_SKINTARGETS, NULL, 0);
+		GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL, nSkinTgts);
+		const char* pszSkinName = GfParmGetStr(params, path, RM_ATTR_SKINNAME, "");
+		if (strlen(pszSkinName) > 0)
 			GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 	}
 	else
@@ -550,7 +556,7 @@ ReRaceStart(void)
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		
-		/* Starting grid in the arrival order of the previous race */
+		// Starting grid in the arrival order of the previous race
 		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER))
 		{
 			GfLogInfo("Starting %s : Starting grid in the order of the last race\n", ReInfo->_reName);
@@ -568,13 +574,15 @@ ReRaceStart(void)
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
-				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0);
-				if (pszSkinName && strlen(pszSkinName) > 0)
+				const int nSkinTgts = (int)GfParmGetNum(results, path, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
+				GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL, nSkinTgts);
+				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, "");
+				if (strlen(pszSkinName) > 0)
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
 		}
 		
-		/* Starting grid in the reversed arrival order of the previous race */
+		// Starting grid in the reversed arrival order of the previous race
 		else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER))
 		{
 			GfLogInfo("Starting %s : Starting grid in the reverse order of the last race\n", ReInfo->_reName);
@@ -592,13 +600,15 @@ ReRaceStart(void)
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+				const int nSkinTgts = (int)GfParmGetNum(results, path, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
+				GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL, nSkinTgts);
 				const char* pszSkinName = GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0);
 				if (pszSkinName && strlen(pszSkinName) > 0)
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);
 			}
 		}
 
-		/* Starting grid in the drivers list order */
+		// Starting grid in the drivers list order
 		else
 		{
 			GfLogInfo("Starting %s : Starting grid in the order of the driver list\n", ReInfo->_reName);
@@ -612,6 +622,8 @@ ReRaceStart(void)
 				GfParmSetStr(params, path2, RM_ATTR_MODULE, GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 				GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, GfParmGetNum(params, path, RM_ATTR_IDX, NULL, 0));
 				GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL, GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
+				const int nSkinTgts = (int)GfParmGetNum(params, path, RM_ATTR_SKINTARGETS, (char*)NULL, 0);
+				GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL, nSkinTgts);
 				const char* pszSkinName = GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0);
 				if (pszSkinName && strlen(pszSkinName) > 0)
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME, pszSkinName);

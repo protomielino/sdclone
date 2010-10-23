@@ -1338,9 +1338,6 @@ const char* grssgLoaderOptions::mapTexture(const char* pszSrcFileName) const
 {
 	const std::map<std::string, std::string>::const_iterator iterTex =
 		_mapTextures.find(pszSrcFileName);
-// 	GfTrace("grssgLoaderOptions::mapTexture(%s) : %s\n",
-// 			pszSrcFileName,
-// 			iterTex != _mapTextures.end() ? iterTex->second.c_str() : pszSrcFileName);
 	return iterTex != _mapTextures.end() ? iterTex->second.c_str() : pszSrcFileName;
 }
 

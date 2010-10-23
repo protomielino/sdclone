@@ -22,10 +22,10 @@
 #include <iostream>
 
 #include <plib/ssg.h>
-#include <glfeatures.h>
 
-#include <robottools.h> //RELAXATION
 #include <portability.h> // snprintf
+#include <glfeatures.h>
+#include <robottools.h> //RELAXATION
 
 #include "grboard.h"
 #include "grmain.h" //grWinX, grHandle, grMaxDamage
@@ -1213,7 +1213,7 @@ static int nstate = 0;
 
 void grInitBoardCar(tCarElt *car)
 {
-  char    buf[4096];
+  static const int nMaxTexPathSize = 4096;
   int     index;
   void    *handle;
   const char  *param;
@@ -1223,7 +1223,7 @@ void grInitBoardCar(tCarElt *car)
   tdble   xSz, ySz, xpos, ypos;
   tdble   needlexSz, needleySz;
   int lg;
-  const bool bTemplate = strlen(car->_carTemplate) != 0;
+  const bool bMasterModel = strlen(car->_masterModel) != 0;
   
   grssgSetCurrentOptions ( &options ) ;
   
@@ -1233,36 +1233,58 @@ void grInitBoardCar(tCarElt *car)
   
   /* Set tachometer/speedometer textures search path :
    1) driver level specified, in the user settings,
-     2) driver level specified,
+   2) driver level specified,
    3) car level specified,
    4) common textures */
-  param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.png");
-  grFilePath = (char*)malloc(4096);
+  grFilePath = (char*)malloc(nMaxTexPathSize);
   lg = 0;
-  lg += snprintf(grFilePath + lg, 4096 - lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carName);
-  if (bTemplate)
-    lg += snprintf(grFilePath + lg, 4096 - lg, "%sdrivers/%s/%s;", GetLocalDir(), car->_modName, car->_carTemplate);
-  lg += snprintf(grFilePath + lg, 4096 - lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carName);
-  if (bTemplate)
-    lg += snprintf(grFilePath + lg, 4096 - lg, "drivers/%s/%d/%s;", car->_modName, car->_driverIndex, car->_carTemplate);
-  lg += snprintf(grFilePath + lg, 4096 - lg, "drivers/%s/%d;", car->_modName, car->_driverIndex);
-  lg += snprintf(grFilePath + lg, 4096 - lg, "drivers/%s/%s;", car->_modName, car->_carName);
-  if (bTemplate)
-    lg += snprintf(grFilePath + lg, 4096 - lg, "drivers/%s/%s;", car->_modName, car->_carTemplate);
-  lg += snprintf(grFilePath + lg, 4096 - lg, "drivers/%s;", car->_modName);
-  lg += snprintf(grFilePath + lg, 4096 - lg, "cars/%s;", car->_carName);
-  if (bTemplate)
-    lg += snprintf(grFilePath + lg, 4096 - lg, "cars/%s;", car->_carTemplate);
-  lg += snprintf(grFilePath + lg, 4096 - lg, "data/textures");
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+				 GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+  if (bMasterModel)
+    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
+				   GetLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+				 GetLocalDir(), car->_modName, car->_carName);
+  if (bMasterModel)
+    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
+				   GetLocalDir(), car->_modName, car->_masterModel);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
+				 GetLocalDir(), car->_modName);
+
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+				 car->_modName, car->_driverIndex, car->_carName);
+  if (bMasterModel)
+    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
+				   car->_modName, car->_driverIndex, car->_masterModel);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d;",
+				 car->_modName, car->_driverIndex);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+				 car->_modName, car->_carName);
+  if (bMasterModel)
+    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%s;",
+				   car->_modName, car->_masterModel);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s;", car->_modName);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_carName);
+  if (bMasterModel)
+    lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "cars/%s;", car->_masterModel);
+  
+  lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "data/textures");
 
   /* Tachometer --------------------------------------------------------- */
   curInst = &(carInfo->instrument[0]);
   
   /* Load the Tachometer texture */
+  param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.png");
+  
   curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
-  if (curInst->texture == 0) {
+  if (curInst->texture == 0)
     curInst->texture = (ssgSimpleState*)grSsgLoadTexState("rpm8000.rgb");
-  }
   
   cleanup[nstate] = curInst->texture;
   nstate++;
@@ -1327,9 +1349,8 @@ void grInitBoardCar(tCarElt *car)
   param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_SPEEDO_TEX, "speed360.png");
 
   curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
-  if (curInst->texture == 0) {
+  if (curInst->texture == 0)
     curInst->texture = (ssgSimpleState*)grSsgLoadTexState("speed360.rgb");
-  }
 
   free(grFilePath);
   
@@ -1390,7 +1411,6 @@ void grInitBoardCar(tCarElt *car)
   }
   glEnd();
   glEndList();
-  
 }
 
 void grShutdownBoardCar(void)

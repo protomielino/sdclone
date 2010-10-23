@@ -39,6 +39,8 @@ const char* rmdStdSkinName = "standard";
 
 static const char* pszSkinFileExt = ".png";
 static const char* pszPreviewFileSuffix = "-preview.jpg";
+static const char* pszLogoFileName = "logo"; // Warning: Must be consistent with grscene.cpp
+static const char* pszWheel3DFileName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/acc
 
 static const char* apszExcludedSkinFileSuffixes[] =
 { "rpm.png", "speed.png", "int.png" };
@@ -81,17 +83,16 @@ void rmdGetDriverType(const char* moduleName, char* driverType, size_t maxSize)
 
 void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 							std::vector<std::string>& vecSkinNames,
+							std::map<std::string, int>& mapSkinTargets,
 							std::map<std::string, std::string>& mapPreviewFiles)
 {
-	//struct stat st;
-	tFList *pSkinFileList, *pCurSkinFile;
+	//GfLogDebug("  rmdGetCarSkinsInFolder(car=%s, path=%s) ...\n", pszCarName, pszFolderPath);
 
-	//GfLogDebug("rmdGetCarSkinsInFolder(%s) :\n", pszFolderPath);
-
-	pCurSkinFile = pSkinFileList =
-		GfDirGetListFiltered(pszFolderPath, pszCarName, pszSkinFileExt);
-		
+	// Search for livery skin files, and asociated preview files if any.
+	tFList *pSkinFileList = GfDirGetListFiltered(pszFolderPath, pszCarName, pszSkinFileExt);
 	if (pSkinFileList)
+	{
+		tFList *pCurSkinFile = pSkinFileList;
 		do
 		{
 			pCurSkinFile = pCurSkinFile->next;
@@ -121,6 +122,14 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 			{
 				// Add found skin in the list
 				vecSkinNames.push_back(strSkinName);
+
+				// Add the whole car livery to the skin targets.
+				if (mapSkinTargets.find(strSkinName) == mapSkinTargets.end())
+					mapSkinTargets[strSkinName] = 0;
+				mapSkinTargets[strSkinName] |= RM_CAR_SKIN_TARGET_WHOLE_LIVERY;
+				
+				GfLogDebug("  Found %s%s livery\n", strSkinName.c_str(),
+						   strSkinName == rmdStdSkinName ? "" : "-skinned");
 				
 				// Add associated preview image, without really checking file existence
 				// (warn only ; up to the client GUI to do what to do if it doesn't exist).
@@ -133,69 +142,152 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 
 				struct stat st;
 				if (stat(ossPreviewName.str().c_str(), &st))
-					GfLogWarning("No preview file %s found for '%s' skin\n",
-								 ossPreviewName.str().c_str(), strSkinName.c_str());
+					GfLogWarning("Preview file not found for %s %s skin (%s)\n",
+								 pszCarName, strSkinName.c_str(), ossPreviewName.str().c_str());
 
 				//GfLogDebug("* found skin=%s, preview=%s\n",
 				//	  strSkinName.c_str(), ossPreviewName.str().c_str());
 			}
-				
+
 		} while (pCurSkinFile != pSkinFileList);
-		
+	}
+	
 	GfDirFreeList(pSkinFileList, NULL);
+	
+	// Search for skinned logo files if any.
+	tFList *pLogoFileList =
+		GfDirGetListFiltered(pszFolderPath, pszLogoFileName, pszSkinFileExt);
+	if (pLogoFileList)
+	{
+		tFList *pCurLogoFile = pLogoFileList;
+		do
+		{
+			pCurLogoFile = pCurLogoFile->next;
+
+			// Extract the skin name from the logo file name.
+			const int nSkinNameLen = // Expecting "logo-<skin name>.png"
+				strlen(pCurLogoFile->name) - strlen(pszLogoFileName)
+				- 1 - strlen(pszSkinFileExt);
+			if (nSkinNameLen > 0)
+			{
+				const std::string strSkinName =
+					std::string(pCurLogoFile->name)
+					.substr(strlen(pszLogoFileName) + 1, nSkinNameLen);
+			
+				// Add the pit door to the skin targets.
+				if (mapSkinTargets.find(strSkinName) == mapSkinTargets.end())
+					mapSkinTargets[strSkinName] = 0;
+				mapSkinTargets[strSkinName] |= RM_CAR_SKIN_TARGET_PIT_DOOR;
+
+				GfLogDebug("  Found %s-skinned logo (targets:%x)\n",
+						   strSkinName.c_str(), mapSkinTargets[strSkinName]);
+			}
+				
+		} while (pCurLogoFile != pLogoFileList);
+	}
+	
+	GfDirFreeList(pLogoFileList, NULL);
+	
+	// Search for skinned 3D wheel files if any.
+	tFList *pWheel3DFileList =
+		GfDirGetListFiltered(pszFolderPath, pszWheel3DFileName, pszSkinFileExt);
+	if (pWheel3DFileList)
+	{
+		tFList *pCurWheel3DFile = pWheel3DFileList;
+		do
+		{
+			pCurWheel3DFile = pCurWheel3DFile->next;
+
+			// Extract the skin name from the 3D wheel texture file name.
+			const int nSkinNameLen = // Expecting "logo-<skin name>.png"
+				strlen(pCurWheel3DFile->name) - strlen(pszWheel3DFileName)
+				- 1 - strlen(pszSkinFileExt);
+			if (nSkinNameLen > 0)
+			{
+				const std::string strSkinName =
+					std::string(pCurWheel3DFile->name)
+					.substr(strlen(pszWheel3DFileName) + 1, nSkinNameLen);
+			
+				// Add the 3D wheels to the skin targets.
+				if (mapSkinTargets.find(strSkinName) == mapSkinTargets.end())
+					mapSkinTargets[strSkinName] = 0;
+				mapSkinTargets[strSkinName] |= RM_CAR_SKIN_TARGET_3D_WHEELS;
+
+				GfLogDebug("  Found %s-skinned 3D wheels (targets:%x)\n",
+						   strSkinName.c_str(), mapSkinTargets[strSkinName]);
+			}
+				
+		} while (pCurWheel3DFile != pWheel3DFileList);
+	}
+	
+	GfDirFreeList(pWheel3DFileList, NULL);
+	
 }
 
 void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForcedCarName,
 								std::vector<std::string>& vecSkinNames,
+								std::map<std::string, int>& mapSkinTargets,
 								std::map<std::string, std::string>& mapPreviewFiles)
 {
 	const char* pszCarName = pszForcedCarName ? pszForcedCarName : pDriver->carName;
 	std::ostringstream ossDirPath;
 	std::string strPreviewName;
 
-	//GfLogDebug("rmdGetCarSkinsInSearchPath : module=%s, idx=%d, car=%s ...\n",
-	//	  pDriver->moduleName, pDriver->interfaceIndex, pszCarName);
+	GfLogDebug("Checking skins for %s ...\n", pszCarName);
 
 	// Clear the skin and preview lists.
 	vecSkinNames.clear();
 	mapPreviewFiles.clear();
+	mapSkinTargets.clear();
 
-	// Get skins/previews from the directories in the search path
-	// (WARNING: Must be consistent with the search path passed to ssgTexturePath in grcar.cpp,
-	//           at least for the car skin file search).
+	// Get/check skins/skin targets/previews from the directories in the search path
+	// WARNING: Must be consistent with the search paths used in grcar.cpp, grboard.cpp,
+	//          grscene.cpp ... etc ... but it is not currently 100% achieved
+	//          (pit door logos are not searched by the graphics engine
+	//           in the car-dedicated folders ... so they may be "over-detected" here).
+	ossDirPath << GetLocalDir() << "drivers/" << pDriver->moduleName
+			   << '/' << pDriver->interfaceIndex << '/' << pszCarName;
+	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
+
 	ossDirPath.str("");
 	ossDirPath << GetLocalDir() << "drivers/" << pDriver->moduleName
 			   << '/' << pszCarName;
 	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
-						   vecSkinNames, mapPreviewFiles);
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
+
+	ossDirPath.str("");
+	ossDirPath << GetLocalDir() << "drivers/" << pDriver->moduleName;
+	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
 
 	ossDirPath.str("");
 	ossDirPath << "drivers/" << pDriver->moduleName
 			   << '/' << pDriver->interfaceIndex << '/' << pszCarName;
 	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
-						   vecSkinNames, mapPreviewFiles);
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
 
 	ossDirPath.str("");
 	ossDirPath << "drivers/" << pDriver->moduleName
 			   << '/' << pDriver->interfaceIndex;
 	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
-						   vecSkinNames, mapPreviewFiles);
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
 
 	ossDirPath.str("");
 	ossDirPath << "drivers/" << pDriver->moduleName
 			   << '/' << pszCarName;
 	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
-						   vecSkinNames, mapPreviewFiles);
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
 
 	ossDirPath.str("");
 	ossDirPath << "drivers/" << pDriver->moduleName;
 	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
-						   vecSkinNames, mapPreviewFiles);
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
 
 	ossDirPath.str("");
 	ossDirPath << "cars/" << pszCarName;
 	rmdGetCarSkinsInFolder(pszCarName, ossDirPath.str().c_str(),
-						   vecSkinNames, mapPreviewFiles);
+						   vecSkinNames, mapSkinTargets, mapPreviewFiles);
 
 	// If we have at least 1 skin, make sure that if the standard one is inside,
 	// it is the first one.
@@ -214,8 +306,8 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForced
 	// (that way, the skin list will never be empty, and that's safer)
 	else
 	{
-		GfLogWarning("No skin found for '%s/%d/%s' : adding dummy '%s' one\n",
-					 pDriver->moduleName, pDriver->interfaceIndex, pszCarName, rmdStdSkinName);
+		GfLogError("No skin at all found for '%s/%d/%s' : adding dummy '%s' one\n",
+				   pDriver->moduleName, pDriver->interfaceIndex, pszCarName, rmdStdSkinName);
 		
 		// Skin.
 		vecSkinNames.push_back(rmdStdSkinName);
@@ -228,8 +320,7 @@ void rmdGetCarSkinsInSearchPath(const trmdDrvElt *pDriver, const char* pszForced
 
 		struct stat st;
 		if (stat(ossPreviewName.str().c_str(), &st))
-			GfLogWarning("No preview file %s found for '%s' skin\n",
+			GfLogWarning("No preview file %s found for dummy '%s' skin\n",
 						 ossPreviewName.str().c_str(), rmdStdSkinName);
 	}
-	
 }

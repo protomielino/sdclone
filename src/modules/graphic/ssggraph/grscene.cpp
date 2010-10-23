@@ -28,6 +28,7 @@
 #include <plib/ssgAux.h>
 #include <glfeatures.h>	//gluXXX
 #include <robottools.h>	//RtXXX()
+#include <portability.h> // snprintf
 
 #include "grscene.h"
 #include "grmain.h"
@@ -941,10 +942,9 @@ initBackground(void) {
   grEnvShadowState=(grMultiTexState*)grSsgEnvTexState("envshadow.png");
   if (grEnvShadowState == NULL) {
 		ulSetError ( UL_WARNING, "grscene:initBackground Failed to open envshadow.png for reading") ;
-		ulSetError ( UL_WARNING, "        mandatory for top env mapping ") ;
-		ulSetError ( UL_WARNING, "        should be in the .xml !! ") ;
-		ulSetError ( UL_WARNING, "        copy the envshadow.png from g-track-2 to the track you selected ") ;
-		ulSetError ( UL_WARNING, "        c'est pas classe comme sortie, mais ca evite un crash ") ;
+		ulSetError ( UL_WARNING, "        mandatory for top env mapping (should be in the .xml !!) ") ;
+		ulSetError ( UL_WARNING, "        copy the envshadow.png from 'chemisay' to the track you selected ") ;
+		ulSetError ( UL_WARNING, "        (sorry for exiting, but it would have actually crashed).") ;
 		GfScrShutdown();
 		exit(-1);
   }//if grEnvShadowState
@@ -994,24 +994,44 @@ grCustomizePits(void)
 				sgVec4 clr = {0, 0, 0, 1};
 				pit_clr->add(clr);
 		
+				std::string strLogoFileName("logo"); // Default driver logo file name (pit door).
+
 				if (pits->driversPits[i].car[0]) {
+					
 					// If we have more than one car in the pit use the team pit logo of driver 0. 
-					if (pits->driversPits[i].freeCarIndex == 1) { 
-						// One car assigned to the pit.
-						sprintf(buf, "drivers/%s/%d;drivers/%s;data/textures;data/img;.",
-							pits->driversPits[i].car[0]->_modName,
-							pits->driversPits[i].car[0]->_driverIndex,
-							pits->driversPits[i].car[0]->_modName);
-					} else {
-						// Multiple cars assigned to the pit.
-						sprintf(buf, "drivers/%s;data/textures;data/img;.",
-							pits->driversPits[i].car[0]->_modName);
-					}//if ...freeCarIndex == 1
+					snprintf(buf, sizeof(buf),
+							 "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s;data/textures",
+							 GetLocalDir(),
+							 pits->driversPits[i].car[0]->_modName,
+							 pits->driversPits[i].car[0]->_driverIndex,
+							 GetLocalDir(),
+							 pits->driversPits[i].car[0]->_modName,
+							 pits->driversPits[i].car[0]->_modName,
+							 pits->driversPits[i].car[0]->_driverIndex,
+							 pits->driversPits[i].car[0]->_modName);
+
+					// If a custom skin was selected, and it can apply to the pit door,
+					// update the logo file name accordingly
+					if (strlen(pits->driversPits[i].car[0]->_skinName) != 0
+						&& pits->driversPits[i].car[0]->_skinTargets & RM_CAR_SKIN_TARGET_PIT_DOOR)
+					{
+						strLogoFileName += '-';
+						strLogoFileName += pits->driversPits[i].car[0]->_skinName;
+						GfLogDebug("Using skinned pit door logo %s\n", strLogoFileName.c_str());
+					}
+					
 				} else {
-					sprintf(buf, "data/textures;data/img;.");
+					snprintf(buf, sizeof(buf), "data/textures");
 				}//if pits->driverPits[i].car[0]
 
-				ssgState *st = grSsgLoadTexStateEx("logo.rgb", buf, FALSE, FALSE);
+				// Load logo texture (.rgb first, for backwards compatibility, then .png)
+				const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+				ssgState *st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE);
+				if (!st)
+				{
+					const std::string strPNGLogoFileName = strLogoFileName + ".png";
+					st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf, FALSE, FALSE);
+				}
 				((ssgSimpleState*)st)->setShininess(50);
 			
 				tdble x, y;
@@ -1116,7 +1136,7 @@ grUpdateTime(tSituation *s)
 
 	double sol_angle = bodies[SUN]->getAngle();
 	double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
-    	double scene_brightness = pow(sky_brightness, 0.5);
+	double scene_brightness = pow(sky_brightness, 0.5);
 	
 	sky_color[0] = base_sky_color[0] * (float)sky_brightness;
 	sky_color[1] = base_sky_color[1] * (float)sky_brightness;
