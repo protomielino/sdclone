@@ -27,62 +27,61 @@
     Pit strategy for drivers.
 */
 
-#ifndef _STRATEGY_H_
-#define _STRATEGY_H_
+#ifndef SRC_DRIVERS_KILO2008_STRATEGY_H_
+#define SRC_DRIVERS_KILO2008_STRATEGY_H_
 
-#include <track.h>  //tTrack
-#include <car.h>    //tCarElt
-#include <raceman.h>    //tSituation
+#include <track.h>    // tTrack
+#include <car.h>      // tCarElt
+#include <raceman.h>  // tSituation
 
 #include <deque>
 
-class KStrategy
-{
-public:
-    KStrategy();
-    ~KStrategy() {delete m_last_damages;}
+class KStrategy {
+ public:
+  KStrategy();
+  ~KStrategy() {delete m_last_damages;}
 
-    //Interface
-    void update();
-    bool needPitstop() const;
-    int pitRepair() const;
-    double pitRefuel();
-    void setFuelAtRaceStart(const tTrack * const t,
-                        void ** const carParmHandle,
-                        const tSituation * const s,
-                        const int index);
-    void setCar(const tCarElt * const car) {this->m_car = car;}
-    
-protected:
-    bool isPitFree() const;
-    int get_avg_damage() const;
-    inline int laps_to_go() const
-        {return m_car->_remainingLaps - m_car->_lapsBehindLeader;}
-    void updateFuelStrategy();
-    void computeBestNumberOfPits(const double tankCapacity,
+  // Interface
+  void Update();
+  bool NeedPitstop() const;
+  int PitRepair() const;
+  double PitRefuel();
+  void SetFuelAtRaceStart(const tTrack * const t,
+                            void ** const carParmHandle,
+                            const tSituation * const s,
+                            const int index);
+  void set_car(const tCarElt * const car) {this->m_car = car;}
+
+ protected:
+  bool IsPitFree() const;
+  int GetAvgDamage() const;
+  inline int LapsToGo() const
+      {return m_car->_remainingLaps - m_car->_lapsBehindLeader;}
+  void UpdateFuelStrategy();
+  void ComputeBestNumberOfPits(const double tankCapacity,
                                 const double requiredFuel,
                                 const int remainingLaps,
                                 const bool preRace);
 
-    const tCarElt * m_car;
-    int m_laps;
-    std::deque<int> *m_last_damages;
-    int m_remainingstops;
-    double m_fuelperstint;
-    double m_pittime;      // Expected additional time for pit stop.
-    double m_bestlap;      // Best possible lap, empty tank and alone.
-    double m_worstlap;     // Worst possible lap, full tank and alone.
-    bool m_fuelchecked;       // Fuel statistics updated.
-    double m_fuelperlap;       // The maximum amount of fuel we needed for a lap.
-    double m_lastpitfuel;      // Amount refueled, special case when we refuel.
-    double m_lastfuel;         // the fuel available when we cross the start lane.
-    double m_expectedfuelperlap;   // Expected fuel per lap (may be very inaccurate).
-    double m_fuelsum;          // all the fuel used.
+  const tCarElt * m_car;
+  int m_laps;
+  std::deque<int> *m_last_damages;
+  int m_remaining_stops;
+  double m_fuel_per_stint;
+  double m_pittime;           // Expected additional time for pit stop.
+  double m_best_lap;          // Best possible lap, empty tank and alone.
+  double m_worst_lap;         // Worst possible lap, full tank and alone.
+  bool m_fuel_checked;        // Fuel statistics updated.
+  double m_fuel_per_lap;      // Maximum amount of fuel we needed for a lap.
+  double m_last_pit_fuel;     // Amount refueled, special case when we refuel.
+  double m_last_fuel;         // Fuel available when we cross the start lane.
+  double m_expected_fuel_per_lap;  // Expected fuel per lap (may be inaccurate).
+  double m_fuel_sum;          // All the fuel used.
 
-    static const double MAX_FUEL_PER_METER;    // [kg/m] fuel consumtion.
-    static const int PIT_DAMAGE; // If damage > we request a pit stop.
-    static const double SAFE_LAPS;   //Can go this # of laps before req. refuel.
-    static const int LAST_LAPS; //Store this count of last laps' damage datae
+  static const double MAX_FUEL_PER_METER;   // [kg/m] fuel consumtion.
+  static const int PIT_DAMAGE;  // If damage > we request a pit stop.
+  static const double SAFE_LAPS;   // Can go this # of laps before req. refuel.
+  static const int LAST_LAPS;   // Store this count of last laps' damage datae
 };
 
-#endif // _STRATEGY_H_
+#endif  // SRC_DRIVERS_KILO2008_STRATEGY_H_

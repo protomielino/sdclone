@@ -23,15 +23,15 @@
  * 
  */
 
-#ifndef _OPPONENT_H_
-#define _OPPONENT_H_
+#ifndef SRC_DRIVERS_KILO2008_OPPONENT_H_
+#define SRC_DRIVERS_KILO2008_OPPONENT_H_
 
-#include <car.h>        //tCarElt
-#include <raceman.h>    //tSituation
-#include "cardata.h"
+#include <car.h>        // tCarElt
+#include <raceman.h>    // tSituation
+
 #include <list>
-#include <string>
-using namespace std;
+
+#include "src/drivers/kilo2008/cardata.h"
 
 class KDriver;
 
@@ -46,9 +46,8 @@ class KDriver;
 
 
 // Opponent maintains the data for one opponent RELATIVE to the driver's car.
-class Opponent
-{
-public:
+class Opponent {
+ public:
   Opponent(tCarElt *car, SingleCardata *cardata, int index);
 
   static void setTrackPtr(tTrack * const track) {Opponent::m_track = track;}
@@ -58,32 +57,40 @@ public:
   double getWidth() const {return m_cardata->getWidthOnTrack();}
   double getSpeed() const {return m_cardata->getSpeedInTrackDirection();}
   int getIndex() const {return m_index;}
-  
-  inline bool isState(const int state) const {return bool(m_state & state);}
+
+  inline bool isState(const int state) const
+    { return static_cast<bool>(m_state & state); }
   inline bool isTeammate() const {return m_teammate;}
   bool isQuickerTeammate(tCarElt * const mycar);
   inline bool isOnRight(const double dMiddle)
-    {return (dMiddle > m_car->_trkPos.toMiddle) ? true : false;}
+    { return (dMiddle > m_car->_trkPos.toMiddle) ? true : false; }
 
   inline void markAsTeamMate() {m_teammate = true;}
   void update(tSituation *s, KDriver *driver);
 
-private:
+ private:
   double getDistToSegStart() const;
   void updateOverlapTimer(tSituation * const s, tCarElt * const mycar);
 
-  double m_distance;         // approximation of the real distance, negative if the opponent is behind.
-  double m_brakedistance;    // distance minus opponent car length
-  double m_catchdist;        // distance needed to catch the opponent (linear estimate).
-  double m_sidedist;         // approx distance of center of gravity of the cars.
-  int m_state;              // State variable to characterize the relation to the opponent, e. g. opponent is behind.
+  // approximation of the real distance, negative if the opponent is behind.
+  double m_distance;
+  // distance minus opponent car length
+  double m_brakedistance;
+  // distance needed to catch the opponent (linear estimate).
+  double m_catchdist;
+  // approx distance of center of gravity of the cars.
+  double m_sidedist;
+  // State variable to characterize the relation to the opponent,
+  // e. g. opponent is behind.
+  int m_state;
   int m_index;
   double m_overlaptimer;
 
   tCarElt *m_car;
-  SingleCardata *m_cardata; // Pointer to global data about this opponent.
-  bool m_teammate;          // Is this opponent a team mate of me (configure it in setup XML)?
-  
+  SingleCardata *m_cardata;   // Pointer to global data about this opponent.
+  bool m_teammate;            // Is this opponent a team mate of me
+                              // TODO(kilo): configure it in setup XML?
+
   // class variables.
   static tTrack *m_track;
 
@@ -101,22 +108,21 @@ private:
 
 // The Opponents class holds a list of all Opponents.
 // Uses STL's list template.
-class Opponents
-{
-public:
+class Opponents {
+ public:
   Opponents(tSituation *s, KDriver *driver, Cardata *cardata);
   ~Opponents() {delete m_opps;}
 
   void update(tSituation *s, KDriver *driver);
   void setTeamMate(const tCarElt *car);
   Opponent *getOppByState(const int state);
-  
-  inline list<Opponent>::iterator begin() {return m_opps->begin();}
-  inline list<Opponent>::iterator end() {return m_opps->end();}
-  
-private:
-  list<Opponent> *m_opps;
+
+  inline std::list<Opponent>::iterator begin() {return m_opps->begin();}
+  inline std::list<Opponent>::iterator end() {return m_opps->end();}
+
+ private:
+  std::list<Opponent> *m_opps;
 };
 
 
-#endif // _OPPONENT_H_
+#endif  // SRC_DRIVERS_KILO2008_OPPONENT_H_

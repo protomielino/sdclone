@@ -23,23 +23,21 @@
  * 
  */
 
-#include "spline.h"
+#include "src/drivers/kilo2008/spline.h"
 
-
-Spline::Spline(int dim, SplinePoint *s)
-{
+Spline::Spline(int dim, SplinePoint *s) {
   this->s = s;
   this->dim = dim;
 }
 
 
-double Spline::evaluate(double z)
-{
+double Spline::evaluate(double z) {
   int i, a, b;
   double t, a0, a1, a2, a3, h;
 
   // Binary search for interval.
-  a = 0; b = dim - 1;
+  a = 0;
+  b = dim - 1;
   do {
     i = (a + b) / 2;
     if (s[i].x <= z) {

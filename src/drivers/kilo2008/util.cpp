@@ -19,29 +19,25 @@
  */
 
 
-#include "util.h"
+#include "src/drivers/kilo2008/util.h"
 #include <math.h>
 
 /////////////////////////////////////////////////////////////////////////////
 // Some utility macros and functions
 /////////////////////////////////////////////////////////////////////////////
 
-double Mag(const double x, const double y)
-{
+double Mag(const double x, const double y) {
   return sqrt(x * x + y * y);
 }
 
-bool BetweenStrict(const double val, const double min, const double max)
-{
+bool BetweenStrict(const double val, const double min, const double max) {
   return static_cast<bool>(val > min && val < max);
 }
 
-bool BetweenLoose(const double val, const double min, const double max)
-{
+bool BetweenLoose(const double val, const double min, const double max) {
   return static_cast<bool>(val >= min && val <= max);
 }
 
-double sign(const double d)
-{
+double sign(const double d) {
   return (d >= 0.0) ? 1.0 : -1.0;
 }

@@ -23,27 +23,26 @@
  * 
  */
 
-#ifndef _SPLINE_H_
-#define _SPLINE_H_
+#ifndef SRC_DRIVERS_KILO2008_SPLINE_H_
+#define SRC_DRIVERS_KILO2008_SPLINE_H_
 
 class SplinePoint {
-  public:
-    double x; // x coordinate.
-    double y; // y coordinate.
-    double s; // slope.
+ public:
+  double x;   // x coordinate.
+  double y;   // y coordinate.
+  double s;   // slope.
 };
 
 
 class Spline {
-  public:
-    Spline(int dim, SplinePoint *s);
+ public:
+  Spline(int dim, SplinePoint *s);
 
-    double evaluate(double z);
+  double evaluate(double z);
 
-  private:
-    SplinePoint *s;
-    int dim;
+ private:
+  SplinePoint *s;
+  int dim;
 };
 
-#endif // _SPLINE_H_
-
+#endif  // SRC_DRIVERS_KILO2008_SPLINE_H_

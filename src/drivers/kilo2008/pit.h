@@ -23,19 +23,18 @@
  * 
  */
 
-#ifndef _PIT_H_
-#define _PIT_H_
+#ifndef SRC_DRIVERS_KILO2008_PIT_H_
+#define SRC_DRIVERS_KILO2008_PIT_H_
 
-#include <raceman.h>    //tSituation
-#include "spline.h"
+#include <raceman.h>    // tSituation
+#include "src/drivers/kilo2008/spline.h"
 
 class KDriver;
 
-class Pit
-{
-public:
+class Pit {
+ public:
   Pit(const tSituation * s, KDriver * driver, const double PitOffset);
-   ~Pit();
+  ~Pit();
 
   void setPitstop(const bool pitstop);
   inline bool getPitstop() const {return m_pitstop;}
@@ -62,29 +61,29 @@ public:
 
   void update();
 
-private:
+ private:
   tTrack *m_track;
   tCarElt *m_car;
-  tTrackOwnPit *m_mypit;    // Pointer to my pit.
-  tTrackPitInfo *m_pitinfo; // General pit info.
+  tTrackOwnPit *m_mypit;      // Pointer to my pit.
+  tTrackPitInfo *m_pitinfo;   // General pit info.
 
   enum
   { NPOINTS = 7 };
   SplinePoint m_p[NPOINTS];   // Spline points.
-  Spline *m_spline;       // Spline.
+  Spline *m_spline;           // Spline.
 
-  bool m_pitstop;         // Pitstop planned.
-  bool m_inpitlane;       // We are still in the pit lane.
-  double m_pitentry;      // Distance to start line of the pit entry.
-  double m_pitexit;       // Distance to the start line of the pit exit.
+  bool m_pitstop;             // Pitstop planned.
+  bool m_inpitlane;           // We are still in the pit lane.
+  double m_pitentry;          // Distance to start line of the pit entry.
+  double m_pitexit;           // Distance to the start line of the pit exit.
 
   double m_speedlimitsqr;     // Pit speed limit squared.
   double m_speedlimit;        // Pit speed limit.
   double m_pitspeedlimitsqr;  // The original speedlimit squared.
 
-  double m_pittimer;       // Timer for pit timeouts.
+  double m_pittimer;          // Timer for pit timeouts.
 
   static const double SPEED_LIMIT_MARGIN;
 };
 
-#endif // _PIT_H_
+#endif  // SRC_DRIVERS_KILO2008_PIT_H_

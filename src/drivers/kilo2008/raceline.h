@@ -23,42 +23,46 @@
  * 
  */
 
-#ifndef _RACELINE_H_
-#define _RACELINE_H_
+#ifndef SRC_DRIVERS_KILO2008_RACELINE_H_
+#define SRC_DRIVERS_KILO2008_RACELINE_H_
 
-#include <raceman.h>    //tSituation
-#include <track.h>      //tTrack
+#include <raceman.h>    // tSituation
+#include <track.h>      // tTrack
 
-#include <iostream> //ostream
-#include <vector>   //vector
-#include <utility>  //pair
+#ifdef KILO_DEBUG
+#include <iostream>     // ostream  // NOLINT(readability/streams) only debug
+#endif
+#include <vector>       // vector
+#include <utility>      // pair
 
 class v2d;
 
-enum
-{ LINE_MID = 0, LINE_RL };
+enum { LINE_MID = 0, LINE_RL };
 
-class rlSegment
-{
-public:
-  ~rlSegment() {};
+class rlSegment {
+ public:
+  ~rlSegment() {}
 
   void UpdateTxTy(const int rl);
-  friend void Nullify(rlSegment &d);
-  friend std::ostream &operator<<(std::ostream &output, const rlSegment &s)
-    {
+  friend void Nullify(rlSegment &d);  // NOLINT(runtime/references)
+  // The above function is called in an STL for_each operation
+#ifdef KILO_DEBUG
+  friend std::ostream &operator<<(std::ostream &output, const rlSegment &s) {
     output << s.tx[0] << ' ' << s.tx[1] << ' '
         << s.ty[0] << ' ' << s.ty[1] << ' '
         << s.tz[0] << ' ' << s.tz[1] << ' '
-    << s.tRInverse << ' ' << s.tMaxSpeed << ' ' << s.tSpeed[0] << ' ' << s.tSpeed[1] << ' '
-    << s.txLeft << ' ' << s.tyLeft << ' ' << s.txRight << ' ' << s.tyRight << ' '
-    << s.tLane << ' ' << s.tLaneLMargin << ' ' << s.tLaneRMargin << ' '
-    << s.tFriction << ' ' << s.dCamber << std::endl;
+        << s.tRInverse << ' ' << s.tMaxSpeed << ' '
+        << s.tSpeed[0] << ' ' << s.tSpeed[1] << ' '
+        << s.txLeft << ' ' << s.tyLeft << ' '
+        << s.txRight << ' ' << s.tyRight << ' '
+        << s.tLane << ' ' << s.tLaneLMargin << ' ' << s.tLaneRMargin << ' '
+        << s.tFriction << ' ' << s.dCamber << std::endl;
 
     return output;
-    }
+  }
+#endif
 
-public:
+ public:
   double tx[2];
   double ty[2];
   double tz[2];
@@ -76,34 +80,36 @@ public:
   double dCamber;
 };
 
-class LRaceLine
-{
-public:
+
+class LRaceLine {
+ public:
   LRaceLine() {}
   virtual ~LRaceLine() {}
-  
+
   inline void setCar(tCarElt * const car) {m_pCar = car;}
-  
-  void InitTrack(const tTrack * const track, void **carParmHandle, const tSituation *s, const double filterSideSkill);
+
+  void InitTrack(const tTrack * const track, void **carParmHandle,
+                  const tSituation *s, const double filterSideSkill);
   void NewRace();
   void GetRaceLineData(const tSituation * const s, v2d * target,
                 double *speed, double *avspeed, double *raceoffset,
                 double *lookahead, double *racesteer);
-  void GetPoint(const double offset, const double lookahead, vec2f * const rt) const;
+  void GetPoint(const double offset, const double lookahead,
+                  vec2f * const rt) const;
   bool isOnLine(void) const;
   double correctLimit(void) const;
   inline double getRInverse(void) const {return m_Seg[Next].tRInverse;}
-  inline double getRInverse(const double distance) const
-    {
-    int d = ((Next + int (distance / m_lDivLength)) % m_cDivs);
+  inline double getRInverse(const double distance) const {
+    int d = ((Next + static_cast<int>(distance / m_lDivLength)) % m_cDivs);
     return m_Seg[d].tRInverse;
-    }
+  }
 
-
-private:
+ private:
   void SetSegmentInfo(const tTrackSeg * pseg, const int i, const double l);
-  void SplitTrack(const tTrack * const ptrack, const int rl, const tSituation *s);
-  double getRInverse(const int prev, const double x, const double y, const int next, const int rl) const;
+  void SplitTrack(const tTrack * const ptrack, const int rl,
+                      const tSituation *s);
+  double getRInverse(const int prev, const double x, const double y,
+                      const int next, const int rl) const;
   void AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl,
             double Security = 0);
   void Smooth(const int Step, const int rl);
@@ -112,7 +118,7 @@ private:
   double getAvoidSpeed(const double distance1, const double distance2) const;
   void SetSegCamber(const tTrackSeg *seg, const int div);
 
-private:
+ private:
   double m_dMinCornerInverse;
   double m_dCornerSpeed;
   double m_dCornerAccel;
@@ -131,13 +137,13 @@ private:
   double m_dTargetSpeed;
   double m_dWidth;
 
-  //first: segment index, second: elem length
+  // first: segment index, second: elem length
   std::vector< std::pair<int, double> > m_SegInfo;
 
-  std::vector<rlSegment> m_Seg;  
+  std::vector<rlSegment> m_Seg;
 
   int Next;
   int This;
 };
 
-#endif // _RACELINE_H_
+#endif  // SRC_DRIVERS_KILO2008_RACELINE_H_
