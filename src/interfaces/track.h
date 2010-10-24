@@ -272,14 +272,15 @@ typedef struct trackSurface {
 
     const char *material;	/**< Type of material used */
 
-    tdble kFriction;		/**< Coefficient of friction */
-    tdble kFriction2;		/**< Coefficient of friction rain*/
-    tdble kRebound;		/**< Coefficient of energy restitution */
-    tdble kRollRes;		/**< Rolling resistance */
+    tdble kFriction;		/**< Coefficient of friction for simu */
+    tdble kFriction2;		/**< Coefficient of friction rain */
+    tdble kFrictionDry;		/**< Coefficient of friction if dry */
+    tdble kRebound;		    /**< Coefficient of energy restitution */
+    tdble kRollRes;		    /**< Rolling resistance */
     tdble kRollRes2;		/**< Rolling resistance rain*/
     tdble kRoughness;		/**< Roughtness in m of the surface (wave height) */
     tdble kRoughWaveLen;	/**< Wave length in m of the surface */
-    tdble kDammage;		/**< Dammages in case of collision */
+    tdble kDammage;		    /**< Dammages in case of collision */
 
 } tTrackSurface;
 

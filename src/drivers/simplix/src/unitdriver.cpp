@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.10.21
+// Last changed : 2010.10.23
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -61,7 +61,7 @@
 // THIS VERSION WAS MODIFIED TO BE USED WITH SD CAREER MODE
 // This results in some issues while using it with windows!
 // Known bugs:
-// Heap corruption -> do not used delete for oCarType, use free (oCarType)
+// Heap corruption -> do not use delete for oCarType, use free (oCarType)
 // 
 //--------------------------------------------------------------------------*
 //#undef SPEED_DREAMS
@@ -70,6 +70,7 @@
 #include <tgf.h>
 #include <robottools.h>
 #include <timeanalysis.h>
+#include "../../../libs/raceengineclient/raceweather.h"
 
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -267,8 +268,10 @@ TDriver::TDriver(int Index):
   oTargetSpeed(0.0),
   oTclRange(10.0),
   oTclSlip(1.6),
-  oTclFactor(3.0),
-  oTclAccel(0.01),
+  oTclFactor(1.0),
+//  oTclAccel(0.1),
+//  oTclAccelLast(1.0),
+//  oTclAccelFactor(0.1),
   oSPEED_DREAMS(true),
   oTrackName(NULL),
   oTrackLoad(NULL),
@@ -283,6 +286,8 @@ TDriver::TDriver(int Index):
   oWheelRadius(0),
   oDeltaOffset(0.0),
   oDriftAngle(0.0),
+  oLastDriftAngle(0.0),
+  oDriftFactor(1.0),
   oLetPassSide(0),
   oOldTarget(0.0),
   oReduced(false),
@@ -338,8 +343,13 @@ TDriver::TDriver(int Index):
   oXXX(1.0),
   oRain(false),
   oRainIntensity(0.0),
-  oWeatherCode(120000),
-  oDryCode(120000)
+  oScaleMuRain(1.07),
+  oScaleBrakeRain(1.07),
+  oWeatherCode(0),
+  oDryCode(0),
+  oJumping(0),
+  oJumpOffset(0.0),
+  oFirstJump(true)
 {
 //  GfOut("#TDriver::TDriver() >>>\n");
   int I;
@@ -495,7 +505,10 @@ void TDriver::AdjustDriving(
 	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BRAKE_Q,NULL,
 	  (float) Param.oCarParam.oScaleBrake);
   GfOut("#Scale Brake: %g\n",Param.oCarParam.oScaleBrake);
+  //Param.oCarParam.oScaleBrake -= 0.1;
 
+  oJumpOffset =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_JUMP_OFFSET,NULL,(float) oJumpOffset);
   oBumpMode =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_BUMP_MODE,NULL,oBumpMode);
   Param.oCarParam.oScaleBump =
@@ -520,6 +533,7 @@ void TDriver::AdjustDriving(
   	  GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU_Q,NULL,
 	  (float) Param.oCarParam.oScaleMu);
   GfOut("#Scale Mu: %g\n",Param.oCarParam.oScaleMu);
+  //Param.oCarParam.oScaleMu -= 0.1;
 
   Param.oCarParam.oScaleMinMu =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MIN_MU,NULL,
@@ -531,10 +545,20 @@ void TDriver::AdjustDriving(
 	oSideScaleMu);
   GfOut("#Side Scale Mu%g\n",oSideScaleMu);
 
+  oScaleMuRain = 
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_MU,NULL,
+	(float) oScaleMuRain);
+  GfOut("#Scale Mu Rain%g\n",oScaleMuRain);
+
   oSideScaleBrake = 
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_BRAKE,NULL,
 	oSideScaleBrake);
   GfOut("#Side Scale Brake%g\n",oSideScaleBrake);
+
+  oScaleBrakeRain = 
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_BRAKE,NULL,
+	(float) oScaleBrakeRain);
+  GfOut("#Scale Brake Rain%g\n",oScaleBrakeRain);
 
   oAvoidScale =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_AVOID_SCALE,0,
@@ -563,9 +587,10 @@ void TDriver::AdjustDriving(
 
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
 	  UseAccelOut();
+/*
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_FILTER,0,0) != 0)
 	  UseFilterAccel();
-
+*/
   oOmegaAhead = Param.Fix.oLength;
   oInitialBrakeCoeff = oBrakeCoeff[0];
 
@@ -648,15 +673,25 @@ void TDriver::AdjustDriving(
 	(float)oTclSlip);
   GfOut("#oTclSlip %g\n",oTclSlip);
 
-  oTclFactor=
+  oTclFactor =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_FACTOR,0,
 	(float)oTclFactor);
   GfOut("#oTclFactor %g\n",oTclFactor);
-
-  oTclAccel=
+/*
+  oTclAccel =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_ACCEL,0,
 	(float)oTclAccel);
   GfOut("#oTclAccel %g\n",oTclAccel);
+
+  oTclAccelFactor =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TCL_ACCELFACTOR,0,
+	(float)oTclAccelFactor);
+  GfOut("#oTclAccelFactor %g\n",oTclAccelFactor);
+*/
+  oDriftFactor =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_DRIFT_FACTOR,0,
+	(float)oDriftFactor);
+  GfOut("#oDriftFactor %g\n",oDriftFactor);
 
   oAbsDelta =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ABS_DELTA,0,
@@ -1252,6 +1287,7 @@ void TDriver::Drive()
 
   //double StartTimeStamp = RtTimeStamp(); 
 
+  DetectFlight();
   double Pos = oTrackDesc.CalcPos(oCar);         // Get current pos on track
 
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
@@ -1306,13 +1342,14 @@ void TDriver::Drive()
     oAccel = FilterDrifting(oAccel);
     oAccel = FilterTrack(oAccel);
     oAccel = FilterTCL(oAccel);
-    if (oUseFilterAccel)
-      oAccel = FilterAccel(oAccel);
+    //oAccel = FilterAccel(oAccel);
   }
 
+  // Keep history
   oLastSteer = oSteer;
-  // Tell TORCS what we want do do
   oLastAccel = oAccel;
+  oLastDriftAngle = oDriftAngle;
+  // Tell TORCS what we want do do
   oCar->ctrl.accelCmd = (float) oAccel;
   oCar->ctrl.brakeCmd = (float) oBrake;
   oCar->ctrl.clutchCmd = (float) oClutch;
@@ -1677,6 +1714,7 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
   oDriftAngle =                                  // Actual drift angle
 	atan2(CarSpeedY, CarSpeedX) - CarYaw;
   DOUBLE_NORM_PI_PI(oDriftAngle);                // normalized to +Pi .. -Pi
+  oDriftAngle = fabs(oDriftAngle);               // drift angle needs no sign
 
   // Get direction of motion
   double MySpd = MAX(0.01,myhypot(CarSpeedX, CarSpeedY));
@@ -1715,7 +1753,9 @@ void TDriver::Update(tCarElt* Car, tSituation* S)
 void TDriver::DetectFlight()
 {
   double H[4];
-  double HMax = 0.0;
+  oJumping = -1.0;
+  if (oFirstJump)
+	  oJumpOffset = 0.0;
 
   for (int I = 0; I < 4; I++)
   {
@@ -1723,12 +1763,19 @@ void TDriver::DetectFlight()
     float Wx = oCar->pub.DynGCg.pos.x;
     float Wy = oCar->pub.DynGCg.pos.y;
     RtTrackGlobal2Local(CarSeg, Wx, Wy, &Wp, TR_LPOS_SEGMENT);
-    H[I] = CarPosZ - RtTrackHeightL(&Wp) - WheelRad(I);
-	if (HMax < H[I])
-      HMax = H[I];
+    H[I] = CarPosZ - RtTrackHeightL(&Wp) - WheelRad(I) + oJumpOffset;
+	if (oJumping < H[I])
+      oJumping = H[I];
   }
 
-  if (HMax > oFlyHeight)
+  if (oFirstJump)
+  {
+    oJumpOffset = - oJumping - 0.03;
+	GfOut("#oJumpOffset: %g\n",oJumpOffset);
+    oFirstJump = false;
+  }
+
+  if (oJumping > oFlyHeight)
   {
     oFlying = MIN(FLY_COUNT, oFlying + (FLY_COUNT / 2));
   }
@@ -1736,6 +1783,9 @@ void TDriver::DetectFlight()
   {
     oFlying--;
   }
+
+  //if (oJumping > 0)
+  //  GfOut("#%g\n",oJumping);
 }
 //==========================================================================*
 
@@ -2044,19 +2094,36 @@ void TDriver::Turning()
 //--------------------------------------------------------------------------*
 void TDriver::Meteorology()
 {
+  tTrackSeg *Seg;
+  tTrackSurface *Surf;
+  oRainIntensity = 0;
   oWeatherCode = GetWeather();
-  if (oWeatherCode < oDryCode)
+  Seg = oTrack->seg;
+
+  for ( int I = 0; I < oTrack->nseg; I++)
   {
-	  oRain = true;
-	  oRainIntensity = oDryCode / oWeatherCode - 1.0;
-	  oTclAccel /= 1 + 12.5 * oRainIntensity;
-	  UseFilterAccel();
+    Surf = Seg->surface;
+	oRainIntensity = MAX(oRainIntensity,Surf->kFrictionDry / Surf->kFriction);
+	//GfLogDebug("# %.4f, %.4f %s\n",
+	//  Surf->kFriction, Surf->kRollRes, Surf->material);
+    Seg = Seg->next;
+  }
+
+  oRainIntensity -= 1;
+
+  if (oRainIntensity > 0)
+  {
+    oRain = true;
+	if (Qualification)
+	{
+	  Param.oCarParam.oScaleMu *= oScaleMuRain;
+	  Param.oCarParam.oScaleBrake *= oScaleBrakeRain;
+	}
+    Param.Fix.oBorderOuter += 0.5;
+    Param.oCarParam.oScaleMinMu = 1.0;
   }
   else
-  {
-	  oRain = false;
-	  oRainIntensity = 0.0;
-  }
+    oRain = false;
 }
 //==========================================================================*
 
@@ -2124,6 +2191,7 @@ void TDriver::InitAdaptiveShiftLevels()
   Edesc[IMax].rpm = Edesc[IMax - 1].rpm;
   Edesc[IMax].tq  = Edesc[IMax - 1].tq;
 
+  double ToRpm[MAX_GEARS];
   double maxTq = 0;
   double rpmMaxTq = 0;
   double maxPw = 0;
@@ -2186,6 +2254,7 @@ void TDriver::InitAdaptiveShiftLevels()
       double TqNext = 0.0;
       double GearRatioAct;
       double GearRatioNext;
+      ToRpm[J] = 0.0;
 
       while (Rpm <= RevsLimiter)
 	  {
@@ -2215,6 +2284,7 @@ void TDriver::InitAdaptiveShiftLevels()
 
         if ((TqNext > Tq ) && (Rpm*RpmFactor > 2000))
 		{
+          ToRpm[J] = RpmNext;
 		  oShift[J] = Rpm * 0.98;
 		  break;
 		}
@@ -2224,7 +2294,7 @@ void TDriver::InitAdaptiveShiftLevels()
   }
   
   for (J = 1; J < oLastGear; J++)
-    GfOut("#%d: Rpm: %g(%g)\n",J,oShift[J]*RpmFactor,oShift[J]);
+    GfOut("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
 
   free(DataPoints);
   free(Edesc);
@@ -2261,6 +2331,9 @@ bool TDriver::EcoShift()
 //--------------------------------------------------------------------------*
 void TDriver::GearTronic()
 {
+  if (oJumping > 0.0)
+	  return;
+
   if (IsTickover)
   {
     oGear = 1;
@@ -2801,17 +2874,16 @@ void TDriver::EvaluateCollisionFlags(
 		}
 	  }
 
-  	  if (AvoidL)
-		Coll.OppsAhead |= F_LEFT;
-
-	  if (AvoidR)
-		Coll.OppsAhead |= F_RIGHT;
-
 	  if (AvoidL)
+	  {
+		Coll.OppsAhead |= F_LEFT;
 		Coll.MinLDist = MIN(OppInfo.State.CarAvgVelLong, Coll.MinLDist);
-
-  	  if (AvoidR)
+	  }
+	  else if (AvoidR)
+	  {
+		Coll.OppsAhead |= F_RIGHT;
 		Coll.MinRDist = MIN(OppInfo.State.CarAvgVelLong, Coll.MinRDist);
+	  }
 	}
   }
 
@@ -2839,20 +2911,22 @@ void TDriver::EvaluateCollisionFlags(
 	oTreatTeamMateAsLapper = false;
   }
 
-  if (oStayTogether > 50
-	&& OppInfo.GotFlags(F_TEAMMATE | F_REAR)
-	&& OppInfo.State.RelPos < -35
-	&& OppInfo.State.RelPos > -oStayTogether
-	&& CarDamage + 1000 > OppInfo.TeamMateDamage)
+  if (oTeamEnabled) 
   {
-    if (oTeamEnabled) 
+    if (oStayTogether > 50
+	  && OppInfo.GotFlags(F_TEAMMATE | F_REAR)
+	  && OppInfo.State.RelPos < -35
+	  && OppInfo.State.RelPos > -oStayTogether
+	  && CarDamage + 1000 > OppInfo.TeamMateDamage)
+    {
   	  IsLapper = true;
-  }
+    }
 
-  if (OppInfo.GotFlags(F_LAPPER) || oTreatTeamMateAsLapper)
-  {
-	Coll.LappersBehind |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
-	IsLapper = true;
+    if (oTreatTeamMateAsLapper)
+    {
+	  Coll.LappersBehind |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
+  	  IsLapper = true;
+    }
   }
 }
 //==========================================================================*
@@ -3262,26 +3336,7 @@ double TDriver::FilterBrakeSpeed(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterAccel(double Accel)
 {
-  if (DistanceRaced < 50)                        // At start
-  {
-    if(fabs(CarSpeedLong) < 0.001)               // Only if driving faster
-	  return Accel;
-
-    if (fabs(oDriftAngle) > 0.1)
-      return MIN(Accel, oLastAccel + oTclAccel/20.0);
-
-    return MIN(Accel,oLastAccel + oTclAccel/2);
-  }
-  else
-  {
-    if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
-	  return Accel;
-
-    if (fabs(oDriftAngle) > 0.1)
-      return MIN(Accel, oLastAccel + oTclAccel/10);
-
-    return MIN(Accel,oLastAccel + oTclAccel);
-  }
+  return Accel;
 }
 //==========================================================================*
 
@@ -3331,7 +3386,7 @@ double TDriver::FilterTCL(double Accel)
 
   double Slip = Spin * Wr - CarSpeedLong;        // Calculate slip
   if (oRain) 
-	  Slip *= oTclFactor * (oRainIntensity + 1);
+	  Slip *= oTclFactor * (oRainIntensity * 0.25 + 1);
 
   if (Slip > oTclSlip)                           // Decrease accel if needed
   {
@@ -3365,13 +3420,15 @@ double TDriver::FilterLetPass(double Accel)
 //--------------------------------------------------------------------------*
 double TDriver::FilterDrifting(double Accel)
 {
+  if(CarSpeedLong < SLOWSPEED)
+    return Accel;
+
   // Decrease accelleration while drifting
-  if((CarSpeedLong > SLOWSPEED) && (fabs(oDriftAngle) > 0.2))
-  {
-	Accel *= (float)
-	  (0.25 + 0.75 * MAX(0.0,cos(oDriftAngle)));
-  }
-  return Accel;
+  double DriftAngle = MAX(MIN(oDriftAngle * 1.75, PI - 0.01),-PI + 0.01);
+  if (oDriftAngle > oLastDriftAngle)
+    return Accel / (oDriftFactor * 150 * ( 1 - cos(DriftAngle)));
+  else
+    return Accel / (oDriftFactor * 50 * ( 1 - cos(DriftAngle)));
 }
 //==========================================================================*
 

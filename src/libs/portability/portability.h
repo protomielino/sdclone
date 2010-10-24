@@ -25,6 +25,7 @@
 #ifdef WIN32
 #include <direct.h>
 #include <process.h>
+#define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
 #endif
 
 #ifdef WIN32

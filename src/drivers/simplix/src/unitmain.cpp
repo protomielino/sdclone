@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2010.10.20
+// Last changed : 2010.10.23
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000 
@@ -165,8 +165,6 @@ char undefined[] = "undefined";
 //  Robot of this modul
 //  Roboter des Moduls
 //--------------------------------------------------------------------------*
-//static char const** BotDesc = defaultBotDesc;
-
 static TCommonData gCommonData;
 static int cRobotType;
 
@@ -693,8 +691,10 @@ static void InitTrack(int Index,
   tTrack* Track,void *CarHandle,void **CarParmHandle, tSituation *S)
 {
   // Init common used data
-  cInstances[Index-IndexOffset].cRobot->SetCommonData(&gCommonData);    
-  cInstances[Index-IndexOffset].cRobot->InitTrack(Track,CarHandle,CarParmHandle, S);
+  cInstances[Index-IndexOffset].cRobot->SetCommonData
+	  (&gCommonData,cRobotType);    
+  cInstances[Index-IndexOffset].cRobot->InitTrack
+	  (Track,CarHandle,CarParmHandle, S);
 }
 //==========================================================================*
 

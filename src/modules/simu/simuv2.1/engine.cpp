@@ -248,7 +248,10 @@ freerads += engine->Tq / engine->I * SimDeltaTime;
      engine->Tq = 0.0;
  } else if (engine->rads > engine->revsMax) {
      engine->rads = engine->revsMax;
-     return engine->revsMax / trans->curOverallRatio;
+	 if (trans->curOverallRatio > 0)
+       return engine->revsMax / trans->curOverallRatio;
+	 else
+       return engine->revsMax;
  }
 
  if ((trans->curOverallRatio!=0.0) && (I_response > 0)) {

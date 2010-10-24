@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2010.10.21
+// Last changed : 2010.10.22
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -380,7 +380,7 @@ enum
 // ... Internal parameters
 
 // Parameters of this robot ...
-#define PRV_ACCEL_FILTER     "accel filter"
+//#define PRV_ACCEL_FILTER     "accel filter"
 #define PRV_ACCEL_OUT        "accel out"
 #define PRV_FORCE_LANE       "force lane"         // Force lane for tests
 #define PRV_SKILL            "skill"              // Car specific skilling
@@ -432,11 +432,14 @@ enum
 #define PRV_SCALE_STEER	     "scale steer"
 
 #define PRV_SIDE_MU          "side mu"            // Scale friction calculation for sides
+#define PRV_RAIN_MU          "scale mu rain"      // Scale friction calculation for sides
 #define PRV_SIDE_BRAKE       "side brake"         // Scale brake calculation for sides
+#define PRV_RAIN_BRAKE       "scale brake rain"   // Scale brake calculation for sides
 
 #define PRV_AVOID_SCALE		 "avoid scale"
 #define PRV_AVOID_WIDTH		 "avoid width"
 
+#define PRV_JUMP_OFFSET	     "jump offset"
 #define PRV_CRV_COMP		 "crv"
 #define PRV_STAY_TOGETHER	 "stay together"
 
@@ -462,8 +465,10 @@ enum
 
 #define PRV_TCL_RANGE        "tcl range"         // default 10.0    
 #define PRV_TCL_SLIP         "tcl slip"          // default 1.6    
-#define PRV_TCL_FACTOR       "tcl factor"        // default 3.0    
-#define PRV_TCL_ACCEL        "tcl accel"         // default 0.01    
+#define PRV_TCL_FACTOR       "tcl factor"        // default 1.0    
+#define PRV_DRIFT_FACTOR     "drift factor"      // default 1.0    
+//#define PRV_TCL_ACCEL        "tcl accel"         // default 0.1    
+//#define PRV_TCL_ACCELFACTOR  "tcl accelfactor"   // default 1.0    
 
 #define PRV_ABS_DELTA        "abs delta"         // default 1.1    
 #define PRV_ABS_SCALE        "abs scale"         // default 0.5    

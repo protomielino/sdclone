@@ -22,18 +22,23 @@
     @version	$Id$
 */
 
+/* Changes by wdbee:
+  #define RAIN_VAL_LITTLE, RAIN_VAL_NORMAL, RAIN_VAL_HEAVY in raceweather.h
+    To make it usabel for robots.
+
+  curSurf->kFrictionDry = curSurf->kFriction; 
+    Store initial value for calculation of the rain intensity.
+
+
+
+*/
+
 #include <ctime>
 
 #include <raceman.h>
 
 #include "racesituation.h"
 #include "raceweather.h"
-
-
-#define RAIN_VAL_LITTLE 1
-#define RAIN_VAL_NORMAL 2
-#define RAIN_VAL_HEAVY 3
-
 
 // Start Weather
 void ReStartWeather(void)
@@ -96,6 +101,10 @@ void ReStartWeather(void)
 			
 	}
 
+//rainbool = RAIN_VAL_LITTLE;
+//rainbool = RAIN_VAL_NORMAL;
+//rainbool = RAIN_VAL_HEAVY;
+
 	if (rainbool > 0)
 		track->Rain = rainbool;
 	else
@@ -118,6 +127,7 @@ void ReTrackUpdate(void)
 	curSurf = track->surfaces;
 	do
 	{
+		curSurf->kFrictionDry = curSurf->kFriction; // Store initial value!
 		switch (rain)
 		{
 			case 1:

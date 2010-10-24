@@ -280,8 +280,6 @@ SimWheelUpdateRotation(tCar *car)
 	for (i = 0; i < 4; i++) {
 		wheel = &(car->wheel[i]);
 		wheel->spinVel = wheel->in.spinVel;
-        if (wheel->spinVel > 1000000)
-			wheel->spinVel  = 1;
 		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
 
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
@@ -303,7 +301,7 @@ SimUpdateFreeWheels(tCar *car, int axlenb)
 	for (i = axlenb * 2; i < axlenb * 2 + 2; i++) {
 		wheel = &(car->wheel[i]);
 
-		I = wheel->I + car->axle[axlenb].I / 2.0f;
+        I = wheel->I + car->axle[axlenb].I / 2.0f;
 
 		ndot = SimDeltaTime * wheel->spinTq / I;
 		wheel->spinVel -= ndot;
@@ -311,7 +309,7 @@ SimUpdateFreeWheels(tCar *car, int axlenb)
 		BrTq = (tdble)(- SIGN(wheel->spinVel) * wheel->brake.Tq);
 		ndot = SimDeltaTime * BrTq / I;
 
-		if (fabs(ndot) > fabs(wheel->spinVel)) {
+        if (fabs(ndot) > fabs(wheel->spinVel)) {
 			ndot = -wheel->spinVel;
 		}
 

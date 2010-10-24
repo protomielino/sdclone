@@ -30,6 +30,7 @@
 
 #include <tgfclient.h>
 
+#include "portability.h"
 #include "racescreens.h"
 #include "driver.h"	//rmdGetDriverType
 

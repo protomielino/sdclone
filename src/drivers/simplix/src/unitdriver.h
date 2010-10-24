@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2010.10.21
+// Last changed : 2010.10.22
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -162,7 +162,7 @@ class TDriver
 	void SetBotName                              // Set name of bot
 	  (void* RobotSettings, char* Value);
 	inline void	SetCommonData                    // Set pointer to common data
-	  (TCommonData* CommonData);
+	  (TCommonData* CommonData, int RobotTyp);
 #ifdef SPEED_DREAMS
 #else
 	inline TTeamManager::TTeam* GetTeam();
@@ -221,6 +221,7 @@ private:
 		cDT_RWD, cDT_FWD, cDT_4WD,
 	};
 
+	int oRobotTyp;
 	TCommonData* oCommonData;                    // Pointer to common data
 	TTrackDescription oTrackDesc;                // Track description
 	TClothoidLane oRacingLine[gNBR_RL];          // Racinglines
@@ -319,7 +320,11 @@ private:
 	double oTclRange;                            // TCL range
 	double oTclSlip;                             // Max TCL slip
 	double oTclFactor;                           // TCL scale 
+/*
 	double oTclAccel;                            // TCL acceleration
+	double oTclAccelLast;                        // Historie
+	double oTclAccelFactor;                      // TCL acceleration scaling
+*/
 	bool oSPEED_DREAMS;
 	char* oTrackName;                            // Name of track to drive on
 	char* oTrackLoad;                            // Name of track to drive on
@@ -335,14 +340,15 @@ private:
 	double oWheelRadius;                         // Mean wheel radius
     double oDeltaOffset;                         // Delta to planned
     double oDriftAngle;                          // Drifting angle
-	int oLetPassSide;                            // Go to side to let pass
+    double oLastDriftAngle;                      // Historie
+    double oDriftFactor;                         // Drifting acceleration factor
+    int oLetPassSide;                            // Go to side to let pass
 	double oOldTarget;
     bool oReduced;
     double oFuelNeeded;
 	double oRepairNeeded;
 	float oSideReduction;
 	double oMinDistLong;
-
 
 	int NBRRL;
 	int oRL_FREE;
@@ -395,8 +401,13 @@ private:
 	double oXXX;
 	bool oRain;
 	double oRainIntensity;
+	double oScaleMuRain;
+	double oScaleBrakeRain;
 	int oWeatherCode;                            // Track specific weather
 	int oDryCode;                                // Track specific dry weather
+    double oJumping;                             // Car is jumping
+    double oJumpOffset;                          // Offset for calculation of jumps
+	bool oFirstJump;
 
 	static int NBBOTS;                           // Nbr of cars
     double CurrSimTime;                          // Current simulation time
@@ -488,7 +499,8 @@ int TDriver::TeamIndex()
 // Set pointer to common data
 //--------------------------------------------------------------------------*
 void TDriver::SetCommonData
-  (TCommonData* CommonData){oCommonData = CommonData;};
+  (TCommonData* CommonData, int RobotTyp)
+  {oCommonData = CommonData; oRobotTyp = RobotTyp;};
 //==========================================================================*
 
 //==========================================================================*

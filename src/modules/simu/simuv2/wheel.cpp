@@ -280,8 +280,6 @@ SimWheelUpdateRotation(tCar *car)
 	for (i = 0; i < 4; i++) {
 		wheel = &(car->wheel[i]);
 		wheel->spinVel = wheel->in.spinVel;
-        if (wheel->spinVel > 100000000)
-			wheel->spinVel = 1;
 		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
 
 		wheel->relPos.ay += wheel->spinVel * SimDeltaTime;
