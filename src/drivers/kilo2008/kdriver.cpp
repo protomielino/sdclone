@@ -37,6 +37,7 @@
 #ifdef DEBUG
 #include <iostream>  // NOLINT(readability/streams), used for logging only
 using ::std::cout;
+using ::std::endl;
 #endif
 
 #include "src/drivers/kilo2008/opponent.h"
