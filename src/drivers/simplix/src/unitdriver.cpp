@@ -546,7 +546,7 @@ void TDriver::AdjustDriving(
   GfOut("#Side Scale Mu%g\n",oSideScaleMu);
 
   oScaleMuRain = 
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_MU,NULL,
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_RAIN_MU,NULL,
 	(float) oScaleMuRain);
   GfOut("#Scale Mu Rain%g\n",oScaleMuRain);
 
@@ -556,7 +556,7 @@ void TDriver::AdjustDriving(
   GfOut("#Side Scale Brake%g\n",oSideScaleBrake);
 
   oScaleBrakeRain = 
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SIDE_BRAKE,NULL,
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_RAIN_BRAKE,NULL,
 	(float) oScaleBrakeRain);
   GfOut("#Scale Brake Rain%g\n",oScaleBrakeRain);
 
@@ -2114,11 +2114,9 @@ void TDriver::Meteorology()
   if (oRainIntensity > 0)
   {
     oRain = true;
-	if (Qualification)
-	{
-	  Param.oCarParam.oScaleMu *= oScaleMuRain;
-	  Param.oCarParam.oScaleBrake *= oScaleBrakeRain;
-	}
+	Param.oCarParam.oScaleMu *= oScaleMuRain;
+    Param.oCarParam.oScaleBrake *= oScaleBrakeRain;
+    oTclSlip = MIN(oTclSlip,2.0);
     Param.Fix.oBorderOuter += 0.5;
     Param.oCarParam.oScaleMinMu = 1.0;
   }
