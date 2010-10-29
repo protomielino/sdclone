@@ -1,7 +1,6 @@
 INCLUDE(../../../cmake/macros.cmake)
 
 INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
-#INCLUDE_DIRECTORIES(../../..)
 
 SET(ROBOT_NAME "kilo2008")
 
