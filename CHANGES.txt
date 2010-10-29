@@ -1,5 +1,3 @@
-Speed Dreams changes since 1.4.0
-
 Here are the summarized changes since 1.4.0
 (More details for associated milestones 2.0.0 and 1.4.1 here : 
  http://sourceforge.net/apps/trac/speed-dreams/report/6)
@@ -13,9 +11,97 @@ http://sourceforge.net/apps/trac/speed-dreams/wiki/ActualFeaturePlanFor20
 More technical details about the work in progress for some tasks here :
 http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
 
-2.0.0 Alpha 1 -----------------------------------------------------------------------------
+Changes since 2.0.0 Alpha 1 released in 2.0.0 Alpha 2
+-----------------------------------------------------
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a2@????.
 
-This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a1@2720.
+Tracks:
+* HQ texture rework + renaming + localization for Wheel-2 (=> Karwada), GTrack2 (=> Chemisay)
+* new Brondehach track :  HQ texture rework + localization + no more real-life brands 
+    + better drivable track sides
+* Improved Goldstone Sand (reworked textures + made pit wall compatible with robots)
+* Texture improvements : Forza, Corkscrew, Aalborg
+
+Cars:
+* T01 : Finale fine tuned LS1 setups with updated engine sounds
+* Reworked Spirit RB1 LT (3D model, speedo/tachometer)
+* Many new livery skins for LS1 cars
+* New TRB1 Vieringe 5 RB and liveries (human + USR setups ??)
+* #191 Added e-brake power parameters for SuperCars (and WRs)
+* #222 Skinnable pit door logo and 3D wheels (when choosing a car livery skin)
+* Renamed GP1600 category to MP5
+
+Robots:
+* D38 : New Kilo2008 robot with skilling, setup for the TRB1 Cavallo 360 RB and LS1 Archer R9
+* D19 : Rain support added to Simplix
+* Added detailed race lines to Simplix
+* Up-to-date LS1 Simplix setups for most circuit + road + speedway tracks
+* Up-to-date TRB1 Simplix setups for most circuit + road + speedway tracks
+* #179 Speed limiter command now toggles on/off for human drivers
+       (no more need to keep the key pressed)
+* #178 Forbid reverse gear if not Neutral state or speed < 10ms = 36km/h
+* #191 Added support for Emergency/Parking Brake (usefull for future rally car set)
+* Simplix setup for new TRB1 Vieringe 5 RB
+* Simplix setup for MP5 FMC, the 1st MP5 (was GP 1600)
+* #137 Simplix now caches race lines and other data in the user settings folder
+  (when setups were not installed in the user settings folder, it did it in the install folder,
+   which worked under WinXP, but no more under Vista / Seven, and neither under Linux)
+
+Menus:
+* Improved splash screen
+* D31 : Save QuickRace configuration (opponent grid, track and config)
+        and more generally race types with no qualification / multiple races
+* D29 : Fixed crash when opening the CarSelect menu the 2nd time after finishing race configuration
+* #117 Default control keys for lights, speed limiter, ABS and ASR (renamed to TCS)
+* #195 Display options : Improved detection of supported screen / window sizes
+       (added real control under Windows, used SDL / removed X-Window specific code 
+        to do this in a portable manner)
+* #191 New command for Emergency/Parking Brake (usefull for future rally car set)
+* #192 Display practice result screen after one car practice
+
+Race engine:
+* #75 Fixed Mouse calibration lost in Ready-Set-Go stage
+* D16 : New "Career" race mode
+* #169 Fixed crashing right after restart
+* D13 : Multi-threaded race engine :
+  - Fixed/Resurrected human pitting in mono and dual threaded modes
+  - Resurrected Result-Only = Blind mode (was crashing whatever mono / dual threaded mode)
+  - Fixed crash when entering pit lane + penalty management
+* D30 : 
+  - Fixed crash when loading a results file for an endurance race (and some possible others)
+    in the race menu (Load button)
+  - Fixed crash when race starts after qualification
+* D19 : Improved / fixed weather configuration
+
+Race screen:
+* #166 Better automatic / customizable board positionning and aspect ratio respect :
+  - enable 3-screen configuration with boards on central one
+  - enable fine vertical positionning for the speedo/tachometers
+* Improved support for wide screen/window configurations (less deformed boards)
+* #39 Vertical 2-way split when window aspect ratio >= 2.
+* #205 Customizable color for speedo/tachometers needles and dynamic figures
+* #78 Mark pitting driver on leaderboard
+* #151 Display correct track name on loading (no more the track _folder_ name)
+* #77 Dont show decimals when displaying track length on loading
+* #229 Board 1 lap counter displays correct numbers
+
+Simulation engines:
+* D48 : Work in progress Simu v2.1 (same a Simu V2 for the moment)
+* #191 Added support for Emergency/Parking Brake with car-level customizable applied brake power
+
+Other:
+* #189,#163 Fixed user settings files installation in Windows binary installer
+* #136 Removed most "TORCS" strings from the build system
+* Enabled $Id$ SVN keyword substitution on all text files
+* #182 Link time lib conflict warnings about msvcrt an/or libcmt with MSVC
+* #145 Trace/log system : Added a heading time indication for each trace line, 
+       as the elapsed time since SD is started, with 1 ms resolution.
+* Added a CMake user option "OPTION_OFFICIAL_ONLY" to restrict the build
+  to the contents of the next official release
+* many other small bug fixes
+
+-------------------------------------------------------
+Changes since 1.4.0 released in 2.0.0 Alpha 1 (svn2720)
 
 Tracks:
 * A32, A16, A17, A19, A22, A24 : HQ texture rework + renaming + localization
@@ -53,7 +139,7 @@ Menus:
 
 Race engine / screen:
 * Display average frame rate in the race screen
-* Spit screen mode (multiplayer) : 
+* Split screen mode (multiplayer) : 
   - 'TAB' key switches to active screen,
   - sound follows the active screen selection consistently,
   - wider 3rd screen in 3-way split screen,
@@ -83,7 +169,6 @@ Other:
 * D11 : Support for multiple cars with same 3D model .acc/.ac file
 * D08 : Work-in-progress code profiling 
   (see http://sourceforge.net/apps/trac/speed-dreams/wiki/CodeProfiling)
-
 
 Known issues : see http://sourceforge.net/apps/trac/speed-dreams/report/2 (version 2.0.0 alpha1).
 
