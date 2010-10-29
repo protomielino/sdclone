@@ -110,8 +110,8 @@ void GfFileSetup()
 	}
 
 	sprintf( filename, "%sversion.xml", GetLocalDir() );
+	anyLocalChange = !GfFileExists(filename);
 	localVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_CREAT );
-	GfParmWriteFile( NULL, localVersionHandle, "versions" );
 
 	// Exit if open/creation failed.
 	if( !localVersionHandle )
@@ -138,7 +138,6 @@ void GfFileSetup()
 	}
 
 	// For each file referenced in the installation version.xml
-	anyLocalChange = false;
 	do
 	{
 		fileFound = false;
