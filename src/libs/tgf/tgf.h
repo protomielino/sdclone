@@ -379,6 +379,7 @@ TGF_API tdble GfParmGetVariable(void *handle, char const *path, char const *key)
  *  - Write formated string messages at run-time to the log stream,             *
  *    with automatic prepending of current time and trace level                 *
  *    (Ex: 12:27.35.267 Debug  My formated message)                             *
+ *  - GfLogFatal also exits the program after logging the message
  *  - Messages are given an integer "level" = "criticity",                      *
  *    (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)              *
  *  - Messages are actually logged into the stream only if their level          *
