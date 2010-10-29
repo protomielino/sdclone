@@ -29,11 +29,13 @@
 #include "portability.h"
 
 
-static void gfFileSetupCopy( char* dataLocation, char* localLocation, int major, int minor, void *localHandle, int count )
+static bool gfFileSetupCopy( char* dataLocation, char* localLocation, int major, int minor, void *localHandle, int count )
 {
+	bool status;
+	
 	// Copy the source file to its target place.
-	if( !GfFileCopy( dataLocation, localLocation ) )
-		return;
+	if( !( status = GfFileCopy( dataLocation, localLocation ) ) )
+		return status;
 
 	// Update local version.xml file.
 	if( localHandle )
@@ -55,6 +57,8 @@ static void gfFileSetupCopy( char* dataLocation, char* localLocation, int major,
 			GfParmSetNum( localHandle, buf, "Minor version", NULL, (tdble)minor );
 		}
 	}
+
+	return status;
 }
 
 void GfFileSetup()
@@ -67,10 +71,10 @@ void GfFileSetup()
 	char *localLocation;
 	char *absLocalLocation;
 	char *absDataLocation;
-	bool *count;
-	int countLength;
+	bool *isIndexUsed;
+	int isIndexUsedLen;
 	int index;
-	bool found;
+	bool anyLocalChange, fileFound;
 	int major;
 	int minor;
 	struct stat st;
@@ -118,25 +122,26 @@ void GfFileSetup()
 	}
 
 	// Setup the index of the XML files referenced in the local version.xml.
-	countLength = GfParmGetEltNb( localVersionHandle, "versions" )
-		          + GfParmGetEltNb( dataVersionHandle, "versions" ) + 2;
-	count = (bool*)malloc( sizeof(bool) * countLength );
-	for( index = 0; index < countLength; index++ )
-		count[index] = false;
+	isIndexUsedLen = GfParmGetEltNb( localVersionHandle, "versions" )
+		             + GfParmGetEltNb( dataVersionHandle, "versions" ) + 2;
+	isIndexUsed = (bool*)malloc( sizeof(bool) * isIndexUsedLen );
+	for( index = 0; index < isIndexUsedLen; index++ )
+		isIndexUsed[index] = false;
 	if( GfParmListSeekFirst( localVersionHandle, "versions" ) == 0 )
 	{
 		do
 		{
 			index = atoi( GfParmListGetCurEltName( localVersionHandle, "versions" ) );
-			if( 0 <= index && index < countLength )
-				count[index] = true;
+			if( 0 <= index && index < isIndexUsedLen )
+				isIndexUsed[index] = true;
 		} while( GfParmListSeekNext( localVersionHandle, "versions" ) == 0 );
 	}
 
 	// For each file referenced in the installation version.xml
+	anyLocalChange = false;
 	do
 	{
-		found = false;
+		fileFound = false;
 
 		// Get its installation path (data), user settings path (local),
 		// and new major and minor version numbers
@@ -160,7 +165,7 @@ void GfFileSetup()
 			{
 				if( strcmp( absLocalLocation, GfParmGetCurStr( localVersionHandle, "versions", "Local location", "" ) ) == 0 )
 				{
-					found = true;
+					fileFound = true;
 					const int locMinor = (int)GfParmGetCurNum( localVersionHandle, "versions", "Minor version", NULL, 0 );
 					const int locMajor = (int)GfParmGetCurNum( localVersionHandle, "versions", "Major version", NULL, 0 );
 
@@ -170,15 +175,17 @@ void GfFileSetup()
 					{
 						GfLogTrace("obsolete (installed one is %d.%d) => updating ...\n",
 								   major, minor);
-						gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, -1 );
+						if ( gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, -1 ) )
+							anyLocalChange = true;
 					}
 					else
 					{
 					    GfLogTrace("up-to-date");
 						if (stat(absLocalLocation, &st))
 						{
-							GfLogTrace(", but the file is not there => installing ...\n");
-							gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, -1 );
+							GfLogTrace(", but not there => installing ...\n");
+							if ( gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, -1 ) )
+								anyLocalChange = true;
 						}
 						else
 							GfLogTrace(".\n");
@@ -189,14 +196,15 @@ void GfFileSetup()
 			} while( GfParmListSeekNext( localVersionHandle, "versions" ) == 0 );
 		}
 
-		if( !found)
+		if( !fileFound)
 		{
 			index = 0;
-			while( count[index] )
+			while( isIndexUsed[index] )
 				++index;
 			GfLogTrace("not found => installing ...\n");
-			gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, index );
-			count[index] = true;
+			if ( gfFileSetupCopy( absDataLocation, absLocalLocation, major, minor, localVersionHandle, index ) )
+				anyLocalChange = true;
+			isIndexUsed[index] = true;
 		}
 
 		free( dataLocation );
@@ -204,14 +212,15 @@ void GfFileSetup()
 		free( absDataLocation );
 		free( absLocalLocation );
 
-		GfParmWriteFile( NULL, localVersionHandle, "versions" );
-
 	} while( GfParmListSeekNext( dataVersionHandle, "versions" ) == 0 );
 
-	GfParmReleaseHandle( dataVersionHandle );
-	GfParmWriteFile( NULL, localVersionHandle, "versions" );
+	// Write the user settings version.xml if changed.
+	if (anyLocalChange)
+		GfParmWriteFile( NULL, localVersionHandle, "versions" );
+
 	GfParmReleaseHandle( localVersionHandle );
-	free( count );
+	GfParmReleaseHandle( dataVersionHandle );
+	free( isIndexUsed );
 	free( filename );
 }
 
