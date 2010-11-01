@@ -128,7 +128,7 @@ static void grSetupState(grManagedState *st, char *buf)
 	curr->state = st;
 	curr->name = strdup(buf);
 
-	GfOut("Loading %s\n", buf);
+	GfLogTrace("Loading texture %s\n", buf);
 }
 
 

@@ -39,12 +39,12 @@ const char* rmdStdSkinName = "standard";
 
 static const char* pszSkinFileExt = ".png";
 static const char* pszPreviewFileSuffix = "-preview.jpg";
+static const char* pszSkinIntFileSuffix = "-int";
 static const char* pszLogoFileName = "logo"; // Warning: Must be consistent with grscene.cpp
 static const char* pszWheel3DFileName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/acc
 
-static const char* apszExcludedSkinFileSuffixes[] =
-{ "rpm.png", "speed.png", "int.png" };
-static const int nExcludedSkinFileSuffixes = sizeof(apszExcludedSkinFileSuffixes) / sizeof(char*);
+static const char* apszExcludedSkinNamePrefixes[] = { "rpm", "speed", "int" };
+static const int nExcludedSkinNamePrefixes = sizeof(apszExcludedSkinNamePrefixes) / sizeof(char*);
 
 
 int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
@@ -88,7 +88,7 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 {
 	//GfLogDebug("  rmdGetCarSkinsInFolder(car=%s, path=%s) ...\n", pszCarName, pszFolderPath);
 
-	// Search for livery skin files, and asociated preview files if any.
+	// Search for skinned livery files, and associated preview files if any.
 	tFList *pSkinFileList = GfDirGetListFiltered(pszFolderPath, pszCarName, pszSkinFileExt);
 	if (pSkinFileList)
 	{
@@ -97,22 +97,24 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 		{
 			pCurSkinFile = pCurSkinFile->next;
 
-			// Ignore files with an excluded suffix.
-			int nExclSfxInd = 0;
-			for (; nExclSfxInd < nExcludedSkinFileSuffixes; nExclSfxInd++)
-				 if (strstr(pCurSkinFile->name, apszExcludedSkinFileSuffixes[nExclSfxInd]))
-					 break;
-			if (nExclSfxInd < nExcludedSkinFileSuffixes)
-				continue;
-
-			// Extract the skin name from the skin file name.
+			// Extract the skin name from the livery file name.
 			const int nSkinNameLen = // Expecting "<car name>-<skin name>.png"
 				strlen(pCurSkinFile->name) - strlen(pszCarName) - 1 - strlen(pszSkinFileExt);
 			std::string strSkinName;
 			if (nSkinNameLen > 0)
+			{
 				strSkinName =
 					std::string(pCurSkinFile->name)
 					.substr(strlen(pszCarName) + 1, nSkinNameLen);
+				
+				// Ignore skins with an excluded prefix.
+				int nExclPrfxInd = 0;
+				for (; nExclPrfxInd < nExcludedSkinNamePrefixes; nExclPrfxInd++)
+					if (strSkinName.find(apszExcludedSkinNamePrefixes[nExclPrfxInd]) == 0)
+						break;
+				if (nExclPrfxInd < nExcludedSkinNamePrefixes)
+					continue;
+			}
 			else // Assuming default/standard "<car name>.png"
 				strSkinName = rmdStdSkinName;
 			
@@ -149,10 +151,46 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 				//	  strSkinName.c_str(), ossPreviewName.str().c_str());
 			}
 
-		} while (pCurSkinFile != pSkinFileList);
+		}
+		while (pCurSkinFile != pSkinFileList);
 	}
 	
 	GfDirFreeList(pSkinFileList, NULL);
+	
+	// Search for skinned interior files, if any.
+	std::string strInteriorPrefix(pszCarName);
+	strInteriorPrefix += pszSkinIntFileSuffix;
+	tFList *pIntFileList =
+		GfDirGetListFiltered(pszFolderPath, strInteriorPrefix.c_str(), pszSkinFileExt);
+	if (pIntFileList)
+	{
+		tFList *pCurSkinFile = pIntFileList;
+		do
+		{
+			pCurSkinFile = pCurSkinFile->next;
+
+			// Extract the skin name from the interior file name.
+			const int nSkinNameLen = // Expecting "<car name>-int-<skin name>.png"
+				strlen(pCurSkinFile->name) - strInteriorPrefix.length()
+				- 1 - strlen(pszSkinFileExt);
+			std::string strSkinName;
+			if (nSkinNameLen > 0)
+			{
+				strSkinName =
+					std::string(pCurSkinFile->name)
+					.substr(strInteriorPrefix.length() + 1, nSkinNameLen);
+			
+				// Add the interior to the skin targets.
+				if (mapSkinTargets.find(strSkinName) == mapSkinTargets.end())
+					mapSkinTargets[strSkinName] = 0;
+				mapSkinTargets[strSkinName] |= RM_CAR_SKIN_TARGET_INTERIOR;
+
+				GfLogDebug("  Found %s-skinned interior (targets:%x)\n",
+						   strSkinName.c_str(), mapSkinTargets[strSkinName]);
+			}
+		}
+		while (pCurSkinFile != pIntFileList);
+	}
 	
 	// Search for skinned logo files if any.
 	tFList *pLogoFileList =
@@ -183,7 +221,8 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 						   strSkinName.c_str(), mapSkinTargets[strSkinName]);
 			}
 				
-		} while (pCurLogoFile != pLogoFileList);
+		}
+		while (pCurLogoFile != pLogoFileList);
 	}
 	
 	GfDirFreeList(pLogoFileList, NULL);
@@ -217,7 +256,8 @@ void rmdGetCarSkinsInFolder(const char* pszCarName, const char* pszFolderPath,
 						   strSkinName.c_str(), mapSkinTargets[strSkinName]);
 			}
 				
-		} while (pCurWheel3DFile != pWheel3DFileList);
+		}
+		while (pCurWheel3DFile != pWheel3DFileList);
 	}
 	
 	GfDirFreeList(pWheel3DFileList, NULL);

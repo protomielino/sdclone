@@ -564,12 +564,12 @@ grInitCar(tCarElt *car)
 	const bool bMasterModel = strlen(car->_masterModel) != 0;
 	const bool bCustomSkin = strlen(car->_skinName) != 0;
 
-	GfLogTrace("Loading graphics for %s (driver:%s, skin:%s.%x, master model:%s)\n",
-			   car->_carName, car->_name,
-			   bCustomSkin ? car->_skinName : "standard", car->_skinTargets,
-			   bMasterModel ? car->_masterModel : "self");
+	GfLogInfo("Loading graphics for %s (driver:%s, skin:%s.%x, master model:%s)\n",
+			  car->_carName, car->_name,
+			  bCustomSkin ? car->_skinName : "standard", car->_skinTargets,
+			  bMasterModel ? car->_masterModel : "self");
 	
-	/* 1) Whole livery */
+	/* 1) Whole livery : <car name>.png => <car name>-<skin name>.png */
 	std::string strSrcTexName(bMasterModel ? car->_masterModel : car->_carName);
 	std::string strTgtTexName(car->_carName);
 	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_WHOLE_LIVERY)
@@ -583,17 +583,30 @@ grInitCar(tCarElt *car)
 		strSrcTexName += pszTexFileExt;
 		strTgtTexName += pszTexFileExt;
 		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
-		GfLogDebug("Using skinned livery %s\n", strTgtTexName.c_str());
+		GfLogTrace("Using skinned livery %s\n", strTgtTexName.c_str());
 	}
 
-	/* 2) 3D wheels if present */
+	/* 2) Interior : <car name>-int.png => <car name>-int-<skin name>.png */
+	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_INTERIOR)
+	{
+		strSrcTexName = (bMasterModel ? car->_masterModel : car->_carName);
+		strTgtTexName = car->_carName;
+		strTgtTexName += "-int-";
+		strTgtTexName += car->_skinName;
+		strSrcTexName += pszTexFileExt;
+		strTgtTexName += pszTexFileExt;
+		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
+		GfLogTrace("Using skinned interior %s\n", strTgtTexName.c_str());
+	}
+	
+	/* 3) 3D wheels if present */
 	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_3D_WHEELS)
 	{
 		strSrcTexName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/.acc contents
 		strTgtTexName = strSrcTexName + '-' + car->_skinName + pszTexFileExt;
 		strSrcTexName += pszTexFileExt;
 		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
-		GfLogDebug("Using skinned 3D wheels %s\n", strTgtTexName.c_str());
+		GfLogTrace("Using skinned 3D wheels %s\n", strTgtTexName.c_str());
 	}
 
 	grssgSetCurrentOptions(&options);

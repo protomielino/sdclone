@@ -1156,7 +1156,7 @@ ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* optio
   t_xmin=+999999.0;
   t_ymin=+999999.0;
 
-  GfOut("Loading %s\n", fname);
+  GfLogTrace("Loading %s\n", fname);
 
   ssgEntity *obj = myssgLoadAC ( fname, options ) ;
   
@@ -1326,7 +1326,6 @@ void grssgLoaderOptions::addTextureMapping(const char* pszSrcFileName, const cha
 {
 	_mapTextures[pszSrcFileName] = pszTgtFileName;
 	_bTextureMapping = true;
-	GfTrace("grssgLoaderOptions::addTextureMapping(%s, %s)\n", pszSrcFileName, pszTgtFileName);
 }
 
 bool grssgLoaderOptions::textureMapping() const

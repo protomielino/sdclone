@@ -499,16 +499,16 @@ grLoadScene(tTrack *track)
 	grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 
 	RainBool = grTrack->Rain;
-	printf("Rain = %d\n", RainBool);
+	GfLogTrace("Rain = %d\n", RainBool);
 
 	//acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 	/*if ((grTrack->Timeday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
 		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC3, "track.ac");
 	else*/
 		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
-  	GfOut("ACname = %s\n", acname);
 	if (strlen(acname) == 0) 
 	{
+		GfLogError("No specified track 3D model file\n");
 		return -1;
 	}
 
@@ -910,14 +910,14 @@ initBackground(void) {
 	//Environment Mapping Settings
 	grEnvSelector = new ssgStateSelector(graphic->envnb);
 	for (i = 0; i < graphic->envnb; i++) {
-		GfOut("Loading Environment Mapping Image %s\n", graphic->env[i]);
+		GfLogTrace("Loading %d Environment Mapping Image %s\n", i, graphic->env[i]);
 		envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
         // Avoid chrash with missing env.rgb files (i.e. Wheel-1)
 		if (envst == NULL) {
-		    GfOut("Try env.png instead\n");
+			GfLogWarning("Failed : trying fallback env.png\n");
 			envst = (ssgSimpleState*)grSsgLoadTexState("env.png");
 			if (envst == NULL) {
-				GfOut("This will stop displaying graphics!\n");
+				GfLogError("No usable Environment Mapping Image for #%d : stop displaying graphics!\n", i);
 				DoNotUseEnv = true;
 				break;
 			}
@@ -935,7 +935,7 @@ initBackground(void) {
 	grEnvState=(grMultiTexState*)grSsgEnvTexState("env.png");
   else {
     if (DoNotUseEnv)
-		GfOut("No env.png found!\n");
+		GfLogError("No env.png found!\n");
 	else
 	    grEnvState=(grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
   }
@@ -985,7 +985,7 @@ grCustomizePits(void)
 	switch (pits->type) {
 		case TR_PIT_ON_TRACK_SIDE:
 			for(int i = 0; i < pits->nMaxPits; i++) {
-				//GfOut("Pit Nbr: %d\n", i);        
+				//GfLogDebug("Pit Nbr: %d\n", i);        
 				ssgVertexArray *pit_vtx = new ssgVertexArray(4);
 				ssgTexCoordArray *pit_tex = new ssgTexCoordArray(4);
 				ssgColourArray *pit_clr = new ssgColourArray(1);
@@ -1017,7 +1017,7 @@ grCustomizePits(void)
 					{
 						strLogoFileName += '-';
 						strLogoFileName += pits->driversPits[i].car[0]->_skinName;
-						GfLogDebug("Using skinned pit door logo %s\n", strLogoFileName.c_str());
+						GfLogTrace("Using skinned pit door logo %s\n", strLogoFileName.c_str());
 					}
 					
 				} else {
