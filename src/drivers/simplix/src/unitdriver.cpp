@@ -658,7 +658,7 @@ void TDriver::AdjustDriving(
 
   oCrvComp =
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CRV_COMP,0,1) != 0;
-  GfOut("#oCrvComp %g\n",oCrvComp);
+  GfOut("#oCrvComp %s\n",oCrvComp ? "true" : "false");
 
   for (int I = 0; I <= NBR_BRAKECOEFF; I++)      // Initialize braking
     oBrakeCoeff[I] = oInitialBrakeCoeff;
