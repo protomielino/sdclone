@@ -103,7 +103,7 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.cmake
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygen_config.cmake
 	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
-SD_INSTALL_FILES(DATA . FILES credits.xml)
+SD_INSTALL_FILES(DATA "/" FILES credits.xml)
 
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(data)

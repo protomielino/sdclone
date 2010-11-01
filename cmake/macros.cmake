@@ -1,3 +1,27 @@
+############################################################################
+#
+#   file        : macros.cmake
+#   copyright   : (C) 2008 by Mart Kelder
+#   web         : www.speed-dreams.org 
+#   version     : $Id$
+#
+############################################################################
+
+############################################################################
+#                                                                          #
+#   This program is free software; you can redistribute it and/or modify   #
+#   it under the terms of the GNU General Public License as published by   #
+#   the Free Software Foundation; either version 2 of the License, or      #
+#   (at your option) any later version.                                    #
+#                                                                          #
+############################################################################
+
+# @file     Main CMake configuration file
+# @author   Mart Kelder
+# @version  $Id$
+
+#MESSAGE(STATUS "Processing ${CMAKE_CURRENT_SOURCE_DIR} ...")
+
 IF(NOT DEFINED IN_SOURCETREE)
 	SET(IN_SOURCETREE TRUE)
 ENDIF(NOT DEFINED IN_SOURCETREE)
@@ -222,62 +246,62 @@ ENDMACRO(ROBOT_MODULE)
 
 # Robot data installation
 # Args:
-#  NAME		: Name of the robot (may be a clone)
-#  PREFIX	: Dir. prefix for source files/subdirs to install in the robot's data dir
-#  FILES	: Extra (non default) files to install in the robot's data dir
-#  SUBDIRS	: Data subdirectories to install in the robot's data dir
+#  NAME     : Name of the robot (may be a clone)
+#  PREFIX   : Prefix to use to get source path for files/subdirs specified in FILES/SUBDIRS
+#  FILES    : Files to install in the robot's data dir (see PREFIX)
+#  SUBDIRS  : Sub-dirs to recusively install in the robot's data dir (see PREFIX)
+#  PATTERNS : Files to install from SUBDIRS in the robot's data dir, 
+#             as glob patterns (defaults to *.*)
+#  USER     : If this keyword is present, also mark _any_ above specified XML file
+#             as a user settings file (installed at run-time is the user settings folders).
+#  
 MACRO(ROBOT_DATA)
+
 	SET(RBD_SYNTAX "NAME,1,1,RBD_HAS_NAME,RBD_NAME")
-	SET(RBD_SYNTAX ${RBD_SYNTAX} "PREFIX,0,-1,RBD_HAS_PREFIX,RBD_PREFIX")
+	SET(RBD_SYNTAX ${RBD_SYNTAX} "PREFIX,0,1,RBD_HAS_PREFIX,RBD_PREFIX")
 	SET(RBD_SYNTAX ${RBD_SYNTAX} "FILES,0,-1,RBD_HAS_FILES,RBD_FILES")
 	SET(RBD_SYNTAX ${RBD_SYNTAX} "SUBDIRS,0,-1,RBD_HAS_SUBDIRS,RBD_SUBDIRS")
+	SET(RBD_SYNTAX ${RBD_SYNTAX} "PATTERNS,0,-1,RBD_HAS_PATTERNS,RBD_PATTERNS")
+	SET(RBD_SYNTAX ${RBD_SYNTAX} "USER,0,0,RBD_IS_USER,_")
 
 	SPLIT_ARGN(${RBD_SYNTAX} ARGUMENTS ${ARGN})
 
-	#MESSAGE(STATUS "ROBOT_DATA(${RBD_NAME}): PREFIX=${RBD_PREFIX} FILES=${RBD_FILES} SUBDIRS=${RBD_SUBDIRS}")
+	#MESSAGE(STATUS "ROBOT_DATA(${RBD_NAME}): PREFIX=${RBD_PREFIX} FILES=${RBD_FILES} PATTERNS=${RBD_PATTERNS} SUBDIRS=${RBD_SUBDIRS} USER=${RBD_IS_USER}")
 
+	# Check arguments syntax / values
 	IF(NOT RBD_HAS_NAME OR NOT RBD_NAME)
 		MESSAGE(FATAL_ERROR "Cannot install data for a robot module with no specified name")
 	ENDIF()
 
-	SET(REAL_FILES) # Reset the list (remember, it's a CMakeLists.txt global variable :-()
+	# Install specified files.
 	IF(RBD_HAS_FILES AND RBD_FILES)
-		IF(RBD_HAS_PREFIX AND RBD_PREFIX)
-			FOREACH(_FILE ${RBD_FILES})
-				LIST(APPEND REAL_FILES ${RBD_PREFIX}/${_FILE})
-			ENDFOREACH(_FILE ${RBD_FILES})
+
+		IF(RBD_IS_USER)
+			SD_INSTALL_FILES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME} 
+						 	 PREFIX ${RBD_PREFIX} FILES ${RBD_FILES})
 		ELSE()
-			 SET(REAL_FILES ${RBD_FILES})
+			SD_INSTALL_FILES(DATA drivers/${RBD_NAME} 
+					     	 PREFIX ${RBD_PREFIX} FILES ${RBD_FILES})
 		ENDIF()
-		#MESSAGE(STATUS "Files to install(-1) for ${RBD_NAME} robot: ${REAL_FILES}")
+
 	ENDIF()
 
-	#MESSAGE(STATUS "Files to install(0) for ${RBD_NAME} robot: ${REAL_FILES}")
-	IF(RBD_HAS_PREFIX AND RBD_PREFIX)
-		LIST(APPEND REAL_FILES ${RBD_PREFIX}/${RBD_NAME}.xml)
-	ELSE()
-		LIST(APPEND REAL_FILES ${RBD_NAME}.xml)
-	ENDIF()
-
-	#MESSAGE(STATUS "Files to install for ${RBD_NAME} robot: ${REAL_FILES}")
-	SD_INSTALL_FILES(DATA drivers/${RBD_NAME} FILES ${REAL_FILES})
-
+	# Install subdirs if specified.
 	IF(RBD_HAS_SUBDIRS AND RBD_SUBDIRS)
-		IF(RBD_HAS_PREFIX AND RBD_PREFIX)
-			SET(REAL_SUBDIRS) # Reset the list (remember, it's a CMakeLists.txt global variable :-()
-			FOREACH(SUBDIR ${RBD_SUBDIRS})
-				LIST(APPEND REAL_SUBDIRS ${RBD_PREFIX}/${SUBDIR})
-			ENDFOREACH(SUBDIR ${RBD_SUBDIRS})
+
+		# Install specified files.
+		IF(RBD_IS_USER)
+			SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME} 
+                           	       PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
+                            	   PATTERNS ${RBD_PATTERNS})
 		ELSE()
-			SET(REAL_SUBDIRS ${RBD_SUBDIRS})
+			SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} 
+                              	   PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
+                               	   PATTERNS ${RBD_PATTERNS})
 		ENDIF()
-		#MESSAGE(STATUS "Subdirs to install for ${RBD_NAME} robot: ${REAL_SUBDIRS}")
-		INSTALL(DIRECTORY ${REAL_SUBDIRS}
-				DESTINATION ${SD_DATADIR}/drivers/${RBD_NAME}
-				PATTERN ".svn" EXCLUDE
-				PATTERN "*.xcf*" EXCLUDE
-				PATTERN "*.psd" EXCLUDE)
-	ENDIF()
+
+	ENDIF(RBD_HAS_SUBDIRS AND RBD_SUBDIRS)
+
 ENDMACRO(ROBOT_DATA)
 
 # Robot project definition (module build and install, with associated data)
@@ -669,35 +693,34 @@ MACRO(ADD_PLIB_LIBRARY TARGET)
 		MESSAGE(FATAL_ERROR "Cannot find plib")
 	ENDIF(NOT PLIB_FOUND)
 
-  IF(NOT APPLE)
-	FOREACH(PLIB_LIB ${ARGN})
-		IF(PLIB_LIB STREQUAL "ul")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_UL_LIBRARY})
-		ELSEIF(PLIB_LIB STREQUAL "js")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_JS_LIBRARY})
-		ELSEIF(PLIB_LIB STREQUAL "sg")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SG_LIBRARY})
-		ELSEIF(PLIB_LIB STREQUAL "sl")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SL_LIBRARY})
-		ELSEIF(PLIB_LIB STREQUAL "sm")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SM_LIBRARY})
-		ELSEIF(PLIB_LIB STREQUAL "ssg")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SSG_LIBRARY})
-		ELSEIF(PLIB_LIB STREQUAL "ssgaux")
-			SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SSGAUX_LIBRARY})
-		ELSE(PLIB_LIB STREQUAL "ul")
-			MESSAGE(WARNING "${PLIB_LIB} is not part of plib")
-		ENDIF(PLIB_LIB STREQUAL "ul")
-	ENDFOREACH(PLIB_LIB ${ARGN})
+	IF(NOT APPLE)
+		FOREACH(PLIB_LIB ${ARGN})
+			IF(PLIB_LIB STREQUAL "ul")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_UL_LIBRARY})
+			ELSEIF(PLIB_LIB STREQUAL "js")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_JS_LIBRARY})
+			ELSEIF(PLIB_LIB STREQUAL "sg")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SG_LIBRARY})
+			ELSEIF(PLIB_LIB STREQUAL "sl")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SL_LIBRARY})
+			ELSEIF(PLIB_LIB STREQUAL "sm")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SM_LIBRARY})
+			ELSEIF(PLIB_LIB STREQUAL "ssg")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SSG_LIBRARY})
+			ELSEIF(PLIB_LIB STREQUAL "ssgaux")
+				SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_SSGAUX_LIBRARY})
+			ELSE(PLIB_LIB STREQUAL "ul")
+				MESSAGE(WARNING "${PLIB_LIB} is not part of plib")
+			ENDIF(PLIB_LIB STREQUAL "ul")
+		ENDFOREACH(PLIB_LIB ${ARGN})
+	ENDIF(NOT APPLE)
 
-   ENDIF(NOT APPLE)
+	# Special case: Apple only uses one library
+	IF(APPLE)
+		SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_APPLE_LIBRARY})  
+	ENDIF(APPLE)
 
-#Special case apple only uses one library
-  IF(APPLE)
-	SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_APPLE_LIBRARY})  
-  ENDIF(APPLE)
-
-  TARGET_LINK_LIBRARIES(${TARGET} ${PLIB_LIBRARIES})
+	TARGET_LINK_LIBRARIES(${TARGET} ${PLIB_LIBRARIES})
 ENDMACRO(ADD_PLIB_LIBRARY TARGET)
 
 MACRO(ADD_SDL_INCLUDEDIR)
@@ -878,7 +901,7 @@ MACRO(ADD_DL_LIBRARY TARGET)
 		IF(LIBDL_LIB)
 			TARGET_LINK_LIBRARIES(${TARGET} ${LIBDL_LIB})
 		ENDIF(LIBDL_LIB)
-		MESSAGE(STATUS LIBDL = ${LIBDL_LIB})
+		#MESSAGE(STATUS LIBDL = ${LIBDL_LIB})
 	ENDIF(UNIX)
 ENDMACRO(ADD_DL_LIBRARY TARGET)
 
@@ -949,55 +972,77 @@ MACRO(ADD_SD_DEFINITIONS)
 	
 ENDMACRO(ADD_SD_DEFINITIONS)
 
-MACRO(SD_INSTALL_CAR carname)
-	SET(files ${carname}.xml ${ARGN})
+MACRO(SD_INSTALL_CAR CARNAME)
+	SET(SDIC_FILES ${CARNAME}.xml ${ARGN})
 
-	FILE(GLOB files_acc *.acc)
-	FILE(GLOB files_rgb *.rgb)
-	FILE(GLOB files_png *.png)
-	FILE(GLOB files_jpg *.jpg)
-	FILE(GLOB files_wav *.wav)
-	SET(files ${files} ${files_acc} ${files_rgb} ${files_png} ${files_jpg} ${files_wav})
+	FILE(GLOB FILES_ACC *.acc)
+	FILE(GLOB FILES_PNG *.png)
+	FILE(GLOB FILES_JPG *.jpg)
+	FILE(GLOB FILES_RGB *.rgb)
+	FILE(GLOB FILES_WAV *.wav)
+	SET(SDIC_FILES ${SDIC_FILES} ${FILES_ACC} ${FILES_RGB} ${FILES_PNG} ${FILES_JPG} ${FILES_WAV})
 
-	SD_INSTALL_FILES(DATA cars/${carname} FILES ${files})
-ENDMACRO(SD_INSTALL_CAR carname)
+	SD_INSTALL_FILES(DATA cars/${CARNAME} FILES ${SDIC_FILES})
+ENDMACRO(SD_INSTALL_CAR CARNAME)
 
-MACRO(SD_INSTALL_TRACK trackname category)
-	SET(files ${trackname}.xml ${ARGN})
+MACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
+	SET(SDIT_FILES ${TRACKNAME}.xml ${ARGN})
 
-	FILE(GLOB files_png *.png)
-	FILE(GLOB files_rgb *.rgb)
-	FILE(GLOB files_ac *.ac)
-	FILE(GLOB files_acc *.acc)
-	SET(files ${files} ${files_png} ${files_rgb} ${files_ac} ${files_acc})
+	FILE(GLOB FILES_ACC *.acc)
+	FILE(GLOB FILES_AC *.ac)
+	FILE(GLOB FILES_PNG *.png)
+	FILE(GLOB FILES_JPG *.jpg)
+	FILE(GLOB FILES_RGB *.rgb)
+	SET(SDIT_FILES ${SDIT_FILES} ${FILES_PNG} ${FILES_RGB} ${FILES_AC} ${FILES_ACC})
 
-	SD_INSTALL_FILES(DATA tracks/${category}/${trackname} FILES ${files})
-ENDMACRO(SD_INSTALL_TRACK trackname category)
+	SD_INSTALL_FILES(DATA tracks/${CATEGORY}/${TRACKNAME} FILES ${SDIT_FILES})
+ENDMACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
 
-#Usage:
+# Data/Lib/Bin/Include files installation (with user settings registration for data files)
+# Args:
+#  DATA     : Data subdirectory where to install specified data files
+#  LIB      : Lib subdirectory where to install specified files/targets
+#  BIN      : If present, instructs to install specified files/targets in the bin dir
+#  INCLUDE  : Include subdirectory where to install specified files
+#  USER     : User settings subdirectory where to install/update specified data files at run-time
+#  PREFIX   : Prefix to use to get source path for files specified in FILES
+#  FILES    : Files to install (see PREFIX)
+#  TARGETS  : Targets to install
+# Examples:
 #  SD_INSTALL_FILES(DATA drivers/bt FILES bt.xml logo.rgb)
-#     Installs the files quickrace.xml and endrace.xml in ${prefix}/share/games/speed-dreams/drivers/bt
+#     Installs bt.xml and logo.rgb in ${prefix}/share/games/speed-dreams/drivers/bt
 #  SD_INSTALL_FILES(DATA config/raceman USER config/raceman FILES quickrace.xml endrace.xml)
-#     Installs the files quickrace.xml and endrace.xml in ${prefix}/share/games/speed-dreams/drivers/bt
-#     and copies the file to the users home directory ~/.speed-dreams/config/raceman at startup.
+#     Installs quickrace.xml and endrace.xml in ${prefix}/share/games/speed-dreams/drivers/bt
+#     and copies the file to the users settings folder ~/.speed-dreams/config/raceman at startup.
 #  SD_INSTALL_FILES(LIB drivers/bt TARGETS bt.so)
-#     Installs the files bt.so in ${prefix}/lib/speed-dreams/drivers/bt
+#     Installs bt.so in ${prefix}/lib/speed-dreams/drivers/bt
 #  SD_INSTALL_FILES(BIN TARGETS speed-dreams)
-#     Installs the speed-dreams target to the bin-directory
+#     Installs the speed-dreams target in ${prefix}/games
 MACRO(SD_INSTALL_FILES)
+
 	SET(SD_INSTALL_FILES_SYNTAX "DATA,1,1,IS_DATA,DATA_PATH")
 	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "LIB,1,1,IS_LIB,LIB_PATH")
-	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "BIN,0,0,IS_BIN,BIN_PATH")
+	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "BIN,0,0,IS_BIN,_")
 	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "INCLUDE,0,1,IS_INCLUDE,INCLUDE_PATH")
 	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "USER,1,1,IS_USER,USER_PATH")
+	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "PREFIX,0,1,HAS_PREFIX,PREFIX")
 	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "FILES,0,-1,HAS_FILES,FILES")
-	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "TARGETS,0,-1,HAS_TARGETS,TARGET_LIST")
+	SET(SD_INSTALL_FILES_SYNTAX ${SD_INSTALL_FILES_SYNTAX} "TARGETS,0,-1,HAS_TARGETS,TARGETS")
+
 	SPLIT_ARGN(${SD_INSTALL_FILES_SYNTAX} ARGUMENTS ${ARGN})
 
-	IF(NOT IS_DATA AND NOT IS_LIB AND NOT IS_BIN AND NOT IS_INCLUDE)
-		MESSAGE(ERROR "Expected either LIB, DATA or BIN in SD_INSTALL_FILES")
-	ENDIF(NOT IS_DATA AND NOT IS_LIB AND NOT IS_BIN AND NOT IS_INCLUDE)
+	#MESSAGE(STATUS "  SD_INSTALL_FILES: LIB=${IS_LIB}:${LIB_PATH} BIN=${IS_BIN} INCLUDE=${IS_INCLUDE}:${INCLUDE_PATH} DATA=${IS_DATA}:${DATA_PATH} USER=${IS_USER}:${USER_PATH} TARGETS=${HAS_TARGETS}:${TARGETS} FILES=${HAS_FILES}:${FILES}")
 
+	# Check argument syntax / values
+	IF(NOT (IS_DATA AND DATA_PATH) AND NOT (IS_LIB AND LIB_PATH) AND NOT IS_BIN AND NOT IS_INCLUDE)
+		MESSAGE(FATAL_ERROR "SD_INSTALL_FILES: Expected 1 and only 1 LIB, DATA, BIN or INCLUDE keyword")
+	ENDIF()
+
+	IF(HAS_PREFIX AND PREFIX AND NOT (HAS_FILES AND FILES))
+		MESSAGE(FATAL_ERROR "SD_INSTALL_FILES: Expected FILES when PREFIX keyword is present")
+	ENDIF()
+
+	# Compute destination sub-dir
 	IF(IS_LIB)
 		SET(DEST1 ${SD_LIBDIR})
 		SET(DEST2 ${LIB_PATH})
@@ -1010,81 +1055,269 @@ MACRO(SD_INSTALL_FILES)
 	ELSEIF(IS_INCLUDE)
 		SET(DEST1 ${SD_INCLUDEDIR})
 		SET(DEST2 "${INCLUDE_PATH}")
-	ELSE(IS_LIB)
-		MESSAGE(WARNING "SD_INSTALL_FILES called without DATA, LIB, BIN or INCLUDE command")
-	ENDIF(IS_LIB)
+	ENDIF()
 
-	IF(DEST2 STREQUAL "" OR DEST2 STREQUAL ".")
+	IF(DEST2 STREQUAL "" OR DEST2 STREQUAL "/")
 		SET(DEST2 "")
 		SET(DEST_ALL "${DEST1}")
-	ELSE(DEST2 STREQUAL "" OR DEST2 STREQUAL ".")
+	ELSE()
 		SET(DEST_ALL "${DEST1}/${DEST2}")
-	ENDIF(DEST2 STREQUAL "" OR DEST2 STREQUAL ".")
+	ENDIF()
 
-	#Install files
-	IF(HAS_FILES)
-		INSTALL(FILES ${FILES} DESTINATION ${DEST_ALL})
-	ENDIF(HAS_FILES)
-	IF(HAS_TARGETS)
-		INSTALL(TARGETS ${TARGET_LIST} DESTINATION ${DEST_ALL})
-	ENDIF(HAS_TARGETS)
+	# Prepend prefix to files if specified.
+	SET(REAL_FILES) # Reset the list (remember, it's a CMakeLists.txt global variable :-()
+	IF(HAS_FILES AND FILES)
+		IF(HAS_PREFIX AND PREFIX)
+			FOREACH(FILE ${FILES})
+				LIST(APPEND REAL_FILES ${PREFIX}/${FILE})
+			ENDFOREACH()
+		ELSE()
+			 SET(REAL_FILES ${FILES})
+		ENDIF()
+	ENDIF()
 
-	#Loop through all the files which must be installed
+	# Install files
+	IF(REAL_FILES)
+		INSTALL(FILES ${REAL_FILES} DESTINATION ${DEST_ALL})
+	ENDIF()
+
+	# Install targets
+	IF(HAS_TARGETS AND TARGETS)
+		INSTALL(TARGETS ${TARGETS} DESTINATION ${DEST_ALL})
+	ENDIF()
+
+	# Register files for run-time install/update at game startup (through filesetup.cpp services)
 	IF(IS_USER)
-		FOREACH(XML_FILE ${FILES})
-			# Get the filename
-			GET_FILENAME_COMPONENT(XMLFILENAME ${XML_FILE} NAME)
 
-			# Execute xmlversion to register the file as to be installed / updated at run-time
-			# in the user settings folder.
-			IF(WIN32)
-				GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
-				GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
-				FIND_PACKAGE(SDL)
-				GET_FILENAME_COMPONENT(SDL_LIBPATH ${SDL_LIBRARY} PATH)
-				GET_FILENAME_COMPONENT(SDL_LIBNAME ${SDL_LIBRARY} NAME_WE)
-				SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-				INSTALL(CODE 
-						"FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
-						 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
-						 GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
-						 SET(TXML_LIB ${TXML_LIB})
-						 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TXML_LIB \${TXML_LIB})
-						 SET(TGF_LIB ${TGF_LIB})
-						 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
-						 FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${TXML_LIB} \${TGF_LIB} \"${SDL_LIB}\")
-						 SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
-						 IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
-							 GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
-						 ENDIF()
-						 EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}/${XMLFILENAME}\" \"${USER_PATH}/${XMLFILENAME}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
-						 IF(XMLVERSTATUS)
-								MESSAGE(FATAL_ERROR \"ERROR: xmlversion failed\")
-						 ENDIF(XMLVERSTATUS)")
-			ELSE(WIN32)
-				INSTALL(CODE 
-						"FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
-						 SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
-						 IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
-							 GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
-						 ENDIF()
-						 # Why this path correction here ? This needs a comment !
-						 SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
-						 IF(CUR_DESTDIR MATCHES \"[^/]\")
-							STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
-						 ELSE(CUR_DESTDIR MATCHES \"[^/]\")
-							SET(CUR_DESTDIR_CORR \"\")
-						 ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
-						 EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}/${XMLFILENAME}\" \"${USER_PATH}/${XMLFILENAME}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
-						 IF(XMLVERSTATUS)
-							MESSAGE(FATAL_ERROR \"ERROR: xmlversion failed\")
-						 ENDIF(XMLVERSTATUS)")
-			ENDIF(WIN32)
-		ENDFOREACH(XML_FILE ${FILES})
+		# Handle properly the "root" folder case.
+		IF(DATA_PATH STREQUAL "" OR DATA_PATH STREQUAL "/")
+			SET(DATA_PATH "")
+		ELSE()
+			SET(DATA_PATH "${DATA_PATH}/")
+		ENDIF()
+
+		# Execute xmlversion at install-time to do this registration job.
+		IF(WIN32)
+
+			# Under Windows, in order to run xmlversion.exe in the build tree,
+			# we have to copy dependencies next to it.
+			GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
+			GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
+			FIND_PACKAGE(SDL)
+			GET_FILENAME_COMPONENT(SDL_LIBPATH ${SDL_LIBRARY} PATH)
+			GET_FILENAME_COMPONENT(SDL_LIBNAME ${SDL_LIBRARY} NAME_WE)
+			SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+			INSTALL(CODE 
+					"FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+					 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
+					 GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
+					 SET(TXML_LIB ${TXML_LIB})
+					 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TXML_LIB \${TXML_LIB})
+					 SET(TGF_LIB ${TGF_LIB})
+					 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
+					 FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${TXML_LIB} \${TGF_LIB} \"${SDL_LIB}\")
+					 SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
+					 IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
+						 GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
+					 ENDIF()
+					 FOREACH(FILE ${FILES})
+						 GET_FILENAME_COMPONENT(FILENAME \${FILE} NAME)
+					 	 EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+					 	 IF(XMLVERSTATUS)
+							 MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
+					 	 ENDIF()
+					 ENDFOREACH()")
+
+		ELSE(WIN32)
+
+			INSTALL(CODE 
+					"FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+					 SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
+					 IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
+						 GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
+					 ENDIF()
+					 # Why this path correction here ? This needs a comment !
+					 SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
+					 IF(CUR_DESTDIR MATCHES \"[^/]\")
+						STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
+					 ELSE(CUR_DESTDIR MATCHES \"[^/]\")
+						SET(CUR_DESTDIR_CORR \"\")
+					 ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
+					 FOREACH(FILE ${FILES})
+						 GET_FILENAME_COMPONENT(FILENAME \${FILE} NAME)
+					 	 EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+					 	 IF(XMLVERSTATUS)
+							 MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
+					 	 ENDIF(XMLVERSTATUS)
+					 ENDFOREACH()")
+
+		ENDIF(WIN32)
+
 	ENDIF(IS_USER)
 
 ENDMACRO(SD_INSTALL_FILES)
 
+# Directory installation with pattern matching on files and user settings registration
+# Args:
+#  DATA        : Data subdirectory where to install specified sub-dirs
+#  USER        : User settings subdirectory where to install/update specified sub-dirs at run-time
+#  PREFIX      : Prefix to use to get source path for dirs specified in DIRECTORIES
+#  DIRECTORIES : Sub-dirs to recursively install (see PREFIX)
+#  PATTERNS    : Glob patterns to use for seelecting files to install (defaults to *.*)
+# Example:
+#  SD_INSTALL_DIRECTORIES(DATA drivers/human USER drivers/human 
+#                         PREFIX pfx DIRECTORIES cars tracks PATTERNS *.xml)
+#  will recursively install any .xml file from drivers/human/pfx/cars and drivers/human/pfx/tracks
+#  into drivers/human/cars and  drivers/human/pfx/tracks data dirs ; 
+#  these files / sub-dirs will also be scheduled for run-time update/install in user settings dir.
+MACRO(SD_INSTALL_DIRECTORIES)
+
+	SET(SDID_SYNTAX "DATA,1,1,IS_DATA,DATA_PATH")
+	SET(SDID_SYNTAX ${SDID_SYNTAX} "USER,1,1,IS_USER,USER_PATH")
+	SET(SDID_SYNTAX ${SDID_SYNTAX} "PREFIX,0,1,HAS_PREFIX,PREFIX")
+	SET(SDID_SYNTAX ${SDID_SYNTAX} "DIRECTORIES,0,-1,HAS_DIRECTORIES,DIRECTORIES")
+	SET(SDID_SYNTAX ${SDID_SYNTAX} "PATTERNS,0,-1,HAS_PATTERNS,PATTERNS")
+
+	SPLIT_ARGN(${SDID_SYNTAX} ARGUMENTS ${ARGN})
+
+	#MESSAGE(STATUS "  SD_INSTALL_DIRECTORIES: DATA=${IS_DATA}:${DATA_PATH} USER=${IS_USER}:${USER_PATH} DIRS=${HAS_DIRECTORIES}:${DIRECTORIES} PATTERNS=${HAS_PATTERNS}:${PATTERNS}")
+
+	# Check arguments syntax / values
+	IF(NOT (IS_DATA AND DATA_PATH) AND NOT(HAS_DIRECTORIES AND DIRECTORIES))
+		MESSAGE(ERROR "SD_INSTALL_DIRECTORIES: Expected mandatory DATA and DIRECTORIES keywords")
+	ENDIF()
+
+	IF(NOT(HAS_PATTERNS AND PATTERNS))
+		SET(PATTERNS "*.*")
+	ENDIF()
+
+	IF(HAS_PREFIX AND PREFIX)
+		SET(PREFIX "${PREFIX}/")
+		SET(POSTFIX "/${PREFIX}")
+	ELSE()
+		SET(POSTFIX "")
+	ENDIF()
+
+	# Compute destination sub-dir
+	SET(DEST1 ${SD_DATADIR})
+	SET(DEST2 ${DATA_PATH})
+
+	IF(DEST2 STREQUAL "" OR DEST2 STREQUAL "/")
+		SET(DEST2 "")
+		SET(DEST_ALL "${DEST1}")
+	ELSE()
+		SET(DEST_ALL "${DEST1}/${DEST2}")
+	ENDIF()
+
+	# Install selected files into the data dir.
+	FOREACH(DIRECTORY ${DIRECTORIES})
+		SET(GLOB_EXPRS)
+		FOREACH(PATTERN ${PATTERNS})
+			LIST(APPEND GLOB_EXPRS "${PREFIX}${DIRECTORY}/${PATTERN}")
+		ENDFOREACH()
+		FILE(GLOB_RECURSE FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${GLOB_EXPRS})
+		FOREACH(FILE ${FILES})
+			IF(NOT "${FILE}" MATCHES "\\.svn")
+				GET_FILENAME_COMPONENT(SUBDIR ${FILE} PATH)
+				INSTALL(FILES ${PREFIX}${FILE} DESTINATION ${DEST_ALL}/${SUBDIR})
+			ENDIF()
+		ENDFOREACH()
+		#MESSAGE(STATUS "${DIRECTORY}/${PATTERNS} : ${FILES}")
+	ENDFOREACH()
+
+	# Register selected files in subdirs for run-time install/update
+	# at game startup (through filesetup.cpp services)
+	IF(FALSE AND IS_USER)
+
+		# Handle properly the "root" folder case.
+		IF(DATA_PATH STREQUAL "" OR DATA_PATH STREQUAL "/")
+			SET(DATA_PATH "")
+		ELSE()
+			SET(DATA_PATH "${DATA_PATH}/")
+		ENDIF()
+
+		# Execute xmlversion at install-time to do this registration job.
+		IF(WIN32)
+
+			# Under Windows, in order to run xmlversion.exe in the build tree,
+			# we have to copy dependencies next to it.
+			GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
+			GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
+			FIND_PACKAGE(SDL)
+			GET_FILENAME_COMPONENT(SDL_LIBPATH ${SDL_LIBRARY} PATH)
+			GET_FILENAME_COMPONENT(SDL_LIBNAME ${SDL_LIBRARY} NAME_WE)
+			SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+
+			INSTALL(CODE 
+					"FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+					 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
+					 GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
+					 SET(TXML_LIB ${TXML_LIB})
+					 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TXML_LIB \${TXML_LIB})
+					 SET(TGF_LIB ${TGF_LIB})
+					 STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
+					 FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${TXML_LIB} \${TGF_LIB} \"${SDL_LIB}\")
+					 SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
+					 IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
+						 GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
+					 ENDIF()
+
+					 FOREACH(DIRECTORY ${DIRECTORIES})
+						 SET(GLOB_EXPRS)
+						 FOREACH(PATTERN ${PATTERNS})
+							 LIST(APPEND GLOB_EXPRS \"${PREFIX}\${DIRECTORY}/\${PATTERN}\")
+						 ENDFOREACH()
+						 FILE(GLOB_RECURSE FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS})
+						 FOREACH(FILE \${FILES})
+							 IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
+							 	 EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+							 	 IF(XMLVERSTATUS)
+									 MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
+							 	 ENDIF(XMLVERSTATUS)
+							 ENDIF()
+						 ENDFOREACH()
+					 ENDFOREACH()")
+
+		ELSE(WIN32)
+
+			INSTALL(CODE 
+					"FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+					 SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
+					 IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
+						 GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
+					 ENDIF()
+					 # Why this path correction here ? This needs a comment !
+					 SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
+					 IF(CUR_DESTDIR MATCHES \"[^/]\")
+						STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
+					 ELSE(CUR_DESTDIR MATCHES \"[^/]\")
+						SET(CUR_DESTDIR_CORR \"\")
+					 ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
+
+					 FOREACH(DIRECTORY ${DIRECTORIES})
+						 SET(GLOB_EXPRS)
+						 FOREACH(PATTERN ${PATTERNS})
+							 LIST(APPEND GLOB_EXPRS \"${PREFIX}\${DIRECTORY}/\${PATTERN}\")
+						 ENDFOREACH()
+						 FILE(GLOB_RECURSE FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS})
+						 FOREACH(FILE \${FILES})
+							 IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
+							 	 EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+							 	 IF(XMLVERSTATUS)
+									 MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
+							 	 ENDIF(XMLVERSTATUS)
+							 ENDIF()
+						 ENDFOREACH()
+					 ENDFOREACH()")
+
+		ENDIF(WIN32)
+
+	ENDIF(FALSE AND IS_USER)
+
+ENDMACRO(SD_INSTALL_DIRECTORIES)
+
+# Macro to install CMake config files for SD if in-source build.
 IF(IN_SOURCETREE)
 	MACRO(INSTALL_SD_CMAKE)
 		INSTALL(CODE 
