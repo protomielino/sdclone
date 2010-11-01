@@ -53,9 +53,10 @@ extern char *grFilePath;	/* Multiple path (: separated) used to search for files
 
 extern int grGetFilename(const char *filename, const char *filepath, char *buf);
 class ssgState;
-extern ssgState* grSsgEnvTexState(const char *img);
-extern ssgState* grSsgLoadTexState(const char *img);
-extern ssgState* grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap);
+extern ssgState* grSsgEnvTexState(const char *img, int errIfNotFound = TRUE);
+extern ssgState* grSsgLoadTexState(const char *img, int errIfNotFound = TRUE);
+extern ssgState* grSsgLoadTexStateEx(const char *img, const char *filepath,
+									 int wrap, int mipmap, int errIfNotFound = TRUE);
 extern void grShutdownState(void);
 extern void grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn);
 extern void grWriteTimeBuf(char *buf, tdble sec, int sgn);

@@ -1026,7 +1026,7 @@ grCustomizePits(void)
 
 				// Load logo texture (.rgb first, for backwards compatibility, then .png)
 				const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
-				ssgState *st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE);
+				ssgState *st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, FALSE);
 				if (!st)
 				{
 					const std::string strPNGLogoFileName = strLogoFileName + ".png";

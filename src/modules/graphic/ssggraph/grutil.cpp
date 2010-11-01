@@ -44,7 +44,7 @@ int grGetFilename(const char *filename, const char *filepath, char *buf)
 	if (filepath) {
 		c1 = filepath;
 		c2 = c1;
-		while ((!found) && (c2 != NULL)) {
+		while (!found && c2) {
 			c2 = strchr(c1, ';');
 			if (c2 == NULL) {
 				sprintf(buf, "%s/%s", c1, filename);
@@ -65,12 +65,8 @@ int grGetFilename(const char *filename, const char *filepath, char *buf)
 			found = 1;
 		}
 	}
-	if (!found) {
-		GfError("File %s not found in search path %s\n", filename, filepath);
-		return 0;
-	}
 
-	return 1;
+	return found;
 }
 
 
@@ -136,7 +132,7 @@ static void grSetupState(grManagedState *st, char *buf)
 }
 
 
-ssgState * grSsgLoadTexState(const char *img)
+ssgState * grSsgLoadTexState(const char *img, int errIfNotFound)
 {
 	char buf[256];
 	const char *s;
@@ -151,7 +147,8 @@ ssgState * grSsgLoadTexState(const char *img)
 	}
 
 	if (!grGetFilename(s, grFilePath, buf)) {
-		GfOut("grSsgLoadTexState: File %s not found\n", s);
+		if (errIfNotFound)
+			GfLogError("Texture file %s not found in %s\n", s, grFilePath);
 		return NULL;
 	}
 
@@ -167,7 +164,7 @@ ssgState * grSsgLoadTexState(const char *img)
 	return (ssgState*)st;
 }
 
-ssgState * grSsgEnvTexState(const char *img)
+ssgState * grSsgEnvTexState(const char *img, int errIfNotFound)
 {
 	char buf[256];
 	const char *s;
@@ -182,7 +179,8 @@ ssgState * grSsgEnvTexState(const char *img)
     }
 
 	if (!grGetFilename(s, grFilePath, buf)) {
-		GfOut("grSsgLoadTexState: File %s not found\n", s);
+		if (errIfNotFound)
+			GfLogError("Env. texture file %s not found in %s\n", s, grFilePath);
 		return NULL;
     }
 
@@ -194,7 +192,8 @@ ssgState * grSsgEnvTexState(const char *img)
 }
 
 ssgState *
-grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap)
+grSsgLoadTexStateEx(const char *img, const char *filepath,
+					int wrap, int mipmap, int errIfNotFound)
 {
 	char buf[256];
 	const char *s;
@@ -209,7 +208,8 @@ grSsgLoadTexStateEx(const char *img, const char *filepath, int wrap, int mipmap)
 	}
 
 	if (!grGetFilename(s, filepath, buf)) {
-		GfLogWarning("Texture file %s not found in search path %s\n", s, filepath);
+		if (errIfNotFound)
+			GfLogError("Texture file (ex) %s not found in %s\n", s, filepath);
 		return NULL;
 	}
 
