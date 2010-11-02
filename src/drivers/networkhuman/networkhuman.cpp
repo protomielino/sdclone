@@ -1270,7 +1270,6 @@ static int pitcmd(int index, tCarElt* car, tSituation *s)
 	car->_pitRepair = (int)car->_dammage;
 
 	int i;
-	int key;
 	tControlCmd *cmd;
 
 	if (HCtx[idx]) {

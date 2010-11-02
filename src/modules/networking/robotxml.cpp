@@ -4,6 +4,7 @@
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -20,6 +21,7 @@
 This file will generate the xml file needed for a robot file.
 Currently only used for networkhuman.xml
 */
+
 #include "robotxml.h"
 
 RobotXml::RobotXml()

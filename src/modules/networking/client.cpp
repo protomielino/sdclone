@@ -4,6 +4,7 @@
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -15,6 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 #include <cstdio>
 #include <SDL/SDL.h>
 #include "network.h"
@@ -24,8 +26,7 @@ Client::Client()
 {
 	if (enet_initialize () != 0)
     {
-        GfOut ("An error occurred while initializing ENet.\n");
-        
+        GfLogError ("An error occurred while initializing ENet.\n");
     }
 
 	m_strClass = "client";
@@ -33,7 +34,6 @@ Client::Client()
 	m_pClient = NULL;
 	m_pHost = NULL;
 	m_eClientAccepted = PROCESSINGCLIENT;
-
 }
 
 
@@ -80,13 +80,12 @@ void Client::ResetNetwork()
             break;
 
         case ENET_EVENT_TYPE_DISCONNECT:
-            puts ("Disconnection succeeded.");
+            GfLogTrace ("Network disconnection succeeded.");
 			bDisconnect=true;
             break;
         }
     }
     
-
     /* We've arrived here, so the disconnect attempt didn't */
     /* succeed yet.  Force the connection down.             */
     if (!bDisconnect)
@@ -95,7 +94,6 @@ void Client::ResetNetwork()
 	SetClient(false);
 
     ENetPeer * pCurrentPeer1;
-
 
 	if (m_pHost ==NULL)
 		return;
@@ -130,7 +128,6 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 	m_pClient = NULL;
 	m_pHost = NULL;
 
-
 	m_pClient = enet_host_create (NULL /* create a client host */,
                 MAXNETWORKPLAYERS, 
                 0/* downstream bandwidth */,
@@ -138,7 +135,7 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 
     if (m_pClient == NULL)
     {
-        GfOut ("An error occurred while trying to create an ENet client host.\n");
+        GfLogError ("An error occurred while trying to create an ENet client host.\n");
 		ResetNetwork();
 		return false;
     }
@@ -166,7 +163,7 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 
 		if (m_pHost == NULL)
 		{
-			GfOut("Unable setup client listener\n");
+			GfLogError("Unable to setup client listener\n");
 			return false;
 		}
     }
@@ -178,12 +175,13 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
     address.port = port;
 	
     /* Initiate the connection, allocating the two channels 0 and 1. */
+	GfLogError ("Initiating network connection to host %s:%d ...\n", pAddress, port);
     m_pServer = enet_host_connect (m_pClient, & address, 2);
 
     if (m_pServer == NULL)
     {
-       GfOut ("No available peers for initiating an ENet connection.\n");
-	ResetNetwork();
+       GfLogInfo ("No available peers for initiating an ENet connection.\n");
+	   ResetNetwork();
        return false;
     }
     
@@ -191,21 +189,22 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
     if (enet_host_service (m_pClient, & event, 5000) > 0 &&
         event.type == ENET_EVENT_TYPE_CONNECT)
     {
-
-	m_address.host = m_pClient->address.host;
-	m_address.port = m_pClient->address.port;
-	m_bConnected = true;
+		m_address.host = m_pClient->address.host;
+		m_address.port = m_pClient->address.port;
+		m_bConnected = true;
+		GfLogInfo ("Network connection accepted.\n");
     }
     else
     {
-	m_bConnected = false;
-	ResetNetwork();
+		m_bConnected = false;
+		ResetNetwork();
     }
 
 	m_eClientAccepted = PROCESSINGCLIENT;
 	SendDriverInfoPacket(pDriver);
 
 	//Wait for server to accept or reject 
+	GfLogInfo ("Sent local driver info to the network server : waiting ...\n");
 	while(m_eClientAccepted == PROCESSINGCLIENT)
 	{
 		SDL_Delay(50);
@@ -217,6 +216,8 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 		ResetNetwork();
 		return false;
 	}
+	else
+		GfLogInfo ("Driver info accepted by the network server.\n");
 
 	return m_bConnected;
 }
@@ -228,6 +229,7 @@ bool Client::IsConnected()
 
 void Client::SetDriverReady(bool bReady)
 {
+	// Get local driver index in the race driver list
 	int idx = GetDriverIdx();
 
 	MutexData *pNData = LockNetworkData();
@@ -254,8 +256,6 @@ void Client::SetDriverReady(bool bReady)
 	delete [] pDataStart;
 	if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
 		return;
-
-
 }
 
 bool Client::SendDriverInfoPacket(Driver *pDriver)
@@ -286,7 +286,7 @@ void Client::SendReadyToStartPacket()
 {
 	
 	std::string strDName = GetDriverName();
-	GfOut("Sending ready to start packet\n");
+	GfLogTrace("Sending ready to start packet\n");
 	int l = strDName.size();
 	int datasize = 1+sizeof(l)+l*sizeof(char);
 	unsigned char *pData = new unsigned char[datasize];
@@ -334,7 +334,7 @@ double Client::WaitForRaceStart()
 
 void Client::ReadStartTimePacket(ENetPacket *pPacket)
 {
-	GfOut("Recieved the start race Packet\n");
+	GfLogTrace("Recieved the start race Packet\n");
 	unsigned char *pData = &pPacket->data[1];
 	memcpy(&m_racestarttime,pData,sizeof(m_racestarttime));
 	//double time = GfTimeClock();
@@ -348,13 +348,13 @@ void Client::ReadStartTimePacket(ENetPacket *pPacket)
 void Client::ReadPlayerRejectedPacket(ENetPacket *pPacket)
 {
 	m_eClientAccepted = CLIENTREJECTED;
-	GfOut ("Server reject connection.\n");
+	GfLogWarning ("Server rejected connection.\n");
 }
 
 void Client::ReadPlayerAcceptedPacket(ENetPacket *pPacket)
 {
 	m_eClientAccepted = CLIENTACCEPTED;
-	GfOut ("Server accepted connection.\n");
+	GfLogTrace ("Server accepted connection.\n");
 }
 
 bool Client::listenHost(ENetHost * pHost)
@@ -374,8 +374,8 @@ bool Client::listenHost(ENetHost * pHost)
 			char hostName[256];
 			enet_address_get_host_ip (&event.peer->address,hostName,256);
 
+            GfLogTrace ("A new client connected from %s\n",hostName); 
 
-            GfOut ("A new client connected from %s\n",hostName); 
             /* Store any relevant client information here. */
             event.peer -> data = (void*)"Client information";
 
@@ -396,7 +396,7 @@ bool Client::listenHost(ENetHost * pHost)
 		{
 			m_bConnected = false;
             /* Reset the peer's client information. */
-			GfOut("server disconnected\n");
+			GfLogTrace("Server disconnected\n");
 		}
 
             event.peer -> data = NULL;
@@ -471,7 +471,7 @@ void Client::ReadPacket(ENetEvent event)
 			break;
 	default:
 			assert(false);
-			GfOut ("A packet of length %u containing %s was received from %s on channel %u.\n",
+			GfLogDebug ("A packet of length %u containing %s was received from %s on channel %u.\n",
                     event.packet -> dataLength,
                     event.packet -> data,
                     (char*)event.peer -> data,
@@ -484,7 +484,7 @@ void Client::ReadPacket(ENetEvent event)
 
 void Client::ReadPrepareToRacePacket(ENetPacket *pPacket)
 {
-	GfOut("Recieved the start race Packet\n");
+	GfLogTrace("Recieved the start race Packet\n");
 
 	//unsigned char packetId = pPacket->data[0];
 	
@@ -496,7 +496,7 @@ void Client::ReadPrepareToRacePacket(ENetPacket *pPacket)
 }
 void Client::ReadRaceSetupPacket(ENetPacket *pPacket)
 {
-	GfOut("\nRecieving race setup\n");
+	GfLogTrace("\nRecieving race setup\n");
 
 	SetRaceInfoChanged(true);
 }
@@ -508,13 +508,13 @@ void Client::ConnectToDriver(Driver driver)
 
 	if (!driver.client)
 	{
-		GfOut("Skipping server: %s Address: %s\n",driver.name,hostName);
+		GfLogTrace("Skipping server: %s Address: %s\n",driver.name,hostName);
 		return;
 	}
 	
 	if (strcmp(driver.name,GetDriverName())==0)
 	{
-		GfOut("Skipping ourself: %s Address:  %s\n",driver.name,hostName);
+		GfLogTrace("Skipping ourself: %s Address:  %s\n",driver.name,hostName);
 		return;
 	}
 
@@ -529,14 +529,14 @@ void Client::ConnectToDriver(Driver driver)
          		if ((pCurrentPeer->address.host == driver.address.host)&&
 				(pCurrentPeer->address.port == driver.address.port))
 			{
-				GfOut("already connected to driver: %s Address: %s\n",driver.name,hostName);
+				GfLogTrace("Already connected to driver: %s Address: %s\n",driver.name,hostName);
 				return;
 			}
 		}
 
     	}
 
-	GfOut("connecting to driver: %s Address: %s\n",driver.name,hostName);
+	GfLogTrace("connecting to driver: %s Address: %s\n",driver.name,hostName);
 
 	//Connect to peer player
 	//ENetPeer *pPeer = enet_host_connect (m_pClient, &driver.address, 2);
@@ -548,12 +548,12 @@ void Client::ConnectToDriver(Driver driver)
     if (enet_host_service (m_pClient, & event, 5000) > 0 &&
         event.type == ENET_EVENT_TYPE_CONNECT)
     {
-		GfOut("Successfully connected to peer\n");
+		GfLogTrace("Successfully connected to peer\n");
 		return;
     }
     else
     {
-		GfOut("Failed to connect to peer!\n");
+		GfLogWarning("Failed to connect to peer!\n");
 		return;
     }
 
@@ -579,7 +579,7 @@ void Client::ReadAllDriverReadyPacket(ENetPacket *pPacket)
 	UnlockNetworkData();
 	SetRaceInfoChanged(true);
 
-	GfOut("Recieved All Driver Ready Packet\n");
+	GfLogTrace("Recieved All Driver Ready Packet\n");
 }
 
 void Client::ReadFinishTimePacket(ENetPacket *pPacket)
@@ -596,7 +596,7 @@ void Client::ReadTimePacket(ENetPacket *pPacket)
 {
 	double curTime = GfTimeClock();
 	m_lag = (curTime-m_packetsendtime)/2.0;
-	GfOut ("Connection lag is %lf seconds\n",m_lag);
+	GfLogTrace ("Connection lag is %lf seconds\n",m_lag);
 
 	unsigned char *pData = &pPacket->data[1];
 	double time;
@@ -618,12 +618,12 @@ void Client::ReadFilePacket(ENetPacket *pPacket)
 	unsigned int filesize;
 	memcpy(&filesize,pData,sizeof(unsigned int));
 	pData+=sizeof(unsigned int);
-	GfOut("Client file size %u\n",filesize);
+	GfLogTrace("Client file size %u\n",filesize);
 	
 	char filepath[255];
 	sprintf(filepath, "%s%s", GetLocalDir(), file);
 	FILE *pFile = fopen(filepath,"w+b");
-	GfOut("Reading file packet: File- %s\n",filepath);
+	GfLogTrace("Reading file packet: File- %s\n",filepath);
 	fwrite(pData,filesize,1,pFile);
 	fclose(pFile);
 
@@ -680,6 +680,6 @@ void Client::SetLocalDrivers()
 	m_setLocalDrivers.clear();
 	m_driverIdx = GetDriverIdx();
 	m_setLocalDrivers.insert(m_driverIdx-1);
-	printf("Adding Human start rank: %i\n",m_driverIdx-1);
+	GfLogTrace("Adding Human start rank: %i\n",m_driverIdx-1);
 }
 

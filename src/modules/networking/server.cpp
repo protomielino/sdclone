@@ -4,6 +4,7 @@
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -15,6 +16,7 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ********************************* ******************************************/
+
 #include <cstdio>
 #include <SDL/SDL.h>
 
@@ -24,25 +26,20 @@
 
 Server::Server()
 {
-
 	if (enet_initialize () != 0)
     {
-        GfOut ("An error occurred while initializing ENet.\n");
+        GfLogError ("An error occurred while initializing ENet.\n");
 		assert(false);
         
     }
 
 	m_strClass = "server";
-	
-
 }
 
 Server::~Server()
 {
 	ResetNetwork();
 	SetServer(false);
-	
-
 }
 
 void Server::Disconnect()
@@ -53,10 +50,8 @@ void Server::Disconnect()
 
 void Server::ResetNetwork()
 {
-
 	if (m_pServer)
 	{
-
 	    ENetPeer * pCurrentPeer;
 
 		for (pCurrentPeer = m_pServer-> peers;
@@ -71,8 +66,9 @@ void Server::ResetNetwork()
 
 		ENetEvent event;
 		bool bDisconnect = false;
+		
 	    /* Allow up to 3 seconds for the disconnect to succeed
-		and drop any packets received packets.
+		and drop any received packets.
 		*/
 		while (enet_host_service (m_pServer, & event, 3000) > 0)
 		{
@@ -83,7 +79,7 @@ void Server::ResetNetwork()
 				break;
 
 			case ENET_EVENT_TYPE_DISCONNECT:
-				puts ("Disconnection succeeded.");
+				GfLogTrace ("Disconnection succeeded.");
 				bDisconnect=true;
 				break;
 			}
@@ -109,7 +105,6 @@ void Server::ResetNetwork()
 		enet_host_destroy(m_pServer);
 		m_pServer = NULL;
 	}
-
 }
 
 bool Server::IsConnected()
@@ -141,19 +136,20 @@ bool Server::Start(int port)
 
 	assert(m_pServer ==NULL);
 
+	GfLogInfo ("Starting network server : Listening on port %d.\n", port);
+	
     m_pServer = enet_host_create (& m_address /* the address to bind the server host to */, 
                                  MAXNETWORKPLAYERS,
                                   0      /* assume any amount of incoming bandwidth */,
                                   0      /* assume any amount of outgoing bandwidth */);
     if (m_pServer == NULL)
     {
-        GfOut ("An error occurred while trying to create an ENet server host.\n");
+        GfLogError ("An error occurred while trying to create an ENet server host.\n");
 		return false;
     }
 
 	m_pHost = m_pServer;
 	return true;
-
 }
 
 
@@ -168,7 +164,6 @@ void Server::WaitForClientsStartPacket()
 	{
 		SDL_Delay(20);
 	}
-	
 }
 
 void Server::SendStartTimePacket(int &startTime)
@@ -190,19 +185,18 @@ void Server::SendStartTimePacket(int &startTime)
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 
 	delete [] pData;
-	GfOut("Server Start time is %lf\n",m_racestarttime);
+	GfLogInfo("Server Start time is %lf\n",m_racestarttime);
 }
 double Server::WaitForRaceStart()
 {
 	int startTime;
 	SendStartTimePacket(startTime);
-	GfOut("Server waiting to start the race\n");
+	GfLogInfo("Server waiting to start the race\n");
 
 
 	double time = GfTimeClock()-m_racestarttime;
 
 	return time;
-
 }
 
 void Server::ClearDrivers()
@@ -210,6 +204,7 @@ void Server::ClearDrivers()
 	LockServerData()->m_vecNetworkPlayers.clear();
 	LockServerData()->Unlock();
 	GenerateDriversForXML();
+	Dump("Server::ClearDrivers");
 }
 
 
@@ -229,8 +224,6 @@ void Server::SetHostSettings(const char *pszCarCat,bool bCollisions)
 
 void Server::GenerateDriversForXML()
 {
-
-
 	assert(m_strRaceXMLFile!="");
 
 	void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
@@ -238,7 +231,8 @@ void Server::GenerateDriversForXML()
 
 	const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
-    int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);	
+    int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
+	
 	//Gather vector of all non human drivers
 	std::vector<Driver> vecRDrivers;
 	for (int i=1;i<=nCars;i++)
@@ -252,7 +246,6 @@ void Server::GenerateDriversForXML()
 		}
 	}
 
-
 	//Recreate drivers section robots first
 	char drvSec[256];
 	GfParmListClean(params, RM_SECT_DRIVERS);
@@ -264,6 +257,7 @@ void Server::GenerateDriversForXML()
 		GfParmSetStr(params, drvSec, RM_ATTR_MODULE, vecRDrivers[i].module);
     }
 
+	//And then add the networkhuman drivers
 	ServerMutexData *pSData = LockServerData();
 	for (int i=0;i<(int)pSData->m_vecNetworkPlayers.size();i++)
 	{
@@ -274,18 +268,17 @@ void Server::GenerateDriversForXML()
     }
 
 	UnlockServerData();
+	
 	//Save our changes
 	GfParmWriteFileLocal(m_strRaceXMLFile.c_str(), params, pName);
-	
 }
 
 void Server::SetLocalDrivers()
 {
-
 	m_setLocalDrivers.clear();
 
 	m_driverIdx = GetDriverIdx();
-	GfOut("Adding Human start rank: %i\n",m_driverIdx);
+	GfLogTrace("Adding Human start rank: %i\n",m_driverIdx);
 	m_setLocalDrivers.insert(m_driverIdx-1);
 
 	assert(m_strRaceXMLFile!="");
@@ -306,10 +299,9 @@ void Server::SetLocalDrivers()
 			&&(strcmp(driver.module,HUMANROBOT)!=0))
 		{
 			m_setLocalDrivers.insert(i-1);
-			GfOut("Adding driver start rank:%i\n",i);
+			GfLogTrace("Adding driver start rank:%i\n",i);
 		}
 	}
-
 }
 
 void Server::OverrideDriverReady(int idx,bool bReady)
@@ -317,6 +309,8 @@ void Server::OverrideDriverReady(int idx,bool bReady)
 	MutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
+
+	Dump("Server::OverrideDriverReady");
 
 	SetRaceInfoChanged(true);
 }
@@ -327,6 +321,8 @@ void Server::SetDriverReady(bool bReady)
 	MutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
+
+	Dump("Server::SetDriverReady");
 
 	SendDriversReadyPacket();
 }
@@ -339,43 +335,43 @@ void Server::UpdateDriver(Driver & driver)
 
 	ServerMutexData *pSData = LockServerData();
 
+	// Search for the driver in m_vecNetworkPlayers, and update its car name if found.
 	for(unsigned int i=0;i<pSData->m_vecNetworkPlayers.size();i++)
 	{
 		if (strcmp(driver.name,pSData->m_vecNetworkPlayers[i].name)==0)
 		{
 			bNewDriver = false;
 			strncpy(pSData->m_vecNetworkPlayers[i].car,driver.car,64);
+			break;
 		}
 	}
 
-
+	// If not found, append it to m_vecNetworkPlayers
 	if (bNewDriver)
 	{
-		if (pSData->m_vecNetworkPlayers.size()==0)
-			driver.idx = 1;
-		else
-			driver.idx = pSData->m_vecNetworkPlayers.size()+1;
+		driver.idx = pSData->m_vecNetworkPlayers.size()+1;
 
 		if (!driver.client)
 		{
 			driver.address = m_pServer->address;
 		}
 
-
 		pSData->m_vecNetworkPlayers.push_back(driver);
+		
 		MutexData *pNData = LockNetworkData();
-		bool bReady = false;
-		pNData->m_vecReadyStatus.push_back(bReady);
+		pNData->m_vecReadyStatus.push_back(false);
 		UnlockNetworkData();
 	}
 
-
 	GenerateDriversForXML();
+	
 	RobotXml rXml;
 	rXml.CreateRobotFile("networkhuman",pSData->m_vecNetworkPlayers);
 
 	UnlockServerData();
 	
+	Dump("Server::UpdateDriver");
+
 	SetRaceInfoChanged(true);
 }
 
@@ -392,9 +388,9 @@ void Server::SetCarInfo(const char *pszName)
 		{
 			strncpy(vecDrivers[i].car,pszName,64);
 			UpdateDriver(vecDrivers[i]);
+			break;
 		}
 	}
-
 }
 
 void Server::CreateNetworkRobotFile()
@@ -413,7 +409,7 @@ void Server::RemoveDriver(ENetEvent event)
 	char hostName[256];
 	enet_address_get_host_ip (&address,hostName,256);
 
-    GfOut ("Client Player Info disconnect from %s\n",hostName); 
+    GfLogTrace ("Client Player Info disconnect from %s\n",hostName); 
 	
 	std::vector<Driver>::iterator p;
 
@@ -471,7 +467,6 @@ void Server::RemoveDriver(ENetEvent event)
 	}
 
 	UnlockServerData();
-
 }
 
 bool Server::SendPlayerAcceptedPacket(ENetPeer * pPeer)
@@ -557,12 +552,10 @@ void Server::SendDriversReadyPacket()
  
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 	m_bRefreshDisplay = true;
-
 }
 
 void Server::SendRaceSetupPacket()
 {
-
 	unsigned char packetId = RACEINFOCHANGE_PACKET;
 	int datasize = 1;
 
@@ -579,13 +572,12 @@ void Server::SendRaceSetupPacket()
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 
 	SetRaceInfoChanged(true);
-
 }
 
 
 void Server::ReadDriverReadyPacket(ENetPacket *pPacket)
 {
-    GfOut ("Read Driver Ready Packet\n"); 
+    GfLogTrace ("Read Driver Ready Packet\n"); 
 	
 	int idx;
 	memcpy(&idx,&pPacket->data[1],sizeof(idx));
@@ -609,7 +601,7 @@ void Server::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
 	char hostName[256];
 	enet_address_get_host_ip (&driver.address,hostName,256);
 
-    GfOut ("Client Player Info connected from %s\n",hostName); 
+    GfLogTrace ("Client Player Info connected from %s\n",hostName); 
 
 	memcpy(&driver,&pPacket->data[1],sizeof(Driver));
 
@@ -619,7 +611,7 @@ void Server::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
 	{
 		if (strcmp(driver.name,pSData->m_vecNetworkPlayers[i].name)==0)
 		{
-			SendPlayerRejectedPacket(pPeer,"Player name already used.  Please choose a different name.");
+			SendPlayerRejectedPacket(pPeer,"Player name already used. Please choose a different name.");
 			UnlockServerData();
 			return;
 		}
@@ -632,10 +624,7 @@ void Server::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
 	SendPlayerAcceptedPacket(pPeer);
 	UpdateDriver(driver);
 
-
-
-	GfOut("Reading Driver Info Packet:  Driver: %s,Car: %s\n",driver.name,driver.car);
-
+	GfLogTrace("Reading Driver Info Packet:  Driver: %s,Car: %s\n",driver.name,driver.car);
 }
 
 
@@ -653,30 +642,28 @@ void Server::PingClients()
 
        enet_peer_ping (pCurrentPeer);
     }
-
 }
 
 
 //Here you are Xavier a dynamic weather packet
 void Server::SendWeatherPacket()
 {
-		GfOut("Sending Weather Packet\n");
-
-		unsigned char  packetId = WEATHERCHANGE_PACKET;
-		//TODO add weather data here
-
-		ENetPacket * pWeatherPacket = enet_packet_create (&packetId, 
-                                              1, 
-                                              ENET_PACKET_FLAG_RELIABLE);
-
-
-		BroadcastPacket(pWeatherPacket,RELIABLECHANNEL);
-
+	GfLogTrace("Sending Weather Packet\n");
+	
+	unsigned char  packetId = WEATHERCHANGE_PACKET;
+	//TODO add weather data here
+	
+	ENetPacket * pWeatherPacket = enet_packet_create (&packetId, 
+													  1, 
+													  ENET_PACKET_FLAG_RELIABLE);
+	
+	
+	BroadcastPacket(pWeatherPacket,RELIABLECHANNEL);
 }
 
 void Server::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
 {
-	GfOut("Sending Time Packet\n");
+	GfLogTrace("Sending Time Packet\n");
 	int packetSize = 1+sizeof(double);
 	unsigned char *pData = new unsigned char[packetSize];
 	unsigned char *pDataStart = pData;
@@ -685,7 +672,7 @@ void Server::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
 	memcpy(pData,&packetId,1);
 	pData++;
 	double time = GfTimeClock();
-	GfOut("\nServer time is %lf",time);
+	GfLogTrace("\nServer time is %lf",time);
 
 	memcpy(pData,&time,sizeof(time));
 	pData+=sizeof(time);
@@ -707,17 +694,15 @@ void Server::SendFilePacket(const char *pszFile)
 	char filepath[255];
 	sprintf(filepath, "%s%s", GetLocalDir(), pszFile);
 	
-	GfOut("Sending file packet: File- %s\n",filepath);
+	GfLogTrace("Sending file packet: File- %s\n",filepath);
 
 	FILE *pFile = fopen(filepath,"rb");
 	if (!pFile)
 		return;
 
-
 	char buf[0xffff];
 	size_t size;
 	size = fread( buf, 1, 0xffff, pFile );
-
 
 	//File is to big
 	if (!feof(pFile))
@@ -745,7 +730,7 @@ void Server::SendFilePacket(const char *pszFile)
 	pData+=namelen;
 	
 	memcpy(pData,&filesize,sizeof(unsigned int));
-	GfOut("Server file size %u\n",filesize);
+	GfLogTrace("Server file size %u\n",filesize);
 	pData+=sizeof(unsigned int);
 	
 	memcpy(pData,buf,size);
@@ -755,13 +740,10 @@ void Server::SendFilePacket(const char *pszFile)
                                               ENET_PACKET_FLAG_RELIABLE);
 	
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
-
-
 }
 
 bool Server::listen()
 {
-
 	if (!m_pServer)
 		return false;
 
@@ -777,7 +759,7 @@ bool Server::listen()
 
 			enet_address_get_host_ip (&event.peer -> address,hostName,256);
 
-            GfOut ("A new client connected from %s\n",hostName); 
+            GfLogTrace ("A new client connected from %s\n",hostName); 
 
             /* Store any relevant client information here. */
             event.peer -> data = (void*)"Client information";
@@ -790,14 +772,14 @@ bool Server::listen()
             break;
            
         case ENET_EVENT_TYPE_DISCONNECT:
-			GfOut("\nA client lost the connection.\n");
+			GfLogTrace("\nA client lost the connection.\n");
 			enet_address_get_host_ip (&event.peer -> address,hostName,256);
-            GfOut ("A new client disconnected from %s\n",hostName); 
+            GfLogTrace ("A new client disconnected from %s\n",hostName); 
 
 			RemoveDriver(event);
 			SetRaceInfoChanged(true);
 
-            GfOut ("%s disconected.\n", (char*)event.peer -> data);
+            GfLogTrace ("%s disconected.\n", (char*)event.peer -> data);
 
             /* Reset the peer's client information. */
 
@@ -815,7 +797,7 @@ bool Server::listen()
 //Remove disconnected player from race track
 void Server::RemovePlayerFromRace(unsigned int idx)
 {
-	GfOut("Removing disconnected player\n");
+	GfLogTrace("Removing disconnected player\n");
 	std::vector<CarStatusPacked> vecCarStatus;
 	double time = 0.0;
 
@@ -884,7 +866,7 @@ void Server::ReadPacket(ENetEvent event)
 		switch (packetId)
 		{
 		case PLAYERINFO_PACKET:
-			GfOut("PlayerInfo Packet\n");
+			GfLogTrace("PlayerInfo Packet\n");
 			ReadDriverInfoPacket(pPacket,event.peer);
 			break;
 		case CLIENTREADYTOSTART_PACKET:
@@ -901,7 +883,7 @@ void Server::ReadPacket(ENetEvent event)
 			{
 				if (strcmp(p->name,name)==0)
 				{
-					GfOut("%s ready to start\n",&name[0]);
+					GfLogTrace("%s ready to start\n",&name[0]);
 					m_vecWaitForPlayers.erase(p);
 					break;
 				}
@@ -931,12 +913,11 @@ void Server::ReadPacket(ENetEvent event)
 			break;
 
 	default:
-			GfOut ("A packet of length %u containing %s was received from %s on channel %u.\n",
+			GfLogTrace ("A packet of length %u containing %s was received from %s on channel %u.\n",
                     event.packet -> dataLength,
                     event.packet -> data,
                     (char*)event.peer -> data,
                     event.channelID);
-
 	}
 
     enet_packet_destroy (event.packet);
@@ -944,7 +925,8 @@ void Server::ReadPacket(ENetEvent event)
 
 void Server::SendFinishTimePacket()
 {
-	GfOut("Sending finish Time Packet\n");
+	GfLogTrace("Sending finish Time Packet\n");
+	
 	int packetSize = 1+sizeof(double);
 	unsigned char *pData = new unsigned char[packetSize];
 	unsigned char *pDataStart = pData;
@@ -956,7 +938,7 @@ void Server::SendFinishTimePacket()
 	double time = pNData->m_finishTime;
 	UnlockNetworkData();
 
-	GfOut("\nServer finish time is %lf",time);
+	GfLogInfo("Server finish time is %lf",time);
 
 	memcpy(pData,&time,sizeof(time));
 	pData+=sizeof(time);
@@ -1025,3 +1007,14 @@ void Server::UnlockServerData()
 	m_ServerData.Unlock();
 }
 
+void Server::Dump(const char* pszCaller)
+{
+	MutexData *pNData = LockNetworkData();
+	ServerMutexData *pSData = LockServerData();
+
+	GfLogDebug("%s : vecReady:%u, vecPlayers:%u\n", 
+			   pszCaller, pNData->m_vecReadyStatus.size(), pSData->m_vecNetworkPlayers.size());
+	
+	UnlockServerData();
+	UnlockNetworkData();
+}

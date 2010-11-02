@@ -4,6 +4,7 @@
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -426,6 +427,7 @@ protected:
 
 	ServerMutexData m_ServerData;
 	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
+	void Dump(const char* pszCaller);
 
 
 	std::vector<Driver> m_vecWaitForPlayers;

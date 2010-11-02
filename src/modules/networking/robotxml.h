@@ -1,6 +1,28 @@
-#pragma once
-#include "network.h"
+// -*- Mode: c++ -*-
+/***************************************************************************
+    file                 : robotxml.h
+    created              : July 2009
+    copyright            : (C) 2009 Brian Gavin
+    web                  : speed-dreams.sourceforge.net
+    version              : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+#ifndef ROBOTXML_H
+#define ROBOTXML_H
+
 #include <vector>
+
+#include "network.h"
 
 class RobotXml
 {
@@ -11,3 +33,4 @@ public:
 	bool ReadRobotDrivers(const char*pRobotName,std::vector<Driver> &vecDrivers);
 };
 
+#endif // ROBOTXML_H

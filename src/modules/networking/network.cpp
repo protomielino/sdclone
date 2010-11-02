@@ -4,6 +4,7 @@
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -18,14 +19,13 @@
 
 /*
 Overview
-The network file is used for networked game play.  The server 
-computer handles all of the physics and robot AI.  The server
-sends car control(steering,brake,gas) frequently in unreliable
-packets.  The client uses these values to figure out car position and
-does its own physics calculation until the server sends the position
-information.  
+The network file is used for networked game play. 
+The server computer handles all of the physics and robot AI.
+The server sends car control (steering, brake, throttle) frequently in unreliable packets.
+The client uses these values to figure out car position
+and does its own physics calculation until the server sends the position information.  
 
-Every CAR_CONTROL_UPDATE seconds the server sends out detailed position 
+Every CAR_CONTROL_UPDATE seconds, the server sends out detailed position 
 information in a reliable ENetPacket.  All cars position information is updated
 based on the server values.
 */ 
@@ -229,7 +229,7 @@ void Network::SetRefreshDisplay(bool bStatus)
 {
 	m_bRefreshDisplay = bStatus;
 	if (!bStatus)
-		GfOut("refreshdisplay false\n");
+		GfLogDebug("refreshdisplay false\n");
 }
 
 void Network::SetRaceInfoChanged(bool bStatus)
@@ -239,20 +239,20 @@ void Network::SetRaceInfoChanged(bool bStatus)
 		m_bRefreshDisplay = true;
 
 	if (!bStatus)
-		GfOut("raceinfo false\n");
+		GfLogDebug("raceinfo false\n");
 }
 
 bool Network::IsClientMode() 
 {
-	if (m_strClass == (char*)"client")
+	if (m_strClass == "client")
 		return true;
 
 	return false;
 }
 
+// Get the index of the local network-human driver in the networkhuman interface list
 int Network::GetNetworkHumanIdx()
 {
-	
 	assert(m_strDriverName!="");
 	int idx = 1;
 
@@ -263,24 +263,20 @@ int Network::GetNetworkHumanIdx()
 	char path2[256];
 
 	int i=0;
-	const char *pName = NULL;
-
-
+	const char *pName;
 	do
 	{
 		i++;
 		sprintf(path2, "Robots/index/%d",i);
 		pName = GfParmGetStr(params, path2, "name",NULL);
-		if (pName)
-		{		
-			if (strcmp(m_strDriverName.c_str(),pName)==0)
-			{
-				idx = i;
-				break;
-			}
+		if (pName && strcmp(m_strDriverName.c_str(),pName)==0)
+		{
+			idx = i;
+			break;
 		}	
 	}
-	while(pName!=NULL);
+	while(pName);
+	
 	GfParmReleaseHandle(params);
 
 	return idx;
@@ -308,7 +304,7 @@ void Network::ClearLocalDrivers()
 void Network::SetDriverName(char *pName)
 {
 	m_strDriverName = pName;
-	printf("\nSetting driver name: %s\n", m_strDriverName.c_str());
+	GfLogInfo("Setting network driver name: %s\n", pName);
 }
 
 const char *Network::GetDriverName()
@@ -336,7 +332,7 @@ bool Network::FinishRace(double time)
 	if (time<finishTime)
 		return false;
 
-	GfOut("Finishing network race\n");
+	GfLogInfo("Finishing network race\n");
 	return true;	
 }
 
@@ -355,9 +351,9 @@ void Network::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
 {
 }
 
+// Get the index of the local network-human driver in the race driver list 
 int	Network::GetDriverIdx()
 {
-
 	int nhidx = GetNetworkHumanIdx();
 
 	assert(m_strRaceXMLFile!="");
@@ -365,24 +361,29 @@ int	Network::GetDriverIdx()
 	void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
 	assert(params);
 
-    int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);	
-	//Gather vector of all non human drivers
-	std::vector<Driver> vecRDrivers;
+	int nDriverIdx = -1;
+	
+    const int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 	for (int i=1;i<=nCars;i++)
 	{
 		Driver driver;
 		ReadDriverData(driver,i,params);
-		if ((driver.idx == nhidx)&&(strcmp(NETWORKROBOT,driver.module)==0))
+		if (driver.idx == nhidx && strcmp(NETWORKROBOT,driver.module) == 0)
 		{
-			GfParmReleaseHandle(params);
-			return i;
+			nDriverIdx = i;
+			break;
 		}
 	}
 
-	GfOut("\n\n\nUnable to GetDriverIdx %s\n",m_strDriverName.c_str());
-	return -1;
+	GfParmReleaseHandle(params);
+
+	if (nDriverIdx == -1)
+		GfLogError("Unable to GetDriverIdx %s\n", m_strDriverName.c_str());
+	
+	return nDriverIdx;
 }
 
+// Get the Driver instance with given index in the race driver list (= the race XML file)
 void Network::ReadDriverData(Driver &driver,int index,void *params)
 {
 	char path2[256];
@@ -390,8 +391,6 @@ void Network::ReadDriverData(Driver &driver,int index,void *params)
 	const char *pMod = GfParmGetStr(params, path2, RM_ATTR_MODULE,NULL);
 	strncpy(&driver.module[0],pMod,64);
 	driver.idx = (int)GfParmGetNum(params, path2, RM_ATTR_IDX, NULL,-1);
-	
-	
 }
 
 void Network::WriteDriverData(Driver driver,int index,void *params)
@@ -400,7 +399,6 @@ void Network::WriteDriverData(Driver driver,int index,void *params)
 	sprintf(path2, "%s/%d", RM_SECT_DRIVERS, index);
 	GfParmSetStr(params, path2, RM_ATTR_MODULE,driver.module);
 	GfParmSetNum(params, path2, RM_ATTR_IDX, NULL,(tdble)driver.idx);
-
 }
 
 std::string Network::GetNetworkDriverName()
@@ -415,7 +413,6 @@ bool Network::SetCurrentDriver()
 	assert(params);
 
 	const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	
 
 	std::string strDriver = GetNetworkDriverName();
 	if (strDriver =="")
@@ -429,6 +426,7 @@ bool Network::SetCurrentDriver()
 	GfParmWriteFileLocal("config/graph.xml", params, pName);
 
 	GfParmReleaseHandle(params);
+	
 	return true;
 }
 
@@ -490,7 +488,7 @@ void Network::SendCarStatusPacket(tSituation *s,bool bForce)
 		//Only transmit local drivers to other clients
 		if (m_setLocalDrivers.find(pCar->info.startRank)!=m_setLocalDrivers.end())
 		{
-			GfOut("Sending car info: %s,startRank=%i\n",pCar->info.name,pCar->info.startRank);
+			GfLogTrace("Sending car info: %s,startRank=%i\n",pCar->info.name,pCar->info.startRank);
 			CarStatusPacked status;
 			status.topSpeed = pCar->race.topSpeed;
 			status.state = pCar->pub.state;
@@ -556,7 +554,6 @@ void Network::SendCarControlsPacket(tSituation *s)
 	std::vector<CarControlsPacked> vecPackedCtrls;
 	double time = 0.0;
 
-
 	//Pack controls values to reduce data size of packet
 	for (int i = 0; i < s->raceInfo.ncars; i++) 
 	{
@@ -581,7 +578,6 @@ void Network::SendCarControlsPacket(tSituation *s)
 	time = s->currentTime;
 
 	m_sendCtrlTime = s->currentTime;
-
 
 	int iNumCars = vecPackedCtrls.size();
 	int packetSize = 1+sizeof(time)+iNumCars*sizeof(iNumCars)+iNumCars*(sizeof(CarControlsPacked));
@@ -640,7 +636,6 @@ void Network::ReadLapStatusPacket(ENetPacket *pPacket)
 
 void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 {
-
 	unsigned char *pData = &pPacket->data[1];
 	
 	//time
@@ -672,7 +667,6 @@ void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 		status.dammage = statusPacked.dammage;
 		
 		status.time = packettime;
-	
 		
 		bool bFound = false;
 		for (unsigned int i=0;i<pNData->m_vecCarStatus.size();i++)
@@ -687,9 +681,9 @@ void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 				}
 				else
 				{
-					GfOut("Rejected car status from startRank %i\n",status.startRank);
+					GfLogTrace("Rejected car status from startRank %i\n",status.startRank);
 				}
-				GfOut("Recieved car status from startRank %i\n",status.startRank);
+				GfLogTrace("Recieved car status from startRank %i\n",status.startRank);
 			}
 		}
 
@@ -700,9 +694,6 @@ void Network::ReadCarStatusPacket(ENetPacket *pPacket)
 	}
 
 	UnlockNetworkData();
-	
-
-
 }
 
 void Network::GetHostSettings(std::string &strCarCat,bool &bCollisions)
@@ -713,6 +704,7 @@ void Network::GetHostSettings(std::string &strCarCat,bool &bCollisions)
 	assert(params);
 
 	strCarCat = GfParmGetStr(params, RM_SECT_HEADER,RM_ATTR_CAR_CATEGORY,"All");
+	
 	//TODO
 	bCollisions = true;
 }
@@ -765,7 +757,7 @@ void Network::ReadCarControlsPacket(ENetPacket *pPacket)
 				}
 				else
 				{
-					GfOut("Rejected car control from startRank %i\n",ctrl.startRank);
+					GfLogTrace("Rejected car control from startRank %i\n",ctrl.startRank);
 				}
 			}
 		}
@@ -795,7 +787,7 @@ bool NetworkInit()
 {
 	// Initialize SDL.
 	if ( SDL_Init(SDL_INIT_TIMER) < 0 ) {
-		GfOut("NetworkInit : Couldn't initialize SDL: %s\n", SDL_GetError());
+		GfLogTrace("NetworkInit : Couldn't initialize SDL: %s\n", SDL_GetError());
 		return false;
 	}
 
@@ -855,7 +847,6 @@ void SetClient(bool bStatus)
 		AddNetworkTimer();
 	else
 		RemoveNetworkTimer();
-
 }
 
 bool IsServer()
