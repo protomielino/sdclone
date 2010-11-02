@@ -8,7 +8,7 @@
       <attstr name="name" val="Online Race"/>
       <attstr name="description" val="Online Race"/>
       <attnum name="priority" val="10"/>
-      <attstr name="menu image" val="data/img/splash-networkrace.png"/>
+      <attstr name="menu image" val="data/img/splash-networkrace.jpg"/>
     </section>
 
     <section name="Tracks">

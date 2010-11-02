@@ -157,26 +157,38 @@ onChangeCarCategory(void * pData)
 	
 }
 
-std::string GetTrackImagePath(const char *pszCategory,const char *pszTrack)
+std::string GetTrackPreviewFileName(const char *pszCategory, const char *pszTrack)
 {
-	char buf[1024];
-    snprintf(buf,1024, "tracks/%s/%s/%s.png", pszCategory,pszTrack,pszTrack);
-         
-	std::string str = buf;
-	return str;
+	char buf[256];
+
+	// Try JPEG first.
+    snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.jpg", pszCategory, pszTrack, pszTrack);
+    buf[255] = 0; /* snprinf manual is not clear about that ... */
+
+	// Then PNG if not found.
+	if (!GfFileExists(buf))
+	{
+		snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.png", pszCategory, pszTrack, pszTrack);
+		buf[255] = 0; /* snprinf manual is not clear about that ... */
+	}
+
+	// Then fallback.
+	if (!GfFileExists(buf))
+		strncpy(buf, "data/img/splash-networkrace.jpg", sizeof(buf));
+	
+	return std::string(buf);
 }
 
-std::string GetOutlineFileName(const char *pszCategory,const char *pszTrack)
+std::string GetTrackOutlineFileName(const char *pszCategory,const char *pszTrack)
 {
-	char buf[1024];
-    snprintf(buf,1024, "tracks/%s/%s/outline.png", pszCategory,pszTrack);
-         
+	char buf[256];
 
-	if (!ulFileExists(buf))
-		snprintf(buf,1024, "data/img/transparent.png");
+    snprintf(buf, sizeof(buf), "tracks/%s/%s/outline.png", pszCategory, pszTrack);
 	
-	std::string str = buf;
-	return str;
+	if (!GfFileExists(buf))
+		strncpy(buf, "data/img/transparent.png", sizeof(buf));
+	
+	return std::string(buf);
 }
 
 void 
@@ -211,8 +223,10 @@ UpdateNetworkPlayers()
 	sprintf(buf, "%i", laps);
 	GfuiLabelSetText(racemanMenuHdle,g_lapsHd,buf);
 
-	GfuiScreenAddBgImg(racemanMenuHdle,GetTrackImagePath(strCategory.c_str(),strTrackPath.c_str()).c_str());
-	GfuiStaticImageSet(racemanMenuHdle, g_OutlineId,GetOutlineFileName(strCategory.c_str(),strTrackPath.c_str()).c_str());
+	GfuiScreenAddBgImg(racemanMenuHdle,
+					   GetTrackPreviewFileName(strCategory.c_str(),strTrackPath.c_str()).c_str());
+	GfuiStaticImageSet(racemanMenuHdle, g_OutlineId,
+					   GetTrackOutlineFileName(strCategory.c_str(),strTrackPath.c_str()).c_str());
 
 	// Update category info
 	std::string strCarCat;
@@ -384,7 +398,7 @@ void CheckDriversCategory()
 }
 
 void
-GufiHostServerIdle(void)
+HostServerIdle(void)
 {
 	GfuiIdle();
 	if (IsServer())
@@ -410,11 +424,14 @@ GufiHostServerIdle(void)
 
 		GfelPostRedisplay();
 	}
+	
+    /* Let CPU take breath (and fans stay at low and quiet speed) */
+    GfuiSleep(0.001);
 }
 
 
 void
-GufiClientIdle(void)
+ClientIdle(void)
 {
 	GfuiIdle();
 	if (IsClient())
@@ -444,6 +461,9 @@ GufiClientIdle(void)
 
 		GfelPostRedisplay();
 	}
+	
+    /* Let CPU take breath (and fans stay at low and quiet speed) */
+    GfuiSleep(0.001);
 }
 
 void NetworkRaceInfo()
@@ -473,7 +493,7 @@ void NetworkDisplay(void)
 
 static void OnActivateNetworkClient(void *)
 {
-	GfelSetIdleCB(GufiClientIdle);
+	GfelSetIdleCB(ClientIdle);
 }
 
 
@@ -491,7 +511,7 @@ static void OnActivateNetworkHost(void *)
 	ReInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(ReInfo->params);
 	ReInfo->_reName = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	GfelSetIdleCB(GufiHostServerIdle);	
+	GfelSetIdleCB(HostServerIdle);	
 	GetServer()->SetRefreshDisplay(true);
 }
 
@@ -702,7 +722,7 @@ reNetworkClientConnectMenu(void * /* dummy */)
 
 	UpdateNetworkPlayers();
 	GfuiScreenActivate(racemanMenuHdle);
-	GfelSetIdleCB(GufiClientIdle);
+	GfelSetIdleCB(ClientIdle);
 }
 
 static void 

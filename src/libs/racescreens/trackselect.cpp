@@ -76,14 +76,26 @@ rmtsFreeLists(void *vl)
 static char*
 rmtsGetPreviewFileName(char* previewNameBuf, unsigned previewNameBufSize)
 {
-    snprintf(previewNameBuf, previewNameBufSize, "tracks/%s/%s/%s.png", CategoryList->name,
-	     ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
+	// Try JPEG first.
+    snprintf(previewNameBuf, previewNameBufSize, "tracks/%s/%s/%s.jpg", CategoryList->name,
+			 ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
     previewNameBuf[previewNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
-	if (!ulFileExists(previewNameBuf))
-	{
-		snprintf(previewNameBuf,previewNameBufSize,"data/img/splash-trackselect.png");
 
+	// Then PNG if not found.
+	if (!GfFileExists(previewNameBuf))
+	{
+		snprintf(previewNameBuf, previewNameBufSize, "tracks/%s/%s/%s.png", CategoryList->name,
+				 ((tFList*)CategoryList->userData)->name, ((tFList*)CategoryList->userData)->name);
+		previewNameBuf[previewNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
 	}
+
+	// Then fallback.
+	if (!GfFileExists(previewNameBuf))
+	{
+		snprintf(previewNameBuf,previewNameBufSize,"data/img/splash-trackselect.jpg");
+		previewNameBuf[previewNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
+	}
+	
     return previewNameBuf;
 }
 
@@ -91,14 +103,16 @@ static char *
 rmtsGetOutlineFileName(char* outlineNameBuf, unsigned outlineNameBufSize)
 {
     snprintf(outlineNameBuf, outlineNameBufSize, "tracks/%s/%s/outline.png", CategoryList->name,
-	     ((tFList*)CategoryList->userData)->name);
+			 ((tFList*)CategoryList->userData)->name);
     outlineNameBuf[outlineNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
-	if (!ulFileExists(outlineNameBuf))
+	
+	if (!GfFileExists(outlineNameBuf))
 	{
 		snprintf(outlineNameBuf,outlineNameBufSize,"data/img/transparent.png");
-
+		outlineNameBuf[outlineNameBufSize-1] = 0; /* snprinf manual is not clear about that ... */
 	}
-    return outlineNameBuf;
+
+	return outlineNameBuf;
 }
 
 
