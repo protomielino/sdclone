@@ -11,8 +11,12 @@ ROBOT_MODULE(NAME ${ROBOT_NAME}
              SOURCES ${ROBOT_SOURCES})
 
 ROBOT_DATA(NAME ${ROBOT_NAME}
-           FILES ${ROBOT_NAME}.xml preferences.xml car.xml logo.png
+           FILES logo.png
            SUBDIRS cars PATTERNS *.xml)
+
+ROBOT_DATA(NAME ${ROBOT_NAME}
+           FILES ${ROBOT_NAME}.xml preferences.xml car.xml
+           USER)
 
 # TODO: Check if link to client is really needed.
 ADD_SDLIB_LIBRARY(${ROBOT_NAME} tgf client)
