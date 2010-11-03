@@ -652,7 +652,7 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		GfParmWriteFile(NULL, PrefHdle, "Human");
 	}
 
-	sprintf(car->_msgCmd[0], "%s %s", (HCtx[idx]->ParamAbs ? "ABS" : ""), (HCtx[idx]->ParamAsr ? "ASR" : ""));
+	sprintf(car->_msgCmd[0], "%s %s", (HCtx[idx]->ParamAbs ? "ABS" : ""), (HCtx[idx]->ParamAsr ? "TCS" : ""));
 	memcpy(car->_msgColorCmd, color, sizeof(car->_msgColorCmd));
 
 	if (((cmd[CMD_SPDLIM].type == GFCTRL_TYPE_JOY_BUT) && (joyInfo->levelup[cmd[CMD_SPDLIM].val] == 1)) ||
