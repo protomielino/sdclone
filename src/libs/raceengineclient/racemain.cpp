@@ -195,7 +195,7 @@ ReRaceEventInit(void)
 			GfLogWarning( "Results weren't read correctly !!!\n" );
 	}
 
-	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
+	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	
 	ReInitTrack();
 	if( ReInfo->_reGraphicItf.inittrack )
@@ -370,7 +370,7 @@ reRaceRealStart(void)
 	//If neither a qualification, nor a practice and has results, load race splash
 	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) ||
 	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)) {
-		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
+		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	}
 
 	//Load drivers for the race
@@ -533,7 +533,7 @@ ReRaceStart(void)
 		// Race loading screen
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
-			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
+			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 			RmLoadingScreenSetText("Preparing Starting Grid ...");
 		} else {
 			RmShutdownLoadingScreen();
@@ -556,7 +556,7 @@ ReRaceStart(void)
 	}
 	else
 	{
-		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.png");
+		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 		RmLoadingScreenSetText("Preparing Starting Grid ...");
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);

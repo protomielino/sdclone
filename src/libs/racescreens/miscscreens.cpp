@@ -187,7 +187,7 @@ RmFiveStateScreen(char const *title,
 	GfuiScreenRelease(fiveStateHdle);
     }
     fiveStateHdle = GfuiMenuScreenCreate(title);
-    GfuiScreenAddBgImg(fiveStateHdle, "data/img/splash-quit.png");
+    GfuiScreenAddBgImg(fiveStateHdle, "data/img/splash-quit.jpg");
 
     GfuiMenuButtonCreate(fiveStateHdle,
 			 label2, tip2, screen2,

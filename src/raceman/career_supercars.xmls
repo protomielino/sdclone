@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
-    file        : champ.xml
-    created     : Sat Jan 25 08:58:03 CET 2003
-    copyright   : (C) 2003 by Eric Espié                         
-    email       : Eric.Espie@torcs.org   
-    version     : $Id$                                  
+    file        : career_supercars.xml
+    created     : 2009
+    copyright   : (C) 2009 by Mart Kelder                         
+    web         : www.speed-dreams.org
+    version     : $Id$
+
 -->
 
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -14,15 +15,15 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="Supercars Championship %A" type="param" mode="mw" version="1.0">
+<params name="Supercars Championship %A" type="param" mode="mw" version="1.1">
 
   <section name="Header">
     <attform name="name" val="#Supercars Championship # + toAlpha(number)"/>
     <attform name="description" val="#Supercars Championship # + toAlpha(number)"/>
     <attnum name="priority" val="30"/>
-    <attstr name="menu image" val="data/img/splash-dtm.png"/>
-    <attstr name="run image" val="data/img/splash-run-practice.png"/>
-    <attstr name="start image" val="data/img/splash-dtm.png"/>
+    <attstr name="menu image" val="data/img/splash-dtm.jpg"/>
+    <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
+    <attstr name="start image" val="data/img/splash-dtm.jpg"/>
     <section name="Subfiles">
       <attstr name="is subfile" val="yes" />
       <attstr name="suffix" val="supercars" />

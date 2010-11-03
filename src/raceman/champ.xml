@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- 
+    file        : champ.xml
+    created     : Sat Jan 25 08:58:03 CET 2003
+    copyright   : (C) 2003 by Eric Espie                         
+    email       : Eric.Espie@torcs.org   
+    version     : $Id$
+-->
+
+<!--    This program is free software; you can redistribute it and/or modify  -->
+<!--    it under the terms of the GNU General Public License as published by  -->
+<!--    the Free Software Foundation; either version 2 of the License, or     -->
+<!--    (at your option) any later version.                                   -->
+
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Championship" version="1.0">
+<params name="Championship" version="1.1">
   <section name="Header">
     <attstr name="name" val="Championship"/>
     <attstr name="description" val="Championship"/>
     <attnum name="priority" val="30"/>
-    <attstr name="menu image" val="data/img/splash-dtm.png"/>
-    <attstr name="run image" val="data/img/splash-run-practice.png"/>
-		<attstr name="start image" val="data/img/splash-dtmstart.png"/>
+    <attstr name="menu image" val="data/img/splash-dtm.jpg"/>
+    <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
+		<attstr name="start image" val="data/img/splash-dtmstart.jpg"/>
   </section>
 
   <section name="Tracks">
