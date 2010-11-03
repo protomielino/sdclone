@@ -58,6 +58,8 @@ SimWheelConfig(tCar *car, int index)
 	} else {
 		wheel->relPos.ax = wheel->staticPos.ax;
 	}
+	wheel->cosax = cos(wheel->relPos.ax);
+	wheel->sinax = sin(wheel->relPos.ax);
 
 	wheel->lfMin = MIN(0.8f, wheel->lfMin);
 	wheel->lfMax = MAX(1.6f, wheel->lfMax);
@@ -103,6 +105,7 @@ SimWheelConfig(tCar *car, int index)
 	wheel->feedBack.Tq = 0.0f;
 	wheel->feedBack.brkTq = 0.0f;
 	wheel->rel_vel = 0.0f;
+	wheel->torques.x = wheel->torques.y = wheel->torques.z = 0.0f;
 }
 
 
@@ -276,9 +279,25 @@ SimWheelUpdateRotation(tCar *car)
 {
 	int i;
 	tWheel *wheel;
+	tdble deltan;
+	tdble cosaz, sinaz;
 
 	for (i = 0; i < 4; i++) {
 		wheel = &(car->wheel[i]);
+		/*calculate gyroscopic forces*/
+		cosaz = cos(wheel->relPos.az);
+		sinaz = sin(wheel->relPos.az);
+		if( (i == 0) || (i == 1) ){
+			wheel->torques.y = wheel->torques.x * sinaz;
+			wheel->torques.x = wheel->torques.x * cosaz;
+		} else {
+			wheel->torques.x = wheel->torques.y =0.0;
+		}
+		deltan = -(wheel->in.spinVel - wheel->prespinVel) * wheel->I / SimDeltaTime;
+		wheel->torques.x -= deltan * wheel->cosax *sinaz;
+		wheel->torques.y += deltan * wheel->cosax *cosaz;
+		wheel->torques.z = deltan * wheel->sinax;
+		/*update rotation*/
 		wheel->spinVel = wheel->in.spinVel;
 		FLOAT_RELAXATION2(wheel->spinVel, wheel->prespinVel, 50.0f);
 

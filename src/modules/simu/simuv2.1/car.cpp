@@ -167,7 +167,7 @@ SimCarUpdateForces(tCar *car)
 	SinTheta = (-car->wheel[FRNT_RGT].zRoad - car->wheel[REAR_RGT].zRoad
 		+ car->wheel[FRNT_LFT].zRoad + car->wheel[REAR_LFT].zRoad) / (2.0 * car->wheeltrack);
 	F.F.y = -w * SinTheta;
-	F.F.z = w; /* not 3D */
+	F.F.z = w - (F.F.x*F.F.x + F.F.y*F.F.y)/(2.0*w);/*Taylor-polinom of sqrt(w^2-F.F.x^2-F.F.y^2)*/
 	F.M.x = F.M.y = F.M.z = 0;
 	
 	/* Wheels */
@@ -179,10 +179,13 @@ SimCarUpdateForces(tCar *car)
 		/* moments */
 		F.M.x += car->wheel[i].forces.z * car->wheel[i].staticPos.y +
 			car->wheel[i].forces.y * (car->statGC.z + car->wheel[i].rideHeight);
+		F.M.x += car->wheel[i].torques.x;
 		F.M.y -= car->wheel[i].forces.z * car->wheel[i].staticPos.x +
 			car->wheel[i].forces.x * (car->statGC.z + car->wheel[i].rideHeight);
+		F.M.y += car->wheel[i].torques.y;
 		F.M.z += -car->wheel[i].forces.x * car->wheel[i].staticPos.y +
 			car->wheel[i].forces.y * car->wheel[i].staticPos.x;
+		F.M.z += car->wheel[i].torques.z;
 	}
 	
 	/* Aero Drag */

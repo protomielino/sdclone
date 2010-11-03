@@ -31,6 +31,7 @@ typedef struct
 
     /* dynamic */
     t3Dd	forces;		/* forces acting on car */
+    t3Dd	torques;	/* torques acting on car (gyroscopic forces) */
     tdble	rollRes;	/* Rolling Resistance (summed over the car) */
     tdble	rideHeight;	/* height of the bottom of the car */
     tdble	zRoad;		/* z of the road */
@@ -56,6 +57,7 @@ typedef struct
     /* static */
     tPosd	staticPos;	/* pos relative to the GC (z is suspension travel at rest) */
 				/* and angles are camber (ax), caster (ay) and toe (az) */
+    tdble   cosax, sinax;/*cosinus and sinus of relPos.ax*/
     tdble	rollCenter;
 
     tdble  	weight0;	/* initial weight on this wheel */

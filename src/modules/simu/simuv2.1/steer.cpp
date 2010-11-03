@@ -51,10 +51,18 @@ SimSteerUpdate(tCar *car)
 	steer2 = atan2((car->wheelbase * tanSteer) , (car->wheelbase - tanSteer * car->wheeltrack));
 
 	if (steer > 0) {
+		car->wheel[FRNT_RGT].torques.x = 
+		car->wheel->cosax * (steer2 - car->wheel[FRNT_RGT].steer) * car->wheel[FRNT_RGT].prespinVel * car->wheel[FRNT_RGT].I / SimDeltaTime;
 		car->wheel[FRNT_RGT].steer = steer2;
+		car->wheel[FRNT_LFT].torques.x = 
+		car->wheel->cosax * (steer - car->wheel[FRNT_LFT].steer) * car->wheel[FRNT_LFT].prespinVel * car->wheel[FRNT_LFT].I / SimDeltaTime;
 		car->wheel[FRNT_LFT].steer = steer;
 	} else {
+		car->wheel[FRNT_RGT].torques.x = 
+		car->wheel->cosax * (steer - car->wheel[FRNT_RGT].steer) * car->wheel[FRNT_RGT].prespinVel * car->wheel[FRNT_RGT].I / SimDeltaTime;
 		car->wheel[FRNT_RGT].steer = steer;
+		car->wheel[FRNT_LFT].torques.x = 
+		car->wheel->cosax * (-steer2 - car->wheel[FRNT_LFT].steer) * car->wheel[FRNT_LFT].prespinVel * car->wheel[FRNT_LFT].I / SimDeltaTime;
 		car->wheel[FRNT_LFT].steer = -steer2;
 	}
 }
