@@ -2,14 +2,14 @@
 // unitdriver.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2010.10.22
+// Last changed : 2010.11.04
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -456,24 +456,17 @@ private:
 	void CalcSkilling_simplix_MPA1();
 	void CalcSkilling_simplix_SC();
 
-	double CalcFriction_simplix(double Crv);
+	double CalcFriction_simplix_Identity(double Crv);
 	double CalcFriction_simplix_TRB1(double Crv);
 
 	double CalcCrv_simplix(double Crv);
-	double CalcCrv_simplix_TRB1(double Crv);
+	double CalcCrv_simplix_Identity(double Crv);
 	double CalcCrv_simplix_SC(double Crv);
 	double CalcCrv_simplix_36GP(double Crv);
-	double CalcCrv_simplix_MPA1(double Crv);
 	double CalcCrv_simplix_LS1(double Crv);
-	double CalcCrv_simplix_MP5(double Crv);
 
-	double CalcHairpin_simplix(double Crv);
-	double CalcHairpin_simplix_TRB1(double Crv);
-	double CalcHairpin_simplix_SC(double Crv);
-	double CalcHairpin_simplix_36GP(double Crv);
-	double CalcHairpin_simplix_MPA1(double Crv);
+	double CalcHairpin_simplix_Identity(double Crv);
 	double CalcHairpin_simplix_LS1(double Crv);
-	double CalcHairpin_simplix_MP5(double Crv);
 
 	void UseFilterAccel(){oUseFilterAccel = true;};
 	void UseAccelOut(){oUseAccelOut = true;};

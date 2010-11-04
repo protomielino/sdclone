@@ -2,14 +2,14 @@
 // unitdriver.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Class for driving and driver/robot
 // Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.10.23
+// Last changed : 2010.11.04
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -3677,54 +3677,15 @@ double TDriver::CalcCrv_simplix(double Crv)
   }
   else
     return 1.0;
-/*
-  if (oCrvComp)
-  {
-    if (Crv < 0.0025) 
-	  return 1.0;
-    else
-      return 1.25 * (1 + Crv);
-  }
-  else
-    return 1.0;
-*/
 }
 //==========================================================================*
 
 //==========================================================================*
-// simplix_TRB1
+// If not used for a carset
 //--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_TRB1(double Crv)
+double TDriver::CalcCrv_simplix_Identity(double Crv)
 {
   return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_MPA1
-//--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_MPA1(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_MP5
-//--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_MP5(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_LS1
-//--------------------------------------------------------------------------*
-double TDriver::CalcCrv_simplix_LS1(double Crv)
-{
-  return MAX(0.75,MIN(3.0,350000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(3.0,600000.0 * Crv * Crv * Crv));
 }
 //==========================================================================*
 
@@ -3754,7 +3715,6 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
 {
   double Offset = 1300;
 
-//  if ((oCrvComp) && (!oGoToPit))
   if (oCrvComp)
   {
     if (Crv < 0.0085) 
@@ -3775,73 +3735,18 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
 //==========================================================================*
 
 //==========================================================================*
-// simplix
+// If not used for a carset
 //--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix(double Crv)
+double TDriver::CalcHairpin_simplix_Identity(double Crv)
 {
   return 1.0;
 }
 //==========================================================================*
 
 //==========================================================================*
-// simplix_TRB1
+// If not used for a carset
 //--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_TRB1(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_MPA1
-//--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_MPA1(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_LS1
-//--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_LS1(double Crv)
-{
-  return MAX(0.75,MIN(5.0,300000.0 * Crv * Crv * Crv));
-  //return MAX(0.75,MIN(5.0,600000.0 * Crv * Crv * Crv));
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_MP5
-//--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_MP5(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_sc
-//--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_SC(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix_36GP
-//--------------------------------------------------------------------------*
-double TDriver::CalcHairpin_simplix_36GP(double Crv)
-{
-  return 1.0;
-}
-//==========================================================================*
-
-//==========================================================================*
-// simplix
-//--------------------------------------------------------------------------*
-double TDriver::CalcFriction_simplix(const double Crv)
+double TDriver::CalcFriction_simplix_Identity(const double Crv)
 {
   return 1.0;
 }
@@ -3868,7 +3773,7 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
 	oXXX = MIN(1.0,oXXX+0.0003);
 
   double FrictionFactor = 0.95;
-/**/
+
   if (AbsCrv > 0.10)
     FrictionFactor = 0.46;
   else if (AbsCrv > 0.05)
@@ -3883,31 +3788,6 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
     FrictionFactor = 0.93;
   else if (AbsCrv > 0.005)
     FrictionFactor = 0.95;
-/**/
-/*/
-  if (AbsCrv > 0.10)
-    FrictionFactor = 0.15;
-  else if (AbsCrv > 0.09)
-    FrictionFactor = 0.2;
-  else if (AbsCrv > 0.08)
-    FrictionFactor = 0.25;
-  else if (AbsCrv > 0.07)
-    FrictionFactor = 0.3;
-  else if (AbsCrv > 0.06)
-    FrictionFactor = 0.35;
-  else if (AbsCrv > 0.05)
-    FrictionFactor = 0.4;
-  else if (AbsCrv > 0.04)
-    FrictionFactor = 0.55;
-  else if (AbsCrv > 0.03)
-    FrictionFactor = 0.65;
-  else if (AbsCrv > 0.02)
-    FrictionFactor = 0.8;
-  else if (AbsCrv > 0.01)
-    FrictionFactor = 0.85;
-  else if (AbsCrv > 0.005)
-    FrictionFactor = 0.9;
-/*/
 
   return FrictionFactor * oXXX;
 }

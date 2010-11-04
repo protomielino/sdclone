@@ -122,7 +122,7 @@ ROBOT_DATA(NAME simplix_36GP PREFIX simplix_36GP
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
 
 # SuperCars
-SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 12 13
+SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 12 13
                   sc-boxer-96 sc-spirit-300 sc-cavallo-360 sc-fmc-gt4 
                   sc-lynx-220 sc-murasama-nsx
                   tracks)
@@ -131,20 +131,22 @@ ROBOT_DATA(NAME simplix_sc PREFIX simplix_sc
            FILES simplix_sc.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
 
-# LS-GT1
-SET(ROBOT_SUBDIRS 0 1 2 3 4 5 8 9 12 13
-                  ls1-toro-rgt ls1-cavallo-570s1 ls1-newcastle-fury ls1-archer-r9
-                  ls1-zentek-z7r ls1-taipan-ltsr ls1-vulture-v6r 
-                  tracks)
+# LS1 
+SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13
+                  ls1-archer-r9 ls1-vulture-v6r ls1-toro-rgt
+                  ls1-cavallo-570s1 ls1-zentek-z7r ls1-newcastle-fury
+			ls1-taipan-ltsr
+			tracks)
 
 ROBOT_DATA(NAME simplix_ls1 PREFIX simplix_ls1 
            FILES simplix_ls1.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
 
 # TRB1
-SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13
-                  trb1-boxer-trbrs trb1-sector-rb1 trb1-spirit-rb1lt
-                  trb1-cavallo-360rb trb1-silber-rblk trb1-taipan-rb1 trb1-zaxxon-rb
+SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
+                  trb1-cavallo-360rb trb1-boxer-trbrs trb1-spirit-rb1lt
+			trb1-taipan-rb1 trb1-silber-rblk trb1-sector-rb1
+                  trb1-zaxxon-rb trb1-vieringe-5rb
                   tracks)
 
 ROBOT_DATA(NAME simplix_trb1 PREFIX simplix_trb1 
