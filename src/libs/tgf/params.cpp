@@ -3135,7 +3135,7 @@ GfParmCheckHandle(void *ref, void *tgt)
 		    if ((curParam->valnum < curParamRef->min) || (curParam->valnum > curParamRef->max)) {
 			GfLogError("GfParmCheckHandle: parameter \"%s\" out of bounds: min:%g max:%g val:%g in (\"%s\" - \"%s\")\n",
 				curParamRef->fullName, curParamRef->min, curParamRef->max, curParam->valnum, conf->name, conf->filename);
-			//error = -2; // Uncomment to stop and get error messages
+			error = -2; // Uncomment to stop and get error messages
 		    }
 		} else {
 		    curWithinRef = GF_TAILQ_FIRST (&(curParamRef->withinList));
@@ -3150,7 +3150,7 @@ GfParmCheckHandle(void *ref, void *tgt)
 		    if (!found && strcmp (curParamRef->value, curParam->value)) {
 			GfLogError("GfParmCheckHandle: parameter \"%s\" value:\"%s\" not allowed in (\"%s\" - \"%s\")\n",
 				curParamRef->fullName, curParam->value, conf->name, conf->filename);
-			//error = -3; // Uncomment to stop and get error messages
+			error = -3; // Uncomment to stop and get error messages
 		    }
 		}
 	    }
