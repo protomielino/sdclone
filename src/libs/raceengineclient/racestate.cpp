@@ -173,13 +173,26 @@ ReStateManage(void)
 				break;
 		}
 
-	} while ((mode & (RM_SYNC | RM_QUIT)) == RM_SYNC);
+		// If this mode is set, there was a serious error:
+		// I.e. no driver in the race (no one selected OR parameters out of range!
+		// Instead of exit(0) go back to the config mode to allow to read the 
+		// error messages in the console window!
+		// TODO: Define another screen showing the error messages instead of
+		// only having it in the console window!
+		if (mode & RM_QUIT) {
+			GfScrShutdown();
+			ReInfo->_reState = RE_STATE_CONFIG;
+			mode = RM_SYNC;
+		}
+//	} while ((mode & (RM_SYNC | RM_QUIT)) == RM_SYNC);
+	} while ((mode & RM_SYNC) == RM_SYNC);
 
+/* Will not happen any longer
 	if (mode & RM_QUIT) {
 		GfScrShutdown();
-		exit (0);		/* brutal isn't it ? */
+		exit (0);		// brutal isn't it ? 
 	}
-
+*/
 	if (mode & RM_ACTIVGAMESCR) {
 		GfuiScreenActivate(ReInfo->_reGameScreen);
 	}

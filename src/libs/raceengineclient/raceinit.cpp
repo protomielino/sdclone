@@ -39,6 +39,7 @@
 #include <graphic.h>
 
 #include "teammanager.h"
+#include "timeanalysis.h"
 #include "racescreens.h"
 
 #include "racesituation.h"
@@ -540,6 +541,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   char path[256];
   char path2[256];
   char buf[256];
+  char buf2[256];
   char const *str;
   char const *category;
   char const *teamname;
@@ -684,9 +686,29 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       strncpy(elt->_category, category, MAX_NAME_LEN - 1);
       elt->_category[MAX_NAME_LEN - 1] = 0;
       /* Read Car Category specifications */
-      cathdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-      if (GfParmCheckHandle(cathdle, carhdle)) {
-        GfLogError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+      sprintf(buf2, "categories/%s.xml", elt->_category);
+      cathdle = GfParmReadFile(buf2, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	  int errorcode = 0;
+      if (errorcode = GfParmCheckHandle(cathdle, carhdle)) 
+	  {
+        switch (errorcode)
+		{
+		  case -1:
+            GfLogError("Car %s NOT in category %s (driver %s) !!!\n", elt->_carName, category, elt->_name);
+		    break;
+
+		  case -2:
+            GfLogError("Parameters out of bound for car %s (driver %s)!!!\n",elt->_carName, elt->_name);
+		    break;
+
+		  case -3:
+            GfLogError("Parameter not allowed for car %s (driver %s)!!!\n",elt->_carName, elt->_name);
+		    break;
+
+		  default:
+            GfLogError("Unknown error for %s (driver %s)!!!\n",elt->_carName, elt->_name);
+		    break;
+	    } 
         return NULL;
       }
       carhdle = GfParmMergeHandles(cathdle, carhdle,
@@ -806,7 +828,23 @@ ReInitCars(void)
           /* We have the right driver : load it */
           elt = reLoadSingleCar( index, i, j, robotIdx, TRUE, robotModuleName );
           if (!elt)
-            GfLogError("No descriptor file for robot %s (1)\n", robotModuleName);
+		  {
+            GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
+			snprintf(buf, sizeof(buf), "Error: May be no driver or parameters out of bound!!!");
+	        RmLoadingScreenSetText(buf);
+			snprintf(buf, sizeof(buf), "Error: Have a look to the console window to get the detailed error messages!!!");
+	        RmLoadingScreenSetText(buf);
+			snprintf(buf, sizeof(buf), "Error: Will go back to the config menu in 10 secs!!!");
+	        RmLoadingScreenSetText(buf);
+			// Wait some time to allow to read the message!
+            RtInitTimer(); // Check existance of Performance Counter Hardware
+	        double Duration; 
+	        double StartTimeStamp = RtTimeStamp(); 
+			do
+			{
+              Duration = RtDuration(StartTimeStamp);
+			} while (Duration < 10000); // 10 seconds
+		  }
         }
       }
     }
