@@ -208,7 +208,7 @@ reConfigRunState(void)
 				}
 			}
 		}
-		RmRaceParamMenu(&rp);
+		RmRaceParamsMenu(&rp);
 	}
 
 	curConf++;

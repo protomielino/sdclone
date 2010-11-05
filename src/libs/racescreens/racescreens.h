@@ -116,7 +116,7 @@ RACESCREENS_API void *RmFiveStateScreen(char const *title,
 RACESCREENS_API void RmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr);
 
 
-RACESCREENS_API void RmRaceParamMenu(void *vrp);
+RACESCREENS_API void RmRaceParamsMenu(void *vrp);
 
 RACESCREENS_API void RmShowStandings(void *prevHdle, tRmInfo *info);
 

@@ -567,12 +567,27 @@ typedef struct
     void	  *params;	/**< Parameters handle */
     char	  *internalname; /**< Internal name of the track */
     const char	  *category;	/**< Category of the track */
-    int		  weather;	/**< Cloud number */
-    int		  Timeday;   /**< time */
-    int		  Rain;
-    int		  rainprob;
-    int		  rainlprob; /** Probability little rain */
-    int		  probrain;	 /** Probability normal rain */
+    int		  clouds;	/**< Clouds coverage in sky (from 1 = clear sky, to 8 = 100% gray sky */
+#define TR_CLOUDS_NONE   1
+#define TR_CLOUDS_FEW    3
+#define TR_CLOUDS_SCARCE 5
+#define TR_CLOUDS_MANY   7
+#define TR_CLOUDS_FULL  8
+    int		  water;	/**< Water on the ground */
+#define TR_WATER_NONE	0
+#define TR_WATER_LITTLE	1
+#define TR_WATER_SOME	2
+#define TR_WATER_MUCH	3
+    int		  timeofday;   /**< Time of day */
+    int		  rain;  /**< Rain strength */
+#define TR_RAIN_NONE 0
+#define TR_RAIN_LITTLE 1
+#define TR_RAIN_MEDIUM 2
+#define TR_RAIN_HEAVY  3
+#define TR_RAIN_RANDOM 4
+    int		  rainprob; /**< Likelyhood of having ??? rain */
+    int		  rainlprob; /**< Likelyhood of having little rain */
+    int		  probrain;	 /**< Likelyhood of having normal rain */
     int		  nseg;		/**< Number of segments */
     int		  version;	/**< Version of the track type */
     int		  skyversion;   /**< Version Sky */

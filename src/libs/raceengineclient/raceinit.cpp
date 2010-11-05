@@ -948,8 +948,10 @@ reDumpTrack(const tTrack *track, int verbose)
       break;
     }//switch pits.type
     
-  GfLogInfo("TimeOfDay= %d\n", track->Timeday);
-  GfLogInfo("Weather  = %d\n", track->weather);
+  GfLogInfo("TimeOfDay= %d\n", track->timeofday);
+  GfLogInfo("Clouds   = %d\n", track->clouds);
+  GfLogInfo("Rain     = %d\n", track->rain);
+  GfLogInfo("Water    = %d\n", track->water);
 
   if (verbose) {
     int i;
@@ -1005,108 +1007,96 @@ reDumpTrack(const tTrack *track, int verbose)
 int
 ReInitTrack(void)
 {
-  const char  *trackName;
-  const char  *catName;
-  const char  *raceName;
-  const char  *cloudA;
+	static const char *RainValueNames[] =
+		{ RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, RM_VAL_RAIN_HEAVY,
+		  RM_VAL_RAIN_RANDOM };
+	static const int NRainValues = sizeof( RainValueNames ) / sizeof( const char* );
+	
+	static const char* CloudsValueNames[] =
+		{ RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE,
+		  RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL };
+	static const int NCloudsValues = sizeof( CloudsValueNames ) / sizeof( const char* );
+	static const int CloudsValues[NCloudsValues] =
+		{ TR_CLOUDS_NONE, TR_CLOUDS_FEW, TR_CLOUDS_SCARCE,
+		  TR_CLOUDS_MANY, TR_CLOUDS_FULL };
 
-  void  *params = ReInfo->params;
-  void  *results = ReInfo->results;
+	const char  *trackName;
+	const char  *catName;
+	const char  *raceName;
+	const char  *cloudA;
+
+	void  *params = ReInfo->params;
+	void  *results = ReInfo->results;
   
-  raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
+	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 
-  int curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
-  sprintf(buf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-  trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
-  if (!trackName)
-    return -1;
+	int curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+	sprintf(buf, "%s/%d", RM_SECT_TRACKS, curTrkIdx);
+	trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
+	if (!trackName)
+		return -1;
 
-  catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
-  if (!catName) 
-    return -1;
+	catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
+	if (!catName) 
+		return -1;
 
-  GfLogDebug("Race Name is '%s'\n", raceName);
-  sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
-  ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
+	GfLogDebug("Race Name is '%s'\n", raceName);
+	sprintf(buf, "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
+	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
-  sprintf(buf, "Loading track %s", ReInfo->track->name);
-  RmLoadingScreenSetText(buf);
+	sprintf(buf, "Loading track %s", ReInfo->track->name);
+	RmLoadingScreenSetText(buf);
 
-  int rain = 0;
-  int cloud = 0;
-  int Timeday = GfParmGetNum(params, raceName, RM_ATTR_TIME, NULL, 0);
-  //int cloud = GfParmGetNum(params, raceName, RM_ATTR_WEATHER, NULL, 0);
-  int weather_rain = GfParmGetNum(params, raceName, RM_ATTR_WEATHER_RAIN, "l/m2/h", 0 );
-  switch (weather_rain)
-  {
-  case 1:  
-	  rain = 1;
-	  break;  
-  case 5:	  
-	  rain = 2;
-	  break;
-  case 20:
-	  rain = 3;
-	  break;
-  default:
-	  rain = 0;
-	  break;
-  }
+	int rain = TR_RAIN_NONE;
+	const char* pszRain =
+		GfParmGetStr(params, raceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
+	for (int i = 0; i < NRainValues; i++)
+		if (!strcmp(pszRain, RainValueNames[i]))
+		{
+			rain = i;
+			break;
+		}
 
-  cloudA = GfParmGetStr(params, raceName, RM_ATTR_WEATHER_CLOUDS, RM_VAL_NO_CLOUDS );
-  //printf("CloudA = %s", cloudA);
-  
-  if( strcmp( "clear sky", cloudA) == 0)
-  {
-	cloud = 1;
-	//printf(" Cloud type = %d", cloud);
-  }
-  else if( strcmp( "scarce clouds", cloudA) == 0)
-  {
-	cloud = 2;
-	//printf(" Cloud type = %d", cloud);
-  }
-  else if( strcmp( "more clouds", cloudA) == 0)
-  {
-	cloud = 3;
-	//printf(" Cloud type = %d", cloud);
-  }
-  else if( strcmp( "overcast clouds", cloudA) == 0)
-  {
-	cloud = 4;
-	//printf(" Cloud type = %d", cloud);
-  }
+	int clouds = TR_CLOUDS_NONE;
+	const char* pszClouds =
+		GfParmGetStr(params, raceName, RM_ATTR_CLOUDS, RM_VAL_CLOUDS_NONE);
+	for (int i = 0; i < NCloudsValues; i++)
+		if (!strcmp(pszClouds, CloudsValueNames[i]))
+		{
+			clouds = CloudsValues[i];
+			break;
+		}
 
-  int cloud1 = cloud + rain;
-  //printf (" Cloud init = %d", cloud1);
+	const int timeofday = (int)GfParmGetNum(params, raceName, RM_ATTR_TIME_OF_DAY, NULL, 0);
 
-  ReInfo->track->Timeday = Timeday;
-  ReInfo->track->weather = cloud1;
+	ReInfo->track->timeofday = timeofday;
+	ReInfo->track->clouds = clouds; // Initial value : ReStartWeather may change it.
+	ReInfo->track->rain = rain; // Initial value : ReStartWeather may change it.
 
-  reDumpTrack(ReInfo->track, 0.0);
+	reDumpTrack(ReInfo->track, 0.0);
 
-  ReStartWeather();
+	ReStartWeather();
 
-  //DEBUG WEATHER - Verification function update friction
+	//DEBUG WEATHER - Verification function update friction
 #ifdef DEBUG
-// No use since already done in that ReTrackUpdate is always called by ReStartWeather. 
-//   tTrack *track = ReInfo->track;
-//   GfLogDebug("ReInitTrack : Track params : clouds=%d, rain=%d l/m2/h\n",
-// 			 cloudA, weather_rain);
-//   GfLogDebug("ReInitTrack : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
-// 			 track->Timeday, track->weather, track->Rain, track->rainprob, track->rainlprob);
-//   GfLogDebug("ReInitTrack : kFriction, kRollRes for each track surface :\n");
-//   tTrackSurface *curSurf;
-//   curSurf = track->surfaces;
-//   do {
-// 	  GfLogDebug("                   %.4f, %.4f   %s\n",
-// 				 curSurf->kFriction, curSurf->kRollRes, curSurf->material);
-// 	  curSurf = curSurf->next;
-//   } while ( curSurf );
+	// No use since already done in that ReTrackUpdate is always called by ReStartWeather. 
+	//   tTrack *track = ReInfo->track;
+	//   GfLogDebug("ReInitTrack : Track params : clouds=%d, rain=%d\n",
+	// 			 clouds, rain);
+	//   GfLogDebug("ReInitTrack : Track timeday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
+	// 			 track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
+	//   GfLogDebug("ReInitTrack : kFriction, kRollRes for each track surface :\n");
+	//   tTrackSurface *curSurf;
+	//   curSurf = track->surfaces;
+	//   do {
+	// 	  GfLogDebug("                   %.4f, %.4f   %s\n",
+	// 				 curSurf->kFriction, curSurf->kRollRes, curSurf->material);
+	// 	  curSurf = curSurf->next;
+	//   } while ( curSurf );
 #endif
-  // End Function DEBUG TRACE Variable kFriction
+	// End Function DEBUG TRACE Variable kFriction
   
-  return 0;
+	return 0;
 }//ReInitTrack
 
 

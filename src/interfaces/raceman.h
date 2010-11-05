@@ -307,10 +307,9 @@ typedef struct RmInfo
 #define RM_ATTR_DISTANCE	"distance"
 #define RM_ATTR_LAPS		"laps"
 #define RM_ATTR_SESSIONTIME	"sessiontime"
-#define RM_ATTR_WEATHER		"weather"
-#define RM_ATTR_WEATHER_CLOUDS	"weather clouds"
-#define RM_ATTR_WEATHER_RAIN    "weather rain"
-#define RM_ATTR_TIME		"Time"
+#define RM_ATTR_CLOUDS	    "clouds"
+#define RM_ATTR_RAIN        "rain"
+#define RM_ATTR_TIME_OF_DAY		"time of day"
 #define RM_ATTR_QUAL_LAPS	"Qualification laps"
 #define RM_ATTR_POLE		"pole position side"
 #define RM_ATTR_CARSPERPIT	"cars per pit"
@@ -338,10 +337,17 @@ typedef struct RmInfo
 #define RM_VAL_INVISIBLE	"results only"
 #define RM_VAL_SIMUSIMU		"simulation simulation"
 
-#define RM_VAL_NO_CLOUDS	"no clouds"
-#define RM_VAL_SCARCE_CLOUDS	"scarce clouds"
-#define RM_VAL_MORE_CLOUDS	"more clouds"
-#define RM_VAL_OVERCAST_CLOUDS	"overcast clouds"
+#define RM_VAL_CLOUDS_NONE	"clear"
+#define RM_VAL_CLOUDS_FEW	"few clouds"
+#define RM_VAL_CLOUDS_SCARCE	"scarce clouds"
+#define RM_VAL_CLOUDS_MANY	"many clouds"
+#define RM_VAL_CLOUDS_FULL	"whole gray"
+
+#define RM_VAL_RAIN_NONE	"none"
+#define RM_VAL_RAIN_LITTLE	"little"
+#define RM_VAL_RAIN_MEDIUM	"medium"
+#define RM_VAL_RAIN_HEAVY	"heavy"
+#define RM_VAL_RAIN_RANDOM	"random"
 
 /* Movie capture */
 

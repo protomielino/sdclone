@@ -505,8 +505,8 @@ ReRaceStart(void)
 	// Some debug traces about weather/rain parameters.
 #ifdef DEBUG
 	tTrack *track = ReInfo->track;
-	GfLogDebug("ReRaceStart : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
-			   track->Timeday, track->weather, track->Rain, track->rainprob, track->rainlprob);
+	GfLogDebug("ReRaceStart : Track timeofday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
+			   track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
 	GfLogDebug("ReRaceStart : kFriction, kRollRes for each track surface :\n");
 	tTrackSurface *curSurf;
 	curSurf = track->surfaces;

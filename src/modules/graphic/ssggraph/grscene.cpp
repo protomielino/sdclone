@@ -46,10 +46,6 @@
 #define NB_BG_FACES	36	//Background faces
 #define BG_DIST			1.0f
 #define SKYDYNAMIC_THR	12000	//Skydynamic setting threshold. No dynamic sky below that.
-#define CLEAR_CLOUD 1
-#define MORE_CLOUD 6
-#define SCARCE_CLOUD 5
-#define COVERAGE_CLOUD 8
 enum {SUN = 0, MOON};	//Celestial bodies
 
 int grWrldX;
@@ -76,7 +72,7 @@ ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
 
-static int RainBool = 0;
+static int Rain = 0;
 static int skydynamic = 0;
 static int TimeDyn = 0;
 static int WeatherDyn = 0;
@@ -195,12 +191,12 @@ grInitScene(void)
 		glEnable(GL_LIGHTING);
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
-	} else 
+	}
+	else 
 	{
-		/** If dynamic sky is needed, we create the Sun, the Moon,
-		 * some stars and clouds */
-		//Query the time
+		/** If dynamic sky is needed, we create the Sun, the Moon, some stars and the clouds */
 
+		//Query the time
 		static ulClock ck;
 		//float sd;
 		//float sd2;
@@ -230,41 +226,36 @@ grInitScene(void)
         bodies[SUN] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), skydynamic, true);
 		GLfloat	sunpos1 = 0.0f;
 		GLfloat	sunpos2 = 0.0f;
-		int cloudtype = 0;
 		sunpos1 = (float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_HOUR, (char*)NULL, sunpos1);
 		sunpos2 = (float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_SUN_H, (char*)NULL, sunpos2);
 
-		int Timeday = grTrack->Timeday;
-		if (Timeday > 0)
+		int timeofday = grTrack->timeofday;
+		switch (timeofday) 
 		{
-			switch (grTrack->Timeday) 
-			{
-				case 1:
-					sd = -90.0f;
-					//bodies[SUN]->setDeclination ( -90.0 * SGD_DEGREES_TO_RADIANS);
-					break;
+			case 1:
+				sd = -90.0f;
+				//bodies[SUN]->setDeclination ( -90.0 * SGD_DEGREES_TO_RADIANS);
+				break;
 					
-				case 2:
-					sd = 2.0f;
-					//bodies[SUN]->setDeclination ( 2.0 * SGD_DEGREES_TO_RADIANS);
-					break;
+			case 2:
+				sd = 2.0f;
+				//bodies[SUN]->setDeclination ( 2.0 * SGD_DEGREES_TO_RADIANS);
+				break;
 					
-				case 3:
-					sd = 30.0f;
-					//bodies[SUN]->setDeclination ( 30.0 * SGD_DEGREES_TO_RADIANS);
-					break;
+			case 3:
+				sd = 30.0f;
+				//bodies[SUN]->setDeclination ( 30.0 * SGD_DEGREES_TO_RADIANS);
+				break;
 					
-				case 4:
-					sd = 85.0f;
-					//bodies[SUN]->setDeclination ( 85.0 * SGD_DEGREES_TO_RADIANS);
-					break;
-			}//switch Timeday
-		} else 
-		{ //if quickrace
-			sd = ((sunpos1 / 3600) * 15.0f) - 90.0f;
-			printf("Sunpos1 = %f - SD = %f\n", sunpos1, sd);
-			//if sunpos
-		}//else if quickrace
+			case 4:
+				sd = 85.0f;
+				//bodies[SUN]->setDeclination ( 85.0 * SGD_DEGREES_TO_RADIANS);
+				break;
+					
+			default: //if quickrace
+				sd = ((sunpos1 / 3600) * 15.0f) - 90.0f;
+				GfLogDebug("Sunpos1 = %f - SD = %f\n", sunpos1, sd);
+		}//switch timeofday
 
 		bodies[SUN]->setDeclination ( sd * SGD_DEGREES_TO_RADIANS);
 		bodies[SUN]->setRightAscension ( sunpos2 * SGD_DEGREES_TO_RADIANS);
@@ -281,32 +272,13 @@ grInitScene(void)
 		bodies[MOON]->setRightAscension ( ((rand() % 240)) * SGD_DEGREES_TO_RADIANS );
 
 		//Add clouds
+		int cloudsState = grTrack->clouds;
 
-		if(Timeday > 0) 
-		{
-			switch (grTrack->weather) 
-			{
-				case 1 : cloudtype = CLEAR_CLOUD; break;
-				case 2 : cloudtype = MORE_CLOUD; break;
-				case 3 : cloudtype = SCARCE_CLOUD; break;
-				case 4 : cloudtype = COVERAGE_CLOUD; break;
-				case 5 :
-				case 6 :
-				case 7 : cloudtype = COVERAGE_CLOUD;
-				default : cloudtype = CLEAR_CLOUD;
-			}//switch cloud
-		}
-		else
-			cloudtype = grTrack->weather;
-
-		if (RainBool > 0)
-			cloudtype = 8;
-
-		printf("Cloud = %d", cloudtype);
+		GfLogDebug("Cloud = %d", cloudsState);
 
 		grCloudLayer *clouds[MAX_CLOUDS] = { NULL };
-		sprintf(buf, "data/textures/scattered%d.rgba", cloudtype);//scattered1, scattered2, etc
-		if (RainBool > 0)
+		sprintf(buf, "data/textures/scattered%d.rgba", cloudsState);//scattered1, scattered2, etc
+		if (Rain > 0)
 			clouds[0] = Sky->addCloud(buf, skydynamic, 650, 400 * div, 400 * div);
 		else
 			clouds[0] = Sky->addCloud(buf, skydynamic, 2550, 100 * div, 100 * div);
@@ -329,32 +301,32 @@ grInitScene(void)
     	Sky->repositionFlat(solposn , 0, dt);    
 
 		//If it rains, decrease visibility
-    		if(RainBool > 0) 
-    		{
-			switch (RainBool)	
+		if(Rain > 0) 
+		{
+			switch (Rain)	
 			{
 				case 1 : Sky->modifyVisibility( 400.0f, (float)dt); break;
 				case 2 : Sky->modifyVisibility( 500.0f, (float)dt); break;
 				case 3 : Sky->modifyVisibility( 550.0f, (float)dt); break;
 
-    			}//switch RainBool
+    			}//switch Rain
 	
 			//grRain.drawPrecipitation(1, 1.0, 1.0, 1.0, 0.0, 0.0, 5.0, 10.0);
-     		}
-     		else 
-     			Sky->modifyVisibility( 0.0f, (float)dt);
-     		//if RainBool
+		}
+		else 
+			Sky->modifyVisibility( 0.0f, (float)dt);
+     	//if Rain
     
-    		double sol_angle = bodies[SUN]->getAngle();
-    		double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
-    		double scene_brightness = pow(sky_brightness, 0.5);
+		double sol_angle = bodies[SUN]->getAngle();
+		double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
+		double scene_brightness = pow(sky_brightness, 0.5);
         
 		sky_color[0] = base_sky_color[0] * (float)sky_brightness;
 		sky_color[1] = base_sky_color[1] * (float)sky_brightness;
 		sky_color[2] = base_sky_color[2] * (float)sky_brightness;
 		sky_color[3] = base_sky_color[3];
 		
-		if (RainBool > 0)
+		if (Rain > 0)
 		{
 			base_fog_color[0] = 0.40f;
 			base_fog_color[1] = 0.43f;
@@ -498,11 +470,11 @@ grLoadScene(tTrack *track)
 	grWrldZ = (int)(track->max.z - track->min.z + 1);
 	grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 
-	RainBool = grTrack->Rain;
-	GfLogTrace("Rain = %d\n", RainBool);
+	Rain = grTrack->rain;
+	GfLogTrace("Rain = %d\n", Rain);
 
 	//acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
-	/*if ((grTrack->Timeday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
+	/*if ((grTrack->timeofday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
 		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC3, "track.ac");
 	else*/
 		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
@@ -558,9 +530,9 @@ grDrawScene(float speedcar, tSituation *s)
 	if (bDrawSky) 
 	{
 		Sky->postDraw(skydynamic);
-		if(RainBool > 0)
+		if(Rain > 0)
 		{
-			grRain.drawPrecipitation(RainBool, 1.0, 0.0, 0.0, 0.0, speedcar);
+			grRain.drawPrecipitation(Rain, 1.0, 0.0, 0.0, 0.0, speedcar);
 		}
 	
 	} 

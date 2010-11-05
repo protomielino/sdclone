@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Practice" version="1.0">
+<params name="Practice" version="1.1">
 
   <section name="Header">
     <attstr name="name" val="Practice"/>
@@ -50,9 +50,9 @@
     <attstr name="display results" val="yes"/>
     <attnum name="distance" unit="km" val="0"/>
     <attnum name="sessiontime" unit="s" val="0"/>
-    <attnum name="weather rain" unit="l/m2/h" val="0"/>
-    <attstr name="weather clouds" val="scarce clouds"/>
-    <attnum name="Time" val="0"/>
+    <attnum name="rain" val="none"/>
+    <attstr name="clouds" val="scarce clouds"/>
+    <attnum name="time of day" val="0"/>
     <section name="Starting Grid">
       <attnum name="rows" val="1"/>
       <attnum name="distance to start" val="100"/>

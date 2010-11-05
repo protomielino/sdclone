@@ -22,9 +22,9 @@
     @version	$Id$
 */
 
-/* Changes by wdbee:
+/* Changes by wdbee (moved to interfaces/track by Jean-Philippe) :
   #define RAIN_VAL_LITTLE, RAIN_VAL_NORMAL, RAIN_VAL_HEAVY in raceweather.h
-    To make it usabel for robots.
+    To make it usable by robots.
 
   curSurf->kFrictionDry = curSurf->kFriction; 
     Store initial value for calculation of the rain intensity.
@@ -36,6 +36,7 @@
 #include <ctime>
 
 #include <raceman.h>
+#include <track.h>
 
 #include "racesituation.h"
 #include "raceweather.h"
@@ -43,12 +44,13 @@
 // Start Weather
 void ReStartWeather(void)
 {
-	int	cloud;
-	int Timeday;
+	int timeofday;
 	int	rain;
+	int	clouds;
+	int	water;
+	int	rainprob;
 	int problrain;
 	int probrain;
-	int	rainbool;
 	int	resul;
 	int resul2;
 	tTrack *track = ReInfo->track;
@@ -56,59 +58,52 @@ void ReStartWeather(void)
 	 // TODO: Move this inside TGF initialization, or so (in order to have it done only once).
 	srand((unsigned)time(NULL));
 	
-	cloud = track->weather;
-	Timeday = track->Timeday;
-
-	if (Timeday > 0)
+	timeofday = track->timeofday;
+	clouds = track->clouds;
+	rain = track->rain;
+	
+	//if (timeofday > 0)
+	if (rain != TR_RAIN_RANDOM)
 	{
-		GfLogDebug("ReStartWeather : Using loaded rain params\n");
-		rainbool = track->weather;
-		rainbool = rainbool - 4;
+		GfLogInfo("ReStartWeather : Using loaded rain (%d) and clouds (%d) settings\n",
+				  rain, (rain != TR_RAIN_NONE) ? TR_CLOUDS_FULL : clouds);
 	}
 	else
 	{
-		GfLogDebug("ReStartWeather : Using random rain params\n");
-		rain = track->rainprob;
-		cloud = 1 + (int)(rand()/(float)RAND_MAX * 7); //random cloud on Track when championship or career
-		track->weather = cloud; // cloud = random cloud
+		// Randow clouds (if no rain).
+		clouds = 1 + (int)(rand()/(float)RAND_MAX * 7); //random clouds on Track when championship or career
+		resul = 1 + (int)(rand()/(float)RAND_MAX * 99); // rain probability, if result < rainprob, then it rains
 
-		resul = 1 + (int)(rand()/(float)RAND_MAX * 99); // probability rain, if result < rain, so it rain
-		//GfLogDebug("Result =  %d - Rain = %d\n", resul, rain);
-		if (resul < rain)
+		// Random rain.
+		rainprob = track->rainprob;
+		GfLogDebug("Result =  %d - RainProb = %d\n", resul, rainprob);
+		if (resul < rainprob)
 		{
 			problrain = track->rainlprob;
 			probrain = track->probrain;
-			track->weather = 8; // it rain so cloud coverage selected
 			resul2 = 1 + (int)(rand()/(float)RAND_MAX * 99); 
 			if (resul2 < (problrain + 1)) // if result2 < probability little rain, so rain = little rain
-			{
-				rainbool = RAIN_VAL_LITTLE;
-				//GfLogDebug("RainBool = %d\n", rainbool);
-			}
+				rain = TR_RAIN_LITTLE;
 			else if (resul2 < (probrain +1)) // if result2 < probability normal rain, so rain = normal rain
-			{
-				rainbool = RAIN_VAL_NORMAL;
-				//GfLogDebug("RainBool = %d\n", rainbool);
-			}
+				rain = TR_RAIN_MEDIUM;
 			else // result2 > probability normal rain so rain = Heavy rain
-			{
-				rainbool = RAIN_VAL_HEAVY;
-   			//GfLogDebug("RainBool = %d\n", rainbool);
-			}
+				rain = TR_RAIN_HEAVY;
 		}
 		else
-			rainbool = 0;
-			
+			rain = TR_RAIN_NONE;
+		
+		GfLogInfo("ReStartWeather : Using random rain (%d) and clouds (%d) settings\n",
+				  rain, (rain != TR_RAIN_NONE) ? TR_CLOUDS_FULL : clouds);
 	}
 
-//rainbool = RAIN_VAL_LITTLE;
-//rainbool = RAIN_VAL_NORMAL;
-//rainbool = RAIN_VAL_HEAVY;
+//rain = TR_RAIN_NONE;
+//rain = TR_RAIN_LITTLE;
+//rain = TR_RAIN_MEDIUM;
+//rain = TR_RAIN_HEAVY;
 
-	if (rainbool > 0)
-		track->Rain = rainbool;
-	else
-		track->Rain = 0;
+	track->rain = rain;
+	track->clouds = (rain != TR_RAIN_NONE) ? TR_CLOUDS_FULL : clouds; // rain => heavy clouds
+	track->water = track->rain; // Hard link between rain and gound water ; may change in the future
 	
 	ReTrackUpdate();
 }
@@ -117,10 +112,10 @@ void ReStartWeather(void)
 void ReTrackUpdate(void)
 {
 	tTrack *track = ReInfo->track;
-	int rain = track->Rain;
+	int rain = track->rain;
 
-	GfLogDebug("ReTrackUpdate : Track timeday=%d, weather=%d, rain=%d, rainp=%d, rainlp=%d\n",
-			   track->Timeday, track->weather, track->Rain, track->rainprob, track->rainlprob);
+	GfLogDebug("ReTrackUpdate : Track timeofday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
+			   track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
 	GfLogDebug("ReTrackUpdate : kFriction, kRollRes for each track surface :\n");
 
 	tTrackSurface *curSurf;

@@ -39,7 +39,7 @@ static int grSmokeMaxNumber;
 static double grSmokeDeltaT;
 static double grFireDeltaT;
 static double grSmokeLife;
-static int rain;
+static int grWater;
 
 
 static ssgSimpleState *mst = NULL;	//Smoke img
@@ -236,13 +236,13 @@ grAddSmoke(tCarElt *car, const double t)
 							}
 						}//if car->priv.wheel
 						
-						//!Rain can change the tire smoke attributes.
-						rain = grTrack->Rain;
+						//! Ground water can change the tire smoke attributes.
+						grWater = grTrack->water;
 
-						if (rain > 0)	
+						if (grWater > 0)	
 						{
 							sd.Init(0.6f, 0.6f, 0.6f, 0.45f, 0.0f, 10.5f, 0.25f);
-						}//if Rainbool
+						}//if grWater
 
 						//!Add smoke
 						cGrSmoke tmp;
@@ -513,7 +513,7 @@ cGrSmoke::Update(const double t)
 	smoke->vvy -= damp * smoke->vvy * fabs(smoke->vvy) * dt;
 	smoke->vvz -= damp * smoke->vvz * fabs(smoke->vvz) * dt;
 	
-	if (rain > 0)	
+	if (grWater > 0)	
 	{
 		smoke->vvx += 0.0039f;
 		smoke->vvy += 0.0039f;
