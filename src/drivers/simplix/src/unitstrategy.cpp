@@ -2,17 +2,17 @@
 // unitstrategy.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Pitstop strategy
 // Boxenstop-Strategie
 //
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2009.07.26
+// Last changed : 2010.11.06
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -348,12 +348,12 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMaxFuel =            
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Maximal möglicher
 	PRV_MAX_FUEL,(char*) NULL,oMaxFuel);         //   Tankinhalt
-  GfOut("#oMaxFuel (private) = %.1f\n",oMaxFuel);
+  //GfOut("#oMaxFuel (private) = %.1f\n",oMaxFuel);
 
   oStartFuel =            
 	GfParmGetNum(*CarSettings,TDriver::SECT_PRIV,         // Tankinhalt beim Start
 	PRV_START_FUEL,(char*) NULL,(float) oStartFuel);          
-  GfOut("#oStartFuel (private) = %.1f\n",oStartFuel);
+  //GfOut("#oStartFuel (private) = %.1f\n",oStartFuel);
 
   if ((!TDriver::Qualification)                  // Fürs Rennen 
 	  && (oStartFuel > 0))
@@ -367,7 +367,7 @@ double TSimpleStrategy::SetFuelAtRaceStart
   oMinLaps = (int)           
 	  GfParmGetNum(*CarSettings,TDriver::SECT_PRIV, // Mindestanzahl an Runden
 	PRV_MIN_LAPS,(char*) NULL,(float) oMinLaps); //   die mit dem Tankinhalt
-  GfOut("#oMinLaps (private) = %d\n",oMinLaps);  //   möglich sein müssen
+  //GfOut("#oMinLaps (private) = %d\n",oMinLaps);  //   möglich sein müssen
 
   if (Fuel == 0)                                 // Wenn nichts bekannt ist,
     Fuel = oMaxFuel;                             // Volltanken
@@ -566,7 +566,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  { // We can't stop here (to early or to late)
 	    if (oPit->oPitLane[0].Overrun(TrackPos))
 		{ // if to late
-			GfOut("#Overrun 1: %g\n",TrackPos);
+			//GfOut("#Overrun 1: %g\n",TrackPos);
 		  PitRelease();
 	      oState = PIT_EXIT_WAIT;
 	      // pit stop finished, need to exit pits now.
@@ -590,13 +590,13 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  oPitTicker++;                              // Check time to start service
 	  if (oPitTicker > 150)                      // Check Timer
 	  { // If we have to wait to long
-		  GfOut("#oPitTicker: %d\n",oPitTicker);
+		  //GfOut("#oPitTicker: %d\n",oPitTicker);
 	    PitRelease();                            // Something went wrong, we have 
 	    oState = PIT_EXIT_WAIT;                  // to leave and release pit for teammate
 	  }
 	  else if (oPit->oPitLane[0].Overrun(TrackPos))
 	  { // If we couldn't stop in place
-		  GfOut("#Overrun 2: %g\n",TrackPos);
+		  //GfOut("#Overrun 2: %g\n",TrackPos);
 	    PitRelease();                            // We have to release the pit
 	    oState = PIT_EXIT_WAIT;                  // for teammate
 	  }
@@ -624,7 +624,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
         oPitStartTicker--;
         if (oPitStartTicker < 0)
 		{
-  		  GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
+  		  //GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
 	      oState = PIT_EXIT;
 		}
 		oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;    // Only small lights on           
