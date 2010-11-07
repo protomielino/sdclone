@@ -20,17 +20,18 @@ Tracks:
 * new Brondehach track :  HQ texture rework + localization + no more real-life brands 
     + better drivable track sides
 * Improved Goldstone Sand (reworked textures + made pit wall compatible with robots)
-* Texture improvements : Forza, Corkscrew, Aalborg
+* Texture improvements : Forza, Corkscrew, Aalborg, Migrants
 
 Cars:
 * T01 : Final fine tuned LS1 setups with updated engine sounds
-* Reworked Spirit RB1 LT (3D model, speedo/tachometer)
+* Reworked Spirit RB1 LT (3D model, speedo/tachometer, texture)
 * Many new livery skins for LS1 cars
 * New TRB1 Vieringe 5 RB and liveries (human + USR setups ??)
 * #191 Added e-brake power parameters for SuperCars (and RSs)
 * #222 Skinnable pit door logo, 3D wheels and interior (when choosing a car livery skin)
 * Renamed GP1600 category to MP5
 * Moved WR cars to the RS category (Rally Series) and optimized artwork file sizes.
+* Improved reflections for all cars
 
 Robots:
 * D38 : New Kilo2008 robot with skilling, setup for the TRB1 Cavallo 360 RB and LS1 Archer R9
