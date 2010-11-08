@@ -86,7 +86,11 @@ class LRaceLine {
   LRaceLine() {}
   virtual ~LRaceLine() {}
 
-  inline void setCar(tCarElt * const car) {m_pCar = car;}
+  inline double rinverse(void) const { return seg_[next_].tRInverse; }
+  inline double rinverse(const double distance) const {
+    int d = ((next_ + static_cast<int>(distance / div_length_)) % divs_);
+    return seg_[d].tRInverse; }
+  inline void set_car(tCarElt * const car) {car_ = car;}
 
   void InitTrack(const tTrack * const track, void **carParmHandle,
                   const tSituation *s, const double filterSideSkill);
@@ -97,53 +101,46 @@ class LRaceLine {
   void GetPoint(const double offset, const double lookahead,
                   vec2f * const rt) const;
   bool isOnLine(void) const;
-  double correctLimit(void) const;
-  inline double getRInverse(void) const {return m_Seg[Next].tRInverse;}
-  inline double getRInverse(const double distance) const {
-    int d = ((Next + static_cast<int>(distance / m_lDivLength)) % m_cDivs);
-    return m_Seg[d].tRInverse;
-  }
+  double CorrectLimit(void) const;
 
  private:
+  double rinverse(const int prev, const double x, const double y,
+                      const int next, const int rl) const;
   void SetSegmentInfo(const tTrackSeg * pseg, const int i, const double l);
+  void SetSegmentCamber(const tTrackSeg *seg, const int div);
   void SplitTrack(const tTrack * const ptrack, const int rl,
                       const tSituation *s);
-  double getRInverse(const int prev, const double x, const double y,
-                      const int next, const int rl) const;
   void AdjustRadius(int prev, int i, int next, double TargetRInverse, int rl,
-            double Security = 0);
+                      double Security = 0);
   void Smooth(const int Step, const int rl);
   void StepInterpolate(int iMin, int iMax, int Step, int rl);
   void Interpolate(int Step, int rl);
-  double getAvoidSpeed(const double distance1, const double distance2) const;
-  void SetSegCamber(const tTrackSeg *seg, const int div);
 
  private:
-  double m_dMinCornerInverse;
-  double m_dCornerSpeed;
-  double m_dCornerAccel;
-  double m_dBrakeDelay;
-  double m_dIntMargin;
-  double m_dExtMargin;
-  double m_dAvoidSpeedAdjust;
-  double m_dSecurityRadius;
-  tCarElt * m_pCar;
+  tCarElt *car_;
+  double min_corner_inverse_;
+  double corner_speed_;
+  double corner_accel_;
+  double brake_delay_;
+  double int_margin_;
+  double ext_margin_;
+  double avoid_speed_adjust_;
+  double security_radius_;
+  double wheel_base_;
+  double wheel_track_;
 
-  double m_dWheelBase;
-  double m_dWheelTrack;
-
-  int m_cDivs;
-  int m_lDivLength;
-  double m_dTargetSpeed;
-  double m_dWidth;
+  int divs_;
+  int div_length_;
+  double target_speed_;
+  double width_;
 
   // first: segment index, second: elem length
-  std::vector< std::pair<int, double> > m_SegInfo;
+  std::vector< std::pair<int, double> > seg_info_;
 
-  std::vector<rlSegment> m_Seg;
+  std::vector<rlSegment> seg_;
 
-  int Next;
-  int This;
+  int next_;
+  int this_;
 };
 
 #endif  // SRC_DRIVERS_KILO2008_RACELINE_H_

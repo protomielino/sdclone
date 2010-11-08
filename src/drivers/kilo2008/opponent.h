@@ -50,49 +50,45 @@ class Opponent {
  public:
   Opponent(tCarElt *car, SingleCardata *cardata, int index);
 
-  static void setTrackPtr(tTrack * const track) {Opponent::m_track = track;}
 
-  tCarElt *getCarPtr() const {return m_car;}
-  double getDistance() const {return m_distance;}
-  double getWidth() const {return m_cardata->getWidthOnTrack();}
-  double getSpeed() const {return m_cardata->getSpeedInTrackDirection();}
-  int getIndex() const {return m_index;}
+  // Accessors
+  inline tCarElt *car_ptr()  const { return car_; }
+  inline double distance()   const { return distance_; }
+  inline double width()      const { return cardata_->getWidthOnTrack(); }
+  inline double speed() const { return cardata_->getSpeedInTrackDirection(); }
+  inline int index()         const { return index_; }
+  inline bool teammate()     const { return teammate_; }
 
-  inline bool isState(const int state) const
-    { return static_cast<bool>(m_state & state); }
-  inline bool isTeammate() const {return m_teammate;}
-  bool isQuickerTeammate(tCarElt * const mycar);
-  inline bool isOnRight(const double dMiddle)
-    { return (dMiddle > m_car->_trkPos.toMiddle) ? true : false; }
+  // State queries
+  inline bool HasState(const int state) const
+        { return static_cast<bool>(state_ & state); }
+  inline bool IsQuickerTeammate(const tCarElt *mycar) const
+        { return (teammate_
+            && (mycar->_dammage - car_->_dammage > TEAM_DAMAGE_CHANGE_LEAD));}
+  inline bool IsOnRight(const double dMiddle) const
+        { return (dMiddle > car_->_trkPos.toMiddle) ? true : false; }
+  bool IsTooFarOnSide(const tCarElt *mycar) const;
 
-  inline void markAsTeamMate() {m_teammate = true;}
-  void update(tSituation *s, KDriver *driver);
+  // Mutators
+  inline void set_teammate() {teammate_ = true;}
+  void Update(tSituation *s, KDriver *driver);
+
 
  private:
-  double getDistToSegStart() const;
-  void updateOverlapTimer(tSituation * const s, tCarElt * const mycar);
+  // distance minus opponent car length
+  inline double brake_distance() const {return distance_ - car_->_dimension_x;}
+  inline double DistToSegStart() const;
+  void UpdateOverlapTimer(tSituation * const s, tCarElt * const mycar);
 
   // approximation of the real distance, negative if the opponent is behind.
-  double m_distance;
-  // distance minus opponent car length
-  double m_brakedistance;
-  // distance needed to catch the opponent (linear estimate).
-  double m_catchdist;
-  // approx distance of center of gravity of the cars.
-  double m_sidedist;
-  // State variable to characterize the relation to the opponent,
-  // e. g. opponent is behind.
-  int m_state;
-  int m_index;
-  double m_overlaptimer;
+  double distance_;
 
-  tCarElt *m_car;
-  SingleCardata *m_cardata;   // Pointer to global data about this opponent.
-  bool m_teammate;            // Is this opponent a team mate of me
-                              // TODO(kilo): configure it in setup XML?
-
-  // class variables.
-  static tTrack *m_track;
+  int state_;   // State describes the relation to the opp, eg. opp is behind
+  int index_;
+  double overlap_timer_;
+  tCarElt *car_;
+  SingleCardata *cardata_;   // Pointer to global data about this opponent.
+  bool teammate_;            // Is this opponent a team mate of me
 
   // constants.
   static const double FRONTCOLLDIST;
@@ -103,6 +99,7 @@ class Opponent {
   static const double LAP_BACK_TIME_PENALTY;
   static const double OVERLAP_WAIT_TIME;
   static const double SPEED_PASS_MARGIN;
+  static const int TEAM_DAMAGE_CHANGE_LEAD;
 };
 
 
@@ -111,17 +108,20 @@ class Opponent {
 class Opponents {
  public:
   Opponents(tSituation *s, KDriver *driver, Cardata *cardata);
-  ~Opponents() {delete m_opps;}
+  ~Opponents() { if (opps_ != NULL) delete opps_;}
 
-  void update(tSituation *s, KDriver *driver);
-  void setTeamMate(const tCarElt *car);
-  Opponent *getOppByState(const int state);
+  void Update(tSituation *s, KDriver *driver);
+  void SetTeamMate(const tCarElt *car);
+  Opponent *GetOppByState(const int state);
+  Opponent *GetSidecollOpp(const tCarElt *car);
+  Opponent *GetOverlappingOpp(const tCarElt *car);
 
-  inline std::list<Opponent>::iterator begin() {return m_opps->begin();}
-  inline std::list<Opponent>::iterator end() {return m_opps->end();}
+  inline std::list<Opponent>::iterator begin() {return opps_->begin();}
+  inline std::list<Opponent>::iterator end() {return opps_->end();}
 
  private:
-  std::list<Opponent> *m_opps;
+  std::list<Opponent> *opps_;
+  static const double TEAM_REAR_DIST;
 };
 
 

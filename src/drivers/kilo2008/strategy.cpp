@@ -43,13 +43,13 @@ const int   KStrategy::LAST_LAPS = 10;
 
 
 KStrategy::KStrategy() {
-  m_last_damages = new std::deque<int>;
+  last_damages_ = new std::deque<int>;
 
-  m_laps = 0;
-  m_fuel_checked = false;
-  m_fuel_per_lap = 0.0;
-  m_last_pit_fuel = 0.0;
-  m_fuel_sum = 0.0;
+  laps_ = 0;
+  fuel_checked_ = false;
+  fuel_per_lap_ = 0.0;
+  last_pit_fuel_ = 0.0;
+  fuel_sum_ = 0.0;
 }  // KStrategy
 
 
@@ -69,13 +69,13 @@ void KStrategy::SetFuelAtRaceStart(const tTrack * const t,
   const double fuel =
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_FUELPERLAP,
          NULL, t->length * MAX_FUEL_PER_METER);
-  m_expected_fuel_per_lap = fuel;
+  expected_fuel_per_lap_ = fuel;
   // Pittime is pittime without refuel.
-  m_pittime = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
+  pittime_ = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
                             KILO_ATT_PITTIME, NULL, 25.0);
-  m_best_lap = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
+  best_lap_ = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
                             KILO_ATT_BESTLAP, NULL, 87.0);
-  m_worst_lap = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
+  worst_lap_ = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
                             KILO_ATT_WORSTLAP, NULL, 87.0);
   // Fuel tank capacity
   const double maxfuel = GfParmGetNum(*carParmHandle, SECT_CAR,
@@ -88,7 +88,7 @@ void KStrategy::SetFuelAtRaceStart(const tTrack * const t,
 
   // Compute race times for min to min + 9 pit stops.
   ComputeBestNumberOfPits(maxfuel, fuelForRace, s->_totLaps, true);
-  m_last_fuel = m_fuel_per_stint;
+  last_fuel_ = fuel_per_stint_;
 
   // If the setup defines initial fuel amount, use that value in races.
   // Otherwise use computed amount.
@@ -100,7 +100,7 @@ void KStrategy::SetFuelAtRaceStart(const tTrack * const t,
     } else {
       // Add fuel dependent on index to avoid fuel stop in the same lap.
       GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL,
-                    m_last_fuel + index * m_expected_fuel_per_lap);
+                    last_fuel_ + index * expected_fuel_per_lap_);
     }
   } else {
     // Use fuel for whole 'race', ie qualy or practice N laps.
@@ -121,14 +121,14 @@ void KStrategy::SetFuelAtRaceStart(const tTrack * const t,
 void KStrategy::UpdateFuelStrategy() {
   // Required additional fuel for the rest of the race.
   // +1 because the computation happens right after crossing the start line.
-  double fuelperlap = MAX(m_fuel_per_lap, 2.5);  // average
-  double required_fuel = ((LapsToGo() + 1) - ceil(m_car->_fuel / fuelperlap))
+  double fuelperlap = MAX(fuel_per_lap_, 2.5);  // average
+  double required_fuel = ((LapsToGo() + 1) - ceil(car_->_fuel / fuelperlap))
                             * fuelperlap;
 
   // We don't have enough fuel to end the race, need at least one stop.
   if (required_fuel >= 0.0) {
     // Compute race times for different pit strategies.
-    ComputeBestNumberOfPits(m_car->_tank, required_fuel, LapsToGo(), FALSE);
+    ComputeBestNumberOfPits(car_->_tank, required_fuel, LapsToGo(), FALSE);
   }
 }  // UpdateFuelStrategy
 
@@ -141,19 +141,19 @@ double KStrategy::PitRefuel() {
   UpdateFuelStrategy();
 
   double fuel;
-  if (m_remaining_stops > 1) {
-    fuel = MIN(MAX(m_fuel_per_stint, MAXFUEL_FOR_THIS_RACE),
-                m_car->_tank - m_car->_fuel);  // !!!
-    --m_remaining_stops;
+  if (remaining_stops_ > 1) {
+    fuel = MIN(MAX(fuel_per_stint_, MAXFUEL_FOR_THIS_RACE),
+                car_->_tank - car_->_fuel);  // !!!
+    --remaining_stops_;
   } else {
-    double cmpfuel = (m_fuel_per_lap == 0.0)
-      ? m_expected_fuel_per_lap
-      : m_fuel_per_lap;
-    fuel = MAX(MIN((LapsToGo() + 1.0) * cmpfuel - m_car->_fuel,
-                m_car->_tank - m_car->_fuel), 0.0);
+    double cmpfuel = (fuel_per_lap_ == 0.0)
+      ? expected_fuel_per_lap_
+      : fuel_per_lap_;
+    fuel = MAX(MIN((LapsToGo() + 1.0) * cmpfuel - car_->_fuel,
+                car_->_tank - car_->_fuel), 0.0);
   }
 
-  m_last_pit_fuel = fuel;
+  last_pit_fuel_ = fuel;
   return fuel;
 }   // pitRefuel
 
@@ -174,16 +174,16 @@ void KStrategy::ComputeBestNumberOfPits(const double tankCapacity,
   for (int i = 0; i < (preRace ? 5 : 4); ++i) {
     double stintFuel = requiredFuel / (pitstopMin + i);   // + 1);
     double fillratio = stintFuel / tankCapacity;
-    double avglapest = m_best_lap + (m_worst_lap - m_best_lap) * fillratio;
-    double racetime = (pitstopMin + i) * (m_pittime + stintFuel / 8.0) +
+    double avglapest = best_lap_ + (worst_lap_ - best_lap_) * fillratio;
+    double racetime = (pitstopMin + i) * (pittime_ + stintFuel / 8.0) +
               remainingLaps * avglapest;
     if (mintime > racetime) {
       mintime = racetime;
       beststops = pitstopMin + i - (preRace ? 1 : 0);
-      m_fuel_per_stint = stintFuel;
+      fuel_per_stint_ = stintFuel;
     }
   }
-  m_remaining_stops = beststops;
+  remaining_stops_ = beststops;
 }   // ComputeBestNumberOfPits
 
 
@@ -198,45 +198,45 @@ void KStrategy::ComputeBestNumberOfPits(const double tankCapacity,
  * @return: -
  */
 void KStrategy::Update() {
-  if (m_car->_laps > m_laps) {   // If a new lap has been finished
-    m_laps = m_car->_laps;
-    m_last_damages->push_front(m_car->_dammage);  // store last lap's damage
-    if (static_cast<int>(m_last_damages->size()) > LAST_LAPS)
-      m_last_damages->pop_back();   // and keep deque size at limit
+  if (car_->_laps > laps_) {   // If a new lap has been finished
+    laps_ = car_->_laps;
+    last_damages_->push_front(car_->_dammage);  // store last lap's damage
+    if (static_cast<int>(last_damages_->size()) > LAST_LAPS)
+      last_damages_->pop_back();   // and keep deque size at limit
 
 #ifdef STRAT_DEBUG
     // print damage values in reverse order
     cerr << car->_name << ": damages";
-    for (deque<int>::reverse_iterator rit = m_last_damages->rbegin();
-          rit < m_last_damages->rend();
-          rit++)
+    for (deque<int>::reverse_iterator rit = last_damages_->rbegin();
+          rit < last_damages_->rend();
+          ++rit)
       cerr << " " << *rit;
     cerr << endl;
 #endif
   }
 
   // Update best & worst lap times
-  m_best_lap = MIN((m_best_lap == 0.0 ? m_car->_lastLapTime : m_best_lap),
-                  m_car->_lastLapTime);
-  m_worst_lap = MAX(m_worst_lap, m_car->_lastLapTime);
+  best_lap_ = MIN((best_lap_ == 0.0 ? car_->_lastLapTime : best_lap_),
+                  car_->_lastLapTime);
+  worst_lap_ = MAX(worst_lap_, car_->_lastLapTime);
 
 
   // Fuel statistics update.
-  int id = m_car->_trkPos.seg->id;
+  int id = car_->_trkPos.seg->id;
   // Range must include enough segments to be executed once guaranteed.
-  if (id >= 0 && id < 5 && !m_fuel_checked) {
-    if (m_car->race.laps > 1) {
-      m_fuel_sum += (m_last_fuel + m_last_pit_fuel - m_car->priv.fuel);
-      m_fuel_per_lap = (m_fuel_sum / (m_car->race.laps - 1));
+  if (id >= 0 && id < 5 && !fuel_checked_) {
+    if (car_->race.laps > 1) {
+      fuel_sum_ += (last_fuel_ + last_pit_fuel_ - car_->priv.fuel);
+      fuel_per_lap_ = (fuel_sum_ / (car_->race.laps - 1));
       // This is here for adding strategy decisions, otherwise
       // it could be moved to pitRefuel for efficiency.
       UpdateFuelStrategy();
     }
-    m_last_fuel = m_car->priv.fuel;
-    m_last_pit_fuel = 0.0;
-    m_fuel_checked = true;
+    last_fuel_ = car_->priv.fuel;
+    last_pit_fuel_ = 0.0;
+    fuel_checked_ = true;
   } else if (id > 5) {
-    m_fuel_checked = false;
+    fuel_checked_ = false;
   }
 }  // update
 
@@ -255,14 +255,14 @@ bool KStrategy::NeedPitstop() const {
   bool ret = false;
 
   // Question makes sense only if there is a pit.
-  if (m_car->_pit != NULL) {
+  if (car_->_pit != NULL) {
     // Ideally we shouldn't pit on the last lap for any reason,
     // just get to the finish line somehow.
     if (LapsToGo() > 0) {
       // Do we need to refuel?
-      double cmpfuel = (m_fuel_per_lap == 0.0)
-        ? m_expected_fuel_per_lap
-        : m_fuel_per_lap;
+      double cmpfuel = (fuel_per_lap_ == 0.0)
+        ? expected_fuel_per_lap_
+        : fuel_per_lap_;
 
 #ifdef STRAT_DEBUG
       if (strcmp(car->_name, "Kilo 1") == 0 && car->_fuel < 5.0)
@@ -278,20 +278,20 @@ bool KStrategy::NeedPitstop() const {
             << endl;
 #endif
       cmpfuel *= MIN(SAFE_LAPS, LapsToGo());
-      if (m_car->_fuel < cmpfuel) {
+      if (car_->_fuel < cmpfuel) {
 #ifdef STRAT_DEBUG
         cerr << car->_name << " REFUEL" << endl;
 #endif
         ret = true;
       } else {
         // Do we need to repair and is the pit free?
-        if (m_car->_dammage > PIT_DAMAGE) {
+        if (car_->_dammage > PIT_DAMAGE) {
           // Let's see if we can make it somehow onto the finish line
           // BEWARE doesnt check for limits, works for races > 5 laps!!!
           if (LapsToGo() <= LAST_LAPS) {
             // If prediction shows we would top the damage limit,
             // let's visit the pit
-            if (m_car->_dammage + GetAvgDamage() * LapsToGo() >= 10000) {
+            if (car_->_dammage + GetAvgDamage() * LapsToGo() >= 10000) {
               ret = IsPitFree();
             }
           } else {
@@ -314,8 +314,8 @@ bool KStrategy::NeedPitstop() const {
  * @return average damage increment
  */
 int KStrategy::GetAvgDamage(void) const {
-  return (m_last_damages->front() - m_last_damages->back())
-          / MAX(m_last_damages->size(), 1);
+  return (last_damages_->front() - last_damages_->back())
+          / MAX(last_damages_->size(), 1);
 }  // GetAvgDamage
 
 
@@ -331,7 +331,7 @@ int KStrategy::GetAvgDamage(void) const {
 int KStrategy::PitRepair() const {
   int ret = (LapsToGo() <= LAST_LAPS)   // In the last N laps
     ? GetAvgDamage() * LapsToGo()       // repair only as much as really needed.
-    : m_car->_dammage;                  // Otherwise repair everything.
+    : car_->_dammage;                  // Otherwise repair everything.
 
 #ifdef STRAT_DEBUG
   cerr << car->_name
@@ -340,14 +340,14 @@ int KStrategy::PitRepair() const {
 #endif
 
   // Clear buffer
-  m_last_damages->clear();
+  last_damages_->clear();
 
   return ret;
 }  // pitRepair
 
 
 bool KStrategy::IsPitFree() const {
-  if (m_car->_pit != NULL && m_car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
+  if (car_->_pit != NULL && car_->_pit->pitCarIndex == TR_PIT_STATE_FREE)
     return true;
   else
     return false;

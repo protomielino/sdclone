@@ -81,65 +81,68 @@ class KDriver {
   void endRace(tSituation * s);
   std::string bot;  // to make it possible to differentiate between Kilo & Dots
 
-  // Used by Opponents
-  tCarElt *getCarPtr()  { return m_car;}
-  tTrack *getTrackPtr() { return m_track;}
-  double getSpeed()     { return m_mycardata->getSpeedInTrackDirection(); }
+  // Used by Opponents & Pit
+  tCarElt *car_ptr() const { return car_;}
+  tTrack *track_ptr() const { return track_;}
+  double speed() const { return my_cardata_->getSpeedInTrackDirection(); }
 
  protected:
   // Initialize
-  void initCa();
-  void initCw();
-  void initTireMu();
-  void initTCLFilter();
-  double initSkill(tSituation * s);
+  void InitCa();
+  void InitCw();
+  void InitTireMu();
+  void InitTCLFilter();
+  double InitSkill(tSituation * s);
 
   // Driving aids
-  double filterTCL_RWD();
-  double filterTCL_FWD();
-  double filterTCL_4WD();
-  double filterTCL(const double accel);
-  double filterTrk(double accel);
-  double brakeDist(double allowedspeed, double mu);
-  double filterABS(double brake);
-  double filterBPit(double brake);
+  double FilterTCL_RWD();
+  double FilterTCL_FWD();
+  double FilterTCL_4WD();
+  double FilterTCL(double accel);
+  double FilterTrk(double accel);
+  double FilterABS(double brake);
+  double FilterBPit(double brake);
 
   // Steering
-  double getSteer(tSituation * s);
-  double calcSteer(double targetAngle, int rl);
-  double correctSteering(double avoidsteer, double racesteer);
-  double smoothSteering(double steercmd);
-  vec2f getTargetPoint();
+  double GetSteer(tSituation * s);
+  double CalcSteer(double targetAngle, int rl);
+  double CorrectSteering(double avoidsteer, double racesteer);
+  double SmoothSteering(double steercmd);
+  double GetOffset();
+  vec2f  TargetPoint();
+
+  // Throttle/brake handling
+  void   CalcSpeed();
+  double GetAccel();
+  double GetBrake();
+  double BrakeDist(double allowedspeed, double mu) const;
+  double FilterBrakeSpeed(double brake);
+  double FilterBColl(double brake);
+  double FilterOverlap(double accel);
+
+  // Gear/clutch
+  int GetGear();
+  double GetClutch();
 
   // 'own' utilities
-  void update(tSituation * s);
-  double filterBrakeSpeed(double brake);
-  double filterBColl(double brake);
-  double filterOverlap(double accel);
-  void calcSpeed();
-  void setAvoidRight() {m_avoidmode |= AVOIDRIGHT;}
-  void setAvoidLeft() {m_avoidmode |= AVOIDLEFT;}
-  void setMode(int newmode);
-  bool oppTooFarOnSide(tCarElt *ocar);
-  bool isStuck();
-  double getDistToSegEnd();
-  double getOffset();
-  double getAccel();
-  double getBrake();
-  int getGear();
-  double getClutch();
-  double getWidth() { return m_mycardata->getWidthOnTrack();}
-  void checkPitStatus(tSituation *s);
-  void * loadDefaultSetup() const;
-  void mergeCarSetups(void **oldHandle, void *newHandle);
+  void Update(tSituation * s);
+  bool IsStuck();
+  inline double GetDistToSegEnd() const;
+  void CheckPitStatus(tSituation *s);
+  void * LoadDefaultSetup() const;
+  void MergeCarSetups(void **oldHandle, void *newHandle) const;
+  void set_avoid_right() { avoid_mode_ |= AVOIDRIGHT; }
+  void set_avoid_left()  { avoid_mode_ |= AVOIDLEFT; }
+  double width() const  { return my_cardata_->getWidthOnTrack(); }
+  double mass() const   { return CARMASS + car_->_fuel; }
+  double current_speed_sqr() const { return car_->_speed_x * car_->_speed_x; }
+  void set_mode(int newmode);
 
   // Opponent handling
-  Opponent * getOverlappingOpp();
-  Opponent * getTakeoverOpp();
-  Opponent * getSidecollOpp();
-  double filterOverlappedOffset(Opponent *o);
-  double filterTakeoverOffset(Opponent *o);
-  double filterSidecollOffset(Opponent *o, const double);
+  Opponent * GetTakeoverOpp();
+  double FilterOverlappedOffset(const Opponent *o);
+  double FilterTakeoverOffset(const Opponent *o);
+  double FilterSidecollOffset(const Opponent *o, const double incfactor);
 
 
   // Constants.
@@ -147,65 +150,74 @@ class KDriver {
   enum { TEAM_FRIEND = 1, TEAM_FOE };
   enum { AVOIDLEFT = 1, AVOIDRIGHT = 2, AVOIDSIDE = 4 };
 
-  tCarElt *m_car;           // Pointer to tCarElt struct.
-  LRaceLine *m_raceline;
-  Opponents *m_opponents;   // The container for opponents.
-  Pit *m_pit;               // Pointer to the pit instance.
-  KStrategy *m_strategy;    // Pit stop strategy.
-  tTrack *m_track;          // Track variables.
+  // Pointers to other classes
+  tCarElt *car_;          // Pointer to tCarElt struct.
+  LRaceLine *raceline_;   // The racing line
+  Opponents *opponents_;  // The container for opponents.
+  Pit *pit_;              // Pointer to the pit instance.
+  KStrategy *strategy_;   // Pit stop strategy.
+  tTrack *track_;         // Track variables.
 
-  static Cardata *m_cardata;    // Data about all cars shared by all instances.
-  SingleCardata *m_mycardata;   // Pointer to "global" data about my car.
+  static Cardata *cardata_;     // Data about all cars shared by all instances.
+  SingleCardata *my_cardata_;   // Pointer to "global" data about my car.
 
-  static double m_currentSimTime;   // Store time to avoid useless updates.
+  static double current_sim_time_;  // Store time to avoid useless updates.
 
   // Per robot global data
-  int m_mode;
-  int m_avoidmode;
-  int m_lastmode;
-  int m_stuckCounter;
-  double m_speedangle;  // the angle of the speed vector
-                        //  relative to trackangle, > 0.0 points to right.
-  double m_angle;
-  double m_mass;        // Mass of car + fuel.
-  double m_myoffset;    // Offset to the track middle.
-  double m_laststeer;
-  double m_lastNSasteer;
-  double m_simTime;         // how long since the race started
-  double m_avoidTime;       // how long since we began avoiding
-  double m_correctTimer;    // how long we've been correcting
-  double m_correctLimit;    // level of divergence with raceline steering
-  double m_brakeDelay;
-  double m_currentSpeedSqr;   // Square of the current speed_x.
-  double m_clutchTime;      // Clutch timer.
-  double m_oldLookahead;    // Lookahead for steering in the previous step.
-  double m_raceSteer;       // steer command to get to raceline
-  double m_rLookahead;      // how far ahead on the track we look for steering
-  double m_raceOffset;      // offset from middle of track towards which
+  int car_index_;
+  std::string car_type_;
+
+  // Driving modes
+  int mode_;
+  int avoid_mode_;
+  int last_mode_;
+
+  // Timers
+  double sim_time_;         // how long since the race started
+  double avoid_time_;       // how long since we began avoiding
+  double correct_timer_;    // how long we've been correcting
+  double correct_limit_;    // level of divergence with raceline steering
+  double clutch_time_;      // clutch timer
+  int stuck_counter_;       // to determine if we are stuck
+
+  // Car state
+  double angle_;
+  double speed_angle_;      // the angle of the speed vector
+                            //  relative to trackangle, > 0.0 points to right.
+  double my_offset_;        // Offset to the track middle.
+
+  // Raceline data
+  double old_lookahead_;    // Lookahead for steering in the previous step.
+  double race_offset_;      // offset from middle of track towards which
                             //  raceline is steering
-  double m_avoidLftOffset;  // closest opponent on the left
-  double m_avoidRgtOffset;  // closest opponent on the right
-  double m_raceSpeed;       // how fast raceline code says we should be going
-  double m_avoidSpeed;      // how fast we should go if avoiding
-  double m_accelCmd;
-  double m_brakeCmd;
-  double m_pitOffset;
-  v2d    m_raceTarget;      // the 2d point the raceline is driving at.
-  double m_mincatchdist;
-  double m_rgtinc;
-  double m_lftinc;
-  double m_maxoffset;
-  double m_minoffset;
-  double m_rInverse;
-  std::string m_carType;
-  int m_carIndex;
+  double race_speed_;       // how fast raceline code says we should be going
+  double avoid_speed_;      // how fast we should go if avoiding
+  double brake_delay_;      // configurable, brake a wee bit late
+  double pit_offset_;       // configurable, pit lane can start late/early
+
+  // Commands
+  double accel_cmd_;        // throttle pedal command [0..1]
+  double brake_cmd_;        // brake pedal command [0..1]
+  double race_steer_;       // steer command to get to raceline
+  double last_steer_;       // previous steer command
+  double last_nsa_steer_;
+
+  // Handling traffic
+  double min_catch_dist_;     // used in considering takeover
+  double avoid_lft_offset_;   // closest opponent on the left
+  double avoid_rgt_offset_;   // closest opponent on the right
+  double rgt_inc_;
+  double lft_inc_;
+  double max_offset_;
+  double min_offset_;
+  double r_inverse_;
 
   // Skilling
-  double m_skill;
-  double m_filterBrakeSkill;
-  double m_filterAccelSkill;
-  double m_filterLookaheadSkill;
-  double m_filterSideSkill;
+  double skill_;
+  double brake_skill_;
+  double accel_skill_;
+  double lookahead_skill_;
+  double side_skill_;
 
   // Data that should stay constant after first initialization.
   int MAX_UNSTUCK_COUNT;
@@ -234,6 +246,7 @@ class KDriver {
   static const double LOOKAHEAD_FACTOR;
   static const double WIDTHDIV;
   static const double BORDER_OVERTAKE_MARGIN;
+  static const double SIDECOLL_MARGIN;
   static const double OVERTAKE_OFFSET_SPEED;
   static const double PIT_LOOKAHEAD;
   static const double PIT_BRAKE_AHEAD;
@@ -246,9 +259,6 @@ class KDriver {
   static const double CATCH_FACTOR;
   static const double TEAM_REAR_DIST;
   static const double LET_OVERTAKE_FACTOR;
-
- public:
-  static const int TEAM_DAMAGE_CHANGE_LEAD;   // Used in opponent.cpp too
 };
 
 #endif  // SRC_DRIVERS_KILO2008_KDRIVER_H_

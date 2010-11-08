@@ -36,52 +36,47 @@ class Pit {
   Pit(const tSituation * s, KDriver * driver, const double PitOffset);
   ~Pit();
 
-  void setPitstop(const bool pitstop);
-  inline bool getPitstop() const {return m_pitstop;}
-  inline void setInPit(const bool inpitlane) {m_inpitlane = inpitlane;}
-  inline bool getInPit() const {return m_inpitlane;}
+  inline bool pit_planned() const { return pit_planned_; }
+  inline bool in_pitlane() const { return in_pitlane_; }
+  inline double speed_limit() const { return speed_limit_; }
+  inline double speed_limit_sqr() const { return pow(speed_limit_, 2); }
 
-  double getPitOffset(const double offset, double fromstart);
+  inline double n_start() const { return points_[1].x; }
+  inline double n_loc()   const { return points_[3].x; }
+  inline double n_end()   const { return points_[5].x; }
+  inline double n_entry() const { return points_[0].x; }
 
-  bool isBetween(const double fromstart) const;
-  bool isTimeout(const double distance);
+  inline double speed_limit_brake(const double speedsqr) const
+    { return (speedsqr - speed_limit_sqr())
+      / (pit_speed_limit_sqr_ - speed_limit_sqr()); }
 
-  inline double getNPitStart() const {return m_p[1].x;}
-  inline double getNPitLoc()   const {return m_p[3].x;}
-  inline double getNPitEnd()   const {return m_p[5].x;}
-  inline double getNPitEntry() const {return m_p[0].x;}
-
-  double toSplineCoord(double x) const;
-
-  inline double getSpeedlimitSqr() const {return m_speedlimitsqr;}
-  inline double getSpeedlimit() const {return m_speedlimit;}
-  inline double getSpeedLimitBrake(const double speedsqr) const
-    {return (speedsqr - m_speedlimitsqr)
-      / (m_pitspeedlimitsqr - m_speedlimitsqr);}
-
-  void update();
+  void set_pitstop(const bool pitstop);
+  bool is_timeout(const double distance);
+  double CalcPitOffset(const double offset, double fromstart);
+  double ToSplineCoord(double x) const;
+  void Update();
 
  private:
-  tTrack *m_track;
-  tCarElt *m_car;
-  tTrackOwnPit *m_mypit;      // Pointer to my pit.
-  tTrackPitInfo *m_pitinfo;   // General pit info.
+  bool is_between(const double fromstart) const;
 
-  enum
-  { NPOINTS = 7 };
-  SplinePoint m_p[NPOINTS];   // Spline points.
-  Spline *m_spline;           // Spline.
+  tTrack *track_;
+  tCarElt *car_;
+  tTrackOwnPit *mypit_;      // Pointer to my pit.
+  tTrackPitInfo *pitinfo_;   // General pit info.
 
-  bool m_pitstop;             // Pitstop planned.
-  bool m_inpitlane;           // We are still in the pit lane.
-  double m_pitentry;          // Distance to start line of the pit entry.
-  double m_pitexit;           // Distance to the start line of the pit exit.
+  enum { NPOINTS = 7 };
+  SplinePoint points_[NPOINTS];   // Spline points.
+  Spline *spline_;           // Spline.
 
-  double m_speedlimitsqr;     // Pit speed limit squared.
-  double m_speedlimit;        // Pit speed limit.
-  double m_pitspeedlimitsqr;  // The original speedlimit squared.
+  bool pit_planned_;          // Pitstop planned.
+  bool in_pitlane_;           // We are still in the pit lane.
+  double pit_entry_;          // Distance to start line of the pit entry.
+  double pit_exit_;           // Distance to the start line of the pit exit.
 
-  double m_pittimer;          // Timer for pit timeouts.
+  double speed_limit_;          // Pit speed limit.
+  double pit_speed_limit_sqr_;  // The original speedlimit squared.
+
+  double pit_timer_;          // Timer for pit timeouts.
 
   static const double SPEED_LIMIT_MARGIN;
 };
