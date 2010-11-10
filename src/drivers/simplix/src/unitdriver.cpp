@@ -832,13 +832,13 @@ void TDriver::AdjustSkilling(PCarHandle Handle)
     oLookAheadFactor = oLookAheadFactor / (1+oSkillGlobal/24);
 
 	CalcSkilling();
-
+/*
 	if (Qualification)
 	{
   	  oSkill *= 1.5;
 	  oSkillMax *= 1.5;
 	}
-
+*/
     Param.Tmp.oSkill = 1.0 + oSkill;
 	//GfOut("\n#>>>Skilling: Skill %g oSkillGlobal %g oSkillDriver %g oLookAhead %g oLookAheadFactor %g effSkill:%g\n\n",
 	//	oSkill,oSkillGlobal,oSkillDriver,oLookAhead,oLookAheadFactor,Param.Tmp.oSkill);
@@ -3245,7 +3245,7 @@ double TDriver::FilterSteerSpeed(double Steer)
   if (oCurrSpeed < 20)
 	return Steer;
 
-  if (!Qualification)
+  //if (!Qualification)
   {
     const float MaxSteerSpeed = 0.1f;
     double Ratio = fabs(oLastSteer - Steer)/MaxSteerSpeed;
@@ -3806,6 +3806,17 @@ void TDriver::CalcSkilling_simplix()
 	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) 
 		* (1.0 + oSkillDriver) + oSkillOffset;
 	oSkillMax = oSkillScale * 24 + oSkillOffset;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_ls1
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling_simplix_LS1()
+{
+	oSkillGlobal = oSkillGlobal/10.0;
+	oSkillDriver = oSkillDriver/3.0;
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
 }
 //==========================================================================*
 

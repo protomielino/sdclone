@@ -157,8 +157,8 @@
 
             <!-- Use the parameters below to tune the robots detection
                  of changes in the track's height -->
-		<attnum name="scale bump" min="0.0" max="2.0" val="0.6"/>
-		<attnum name="scale bump outer" min="0.0" max="2.0" val="0.8"/>
+		<attnum name="_scale bump" min="0.0" max="2.0" val="0.6"/>
+		<attnum name="_scale bump outer" min="0.0" max="2.0" val="0.8"/>
 
             <!-- Use the parameters below to tune the robots 
                  detection of the car's limits -->

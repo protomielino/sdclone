@@ -453,6 +453,7 @@ private:
 	double (TDriver::*CalcHairpinFoo)(double Crv);
 
 	void CalcSkilling_simplix();
+	void CalcSkilling_simplix_LS1();
 	void CalcSkilling_simplix_MPA1();
 	void CalcSkilling_simplix_SC();
 

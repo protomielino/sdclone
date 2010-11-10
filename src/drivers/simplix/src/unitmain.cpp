@@ -661,7 +661,7 @@ static int InitFuncPt(int Index, void *Pt)
   else if (cRobotType == RTYPE_SIMPLIX_LS1)
   {
     //GfOut("#cRobotType == RTYPE_SIMPLIX_LS1\n");
-    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS1;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
