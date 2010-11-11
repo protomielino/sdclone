@@ -225,12 +225,12 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     const int xAdv = 35;
     const int xDriver = 55;
     const int xType = 195;
-    const int xCar  = 275;
-    const int xTotal = 425;
-    const int xBest = 490;
-    const int xLaps = 515;
-    const int xTSpd = 550;
-    const int xDamg = 590;
+    const int xCar  = 255;
+    const int xTotal = 435;
+    const int xBest = 500;
+    const int xLaps = 525;
+    const int xTSpd = 555;
+    const int xDamg = 595;
     const int xPStp = 625;
     
     //Heading
@@ -242,9 +242,9 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     GfuiLabelCreateEx(rmScrHdle, "Car",     fgcolor, GFUI_FONT_MEDIUM_C, xCar+10, y, GFUI_ALIGN_HL_VB, 0);
     GfuiLabelCreateEx(rmScrHdle, "Total",   fgcolor, GFUI_FONT_MEDIUM_C, xTotal-15, y, GFUI_ALIGN_HR_VB, 0);
     GfuiLabelCreateEx(rmScrHdle, "Best",    fgcolor, GFUI_FONT_MEDIUM_C, xBest-15, y, GFUI_ALIGN_HR_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "Laps",    fgcolor, GFUI_FONT_MEDIUM_C, xLaps, y, GFUI_ALIGN_HC_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "T.Sp.",   fgcolor, GFUI_FONT_MEDIUM_C, xTSpd, y, GFUI_ALIGN_HC_VB, 0);
-    GfuiLabelCreateEx(rmScrHdle, "Dam.",    fgcolor, GFUI_FONT_MEDIUM_C, xDamg, y, GFUI_ALIGN_HC_VB, 0);
+    GfuiLabelCreateEx(rmScrHdle, "Laps",    fgcolor, GFUI_FONT_MEDIUM_C, xLaps-10, y, GFUI_ALIGN_HC_VB, 0);
+    GfuiLabelCreateEx(rmScrHdle, "T.Sp.",   fgcolor, GFUI_FONT_MEDIUM_C, xTSpd-5, y, GFUI_ALIGN_HC_VB, 0);
+    GfuiLabelCreateEx(rmScrHdle, "Dam.",    fgcolor, GFUI_FONT_MEDIUM_C, xDamg-5, y, GFUI_ALIGN_HC_VB, 0);
     GfuiLabelCreateEx(rmScrHdle, "Pits",    fgcolor, GFUI_FONT_MEDIUM_C, xPStp, y, GFUI_ALIGN_HC_VB, 0);
     y -= 20;
 
@@ -290,28 +290,33 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
       xCar, y, GFUI_ALIGN_HL_VB, 0);
 
-      //Best lap
-      str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);
-      GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,  xBest, y, GFUI_ALIGN_HR_VB, 0);
-      free(str);
-
-      //Laps covered
-      sprintf(buf, "%d", laps);
-      GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xLaps, y, GFUI_ALIGN_HC_VB, 0);
-
-      //Top speed
-      sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
-      GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xTSpd, y, GFUI_ALIGN_HC_VB, 0);
-
-      //Damage
-      sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)));
-      GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xDamg, y, GFUI_ALIGN_HC_VB, 0);
-
-      //Pitstops
-      sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_NB_PIT_STOPS, NULL, 0)));
-      GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xPStp, y, GFUI_ALIGN_HC_VB, 0);
-  
-      y -= 15;  //Line feed
+        //Total Time 
+        str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), "  ", false, 2); 
+        GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,  xTotal, y, GFUI_ALIGN_HR_VB, 0); 
+        free(str);
+        
+        //Best lap
+        str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);
+        GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,  xBest, y, GFUI_ALIGN_HR_VB, 0);
+        free(str);
+        
+        //Laps covered
+        sprintf(buf, "%d", laps);
+        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xLaps, y, GFUI_ALIGN_HC_VB, 0);
+        
+        //Top speed
+        sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
+        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xTSpd, y, GFUI_ALIGN_HC_VB, 0);
+        
+        //Damage
+        sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)));
+        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xDamg, y, GFUI_ALIGN_HC_VB, 0);
+        
+        //Pitstops
+        sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_NB_PIT_STOPS, NULL, 0)));
+        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xPStp, y, GFUI_ALIGN_HC_VB, 0);
+        
+        y -= 15;  //Line feed
     }//for i
 
     //If it is not the first screen of the results, show a 'Prev' button
@@ -345,7 +350,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
-  	//Show!
+      //Show!
     GfuiScreenActivate(rmScrHdle);
 }//rmRaceResults
 
@@ -377,7 +382,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     int			nbCars;
 
     rmScrHdle = GfuiScreenCreate();
-		void *menuXMLDescHdle = LoadMenuXML("qualifsresultsmenu.xml");
+    void *menuXMLDescHdle = LoadMenuXML("qualifsresultsmenu.xml");
     CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
     sprintf(buf, "%s", info->track->name);
