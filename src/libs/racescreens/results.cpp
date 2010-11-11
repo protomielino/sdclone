@@ -88,7 +88,8 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     char		*str;
     static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
     int			totLaps;
-
+    int 		damage; 
+    int 		lastDamage = 0; 
 
     rmScrHdle = GfuiScreenCreate();
 
@@ -147,8 +148,10 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xMSpd, y, GFUI_ALIGN_HC_VB, 0);
 
 	/* Damages */
-	sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)));
-	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xDamg, y, GFUI_ALIGN_HC_VB, 0);
+	damage =  (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)); 
+	sprintf(buf, "%d (%d)", damage - lastDamage, damage); 
+	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xDamg, y, GFUI_ALIGN_HC_VB, 0); 
+	lastDamage = damage; 
 
 	y -= 15;
     }
