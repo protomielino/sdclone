@@ -417,7 +417,8 @@ reRaceRealStart(void)
 		} else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && s->_ncars > 1) {
 			ReUpdatePracticeCurRes(s->cars[0]);
 		} else {
-			snprintf(buf, 128, "%s on %s", s->cars[0]->_name, ReInfo->track->name);
+			ReResScreenSetTrackName(ReInfo->track->name);
+			snprintf(buf, sizeof(buf), "%s (%s)", s->cars[0]->_name, s->cars[0]->_carName);
 			ReResScreenSetTitle(buf);
 		}
 	}//if displayMode != normal

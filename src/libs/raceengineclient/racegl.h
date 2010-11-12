@@ -34,6 +34,7 @@ extern void ReSetRaceMsg(const char *msg);
 extern void ReSetRaceBigMsg(const char *msg);
 
 extern void *ReResScreenInit(void);
+extern void ReResScreenSetTrackName(const char *trackName);
 extern void ReResScreenSetTitle(const char *title);
 extern void ReResScreenAddText(const char *text);
 extern void ReResScreenSetText(const char *text, int line, int clr);

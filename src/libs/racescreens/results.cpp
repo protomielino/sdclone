@@ -28,9 +28,9 @@
 #include <windows.h>
 #endif
 
+#include <portability.h>
 #include <tgfclient.h>
 
-#include "portability.h"
 #include "racescreens.h"
 #include "driver.h"	//rmdGetDriverType
 
@@ -82,8 +82,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     const char		*race = info->_reRaceName;
     int			i;
     int			y;
-    static const unsigned maxBufSize = 256;
-    static char		buf[maxBufSize];
+    static char		buf[256];
     static char		path[1024];
     char		*str;
     static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
@@ -96,11 +95,16 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     void *menuXMLDescHdle = LoadMenuXML("practiceresultsmenu.xml");
     CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
-    sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
-    sprintf(buf, "%s on %s", GfParmGetStr(results, path, RM_ATTR_DRVNAME, NULL), info->track->name);
+    snprintf(buf, sizeof(buf), "Practice Results on %s", info->track->name);
+    const int titleId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "title");
+    GfuiLabelSetText(rmScrHdle, titleId, buf);
+ 
+    snprintf(path, sizeof(path), "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
+    snprintf(buf, sizeof(buf), "%s (%s)", GfParmGetStr(results, path, RM_ATTR_DRVNAME, NULL),
+			 GfParmGetStr(results, path, RM_ATTR_CAR, NULL));
 
-    const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "playertitle");
-    GfuiLabelSetText(rmScrHdle, messId, buf);
+    const int subTitleId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "playertitle");
+    GfuiLabelSetText(rmScrHdle, subTitleId, buf);
  
     const int offset = 90;
     
@@ -204,9 +208,8 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 {
     void		*results = info->results;
     const char		*race = info->_reRaceName;
-    static const unsigned maxBufSize = 256;
-    static char		buf[maxBufSize];
-    static char		path[1024];
+    static char		buf[256];
+    static char		path[512];
     char		*str;
     static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
     static float  green[4] = {0.196, 0.804, 0.196, 1.0};//Lime green, #32CD32
@@ -219,8 +222,8 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
     sprintf(buf, "%s", info->track->name);
-    const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
-    GfuiLabelSetText(rmScrHdle, messId, buf);
+    const int subTitleId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
+    GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
   
     //Column positions
@@ -280,7 +283,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         xDriver, y, GFUI_ALIGN_HL_VB, 0);
 
         //Driver type
-        rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, maxBufSize);
+        rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
         GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xType, y, GFUI_ALIGN_HL_VB, 0);
 
         //Car
@@ -288,7 +291,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         xCar, y, GFUI_ALIGN_HL_VB, 0);
 
         GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C, xDriver, y, GFUI_ALIGN_HL_VB, 0);
-        rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, maxBufSize);
+        rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
         GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xType, y, GFUI_ALIGN_HL_VB, 0);
         GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
       xCar, y, GFUI_ALIGN_HL_VB, 0);
@@ -375,9 +378,8 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     const char		*race = info->_reRaceName;
     int			i;
     int			y;
-    static const unsigned maxBufSize = 256;
-    static char		buf[maxBufSize];
-    static char		path[1024];
+    static char		buf[256];
+    static char		path[512];
     char		*str;
     static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
     int			laps, totLaps;
@@ -389,8 +391,8 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
     sprintf(buf, "%s", info->track->name);
-    const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
-    GfuiLabelSetText(rmScrHdle, messId, buf);
+    const int subTitleId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
+    GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
     const int offset  = 50;
     const int xRank   = offset + 30;
@@ -423,7 +425,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 
 	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C,
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
-	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, maxBufSize);
+	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
 	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
@@ -493,9 +495,8 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 {
 	int			i;
 	int			y;
-	static const unsigned maxBufSize = 256;
-	static char		buf[maxBufSize];
-	static char		path[1024];
+	static char		buf[256];
+	static char		path[512];
 	static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
 	int			nbCars;
 	void		*results = info->results;
@@ -508,8 +509,8 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 
 	//Set title
 	sprintf(buf, "%s Standings", race);
-	const int messId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
-	GfuiLabelSetText(rmScrHdle, messId, buf);
+	const int subTitleId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "racetitle");
+	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 	//Show header
 	const int offset  = 50;
@@ -541,7 +542,7 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
 	
 		//Driver type
-		rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, maxBufSize);
+		rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
 		GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
 			

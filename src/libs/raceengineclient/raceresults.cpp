@@ -310,6 +310,7 @@ ReStoreRaceResults(const char *race)
 				car = s->cars[0];
 				sprintf(path, "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, race);
 				GfParmSetStr(results, path, RM_ATTR_DRVNAME, car->_name);
+				GfParmSetStr(results, path, RE_ATTR_CAR, car->_carName);
 				break;
 			}
 			/* Otherwise, fall through */
@@ -455,17 +456,22 @@ ReUpdateQualifCurRes(tCarElt *car)
 	double		time_left;
 	
 
+	ReResScreenSetTrackName(ReInfo->track->name);
+
 	if (ReInfo->s->_ncars == 1)
 	{
 		ReResEraseScreen();
 		maxLines = ReResGetLines();
 		
-		sprintf(buf, "%s on %s - Lap %d", car->_name, ReInfo->track->name, car->_laps);
-		ReResScreenSetTitle(buf);
-		
-		sprintf(buf, "cars/%s/%s.xml", car->_carName, car->_carName);
+		snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
 		carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		carName = GfParmGetName(carparam);
+
+		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+			snprintf(buf, sizeof(buf), "%s (%s)", car->_name, carName);
+		else
+			snprintf(buf, sizeof(buf), "%s (%s) - Lap %d", car->_name, carName, car->_laps);
+		ReResScreenSetTitle(buf);
 		
 		printed = 0;
 		sprintf(path, "%s/%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
@@ -507,12 +513,12 @@ ReUpdateQualifCurRes(tCarElt *car)
 		if (ReInfo->s->_totTime > ReInfo->s->currentTime)
 		{
 			time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
-			sprintf( buf, "%s - %d:%02d:%02d", ReInfo->track->name, (int)floor( time_left / 3600.0f ), (int)floor( time_left / 60.0f ) % 60,
+			sprintf( buf, "%d:%02d:%02d", (int)floor( time_left / 3600.0f ), (int)floor( time_left / 60.0f ) % 60,
 			         (int)floor( time_left ) % 60 );
 		}
 		else
 		{
-			sprintf( buf, "%s - %d laps", ReInfo->track->name, ReInfo->s->_totLaps );
+			sprintf( buf, "%d laps", ReInfo->s->_totLaps );
 		}
 		ReResScreenSetTitle(buf);
 		
@@ -556,17 +562,18 @@ ReUpdateRaceCurRes()
     char *tmp_str;
     double time_left;
 
+	ReResScreenSetTrackName(ReInfo->track->name);
     ncars = ReInfo->s->_ncars;
     if (ncars > ReResGetLines())
     	ncars = ReResGetLines();
     if (ReInfo->s->_totTime > ReInfo->s->currentTime)
     {
     	time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
-    	sprintf( buf, "%s - %d:%02d:%02d", ReInfo->track->name, (int)floor( time_left / 3600.0f ), (int)floor( time_left / 60.0f ) % 60, (int)floor( time_left ) % 60 );
+    	sprintf( buf, "%d:%02d:%02d", (int)floor( time_left / 3600.0f ), (int)floor( time_left / 60.0f ) % 60, (int)floor( time_left ) % 60 );
     }
     else
     {
-    	sprintf( buf, "%s - %d laps", ReInfo->track->name, ReInfo->s->_totLaps );
+    	sprintf( buf, "%d laps", ReInfo->s->_totLaps );
     }
     ReResScreenSetTitle(buf);
 

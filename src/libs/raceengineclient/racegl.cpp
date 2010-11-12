@@ -25,6 +25,7 @@
 #include <cstdlib>
 #include <cstdio>
 
+#include <portability.h>
 #include <tgfclient.h>
 #include <raceman.h>
 #include <robot.h>
@@ -46,7 +47,6 @@ static int	reMsgId;
 static int	reBigMsgId;
 
 static float black[4] = {0.0, 0.0, 0.0, 0.0};
-
 
 /**************************************************************************
  * Normal race screen (3D animated scene mode = non "blind" mode)
@@ -302,8 +302,11 @@ static float	white[4]   = {1.0, 1.0, 1.0, 1.0};
 static float	red[4]     = {1.0, 0.0, 0.0, 1.0};
 static float	*reColor[] = {white, red};
 
+static const char *aRaceTypeNames[3] = {"Practice", "Qualifications", "Race"};
+
 static void	*reResScreenHdle = 0;
 
+static int	reResMainTitleId;
 static int	reResTitleId;
 static int	reResMsgId[NMaxResultLines];
 
@@ -365,7 +368,6 @@ ReResScreenInit(void)
     int		i;
     int		y, dy;
     const char	*img;
-    static const char *title[3] = {"Practice", "Qualifications", "Race"};
 
     if (reResScreenHdle) {
 	GfuiScreenRelease(reResScreenHdle);
@@ -377,8 +379,8 @@ ReResScreenInit(void)
     CreateStaticControls(menuXMLDescHdle, reResScreenHdle);
 
     // Create variable main title (race type/stage) label.
-    int mainTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "title");
-    GfuiLabelSetText(reResScreenHdle, mainTitleId, title[ReInfo->s->_raceType]);
+    reResMainTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "title");
+    GfuiLabelSetText(reResScreenHdle, reResMainTitleId, aRaceTypeNames[ReInfo->s->_raceType]);
 
     // Create background image if any specified.
     img = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
@@ -418,10 +420,21 @@ ReResScreenInit(void)
 }
 
 void
-ReResScreenSetTitle(const char *title)
+ReResScreenSetTrackName(const char *pszTrackName)
 {
     if (reResScreenHdle) {
-	GfuiLabelSetText(reResScreenHdle, reResTitleId, title);
+		char pszTitle[128];
+		snprintf(pszTitle, sizeof(pszTitle), "%s on %s",
+				 aRaceTypeNames[ReInfo->s->_raceType], pszTrackName);
+		GfuiLabelSetText(reResScreenHdle, reResMainTitleId, pszTitle);
+    }
+}
+
+void
+ReResScreenSetTitle(const char *pszTitle)
+{
+    if (reResScreenHdle) {
+		GfuiLabelSetText(reResScreenHdle, reResTitleId, pszTitle);
     }
 }
 
