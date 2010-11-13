@@ -299,8 +299,8 @@ TGF_API char* GfPathMakeOSCompatible(char* path);
 #define GFPARM_RMODE_CREAT	0x04	/**< Create the file if doesn't exist */
 #define GFPARM_RMODE_PRIVATE	0x08
 
-TGF_API void * GfParmReadFileLocal(const char *file, int mode);
-TGF_API void *GfParmReadFile(const char *file, int mode);
+TGF_API void * GfParmReadFileLocal(const char *file, int mode, bool neededFile = true);
+TGF_API void *GfParmReadFile(const char *file, int mode, bool neededFile = true);
 /* parameter file write */
 TGF_API int GfParmWriteFileLocal(const char *file, void* handle, const char *name);
 TGF_API int GfParmWriteFile(const char *file, void* handle, const char *name);

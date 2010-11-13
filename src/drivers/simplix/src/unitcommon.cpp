@@ -2,17 +2,17 @@
 // unitcommon.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Common used functions
 // Gemeinsam nutzbare Funktionen
 //
 // File         : unitcommon.cpp
 // Created      : 2007.11.25
-// Last changed : 2008.12.21
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2010.11.12
+// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.000
 //--------------------------------------------------------------------------*
 // This unit is based on the robot mouse_2006 
 // Diese Unit basiert auf dem Roboter mouse_2006
@@ -66,7 +66,7 @@ void* TUtils::MergeParamFile(
   const char* FileName)
 {
   PCarSettings NewParams =                       // Open setup file
-	GfParmReadFile(FileName, GFPARM_RMODE_STD);
+	GfParmReadFile(FileName, GFPARM_RMODE_STD, false);
 
   if(NewParams == NULL)                          // Return old one, 
     return Params;                               //   if new one is empty 

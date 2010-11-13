@@ -1158,13 +1158,13 @@ GfParmReadBuf (char *buffer)
 
 
 void * 
-GfParmReadFileLocal(const char *file, int mode)
+GfParmReadFileLocal(const char *file, int mode, bool neededFile)
 {
 	//use local dir
 	char buf[255];
 	sprintf(buf, "%s%s", GetLocalDir(),file);
 	
-	void *pResult = GfParmReadFile(buf,mode);
+	void *pResult = GfParmReadFile(buf,mode,neededFile);
 
 	return pResult;
 }
@@ -1183,7 +1183,7 @@ GfParmReadFileLocal(const char *file, int mode)
     <br>0 if Error
 */
 void *
-GfParmReadFile (const char *file, int mode)
+GfParmReadFile (const char *file, int mode, bool neededFile)
 {
     FILE		*in = NULL;
     struct parmHeader	*conf;
@@ -1227,7 +1227,8 @@ GfParmReadFile (const char *file, int mode)
     if (mode & GFPARM_RMODE_REREAD) {
 	in = fopen (file, "r");
 	if (!in && ((mode & GFPARM_RMODE_CREAT) == 0)) {
-	    GfLogTrace ("Failed to load \"%s\" (fopen failed)\n", file);
+		if (neededFile)
+	      GfLogTrace ("Failed to load \"%s\" (fopen failed)\n", file);
 	    goto bailout;
 	}
 
