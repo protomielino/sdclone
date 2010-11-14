@@ -702,7 +702,7 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 
   int Version;
   fread(&Version,sizeof(int),1,F);
-  if (Version < 112)
+  if (Version < 113)
   {
     fclose(F);
     return false;
@@ -742,7 +742,7 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int K = 0;
   fwrite(&K,sizeof(int),1,F);
 
-  int Version = 112;
+  int Version = 113;
   fwrite(&Version,sizeof(int),1,F);
 
   int Weather = GetWeather();

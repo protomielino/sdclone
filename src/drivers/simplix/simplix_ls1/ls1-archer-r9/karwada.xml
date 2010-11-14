@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     file          : drivers/simplix_ls1/ls1-archer-r9/karwada
-    created       : 11/07/10
-    last modified : 11/07/10
+    created       : 11/14/10
+    last modified : 11/14/10
     copyright     : (C) 2010 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
@@ -20,7 +20,7 @@
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="22.3"/>
+    <attnum name="angle" unit="deg" val="22.5"/>
   </section>
 
   <section name="Rear Differential">
@@ -28,16 +28,24 @@
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.69"/>
-    <attnum name="max pressure" unit="kPa" val="45900"/>
+    <attnum name="front-rear brake repartition" val="0.7"/>
+    <attnum name="max pressure" unit="kPa" val="46500"/>
+  </section>
+
+  <section name="Front Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="770"/>
+  </section>
+
+  <section name="Rear Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="1000"/>
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="0.88"/>
+    <attnum name="bellcrank" val="0.94"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="0.88"/>
+    <attnum name="bellcrank" val="0.94"/>
   </section>
 
   <section name="Rear Right Suspension">
@@ -50,17 +58,20 @@
 
   <section name="simplix private">
     <attnum name="pit test stop" min="0" max="1" val="0"/>
-    <attnum name="qualification" min="0" max="1" val="0"/>
+    <attnum name="qualification" val="0"/>
     <attnum name="reserve" min="0" max="20000" unit="m" val="2000"/>
     <attnum name="start fuel" min="-1" max="60" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
-    <attnum name="lookaheadfactor" min="0" max="0.5" val="0.05"/>
-    <attnum name="scale brake" val="1.17"/>
-    <attnum name="scale mu" val="1.2"/>
+    <attnum name="lookaheadfactor" val="0.16"/>
+    <attnum name="scale bump" val="0.008"/>
+    <attnum name="scale bump outer" val="0.012"/>
+    <attnum name="scale brake" val="1.31"/>
+    <attnum name="scale mu" val="1.21"/>
     <attnum name="scale brake rain" min="0" max="1" val="1"/>
     <attnum name="scale mu rain" min="0" max="5" val="1"/>
-    <attnum name="qualy brake" val="1.22"/>
-    <attnum name="qualy mu" val="1.25"/>
+    <attnum name="qualy brake" val="1.42"/>
+    <attnum name="qualy mu" val="1.21"/>
   </section>
 
 </params>
+

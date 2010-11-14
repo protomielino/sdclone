@@ -665,8 +665,8 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.90f,0.90f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.50f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_MP5)
   {
