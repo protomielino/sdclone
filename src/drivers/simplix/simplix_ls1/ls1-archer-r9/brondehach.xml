@@ -49,11 +49,11 @@
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.75"/>
+    <attnum name="bellcrank" val="1.65"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.75"/>
+    <attnum name="bellcrank" val="1.65"/>
   </section>
 
   <section name="simplix private">

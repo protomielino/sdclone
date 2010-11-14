@@ -37,7 +37,7 @@
   </section>
 
   <section name="Rear Anti-Roll Bar">
-    <attnum name="spring" unit="lbs/in" val="2020"/>
+    <attnum name="spring" unit="lbs/in" val="1000"/>
   </section>
 
   <section name="Front Right Suspension">
@@ -49,11 +49,11 @@
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.69"/>
+    <attnum name="bellcrank" val="1.4"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.69"/>
+    <attnum name="bellcrank" val="1.4"/>
   </section>
 
   <section name="simplix private">
@@ -66,7 +66,7 @@
     <attnum name="scale bump" val="0.044"/>
     <attnum name="scale bump outer" val="0.066"/>
     <attnum name="scale brake" val="1.46"/>
-    <attnum name="scale mu" val="1.47"/>
+    <attnum name="scale mu" val="1.38"/>
     <attnum name="scale brake rain" min="0" max="1" val="1"/>
     <attnum name="scale mu rain" min="0" max="5" val="1"/>
     <attnum name="qualy brake" val="1.46"/>
