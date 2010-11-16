@@ -87,6 +87,7 @@ static char *strndup(const char *str, int len)
 #define strnicmp _strnicmp
 #define chdir _chdir
 #define getcwd _getcwd
+#define chmod _chmod
 #ifdef mkdir
 #undef mkdir
 #endif

@@ -30,6 +30,7 @@
 #include <cmath>
 #include <sys/stat.h>
 #ifdef WIN32
+#include <io.h>
 #include <windows.h>
 #else
 #include <unistd.h>
@@ -37,8 +38,9 @@
 
 #include <xmlparse.h>
 
+#include <portability.h>
 #include "tgf.h"
-#include "portability.h"
+
 
 #define LINE_SZ		1024
 
@@ -1572,7 +1574,7 @@ GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
 {
 	//use local dir
 	char buf[255];
-	sprintf(buf, "%s%s", GetLocalDir(),file);
+	sprintf(buf, "%s%s", GetLocalDir(), file);
 
 	return GfParmWriteFile(buf,parmHandle,name);
 }
@@ -3136,7 +3138,7 @@ GfParmCheckHandle(void *ref, void *tgt)
 		    if ((curParam->valnum < curParamRef->min) || (curParam->valnum > curParamRef->max)) {
 			GfLogError("GfParmCheckHandle: parameter \"%s\" out of bounds: min:%g max:%g val:%g in (\"%s\" - \"%s\")\n",
 				curParamRef->fullName, curParamRef->min, curParamRef->max, curParam->valnum, conf->name, conf->filename);
-			error = -2; // Uncomment to stop and get error messages
+			//error = -1;
 		    }
 		} else {
 		    curWithinRef = GF_TAILQ_FIRST (&(curParamRef->withinList));
@@ -3151,7 +3153,7 @@ GfParmCheckHandle(void *ref, void *tgt)
 		    if (!found && strcmp (curParamRef->value, curParam->value)) {
 			GfLogError("GfParmCheckHandle: parameter \"%s\" value:\"%s\" not allowed in (\"%s\" - \"%s\")\n",
 				curParamRef->fullName, curParam->value, conf->name, conf->filename);
-			error = -3; // Uncomment to stop and get error messages
+			//error = -1;
 		    }
 		}
 	    }
@@ -3461,8 +3463,10 @@ GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *m
  * Safely opens a file (useful for writing a file).
  * If the directory where the file should reside does not exists,
  * it creates each directory on the given path, step by step.
+ * If the file exists, is read-only and we want to write it,
+ * try and remove the read-only attribute.
  * 
- * Note: needs <errno.h> and <sys/stat.h>
+ * Note: needs <errno.h> and <sys/stat.h> (+ <io.h> under Ruin'dows)
  * 
  * @param fileName: full path of the file to be opened (for writing)
  * @param mode: open mode
@@ -3483,8 +3487,21 @@ safeFOpen(const char *fileName, const char *mode)
     // Try first normal fopen (very likely to work well => if OK, nothing more to do)
     FILE* file = fopen(fileName, mode);
     if (file)
-	return file;
+		return file;
 
+	// If it failed, may be its because we want to write it, but it is read-only ?
+	struct stat st;
+	if ((strchr(mode, 'w') || strchr(mode, 'a')) && !stat(fileName, &st)) {
+		if (chmod(fileName, 0640)) {
+			const int errnum = errno; // Get errno before it is overwritten by some system call.
+			GfLogWarning("Failed to set 0640 attributes to %s (%s)\n",
+						 fileName, strerror(errnum));
+		}
+		file = fopen(fileName, mode);
+		if (file)
+			return file;
+	}
+	
 	// TODO: Make things simpler by using GfDirCreate (takes care of parent dirs).
     // Otherwise, try and create parent dirs in case it is the cause of the error :
     // - search the fileName for directory level separators (\\ or /) and create each directory.
@@ -3492,17 +3509,17 @@ safeFOpen(const char *fileName, const char *mode)
     // - the only error we silently ignore from mkdir is when the dir already exists.
     char *mname = strdup(fileName);
     for(int i = 0; mname[i] != '\0'; i++) {
-	if(i > 0 && (mname[i] == '\\' || mname[i] == '/')) {
-	    const char slash = mname[i];
-	    mname[i] = '\0';
-	    if(mkdir(mname) == -1 && errno != EEXIST) {
-		return NULL;
-	    }
-	    
-	    mname[i] = slash;
-	}//if i
+		if(i > 0 && (mname[i] == '\\' || mname[i] == '/')) {
+			const char slash = mname[i];
+			mname[i] = '\0';
+			if(mkdir(mname) == -1 && errno != EEXIST) {
+				return NULL;
+			}
+			
+			mname[i] = slash;
+		}//if i
     }//for i
-
+	
     free(mname);
     return fopen(fileName, mode);
 }//safeFOpen

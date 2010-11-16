@@ -27,6 +27,12 @@
 #include <cerrno>
 #include <sys/stat.h>
 
+#ifdef WIN32
+#include <io.h>
+#endif
+
+#include <portability.h>
+
 #include "tgf.h"
 
 
@@ -61,6 +67,17 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	  GfDirCreate( buf );
 	}
 
+	// Set target file access attributes to "read/write for the current user",
+	// if the target file exists (quite paranoid, but sometimes needed).
+	struct stat st;
+	if (! stat(pszTgtName, &st) && chmod( pszTgtName, 0640 ))
+	{
+		const int errnum = errno; // Get errno before it is overwritten by some system call.
+		GfLogWarning("Failed to set 0640 attributes to %s (%s)\n",
+					 pszTgtName, strerror(errnum));
+	}
+
+	// Open the source and the target file.
 	if( ( in = fopen( pszSrcName, "rb" ) ) == NULL )
 	{
 		errnum = errno; // Get errno before it is overwritten by some system call.
@@ -77,6 +94,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 		return false;
 	}
 
+	// Do the byte to byte copy.
 	GfLogDebug("Copying %s to %s\n", pszSrcName, pszTgtName);
 
 	while( !feof( in ) )
@@ -107,9 +125,13 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	fclose( in );
 	fclose( out );
 
-#ifndef WIN32
-	chmod( pszTgtName, 0640 );
-#endif //!WIN32
+	// Set target file access attributes to "read/write for the current user".
+	if (chmod( pszTgtName, 0640 ))
+	{
+		const int errnum = errno; // Get errno before it is overwritten by some system call.
+		GfLogWarning("Failed to set 0640 attributes to %s (%s)\n",
+					 pszTgtName, strerror(errnum));
+	}
 
 	return true;
 }
