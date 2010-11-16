@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
-    file          : chemisay.xml 
-    created       : 25 Dec 2007
-    last modified : 06 Nov 2010
-    copyright     : (C) 2007-2010 Wolf-Dieter Beelitz
-
-    SIMPLIX - LS1-CAVALLO-570S1 
+<!--
+    file          : drivers/simplix_ls1/ls1-cavallo-570s1/chemisay
+    created       : 11/16/10
+    last modified : 11/16/10
+    copyright     : (C) 2010 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
 -->
@@ -14,59 +12,67 @@
 <!--    the Free Software Foundation; either version 2 of the License, or     -->
 <!--    (at your option) any later version.                                   -->
 <!DOCTYPE params SYSTEM "params.dtd">
+
+
 <params name="ls1-cavallo-570s1">
   <section name="Front Wing">
     <attnum name="angle" unit="deg" val="21"/>
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="20.7"/>
+    <attnum name="angle" unit="deg" val="20.6"/>
   </section>
 
   <section name="Rear Differential">
     <attstr name="type" in="LIMITED SLIP" val="LIMITED SLIP"/>
-    <attnum name="ratio" val="4.02"/>
+    <attnum name="ratio" val="4.07"/>
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.64"/>
+    <attnum name="front-rear brake repartition" val="0.69"/>
     <attnum name="max pressure" unit="kPa" val="44400"/>
   </section>
 
+  <section name="Front Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="1660"/>
+  </section>
+
+  <section name="Rear Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="2500"/>
+  </section>
+
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="0.88"/>
+    <attnum name="bellcrank" val="0.97"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="0.88"/>
+    <attnum name="bellcrank" val="0.97"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.235"/>
+    <attnum name="bellcrank" val="1.315"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.235"/>
+    <attnum name="bellcrank" val="1.315"/>
   </section>
 
   <section name="simplix private">
     <attnum name="pit test stop" min="0" max="1" val="0"/>
-    <attnum name="qualification" min="0" max="1" val="0"/>
-
+    <attnum name="qualification" val="0"/>
     <attnum name="reserve" min="0" max="20000" unit="m" val="2000"/>
     <attnum name="start fuel" min="-1" max="60" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
-
-    <attnum name="lookaheadfactor" min="0" max="0.5" val="0.05"/>
-
-    <attnum name="scale brake" val="1.44"/>
-    <attnum name="scale mu" val="1.28"/>
-
+    <attnum name="lookaheadfactor" val="0.2"/>
+    <attnum name="scale bump" val="0.031"/>
+    <attnum name="scale bump outer" val="0.0465"/>
+    <attnum name="scale brake" val="1.43"/>
+    <attnum name="scale mu" val="1.33"/>
     <attnum name="scale brake rain" min="0" max="1" val="1"/>
     <attnum name="scale mu rain" min="0" max="5" val="1"/>
-
-    <attnum name="qualy brake" min="0" max="2" val="1.49"/>
-    <attnum name="qualy mu" min="0" max="2" val="1.33"/>
+    <attnum name="qualy brake" val="1.49"/>
+    <attnum name="qualy mu" val="1.33"/>
   </section>
 
 </params>
+
