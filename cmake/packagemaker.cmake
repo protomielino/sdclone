@@ -44,13 +44,15 @@ SET(CPACK_SOURCE_PACKAGE_FILE_NAME "${PACKAGE_FILE_PREFIX}-${CPACK_PACKAGE_VERSI
 #SET(CPACK_RESOURCE_FILE_WELCOME "/home/andy/vtk/CMake/Templates/CPack.GenericWelcome.txt")
 
 SET(CPACK_SOURCE_IGNORE_FILES
-    "installer/" "doc/design/" "doc/develdoc" "doc/website/"
-    "/\\\\.svn/" "\\\\.bak$" "#.*#$" "~$" "\\\\.~.*" "\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$" 
-    "_CPack_Packages/" "/\\\\.dir/" "/CMakeFiles/" 
+    "/installer/" "/doc/design/" "/doc/develdoc" "/doc/website/" "/_CPack_Packages/" 
+    "/CMakeCache\\\\.txt$" "/install_manifest\\\\.txt$" "/xmlversion_loc\\\\.txt$" 
+    "/config\\\\.h$" "/version\\\\.h$" "/doxygen_config$"
+    "/\\\\.svn/" "/\\\\.dir/" "/CMakeFiles/" 
     "cmake_install\\\\.cmake$" "CPackConfig\\\\.cmake$" "CPackSourceConfig\\\\.cmake$"
-    "CMakeCache\\\\.txt$" "install_manifest\\\\.txt$" "xmlversion_loc\\\\.txt$" 
-    "config\\\\.h$" "version\\\\.h$" "doxygen_config$"
-    "\\\\.exe$" "\\\\.zip$" "\\\\.tar\\\\.bz2$" "\\\\.tar\\\\.gz$" "\\\\.tar\\\\.Z$")
+    "\\\\.bak$" "\\\\.flc$" "#.*#$" "~$" "\\\\.~.*"
+	"\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$" 
+    "\\\\.exe$" "\\\\.zip$" "\\\\.tar\\\\.bz2$" "\\\\.tar\\\\.gz$" "\\\\.tar\\\\.Z$" 
+    "\\\\.tar\\\\.7z$")
 
 ##########################################################################################
 # Put Linux install information here
@@ -65,7 +67,7 @@ IF(UNIX)
     # Put other Debian-based distros settings here.
 
     # Source package specific settings.
-    LIST(APPEND CPACK_SOURCE_IGNORE_FILES "Makefile$")
+    LIST(APPEND CPACK_SOURCE_IGNORE_FILES "Makefile$" "\\\\.so$")
 
 ENDIF(UNIX)
 
@@ -77,7 +79,7 @@ IF(WIN32)
     # General note: There is a bug in NSI that does not handle full unix paths properly.
     # Make sure there is at least one set of four (4) backlasshes.
 
-	SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${INTERNAL_NAME}-${VERSION_LONG}")
+    SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${INTERNAL_NAME}-${VERSION_LONG}")
 
     SET(EXECUTABLE_PATHNAME "$INSTDIR\\\\bin\\\\${EXECUTABLE_NAME}.exe")
 
@@ -88,15 +90,15 @@ IF(WIN32)
     SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
     SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_NSIS_DISPLAY_NAME}")
 
-	# Icon for the generated installer/uninstaller files.
+    # Icon for the generated installer/uninstaller files.
     SET(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
     #SET(CPACK_NSIS_MUI_UNIICON "${CMAKE_SOURCE_DIR}\\\\data\\\\data\\\\icons\\\\icon.ico")
     SET(CPACK_PACKAGE_ICON ${CMAKE_SOURCE_DIR}\\\\installer\\\\windows\\\\header.bmp)
     
-	# Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
+    # Extra shortcuts to add in the start menu (a list of pairs : URL, Menu label).
     SET(CPACK_NSIS_MENU_LINKS 
-           "${CPACK_PACKAGE_CONTACT}" "Project Homepage")
-           #"$INSTDIR\\\\share\\\\doc\\\\userman\\\\how_to_drive.html" "User manual")
+        "${CPACK_PACKAGE_CONTACT}" "Project Homepage")
+        #"$INSTDIR\\\\share\\\\doc\\\\userman\\\\how_to_drive.html" "User manual")
 
     # Icon in the add/remove control panel. Must be an .exe file 
     Set(CPACK_NSIS_INSTALLED_ICON_NAME "${EXECUTABLE_PATHNAME}")
@@ -124,7 +126,7 @@ IF(WIN32)
                 "/VTune/"
                 "/Release/" "/Debug/" "/RelWithDebInfo/" "/MinSizeRel/"
                 "/release/" "/debug/" "/relwithdebinfo/" "/minsizerel/"
-                "\\\\.sln$" "\\\\.suo$" "\\\\.ncb$" "\\\\.vcproj*")
+                "\\\\.sln$" "\\\\.suo$" "\\\\.ncb$" "\\\\.vcproj*$" "\\\\.dll$")
 
     # Add the PACKAGE_SRC project in the MSVC solution
     # (CMake 2.6 and 2.8 fail to do this itself).
