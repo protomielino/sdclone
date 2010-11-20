@@ -97,7 +97,7 @@ bool HostSettingsMenu::Init(void* pMenu)
     CreateStaticControls();
 
 	int carCatId = CreateComboboxControl("carcatcombobox",NULL,CarControlCB);
-	const std::vector<std::string> vecCategories = CarInfo::self()->GetCategoryNames();
+	const std::vector<std::string>& vecCategories = CarInfo::self()->GetCategoryNames();
 	
 	int CatIndex = 0;
 	for (unsigned int i=0;i<vecCategories.size();i++)

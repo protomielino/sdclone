@@ -43,15 +43,14 @@ static const char* pszSkinIntFileSuffix = "-int";
 static const char* pszLogoFileName = "logo"; // Warning: Must be consistent with grscene.cpp
 static const char* pszWheel3DFileName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/acc
 
-static const char* apszExcludedSkinNamePrefixes[] = { "rpm", "speed", "int" };
+static const char* apszExcludedSkinNamePrefixes[] = { "rpm", "speed", "int", "0", "1", "2", "3" };
 static const int nExcludedSkinNamePrefixes = sizeof(apszExcludedSkinNamePrefixes) / sizeof(char*);
 
 
 int rmdDriverMatchesFilters(const trmdDrvElt *drv, const char* carCat, const char* drvTyp,
 			    const char* anyCarCat, const char* anyDrvTyp)
 {
-    return (!strcmp(carCat, anyCarCat)
-			|| !strcmp(GfParmGetStr(drv->carParmHdle, SECT_CAR, PRM_CATEGORY, ""), carCat))
+    return (!strcmp(carCat, anyCarCat) || !strcmp(carCat, drv->carCategory))
 		   && (!strcmp(drvTyp, anyDrvTyp)
 			   || strstr(drv->moduleName, drvTyp) == drv->moduleName);
 }

@@ -32,6 +32,7 @@ public:
 	std::string strName; // XML file / folder name (ex: "sc-boxer-96")
 	std::string strRealName; // User friendly name (ex: "SC Boxer 96").
 	std::string strCategoryName; // Category name (ex: "LS-GT1").
+	std::string strCategoryRealName; // Category name (ex: "Long Day Series GT1").
 	std::string strXMLPath; // Path-name of the car XML file.
 };
 
@@ -42,13 +43,15 @@ public:
 	// Accessor to the unique instance of the singleton.
 	static CarInfo* self();
 	
-	std::vector<std::string> GetCategoryNames() const;
+	const std::vector<std::string>& GetCategoryNames() const;
+	const std::vector<std::string>& GetCategoryRealNames() const;
 
 	CarData* GetCarData(const std::string& strCarName) const;
 	std::string GetCarRealName(const std::string& strCarName) const;
 	CarData* GetCarDataFromRealName(const std::string& strCarRealName) const;
 
-	std::vector<CarData> GetCarsInCategory(const std::string& strCatName = "All") const;
+	std::vector<CarData*> GetCarsInCategory(const std::string& strCatName = "All") const;
+	std::vector<CarData*> GetCarsInCategoryRealName(const std::string& strCatRealName = "All") const;
 	std::vector<std::string> GetCarNamesInCategory(const std::string& strCatName = "All") const;
 	std::vector<std::string> GetCarRealNamesInCategory(const std::string& strCatName = "All") const;
 	

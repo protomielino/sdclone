@@ -82,7 +82,8 @@ static int		NbMaxSelectedDrivers;
 
 // Car categories
 static const char* AnyCarCategory = "--- All ---";
-static std::vector<std::string> VecCarCategories;
+static std::vector<std::string> VecCarCategories; // Category folder/file names
+static std::vector<std::string> VecCarCategoryNames; // Category real/displayed names
 static size_t CurCarCategoryIndex = 0;
 
 // Driver types
@@ -100,6 +101,8 @@ static size_t CurSkinIndex = 0;
 GF_TAILQ_HEAD(DriverListHead, trmdDrvElt);
 static tDriverListHead DriverList;
 
+trmdDrvElt *PPickedDriver;
+
 // Local functions.
 static void rmdsCleanup(void);
 static void rmdsFilterDriverScrollList(const char* carCat, const char* driverType);
@@ -112,37 +115,90 @@ static void rmdsClickOnDriver(void * /* dummy */);
 static void
 rmdsActivate(void * /* notused */)
 {
+	GfLogTrace("Entering Driver Select menu\n");
+
 	std::vector<std::string> vecSkinNames;
 	std::map<std::string, std::string> mapSkinPreviewFiles; // Key = skin name.
 	std::map<std::string, int> mapSkinTargets; // Key = skin name.
 
 	// Update competitors skinning data (in case things changed since the menu was last open ;
 	//   ex: the user added a 3D wheel skinned texture in its user settings)
-    trmdDrvElt	*curDrv;
+	trmdDrvElt *driver;
     int index = 0;
 	const char* name;
     while ((name = GfuiScrollListGetElement(ScrHandle, CompetitorsScrollListId,
-											index, (void**)&curDrv)))
+											index, (void**)&driver)))
 	{
 		// Get really available (now) skins, skin targets and preview files for the driver's car.
-		rmdGetCarSkinsInSearchPath(curDrv, 0, vecSkinNames, mapSkinTargets, mapSkinPreviewFiles);
+		rmdGetCarSkinsInSearchPath(driver, 0, vecSkinNames, mapSkinTargets, mapSkinPreviewFiles);
 
 		// Update skin targets for the choosen skin (targets might have changed).
-		curDrv->skinTargets = 0;
-		if (curDrv->skinName)
+		driver->skinTargets = 0;
+		if (driver->skinName)
 		{
 			std::map<std::string, int>::const_iterator itSkinTargets =
-				mapSkinTargets.find(curDrv->skinName);
+				mapSkinTargets.find(driver->skinName);
 			if (itSkinTargets != mapSkinTargets.end())
-				curDrv->skinTargets = itSkinTargets->second;
+				driver->skinTargets = itSkinTargets->second;
 		}
 		
 		// Next competitor.
 		index++;
 	}
 
-	// Update selected driver displayed info
-    rmdsClickOnDriver(NULL);
+	// Select the current driver in the relevant scroll-list
+	if (PPickedDriver)
+	{
+		const char* name;
+		int curDrvIndex = -1;
+		index = 0;
+		while ((name = GfuiScrollListGetElement(ScrHandle, CompetitorsScrollListId,
+												index, (void**)&driver)))
+		{
+			if (driver == PPickedDriver)
+			{
+				curDrvIndex = index;
+				break;
+			}
+			index++;
+		}
+		if (curDrvIndex >= 0)
+		{
+			GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId, curDrvIndex);
+			//GfLogDebug("Selecting competitor #%d '%s'\n", curDrvIndex, name);
+		}
+		else
+		{
+			curDrvIndex = -1;
+			index = 0;
+			while ((name = GfuiScrollListGetElement(ScrHandle, CandidatesScrollListId,
+													index, (void**)&driver)))
+			{
+				if (driver == PPickedDriver)
+				{
+					curDrvIndex =index;
+					break;
+				}
+				index++;
+			}
+			if (curDrvIndex >= 0)
+			{
+				GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, curDrvIndex);
+				//GfLogDebug("Selecting candidate #%d '%s'\n", curDrvIndex, name);
+			}
+		}
+	}
+
+	// Update car category filter criteria : use the one of the current driver if any.
+	const char* curDrvCarCat =  PPickedDriver ? PPickedDriver->carCategory : AnyCarCategory;
+    CurCarCategoryIndex =
+		(std::find(VecCarCategories.begin(), VecCarCategories.end(), curDrvCarCat)
+		 - VecCarCategories.begin() + VecCarCategories.size()) % VecCarCategories.size();
+	//GfLogDebug("Car cat filter : %p '%s' %d\n", PPickedDriver, curDrvCarCat, CurCarCategoryIndex);
+    rmdsFilterDriverScrollList(curDrvCarCat, VecDriverTypes[CurDriverTypeIndex].c_str());
+    GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
+    GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
+
 }
 
 // Screen de-activation call-back.
@@ -162,7 +218,7 @@ rmdsChangeCarCategory(void *vp)
 	CurCarCategoryIndex =
 		(CurCarCategoryIndex + VecCarCategories.size() + (int)(long)vp) % VecCarCategories.size();
 
-    GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategories[CurCarCategoryIndex].c_str());
+    GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
 
     rmdsFilterDriverScrollList(VecCarCategories[CurCarCategoryIndex].c_str(),
 							   VecDriverTypes[CurDriverTypeIndex].c_str());
@@ -201,7 +257,7 @@ rmdsChangeSkin(void *vp)
 
 	// Load associated preview image (or "no preview" panel if none available).
 	struct stat st;
-	if (!stat(MapCurDriverSkinPreviewFiles[pszCurSkinName].c_str(), &st))
+	if (GfFileExists(MapCurDriverSkinPreviewFiles[pszCurSkinName].c_str()))
 		GfuiStaticImageSet(ScrHandle, CarImageId,
 						   MapCurDriverSkinPreviewFiles[pszCurSkinName].c_str(),
 						   /* index= */ 0, /* canDeform= */false);
@@ -306,14 +362,10 @@ rmdsPreviousMenu(void *screen)
 static void
 rmdsCarSelectMenu(void *pPreviousMenu)
 {
-	//GfLogDebug("rmdsCarSelectMenu\n");
-
-	trmdDrvElt *pDriver = rmdsGetHighlightedDriver();
-
-	if (pDriver)
+	if (PPickedDriver)
 	{
 		CarSelectMenu.SetPreviousMenuHandle(pPreviousMenu);
-		CarSelectMenu.RunMenu(pDriver);
+		CarSelectMenu.RunMenu(PPickedDriver);
 	}
 }
 
@@ -326,8 +378,7 @@ rmdsMoveDriver(void *vd)
 static void
 rmdsClickOnDriver(void * /* dummy */)
 {
-    static const unsigned maxBufSize = 64;
-    char         buf[maxBufSize];
+    char         buf[64];
     const char	*name;
 	trmdDrvElt	*curDrv;
 
@@ -361,11 +412,14 @@ rmdsClickOnDriver(void * /* dummy */)
     // Update selected driver (if any) displayed infos.
     if (name)
 	{
-		rmdGetDriverType(curDrv->moduleName, buf, maxBufSize);
+		// The selected driver is the new picked one.
+		PPickedDriver = curDrv;
+
+		// Update picked driver info.
+		rmdGetDriverType(curDrv->moduleName, buf, sizeof(buf));
 		GfuiLabelSetText(ScrHandle, PickedDriverTypeLabelId, buf);
-		GfuiLabelSetText(ScrHandle, PickedDriverCarLabelId, GfParmGetName(curDrv->carParmHdle));
-		GfuiLabelSetText(ScrHandle, PickedDriverCarCategoryLabelId,
-						 GfParmGetStr(curDrv->carParmHdle, SECT_CAR, PRM_CATEGORY, ""));
+		GfuiLabelSetText(ScrHandle, PickedDriverCarLabelId, curDrv->carRealName);
+		GfuiLabelSetText(ScrHandle, PickedDriverCarCategoryLabelId, curDrv->carCategory);
 		
 		// Get really available skins, skin targets and preview files for the driver's car.
 		rmdGetCarSkinsInSearchPath(curDrv, 0, VecCurDriverSkinNames,
@@ -551,15 +605,15 @@ RmDriversSelect(void *vs)
     trmdDrvElt	*curDrv;
     int		nDrivers, robotIdx;
     void	*robhdle;
-    struct stat st;
     const char	*carName;
+    const char	*carRealName;
+    const char	*carCat;
     int		extended;
     void	*carhdle;
+    void	*cathdle;
     int		human;
     const char* initCarCat;
 
-	//GfLogDebug("RmDriversSelect\n");
-	
     // Initialize drivers selection
     MenuData = (tRmDriverSelect*)vs;
 
@@ -605,6 +659,7 @@ RmDriversSelect(void *vs)
     GF_TAILQ_INIT(&DriverList);
 
     VecCarCategories.push_back(AnyCarCategory);
+    VecCarCategoryNames.push_back(AnyCarCategory);
     VecDriverTypes.push_back(AnyDriverType);
 
     list = 0;
@@ -637,41 +692,54 @@ RmDriversSelect(void *vs)
 					carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "");
 					human = strcmp(GfParmGetStr(robhdle, path, ROB_ATTR_TYPE, ROB_VAL_ROBOT), ROB_VAL_ROBOT);
 					sprintf(path, "cars/%s/%s.xml", carName, carName);
-					if (!stat(path, &st)) {
-						carhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
-						if (carhdle) {
-							curDrv = (trmdDrvElt*)calloc(1, sizeof(trmdDrvElt));
-							curDrv->interfaceIndex = curmod->modInfo[i].index;
-							curDrv->moduleName = strdup(modName);
-							curDrv->carName = strdup(carName); // Default one if not specified in race file.
-							curDrv->skinName = 0; // Set later if needed from race params.
-							curDrv->skinTargets = 0; // Set later if needed from race params.
-							curDrv->name = strdup(curmod->modInfo[i].name);
-							curDrv->carParmHdle = carhdle;
-							//GfLogDebug("Candidate %s : %s on %s\n", modName, curDrv->name, carName);
-							const char* carCat = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, "");
-							if (std::find(VecCarCategories.begin(), VecCarCategories.end(), carCat) == VecCarCategories.end()) {
-								VecCarCategories.push_back(carCat);
-							}
-							rmdGetDriverType(modName, drvType, drvTypeMaxSize);
-							if (std::find(VecDriverTypes.begin(), VecDriverTypes.end(), drvType) == VecDriverTypes.end()) {
-								VecDriverTypes.push_back(drvType);
-							}
-			    
-							curDrv->isHuman = human ? 1 : 0;
-							if (human) {
-								GF_TAILQ_INSERT_HEAD(&DriverList, curDrv, link);
+					carhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
+					if (carhdle) {
+						carCat = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, "");
+						carRealName = GfParmGetName(carhdle);
+
+						curDrv = (trmdDrvElt*)calloc(1, sizeof(trmdDrvElt));
+						curDrv->interfaceIndex = curmod->modInfo[i].index;
+						curDrv->moduleName = strdup(modName);
+						curDrv->carName = strdup(carName); // Default one if not specified in race file.
+						curDrv->carRealName = strdup(carRealName); // For the default car.
+						curDrv->carCategory = strdup(carCat); // For the default car.
+						curDrv->skinName = 0; // Set later if needed from race params.
+						curDrv->skinTargets = 0; // Set later if needed from race params.
+						curDrv->name = strdup(curmod->modInfo[i].name);
+						//GfLogDebug("Candidate %s : %s on %s\n", modName, curDrv->name, carName);
+						if (std::find(VecCarCategories.begin(), VecCarCategories.end(), carCat) == VecCarCategories.end()) {
+							VecCarCategories.push_back(carCat);
+							sprintf(path, "categories/%s.xml", carCat);
+							cathdle = GfParmReadFile(path, GFPARM_RMODE_STD);
+							if (cathdle) {
+								carCat = GfParmGetName(cathdle);
 							} else {
-								GF_TAILQ_INSERT_TAIL(&DriverList, curDrv, link);
+								GfLogWarning("Car %s category file %s not %s for '%s' (%s #%d)\n",
+											 carName, path, GfFileExists(path) ? "readable" : "found",
+											 curmod->modInfo[i].name, modName, i);
 							}
-							NbTotDrivers++;
-						} else {
-							GfLogWarning("Ignoring '%s' (%s #%d) because '%s' is not readable\n",
-									curmod->modInfo[i].name, modName, i, path);
+							VecCarCategoryNames.push_back(carCat);
+							if (cathdle) 
+								GfParmReleaseHandle(cathdle);
 						}
+						GfParmReleaseHandle(carhdle);
+						
+						rmdGetDriverType(modName, drvType, drvTypeMaxSize);
+						if (std::find(VecDriverTypes.begin(), VecDriverTypes.end(), drvType) == VecDriverTypes.end()) {
+							VecDriverTypes.push_back(drvType);
+						}
+			    
+						curDrv->isHuman = human ? 1 : 0;
+						if (human) {
+							GF_TAILQ_INSERT_HEAD(&DriverList, curDrv, link);
+						} else {
+							GF_TAILQ_INSERT_TAIL(&DriverList, curDrv, link);
+						}
+						NbTotDrivers++;
 					} else {
-						GfLogWarning("Ignoring '%s' (%s #%d) because '%s' was not found\n",
-								curmod->modInfo[i].name, modName, i, path);
+						GfLogWarning("Ignoring '%s' (%s #%d) because '%s' file not %s\n",
+									 curmod->modInfo[i].name, modName, i, path,
+									 GfFileExists(path) ? "readable" : "found");
 					}
 				}
 			}
@@ -693,7 +761,7 @@ RmDriversSelect(void *vs)
 		(int)GfParmGetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 0);
     nDrivers = GfParmGetEltNb(MenuData->param, RM_SECT_DRIVERS);
 	//GfLogDebug("Competitors : n=%d (max=%d)\n", nDrivers, NbMaxSelectedDrivers);
-    initCarCat = 0;
+	PPickedDriver = 0;
     index = 1;
     for (i = 1; i < nDrivers+1; i++) {
 		// Get driver infos from the the starting grid in the race params file
@@ -723,10 +791,10 @@ RmDriversSelect(void *vs)
 						GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId,
 													curDrv->name, index, (void*)curDrv);
 
-						// Try and determine the initial car category for the filtering combo-box
-						// (the car category of the last human driver, or else of the last driver).
-						if (!initCarCat || curDrv->isHuman)
-							initCarCat = GfParmGetStr(curDrv->carParmHdle, SECT_CAR, PRM_CATEGORY, "");
+						// Initialize the picked driver
+						// (the last human driver, or else of the last driver).
+						if (!PPickedDriver || curDrv->isHuman)
+							PPickedDriver = curDrv;
 
 						// Get the chosen car for the race if any specified (human only).
 						if (curDrv->isHuman && extended)
@@ -735,16 +803,21 @@ RmDriversSelect(void *vs)
 							sprintf(path, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, moduleName, extended, robotIdx);
 							carName = GfParmGetStr(MenuData->param, path, RM_ATTR_CARNAME, 0);
 							sprintf(path, "cars/%s/%s.xml", carName, carName);
-							if (!stat(path, &st)) {
+							if (GfFileExists(path)) {
 								carhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
 								if (carhdle) {
-									//GfLogDebug("  Car XML OK : %s\n", path);
-									if (curDrv->carParmHdle)
-										GfParmReleaseHandle(curDrv->carParmHdle);
-									curDrv->carParmHdle = carhdle;
 									if (curDrv->carName)
 										free(curDrv->carName);
 									curDrv->carName = strdup(carName);
+									carCat = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, "");
+									if (curDrv->carCategory)
+										free(curDrv->carCategory);
+									curDrv->carCategory = strdup(carCat);
+									carRealName = GfParmGetName(carhdle);
+									if (curDrv->carRealName)
+										free(curDrv->carRealName);
+									curDrv->carRealName = strdup(carRealName);
+									GfParmReleaseHandle(carhdle);
 								} else {
 									GfLogError("Falling back to default car '%s' "
 											   "for %s because '%s' is not readable\n",
@@ -771,15 +844,10 @@ RmDriversSelect(void *vs)
 		}
     }
 
-    // Initialize Candidates scroll-list filter criteria and fill-in the scroll-list.
-    CurDriverTypeIndex = 0;
-    if (!initCarCat)
-		initCarCat = AnyCarCategory;
-    CurCarCategoryIndex = std::find(VecCarCategories.begin(), VecCarCategories.end(), initCarCat) - VecCarCategories.begin();
-    CurCarCategoryIndex = CurCarCategoryIndex % VecCarCategories.size();
-    rmdsFilterDriverScrollList(initCarCat, AnyDriverType);
-    GfuiLabelSetText(ScrHandle, DriverTypeEditId, AnyDriverType);
-    GfuiLabelSetText(ScrHandle, CarCategoryEditId, initCarCat);
+    // Initialize driver type filter criteria to "all types".
+    CurDriverTypeIndex =
+		(std::find(VecDriverTypes.begin(), VecDriverTypes.end(), AnyDriverType)
+		 - VecDriverTypes.begin() + VecDriverTypes.size()) % VecDriverTypes.size();
 
     // Picked Driver Info
     PickedDriverTypeLabelId = CreateLabelControl(ScrHandle,menuDescHdle,"pickeddrivertypelabel");
@@ -808,6 +876,7 @@ rmdsCleanup(void)
     trmdDrvElt *curDrv;
 
     VecCarCategories.clear();
+    VecCarCategoryNames.clear();
     VecDriverTypes.clear();
     VecCurDriverSkinNames.clear();
     MapCurDriverSkinPreviewFiles.clear();
@@ -817,9 +886,10 @@ rmdsCleanup(void)
 	free(curDrv->name);
 	free(curDrv->moduleName);
 	free(curDrv->carName);
+	free(curDrv->carRealName);
+	free(curDrv->carCategory);
 	if (curDrv->skinName)
 	    free(curDrv->skinName);
-	GfParmReleaseHandle(curDrv->carParmHdle);
 	free(curDrv);
     }
 }

@@ -33,7 +33,7 @@
 
 void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 {
-	//GfLogDebug("RmCarSelectMenu::onActivateCB\n");
+	GfLogTrace("Entering Car Select menu\n");
 
 	// Get the RmCarSelectMenu instance.
 	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
@@ -42,11 +42,8 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	// (use the 1st one from the 1st category if none).
 	CarData* pCurCar = CarInfo::self()->GetCarData(pMenu->getDriver()->carName);
 	if (!pCurCar)
-		pCurCar = &CarInfo::self()->GetCarsInCategory(CarInfo::self()->GetCategoryNames()[0])[0];
+		pCurCar = CarInfo::self()->GetCarsInCategory(CarInfo::self()->GetCategoryNames()[0])[0];
 
-	// Store current car params handle.
-	pMenu->setSelectedCarParamsHandle(pMenu->getDriver()->carParmHdle);
-	
 	// Get currently selected skin name for the current driver.
 	const char* pszCurSkinName =
 		pMenu->getDriver()->skinName ? pMenu->getDriver()->skinName : rmdStdSkinName;
@@ -54,8 +51,8 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	// Initialize the GUI contents.
 	GfuiLabelSetText(pMenu->GetMenuHandle(), pMenu->GetDynamicControlId("drivernamelabel"),
 					 pMenu->getDriver()->name);
-	pMenu->resetCarCategoryComboBox(pCurCar->strCategoryName);
-	pMenu->resetCarModelComboBox(pCurCar->strCategoryName, pCurCar->strRealName);
+	pMenu->resetCarCategoryComboBox(pCurCar->strCategoryRealName);
+	pMenu->resetCarModelComboBox(pCurCar->strCategoryRealName, pCurCar->strRealName);
 	pMenu->resetCarDataSheet(pCurCar->strName);
 	pMenu->resetCarSkinComboBox(pCurCar->strRealName, pszCurSkinName);
 	pMenu->resetCarPreviewImage(pszCurSkinName);
@@ -146,21 +143,33 @@ void RmCarSelectMenu::onAcceptCB(void *pCarSelectMenu)
 	}
 	pMenu->getDriver()->skinTargets = pMenu->getSelectedCarSkinTargets();
 	
-	// Save car choice into the driver structure (only human drivers can change it).
+	// Save car choice into the driver structure if any change
+	// (only human drivers can change it).
 	if (pMenu->getDriver()->isHuman)
 	{
+		const CarData* pNewCar = pMenu->getSelectedCarModel();
+		
 		// Car name.
 		const char* pszOldCarName = pMenu->getDriver()->carName;
-		const char* pszNewCarName = pMenu->getSelectedCarModel()->strName.c_str();
+		const char* pszNewCarName = pNewCar->strName.c_str();
 		if (pszNewCarName && (!pszOldCarName || strcmp(pszOldCarName, pszNewCarName)))
 		{
-			if (pszOldCarName)
+			if (pMenu->getDriver()->carName)
 				free(pMenu->getDriver()->carName);
 			pMenu->getDriver()->carName = strdup(pszNewCarName);
-		}
 
-		// Car XML file.
-		pMenu->getDriver()->carParmHdle = pMenu->getSelectedCarParamsHandle();
+			// Car real name.
+			if (pMenu->getDriver()->carRealName)
+				free(pMenu->getDriver()->carRealName);
+			const char* pszNewCarRealName = pNewCar->strRealName.c_str();
+			pMenu->getDriver()->carRealName = strdup(pszNewCarRealName);
+
+			// Car category.
+			if (pMenu->getDriver()->carCategory)
+				free(pMenu->getDriver()->carCategory);
+			const char* pszNewCarCatName = pNewCar->strCategoryName.c_str();
+			pMenu->getDriver()->carCategory = strdup(pszNewCarCatName);
+		}
 	}
 	
 	// Back to previous screen.
@@ -177,11 +186,11 @@ void RmCarSelectMenu::onCancelCB(void *pCarSelectMenu)
 }
 
 RmCarSelectMenu::RmCarSelectMenu()
-: GfuiMenuScreen("carselectmenu.xml"), _nCurSkinIndex(0), _pDriver(0), _hCarParams(0)
+: GfuiMenuScreen("carselectmenu.xml"), _nCurSkinIndex(0), _pDriver(0)
 {
 }
 
-void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelectedCategoryName)
+void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelectedCategoryRealName)
 {
 	const int nCategoryComboId = GetDynamicControlId("categorycombo");
 
@@ -189,15 +198,15 @@ void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelectedCat
 	GfuiEnable(GetMenuHandle(), nCategoryComboId, getDriver()->isHuman ? GFUI_ENABLE : GFUI_DISABLE);
 	
 	// Retrieve the available car categories.
-	const std::vector<std::string> vecCatNames = CarInfo::self()->GetCategoryNames();
+	const std::vector<std::string>& vecCatRealNames = CarInfo::self()->GetCategoryRealNames();
 
 	// Load the combo-box from their names (and determine the requested category index).
 	unsigned nCurrentCategoryIndex = 0;
 	GfuiComboboxClear(GetMenuHandle(), nCategoryComboId);
-	for (unsigned nCatIndex = 0; nCatIndex < vecCatNames.size(); nCatIndex++)
+	for (unsigned nCatIndex = 0; nCatIndex < vecCatRealNames.size(); nCatIndex++)
 	{
-		GfuiComboboxAddText(GetMenuHandle(), nCategoryComboId, vecCatNames[nCatIndex].c_str());
-		if (!strSelectedCategoryName.empty() && vecCatNames[nCatIndex] == strSelectedCategoryName)
+		GfuiComboboxAddText(GetMenuHandle(), nCategoryComboId, vecCatRealNames[nCatIndex].c_str());
+		if (!strSelectedCategoryRealName.empty() && vecCatRealNames[nCatIndex] == strSelectedCategoryRealName)
 			nCurrentCategoryIndex = nCatIndex;
 	}
 	
@@ -205,10 +214,10 @@ void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelectedCat
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nCategoryComboId, nCurrentCategoryIndex);
 
 	//GfLogDebug("resetCarCategoryComboBox(%s) : cur=%d\n",
-	//		   strSelectedCategoryName.c_str(), nCurrentCategoryIndex);
+	//		   strSelectedCategoryRealName.c_str(), nCurrentCategoryIndex);
 }
 
-void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
+void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryRealName,
 											const std::string& strSelectedCarRealName)
 {
 	const int nModelComboId = GetDynamicControlId("modelcombo");
@@ -217,8 +226,8 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
 	GfuiEnable(GetMenuHandle(), nModelComboId, getDriver()->isHuman ? GFUI_ENABLE : GFUI_DISABLE);
 	
 	// Retrieve car models in the selected category.
-	const std::vector<CarData> vecCarsInCat =	
-		CarInfo::self()->GetCarsInCategory(strCategoryName);
+	const std::vector<CarData*> vecCarsInCat =	
+		CarInfo::self()->GetCarsInCategoryRealName(strCategoryRealName);
 
 	// Load the combo-box from their real names (and determine the selected model index).
 	unsigned nCurrentCarIndexInCategory = 0;
@@ -226,9 +235,9 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
 	for (unsigned nCarIndex = 0; nCarIndex < vecCarsInCat.size(); nCarIndex++)
 	{
 		GfuiComboboxAddText(GetMenuHandle(), nModelComboId,
-							vecCarsInCat[nCarIndex].strRealName.c_str());
+							vecCarsInCat[nCarIndex]->strRealName.c_str());
 		if (!strSelectedCarRealName.empty()
-			&& vecCarsInCat[nCarIndex].strRealName == strSelectedCarRealName)
+			&& vecCarsInCat[nCarIndex]->strRealName == strSelectedCarRealName)
 			nCurrentCarIndexInCategory = nCarIndex;
 	}
 
@@ -236,7 +245,7 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCategoryName,
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nModelComboId, nCurrentCarIndexInCategory);
 
 	//GfLogDebug("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
-	//		   strCategoryName.c_str(), strSelectedCarRealName.c_str(),
+	//		   strCategoryRealName.c_str(), strSelectedCarRealName.c_str(),
 	//		   nCurrentCarIndexInCategory, vecCarsInCat.size());
 }
 
@@ -246,12 +255,9 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelectedCarName)
 
 	// Open new car params.
 	std::ostringstream ossCarXMLFileName;
-	ossCarXMLFileName << "cars/" << strSelectedCarName << '/' << strSelectedCarName << ".xml";
+	ossCarXMLFileName << "cars/" << strSelectedCarName << '/' << strSelectedCarName << PARAMEXT;
 	void* newHdle = GfParmReadFile(ossCarXMLFileName.str().c_str(), GFPARM_RMODE_STD);
 	
-	// Store new car params handle.
-	setSelectedCarParamsHandle(newHdle);
-
 	// Update GUI.
 	std::ostringstream ossSpecValue;
 	std::ostringstream ossSpecPath;
@@ -346,8 +352,6 @@ void RmCarSelectMenu::resetCarPreviewImage(const std::string& strSelectedSkinNam
 
 void RmCarSelectMenu::RunMenu(trmdDrvElt* pDriver)
 {
-	//GfLogDebug("RmCarSelectMenu::RunMenu\n");
-
 	// Initialize if not already done.
 	if (!GetMenuHandle())
 		Initialize();
@@ -361,10 +365,6 @@ void RmCarSelectMenu::RunMenu(trmdDrvElt* pDriver)
 
 bool RmCarSelectMenu::Initialize()
 {
-	//GfLogDebug("RmCarSelectMenu::Initialize\n");
-
-	CarInfo::self()->print();
-
 	// Create the menu and all its controls.
 	CreateMenuEx(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
 
@@ -415,24 +415,4 @@ trmdDrvElt* RmCarSelectMenu::getDriver()
 void RmCarSelectMenu::setDriver(trmdDrvElt* pDriver)
 {
 	_pDriver = pDriver;
-	_hCarParams = 0; // No newly selected car for the moment.
-}
-
-void RmCarSelectMenu::setSelectedCarParamsHandle(void* hdle)
-{
-	if (!hdle)
-		return;
-	
-	// Close old car params if not null and not the current driver's one
-	// (and if it really changes).
-	if (_hCarParams && _hCarParams != _pDriver->carParmHdle && _hCarParams != hdle)
-		GfParmReleaseHandle(_hCarParams);
-
-	// Store the new one.
-	_hCarParams = hdle;
-}
-
-void* RmCarSelectMenu::getSelectedCarParamsHandle() const
-{
-	return _hCarParams;
 }

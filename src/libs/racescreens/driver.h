@@ -29,6 +29,7 @@
 #include <map>
 
 #include <tgf.h>
+#include <carinfo.h>
 
 
 // Driver description
@@ -39,10 +40,11 @@ typedef struct rmdDrvElt
     char	*name;		// Driver name
     int		isSelected;	// Selected for race ?
     int		isHuman;	// Human driver ?
-    char	*carName;		// Car (folder) name
+    char	*carName;		// Car XML file / folder name
+    char	*carRealName;	// Car user-friendly name
+    char	*carCategory;	// Car category XML file / folder name
 	int		skinTargets;	// Skin targets bit-field (see car.h for possible values)   
     char	*skinName;		// Skin name (or 0 if standard skin)
-    void	*carParmHdle;	// Handle to the car XML params file
     GF_TAILQ_ENTRY(struct rmdDrvElt)	link;
 } trmdDrvElt;
 
