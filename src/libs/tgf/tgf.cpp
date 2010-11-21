@@ -441,6 +441,9 @@ void GfInit(void)
 	gfOsInit();
 	gfParamInit();
 
+	// Initialize random generator.
+	srand((unsigned)time(NULL));
+	
 	// Initialize SDL subsystems usefull for TGF.
 	if (SDL_Init(SDL_INIT_TIMER) < 0)
 		GfLogFatal("Couldn't initialize SDL(timer) (%s)\n", SDL_GetError());

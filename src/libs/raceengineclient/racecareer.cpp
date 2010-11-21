@@ -501,7 +501,7 @@ void ReCareerNew()
 
 	t = time(NULL);
 	stm = localtime(&t);
-	srand((unsigned int)t);
+	//srand((unsigned int)t); // Already done in tgf::gfInit (needed only once in the process life time)
 	snprintf( buf, 1024, "%sresults/%s/%%s-%4d-%02d-%02d-%02d-%02d%%s%%s%%s.xml%%s", GetLocalDir(), ReInfo->_reFilename,
 	          stm->tm_year + 1900, stm->tm_mon + 1, stm->tm_mday, stm->tm_hour, stm->tm_min );
 	filename = strdup(buf); //Makes it possible to reuse buf

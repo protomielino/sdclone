@@ -21,7 +21,7 @@ static const float PI = 3.1415927f;
 
 void setRandomSeed(unsigned int seed)
 {
-	srand(seed);
+	//srand(seed); // Already done in tgf::gfInit (needed only once in the process life time)
 }
 
 real urandom()
