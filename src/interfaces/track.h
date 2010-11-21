@@ -567,27 +567,34 @@ typedef struct
     void	  *params;	/**< Parameters handle */
     char	  *internalname; /**< Internal name of the track */
     const char	  *category;	/**< Category of the track */
-    int		  clouds;	/**< Clouds coverage in sky (from 1 = clear sky, to 8 = 100% gray sky */
+    int		  timeofday;   /**< Time of day (warning : consistency with RM_VAL_TIME_*) */
+#define TR_TIME_DAWN	0
+#define TR_TIME_MORNING	1
+#define TR_TIME_NOON	2
+#define TR_TIME_AFTERNOON	3
+#define TR_TIME_DUSK	4
+#define TR_TIME_NIGHT	5
+#define TR_TIME_DYNAMIC	6
+    int		  clouds;	/**< Clouds coverage in sky (warning : consistency with RM_VAL_CLOUDS_*)*/
 #define TR_CLOUDS_NONE   1
 #define TR_CLOUDS_FEW    3
 #define TR_CLOUDS_SCARCE 5
 #define TR_CLOUDS_MANY   7
 #define TR_CLOUDS_FULL  8
-    int		  water;	/**< Water on the ground */
-#define TR_WATER_NONE	0
-#define TR_WATER_LITTLE	1
-#define TR_WATER_SOME	2
-#define TR_WATER_MUCH	3
-    int		  timeofday;   /**< Time of day */
-    int		  rain;  /**< Rain strength */
+    int		  rain;  /**< Rain strength (warning : consistency with RM_VAL_RAIN_*) */
 #define TR_RAIN_NONE 0
 #define TR_RAIN_LITTLE 1
 #define TR_RAIN_MEDIUM 2
 #define TR_RAIN_HEAVY  3
 #define TR_RAIN_RANDOM 4
-    int		  rainprob; /**< Likelyhood of having ??? rain */
-    int		  rainlprob; /**< Likelyhood of having little rain */
-    int		  probrain;	 /**< Likelyhood of having normal rain */
+    int		  water;	/**< Water on the ground (= TR_RAIN_* for the moment) */
+#define TR_WATER_NONE	0
+#define TR_WATER_LITTLE	1
+#define TR_WATER_SOME	2
+#define TR_WATER_MUCH	3
+    int		  rainprob; /**< Likelyhood of having rain */
+    int		  rainlprob; /**< Likelyhood of having little rain when raining */
+    int		  probrain;	 /**< Likelyhood of having normal rain when raining */
     int		  nseg;		/**< Number of segments */
     int		  version;	/**< Version of the track type */
     int		  skyversion;   /**< Version Sky */

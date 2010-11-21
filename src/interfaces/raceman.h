@@ -321,6 +321,9 @@ typedef struct RmInfo
 #define RM_VAL_RACECONF		"race config"
 #define RM_VAL_CONFRACELEN	"race length"
 #define RM_VAL_CONFDISPMODE	"display mode"
+#define RM_VAL_CONFTIMEOFDAY	"time of day"
+#define RM_VAL_CONFCLOUDCOVER	"cloud cover"
+#define RM_VAL_CONFRAINFALL	"rain fall"
 
 #define RM_VAL_DRV_LIST_ORDER	"drivers list"
 #define RM_VAL_LAST_RACE_ORDER	"last race"
@@ -337,17 +340,31 @@ typedef struct RmInfo
 #define RM_VAL_INVISIBLE	"results only"
 #define RM_VAL_SIMUSIMU		"simulation simulation"
 
-#define RM_VAL_CLOUDS_NONE	"clear"
+#define RM_VAL_TIME_DAWN	"dawn"
+#define RM_VAL_TIME_MORNING	"morning"
+#define RM_VAL_TIME_NOON	"noon"
+#define RM_VAL_TIME_AFTERNOON	"afternoon"
+#define RM_VAL_TIME_DUSK	"dusk"
+#define RM_VAL_TIME_NIGHT	"night"
+#define RM_VAL_TIME_DYNAMIC	"dynamic"
+#define RM_VALS_TIME { RM_VAL_TIME_DAWN, RM_VAL_TIME_MORNING, RM_VAL_TIME_NOON, \
+                       RM_VAL_TIME_AFTERNOON, RM_VAL_TIME_DUSK, RM_VAL_TIME_NIGHT }
+
+#define RM_VAL_CLOUDS_NONE	"no cloud"
 #define RM_VAL_CLOUDS_FEW	"few clouds"
 #define RM_VAL_CLOUDS_SCARCE	"scarce clouds"
 #define RM_VAL_CLOUDS_MANY	"many clouds"
-#define RM_VAL_CLOUDS_FULL	"whole gray"
+#define RM_VAL_CLOUDS_FULL	"full cover"
+#define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE, \
+                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL }
 
 #define RM_VAL_RAIN_NONE	"none"
 #define RM_VAL_RAIN_LITTLE	"little"
 #define RM_VAL_RAIN_MEDIUM	"medium"
 #define RM_VAL_RAIN_HEAVY	"heavy"
 #define RM_VAL_RAIN_RANDOM	"random"
+#define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, \
+                       RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
 
 /* Movie capture */
 

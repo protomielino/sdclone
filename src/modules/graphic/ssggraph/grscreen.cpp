@@ -229,7 +229,7 @@ comparCars(const void *car1, const void *car2)
 void cGrScreen::camDraw(tSituation *s)
 {
 	int i;
-	double speedcar;
+	double carSpeed;
 	
 	glDisable(GL_COLOR_MATERIAL);
 	
@@ -267,10 +267,10 @@ void cGrScreen::camDraw(tSituation *s)
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	if (mirrorFlag == 1)
-		speedcar = curCar->_speed_x;
+		carSpeed = curCar->_speed_x;
 	else
-		speedcar = 0.0f;	
-	grDrawScene(speedcar, s);
+		carSpeed = 0.0f;	
+	grDrawScene(carSpeed, s);
 	GfProfStopProfile("grDrawScene*");
 }
 
@@ -432,14 +432,12 @@ void cGrScreen::initCams(tSituation *s)
 {
 	tdble fovFactor;
 	int i;
-	float skydynamic;
 	
 	fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
 	fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
-	skydynamic = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, (char*)NULL, 1.0);
-	if (skydynamic > 10000)
+	if (grSkyDomeDistance != 0)
 	{
-		fovFactor = (skydynamic / 10);
+		fovFactor = (grSkyDomeDistance / 10);
 	}
 	
 	if (boardCam == NULL) {

@@ -63,6 +63,9 @@ typedef struct RmRaceParam
     unsigned int	confMask;	/* Tell what to configure */
 #define RM_CONF_RACE_LEN	0x00000001
 #define RM_CONF_DISP_MODE	0x00000002
+#define RM_CONF_TIME_OF_DAY	0x00000004
+#define RM_CONF_CLOUD_COVER	0x00000008
+#define RM_CONF_RAIN_FALL	0x00000010
 } tRmRaceParam;
 
 typedef void (*tfSelectFile) (const char *);

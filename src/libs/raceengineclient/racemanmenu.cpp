@@ -26,8 +26,10 @@
 #include <cstdlib>
 #include <cstdio>
 
-#include <raceman.h>
+#include <portability.h>
+
 #include <tgfclient.h>
+#include <raceman.h>
 #include <playerconfig.h>
 #include <racescreens.h>
 #include <network.h>
@@ -39,21 +41,6 @@
 
 #include "racemanmenu.h"
 #include "networkingmenu.h"
-
-
-// TODO: Move this MSVC stuff to portability.h, in order we can "enjoy" it everywhere.
-// VC++ 2005 or newer ...
-#if defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++ 2005
-#undef snprintf 
-#define snprintf _snprintf_s
-#endif
-// ... VC++ 2005 or newer
-
-// VC++ 6.0 ...
-#if defined(WIN32) && !defined(snprintf_s) 
-#undef snprintf 
-#define snprintf _snprintf 
-#endif
 
 
 // Raceman menu.
@@ -159,6 +146,7 @@ reConfigRunState(void)
 
 	GfLogInfo("%s configuration now in '%s' stage.\n", ReInfo->_reName, conf);
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
+		
 		/* Track Select Menu */
 		ts.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
@@ -171,6 +159,7 @@ reConfigRunState(void)
 		RmTrackSelect(&ts);
 
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
+		
 		/* Drivers select menu */
 		ds.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
@@ -182,6 +171,7 @@ reConfigRunState(void)
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
+		
 		/* Race Options menu */
 		rp.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
@@ -191,6 +181,7 @@ reConfigRunState(void)
 		}
 		rp.param = ReInfo->params;
 		rp.title = GfParmGetStr(params, path, RM_ATTR_RACE, "Race");
+		
 		/* Select options to configure */
 		rp.confMask = 0;
 		snprintf(path, sizeof(path), "%s/%d/%s", RM_SECT_CONF, curConf, RM_SECT_OPTIONS);
@@ -201,13 +192,40 @@ reConfigRunState(void)
 			if (!strcmp(opt, RM_VAL_CONFRACELEN)) {
 				/* Configure race length */
 				rp.confMask |= RM_CONF_RACE_LEN;
-			} else {
-				if (!strcmp(opt, RM_VAL_CONFDISPMODE)) {
-					/* Configure display mode */
-					rp.confMask |= RM_CONF_DISP_MODE;
-				}
+			} else if (!strcmp(opt, RM_VAL_CONFDISPMODE)) {
+				/* Configure display mode */
+				rp.confMask |= RM_CONF_DISP_MODE;
+			} else if (!strcmp(opt, RM_VAL_CONFTIMEOFDAY)) {
+				/* Configure time of day */
+				rp.confMask |= RM_CONF_TIME_OF_DAY;
+			} else if (!strcmp(opt, RM_VAL_CONFCLOUDCOVER)) {
+				/* Configure cloud cover */
+				rp.confMask |= RM_CONF_CLOUD_COVER;
+			} else if (!strcmp(opt, RM_VAL_CONFRAINFALL)) {
+				/* Configure rain fall and dry/wet track */
+				rp.confMask |= RM_CONF_RAIN_FALL;
 			}
 		}
+		
+		/* Check if really something we can configure (given the graphic options) */
+		if ((rp.confMask & (RM_CONF_TIME_OF_DAY | RM_CONF_CLOUD_COVER)) == rp.confMask) {
+			
+			snprintf(path, sizeof(path), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+			void *grHandle = GfParmReadFile(path, GFPARM_RMODE_STD);
+			const bool bSkyDomeEnabled =
+				(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;
+			GfParmReleaseHandle(grHandle);
+			
+			if (!bSkyDomeEnabled)
+			{
+				GfLogInfo("Skipping Race Params menu because Sky Dome is disabled"
+						  " and is needed for all the configurable options\n");
+				GfuiScreenActivate(RacemanMenuHdle); /* Back to the race menu */
+				return;
+			}
+		}
+
+		/* All's right till now : enter the Race Params menu */
 		RmRaceParamsMenu(&rp);
 	}
 

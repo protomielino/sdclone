@@ -1007,18 +1007,14 @@ reDumpTrack(const tTrack *track, int verbose)
 int
 ReInitTrack(void)
 {
-	static const char *RainValueNames[] =
-		{ RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, RM_VAL_RAIN_HEAVY,
-		  RM_VAL_RAIN_RANDOM };
-	static const int NRainValues = sizeof( RainValueNames ) / sizeof( const char* );
+	static const char *TimeOfDayValues[] = RM_VALS_TIME;
+	static const int NTimeOfDayValues = sizeof( TimeOfDayValues ) / sizeof( const char* );
 	
-	static const char* CloudsValueNames[] =
-		{ RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE,
-		  RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL };
-	static const int NCloudsValues = sizeof( CloudsValueNames ) / sizeof( const char* );
-	static const int CloudsValues[NCloudsValues] =
-		{ TR_CLOUDS_NONE, TR_CLOUDS_FEW, TR_CLOUDS_SCARCE,
-		  TR_CLOUDS_MANY, TR_CLOUDS_FULL };
+	static const char* CloudsValues[] = RM_VALS_CLOUDS;
+	static const int NCloudsValues = sizeof( CloudsValues ) / sizeof( const char* );
+	
+	static const char *RainValues[] = RM_VALS_RAIN;
+	static const int NRainValues = sizeof( RainValues ) / sizeof( const char* );
 
 	const char  *trackName;
 	const char  *catName;
@@ -1047,27 +1043,38 @@ ReInitTrack(void)
 	sprintf(buf, "Loading track %s", ReInfo->track->name);
 	RmLoadingScreenSetText(buf);
 
-	int rain = TR_RAIN_NONE;
-	const char* pszRain =
-		GfParmGetStr(params, raceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
-	for (int i = 0; i < NRainValues; i++)
-		if (!strcmp(pszRain, RainValueNames[i]))
+	// Load time of day settings.
+	int timeofday = TR_TIME_AFTERNOON;
+	const char* pszTimeOfDay =
+		GfParmGetStr(params, raceName, RM_ATTR_TIME_OF_DAY, RM_VAL_TIME_AFTERNOON);
+	for (int i = 0; i < NTimeOfDayValues; i++)
+		if (!strcmp(pszTimeOfDay, TimeOfDayValues[i]))
 		{
-			rain = i;
+			timeofday = i;
 			break;
 		}
 
+	// Load cloud cover settings.
 	int clouds = TR_CLOUDS_NONE;
 	const char* pszClouds =
 		GfParmGetStr(params, raceName, RM_ATTR_CLOUDS, RM_VAL_CLOUDS_NONE);
 	for (int i = 0; i < NCloudsValues; i++)
-		if (!strcmp(pszClouds, CloudsValueNames[i]))
+		if (!strcmp(pszClouds, CloudsValues[i]))
 		{
-			clouds = CloudsValues[i];
+			clouds = i;
 			break;
 		}
 
-	const int timeofday = (int)GfParmGetNum(params, raceName, RM_ATTR_TIME_OF_DAY, NULL, 0);
+	// Load rain fall (and track dry/wet conditions) settings
+	int rain = TR_RAIN_NONE;
+	const char* pszRain =
+		GfParmGetStr(params, raceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
+	for (int i = 0; i < NRainValues; i++)
+		if (!strcmp(pszRain, RainValues[i]))
+		{
+			rain = i;
+			break;
+		}
 
 	ReInfo->track->timeofday = timeofday;
 	ReInfo->track->clouds = clouds; // Initial value : ReStartWeather may change it.
@@ -1076,25 +1083,6 @@ ReInitTrack(void)
 	reDumpTrack(ReInfo->track, 0.0);
 
 	ReStartWeather();
-
-	//DEBUG WEATHER - Verification function update friction
-#ifdef DEBUG
-	// No use since already done in that ReTrackUpdate is always called by ReStartWeather. 
-	//   tTrack *track = ReInfo->track;
-	//   GfLogDebug("ReInitTrack : Track params : clouds=%d, rain=%d\n",
-	// 			 clouds, rain);
-	//   GfLogDebug("ReInitTrack : Track timeday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
-	// 			 track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
-	//   GfLogDebug("ReInitTrack : kFriction, kRollRes for each track surface :\n");
-	//   tTrackSurface *curSurf;
-	//   curSurf = track->surfaces;
-	//   do {
-	// 	  GfLogDebug("                   %.4f, %.4f   %s\n",
-	// 				 curSurf->kFriction, curSurf->kRollRes, curSurf->material);
-	// 	  curSurf = curSurf->next;
-	//   } while ( curSurf );
-#endif
-	// End Function DEBUG TRACE Variable kFriction
   
 	return 0;
 }//ReInitTrack

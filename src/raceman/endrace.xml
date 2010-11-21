@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Endurance Race" version="1.13">
+<params name="Endurance Race" version="1.14">
 
   <section name="Header">
     <attstr name="name" val="Endurance Race"/>
@@ -148,6 +148,22 @@
 
     <section name="2">
       <attstr name="type" val="drivers select"/>
+    </section>
+
+    <section name="3">
+      <attstr name="type" val="race config"/>
+      <attstr name="race" val="Race"/>
+      <section name="Options">
+        <section name="1">
+          <attstr name="type" val="time of day"/>
+        </section>
+        <section name="2">
+          <attstr name="type" val="cloud cover"/>
+        </section>
+        <section name="3">
+          <attstr name="type" val="rain fall"/>
+        </section>
+      </section>
     </section>
 
   </section>

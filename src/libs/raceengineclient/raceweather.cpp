@@ -33,8 +33,6 @@
 
 */
 
-#include <ctime>
-
 #include <raceman.h>
 #include <track.h>
 
@@ -55,17 +53,13 @@ void ReStartWeather(void)
 	int resul2;
 	tTrack *track = ReInfo->track;
 
-	 // TODO: Move this inside TGF initialization, or so (in order to have it done only once).
-	srand((unsigned)time(NULL));
-	
 	timeofday = track->timeofday;
 	clouds = track->clouds;
 	rain = track->rain;
 	
-	//if (timeofday > 0)
 	if (rain != TR_RAIN_RANDOM)
 	{
-		GfLogInfo("ReStartWeather : Using loaded rain (%d) and clouds (%d) settings\n",
+		GfLogInfo("Using loaded rain (%d) and clouds (%d) settings\n",
 				  rain, (rain != TR_RAIN_NONE) ? TR_CLOUDS_FULL : clouds);
 	}
 	else
@@ -103,7 +97,7 @@ void ReStartWeather(void)
 
 	track->rain = rain;
 	track->clouds = (rain != TR_RAIN_NONE) ? TR_CLOUDS_FULL : clouds; // rain => heavy clouds
-	track->water = track->rain; // Hard link between rain and gound water ; may change in the future
+	track->water = track->rain; // ground water = rain ; should change in the future
 	
 	ReTrackUpdate();
 }

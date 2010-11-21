@@ -39,14 +39,18 @@
 #include "grrain.h"
 #include "grSky.h"
 
-#define MAX_BODIES	2
-#define MAX_CLOUDS	3
-#define NSTARS			1000
-#define NPLANETS		0	//No planets displayed
 #define NB_BG_FACES	36	//Background faces
 #define BG_DIST			1.0f
-#define SKYDYNAMIC_THR	12000	//Skydynamic setting threshold. No dynamic sky below that.
-enum {SUN = 0, MOON};	//Celestial bodies
+
+const int grSkyDomeDistThresh = 12000; // No dynamic sky below that value.
+
+static const int NMaxStars = 1000;
+static const int NMaxPlanets = 0; //No planets displayed for the moment
+static const int NMaxCloudLayers = 3;
+enum {eCBSun = 0, eCBMoon, NMaxCelestianBodies};	// Celestial bodies
+
+static int NStars = 0;
+static int NPlanets = 0;
 
 int grWrldX;
 int grWrldY;
@@ -58,6 +62,8 @@ ssgStateSelector *grEnvSelector = NULL;
 grMultiTexState	*grEnvState = NULL;
 grMultiTexState	*grEnvShadowState = NULL;
 grMultiTexState	*grEnvShadowStateOnCars = NULL;
+
+int grSkyDomeDistance = 0;
 
 ssgRoot *TheScene = NULL;
 //TheScene kid order
@@ -72,13 +78,10 @@ ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
 
-static int Rain = 0;
-static int skydynamic = 0;
-static int TimeDyn = 0;
-static int WeatherDyn = 0;
+//static int DynamicWeather = 0;
 static int BackgroundType = 0;
-static float sd = 0.0f;
-static float sd2 = 0.0f;
+static float grSunDeclination = 0.0f;
+static float grMoonDeclination = 0.0f;
 static GLuint BackgroundList = 0;
 static GLuint BackgroundTex = 0;
 static GLuint BackgroundList2;
@@ -88,11 +91,11 @@ static ssgRoot *TheBackground = NULL;
 static grSky *Sky = NULL;
 static ssgTransform *TheSun = NULL;
 
-static grCelestialBody *bodies[MAX_BODIES] = { NULL };
+static grCelestialBody *bodies[NMaxCelestianBodies] = { NULL };
 static grMoon *Moon = NULL;
 
-static sgdVec3 *star_data = NULL;
-static sgdVec3 *planet_data = NULL;
+static sgdVec3 *AStarsData = NULL;
+static sgdVec3 *APlanetsData = NULL;
 
 static sgVec4 black             = { 0.0f, 0.0f, 0.0f, 1.0f } ;
 static sgVec4 white             = { 1.0f, 1.0f, 1.0f, 1.0f } ;
@@ -118,7 +121,6 @@ static const double m_log01 = -log( 0.01 );
 static const double sqrt_m_log01 = sqrt( m_log01 );
 static char buf[1024];
 static void initBackground(void);
-static void grDrawRain(void);
 
 
 //Must have
@@ -143,11 +145,12 @@ grInitScene(void)
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	}//if grHandle
 
-	/**If no dynamic sky is set,
-	 * or the track skyversion doesn't support dynamic sky,
-	 * we set up a static one */
-	if((skydynamic < SKYDYNAMIC_THR) || (grTrack->skyversion < 1)) 
+	/* If no dynamic sky is set, or the track skyversion doesn't support dynamic sky,
+	   we set up a static one */
+	if (grSkyDomeDistance < grSkyDomeDistThresh || grTrack->skyversion < 1) 
 	{
+		GfLogInfo("Setting up static sky\n");
+
 		GLfloat mat_specular[]   = {0.3, 0.3, 0.3, 1.0};
 		GLfloat mat_shininess[]  = {50.0};
 		GLfloat light_position[] = {0, 0, 200, 0.0};
@@ -192,132 +195,183 @@ grInitScene(void)
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
 	}
+	
+	/** If dynamic sky is needed, we create the Sun, the Moon, some stars and the clouds */
 	else 
 	{
-		/** If dynamic sky is needed, we create the Sun, the Moon, some stars and the clouds */
+		GfLogInfo("Setting up dynamic sky :\n");
+
+		static const int CloudsTextureIndices[] = { 1, 3, 5, 7, 8 };
+		static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
 
 		//Query the time
 		static ulClock ck;
-		//float sd;
-		//float sd2;
 		double dt = ck.getDeltaTime();
 
-		int div = 80000 / skydynamic;	//skydynamic >= SKYDYNAMIC_THR so cannot div0
-		ssgSetNearFar(1, skydynamic);
+		int div = 80000 / grSkyDomeDistance;	//grSkyDomeDistance >= grSkyDomeDistThresh so cannot div0
+		ssgSetNearFar(1, grSkyDomeDistance);
 
-		//Add random stars
-		star_data = new sgdVec3[NSTARS];
-		for(int i= 0; i < NSTARS; i++) 
+		// Add random stars at dawn, dusk or night.
+		switch (grTrack->timeofday) 
 		{
-			star_data[i][0] = grRandom() * SGD_PI;
-			star_data[i][1] = grRandom() * SGD_PI;
-			star_data[i][2] = grRandom();
-		}//for i
+			case TR_TIME_DUSK:
+			case TR_TIME_DAWN:
+				NStars = NMaxStars / 2;
+				break;
 
-		//No planets
-		//sgdVec3 *planet_data = NULL;
-
-		//Build the sky
-		Sky	= new grSky;
-		Sky->build(skydynamic, skydynamic, NPLANETS, planet_data, NSTARS, star_data);
-		
-		//Add the Sun itself
-		//ssgaCelestialBody *bodies[MAX_BODIES] = { NULL };
-        bodies[SUN] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), skydynamic, true);
-		GLfloat	sunpos1 = 0.0f;
-		GLfloat	sunpos2 = 0.0f;
-		sunpos1 = (float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_HOUR, (char*)NULL, sunpos1);
-		sunpos2 = (float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_SUN_H, (char*)NULL, sunpos2);
-
-		int timeofday = grTrack->timeofday;
-		switch (timeofday) 
-		{
-			case 1:
-				sd = -90.0f;
-				//bodies[SUN]->setDeclination ( -90.0 * SGD_DEGREES_TO_RADIANS);
+			case TR_TIME_NIGHT:
+				NStars = NMaxStars;
 				break;
 					
-			case 2:
-				sd = 2.0f;
-				//bodies[SUN]->setDeclination ( 2.0 * SGD_DEGREES_TO_RADIANS);
+			default:
+				NStars = 0;
 				break;
-					
-			case 3:
-				sd = 30.0f;
-				//bodies[SUN]->setDeclination ( 30.0 * SGD_DEGREES_TO_RADIANS);
-				break;
-					
-			case 4:
-				sd = 85.0f;
-				//bodies[SUN]->setDeclination ( 85.0 * SGD_DEGREES_TO_RADIANS);
-				break;
-					
-			default: //if quickrace
-				sd = ((sunpos1 / 3600) * 15.0f) - 90.0f;
-				GfLogDebug("Sunpos1 = %f - SD = %f\n", sunpos1, sd);
+				
 		}//switch timeofday
 
-		bodies[SUN]->setDeclination ( sd * SGD_DEGREES_TO_RADIANS);
-		bodies[SUN]->setRightAscension ( sunpos2 * SGD_DEGREES_TO_RADIANS);
+		if (AStarsData)
+			delete AStarsData;
+		AStarsData = new sgdVec3[NStars];
+		for(int i= 0; i < NStars; i++) 
+		{
+			AStarsData[i][0] = grRandom() * SGD_PI;
+			AStarsData[i][1] = grRandom() * SGD_PI;
+			AStarsData[i][2] = grRandom();
+		}//for i
+
+		GfLogInfo("  Stars : %d random ones\n", NStars);
+		
+		//No planets
+		NPlanets = 0;
+		APlanetsData = NULL;
+
+		GfLogInfo("  Planets : none\n");
+		
+		//Build the sky
+		Sky	= new grSky;
+		Sky->build(grSkyDomeDistance, grSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData);
+		
+		//Add the Sun itself
+        bodies[eCBSun] = Sky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), grSkyDomeDistance, true);
+		GLfloat sunAscension =
+			(float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_SUN_H, (char*)NULL, 0.0f);
+
+		switch (grTrack->timeofday) 
+		{
+			case TR_TIME_DAWN:
+				grSunDeclination = 2.0f;
+				break;
+					
+			case TR_TIME_MORNING:
+				grSunDeclination = 30.0f;
+				break;
+					
+			case TR_TIME_NOON:
+				grSunDeclination = 85.0f;
+				break;
+					
+			case TR_TIME_AFTERNOON:
+				grSunDeclination = 135.0f;
+				break;
+					
+			case TR_TIME_DUSK:
+				grSunDeclination = 178.0f;
+				break;
+					
+			case TR_TIME_NIGHT:
+				grSunDeclination = -90.0f;
+				break;
+					
+			case TR_TIME_DYNAMIC:
+			{
+				const float sunHeight =
+					(float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_HOUR, (char*)NULL, 0.0f);
+				GfLogDebug("User defined sun height = %f\n", sunHeight);
+				grSunDeclination = ((sunHeight / 3600) * 15.0f) - 90.0f;
+				break;
+			}
+
+			default:
+				grSunDeclination = 135.0f;
+				GfLogError("Unsupported value %d for grTrack->timeofday (assuming afternoon)\n",
+						   grTrack->timeofday);
+				break;
+				
+		}//switch timeofday
+
+		bodies[eCBSun]->setDeclination ( grSunDeclination * SGD_DEGREES_TO_RADIANS);
+		bodies[eCBSun]->setRightAscension ( sunAscension * SGD_DEGREES_TO_RADIANS);
+
+		GfLogInfo("  Sun : declination = %4.1f deg, ascension = %4.1f deg\n",
+				  grSunDeclination, sunAscension);
 
 		//Add the Moon
-		bodies[MOON] = Sky->addBody ( "data/textures/moon.rgba",NULL, (2500 / div), skydynamic);
-		if ( sd < 0 )
-			sd2 = 3.0 + (rand() % 25);
+		bodies[eCBMoon] = Sky->addBody ( "data/textures/moon.rgba",NULL, (2500 / div), grSkyDomeDistance);
+		if ( grSunDeclination < 0 )
+			grMoonDeclination = 3.0 + (rand() % 25);
 		else
-			sd2 = -(rand() % 45) + 10;
+			grMoonDeclination = -(rand() % 45) + 10;
 
-		bodies[MOON]->setDeclination (sd2 * SGD_DEGREES_TO_RADIANS );
+		const float moonAscension = (float)(rand() % 240);
+		
+		bodies[eCBMoon]->setDeclination (grMoonDeclination * SGD_DEGREES_TO_RADIANS );
+		bodies[eCBMoon]->setRightAscension ( moonAscension * SGD_DEGREES_TO_RADIANS );
 
-		bodies[MOON]->setRightAscension ( ((rand() % 240)) * SGD_DEGREES_TO_RADIANS );
+		GfLogInfo("  Moon : declination = %4.1f deg, ascension = %4.1f deg\n",
+				  grMoonDeclination, moonAscension);
 
-		//Add clouds
-		int cloudsState = grTrack->clouds;
+		// Add clouds
+		if (grTrack->clouds < 0)
+			grTrack->clouds = 0;
+		else if(grTrack->clouds >= NCloudsTextureIndices)
+			grTrack->clouds = NCloudsTextureIndices - 1;
+		const int cloudsTextureIndex = CloudsTextureIndices[grTrack->clouds];
 
-		GfLogDebug("Cloud = %d", cloudsState);
-
-		grCloudLayer *clouds[MAX_CLOUDS] = { NULL };
-		sprintf(buf, "data/textures/scattered%d.rgba", cloudsState);//scattered1, scattered2, etc
-		if (Rain > 0)
-			clouds[0] = Sky->addCloud(buf, skydynamic, 650, 400 * div, 400 * div);
+		grCloudLayer *cloudLayers[NMaxCloudLayers] = { NULL };
+		snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+		if (grTrack->rain > 0) // TODO: More/different cloud layers for each rain strength value ?
+			cloudLayers[0] = Sky->addCloud(buf, grSkyDomeDistance, 650, 400 * div, 400 * div);
 		else
-			clouds[0] = Sky->addCloud(buf, skydynamic, 2550, 100 * div, 100 * div);
-		clouds[0]->setSpeed(60);
-		clouds[0]->setDirection(45);
+			cloudLayers[0] = Sky->addCloud(buf, grSkyDomeDistance, 2550, 100 * div, 100 * div);
+		cloudLayers[0]->setSpeed(60);
+		cloudLayers[0]->setDirection(45);
+		GfLogInfo("  Cloud cover : 1 layer, texture=%s, speed=60, direction=45\n", buf);
     
-		/*clouds[1] = Sky->addCloud ("data/textures/scattered1.rgba", skydynamic, skydynamic-2000, 400 * div, 400 * div);
-		clouds[1] -> setSpeed (20);
-		clouds[1] -> setDirection (45);
-    
-		clouds[2] = Sky->addCloud ("data/textures/scattered.png", 20000, 2450, 400, 400);
-		clouds[2] -> setSpeed (20);
-		clouds[2] -> setDirection (45);*/
-   		
 		//Set up the light source to the Sun position?
     	sgVec3 solposn;
     	sgSetVec3(solposn, 0, 0, 0);
 				  
     	ssgGetLight(0)->setPosition(solposn);
-    	Sky->repositionFlat(solposn , 0, dt);    
+    	Sky->repositionFlat(solposn, 0, dt);    
 
-		//If it rains, decrease visibility
-		if(Rain > 0) 
+		//Setup visibility according to rain if any
+		float visibility = 0.0f;
+		switch (grTrack->rain)	
 		{
-			switch (Rain)	
-			{
-				case 1 : Sky->modifyVisibility( 400.0f, (float)dt); break;
-				case 2 : Sky->modifyVisibility( 500.0f, (float)dt); break;
-				case 3 : Sky->modifyVisibility( 550.0f, (float)dt); break;
-
-    			}//switch Rain
-	
-			//grRain.drawPrecipitation(1, 1.0, 1.0, 1.0, 0.0, 0.0, 5.0, 10.0);
-		}
-		else 
-			Sky->modifyVisibility( 0.0f, (float)dt);
-     	//if Rain
+			case TR_RAIN_NONE:
+				visibility = 0.0f;
+				break;
+			case TR_RAIN_LITTLE:
+				visibility = 400.0f;
+				break;
+			case TR_RAIN_MEDIUM:
+				visibility = 500.0f;
+				break;
+			case TR_RAIN_HEAVY:
+				visibility = 550.0f;
+				break;
+			case TR_RAIN_RANDOM:
+				// Should never happens here (only used in the menu side).
+			default:
+				GfLogWarning("Unsupported rain strength value %d (assuming none)", grTrack->rain);
+				visibility = 0.0f;
+				break;
+		}//switch Rain
+		
+		Sky->modifyVisibility( visibility, (float)dt);
     
-		double sol_angle = bodies[SUN]->getAngle();
+		//Setup overall light level according to rain if any
+		double sol_angle = bodies[eCBSun]->getAngle();
 		double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 		double scene_brightness = pow(sky_brightness, 0.5);
         
@@ -326,7 +380,7 @@ grInitScene(void)
 		sky_color[2] = base_sky_color[2] * (float)sky_brightness;
 		sky_color[3] = base_sky_color[3];
 		
-		if (Rain > 0)
+		if (grTrack->rain > 0) // TODO: Different values for each rain strength value ?
 		{
 			base_fog_color[0] = 0.40f;
 			base_fog_color[1] = 0.43f;
@@ -348,10 +402,10 @@ grInitScene(void)
 		cloud_color[2] = fog_color[2] = base_fog_color[2] * (float)sky_brightness;
 		cloud_color[3] = fog_color[3] = base_fog_color[3];
 	
-		Sky->repaint(sky_color, fog_color, cloud_color, sol_angle, NPLANETS, planet_data, NSTARS, star_data);
+		Sky->repaint(sky_color, fog_color, cloud_color, sol_angle, NPlanets, APlanetsData, NStars, AStarsData);
 	
 		sgCoord solpos;
-		bodies[SUN]-> getPosition(&solpos);
+		bodies[eCBSun]-> getPosition(&solpos);
 		ssgGetLight(0)-> setPosition(solpos.xyz);	
 	
 		scene_ambiant[0] = base_ambiant[0] * (float)scene_brightness;
@@ -367,13 +421,19 @@ grInitScene(void)
 		scene_specular[0] = base_specular[0] * (float)scene_brightness;
 		scene_specular[1] = base_specular[1] * (float)scene_brightness;
 		scene_specular[2] = base_specular[2] * (float)scene_brightness;
-                scene_specular[3] = 1.0;
+		scene_specular[3] = 1.0;
 	
 		glLightModelfv( GL_LIGHT_MODEL_AMBIENT, black);
 		ssgGetLight(0) -> setColour( GL_AMBIENT, scene_ambiant);
 		ssgGetLight(0) -> setColour( GL_DIFFUSE, scene_diffuse);
 		ssgGetLight(0) -> setColour( GL_SPECULAR, scene_specular);
-	}//else skydynamic 
+	}//else grSkyDomeDistance 
+
+	// Initialize rain renderer
+	if (grTrack->rain > 0)
+	{
+		grRain.initialize(grTrack->rain);
+	}
 	
 	/*if (!SUN) 
 	{
@@ -400,7 +460,7 @@ grInitScene(void)
 }//grInitScene
 
 
-static grssgLoaderOptions	options(/*bDoMipMap*/true);
+static grssgLoaderOptions options(/*bDoMipMap*/true);
 
 int
 grLoadScene(tTrack *track)
@@ -420,9 +480,11 @@ grLoadScene(tTrack *track)
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	}//if grHandle
 
-	skydynamic = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, (char*)NULL, skydynamic);
-	TimeDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, (char*)NULL, TimeDyn);
-	WeatherDyn = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICWEATHER, (char*)NULL, WeatherDyn);
+	grSkyDomeDistance =
+		GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
+	if (grSkyDomeDistance > 0 && grSkyDomeDistance < grSkyDomeDistThresh)
+		grSkyDomeDistance = grSkyDomeDistThresh; // If user enabled it (>0), must be over the threshold.
+	//DynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICWEATHER, (char*)NULL, DynamicWeather);
 			
 	grTrack = track;
 	TheScene = new ssgRoot;
@@ -470,14 +532,7 @@ grLoadScene(tTrack *track)
 	grWrldZ = (int)(track->max.z - track->min.z + 1);
 	grWrldMaxSize = (int)(MAX(MAX(grWrldX, grWrldY), grWrldZ));
 
-	Rain = grTrack->rain;
-	GfLogTrace("Rain = %d\n", Rain);
-
-	//acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
-	/*if ((grTrack->timeofday == 1) && (grTrack->skyversion > 0)) // If night in quickrace, practice or network mode
-		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC3, "track.ac");
-	else*/
-		acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
+	acname = GfParmGetStr(hndl, TRK_SECT_GRAPH, TRK_ATT_3DDESC, "track.ac");
 	if (strlen(acname) == 0) 
 	{
 		GfLogError("No specified track 3D model file\n");
@@ -496,13 +551,15 @@ grLoadScene(tTrack *track)
 }//grLoadScene
 
 void
-grDrawScene(float speedcar, tSituation *s) 
+grDrawScene(float carSpeed, tSituation *s) 
 {
-	const bool bDrawSky = skydynamic >= SKYDYNAMIC_THR && grTrack->skyversion > 0;
+	const bool bDrawSky = (grSkyDomeDistance >= grSkyDomeDistThresh && grTrack->skyversion > 0);
 	if (bDrawSky) 
 	{
-		if(TimeDyn == 1) {grUpdateTime(s);}		
-				
+		if (grTrack->timeofday == TR_TIME_DYNAMIC) {
+			grUpdateTime(s);
+		}
+		
 		glClearColor(fog_color[0], fog_color[1], fog_color[2], fog_color[3]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -513,14 +570,14 @@ grDrawScene(float speedcar, tSituation *s)
 		glFogf(GL_FOG_DENSITY, fog_exp2_density);
 		glHint(GL_FOG_HINT, GL_DONT_CARE);
 
-		ssgGetLight(0)-> setColour(GL_DIFFUSE, white);
+		ssgGetLight(0)->setColour(GL_DIFFUSE, white);
 
 		Sky->preDraw();
 
 		glLightModelfv( GL_LIGHT_MODEL_AMBIENT, black);
-		ssgGetLight(0) -> setColour( GL_AMBIENT, scene_ambiant);
-		ssgGetLight(0) -> setColour( GL_DIFFUSE, scene_diffuse);
-		ssgGetLight(0) -> setColour( GL_SPECULAR, scene_specular);
+		ssgGetLight(0)->setColour(GL_AMBIENT, scene_ambiant);
+		ssgGetLight(0)->setColour(GL_DIFFUSE, scene_diffuse);
+		ssgGetLight(0)->setColour(GL_SPECULAR, scene_specular);
 	}
 	
 	TRACE_GL("refresh: ssgCullAndDraw start");
@@ -529,13 +586,14 @@ grDrawScene(float speedcar, tSituation *s)
 	
 	if (bDrawSky) 
 	{
-		Sky->postDraw(skydynamic);
-		if(Rain > 0)
-		{
-			grRain.drawPrecipitation(Rain, 1.0, 0.0, 0.0, 0.0, speedcar);
-		}
+		Sky->postDraw(grSkyDomeDistance);
+	}
 	
-	} 
+	if (grTrack->rain > 0)
+	{
+		grRain.drawPrecipitation(grTrack->rain, 1.0, 0.0, 0.0, 0.0, carSpeed);
+	}
+	
 }//grDrawScene
 
 
@@ -1083,30 +1141,39 @@ grUpdateTime(tSituation *s)
 {
 	static int lastchecked = -100;
 	static double lastTime = -10.0f;
-	if( s->currentTime < lastTime ) { lastchecked = -100; lastTime = s->currentTime; return; }
+	if( s->currentTime < lastTime ) {
+		lastchecked = -100;
+		lastTime = s->currentTime;
+		return;
+	}
+
 	int current = (int)floor( ( s->currentTime + 10.0f ) / 60.0f );
 	double dt = s->currentTime - lastTime;
 	sgVec3 solposn;
-    	sgSetVec3(solposn, 0, 0, 0);				  
-    	ssgGetLight(0)->setPosition(solposn);
-    	Sky->repositionFlat(solposn , 0, dt);
+	sgSetVec3(solposn, 0, 0, 0);				  
+	ssgGetLight(0)->setPosition(solposn);
+	Sky->repositionFlat(solposn , 0, dt);
 	lastTime = s->currentTime;
 	if( current == lastchecked )
 		return;
 	lastchecked = current;
 
-	/* Update */
-	sd = sd + 0.25f;
-	if (sd > 359.9f)
-		sd = 0.0f;
-	sd2 = sd2 + 0.25f;
-	if (sd2 > 359.9f)
-		sd2 = 0.0f;
+	GfLogDebug("Updating time for dynamic time of day\n");
 	
-	bodies[SUN]->setDeclination ( sd * SGD_DEGREES_TO_RADIANS);
-	bodies[MOON]->setDeclination (	sd2 * SGD_DEGREES_TO_RADIANS );
+	/* Update */
+	grSunDeclination += 0.25f; // TODO: Is this delta value realistic ?
+	if (grSunDeclination >= 360.0f)
+		grSunDeclination = 0.0f;
+	
+	bodies[eCBSun]->setDeclination ( grSunDeclination * SGD_DEGREES_TO_RADIANS );
 
-	double sol_angle = bodies[SUN]->getAngle();
+	grMoonDeclination += 0.25f; // TODO: Is this delta value realistic ?
+	if (grMoonDeclination >= 360.0f)
+		grMoonDeclination = 0.0f;
+	
+	bodies[eCBMoon]->setDeclination ( grMoonDeclination * SGD_DEGREES_TO_RADIANS );
+
+	double sol_angle = bodies[eCBSun]->getAngle();
 	double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 	double scene_brightness = pow(sky_brightness, 0.5);
 	
@@ -1123,10 +1190,10 @@ grUpdateTime(tSituation *s)
 
 	/* repaint the sky */			
 
-	Sky->repaint(sky_color, fog_color, cloud_color, sol_angle, NPLANETS, planet_data, NSTARS, star_data);
+	Sky->repaint(sky_color, fog_color, cloud_color, sol_angle, NPlanets, APlanetsData, NStars, AStarsData);
 
 	sgCoord solpos;
-	bodies[SUN]-> getPosition(&solpos);
+	bodies[eCBSun]-> getPosition(&solpos);
 	ssgGetLight(0)-> setPosition(solpos.xyz);	
 
 	scene_ambiant[0] = base_ambiant[0] * (float)scene_brightness;
@@ -1142,5 +1209,5 @@ grUpdateTime(tSituation *s)
 	scene_specular[0] = base_specular[0] * (float)scene_brightness;
 	scene_specular[1] = base_specular[1] * (float)scene_brightness;
 	scene_specular[2] = base_specular[2] * (float)scene_brightness;
-    	scene_specular[3] = 1.0;
+	scene_specular[3] = 1.0;
 }

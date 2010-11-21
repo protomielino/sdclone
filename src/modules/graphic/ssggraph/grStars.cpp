@@ -50,7 +50,12 @@ ssgBranch * grStars::build( int num, sgdVec3 *star_data, double star_dist )
   stars_transform->ref();
 
   if ( star_data == NULL )
-    ulSetError(UL_WARNING, "null star data passed to grStars::build()");
+  {
+	  if (num > 0)
+		  ulSetError(UL_WARNING, "null star data passed to grStars::build()");
+	  else
+		  return stars_transform;
+  }
 
   // set up the orb state
   state = new ssgSimpleState();

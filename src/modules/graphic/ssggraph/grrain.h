@@ -35,7 +35,7 @@
 class cGrRain
 {
 private:
-	void DrawCone2(float baseRadius, float height, int slices, bool down, double rain_norm, double speed);
+	void drawCone(float baseRadius, float height, int slices, bool down, double rain_norm, double speed);
 	void lt_update(void);
 
 	bool precipitation_enable_state;
@@ -64,6 +64,8 @@ private:
 public:
 	cGrRain();
 	~cGrRain();
+
+	void initialize(int rainStrength);
 	
 	void drawRain(double pitch, double roll, double heading, double hspeed, double rain_norm, int rain);
     /**

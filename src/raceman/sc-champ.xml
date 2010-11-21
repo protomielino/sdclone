@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Supercar Championship" version="1.1">
+<params name="Supercar Championship" version="1.2">
   <section name="Header">
     <attstr name="name" val="Supercar Championship"/>
     <attstr name="description" val="Championship"/>
@@ -284,9 +284,24 @@
   </section>
 
   <section name="Configuration">
-    <attnum name="current configuration" val="2"/>
+
     <section name="1">
       <attstr name="type" val="drivers select"/>
+    </section>
+    <section name="2">
+      <attstr name="type" val="race config"/>
+      <attstr name="race" val="Race"/>
+      <section name="Options">
+        <section name="1">
+          <attstr name="type" val="time of day"/>
+        </section>
+        <section name="2">
+          <attstr name="type" val="cloud cover"/>
+        </section>
+        <section name="3">
+          <attstr name="type" val="rain fall"/>
+        </section>
+      </section>
     </section>
 
   </section>

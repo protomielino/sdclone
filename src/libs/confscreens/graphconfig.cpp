@@ -23,40 +23,39 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
-
+#include <portability.h>
 #include <tgfclient.h>
 #include <graphic.h>
 
 #include "graphconfig.h"
-#include "gui.h"
 
-static void	*scrHandle = NULL;
-static char	buf[1024];
-//static char	valuebuf[10];
+static const int SkyDomeDistValues[] = {0, 12000, 20000, 40000, 80000};
+static const int NbSkyDomeDistValues = sizeof(SkyDomeDistValues) / sizeof(SkyDomeDistValues[0]);
+static const int PrecipDensityValues[] = {0, 20, 40, 60, 80, 100};
+static const int NbPrecipDensityValues = sizeof(PrecipDensityValues) / sizeof(PrecipDensityValues[0]);
+
+static void	*ScrHandle = NULL;
 
 static int	FovEditId;
-static int	FovFactorValue = 100;
 static int	SmokeEditId;
-static int	SmokeValue = 300;
 static int	SkidEditId;
-static int	SkidValue = 20;
 static int	LodFactorEditId;
-static tdble	LodFactorValue = 1.0;
-static int	SkyDomeOptionId;
-static int 	SkyDomeValueIndex = 0;
-static int	DynamicTimeOptionId;
-static int	DynamicTimeOptionValue = 0;
+static int	SkyDomeDistLabelId;
+static int	PrecipDensityLabelId;
 
-static const int SkyDomeSizeValues[] = {0, 12000, 20000, 40000, 80000};
-static const int NbSkyDomeValues = sizeof(SkyDomeSizeValues) / sizeof(SkyDomeSizeValues[0]);
-//static const int RainDensityValues[] = {0, 100, 200, 300};
-//static const int NbRainDensityValues = sizeof(RainDensityValues) / sizeof(RainDensityValues[0]);
-static const char *DynamicTimeValues[] = {"Disable", "Enable"};
-static const int NbDynamicTimeValues = sizeof(DynamicTimeValues) / sizeof(DynamicTimeValues[0]); 
+static int	FovFactorValue = 100;
+static int	SmokeValue = 300;
+static int	SkidValue = 20;
+static tdble	LodFactorValue = 1.0;
+static int 	SkyDomeDistIndex = 0;
+static int 	PrecipDensityIndex = NbPrecipDensityValues - 1;
+
+static char	buf[512];
+
 
 static void
 ExitGraphicOptions(void *prevMenu)
@@ -70,17 +69,15 @@ SaveGraphicOptions(void *prevMenu)
     // Force current edit to loose focus (if one has it) and update associated variable.
     GfuiUnSelectCurrent();
 
-    sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-    void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", FovFactorValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, SmokeValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, SkidValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, LodFactorValue);
-    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, NULL, SkyDomeSizeValues[SkyDomeValueIndex]);
-    //GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_RAINDENSITY, NULL, RainDensityValue);
-    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, NULL, DynamicTimeOptionValue);
-    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_RAINBOOL, NULL, 0);
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, SkyDomeDistValues[SkyDomeDistIndex]);
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", PrecipDensityValues[PrecipDensityIndex]);
     
     GfParmWriteFile(NULL, grHandle, "graph");
     
@@ -92,191 +89,159 @@ SaveGraphicOptions(void *prevMenu)
 static void
 LoadGraphicOptions()
 {
-    sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-    void * grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     
     FovFactorValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", 100.0);
-    sprintf(buf, "%d", FovFactorValue);
-    GfuiEditboxSetString(scrHandle,FovEditId,buf);
+    snprintf(buf, sizeof(buf), "%d", FovFactorValue);
+    GfuiEditboxSetString(ScrHandle,FovEditId,buf);
       
     SmokeValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SMOKENB, NULL, 300.0);
-    sprintf(buf, "%d", SmokeValue);
-    GfuiEditboxSetString(scrHandle,SmokeEditId,buf);
+    snprintf(buf, sizeof(buf), "%d", SmokeValue);
+    GfuiEditboxSetString(ScrHandle,SmokeEditId,buf);
 
     SkidValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, 20.0);
-    sprintf(buf, "%d", SkidValue);
-    GfuiEditboxSetString(scrHandle,SkidEditId,buf);
+    snprintf(buf, sizeof(buf), "%d", SkidValue);
+    GfuiEditboxSetString(ScrHandle,SkidEditId,buf);
 
     LodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
-    sprintf(buf, "%g", LodFactorValue);
-    GfuiEditboxSetString(scrHandle,LodFactorEditId,buf);
+    snprintf(buf, sizeof(buf), "%g", LodFactorValue);
+    GfuiEditboxSetString(ScrHandle,LodFactorEditId,buf);
 
-    SkyDomeValueIndex = 0; // Default value index, In case file value not found in list.
-    const int nSkyDomeSize = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOME, NULL, 0);
-    for (int i = 0; i < NbSkyDomeValues; i++) 
+    SkyDomeDistIndex = 0; // Default value index, in case file value not found in list.
+    const int nSkyDomeDist =
+		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0);
+    for (int i = 0; i < NbSkyDomeDistValues; i++) 
     {
-	if (nSkyDomeSize == SkyDomeSizeValues[i]) 
-	{
-	    SkyDomeValueIndex = i;
-	    break;
-	}
+		if (nSkyDomeDist == SkyDomeDistValues[i]) 
+		{
+			SkyDomeDistIndex = i;
+			break;
+		}
     }
-    sprintf(buf, "%d", SkyDomeSizeValues[SkyDomeValueIndex]); // In case value not found in list.
-    GfuiLabelSetText(scrHandle,SkyDomeOptionId,buf);
+    snprintf(buf, sizeof(buf), "%d", SkyDomeDistValues[SkyDomeDistIndex]);
+    GfuiLabelSetText(ScrHandle,SkyDomeDistLabelId,buf);
 
-    //RainDensityValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_RAINDENSITY, NULL, 0.0);
-    //sprintf(buf, "%d", RainDensityValue);
-    //GfuiEditboxSetString(scrHandle,RainEditId,buf);
-    DynamicTimeOptionValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, NULL, 0);
-    sprintf(buf, "%d", DynamicTimeValues[DynamicTimeOptionValue]);
-    GfuiLabelSetText(scrHandle, DynamicTimeOptionId, DynamicTimeValues[DynamicTimeOptionValue]);
-
-    if (SkyDomeValueIndex == 0)
+    PrecipDensityIndex = NbPrecipDensityValues - 1; // Default value index, in case file value not found in list.
+    const int nPrecipDensity =
+		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", 100.0);
+    for (int i = 0; i < NbPrecipDensityValues; i++) 
     {
-    	GfuiVisibilitySet(scrHandle,DynamicTimeOptionId, 0);
-    	DynamicTimeOptionValue = 0;
+		if (nPrecipDensity == PrecipDensityValues[i]) 
+		{
+			PrecipDensityIndex = i;
+			break;
+		}
     }
+    snprintf(buf, sizeof(buf), "%d", PrecipDensityValues[PrecipDensityIndex]);
+    GfuiLabelSetText(ScrHandle,PrecipDensityLabelId,buf);
 
     GfParmReleaseHandle(grHandle);
 }
 
 static void
-ChangeFov(void * /* dummy */)
+ChangeFov(void* /* dummy */)
 {
     char	*val;
 
-    val = GfuiEditboxGetString(scrHandle, FovEditId);
+    val = GfuiEditboxGetString(ScrHandle, FovEditId);
     FovFactorValue = strtol(val, (char **)NULL, 0);
-    sprintf(buf, "%d", FovFactorValue);
-    GfuiEditboxSetString(scrHandle, FovEditId, buf);
+    snprintf(buf, sizeof(buf), "%d", FovFactorValue);
+    GfuiEditboxSetString(ScrHandle, FovEditId, buf);
 }
 
 static void
-ChangeLodFactor(void * /* dummy */)
+ChangeLodFactor(void* /* dummy */)
 {
     char	*val;
 
-    val = GfuiEditboxGetString(scrHandle, LodFactorEditId);
+    val = GfuiEditboxGetString(ScrHandle, LodFactorEditId);
     sscanf(val, "%g", &LodFactorValue);
-    sprintf(buf, "%g", LodFactorValue);
-    GfuiEditboxSetString(scrHandle, LodFactorEditId, buf);
+    snprintf(buf, sizeof(buf), "%g", LodFactorValue);
+    GfuiEditboxSetString(ScrHandle, LodFactorEditId, buf);
 }
 
 static void
-ChangeSmoke(void * /* dummy */)
+ChangeSmoke(void* /* dummy */)
 {
     char	*val;
 
-    val = GfuiEditboxGetString(scrHandle, SmokeEditId);
+    val = GfuiEditboxGetString(ScrHandle, SmokeEditId);
     SmokeValue = strtol(val, (char **)NULL, 0);
-    sprintf(buf, "%d", SmokeValue);
-    GfuiEditboxSetString(scrHandle, SmokeEditId, buf);
+    snprintf(buf, sizeof(buf), "%d", SmokeValue);
+    GfuiEditboxSetString(ScrHandle, SmokeEditId, buf);
 }
 
 static void
-ChangeSkid(void * /* dummy */)
+ChangeSkid(void* /* dummy */)
 {
     char	*val;
 
-    val = GfuiEditboxGetString(scrHandle, SkidEditId);
+    val = GfuiEditboxGetString(ScrHandle, SkidEditId);
     SkidValue = strtol(val, (char **)NULL, 0);
-    sprintf(buf, "%d", SkidValue);
-    GfuiEditboxSetString(scrHandle, SkidEditId, buf);
+    snprintf(buf, sizeof(buf), "%d", SkidValue);
+    GfuiEditboxSetString(ScrHandle, SkidEditId, buf);
 }
 
 static void
-ChangeSkyDome(void *vp)
+ChangeSkyDome(void* vp)
 {
     const long delta = (long)vp;
-    SkyDomeValueIndex = (SkyDomeValueIndex + NbSkyDomeValues + delta) % NbSkyDomeValues;
-    sprintf(buf, "%d", SkyDomeSizeValues[SkyDomeValueIndex]);
-    GfuiLabelSetText(scrHandle, SkyDomeOptionId, buf);
-
-    if (SkyDomeValueIndex == 0)
-    {
-    GfuiVisibilitySet(scrHandle,DynamicTimeOptionId, 0);
-    DynamicTimeOptionValue = 0;
-    //ChangeDynamicTime(0);
-    }
-    else
-    {
-    GfuiVisibilitySet(scrHandle,DynamicTimeOptionId, 1);
-    }
+    SkyDomeDistIndex = (SkyDomeDistIndex + NbSkyDomeDistValues + delta) % NbSkyDomeDistValues;
+    snprintf(buf, sizeof(buf), "%d", SkyDomeDistValues[SkyDomeDistIndex]);
+    GfuiLabelSetText(ScrHandle, SkyDomeDistLabelId, buf);
 } 
-
-/*static void
-ChangeRain(void * dummy)
-{
-    char	*val;
-
-    val = GfuiEditboxGetString(scrHandle, RainEditId);
-    RainDensityValue = strtol(val, (char **)NULL, 0);
-    sprintf(buf, "%d", RainDensityValue);
-    GfuiEditboxSetString(scrHandle, RainEditId, buf);
-}*/
 
 static void
-ChangeDynamicTime(void *vp)
+ChangePrecipDensity(void* vp)
 {
     const long delta = (long)vp;
-    DynamicTimeOptionValue = (DynamicTimeOptionValue + NbDynamicTimeValues + delta) % NbDynamicTimeValues;
-    GfuiLabelSetText(scrHandle, DynamicTimeOptionId, DynamicTimeValues[DynamicTimeOptionValue]);
-} 
+    PrecipDensityIndex = (PrecipDensityIndex + NbPrecipDensityValues + delta) % NbPrecipDensityValues;
+    snprintf(buf, sizeof(buf), "%d", PrecipDensityValues[PrecipDensityIndex]);
+    GfuiLabelSetText(ScrHandle, PrecipDensityLabelId, buf);
+}
 
-static void onActivate(void * /* dummy */)
+static void onActivate(void* /* dummy */)
 {
     LoadGraphicOptions();
 }
 
-void *
-GraphMenuInit(void *prevMenu)
+void*
+GraphMenuInit(void* prevMenu)
 {
     /* screen already created */
-    if (scrHandle) {
-	return scrHandle;
+    if (ScrHandle) {
+	return ScrHandle;
     }
 
-    scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void *param = LoadMenuXML("graphicconfig.xml");
+    void* param = LoadMenuXML("graphicconfig.xml");
 
-    CreateStaticControls(param,scrHandle);
+    CreateStaticControls(param,ScrHandle);
 
-    FovEditId = CreateEditControl(scrHandle,param,"fovedit",NULL,NULL,ChangeFov);
-    SmokeEditId = CreateEditControl(scrHandle,param,"smokeedit",NULL,NULL,ChangeSmoke);
-    SkidEditId = CreateEditControl(scrHandle,param,"skidedit",NULL,NULL,ChangeSkid);
-    LodFactorEditId = CreateEditControl(scrHandle,param,"lodedit",NULL,NULL,ChangeLodFactor);
+    FovEditId = CreateEditControl(ScrHandle,param,"fovedit",NULL,NULL,ChangeFov);
+    SmokeEditId = CreateEditControl(ScrHandle,param,"smokeedit",NULL,NULL,ChangeSmoke);
+    SkidEditId = CreateEditControl(ScrHandle,param,"skidedit",NULL,NULL,ChangeSkid);
+    LodFactorEditId = CreateEditControl(ScrHandle,param,"lodedit",NULL,NULL,ChangeLodFactor);
 
-    CreateButtonControl(scrHandle,param,"skydomeleftarrow",(void*)-1, ChangeSkyDome);
-    CreateButtonControl(scrHandle,param,"skydomerightarrow",(void*)1, ChangeSkyDome);
-    SkyDomeOptionId = CreateLabelControl(scrHandle,param,"skydomelabel");
+    CreateButtonControl(ScrHandle,param,"skydomedistleftarrow",(void*)-1, ChangeSkyDome);
+    CreateButtonControl(ScrHandle,param,"skydomedistrightarrow",(void*)1, ChangeSkyDome);
+    SkyDomeDistLabelId = CreateLabelControl(ScrHandle,param,"skydomedistlabel");
     
-    if (SkyDomeValueIndex == 0)
-    {
-    	GfuiVisibilitySet(scrHandle,DynamicTimeOptionId, 0);
-    	DynamicTimeOptionValue = 0;
-    	ChangeDynamicTime(0);
-    }
-    else
-    {
-    	GfuiVisibilitySet(scrHandle,DynamicTimeOptionId, 1);
-    }
-    CreateButtonControl(scrHandle,param,"dynamictimeleftarrow",(void*)-1, ChangeDynamicTime);
-    CreateButtonControl(scrHandle,param,"dynamictimerightarrow",(void*)1, ChangeDynamicTime);
-    DynamicTimeOptionId = CreateLabelControl(scrHandle,param,"dynamictimelabel");
+    CreateButtonControl(ScrHandle,param,"precipdensityleftarrow",(void*)-1, ChangePrecipDensity);
+    CreateButtonControl(ScrHandle,param,"precipdensityrightarrow",(void*)1, ChangePrecipDensity);
+    PrecipDensityLabelId = CreateLabelControl(ScrHandle,param,"precipdensitylabel");
 
-    //Keep
-    //RainEditId = CreateEditControl(scrHandle,param,"rainedit",NULL,NULL,ChangeRain);
-
-    CreateButtonControl(scrHandle, param, "accept", prevMenu, SaveGraphicOptions);
-    CreateButtonControl(scrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
+    CreateButtonControl(ScrHandle, param, "accept", prevMenu, SaveGraphicOptions);
+    CreateButtonControl(ScrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
     
     GfParmReleaseHandle(param);
     
-    GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, SaveGraphicOptions, NULL);
-    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
-    GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, SaveGraphicOptions, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
-    return scrHandle;
+    return ScrHandle;
 }

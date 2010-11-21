@@ -18,11 +18,15 @@
 #include <plib/ssg.h>
 #include <plib/ssgAux.h>
 #include <plib/ssgaSky.h>
+
+#include <graphic.h>
+
+#include "grmain.h"
 #include "grrain.h"
 
 #include <vector>
 
-//#define MAX_RAIN_SLICE	200
+
 #define MAX_RAIN_SLICE	1000
 static float rainpos[MAX_RAIN_SLICE];
 #define MAX_LT_TREE_SEG	400
@@ -43,6 +47,7 @@ static float rainpos[MAX_RAIN_SLICE];
 #define SG_MPS_TO_KT        1.9438444924406046432
 
 #define DFL_MIN_LIGHT 0.35
+
 sgVec3 cGrRain::min_light = {(float)DFL_MIN_LIGHT, (float)DFL_MIN_LIGHT, (float)DFL_MIN_LIGHT};
 
 float cGrRain::streak_period_max = DFL_STREAK_PERIOD_MAX;
@@ -76,12 +81,19 @@ cGrRain::cGrRain() :
 
 cGrRain::~cGrRain(void) 
 {
-	//destructor
+}
+
+void cGrRain::initialize(int rainStrength) 
+{
+	precipitation_density =
+		GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", precipitation_density);
+	GfLogInfo("Precipitation : Initial rain strength = %d, density = %d\n",
+			  rainStrength, (int)precipitation_density);
 }
 
 
 void
-cGrRain::DrawCone2(float baseRadius, float height, int slices, bool down, double rain_norm, double speed)
+cGrRain::drawCone(float baseRadius, float height, int slices, bool down, double rain_norm, double speed)
 {
 	sgVec3 light;
 	sgAddVec3( light, fog_color, min_light );
@@ -109,7 +121,7 @@ cGrRain::DrawCone2(float baseRadius, float height, int slices, bool down, double
 		angle += da;
 		sgVec3 dir = {x, -height, y};
 
-		// rain drops at 2 different speed to simulate depth\par
+		// rain drops at 2 different speeds to simulate depth\par
 		float t1 = (i & 1 ? t : t + t) + rainpos[i];
 		if(t1 > 1.0f)	
 			t1 -= 1.0f;
@@ -135,22 +147,15 @@ void
 cGrRain::drawRain(double pitch, double roll, double heading, double hspeed, double rain_norm, int rain)
 {
 
-	#if 0
+#if 0
 	static int debug_period = 0;
 	if (debug_period++ == 50)
 	{
 		debug_period = 0;
-		cout << "drawRain("
-		<< pitch << ", "
-		<< roll  << ", "
-		<< heading << ", "
-		<< hspeed << ", "
-		<< rain_norm << ");"
-		//" angle = " << angle
-		//<< " raindrop(KTS) = " << raindrop_speed_kts
-		<< endl;
+		GfLogDebug("drawRain(p=%f, r=%f, h=%f, s=%s, n=%f, rain=%d)\n",
+				   pitch, roll, heading, hspeed, rain_norm, rain);
 	}
-	#endif
+#endif
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -161,7 +166,10 @@ cGrRain::drawRain(double pitch, double roll, double heading, double hspeed, doub
 	glDisable( GL_FOG );
 	glDisable(GL_LIGHTING);
 
-	int slice_count = static_cast<int>((streak_count_min + rain_norm * (streak_count_max - streak_count_min)) * (precipitation_density / 100.0) * rain);
+	int slice_count =
+		(int)((streak_count_min + rain_norm * (streak_count_max - streak_count_min))
+			  * (precipitation_density / 100.0)
+			  * rain);
 
 	double raindrop_speed_kts = (5.0 + rain_norm * 15.0) * SG_MPH_TO_MPS * SG_MPS_TO_KT;
 
@@ -175,12 +183,12 @@ cGrRain::drawRain(double pitch, double roll, double heading, double hspeed, doub
 	glRotatef(angle, 1.0, 0.0, 0.0);
 
 	// up cone
-	DrawCone2(cone_base_radius, cone_height, slice_count, true, rain_norm, hspeed);
+	drawCone(cone_base_radius, cone_height, slice_count, true, rain_norm, hspeed);
 
 	// down cone (usually not visible)
 	//if(angle > 0.0 || heading != 0.0)
 	if(angle > 0.0)
-		DrawCone2(cone_base_radius, -cone_height, slice_count, false, rain_norm, hspeed);
+		drawCone(cone_base_radius, -cone_height, slice_count, false, rain_norm, hspeed);
 
 	glPopMatrix();
 
