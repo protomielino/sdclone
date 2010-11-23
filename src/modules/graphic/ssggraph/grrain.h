@@ -65,7 +65,7 @@ public:
 	cGrRain();
 	~cGrRain();
 
-	void initialize(int rainStrength);
+	void initialize(float precipitationDensity);
 	
 	void drawRain(double pitch, double roll, double heading, double hspeed, double rain_norm, int rain);
     /**

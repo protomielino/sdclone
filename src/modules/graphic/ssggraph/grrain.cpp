@@ -83,12 +83,10 @@ cGrRain::~cGrRain(void)
 {
 }
 
-void cGrRain::initialize(int rainStrength) 
+
+void cGrRain::initialize(float precipitationDensity) 
 {
-	precipitation_density =
-		GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", precipitation_density);
-	GfLogInfo("Precipitation : Initial rain strength = %d, density = %d\n",
-			  rainStrength, (int)precipitation_density);
+	precipitation_density = precipitationDensity;
 }
 
 

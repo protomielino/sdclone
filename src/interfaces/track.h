@@ -574,7 +574,8 @@ typedef struct
 #define TR_TIME_AFTERNOON	3
 #define TR_TIME_DUSK	4
 #define TR_TIME_NIGHT	5
-#define TR_TIME_DYNAMIC	6
+#define TR_TIME_NOW		6
+#define TR_TIME_TRACK	7
     int		  clouds;	/**< Clouds coverage in sky (warning : consistency with RM_VAL_CLOUDS_*)*/
 #define TR_CLOUDS_NONE   1
 #define TR_CLOUDS_FEW    3

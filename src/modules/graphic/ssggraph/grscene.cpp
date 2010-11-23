@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <ctime>
 
 #ifdef WIN32
 #include <windows.h>
@@ -38,6 +39,7 @@
 #include "grssgext.h"
 #include "grrain.h"
 #include "grSky.h"
+
 
 #define NB_BG_FACES	36	//Background faces
 #define BG_DIST			1.0f
@@ -66,6 +68,7 @@ grMultiTexState	*grEnvShadowStateOnCars = NULL;
 int grSkyDomeDistance = 0;
 
 ssgRoot *TheScene = NULL;
+
 //TheScene kid order
 ssgBranch *SunAnchor = NULL;
 ssgBranch *LandAnchor = NULL;
@@ -78,7 +81,9 @@ ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
 
-//static int DynamicWeather = 0;
+//static int grDynamicWeather = 0;
+static bool grDynamicTime = false;
+static float grPrecipitationDensity = 100.0f;
 static int BackgroundType = 0;
 static float grSunDeclination = 0.0f;
 static float grMoonDeclination = 0.0f;
@@ -211,26 +216,71 @@ grInitScene(void)
 		int div = 80000 / grSkyDomeDistance;	//grSkyDomeDistance >= grSkyDomeDistThresh so cannot div0
 		ssgSetNearFar(1, grSkyDomeDistance);
 
-		// Add random stars at dawn, dusk or night.
+		// Determine time of day.
+		int timeOfDay = 15 * 3600 + 0 * 60 + 0; // 15:00:00
 		switch (grTrack->timeofday) 
 		{
-			case TR_TIME_DUSK:
 			case TR_TIME_DAWN:
-				NStars = NMaxStars / 2;
-				break;
-
-			case TR_TIME_NIGHT:
-				NStars = NMaxStars;
+				timeOfDay = 6 * 3600 + 13 * 60 + 20; // 06:13:20
 				break;
 					
+			case TR_TIME_MORNING:
+				timeOfDay = 10 * 3600 + 0 * 60 + 0; // 10:00:00
+				break;
+					
+			case TR_TIME_NOON:
+				timeOfDay = 12 * 3600 + 0 * 60 + 0; // 12:00:00
+				break;
+					
+			case TR_TIME_AFTERNOON:
+				timeOfDay = 15 * 3600 + 0 * 60 + 0; // 15:00:00
+				break;
+					
+			case TR_TIME_DUSK:
+				timeOfDay = 17 * 3600 + 46 * 60 + 40; // 17:46:40
+				break;
+					
+			case TR_TIME_NIGHT:
+				timeOfDay = 0 * 3600 + 0 * 60 + 0; // Midnight = 00:00:00
+				break;
+					
+			case TR_TIME_NOW:
+			{
+				time_t t = time(0);
+				struct tm *ptm = localtime(&t);
+				timeOfDay = ptm->tm_hour * 3600 + ptm->tm_min * 60 + ptm->tm_sec;
+				GfLogDebug("  Now time of day\n");
+				break;
+			}
+
+			case TR_TIME_TRACK:
+				timeOfDay =
+					(int)(GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_HOUR, (char*)NULL,
+									   (float)(15 * 3600 + 0 * 60 + 0))); // 15:00:00
+				GfLogDebug("  Track-defined time of day\n");
+				break;
+
 			default:
-				NStars = 0;
+				timeOfDay = 15 * 3600 + 0 * 60 + 0; // 15:00:00
+				GfLogError("Unsupported value %d for grTrack->timeofday (assuming 16:00)\n",
+						   grTrack->timeofday);
 				break;
 				
 		}//switch timeofday
 
+		// Add random stars when relevant.
+		if (timeOfDay < 7 * 3600 || timeOfDay > 17 * 3600)
+		{
+			if (timeOfDay < 5 * 3600 || timeOfDay > 19 * 3600)
+				NStars = NMaxStars;
+			else
+				NStars = NMaxStars / 2;
+		}
+		else
+			NStars = 0;
+			
 		if (AStarsData)
-			delete AStarsData;
+			delete [] AStarsData;
 		AStarsData = new sgdVec3[NStars];
 		for(int i= 0; i < NStars; i++) 
 		{
@@ -239,13 +289,13 @@ grInitScene(void)
 			AStarsData[i][2] = grRandom();
 		}//for i
 
-		GfLogInfo("  Stars : %d random ones\n", NStars);
+		GfLogInfo("  Stars (random) : %d\n", NStars);
 		
 		//No planets
 		NPlanets = 0;
 		APlanetsData = NULL;
 
-		GfLogInfo("  Planets : none\n");
+		GfLogInfo("  Planets : %d\n", NPlanets);
 		
 		//Build the sky
 		Sky	= new grSky;
@@ -256,53 +306,14 @@ grInitScene(void)
 		GLfloat sunAscension =
 			(float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_SUN_H, (char*)NULL, 0.0f);
 
-		switch (grTrack->timeofday) 
-		{
-			case TR_TIME_DAWN:
-				grSunDeclination = 2.0f;
-				break;
-					
-			case TR_TIME_MORNING:
-				grSunDeclination = 30.0f;
-				break;
-					
-			case TR_TIME_NOON:
-				grSunDeclination = 85.0f;
-				break;
-					
-			case TR_TIME_AFTERNOON:
-				grSunDeclination = 135.0f;
-				break;
-					
-			case TR_TIME_DUSK:
-				grSunDeclination = 178.0f;
-				break;
-					
-			case TR_TIME_NIGHT:
-				grSunDeclination = -90.0f;
-				break;
-					
-			case TR_TIME_DYNAMIC:
-			{
-				const float sunHeight =
-					(float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_HOUR, (char*)NULL, 0.0f);
-				GfLogDebug("User defined sun height = %f\n", sunHeight);
-				grSunDeclination = ((sunHeight / 3600) * 15.0f) - 90.0f;
-				break;
-			}
-
-			default:
-				grSunDeclination = 135.0f;
-				GfLogError("Unsupported value %d for grTrack->timeofday (assuming afternoon)\n",
-						   grTrack->timeofday);
-				break;
-				
-		}//switch timeofday
+		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
 		bodies[eCBSun]->setDeclination ( grSunDeclination * SGD_DEGREES_TO_RADIANS);
 		bodies[eCBSun]->setRightAscension ( sunAscension * SGD_DEGREES_TO_RADIANS);
 
-		GfLogInfo("  Sun : declination = %4.1f deg, ascension = %4.1f deg\n",
+		GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %4.1f deg, "
+		          "ascension = %4.1f deg)\n", 
+				  timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
 				  grSunDeclination, sunAscension);
 
 		//Add the Moon
@@ -430,10 +441,9 @@ grInitScene(void)
 	}//else grSkyDomeDistance 
 
 	// Initialize rain renderer
+	GfLogInfo("Precipitation : Initial rain strength = %d\n", grTrack->rain);
 	if (grTrack->rain > 0)
-	{
-		grRain.initialize(grTrack->rain);
-	}
+		grRain.initialize(grPrecipitationDensity);
 	
 	/*if (!SUN) 
 	{
@@ -475,6 +485,7 @@ grLoadScene(tTrack *track)
 
 	grssgSetCurrentOptions(&options);
 
+	// Load graphic options.
 	if(grHandle == NULL) {
 		sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
@@ -484,8 +495,18 @@ grLoadScene(tTrack *track)
 		GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
 	if (grSkyDomeDistance > 0 && grSkyDomeDistance < grSkyDomeDistThresh)
 		grSkyDomeDistance = grSkyDomeDistThresh; // If user enabled it (>0), must be over the threshold.
-	//DynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICWEATHER, (char*)NULL, DynamicWeather);
+
+	grDynamicTime = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, GR_ATT_DYNAMICTIME_DISABLED), GR_ATT_DYNAMICTIME_ENABLED) == 0; 
+
+	grPrecipitationDensity = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", 100);
+
+	//grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
 			
+	GfLogInfo("Graphic options : Sky dome distance = %d m, dynamic time = %s, "
+	          "precipitation density = %d %%\n", grSkyDomeDistance, 
+			  grDynamicTime ? "true" : "false", (int)grPrecipitationDensity);
+
+	// Build scene.
 	grTrack = track;
 	TheScene = new ssgRoot;
 
@@ -556,9 +577,8 @@ grDrawScene(float carSpeed, tSituation *s)
 	const bool bDrawSky = (grSkyDomeDistance >= grSkyDomeDistThresh && grTrack->skyversion > 0);
 	if (bDrawSky) 
 	{
-		if (grTrack->timeofday == TR_TIME_DYNAMIC) {
+		if (grDynamicTime)
 			grUpdateTime(s);
-		}
 		
 		glClearColor(fog_color[0], fog_color[1], fog_color[2], fog_color[3]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
