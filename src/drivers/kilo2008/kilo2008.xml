@@ -109,7 +109,7 @@
 
       <section name="7">
         <attstr name="name" val="Darius Krol"></attstr>
-        <attstr name="desc" val="Polish"></attstr>
+        <attstr name="desc" val="The new rising star of Poland"></attstr>
         <attstr name="team" val="Team Polar Sand"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
         <attstr name="car name" val="ls1-cavallo-570s1"></attstr>
@@ -121,7 +121,7 @@
 
       <section name="8">
         <attstr name="name" val="Tomas Kosta"></attstr>
-        <attstr name="desc" val="Czech"></attstr>
+        <attstr name="desc" val="The Czech tech guru"></attstr>
         <attstr name="team" val="Team Polar Sand"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
         <attstr name="car name" val="ls1-cavallo-570s1"></attstr>
