@@ -107,17 +107,13 @@
         <attnum name="blue" val="0.1"></attnum>
       </section>
 
-
-
-      <!-- WIP
-      
       <section name="7">
         <attstr name="name" val="Darius Krol"></attstr>
         <attstr name="desc" val="Polish"></attstr>
-        <attstr name="team" val="Scuderia Archi Radianti"></attstr>
+        <attstr name="team" val="Team Polar Sand"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
-        <attstr name="car name" val="ls1-archer-r9"></attstr>
-        <attnum name="race number" val="76"></attnum>
+        <attstr name="car name" val="ls1-cavallo-570s1"></attstr>
+        <attnum name="race number" val="77"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
@@ -126,16 +122,18 @@
       <section name="8">
         <attstr name="name" val="Tomas Kosta"></attstr>
         <attstr name="desc" val="Czech"></attstr>
-        <attstr name="team" val="Scuderia Archi Radianti"></attstr>
+        <attstr name="team" val="Team Polar Sand"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
-        <attstr name="car name" val="ls1-archer-r9"></attstr>
-        <attnum name="race number" val="76"></attnum>
+        <attstr name="car name" val="ls1-cavallo-570s1"></attstr>
+        <attnum name="race number" val="78"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
       </section>
 
 
+      <!-- WIP
+      
 
       <section name="9">
         <attstr name="name" val="Anders Nikolsen"></attstr>
@@ -164,7 +162,7 @@
 
 
       <section name="11">
-        <attstr name="name" val="Hwang Yin Bak"></attstr>
+        <attstr name="name" val="Hwang Su Bak"></attstr>
         <attstr name="desc" val="South Korean"></attstr>
         <attstr name="team" val="Scuderia Archi Radianti"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
