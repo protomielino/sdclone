@@ -119,13 +119,13 @@ void cGrScreen::activate(int x, int y, int w, int h)
 	scrh = h;
 	
 	if (boardCam) {
-		int fake_width = (float) scrw * 600 / (float) scrh;
-		if (fake_width < 800)
-			fake_width = 800;
+		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
+		if (fakeWidth < 800)
+			fakeWidth = 800;
 
 		delete boardCam;
-		boardCam = new cGrOrthoCamera(this, 0, fake_width, 0, 600);
-		board->setWidth(fake_width);
+		boardCam = new cGrOrthoCamera(this, 0, fakeWidth, 0, 600);
+		board->setWidth(fakeWidth);
 	}
 
 	if (mirrorCam) {
@@ -320,6 +320,7 @@ void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 		sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 		GfParmSetStr(grHandle, path, GR_ATT_CUR_DRV, curCar->_name);
 		loadParams (s);
+		board->setWidth(fakeWidth);
 		GfParmWriteFile(NULL, grHandle, "Graph");
 		curCam->onSelect(curCar, s);
 	}
@@ -441,12 +442,12 @@ void cGrScreen::initCams(tSituation *s)
 	}
 	
 	if (boardCam == NULL) {
-		int fake_width = (float) scrw * 600 / (float) scrh;
-		if (fake_width < 800)
-			fake_width = 800;
+		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
+		if (fakeWidth < 800)
+			fakeWidth = 800;
 
-		boardCam = new cGrOrthoCamera(this, 0, fake_width, 0, 600);
-		board->setWidth(fake_width);
+		boardCam = new cGrOrthoCamera(this, 0, fakeWidth, 0, 600);
+		board->setWidth(fakeWidth);
 	}
 	
 	if (bgCam == NULL) {
