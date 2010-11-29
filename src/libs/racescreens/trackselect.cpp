@@ -187,6 +187,7 @@ rmtsUpdateTrackInfo(void)
     }
 
     /* Update GUI with track info */
+    //First the track description, optionally wrapped in 2 lines
     std::string strDesc = GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, "");
 
     std::string str1, str2;
@@ -194,15 +195,18 @@ rmtsUpdateTrackInfo(void)
     GfuiLabelSetText(ScrHandle, DescId, str1.c_str());
     GfuiLabelSetText(ScrHandle, Desc2Id, str2.c_str());
 
+    //Track author
     GfuiLabelSetText(ScrHandle, AuthorId, GfParmGetStr(trackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, ""));
 
+    //Track length and width
     tmp = GfParmGetNum(trackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, NULL, 0);
-    sprintf(buf, "%.2f m", tmp);
+    sprintf(buf, "%.0f m", tmp);
     GfuiLabelSetText(ScrHandle, WidthId, buf);
     tmp = trk->length;
-    sprintf(buf, "%.2f m", tmp);
+    sprintf(buf, "%.0f m", tmp);
     GfuiLabelSetText(ScrHandle, LengthId, buf);
 
+    //Number of pits
     if (trk->pits.nMaxPits) {
         sprintf(buf, "%d", trk->pits.nMaxPits);
         GfuiLabelSetText(ScrHandle, PitsId, buf);
