@@ -370,9 +370,11 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 	}//if-else curTrack->pits
 
 	//Initial fuel fill computation
+	//Fuel tank capacity
+	const double tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0);
 	tdble fuel = (MaxFuelPerMeter * curTrack->length * (s->_totLaps + 1) + 2.7f / 60.0f * MAX(s->_totTime, 0) )
 		/ (1.0 + ((tdble)HCtx[idx]->nbPitStopProg)) + FuelReserve;
-
+	fuel = MIN(fuel, tank_capacity);	//Obey limits
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, fuel);
 	
 	speedLimit = curTrack->pits.speedLimit;

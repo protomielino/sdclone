@@ -53,6 +53,9 @@
 #define DFWD 1
 #define D4WD 2
 
+static const int FuelReserve = 5;
+static const double MaxFuelPerMeter = 0.0008;	//[kg/m] fuel consumption
+
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void drive_mt(int index, tCarElt* car, tSituation *s);
 static void drive_at(int index, tCarElt* car, tSituation *s);
@@ -431,8 +434,15 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 	} else {
 		HCtx[idx]->NbPitStopProg = 0;
 	}
-	fuel = ( 0.0008 * curTrack->length * (s->_totLaps + 1) + 2.7f / 60.0f * ( s->_totTime > 0 ? s->_totTime : 0 ) ) / (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + 20.0;
+
+	//Initial fuel fill computation
+	//Fuel tank capacity
+	const double tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0);
+	fuel = (MaxFuelPerMeter * curTrack->length * (s->_totLaps + 1) + 2.7f / 60.0f * MAX(s->_totTime, 0) )
+		/ (1.0 + ((tdble)HCtx[idx]->NbPitStopProg)) + FuelReserve;
+	fuel = MIN(fuel, tank_capacity);	//Obey limits
 	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, fuel);
+
 	Vtarget = curTrack->pits.speedLimit;
 	if (DrvInfo != NULL) {
 		GfParmReleaseHandle(DrvInfo);
