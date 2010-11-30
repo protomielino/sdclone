@@ -1299,13 +1299,22 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 {
 	const int idx = index - 1;
 
-	HCtx[idx]->nbPitStops++;
-	tdble f1 = car->_tank - car->_fuel;
+	HCtx[idx]->nbPitStops++;  //Yet another pitstop
+	tdble curr_fuel = car->_tank - car->_fuel;  //Can receive max. this fuel
 
-	tdble ns = 1.0 + MAX(HCtx[idx]->nbPitStopProg - HCtx[idx]->nbPitStops, 0);
-	tdble f2 = ( 0.00065 * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart) + 2.7f / 60.0f * ( s->_totTime > 0 ? s->_totTime : 0 ) ) / ns - car->_fuel;
+	tdble planned_stops = 1.0
+      + MAX(HCtx[idx]->nbPitStopProg - HCtx[idx]->nbPitStops, 0);  //Planned pitstops still ahead
+	
+  //Need this amount of extra fuel to finish the race
+  tdble fuel = ( MaxFuelPerMeter
+      * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart)
+      + 2.7f / 60.0f * MAX(s->_totTime, 0) )
+    / planned_stops
+    - car->_fuel;
 
-	car->_pitFuel = MAX(MIN(f1, f2), 0);
+  //No need to check for limits as curr_fuel cannot be bigger
+  //than the tank capacity
+	car->_pitFuel = MAX(MIN(curr_fuel, fuel), 0);
 
 	HCtx[idx]->lastPitStopLap = car->_laps;
 

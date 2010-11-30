@@ -1259,21 +1259,25 @@ static void drive_at(int index, tCarElt* car, tSituation *s)
 
 static int pitcmd(int index, tCarElt* car, tSituation *s)
 {
-	tdble f1, f2;
-	tdble ns;
-	int idx = index - 1;
+	const int idx = index - 1;
 
-	HCtx[idx]->NbPitStops++;
-	f1 = car->_tank - car->_fuel;
-	if (HCtx[idx]->NbPitStopProg < HCtx[idx]->NbPitStops) {
-		ns = 1.0;
-	} else {
-		ns = 1.0 + (HCtx[idx]->NbPitStopProg - HCtx[idx]->NbPitStops);
+	HCtx[idx]->NbPitStops++;  //Yet another pitstop
+	tdble curr_fuel = car->_tank - car->_fuel;  //Can receive max. this fuel
+  tdble planned_stops = 1.0; //Planned pitstops still ahead
+	if (HCtx[idx]->NbPitStopProg >= HCtx[idx]->NbPitStops) {
+		planned_stops += HCtx[idx]->NbPitStopProg - HCtx[idx]->NbPitStops;
 	}
 
-	f2 = ( 0.00065 * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart) + 2.7f / 60.0f * ( s->_totTime > 0 ? s->_totTime : 0 ) )/ ns - car->_fuel;
+  //Need this amount of extra fuel to finish the race
+  tdble fuel = ( MaxFuelPerMeter
+      * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart)
+      + 2.7f / 60.0f * MAX(s->_totTime, 0) )
+    / planned_stops
+    - car->_fuel;
 
-	car->_pitFuel = MAX(MIN(f1, f2), 0);
+  //No need to check for limits as curr_fuel cannot be bigger
+  //than the tank capacity
+	car->_pitFuel = MAX(MIN(curr_fuel, fuel), 0);
 
 	HCtx[idx]->LastPitStopLap = car->_laps;
 
