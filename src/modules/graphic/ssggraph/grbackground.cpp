@@ -321,6 +321,7 @@ grInitBackground(void)
     	TheSky->repositionFlat(solposn, 0, dt);    
 
 		//Setup visibility according to rain if any
+		// TODO: Does visibility really decrease when rain gets heavier ????
 		float visibility = 0.0f;
 		switch (grTrack->rain)	
 		{
@@ -349,11 +350,6 @@ grInitBackground(void)
 		double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 		double scene_brightness = pow(sky_brightness, 0.5);
         
-		SkyColor[0] = BaseSkyColor[0] * (float)sky_brightness;
-		SkyColor[1] = BaseSkyColor[1] * (float)sky_brightness;
-		SkyColor[2] = BaseSkyColor[2] * (float)sky_brightness;
-		SkyColor[3] = BaseSkyColor[3];
-		
 		if (grTrack->rain > 0) // TODO: Different values for each rain strength value ?
 		{
 			BaseFogColor[0] = 0.40f;
@@ -371,6 +367,11 @@ grInitBackground(void)
 			scene_brightness = scene_brightness;
 		}
     
+		SkyColor[0] = BaseSkyColor[0] * (float)sky_brightness;
+		SkyColor[1] = BaseSkyColor[1] * (float)sky_brightness;
+		SkyColor[2] = BaseSkyColor[2] * (float)sky_brightness;
+		SkyColor[3] = BaseSkyColor[3];
+		
 		CloudsColor[0] = FogColor[0] = BaseFogColor[0] * (float)sky_brightness;
 		CloudsColor[1] = FogColor[1] = BaseFogColor[1] * (float)sky_brightness;
 		CloudsColor[2] = FogColor[2] = BaseFogColor[2] * (float)sky_brightness;
@@ -841,6 +842,7 @@ grUpdateSky(double currentTime)
 	if (!grDynamicTime)
 		return;
 
+	// Update last update time.
 	static int lastchecked = -100;
 	static double lastTime = -10.0f;
 	if( currentTime < lastTime ) {
@@ -849,6 +851,7 @@ grUpdateSky(double currentTime)
 		return;
 	}
 
+	// Update sun position (?)
 	int current = (int)floor( ( currentTime + 10.0f ) / 60.0f );
 	double dt = currentTime - lastTime;
 	sgVec3 solposn;
@@ -862,19 +865,21 @@ grUpdateSky(double currentTime)
 
 	GfLogDebug("Updating sky (dynamic time)\n");
 	
-	/* Update */
+	// Update sun position
 	grSunDeclination += 0.25f; // TODO: Is this delta value realistic ?
 	if (grSunDeclination >= 360.0f)
 		grSunDeclination = 0.0f;
 	
 	TheCelestBodies[eCBSun]->setDeclination ( grSunDeclination * SGD_DEGREES_TO_RADIANS );
 
+	// Update moon position
 	grMoonDeclination += 0.25f; // TODO: Is this delta value realistic ?
 	if (grMoonDeclination >= 360.0f)
 		grMoonDeclination = 0.0f;
 	
 	TheCelestBodies[eCBMoon]->setDeclination ( grMoonDeclination * SGD_DEGREES_TO_RADIANS );
 
+	// Update scene color and light
 	double sol_angle = TheCelestBodies[eCBSun]->getAngle();
 	double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 	double scene_brightness = pow(sky_brightness, 0.5);
@@ -890,8 +895,7 @@ grUpdateSky(double currentTime)
 	CloudsColor[2] = FogColor[2] = BaseFogColor[2] * (float)sky_brightness;
 	CloudsColor[3] = FogColor[3] = BaseFogColor[3];
 
-	/* repaint the sky */			
-
+	/* repaint the sky (simply update geometrical, color, ... state, no actual redraw) */
 	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, NPlanets, APlanetsData, NStars, AStarsData);
 
 	sgCoord solpos;

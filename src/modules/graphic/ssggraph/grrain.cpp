@@ -87,7 +87,7 @@ cGrRain::~cGrRain(void)
 void cGrRain::initialize(int rain, float precipitationDensity) 
 {
 	GfLogInfo("Precipitation : Density = %d %%, initial rain strength = %d\n",
-			  precipitationDensity, rain);
+			  (int)precipitationDensity, rain);
 	precipitation_density = precipitationDensity;
 }
 
