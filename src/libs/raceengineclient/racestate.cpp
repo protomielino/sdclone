@@ -93,7 +93,6 @@ ReStateManage(void)
 
 			case RE_STATE_RACE_START:
 				GfLogInfo("%s now in RACE_START state\n", ReInfo->_reName);
-
 				mode = ReRaceStart();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_NETWORK_WAIT;

@@ -56,7 +56,6 @@
 #define TRK_ATT_3DDESC3 "3d description night"
 #define TRK_ATT_3DDESC4 "3d description rain+night"
 #define TRK_ATT_BKGRND	"background image"
-#define TRK_ATT_BKGRND2	"background image2"
 #define TRK_ATT_BGTYPE	"background type"
 #define TRK_ATT_BGCLR_R	"background color R"
 #define TRK_ATT_BGCLR_G	"background color G"
@@ -544,8 +543,10 @@ typedef struct GraphicLightInfo
 typedef struct 
 {
     const char		*background;
-    const char		*background2;
     int			bgtype;
+#define TR_BACKGROUND_TYPE_0	0 /**< ??? Anyone who knows what's this */
+#define TR_BACKGROUND_TYPE_2	2 /**< ??? Anyone who knows what's this */
+#define TR_BACKGROUND_TYPE_4	4 /**< ??? Anyone who knows what's this */
     float		bgColor[3];
     float		sunpos1;
     float		sunpos2;

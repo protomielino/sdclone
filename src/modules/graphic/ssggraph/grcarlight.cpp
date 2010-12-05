@@ -156,7 +156,7 @@ void ssgVtxTableCarlight::draw_geometry ()
 	axis[1] = 0;
 	axis[2] = 1;
 
-	if (maxTextureUnits > 1) {
+	if (grMaxTextureUnits > 1) {
 		glActiveTextureARB (GL_TEXTURE0_ARB);
 	}
 
@@ -194,7 +194,7 @@ void ssgVtxTableCarlight::draw_geometry ()
 	}
 	glDisable(GL_POLYGON_OFFSET_FILL);
 
-	if (maxTextureUnits > 1) {
+	if (grMaxTextureUnits > 1) {
 		glActiveTextureARB (GL_TEXTURE0_ARB);
 	}
 

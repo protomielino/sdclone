@@ -84,8 +84,10 @@ cGrRain::~cGrRain(void)
 }
 
 
-void cGrRain::initialize(float precipitationDensity) 
+void cGrRain::initialize(int rain, float precipitationDensity) 
 {
+	GfLogInfo("Precipitation : Density = %d %%, initial rain strength = %d\n",
+			  precipitationDensity, rain);
 	precipitation_density = precipitationDensity;
 }
 
@@ -199,5 +201,6 @@ cGrRain::drawRain(double pitch, double roll, double heading, double hspeed, doub
 
 void cGrRain::drawPrecipitation(int rain, double rain_norm, double pitch, double roll, double heading, double hspeed)
 {
-	drawRain(pitch, roll, heading, hspeed, rain_norm, rain);
+	if (rain > 0)
+		drawRain(pitch, roll, heading, hspeed, rain_norm, rain);
 }

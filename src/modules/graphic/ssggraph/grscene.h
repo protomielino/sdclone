@@ -59,15 +59,10 @@ class cGrBackgroundCam;
 //!Public interface
 extern int grInitScene(void);
 extern int grLoadScene(tTrack *track);
-extern void grDrawScene(float carSpeed, tSituation *s);
-//extern void grDrawScene(void);
+extern void grDrawScene();
 extern void grShutdownScene(void);
 extern void grCustomizePits(void);
 extern void grDrawBackground(class cGrCamera *, class cGrBackgroundCam *bgCam);
-extern void grUpdateTime(tSituation *s);
-
-extern int grSkyDomeDistance;
-extern const int grSkyDomeDistThresh; // No dynamic sky below that value.
 
 //TODO: Question: What is this??? kilo
 //      Possible answer: Some try to lower GPU load by filtering the scene ? JP

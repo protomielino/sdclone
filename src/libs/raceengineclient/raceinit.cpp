@@ -1019,7 +1019,6 @@ ReInitTrack(void)
 	const char  *trackName;
 	const char  *catName;
 	const char  *raceName;
-	const char  *cloudA;
 
 	void  *params = ReInfo->params;
 	void  *results = ReInfo->results;
@@ -1083,10 +1082,26 @@ ReInitTrack(void)
 	reDumpTrack(ReInfo->track, 0.0);
 
 	ReStartWeather();
-  
+
+	// Make the graphics engine aware of the possibly chenged track.
+	if( ReInfo->_reGraphicItf.inittrack )
+		ReInfo->_reGraphicItf.inittrack(ReInfo->track);
+
 	return 0;
 }//ReInitTrack
 
+/** Shutdown the track for a race manager.
+    @return <tt>0 ... </tt>Ok<br>
+    <tt>-1 .. </tt>Error
+*/
+int
+ReShutdowTrack(void)
+{
+	if (ReInfo->_reGraphicItf.shutdowntrack)
+		ReInfo->_reGraphicItf.shutdowntrack();
+
+	return 0;
+}
 
 /**
  * This functions initialized the graphics.
@@ -1107,7 +1122,8 @@ void ReInitGraphics()
   GfLogInfo("Loading Graphic Engine...\n");
   dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
   sprintf(key, "%smodules/graphic/%s.%s", GetLibDir (), dllname, DLLEXT);
-  if (GfModLoad(0, key, &reEventModList)) return;
+  if (GfModLoad(0, key, &reEventModList))
+	  return;
   reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reGraphicItf);
 
   ReInfo->_reGraphicItf.inittrack(ReInfo->track);

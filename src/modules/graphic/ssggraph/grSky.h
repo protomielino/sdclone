@@ -1,23 +1,39 @@
-// grSky.h
+/***************************************************************************
+
+    file        : grSky.h
+    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+    web         : http://www.speed-dreams.org
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 
 #ifndef _GRSKY_H_
 #define _GRSKY_H_
 
 #include "plib/ssg.h"
-//#include "plib/ssgAux.h"
 
-class grCelestialBody;
-class grCelestialBodyList;
-class grCloudLayer;
-class grCloudLayerList;
-class grStars;
-class grSkyDome;
-class grSky;
-class grMoon;
-class grSun;
+class cGrCelestialBody;
+class cGrCelestialBodyList;
+class cGrCloudLayer;
+class cGrCloudLayerList;
+class cGrStars;
+class cGrSkyDome;
+class cGrSky;
+class cGrMoon;
+class cGrSun;
 
 
-class grCelestialBody
+class cGrCelestialBody
 {
 private:
 
@@ -35,8 +51,8 @@ private:
 
 public:
 
-  grCelestialBody( void );
-  ~grCelestialBody( void );
+  cGrCelestialBody( void );
+  ~cGrCelestialBody( void );
 
   ssgBranch *build( const char* body_tex_path, const char* halo_tex_path, double body_size );
   ssgBranch *build( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double body_size );
@@ -76,24 +92,24 @@ public:
 } ;
 
 
-class grCelestialBodyList : private ssgSimpleList
+class cGrCelestialBodyList : private ssgSimpleList
 {
 public:
 
-  grCelestialBodyList ( int init = 3 )
-	  : ssgSimpleList ( sizeof(grCelestialBody*), init ) { }
+  cGrCelestialBodyList ( int init = 3 )
+	  : ssgSimpleList ( sizeof(cGrCelestialBody*), init ) { }
 
-  ~grCelestialBodyList () { removeAll(); }
+  ~cGrCelestialBodyList () { removeAll(); }
 
   int getNum (void) { return total ; }
 
-  grCelestialBody* get ( unsigned int n )
+  cGrCelestialBody* get ( unsigned int n )
   {
     assert(n<total);
-    return *( (grCelestialBody**) raw_get ( n ) ) ;
+    return *( (cGrCelestialBody**) raw_get ( n ) ) ;
   }
 
-  void add ( grCelestialBody* item ) { raw_add ( (char *) &item ) ;}
+  void add ( cGrCelestialBody* item ) { raw_add ( (char *) &item ) ;}
 
   void removeAll ()
   {
@@ -104,7 +120,7 @@ public:
 } ;
 
 
-class grCloudLayer
+class cGrCloudLayer
 {
 private:
 
@@ -130,8 +146,8 @@ private:
 
 public:
 
-  grCloudLayer( void );
-  ~grCloudLayer( void );
+  cGrCloudLayer( void );
+  ~cGrCloudLayer( void );
 
   void build( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
   void build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
@@ -164,24 +180,24 @@ public:
 };
 
 
-class grCloudLayerList : private ssgSimpleList
+class cGrCloudLayerList : private ssgSimpleList
 {
 public:
 
-  grCloudLayerList ( int init = 3 )
-	  : ssgSimpleList ( sizeof(grCloudLayer*), init ) { }
+  cGrCloudLayerList ( int init = 3 )
+	  : ssgSimpleList ( sizeof(cGrCloudLayer*), init ) { }
 
-  ~grCloudLayerList () { removeAll(); }
+  ~cGrCloudLayerList () { removeAll(); }
 
   int getNum (void) { return total ; }
 
-  grCloudLayer* get ( unsigned int n )
+  cGrCloudLayer* get ( unsigned int n )
   {
     assert(n<total);
-    return *( (grCloudLayer**) raw_get ( n ) ) ;
+    return *( (cGrCloudLayer**) raw_get ( n ) ) ;
   }
 
-  void add ( grCloudLayer* item ) { raw_add ( (char *) &item ) ;}
+  void add ( cGrCloudLayer* item ) { raw_add ( (char *) &item ) ;}
 
   void removeAll ()
   {
@@ -192,7 +208,7 @@ public:
 } ;
 
 
-class grStars
+class cGrStars
 {
 private:
 
@@ -206,8 +222,8 @@ private:
 
 public:
 
-  grStars( void );
-  ~grStars( void );
+  cGrStars( void );
+  ~cGrStars( void );
 
   ssgBranch *build( int num, sgdVec3 *star_data, double star_dist );
 
@@ -217,7 +233,7 @@ public:
 };
 
 
-class grSkyDome
+class cGrSkyDome
 {
 private:
 
@@ -239,8 +255,8 @@ private:
 
 public:
 
-  grSkyDome( void );
-  ~grSkyDome( void );
+  cGrSkyDome( void );
+  ~cGrSkyDome( void );
 
   ssgBranch *build( double hscale = 80000.0, double vscale = 80000.0 );
 
@@ -251,17 +267,17 @@ public:
 };
 
 
-class grSky
+class cGrSky
 {
 private:
 
   // components of the sky
-  grSkyDome *dome;
-  grCelestialBody* sol_ref;
-  grCelestialBodyList bodies;
-  grCloudLayerList clouds;
-  grStars *planets;
-  grStars *stars;
+  cGrSkyDome *dome;
+  cGrCelestialBody* sol_ref;
+  cGrCelestialBodyList bodies;
+  cGrCloudLayerList clouds;
+  cGrStars *planets;
+  cGrStars *stars;
 
   ssgRoot *pre_root, *post_root;
 
@@ -282,21 +298,21 @@ private:
 
 public:
 
-  grSky( void );
-  ~grSky( void );
+  cGrSky( void );
+  ~cGrSky( void );
 
   void build( double h_radius, double v_radius,
 	  int nplanets, sgdVec3 *planet_data,
 	  int nstars, sgdVec3 *star_data);
 
-  grCelestialBody* addBody( const char *body_tex_path, const char *halo_tex_path, double size, double dist, bool sol = false );
-  grCelestialBody* addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double size, double dist, bool sol = false );
-  grCelestialBody* getBody(int i) { return bodies.get(i); }
+  cGrCelestialBody* addBody( const char *body_tex_path, const char *halo_tex_path, double size, double dist, bool sol = false );
+  cGrCelestialBody* addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double size, double dist, bool sol = false );
+  cGrCelestialBody* getBody(int i) { return bodies.get(i); }
   int getBodyCount() { return bodies.getNum(); }
 
-  grCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
-  grCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
-  grCloudLayer* getCloud(int i) { return clouds.get(i); }
+  cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
+  cGrCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
+  cGrCloudLayer* getCloud(int i) { return clouds.get(i); }
   int getCloudCount() { return clouds.getNum(); }
 
   bool repositionFlat( sgVec3 view_pos, double spin, double dt );
@@ -374,7 +390,7 @@ inline void grGammaRestoreC(float *color, float reff = 2.5, float system = syste
   *color = (float)pow(*color, system/reff);
 };
 
-class grMoon 
+class cGrMoon 
 {
     ssgTransform *moon_transform;
     ssgSimpleState *orb_state;
@@ -397,10 +413,10 @@ class grMoon
 public:
 
     // Constructor
-    grMoon( void );
+    cGrMoon( void );
 
     // Destructor
-    ~grMoon( void );
+    ~cGrMoon( void );
 
     // build the moon object
     ssgBranch *build( const char* body_tex_path, double moon_size );
@@ -488,7 +504,7 @@ public:
     }
 };
 
-/*class grSun 
+/*class cGrSun 
 {
     ssgTransform *sun_transform;
     ssgSimpleState *sun_state; 
@@ -518,10 +534,10 @@ public:
 public:
 
     // Constructor
-    grSun( void );
+    cGrSun( void );
 
     // Destructor
-    ~grSun( void );
+    ~cGrSun( void );
 
     // return the sun object
     ssgBranch *build( const char* body_tex_path, const char* halo_tex_path, double sun_size);

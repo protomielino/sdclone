@@ -250,7 +250,7 @@ void grVtxTable::draw ()
 #endif
 
 	if(internalType==TABLE) {
-		if (mapLevelBitmap==LEVEL0 || maxTextureUnits==1) {
+		if (mapLevelBitmap==LEVEL0 || grMaxTextureUnits==1) {
 			ssgVtxTable::draw_geometry ();
 		} else if (mapLevelBitmap < 0) {
 			draw_geometry_for_a_car();
@@ -258,7 +258,7 @@ void grVtxTable::draw ()
 			draw_geometry_multi();
 		}
 	} else {
-		if (mapLevelBitmap==LEVEL0 || maxTextureUnits==1) {
+		if (mapLevelBitmap==LEVEL0 || grMaxTextureUnits==1) {
 			draw_geometry_array();
 		} else if (mapLevelBitmap < 0) {
 			draw_geometry_for_a_car_array();
@@ -339,7 +339,7 @@ void grVtxTable::draw_geometry_multi ()
 		glDisable(GL_TEXTURE_2D);
 	}
 
-	if (maxTextureUnits > 1) {
+	if (grMaxTextureUnits > 1) {
 		glActiveTextureARB(GL_TEXTURE0_ARB);
 	}
 	TRACE_GL("draw_geometry_multi: end");
@@ -457,7 +457,7 @@ void grVtxTable::draw_geometry_array ()
 		state2->apply(2);
 	}
 
-	if (maxTextureUnits > 1) {
+	if (grMaxTextureUnits > 1) {
 		glActiveTextureARB(GL_TEXTURE0_ARB);
 	}
 
@@ -503,7 +503,7 @@ void grVtxTable::draw_geometry_array ()
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_FLOAT, 0, vertices->get(0));
 
-	if (maxTextureUnits > 1) {
+	if (grMaxTextureUnits > 1) {
 		glClientActiveTextureARB(GL_TEXTURE0_ARB);
 	}
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -532,7 +532,7 @@ void grVtxTable::draw_geometry_array ()
 		glDisable(GL_TEXTURE_2D);
 	}
 
-	if (maxTextureUnits > 1) {
+	if (grMaxTextureUnits > 1) {
 		glActiveTextureARB(GL_TEXTURE0_ARB);
 	}
 }

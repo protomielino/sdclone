@@ -198,8 +198,6 @@ ReRaceEventInit(void)
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	
 	ReInitTrack();
-	if( ReInfo->_reGraphicItf.inittrack )
-		ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 	ReEventInitResults();
 
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
@@ -864,8 +862,7 @@ ReEventShutdown(void)
 	char careerMode = FALSE;
 	char first = TRUE;
 
-	if (ReInfo->_reGraphicItf.shutdowntrack)
-		ReInfo->_reGraphicItf.shutdowntrack();
+	ReShutdowTrack();
 
 	do {
 		nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);

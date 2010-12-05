@@ -1,4 +1,21 @@
-// grSky.h
+/***************************************************************************
+
+    file        : grSky.cpp
+    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+    web         : http://www.speed-dreams.org
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 
 #include "grSky.h"
 
@@ -12,7 +29,7 @@ void calc_celestial_angles( const sgVec3 body, const sgVec3 view, double& angle,
 }
 
 
-grSky::grSky( void )
+cGrSky::cGrSky( void )
 {
   dome = 0;
   planets = 0;
@@ -32,7 +49,7 @@ grSky::grSky( void )
 }
 
 
-grSky::~grSky( void )
+cGrSky::~cGrSky( void )
 {
   delete dome;
   delete planets;
@@ -42,7 +59,7 @@ grSky::~grSky( void )
 }
 
 
-void grSky::build( double h_radius, double v_radius,
+void cGrSky::build( double h_radius, double v_radius,
                      int nplanets, sgdVec3 *planet_data,
                      int nstars, sgdVec3 *star_data )
 {
@@ -67,13 +84,13 @@ void grSky::build( double h_radius, double v_radius,
   bodies_transform = new ssgTransform;
   stars_transform = new ssgTransform;
 
-  dome = new grSkyDome;
+  dome = new cGrSkyDome;
   pre_transform -> addKid( dome->build( h_radius, v_radius ) );
 
-  planets = new grStars;
+  planets = new cGrStars;
   stars_transform -> addKid( planets->build( nplanets, planet_data, h_radius ) );
 
-  stars = new grStars;
+  stars = new cGrStars;
   stars_transform -> addKid( stars->build( nstars, star_data, h_radius ) );
 
   pre_transform -> addKid( bodies_transform );
@@ -90,10 +107,10 @@ void grSky::build( double h_radius, double v_radius,
 }
 
 
-grCelestialBody*
-grSky::addBody( const char *body_tex_path, const char *halo_tex_path, double size, double dist, bool sol )
+cGrCelestialBody*
+cGrSky::addBody( const char *body_tex_path, const char *halo_tex_path, double size, double dist, bool sol )
 {
-  grCelestialBody* body = new grCelestialBody;
+  cGrCelestialBody* body = new cGrCelestialBody;
   bodies_transform->addKid( body->build( body_tex_path, halo_tex_path, size ) );
   bodies.add( body );
 
@@ -106,10 +123,10 @@ grSky::addBody( const char *body_tex_path, const char *halo_tex_path, double siz
 }
 
 
-grCelestialBody*
-grSky::addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double size, double dist, bool sol )
+cGrCelestialBody*
+cGrSky::addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double size, double dist, bool sol )
 {
-  grCelestialBody* body = new grCelestialBody;
+  cGrCelestialBody* body = new cGrCelestialBody;
   bodies_transform->addKid( body->build( orb_state, halo_state, size ) );
   bodies.add( body );
 
@@ -122,27 +139,27 @@ grSky::addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double si
 }
 
 
-grCloudLayer*
-grSky::addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition )
+cGrCloudLayer*
+cGrSky::addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition )
 {
-  grCloudLayer* cloud = new grCloudLayer;
+  cGrCloudLayer* cloud = new cGrCloudLayer;
   cloud->build ( cloud_tex_path, span, elevation, thickness, transition );
   clouds.add( cloud );
   return cloud;
 }
 
 
-grCloudLayer*
-grSky::addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
+cGrCloudLayer*
+cGrSky::addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
 {
-  grCloudLayer* cloud = new grCloudLayer;
+  cGrCloudLayer* cloud = new cGrCloudLayer;
   cloud->build ( cloud_state, span, elevation, thickness, transition );
   clouds.add( cloud );
   return cloud;
 }
 
 
-bool grSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
+bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 {
   int i;
   double angle;
@@ -151,7 +168,7 @@ bool grSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 
   for ( i = 0; i < bodies.getNum (); i++ ) 
   {
-    grCelestialBody *body = bodies.get(i);
+    cGrCelestialBody *body = bodies.get(i);
 	body->reposition( view_pos, 0 );
 
 	// Calc angles for rise/set effects
@@ -182,7 +199,7 @@ bool grSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 }
 
 
-bool grSky::reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt )
+bool cGrSky::reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt )
 {
   int i;
 
@@ -203,7 +220,7 @@ bool grSky::reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, doubl
 }
 
 
-bool grSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle,
+bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle,
                        int nplanets, sgdVec3 *planet_data,
                        int nstars, sgdVec3 *star_data )
 {
@@ -235,13 +252,13 @@ bool grSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, dou
 }
 
 
-void grSky::preDraw()
+void cGrSky::preDraw()
 {
   ssgCullAndDraw( pre_root );
 }
 
 
-void grSky::postDraw( float alt )
+void cGrSky::postDraw( float alt )
 {
   // Sort clouds in order of distance from alt (furthest to closest)
   int i, j;
@@ -277,7 +294,7 @@ void grSky::postDraw( float alt )
 
     for ( int i = 0; i < num; i++ ) 
     {
-      grCloudLayer *cloud = clouds.get(index[i]);
+      cGrCloudLayer *cloud = clouds.get(index[i]);
 
       float asl = cloud->getElevation();
       float thickness = cloud->getThickness();
@@ -291,13 +308,13 @@ void grSky::postDraw( float alt )
   }
 }
 
-void grSky::modifyVisibility( float alt, float time_factor )
+void cGrSky::modifyVisibility( float alt, float time_factor )
 {
   float effvis = visibility;
 
   for ( int i = 0; i < clouds.getNum (); ++i ) 
   {
-    grCloudLayer *cloud = clouds.get(i);
+    cGrCloudLayer *cloud = clouds.get(i);
 
     if ( cloud->isEnabled() ) 
     {

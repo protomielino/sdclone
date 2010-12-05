@@ -1,4 +1,21 @@
-// grSkyDome.cpp
+/***************************************************************************
+
+    file        : grSkyDome.cpp
+    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+    web         : http://www.speed-dreams.org
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 
 #include <math.h>
 #include "grSky.h"
@@ -40,21 +57,21 @@ static int grSkyDomePostDraw( ssgEntity *e )
 }
 
 
-grSkyDome::grSkyDome( void )
+cGrSkyDome::cGrSkyDome( void )
 {
   dome_transform = 0;
   asl = 0.0f;
 }
 
 
-grSkyDome::~grSkyDome( void )
+cGrSkyDome::~cGrSkyDome( void )
 {
   ssgDeRefDelete( dome_transform );
 }
 
 
 // initialize the sky object and connect it into our scene graph
-ssgBranch * grSkyDome::build( double hscale, double vscale )
+ssgBranch * cGrSkyDome::build( double hscale, double vscale )
 {
   sgVec4 color;
   double theta;
@@ -234,7 +251,7 @@ ssgBranch * grSkyDome::build( double hscale, double vscale )
   return dome_transform;
 }
 
-bool grSkyDome::repositionFlat( sgVec3 p, double spin )
+bool cGrSkyDome::repositionFlat( sgVec3 p, double spin )
 {
   sgMat4 T, SPIN;
   sgVec3 axis;
@@ -265,10 +282,10 @@ static void fade_to_black( sgVec4 sky_color[], float asl, int count)
     const sgVec3 space_color = {0.0f, 0.0f, 0.0f};
     float d = exp( - asl / ref_asl );
     for(int i = 0; i < count ; i++)
-        sgLerpVec3( sky_color[i], sky_color[i], space_color, 1.0 - d);
+        sgLerpVec3( sky_color[i], sky_color[i], space_color, 1.0f - d);
 }
 
-bool grSkyDome::reposition( sgVec3 p, double lon, double lat, double spin )
+bool cGrSkyDome::reposition( sgVec3 p, double lon, double lat, double spin )
 {
   sgMat4 T, LON, LAT, SPIN;
   sgVec3 axis;
@@ -303,7 +320,7 @@ bool grSkyDome::reposition( sgVec3 p, double lon, double lat, double spin )
 }
 
 
-bool grSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, double vis )
+bool cGrSkyDome::repaint( sgVec4 sky_color, sgVec4 fog_color, double sol_angle, double vis )
 {
   double diff, prev_sun_angle = 999.0;
   sgVec3 outer_param, outer_amt, outer_diff;

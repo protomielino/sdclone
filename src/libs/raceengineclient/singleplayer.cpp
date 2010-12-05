@@ -48,7 +48,7 @@ singlePlayerMenuActivate(void * /* dummy */)
 
 /* Exit from Race engine */
 static void
-singlePLayerShutdown(void *prevMenu)
+singlePlayerShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
     ReShutdown();
@@ -74,14 +74,14 @@ ReSinglePlayerInit(void *prevMenu)
     ReAddRacemanListButton(singlePlayerHandle, menuXMLDescHdle);
 
     // Create Back button
-    CreateButtonControl(singlePlayerHandle, menuXMLDescHdle, "backbutton", prevMenu, singlePLayerShutdown);
+    CreateButtonControl(singlePlayerHandle, menuXMLDescHdle, "backbutton", prevMenu, singlePlayerShutdown);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(singlePlayerHandle);
-    GfuiAddKey(singlePlayerHandle, GFUIK_ESCAPE, "Back To Main", prevMenu, singlePLayerShutdown, NULL);
+    GfuiAddKey(singlePlayerHandle, GFUIK_ESCAPE, "Back To Main", prevMenu, singlePlayerShutdown, NULL);
 
     // Give the race engine the menu to come back to.
     ReStateInit(singlePlayerHandle);

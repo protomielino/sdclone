@@ -24,9 +24,6 @@
 #ifndef _GRRAIN_H
 #define _GRRAIN_H
 
-//SG_USING_STD(vector);
-//SG_USING_STD(string);
-
 #include <vector>
 
 /**
@@ -65,7 +62,7 @@ public:
 	cGrRain();
 	~cGrRain();
 
-	void initialize(float precipitationDensity);
+	void initialize(int rain, float precipitationDensity);
 	
 	void drawRain(double pitch, double roll, double heading, double hspeed, double rain_norm, int rain);
     /**

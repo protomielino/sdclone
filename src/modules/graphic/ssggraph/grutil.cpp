@@ -240,12 +240,12 @@ grSsgLoadTexStateEx(const char *img, const char *filepath,
  * 
  * @return
  */
-void  grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
+void grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
 {
 	char  buf[256];
 	
 	grWriteTimeBuf(buf, sec, sgn);
-  GfuiPrintString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
+	GfuiPrintString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
 }
 
 
@@ -260,7 +260,7 @@ void  grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
  * 
  * @return
  */
-void  grWriteTimeBuf(char *buf, tdble sec, int sgn)
+void grWriteTimeBuf(char *buf, tdble sec, int sgn)
 {
 	const char* sign;
 

@@ -3,19 +3,19 @@ INCLUDE(../../../../cmake/macros.cmake)
 Find_Package(OpenAL)
 
 SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h 
-		     OpenalSoundInterface.cpp PlibSoundInterface.cpp
-		     SoundInterface.cpp SoundInterface.h TorcsSound.cpp TorcsSound.h 
-		     grCelestialBody.cpp grCloudLayer.cpp grSky.cpp grSky.h
-		     grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
-		     grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
-		     grcarlight.cpp grcarlight.h grmain.cpp grmain.h 
-		     grmultitexstate.cpp grmultitexstate.h grloadac.cpp grloadac.h grssgext.h
-                     grscene.cpp grscene.h grscreen.cpp grscreen.h 
-		     grshadow.cpp grshadow.h grskidmarks.cpp grskidmarks.h
-		     grsmoke.cpp grsmoke.h grtexture.cpp grtexture.h loadsgi.h
+                     OpenalSoundInterface.cpp PlibSoundInterface.cpp
+                     SoundInterface.cpp SoundInterface.h TorcsSound.cpp TorcsSound.h 
+                     grCelestialBody.cpp grCloudLayer.cpp grSky.cpp grSky.h
+                     grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
+                     grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
+                     grcarlight.cpp grcarlight.h grmain.cpp grmain.h 
+                     grmultitexstate.cpp grmultitexstate.h grloadac.cpp grloadac.h grssgext.h
+                     grscene.cpp grscene.h grbackground.cpp grbackground.h grscreen.cpp grscreen.h 
+                     grshadow.cpp grshadow.h grskidmarks.cpp grskidmarks.h
+                     grsmoke.cpp grsmoke.h grtexture.cpp grtexture.h loadsgi.h
                      grsound.cpp grsound.h grtracklight.cpp grtracklight.h 
-		     grtrackmap.cpp grtrackmap.h grutil.cpp grutil.h
-		     grvtxtable.cpp grvtxtable.h grrain.cpp grrain.h ssggraph.cpp)
+                     grtrackmap.cpp grtrackmap.h grutil.cpp grutil.h
+                     grvtxtable.cpp grvtxtable.h grrain.cpp grrain.h ssggraph.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()

@@ -19,6 +19,8 @@
 
 #ifdef WIN32
 #include <windows.h>
+#include <GL/gl.h>
+#include <GL/glext.h>
 #endif
 
 #include <plib/ssg.h>
@@ -37,10 +39,10 @@
 #include "grcarlight.h"
 #include "grboard.h"
 #include "grtracklight.h"
+#include "grbackground.h"
 
 
-int maxTextureUnits = 0;
-int segIndice = 0;
+int grMaxTextureUnits = 0;
 
 tdble grMaxDammage = 10000.0;
 int grNbCars = 0;
@@ -74,7 +76,6 @@ static int nCurrentScreenIndex = 0;
 
 
 #ifdef WIN32
-#include <GL/glext.h>
 PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB = NULL;
 PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB = NULL;
 PFNGLACTIVETEXTUREARBPROC glActiveTextureARB = NULL;
@@ -82,34 +83,37 @@ PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 #endif
 
 
-// InitMultiTex
-// desc: sets up OpenGL for multitexturing support
-bool InitMultiTex(void)
+// Set up OpenGL for multitexturing support
+bool grInitMultiTex(void)
 {
-	if (!GfglIsMultiTexturingEnabled()) {
-		maxTextureUnits = 1;
+	if (!GfglIsMultiTexturingEnabled())
+	{
+		grMaxTextureUnits = 1;
 		return true;
-    } else {
-		// list of available extensions
-		char *extensionStr = (char*)glGetString(GL_EXTENSIONS);
-		if (extensionStr == NULL)
-			return false;
-
-		if (strstr(extensionStr, "GL_ARB_multitexture")) {
-			// retrieve the maximum number of texture units allowed
-			glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &maxTextureUnits);
-#ifdef WIN32
-			// retrieve addresses of multitexturing functions
-			glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC) wglGetProcAddress("glMultiTexCoord2fARB");
-			glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) wglGetProcAddress("glActiveTextureARB");
-			glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC) wglGetProcAddress("glClientActiveTextureARB");
-			glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) wglGetProcAddress("glMultiTexCoord2fvARB");
-#endif
-			return true;
-		} else {
-			return false;
-		}
     }
+
+	// TODO: Move most of the following code to tgfclient/glfeatures.cpp ?
+		
+	// list of available extensions
+	char *extensionStr = (char*)glGetString(GL_EXTENSIONS);
+	if (!extensionStr)
+		return false;
+
+	if (strstr(extensionStr, "GL_ARB_multitexture"))
+	{
+		// retrieve the maximum number of texture units allowed
+		glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &grMaxTextureUnits);
+#ifdef WIN32
+		// retrieve addresses of multitexturing functions
+		glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC) wglGetProcAddress("glMultiTexCoord2fARB");
+		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) wglGetProcAddress("glActiveTextureARB");
+		glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC) wglGetProcAddress("glClientActiveTextureARB");
+		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) wglGetProcAddress("glMultiTexCoord2fvARB");
+#endif
+		return true;
+	}
+	
+	return false;
 }
 
 
@@ -262,10 +266,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 	char buf[256];
     int i;
 
-    if (maxTextureUnits==0)
-      {
-	InitMultiTex();
-      }
+	// TODO: Is this needed, as already done in initTrack ?
+    if (grMaxTextureUnits==0)
+		grInitMultiTex();
     
     grWinx = x;
     grWiny = y;
@@ -289,7 +292,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     }
 
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-	grScreens[i]->initBoard ();
+		grScreens[i]->initBoard ();
     }
 
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
@@ -366,6 +369,9 @@ refresh(tSituation *s)
 	// Because it has to be done only once per graphics update, whereas grDrawCar
 	// is called once for each car and for each screen.
 	grPropagateDamage(s);
+
+	// Update sky if dynamic time enabled.
+	grUpdateSky(s->currentTime);
 	
     GfProfStartProfile("grDrawBackground/glClear");
     glDepthFunc(GL_LEQUAL);
@@ -425,20 +431,10 @@ initCars(tSituation *s)
 	elt = s->cars[i];
 	index = elt->index;
 	hdle = elt->_paramsHandle;
-	//sprintf(idx, "Robots/index/%d", elt->_driverIndex);
-	//grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, 0);
-	//grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, 0);
-	//grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, 0);
-	if (elt->_driverType == RM_DRV_HUMAN) 
-	{
-	if (elt->_driverIndex > 10)
+	if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
 		sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
 	else
 		sprintf(idx, "Robots/index/%d", elt->_driverIndex);
-	} else
-	{
-		sprintf(idx, "Robots/index/%d", elt->_driverIndex);
-	}
 	grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
 	grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
 	grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
@@ -513,8 +509,6 @@ shutdownCars(void)
 int
 initTrack(tTrack *track)
 {
-	int i;
-
 	// The inittrack does as well init the context, that is highly inconsistent, IMHO.
 	// TODO: Find a solution to init the graphics first independent of objects.
 	grContext.makeCurrent();
@@ -523,7 +517,7 @@ initTrack(tTrack *track)
 	if (grNbActiveScreens > 0)
 		grLoadScene(track);
 
-	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
+	for (int i = 0; i < GR_NB_MAX_SCREEN; i++) {
 		grScreens[i] = new cGrScreen(i);
 	}
 

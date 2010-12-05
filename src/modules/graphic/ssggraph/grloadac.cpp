@@ -940,16 +940,16 @@ static int do_refs( char *s )
 #endif
 
 	/* check the number of texture units */
-	if (numMapLevel > maxTextureUnits) {
-		numMapLevel=maxTextureUnits;
+	if (numMapLevel > grMaxTextureUnits) {
+		numMapLevel = grMaxTextureUnits;
 	}
 	if (isacar == TRUE) {
 		mapLevel=LEVELC;
-		if (tlist1 && maxTextureUnits > 1) {
+		if (tlist1 && grMaxTextureUnits > 1) {
 			mapLevel = LEVELC2;
 			numMapLevel = 2;
 		}
-		if (tlist2 && maxTextureUnits > 2) {
+		if (tlist2 && grMaxTextureUnits > 2) {
 			mapLevel = LEVELC3;
 			numMapLevel = 3;
 		}
@@ -1067,15 +1067,15 @@ static int do_kids ( char *s )
 		GLenum gltype = GL_TRIANGLE_STRIP ;
 
 		/* check the number of texture units */
-		if (numMapLevel>maxTextureUnits)
-			numMapLevel=maxTextureUnits;
+		if (numMapLevel>grMaxTextureUnits)
+			numMapLevel=grMaxTextureUnits;
 		if (isacar==TRUE) {
 			mapLevel=LEVELC;
-			if (tlist1 && maxTextureUnits>2) {
+			if (tlist1 && grMaxTextureUnits>2) {
 				mapLevel=LEVELC2;
 				numMapLevel=2;
 			}
-			if (tlist2 && maxTextureUnits>2){
+			if (tlist2 && grMaxTextureUnits>2){
 				mapLevel=LEVELC3;
 				numMapLevel=3;
 			}
@@ -1221,10 +1221,8 @@ ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options 
 static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* options )
 {
 
-  if (maxTextureUnits==0)
-    {
-      InitMultiTex();
-    }
+  if (grMaxTextureUnits==0)
+      grInitMultiTex();
 
   char filename [ 1024 ] ;
   current_options -> makeModelPath ( filename, fname ) ;

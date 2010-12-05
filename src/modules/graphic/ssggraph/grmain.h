@@ -38,12 +38,11 @@ extern PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
 #endif
 
-extern bool InitMultiTex();
+extern bool grInitMultiTex();
 
 extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;
 extern int grVectDispFlag[];
-extern int segIndice;
 
 extern double grCurTime;
 
@@ -60,7 +59,8 @@ extern void shutdownCars(void);
 extern int  initTrack(tTrack *track);
 extern void shutdownTrack(void);
 //extern void bendCar (int index, sgVec3 poc, sgVec3 force, int cnt);
-extern int maxTextureUnits;
+
+extern int grMaxTextureUnits;
 extern tdble grMaxDammage;
 
 // Number of active screens.

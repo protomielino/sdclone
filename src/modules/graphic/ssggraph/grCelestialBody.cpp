@@ -1,4 +1,20 @@
-// grCelestiaBody.cpp
+/***************************************************************************
+
+    file        : grCelestiaBody.cpp
+    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+    web         : http://www.speed-dreams.org
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include <math.h>
 #include "grSky.h"
@@ -50,7 +66,7 @@ static int grCelestialBodyHaloPostDraw( ssgEntity *e )
 }
 
 
-grCelestialBody::grCelestialBody( void )
+cGrCelestialBody::cGrCelestialBody( void )
 {
   transform = 0;
   body_angle = 0;
@@ -61,13 +77,13 @@ grCelestialBody::grCelestialBody( void )
 }
 
 
-grCelestialBody::~grCelestialBody( void )
+cGrCelestialBody::~cGrCelestialBody( void )
 {
   ssgDeRefDelete( transform );
 }
 
 
-ssgBranch * grCelestialBody::build( const char* body_tex_path, const char* halo_tex_path, double body_size )
+ssgBranch * cGrCelestialBody::build( const char* body_tex_path, const char* halo_tex_path, double body_size )
 {
   ssgSimpleState *orb_state = NULL;
   ssgSimpleState *halo_state = NULL;
@@ -125,7 +141,7 @@ ssgBranch * grCelestialBody::build( const char* body_tex_path, const char* halo_
 }
 
 
-ssgBranch * grCelestialBody::build( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double body_size )
+ssgBranch * cGrCelestialBody::build( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double body_size )
 {
   ssgVertexArray *halo_vl;
   ssgTexCoordArray *halo_tl;
@@ -192,7 +208,7 @@ ssgBranch * grCelestialBody::build( ssgSimpleState *orb_state, ssgSimpleState *h
 }
 
 
-bool grCelestialBody::reposition( sgVec3 p, double angle, double rightAscension, double declination, double sol_dist )
+bool cGrCelestialBody::reposition( sgVec3 p, double angle, double rightAscension, double declination, double sol_dist )
 {
   sgMat4 T1, T2, GST, RA, DEC;
   sgVec3 axis;
@@ -228,7 +244,7 @@ bool grCelestialBody::reposition( sgVec3 p, double angle, double rightAscension,
 }
 
 
-bool grCelestialBody::repaint( double angle )
+bool cGrCelestialBody::repaint( double angle )
 {
   static double prev_angle = 9999.0;
 

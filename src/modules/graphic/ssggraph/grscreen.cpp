@@ -2,8 +2,8 @@
 
     file        : grscreen.cpp
     created     : Thu May 15 22:11:03 CEST 2003
-    copyright   : (C) 2003 by Eric Espi�                       
-    email       : eric.espie@torcs.org   
+    copyright   : (C) 2003 by Eric Espie
+    email       : eric.espie@torcs.org
     version     : $Id$
 
  ***************************************************************************/
@@ -25,11 +25,12 @@
 #include "grtrackmap.h"
 
 #include "grmain.h"
-#include "grscene.h"	//grDrawBackground, grDrawScene
+#include "grscene.h"	//grDrawScene
+#include "grbackground.h"	//grPre/postDrawBackground
 #include "grcar.h"	//grDrawCar
 #include "grboard.h"	//cGrBoard
-#include "grutil.h"
 #include "grrain.h"
+#include "grutil.h"
 
 static char buf[1024];
 static char path[1024];
@@ -154,7 +155,6 @@ void cGrScreen::selectTrackMap()
 		GfParmSetNum(grHandle, path2, GR_ATT_MAP, NULL, (tdble)viewmode);
 	}
 	GfParmWriteFile(NULL, grHandle, "Graph");
-	
 }
 
 void cGrScreen::switchMirror(void)
@@ -211,13 +211,13 @@ void cGrScreen::selectCamera(long cam)
 	GfParmWriteFile(NULL, grHandle, "Graph");
 }
 
-static class cGrPerspCamera *ThedispCam;	/* the display camera */
+static class cGrPerspCamera *TheDispCam;	/* the display camera */
 
 static int
-comparCars(const void *car1, const void *car2)
+compareCars(const void *car1, const void *car2)
 {
-	float d1 = ThedispCam->getDist2(*(tCarElt**)car1);
-	float d2 = ThedispCam->getDist2(*(tCarElt**)car2);
+	const float d1 = TheDispCam->getDist2(*(tCarElt**)car1);
+	const float d2 = TheDispCam->getDist2(*(tCarElt**)car2);
 	
 	if (d1 > d2) {
 		return -1;
@@ -228,67 +228,82 @@ comparCars(const void *car1, const void *car2)
 
 void cGrScreen::camDraw(tSituation *s)
 {
-	int i;
-	double carSpeed;
-	
 	glDisable(GL_COLOR_MATERIAL);
 	
 	GfProfStartProfile("dispCam->update*");
 	dispCam->update(curCar, s);
 	GfProfStopProfile("dispCam->update*");
-	
+
+	// Draw the static background.
+	// TODO: Exclude this when sky dome enabled, because it is then actually invisible.
 	if (dispCam->getDrawBackground()) {
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
-		grDrawBackground(dispCam, bgCam);
+		grDrawStaticBackground(dispCam, bgCam);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
 	glEnable(GL_DEPTH_TEST);
-	
+
+	// Activate the current display camera.
 	GfProfStartProfile("dispCam->action*");
 	dispCam->action();
 	GfProfStopProfile("dispCam->action*");
-	
+
 	GfProfStartProfile("grDrawCar*");
-	glFogf(GL_FOG_START, dispCam->getFogStart());
-	glFogf(GL_FOG_END, dispCam->getFogEnd());
-	glEnable(GL_FOG);
 	
-	/*sort the cars by distance for transparent windows */
-	ThedispCam = dispCam;
-	qsort(cars, s->_ncars, sizeof(tCarElt*), comparCars);
+	// Draw the fog
+	// TODO: Make this consistent with sky dome own fog / excluded when sky dome enabled ?
+ 	glFogf(GL_FOG_START, dispCam->getFogStart());
+ 	glFogf(GL_FOG_END, dispCam->getFogEnd());
+ 	glEnable(GL_FOG);
 	
-	for (i = 0; i < s->_ncars; i++) {
+	// Sort the cars by distance for transparent windows
+	TheDispCam = dispCam; // Needed by compareCars() ordering function
+	qsort(cars, s->_ncars, sizeof(tCarElt*), compareCars);
+	
+	for (int i = 0; i < s->_ncars; i++) {
 		grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
-	} 
-	GfProfStopProfile("grDrawCar*");
+	}
 	
+	GfProfStopProfile("grDrawCar*");
+
 	GfProfStartProfile("grDrawScene*");
+
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	if (mirrorFlag == 1)
-		carSpeed = curCar->_speed_x;
-	else
-		carSpeed = 0.0f;	
-	grDrawScene(carSpeed, s);
+
+	// Draw the sky dome if enabled (first part)
+  	if (dispCam->getDrawBackground()) {
+  		grPreDrawSky(s, dispCam->getFogStart(), dispCam->getFogEnd());
+  	}
+
+	// Draw the rest of the scene (track, buildings, landscape, cars, ...)
+	grDrawScene();
+
+	// Draw the sky dome if enabled (last part)
+	if (dispCam->getDrawBackground()) {
+		grPostDrawSky();
+	}
+	
 	GfProfStopProfile("grDrawScene*");
+
+	// Draw the precipitation if any.
+	// TODO: Is camSpeed always such ? For all cameras ? Why speed == 0 when no mirror ?
+	const double camSpeed = mirrorFlag ? curCar->_speed_x : 0.0f;
+	grRain.drawPrecipitation(grTrack->rain, 1.0, 0.0, 0.0, 0.0, camSpeed);
 }
 
 
 /* Update screen display */
 void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 {
-	int i;
-	ssgLight *light;
-	int carChanged;
-	
 	if (!active) {
 		return;
 	}
 	
-	carChanged = 0;
+	int carChanged = 0;
 	if (selectNextFlag) {
-		for (i = 0; i < (s->_ncars - 1); i++) {
+		for (int i = 0; i < (s->_ncars - 1); i++) {
 			if (curCar == s->cars[i]) {
 				curCar = s->cars[i + 1];
 				// WIP #132 (D13) : Try and move collision event acknowledgement
@@ -303,7 +318,7 @@ void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 	}
 
 	if (selectPrevFlag) {
-		for (i = 1; i < s->_ncars; i++) {
+		for (int i = 1; i < s->_ncars; i++) {
 			if (curCar == s->cars[i]) {
 				curCar = s->cars[i - 1];
 				// WIP #132 (D13) : Try and move collision event acknowledgement
@@ -325,9 +340,7 @@ void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 		curCam->onSelect(curCar, s);
 	}
 	
-	light = ssgGetLight (0);
-	
-	/* MIRROR */
+	/* Mirror */
 	if (mirrorFlag && curCam->isMirrorAllowed ()) {
 		mirrorCam->activateViewport ();
 		dispCam = mirrorCam;
@@ -349,7 +362,7 @@ void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 	glDisable(GL_FOG);
 	glEnable(GL_TEXTURE_2D);
 	
-	/* MIRROR */
+	/* Mirror */
 	if (mirrorFlag && curCam->isMirrorAllowed ()) {
 		mirrorCam->display ();
 		glViewport (scrx, scry, scrw, scrh);
@@ -431,15 +444,17 @@ void cGrScreen::loadParams(tSituation *s)
 /* Create cameras */
 void cGrScreen::initCams(tSituation *s)
 {
-	tdble fovFactor;
-	int i;
-	
-	fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
+	tdble fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
 	fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
-	if (grSkyDomeDistance != 0)
-	{
+	if (grSkyDomeDistance) {
+		// TODO: Don't roughly overwrite fovFactor with such a huge value without taking care
+		//       of graphic/track settings (see the proposal below).
 		fovFactor = (grSkyDomeDistance / 10);
+
+		// TODO: This formula is more consistent, but it prevents the sky dome from being visible.
+		//fovFactor *= grSkyDomeDistance / grSkyDomeNeutralFOVDistance;
 	}
+	GfLogTrace("Screen #%d : Factor of visibility = %3.2f\n", id, fovFactor);
 	
 	if (boardCam == NULL) {
 		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
@@ -465,8 +480,8 @@ void cGrScreen::initCams(tSituation *s)
 			360.0,				// fovymax
 			0.3,				// near
 			300.0 * fovFactor,	// far
-			200.0 * fovFactor,	// fog1
-			300.0 * fovFactor	// fog
+			200.0 * fovFactor,	// fogstart
+			300.0 * fovFactor	// fogend
 		);
 	}
 	
@@ -476,7 +491,7 @@ void cGrScreen::initCams(tSituation *s)
 	grCamCreateSceneCameraList(this, cams, fovFactor);
 	
 	cars = (tCarElt**)calloc(s->_ncars, sizeof (tCarElt*));
-	for (i = 0; i < s->_ncars; i++) {
+	for (int i = 0; i < s->_ncars; i++) {
 		cars[i] = s->cars[i];
 	}
 	

@@ -1,4 +1,21 @@
-// grStars.cpp - Based on ssgasky plib code
+/***************************************************************************
+
+    file        : grStars.cpp
+    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+    web         : http://www.speed-dreams.org
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
 #include "grSky.h"
 
 #define SD_2PI   6.28318530717958647692
@@ -25,20 +42,20 @@ static int grStarPostDraw( ssgEntity *e )
 }
 
 
-grStars::grStars( void ) :
+cGrStars::cGrStars( void ) :
   stars_transform(0),
   old_phase(-1)
 {
 }
 
   
-grStars::~grStars( void )
+cGrStars::~cGrStars( void )
 {
   ssgDeRefDelete( stars_transform );
 }
 
 
-ssgBranch * grStars::build( int num, sgdVec3 *star_data, double star_dist )
+ssgBranch * cGrStars::build( int num, sgdVec3 *star_data, double star_dist )
 {
   sgVec4 color;
 
@@ -52,7 +69,7 @@ ssgBranch * grStars::build( int num, sgdVec3 *star_data, double star_dist )
   if ( star_data == NULL )
   {
 	  if (num > 0)
-		  ulSetError(UL_WARNING, "null star data passed to grStars::build()");
+		  ulSetError(UL_WARNING, "null star data passed to cGrStars::build()");
 	  else
 		  return stars_transform;
   }
@@ -105,7 +122,7 @@ ssgBranch * grStars::build( int num, sgdVec3 *star_data, double star_dist )
 }
 
 
-bool grStars::reposition( sgVec3 p, double angle )
+bool cGrStars::reposition( sgVec3 p, double angle )
 {
   sgMat4 T1, GST;
   sgVec3 axis;
@@ -128,7 +145,7 @@ bool grStars::reposition( sgVec3 p, double angle )
 }
 
 
-bool grStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
+bool cGrStars::repaint( double sol_angle, int num, sgdVec3 *star_data )
 {
   double mag, nmag, alpha, factor, cutoff;
   float *color;

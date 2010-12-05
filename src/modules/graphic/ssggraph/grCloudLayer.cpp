@@ -1,4 +1,20 @@
-// grCloudLayer.cpp
+/***************************************************************************
+
+    file        : grCloudLayer.cpp
+    copyright   : (C) 2009 by Xavier Bertaux (based on ssgasky plib code)
+    web         : http://www.speed-dreams.org
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
 
 #include "grSky.h"
 
@@ -20,7 +36,7 @@ void calc_gc_course_dist( const sgVec2& start, const sgVec2& dest, double *cours
 ssgSimpleState *grCloudMakeState( const char* path );
 
 
-grCloudLayer::grCloudLayer( void ) :
+cGrCloudLayer::cGrCloudLayer( void ) :
   layer_root(new ssgRoot),
   layer_transform(new ssgTransform),
   enabled(true),
@@ -44,14 +60,14 @@ grCloudLayer::grCloudLayer( void ) :
   layer_root->addKid(layer_transform);
 }
   
-grCloudLayer::~grCloudLayer()
+cGrCloudLayer::~cGrCloudLayer()
 {
   delete layer_root; // deletes layer_transform and layer as well
 }
 
   
 void
-grCloudLayer::build( const char *cloud_tex_path, float span, float elevation, float thickness, float transition )
+cGrCloudLayer::build( const char *cloud_tex_path, float span, float elevation, float thickness, float transition )
 {
   ssgSimpleState *cloud_state = grCloudMakeState( cloud_tex_path );
   build(cloud_state, span, elevation, thickness, transition);
@@ -59,7 +75,7 @@ grCloudLayer::build( const char *cloud_tex_path, float span, float elevation, fl
 
 
 void
-grCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
+cGrCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition )
 {
   layer_span = span;
   layer_asl = elevation;
@@ -157,7 +173,7 @@ grCloudLayer::build( ssgSimpleState *cloud_state, float span, float elevation, f
 }
 
 
-bool grCloudLayer::repositionFlat( sgVec3 p, double dt )
+bool cGrCloudLayer::repositionFlat( sgVec3 p, double dt )
 {
   sgMat4 T1;
 
@@ -268,7 +284,7 @@ bool grCloudLayer::repositionFlat( sgVec3 p, double dt )
 }
 
 
-bool grCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, double alt, double dt )
+bool cGrCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, double alt, double dt )
 {
   sgMat4 T1, LON, LAT;
   sgVec3 axis;
@@ -403,7 +419,7 @@ bool grCloudLayer::reposition( sgVec3 p, sgVec3 up, double lon, double lat, doub
   return true;
 }
 
-bool grCloudLayer::repaint( sgVec3 fog_color )
+bool cGrCloudLayer::repaint( sgVec3 fog_color )
 {
   float *color;
 
@@ -417,7 +433,7 @@ bool grCloudLayer::repaint( sgVec3 fog_color )
   return true;
 }
 
-void grCloudLayer::draw()
+void cGrCloudLayer::draw()
 {
   if (!enabled)
 	  return;
