@@ -34,6 +34,10 @@
 #include "dmalloc.h"
 #endif
 
+// Default SSG loader options for ssgInit (workaround try for ssggraph crash at re-load time).
+static ssgLoaderOptions* DefaultSSGLoaderOptions = 0;
+
+
 static int
 graphInit(int /* idx */, void *pt)
 {
@@ -94,15 +98,20 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
  * Remarks
  *	
  */
-// We need a unique global name for static link under Windows.
 extern "C" int moduleInitialize(tModInfo *modInfo)
 {
     modInfo->name = "ssggraph";		        		/* name of the module (short) */
-    modInfo->desc = "The Graphic Library using PLIB ssg";	/* description of the module (can be long) */
+    modInfo->desc = "The graphics module built on top of PLib ssg";	/* description of the module (can be long) */
     modInfo->fctInit = graphInit;				/* init function */
     modInfo->gfId = 1;						/* v 1  */
     modInfo->index = 0;
 
+	// Override default SSG loader option with ours
+	// (workaround try for ssggraph crash at re-load time).
+	DefaultSSGLoaderOptions = new ssgLoaderOptions;
+	ssgSetCurrentOptions(DefaultSSGLoaderOptions);
+
+	// Initialize PLib SSG layer.
     ssgInit();
 
 	//Setup image loaders
@@ -110,9 +119,6 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
 
     return 0;
 }
-
-
-
 
 /*
  * Function
@@ -131,9 +137,10 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
  * Remarks
  *	
  */
-// We need a unique global name for static link under Windows.
 extern "C" int moduleTerminate()
 {
+	delete DefaultSSGLoaderOptions;
+	
     return 0;
 }
 
