@@ -7,11 +7,11 @@ ADD_SDL_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(txml portability)
 
-SET(TGF_HEADERS os.h tgf.h modinfo.h carinfo.h)
+SET(TGF_HEADERS os.h tgf.h modinfo.h)
 SET(TGF_SOURCES directory.cpp file.cpp filesetup.cpp 
 				formula.cpp hash.cpp module.cpp modinfo.cpp os.cpp
 				params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp 
-				carinfo.cpp ${TGF_HEADERS})
+				${TGF_HEADERS})
 
 IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
@@ -38,5 +38,7 @@ IF(WIN32)
 ELSE(WIN32)
 	SD_INSTALL_FILES(LIB lib TARGETS tgf)
 ENDIF(WIN32)
+
 SD_INSTALL_FILES(INCLUDE FILES ${TGF_HEADERS})
 
+SD_INSTALL_FILES(DATA config FILES params.dtd)

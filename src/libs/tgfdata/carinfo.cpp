@@ -4,6 +4,7 @@
     created              : July 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
