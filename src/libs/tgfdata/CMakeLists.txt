@@ -2,6 +2,8 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(tgfdata)
 
+ADD_PLIB_INCLUDEDIR()
+
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability txml math tgf)
@@ -12,6 +14,9 @@ SET(TGFDATA_SOURCES carinfo.cpp racemanagers.cpp ${TGFDATA_HEADERS})
 IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
 	ADD_DEFINITIONS(-DTGFDATA_DLL)
+	
+	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(WIN32)
 
 # Disable developer warning
@@ -27,7 +32,7 @@ ENDIF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
 
 ADD_SDLIB_LIBRARY(tgfdata txml tgf)
 
-ADD_SDL_LIBRARY(tgfdata)
+ADD_PLIB_LIBRARY(tgfdata sg ul)
 
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS tgfdata)

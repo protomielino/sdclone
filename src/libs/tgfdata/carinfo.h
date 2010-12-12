@@ -22,14 +22,14 @@
 #include <string>
 #include <vector>
 
-#include "tgf.h"
+#include "tgfdata.h"
 
 
 /** @file   
     		Singleton holding information on available cars and categories
 */
 
-class TGF_API CarData
+class TGFDATA_API CarData
 {
 public:
 	std::string strName; // XML file / folder name (ex: "sc-boxer-96")
@@ -39,7 +39,7 @@ public:
 	std::string strXMLPath; // Path-name of the car XML file.
 };
 
-class TGF_API CarInfo
+class TGFDATA_API CarInfo
 {
 public:
 

@@ -256,7 +256,6 @@ rmdsChangeSkin(void *vp)
     GfuiLabelSetText(ScrHandle, SkinEditId, pszCurSkinName);
 
 	// Load associated preview image (or "no preview" panel if none available).
-	struct stat st;
 	if (GfFileExists(MapCurDriverSkinPreviewFiles[pszCurSkinName].c_str()))
 		GfuiStaticImageSet(ScrHandle, CarImageId,
 						   MapCurDriverSkinPreviewFiles[pszCurSkinName].c_str(),
@@ -612,7 +611,6 @@ RmDriversSelect(void *vs)
     void	*carhdle;
     void	*cathdle;
     int		human;
-    const char* initCarCat;
 
     // Initialize drivers selection
     MenuData = (tRmDriverSelect*)vs;

@@ -45,7 +45,6 @@ void ReStartWeather(void)
 	int timeofday;
 	int	rain;
 	int	clouds;
-	int	water;
 	int	rainprob;
 	int problrain;
 	int probrain;

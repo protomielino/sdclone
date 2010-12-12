@@ -21,6 +21,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include <tgf.h>
+
 #include "carinfo.h"
 
 
@@ -113,7 +115,7 @@ CarInfo::CarInfo()
 	// has to be completed before we can GetCategoryRealNames().
 	const std::vector<std::string> vecCatRealNames = GetCategoryRealNames();
 	std::vector<std::string>::const_iterator iterCatName;
-	for (int nCatIndex = 0; nCatIndex < m_priv->vecCategoryNames.size(); nCatIndex++)
+	for (unsigned nCatIndex = 0; nCatIndex < m_priv->vecCategoryNames.size(); nCatIndex++)
 	{
 		std::vector<CarData*> vecCarsInCat =
 			GetCarsInCategory(m_priv->vecCategoryNames[nCatIndex]);
@@ -247,7 +249,7 @@ void CarInfo::print() const
 	GfLogDebug("Found %d cars in %d categories\n",
 			   m_priv->vecCars.size(), m_priv->vecCategoryNames.size());
 	std::vector<std::string>::const_iterator iterCat;
-	for (int nCatIndex = 0; nCatIndex < m_priv->vecCategoryNames.size(); nCatIndex++)
+	for (unsigned nCatIndex = 0; nCatIndex < m_priv->vecCategoryNames.size(); nCatIndex++)
 	{
 		GfLogDebug("  %s (%s) :\n", m_priv->vecCategoryRealNames[nCatIndex].c_str(),
 				   m_priv->vecCategoryNames[nCatIndex].c_str());
