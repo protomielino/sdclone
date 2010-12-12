@@ -29,6 +29,7 @@
 #include <portability.h>
 
 #include <tgfclient.h>
+#include <tgfdata.h>
 #include <raceman.h>
 #include <playerconfig.h>
 #include <racescreens.h>
@@ -292,14 +293,16 @@ reLoadRaceFromConfigFile(const char *filename)
 	ReInfo->mainParams = ReInfo->params = GfParmReadFile(pszMainFilePathName, GFPARM_RMODE_STD);
 	ReInfo->_reName = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 	ReInfo->_reRaceName = ReInfo->_reName;
-	
+
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
 	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
 
-	// Update raceman info (the params pointer changed).
-	char pszFileName[64];
-	snprintf(pszFileName, sizeof(pszFileName), "%s%s", ReInfo->_reFilename, PARAMEXT);
-	ReUpdateRaceman(pszFileName, ReInfo->params);
+	// Update the race manager (the params handle changed).
+	GfRaceManager* pRaceMan = GfRaceManagers::self()->getRaceManager(ReInfo->_reFilename);
+	if (pRaceMan)
+		pRaceMan->setDescriptorHandle(ReInfo->params);
+	else
+		GfLogError("No such race manager (id=%s)\n", ReInfo->_reFilename);
 }
 
 static void
@@ -455,19 +458,19 @@ ReRacemanMenu(void)
 			{
 				if (IsClient())
 				{
-					reNetworkClientConnectMenu(NULL);
+					ReNetworkClientConnectMenu(NULL);
 					return RM_ASYNC | RM_NEXT_STEP;
 				}
 				else if (IsServer())
 				{
-					reNetworkHostMenu(NULL);
+					ReNetworkHostMenu(NULL);
 					return RM_ASYNC | RM_NEXT_STEP;
 				}
 			}
 		}
 		else
 		{
-			reNetworkMenu(NULL);
+			ReNetworkMenu(NULL);
 			return RM_ASYNC | RM_NEXT_STEP;
 		}
 
@@ -533,7 +536,6 @@ ReNewTrackMenu(void)
 	void	*params = ReInfo->params;
 	void	*results = ReInfo->results;
 	int		raceNumber;
-	int		 xx;
 
 	if (NewTrackMenuHdle) {
 		GfuiScreenRelease(NewTrackMenuHdle);
@@ -559,9 +561,9 @@ ReNewTrackMenu(void)
 
 	// Calculate which race of the series this is
 	raceNumber = 1;
-	for (xx = 1; xx < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++xx) 
+	for (int nEventInd = 1; nEventInd < (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1); ++nEventInd) 
 	{
-		snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, xx);
+		snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, nEventInd);
 		if (!strcmp( GfParmGetStr(ReInfo->params, buf, RM_ATTR_NAME, "free"), "free") == 0)
 			++raceNumber;
 	}

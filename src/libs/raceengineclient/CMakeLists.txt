@@ -5,20 +5,20 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(RACEENGINECLIENT_SOURCES racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
 							 racemessage.cpp racegl.cpp raceinit.cpp racemain.cpp
 							 raceweather.cpp racemanmenu.cpp raceresults.cpp racesimusimu.cpp 
-							 racestate.cpp racesituation.cpp singleplayer.cpp networkingmenu.cpp
+							 racestate.cpp racesituation.cpp raceselectmenu.cpp networkingmenu.cpp
 							 raceengineclient.h 
 							 racecareer.h raceupdate.h racenetwork.h racecars.h
 							 racemessage.h racegl.h raceinit.h 
 							 raceweather.h racemanmenu.h raceresults.h racesimusimu.h 
-							 racestate.h racesituation.h singleplayer.h networkingmenu.h)
+							 racestate.h racesituation.h raceselectmenu.h networkingmenu.h)
 
 ADD_SD_DEFINITIONS()
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 
-ADD_SDLIB_INCLUDEDIR(confscreens math portability racescreens robottools 
-						tgf tgfclient networking)
+ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfclient tgfdata
+                     confscreens racescreens networking)
 
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
 
@@ -37,7 +37,9 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_LIBRARY(raceengineclient SHARED ${RACEENGINECLIENT_SOURCES})
 
-ADD_SDLIB_LIBRARY(raceengineclient confscreens racescreens robottools tgf tgfclient networking)
+ADD_SDLIB_LIBRARY(raceengineclient
+                  tgf tgfclient tgfdata robottools
+                  confscreens racescreens networking)
 
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS raceengineclient)
@@ -45,7 +47,9 @@ ELSE(WIN32)
 	SD_INSTALL_FILES(LIB lib TARGETS raceengineclient)
 ENDIF(WIN32)
 
+SD_INSTALL_FILES(DATA config FILES raceresults.xsl)
+
 SD_INSTALL_FILES(DATA config USER config FILES raceengine.xml)
 
-SD_INSTALL_FILES(INCLUDE FILES raceinit.h singleplayer.h)
+SD_INSTALL_FILES(INCLUDE FILES raceinit.h raceselectmenu.h)
 

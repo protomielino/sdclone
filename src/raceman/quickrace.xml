@@ -15,12 +15,13 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Quick Race" type="param" mode="mw" version="1.16">
+<params name="Quick Race" type="param" mode="mw" version="1.17">
 
     <section name="Header">
       <attstr name="name" val="Quick Race"/>
+      <attstr name="type" val="Quick"/>
       <attstr name="description" val="Quick Race"/>
-      <attnum name="priority" val="10"/>
+      <attnum name="priority" val="90"/>
       <attstr name="menu image" val="data/img/splash-quickrace.jpg"/>
     </section>
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
-    file        : sc-champ.xml
+    file        : championship-supercars.xml
     created     : 2008
     copyright   : (C) 2008 by Xavier Bertaux
     web         : www.speed-dreams.org   
@@ -15,14 +15,16 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Supercar Championship" version="1.2">
+<params name="Supercar Championship" version="1.3">
   <section name="Header">
     <attstr name="name" val="Supercar Championship"/>
-    <attstr name="description" val="Championship"/>
-    <attnum name="priority" val="30"/>
-    <attstr name="menu image" val="data/img/splash-dtm.jpg"/>
+    <attstr name="type" val="Championship"/>
+    <attstr name="subtype" val="Supercars"/>
+    <attstr name="description" val="Supercar Championship"/>
+    <attnum name="priority" val="59"/>
+    <attstr name="menu image" val="data/img/splash-champ.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
-    <attstr name="start image" val="data/img/splash-dtmstart.jpg"/>
+    <attstr name="start image" val="data/img/splash-champstart.jpg"/>
   </section>
 
   <section name="Tracks">

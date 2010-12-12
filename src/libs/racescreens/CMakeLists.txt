@@ -9,7 +9,8 @@ SET(RACESCREENS_SOURCES carselect.cpp driverselect.cpp fileselect.cpp
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(portability tgf tgfclient math robottools)
+ADD_SDLIB_INCLUDEDIR(portability tgf tgfclient tgfdata math robottools)
+
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
 
 IF(WIN32)
@@ -27,7 +28,8 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_LIBRARY(racescreens SHARED ${RACESCREENS_SOURCES})
 
-ADD_SDLIB_LIBRARY(racescreens tgf tgfclient robottools)
+ADD_SDLIB_LIBRARY(racescreens
+                  tgf tgfclient tgfdata robottools)
 
 ADD_PLIB_LIBRARY(racescreens ul)
 

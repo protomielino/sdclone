@@ -21,7 +21,7 @@
 #include <cstdio>
 
 #include <tgfclient.h>
-#include <singleplayer.h>
+#include <raceselectmenu.h>
 #include <racemain.h>
 #include <playerconfig.h>
 
@@ -87,7 +87,7 @@ MainMenuInit(void)
     CreateStaticControls(menuDescHdle,MenuHandle);
 
     //Add buttons and create based on xml
-    CreateButtonControl(MenuHandle, menuDescHdle, "race", ReSinglePlayerInit(MenuHandle), GfuiScreenActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "race", ReRaceSelectInit(MenuHandle), GfuiScreenActivate);
     CreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, PlayerConfigActivate);
     CreateButtonControl(MenuHandle, menuDescHdle, "options",OptionOptionInit(MenuHandle), GfuiScreenActivate);
     CreateButtonControl(MenuHandle, menuDescHdle, "credits", MenuHandle, CreditsScreenActivate);

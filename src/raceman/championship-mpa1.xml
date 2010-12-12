@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
-    file        : mpa1-champ.xml
+    file        : championship-mpa1.xml
     created     : 2009
     copyright   : (C) 2009 by Xavier Bertaux                         
     web         : www.speed-dreams.org
@@ -15,15 +15,17 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="MPA1 Championship" version="1.4">
+<params name="MPA1 Championship" version="1.5">
 
   <section name="Header">
     <attstr name="name" val="MPA1 Championship"/>
-    <attstr name="description" val="Championship"/>
-    <attnum name="priority" val="50"/>
-    <attstr name="menu image" val="data/img/splash-dtm.jpg"/>
+    <attstr name="type" val="Championship"/>
+    <attstr name="subtype" val="MPA1"/>
+    <attstr name="description" val="MPA1 Championship"/>
+    <attnum name="priority" val="51"/>
+    <attstr name="menu image" val="data/img/splash-champ.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
-    <attstr name="start image" val="data/img/splash-dtm.jpg"/>
+    <attstr name="start image" val="data/img/splash-champstart.jpg"/>
   </section>
 
   <section name="Tracks">

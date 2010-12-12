@@ -30,8 +30,8 @@ ENDIF(WIN32)
 
 ADD_LIBRARY(client SHARED ${CLIENT_SOURCES})
 
-#ADD_PLIB_LIBRARY(client ssg ul sg sl ssg ssgaux)
-ADD_SDLIB_LIBRARY(client confscreens tgfclient raceengineclient racescreens track ssggraph robottools)
+ADD_SDLIB_LIBRARY(client 
+                  tgfclient robottools confscreens raceengineclient racescreens)
 
 ADD_OPENGL_LIBRARY(client)
 ADD_SDL_LIBRARY(client)

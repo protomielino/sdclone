@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
-    file        : endrace.xml
+    file        : singleevent-endurance.xml
     created     : Sat Jan 25 08:58:03 CET 2003
     copyright   : (C) 2003 by Eric Espie                         
     email       : Eric.Espie@torcs.org   
@@ -15,15 +15,17 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Endurance Race" version="1.14">
+<params name="Endurance Race" version="1.15">
 
   <section name="Header">
     <attstr name="name" val="Endurance Race"/>
+    <attstr name="type" val="Single Event"/>
+    <attstr name="subtype" val="Endurance"/>
     <attstr name="description" val="Endurance Race"/>
-    <attnum name="priority" val="21"/>
-    <attstr name="menu image" val="data/img/splash-dtm.jpg"/>
+    <attnum name="priority" val="70"/>
+    <attstr name="menu image" val="data/img/splash-endur.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
-    <attstr name="start image" val="data/img/splash-dtmstart.jpg"/>
+    <attstr name="start image" val="data/img/splash-endurstart.jpg"/>
   </section>
 
   <section name="Tracks">

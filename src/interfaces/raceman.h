@@ -146,7 +146,7 @@ typedef struct
     tRaceModIft		itf;
     void		*gameScreen;
     void		*menuScreen;
-    char		*filename;
+    const char		*filename;
     const char		*name;
     const char		*raceName;
     tReCarInfo		*carInfo;
@@ -272,6 +272,8 @@ typedef struct RmInfo
 
 #define RM_ATTR_PRIO		"priority"
 #define RM_ATTR_NAME		"name"
+#define RM_ATTR_TYPE		"type"
+#define RM_ATTR_SUBTYPE		"subtype"
 #define RM_ATTR_FULLNAME		"full name"
 #define RM_ATTR_DRVNAME		"driver name"
 #define RM_ATTR_CATEGORY	"category"
@@ -294,7 +296,6 @@ typedef struct RmInfo
 
 #define RM_ATTR_TIMESTEP	"time step"
 
-#define RM_ATTR_TYPE		"type"
 #define RM_ATTR_RACE		"race"
 #define RM_ATTR_ROWS		"rows"
 #define RM_ATTR_TOSTART		"distance to start"

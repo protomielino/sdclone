@@ -2,9 +2,9 @@
 
     file        : raceinit.h
     created     : Sat Nov 16 12:24:26 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -28,14 +28,15 @@
 
 #include "raceengineclient.h"
 
+class GfRaceManager;
+
 
 RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
 
 extern void ReInit(void);
 extern void ReShutdown(void);
 
-extern void ReUpdateRaceman(const char* pszFileName, void* params);
-extern void ReAddRacemanListButton(void *menuHandle, void *menuXMLDescHandle);
+extern void ReRaceConfigure(GfRaceManager* pRaceman);
 
 extern int  ReInitCars(void);
 

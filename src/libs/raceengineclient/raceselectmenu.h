@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    file        : singleplayer.h
+    file        : raceselectmenu.h
     created     : Sat Nov 16 09:48:11 CET 2002
-    copyright   : (C) 2002 by Eric Espié                        
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
     version     : $Id$                                  
 
@@ -18,20 +18,20 @@
  ***************************************************************************/
  
 /** @file    
-    		
+    		Race selection menu
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
 
-#ifndef _SINGLEPLAYER_H_
-#define _SINGLEPLAYER_H_
+#ifndef _RACESELECTMENU_H_
+#define _RACESELECTMENU_H_
 
 #include "raceengineclient.h"
 
 
-RACEENGINECLIENT_API void *ReSinglePlayerInit(void *precMenu);
+RACEENGINECLIENT_API void *ReRaceSelectInit(void *precMenu);
 
-#endif /* _SINGLEPLAYER_H_ */ 
+#endif /* _RACESELECTMENU_H_ */ 
 
 
 

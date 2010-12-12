@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!-- 
-    file        : dtmrace.xml
+    file        : championship.xml
     created     : Sat Jan 25 08:58:03 CET 2003
     copyright   : (C) 2003 by Eric Espie                         
     email       : Eric.Espie@torcs.org   
@@ -14,21 +15,79 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Challenge Race" version="1.2">
+
+<params name="Championship" version="1.3">
   <section name="Header">
-    <attstr name="name" val="Challenge Race"/>
-    <attstr name="description" val="Multiple races"/>
-    <attnum name="priority" val="50"/>
-    <attstr name="menu image" val="data/img/splash-dtm.jpg"/>
+    <attstr name="name" val="Championship"/>
+    <attstr name="type" val="Championship"/>
+    <attstr name="subtype" val="All classes"/>
+    <attstr name="description" val="Championship not limited to a special car category"/>
+    <attnum name="priority" val="60"/>
+    <attstr name="menu image" val="data/img/splash-champ.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
-    <attstr name="start image" val="data/img/splash-dtmstart.jpg"/>
+    <attstr name="start image" val="data/img/splash-champstart.jpg"/>
   </section>
 
   <section name="Tracks">
-    <attnum name="maximum number" val="1"/>
+    <attnum name="maximum number" val="20"/>
     <section name="1">
+      <attstr name="name" val="g-track-1"/>
+      <attstr name="category" val="road"/>
+    </section>
+
+    <section name="2">
       <attstr name="name" val="espie"/>
-			<attstr name="category" val="circuit"/>
+      <attstr name="category" val="circuit"/>
+    </section>
+
+    <section name="3">
+      <attstr name="name" val="prenzlau"/>
+      <attstr name="category" val="road"/>
+    </section>
+
+    <section name="4">
+      <attstr name="name" val="street-1"/>
+      <attstr name="category" val="road"/>
+    </section>
+
+    <section name="5">
+      <attstr name="name" val="wheel-2"/>
+      <attstr name="category" val="circuit"/>
+    </section>
+
+    <section name="6">
+      <attstr name="name" val="ruudskogen"/>
+      <attstr name="category" val="circuit"/>
+    </section>
+
+    <section name="7">
+      <attstr name="name" val="aalborg"/>
+      <attstr name="category" val="circuit"/>
+    </section>
+
+    <section name="8">
+      <attstr name="name" val="allondaz"/>
+      <attstr name="category" val="road"/>
+    </section>
+
+    <section name="9">
+      <attstr name="name" val="dirt-3"/>
+      <attstr name="category" val="dirt"/>
+    </section>
+
+    <section name="10">
+      <attstr name="name" val="manton"/>
+      <attstr name="category" val="speedway"/>
+    </section>
+
+    <section name="11">
+      <attstr name="name" val="forza"/>
+      <attstr name="category" val="circuit"/>
+    </section>
+
+    <section name="12">
+      <attstr name="name" val="alpine-2"/>
+      <attstr name="category" val="road"/>
     </section>
 
   </section>
@@ -39,11 +98,7 @@
     </section>
 
     <section name="2">
-      <attstr name="name" val="Sprint Race"/>
-    </section>
-
-    <section name="3">
-      <attstr name="name" val="Main Race"/>
+      <attstr name="name" val="Race"/>
     </section>
 
   </section>
@@ -67,8 +122,8 @@
 
   </section>
 
-  <section name="Sprint Race">
-    <attnum name="distance" unit="km" val="50"/>
+  <section name="Race">
+    <attnum name="distance" unit="km" val="180"/>
     <attstr name="type" val="race"/>
     <attstr name="starting order" val="last race"/>
     <attstr name="restart" val="no"/>
@@ -77,7 +132,7 @@
     <section name="Starting Grid">
       <attnum name="rows" val="2"/>
       <attnum name="distance to start" val="25"/>
-      <attnum name="distance between columns" val="20"/>
+      <attnum name="distance between columns" val="30"/>
       <attnum name="offset within a column" val="10"/>
       <attnum name="initial speed" val="0"/>
       <attnum name="initial height" val="0.2"/>
@@ -120,71 +175,18 @@
 
   </section>
 
-  <section name="Main Race">
-    <attnum name="distance" unit="km" val="180"/>
-    <attstr name="type" val="race"/>
-    <attstr name="starting order" val="last race"/>
-    <attstr name="restart" val="no"/>
-    <attstr name="splash menu" val="yes"/>
-    <section name="Starting Grid">
-      <attnum name="rows" val="2"/>
-      <attnum name="distance to start" val="25"/>
-      <attnum name="distance between columns" val="20"/>
-      <attnum name="offset within a column" val="10"/>
-      <attnum name="initial speed" val="0"/>
-      <attnum name="initial height" val="0.2"/>
-    </section>
-
-    <section name="Points">
-      <section name="1">
-        <attnum name="points" val="20"/>
-      </section>
-
-      <section name="2">
-        <attnum name="points" val="16"/>
-      </section>
-
-      <section name="3">
-        <attnum name="points" val="12"/>
-      </section>
-
-      <section name="4">
-        <attnum name="points" val="10"/>
-      </section>
-
-      <section name="5">
-        <attnum name="points" val="8"/>
-      </section>
-
-      <section name="6">
-        <attnum name="points" val="6"/>
-      </section>
-
-      <section name="7">
-        <attnum name="points" val="4"/>
-      </section>
-
-      <section name="8">
-        <attnum name="points" val="2"/>
-      </section>
-
-    </section>
-
-  </section>
-
   <section name="Drivers">
     <attnum name="maximum number" val="50"/>
     <attstr name="focused module" val="human"/>
     <attnum name="focused idx" val="3"/>
-
     <section name="1">
-      <attnum name="idx" val="1"/>
-      <attstr name="module" val="usr_trb1"/>
+      <attnum name="idx" val="8"/>
+      <attstr name="module" val="simplix_trb1"/>
     </section>
 
     <section name="2">
-      <attnum name="idx" val="4"/>
-      <attstr name="module" val="simplix_trb1"/>
+      <attnum name="idx" val="9"/>
+      <attstr name="module" val="usr_trb1"/>
     </section>
 
     <section name="3">
@@ -195,16 +197,14 @@
   </section>
 
   <section name="Configuration">
-    <attnum name="current configuration" val="3"/>
-    <section name="1">
-      <attstr name="type" val="track select"/>
-    </section>
 
-    <section name="2">
+    <attnum name="current configuration" val="2"/>
+
+    <section name="1">
       <attstr name="type" val="drivers select"/>
     </section>
 
-    <section name="3">
+    <section name="2">
       <attstr name="type" val="race config"/>
       <attstr name="race" val="Race"/>
       <section name="Options">

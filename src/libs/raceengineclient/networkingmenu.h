@@ -20,12 +20,8 @@
 #ifndef _NETWORKINGMENU_H_
 #define _NETWORKINGMENU_H_
 
-void ReLoadQuickRace();
-void ServerPrepareStartNetworkRace(void *pVoid);
-
-void reNetworkClientConnectMenu(void *pVoid);
-void reNetworkMenu(void * /* dummy */);
-void reNetworkHostMenu(void * /* dummy */);
-void reNetworkClientMenu(void * /* dummy */);
+extern void ReNetworkClientConnectMenu(void *pVoid);
+extern void ReNetworkMenu(void * /* dummy */);
+extern void ReNetworkHostMenu(void * /* dummy */);
 
 #endif // _NETWORKINGMENU_H_

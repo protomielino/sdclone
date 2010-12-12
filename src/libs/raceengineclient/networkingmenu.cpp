@@ -73,8 +73,8 @@ static int g_IPEditId;
 static int g_NameId;
 
 
-static char		buf[1024];
-static void		*racemanMenuHdle = NULL;
+static char	buf[1024];
+static void	*racemanMenuHdle = NULL;
 
 //static char *g_pDriver = NULL;
 //static char *g_pCar = NULL;
@@ -91,15 +91,17 @@ static std::string g_strHostIP = "127.0.0.1";
 HostSettingsMenu g_HostMenu;
 CarSettingsMenu g_CarMenu;
 
-void GetHumanDriver(Driver &driver,int index);
+static void GetHumanDriver(Driver &driver,int index);
+static void ServerPrepareStartNetworkRace(void *pVoid);
+static void NetworkClientMenu(void * /* dummy */);
 
 
-void SetReadyStatus(int index,bool bStatus)
+static void SetReadyStatus(int index,bool bStatus)
 {
 	GfuiStaticImageSetActive(racemanMenuHdle,g_readystatus[index],bStatus ? 1 : 0);
 }
 
-void EnableMenuHostButtons(bool bChecked)
+static void EnableMenuHostButtons(bool bChecked)
 {
 	//Disable/enable menu selections
 	const int isEnabled = bChecked ? GFUI_ENABLE : GFUI_DISABLE;
@@ -109,14 +111,14 @@ void EnableMenuHostButtons(bool bChecked)
 	GfuiEnable(racemanMenuHdle, g_RaceSetupId,isEnabled);
 }
 
-void onHostPlayerReady(tCheckBoxInfo* pInfo)
+static void onHostPlayerReady(tCheckBoxInfo* pInfo)
 {
 	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
 	GetNetwork()->SetDriverReady(pInfo->bChecked);
 	EnableMenuHostButtons(pInfo->bChecked);
 }
 
-void EnableMenuClientButtons(bool bChecked)
+static void EnableMenuClientButtons(bool bChecked)
 {
 	//Disable/enable menu selections
 	const int isEnabled = bChecked ? GFUI_ENABLE : GFUI_DISABLE;
@@ -124,14 +126,14 @@ void EnableMenuClientButtons(bool bChecked)
 	GfuiEnable(racemanMenuHdle, g_DisconnectButtonId,isEnabled);
 }
 
-void onClientPlayerReady(tCheckBoxInfo* pInfo)
+static void onClientPlayerReady(tCheckBoxInfo* pInfo)
 {
 	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
 	GetNetwork()->SetDriverReady(pInfo->bChecked);
 	EnableMenuClientButtons(pInfo->bChecked);
 }
 
-std::string 
+static std::string 
 GetTrackName(const char *category, const char *trackName)
 {
     void *trackHandle;
@@ -157,7 +159,8 @@ onChangeCarCategory(void * pData)
 	
 }
 
-std::string GetTrackPreviewFileName(const char *pszCategory, const char *pszTrack)
+static std::string
+GetTrackPreviewFileName(const char *pszCategory, const char *pszTrack)
 {
 	char buf[256];
 
@@ -179,7 +182,8 @@ std::string GetTrackPreviewFileName(const char *pszCategory, const char *pszTrac
 	return std::string(buf);
 }
 
-std::string GetTrackOutlineFileName(const char *pszCategory,const char *pszTrack)
+static std::string
+GetTrackOutlineFileName(const char *pszCategory,const char *pszTrack)
 {
 	char buf[256];
 
@@ -191,7 +195,7 @@ std::string GetTrackOutlineFileName(const char *pszCategory,const char *pszTrack
 	return std::string(buf);
 }
 
-void 
+static void 
 UpdateNetworkPlayers()
 {
 	Network *pNetwork = GetNetwork();
@@ -208,7 +212,7 @@ UpdateNetworkPlayers()
 	assert(ReInfo->params);
 
 	ReInfo->_reName = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	assert(ReInfo->params);
+	assert(ReInfo->_reName);
 
 	//Update track info
 	std::string strTrackPath = GfParmGetStr(ReInfo->params, "Tracks/1", RM_ATTR_NAME, "");
@@ -358,7 +362,8 @@ reNetworkClientDisconnect(void * /* dummy */)
 }
 
 
-void CheckDriversCategory()
+static void
+CheckDriversCategory()
 {
 	bool bDriversChange = false;
 	std::string strCarCat;
@@ -397,7 +402,7 @@ void CheckDriversCategory()
 	GetServer()->UnlockServerData();
 }
 
-void
+static void
 HostServerIdle(void)
 {
 	GfuiIdle();
@@ -430,7 +435,7 @@ HostServerIdle(void)
 }
 
 
-void
+static void
 ClientIdle(void)
 {
 	GfuiIdle();
@@ -466,7 +471,8 @@ ClientIdle(void)
     GfuiSleep(0.001);
 }
 
-void NetworkRaceInfo()
+static void
+NetworkRaceInfo()
 {
 	GetServer()->SetRaceXMLFile("config/raceman/networkrace.xml");
 
@@ -487,7 +493,8 @@ void NetworkRaceInfo()
 	ReInfo->_reName = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 }
 
-void NetworkDisplay(void)
+static void
+NetworkDisplay(void)
 {
 }
 
@@ -497,7 +504,8 @@ static void OnActivateNetworkClient(void *)
 }
 
 
-static void OnActivateNetworkHost(void *)
+static void
+OnActivateNetworkHost(void *)
 {
 	MutexData *pNData = GetNetwork()->LockNetworkData();
 	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
@@ -528,7 +536,6 @@ reNetworkServerDisconnect(void * /* dummy */)
 static void
 reCarSettingsMenu(void *pMenu)
 {
-
 	g_CarMenu.Init(pMenu,g_strCar.c_str());
 
 	ReSetRacemanMenuHandle(g_CarMenu.GetMenuHandle());
@@ -549,7 +556,7 @@ reNetworkHostSettingsMenu(void *pMenu)
 
 // Host on-line race menu.
 void
-reNetworkHostMenu(void * /* dummy */)
+ReNetworkHostMenu(void * /* dummy */)
 {
 	if (!GetNetwork())
 	{
@@ -575,8 +582,6 @@ reNetworkHostMenu(void * /* dummy */)
 
     CreateStaticControls(mparam,racemanMenuHdle);
 
-    void	*params = ReInfo->params;
- 
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
 	std::vector<std::string> vecCat = CarInfo::self()->GetCategoryNames();
@@ -622,7 +627,8 @@ reNetworkHostMenu(void * /* dummy */)
     GfuiScreenActivate(racemanMenuHdle);
 }
 
-void ShowWaitingToConnectScreen()
+static void
+ShowWaitingToConnectScreen()
 {
 	if (racemanMenuHdle) 
 	{
@@ -632,10 +638,8 @@ void ShowWaitingToConnectScreen()
 						NULL, (tfuiCallback) NULL, 
 						NULL, (tfuiCallback)NULL, 
 						1);
-	const char	*str;
-	void	*params = ReInfo->params;
-
-	str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
+	void *params = ReInfo->params;
+	const char *str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
 	if (str) 
 	{
 		GfuiScreenAddBgImg(racemanMenuHdle, str);
@@ -649,7 +653,7 @@ void ShowWaitingToConnectScreen()
 }
 
 void
-reNetworkClientConnectMenu(void * /* dummy */)
+ReNetworkClientConnectMenu(void * /* dummy */)
 {
 	ShowWaitingToConnectScreen();
 	
@@ -665,14 +669,12 @@ reNetworkClientConnectMenu(void * /* dummy */)
 		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
 		{
 			//failed so back to connect menu
-			reNetworkClientMenu(NULL);
+			NetworkClientMenu(NULL);
 			return;
 		}
 
 		//GetClient()->SendDriverInfoPacket(&driver);
 	}
-
-	void *params = ReInfo->params;
 
 	if (racemanMenuHdle) {
 	GfuiScreenRelease(racemanMenuHdle);
@@ -746,7 +748,8 @@ ChangeIP(void * /* dummy */)
 }
 
 
-void LookupPlayerSetup(std::string & strDriver,std::string & strCar)
+static void
+LookupPlayerSetup(std::string & strDriver,std::string & strCar)
 {
     	void	*drvinfo;
 	
@@ -767,35 +770,36 @@ void LookupPlayerSetup(std::string & strDriver,std::string & strCar)
 	GfParmReleaseHandle(drvinfo);
 }
 
-void reNetworkClientMenu(void * /* dummy */)
+static void
+NetworkClientMenu(void * /* dummy */)
 {
-    	const char	*str;
-    	void	*params = ReInfo->params;
+	const char	*str;
 
 	LookupPlayerSetup(g_strDriver,g_strCar);
 
 
-    	if (racemanMenuHdle) {
+	if (racemanMenuHdle) {
 		GfuiScreenRelease(racemanMenuHdle);
-    	}
-    	racemanMenuHdle = GfuiScreenCreateEx(NULL, 
-					 NULL, (tfuiCallback)NULL, 
-					 NULL, (tfuiCallback)NULL, 
-					 1);
+	}
+	racemanMenuHdle = GfuiScreenCreateEx(NULL, 
+										 NULL, (tfuiCallback)NULL, 
+										 NULL, (tfuiCallback)NULL, 
+										 1);
 
-    	str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
-    	if (str) {
+	void *params = ReInfo->params;
+	str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
+	if (str) {
 		GfuiScreenAddBgImg(racemanMenuHdle, str);
-    	}
+	}
     
-    	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
 	GfuiTitleCreate(racemanMenuHdle, "Connect to Host", 15);
 
 	int x,x2,x3,x4,y,dy;
-    	x = 20;
-    	x2 = 170;
-    	x3 = x2 + 100;
+	x = 20;
+	x2 = 170;
+	x3 = x2 + 100;
 	x4 = x2 + 200;
 	y = 370;
 	dy = 30;
@@ -813,7 +817,7 @@ void reNetworkClientMenu(void * /* dummy */)
 	g_NameId = GfuiEditboxCreate(racemanMenuHdle, namebuf, GFUI_FONT_MEDIUM_C, x2+10, y, 180,16,NULL,(tfuiCallback)NULL,ChangeName);
 
 	GfuiButtonCreate(racemanMenuHdle, "Connect", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	NULL, reNetworkClientConnectMenu, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	NULL, ReNetworkClientConnectMenu, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 	
 	GfuiButtonCreate(racemanMenuHdle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
 	ReInfo->_reMenuScreen, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
@@ -822,10 +826,9 @@ void reNetworkClientMenu(void * /* dummy */)
 
 }
 
-void reNetworkMenu(void *)
+void ReNetworkMenu(void *)
 {
     const char	*str;
-    void	*params = ReInfo->params;
 
 	if (GetNetwork())
 	{
@@ -837,6 +840,7 @@ void reNetworkMenu(void *)
 					 NULL, (tfuiCallback)NULL, 
 					 1);
 
+	void *params = ReInfo->params;
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
     if (str) {
 	GfuiScreenAddBgImg(racemanMenuHdle, str);
@@ -852,11 +856,11 @@ void reNetworkMenu(void *)
 
     GfuiMenuButtonCreate(racemanMenuHdle,
 			 "Host Online Race", "Host a race",
-			 NULL, GFUI_ALIGN_HL_VB,reNetworkHostMenu);
+			 NULL, GFUI_ALIGN_HL_VB, ReNetworkHostMenu);
 
     GfuiMenuButtonCreate(racemanMenuHdle,
 			 "Connect to Online Race", "Connect to a race on Internet or Network",
-			 NULL, GFUI_ALIGN_HL_VB,reNetworkClientMenu);
+			 NULL, GFUI_ALIGN_HL_VB, NetworkClientMenu);
 
     GfuiMenuBackQuitButtonCreate(racemanMenuHdle,
 				 "Back", "Return to previous Menu",
@@ -865,7 +869,8 @@ void reNetworkMenu(void *)
     GfuiScreenActivate(racemanMenuHdle);
 }
 
-void ServerPrepareStartNetworkRace(void *pVoid)
+static void
+ServerPrepareStartNetworkRace(void *pVoid)
 {
 	GetServer()->SetLocalDrivers();
 	//Tell all clients to prepare to race and wait for response from all clients
@@ -877,7 +882,8 @@ void ServerPrepareStartNetworkRace(void *pVoid)
 }
 
 // Retrieve the Driver instance with given index in the human module interface list
-void GetHumanDriver(Driver &driver,int index)
+static void
+GetHumanDriver(Driver &driver,int index)
 {
 	char buf[255];
 	sprintf(buf,"drivers/human/human.xml");

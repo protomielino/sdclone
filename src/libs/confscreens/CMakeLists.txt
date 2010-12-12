@@ -15,7 +15,7 @@ SET(CONFSCREENS_SOURCES controlconfig.cpp playerconfig.cpp displayconfig.cpp gra
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(tgf tgfclient networking math portability)
+ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient tgfdata networking)
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
 
 IF(WIN32)
@@ -37,7 +37,8 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_LIBRARY(confscreens SHARED ${CONFSCREENS_SOURCES})
 
-ADD_SDLIB_LIBRARY(confscreens tgf tgfclient networking)
+ADD_SDLIB_LIBRARY(confscreens
+                  tgf tgfclient tgfdata networking)
 
 ADD_PLIB_LIBRARY(confscreens ul)
 

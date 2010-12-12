@@ -15,12 +15,13 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Online Race" type="param" mode="mw" version="1.16">
+<params name="Online Race" type="param" mode="mw" version="1.17">
 
     <section name="Header">
       <attstr name="name" val="Online Race"/>
+      <attstr name="type" val="Online"/>
       <attstr name="description" val="Online Race"/>
-      <attnum name="priority" val="10"/>
+      <attnum name="priority" val="80"/>
       <attstr name="menu image" val="data/img/splash-networkrace.jpg"/>
     </section>
 
