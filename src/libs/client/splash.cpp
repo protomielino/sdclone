@@ -39,6 +39,7 @@ static int s_imgPow2Width, s_imgPow2Height; // Smallest possible containing 2^N 
 static GLuint s_texture = 0;
 static int SplashDisplaying;
 static int SplashTimedOut;
+static int MainMenuReady;
 static char buf[1024];
 
 /*
@@ -59,6 +60,9 @@ static char buf[1024];
  */
 static void splashClose()
 {
+	if (!MainMenuReady)
+		return;
+	
 	SplashDisplaying = 0;
 	glDeleteTextures(1, &s_texture);
 	s_texture = 0;
@@ -71,7 +75,7 @@ static void splashClose()
  *
  * Description
  *	Called by main loop when nothing to do : 
- *  check if spash screen must be closed and close it if so.
+ *  check if splash screen must be closed and close it if so.
  *
  * Parameters
  *	
@@ -86,7 +90,7 @@ static void splashIdle()
 {
 	// A kind of background main menus loading (as it may me a bit long).
 	MainMenuInit();
-
+	MainMenuReady = 1;
 	if (SplashTimedOut)
 		splashClose();
 }
@@ -268,6 +272,9 @@ bool SplashScreen(void)
 	// Load splash texture from file.
 	s_texture = GfTexReadTexture("data/img/splash.jpg",
 								 &s_imgWidth, &s_imgHeight, &s_imgPow2Width, &s_imgPow2Height);
+
+	// Prevent MainMenuRun being called (by splashClose) before MainMenuInit (by splashIdle)
+	MainMenuReady = 0;
 
 	// Setup event loop callbacks.
 	GfelSetDisplayCB(splashDisplay);
