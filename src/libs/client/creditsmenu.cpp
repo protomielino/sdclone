@@ -249,7 +249,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 }
 
 // Menu entry.
-void CreditsScreenActivate(void *retScrHdle)
+void CreditsMenuActivate(void *retScrHdle)
 {
     // Store return screen handle.
     RetScrHdle = retScrHdle;

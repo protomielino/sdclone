@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : optionmenu.h
+    file                 : optionsmenu.h
     created              : Mon Apr 24 14:34:09 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
@@ -18,13 +18,13 @@
  ***************************************************************************/
  
 
-#ifndef _OPTIONMENU_H_
-#define _OPTIONMENU_H_
+#ifndef _OPTIONSMENU_H_
+#define _OPTIONSMENU_H_
 
-extern void *OptionOptionInit(void *precMenu);
+extern void *OptionsMenuInit(void *precMenu);
 
 
-#endif /* _OPTIONMENU_H_ */ 
+#endif /* _OPTIONSMENU_H_ */ 
 
 
 

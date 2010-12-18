@@ -3,9 +3,9 @@ INCLUDE(../../../cmake/macros.cmake)
 #PROJECT(client)
 
 SET(CLIENT_SOURCES creditsmenu.cpp entry.cpp exitmenu.cpp mainmenu.cpp
-                   optionmenu.cpp splash.cpp 
+                   optionsmenu.cpp splash.cpp 
                    client.h creditsmenu.h exitmenu.h mainmenu.h
-                   optionmenu.h splash.h)
+                   optionsmenu.h splash.h)
 IF(WIN32)
 	#errno.cpp should only be included in Windows
 	#(it fails to compile when added in Linux)

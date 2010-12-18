@@ -20,7 +20,7 @@
 #ifndef _CREDITSMENU_H_
 #define _CREDITSMENU_H_
 
-extern void CreditsScreenActivate(void *retScrHdle);
+extern void CreditsMenuActivate(void *retScrHdle);
 
 
 #endif /* _CREDITSMENU_H_ */ 

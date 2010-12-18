@@ -21,13 +21,14 @@
 #include <cstdio>
 
 #include <tgfclient.h>
-#include <raceselectmenu.h>
 #include <racemain.h>
+
+#include <raceselectmenu.h>
 #include <playerconfig.h>
 
 #include "mainmenu.h"
 #include "exitmenu.h"
-#include "optionmenu.h"
+#include "optionsmenu.h"
 #include "creditsmenu.h"
 
 
@@ -36,7 +37,7 @@ void *MenuHandle = 0;
 tModList *RacemanModLoaded = 0;
 
 static void
-PlayerConfigActivate(void * /* dummy */)
+onPlayerConfigMenuActivate(void * /* dummy */)
 {
    /* Here, we need to call OptionOptionInit each time the firing button
        is pressed, and not only once at the Main menu initialization,
@@ -46,11 +47,28 @@ PlayerConfigActivate(void * /* dummy */)
 }
 
 static void
-MainMenuActivate(void * /* dummy */)
+onRaceSelectMenuActivate(void * /* dummy */)
 {
-    if (RacemanModLoaded) {
-	GfModUnloadList(&RacemanModLoaded);
-    }
+    GfuiScreenActivate(ReRaceSelectInit(MenuHandle));
+}
+
+static void
+onOptionsMenuActivate(void * /* dummy */)
+{
+    GfuiScreenActivate(OptionsMenuInit(MenuHandle));
+}
+
+static void
+onCreditsMenuActivate(void * /* dummy */)
+{
+    CreditsMenuActivate(MenuHandle);
+}
+
+static void
+onMainMenuActivate(void * /* dummy */)
+{
+    if (RacemanModLoaded)
+		GfModUnloadList(&RacemanModLoaded);
 }
 
 /*
@@ -78,19 +96,19 @@ MainMenuInit(void)
         return 0;
 
     MenuHandle = GfuiScreenCreateEx((float*)NULL, 
-				    NULL, MainMenuActivate, 
+				    NULL, onMainMenuActivate, 
 				    NULL, (tfuiCallback)NULL, 
 				    1);
 
     void *menuDescHdle = LoadMenuXML("mainmenu.xml");
 
-    CreateStaticControls(menuDescHdle,MenuHandle);
+    CreateStaticControls(menuDescHdle, MenuHandle);
 
     //Add buttons and create based on xml
-    CreateButtonControl(MenuHandle, menuDescHdle, "race", ReRaceSelectInit(MenuHandle), GfuiScreenActivate);
-    CreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, PlayerConfigActivate);
-    CreateButtonControl(MenuHandle, menuDescHdle, "options",OptionOptionInit(MenuHandle), GfuiScreenActivate);
-    CreateButtonControl(MenuHandle, menuDescHdle, "credits", MenuHandle, CreditsScreenActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "race", NULL, onRaceSelectMenuActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
+    CreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);
     void* exitMenu = MainExitMenuInit(MenuHandle);
     CreateButtonControl(MenuHandle, menuDescHdle, "quit", exitMenu, GfuiScreenActivate);
 
