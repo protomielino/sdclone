@@ -46,7 +46,7 @@ static const char *Instructions[] = {
     "Apply full throttle and press a button",
     "Apply full brake and press a button",
     "Apply full clutch then press a button",
-    "Calibration is successful terminated",
+    "Calibration is successfully terminated",
     "Calibration failed"
 };
 
