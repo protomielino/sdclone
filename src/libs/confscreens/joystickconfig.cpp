@@ -41,12 +41,12 @@ static const char *LabName[] = { "steer", "throttle", "brake", "clutch" };
 // TODO: Put these strings in joystickconfigmenu.xml for translation.
 static const char *Instructions[] = {
     "Center the joystick then press a button",
-    "Steer left then press a button",
-    "Steer right then press a button",
-    "Apply full throttle then press a button",
-    "Apply full brake then press a button",
+    "Hold steer left and press a button",
+    "Hold steer right and press a button",
+    "Apply full throttle and press a button",
+    "Apply full brake and press a button",
     "Apply full clutch then press a button",
-    "Calibration terminated",
+    "Calibration is successful terminated",
     "Calibration failed"
 };
 
