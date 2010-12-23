@@ -520,23 +520,20 @@ void GfScrInit(int argc, char *argv[])
 	if (glMSamp)
 		GfLogInfo(" (multi-sampling level %d)\n", glMSampLevel);
 
-	// Give an initial size and position to the WM window if not full-screen mode.
+#ifdef WIN32
+	// Under Windows, give an initial position to the window if not full-screen mode
+	// (under Linux/Mac OS X, no need, the window manager smartly takes care of this).
 	if (!(videomode & SDL_FULLSCREEN))
 	{
-#ifdef WIN32
+		// Try to center the game Window on the desktop, but keep the title bar visible if any.
 		const HWND hDesktop = GetDesktopWindow();
 		RECT rectDesktop;
 		GetWindowRect(hDesktop, &rectDesktop);
-		GfLogDebug("current : w=%d, h=%d\n", rectDesktop.right, rectDesktop.bottom);
-		const int nWMWinX = winX >= rectDesktop.right ? 0 : (rectDesktop.right - winX) / 2;
-		const int nWMWinY = winY >= rectDesktop.bottom ? 0 : (rectDesktop.bottom - winY) / 2;
-#else
-		// TODO.
- 		const int nWMWinX = 0;
- 		const int nWMWinY = 0;
-#endif
-		GfuiInitWindowPositionAndSize(nWMWinX, nWMWinY, winX, winY);
+		const int nWMWinXPos = winX >= rectDesktop.right ? 0 : (rectDesktop.right - winX) / 2;
+		const int nWMWinYPos = winY >= rectDesktop.bottom ? 0 : (rectDesktop.bottom - winY) / 2;
+		GfuiInitWindowPositionAndSize(nWMWinXPos, nWMWinYPos, winX, winY);
 	}
+#endif
 
 	// Initialize the Open GL viewport.
 	gfScrReshapeViewport(winX, winY);

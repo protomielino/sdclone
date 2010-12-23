@@ -960,6 +960,7 @@ GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 		SetWindowPos(wmInfo.window, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
 #else
 		// TODO.
+		GfLogWarning("GfuiInitWindowPositionAndSize not yet implemented under non-Windows OSes\n");
 #endif // WIN32
 	}
 }

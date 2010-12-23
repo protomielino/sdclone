@@ -246,8 +246,7 @@ void init_graphics ()
     SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
     SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
     SDL_SetVideoMode( ImgSize, ImgSize, 24, SDL_OPENGL);
-    GfuiInitWindowPosition(0, 0);
-    GfuiInitWindowSize(ImgSize, ImgSize);
+    GfuiInitWindowPositionAndSize(0, 0, ImgSize, ImgSize);
 
  
     /* Callbacks */
