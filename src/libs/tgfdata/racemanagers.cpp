@@ -26,10 +26,12 @@
 #include "racemanagers.h"
 
 
-struct Private
+class GfRaceManagers::Private
 {
+public:
+	
 	// One GfRaceManager structure for each car (no special order).
-	std::vector<GfRaceManager> vecRaceMans;
+	std::vector<GfRaceManager*> vecRaceMans;
 
 	// Map for quick access to GfRaceManager by id
 	std::map<std::string, GfRaceManager*> mapRaceMansById;
@@ -49,9 +51,17 @@ GfRaceManagers *GfRaceManagers::self()
 	return _pSelf;
 }
 
-static bool hasHigherPriority(const GfRaceManager& left, const GfRaceManager& right)
+GfRaceManagers::~GfRaceManagers()
 {
-	return left.getPriority() > right.getPriority();
+	std::vector<GfRaceManager*>::const_iterator itRaceMan;
+	for (itRaceMan = _pPrivate->vecRaceMans.begin();
+		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+		delete *itRaceMan;
+}
+
+static bool hasHigherPriority(const GfRaceManager* pLeft, const GfRaceManager* pRight)
+{
+	return pLeft->getPriority() > pRight->getPriority();
 }
 	
 GfRaceManagers::GfRaceManagers()
@@ -70,8 +80,6 @@ GfRaceManagers::GfRaceManagers()
 	tFList* pFile = lstFiles;
 	do 
 	{
-		GfLogDebug("GfRaceManagers::GfRaceManagers() : Examining %s\n", pFile->name);
-		
 		// Open the XML descriptor file (look first in user settings, then in the install folder).
 		std::ostringstream ossRaceManFileName;
 		ossRaceManFileName << GetLocalDir() << "config/raceman/" << pFile->name;
@@ -91,29 +99,31 @@ GfRaceManagers::GfRaceManagers()
 			}
 		}
 		
-		std::string strRaceManId(pFile->name, strlen(pFile->name) - strlen(PARAMEXT));
-		if (!hparmRaceMan) {
+		//const std::string strRaceManId(pFile->name, strlen(pFile->name) - strlen(PARAMEXT));
+		std::string strRaceManId(pFile->name);
+		strRaceManId.erase(strlen(pFile->name) - strlen(PARAMEXT));
+		if (!hparmRaceMan)
+		{
 			GfLogWarning("GfRaceManagers : Ignoring race manager %s (failed to read from config/raceman/%s in %s and %s)\n",
 						 strRaceManId.c_str(), pFile->name, GetLocalDir(), GetDataDir());
 			continue;
 		}
 
 		// Read race manager info and store it in the GfRaceManager structure.
-		GfRaceManager raceMan;
-		raceMan.setId(strRaceManId);
-		raceMan.setName(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_NAME, "<unknown>"));
-		raceMan.setType(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_TYPE, "<unknown>"));
-		raceMan.setSubType(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_SUBTYPE, ""));
-		//raceMan.setDescriptorFileName(ossRaceManFileName.str());
-		raceMan.setPriority((int)GfParmGetNum(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_PRIO, NULL, 10000));
-		raceMan.setDescriptorHandle(hparmRaceMan);
+		GfRaceManager* pRaceMan = new GfRaceManager;
+		pRaceMan->setId(strRaceManId);
+		pRaceMan->setName(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_NAME, "<unknown>"));
+		pRaceMan->setType(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_TYPE, "<unknown>"));
+		pRaceMan->setSubType(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_SUBTYPE, ""));
+		pRaceMan->setPriority((int)GfParmGetNum(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_PRIO, NULL, 10000));
+		pRaceMan->setDescriptorHandle(hparmRaceMan);
 
 		// Update the GfRaceManagers singleton.
-		_pPrivate->vecRaceMans.push_back(raceMan);
-		_pPrivate->mapRaceMansById[strRaceManId] = &_pPrivate->vecRaceMans.back();
-		if (std::find(_pPrivate->vecTypes.begin(), _pPrivate->vecTypes.end(), raceMan.getType())
+		_pPrivate->vecRaceMans.push_back(pRaceMan);
+		_pPrivate->mapRaceMansById[strRaceManId] = pRaceMan;
+		if (std::find(_pPrivate->vecTypes.begin(), _pPrivate->vecTypes.end(), pRaceMan->getType())
 			== _pPrivate->vecTypes.end())
-			_pPrivate->vecTypes.push_back(raceMan.getType());
+			_pPrivate->vecTypes.push_back(pRaceMan->getType());
 	} 
 	while ((pFile = pFile->next) != lstFiles);
 	
@@ -142,10 +152,11 @@ GfRaceManager* GfRaceManagers::getRaceManager(const std::string& strId) const
 
 GfRaceManager* GfRaceManagers::getRaceManagerWithName(const std::string& strName) const
 {
-	std::vector<GfRaceManager>::iterator itRaceMan;
-	for (itRaceMan = _pPrivate->vecRaceMans.begin(); itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
-		if (itRaceMan->getName() == strName)
-			return &(*itRaceMan);
+	std::vector<GfRaceManager*>::iterator itRaceMan;
+	for (itRaceMan = _pPrivate->vecRaceMans.begin();
+		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+		if ((*itRaceMan)->getName() == strName)
+			return *itRaceMan;
 
 	return 0;
 }
@@ -154,28 +165,95 @@ const std::vector<GfRaceManager*> GfRaceManagers::getRaceManagersWithType(const 
 {
 	std::vector<GfRaceManager*> vecRaceMans;
 
-	std::vector<GfRaceManager>::iterator itRaceMan;
+	std::vector<GfRaceManager*>::iterator itRaceMan;
 	for (itRaceMan = _pPrivate->vecRaceMans.begin(); itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
-		if (strType.empty() || itRaceMan->getType() == strType)
-			vecRaceMans.push_back(&(*itRaceMan));
+		if (strType.empty() || (*itRaceMan)->getType() == strType)
+			vecRaceMans.push_back(*itRaceMan);
 
 	return vecRaceMans;
 }
 
 void GfRaceManagers::print() const
 {
-	GfLogDebug("GfRaceManagers : %d race managers, %d types\n",
-			   _pPrivate->vecRaceMans.size(), _pPrivate->vecTypes.size());
+	GfLogTrace("Race managers : %d types, %d race managers\n",
+			   _pPrivate->vecTypes.size(), _pPrivate->vecRaceMans.size());
 	std::vector<std::string>::const_iterator itType;
 	for (itType = _pPrivate->vecTypes.begin();
 		 itType != _pPrivate->vecTypes.end(); itType++)
 	{
-		GfLogDebug("  %s type :\n", itType->c_str());
+		GfLogTrace("  %s type :\n", itType->c_str());
 		const std::vector<GfRaceManager*> vecRaceMans =
 			getRaceManagersWithType(itType->c_str());
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
-			GfLogDebug("    %s : subtype='%s', name='%s'\n", (*itRaceMan)->getId().c_str(),
+			GfLogTrace("    %s : subtype='%s', name='%s'\n", (*itRaceMan)->getId().c_str(),
 					   (*itRaceMan)->getSubType().c_str(), (*itRaceMan)->getName().c_str());
 	}
 }
+
+// GfRaceManager class ---------------------------------------------------------------
+
+GfRaceManager::GfRaceManager() : _nPriority(-1), _hparmHandle(0)
+{
+}
+
+const std::string& GfRaceManager::getId() const
+{
+	return _strId;
+}
+
+const std::string& GfRaceManager::getName() const
+{
+	return _strName;
+}
+
+const std::string& GfRaceManager::getType() const
+{
+	return _strType;
+}
+
+const std::string& GfRaceManager::getSubType() const
+{
+	return _strSubType;
+}
+
+const int GfRaceManager::getPriority() const
+{
+	return _nPriority;
+}
+
+void* GfRaceManager::getDescriptorHandle() const
+{
+	return _hparmHandle;
+}
+
+void GfRaceManager::setId(const std::string& strId)
+{
+	_strId = strId;
+}
+
+void GfRaceManager::setName(const std::string& strName)
+{
+	_strName = strName;
+}
+
+void GfRaceManager::setType(const std::string& strType)
+{
+	_strType = strType ;
+}
+
+void GfRaceManager::setSubType(const std::string& strSubType)
+{
+	_strSubType = strSubType;
+}
+
+void GfRaceManager::setPriority(int nPriority)
+{
+	_nPriority = nPriority;
+}
+
+void GfRaceManager::setDescriptorHandle(void* hparmHandle)
+{
+	_hparmHandle = hparmHandle;
+}
+

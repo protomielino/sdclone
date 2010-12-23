@@ -32,7 +32,7 @@
 #include <tgfclient.h>
 
 #include "racescreens.h"
-#include "driver.h"	//rmdGetDriverType
+
 
 static int	rmSaveId;
 static void	*rmScrHdle = NULL;
@@ -73,6 +73,33 @@ rmChgPracticeScreen(void *vprc)
 
     rmPracticeResults(prc->prevHdle, prc->info, prc->start);
     GfuiScreenRelease(prevScr);
+}
+
+void rmGetDriverType(const char* moduleName, char* driverType, size_t maxSize)
+{
+    char* pos;
+
+    strncpy(driverType, moduleName, maxSize);
+    driverType[maxSize-1] = 0; // Ensure 0 termination
+
+    // Parse module name for last '_' char : 
+    // assumed to be the separator between type and instance name for ubiquitous robots (ex: simplix)
+    pos = strrchr(driverType, '_');
+    if (pos)
+		*pos = 0;
+
+	// Commented-out because it shylessly truncates kilo2008's name ...
+	// but we can assume we won't have anymore those old-patterned robots.
+    // Otherwise, search for an isolated last digit in the module name :
+    // old robot with hard-coded max cars of 10 may follow this pattern (ex: berniw2 and 3)
+//     else
+//     {
+// 		pos = driverType + strlen(driverType) - 1;
+// 		while (pos != driverType && isdigit(*pos))
+// 			pos--;
+// 		if (++pos == driverType + strlen(driverType) - 1)
+// 			*pos = 0;
+//     }
 }
 
 static void
@@ -283,7 +310,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         xDriver, y, GFUI_ALIGN_HL_VB, 0);
 
         //Driver type
-        rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
+        rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
         GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xType, y, GFUI_ALIGN_HL_VB, 0);
 
         //Car
@@ -291,7 +318,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         xCar, y, GFUI_ALIGN_HL_VB, 0);
 
         GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C, xDriver, y, GFUI_ALIGN_HL_VB, 0);
-        rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
+        rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
         GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xType, y, GFUI_ALIGN_HL_VB, 0);
         GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
       xCar, y, GFUI_ALIGN_HL_VB, 0);
@@ -425,7 +452,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 
 	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C,
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
-	rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
+	rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
 	GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
 	GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
@@ -542,7 +569,7 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 			xDriver, y, GFUI_ALIGN_HL_VB, 0);
 	
 		//Driver type
-		rmdGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
+		rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
 		GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,
 			xType, y, GFUI_ALIGN_HL_VB, 0);
 			

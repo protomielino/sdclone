@@ -29,11 +29,11 @@
 #include <portability.h>
 
 #include <tgfclient.h>
-#include <tgfdata.h>
 #include <raceman.h>
 #include <playerconfig.h>
 #include <racescreens.h>
 #include <network.h>
+#include <racemanagers.h>
 
 #include "racesituation.h"
 #include "racemain.h"

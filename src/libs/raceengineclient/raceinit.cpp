@@ -32,13 +32,13 @@
 
 #include <portability.h>
 #include <tgfclient.h>
-#include <tgfdata.h>
 #include <graphic.h>
 #include <raceman.h>
 #include <robot.h>
 #include <teammanager.h>
 #include <timeanalysis.h>
 #include <robottools.h>
+#include <racemanagers.h>
 
 #include <racescreens.h>
 

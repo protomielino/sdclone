@@ -8,15 +8,15 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability txml math tgf)
 
-SET(TGFDATA_HEADERS tgfdata.h carinfo.h racemanagers.h)
-SET(TGFDATA_SOURCES carinfo.cpp racemanagers.cpp ${TGFDATA_HEADERS})
+SET(TGFDATA_HEADERS cars.h tracks.h racemanagers.h race.h drivers.h tgfdata.h)
+SET(TGFDATA_SOURCES cars.cpp tracks.cpp racemanagers.cpp race.cpp drivers.cpp ${TGFDATA_HEADERS})
 
 IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
 	ADD_DEFINITIONS(-DTGFDATA_DLL)
 	
 	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+	SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(WIN32)
 
 # Disable developer warning

@@ -28,27 +28,30 @@
 
 /** @file   
     		Singleton holding information on the available race managers
+    @defgroup	tgfdata	Data manager for the client gaming framework.
 */
 
 class TGFDATA_API GfRaceManager
 {
 public:
 	
-	const std::string& getId() const { return _strId; }; // TODO: => file name ?
-	const std::string& getName() const { return _strName; };
-	const std::string& getType() const { return _strType; };
-	const std::string& getSubType() const { return _strSubType; };
-	const int getPriority() const { return _nPriority; };
-	//const std::string& getDescriptorFileName() const { return _strDescFile; }; // 
-	void* getDescriptorHandle() const { return _hparmHandle; }; // 
+	GfRaceManager();
 
-	void setId(const std::string& strId) { _strId = strId; };
-	void setName(const std::string& strName) { _strName = strName; };
-	void setType(const std::string& strType) { _strType = strType ; };
-	void setSubType(const std::string& strSubType) { _strSubType = strSubType; };
-	void setPriority(int nPriority) { _nPriority = nPriority; };
-	//void setDescriptorFileName(const std::string& strDescFile) { _strDescFile = strDescFile; };
-	void setDescriptorHandle(void* hparmHandle) { _hparmHandle = hparmHandle; };
+public:
+	
+	const std::string& getId() const;
+	const std::string& getName() const;
+	const std::string& getType() const;
+	const std::string& getSubType() const;
+	const int getPriority() const;
+	void* getDescriptorHandle() const;
+
+	void setId(const std::string& strId);
+	void setName(const std::string& strName);
+	void setType(const std::string& strType);
+	void setSubType(const std::string& strSubType);
+	void setPriority(int nPriority);
+	void setDescriptorHandle(void* hparmHandle);
 	
 protected:
 	
@@ -79,8 +82,9 @@ public:
 
 protected:
 
-	// Protected constructor : clients cannot use it (singleton pattern).
+	// Protected constructor and destructor : clients can not use them.
 	GfRaceManagers();
+	~GfRaceManagers();
 	
 protected:
 
@@ -88,7 +92,8 @@ protected:
 	static GfRaceManagers* _pSelf;
 
 	// Its private data.
-	struct Private* _pPrivate;
+	class Private;
+	Private* _pPrivate;
 };
 
 #endif /* __TGFRACEMANAGERS__H__ */

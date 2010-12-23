@@ -29,8 +29,8 @@
 #include <algorithm>
 
 #include <tgfclient.h>
-#include <tgfdata.h>
 #include <raceman.h>
+#include <racemanagers.h>
 
 #include "racesituation.h"
 #include "racemain.h"

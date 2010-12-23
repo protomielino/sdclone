@@ -21,7 +21,7 @@
 This file deals with network host settings
 */
 
-#include <carinfo.h>
+#include <cars.h>
 #include <network.h>
 
 #include "hostsettingsmenu.h"
@@ -97,7 +97,7 @@ bool HostSettingsMenu::Init(void* pMenu)
     CreateStaticControls();
 
 	int carCatId = CreateComboboxControl("carcatcombobox",NULL,CarControlCB);
-	const std::vector<std::string>& vecCategories = CarInfo::self()->GetCategoryNames();
+	const std::vector<std::string>& vecCategories = GfCars::self()->getCategoryIds();
 	
 	int CatIndex = 0;
 	for (unsigned int i=0;i<vecCategories.size();i++)

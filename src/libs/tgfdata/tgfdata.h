@@ -36,9 +36,6 @@
 # define TGFDATA_API
 #endif
 
-#include "carinfo.h"
-#include "racemanagers.h"
-
 #endif /* __TGFDATA__H__ */
 
 

@@ -433,9 +433,11 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 void* DisplayMenuInit(void *pPreviousMenu)
 {
 	if (!PDisplayMenu)
+	{
 		PDisplayMenu = new DisplayMenu;
 	
-	PDisplayMenu->initialize(pPreviousMenu);
+		PDisplayMenu->initialize(pPreviousMenu);
+	}
 
 	return PDisplayMenu->GetMenuHandle();
 }

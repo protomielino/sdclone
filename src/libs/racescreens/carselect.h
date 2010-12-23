@@ -21,12 +21,13 @@
 
 #include <map>
 
-#include <carinfo.h>
 #include <tgfclient.h>
 
 #include "racescreens.h"
 
-struct rmdDrvElt;
+class GfDriverSkin;
+class GfDriver;
+class GfCar;
 
 
 class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
@@ -34,27 +35,27 @@ class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
 public:
 
 	RmCarSelectMenu();
-	void RunMenu(trmdDrvElt* pDriver);
+	void RunMenu(GfDriver* pDriver);
 	
-	void resetCarCategoryComboBox(const std::string& strSelectedCategoryName = "");
-	void resetCarModelComboBox(const std::string& strCategoryName,
-							   const std::string& strSelectedRealCarName = "");
-	void resetCarDataSheet(const std::string& strSelectedCarName);
-	void resetCarSkinComboBox(const std::string& strRealCarName,
-							  const std::string& strSelectedSkinName = "");
-	void resetCarPreviewImage(const std::string& strSelectedSkinName = "");
-	
+	void resetCarCategoryComboBox(const std::string& strSelCatName = "");
+	void resetCarModelComboBox(const std::string& strCatName,
+							   const std::string& strSelCarName = "");
+	void resetCarDataSheet(const std::string& strSelCarId);
+	void resetSkinComboBox(const std::string& strCarName,
+						   const GfDriverSkin* pSelSkin = 0);
+	void resetCarPreviewImage(const GfDriverSkin& selSkin);
+
 protected:
 	
 	bool Initialize();
 
-	const struct rmdDrvElt* getDriver() const;
-	struct rmdDrvElt* getDriver();
-	void setDriver(struct rmdDrvElt* pDriver);
+	const GfDriver* getDriver() const;
+	GfDriver* getDriver();
+	void setDriver(GfDriver* pDriver);
 
-	const CarData* getSelectedCarModel() const;
-	const char* getSelectedCarSkin() const;
-	int getSelectedCarSkinTargets() const;
+	const GfCar* getSelectedCarModel() const;
+	const GfDriverSkin& getSelectedSkin() const;
+	void setSelectedSkinIndex(int nSkinIndex);
 
 	// Control callback functions (have to be static, as used as tgfclient controls callbacks).
 	static void onActivateCB(void *pCarSelectMenu);
@@ -68,15 +69,10 @@ protected:
 private:
 
 	// The target driver.
-	struct rmdDrvElt* _pDriver;
-
-	// Currently selected car params handle.
-	//void* _hCarParams;
+	GfDriver* _pDriver;
 	
-	// Skin names and targets + associated skinned livery preview files
-	std::vector<std::string> _vecSkinNames;
-	std::map<std::string, int> _mapSkinTargets;
-	std::map<std::string, std::string> _mapPreviewFiles;
+	// Possible driver skins and the currently selected one.
+	std::vector<GfDriverSkin> _vecPossSkins;
 	size_t _nCurSkinIndex;
 
 };

@@ -33,7 +33,7 @@ Should also allow choosing IP address, track, etc ...
 
 #include <raceman.h>
 #include <robot.h>
-#include <carinfo.h>
+#include <cars.h>
 #include <network.h>
 
 #include <racescreens.h>
@@ -275,7 +275,7 @@ UpdateNetworkPlayers()
 		const char* name = GfParmGetStr(pMod, ppname, RM_ATTR_NAME, "");
 
 		const char* car = GfParmGetStr(pMod, ppname, "car name", "");
-		std::string strRealCar = CarInfo::self()->GetCarRealName(car);
+		std::string strRealCar = GfCars::self()->getCar(car)->getName();
 
 		// WAIT : pNData->m_vecReadyStatus[i-1] ?!
 		//        This can only work when _only_ networkhuman drivers in the race
@@ -373,7 +373,7 @@ CheckDriversCategory()
 		return;
 
 	const std::vector<std::string> vecCars =
-		CarInfo::self()->GetCarNamesInCategory(strCarCat);
+		GfCars::self()->getCarIdsInCategory(strCarCat);
 
 	//Make sure all cars are in the correct category or force change of car
 	Driver *pDrivers = NULL;
@@ -383,8 +383,8 @@ CheckDriversCategory()
 	count = pSData->m_vecNetworkPlayers.size();
 	for (unsigned int i=0;i<count;i++)
 	{
-		CarData * pData = CarInfo::self()->GetCarData(pSData->m_vecNetworkPlayers[i].car);
-		if (pData->strCategoryName!=strCarCat)
+		const GfCar* pCar = GfCars::self()->getCar(pSData->m_vecNetworkPlayers[i].car);
+		if (pCar->getCategoryId() != strCarCat)
 		{
 			//Pick first car in categroy
 			strncpy(pSData->m_vecNetworkPlayers[i].car,vecCars[0].c_str(),64);
@@ -583,9 +583,6 @@ ReNetworkHostMenu(void * /* dummy */)
     CreateStaticControls(mparam,racemanMenuHdle);
 
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
-
-	std::vector<std::string> vecCat = CarInfo::self()->GetCategoryNames();
-	vecCat.push_back("All Cars");
 
 	ReSetRacemanMenuHandle(racemanMenuHdle);
 

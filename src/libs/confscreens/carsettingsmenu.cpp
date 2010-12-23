@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : hostsettingsmenu.cpp
+    file                 : carsettingsmenu.cpp
     created              : December 2009
     copyright            : (C) 2009 Brian Gavin
     web                  : speed-dreams.sourceforge.net
@@ -18,10 +18,10 @@
 
 
 /*
-This file deals with network host settings
+This file deals with car settings
 */
 
-#include <carinfo.h>
+#include <cars.h>
 #include <network.h>
 
 #include "carsettingsmenu.h"
@@ -42,8 +42,8 @@ void CarSettingsMenu::CarPickCB(tComboBoxInfo *pInfo)
 
 void CarSettingsMenu::onAcceptCB(void *p)
 {
-	CarData *pData = CarInfo::self()->GetCarDataFromRealName(m_strCar);
-	GetNetwork()->SetCarInfo(pData->strName.c_str());
+	GfCar *pCar = GfCars::self()->getCarWithName(m_strCar);
+	GetNetwork()->SetCarInfo(pCar->getId().c_str());
 	GfuiScreenActivate(pPrevMenu);
 }
 
@@ -82,7 +82,7 @@ bool CarSettingsMenu::Init(void* pMenu,const char *pszCar)
 	int brakingId = CreateProgressbarControl("brakingprogress");
 
 	const std::vector<std::string> vecCarRealNames =
-		CarInfo::self()->GetCarRealNamesInCategory(strCarCat);
+		GfCars::self()->getCarNamesInCategory(strCarCat);
 	
 	m_strCar = pszCar;
 	int carIndex = 0;
