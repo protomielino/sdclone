@@ -108,8 +108,8 @@ typedef struct RobotItf {
 #define ROB_SECT_ARBITRARY	"Robots/arbitrary cars"
 
 #define ROB_VAL_FEATURE_PENALTIES	"penalties"
-#define ROB_VAL_FEATURE_TIMEDSESSION	"timed_session"
-#define ROB_VAL_FEATURE_WEATHER		"weather"
+#define ROB_VAL_FEATURE_TIMEDSESSION	"timed session"
+#define ROB_VAL_FEATURE_WETTRACK		"wet track"
 
 #endif /* _ROBOTV1_H_ */ 
 

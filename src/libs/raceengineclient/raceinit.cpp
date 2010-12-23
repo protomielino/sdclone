@@ -943,16 +943,19 @@ ReInitTrack(void)
 			break;
 		}
 
-	// Load rain fall (and track dry/wet conditions) settings
+	// Load rain fall (and track dry/wet conditions) settings if feature supported.
 	int rain = TR_RAIN_NONE;
-	const char* pszRain =
-		GfParmGetStr(params, raceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
-	for (int i = 0; i < NRainValues; i++)
-		if (!strcmp(pszRain, RainValues[i]))
-		{
-			rain = i;
-			break;
-		}
+	if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
+	{
+		const char* pszRain =
+			GfParmGetStr(params, raceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
+		for (int i = 0; i < NRainValues; i++)
+			if (!strcmp(pszRain, RainValues[i]))
+			{
+				rain = i;
+				break;
+			}
+	}
 
 	ReInfo->track->timeofday = timeofday;
 	ReInfo->track->clouds = clouds; // Initial value : ReStartWeather may change it.

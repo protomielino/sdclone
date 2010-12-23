@@ -110,7 +110,8 @@ AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
     curSurf->kDammage      = GfParmGetNum(TrackHandle, path, TRK_ATT_DAMMAGE, (char*)NULL, 10.0f);
     curSurf->kRebound      = GfParmGetNum(TrackHandle, path, TRK_ATT_REBOUND, (char*)NULL, 0.5f);
     
-	GfLogDebug("track loader kFriction : %f - kFriction2 : %f\n", curSurf->kFriction, curSurf->kFriction2);
+	GfLogDebug("                   %.4f |     %.4f | %s\n",
+			   curSurf->kFriction, curSurf->kFriction2, curSurf->material);
 
     curSurf->next = theTrack->surfaces;
     theTrack->surfaces = curSurf;
@@ -861,6 +862,8 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 	}
     }
     
+
+	GfLogDebug("Track physics : kFriction | kFriction2 | Surface :\n");
 
     /* Main Track */
     material = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, TRK_ATT_SURF, TRK_VAL_ASPHALT);

@@ -77,9 +77,10 @@ typedef struct {
 #define RM_TYPE_RACE		2
     int                 maxDammage;
     unsigned long	fps;
-    int			features;	/**< A list of features a race will have (all the robots in the race will have these features) */
-#define RM_FEATURE_PENALTIES	0x01	/**< A robot with this feature implemented penalties */
-#define RM_FEATURE_TIMEDSESSION 0x02	/**< A robot with this feature has implemented timed sessions */
+    int			features;	/**< A list of features a race have (the common set of features all the robots in the race actually support) */
+#define RM_FEATURE_PENALTIES	0x01 /**< A robot with this feature implements penalties */
+#define RM_FEATURE_TIMEDSESSION 0x02 /**< A robot with this feature implements timed sessions */
+#define RM_FEATURE_WETTRACK	0x04 /**< A robot with this feature can handle wet track conditions */
 } tRaceAdmInfo;
 
 #define _ncars		raceInfo.ncars

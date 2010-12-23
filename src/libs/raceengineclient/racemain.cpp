@@ -197,7 +197,10 @@ ReRaceEventInit(void)
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	
+	ReInfo->s->_features = RmGetFeaturesList(params);
+
 	ReInitTrack();
+	
 	ReEventInitResults();
 
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
@@ -243,8 +246,6 @@ RePreRace(void)
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 		return RM_SYNC | RM_NEXT_RACE | RM_NEXT_STEP;
 	}
-
-	ReInfo->s->_features = RmGetFeaturesList(params);
 
 	dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, 0);
 	if (dist < 0.001) {
@@ -500,22 +501,6 @@ ReRaceStart(void)
 	const char *raceName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
-
-	// Some debug traces about weather/rain parameters.
-#ifdef DEBUG
-	tTrack *track = ReInfo->track;
-	GfLogDebug("ReRaceStart : Track timeofday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
-			   track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
-	GfLogDebug("ReRaceStart : kFriction, kRollRes for each track surface :\n");
-	tTrackSurface *curSurf;
-	curSurf = track->surfaces;
-	do
-	{
-		GfLogDebug("                   %.4f, %.4f   %s\n",
-				   curSurf->kFriction, curSurf->kRollRes, curSurf->material);
-		curSurf = curSurf->next;
-	} while (curSurf);
-#endif
 
 	// Reallocate car info for the race.
 	FREEZ(ReInfo->_reCarInfo);

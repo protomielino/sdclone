@@ -213,7 +213,7 @@ rmChangeClouds(void *vp)
     rmrpClouds = (rmrpClouds + NCloudsValues + delta) % NCloudsValues;
     GfuiLabelSetText(scrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 
-    if (rp->confMask & RM_CONF_RAIN_FALL)
+    if ((rp->confMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
 	{
 		// Make rain level compatible if needed.
 		if (rmrpClouds < NCloudsValues - 1) // No heavy clouds => no rain
@@ -223,7 +223,6 @@ rmChangeClouds(void *vp)
 		}
 	}
 }
-
 
 static void
 rmChangeRain(void *vp)
@@ -280,7 +279,7 @@ rmrpValidate(void * /* dummy */)
 		GfParmSetStr(rp->param, rp->title, RM_ATTR_CLOUDS, CloudsValues[rmrpClouds]);
 	}
 	
-    if (rp->confMask & RM_CONF_RAIN_FALL)
+    if ((rp->confMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
 	{
 		GfParmSetStr(rp->param, rp->title, RM_ATTR_RAIN, RainValues[rmrpRain]);
 	}
@@ -462,7 +461,7 @@ RmRaceParamsMenu(void *vrp)
 		}
 	}
 	
-    if (rp->confMask & RM_CONF_RAIN_FALL)
+	if ((rp->confMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
 	{
 		// Create and initialize Rain combo box (2 arrow buttons and a variable label).
 		rmrpRain = 0;

@@ -22,15 +22,11 @@
     @version	$Id$
 */
 
-/* Changes by wdbee (moved to interfaces/track by Jean-Philippe) :
-  #define RAIN_VAL_LITTLE, RAIN_VAL_NORMAL, RAIN_VAL_HEAVY in raceweather.h
-    To make it usable by robots.
-
-  curSurf->kFrictionDry = curSurf->kFriction; 
-    Store initial value for calculation of the rain intensity.
-
-
-
+/* Changes by wdbee :
+   - #define RAIN_VAL_LITTLE, RAIN_VAL_NORMAL, RAIN_VAL_HEAVY in raceweather.h
+     to make it usable by robots (moved to interfaces/track by Jean-Philippe).
+   - curSurf->kFrictionDry = curSurf->kFriction; 
+     Store initial value for calculation of the rain intensity.
 */
 
 #include <raceman.h>
@@ -109,7 +105,7 @@ void ReTrackUpdate(void)
 
 	GfLogDebug("ReTrackUpdate : Track timeofday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
 			   track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
-	GfLogDebug("ReTrackUpdate : kFriction, kRollRes for each track surface :\n");
+	GfLogDebug("ReTrackUpdate : kFriction | kRollRes | Surface :\n");
 
 	tTrackSurface *curSurf;
 	curSurf = track->surfaces;
@@ -144,7 +140,7 @@ void ReTrackUpdate(void)
 			}
 		}							
 		
-		GfLogDebug("                   %.4f, %.4f   %s\n",
+		GfLogDebug("                   %.4f |   %.4f | %s\n",
 				   curSurf->kFriction, curSurf->kRollRes, curSurf->material);
 
 		curSurf = curSurf->next;
