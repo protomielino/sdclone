@@ -69,7 +69,7 @@ static char *strndup(const char *str, int len)
 
 // Windows platform -------------------------------------------------
 // Posix functions special names with MS compilers.
-// Notes on MSVC compilers detection :
+// Notes about MSVC compilers detection :
 // * _MSC_VER define should be prefered to WIN32/_WIN32
 // * MSVC    6 : 1200 <= _MSC_VER < 1300
 // * MSVC 2003 : 1300 <= _MSC_VER < 1400
@@ -80,6 +80,31 @@ static char *strndup(const char *str, int len)
 #define isnan _isnan
 
 #define snprintf _snprintf
+
+#define access _access
+
+// Workaround for sucking MSVC "access" function in C lib :
+// * define F_OK, R_OK, W_OK and X_OK.
+// * X_OK : no "executable" bit under Windows => use "R_OK" 
+#ifdef F_OK
+#undef F_OK
+#endif
+#define F_OK 0x0
+
+#ifdef W_OK
+#undef W_OK
+#endif
+#define W_OK 0x2
+
+#ifdef R_OK
+#undef R_OK
+#endif
+#define R_OK 0x4
+
+#ifdef X_OK
+#undef X_OK
+#endif
+#define X_OK R_OK
 
 // For MSVC 2005 and older (2008 already defines these)
 #if _MSC_VER < 1500

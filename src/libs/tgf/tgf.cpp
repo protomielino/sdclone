@@ -20,8 +20,9 @@
 #include <windows.h>
 #include <direct.h>
 #include <shlobj.h>
+#include <io.h>
 #else
-#include <unistd.h> // getcwd
+#include <unistd.h> // getcwd, access
 #endif
 
 #include <cerrno>
@@ -785,6 +786,14 @@ const char* GfGetInstallDir(void)
 	return gfInstallDir;
 }
 
+#ifdef WIN32
+static const char* pszPathSeparator = "\\";
+static const char* pszPATHSeparator = ";";
+#else
+static const char* pszPathSeparator = "/";
+static const char* pszPATHSeparator = ":";
+#endif
+
 void GfInitInstallDir(const char *pszExecutablePath)
 {
 	if (gfInstallDir)
@@ -798,9 +807,51 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	if (!pLastPathSep)
 		pLastPathSep = strrchr(pszPath, '\\');
 #endif
-	if (!pLastPathSep)
-		pLastPathSep = pszPath;
-	*pLastPathSep = 0;
+
+	// If found, we've got the path of the folder where the executable is stored.
+	if (pLastPathSep)
+	{
+		*pLastPathSep = 0;
+	}
+	
+	// Otherwise, let's try the PATH
+	else if (getenv("PATH"))
+	{
+		char* pszPATH = strdup(getenv("PATH"));
+		for (char* pszCandPath = strtok(pszPATH, pszPATHSeparator);
+			 pszCandPath != NULL; pszCandPath = strtok(NULL, pszPATHSeparator))
+		{
+			// Workaround quoted pathes.
+			if (strlen(pszCandPath) > 0
+				&& (pszCandPath[0] == '"' || pszCandPath[0] == '\''))
+			{
+				pszCandPath[strlen(pszCandPath)-1] = 0;
+				pszCandPath++;
+			}
+
+			// Are we in the right folder ?
+			strcpy(pszPath, pszCandPath);
+			strcat(pszPath, pszPathSeparator);
+			strcat(pszPath, pszExecutablePath);
+#ifdef WIN32
+			if (strstr(pszPath, ".exe") != pszPath + strlen(pszPath) - 4)
+				strcat(pszPath, ".exe");
+#endif
+			if (access(pszPath, X_OK) == 0) {
+				// Bingo !
+				strcpy(pszPath, pszCandPath);
+				break;
+			}
+		}
+		free(pszPATH);
+	}
+
+	// If no PATH, cannot work if we are not in the executable folder.
+	else
+	{
+		getcwd(pszPath, 512);
+	}
+
 	gfInstallDir = makeRunTimeDirPath(pszPath);
 
 	// If the path to the folder where the executable is stored ends with SD_BINDIR,
