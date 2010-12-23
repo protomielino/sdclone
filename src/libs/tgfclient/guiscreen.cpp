@@ -286,7 +286,7 @@ int* GfScrGetPossibleColorDepths(int* pnDepths)
 	return aPossDepths;
 }
 
-static void gfScrReshape(int width, int height)
+static void gfScrReshapeViewport(int width, int height)
 {
     glViewport( (width-GfViewWidth)/2, (height-GfViewHeight)/2, GfViewWidth,  GfViewHeight);
     glMatrixMode( GL_PROJECTION );
@@ -351,8 +351,8 @@ void GfScrInit(int argc, char *argv[])
 	// Get graphical settings from config file.
     sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
     handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    xw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, 640);
-    yw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, 480);
+    xw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, 800);
+    yw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, 600);
     winX = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, xw);
     winY = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, yw);
     depth = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, 32);
@@ -462,35 +462,38 @@ void GfScrInit(int argc, char *argv[])
 		// Failed : Give up but say why.
 		if (!ScreenSurface)
 		{
-		  GfTrace("The minimum display requirements are not fulfilled.\n");
-		  GfTrace("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
+		  GfLogWarning("The minimum display requirements are not fulfilled :\n");
+		  GfLogWarning("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
 		}
 	}
 
 	// Video initialization with generic compatible settings.
 	if (!ScreenSurface)
 	{
-		GfTrace("Trying generic video initialization with requested resolution, fallback.\n\n");
+		GfLogInfo("Trying generic video initialization with requested resolution, fallback.\n\n");
 		ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 	}
 
 	// Failed : Try with a lower fallback resolution that should be supported everywhere ...
 	if (!ScreenSurface)
 	{
-		GfError("Unable to get compatible video mode with requested resolution\n\n");
+		GfLogError("Unable to get compatible video mode with requested resolution\n\n");
 		winX = ADefScreenSizes[0].width;
 		winY = ADefScreenSizes[0].height;
-		GfTrace("Trying generic video initialization with fallback resolution %dx%d.\n\n",
-				winX, winY);
+		GfLogInfo("Trying generic video initialization with fallback resolution %dx%d.\n\n",
+				  winX, winY);
 		ScreenSurface = SDL_SetVideoMode( winX, winY, depth, videomode);
 	}
 
 	// Failed : No way ... no more ideas !
 	if (!ScreenSurface)
 	{
-		GfFatal("Unable to get any compatible video mode (fallback resolution not supported)\n\n");
+		GfLogFatal("Unable to get any compatible video mode"
+				   " (fallback resolution not supported) : giving up !\n\n");
 		exit(1);
 	}
+
+	GfParmReleaseHandle(handle);
 
 	// Save view geometry and screen center.
     GfViewWidth = xw;
@@ -506,26 +509,43 @@ void GfScrInit(int argc, char *argv[])
 	SDL_GL_GetAttribute( SDL_GL_MULTISAMPLEBUFFERS, &glMSamp );
 	SDL_GL_GetAttribute( SDL_GL_MULTISAMPLESAMPLES, &glMSampLevel );
 
-	GfTrace("Visual Properties Report\n");
-	GfTrace("------------------------\n");
- 	GfTrace("Resolution    : %dx%dx%d\n", winX, winY, depth);
- 	GfTrace("Double-buffer : %s", glDblBuff ? "Yes" : "No\n");
+	GfLogInfo("Visual Properties Report\n");
+	GfLogInfo("------------------------\n");
+ 	GfLogInfo("Resolution    : %dx%dx%d\n", winX, winY, depth);
+ 	GfLogInfo("Double-buffer : %s", glDblBuff ? "Yes" : "No\n");
 	if (glDblBuff)
-		GfTrace(" (%d bits)\n", glDepth);
- 	GfTrace("Alpha-channel : %s\n", glAlpha ? "Yes" : "No");
- 	GfTrace("Anti-aliasing : %s", glMSamp ? "Yes" : "No\n");
+		GfLogInfo(" (%d bits)\n", glDepth);
+ 	GfLogInfo("Alpha-channel : %s\n", glAlpha ? "Yes" : "No");
+ 	GfLogInfo("Anti-aliasing : %s", glMSamp ? "Yes" : "No\n");
 	if (glMSamp)
-		GfTrace(" (multi-sampling level %d)\n", glMSampLevel);
+		GfLogInfo(" (multi-sampling level %d)\n", glMSampLevel);
 
-	/* Give an initial size and position*/
+	// Give an initial size and position to the WM window if not full-screen mode.
+	if (!(videomode & SDL_FULLSCREEN))
+	{
+#ifdef WIN32
+		const HWND hDesktop = GetDesktopWindow();
+		RECT rectDesktop;
+		GetWindowRect(hDesktop, &rectDesktop);
+		GfLogDebug("current : w=%d, h=%d\n", rectDesktop.right, rectDesktop.bottom);
+		const int nWMWinX = winX >= rectDesktop.right ? 0 : (rectDesktop.right - winX) / 2;
+		const int nWMWinY = winY >= rectDesktop.bottom ? 0 : (rectDesktop.bottom - winY) / 2;
+#else
+		// TODO.
+ 		const int nWMWinX = 0;
+ 		const int nWMWinY = 0;
+#endif
+		GfuiInitWindowPositionAndSize(nWMWinX, nWMWinY, winX, winY);
+	}
+
+	// Initialize the Open GL viewport.
+	gfScrReshapeViewport(winX, winY);
+
+	//
 	GfelPostRedisplay();
-	GfuiInitWindowPosition(0, 0);
-	GfuiInitWindowSize(winX, winY);
-	gfScrReshape(winX,winY);
-	GfelSetReshapeCB(gfScrReshape);
+	GfelSetReshapeCB(gfScrReshapeViewport);
 
-	GfParmReleaseHandle(handle);
-
+	// Initialize Open GL feature management layer
 	gfglCheckGLFeatures();
 }
 

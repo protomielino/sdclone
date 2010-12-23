@@ -245,8 +245,7 @@ TGFCLIENT_API void GfuiScreenAddBgImg(void *scr, const char *filename);
 TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiSleep(double delay);
-TGFCLIENT_API void GfuiInitWindowPosition(int x, int y);
-TGFCLIENT_API void GfuiInitWindowSize(int x, int y);
+TGFCLIENT_API void GfuiInitWindowPositionAndSize(int x, int y, int w, int h);
 TGFCLIENT_API void GfuiSwapBuffers(void);
 
 class TGFCLIENT_API GfuiMenuScreen

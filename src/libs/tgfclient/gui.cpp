@@ -30,6 +30,7 @@
 #include <ctime>
 
 #include <SDL/SDL.h>
+#include <SDL/SDL_syswm.h>
 
 #include <raceman.h>
 
@@ -940,25 +941,28 @@ GfuiSleep(double delay)
 }
 
 /** Initialize window position
-    
     @ingroup	gui
+    @param	x		Left x position in the screen (pixels)
+    @param	y		Top y position in the screen (pixels)
+    @param	w		Width (pixels)
+    @param	h		Height (pixels)
 */
 
 void 
-GfuiInitWindowPosition(int x, int y)
+GfuiInitWindowPositionAndSize(int x, int y, int w, int h)
 {
+	// No need to resize, already done when setting the video mode.
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	if (SDL_GetWMInfo(&wmInfo))
+	{
+#ifdef WIN32
+		SetWindowPos(wmInfo.window, HWND_TOP, x, y, 0, 0, SWP_NOSIZE);
+#else
+		// TODO.
+#endif // WIN32
+	}
 }
-
-/** Initialize window size
-    
-    @ingroup	gui
-*/
-
-void 
-GfuiInitWindowSize(int x, int y)
-{
-}
-
 
 /** Swap display buffers (double buffering)
     
