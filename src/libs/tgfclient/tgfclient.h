@@ -423,7 +423,9 @@ TGFCLIENT_API const char *GfuiScrollListExtractElement(void *scr, int Id, int in
 TGFCLIENT_API void GfuiScrollListClear(void *scr, int Id);
 TGFCLIENT_API const char *GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData);
 TGFCLIENT_API bool GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement);
+TGFCLIENT_API bool GfuiScrollListClearSelection(void *scr, int Id);
 TGFCLIENT_API const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
+TGFCLIENT_API int GfuiScrollListGetNumberOfElements(void *scr, int Id);
 TGFCLIENT_API void GfuiScrollListShowElement(void *scr, int Id, int index);
 TGFCLIENT_API void GfuiScrollListSetColor(void *scr, int id,Color color);
 TGFCLIENT_API void GfuiScrollListSetSelectColor(void *scr, int id,Color color);

@@ -276,6 +276,32 @@ GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
     return true;
 }
 
+/** Clear the selection of the scroll list (no more selected element).
+    @ingroup	gui
+    @param	scr		Current screen
+    @param	Id		Scroll list Id
+    @return	<br>false if any error, true otherwise
+ */
+bool
+GfuiScrollListClearSelection(void *scr, int Id)
+{
+    tGfuiObject		*object;
+    tGfuiScrollList	*scrollist;
+    
+    object = gfuiGetObject(scr, Id);
+    if (object == NULL) {
+	return false;
+    }
+    if (object->widget != GFUI_SCROLLIST) {
+	return false;
+    }
+    scrollist = &(object->u.scrollist);
+
+    scrollist->selectedElt = -1;
+    
+    return true;
+}
+
 /** Get the selected element from the scroll list.
     @ingroup	gui
     @param	scr		Current screen
@@ -324,6 +350,31 @@ GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData)
     *userData = elt->userData;
     
     return name;
+}
+
+/** Get the number of elements from the scroll list.
+    @ingroup	gui
+    @param	scr		Current screen
+    @param	Id		Scroll list Id
+    @return	Current number of elements
+		<br>-1 if Error
+ */
+int
+GfuiScrollListGetNumberOfElements(void *scr, int Id)
+{
+    tGfuiObject		*object;
+    tGfuiScrollList	*scrollist;
+
+    object = gfuiGetObject(scr, Id);
+    if (object == NULL) {
+	return -1;
+    }
+    if (object->widget != GFUI_SCROLLIST) {
+	return -1;
+    }
+    scrollist = &(object->u.scrollist);
+
+	return scrollist->nbElts;
 }
 
 /** Get the specified element from the scroll list.
