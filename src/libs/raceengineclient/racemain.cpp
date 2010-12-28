@@ -35,7 +35,7 @@
 #include "racegl.h"
 #include "raceresults.h"
 #include "racestate.h"
-#include "racemanmenu.h"
+#include "raceenginemenus.h"
 //#include "raceweatherupdate.h"
 
 #include "teammanager.h"
@@ -204,7 +204,7 @@ ReRaceEventInit(void)
 	ReEventInitResults();
 
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-		ReNewTrackMenu();
+		ReNextEventMenu();
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
 	return RM_SYNC | RM_NEXT_STEP;

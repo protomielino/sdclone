@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file        : racemanmenu.h
+    file        : raceenginemenus.h
     created     : Fri Jan  3 22:25:02 CET 2003
     copyright   : (C) 2003 by Eric Espié                        
     email       : eric.espie@torcs.org   
@@ -23,18 +23,22 @@
     @version	$Id$
 */
 
-#ifndef _RACEMANMENU_H_
-#define _RACEMANMENU_H_
+#ifndef _RACEENGINEMENUS_H_
+#define _RACEENGINEMENUS_H_
 
 #include "raceengineclient.h"
 
 
 RACEENGINECLIENT_API int ReRacemanMenu(void);
-RACEENGINECLIENT_API int ReNewTrackMenu(void);
-RACEENGINECLIENT_API void ReConfigureMenu(void * /* dummy */);
-RACEENGINECLIENT_API void ReSetRacemanMenuHandle( void * handle);
+RACEENGINECLIENT_API int ReNextEventMenu(void);
+RACEENGINECLIENT_API void ReConfigureRace(void * /* dummy */);
+RACEENGINECLIENT_API void ReSetRacemanMenuHandle(void * handle);
 
-#endif /* _RACEMANMENU_H_ */ 
+extern void* ReGetRacemanMenuHandle();
+
+extern void ReConfigRunState(void);
+
+#endif /* _RACEENGINEMENU_H_ */ 
 
 
 

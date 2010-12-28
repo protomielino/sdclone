@@ -52,9 +52,9 @@
 #define TRK_SECT_GRAPH	"Graphic"
 
 #define TRK_ATT_3DDESC	"3d description"
-#define TRK_ATT_3DDESC2 "3d description rain"
-#define TRK_ATT_3DDESC3 "3d description night"
-#define TRK_ATT_3DDESC4 "3d description rain+night"
+//#define TRK_ATT_3DDESC2 "3d description rain"
+//#define TRK_ATT_3DDESC3 "3d description night"
+//#define TRK_ATT_3DDESC4 "3d description rain+night"
 #define TRK_ATT_BKGRND	"background image"
 #define TRK_ATT_BGTYPE	"background type"
 #define TRK_ATT_BGCLR_R	"background color R"
@@ -542,7 +542,8 @@ typedef struct GraphicLightInfo
 
 typedef struct 
 {
-    const char		*background;
+    const char	*filename3d;	/**< Name of the track 3D description file (.ac/.acc) */
+    const char	*background;	/**< Name of the background image file (.png) */
     int			bgtype;
 #define TR_BACKGROUND_TYPE_0	0 /**< ??? Anyone who knows what's this */
 #define TR_BACKGROUND_TYPE_2	2 /**< ??? Anyone who knows what's this */
@@ -560,10 +561,11 @@ typedef struct
 /** Track structure
     @ingroup trackstruct
 */
-typedef struct
+typedef struct Track
 {
     const char	  *name;	/**< Name of the track */
-    const char	  *author;	/**< Author's name */
+    const char	  *descr;	/**< Description of the track */
+    const char	  *authors;	/**< Authors names */
     char	  *filename;	/**< Filename of the track description */
     void	  *params;	/**< Parameters handle */
     char	  *internalname; /**< Internal name of the track */
@@ -616,7 +618,7 @@ typedef struct
 
 
 
-typedef tTrack*(*tfTrackBuild)(char*);
+typedef tTrack*(*tfTrackBuild)(const char*);
 typedef tdble(*tfTrackHeightG)(tTrackSeg*, tdble, tdble);
 typedef tdble(*tfTrackHeightL)(tTrkLocPos*);
 typedef void(*tfTrackGlobal2Local)(tTrackSeg* /*seg*/, tdble /*X*/, tdble /*Y*/, tTrkLocPos* /*pos*/, int /*sides*/);
@@ -625,7 +627,8 @@ typedef void(*tfTrackSideNormal)(tTrackSeg*, tdble, tdble, int, t3Dd*);
 typedef void(*tfTrackSurfaceNormal)(tTrkLocPos *, t3Dd*);
 typedef void(*tfTrackShutdown)(void);
 
-typedef struct {
+typedef struct TrackItf
+{
     tfTrackBuild		trkBuild;		/* build track structure for simu */
     tfTrackBuild		trkBuildEx;		/* build with graphic extensions  */
     tfTrackHeightG		trkHeightG;

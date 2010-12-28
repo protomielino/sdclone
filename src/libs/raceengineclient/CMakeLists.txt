@@ -4,12 +4,14 @@ INCLUDE(../../../cmake/macros.cmake)
 
 SET(RACEENGINECLIENT_SOURCES racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
 							 racemessage.cpp racegl.cpp raceinit.cpp racemain.cpp
-							 raceweather.cpp racemanmenu.cpp raceresults.cpp racesimusimu.cpp 
-							 racestate.cpp racesituation.cpp raceselectmenu.cpp networkingmenu.cpp
-							 raceengineclient.h 
+							 raceweather.cpp raceresults.cpp racesimusimu.cpp 
+							 racestate.cpp racesituation.cpp 
+                             racemanmenu.cpp raceselectmenu.cpp networkingmenu.cpp
+                             racenexteventmenu.cpp raceconfigstate.cpp
+							 raceengineclient.h raceenginemenus.h
 							 racecareer.h raceupdate.h racenetwork.h racecars.h
 							 racemessage.h racegl.h raceinit.h 
-							 raceweather.h racemanmenu.h raceresults.h racesimusimu.h 
+							 raceweather.h raceresults.h racesimusimu.h 
 							 racestate.h racesituation.h raceselectmenu.h networkingmenu.h)
 
 ADD_SD_DEFINITIONS()

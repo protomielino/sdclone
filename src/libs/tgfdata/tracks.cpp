@@ -38,8 +38,14 @@ public:
 	// Map for quick access to GfTrack by id
 	std::map<std::string, GfTrack*> mapTracksById;
 
-	// Set of category Ids.
+	// Vector of category Ids.
 	std::vector<std::string> vecCatIds;
+
+	// Vector of category names.
+	std::vector<std::string> vecCatNames;
+
+	// Track module interface (needed to get some tracks properties).
+	tTrackItf* pTrackItf;
 };
 
 
@@ -84,11 +90,13 @@ GfTracks::GfTracks()
 			continue;
 			
 		// Get the list of sub-dirs in the "tracks" folder (the track categories).
-		tFList* lstTrackFolders = GfDirGetList("tracks");
+		std::string strDirName("tracks/");
+		strDirName += pszCatId;
+		tFList* lstTrackFolders = GfDirGetList(strDirName.c_str());
 		if (!lstTrackFolders)
 		{
-			GfLogFatal("No category available in the 'tracks' folder\n");
-			return;
+			GfLogWarning("No track available in the '%s' folder\n", strDirName.c_str());
+			continue;
 		}
 
 		// Add new category.
@@ -100,22 +108,21 @@ GfTracks::GfTracks()
 		{
 			//GfLogDebug("GfTracks::GfTracks() : Examining track %s\n", pTrackFolder->name);
 		
-			// Open the XML file of the car.
+			// Determine and check the XML file of the track.
 			const char* pszTrackId = pTrackFolder->name;
 			
 			std::ostringstream ossFileName;
 			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId
-							 << '/' << pszTrackId << PARAMEXT;
+						<< '/' << pszTrackId << '.' << TRKEXT;
 			const std::string strTrackFileName(ossFileName.str());
-			void* hparmTrack = GfParmReadFile(strTrackFileName.c_str(), GFPARM_RMODE_STD);
-			if (!hparmTrack)
+			if (!GfFileExists(strTrackFileName.c_str()))
 			{
-				GfLogWarning("GfTracks : Ignoring track %s (failed to read from %s)\n",
+				GfLogWarning("Ignoring track %s : %s not found\n",
 							 pszTrackId, strTrackFileName.c_str());
 				continue;
 			}
 
-			// Read track info.
+			// Get 1st level track info (those which don't need to open any file).
 			ossFileName.str("");
 			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId
 						<< '/' << pszTrackId << ".jpg";
@@ -140,17 +147,13 @@ GfTracks::GfTracks()
 			GfTrack* pTrack = new GfTrack;
 			pTrack->setId(pszTrackId);
 			pTrack->setCategoryId(pszCatId);
-			pTrack->setName(GfParmGetStr(hparmTrack, TRK_SECT_HDR, TRK_ATT_NAME, pszTrackId));
-			pTrack->setDescriptorFileName(strTrackFileName);
-			pTrack->setPreviewFileName(strPreviewFileName);
-			pTrack->setOutlineFileName(strOutlineFileName);
+			pTrack->setDescriptorFile(strTrackFileName);
+			pTrack->setPreviewFile(strPreviewFileName);
+			pTrack->setOutlineFile(strOutlineFileName);
 
 			// Update the GfTracks singleton.
 			_pPrivate->vecTracks.push_back(pTrack);
 			_pPrivate->mapTracksById[pszTrackId] = pTrack;
-
-			// Close the XML file of the track.
-			GfParmReleaseHandle(hparmTrack);
 		}
 		while ((pTrackFolder = pTrackFolder->next) != lstTrackFolders);
 	} 
@@ -162,12 +165,61 @@ GfTracks::GfTracks()
 	std::sort(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end());
 
 	// Trace what we got.
-	print();
+	print(false); // No verbose here, otherwise infinite recursion.
+}
+
+tTrackItf* GfTracks::getTrackInterface() const
+{
+	return _pPrivate->pTrackItf;
+}
+
+void GfTracks::setTrackInterface(tTrackItf* pTrackItf)
+{
+	_pPrivate->pTrackItf = pTrackItf;
 }
 
 const std::vector<std::string>& GfTracks::getCategoryIds() const
 {
 	return _pPrivate->vecCatIds;
+}
+
+const std::vector<std::string>& GfTracks::getCategoryNames() const
+{
+	// Get category names only when asked for (need to open files for this).
+	if (_pPrivate->vecCatNames.empty())
+	{
+		std::vector<std::string>::const_iterator itCatId;
+		for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); itCatId++)
+		{
+			std::ostringstream ossFileName;
+			ossFileName << "data/tracks/" << *itCatId << '.' << TRKEXT;
+			void* hparmCat = GfParmReadFile(ossFileName.str().c_str(), GFPARM_RMODE_STD);
+			const char* pszCatName;
+			if (!hparmCat)
+			{
+				GfLogError("Could not read track category file %s\n", ossFileName.str().c_str());
+				pszCatName = (*itCatId).c_str();
+			}
+			else
+				pszCatName =
+					GfParmGetStr(hparmCat, TRK_SECT_HDR, TRK_ATT_NAME, (*itCatId).c_str());
+			_pPrivate->vecCatNames.push_back(pszCatName);
+
+			GfParmReleaseHandle(hparmCat);
+		}
+
+		// Update tracks, as they don't have their category name set yet.
+		for (unsigned nCatInd = 0; nCatInd < _pPrivate->vecCatIds.size(); nCatInd++)
+		{
+			std::vector<GfTrack*> vecTracksInCat =
+				getTracksInCategory(_pPrivate->vecCatIds[nCatInd]);
+			std::vector<GfTrack*>::iterator itTrack;
+			for (itTrack = vecTracksInCat.begin(); itTrack != vecTracksInCat.end(); itTrack++)
+				(*itTrack)->setCategoryName(_pPrivate->vecCatNames[nCatInd]);
+		}
+	}
+	
+	return _pPrivate->vecCatNames;
 }
 
 GfTrack* GfTracks::getTrack(const std::string& strId) const
@@ -226,18 +278,211 @@ std::vector<std::string> GfTracks::getTrackNamesInCategory(const std::string& st
 	return vecTrackNames;
 }
 
-void GfTracks::print() const
+void GfTracks::print(bool bVerbose) const
 {
 	GfLogTrace("Track base : %d categories, %d tracks\n",
 			   _pPrivate->vecCatIds.size(), _pPrivate->vecTracks.size());
-	std::vector<std::string>::const_iterator itCat;
-	for (itCat = _pPrivate->vecCatIds.begin(); itCat != _pPrivate->vecCatIds.end(); itCat++)
+	std::vector<std::string>::const_iterator itCatId;
+	for (itCatId = _pPrivate->vecCatIds.begin(); itCatId != _pPrivate->vecCatIds.end(); itCatId++)
 	{
-		GfLogTrace("  '%s' category :\n", itCat->c_str());
-		const std::vector<GfTrack*> vecTracksInCat = getTracksInCategory(*itCat);
+		GfLogTrace("  '%s' category :\n", itCatId->c_str());
+		const std::vector<GfTrack*> vecTracksInCat = getTracksInCategory(*itCatId);
 		std::vector<GfTrack*>::const_iterator itTrack;
 		for (itTrack = vecTracksInCat.begin(); itTrack != vecTracksInCat.end(); itTrack++)
-			GfLogTrace("    %-22s : %s\n", (*itTrack)->getName().c_str(),
-					   (*itTrack)->getDescriptorFileName().c_str());
+			if (bVerbose)
+				GfLogTrace("    %-22s : %s\n", (*itTrack)->getName().c_str(),
+						   (*itTrack)->getDescriptorFile().c_str());
+			else
+				GfLogTrace("    %-16s : %s\n", (*itTrack)->getId().c_str(),
+						   (*itTrack)->getDescriptorFile().c_str());
 	}
+}
+
+// GfTrack class ----------------------------------------------------------
+
+GfTrack::GfTrack() : _fLength(-1), _fWidth(-1), _nMaxPitSlots(-1), _bUsable(false)
+{
+}
+
+const std::string& GfTrack::getId() const
+{
+	return _strId;
+}
+
+const std::string& GfTrack::getName() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_strName.empty())
+		load();
+	return _strName;
+}
+
+const std::string& GfTrack::getDescription() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_strDesc.empty())
+		load();
+	return _strDesc;
+}
+
+const std::string& GfTrack::getAuthors() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_strAuthors.empty())
+		load();
+	return _strAuthors;
+}
+
+const std::string& GfTrack::getCategoryId() const
+{
+	return _strCatId;
+}
+
+const std::string& GfTrack::getCategoryName() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_strCatName.empty())
+		// Getting the names of all the categories updates all the tracks.
+		GfTracks::self()->getCategoryNames();
+
+	// Not, it is no more empty.
+	return _strCatName;
+}
+
+const std::string& GfTrack::getDescriptorFile() const
+{
+	return _strDescFile;
+}
+
+const std::string& GfTrack::getOutlineFile() const
+{
+	return _strOutlineFile;
+}
+
+const std::string& GfTrack::getPreviewFile() const
+{
+	return _strPreviewFile;
+}
+
+
+float GfTrack::getLength() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_fLength < 0)
+		load();
+	return _fLength;
+}
+
+float GfTrack::getWidth() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_fWidth < 0)
+		load();
+	return _fWidth;
+}
+
+int GfTrack::getMaxNumOfPitSlots() const
+{
+	// Lazy load scheme : read files only when really needed, and only once.
+	if (_nMaxPitSlots < 0)
+		load();
+	return _nMaxPitSlots;
+}
+
+bool GfTrack::isUsable() const
+{
+	// Must load to know if really usable.
+	if (!_bUsable && _strName.empty())
+		load();
+	return _bUsable;
+}
+
+void GfTrack::setId(const std::string& strId)
+{
+	_strId = strId;
+}
+
+void GfTrack::setName(const std::string& strName)
+{
+	_strName = strName;
+}
+
+void GfTrack::setCategoryId(const std::string& strCatId)
+{
+	_strCatId = strCatId;
+}
+
+void GfTrack::setCategoryName(const std::string& strCatName)
+{
+	_strCatName = strCatName;
+}
+
+void GfTrack::setDescriptorFile(const std::string& strDescFile)
+{
+	_strDescFile = strDescFile;
+}
+
+void GfTrack::setOutlineFile(const std::string& strOutlineFile)
+{
+	_strOutlineFile = strOutlineFile;
+}
+
+void GfTrack::setPreviewFile(const std::string& strPreviewFile)
+{
+	_strPreviewFile = strPreviewFile;
+}
+
+void GfTrack::setLength(float fLength)
+{
+	_fLength = fLength;
+}
+
+void GfTrack::setWidth(float fWidth)
+{
+	_fWidth = fWidth;
+}
+
+void GfTrack::setMaxNumOfPitSlots(int nPitSlots)
+{
+	_nMaxPitSlots = nPitSlots;
+}
+
+bool GfTrack::load() const
+{
+    // Load track data from the XML file.
+	tTrackItf* pTrackItf = GfTracks::self()->getTrackInterface();
+    tTrack* pTrack = pTrackItf->trkBuild(_strDescFile.c_str());
+    if (!pTrack)
+	{
+		GfLogWarning("Unusable track %s : failed to build track data from %s\n",
+					 _strId.c_str(), _strDescFile.c_str());
+        return false;
+    }
+
+	// Check if the track 3D model file exists.
+	std::ostringstream ossFileName;
+	ossFileName << "tracks/" << _strCatId << '/' << _strId << '/'
+				<< (pTrack->graphic.filename3d ? pTrack->graphic.filename3d : "track.ac");
+    if (!GfFileExists(ossFileName.str().c_str()))
+	{
+		GfLogWarning("Unusable track %s : could not find 3D model %s\n",
+					 _strId.c_str(), ossFileName.str().c_str());
+        return false;
+    }
+
+	// All right now : let's read last needed infos.
+	_strName = pTrack->name;
+	_strDesc = pTrack->descr;
+	_strAuthors = pTrack->authors;
+	_fLength = pTrack->length;
+	_fWidth = pTrack->width;
+	_nMaxPitSlots = pTrack->pits.nMaxPits;
+
+    // Unload track data.
+    pTrackItf->trkShutdown();
+
+	// Now, the track seems usable (hm ... OK, we didn't check the 3D file contents ...).
+	_bUsable = true;
+	
+	return true;
 }

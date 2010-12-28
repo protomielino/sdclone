@@ -43,21 +43,21 @@ static void FinishTrackLoading(void *TrackHandle);
  * from the track file
  */
 tTrack *
-TrackBuildv1(char *trackfile)
+TrackBuildv1(const char *trackfile)
 {
     TrackShutdown();
 
     theTrack = (tTrack*)calloc(1, sizeof(tTrack));
     theCamList = (tRoadCam*)NULL;
 
-    theTrack->params = TrackHandle = GfParmReadFile (trackfile, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT | GFPARM_RMODE_PRIVATE);
+    theTrack->params = TrackHandle =
+		GfParmReadFile (trackfile, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT | GFPARM_RMODE_PRIVATE);
     
     theTrack->filename = strdup(trackfile);
 
     GetTrackHeader(TrackHandle);
 
-    
-    switch(theTrack->version) {
+	switch(theTrack->version) {
     case 0:
     case 1:
     case 2:
@@ -76,7 +76,7 @@ TrackBuildv1(char *trackfile)
 }
 
 tTrack *
-TrackBuildEx(char *trackfile)
+TrackBuildEx(const char *trackfile)
 {
     	void	*TrackHandle;
 
@@ -136,18 +136,20 @@ GetTrackHeader(void *TrackHandle)
     char		*cs;
 
     theTrack->name = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_NAME, "no name");
+    theTrack->descr = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_DESCR, "no description");
     theTrack->version = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_VERSION, (char*)NULL, 0);
     theTrack->skyversion = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_SKY, (char*)NULL, 0);
     theTrack->rainprob = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_RAINPROB, (char*)NULL, 0);
     theTrack->rainlprob = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_PROBLRAIN, (char*)NULL, 0);
     theTrack->probrain = (int)GfParmGetNum(TrackHandle, TRK_SECT_HDR, TRK_ATT_PROBRAIN, (char*)NULL, 0);
     theTrack->width = GfParmGetNum(TrackHandle, TRK_SECT_MAIN, TRK_ATT_WIDTH, (char*)NULL, 15.0);
-    theTrack->author = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, "none");
+    theTrack->authors = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_AUTHOR, "none");
     theTrack->category = GfParmGetStr(TrackHandle, TRK_SECT_HDR, TRK_ATT_CAT, "road");
 
     /* Graphic part */
     graphic = &theTrack->graphic;
 
+	graphic->filename3d = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_3DDESC, 0);
 	graphic->background = GfParmGetStr(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BKGRND, "background.png");
 
     graphic->bgtype = (int)GfParmGetNum(TrackHandle, TRK_SECT_GRAPH, TRK_ATT_BGTYPE, (char*)NULL, 0.0);

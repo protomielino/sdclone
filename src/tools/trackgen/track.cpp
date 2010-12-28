@@ -249,7 +249,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
     printf("++++++++++++ Track ++++++++++++\n");
     printf("name      = %s\n", Track->name);
-    printf("author    = %s\n", Track->author);
+    printf("authors   = %s\n", Track->authors);
     printf("filename  = %s\n", Track->filename);
     printf("nseg      = %d\n", Track->nseg);
     printf("version   = %d\n", Track->version);

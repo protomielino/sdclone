@@ -31,34 +31,64 @@
 
 #include "tgfdata.h"
 
+struct TrackItf;
+
 
 // Information on one track.
 class TGFDATA_API GfTrack
 {
 public:
 
-	const std::string& getId() const { return _strId; };
-	const std::string& getName() const { return _strName; };
-	const std::string& getCategoryId() const { return _strCatId; };
-	const std::string& getDescriptorFileName() const { return _strDescFile; };
-	const std::string& getOutlineFileName() const { return _strOutlineFile; };
-	const std::string& getPreviewFileName() const { return _strPreviewFile; };
+	GfTrack();
 	
-	void setId(const std::string& strId) { _strId = strId; };
-	void setName(const std::string& strName) { _strName = strName; };
-	void setCategoryId(const std::string& strCatId) { _strCatId = strCatId; };
-	void setDescriptorFileName(const std::string& strDescFile) { _strDescFile = strDescFile; };
-	void setOutlineFileName(const std::string& strOutlineFile) { _strOutlineFile = strOutlineFile; };
-	void setPreviewFileName(const std::string& strPreviewFile) { _strPreviewFile = strPreviewFile; };
+	const std::string& getId() const;
+	const std::string& getName() const;
+	const std::string& getDescription() const;
+	const std::string& getAuthors() const;
+	const std::string& getCategoryId() const;
+	const std::string& getCategoryName() const;
+	const std::string& getDescriptorFile() const;
+	const std::string& getOutlineFile() const;
+	const std::string& getPreviewFile() const;
+	float getLength() const;
+	float getWidth() const;
+	int getMaxNumOfPitSlots() const;
+
+	bool isUsable() const;
 	
+	void setId(const std::string& strId);
+	void setName(const std::string& strName);
+	void setDescription(const std::string& strDesc);
+	void setAuthors(const std::string& strName);
+	void setCategoryId(const std::string& strCatId);
+	void setCategoryName(const std::string& strCatName);
+	void setDescriptorFile(const std::string& strDescFile);
+	void setOutlineFile(const std::string& strOutlineFile);
+	void setPreviewFile(const std::string& strPreviewFile);
+	void setLength(float fLength);
+	void setWidth(float fWidth);
+	void setMaxNumOfPitSlots(int nPitSlots);
+
 protected:
-	
-	std::string _strId;          // XML file / folder name (ex: "goldstone-sand")
- 	std::string _strName;        // User friendly name (ex: "Goldstone Sand").
-	std::string _strCatId;       // Category XML file / folder name (ex: "circuit").
-	std::string _strDescFile;    // Path-name of the XML descriptor file.
-	std::string _strOutlineFile; // Path-name of the outline image file.
-	std::string _strPreviewFile; // Path-name of the preview image file.
+
+	bool load() const;
+
+protected:
+
+	std::string _strId;              // XML file / folder name (ex: "goldstone-sand")
+ 	mutable std::string _strName;    // User friendly name (ex: "Goldstone Sand").
+	std::string _strCatId;           // Category XML file / folder name (ex: "circuit").
+	mutable std::string _strCatName; // Category user friendly name (ex: "Circuit").
+	mutable std::string _strAuthors; // Name of the authors
+	std::string _strDescFile;        // Path-name of the XML descriptor file.
+	std::string _strOutlineFile;     // Path-name of the outline image file.
+	std::string _strPreviewFile;     // Path-name of the preview image file.
+ 	mutable std::string _strDesc;    // Description.
+	mutable float _fLength;          // Length (m).
+	mutable float _fWidth;           // Width (m).
+	mutable int _nMaxPitSlots;       // Max. number of pit slots (m).
+
+	mutable bool _bUsable;           // False if anything wrong.
 };
 
 
@@ -69,8 +99,12 @@ public:
 
 	// Accessor to the unique instance of the singleton.
 	static GfTracks* self();
+
+	struct TrackItf* getTrackInterface() const;
+	void setTrackInterface(struct TrackItf* pTrackItf);
 	
  	const std::vector<std::string>& getCategoryIds() const;
+ 	const std::vector<std::string>& getCategoryNames() const;
 
  	GfTrack* getTrack(const std::string& strId) const;
  	GfTrack* getTrackWithName(const std::string& strName) const;
@@ -79,7 +113,7 @@ public:
  	std::vector<std::string> getTrackIdsInCategory(const std::string& strCatId = "") const;
  	std::vector<std::string> getTrackNamesInCategory(const std::string& strCatId = "") const;
 	
- 	void print() const;
+ 	void print(bool bVerbose = false) const;
 
 protected:
 
@@ -94,7 +128,7 @@ protected:
 
 	// Its private data.
 	class Private;
-	Private* _pPrivate;
+	mutable Private* _pPrivate;
 };
 
 #endif /* __TGFTRACKS_H__ */

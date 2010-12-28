@@ -797,12 +797,12 @@ reDumpTrack(const tTrack *track, int verbose)
 	char buf[128];
 	
 	snprintf(buf, sizeof(buf), "  by %s (%.0f m long, %.0f m wide) ...", 
-			 track->author, track->length, track->width);
+			 track->authors, track->length, track->width);
 	RmLoadingScreenSetText(buf);
 
 	GfLogInfo("++++++++++++ Track ++++++++++++\n");
 	GfLogInfo("Name     = %s\n", track->name);
-	GfLogInfo("Author   = %s\n", track->author);
+	GfLogInfo("Authors  = %s\n", track->authors);
 	GfLogInfo("Filename = %s\n", track->filename);
 	GfLogInfo("NSeg     = %d\n", track->nseg);
 	GfLogInfo("Version  = %d\n", track->version);

@@ -48,7 +48,7 @@ Should also allow choosing IP address, track, etc ...
 #include "racestate.h"
 #include "raceresults.h"
 
-#include "racemanmenu.h"
+#include "raceenginemenus.h"
 #include "networkingmenu.h"
 
 
@@ -611,7 +611,7 @@ ReNetworkHostMenu(void * /* dummy */)
 
 	g_ReadyCheckboxId = CreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",NULL,onHostPlayerReady);
 	g_HostSettingsButtonId = CreateButtonControl(racemanMenuHdle,mparam,"networkhostsettings",racemanMenuHdle,reNetworkHostSettingsMenu);
-	g_RaceSetupId = CreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,ReConfigureMenu);
+	g_RaceSetupId = CreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,ReConfigureRace);
 	g_CarSetupButtonId = CreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,reCarSettingsMenu);
 
 	CreateButtonControl(racemanMenuHdle,mparam,"start race",NULL,ServerPrepareStartNetworkRace);
