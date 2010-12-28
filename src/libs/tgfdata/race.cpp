@@ -289,6 +289,35 @@ bool GfRace::removeCompetitor(GfDriver* pComp)
 	return bRemoved;
 }
 
+bool GfRace::moveCompetitor(GfDriver* pComp, int nDeltaPlace)
+{
+	// Nothing to do if no real move.
+	if (nDeltaPlace == 0)
+		return false;
+
+	// Neither if competitor not found in race.
+	std::vector<GfDriver*>::iterator itComp =
+		std::find(_pPrivate->vecCompetitors.begin(), _pPrivate->vecCompetitors.end(), pComp);
+	if (itComp == _pPrivate->vecCompetitors.end())
+		return false;
+
+	// Remove the competitor from his place.
+	_pPrivate->vecCompetitors.erase(itComp);
+	
+	// Determine his new place.
+	const int nNewIndex = (itComp - _pPrivate->vecCompetitors.begin()) + nDeltaPlace;
+	if (nNewIndex < 0)
+		itComp = _pPrivate->vecCompetitors.begin();
+	else if (nNewIndex >= _pPrivate->vecCompetitors.size())
+		itComp = _pPrivate->vecCompetitors.end();
+	else
+		itComp = _pPrivate->vecCompetitors.begin() + nNewIndex;
+
+	// Insert it at his new place.
+	_pPrivate->vecCompetitors.insert(itComp, pComp);
+}
+
+
 bool GfRace::removeAllCompetitors()
 {
 	const bool bAnyRemoved = !_pPrivate->vecCompetitors.empty();

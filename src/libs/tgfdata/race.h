@@ -55,6 +55,7 @@ public:
 	bool acceptsMoreCompetitors() const;
 	bool appendCompetitor(GfDriver* pComp);
 	bool removeCompetitor(GfDriver* pComp);
+	bool moveCompetitor(GfDriver* pComp, int nDeltaPlace);
 	bool removeAllCompetitors();
 	bool shuffleCompetitors();
 

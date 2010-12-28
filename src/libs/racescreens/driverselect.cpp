@@ -48,10 +48,10 @@
 //#define FOCUS on
 
 // Handle for the screen.
-static void		*ScrHandle;
+static void* ScrHandle;
 
 // Information about the current race type.
-static tRmDriverSelect	*MenuData;
+static tRmDriverSelect* MenuData;
 
 // GUI control Ids.
 static int		CompetitorsScrollListId, CandidatesScrollListId;
@@ -65,9 +65,9 @@ static int		CarImageId;
 #ifdef FOCUS
 static int		FocusedDriverLabelId;
 #endif
-static int		PickedDriverTypeLabelId;
-static int		PickedDriverCarLabelId;
-static int		PickedDriverCarCategoryLabelId;
+static int		CurrentDriverTypeLabelId;
+static int		CurrentDriverCarLabelId;
+static int		CurrentDriverCarCategoryLabelId;
 
 static int      NextButtonId;
 static int      ChangeCarButtonId;
@@ -93,14 +93,13 @@ static size_t CurSkinIndex = 0;
 // The current race.
 GfRace TheRace;
 
-GfDriver* PPickedDriver;
+// The current driver
+// (the last one the user clicked on, shown as highligthed in one of the scroll-lists).
+GfDriver* PCurrentDriver;
 
 // Local functions.
-static void rmdsCleanup(void);
 static void rmdsFilterCandidatesScrollList(const std::string& strCarCatId,
 											const std::string& strType);
-static GfDriver* rmdsGetHighlightedDriver();
-static bool rmdsIsAnyCompetitorHighlighted();
 static void rmdsClickOnDriver(void * /* dummy */);
 
 
@@ -113,21 +112,6 @@ rmdsIsAnyCompetitorHighlighted()
 		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollListId, (void**)&pDriver);
 
 	return name != 0;
-}
-
-static GfDriver*
-rmdsGetHighlightedDriver()
-{
-	GfDriver *pDriver;
-	
-	const char *name =
-		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollListId, (void**)&pDriver);
-    if (!name)
-		name = GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver);
-    if (!name)
-		pDriver = 0;
-
-	return pDriver;
 }
 
 static void
@@ -187,8 +171,8 @@ rmdsActivate(void * /* notused */)
 {
 	GfLogTrace("Entering Driver Select menu\n");
 
-	// Update GUI : picked driver info, car preview.
-	rmdsHighlightDriver(PPickedDriver);
+	// Update GUI : current driver info, car preview.
+	rmdsHighlightDriver(PCurrentDriver);
 	
     // Initialize the driver type filter criteria to "any driver".
     CurDriverTypeIndex =
@@ -197,7 +181,7 @@ rmdsActivate(void * /* notused */)
 
 	// Initialize the car category filter criteria : use the one of the current driver if any.
 	const std::string strCurCarCatId =
-		PPickedDriver ? PPickedDriver->getCar()->getCategoryId() : AnyCarCategory;
+		PCurrentDriver ? PCurrentDriver->getCar()->getCategoryId() : AnyCarCategory;
     CurCarCategoryIndex =
 		(std::find(VecCarCategoryIds.begin(), VecCarCategoryIds.end(), strCurCarCatId)
 		 - VecCarCategoryIds.begin()) % VecCarCategoryIds.size();
@@ -206,6 +190,17 @@ rmdsActivate(void * /* notused */)
     GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
     GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
     rmdsFilterCandidatesScrollList(strCurCarCatId, VecDriverTypes[CurDriverTypeIndex]);
+}
+
+static void
+rmdsCleanup(void)
+{
+    VecCarCategoryIds.clear();
+    VecCarCategoryNames.clear();
+    VecDriverTypes.clear();
+    VecCurDriverPossSkins.clear();
+
+    TheRace.clear();
 }
 
 // Screen de-activation call-back.
@@ -273,9 +268,8 @@ rmdsChangeSkin(void *vp)
 		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 
 	// Update highlighted driver skin.
-	GfDriver *pDriver = rmdsGetHighlightedDriver();
-	if (pDriver)
-		pDriver->setSkin(curSkin); // TODO: Can we do this for the whole game session (not only this race if it ever starts) ?
+	if (PCurrentDriver)
+		PCurrentDriver->setSkin(curSkin); // TODO: Can we do this for the whole game session (not only this race if it ever starts) ?
 }
 
 #ifdef FOCUS
@@ -316,17 +310,24 @@ rmdsPreviousMenu(void *screen)
 static void
 rmdsCarSelectMenu(void *pPreviousMenu)
 {
-	if (PPickedDriver)
+	if (PCurrentDriver)
 	{
 		CarSelectMenu.SetPreviousMenuHandle(pPreviousMenu);
-		CarSelectMenu.RunMenu(PPickedDriver);
+		CarSelectMenu.RunMenu(PCurrentDriver);
 	}
 }
 
 static void
 rmdsMoveCompetitor(void *vd)
 {
-    GfuiScrollListMoveSelectedElement(ScrHandle, CompetitorsScrollListId, (long)vd);
+	if (PCurrentDriver)
+	{
+		// Move the competitor in the scroll-list.
+		GfuiScrollListMoveSelectedElement(ScrHandle, CompetitorsScrollListId, (int)(long)vd);
+
+		// Move the competitor in the race.
+		TheRace.moveCompetitor(PCurrentDriver, (int)(long)vd);
+	}
 }
 
 static void
@@ -365,14 +366,14 @@ rmdsClickOnDriver(void * /* dummy */)
 	{
 		//GfLogDebug("rmdsClickOnDriver: '%s'\n", pDriver->getName().c_str());
 		
-		// The selected driver is the new picked one.
-		PPickedDriver = pDriver;
+		// The selected driver is the new current one.
+		PCurrentDriver = pDriver;
 
-		// Update picked driver info.
-		GfuiLabelSetText(ScrHandle, PickedDriverTypeLabelId, pDriver->getType().c_str());
+		// Update current driver info.
+		GfuiLabelSetText(ScrHandle, CurrentDriverTypeLabelId, pDriver->getType().c_str());
 		const GfCar* pCar = pDriver->getCar();
-		GfuiLabelSetText(ScrHandle, PickedDriverCarLabelId, pCar->getName().c_str());
-		GfuiLabelSetText(ScrHandle, PickedDriverCarCategoryLabelId, pCar->getCategoryId().c_str());
+		GfuiLabelSetText(ScrHandle, CurrentDriverCarLabelId, pCar->getName().c_str());
+		GfuiLabelSetText(ScrHandle, CurrentDriverCarCategoryLabelId, pCar->getCategoryId().c_str());
 		
 		// Get really available skins (the user may have changed some file somewhere
 		// since last time we got here for this driver).
@@ -539,15 +540,13 @@ rmdsSelectRandomCandidates(void * /* dummy */ )
 static void
 rmdsShuffleCompetitors(void * /* dummy */ )
 {
-	// Save currently highlighted driver.
-	const GfDriver* pDriver = rmdsGetHighlightedDriver();
-	
 	// Shuffle the race competitor list and reload the scroll-list.
 	TheRace.shuffleCompetitors();
 	rmdsReloadCompetitorsScrollList();
 
-    // Re-highlight the previously highlighted driver.
-	rmdsHighlightDriver(pDriver);
+    // Re-highlight the previously highlighted driver if any
+	// (in case it was in the competitors list).
+	rmdsHighlightDriver(PCurrentDriver);
 }
 
 static void
@@ -624,13 +623,13 @@ RmDriversSelect(void *vs)
 	VecDriverTypes = GfDrivers::self()->getTypes();
     VecDriverTypes.push_back(AnyDriverType);
 	
-    // Picked Driver Info
-    PickedDriverTypeLabelId =
-		CreateLabelControl(ScrHandle, menuDescHdle, "pickeddrivertypelabel");
-    PickedDriverCarCategoryLabelId =
-		CreateLabelControl(ScrHandle, menuDescHdle, "pickeddrivercarcategorylabel");
-    PickedDriverCarLabelId =
-		CreateLabelControl(ScrHandle, menuDescHdle, "pickeddrivercarlabel");
+    // Current Driver Info
+    CurrentDriverTypeLabelId =
+		CreateLabelControl(ScrHandle, menuDescHdle, "currentdrivertypelabel");
+    CurrentDriverCarCategoryLabelId =
+		CreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarcategorylabel");
+    CurrentDriverCarLabelId =
+		CreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarlabel");
     
     // Next, Previous and Change Car buttons
     NextButtonId =
@@ -654,29 +653,18 @@ RmDriversSelect(void *vs)
 	rmdsReloadCompetitorsScrollList();
 	
 	// Initialize the currently highlighted driver.
-	PPickedDriver = 0;
+	PCurrentDriver = 0;
 	std::vector<GfDriver*> vecCompetitors = TheRace.getCompetitors();
 	std::vector<GfDriver*>::iterator itComp;
 	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); itComp++)
-		// Initialize the picked driver (the last human driver, or else of the last driver).
-		if (!PPickedDriver || (*itComp)->isHuman())
-			PPickedDriver = *itComp;
+		// Initialize the current driver (the last human driver, or else of the last driver).
+		if (!PCurrentDriver || (*itComp)->isHuman())
+			PCurrentDriver = *itComp;
 
 	// Display the menu.
     GfuiScreenActivate(ScrHandle);
 }
 
-
-static void
-rmdsCleanup(void)
-{
-    VecCarCategoryIds.clear();
-    VecCarCategoryNames.clear();
-    VecDriverTypes.clear();
-    VecCurDriverPossSkins.clear();
-
-    TheRace.clear();
-}
 
 static void
 rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string& strType)
