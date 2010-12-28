@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <cstdlib>
 #include <sstream>
 #include <map>
 #include <algorithm>
@@ -238,16 +239,6 @@ bool GfRace::acceptsMoreCompetitors() const
 	return _pPrivate->vecCompetitors.size() < _pPrivate->nMaxCompetitors;
 }
 
-// GfDriver* GfRace::getCompetitor(const std::string& strId) const
-// {
-// 	std::map<std::string, GfDriver*>::const_iterator iterCompetitor =
-// 		_pPrivate->mapCompetitorsById.find(strId);
-// 	if (iterCompetitor != _pPrivate->mapCompetitorsById.end())
-// 		return iterCompetitor->second;
-	
-// 	return 0;
-// }
-
 GfDriver* GfRace::getCompetitor(const std::string& strModName, int nItfIndex) const
 {
 	const std::pair<std::string, int> compKey(strModName, nItfIndex);
@@ -309,6 +300,30 @@ bool GfRace::removeAllCompetitors()
 
 bool GfRace::shuffleCompetitors()
 {
-	// TODO.
+	// Get the number of competitors ('cause nothing to do if less than 2).
+	const unsigned nCompetitors = _pPrivate->vecCompetitors.size();
+	if (nCompetitors < 2)
+		return false; // Didn't change anything.
+
+	// Make a copy of the competitors vector, and clear it.
+	std::vector<GfDriver*> vecCompetitors = _pPrivate->vecCompetitors;
+	_pPrivate->vecCompetitors.clear();
+
+	// Pickup a random competitor from the old vector, and add it at the end o fthe new one.
+	for (unsigned nCount = 1; nCount < nCompetitors; nCount++)
+	{
+		// Get a random competitor index in the remaining list.
+		const unsigned nPickedCompInd = rand() % vecCompetitors.size();
+
+		// Put this competitor at the end of the new list.
+		_pPrivate->vecCompetitors.push_back(vecCompetitors[nPickedCompInd]);
+
+		// Remove it from the old list.
+		vecCompetitors.erase(vecCompetitors.begin() + nPickedCompInd);
+	}
+
+	// Put the last competitor at the end of the new list.
+	_pPrivate->vecCompetitors.push_back(vecCompetitors[0]);
+	
 	return true;
 }

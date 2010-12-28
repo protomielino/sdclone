@@ -104,7 +104,71 @@ static bool rmdsIsAnyCompetitorHighlighted();
 static void rmdsClickOnDriver(void * /* dummy */);
 
 
-static void rmdsReloadCompetitorsScrollList()
+static bool
+rmdsIsAnyCompetitorHighlighted()
+{
+	GfDriver *pDriver;
+
+    const char* name =
+		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollListId, (void**)&pDriver);
+
+	return name != 0;
+}
+
+static GfDriver*
+rmdsGetHighlightedDriver()
+{
+	GfDriver *pDriver;
+	
+	const char *name =
+		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollListId, (void**)&pDriver);
+    if (!name)
+		name = GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver);
+    if (!name)
+		pDriver = 0;
+
+	return pDriver;
+}
+
+static void
+rmdsHighlightDriver(const GfDriver* pDriver)
+{
+	if (!pDriver)
+		return;
+
+	// Search first in the competitors scroll-list.
+	GfDriver* pCompetitor;
+	int index = 0;
+	while (GfuiScrollListGetElement(ScrHandle, CompetitorsScrollListId, index, (void**)&pCompetitor))
+	{
+		if (pCompetitor == pDriver)
+		{
+			//GfLogDebug("Selecting competitor #%d '%s'\n", curDrvIndex, pCompetitor->getName().c_str());
+			GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId, index);
+			rmdsClickOnDriver(0);
+			return;
+		}
+		index++;
+	}
+	
+	// Then in the candidates scroll-list.
+	GfDriver* pCandidate;
+	index = 0;
+	while (GfuiScrollListGetElement(ScrHandle, CandidatesScrollListId, index, (void**)&pCandidate))
+	{
+		if (pCandidate == pDriver)
+		{
+			//GfLogDebug("Selecting candidate #%d '%s'\n", curDrvIndex, name);
+			GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, index);
+			rmdsClickOnDriver(0);
+			return;
+		}
+		index++;
+	}
+}
+
+static void
+rmdsReloadCompetitorsScrollList()
 {
 	GfuiScrollListClear(ScrHandle, CompetitorsScrollListId);
 
@@ -123,52 +187,8 @@ rmdsActivate(void * /* notused */)
 {
 	GfLogTrace("Entering Driver Select menu\n");
 
-	// Select the current driver in the relevant scroll-list
-	if (PPickedDriver)
-	{
-		GfDriver* pDriver;
-		const char* name;
-		int curDrvIndex = -1;
-		int index = 0;
-		while ((name = GfuiScrollListGetElement(ScrHandle, CompetitorsScrollListId,
-												index, (void**)&pDriver)))
-		{
-			if (pDriver == PPickedDriver)
-			{
-				curDrvIndex = index;
-				break;
-			}
-			index++;
-		}
-		if (curDrvIndex >= 0)
-		{
-			GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId, curDrvIndex);
-			GfLogDebug("Selecting competitor #%d '%s'\n", curDrvIndex, name);
-		}
-		else
-		{
-			curDrvIndex = -1;
-			index = 0;
-			while ((name = GfuiScrollListGetElement(ScrHandle, CandidatesScrollListId,
-													index, (void**)&pDriver)))
-			{
-				if (pDriver == PPickedDriver)
-				{
-					curDrvIndex = index;
-					break;
-				}
-				index++;
-			}
-			if (curDrvIndex >= 0)
-			{
-				GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, curDrvIndex);
-				GfLogDebug("Selecting candidate #%d '%s'\n", curDrvIndex, name);
-			}
-		}
-	}
-
 	// Update GUI : picked driver info, car preview.
-	rmdsClickOnDriver(NULL);
+	rmdsHighlightDriver(PPickedDriver);
 	
     // Initialize the driver type filter criteria to "any driver".
     CurDriverTypeIndex =
@@ -343,7 +363,7 @@ rmdsClickOnDriver(void * /* dummy */)
     // Update selected driver (if any) displayed infos.
     if (pDriver)
 	{
-		GfLogDebug("rmdsClickOnDriver: '%s'\n", pDriver->getName().c_str());
+		//GfLogDebug("rmdsClickOnDriver: '%s'\n", pDriver->getName().c_str());
 		
 		// The selected driver is the new picked one.
 		PPickedDriver = pDriver;
@@ -375,62 +395,6 @@ rmdsClickOnDriver(void * /* dummy */)
     }
 }
 
-static GfDriver*
-rmdsGetHighlightedDriver()
-{
-	GfDriver *pDriver;
-	
-	const char *name =
-		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollListId, (void**)&pDriver);
-    if (!name)
-		name = GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver);
-    if (!name)
-		pDriver = 0;
-
-	return pDriver;
-}
-
-static bool
-rmdsIsAnyCompetitorHighlighted()
-{
-	GfDriver *pDriver;
-
-    const char* name =
-		GfuiScrollListGetSelectedElement(ScrHandle, CompetitorsScrollListId, (void**)&pDriver);
-
-	return name != 0;
-}
-
-static void
-rmdsRemoveAllCompetitors(void * /* dummy */ )
-{
-	// TODO: Test.
-	TheRace.removeAllCompetitors();
-
-	GfuiScrollListClear(ScrHandle, CompetitorsScrollListId);
-
-    // Update selected driver displayed info
-    rmdsClickOnDriver(0);
-}
-
-static void
-rmdsSelectRandomCandidates(void * /* dummy */ )
-{
-	//TODO.
-}
-
-static void
-rmdsShuffleCompetitors(void * /* dummy */ )
-{
-	// TODO: Test.
-	TheRace.shuffleCompetitors();
-
-	rmdsReloadCompetitorsScrollList();
-
-    // Update selected driver displayed info
-    rmdsClickOnDriver(0);
-}
-
 static void
 rmdsSelectDeselectDriver(void * /* dummy */ )
 {
@@ -441,8 +405,8 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 
     // If the selected driver is in the Candidate scroll-list,
     // and if the max number of selected drivers has not been reached,
-    // remove the driver from the NotSelected scroll-list,
-	// and add him to the Selected scroll-list and to the race competitors.
+    // remove the driver from the Candidate scroll-list,
+	// and add him to the Competitors scroll-list and to the race competitors.
     sel = 0;
     name = 0;
     if (TheRace.acceptsMoreCompetitors()) {
@@ -514,14 +478,76 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 		}
     }
 
-    // Update selected driver displayed info
+    // Update selected driver displayed info.
     rmdsClickOnDriver(0);
 
-    // Don't allow user to Accept 0 drivers this would cause a crash
-    GfuiEnable(ScrHandle, NextButtonId,
-			   TheRace.getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
-    
+    // Don't allow user to Accept 0 drivers, this would cause a crash.
+    GfuiEnable(ScrHandle, NextButtonId, TheRace.getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+
+	// For a smart display refresh, when automatically called multiple time.
     GfuiDisplay();
+}
+
+static void
+rmdsRemoveAllCompetitors(void * /* dummy */ )
+{
+	// Take care that no candidate is selected (see why in rmdsSelectDeselectDriver).
+	GfuiScrollListClearSelection(ScrHandle, CandidatesScrollListId);
+	
+	// Deselect the first competitors until there's none left.
+	int nCompetitors;
+	while ((nCompetitors = GfuiScrollListGetNumberOfElements(ScrHandle, CompetitorsScrollListId)) > 0)
+	{
+		// Select the firstd element of the Competitors scroll-list.
+		GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId, 0);
+
+		// Do the normal deselection job (just as if the user had manually done it).
+		rmdsSelectDeselectDriver(0);
+	}
+}
+
+static void
+rmdsSelectRandomCandidates(void * /* dummy */ )
+{
+	// Max number of randomly selected candidates.
+	static const unsigned nRandomCompetitors = 5;
+
+	// Take care that no competitor is selected (see why in rmdsSelectDeselectDriver).
+	GfuiScrollListClearSelection(ScrHandle, CompetitorsScrollListId);
+	
+	// Select as many random candidates as possible.
+	unsigned nCount = 1;
+	int nCandidates;
+	while (nCount <= nRandomCompetitors
+		   && TheRace.acceptsMoreCompetitors()
+		   && (nCandidates = GfuiScrollListGetNumberOfElements(ScrHandle, CandidatesScrollListId)) > 0)
+	{
+		// Pick-up a random candidate from the candidate scroll-list.
+		const unsigned nPickedCandInd = rand() % nCandidates;
+
+		// Make it the selected element of the Candidate scroll-list.
+		GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, nPickedCandInd);
+
+		// Do the normal selection job (just as if the user had manually done it).
+		rmdsSelectDeselectDriver(0);
+		
+		// Next random candidate.
+		nCount++;
+	}
+}
+
+static void
+rmdsShuffleCompetitors(void * /* dummy */ )
+{
+	// Save currently highlighted driver.
+	const GfDriver* pDriver = rmdsGetHighlightedDriver();
+	
+	// Shuffle the race competitor list and reload the scroll-list.
+	TheRace.shuffleCompetitors();
+	rmdsReloadCompetitorsScrollList();
+
+    // Re-highlight the previously highlighted driver.
+	rmdsHighlightDriver(pDriver);
 }
 
 static void
@@ -532,7 +558,7 @@ rmdsAddKeys(void)
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, '-', "Move Up", (void*)-1, rmdsMoveCompetitor, NULL);
-    GfuiAddKey(ScrHandle, '+', "Move Down", (void*)1, rmdsMoveCompetitor, NULL);
+    GfuiAddKey(ScrHandle, '+', "Move Down", (void*)+1, rmdsMoveCompetitor, NULL);
     GfuiAddKey(ScrHandle, ' ', "Select/Deselect", NULL, rmdsSelectDeselectDriver, NULL);
 #ifdef FOCUS
     GfuiAddKey(ScrHandle, 'f', "Set Focus", NULL, rmdsSetFocus, NULL);
@@ -575,9 +601,9 @@ RmDriversSelect(void *vs)
 	
     SelectButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
     DeselectButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "deselectbutton", 0, rmdsSelectDeselectDriver);
-    //RemoveAllButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsRemoveAllCompetitors);
-    //SelectRandomButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsSelectRandomCandidates);
-    //ShuffleButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
+    RemoveAllButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsRemoveAllCompetitors);
+    SelectRandomButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "selectrandombutton", 0, rmdsSelectRandomCandidates);
+    ShuffleButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
 
     // Skin selection "combobox" (left arrow, label, right arrow)
     SkinLeftButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", (void*)-1, rmdsChangeSkin);
