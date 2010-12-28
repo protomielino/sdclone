@@ -733,7 +733,7 @@ GfuiRegisterKey(int key, const char *descr, void *userData,
 	GfuiAddKey(GfuiScreen, key, descr, userData, onKeyPressed, onKeyReleased);
 }
 
-/** Add a Keyboard shortcut to the screen (Wanring: no onKeyRelease support for special keys tgfclient::GFUIK_*).
+/** Add a Keyboard shortcut to the screen (Warning: no onKeyRelease support for special keys tgfclient::GFUIK_*).
     @ingroup	gui
     @param	scr		Target screen
     @param	key		Key code : the ASCII code when possible (for 'a', '_', '[' ...), or else the tgfclient::GFUIK_* value for special keys) ; Always in [0, GFUIK_MAX]
@@ -857,14 +857,31 @@ GfuiAddKey(void *scr, int key, const char *descr, void *userData,
 			break;
 	}
 
-	// Add the new key entry in the key list.
-	if (screen->userKeys == NULL) {
-		curKey->next = curKey;
+	// Add the new key entry in the key list if not already in,
+	// or else replace the previous definition.
+	if (!screen->userKeys) {
+		screen->userKeys = curKey->next = curKey;
 	} else {
-		curKey->next = screen->userKeys->next;
-		screen->userKeys->next = curKey;
+		// Search in the list for a definition for the same key.
+		tGfuiKey* curKey2 = screen->userKeys;
+		do {
+			// Found => replace with new one.
+			if (curKey2->next->key == key) {
+				curKey->next = curKey2->next->next;
+				free(curKey2->next);
+				curKey2->next = curKey;
+				break;
+			}
+			curKey2 = curKey2->next;
+		} while (curKey2 != screen->userKeys);
+
+		// Not found => add at the end of the list.
+		if (curKey2 == screen->userKeys) {
+			curKey->next = screen->userKeys->next;
+			screen->userKeys->next = curKey;
+			screen->userKeys = curKey;
+		}
 	}
-	screen->userKeys = curKey;
 }
 
 /** Enable/disable the key auto-repeat for the given screen.

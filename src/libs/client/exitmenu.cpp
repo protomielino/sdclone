@@ -27,8 +27,11 @@
 #include "mainmenu.h"
 
 
+static void *exitmenuHandle = NULL;
+static void *exitMainMenuHandle = NULL;
+
 static void 
-endofprog(void * /* dummy */)
+onAcceptExit(void * /* dummy */)
 {
     GfProfStopActiveProfiles();
     GfProfPrintReport();
@@ -36,11 +39,7 @@ endofprog(void * /* dummy */)
     exit(0);
 }
 
-static void *exitmenuHandle = NULL;
-static void *exitMainMenuHandle = NULL;
-
-
-void * exitMenuInit(void *prevMenu, void *menuHandle)
+void* exitMenuInit(void *prevMenu, void *menuHandle)
 {
     if (menuHandle) {
 		GfuiScreenRelease(menuHandle);
@@ -51,13 +50,14 @@ void * exitMenuInit(void *prevMenu, void *menuHandle)
     void *param = LoadMenuXML("exitmenu.xml");
 
     CreateStaticControls(param,menuHandle);
-    CreateButtonControl(menuHandle,param,"yesquit",NULL,endofprog);
-    CreateButtonControl(menuHandle,param,"nobacktogame",prevMenu,GfuiScreenActivate);
+    CreateButtonControl(menuHandle, param, "yesquit", NULL, onAcceptExit);
+    CreateButtonControl(menuHandle, param, "nobacktogame", prevMenu, GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
     
     GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddKey(menuHandle, GFUIK_ESCAPE, "No, Back to Game", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(menuHandle, GFUIK_RETURN, "Yes, quit the game", NULL, onAcceptExit, NULL);
+    GfuiAddKey(menuHandle, GFUIK_ESCAPE, "No, back to the game", prevMenu, GfuiScreenActivate, NULL);
 
     return menuHandle;
 }
@@ -78,14 +78,14 @@ void * exitMenuInit(void *prevMenu, void *menuHandle)
  * Remarks
  *	
  */
-void * ExitMenuInit(void *menu)
+void* ExitMenuInit(void *menu)
 {
 	exitmenuHandle = exitMenuInit(menu, exitmenuHandle);
 	return exitmenuHandle;
 }
 
 
-void * MainExitMenuInit(void *mainMenu)
+void* MainExitMenuInit(void *mainMenu)
 {
 	exitMainMenuHandle = exitMenuInit(mainMenu, exitMainMenuHandle);
 	return exitMainMenuHandle;
