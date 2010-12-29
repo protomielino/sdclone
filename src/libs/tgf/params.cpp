@@ -29,6 +29,7 @@
 #include <cerrno>
 #include <cmath>
 #include <sys/stat.h>
+#include <time.h>
 #ifdef WIN32
 #include <io.h>
 #include <windows.h>
@@ -716,7 +717,7 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 
 		if (!conf->name) 
 		{
-			GfLogTrace ("xmlStartElement: Syntax error, missing \"name\" field in params definition\n");
+			//GfLogTrace ("xmlStartElement: Syntax error, missing \"name\" field in params definition\n");
 			goto bailout;
 		}
 
@@ -1111,7 +1112,7 @@ GfParmReadBuf (char *buffer)
     /* Conf Header creation */
     conf = createParmHeader ("");
     if (!conf) {
-	GfLogError ("gfParmReadBuf: conf header creation failed\n");
+	GfLogError ("GfParmReadBuf: conf header creation failed\n");
 	goto bailout;
     }
 
@@ -1119,9 +1120,9 @@ GfParmReadBuf (char *buffer)
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
 #ifdef WIN32
-	GfLogError ("gfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
+	GfLogError ("GfParmReadBuf: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
 #else //WIN32
-	GfLogError ("gfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
+	GfLogError ("GfParmReadBuf: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
 #endif //WIN32
 	goto bailout;
     }
@@ -1133,13 +1134,13 @@ GfParmReadBuf (char *buffer)
 
     /* Parsers Initialization */
     if (parserXmlInit (parmHandle)) {
-	GfLogError ("gfParmReadBuf: parserInit failed\n");
+	GfLogError ("GfParmReadBuf: parserInit failed\n");
 	goto bailout;
     }
 
     /* Parameters reading in buffer */
     if (parseXml (parmHandle, buffer, strlen (buffer), 1)) {
-	GfLogError ("gfParmReadBuf: Parsing failed for buffer\n");
+	GfLogError ("GfParmReadBuf: Parsing failed for buffer\n");
 	goto bailout;
     }
 
@@ -1201,7 +1202,7 @@ GfParmReadFile (const char *file, int mode, bool neededFile)
     if (conf == NULL) {
 	conf = createParmHeader (file);
 	if (!conf) {
-	    GfLogError ("gfParmReadFile: conf header creation failed\n");
+	    GfLogError ("GfParmReadFile: conf header creation failed\n");
 	    goto bailout;
 	}
 	mode |= GFPARM_RMODE_REREAD;
@@ -1211,9 +1212,9 @@ GfParmReadFile (const char *file, int mode, bool neededFile)
     parmHandle = (struct parmHandle *) calloc (1, sizeof (struct parmHandle));
     if (!parmHandle) {
 #ifdef WIN32
-	GfLogError ("gfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
+	GfLogError ("GfParmReadFile: calloc (1, %03Iu) failed\n", sizeof (struct parmHandle));
 #else //WIN32
-	GfLogError ("gfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
+	GfLogError ("GfParmReadFile: calloc (1, %zu) failed\n", sizeof (struct parmHandle));
 #endif //WIN32
 	goto bailout;
     }
@@ -1237,7 +1238,7 @@ GfParmReadFile (const char *file, int mode, bool neededFile)
 	if (in) {
 	    /* Parsers Initialization */
 	    if (parserXmlInit (parmHandle)) {
-		GfLogError ("gfParmReadBuf: parserInit failed for file \"%s\"\n", file);
+		GfLogError ("GfParmReadBuf: parserInit failed for file \"%s\"\n", file);
 		goto bailout;
 	    }
 	    /* Parameters reading */
@@ -1245,12 +1246,12 @@ GfParmReadFile (const char *file, int mode, bool neededFile)
 		len = fread (buf, 1, sizeof(buf), in);
 		done = len < (int)sizeof(buf);
 		if (parseXml (parmHandle, buf, len, done)) {
-		    GfLogError ("gfParmReadFile: Parsing failed in file \"%s\"\n", file);
+		    GfLogError ("GfParmReadFile: Parsing failed in file \"%s\"\n", file);
 		    goto bailout;
 		}
 		if (parmHandle->flag & PARM_HANDLE_FLAG_PARSE_ERROR) {
 		    /* parse error occured, ignore */
-		    GfLogError ("gfParmReadFile: Parsing failed in file \"%s\"\n", file);
+		    GfLogError ("GfParmReadFile: Parsing failed in file \"%s\"\n", file);
 		    goto bailout;
 		}
 	    } while (!done);
@@ -1259,7 +1260,7 @@ GfParmReadFile (const char *file, int mode, bool neededFile)
 	    in = NULL;
 	}
 
-	GfLogTrace("Loaded %s (%p)\n", file, parmHandle);
+	//GfLogTrace("Loaded %s (%p)\n", file, parmHandle);
     }
 
     GF_TAILQ_INSERT_HEAD (&parmHandleList, parmHandle, linkHandle);
@@ -1517,12 +1518,12 @@ GfParmWriteBuf (void *handle, char *buf, int size)
     int			curSize;
     char		*s;
 
-    conf = parmHandle->conf;
-
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("gfParmWriteBuf: bad handle (%p)\n", parmHandle);
-	return 1;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogFatal ("GfParmWriteBuf: bad handle (%p)\n", parmHandle);
+		return 1;
     }
+
+    conf = parmHandle->conf;
 
     parmHandle->outCtrl.state = 0;
     parmHandle->outCtrl.curSection = NULL;
@@ -1590,21 +1591,22 @@ GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
 int
 GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 {
-    struct parmHandle	*handle = (struct parmHandle *)parmHandle;
-    struct parmHeader	*conf = handle->conf;
-    char		line[LINE_SZ];
-    FILE		*fout;
-
+    struct parmHandle *handle = (struct parmHandle *)parmHandle;
+    struct parmHeader *conf;
+    char line[LINE_SZ];
+    FILE *fout;
  
-    if (handle->magic != PARM_MAGIC) {
-	GfLogFatal ("gfParmWriteFile: bad handle (%p)\n", parmHandle);
-	return 1;
+    if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmWriteFile: bad handle (%p)\n", handle);
+		return 1;
     }
+
+    conf = handle->conf;
 
     if (!file) {
 	file = conf->filename;
 	if (!file) {
-	    GfLogError ("gfParmWriteFile: bad file name\n");
+	    GfLogError ("GfParmWriteFile: bad file name\n");
 	    return 1;
 	}
     }
@@ -1630,7 +1632,94 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 
     fclose (fout);
   
-    GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
+    //GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
+    
+    return 0;
+}
+
+/** Write a configuration file with SD Header as comment.
+    @ingroup	conf
+    @param	parmHandle	Configuration handle
+    @param	file		Name of the file to write (NULL if previously read file)
+    @param	name	Name of the parameters
+    @return	0 if OK
+    <br>1 if Error
+*/
+int
+GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name)
+{
+    struct parmHandle *handle = (struct parmHandle *)parmHandle;
+    struct parmHeader *conf;
+    char line[LINE_SZ];
+    FILE *fout;
+ 
+    if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmWriteFileSDHeader: bad handle (%p)\n", handle);
+		return 1;
+    }
+
+	conf = handle->conf;
+
+	//use local dir
+	char buf[255];
+	sprintf(buf, "%s%s", GetLocalDir(),file);
+    char* filepath = &buf[0];
+
+    if (!filepath) {
+	filepath = conf->filename;
+	if (!filepath) {
+	    GfLogError ("GfParmWriteFileSDHeader: bad file name\n");
+	    return 1;
+	}
+    }
+    
+    fout = safeFOpen(filepath, "wb");
+    if (!fout) {
+	GfLogError ("gfParmWriteFileSDHeader: fopen (%s, \"wb\") failed\n", filepath);
+	return 1;
+    }
+
+    if (name) {
+	FREEZ (conf->name);
+	conf->name = strdup (name);
+    }
+
+    handle->outCtrl.state = 0;
+    handle->outCtrl.curSection = NULL;
+    handle->outCtrl.curParam = NULL;
+
+	bool First = true;
+    while (xmlGetOuputLine (handle, line, sizeof (line))) 
+	{
+	  fputs (line, fout);
+      if (First)
+	  {
+		  First = false;
+  	      fputs ("<!--\n", fout);
+  	      fputs ("    file          : ", fout);
+		  strncpy(buf,file,strlen(file)-4);
+		  buf[strlen(file)-4] = 0;
+  	      fputs (buf, fout);
+  	      fputs ("\n    created       : ", fout);
+		  _strdate_s(buf,sizeof(buf));
+  	      fputs (buf, fout);
+  	      fputs ("\n    last modified : ", fout);
+		  _strdate_s(buf,sizeof(buf));
+  	      fputs (buf, fout);
+  	      fputs ("\n    copyright     : (C) 2010 Wolf-Dieter Beelitz\n", fout);
+  	      fputs ("\n", fout);
+  	      fputs ("    SVN version   : $Id$\n", fout);
+  	      fputs ("-->\n", fout);
+  	      fputs ("<!--    This program is free software; you can redistribute it and/or modify  -->\n", fout);
+  	      fputs ("<!--    it under the terms of the GNU General Public License as published by  -->\n", fout);
+  	      fputs ("<!--    the Free Software Foundation; either version 2 of the License, or     -->\n", fout);
+  	      fputs ("<!--    (at your option) any later version.                                   -->\n", fout);
+	  }
+    }    
+
+    fclose (fout);
+  
+    //GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
     
     return 0;
 }
@@ -1645,15 +1734,15 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 void
 GfParmRemove (void *parmHandle, char *sectionName, char *paramName)
 {
-    struct parmHandle	*handle = (struct parmHandle *)parmHandle;
-    struct parmHeader	*conf;
+    struct parmHandle *handle = (struct parmHandle *)parmHandle;
+    struct parmHeader *conf;
+
+	if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmRemove: bad handle (%p)\n", handle);
+		return;
+    }
 
     conf = handle->conf;
-
-    if (handle->magic != PARM_MAGIC) {
-	GfLogFatal ("gfParmRemove: bad handle (%p)\n", parmHandle);
-	return;
-    }
 
     removeParamByName (conf, sectionName, paramName);
 }
@@ -1683,12 +1772,12 @@ GfParmClean (void *parmHandle)
     struct parmHandle	*handle = (struct parmHandle *)parmHandle;
     struct parmHeader	*conf;
 
-    conf = handle->conf;
-
-    if (handle->magic != PARM_MAGIC) {
-	GfLogFatal ("gfParmClean: bad handle (%p)\n", parmHandle);
-	return;
+	if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmClean: bad handle (%p)\n", handle);
+		return;
     }
+
+    conf = handle->conf;
 
     parmClean (conf);
 }
@@ -1753,8 +1842,8 @@ void GfParmReleaseHandle (void *parmHandle)
 {
 	struct parmHandle *handle = (struct parmHandle *)parmHandle;
 
-	if (handle->magic != PARM_MAGIC) {
-		GfLogFatal ("gfParmReleaseHandle: bad handle (%p)\n", parmHandle);
+	if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmReleaseHandle: bad handle (%p)\n", handle);
 		return;
 	}
 
@@ -1948,15 +2037,14 @@ GfParmSI2Unit (const char *unit, tdble val)
 char *
 GfParmGetName (void *handle)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetName: bad handle (%p)\n", parmHandle);
-	return NULL;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetName: bad handle (%p)\n", parmHandle);
+		return NULL;
     }
 
-    return conf->name;
+    return parmHandle->conf->name;
 }
 
 /** Get the pararmeters name
@@ -1968,14 +2056,13 @@ int
 GfParmGetMajorVersion (void *handle)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetMajorVersion: bad handle (%p)\n", parmHandle);
-	return 0;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetMajorVersion: bad handle (%p)\n", parmHandle);
+		return 0;
     }
 
-    return conf->major;
+    return parmHandle->conf->major;
 }
 
 /** Get the pararmeters name
@@ -1986,15 +2073,14 @@ GfParmGetMajorVersion (void *handle)
 int
 GfParmGetMinorVersion (void *handle)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetMinorVersion: bad handle (%p)\n", parmHandle);
-	return 0;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetMinorVersion: bad handle (%p)\n", parmHandle);
+		return 0;
     }
 
-    return conf->minor;
+    return parmHandle->conf->minor;
 }
 
 
@@ -2007,14 +2093,13 @@ char *
 GfParmGetFileName (void *handle)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetFileName: bad handle (%p)\n", parmHandle);
-	return NULL;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetFileName: bad handle (%p)\n", parmHandle);
+		return NULL;
     }
 
-    return conf->filename;
+    return parmHandle->conf->filename;
 }
 
 
@@ -2027,15 +2112,17 @@ GfParmGetFileName (void *handle)
 int
 GfParmGetEltNb (void *handle, const char *path)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
-    int			count;
+    int	count;
     
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetEltNb: bad handle (%p)\n", parmHandle);
-	return 0;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetEltNb: bad handle (%p)\n", parmHandle);
+		return 0;
     }
+
+	conf = parmHandle->conf;
 
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if (!section) {
@@ -2066,15 +2153,16 @@ GfParmGetEltNb (void *handle, const char *path)
 int
 GfParmListSeekFirst (void *handle, const char *path)
 {
-
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
-    struct section	*section;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section *section;
     
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmListSeekFirst: bad handle (%p)\n", parmHandle);
-	return -1;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListSeekFirst: bad handle (%p)\n", parmHandle);
+		return -1;
     }
+
+	conf = parmHandle->conf;
 
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if (!section) {
@@ -2098,14 +2186,16 @@ GfParmListSeekFirst (void *handle, const char *path)
 int
 GfParmListSeekNext (void *handle, const char *path)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
-    struct section	*section;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section *section;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmListSeekNext: bad handle (%p)\n", parmHandle);
-	return -1;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListSeekNext: bad handle (%p)\n", parmHandle);
+		return -1;
     }
+
+	conf = parmHandle->conf;
 
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
@@ -2132,19 +2222,22 @@ GfParmListSeekNext (void *handle, const char *path)
 int
 GfParmListRemoveElt (void *handle, const char *path, const char *key)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
-    struct section	*listSection;
-    struct section	*section;
-    char		*fullName;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section *listSection;
+    struct section *section;
+    char *fullName;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmListRemoveElt: bad handle (%p)\n", parmHandle);
-	return -1;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListRemoveElt: bad handle (%p)\n", parmHandle);
+		return -1;
     }
+
+	conf = parmHandle->conf;
+
     listSection = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if (!listSection) {
-	GfLogTrace ("GfParmListRemoveElt: \"%s\" not found\n", path);
+	//GfLogTrace ("GfParmListRemoveElt: \"%s\" not found\n", path);
 	return -1;
     }
     fullName = (char *) malloc (strlen (path) + strlen (key) + 2);
@@ -2176,17 +2269,19 @@ GfParmListRemoveElt (void *handle, const char *path, const char *key)
 int
 GfParmListRenameElt (void *handle, const char *path, const char *oldKey, const char *newKey)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
-    struct section	*section;
-    struct param	*param;
-    char		*oldFullName;
-    char		*newFullName;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section *section;
+    struct param *param;
+    char *oldFullName;
+    char *newFullName;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmListRenameElt: bad handle (%p)\n", parmHandle);
-	return -1;
+    if ((parmHandle == NULL) ||(parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListRenameElt: bad handle (%p)\n", parmHandle);
+		return -1;
     }
+
+	conf = parmHandle->conf;
 
 	// Build new element full name.
     newFullName = (char *) malloc (strlen (path) + strlen (newKey) + 2);
@@ -2248,17 +2343,20 @@ int
 GfParmListClean (void *handle, const char *path)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHeader	*conf;
     struct section	*listSection;
     struct section	*section;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmListSeekNext: bad handle (%p)\n", parmHandle);
-	return -1;
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListSeekNext: bad handle (%p)\n", parmHandle);
+		return -1;
     }
+
+	conf = parmHandle->conf;
+
     listSection = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if (!listSection) {
-	GfLogTrace ("GfParmListClean: \"%s\" not found\n", path);
+	//GfLogTrace ("GfParmListClean: \"%s\" not found\n", path);
 	return -1;
     }
     while ((section = GF_TAILQ_FIRST (&(listSection->subSectionList))) != NULL) {
@@ -2282,14 +2380,16 @@ char *
 GfParmListGetCurEltName (void *handle, const char *path)
 {
 	struct parmHandle *parmHandle = (struct parmHandle *)handle;
-	struct parmHeader *conf = parmHandle->conf;
+	struct parmHeader *conf;
 	struct section *section;
 	char *s;
 
-	if (parmHandle->magic != PARM_MAGIC) {
-		GfLogFatal ("GfParmListGetCurEltName: bad handle (%p)\n", parmHandle);
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmListGetCurEltName: bad handle (%p)\n", parmHandle);
 		return NULL;
-	}
+    }
+
+	conf = parmHandle->conf;
 
 	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
 	if ((!section) || (!section->curSubSection)) {
@@ -2332,12 +2432,12 @@ GfParmGetStr (void *parmHandle, const char *path, const char *key, const char *d
 	char const *val;
 	char *ncval;
 
-	conf = handle->conf;
-
-	if (handle->magic != PARM_MAGIC) {
-		GfLogFatal ("gfParmGetStr: bad handle (%p)\n", parmHandle);
+	if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetStr: bad handle (%p)\n", parmHandle);
 		return deflt;
 	}
+
+	conf = handle->conf;
 
 	param = getParamByName (conf, path, key, 0);
 	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) {
@@ -2378,12 +2478,12 @@ GfParmGetStrNC (void *parmHandle, const char *path, const char *key, char *deflt
 	struct parmHeader *conf;
 	char *val;
 
-	conf = handle->conf;
-
-	if (handle->magic != PARM_MAGIC) {
-		GfLogFatal ("gfParmGetStr: bad handle (%p)\n", parmHandle);
+	if ((handle == NULL) || (handle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetStrNC: bad handle (%p)\n", parmHandle);
 		return deflt;
 	}
+
+	conf = handle->conf;
 
 	param = getParamByName (conf, path, key, 0);
 	if (!param || !(param->value) || !strlen (param->value) || (param->type != P_STR && param->type != P_FORM)) 
@@ -2418,17 +2518,20 @@ GfParmGetStrNC (void *parmHandle, const char *path, const char *key, char *deflt
 const char *
 GfParmGetCurStr (void *handle, const char *path, const char *key, const char *deflt)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+	struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
     char const *val;
     char *ncval;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetCurStr: bad handle (%p)\n", parmHandle);
-	return deflt;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetCurStr: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
+
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return deflt;
@@ -2465,16 +2568,19 @@ GfParmGetCurStr (void *handle, const char *path, const char *key, const char *de
 char *
 GfParmGetCurStrNC (void *handle, const char *path, const char *key, char *deflt)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
     char *val;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetCurStr: bad handle (%p)\n", parmHandle);
-	return deflt;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetCurStrNC: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+	
+	conf = parmHandle->conf;
+
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return deflt;
@@ -2510,10 +2616,17 @@ GfParmGetCurStrNC (void *handle, const char *path, const char *key, char *deflt)
 tdble
 GfParmGetNum (void *handle, char const *path, const char *key, const char *unit, tdble deflt)
 {
-	struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-	struct parmHeader	*conf = parmHandle->conf;
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+	struct parmHeader *conf;
 	struct param	*param;
         tdble                val;
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
 
 	if (parmHandle->magic != PARM_MAGIC) 
 	{
@@ -2557,17 +2670,20 @@ GfParmGetNum (void *handle, char const *path, const char *key, const char *unit,
 tdble
 GfParmGetCurNum (void *handle, const char *path, const char *key, const char *unit, tdble deflt)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
     tdble val;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
-	return deflt;
-    }
-    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
+		return deflt;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return deflt;
     }
@@ -2600,16 +2716,19 @@ GfParmGetCurNum (void *handle, const char *path, const char *key, const char *un
 int
 GfParmIsFormula (void *handle, char const *path, char const *key)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
-    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmIsFormula: bad handle (%p)\n", parmHandle);
+		return 1;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return -1;
     }
@@ -2632,16 +2751,19 @@ GfParmIsFormula (void *handle, char const *path, char const *key)
 char*
 GfParmGetFormula (void *handle, char const *path, char const *key)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
-	return NULL;
-    }
-    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetFormula: bad handle (%p)\n", parmHandle);
+		return NULL;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return NULL;
     }
@@ -2664,15 +2786,18 @@ GfParmGetFormula (void *handle, char const *path, char const *key)
 char*
 GfParmGetCurFormula (void *handle, char const *path, char const *key)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetCurNum: bad handle (%p)\n", parmHandle);
-	return NULL;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetCurFormula: bad handle (%p)\n", parmHandle);
+		return NULL;
+	}
+
+	conf = parmHandle->conf;
+
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return NULL;
@@ -2701,16 +2826,18 @@ GfParmGetCurFormula (void *handle, char const *path, char const *key)
 int
 GfParmSetStr(void *handle, const char *path, const char *key, const char *val)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmSetStr: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetStr: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
 
-    if (!val || !strlen (val)) {
+	conf = parmHandle->conf;
+
+	if (!val || !strlen (val)) {
 	/* Remove the entry */
 	removeParamByName (conf, path, key);
 	return 0;
@@ -2745,16 +2872,19 @@ GfParmSetStr(void *handle, const char *path, const char *key, const char *val)
 int
 GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmSetCurStr: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
-    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetCurStr: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return -1;
     }
@@ -2790,15 +2920,16 @@ GfParmSetCurStr(void *handle, const char *path, const char *key, const char *val
 int
 GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, tdble val)
 {
-	struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-	struct parmHeader	*conf = parmHandle->conf;
+	struct parmHandle *parmHandle = (struct parmHandle *)handle;
+	struct parmHeader *conf;
 	struct param	*param;
-	
-	if (parmHandle->magic != PARM_MAGIC) 
-	{
-		GfLogFatal ("GfParmSetNum: bad handle (%p)\n", parmHandle);
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetNum: bad handle (%p)\n", parmHandle);
 		return -1;
 	}
+
+	conf = parmHandle->conf;
 	
 	param = getParamByName (conf, path, key, PARAM_CREATE);
 	if (!param) 
@@ -2837,14 +2968,16 @@ GfParmSetNum(void *handle, const char *path, const char *key, const char *unit, 
 int
 GfParmSetNumEx(void *handle, char *path, char *key, char *unit, tdble val, tdble min, tdble max)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmSetNumEx: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetNumEx: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	conf = parmHandle->conf;
 
     param = getParamByName (conf, path, key, PARAM_CREATE);
     if (!param) {
@@ -2877,16 +3010,19 @@ GfParmSetNumEx(void *handle, char *path, char *key, char *unit, tdble val, tdble
 int
 GfParmSetCurNum(void *handle, const char *path, const char *key, const char *unit, tdble val)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmSetCurNum: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
-    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetCurNum: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return -1;
     }
@@ -2922,14 +3058,16 @@ GfParmSetCurNum(void *handle, const char *path, const char *key, const char *uni
 int
 GfParmSetFormula (void *handle, char const *path, char const *key, char const *val)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmSetFormula: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetFormula: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	conf = parmHandle->conf;
 
     if (!val || !strlen (val)) {
 	/* Remove the entry */
@@ -2967,16 +3105,19 @@ GfParmSetFormula (void *handle, char const *path, char const *key, char const *v
 int
 GfParmSetCurFormula(void *handle, char const *path, char const *key, char *val)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct section	*section;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmSetCurFormula: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
-    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetCurFormula: bad handle (%p)\n", parmHandle);
+		return -1;
+	}
+
+	conf = parmHandle->conf;
+
+	section = (struct section *)GfHashGetStr (conf->sectionHash, path);
     if ((!section) || (!section->curSubSection)) {
 	return -1;
     }
@@ -3000,8 +3141,8 @@ GfParmSetCurFormula(void *handle, char const *path, char const *key, char *val)
 
 tdble GfParmGetVariable(void *handle, char const *path, char const *key)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     char *pathdup = (char*)malloc( strlen( path ) + strlen( key ) + 3 );
     char *str;
     tdble *val;
@@ -3009,10 +3150,12 @@ tdble GfParmGetVariable(void *handle, char const *path, char const *key)
     if( pathdup[ 0 ] == '/' )
     	memmove( pathdup, pathdup + sizeof( char ), sizeof( char ) * strlen( pathdup ) );
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
-	return 0.0f;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetVariable: bad handle (%p)\n", parmHandle);
+   	    return 0.0f;
+	}
+
+	conf = parmHandle->conf;
 
     do {
         strcat( pathdup, "/" );
@@ -3043,7 +3186,7 @@ tdble GfParmGetVariable(void *handle, char const *path, char const *key)
 void GfParmRemoveVariable(void *handle, char const *path, char const *key)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHeader	*conf;
     char *pathdup = (char*)malloc( strlen( path ) + strlen( key ) + 3 );
     void *val;
 
@@ -3054,10 +3197,12 @@ void GfParmRemoveVariable(void *handle, char const *path, char const *key)
         strcat( pathdup, "/" );
     strcat( pathdup, key );
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
-	return;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmRemoveVariable: bad handle (%p)\n", parmHandle);
+   	    return;
+	}
+
+	conf = parmHandle->conf;
  
     val = GfHashGetStr(conf->variableHash, pathdup);
     GfHashRemStr(conf->variableHash, pathdup);
@@ -3069,8 +3214,8 @@ void GfParmRemoveVariable(void *handle, char const *path, char const *key)
 
 void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     char *pathdup = (char*)malloc( strlen( path ) + strlen( key ) + 3 );
 
     tdble *val_ptr;
@@ -3081,10 +3226,12 @@ void GfParmSetVariable(void *handle, char const *path, char const *key, tdble va
         strcat( pathdup, "/" );
     strcat( pathdup, key );
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetNum: bad handle (%p)\n", parmHandle);
-	return;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmSetVariable: bad handle (%p)\n", parmHandle);
+   	    return;
+	}
+
+	conf = parmHandle->conf;
  
     val_ptr = (tdble*)malloc( sizeof(tdble) );
     *val_ptr = val;
@@ -3107,8 +3254,8 @@ GfParmCheckHandle(void *ref, void *tgt)
 {
     struct parmHandle	*parmHandleRef = (struct parmHandle *)ref;
     struct parmHandle	*parmHandle = (struct parmHandle *)tgt;
-    struct parmHeader	*confRef = parmHandleRef->conf;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHeader	*confRef;
+    struct parmHeader	*conf;
     struct section	*curSectionRef;
     struct section	*nextSectionRef;
     struct param	*curParamRef;
@@ -3117,10 +3264,18 @@ GfParmCheckHandle(void *ref, void *tgt)
     int			found;
     int			error = 0;
 
-    if ((parmHandleRef->magic != PARM_MAGIC) || (parmHandle->magic != PARM_MAGIC)) {
-	GfLogFatal ("GfParmCheckHandle: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmCheckHandle: bad handle (%p)\n", parmHandle);
+   	    return -1;
+	}
+
+	if ((parmHandleRef == NULL) || (parmHandleRef->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmCheckHandle: bad handle (%p)\n", parmHandleRef);
+   	    return -1;
+	}
+
+	conf = parmHandle->conf;
+	confRef = parmHandleRef->conf;
 
     /* Traverse all the reference tree */
     curSectionRef = GF_TAILQ_FIRST (&(confRef->rootSection->subSectionList));
@@ -3178,12 +3333,29 @@ GfParmCheckHandle(void *ref, void *tgt)
 static void
 insertParamMerge (struct parmHandle *parmHandle, char *path, struct param *paramRef, struct param *param)
 {
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHeader *conf;
     struct param	*paramNew;
     struct within	*withinRef;
     struct within	*within;
     tdble		num;
     char		*str;
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("insertParamMerge: bad handle (%p)\n", parmHandle);
+   	    return;
+	}
+
+	if (paramRef == NULL) {
+		GfLogError ("insertParamMerge: bad handle (%p)\n", paramRef);
+   	    return;
+	}
+
+	if (param == NULL) {
+		GfLogError ("insertParamMerge: bad handle (%p)\n", param);
+   	    return;
+	}
+
+	conf = parmHandle->conf;
  
     paramNew = getParamByName (conf, path, param->name, PARAM_CREATE);
     if (!paramNew) {
@@ -3249,9 +3421,21 @@ insertParamMerge (struct parmHandle *parmHandle, char *path, struct param *param
 static void
 insertParam (struct parmHandle *parmHandle, char *path, struct param *param)
 {
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHeader *conf;
     struct param	*paramNew;
     struct within	*within;
+
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("insertParam: bad handle (%p)\n", parmHandle);
+   	    return;
+	}
+
+	if (param == NULL) {
+		GfLogError ("insertParam: bad handle (%p)\n", param);
+   	    return;
+	}
+
+	conf = parmHandle->conf;
 
     paramNew = getParamByName (conf, path, param->name, PARAM_CREATE);
     if (!paramNew) {
@@ -3297,8 +3481,8 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     struct parmHandle	*parmHandleRef = (struct parmHandle *)ref;
     struct parmHandle	*parmHandleTgt = (struct parmHandle *)tgt;
     struct parmHandle	*parmHandleOut;
-    struct parmHeader	*confRef = parmHandleRef->conf;
-    struct parmHeader	*confTgt = parmHandleTgt->conf;
+    struct parmHeader	*confRef;
+    struct parmHeader	*confTgt;
     struct parmHeader	*confOut;
     struct section	*curSectionRef;
     struct section	*nextSectionRef;
@@ -3307,16 +3491,20 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     struct param	*curParamRef;
     struct param	*curParamTgt;
 
-    GfLogTrace ("Merging \"%s\" and \"%s\" (%s - %s)\n", confRef->filename, confTgt->filename, ((mode & GFPARM_MMODE_SRC) ? "SRC" : ""), ((mode & GFPARM_MMODE_DST) ? "DST" : ""));
+    //GfLogTrace ("Merging \"%s\" and \"%s\" (%s - %s)\n", confRef->filename, confTgt->filename, ((mode & GFPARM_MMODE_SRC) ? "SRC" : ""), ((mode & GFPARM_MMODE_DST) ? "DST" : ""));
 
-    if (parmHandleRef->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmMergeHandles: bad handle (%p)\n", parmHandleRef);
-	return NULL;
-    }
-    if (parmHandleTgt->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmMergeHandles: bad handle (%p)\n", parmHandleTgt);
-	return NULL;
-    }
+	if ((parmHandleRef == NULL) || (parmHandleRef->magic != PARM_MAGIC)) {
+		GfLogError ("insertParam: bad handle (%p)\n", parmHandleRef);
+   	    return NULL;
+	}
+
+	if ((parmHandleTgt == NULL) || (parmHandleTgt->magic != PARM_MAGIC)) {
+		GfLogError ("insertParam: bad handle (%p)\n", parmHandleTgt);
+   	    return NULL;
+	}
+
+    confRef = parmHandleRef->conf;
+    confTgt = parmHandleTgt->conf;
 
         /* Conf Header creation */
     confOut = createParmHeader ("");
@@ -3436,15 +3624,17 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
 int
 GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max)
 {
-    struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf = parmHandle->conf;
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
     struct param	*param;
 
-    if (parmHandle->magic != PARM_MAGIC) {
-	GfLogFatal ("GfParmGetNumBoundaries: bad handle (%p)\n", parmHandle);
-	return -1;
-    }
+	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmGetNumBoundaries: bad handle (%p)\n", parmHandle);
+   	    return -1;
+	}
 
+    conf = parmHandle->conf;
+    
     param = getParamByName (conf, path, key, 0);
     if (!param || (param->type != P_NUM)) {
 	return -1;
@@ -3523,3 +3713,4 @@ safeFOpen(const char *fileName, const char *mode)
     free(mname);
     return fopen(fileName, mode);
 }//safeFOpen
+
