@@ -28,8 +28,8 @@
 #include <cstring>
 #include <cerrno>
 #include <cmath>
+#include <ctime>
 #include <sys/stat.h>
-#include <time.h>
 #ifdef WIN32
 #include <io.h>
 #include <windows.h>
@@ -1695,17 +1695,27 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name)
       if (First)
 	  {
 		  First = false;
+
+		  char time_buf[255];
+#ifdef WIN32
+		  _strdate_s(time_buf, sizeof(time_buf));
+#else
+		  time_t rawtime;
+		  struct tm *timeinfo;
+		  time( &rawtime );
+		  timeinfo = localtime( &rawtime );
+		  strftime(time_buf, sizeof(time_buf), "%Y-%m-%d %X", timeinfo);
+#endif  //WIN32
+
   	      fputs ("<!--\n", fout);
   	      fputs ("    file          : ", fout);
 		  strncpy(buf,file,strlen(file)-4);
 		  buf[strlen(file)-4] = 0;
   	      fputs (buf, fout);
   	      fputs ("\n    created       : ", fout);
-		  _strdate_s(buf,sizeof(buf));
-  	      fputs (buf, fout);
+		  fputs (time_buf, fout);
   	      fputs ("\n    last modified : ", fout);
-		  _strdate_s(buf,sizeof(buf));
-  	      fputs (buf, fout);
+		  fputs (time_buf, fout);
   	      fputs ("\n    copyright     : (C) 2010 Wolf-Dieter Beelitz\n", fout);
   	      fputs ("\n", fout);
   	      fputs ("    SVN version   : $Id$\n", fout);
