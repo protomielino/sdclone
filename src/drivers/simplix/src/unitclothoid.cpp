@@ -9,7 +9,7 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.10.16
+// Last changed : 2010.11.21
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -702,7 +702,7 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 
   int Version;
   fread(&Version,sizeof(int),1,F);
-  if (Version < 113)
+  if (Version < RL_VERSION)
   {
     fclose(F);
     return false;
@@ -742,7 +742,7 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int K = 0;
   fwrite(&K,sizeof(int),1,F);
 
-  int Version = 113;
+  int Version = RL_VERSION;
   fwrite(&Version,sizeof(int),1,F);
 
   int Weather = GetWeather();

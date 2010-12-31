@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     file          : drivers/simplix_ls1/ls1-zentek-z7r/espie
-    created       : 11/07/10
-    last modified : 11/07/10
+    created       : 11/19/10
+    last modified : 11/19/10
     copyright     : (C) 2010 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
@@ -20,48 +20,59 @@
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="22.9"/>
+    <attnum name="angle" unit="deg" val="18.7"/>
   </section>
 
   <section name="Rear Differential">
     <attstr name="type" in="LIMITED SLIP" val="LIMITED SLIP"/>
-    <attnum name="ratio" val="4.18"/>
+    <attnum name="ratio" val="4.13"/>
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.49"/>
-    <attnum name="max pressure" unit="kPa" val="44700"/>
+    <attnum name="front-rear brake repartition" val="0.68"/>
+    <attnum name="max pressure" unit="kPa" val="46200"/>
+  </section>
+
+  <section name="Front Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="1800"/>
+  </section>
+
+  <section name="Rear Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="1311"/>
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="1.13"/>
+    <attnum name="bellcrank" val="1.31"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="1.13"/>
+    <attnum name="bellcrank" val="1.31"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.345"/>
+    <attnum name="bellcrank" val="1.645"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.345"/>
+    <attnum name="bellcrank" val="1.645"/>
   </section>
 
   <section name="simplix private">
     <attnum name="pit test stop" min="0" max="1" val="0"/>
-    <attnum name="qualification" min="0" max="1" val="0"/>
+    <attnum name="qualification" val="0"/>
     <attnum name="reserve" min="0" max="20000" unit="m" val="2000"/>
     <attnum name="start fuel" min="-1" max="60" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
-    <attnum name="lookaheadfactor" min="0" max="0.5" val="0.05"/>
-    <attnum name="scale brake" val="0.95"/>
-    <attnum name="scale mu" val="1.12"/>
+    <attnum name="lookaheadfactor" val="0.15"/>
+    <attnum name="scale bump" val="0.215"/>
+    <attnum name="scale bump outer" val="0.3225"/>
+    <attnum name="scale brake" val="0.9"/>
+    <attnum name="scale mu" val="1.22"/>
     <attnum name="scale brake rain" min="0" max="1" val="1"/>
     <attnum name="scale mu rain" min="0" max="5" val="1"/>
-    <attnum name="qualy brake" val="1"/>
-    <attnum name="qualy mu" val="1.17"/>
+    <attnum name="qualy brake" val="0.97"/>
+    <attnum name="qualy mu" val="1.35"/>
   </section>
 
 </params>
+

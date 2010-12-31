@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     file          : drivers/simplix_ls1/ls1-cavallo-570s1/brondehach
-    created       : 11/16/10
-    last modified : 11/16/10
+    created       : 11/22/10
+    last modified : 11/22/10
     copyright     : (C) 2010 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
@@ -20,40 +20,40 @@
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="22.9"/>
+    <attnum name="angle" unit="deg" val="22.7"/>
   </section>
 
   <section name="Rear Differential">
-    <attnum name="ratio" val="4.31"/>
+    <attnum name="ratio" val="4.59"/>
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.69"/>
+    <attnum name="front-rear brake repartition" val="0.7"/>
     <attnum name="max pressure" unit="kPa" val="45800"/>
   </section>
 
   <section name="Front Anti-Roll Bar">
-    <attnum name="spring" unit="lbs/in" val="2410"/>
+    <attnum name="spring" unit="lbs/in" val="2090"/>
   </section>
 
   <section name="Rear Anti-Roll Bar">
-    <attnum name="spring" unit="lbs/in" val="1571"/>
+    <attnum name="spring" unit="lbs/in" val="1650"/>
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="1.09"/>
+    <attnum name="bellcrank" val="0.99"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="1.09"/>
+    <attnum name="bellcrank" val="0.99"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.43"/>
+    <attnum name="bellcrank" val="1.36"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.43"/>
+    <attnum name="bellcrank" val="1.36"/>
   </section>
 
   <section name="simplix private">
@@ -62,13 +62,13 @@
     <attnum name="reserve" min="0" max="20000" unit="m" val="2000"/>
     <attnum name="start fuel" min="-1" max="60" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
-    <attnum name="lookaheadfactor" val="0.2"/>
-    <attnum name="scale bump" val="0.322"/>
-    <attnum name="scale bump outer" val="0.483"/>
-    <attnum name="scale brake" val="0.94"/>
-    <attnum name="scale mu" val="1.15"/>
-    <attnum name="qualy brake" val="1.25"/>
-    <attnum name="qualy mu" val="1.38"/>
+    <attnum name="lookaheadfactor" val="0.16"/>
+    <attnum name="scale bump" val="0.348"/>
+    <attnum name="scale bump outer" val="0.522"/>
+    <attnum name="scale brake" val="1.07"/>
+    <attnum name="scale mu" val="1.22"/>
+    <attnum name="qualy brake" val="1.09"/>
+    <attnum name="qualy mu" val="1.47"/>
   </section>
 
 </params>

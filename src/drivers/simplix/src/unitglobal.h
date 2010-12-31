@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2010.10.22
+// Last changed : 2010.11.21
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -56,9 +56,9 @@
 #endif                   // ... who needs windows and gates?   
 // ... but the answer is just 42!
 
-//#include <portability.h> // could be used now without vc++ 2005 warnings ...
+#include <portability.h> // could be used now without vc++ 2005 warnings ...
 //... BUT will not work with vc++2008!!!
-
+/*
 // VC++ 2005 or newer ...
 #if defined(_CRT_SECURE_NO_DEPRECATE) // used with vc++ 2005
 #undef snprintf 
@@ -71,11 +71,12 @@
 #undef snprintf 
 #define snprintf _snprintf 
 #endif
-
+*/
 #if defined(WIN32) && !defined(fopen_s)
 #undef mysecure
 #endif
 // ... VC++ 6.0
+
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -88,6 +89,13 @@
 #include <track.h>   // TORCS
 #include <car.h>     // TORCS
 #include <raceman.h> // TORCS
+
+//==========================================================================*
+// Racing line version marker 
+// (Increment if racinglines needs to be recalculated)
+//--------------------------------------------------------------------------*
+#define RL_VERSION 114
+//==========================================================================*
 
 //==========================================================================*
 // Global constants, to be changed for different wdbee-bots

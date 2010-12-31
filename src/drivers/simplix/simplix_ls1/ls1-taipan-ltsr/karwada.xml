@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     file          : drivers/simplix_ls1/ls1-taipan-ltsr/karwada
-    created       : 11/09/10
-    last modified : 11/09/10
+    created       : 11/21/10
+    last modified : 11/21/10
     copyright     : (C) 2010 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
@@ -20,47 +20,58 @@
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="20.8"/>
+    <attnum name="angle" unit="deg" val="24"/>
   </section>
 
   <section name="Rear Differential">
-    <attnum name="ratio" val="3.29"/>
+    <attnum name="ratio" val="3.52"/>
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.59"/>
+    <attnum name="front-rear brake repartition" val="0.68"/>
     <attnum name="max pressure" unit="kPa" val="46100"/>
   </section>
 
+  <section name="Front Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="200"/>
+  </section>
+
+  <section name="Rear Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="351"/>
+  </section>
+
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="0.83"/>
+    <attnum name="bellcrank" val="0.92"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="0.83"/>
+    <attnum name="bellcrank" val="0.92"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.26"/>
+    <attnum name="bellcrank" val="1.33"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.26"/>
+    <attnum name="bellcrank" val="1.33"/>
   </section>
 
   <section name="simplix private">
     <attnum name="pit test stop" min="0" max="1" val="0"/>
-    <attnum name="qualification" min="0" max="1" val="0"/>
+    <attnum name="qualification" val="0"/>
     <attnum name="reserve" min="0" max="20000" unit="m" val="2000"/>
     <attnum name="start fuel" min="-1" max="60" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
-    <attnum name="lookaheadfactor" min="0" max="0.5" val="0.05"/>
-    <attnum name="scale brake" val="1.32"/>
-    <attnum name="scale mu" val="1.18"/>
+    <attnum name="lookaheadfactor" val="0.2"/>
+    <attnum name="scale bump" val="0.2"/>
+    <attnum name="scale bump outer" val="0.3"/>
+    <attnum name="scale brake" val="1.0"/>
+    <attnum name="scale mu" val="1.22"/>
     <attnum name="scale brake rain" min="0" max="1" val="1"/>
     <attnum name="scale mu rain" min="0" max="5" val="1"/>
-    <attnum name="qualy brake" val="1.37"/>
-    <attnum name="qualy mu" val="1.23"/>
+    <attnum name="qualy brake" val="1.0"/>
+    <attnum name="qualy mu" val="1.22"/>
   </section>
 
 </params>
+

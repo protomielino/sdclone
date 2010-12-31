@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     file          : drivers/simplix_ls1/ls1-vulture-v6r/goldstone-sand
-    created       : 11/07/10
-    last modified : 11/07/10
+    created       : 11/20/10
+    last modified : 11/20/10
     copyright     : (C) 2010 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
@@ -24,43 +24,53 @@
   </section>
 
   <section name="Rear Differential">
-    <attnum name="ratio" val="3.65"/>
+    <attnum name="ratio" val="3.9"/>
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.54"/>
-    <attnum name="max pressure" unit="kPa" val="46000"/>
+    <attnum name="front-rear brake repartition" val="0.47"/>
+    <attnum name="max pressure" unit="kPa" val="48100"/>
+  </section>
+
+  <section name="Front Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="2500"/>
+  </section>
+
+  <section name="Rear Anti-Roll Bar">
+    <attnum name="spring" unit="lbs/in" val="691"/>
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="0.98"/>
+    <attnum name="bellcrank" val="0.99"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="0.98"/>
+    <attnum name="bellcrank" val="0.99"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.59"/>
+    <attnum name="bellcrank" val="1.79"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.59"/>
+    <attnum name="bellcrank" val="1.79"/>
   </section>
 
   <section name="simplix private">
     <attnum name="pit test stop" min="0" max="1" val="0"/>
-    <attnum name="qualification" min="0" max="1" val="0"/>
+    <attnum name="qualification" val="0"/>
     <attnum name="reserve" min="0" max="20000" unit="m" val="2000"/>
     <attnum name="start fuel" min="-1" max="60" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="80"/>
-    <attnum name="lookaheadfactor" min="0" max="0.5" val="0.05"/>
-    <attnum name="scale brake" val="1.11"/>
-    <attnum name="scale mu" val="1.38"/>
+    <attnum name="lookaheadfactor" val="0.17"/>
+    <attnum name="scale bump" val="0.222"/>
+    <attnum name="scale bump outer" val="0.333"/>
+    <attnum name="scale brake" val="1.0"/>
+    <attnum name="scale mu" val="1.4"/>
     <attnum name="scale brake rain" min="0" max="1" val="1"/>
     <attnum name="scale mu rain" min="0" max="5" val="1"/>
-    <attnum name="qualy brake" val="1.16"/>
-    <attnum name="qualy mu" val="1.43"/>
+    <attnum name="qualy brake" val="1.0"/>
+    <attnum name="qualy mu" val="1.5"/>
   </section>
-
 </params>
+
