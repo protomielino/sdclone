@@ -299,7 +299,7 @@ TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...)
 			if (nLevel >= gfLogFatal && nLevel <= gfLogDebug)
 				fprintf(gfLogStream, "%s %.7s ", gfLogLevelNames[nLevel], pszClock);
 			else
-				fprintf(gfLogStream, "%s Level%d ", nLevel, pszClock);
+				fprintf(gfLogStream, "%s Level%d ", pszClock, nLevel);
 			free(pszClock);
 		}
 		va_list vaArgs;
