@@ -1642,11 +1642,12 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
     @param	parmHandle	Configuration handle
     @param	file		Name of the file to write (NULL if previously read file)
     @param	name	Name of the parameters
+    @param	author	Name for copyright
     @return	0 if OK
     <br>1 if Error
 */
 int
-GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name)
+GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, const char *author)
 {
     struct parmHandle *handle = (struct parmHandle *)parmHandle;
     struct parmHeader *conf;
@@ -1716,9 +1717,11 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name)
 		  fputs (time_buf, fout);
   	      fputs ("\n    last modified : ", fout);
 		  fputs (time_buf, fout);
-  	      fputs ("\n    copyright     : (C) 2010 Wolf-Dieter Beelitz\n", fout);
+		  snprintf(buf,sizeof(buf),"\n    copyright     : (C) 2010 %s\n",author);
+  	      fputs (buf, fout);
   	      fputs ("\n", fout);
-  	      fputs ("    SVN version   : $Id$\n", fout);
+		  snprintf(buf,sizeof(buf),"    SVN version   : $%s$\n","Id:"); // Written in a way that is not replaced here
+  	      fputs (buf, fout);
   	      fputs ("-->\n", fout);
   	      fputs ("<!--    This program is free software; you can redistribute it and/or modify  -->\n", fout);
   	      fputs ("<!--    it under the terms of the GNU General Public License as published by  -->\n", fout);

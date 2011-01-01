@@ -304,6 +304,7 @@ TGF_API void *GfParmReadFile(const char *file, int mode, bool neededFile = true)
 /* parameter file write */
 TGF_API int GfParmWriteFileLocal(const char *file, void* handle, const char *name);
 TGF_API int GfParmWriteFile(const char *file, void* handle, const char *name);
+TGF_API int GfParmWriteFileSDHeader(const char *file, void* handle, const char *name, const char *author);
 
 TGF_API char *GfParmGetName(void *handle);
 TGF_API char *GfParmGetFileName(void *handle);
