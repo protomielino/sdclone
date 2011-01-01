@@ -152,9 +152,9 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 
 	        if (strncmp(DriverName,undefined,strlen(undefined)) != 0)
 			{   // This driver is defined in robot's xml-file
-				snprintf( &DriverNames[i*DRIVERLEN], DRIVERLEN-1, DriverName );
+				strncpy( &DriverNames[i*DRIVERLEN], DriverName, DRIVERLEN-1);
 			    const char *DriverDesc = GfParmGetStr( RobotSettings, Section, (char *) ROB_ATTR_DESC, defaultBotDesc[i]);
-				snprintf( &DriverDescs[i*DRIVERLEN], DRIVERLEN-1, DriverDesc );
+				strncpy( &DriverDescs[i*DRIVERLEN], DriverDesc, DRIVERLEN-1);
 				NBBOTS = i + 1;
 			}
 		}
@@ -228,10 +228,10 @@ extern "C" int usr_trb1(tModInfo *modInfo)
     {
 	  const char *DriverName = GfParmGetStr( RobotSettings, 
 		  Section, (char *) ROB_ATTR_NAME, defaultBotName[I]);
-	  snprintf(&DriverNames[I*DRIVERLEN], DRIVERLEN-1, DriverName);
+	  strncpy(&DriverNames[I*DRIVERLEN], DriverName, DRIVERLEN-1);
       const char *DriverDesc = GfParmGetStr( RobotSettings, 
 		  Section, (char *) ROB_ATTR_DESC, defaultBotDesc[I]);
-	  snprintf(&DriverDescs[I*DRIVERLEN], DRIVERLEN-1, DriverDesc);
+	  strncpy(&DriverDescs[I*DRIVERLEN], DriverDesc, DRIVERLEN-1);
     }
   }
   return moduleInitialize(modInfo);
