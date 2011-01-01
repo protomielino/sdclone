@@ -625,11 +625,11 @@ char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 	const int f = (int)floor(sec * mult);
 
 	if (h || zeros) {
-		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%0.*d", sign, h, m, s, prec, f);
+		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%.*d", sign, h, m, s, prec, f);
 	} else if (m) {
-		(void)sprintf(buf, "   %s%2.2d:%2.2d.%0.*d", sign, m, s, prec, f);
+		(void)sprintf(buf, "   %s%2.2d:%2.2d.%.*d", sign, m, s, prec, f);
 	} else {
-		(void)sprintf(buf, "      %s%2.2d.%0.*d", sign, s, prec, f);
+		(void)sprintf(buf, "      %s%2.2d.%.*d", sign, s, prec, f);
 	}
 	return buf;
 }
