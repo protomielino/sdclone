@@ -7,40 +7,28 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     usr_trb1
                     )
 
-# Work-in-progress / unofficial simplix interface.
-IF(NOT OPTION_OFFICIAL_ONLY)
-    SET(ROBOT_INTERFACE ${ROBOT_INTERFACE} usr_mpa1)
-ENDIF()
-
 SET(ROBOT_SOURCES
-  ${ROBOT_NAME}.cpp
-  cardata.h
-  cardata.cpp
-  driver.h
-  driver.cpp
-  linalg.h
-  mod.h
-  opponent.h
-  opponent.cpp
-  pit.h
-  pit.cpp
-  raceline.h
-  raceline.cpp
-  spline.h
-  spline.cpp
-  strategy.h
-  strategy.cpp
-  xmldefs.h)
+  src/usr.cpp
+  src/cardata.h
+  src/cardata.cpp
+  src/driver.h
+  src/driver.cpp
+  src/linalg.h
+  src/mod.h
+  src/opponent.h
+  src/opponent.cpp
+  src/pit.h
+  src/pit.cpp
+  src/raceline.h
+  src/raceline.cpp
+  src/spline.h
+  src/spline.cpp
+  src/strategy.h
+  src/strategy.cpp
+  src/xmldefs.h)
 
 # Official-only USR instances.
 SET(ROBOT_CLONES usr_trb1)
-
-IF(NOT OPTION_OFFICIAL_ONLY)
-
-  # Work-in-progress / unofficial USR instances.
-    SET(ROBOT_CLONES ${ROBOT_CLONES} usr_mpa1)
-
-ENDIF()
 
 ROBOT_MODULE(NAME ${ROBOT_NAME}
               INTERFACE ${ROBOT_INTERFACE} 
@@ -48,6 +36,15 @@ ROBOT_MODULE(NAME ${ROBOT_NAME}
               CLONENAMES ${ROBOT_CLONES})
 
 # The data associated to the USR robot module and its clones.
+# USR
+SET(ROBOT_SUBDIRS 1
+                  tracks)
+
+ROBOT_DATA(NAME ${ROBOT_NAME} PREFIX src
+           #FILES README
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+
+
 # USR_TRB1
 SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
                   trb1-boxer-trbrs trb1-cavallo-360rb trb1-sector-rb1
@@ -55,7 +52,6 @@ SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
                   trb1-zaxxon-rb
                   tracks)
 
-ROBOT_DATA(NAME usr_trb1 PREFIX usr_trb1 
+ROBOT_DATA(NAME usr_trb1 PREFIX usr_trb1
            FILES usr_trb1.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
-
