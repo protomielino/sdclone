@@ -222,12 +222,12 @@ rmtsUpdateTrackInfo(void)
     // 2) Authors
     GfuiLabelSetText(ScrHandle, AuthorLabelId, PCurTrack->getAuthors().c_str());
 
-    // 3) Length.
+    // 3) Width.
 	std::ostringstream ossData;
-	ossData << std::setprecision(0) << PCurTrack->getWidth() << " m";
+	ossData << std::fixed << std::setprecision(0) << PCurTrack->getWidth() << " m";
     GfuiLabelSetText(ScrHandle, WidthLabelId, ossData.str().c_str());
 	
-    // 4) Width.
+    // 4) Length.
 	ossData.str("");
 	ossData << PCurTrack->getLength() << " m";
     GfuiLabelSetText(ScrHandle, LengthLabelId, ossData.str().c_str());
