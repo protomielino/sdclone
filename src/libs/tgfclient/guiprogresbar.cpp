@@ -35,7 +35,7 @@
 	@param align image alignment
     @return	Image Id
 		<br>-1 Error
-    @warning	the image must be sqare and its size must be a power of 2.
+    @warning	the image must be square and its size must be a power of 2.
 */
 int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value)
 {
@@ -59,6 +59,10 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *psz
 
 	progress->min = min;
 	progress->max = max;
+	if (value > progress->max)
+		value = progress->max;
+	else if (value < progress->min)
+		value = progress->min;
 	progress->value = value;
 
     switch (align) {
@@ -125,6 +129,28 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *psz
 	return object->id;
 }
 
+void GfuiProgressbarSetValue(void *scr, int id, float value)
+{
+    tGfuiObject *curObject;
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    
+    curObject = screen->objects;
+    if (curObject) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id) {
+				if (curObject->widget == GFUI_PROGRESSBAR) {
+					if (value > curObject->u.progressbar.max)
+						value = curObject->u.progressbar.max;
+					else if (value < curObject->u.progressbar.min)
+						value = curObject->u.progressbar.min;
+					curObject->u.progressbar.value = value;
+				}
+				return;
+			}
+		} while (curObject != screen->objects);
+    }
+}
 
 void
 gfuiReleaseProgressbar(tGfuiObject *obj)
@@ -144,8 +170,6 @@ gfuiDrawProgressbar(tGfuiObject *obj)
 
 	progress = &(obj->u.progressbar);
 
-
-
     glColor4f(1.0,1.0,1.0,0.25);
     glBegin(GL_QUADS);
     glVertex2i(obj->xmin, obj->ymin);
@@ -154,36 +178,33 @@ gfuiDrawProgressbar(tGfuiObject *obj)
     glVertex2i(obj->xmax, obj->ymin);
     glEnd();
 
-//calculate and draw progress bar
-	float width = obj->xmax- obj->xmin;
-
-	float range = progress->max - progress->min;
-	float umax = progress->value/range;
-	float endx = obj->xmin+(width*umax);
+	//calculate and draw progress bar
+	const float width = obj->xmax- obj->xmin;
+	const float range = progress->max - progress->min;
+	const float umax = (progress->value - progress->min) / range;
+	const float endx = obj->xmin+(width*umax);
 
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glBindTexture(GL_TEXTURE_2D,progress->progressbarimage );
 
     glBegin(GL_TRIANGLE_STRIP);
-    {
 	glColor4f(1.0, 1.0, 1.0, 1.0);
 	glTexCoord2f(0.0, 0.0); glVertex2f(obj->xmin, obj->ymin);
 	glTexCoord2f(0.0, 1.0); glVertex2f(obj->xmin, obj->ymax);
 	glTexCoord2f(umax, 0.0); glVertex2f(endx, obj->ymin);
 	glTexCoord2f(umax, 1.0); glVertex2f(endx, obj->ymax);
-    }
     glEnd();
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
-//DRAW OUTLINE
+
+	//draw outline
 	glColor4f(1.0,0.0,0.0,1.0);
-	 glBegin(GL_LINE_STRIP);
+	glBegin(GL_LINE_STRIP);
     glVertex2i(obj->xmin, obj->ymin);
     glVertex2i(obj->xmin, obj->ymax);
     glVertex2i(obj->xmax, obj->ymax);
     glVertex2i(obj->xmax, obj->ymin);
     glVertex2i(obj->xmin, obj->ymin);
     glEnd();	
-
 }

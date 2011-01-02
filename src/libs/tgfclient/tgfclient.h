@@ -384,6 +384,7 @@ TGFCLIENT_API const char* GfuiComboboxGetText(void *scr, int id);
 TGFCLIENT_API void GfuiComboboxClear(void *scr, int id);
 
 TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value);
+TGFCLIENT_API void GfuiProgressbarSetValue(void *scr, int id, float value);
 
 
 TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
