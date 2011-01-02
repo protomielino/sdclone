@@ -253,7 +253,7 @@ extern "C" int moduleTerminate() {
 
 
 // Module exit point (Torcs backward compatibility scheme).
-extern "C" int usr_Shut() {
+extern "C" int usrShut() {
   return moduleTerminate();
 }
 
@@ -311,3 +311,14 @@ static void shutdown(int index) {
   driver[index-indexOffset]->shutdown();
   delete driver[index-indexOffset];
 }
+
+//==========================================================================*
+// Schismatic entry point for usr_trb1
+//--------------------------------------------------------------------------*
+extern "C" int usr_trb1(tModInfo *ModInfo)
+{
+	// TODO.
+	return -1;
+}
+//==========================================================================*
+
