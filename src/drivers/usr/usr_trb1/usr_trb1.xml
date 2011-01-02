@@ -69,7 +69,7 @@
       <section name="5">
         <attstr name="name" val="May Maeda"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="ProjectDiskie and Yukiho Speed"></attstr>
+        <attstr name="team" val="LeekSpin Yukiho Speed"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="trb1-spirit-rb1lt"></attstr>
         <attnum name="race number" val="3"></attnum>
@@ -81,7 +81,7 @@
       <section name="6">
         <attstr name="name" val="Mark Sanders"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="ProjectDiskie and Yukiho Speed"></attstr>
+        <attstr name="team" val="Leekspin Yukiho Speed"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="trb1-spirit-rb1lt"></attstr>
         <attnum name="race number" val="666"></attnum>
@@ -115,7 +115,7 @@
       </section>
 
       <section name="9">
-        <attstr name="name" val="Marcelo 'Hidoi' Takeda"></attstr>
+        <attstr name="name" val="Marcelo Takeda"></attstr>
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Lovely BEAM"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
@@ -141,7 +141,7 @@
       <section name="11">
         <attstr name="name" val="Eckhard Jaeger"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="MARCH RACING with Haruna"></attstr>
+        <attstr name="team" val="Petrol Addictions"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="trb1-sector-rb1"></attstr>
         <attnum name="race number" val="6"></attnum>
@@ -153,7 +153,7 @@
       <section name="12">
         <attstr name="name" val="Jean-Philipe Meuret"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="MARCH RACING with Haruna"></attstr>
+        <attstr name="team" val="Petrol Addictions"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="trb1-sector-rb1"></attstr>
         <attnum name="race number" val="25"></attnum>
