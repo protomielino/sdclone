@@ -308,13 +308,15 @@ bool GfRace::moveCompetitor(GfDriver* pComp, int nDeltaPlace)
 	const int nNewIndex = (itComp - _pPrivate->vecCompetitors.begin()) + nDeltaPlace;
 	if (nNewIndex < 0)
 		itComp = _pPrivate->vecCompetitors.begin();
-	else if (nNewIndex >= _pPrivate->vecCompetitors.size())
+	else if (nNewIndex >= (int)_pPrivate->vecCompetitors.size())
 		itComp = _pPrivate->vecCompetitors.end();
 	else
 		itComp = _pPrivate->vecCompetitors.begin() + nNewIndex;
 
 	// Insert it at his new place.
 	_pPrivate->vecCompetitors.insert(itComp, pComp);
+
+	return true;
 }
 
 
