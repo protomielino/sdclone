@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+#include <tgf.h>
+
 #include "tgfdata.h"
 
 
@@ -35,17 +37,38 @@ class TGFDATA_API GfCar
 {
 public:
 	
+	GfCar(const std::string& strId, const std::string& strCatId,
+		  const std::string& strCatName, void* hparmCar);
+
 	const std::string& getId() const;
 	const std::string& getName() const;
 	const std::string& getCategoryId() const;
 	const std::string& getCategoryName() const;
 	const std::string& getDescriptorFileName() const;
+
+	enum EDriveTrain { eRWD, eFWD, e4WD };
+	EDriveTrain getDriveTrain() const;
+	unsigned getGearsCount() const;
+	bool isTurboCharged() const;
+	tdble getMaxPower() const;
+	tdble getMaxPowerSpeed() const;
+	tdble getMaxTorque() const;
+	tdble getMaxTorqueSpeed() const;
+	tdble getMass() const;
+	tdble getFrontRearMassRatio() const;
+
+	tdble getTopSpeed() const;
+	tdble getLowSpeedGrip() const;
+	tdble getHighSpeedGrip() const;
+	tdble getInvertedZAxisInertia() const;
 	
-	void setId(const std::string& strId);
-	void setName(const std::string& strName);
-	void setCategoryId(const std::string& strCatId);
-	void setCategoryName(const std::string& strCatName);
-	void setDescriptorFileName(const std::string& strDescFile);
+// 	void setId(const std::string& strId);
+// 	void setName(const std::string& strName);
+// 	void setCategoryId(const std::string& strCatId);
+// 	void setCategoryName(const std::string& strCatName);
+// 	void setDescriptorFileName(const std::string& strDescFile);
+
+	void load(void* hparmCar);
 
 protected:
 	
@@ -54,6 +77,19 @@ protected:
 	std::string _strCatId; // Category XML file / folder name (ex: "LS-GT1").
 	std::string _strCatName; // User friendly category name (ex: "Long day Series GT1").
 	std::string _strDescFile; // Path-name of the XML descriptor file.
+
+	EDriveTrain _eDriveTrain;
+	unsigned _nGears; // Number of gears.
+	bool _bTurboCharged;
+	tdble _fMaxPower, _fMaxPowerSpeed; // Engine max power (bhp) and associated engine speed.
+	tdble _fMaxTorque, _fMaxTorqueSpeed; // Engine max torque (Nm) and associated engine speed.
+	tdble _fMass; // Total mass (kg).
+	tdble _fFrontRearMassRatio; // Front to rear mass ratio (no unit, inside ]0,1[).
+	
+	tdble _fTopSpeed; // Theorical top speed (m/s)
+	tdble _fLowSpeedGrip; // Mechanical grip (~mu*g, but with front/rear mass repartition)
+	tdble _fHighSpeedGrip; // Aerodynamic grip (same + with aero down-force)
+	tdble _fInvertedZAxisInertia;
 };
 
 class TGFDATA_API GfCars

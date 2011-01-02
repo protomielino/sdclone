@@ -43,7 +43,7 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	const GfCar* pCurCar = pDriver->getCar();
 
 	// Initialize the GUI contents.
-	GfuiLabelSetText(pMenu->GetMenuHandle(), pMenu->GetDynamicControlId("drivernamelabel"),
+	GfuiLabelSetText(pMenu->GetMenuHandle(), pMenu->GetDynamicControlId("DriverNameLabel"),
 					 pDriver->getName().c_str());
 	pMenu->resetCarCategoryComboBox(pCurCar->getCategoryName());
 	pMenu->resetCarModelComboBox(pCurCar->getCategoryName(), pCurCar->getName());
@@ -55,7 +55,7 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 const GfCar* RmCarSelectMenu::getSelectedCarModel() const
 {
 	const char* pszSelCarName =
-		GfuiComboboxGetText(GetMenuHandle(), GetDynamicControlId("modelcombo"));
+		GfuiComboboxGetText(GetMenuHandle(), GetDynamicControlId("ModelCombo"));
 
 	if (pszSelCarName)
 		return GfCars::self()->getCarWithName(pszSelCarName);
@@ -151,7 +151,7 @@ RmCarSelectMenu::RmCarSelectMenu()
 
 void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
 {
-	const int nCatComboId = GetDynamicControlId("categorycombo");
+	const int nCatComboId = GetDynamicControlId("CategoryCombo");
 
 	// Disable the combo-box for non human drivers (robot drivers can't change their car).
 	GfuiEnable(GetMenuHandle(), nCatComboId, getDriver()->isHuman() ? GFUI_ENABLE : GFUI_DISABLE);
@@ -179,7 +179,7 @@ void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
 void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 											const std::string& strSelCarName)
 {
-	const int nModelComboId = GetDynamicControlId("modelcombo");
+	const int nModelComboId = GetDynamicControlId("ModelCombo");
 
 	// Disable the combo-box for non human drivers (robot drivers can't change their car).
 	GfuiEnable(GetMenuHandle(), nModelComboId, getDriver()->isHuman() ? GFUI_ENABLE : GFUI_DISABLE);
@@ -209,62 +209,70 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 
 void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 {
-	// TODO : Merge params with category / user settings ?
-
-	// Open new car params.
+	static const char* pszDriveWheels[] = { "Rear", "Front", "4" };
+	
+	// Retrieve selected car.
 	const GfCar* pSelCar = GfCars::self()->getCar(strSelCarId);
-	void* hparmSelCar = GfParmReadFile(pSelCar->getDescriptorFileName().c_str(), GFPARM_RMODE_STD);
 	
 	// Update GUI.
 	std::ostringstream ossSpecValue;
-	ossSpecValue << (long)GfParmGetNum(hparmSelCar, SECT_CAR, PRM_MASS, 0 /* SI */, 0) << " kg";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("masslabel"),
+	
+	ossSpecValue << (long)pSelCar->getMass() << " kg ";
+	const long nFRMassPercent = (long)(pSelCar->getFrontRearMassRatio() * 100);
+	if (nFRMassPercent > 50)
+		ossSpecValue << "(" << nFRMassPercent << "% front)";
+	else
+		ossSpecValue << "(" << 100 - nFRMassPercent << "% rear)";
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MassLabel"),
 					 ossSpecValue.str().c_str());
 
-	const tdble dMaxRev = GfParmGetNum(hparmSelCar, SECT_ENGINE, PRM_REVSLIM, 0, 0);
-
-	tdble dMaxTorque = 0;
-	tdble dMaxTorqueRev = 0;
-	tdble dMaxPower = 0;
-	tdble dMaxPowerRev = 0;
-	std::ostringstream ossSpecPath;
-	ossSpecPath << SECT_ENGINE << '/' << ARR_DATAPTS;
-	const int nEngineTqCurvePts = GfParmGetEltNb(hparmSelCar, ossSpecPath.str().c_str());
-	for (int nPtInd = 2; nPtInd <= nEngineTqCurvePts; nPtInd++)
-	{
-		ossSpecPath.str("");
-		ossSpecPath << SECT_ENGINE << '/' << ARR_DATAPTS << '/' << nPtInd;
-		const tdble dRev = GfParmGetNum(hparmSelCar, ossSpecPath.str().c_str(), PRM_RPM, 0, 0);
-		if (dRev > dMaxRev)
-			break;
-		const tdble dTorque = GfParmGetNum(hparmSelCar, ossSpecPath.str().c_str(), PRM_TQ, 0, 0);
-		if (dTorque > dMaxTorque)
-		{
-			dMaxTorque = dTorque;
-			dMaxTorqueRev = dRev;
-		}
-		const tdble dPower = (tdble)(dTorque * dRev / (75 * G)); 
-		if (dPower > dMaxPower)
-		{
-			dMaxPower = dPower;
-			dMaxPowerRev = dRev;
-		}
-	}
 	ossSpecValue.str("");
-	ossSpecValue << (long)dMaxPower << " bhp (" << dMaxPowerRev * 30.0 / PI << " rpm)";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("maxpowerlabel"),
+	ossSpecValue << pszDriveWheels[pSelCar->getDriveTrain()] << " WD, "
+				 << pSelCar->getGearsCount() << " gears";
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("DriveTrainLabel"),
+					 ossSpecValue.str().c_str());
+
+	ossSpecValue.str("");
+	ossSpecValue << (long)pSelCar->getMaxPower() << " bhp ("
+				 << (long)(pSelCar->getMaxPowerSpeed() * 30.0 / PI) << " rpm)";
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxPowerLabel"),
 					 ossSpecValue.str().c_str());
 	
 	ossSpecValue.str("");
-	ossSpecValue << (long)dMaxTorque << " N.m (" << dMaxTorqueRev * 30.0 / PI << " rpm)";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("maxtorquelabel"),
+	ossSpecValue << (long)pSelCar->getMaxTorque() << " N.m ("
+						   << (long)(pSelCar->getMaxTorqueSpeed() * 30.0 / PI) << " rpm)";
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxTorqueLabel"),
 					 ossSpecValue.str().c_str());
+
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("Engine1Label"),
+					 "? cyl., ???? cm3");
+	
+	ossSpecValue.str("");
+	ossSpecValue << (pSelCar->isTurboCharged() ? "Turbo-charged" : "Naturally-aspirated");
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("Engine2Label"),
+					 ossSpecValue.str().c_str());
+
+	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("TopSpeedProgress"),
+							pSelCar->getTopSpeed() * 3.6f);
+	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("PowerMassRatioProgress"),
+							pSelCar->getMaxPower() / pSelCar->getMass());
+	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("HighSpeedGripProgress"),
+							pSelCar->getLowSpeedGrip());
+	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("LowSpeedGripProgress"),
+							pSelCar->getHighSpeedGrip());
+	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("CorneringProgress"),
+							pSelCar->getInvertedZAxisInertia());
+	
+	GfLogDebug("%s : ts=%f, mpr=%f, lsg=%f, hsg=%f, izi=%f\n", strSelCarId.c_str(),
+			   pSelCar->getTopSpeed(), pSelCar->getMaxPower() / pSelCar->getMass(),
+			   pSelCar->getLowSpeedGrip(), pSelCar->getHighSpeedGrip(),
+			   pSelCar->getInvertedZAxisInertia());
 }
 
 void RmCarSelectMenu::resetSkinComboBox(const std::string& strCarName,
 										const GfDriverSkin* pSelSkin)
 {
-	const int nSkinComboId = GetDynamicControlId("skincombo");
+	const int nSkinComboId = GetDynamicControlId("SkinCombo");
 
 	// Get really available skins and previews for this car and current driver.
 	const std::string strCarId =
@@ -294,7 +302,7 @@ void RmCarSelectMenu::resetSkinComboBox(const std::string& strCarName,
 
 void RmCarSelectMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 {
-	const int nCarImageId = GetDynamicControlId("previewimage");
+	const int nCarImageId = GetDynamicControlId("PreviewImage");
 
 	// Load the preview image.
 	if (GfFileExists(selSkin.getCarPreviewFileName().c_str()))
@@ -326,22 +334,30 @@ bool RmCarSelectMenu::Initialize()
     
     CreateStaticControls();
     
-	CreateLabelControl("drivernamelabel");
-	CreateComboboxControl("categorycombo", this, onChangeCategory);
-	CreateComboboxControl("modelcombo", this, onChangeModel);
-	CreateComboboxControl("skincombo", this, onChangeSkin);
-	CreateStaticImageControl("previewimage");
-	CreateLabelControl("masslabel");
-	CreateLabelControl("maxpowerlabel");
-	CreateLabelControl("maxtorquelabel");
-	CreateProgressbarControl("topspeedprogress");
-	CreateProgressbarControl("accelerationprogress");
-	CreateProgressbarControl("handlingprogress");
-	CreateProgressbarControl("brakingprogress");
+	CreateLabelControl("DriverNameLabel");
+	
+	CreateComboboxControl("CategoryCombo", this, onChangeCategory);
+	CreateComboboxControl("ModelCombo", this, onChangeModel);
+	CreateComboboxControl("SkinCombo", this, onChangeSkin);
+	
+	CreateStaticImageControl("PreviewImage");
+	
+	CreateLabelControl("DriveTrainLabel");
+	CreateLabelControl("MaxPowerLabel");
+	CreateLabelControl("MaxTorqueLabel");
+	CreateLabelControl("MassLabel");
+	CreateLabelControl("Engine1Label");
+	CreateLabelControl("Engine2Label");
+	
+	CreateProgressbarControl("TopSpeedProgress");
+	CreateProgressbarControl("PowerMassRatioProgress");
+	CreateProgressbarControl("HighSpeedGripProgress");
+	CreateProgressbarControl("LowSpeedGripProgress");
+	CreateProgressbarControl("CorneringProgress");
 
-    CreateButtonControl("garagebutton", this, onGarageCB);
-	CreateButtonControl("acceptbutton", this, onAcceptCB);
-    CreateButtonControl("cancelbutton", this, onCancelCB);
+    CreateButtonControl("GarageButton", this, onGarageCB);
+	CreateButtonControl("AcceptButton", this, onAcceptCB);
+    CreateButtonControl("CancelButton", this, onCancelCB);
 
     CloseXMLDescriptor();
 
