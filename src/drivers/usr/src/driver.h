@@ -49,10 +49,11 @@ class AbstractStrategy;
 enum { TEAM_FRIEND=1, TEAM_FOE };
 enum { avoidleft=1, avoidright=2, avoidside=4, avoidsideclosing=8, avoidback=16 };
 enum { debug_steer=1, debug_overtake=2, debug_brake=4 };
+enum { USR_TRB1=1 };
 
 class Driver {
 	public:
-		Driver(int index);
+		Driver(int index, const int robot_type);
 		~Driver();
 
 		// Callback functions called from Speed Dreams / TORCS.
@@ -143,6 +144,7 @@ class Driver {
 		float stuckSteering( float steercmd );
 
 		// Per robot global data.
+		const char *robot_name;
 		int NoTeamWaiting;
 		float TeamWaitTime;
 		float truespeed;

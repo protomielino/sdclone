@@ -19,8 +19,6 @@
 
 #include "driver.h"
 
-#define robot_name "usr_trb1"
-
 #define CONTROL_SKILL
 
 //const float Driver::MAX_UNSTUCK_ANGLE = (float)(15.0f/180.0f*PI); // [radians] If the angle of the car on the track is smaller, we assume we are not stuck.
@@ -64,7 +62,7 @@ enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
 Cardata *Driver::cardata = NULL;
 
 
-Driver::Driver(int index) :
+Driver::Driver(int index, const int robot_type) :
     NoTeamWaiting(0),
     TeamWaitTime(0.0f),
     truespeed(0.0f),
@@ -204,6 +202,9 @@ Driver::Driver(int index) :
     cmd_light(0.0f)
 {
   INDEX = index;
+  if (robot_type == USR_TRB1) {
+    robot_name = "usr_trb1";
+  }
 }
 
 
