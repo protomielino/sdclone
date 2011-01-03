@@ -202,8 +202,15 @@ Driver::Driver(int index, const int robot_type) :
     cmd_light(0.0f)
 {
   INDEX = index;
-  if (robot_type == USR_TRB1) {
-    robot_name = "usr_trb1";
+  
+  switch(robot_type) {
+    case USR_TRB1:
+      robot_name = "usr_trb1";
+      break;
+    
+    case USR_SC:
+      robot_name = "usr_sc";
+      break;
   }
 }
 

@@ -5,6 +5,7 @@ SET(ROBOT_NAME "usr")
 # Official-only USR interface.
 SET(ROBOT_INTERFACE LEGACY WELCOME
                     usr_trb1
+                    usr_sc
                     )
 
 SET(ROBOT_SOURCES
@@ -28,7 +29,7 @@ SET(ROBOT_SOURCES
   src/xmldefs.h)
 
 # Official-only USR instances.
-SET(ROBOT_CLONES usr_trb1)
+SET(ROBOT_CLONES usr_trb1 usr_sc)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME}
               INTERFACE ${ROBOT_INTERFACE} 

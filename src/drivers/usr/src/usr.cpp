@@ -138,6 +138,13 @@ void SetupUSR_trb1() {
 };
 
 
+// Schismatic init for usr_sc
+void SetupUSR_sc() {
+  // Add usr_sc specific initialization here
+  robot_type = USR_SC;
+};
+
+
 ////////////////////////////////////////////////////////////
 // Carset specific entry points (functions)
 ////////////////////////////////////////////////////////////
@@ -147,6 +154,20 @@ extern "C" int usr_trb1(tModInfo *ModInfo) {
   int ret = -1;
   setRobotName("usr_trb1");
   robot_type = USR_TRB1;
+  void *robot_settings = getFileHandle();
+  if (robot_settings) {
+    ret = usr(ModInfo);
+  }
+  
+  return ret;
+}
+
+
+// Schismatic entry point for usr_trb1
+extern "C" int usr_sc(tModInfo *ModInfo) {
+  int ret = -1;
+  setRobotName("usr_sc");
+  robot_type = USR_SC;
   void *robot_settings = getFileHandle();
   if (robot_settings) {
     ret = usr(ModInfo);
@@ -218,7 +239,10 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
   }
   GfOut("NBBOTS: %d (of %d)\n", NBBOTS, MAXNBBOTS);
 
-  SetupUSR_trb1();
+  if (strncmp(robot_name, "usr_trb1", strlen("usr_trb1")) == 0)
+		SetupUSR_trb1();
+  else if (strncmp(robot_name,"usr_sc", strlen("usr_sc")) == 0)
+		SetupUSR_sc();
 
   // Set max nb of interfaces to return.
   welcomeOut->maxNbItf = NBBOTS;
