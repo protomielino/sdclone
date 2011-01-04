@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
 
-<params name="usr_trb1" type="robotdef">
+<params name="usr_ls1" type="robotdef">
   <section name="Robots">
     <section name="index">
 

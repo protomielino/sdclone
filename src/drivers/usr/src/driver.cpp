@@ -211,6 +211,10 @@ Driver::Driver(int index, const int robot_type) :
     case USR_SC:
       robot_name = "usr_sc";
       break;
+
+    case USR_LS1:
+      robot_name = "usr_ls1";
+      break;
   }
 }
 
