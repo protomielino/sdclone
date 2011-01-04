@@ -312,23 +312,26 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
     if (p) *p = '\0';
   }
 
-  snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/default.xml", robot_name, carName);
+  snprintf(buffer, BUFSIZE, "drivers/%s/%s/default.xml", robot_name, carName);
   *carParmHandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   void *newhandle;
 
+#if 0
   switch (s->_raceType) {
     case RM_TYPE_PRACTICE:
-      snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/practice/%s.xml", robot_name, carName, trackname);
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/practice/%s.xml", robot_name, carName, trackname);
       break;
     case RM_TYPE_QUALIF:
-      snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/qualifying/%s.xml", robot_name, carName, trackname);
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/qualifying/%s.xml", robot_name, carName, trackname);
       break;
     case RM_TYPE_RACE:
-      snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/race/%s.xml", robot_name, carName, trackname);
+      snprintf(buffer, BUFSIZE, "drivers/%s/%s/race/%s.xml", robot_name, carName, trackname);
       break;
     default:
       break;
   }
+#endif
+  snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
 
   newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
   if (newhandle)
@@ -340,7 +343,7 @@ void Driver::initTrack(tTrack* t, void *carHandle, void **carParmHandle, tSituat
   }
   else
   {
-    snprintf(buffer, BUFSIZE, "drivers/%s/cars/%s/%s.xml", robot_name, carName, trackname);
+    snprintf(buffer, BUFSIZE, "drivers/%s/%s/%s.xml", robot_name, carName, trackname);
     newhandle = GfParmReadFile(buffer, GFPARM_RMODE_STD);
     if (newhandle)
     {
@@ -447,20 +450,20 @@ void Driver::LoadDAT( tSituation *s, char *carname, char *trackname )
 
  switch (s->_raceType) {
   case RM_TYPE_PRACTICE:
-   snprintf(buffer, 1024, "drivers/%s/cars/%s/practice/%s.dat", robot_name, carname, trackname);
+   snprintf(buffer, 1024, "drivers/%s/%s/practice/%s.dat", robot_name, carname, trackname);
    break;
   case RM_TYPE_QUALIF:
-   snprintf(buffer, 1024, "drivers/%s/cars/%s/qualifying/%s.dat", robot_name, carname, trackname);
+   snprintf(buffer, 1024, "drivers/%s/%s/qualifying/%s.dat", robot_name, carname, trackname);
    break;
   case RM_TYPE_RACE:
-   snprintf(buffer, 1024, "drivers/%s/cars/%s/race/%s.dat", robot_name, carname, trackname);
+   snprintf(buffer, 1024, "drivers/%s/%s/race/%s.dat", robot_name, carname, trackname);
    break;
  }
 
  if (!(fp = fopen(buffer, "r")))
  {
    fprintf(stderr, "Failed to load %s\n", buffer);
-   snprintf(buffer, 1024, "drivers/%s/cars/%s/%s.dat", robot_name, carname, trackname);
+   snprintf(buffer, 1024, "drivers/%s/%s/%s.dat", robot_name, carname, trackname);
 
    if (!(fp = fopen(buffer, "r")))
    {
