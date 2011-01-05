@@ -132,6 +132,7 @@ ReConfigRunState(void)
 
 	GfLogInfo("%s configuration now in '%s' stage.\n", ReInfo->_reName, conf);
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
+		
 		/* Track Select Menu */
 		ts.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
@@ -144,6 +145,7 @@ ReConfigRunState(void)
 		RmTrackSelect(&ts);
 
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
+		
 		/* Drivers select menu */
 		ds.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
@@ -155,6 +157,7 @@ ReConfigRunState(void)
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
+		
 		/* Race Options menu */
 		rp.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
@@ -164,6 +167,7 @@ ReConfigRunState(void)
 		}
 		rp.param = ReInfo->params;
 		rp.title = GfParmGetStr(params, path, RM_ATTR_RACE, "Race");
+		
 		/* Select options to configure */
 		rp.confMask = 0;
 		snprintf(path, sizeof(path), "%s/%d/%s", RM_SECT_CONF, curConf, RM_SECT_OPTIONS);
@@ -174,13 +178,41 @@ ReConfigRunState(void)
 			if (!strcmp(opt, RM_VAL_CONFRACELEN)) {
 				/* Configure race length */
 				rp.confMask |= RM_CONF_RACE_LEN;
-			} else {
-				if (!strcmp(opt, RM_VAL_CONFDISPMODE)) {
-					/* Configure display mode */
-					rp.confMask |= RM_CONF_DISP_MODE;
-				}
+			} else if (!strcmp(opt, RM_VAL_CONFDISPMODE)) {
+				/* Configure display mode */
+				rp.confMask |= RM_CONF_DISP_MODE;
+			} else if (!strcmp(opt, RM_VAL_CONFTIMEOFDAY)) {
+				/* Configure time of day */
+				rp.confMask |= RM_CONF_TIME_OF_DAY;
+			} else if (!strcmp(opt, RM_VAL_CONFCLOUDCOVER)) {
+				/* Configure cloud cover */
+				rp.confMask |= RM_CONF_CLOUD_COVER;
+			} else if (!strcmp(opt, RM_VAL_CONFRAINFALL)) {
+				/* Configure rain fall and dry/wet track */
+				rp.confMask |= RM_CONF_RAIN_FALL;
 			}
 		}
+
+		/* Check if really something we can configure (given the graphic options) */
+		if ((rp.confMask & (RM_CONF_TIME_OF_DAY | RM_CONF_CLOUD_COVER)) == rp.confMask) {
+ 	
+			snprintf(path, sizeof(path), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+			void *grHandle = GfParmReadFile(path, GFPARM_RMODE_STD);
+			const bool bSkyDomeEnabled =
+				(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;
+			GfParmReleaseHandle(grHandle);
+ 	
+			if (!bSkyDomeEnabled)
+			{
+				GfLogInfo("Skipping Race Params menu because Sky Dome is disabled"
+						  " and is needed for all the configurable options\n");
+				GfuiScreenActivate(ReGetRacemanMenuHandle()); /* Back to the race menu */
+				return;
+			}
+		}
+		GfLogTrace("Race configuration mask : 0x%02X\n", rp.confMask);
+ 	
+		/* All's right till now : enter the Race Params menu */
 		RmRaceParamsMenu(&rp);
 	}
 

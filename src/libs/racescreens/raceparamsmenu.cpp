@@ -306,7 +306,9 @@ RmRaceParamsMenu(void *vrp)
 {
     char buf[256];
 
-    rp = (tRmRaceParam*)vrp;
+	GfLogTrace("Entering Race Params menu\n");
+
+	rp = (tRmRaceParam*)vrp;
 
 	// Get race features.
     rmrpFeatures = RmGetFeaturesList(rp->param);
@@ -398,7 +400,7 @@ RmRaceParamsMenu(void *vrp)
     }
 
     // Create and initialize Time of day combo box (2 arrow buttons and a variable label).
-    if (rp->confMask & RM_CONF_TIME_OF_DAY)
+	if (rp->confMask & RM_CONF_TIME_OF_DAY)
 	{
 		if (rmrpIsSkyDomeEnabled)
 		{
@@ -412,7 +414,7 @@ RmRaceParamsMenu(void *vrp)
 					break;
 				}
 		
-			// Create Display mode label.
+			// Create Time of day label.
 			CreateLabelControl(scrHandle,menuXMLDescHdle,"timeofdaylabel");
 
 			// Create and initialize Time of day combo-box-like control.
@@ -443,7 +445,7 @@ RmRaceParamsMenu(void *vrp)
 					break;
 				}
 			
-			// Create Display mode label.
+			// Create Cloud cover label.
 			CreateLabelControl(scrHandle,menuXMLDescHdle,"cloudslabel");
 
 			// Create and initialize Cloud cover combo-box-like control.
@@ -474,7 +476,7 @@ RmRaceParamsMenu(void *vrp)
 				break;
 			}
 			
-		// Create Display mode label.
+		// Create Rain label.
 		CreateLabelControl(scrHandle,menuXMLDescHdle,"rainlabel");
 
 		// Create and initialize Rain combo-box-like control.
