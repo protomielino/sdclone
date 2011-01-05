@@ -7,6 +7,7 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     usr_trb1
                     usr_sc
                     usr_ls1
+                    usr_36GP
                     )
 
 SET(ROBOT_SOURCES
@@ -30,7 +31,7 @@ SET(ROBOT_SOURCES
   src/xmldefs.h)
 
 # Official-only USR instances.
-SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1)
+SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1 usr_36GP)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME}
               INTERFACE ${ROBOT_INTERFACE} 
@@ -83,5 +84,18 @@ SET(ROBOT_SUBDIRS 1 2 3 4 7 8
 
 ROBOT_DATA(NAME usr_ls1 PREFIX usr_ls1
            FILES usr_ls1.xml default.xml logo.rgb readme.txt
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+
+###################
+# USR_36GP
+###################
+SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12
+                  36gp-ettore-t59 36gp-milano-12c36 36gp-milano-tipop3
+                  36gp-motorunion-typec 36gp-tridenti-6c34
+                  36gp-tridenti-v8ri
+                  tracks)
+
+ROBOT_DATA(NAME usr_36GP PREFIX usr_36GP
+           FILES usr_36GP.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
 

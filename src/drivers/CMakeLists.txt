@@ -5,10 +5,6 @@ ADD_SUBDIRECTORY(human)
 ADD_SUBDIRECTORY(networkhuman)
 ADD_SUBDIRECTORY(kilo2008)
 ADD_SUBDIRECTORY(simplix)
-#ADD_SUBDIRECTORY(usr_36GP)
-#ADD_SUBDIRECTORY(usr_ls1)
-#ADD_SUBDIRECTORY(usr_sc)
-#ADD_SUBDIRECTORY(usr_trb1)
 ADD_SUBDIRECTORY(usr)
 
 # Work-in-progress / unofficial robots.
