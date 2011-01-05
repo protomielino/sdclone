@@ -233,7 +233,7 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 					 ossSpecValue.str().c_str());
 
 	ossSpecValue.str("");
-	ossSpecValue << (long)pSelCar->getMaxPower() << " bhp ("
+	ossSpecValue << (long)(pSelCar->getMaxPower() / 75 / G) << " bhp ("
 				 << (long)(pSelCar->getMaxPowerSpeed() * 30.0 / PI) << " rpm)";
 	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxPowerLabel"),
 					 ossSpecValue.str().c_str());
@@ -255,16 +255,16 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("TopSpeedProgress"),
 							pSelCar->getTopSpeed() * 3.6f);
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("PowerMassRatioProgress"),
-							pSelCar->getMaxPower() / pSelCar->getMass());
-	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("HighSpeedGripProgress"),
-							pSelCar->getLowSpeedGrip());
+							pSelCar->getMaxPower() / 75 / G / pSelCar->getMass());
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("LowSpeedGripProgress"),
+							pSelCar->getLowSpeedGrip());
+	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("HighSpeedGripProgress"),
 							pSelCar->getHighSpeedGrip());
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("CorneringProgress"),
 							pSelCar->getInvertedZAxisInertia());
 	
 	GfLogDebug("%s : ts=%f, mpr=%f, lsg=%f, hsg=%f, izi=%f\n", strSelCarId.c_str(),
-			   pSelCar->getTopSpeed(), pSelCar->getMaxPower() / pSelCar->getMass(),
+			   pSelCar->getTopSpeed()*3.6f, pSelCar->getMaxPower() / 75 / G / pSelCar->getMass(),
 			   pSelCar->getLowSpeedGrip(), pSelCar->getHighSpeedGrip(),
 			   pSelCar->getInvertedZAxisInertia());
 }

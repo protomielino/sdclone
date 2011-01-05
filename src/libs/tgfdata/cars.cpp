@@ -313,7 +313,7 @@ void GfCar::load(void* hparmCar)
 			_fMaxTorque = fTorque;
 			_fMaxTorqueSpeed = fSpeed;
 		}
-		const tdble fPower = (tdble)(fTorque * fSpeed / (75 * G)); 
+		const tdble fPower = (tdble)(fTorque * fSpeed); 
 		if (fPower > _fMaxPower)
 		{
 			_fMaxPower = fPower;
@@ -328,13 +328,12 @@ void GfCar::load(void* hparmCar)
 	const tdble fMuRear =
 		(GfParmGetNum(hparmCar, SECT_REARRGTWHEEL, PRM_MU, (char*)NULL, 1.0)
 		 + GfParmGetNum(hparmCar, SECT_REARLFTWHEEL, PRM_MU, (char*)NULL, 1.0)) / 2.0f;
-// Work in progress.
-	_fLowSpeedGrip = 0.0f;
-//		(_fFrontRearMassRatio * fMuFront + (1.0f - _fFrontRearMassRatio) * fMuRear) * G;
+	_fLowSpeedGrip =
+		(_fFrontRearMassRatio * fMuFront + (1.0f - _fFrontRearMassRatio) * fMuRear) * G;
 
 	// "Aerodynamic = High speed" grip (same + with aero down-force).
-	// TODO: Check formula (F/R Clift repartition "guessed" from Kristof's)
-	const tdble fRefCarSpeed = 200 * 1000 / 3600.0f;
+	// TODO: Check formula (F/R Clift repartition "guessed" from Kristof's ; sure it's wrong ;-)
+	const tdble fRefCarSpeed = 200 / 3.6f;
 	const tdble fFrontWingArea =
 		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_WINGAREA, (char*)NULL, 0.0);
 	const tdble fRearWingArea =
@@ -349,19 +348,19 @@ void GfCar::load(void* hparmCar)
 		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0);
 	const double fTotalFrontClift = 2 * fFrontClift + 4.92 * fFrontWingArea * sin(fFrontWingAngle);
 	const double fTotalRearClift = 2 * fRearClift + 4.92 * fRearWingArea * sin(fRearWingAngle);
-	_fHighSpeedGrip = _fLowSpeedGrip;
 // Work in progress.
-// 	_fHighSpeedGrip +=
-// 		fRefCarSpeed * fRefCarSpeed
-// 		* (tdble)(_fFrontRearMassRatio * fTotalFrontClift
-// 		   + (1.0 - _fFrontRearMassRatio) * fTotalRearClift) * G;
+ 	_fHighSpeedGrip =
+ 		fRefCarSpeed * fRefCarSpeed
+ 		* (tdble)(_fFrontRearMassRatio * fTotalFrontClift * fMuFront
+				  + (1.0 - _fFrontRearMassRatio) * fTotalRearClift * fMuRear) * G / _fMass;
 
 	// Inverse of the inertia around the Z axis.
 	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, (char*)NULL, 1.0);
 	const tdble fCarLength = GfParmGetNum(hparmCar, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
 	const tdble fCarWidth = GfParmGetNum(hparmCar, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
 	_fInvertedZAxisInertia = // Stolen from Simu V2.1, car.cpp, SimCarConfig()
-		12.0f / (_fMass * fMassRepCoef * fMassRepCoef * (fCarWidth * fCarWidth + fCarLength * fCarLength));
+		12.0f / (_fMass * fMassRepCoef * fMassRepCoef)
+		/ (fCarWidth * fCarWidth + fCarLength * fCarLength);
 	
 	// Theorical top speed on a flat road, assuming the gears are tuned accordingly.
 	const tdble fFrontArea =
@@ -377,9 +376,9 @@ void GfCar::load(void* hparmCar)
 		muRollRes * _fMass * G / (Cd + muRollRes * (tdble)(fTotalFrontClift + fTotalRearClift));
 	const double q = eff * _fMaxPower / (Cd + muRollRes * (tdble)(fTotalFrontClift + fTotalRearClift));
 // Work in progress.
-	_fTopSpeed = 0.0f;
-// 		(tdble)pow(q/2+sqrt(q*q/4+(pp*pp*pp)/27), 1.0/3)
-// 		- (tdble)pow(-q/2+sqrt(q*q/4+(pp*pp*pp)/27), 1.0/3);
+	_fTopSpeed =
+ 		(tdble)pow(q/2+sqrt(q*q/4+pp*pp*pp/27), 1.0/3)
+ 		- (tdble)pow(-q/2+sqrt(q*q/4+pp*pp*pp/27), 1.0/3);
 }
 
 const std::string& GfCar::getId() const

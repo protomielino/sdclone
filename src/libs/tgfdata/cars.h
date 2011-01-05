@@ -80,8 +80,12 @@ protected:
 
 	EDriveTrain _eDriveTrain;
 	unsigned _nGears; // Number of gears.
-	bool _bTurboCharged;
-	tdble _fMaxPower, _fMaxPowerSpeed; // Engine max power (bhp) and associated engine speed.
+	bool _bTurboCharged; // TODO: Move to an enum (Turbo, Compressor, ...)
+// 	unsigned _nCylinders; // TODO
+// 	enum { eV, eW, eFlat, eStraight, eTurbine } EEngineShape;
+// 	EEngineShape _eEngineShape; // TODO
+// 	tdble fEngineCapacity; // TODO
+	tdble _fMaxPower, _fMaxPowerSpeed; // Engine max power (SI) and associated engine speed.
 	tdble _fMaxTorque, _fMaxTorqueSpeed; // Engine max torque (Nm) and associated engine speed.
 	tdble _fMass; // Total mass (kg).
 	tdble _fFrontRearMassRatio; // Front to rear mass ratio (no unit, inside ]0,1[).
@@ -89,7 +93,7 @@ protected:
 	tdble _fTopSpeed; // Theorical top speed (m/s)
 	tdble _fLowSpeedGrip; // Mechanical grip (~mu*g, but with front/rear mass repartition)
 	tdble _fHighSpeedGrip; // Aerodynamic grip (same + with aero down-force)
-	tdble _fInvertedZAxisInertia;
+	tdble _fInvertedZAxisInertia; // (SI)
 };
 
 class TGFDATA_API GfCars
