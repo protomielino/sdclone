@@ -1,5 +1,7 @@
 INCLUDE(../../../cmake/macros.cmake)
 
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
+
 SET(ROBOT_NAME "usr")
 
 # Official-only USR interface.
