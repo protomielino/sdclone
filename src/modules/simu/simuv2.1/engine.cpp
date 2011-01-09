@@ -42,6 +42,7 @@ SimEngineConfig(tCar *car)
 	car->engine.I           = GfParmGetNum(hdle, SECT_ENGINE, PRM_INERTIA, (char*)NULL, 0.2423f);
 	car->engine.fuelcons    = GfParmGetNum(hdle, SECT_ENGINE, PRM_FUELCONS, (char*)NULL, 0.0622f);
 	car->engine.brakeCoeff  = GfParmGetNum(hdle, SECT_ENGINE, PRM_ENGBRKCOEFF, (char*)NULL, 0.33f);
+	car->engine.brakeLinCoeff= GfParmGetNum(hdle, SECT_ENGINE, PRM_ENGBRKLINCOEFF, (char*)NULL, 0.03f);
 	car->engine.exhaust_pressure = 0.0f;
 	car->engine.exhaust_refract = 0.1f;
 	car->engine.Tq_response = 0.0f;
@@ -93,6 +94,11 @@ SimEngineConfig(tCar *car)
 	car->engine.rads = car->engine.tickover;
 	
 	free(edesc);
+	
+	/* check engine brake */
+	if ( car->engine.brakeCoeff < 0.0 )
+	   {car->engine.brakeCoeff = 0.0;}
+	car->engine.brakeLinCoeff *= M_PI/30.0;
 }
 
 /* Update torque output with engine rpm and accelerator command */
@@ -126,8 +132,7 @@ SimEngineUpdateTq(tCar *car)
 	if (engine->rads > engine->revsMax) {
 		engine->rads = engine->revsMax;
 	}
-    const tdble static_friction = 0.1f;
-	tdble EngBrkK = curve->TqAtMaxPw * engine->brakeCoeff * (static_friction + (1.0f - static_friction)*(engine->rads) / (engine->revsMax));
+	tdble EngBrkK = engine->brakeLinCoeff * engine->rads;
 
     if (engine->rads < engine->tickover) {
 		engine->Tq = 0.0f;
@@ -144,13 +149,16 @@ SimEngineUpdateTq(tCar *car)
         if (engine->rads > engine->revsLimiter) {
             alpha = 0.0;
         }
-		tdble Tq_cur = (Tq_max + EngBrkK)* alpha;
-		engine->Tq =  Tq_cur;
+		tdble Tq_cur = (Tq_max + EngBrkK) * alpha;
+		engine->Tq = Tq_cur;
 		if (engine->rads > engine->tickover) {
 			engine->Tq -= EngBrkK;
 		}
+		if (alpha <= 1e-6) {
+			engine->Tq -= curve->maxTq * engine->brakeCoeff;
+		}
+		
 		tdble cons = Tq_cur * 0.75f;
-
 		if (cons > 0) {
 			car->fuel -= cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime;
 		}

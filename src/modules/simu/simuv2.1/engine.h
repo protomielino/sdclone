@@ -48,7 +48,8 @@ typedef struct
     tdble       Tq_response; /* response Tq due to mismatch */
     tdble       I_joint; /* joint inertia */
     tdble		fuelcons;
-    tdble		brakeCoeff;
+    tdble		brakeCoeff; /* coefficient for constant engine brake */
+    tdble		brakeLinCoeff; /* coefficient for RPM dependent engine brake */
 	tdble       pressure;
 	tdble       exhaust_pressure;
 	tdble       exhaust_refract;

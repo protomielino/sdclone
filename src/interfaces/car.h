@@ -578,6 +578,7 @@ typedef struct CarElt
 #define ARR_DATAPTS		"data points"
 #define PRM_FUELCONS		"fuel cons factor"
 #define PRM_ENGBRKCOEFF		"brake coefficient"
+#define PRM_ENGBRKLINCOEFF		"brake linear coefficient"
 #define PRM_POWER		"power"
 #define PRM_TURBO               "turbo"
 #define PRM_TURBO_RPM           "turbo rpm"
