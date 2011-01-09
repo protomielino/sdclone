@@ -42,6 +42,7 @@
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
         <attnum name="blue" val="0.3"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="2">
@@ -54,6 +55,7 @@
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
         <attnum name="blue" val="0.3"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="3">
@@ -66,6 +68,7 @@
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
         <attnum name="blue" val="0.3"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="4">
@@ -78,6 +81,7 @@
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
         <attnum name="blue" val="0.3"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
       
       
@@ -93,6 +97,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="6">
@@ -105,6 +110,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
 
@@ -118,6 +124,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="8">
@@ -130,6 +137,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
 
@@ -143,6 +151,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="10">
@@ -155,6 +164,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
 
@@ -170,6 +180,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="12">
@@ -182,6 +193,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
 
@@ -196,6 +208,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
 
       <section name="14">
@@ -208,6 +221,7 @@
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
+        <attstr name="features" val=""></attstr>
       </section>
       -->
     </section>
