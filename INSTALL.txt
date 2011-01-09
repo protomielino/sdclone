@@ -1,6 +1,8 @@
 Table of contents
 -----------------
 
+WARNING: Only intended for developers who'll build Speed Dreams from sources.
+
 I - Pre-requisites
 
 II - Linux Installation from Sources
