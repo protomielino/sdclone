@@ -101,17 +101,16 @@ AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
 
     curSurf->material = material;
     sprintf(path, "%s/%s", TRK_SECT_SURFACES, material);
-    curSurf->kFriction     = GfParmGetNum(TrackHandle, path, TRK_ATT_FRICTION, (char*)NULL, 0.8f);
-    curSurf->kFriction2	   = GfParmGetNum(TrackHandle, path, TRK_ATT_FRICTION2, (char*)NULL, 0.8f);
+    curSurf->kFriction     = curSurf->kFrictionDry =
+		GfParmGetNum(TrackHandle, path, TRK_ATT_FRICTION, (char*)NULL, 0.8f);
     curSurf->kRollRes      = GfParmGetNum(TrackHandle, path, TRK_ATT_ROLLRES, (char*)NULL, 0.001f);
-    curSurf->kRollRes2	   = GfParmGetNum(TrackHandle, path, TRK_ATT_ROLLRES2, (char*)NULL, 0.001f);
     curSurf->kRoughness    = GfParmGetNum(TrackHandle, path, TRK_ATT_ROUGHT, (char*)NULL, 0.0f) /  2.0f;
     curSurf->kRoughWaveLen = (tdble)(2.0 * PI / GfParmGetNum(TrackHandle, path, TRK_ATT_ROUGHTWL, (char*)NULL, 1.0f));
     curSurf->kDammage      = GfParmGetNum(TrackHandle, path, TRK_ATT_DAMMAGE, (char*)NULL, 10.0f);
     curSurf->kRebound      = GfParmGetNum(TrackHandle, path, TRK_ATT_REBOUND, (char*)NULL, 0.5f);
     
-	//GfLogDebug("                   %.4f |     %.4f | %s\n",
-	//		   curSurf->kFriction, curSurf->kFriction2, curSurf->material);
+	//GfLogDebug("                      %.4f | %s\n",
+	//		   curSurf->kFrictionDry, curSurf->material);
 
     curSurf->next = theTrack->surfaces;
     theTrack->surfaces = curSurf;
@@ -863,7 +862,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
     }
     
 
-	//GfLogDebug("Track physics : kFriction | kFriction2 | Surface :\n");
+	//GfLogDebug("Track physics : kFrictionDry | Surface :\n");
 
     /* Main Track */
     material = GfParmGetStr(TrackHandle, TRK_SECT_MAIN, TRK_ATT_SURF, TRK_VAL_ASPHALT);

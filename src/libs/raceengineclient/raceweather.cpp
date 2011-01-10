@@ -29,28 +29,22 @@
      Store initial value for calculation of the rain intensity.
 */
 
+#include <tgf.h>
+
 #include <raceman.h>
 #include <track.h>
 
 #include "racesituation.h"
 #include "raceweather.h"
 
+
 // Start Weather
 void ReStartWeather(void)
 {
-	int timeofday;
-	int	rain;
-	int	clouds;
-	int	rainprob;
-	int problrain;
-	int probrain;
-	int	resul;
-	int resul2;
 	tTrack *track = ReInfo->track;
 
-	timeofday = track->timeofday;
-	clouds = track->clouds;
-	rain = track->rain;
+	int clouds = track->clouds;
+	int rain = track->rain;
 	
 	if (rain != TR_RAIN_RANDOM)
 	{
@@ -61,21 +55,18 @@ void ReStartWeather(void)
 	{
 		// Randow clouds (if no rain).
 		clouds = 1 + (int)(rand()/(float)RAND_MAX * 7); //random clouds on Track when championship or career
-		resul = 1 + (int)(rand()/(float)RAND_MAX * 99); // rain probability, if result < rainprob, then it rains
+		int result = 1 + (int)(rand()/(float)RAND_MAX * 99); // rain likelyhood, if result < track->rainprob, then it rains
 
 		// Random rain.
-		rainprob = track->rainprob;
-		GfLogDebug("Result =  %d - RainProb = %d\n", resul, rainprob);
-		if (resul < rainprob)
+		GfLogDebug("Result =  %d - RainProb = %d\n", result, track->rainprob);
+		if (result < track->rainprob)
 		{
-			problrain = track->rainlprob;
-			probrain = track->probrain;
-			resul2 = 1 + (int)(rand()/(float)RAND_MAX * 99); 
-			if (resul2 < (problrain + 1)) // if result2 < probability little rain, so rain = little rain
+			int resul2 = 1 + (int)(rand()/(float)RAND_MAX * 99); 
+			if (resul2 < (track->rainlprob + 1)) // if result2 < little rain likelyhood, rain = little rain
 				rain = TR_RAIN_LITTLE;
-			else if (resul2 < (probrain +1)) // if result2 < probability normal rain, so rain = normal rain
+			else if (resul2 < (track->probrain +1)) // if result2 < medium rain likelyhood, rain = medium rain
 				rain = TR_RAIN_MEDIUM;
-			else // result2 > probability normal rain so rain = Heavy rain
+			else // otherwise, result2 >= medium rain likelyhood, rain = Heavy rain
 				rain = TR_RAIN_HEAVY;
 		}
 		else
@@ -92,54 +83,42 @@ void ReStartWeather(void)
 
 	track->rain = rain;
 	track->clouds = (rain != TR_RAIN_NONE) ? TR_CLOUDS_FULL : clouds; // rain => heavy clouds
-	track->water = track->rain; // ground water = rain ; should change in the future
+	track->water = rain; // ground water = rain ; may be disconnected in the future
 	
 	ReTrackUpdate();
 }
 
-// Update Track Physic
+// Update Track Physics (compute kFriction from current "water level" on ground).
 void ReTrackUpdate(void)
 {
 	tTrack *track = ReInfo->track;
-	int rain = track->rain;
 
-	GfLogDebug("ReTrackUpdate : Track timeofday=%d, clouds=%d, rain=%d, water=%d, rainp=%d, rainlp=%d\n",
-			   track->timeofday, track->clouds, track->rain, track->water, track->rainprob, track->rainlprob);
+	// Get the wet / dry friction coefficients ratio.
+	void* hparmTrackConsts =
+		GfParmReadFile(TRK_PHYSICS_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	const tdble kFrictionWetDryRatio = 
+		GfParmGetNum(hparmTrackConsts, TRKP_SECT_SURFACES, TRKP_VAL_FRICTIONWDRATIO, (char*)NULL, 0.5f);
+	GfParmReleaseHandle(hparmTrackConsts);
+	
+	// Determine the "wetness" (inside  [0, 1]).
+	const tdble wetness = (tdble)track->water / TR_WATER_MUCH;
+
+	GfLogDebug("ReTrackUpdate : water = %d, wetness = %.2f, wet/dry mu = %.4f\n",
+			   track->water, wetness, kFrictionWetDryRatio);
+
+	// Set the actual friction for each track surface (only those on the ground).
 	GfLogDebug("ReTrackUpdate : kFriction | kRollRes | Surface :\n");
-
 	tTrackSurface *curSurf;
 	curSurf = track->surfaces;
 	do
 	{
-		curSurf->kFrictionDry = curSurf->kFriction; // Store initial value!
-		switch (rain)
-		{
-			case 1:
-			{
-				curSurf->kFriction     = curSurf->kFriction2;
-				curSurf->kRollRes      = curSurf->kRollRes2;
-				break;
-			}
-			case 2:
-			{
-				curSurf->kFriction     = curSurf->kFriction2 * 0.9f;
-				curSurf->kRollRes      = curSurf->kRollRes2;
-				break;
-			}
-			case 3:
-			{
-				curSurf->kFriction     = curSurf->kFriction2 * 0.7f;
-				curSurf->kRollRes      = curSurf->kRollRes2;
-				break;
-			}
-			default:
-			{
-				curSurf->kFriction     = curSurf->kFriction;
-				curSurf->kRollRes      = curSurf->kRollRes;
-				break;
-			}
-		}							
-		
+		// Linear interpolation of kFriction from dry to wet according to wetness.
+		curSurf->kFriction =
+			curSurf->kFrictionDry * (1 - wetness)
+			+ curSurf->kFrictionDry * kFrictionWetDryRatio * wetness;
+
+		// For the moment, we don't change curSurf->kRollRes (will change in the future).
+			
 		GfLogDebug("                   %.4f |   %.4f | %s\n",
 				   curSurf->kFriction, curSurf->kRollRes, curSurf->material);
 
