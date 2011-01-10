@@ -132,8 +132,6 @@
 #define TRK_ATT_ROUGHTWL "roughness wavelength"
 #define TRK_ATT_DAMMAGE  "dammage"
 #define TRK_ATT_REBOUND  "rebound"
-#define TRK_ATT_FRICTION2 "friction rain"
-#define TRK_ATT_ROLLRES2  "rolling resistance rain"
 #define TRK_ATT_TEXTURE  "texture name"
 #define TRK_ATT_BUMPNAME "bump name"
 #define TRK_ATT_TEXTYPE  "texture type"
@@ -249,6 +247,15 @@
 #define TRK_SECT_SECTORS	"Sectors"
 #define TRK_ATT_SECTOR_DFS	"distance from start"
 
+
+/* Parameters strings for track physics constants */
+
+#define TRK_PHYSICS_FILE "data/tracks/physics.xml"
+
+#define TRKP_SECT_SURFACES	"Surfaces"
+#define TRKP_VAL_FRICTIONWDRATIO		"friction wet dry ratio"
+
+
 /** road camera */
 typedef struct RoadCam
 {
@@ -272,11 +279,9 @@ typedef struct trackSurface {
     const char *material;	/**< Type of material used */
 
     tdble kFriction;		/**< Coefficient of friction for simu */
-    tdble kFriction2;		/**< Coefficient of friction rain */
-    tdble kFrictionDry;		/**< Coefficient of friction if dry */
+    tdble kFrictionDry;		/**< TODO: Remove ????? Coefficient of friction if dry */
     tdble kRebound;		    /**< Coefficient of energy restitution */
     tdble kRollRes;		    /**< Rolling resistance */
-    tdble kRollRes2;		/**< Rolling resistance rain*/
     tdble kRoughness;		/**< Roughtness in m of the surface (wave height) */
     tdble kRoughWaveLen;	/**< Wave length in m of the surface */
     tdble kDammage;		    /**< Dammages in case of collision */
