@@ -1260,7 +1260,7 @@ GfParmReadFile (const char *file, int mode, bool neededFile)
 	    in = NULL;
 	}
 
-	//GfLogTrace("Loaded %s (%p)\n", file, parmHandle);
+	GfLogTrace("Loaded %s (%p)\n", file, parmHandle);
     }
 
     GF_TAILQ_INSERT_HEAD (&parmHandleList, parmHandle, linkHandle);
@@ -1632,7 +1632,7 @@ GfParmWriteFile (const char *file, void *parmHandle, const char *name)
 
     fclose (fout);
   
-    //GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
+    GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
     
     return 0;
 }
@@ -1728,11 +1728,11 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
   	      fputs ("<!--    the Free Software Foundation; either version 2 of the License, or     -->\n", fout);
   	      fputs ("<!--    (at your option) any later version.                                   -->\n", fout);
 	  }
-    }    
+    }
 
     fclose (fout);
   
-    //GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
+    GfLogTrace ("Wrote %s (%p)\n", file, parmHandle);
     
     return 0;
 }
