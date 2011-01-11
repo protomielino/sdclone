@@ -80,8 +80,10 @@ ROBOT_DATA(NAME usr_sc PREFIX usr_sc
 ###################
 # USR_LS1
 ###################
-SET(ROBOT_SUBDIRS 1 2 3 4 7 8
+SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
                   ls1-archer-r9 ls1-vulture-v6r ls1-zentek-z7r
+                  ls1-cavallo-570s1 ls1-newcastle-fury
+                  ls1-taipan-ltsr ls1-toro-rgt
                   tracks)
 
 ROBOT_DATA(NAME usr_ls1 PREFIX usr_ls1
