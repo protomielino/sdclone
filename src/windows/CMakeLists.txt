@@ -14,16 +14,16 @@ if (COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-ADD_EXECUTABLE(speed-dreams ${SD_SOURCES})
+ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
 include_directories(../libs)
-ADD_SDLIB_LIBRARY(speed-dreams client tgf ssggraph)
+ADD_SDLIB_LIBRARY(speed-dreams-2 client tgf ssggraph)
 
-ADD_PLIB_LIBRARY(speed-dreams sg ssg ul)
+ADD_PLIB_LIBRARY(speed-dreams-2 sg ssg ul)
 
 SD_INSTALL_FILES(INCLUDE FILES osspec.h)
 
-SD_INSTALL_FILES(BIN TARGETS speed-dreams)
+SD_INSTALL_FILES(BIN TARGETS speed-dreams-2)
 
 # Install OpenAL and SDL DLLs close to Speed Dreams executable
 FIND_PACKAGE(OpenAL)

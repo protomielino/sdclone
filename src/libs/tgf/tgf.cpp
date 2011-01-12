@@ -469,7 +469,7 @@ void GfRestart(bool bHardwareMouse, bool bMultiTexturing)
     int	argInd;
 
     // Command name.
-    sprintf(cmd, "%sspeed-dreams", GetBinDir());
+    sprintf(cmd, "%sspeed-dreams-2", GetBinDir());
 #ifdef WIN32
     strcat(cmd, ".exe");
 #endif

@@ -1,5 +1,5 @@
 INCLUDE(../../../cmake/macros.cmake)
-PROJECT(sd-menuview)
+PROJECT(menuview)
 
 SET(MENUVIEW_SOURCES main.cpp previewmenu.cpp)
 
@@ -14,26 +14,26 @@ if (COMMAND cmake_policy)
 endif(COMMAND cmake_policy)
 
 IF(UNIX)
-	ADD_EXECUTABLE(sd-menuview ${MENUVIEW_SOURCES} ../../linux/linuxspec.cpp)
+	ADD_EXECUTABLE(${SD_TOOLS_EXECPREFIX}menuview ${MENUVIEW_SOURCES} ../../linux/linuxspec.cpp)
 ENDIF(UNIX)
 
 IF (WIN32)	
-	ADD_EXECUTABLE(sd-menuview ${MENUVIEW_SOURCES} ../../windows/windowsspec.cpp)
+	ADD_EXECUTABLE(${SD_TOOLS_EXECPREFIX}menuview ${MENUVIEW_SOURCES} ../../windows/windowsspec.cpp)
 ENDIF(WIN32)
 
 
-ADD_SDLIB_LIBRARY(sd-menuview robottools tgf tgfclient client)
+ADD_SDLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview robottools tgf tgfclient client)
 
 
 IF(OPENGL_FOUND)
-	TARGET_LINK_LIBRARIES(sd-menuview ${OPENGL_LIBRARY})
+	TARGET_LINK_LIBRARIES(${SD_TOOLS_EXECPREFIX}menuview ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
 
-ADD_PNG_LIBRARY(sd-menuview)
-ADD_SDL_LIBRARY(sd-menuview)
+ADD_PNG_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview)
+ADD_SDL_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview)
 
-ADD_PLIB_LIBRARY(sd-menuview sg ssg ul)
-ADD_DL_LIBRARY(sd-menuview)
+ADD_PLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview sg ssg ul)
+ADD_DL_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview)
 
-SD_INSTALL_FILES(BIN TARGETS sd-menuview)
+SD_INSTALL_FILES(BIN TARGETS ${SD_TOOLS_EXECPREFIX}menuview)
 

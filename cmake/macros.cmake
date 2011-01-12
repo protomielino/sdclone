@@ -28,9 +28,9 @@ ENDIF(NOT DEFINED IN_SOURCETREE)
 
 IF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   IF(WIN32)
-	  SET(CMAKE_INSTALL_PREFIX "C:/Program files/speed-dreams-dev" CACHE PATH "Prefix prepended to install directories" FORCE)
+	  SET(CMAKE_INSTALL_PREFIX "C:/Program files" CACHE PATH "Prefix prepended to install directories" FORCE)
   ELSE()
-    SET(CMAKE_INSTALL_PREFIX "/usr/local/dev" CACHE PATH "Prefix prepended to install directories" FORCE)
+    SET(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Prefix prepended to install directories" FORCE)
   ENDIF()
 ENDIF(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 
@@ -58,9 +58,15 @@ ELSE(IN_SOURCETREE)
 ENDIF(IN_SOURCETREE)
 
 IF(WIN32)
-	SET(SD_LOCALDIR "~/speed-dreams-dev.settings" CACHE DOC "Where the user settings files should go")
+	SET(SD_LOCALDIR "~/speed-dreams-2.settings" CACHE DOC "Where the user settings files should go")
 ELSE(WIN32) #UNIX
-	SET(SD_LOCALDIR "~/.speed-dreams-dev" CACHE DOC "Where the user settings files should go")
+	SET(SD_LOCALDIR "~/.speed-dreams-2" CACHE DOC "Where the user settings files should go")
+ENDIF(WIN32)
+
+IF(WIN32)
+	SET(SD_TOOLS_EXECPREFIX "sd2-" CACHE DOC "Prefix for the tools executable names")
+ELSE(WIN32) #UNIX
+	SET(SD_TOOLS_EXECPREFIX "sd2-" CACHE DOC "Prefix for the tools executable names")
 ENDIF(WIN32)
 
 IF(IN_SOURCETREE)
@@ -70,15 +76,15 @@ IF(IN_SOURCETREE)
 		SET(_DEFLIBDIR "lib64")
 	ENDIF()
 	IF(WIN32)
-		SET(SD_BINDIR bin CACHE PATH "Place where the executables should go")
-		SET(SD_DATADIR data CACHE PATH "Place where all the static data files should go")
-		SET(SD_LIBDIR ${_DEFLIBDIR} CACHE PATH "Place where the libraries should go")
-		SET(SD_INCLUDEDIR include CACHE PATH "Place where the include files should go")
+		SET(SD_BINDIR speed-dreams-2/bin CACHE PATH "Place where the executables should go")
+		SET(SD_DATADIR speed-dreams-2/data CACHE PATH "Place where all the static data files should go")
+		SET(SD_LIBDIR speed-dreams-2/${_DEFLIBDIR} CACHE PATH "Place where the libraries should go")
+		SET(SD_INCLUDEDIR speed-dreams-2/include CACHE PATH "Place where the include files should go")
 	ELSE(WIN32) #UNIX
 		SET(SD_BINDIR games CACHE PATH "Place where the executables should go")
-		SET(SD_DATADIR share/games/speed-dreams CACHE PATH "Place where all the static data files should go")
-		SET(SD_LIBDIR ${_DEFLIBDIR}/games/speed-dreams CACHE PATH "Place where the libraries should go")
-		SET(SD_INCLUDEDIR include/speed-dreams CACHE PATH "Place where the include files should go")
+		SET(SD_DATADIR share/games/speed-dreams-2 CACHE PATH "Place where all the static data files should go")
+		SET(SD_LIBDIR ${_DEFLIBDIR}/games/speed-dreams-2 CACHE PATH "Place where the libraries should go")
+		SET(SD_INCLUDEDIR include/speed-dreams-2 CACHE PATH "Place where the include files should go")
 	ENDIF(WIN32)
 ELSE(IN_SOURCETREE)
 	SET(SD_DATADIR ${SD_DATADIR_ABS})
@@ -1045,14 +1051,14 @@ ENDMACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
 #  TARGETS  : Targets to install
 # Examples:
 #  SD_INSTALL_FILES(DATA drivers/bt FILES bt.xml logo.rgb)
-#     Installs bt.xml and logo.rgb in ${prefix}/share/games/speed-dreams/drivers/bt
+#     Installs bt.xml and logo.rgb in ${prefix}/${SD_DATADIR}/drivers/bt
 #  SD_INSTALL_FILES(DATA config/raceman USER config/raceman FILES quickrace.xml endrace.xml)
-#     Installs quickrace.xml and endrace.xml in ${prefix}/share/games/speed-dreams/drivers/bt
-#     and copies the file to the users settings folder ~/.speed-dreams/config/raceman at startup.
+#     Installs quickrace.xml and endrace.xml in ${prefix}/${SD_DATADIR}/drivers/bt
+#     and copies the file to the users settings folder ${SD_LOCALDIR}/config/raceman at startup.
 #  SD_INSTALL_FILES(LIB drivers/bt TARGETS bt.so)
-#     Installs bt.so in ${prefix}/lib/speed-dreams/drivers/bt
+#     Installs bt.so in ${prefix}/${SD_LIBDIR}/drivers/bt
 #  SD_INSTALL_FILES(BIN TARGETS speed-dreams)
-#     Installs the speed-dreams target in ${prefix}/games
+#     Installs the speed-dreams target in ${prefix}/${SD_BINDIR}
 MACRO(SD_INSTALL_FILES)
 
 	SET(SD_INSTALL_FILES_SYNTAX "DATA,1,1,IS_DATA,DATA_PATH")

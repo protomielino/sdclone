@@ -48,9 +48,9 @@ or our Tracker (visit http://sourceforge.net/apps/trac and login to SF.net for t
 
 Car Setups
 ----------
-For the human player driver, the car parameters are located in the files :
-- Linux   : ~/.speed-dreams-dev/drivers/human/car*.xml
-- Windows : <My documents>\speed-dreams-dev.settings\drivers\human\car*.xml
+You can have you own version on the car setups for the human driver
+- Linux   : ~/.speed-dreams-2/drivers/human/...
+- Windows : <My documents>\speed-dreams-2.settings\human\...
 depending on the car used. You can change them with a text editor, 
 for more information look into the robot tutorial chapter 5
 (http://www.berniw.org/torcs/robot/ch5/properties.html).

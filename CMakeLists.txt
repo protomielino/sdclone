@@ -107,9 +107,6 @@ SD_INSTALL_FILES(DATA "/"
                  FILES credits.xml 
                        CHANGES.txt COPYING.txt INSTALL.txt README.txt TODO.txt)
 
-SD_INSTALL_FILES(BIN
-                 FILES sd-robotgen.sh)
-
 ADD_SUBDIRECTORY(src)
 ADD_SUBDIRECTORY(data)
 ADD_SUBDIRECTORY(cmake)
@@ -126,6 +123,17 @@ IF(WIN32)
 	ADD_CUSTOM_TARGET(UNINSTALL "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
 ELSE(WIN32)
 	ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
+ENDIF(WIN32)
+
+# Ensure system run-time libs are installed under Windows (MSVC*80.dll and co.).
+# We do it ourselves, but use InstallRequiredSystemLibraries to figure out what they are
+IF(WIN32)
+	SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
+	INCLUDE(InstallRequiredSystemLibraries)
+	IF(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
+		INSTALL(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} 
+		        DESTINATION ${SD_BINDIR_ABS})
+	ENDIF(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
 ENDIF(WIN32)
 
 # Configure CPack.

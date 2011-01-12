@@ -1,5 +1,3 @@
-INCLUDE(InstallRequiredSystemLibraries)
-
 ##########################################################################################
 # Settings that are common to all target systems.
 

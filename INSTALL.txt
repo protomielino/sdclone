@@ -62,11 +62,17 @@ The Speed Dreams Team.
 
   a - uncompress the tarball :
 
-      $ tar xfvj speed-dreams-xxx.tar.bz2
+     . if bzip2-compressed (the old way) :
+
+         $ tar xfvj speed-dreams-xxx.tar.bz2
+
+     . if 7z-compressed (the new way) :
+
+      $ 7zr x -so speed-dreams-xxx.tar.7z | tar xvf -
 
   b - configure :
 
-    1.  cd to the path where Speed-dreams sources are installed.
+    1.  cd to the path where Speed Dreams sources are installed.
 
       $ cd <speed-dreams-source-tree>
 
@@ -84,10 +90,10 @@ The Speed Dreams Team.
 
           Example :
 
-            $ cmake -D TORCS_LOCALDIR:STRING=~/dev/.speed-dreams \
-                    -D CMAKE_INSTALL_PREFIX:PATH=/usr/local/dev \
+            $ cmake -D SD_LOCALDIR:STRING=~/dev/.sd-settings \
+                    -D CMAKE_PREFIX_PATH:STRING=/usr/local
                     -D CMAKE_BUILD_TYPE:STRING=Debug \
-                    -D OPTION_DEBUG:BOOL=ON
+                    -D OPTION_OFFICIAL_ONLY:BOOL=OFF
 
         or else you can use ccmake to change the variables interactively :
 
@@ -106,8 +112,14 @@ The Speed Dreams Team.
 
         Usefull CMake variables for Speed Dreams :
 
-        - TORCS_LOCALDIR:STRING		: User settings dir for run-time (def: ~/.speed-dreams)
-        - OPTION_DEBUG:BOOL		    : Full run-time traces if ON (def: OFF)
+        - SD_LOCALDIR:STRING		: User settings dir for run-time (def: ~/.speed-dreams-2)
+        - OPTION_DEBUG:BOOL			: Full run-time traces if ON (def: OFF)
+        - OPTION_TRACE_LEVEL:STRING : Run-time traces level integer threshold, 
+                                      only if OPTION_DEBUG (traces with higher level are 
+                                      not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 
+                                                   4=Trace, 5=Debug, ...) (def: 5)
+        - CMAKE_PREFIX_PATH:STRING	: Path prefixes for additional 3rdParty libraries (def:empty)
+                                      (use /usr/local if you compiled some 3rdParty libs yourself).
         - CMAKE_INSTALL_PREFIX:PATH	: Install path (def: /usr/local)
         - CMAKE_BUILD_TYPE:STRING	: Debug, Release, RelWithDebInfo, MinSizeRel (def: Release)
 
@@ -128,11 +140,11 @@ The Speed Dreams Team.
 
     if default CMake settings were kept, Speed Dreams is normally installed in /usr/local :
 
-      $ speed-dreams
+      $ speed-dreams-2
       
-    or, if /usr/local/bin not already in your PATH :
+    or, if /usr/local/games not already in your PATH :
       
-      $ /usr/local/bin/speed-dreams
+      $ /usr/local/games/speed-dreams-2
 
 3 - Runtime options
 
@@ -208,7 +220,9 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
         or be ready for headaches.
 
 
-2) MS VC++ 6 no more supported.
+2) MinGW : We want it ! Who can take care of the port :-?
+
+3) MS VC++ 6 : No more supported.
 
 III - FreeBSD installation from sources
 ---------------------------------------

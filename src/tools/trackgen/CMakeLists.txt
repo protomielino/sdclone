@@ -1,4 +1,5 @@
 INCLUDE(../../../cmake/macros.cmake)
+
 PROJECT(trackgen)
 
 SET(TRACKGEN_SOURCES ac3d.cpp easymesh.cpp elevation.cpp maintrackgen.cpp
@@ -12,9 +13,9 @@ ADD_SDL_INCLUDEDIR()
 ADD_INTERFACE_INCLUDEDIR()
 
 #disable developer warning
-if (COMMAND cmake_policy)
+IF (COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
-endif(COMMAND cmake_policy)
+ENDIF(COMMAND cmake_policy)
 
 IF(WIN32)
 	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
@@ -22,26 +23,23 @@ IF(WIN32)
 ENDIF(WIN32)
 
 IF(UNIX)
-	ADD_EXECUTABLE(sd-trackgen ${TRACKGEN_SOURCES} ../../linux/linuxspec.cpp)
+	ADD_EXECUTABLE(${SD_TOOLS_EXECPREFIX}trackgen ${TRACKGEN_SOURCES} ../../linux/linuxspec.cpp)
 ENDIF(UNIX)
 
 IF (WIN32)	
-	ADD_EXECUTABLE(sd-trackgen ${TRACKGEN_SOURCES} ../../windows/windowsspec.cpp)
+	ADD_EXECUTABLE(${SD_TOOLS_EXECPREFIX}trackgen ${TRACKGEN_SOURCES} ../../windows/windowsspec.cpp)
 ENDIF(WIN32)
 
-
-ADD_SDLIB_LIBRARY(sd-trackgen robottools tgf tgfclient client)
-
+ADD_SDLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen robottools tgf tgfclient client)
 
 IF(OPENGL_FOUND)
-	TARGET_LINK_LIBRARIES(sd-trackgen ${OPENGL_LIBRARY})
+	TARGET_LINK_LIBRARIES(${SD_TOOLS_EXECPREFIX}trackgen ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
 
-ADD_PNG_LIBRARY(sd-trackgen)
-ADD_SDL_LIBRARY(sd-trackgen)
+ADD_PNG_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen)
+ADD_SDL_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen)
+ADD_PLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen sg ssg ul)
+ADD_DL_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen)
 
-ADD_PLIB_LIBRARY(sd-trackgen sg ssg ul)
-ADD_DL_LIBRARY(sd-trackgen)
-
-SD_INSTALL_FILES(BIN TARGETS sd-trackgen)
+SD_INSTALL_FILES(BIN TARGETS ${SD_TOOLS_EXECPREFIX}trackgen)
 
