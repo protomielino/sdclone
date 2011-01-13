@@ -332,8 +332,7 @@ void GfCar::load(void* hparmCar)
 		(_fFrontRearMassRatio * fMuFront + (1.0f - _fFrontRearMassRatio) * fMuRear) * G;
 
 	// "Aerodynamic = High speed" grip (same + with aero down-force).
-	// TODO: Check formula (F/R Clift repartition "guessed" from Kristof's ; sure it's wrong ;-)
-	const tdble fRefCarSpeed = 200 / 3.6f;
+	const tdble fRefCarSpeed2 = 40000 / 12.96f; //200 km/h square in m/s
 	const tdble fFrontWingArea =
 		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_WINGAREA, (char*)NULL, 0.0);
 	const tdble fRearWingArea =
@@ -346,29 +345,47 @@ void GfCar::load(void* hparmCar)
 		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0);
 	const tdble fRearClift =
 		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0);
-	const double fTotalFrontClift = 2 * fFrontClift + 4.92 * fFrontWingArea * sin(fFrontWingAngle);
-	const double fTotalRearClift = 2 * fRearClift + 4.92 * fRearWingArea * sin(fRearWingAngle);
-// Work in progress.
+	const tdble fFrontWingXpos =
+		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_XPOS, (char*)NULL, 0);
+	const tdble fRearWingXpos =
+		GfParmGetNum(hparmCar, SECT_REARWING, PRM_XPOS, (char*)NULL, 0);
+	const tdble fFrontAxleXpos = 
+		GfParmGetNum(hparmCar, SECT_FRNTAXLE, PRM_XPOS, (char*)NULL, 0.0f);
+	const tdble fRearAxleXpos = 
+		GfParmGetNum(hparmCar, SECT_REARAXLE, PRM_XPOS, (char*)NULL, 0.0f);
+	const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0 - _fFrontRearMassRatio) * fRearAxleXpos;
+	const tdble fTotalFrontClift = 2 * fFrontClift + 4.92 * fFrontWingArea * sin(fFrontWingAngle);
+	const tdble fTotalRearClift = 2 * fRearClift + 4.92 * fRearWingArea * sin(fRearWingAngle);
+	const tdble fFrontAeroLoad = fRefCarSpeed2 *
+		(fTotalFrontClift * (fFrontWingXpos - fRearAxleXpos) + fTotalRearClift * (fRearWingXpos - fRearAxleXpos))
+		/(fFrontAxleXpos - fRearAxleXpos);
+	const tdble fRearAeroLoad = fRefCarSpeed2 *
+		(fTotalFrontClift * (fFrontAxleXpos - fFrontWingXpos) + fTotalRearClift * (fFrontAxleXpos - fRearWingXpos))
+		/(fFrontAxleXpos - fRearAxleXpos);
  	_fHighSpeedGrip =
- 		fRefCarSpeed * fRefCarSpeed
- 		* (tdble)(_fFrontRearMassRatio * fTotalFrontClift * fMuFront
-				  + (1.0 - _fFrontRearMassRatio) * fTotalRearClift * fMuRear) * G / _fMass;
+ 		(tdble)((_fFrontRearMassRatio * _fMass * G + fFrontAeroLoad) * fMuFront
+				  + ((1.0 - _fFrontRearMassRatio) * _fMass * G + fRearAeroLoad) * fMuRear) / _fMass;
 
-	// Inverse of the inertia around the Z axis.
+	// Cornering: axle distance divided by the inertia around the Z axis.
 	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, (char*)NULL, 1.0);
 	const tdble fCarLength = GfParmGetNum(hparmCar, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
 	const tdble fCarWidth = GfParmGetNum(hparmCar, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
 	_fInvertedZAxisInertia = // Stolen from Simu V2.1, car.cpp, SimCarConfig()
-		12.0f / (_fMass * fMassRepCoef * fMassRepCoef)
+		(fFrontAxleXpos - fRearAxleXpos) * 12.0f / (_fMass * fMassRepCoef * fMassRepCoef)
 		/ (fCarWidth * fCarWidth + fCarLength * fCarLength);
 	
-	// Theorical top speed on a flat road, assuming the gears are tuned accordingly.
+	// Theoretical top speed on a flat road, assuming the gears are tuned accordingly.
 	const tdble fFrontArea =
 		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.0f);
 	const tdble fCx =
 		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.35f);
 	const tdble muRollRes = 0.015f; // Average track.
-	const tdble eff = 0.95f * 0.95f; // Average gear * differential efficiencies
+	ossSpecPath.str("");
+	ossSpecPath << SECT_GEARBOX << '/' << ARR_GEARS << '/' << pszGearName[_nGears];
+	const tdble fTopGearEff = GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_EFFICIENCY, (char*)NULL, 1.0f);
+	// TODO: RWD, FWD, 4WD differential efficiency
+	const tdble fDiffEff = 0.95f; // now use an average number
+	const tdble eff = fTopGearEff * fDiffEff; // gear * differential efficiencies
 	const tdble Cd =
 		0.645f * fCx * fFrontArea
 		+ 1.23f * (fFrontWingArea * sin(fFrontWingAngle) + fRearWingArea * sin(fRearWingAngle));
