@@ -98,7 +98,6 @@ SimEngineConfig(tCar *car)
 	/* check engine brake */
 	if ( car->engine.brakeCoeff < 0.0 )
 	   {car->engine.brakeCoeff = 0.0;}
-	car->engine.brakeLinCoeff *= M_PI/30.0;
 }
 
 /* Update torque output with engine rpm and accelerator command */
