@@ -86,7 +86,8 @@ gfuiRightArrow(void *idv)
 int
 GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 				   int align, int style, const char *pszText,
-				   void *userData, tfuiComboboxCallback onChange)
+				   void *userData, tfuiComboboxCallback onChange, 
+				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiCombobox	*combobox;
     tGfuiObject		*object;
@@ -94,7 +95,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
   
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
 	object->widget = GFUI_COMBOBOX;
-	object->focusMode = GFUI_FOCUS_NONE;
+	object->focusMode = GFUI_FOCUS_NONE; // Children controls take care of this.
     object->id = screen->curId++;
     object->visible = 1;
 
@@ -170,23 +171,23 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	int xm = object->xmin + (object->xmax-object->xmin)/2;
 	int ym = object->ymin + (object->ymax-object->ymin)/2;
 
-	combobox->labelId = GfuiLabelCreate(scr, pszText, font, xm, ym, GFUI_ALIGN_HC_VC, 99);
+	combobox->labelId =
+		GfuiLabelCreateEx(scr, pszText, 0, font, xm, ym, GFUI_ALIGN_HC_VC, 99,
+						  userDataOnFocus, onFocus, onFocusLost);
 
 	// Create the left arrow button control.
     combobox->leftButtonId =
 		GfuiGrButtonCreate(scr, "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
 						   "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
 						   object->xmin, ym, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-						   (void*)(object->id), gfuiLeftArrow,
-						   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+						   (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
 
 	// Create the right arrow button control.
     combobox->rightButtonId =
 		GfuiGrButtonCreate(scr, "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
 						   "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
 						   object->xmax, ym, GFUI_ALIGN_HR_VC, GFUI_MOUSE_UP,
-						   (void*)(object->id), gfuiRightArrow,
-						   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+						   (void*)(object->id), gfuiRightArrow, 0, 0, 0);
 
     gfuiAddObject(screen, object);
 	

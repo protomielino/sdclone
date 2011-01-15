@@ -332,8 +332,10 @@ TGFCLIENT_API void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_SMALL_C       7
 #define GFUI_FONT_DIGIT         8
 TGFCLIENT_API int GfuiLabelCreate(void *scr, const char *text, 
-                        int font, int x, int y, int align, int maxlen);
-TGFCLIENT_API int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font, int x, int y, int align, int maxlen);
+								  int font, int x, int y, int align, int maxlen);
+TGFCLIENT_API int GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr,
+									int font, int x, int y, int align, int maxlen, 
+									void *userDataOnFocus = 0, tfuiCallback onFocus = 0, tfuiCallback onFocusLost = 0);
 
 TGFCLIENT_API void GfuiSetTipPosition(int x,int y);
 TGFCLIENT_API int GfuiTipCreate(void *scr, const char *text, int maxlen);
@@ -342,7 +344,8 @@ TGFCLIENT_API int GfuiTitleCreate(void *scr, const char *text, int maxlen);
 TGFCLIENT_API void GfuiLabelSetText(void *scr, int id, const char *text);
 TGFCLIENT_API void GfuiLabelSetColor(void *scr, int id, const float * colorPtr);
 
-TGFCLIENT_API void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, int align);
+TGFCLIENT_API void GfuiPrintString(const char *text, float *fgColor,
+								   int font, int x, int y, int align);
 TGFCLIENT_API int  GfuiFontHeight(int font);
 TGFCLIENT_API int  GfuiFontWidth(int font, const char *text);
 
@@ -350,22 +353,33 @@ TGFCLIENT_API int  GfuiFontWidth(int font, const char *text);
 /* Buttons */
 #define GFUI_BTNSZ      300
 TGFCLIENT_API int GfuiButtonCreate(void *scr, const char *text, int font,
-                            int x, int y, int width, int align, int mouse,
-                            void *userDataOnPush, tfuiCallback onPush, 
-                            void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
-                                 void *userDataOnPush, tfuiCallback onPush, 
-                                 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
-                              int x, int y, int align, int mouse,
-                              void *userDataOnPush, tfuiCallback onPush, 
-                              void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
-                   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
-                   void *userDataOnPush, tfuiCallback onPush, 
-                   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,int align ,int style,const char *pszText,void* userData,tfuiComboboxCallback onChange);
-TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,void* userData,tfuiCheckboxCallback onChange);
+								   int x, int y, int width, int align, int mouse,
+								   void *userDataOnPush, tfuiCallback onPush, 
+								   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y,
+										int width, int align, int mouse,
+										void *userDataOnPush, tfuiCallback onPush, 
+										void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
+									 const char *focused, const char *pushed,
+									 int x, int y, int align, int mouse,
+									 void *userDataOnPush, tfuiCallback onPush, 
+									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled,
+									   const char *focused, const char *pushed,
+									   int x, int y, int imageWidth,int imageHeight,
+									   int align, int mouse,
+									   void *userDataOnPush, tfuiCallback onPush, 
+									   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
+									 int align ,int style, const char *pszText,
+									 void* userData, tfuiComboboxCallback onChange,
+									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y,
+									 int imagewidth, int imageheight, int align, int style,
+									 const char *pszText, bool bChecked,
+									 void* userData, tfuiCheckboxCallback onChange,
+									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
 
 class TGFCLIENT_API Color
@@ -383,7 +397,10 @@ TGFCLIENT_API unsigned int GfuiComboboxGetPosition(void *scr, int id);
 TGFCLIENT_API const char* GfuiComboboxGetText(void *scr, int id);
 TGFCLIENT_API void GfuiComboboxClear(void *scr, int id);
 
-TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value);
+TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
+										const char *pszProgressbackImg, const char *progressbarimg,
+										int align,float min,float max,float value, 
+										void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 TGFCLIENT_API void GfuiProgressbarSetValue(void *scr, int id, float value);
 
 

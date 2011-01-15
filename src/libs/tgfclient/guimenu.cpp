@@ -481,7 +481,24 @@ CreateLabel(void *menuHandle,void *param,const char *pControlName)
         const int alignment = GetAlignment(pszAlignH,pszAlignV);
         const int maxlen = (int)GfParmGetNum(param,pControlName,"maxlen",NULL,32.0);
         
-        int labelId = GfuiLabelCreate(menuHandle, pszText, textsize, x, y, alignment, maxlen);
+        void *userDataOnFocus = 0;
+        tfuiCallback onFocus = 0;
+        tfuiCallback onFocusLost = 0;
+        const char* pszTip = GfParmGetStr(param, pControlName, "tip", 0);
+        if (pszTip && strlen(pszTip) > 0)
+        {
+                tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+                cbinfo->screen = menuHandle;
+                cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+                GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
+
+                userDataOnFocus = (void*)cbinfo;
+                onFocus = dispInfo;
+                onFocusLost = remInfo;
+        }
+
+        int labelId = GfuiLabelCreateEx(menuHandle, pszText, 0, textsize, x, y, alignment, maxlen,
+										userDataOnFocus, onFocus, onFocusLost);
 
         Color c;
         const bool bColor = GetColorFromXML(param,pControlName,"color",c);
@@ -505,9 +522,8 @@ CreateLabelControl(void *menuHandle,void *param,const char *pControlName)
 int 
 CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-        const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
-
-        if (strlen(pszTip) > 0)
+        const char* pszTip = GfParmGetStr(param, pControlName, "tip", 0);
+        if (pszTip && strlen(pszTip) > 0)
         {
                 tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
                 cbinfo->screen = menuHandle;
@@ -718,28 +734,42 @@ CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,void
 
 	int id = -1;
 	
-	std::string strText,strTip;
-	int textsize;
-	int x,y,width;
-
-	x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
-	y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
+	const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
 
 	std::string strTextsize = GfParmGetStr(param, strControlName.c_str(), "textsize", "");
-	textsize = GetFontSize(strTextsize.c_str());
+	const int textsize = GetFontSize(strTextsize.c_str());
 
 	const char * pszAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
 	const char * pszAlignV = GfParmGetStr(param, strControlName.c_str(), "alignV", "");
-	int align = GetAlignment(pszAlignH,pszAlignV);
+	const int align = GetAlignment(pszAlignH,pszAlignV);
 
 	
-	width = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
+	int width = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
 	if (width == 0)
 	    width = 200;
 
     const char* pszText = GfParmGetStr(param, strControlName.c_str(), "text", "");
 
-	id = GfuiComboboxCreate(menuHandle,textsize,x,y,width,align,0,pszText,userData,onChange);
+	const char* pszTip = GfParmGetStr(param, strControlName.c_str(), "tip", 0);
+	
+	void *userDataOnFocus = 0;
+	tfuiCallback onFocus = 0;
+	tfuiCallback onFocusLost = 0;
+	if (pszTip && strlen(pszTip) > 0)
+	{
+		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+		cbinfo->screen = menuHandle;
+		cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+		GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
+		
+		userDataOnFocus = (void*)cbinfo;
+		onFocus = dispInfo;
+		onFocusLost = remInfo;
+	}
+
+	id = GfuiComboboxCreate(menuHandle, textsize, x, y, width, align, 0, pszText,
+							userData, onChange, userDataOnFocus, onFocus, onFocusLost);
 
 	Color c;
 	bool bColor = GetColorFromXML(param,pControlName,"color",c);
@@ -883,8 +913,27 @@ CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,void
 
     const bool bChecked = ReadBoolean(param,strControlName.c_str(),"checked", true);
 
+	const char* pszTip = GfParmGetStr(param, strControlName.c_str(), "tip", "");
+	
+	void *userDataOnFocus = 0;
+	tfuiCallback onFocus = 0;
+	tfuiCallback onFocusLost = 0;
+	if (strlen(pszTip) > 0)
+	{
+		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+		cbinfo->screen = menuHandle;
+		cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+		GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
+		
+		userDataOnFocus = (void*)cbinfo;
+		onFocus = dispInfo;
+		onFocusLost = remInfo;
+	}
 
-	id = GfuiCheckboxCreate(menuHandle,textsize,x,y,imagewidth,imageheight,align,0,pszText,bChecked,userData,onChange);
+
+	id = GfuiCheckboxCreate(menuHandle, textsize, x, y, imagewidth, imageheight, align, 0,
+							pszText, bChecked, userData, onChange,
+							userDataOnFocus, onFocus, onFocusLost);
 
 	Color c;
 	bool bColor = GetColorFromXML(param,pControlName,"color",c);
@@ -898,31 +947,51 @@ CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,void
 int 
 CreateProgressbarControl(void *menuHandle,void *param,const char *pControlName)
 {
-		std::string strControlName("dynamiccontrols/");
-		strControlName += pControlName;
+	std::string strControlName("dynamiccontrols/");
+	strControlName += pControlName;
+	
+	const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
+	if (strType != "progressbar")
+		return -1;
+	
+	const char* pszProgressbackgroundImage = GfParmGetStr(param, strControlName.c_str(), "image", "data/img/progressbackground.png");
+	const char* pszProgressbarImage = GfParmGetStr(param, pControlName, "image", "data/img/progressbar.png");
+	
+	const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
+	const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
+	const int w = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
+	const int h = (int)GfParmGetNum(param,strControlName.c_str(),"height",NULL,0.0);
+	
+	const char* pszAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
+	const char* pszAlignV = GfParmGetStr(param, strControlName.c_str(), "alignV", "");
+	const float min = GfParmGetNum(param, strControlName.c_str(), "min",NULL,0.0);
+	const float max = GfParmGetNum(param, strControlName.c_str(), "max",NULL,100.0);
+	const float value = GfParmGetNum(param, strControlName.c_str(), "value",NULL,100.0);
+	const int alignment = GetAlignment(pszAlignH,pszAlignV);
+	
+	const char* pszTip = GfParmGetStr(param, strControlName.c_str(), "tip", "");
+	
+	void *userDataOnFocus = 0;
+	tfuiCallback onFocus = 0;
+	tfuiCallback onFocusLost = 0;
+	if (strlen(pszTip) > 0)
+	{
+		tMnuCallbackInfo * cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
+		cbinfo->screen = menuHandle;
+		cbinfo->labelId = GfuiTipCreate(menuHandle, pszTip, strlen(pszTip));
+		GfuiVisibilitySet(menuHandle, cbinfo->labelId, 0);
+		
+		userDataOnFocus = (void*)cbinfo;
+		onFocus = dispInfo;
+		onFocusLost = remInfo;
+	}
 
-		const std::string strType = GfParmGetStr(param, strControlName.c_str(), "type", "");
-		if (strType != "progressbar")
-			return -1;
-
-		const char* pszProgressbackgroundImage = GfParmGetStr(param, strControlName.c_str(), "image", "data/img/progressbackground.png");
-		const char* pszProgressbarImage = GfParmGetStr(param, pControlName, "image", "data/img/progressbar.png");
-
-        const int x = (int)GfParmGetNum(param,strControlName.c_str(),"x",NULL,0.0);
-        const int y = (int)GfParmGetNum(param,strControlName.c_str(),"y",NULL,0.0);
-        const int w = (int)GfParmGetNum(param,strControlName.c_str(),"width",NULL,0.0);
-        const int h = (int)GfParmGetNum(param,strControlName.c_str(),"height",NULL,0.0);
-
-        const char* pszAlignH = GfParmGetStr(param, strControlName.c_str(), "alignH", "");
-        const char* pszAlignV = GfParmGetStr(param, strControlName.c_str(), "alignV", "");
-		const float min = GfParmGetNum(param, strControlName.c_str(), "min",NULL,0.0);
-		const float max = GfParmGetNum(param, strControlName.c_str(), "max",NULL,100.0);
-		const float value = GfParmGetNum(param, strControlName.c_str(), "value",NULL,100.0);
-        const int alignment = GetAlignment(pszAlignH,pszAlignV);
-
-		int id = GfuiProgressbarCreate(menuHandle,x,y,w,h,pszProgressbackgroundImage,pszProgressbarImage,alignment,min,max,value);
-
-		return id;
+	int id = GfuiProgressbarCreate(menuHandle, x, y, w, h,
+								   pszProgressbackgroundImage, pszProgressbarImage,
+								   alignment, min, max, value,
+								   userDataOnFocus, onFocus, onFocusLost);
+	
+	return id;
 }
 
 //===================================================================================

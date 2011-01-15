@@ -239,68 +239,106 @@ GfuiUnSelectCurrent(void)
 static void
 gfuiLoseFocus(tGfuiObject *obj)
 {
-    tGfuiButton		*button;
-    tGfuiEditbox	*editbox;
-    tGfuiGrButton	*grbutton;
-
     GfuiScreen->hasFocus = (tGfuiObject*)NULL;
     obj->focus = 0;
-    switch (obj->widget) {
-    case GFUI_BUTTON:
-	button = &(obj->u.button);
-	button->state = GFUI_BTN_RELEASED;
-	if (button->onFocusLost != NULL) {
-	    button->onFocusLost(button->userDataOnFocus);
-	}
-	break;
-    case GFUI_GRBUTTON:
-	grbutton = &(obj->u.grbutton);
-	grbutton->state = GFUI_BTN_RELEASED;
-	if (grbutton->onFocusLost != NULL) {
-	    grbutton->onFocusLost(grbutton->userDataOnFocus);
-	}
-	break;
-    case GFUI_EDITBOX:
-	editbox = &(obj->u.editbox);
-	editbox->state = GFUI_BTN_RELEASED;	
-	if (editbox->onFocusLost != NULL) {
-	    editbox->onFocusLost(editbox->userDataOnFocus);
-	}
-	break;
+
+    switch (obj->widget)
+	{
+		case GFUI_BUTTON:
+		{
+			tGfuiButton* button = &(obj->u.button);
+			button->state = GFUI_BTN_RELEASED;
+			if (button->onFocusLost)
+				button->onFocusLost(button->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_GRBUTTON:
+		{
+			tGfuiGrButton* grbutton = &(obj->u.grbutton);
+			grbutton->state = GFUI_BTN_RELEASED;
+			if (grbutton->onFocusLost)
+				grbutton->onFocusLost(grbutton->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_EDITBOX:
+		{
+			tGfuiEditbox* editbox = &(obj->u.editbox);
+			editbox->state = GFUI_BTN_RELEASED;	
+			if (editbox->onFocusLost)
+				editbox->onFocusLost(editbox->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_PROGRESSBAR:
+		{
+			tGfuiProgressbar* progress = &(obj->u.progressbar);
+			if (progress->onFocusLost)
+				progress->onFocusLost(progress->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_LABEL:
+		{
+			tGfuiLabel* label = &(obj->u.label);
+			if (label->onFocusLost)
+				label->onFocusLost(label->userDataOnFocus);
+		}
+		break;
     }
 }
 
 static void
 gfuiSetFocus(tGfuiObject *obj)
 {
-    tGfuiButton		*button;
-    tGfuiEditbox	*editbox;
-    tGfuiGrButton	*grbutton;
-    
-    if (GfuiScreen->hasFocus != NULL) {
-	gfuiLoseFocus(GfuiScreen->hasFocus);
-    }
+    if (GfuiScreen->hasFocus)
+		gfuiLoseFocus(GfuiScreen->hasFocus);
+
     GfuiScreen->hasFocus = obj;
     obj->focus = 1;
-    switch (obj->widget) {
-    case GFUI_BUTTON:
-	button = &(obj->u.button);
-	if (button->onFocus != NULL) {
-	    button->onFocus(button->userDataOnFocus);
-	}
-	break;
-    case GFUI_GRBUTTON:
-	grbutton = &(obj->u.grbutton);
-	if (grbutton->onFocus != NULL) {
-	    grbutton->onFocus(grbutton->userDataOnFocus);
-	}
-	break;
-    case GFUI_EDITBOX:
-	editbox = &(obj->u.editbox);
-	if (editbox->onFocus != NULL) {
-	    editbox->onFocus(editbox->userDataOnFocus);
-	}
-	break;
+
+    switch (obj->widget)
+	{
+		case GFUI_BUTTON:
+		{
+			tGfuiButton* button = &(obj->u.button);
+			if (button->onFocus)
+				button->onFocus(button->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_GRBUTTON:
+		{
+			tGfuiGrButton* grbutton = &(obj->u.grbutton);
+			if (grbutton->onFocus)
+				grbutton->onFocus(grbutton->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_EDITBOX:
+		{
+			tGfuiEditbox* editbox = &(obj->u.editbox);
+			if (editbox->onFocus)
+				editbox->onFocus(editbox->userDataOnFocus);
+		}
+		break;
+
+		case GFUI_PROGRESSBAR:
+		{
+			tGfuiProgressbar* progress = &(obj->u.progressbar);
+			if (progress->onFocus)
+				progress->onFocus(progress->userDataOnFocus);
+		}
+		break;
+		
+		case GFUI_LABEL:
+		{
+			tGfuiLabel* label = &(obj->u.label);
+			if (label->onFocus)
+				label->onFocus(label->userDataOnFocus);
+		}
+		break;
     }
 }
 

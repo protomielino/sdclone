@@ -100,6 +100,10 @@ GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width
     strncpy(label->text, text, maxlen+1);
     label->font = gfuiFont[font];
     label->maxlen = maxlen;
+    label->userDataOnFocus = 0;
+    label->onFocus = 0;
+    label->onFocusLost = 0;
+
     if (width == 0) {
 	char *buf;
 	int  i;

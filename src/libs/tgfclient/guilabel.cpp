@@ -64,7 +64,9 @@ gfuiLabelInit(void)
     @see	GfuiSetLabelText
  */
 int 
-GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font, int x, int y, int align, int maxlen)
+GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr,
+				  int font, int x, int y, int align, int maxlen, 
+				  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiLabel	*label;
     tGfuiObject	*object;
@@ -72,11 +74,12 @@ GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font
     int     height;
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 
-    Color fgColor = GetColor((float*)fgColorPtr);
+    Color fgColor =
+		GetColor(fgColorPtr ? fgColorPtr : &(GfuiColor[GFUI_LABELCOLOR][0]));
     
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
     object->widget = GFUI_LABEL;
-    object->focusMode = GFUI_FOCUS_NONE;
+    object->focusMode = (onFocus || onFocusLost) ? GFUI_FOCUS_MOUSE_MOVE : GFUI_FOCUS_NONE;
     object->visible = 1;
     object->id = screen->curId++;
     
@@ -94,6 +97,11 @@ GfuiLabelCreateEx(void *scr, const char *text, const float *fgColorPtr, int font
 	height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
     
 	label->align = align;
+	
+    label->userDataOnFocus = userDataOnFocus;
+    label->onFocus = onFocus;
+    label->onFocusLost = onFocusLost;
+	
     switch(align) {
 	case GFUI_ALIGN_HL_VB:
 	label->x = object->xmin = x;
@@ -347,6 +355,7 @@ gfuiReleaseLabel(tGfuiObject *obj)
 
     label = &(obj->u.label);
 
+	freez(label->userDataOnFocus);
     free(label->text);
     free(obj);
 }

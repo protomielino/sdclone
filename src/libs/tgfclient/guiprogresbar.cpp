@@ -37,7 +37,10 @@
 		<br>-1 Error
     @warning	the image must be square and its size must be a power of 2.
 */
-int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *pszProgressbackImg,const char *progressbarimg, int align,float min,float max,float value)
+int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
+						  const char *pszProgressbackImg, const char *progressbarimg,
+						  int align, float min, float max, float value, 
+						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	tGfuiProgressbar *progress;
 	tGfuiObject *object;
@@ -45,7 +48,7 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *psz
 
 	object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
 	object->widget = GFUI_PROGRESSBAR;
-	object->focusMode = GFUI_FOCUS_NONE;
+	object->focusMode = (onFocus || onFocusLost) ? GFUI_FOCUS_MOUSE_MOVE : GFUI_FOCUS_NONE;
 	object->visible = 1;
 	object->id = screen->curId++;
 
@@ -64,6 +67,10 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h, const char *psz
 	else if (value < progress->min)
 		value = progress->min;
 	progress->value = value;
+
+    progress->userDataOnFocus = userDataOnFocus;
+    progress->onFocus = onFocus;
+    progress->onFocusLost = onFocusLost;
 
     switch (align) {
     case GFUI_ALIGN_HR_VB:
@@ -159,6 +166,7 @@ gfuiReleaseProgressbar(tGfuiObject *obj)
 
 	progress = &(obj->u.progressbar);
 	GfTexFreeTexture(progress->progressbarimage);
+	freez(progress->userDataOnFocus);
 
 	free(obj);
 }

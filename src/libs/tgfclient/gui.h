@@ -68,6 +68,9 @@ typedef struct
     int	x, y;		/* label position */
     int	align;
     int	maxlen;
+    void		*userDataOnFocus;
+    tfuiCallback	onFocus;
+    tfuiCallback	onFocusLost;
 } tGfuiLabel;
 
 /* button state */
@@ -225,6 +228,9 @@ typedef struct
 	float max;
 	float value;
 
+    void		*userDataOnFocus;
+    tfuiCallback	onFocus;
+    tfuiCallback	onFocusLost;
 } tGfuiProgressbar;
 
 

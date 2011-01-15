@@ -72,8 +72,10 @@ gfuiUnchecked(void *idv)
 }
 
 int 
-GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imageheight,int align ,int style,const char *pszText,bool bChecked,
-				   void* userData, tfuiCheckboxCallback onChange)
+GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageheight,
+				   int align ,int style, const char *pszText, bool bChecked,
+				   void* userData, tfuiCheckboxCallback onChange, 
+				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiCheckbox	*Checkbox;
     tGfuiObject		*object;
@@ -159,17 +161,19 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth,int imagehe
 	break;
     }
 
-	Checkbox->checkId = GfuiGrButtonCreateEx(scr, "data/img/checked.png", "data/img/checked.png",
-			       "data/img/checked.png", "data/img/checked.png",
-			       	x,y,imagewidth,imageheight, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-				   (void*)(object->id), gfuiChecked,
-			       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	Checkbox->checkId =
+		GfuiGrButtonCreateEx(scr, "data/img/checked.png", "data/img/checked.png",
+							 "data/img/checked.png", "data/img/checked.png",
+							 x,y,imagewidth,imageheight, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
+							 (void*)(object->id), gfuiChecked,
+							 userDataOnFocus, onFocus, onFocusLost);
 
-	Checkbox->uncheckId = GfuiGrButtonCreateEx(scr, "data/img/unchecked.png", "data/img/unchecked.png",
-			       "data/img/unchecked.png", "data/img/unchecked.png",
-			       x,y, imagewidth,imageheight,GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-				   (void*)(object->id), gfuiUnchecked,
-			       NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	Checkbox->uncheckId =
+		GfuiGrButtonCreateEx(scr, "data/img/unchecked.png", "data/img/unchecked.png",
+							 "data/img/unchecked.png", "data/img/unchecked.png",
+							 x,y, imagewidth,imageheight,GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
+							 (void*)(object->id), gfuiUnchecked, 0, 0, 0);
+	// We avoid sharing the same userDataOnFocus among multiple controls (otherwise multiple frees).
 
     gfuiAddObject(screen, object);
 

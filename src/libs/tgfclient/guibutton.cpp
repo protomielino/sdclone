@@ -417,6 +417,9 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
 	object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	break;
     }
+    label->userDataOnFocus = 0;
+    label->onFocus = 0;
+    label->onFocusLost = 0;
 #define HORIZ_MARGIN 10
     object->xmin -= HORIZ_MARGIN;
     object->xmax += HORIZ_MARGIN;

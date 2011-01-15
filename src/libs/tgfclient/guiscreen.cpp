@@ -179,8 +179,8 @@ tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSiz
 	// Get the possible sizes for this pixel format.
 	SDL_Rect **asdlPossSizes = SDL_ListModes(&sdlPixelFormat, sdlDisplayMode);
 
-	GfLogTrace("Available %u-bit %s video sizes :",
-			   sdlPixelFormat.BitsPerPixel, bFullScreen ? "full-screen" : "windowed");
+	GfLogInfo("Available %u-bit %s video sizes :",
+			  sdlPixelFormat.BitsPerPixel, bFullScreen ? "full-screen" : "windowed");
 
 	tScreenSize* aPossSizes;
 	if (asdlPossSizes == (SDL_Rect**)0)
@@ -216,7 +216,7 @@ tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSiz
 	return aPossSizes;
 }
 
-/** Get the possible color depths as supported bythe underlying hardware/driver.
+/** Get the possible color depths as supported by the underlying hardware/driver.
     @ingroup	screen
     @param	pnDepths	Address of number of detected color depths (output)
     @return	Array of detected possible color depths (allocated on the heap, must use free at the end)
