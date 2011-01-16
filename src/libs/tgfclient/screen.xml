@@ -16,7 +16,8 @@
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
 
-<params name="Screen" version="1.0">
+<params name="Screen" version="1.1">
+
   <section name="Screen Properties">
     <attnum name="x" val="800"/>
     <attnum name="y" val="600"/>
@@ -25,7 +26,8 @@
     <attnum name="gamma" val="2"/>
     <attnum name="window width" val="800"/>
     <attnum name="window height" val="600"/>
-    <attstr name="video mode init" val="compatible"/>
+    <attstr name="video mode detect" in="auto,manual" val="auto"/>
+    <attstr name="video mode init" in="compatible,best" val="compatible"/>
   </section>
 
   <section name="Menu Font">
@@ -239,7 +241,7 @@
   </section>
 
 </params>
-<!-- Keep this comment at the end of the file
+<!-- Emacs settings : Keep this comment at the end of the file
 Local variables:
 mode: xml
 sgml-omittag:nil

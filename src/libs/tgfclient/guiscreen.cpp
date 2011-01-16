@@ -64,6 +64,12 @@ static int GfScrCenY;
 // The screen surface.
 SDL_Surface *ScreenSurface = NULL;
 
+/* Default list of screen color depths (bits per pixel, alpha included) in case
+   something went wrong during hardware / driver capabilities detection */
+static int ADefScreenColorDepths[] = { 16, 24, 32 };
+static const int NDefScreenColorDepths =
+	sizeof(ADefScreenColorDepths) / sizeof(ADefScreenColorDepths[0]);
+
 /* Default list of screen sizes ("resolutions") in case
    something went wrong during hardware / driver capabilities detection */
 static tScreenSize ADefScreenSizes[] =
@@ -112,12 +118,13 @@ static tScreenSize ADefScreenSizes[] =
 	{ 1920, 1080 },
 	{ 1920, 1200 },
 };
-static const int NDefScreenSizes = sizeof(ADefScreenSizes) / sizeof(ADefScreenSizes[0]);
+static const int NDefScreenSizes =
+	sizeof(ADefScreenSizes) / sizeof(ADefScreenSizes[0]);
 
-/** Get the default / fallback screen / windows sizes (pixels).
+/** Get the default / fallback screen / window sizes (pixels).
     @ingroup	screen
     @param	pnSizes	Address of number of default sizes (output).
-    @return	Array of detected possible sizes (static data, never free).
+    @return	Array of detected supported sizes (static data, never free).
  */
 tScreenSize* GfScrGetDefaultSizes(int* pnSizes)
 {
@@ -126,15 +133,15 @@ tScreenSize* GfScrGetDefaultSizes(int* pnSizes)
 	return ADefScreenSizes;
 }
 
-/** Get the possible screen / windows sizes (pixels) for the given color depth and display mode.
+/** Get the supported screen / window sizes (pixels) for the given color depth and display mode.
     @ingroup	screen
     @param	nColorDepth	Requested color depth (bits)
     @param	bFullScreen	Requested display mode : full-screeen mode if true, windowed otherwise.
-    @param	pnSizes	Address of number of detected possible sizes (output) (-1 if any size is possible).
-    @return	Array of detected possible sizes (allocated on the heap, must use free at the end), or 0 if no detected possible size, or -1 if any size is possible.
+    @param	pnSizes	Address of number of detected supported sizes (output) (-1 if any size is supported).
+    @return	Array of detected supported sizes (allocated on the heap, must use free at the end), or 0 if no detected supported size, or -1 if any size is supported.
 	@note   The vertical refresh rate is not taken into account as a parameter for detection here, due to SDL API not supporting this ; fortunately, when selecting a given video mode, SDL ensures to (silently) select a safe refresh rate for the selected mode, which may be of some importantce especially in full-screen modes.
  */
-tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSizes)
+tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSizes)
 {
 	// Query system video capabilities.
 	const SDL_VideoInfo* sdlVideoInfo = SDL_GetVideoInfo();
@@ -176,56 +183,68 @@ tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSiz
 	if (bFullScreen)
 		sdlDisplayMode |= SDL_FULLSCREEN;
 	
-	// Get the possible sizes for this pixel format.
-	SDL_Rect **asdlPossSizes = SDL_ListModes(&sdlPixelFormat, sdlDisplayMode);
+	// Get the supported sizes for this pixel format.
+	SDL_Rect **asdlSuppSizes = SDL_ListModes(&sdlPixelFormat, sdlDisplayMode);
 
 	GfLogInfo("Available %u-bit %s video sizes :",
 			  sdlPixelFormat.BitsPerPixel, bFullScreen ? "full-screen" : "windowed");
 
-	tScreenSize* aPossSizes;
-	if (asdlPossSizes == (SDL_Rect**)0)
+	tScreenSize* aSuppSizes;
+	if (asdlSuppSizes == (SDL_Rect**)0)
 	{
 		GfLogInfo(" None.\n");
-		aPossSizes = (tScreenSize*)0;
+		aSuppSizes = (tScreenSize*)0;
 		*pnSizes = 0;
 	}
-	else if (asdlPossSizes == (SDL_Rect**)-1)
+	else if (asdlSuppSizes == (SDL_Rect**)-1)
 	{
 		GfLogInfo(" Any.\n");
-		aPossSizes = (tScreenSize*)-1;
+		aSuppSizes = (tScreenSize*)-1;
 		*pnSizes = -1;
 	}
 	else
 	{
-		// Count the possible sizes.
+		// Count the supported sizes.
 		*pnSizes = 0;
-		while (asdlPossSizes[*pnSizes])
+		while (asdlSuppSizes[*pnSizes])
 			(*pnSizes)++;
 
 		// Copy them into the output array.
-		aPossSizes = (tScreenSize*)malloc((*pnSizes)*sizeof(tScreenSize));
+		aSuppSizes = (tScreenSize*)malloc((*pnSizes)*sizeof(tScreenSize));
 		for (int nSizeInd = 0; nSizeInd < *pnSizes; nSizeInd++)
 		{
-			aPossSizes[nSizeInd].width  = asdlPossSizes[*pnSizes - 1 - nSizeInd]->w;
-			aPossSizes[nSizeInd].height = asdlPossSizes[*pnSizes - 1 - nSizeInd]->h;
-			GfLogInfo(" %dx%d,", aPossSizes[nSizeInd].width, aPossSizes[nSizeInd].height);
+			aSuppSizes[nSizeInd].width  = asdlSuppSizes[*pnSizes - 1 - nSizeInd]->w;
+			aSuppSizes[nSizeInd].height = asdlSuppSizes[*pnSizes - 1 - nSizeInd]->h;
+			GfLogInfo(" %dx%d,", aSuppSizes[nSizeInd].width, aSuppSizes[nSizeInd].height);
 		}
 		GfLogInfo("\n");
 	}
 	
-	return aPossSizes;
+	return aSuppSizes;
 }
 
-/** Get the possible color depths as supported by the underlying hardware/driver.
+/** Get the default / fallback screen / window color depths (bits per pixels, alpha included).
+    @ingroup	screen
+    @param	pnColorDepths	Address of number of default sizes (output).
+    @return	Array of detected supported sizes (static data, never free).
+ */
+int* GfScrGetDefaultColorDepths(int* pnColorDepths)
+{
+	*pnColorDepths = NDefScreenColorDepths;
+	
+	return ADefScreenColorDepths;
+}
+
+/** Get the supported color depths as supported by the underlying hardware/driver.
     @ingroup	screen
     @param	pnDepths	Address of number of detected color depths (output)
-    @return	Array of detected possible color depths (allocated on the heap, must use free at the end)
+    @return	Array of detected supported color depths (allocated on the heap, must use free at the end)
  */
-int* GfScrGetPossibleColorDepths(int* pnDepths)
+int* GfScrGetSupportedColorDepths(int* pnDepths)
 {
-	// Determine the maximum supported color depth (default to 24 in any case).
+	// Determine the maximum supported color depth (default to 32 in any case).
 	const SDL_VideoInfo* sdlVideoInfo = SDL_GetVideoInfo();
-	int nMaxColorDepth = 24;
+	int nMaxColorDepth = 32;
 	if (sdlVideoInfo)
 	{
 		nMaxColorDepth = sdlVideoInfo->vfmt->BitsPerPixel;
@@ -243,50 +262,52 @@ int* GfScrGetPossibleColorDepths(int* pnDepths)
 	
 	// Check video backend capabilities for each color depth between min and max,
 	// and store in target array if OK.
-	int nPossSizes;
-	tScreenSize* aPossSizes;
-	int* aPossDepths = (int*)malloc(nMaxColorDepths*sizeof(int));
+	int nSuppSizes;
+	tScreenSize* aSuppSizes;
+	int* aSuppDepths = (int*)malloc(nMaxColorDepths*sizeof(int));
 	*pnDepths = 0;
 	for (int nDepthInd = 0; nDepthInd < nMaxColorDepths; nDepthInd++)
 	{
 		const int nCheckedColorDepth = nMinColorDepth + 8 * nDepthInd;
 
 		// Windowed mode.
-		aPossSizes = GfScrGetPossibleSizes(nCheckedColorDepth, false, &nPossSizes);
-		const bool bWindowedOK = (aPossSizes != 0);
-		if (aPossSizes && aPossSizes != (tScreenSize*)-1)
-			free(aPossSizes);
+		aSuppSizes = GfScrGetSupportedSizes(nCheckedColorDepth, false, &nSuppSizes);
+		const bool bWindowedOK = (aSuppSizes != 0);
+		if (aSuppSizes && aSuppSizes != (tScreenSize*)-1)
+			free(aSuppSizes);
 
 		// Full-screen mode
-		aPossSizes = GfScrGetPossibleSizes(nCheckedColorDepth, true, &nPossSizes);
-		const bool bFullScreenOK = (aPossSizes != 0);
-		if (aPossSizes && aPossSizes != (tScreenSize*)-1)
-			free(aPossSizes);
+		aSuppSizes = GfScrGetSupportedSizes(nCheckedColorDepth, true, &nSuppSizes);
+		const bool bFullScreenOK = (aSuppSizes != 0);
+		if (aSuppSizes && aSuppSizes != (tScreenSize*)-1)
+			free(aSuppSizes);
 
 		// Keep this color depth if one of the display modes work
 		// TODO: Shouldn't we use "and" here ?
 		if (bWindowedOK || bFullScreenOK)
 		{
-			aPossDepths[*pnDepths] = nCheckedColorDepth;
+			aSuppDepths[*pnDepths] = nCheckedColorDepth;
 			(*pnDepths)++;
 		}
 	}
 
-	// Fallback : assume at least 24 bit depth is supported.
+	// Report supported depths.
 	if (*pnDepths == 0)
 	{
-		GfLogWarning("SDL reports no supported color depth : assuming 24 bit is OK");
-		aPossDepths[*pnDepths] = 24;
+		// Fallback : assume at least 24 bit depth is supported.
+		GfLogWarning("SDL reports no supported color depth : assuming 32 bit is OK");
+		aSuppDepths[*pnDepths] = 32;
 		(*pnDepths)++;
 	}
+	else
+	{
+		GfLogInfo("Supported color depths (bits) :");
+		for (int nDepthInd = 0; nDepthInd < *pnDepths; nDepthInd++)
+			GfLogInfo(" %d,", aSuppDepths[nDepthInd]);
+		GfLogInfo("\n");
+	}
 
-	// Report supported depths.
-	GfLogInfo("Supported color depths (bits) :");
-	for (int nDepthInd = 0; nDepthInd < *pnDepths; nDepthInd++)
-		GfLogInfo(" %d,", aPossDepths[nDepthInd]);
-	GfLogInfo("\n");
-
-	return aPossDepths;
+	return aSuppDepths;
 }
 
 static void gfScrReshapeViewport(int width, int height)
@@ -317,7 +338,7 @@ void GfScrInit(int argc, char *argv[])
     int		maxfreq;
     int		depth;
 
-	// Initialize SDL video subsystem (and exit if not possible).
+	// Initialize SDL video subsystem (and exit if not supported).
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 		GfLogFatal("Couldn't initialize SDL video sub-system (%s)\n", SDL_GetError());
 
@@ -385,7 +406,7 @@ void GfScrInit(int argc, char *argv[])
 
 	// Set full screen mode if required.
 	int videomode = SDL_OPENGL;
-	if (strcmp(fscr,"yes")==0)
+	if (!strcmp(fscr, "yes"))
 		videomode |= SDL_FULLSCREEN;
  
 	// Video initialization with best possible settings.

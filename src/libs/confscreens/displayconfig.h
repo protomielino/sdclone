@@ -36,11 +36,13 @@ public:
 	bool initialize(void* pPreviousMenu);
 	
 	enum EDisplayMode { eFullScreen = 0, eWindowed = 1, nDisplayModes };
+	enum EVideoDetectMode { eAuto = 0, eManual = 1, nVideoDetectModes };
 	enum EVideoInitMode { eCompatible = 0, eBestPossible = 1, nVideoInitModes };
 
 	void setDisplayMode(EDisplayMode eMode);
 	void setColorDepthIndex(int nIndex);
 	void setScreenSizeIndex(int nIndex);
+	void setVideoDetectMode(EVideoDetectMode eMode);
 	void setVideoInitMode(EVideoInitMode eMode);
 #ifndef NoMaxRefreshRate
 	void setMaxRefreshRateIndex(int nIndex);
@@ -52,14 +54,15 @@ public:
 
 protected:
 	
-	void resetScreenSizes(int nCurrWidth, int nCurrHeight,
-						  int nColorDepth, EDisplayMode eDisplayMode);
+	void resetColorDepths();
+	void resetScreenSizes();
 
 	// Control callback functions (must be static).
 	static void onActivate(void *pDisplayMenu);
 	static void onChangeScreenSize(tComboBoxInfo *pInfo);
 	static void onChangeColorDepth(tComboBoxInfo *pInfo);
 	static void onChangeDisplayMode(tComboBoxInfo *pInfo);
+	static void onChangeVideoDetectMode(tComboBoxInfo *pInfo);
 	static void onChangeVideoInitMode(tComboBoxInfo *pInfo);
 #ifndef NoMaxRefreshRate
 	static void onChangeMaxRefreshRate(tComboBoxInfo *pInfo);
@@ -89,7 +92,10 @@ private:
 	int _nScreenWidth;
 	int _nScreenHeight;
 	
-	//! Currently selected video init. mode.
+	//! Currently selected video features detection mode.
+	EVideoDetectMode _eVideoDetectMode;
+
+	//! Currently selected video initialization mode.
 	EVideoInitMode _eVideoInitMode;
 
 #ifndef NoMaxRefreshRate

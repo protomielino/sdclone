@@ -87,8 +87,9 @@ TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
 TGFCLIENT_API unsigned char* GfScrCaptureAsImage(int* viewW, int *viewH);
 TGFCLIENT_API int GfScrCaptureAsPNG(const char *filename);
 
-TGFCLIENT_API int* GfScrGetPossibleColorDepths(int* pnDepths);
-TGFCLIENT_API tScreenSize* GfScrGetPossibleSizes(int nColorDepth, bool bFullScreen, int* pnSizes);
+TGFCLIENT_API int* GfScrGetSupportedColorDepths(int* pnDepths);
+TGFCLIENT_API int* GfScrGetDefaultColorDepths(int* pnDepths);
+TGFCLIENT_API tScreenSize* GfScrGetSupportedSizes(int nColorDepth, bool bFullScreen, int* pnSizes);
 TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 
 /*****************************
