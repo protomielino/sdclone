@@ -17,28 +17,19 @@
  ***************************************************************************/
 
 
-/*
-	Functions to check if features seems to be available and requested by the
-	user. The isAvailable functions should return if a feature is working on
-	the system, the isEnabled feature should check if the user wants to enable
-	it as well.
-	It should NOT check if the features are really working, that is subject
-	to another part eventually.
-*/
-
 #include <SDL/SDL.h>
 
 #include "glfeatures.h"
 
 
-/** Report if a given OpenGL extension is supported (1) or not (0)
+/** Report if a given OpenGL extension is supported
 
     Warning: Should not be called before any successfull call to SDL_SetVideoMode()
 
     Note: Copied from freeGLUT 2.4.0
 */
 
-int GfglIsOpenGLExtensionSupported(const char* extension)
+static bool gfglIsOpenGLExtensionSupported(const char* extension)
 {
   const char *extensions, *start;
   const int len = strlen(extension);
@@ -46,12 +37,12 @@ int GfglIsOpenGLExtensionSupported(const char* extension)
   /* TODO: Make sure there is a current window, and thus a current context available */
 
   if (strchr(extension, ' '))
-    return 0;
+    return false;
 
   start = extensions = (const char *)glGetString(GL_EXTENSIONS);
 
   if (!extensions)
-	return 0;
+	return false;
 
   while (1)
   {
@@ -60,194 +51,180 @@ int GfglIsOpenGLExtensionSupported(const char* extension)
         return 0;  /* not found */
      /* check that the match isn't a super string */
      if ((p == start || p[-1] == ' ') && (p[len] == ' ' || p[len] == 0))
-        return 1;
+        return true;
      /* skip the false match and continue */
      extensions = p + len;
   }
 
-  return 0;
+  return false;
 }
 
-/*
-	----------------------- Texture Compression
-*/
+// GfglFeatures singleton --------------------------------------------------------
 
+GfglFeatures* GfglFeatures::_pSelf = 0;
 
-static bool bCompressARBAvailable;
-static bool bCompressARBEnabled;
-
-// Feature checks, GL_ARB_texture_compression.
-void checkCompressARBAvailable(bool &result)
+// Initialization.
+GfglFeatures::GfglFeatures()
 {
-	// Query if the extension is available at the runtime system (true, if > 0).
-	int compressARB = GfglIsOpenGLExtensionSupported("GL_ARB_texture_compression");
+	checkSupport();
+}
+
+// Initialization.
+GfglFeatures* GfglFeatures::self()
+{
+	if (!_pSelf)
+		_pSelf = new GfglFeatures;
+
+	return _pSelf;
+}
+
+void GfglFeatures::setSelectionLoader(void (*funcLoad)())
+{
+	_funcLoadSelection = funcLoad;
+}
+
+void GfglFeatures::setSelectionStorer(void (*funcStore)())
+{
+	_funcStoreSelection = funcStore;
+}
+
+void GfglFeatures::checkSupport()
+{
+	int nValue;
+	bool bValue;
 	
-	// Check if at least one internal format is vailable. This is a workaround for
-	// driver problems and not a bugfix. According to the specification OpenGL should
-	// choose an uncompressed alternate format if it can't provide the requested
-	// compressed one... but it does not on all cards/drivers.
-	if (compressARB) 
+	GfLogInfo("Supported OpenGL features :\n");
+
+	// a) Max texture size.
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &nValue);
+ 	if (nValue > 16384) // Max in-game supported value (must be consistent with openglconfig.cpp)
+ 		nValue = 16384;
+	_mapSupportedInt[TextureMaxSize] = nValue;
+	GfLogInfo("  Max texture size        : %d\n", nValue);
+
+	// b) Texture compression.
+	//    Note: Check if at least one internal format is vailable. This is a workaround for
+	//    driver problems and not a bugfix. According to the specification OpenGL should
+	//    choose an uncompressed alternate format if it can't provide the requested
+	//    compressed one... but it does not on all cards/drivers.
+	bValue = gfglIsOpenGLExtensionSupported("GL_ARB_texture_compression");
+	if (bValue) 
 	{
-		int numformats;
-		glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, &numformats);
-		if (numformats == 0) 
-		{
-			compressARB = 0;
-		}
+		int nFormats;
+		glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, &nFormats);
+		if (nFormats == 0) 
+			bValue = false;
 	}
+	_mapSupportedBool[TextureCompression] = bValue;
+	GfLogInfo("  Texture compression     : %s\n", bValue ? "Yes" : "No");
+	
+	// c) Multi-texturing (automatically select all the texturing units).
+	bValue = gfglIsOpenGLExtensionSupported("GL_ARB_multitexture");
+	glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &nValue);
+	if (nValue < 2)
+		bValue = false;
+	_mapSupportedBool[MultiTexturing] = bValue;
+	GfLogInfo("  Multi-texturing         : %s\n", bValue ? "Yes" : "No");
+	_mapSupportedInt[MultiTexturingUnits] = nValue;
+	GfLogInfo("  Multi-texturing units   : %d\n", nValue);
 
-	result = compressARB != 0;
-}
+	_mapSelectedInt[MultiTexturingUnits] = nValue; // Auto-select.
+	
+	// d) Rectangle textures.
+	bValue = gfglIsOpenGLExtensionSupported("GL_ARB_texture_rectangle");
+	_mapSupportedBool[TextureRectangle] = bValue;
+	GfLogInfo("  Rectangle textures      : %s\n", bValue ? "Yes" : "No");
 
-
-void checkCompressARBEnabled(bool &result)
-{
-	if (!GfglIsCompressARBAvailable()) 
+	// e) Non-power-of-2 textures.
+	bValue = gfglIsOpenGLExtensionSupported("GL_ARB_texture_non_power_of_two");
+	_mapSupportedBool[TextureNonPowerOf2] = bValue;
+	GfLogInfo("  Non power-of-2 textures : %s\n", bValue ? "Yes" : "No");
+	
+	// f) Multi-sampling (anti-aliasing).
+	bValue = gfglIsOpenGLExtensionSupported("GL_ARB_multisample");
+	if (bValue) 
 	{
-		// Feature not available, do not use it.
-		result = false;
-	} 
-	else
-	{
-		// Feature available, check if the user wants to use it.
-		// TODO: put this enabled/disable stuff in one function (it is used in grsound.cpp as well).
-		const char *tcEnabledStr = GR_ATT_TEXTURECOMPRESSION_ENABLED;
-		char fnbuf[1024];
-		sprintf(fnbuf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-		void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-		const char *optionName = GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION, GR_ATT_TEXTURECOMPRESSION_DISABLED);
-
-		result = strcmp(optionName, tcEnabledStr) == 0;
-		GfParmReleaseHandle(paramHandle);
+		// Work-in-progress.
+		// TODO: More checks needed : number of samples
+		bValue = false;
 	}
+	_mapSupportedBool[MultiSampling] = bValue;
+	GfLogInfo("  Multi-sampling          : %s (not yet implemented)\n", bValue ? "Yes" : "No");
+	
 }
 
-
-void GfglUpdateCompressARBEnabled(void)
+void GfglFeatures::loadSelection()
 {
-	checkCompressARBEnabled(bCompressARBEnabled);
+	if (_funcLoadSelection)
+		_funcLoadSelection();
+	dumpSelection();
 }
 
-
-// GL_ARB_texture_compression
-bool GfglIsCompressARBAvailable(void)
+void GfglFeatures::storeSelection() const
 {
-	return bCompressARBAvailable;
+	dumpSelection();
+	if (_funcStoreSelection)
+		_funcStoreSelection();
 }
 
-
-bool GfglIsCompressARBEnabled(void) 
+void GfglFeatures::dumpSelection() const
 {
-	return bCompressARBEnabled;
+	GfLogInfo("Selected OpenGL features :\n");
+	GfLogInfo("  Max texture size      : %d\n", getSelected(TextureMaxSize));
+	GfLogInfo("  Texture compression   : %s\n", isSelected(TextureCompression) ? "On" : "Off");
+	GfLogInfo("  Multi-texturing       : %s\n", isSelected(MultiTexturing) ? "On" : "Off");
+	GfLogInfo("  Multi-texturing units : %d\n", getSelected(MultiTexturingUnits));
+	GfLogInfo("  Multi-sampling        : %s\n", isSelected(MultiSampling)  ? "Yes" : "No");
 }
 
-
-/*
-	----------------------- Texture downsizing.
-*/
-static int nGLTextureMaxSize;
-static int nUserTextureMaxSize;
-
-
-void GfglGetGLTextureMaxSize(int &result)
+bool GfglFeatures::isSelected(EFeatureBool eFeature) const
 {
-	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &result);
-	if (result > 16384) 
-	{
-		result = 16384;
-	}
+	const std::map<EFeatureBool, bool>::const_iterator itFeature =
+		_mapSelectedBool.find(eFeature);
+	return itFeature == _mapSelectedBool.end() ? false : itFeature->second;
 }
 
-
-void GfglGetUserTextureMaxSize(int &result)
+bool GfglFeatures::isSupported(EFeatureBool eFeature) const
 {
-	char fnbuf[1024];
-	sprintf(fnbuf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(fnbuf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	result = (int) GfParmGetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURESIZE, (char*)NULL, (tdble) nGLTextureMaxSize);
-	if (result > nGLTextureMaxSize) 
-	{
-		result = nGLTextureMaxSize;
-	}
-	GfParmReleaseHandle(paramHandle);
+	const std::map<EFeatureBool, bool>::const_iterator itFeature =
+		_mapSupportedBool.find(eFeature);
+	return itFeature == _mapSupportedBool.end() ? false : itFeature->second;
 }
 
-
-void GfglUpdateUserTextureMaxSize(void)
+void GfglFeatures::select(EFeatureBool eFeature, bool bSelected)
 {
-	GfglGetUserTextureMaxSize(nUserTextureMaxSize);
+	if (isSupported(eFeature))
+		_mapSelectedBool[eFeature] = bSelected;
+// 	GfLogDebug("GfglFeatures::select(Bool:%d, %s) : supp=%s, new=%s\n",
+// 			   (int)eFeature, bSelected ? "true" : "false",
+// 			   isSupported(eFeature) ? "true" : "false",
+// 			   _mapSelectedBool[eFeature] ? "true" : "false");
 }
 
-int GfglGetGLTextureMaxSize(void)
+int GfglFeatures::getSelected(EFeatureInt eFeature) const
 {
-	return nGLTextureMaxSize;
+	const std::map<EFeatureInt, int>::const_iterator itFeature =
+		_mapSelectedInt.find(eFeature);
+	return itFeature == _mapSelectedInt.end() ? -1 : itFeature->second;
 }
 
-
-int GfglGetUserTextureMaxSize(void)
+int GfglFeatures::getSupported(EFeatureInt eFeature) const
 {
-	return nUserTextureMaxSize;
+	const std::map<EFeatureInt, int>::const_iterator itFeature =
+		_mapSupportedInt.find(eFeature);
+	return itFeature == _mapSupportedInt.end() ? -1 : itFeature->second;
 }
 
-
-/*
-	----------------------- Multi-texturing (anti-aliasing) support.
-*/
-static bool bMultiTexturingEnabled = true;
-
-
-bool GfglIsMultiTexturingEnabled()
+void GfglFeatures::select(EFeatureInt eFeature, int nSelectedValue)
 {
-	return bMultiTexturingEnabled;
+	if (getSupported(eFeature) != -1)
+		_mapSelectedInt[eFeature] = nSelectedValue;
+// 	GfLogDebug("GfglFeatures::select(Int:%d, %d) : supp=%s, new=%d\n",
+// 			   (int)eFeature, nSelectedValue, getSupported(eFeature) >= 0 ? "true" : "false",
+// 			   _mapSelectedInt[eFeature]);
 }
 
-
-void GfglEnableMultiTexturing(bool bEnable)
+void* GfglFeatures::getProcAddress(const char* pszName)
 {
-	bMultiTexturingEnabled = bEnable;
-}
-
-
-/*
-	----------------------- Non-power of 2 size texture support.
-*/
-static bool bTextureRectangleARBAvailable;
-static bool bTextureNonPowerOf2ARBAvailable;
-
-// Feature checks, GL_ARB_texture_rectangle.
-void checkTextureRectangleARBAvailable(bool &result)
-{
-	// Query if the extension is available at the runtime system (true, if not 0).
-	result = GfglIsOpenGLExtensionSupported("GL_ARB_texture_rectangle") != 0;
-}
-
-// Feature checks, GL_ARB_texture_rectangle.
-void checkTextureNonPowerOf2ARBAvailable(bool &result)
-{
-	// Query if the extension is available at the runtime system (true if not 0).
-	result = GfglIsOpenGLExtensionSupported("GL_ARB_texture_non_power_of_two") != 0;
-}
-
-bool GfglIsTextureRectangleARBAvailable(void)
-{
-	return bTextureRectangleARBAvailable;
-}
-
-bool GfglIsTextureNonPowerOf2ARBAvailable(void)
-{
-	return bTextureNonPowerOf2ARBAvailable;
-}
-
-/*
-	----------------------- Initialization.
-*/
-
-void gfglCheckGLFeatures(void) 
-{
-	checkCompressARBAvailable(bCompressARBAvailable);
-	checkCompressARBEnabled(bCompressARBEnabled);
-	GfglGetGLTextureMaxSize(nGLTextureMaxSize);
-	GfglGetUserTextureMaxSize(nUserTextureMaxSize);
-	checkTextureRectangleARBAvailable(bTextureRectangleARBAvailable);
-	checkTextureNonPowerOf2ARBAvailable(bTextureNonPowerOf2ARBAvailable);
+	return SDL_GL_GetProcAddress(pszName);
 }

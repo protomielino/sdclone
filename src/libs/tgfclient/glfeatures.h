@@ -16,15 +16,6 @@
  *                                                                         *
  ***************************************************************************/
 
-/*
-Functions to check if features seems to be available and requested by the
-user. The isAvailable functions should return if a feature is working on
-the system, the isEnabled feature should check if the user wants to enable
-it as well.
-It should NOT check if the features are really working, that is subject
-to another part eventually.
-*/
-
 #ifndef _GLFEATURES_H_
 #define _GLFEATURES_H_
 
@@ -45,10 +36,6 @@ to another part eventually.
 #include <graphic.h>
 
 #include "tgfclient.h"
-
-
-// Initialize
-extern void gfglCheckGLFeatures(void);
 
 #endif // _GLFEATURES_H_
 

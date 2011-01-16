@@ -453,12 +453,11 @@ void GfInit(void)
 
 /** Restart the gaming framework (restart the current process).
     @ingroup	tgf
-    @param	sec	Time to convert
-    @param	plus	String to display as the positive sign (+) for positive values of time.
+    @param	bHardwareMouse	If true, use hardware mouse cursor
     @return	None
-    @warning	Never returns (retart the process).
+    @warning	Never returns (restart the process).
  */
-void GfRestart(bool bHardwareMouse, bool bMultiTexturing)
+void GfRestart(bool bHardwareMouse)
 {
     int retcode = 0;
     static const int CMDSIZE = 1024;
@@ -479,8 +478,6 @@ void GfRestart(bool bHardwareMouse, bool bMultiTexturing)
     nArgs = 1; // Executable is always the first arg.
     
     if (bHardwareMouse)
-	  nArgs += 1;
-    if (!bMultiTexturing)
 	  nArgs += 1;
     if (GetLocalDir() && strlen(GetLocalDir()))
 	  nArgs += 2;
@@ -503,9 +500,6 @@ void GfRestart(bool bHardwareMouse, bool bMultiTexturing)
     // Then add subsequent args.
     if (bHardwareMouse)
         args[argInd++] = strdup("-m");
-    
-    if (!bMultiTexturing)
-        args[argInd++] = strdup("-s");
     
     if (GetLocalDir() && strlen(GetLocalDir()))
     {

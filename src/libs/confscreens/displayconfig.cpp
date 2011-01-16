@@ -118,7 +118,7 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
     GfScrShutdown();
 
     // Restart the game.
-	GfRestart(GfuiMouseIsHWPresent(), GfglIsMultiTexturingEnabled());
+	GfRestart(GfuiMouseIsHWPresent());
 
 	// TODO: A nice system to get back to previous display settings if the chosen ones
 	//       keep the game from really restarting (ex: unsupported full screen size) ?

@@ -22,9 +22,10 @@
 	they should obsolete parts of grutil.cpp.
 */
 
-#include <glfeatures.h>
+#include <tgfclient.h> // GfglFeatures
 
 #include "grutil.h"
+
 
 int doMipMap(const char *tfname, int mipmap)
 {
@@ -283,7 +284,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 	GLint ww;
 
 	GLint textureTargetFormat;
-	if (GfglIsCompressARBEnabled()) {
+	if (GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)) {
 		//GfTrace("COMPRESSOR: ");
 
 		switch (zsize) {
@@ -309,7 +310,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 		//GfTrace("NON COMPRESSOR\n");
 	}
 
-	int tlimit = GfglGetUserTextureMaxSize();
+	const int tlimit = GfglFeatures::self()->getSelected(GfglFeatures::TextureMaxSize);
 
 	do {
 		if (xsize > tlimit || ysize > tlimit) {

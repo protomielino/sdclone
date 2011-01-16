@@ -21,6 +21,7 @@
 #include <tgfclient.h>
 
 #include "client.h"
+#include "openglconfig.h"
 #include "splash.h"
 
 /*
@@ -42,8 +43,11 @@
 bool
 MenuEntry(void)
 {
-    // Initialize gaming framework.
+    // Initialize gaming framework UI.
     GfInitClient();
+	GfglFeatures::self()->setSelectionLoader(OpenGLLoadSelectedFeatures);
+	GfglFeatures::self()->setSelectionStorer(OpenGLStoreSelectedFeatures);
+	GfglFeatures::self()->loadSelection();
 
     // Open the splash screen, load menus in "backgroud" and finally open the main menu.
     return SplashScreen();

@@ -27,7 +27,7 @@
 
 #include <plib/ssg.h>
 #include <plib/ssgAux.h>
-#include <glfeatures.h>	//gluXXX
+#include <glfeatures.h>
 #include <robottools.h>	//RtXXX()
 #include <portability.h> // snprintf
 

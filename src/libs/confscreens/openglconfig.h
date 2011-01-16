@@ -30,5 +30,7 @@
 
 CONFSCREENS_API void *OpenGLMenuInit(void *prevMenu);
 
+CONFSCREENS_API void OpenGLLoadSelectedFeatures();
+CONFSCREENS_API void OpenGLStoreSelectedFeatures();
 
 #endif // _OPENGLCONFIG_H_

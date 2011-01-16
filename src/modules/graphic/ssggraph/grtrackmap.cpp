@@ -24,12 +24,13 @@
 	game just the texture needs to be redrawn.
 */
 #include <SDL/SDL.h>
-#include <glfeatures.h>
+#include <tgfclient.h> // GfglFeatures
 
 #include <raceman.h>	//tSituation
 
 #include "grtrackmap.h"
 #include "grmain.h"	//grWinXXX
+
 
 // The resolution in [m] to analyse turns.
 const float cGrTrackMap::RESOLUTION = 5.0;
@@ -367,10 +368,10 @@ cGrTrackMap::cGrTrackMap()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
 
-		// If GL_ARB_texture_compression is available at runtime, (try to) compress the
+		// If GL_ARB_texture_compression is available at runtime and selected, (try to) compress the
 		// texture. This is done with the specification of the internal format to
 		// GL_COMPRESSED_RGBA_ARB.
-		if (GfglIsCompressARBAvailable()) {
+		if (GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)) {
 			// This texture contains mostly the clear color value and should therefore
 			// compress well even with high quality.
 			glHint(GL_TEXTURE_COMPRESSION_HINT_ARB, GL_NICEST);
@@ -385,7 +386,7 @@ cGrTrackMap::cGrTrackMap()
 				printf("compression ratio: %d to %d\n", csize, texturesize*texturesize*sizeof(GLuint));
 			}*/
 		} else {
-			// GL_ARB_texture_compression not available at runtime, fallback.
+			// GL_ARB_texture_compression not available at runtime or not selected, fallback.
 			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
 		}
 

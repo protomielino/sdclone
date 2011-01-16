@@ -31,14 +31,15 @@
 
 
 #ifdef WIN32
-////// Multitexturing Info
+// Multi-texturing functions : Under Windows, not present in gl.h or any other ;
+// you can only get them through a call to wglGetProcAddress at run-time.
 extern PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB ;
 extern PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB;
 extern PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
 #endif
 
-extern bool grInitMultiTex();
+extern int grInitMultiTex();
 
 extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;

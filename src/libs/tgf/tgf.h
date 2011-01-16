@@ -168,7 +168,7 @@ typedef struct
  * Gaming framework managment *
  ******************************/
 TGF_API void GfInit(void);
-TGF_API void GfRestart(bool bHardwareMouse = false, bool bSingleTexturing = false);
+TGF_API void GfRestart(bool bHardwareMouse = false);
 
 
 /************************************************************************

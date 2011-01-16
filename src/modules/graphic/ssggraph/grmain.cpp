@@ -24,7 +24,7 @@
 #endif
 
 #include <plib/ssg.h>
-#include <glfeatures.h>
+#include <tgfclient.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
 
 #include "grmain.h"
@@ -83,37 +83,28 @@ PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 #endif
 
 
-// Set up OpenGL for multitexturing support
-bool grInitMultiTex(void)
+// Set up OpenGL for multi-texturing support
+int grInitMultiTex(void)
 {
-	if (!GfglIsMultiTexturingEnabled())
+	grMaxTextureUnits = 1;
+	
+	if (GfglFeatures::self()->isSelected(GfglFeatures::MultiTexturing))
 	{
-		grMaxTextureUnits = 1;
-		return true;
-    }
+		// Use the selected number of texture units.
+		grMaxTextureUnits = GfglFeatures::self()->getSelected(GfglFeatures::MultiTexturingUnits);
 
-	// TODO: Move most of the following code to tgfclient/glfeatures.cpp ?
-		
-	// list of available extensions
-	char *extensionStr = (char*)glGetString(GL_EXTENSIONS);
-	if (!extensionStr)
-		return false;
-
-	if (strstr(extensionStr, "GL_ARB_multitexture"))
-	{
-		// retrieve the maximum number of texture units allowed
-		glGetIntegerv(GL_MAX_TEXTURE_UNITS_ARB, &grMaxTextureUnits);
 #ifdef WIN32
-		// retrieve addresses of multitexturing functions
-		glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC) wglGetProcAddress("glMultiTexCoord2fARB");
-		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC) wglGetProcAddress("glActiveTextureARB");
-		glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC) wglGetProcAddress("glClientActiveTextureARB");
-		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC) wglGetProcAddress("glMultiTexCoord2fvARB");
+		// Retrieve the addresses of multi-texturing functions under Windows
+		// They are not declared in gl.h or any other header ;
+		// you can only get them through a call to wglGetProcAddress at run-time.
+		glMultiTexCoord2fARB = (PFNGLMULTITEXCOORD2FARBPROC)wglGetProcAddress("glMultiTexCoord2fARB");
+		glActiveTextureARB = (PFNGLACTIVETEXTUREARBPROC)wglGetProcAddress("glActiveTextureARB");
+		glClientActiveTextureARB = (PFNGLCLIENTACTIVETEXTUREARBPROC)wglGetProcAddress("glClientActiveTextureARB");
+		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress("glMultiTexCoord2fvARB");
 #endif
-		return true;
 	}
 	
-	return false;
+	return grMaxTextureUnits;
 }
 
 

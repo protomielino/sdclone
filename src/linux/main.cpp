@@ -67,11 +67,6 @@ init_args(int argc, char **argv)
             if (++i < argc)
                 bindir = SetBinDir(argv[i]);
         }
-        // -s option : Single texture mode (= disable multi-texturing)
-        else if (!strncmp(argv[i], "-s", 2))
-        {
-            GfglEnableMultiTexturing(false);
-        }
         // -m option : Allow the hardware mouse cursor
         else if (!strncmp(argv[i], "-m", 2))
         {
