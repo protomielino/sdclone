@@ -550,9 +550,9 @@ void GfScrInit(int argc, char *argv[])
 	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &glMSamp);
 	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &glMSampLevel);
 
-	// TODO: Is this really related to video mode initialization ?
-	//       What about moving this to gfglCheckGLFeatures ?
-	GfLogInfo("Supported OpenGL features :\n");
+	// TODO: Is anti-aliasing really related to video mode initialization ?
+	//       What about moving this to gfglCheckGLFeatures and enable it later ?
+	GfLogInfo("Enabled OpenGL features :\n");
  	GfLogInfo("  Double-buffer : %s", glDblBuff ? "Yes" : "No\n");
 	if (glDblBuff)
 		GfLogInfo(" (%d bits)\n", glDepth);

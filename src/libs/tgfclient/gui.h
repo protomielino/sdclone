@@ -20,6 +20,7 @@
 #define _GUI_H__
 
 #include "tgfclient.h"
+#include "glfeatures.h"
 #include "guifont.h"
 
 

@@ -24,7 +24,7 @@
 #endif
 
 #include <plib/ssg.h>
-#include <tgfclient.h> // GfglFeatures
+#include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
 
 #include "grmain.h"

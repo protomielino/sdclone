@@ -29,6 +29,7 @@
 #include <graphic.h>
 #include <portability.h>
 #include <tgfclient.h>
+#include <glfeatures.h>
 
 #include "openglconfig.h"
 

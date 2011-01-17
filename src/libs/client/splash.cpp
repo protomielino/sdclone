@@ -30,6 +30,7 @@
 #endif
 #include <SDL/SDL.h>
 #include <tgfclient.h>
+#include <glfeatures.h>
 
 #include "splash.h"
 #include "mainmenu.h"

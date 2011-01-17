@@ -22,7 +22,7 @@
 	they should obsolete parts of grutil.cpp.
 */
 
-#include <tgfclient.h> // GfglFeatures
+#include <glfeatures.h> // GfglFeatures
 
 #include "grutil.h"
 

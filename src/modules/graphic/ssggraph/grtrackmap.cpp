@@ -24,7 +24,7 @@
 	game just the texture needs to be redrawn.
 */
 #include <SDL/SDL.h>
-#include <tgfclient.h> // GfglFeatures
+#include <glfeatures.h> // GfglFeatures
 
 #include <raceman.h>	//tSituation
 

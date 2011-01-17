@@ -19,6 +19,7 @@
 
 
 #include <tgfclient.h>
+#include <glfeatures.h>
 
 #include "client.h"
 #include "openglconfig.h"

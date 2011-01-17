@@ -21,6 +21,7 @@
 
 #include <robottools.h>	//RtXXX()
 #include <portability.h> // snprintf
+#include <glfeatures.h> // snprintf
 
 #include "grscene.h"
 #include "grmain.h"

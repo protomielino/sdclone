@@ -28,12 +28,10 @@
 #include <cstdio>
 
 #ifdef WIN32
-#include <windows.h>
 #include <direct.h>
 #define XMD_H
 #endif
 
-#include <GL/glu.h>
 #include <png.h>
 extern "C"
 {
@@ -41,6 +39,8 @@ extern "C"
 }
 
 #include "tgfclient.h"
+#include "glfeatures.h"
+
 
 unsigned gfTexGetClosestGreaterPowerOf2(unsigned nSize)
 {
@@ -73,7 +73,7 @@ unsigned gfTexGetClosestGreaterPowerOf2(unsigned nSize)
 
 #ifdef Useful
 void
-GfTexScaleImagePowerof2(unsigned char *pSrcImg, int srcW, int srcH, GLenum format, GLuint &texId)
+GfTexScaleImagePowerof2(unsigned char *pSrcImg, int srcW, int srcH, GLenum format, unsigned &texId)
 {
 	int destH = 128;
 	int destW = 128;
@@ -617,7 +617,7 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
     @param	pPow2Height	read texture total height (pixels, as the closest greater or equal power of 2 height value)
     @return	None.
  */
-GLuint
+unsigned
 GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
 				 int* pPow2Width, int* pPow2Height)
 {
@@ -660,7 +660,7 @@ GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
 	if (pHeight)
 		*pHeight = nHeight;
 
-	return glTexId;
+	return (unsigned)glTexId;
 }
 
 /** Free the texture
@@ -669,7 +669,7 @@ GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
     @return	none
 */
 void
-GfTexFreeTexture(GLuint glTexId)
+GfTexFreeTexture(unsigned glTexId)
 {
 	if (glTexId)
 		glDeleteTextures(1, &glTexId);

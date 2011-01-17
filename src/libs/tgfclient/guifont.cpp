@@ -23,10 +23,6 @@
 #include <stdlib.h>
 #include <cstring>
 
-#ifdef WIN32
-#include <windows.h>
-#endif 
-
 #if defined(__FreeBSD__) || defined(__APPLE__)
 #include <machine/endian.h>
 #endif
@@ -36,9 +32,11 @@
 #endif
 
 #include "tgfclient.h"
+#include "glfeatures.h"
 
 #include "guifont.h"
 
+				  
 static char buf[1024];
 
 #define FONT_NB	9
