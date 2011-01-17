@@ -22,7 +22,7 @@
 // Multi-plateform Open GL includes : use this header files when calling OpenGL
 
 #ifdef WIN32
-//#  include <windows.h>
+#  include <windows.h>
 #endif //WIN32
 
 #ifdef __APPLE__

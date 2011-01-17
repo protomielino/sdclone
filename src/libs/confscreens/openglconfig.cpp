@@ -81,7 +81,6 @@ static void	*PrevHandle = NULL;
 
 void OpenGLLoadSelectedFeatures()
 {
-	int	i;
 	char buf[512];
 
 	// Read OpenGL configuration from graph.xml, and select relevant OpenGL features.
