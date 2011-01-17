@@ -14,11 +14,11 @@
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
-<params name="" type="template" mode="mw" version="1.3">
+<params name="" type="template" mode="mw" version="1.4">
 
   <section name="Modules">
     <attstr name="track" val="track"/>
-    <attstr name="simu" val="simuv2"/>
+    <attstr name="simu" val="simuv2.1"/>
     <attstr name="graphic" val="ssggraph"/>
   </section>
 
