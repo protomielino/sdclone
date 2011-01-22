@@ -172,67 +172,14 @@ grInitBackground(void)
 	{
 		GfLogInfo("Setting up dynamic sky :\n");
 
-		static const int CloudsTextureIndices[] = { 1, 3, 5, 7, 8 };
+		static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = { 1, 3, 5, 7, 8 };
 		static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
-
-		//Query the time
-		static ulClock ck;
-		double dt = ck.getDeltaTime();
 
 		int div = 80000 / grSkyDomeDistance; //grSkyDomeDistance > 0 so cannot div0
 		ssgSetNearFar(1, grSkyDomeDistance);
 
-		// Determine time of day.
-		int timeOfDay = 15 * 3600 + 0 * 60 + 0; // 15:00:00
-		switch (grTrack->timeofday) 
-		{
-			case TR_TIME_DAWN:
-				timeOfDay = 6 * 3600 + 13 * 60 + 20; // 06:13:20
-				break;
-					
-			case TR_TIME_MORNING:
-				timeOfDay = 10 * 3600 + 0 * 60 + 0; // 10:00:00
-				break;
-					
-			case TR_TIME_NOON:
-				timeOfDay = 12 * 3600 + 0 * 60 + 0; // 12:00:00
-				break;
-					
-			case TR_TIME_AFTERNOON:
-				timeOfDay = 15 * 3600 + 0 * 60 + 0; // 15:00:00
-				break;
-					
-			case TR_TIME_DUSK:
-				timeOfDay = 17 * 3600 + 46 * 60 + 40; // 17:46:40
-				break;
-					
-			case TR_TIME_NIGHT:
-				timeOfDay = 0 * 3600 + 0 * 60 + 0; // Midnight = 00:00:00
-				break;
-					
-			case TR_TIME_NOW:
-			{
-				time_t t = time(0);
-				struct tm *ptm = localtime(&t);
-				timeOfDay = ptm->tm_hour * 3600 + ptm->tm_min * 60 + ptm->tm_sec;
-				GfLogDebug("  Now time of day\n");
-				break;
-			}
-
-			case TR_TIME_TRACK:
-				timeOfDay =
-					(int)(GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_HOUR, (char*)NULL,
-									   (float)(15 * 3600 + 0 * 60 + 0))); // 15:00:00
-				GfLogDebug("  Track-defined time of day\n");
-				break;
-
-			default:
-				timeOfDay = 15 * 3600 + 0 * 60 + 0; // 15:00:00
-				GfLogError("Unsupported value %d for grTrack->timeofday (assuming 16:00)\n",
-						   grTrack->timeofday);
-				break;
-				
-		}//switch timeofday
+		// Determine time of day (seconds since 00:00).
+		const int timeOfDay = (int)grTrack->local.timeofday;
 
 		// Add random stars when relevant.
 		if (timeOfDay < 7 * 3600 || timeOfDay > 17 * 3600)
@@ -250,8 +197,8 @@ grInitBackground(void)
 		AStarsData = new sgdVec3[NStars];
 		for(int i= 0; i < NStars; i++) 
 		{
-			AStarsData[i][0] = grRandom() * SGD_PI;
-			AStarsData[i][1] = grRandom() * SGD_PI;
+			AStarsData[i][0] = grRandom() * PI;
+			AStarsData[i][1] = grRandom() * PI;
 			AStarsData[i][2] = grRandom();
 		}//for i
 
@@ -269,18 +216,16 @@ grInitBackground(void)
 		
 		//Add the Sun itself
         TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), grSkyDomeDistance, true);
-		GLfloat sunAscension =
-			(float)GfParmGetNum(hndl, TRK_SECT_GRAPH, TRK_ATT_SUN_H, (char*)NULL, 0.0f);
-
+		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
-		TheCelestBodies[eCBSun]->setDeclination ( grSunDeclination * SGD_DEGREES_TO_RADIANS);
-		TheCelestBodies[eCBSun]->setRightAscension ( sunAscension * SGD_DEGREES_TO_RADIANS);
+		TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination));
+		TheCelestBodies[eCBSun]->setRightAscension ( sunAscension );
 
-		GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %4.1f deg, "
-		          "ascension = %4.1f deg)\n", 
+		GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
+		          "ascension = %.1f deg\n", 
 				  timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
-				  grSunDeclination, sunAscension);
+				  grSunDeclination, RAD2DEG(sunAscension));
 
 		// Add the Moon
 		TheCelestBodies[eCBMoon] = TheSky->addBody ( "data/textures/moon.rgba",NULL, (2500 / div), grSkyDomeDistance);
@@ -291,22 +236,22 @@ grInitBackground(void)
 
 		const float moonAscension = (float)(rand() % 240);
 		
-		TheCelestBodies[eCBMoon]->setDeclination (grMoonDeclination * SGD_DEGREES_TO_RADIANS );
-		TheCelestBodies[eCBMoon]->setRightAscension ( moonAscension * SGD_DEGREES_TO_RADIANS );
+		TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
+		TheCelestBodies[eCBMoon]->setRightAscension ( DEG2RAD(moonAscension) );
 
-		GfLogInfo("  Moon : declination = %4.1f deg, ascension = %4.1f deg\n",
+		GfLogInfo("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
 				  grMoonDeclination, moonAscension);
 
 		// Add the cloud layers
-		if (grTrack->clouds < 0)
-			grTrack->clouds = 0;
-		else if(grTrack->clouds >= NCloudsTextureIndices)
-			grTrack->clouds = NCloudsTextureIndices - 1;
-		const int cloudsTextureIndex = CloudsTextureIndices[grTrack->clouds];
+		if (grTrack->local.clouds < 0)
+			grTrack->local.clouds = 0;
+		else if(grTrack->local.clouds >= NCloudsTextureIndices)
+			grTrack->local.clouds = NCloudsTextureIndices - 1;
+		const int cloudsTextureIndex = CloudsTextureIndices[grTrack->local.clouds];
 
 		cGrCloudLayer *cloudLayers[NMaxCloudLayers];
 		snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-		if (grTrack->rain > 0) // TODO: More/different cloud layers for each rain strength value ?
+		if (grTrack->local.rain > 0) // TODO: More/different cloud layers for each rain strength value ?
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 650, 400 * div, 400 * div);
 		else
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550, 100 * div, 100 * div);
@@ -319,12 +264,14 @@ grInitBackground(void)
     	sgSetVec3(solposn, 0, 0, 0);
 				  
     	light->setPosition(solposn);
+		static ulClock ck;
+		double dt = ck.getDeltaTime();
     	TheSky->repositionFlat(solposn, 0, dt);    
 
 		//Setup visibility according to rain if any
 		// TODO: Does visibility really decrease when rain gets heavier ????
 		float visibility = 0.0f;
-		switch (grTrack->rain)	
+		switch (grTrack->local.rain)	
 		{
 			case TR_RAIN_NONE:
 				visibility = 0.0f;
@@ -339,7 +286,8 @@ grInitBackground(void)
 				visibility = 550.0f;
 				break;
 			default:
-				GfLogWarning("Unsupported rain strength value %d (assuming none)", grTrack->rain);
+				GfLogWarning("Unsupported rain strength value %d (assuming none)",
+							 grTrack->local.rain);
 				visibility = 0.0f;
 				break;
 		}//switch Rain
@@ -351,7 +299,7 @@ grInitBackground(void)
 		double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 		double scene_brightness = pow(sky_brightness, 0.5);
         
-		if (grTrack->rain > 0) // TODO: Different values for each rain strength value ?
+		if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
 		{
 			BaseFogColor[0] = 0.40f;
 			BaseFogColor[1] = 0.43f;
@@ -466,7 +414,7 @@ grLoadBackground(void)
 	glClearColor(graphic->bgColor[0], graphic->bgColor[1], graphic->bgColor[2], 1.0);
 
 	TheBackground = new ssgRoot();
-	clr[0] = clr[1] = clr[2] = 1.0 / (1.0 + 0.5 * grTrack->rain); //1.0;
+	clr[0] = clr[1] = clr[2] = 1.0 / (1.0 + 0.5 * grTrack->local.rain); //1.0;
 	clr[3] = 1.0;
 	nrm[0] = nrm[2] = 0.0;
 	nrm[1] = 1.0;
@@ -871,14 +819,14 @@ grUpdateSky(double currentTime)
 	if (grSunDeclination >= 360.0f)
 		grSunDeclination = 0.0f;
 	
-	TheCelestBodies[eCBSun]->setDeclination ( grSunDeclination * SGD_DEGREES_TO_RADIANS );
+	TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination) );
 
 	// Update moon position
 	grMoonDeclination += 0.25f; // TODO: Is this delta value realistic ?
 	if (grMoonDeclination >= 360.0f)
 		grMoonDeclination = 0.0f;
 	
-	TheCelestBodies[eCBMoon]->setDeclination ( grMoonDeclination * SGD_DEGREES_TO_RADIANS );
+	TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
 
 	// Update scene color and light
 	double sol_angle = TheCelestBodies[eCBSun]->getAngle();

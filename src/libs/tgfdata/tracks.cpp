@@ -462,7 +462,7 @@ bool GfTrack::load() const
 	// Check if the track 3D model file exists.
 	std::ostringstream ossFileName;
 	ossFileName << "tracks/" << _strCatId << '/' << _strId << '/'
-				<< (pTrack->graphic.filename3d ? pTrack->graphic.filename3d : "track.ac");
+				<< (pTrack->graphic.model3d ? pTrack->graphic.model3d : "track.ac");
     if (!GfFileExists(ossFileName.str().c_str()))
 	{
 		GfLogWarning("Unusable track %s : could not find 3D model %s\n",

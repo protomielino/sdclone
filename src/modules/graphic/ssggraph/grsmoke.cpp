@@ -237,7 +237,7 @@ grAddSmoke(tCarElt *car, const double t)
 						}//if car->priv.wheel
 						
 						//! Ground water can change the tire smoke attributes.
-						grWater = grTrack->water;
+						grWater = grTrack->local.water;
 
 						if (grWater > 0)	
 						{

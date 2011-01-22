@@ -40,9 +40,6 @@ extern void ReRaceConfigure(GfRaceManager* pRaceman);
 
 extern int  ReInitCars(void);
 
-extern int  ReInitTrack(void);
-extern int  ReShutdowTrack(void);
-
 extern void ReInitGraphics(void);
 
 extern void ReRaceCleanup(void);

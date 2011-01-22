@@ -36,7 +36,7 @@
 #include "raceresults.h"
 #include "racestate.h"
 #include "raceenginemenus.h"
-//#include "raceweatherupdate.h"
+#include "racetrack.h" // ReTrackInit, ReTrackUpdate
 
 #include "teammanager.h"
 
@@ -199,7 +199,7 @@ ReRaceEventInit(void)
 	
 	ReInfo->s->_features = RmGetFeaturesList(params);
 
-	ReInitTrack();
+	ReTrackInit();
 	
 	ReEventInitResults();
 
@@ -632,7 +632,7 @@ ReRaceStart(void)
 		}
 	}
 	
-	//ReWeatherUpdate();
+	//ReTrackUpdate();
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {
 		RmShutdownLoadingScreen();
@@ -847,7 +847,7 @@ ReEventShutdown(void)
 	char careerMode = FALSE;
 	char first = TRUE;
 
-	ReShutdowTrack();
+	ReTrackShutdown();
 
 	do {
 		nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);

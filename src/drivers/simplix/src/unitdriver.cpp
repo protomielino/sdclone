@@ -70,7 +70,6 @@
 #include <tgf.h>
 #include <robottools.h>
 #include <timeanalysis.h>
-#include "../../../libs/raceengineclient/raceweather.h"
 
 #include "unitglobal.h"
 #include "unitcommon.h"

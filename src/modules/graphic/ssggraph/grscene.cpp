@@ -96,7 +96,7 @@ grInitScene(void)
 	// Initialize the rain renderer
 	const float precipitationDensity =
 		GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", 100);
-	grRain.initialize(grTrack->rain, precipitationDensity);
+	grRain.initialize(grTrack->local.rain, precipitationDensity);
 	
 	/* GUIONS GL_TRUE */
 	glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_FALSE);

@@ -27,6 +27,9 @@
 
 #include <raceman.h>
 
+#include <tgfclient.h> // tfuiCalback
+
+
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
 # ifdef RACESCREENS_DLL

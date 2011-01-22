@@ -30,9 +30,9 @@
 
 #ifdef WIN32
 #include <windows.h>
-#include "time.h"
+#include <time.h>
 #else
-#include "sys/time.h"
+#include <sys/time.h>
 #endif
 
 #include "robottools.h"

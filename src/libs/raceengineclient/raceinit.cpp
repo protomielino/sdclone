@@ -31,12 +31,10 @@
 #include <map>
 
 #include <portability.h>
-#include <tgfclient.h>
-#include <graphic.h>
 #include <raceman.h>
 #include <robot.h>
 #include <teammanager.h>
-#include <timeanalysis.h>
+#include <timeanalysis.h> // RtTimeStamp, RtDuration ; TODO: Use GfSleep (after moving GfuiSleep to tgf)
 #include <robottools.h>
 #include <racemanagers.h>
 
@@ -48,7 +46,6 @@
 #include "racegl.h"
 #include "raceresults.h"
 #include "racecareer.h"
-#include "raceweather.h"
 
 #include "raceinit.h"
 
@@ -784,205 +781,6 @@ ReInitCars(void)
     initPits();
 
     return 0;
-}
-
-/** Dump the track segments on screen
-    @param  track track to dump
-    @param  verbose if set to 1 all the segments are described (long)
-    @ingroup  racemantools
- */
-static void
-reDumpTrack(const tTrack *track, int verbose)
-{
-	char buf[128];
-	
-	snprintf(buf, sizeof(buf), "  by %s (%.0f m long, %.0f m wide) ...", 
-			 track->authors, track->length, track->width);
-	RmLoadingScreenSetText(buf);
-
-	GfLogInfo("++++++++++++ Track ++++++++++++\n");
-	GfLogInfo("Name     = %s\n", track->name);
-	GfLogInfo("Authors  = %s\n", track->authors);
-	GfLogInfo("Filename = %s\n", track->filename);
-	GfLogInfo("NSeg     = %d\n", track->nseg);
-	GfLogInfo("Version  = %d\n", track->version);
-	GfLogInfo("Length   = %f\n", track->length);
-	GfLogInfo("Width    = %f\n", track->width);
-	GfLogInfo("XSize    = %f\n", track->max.x);
-	GfLogInfo("YSize    = %f\n", track->max.y);
-	GfLogInfo("ZSize    = %f\n", track->max.z);
-  
-	switch (track->pits.type) {
-		case TR_PIT_NONE:
-			GfLogInfo("Pits     = none\n");
-			break;
-      
-		case TR_PIT_ON_TRACK_SIDE:
-			GfLogInfo("Pits     = present on track side\n");
-			break;
-      
-		case TR_PIT_ON_SEPARATE_PATH:
-			GfLogInfo("Pits     = present on separate path\n");
-			break;
-    }//switch pits.type
-    
-	GfLogInfo("TimeOfDay= %d\n", track->timeofday);
-	GfLogInfo("Clouds   = %d\n", track->clouds);
-	GfLogInfo("Rain     = %d\n", track->rain);
-	GfLogInfo("Water    = %d\n", track->water);
-
-	if (verbose) {
-		int i;
-		tTrackSeg *seg;
-#ifdef DEBUG
-		const char  *stype[4] = { "", "RGT", "LFT", "STR" };
-#endif
-
-		for (i = 0, seg = track->seg->next; i < track->nseg; i++, seg = seg->next) {
-			GfLogTrace("  segment %d -------------- \n", seg->id);
-#ifdef DEBUG
-			GfLogTrace("        type    %s\n", stype[seg->type]);
-#endif
-			GfLogTrace("        length  %f\n", seg->length);
-			GfLogTrace("  radius  %f\n", seg->radius);
-			GfLogTrace("  arc %f   Zs %f   Ze %f   Zcs %f\n", RAD2DEG(seg->arc),
-					   RAD2DEG(seg->angle[TR_ZS]),
-					   RAD2DEG(seg->angle[TR_ZE]),
-					   RAD2DEG(seg->angle[TR_CS]));
-			GfLogTrace("  Za  %f\n", RAD2DEG(seg->angle[TR_ZS]));
-			GfLogTrace("  vertices: %-8.8f %-8.8f %-8.8f ++++ ",
-					   seg->vertex[TR_SR].x,
-					   seg->vertex[TR_SR].y,
-					   seg->vertex[TR_SR].z);
-			GfLogTrace("%-8.8f %-8.8f %-8.8f\n",
-					   seg->vertex[TR_SL].x,
-					   seg->vertex[TR_SL].y,
-					   seg->vertex[TR_SL].z);
-			GfLogTrace("  vertices: %-8.8f %-8.8f %-8.8f ++++ ",
-					   seg->vertex[TR_ER].x,
-					   seg->vertex[TR_ER].y,
-					   seg->vertex[TR_ER].z);
-			GfLogTrace("%-8.8f %-8.8f %-8.8f\n",
-					   seg->vertex[TR_EL].x,
-					   seg->vertex[TR_EL].y,
-					   seg->vertex[TR_EL].z);
-			GfLogTrace("  prev    %d\n", seg->prev->id);
-			GfLogTrace("  next    %d\n", seg->next->id);
-		}//for i
-		GfLogTrace("From Last To First\n");
-		GfLogTrace("Dx = %-8.8f  Dy = %-8.8f Dz = %-8.8f\n",
-				   track->seg->next->vertex[TR_SR].x - track->seg->vertex[TR_ER].x,
-				   track->seg->next->vertex[TR_SR].y - track->seg->vertex[TR_ER].y,
-				   track->seg->next->vertex[TR_SR].z - track->seg->vertex[TR_ER].z);
-    }//if verbose
-}//reDumpTrack
-
-
-/** Initialize the track for a race manager.
-    @return <tt>0 ... </tt>Ok<br>
-    <tt>-1 .. </tt>Error
-*/
-int
-ReInitTrack(void)
-{
-	char buf[256];
-	static const char *TimeOfDayValues[] = RM_VALS_TIME;
-	static const int NTimeOfDayValues = sizeof( TimeOfDayValues ) / sizeof( const char* );
-	
-	static const char* CloudsValues[] = RM_VALS_CLOUDS;
-	static const int NCloudsValues = sizeof( CloudsValues ) / sizeof( const char* );
-	
-	static const char *RainValues[] = RM_VALS_RAIN;
-	static const int NRainValues = sizeof( RainValues ) / sizeof( const char* );
-
-	const char  *trackName;
-	const char  *catName;
-	const char  *raceName;
-
-	void  *params = ReInfo->params;
-	void  *results = ReInfo->results;
-  
-	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
-
-	int curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
-	snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, curTrkIdx);
-	trackName = GfParmGetStr(params, buf, RM_ATTR_NAME, 0);
-	if (!trackName)
-		return -1;
-
-	catName = GfParmGetStr(params, buf, RM_ATTR_CATEGORY, 0);
-	if (!catName) 
-		return -1;
-
-	GfLogDebug("Race Name is '%s'\n", raceName);
-	snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
-	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
-
-	snprintf(buf, sizeof(buf), "Loading track %s", ReInfo->track->name);
-	RmLoadingScreenSetText(buf);
-
-	// Load time of day settings.
-	int timeofday = TR_TIME_AFTERNOON;
-	const char* pszTimeOfDay =
-		GfParmGetStr(params, raceName, RM_ATTR_TIME_OF_DAY, RM_VAL_TIME_AFTERNOON);
-	for (int i = 0; i < NTimeOfDayValues; i++)
-		if (!strcmp(pszTimeOfDay, TimeOfDayValues[i]))
-		{
-			timeofday = i;
-			break;
-		}
-
-	// Load cloud cover settings.
-	int clouds = TR_CLOUDS_NONE;
-	const char* pszClouds =
-		GfParmGetStr(params, raceName, RM_ATTR_CLOUDS, RM_VAL_CLOUDS_NONE);
-	for (int i = 0; i < NCloudsValues; i++)
-		if (!strcmp(pszClouds, CloudsValues[i]))
-		{
-			clouds = i;
-			break;
-		}
-
-	// Load rain fall (and track dry/wet conditions) settings if feature supported.
-	int rain = TR_RAIN_NONE;
-	if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
-	{
-		const char* pszRain =
-			GfParmGetStr(params, raceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
-		for (int i = 0; i < NRainValues; i++)
-			if (!strcmp(pszRain, RainValues[i]))
-			{
-				rain = i;
-				break;
-			}
-	}
-
-	ReInfo->track->timeofday = timeofday;
-	ReInfo->track->clouds = clouds; // Initial value : ReStartWeather may change it.
-	ReInfo->track->rain = rain; // Initial value : ReStartWeather may change it.
-
-	reDumpTrack(ReInfo->track, 0.0);
-
-	ReStartWeather();
-
-	// Make the graphics engine aware of the possibly chenged track.
-	if( ReInfo->_reGraphicItf.inittrack )
-		ReInfo->_reGraphicItf.inittrack(ReInfo->track);
-
-	return 0;
-}//ReInitTrack
-
-/** Shutdown the track for a race manager.
-    @return <tt>0 ... </tt>Ok<br>
-    <tt>-1 .. </tt>Error
-*/
-int
-ReShutdowTrack(void)
-{
-	if (ReInfo->_reGraphicItf.shutdowntrack)
-		ReInfo->_reGraphicItf.shutdowntrack();
-
-	return 0;
 }
 
 /**

@@ -31,6 +31,7 @@
 #include <tgf.h>
 #include <linalg_t.h>
 
+				  
 #define TRK_IDENT	0	/* from 0x01 to 0xFF */
 
 /* Parameters strings for track files */
@@ -41,29 +42,30 @@
 #define TRK_ATT_SURF	"surface"
 #define TRK_ATT_NAME	"name"
 #define TRK_ATT_VERSION	"version"
-#define TRK_ATT_SKY		"sky version"
-#define TRK_ATT_RAINPROB "Rain"
-#define TRK_ATT_PROBLRAIN "Little Rain"
-#define TRK_ATT_PROBRAIN "Normal Rain"
+#define TRK_ATT_SKY_VERSION		"sky version"
 #define TRK_ATT_AUTHOR	"author"
 #define TRK_ATT_DESCR	"description"
 #define TRK_ATT_CAT     "category"
 
+#define TRK_SECT_LOCAL	"Local Info"
+
+#define TRK_ATT_ANYRAINLKHD "overall rain likelyhood"
+#define TRK_ATT_LITTLERAINLKHD "little rain likelyhood"
+#define TRK_ATT_MEDIUMRAINLKHD "medium rain likelyhood"
+#define TRK_ATT_TIMEOFDAY	"time of day"
+#define TRK_ATT_SUN_ASCENSION	"sun ascension"
+
 #define TRK_SECT_GRAPH	"Graphic"
 
 #define TRK_ATT_3DDESC	"3d description"
-//#define TRK_ATT_3DDESC2 "3d description rain"
-//#define TRK_ATT_3DDESC3 "3d description night"
-//#define TRK_ATT_3DDESC4 "3d description rain+night"
+//#define TRK_ATT_3DDESC_RAIN "3d description rain"
+//#define TRK_ATT_3DDESC_NIGHT "3d description night"
+//#define TRK_ATT_3DDESC_RAIN_NIGHT "3d description rain+night"
 #define TRK_ATT_BKGRND	"background image"
 #define TRK_ATT_BGTYPE	"background type"
 #define TRK_ATT_BGCLR_R	"background color R"
 #define TRK_ATT_BGCLR_G	"background color G"
 #define TRK_ATT_BGCLR_B	"background color B"
-#define TRK_ATT_HOUR	"Hour"
-#define TRK_ATT_SUN_H	"Sun horizontal"
-#define TRK_ATT_CLOUDTYPE	"Cloud Type"
-#define TRK_ATT_RAIN	"Rain"
 
 #define TRK_SECT_TRACKLIGHTS	"Track Lights"
 #define TRK_ATT_ROLE    "role"
@@ -278,8 +280,8 @@ typedef struct trackSurface {
 
     const char *material;	/**< Type of material used */
 
-    tdble kFriction;		/**< Coefficient of friction for simu */
-    tdble kFrictionDry;		/**< TODO: Remove ????? Coefficient of friction if dry */
+    tdble kFriction;		/**< Actual mu = coefficient of friction (set at race start) */
+    tdble kFrictionDry;		/**< Coefficient of friction when dry */
     tdble kRebound;		    /**< Coefficient of energy restitution */
     tdble kRollRes;		    /**< Rolling resistance */
     tdble kRoughness;		/**< Roughtness in m of the surface (wave height) */
@@ -547,21 +549,55 @@ typedef struct GraphicLightInfo
 
 typedef struct 
 {
-    const char	*filename3d;	/**< Name of the track 3D description file (.ac/.acc) */
+    const char	*model3d;	/**< Name of the track 3D model file (.ac/.acc) */
     const char	*background;	/**< Name of the background image file (.png) */
     int			bgtype;
 #define TR_BACKGROUND_TYPE_0	0 /**< ??? Anyone who knows what's this */
 #define TR_BACKGROUND_TYPE_2	2 /**< ??? Anyone who knows what's this */
 #define TR_BACKGROUND_TYPE_4	4 /**< ??? Anyone who knows what's this */
     float		bgColor[3];
-    float		sunpos1;
-    float		sunpos2;
     int			envnb;
     const char		**env;
     tTurnMarksInfo	turnMarksInfo;
     int			nb_lights;
     tGraphicLightInfo	*lights;
 } tTrackGraphicInfo;
+
+/** Track local information 
+    @ingroup trackstruct
+*/
+typedef struct TrackLocalInfo
+{
+	/* Constant spec. data, read from <track>.xml */
+    tdble anyrainlkhood; /**< Overall likelyhood of having rain (when random) [0, 1] */
+    tdble littlerainlkhood; /**< Likelyhood of having little rain when it rains [0, 1] */
+    tdble mediumrainlkhood;	 /**< Likelyhood of having medium rain when it rains [0, 1-little] */
+
+	/* Actual data for a race (computed at race start) */
+    tdble timeofday;   /**< Local time of day, in seconds from 0:00 (0 = 0:00, 86400 = 24:00 */
+	tdble sunascension; /**< Local sun "height" (related to the latitude, not to the time of day) */
+
+    int clouds;	/**< Clouds coverage in the sky  (warning : consistency with RM_VAL_CLOUDS_*) */
+#define TR_CLOUDS_NONE   0
+#define TR_CLOUDS_FEW    1
+#define TR_CLOUDS_SCARCE 2
+#define TR_CLOUDS_MANY   3
+#define TR_CLOUDS_FULL   4
+	
+    int rain;  /**< Rain strength / strength spec (warning : consistency with RM_VAL_RAIN_*) */
+#define TR_RAIN_NONE 0
+#define TR_RAIN_LITTLE 1
+#define TR_RAIN_MEDIUM 2
+#define TR_RAIN_HEAVY  3
+#define TR_RAIN_RANDOM 4
+	
+    int water;	/**< Water "level" on the ground (very simple constant model) */
+#define TR_WATER_NONE	0
+#define TR_WATER_LITTLE	1
+#define TR_WATER_SOME	2
+#define TR_WATER_MUCH	3
+	
+} tTrackLocalInfo;
 
 /** Track structure
     @ingroup trackstruct
@@ -575,50 +611,23 @@ typedef struct Track
     void	  *params;	/**< Parameters handle */
     char	  *internalname; /**< Internal name of the track */
     const char	  *category;	/**< Category of the track */
-    int		  timeofday;   /**< Time of day (warning : consistency with RM_VAL_TIME_*) */
-#define TR_TIME_DAWN	0
-#define TR_TIME_MORNING	1
-#define TR_TIME_NOON	2
-#define TR_TIME_AFTERNOON	3
-#define TR_TIME_DUSK	4
-#define TR_TIME_NIGHT	5
-#define TR_TIME_NOW		6
-#define TR_TIME_TRACK	7
-    int		  clouds;	/**< Clouds coverage in sky (warning : consistency with RM_VAL_CLOUDS_*)*/
-#define TR_CLOUDS_NONE   1
-#define TR_CLOUDS_FEW    3
-#define TR_CLOUDS_SCARCE 5
-#define TR_CLOUDS_MANY   7
-#define TR_CLOUDS_FULL  8
-    int		  rain;  /**< Rain strength (warning : consistency with RM_VAL_RAIN_*) */
-#define TR_RAIN_NONE 0
-#define TR_RAIN_LITTLE 1
-#define TR_RAIN_MEDIUM 2
-#define TR_RAIN_HEAVY  3
-#define TR_RAIN_RANDOM 4
-    int		  water;	/**< Water on the ground (= TR_RAIN_* for the moment) */
-#define TR_WATER_NONE	0
-#define TR_WATER_LITTLE	1
-#define TR_WATER_SOME	2
-#define TR_WATER_MUCH	3
-    int		  rainprob; /**< Likelyhood of having rain */
-    int		  rainlprob; /**< Likelyhood of having little rain when raining */
-    int		  probrain;	 /**< Likelyhood of having normal rain when raining */
     int		  nseg;		/**< Number of segments */
     int		  version;	/**< Version of the track type */
-    int		  skyversion;   /**< Version Sky */
+    int		  skyversion;   /**< Version of the "Sky dome" feature */
     tdble	  length;	/**< main track length */
     tdble	  width;	/**< main track width */
     tTrackPitInfo pits;		/**< Pits information */
-    tTrackSeg	  *seg;		/**< Main track */
+    tTrackSeg	  *seg;		/**< Segment list for the main track */
     tTrackSurface *surfaces;	/**< Segment surface list */
 
     t3Dd		min;
     t3Dd		max;
     tTrackGraphicInfo	graphic;
 
-    int		numberOfSectors;	/**< Number of section. Every section is used for calculating split times */
+    int		numberOfSectors;	/**< Number of sectors. Every sector is used for calculating split times */
     double	*sectors;		/**< sectors[i] is the distance from start where sector i+1 ends and sector i starts */
+
+	tTrackLocalInfo local; /**< Local info (weather, timeof day ...) */
 } tTrack;
 
 

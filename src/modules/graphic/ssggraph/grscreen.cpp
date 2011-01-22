@@ -290,7 +290,7 @@ void cGrScreen::camDraw(tSituation *s)
 	// Draw the precipitation if any.
 	// TODO: Is camSpeed always such ? For all cameras ? Why speed == 0 when no mirror ?
 	const double camSpeed = mirrorFlag ? curCar->_speed_x : 0.0f;
-	grRain.drawPrecipitation(grTrack->rain, 1.0, 0.0, 0.0, 0.0, camSpeed);
+	grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0, 0.0, 0.0, camSpeed);
 }
 
 

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file        : raceweather.h
+    file        : racetrack.h
     copyright   : (C) 2010 by Xavier Bertaux
     web         : www.speed-dreams.org 
     version     : $Id$
@@ -16,11 +16,14 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef MK_RACEWEATHER_H
-#define MK_RACEWEATHER_H
+#ifndef _RACETRACK_H
+#define _RACETRACK_H
 
-void ReStartWeather(void);
-void ReTrackUpdate(void);
+extern int ReTrackInit(void);
 
-#endif //MK_RACESIMUSIMU_H
+extern void ReTrackUpdate(void);
+
+extern int ReTrackShutdown(void);
+
+#endif //_RACETRACK_H
 
