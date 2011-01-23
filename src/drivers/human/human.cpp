@@ -206,7 +206,7 @@ extern "C" int
 moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
 	// Open and load the human drivers params file
-	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// Count the number of human drivers registered in the params 
@@ -252,7 +252,7 @@ moduleInitialize(tModInfo *modInfo)
 	VecNames.clear();
     
 	// Open and load the human drivers params file
-	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	if (drvInfo) {
@@ -323,28 +323,28 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 	trackname[s2 - s1] = 0;
 	sprintf(sstring, "Robots/index/%d", index);
 
-	sprintf(buf, "%sdrivers/human/human.xml", GetLocalDir());
+	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	std::string carname = (drvInfo != NULL)
 		? GfParmGetStrNC(drvInfo, sstring, "car name", NULL)
 		: "";
 
-	sprintf(sstring, "%sdrivers/curcarnames.xml", GetLocalDir());
+	sprintf(sstring, "%sdrivers/curcarnames.xml", GfLocalDir());
 	void *curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (curCars) {
 		sprintf(sstring, "drivers/human/%d", index + NbDrivers + 1);
 		carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
 	}//if curCars
 
-	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GetLocalDir(), carname.c_str());
+	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 
 	if (!*carParmHandle) {
-		sprintf(sstring, "%s/drivers/human/car.xml", GetLocalDir());
+		sprintf(sstring, "%s/drivers/human/car.xml", GfLocalDir());
 		*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	}
 
-	sprintf(sstring, "%sdrivers/human/cars/%s/%s.xml", GetLocalDir(), carname.c_str(), trackname);
+	sprintf(sstring, "%sdrivers/human/cars/%s/%s.xml", GfLocalDir(), carname.c_str(), trackname);
 	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (newhandle) {
 		*carParmHandle = (*carParmHandle)

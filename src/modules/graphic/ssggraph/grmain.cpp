@@ -278,7 +278,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 
     if (!grHandle)
     {
-    	sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    	sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
     	grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
@@ -394,7 +394,7 @@ initCars(tSituation *s)
 
     if (!grHandle)
     {
-        sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+        sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
         grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 

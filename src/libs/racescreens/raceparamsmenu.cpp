@@ -314,7 +314,7 @@ RmRaceParamsMenu(void *vrp)
     rmrpFeatures = RmGetFeaturesList(rp->param);
 
 	// Check if SkyDome is enabled
-	snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
 	void *grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	rmrpIsSkyDomeEnabled =
 		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;

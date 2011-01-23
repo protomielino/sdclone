@@ -392,7 +392,7 @@ static void* ReCareerNewClass( const char* filename, void *prevParam, void **fir
 	int xx;
 
 	/* Open subfile */
-	snprintf( buf, 1024, "%sconfig/raceman/%s", GetLocalDir(), GfParmGetCurStr(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_SUBFILE, "") );
+	snprintf( buf, 1024, "%sconfig/raceman/%s", GfLocalDir(), GfParmGetCurStr(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_SUBFILE, "") );
 	subparam = GfParmReadFile( buf, GFPARM_RMODE_STD );
 	if( !subparam ) {
 		GfError( "WARNING: subfile %s not found\n", buf );
@@ -502,7 +502,7 @@ void ReCareerNew()
 	t = time(NULL);
 	stm = localtime(&t);
 	//srand((unsigned int)t); // Already done in tgf::gfInit (needed only once in the process life time)
-	snprintf( buf, 1024, "%sresults/%s/%%s-%4d-%02d-%02d-%02d-%02d%%s%%s%%s.xml%%s", GetLocalDir(), ReInfo->_reFilename,
+	snprintf( buf, 1024, "%sresults/%s/%%s-%4d-%02d-%02d-%02d-%02d%%s%%s%%s.xml%%s", GfLocalDir(), ReInfo->_reFilename,
 	          stm->tm_year + 1900, stm->tm_mon + 1, stm->tm_mday, stm->tm_hour, stm->tm_min );
 	filename = strdup(buf); //Makes it possible to reuse buf
 	ReCareerNewParams(filename, (double)t);

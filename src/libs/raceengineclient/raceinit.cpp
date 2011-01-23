@@ -71,13 +71,13 @@ ReInit(void)
   ReInfo->modList = &ReRaceModList;
 
   char buf[512];
-  snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), RACE_ENG_CFG);
+  snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
   ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
   GfLogInfo("Loading Track Loader ...\n");
   dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
-  snprintf(key, sizeof(key), "%smodules/track/%s.%s", GetLibDir (), dllname, DLLEXT);
+  snprintf(key, sizeof(key), "%smodules/track/%s.%s", GfLibDir (), dllname, DLLEXT);
   if (GfModLoad(0, key, &reEventModList))
 	  return;
   reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reTrackItf);
@@ -97,7 +97,7 @@ ReInit(void)
     capture->deltaSimu = RCM_MAX_DT_SIMU;
     char pszDefOutputBase[256];
     snprintf(pszDefOutputBase, sizeof(pszDefOutputBase), "%s%s",
-        GetLocalDir(), GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE,
+        GfLocalDir(), GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE,
                       RM_ATT_CAPTURE_OUT_DIR, "captures"));
     capture->outputBase = strdup(pszDefOutputBase);
     GfDirCreate(pszDefOutputBase); // In case not already done.
@@ -452,7 +452,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   /* Retrieve and load the driver type XML file :
      1) from user settings dir (local dir)
      2) from installed data dir */
-  snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GetLocalDir(), cardllname, cardllname);
+  snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname);
   robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
   if (!robhdle) {
     snprintf(buf, sizeof(buf), "drivers/%s/%s.xml", cardllname, cardllname);
@@ -587,7 +587,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       /* The code below stores the carnames to a separate xml-file
 		 such that at newTrack it is known which car is used.
 		 TODO: find a better method for this */
-      snprintf (buf, sizeof(buf), "%sdrivers/curcarnames.xml", GetLocalDir());
+      snprintf (buf, sizeof(buf), "%sdrivers/curcarnames.xml", GfLocalDir());
       handle = GfParmReadFile(buf, GFPARM_RMODE_CREAT);
       if (handle) {
         snprintf(path, sizeof(path), "drivers/%s/%d", cardllname, elt->_driverIndex);
@@ -677,7 +677,7 @@ ReInitCars(void)
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
     robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
     robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
-    snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GetLibDir(), robotModuleName, robotModuleName, DLLEXT);
+    snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
     /* Load the driver type shared library */
     if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
@@ -718,7 +718,7 @@ ReInitCars(void)
     else 
     {
       GfLogTrace("Loading robot %s descriptor file\n", robotModuleName );
-      snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GetLocalDir(), robotModuleName, robotModuleName);
+      snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), robotModuleName, robotModuleName);
       robhdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
       if (!robhdle) 
       {
@@ -795,7 +795,7 @@ void ReInitGraphics()
   /* Load the graphic module */
   GfLogInfo("Loading Graphic Engine...\n");
   dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
-  snprintf(key, sizeof(key), "%smodules/graphic/%s.%s", GetLibDir (), dllname, DLLEXT);
+  snprintf(key, sizeof(key), "%smodules/graphic/%s.%s", GfLibDir (), dllname, DLLEXT);
   if (GfModLoad(0, key, &reEventModList))
 	  return;
   reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reGraphicItf);

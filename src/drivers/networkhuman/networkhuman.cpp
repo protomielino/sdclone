@@ -230,7 +230,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
     const char *driver;
 
     // Open and load the networkhuman drivers params file
-    sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GetLocalDir());
+    sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GfLocalDir());
     drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
     NbDrivers = -1;
@@ -291,11 +291,11 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
     memset(modInfo, 0, (NbDrivers+1)*sizeof(tModInfo));
     
     // Open and load the networkhuman drivers params file
-    sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GetLocalDir());
+    sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GfLocalDir());
     drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
     char stopped = FALSE;
     
-    sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GetLocalDir());
+    sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GfLocalDir());
     void *DrvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
     
 	if (drvInfo) {
@@ -381,13 +381,13 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 	trackname[s2-s1] = 0;
 	sprintf(sstring, "Robots/index/%d", index);
 
-	sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GetLocalDir());
+	sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GfLocalDir());
 	void *DrvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	carname = NULL;
 	if (DrvInfo != NULL) {
 		carname = strdup(GfParmGetStr(DrvInfo, sstring, "car name", ""));
 	}
-	sprintf(sstring, "%sdrivers/curcarnames.xml", GetLocalDir());
+	sprintf(sstring, "%sdrivers/curcarnames.xml", GfLocalDir());
 	curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (curCars) {
 		sprintf(sstring, "drivers/networkhuman/%d", index + NbDrivers + 1);
@@ -397,27 +397,27 @@ static void initTrack(int index, tTrack* track, void *carHandle, void **carParmH
 			free (oldcarname);
 	}
 
-	sprintf(sstring, "%sdrivers/networkhuman/tracks/%s/car-%s-%d.xml", GetLocalDir(), trackname, carname, index);
+	sprintf(sstring, "%sdrivers/networkhuman/tracks/%s/car-%s-%d.xml", GfLocalDir(), trackname, carname, index);
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (*carParmHandle != NULL) {
 		GfOut("Player: %s Loaded\n", sstring);
 	} else {
-		sprintf(sstring, "%sdrivers/networkhuman/tracks/%s/car-%s.xml", GetLocalDir(), trackname, carname);
+		sprintf(sstring, "%sdrivers/networkhuman/tracks/%s/car-%s.xml", GfLocalDir(), trackname, carname);
 		*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 		if (*carParmHandle != NULL) {
 			GfOut("Player: %s Loaded\n", sstring);
 		} else {
-			sprintf(sstring, "%sdrivers/networkhuman/car-%s-%d.xml", GetLocalDir(), carname, index);
+			sprintf(sstring, "%sdrivers/networkhuman/car-%s-%d.xml", GfLocalDir(), carname, index);
 			*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 			if (*carParmHandle != NULL) {
 				GfOut("Player: %s Loaded\n", sstring);
 			} else {
-				sprintf(sstring, "%sdrivers/networkhuman/car-%s.xml", GetLocalDir(), carname);
+				sprintf(sstring, "%sdrivers/networkhuman/car-%s.xml", GfLocalDir(), carname);
 				*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 				if (*carParmHandle != NULL) {
 					GfOut("Player: %s Loaded\n", sstring);
 				} else {
-					sprintf(sstring, "%sdrivers/networkhuman/car.xml", GetLocalDir ());
+					sprintf(sstring, "%sdrivers/networkhuman/car.xml", GfLocalDir ());
 					*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 					if (*carParmHandle != NULL) {
 						GfOut("Player: %s Loaded\n", sstring);

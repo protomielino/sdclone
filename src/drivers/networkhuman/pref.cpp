@@ -115,7 +115,7 @@ HmReadPrefs(int index)
     cmdCtrl = HCtx[idx]->CmdControl;
     memcpy(cmdCtrl, CmdControlRef, nbCmdControl * sizeof (tControlCmd));
 
-    sprintf(sstring, "%s%s", GetLocalDir(), HM_PREF_FILE);
+    sprintf(sstring, "%s%s", GfLocalDir(), HM_PREF_FILE);
     PrefHdle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
     sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);

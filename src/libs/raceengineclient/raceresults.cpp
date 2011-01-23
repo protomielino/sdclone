@@ -65,7 +65,7 @@ ReInitResults(void)
 	t = time(NULL);
 	stm = localtime(&t);
 	sprintf(buf, "%sresults/%s/results-%4d-%02d-%02d-%02d-%02d.xml",
-		GetLocalDir(),
+		GfLocalDir(),
 		ReInfo->_reFilename,
 		stm->tm_year+1900,
 		stm->tm_mon+1,
@@ -192,8 +192,8 @@ ReUpdateStandings(void)
 	delete standings;
 	
 	char		str1[1024], str2[1024];
-	sprintf(str1, "%sconfig/params.dtd", GetDataDir());
-	sprintf(str2, "<?xml-stylesheet type=\"text/xsl\" href=\"file:///%sconfig/raceresults.xsl\"?>", GetDataDir());
+	sprintf(str1, "%sconfig/params.dtd", GfDataDir());
+	sprintf(str2, "<?xml-stylesheet type=\"text/xsl\" href=\"file:///%sconfig/raceresults.xsl\"?>", GfDataDir());
 	
 	GfParmSetDTD (results, str1, str2);
 	GfParmWriteFile(0, results, "Results");

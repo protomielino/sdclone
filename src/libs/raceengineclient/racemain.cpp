@@ -317,7 +317,7 @@ reRaceRealStart(void)
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
 	snprintf(buf, sizeof(buf), "Loading simulation engine (%s) ...", dllname);
 	RmLoadingScreenSetText(buf);
-	snprintf(path, sizeof(path), "%smodules/simu/%s.%s", GetLibDir (), dllname, DLLEXT);
+	snprintf(path, sizeof(path), "%smodules/simu/%s.%s", GfLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, path, &ReRaceModList)) 
 		return RM_QUIT;
 	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);

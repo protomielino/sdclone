@@ -68,11 +68,11 @@ GfRaceManagers::GfRaceManagers()
 {
 	_pPrivate = new Private;
 
-	// Get the list of racemans from the xml files available in GetDataDir()/config/raceman folder
+	// Get the list of racemans from the xml files available in GfDataDir()/config/raceman folder
 	tFList* lstFiles = GfDirGetListFiltered("config/raceman", "", PARAMEXT);
 	if (!lstFiles)
 	{
-		GfLogFatal("No race manager available in %sconfig/raceman\n", GetDataDir());
+		GfLogFatal("No race manager available in %sconfig/raceman\n", GfDataDir());
 		return;
 	}
 
@@ -82,7 +82,7 @@ GfRaceManagers::GfRaceManagers()
 	{
 		// Open the XML descriptor file (look first in user settings, then in the install folder).
 		std::ostringstream ossRaceManFileName;
-		ossRaceManFileName << GetLocalDir() << "config/raceman/" << pFile->name;
+		ossRaceManFileName << GfLocalDir() << "config/raceman/" << pFile->name;
 		void* hparmRaceMan = GfParmReadFile(ossRaceManFileName.str().c_str(), GFPARM_RMODE_STD);
 		if (!hparmRaceMan)
 		{
@@ -94,7 +94,7 @@ GfRaceManagers::GfRaceManagers()
 			if (hparmRaceMan)
 			{
 				ossRaceManFileName.str("");
-				ossRaceManFileName << GetLocalDir() << "config/raceman/" << pFile->name;
+				ossRaceManFileName << GfLocalDir() << "config/raceman/" << pFile->name;
 				GfParmWriteFile(ossRaceManFileName.str().c_str(), hparmRaceMan, NULL);
 			}
 		}
@@ -105,7 +105,7 @@ GfRaceManagers::GfRaceManagers()
 		if (!hparmRaceMan)
 		{
 			GfLogWarning("GfRaceManagers : Ignoring race manager %s (failed to read from config/raceman/%s in %s and %s)\n",
-						 strRaceManId.c_str(), pFile->name, GetLocalDir(), GetDataDir());
+						 strRaceManId.c_str(), pFile->name, GfLocalDir(), GfDataDir());
 			continue;
 		}
 

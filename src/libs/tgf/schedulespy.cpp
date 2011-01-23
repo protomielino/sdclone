@@ -194,9 +194,9 @@ void GfScheduleSpy::printReport(const char* pszFileName, double fTimeResolution,
 								double fDurationUnit, double fDurationResolution)
 {
 	// Output file :
-	// a) Build absolute path (mandatory storage under GetLocalDir()/debug folder.
+	// a) Build absolute path (mandatory storage under GfLocalDir()/debug folder.
 	std::ostringstream ossFilePathName;
-	ossFilePathName << GetLocalDir() << "debug/" << pszFileName;
+	ossFilePathName << GfLocalDir() << "debug/" << pszFileName;
 	GfOut("Writing schedule spy report to %s\n", ossFilePathName.str().c_str());
 
 	// b) Create parent dir(s) if needed.

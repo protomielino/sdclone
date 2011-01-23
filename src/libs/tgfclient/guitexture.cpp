@@ -623,7 +623,7 @@ GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
 {
 	// Get screen gamma value from graphics params.
 	char buf[256];
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	void *handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	const float screen_gamma =
 		(float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);

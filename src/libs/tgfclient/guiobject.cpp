@@ -38,7 +38,7 @@ gfuiObjectInit(void)
 	char buf[1024];
 	void *param;
 
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	static const char* pszSec = "Mouse Pointer";

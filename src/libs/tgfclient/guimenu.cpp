@@ -869,7 +869,7 @@ LoadMenuXML(const char *pszMenuPath)
         strPath += pszMenuPath;
         
         char buf[1024];
-        sprintf(buf, "%s%s", GetDataDir(), strPath.c_str());
+        sprintf(buf, "%s%s", GfDataDir(), strPath.c_str());
 
         return GfParmReadFile(buf, GFPARM_RMODE_STD);
 }

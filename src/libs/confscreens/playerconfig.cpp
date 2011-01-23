@@ -526,7 +526,7 @@ GenPlayerList(void)
     PlayersInfo.clear();
 
     /* Load players settings from human.xml file */
-    sprintf(buf, "%s%s", GetLocalDir(), HM_DRV_FILE);
+    sprintf(buf, "%s%s", GfLocalDir(), HM_DRV_FILE);
     PlayerHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (PlayerHdle == NULL) {
         return -1;
@@ -568,7 +568,7 @@ GenPlayerList(void)
     UpdtScrollList();
 
     /* Load players settings from human.xml file*/
-    sprintf(buf, "%s%s", GetLocalDir(), HM_PREF_FILE);
+    sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
     PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (!PrefHdle) {
         return -1;

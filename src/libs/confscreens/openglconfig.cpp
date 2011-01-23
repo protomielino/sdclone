@@ -84,7 +84,7 @@ void OpenGLLoadSelectedFeatures()
 	char buf[512];
 
 	// Read OpenGL configuration from graph.xml, and select relevant OpenGL features.
-	snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
 	void* paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// 1) Texture compression.
@@ -129,7 +129,7 @@ void OpenGLStoreSelectedFeatures()
 {
 	// Save settings to graph.xml
 	char buf[512];
-	snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	GfParmSetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION,

@@ -94,11 +94,11 @@ reGetLoadFileDir(char* pszDirPath, int nMaxLen)
 	// For race types with more than 1 event (= 1 race on 1 track), load a race result file,
 	// as the previous race standings has an influence on the next race starting grid.
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1)
-		snprintf(pszDirPath, nMaxLen, "%sresults/%s", GetLocalDir(), ReInfo->_reFilename);
+		snprintf(pszDirPath, nMaxLen, "%sresults/%s", GfLocalDir(), ReInfo->_reFilename);
 
 	// But for race types with only 1 event (= 1 race on 1 track), load a race config file.
 	else
-		snprintf(pszDirPath, nMaxLen, "%sconfig/raceman/%s", GetLocalDir(), ReInfo->_reFilename);
+		snprintf(pszDirPath, nMaxLen, "%sconfig/raceman/%s", GfLocalDir(), ReInfo->_reFilename);
 
 	return pszDirPath;
 }
@@ -189,7 +189,7 @@ reLoadRaceFromResultsFile(const char *filename)
 {
 	char pszFileName[256];
 
-	snprintf(pszFileName, sizeof(pszFileName), "%sresults/%s/%s", GetLocalDir(), ReInfo->_reFilename, filename);
+	snprintf(pszFileName, sizeof(pszFileName), "%sresults/%s/%s", GfLocalDir(), ReInfo->_reFilename, filename);
 	GfLogInfo("Loading saved race from %s ...\n", pszFileName);
 
 	// Update race data.
@@ -209,13 +209,13 @@ reLoadRaceFromConfigFile(const char *filename)
 {
 	char pszSelFilePathName[256];
 	snprintf(pszSelFilePathName, sizeof(pszSelFilePathName), "%sconfig/raceman/%s/%s",
-			 GetLocalDir(), ReInfo->_reFilename, filename);
+			 GfLocalDir(), ReInfo->_reFilename, filename);
 	GfLogInfo("Loading saved race from %s ...\n", pszSelFilePathName);
 
 	// Replace the main race file by the selected one.
 	char pszMainFilePathName[256];
 	snprintf(pszMainFilePathName, sizeof(pszMainFilePathName), "%sconfig/raceman/%s%s",
-			 GetLocalDir(), ReInfo->_reFilename, PARAMEXT);
+			 GfLocalDir(), ReInfo->_reFilename, PARAMEXT);
 	if (!GfFileCopy(pszSelFilePathName, pszMainFilePathName))
 	{
 		GfLogError("Failed to load selected race file %s", pszSelFilePathName);
@@ -248,12 +248,12 @@ reSaveRaceToConfigFile(const char *filename)
 	// Note: No need to write the main file here, already done at the end of race configuration.
 	char pszMainFilePathName[256];
 	snprintf(pszMainFilePathName, sizeof(pszMainFilePathName), "%sconfig/raceman/%s%s",
-			 GetLocalDir(), ReInfo->_reFilename, PARAMEXT);
+			 GfLocalDir(), ReInfo->_reFilename, PARAMEXT);
 
 	// Add .xml extension if not there.
 	char pszSelFilePathName[256];
 	snprintf(pszSelFilePathName, sizeof(pszSelFilePathName), "%sconfig/raceman/%s/%s",
-			GetLocalDir(), ReInfo->_reFilename, filename);
+			GfLocalDir(), ReInfo->_reFilename, filename);
 	const char* pszFileExt = strrchr(pszSelFilePathName, '.');
 	if (!pszFileExt || strcmp(pszFileExt, PARAMEXT))
 		strcat(pszSelFilePathName, PARAMEXT);
@@ -321,7 +321,7 @@ reOnSaveRaceToFile(void *pPrevMenu)
 
 	char pszDirPath[256];
 	snprintf(pszDirPath, sizeof(pszDirPath), "%sconfig/raceman/%s",
-			 GetLocalDir(), ReInfo->_reFilename);
+			 GfLocalDir(), ReInfo->_reFilename);
 	fs.path = pszDirPath;
 
 	fs.select = reSaveRaceToConfigFile;

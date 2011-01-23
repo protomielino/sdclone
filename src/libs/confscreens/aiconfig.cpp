@@ -54,7 +54,7 @@ static void ReadAICfg(void)
 	int i;
 
 	char buf[256];
-	snprintf(buf, 256, "%s%s", GetLocalDir(), AIGlobalSkillFilePathName);
+	snprintf(buf, 256, "%s%s", GfLocalDir(), AIGlobalSkillFilePathName);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	aiSkillValue = GfParmGetNum(paramHandle, "skill", "level", 0, SkillLevelValues[0]);
@@ -77,7 +77,7 @@ static void ReadAICfg(void)
 static void SaveSkillLevel(void * /* dummy */)
 {
 	char buf[256];
-	snprintf(buf, 256, "%s%s", GetLocalDir(), AIGlobalSkillFilePathName);
+	snprintf(buf, 256, "%s%s", GfLocalDir(), AIGlobalSkillFilePathName);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetNum(paramHandle, "skill", "level", 0, SkillLevelValues[CurSkillLevelIndex]);

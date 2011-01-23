@@ -86,7 +86,7 @@ grInitScene(void)
 	// Load graphic options if not already done.
 	if(!grHandle) 
 	{
-		sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	}//if grHandle
 
@@ -133,7 +133,7 @@ grLoadScene(tTrack *track)
 
 	// Load graphic options if not already done.
 	if(!grHandle) {
-		sprintf(buf, "%s%s", GetLocalDir(), GR_PARAM_FILE);
+		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	}//if grHandle
 
@@ -253,10 +253,10 @@ grCustomizePits(void)
 					// If we have more than one car in the pit use the team pit logo of driver 0. 
 					snprintf(buf, sizeof(buf),
 							 "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s;data/textures",
-							 GetLocalDir(),
+							 GfLocalDir(),
 							 pits->driversPits[i].car[0]->_modName,
 							 pits->driversPits[i].car[0]->_driverIndex,
-							 GetLocalDir(),
+							 GfLocalDir(),
 							 pits->driversPits[i].car[0]->_modName,
 							 pits->driversPits[i].car[0]->_modName,
 							 pits->driversPits[i].car[0]->_driverIndex,

@@ -692,7 +692,7 @@ void Server::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
 void Server::SendFilePacket(const char *pszFile)
 {
 	char filepath[255];
-	sprintf(filepath, "%s%s", GetLocalDir(), pszFile);
+	sprintf(filepath, "%s%s", GfLocalDir(), pszFile);
 	
 	GfLogTrace("Sending file packet: File- %s\n",filepath);
 

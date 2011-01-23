@@ -311,7 +311,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             }
             else
             {
-                sprintf(path, "%sdrivers/%s/%s.xml", GetLocalDir(), name, name);
+                sprintf(path, "%sdrivers/%s/%s.xml", GfLocalDir(), name, name);
                 robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
                 if (!robhdle)
 				{

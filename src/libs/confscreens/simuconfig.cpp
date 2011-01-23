@@ -71,7 +71,7 @@ static void loadSimuCfg(void)
 	int i;
 
 	char buf[1024];
-	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
+	snprintf(buf, 1024, "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	
@@ -111,7 +111,7 @@ static void loadSimuCfg(void)
 static void storeSimuCfg(void * /* dummy */)
 {
 	char buf[1024];
-	snprintf(buf, 1024, "%s%s", GetLocalDir(), RACE_ENG_CFG);
+	snprintf(buf, 1024, "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[CurSimuVersion]);

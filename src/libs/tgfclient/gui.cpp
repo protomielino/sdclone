@@ -76,7 +76,7 @@ gfuiColorInit(void)
 		GFSCR_ELt_LABELCOLOROPTIONS, GFSCR_ELT_TABLEHEADER
 	};
 
-	sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	hdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	for (i = 0; i < GFUI_COLORNB; i++) {
@@ -903,7 +903,7 @@ void
 GfuiScreenShot(void * /* notused */)
 {
 	char path[256];
-	snprintf(path, sizeof(path), "%sscreenshots", GetLocalDir());
+	snprintf(path, sizeof(path), "%sscreenshots", GfLocalDir());
 
 	// Ensure that screenshot directory exists.
 	if (GfDirCreate(path) == GF_DIR_CREATED)

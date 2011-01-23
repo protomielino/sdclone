@@ -655,19 +655,19 @@ grInitCar(tCarElt *car)
 	grFilePath = (char*)malloc(nMaxTexPathSize);
 	lg = 0;
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-				   GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+				   GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
 	if (bMasterModel)
 		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-					   GetLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+					   GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
 	
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
-				   GetLocalDir(), car->_modName, car->_carName);
+				   GfLocalDir(), car->_modName, car->_carName);
 	if (bMasterModel)
 		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
-					   GetLocalDir(), car->_modName, car->_masterModel);
+					   GfLocalDir(), car->_modName, car->_masterModel);
 	
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
-				   GetLocalDir(), car->_modName);
+				   GfLocalDir(), car->_modName);
 	
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
 				   car->_modName, car->_driverIndex, car->_carName);
@@ -719,19 +719,19 @@ grInitCar(tCarElt *car)
 	   1) driver level specified, 2) car level specified, 3) common models / textures */
 	lg = 0;
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-				   GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+				   GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
 	if (bMasterModel)
 		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-					   GetLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+					   GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
 	
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
-				   GetLocalDir(), car->_modName, car->_carName);
+				   GfLocalDir(), car->_modName, car->_carName);
 	if (bMasterModel)
 		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
-					   GetLocalDir(), car->_modName, car->_masterModel);
+					   GfLocalDir(), car->_modName, car->_masterModel);
 	
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
-				   GetLocalDir(), car->_modName);
+				   GfLocalDir(), car->_modName);
 	
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
 				   car->_modName, car->_driverIndex, car->_carName);

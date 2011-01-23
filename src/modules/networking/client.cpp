@@ -621,7 +621,7 @@ void Client::ReadFilePacket(ENetPacket *pPacket)
 	GfLogTrace("Client file size %u\n",filesize);
 	
 	char filepath[255];
-	sprintf(filepath, "%s%s", GetLocalDir(), file);
+	sprintf(filepath, "%s%s", GfLocalDir(), file);
 	FILE *pFile = fopen(filepath,"w+b");
 	GfLogTrace("Reading file packet: File- %s\n",filepath);
 	fwrite(pData,filesize,1,pFile);

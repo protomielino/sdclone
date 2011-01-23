@@ -62,25 +62,25 @@ init_args(int argc, char **argv)
 		if (!strncmp(argv[i], "-l", 2))
 		{
 			if (++i < argc)
-				localdir = SetLocalDir(argv[i]);
+				localdir = GfSetLocalDir(argv[i]);
 		}
 		// -L option : Libraries dir (root dir of the tree where loadable modules are installed)
 		else if (!strncmp(argv[i], "-L", 2))
 		{
 			if (++i < argc)
-				libdir = SetLibDir(argv[i]);
+				libdir = GfSetLibDir(argv[i]);
 		}
 		// -D option : Data dir (root dir of the data tree)
 		else if (!strncmp(argv[i], "-D", 2))
 		{
 			if (++i < argc)
-				datadir = SetDataDir(argv[i]);
+				datadir = GfSetDataDir(argv[i]);
 		}
 		// -B option : Binaries dir (the dir where game exe and DLLs are installed)
 		else if (!strncmp(argv[i], "-B", 2))
 		{
 			if (++i < argc)
-				bindir = SetBinDir(argv[i]);
+				bindir = GfSetBinDir(argv[i]);
 		}
 		// -m option : Allow the hardware mouse cursor
 		else if (!strncmp(argv[i], "-m", 2))
@@ -99,13 +99,13 @@ init_args(int argc, char **argv)
     // If any of the Speed-Dreams dirs not run-time specified / empty, 
     // use associated compile-time variable SD_XXDIR to get default value
     if (!(localdir && strlen(localdir)))
-		localdir = SetLocalDir(SD_LOCALDIR);
+		localdir = GfSetLocalDir(SD_LOCALDIR);
 	if (!(libdir && strlen(libdir)))
-		libdir = SetLibDir(SD_LIBDIR);
+		libdir = GfSetLibDir(SD_LIBDIR);
     if (!(bindir && strlen(bindir)))
-		bindir = SetBinDir(SD_BINDIR);
+		bindir = GfSetBinDir(SD_BINDIR);
     if (!(datadir && strlen(datadir)))
-		datadir = SetDataDir(SD_DATADIR);
+		datadir = GfSetDataDir(SD_DATADIR);
 	
     // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
     if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 

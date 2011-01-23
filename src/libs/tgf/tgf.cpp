@@ -468,7 +468,7 @@ void GfRestart(bool bHardwareMouse)
     int	argInd;
 
     // Command name.
-    sprintf(cmd, "%sspeed-dreams-2", GetBinDir());
+    sprintf(cmd, "%sspeed-dreams-2", GfBinDir());
 #ifdef WIN32
     strcat(cmd, ".exe");
 #endif
@@ -479,13 +479,13 @@ void GfRestart(bool bHardwareMouse)
     
     if (bHardwareMouse)
 	  nArgs += 1;
-    if (GetLocalDir() && strlen(GetLocalDir()))
+    if (GfLocalDir() && strlen(GfLocalDir()))
 	  nArgs += 2;
-    if (GetBinDir() && strlen(GetBinDir()))
+    if (GfBinDir() && strlen(GfBinDir()))
 	  nArgs += 2;
-    if (GetLibDir() && strlen(GetLibDir()))
+    if (GfLibDir() && strlen(GfLibDir()))
 	  nArgs += 2;
-    if (GetDataDir() && strlen(GetDataDir()))
+    if (GfDataDir() && strlen(GfDataDir()))
 	  nArgs += 2;
 
     nArgs++; // Last arg must be a null pointer.
@@ -501,28 +501,28 @@ void GfRestart(bool bHardwareMouse)
     if (bHardwareMouse)
         args[argInd++] = strdup("-m");
     
-    if (GetLocalDir() && strlen(GetLocalDir()))
+    if (GfLocalDir() && strlen(GfLocalDir()))
     {
         args[argInd++] = strdup("-l");
-		args[argInd++] = gfPathBuildCommandLineArg(GetLocalDir());
+		args[argInd++] = gfPathBuildCommandLineArg(GfLocalDir());
     }
 
-    if (GetBinDir() && strlen(GetBinDir()))
+    if (GfBinDir() && strlen(GfBinDir()))
     {
         args[argInd++] = strdup("-B");
-		args[argInd++] = gfPathBuildCommandLineArg(GetBinDir());
+		args[argInd++] = gfPathBuildCommandLineArg(GfBinDir());
     }
 	
-    if (GetLibDir() && strlen(GetLibDir()))
+    if (GfLibDir() && strlen(GfLibDir()))
     {
         args[argInd++] = strdup("-L");
-		args[argInd++] = gfPathBuildCommandLineArg(GetLibDir());
+		args[argInd++] = gfPathBuildCommandLineArg(GfLibDir());
     }
 	
-    if (GetDataDir() && strlen(GetDataDir()))
+    if (GfDataDir() && strlen(GfDataDir()))
     {
         args[argInd++] = strdup("-D");
-		args[argInd++] = gfPathBuildCommandLineArg(GetDataDir ());
+		args[argInd++] = gfPathBuildCommandLineArg(GfDataDir ());
     }
 	
     // Finally, last null arg.
@@ -866,12 +866,12 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	GfLogInfo("Install dir is %s (from executable %s)\n", gfInstallDir, pszExecutablePath);
 }
 
-const char* GetLocalDir(void)
+const char* GfLocalDir(void)
 {
 	return gfLocalDir;
 }
 
-const char* SetLocalDir(const char *pszPath)
+const char* GfSetLocalDir(const char *pszPath)
 {
 	if (gfLocalDir)
 		free(gfLocalDir);
@@ -880,12 +880,12 @@ const char* SetLocalDir(const char *pszPath)
 	return gfLocalDir;
 }
 
-const char* GetLibDir(void)
+const char* GfLibDir(void)
 {
 	return gfLibDir;
 }
 
-const char* SetLibDir(const char *pszPath)
+const char* GfSetLibDir(const char *pszPath)
 {
 	if (gfLibDir)
 		free(gfLibDir);
@@ -894,12 +894,12 @@ const char* SetLibDir(const char *pszPath)
 	return gfLibDir;
 }
 
-const char* GetDataDir(void)
+const char* GfDataDir(void)
 {
 	return gfDataDir;
 }
 
-const char* SetDataDir(const char *pszPath)
+const char* GfSetDataDir(const char *pszPath)
 {
 	if (gfDataDir)
 		free(gfDataDir);
@@ -908,12 +908,12 @@ const char* SetDataDir(const char *pszPath)
 	return gfDataDir;
 }
 
-const char* GetBinDir(void)
+const char* GfBinDir(void)
 {
 	return gfBinDir;
 }
 
-const char* SetBinDir(const char *pszPath)
+const char* GfSetBinDir(const char *pszPath)
 {
 	if (gfBinDir)
 		free(gfBinDir);

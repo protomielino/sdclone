@@ -38,7 +38,7 @@ void RtGetCarindexString( int index, const char *bot_dname, char extended, char 
 	}
 	else
 	{
-		snprintf( buffer, BUFFERSIZE, "%sdrivers/curcarnames.xml", GetLocalDir() );
+		snprintf( buffer, BUFFERSIZE, "%sdrivers/curcarnames.xml", GfLocalDir() );
 		buffer[ BUFFERSIZE - 1 ] = '\0';
 		carnames_xml = GfParmReadFile( buffer, GFPARM_RMODE_STD );
 		if( carnames_xml )

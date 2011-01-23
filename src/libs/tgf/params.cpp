@@ -1165,7 +1165,7 @@ GfParmReadFileLocal(const char *file, int mode, bool neededFile)
 {
 	//use local dir
 	char buf[255];
-	sprintf(buf, "%s%s", GetLocalDir(),file);
+	sprintf(buf, "%s%s", GfLocalDir(),file);
 	
 	void *pResult = GfParmReadFile(buf,mode,neededFile);
 
@@ -1575,7 +1575,7 @@ GfParmWriteFileLocal(const char *file, void *parmHandle, const char *name)
 {
 	//use local dir
 	char buf[255];
-	sprintf(buf, "%s%s", GetLocalDir(), file);
+	sprintf(buf, "%s%s", GfLocalDir(), file);
 
 	return GfParmWriteFile(buf,parmHandle,name);
 }
@@ -1663,7 +1663,7 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
 
 	//use local dir
 	char buf[255];
-	sprintf(buf, "%s%s", GetLocalDir(),file);
+	sprintf(buf, "%s%s", GfLocalDir(),file);
     char* filepath = &buf[0];
 
     if (!filepath) {

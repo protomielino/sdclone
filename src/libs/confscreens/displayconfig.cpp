@@ -165,7 +165,7 @@ void DisplayMenu::loadSettings()
 {
 	// Load screen config params file.
 	std::ostringstream ossConfFile;
-	ossConfFile << GetLocalDir() << GFSCR_CONF_FILE;
+	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams =
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	
@@ -208,7 +208,7 @@ void DisplayMenu::storeSettings() const
 {
 	// Load screen config params file.
 	std::ostringstream ossConfFile;
-	ossConfFile << GetLocalDir() << GFSCR_CONF_FILE;
+	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams =
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 

@@ -75,7 +75,7 @@ SaveGraphicOptions(void *prevMenu)
     // Force current edit to loose focus (if one has it) and update associated variable.
     GfuiUnSelectCurrent();
 
-    snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
     void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", FovFactorValue);
@@ -99,7 +99,7 @@ ChangeSkyDomeDist(void* vp);
 static void
 LoadGraphicOptions()
 {
-    snprintf(buf, sizeof(buf), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
     void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     
     FovFactorValue = (int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, "%", 100.0);

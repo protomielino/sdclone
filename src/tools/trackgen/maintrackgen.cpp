@@ -215,11 +215,11 @@ void init_args(int argc, char **argv)
 	// Initialize run-time libs path.
 	if (libDir)
 	{
-		SetLibDir(libDir);
+		GfSetLibDir(libDir);
 		free(libDir);
 	}
 	else
-		SetLibDir(SD_LIBDIR);
+		GfSetLibDir(SD_LIBDIR);
 	
 #else
 	
@@ -282,14 +282,14 @@ void init_args(int argc, char **argv)
     }
 	
 	// Initialize run-time libs path.
-	SetLibDir(SD_LIBDIR);
+	GfSetLibDir(SD_LIBDIR);
 	
 #endif
 
 	// Initialize other run-time pathes.
-	SetBinDir(SD_BINDIR);
-	SetDataDir(SD_DATADIR);
-	SetLocalDir(SD_LOCALDIR);
+	GfSetBinDir(SD_BINDIR);
+	GfSetDataDir(SD_DATADIR);
+	GfSetLocalDir(SD_LOCALDIR);
 
     if (!TrackName || !TrackCategory) {
 	usage();
@@ -340,8 +340,8 @@ Generate(void)
 {
 	const char *trackdllname;
 	const char *extName;
-	const char *libdir = GetLibDir();
-	const char *datadir = GetDataDir();
+	const char *libdir = GfLibDir();
+	const char *datadir = GfDataDir();
 	FILE *outfd = NULL;
 
 	// Tested for windows only

@@ -196,7 +196,7 @@ ReConfigRunState(void)
 		/* Check if really something we can configure (given the graphic options) */
 		if ((rp.confMask & (RM_CONF_TIME_OF_DAY | RM_CONF_CLOUD_COVER)) == rp.confMask) {
  	
-			snprintf(path, sizeof(path), "%s%s", GetLocalDir(), GR_PARAM_FILE);
+			snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GR_PARAM_FILE);
 			void *grHandle = GfParmReadFile(path, GFPARM_RMODE_STD);
 			const bool bSkyDomeEnabled =
 				(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;

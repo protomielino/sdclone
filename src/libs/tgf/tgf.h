@@ -470,20 +470,25 @@ TGF_API void GfSleep(double seconds);
  ***************************/
 
 TGF_API void GfInitInstallDir(const char *pszExecutablePath);
-TGF_API const char* GfGetInstallDir();
+TGF_API const char* GfInstallDir();
 
-TGF_API const char *GetLocalDir();
-TGF_API const char *SetLocalDir(const char *pszPath);
+TGF_API const char* GfLocalDir();
+TGF_API const char* GfSetLocalDir(const char* pszPath);
 
-TGF_API const char *GetLibDir();
-TGF_API const char *SetLibDir(const char *pszPath);
+TGF_API const char* GfLibDir();
+TGF_API const char* GfSetLibDir(const char* pszPath);
 
-TGF_API const char *GetDataDir();
-TGF_API const char *SetDataDir(const char *pszPath);
+TGF_API const char* GfDataDir();
+TGF_API const char* GfSetDataDir(const char* pszPath);
 
-TGF_API const char *GetBinDir();
-TGF_API const char *SetBinDir(const char *pszPath);
+TGF_API const char* GfBinDir();
+TGF_API const char* GfSetBinDir(const char* pszPath);
 
+// TORCS backward-compatible symbols, for robots.
+#define GetLocalDir GfLocalDir
+#define GetLibDir   GfLibDir
+#define GetDataDir  GfDataDir
+#define GetBinDir   GfBinDir
 
 /************************************************
  * User settings files run-time update/install. *

@@ -335,7 +335,7 @@ reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
 	// Determine if we have a dedicated separate thread or not
 	// (according to the user settings, and the actual number of CPUs).
 	std::ostringstream ossConfFile;
-	ossConfFile << GetLocalDir() << RACE_ENG_CFG;
+	ossConfFile << GfLocalDir() << RACE_ENG_CFG;
 	void *paramHandle =
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	const char* pszMultiThreadScheme =
@@ -658,7 +658,7 @@ reMainUpdater::reMainUpdater(reSituationUpdater* pSituUpdater)
 #ifndef NoFPSLimiter
 	// Get the max. refresh rate from screen config params file.
 	std::ostringstream ossConfFile;
-	ossConfFile << GetLocalDir() << GFSCR_CONF_FILE;
+	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams = GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD);
 	_dLastTime = 0.0;
 	_dMaxRate =

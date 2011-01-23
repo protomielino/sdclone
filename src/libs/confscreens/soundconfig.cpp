@@ -61,7 +61,7 @@ static void readSoundCfg(void)
 	char buf[1024];
 
 	// Sound interface.
-	sprintf(buf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
+	sprintf(buf, "%s%s", GfLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	optionName = GfParmGetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[0]);
 
@@ -97,7 +97,7 @@ static void saveSoundOption(void *)
 	GfuiUnSelectCurrent();
 
 	char buf[1024];
-	sprintf(buf, "%s%s", GetLocalDir(), GR_SOUND_PARM_CFG);
+	sprintf(buf, "%s%s", GfLocalDir(), GR_SOUND_PARM_CFG);
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_STATE, soundOptionList[curOption]);
 	GfParmSetNum(paramHandle, GR_SCT_SOUND, GR_ATT_SOUND_VOLUME, "%", VolumeValue);

@@ -80,9 +80,9 @@ void GfFileSetup()
 	struct stat st;
 
 	// Open data (installation) version.xml.
-	filenameLength = strlen(GetDataDir()) + 12 + 40;
+	filenameLength = strlen(GfDataDir()) + 12 + 40;
 	filename = (char*)malloc( sizeof(char) * filenameLength );
-	sprintf( filename, "%sversion.xml", GetDataDir() );
+	sprintf( filename, "%sversion.xml", GfDataDir() );
 	dataVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_STD );
 	if( !dataVersionHandle )
 	{
@@ -99,17 +99,17 @@ void GfFileSetup()
 	}
 
 	// Create LocalDir (user settings root) if not already done.
-	GfDirCreate( GetLocalDir() );
+	GfDirCreate( GfLocalDir() );
 
 	// Open local (user settings) version.xml (create it if not there).
-	if( filenameLength < strlen(GetLocalDir()) + 12 )
+	if( filenameLength < strlen(GfLocalDir()) + 12 )
 	{
 		free( filename );
-		filenameLength = strlen(GetLocalDir()) + 12 + 40;
+		filenameLength = strlen(GfLocalDir()) + 12 + 40;
 		filename = (char*)malloc( sizeof(char) * filenameLength );
 	}
 
-	sprintf( filename, "%sversion.xml", GetLocalDir() );
+	sprintf( filename, "%sversion.xml", GfLocalDir() );
 	anyLocalChange = !GfFileExists(filename);
 	localVersionHandle = GfParmReadFile( filename, GFPARM_RMODE_CREAT );
 
@@ -149,11 +149,11 @@ void GfFileSetup()
 		major = (int)GfParmGetCurNum( dataVersionHandle, "versions", "Major version", NULL, 0 );
 		minor = (int)GfParmGetCurNum( dataVersionHandle, "versions", "Minor version", NULL, 0 );
 
-		absLocalLocation = (char*)malloc( sizeof(char)*(strlen(GetLocalDir())+strlen(localLocation)+3) );
-		sprintf( absLocalLocation, "%s%s", GetLocalDir(), localLocation );
+		absLocalLocation = (char*)malloc( sizeof(char)*(strlen(GfLocalDir())+strlen(localLocation)+3) );
+		sprintf( absLocalLocation, "%s%s", GfLocalDir(), localLocation );
 
-		absDataLocation = (char*)malloc( sizeof(char)*(strlen(GetDataDir())+strlen(dataLocation)+3) );
-		sprintf( absDataLocation, "%s%s", GetDataDir(), dataLocation );
+		absDataLocation = (char*)malloc( sizeof(char)*(strlen(GfDataDir())+strlen(dataLocation)+3) );
+		sprintf( absDataLocation, "%s%s", GfDataDir(), dataLocation );
 
 		GfLogTrace("Checking %s : user settings version ", localLocation);
 

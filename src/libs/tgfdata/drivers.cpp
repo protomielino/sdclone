@@ -71,7 +71,7 @@ GfDrivers::GfDrivers()
 	_pPrivate = new GfDrivers::Private;
 
 	// Load robot modules from the "drivers" installed folder.
-	std::string strDriversDirName(GetLibDir());
+	std::string strDriversDirName(GfLibDir());
 	strDriversDirName += "drivers";
 
     tModList* lstDriverModules = 0;
@@ -97,7 +97,7 @@ GfDrivers::GfDrivers()
 
 		// Load the module XML descriptor file (try  user settings first, and then installed one)
 		std::ostringstream ossRobotFileName;
-		ossRobotFileName << GetLocalDir() << "drivers/" << strModName
+		ossRobotFileName << GfLocalDir() << "drivers/" << strModName
 						 << '/' << strModName << PARAMEXT;
 		void *hparmRobot = GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD);
 		if (!hparmRobot)
@@ -601,17 +601,17 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
 	//          (pit door logos are not searched by the graphics engine
 	//           in the car-dedicated folders ... so they may be "over-detected" here).
 	std::ostringstream ossDirPath;
-	ossDirPath << GetLocalDir() << "drivers/" << _strModName
+	ossDirPath << GfLocalDir() << "drivers/" << _strModName
 			   << '/' << _nItfIndex << '/' << strCarId;
 	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
 	ossDirPath.str("");
-	ossDirPath << GetLocalDir() << "drivers/" << _strModName
+	ossDirPath << GfLocalDir() << "drivers/" << _strModName
 			   << '/' << strCarId;
 	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
 	ossDirPath.str("");
-	ossDirPath << GetLocalDir() << "drivers/" << _strModName;
+	ossDirPath << GfLocalDir() << "drivers/" << _strModName;
 	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
 	ossDirPath.str("");

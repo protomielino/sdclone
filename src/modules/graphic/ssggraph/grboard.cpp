@@ -1239,19 +1239,19 @@ void grInitBoardCar(tCarElt *car)
   grFilePath = (char*)malloc(nMaxTexPathSize);
   lg = 0;
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-				 GetLocalDir(), car->_modName, car->_driverIndex, car->_carName);
+				 GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
   if (bMasterModel)
     lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
-				   GetLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+				   GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
   
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
-				 GetLocalDir(), car->_modName, car->_carName);
+				 GfLocalDir(), car->_modName, car->_carName);
   if (bMasterModel)
     lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
-				   GetLocalDir(), car->_modName, car->_masterModel);
+				   GfLocalDir(), car->_modName, car->_masterModel);
   
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s;",
-				 GetLocalDir(), car->_modName);
+				 GfLocalDir(), car->_modName);
 
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "drivers/%s/%d/%s;",
 				 car->_modName, car->_driverIndex, car->_carName);

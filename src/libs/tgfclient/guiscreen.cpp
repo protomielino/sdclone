@@ -373,7 +373,7 @@ void GfScrInit(int argc, char *argv[])
 	GfLogTrace("Maximum pixel depth : %d bits\n", sdlVideoInfo->vfmt->BitsPerPixel);
 
 	// Get graphical settings from config file.
-    sprintf(buf, "%s%s", GetLocalDir(), GFSCR_CONF_FILE);
+    sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
     handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     xw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, 800);
     yw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, 600);
@@ -396,7 +396,7 @@ void GfScrInit(int argc, char *argv[])
 
 	// Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
 	// as BMP doesn't support transparency).
-	sprintf(buf, "%sdata/icons/icon.bmp", GetDataDir());
+	sprintf(buf, "%sdata/icons/icon.bmp", GfDataDir());
 	if ((icon = SDL_LoadBMP(buf)))
 	{
 	    SDL_SetColorKey(icon, SDL_SRCCOLORKEY, SDL_MapRGB(icon->format, 0, 0, 0));

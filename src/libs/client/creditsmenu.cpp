@@ -88,7 +88,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     static float colNameColor[4] = {1.0, 0.0, 1.0, 1.0};
 
     // Open and parse credits file
-    sprintf(buf, "%s%s", GetDataDir(), "credits.xml");
+    sprintf(buf, "%s%s", GfDataDir(), "credits.xml");
     void* crHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (!crHdle)
         return 0;
