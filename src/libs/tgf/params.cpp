@@ -1871,6 +1871,7 @@ evalUnit (char *unit, tdble *dest, int invert)
     
     // SI units.
     if (strcmp(unit, "m") == 0) return;
+    if (strcmp(unit, "N") == 0) return;
     if (strcmp(unit, "kg") == 0) return;
     if (strcmp(unit, "s") == 0) return;
     if (strcmp(unit, "rad") == 0) return;
@@ -1879,39 +1880,40 @@ evalUnit (char *unit, tdble *dest, int invert)
     // Other non-SI units that are considered as SI ones (backward compatibility with TORCS).
     if ((strcmp(unit, "l") == 0) || (strcmp(unit, "litre") == 0)) return;
 
-    // Non-SI units conversion.
-    if ((strcmp(unit, "feet") == 0) || (strcmp(unit, "ft") == 0)) {
-	coeff = 0.304801f; /* m */
-    } else if (strcmp(unit, "deg") == 0) {
+    // Non-SI units conversion
+	// (please keep the order of the following tests : it is staticstically optimized).
+    if (strcmp(unit, "deg") == 0) {
 	coeff = (float) (M_PI/180.0); /* rad */
-    } else if ((strcmp(unit, "h") == 0) || (strcmp(unit, "hour") == 0) || (strcmp(unit, "hours") == 0)) {
-	coeff = 3600.0; /* s */
-    } else if ((strcmp(unit, "day") == 0) || (strcmp(unit, "days") == 0)) {
-	coeff = 24*3600.0; /* s */
-    } else if (strcmp(unit, "km") == 0) {
-	coeff = 1000.0; /* m */
+    } else if ((strcmp(unit, "lbs") == 0)  || (strcmp(unit, "lb") == 0)) {
+	coeff = 0.45359237f; /* kg */
+    } else if ((strcmp(unit, "%") == 0) || (strcmp(unit, "percent") == 0)) {
+	coeff = 0.01f;
     } else if (strcmp(unit, "mm") == 0) {
 	coeff = 0.001f; /* m */
+    } else if ((strcmp(unit, "rpm") == 0) || (strcmp(unit, "RPM") == 0)) {
+	coeff = 0.104719755f; /* rad/s */
+    } else if (strcmp(unit, "kPa") == 0) {
+	coeff = 1000.0; /* Pa */
+    } else if ((strcmp(unit, "feet") == 0) || (strcmp(unit, "ft") == 0)) {
+	coeff = 0.304801f; /* m */
+    } else if (strcmp(unit, "km") == 0) {
+	coeff = 1000.0; /* m */
     } else if (strcmp(unit, "cm") == 0) {
 	coeff = 0.01f; /* m */
     } else if ((strcmp(unit, "in") == 0) || (strcmp(unit, "inch") == 0) || (strcmp(unit, "inches") == 0)) {
 	coeff = 0.0254f; /* m */
-    } else if ((strcmp(unit, "lbs") == 0)  || (strcmp(unit, "lb") == 0)) {
-	coeff = 0.45359237f; /* kg */
-    } else if ((strcmp(unit, "slug") == 0) || (strcmp(unit, "slugs") == 0)) {
-	coeff = 14.59484546f; /* kg */
-    } else if (strcmp(unit, "kPa") == 0) {
-	coeff = 1000.0; /* Pa */
-    } else if (strcmp(unit, "MPa") == 0) {
-	coeff = 1000000.0; /* Pa */
     } else if ((strcmp(unit, "psi") == 0) || (strcmp(unit, "PSI") == 0)){
 	coeff = 6894.76f; /* Pa */
-    } else if ((strcmp(unit, "rpm") == 0) || (strcmp(unit, "RPM") == 0)) {
-	coeff = 0.104719755f; /* rad/s */
-    } else if ((strcmp(unit, "%") == 0) || (strcmp(unit, "percent") == 0)) {
-	coeff = 0.01f;
     } else if ((strcmp(unit, "mph") == 0) || (strcmp(unit, "MPH") == 0)) {
 	coeff = 0.44704f; /* m/s */
+    } else if (strcmp(unit, "MPa") == 0) {
+	coeff = 1000000.0; /* Pa */
+    } else if ((strcmp(unit, "h") == 0) || (strcmp(unit, "hour") == 0) || (strcmp(unit, "hours") == 0)) {
+	coeff = 3600.0; /* s */
+    } else if ((strcmp(unit, "day") == 0) || (strcmp(unit, "days") == 0)) {
+	coeff = 24*3600.0; /* s */
+    } else if ((strcmp(unit, "slug") == 0) || (strcmp(unit, "slugs") == 0)) {
+	coeff = 14.59484546f; /* kg */
     }
 
     if (invert) {
