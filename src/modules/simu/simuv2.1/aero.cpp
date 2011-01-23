@@ -137,19 +137,17 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
     tdble vt2 = car->airSpeed2;
 	// compute angle of attack
 	tdble aoa = atan2(car->DynGC.vel.z, car->DynGC.vel.x) + car->DynGCg.pos.ay;
-    if (aoa < 0) {
-        wing->forces.x = wing->forces.z = 0;
-    } else {
-        aoa += wing->angle;
-        // the sinus of the angle of attack
-        tdble sinaoa = sin(aoa);
 
-        if (car->DynGC.vel.x > 0.0f) {
-            wing->forces.x = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * sinaoa;
-            wing->forces.z = wing->Kz * vt2 * sinaoa;
-        } else {
-            wing->forces.x = wing->forces.z = 0.0f;
-        }
+    aoa += wing->angle;
+    // the sinus of the angle of attack
+    tdble sinaoa = sin(aoa);
+
+    if (car->DynGC.vel.x > 0.0f) {
+        //make drag always negative and have a minimal angle of attack
+        wing->forces.x = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * MAX(fabs(sinaoa), 0.02);
+        wing->forces.z = wing->Kz * vt2 * sinaoa;
+    } else {
+        wing->forces.x = wing->forces.z = 0.0f;
     }
 }
 
