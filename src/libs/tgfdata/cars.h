@@ -88,7 +88,7 @@ protected:
 	EDriveTrain _eDriveTrain;
 	unsigned _nGears; // Number of gears.
 	bool _bTurboCharged; // TODO: Move to an enum (Turbo, Compressor, ...)
-	tdble _fEngineCapacity; // m3
+	tdble _fEngineCapacity; // litres
 	unsigned _nCylinders;
 	EEngineShape _eEngineShape;
 	EEnginePosition _eEnginePosition;

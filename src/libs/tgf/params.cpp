@@ -1869,12 +1869,17 @@ evalUnit (char *unit, tdble *dest, int invert)
 {
     tdble coeff = 1.0;
     
+    // SI units.
     if (strcmp(unit, "m") == 0) return;
     if (strcmp(unit, "kg") == 0) return;
     if (strcmp(unit, "s") == 0) return;
     if (strcmp(unit, "rad") == 0) return;
     if (strcmp(unit, "Pa") == 0) return;
 
+    // Other non-SI units that are considered as SI ones (backward compatibility with TORCS).
+    if ((strcmp(unit, "l") == 0) || (strcmp(unit, "litre") == 0)) return;
+
+    // Non-SI units conversion.
     if ((strcmp(unit, "feet") == 0) || (strcmp(unit, "ft") == 0)) {
 	coeff = 0.304801f; /* m */
     } else if (strcmp(unit, "deg") == 0) {
@@ -1907,8 +1912,6 @@ evalUnit (char *unit, tdble *dest, int invert)
 	coeff = 0.01f;
     } else if ((strcmp(unit, "mph") == 0) || (strcmp(unit, "MPH") == 0)) {
 	coeff = 0.44704f; /* m/s */
-    } else if ((strcmp(unit, "l") == 0) || (strcmp(unit, "litre") == 0)) {
-	coeff = 0.001f; /* m3 */
     }
 
     if (invert) {
@@ -1931,7 +1934,6 @@ evalUnit (char *unit, tdble *dest, int invert)
 			<li><b>lbs</b> converted to <b>kg</b></li>
 			<li><b>slug</b> or <b>slugs</b> converted to <b>kg</b></li>
 			<li><b>h</b> or <b>hours</b> converted to <b>s</b></li>
-			<li><b>litre</b> or <b>l</b> converted to <b>m3</b></li>
 			<li><b>day</b> or <b>days</b> converted to <b>s</b></li>
 			<li><b>km</b> converted to <b>m</b></li>
 			<li><b>cm</b> converted to <b>m</b></li>
@@ -1941,6 +1943,7 @@ evalUnit (char *unit, tdble *dest, int invert)
 			<li><b>rpm</b> or <b>RPM</b> converted to <b>rad/s</b></li>
 			<li><b>percent</b> or <b>%</b> divided by <b>100</b></li>
 	     </ul>
+	     <br>All other units are considered SI, and thus not converted (coef=1)
     @see	GfParmSI2Unit
  */
 tdble
