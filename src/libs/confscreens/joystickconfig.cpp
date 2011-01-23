@@ -17,11 +17,16 @@
  *                                                                         *
  ***************************************************************************/
 
+/** @file   
+    		Human player joystick configuration menu
+    @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
+    @version	$Id$
+*/
+
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstring>
-
 
 #include <tgfclient.h>
 
@@ -179,7 +184,7 @@ Idle2(void)
     }
 
     /* Let CPU take breath (and fans stay at low and quite speed) */
-    GfuiSleep(0.001);
+    GfSleep(0.001);
 }
 
 

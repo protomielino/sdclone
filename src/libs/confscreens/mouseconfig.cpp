@@ -17,15 +17,21 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <cstring>
+/** @file   
+    		Human player mouse configuration menu
+    @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
+    @version	$Id$
+*/
 
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <tgfclient.h>
 
 #include "controlconfig.h"
 #include "mouseconfig.h"
+
 
 // Constants.
 static const int CmdOffset = 0;
@@ -141,7 +147,7 @@ Idle2(void)
     }
 
     /* Let CPU take breath (and fans stay at low and quiet speed) */
-    GfuiSleep(0.001);
+    GfSleep(0.001);
 }
 
 static void

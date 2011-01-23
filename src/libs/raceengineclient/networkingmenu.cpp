@@ -431,7 +431,7 @@ HostServerIdle(void)
 	}
 	
     /* Let CPU take breath (and fans stay at low and quiet speed) */
-    GfuiSleep(0.001);
+    GfSleep(0.001);
 }
 
 
@@ -468,7 +468,7 @@ ClientIdle(void)
 	}
 	
     /* Let CPU take breath (and fans stay at low and quiet speed) */
-    GfuiSleep(0.001);
+    GfSleep(0.001);
 }
 
 static void

@@ -946,17 +946,6 @@ GfuiScreenAddBgImg(void *scr, const char *filename)
 		GfTexReadTexture(filename, &screen->bgWidth, &screen->bgHeight, &pow2Width, &pow2Height);
 }
 
-/** Passive wait (no CPU use) for the current thread.
-    @ingroup	gui
-    @param	delay		The number of seconds to sleep (real granularity is platform-dependant)
-    @return	None.
- */
-void
-GfuiSleep(double delay)
-{
-  SDL_Delay(delay*1000); // ms.
-}
-
 /** Initialize window position
     @ingroup	gui
     @param	x		Left x position in the screen (pixels)

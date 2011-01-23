@@ -941,3 +941,14 @@ int GfNearestPow2 (int x)
 
 	return (1 << r);
 }
+
+/** Passive wait (no CPU use) for the current thread.
+    @ingroup	tgf
+    @param	seconds		The number of seconds to sleep (real granularity is platform-dependant)
+    @return	None.
+ */
+void
+GfSleep(double seconds)
+{
+  SDL_Delay(seconds*1000); // ms.
+}

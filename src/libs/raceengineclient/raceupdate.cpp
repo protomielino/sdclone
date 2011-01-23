@@ -722,11 +722,11 @@ int reMainUpdater::operator()(void)
 					// Note : Theorical resolution is 1ms, but actual one is from far more
 					//        (10-15ms under Windows, even worse under Linux ?)
 					//        which explains a lower than expected actual FPS mean.
-					GfuiSleep(0.001);
+					GfSleep(0.001);
 
 					// Only giving back control to the scheduler gives good results
 					// as for the actual mean FPS, but keeps the CPU 100 % (not very cool).
-					//GfuiSleep(0.0);
+					//GfSleep(0.0);
 			
 					break;
 				}

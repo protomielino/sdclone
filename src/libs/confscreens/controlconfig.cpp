@@ -2,9 +2,9 @@
 
     file        : controlconfig.cpp
     created     : Wed Mar 12 21:20:34 CET 2003
-    copyright   : (C) 2003 by Eric Espi�                        
+    copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -18,17 +18,15 @@
  ***************************************************************************/
 
 /** @file   
-    		
+    		Human player control configuration menu
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
-
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
-
 
 #include <tgfclient.h>
 #include <track.h>
@@ -38,6 +36,7 @@
 #include "controlconfig.h"
 #include "mouseconfig.h"
 #include "joystickconfig.h"
+
 
 static void *ScrHandle = NULL;
 static void	*PrevScrHandle = NULL;
@@ -421,7 +420,7 @@ IdleWaitForInput(void)
     }
 
     /* Let CPU take breath (and fans stay at low and quiet speed) */
-    GfuiSleep(0.001);
+    GfSleep(0.001);
 }
 
 /* Push button callback for each command button : activate input devices action collection loop */

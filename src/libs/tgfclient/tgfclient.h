@@ -246,7 +246,6 @@ TGFCLIENT_API void GfuiScreenShot(void *notused);
 TGFCLIENT_API void GfuiScreenAddBgImg(void *scr, const char *filename);
 TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
-TGFCLIENT_API void GfuiSleep(double delay);
 TGFCLIENT_API void GfuiInitWindowPositionAndSize(int x, int y, int w, int h);
 TGFCLIENT_API void GfuiSwapBuffers(void);
 

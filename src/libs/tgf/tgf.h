@@ -265,6 +265,7 @@ TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool fr
 TGF_API bool GfFileExists(const char* pszName);
 TGF_API bool GfFileCopy(const char* pszSrcName, const char* pszTgtName);
 
+
 /**************************************
  * Directory and file path management *
  **************************************/
@@ -272,6 +273,7 @@ TGF_API bool GfFileCopy(const char* pszSrcName, const char* pszTgtName);
 TGF_API bool GfPathIsAbsolute(const char *pszPath);
 TGF_API char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen);
 TGF_API char* GfPathMakeOSCompatible(char* path);
+
 
 /**********************************
  *  Interface For Parameter Files *
@@ -281,7 +283,6 @@ TGF_API char* GfPathMakeOSCompatible(char* path);
  *	This set of function is used to store and retrieve
  *	values in parameters files.
  */
-
 
 /* parameters file type */
 #define GFPARM_PARAMETER	0	/**< Parameter file */
@@ -362,7 +363,6 @@ TGF_API int GfParmCheckHandle(void *ref, void *tgt);
 TGF_API void *GfParmMergeHandles(void *ref, void *tgt, int mode);
 TGF_API int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
 
-
 TGF_API int GfParmGetEltNb(void *handle, const char *path);
 TGF_API int GfParmListSeekFirst(void *handle, const char *path);
 TGF_API int GfParmListSeekNext(void *handle, const char *path);
@@ -428,11 +428,13 @@ static inline void GfLogMessage(int nLevel, const char *pszFmt, ...) {};
 #define GfOut   GfLogInfo
 #define GfTrace GfLogTrace
 
+
 /******************* 
  * Time  Interface *
  *******************/
 TGF_API double GfTimeClock(void);
 TGF_API char *GfTime2Str(double sec, const char* plus="", bool zeros=true, int prec=3);
+
 
 /******************
  * Miscellaneous. *
@@ -451,6 +453,7 @@ typedef struct
 TGF_API tdble gfMean(tdble v, tMeanVal *pvt, int n, int w);
 TGF_API void gfMeanReset(tdble v, tMeanVal *pvt);
 
+
 /********************
  * System Interface *
  ********************/
@@ -459,7 +462,13 @@ TGF_API unsigned GfGetNumberOfCPUs();
 enum { GfAffinityAnyCPU = -1 };
 TGF_API bool GfSetThreadAffinity(int nCPUId);
 
-/* Run-time dirs accessors */
+TGF_API void GfSleep(double seconds);
+
+
+/***************************
+ * Run-time dirs accessors *
+ ***************************/
+
 TGF_API void GfInitInstallDir(const char *pszExecutablePath);
 TGF_API const char* GfGetInstallDir();
 
@@ -474,6 +483,7 @@ TGF_API const char *SetDataDir(const char *pszPath);
 
 TGF_API const char *GetBinDir();
 TGF_API const char *SetBinDir(const char *pszPath);
+
 
 /************************************************
  * User settings files run-time update/install. *

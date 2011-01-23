@@ -34,7 +34,6 @@
 #include <raceman.h>
 #include <robot.h>
 #include <teammanager.h>
-#include <timeanalysis.h> // RtTimeStamp, RtDuration ; TODO: Use GfSleep (after moving GfuiSleep to tgf)
 #include <robottools.h>
 #include <racemanagers.h>
 
@@ -703,20 +702,15 @@ ReInitCars(void)
           if (!elt)
 		  {
             GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
-			snprintf(buf, sizeof(buf), "Error: May be no driver or parameters out of bound!!!");
+			snprintf(buf, sizeof(buf), "Error: May be no driver, or some parameters are out of bound");
 	        RmLoadingScreenSetText(buf);
-			snprintf(buf, sizeof(buf), "Error: Have a look to the console window to get the detailed error messages!!!");
+			snprintf(buf, sizeof(buf), "       Have a look to the console window to get the detailed error messages");
 	        RmLoadingScreenSetText(buf);
-			snprintf(buf, sizeof(buf), "Error: Will go back to the config menu in 10 secs!!!");
+			snprintf(buf, sizeof(buf), "       Will go back to the config menu in 10 s");
 	        RmLoadingScreenSetText(buf);
-			// Wait some time to allow to read the message!
-            RtInitTimer(); // Check existance of Performance Counter Hardware
-	        double Duration; 
-	        double StartTimeStamp = RtTimeStamp(); 
-			do
-			{
-              Duration = RtDuration(StartTimeStamp);
-			} while (Duration < 10000); // 10 seconds
+			
+			// Wait some time to allow the user to read the message!
+            GfSleep(10.0); // 10 seconds
 		  }
         }
       }
