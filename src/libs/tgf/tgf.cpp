@@ -950,5 +950,5 @@ int GfNearestPow2 (int x)
 void
 GfSleep(double seconds)
 {
-  SDL_Delay(seconds*1000); // ms.
+  SDL_Delay((Uint32)(seconds*1000)); // ms.
 }

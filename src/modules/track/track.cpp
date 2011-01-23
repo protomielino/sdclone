@@ -150,7 +150,7 @@ GetTrackHeader(void *TrackHandle)
     local->littlerainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_LITTLERAINLKHD, (char*)NULL, 0);
     local->mediumrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_MEDIUMRAINLKHD, (char*)NULL, 0);
 
-	local->timeofday = (int)(GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEOFDAY, (char*)NULL, (float)(15 * 3600 + 0 * 60 + 0))); // 15:00:00
+	local->timeofday = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_TIMEOFDAY, (char*)NULL, (tdble)(15 * 3600 + 0 * 60 + 0)); // 15:00:00
 	local->sunascension = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_SUN_ASCENSION, (char*)NULL, 0.0f);
 
 	/* Graphic part */

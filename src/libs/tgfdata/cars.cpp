@@ -393,9 +393,9 @@ void GfCar::load(void* hparmCar)
 		GfParmGetNum(hparmCar, SECT_FRNTAXLE, PRM_XPOS, 0, 0.0f);
 	const tdble fRearAxleXpos = 
 		GfParmGetNum(hparmCar, SECT_REARAXLE, PRM_XPOS, 0, 0.0f);
-	const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0 - _fFrontRearMassRatio) * fRearAxleXpos;
-	const tdble fTotalFrontClift = 2 * fFrontClift + 4.92 * fFrontWingArea * sin(fFrontWingAngle);
-	const tdble fTotalRearClift = 2 * fRearClift + 4.92 * fRearWingArea * sin(fRearWingAngle);
+	const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0f - _fFrontRearMassRatio) * fRearAxleXpos;
+	const tdble fTotalFrontClift = 2 * fFrontClift + 4.92f * fFrontWingArea * sin(fFrontWingAngle);
+	const tdble fTotalRearClift = 2 * fRearClift + 4.92f * fRearWingArea * sin(fRearWingAngle);
 	const tdble fFrontAeroLoad = fRefCarSpeed2 *
 		(fTotalFrontClift * (fFrontWingXpos - fRearAxleXpos) + fTotalRearClift * (fRearWingXpos - fRearAxleXpos))
 		/(fFrontAxleXpos - fRearAxleXpos);
@@ -407,7 +407,7 @@ void GfCar::load(void* hparmCar)
 				  + ((1.0 - _fFrontRearMassRatio) * _fMass * G + fRearAeroLoad) * fMuRear) / _fMass;
 
 	// Cornering: axle distance divided by the inertia around the Z axis.
-	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, 0, 1.0);
+	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, 0, 1.0f);
 	const tdble fCarLength = GfParmGetNum(hparmCar, SECT_CAR, PRM_LEN, 0, 4.7f);
 	const tdble fCarWidth = GfParmGetNum(hparmCar, SECT_CAR, PRM_WIDTH, 0, 1.9f);
 	_fInvertedZAxisInertia = // Stolen from Simu V2.1, car.cpp, SimCarConfig()

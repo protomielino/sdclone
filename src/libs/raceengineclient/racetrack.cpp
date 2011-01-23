@@ -63,7 +63,6 @@ ReTrackInit(void)
 	
 	const char  *trackName;
 	const char  *catName;
-	const char  *raceName;
 
 	ReInfo->_reRaceName = ReGetCurrentRaceName();
 
@@ -194,7 +193,6 @@ reTrackDump(const tTrack *track, int verbose)
 void
 reTrackInitTimeOfDay(void)
 {
-	char buf[256];
 	static const char *TimeOfDayValues[] = RM_VALS_TIME;
 	static const int NTimeOfDayValues = sizeof(TimeOfDayValues) / sizeof(const char*);
 	
@@ -265,8 +263,6 @@ reTrackInitTimeOfDay(void)
 void
 reTrackInitWeather(void)
 {
-	char buf[256];
-
 	static const char* CloudsValues[] = RM_VALS_CLOUDS;
 	static const int NCloudsValues = sizeof(CloudsValues) / sizeof(const char*);
 	
