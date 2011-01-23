@@ -2,8 +2,9 @@
 
     file                 : carselect.cpp
     created              : December 2009
-    copyright            : (C) 2009 Brian Gavin
+    copyright            : (C) 2009 Brian Gavin, 2010 Jean-Philippe Meuret
     web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,12 +18,13 @@
  ***************************************************************************/
 
 
-/* Car selection / view menu */
+/* Car selection / preview menu */
 
 #include <sys/stat.h>
 #include <algorithm>
 #include <string>
 #include <sstream>
+#include <iomanip>
 
 #include <tgfclient.h>
 #include <cars.h>
@@ -209,7 +211,12 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 
 void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 {
-	static const char* pszDriveWheels[] = { "Rear", "Front", "4" };
+	static const char* pszDriveWheels[GfCar::eNDriveTrains+1] =
+		{ "Rear", "Front", "4", "?" };
+	static const char* pszEnginePosition[GfCar::eNEnginePositions+1] =
+		{ "Front", "Front-mid", "Mid", "Rear-mid", "Rear", "?" };
+	static const char* pszEngineShape[GfCar::eNEngineShapes+1] =
+		{ "V", "L", "H", "W", "?" };
 	
 	// Retrieve selected car.
 	const GfCar* pSelCar = GfCars::self()->getCar(strSelCarId);
@@ -233,25 +240,39 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 					 ossSpecValue.str().c_str());
 
 	ossSpecValue.str("");
-	ossSpecValue << (long)(pSelCar->getMaxPower() / 75 / G) << " bhp ("
-				 << (long)(pSelCar->getMaxPowerSpeed() * 30.0 / PI) << " rpm)";
+	ossSpecValue << std::fixed << std::setprecision(0)
+				 << pSelCar->getMaxPower() / 75 / G << " bhp ("
+				 << pSelCar->getMaxPowerSpeed() * 30.0 / PI << " rpm)";
 	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxPowerLabel"),
 					 ossSpecValue.str().c_str());
 	
 	ossSpecValue.str("");
-	ossSpecValue << (long)pSelCar->getMaxTorque() << " N.m ("
-						   << (long)(pSelCar->getMaxTorqueSpeed() * 30.0 / PI) << " rpm)";
+	ossSpecValue << pSelCar->getMaxTorque() << " N.m ("
+				 << pSelCar->getMaxTorqueSpeed() * 30.0 / PI << " rpm)";
 	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxTorqueLabel"),
 					 ossSpecValue.str().c_str());
 
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("Engine1Label"),
-					 "? cyl., ???? cm3");
-	
 	ossSpecValue.str("");
-	ossSpecValue << (pSelCar->isTurboCharged() ? "Turbo-charged" : "Naturally-aspirated");
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("Engine2Label"),
+	if (pSelCar->getEnginePosition() != GfCar::eNEnginePositions)
+		ossSpecValue << pszEnginePosition[pSelCar->getEnginePosition()] << ' ';
+	if (pSelCar->getEngineShape() != GfCar::eNEngineShapes)
+		ossSpecValue << pszEngineShape[pSelCar->getEngineShape()];
+	if (pSelCar->getCylinders() > 0)
+	{
+		ossSpecValue << pSelCar->getCylinders() << " ";
+		if (pSelCar->getEngineShape() == GfCar::eNEngineShapes)
+			ossSpecValue << "cyl. ";
+	}
+	if (pSelCar->getEngineCapacity() > 0)
+		ossSpecValue << std::setprecision(1) << pSelCar->getEngineCapacity() * 1000 << " l ";
+	if (pSelCar->isTurboCharged())
+		ossSpecValue << "turbo";
+	if (ossSpecValue.str().empty())
+		ossSpecValue << "missing information";
+	
+	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("EngineLabel"),
 					 ossSpecValue.str().c_str());
-
+	
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("TopSpeedProgress"),
 							pSelCar->getTopSpeed() * 3.6f);
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("PowerMassRatioProgress"),
@@ -263,7 +284,8 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("CorneringProgress"),
 							pSelCar->getInvertedZAxisInertia());
 	
-	GfLogDebug("%s : ts=%f, mpr=%f, lsg=%f, hsg=%f, izi=%f\n", strSelCarId.c_str(),
+	GfLogDebug("%s : topSp=%.1f, powMass=%.2f, lowSpGrip=%.1f, highSpGrip=%.1f, 1/ZInertia=%.5f\n",
+			   strSelCarId.c_str(),
 			   pSelCar->getTopSpeed()*3.6f, pSelCar->getMaxPower() / 75 / G / pSelCar->getMass(),
 			   pSelCar->getLowSpeedGrip(), pSelCar->getHighSpeedGrip(),
 			   pSelCar->getInvertedZAxisInertia());
@@ -346,8 +368,7 @@ bool RmCarSelectMenu::Initialize()
 	CreateLabelControl("MaxPowerLabel");
 	CreateLabelControl("MaxTorqueLabel");
 	CreateLabelControl("MassLabel");
-	CreateLabelControl("Engine1Label");
-	CreateLabelControl("Engine2Label");
+	CreateLabelControl("EngineLabel");
 	
 	CreateProgressbarControl("TopSpeedProgress");
 	CreateProgressbarControl("PowerMassRatioProgress");

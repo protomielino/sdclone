@@ -252,7 +252,8 @@ GfCar::GfCar(const std::string& strId, const std::string& strCatId,
 
 void GfCar::load(void* hparmCar)
 {
-	static const char *pszGearName[MAX_GEARS] = {"r", "n", "1", "2", "3", "4", "5", "6", "7", "8"};
+	static const char *pszGearName[MAX_GEARS] =
+		{ "r", "n", "1", "2", "3", "4", "5", "6", "7", "8" };
 
 	// Name.
 	_strName = GfParmGetName(hparmCar);
@@ -261,18 +262,20 @@ void GfCar::load(void* hparmCar)
 	_strDescFile = GfParmGetFileName(hparmCar);
 
 	// Mass and front/rear repartition.
-	_fMass = GfParmGetNum(hparmCar, SECT_CAR, PRM_MASS, (char*)NULL, 1500);
-	_fFrontRearMassRatio = GfParmGetNum(hparmCar, SECT_CAR, PRM_FRWEIGHTREP, (char*)NULL, .5);
+	_fMass = GfParmGetNum(hparmCar, SECT_CAR, PRM_MASS, 0, 1500);
+	_fFrontRearMassRatio = GfParmGetNum(hparmCar, SECT_CAR, PRM_FRWEIGHTREP, 0, .5);
 	
 	// Drive train.
 	const std::string strDriveTrain =
-		GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+		GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, "");
 	if (strDriveTrain == VAL_TRANS_RWD)
 		_eDriveTrain = eRWD;
 	else if (strDriveTrain == VAL_TRANS_FWD)
 		_eDriveTrain = eFWD;
 	else if (strDriveTrain == VAL_TRANS_4WD)
 		_eDriveTrain = e4WD;
+	else
+		_eDriveTrain = eNDriveTrains;
 
 	// Number of gears.
 	std::ostringstream ossSpecPath;
@@ -280,7 +283,7 @@ void GfCar::load(void* hparmCar)
 	{
 		ossSpecPath.str("");
 		ossSpecPath << SECT_GEARBOX << '/' << ARR_GEARS << '/' << pszGearName[nGearInd];
-		if (GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_RATIO, (char*)NULL, 0.0f))
+		if (GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_RATIO, 0, 0.0f))
 		{
 			_nGears = nGearInd - 1;
 			break;
@@ -321,38 +324,75 @@ void GfCar::load(void* hparmCar)
 		}
 	}
 
-	 // "Mechanical = Low speed" grip (~mu*g, but with front/rear mass repartition).
+	// Engine shape.
+	const std::string strEngShape =
+		GfParmGetStr(hparmCar, SECT_ENGINE, PRM_ENGSHAPE, "");
+	if (strEngShape == VAL_ENGSHAPE_V)
+		_eEngineShape = eV;
+	else if (strEngShape == VAL_ENGSHAPE_H)
+		_eEngineShape = eH;
+	else if (strEngShape == VAL_ENGSHAPE_L)
+		_eEngineShape = eL;
+	else if (strEngShape == VAL_ENGSHAPE_W)
+		_eEngineShape = eW;
+	else
+		_eEngineShape = eNEngineShapes;
+	
+	// Engine position.
+	const std::string strEngPos =
+		GfParmGetStr(hparmCar, SECT_ENGINE, PRM_ENGPOS, "");
+	if (strEngPos == VAL_ENGPOS_REAR)
+		_eEnginePosition = eRear;
+	else if (strEngPos == VAL_ENGPOS_REARMID)
+		_eEnginePosition = eRearMid;
+	else if (strEngPos == VAL_ENGPOS_MID)
+		_eEnginePosition = eMid;
+	else if (strEngPos == VAL_ENGPOS_FRONTMID)
+		_eEnginePosition = eFrontMid;
+	else if (strEngPos == VAL_ENGPOS_FRONT)
+		_eEnginePosition = eFront;
+	else
+		_eEnginePosition = eNEnginePositions;
+
+	// Engine capacity.
+	_fEngineCapacity =
+		GfParmGetNum(hparmCar, SECT_ENGINE, PRM_CAPACITY, 0, 0);
+	
+	// Engine number of cylinders.
+	_nCylinders = (unsigned)GfParmGetNum(hparmCar, SECT_ENGINE, PRM_CYLINDERS, 0, 0);
+	
+	// "Mechanical = Low speed" grip (~mu*g, but with front/rear mass repartition).
 	const tdble fMuFront =
-		(GfParmGetNum(hparmCar, SECT_FRNTRGTWHEEL, PRM_MU, (char*)NULL, 1.0)
-		 + GfParmGetNum(hparmCar, SECT_FRNTLFTWHEEL, PRM_MU, (char*)NULL, 1.0)) / 2.0f;
+		(GfParmGetNum(hparmCar, SECT_FRNTRGTWHEEL, PRM_MU, 0, 1.0)
+		 + GfParmGetNum(hparmCar, SECT_FRNTLFTWHEEL, PRM_MU, 0, 1.0)) / 2.0f;
 	const tdble fMuRear =
-		(GfParmGetNum(hparmCar, SECT_REARRGTWHEEL, PRM_MU, (char*)NULL, 1.0)
-		 + GfParmGetNum(hparmCar, SECT_REARLFTWHEEL, PRM_MU, (char*)NULL, 1.0)) / 2.0f;
+		(GfParmGetNum(hparmCar, SECT_REARRGTWHEEL, PRM_MU, 0, 1.0)
+		 + GfParmGetNum(hparmCar, SECT_REARLFTWHEEL, PRM_MU, 0, 1.0)) / 2.0f;
 	_fLowSpeedGrip =
 		(_fFrontRearMassRatio * fMuFront + (1.0f - _fFrontRearMassRatio) * fMuRear) * G;
 
 	// "Aerodynamic = High speed" grip (same + with aero down-force).
 	const tdble fRefCarSpeed2 = 40000 / 12.96f; //200 km/h square in m/s
 	const tdble fFrontWingArea =
-		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_WINGAREA, (char*)NULL, 0.0);
+		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_WINGAREA, 0, 0.0);
 	const tdble fRearWingArea =
-		GfParmGetNum(hparmCar, SECT_REARWING, PRM_WINGAREA, (char*)NULL, 0.0);
+		GfParmGetNum(hparmCar, SECT_REARWING, PRM_WINGAREA, 0, 0.0);
 	const tdble fFrontWingAngle =
-		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_WINGANGLE, (char*)NULL, 0.0);
+		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_WINGANGLE, 0, 0.0);
 	const tdble fRearWingAngle =
-		GfParmGetNum(hparmCar, SECT_REARWING, PRM_WINGANGLE, (char*)NULL, 0.0);
+		GfParmGetNum(hparmCar, SECT_REARWING, PRM_WINGANGLE, 0, 0.0);
 	const tdble fFrontClift =
-		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FCL, (char*)NULL, 0.0);
+		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FCL, 0, 0.0);
 	const tdble fRearClift =
-		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_RCL, (char*)NULL, 0.0);
+		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_RCL, 0, 0.0);
 	const tdble fFrontWingXpos =
-		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_XPOS, (char*)NULL, 0);
+		GfParmGetNum(hparmCar, SECT_FRNTWING, PRM_XPOS, 0, 0);
 	const tdble fRearWingXpos =
-		GfParmGetNum(hparmCar, SECT_REARWING, PRM_XPOS, (char*)NULL, 0);
+		GfParmGetNum(hparmCar, SECT_REARWING, PRM_XPOS, 0, 0);
 	const tdble fFrontAxleXpos = 
-		GfParmGetNum(hparmCar, SECT_FRNTAXLE, PRM_XPOS, (char*)NULL, 0.0f);
+		GfParmGetNum(hparmCar, SECT_FRNTAXLE, PRM_XPOS, 0, 0.0f);
 	const tdble fRearAxleXpos = 
-		GfParmGetNum(hparmCar, SECT_REARAXLE, PRM_XPOS, (char*)NULL, 0.0f);
+		GfParmGetNum(hparmCar, SECT_REARAXLE, PRM_XPOS, 0, 0.0f);
 	const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0 - _fFrontRearMassRatio) * fRearAxleXpos;
 	const tdble fTotalFrontClift = 2 * fFrontClift + 4.92 * fFrontWingArea * sin(fFrontWingAngle);
 	const tdble fTotalRearClift = 2 * fRearClift + 4.92 * fRearWingArea * sin(fRearWingAngle);
@@ -367,32 +407,33 @@ void GfCar::load(void* hparmCar)
 				  + ((1.0 - _fFrontRearMassRatio) * _fMass * G + fRearAeroLoad) * fMuRear) / _fMass;
 
 	// Cornering: axle distance divided by the inertia around the Z axis.
-	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, (char*)NULL, 1.0);
-	const tdble fCarLength = GfParmGetNum(hparmCar, SECT_CAR, PRM_LEN, (char*)NULL, 4.7f);
-	const tdble fCarWidth = GfParmGetNum(hparmCar, SECT_CAR, PRM_WIDTH, (char*)NULL, 1.9f);
+	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, 0, 1.0);
+	const tdble fCarLength = GfParmGetNum(hparmCar, SECT_CAR, PRM_LEN, 0, 4.7f);
+	const tdble fCarWidth = GfParmGetNum(hparmCar, SECT_CAR, PRM_WIDTH, 0, 1.9f);
 	_fInvertedZAxisInertia = // Stolen from Simu V2.1, car.cpp, SimCarConfig()
 		(fFrontAxleXpos - fRearAxleXpos) * 12.0f / (_fMass * fMassRepCoef * fMassRepCoef)
 		/ (fCarWidth * fCarWidth + fCarLength * fCarLength);
 	
 	// Theoretical top speed on a flat road, assuming the gears are tuned accordingly.
 	const tdble fFrontArea =
-		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FRNTAREA, (char*)NULL, 2.0f);
+		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_FRNTAREA, 0, 2.0f);
 	const tdble fCx =
-		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_CX, (char*)NULL, 0.35f);
+		GfParmGetNum(hparmCar, SECT_AERODYNAMICS, PRM_CX, 0, 0.35f);
 	const tdble muRollRes = 0.015f; // Average track.
 	ossSpecPath.str("");
 	ossSpecPath << SECT_GEARBOX << '/' << ARR_GEARS << '/' << pszGearName[_nGears];
-	const tdble fTopGearEff = GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_EFFICIENCY, (char*)NULL, 1.0f);
+	const tdble fTopGearEff =
+		GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_EFFICIENCY, 0, 1.0f);
 	// TODO: RWD, FWD, 4WD differential efficiency
-	const tdble fDiffEff = 0.95f; // now use an average number
+	const tdble fDiffEff = 0.95f; // For now, use an average number
 	const tdble eff = fTopGearEff * fDiffEff; // gear * differential efficiencies
 	const tdble Cd =
 		0.645f * fCx * fFrontArea
 		+ 1.23f * (fFrontWingArea * sin(fFrontWingAngle) + fRearWingArea * sin(fRearWingAngle));
 	const double pp =
 		muRollRes * _fMass * G / (Cd + muRollRes * (tdble)(fTotalFrontClift + fTotalRearClift));
-	const double q = eff * _fMaxPower / (Cd + muRollRes * (tdble)(fTotalFrontClift + fTotalRearClift));
-// Work in progress.
+	const double q =
+		eff * _fMaxPower / (Cd + muRollRes * (tdble)(fTotalFrontClift + fTotalRearClift));
 	_fTopSpeed =
  		(tdble)pow(q/2+sqrt(q*q/4+pp*pp*pp/27), 1.0/3)
  		- (tdble)pow(-q/2+sqrt(q*q/4+pp*pp*pp/27), 1.0/3);
@@ -436,6 +477,26 @@ unsigned GfCar::getGearsCount() const
 bool GfCar::isTurboCharged() const
 {
 	return _bTurboCharged;
+}
+
+unsigned GfCar::getCylinders() const
+{
+	return _nCylinders;
+}
+
+tdble GfCar::getEngineCapacity() const
+{
+	return _fEngineCapacity;
+}
+
+GfCar::EEngineShape GfCar::getEngineShape() const
+{
+	return _eEngineShape;
+}
+
+GfCar::EEnginePosition GfCar::getEnginePosition() const
+{
+	return _eEnginePosition;
 }
 
 tdble GfCar::getMaxPower() const
@@ -487,28 +548,3 @@ tdble GfCar::getInvertedZAxisInertia() const
 {
 	return _fInvertedZAxisInertia;
 }
-
-// void GfCar::setId(const std::string& strId)
-// {
-// 	_strId = strId;
-// }
-
-// void GfCar::setName(const std::string& strName)
-// {
-// 	_strName = strName;
-// }
-
-// void GfCar::setCategoryId(const std::string& strCatId)
-// {
-// 	_strCatId = strCatId;
-// }
-
-// void GfCar::setCategoryName(const std::string& strCatName)
-// {
-// 	_strCatName = strCatName;
-// }
-
-// void GfCar::setDescriptorFileName(const std::string& strDescFile)
-// {
-// 	_strDescFile = strDescFile;
-// }

@@ -29,7 +29,6 @@
     <attnum name="initial fuel" unit="l" min="1.0" max="100.0" val="80.0"/>
   </section>
 
-  <!-- Same engine for every one -->
   <section name="Engine">
     <attnum name="revs maxi" unit="rpm" min="5000" max="8000" val="8000"/>
     <attnum name="revs limiter" unit="rpm" min="3000" max="10000" val="7000"/>

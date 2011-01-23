@@ -459,7 +459,7 @@ typedef struct CarElt
 
 
 
-/* sections in xml description files */
+/* Sections in XML description files */
 
 #define SECT_SIMU_SETTINGS "Simulation Options"
 #define SECT_CAR		"Car"
@@ -499,7 +499,7 @@ typedef struct CarElt
 #define SECT_EXHAUST		"Exhaust"
 #define SECT_LIGHT		"Light"
 
-/* parameters names */
+/* Parameter names */
 #define PRM_CATEGORY		"category"
 #define PRM_LEN			"body length"
 #define PRM_WIDTH		"body width"
@@ -580,10 +580,14 @@ typedef struct CarElt
 #define PRM_ENGBRKCOEFF		"brake coefficient"
 #define PRM_ENGBRKLINCOEFF		"brake linear coefficient"
 #define PRM_POWER		"power"
-#define PRM_TURBO               "turbo"
-#define PRM_TURBO_RPM           "turbo rpm"
-#define PRM_TURBO_FACTOR        "turbo factor"
-#define PRM_TURBO_LAG           "turbo lag"
+#define PRM_TURBO         "turbo"
+#define PRM_TURBO_RPM     "turbo rpm"
+#define PRM_TURBO_FACTOR  "turbo factor"
+#define PRM_TURBO_LAG     "turbo lag"
+#define PRM_CAPACITY      "capacity"
+#define PRM_CYLINDERS     "cylinders"
+#define PRM_ENGSHAPE      "shape"
+#define PRM_ENGPOS        "position"
 
 #define PRM_RATIO		"ratio"
 #define PRM_BIAS		"bias"
@@ -631,6 +635,16 @@ typedef struct CarElt
 #define VAL_TRANS_FWD		"FWD"
 #define VAL_TRANS_4WD		"4WD"
 
+#define VAL_ENGSHAPE_V		"v"
+#define VAL_ENGSHAPE_L		"l"
+#define VAL_ENGSHAPE_H		"h"
+#define VAL_ENGSHAPE_W		"w"
+
+#define VAL_ENGPOS_FRONT		"front"
+#define VAL_ENGPOS_FRONTMID		"front-mid"
+#define VAL_ENGPOS_MID		"mid"
+#define VAL_ENGPOS_REARMID		"rear-mid"
+#define VAL_ENGPOS_REAR		"rear"
 
 /* graphic */
 #define PRM_TACHO_TEX		"tachometer texture"
@@ -682,6 +696,7 @@ typedef struct CarElt
 #define	VAL_LIGHT_BRAKE2	"brake2"
 #define	VAL_LIGHT_REVERSE	"reverse"
 #define	VAL_LIGHT_REAR		"rear"
+
 /* Simulation Options */
 #define PRM_DAMAGE_TYRES "damage/tyres"
 #define PRM_DAMAGE_SUSPENSION "damage/suspension"

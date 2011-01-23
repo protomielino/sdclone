@@ -46,10 +46,23 @@ public:
 	const std::string& getCategoryName() const;
 	const std::string& getDescriptorFileName() const;
 
-	enum EDriveTrain { eRWD, eFWD, e4WD };
+	enum EDriveTrain { eRWD, eFWD, e4WD, eNDriveTrains };
 	EDriveTrain getDriveTrain() const;
+	
 	unsigned getGearsCount() const;
+	
 	bool isTurboCharged() const;
+	
+	unsigned getCylinders() const;
+	
+	tdble getEngineCapacity() const;
+	
+	enum EEngineShape { eV, eL, eH, eW, eNEngineShapes };
+	EEngineShape getEngineShape() const;
+	
+	enum EEnginePosition { eFront, eFrontMid, eMid, eRearMid, eRear, eNEnginePositions };
+	EEnginePosition getEnginePosition() const;
+	
 	tdble getMaxPower() const;
 	tdble getMaxPowerSpeed() const;
 	tdble getMaxTorque() const;
@@ -62,12 +75,6 @@ public:
 	tdble getHighSpeedGrip() const;
 	tdble getInvertedZAxisInertia() const;
 	
-// 	void setId(const std::string& strId);
-// 	void setName(const std::string& strName);
-// 	void setCategoryId(const std::string& strCatId);
-// 	void setCategoryName(const std::string& strCatName);
-// 	void setDescriptorFileName(const std::string& strDescFile);
-
 	void load(void* hparmCar);
 
 protected:
@@ -81,10 +88,10 @@ protected:
 	EDriveTrain _eDriveTrain;
 	unsigned _nGears; // Number of gears.
 	bool _bTurboCharged; // TODO: Move to an enum (Turbo, Compressor, ...)
-// 	unsigned _nCylinders; // TODO
-// 	enum { eV, eW, eFlat, eStraight, eTurbine } EEngineShape;
-// 	EEngineShape _eEngineShape; // TODO
-// 	tdble fEngineCapacity; // TODO
+	tdble _fEngineCapacity; // m3
+	unsigned _nCylinders;
+	EEngineShape _eEngineShape;
+	EEnginePosition _eEnginePosition;
 	tdble _fMaxPower, _fMaxPowerSpeed; // Engine max power (SI) and associated engine speed.
 	tdble _fMaxTorque, _fMaxTorqueSpeed; // Engine max torque (Nm) and associated engine speed.
 	tdble _fMass; // Total mass (kg).
