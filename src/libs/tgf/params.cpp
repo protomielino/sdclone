@@ -1865,7 +1865,7 @@ void GfParmReleaseHandle (void *parmHandle)
 
 
 static void
-evalUnit (char *unit, tdble *dest, int flg)
+evalUnit (char *unit, tdble *dest, int invert)
 {
     tdble coeff = 1.0;
     
@@ -1899,17 +1899,19 @@ evalUnit (char *unit, tdble *dest, int flg)
 	coeff = 1000.0; /* Pa */
     } else if (strcmp(unit, "MPa") == 0) {
 	coeff = 1000000.0; /* Pa */
-    } else if ((strcmp(unit, "PSI") == 0) || (strcmp(unit, "psi") == 0)){
+    } else if ((strcmp(unit, "psi") == 0) || (strcmp(unit, "PSI") == 0)){
 	coeff = 6894.76f; /* Pa */
     } else if ((strcmp(unit, "rpm") == 0) || (strcmp(unit, "RPM") == 0)) {
 	coeff = 0.104719755f; /* rad/s */
-    } else if ((strcmp(unit, "percent") == 0) || (strcmp(unit, "%") == 0)) {
+    } else if ((strcmp(unit, "%") == 0) || (strcmp(unit, "percent") == 0)) {
 	coeff = 0.01f;
     } else if ((strcmp(unit, "mph") == 0) || (strcmp(unit, "MPH") == 0)) {
 	coeff = 0.44704f; /* m/s */
+    } else if ((strcmp(unit, "l") == 0) || (strcmp(unit, "litre") == 0)) {
+	coeff = 0.001f; /* m3 */
     }
 
-    if (flg) {
+    if (invert) {
 	*dest /= coeff;
     } else {
 	*dest *= coeff;
@@ -1924,11 +1926,12 @@ evalUnit (char *unit, tdble *dest, int flg)
     @param	val	value in units
     @return	the value in corresponding SI unit
     @warning	The supported units are:
-    			<br><ul><li><b>feet</b> or <b>ft</b>  converted to <b>m</b></li>
+    <br><ul><li><b>feet</b> or <b>ft</b>  converted to <b>m</b></li>
 			<li><b>inches</b> or <b>in</b> converted to <b>m</b></li>
 			<li><b>lbs</b> converted to <b>kg</b></li>
 			<li><b>slug</b> or <b>slugs</b> converted to <b>kg</b></li>
 			<li><b>h</b> or <b>hours</b> converted to <b>s</b></li>
+			<li><b>litre</b> or <b>l</b> converted to <b>m3</b></li>
 			<li><b>day</b> or <b>days</b> converted to <b>s</b></li>
 			<li><b>km</b> converted to <b>m</b></li>
 			<li><b>cm</b> converted to <b>m</b></li>
@@ -1936,7 +1939,8 @@ evalUnit (char *unit, tdble *dest, int flg)
 			<li><b>kPa</b> converted to <b>Pa</b></li>
 			<li><b>deg</b> converted to <b>rad</b></li>
 			<li><b>rpm</b> or <b>RPM</b> converted to <b>rad/s</b></li>
-			<li><b>percent</b> or <b>%</b> divided by <b>100</b></li></ul>
+			<li><b>percent</b> or <b>%</b> divided by <b>100</b></li>
+	     </ul>
     @see	GfParmSI2Unit
  */
 tdble
@@ -2631,8 +2635,8 @@ GfParmGetNum (void *handle, char const *path, const char *key, const char *unit,
 {
 	struct parmHandle *parmHandle = (struct parmHandle *)handle;
 	struct parmHeader *conf;
-	struct param	*param;
-        tdble                val;
+	struct param *param;
+	tdble val;
 
 	if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogError ("GfParmGetNum: bad handle (%p)\n", parmHandle);
@@ -2655,9 +2659,10 @@ GfParmGetNum (void *handle, char const *path, const char *key, const char *unit,
     if (param->type == P_FORM) 
     {
          val = deflt;
-	 //GfFormCalcFuncNew( param->formula, parmHandle, NULL, NULL, NULL, &val, NULL );        
-	 GfFormCalcFuncNew( param->formula, parmHandle, path, NULL, NULL, &val, NULL );
-    } else 
+		 //GfFormCalcFuncNew( param->formula, parmHandle, NULL, NULL, NULL, &val, NULL );        
+		 GfFormCalcFuncNew( param->formula, parmHandle, path, NULL, NULL, &val, NULL );
+    }
+	else 
     {
          val = param->valnum;
     }
@@ -2666,6 +2671,7 @@ GfParmGetNum (void *handle, char const *path, const char *key, const char *unit,
 	{
 		return GfParmSI2Unit(unit, val);
 	}
+	
     return val;
 }
 
