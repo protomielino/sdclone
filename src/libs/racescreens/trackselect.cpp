@@ -275,31 +275,9 @@ rmtsTrackPrevNext(void *vsel)
 	PCurTrack =
 		rmtsGetFirstUsableTrack(PCurTrack->getCategoryId(), PCurTrack->getId(), nSearchDir, true);
 
-
-
-	/* Get next/previous usable track
-       Note: Here, we assume there's at least one usable track in current category,
-       which is guaranteed by CategoryList initialization in RmTrackSelect,
-       and by rmtsTrackCatPrevNext */
-// 	const int nDeltaInd = (int)(long)(vsel ? vsel : 1);
-// 	const std::string& strCurCat = GfTracks::self()->getCategoryIds()[NCurCatIndex];
-// 	const std::vector<GfTrack*> vecTracksInCat =
-// 		GfTracks::self()->getTracksInCategory(strCurCat);
-// 	const int nPrevTrackIndex = NCurTrackInCatIndex;
-//     do
-// 	{
-// 		NCurTrackInCatIndex =
-// 			(NCurTrackInCatIndex + nDeltaInd + vecTracksInCat.size()) % vecTracksInCat.size();
-// 	}
-// 	while (nPrevTrackIndex != NCurTrackInCatIndex && vecTracksInCat[NCurTrackInCatIndex]->isUsable());
-
 	// If any next/previous usable track in the current category, select it.
-	//if (nPrevTrackIndex != NCurTrackInCatIndex)
 	if (PCurTrack)
 	{
-		// Set new currently selected track.
-		//PCurTrack = vecTracksInCat[NCurTrackCatIndex];
-		
 		// Update GUI
 		rmtsUpdateTrackInfo();
 	}
@@ -313,14 +291,11 @@ rmtsTrackCatPrevNext(void *vsel)
  	const int nSearchDir = vsel ? (int)(long)vsel : +1;
 
 	//
-	PCurTrack = rmtsGetFirstUsableTrack(PCurTrack->getCategoryId(), +1, true);
+	PCurTrack = rmtsGetFirstUsableTrack(PCurTrack->getCategoryId(), nSearchDir, true);
 
-	//
+	// If any next/previous usable category, select it.
 	if (PCurTrack)
 	{
-		// Set new currently selected track.
-		//PCurTrack = vecTracksInCat[NCurTrackCatIndex];
-		
 		// Update GUI
 		rmtsUpdateTrackInfo();
 	}
@@ -421,12 +396,12 @@ rmtsAddKeys(void)
 {
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Select Track", NULL, rmtsSelect, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)0, rmtsTrackPrevNext, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)1, rmtsTrackPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)-1, rmtsTrackPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)+1, rmtsTrackPrevNext, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)0, rmtsTrackCatPrevNext, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)1, rmtsTrackCatPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Track Category", (void*)-1, rmtsTrackCatPrevNext, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_DOWN, "Next Track Category", (void*)+1, rmtsTrackCatPrevNext, NULL);
 }
 
 
