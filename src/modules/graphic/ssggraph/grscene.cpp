@@ -295,6 +295,7 @@ grCustomizePits(void)
 				tdble y2 = y - pits->width / 2.0 * normalvector.y
 					- pits->len / 2.0 * normalvector.x;
 				tdble z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
+				GfOut("i:%d x:%.2f y:%.2f x2:%.2f y2:%.2f z2:%.2f\n", i, x, y, x2, y2, z2);
 		
 				sgVec3 nrm;
 				nrm[0] = normalvector.x;
