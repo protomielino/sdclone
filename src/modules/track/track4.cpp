@@ -1504,10 +1504,24 @@ void ReadTrack4(tTrack *theTrack, void *TrackHandle,
 				}//switch pits->side
 			}//if changeSeg
 
-	    pits->driversPits[i].pos.seg = mSeg;
-	    pits->driversPits[i].pos.toStart = (tdble)(toStart + pits->len / 2.0);
-		printf("toStart: %s %.2f ", mSeg->name, pits->driversPits[i].pos.toStart);
-	    
+			pits->driversPits[i].pos.type = TR_TOMIDDLE;
+			//TR_LPOS_MAIN; //NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
+			pits->driversPits[i].pos.seg = mSeg;
+
+			//RtTrackLocal2Global expects toStart as a length in meters for straight,
+			//and as an angle in radian for curves
+			tdble pitCenter = toStart + pits->len / 2.0;
+			switch(mSeg->type) {
+				case TR_STR:
+					pits->driversPits[i].pos.toStart = pitCenter;
+					break;
+
+				case TR_LFT:
+				case TR_RGT:
+					pits->driversPits[i].pos.toStart = pitCenter / mSeg->radius;
+					break;
+			}
+			
 			switch (pits->side) {
 				case TR_RGT:
 					pits->driversPits[i].pos.toRight  = (tdble)(-offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0);
