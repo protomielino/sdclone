@@ -2246,7 +2246,7 @@ GenerateTerrain(tTrack *track, void *TrackHandle, char *outfile, FILE *AllFd, in
     } else {
 	sprintf(buf, "%s/%s", TRK_SECT_SURFACES, mat);
     }
-    TexName = GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE, "grass.rgb");
+    TexName = GfParmGetStr(TrackHandle, buf, TRK_ATT_TEXTURE, "grass.png");
     TexSize = GfParmGetNum(TrackHandle, buf, TRK_ATT_TEXSIZE, (char*)NULL, 20.0f);
     TexRand = GfParmGetNum(TrackHandle, buf, TRK_ATT_SURFRAND, (char*)NULL, (tdble)(TexSize / 10.0));
 

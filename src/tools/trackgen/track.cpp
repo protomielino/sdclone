@@ -398,7 +398,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 	    sprintf(path_, "%s/%s", TRK_SECT_SURFACES, mat);							\
         }													\
 	texnamebump = GfParmGetStr(TrackHandle, path_, TRK_ATT_BUMPNAME, "");					\
-	texname = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTURE, "tr-asphalt.rgb");				\
+	texname = GfParmGetStr(TrackHandle, path_, TRK_ATT_TEXTURE, "tr-asphalt.png");				\
 	mipmap = (int)GfParmGetNum(TrackHandle, path_, TRK_ATT_TEXMIPMAP, (char*)NULL, 0);			\
 	SETTEXTURE(texname, texnamebump, mipmap);										\
 	if ((curTexId != prevTexId) || (startNeeded)) {								\
@@ -433,7 +433,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
 #define CHECKDISPLIST2(texture, mipmap, name, id) do {		\
 	char texname[256];					\
-	sprintf(texname, "%s.rgb", texture);			\
+	sprintf(texname, "%s.png", texture);			\
 	SETTEXTURE(texname, "", mipmap);			\
 	if (curTexId != prevTexId) {				\
 	    prevTexId = curTexId;				\
@@ -2459,7 +2459,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
 		startNeeded = 1;
 		sprintf(sname, "P%dts", uid++);
-		CHECKDISPLIST3("concrete2.rgb", 4, sname, pits->driversPits[0].pos.seg->id);
+		CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[0].pos.seg->id);
 
 		RtTrackLocal2Global(&(pits->driversPits[0].pos), &x, &y, pits->driversPits[0].pos.type);
 		RtTrackSideNormalG(pits->driversPits[0].pos.seg, x, y, pits->side, &normvec);
@@ -2489,7 +2489,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		for (i = 0; i < pits->driversPitsNb; i++) {
 			startNeeded = 1;
 			sprintf(sname, "P%dts", uid++);
-			CHECKDISPLIST3("concrete.rgb", 4, sname, pits->driversPits[i].pos.seg->id);
+			CHECKDISPLIST3("concrete.png", 4, sname, pits->driversPits[i].pos.seg->id);
 
 			RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y, pits->driversPits[i].pos.type);
 			RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y, pits->side, &normvec);
@@ -2528,7 +2528,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 		startNeeded = 1;
 		i--;
 		sprintf(sname, "P%dts", uid++);
-		CHECKDISPLIST3("concrete2.rgb", 4, sname, pits->driversPits[i].pos.seg->id);
+		CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[i].pos.seg->id);
 
 		RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y, pits->driversPits[i].pos.type);
 		RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y, pits->side, &normvec);
