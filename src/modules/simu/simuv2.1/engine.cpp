@@ -98,6 +98,7 @@ SimEngineConfig(tCar *car)
 	/* check engine brake */
 	if ( car->engine.brakeCoeff < 0.0 )
 	   {car->engine.brakeCoeff = 0.0;}
+	car->engine.brakeCoeff *= maxTq;
 }
 
 /* Update torque output with engine rpm and accelerator command */
@@ -133,7 +134,8 @@ SimEngineUpdateTq(tCar *car)
 	}
 	tdble EngBrkK = engine->brakeLinCoeff * engine->rads;
 
-    if (engine->rads < engine->tickover) {
+    if ( (engine->rads < engine->tickover) || 
+         ( (engine->rads == engine->tickover) && (car->ctrl->accelCmd <= 1e-6) ) ) {
 		engine->Tq = 0.0f;
 		engine->rads = engine->tickover;
 	} else {
@@ -150,11 +152,9 @@ SimEngineUpdateTq(tCar *car)
         }
 		tdble Tq_cur = (Tq_max + EngBrkK) * alpha;
 		engine->Tq = Tq_cur;
-		if (engine->rads > engine->tickover) {
-			engine->Tq -= EngBrkK;
-		}
+		engine->Tq -= EngBrkK;
 		if (alpha <= 1e-6) {
-			engine->Tq -= curve->maxTq * engine->brakeCoeff;
+			engine->Tq -= engine->brakeCoeff;
 		}
 		
 		tdble cons = Tq_cur * 0.75f;
