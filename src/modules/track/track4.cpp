@@ -906,10 +906,10 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 		pits->nPitSeg  = 0;
 		if (pitStart->lgfromstart > pitEnd->lgfromstart) {
 			pits->nPitSeg = (int)((theTrack->length - pitStart->lgfromstart
-				+ pitEnd->lgfromstart + pitEnd->length + pits->len / 2.0) / pits->len);
+				+ pitEnd->lgfromstart + pitEnd->length /*+ pits->len / 2.0*/) / pits->len);
 		} else {
 			pits->nPitSeg = (int)((pitEnd->lgfromstart + pitEnd->length
-				- pitStart->lgfromstart + pits->len / 2.0) / pits->len);
+				- pitStart->lgfromstart /*+ pits->len / 2.0*/) / pits->len);
 		}
 		pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
 		pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
@@ -955,13 +955,15 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 				}//switch pits->side
 			}//if changeSeg
 
-			pits->driversPits[i].pos.type = TR_TOMIDDLE;
-			//TR_LPOS_MAIN; //NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
+			pits->driversPits[i].pos.type = TR_LPOS_MAIN;
+			//NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
+			//It is coincidentally equal to TR_TORIGHT, that's why it works.
+			//Should clear up.
 			pits->driversPits[i].pos.seg = mSeg;
 
 			//RtTrackLocal2Global expects toStart as a length in meters for straight,
 			//and as an angle in radian for curves
-			tdble pitCenter = toStart + pits->len / 2.0;
+			tdble pitCenter = toStart; //+ pits->len / 2.0;
 			switch(mSeg->type) {
 				case TR_STR:
 					pits->driversPits[i].pos.toStart = pitCenter;
