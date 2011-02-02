@@ -124,26 +124,14 @@ GfDrivers::GfDrivers()
 				continue;
 			}
 
-			// Read driver info from the XML file.
-			std::ostringstream ossDriverListPath;
-			ossDriverListPath << ROB_SECT_ROBOTS << '/' << ROB_LIST_INDEX
-							  << '/' << pCurModule->modInfo[nItfInd].index;
-			const char* pszCarId = GfParmGetStr(hparmRobot, ossDriverListPath.str().c_str(), ROB_ATTR_CAR, "");
-			const bool bIsHuman = strcmp(GfParmGetStr(hparmRobot, ossDriverListPath.str().c_str(), ROB_ATTR_TYPE, ROB_VAL_ROBOT), ROB_VAL_ROBOT) != 0;
+			// Create the driver and load info from the XML file.
+			GfDriver* pDriver = new GfDriver(strModName, pCurModule->modInfo[nItfInd].index,
+											 pCurModule->modInfo[nItfInd].name, hparmRobot);
 
-			// Compute/retrieve other information.
-			const GfCar* pCar = GfCars::self()->getCar(pszCarId);
-			if (pCar)
+			// Keep the driver only if its car exists and is usable.
+			if (pDriver->getCar())
 			{
-				// Store it in the GfDriver structure.
-				GfDriver* pDriver = new GfDriver;
-				pDriver->setName(pCurModule->modInfo[nItfInd].name);
-				pDriver->setModuleName(strModName);
-				pDriver->setInterfaceIndex(pCurModule->modInfo[nItfInd].index);
-				pDriver->setIsHuman(bIsHuman);
-				pDriver->setCar(pCar);
-			
-				// Update the GfCars singleton.
+				// Update the GfDrivers singleton.
 				_pPrivate->vecDrivers.push_back(pDriver);
 				const std::pair<std::string, int> driverKey(pDriver->getModuleName(),
 															pDriver->getInterfaceIndex());
@@ -152,13 +140,21 @@ GfDrivers::GfDrivers()
 							  pDriver->getType()) == _pPrivate->vecTypes.end())
 					_pPrivate->vecTypes.push_back(pDriver->getType());
 				if (std::find(_pPrivate->vecCarCategoryIds.begin(), _pPrivate->vecCarCategoryIds.end(),
-							  pCar->getCategoryId()) == _pPrivate->vecCarCategoryIds.end())
-					_pPrivate->vecCarCategoryIds.push_back(pCar->getCategoryId());
+							  pDriver->getCar()->getCategoryId()) == _pPrivate->vecCarCategoryIds.end())
+					_pPrivate->vecCarCategoryIds.push_back(pDriver->getCar()->getCategoryId());
 			}
 			else
 			{
+				delete pDriver;
+				
+				std::ostringstream ossDrvSecPath;
+				ossDrvSecPath << ROB_SECT_ROBOTS << '/' << ROB_LIST_INDEX << '/'
+							  << pCurModule->modInfo[nItfInd].index;
+				const char* pszCarId =
+					GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_CAR, "");
 				GfLogWarning("Ignoring '%s' driver '%s' (#%d) (default car %s not available)\n",
-							 strModName.c_str(), pCurModule->modInfo[nItfInd].name, nItfInd, pszCarId);
+							 strModName.c_str(), pCurModule->modInfo[nItfInd].name,
+							 pCurModule->modInfo[nItfInd].index, pszCarId);
 			}
 		}
 		
@@ -233,8 +229,10 @@ void GfDrivers::print() const
 			GfLogTrace("      '%s' car category :\n", itCarCatId->c_str());
 			std::vector<GfDriver*>::const_iterator itDriver;
 			for (itDriver = vecDrivers.begin(); itDriver != vecDrivers.end(); itDriver++)
-				GfLogTrace("          %-24s : %s\n", (*itDriver)->getName().c_str(),
-						   (*itDriver)->getCar()->getName().c_str());
+				GfLogTrace("          %-24s : %s, %02X-featured\n",
+						   (*itDriver)->getName().c_str(),
+						   (*itDriver)->getCar()->getName().c_str(),
+						   (*itDriver)->getSupportedFeatures());
 		}
 	}
 }
@@ -282,8 +280,95 @@ void GfDriverSkin::setCarPreviewFileName(const std::string& strFileName)
 
 // GfDriver class -------------------------------------------------------------------
 
-GfDriver::GfDriver() : _nItfIndex(-1), _bIsHuman(false), _pCar(0)
+// Skill level related constants.
+static const char *ASkillLevelStrings[] =
+	{ ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const int NbSkillLevels = sizeof(ASkillLevelStrings) / sizeof(ASkillLevelStrings[0]);
+static const double ASkillLevelValues[NbSkillLevels] = { 10.0, 7.0, 3.0, 0.0 };
+
+// Robot drivers features related constants.
+struct RobotFeature
 {
+	const char *pszName;
+	int nValue;
+};
+
+static RobotFeature RobotFeatures[] =
+{
+	{ ROB_VAL_FEATURE_PENALTIES, RM_FEATURE_PENALTIES },
+	{ ROB_VAL_FEATURE_TIMEDSESSION, RM_FEATURE_TIMEDSESSION },
+	{ ROB_VAL_FEATURE_WETTRACK, RM_FEATURE_WETTRACK },
+	
+	/* Career mode features not yet resurrected (robots need work to support them).
+	   { ROB_VAL_FEATURE_SC, RM_FEATURE_SC | RM_FEATURE_YELLOW | RM_FEATURE_PENALTIES },
+	   { ROB_VAL_FEATURE_YELLOW, RM_FEATURE_YELLOW | RM_FEATURE_PENALTIES },
+	   { ROB_VAL_FEATURE_RED, RM_FEATURE_RED },
+	   { ROB_VAL_FEATURE_BLUE, RM_FEATURE_BLUE },
+	   { ROB_VAL_FEATURE_PITEXIT, RM_FEATURE_PITEXIT | RM_FEATURE_PENALTIES },
+	   { ROB_VAL_FEATURE_TIMEDSESSION, RM_FEATURE_TIMEDSESSION },
+	   { ROB_VAL_FEATURE_PENALTIES, RM_FEATURE_PENALTIES }
+	*/
+};
+static const int NRobotFeatures = sizeof(RobotFeatures) / sizeof(RobotFeatures[0]);
+
+
+GfDriver::GfDriver(const std::string& strModName, int nItfIndex,
+				   const std::string& strName, void* hparmRobot)
+: _strModName(strModName), _strName(strName), _nItfIndex(nItfIndex), _bIsHuman(false), _pCar(0)
+{
+	load(hparmRobot);
+}
+
+void GfDriver::load(void* hparmRobot)
+{
+	std::ostringstream ossDrvSecPath;
+	ossDrvSecPath << ROB_SECT_ROBOTS << '/' << ROB_LIST_INDEX << '/' << _nItfIndex;
+
+	// Humanity.
+	_bIsHuman =
+		strcmp(GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_TYPE, ROB_VAL_ROBOT),
+			   ROB_VAL_ROBOT) != 0;
+
+	// Skill level.
+    const char* pszKillLevel =
+		GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
+    for(int nLevelInd = 0; nLevelInd < NbSkillLevels; nLevelInd++)
+	{
+		if (!strcmp(ASkillLevelStrings[nLevelInd], pszKillLevel))
+		{
+			_fSkillLevel = ASkillLevelValues[nLevelInd];
+			break;
+		}
+    }
+
+	// Supported features.
+	if (_bIsHuman)
+	{
+		_nFeatures = RM_FEATURE_TIMEDSESSION | RM_FEATURE_WETTRACK;
+		if (_fSkillLevel <= ASkillLevelValues[3]) // Pro (TODO: Create enum fro that !)
+			_nFeatures |= RM_FEATURE_PENALTIES;
+	}
+	else
+	{
+		_nFeatures = 0;
+		char* pszDrvFeatures =
+			strdup(GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_FEATURES, ""));
+		for (char* pszFeature = strtok(pszDrvFeatures, ";");
+			 pszFeature != 0; pszFeature = strtok(NULL, ";"))
+		{
+			for (int nFeatInd = 0; nFeatInd < NRobotFeatures; nFeatInd++)
+				if (!strcmp(pszFeature, RobotFeatures[nFeatInd].pszName))
+				{
+					_nFeatures |= RobotFeatures[nFeatInd].nValue;
+					break;
+				}
+		}
+		free(pszDrvFeatures);
+	}
+
+	// Driven car.
+	const char* pszCarId = GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_CAR, "");
+	_pCar = GfCars::self()->getCar(pszCarId);
 }
 
 const std::string& GfDriver::getName() const
@@ -345,25 +430,35 @@ bool GfDriver::matchesTypeAndCategory(const std::string& strType,
 		   && (strCarCatId.empty() || getCar()->getCategoryId() == strCarCatId);
 }
 
-void GfDriver::setName(const std::string& strName)
+double GfDriver::getSkillLevel() const
 {
-	_strName = strName;
+	return _fSkillLevel;
 }
 
-void GfDriver::setModuleName(const std::string& strModName)
+int GfDriver::getSupportedFeatures() const
 {
-	_strModName = strModName;
+	return _nFeatures;
 }
 
-void GfDriver::setInterfaceIndex(int nItfIndex)
-{
-	_nItfIndex = nItfIndex;
-}
+// void GfDriver::setName(const std::string& strName)
+// {
+// 	_strName = strName;
+// }
 
-void GfDriver::setIsHuman(bool bIsHuman)
-{
-	_bIsHuman = bIsHuman;
-}
+// void GfDriver::setModuleName(const std::string& strModName)
+// {
+// 	_strModName = strModName;
+// }
+
+// void GfDriver::setInterfaceIndex(int nItfIndex)
+// {
+// 	_nItfIndex = nItfIndex;
+// }
+
+// void GfDriver::setIsHuman(bool bIsHuman)
+// {
+// 	_bIsHuman = bIsHuman;
+// }
 
 void GfDriver::setCar(const GfCar* pCar)
 {

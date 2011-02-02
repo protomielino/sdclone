@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : raceenginemenus.h
-    created     : Fri Jan  3 22:25:02 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    file        : racestate.h
+    created     : Sat Nov 16 14:05:06 CET 2006
+    copyright   : (C) 2006 Mart Kelder
+    email       : mart@kelder31.nl   
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -18,27 +18,17 @@
  ***************************************************************************/
  
 /** @file    
-    		
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
+    		Useful functions for race engine
+    @author	<a href=mailto:mart@kelder31.nl>Mart Kelder</a>
     @version	$Id$
 */
 
-#ifndef _RACEENGINEMENUS_H_
-#define _RACEENGINEMENUS_H_
+#ifndef _RACEUTIL_H_
+#define _RACEUTIL_H_
 
-#include "raceengineclient.h"
+extern int RmGetFeaturesList(void* param);
 
-
-RACEENGINECLIENT_API int ReRacemanMenu();
-RACEENGINECLIENT_API int ReNextEventMenu(void);
-RACEENGINECLIENT_API void ReConfigureRace(void * /* dummy */);
-RACEENGINECLIENT_API void ReSetRacemanMenuHandle(void * handle);
-
-extern void* ReGetRacemanMenuHandle();
-
-extern void ReConfigRunState(bool bStart = false);
-
-#endif /* _RACEENGINEMENU_H_ */ 
+#endif /* _RACEUTIL_H_ */ 
 
 
 

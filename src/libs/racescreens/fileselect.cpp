@@ -46,7 +46,7 @@ rmOnActivate(void * /* dummy */ )
 	// Fill-in the Scroll List with the names of the files in the specified folder.
 	GfuiScrollListClear(ScrHandle, FilesScrollListId);
 	
-	FileList = GfDirGetList(RmFs->path);
+	FileList = GfDirGetList(RmFs->path.c_str());
 	if (FileList)
 	{
 		tFList	*fileCur;
@@ -135,7 +135,7 @@ RmFileSelect(void *pFileSelect)
 
 	// Create variable title label.
 	const int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "TitleLabel");
-	GfuiLabelSetText(ScrHandle, titleId, RmFs->title);
+	GfuiLabelSetText(ScrHandle, titleId, RmFs->title.c_str());
 	
 	// Create the Scroll List containing the File list
 	FilesScrollListId = CreateScrollListControl(ScrHandle, menuXMLDescHdle, "FilesScrollList",

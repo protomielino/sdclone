@@ -32,23 +32,55 @@
 #include "tgfdata.h"
 
 
+class GfRaceManager;
 class GfDriver;
+class GfTrack;
 
 
 class TGFDATA_API GfRace
 {
 public:
 
-	GfRace(void* hparmRace = 0);
+	//! Constructor.
+	GfRace();
 
-	//! Load from the race params.
-	void load(void* hparmRace);
+	//! Load from the given race manager params file.
+	void load(GfRaceManager* pRaceMan);
 
 	//! Clear the race.
 	void clear();
 	
-	//! Save to the race params.
+	//! Save to the race manager params file.
 	void save();
+
+	GfRaceManager* getManager() const;
+
+	const std::string& getSessionName() const;
+
+	enum EDisplayMode { eDisplayNormal, eDisplayResultsOnly,
+						nDisplayModeNumber };
+	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
+						  eTimeDusk, eTimeNight, eTimeNow, eTimeFromTrack,
+						  nTimeSpecNumber };
+	enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
+					   nCloudsSpecNumber};
+	enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
+					 nRainSpecNumber };
+	class Parameters
+	{
+	  public:
+		int nLaps;
+		int nDistance; // km
+		int nDuration; // s
+		EDisplayMode eDisplayMode;
+		ETimeOfDaySpec eTimeOfDaySpec;
+		ECloudsSpec eCloudsSpec;
+		ERainSpec eRainSpec;
+	};
+	
+	Parameters* getParameters();
+
+	int getSupportedFeatures() const;
 	
 	unsigned getCompetitorsCount() const;
 	const std::vector<GfDriver*>& getCompetitors() const;
@@ -60,14 +92,15 @@ public:
 	bool shuffleCompetitors();
 
  	GfDriver* getCompetitor(const std::string& strModName, int nItfIndex) const;
-//	GfDriver* getCompetitorWithName(const std::string& strName) const;
 
-// 	const std::string& getCompetitorName(const std::string& strId) const;
-// 	std::vector<GfDriver*> getCompetitorsInCategory(const std::string& strCatId = "") const;
-// 	std::vector<std::string> getCompetitorIdsInCategory(const std::string& strCatId = "") const;
-// 	std::vector<std::string> getCompetitorIdsInCategory(const std::string& strCatId = "") const;
+	bool isCompetitorFocused(const GfDriver* pComp) const;
+	GfDriver* getFocusedCompetitor() const;
+	void setFocusedCompetitor(const GfDriver* pComp);
+
+	GfTrack* getTrack() const;
+	void setTrack(GfTrack* pTrack);
 	
-// 	void print() const;
+ 	void print() const;
 
 protected:
 	

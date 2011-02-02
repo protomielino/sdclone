@@ -29,6 +29,7 @@
 #include "raceengineclient.h"
 
 class GfRaceManager;
+class GfRace;
 
 
 RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
@@ -36,7 +37,9 @@ RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
 extern void ReInit(void);
 extern void ReShutdown(void);
 
-extern void ReRaceConfigure(GfRaceManager* pRaceman);
+extern void ReRaceSelectRaceman(GfRaceManager* pRaceMan);
+extern void ReRaceRestore(GfRaceManager* pRaceMan, const char *pszResultFileName);
+extern void ReRaceConfigure(GfRaceManager* pRaceMan);
 
 extern int  ReInitCars(void);
 
@@ -50,6 +53,9 @@ extern char *ReGetCurrentRaceName(void);
 extern char *ReGetPrevRaceName(void);
 
 extern tModList *ReRaceModList;
+
+// The race (temporarily partly duplicates ReInfo, as long as not merged together).
+extern GfRace* ReGetRace();
 
 #endif /* _RACEINIT_H_ */ 
 

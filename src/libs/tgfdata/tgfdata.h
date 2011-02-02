@@ -36,6 +36,11 @@
 # define TGFDATA_API
 #endif
 
+#ifdef _MSC_VER
+// Disable useless MSVC warnings
+#  pragma warning (disable:4251) // class XXX needs a DLL interface ...
+#endif
+
 #endif /* __TGFDATA__H__ */
 
 

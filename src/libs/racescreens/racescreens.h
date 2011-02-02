@@ -29,6 +29,8 @@
 
 #include <tgfclient.h> // tfuiCalback
 
+class GfRace;
+
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -44,7 +46,7 @@
 
 typedef struct RmTrackSelect
 {
-    void        *param;		/* Race manager parameters where to set the selected track */
+	GfRace      *pRace; /* The race to update */
     void        *prevScreen;	/* Race manager screen to go back */
     void        *nextScreen;	/* Race manager screen to go after select */
     tTrackItf	trackItf;	/* Track module interface */
@@ -52,17 +54,16 @@ typedef struct RmTrackSelect
 
 typedef struct RmDriverSelect
 {
-    void        *param;
+	GfRace      *pRace; /* The race to update */
     void        *prevScreen;	/* Race manager screen to go back */
     void        *nextScreen;	/* Race manager screen to go after select */
 } tRmDriverSelect;
 
 typedef struct RmRaceParam
 {
-    void        	*param;
+	GfRace          *pRace; /* The race to update */
     void        	*prevScreen;
     void        	*nextScreen;	/* Race manager screen to go after select */
-    const char		*title;
     unsigned int	confMask;	/* Tell what to configure */
 #define RM_CONF_RACE_LEN	0x00000001
 #define RM_CONF_DISP_MODE	0x00000002
@@ -77,8 +78,8 @@ enum RmFileSelectMode { RmFSModeLoad, RmFSModeSave };
 
 typedef struct RmFileSelect
 {
-    const char		*title;
-    const char		*path;
+    std::string		title;
+    std::string		path;
     void        	*prevScreen;
     tfSelectFile	select;
 	RmFileSelectMode mode;
@@ -127,8 +128,6 @@ RACESCREENS_API void RmRaceParamsMenu(void *vrp);
 RACESCREENS_API void RmShowStandings(void *prevHdle, tRmInfo *info);
 
 RACESCREENS_API void* RmFileSelect(void *vs);
-
-RACESCREENS_API int RmGetFeaturesList( void* param );
 
 #endif /* __RACESCREENS_H__ */
 

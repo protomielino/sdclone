@@ -22,16 +22,16 @@
     @version    $Id$
 */
 
-
 #include <sstream>
 #include <iterator>
-#include <algorithm>
 #include <iomanip>
 
 #include <raceman.h>
 
 #include <tgfclient.h>
 #include <portability.h>
+
+#include <race.h>
 #include <tracks.h>
 
 #include "racescreens.h"
@@ -40,8 +40,8 @@
 // Screen handle.
 static void *ScrHandle;
 
-// 
-static tRmTrackSelect *TrackSelect;
+// Track select menu data.
+static tRmTrackSelect *MenuData;
 
 // The currently selected track.
 GfTrack* PCurTrack;
@@ -84,130 +84,18 @@ rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsign
         it++;
     }//while
     
-    if(str.size() >= length)    //If input string was longer than required,
+    if (str.size() >= length)    //If input string was longer than required,
         str2 = str.substr(str1.size()); //put the rest in str2.
 }//rmtsWordWrap
 
-/** 
- * rmtsGetFirstUsableTrack
- * 
- * Retrieve the first usable track in the given category, searching in the given direction
- * and skipping the first found if specified
- * 
- * @param   strCatId       Id of the category to search inside of.
- * @param   strFromTrackId Id of the track from which to start the search.
- * @param   nSearchDir     <0 = previous, >0 = next.
- * @param   bSkipFrom      If true, skip the first found track.
- */
-static GfTrack*
-rmtsGetFirstUsableTrack(const std::string& strCatId, const std::string& strFromTrackId = "",
-						int nSearchDir = +1, bool bSkipFrom = false)
-{
-	//GfLogDebug("rmtsGetFirstUsableTrack(c=%s, ft=%s, %d)\n",
-	//		   strCatId.c_str(), strFromTrackId.c_str(), nSearchDir);
-
-	GfTrack* pTrack = 0;
-
-	if (nSearchDir == 0)
-		nSearchDir = +1;
-	
-	// Check category.
-	const std::vector<std::string>& vecCatIds = GfTracks::self()->getCategoryIds();
-	if (std::find(vecCatIds.begin(), vecCatIds.end(), strCatId) == vecCatIds.end())
-		return 0;
-
-	// Retrieve tracks in this category.
-	const std::vector<GfTrack*> vecTracksInCat =
-		GfTracks::self()->getTracksInCategory(strCatId);
-	if (vecTracksInCat.size() == 0)
-		return 0;
-	
-	// Retrieve the index of the specified track to start from, if any.
-	int nCurTrackInd = 0;
-	if (!strFromTrackId.empty())
-	{
-		std::vector<GfTrack*>::const_iterator itTrack = vecTracksInCat.begin();
-		while (itTrack != vecTracksInCat.end())
-		{
-			if ((*itTrack)->getId() == strFromTrackId)
-			{
-				nCurTrackInd = itTrack - vecTracksInCat.begin();
-				break;
-			}
-			itTrack++;
-		}
-	}
-	
-	int nTrackInd = nCurTrackInd;
-	if (bSkipFrom || !vecTracksInCat[nTrackInd]->isUsable())
-	{
-		const int nPrevTrackInd = nCurTrackInd;
-		do
-		{
-			nTrackInd =
-				(nTrackInd + nSearchDir + vecTracksInCat.size()) % vecTracksInCat.size();
-			//GfLogDebug("xxx nTrackInd=%d\n", nTrackInd);
-		}
-		while (nTrackInd != nPrevTrackInd && !vecTracksInCat[nTrackInd]->isUsable());
-	}
-
-	if (vecTracksInCat[nTrackInd]->isUsable())
-		pTrack = vecTracksInCat[nTrackInd];
-
-	return pTrack;
-}
-				  
-/** 
- * rmtsGetFirstUsableTrack
- * 
- * Retrieve the first usable track among all categories, searching in the given direction
- * from the given category, but skipping it if specified
- * 
- * @param   strFromCatId   Id of the category to search inside of.
- * @param   nSearchDir     <0 = previous, >0 = next.
- * @param   bSkipFrom      If true, skip the first found track.
- */
-static GfTrack*
-rmtsGetFirstUsableTrack(const std::string& strFromCatId, int nSearchDir, bool bSkipFrom = false)
-{
-	//GfLogDebug("rmtsGetFirstUsableTrack(fc=%s, %d)\n", strFromCatId.c_str(), nSearchDir);
-
-	GfTrack* pTrack = 0;
-
-	if (nSearchDir == 0)
-		nSearchDir = +1;
-	
-	// Retrieve and check category.
-	const std::vector<std::string>& vecCatIds = GfTracks::self()->getCategoryIds();
-	std::vector<std::string>::const_iterator itFromCat =
-		std::find(vecCatIds.begin(), vecCatIds.end(), strFromCatId);
-	if (itFromCat == vecCatIds.end())
-		return 0;
-
-	int nCatInd = itFromCat - vecCatIds.begin();
-
-	if (bSkipFrom || !(pTrack = rmtsGetFirstUsableTrack(vecCatIds[nCatInd])))
-	{
-		const int nPrevCatInd = nCatInd;
-		//GfLogDebug("xxx nPrevCatInd=%d\n", nPrevCatInd);
-		do
-		{
-			nCatInd =
-				(nCatInd + nSearchDir + vecCatIds.size()) % vecCatIds.size();
-			pTrack = rmtsGetFirstUsableTrack(vecCatIds[nCatInd]);
-			//GfLogDebug("xxx cat[%d]=%s, p=%p\n", nCatInd, vecCatIds[nCatInd].c_str(), pTrack);
-		}
-		while (nCatInd != nPrevCatInd && !pTrack);
-	}
-
-	return pTrack;
-}
-	
 static void
 rmtsUpdateTrackInfo(void)
 {
 	static const int nMaxLinesLength = 30;  //Line length for track description (chars)
 
+	if (!PCurTrack)
+		return;
+	
     // Update GUI with track info.
 	// 0) Track category and name.
 	GfuiLabelSetText(ScrHandle, CategoryEditId, PCurTrack->getCategoryName().c_str());
@@ -270,17 +158,14 @@ rmtsActivate(void * /* dummy */)
 static void
 rmtsTrackPrevNext(void *vsel)
 {
- 	const int nSearchDir = vsel ? (int)(long)vsel : +1;
+ 	const int nSearchDir = (long)vsel > 0 ? +1 : -1;
 
-	PCurTrack =
-		rmtsGetFirstUsableTrack(PCurTrack->getCategoryId(), PCurTrack->getId(), nSearchDir, true);
+	// Select next usable track in the current catergory in the requested direction.
+	PCurTrack = GfTracks::self()->getFirstUsableTrack(PCurTrack->getCategoryId(),
+													  PCurTrack->getId(), nSearchDir, true);
 
-	// If any next/previous usable track in the current category, select it.
-	if (PCurTrack)
-	{
-		// Update GUI
-		rmtsUpdateTrackInfo();
-	}
+	// Update GUI
+	rmtsUpdateTrackInfo();
 }
 
 
@@ -288,106 +173,25 @@ rmtsTrackPrevNext(void *vsel)
 static void
 rmtsTrackCatPrevNext(void *vsel)
 {
- 	const int nSearchDir = vsel ? (int)(long)vsel : +1;
+ 	const int nSearchDir = (long)vsel > 0 ? +1 : -1;
 
-	//
-	PCurTrack = rmtsGetFirstUsableTrack(PCurTrack->getCategoryId(), nSearchDir, true);
+	// Select first usable track in the next catergory in the requested direction.
+	PCurTrack = GfTracks::self()->getFirstUsableTrack(PCurTrack->getCategoryId(),
+													  nSearchDir, true);
 
-	// If any next/previous usable category, select it.
-	if (PCurTrack)
-	{
-		// Update GUI
-		rmtsUpdateTrackInfo();
-	}
-
-// 	/* Get next/previous usable track category
-//        Note: Here, we assume there's at least one,
-//              which is guaranteed by CategoryList initialization in RmTrackSelect */
-// 	const int nDeltaInd = (int)(long)(vsel ? vsel : 1);
-// 	const std::string& strCurCat = GfTracks::self()->getCategoryIds()[NCurCatIndex];
-// 	const std::vector<GfTrack*> vecTracksInCat =
-// 		GfTracks::self()->getTracksInCategory(strCurCat);
-// 	const int nPrevTrackIndex = NCurTrackCatIndex;
-//     do
-// 	{
-// 		NCurTrackInCatIndex =
-// 			(NCurTrackInCatIndex + nDeltaInd + GfTracks::self()->getCategoryIds())
-// 			% GfTracks::self()->getCategoryIds();
-// 	}
-// 	while (nPrevTrackIndex != NCurTrackInCatIndex
-// 		   && vecTracksInCat[NCurTrackCatIndex]->isUsable());
-
-
-// 	tFList *curCat = CategoryList;
-//     do {
-    
-//     /* Next/previous category */
-//     curCat = vsel ? curCat->next : curCat->prev;
-    
-//     /* Try and get the category display name if not already done */
-//     if (curCat->userData && !curCat->dispName) {
-//         curCat->dispName = rmtsGetCategoryName(curCat->name);
-//         if (!curCat->dispName || strlen(curCat->dispName) == 0) {
-// 	    GfError("rmtsTrackCatPrevNext: No definition for track category %s\n", curCat->name);
-//         }
-//     }
-    
-//     /* If the category is loadable and not empty : */
-//     if (curCat->dispName && curCat->userData) {
-        
-//         /* Select the first usable track in the category */
-//         tFList *curTr = (tFList*)(curCat->userData);
-//         do {
-    
-//         /* Try and get the track display name if not already done */
-//         if (!curTr->dispName) {
-//             curTr->dispName = rmtsGetTrackName(curCat->name, curTr->name);
-//             if (!curTr->dispName || strlen(curTr->dispName) == 0) {
-// 		GfError("rmtsTrackCatPrevNext: No definition for track %s\n", curTr->name);
-//             }
-//         }
-
-//         /* That's all if the track is usable*/
-//         if (curTr->dispName)
-//             break;
-    
-//         /* Next track */
-//         curTr = curTr->next;
-    
-//         } while (curTr != (tFList*)(curCat->userData));
-//         curCat->userData = (void*)curTr;
-//     }
-
-//     } while ((!curCat->dispName || !curCat->userData || !((tFList*)(curCat->userData))->dispName) 
-// 	     && curCat != CategoryList);
-//     CategoryList = curCat;
-    
-//     /* Update GUI */
-//     GfuiLabelSetText(ScrHandle, CategoryEditId, CategoryList->dispName);
-//     GfuiLabelSetText(ScrHandle, NameEditId, ((tFList*)curCat->userData)->dispName);
-//     GfuiStaticImageSet(ScrHandle, OutlineImageLabelId, rmtsGetOutlineFileName(PathBuf, MaxPathSize));
-//     GfuiScreenAddBgImg(ScrHandle, rmtsGetPreviewFileName(PathBuf, MaxPathSize));
-//     rmtsUpdateTrackInfo();
+	// Update GUI
+	rmtsUpdateTrackInfo();
 }
 
 
 static void
 rmtsSelect(void * /* dummy */)
 {
-	// Save currently slected track category and LabelId to the race params file.
-    const int nCurTrackInd =
-		(int)GfParmGetNum(TrackSelect->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
-	std::ostringstream ossParamPath;
-	ossParamPath << RM_SECT_TRACKS << '/' << nCurTrackInd;
-	
-    GfParmSetStr(TrackSelect->param, ossParamPath.str().c_str(), RM_ATTR_CATEGORY,
-				 PCurTrack->getCategoryId().c_str());
-    GfParmSetStr(TrackSelect->param, ossParamPath.str().c_str(), RM_ATTR_NAME,
-				 PCurTrack->getId().c_str());
-    GfParmSetStr(TrackSelect->param, ossParamPath.str().c_str(), RM_ATTR_FULLNAME,
-				 PCurTrack->getId().c_str());
+	// Save currently selected track into the race.
+	MenuData->pRace->setTrack(PCurTrack);
 
-    rmtsDeactivate(TrackSelect->nextScreen);
+	// Next screen.
+    rmtsDeactivate(MenuData->nextScreen);
 }
 
 
@@ -395,7 +199,7 @@ static void
 rmtsAddKeys(void)
 {
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Select Track", NULL, rmtsSelect, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", TrackSelect->prevScreen, rmtsDeactivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", MenuData->prevScreen, rmtsDeactivate, NULL);
     GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Track", (void*)-1, rmtsTrackPrevNext, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Track", (void*)+1, rmtsTrackPrevNext, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
@@ -413,33 +217,28 @@ rmtsAddKeys(void)
 void
 RmTrackSelect(void *vs)
 {
-    TrackSelect = (tRmTrackSelect*)vs;
+    MenuData = (tRmTrackSelect*)vs;
 
     // Get currently selected track for the current race type
 	// (or the first usable one in the selected category).
-    const int nCurTrackInd =
-		(int)GfParmGetNum(TrackSelect->param, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1);
-	std::ostringstream ossSectionPath;
-	ossSectionPath << RM_SECT_TRACKS << '/' << nCurTrackInd;
-    const char* pszCurTrackId =
-		GfParmGetStr(TrackSelect->param, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
-	const char* pszCurTrackCatId =
-		GfParmGetStr(TrackSelect->param, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY, 0);
-
-	PCurTrack = rmtsGetFirstUsableTrack(pszCurTrackCatId, pszCurTrackId);
-	if (PCurTrack && PCurTrack->getId() != pszCurTrackId)
-        GfLogWarning("Could not find selected track %s (%s) ; using %s (%s)\n",
-					 pszCurTrackId, pszCurTrackCatId,
+	PCurTrack = MenuData->pRace->getTrack();
+	const std::string strReqTrackId = PCurTrack->getId();
+	const std::string strReqTrackCatId = PCurTrack->getCategoryId();
+	PCurTrack =
+		GfTracks::self()->getFirstUsableTrack(PCurTrack->getCategoryId(), PCurTrack->getId());
+	if (PCurTrack && PCurTrack->getId() != strReqTrackId)
+        GfLogWarning("Could not find / use selected track %s (%s) ; using %s (%s)\n", 
+					 strReqTrackId.c_str(), strReqTrackCatId.c_str(),
 					 PCurTrack->getId().c_str(), PCurTrack->getCategoryId().c_str());
 
     // If not usable, try and get the first usable track going ahead in categories
 	if (!PCurTrack)
 	{
-		PCurTrack = rmtsGetFirstUsableTrack(pszCurTrackCatId, +1, true);
+		PCurTrack = GfTracks::self()->getFirstUsableTrack(strReqTrackCatId, +1, true);
 		if (PCurTrack)
-			GfLogWarning("Could not find selected track %s and category %s unusable"
+			GfLogWarning("Could not find / use selected track %s and category %s unusable"
 						 " ; using %s (%s)\n",
-						 pszCurTrackId, pszCurTrackCatId,
+						 strReqTrackId.c_str(), strReqTrackCatId.c_str(),
 						 PCurTrack->getId().c_str(), PCurTrack->getCategoryId().c_str());
 	}
 	
@@ -468,7 +267,7 @@ RmTrackSelect(void *vs)
     OutlineImageId = CreateStaticImageControl(ScrHandle, hparmMenu, "outlineimage");
 
     CreateButtonControl(ScrHandle, hparmMenu, "nextbutton", NULL, rmtsSelect);
-    CreateButtonControl(ScrHandle, hparmMenu, "previousbutton", TrackSelect->prevScreen, rmtsDeactivate);
+    CreateButtonControl(ScrHandle, hparmMenu, "previousbutton", MenuData->prevScreen, rmtsDeactivate);
 
     DescLine1LabelId = CreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel");
     DescLine2LabelId = CreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel2");

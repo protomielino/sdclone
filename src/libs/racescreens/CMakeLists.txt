@@ -5,7 +5,6 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(RACESCREENS_SOURCES carselect.cpp driverselect.cpp fileselect.cpp
                         loadingscreen.cpp miscscreens.cpp 
                         pitmenu.cpp raceparamsmenu.cpp results.cpp trackselect.cpp
-                        util.cpp
                         racescreens.h)
 
 ADD_INTERFACE_INCLUDEDIR()

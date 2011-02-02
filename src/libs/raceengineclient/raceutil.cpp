@@ -1,14 +1,36 @@
-/**
- * This file contains function which can also be used by raceengineclient.
- * This function is needed in both modules 
- *
- * Copyright (C) 2006, Mart Kelder <mart@kelder31.nl>
- */
+/**************************************************************************
 
-#include <tgfclient.h>
-#include "racescreens.h"
+    file        : racemain.cpp
+    created     : Sat Nov 16 12:13:31 CET 2006
+    copyright   : (C) 2006 Mart Kelder
+    email       : mart@kelder31.nl   
+    version     : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+/** @file   
+    		Useful functions for race engine
+    @author	<a href=mailto:mart@kelder31.nl>Mart Kelder</a>
+    @version	$Id$
+*/
+
+#include <tgf.h>
+#include "raceutil.h"
 
 #include <robot.h>
+
+
+// TODO: When the race engine will have been moved to using tgfdata (it is not at present),
+//       remove RmGetFeaturesList (use GfRace::getSupportedFeatures).
 
 static const int nMaxFeatureNameLength = 30;
 

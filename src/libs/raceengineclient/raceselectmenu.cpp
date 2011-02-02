@@ -23,8 +23,6 @@
     @version	$Id$
 */
 
-#include <cstdlib>
-#include <cstdio>
 #include <map>
 #include <algorithm>
 
@@ -46,7 +44,7 @@ static std::map<std::string, int> reMapSubTypeComboIds;
 
 /* Called when the menu is activated */
 static void
-reOnRaceSelectMenuActivate(void * /* dummy */)
+reOnActivate(void * /* dummy */)
 {
     /* Race engine init */
     ReInit();
@@ -88,6 +86,7 @@ reOnSelectRaceMan(void *pvRaceManTypeIndex)
 			}
 		}
 	}
+
 	// If only 1, no choice.
 	else if (vecRaceMans.size() == 1)
 	{
@@ -114,7 +113,7 @@ ReRaceSelectInit(void *prevMenu)
     
     // Create screen, load menu XML descriptor and create static controls.
     reRaceSelectHandle = GfuiScreenCreateEx((float*)NULL, 
-											NULL, reOnRaceSelectMenuActivate, 
+											NULL, reOnActivate, 
 											NULL, (tfuiCallback)NULL, 
 											1);
     void *hMenuXMLDesc = LoadMenuXML("raceselectmenu.xml");

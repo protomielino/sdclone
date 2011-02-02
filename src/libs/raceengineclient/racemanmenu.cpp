@@ -23,14 +23,15 @@
     @version	$Id$
 */
 
-#include <cstdlib>
-#include <cstdio>
 #include <vector>
+#include <string>
+#include <sstream>
 
 #include <portability.h>
+#include <tgfclient.h>
 
 #include <raceman.h>
-#include <tgfclient.h>
+
 #include <racemanagers.h>
 #include <race.h>
 #include <tracks.h>
@@ -79,41 +80,37 @@ void* ReGetRacemanMenuHandle()
 void
 ReConfigureRace(void * /* dummy */)
 {
-	void *params = ReInfo->params;
-
-	/* Reset configuration automaton */
-	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
-	ReConfigRunState();
+	ReConfigRunState(/*bStart=*/true);
 }
 
-static char*
-reGetLoadFileDir(char* pszDirPath, int nMaxLen)
+// TODO: ossPathDirPath ...
+static std::string
+reGetLoadFileDir()
 {
-	void *params = ReInfo->params;
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
 	// For race types with more than 1 event (= 1 race on 1 track), load a race result file,
 	// as the previous race standings has an influence on the next race starting grid.
-	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1)
-		snprintf(pszDirPath, nMaxLen, "%sresults/%s", GfLocalDir(), ReInfo->_reFilename);
+	std::string strDirPath(GfLocalDir());
 
+	if (pRaceMan->getEventCount() > 1)
+		strDirPath += "results/";
+	
 	// But for race types with only 1 event (= 1 race on 1 track), load a race config file.
 	else
-		snprintf(pszDirPath, nMaxLen, "%sconfig/raceman/%s", GfLocalDir(), ReInfo->_reFilename);
+		strDirPath += "config/raceman/";
+	
+	strDirPath += pRaceMan->getId();
 
-	return pszDirPath;
+	return strDirPath;
 }
 
 static bool
 reCanLoadRace()
 {
-	void *params = ReInfo->params;
-
-	// Determine the source folder.
-	char pszDirPath[256];
-	reGetLoadFileDir(pszDirPath, sizeof(pszDirPath));
-
 	// Get the list of files in the target folder.
-	tFList *pFileList = GfDirGetListFiltered(pszDirPath, "", PARAMEXT);
+	std::string strDirPath = reGetLoadFileDir();
+	tFList *pFileList = GfDirGetListFiltered(strDirPath.c_str(), "", PARAMEXT);
 
 	// Now we know what to answer.
 	const bool bAnswer = (pFileList != 0);
@@ -128,25 +125,24 @@ reCanLoadRace()
 static bool
 reCanSaveRace()
 {
-	void *params = ReInfo->params;
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
 	// Multi-events race types are automatically saved in config/raceman/results
-	return GfParmGetEltNb(params, RM_SECT_TRACKS) == 1;
+	return pRaceMan->getEventCount() == 1;
 }
 
 static void
 reOnRaceDataChanged()
 {
-	char buf[128];
-	void *params = ReInfo->params;
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
-	// Retrieve track infos.
-	const char* pszTrackId = GfParmGetStr(ReInfo->params, "Tracks/1", RM_ATTR_NAME, "");
-	const GfTrack* pTrack = GfTracks::self()->getTrack(pszTrackId);
+	// Get the current track.
+	const GfTrack* pTrack = ReGetRace()->getTrack();
 
 	// Set title (race type + track name).
-	snprintf(buf, sizeof(buf), "%s at %s", ReInfo->_reName, pTrack->getName().c_str());
-	GfuiLabelSetText(ScrHandle, TitleLabelId, buf);
+	std::ostringstream ossText;
+	ossText << pRaceMan->getName() << " at " << pTrack->getName();
+	GfuiLabelSetText(ScrHandle, TitleLabelId, ossText.str().c_str());
 
 	// Display track name, outline image and preview image
 	GfuiScreenAddBgImg(ScrHandle, pTrack->getPreviewFile().c_str());
@@ -158,86 +154,64 @@ reOnRaceDataChanged()
 	GfuiEnable(ScrHandle, SaveRaceButtonId, 
 			   reCanSaveRace() ? GFUI_ENABLE : GFUI_DISABLE);
 
-	// Re-load competitors scroll list from the race file.
+	// Re-load competitors scroll list from the race.
 	GfuiScrollListClear(ScrHandle, CompetitorsScrollListId);
 	VecCompetitorsInfo.clear();
-	const int nCompetitors = GfParmGetEltNb(ReInfo->params, RM_SECT_DRIVERS);
-    for (int nCompIndex = 1; nCompIndex <= nCompetitors; nCompIndex++)
+	const std::vector<GfDriver*>& vecCompetitors = ReGetRace()->getCompetitors();
+    for (int nCompIndex = 0; nCompIndex < (int)vecCompetitors.size(); nCompIndex++)
 	{
-		snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_DRIVERS, nCompIndex);
-		const char* pszCompModuleName = GfParmGetStr(ReInfo->params, buf, RM_ATTR_MODULE, "");
-		int nCompItfIdx = (int)GfParmGetNum(ReInfo->params, buf, RM_ATTR_IDX, (char*)NULL, 0);
-
-		const GfDriver* pComp =
-			GfDrivers::self()->getDriver(pszCompModuleName, nCompItfIdx);
-		if (pComp)
-		{
-			snprintf(buf, sizeof(buf), "%s (%s)", pComp->getName().c_str(), pComp->getCar()->getName().c_str());
-			VecCompetitorsInfo.push_back(buf);
-			GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId,
-										VecCompetitorsInfo.back().c_str(), nCompIndex, (void*)pComp);
-			GfLogDebug("Added competitor %s (%s#%d)\n", buf, pszCompModuleName, nCompItfIdx);
-		}
-		else
-			GfLogWarning("Ignoring competitor %s#%d (no such driver available)\n",
-						 pszCompModuleName, nCompItfIdx);
+		const GfDriver* pComp = vecCompetitors[nCompIndex];
+		ossText.str("");
+		ossText << pComp->getName() << " (" << pComp->getCar()->getName() << ')';
+		VecCompetitorsInfo.push_back(ossText.str());
+		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId,
+									VecCompetitorsInfo.back().c_str(), nCompIndex+1, (void*)pComp);
+		GfLogDebug("Added competitor %s (%s#%d)\n", ossText.str().c_str(),
+				   pComp->getModuleName().c_str(),  pComp->getInterfaceIndex());
 	}
 }
 
 static void
 reLoadRaceFromResultsFile(const char *filename)
 {
-	char pszFileName[256];
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
-	snprintf(pszFileName, sizeof(pszFileName), "%sresults/%s/%s", GfLocalDir(), ReInfo->_reFilename, filename);
-	GfLogInfo("Loading saved race from %s ...\n", pszFileName);
+	// Determine the full path-name of the result file.
+	std::ostringstream ossResFileName;
+	ossResFileName << GfLocalDir() << "results/" << pRaceMan->getId() << '/' << filename;
 
-	// Update race data.
-	ReInfo->mainResults = GfParmReadFile(pszFileName, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	ReInfo->results = ReInfo->mainResults;
-	ReInfo->_reRaceName = ReInfo->_reName;
-	
-	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
+	GfLogInfo("Restoring race from results %s ...\n", ossResFileName.str().c_str());
 
-	// Fire standings screen.
-	RmShowStandings(ReInfo->_reGameScreen, ReInfo);
+	// Restore the race from the result file.
+	ReRaceRestore(ReGetRace()->getManager(), ossResFileName.str().c_str());
 }
 
 static void
 reLoadRaceFromConfigFile(const char *filename)
 {
-	char pszSelFilePathName[256];
-	snprintf(pszSelFilePathName, sizeof(pszSelFilePathName), "%sconfig/raceman/%s/%s",
-			 GfLocalDir(), ReInfo->_reFilename, filename);
-	GfLogInfo("Loading saved race from %s ...\n", pszSelFilePathName);
+	GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
-	// Replace the main race file by the selected one.
-	char pszMainFilePathName[256];
-	snprintf(pszMainFilePathName, sizeof(pszMainFilePathName), "%sconfig/raceman/%s%s",
-			 GfLocalDir(), ReInfo->_reFilename, PARAMEXT);
-	if (!GfFileCopy(pszSelFilePathName, pszMainFilePathName))
+	// Determine the full path-name of the selected race config file.
+	std::ostringstream ossSelFileName;
+	ossSelFileName << GfLocalDir() << "config/raceman/" << pRaceMan->getId() << '/' << filename;
+
+	GfLogInfo("Loading saved race from config %s ...\n", ossSelFileName.str().c_str());
+
+	// Replace the main race config file by the selected one.
+	const std::string strMainFileName = pRaceMan->getDescriptorFileName();
+	if (!GfFileCopy(ossSelFileName.str().c_str(), strMainFileName.c_str()))
 	{
-		GfLogError("Failed to load selected race file %s", pszSelFilePathName);
+		GfLogError("Failed to load selected race config file %s", strMainFileName.c_str());
 		return;
 	}
 	
-	// Update race data.
-	GfParmReleaseHandle(ReInfo->params);
-	ReInfo->mainParams = ReInfo->params = GfParmReadFile(pszMainFilePathName, GFPARM_RMODE_STD);
-	ReInfo->_reName = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	ReInfo->_reRaceName = ReInfo->_reName;
+	// Update the race manager.
+	void* hparmRaceMan = GfParmReadFile(strMainFileName.c_str(), GFPARM_RMODE_STD);
+	pRaceMan->reset(hparmRaceMan, /* bClosePrevHdle= */ true);
+
+	// Notify the race engine of the changes.
+	ReRaceSelectRaceman(pRaceMan);
 	
-	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
-
-	// Update the race manager (the params handle changed).
-	GfRaceManager* pRaceMan = GfRaceManagers::self()->getRaceManager(ReInfo->_reFilename);
-	if (pRaceMan)
-		pRaceMan->setDescriptorHandle(ReInfo->params);
-	else
-		GfLogError("No such race manager (id=%s)\n", ReInfo->_reFilename);
-
 	// Update GUI.
 	reOnRaceDataChanged();
 }
@@ -246,22 +220,19 @@ static void
 reSaveRaceToConfigFile(const char *filename)
 {
 	// Note: No need to write the main file here, already done at the end of race configuration.
-	char pszMainFilePathName[256];
-	snprintf(pszMainFilePathName, sizeof(pszMainFilePathName), "%sconfig/raceman/%s%s",
-			 GfLocalDir(), ReInfo->_reFilename, PARAMEXT);
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
-	// Add .xml extension if not there.
-	char pszSelFilePathName[256];
-	snprintf(pszSelFilePathName, sizeof(pszSelFilePathName), "%sconfig/raceman/%s/%s",
-			GfLocalDir(), ReInfo->_reFilename, filename);
-	const char* pszFileExt = strrchr(pszSelFilePathName, '.');
-	if (!pszFileExt || strcmp(pszFileExt, PARAMEXT))
-		strcat(pszSelFilePathName, PARAMEXT);
+	// Determine the full path-name of the target race config file (add .xml ext. if not there).
+	std::ostringstream ossTgtFileName;
+	ossTgtFileName << GfLocalDir() << "config/raceman/" << pRaceMan->getId() << '/' << filename;
+	if (ossTgtFileName.str().rfind(PARAMEXT) != ossTgtFileName.str().length() - strlen(PARAMEXT))
+		ossTgtFileName << PARAMEXT;
 
 	// Copy the main file to the selected one (overwrite if already there).
-	GfLogInfo("Saving race config to %s ...\n", pszSelFilePathName);
-	if (!GfFileCopy(pszMainFilePathName, pszSelFilePathName))
-		GfLogError("Failed to save race to selected config file %s", pszSelFilePathName);
+	const std::string strMainFileName = pRaceMan->getDescriptorFileName();
+	GfLogInfo("Saving race config to %s ...\n", strMainFileName.c_str());
+	if (!GfFileCopy(strMainFileName.c_str(), ossTgtFileName.str().c_str()))
+		GfLogError("Failed to save race to selected config file %s", ossTgtFileName.str().c_str());
 }
 
 static void
@@ -287,18 +258,18 @@ reOnPlayerConfig(void * /* dummy */)
 static void
 reOnLoadRaceFromFile(void *pPrevMenu)
 {
-	void *params = ReInfo->params;
-
-	fs.title = ReInfo->_reName;
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	
+	fs.title = pRaceMan->getName();
 	fs.prevScreen = pPrevMenu;
 	fs.mode = RmFSModeLoad;
 
-	char pszDirPath[256];
-	fs.path = reGetLoadFileDir(pszDirPath, 256);
+	std::string strDirPath = reGetLoadFileDir();
+	fs.path = strDirPath;
 
 	// For race types with more than 1 event (= 1 race on 1 track), load a race result file,
 	// as the previous race standings has an influence on the next race starting grid.
-	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1)
+	if (pRaceMan->getEventCount() > 1)
 		fs.select = reLoadRaceFromResultsFile;
 	
 	// But for race types with only 1 event (= 1 race on 1 track), load a race config file.
@@ -312,17 +283,16 @@ reOnLoadRaceFromFile(void *pPrevMenu)
 static void
 reOnSaveRaceToFile(void *pPrevMenu)
 {
-	void *params = ReInfo->params;
-
+	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	
 	// Fill-in file selection descriptor
-	fs.title = ReInfo->_reName;
+	fs.title = pRaceMan->getName();
 	fs.prevScreen = pPrevMenu;
 	fs.mode = RmFSModeSave;
 
-	char pszDirPath[256];
-	snprintf(pszDirPath, sizeof(pszDirPath), "%sconfig/raceman/%s",
-			 GfLocalDir(), ReInfo->_reFilename);
-	fs.path = pszDirPath;
+	fs.path = GfLocalDir();
+	fs.path += "config/raceman/";
+	fs.path += pRaceMan->getId();
 
 	fs.select = reSaveRaceToConfigFile;
 
@@ -341,10 +311,8 @@ reOnActivate(void * /* dummy */)
 }
 
 int
-ReRacemanMenu(void)
+ReRacemanMenu()
 {
-	void *params = ReInfo->params;
-
 	// Special case of the online race.
 	if (!strcmp(ReInfo->_reName, "Online Race"))
 	{

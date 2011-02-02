@@ -322,7 +322,7 @@ reTrackInitWeather(void)
 			else
 				rain = TR_RAIN_HEAVY;
 			
-			// Whatever rain level, heavy clouds.
+			// Whatever rain level (except for none), heavy clouds.
 			clouds = TR_CLOUDS_FULL;
 		}
 		else
@@ -335,6 +335,12 @@ reTrackInitWeather(void)
 		}
 		
 		pszWeatherSelect = "randomly selected";
+	}
+	else
+	{
+		if (rain != TR_RAIN_NONE)
+			// Whatever rain level (except for none), heavy clouds.
+			clouds = TR_CLOUDS_FULL;
 	}
 
 	// Ground water = rain for the moment (might change in the future).

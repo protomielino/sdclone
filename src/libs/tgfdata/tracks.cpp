@@ -278,6 +278,121 @@ std::vector<std::string> GfTracks::getTrackNamesInCategory(const std::string& st
 	return vecTrackNames;
 }
 
+/** 
+ * GfTracks::getFirstUsableTrack
+ * 
+ * Retrieve the first usable track in the given category, searching in the given direction
+ * and skipping the first found if specified
+ * 
+ * @param   strCatId       Id of the category to search inside of.
+ * @param   strFromTrackId Id of the track from which to start the search.
+ * @param   nSearchDir     <0 = previous, >0 = next.
+ * @param   bSkipFrom      If true, skip the first found track.
+ */
+GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
+									   const std::string& strFromTrackId,
+									   int nSearchDir, bool bSkipFrom) const
+{
+	// Check and fix nSearchDir.
+	nSearchDir = nSearchDir > 0 ? +1 : -1;
+	
+	// Check category.
+	if (std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strCatId)
+		== _pPrivate->vecCatIds.end())
+	{
+		GfLogError("GfTracks::getFirstUsableTrack : No such category %s\n", strCatId.c_str());
+		return 0;
+	}
+
+	// Retrieve tracks in this category.
+	const std::vector<GfTrack*> vecTracksInCat = getTracksInCategory(strCatId);
+	if (vecTracksInCat.size() == 0)
+	{
+		// Should never happen, empty categories are not even created ...
+		GfLogError("GfTracks::getFirstUsableTrack : Empty category %s\n", strCatId.c_str());
+		return 0;
+	}
+	
+	// Retrieve the index of the specified track to start from, if any.
+	int nCurTrackInd = 0;
+	if (!strFromTrackId.empty())
+	{
+		std::vector<GfTrack*>::const_iterator itTrack = vecTracksInCat.begin();
+		while (itTrack != vecTracksInCat.end())
+		{
+			if ((*itTrack)->getId() == strFromTrackId)
+			{
+				nCurTrackInd = itTrack - vecTracksInCat.begin();
+				break;
+			}
+			itTrack++;
+		}
+	}
+	
+	int nTrackInd = nCurTrackInd;
+	if (bSkipFrom || !vecTracksInCat[nTrackInd]->isUsable())
+	{
+		const int nPrevTrackInd = nCurTrackInd;
+		do
+		{
+			nTrackInd =
+				(nTrackInd + nSearchDir + vecTracksInCat.size()) % vecTracksInCat.size();
+		}
+		while (nTrackInd != nPrevTrackInd && !vecTracksInCat[nTrackInd]->isUsable());
+	}
+
+	GfTrack* pTrack = 0;
+	if (vecTracksInCat[nTrackInd]->isUsable())
+		pTrack = vecTracksInCat[nTrackInd];
+
+	return pTrack;
+}
+				  
+/** 
+ * GfTracks::getFirstUsableTrack
+ * 
+ * Retrieve the first usable track among all categories, searching in the given direction
+ * from the given category, but skipping it if specified
+ * 
+ * @param   strFromCatId   Id of the category to search inside of.
+ * @param   nSearchDir     <0 = previous, >0 = next.
+ * @param   bSkipFrom      If true, skip the first found track.
+ */
+GfTrack* GfTracks::getFirstUsableTrack(const std::string& strFromCatId,
+									   int nSearchDir, bool bSkipFrom) const
+{
+	// Check and fix nSearchDir.
+	nSearchDir = nSearchDir > 0 ? +1 : -1;
+	
+	// Retrieve and check category.
+	const std::vector<std::string>& vecCatIds = GfTracks::self()->getCategoryIds();
+	std::vector<std::string>::const_iterator itFromCat =
+		std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strFromCatId);
+	if (itFromCat == _pPrivate->vecCatIds.end())
+	{
+		GfLogError("GfTracks::getFirstUsableTrack : No such category %s\n", strFromCatId.c_str());
+		return 0;
+	}
+
+	int nCatInd = itFromCat - _pPrivate->vecCatIds.begin();
+
+	GfTrack* pTrack = 0;
+
+	if (bSkipFrom || !(pTrack = getFirstUsableTrack(_pPrivate->vecCatIds[nCatInd])))
+	{
+		const int nPrevCatInd = nCatInd;
+		do
+		{
+			nCatInd =
+				(nCatInd + nSearchDir + _pPrivate->vecCatIds.size()) % _pPrivate->vecCatIds.size();
+			pTrack = getFirstUsableTrack(_pPrivate->vecCatIds[nCatInd]);
+		}
+		while (nCatInd != nPrevCatInd && !pTrack);
+	}
+
+	return pTrack;
+}
+	
 void GfTracks::print(bool bVerbose) const
 {
 	GfLogTrace("Track base : %d categories, %d tracks\n",

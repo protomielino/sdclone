@@ -28,6 +28,7 @@
 #include <racescreens.h>
 #include <network.h>
 
+#include "raceutil.h" // RmGetFeaturesList
 #include "racesituation.h"
 #include "racecareer.h"
 #include "raceinit.h"

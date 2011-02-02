@@ -27,7 +27,9 @@
 #include <cstdio>
 
 #include <tgfclient.h>
+
 #include <raceman.h>
+
 #include <racescreens.h>
 
 #include "racesituation.h"

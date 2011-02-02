@@ -23,6 +23,7 @@
 
 #include <raceman.h>
 
+#include "tracks.h"
 #include "racemanagers.h"
 
 
@@ -99,7 +100,6 @@ GfRaceManagers::GfRaceManagers()
 			}
 		}
 		
-		//const std::string strRaceManId(pFile->name, strlen(pFile->name) - strlen(PARAMEXT));
 		std::string strRaceManId(pFile->name);
 		strRaceManId.erase(strlen(pFile->name) - strlen(PARAMEXT));
 		if (!hparmRaceMan)
@@ -109,14 +109,8 @@ GfRaceManagers::GfRaceManagers()
 			continue;
 		}
 
-		// Read race manager info and store it in the GfRaceManager structure.
-		GfRaceManager* pRaceMan = new GfRaceManager;
-		pRaceMan->setId(strRaceManId);
-		pRaceMan->setName(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_NAME, "<unknown>"));
-		pRaceMan->setType(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_TYPE, "<unknown>"));
-		pRaceMan->setSubType(GfParmGetStr(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_SUBTYPE, ""));
-		pRaceMan->setPriority((int)GfParmGetNum(hparmRaceMan, RM_SECT_HEADER, RM_ATTR_PRIO, NULL, 10000));
-		pRaceMan->setDescriptorHandle(hparmRaceMan);
+		// Create the race manager and load it from the params file.
+		GfRaceManager* pRaceMan = new GfRaceManager(strRaceManId, hparmRaceMan);
 
 		// Update the GfRaceManagers singleton.
 		_pPrivate->vecRaceMans.push_back(pRaceMan);
@@ -132,6 +126,7 @@ GfRaceManagers::GfRaceManagers()
 	// Sort the race manager vector by priority.
 	std::sort(_pPrivate->vecRaceMans.begin(), _pPrivate->vecRaceMans.end(), hasHigherPriority);
 
+	// And log what we've got now.
 	print();
 }
 
@@ -161,7 +156,7 @@ GfRaceManager* GfRaceManagers::getRaceManagerWithName(const std::string& strName
 	return 0;
 }
 
-const std::vector<GfRaceManager*> GfRaceManagers::getRaceManagersWithType(const std::string& strType) const
+std::vector<GfRaceManager*> GfRaceManagers::getRaceManagersWithType(const std::string& strType) const
 {
 	std::vector<GfRaceManager*> vecRaceMans;
 
@@ -193,13 +188,92 @@ void GfRaceManagers::print() const
 
 // GfRaceManager class ---------------------------------------------------------------
 
-GfRaceManager::GfRaceManager() : _nPriority(-1), _hparmHandle(0)
+GfRaceManager::GfRaceManager(const std::string& strId, void* hparmHandle)
 {
+	_strId = strId;
+
+	// Load constant properties (never changed afterwards).
+	_strName = GfParmGetStr(hparmHandle, RM_SECT_HEADER, RM_ATTR_NAME, "<unknown>");
+	_strType = GfParmGetStr(hparmHandle, RM_SECT_HEADER, RM_ATTR_TYPE, "<unknown>");
+	_strSubType = GfParmGetStr(hparmHandle, RM_SECT_HEADER, RM_ATTR_SUBTYPE, "");
+	_nPriority = (int)GfParmGetNum(hparmHandle, RM_SECT_HEADER, RM_ATTR_PRIO, NULL, 10000);
+
+	// Load other "mutable" properties.
+	reset(hparmHandle, false);
 }
 
+void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
+{
+	if (bClosePrevHdle && _hparmHandle)
+		GfParmReleaseHandle(_hparmHandle);
+	_hparmHandle = hparmHandle;
+
+	// Get current event in the schedule.
+	_nCurrentEventInd =
+		(int)GfParmGetNum(_hparmHandle, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1) - 1;
+
+	// Load track id for each event in the schedule.
+	std::ostringstream ossSectionPath;
+	int nEventNum = 1;
+	const char* pszTrackId;
+	do
+	{
+		ossSectionPath.str("");
+		ossSectionPath << RM_SECT_TRACKS << '/' << nEventNum;
+		pszTrackId = GfParmGetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
+		if (pszTrackId)
+		{
+			_vecEventTrackIds.push_back(pszTrackId);
+			nEventNum++;
+		}
+	}
+	while (pszTrackId);
+}
+
+void GfRaceManager::save()
+{
+	if (!_hparmHandle)
+		return;
+
+	// Note: No need to save constant properties (never changed).
+	
+	// Current event in the schedule.
+	GfParmSetNum(_hparmHandle, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL,
+				 (tdble)(_nCurrentEventInd + 1));
+	
+	// Info about each event in the schedule.
+	std::ostringstream ossSectionPath;
+	for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
+	{
+		ossSectionPath.str("");
+		ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
+		GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
+					 _vecEventTrackIds[nEventInd].c_str());
+		GfTrack* pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[nEventInd]);
+		GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY,
+					 pTrack->getCategoryId().c_str());
+	}
+}
+
+GfRaceManager::~GfRaceManager()
+{
+	if (_hparmHandle)
+		GfParmReleaseHandle(_hparmHandle);
+}
+			 
 const std::string& GfRaceManager::getId() const
 {
 	return _strId;
+}
+
+void* GfRaceManager::getDescriptorHandle() const
+{
+	return _hparmHandle;
+}
+
+std::string GfRaceManager::getDescriptorFileName() const
+{
+	return const_cast<const char*>(GfParmGetFileName(_hparmHandle));
 }
 
 const std::string& GfRaceManager::getName() const
@@ -222,38 +296,37 @@ const int GfRaceManager::getPriority() const
 	return _nPriority;
 }
 
-void* GfRaceManager::getDescriptorHandle() const
+unsigned GfRaceManager::getEventCount() const
 {
-	return _hparmHandle;
+	return _vecEventTrackIds.size();
 }
 
-void GfRaceManager::setId(const std::string& strId)
+bool GfRaceManager::stepToNextEvent()
 {
-	_strId = strId;
+	if (_nCurrentEventInd < (int)_vecEventTrackIds.size() - 1)
+	{
+		_nCurrentEventInd++;
+		return true;
+	}
+
+	return false;
 }
 
-void GfRaceManager::setName(const std::string& strName)
+GfTrack* GfRaceManager::getCurrentEventTrack()
 {
-	_strName = strName;
+	GfTrack* pTrack;
+
+	// If the current event track is not usable, step to the next event (an so on).
+	while (!(pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[_nCurrentEventInd]))
+		   && stepToNextEvent());
+		   
+	return pTrack;
 }
 
-void GfRaceManager::setType(const std::string& strType)
+void GfRaceManager::setCurrentEventTrack(GfTrack* pTrack)
 {
-	_strType = strType ;
-}
+	if (!pTrack)
+		return;
 
-void GfRaceManager::setSubType(const std::string& strSubType)
-{
-	_strSubType = strSubType;
+	_vecEventTrackIds[_nCurrentEventInd] = pTrack->getId();
 }
-
-void GfRaceManager::setPriority(int nPriority)
-{
-	_nPriority = nPriority;
-}
-
-void GfRaceManager::setDescriptorHandle(void* hparmHandle)
-{
-	_hparmHandle = hparmHandle;
-}
-

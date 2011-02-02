@@ -33,10 +33,10 @@
 
 #include <racescreens.h>
 
+#include <race.h>
+
 #include "racesituation.h"
-//#include "racemain.h"
-//#include "raceinit.h"
-//#include "racestate.h"
+#include "raceinit.h"
 
 #include "raceenginemenus.h"
 
@@ -104,7 +104,7 @@ reConfigBackHookInit(void)
 }
 
 void
-ReConfigRunState(void)
+ReConfigRunState(bool bStart)
 {
 	char	path[256];
 	int		i;
@@ -114,23 +114,35 @@ ReConfigRunState(void)
 	const char	*opt;
 	void	*params = ReInfo->params;
 
+	// TODO: Replace any read/write to params to get/set from/to race/raceman instances ?
+	
+	// Reset config automaton to the "start" state if specified.
+	if (bStart)
+		GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
+
+	// If configuration finished, save race config to disk and go back to the raceman menu.
 	curConf = (int)GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
 	if (curConf > GfParmGetEltNb(params, RM_SECT_CONF)) {
 		GfLogInfo("%s configuration finished.\n", ReInfo->_reName);
-		GfParmWriteFile(NULL, ReInfo->params, ReInfo->_reName);
-		GfuiScreenActivate(ReGetRacemanMenuHandle()); /* Back to the race manager menu */
+		ReGetRace()->save(); // Save race data to params.
+		GfParmWriteFile(NULL, params, ReInfo->_reName); // Save params to disk.
+		GfuiScreenActivate(ReGetRacemanMenuHandle()); // Back to the race manager menu
 		return;
 	}
-	
+
+	// If wrong configuration data, back to the raceman menu.
 	snprintf(path, sizeof(path), "%s/%d", RM_SECT_CONF, curConf);
 	conf = GfParmGetStr(params, path, RM_ATTR_TYPE, 0);
 	if (!conf) {
-		GfLogError("No %s here (%s) !\n", RM_ATTR_TYPE, path);
+		GfLogError("No '%s' field in '%s' section of %s\n",
+				   RM_ATTR_TYPE, path, GfParmGetFileName(params));
 		GfuiScreenActivate(ReGetRacemanMenuHandle()); /* Back to the race manager menu */
 		return;
 	}
 
+	// Normal configuration steps :
 	GfLogInfo("%s configuration now in '%s' stage.\n", ReInfo->_reName, conf);
+	
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
 		
 		/* Track Select Menu */
@@ -140,7 +152,7 @@ ReConfigRunState(void)
 		} else {
 			ts.prevScreen = reConfigBackHookInit();
 		}
-		ts.param = ReInfo->params;
+		ts.pRace = ReGetRace();
 		ts.trackItf = ReInfo->_reTrackItf;
 		RmTrackSelect(&ts);
 
@@ -153,7 +165,7 @@ ReConfigRunState(void)
 		} else {
 			ds.prevScreen = reConfigBackHookInit();
 		}
-		ds.param = ReInfo->params;
+		ds.pRace = ReGetRace();
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
@@ -165,8 +177,7 @@ ReConfigRunState(void)
 		} else {
 			rp.prevScreen = reConfigBackHookInit();
 		}
-		rp.param = ReInfo->params;
-		rp.title = GfParmGetStr(params, path, RM_ATTR_RACE, "Race");
+		rp.pRace = ReGetRace();
 		
 		/* Select options to configure */
 		rp.confMask = 0;

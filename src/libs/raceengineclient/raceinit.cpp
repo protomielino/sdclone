@@ -36,6 +36,7 @@
 #include <teammanager.h>
 #include <robottools.h>
 #include <racemanagers.h>
+#include <race.h>
 
 #include <racescreens.h>
 
@@ -49,11 +50,21 @@
 #include "raceinit.h"
 
 
-static const char *level_str[] = { ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const char *level_str[] =
+	{ ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
 
 static tModList *reEventModList = 0;
 
+// Modules ... ?
 tModList *ReRaceModList = 0;
+
+// The race (temporary partially duplicates ReInfo, as long as not merged).
+static GfRace* PReRace = 0;
+
+GfRace* ReGetRace()
+{
+  return PReRace;
+}
 
 
 /* Race Engine Initialization */
@@ -156,24 +167,60 @@ ReStartNewRace(void * /* dummy */)
 }
 
 
+// Select the given manager for the race.
+void
+ReRaceSelectRaceman(GfRaceManager* pRaceMan)
+{
+	// Trace the chosen raceman full type.
+	std::string strFullType(pRaceMan->getType());
+	if (!pRaceMan->getSubType().empty())
+	{
+		strFullType += " / ";
+		strFullType += pRaceMan->getSubType();
+	}
+	GfLogTrace("'%s' race type selected\n", strFullType.c_str());
+	
+	// Re-init. race engine info about the race.
+	ReInfo->mainParams = ReInfo->params = pRaceMan->getDescriptorHandle();
+	ReInfo->_reName = pRaceMan->getName().c_str();
+	ReInfo->_reFilename = pRaceMan->getId().c_str();
+	
+	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
+}
+
 // Start configuring a race for the given manager
 void
-ReRaceConfigure(GfRaceManager* pRaceman)
+ReRaceConfigure(GfRaceManager* pRaceMan)
 {
-  ReInfo->mainParams = ReInfo->params = pRaceman->getDescriptorHandle();
-  ReInfo->_reName = pRaceman->getName().c_str();
-  ReInfo->_reFilename = pRaceman->getId().c_str();
+	// Select the given race manager for the race.
+	ReRaceSelectRaceman(pRaceMan);
+	
+	// If not already done, instanciate the race.
+	if (!PReRace)
+		PReRace = new GfRace();
+	
+	// (Re-)initialize it from the selected race manager.
+	PReRace->load(pRaceMan);
+	
+	// Enter CONFIG state.
+	ReStateApply(RE_STATE_CONFIG);
+}
 
-  std::string strFullType(pRaceman->getType());
-  if (!pRaceman->getSubType().empty())
-  {
-	  strFullType += " / ";
-	  strFullType += pRaceman->getSubType();
-  }
-  GfLogTrace("%s selected\n", strFullType.c_str());
-  
-  // Enter CONFIG state.
-  ReStateApply(RE_STATE_CONFIG);
+// Restore the race from the given result file
+void
+ReRaceRestore(GfRaceManager* pRaceMan, const char *pszResultFileName)
+{
+	// Select the given race manager for the race.
+	ReRaceSelectRaceman(pRaceMan);
+	
+	// Update race engine info.
+	ReInfo->mainResults = GfParmReadFile(pszResultFileName, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	ReInfo->results = ReInfo->mainResults;
+	ReInfo->_reRaceName = ReInfo->_reName;
+	
+	// Fire standings screen.
+	RmShowStandings(ReInfo->_reGameScreen, ReInfo);
 }
 
 /*

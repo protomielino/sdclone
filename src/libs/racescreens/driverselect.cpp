@@ -25,9 +25,6 @@
 */
 
 
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
 #include <algorithm>
 
 #include <tgfclient.h>
@@ -90,16 +87,13 @@ static size_t CurDriverTypeIndex = 0;
 static std::vector<GfDriverSkin> VecCurDriverPossSkins;
 static size_t CurSkinIndex = 0;
 
-// The current race.
-GfRace TheRace;
-
 // The current driver
 // (the last one the user clicked on, shown as highligthed in one of the scroll-lists).
 GfDriver* PCurrentDriver;
 
 // Local functions.
 static void rmdsFilterCandidatesScrollList(const std::string& strCarCatId,
-											const std::string& strType);
+										   const std::string& strType);
 static void rmdsClickOnDriver(void * /* dummy */);
 
 
@@ -157,12 +151,12 @@ rmdsReloadCompetitorsScrollList()
 	GfuiScrollListClear(ScrHandle, CompetitorsScrollListId);
 
 	// For each competitor in the race :
-	std::vector<GfDriver*> vecCompetitors = TheRace.getCompetitors();
+	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
 	std::vector<GfDriver*>::iterator itComp;
 	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); itComp++)
 		// Add its name to the Competitors scroll list.
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId, (*itComp)->getName().c_str(),
-									TheRace.getCompetitorsCount(), (void*)(*itComp));
+									MenuData->pRace->getCompetitorsCount(), (void*)(*itComp));
 }
 
 // Screen activation call-back.
@@ -199,8 +193,6 @@ rmdsCleanup(void)
     VecCarCategoryNames.clear();
     VecDriverTypes.clear();
     VecCurDriverPossSkins.clear();
-
-    TheRace.clear();
 }
 
 // Screen de-activation call-back.
@@ -294,7 +286,7 @@ static void
 rmdsNextMenu(void * /* dummy */)
 {
 	// Save the race data to its params file
-	TheRace.save();
+	MenuData->pRace->save();
 
 	// Finally, go back to the caller menu.
     rmdsDeactivate(MenuData->nextScreen);
@@ -326,7 +318,7 @@ rmdsMoveCompetitor(void *vd)
 		GfuiScrollListMoveSelectedElement(ScrHandle, CompetitorsScrollListId, (int)(long)vd);
 
 		// Move the competitor in the race.
-		TheRace.moveCompetitor(PCurrentDriver, (int)(long)vd);
+		MenuData->pRace->moveCompetitor(PCurrentDriver, (int)(long)vd);
 	}
 }
 
@@ -402,21 +394,21 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
     const char* name;
     int	src, dst;
     GfDriver *pDriver;
-    int	sel;
+    bool bSelect;
 
     // If the selected driver is in the Candidate scroll-list,
     // and if the max number of selected drivers has not been reached,
     // remove the driver from the Candidate scroll-list,
 	// and add him to the Competitors scroll-list and to the race competitors.
-    sel = 0;
+    bSelect = false;
     name = 0;
-    if (TheRace.acceptsMoreCompetitors()) {
+    if (MenuData->pRace->acceptsMoreCompetitors()) {
 		src = CandidatesScrollListId;
 		name = GfuiScrollListExtractSelectedElement(ScrHandle, src, (void**)&pDriver);
 		if (name) {
 			dst = CompetitorsScrollListId;
 			GfuiScrollListInsertElement(ScrHandle, dst, name, GfDrivers::self()->getCount(), (void*)pDriver);
-			TheRace.appendCompetitor(pDriver); // Now selected.
+			MenuData->pRace->appendCompetitor(pDriver); // Now selected.
 		}
     }
 
@@ -425,7 +417,7 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 	// and add him to the Candidate scroll-list
     // (if it matches the Candidate scroll-list filtering criteria)
     if (!name) {
-		sel = 1;
+		bSelect = true;
 		src = CompetitorsScrollListId;
 		name = GfuiScrollListExtractSelectedElement(ScrHandle, src, (void**)&pDriver);
 		if (name) {
@@ -440,39 +432,33 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 				GfuiScrollListInsertElement(ScrHandle, dst, name,
 											pDriver->isHuman() ? 0 : GfDrivers::self()->getCount(), (void*)pDriver);
 			}
-			TheRace.removeCompetitor(pDriver); // No more selected.
+			MenuData->pRace->removeCompetitor(pDriver); // No more selected.
 		} else {
 			return;
 		}
     }
 
     // Focused driver management (inhibited for the moment : what is it useful for ?)
-    const char *modName = GfParmGetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-    int robotIdx = (int)GfParmGetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
-    if (sel) {
-		modName = GfParmGetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-		robotIdx = (int)GfParmGetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
-		if (pDriver->getInterfaceIndex() == robotIdx && pDriver->getModuleName() == modName) {
+	const GfDriver* pFocDriver = MenuData->pRace->getFocusedCompetitor();
+    if (bSelect) {
+		if (MenuData->pRace->isCompetitorFocused(pDriver)) {
 			/* the focused element was deselected : select a new one */
 			name = GfuiScrollListGetElement(ScrHandle, CompetitorsScrollListId, 0, (void**)&pDriver);
 			if (name) {
-				GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, pDriver->getModuleName().c_str());
-				GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, pDriver->getInterfaceIndex());
+				MenuData->pRace->setFocusedCompetitor(pDriver);
 #ifdef FOCUS
 				GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, pDriver->getName.c_str());
 #endif
 			} else {
-				GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-				GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, 0);
+				MenuData->pRace->setFocusedCompetitor(0);
 #ifdef FOCUS
 				GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, "");
 #endif
 			}
 		}
     } else {
-		if (strlen(modName) == 0 || pDriver->isHuman()) {
-			GfParmSetStr(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, pDriver->getModuleName().c_str());
-			GfParmSetNum(MenuData->param, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, (char*)NULL, pDriver->getInterfaceIndex());
+		if (!pFocDriver || pDriver->isHuman()) {
+			MenuData->pRace->setFocusedCompetitor(pDriver);
 #ifdef FOCUS
 			GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, pDriver->getName().c_str());
 #endif
@@ -483,7 +469,7 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
     rmdsClickOnDriver(0);
 
     // Don't allow user to Accept 0 drivers, this would cause a crash.
-    GfuiEnable(ScrHandle, NextButtonId, TheRace.getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+    GfuiEnable(ScrHandle, NextButtonId, MenuData->pRace->getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
 
 	// For a smart display refresh, when automatically called multiple time.
     GfuiDisplay();
@@ -520,7 +506,7 @@ rmdsSelectRandomCandidates(void * /* dummy */ )
 	unsigned nCount = 1;
 	int nCandidates;
 	while (nCount <= nRandomCompetitors
-		   && TheRace.acceptsMoreCompetitors()
+		   && MenuData->pRace->acceptsMoreCompetitors()
 		   && (nCandidates = GfuiScrollListGetNumberOfElements(ScrHandle, CandidatesScrollListId)) > 0)
 	{
 		// Pick-up a random candidate from the candidate scroll-list.
@@ -541,7 +527,7 @@ static void
 rmdsShuffleCompetitors(void * /* dummy */ )
 {
 	// Shuffle the race competitor list and reload the scroll-list.
-	TheRace.shuffleCompetitors();
+	MenuData->pRace->shuffleCompetitors();
 	rmdsReloadCompetitorsScrollList();
 
     // Re-highlight the previously highlighted driver if any
@@ -646,15 +632,12 @@ RmDriversSelect(void *vs)
     GfuiMenuDefaultKeysAdd(ScrHandle);
     rmdsAddKeys();
 
-    // Load the race data from the params file.
-	TheRace.load(MenuData->param);
-
 	// Fill-in the competitors scroll-list.
 	rmdsReloadCompetitorsScrollList();
 	
 	// Initialize the currently highlighted driver.
 	PCurrentDriver = 0;
-	std::vector<GfDriver*> vecCompetitors = TheRace.getCompetitors();
+	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
 	std::vector<GfDriver*>::iterator itComp;
 	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); itComp++)
 		// Initialize the current driver (the last human driver, or else of the last driver).
@@ -675,7 +658,7 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 	GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 
     // Fill it with drivers that match the filter criteria and are not among competitors.
-	const std::vector<GfDriver*>& vecCompetitors = TheRace.getCompetitors();
+	const std::vector<GfDriver*>& vecCompetitors = MenuData->pRace->getCompetitors();
 	const std::string strCarCatIdFilter = (strCarCatId == AnyCarCategory ? "" : strCarCatId);
 	const std::string strTypeFilter = (strType == AnyDriverType ? "" : strType);
 	const std::vector<GfDriver*> vecCandidates =

@@ -61,10 +61,11 @@ class TGFDATA_API GfDriver
 {
 public:
 
-	GfDriver();
-	
-public:
+	GfDriver(const std::string& strModuleName, int nItfIndex,
+			 const std::string& strName, void* hparmRobot);
 
+	void load(void* hparmRobot);
+	
 	const std::string& getName() const;
 	const std::string& getModuleName() const;
 	int getInterfaceIndex() const;
@@ -76,10 +77,14 @@ public:
 	bool matchesTypeAndCategory(const std::string& strType = "",
 								const std::string& strCarCatId = "") const;
 
-	void setName(const std::string& strName);
-	void setModuleName(const std::string& strModName);
-	void setInterfaceIndex(int nItfIndex);
-	void setIsHuman(bool bIsHuman);
+	int getSupportedFeatures() const;
+	
+	double getSkillLevel() const;
+
+// 	void setName(const std::string& strName);
+// 	void setModuleName(const std::string& strModName);
+// 	void setInterfaceIndex(int nItfIndex);
+// 	void setIsHuman(bool bIsHuman);
 	void setCar(const GfCar* pCar);
 	void setSkin(const GfDriverSkin& skin);
 
@@ -107,6 +112,9 @@ protected:
 	GfDriverSkin _skin;         // Skin
 
 	mutable std::string _strType;     // Type ~ module type (ex: "simplix", "usr")
+
+	double _fSkillLevel; // From 0 (pro) to 10 (rookie).
+	int _nFeatures; // Bit mask built with RM_FEATURE_*
 };
 
 class TGFDATA_API GfDrivers
