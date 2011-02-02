@@ -414,7 +414,7 @@ grLoadBackground(void)
 	glClearColor(graphic->bgColor[0], graphic->bgColor[1], graphic->bgColor[2], 1.0);
 
 	TheBackground = new ssgRoot();
-	clr[0] = clr[1] = clr[2] = 1.0 / (1.0 + 0.5 * grTrack->local.rain); //1.0;
+	clr[0] = clr[1] = clr[2] = 1.0 / (1.0 + 1.0 * grTrack->local.rain);
 	clr[3] = 1.0;
 	nrm[0] = nrm[2] = 0.0;
 	nrm[1] = 1.0;
