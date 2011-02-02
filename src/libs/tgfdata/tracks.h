@@ -113,7 +113,7 @@ public:
  	std::vector<std::string> getTrackIdsInCategory(const std::string& strCatId = "") const;
  	std::vector<std::string> getTrackNamesInCategory(const std::string& strCatId = "") const;
 	
-	GfTrack* getFirstUsableTrack(const std::string& strCatId,
+	GfTrack* getFirstUsableTrack(const std::string& strCatId = "",
 								 const std::string& strFromTrackId = "",
 								 int nSearchDir = +1, bool bSkipFrom = false) const;
 	GfTrack* getFirstUsableTrack(const std::string& strFromCatId,

@@ -297,8 +297,9 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 	nSearchDir = nSearchDir > 0 ? +1 : -1;
 	
 	// Check category.
-	if (std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strCatId)
-		== _pPrivate->vecCatIds.end())
+	if (!strCatId.empty()
+		&& std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strCatId)
+		   == _pPrivate->vecCatIds.end())
 	{
 		GfLogError("GfTracks::getFirstUsableTrack : No such category %s\n", strCatId.c_str());
 		return 0;

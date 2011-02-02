@@ -316,9 +316,10 @@ GfTrack* GfRaceManager::getCurrentEventTrack()
 {
 	GfTrack* pTrack;
 
-	// If the current event track is not usable, step to the next event (an so on).
-	while (!(pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[_nCurrentEventInd]))
-		   && stepToNextEvent());
+	// If the current event track is not usable, take the first usable one.
+	pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[_nCurrentEventInd]);
+	if (!pTrack)
+		pTrack = GfTracks::self()->getFirstUsableTrack();
 		   
 	return pTrack;
 }

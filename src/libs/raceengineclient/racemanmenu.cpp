@@ -136,7 +136,7 @@ reOnRaceDataChanged()
 {
 	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 
-	// Get the current track.
+	// Get the currently selected track for the race (should never fail, unless no track at all).
 	const GfTrack* pTrack = ReGetRace()->getTrack();
 
 	// Set title (race type + track name).
