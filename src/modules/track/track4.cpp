@@ -762,11 +762,21 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 	int i;
 	int			segId;
-	
+
+	//Set each pit-related ptr to initial value
+	pitEntrySeg = NULL;
+	pitExitSeg = NULL;
+	pitStart = NULL;
+	pitBuildingsStart = NULL; 
+	pitEnd = NULL;
+
+	//Search for the pit section in the track XML file
 	pits = &(theTrack->pits);
 	sprintf(path2, "%s/%s", TRK_SECT_MAIN, TRK_SECT_PITS);
 	char *segName = GfParmGetStrNC(TrackHandle, path2, TRK_ATT_ENTRY, NULL);
 	
+	//If there exists a pit section, we search and set each ptr
+	//to the appropriate part of the pit.
 	bool found = false;
 	if (segName != 0) {
 		//Search for pit entry
