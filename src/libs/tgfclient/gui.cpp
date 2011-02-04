@@ -502,12 +502,10 @@ GfuiScreenActivate(void *screen)
 		{
 			gfuiSelectNext(NULL);
 		}
-		GfLogDebug("GfuiScreenActivate : GfelSetDisplayCB(GfuiDisplay)\n");
 		GfelSetDisplayCB(GfuiDisplay);
 	} 
 	else 
 	{
-		GfLogDebug("GfuiScreenActivate : GfelSetDisplayCB(GfuiDisplayNothing)\n");
 		GfelSetDisplayCB(GfuiDisplayNothing);
 	}
 	
@@ -553,7 +551,6 @@ GfuiScreenDeactivate(void)
   	GfelSetMouseMotionCB(0);
 	GfelSetMousePassiveMotionCB(0);
  	GfelSetIdleCB(0);
-	GfLogDebug("GfuiScreenDeactivate : GfelSetDisplayCB(GfuiDisplayNothing)\n");
  	GfelSetDisplayCB(GfuiDisplayNothing);
 }
 
