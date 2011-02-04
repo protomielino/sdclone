@@ -303,9 +303,6 @@ reOnSaveRaceToFile(void *pPrevMenu)
 static void
 reOnActivate(void * /* dummy */)
 {
-	// Initialize GfTracks' track module interface (needed for some track infos).
-	GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
-	
 	// Update GUI.
 	reOnRaceDataChanged();
 }

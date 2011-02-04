@@ -198,6 +198,14 @@ void GfRace::load(GfRaceManager* pRaceMan)
 						 pszModName, nItfIndex);
 			continue;
 		}
+
+		// Check if this driver can compete in this race.
+		if (pCompetitor->isNetwork() && !pRaceMan->isNetwork())
+		{
+			GfLogWarning("Ignoring '%s' driver #%d (%s) : Network humans can only race in network races\n",
+						 pszModName, nItfIndex, pCompetitor->getName().c_str());
+			continue;
+		}
 		
 		// We've got it : if we can keep it for the race, make it a competitor
 		// (there is a threshold on the number of competitors) :

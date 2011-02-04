@@ -35,6 +35,7 @@
 
 #include <cars.h>
 #include <drivers.h>
+#include <racemanagers.h>
 #include <race.h>
 
 #include "racescreens.h"
@@ -606,7 +607,14 @@ RmDriversSelect(void *vs)
 	VecCarCategoryNames = GfCars::self()->getCategoryNames();
     VecCarCategoryNames.push_back(AnyCarCategory);
 
-	VecDriverTypes = GfDrivers::self()->getTypes();
+	std::vector<std::string>::const_iterator itDrvType = GfDrivers::self()->getTypes().begin();
+	while (itDrvType != GfDrivers::self()->getTypes().end())
+	{
+		// No network human in non network races.
+		if (*itDrvType != "networkhuman" || MenuData->pRace->getManager()->isNetwork())
+			VecDriverTypes.push_back(*itDrvType);
+		itDrvType++;
+	}
     VecDriverTypes.push_back(AnyDriverType);
 	
     // Current Driver Info

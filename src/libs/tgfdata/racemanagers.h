@@ -49,6 +49,7 @@ public:
 	const std::string& getName() const;
 	const std::string& getType() const;
 	const std::string& getSubType() const;
+	bool isNetwork() const;
 	const int getPriority() const;
 
 	unsigned getEventCount() const;

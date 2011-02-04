@@ -391,6 +391,11 @@ bool GfDriver::isHuman() const
 	return _bIsHuman;
 }
 
+bool GfDriver::isNetwork() const
+{
+	return _strModName == "networkhuman";
+}
+
 const GfCar* GfDriver::getCar() const
 {
 	return _pCar;

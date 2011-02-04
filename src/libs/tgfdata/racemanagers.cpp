@@ -291,6 +291,11 @@ const std::string& GfRaceManager::getSubType() const
 	return _strSubType;
 }
 
+bool GfRaceManager::isNetwork() const
+{
+	return _strType == "Online";
+}
+
 const int GfRaceManager::getPriority() const
 {
 	return _nPriority;

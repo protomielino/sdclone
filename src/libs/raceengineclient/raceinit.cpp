@@ -35,6 +35,8 @@
 #include <robot.h>
 #include <teammanager.h>
 #include <robottools.h>
+
+#include <tracks.h>
 #include <racemanagers.h>
 #include <race.h>
 
@@ -92,6 +94,9 @@ ReInit(void)
   if (GfModLoad(0, key, &reEventModList))
 	  return;
   reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reTrackItf);
+
+  // Initialize GfTracks' track module interface (needed for some track infos).
+  GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
 
   /* The graphic modules isn't loaded at this moment, so make sure _reGraphicItf equals NULL */
   memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf));

@@ -70,6 +70,7 @@ public:
 	const std::string& getModuleName() const;
 	int getInterfaceIndex() const;
 	bool isHuman() const;
+	bool isNetwork() const;
 	const GfCar* getCar() const;
 	const std::string& getType() const;
 	const GfDriverSkin& getSkin() const;
@@ -81,10 +82,6 @@ public:
 	
 	double getSkillLevel() const;
 
-// 	void setName(const std::string& strName);
-// 	void setModuleName(const std::string& strModName);
-// 	void setInterfaceIndex(int nItfIndex);
-// 	void setIsHuman(bool bIsHuman);
 	void setCar(const GfCar* pCar);
 	void setSkin(const GfDriverSkin& skin);
 
