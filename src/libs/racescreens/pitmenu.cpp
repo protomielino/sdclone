@@ -91,14 +91,15 @@ rmRepair(void* /* dummy */)
 void
 RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 {
-    char	buf[256];
+    char buf[32];
 
     rmCar = car;
     rmCallback = callback;
 
-    if (menuHandle) {
-	GfuiScreenRelease(menuHandle);
-    }
+    if (menuHandle)
+        GfuiScreenRelease(menuHandle);
+
+	GfLogInfo("Entering Pit menu\n");
 
     // Create screen, load menu XML descriptor and create static controls.
     menuHandle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
@@ -137,8 +138,7 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
     
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddKey(menuHandle, GFUIK_F1, "Help", menuHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(menuHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 
+    // Activate the created screen.
     GfuiScreenActivate(menuHandle);
 }

@@ -90,8 +90,6 @@ rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, in
     GfuiMenuDefaultKeysAdd(screenHdle);
     GfuiAddKey(screenHdle, GFUIK_ESCAPE, aButtons[nCancelIndex].tip, 
                aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
-    GfuiAddKey(screenHdle, GFUIK_F1, "Help", screenHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(screenHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     // Activate the created screen.
     GfuiScreenActivate(screenHdle);

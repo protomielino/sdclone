@@ -324,13 +324,13 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 	tGfuiKey	*curKey;
 	tGfuiObject	*obj;
 	
-	/* user preempt key */
+	/* User-preempted key */
 	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_DOWN)) 
 	{
 		return;
 	}
 	
-	/* now see the user's defined keys */
+	/* Now look at the user's defined keys */
 	if (GfuiScreen->userKeys) {
 		curKey = GfuiScreen->userKeys;
 		do 
@@ -363,13 +363,13 @@ gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 {
 	tGfuiKey	*curKey;
 	
-	/* user preempt key */
+	/* User-preempted key */
 	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_UP)) 
 	{
 		return;
 	}
 	
-	/* now see the user's defined keys */
+	/* Now look at the user's defined keys */
 	if (GfuiScreen->userKeys) 
 	{
 		curKey = GfuiScreen->userKeys;
@@ -502,10 +502,12 @@ GfuiScreenActivate(void *screen)
 		{
 			gfuiSelectNext(NULL);
 		}
+		GfLogDebug("GfuiScreenActivate : GfelSetDisplayCB(GfuiDisplay)\n");
 		GfelSetDisplayCB(GfuiDisplay);
 	} 
 	else 
 	{
+		GfLogDebug("GfuiScreenActivate : GfelSetDisplayCB(GfuiDisplayNothing)\n");
 		GfelSetDisplayCB(GfuiDisplayNothing);
 	}
 	
@@ -551,6 +553,7 @@ GfuiScreenDeactivate(void)
   	GfelSetMouseMotionCB(0);
 	GfelSetMousePassiveMotionCB(0);
  	GfelSetIdleCB(0);
+	GfLogDebug("GfuiScreenDeactivate : GfelSetDisplayCB(GfuiDisplayNothing)\n");
  	GfelSetDisplayCB(GfuiDisplayNothing);
 }
 
@@ -746,6 +749,7 @@ void
 GfuiAddKey(void *scr, int key, const char *descr, void *userData,
 		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
+	// TODO: Support for modifier ?
 	tGfuiKey	*curKey;
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	char	buf[32];
@@ -863,20 +867,27 @@ GfuiAddKey(void *scr, int key, const char *descr, void *userData,
 		screen->userKeys = curKey->next = curKey;
 	} else {
 		// Search in the list for a definition for the same key.
+		bool bFound = false;
 		tGfuiKey* curKey2 = screen->userKeys;
 		do {
-			// Found => replace with new one.
-			if (curKey2->next->key == key) {
-				curKey->next = curKey2->next->next;
-				free(curKey2->next);
-				curKey2->next = curKey;
+			// Found => replace with the new definition.
+			if (curKey2->key == key) {
+				free(curKey2->name);
+				curKey2->name = curKey->name;
+				free(curKey2->descr);
+				curKey2->descr = curKey->descr;
+				curKey2->modifier = curKey->modifier;
+				curKey2->userData = curKey->userData;
+				curKey2->onPress = curKey->onPress;
+				curKey2->onRelease = curKey->onRelease;
+				free(curKey);
+				bFound = true;
 				break;
 			}
-			curKey2 = curKey2->next;
-		} while (curKey2 != screen->userKeys);
+		} while ((curKey2 = curKey2->next) != screen->userKeys);
 
-		// Not found => add at the end of the list.
-		if (curKey2 == screen->userKeys) {
+		// Not found => add at the beginning of the list.
+		if (not bFound) {
 			curKey->next = screen->userKeys->next;
 			screen->userKeys->next = curKey;
 			screen->userKeys = curKey;
