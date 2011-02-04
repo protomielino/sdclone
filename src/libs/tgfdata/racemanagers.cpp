@@ -181,8 +181,9 @@ void GfRaceManagers::print() const
 			getRaceManagersWithType(itType->c_str());
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
-			GfLogTrace("    %s : subtype='%s', name='%s'\n", (*itRaceMan)->getId().c_str(),
-					   (*itRaceMan)->getSubType().c_str(), (*itRaceMan)->getName().c_str());
+			GfLogTrace("    %s : subtype='%s', name='%s', events=%d\n",
+					   (*itRaceMan)->getId().c_str(), (*itRaceMan)->getSubType().c_str(),
+					   (*itRaceMan)->getName().c_str(), (*itRaceMan)->getEventCount());
 	}
 }
 
@@ -319,10 +320,14 @@ bool GfRaceManager::stepToNextEvent()
 
 GfTrack* GfRaceManager::getCurrentEventTrack()
 {
-	GfTrack* pTrack;
-
+	GfTrack* pTrack = 0;
+	
+	// If the race manager has any event, get the current one track.
+	// Note: For the moment, Career raceman has none (but this will probably change, WIP).
+	if (_vecEventTrackIds.size() > 0)
+		pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[_nCurrentEventInd]);
+	
 	// If the current event track is not usable, take the first usable one.
-	pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[_nCurrentEventInd]);
 	if (!pTrack)
 		pTrack = GfTracks::self()->getFirstUsableTrack();
 		   
