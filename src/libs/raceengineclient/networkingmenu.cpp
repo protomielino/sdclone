@@ -103,24 +103,24 @@ static void SetReadyStatus(int index,bool bStatus)
 
 static void EnableMenuHostButtons(bool bChecked)
 {
-	//Disable/enable menu selections
-	const int isEnabled = bChecked ? GFUI_ENABLE : GFUI_DISABLE;
-	GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,isEnabled);
-	GfuiEnable(racemanMenuHdle, g_HostSettingsButtonId,isEnabled);		
-	GfuiEnable(racemanMenuHdle, g_CancelButtonId,isEnabled);
-	GfuiEnable(racemanMenuHdle, g_RaceSetupId,isEnabled);
+	// Disable/enable menu selections
+	const int isEnabled = bChecked ? GFUI_DISABLE : GFUI_ENABLE;
+	GfuiEnable(racemanMenuHdle, g_CarSetupButtonId, isEnabled);
+	GfuiEnable(racemanMenuHdle, g_HostSettingsButtonId, isEnabled);		
+	GfuiEnable(racemanMenuHdle, g_CancelButtonId, isEnabled);
+	GfuiEnable(racemanMenuHdle, g_RaceSetupId, isEnabled);
 }
 
 static void onHostPlayerReady(tCheckBoxInfo* pInfo)
 {
-	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
+	SetReadyStatus(GetNetwork()->GetDriverIdx()-1, pInfo->bChecked);
 	GetNetwork()->SetDriverReady(pInfo->bChecked);
 	EnableMenuHostButtons(pInfo->bChecked);
 }
 
 static void EnableMenuClientButtons(bool bChecked)
 {
-	//Disable/enable menu selections
+	// Disable/enable menu selections
 	const int isEnabled = bChecked ? GFUI_ENABLE : GFUI_DISABLE;
 	GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,isEnabled);
 	GfuiEnable(racemanMenuHdle, g_DisconnectButtonId,isEnabled);
