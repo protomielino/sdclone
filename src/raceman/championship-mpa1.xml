@@ -71,7 +71,7 @@
     </section>
 
     <section name="9">
-      <attstr name="name" val="Corkscrew"/>
+      <attstr name="name" val="corkscrew"/>
       <attstr name="category" val="circuit"/>
     </section>
 
