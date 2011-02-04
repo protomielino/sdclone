@@ -753,7 +753,7 @@ int reMainUpdater::operator()(void)
 			// or do nothing (dual-threaded race engine : the updater thread does the job itself).
 			_pSituationUpdater->computeCurrentStep();
 			
-			// If one (human) driver is in pit, switch to the display loop to the pit menu.
+			// If one (human) driver is in pit, switch the display loop to the pit menu.
 			if (_pReInfo->_reInPitMenuCar) // Does this really work in capture mode ?
 			{
 				//if (ReInfo->_displayMode != RM_DISP_MODE_CAPTURE) {
