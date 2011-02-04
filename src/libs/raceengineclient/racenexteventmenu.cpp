@@ -64,7 +64,7 @@ ReNextEventMenu(void)
 								  NULL, (tfuiCallback)NULL, 
 								  NULL, (tfuiCallback)NULL, 
 								  1);
-	void *menuXMLDescHdle = LoadMenuXML("newtrackmenu.xml");
+	void *menuXMLDescHdle = LoadMenuXML("racenexteventmenu.xml");
 	CreateStaticControls(menuXMLDescHdle, ScrHandle);
 
 	// Create background image from race params.
