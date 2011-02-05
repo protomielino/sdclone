@@ -1916,6 +1916,7 @@ evalUnit (char *unit, tdble *dest, int invert)
 	coeff = 14.59484546f; /* kg */
     } else if (strcmp(unit, "kN") == 0) {
 	coeff = 1000.0f; /* N */
+    }
 
     if (invert) {
 	*dest /= coeff;
