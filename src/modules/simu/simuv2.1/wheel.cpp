@@ -63,8 +63,8 @@ SimWheelConfig(tCar *car, int index)
 	wheel->cosax = cos(wheel->relPos.ax);
 	wheel->sinax = sin(wheel->relPos.ax);
 
-	wheel->lfMin = MIN(0.8f, wheel->lfMin);
-	wheel->lfMax = MAX(1.6f, wheel->lfMax);
+	wheel->lfMin = MIN(0.9f, wheel->lfMin);
+	wheel->lfMax = MAX(1.1f, wheel->lfMax);
 
 	RFactor = MIN(1.0f, RFactor);
 	RFactor = MAX(0.1f, RFactor);
@@ -230,7 +230,7 @@ void SimWheelUpdateForce(tCar *car, int index)
 		car->carElt->_reaction[index] = reaction_force;
 	}
 
-	stmp = MIN(s, 1.5f);
+	stmp = MIN(s, 150.0f);
 
 	// MAGIC FORMULA
 	Bx = wheel->mfB * stmp;
