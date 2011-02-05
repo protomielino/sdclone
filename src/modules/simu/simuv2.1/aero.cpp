@@ -89,14 +89,6 @@ SimAeroUpdate(tCar *car, tSituation *s)
 	tdble speed = sqrt(car->DynGC.vel.x*car->DynGC.vel.x + car->DynGC.vel.y*car->DynGC.vel.y);
 	tdble cosa = 1.0f;
 	
-	if (speed > 1.0f) {
-		cosa = car->DynGC.vel.x/speed;
-	}
-	
-	if (cosa < 0.0f) {
-		cosa = 0.0f;
-	}
-			
     car->aero.drag = -SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK;
 
     hm = 1.5f * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);
