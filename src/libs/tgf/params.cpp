@@ -1914,7 +1914,8 @@ evalUnit (char *unit, tdble *dest, int invert)
 	coeff = 24*3600.0; /* s */
     } else if ((strcmp(unit, "slug") == 0) || (strcmp(unit, "slugs") == 0)) {
 	coeff = 14.59484546f; /* kg */
-    }
+    } else if (strcmp(unit, "kN") == 0) {
+	coeff = 1000.0f; /* N */
 
     if (invert) {
 	*dest /= coeff;
