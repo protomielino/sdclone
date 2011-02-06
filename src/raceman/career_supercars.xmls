@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="Supercars Championship %A" type="param" mode="mw" version="1.2">
+<params name="Supercars Championship %A" type="param" mode="mw" version="1.3">
 
   <section name="Header">
     <attform name="name" val="#Supercars Championship # + toAlpha(number)"/>
@@ -373,50 +373,50 @@
 
     <section name="1">
       <attnum name="idx" val="0"/>
-      <attstr name="module" val="bt"/>
+      <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
-      <attstr name="name" val="bt I"/>
-      <attstr name="car name" val="clkdtm" />
+      <attstr name="name" val="simplix I"/>
+      <attstr name="car name" val="sc-boxer-96" />
     </section>
 
     <section name="2">
       <attnum name="idx" val="1"/>
-      <attstr name="module" val="bt"/>
+      <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
-      <attstr name="name" val="bt II"/>
-      <attstr name="car name" val="clkdtm" />
+      <attstr name="name" val="simplix II"/>
+      <attstr name="car name" val="sc-boxer-96" />
     </section>
 
     <section name="3">
       <attnum name="idx" val="2"/>
-      <attstr name="module" val="bt"/>
+      <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
-      <attstr name="name" val="bt III"/>
-      <attstr name="car name" val="clkdtm" />
+      <attstr name="name" val="simplix III"/>
+      <attstr name="car name" val="sc-boxer-96" />
     </section>
 
     <section name="4">
       <attnum name="idx" val="3"/>
-      <attstr name="module" val="bt"/>
+      <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
-      <attstr name="name" val="bt IV"/>
-      <attstr name="car name" val="clkdtm" />
+      <attstr name="name" val="simplix IV"/>
+      <attstr name="car name" val="sc-boxer-96" />
     </section>
 
     <section name="5">
       <attnum name="idx" val="4"/>
-      <attstr name="module" val="bt"/>
+      <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
-      <attstr name="name" val="bt V"/>
-      <attstr name="car name" val="clkdtm" />
+      <attstr name="name" val="simplix V"/>
+      <attstr name="car name" val="sc-boxer-96" />
     </section>
 
     <section name="6">
       <attnum name="idx" val="5"/>
-      <attstr name="module" val="bt"/>
+      <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
-      <attstr name="name" val="bt VI"/>
-      <attstr name="car name" val="clkdtm" />
+      <attstr name="name" val="simplix VI"/>
+      <attstr name="car name" val="sc-boxer-96" />
     </section>
 
   </section>

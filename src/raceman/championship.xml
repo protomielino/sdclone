@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Championship" version="1.3">
+<params name="Championship" version="1.4">
   <section name="Header">
     <attstr name="name" val="Championship"/>
     <attstr name="type" val="Championship"/>
@@ -51,7 +51,7 @@
     </section>
 
     <section name="5">
-      <attstr name="name" val="wheel-2"/>
+      <attstr name="name" val="karwada"/>
       <attstr name="category" val="circuit"/>
     </section>
 
@@ -176,9 +176,12 @@
   </section>
 
   <section name="Drivers">
+
     <attnum name="maximum number" val="50"/>
-    <attstr name="focused module" val="human"/>
-    <attnum name="focused idx" val="3"/>
+    <attstr name="focused module" val="simplix_trb1"/>
+    <attnum name="focused idx" val="8"/>
+    <attstr name="rejected types" val="networkhuman"/>
+
     <section name="1">
       <attnum name="idx" val="8"/>
       <attstr name="module" val="simplix_trb1"/>

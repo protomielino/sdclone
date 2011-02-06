@@ -49,9 +49,14 @@ public:
 	const std::string& getName() const;
 	const std::string& getType() const;
 	const std::string& getSubType() const;
-	bool isNetwork() const;
 	const int getPriority() const;
 
+	bool isNetwork() const;
+	bool acceptsDriverType(const std::string& strType) const;
+	const std::vector<std::string>& getAcceptedDriverTypes() const;
+	bool acceptsCarCategory(const std::string& strCatId) const;
+	const std::vector<std::string>& getAcceptedCarCategoryIds() const;
+	
 	unsigned getEventCount() const;
 	bool stepToNextEvent();
 	GfTrack* getCurrentEventTrack();
@@ -70,6 +75,11 @@ protected:
 	std::string _strSubType; // User friendly sub-type name (ex: "", Endurance, Challenge, Supercars").
 	int         _nPriority; // Gives the order of the buttons in the race select menu
 
+	std::vector<std::string> _vecAcceptedDriverTypes;
+	std::vector<std::string> _vecAcceptedCarCategoryIds;
+
+	bool _bHasSubFiles; // True if multiple configuration files are used (ex: Career mode).
+	
 	std::vector<std::string> _vecEventTrackIds; // Id of the track for each event.
 	int _nCurrentEventInd;
 };

@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Online Race" type="param" mode="mw" version="1.17">
+<params name="Online Race" type="param" mode="mw" version="1.18">
 
     <section name="Header">
       <attstr name="name" val="Online Race"/>
@@ -60,6 +60,7 @@
 
     <section name="Drivers">
       <attnum name="maximum number" val="40"/>
+      <attstr name="rejected types" val="human"/>
     </section>
 
     <section name="Configuration">

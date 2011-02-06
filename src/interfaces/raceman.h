@@ -264,6 +264,13 @@ typedef struct RmInfo
 
 #define RM_ATTR_MAXNUM		"maximum number"
 #define RM_ATTR_MINNUM		"minimum number"
+#define RM_ATTR_FOCUSED		"focused module"
+#define RM_ATTR_FOCUSEDIDX	"focused idx"
+#define RM_ATTR_ACCEPT_TYPES	"accepted types"
+#define RM_ATTR_REJECT_TYPES	"rejected types"
+#define RM_ATTR_ACCEPT_CATEGORIES	"accepted categories"
+#define RM_ATTR_REJECT_CATEGORIES	"rejected categories"
+
 #define RM_ATTR_TOTALNUM	"total number"
 #define RM_ATTR_MAX_DRV		"maximum drivers"
 #define RM_ATTR_NUMBER		"number"
@@ -290,8 +297,6 @@ typedef struct RmInfo
 #define RM_ATTR_SKINTARGETS	"skin targets"
 #define RM_ATTR_EXTENDED	"extended"
 #define RM_ATTR_SKILLLEVEL	"skill level"
-#define RM_ATTR_FOCUSED		"focused module"
-#define RM_ATTR_FOCUSEDIDX	"focused idx"
 #define RM_ATTR_DISPMODE	"display mode"
 #define RM_ATTR_DISPRES		"display results"
 

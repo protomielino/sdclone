@@ -23,7 +23,9 @@
 
 #include <raceman.h>
 
+#include "cars.h"
 #include "tracks.h"
+#include "drivers.h"
 #include "racemanagers.h"
 
 
@@ -110,6 +112,7 @@ GfRaceManagers::GfRaceManagers()
 		}
 
 		// Create the race manager and load it from the params file.
+		GfLogDebug("GfRaceManagers::GfRaceManagers: creating '%s'\n", strRaceManId.c_str());
 		GfRaceManager* pRaceMan = new GfRaceManager(strRaceManId, hparmRaceMan);
 
 		// Update the GfRaceManagers singleton.
@@ -181,9 +184,11 @@ void GfRaceManagers::print() const
 			getRaceManagersWithType(itType->c_str());
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
+		{
 			GfLogTrace("    %s : subtype='%s', name='%s', events=%d\n",
 					   (*itRaceMan)->getId().c_str(), (*itRaceMan)->getSubType().c_str(),
 					   (*itRaceMan)->getName().c_str(), (*itRaceMan)->getEventCount());
+		}
 	}
 }
 
@@ -194,11 +199,76 @@ GfRaceManager::GfRaceManager(const std::string& strId, void* hparmHandle)
 	_strId = strId;
 
 	// Load constant properties (never changed afterwards).
+	// 1) Name, type, sub-type and priority (ordering the buttons in the race select menu).
 	_strName = GfParmGetStr(hparmHandle, RM_SECT_HEADER, RM_ATTR_NAME, "<unknown>");
 	_strType = GfParmGetStr(hparmHandle, RM_SECT_HEADER, RM_ATTR_TYPE, "<unknown>");
 	_strSubType = GfParmGetStr(hparmHandle, RM_SECT_HEADER, RM_ATTR_SUBTYPE, "");
 	_nPriority = (int)GfParmGetNum(hparmHandle, RM_SECT_HEADER, RM_ATTR_PRIO, NULL, 10000);
 
+	// 2) Accepted driver types.
+	static const char cFilterSeparator = ';';
+
+	// a) Load accepted driver types from a ';'-separated string (ignore duplicates).
+	const char* pszAcceptDrvTypes =
+		GfParmGetStr(hparmHandle, RM_SECT_DRIVERS, RM_ATTR_ACCEPT_TYPES, "");
+    std::stringstream ssAcceptDrvTypes(pszAcceptDrvTypes);
+    std::string strDrvType;
+    while(std::getline(ssAcceptDrvTypes, strDrvType, cFilterSeparator))
+	{
+		std::vector<std::string>::iterator itDrvType =
+			std::find(_vecAcceptedDriverTypes.begin(), _vecAcceptedDriverTypes.end(), strDrvType);
+		if (itDrvType == _vecAcceptedDriverTypes.end()) // Not already there => store it.
+			_vecAcceptedDriverTypes.push_back(strDrvType);
+    }
+
+	// b) If the race file finally doesn't specify any accepted driver type,
+	//    accpet them all.
+	if (_vecAcceptedDriverTypes.empty())
+		_vecAcceptedDriverTypes = GfDrivers::self()->getTypes();
+
+	// c) Load rejected driver types from a ';'-separated string (ignore duplicates).
+	const char* pszRejectDrvTypes =
+		GfParmGetStr(hparmHandle, RM_SECT_DRIVERS, RM_ATTR_REJECT_TYPES, "");
+    std::stringstream ssRejectDrvTypes(pszRejectDrvTypes);
+    while(std::getline(ssRejectDrvTypes, strDrvType, cFilterSeparator))
+	{
+		std::vector<std::string>::iterator itDrvType =
+			std::find(_vecAcceptedDriverTypes.begin(), _vecAcceptedDriverTypes.end(), strDrvType);
+		if (itDrvType != _vecAcceptedDriverTypes.end()) // Accepted til now => now rejected.
+			_vecAcceptedDriverTypes.erase(itDrvType);
+    }
+	
+	// 3) Accepted car categories.
+	// a) Load accepted car categories from a ';'-separated string (ignore duplicates).
+	const char* pszAcceptCarCats =
+		GfParmGetStr(hparmHandle, RM_SECT_DRIVERS, RM_ATTR_ACCEPT_CATEGORIES, "");
+    std::stringstream ssAcceptCarCats(pszAcceptCarCats);
+    std::string strCarCat;
+    while(std::getline(ssAcceptCarCats, strCarCat, cFilterSeparator))
+	{
+		std::vector<std::string>::iterator itCarCat =
+			std::find(_vecAcceptedCarCategoryIds.begin(), _vecAcceptedCarCategoryIds.end(), strCarCat);
+		if (itCarCat == _vecAcceptedCarCategoryIds.end()) // Not already there => store it.
+			_vecAcceptedCarCategoryIds.push_back(strCarCat);
+    }
+
+	// b) If the race file finally doesn't specify any accepted car category,
+	//    accpet them all.
+	if (_vecAcceptedCarCategoryIds.empty())
+		_vecAcceptedCarCategoryIds = GfCars::self()->getCategoryIds();
+
+	// c) Load rejected car categories from a ';'-separated string (ignore duplicates).
+	const char* pszRejectCarCats =
+		GfParmGetStr(hparmHandle, RM_SECT_DRIVERS, RM_ATTR_REJECT_CATEGORIES, "");
+    std::stringstream ssRejectCarCats(pszRejectCarCats);
+    while(std::getline(ssRejectCarCats, strCarCat, cFilterSeparator))
+	{
+		std::vector<std::string>::iterator itCarCat =
+			std::find(_vecAcceptedCarCategoryIds.begin(), _vecAcceptedCarCategoryIds.end(), strCarCat);
+		if (itCarCat != _vecAcceptedCarCategoryIds.end()) // Accepted til now => now rejected.
+			_vecAcceptedCarCategoryIds.erase(itCarCat);
+    }
+	
 	// Load other "mutable" properties.
 	reset(hparmHandle, false);
 }
@@ -209,11 +279,39 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		GfParmReleaseHandle(_hparmHandle);
 	_hparmHandle = hparmHandle;
 
+	// Determine the race manager file from which to load the events info.
+	// 1) Simple case : the race manager has no subfiles, use the normal file.
+	// 2) Career case : the events are defined in "sub-championships" files.
+	//    WARNING: Very partial support for the moment : we only care about the 1st event
+	//             ('cause it is quite complicated, with events are intermixed between
+	//              the other "sub-championships", each defined in a career_<sub-champ>.xmls).
+	//             This is not an issue as long as this class is not used in the race engine
+	//             or the event management purpose (everything is in racecareer.cpp for now).
+	const char* pszHasSubFiles =
+		GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO);
+	_bHasSubFiles = strcmp(pszHasSubFiles, RM_VAL_YES) ? false : true;
+	if (_bHasSubFiles)
+	{
+		const char* psz1stSubFileName =
+			GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_FIRSTSUBFILE, 0);
+		if (psz1stSubFileName)
+		{
+			std::ostringstream ossSubFilePath;
+			ossSubFilePath << GfLocalDir() << "config/raceman/" << psz1stSubFileName;
+			hparmHandle = GfParmReadFile(ossSubFilePath.str().c_str(), GFPARM_RMODE_STD);
+		}
+		if (!hparmHandle)
+			_bHasSubFiles = false;
+	}
+
 	// Get current event in the schedule.
 	_nCurrentEventInd =
-		(int)GfParmGetNum(_hparmHandle, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1) - 1;
+		(int)GfParmGetNum(hparmHandle, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1) - 1;
+	GfLogDebug("GfRaceManager::reset(%s): curEvent = %d (%s)\n",
+			   _strName.c_str(), _nCurrentEventInd, GfParmGetFileName(hparmHandle));
 
-	// Load track id for each event in the schedule.
+	// Load track id for each event in the schedule
+	// (warning: we don't check here that the tracks exist and are usable).
 	std::ostringstream ossSectionPath;
 	int nEventNum = 1;
 	const char* pszTrackId;
@@ -221,10 +319,16 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 	{
 		ossSectionPath.str("");
 		ossSectionPath << RM_SECT_TRACKS << '/' << nEventNum;
-		pszTrackId = GfParmGetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
+		pszTrackId = GfParmGetStr(hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
+		GfLogDebug("GfRaceManager::reset(%s): event[%d].track = '%s'\n",
+				   _strName.c_str(), nEventNum-1, pszTrackId);
 		if (pszTrackId)
 		{
-			_vecEventTrackIds.push_back(pszTrackId);
+			if (GfTracks::self()->getTrack(pszTrackId))
+				_vecEventTrackIds.push_back(pszTrackId);
+			else
+				GfLogWarning("Skipping non-existing track '%s' (event #%d) for %s type\n",
+							 pszTrackId, nEventNum, _strName.c_str());
 			nEventNum++;
 		}
 	}
@@ -243,16 +347,26 @@ void GfRaceManager::save()
 				 (tdble)(_nCurrentEventInd + 1));
 	
 	// Info about each event in the schedule.
-	std::ostringstream ossSectionPath;
-	for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
+	// WARNING: Not supported for Career mode (TODO ?).
+	if (!_bHasSubFiles)
 	{
-		ossSectionPath.str("");
-		ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
-		GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
-					 _vecEventTrackIds[nEventInd].c_str());
-		GfTrack* pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[nEventInd]);
-		GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY,
-					 pTrack->getCategoryId().c_str());
+		// a) clear the event list.
+		GfParmListClean(_hparmHandle, RM_SECT_TRACKS);
+
+		// b) re-create it from the current event list state (may have changed since loaded).
+		std::ostringstream ossSectionPath;
+		for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
+		{
+			GfLogDebug("GfRaceManager::save(%s): event[%u].track = '%s'\n",
+					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
+			ossSectionPath.str("");
+			ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
+			GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
+						 _vecEventTrackIds[nEventInd].c_str());
+			GfTrack* pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[nEventInd]);
+			GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY,
+						 pTrack->getCategoryId().c_str());
+		}
 	}
 }
 
@@ -292,14 +406,36 @@ const std::string& GfRaceManager::getSubType() const
 	return _strSubType;
 }
 
+const int GfRaceManager::getPriority() const
+{
+	return _nPriority;
+}
+
 bool GfRaceManager::isNetwork() const
 {
 	return _strType == "Online";
 }
 
-const int GfRaceManager::getPriority() const
+bool GfRaceManager::acceptsDriverType(const std::string& strType) const
 {
-	return _nPriority;
+	return std::find(_vecAcceptedDriverTypes.begin(), _vecAcceptedDriverTypes.end(), strType)
+		   != _vecAcceptedDriverTypes.end();
+}
+
+const std::vector<std::string>& GfRaceManager::getAcceptedDriverTypes() const
+{
+	return _vecAcceptedDriverTypes;
+}
+	
+bool GfRaceManager::acceptsCarCategory(const std::string& strCatId) const
+{
+	return std::find(_vecAcceptedCarCategoryIds.begin(), _vecAcceptedCarCategoryIds.end(), strCatId)
+		   != _vecAcceptedCarCategoryIds.end();
+}
+
+const std::vector<std::string>& GfRaceManager::getAcceptedCarCategoryIds() const
+{
+	return _vecAcceptedCarCategoryIds;
 }
 
 unsigned GfRaceManager::getEventCount() const

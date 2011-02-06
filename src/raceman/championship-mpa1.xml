@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="MPA1 Championship" version="1.5">
+<params name="MPA1 Championship" version="1.6">
 
   <section name="Header">
     <attstr name="name" val="MPA1 Championship"/>
@@ -233,9 +233,13 @@
   </section>
 
   <section name="Drivers">
+
     <attnum name="maximum number" val="50"/>
     <attnum name="focused idx" val="0"/>
     <attstr name="focused module" val="simplix_mpa1"/>
+    <attstr name="rejected types" val="networkhuman"/>
+    <attstr name="accepted categories" val="MPA1"/>
+
     <section name="1">
       <attnum name="idx" val="0"/>
       <attstr name="module" val="simplix_mpa1"/>

@@ -122,7 +122,8 @@ rmdsHighlightDriver(const GfDriver* pDriver)
 	{
 		if (pCompetitor == pDriver)
 		{
-			//GfLogDebug("Selecting competitor #%d '%s'\n", curDrvIndex, pCompetitor->getName().c_str());
+			//GfLogDebug("Highlighting competitor #%d '%s'\n",
+			//		   curDrvIndex, pCompetitor->getName().c_str());
 			GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId, index);
 			rmdsClickOnDriver(0);
 			return;
@@ -137,7 +138,7 @@ rmdsHighlightDriver(const GfDriver* pDriver)
 	{
 		if (pCandidate == pDriver)
 		{
-			//GfLogDebug("Selecting candidate #%d '%s'\n", curDrvIndex, name);
+			//GfLogDebug("Highlighting candidate #%d '%s'\n", curDrvIndex, name);
 			GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, index);
 			rmdsClickOnDriver(0);
 			return;
@@ -169,22 +170,32 @@ rmdsActivate(void * /* notused */)
 	// Update GUI : current driver info, car preview.
 	rmdsHighlightDriver(PCurrentDriver);
 	
-    // Initialize the driver type filter criteria to "any driver".
-    CurDriverTypeIndex =
-		(std::find(VecDriverTypes.begin(), VecDriverTypes.end(), AnyDriverType)
-		 - VecDriverTypes.begin()) % VecDriverTypes.size();
+    // Initialize the driver type filter criteria to "any driver" if possible.
+	// or else the first available type.
+	const std::vector<std::string>::const_iterator itDrvTyp =
+		std::find(VecDriverTypes.begin(), VecDriverTypes.end(), AnyDriverType);
+	if (itDrvTyp == VecDriverTypes.end())
+		CurDriverTypeIndex = 0;
+	else
+		CurDriverTypeIndex = itDrvTyp - VecDriverTypes.begin();
 
-	// Initialize the car category filter criteria : use the one of the current driver if any.
-	const std::string strCurCarCatId =
+	// Initialize the car category filter criteria :
+	// use the one of the current driver if any, or else "any category" if possible,
+	// or else the first available category.
+	const std::string strCarCatId =
 		PCurrentDriver ? PCurrentDriver->getCar()->getCategoryId() : AnyCarCategory;
-    CurCarCategoryIndex =
-		(std::find(VecCarCategoryIds.begin(), VecCarCategoryIds.end(), strCurCarCatId)
-		 - VecCarCategoryIds.begin()) % VecCarCategoryIds.size();
+	const std::vector<std::string>::const_iterator itCarCat =
+		std::find(VecCarCategoryIds.begin(), VecCarCategoryIds.end(), strCarCatId);
+	if (itCarCat == VecCarCategoryIds.end())
+		CurCarCategoryIndex = 0;
+	else
+		CurCarCategoryIndex = itCarCat - VecCarCategoryIds.begin();
 
 	// Update GUI (candidate list, filter criteria).
     GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
     GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
-    rmdsFilterCandidatesScrollList(strCurCarCatId, VecDriverTypes[CurDriverTypeIndex]);
+    rmdsFilterCandidatesScrollList(VecCarCategoryIds[CurCarCategoryIndex],
+								   VecDriverTypes[CurDriverTypeIndex]);
 }
 
 static void
@@ -216,7 +227,7 @@ rmdsChangeCarCategory(void *vp)
     GfuiLabelSetText(ScrHandle, CarCategoryEditId, VecCarCategoryNames[CurCarCategoryIndex].c_str());
 
     rmdsFilterCandidatesScrollList(VecCarCategoryIds[CurCarCategoryIndex],
-							   VecDriverTypes[CurDriverTypeIndex]);
+								   VecDriverTypes[CurDriverTypeIndex]);
 
 	if (rmdsIsAnyCompetitorHighlighted())
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
@@ -231,7 +242,7 @@ rmdsChangeDriverType(void *vp)
     GfuiLabelSetText(ScrHandle, DriverTypeEditId, VecDriverTypes[CurDriverTypeIndex].c_str());
 
     rmdsFilterCandidatesScrollList(VecCarCategoryIds[CurCarCategoryIndex],
-							   VecDriverTypes[CurDriverTypeIndex]);
+								   VecDriverTypes[CurDriverTypeIndex]);
 
 	if (rmdsIsAnyCompetitorHighlighted())
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
@@ -403,12 +414,34 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 	// and add him to the Competitors scroll-list and to the race competitors.
     bSelect = false;
     name = 0;
-    if (MenuData->pRace->acceptsMoreCompetitors()) {
+    if (MenuData->pRace->acceptsMoreCompetitors())
+	{
 		src = CandidatesScrollListId;
 		name = GfuiScrollListExtractSelectedElement(ScrHandle, src, (void**)&pDriver);
-		if (name) {
+		if (name)
+		{
 			dst = CompetitorsScrollListId;
 			GfuiScrollListInsertElement(ScrHandle, dst, name, GfDrivers::self()->getCount(), (void*)pDriver);
+			// Change human car to an accepted category if this not the case, and if possible.
+			if (pDriver->isHuman()
+				&& !MenuData->pRace->acceptsCarCategory(pDriver->getCar()->getCategoryId()))
+			{
+				const std::vector<std::string>& vecAccCatIds =
+					MenuData->pRace->getAcceptedCarCategoryIds();
+				if (vecAccCatIds.size() > 0)
+				{
+					const GfCar* pNewCar = GfCars::self()->getCarsInCategory(vecAccCatIds[0])[0];
+					if (pNewCar)
+					{
+						const GfCar* pOldCar = pDriver->getCar();
+						pDriver->setCar(pNewCar);
+						GfLogTrace("Changing %s car to %s (%s category was not accepted)\n",
+								   pDriver->getName().c_str(), pNewCar->getName().c_str(),
+								   pOldCar->getName().c_str());
+					}
+				}
+			}
+
 			MenuData->pRace->appendCompetitor(pDriver); // Now selected.
 		}
     }
@@ -416,27 +449,29 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
     // Otherwise, if the selected driver is in the Competitors scroll-list,
     // remove the driver from the Competitors scroll-list and from the race competitors,
 	// and add him to the Candidate scroll-list
-    // (if it matches the Candidate scroll-list filtering criteria)
-    if (!name) {
+    // (if it matches the Candidate scroll-list filtering criteria,
+	//  see rmdsFilterCandidatesScrollList for how humans enjoy a different filtering).
+    if (!name)
+	{
 		bSelect = true;
 		src = CompetitorsScrollListId;
 		name = GfuiScrollListExtractSelectedElement(ScrHandle, src, (void**)&pDriver);
-		if (name) {
-			const std::string strCarCatIdFilter =
-				(VecCarCategoryIds[CurCarCategoryIndex] == AnyCarCategory
-				 ? "" : VecCarCategoryIds[CurCarCategoryIndex]);
-			const std::string strTypeFilter =
-				(VecDriverTypes[CurDriverTypeIndex] == AnyDriverType
-				 ? "" : VecDriverTypes[CurDriverTypeIndex]);
-			if (pDriver->matchesTypeAndCategory(strTypeFilter, strCarCatIdFilter)) {
-				dst = CandidatesScrollListId;
-				GfuiScrollListInsertElement(ScrHandle, dst, name,
-											pDriver->isHuman() ? 0 : GfDrivers::self()->getCount(), (void*)pDriver);
-			}
-			MenuData->pRace->removeCompetitor(pDriver); // No more selected.
-		} else {
-			return;
+		if (!name)
+			return; // Should never happen.
+
+		const std::string strCarCatIdFilter =
+			(pDriver->isHuman() || VecCarCategoryIds[CurCarCategoryIndex] == AnyCarCategory
+			 ? "" : VecCarCategoryIds[CurCarCategoryIndex]);
+		const std::string strTypeFilter =
+			(VecDriverTypes[CurDriverTypeIndex] == AnyDriverType
+			 ? "" : VecDriverTypes[CurDriverTypeIndex]);
+		if (pDriver->matchesTypeAndCategory(strTypeFilter, strCarCatIdFilter))
+		{
+			dst = CandidatesScrollListId;
+			GfuiScrollListInsertElement(ScrHandle, dst, name,
+										pDriver->isHuman() ? 0 : GfDrivers::self()->getCount(), (void*)pDriver);
 		}
+		MenuData->pRace->removeCompetitor(pDriver); // No more selected.
     }
 
     // Focused driver management (inhibited for the moment : what is it useful for ?)
@@ -572,13 +607,21 @@ RmDriversSelect(void *vs)
 
 	
     // Car category filtering "combobox" (left arrow, label, right arrow)
-    CreateButtonControl(ScrHandle, menuDescHdle, "carcategoryleftarrow", (void*)-1, rmdsChangeCarCategory);
-    CreateButtonControl(ScrHandle, menuDescHdle, "carcategoryrightarrow", (void*)1, rmdsChangeCarCategory);
+	const int nCatPrevButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "carcategoryleftarrow",
+							(void*)-1, rmdsChangeCarCategory);
+	const int nCatNextButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "carcategoryrightarrow",
+							(void*)1, rmdsChangeCarCategory);
     CarCategoryEditId = CreateLabelControl(ScrHandle, menuDescHdle, "carcategorytext");
     
     // Driver type filtering "combobox" (left arrow, label, right arrow)
-    CreateButtonControl(ScrHandle, menuDescHdle, "drivertypeleftarrow", (void*)-1, rmdsChangeDriverType);
-    CreateButtonControl(ScrHandle, menuDescHdle, "drivertyperightarrow", (void*)1, rmdsChangeDriverType);
+	const int nDrvTypPrevButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "drivertypeleftarrow",
+							(void*)-1, rmdsChangeDriverType);
+	const int nDrvTypNextButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "drivertyperightarrow",
+							(void*)1, rmdsChangeDriverType);
     DriverTypeEditId = CreateLabelControl(ScrHandle, menuDescHdle, "drivertypetext");
 
     // Scroll-lists manipulation buttons
@@ -600,22 +643,47 @@ RmDriversSelect(void *vs)
     CarImageId = CreateStaticImageControl(ScrHandle, menuDescHdle, "carpreviewimage");
     GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 
-	// Initialize the car category Ids, names and driver types lists for the driver filter system.
-	VecCarCategoryIds = GfCars::self()->getCategoryIds();
-    VecCarCategoryIds.push_back(AnyCarCategory);
-	
-	VecCarCategoryNames = GfCars::self()->getCategoryNames();
-    VecCarCategoryNames.push_back(AnyCarCategory);
+	// Initialize the car category Ids and names for the driver filter system.
+	for (unsigned nCatInd = 0; nCatInd < GfCars::self()->getCategoryIds().size(); nCatInd++)
+	{
+		// Keep only accepted categories.
+		if (MenuData->pRace->acceptsCarCategory(GfCars::self()->getCategoryIds()[nCatInd]))
+		{
+			VecCarCategoryIds.push_back(GfCars::self()->getCategoryIds()[nCatInd]);
+			VecCarCategoryNames.push_back(GfCars::self()->getCategoryNames()[nCatInd]);
+			//GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
+		}
+	}
+	if (VecDriverTypes.size() > 1)
+	{
+		VecCarCategoryIds.push_back(AnyCarCategory);
+		VecCarCategoryNames.push_back(AnyCarCategory);
+	}
+	else
+	{
+		GfuiEnable(ScrHandle, nCatPrevButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, nCatNextButtonId, GFUI_DISABLE);
+	}
 
+	// Initialize the driver types lists for the driver filter system.
 	std::vector<std::string>::const_iterator itDrvType = GfDrivers::self()->getTypes().begin();
 	while (itDrvType != GfDrivers::self()->getTypes().end())
 	{
-		// No network human in non network races.
-		if (*itDrvType != "networkhuman" || MenuData->pRace->getManager()->isNetwork())
+		// Keep only accepted types.
+		if (MenuData->pRace->acceptsDriverType(*itDrvType))
+		{
 			VecDriverTypes.push_back(*itDrvType);
+			//GfLogDebug("Accepted type : %s\n", itDrvType->c_str());
+		}
 		itDrvType++;
 	}
-    VecDriverTypes.push_back(AnyDriverType);
+	if (VecDriverTypes.size() > 1)
+		VecDriverTypes.push_back(AnyDriverType);
+	else
+	{
+		GfuiEnable(ScrHandle, nDrvTypPrevButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, nDrvTypNextButtonId, GFUI_DISABLE);
+	}
 	
     // Current Driver Info
     CurrentDriverTypeLabelId =
@@ -660,28 +728,52 @@ RmDriversSelect(void *vs)
 static void
 rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string& strType)
 {
-
-    // Empty the unselected scroll-list
+	// Empty the unselected scroll-list
     GfuiScrollListClear(ScrHandle, CandidatesScrollListId);
 	GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 
-    // Fill it with drivers that match the filter criteria and are not among competitors.
+    // Fill it with drivers that match the filter criteria,
+	// are accepted by the race and are not already among competitors.
+	// Note: We must check this race acceptance because strCarCatId and strType may be empty,
+	//       and in these cases getDriversWithTypeAndCategory(...) filters less.
+	// a) Retrieve the list of competitors.
 	const std::vector<GfDriver*>& vecCompetitors = MenuData->pRace->getCompetitors();
-	const std::string strCarCatIdFilter = (strCarCatId == AnyCarCategory ? "" : strCarCatId);
-	const std::string strTypeFilter = (strType == AnyDriverType ? "" : strType);
+
+	// b) Tweak the filtering criteria :
+	//    - use "" for AnyCarCategory,
+	//    - use "" for AnyDriverType,
+	//    - when strType is "*human", set strCarCatId to AnyCarCategory
+	//      (because humans can change their car for the race, and so they have
+	//       to be in the candidate list even if their current car is not in the right category).
+	const std::string strCarCatIdFilter =
+		(strCarCatId == AnyCarCategory || strType.find("human") != strType.npos)
+		? "" : strCarCatId;
+	const std::string strTypeFilter = strType == AnyDriverType ? "" : strType;
+
+	// c) Retrieve the list of drivers matching with the criteria.
 	const std::vector<GfDriver*> vecCandidates =
 		GfDrivers::self()->getDriversWithTypeAndCategory(strTypeFilter, strCarCatIdFilter);
+	
+	//GfLogDebug("rmdsFilterCandidatesScrollList('%s' => '%s', '%s' => '%s')\n",
+	//		   strCarCatId.c_str(), strCarCatIdFilter.c_str(),
+	//		   strType.c_str(), strTypeFilter.c_str());
+
+	// e) Keep only drivers accepted by the race and not already among competitors
+	//    (but don't reject humans with the wrong car category : they must be able to change it).
 	std::vector<GfDriver*>::const_iterator itCandidate;
-	int index = 1;
 	for (itCandidate = vecCandidates.begin(); itCandidate != vecCandidates.end(); itCandidate++)
 	{
 		if (std::find(vecCompetitors.begin(), vecCompetitors.end(), *itCandidate)
-			== vecCompetitors.end())
+			== vecCompetitors.end()
+			&& MenuData->pRace->acceptsDriverType((*itCandidate)->getType())
+			&& ((*itCandidate)->isHuman()
+				|| MenuData->pRace->acceptsCarCategory((*itCandidate)->getCar()->getCategoryId())))
 			GfuiScrollListInsertElement(ScrHandle, CandidatesScrollListId,
-										(*itCandidate)->getName().c_str(), index++,
+										(*itCandidate)->getName().c_str(), // Item string
+										itCandidate - vecCandidates.begin() + 1, // Insert. index
 										(void*)(*itCandidate));
     }
 
-    // Show first element if any
+    // Show first element of the list if any.
     GfuiScrollListShowElement(ScrHandle, CandidatesScrollListId, 0);
 }

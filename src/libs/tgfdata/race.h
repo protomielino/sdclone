@@ -81,6 +81,11 @@ public:
 	Parameters* getParameters();
 
 	int getSupportedFeatures() const;
+
+	bool acceptsDriverType(const std::string& strType) const;
+	const std::vector<std::string>& getAcceptedDriverTypes() const;
+	bool acceptsCarCategory(const std::string& strCatId) const;
+	const std::vector<std::string>& getAcceptedCarCategoryIds() const;
 	
 	unsigned getCompetitorsCount() const;
 	const std::vector<GfDriver*>& getCompetitors() const;

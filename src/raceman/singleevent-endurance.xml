@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Endurance Race" version="1.15">
+<params name="Endurance Race" version="1.16">
 
   <section name="Header">
     <attstr name="name" val="Endurance Race"/>
@@ -122,9 +122,12 @@
   </section>
 
   <section name="Drivers">
+
     <attnum name="maximum number" val="50"/>
     <attstr name="focused module" val="human"/>
     <attnum name="focused idx" val="3"/>
+    <attstr name="rejected types" val="networkhuman"/>
+
     <section name="1">
       <attnum name="idx" val="3"/>
       <attstr name="module" val="usr_trb1"/>

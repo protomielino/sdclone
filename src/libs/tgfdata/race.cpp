@@ -40,7 +40,8 @@ static const char *TimeOfDaySpecNames[GfRace::nTimeSpecNumber] = RM_VALS_TIME;
 static const char* CloudsSpecNames[GfRace::nCloudsSpecNumber] = RM_VALS_CLOUDS;
 static const char *RainSpecNames[GfRace::nRainSpecNumber] = RM_VALS_RAIN;
 
-// Private data for GfRace				  
+
+// Private data for GfRace
 class GfRace::Private
 {
 public:
@@ -71,8 +72,15 @@ public:
 	// Focused competitor (what for ?).
 	std::string strFocusedModuleName;
 	int nFocusedItfIndex;
+
+	// An empty string vector.
+	static const std::vector<std::string> vecstrEmpty;
 };
 
+const std::vector<std::string> GfRace::Private::vecstrEmpty;
+
+
+// GfRace class.
 GfRace::GfRace()
 {
 	_pPrivate = new GfRace::Private;
@@ -199,14 +207,6 @@ void GfRace::load(GfRaceManager* pRaceMan)
 			continue;
 		}
 
-		// Check if this driver can compete in this race.
-		if (pCompetitor->isNetwork() && !pRaceMan->isNetwork())
-		{
-			GfLogWarning("Ignoring '%s' driver #%d (%s) : Network humans can only race in network races\n",
-						 pszModName, nItfIndex, pCompetitor->getName().c_str());
-			continue;
-		}
-		
 		// We've got it : if we can keep it for the race, make it a competitor
 		// (there is a threshold on the number of competitors) :
 		if (acceptsMoreCompetitors())
@@ -220,7 +220,7 @@ void GfRace::load(GfRaceManager* pRaceMan)
 				? true : false;
 
 			// Get the chosen car for the race if any specified (human only).
-			const GfCar* pCar = 0;
+			const GfCar* pCarForRace = 0;
 			if (pCompetitor->isHuman() && bExtended)
 			{
 				ossDrvSecPath.str("");
@@ -228,23 +228,35 @@ void GfRace::load(GfRaceManager* pRaceMan)
 							   << '/' << (bExtended ? 1 : 0) << '/' << nItfIndex;
 				const char* pszCarId =
 					GfParmGetStr(hparmRaceMan, ossDrvSecPath.str().c_str(), RM_ATTR_CARNAME, 0);
-				pCar = GfCars::self()->getCar(pszCarId);
-				if (!pCar)
+				pCarForRace = GfCars::self()->getCar(pszCarId);
+				if (!pCarForRace)
+				{
 					GfLogError("Falling back to default car '%s' "
 							   "for %s because '%s' is not available\n",
 							   pCompetitor->getCar()->getName().c_str(),
-							   pCompetitor->getName().c_str(), pszCarId);
+							   pCompetitor->getCar()->getName().c_str(), pszCarId);
+				}
 			}
 
 			// Update the driver.
 			GfDriverSkin skin(pszSkinName);
 			skin.setTargets(nSkinTargets);
 			pCompetitor->setSkin(skin);
-			if (pCar) // Override default car.
-				pCompetitor->setCar(pCar);
+			if (pCarForRace) // Override default car with the one chosen for the race if any.
+				pCompetitor->setCar(pCarForRace);
 			
-			// Update the GfRace.
-			appendCompetitor(pCompetitor);
+			// Check if this driver can compete in this race.
+			if (acceptsDriverType(pCompetitor->getType())
+				&& acceptsCarCategory(pCompetitor->getCar()->getCategoryId()))
+			{
+				// Update the GfRace.
+				appendCompetitor(pCompetitor);
+			}
+			else
+			{
+				GfLogWarning("Ignoring '%s' (%s' #%d) : Type or car category not accepted by the race\n",
+							 pCompetitor->getName().c_str(), pszModName, nItfIndex);
+			}				
 		}
 		else
 		{
@@ -396,6 +408,28 @@ int GfRace::getSupportedFeatures() const
 	}
 	
 	return nFeatures;
+}
+
+bool GfRace::acceptsDriverType(const std::string& strType) const
+{
+	return _pPrivate->pRaceMan ? _pPrivate->pRaceMan->acceptsDriverType(strType) : false;
+}
+
+const std::vector<std::string>& GfRace::getAcceptedDriverTypes() const
+{
+	return _pPrivate->pRaceMan
+		? _pPrivate->pRaceMan->getAcceptedDriverTypes() : _pPrivate->vecstrEmpty;
+}
+	
+bool GfRace::acceptsCarCategory(const std::string& strCatId) const
+{
+	return _pPrivate->pRaceMan ? _pPrivate->pRaceMan->acceptsCarCategory(strCatId) : false;
+}
+
+const std::vector<std::string>& GfRace::getAcceptedCarCategoryIds() const
+{
+	return _pPrivate->pRaceMan
+		? _pPrivate->pRaceMan->getAcceptedCarCategoryIds() : _pPrivate->vecstrEmpty;
 }
 
 const std::vector<GfDriver*>& GfRace::getCompetitors() const
