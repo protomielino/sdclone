@@ -46,6 +46,8 @@ static std::map<std::string, int> reMapSubTypeComboIds;
 static void
 reOnActivate(void * /* dummy */)
 {
+	GfLogTrace("Entering Race Mode Select menu\n");
+
     /* Race engine init */
     ReInit();
     ReInfo->_reMenuScreen = reRaceSelectHandle;
@@ -159,6 +161,10 @@ ReRaceSelectInit(void *prevMenu)
 
 			// Select the first one by default.
 			GfuiComboboxSetPosition(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], 0);
+
+			// Disable combo if only one race manager.
+			if (vecRaceMans.size() == 1)
+				GfuiEnable(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
 		}
 
 		// Create the race manager type button.
