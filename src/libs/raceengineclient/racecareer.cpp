@@ -402,7 +402,7 @@ static void* ReCareerNewClass( const char* filename, void *prevParam, void **fir
 	nbGroups = (int)GfParmGetCurNum( ReInfo->params, RM_SECT_CLASSES, RM_ATTR_NBGROUPS, NULL, 1 );
 	nbDrivers = (int)GfParmGetNum( ReInfo->params, RM_SECT_RACECARS, RM_ATTR_MAXNUM, NULL, 10 ) * nbGroups;
 	if( first && nbDrivers < 10 )
-		nbDrivers = 10; /* The lowest class should at least have 10 drivers, because there can be 10 humans */
+		nbDrivers = 10; /* The lowest class should at least have 10 drivers, because there can be 10 humans. Note: This 10 limitation no longer exists */
 
 	if( nbGroups == 1 ) {
 		groupAlpha[ 0 ] = '\0';
@@ -458,7 +458,7 @@ static void ReCareerNewParams( const char* filename, double date )
 		return;
 	}
 
-	/* Calculate the maximum number of tracks neccesairy */
+	/* Calculate the maximum number of needed tracks */
 	do {
 		snprintf( buf, 1024, "%s/%s/%s", RM_SECT_CLASSES, GfParmListGetCurEltName(ReInfo->params, RM_SECT_CLASSES), RM_SECT_TRACKS );
 		if( totalTracks < 0 || totalTracks < (int)GfParmGetNum(ReInfo->params, buf, RM_ATTR_MAXNUM, NULL, 1) )
