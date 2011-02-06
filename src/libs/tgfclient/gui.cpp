@@ -884,7 +884,7 @@ GfuiAddKey(void *scr, int key, const char *descr, void *userData,
 		} while ((curKey2 = curKey2->next) != screen->userKeys);
 
 		// Not found => add at the beginning of the list.
-		if (not bFound) {
+		if (!bFound) {
 			curKey->next = screen->userKeys->next;
 			screen->userKeys->next = curKey;
 			screen->userKeys = curKey;
