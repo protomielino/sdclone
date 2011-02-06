@@ -119,6 +119,8 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 
     rmScrHdle = GfuiScreenCreate();
 
+	GfLogTrace("Entering Practice Results menu\n");
+
     void *menuXMLDescHdle = LoadMenuXML("practiceresultsmenu.xml");
     CreateStaticControls(menuXMLDescHdle,rmScrHdle);
 
@@ -243,6 +245,8 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     static float	orange[4] = {0.953, 0.518, 0.0, 1.0};//Tangerine, #F28500
     static float	white[4] = {1.0, 1.0, 1.0, 1.0};
     
+	GfLogTrace("Entering Race Results menu\n");
+
     //Screen title
     rmScrHdle = GfuiScreenCreate();
     void *menuXMLDescHdle = LoadMenuXML("raceresultsmenu.xml");
@@ -413,6 +417,8 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     tdble		refTime;
     int			nbCars;
 
+	GfLogTrace("Entering Qualification Results menu\n");
+
     rmScrHdle = GfuiScreenCreate();
     void *menuXMLDescHdle = LoadMenuXML("qualifsresultsmenu.xml");
     CreateStaticControls(menuXMLDescHdle,rmScrHdle);
@@ -529,6 +535,8 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	void		*results = info->results;
 	const char		*race = info->_reRaceName;
 
+	GfLogTrace("Entering Standings menu\n");
+
 	rmScrHdle = GfuiScreenCreate();
 
 	void *menuXMLDescHdle = LoadMenuXML("standingsmenu.xml");
@@ -598,7 +606,7 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	// Add "Continue" button in the bottom left
 	CreateButtonControl(rmScrHdle, menuXMLDescHdle, "continuebutton", prevHdle, GfuiScreenReplace);
     
-	//Create 'save' button in the bottom right if ????
+	//Create 'save' button in the bottom right if ... not Career mode.
 	if (!strcmp( GfParmGetStr( info->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO ), RM_VAL_YES ) == 0) {
 	    rmSaveId = CreateButtonControl(rmScrHdle, menuXMLDescHdle, "savebutton", info, rmSaveRes);
 	}
