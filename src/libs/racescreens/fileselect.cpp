@@ -97,8 +97,9 @@ rmOnDeactivate(void * /* dummy */ )
 		FileList = NULL;
 	}
 
-	// Fire the return screen
-	GfuiScreenActivate(RmFs->prevScreen);
+	// Fire the return screen if any.
+	if (RmFs->prevScreen)
+		GfuiScreenActivate(RmFs->prevScreen);
 }
 
 static void

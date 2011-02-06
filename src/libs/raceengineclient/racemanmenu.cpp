@@ -261,7 +261,6 @@ reOnLoadRaceFromFile(void *pPrevMenu)
 	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
 	
 	fs.title = pRaceMan->getName();
-	fs.prevScreen = pPrevMenu;
 	fs.mode = RmFSModeLoad;
 
 	std::string strDirPath = reGetLoadFileDir();
@@ -270,11 +269,17 @@ reOnLoadRaceFromFile(void *pPrevMenu)
 	// For race types with more than 1 event (= 1 race on 1 track), load a race result file,
 	// as the previous race standings has an influence on the next race starting grid.
 	if (pRaceMan->getEventCount() > 1)
+	{
 		fs.select = reLoadRaceFromResultsFile;
+		fs.prevScreen = 0;
+	}
 	
 	// But for race types with only 1 event (= 1 race on 1 track), load a race config file.
 	else
+	{
 		fs.select = reLoadRaceFromConfigFile;
+		fs.prevScreen = pPrevMenu;
+	}
 
 	// Fire the file selection menu.
 	GfuiScreenActivate(RmFileSelect(&fs));
@@ -303,6 +308,8 @@ reOnSaveRaceToFile(void *pPrevMenu)
 static void
 reOnActivate(void * /* dummy */)
 {
+	GfLogTrace("Entering Race Manager menu\n");
+
 	// Update GUI.
 	reOnRaceDataChanged();
 }
