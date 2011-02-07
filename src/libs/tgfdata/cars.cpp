@@ -369,7 +369,7 @@ void GfCar::load(void* hparmCar)
 		(GfParmGetNum(hparmCar, SECT_REARRGTWHEEL, PRM_MU, 0, 1.0)
 		 + GfParmGetNum(hparmCar, SECT_REARLFTWHEEL, PRM_MU, 0, 1.0)) / 2.0f;
 	_fLowSpeedGrip =
-		(_fFrontRearMassRatio * fMuFront + (1.0f - _fFrontRearMassRatio) * fMuRear) * G;
+		1.1 * (_fFrontRearMassRatio * fMuFront + (1.0f - _fFrontRearMassRatio) * fMuRear) * G;
 
 	// "Aerodynamic = High speed" grip (same + with aero down-force).
 	const tdble fRefCarSpeed2 = 40000 / 12.96f; //200 km/h square in m/s
@@ -403,8 +403,8 @@ void GfCar::load(void* hparmCar)
 		(fTotalFrontClift * (fFrontAxleXpos - fFrontWingXpos) + fTotalRearClift * (fFrontAxleXpos - fRearWingXpos))
 		/(fFrontAxleXpos - fRearAxleXpos);
  	_fHighSpeedGrip =
- 		(tdble)((_fFrontRearMassRatio * _fMass * G + fFrontAeroLoad) * fMuFront
-				  + ((1.0 - _fFrontRearMassRatio) * _fMass * G + fRearAeroLoad) * fMuRear) / _fMass;
+ 		(tdble)(1.1 * ((_fFrontRearMassRatio * _fMass * G + fFrontAeroLoad) * fMuFront
+				  + ((1.0 - _fFrontRearMassRatio) * _fMass * G + fRearAeroLoad) * fMuRear) / _fMass);
 
 	// Cornering: axle distance divided by the inertia around the Z axis.
 	const tdble fMassRepCoef = GfParmGetNum(hparmCar, SECT_CAR, PRM_CENTR, 0, 1.0f);
@@ -424,8 +424,18 @@ void GfCar::load(void* hparmCar)
 	ossSpecPath << SECT_GEARBOX << '/' << ARR_GEARS << '/' << pszGearName[_nGears];
 	const tdble fTopGearEff =
 		GfParmGetNum(hparmCar, ossSpecPath.str().c_str(), PRM_EFFICIENCY, 0, 1.0f);
-	// TODO: RWD, FWD, 4WD differential efficiency
-	const tdble fDiffEff = 0.95f; // For now, use an average number
+	// calculate differential efficiency
+	tdble fDiffEff = 0.95f;
+	const char *fTransType = GfParmGetStr(hparmCar, SECT_DRIVETRAIN, PRM_TYPE, VAL_TRANS_RWD);
+	if (strcmp(VAL_TRANS_RWD, fTransType) == 0) {
+		fDiffEff = GfParmGetNum(hparmCar, SECT_REARDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f);
+	} else if (strcmp(VAL_TRANS_FWD, fTransType) == 0) {
+		fDiffEff = GfParmGetNum(hparmCar, SECT_FRNTDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f);
+	} else if (strcmp(VAL_TRANS_4WD, fTransType) == 0) {
+		fDiffEff = ( GfParmGetNum(hparmCar, SECT_REARDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f)
+			+ GfParmGetNum(hparmCar, SECT_FRNTDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f) ) * 0.5
+			* GfParmGetNum(hparmCar, SECT_CENTRALDIFFERENTIAL, PRM_EFFICIENCY, 0, 1.0f);
+	}
 	const tdble eff = fTopGearEff * fDiffEff; // gear * differential efficiencies
 	const tdble Cd =
 		0.645f * fCx * fFrontArea
