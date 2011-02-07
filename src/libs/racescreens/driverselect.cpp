@@ -317,7 +317,7 @@ rmdsCarSelectMenu(void *pPreviousMenu)
 	if (PCurrentDriver)
 	{
 		CarSelectMenu.SetPreviousMenuHandle(pPreviousMenu);
-		CarSelectMenu.RunMenu(PCurrentDriver);
+		CarSelectMenu.RunMenu(MenuData->pRace, PCurrentDriver);
 	}
 }
 

@@ -27,6 +27,8 @@
 #include <iomanip>
 
 #include <tgfclient.h>
+
+#include <race.h>
 #include <cars.h>
 #include <drivers.h>
 
@@ -47,8 +49,8 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	// Initialize the GUI contents.
 	GfuiLabelSetText(pMenu->GetMenuHandle(), pMenu->GetDynamicControlId("DriverNameLabel"),
 					 pDriver->getName().c_str());
-	pMenu->resetCarCategoryComboBox(pCurCar->getCategoryName());
-	pMenu->resetCarModelComboBox(pCurCar->getCategoryName(), pCurCar->getName());
+	const std::string strSelCatName = pMenu->resetCarCategoryComboBox(pCurCar->getCategoryName());
+	pCurCar = pMenu->resetCarModelComboBox(strSelCatName, pCurCar->getName());
 	pMenu->resetCarDataSheet(pCurCar->getId());
 	pMenu->resetSkinComboBox(pCurCar->getName(), &pDriver->getSkin());
 	pMenu->resetCarPreviewImage(pDriver->getSkin());
@@ -82,8 +84,7 @@ void RmCarSelectMenu::onChangeCategory(tComboBoxInfo *pInfo)
 	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pInfo->userData);
 
 	// Update GUI.
-	pMenu->resetCarModelComboBox(pInfo->vecChoices[pInfo->nPos]);
-	const GfCar* pSelCar = pMenu->getSelectedCarModel();
+	const GfCar* pSelCar = pMenu->resetCarModelComboBox(pInfo->vecChoices[pInfo->nPos]);
 	pMenu->resetCarDataSheet(pSelCar->getId());
 	pMenu->resetSkinComboBox(pSelCar->getName());
 	pMenu->resetCarPreviewImage(pMenu->getSelectedSkin());
@@ -151,41 +152,49 @@ RmCarSelectMenu::RmCarSelectMenu()
 {
 }
 
-void RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
+std::string RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
 {
 	const int nCatComboId = GetDynamicControlId("CategoryCombo");
 
-	// Disable the combo-box for non human drivers (robot drivers can't change their car).
-	GfuiEnable(GetMenuHandle(), nCatComboId, getDriver()->isHuman() ? GFUI_ENABLE : GFUI_DISABLE);
-	
 	// Retrieve the available car categories.
 	const std::vector<std::string>& vecCatNames = GfCars::self()->getCategoryNames();
+	const std::vector<std::string>& vecCatIds = GfCars::self()->getCategoryIds();
 
 	// Load the combo-box from their names (and determine the requested category index).
 	unsigned nCurCatIndex = 0;
 	GfuiComboboxClear(GetMenuHandle(), nCatComboId);
 	for (unsigned nCatIndex = 0; nCatIndex < vecCatNames.size(); nCatIndex++)
 	{
-		GfuiComboboxAddText(GetMenuHandle(), nCatComboId, vecCatNames[nCatIndex].c_str());
-		if (!strSelCatName.empty() && vecCatNames[nCatIndex] == strSelCatName)
-			nCurCatIndex = nCatIndex;
+		if (getRace()->acceptsCarCategory(vecCatIds[nCatIndex]))
+		{
+			GfuiComboboxAddText(GetMenuHandle(), nCatComboId, vecCatNames[nCatIndex].c_str());
+			if (!strSelCatName.empty() && vecCatNames[nCatIndex] == strSelCatName)
+				nCurCatIndex = nCatIndex;
+		}
 	}
 	
 	// Select the requested category in the combo-box.
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nCatComboId, nCurCatIndex);
 
+	// Disable the combo-box for non human drivers (robot drivers can't change their car),
+	// or if it contains only 1 category.
+	GfuiEnable(GetMenuHandle(), nCatComboId,
+			   getDriver()->isHuman()
+			   && GfuiComboboxGetNumberOfChoices(GetMenuHandle(), nCatComboId) > 1
+			   ? GFUI_ENABLE : GFUI_DISABLE);
+	
 	//GfLogDebug("resetCarCategoryComboBox(%s) : cur=%d\n",
 	//		   strSelCatName.c_str(), nCurCatIndex);
+
+	// Return actually selected category name (may differ from the requested one).
+	return vecCatNames[nCurCatIndex];
 }
 
-void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
-											const std::string& strSelCarName)
+GfCar* RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
+											  const std::string& strSelCarName)
 {
 	const int nModelComboId = GetDynamicControlId("ModelCombo");
 
-	// Disable the combo-box for non human drivers (robot drivers can't change their car).
-	GfuiEnable(GetMenuHandle(), nModelComboId, getDriver()->isHuman() ? GFUI_ENABLE : GFUI_DISABLE);
-	
 	// Retrieve car models in the selected category.
 	const std::vector<GfCar*> vecCarsInCat =	
 		GfCars::self()->getCarsInCategoryWithName(strCatName);
@@ -204,9 +213,19 @@ void RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 	// Select the right car in the combo-box.
 	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nModelComboId, nCurrCarIndexInCat);
 
+	// Disable the combo-box for non human drivers (robot drivers can't change their car).
+	// or if it contains only 1 model.
+	GfuiEnable(GetMenuHandle(), nModelComboId,
+			   getDriver()->isHuman()
+			   && GfuiComboboxGetNumberOfChoices(GetMenuHandle(), nModelComboId) > 1
+			   ? GFUI_ENABLE : GFUI_DISABLE);
+	
 	//GfLogDebug("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
 	//		   strCatName.c_str(), strSelCarName.c_str(),
 	//		   nCurrCarIndexInCat, vecCarsInCat.size());
+
+	// Return the actually selected car (may differ from the requested car).
+	return vecCarsInCat[nCurrCarIndexInCat];
 }
 
 void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
@@ -334,11 +353,14 @@ void RmCarSelectMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 		GfuiStaticImageSet(GetMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
 }
 
-void RmCarSelectMenu::RunMenu(GfDriver* pDriver)
+void RmCarSelectMenu::RunMenu(GfRace* pRace, GfDriver* pDriver)
 {
 	// Initialize if not already done.
 	if (!GetMenuHandle())
 		Initialize();
+	
+	// Store target race.
+	setRace(pRace);
 	
 	// Store target driver.
 	setDriver(pDriver);
@@ -393,6 +415,11 @@ bool RmCarSelectMenu::Initialize()
 	return true;
 }
 
+void RmCarSelectMenu::setDriver(GfDriver* pDriver)
+{
+	_pDriver = pDriver;
+}
+
 const GfDriver* RmCarSelectMenu::getDriver() const
 {
 	return _pDriver;
@@ -403,7 +430,13 @@ GfDriver* RmCarSelectMenu::getDriver()
 	return _pDriver;
 }
 
-void RmCarSelectMenu::setDriver(GfDriver* pDriver)
+void RmCarSelectMenu::setRace(GfRace* pRace)
 {
-	_pDriver = pDriver;
+	_pRace = pRace;
 }
+
+const GfRace* RmCarSelectMenu::getRace() const
+{
+	return _pRace;
+}
+

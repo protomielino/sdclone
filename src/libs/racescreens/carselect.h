@@ -26,6 +26,7 @@
 
 #include "racescreens.h"
 
+class GfRace;
 class GfDriverSkin;
 class GfDriver;
 class GfCar;
@@ -36,11 +37,11 @@ class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
 public:
 
 	RmCarSelectMenu();
-	void RunMenu(GfDriver* pDriver);
+	void RunMenu(GfRace* pRace, GfDriver* pDriver);
 	
-	void resetCarCategoryComboBox(const std::string& strSelCatName = "");
-	void resetCarModelComboBox(const std::string& strCatName,
-							   const std::string& strSelCarName = "");
+	std::string resetCarCategoryComboBox(const std::string& strSelCatName = "");
+	GfCar* resetCarModelComboBox(const std::string& strCatName,
+								 const std::string& strSelCarName = "");
 	void resetCarDataSheet(const std::string& strSelCarId);
 	void resetSkinComboBox(const std::string& strCarName,
 						   const GfDriverSkin* pSelSkin = 0);
@@ -50,9 +51,12 @@ protected:
 	
 	bool Initialize();
 
+	void setDriver(GfDriver* pDriver);
 	const GfDriver* getDriver() const;
 	GfDriver* getDriver();
-	void setDriver(GfDriver* pDriver);
+
+	void setRace(GfRace* pRace);
+	const GfRace* getRace() const;
 
 	const GfCar* getSelectedCarModel() const;
 	const GfDriverSkin& getSelectedSkin() const;
@@ -69,6 +73,9 @@ protected:
 
 private:
 
+	// The target race.
+	GfRace* _pRace;
+	
 	// The target driver.
 	GfDriver* _pDriver;
 	
