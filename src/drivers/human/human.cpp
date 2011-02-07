@@ -906,31 +906,37 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			break;
 	}
 
-	if (s->currentTime > 1.0) {
-		// thanks Christos for the following: gradual accel/brake changes for on/off controls.
-		const tdble inc_rate = 0.2f;
+	// thanks Christos for the following: gradual accel/brake changes for on/off controls.
+	if (cmd[CMD_BRAKE].type == GFCTRL_TYPE_JOY_BUT
+		|| cmd[CMD_BRAKE].type == GFCTRL_TYPE_MOUSE_BUT
+		|| cmd[CMD_BRAKE].type == GFCTRL_TYPE_KEYBOARD)
+	{
+		if (s->currentTime > 1.0)
+		{
+			static const tdble inc_rate = 0.2f;
 		
-		if (cmd[CMD_BRAKE].type == GFCTRL_TYPE_JOY_BUT ||
-		    cmd[CMD_BRAKE].type == GFCTRL_TYPE_MOUSE_BUT ||
-		    cmd[CMD_BRAKE].type == GFCTRL_TYPE_KEYBOARD)
-		{
 			tdble d_brake = car->_brakeCmd - HCtx[idx]->pbrake;
-			if (fabs(d_brake) > inc_rate && car->_brakeCmd > HCtx[idx]->pbrake) {
-				car->_brakeCmd = MIN(car->_brakeCmd, HCtx[idx]->pbrake + inc_rate*d_brake/fabs(d_brake));
-			}
-			HCtx[idx]->pbrake = car->_brakeCmd;
+			if (fabs(d_brake) > inc_rate && car->_brakeCmd > HCtx[idx]->pbrake)
+				car->_brakeCmd =
+					MIN(car->_brakeCmd, HCtx[idx]->pbrake + inc_rate*d_brake/fabs(d_brake));
 		}
-
-		if (cmd[CMD_THROTTLE].type == GFCTRL_TYPE_JOY_BUT ||
-			cmd[CMD_THROTTLE].type == GFCTRL_TYPE_MOUSE_BUT ||
-			cmd[CMD_THROTTLE].type == GFCTRL_TYPE_KEYBOARD)
+		HCtx[idx]->pbrake = car->_brakeCmd;
+	}
+	
+	if (cmd[CMD_THROTTLE].type == GFCTRL_TYPE_JOY_BUT
+		|| cmd[CMD_THROTTLE].type == GFCTRL_TYPE_MOUSE_BUT
+		|| cmd[CMD_THROTTLE].type == GFCTRL_TYPE_KEYBOARD)
+	{
+		if (s->currentTime > 1.0)
 		{
+			static const tdble inc_rate = 0.2f;
+			
 			tdble d_accel = car->_accelCmd - HCtx[idx]->paccel;
-			if (fabs(d_accel) > inc_rate && car->_accelCmd > HCtx[idx]->paccel) {
-				car->_accelCmd = MIN(car->_accelCmd, HCtx[idx]->paccel + inc_rate*d_accel/fabs(d_accel));
-			}
-			HCtx[idx]->paccel = car->_accelCmd;
+			if (fabs(d_accel) > inc_rate && car->_accelCmd > HCtx[idx]->paccel)
+				car->_accelCmd =
+					MIN(car->_accelCmd, HCtx[idx]->paccel + inc_rate*d_accel/fabs(d_accel));
 		}
+		HCtx[idx]->paccel = car->_accelCmd;
 	}
 
 	if (HCtx[idx]->autoReverseEngaged) {
