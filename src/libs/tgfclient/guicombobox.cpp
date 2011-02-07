@@ -202,29 +202,38 @@ gfuiDrawCombobox(tGfuiObject *obj)
 //Do nothing because children already draw themselves
 }
 
+static tGfuiCombobox*
+gfuiGetCombobox(void *scr, int id)
+{
+    tGfuiScreen	*screen = (tGfuiScreen*)scr;
+    tGfuiObject* curObject = screen->objects;
+
+    if (curObject)
+	{
+		do
+		{
+			curObject = curObject->next;
+			if (curObject->id == id && curObject->widget == GFUI_COMBOBOX)
+					return &(curObject->u.combobox);
+		}
+		while (curObject != screen->objects);
+    }
+
+	return 0;
+}
+				  
 unsigned int
 GfuiComboboxAddText(void *scr, int id, const char *text)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	unsigned int index = 0;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_COMBOBOX) 
-		{
-			tGfuiCombobox *combo = &(curObject->u.combobox);
-			combo->pInfo->vecChoices.push_back(text);
-			index = combo->pInfo->vecChoices.size();
-			GfuiLabelSetText(combo->scr, combo->labelId,
-							 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
-		}
-		return index;
-	    }
-	} while (curObject != screen->objects);
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo)
+	{
+		combo->pInfo->vecChoices.push_back(text);
+		index = combo->pInfo->vecChoices.size();
+		GfuiLabelSetText(combo->scr, combo->labelId,
+						 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
     }
 
 	return index;
@@ -233,53 +242,23 @@ GfuiComboboxAddText(void *scr, int id, const char *text)
 void
 GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_COMBOBOX) 
-		{
-			tGfuiCombobox *combo = &(curObject->u.combobox);
-			if (combo->pInfo->vecChoices.size()<= index)
-				return;
-
-			combo->pInfo->nPos = index;
-			GfuiLabelSetText(combo->scr, combo->labelId,
-							 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }
-
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo && index < combo->pInfo->vecChoices.size())
+	{
+		combo->pInfo->nPos = index;
+		GfuiLabelSetText(combo->scr, combo->labelId,
+						 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
+	}
 }
 
 void
 GfuiComboboxSetTextColor(void *scr, int id, const Color& color)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_COMBOBOX) 
-		{
-			tGfuiCombobox *combo = &(curObject->u.combobox);
-			GfuiLabelSetColor(combo->scr, combo->labelId, color.GetPtr());
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }
-
-	return;
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo)
+		GfuiLabelSetColor(combo->scr, combo->labelId, color.GetPtr());
 }
 
 
@@ -287,120 +266,68 @@ GfuiComboboxSetTextColor(void *scr, int id, const Color& color)
 void
 GfuiComboboxSetPosition(void *scr, int id, unsigned int pos)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	unsigned int index = 0;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) 
-	{
-		do {
-			curObject = curObject->next;
-			if (curObject->id == id) 
-			{
-				if (curObject->widget == GFUI_COMBOBOX) 
-				{
-					tGfuiCombobox *combo = &(curObject->u.combobox);
-					combo->pInfo->nPos = pos;
-				}
-				return;
-			}
-		} while (curObject != screen->objects);
-    }
-
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo)
+		combo->pInfo->nPos = pos;
 }
 
 unsigned int
 GfuiComboboxGetPosition(void *scr, int id)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	unsigned int index = 0;
     
-    curObject = screen->objects;
-    if (curObject != NULL) 
-	{
-		do 
-		{
-			curObject = curObject->next;
-			if (curObject->id == id) 
-			{
-				if (curObject->widget == GFUI_COMBOBOX) 
-				{
-					tGfuiCombobox *combo = &(curObject->u.combobox);
-					return combo->pInfo->nPos;
-				}
-				return 0;
-			}
-		} while (curObject != screen->objects);
-    }
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo)
+		index = combo->pInfo->nPos;
 
-	return 0;
+	return index;
 }
 
 const char*
 GfuiComboboxGetText(void *scr, int id)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	char* pszText = 0;
+	const char* pszText = 0;
     
-    curObject = screen->objects;
-    if (curObject != NULL) 
-	{
-		do 
-		{
-			curObject = curObject->next;
-			if (curObject->id == id) 
-			{
-				if (curObject->widget == GFUI_COMBOBOX) 
-				{
-					tGfuiCombobox *combo = &(curObject->u.combobox);
-					if (combo->pInfo->nPos >= 0
-						&& combo->pInfo->nPos < combo->pInfo->vecChoices.size())
-						return combo->pInfo->vecChoices[combo->pInfo->nPos].c_str();
-				}
-				return 0;
-			}
-		} while (curObject != screen->objects);
-    }
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo && combo->pInfo->nPos >= 0 && combo->pInfo->nPos < combo->pInfo->vecChoices.size())
+		pszText = combo->pInfo->vecChoices[combo->pInfo->nPos].c_str();
 
 	return pszText;
 }
 
+unsigned
+GfuiComboboxGetNumberOfChoices(void *scr, int id)
+{
+	unsigned nChoices = 0;
+    
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo)
+		nChoices = combo->pInfo->vecChoices.size();
+
+	return nChoices;
+}
+				  
+
 void
 GfuiComboboxClear(void *scr, int id)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) 
+	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
+	
+    if (combo)
 	{
-		do 
-		{
-			curObject = curObject->next;
-			if (curObject->id == id) 
-			{
-				if (curObject->widget == GFUI_COMBOBOX) 
-				{
-					tGfuiCombobox *combo = &(curObject->u.combobox);
-					combo->pInfo->nPos = 0;
-					combo->pInfo->vecChoices.clear();
-					GfuiLabelSetText(combo->scr, combo->labelId, "");
-				}
-				break;
-			}
-		} while (curObject != screen->objects);
-    }
+		combo->pInfo->nPos = 0;
+		combo->pInfo->vecChoices.clear();
+		GfuiLabelSetText(combo->scr, combo->labelId, "");
+	}
 }
 
 void
 gfuiReleaseCombobox(tGfuiObject *obj)
 {
-    tGfuiCombobox	*combobox;
-
-    combobox = &(obj->u.combobox);
-	delete combobox->pInfo;
+	delete obj->u.combobox.pInfo;
     free(obj);
 }

@@ -397,6 +397,7 @@ TGFCLIENT_API void GfuiComboboxSetPosition(void *scr, int id, unsigned int pos);
 TGFCLIENT_API unsigned int GfuiComboboxGetPosition(void *scr, int id);
 TGFCLIENT_API const char* GfuiComboboxGetText(void *scr, int id);
 TGFCLIENT_API void GfuiComboboxClear(void *scr, int id);
+TGFCLIENT_API unsigned GfuiComboboxGetNumberOfChoices(void *scr, int id);
 
 TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
 										const char *pszProgressbackImg, const char *progressbarimg,
