@@ -651,10 +651,10 @@ RmDriversSelect(void *vs)
 		{
 			VecCarCategoryIds.push_back(GfCars::self()->getCategoryIds()[nCatInd]);
 			VecCarCategoryNames.push_back(GfCars::self()->getCategoryNames()[nCatInd]);
-			//GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
+			GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
 		}
 	}
-	if (VecDriverTypes.size() > 1)
+	if (VecCarCategoryIds.size() > 1)
 	{
 		VecCarCategoryIds.push_back(AnyCarCategory);
 		VecCarCategoryNames.push_back(AnyCarCategory);
@@ -673,7 +673,7 @@ RmDriversSelect(void *vs)
 		if (MenuData->pRace->acceptsDriverType(*itDrvType))
 		{
 			VecDriverTypes.push_back(*itDrvType);
-			//GfLogDebug("Accepted type : %s\n", itDrvType->c_str());
+			GfLogDebug("Accepted type : %s\n", itDrvType->c_str());
 		}
 		itDrvType++;
 	}
