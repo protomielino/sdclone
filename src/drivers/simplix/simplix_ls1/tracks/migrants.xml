@@ -11,18 +11,6 @@
 <!--    (at your option) any later version.                                   -->
 <!DOCTYPE params SYSTEM "../../../src/libs/tgf/params.dtd">
 <params name="" type="template" mode="mw">
-	<section name="Front Right Suspension">
-		<attnum name="spring" unit="lbs/in" min="0" max="10000" val="3200"/>
-	</section>
-	<section name="Front Left Suspension">
-		<attnum name="spring" unit="lbs/in" min="0" max="10000" val="3200"/>
-	</section>
-	<section name="Rear Right Suspension">
-		<attnum name="spring" unit="lbs/in" min="0" max="10000" val="4000"/>
-	</section>
-	<section name="Rear Left Suspension">
-		<attnum name="spring" unit="lbs/in" min="0" max="10000" val="4000"/>
-	</section>
 	<section name="simplix private">
 		<attnum name="pit use first" min="0" max="1" val="1"/>
 		<attnum name="pit use smooth" min="0" max="1" val="1"/>
