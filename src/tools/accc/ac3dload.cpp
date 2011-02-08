@@ -76,7 +76,7 @@ double   tmptexa[200000];
 int     tmpsurf[100000];  
 ob_t * root_ob;
 int refs=0;
-char * const shadowtexture=strdup("shadow2.rgb");
+char * const shadowtexture=strdup("shadow2.png");
 
 FILE * ofile;
 
@@ -1467,8 +1467,8 @@ void saveObin3DS( char * OutputFilename, ob_t * object)
 	    }
 	}
 
-	printf("texture file %s will be stored as %s.rgb \n",tex[i],name2);
-	sprintf(matr->texture.map.name,"%s.rgb",name2);
+	printf("texture file %s will be stored as %s.png \n",tex[i],name2);
+	sprintf(matr->texture.map.name,"%s.png",name2);
        
 	if (root_material!=NULL) {
 	    matr->ambient.r = root_material->amb.r;
@@ -2451,7 +2451,7 @@ void computeSaveAC3D( char * OutputFilename, ob_t * object)
 	    }
 	}
 
-	printf("texture file %s will be stored as %s.rgb \n",tex[i],name2);
+	printf("texture file %s will be stored as %s.png \n",tex[i],name2);
     }
 
 
@@ -2611,7 +2611,7 @@ void computeSaveOBJ( char * OutputFilename, ob_t * object)
 			}
 		}
 
-	    printf("texture file %s will be stored as %s.rgb \n",tex[i],name2);
+	    printf("texture file %s will be stored as %s.png \n",tex[i],name2);
 	}
 
     tmpob=object;
@@ -3139,7 +3139,7 @@ void computeSaveAC3DM( char * OutputFilename, ob_t * object)
 			}
 		}
 
-	    printf("texture file %s will be stored as %s.rgb \n",tex[i],name2);
+	    printf("texture file %s will be stored as %s.png \n",tex[i],name2);
 	}
 
     tmpob=object;
