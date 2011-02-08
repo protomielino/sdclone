@@ -794,7 +794,12 @@ grUpdateSky(double currentTime)
 	// Update last update time.
 	static int lastchecked = -100;
 	static double lastTime = -10.0f;
-	if( currentTime < lastTime ) {
+	static ulClock ck ;
+	ck.update () ;
+	double t = ck.getAbsTime();
+	double dt1 = ck.getDeltaTime();
+	if( currentTime < lastTime ) 
+	{
 		lastchecked = -100;
 		lastTime = currentTime;
 		return;
@@ -803,10 +808,13 @@ grUpdateSky(double currentTime)
 	// Update sun position (?)
 	int current = (int)floor( ( currentTime + 10.0f ) / 60.0f );
 	double dt = currentTime - lastTime;
+	
 	sgVec3 solposn;
-	sgSetVec3(solposn, 0, 0, 0);				  
-	ssgGetLight(0)->setPosition(solposn);
-	TheSky->repositionFlat(solposn , 0, dt);
+	//sgSetVec3(solposn, 0, 0, 0);				  
+	//ssgGetLight(0)->setPosition(solposn);
+	//TheSky->repositionFlat(solposn, 0, dt1 );
+	TheSky->repositionFlat(solposn , 0, dt1);
+	//TheSky->modifyVisibility(solposn, (float)dt1);
 	lastTime = currentTime;
 	if( current == lastchecked )
 		return;
