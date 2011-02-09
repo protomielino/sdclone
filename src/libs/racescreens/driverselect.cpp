@@ -297,9 +297,6 @@ rmdsSetFocus(void * /* dummy */)
 static void
 rmdsNextMenu(void * /* dummy */)
 {
-	// Save the race data to its params file
-	MenuData->pRace->save();
-
 	// Finally, go back to the caller menu.
     rmdsDeactivate(MenuData->nextScreen);
 }

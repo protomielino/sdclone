@@ -31,6 +31,7 @@
 #include <tgfclient.h>
 #include <portability.h>
 
+#include <racemanagers.h>
 #include <race.h>
 #include <tracks.h>
 
@@ -91,7 +92,7 @@ rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsign
 static void
 rmtsUpdateTrackInfo(void)
 {
-	static const int nMaxLinesLength = 30;  //Line length for track description (chars)
+	static const int nMaxLinesLength = 35;  //Line length for track description (chars)
 
 	if (!PCurTrack)
 		return;
@@ -187,8 +188,8 @@ rmtsTrackCatPrevNext(void *vsel)
 static void
 rmtsSelect(void * /* dummy */)
 {
-	// Save currently selected track into the race.
-	MenuData->pRace->setTrack(PCurTrack);
+	// Save currently selected track into the race manager.
+	MenuData->pRace->getManager()->setEventTrack(0, PCurTrack);
 
 	// Next screen.
     rmtsDeactivate(MenuData->nextScreen);

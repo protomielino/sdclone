@@ -44,14 +44,14 @@ public:
 	//! Constructor.
 	GfRace();
 
-	//! Load from the given race manager params file.
-	void load(GfRaceManager* pRaceMan);
+	//! Load from the given race manager params and results file if specified.
+	void load(GfRaceManager* pRaceMan, void* hparmResults = 0);
 
 	//! Clear the race.
 	void clear();
 	
-	//! Save to the race manager params file.
-	void save();
+	//! Store to the race manager params file.
+	void store();
 
 	GfRaceManager* getManager() const;
 
@@ -103,7 +103,8 @@ public:
 	void setFocusedCompetitor(const GfDriver* pComp);
 
 	GfTrack* getTrack() const;
-	void setTrack(GfTrack* pTrack);
+
+	void* getResultsDescriptorHandle() const;
 	
  	void print() const;
 

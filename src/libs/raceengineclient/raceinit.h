@@ -33,13 +33,14 @@ class GfRace;
 
 
 RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
+RACEENGINECLIENT_API void ReResumeRace(void * /* dummy */);
 
 extern void ReInit(void);
 extern void ReShutdown(void);
 
 extern void ReRaceSelectRaceman(GfRaceManager* pRaceMan);
-extern void ReRaceRestore(GfRaceManager* pRaceMan, const char *pszResultFileName);
-extern void ReRaceConfigure(GfRaceManager* pRaceMan);
+extern void ReRaceRestore(void* hparmResults);
+extern void ReRaceConfigure(bool bInteractive = true);
 
 extern int  ReInitCars(void);
 

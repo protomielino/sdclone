@@ -27,8 +27,11 @@
 #include <algorithm>
 
 #include <tgfclient.h>
+
 #include <raceman.h>
+
 #include <racemanagers.h>
+#include <race.h>
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -96,9 +99,19 @@ reOnSelectRaceMan(void *pvRaceManTypeIndex)
 	}
 
 	if (pSelRaceMan)
-		ReRaceConfigure(pSelRaceMan);
+	{
+		ReRaceSelectRaceman(pSelRaceMan);
+		
+		// (Re-)initialize the currrent race configuration from the selected race manager.
+		ReGetRace()->load(pSelRaceMan);
+
+		// Start the race configuration menus sequence.
+		ReRaceConfigure(/* bInteractive */ true);
+	}
 	else
+	{
 		GfLogDebug("No such race manager (type '%s')\n", strRaceManType.c_str());
+	}
 }
 
 static void

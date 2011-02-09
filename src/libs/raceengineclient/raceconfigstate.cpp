@@ -124,7 +124,7 @@ ReConfigRunState(bool bStart)
 	curConf = (int)GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
 	if (curConf > GfParmGetEltNb(params, RM_SECT_CONF)) {
 		GfLogInfo("%s configuration finished.\n", ReInfo->_reName);
-		ReGetRace()->save(); // Save race data to params.
+		ReGetRace()->store(); // Save race data to params.
 		GfParmWriteFile(NULL, params, ReInfo->_reName); // Save params to disk.
 		GfuiScreenActivate(ReGetRacemanMenuHandle()); // Back to the race manager menu
 		return;

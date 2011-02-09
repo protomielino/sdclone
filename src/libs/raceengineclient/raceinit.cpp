@@ -65,7 +65,7 @@ static GfRace* PReRace = 0;
 
 GfRace* ReGetRace()
 {
-  return PReRace;
+	return PReRace;
 }
 
 
@@ -73,64 +73,78 @@ GfRace* ReGetRace()
 void
 ReInit(void)
 {
-  const char *dllname;
-  char key[256];
-  tRmMovieCapture *capture;
+	// If not already done, instanciate the race object.
+	if (!PReRace)
+		PReRace = new GfRace();
 
-  ReShutdown();
+	// Shutdown the previous race engine if any.
+	ReShutdown();
 
-  ReInfo = (tRmInfo *)calloc(1, sizeof(tRmInfo));
-  ReInfo->s = (tSituation *)calloc(1, sizeof(tSituation));
-  ReInfo->modList = &ReRaceModList;
+	// Allocate race engine info structures.
+	ReInfo = (tRmInfo *)calloc(1, sizeof(tRmInfo));
+	ReInfo->s = (tSituation *)calloc(1, sizeof(tSituation));
+	ReInfo->modList = &ReRaceModList;
 
-  char buf[512];
-  snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
+	// Load Race engine params.
+	char buf[256];
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
-  ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+	ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
-  GfLogInfo("Loading Track Loader ...\n");
-  dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
-  snprintf(key, sizeof(key), "%smodules/track/%s.%s", GfLibDir (), dllname, DLLEXT);
-  if (GfModLoad(0, key, &reEventModList))
-	  return;
-  reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reTrackItf);
+	// Load and initialize the track loader module.
+	GfLogInfo("Loading Track Loader ...\n");
+	const char* dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
+	snprintf(buf, sizeof(buf), "%smodules/track/%s.%s", GfLibDir(), dllname, DLLEXT);
+	if (GfModLoad(0, buf, &reEventModList))
+		return;
+	reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reTrackItf);
 
-  // Initialize GfTracks' track module interface (needed for some track infos).
-  GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
+	// Initialize GfTracks' track module interface (needed for some track infos).
+	GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
 
-  /* The graphic modules isn't loaded at this moment, so make sure _reGraphicItf equals NULL */
-  memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf));
+	/* The graphic modules isn't loaded at this moment, so make sure _reGraphicItf equals NULL */
+	memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf));
 
-  capture = &(ReInfo->movieCapture);
-  if (!strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE, "no"), "no")){
-    capture->enabled = 0;
-    capture->outputBase = 0;
-    GfLogInfo("Movie capture disabled\n");
-  } else {
-    capture->enabled = 1;
-    capture->state = 0;
-    capture->deltaFrame = 1.0 / GfParmGetNum(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 25.0);
-    capture->deltaSimu = RCM_MAX_DT_SIMU;
-    char pszDefOutputBase[256];
-    snprintf(pszDefOutputBase, sizeof(pszDefOutputBase), "%s%s",
-        GfLocalDir(), GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE,
-                      RM_ATT_CAPTURE_OUT_DIR, "captures"));
-    capture->outputBase = strdup(pszDefOutputBase);
-    GfDirCreate(pszDefOutputBase); // In case not already done.
-    GfLogInfo("Movie capture enabled (%.0f FPS, PNG frames in %s)\n", 
-			  1.0 / capture->deltaFrame, capture->outputBase);
-  }
+	// Initialize the movie capture system.
+	tRmMovieCapture *capture = &(ReInfo->movieCapture);
+	capture->enabled =
+		strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE,
+							RM_VAL_NO),
+			   RM_VAL_NO) ? 1 : 0;
+	if (!capture->enabled)
+	{
+		capture->outputBase = 0;
+		GfLogInfo("Movie capture disabled\n");
+	}
+	else
+	{
+		capture->state = 0;
+		capture->deltaFrame = 1.0 / GfParmGetNum(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 25.0);
+		capture->deltaSimu = RCM_MAX_DT_SIMU;
+		char pszDefOutputBase[256];
+		snprintf(pszDefOutputBase, sizeof(pszDefOutputBase), "%s%s",
+				 GfLocalDir(), GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE,
+											RM_ATT_CAPTURE_OUT_DIR, "captures"));
+		capture->outputBase = strdup(pszDefOutputBase);
+		GfDirCreate(pszDefOutputBase); // In case not already done.
+		GfLogInfo("Movie capture enabled (%.0f FPS, PNG frames in %s)\n", 
+				  1.0 / capture->deltaFrame, capture->outputBase);
+	}
 
-  ReInfo->_reGameScreen = ReHookInit();
+	// Set ReStateManage as the event loop "display" call-back when the race will actually start
+	// (will be actually used after something like GfuiScreenActivate(ReInfo->_reGameScreen)).
+	ReInfo->_reGameScreen = ReHookInit();
 }
 
 
 /* Race Engine Exit */
 void ReShutdown(void)
 {
-  /* Free previous situation */
-  if (ReInfo) {
-    ReInfo->_reTrackItf.trkShutdown();
+	if (!ReInfo)
+		return;
+
+	/* Free previous situation */
+	ReInfo->_reTrackItf.trkShutdown();
 
     GfModUnloadList(&reEventModList);
 
@@ -138,39 +152,25 @@ void ReShutdown(void)
 
     if (ReInfo->results) 
     {
-          if (ReInfo->mainResults != ReInfo->results)
-        GfParmReleaseHandle(ReInfo->mainResults);
-            GfParmReleaseHandle(ReInfo->results);
+		if (ReInfo->mainResults != ReInfo->results)
+			GfParmReleaseHandle(ReInfo->mainResults);
+		GfParmReleaseHandle(ReInfo->results);
     }
-    if (ReInfo->_reParam) {
-      GfParmReleaseHandle(ReInfo->_reParam);
-    }
+    if (ReInfo->_reParam)
+		GfParmReleaseHandle(ReInfo->_reParam);
     if (ReInfo->params != ReInfo->mainParams) 
     {
-      GfParmReleaseHandle(ReInfo->params);
-      ReInfo->params = ReInfo->mainParams;
+		GfParmReleaseHandle(ReInfo->params);
+		ReInfo->params = ReInfo->mainParams;
     }
     if (ReInfo->movieCapture.outputBase)
-      free(ReInfo->movieCapture.outputBase);
+		free(ReInfo->movieCapture.outputBase);
     free(ReInfo->s);
     free(ReInfo->carList);
     free(ReInfo->rules);
     
     FREEZ(ReInfo);
-    }
 }
-
-
-void
-ReStartNewRace(void * /* dummy */)
-{
-  if (strcmp(GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_NO) == 0)
-    ReInitResults();
-  else
-    ReCareerNew();
-  ReStateManage();
-}
-
 
 // Select the given manager for the race.
 void
@@ -185,48 +185,64 @@ ReRaceSelectRaceman(GfRaceManager* pRaceMan)
 	}
 	GfLogTrace("'%s' race type selected\n", strFullType.c_str());
 	
-	// Re-init. race engine info about the race.
-	ReInfo->mainParams = ReInfo->params = pRaceMan->getDescriptorHandle();
+	// Re-init. race engine info about the race manager (= the race mode / type / class).
 	ReInfo->_reName = pRaceMan->getName().c_str();
 	ReInfo->_reFilename = pRaceMan->getId().c_str();
+}
+
+// Start configuring the race
+void
+ReRaceConfigure(bool bInteractive)
+{
+	// Update race engine info.
+	ReInfo->mainParams = ReInfo->params = PReRace->getManager()->getDescriptorHandle();
 	
+	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
+	
+	// Enter CONFIG state if interactive mode.
+	if (bInteractive)
+		ReStateApply(RE_STATE_CONFIG);
+}
+
+// Restore the race from the given results file
+void
+ReRaceRestore(void* hparmResults)
+{
+	// Update race engine info.
+	ReInfo->mainParams = ReInfo->params = PReRace->getManager()->getDescriptorHandle();
+	ReInfo->mainResults = ReInfo->results = PReRace->getResultsDescriptorHandle();
+
+	// TODO: Improve this : we set _reRaceName to the name of the race manager
+	//       in order to have a correctrelevant Standings menu title,
+	//       but this field normally holds the _session_ name (quali, 1st race, ...)
+	ReInfo->_reRaceName = ReInfo->_reName;
+
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
 	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
 }
 
-// Start configuring a race for the given manager
+// Start a new race for the previously configured race manager
 void
-ReRaceConfigure(GfRaceManager* pRaceMan)
+ReStartNewRace(void * /* dummy */)
 {
-	// Select the given race manager for the race.
-	ReRaceSelectRaceman(pRaceMan);
+	if (!strcmp(GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO),
+				RM_VAL_NO))
+		ReInitResults();
+	else
+		ReCareerNew();
 	
-	// If not already done, instanciate the race.
-	if (!PReRace)
-		PReRace = new GfRace();
-	
-	// (Re-)initialize it from the selected race manager.
-	PReRace->load(pRaceMan);
-	
-	// Enter CONFIG state.
-	ReStateApply(RE_STATE_CONFIG);
+	ReStateManage();
 }
 
-// Restore the race from the given result file
+// Resume the previously restored race from a results file
 void
-ReRaceRestore(GfRaceManager* pRaceMan, const char *pszResultFileName)
+ReResumeRace(void * /* dummy */)
 {
-	// Select the given race manager for the race.
-	ReRaceSelectRaceman(pRaceMan);
-	
-	// Update race engine info.
-	ReInfo->mainResults = GfParmReadFile(pszResultFileName, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	ReInfo->results = ReInfo->mainResults;
-	ReInfo->_reRaceName = ReInfo->_reName;
-	
 	// Fire standings screen.
 	RmShowStandings(ReInfo->_reGameScreen, ReInfo);
 }
+
 
 /*
  * Function
@@ -484,11 +500,13 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
   isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
 
-  if (!normal_carname && !isHuman) /*Extended is forced for humans, so no need to increase robotIdx*/
+  /*Extended is forced for humans, so no need to increase robotIdx*/
+  if (!normal_carname && !isHuman) 
     robotIdx += curModInfo->index;
 
   /* Retrieve the driver interface (function pointers) */
   curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
+
   /* ... and initialize the driver */
   if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) {
     curModInfo->fctInit(robotIdx, (void*)(curRobot));
@@ -501,7 +519,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     curRobot->rbShutdown = NULL;
     curRobot->index      = 0;
   }
-  /* Retrieve and load the driver type XML file :
+  
+  /* Retrieve and load the robotXML file :
      1) from user settings dir (local dir)
      2) from installed data dir */
   snprintf(buf, sizeof(buf), "%sdrivers/%s/%s.xml", GfLocalDir(), cardllname, cardllname);
@@ -725,13 +744,13 @@ ReInitCars(void)
   /* For each car/driver : */
   for (i = 1; i < nCars + 1; i++) 
   {
-    /* Get the name of the module (= shared library) of the driver type */
+    /* Get the name of the module (= shared library) of the robot */
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i);
     robotModuleName = GfParmGetStr(ReInfo->params, path, RM_ATTR_MODULE, "");
     robotIdx = (int)GfParmGetNum(ReInfo->params, path, RM_ATTR_IDX, NULL, 0);
     snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
-    /* Load the driver type shared library */
+    /* Load the robot shared library */
     if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
     {
       GfLogError("Failed to load robot module %s\n", path);
@@ -789,7 +808,6 @@ ReInitCars(void)
       }
       else
         GfLogError("No descriptor for robot %s (2)\n", robotModuleName );
-
     }
 
     if (elt)
@@ -914,6 +932,9 @@ ReGetCurrentRaceName(void)
 
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, curRaceIdx);
+
+	GfLogDebug("ReGetCurrentRaceName : ind=%d\n", curRaceIdx);
+	
     return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
 }
 
@@ -927,5 +948,8 @@ ReGetPrevRaceName(void)
 
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1) - 1;
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, curRaceIdx);
+
+	GfLogDebug("ReGetPrevRaceName : ind=%d\n", curRaceIdx);
+	
     return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
 }

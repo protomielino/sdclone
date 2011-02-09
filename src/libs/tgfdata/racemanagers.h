@@ -58,12 +58,21 @@ public:
 	const std::vector<std::string>& getAcceptedCarCategoryIds() const;
 	
 	unsigned getEventCount() const;
-	bool stepToNextEvent();
-	GfTrack* getCurrentEventTrack();
-	void setCurrentEventTrack(GfTrack* pTrack);
+	bool isMultiEvent() const;
+	GfTrack* getEventTrack(unsigned nEventIndex); // index in [0, nEvents[
+	void setEventTrack(unsigned nEventIndx, GfTrack* pTrack); // index in [0, nEvents[
+	GfTrack* getPreviousEventTrack(unsigned nEventIndex); // index in [0, nEvents[
 
-	//! Save data to params (in-memory).
-	void save();
+	const std::vector<std::string>& getSessionNames() const;
+	unsigned getSessionCount() const;
+	
+	const std::string& getSavedConfigsDir() const;
+	bool hasSavedConfigsFiles() const;
+	const std::string& getResultsDir() const;
+	bool hasResultsFiles() const;
+
+	//! Save data to params (in-memory, no file written to disk).
+	void store();
 	
 protected:
 	
@@ -80,8 +89,12 @@ protected:
 
 	bool _bHasSubFiles; // True if multiple configuration files are used (ex: Career mode).
 	
-	std::vector<std::string> _vecEventTrackIds; // Id of the track for each event.
-	int _nCurrentEventInd;
+	// Saved configs and results files dirs.
+	mutable std::string _strSavedConfigsDir;
+	mutable std::string _strResultsDir;
+	
+	std::vector<std::string> _vecEventTrackIds; // Id of the track for each scheduled event.
+	std::vector<std::string> _vecSessionNames; // Name and order of sessions for each event.
 };
 
 class TGFDATA_API GfRaceManagers

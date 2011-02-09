@@ -268,7 +268,7 @@ GfRaceManager::GfRaceManager(const std::string& strId, void* hparmHandle)
 		if (itCarCat != _vecAcceptedCarCategoryIds.end()) // Accepted til now => now rejected.
 			_vecAcceptedCarCategoryIds.erase(itCarCat);
     }
-	
+
 	// Load other "mutable" properties.
 	reset(hparmHandle, false);
 }
@@ -283,10 +283,10 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 	// 1) Simple case : the race manager has no subfiles, use the normal file.
 	// 2) Career case : the events are defined in "sub-championships" files.
 	//    WARNING: Very partial support for the moment : we only care about the 1st event
-	//             ('cause it is quite complicated, with events are intermixed between
+	//             ('cause it is quite complicated, with intermixed events between
 	//              the other "sub-championships", each defined in a career_<sub-champ>.xmls).
 	//             This is not an issue as long as this class is not used in the race engine
-	//             or the event management purpose (everything is in racecareer.cpp for now).
+	//             or the event management purpose (most of it is in racecareer.cpp for now).
 	const char* pszHasSubFiles =
 		GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO);
 	_bHasSubFiles = strcmp(pszHasSubFiles, RM_VAL_YES) ? false : true;
@@ -300,18 +300,20 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 			ossSubFilePath << GfLocalDir() << "config/raceman/" << psz1stSubFileName;
 			hparmHandle = GfParmReadFile(ossSubFilePath.str().c_str(), GFPARM_RMODE_STD);
 		}
-		if (!hparmHandle)
+		if (!psz1stSubFileName || !hparmHandle)
+		{
 			_bHasSubFiles = false;
+			hparmHandle = _hparmHandle;
+		}
 	}
 
-	// Get current event in the schedule.
-	_nCurrentEventInd =
-		(int)GfParmGetNum(hparmHandle, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL, 1) - 1;
-	GfLogDebug("GfRaceManager::reset(%s): curEvent = %d (%s)\n",
-			   _strName.c_str(), _nCurrentEventInd, GfParmGetFileName(hparmHandle));
+	GfLogDebug("GfRaceManager::reset(%s): %s\n",
+			   _strName.c_str(), GfParmGetFileName(hparmHandle));
 
-	// Load track id for each event in the schedule
-	// (warning: we don't check here that the tracks exist and are usable).
+	// Clear the event list
+	_vecEventTrackIds.clear();
+
+	// And reload it (warning: we don't check here that the tracks exist and are usable).
 	std::ostringstream ossSectionPath;
 	int nEventNum = 1;
 	const char* pszTrackId;
@@ -333,18 +335,31 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		}
 	}
 	while (pszTrackId);
+	
+	// Session names.
+	std::ostringstream ossSecPath;
+	int nSessionInd = 1;
+    while (nSessionInd <= (int)GfParmGetEltNb(hparmHandle, RM_SECT_RACES))
+	{
+		ossSecPath.str("");
+		ossSecPath << RM_SECT_RACES << '/' << nSessionInd;
+		const char* pszSessionName =
+			GfParmGetStr(hparmHandle, ossSecPath.str().c_str(), RM_ATTR_NAME, 0);
+		if (pszSessionName && strlen(pszSessionName) > 0)
+			_vecSessionNames.push_back(pszSessionName);
+
+		// Next session.
+		nSessionInd++;
+	}
+	
 }
 
-void GfRaceManager::save()
+void GfRaceManager::store()
 {
 	if (!_hparmHandle)
 		return;
 
 	// Note: No need to save constant properties (never changed).
-	
-	// Current event in the schedule.
-	GfParmSetNum(_hparmHandle, RM_SECT_TRACKS, RE_ATTR_CUR_TRACK, NULL,
-				 (tdble)(_nCurrentEventInd + 1));
 	
 	// Info about each event in the schedule.
 	// WARNING: Not supported for Career mode (TODO ?).
@@ -357,7 +372,7 @@ void GfRaceManager::save()
 		std::ostringstream ossSectionPath;
 		for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
 		{
-			GfLogDebug("GfRaceManager::save(%s): event[%u].track = '%s'\n",
+			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
 					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
 			ossSectionPath.str("");
 			ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
@@ -443,37 +458,124 @@ unsigned GfRaceManager::getEventCount() const
 	return _vecEventTrackIds.size();
 }
 
-bool GfRaceManager::stepToNextEvent()
+bool GfRaceManager::isMultiEvent() const
 {
-	if (_nCurrentEventInd < (int)_vecEventTrackIds.size() - 1)
-	{
-		_nCurrentEventInd++;
-		return true;
-	}
-
-	return false;
+	return _vecEventTrackIds.size() > 1;
 }
 
-GfTrack* GfRaceManager::getCurrentEventTrack()
+GfTrack* GfRaceManager::getEventTrack(unsigned nEventIndex)
 {
 	GfTrack* pTrack = 0;
+
+	if (!_vecEventTrackIds.empty())
+	{
+		if (nEventIndex < 0)
+			nEventIndex = 0;
+		else if (nEventIndex >= _vecEventTrackIds.size())
+			nEventIndex = _vecEventTrackIds.size() - 1;
 	
-	// If the race manager has any event, get the current one track.
-	// Note: For the moment, Career raceman has none (but this will probably change, WIP).
-	if (_vecEventTrackIds.size() > 0)
-		pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[_nCurrentEventInd]);
+		pTrack =
+			GfTracks::self()->getTrack(_vecEventTrackIds[nEventIndex]);
+	}
 	
-	// If the current event track is not usable, take the first usable one.
+	// If the event track could not be found, take the first usable one.
 	if (!pTrack)
 		pTrack = GfTracks::self()->getFirstUsableTrack();
 		   
 	return pTrack;
 }
 
-void GfRaceManager::setCurrentEventTrack(GfTrack* pTrack)
+void GfRaceManager::setEventTrack(unsigned nEventIndex, GfTrack* pTrack)
 {
-	if (!pTrack)
+	if (!pTrack || _vecEventTrackIds.empty())
 		return;
+	
+	if (nEventIndex < 0)
+		nEventIndex = 0;
+	else if (nEventIndex >= _vecEventTrackIds.size())
+		nEventIndex = _vecEventTrackIds.size() - 1;
 
-	_vecEventTrackIds[_nCurrentEventInd] = pTrack->getId();
+	_vecEventTrackIds[nEventIndex] = pTrack->getId();
 }
+
+GfTrack* GfRaceManager::getPreviousEventTrack(unsigned nEventIndex)
+{
+	GfTrack* pTrack = 0;
+
+	if (!_vecEventTrackIds.empty())
+	{
+		if (nEventIndex < 0)
+			nEventIndex = 0;
+		else if (nEventIndex >= _vecEventTrackIds.size())
+			nEventIndex = _vecEventTrackIds.size() - 1;
+
+		if (nEventIndex >= 1)
+			pTrack =
+				GfTracks::self()->getTrack(_vecEventTrackIds[nEventIndex - 1]);
+	}
+		   
+	return pTrack;
+}
+
+const std::vector<std::string>& GfRaceManager::getSessionNames() const
+{
+	return _vecSessionNames;
+}
+
+unsigned GfRaceManager::getSessionCount() const
+{
+	return _vecSessionNames.size();
+}
+
+const std::string& GfRaceManager::getSavedConfigsDir() const
+{
+	if (_strSavedConfigsDir.empty())
+	{
+		_strSavedConfigsDir = GfLocalDir();
+		_strSavedConfigsDir += "config/raceman/";
+		_strSavedConfigsDir += _strId;
+	}
+	
+	return _strSavedConfigsDir;
+}
+
+bool GfRaceManager::hasSavedConfigsFiles() const
+{
+	tFList *pFileList = GfDirGetListFiltered(getSavedConfigsDir().c_str(), "", PARAMEXT);
+
+	// Now we know what to answer.
+	const bool bAnswer = (pFileList != 0);
+
+	// Free the file list.
+	GfDirFreeList(pFileList, 0, true, true);
+
+	// Answer.
+	return bAnswer;
+}
+
+const std::string& GfRaceManager::getResultsDir() const
+{
+	if (_strResultsDir.empty())
+	{
+		_strResultsDir = GfLocalDir();
+		_strResultsDir += "results/";
+		_strResultsDir += _strId;
+	}
+	
+	return _strResultsDir;
+}
+
+bool GfRaceManager::hasResultsFiles() const
+{
+	tFList *pFileList = GfDirGetListFiltered(getResultsDir().c_str(), "", PARAMEXT);
+
+	// Now we know what to answer.
+	const bool bAnswer = (pFileList != 0);
+
+	// Free the file list.
+	GfDirFreeList(pFileList, 0, true, true);
+
+	// Answer.
+	return bAnswer;
+}
+
