@@ -30,7 +30,9 @@
 
 #include <portability.h>
 #include <tgfclient.h>
+
 #include <racescreens.h>
+
 #include <robot.h>
 
 #include "racesituation.h"

@@ -24,9 +24,11 @@
 */
 #include <portability.h>
 #include <tgfclient.h>
+
 #include <robot.h>
-#include <racescreens.h>
 #include <network.h>
+
+#include <racescreens.h>
 
 #include "raceutil.h" // RmGetFeaturesList
 #include "racesituation.h"
@@ -233,12 +235,12 @@ RePreRace(void)
 	}
 
 	if (strcmp(GfParmGetStr(params, raceName, RM_ATTR_ENABLED, RM_VAL_YES), RM_VAL_NO) == 0) {
-		printf( "||||++|||| NOT ENABLED!\n" );
+		GfLogDebug( "||||++|||| NOT ENABLED!\n" );
 		curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 		if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
-			printf( "||||++|||| NOT LAST RACE!\n" );
+			GfLogDebug( "||||++|||| NOT LAST RACE!\n" );
 			curRaceIdx++;
-			GfOut("Race Nb %d\n", curRaceIdx);
+			GfLogTrace("Race Nb %d\n", curRaceIdx);
 			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, curRaceIdx);
 	
 			return RM_SYNC | RM_NEXT_RACE;
@@ -503,30 +505,31 @@ ReRaceStart(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 
-	// Reallocate car info for the race.
+	// Reallocate and reset car info for the race.
 	FREEZ(ReInfo->_reCarInfo);
-	ReInfo->_reCarInfo = (tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
+	ReInfo->_reCarInfo =
+		(tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
+
+	GfLogInfo("Starting %s %s session on %s\n", ReInfo->_reName, raceName, ReInfo->track->name);
 
 	// Drivers starting order
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-		&& ReInfo->s->_totTime < 0.0f)
+		&& ReInfo->s->_totTime < 0.0f) // <= What's this time test for ?
 	{
-		GfLogInfo("Starting %s %s session\n",
-				  ReInfo->_reName, ReInfo->s->_raceType == RM_TYPE_PRACTICE ? "practice" : "qualification");
-
 		// Race loading screen
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
 			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 			RmLoadingScreenSetText("Preparing Starting Grid ...");
 		} else {
-			RmShutdownLoadingScreen();
+			RmLoadingScreenShutdown();
 		}
 
 		// Propagate competitor drivers info to the real race starting grid
 		snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, i);
 		snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, 1);
+
 		GfParmSetStr(params, path2, RM_ATTR_MODULE,
 					 GfParmGetStr(params, path, RM_ATTR_MODULE, ""));
 		GfParmSetNum(params, path2, RM_ATTR_IDX, NULL,
@@ -546,19 +549,20 @@ ReRaceStart(void)
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		
+		nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
+		maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
+		nCars = MIN(nCars, maxCars);
+		
 		// Starting grid in the arrival order of the previous race (or qualification session)
 		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER))
 		{
-			GfLogInfo("Starting %s : Starting grid in the order of the last race\n",
-					  ReInfo->_reName);
+			GfLogTrace("Starting grid in the order of the last race\n");
 			
-			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
-			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
-			nCars = MIN(nCars, maxCars);
 			prevRaceName = ReGetPrevRaceName();
 			if (!prevRaceName) {
 				return RM_QUIT;
 			}
+
 			for (i = 1; i < nCars + 1; i++) {
 				snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
 						 ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, i);
@@ -580,15 +584,13 @@ ReRaceStart(void)
 		// Starting grid in the reversed arrival order of the previous race
 		else if (!strcmp(gridType, RM_VAL_LAST_RACE_RORDER))
 		{
-			GfLogInfo("Starting %s : Starting grid in the reverse order of the last race\n", ReInfo->_reName);
+			GfLogTrace("Starting grid in the reverse order of the last race\n");
 
-			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
-			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
-			nCars = MIN(nCars, maxCars);
 			prevRaceName = ReGetPrevRaceName();
 			if (!prevRaceName) {
 				return RM_QUIT;
 			}
+
 			for (i = 1; i < nCars + 1; i++) {
 				snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
 						ReInfo->track->name, RE_SECT_RESULTS, prevRaceName, RE_SECT_RANK, nCars - i + 1);
@@ -610,11 +612,8 @@ ReRaceStart(void)
 		// Starting grid in the drivers list order
 		else
 		{
-			GfLogInfo("Starting %s : Starting grid in the order of the driver list\n", ReInfo->_reName);
+			GfLogTrace("Starting grid in the order of the driver list\n");
 
-			nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
-			maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
-			nCars = MIN(nCars, maxCars);
 			for (i = 1; i < nCars + 1; i++) {
 				snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, i);
 				snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, i);
@@ -636,7 +635,7 @@ ReRaceStart(void)
 	//ReTrackUpdate();
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {
-		RmShutdownLoadingScreen();
+		RmLoadingScreenShutdown();
 		RmDisplayStartRace(ReInfo, StartRaceHookInit(), AbandonRaceHookInit());
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
@@ -820,7 +819,7 @@ RePostRace(void)
 	curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 	if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
 		curRaceIdx++;
-		GfOut("Race Nb %d\n", curRaceIdx);
+		GfLogInfo("Race Nb %d\n", curRaceIdx);
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, curRaceIdx);
 		ReUpdateStandings();
 		return RM_SYNC | RM_NEXT_RACE;

@@ -26,10 +26,13 @@
 
 #include <cstring>
 #include <cstdlib>
+
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include <tgfclient.h>
+
 #include <car.h>
 
 #include "racescreens.h"
@@ -113,7 +116,7 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
 }
 
 void
-RmShutdownLoadingScreen(void)
+RmLoadingScreenShutdown(void)
 {
     if (MenuHandle) {
 	GfuiScreenRelease(MenuHandle);

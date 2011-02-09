@@ -94,7 +94,7 @@ RACESCREENS_API void RmPitMenuStart(tCarElt * /* car */, tfuiCallback /* callbac
 
 RACESCREENS_API void RmLoadingScreenStart(const char * /* text */, const char * /* bgimg */);
 RACESCREENS_API void RmLoadingScreenSetText(const char * /* text */);
-RACESCREENS_API void RmShutdownLoadingScreen(void);
+RACESCREENS_API void RmLoadingScreenShutdown(void);
 
 RACESCREENS_API void RmShowResults(void * /* prevHdle */, tRmInfo * /* info */);
 
@@ -125,7 +125,7 @@ RACESCREENS_API void RmDisplayStartRace(tRmInfo *info, void *startScr, void *abo
 
 RACESCREENS_API void RmRaceParamsMenu(void *vrp);
 
-RACESCREENS_API void RmShowStandings(void *prevHdle, tRmInfo *info);
+RACESCREENS_API void RmShowStandings(void *prevHdle, tRmInfo *info, int start = 0);
 
 RACESCREENS_API void* RmFileSelect(void *vs);
 

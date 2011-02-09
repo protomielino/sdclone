@@ -40,7 +40,6 @@ static void	*rmScrHdle = NULL;
 static void rmPracticeResults(void *prevHdle, tRmInfo *info, int start);
 static void rmRaceResults(void *prevHdle, tRmInfo *info, int start);
 static void rmQualifResults(void *prevHdle, tRmInfo *info, int start);
-static void rmShowStandings(void *prevHdle, tRmInfo *info, int start);
 
 #define MAX_LINES	20	//Max number of result lines ona screen
 
@@ -60,7 +59,7 @@ rmSaveRes(void *vInfo)
 {
     tRmInfo *info = (tRmInfo *)vInfo;
 
-    GfParmWriteFile(0, info->results, (char*)"Results");
+    GfParmWriteFile(0, info->results, "Results");
 
     GfuiVisibilitySet(rmScrHdle, rmSaveId, GFUI_INVISIBLE);
 }
@@ -510,12 +509,12 @@ rmChgStandingScreen(void *vprc)
     void		*prevScr = rmScrHdle;
     tRaceCall 	*prc = (tRaceCall*)vprc;
 
-    rmShowStandings(prc->prevHdle, prc->info, prc->start);
+    RmShowStandings(prc->prevHdle, prc->info, prc->start);
     GfuiScreenRelease(prevScr);
 }
 
 /** 
- * rmShowStandings
+ * RmShowStandings
  * 
  * Shows a results page, with optional prev/next results page buttons
  * 
@@ -523,8 +522,8 @@ rmChgStandingScreen(void *vprc)
  * @param info	race results information
  * @param start	page number
 */
-static void
-rmShowStandings(void *prevHdle, tRmInfo *info, int start)
+void
+RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 {
 	int			i;
 	int			y;
@@ -627,38 +626,32 @@ rmShowStandings(void *prevHdle, tRmInfo *info, int start)
     GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiScreenActivate(rmScrHdle);
-}//rmShowStandings
+}//RmShowStandings
 
 
 void
 RmShowResults(void *prevHdle, tRmInfo *info)
 {
     int nCars;
-    char buffer[512];
+    char buffer[128];
 
-    switch (info->s->_raceType) {
-    case RM_TYPE_PRACTICE:
-        snprintf( buffer, 512, "%s/%s", info->track->name, RE_SECT_DRIVERS );
-        nCars = GfParmGetEltNb( info->results, buffer );
-	if (nCars == 1)
-	    rmPracticeResults(prevHdle, info, 0);
-	else
-	    rmQualifResults(prevHdle, info, 0);
-	break;
+    switch (info->s->_raceType)
+	{
+		case RM_TYPE_PRACTICE:
+			snprintf( buffer, sizeof(buffer), "%s/%s", info->track->name, RE_SECT_DRIVERS );
+			nCars = GfParmGetEltNb( info->results, buffer );
+			if (nCars == 1)
+				rmPracticeResults(prevHdle, info, 0);
+			else
+				rmQualifResults(prevHdle, info, 0);
+			break;
 
-    case RM_TYPE_RACE:
-	rmRaceResults(prevHdle, info, 0);
-	break;
-
-    case RM_TYPE_QUALIF:
-	rmQualifResults(prevHdle, info, 0);
-	break;
+		case RM_TYPE_RACE:
+			rmRaceResults(prevHdle, info, 0);
+			break;
+			
+		case RM_TYPE_QUALIF:
+			rmQualifResults(prevHdle, info, 0);
+			break;
     }//switch raceType
 }//RmShowResults
-
-
-void
-RmShowStandings(void *prevHdle, tRmInfo *info)
-{
-    rmShowStandings(prevHdle, info, 0);
-}//RmShowStandings
