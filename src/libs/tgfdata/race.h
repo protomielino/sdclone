@@ -55,8 +55,6 @@ public:
 
 	GfRaceManager* getManager() const;
 
-	const std::string& getSessionName() const;
-
 	enum EDisplayMode { eDisplayNormal, eDisplayResultsOnly,
 						nDisplayModeNumber };
 	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
@@ -78,7 +76,7 @@ public:
 		ERainSpec eRainSpec;
 	};
 	
-	Parameters* getParameters();
+	Parameters* getParameters(const std::string& strSessionName) const;
 
 	int getSupportedFeatures() const;
 
@@ -103,6 +101,8 @@ public:
 	void setFocusedCompetitor(const GfDriver* pComp);
 
 	GfTrack* getTrack() const;
+
+	const std::string& getSessionName() const;
 
 	void* getResultsDescriptorHandle() const;
 	

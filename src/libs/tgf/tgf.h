@@ -363,6 +363,7 @@ TGF_API int GfParmCheckHandle(void *ref, void *tgt);
 TGF_API void *GfParmMergeHandles(void *ref, void *tgt, int mode);
 TGF_API int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
 
+TGF_API int GfParmExists(void *handle, const char *path);
 TGF_API int GfParmGetEltNb(void *handle, const char *path);
 TGF_API int GfParmListSeekFirst(void *handle, const char *path);
 TGF_API int GfParmListSeekNext(void *handle, const char *path);
