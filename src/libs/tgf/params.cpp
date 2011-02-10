@@ -2163,6 +2163,32 @@ GfParmGetEltNb (void *handle, const char *path)
     return count;
 }
 
+/** Check if a section exists.
+    @ingroup	paramsdata
+    @param	handle	handle of parameters
+    @param	path	path of section
+    @return	0 if doesn't exist, not 0 otherwise.
+ */
+int
+GfParmExists (void *handle, const char *path)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section	*section;
+    int	count;
+    
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmExists: bad handle (%p)\n", parmHandle);
+		return 0;
+    }
+
+	conf = parmHandle->conf;
+
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+
+	return section != 0;
+}
+
 
 
 /** Seek the first section element of a list.
