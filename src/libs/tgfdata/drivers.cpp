@@ -345,7 +345,7 @@ void GfDriver::load(void* hparmRobot)
 	if (_bIsHuman)
 	{
 		_nFeatures = RM_FEATURE_TIMEDSESSION | RM_FEATURE_WETTRACK;
-		if (_fSkillLevel <= ASkillLevelValues[3]) // Pro (TODO: Create enum fro that !)
+		if (_fSkillLevel <= ASkillLevelValues[3]) // Pro (TODO: Create enum for that !)
 			_nFeatures |= RM_FEATURE_PENALTIES;
 	}
 	else
@@ -444,26 +444,6 @@ int GfDriver::getSupportedFeatures() const
 {
 	return _nFeatures;
 }
-
-// void GfDriver::setName(const std::string& strName)
-// {
-// 	_strName = strName;
-// }
-
-// void GfDriver::setModuleName(const std::string& strModName)
-// {
-// 	_strModName = strModName;
-// }
-
-// void GfDriver::setInterfaceIndex(int nItfIndex)
-// {
-// 	_nItfIndex = nItfIndex;
-// }
-
-// void GfDriver::setIsHuman(bool bIsHuman)
-// {
-// 	_bIsHuman = bIsHuman;
-// }
 
 void GfDriver::setCar(const GfCar* pCar)
 {

@@ -208,6 +208,8 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 	drivers = (int)GfParmGetNum( curResult, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 10 );
 	GfParmListClean( curParam, RM_SECT_DRIVERS );
 
+	GfLogDebug("ReCareerNewAddDrivers: humans=%d\n", *humans);
+
 	for (xx = 0; xx < drivers; ++xx) {
 		if( *humans ) {
 			do {
@@ -220,6 +222,9 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 			} while( true );
 
 			if( *humans ) {
+				GfLogDebug("ReCareerNewAddDrivers: xx=%d, human #%d, ext=%d\n", xx,
+						   GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_IDX, NULL, 1),
+						   GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_EXTENDED, NULL, 1));
 				/* Current one is a human */
 				sprintf( buf, "%s/%d", RM_SECT_DRIVERS, xx + 1 );
 				GfParmSetStr(curParam, buf, RM_ATTR_MODULE, "human");
@@ -310,13 +315,16 @@ static void ReCareerNewDrivers()
 
 	curParam = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
 	if( !curParam ) {
-		GfError( "WARNING: Could not open main Params\n" );
+		GfLogError( "Could not open main Params\n" );
 		return;
 	}
 	if( GfParmListSeekFirst(ReInfo->params, RM_SECT_DRIVERS) == 0 )
 		humans = TRUE;
 	else
 		humans = FALSE;
+	GfLogDebug("ReCareerNewDrivers: humans=%d (%s)\n", humans, GfParmGetFileName(ReInfo->params));
+	GfLogDebug("ReCareerNewDrivers: curParam=%s\n", GfParmGetFileName(curParam));
+
 	if( GfParmListSeekFirst(ReInfo->params, RM_SECT_CLASSES) == 0 ) {
 		do {
 			nbGroups = (int)GfParmGetCurNum(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_NBGROUPS, NULL, 1);
@@ -324,14 +332,15 @@ static void ReCareerNewDrivers()
 				curResult = GfParmReadFile( GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, "" ), GFPARM_RMODE_STD );
 				if( !curResult )
 				{
-					GfError( "WARNING: Could not read a subfile\n" );
+					GfLogError( "Could not read a subfile\n" );
 				} else {
+					GfLogDebug("ReCareerNewDrivers: curResult=%s\n", GfParmGetFileName(curResult));
 					ReCareerNewAddDrivers( curParam, curResult, &humans, classNb );
 					ReCareerNewAddTeams( curParam, curResult, xx, nbGroups );
 				}
 				tmp = GfParmReadFile( GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, "" ), GFPARM_RMODE_STD );
 				if( !tmp ) {
-					GfError( "Could not read next subparam\n" );
+					GfLogError( "Could not read next subparam\n" );
 					break;
 				}
 				GfParmWriteFile( NULL, curResult, NULL );
@@ -395,7 +404,7 @@ static void* ReCareerNewClass( const char* filename, void *prevParam, void **fir
 	snprintf( buf, 1024, "%sconfig/raceman/%s", GfLocalDir(), GfParmGetCurStr(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_SUBFILE, "") );
 	subparam = GfParmReadFile( buf, GFPARM_RMODE_STD );
 	if( !subparam ) {
-		GfError( "WARNING: subfile %s not found\n", buf );
+		GfLogError( "Subfile %s not found\n", buf );
 		return prevParam;
 	}
 	
@@ -454,7 +463,7 @@ static void ReCareerNewParams( const char* filename, double date )
 	int totalTracks = 1;
 
 	if( GfParmListSeekFirst(ReInfo->params, RM_SECT_CLASSES) != 0 ) {
-		GfError( "No classes defined\n" );
+		GfLogError( "No classes defined\n" );
 		return;
 	}
 
@@ -547,7 +556,7 @@ void ReCareerNextAddTeams( tGroupInfo *group, void *curParam, void *curResults )
 	group->teams = (tTeamInfo*)malloc( sizeof( tTeamInfo ) * group->nbTeams );
 
 	GfParmListSeekFirst( curResults, RE_SECT_TEAMINFO );
-	printf( ">>>>>ReCareerNextAddTeams()\n" );
+	GfLogDebug( ">>>>>ReCareerNextAddTeams()\n" );
 	for( xx = 0; xx < group->nbTeams; ++xx ) {
 		group->teams[ xx ].name = strdup( GfParmListGetCurEltName( curResults, RE_SECT_TEAMINFO ) );
 		group->teams[ xx ].car_dname = strdup( GfParmGetCurStr( curResults, RE_SECT_TEAMINFO, ROB_ATTR_CAR, "" ) );
@@ -946,7 +955,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 			++xx;
 		}
 		if( xx >= info->nbClasses ) {
-			GfError( "Warning: could not found a class for suffix %s\n", GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) );
+			GfLogError( "Could not found a class for suffix %s\n", GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_SUFFIX, "" ) );
 			xx = 0;
 		}
 		curGroupPtr = &info->classes[ xx ].groups[ curGroup[ xx ] ];
@@ -965,7 +974,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 											curGroupPtr->teams[ zz ].drivers[ uu ]->idx );
 				GfParmSetStr( curParam, buf, RM_ATTR_NAME, curGroupPtr->teams[ zz ].drivers[ uu ]->name );
 				GfParmSetStr( curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
-				printf( "GfParmSetStr( %p, %s, %s, %s )\n", curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
+				GfLogDebug( "GfParmSetStr( %p, %s, %s, %s )\n", curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
 				GfParmSetStr( curParam, buf, ROB_ATTR_TEAM, curGroupPtr->teams[ zz ].name );
 				GfParmSetNum( curParam, buf, RM_ATTR_SKILLLEVEL, NULL, (tdble)curGroupPtr->teams[ zz ].drivers[ uu ]->skill );
 				++yy;

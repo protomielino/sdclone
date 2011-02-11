@@ -1,8 +1,10 @@
 /***************************************************************************
 
-    file        : formula.cpp
-    copyright   : (C) 2009 by Mart Kelder
-    web         : http://speed-dreams.sourceforge.net   
+    file                 : formula.cpp
+    copyright            : (C) 2009 by Mart Kelder
+    web                  : http://speed-dreams.sourceforge.net   
+    web                  : speed-dreams.sourceforge.net
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -240,7 +242,7 @@ static char pushBool( tPSStackItem **topStack, char boolean )
 {
 	tPSStackItem *item = (tPSStackItem*)malloc( sizeof(tPSStackItem) );
 
-	printf( "pushBool( ...., %s )\n", boolean ? "true" : "false" );
+	GfLogDebug( "pushBool( ...., %s )\n", boolean ? "true" : "false" );
 
 	item->type = PSTYPE_BOOL;
 	item->d.boolean = boolean;
@@ -254,7 +256,7 @@ static char pushBool( tPSStackItem **topStack, char boolean )
 
 static char pushDouble( tPSStackItem **topStack, double value )
 {
-	printf( "pushDouble( ..., %f )\n", value );
+	GfLogDebug( "pushDouble( ..., %f )\n", value );
 	tPSStackItem *item = (tPSStackItem*)malloc( sizeof(tPSStackItem) );
 	item->type = PSTYPE_DOUBLE;
 	item->d.doublefloat = value;
@@ -268,7 +270,7 @@ static char pushDouble( tPSStackItem **topStack, double value )
 
 static char pushCommand( tPSStackItem **topStack, void *v_commands )
 {
-	printf( "pushCommand\n" );
+	GfLogDebug( "pushCommand\n" );
 
 	tPSCommand *commands = (tPSCommand*)v_commands;
 	tPSStackItem *item = (tPSStackItem*)malloc( sizeof(tPSStackItem) );
@@ -1266,9 +1268,9 @@ static tFormAnswer eval( tFormNode *node, void *parmHandle, char const *path )
 	}
 
 	if( result.string )
-		printf( "Result after eval: %s\n", result.string );
+		GfLogDebug( "Result after eval: %s\n", result.string );
 	else
-		printf( "No string result after eval (%x)\n", node->type );
+		GfLogDebug( "No string result after eval (%x)\n", node->type );
 
 	return result;
 }
@@ -1279,7 +1281,7 @@ char GfFormCalcFuncNew(void *cmd, void *parmHandle, char const *path, char *bool
 	tFormAnswer answer;
 
 	answer = eval( formula->node, parmHandle, path );
-	printf( "answer = %x\n", answer.validFields );
+	GfLogDebug( "answer = %x\n", answer.validFields );
 	if( boolean && ( answer.validFields & FORMANSWER_TYPE_BOOLEAN ) )
 		*boolean = answer.boolean;
 	if( integer && ( answer.validFields & FORMANSWER_TYPE_INTEGER ) )
@@ -1808,7 +1810,7 @@ static tFormAnswer func_toAlpha( tFormNode *node, void *parmHandle, char const *
 
 	result.string = (char*)malloc( sizeof( char ) * ( length + 1 ) );
 	result.string[ length ] = '\0';
-	printf( "result.string[ %d ] = \'\\0\'\n;", length );
+	GfLogDebug( "result.string[ %d ] = \'\\0\'\n;", length );
 	for( xx = length - 1; xx >= 0; --xx ) {
 		result.string[ xx ] = 'A' + ( number % 26 );
 		number -= number % 26;
