@@ -159,6 +159,10 @@ rmdsReloadCompetitorsScrollList()
 		// Add its name to the Competitors scroll list.
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId, (*itComp)->getName().c_str(),
 									MenuData->pRace->getCompetitorsCount(), (void*)(*itComp));
+
+	// Be carefull with max nb of competitors.	
+	GfuiEnable(ScrHandle, SelectButtonId,
+			   MenuData->pRace->acceptsMoreCompetitors() ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
 // Screen activation call-back.
@@ -347,7 +351,8 @@ rmdsClickOnDriver(void * /* dummy */)
     else if (GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver))
 	{
 		// A driver from the Candidates scroll-list.
-		GfuiEnable(ScrHandle, SelectButtonId, GFUI_ENABLE);
+		GfuiEnable(ScrHandle, SelectButtonId,
+				   MenuData->pRace->acceptsMoreCompetitors() ? GFUI_ENABLE : GFUI_DISABLE);
 		GfuiEnable(ScrHandle, DeselectButtonId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_DISABLE);
 		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_VISIBLE);
@@ -473,24 +478,32 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 
     // Focused driver management (inhibited for the moment : what is it useful for ?)
 	const GfDriver* pFocDriver = MenuData->pRace->getFocusedCompetitor();
-    if (bSelect) {
-		if (MenuData->pRace->isCompetitorFocused(pDriver)) {
+    if (bSelect)
+	{
+		if (MenuData->pRace->isCompetitorFocused(pDriver))
+		{
 			/* the focused element was deselected : select a new one */
 			name = GfuiScrollListGetElement(ScrHandle, CompetitorsScrollListId, 0, (void**)&pDriver);
-			if (name) {
+			if (name)
+			{
 				MenuData->pRace->setFocusedCompetitor(pDriver);
 #ifdef FOCUS
 				GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, pDriver->getName.c_str());
 #endif
-			} else {
+			}
+			else
+			{
 				MenuData->pRace->setFocusedCompetitor(0);
 #ifdef FOCUS
 				GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, "");
 #endif
 			}
 		}
-    } else {
-		if (!pFocDriver || pDriver->isHuman()) {
+    }
+	else
+	{
+		if (!pFocDriver || pDriver->isHuman())
+		{
 			MenuData->pRace->setFocusedCompetitor(pDriver);
 #ifdef FOCUS
 			GfuiLabelSetText(ScrHandle, FocusedDriverLabelId, pDriver->getName().c_str());
@@ -502,7 +515,8 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
     rmdsClickOnDriver(0);
 
     // Don't allow user to Accept 0 drivers, this would cause a crash.
-    GfuiEnable(ScrHandle, NextButtonId, MenuData->pRace->getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+    GfuiEnable(ScrHandle, NextButtonId,
+			   MenuData->pRace->getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
 
 	// For a smart display refresh, when automatically called multiple time.
     GfuiDisplay();
@@ -750,7 +764,6 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 {
 	// Empty the unselected scroll-list
     GfuiScrollListClear(ScrHandle, CandidatesScrollListId);
-	GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 
     // Fill it with drivers that match the filter criteria,
 	// are accepted by the race and are not already among competitors.
