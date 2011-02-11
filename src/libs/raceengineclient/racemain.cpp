@@ -168,9 +168,6 @@ ReRaceEventInit(void)
 {
 	void *mainParams = ReInfo->mainParams;
 	void *params = ReInfo->params;
-	const char *raceName;
-	
-	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 	
 	/* Look if it is necessary to open another file */
 	if (strcmp(GfParmGetStr(mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0) {
@@ -197,6 +194,9 @@ ReRaceEventInit(void)
 		if (!ReInfo->results)
 			GfLogWarning( "Results weren't read correctly !!!\n" );
 	}
+
+	// Initialize the race session name.
+	ReInfo->_reRaceName = ReGetCurrentRaceName();
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	
@@ -226,6 +226,7 @@ RePreRace(void)
 	int curRaceIdx;
 
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
+	
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
 	GfParmRemoveVariable (ReInfo->params, "/", "eventNb");
 	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
