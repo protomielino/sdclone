@@ -183,7 +183,7 @@ ReRaceSelectRaceman(GfRaceManager* pRaceMan)
 		strFullType += " / ";
 		strFullType += pRaceMan->getSubType();
 	}
-	GfLogTrace("'%s' race type selected\n", strFullType.c_str());
+	GfLogTrace("'%s' race mode selected\n", strFullType.c_str());
 	
 	// Re-init. race engine info about the race manager (= the race mode / type / class).
 	ReInfo->_reName = pRaceMan->getName().c_str();
@@ -212,11 +212,7 @@ ReRaceRestore(void* hparmResults)
 	// Update race engine info.
 	ReInfo->mainParams = ReInfo->params = PReRace->getManager()->getDescriptorHandle();
 	ReInfo->mainResults = ReInfo->results = PReRace->getResultsDescriptorHandle();
-
-	// TODO: Improve this : we set _reRaceName to the name of the race manager
-	//       in order to have a correctrelevant Standings menu title,
-	//       but this field normally holds the _session_ name (quali, 1st race, ...)
-	ReInfo->_reRaceName = ReInfo->_reName;
+	ReInfo->_reRaceName = PReRace->getSessionName().c_str(); //ReInfo->_reName;
 
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
 	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
@@ -226,12 +222,14 @@ ReRaceRestore(void* hparmResults)
 void
 ReStartNewRace(void * /* dummy */)
 {
+	// Initialize the result system (different way for the Career mode).
 	if (!strcmp(GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO),
 				RM_VAL_NO))
 		ReInitResults();
 	else
 		ReCareerNew();
-	
+
+	// Return to the race engine automaton.
 	ReStateManage();
 }
 
@@ -921,7 +919,8 @@ ReRaceCleanDrivers(void)
   GfModUnloadList(&ReRaceModList);
 }
 
-
+// Get the name of the current "race"
+// (actually the current "race session", like quali.1, quali2, ... 1st race, ...).
 char *
 ReGetCurrentRaceName(void)
 {
@@ -933,11 +932,10 @@ ReGetCurrentRaceName(void)
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, curRaceIdx);
 
-	GfLogDebug("ReGetCurrentRaceName : ind=%d\n", curRaceIdx);
-	
     return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
 }
 
+// Get the previous "race" (actually the previous "race session").
 char *
 ReGetPrevRaceName(void)
 {
@@ -949,7 +947,5 @@ ReGetPrevRaceName(void)
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1) - 1;
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, curRaceIdx);
 
-	GfLogDebug("ReGetPrevRaceName : ind=%d\n", curRaceIdx);
-	
     return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
 }

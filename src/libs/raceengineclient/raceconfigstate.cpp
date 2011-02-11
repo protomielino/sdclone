@@ -28,6 +28,7 @@
 
 #include <portability.h>
 #include <tgfclient.h>
+#include <gui.h> // tGfuiScreen, Debug, to be removed
 
 #include <raceman.h>
 
@@ -141,11 +142,11 @@ ReConfigRunState(bool bStart)
 	}
 
 	// Normal configuration steps :
-	GfLogInfo("%s configuration now in '%s' stage.\n", ReInfo->_reName, conf);
+	GfLogInfo("%s configuration now in #%d '%s' stage.\n", ReInfo->_reName, curConf, conf);
 	
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
 		
-		/* Track Select Menu */
+		// Track Select Menu 
 		ts.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
 			ts.prevScreen = ReGetRacemanMenuHandle();
@@ -158,8 +159,9 @@ ReConfigRunState(bool bStart)
 
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
 		
-		/* Drivers select menu */
+		// Drivers select menu
 		ds.nextScreen = reConfigHookInit();
+		tGfuiScreen* pNextScreen = (tGfuiScreen*)ds.nextScreen;
 		if (curConf == 1) {
 			ds.prevScreen = ReGetRacemanMenuHandle();
 		} else {
@@ -170,7 +172,7 @@ ReConfigRunState(bool bStart)
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
 		
-		/* Race Options menu */
+		// Race (= session) Options menu
 		rp.nextScreen = reConfigHookInit();
 		if (curConf == 1) {
 			rp.prevScreen = ReGetRacemanMenuHandle();
@@ -178,55 +180,11 @@ ReConfigRunState(bool bStart)
 			rp.prevScreen = reConfigBackHookInit();
 		}
 		rp.pRace = ReGetRace();
-		
-		/* Select options to configure */
-		rp.confMask = 0;
-		snprintf(path, sizeof(path), "%s/%d/%s", RM_SECT_CONF, curConf, RM_SECT_OPTIONS);
-		numOpt = GfParmGetEltNb(params, path);
-		for (i = 1; i < numOpt + 1; i++) {
-			snprintf(path, sizeof(path), "%s/%d/%s/%d", RM_SECT_CONF, curConf, RM_SECT_OPTIONS, i);
-			opt = GfParmGetStr(params, path, RM_ATTR_TYPE, "");
-			if (!strcmp(opt, RM_VAL_CONFRACELEN)) {
-				/* Configure race length */
-				rp.confMask |= RM_CONF_RACE_LEN;
-			} else if (!strcmp(opt, RM_VAL_CONFDISPMODE)) {
-				/* Configure display mode */
-				rp.confMask |= RM_CONF_DISP_MODE;
-			} else if (!strcmp(opt, RM_VAL_CONFTIMEOFDAY)) {
-				/* Configure time of day */
-				rp.confMask |= RM_CONF_TIME_OF_DAY;
-			} else if (!strcmp(opt, RM_VAL_CONFCLOUDCOVER)) {
-				/* Configure cloud cover */
-				rp.confMask |= RM_CONF_CLOUD_COVER;
-			} else if (!strcmp(opt, RM_VAL_CONFRAINFALL)) {
-				/* Configure rain fall and dry/wet track */
-				rp.confMask |= RM_CONF_RAIN_FALL;
-			}
-		}
-
-		/* Check if really something we can configure (given the graphic options) */
-		if ((rp.confMask & (RM_CONF_TIME_OF_DAY | RM_CONF_CLOUD_COVER)) == rp.confMask) {
- 	
-			snprintf(path, sizeof(path), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-			void *grHandle = GfParmReadFile(path, GFPARM_RMODE_STD);
-			const bool bSkyDomeEnabled =
-				(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;
-			GfParmReleaseHandle(grHandle);
- 	
-			if (!bSkyDomeEnabled)
-			{
-				GfLogInfo("Skipping Race Params menu because Sky Dome is disabled"
-						  " and is needed for all the configurable options\n");
-				GfuiScreenActivate(ReGetRacemanMenuHandle()); /* Back to the race menu */
-				return;
-			}
-		}
-		GfLogTrace("Race configuration mask : 0x%02X\n", rp.confMask);
- 	
-		/* All's right till now : enter the Race Params menu */
+		rp.session = GfParmGetStr(params, path, RM_ATTR_RACE, RM_VAL_ANYRACE);
 		RmRaceParamsMenu(&rp);
 	}
-
+	
+	// Prepare next configuration if any.
 	curConf++;
 	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, curConf);
 }

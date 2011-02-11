@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="Supercars Championship %A" type="param" mode="mw" version="1.3">
+<params name="Supercars Championship %A" type="param" mode="mw" version="1.4">
 
   <section name="Header">
     <attform name="name" val="#Supercars Championship # + toAlpha(number)"/>
@@ -73,7 +73,7 @@
       <attstr name="category" val="road"/>
     </section>
     <section name="5">
-      <attstr name="name" val="wheel-2"/>
+      <attstr name="name" val="karwada"/>
       <attstr name="category" val="circuit"/>
     </section>
     <section name="6">
@@ -190,6 +190,14 @@
     <section name="4">
       <attstr name="name" val="Second Race"/>
     </section>
+  </section>
+
+  <!-- A fictive race (= session) where to put default parameters values
+       which are common to all the normal races (= sessions)  -->
+  <section name="All Sessions">
+    <attstr name="rain" val="random"/>
+    <attstr name="clouds" val="scarce clouds"/>
+    <attstr name="time of day" val="afternoon"/>
   </section>
 
   <section name="Practice">

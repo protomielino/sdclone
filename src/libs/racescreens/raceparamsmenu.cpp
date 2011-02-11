@@ -27,6 +27,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <sstream>
+
 #ifdef WIN32
 #include <windows.h>
 #endif
@@ -40,6 +42,7 @@
 #include <robot.h>
 #include <graphic.h>
 
+#include <racemanagers.h>
 #include <race.h>
 
 #include "racescreens.h"
@@ -59,23 +62,23 @@ static tRmRaceParam	*MenuData;
 // Menu control ids
 static int		rmrpDistEditId;
 static int		rmrpLapsEditId;
-static int		rmrpSessionTimeEditId;
+static int		rmrpDurationEditId;
 static int		rmrpDispModeEditId;
 static int		rmrpCloudsEditId, rmrpCloudsLeftArrowId, rmrpCloudsRightArrowId;
 static int		rmrpTimeOfDayEditId;
 static int		rmrpRainEditId;
 
 // Race params
+static unsigned rmrpConfMask;
 static int		rmrpDistance;
 static int		rmrpLaps;
-static int		rmrpSessionTime;
+static int		rmrpDuration;
 static GfRace::EDisplayMode		rmrpDispMode;
 static GfRace::ECloudsSpec		rmrpClouds;
 static GfRace::ETimeOfDaySpec	rmrpTimeOfDay;
 static GfRace::ERainSpec		rmrpRain;
 
 static int		rmrpFeatures;
-static bool		rmrpIsSkyDomeEnabled;
 
 
 static void
@@ -99,7 +102,7 @@ rmrpUpdDist(void * /* dummy */)
     if (rmrpDistance == 0) {
 		strcpy(buf, "---");
     } else {
-		sprintf(buf, "%d", rmrpDistance);
+		snprintf(buf, sizeof(buf), "%d", rmrpDistance);
 		rmrpLaps = 0;
 		GfuiEditboxSetString(ScrHandle, rmrpLapsEditId, "---");
     }
@@ -117,7 +120,7 @@ rmrpUpdLaps(void * /* dummy */)
     if (rmrpLaps == 0) {
 		strcpy(buf, "---");
     } else {
-		sprintf(buf, "%d", rmrpLaps);
+		snprintf(buf, sizeof(buf), "%d", rmrpLaps);
 		rmrpDistance = 0;
 		GfuiEditboxSetString(ScrHandle, rmrpDistEditId, "---");
     }
@@ -125,7 +128,7 @@ rmrpUpdLaps(void * /* dummy */)
 }
 
 static void
-rmrpUpdSessionTime(void * /*dummy*/)
+rmrpUpdDuration(void * /*dummy*/)
 {
     char buf[64];
     char *val;
@@ -133,10 +136,7 @@ rmrpUpdSessionTime(void * /*dummy*/)
     int subresult = 0;
     int result = 0;
 
-    if ((rmrpFeatures & RM_FEATURE_TIMEDSESSION) == 0)
-    	return;	/* No timed session feature => nothing to do here */
-
-    val = GfuiEditboxGetString(ScrHandle, rmrpSessionTimeEditId);
+    val = GfuiEditboxGetString(ScrHandle, rmrpDurationEditId);
     
     while( true )
     {
@@ -178,13 +178,16 @@ rmrpUpdSessionTime(void * /*dummy*/)
 		result = 0;
     }
     
-    rmrpSessionTime = result;
+    rmrpDuration = result;
     
-    if (rmrpSessionTime <= 0)
+    if (rmrpDuration <= 0)
 		strcpy( buf, "---");
     else
-		sprintf(buf, "%d:%02d:%02d", (int)floor( (float)rmrpSessionTime / 3600.0f ), (int)floor( (float)rmrpSessionTime / 60.0f ) % 60, (int)floor( (float)rmrpSessionTime ) % 60 );
-    GfuiEditboxSetString(ScrHandle, rmrpSessionTimeEditId, buf);
+		snprintf(buf, sizeof(buf), "%d:%02d:%02d",
+				 (int)floor((float)rmrpDuration / 3600.0f),
+				 (int)floor((float)rmrpDuration / 60.0f) % 60,
+				 (int)floor((float)rmrpDuration) % 60);
+    GfuiEditboxSetString(ScrHandle, rmrpDurationEditId, buf);
 }
 
 static void
@@ -218,7 +221,7 @@ rmChangeClouds(void *vp)
 		((rmrpClouds + GfRace::nCloudsSpecNumber + delta) % GfRace::nCloudsSpecNumber);
     GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 
-    if ((MenuData->confMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
+    if (rmrpConfMask & RM_CONF_RAIN_FALL)
 	{
 		// Make rain level compatible if needed.
 		if (rmrpClouds != GfRace::eCloudsFull) // No heavy clouds => no rain
@@ -238,7 +241,7 @@ rmChangeRain(void *vp)
 		((rmrpRain + GfRace::nRainSpecNumber + delta) % GfRace::nRainSpecNumber);
 	GfuiLabelSetText(ScrHandle, rmrpRainEditId, RainValues[rmrpRain]);
 
-    if ((MenuData->confMask & RM_CONF_CLOUD_COVER) && rmrpIsSkyDomeEnabled)
+    if (rmrpConfMask & RM_CONF_CLOUD_COVER)
 	{
 		// Make clouds state compatible if needed.
 		int cloudsComboVisibility;
@@ -250,9 +253,7 @@ rmChangeRain(void *vp)
 		else
 		{
 			cloudsComboVisibility = GFUI_VISIBLE;
-			if (rmrpRain == GfRace::eRainNone)
-				rmrpClouds = GfRace::eCloudsNone; // No rain => no clouds by default.
-			else
+			if (rmrpRain != GfRace::eRainNone)
 				rmrpClouds = GfRace::eCloudsFull; // Rain => Heavy clouds.
 			GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 		}
@@ -269,35 +270,41 @@ rmrpValidate(void * /* dummy */)
     // Force current edit to loose focus (if one has it) and update associated variable.
     GfuiUnSelectCurrent();
 
-	GfRace::Parameters* pRaceParams = MenuData->pRace->getParameters();
-	
-    if (MenuData->confMask & RM_CONF_RACE_LEN)
+	// And then update configurable race session parameters from the current local settings,
+	// if anything to configure (Don't change non-configurable parameters).
+	GfRace::Parameters* pRaceSessionParams =
+		MenuData->pRace->getParameters(MenuData->session, /* bUserConfig */ true);
+	if (pRaceSessionParams)
 	{
-		pRaceParams->nDistance = rmrpDistance;
-		pRaceParams->nLaps = rmrpLaps;
-		pRaceParams->nDuration = rmrpSessionTime;
-    }
+		if (rmrpConfMask & RM_CONF_RACE_LEN)
+		{
+			pRaceSessionParams->nDistance = rmrpDistance;
+			pRaceSessionParams->nLaps = rmrpLaps;
+			if (rmrpFeatures & RM_FEATURE_TIMEDSESSION)
+				pRaceSessionParams->nDuration = rmrpDuration;
+		}
 	
-    if (MenuData->confMask & RM_CONF_TIME_OF_DAY)
-	{
-		pRaceParams->eTimeOfDaySpec = (GfRace::ETimeOfDaySpec)rmrpTimeOfDay;
-	}
+		if (rmrpConfMask & RM_CONF_TIME_OF_DAY)
+		{
+			pRaceSessionParams->eTimeOfDaySpec = (GfRace::ETimeOfDaySpec)rmrpTimeOfDay;
+		}
 	
-    if (MenuData->confMask & RM_CONF_CLOUD_COVER)
-	{
-		pRaceParams->eCloudsSpec = (GfRace::ECloudsSpec)rmrpClouds;
-	}
+		if (rmrpConfMask & RM_CONF_CLOUD_COVER)
+		{
+			pRaceSessionParams->eCloudsSpec = (GfRace::ECloudsSpec)rmrpClouds;
+		}
 	
-    if ((MenuData->confMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
-	{
-		pRaceParams->eRainSpec = (GfRace::ERainSpec)rmrpRain;
-	}
+		if (rmrpConfMask & RM_CONF_RAIN_FALL)
+		{
+			pRaceSessionParams->eRainSpec = (GfRace::ERainSpec)rmrpRain;
+		}
 
-	if (MenuData->confMask & RM_CONF_DISP_MODE)
-	{
-		pRaceParams->eDisplayMode = (GfRace::EDisplayMode)rmrpDispMode;
+		if (rmrpConfMask & RM_CONF_DISP_MODE)
+		{
+			pRaceSessionParams->eDisplayMode = (GfRace::EDisplayMode)rmrpDispMode;
+		}
 	}
-
+	
     rmrpDeactivate(MenuData->nextScreen);
 }
 
@@ -315,63 +322,112 @@ RmRaceParamsMenu(void *vrp)
 {
     char buf[256];
 
-	GfLogTrace("Entering Race Params menu\n");
-
 	MenuData = (tRmRaceParam*)vrp;
 
-	GfRace::Parameters* pRaceParams = MenuData->pRace->getParameters();
-	if (!pRaceParams)
-		return;
-	
-	// Get race features.
-    rmrpFeatures = MenuData->pRace->getSupportedFeatures();
+	GfLogTrace("Entering %s Params menu for %s\n",
+			   MenuData->session.c_str(), MenuData->pRace->getManager()->getName().c_str());
 
-	// Check if SkyDome is enabled
+	// Update the conf mask according to the session params, graphics options and race features.
+	// 1) According to the availability of parameters for this session,.
+	GfRace::Parameters* pRaceSessionParams =
+		MenuData->pRace->getParameters(MenuData->session, /* bUserConfig */ true);
+	if (!pRaceSessionParams)
+		rmrpConfMask = 0;
+	else
+		rmrpConfMask = pRaceSessionParams->bfOptions;
+	
+	// 2) According to SkyDome settings.
 	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
 	void *grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-	rmrpIsSkyDomeEnabled =
+	const bool bSkyDomeEnabled =
 		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) != 0;
 	GfParmReleaseHandle(grHandle);
+
+	if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_TIME_OF_DAY))
+	{
+		GfLogTrace("Will not configure Time of Day as Sky Dome is disabled\n");
+		rmrpConfMask &= ~RM_CONF_TIME_OF_DAY;
+	}
+	if (!bSkyDomeEnabled && (rmrpConfMask & RM_CONF_CLOUD_COVER))
+	{
+		GfLogTrace("Will not configure Cloud Cover as Sky Dome is disabled\n");
+		rmrpConfMask &= ~RM_CONF_CLOUD_COVER;
+	}
+
+	// 3) According to the race features.
+    rmrpFeatures = MenuData->pRace->getSupportedFeatures();
+
+	if (!(rmrpFeatures & RM_FEATURE_WETTRACK) && (rmrpConfMask & RM_CONF_RAIN_FALL))
+	{
+		GfLogTrace("Will not configure Rain Fall as some drivers don't support wet track\n");
+		rmrpConfMask &= ~RM_CONF_RAIN_FALL;
+	}
+
+	// 4) According to the competitors.
+	if ((rmrpConfMask & RM_CONF_DISP_MODE) && MenuData->pRace->hasHumanCompetitors())
+	{
+		GfLogTrace("Will not configure Display Mode as some human driver(s) in the session\n");
+		rmrpConfMask &= ~RM_CONF_DISP_MODE;
+	}
 	
-    // Create screen, load menu XML descriptor and create static controls.
+    // Create the screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);   
     void *menuXMLDescHdle = LoadMenuXML("raceparamsmenu.xml");
     CreateStaticControls(menuXMLDescHdle,ScrHandle);
 
-    // Create variable title label.
-    int titleId = CreateLabelControl(ScrHandle,menuXMLDescHdle,"title");
-	sprintf(buf, "%s Options", MenuData->pRace->getSessionName().c_str());
-    GfuiLabelSetText(ScrHandle,titleId,buf);
-    
-    if (MenuData->confMask & RM_CONF_RACE_LEN) 
+    // Create the variable title label.
+    int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");
+	std::string strTitle(MenuData->session);
+	strTitle += " Options";
+    GfuiLabelSetText(ScrHandle, titleId, strTitle.c_str());
+
+	// Create the "nothing to configure here" label if actually nothing configurable.
+	if (!rmrpConfMask)
+	{
+		CreateLabelControl(ScrHandle, menuXMLDescHdle, "nooptionlabel");
+	}
+	
+    if (rmrpConfMask & RM_CONF_RACE_LEN) 
     {
+		if (pRaceSessionParams->nDistance < 0)
+			rmrpDistance = 0; // Default value.
+		else
+			rmrpDistance = pRaceSessionParams->nDistance;
+
+		if (pRaceSessionParams->nDuration < 0)
+			rmrpDuration = 0; // Default value.
+		else
+			rmrpDuration = pRaceSessionParams->nDuration;
+		if (rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION))
+			rmrpDistance += rmrpDuration / 30;
+
+		if (pRaceSessionParams->nLaps < 0)
+			rmrpLaps = 0; // Default value.
+		else
+			rmrpLaps = pRaceSessionParams->nLaps;
+		if (rmrpDistance == 0 && rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION))
+			rmrpLaps += (int)floor((tdble)rmrpDuration / 1.5f + 0.5f);
+
 		// Create Race distance label.
-		CreateLabelControl(ScrHandle,menuXMLDescHdle,"racedistancelabel");
-		rmrpDistance = pRaceParams->nDistance;
+		CreateLabelControl(ScrHandle, menuXMLDescHdle, "distancelabel");
 		
 		// Create and initialize Race distance edit.
-		rmrpSessionTime = pRaceParams->nDuration;
-		if (rmrpSessionTime > 0 && ( rmrpFeatures & RM_FEATURE_TIMEDSESSION ) == 0 )
-			rmrpDistance += rmrpSessionTime / 30;
 		if (rmrpDistance == 0) 
 		{
 			strcpy(buf, "---");
-			rmrpLaps = pRaceParams->nLaps;
-			if (rmrpSessionTime > 0 && ( rmrpFeatures & RM_FEATURE_TIMEDSESSION ) == 0 )
-				rmrpLaps += (int)floor( (tdble)rmrpSessionTime / 1.5f + 0.5f );
 		} 
 		else 
 		{
-			sprintf(buf, "%d", rmrpDistance);
+			snprintf(buf, sizeof(buf), "%d", rmrpDistance);
 			rmrpLaps = 0;
 		}
 		
-		rmrpDistEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "racedistanceedit",
+		rmrpDistEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "distanceedit",
 										   NULL, NULL, rmrpUpdDist);
 		GfuiEditboxSetString(ScrHandle,rmrpDistEditId,buf);
 		
 		// Create Laps label.
-		CreateLabelControl(ScrHandle,menuXMLDescHdle,"lapslabel");
+		CreateLabelControl(ScrHandle, menuXMLDescHdle, "lapslabel");
 		
 		// Create and initialize Laps edit.
 		if (rmrpLaps == 0) 
@@ -380,7 +436,7 @@ RmRaceParamsMenu(void *vrp)
 		} 
 		else 
 		{
-			sprintf(buf, "%d", rmrpLaps);
+			snprintf(buf, sizeof(buf), "%d", rmrpLaps);
 		}
 		
 		rmrpLapsEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "lapsedit",
@@ -390,90 +446,82 @@ RmRaceParamsMenu(void *vrp)
 		if (rmrpFeatures & RM_FEATURE_TIMEDSESSION)
 		{
 			// Create Session time label.
-			CreateLabelControl(ScrHandle,menuXMLDescHdle,"sessiontimelabel");
+			CreateLabelControl(ScrHandle, menuXMLDescHdle, "durationlabel");
 			
 			// Create and initialize Session time edit.
-			if (rmrpSessionTime <= 0) 
+			if (rmrpDuration <= 0) 
 			{
 				strcpy(buf, "---");
 			}
 			else 
 			{
-				sprintf(buf, "%d:%02d:%02d", (int)floor((float) rmrpSessionTime / 3600.0f ),
-						(int)floor( (float)rmrpSessionTime / 60.0f ) % 60,
-						(int)floor( (float)rmrpSessionTime ) % 60 );
+				snprintf(buf, sizeof(buf), "%d:%02d:%02d",
+						 (int)floor((float) rmrpDuration / 3600.0f ),
+						 (int)floor( (float)rmrpDuration / 60.0f ) % 60,
+						 (int)floor( (float)rmrpDuration ) % 60 );
 			}
 			
-			rmrpSessionTimeEditId =
-				CreateEditControl(ScrHandle, menuXMLDescHdle, "sessiontimeedit",
-								  NULL, NULL, rmrpUpdSessionTime);
-			GfuiEditboxSetString(ScrHandle,rmrpSessionTimeEditId,buf);
-		}
-		else
-		{
-			rmrpSessionTime = 0;
+			rmrpDurationEditId =
+				CreateEditControl(ScrHandle, menuXMLDescHdle, "durationedit",
+								  NULL, NULL, rmrpUpdDuration);
+			GfuiEditboxSetString(ScrHandle,rmrpDurationEditId,buf);
 		}
     }
 
     // Create and initialize Time of day combo box (2 arrow buttons and a variable label).
-	if (MenuData->confMask & RM_CONF_TIME_OF_DAY)
+	if (rmrpConfMask & RM_CONF_TIME_OF_DAY)
 	{
-		if (rmrpIsSkyDomeEnabled)
-		{
-			rmrpTimeOfDay = pRaceParams->eTimeOfDaySpec;
-		
-			// Create Time of day label.
-			CreateLabelControl(ScrHandle,menuXMLDescHdle,"timeofdaylabel");
-
-			// Create and initialize Time of day combo-box-like control.
-			CreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayleftarrow",
-								(void*)-1, rmChangeTimeOfDay);
-			CreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayrightarrow",
-								(void*)1, rmChangeTimeOfDay);
-			
-			rmrpTimeOfDayEditId = CreateLabelControl(ScrHandle,menuXMLDescHdle,"timeofdayedit");
-			GfuiLabelSetText(ScrHandle, rmrpTimeOfDayEditId, TimeOfDayValues[rmrpTimeOfDay]);
-		}
+		if (pRaceSessionParams->eTimeOfDaySpec == GfRace::nTimeSpecNumber)
+			rmrpTimeOfDay = GfRace::eTimeAfternoon; // Default value.
 		else
-		{
-			rmrpTimeOfDay = GfRace::eTimeAfternoon; // Normally not taken into account.
-		}
+			rmrpTimeOfDay = pRaceSessionParams->eTimeOfDaySpec;
+		
+		// Create Time of day label.
+		CreateLabelControl(ScrHandle,menuXMLDescHdle,"timeofdaylabel");
+
+		// Create and initialize Time of day combo-box-like control.
+		CreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayleftarrow",
+							(void*)-1, rmChangeTimeOfDay);
+		CreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayrightarrow",
+							(void*)1, rmChangeTimeOfDay);
+			
+		rmrpTimeOfDayEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "timeofdayedit");
+		GfuiLabelSetText(ScrHandle, rmrpTimeOfDayEditId, TimeOfDayValues[rmrpTimeOfDay]);
     }
 	
-    if (MenuData->confMask & RM_CONF_CLOUD_COVER)
+    if (rmrpConfMask & RM_CONF_CLOUD_COVER)
 	{
-		if (rmrpIsSkyDomeEnabled)
-		{
-			// Create and initialize Clouds combo box (2 arrow buttons and a variable label).
-			rmrpClouds = pRaceParams->eCloudsSpec;
-			
-			// Create Cloud cover label.
-			CreateLabelControl(ScrHandle,menuXMLDescHdle,"cloudslabel");
-
-			// Create and initialize Cloud cover combo-box-like control.
-			rmrpCloudsLeftArrowId =
-				CreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsleftarrow",
-									(void*)-1, rmChangeClouds);
-			rmrpCloudsRightArrowId =
-				CreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsrightarrow",
-									(void*)+1, rmChangeClouds);
-			
-			rmrpCloudsEditId = CreateLabelControl(ScrHandle,menuXMLDescHdle,"cloudsedit");
-			GfuiLabelSetText(ScrHandle,rmrpCloudsEditId,CloudsValues[rmrpClouds]);
-		}
+		// Create and initialize Clouds combo box (2 arrow buttons and a variable label).
+		if (pRaceSessionParams->eCloudsSpec == GfRace::nCloudsSpecNumber)
+			rmrpClouds = GfRace::eCloudsNone; // Default value.
 		else
-		{
-			rmrpClouds = GfRace::eCloudsNone;
-		}
+			rmrpClouds = pRaceSessionParams->eCloudsSpec;
+			
+		// Create Cloud cover label.
+		CreateLabelControl(ScrHandle, menuXMLDescHdle, "cloudslabel");
+
+		// Create and initialize Cloud cover combo-box-like control.
+		rmrpCloudsLeftArrowId =
+			CreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsleftarrow",
+								(void*)-1, rmChangeClouds);
+		rmrpCloudsRightArrowId =
+			CreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsrightarrow",
+								(void*)+1, rmChangeClouds);
+			
+		rmrpCloudsEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "cloudsedit");
+		GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 	}
 	
-	if ((MenuData->confMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
+	if ((rmrpConfMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
 	{
 		// Create and initialize Rain combo box (2 arrow buttons and a variable label).
-		rmrpRain = pRaceParams->eRainSpec;
+		if (pRaceSessionParams->eRainSpec == GfRace::nRainSpecNumber)
+			rmrpRain = GfRace::eRainNone; // Default value.
+		else
+			rmrpRain = pRaceSessionParams->eRainSpec;
 			
 		// Create Rain label.
-		CreateLabelControl(ScrHandle,menuXMLDescHdle,"rainlabel");
+		CreateLabelControl(ScrHandle, menuXMLDescHdle, "rainlabel");
 
 		// Create and initialize Rain combo-box-like control.
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "rainleftarrow",
@@ -481,15 +529,18 @@ RmRaceParamsMenu(void *vrp)
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "rainrightarrow",
 							(void*)1, rmChangeRain);
 			
-		rmrpRainEditId = CreateLabelControl(ScrHandle,menuXMLDescHdle,"rainedit");
-		GfuiLabelSetText(ScrHandle,rmrpRainEditId,RainValues[rmrpRain]);
+		rmrpRainEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "rainedit");
+		GfuiLabelSetText(ScrHandle, rmrpRainEditId, RainValues[rmrpRain]);
 			
 		rmChangeRain(0); // Make cloud cover settings compatible if needed.
 	}
 	
-    if (MenuData->confMask & RM_CONF_DISP_MODE) 
+    if (rmrpConfMask & RM_CONF_DISP_MODE) 
     {
-		rmrpDispMode = pRaceParams->eDisplayMode;
+		if (pRaceSessionParams->eDisplayMode == GfRace::nDisplayModeNumber)
+			rmrpDispMode = GfRace::eDisplayNormal; // Default value.
+		else
+			rmrpDispMode = pRaceSessionParams->eDisplayMode;
 
 		// Create Display mode label.
 		CreateLabelControl(ScrHandle, menuXMLDescHdle, "displaylabel");

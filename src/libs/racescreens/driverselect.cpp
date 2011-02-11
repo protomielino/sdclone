@@ -625,11 +625,16 @@ RmDriversSelect(void *vs)
     CreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", (void*)-1, rmdsMoveCompetitor);
     CreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", (void*)1, rmdsMoveCompetitor);
 	
-    SelectButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
-    DeselectButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "deselectbutton", 0, rmdsSelectDeselectDriver);
-    RemoveAllButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsRemoveAllCompetitors);
-    SelectRandomButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "selectrandombutton", 0, rmdsSelectRandomCandidates);
-    ShuffleButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
+    SelectButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
+    DeselectButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "deselectbutton", 0, rmdsSelectDeselectDriver);
+    RemoveAllButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsRemoveAllCompetitors);
+    SelectRandomButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "selectrandombutton", 0, rmdsSelectRandomCandidates);
+    ShuffleButtonId =
+		CreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
 
     // Skin selection "combobox" (left arrow, label, right arrow)
     SkinLeftButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", (void*)-1, rmdsChangeSkin);
@@ -648,7 +653,7 @@ RmDriversSelect(void *vs)
 		{
 			VecCarCategoryIds.push_back(GfCars::self()->getCategoryIds()[nCatInd]);
 			VecCarCategoryNames.push_back(GfCars::self()->getCategoryNames()[nCatInd]);
-			GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
+			//GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
 		}
 	}
 	if (VecCarCategoryIds.size() > 1)
@@ -670,7 +675,7 @@ RmDriversSelect(void *vs)
 		if (MenuData->pRace->acceptsDriverType(*itDrvType))
 		{
 			VecDriverTypes.push_back(*itDrvType);
-			GfLogDebug("Accepted type : %s\n", itDrvType->c_str());
+			//GfLogDebug("Accepted type : %s\n", itDrvType->c_str());
 		}
 		itDrvType++;
 	}
@@ -708,14 +713,32 @@ RmDriversSelect(void *vs)
 	// Fill-in the competitors scroll-list.
 	rmdsReloadCompetitorsScrollList();
 	
-	// Initialize the currently highlighted driver.
+	// Initialize the currently highlighted driver
+	// (the 1st human driver, or else of the 1st driver).
 	PCurrentDriver = 0;
 	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
 	std::vector<GfDriver*>::iterator itComp;
 	for (itComp = vecCompetitors.begin(); itComp != vecCompetitors.end(); itComp++)
-		// Initialize the current driver (the last human driver, or else of the last driver).
-		if (!PCurrentDriver || (*itComp)->isHuman())
+	{
+		if ((*itComp)->isHuman())
+		{
 			PCurrentDriver = *itComp;
+			break;
+		}
+	}
+	if (!PCurrentDriver && !vecCompetitors.empty())
+	{
+		itComp = vecCompetitors.begin();
+		PCurrentDriver = *itComp;
+	}
+
+	if (PCurrentDriver)
+	{
+		GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId,
+										 itComp - vecCompetitors.begin());
+		GfuiScrollListShowElement(ScrHandle, CompetitorsScrollListId,
+								  itComp - vecCompetitors.begin());
+	}
 
 	// Display the menu.
     GfuiScreenActivate(ScrHandle);
@@ -755,7 +778,7 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 	//		   strCarCatId.c_str(), strCarCatIdFilter.c_str(),
 	//		   strType.c_str(), strTypeFilter.c_str());
 
-	// e) Keep only drivers accepted by the race and not already among competitors
+	// d) Keep only drivers accepted by the race and not already among competitors
 	//    (but don't reject humans with the wrong car category : they must be able to change it).
 	std::vector<GfDriver*>::const_iterator itCandidate;
 	for (itCandidate = vecCandidates.begin(); itCandidate != vecCandidates.end(); itCandidate++)

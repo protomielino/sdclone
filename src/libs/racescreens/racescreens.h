@@ -62,14 +62,9 @@ typedef struct RmDriverSelect
 typedef struct RmRaceParam
 {
 	GfRace          *pRace; /* The race to update */
-    void        	*prevScreen;
+    std::string		session; /* The race session to configure (RM_VAL_ANYRACE for all of them) */
+    void        	*prevScreen;	/* Race manager screen to go back */
     void        	*nextScreen;	/* Race manager screen to go after select */
-    unsigned int	confMask;	/* Tell what to configure */
-#define RM_CONF_RACE_LEN	0x00000001
-#define RM_CONF_DISP_MODE	0x00000002
-#define RM_CONF_TIME_OF_DAY	0x00000004
-#define RM_CONF_CLOUD_COVER	0x00000008
-#define RM_CONF_RAIN_FALL	0x00000010
 } tRmRaceParam;
 
 typedef void (*tfSelectFile) (const char *);

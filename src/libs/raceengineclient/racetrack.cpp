@@ -64,9 +64,8 @@ ReTrackInit(void)
 	const char  *trackName;
 	const char  *catName;
 
-	ReInfo->_reRaceName = ReGetCurrentRaceName();
-
-	int curTrkIdx = (int)GfParmGetNum(ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+	const int curTrkIdx =
+		(int)GfParmGetNum(ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 	snprintf(buf, sizeof(buf), "%s/%d", RM_SECT_TRACKS, curTrkIdx);
 	trackName = GfParmGetStr(ReInfo->params, buf, RM_ATTR_NAME, 0);
 	if (!trackName)

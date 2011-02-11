@@ -55,20 +55,19 @@ public:
 
 	GfRaceManager* getManager() const;
 
-	const std::string& getSessionName() const;
-
 	enum EDisplayMode { eDisplayNormal, eDisplayResultsOnly,
-						nDisplayModeNumber };
+						nDisplayModeNumber }; // Last = invalid value = nb of valid ones.
 	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
 						  eTimeDusk, eTimeNight, eTimeNow, eTimeFromTrack,
-						  nTimeSpecNumber };
+						  nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
 	enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
-					   nCloudsSpecNumber};
+					   nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
 	enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
-					 nRainSpecNumber };
+					 nRainSpecNumber }; // Last = invalid value = nb of valid ones.
 	class Parameters
 	{
 	  public:
+		unsigned bfOptions; // Bit field of configurable parameters (RM_CONF_* values).
 		int nLaps;
 		int nDistance; // km
 		int nDuration; // s
@@ -78,7 +77,7 @@ public:
 		ERainSpec eRainSpec;
 	};
 	
-	Parameters* getParameters();
+	Parameters* getParameters(const std::string& strSessionName, bool bUserConfig = false) const;
 
 	int getSupportedFeatures() const;
 
@@ -89,6 +88,7 @@ public:
 	
 	unsigned getCompetitorsCount() const;
 	const std::vector<GfDriver*>& getCompetitors() const;
+	bool hasHumanCompetitors() const;
 	bool acceptsMoreCompetitors() const;
 	bool appendCompetitor(GfDriver* pComp);
 	bool removeCompetitor(GfDriver* pComp);
@@ -103,6 +103,8 @@ public:
 	void setFocusedCompetitor(const GfDriver* pComp);
 
 	GfTrack* getTrack() const;
+
+	const std::string& getSessionName() const;
 
 	void* getResultsDescriptorHandle() const;
 	

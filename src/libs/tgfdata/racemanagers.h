@@ -65,6 +65,7 @@ public:
 
 	const std::vector<std::string>& getSessionNames() const;
 	unsigned getSessionCount() const;
+	const std::string& getSessionName(unsigned nIndex) const;
 	
 	const std::string& getSavedConfigsDir() const;
 	bool hasSavedConfigsFiles() const;

@@ -326,11 +326,19 @@ typedef struct RmInfo
 #define RM_VAL_TRACKSEL		"track select"
 #define RM_VAL_DRVSEL		"drivers select"
 #define RM_VAL_RACECONF		"race config"
+#define RM_VAL_ANYRACE		"All Sessions"
+
 #define RM_VAL_CONFRACELEN	"race length"
 #define RM_VAL_CONFDISPMODE	"display mode"
 #define RM_VAL_CONFTIMEOFDAY	"time of day"
 #define RM_VAL_CONFCLOUDCOVER	"cloud cover"
 #define RM_VAL_CONFRAINFALL	"rain fall"
+
+#define RM_CONF_RACE_LEN	0x0001
+#define RM_CONF_DISP_MODE	0x0002
+#define RM_CONF_TIME_OF_DAY	0x0004
+#define RM_CONF_CLOUD_COVER	0x0008
+#define RM_CONF_RAIN_FALL	0x0010
 
 #define RM_VAL_DRV_LIST_ORDER	"drivers list"
 #define RM_VAL_LAST_RACE_ORDER	"last race"
@@ -441,7 +449,6 @@ typedef struct RmInfo
 
 #define RE_SECT_HEADER		"Header"
 #define RE_ATTR_DATE		"date"
-#define RE_ATTR_TYPE		"race"
 
 #define RE_SECT_CURRENT		"Current"
 #define RE_ATTR_CUR_RACE	"current race"

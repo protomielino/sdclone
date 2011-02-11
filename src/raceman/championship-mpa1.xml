@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="MPA1 Championship" version="1.6">
+<params name="MPA1 Championship" version="1.7">
 
   <section name="Header">
     <attstr name="name" val="MPA1 Championship"/>
@@ -89,6 +89,15 @@
     <section name="3">
       <attstr name="name" val="Second Race"/>
     </section>
+
+  </section>
+
+  <!-- A fictive race (= session) where to put default parameters values
+       which are common to all the normal races (= sessions)  -->
+  <section name="All Sessions">
+    <attstr name="rain" val="random"/>
+    <attstr name="clouds" val="scarce clouds"/>
+    <attstr name="time of day" val="afternoon"/>
 
   </section>
 
@@ -279,7 +288,7 @@
     </section>
     <section name="2">
       <attstr name="type" val="race config"/>
-      <attstr name="race" val="Race"/>
+      <attstr name="race" val="All Sessions"/>
       <section name="Options">
         <section name="1">
           <attstr name="type" val="time of day"/>

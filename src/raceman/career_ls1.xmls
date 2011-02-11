@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="LS1 Championship" type="param" mode="mw" version="1.4">
+<params name="LS1 Championship" type="param" mode="mw" version="1.5">
 
   <section name="Header">
     <attstr name="name" val="LS1 Championship"/>
@@ -190,6 +190,14 @@
     <section name="4">
       <attstr name="name" val="Second Race"/>
     </section>
+  </section>
+
+  <!-- A fictive race (= session) where to put default parameters values
+       which are common to all the normal races (= sessions)  -->
+  <section name="All Sessions">
+    <attstr name="rain" val="random"/>
+    <attstr name="clouds" val="scarce clouds"/>
+    <attstr name="time of day" val="afternoon"/>
   </section>
 
   <section name="Practice">

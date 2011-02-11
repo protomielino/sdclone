@@ -29,6 +29,9 @@
 #include "racemanagers.h"
 
 
+// An empty string.
+static const std::string strEmpty;
+
 class GfRaceManagers::Private
 {
 public:
@@ -112,7 +115,7 @@ GfRaceManagers::GfRaceManagers()
 		}
 
 		// Create the race manager and load it from the params file.
-		GfLogDebug("GfRaceManagers::GfRaceManagers: creating '%s'\n", strRaceManId.c_str());
+		//GfLogDebug("GfRaceManagers::GfRaceManagers: creating '%s'\n", strRaceManId.c_str());
 		GfRaceManager* pRaceMan = new GfRaceManager(strRaceManId, hparmRaceMan);
 
 		// Update the GfRaceManagers singleton.
@@ -307,13 +310,14 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		}
 	}
 
-	GfLogDebug("GfRaceManager::reset(%s): %s\n",
-			   _strName.c_str(), GfParmGetFileName(hparmHandle));
+// 	GfLogDebug("GfRaceManager::reset(%s): %s %s\n",
+// 			   _strName.c_str(), _hparmHandle == hparmHandle ? "file" : "sub-file",
+// 			   GfParmGetFileName(hparmHandle));
 
 	// Clear the event list
 	_vecEventTrackIds.clear();
 
-	// And reload it (warning: we don't check here that the tracks exist and are usable).
+	// And reload it (warning: here, we only check the tracks existence, not their usability).
 	std::ostringstream ossSectionPath;
 	int nEventNum = 1;
 	const char* pszTrackId;
@@ -322,14 +326,14 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		ossSectionPath.str("");
 		ossSectionPath << RM_SECT_TRACKS << '/' << nEventNum;
 		pszTrackId = GfParmGetStr(hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
-		GfLogDebug("GfRaceManager::reset(%s): event[%d].track = '%s'\n",
-				   _strName.c_str(), nEventNum-1, pszTrackId);
+// 		GfLogDebug("GfRaceManager::reset(...): event[%d].track = '%s'\n",
+// 				   nEventNum-1, pszTrackId);
 		if (pszTrackId)
 		{
 			if (GfTracks::self()->getTrack(pszTrackId))
 				_vecEventTrackIds.push_back(pszTrackId);
 			else
-				GfLogWarning("Skipping non-existing track '%s' (event #%d) for %s type\n",
+				GfLogWarning("Skipping non-existing track '%s' (event #%d) for %s mode\n",
 							 pszTrackId, nEventNum, _strName.c_str());
 			nEventNum++;
 		}
@@ -345,6 +349,7 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		ossSecPath << RM_SECT_RACES << '/' << nSessionInd;
 		const char* pszSessionName =
 			GfParmGetStr(hparmHandle, ossSecPath.str().c_str(), RM_ATTR_NAME, 0);
+// 		GfLogDebug("GfRaceManager::reset(...): session '%s'\n", pszSessionName);
 		if (pszSessionName && strlen(pszSessionName) > 0)
 			_vecSessionNames.push_back(pszSessionName);
 
@@ -372,8 +377,8 @@ void GfRaceManager::store()
 		std::ostringstream ossSectionPath;
 		for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
 		{
-			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
-					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
+// 			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
+// 					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
 			ossSectionPath.str("");
 			ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
 			GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
@@ -525,6 +530,17 @@ const std::vector<std::string>& GfRaceManager::getSessionNames() const
 unsigned GfRaceManager::getSessionCount() const
 {
 	return _vecSessionNames.size();
+}
+
+const std::string& GfRaceManager::getSessionName(unsigned nIndex) const
+{
+	if (_vecSessionNames.empty())
+		return strEmpty;
+	
+	if (nIndex >= _vecSessionNames.size())
+		nIndex = _vecSessionNames.size() - 1;
+	
+	return _vecSessionNames[nIndex];
 }
 
 const std::string& GfRaceManager::getSavedConfigsDir() const
