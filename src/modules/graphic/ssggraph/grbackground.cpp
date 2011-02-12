@@ -182,7 +182,7 @@ grInitBackground(void)
 		const int timeOfDay = (int)grTrack->local.timeofday;
 
 		// Add random stars when relevant.
-		if (timeOfDay < 7 * 3600 || timeOfDay > 17 * 3600)
+		/*if (timeOfDay < 7 * 3600 || timeOfDay > 17 * 3600)
 		{
 			if (timeOfDay < 5 * 3600 || timeOfDay > 19 * 3600)
 				NStars = NMaxStars;
@@ -190,7 +190,8 @@ grInitBackground(void)
 				NStars = NMaxStars / 2;
 		}
 		else
-			NStars = 0;
+			NStars = 0;*/
+		NStars = NMaxStars; // Stars must be initialized same in day not only in the night
 			
 		if (AStarsData)
 			delete [] AStarsData;
