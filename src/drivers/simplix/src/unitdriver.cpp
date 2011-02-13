@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.11.06
+// Last changed : 2011.02.12
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -3774,12 +3774,12 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
   else
 	oXXX = MIN(1.0,oXXX+0.0003);
 
-  double FrictionFactor = 0.95;
+    double FrictionFactor = 0.95;
 
   if (AbsCrv > 0.10)
-    FrictionFactor = 0.46;
+    FrictionFactor = 0.44;
   else if (AbsCrv > 0.05)
-    FrictionFactor = 0.55;
+    FrictionFactor = 0.53;
   else if (AbsCrv > 0.045)
     FrictionFactor = 0.74;
   else if (AbsCrv > 0.03)
@@ -3796,15 +3796,21 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
 //==========================================================================*
 
 //==========================================================================*
+// simplix_TRB1
 // simplix_GP36
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_simplix()
 {
+	oSkillGlobal = oSkillGlobal/10.0;
+	oSkillDriver = oSkillDriver/3.0;
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
+/*
 	oSkillScale = oSkillScale/50.0;
 	oSkillDriver = oSkillDriver / (5.0 * ((50.0 - oSkillGlobal)/40.0));
 	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) 
 		* (1.0 + oSkillDriver) + oSkillOffset;
 	oSkillMax = oSkillScale * 24 + oSkillOffset;
+*/
 }
 //==========================================================================*
 

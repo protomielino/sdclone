@@ -9,7 +9,7 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.10.16
+// Last changed : 2011.02.12
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -397,8 +397,13 @@ double TFixCarParam::CalcMaxSpeed
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
 
-  if (fabs(AbsCrv) > 1/45.0)
-    Speed *= 0.89;                               // Filter hairpins
+//  if (fabs(AbsCrv) > 1/45.0)
+//    Speed *= 0.89;                               // Filter hairpins
+
+  if (fabs(AbsCrv) > 1/40.0)
+    Speed *= 0.70;                               // Filter hairpins
+  else if (fabs(AbsCrv) > 1/45.0)
+    Speed *= 0.84;                               // Filter hairpins
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
     Speed = 112;                                 
 
