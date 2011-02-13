@@ -9,8 +9,8 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.02.12
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.02.13
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
 //--------------------------------------------------------------------------*

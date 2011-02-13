@@ -167,9 +167,9 @@
     <attnum name="scale bump" min="0.0" max="2.0" val="0.4"/>
     <attnum name="scale bump outer" min="0.0" max="3.0" val="0.6"/>
     <attnum name="scale brake" min="0.5" max="2.5" val="0.9"/>
-    <attnum name="scale mu" min="0.5" max="2.5"  val="0.9"/>
-    <attnum name="qualy brake" min="0.5" max="2.5"  val="0.95"/>
-    <attnum name="qualy mu" min="0.5" max="2.5"  val="1.0"/>
+    <attnum name="scale mu" min="0.5" max="2.5" val="0.9"/>
+    <attnum name="qualy brake" min="0.5" max="2.5" val="0.95"/>
+    <attnum name="qualy mu" min="0.5" max="2.5" val="1.0"/>
   </section>
 
 </params>

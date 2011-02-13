@@ -9,8 +9,8 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2010.11.21
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.02.13
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
 //--------------------------------------------------------------------------*
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 114
+#define RL_VERSION 115
 //==========================================================================*
 
 //==========================================================================*
