@@ -7,7 +7,7 @@ Group: 'Export'
 Tip: 'Export selected meshes to AC3D (.ac) format'
 """
 
-__author__ = "Willian P. Germano"
+__author__ = "Willian P. Germano, Eckhard M. Jaeger"
 __url__ = ("blender", "blenderartists.org", "AC3D's homepage, http://www.ac3d.org",
 	"PLib 3d gaming lib, http://plib.sf.net")
 __version__ = "2.44 2007-05-05"
