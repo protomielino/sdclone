@@ -9,7 +9,7 @@
 // The default setups are based on spring only!
 // There was still no check for all other tracks.
 // 
-// (See brondehach as preview)
+// (See brondehach and corkscrew as preview)
 
 
 

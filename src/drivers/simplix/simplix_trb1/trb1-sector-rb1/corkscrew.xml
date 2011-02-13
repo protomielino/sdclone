@@ -149,7 +149,7 @@
 
   <section name="simplix private">
     <attnum name="skill" min="-1" max="10" val="0"/>
-    <attnum name="pit test stop" min="0" max="1" val="1"/>
+    <attnum name="pit test stop" min="0" max="1" val="0"/>
     <attnum name="qualification" val="0"/>
     <attnum name="reserve" min="0" max="20000" val="2000"/>
     <attnum name="start fuel" min="-1" max="100" val="-1"/>
