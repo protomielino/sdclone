@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    file          : drivers/simplix_trb1/trb1-taipan-rb1/Corkscrew
+    file          : drivers/simplix_trb1/trb1-taipan-rb1/espie
     created       : 02/13/11
     last modified : 02/13/11
     copyright     : (C) 2010 Wolf-Dieter Beelitz
@@ -20,7 +20,7 @@
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="16.3"/>
+    <attnum name="angle" unit="deg" val="15"/>
   </section>
 
   <section name="Gearbox">
@@ -59,22 +59,22 @@
 
   <section name="Rear Differential">
     <attstr name="type" in="SPOOL,FREE,LIMITED SLIP" val="LIMITED SLIP"/>
-    <attnum name="ratio" val="3.59"/>
+    <attnum name="ratio" val="3.4"/>
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.7"/>
-    <attnum name="max pressure" unit="kPa" val="42100"/>
+    <attnum name="front-rear brake repartition" val="0.59"/>
+    <attnum name="max pressure" unit="kPa" val="42700"/>
   </section>
 
   <section name="Front Anti-Roll Bar">
-    <attnum name="spring" unit="lbs/in" val="590"/>
+    <attnum name="spring" unit="lbs/in" val="540"/>
     <attnum name="suspension course" min="0" max="0.2" unit="m" val="0.2"/>
     <attnum name="bellcrank" min="1" max="5" val="2.5"/>
   </section>
 
   <section name="Rear Anti-Roll Bar">
-    <attnum name="spring" unit="lbs/in" val="2440"/>
+    <attnum name="spring" unit="lbs/in" val="2480"/>
     <attnum name="suspension course" min="0" max="0.2" unit="m" val="0.2"/>
     <attnum name="bellcrank" min="1" max="5" val="2.5"/>
   </section>
@@ -104,47 +104,47 @@
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="spring" unit="lbs/in" val="1700"/>
+    <attnum name="spring" unit="lbs/in" val="1100"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.15"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="20" unit="mm" val="0"/>
-    <attnum name="slow bump" unit="lbs/in/s" val="319"/>
-    <attnum name="slow rebound" unit="lbs/in/s" val="352"/>
-    <attnum name="fast bump" unit="lbs/in/s" val="239"/>
-    <attnum name="fast rebound" unit="lbs/in/s" val="221"/>
+    <attnum name="slow bump" unit="lbs/in/s" val="390"/>
+    <attnum name="slow rebound" unit="lbs/in/s" val="269"/>
+    <attnum name="fast bump" unit="lbs/in/s" val="323"/>
+    <attnum name="fast rebound" unit="lbs/in/s" val="324"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="spring" unit="lbs/in" val="1700"/>
+    <attnum name="spring" unit="lbs/in" val="1100"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.15"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="20" unit="mm" val="0"/>
-    <attnum name="slow bump" unit="lbs/in/s" val="319"/>
-    <attnum name="slow rebound" unit="lbs/in/s" val="352"/>
-    <attnum name="fast bump" unit="lbs/in/s" val="239"/>
-    <attnum name="fast rebound" unit="lbs/in/s" val="221"/>
+    <attnum name="slow bump" unit="lbs/in/s" val="390"/>
+    <attnum name="slow rebound" unit="lbs/in/s" val="269"/>
+    <attnum name="fast bump" unit="lbs/in/s" val="323"/>
+    <attnum name="fast rebound" unit="lbs/in/s" val="324"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="spring" unit="lbs/in" val="1200"/>
+    <attnum name="spring" unit="lbs/in" val="1400"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.2"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="10" unit="mm" val="0"/>
-    <attnum name="slow bump" unit="lbs/in/s" val="387"/>
-    <attnum name="slow rebound" unit="lbs/in/s" val="365"/>
-    <attnum name="fast bump" unit="lbs/in/s" val="259"/>
-    <attnum name="fast rebound" unit="lbs/in/s" val="188"/>
+    <attnum name="slow bump" unit="lbs/in/s" val="361"/>
+    <attnum name="slow rebound" unit="lbs/in/s" val="342"/>
+    <attnum name="fast bump" unit="lbs/in/s" val="261"/>
+    <attnum name="fast rebound" unit="lbs/in/s" val="332"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="spring" unit="lbs/in" val="1200"/>
+    <attnum name="spring" unit="lbs/in" val="1400"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.2"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="10" unit="mm" val="0"/>
-    <attnum name="slow bump" unit="lbs/in/s" val="387"/>
-    <attnum name="slow rebound" unit="lbs/in/s" val="365"/>
-    <attnum name="fast bump" unit="lbs/in/s" val="259"/>
-    <attnum name="fast rebound" unit="lbs/in/s" val="188"/>
+    <attnum name="slow bump" unit="lbs/in/s" val="361"/>
+    <attnum name="slow rebound" unit="lbs/in/s" val="342"/>
+    <attnum name="fast bump" unit="lbs/in/s" val="261"/>
+    <attnum name="fast rebound" unit="lbs/in/s" val="332"/>
   </section>
 
   <section name="simplix private">
@@ -154,7 +154,7 @@
     <attnum name="reserve" min="0" max="20000" val="2000"/>
     <attnum name="start fuel" min="-1" max="100" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="70"/>
-    <attnum name="lookaheadfactor" val="0.16"/>
+    <attnum name="lookaheadfactor" val="0.08"/>
     <attnum name="avoid width" min="0" max="3" val="0.5"/>
     <attnum name="drift factor" min="1" max="10" val="1.5"/>
     <attnum name="scale avoid" min="1" max="20" val="10"/>
@@ -164,12 +164,12 @@
     <attnum name="scale steer" min="0.1" max="2" val="1"/>
     <attnum name="stay together" min="10" max="2000" val="10"/>
     <attnum name="length margin" min="1" max="10" val="2"/>
-    <attnum name="scale bump" val="0.427"/>
-    <attnum name="scale bump outer" val="0.6405"/>
-    <attnum name="scale brake" val="1.15"/>
-    <attnum name="scale mu" val="0.99"/>
-    <attnum name="qualy brake" val="1.16"/>
-    <attnum name="qualy mu" val="1.02"/>
+    <attnum name="scale bump" val="0.484"/>
+    <attnum name="scale bump outer" val="0.726"/>
+    <attnum name="scale brake" val="0.86"/>
+    <attnum name="scale mu" val="1.04"/>
+    <attnum name="qualy brake" val="1.03"/>
+    <attnum name="qualy mu" val="1.04"/>
   </section>
 
 </params>

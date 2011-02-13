@@ -166,8 +166,8 @@
     <attnum name="length margin" min="1" max="10" val="2"/>
     <attnum name="scale bump" val="0.394"/>
     <attnum name="scale bump outer" val="0.591"/>
-    <attnum name="scale brake" val="0.87"/>
-    <attnum name="scale mu" val="1"/>
+    <attnum name="scale brake" val="0.84"/>
+    <attnum name="scale mu" val="0.97"/>
     <attnum name="qualy brake" val="0.92"/>
     <attnum name="qualy mu" val="1"/>
   </section>
