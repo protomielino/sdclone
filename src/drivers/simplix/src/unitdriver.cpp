@@ -2902,9 +2902,9 @@ void TDriver::EvaluateCollisionFlags(
   {
     oTreatTeamMateAsLapper =
 	  OppInfo.GotFlags(F_TEAMMATE | F_REAR)
-	  && OppInfo.State.RelPos > -25
-	  && CarLaps == OppCar->_laps
-	  && CarDamage > OppInfo.TeamMateDamage + 1000;
+	  && OppInfo.State.RelPos > -50
+	  && ((CarLaps <= OppCar->_laps)
+	  || (CarDamage > OppInfo.TeamMateDamage + 1000));
   }
   else
   {
@@ -2915,10 +2915,10 @@ void TDriver::EvaluateCollisionFlags(
   {
     if (oStayTogether > 50
 	  && OppInfo.GotFlags(F_TEAMMATE | F_REAR)
-	  && OppInfo.State.RelPos < -35
 	  && OppInfo.State.RelPos > -oStayTogether
 	  && CarDamage + 1000 > OppInfo.TeamMateDamage)
     {
+	  Coll.LappersBehind |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
   	  IsLapper = true;
     }
 
@@ -3407,7 +3407,7 @@ double TDriver::FilterLetPass(double Accel)
   if (oLetPass)
   {
     if (oTreatTeamMateAsLapper)
-      Accel = MIN(Accel, 0.7);
+      Accel = MIN(Accel, 0.3);
 	else
       Accel = MIN(Accel, 0.5);
   }

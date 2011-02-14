@@ -63,7 +63,7 @@
   </section>
 
   <section name="Brake System">
-    <attnum name="front-rear brake repartition" val="0.3"/>
+    <attnum name="front-rear brake repartition" val="0.5"/>
     <attnum name="max pressure" unit="kPa" val="42000"/>
   </section>
 
@@ -104,7 +104,7 @@
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="spring" unit="lbs/in" val="2400"/>
+    <attnum name="spring" unit="lbs/in" val="2000"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.15"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="20" unit="mm" val="0"/>
@@ -115,7 +115,7 @@
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="spring" unit="lbs/in" val="2400"/>
+    <attnum name="spring" unit="lbs/in" val="2000"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.15"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="20" unit="mm" val="0"/>
@@ -126,7 +126,7 @@
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="spring" unit="lbs/in" val="3400"/>
+    <attnum name="spring" unit="lbs/in" val="2000"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.2"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="10" unit="mm" val="0"/>
@@ -137,7 +137,7 @@
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="spring" unit="lbs/in" val="3400"/>
+    <attnum name="spring" unit="lbs/in" val="2000"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.2"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="10" unit="mm" val="0"/>
@@ -166,7 +166,7 @@
     <attnum name="length margin" min="1" max="10" val="2"/>
     <attnum name="scale bump" val="0.349"/>
     <attnum name="scale bump outer" val="0.5235"/>
-    <attnum name="scale brake" val="0.8"/>
+    <attnum name="scale brake" val="0.78"/>
     <attnum name="scale mu" val="1.03"/>
     <attnum name="qualy brake" val="0.94"/>
     <attnum name="qualy mu" val="1.06"/>

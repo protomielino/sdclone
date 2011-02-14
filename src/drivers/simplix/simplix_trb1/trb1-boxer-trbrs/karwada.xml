@@ -126,7 +126,7 @@
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="spring" unit="lbs/in" val="2400"/>
+    <attnum name="spring" unit="lbs/in" val="1800"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.2"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="10" unit="mm" val="0"/>
@@ -137,7 +137,7 @@
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="spring" unit="lbs/in" val="2400"/>
+    <attnum name="spring" unit="lbs/in" val="1800"/>
     <attnum name="suspension course" min="0" max="0.25" unit="m" val="0.2"/>
     <attnum name="bellcrank" val="1.5"/>
     <attnum name="packers" min="0" max="10" unit="mm" val="0"/>
