@@ -110,6 +110,7 @@ void grRegisterCustomSGILoader(void)
 	ssgAddTextureFormat(".inta", grLoadSGI);
 	ssgAddTextureFormat(".bw", grLoadSGI);
 	ssgAddTextureFormat(".png", grLoadPngTexture);
+	ssgAddTextureFormat(".jpg", grLoadJpegTexture);
 }
 
 grSGIHeader::grSGIHeader(const char *fname, ssgTextureInfo* info)
@@ -417,5 +418,32 @@ bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
 // 	tex = tex2;
 // #endif // WIN32
 	
+	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
+}
+
+bool grLoadJpegTexture (const char *fname, ssgTextureInfo* info)
+{
+	GLubyte *tex;
+	int w, h;
+	int mipmap = 1;
+
+	TRACE_GL("Load: loadJpegTexture start");
+
+	tex = (GLubyte*)GfTexReadImageFromJPEG(fname, 2.0, &w, &h, 0, 0);
+	if (!tex) {
+		return false;
+	}
+
+	if (info) {
+		info -> width  = w;
+		info -> height = h;
+		info -> depth  = 4;
+		info -> alpha  = true;
+	}
+
+	TRACE_GL("Load: loadPngTexture stop");
+
+	mipmap = doMipMap(fname, mipmap);
+
 	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
 }

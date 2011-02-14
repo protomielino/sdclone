@@ -846,10 +846,10 @@ ReInitCars(void)
 }
 
 /**
- * This functions initialized the graphics.
+ * This function initializes the graphics.
  * This function must be called after the cars are loaded and the track is loaded.
- * The track will be unloaded if the event end. The graphics module is keps open
- * if more then one race is driven
+ * The track will be unloaded if the event ends. The graphics module is kept open
+ * if more than one race is driven.
  */
 void ReInitGraphics()
 {
@@ -857,13 +857,13 @@ void ReInitGraphics()
   char key[256];
 
   /* Check if the module is already loaded */
-  if( ReInfo->_reGraphicItf.refresh != 0 )
+  if (ReInfo->_reGraphicItf.refresh)
     return; /* Module is already loaded: don't load again */
     
   /* Load the graphic module */
   GfLogInfo("Loading Graphic Engine...\n");
   dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
-  snprintf(key, sizeof(key), "%smodules/graphic/%s.%s", GfLibDir (), dllname, DLLEXT);
+  snprintf(key, sizeof(key), "%smodules/graphic/%s.%s", GfLibDir(), dllname, DLLEXT);
   if (GfModLoad(0, key, &reEventModList))
 	  return;
   reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reGraphicItf);

@@ -62,6 +62,7 @@ inline grManagedState* grStateFactory(void) { return new grManagedState(); }
 extern void grRegisterCustomSGILoader(void);
 
 extern bool grLoadPngTexture(const char *fname, ssgTextureInfo* info);
+extern bool grLoadJpegTexture(const char *fname, ssgTextureInfo* info);
 
 // SGI loader class to call customized ssgMakeMipMaps. This is necessary because
 // of plib architecture which does not allow to customize the mipmap

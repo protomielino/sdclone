@@ -148,6 +148,8 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	png_uint_32 src_rowbytes, tgt_rowbytes;
 	png_uint_32 i;
 
+	//const double dStartTime = GfTimeClock(); // Start measuring elapsed time.
+
 	// Check if we can open the image file.
 	if ((fp = fopen(filename, "rb")) == NULL) {
 		GfError("GfTexReadImageFromPNG(%s) : Can't open file for reading\n", filename);
@@ -315,6 +317,8 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	// Close source file.
 	fclose(fp);
 	
+	//GfLogDebug("GfTexReadImageFromPNG(%s) : %.3f s)\n", filename, GfTimeClock() - dStartTime);
+	
 	return image_ptr;
 }
 
@@ -360,6 +364,8 @@ GfTexReadImageFromJPEG(const char *filename, float screen_gamma, int *pWidth, in
 					   int *pPow2Width, int *pPow2Height)
 {
 	unsigned char *pBuffer = NULL;
+
+	//const double dStartTime = GfTimeClock(); // Start measuring elapsed time.
 
 	// Try and open the source image file.
 	FILE* infile;
@@ -477,7 +483,8 @@ GfTexReadImageFromJPEG(const char *filename, float screen_gamma, int *pWidth, in
 	jpeg_destroy_decompress(&cinfo);
 	fclose(infile);
 
-	//return pBuffer;
+	//GfLogDebug("GfTexReadImageFromJPEG(%s) : %.3f s)\n", filename, GfTimeClock() - dStartTime);
+	
 	return aTgtImageBuffer;
 }
 
@@ -548,7 +555,7 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 		GfError("GfTexWriteImageToPNG(%s) : Null image buffer pointer\n", filename);
 		return -1;
 	}
-	
+
 	fp = fopen(filename, "wb");
 	if (fp == NULL) {
 		GfError("GfTexWriteImageToPNG(%s) : Can't open file for writing\n", filename);
@@ -605,6 +612,7 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	fclose(fp);
 	free(row_pointers);
+
 	return 0;
 }
 
