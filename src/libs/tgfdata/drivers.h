@@ -45,14 +45,14 @@ public:
 	const std::string& getName() const;
 	const std::string& getCarPreviewFileName() const;
 
-	void setTargets(int nTargets); // Overwrite any previous target.
+	void setTargets(int bfTargets); // Overwrite any previous target.
 	void addTargets(int nTargets); // Bit-or.
 	void setName(const std::string& strName);
 	void setCarPreviewFileName(const std::string& strFileName);
 
 protected:
 
-	int          _nTargets; // Skin targets bit-field (see car.h for possible values)
+	int          _bfTargets; // Skin targets bit-field (see car.h for possible values)
 	std::string  _strName;  // Skin name (empty if standard skin)
 	std::string  _strCarPreviewFileName;  // Car preview for this skin name (empty if none)
 };

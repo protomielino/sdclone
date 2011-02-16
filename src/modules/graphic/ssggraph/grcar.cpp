@@ -599,10 +599,20 @@ grInitCar(tCarElt *car)
 		GfLogTrace("Using skinned interior %s\n", strTgtTexName.c_str());
 	}
 	
-	/* 3) 3D wheels if present */
+	/* 3) driver if present */
+	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_DRIVER)
+	{
+		strSrcTexName = "driver"; // Warning: Must be consistent with wheel<i>.ac/.acc contents
+		strTgtTexName = strSrcTexName + '-' + car->_skinName + pszTexFileExt;
+		strSrcTexName += pszTexFileExt;
+		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());
+		GfLogTrace("Using skinned driver %s\n", strTgtTexName.c_str());
+	}
+
+	/* 4) 3D wheels if present */
 	if (bCustomSkin && car->_skinTargets & RM_CAR_SKIN_TARGET_3D_WHEELS)
 	{
-		strSrcTexName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/.acc contents
+		strSrcTexName = "wheel3d"; // Warning: Must be consistent with <car>.ac/.acc contents
 		strTgtTexName = strSrcTexName + '-' + car->_skinName + pszTexFileExt;
 		strSrcTexName += pszTexFileExt;
 		options.addTextureMapping(strSrcTexName.c_str(), strTgtTexName.c_str());

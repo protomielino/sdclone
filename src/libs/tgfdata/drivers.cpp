@@ -239,13 +239,13 @@ void GfDrivers::print() const
 
 // GfDriverSkin class ---------------------------------------------------------------
 
-GfDriverSkin::GfDriverSkin(const std::string& strName) : _strName(strName), _nTargets(0)
+GfDriverSkin::GfDriverSkin(const std::string& strName) : _strName(strName), _bfTargets(0)
 {
 }
 
 int GfDriverSkin::getTargets() const
 {
-	return _nTargets;
+	return _bfTargets;
 }
 
 const std::string& GfDriverSkin::getName() const
@@ -258,14 +258,14 @@ const std::string& GfDriverSkin::getCarPreviewFileName() const
 	return _strCarPreviewFileName;
 }
 
-void GfDriverSkin::setTargets(int nTargets)
+void GfDriverSkin::setTargets(int bfTargets)
 {
-	_nTargets = nTargets;
+	_bfTargets = bfTargets;
 }
 
-void GfDriverSkin::addTargets(int nTargets)
+void GfDriverSkin::addTargets(int bfTargets)
 {
-	_nTargets |= nTargets;
+	_bfTargets |= bfTargets;
 }
 
 void GfDriverSkin::setName(const std::string& strName)
@@ -459,6 +459,8 @@ static const char* pszLiveryTexExt = ".png";
 static const char* pszPreviewTexSufx = "-preview.jpg";
 static const char* pszInteriorTexExt = ".png";
 static const char* pszInteriorTexSufx = "-int";
+static const char* pszDriverTexName = "driver"; // Warning: Must be consistent with <car>.ac/acc
+static const char* pszDriverTexExt = ".png";
 static const char* pszLogoTexName = "logo"; // Warning: Must be consistent with grscene.cpp
 static const char* pszLogoTexExt = ".png";
 static const char* pszWheel3DTexName = "wheel3d"; // Warning: Must be consistent with wheel<i>.ac/acc
@@ -641,7 +643,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 			pCurWheel3DFile = pCurWheel3DFile->next;
 
 			// Extract the skin name from the 3D wheel texture file name.
-			const int nSkinNameLen = // Expecting "logo-<skin name>.png"
+			const int nSkinNameLen = // Expecting "wheel3d-<skin name>.png"
 				strlen(pCurWheel3DFile->name) - strlen(pszWheel3DTexName)
 				- 1 - strlen(pszWheel3DTexExt);
 			if (nSkinNameLen > 0)
@@ -664,6 +666,41 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 	}
 	
 	GfDirFreeList(pWheel3DFileList, NULL);
+	
+	// Search for skinned driver files if any.
+	tFList *pDriverFileList =
+		GfDirGetListFiltered(strFolderPath.c_str(), pszDriverTexName, pszDriverTexExt);
+	if (pDriverFileList)
+	{
+		tFList *pCurDriverFile = pDriverFileList;
+		do
+		{
+			pCurDriverFile = pCurDriverFile->next;
+
+			// Extract the skin name from the 3D wheel texture file name.
+			const int nSkinNameLen = // Expecting "driver-<skin name>.png"
+				strlen(pCurDriverFile->name) - strlen(pszDriverTexName)
+				- 1 - strlen(pszDriverTexExt);
+			if (nSkinNameLen > 0)
+			{
+				const std::string strSkinName =
+					std::string(pCurDriverFile->name)
+					.substr(strlen(pszDriverTexName) + 1, nSkinNameLen);
+			
+				// If a skin with such name already exists in the list, update it.
+				std::vector<GfDriverSkin>::iterator itSkin = findSkin(vecPossSkins, strSkinName);
+				if (itSkin != vecPossSkins.end())
+				{
+					itSkin->addTargets(RM_CAR_SKIN_TARGET_DRIVER);
+					GfLogDebug("  Found %s-skinned driver (targets:%x)\n",
+							   strSkinName.c_str(), itSkin->getTargets());
+				}
+			}
+		}
+		while (pCurDriverFile != pDriverFileList);
+	}
+	
+	GfDirFreeList(pDriverFileList, NULL);
 }
 
 std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCarId) const

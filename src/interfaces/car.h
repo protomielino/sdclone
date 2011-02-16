@@ -98,12 +98,14 @@ typedef struct {
 				   - RM_CAR_SKIN_TARGET_3D_WHEELS
 				   - RM_CAR_SKIN_TARGET_INTERIOR
 				   - RM_CAR_SKIN_TARGET_BOARD
+				   - RM_CAR_SKIN_TARGET_DRIVER
 				   - RM_CAR_SKIN_TARGET_PIT_DOOR
 */
 #define RM_CAR_SKIN_TARGET_WHOLE_LIVERY	 	0x00000001	/**< The whole car external livery */
 #define RM_CAR_SKIN_TARGET_3D_WHEELS 	0x00000002	/**< The 3D wheels */
 #define RM_CAR_SKIN_TARGET_INTERIOR	 	0x00000010	/**< The car interior */
 #define RM_CAR_SKIN_TARGET_BOARD 	0x00000020	/**< The interior instrument board */
+#define RM_CAR_SKIN_TARGET_DRIVER 	0x00000040	/**< The driver */
 #define RM_CAR_SKIN_TARGET_PIT_DOOR 	0x00000100	/**< The pit door logo */
 } tInitCar;
 
