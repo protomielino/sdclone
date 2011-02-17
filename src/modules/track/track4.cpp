@@ -759,6 +759,14 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 }
 
 
+// 
+// InitPits
+// Tries to discover each specific pit segment, like entry/exit,
+// start/end, pit building start.
+// 
+// @param theTrack pointer to the track structure
+// @param TrackHandle handle of the track XML file
+// @return true on success
 static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 	int i;
 	int			segId;
@@ -885,6 +893,10 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 		//Set pitlane speed limit
 		pits->speedLimit = GfParmGetNum(TrackHandle, path2, TRK_ATT_SPD_LIM, (char*)NULL, 25.0);
 
+		//Decide pit style
+		pits->type = GfParmGetNum(TrackHandle, path2, TRK_ATT_PIT_STYLE, NULL, TR_PIT_ON_TRACK_SIDE);
+		GfOut("track4:: Pit style: %d\n", pits->type);
+
 		if ((pitEntrySeg != NULL) && (pitExitSeg != NULL)
 			&& (pitStart != NULL) && (pitEnd != NULL)) {
 			pits->pitEntry = pitEntrySeg;
@@ -905,6 +917,15 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 }//InitPits
 
 
+// 
+// AddPitDoors
+// Decides the locations of pit buildings and doors.
+// It is only used to draw the pit doors later in GrScene,
+// as the pit buildings are drawn statically by Trackgen.
+// 
+// @param theTrack pointer to the track structure
+// @param TrackHandle handle of the track XML file
+// @param found if InitPits found each pit segment OK
 static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 	tTrackSeg		*curSeg;
 	tTrackSeg		*curSeg2;
@@ -912,145 +933,163 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 	tTrackSeg		*curPitSeg = NULL;
 
 	if (found) {
-		pits->type     = TR_PIT_ON_TRACK_SIDE;
-		pits->nPitSeg  = 0;
-		if (pitStart->lgfromstart > pitEnd->lgfromstart) {
-			pits->nPitSeg = (int)((theTrack->length - pitStart->lgfromstart
-				+ pitEnd->lgfromstart + pitEnd->length /*+ pits->len / 2.0*/) / pits->len);
-		} else {
-			pits->nPitSeg = (int)((pitEnd->lgfromstart + pitEnd->length
-				- pitStart->lgfromstart /*+ pits->len / 2.0*/) / pits->len);
-		}
-		pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
-		pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
-		//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
-		//GfOut("pits->nMaxPits: %d\n",pits->nMaxPits); 
-
-		if (pitBuildingsStart == NULL)
-			pitBuildingsStart = pitStart;
-		mSeg = pitBuildingsStart->prev;
-		mSeg = mSeg->next;
-
-		bool		changeSeg = true;
-		tdble		offset = 0;
-		tdble		toStart = 0;
-		int i = 0;
-		while (i < pits->nPitSeg) {
-			if (changeSeg) {
-				changeSeg = false;
-				offset = 0;
-				mSeg = mSeg->next;
-				if (toStart >= mSeg->length) {
-					toStart -= mSeg->length;
-					changeSeg = true;
-					continue;
-				}
-
-				switch (pits->side) {
-					case TR_RGT:
-						curPitSeg = mSeg->rside;
-						if (curPitSeg->rside) {
-							offset = curPitSeg->width;
-							curPitSeg = curPitSeg->rside;
-						}
-						break;
-
-					case TR_LFT:
-						curPitSeg = mSeg->lside;
-						if (curPitSeg->lside) {
-							offset = curPitSeg->width;
-							curPitSeg = curPitSeg->lside;
-						}
-						break;
-				}//switch pits->side
-			}//if changeSeg
-
-			pits->driversPits[i].pos.type = TR_LPOS_MAIN;
-			//NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
-			//It is coincidentally equal to TR_TORIGHT, that's why it works.
-			//Should clear up.
-			pits->driversPits[i].pos.seg = mSeg;
-
-			//RtTrackLocal2Global expects toStart as a length in meters for straight,
-			//and as an angle in radian for curves
-			tdble pitCenter = toStart; //+ pits->len / 2.0;
-			switch(mSeg->type) {
-				case TR_STR:
-					pits->driversPits[i].pos.toStart = pitCenter;
-					break;
-
-				case TR_LFT:
-				case TR_RGT:
-					pits->driversPits[i].pos.toStart = pitCenter / mSeg->radius;
-					break;
-			}
-			
-			switch (pits->side) {
-				case TR_RGT:
-					pits->driversPits[i].pos.toRight  = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
-					pits->driversPits[i].pos.toLeft   = mSeg->width - pits->driversPits[i].pos.toRight;
-					pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toRight;
-					break;
-
-				case TR_LFT:
-					pits->driversPits[i].pos.toLeft   = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
-					pits->driversPits[i].pos.toRight  = mSeg->width - pits->driversPits[i].pos.toLeft;
-					pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toLeft;
-					break;
-			}//switch pits->side
-
-			toStart += pits->len;
-			if (toStart >= mSeg->length) {
-				toStart -= mSeg->length;
-				changeSeg = true;
-			}
-
-			i++;
-		}//while i
-
-		for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
-			curSeg2 = NULL;
-
-			switch(pits->side) {
-				case TR_RGT:
-					curSeg = mSeg->rside;
-					curSeg2 = curSeg->rside;
-					if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
-						//GfOut("mSeg: %s PitBuilding R\n",mSeg->name); 
-						mSeg->barrier[0]->style = TR_PITBUILDING;
+		switch(pits->type) {
+			case TR_PIT_NO_BUILDING:
+			case TR_PIT_ON_TRACK_SIDE:
+				{//dummy for eliminating warnings of locally declared variables cross-jumping with cases
+					//pits->type     = TR_PIT_ON_TRACK_SIDE;
+					pits->nPitSeg  = 0;
+					if (pitStart->lgfromstart > pitEnd->lgfromstart) {
+						pits->nPitSeg = (int)((theTrack->length - pitStart->lgfromstart
+							+ pitEnd->lgfromstart + pitEnd->length /*+ pits->len / 2.0*/) / pits->len);
+					} else {
+						pits->nPitSeg = (int)((pitEnd->lgfromstart + pitEnd->length
+							- pitStart->lgfromstart /*+ pits->len / 2.0*/) / pits->len);
 					}
-					break;
-					
-				case TR_LFT:
-					curSeg = mSeg->lside;
-					curSeg2 = curSeg->lside;
-					if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
-						//GfOut("mSeg: %s PitBuilding L\n",mSeg->name); 
-						mSeg->barrier[1]->style = TR_PITBUILDING;
-					}
-					break;
-			}//switch pits->side
+					pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
+					pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
+					//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
+					//GfOut("pits->nMaxPits: %d\n",pits->nMaxPits); 
 
-			if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
-				curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-				//GfOut("mSeg: %s SL\n",mSeg->name); 
-				if (curSeg2) {
-					curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-				}
-			} else if (mSeg == pitStart->prev) {
-				curSeg->raceInfo |= TR_PITSTART;
-				//GfOut("mSeg: %s PitStart\n",mSeg->name); 
-				if (curSeg2) {
-					curSeg2->raceInfo |= TR_PITSTART;
-				}
-			} else if (mSeg == pitEnd->next) {
-				curSeg->raceInfo |= TR_PITEND;
-				//GfOut("mSeg: %s PitEnd\n",mSeg->name); 
-				if (curSeg2) {
-					curSeg2->raceInfo |= TR_PITEND;
-				}
-			}
-		}//for mSeg
+					if (pitBuildingsStart == NULL)
+						pitBuildingsStart = pitStart;
+					mSeg = pitBuildingsStart->prev;
+					mSeg = mSeg->next;
+
+					bool		changeSeg = true;
+					tdble		offset = 0;
+					tdble		toStart = 0;
+					int i = 0;
+					while (i < pits->nPitSeg) {
+						if (changeSeg) {
+							changeSeg = false;
+							offset = 0;
+							mSeg = mSeg->next;
+							if (toStart >= mSeg->length) {
+								toStart -= mSeg->length;
+								changeSeg = true;
+								continue;
+							}
+
+							switch (pits->side) {
+								case TR_RGT:
+									curPitSeg = mSeg->rside;
+									if (curPitSeg->rside) {
+										offset = curPitSeg->width;
+										curPitSeg = curPitSeg->rside;
+									}
+									break;
+
+								case TR_LFT:
+									curPitSeg = mSeg->lside;
+									if (curPitSeg->lside) {
+										offset = curPitSeg->width;
+										curPitSeg = curPitSeg->lside;
+									}
+									break;
+							}//switch pits->side
+						}//if changeSeg
+
+						pits->driversPits[i].pos.type = TR_LPOS_MAIN;
+						//NB: TR_LPOS_MAIN not handled by RtTrackLocal2Global!
+						//It is coincidentally equal to TR_TORIGHT, that's why it works.
+						//Should clear up.
+						pits->driversPits[i].pos.seg = mSeg;
+
+						//RtTrackLocal2Global expects toStart as a length in meters for straight,
+						//and as an angle in radian for curves
+						tdble pitCenter = toStart; //+ pits->len / 2.0;
+						switch(mSeg->type) {
+							case TR_STR:
+								pits->driversPits[i].pos.toStart = pitCenter;
+								break;
+
+							case TR_LFT:
+							case TR_RGT:
+								pits->driversPits[i].pos.toStart = pitCenter / mSeg->radius;
+								break;
+						}
+						
+						switch (pits->side) {
+							case TR_RGT:
+								pits->driversPits[i].pos.toRight  = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
+								pits->driversPits[i].pos.toLeft   = mSeg->width - pits->driversPits[i].pos.toRight;
+								pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toRight;
+								break;
+
+							case TR_LFT:
+								pits->driversPits[i].pos.toLeft   = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
+								pits->driversPits[i].pos.toRight  = mSeg->width - pits->driversPits[i].pos.toLeft;
+								pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toLeft;
+								break;
+						}//switch pits->side
+
+						toStart += pits->len;
+						if (toStart >= mSeg->length) {
+							toStart -= mSeg->length;
+							changeSeg = true;
+						}
+
+						i++;
+					}//while i
+
+					for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
+						curSeg2 = NULL;
+
+						switch(pits->side) {
+							case TR_RGT:
+								curSeg = mSeg->rside;
+								curSeg2 = curSeg->rside;
+								if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
+									//GfOut("mSeg: %s PitBuilding R\n",mSeg->name); 
+									mSeg->barrier[0]->style = TR_PITBUILDING;
+								}
+								break;
+								
+							case TR_LFT:
+								curSeg = mSeg->lside;
+								curSeg2 = curSeg->lside;
+								if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
+									//GfOut("mSeg: %s PitBuilding L\n",mSeg->name); 
+									mSeg->barrier[1]->style = TR_PITBUILDING;
+								}
+								break;
+						}//switch pits->side
+
+						if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
+							curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+							//GfOut("mSeg: %s SL\n",mSeg->name); 
+							if (curSeg2) {
+								curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
+							}
+						} else if (mSeg == pitStart->prev) {
+							curSeg->raceInfo |= TR_PITSTART;
+							//GfOut("mSeg: %s PitStart\n",mSeg->name); 
+							if (curSeg2) {
+								curSeg2->raceInfo |= TR_PITSTART;
+							}
+						} else if (mSeg == pitEnd->next) {
+							curSeg->raceInfo |= TR_PITEND;
+							//GfOut("mSeg: %s PitEnd\n",mSeg->name); 
+							if (curSeg2) {
+								curSeg2->raceInfo |= TR_PITEND;
+							}
+						}
+					}//for mSeg
+				}//dummy
+				break;
+
+			case TR_PIT_ON_SEPARATE_PATH:
+				//NOT IMPLEMENTED YET
+				break;
+
+			//~ case TR_PIT_NO_BUILDING:
+				//~ break;
+
+			case TR_PIT_NONE:
+				//No action needed
+				break;
+		}//switch pits->type
 	}//if found
 
 	for (mSeg = pitBuildingsStart; mSeg != pitEnd; mSeg = mSeg->next) {

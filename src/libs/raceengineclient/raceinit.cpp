@@ -384,6 +384,7 @@ initPits(void)
 
   switch (ReInfo->track->pits.type) {
     case TR_PIT_ON_TRACK_SIDE:
+    case TR_PIT_NO_BUILDING:
       pits = &(ReInfo->track->pits);
       pits->driversPitsNb = ReInfo->s->_ncars;
       pits->carsPerPit = carsPerPit;
@@ -450,8 +451,10 @@ initPits(void)
       }
 
       break;
+      
     case TR_PIT_ON_SEPARATE_PATH:
       break;
+      
     case TR_PIT_NONE:
       break;
   }

@@ -192,8 +192,7 @@
 #define TRK_SECT_PITS		"Pits"
 #define TRK_ATT_MAX_PITS    "max pits"             
 #define TRK_ATT_BUILDINGS_START "start buildings"  
-
-
+#define TRK_ATT_PIT_STYLE	"pit style"
 #define TRK_ATT_ENTRY		"entry"
 #define TRK_ATT_EXIT		"exit"
 #define TRK_ATT_START		"start"
@@ -492,26 +491,30 @@ typedef struct
 	int type;		/**< Type of Pit:
 				   - TR_PIT_NONE
 				   - TR_PIT_ON_TRACK_SIDE
+				   - TR_PIT_ON_SEPARATE_PATH
+				   - TR_PIT_NO_BUILDING
 				 */
 #define TR_PIT_NONE		0 /**< No pits for that tracks */
 #define TR_PIT_ON_TRACK_SIDE	1 /**< The pits are on the track side */
-#define TR_PIT_ON_SEPARATE_PATH 2
+#define TR_PIT_ON_SEPARATE_PATH 2 /**< The pit is on a separate pitlane */
+#define TR_PIT_NO_BUILDING	3 /**< Draw no building, only low wall, NASCAR style */
+
 	int nMaxPits;	/**< number max of pits */
 	int nPitSeg;	/**< actual number of pits */
 	int side;		/**< Pits side:
 				   - TR_RGT
 				   - TR_LFT
 				*/
-	tdble len;					/**< Lenght of each pit stop */
-	tdble width;				/**< Width of each pit stop */
-	tdble speedLimit;			/**< Speed limit between pitStart and pitEnd */
+	tdble len;			/**< Lenght of each pit stop */
+	tdble width;			/**< Width of each pit stop */
+	tdble speedLimit;		/**< Speed limit between pitStart and pitEnd */
 	tTrackSeg *pitEntry;		/**< Pit lane segment */
 	tTrackSeg *pitStart;		/**< Pit lane segment */
-	tTrackSeg *pitEnd;			/**< Pit lane segment */
-	tTrackSeg *pitExit;			/**< Pit lane segment */
+	tTrackSeg *pitEnd;		/**< Pit lane segment */
+	tTrackSeg *pitExit;		/**< Pit lane segment */
 	tTrackOwnPit *driversPits;	/**< List of pits by driver */
 	int carsPerPit;
-	int driversPitsNb;			/**< Number of drivers */
+	int driversPitsNb;		/**< Number of drivers */
 } tTrackPitInfo;
 
 typedef struct

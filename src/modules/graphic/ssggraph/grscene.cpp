@@ -234,6 +234,7 @@ grCustomizePits(void)
 	tTrackPitInfo *pits = &(grTrack->pits);
 	
 	/* draw the pit identification */
+	GfOut("GrScene:: pits->type: %d\n", pits->type);
 	switch (pits->type) {
 		case TR_PIT_ON_TRACK_SIDE:
 			for(int i = 0; i < pits->nMaxPits; i++) {
@@ -349,11 +350,198 @@ grCustomizePits(void)
 				ThePits->addKid(pit);
 			}//for i
 			break;
+
+		case TR_PIT_NO_BUILDING:
+			//Draw white, low wall (about 3ft high) with logos
+			for(int i = 0; i < pits->nMaxPits; i++) {
+				tTrackOwnPit *actual_pit = &(pits->driversPits[i]);
+				ssgVertexArray *pit_vtx = new ssgVertexArray(4);
+				ssgTexCoordArray *pit_tex = new ssgTexCoordArray(4);
+				ssgColourArray *pit_clr = new ssgColourArray(1);
+				ssgNormalArray *pit_nrm = new ssgNormalArray(1);
+			
+				sgVec4 clr = {0, 0, 0, 1};
+				pit_clr->add(clr);
+		
+				std::string strLogoFileName("logo"); // Default driver logo file name (pit door).
+
+				if (actual_pit->car[0]) {
+					
+					// If we have more than one car in the pit use the team pit logo of driver 0. 
+					snprintf(buf, sizeof(buf),
+							 "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s;data/textures",
+							 GfLocalDir(),
+							 actual_pit->car[0]->_modName,
+							 actual_pit->car[0]->_driverIndex,
+							 GfLocalDir(),
+							 actual_pit->car[0]->_modName,
+							 actual_pit->car[0]->_modName,
+							 actual_pit->car[0]->_driverIndex,
+							 actual_pit->car[0]->_modName);
+
+					// If a custom skin was selected, and it can apply to the pit door,
+					// update the logo file name accordingly
+					if (strlen(actual_pit->car[0]->_skinName) != 0
+						&& actual_pit->car[0]->_skinTargets & RM_CAR_SKIN_TARGET_PIT_DOOR)
+					{
+						strLogoFileName += '-';
+						strLogoFileName += actual_pit->car[0]->_skinName;
+						GfLogTrace("Using skinned pit door logo %s\n", strLogoFileName.c_str());
+					}
+					
+				} else {
+					snprintf(buf, sizeof(buf), "data/textures");
+				}//if actual_pit->car[0]
+
+				// Load logo texture (.rgb first, for backwards compatibility, then .png)
+				const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+				ssgState *st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, FALSE);
+				if (!st)
+				{
+					const std::string strPNGLogoFileName = strLogoFileName + ".png";
+					st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf, FALSE, FALSE);
+				}
+				((ssgSimpleState*)st)->setShininess(50);
+			
+				tdble x, y;
+				t3Dd normalvector;
+				RtTrackLocal2Global(&(actual_pit->pos), &x, &y, actual_pit->pos.type);
+				RtTrackSideNormalG(actual_pit->pos.seg, x, y, pits->side, &normalvector);
+				tdble x2 = x - pits->width / 2.0 * normalvector.x
+					+ pits->len / 2.0 * normalvector.y;
+				tdble y2 = y - pits->width / 2.0 * normalvector.y
+					- pits->len / 2.0 * normalvector.x;
+				tdble z2 = RtTrackHeightG(actual_pit->pos.seg, x2, y2);
+
+#if 0
+				//Let's draw the logo		
+				sgVec3 nrm;
+				nrm[0] = normalvector.x;
+				nrm[1] = normalvector.y;
+				nrm[2] = 0;
+				pit_nrm->add(nrm);
+
+				//First, bottom vertex
+				sgVec2 tex;
+				sgVec3 vtx;
+				tex[0] = 0.0;//-0.7;
+				tex[1] = 0.0;
+				vtx[0] = x2;
+				vtx[1] = y2;
+				vtx[2] = z2;
+				pit_tex->add(tex);
+				pit_vtx->add(vtx);
+
+				//First, top vertex
+				tex[0] = 0.0;//-0.7;
+				tex[1] = 0.33;
+				vtx[0] = x2;
+				vtx[1] = y2;
+				vtx[2] = z2 + 0.9;
+				pit_tex->add(tex);
+				pit_vtx->add(vtx);
+			
+				x2 = x - pits->width / 2.0 * normalvector.x
+					- pits->len / 1.0 * normalvector.y;
+				y2 = y - pits->width / 2.0 * normalvector.y
+					+ pits->len / 1.0 * normalvector.x;
+				z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
+
+				//Second, bottom vertex
+				tex[0] = 1.0;//1.3;
+				tex[1] = 0.0;
+				vtx[0] = x2;
+				vtx[1] = y2;
+				vtx[2] = z2;
+				pit_tex->add(tex);
+				pit_vtx->add(vtx);
+
+				//Second, top vertex
+				tex[0] = 1.0;//1.3;
+				tex[1] = 0.33;
+				vtx[0] = x2;
+				vtx[1] = y2;
+				vtx[2] = z2 + 0.9;
+				pit_tex->add(tex);
+				pit_vtx->add(vtx);
+
+				ssgVtxTable *pit = new ssgVtxTable(GL_TRIANGLE_STRIP, pit_vtx, pit_nrm, pit_tex, pit_clr);
+				pit->setState(st);
+				pit->setCullFace(0);
+				ThePits->addKid(pit);
+#endif
+
+				//Let's draw the low wall
+				st = grSsgLoadTexStateEx("tr-bar-gr.png", buf, FALSE, FALSE);
+				((ssgSimpleState*)st)->setShininess(100);
+				x2 = x - pits->width / 2.0 * normalvector.x
+					+ pits->len * normalvector.y;
+				y2 = y - pits->width / 2.0 * normalvector.y
+					- pits->len * normalvector.x;
+				z2 = RtTrackHeightG(actual_pit->pos.seg, x2, y2);
+
+				sgVec3 nrm2 = { normalvector.x, normalvector.y, 0.0 };
+				pit_nrm->add(nrm2);
+
+				//First, bottom vertex
+				sgVec2 tex2 = { 0.0, 0.0 };
+				sgVec3 vtx2 = { x2, y2, z2 };
+				//~ tex2[0] = 0.0;
+				//~ tex2[1] = 0.0;
+				//~ vtx2[0] = x2;
+				//~ vtx2[1] = y2;
+				//~ vtx2[2] = z2;
+				pit_tex->add(tex2);
+				pit_vtx->add(vtx2);
+
+				//First, top vertex
+				//~ tex2 = { 0.0, 0.25 };
+				//~ vtx2 = { x2, y2, z2 + 0.9 };
+				tex2[0] = 0.0;
+				tex2[1] = 0.25;
+				vtx2[0] = x2;
+				vtx2[1] = y2;
+				vtx2[2] = z2 + 0.9;
+				pit_tex->add(tex2);
+				pit_vtx->add(vtx2);
+			
+				x2 = x - pits->width / 2.0 * normalvector.x
+					- pits->len * normalvector.y;
+				y2 = y - pits->width / 2.0 * normalvector.y
+					+ pits->len * normalvector.x;
+				z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
+
+				//Second, bottom vertex
+				tex2[0] = 1.0;
+				tex2[1] = 0.0;
+				vtx2[0] = x2;
+				vtx2[1] = y2;
+				vtx2[2] = z2;
+				pit_tex->add(tex2);
+				pit_vtx->add(vtx2);
+
+				//Second, top vertex
+				tex2[0] = 1.0;
+				tex2[1] = 0.25;
+				vtx2[0] = x2;
+				vtx2[1] = y2;
+				vtx2[2] = z2 + 0.9;
+				pit_tex->add(tex2);
+				pit_vtx->add(vtx2);
+		
+				ssgVtxTable *pit2 = new ssgVtxTable(GL_TRIANGLE_STRIP, pit_vtx, pit_nrm, pit_tex, pit_clr);
+				pit2->setState(st);
+				pit2->setCullFace(false);
+				ThePits->addKid(pit2);
+			}//for i
+			break;
 			
 		case TR_PIT_ON_SEPARATE_PATH:
+			//Not implemented yet
 			break;
 		
 		case TR_PIT_NONE:
+			//Nothing to do
 			break;	
 	}//switch pit->type
 }//grCustomizePits

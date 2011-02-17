@@ -132,6 +132,10 @@ reTrackDump(const tTrack *track, int verbose)
 		case TR_PIT_ON_SEPARATE_PATH:
 			GfLogInfo("Pits     = present on separate path\n");
 			break;
+
+		case TR_PIT_NO_BUILDING:
+			GfLogInfo("Pits     = present, no building style\n");
+			break;
     }//switch pits.type
 
 	const int seconds = (int)track->local.timeofday;

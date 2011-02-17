@@ -102,8 +102,12 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 
 	sprintf(path2, "%s/%s", TRK_SECT_MAIN, TRK_SECT_PITS);
 
+	// In TR_PIT_NO_BUILDING, the pit positions are located exactly the same,
+	// as in the TR_PIT_ON_TRACK_SIDE. It differs only later, showing/not showing
+	// the buildings.
 	switch (pits->type) {
 		case TR_PIT_ON_TRACK_SIDE:
+		case TR_PIT_NO_BUILDING:
 			pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
 			pits->driversPitsNb = pits->nPitSeg; 
 			curPos.type = TR_TOMIDDLE;
@@ -2452,118 +2456,129 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
 	pits = &(Track->pits);
 	initPits(Track,TrackHandle,pits);
-    
-	if (pits->type == TR_PIT_ON_TRACK_SIDE) {
-		int	uid = 1;
-		t3Dd	normvec;
 
-		startNeeded = 1;
-		sprintf(sname, "P%dts", uid++);
-		CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[0].pos.seg->id);
+  switch(pits->type) {  
+		case TR_PIT_ON_TRACK_SIDE:
+			static int	uid = 1;
+			t3Dd	normvec;
 
-		RtTrackLocal2Global(&(pits->driversPits[0].pos), &x, &y, pits->driversPits[0].pos.type);
-		RtTrackSideNormalG(pits->driversPits[0].pos.seg, x, y, pits->side, &normvec);
-		z2 = RtTrackHeightG(pits->driversPits[0].pos.seg, x, y);
-
-		x2 = x + PIT_TOP * normvec.x;
-		y2 = y + PIT_TOP * normvec.y;
-		SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
-		SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
-
-		x2 = x;
-		y2 = y;
-		SETPOINT(1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
-
-		x2 = x - PIT_DEEP * normvec.x;
-		y2 = y - PIT_DEEP * normvec.y;
-		SETPOINT(1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
-
-		x2 = x;
-		y2 = y;
-		SETPOINT(1.0, 0, x2, y2, z2);
-
-		x2 = x - PIT_DEEP * normvec.x;
-		y2 = y - PIT_DEEP * normvec.y;
-		SETPOINT(1.0 + PIT_DEEP, 0, x2, y2, z2);
-
-		for (i = 0; i < pits->driversPitsNb; i++) {
 			startNeeded = 1;
 			sprintf(sname, "P%dts", uid++);
-			CHECKDISPLIST3("concrete.png", 4, sname, pits->driversPits[i].pos.seg->id);
+			CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[0].pos.seg->id);
+
+			RtTrackLocal2Global(&(pits->driversPits[0].pos), &x, &y, pits->driversPits[0].pos.type);
+			RtTrackSideNormalG(pits->driversPits[0].pos.seg, x, y, pits->side, &normvec);
+			z2 = RtTrackHeightG(pits->driversPits[0].pos.seg, x, y);
+
+			x2 = x + PIT_TOP * normvec.x;
+			y2 = y + PIT_TOP * normvec.y;
+			SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+			SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+
+			x2 = x;
+			y2 = y;
+			SETPOINT(1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+
+			x2 = x - PIT_DEEP * normvec.x;
+			y2 = y - PIT_DEEP * normvec.y;
+			SETPOINT(1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+
+			x2 = x;
+			y2 = y;
+			SETPOINT(1.0, 0, x2, y2, z2);
+
+			x2 = x - PIT_DEEP * normvec.x;
+			y2 = y - PIT_DEEP * normvec.y;
+			SETPOINT(1.0 + PIT_DEEP, 0, x2, y2, z2);
+
+			for (i = 0; i < pits->driversPitsNb; i++) {
+				startNeeded = 1;
+				sprintf(sname, "P%dts", uid++);
+				CHECKDISPLIST3("concrete.png", 4, sname, pits->driversPits[i].pos.seg->id);
+
+				RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y, pits->driversPits[i].pos.type);
+				RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y, pits->side, &normvec);
+				x2 = x;
+				y2 = y;
+				z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
+
+				if (pits->side == TR_RGT) {
+					x3 = x + pits->len * normvec.y;
+					y3 = y - pits->len * normvec.x;
+				} else {
+					x3 = x - pits->len * normvec.y;
+					y3 = y + pits->len * normvec.x;
+				}
+
+				z3 = RtTrackHeightG(pits->driversPits[i].pos.seg, x3, y3);
+				SETPOINT(pits->len, 0, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+				SETPOINT(0, 0, x3, y3, z3 + PIT_HEIGHT - PIT_TOP);
+
+				tdble dx = PIT_TOP * normvec.x;
+				tdble dy = PIT_TOP * normvec.y;
+				SETPOINT(pits->len, PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT - PIT_TOP);
+				SETPOINT(0, PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT - PIT_TOP);
+				SETPOINT(pits->len, 2 * PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
+				SETPOINT(0, 2 * PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
+
+				dx = - PIT_DEEP * normvec.x;
+				dy = - PIT_DEEP * normvec.y;
+
+				SETPOINT(pits->len, 2 * PIT_TOP + PIT_DEEP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
+				SETPOINT(0, 2 * PIT_TOP + PIT_DEEP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
+				SETPOINT(pits->len, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x2 + dx, y2 + dy, z2);
+				SETPOINT(0, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x3 + dx, y3 + dy, z3);
+			}//for i
+
+			startNeeded = 1;
+			i--;
+			sprintf(sname, "P%dts", uid++);
+			CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[i].pos.seg->id);
 
 			RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y, pits->driversPits[i].pos.type);
 			RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y, pits->side, &normvec);
-			x2 = x;
-			y2 = y;
-			z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
 
 			if (pits->side == TR_RGT) {
-				x3 = x + pits->len * normvec.y;
-				y3 = y - pits->len * normvec.x;
+				x += pits->len * normvec.y;
+				y -= pits->len * normvec.x;
 			} else {
-				x3 = x - pits->len * normvec.y;
-				y3 = y + pits->len * normvec.x;
+				x -= pits->len * normvec.y;
+				y += pits->len * normvec.x;
 			}
 
-			z3 = RtTrackHeightG(pits->driversPits[i].pos.seg, x3, y3);
-			SETPOINT(pits->len, 0, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
-			SETPOINT(0, 0, x3, y3, z3 + PIT_HEIGHT - PIT_TOP);
+			z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x, y);
+			x2 = x + PIT_TOP * normvec.x;
+			y2 = y + PIT_TOP * normvec.y;
+			SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
+			SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
 
-			tdble dx = PIT_TOP * normvec.x;
-			tdble dy = PIT_TOP * normvec.y;
-			SETPOINT(pits->len, PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT - PIT_TOP);
-			SETPOINT(0, PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT - PIT_TOP);
-			SETPOINT(pits->len, 2 * PIT_TOP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
-			SETPOINT(0, 2 * PIT_TOP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
+			x2 = x - PIT_DEEP * normvec.x;
+			y2 = y - PIT_DEEP * normvec.y;
+			SETPOINT(1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
 
-			dx = - PIT_DEEP * normvec.x;
-			dy = - PIT_DEEP * normvec.y;
+			x2 = x;
+			y2 = y;
+			SETPOINT(1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
 
-			SETPOINT(pits->len, 2 * PIT_TOP + PIT_DEEP, x2 + dx, y2 + dy, z2 + PIT_HEIGHT);
-			SETPOINT(0, 2 * PIT_TOP + PIT_DEEP, x3 + dx, y3 + dy, z3 + PIT_HEIGHT);
-			SETPOINT(pits->len, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x2 + dx, y2 + dy, z2);
-			SETPOINT(0, 2 * PIT_TOP + PIT_DEEP + PIT_HEIGHT, x3 + dx, y3 + dy, z3);
-		}//for i
+			x2 = x - PIT_DEEP * normvec.x;
+			y2 = y - PIT_DEEP * normvec.y;
+			SETPOINT(1.0 + PIT_DEEP, 0, x2, y2, z2);
 
-		startNeeded = 1;
-		i--;
-		sprintf(sname, "P%dts", uid++);
-		CHECKDISPLIST3("concrete2.png", 4, sname, pits->driversPits[i].pos.seg->id);
+			x2 = x;
+			y2 = y;
+			SETPOINT(1.0, 0, x2, y2, z2);
+			break; //TR_PIT_ON_TRACK_SIDE
 
-		RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y, pits->driversPits[i].pos.type);
-		RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y, pits->side, &normvec);
+		case TR_PIT_NO_BUILDING:
+			break;
 
-		if (pits->side == TR_RGT) {
-			x += pits->len * normvec.y;
-			y -= pits->len * normvec.x;
-		} else {
-			x -= pits->len * normvec.y;
-			y += pits->len * normvec.x;
-		}
+		case TR_PIT_ON_SEPARATE_PATH:
+		  break;
 
-		z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x, y);
-		x2 = x + PIT_TOP * normvec.x;
-		y2 = y + PIT_TOP * normvec.y;
-		SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
-		SETPOINT(1.0 - PIT_TOP, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
+		case TR_PIT_NONE:
+			break;
 
-		x2 = x - PIT_DEEP * normvec.x;
-		y2 = y - PIT_DEEP * normvec.y;
-		SETPOINT(1.0 + PIT_DEEP, PIT_HEIGHT, x2, y2, z2 + PIT_HEIGHT);
-
-		x2 = x;
-		y2 = y;
-		SETPOINT(1.0, PIT_HEIGHT - PIT_TOP, x2, y2, z2 + PIT_HEIGHT - PIT_TOP);
-
-		x2 = x - PIT_DEEP * normvec.x;
-		y2 = y - PIT_DEEP * normvec.y;
-		SETPOINT(1.0 + PIT_DEEP, 0, x2, y2, z2);
-
-		x2 = x;
-		y2 = y;
-		SETPOINT(1.0, 0, x2, y2, z2);
-		}//if pits->type == TR_PIT_ON_TRACK_SIDE
-
+	}//switch pits->type
 	}
 	CLOSEDISPLIST();
 	printf("=== Indices really used = %d\n", nbvert);
