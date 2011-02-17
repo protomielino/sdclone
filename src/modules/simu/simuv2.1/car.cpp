@@ -208,7 +208,11 @@ SimCarUpdateForces(tCar *car)
 		R += car->wheel[i].rollRes;
 	}
 	if (v > 0.00001) {
-		Rv = R / v;
+		if (v > 10.0) {
+			Rv = R / v;
+		} else {
+			Rv = R / 10.0;
+		}
 		if ((Rv * minv * SimDeltaTime) > v) {
 			Rv = v * m / SimDeltaTime;
 		}
