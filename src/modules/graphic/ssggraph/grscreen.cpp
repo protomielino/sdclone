@@ -55,6 +55,11 @@ cGrScreen::cGrScreen(int myid)
 	memset(cams, 0, sizeof(cams));
 	viewRatio = 1.33;
 	cars = 0;
+	
+	scrx = 0;
+	scry = 0;
+	scrw = 800;
+	scrh = 600;
 }
 
 cGrScreen::~cGrScreen()
