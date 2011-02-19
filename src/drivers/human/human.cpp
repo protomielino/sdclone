@@ -58,7 +58,7 @@ static void drive_mt(int index, tCarElt* car, tSituation *s);
 static void drive_at(int index, tCarElt* car, tSituation *s);
 static void newrace(int index, tCarElt* car, tSituation *s);
 static int  pitcmd(int index, tCarElt* car, tSituation *s);
-
+static void SetFuelAtRaceStart(tTrack *track, void **carParmHandle, tSituation *s, int idx);
 static char	sstring[1024];
 static char	buf[1024];
 
@@ -370,12 +370,7 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 	}//if-else curTrack->pits
 
 	//Initial fuel fill computation
-	//Fuel tank capacity
-	const double tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0);
-	tdble fuel = (MaxFuelPerMeter * curTrack->length * (s->_totLaps + 1) + 2.7f / 60.0f * MAX(s->_totTime, 0) )
-		/ (1.0 + ((tdble)HCtx[idx]->nbPitStopProg)) + FuelReserve;
-	fuel = MIN(fuel, tank_capacity);	//Obey limits
-	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, (char*)NULL, fuel);
+	SetFuelAtRaceStart(track, carParmHandle, s, idx);
 	
 	speedLimit = curTrack->pits.speedLimit;
 	
@@ -1342,3 +1337,30 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 	return ROB_PIT_MENU; /* The player is able to modify the value by menu */
 }//pitcmd
 
+
+// Trivial strategy:
+// fill in as much fuel as required for the whole race,
+// or if the tank is too small, fill the tank completely.
+static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
+																tSituation *s, int idx) {
+	// Load and set parameters.
+	tdble fuel_per_lap = track->length * MaxFuelPerMeter;
+	tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f)
+												 + fuel_per_lap / 60.0 * MAX(s->_totTime, 0);	//aimed at timed sessions
+
+	fuel_for_race /= (1.0 + ((tdble)HCtx[idx]->nbPitStopProg));
+	fuel_for_race += FuelReserve;
+	
+	const tdble tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK,
+															NULL, 100.0f);
+	float initial_fuel = 0;//GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_MAX_FUEL,
+													//		NULL, 0.0f);
+	tdble fuel_requested;
+	if (initial_fuel) {
+		fuel_requested = initial_fuel;
+	} else {
+	 	fuel_requested = MIN(fuel_for_race, tank_capacity);
+	}
+
+	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL, fuel_requested);
+}  // SetFuelAtRaceStart
