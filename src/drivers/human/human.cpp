@@ -34,6 +34,7 @@
 #define BINCTRL_STEERING JPM
 
 #include <map>
+#include <vector>
 #include <string>
 
 #ifdef _WIN32
