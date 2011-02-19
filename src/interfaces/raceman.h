@@ -382,8 +382,9 @@ typedef struct RmInfo
 #define RM_VAL_CLOUDS_SCARCE	"scarce clouds"
 #define RM_VAL_CLOUDS_MANY	"many clouds"
 #define RM_VAL_CLOUDS_FULL	"full cover"
+#define RM_VAL_CLOUDS_RANDOM	"random"
 #define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE, \
-                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL }
+                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
 
 #define RM_VAL_RAIN_NONE	"none"
 #define RM_VAL_RAIN_LITTLE	"little"

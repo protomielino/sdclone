@@ -61,7 +61,7 @@ public:
 						  eTimeDusk, eTimeNight, eTimeNow, eTimeFromTrack,
 						  nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
 	enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
-					   nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
+					   eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
 	enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
 					 nRainSpecNumber }; // Last = invalid value = nb of valid ones.
 	class Parameters

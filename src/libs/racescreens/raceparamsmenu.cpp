@@ -220,16 +220,6 @@ rmChangeClouds(void *vp)
 		(GfRace::ECloudsSpec)
 		((rmrpClouds + GfRace::nCloudsSpecNumber + delta) % GfRace::nCloudsSpecNumber);
     GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
-
-    if (rmrpConfMask & RM_CONF_RAIN_FALL)
-	{
-		// Make rain level compatible if needed.
-		if (rmrpClouds != GfRace::eCloudsFull) // No heavy clouds => no rain
-		{
-			rmrpRain = GfRace::eRainNone;
-			GfuiLabelSetText(ScrHandle, rmrpRainEditId, RainValues[rmrpRain]);
-		}
-	}
 }
 
 static void
@@ -244,23 +234,22 @@ rmChangeRain(void *vp)
     if (rmrpConfMask & RM_CONF_CLOUD_COVER)
 	{
 		// Make clouds state compatible if needed.
-		int cloudsComboVisibility;
+		int cloudsComboEnabled = GFUI_ENABLE;
 		if (rmrpRain == GfRace::eRainRandom) // Random rain => Random clouds.
 		{
-			cloudsComboVisibility = GFUI_INVISIBLE;
-			GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, "random");
+			cloudsComboEnabled = GFUI_DISABLE;
+			rmrpClouds = GfRace::eCloudsRandom;
 		}
-		else
+		else if (rmrpRain != GfRace::eRainNone)
 		{
-			cloudsComboVisibility = GFUI_VISIBLE;
-			if (rmrpRain != GfRace::eRainNone)
-				rmrpClouds = GfRace::eCloudsFull; // Rain => Heavy clouds.
-			GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
+			cloudsComboEnabled = GFUI_DISABLE;
+			rmrpClouds = GfRace::eCloudsFull; // Rain => Heavy clouds.
 		}
-
-		// Show / hide clouds combo arrow buttons (random rain => no sky choice).
-		GfuiVisibilitySet(ScrHandle, rmrpCloudsLeftArrowId, cloudsComboVisibility);
-		GfuiVisibilitySet(ScrHandle, rmrpCloudsRightArrowId, cloudsComboVisibility);
+		GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
+		
+		// Show / hide clouds combo arrow buttons (any rain => no sky choice).
+		GfuiEnable(ScrHandle, rmrpCloudsLeftArrowId, cloudsComboEnabled);
+		GfuiEnable(ScrHandle, rmrpCloudsRightArrowId, cloudsComboEnabled);
 	}
 }
 
@@ -366,7 +355,7 @@ RmRaceParamsMenu(void *vrp)
 	// 4) According to the competitors.
 	if ((rmrpConfMask & RM_CONF_DISP_MODE) && MenuData->pRace->hasHumanCompetitors())
 	{
-		GfLogTrace("Will not configure Display Mode as some human driver(s) in the session\n");
+		GfLogTrace("Will not configure Display Mode as some human driver(s) are in\n");
 		rmrpConfMask &= ~RM_CONF_DISP_MODE;
 	}
 	
@@ -387,6 +376,7 @@ RmRaceParamsMenu(void *vrp)
 		CreateLabelControl(ScrHandle, menuXMLDescHdle, "nooptionlabel");
 	}
 	
+    // Otherwise, create and initialize the race length configuration controls.
     if (rmrpConfMask & RM_CONF_RACE_LEN) 
     {
 		if (pRaceSessionParams->nDistance < 0)
@@ -489,9 +479,9 @@ RmRaceParamsMenu(void *vrp)
 		GfuiLabelSetText(ScrHandle, rmrpTimeOfDayEditId, TimeOfDayValues[rmrpTimeOfDay]);
     }
 	
+	// Create and initialize Clouds combo box (2 arrow buttons and a variable label).
     if (rmrpConfMask & RM_CONF_CLOUD_COVER)
 	{
-		// Create and initialize Clouds combo box (2 arrow buttons and a variable label).
 		if (pRaceSessionParams->eCloudsSpec == GfRace::nCloudsSpecNumber)
 			rmrpClouds = GfRace::eCloudsNone; // Default value.
 		else
@@ -512,9 +502,9 @@ RmRaceParamsMenu(void *vrp)
 		GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 	}
 	
+	// Create and initialize Rain combo box (2 arrow buttons and a variable label).
 	if ((rmrpConfMask & RM_CONF_RAIN_FALL) && (rmrpFeatures & RM_FEATURE_WETTRACK))
 	{
-		// Create and initialize Rain combo box (2 arrow buttons and a variable label).
 		if (pRaceSessionParams->eRainSpec == GfRace::nRainSpecNumber)
 			rmrpRain = GfRace::eRainNone; // Default value.
 		else
@@ -535,6 +525,7 @@ RmRaceParamsMenu(void *vrp)
 		rmChangeRain(0); // Make cloud cover settings compatible if needed.
 	}
 	
+	// Create and initialize Display mode combo-box-like control.
     if (rmrpConfMask & RM_CONF_DISP_MODE) 
     {
 		if (pRaceSessionParams->eDisplayMode == GfRace::nDisplayModeNumber)

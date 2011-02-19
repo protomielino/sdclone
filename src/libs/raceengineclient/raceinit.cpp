@@ -103,7 +103,7 @@ ReInit(void)
 	GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
 
 	/* The graphic modules isn't loaded at this moment, so make sure _reGraphicItf equals NULL */
-	memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf));
+	//memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf)); // Already done by calloc.
 
 	// Initialize the movie capture system.
 	tRmMovieCapture *capture = &(ReInfo->movieCapture);

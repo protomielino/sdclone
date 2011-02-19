@@ -299,10 +299,13 @@ reTrackInitWeather(void)
 			}
 	}
 
-	// Take care of the random case for rain falls, clouds cover and ground water.
-	const  char* pszWeatherSelect = "user-defined";
-	if (rain == TR_RAIN_RANDOM)
+	// Take care of the random case for rain falls and ground water.
+	const bool bRandomRain = (rain == TR_RAIN_RANDOM);
+	if (bRandomRain)
 	{
+		// Force random clouds, in case there is no rain at the end.
+		clouds = TR_CLOUDS_RANDOM;
+		
 		// Random rain (if random[0,1] < trackLocal->anyrainlkhood, then it rains).
 		const tdble randDraw = (tdble)(rand()/(double)RAND_MAX);
 
@@ -324,33 +327,36 @@ reTrackInitWeather(void)
 			// otherwise, random[0,1] >= medium + little rain likelyhood => rain = Heavy rain
 			else
 				rain = TR_RAIN_HEAVY;
-			
-			// Whatever rain level (except for none), heavy clouds.
-			clouds = TR_CLOUDS_FULL;
 		}
 		else
 		{
 			// No Rain.
 			rain = TR_RAIN_NONE;
-			
-			// Random clouds.
-			clouds = rand() % (TR_CLOUDS_FULL + 1);
 		}
-		
-		pszWeatherSelect = "randomly selected";
 	}
-	else
+	
+	// Take care of the random case for clouds cover.
+	const bool bRandomClouds = (clouds == TR_CLOUDS_RANDOM);
+	if (bRandomClouds)
 	{
 		if (rain != TR_RAIN_NONE)
-			// Whatever rain level (except for none), heavy clouds.
+		{
+			// If any rain level, heavy clouds.
 			clouds = TR_CLOUDS_FULL;
+		}
+		else
+		{
+			// Really random clouds.
+			clouds = rand() % (TR_CLOUDS_FULL + 1);
+		}
 	}
 
 	// Ground water = rain for the moment (might change in the future).
 	const int water = rain;
 	
-	GfLogInfo("Weather : Using %s rain (%d), clouds (%d) and ground water (%d) settings\n",
-			  pszWeatherSelect, rain, clouds, water);
+	GfLogInfo("Weather : Using %s rain (%d) and ground water (%d) + %s clouds (%d) settings\n",
+			  bRandomRain ? "random" : "user defined", rain, water,
+			  bRandomClouds ? "random" : "user defined", clouds);
 	
 	// Update track local info.
 	trackLocal->rain = rain;

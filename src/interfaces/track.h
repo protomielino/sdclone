@@ -586,13 +586,14 @@ typedef struct TrackLocalInfo
 #define TR_CLOUDS_SCARCE 2
 #define TR_CLOUDS_MANY   3
 #define TR_CLOUDS_FULL   4
+#define TR_CLOUDS_RANDOM 5 // Must not be used in the clouds field. Race engine only.
 	
     int rain;  /**< Rain strength / strength spec (warning : consistency with RM_VAL_RAIN_*) */
 #define TR_RAIN_NONE 0
 #define TR_RAIN_LITTLE 1
 #define TR_RAIN_MEDIUM 2
 #define TR_RAIN_HEAVY  3
-#define TR_RAIN_RANDOM 4
+#define TR_RAIN_RANDOM 4 // Must not be used in the rain field. Race engine only.
 	
     int water;	/**< Water "level" on the ground (very simple constant model) */
 #define TR_WATER_NONE	0
