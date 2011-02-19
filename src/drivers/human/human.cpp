@@ -1342,25 +1342,29 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 // fill in as much fuel as required for the whole race,
 // or if the tank is too small, fill the tank completely.
 static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
-																tSituation *s, int idx) {
-	// Load and set parameters.
-	tdble fuel_per_lap = track->length * MaxFuelPerMeter;
-	tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f)
-												 + fuel_per_lap / 60.0 * MAX(s->_totTime, 0);	//aimed at timed sessions
+                                tSituation *s, int idx) {
+  tdble fuel_requested;
+  tdble initial_fuel = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_FUEL,
+                              NULL, 0.0f);
+  if (initial_fuel) {
+    // If starting fuel is set up explicitely,
+    // no use computing anything...
+    fuel_requested = initial_fuel;
+  } else {
+    // We must load and calculate parameters.
+    tdble fuel_per_lap = track->length * MaxFuelPerMeter;
+    tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f);
+    fuel_for_race +=  fuel_per_lap / 60.0 * MAX(s->_totTime, 0);
+    // aimed at timed sessions
+    fuel_for_race /= (1.0 + ((tdble)HCtx[idx]->nbPitStopProg));
+    // divide qty byt planned pitstops
+    //fuel_for_race += FuelReserve;
+    // Add some reserve
 
-	fuel_for_race /= (1.0 + ((tdble)HCtx[idx]->nbPitStopProg));
-	fuel_for_race += FuelReserve;
-	
-	const tdble tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK,
-															NULL, 100.0f);
-	float initial_fuel = 0;//GfParmGetNum(*carParmHandle, SECT_PRIVATE, PRV_MAX_FUEL,
-													//		NULL, 0.0f);
-	tdble fuel_requested;
-	if (initial_fuel) {
-		fuel_requested = initial_fuel;
-	} else {
-	 	fuel_requested = MIN(fuel_for_race, tank_capacity);
-	}
+    const tdble tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK,
+                              NULL, 100.0f);
+    fuel_requested = MIN(fuel_for_race, tank_capacity);
+  }
 
-	GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL, fuel_requested);
+  GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL, fuel_requested);
 }  // SetFuelAtRaceStart
