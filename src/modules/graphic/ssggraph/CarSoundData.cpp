@@ -178,6 +178,7 @@ void CarSoundData::calculateBackfireSound (tCarElt* car)
 void CarSoundData::calculateTyreSound(tCarElt* car)
 {
     grass_skid.a = 0.0;
+    grass_skid.f = 1.0f;
     grass.a = 0.0;
     grass.f = 1.0f;
     road.a = 0.0;
