@@ -2459,6 +2459,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 
   switch(pits->type) {  
 		case TR_PIT_ON_TRACK_SIDE:
+		{
 			static int	uid = 1;
 			t3Dd	normvec;
 
@@ -2568,7 +2569,7 @@ InitScene(tTrack *Track, void *TrackHandle, int bump)
 			y2 = y;
 			SETPOINT(1.0, 0, x2, y2, z2);
 			break; //TR_PIT_ON_TRACK_SIDE
-
+		}
 		case TR_PIT_NO_BUILDING:
 			break;
 
