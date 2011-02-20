@@ -1345,8 +1345,9 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
                                 tSituation *s, int idx) {
   tdble fuel_requested;
-  tdble initial_fuel = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_FUEL,
-                              NULL, 0.0f);
+  const tdble initial_fuel = GfParmGetNum(*carParmHandle, SECT_CAR,
+                                            PRM_FUEL, NULL, 0.0f);
+
   if (initial_fuel) {
     // If starting fuel is set up explicitely,
     // no use computing anything...
@@ -1355,15 +1356,15 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     // We must load and calculate parameters.
     tdble fuel_per_lap = track->length * MaxFuelPerMeter;
     tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f);
-    fuel_for_race +=  fuel_per_lap / 60.0 * MAX(s->_totTime, 0);
-    // aimed at timed sessions
+    // aimed at timed sessions:
+    fuel_for_race +=  fuel_per_lap / 60.0 * MAX(s->_totTime, 0)
+    // divide qty by planned pitstops:
     fuel_for_race /= (1.0 + ((tdble)HCtx[idx]->nbPitStopProg));
-    // divide qty byt planned pitstops
+    // add some reserve:
     //fuel_for_race += FuelReserve;
-    // Add some reserve
 
-    const tdble tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK,
-                              NULL, 100.0f);
+    const tdble tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR,
+                                              PRM_TANK, NULL, 100.0f);
     fuel_requested = MIN(fuel_for_race, tank_capacity);
   }
 
