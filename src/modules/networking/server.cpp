@@ -138,10 +138,18 @@ bool Server::Start(int port)
 
 	GfLogInfo ("Starting network server : Listening on port %d.\n", port);
 	
-    m_pServer = enet_host_create (& m_address /* the address to bind the server host to */, 
-                                 MAXNETWORKPLAYERS,
-                                  0      /* assume any amount of incoming bandwidth */,
-                                  0      /* assume any amount of outgoing bandwidth */);
+     #if (ENET_VERSION >= 0x010300)
+        m_pServer = enet_host_create (& m_address /* the address to bind the server host to */, 
+                                      MAXNETWORKPLAYERS,
+                                      0,     /* assume tha maximum number of channels is allowed*/
+                                      0      /* assume any amount of incoming bandwidth */,
+                                      0      /* assume any amount of outgoing bandwidth */);
+    #else
+        m_pServer = enet_host_create (& m_address /* the address to bind the server host to */, 
+                                      MAXNETWORKPLAYERS,
+                                      0      /* assume any amount of incoming bandwidth */,
+                                      0      /* assume any amount of outgoing bandwidth */);
+    #endif
     if (m_pServer == NULL)
     {
         GfLogError ("An error occurred while trying to create an ENet server host.\n");
