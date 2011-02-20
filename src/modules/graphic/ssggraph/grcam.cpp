@@ -317,8 +317,6 @@ class cGrCarCamInside : public cGrPerspCamera
 	speed[2] = car->pub.DynGCg.vel.z;
 
 	Speed = car->_speed_x * 3.6;
-
-	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
     }
 };
 
@@ -707,9 +705,6 @@ class cGrCarCamFront : public cGrPerspCamera
 	speed[2] = car->pub.DynGCg.vel.z;
 
 	Speed = car->_speed_x * 3.6;
-
-	//grRain.drawPrecipitation(1, up[2], 0.0, 0.0, eye[2], eye[1], eye[0], Speed);
-
     }
 };
 
@@ -755,9 +750,6 @@ protected:
 	speed[2] = car->pub.DynGCg.vel.z;
 
 	Speed = car->_speed_x * 3.6;
-
-	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], Speed);
-
     }
 };
 
@@ -818,9 +810,6 @@ class cGrCarCamUp : public cGrPerspCamera
 	speed[2] = car->pub.DynGCg.vel.z;
 
 	Speed = car->_speed_x * 3.6;
-
-	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], Speed);
-
     }
 };
 
@@ -890,9 +879,6 @@ class cGrCarCamCenter : public cGrPerspCamera
 	speed[2] = 0;
 
 	Speed = car->_speed_x * 3.6;
-
-	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
-
     }
 };
 
@@ -919,8 +905,6 @@ class cGrCarCamLookAt : public cGrPerspCamera
 	center[1] = centery;
 	center[2] = centerz;
 
-	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
-	
 	switch (axis) {
 	case 0:
 	    up[0] = 0;
@@ -1006,8 +990,6 @@ class cGrCarCamRoadNoZoom : public cGrPerspCamera
 	speed[0] = 0.0;
 	speed[1] = 0.0;
 	speed[2] = 0.0;
-
-	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
     }
 };
 
@@ -1111,8 +1093,6 @@ class cGrCarCamRoadFly : public cGrPerspCamera
         center[1] = (car->_pos_Y);
         center[2] = (car->_pos_Z);
 
-		//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
-
         // avoid going under the scene
         height = grGetHOT(eye[0], eye[1]) + 1.0;
         if (eye[2] < height) {
@@ -1204,8 +1184,6 @@ class cGrCarCamRoadZoom : public cGrPerspCamera
 	speed[0] = 0.0;
 	speed[1] = 0.0;
 	speed[2] = 0.0;
-
-	//grRain.drawPrecipitation(1, eye[0], up[0], up[1], eye[0], eye[1], eye[2], 0);
     }
 };
 

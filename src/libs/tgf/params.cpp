@@ -2307,7 +2307,7 @@ GfParmListRemoveElt (void *handle, const char *path, const char *key)
 }
 
 
-/** Remove a section element with given name of a list.
+/** Rename a section element to a given name.
     @ingroup	paramslist
     @param	handle	handle of parameters
     @param	path	path of list

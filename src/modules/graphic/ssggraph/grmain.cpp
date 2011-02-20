@@ -422,38 +422,51 @@ initCars(tSituation *s)
 	elt = s->cars[i];
 	index = elt->index;
 	hdle = elt->_paramsHandle;
+
+	// WARNING: This index hack on the human robot for the Career mode
+	//          does no more work with the new "welcome" module system
+	//          (the "normal" index has no more the 10 limit) ... TO BE FIXED !!!!!!!
 	if (elt->_driverType == RM_DRV_HUMAN && elt->_driverIndex > 10)
 		sprintf(idx, "Robots/index/%d", elt->_driverIndex - 11);
 	else
 		sprintf(idx, "Robots/index/%d", elt->_driverIndex);
+
 	grCarInfo[index].iconColor[0] = GfParmGetNum(hdle, idx, "red",   (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "red",   NULL, 0));
 	grCarInfo[index].iconColor[1] = GfParmGetNum(hdle, idx, "green", (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "green", NULL, 0));
 	grCarInfo[index].iconColor[2] = GfParmGetNum(hdle, idx, "blue",  (char*)NULL, GfParmGetNum(hdle, ROB_SECT_ARBITRARY, "blue",  NULL, 0));
 	grCarInfo[index].iconColor[3] = 1.0;
 	grInitCar(elt);
-	if ((elt->_driverType == RM_DRV_HUMAN) && (grNbActiveScreens < GR_NB_MAX_SCREEN) &&(elt->_networkPlayer == 0)) 
+
+	// Pre-assign each human driver (if any) to a different screen
+	// (set him as the "current driver" for this screen).
+	if (grNbActiveScreens < GR_NB_MAX_SCREEN
+		&& elt->_driverType == RM_DRV_HUMAN && !elt->_networkPlayer) 
 	{
 	    grScreens[grNbActiveScreens]->setCurrentCar(elt);
+		GfLogTrace("Screen #%d : Assigned to %s\n", grNbActiveScreens, elt->_name);
 	    grNbActiveScreens++;
 	}
     }
 
+	// Load the real number of active screens.
 	grNbActiveScreens = (int)GfParmGetNum(grHandle, GR_SCT_DISPMODE, GR_ATT_NB_SCREENS, NULL, 1.0);
 
+	// Initialize the cameras for all the screens.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 	grScreens[i]->initCams(s);
     }
 
     TRACE_GL("initCars: end");
 
+	// Initialize other stuff.
     grInitSmoke(s->_ncars);
     grInitSound(s, s->_ncars);
     grTrackLightInit();
 
+	// Setup the screens (= OpenGL viewports) inside the physical game window.
     grAdaptScreenSize();
 
     return 0;
-    
 }
 
 void

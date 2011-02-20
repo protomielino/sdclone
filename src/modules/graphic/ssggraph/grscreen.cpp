@@ -394,33 +394,46 @@ void cGrScreen::loadParams(tSituation *s)
 	int i;
 	class cGrCamera *cam;
 	const char *carName;
-	
+
+	// Initialize the screen "current car" if not already done.
 	sprintf(path, "%s/%d", GR_SCT_DISPMODE, id);
 	
 	if (!curCar) {
+
+		// Load the name of the "current driver", and search it in the race competitors.
 		carName = GfParmGetStr(grHandle, path, GR_ATT_CUR_DRV, "");
 		for (i = 0; i < s->_ncars; i++) {
 			if (!strcmp(s->cars[i]->_name, carName)) {
 				break;
 			}
 		}
+
+		// Found : this is the "current driver".
 		if (i < s->_ncars) {
 			curCar = s->cars[i];
+
+		// Not found, and screen id OK => "current driver" = competitors[screen id].
 		} else if (id < s->_ncars) {
 			curCar = s->cars[id];
+
+		// Not found and screen id not usable => "current driver" = competitors[0].
 		} else {
 			curCar = s->cars[0];
 		}
+		
+		GfLogTrace("Screen #%d : Assigned to %s\n", id, curCar->_name);
 	}
+
+	// Load "current camera" settings (attached to the "current car").
 	sprintf(path2, "%s/%s", GR_SCT_DISPMODE, curCar->_name);
-	
 	curCamHead	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM_HEAD, NULL, 9);
 	camNum	= (int)GfParmGetNum(grHandle, path, GR_ATT_CAM, NULL, 0);
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
 	curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
 	camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camNum);
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
-	
+
+	// Retrieve the "current camera".
 	cam = GF_TAILQ_FIRST(&cams[curCamHead]);
 	curCam = NULL;
 	while (cam) {
@@ -431,8 +444,8 @@ void cGrScreen::loadParams(tSituation *s)
 		cam = cam->next();
 	}
 
-	if (curCam == NULL) {
-		// back to default camera
+	// Back to the default camera if not found (and save it as the new current one).
+	if (!curCam) {
 		curCamHead = 0;
 		curCam = (cGrPerspCamera*)GF_TAILQ_FIRST(&cams[curCamHead]);
 		GfParmSetNum(grHandle, path, GR_ATT_CAM, NULL, (tdble)curCam->getId());
@@ -459,7 +472,7 @@ void cGrScreen::initCams(tSituation *s)
 		// TODO: This formula is more consistent, but it prevents the sky dome from being visible.
 		//fovFactor *= grSkyDomeDistance / grSkyDomeNeutralFOVDistance;
 	}
-	GfLogTrace("Screen #%d : Factor of visibility = %3.2f\n", id, fovFactor);
+	GfLogTrace("Screen #%d : Factor of visibility = %.2f\n", id, fovFactor);
 	
 	if (boardCam == NULL) {
 		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
