@@ -22,6 +22,7 @@
 #include <cstring>
 #include <deque>
 
+#include <portability.h>
 #include <tgfclient.h>
 #include <robot.h>
 #include <playerpref.h>
@@ -49,6 +50,7 @@ static void	*PrevScrHandle = NULL;
 
 static void	*PrefHdle = NULL;
 static void	*PlayerHdle = NULL;
+static void	*GraphHdle = NULL;
 
 static int NameEditId;
 static int RaceNumEditId;
@@ -246,14 +248,14 @@ refreshEditVal(void)
 	}
 	GfuiEnable(ScrHandle, NameEditId, GFUI_ENABLE);
 
-	sprintf(buf, "%d", (*CurrPlayer)->raceNumber());
+	snprintf(buf, sizeof(buf), "%d", (*CurrPlayer)->raceNumber());
 	GfuiEditboxSetString(ScrHandle, RaceNumEditId, buf);
 	GfuiEnable(ScrHandle, RaceNumEditId, GFUI_ENABLE);
 
 	GfuiLabelSetText(ScrHandle, GearChangeEditId, (*CurrPlayer)->gearChangeModeString());
 	GfuiEnable(ScrHandle, GearChangeEditId, GFUI_ENABLE);
 
-	sprintf(buf, "%d", (*CurrPlayer)->nbPitStops());
+	snprintf(buf, sizeof(buf), "%d", (*CurrPlayer)->nbPitStops());
 	GfuiEditboxSetString(ScrHandle, PitsEditId, buf);
 	GfuiEnable(ScrHandle, PitsEditId, GFUI_ENABLE);
 
@@ -309,16 +311,45 @@ UpdtScrollList(void)
 static void
 PutPlayerSettings(unsigned index)
 {
-    char drvSectionPath[256];
-
     if (!PlayerHdle || !PrefHdle) {
 	return;
     }
 
     tPlayerInfo *player = PlayersInfo[index-1];
 
+	// Graphics params (take driver name changes into account for camera settings).
+    char drvSectionPath[128];
+    snprintf(drvSectionPath, sizeof(drvSectionPath), "%s/%s/%u", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
+	const char* pszOldDispName = GfParmGetStr(PlayerHdle, drvSectionPath, ROB_ATTR_NAME, "");
+	if (strcmp(pszOldDispName, player->dispName())) { // Only if the display name changed.
+		char drvDispSecPath[128];
+		snprintf(drvDispSecPath, sizeof(drvDispSecPath), "%s/%s", GR_SCT_DISPMODE, pszOldDispName);
+		if (!GraphHdle) // Load graphic params file if not already done.
+		{
+			char pszGraphFileName[256];
+			snprintf(pszGraphFileName, sizeof(pszGraphFileName), "%s%s", GfLocalDir(), GR_PARAM_FILE);
+			GraphHdle = GfParmReadFile(pszGraphFileName, GFPARM_RMODE_REREAD);
+		}
+
+		if (GfParmExists(GraphHdle, drvDispSecPath)) { // Change section name.
+			GfParmListRenameElt(GraphHdle, GR_SCT_DISPMODE, pszOldDispName, player->dispName());
+		}
+
+		if (!GfParmListSeekFirst(GraphHdle, GR_SCT_DISPMODE)) {
+			do {
+				const char* pszSecName = GfParmListGetCurEltName(GraphHdle, GR_SCT_DISPMODE);
+				if (!pszSecName || !isdigit(*pszSecName))
+					continue; // Ignore sections whose name is not (likely) a screen id.
+				snprintf(drvDispSecPath, sizeof(drvDispSecPath), "%s/%s", GR_SCT_DISPMODE, pszSecName);
+				const char* pszCurDrvName =
+					GfParmGetStr(GraphHdle, drvDispSecPath, GR_ATT_CUR_DRV, "");
+				if (!strcmp(pszOldDispName, pszCurDrvName)) // Change current driver name.
+					GfParmSetStr(GraphHdle, drvDispSecPath, GR_ATT_CUR_DRV, player->dispName());
+			} while (!GfParmListSeekNext(GraphHdle, GR_SCT_DISPMODE));
+		}
+	}
+	
     // Human driver params
-    sprintf(drvSectionPath, "%s/%s/%u", ROB_SECT_ROBOTS, ROB_LIST_INDEX, index);
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_NAME, player->dispName());
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_CAR, player->defaultCarName());
     GfParmSetNum(PlayerHdle, drvSectionPath, ROB_ATTR_RACENUM, (char*)NULL, player->raceNumber());
@@ -329,7 +360,7 @@ PutPlayerSettings(unsigned index)
     GfParmSetStr(PlayerHdle, drvSectionPath, ROB_ATTR_LEVEL, SkillLevelString[player->skillLevel()]);
 
     // Driver preferences params
-    sprintf(drvSectionPath, "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
+    snprintf(drvSectionPath, sizeof(drvSectionPath), "%s/%s/%u", HM_SECT_PREF, HM_LIST_DRV, index);
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_TRANS, player->gearChangeModeString());
     GfParmSetNum(PrefHdle, drvSectionPath, HM_ATT_NBPITS, (char*)NULL, (tdble)player->nbPitStops());
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_AUTOREVERSE, Yn[player->autoReverse()]);
@@ -355,9 +386,9 @@ static void
 NewPlayer(void * /* dummy */)
 {
     unsigned newPlayerIdx, playerIdx;
-    char sectionPath[256];
-    char driverId[5];
-    char newDriverId[5];
+    char sectionPath[128];
+    char driverId[8];
+    char newDriverId[8];
 
     // Insert new player after current (or after last if no current)
     CurrPlayer = PlayersInfo.insert(CurrPlayer + (CurrPlayer == PlayersInfo.end() ? 0 : 1),
@@ -367,17 +398,17 @@ NewPlayer(void * /* dummy */)
     newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
 
     // Update preferences and drivers params (rename those after, add new).
-    sprintf(sectionPath, "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
+    snprintf(sectionPath, sizeof(sectionPath), "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
     for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
-        sprintf(driverId, "%u", playerIdx);
-	sprintf(newDriverId, "%u", playerIdx+1);
+        snprintf(driverId, sizeof(driverId), "%u", playerIdx);
+	snprintf(newDriverId, sizeof(newDriverId), "%u", playerIdx+1);
 	GfParmListRenameElt(PrefHdle, sectionPath, driverId, newDriverId);
     }
 
-    sprintf(sectionPath, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
+    snprintf(sectionPath, sizeof(sectionPath), "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
     for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
-        sprintf(driverId, "%u", playerIdx);
-	sprintf(newDriverId, "%u", playerIdx+1);
+        snprintf(driverId, sizeof(driverId), "%u", playerIdx);
+	snprintf(newDriverId, sizeof(newDriverId), "%u", playerIdx+1);
 	GfParmListRenameElt(PlayerHdle, sectionPath, driverId, newDriverId);
     }
 
@@ -394,9 +425,9 @@ CopyPlayer(void * /* dummy */)
 {
     unsigned curPlayerIdx, newPlayerIdx;
     unsigned playerIdx;
-    char sectionPath[256];
-    char driverId[5];
-    char newDriverId[5];
+    char sectionPath[128];
+    char driverId[8];
+    char newDriverId[8];
 
     tGearChangeMode gearChange;
     
@@ -408,27 +439,27 @@ CopyPlayer(void * /* dummy */)
 	// Save current player gear change mode
 	gearChange = (*CurrPlayer)->gearChangeMode();
 
-	 // Get current player control settings.
-        ControlGetSettings(PrefHdle, curPlayerIdx);
+	// Get current player control settings.
+	ControlGetSettings(PrefHdle, curPlayerIdx);
 
 	// Insert new player after current
-        CurrPlayer = PlayersInfo.insert(CurrPlayer + 1, new tPlayerInfo(**CurrPlayer));
+	CurrPlayer = PlayersInfo.insert(CurrPlayer + 1, new tPlayerInfo(**CurrPlayer));
 
         // Get new (copy) player index (= identification number in params).
-        newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
+	newPlayerIdx = (unsigned)(CurrPlayer - PlayersInfo.begin()) + 1;
 
 	// Update preferences and drivers params (rename those after, add new).
-	sprintf(sectionPath, "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
+	snprintf(sectionPath, sizeof(sectionPath), "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
 	for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
-	    sprintf(driverId, "%u", playerIdx);
-	    sprintf(newDriverId, "%u", playerIdx+1);
+	    snprintf(driverId, sizeof(driverId), "%u", playerIdx);
+	    snprintf(newDriverId, sizeof(newDriverId), "%u", playerIdx+1);
 	    GfParmListRenameElt(PrefHdle, sectionPath, driverId, newDriverId);
 	}
     
-	sprintf(sectionPath, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
+	snprintf(sectionPath, sizeof(sectionPath), "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
 	for (playerIdx = PlayersInfo.size() - 1; playerIdx >= newPlayerIdx; playerIdx--) {
-	    sprintf(driverId, "%u", playerIdx);
-	    sprintf(newDriverId, "%u", playerIdx+1);
+	    snprintf(driverId, sizeof(driverId), "%u", playerIdx);
+	    snprintf(newDriverId, sizeof(newDriverId), "%u", playerIdx+1);
 	    GfParmListRenameElt(PlayerHdle, sectionPath, driverId, newDriverId);
 	}
 
@@ -449,9 +480,9 @@ DeletePlayer(void * /* dummy */)
 {
     int delPlayerIdx;
     unsigned int playerIdx;
-    char sectionPath[256];
-    char driverId[5];
-    char newDriverId[5];
+    char sectionPath[128];
+    char driverId[8];
+    char newDriverId[8];
     
     if (CurrPlayer != PlayersInfo.end()) {
 
@@ -463,22 +494,22 @@ DeletePlayer(void * /* dummy */)
         CurrPlayer = PlayersInfo.erase(CurrPlayer);
 
 	// Update preferences and drivers params.
-	sprintf(sectionPath, "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
-	sprintf(driverId, "%d", delPlayerIdx);
+		snprintf(sectionPath, sizeof(sectionPath), "%s/%s", HM_SECT_PREF, HM_LIST_DRV);
+		snprintf(driverId, sizeof(driverId), "%d", delPlayerIdx);
 	if (!GfParmListRemoveElt(PrefHdle, sectionPath, driverId)) {
 	    for (playerIdx = delPlayerIdx; playerIdx <= PlayersInfo.size(); playerIdx++) {
-	        sprintf(driverId, "%u", playerIdx+1);
-	        sprintf(newDriverId, "%u", playerIdx);
+	        snprintf(driverId, sizeof(driverId), "%u", playerIdx+1);
+	        snprintf(newDriverId, sizeof(newDriverId), "%u", playerIdx);
 	        GfParmListRenameElt(PrefHdle, sectionPath, driverId, newDriverId);
 	    }
 	}
 
-	sprintf(sectionPath, "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
-	sprintf(driverId, "%d", delPlayerIdx);
+	snprintf(sectionPath, sizeof(sectionPath), "%s/%s", ROB_SECT_ROBOTS, ROB_LIST_INDEX);
+	snprintf(driverId, sizeof(driverId), "%d", delPlayerIdx);
 	if (!GfParmListRemoveElt(PlayerHdle, sectionPath, driverId)) {
 	    for (playerIdx = delPlayerIdx; playerIdx <= PlayersInfo.size(); playerIdx++) {
-	        sprintf(driverId, "%u", playerIdx+1);
-	        sprintf(newDriverId, "%u", playerIdx);
+	        snprintf(driverId, sizeof(driverId), "%u", playerIdx+1);
+	        snprintf(newDriverId, sizeof(newDriverId), "%u", playerIdx);
 	        GfParmListRenameElt(PlayerHdle, sectionPath, driverId, newDriverId);
 	    }
 	}
@@ -509,7 +540,7 @@ ConfControls(void * /* dummy */ )
 static int
 GenPlayerList(void)
 {
-    char sstring[256];
+    char sstring[128];
     int i;
     int j;
     const char *driver;
@@ -526,14 +557,14 @@ GenPlayerList(void)
     PlayersInfo.clear();
 
     /* Load players settings from human.xml file */
-    sprintf(buf, "%s%s", GfLocalDir(), HM_DRV_FILE);
+    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), HM_DRV_FILE);
     PlayerHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (PlayerHdle == NULL) {
         return -1;
     }
 
     for (i = 0; ; i++) {
-        sprintf(sstring, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
+        snprintf(sstring, sizeof(sstring), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, i+1);
 	driver = GfParmGetStr(PlayerHdle, sstring, ROB_ATTR_NAME, "");
 	if (strlen(driver) == 0) {
 	    break; // Exit at end of driver list.
@@ -568,14 +599,14 @@ GenPlayerList(void)
     UpdtScrollList();
 
     /* Load players settings from human.xml file*/
-    sprintf(buf, "%s%s", GfLocalDir(), HM_PREF_FILE);
+    snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), HM_PREF_FILE);
     PrefHdle = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
     if (!PrefHdle) {
         return -1;
     }
 
     for (i = 0; i < (int)PlayersInfo.size(); i++) {
-        sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
+        snprintf(sstring, sizeof(sstring), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, i+1);
 	str = GfParmGetStr(PrefHdle, sstring, HM_ATT_TRANS, HM_VAL_AUTO);
 	if (!strcmp(str, HM_VAL_AUTO)) {
 	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_AUTO);
@@ -621,7 +652,8 @@ QuitPlayerConfig(void * /* dummy */)
     return;
 }
 
-/* Save players info (from PlayersInfo array) to the human drivers and preferences XML files */
+/* Save players info (from PlayersInfo array) to the human drivers and preferences XML files,
+   as well as graphics settings for players if they changed */
 static void
 SavePlayerList(void * /* dummy */)
 {
@@ -640,6 +672,8 @@ SavePlayerList(void * /* dummy */)
 
     GfParmWriteFile(NULL, PlayerHdle, HumanDriverModuleName);
     GfParmWriteFile(NULL, PrefHdle, "preferences");
+	if (GraphHdle) // Write graphic params file if needed.
+		GfParmWriteFile(NULL, GraphHdle, "Graph");
 
     QuitPlayerConfig(0 /* dummy */);
 
@@ -667,7 +701,7 @@ ChangeNum(void * /* dummy */)
     if (CurrPlayer != PlayersInfo.end()) {
        val = GfuiEditboxGetString(ScrHandle, RaceNumEditId);
        (*CurrPlayer)->setRaceNumber((int)strtol(val, (char **)NULL, 0));
-	sprintf(buf, "%d", (*CurrPlayer)->raceNumber());
+	snprintf(buf, sizeof(buf), "%d", (*CurrPlayer)->raceNumber());
 	GfuiEditboxSetString(ScrHandle, RaceNumEditId, buf);
     }
 }
@@ -680,7 +714,7 @@ ChangePits(void * /* dummy */)
     if (CurrPlayer != PlayersInfo.end()) {    
         val = GfuiEditboxGetString(ScrHandle, PitsEditId);
         (*CurrPlayer)->setNbPitStops((int)strtol(val, (char **)NULL, 0));
-	sprintf(buf, "%d", (*CurrPlayer)->nbPitStops());
+	snprintf(buf, sizeof(buf), "%d", (*CurrPlayer)->nbPitStops());
 	GfuiEditboxSetString(ScrHandle, PitsEditId, buf);
     }
 }
