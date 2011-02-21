@@ -1357,7 +1357,7 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     tdble fuel_per_lap = track->length * MaxFuelPerMeter;
     tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f);
     // aimed at timed sessions:
-    fuel_for_race +=  fuel_per_lap / 60.0 * MAX(s->_totTime, 0)
+    fuel_for_race +=  fuel_per_lap / 60.0 * MAX(s->_totTime, 0);
     // divide qty by planned pitstops:
     fuel_for_race /= (1.0 + ((tdble)HCtx[idx]->nbPitStopProg));
     // add some reserve:
