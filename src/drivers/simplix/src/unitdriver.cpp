@@ -2903,7 +2903,7 @@ void TDriver::EvaluateCollisionFlags(
     oTreatTeamMateAsLapper =
 	  OppInfo.GotFlags(F_TEAMMATE | F_REAR)
 	  && OppInfo.State.RelPos > -50
-	  && ((CarLaps <= OppCar->_laps)
+	  && ((CarLaps < OppCar->_laps)
 	  || (CarDamage > OppInfo.TeamMateDamage + 1000));
   }
   else
