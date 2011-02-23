@@ -543,7 +543,7 @@ void TPitLane::MakePath
     oPitDist += oTrack->Length();
 
   float Factor = 1.00;
-
+/*
   // Set speed to allow to stop
   float Speed = 4.0;
   if (TDriver::UseGPBrakeLimit)
@@ -562,7 +562,8 @@ void TPitLane::MakePath
 
   if (!TDriver::UseGPBrakeLimit)
   {
-    int N = 6;
+//    int N = 6;
+    int N = 15;
     float Delta = 0.75;
 
     for (I = 0; I < N; I++)
@@ -579,23 +580,25 @@ void TPitLane::MakePath
     Idx0 = (Idx0 + 1) % NSEG;
     oPathPoints[Idx0].MaxSpeed = oPathPoints[Idx0].Speed = PitInfo->speedLimit - 0.5;
   }
-
+*/
   // Calculate braking
   PropagatePitBreaking((tdble) oPitStopPos,(tdble)(Factor * Param.oCarParam.oScaleMu));
-
+/*
   if (Param.Pit.oUseSmoothPit > 0) 
   {
     // Overwrite speed calculations before speed limit
     if (FirstPit)
 	{
-      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 20);
+//      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 20);
+      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 30);
       if (Idx1 < 0)
 		  Idx1 += NSEG;
       Idx1 = Idx1 % NSEG;
 	}
 	else
 	{
-      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 5);
+//      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 5);
+      Idx1 = (oTrack->IndexFromPos(oPitStartPos) - 10);
       if (Idx1 < 0)
 		  Idx1 += NSEG;
       Idx1 = Idx1 % NSEG;
@@ -611,8 +614,10 @@ void TPitLane::MakePath
     // Overwrite speed calculations in pitlane after pit
     Idx0 = (oTrack->IndexFromPos(oPitEndPos) + 1) % NSEG;
     for (I = oStopIdx + 5; I != Idx0; I = (I + 1) % NSEG)
-    {
-      oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = PitInfo->speedLimit - 0.5;
+    {  
+      double Speed = MIN(oPathPoints[I].Speed, PitInfo->speedLimit - 0.5);
+	  //if (oPathPoints[I].Crv < 0.001)
+      oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = Speed;
 	}
 
     // Overwrite speed calculations after speed limit
@@ -624,6 +629,7 @@ void TPitLane::MakePath
       oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = Speed;
 	}
   }
+*/
 }
 //==========================================================================*
 
