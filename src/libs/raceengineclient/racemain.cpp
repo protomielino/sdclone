@@ -2,10 +2,9 @@
 
     file        : racemain.cpp
     created     : Sat Nov 16 12:13:31 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                        
+    copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
-
+    version     : $Id$
  ***************************************************************************/
 
 /***************************************************************************
@@ -22,6 +21,7 @@
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
+
 #include <portability.h>
 #include <tgfclient.h>
 
@@ -197,6 +197,7 @@ ReRaceEventInit(void)
 
 	// Initialize the race session name.
 	ReInfo->_reRaceName = ReGetCurrentRaceName();
+	GfLogInfo("Starting %s session\n", ReInfo->_reRaceName);
 
 	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	

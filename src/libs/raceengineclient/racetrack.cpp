@@ -75,7 +75,6 @@ ReTrackInit(void)
 	if (!catName) 
 		return -1;
 
-	GfLogDebug("Race Name is '%s'\n", ReInfo->_reRaceName);
 	snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
 	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
