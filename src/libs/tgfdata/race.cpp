@@ -46,10 +46,13 @@ class GfRace::Private
 {
 public:
 
-	Private() : pRaceMan(0), nMaxCompetitors(0), nFocusedItfIndex(-1),
+	Private() : bIsDirty(false), pRaceMan(0), nMaxCompetitors(0), nFocusedItfIndex(-1),
 				nEventInd(0), nSessionInd(0), hparmResults(0) {};
 	
 public:
+
+	// True if no change occurred since last reset().
+	bool bIsDirty;
 
 	// The "parent" race manager.
 	GfRaceManager* pRaceMan;
@@ -474,6 +477,9 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 		GfParmGetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
     _pPrivate->nFocusedItfIndex =
 		(int)GfParmGetNum(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
+
+	// Now we are consistent with the race params (in memory).
+	_pPrivate->bIsDirty = false;
 }
 
 void GfRace::store()
@@ -643,6 +649,14 @@ void GfRace::store()
 				 _pPrivate->strFocusedModuleName.c_str());
 	GfParmSetNum(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL,
 				 (tdble)_pPrivate->nFocusedItfIndex);
+
+	// Now we are consistent with the race params (in memory).
+	_pPrivate->bIsDirty = false;
+}
+
+bool GfRace::isDirty() const
+{
+	return _pPrivate->bIsDirty || (_pPrivate->pRaceMan && _pPrivate->pRaceMan->isDirty());
 }
 
 GfRaceManager* GfRace::getManager() const
@@ -786,6 +800,9 @@ bool GfRace::appendCompetitor(GfDriver* pComp)
 		const std::pair<std::string, int> compKey(pComp->getModuleName(),
 												  pComp->getInterfaceIndex());
 		_pPrivate->mapCompetitorsByKey[compKey] = pComp;
+
+		// Now we are no more consistent with the race params (in memory).
+		_pPrivate->bIsDirty = true;
 	}
 
 	return bAppended;
@@ -799,7 +816,12 @@ bool GfRace::removeCompetitor(GfDriver* pComp)
 	std::vector<GfDriver*>::iterator itVComp =
 		std::find(_pPrivate->vecCompetitors.begin(), _pPrivate->vecCompetitors.end(), pComp);
 	if (itVComp != _pPrivate->vecCompetitors.end())
+	{
 		_pPrivate->vecCompetitors.erase(itVComp);
+
+		// Now we are no more consistent with the race params (in memory).
+		_pPrivate->bIsDirty = true;
+	}
 	else
 		bRemoved = false;
 	
@@ -808,7 +830,12 @@ bool GfRace::removeCompetitor(GfDriver* pComp)
 	Private::TMapCompetitorsByKey::iterator itMComp =
 		_pPrivate->mapCompetitorsByKey.find(compKey);
 	if (itMComp != _pPrivate->mapCompetitorsByKey.end())
+	{
 		_pPrivate->mapCompetitorsByKey.erase(itMComp);
+
+		// Now we are no more consistent with the race params (in memory).
+		_pPrivate->bIsDirty = true;
+	}
 	else
 		bRemoved = false;
 
@@ -842,6 +869,9 @@ bool GfRace::moveCompetitor(GfDriver* pComp, int nDeltaPlace)
 	// Insert it at his new place.
 	_pPrivate->vecCompetitors.insert(itComp, pComp);
 
+	// Now we are no more consistent with the race params (in memory).
+	_pPrivate->bIsDirty = true;
+
 	return true;
 }
 
@@ -851,6 +881,9 @@ bool GfRace::removeAllCompetitors()
 	const bool bAnyRemoved = !_pPrivate->vecCompetitors.empty();
 
 	_pPrivate->vecCompetitors.clear();
+
+	// Now we are no more consistent with the race params (in memory).
+	_pPrivate->bIsDirty = true;
 
 	return true;
 }
@@ -882,6 +915,9 @@ bool GfRace::shuffleCompetitors()
 	// Put the last competitor at the end of the new list.
 	_pPrivate->vecCompetitors.push_back(vecCompetitors[0]);
 	
+	// Now we are no more consistent with the race params (in memory).
+	_pPrivate->bIsDirty = true;
+
 	return true;
 }
 

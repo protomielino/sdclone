@@ -31,6 +31,10 @@
 class GfTracks::Private
 {
 public:
+
+	Private() : pTrackItf(0) {};
+	
+public:
 	
 	// One GfTrack structure for each track (order = sorted directory one).
 	std::vector<GfTrack*> vecTracks;
@@ -301,7 +305,7 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strCatId,
 		&& std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strCatId)
 		   == _pPrivate->vecCatIds.end())
 	{
-		GfLogError("GfTracks::getFirstUsableTrack : No such category %s\n", strCatId.c_str());
+		GfLogError("GfTracks::getFirstUsableTrack(1) : No such category %s\n", strCatId.c_str());
 		return 0;
 	}
 
@@ -371,8 +375,14 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strFromCatId,
 		std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strFromCatId);
 	if (itFromCat == _pPrivate->vecCatIds.end())
 	{
-		GfLogError("GfTracks::getFirstUsableTrack : No such category %s\n", strFromCatId.c_str());
-		return 0;
+		if (!bSkipFrom) // No way if no such category and mustn't skip it.
+		{
+			GfLogError("GfTracks::getFirstUsableTrack(2) : No such category %s\n",
+					   strFromCatId.c_str());
+			return 0;
+		}
+		else // Otherwise, let's start by the first available category.
+			itFromCat = _pPrivate->vecCatIds.begin();
 	}
 
 	int nCatInd = itFromCat - _pPrivate->vecCatIds.begin();
@@ -565,8 +575,15 @@ void GfTrack::setMaxNumOfPitSlots(int nPitSlots)
 
 bool GfTrack::load() const
 {
-    // Load track data from the XML file.
+	// Check if the track loader is ready.
 	tTrackItf* pTrackItf = GfTracks::self()->getTrackInterface();
+    if (!pTrackItf)
+	{
+		GfLogError("Track loader not yet initialized ; failed to load any track\n");
+        return false;
+    }
+	
+    // Load track data from the XML file.
     tTrack* pTrack = pTrackItf->trkBuild(_strDescFile.c_str());
     if (!pTrack)
 	{

@@ -133,7 +133,7 @@ GfRaceManagers::GfRaceManagers()
 	std::sort(_pPrivate->vecRaceMans.begin(), _pPrivate->vecRaceMans.end(), hasHigherPriority);
 
 	// And log what we've got now.
-	print();
+	print(/* bVerbose */false);
 }
 
 const std::vector<std::string>& GfRaceManagers::getTypes() const
@@ -174,7 +174,7 @@ std::vector<GfRaceManager*> GfRaceManagers::getRaceManagersWithType(const std::s
 	return vecRaceMans;
 }
 
-void GfRaceManagers::print() const
+void GfRaceManagers::print(bool bVerbose) const
 {
 	GfLogTrace("Race managers : %d types, %d race managers\n",
 			   _pPrivate->vecTypes.size(), _pPrivate->vecRaceMans.size());
@@ -190,7 +190,8 @@ void GfRaceManagers::print() const
 		{
 			GfLogTrace("    %s : subtype='%s', name='%s', events=%d\n",
 					   (*itRaceMan)->getId().c_str(), (*itRaceMan)->getSubType().c_str(),
-					   (*itRaceMan)->getName().c_str(), (*itRaceMan)->getEventCount());
+					   (*itRaceMan)->getName().c_str(),
+					   bVerbose ? (*itRaceMan)->getEventCount() : -1);
 		}
 	}
 }
@@ -282,6 +283,19 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		GfParmReleaseHandle(_hparmHandle);
 	_hparmHandle = hparmHandle;
 
+	// Clear the event list
+	_vecEventTrackIds.clear();
+
+	// Clear the session name list
+	_vecSessionNames.clear();
+	
+	// No more ready for serialization (in memory, to params) for the moment.
+	_bIsDirty = false;
+}
+
+// This methos is const because we want it to be called by const methods. No other way.
+void GfRaceManager::load() const
+{
 	// Determine the race manager file from which to load the events info.
 	// 1) Simple case : the race manager has no subfiles, use the normal file.
 	// 2) Career case : the events are defined in "sub-championships" files.
@@ -290,6 +304,7 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 	//              the other "sub-championships", each defined in a career_<sub-champ>.xmls).
 	//             This is not an issue as long as this class is not used in the race engine
 	//             or the event management purpose (most of it is in racecareer.cpp for now).
+	void* hparmHandle = _hparmHandle;
 	const char* pszHasSubFiles =
 		GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO);
 	_bHasSubFiles = strcmp(pszHasSubFiles, RM_VAL_YES) ? false : true;
@@ -317,29 +332,70 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 	// Clear the event list
 	_vecEventTrackIds.clear();
 
-	// And reload it (warning: here, we only check the tracks existence, not their usability).
+	// And reload it
+	// (warning: here, we only check the tracks usability when the specified one was not found).
 	std::ostringstream ossSectionPath;
 	int nEventNum = 1;
 	const char* pszTrackId;
 	do
 	{
+		// Get event track name.
 		ossSectionPath.str("");
 		ossSectionPath << RM_SECT_TRACKS << '/' << nEventNum;
 		pszTrackId = GfParmGetStr(hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
-// 		GfLogDebug("GfRaceManager::reset(...): event[%d].track = '%s'\n",
-// 				   nEventNum-1, pszTrackId);
+ 		GfLogDebug("GfRaceManager::reset(...): event[%d].track = '%s'\n",
+ 				   nEventNum-1, pszTrackId);
+
+		// If not end of event list :
 		if (pszTrackId)
 		{
-			if (GfTracks::self()->getTrack(pszTrackId))
-				_vecEventTrackIds.push_back(pszTrackId);
-			else
-				GfLogWarning("Skipping non-existing track '%s' (event #%d) for %s mode\n",
-							 pszTrackId, nEventNum, _strName.c_str());
+			// If no such track, try and get the first usable one in the existing categories.
+			if (!GfTracks::self()->getTrack(pszTrackId))
+			{
+				// Get the track category.
+				const char* pszCatId =
+					GfParmGetStr(hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_CATEGORY, 0);
+
+				// Get the first usable track in the same category,
+				// or else in the next categories.
+				GfTrack* pTrack = GfTracks::self()->getFirstUsableTrack(pszCatId, pszTrackId, +1, true);
+				if (!pTrack)
+					pTrack = GfTracks::self()->getFirstUsableTrack(pszCatId, +1, true);
+
+				// If found, select this one for the the event.
+				if (pTrack)
+				{
+					GfLogWarning("Replacing non-existing track '%s' by first usable '%s' "
+								 "(event #%d) for %s mode\n", pszTrackId,
+								 pTrack->getId().c_str(), nEventNum, _strName.c_str());
+
+					pszTrackId = pTrack->getId().c_str();
+
+					// Now we are no more consistent with the race managers params (in memory).
+					_bIsDirty = true;
+				}
+				else
+				{
+					// Should never happen : no usable track.
+					GfLogError("Skipping non-existing track '%s' (event #%d) for %s mode"
+							   " and no other usable track ; let's start praying ...\n",
+							   pszTrackId, nEventNum, _strName.c_str());
+					break;
+				}
+			}
+
+			// We got it.
+			_vecEventTrackIds.push_back(pszTrackId);
+
+			// Next event.
 			nEventNum++;
 		}
 	}
 	while (pszTrackId);
 	
+	// Clear the session name list
+	_vecSessionNames.clear();
+
 	// Session names.
 	std::ostringstream ossSecPath;
 	int nSessionInd = 1;
@@ -349,14 +405,13 @@ void GfRaceManager::reset(void* hparmHandle, bool bClosePrevHdle)
 		ossSecPath << RM_SECT_RACES << '/' << nSessionInd;
 		const char* pszSessionName =
 			GfParmGetStr(hparmHandle, ossSecPath.str().c_str(), RM_ATTR_NAME, 0);
-// 		GfLogDebug("GfRaceManager::reset(...): session '%s'\n", pszSessionName);
+ 		GfLogDebug("GfRaceManager::reset(...): session '%s'\n", pszSessionName);
 		if (pszSessionName && strlen(pszSessionName) > 0)
 			_vecSessionNames.push_back(pszSessionName);
 
 		// Next session.
 		nSessionInd++;
 	}
-	
 }
 
 void GfRaceManager::store()
@@ -377,8 +432,8 @@ void GfRaceManager::store()
 		std::ostringstream ossSectionPath;
 		for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
 		{
-// 			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
-// 					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
+			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
+					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
 			ossSectionPath.str("");
 			ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
 			GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
@@ -388,6 +443,9 @@ void GfRaceManager::store()
 						 pTrack->getCategoryId().c_str());
 		}
 	}
+
+	// Now we are consistent with the race managers params (in memory).
+	_bIsDirty = false;
 }
 
 GfRaceManager::~GfRaceManager()
@@ -460,16 +518,25 @@ const std::vector<std::string>& GfRaceManager::getAcceptedCarCategoryIds() const
 
 unsigned GfRaceManager::getEventCount() const
 {
+	if (_vecEventTrackIds.empty())
+		load(); // Lazy loading.
+	
 	return _vecEventTrackIds.size();
 }
 
 bool GfRaceManager::isMultiEvent() const
 {
+	if (_vecEventTrackIds.empty())
+		load(); // Lazy loading.
+	
 	return _vecEventTrackIds.size() > 1;
 }
 
 GfTrack* GfRaceManager::getEventTrack(unsigned nEventIndex)
 {
+	if (_vecEventTrackIds.empty())
+		load(); // Lazy loading.
+	
 	GfTrack* pTrack = 0;
 
 	if (!_vecEventTrackIds.empty())
@@ -483,15 +550,14 @@ GfTrack* GfRaceManager::getEventTrack(unsigned nEventIndex)
 			GfTracks::self()->getTrack(_vecEventTrackIds[nEventIndex]);
 	}
 	
-	// If the event track could not be found, take the first usable one.
-	if (!pTrack)
-		pTrack = GfTracks::self()->getFirstUsableTrack();
-		   
 	return pTrack;
 }
 
 void GfRaceManager::setEventTrack(unsigned nEventIndex, GfTrack* pTrack)
 {
+	if (_vecEventTrackIds.empty())
+		load(); // Lazy loading.
+	
 	if (!pTrack || _vecEventTrackIds.empty())
 		return;
 	
@@ -501,10 +567,18 @@ void GfRaceManager::setEventTrack(unsigned nEventIndex, GfTrack* pTrack)
 		nEventIndex = _vecEventTrackIds.size() - 1;
 
 	_vecEventTrackIds[nEventIndex] = pTrack->getId();
+	GfLogDebug("GfRaceManager::setEventTrack(evt #%u, track '%s')\n",
+			   nEventIndex, pTrack->getId().c_str());
+
+	// Now we are no more consistent with the race managers params (in memory).
+	_bIsDirty = true;
 }
 
 GfTrack* GfRaceManager::getPreviousEventTrack(unsigned nEventIndex)
 {
+	if (_vecEventTrackIds.empty())
+		load(); // Lazy loading.
+	
 	GfTrack* pTrack = 0;
 
 	if (!_vecEventTrackIds.empty())
@@ -524,16 +598,25 @@ GfTrack* GfRaceManager::getPreviousEventTrack(unsigned nEventIndex)
 
 const std::vector<std::string>& GfRaceManager::getSessionNames() const
 {
+	if (_vecSessionNames.empty())
+		load(); // Lazy loading.
+	
 	return _vecSessionNames;
 }
 
 unsigned GfRaceManager::getSessionCount() const
 {
+	if (_vecSessionNames.empty())
+		load(); // Lazy loading.
+	
 	return _vecSessionNames.size();
 }
 
 const std::string& GfRaceManager::getSessionName(unsigned nIndex) const
 {
+	if (_vecSessionNames.empty())
+		load(); // Lazy loading.
+	
 	if (_vecSessionNames.empty())
 		return strEmpty;
 	
@@ -595,3 +678,7 @@ bool GfRaceManager::hasResultsFiles() const
 	return bAnswer;
 }
 
+bool GfRaceManager::isDirty() const
+{
+	return _bIsDirty;
+}

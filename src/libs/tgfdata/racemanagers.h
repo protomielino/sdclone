@@ -39,7 +39,7 @@ public:
 	
 	GfRaceManager(const std::string& strId, void* hparmHandle);
 	void reset(void* hparmHandle, bool bClosePrevHdle = false);
-	
+
 	~GfRaceManager();
 
 	const std::string& getId() const;
@@ -71,11 +71,19 @@ public:
 	bool hasSavedConfigsFiles() const;
 	const std::string& getResultsDir() const;
 	bool hasResultsFiles() const;
-
+	
 	//! Save data to params (in-memory, no file written to disk).
 	void store();
 	
+	//! Is the race manager data consistent with the params from which it was loaded ?
+	bool isDirty() const;
+	
 protected:
+
+	//! Load remaining info from params (called by accessors, lazy mode).
+	void load() const;
+
+ protected:
 	
 	std::string _strId; // XML file name (ex: quickrace, singleevent-endurance, championship-sc)
 	void*       _hparmHandle; // Params handle to the descriptor file.
@@ -88,14 +96,16 @@ protected:
 	std::vector<std::string> _vecAcceptedDriverTypes;
 	std::vector<std::string> _vecAcceptedCarCategoryIds;
 
-	bool _bHasSubFiles; // True if multiple configuration files are used (ex: Career mode).
+	mutable bool _bHasSubFiles; // True if multiple configuration files are used (ex: Career mode).
 	
 	// Saved configs and results files dirs.
 	mutable std::string _strSavedConfigsDir;
 	mutable std::string _strResultsDir;
 	
-	std::vector<std::string> _vecEventTrackIds; // Id of the track for each scheduled event.
-	std::vector<std::string> _vecSessionNames; // Name and order of sessions for each event.
+	mutable std::vector<std::string> _vecEventTrackIds; // Id of the track for each scheduled event.
+	mutable std::vector<std::string> _vecSessionNames; // Name and order of sessions for each event.
+
+	mutable bool _bIsDirty; // True if no change occurred since last reset().
 };
 
 class TGFDATA_API GfRaceManagers
@@ -112,7 +122,7 @@ public:
 
 	std::vector<GfRaceManager*> getRaceManagersWithType(const std::string& strType = "") const;
 	
-	void print() const;
+	void print(bool bVerbose = false) const;
 
 protected:
 

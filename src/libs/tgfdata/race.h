@@ -53,6 +53,9 @@ public:
 	//! Store to the race manager params file.
 	void store();
 
+	//! Is the race data consistent with the params from which it was loaded ?
+	bool isDirty() const;
+	
 	GfRaceManager* getManager() const;
 
 	enum EDisplayMode { eDisplayNormal, eDisplayResultsOnly,

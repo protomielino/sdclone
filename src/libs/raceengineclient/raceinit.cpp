@@ -222,6 +222,14 @@ ReRaceRestore(void* hparmResults)
 void
 ReStartNewRace(void * /* dummy */)
 {
+	// Save the race settings to the race manager file is anything changed.
+	GfLogDebug("ReStartNewRace: _reName='%s', dirty=%d\n", ReInfo->_reName, PReRace->isDirty());
+	if (PReRace->isDirty())
+	{
+		ReGetRace()->store(); // Save data to params.
+		GfParmWriteFile(NULL, ReInfo->params, ReInfo->_reName); // Save params to disk.
+	}
+
 	// Initialize the result system (different way for the Career mode).
 	if (!strcmp(GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO),
 				RM_VAL_NO))
@@ -451,10 +459,8 @@ initPits(void)
       }
 
       break;
-      
     case TR_PIT_ON_SEPARATE_PATH:
       break;
-      
     case TR_PIT_NONE:
       break;
   }
