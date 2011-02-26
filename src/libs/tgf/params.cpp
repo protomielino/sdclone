@@ -2175,7 +2175,6 @@ GfParmExists (void *handle, const char *path)
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
     struct parmHeader *conf;
     struct section	*section;
-    int	count;
     
     if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
 		GfLogError ("GfParmExists: bad handle (%p)\n", parmHandle);
