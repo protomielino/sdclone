@@ -108,11 +108,8 @@ void
 ReConfigRunState(bool bStart)
 {
 	char	path[256];
-	int		i;
 	int		curConf;
 	const char	*conf;
-	int		numOpt;
-	const char	*opt;
 	void	*params = ReInfo->params;
 
 	// TODO: Replace any read/write to params to get/set from/to race/raceman instances ?
