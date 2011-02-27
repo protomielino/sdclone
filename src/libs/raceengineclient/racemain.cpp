@@ -177,8 +177,8 @@ ReRaceEventInit(void)
 
 		/* Read the new params */
 		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-		GfLogDebug( "ReInfo->mainResults : curfile = %s\n",
-					GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ) );
+		GfLogDebug("Career : ReInfo->mainResults gives curfile = %s\n",
+				   GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
 		if (!params)
 			GfLogWarning( "Params weren't read correctly !!!\n" );
 		params = ReInfo->params;

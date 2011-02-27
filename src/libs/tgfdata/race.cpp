@@ -390,10 +390,11 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 //  			   hparmStartGrid == hparmResults ? "hRes" : GfParmGetFileName(hparmStartGrid));
 
 	std::ostringstream ossDrvSecPath;
-	int nCompIndex = bReversedGrid ? nCompetitors : 1;
 	const int nCompIndexDelta = bReversedGrid ? -1 : +1;
 	const int nEndCompIndex = bReversedGrid ? 0 : nCompetitors + 1;
-    while (nCompIndex != nEndCompIndex)
+	int nCompIndex = bReversedGrid ? nCompetitors : 1;
+	nCompIndex -= nCompIndexDelta;
+    while ((nCompIndex += nCompIndexDelta) != nEndCompIndex)
 	{
 		// Get driver infos from the the starting grid.
 		ossDrvSecPath.str("");
@@ -414,62 +415,58 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 			continue;
 		}
 
-		// We've got it : if we can keep it for the race, make it a competitor
-		// (there is a threshold on the number of competitors) :
-		if (acceptsMoreCompetitors())
-		{
-			const char* pszSkinName =
-				GfParmGetStr(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_SKINNAME, "");
-			const int nSkinTargets =
-				(int)GfParmGetNum(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_SKINTARGETS, NULL, 0);
-			const bool bExtended =
-				GfParmGetNum(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_EXTENDED, NULL, 0)
-				? true : false;
-
-			// Get the chosen car for the race if any specified (extended drivers only).
-			const GfCar* pCarForRace = 0;
-			if (bExtended)
-			{
-				ossDrvSecPath.str("");
-				ossDrvSecPath << RM_SECT_DRIVERINFO << '/' << pszModName
-								  << '/' << (bExtended ? 1 : 0) << '/' << nItfIndex;
-				const char* pszCarId =
-					GfParmGetStr(hparmRaceMan, ossDrvSecPath.str().c_str(), RM_ATTR_CARNAME, "<none>");
-				pCarForRace = GfCars::self()->getCar(pszCarId);
-			}
-//  			GfLogDebug("GfRace::load(...) : car=%s (%s)\n",
-//  					   pCarForRace ? pCarForRace->getName().c_str() : pCompetitor->getCar()->getName().c_str(),
-//  					   pCarForRace ? "extended" : "standard");
-
-			// Update the driver.
-			GfDriverSkin skin(pszSkinName);
-			skin.setTargets(nSkinTargets);
-			pCompetitor->setSkin(skin);
-			if (pCarForRace) // Override default car with the one chosen for the race if any.
-				pCompetitor->setCar(pCarForRace);
-			
-			// Check if this driver can compete in this race.
-			if (acceptsDriverType(pCompetitor->getType())
-				&& acceptsCarCategory(pCompetitor->getCar()->getCategoryId()))
-			{
-				// Update the GfRace.
-				appendCompetitor(pCompetitor);
-			}
-			else
-			{
-				GfLogWarning("Ignoring '%s' (%s' #%d) : Type or car category not accepted by the race\n",
-							 pCompetitor->getName().c_str(), pszModName, nItfIndex);
-			}				
-		}
-		else
+		// We've got it but can't keep it for the race,
+		// because there is a threshold on the number of competitors.
+		if (!acceptsMoreCompetitors())
 		{
 			GfLogWarning("Ignoring subsequent competitors (max=%u)\n",
 						 _pPrivate->nMaxCompetitors);
 			break;
 		}
 
-		// Next driver in the starting grid.
-		nCompIndex += nCompIndexDelta;
+		// We've got it and can keep it for the race => make it a competitor
+		const char* pszSkinName =
+			GfParmGetStr(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_SKINNAME, "");
+		const int nSkinTargets =
+			(int)GfParmGetNum(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_SKINTARGETS, NULL, 0);
+		const bool bExtended =
+			GfParmGetNum(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_EXTENDED, NULL, 0)
+			? true : false;
+
+		// Get the chosen car for the race if any specified (extended drivers only).
+		const GfCar* pCarForRace = 0;
+		if (bExtended)
+		{
+			ossDrvSecPath.str("");
+			ossDrvSecPath << RM_SECT_DRIVERINFO << '/' << pszModName
+						  << '/' << (bExtended ? 1 : 0) << '/' << nItfIndex;
+			const char* pszCarId =
+				GfParmGetStr(hparmRaceMan, ossDrvSecPath.str().c_str(), RM_ATTR_CARNAME, "<none>");
+			pCarForRace = GfCars::self()->getCar(pszCarId);
+		}
+		//  			GfLogDebug("GfRace::load(...) : car=%s (%s)\n",
+		//  					   pCarForRace ? pCarForRace->getName().c_str() : pCompetitor->getCar()->getName().c_str(),
+		//  					   pCarForRace ? "extended" : "standard");
+
+		// Update the driver.
+		GfDriverSkin skin(pszSkinName);
+		skin.setTargets(nSkinTargets);
+		pCompetitor->setSkin(skin);
+		if (pCarForRace) // Override default car with the one chosen for the race if any.
+			pCompetitor->setCar(pCarForRace);
+			
+		// Check if this driver can compete in this race.
+		if (acceptsDriverType(pCompetitor->getType())
+			&& acceptsCarCategory(pCompetitor->getCar()->getCategoryId()))
+		{
+			// Update the GfRace.
+			appendCompetitor(pCompetitor);
+		}
+		else
+		{
+			GfLogWarning("Ignoring '%s' (%s' #%d) : Type or car category not accepted by the race\n",
+						 pCompetitor->getName().c_str(), pszModName, nItfIndex);
+		}				
 	}
 	
 	// Load focused competitor data from the raceman params.
@@ -855,10 +852,11 @@ bool GfRace::moveCompetitor(GfDriver* pComp, int nDeltaPlace)
 		return false;
 
 	// Remove the competitor from his place.
+	const int nOldIndex = itComp - _pPrivate->vecCompetitors.begin();
 	_pPrivate->vecCompetitors.erase(itComp);
 	
 	// Determine his new place.
-	const int nNewIndex = (itComp - _pPrivate->vecCompetitors.begin()) + nDeltaPlace;
+	const int nNewIndex = nOldIndex + nDeltaPlace;
 	if (nNewIndex < 0)
 		itComp = _pPrivate->vecCompetitors.begin();
 	else if (nNewIndex >= (int)_pPrivate->vecCompetitors.size())

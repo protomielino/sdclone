@@ -223,10 +223,9 @@ void
 ReStartNewRace(void * /* dummy */)
 {
 	// Save the race settings to the race manager file is anything changed.
-	GfLogDebug("ReStartNewRace: _reName='%s', dirty=%d\n", ReInfo->_reName, PReRace->isDirty());
 	if (PReRace->isDirty())
 	{
-		ReGetRace()->store(); // Save data to params.
+		PReRace->store(); // Save data to params.
 		GfParmWriteFile(NULL, ReInfo->params, ReInfo->_reName); // Save params to disk.
 	}
 

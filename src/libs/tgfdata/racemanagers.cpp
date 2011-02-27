@@ -343,8 +343,8 @@ void GfRaceManager::load() const
 		ossSectionPath.str("");
 		ossSectionPath << RM_SECT_TRACKS << '/' << nEventNum;
 		pszTrackId = GfParmGetStr(hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME, 0);
- 		GfLogDebug("GfRaceManager::reset(...): event[%d].track = '%s'\n",
- 				   nEventNum-1, pszTrackId);
+//  		GfLogDebug("GfRaceManager::reset(...): event[%d].track = '%s'\n",
+//  				   nEventNum-1, pszTrackId);
 
 		// If not end of event list :
 		if (pszTrackId)
@@ -405,7 +405,7 @@ void GfRaceManager::load() const
 		ossSecPath << RM_SECT_RACES << '/' << nSessionInd;
 		const char* pszSessionName =
 			GfParmGetStr(hparmHandle, ossSecPath.str().c_str(), RM_ATTR_NAME, 0);
- 		GfLogDebug("GfRaceManager::reset(...): session '%s'\n", pszSessionName);
+//  		GfLogDebug("GfRaceManager::reset(...): session '%s'\n", pszSessionName);
 		if (pszSessionName && strlen(pszSessionName) > 0)
 			_vecSessionNames.push_back(pszSessionName);
 
@@ -432,8 +432,8 @@ void GfRaceManager::store()
 		std::ostringstream ossSectionPath;
 		for (unsigned nEventInd = 0; nEventInd < _vecEventTrackIds.size(); nEventInd++)
 		{
-			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
-					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
+// 			GfLogDebug("GfRaceManager::store(%s): event[%u].track = '%s'\n",
+// 					   _strName.c_str(), nEventInd, _vecEventTrackIds[nEventInd].c_str());
 			ossSectionPath.str("");
 			ossSectionPath << RM_SECT_TRACKS << '/' << nEventInd + 1;
 			GfParmSetStr(_hparmHandle, ossSectionPath.str().c_str(), RM_ATTR_NAME,
@@ -567,8 +567,8 @@ void GfRaceManager::setEventTrack(unsigned nEventIndex, GfTrack* pTrack)
 		nEventIndex = _vecEventTrackIds.size() - 1;
 
 	_vecEventTrackIds[nEventIndex] = pTrack->getId();
-	GfLogDebug("GfRaceManager::setEventTrack(evt #%u, track '%s')\n",
-			   nEventIndex, pTrack->getId().c_str());
+// 	GfLogDebug("GfRaceManager::setEventTrack(evt #%u, track '%s')\n",
+// 			   nEventIndex, pTrack->getId().c_str());
 
 	// Now we are no more consistent with the race managers params (in memory).
 	_bIsDirty = true;
