@@ -36,12 +36,64 @@
 #include "tgf.h"
 
 
+/** Get the path-name of the directory containing a file
+    @ingroup	file
+    @param	pszFileName	path-name of the file
+    @return	Path-name of the directory, allocated on the heap (the caller must free it).
+ */
+char* GfFileGetDirName(const char* pszFileName)
+{
+	// Allocate and initialize the target string
+	char* pszDirName = strdup(pszFileName);
+
+	// Replace '\\' by '/' under Windows
+#ifdef WIN32
+	for (int i = 0; pszDirName[i]; i++)
+		if (pszDirName[i] == '\\')
+			pszDirName[i] = '/';
+#endif
+
+	// Search for the last '/'.
+	char *lastSlash = strrchr(pszDirName, '/');
+
+	// If found, we've got the end of the directory name.
+	if (lastSlash)
+	{
+		// But keep the '/' if it is the first one of an absolute path-name.
+		if (lastSlash != pszDirName)
+#ifdef WIN32
+			if (*(lastSlash-1) != ':')
+#endif
+				*lastSlash = '\0';
+	}
+
+	// If no '/' found, empty directory name.
+	else
+		*pszDirName = '\0';
+
+	//GfLogDebug("GfFileGetDirName(%s) = %s\n", pszFileName, pszDirName);
+	
+	// That's all.
+	return pszDirName;
+}
+
+/** Check if a file exists
+    @ingroup	file
+    @param	pszName	Path-name of the file
+    @return	true if the file exists, false otherwise.
+ */
 bool GfFileExists(const char* pszName)
 {
 	struct stat st;
 	return stat(pszName, &st) ? false : true;
 }
 
+/** Copy a file to a target path-name
+    @ingroup	file
+    @param	pszSrcName	Source file path-name
+    @param	pszSrcName	Target file path-name for the copy
+    @return	true upon success, false otherwise.
+ */
 bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 {
 	static const size_t maxBufSize = 1024;
@@ -54,6 +106,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	
 	// Create the target local directory (and parents) if not already done
 	// (first, we have to deduce its path from the target file path-name).
+	// TODO: Use GfFileGetDirName
 	strncpy(buf, pszTgtName, strlen(pszTgtName)+1);
 #ifdef WIN32
 	for (int i = 0; i < maxBufSize && buf[i] != '\0'; i++)

@@ -262,6 +262,7 @@ TGF_API void GfDirFreeList(tFList *list, tfDirfreeUserData freeUserData, bool fr
  * File management      *
  ************************/
 
+TGF_API char* GfFileGetDirName(const char* pszFileName);
 TGF_API bool GfFileExists(const char* pszName);
 TGF_API bool GfFileCopy(const char* pszSrcName, const char* pszTgtName);
 

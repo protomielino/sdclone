@@ -3743,25 +3743,14 @@ safeFOpen(const char *fileName, const char *mode)
 			return file;
 	}
 	
-	// TODO: Make things simpler by using GfDirCreate (takes care of parent dirs).
     // Otherwise, try and create parent dirs in case it is the cause of the error :
-    // - search the fileName for directory level separators (\\ or /) and create each directory.
-    // - directories' permissions are set to 700=u+rwx on UNIX-like systems.
-    // - the only error we silently ignore from mkdir is when the dir already exists.
-    char *mname = strdup(fileName);
-    for(int i = 0; mname[i] != '\0'; i++) {
-		if(i > 0 && (mname[i] == '\\' || mname[i] == '/')) {
-			const char slash = mname[i];
-			mname[i] = '\0';
-			if(mkdir(mname) == -1 && errno != EEXIST) {
-				return NULL;
-			}
-			
-			mname[i] = slash;
-		}//if i
-    }//for i
+    char *pszDirName = GfFileGetDirName(fileName);
+	if (GfDirCreate(pszDirName) != GF_DIR_CREATED)
+		GfLogWarning("Failed to create parent dir(s) of %s\n", fileName);
+	free(pszDirName);
 	
-    free(mname);
+	// And finally try again to open the file.
     return fopen(fileName, mode);
+	
 }//safeFOpen
 
