@@ -130,6 +130,9 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 	// Save the new race manager.
 	_pPrivate->pRaceMan = pRaceMan;
 
+	// Now we should be consistent with the race params (in memory).
+	_pPrivate->bIsDirty = false;
+
 	// Check if usable, and exit if not.
 	if (!_pPrivate->pRaceMan)
 		return;
@@ -412,6 +415,10 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 		{
 			GfLogWarning("Ignoring '%s' driver #%d : not found in available drivers\n",
 						 pszModName, nItfIndex);
+			
+			// We are no more consistent with the race params (in memory).
+			_pPrivate->bIsDirty = true;
+			
 			continue;
 		}
 
@@ -421,6 +428,10 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 		{
 			GfLogWarning("Ignoring subsequent competitors (max=%u)\n",
 						 _pPrivate->nMaxCompetitors);
+			
+			// We are no more consistent with the race params (in memory).
+			_pPrivate->bIsDirty = true;
+			
 			break;
 		}
 
@@ -466,6 +477,9 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 		{
 			GfLogWarning("Ignoring '%s' (%s' #%d) : Type or car category not accepted by the race\n",
 						 pCompetitor->getName().c_str(), pszModName, nItfIndex);
+			
+			// We are no more consistent with the race params (in memory).
+			_pPrivate->bIsDirty = true;
 		}				
 	}
 	
@@ -474,9 +488,6 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 		GfParmGetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
     _pPrivate->nFocusedItfIndex =
 		(int)GfParmGetNum(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
-
-	// Now we are consistent with the race params (in memory).
-	_pPrivate->bIsDirty = false;
 }
 
 void GfRace::store()

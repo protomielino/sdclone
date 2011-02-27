@@ -760,7 +760,7 @@ ReInitCars(void)
     if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
     {
       GfLogError("Failed to load robot module %s\n", path);
-      break;
+      continue;
     }
 
     /* Load the racing driver info in the race data structure */
