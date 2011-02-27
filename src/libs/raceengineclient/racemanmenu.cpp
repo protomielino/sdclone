@@ -320,10 +320,24 @@ reOnSaveRaceToConfigFile(void *pPrevMenu)
 int
 ReRacemanMenu()
 {
-	// Special case of the online race
-	// TODO: Integrate it better.
+	// Special case of the online race, not yet migrated to using tgfdata.
+	// TODO: Integrate better the networking menu system in the race config. menu system
+	//       (merge the ReNetworkClientConnectMenu and ReNetworkHostMenu into this race man menu,
+	//        after adding some more features / controls ? because they look similar).
 	if (!strcmp(ReInfo->_reName, "Online Race"))
 	{
+		// Temporary, as long as the networking menu are not ported to tgfdata.
+		
+		// Force any needed fix on the specified track for the race (may not exist)
+		const GfTrack* pTrack = ReGetRace()->getTrack();
+		GfLogDebug("Using track %s for Online Race", pTrack->getName().c_str());
+
+		// Synchronize ReInfo->params with ReGetRace() state, in case the track was fixed.
+		if (ReGetRace()->isDirty())
+			ReGetRace()->store(); // Save data to params.
+		
+		// End of temporary.
+
 		if (GetNetwork())
 		{
 			if (GetNetwork()->IsConnected())

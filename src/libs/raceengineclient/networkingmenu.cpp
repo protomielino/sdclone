@@ -18,10 +18,9 @@
  ***************************************************************************/
 
 
-/*
-This file deals with the networking menus.  
-Server sees a list of players and the client sees a list of other players.
-Should also allow choosing IP address, track, etc ...
+/* This file deals with the networking menus.  
+   The server sees a list of players and the client sees a list of other players.
+   Should also allow choosing IP address, track, etc ...
 */
 
 #include <cstdlib>
