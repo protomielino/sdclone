@@ -61,7 +61,7 @@ class Opponent {
 
   // State queries
   inline bool HasState(const int state) const
-        { return static_cast<bool>(state_ & state); }
+  { return (state_ & state) ? true : false; }
   inline bool IsQuickerTeammate(const tCarElt *mycar) const
         { return (teammate_
             && (mycar->_dammage - car_->_dammage > TEAM_DAMAGE_CHANGE_LEAD));}

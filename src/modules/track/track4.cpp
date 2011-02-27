@@ -894,7 +894,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 		pits->speedLimit = GfParmGetNum(TrackHandle, path2, TRK_ATT_SPD_LIM, (char*)NULL, 25.0);
 
 		//Decide pit style
-		pits->type = GfParmGetNum(TrackHandle, path2, TRK_ATT_PIT_STYLE, NULL, TR_PIT_ON_TRACK_SIDE);
+		pits->type = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_PIT_STYLE, NULL, TR_PIT_ON_TRACK_SIDE);
 		GfOut("track4:: Pit style: %d\n", pits->type);
 
 		if ((pitEntrySeg != NULL) && (pitExitSeg != NULL)
@@ -1012,15 +1012,15 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 						
 						switch (pits->side) {
 							case TR_RGT:
-								pits->driversPits[i].pos.toRight  = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
+								pits->driversPits[i].pos.toRight  = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0f;
 								pits->driversPits[i].pos.toLeft   = mSeg->width - pits->driversPits[i].pos.toRight;
-								pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toRight;
+								pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0f - pits->driversPits[i].pos.toRight;
 								break;
 
 							case TR_LFT:
-								pits->driversPits[i].pos.toLeft   = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0;
+								pits->driversPits[i].pos.toLeft   = -offset - RtTrackGetWidth(curPitSeg, toStart) + pits->width / 2.0f;
 								pits->driversPits[i].pos.toRight  = mSeg->width - pits->driversPits[i].pos.toLeft;
-								pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0 - pits->driversPits[i].pos.toLeft;
+								pits->driversPits[i].pos.toMiddle = mSeg->width / 2.0f - pits->driversPits[i].pos.toLeft;
 								break;
 						}//switch pits->side
 
@@ -1663,7 +1663,7 @@ theTrack->nseg = curindex;
 void ReadTrack4(tTrack *theTrack, void *TrackHandle,
 									tRoadCam **camList, int ext) {
 	int			i;
-	tTrackSeg		*curSeg = NULL, *mSeg;
+	tTrackSeg		*curSeg = NULL;
 	int			segId;
 	tRoadCam		*curCam;
 	tTrkLocPos		trkPos;
