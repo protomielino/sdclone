@@ -48,9 +48,9 @@ SET(CPACK_SOURCE_IGNORE_FILES
     "/\\\\.svn/" "/\\\\.dir/" "/CMakeFiles/" 
     "cmake_install\\\\.cmake$" "CPackConfig\\\\.cmake$" "CPackSourceConfig\\\\.cmake$"
     "\\\\.bak$" "\\\\.flc$" "#.*#$" "~$" "\\\\.~.*"
-	"\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$" 
-    "\\\\.exe$" "\\\\.zip$" "\\\\.tar\\\\.bz2$" "\\\\.tar\\\\.gz$" "\\\\.tar\\\\.Z$" 
-    "\\\\.tar\\\\.7z$")
+    "\\\\.xcf$" "\\\\.xcf\\\\.bz2$" "\\\\.psd$" 
+    "\\\\.exe$" "/sd2-.*$" "/speed-dreams-2$" "/xmlversion$" 
+    "\\\\.zip$" "\\\\.tar\\\\.bz2$" "\\\\.tar\\\\.gz$" "\\\\.tar\\\\.Z$" "\\\\.tar\\\\.7z$")
 
 ##########################################################################################
 # Put Linux install information here
