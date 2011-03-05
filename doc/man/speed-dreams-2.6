@@ -1,0 +1,53 @@
+.TH "Speed Dreams 2" "6" "1.2.2" "Rudy Godoy" "Games"
+.SH NAME
+speed-dreams-2 \- 3D racing cars simulator game using OpenGL
+.SH DESCRIPTION
+Speed Dreams, an Open Motorsport Simulator, is a car racing simulation, which
+allows you to drive in races against opponents simulated by the computer.
+You can also develop your own computer-controlled driver (also called a
+robot) in C or C++, and even build your own cars and tracks.
+.br
+Speed Dreams 2 is 'Open Source' (GNU General Public License Version 2 or later).
+.SH OPTIONS
+.TP
+.B \-l <local dir>
+Set the run-time user settings folder
+(default = ~/.speed-dreams-2,
+ unless not using the default CMake configuration for building)
+.TP
+.B \-L <lib dir>
+Set the run-time library folder
+(default = /usr/local/lib[64]/games/speed-dreams-2,
+ unless not using the default CMake configuration for building)
+.TP
+.B \-D <data dir>
+Set the run-time data folder
+(default = /usr/local/share/games/speed-dreams-2,
+ unless not using the default CMake configuration for building)
+.TP
+.B \-B <bin dir>
+Set the run-time binary data folder
+(default = /usr/local/games,
+ unless not using the default CMake configuration for building)
+.TP
+.B \-m
+Use hardware mouse cursor
+.TP
+.B \-t <trace level threshold>
+Set the trace level threshold to the given integer value
+(0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ... ;
+ default = Debug, unless not using the default CMake configuration for building)
+Only traces with lower or equal level will appear in the trace stream
+Note: May be disabled if CMake option 'OPTION_DEBUG' is not true at build time)
+.TP
+.B \-r <trace stream>
+Set the target stream for the traces (among 'stdout', 'stderr' or <file name>) ;
+ default = stderr, unless not using the default CMake configuration for building))
+Note: May be disabled if CMake option 'OPTION_DEBUG' is not true at build time)
+.SH SEE ALSO
+For a more detailed player manual, please see:
+.br
+http://torcs.sourceforge.net/sections.php?op=viewarticle&artid=10
+.SH AUTHOR
+This manual page was written by Rudy Godoy <rudy@kernel-panik.org>,
+for the Debian project (but may be used by others).
