@@ -128,7 +128,26 @@ GfDrivers::GfDrivers()
 			GfDriver* pDriver = new GfDriver(strModName, pCurModule->modInfo[nItfInd].index,
 											 pCurModule->modInfo[nItfInd].name, hparmRobot);
 
-			// Keep the driver only if its car exists and is usable.
+			// For human drivers, if the car was not found, select the 1st possible one.
+			if (!pDriver->getCar() && pDriver->isHuman())
+			{
+				GfCar* pSubstCar = GfCars::self()->getCarsInCategory()[0]; // Should never fail.
+				if (pSubstCar)
+				{
+					std::ostringstream ossDrvSecPath;
+					ossDrvSecPath << ROB_SECT_ROBOTS << '/' << ROB_LIST_INDEX << '/'
+								  << pCurModule->modInfo[nItfInd].index;
+					const char* pszCarId =
+						GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_CAR, "");
+					GfLogWarning("Changing '%s' driver '%s' (#%d) 's car to %s (default one %s not available)\n",
+								 strModName.c_str(), pCurModule->modInfo[nItfInd].name,
+								 pCurModule->modInfo[nItfInd].index, pSubstCar->getId().c_str(),
+								 pszCarId);
+					pDriver->setCar(pSubstCar);
+				}
+			}
+			
+			// Keep the driver only if he drives an existing car.
 			if (pDriver->getCar())
 			{
 				// Update the GfDrivers singleton.
