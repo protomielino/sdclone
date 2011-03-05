@@ -13,7 +13,7 @@ http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
 
 Changes since 2.0.0 Alpha 2 released in 2.0.0 Alpha 3
 -----------------------------------------------------
-This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a2@34xy???????????????????????????????????????.
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a2@3412.
 
 We started the most important work for 2.0 : a full rework of the parameters
 of all our cars, towards realism (as for parameter values as for the handling).
@@ -21,6 +21,11 @@ This also implies reworking the robots setups for the cars, which is work-in-pro
 The weather simulation was also made more stable and user-friendly in many ways.
 The race choice / configuration menu system was also improved.
 And cars and tracks got even more HQ sugar.
+
+Known bugs (yes, there are ;-)
+* Career mode : no human driver seems to be able to join, at least at the beginning
+* Installer : the base installer fails to run any of the other installers the first time ;
+  simply re-run it and this time it will work.
 
 Tracks:
 * #331 Fix too high friction coefficients in many tracks (towards realism)
