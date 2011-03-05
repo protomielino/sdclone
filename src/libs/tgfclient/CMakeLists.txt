@@ -37,7 +37,7 @@ ENDIF(WIN32)
 
 ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
 
-ADD_PLIB_LIBRARY(tgfclient ssg ul sg sl ssg ssgaux)
+ADD_PLIB_LIBRARY(tgfclient ul sg sl)
 ADD_SDLIB_LIBRARY(tgfclient tgf networking)
 
 ADD_PNG_LIBRARY(tgfclient)
