@@ -23,19 +23,21 @@
     @ingroup	gui
 */
 
-#include <stdlib.h>
+#include <cstdlib>
+
 #ifdef WIN32
 #include <windows.h>
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif
 #endif
+
 #ifdef HAVE_CONFIG_H
 #include "version.h"
 #endif
 
-#include "tgfclient.h"
 #include "gui.h"
+
 
 static void	*scrHandle;
 static float	*fgColor1 = &(GfuiColor[GFUI_HELPCOLOR1][0]);
@@ -101,18 +103,18 @@ GfuiHelpScreen(void *prevScreen)
 				case GFUIK_DELETE:
 				case GFUIK_CLEAR:
 				case GFUIK_PAUSE:
-					GfuiLabelCreateEx(scrHandle, curKey->name, fgColor1, GFUI_FONT_SMALL_C,
-									  xs, ys, GFUI_ALIGN_HL_VB, 0);
-					GfuiLabelCreateEx(scrHandle, curKey->descr, fgColor2, GFUI_FONT_SMALL_C,
-									  xs + dx, ys, GFUI_ALIGN_HL_VB, 0);
+					GfuiLabelCreate(scrHandle, curKey->name, GFUI_FONT_SMALL_C,
+									xs, ys, GFUI_ALIGN_HL_VB, 0, fgColor1);
+					GfuiLabelCreate(scrHandle, curKey->descr, GFUI_FONT_SMALL_C,
+									xs + dx, ys, GFUI_ALIGN_HL_VB, 0, fgColor2);
 					ys += dy;
 					break;
 
 				default:
-					GfuiLabelCreateEx(scrHandle, curKey->name, fgColor1, GFUI_FONT_SMALL_C,
-									  xn, yn, GFUI_ALIGN_HL_VB, 0);
-					GfuiLabelCreateEx(scrHandle, curKey->descr, fgColor2, GFUI_FONT_SMALL_C,
-									  xn + dx, yn, GFUI_ALIGN_HL_VB, 0);
+					GfuiLabelCreate(scrHandle, curKey->name, GFUI_FONT_SMALL_C,
+									xn, yn, GFUI_ALIGN_HL_VB, 0, fgColor1);
+					GfuiLabelCreate(scrHandle, curKey->descr, GFUI_FONT_SMALL_C,
+									xn + dx, yn, GFUI_ALIGN_HL_VB, 0, fgColor2);
 					yn += dy;
 					break;
 			}

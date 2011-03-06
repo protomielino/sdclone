@@ -150,8 +150,8 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	} 
 	
 	const char* colId = GfParmListGetCurEltName(crHdle, buf);
-	GfuiLabelCreateEx(pageScrHdle, column.name, colNameColor, GFUI_FONT_MEDIUM_C, 
-			  x, y, GFUI_ALIGN_HL_VB, 0);
+	GfuiLabelCreate(pageScrHdle, column.name, GFUI_FONT_MEDIUM_C, 
+					x, y, GFUI_ALIGN_HL_VB, 0, colNameColor);
 	x += column.width;
 	orderedColumnIds.push_back(colId);
 	columns.insert(std::pair<const char*, tColumnDesc>(colId, column));
@@ -181,7 +181,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 		nScreenLines++;
 	    }
 	    GfuiLabelCreate(pageScrHdle, colValue, GFUI_FONT_MEDIUM_C,
-			    x, y, GFUI_ALIGN_HL_VB, 0);
+						x, y, GFUI_ALIGN_HL_VB, 0);
 	    x += columns[*colIdIter].width;
 	}
 	while (GfParmListSeekNext(crHdle, buf) == 0);

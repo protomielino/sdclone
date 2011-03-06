@@ -65,11 +65,15 @@ typedef struct
     char	*text;		/* text */
     Color	bgColor;	/* RGBA */
     Color	fgColor;
+    Color	bgFocusColor;
+    Color	fgFocusColor;
     GfuiFontClass	*font;		/* ttf font */
+
     int	x, y;		/* label position */
     int	align;
     int	maxlen;
-    void		*userDataOnFocus;
+
+	void		*userDataOnFocus;
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
 } tGfuiLabel;
@@ -123,6 +127,8 @@ typedef struct
     GLuint focused;
     GLuint pushed;
     
+    int	x, y;		/* image position */
+    int	align;
     int			width, height;
     int			buttonType;
     int			mouseBehaviour;
@@ -198,13 +204,17 @@ typedef struct
 
 typedef struct
 {
-    int labelId;
-    int leftButtonId, rightButtonId;
+    tGfuiLabel	label;
+    tGfuiGrButton	leftButton;
+	tGfuiGrButton	rightButton;
 	void *scr;
 	tComboBoxInfo *pInfo;
 
     Color fgColor[3];
     int	comboType;
+    void		*userDataOnFocus;
+    tfuiCallback	onFocus;
+    tfuiCallback	onFocusLost;
     tfuiComboboxCallback onChange;
 } tGfuiCombobox;
 
@@ -341,23 +351,28 @@ extern void gfuiSelectId(void *scr, int id);
 extern void gfuiAddObject(tGfuiScreen *screen, tGfuiObject *object);
 extern tGfuiObject *gfuiGetObject(void *scr, int id);
 
-extern void gfuiSetLabelText(tGfuiObject *object, tGfuiLabel *label, const char *text);
+extern bool gfuiGrButtonMouseIn(tGfuiGrButton *button);
 
-extern void gfuiDrawProgressbar(tGfuiObject *obj);
+extern void gfuiButtonAction(int action);
+extern void gfuiEditboxAction(int action);
+extern void gfuiGrButtonAction(int action);
+extern void gfuiScrollListAction(int mouse);
+extern void gfuiComboboxAction(int mouse);
+
 extern void gfuiDrawLabel(tGfuiObject *obj);
 extern void gfuiDrawButton(tGfuiObject *obj);
 extern void gfuiDrawCombobox(tGfuiObject *obj);
-void gfuiDrawCheckbox(tGfuiObject *obj);
-
-extern void gfuiButtonAction(int action);
+extern void gfuiDrawCheckbox(tGfuiObject *obj);
 extern void gfuiDrawGrButton(tGfuiObject *obj);
-extern void gfuiGrButtonAction(int action);
 extern void gfuiDrawScrollist(tGfuiObject *obj);
-extern void gfuiScrollListAction(int mouse);
 extern void gfuiDrawEditbox(tGfuiObject *obj);
-extern void gfuiEditboxAction(int action);
 extern void gfuiDrawProgressbar(tGfuiObject *obj);
 
+extern void gfuiLabelSetText(tGfuiLabel *label, const char *text);
+extern void gfuiLabelSetColor(tGfuiLabel *label, const float *color);
+
+extern void gfuiLabelDraw(tGfuiLabel *label, int focus);
+extern void gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus);
 
 extern void gfuiInit(void);
 extern void gfuiButtonInit(void);
@@ -367,6 +382,16 @@ extern void gfuiObjectInit(void);
 extern void gfuiEditboxInit(void);
 extern void gfuiComboboxInit(void);
 
+extern void gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
+						  int x, int y, int align, int width, int font,
+						  const float *bgColor, const float *fgColor,
+						  const float *bgFocusColor, const float *fgFocusColor,
+						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+extern void gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enabled,
+							 const char *focused, const char *pushed,
+							 int x, int y, int align, int width, int height, int mouse,
+							 void *userDataOnPush, tfuiCallback onPush, 
+							 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
 extern void gfuiReleaseLabel(tGfuiObject *obj);
 extern void gfuiReleaseButton(tGfuiObject *obj);
@@ -377,7 +402,6 @@ extern void gfuiReleaseEditbox(tGfuiObject *curObject);
 extern void gfuiReleaseCombobox(tGfuiObject *obj);
 extern void gfuiReleaseCheckbox(tGfuiObject *obj);
 extern void gfuiReleaseProgressbar(tGfuiObject *obj);
-
 
 extern void gfuiLoadFonts(void);
 

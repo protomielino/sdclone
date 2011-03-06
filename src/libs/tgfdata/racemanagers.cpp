@@ -121,9 +121,6 @@ GfRaceManagers::GfRaceManagers()
 		// Update the GfRaceManagers singleton.
 		_pPrivate->vecRaceMans.push_back(pRaceMan);
 		_pPrivate->mapRaceMansById[strRaceManId] = pRaceMan;
-		if (std::find(_pPrivate->vecTypes.begin(), _pPrivate->vecTypes.end(), pRaceMan->getType())
-			== _pPrivate->vecTypes.end())
-			_pPrivate->vecTypes.push_back(pRaceMan->getType());
 	} 
 	while ((pFile = pFile->next) != lstFiles);
 	
@@ -131,6 +128,14 @@ GfRaceManagers::GfRaceManagers()
 
 	// Sort the race manager vector by priority.
 	std::sort(_pPrivate->vecRaceMans.begin(), _pPrivate->vecRaceMans.end(), hasHigherPriority);
+
+	// Fill the race manager type vector (=> also sorted by priority).
+	std::vector<GfRaceManager*>::const_iterator itRaceMan;
+	for (itRaceMan = _pPrivate->vecRaceMans.begin();
+		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
+		if (std::find(_pPrivate->vecTypes.begin(), _pPrivate->vecTypes.end(), (*itRaceMan)->getType())
+			== _pPrivate->vecTypes.end())
+			_pPrivate->vecTypes.push_back((*itRaceMan)->getType());
 
 	// And log what we've got now.
 	print(/* bVerbose */false);
@@ -188,9 +193,9 @@ void GfRaceManagers::print(bool bVerbose) const
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
 		{
-			GfLogTrace("    %s : subtype='%s', name='%s', events=%d\n",
+			GfLogTrace("    %s : subtype='%s', name='%s', prio=%d, events=%d\n",
 					   (*itRaceMan)->getId().c_str(), (*itRaceMan)->getSubType().c_str(),
-					   (*itRaceMan)->getName().c_str(),
+					   (*itRaceMan)->getName().c_str(), (*itRaceMan)->getPriority(),
 					   bVerbose ? (*itRaceMan)->getEventCount() : -1);
 		}
 	}

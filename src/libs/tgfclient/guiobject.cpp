@@ -286,7 +286,15 @@ gfuiLoseFocus(tGfuiObject *obj)
 				label->onFocusLost(label->userDataOnFocus);
 		}
 		break;
-    }
+		
+ 		case GFUI_COMBOBOX:
+		{
+			tGfuiCombobox* combo = &(obj->u.combobox);
+			if (combo->onFocusLost)
+				combo->onFocusLost(combo->userDataOnFocus);
+		}
+		break;
+   }
 }
 
 static void
@@ -339,6 +347,14 @@ gfuiSetFocus(tGfuiObject *obj)
 				label->onFocus(label->userDataOnFocus);
 		}
 		break;
+		
+		case GFUI_COMBOBOX:
+		{
+			tGfuiCombobox* combo = &(obj->u.combobox);
+			if (combo->onFocus)
+				combo->onFocus(combo->userDataOnFocus);
+		}
+		break;
     }
 }
 
@@ -387,23 +403,29 @@ gfuiSelectNext(void * /* dummy */)
 	startObject = GfuiScreen->objects;
     }
     if (startObject == NULL) {
+		//GfLogDebug("gfuiSelectNext : No start object\n");
 	return;
     }
     curObject = startObject;
     do {
 	switch (curObject->widget) {
 	case GFUI_SCROLLIST:
+		//GfLogDebug("gfuiSelectNext : gfuiScrollListNextElt\n");
 	    gfuiScrollListNextElt(curObject);
 	    break;
 	    
 	default:
 	    curObject = curObject->next;
+		//GfLogDebug("gfuiSelectNext : curObject(id=%d, widget=%d, focusMode=%d, state=%d, visible=%d) : ",
+		//		   curObject->id, curObject->widget, curObject->focusMode, curObject->state, curObject->visible);
 	    if ((curObject->focusMode != GFUI_FOCUS_NONE) &&
 		(curObject->state != GFUI_DISABLE) &&
 		(curObject->visible)) {
+		//GfLogDebug("got focus\n");
 		gfuiSetFocus(curObject);
 		return;
 	    }
+		//GfLogDebug("skipped\n");
 	    break;
 	}
     } while (curObject != startObject);    
@@ -419,6 +441,7 @@ gfuiSelectPrev(void * /* dummy */)
     if (startObject == NULL) {
 	startObject = GfuiScreen->objects;
 	if (startObject == NULL) {
+		//GfLogDebug("gfuiSelectPrev : No start object\n");
 	    return;
 	}
 	startObject = startObject->next;
@@ -427,17 +450,22 @@ gfuiSelectPrev(void * /* dummy */)
     do {
 	switch (curObject->widget) {
 	case GFUI_SCROLLIST:
+		//GfLogDebug("gfuiSelectPrev : gfuiScrollListNextElt\n");
 	    gfuiScrollListPrevElt(curObject);
 	    break;
 
 	default:
 	    curObject = curObject->prev;
+		//GfLogDebug("gfuiSelectPrev : curObject(id=%d, widget=%d, focusMode=%d, state=%d, visible=%d) : ",
+		//		   curObject->id, curObject->widget, curObject->focusMode, curObject->state, curObject->visible);
 	    if ((curObject->focusMode != GFUI_FOCUS_NONE) &&
 		(curObject->state != GFUI_DISABLE) &&
 		(curObject->visible)) {
+		//GfLogDebug("got focus\n");
 		gfuiSetFocus(curObject);
 		return;
 	    }
+		//GfLogDebug("skipped\n");
 	    break;
 	}
     } while (curObject != startObject);
@@ -506,19 +534,19 @@ GfuiEnable(void *scr, int id, int flag)
     tGfuiObject *curObject;
 
     curObject = gfuiGetObject(scr, id);
-    if (curObject == NULL) {
-	return -1;
-    }
+    if (!curObject)
+		return -1;
 
-    switch(flag) {
-    case GFUI_ENABLE:
-	curObject->state = GFUI_ENABLE;
-	break;
-    case GFUI_DISABLE:
-	curObject->state = GFUI_DISABLE;
-	break;
-    default:
-	return -1;
+    switch(flag)
+	{
+		case GFUI_ENABLE:
+			curObject->state = GFUI_ENABLE;
+			break;
+		case GFUI_DISABLE:
+			curObject->state = GFUI_DISABLE;
+			break;
+		default:
+			return -1;
     }
 
 	switch (curObject->widget)
@@ -528,12 +556,6 @@ GfuiEnable(void *scr, int id, int flag)
 				curObject->u.button.state = GFUI_BTN_DISABLE;
 			else
 				curObject->u.button.state = GFUI_BTN_RELEASED;
-			break;
-
-		case GFUI_COMBOBOX:
-			GfuiEnable(scr, curObject->u.combobox.leftButtonId, flag);
-			GfuiEnable(scr, curObject->u.combobox.rightButtonId, flag);
-			GfuiEnable(scr, curObject->u.combobox.labelId, flag);
 			break;
 
 		default:
@@ -563,6 +585,9 @@ gfuiMouseAction(void *vaction)
 	    break;
 	case GFUI_EDITBOX:
 	    gfuiEditboxAction((int)action);
+	    break;
+	case GFUI_COMBOBOX:
+	    gfuiComboboxAction((int)action);
 	    break;
 	}
     }

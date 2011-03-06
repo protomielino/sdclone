@@ -497,14 +497,13 @@ CreateLabel(void *menuHandle,void *param,const char *pControlName)
                 onFocusLost = remInfo;
         }
 
-        int labelId = GfuiLabelCreateEx(menuHandle, pszText, 0, textsize, x, y, alignment, maxlen,
-										userDataOnFocus, onFocus, onFocusLost);
+		const float* aColor = 0;
+        Color color;
+        if (GetColorFromXML(param, pControlName, "color", color))
+			aColor = color.GetPtr();
 
-        Color c;
-        const bool bColor = GetColorFromXML(param,pControlName,"color",c);
-
-        if (bColor)
-                GfuiLabelSetColor(menuHandle, labelId, c.GetPtr());
+        int labelId = GfuiLabelCreate(menuHandle, pszText, textsize, x, y, alignment, maxlen,
+									  aColor, 0, userDataOnFocus, onFocus, onFocusLost);
 
     return labelId;
 }
@@ -621,23 +620,11 @@ CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,v
         const char* pszAlignV = GfParmGetStr(param, pControlName, "alignV", "");
         const int alignment = GetAlignment(pszAlignH,pszAlignV);
 
-        int id = -1;
-        if (w == 0 && h==0)
-        {
-                id = GfuiGrButtonCreate(menuHandle,
-                                        pszDisabledImage,pszEnabledImage,pszFocusedImage,pszPushedImage,
-                                        x,y,alignment,GFUI_MOUSE_UP,
-                                        userData,onpush,
-                                        userDataOnFocus,onFocus,onFocusLost);
-        }
-        else
-        {
-                id = GfuiGrButtonCreateEx(menuHandle,
-                                          pszDisabledImage,pszEnabledImage,pszFocusedImage,pszPushedImage,
-                                          x,y,w,h,alignment,GFUI_MOUSE_UP,
-                                          userData,onpush,
-                                          userDataOnFocus,onFocus,onFocusLost);
-        }
+		int id = GfuiGrButtonCreate(menuHandle,
+									pszDisabledImage,pszEnabledImage,pszFocusedImage,pszPushedImage,
+									x,y,w,h,alignment,GFUI_MOUSE_UP,
+									userData,onpush,
+									userDataOnFocus,onFocus,onFocusLost);
 
         return id;
 }
@@ -768,13 +755,19 @@ CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,void
 		onFocusLost = remInfo;
 	}
 
+	const float* aColor = 0;
+	Color color;
+	if (GetColorFromXML(param, strControlName.c_str(), "color", color))
+		aColor = color.GetPtr();
+	
+	const float* aFocusColor = 0;
+	Color focusColor;
+	if (GetColorFromXML(param, strControlName.c_str(), "focuscolor", focusColor))
+		aFocusColor = focusColor.GetPtr();
+	
 	id = GfuiComboboxCreate(menuHandle, textsize, x, y, width, align, 0, pszText,
+							aColor, aFocusColor,
 							userData, onChange, userDataOnFocus, onFocus, onFocusLost);
-
-	Color c;
-	bool bColor = GetColorFromXML(param,pControlName,"color",c);
-	if(bColor)
-		GfuiComboboxSetTextColor(menuHandle,id,c);
 
 	return id;
 }

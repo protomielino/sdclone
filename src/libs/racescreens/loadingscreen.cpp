@@ -91,8 +91,8 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
     for (i = 0, y = 400; i < NbTextLines; i++, y -= 16) {
 	FGColors[i][0] = FGColors[i][1] = FGColors[i][2] = 1.0;
 	FGColors[i][3] = (float)i * 0.0421 + 0.2;
-	TextLineIds[i] = GfuiLabelCreateEx(MenuHandle, "", FGColors[i], GFUI_FONT_MEDIUM_C, 60, y, 
-									   GFUI_ALIGN_HL_VB, 100);
+	TextLineIds[i] = GfuiLabelCreate(MenuHandle, "", GFUI_FONT_MEDIUM_C, 60, y, 
+									 GFUI_ALIGN_HL_VB, 100, FGColors[i]);
 	if (TextLines[i]) {
 	    /* free old text */
 	    free(TextLines[i]);

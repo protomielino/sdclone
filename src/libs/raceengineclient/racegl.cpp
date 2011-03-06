@@ -398,12 +398,8 @@ ReResScreenInit(void)
     for (i = 0; i < NMaxResultLines; i++) {
 	FREEZ(reResMsg[i]);
 	reResMsgClr[i] = 0;
-	reResMsgId[i] = GfuiLabelCreateEx(reResScreenHdle,
-					  "",
-					  white,
-					  GFUI_FONT_MEDIUM_C,
-					  20, y, 
-					  GFUI_ALIGN_HL_VB, 120);
+	reResMsgId[i] = GfuiLabelCreate(reResScreenHdle, "", GFUI_FONT_MEDIUM_C, 20, y, 
+									GFUI_ALIGN_HL_VB, 120, white);
 	y -= dy;
     }
 

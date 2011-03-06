@@ -144,6 +144,15 @@ ReRaceSelectInit(void *prevMenu)
 		// Get the racemanagers with this type
 		const std::vector<GfRaceManager*> vecRaceMans =
 			GfRaceManagers::self()->getRaceManagersWithType(itRaceManType->c_str());
+		GfLogDebug("ReRaceSelectInit : Type %s (%u)\n", itRaceManType->c_str(), vecRaceMans.size());
+
+		// Create the race manager type button.
+		std::string strButtonCtrlName(*itRaceManType);
+		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
+		strButtonCtrlName += "Button";
+		int n = CreateButtonControl(reRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
+							(void*)(itRaceManType - vecRaceManTypes.begin()), reOnSelectRaceMan);
+		GfLogDebug("CreateButtonControl(%d, '%s')\n", n, strButtonCtrlName.c_str());
 
 		// Look for sub-types : if any, we have a sub-type combo box for this type.
 		bool bCreateCombo = false;
@@ -157,35 +166,32 @@ ReRaceSelectInit(void *prevMenu)
 			}
 		}
 
-		if (bCreateCombo)
-		{
+		if (!bCreateCombo)
+			continue;
+		
 			// Create the race manager sub-type combo-box.
-			std::string strComboCtrlName(*itRaceManType);
-			strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
-			strComboCtrlName += "Combo";
-			reMapSubTypeComboIds[*itRaceManType] =
-				CreateComboboxControl(reRaceSelectHandle, hMenuXMLDesc,
-									  strComboCtrlName.c_str(), 0, reOnChangeRaceMan);
+		std::string strComboCtrlName(*itRaceManType);
+		strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
+		strComboCtrlName += "Combo";
+		reMapSubTypeComboIds[*itRaceManType] =
+			CreateComboboxControl(reRaceSelectHandle, hMenuXMLDesc,
+								  strComboCtrlName.c_str(), 0, reOnChangeRaceMan);
+		GfLogDebug("CreateComboboxControl(%d, '%s')\n", reMapSubTypeComboIds[*itRaceManType], strComboCtrlName.c_str());
 
-			// Add one item in the combo for each race manager of this type.
-			for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
-				GfuiComboboxAddText(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType],
-									(*itRaceMan)->getSubType().c_str());
-
-			// Select the first one by default.
-			GfuiComboboxSetPosition(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], 0);
-
-			// Disable combo if only one race manager.
-			if (vecRaceMans.size() == 1)
-				GfuiEnable(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
+		// Add one item in the combo for each race manager of this type.
+		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
+		{
+			GfuiComboboxAddText(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType],
+								(*itRaceMan)->getSubType().c_str());
+			GfLogDebug("ReRaceSelectInit : SubType %s : \n", (*itRaceMan)->getSubType().c_str());
 		}
 
-		// Create the race manager type button.
-		std::string strButtonCtrlName(*itRaceManType);
-		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
-		strButtonCtrlName += "Button";
-		CreateButtonControl(reRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
-							(void*)(itRaceManType - vecRaceManTypes.begin()), reOnSelectRaceMan);
+		// Select the first one by default.
+		GfuiComboboxSetPosition(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], 0);
+
+		// Disable combo if only one race manager.
+		if (vecRaceMans.size() == 1)
+			GfuiEnable(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
 	}
 	
     // Create Back button

@@ -15,21 +15,22 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <cstring>
+
 #ifdef WIN32
 #include <windows.h>
 #endif
+
 #include <SDL/SDL.h>
-#include "tgfclient.h"
+
 #include "gui.h"
-#include "guifont.h"
+
 
 void
 gfuiComboboxInit(void)
 {
 }
-
 
 static void
 gfuiLeftArrow(void *idv)
@@ -38,20 +39,21 @@ gfuiLeftArrow(void *idv)
     tGfuiCombobox	*combobox;
 
     object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (object == NULL) {
-	return;
-    }
+    if (!object)
+		return;
 
 	combobox = &(object->u.combobox);
 
-	if (combobox->pInfo->nPos>0)
+	if (combobox->pInfo->vecChoices.empty())
+		return;
+	
+	if (combobox->pInfo->nPos > 0)
 		combobox->pInfo->nPos--;
 	else
-		combobox->pInfo->nPos = combobox->pInfo->vecChoices.size()-1;
+		combobox->pInfo->nPos = combobox->pInfo->vecChoices.size() - 1;
 
-	if (combobox->pInfo->vecChoices.size()>0)
-		GfuiLabelSetText(combobox->scr, combobox->labelId,
-						 combobox->pInfo->vecChoices[combobox->pInfo->nPos].c_str());
+	gfuiLabelSetText(&combobox->label,
+					 combobox->pInfo->vecChoices[combobox->pInfo->nPos].c_str());
 	
 	if (combobox->onChange)
 		combobox->onChange(combobox->pInfo);
@@ -64,20 +66,21 @@ gfuiRightArrow(void *idv)
     tGfuiCombobox	*combobox;
 
     object = gfuiGetObject(GfuiScreen, (long)idv);
-    if (object == NULL) {
-	return;
-    }
+    if (!object)
+		return;
 
 	combobox = &(object->u.combobox);
-	combobox->pInfo->nPos++;
-
-	unsigned int max = combobox->pInfo->vecChoices.size()-1; 
-	if (combobox->pInfo->nPos>max)
-		combobox->pInfo->nPos = 0;
 	
-	if (combobox->pInfo->vecChoices.size()>0)
-		GfuiLabelSetText(combobox->scr, combobox->labelId,
-						 combobox->pInfo->vecChoices[combobox->pInfo->nPos].c_str());
+	if (combobox->pInfo->vecChoices.empty())
+		return;
+	
+	if (combobox->pInfo->nPos < combobox->pInfo->vecChoices.size() - 1)
+		combobox->pInfo->nPos++;
+	else
+		combobox->pInfo->nPos = 0;
+
+	gfuiLabelSetText(&combobox->label,
+					 combobox->pInfo->vecChoices[combobox->pInfo->nPos].c_str());
 	
 	if (combobox->onChange)
 		combobox->onChange(combobox->pInfo);
@@ -86,138 +89,136 @@ gfuiRightArrow(void *idv)
 int
 GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 				   int align, int style, const char *pszText,
+				   const float *fgColor, const float *fgFocusColor,
 				   void *userData, tfuiComboboxCallback onChange, 
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiCombobox	*combobox;
+    tGfuiLabel	*label;
+    tGfuiGrButton	*leftButton, *rightButton;
     tGfuiObject		*object;
     tGfuiScreen		*screen = (tGfuiScreen*)scr;
   
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
 	object->widget = GFUI_COMBOBOX;
-	object->focusMode = GFUI_FOCUS_NONE; // Children controls take care of this.
+	object->focusMode = GFUI_FOCUS_MOUSE_MOVE;
     object->id = screen->curId++;
     object->visible = 1;
 
 	combobox = &(object->u.combobox);
+	
+    combobox->userDataOnFocus = userDataOnFocus;
+    combobox->onFocus = onFocus;
+    combobox->onFocusLost = onFocusLost;
 	combobox->onChange = onChange;
+	
     combobox->pInfo = new tComboBoxInfo;
 	combobox->pInfo->nPos = 0;
 	combobox->pInfo->userData = userData;
 	combobox->scr = scr;
 
-	int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
+	const int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 	
     switch (align) {
-    case GFUI_ALIGN_HR_VB:
-	object->xmin = x - width;
-	object->xmax = x;
-	object->ymin = y;
-	object->ymax = y + height;
-	break;
-    case GFUI_ALIGN_HR_VC:
-	object->xmin = x - width;
-	object->xmax = x;
-	object->ymin = y - height / 2;
-	object->ymax = y + height / 2;
-	break;
-    case GFUI_ALIGN_HR_VT:
-	object->xmin = x - width;
-	object->xmax = x;
-	object->ymin = y - height;
-	object->ymax = y;
-	break;
-    case GFUI_ALIGN_HC_VB:
-	object->xmin = x - width / 2;
-	object->xmax = x + width / 2;
-	object->ymin = y;
-	object->ymax = y + height;
-	break;
-    case GFUI_ALIGN_HC_VC:
-	object->xmin = x - width / 2;
-	object->xmax = x + width / 2;
-	object->ymin = y - height / 2;
-	object->ymax = y + height / 2;
-	break;
-    case GFUI_ALIGN_HC_VT:
-	object->xmin = x - width / 2;
-	object->xmax = x + width / 2;
-	object->ymin = y - height;
-	object->ymax = y;
-	break;
-    case GFUI_ALIGN_HL_VB:
-	object->xmin = x;
-	object->xmax = x + width;
-	object->ymin = y;
-	object->ymax = y + height;
-	break;
-    case GFUI_ALIGN_HL_VC:
-	object->xmin = x;
-	object->xmax = x + width;
-	object->ymin = y - height / 2;
-	object->ymax = y + height / 2;
-	break;
-    case GFUI_ALIGN_HL_VT:
-	object->xmin = x;
-	object->xmax = x + width;
-	object->ymin = y - height;
-	object->ymax = y;
-	break;
-    default:
-	break;
+		case GFUI_ALIGN_HR_VB:
+			object->xmin = x - width;
+			object->xmax = x;
+			object->ymin = y;
+			object->ymax = y + height;
+			break;
+		case GFUI_ALIGN_HR_VC:
+			object->xmin = x - width;
+			object->xmax = x;
+			object->ymin = y - height / 2;
+			object->ymax = y + height / 2;
+			break;
+		case GFUI_ALIGN_HR_VT:
+			object->xmin = x - width;
+			object->xmax = x;
+			object->ymin = y - height;
+			object->ymax = y;
+			break;
+		case GFUI_ALIGN_HC_VB:
+			object->xmin = x - width / 2;
+			object->xmax = x + width / 2;
+			object->ymin = y;
+			object->ymax = y + height;
+			break;
+		case GFUI_ALIGN_HC_VC:
+			object->xmin = x - width / 2;
+			object->xmax = x + width / 2;
+			object->ymin = y - height / 2;
+			object->ymax = y + height / 2;
+			break;
+		case GFUI_ALIGN_HC_VT:
+			object->xmin = x - width / 2;
+			object->xmax = x + width / 2;
+			object->ymin = y - height;
+			object->ymax = y;
+			break;
+		case GFUI_ALIGN_HL_VB:
+			object->xmin = x;
+			object->xmax = x + width;
+			object->ymin = y;
+			object->ymax = y + height;
+			break;
+		case GFUI_ALIGN_HL_VC:
+			object->xmin = x;
+			object->xmax = x + width;
+			object->ymin = y - height / 2;
+			object->ymax = y + height / 2;
+			break;
+		case GFUI_ALIGN_HL_VT:
+			object->xmin = x;
+			object->xmax = x + width;
+			object->ymin = y - height;
+			object->ymax = y;
+			break;
+		default:
+			break;
     }
 
-	// Create label control.
-	int xm = object->xmin + (object->xmax-object->xmin)/2;
-	int ym = object->ymin + (object->ymax-object->ymin)/2;
+	// Initialize the label child.
+	int xm = object->xmin + (object->xmax - object->xmin) / 2;
+	int ym = object->ymin + (object->ymax - object->ymin) / 2;
 
-	combobox->labelId =
-		GfuiLabelCreateEx(scr, pszText, 0, font, xm, ym, GFUI_ALIGN_HC_VC, 99,
-						  userDataOnFocus, onFocus, onFocusLost);
+	gfuiLabelInit(&combobox->label, pszText, 100, xm, ym, GFUI_ALIGN_HC_VC, 0,
+				  font, 0, fgColor, 0, fgFocusColor, 0, 0, 0);
 
-	// Create the left arrow button control.
-    combobox->leftButtonId =
-		GfuiGrButtonCreate(scr, "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
-						   "data/img/arrow-left.png", "data/img/arrow-left-pushed.png",
-						   object->xmin, ym, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-						   (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
+	// Initialize the left and right arrow button children.
+	// TODO: Make graphic properties XML-customizable (images, ...)
+	gfuiGrButtonInit(&combobox->leftButton,
+					 "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
+					 "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
+					 object->xmin, ym, GFUI_ALIGN_HL_VC, 0, 0, GFUI_MOUSE_UP,
+					 (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
+	gfuiGrButtonInit(&combobox->rightButton,
+					 "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
+					 "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
+					 object->xmax, ym, GFUI_ALIGN_HR_VC, 0, 0, GFUI_MOUSE_UP,
+					 (void*)(object->id), gfuiRightArrow, 0, 0, 0);
 
-	// Create the right arrow button control.
-    combobox->rightButtonId =
-		GfuiGrButtonCreate(scr, "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
-						   "data/img/arrow-right.png", "data/img/arrow-right-pushed.png",
-						   object->xmax, ym, GFUI_ALIGN_HR_VC, GFUI_MOUSE_UP,
-						   (void*)(object->id), gfuiRightArrow, 0, 0, 0);
-
+	// Add the combo control to the display list.
     gfuiAddObject(screen, object);
 	
     return object->id;
 }
 
-
-
 void
 gfuiDrawCombobox(tGfuiObject *obj)
 {
-//Do nothing because children already draw themselves
+	gfuiLabelDraw(&obj->u.combobox.label, obj->focus);
+	gfuiGrButtonDraw(&obj->u.combobox.leftButton, obj->state, obj->focus);
+	gfuiGrButtonDraw(&obj->u.combobox.rightButton, obj->state, obj->focus);
 }
 
 static tGfuiCombobox*
 gfuiGetCombobox(void *scr, int id)
 {
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    tGfuiObject* curObject = screen->objects;
+    tGfuiObject* object = gfuiGetObject(scr, id);
 
-    if (curObject)
-	{
-		do
-		{
-			curObject = curObject->next;
-			if (curObject->id == id && curObject->widget == GFUI_COMBOBOX)
-					return &(curObject->u.combobox);
-		}
-		while (curObject != screen->objects);
-    }
+    if (object && object->widget == GFUI_COMBOBOX)
+		return &(object->u.combobox);
 
 	return 0;
 }
@@ -226,13 +227,14 @@ unsigned int
 GfuiComboboxAddText(void *scr, int id, const char *text)
 {
 	unsigned int index = 0;
-	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
-    if (combo)
+    tGfuiObject* object = gfuiGetObject(scr, id);
+
+    if (object && object->widget == GFUI_COMBOBOX)
 	{
+		tGfuiCombobox* combo = &(object->u.combobox);
 		combo->pInfo->vecChoices.push_back(text);
 		index = combo->pInfo->vecChoices.size();
-		GfuiLabelSetText(combo->scr, combo->labelId,
+		gfuiLabelSetText(&combo->label,
 						 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
     }
 
@@ -242,23 +244,30 @@ GfuiComboboxAddText(void *scr, int id, const char *text)
 void
 GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index)
 {
-	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
-    if (combo && index < combo->pInfo->vecChoices.size())
+    tGfuiObject* object = gfuiGetObject(scr, id);
+
+    if (object && object->widget == GFUI_COMBOBOX)
 	{
-		combo->pInfo->nPos = index;
-		GfuiLabelSetText(combo->scr, combo->labelId,
-						 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
+		tGfuiCombobox* combo = &(object->u.combobox);
+		if (index < combo->pInfo->vecChoices.size())
+		{
+			combo->pInfo->nPos = index;
+			gfuiLabelSetText(&combo->label,
+							 combo->pInfo->vecChoices[combo->pInfo->nPos].c_str());
+		}
 	}
 }
 
 void
 GfuiComboboxSetTextColor(void *scr, int id, const Color& color)
 {
-	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
-    if (combo)
-		GfuiLabelSetColor(combo->scr, combo->labelId, color.GetPtr());
+    tGfuiObject* object = gfuiGetObject(scr, id);
+
+    if (object && object->widget == GFUI_COMBOBOX)
+	{
+		tGfuiCombobox* combo = &(object->u.combobox);
+		gfuiLabelSetColor(&combo->label, color.GetPtr());
+	}
 }
 
 
@@ -315,19 +324,64 @@ GfuiComboboxGetNumberOfChoices(void *scr, int id)
 void
 GfuiComboboxClear(void *scr, int id)
 {
-	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
-    if (combo)
+    tGfuiObject* object = gfuiGetObject(scr, id);
+
+    if (object && object->widget == GFUI_COMBOBOX)
 	{
+		tGfuiCombobox* combo = &(object->u.combobox);
 		combo->pInfo->nPos = 0;
 		combo->pInfo->vecChoices.clear();
-		GfuiLabelSetText(combo->scr, combo->labelId, "");
+		gfuiLabelSetText(&combo->label, "");
 	}
 }
+
+/** Handles the button action.
+    @ingroup	gui
+    @param	action	action
+ */
+void
+gfuiComboboxAction(int action)
+{
+	if (GfuiScreen->hasFocus->state == GFUI_DISABLE) 
+		return;
+
+	tGfuiCombobox* combo = &(GfuiScreen->hasFocus->u.combobox);
+
+	if (action == 2) { /* enter key */
+		if (gfuiGrButtonMouseIn(&combo->leftButton)) {
+			if (combo->leftButton.onPush)
+				combo->leftButton.onPush(combo->leftButton.userDataOnPush);
+		} else if (gfuiGrButtonMouseIn(&combo->rightButton)) {
+			if (combo->rightButton.onPush)
+				combo->rightButton.onPush(combo->rightButton.userDataOnPush);
+		}
+	} else if (action == 1) { /* mouse up */
+		if (gfuiGrButtonMouseIn(&combo->leftButton)) {
+			combo->leftButton.state = GFUI_BTN_RELEASED;
+			if (combo->leftButton.mouseBehaviour == GFUI_MOUSE_UP && combo->leftButton.onPush)
+				combo->leftButton.onPush(combo->leftButton.userDataOnPush);
+		} else if (gfuiGrButtonMouseIn(&combo->rightButton)) {
+			combo->rightButton.state = GFUI_BTN_RELEASED;
+			if (combo->rightButton.mouseBehaviour == GFUI_MOUSE_UP && combo->rightButton.onPush)
+				combo->rightButton.onPush(combo->rightButton.userDataOnPush);
+		}
+	} else { /* mouse down */
+		if (gfuiGrButtonMouseIn(&combo->leftButton)) {
+			combo->leftButton.state = GFUI_BTN_PUSHED;
+			if (combo->leftButton.mouseBehaviour == GFUI_MOUSE_DOWN && combo->leftButton.onPush)
+				combo->leftButton.onPush(combo->leftButton.userDataOnPush);
+		} else if (gfuiGrButtonMouseIn(&combo->rightButton)) {
+			combo->rightButton.state = GFUI_BTN_PUSHED;
+			if (combo->rightButton.mouseBehaviour == GFUI_MOUSE_DOWN && combo->rightButton.onPush)
+				combo->rightButton.onPush(combo->rightButton.userDataOnPush);
+		}
+	}
+}//gfuiComboboxAction
 
 void
 gfuiReleaseCombobox(tGfuiObject *obj)
 {
 	delete obj->u.combobox.pInfo;
+	freez(obj->u.combobox.userDataOnFocus);
     free(obj);
 }

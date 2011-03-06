@@ -162,17 +162,17 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageh
     }
 
 	Checkbox->checkId =
-		GfuiGrButtonCreateEx(scr, "data/img/checked.png", "data/img/checked.png",
-							 "data/img/checked.png", "data/img/checked.png",
-							 x,y,imagewidth,imageheight, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-							 (void*)(object->id), gfuiChecked,
-							 userDataOnFocus, onFocus, onFocusLost);
+		GfuiGrButtonCreate(scr, "data/img/checked.png", "data/img/checked.png",
+						   "data/img/checked.png", "data/img/checked.png",
+						   x, y, imagewidth, imageheight, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
+						   (void*)(object->id), gfuiChecked,
+						   userDataOnFocus, onFocus, onFocusLost);
 
 	Checkbox->uncheckId =
-		GfuiGrButtonCreateEx(scr, "data/img/unchecked.png", "data/img/unchecked.png",
-							 "data/img/unchecked.png", "data/img/unchecked.png",
-							 x,y, imagewidth,imageheight,GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
-							 (void*)(object->id), gfuiUnchecked, 0, 0, 0);
+		GfuiGrButtonCreate(scr, "data/img/unchecked.png", "data/img/unchecked.png",
+						   "data/img/unchecked.png", "data/img/unchecked.png",
+						   x, y, imagewidth, imageheight, GFUI_ALIGN_HL_VC, GFUI_MOUSE_UP,
+						   (void*)(object->id), gfuiUnchecked, 0, 0, 0);
 	// We avoid sharing the same userDataOnFocus among multiple controls (otherwise multiple frees).
 
     gfuiAddObject(screen, object);
