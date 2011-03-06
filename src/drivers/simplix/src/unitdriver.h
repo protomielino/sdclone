@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2010.11.04
+// Last changed : 2011.03.06
 // Copyright    : © 2007-2010 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -290,6 +290,7 @@ private:
 	double oClutchDelta;
 	double oClutchRange;
 	double oClutchRelease;
+	double oEarlyShiftFactor;
 	double oCurrSpeed;                           // Currend speed
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
 	int oExtended;                               // Information if this robot is extended (oExtended = 1) or not (oExtended = 0).

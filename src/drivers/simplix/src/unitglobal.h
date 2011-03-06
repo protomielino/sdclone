@@ -9,7 +9,7 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2011.02.13
+// Last changed : 2011.03.06
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.00.000
@@ -21,17 +21,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
-// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
+// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
+// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #ifndef _UNITGOBAL_H_
 #define _UNITGOBAL_H_
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 115
+#define RL_VERSION 116
 //==========================================================================*
 
 //==========================================================================*
@@ -485,6 +485,7 @@ enum
 #define PRV_CLUTCH_DELTA     "clutch delta"      // default 0.05
 #define PRV_CLUTCH_RANGE     "clutch range"      // default 0.82
 #define PRV_CLUTCH_RELEASE   "clutch release"    // default 0.4
+#define PRV_EARLY_SHIFT      "early shift"       // default 1.0
 
 #define PRV_TEAM_ENABLE      "team enable"       // default 1
 

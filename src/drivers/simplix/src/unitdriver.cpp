@@ -238,6 +238,7 @@ TDriver::TDriver(int Index):
   oClutchDelta(0.009),
   oClutchRange(0.82),
   oClutchRelease(0.5),
+  oEarlyShiftFactor(1.0),
   oCurrSpeed(0),
   // oGearEff,
   oExtended(0),
@@ -721,6 +722,11 @@ void TDriver::AdjustDriving(
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_CLUTCH_RELEASE,0,
 	(float)oClutchRelease);
   //GfOut("#oClutchRelease %g\n",oClutchRelease);
+
+  oEarlyShiftFactor =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_EARLY_SHIFT,0,
+	(float)oEarlyShiftFactor);
+  //GfOut("#oEarlyShiftFactor %g\n",oEarlyShiftFactor);
 
   oTeamEnabled =
     GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_TEAM_ENABLE,0,
@@ -2035,6 +2041,8 @@ void TDriver::Clutching()
 	  {
         oClutch = oClutchMax - 0.01;
 	  }
+	  else
+  	    oClutch -= oClutchDelta/10;
 	}
 	else
 	{
@@ -2281,10 +2289,12 @@ void TDriver::InitAdaptiveShiftLevels()
 			}
 		}
 
-        if ((TqNext > Tq ) && (Rpm*RpmFactor > 2000))
+        if ((TqNext > oEarlyShiftFactor * Tq ) && (Rpm*RpmFactor > 2000))
 		{
           ToRpm[J] = RpmNext;
 		  oShift[J] = Rpm * 0.98;
+		  GfOut("#TqNext > Tq\n");
+  		  GfOut("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
 		  break;
 		}
  	    Rpm += 1;
@@ -2292,9 +2302,10 @@ void TDriver::InitAdaptiveShiftLevels()
 
   }
   
+  //GfOut("\n#Gear change summary:\n");
   //for (J = 1; J < oLastGear; J++)
   //  GfOut("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
-  //J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
+  //    J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
 
   free(DataPoints);
   free(Edesc);
