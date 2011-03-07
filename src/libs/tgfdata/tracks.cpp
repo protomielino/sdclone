@@ -139,13 +139,13 @@ GfTracks::GfTracks()
 				strPreviewFileName = ossFileName.str();
 			}
 			if (!GfFileExists(strPreviewFileName.c_str()))
-				strPreviewFileName = "data/img/splash-racemanmenu.jpg";
+				strPreviewFileName = "data/img/splash-trackselect.jpg";
 			
 			ossFileName.str("");
 			ossFileName << "tracks/" << pszCatId << '/' << pszTrackId << '/' << "outline.png";
 			std::string strOutlineFileName(ossFileName.str());
 			if (!GfFileExists(strOutlineFileName.c_str()))
-				strPreviewFileName = "data/img/transparent.png";
+				strOutlineFileName = "data/img/notrackoutline.png";
 			
 			// Store track info in the GfTrack structure.
 			GfTrack* pTrack = new GfTrack;
