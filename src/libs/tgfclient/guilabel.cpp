@@ -186,8 +186,6 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
 {
     tGfuiLabel	*label;
     tGfuiObject	*object;
-    int 	width;
-    int     height;
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
@@ -201,64 +199,59 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
 				  screen->bgColor.GetPtr(), fgColor, screen->bgColor.GetPtr(), fgFocusColor, 
 				  userDataOnFocus, onFocus, onFocusLost);
 
+	const int width = gfuiFont[font]->getWidth((const char *)text);
+	const int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
+
 	switch(align)
 	{
 		case GFUI_ALIGN_HL_VB:
 			object->xmin = x;
 			object->ymin = y;
-			object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 			break;
 
 		case GFUI_ALIGN_HL_VC:
 			object->xmin = x;
 			object->ymin = y - height / 2;
-			object->ymax = y + height / 2;
 			break;
 
 		case GFUI_ALIGN_HL_VT:
 			object->xmin = x;
 			object->ymin = y;
-			object->ymax = y + height;
 			break;
 
 		case GFUI_ALIGN_HC_VB:
 			object->xmin = x - width / 2;
 			object->ymin = y;
-			object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 			break;
 
 		case GFUI_ALIGN_HC_VC:
 			object->xmin = x - width / 2;
 			object->ymin = y - height / 2;
-			object->ymax = y + height /2;
 			break;
 
 		case GFUI_ALIGN_HC_VT:
 			object->xmin = x - width / 2;
 			object->ymin = y;
-			object->ymax = y+ height;
 			break;
 
 		case GFUI_ALIGN_HR_VB:
 			object->xmin = x - width;
 			object->ymin = y;
-			object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
 			break;
 
 		case GFUI_ALIGN_HR_VC:
 			object->xmin = x - width;
 			object->ymin = y - height / 2;
-			object->ymax = y + height / 2;
 			break;
 
 		case GFUI_ALIGN_HR_VT:
 			object->xmin = x - width;
 			object->ymin = y;
-			object->ymax = y + height;
 			break;
 	}
 
 	object->xmax = object->xmin + width;
+	object->ymax = object->ymin + height;
 
     gfuiAddObject(screen, object);
 
