@@ -94,8 +94,6 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiCombobox	*combobox;
-    tGfuiLabel	*label;
-    tGfuiGrButton	*leftButton, *rightButton;
     tGfuiObject		*object;
     tGfuiScreen		*screen = (tGfuiScreen*)scr;
   

@@ -170,7 +170,6 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
     tGfuiGrButton	*button;
     tGfuiObject		*object;
     tGfuiScreen		*screen = (tGfuiScreen*)scr;
-    int			w, h;
     
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
     object->widget = GFUI_GRBUTTON;
@@ -338,7 +337,6 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
 				 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiButton	*button;
-    tGfuiLabel	*label;
     tGfuiObject	*object;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
 
