@@ -14,7 +14,7 @@ ENDIF(COMMAND cmake_policy)
 
 ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
-ADD_SDLIB_LIBRARY(speed-dreams-2 client confscreens learning raceengineclient racescreens tgf tgfclient)
+ADD_SDLIB_LIBRARY(speed-dreams-2 client confscreens learning raceengine racescreens tgf tgfclient)
 
 ADD_PLIB_LIBRARY(speed-dreams-2 sg ul)
 ADD_DL_LIBRARY(speed-dreams-2)

@@ -38,16 +38,16 @@ IF (COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-ADD_LIBRARY(raceengineclient SHARED ${RACEENGINE_SOURCES})
+ADD_LIBRARY(raceengine SHARED ${RACEENGINE_SOURCES})
 
-ADD_SDLIB_LIBRARY(raceengineclient
+ADD_SDLIB_LIBRARY(raceengine
                   tgf tgfclient tgfdata robottools
                   racescreens networking)
 
 IF(WIN32)
-    SD_INSTALL_FILES(BIN TARGETS raceengineclient)
+    SD_INSTALL_FILES(BIN TARGETS raceengine)
 ELSE(WIN32)
-    SD_INSTALL_FILES(LIB lib TARGETS raceengineclient)
+    SD_INSTALL_FILES(LIB lib TARGETS raceengine)
 ENDIF(WIN32)
 
 SD_INSTALL_FILES(DATA config FILES raceresults.xsl)

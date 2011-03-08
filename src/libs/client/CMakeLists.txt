@@ -14,7 +14,7 @@ ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(confscreens tgf tgfclient raceengineclient racescreens math)
+ADD_SDLIB_INCLUDEDIR(confscreens tgf tgfclient raceengine racescreens math)
 ADD_SDL_INCLUDEDIR()
 ADD_ENET_INCLUDEDIR()
 
@@ -31,7 +31,7 @@ ENDIF(WIN32)
 ADD_LIBRARY(client SHARED ${CLIENT_SOURCES})
 
 ADD_SDLIB_LIBRARY(client 
-                  tgfclient robottools confscreens raceengineclient racescreens)
+                  tgfclient robottools confscreens raceengine racescreens)
 
 ADD_OPENGL_LIBRARY(client)
 ADD_SDL_LIBRARY(client)
