@@ -31,12 +31,12 @@
 #include <portability.h>
 #include <tgfclient.h>
 
-#include <racescreens.h>
-
 #include <robot.h>
 
+#include <racescreens.h>
+#include <racegl.h>
+
 #include "racesituation.h"
-#include "racegl.h"
 #include "racestate.h"
 #include "raceresults.h"
 

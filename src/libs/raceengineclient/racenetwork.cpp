@@ -25,8 +25,9 @@
 #include <network.h>
 #include <tgfclient.h>
 
+#include <racegl.h>
+
 #include "racesituation.h"
-#include "racegl.h"
 #include "racenetwork.h"
 
 

@@ -41,11 +41,11 @@
 #include <race.h>
 
 #include <racescreens.h>
+#include <racegl.h>
 
 #include "racesituation.h"
 #include "racemain.h"
 #include "racestate.h"
-#include "racegl.h"
 #include "raceresults.h"
 #include "racecareer.h"
 

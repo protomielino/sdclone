@@ -34,14 +34,15 @@
 #include <tgfclient.h>
 #include <robot.h>
 #include <raceman.h>
-#include <racescreens.h>
 
-#include "racegl.h"
+#include <racescreens.h>
+#include <racegl.h>
+#include <racemessage.h>
+
 #include "raceresults.h"
 #include "racesimusimu.h"
 
 #include "racesituation.h"
-#include "racemessage.h"
 #include "racenetwork.h"
 #include "racecars.h"
 #include "raceupdate.h"

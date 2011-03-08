@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
  
-#include <iraceengine.h>
+#include "racescreens.h"
 
 
 static IRaceEngine* rmPRaceEngine;

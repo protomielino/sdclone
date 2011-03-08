@@ -24,9 +24,10 @@
 */
 
 #include <tgf.h>
-#include "raceutil.h"
 
 #include <robot.h>
+
+#include "raceutil.h"
 
 
 // TODO: When the race engine will have been moved to using tgfdata (it is not at present),

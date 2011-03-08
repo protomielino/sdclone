@@ -28,17 +28,16 @@
 #include <robot.h>
 #include <network.h>
 
-#include <racescreens.h>
+#include <raceenginemenus.h>
+#include <racegl.h>
 
 #include "raceutil.h" // RmGetFeaturesList
 #include "racesituation.h"
 #include "racecareer.h"
 #include "raceinit.h"
 #include "raceupdate.h"
-#include "racegl.h"
 #include "raceresults.h"
 #include "racestate.h"
-#include "raceenginemenus.h"
 #include "racetrack.h" // ReTrackInit, ReTrackUpdate
 
 #include "teammanager.h"

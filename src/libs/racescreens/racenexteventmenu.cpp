@@ -31,7 +31,7 @@
 #include <raceman.h>
 #include <tgfclient.h>
 
-#include "racescreens.h"
+#include "raceenginemenus.h"
 
 
 // New track menu.

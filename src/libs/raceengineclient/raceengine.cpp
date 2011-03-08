@@ -84,7 +84,7 @@ void RaceEngine::configureRace(bool bInteractive)
 
 GfRace* RaceEngine::race()
 {
-	::ReGetRace();
+	return ::ReGetRace();
 }
 
 // From racestate

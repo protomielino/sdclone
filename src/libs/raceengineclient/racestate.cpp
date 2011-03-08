@@ -31,15 +31,15 @@
 #include <raceman.h>
 
 #include <racescreens.h>
+#include <racegl.h>
+#include <raceenginemenus.h>
 
 #include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
 #include "racenetwork.h"
 #include "raceupdate.h"
-#include "racegl.h"
 #include "raceresults.h"
-#include "raceenginemenus.h"
 
 #include "racestate.h"
 

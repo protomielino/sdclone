@@ -32,11 +32,12 @@
 #include <robot.h>
 #include <robottools.h>
 
+#include <racemessage.h>
+#include <racegl.h>
+
 #include "racesituation.h"
-#include "racemessage.h"
 #include "raceupdate.h"
 #include "raceresults.h"
-#include "racegl.h"
 #include "racecars.h"
 
 
