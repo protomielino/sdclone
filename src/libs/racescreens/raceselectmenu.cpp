@@ -33,10 +33,7 @@
 #include <racemanagers.h>
 #include <race.h>
 
-#include "racesituation.h"
-#include "racemain.h"
-#include "raceinit.h"
-#include "racestate.h"
+#include "racescreens.h"
 #include "raceselectmenu.h"
 
 
@@ -52,8 +49,8 @@ reOnActivate(void * /* dummy */)
 	GfLogTrace("Entering Race Mode Select menu\n");
 
     /* Race engine init */
-    ReInit();
-    ReInfo->_reMenuScreen = reRaceSelectHandle;
+    RmRaceEngine().initialize();
+    RmRaceEngine().data()->_reMenuScreen = reRaceSelectHandle;
 }
 
 /* Exit from Race engine */
@@ -61,7 +58,7 @@ static void
 reOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
-    ReShutdown();
+    RmRaceEngine().shutdown();
 }
 
 
@@ -100,13 +97,13 @@ reOnSelectRaceMan(void *pvRaceManTypeIndex)
 
 	if (pSelRaceMan)
 	{
-		ReRaceSelectRaceman(pSelRaceMan);
+		RmRaceEngine().selectRaceman(pSelRaceMan);
 		
 		// (Re-)initialize the currrent race configuration from the selected race manager.
-		ReGetRace()->load(pSelRaceMan);
+		RmRaceEngine().race()->load(pSelRaceMan);
 
 		// Start the race configuration menus sequence.
-		ReRaceConfigure(/* bInteractive */ true);
+		RmRaceEngine().configureRace(/* bInteractive */ true);
 	}
 	else
 	{
@@ -151,7 +148,8 @@ ReRaceSelectInit(void *prevMenu)
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
 		int n = CreateButtonControl(reRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
-							(void*)(itRaceManType - vecRaceManTypes.begin()), reOnSelectRaceMan);
+									(void*)(itRaceManType - vecRaceManTypes.begin()),
+									reOnSelectRaceMan);
 		GfLogDebug("CreateButtonControl(%d, '%s')\n", n, strButtonCtrlName.c_str());
 
 		// Look for sub-types : if any, we have a sub-type combo box for this type.
@@ -169,7 +167,7 @@ ReRaceSelectInit(void *prevMenu)
 		if (!bCreateCombo)
 			continue;
 		
-			// Create the race manager sub-type combo-box.
+		// Create the race manager sub-type combo-box.
 		std::string strComboCtrlName(*itRaceManType);
 		strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
 		strComboCtrlName += "Combo";
@@ -207,7 +205,7 @@ ReRaceSelectInit(void *prevMenu)
 			   prevMenu, reOnRaceSelectShutdown, NULL);
 
     // Give the race engine the menu to come back to.
-    ReStateInit(reRaceSelectHandle);
+    RmRaceEngine().initializeState(reRaceSelectHandle);
 
     return reRaceSelectHandle;
 }

@@ -27,10 +27,9 @@
 
 #include <portability.h>
 #include <tgfclient.h>
-#include <racescreens.h>
 
+#include "racescreens.h"
 #include "racegl.h"
-
 #include "racemessage.h"
 
 

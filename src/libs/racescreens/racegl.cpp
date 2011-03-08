@@ -27,16 +27,13 @@
 
 #include <portability.h>
 #include <tgfclient.h>
+
 #include <raceman.h>
 #include <robot.h>
 
-#include "racesituation.h"
-#include "racemessage.h"
-#include "racemain.h"
-#include "raceinit.h"
-#include "racestate.h"
-#include "raceupdate.h"
+#include "racescreens.h"
 
+#include "racemessage.h"
 #include "racegl.h"
 
 
@@ -60,7 +57,7 @@ reIdle(void)
 static void
 reDisplay(void)
 {
-    ReStateManage();
+    RmRaceEngine().updateState();
 }
 
 static void
@@ -73,8 +70,9 @@ reScreenActivate(void * /* dummy */)
     GfelSetDisplayCB(reDisplay);
 
 	// Resync race engine if it is not paused or stopped
-    if (!(ReInfo->s->_raceState & RM_RACE_PAUSED)) {
-	ReStart(); 			/* resynchro */
+	tRmInfo* reInfo = RmRaceEngine().data();
+    if (!(reInfo->s->_raceState & RM_RACE_PAUSED)) {
+	RmRaceEngine().start(); 			/* resynchro */
     }
 
     GfelPostRedisplay();
@@ -83,13 +81,14 @@ reScreenActivate(void * /* dummy */)
 static void
 ReBoardInfo(void * /* vboard */)
 {
-    if (ReInfo->s->_raceState & RM_RACE_PAUSED) {
-	ReInfo->s->_raceState &= ~RM_RACE_PAUSED;
-	ReStart();
+	tRmInfo* reInfo = RmRaceEngine().data();
+    if (reInfo->s->_raceState & RM_RACE_PAUSED) {
+	reInfo->s->_raceState &= ~RM_RACE_PAUSED;
+	RmRaceEngine().start();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
     } else {
-	ReInfo->s->_raceState |= RM_RACE_PAUSED;
-	ReStop();
+	reInfo->s->_raceState |= RM_RACE_PAUSED;
+	RmRaceEngine().stop();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 1);
     }
 }
@@ -97,9 +96,10 @@ ReBoardInfo(void * /* vboard */)
 static void
 reSkipPreStart(void * /* dummy */)
 {
-    if (ReInfo->s->currentTime < -1.0) {
-	ReInfo->s->currentTime = -1.0;
-	ReInfo->_reLastTime = -1.0;
+	tRmInfo* reInfo = RmRaceEngine().data();
+    if (reInfo->s->currentTime < -1.0) {
+	reInfo->s->currentTime = -1.0;
+	reInfo->_reLastTime = -1.0;
     }
 }
 
@@ -109,34 +109,36 @@ reTimeMod (void *vcmd)
 	char buf[32];
     long cmd = (long)vcmd;
     
+	tRmInfo* reInfo = RmRaceEngine().data();
     switch ((int)cmd) {
     case 0:
-	ReInfo->_reTimeMult *= 2.0;
-	if (ReInfo->_reTimeMult > 64.0) {
-	    ReInfo->_reTimeMult = 64.0;
+	reInfo->_reTimeMult *= 2.0;
+	if (reInfo->_reTimeMult > 64.0) {
+	    reInfo->_reTimeMult = 64.0;
 	}
 	break;
     case 1:
-	ReInfo->_reTimeMult *= 0.5;
-	if (ReInfo->_reTimeMult < 0.25) {
-	    ReInfo->_reTimeMult = 0.25;
+	reInfo->_reTimeMult *= 0.5;
+	if (reInfo->_reTimeMult < 0.25) {
+	    reInfo->_reTimeMult = 0.25;
 	}
 	break;
     case 2:
     default:
-	ReInfo->_reTimeMult = 1.0;
+	reInfo->_reTimeMult = 1.0;
 	break;
     }
-    sprintf(buf, "Time x%.2f", 1.0 / ReInfo->_reTimeMult);
-    ReRaceMsgSet(ReInfo, buf, 5); // TODO: Thread-safe access to ReInfo in multi-threaded mode !
+    sprintf(buf, "Time x%.2f", 1.0 / reInfo->_reTimeMult);
+    ReRaceMsgSet(reInfo, buf, 5); // TODO: Thread-safe access to reInfo in multi-threaded mode !
 }
 
 static void
 reMovieCapture(void * /* dummy */)
 {
-	tRmMovieCapture	*capture = &(ReInfo->movieCapture);
+	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmMovieCapture	*capture = &(reInfo->movieCapture);
 
-    if (!capture->enabled || ReInfo->_displayMode == RM_DISP_MODE_NONE || ReInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
+    if (!capture->enabled || reInfo->_displayMode == RM_DISP_MODE_NONE || reInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
     {
 	GfLogWarning("Movie capture is not enabled : command ignored\n");
 	return;
@@ -144,15 +146,15 @@ reMovieCapture(void * /* dummy */)
     
     capture->state = 1 - capture->state;
     if (capture->state) {
-	GfOut("Starting movie capture\n");
+	GfLogInfo("Starting movie capture\n");
 	capture->currentFrame = 0;
 	capture->currentCapture++;
 	capture->lastFrame = GfTimeClock() - capture->deltaFrame;
-	ReInfo->_displayMode = RM_DISP_MODE_CAPTURE;
+	reInfo->_displayMode = RM_DISP_MODE_CAPTURE;
     } else {
-	GfOut("Stopping movie capture\n");
-	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	ReStart();
+	GfLogInfo("Stopping movie capture\n");
+	reInfo->_displayMode = RM_DISP_MODE_NORMAL;
+	RmRaceEngine().start();
     }
 
 }
@@ -161,6 +163,18 @@ static void
 reHideShowMouseCursor(void * /* dummy */)
 {
     GfuiMouseToggleVisibility();
+}
+
+static void
+reApplyState(void *pvState)
+{
+    RmRaceEngine().applyState((int)(long)pvState);
+}
+
+static void
+reOneStep(void *pvState)
+{
+    RmRaceEngine().step((int)(long)pvState);
 }
 
 static void
@@ -173,8 +187,8 @@ reAddKeys(void)
     GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, reTimeMod, NULL);
     GfuiAddKey(reScreenHandle, '.', "Restore Real Time", (void*)2, reTimeMod, NULL);
     GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
-    GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
-    /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
+    GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, reApplyState, NULL);
+    /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, reApplyState, NULL); */
     GfuiAddKey(reScreenHandle, ' ', "Skip Pre-start",    (void*)0, reSkipPreStart, NULL);
 #ifdef DEBUG
 	// WARNING: Certainly won't work with multi-threading On/Auto ...
@@ -268,7 +282,7 @@ ReScreenShutdown(void)
 static void
 reHookActivate(void * /* dummy */)
 {
-    ReStateManage();
+    RmRaceEngine().updateState();
 }
 
 void *
@@ -321,8 +335,8 @@ reAddResKeys(void)
     GfuiAddKey(reResScreenHdle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(reResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, ReStateApply, NULL);
-    /* GfuiAddKey(reResScreenHdle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, ReStateApply, NULL); */
+    GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, reApplyState, NULL);
+    /* GfuiAddKey(reResScreenHdle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, reApplyState, NULL); */
 }
 
 static void
@@ -349,7 +363,7 @@ reContDisplay(void)
 static void
 reResCont(void * /* dummy */)
 {
-    ReStateManage();
+    RmRaceEngine().updateState();
 }
 
 static void
@@ -373,6 +387,8 @@ ReResScreenInit(void)
 	GfuiScreenRelease(reResScreenHdle);
     }
 
+	tRmInfo* reInfo = RmRaceEngine().data();
+
     // Create screen, load menu XML descriptor and create static controls.
     reResScreenHdle = GfuiScreenCreateEx(black, 0, reResScreenActivate, 0, reResScreenShutdown, 0);
     void *menuXMLDescHdle = LoadMenuXML("raceblindscreen.xml");
@@ -380,10 +396,10 @@ ReResScreenInit(void)
 
     // Create variable main title (race type/stage) label.
     reResMainTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "title");
-    GfuiLabelSetText(reResScreenHdle, reResMainTitleId, aRaceTypeNames[ReInfo->s->_raceType]);
+    GfuiLabelSetText(reResScreenHdle, reResMainTitleId, aRaceTypeNames[reInfo->s->_raceType]);
 
     // Create background image if any specified.
-    img = GfParmGetStr(ReInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
+    img = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
     if (img) {
 	GfuiScreenAddBgImg(reResScreenHdle, img);
     }
@@ -420,8 +436,9 @@ ReResScreenSetTrackName(const char *pszTrackName)
 {
     if (reResScreenHdle) {
 		char pszTitle[128];
+		tRmInfo* reInfo = RmRaceEngine().data();
 		snprintf(pszTitle, sizeof(pszTitle), "%s on %s",
-				 aRaceTypeNames[ReInfo->s->_raceType], pszTrackName);
+				 aRaceTypeNames[reInfo->s->_raceType], pszTrackName);
 		GfuiLabelSetText(reResScreenHdle, reResMainTitleId, pszTitle);
     }
 }

@@ -1,10 +1,9 @@
 /***************************************************************************
 
-    file        : raceenginemenus.h
-    created     : Fri Jan  3 22:25:02 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    file                 : racescreens.cpp
+    copyright            : (C) 2010 by Jean-Philippe Meuret                        
+    email                : pouillot@users.sourceforge.net   
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -17,28 +16,20 @@
  *                                                                         *
  ***************************************************************************/
  
-/** @file    
-    		
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
-*/
-
-#ifndef _RACEENGINEMENUS_H_
-#define _RACEENGINEMENUS_H_
-
-#include "raceengineclient.h"
+#include <iraceengine.h>
 
 
-RACEENGINECLIENT_API int ReRacemanMenu();
-RACEENGINECLIENT_API int ReNextEventMenu(void);
-RACEENGINECLIENT_API void ReConfigureRace(void * /* dummy */);
-RACEENGINECLIENT_API void ReSetRacemanMenuHandle(void * handle);
+static IRaceEngine* rmPRaceEngine;
 
-extern void* ReGetRacemanMenuHandle();
 
-extern void ReConfigRunState(bool bStart = false);
+void RmSetRaceEngine(IRaceEngine& raceEngine)
+{
+	rmPRaceEngine = &raceEngine;
+}
 
-#endif /* _RACEENGINEMENU_H_ */ 
-
+IRaceEngine& RmRaceEngine()
+{
+	return *rmPRaceEngine;
+}
 
 

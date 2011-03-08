@@ -26,22 +26,25 @@
 #ifndef _RACEGL_H_
 #define _RACEGL_H_
 
-extern void *ReScreenInit(void);
-extern void  ReScreenShutdown(void);
-extern void *ReHookInit(void);
-extern void ReHookShutdown(void);
-extern void ReSetRaceMsg(const char *msg);
-extern void ReSetRaceBigMsg(const char *msg);
+#include "racescreens.h"
 
-extern void *ReResScreenInit(void);
-extern void ReResScreenSetTrackName(const char *trackName);
-extern void ReResScreenSetTitle(const char *title);
-extern void ReResScreenAddText(const char *text);
-extern void ReResScreenSetText(const char *text, int line, int clr);
-extern void ReResScreenRemoveText(int line);
-extern void ReResShowCont(void);
-extern int  ReResGetLines(void);
-extern void ReResEraseScreen(void);
+
+RACESCREENS_API void *ReScreenInit(void);
+RACESCREENS_API void  ReScreenShutdown(void);
+RACESCREENS_API void *ReHookInit(void);
+RACESCREENS_API void ReHookShutdown(void);
+RACESCREENS_API void ReSetRaceMsg(const char *msg);
+RACESCREENS_API void ReSetRaceBigMsg(const char *msg);
+
+RACESCREENS_API void *ReResScreenInit(void);
+RACESCREENS_API void ReResScreenSetTrackName(const char *trackName);
+RACESCREENS_API void ReResScreenSetTitle(const char *title);
+RACESCREENS_API void ReResScreenAddText(const char *text);
+RACESCREENS_API void ReResScreenSetText(const char *text, int line, int clr);
+RACESCREENS_API void ReResScreenRemoveText(int line);
+RACESCREENS_API void ReResShowCont(void);
+RACESCREENS_API int  ReResGetLines(void);
+RACESCREENS_API void ReResEraseScreen(void);
 
 #endif /* _RACEGL_H_ */ 
 

@@ -705,9 +705,9 @@ RestartRaceHookInit(void)
 static void	*QuitHookHandle = 0;
 static void	*StopScrHandle = 0;
 
-static tMenuInitFunc ExitMenuInitFunc = 0;
+static void* (*ExitMenuInitFunc)(void*) = 0;
 
-void ReSetExitMenuInitFunc(tMenuInitFunc func)
+void ReSetExitMenuInitFunc(void* (*func)(void*))
 {
 	ExitMenuInitFunc = func;
 }

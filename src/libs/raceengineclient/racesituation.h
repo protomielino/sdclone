@@ -25,14 +25,13 @@
 #ifndef _RACESITUATION_H_
 #define _RACESITUATION_H_
 
-#include "raceengineclient.h"
-
 #include "raceman.h"
+
 
 // The race situation data structure.
 extern tRmInfo *ReInfo;
 
-RACEENGINECLIENT_API tRmInfo* ReSituation();
+extern tRmInfo* ReSituation();
 
 extern tRmInfo* ReSituationAllocInit(const tRmInfo* pSource);
 extern tRmInfo* ReSituationCopy(tRmInfo*& pTarget, const tRmInfo* pSource);

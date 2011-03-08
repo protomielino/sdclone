@@ -26,11 +26,9 @@
 #ifndef _RACEMAIN_H_
 #define _RACEMAIN_H_
 
-#include "raceengineclient.h"
+//typedef void* (*tMenuInitFunc)(void*);
 
-typedef void* (*tMenuInitFunc)(void*);
-
-RACEENGINECLIENT_API void ReSetExitMenuInitFunc(tMenuInitFunc func);
+extern void ReSetExitMenuInitFunc(void* (*func)(void*));
 
 extern bool ReHumanInGroup();
 extern int  ReRaceEventInit(void);

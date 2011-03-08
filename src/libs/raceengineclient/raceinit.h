@@ -26,14 +26,12 @@
 #ifndef _RACEINIT_H_
 #define _RACEINIT_H_
 
-#include "raceengineclient.h"
-
 class GfRaceManager;
 class GfRace;
 
 
-RACEENGINECLIENT_API void ReStartNewRace(void * /* dummy */);
-RACEENGINECLIENT_API void ReResumeRace(void * /* dummy */);
+extern void ReStartNewRace(void);
+extern void ReResumeRace(void);
 
 extern void ReInit(void);
 extern void ReShutdown(void);

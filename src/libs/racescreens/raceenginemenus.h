@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    file        : racemessage.h
-    created     : Sat Nov 23 09:35:21 CET 2002
-    copyright   : (C) 2002 by Eric Espie                        
+    file        : raceenginemenus.h
+    created     : Fri Jan  3 22:25:02 CET 2003
+    copyright   : (C) 2003 by Eric Espié                        
     email       : eric.espie@torcs.org   
     version     : $Id$                                  
 
@@ -23,18 +23,22 @@
     @version	$Id$
 */
 
-#ifndef _RACEMESSAGE_H_
-#define _RACEMESSAGE_H_
+#ifndef _RACEENGINEMENUS_H_
+#define _RACEENGINEMENUS_H_
 
-struct RmInfo;
-
-extern void ReRaceMsgUpdate(struct RmInfo* pReInfo);
-extern void ReRaceMsgManage(struct RmInfo* pReInfo);
-extern void ReRaceMsgSet(struct RmInfo* pReInfo, const char *msg, double life);
-extern void ReRaceMsgSetBig(struct RmInfo* pReInfo, const char *msg, double life);
+#include "racescreens.h"
 
 
-#endif /* _RACEMESSAGE_H_ */ 
+RACESCREENS_API int ReRacemanMenu();
+RACESCREENS_API int ReNextEventMenu(void);
+RACESCREENS_API void ReConfigureRace(void * /* dummy */);
+RACESCREENS_API void ReSetRacemanMenuHandle(void * handle);
+
+extern void* ReGetRacemanMenuHandle();
+
+extern void ReConfigRunState(bool bStart = false);
+
+#endif /* _RACEENGINEMENU_H_ */ 
 
 
 

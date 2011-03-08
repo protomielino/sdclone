@@ -1,8 +1,8 @@
 /***************************************************************************
 
-    file        : raceselectmenu.h
-    created     : Sat Nov 16 09:48:11 CET 2002
-    copyright   : (C) 2002 by Eric Espie
+    file        : racemessage.h
+    created     : Sat Nov 23 09:35:21 CET 2002
+    copyright   : (C) 2002 by Eric Espie                        
     email       : eric.espie@torcs.org   
     version     : $Id$                                  
 
@@ -18,20 +18,26 @@
  ***************************************************************************/
  
 /** @file    
-    		Race selection menu
+    		
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
 
-#ifndef _RACESELECTMENU_H_
-#define _RACESELECTMENU_H_
+#ifndef _RACEMESSAGE_H_
+#define _RACEMESSAGE_H_
 
-#include "raceengineclient.h"
+#include "racescreens.h"
 
 
-RACEENGINECLIENT_API void *ReRaceSelectInit(void *precMenu);
+struct RmInfo;
 
-#endif /* _RACESELECTMENU_H_ */ 
+RACESCREENS_API void ReRaceMsgUpdate(struct RmInfo* pReInfo);
+RACESCREENS_API void ReRaceMsgManage(struct RmInfo* pReInfo);
+RACESCREENS_API void ReRaceMsgSet(struct RmInfo* pReInfo, const char *msg, double life);
+RACESCREENS_API void ReRaceMsgSetBig(struct RmInfo* pReInfo, const char *msg, double life);
+
+
+#endif /* _RACEMESSAGE_H_ */ 
 
 
 

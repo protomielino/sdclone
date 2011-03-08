@@ -1,8 +1,9 @@
 /***************************************************************************
 
-    file        : raceengineclient.h
-    copyright   : (C) 2010 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
+    file        : raceselectmenu.h
+    created     : Sat Nov 16 09:48:11 CET 2002
+    copyright   : (C) 2002 by Eric Espie
+    email       : eric.espie@torcs.org   
     version     : $Id$                                  
 
  ***************************************************************************/
@@ -17,23 +18,20 @@
  ***************************************************************************/
  
 /** @file    
-    		
-    @author	<a href=mailto:pouillot@users.sourceforge.net>Jean-Philippe Meuret</a>
-    @version    $Id$
+    		Race selection menu
+    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
+    @version	$Id$
 */
 
-#ifndef _RACEENGINECLIENT_H_
-#define _RACEENGINECLIENT_H_
+#ifndef _RACESELECTMENU_H_
+#define _RACESELECTMENU_H_
 
-// DLL exported symbols declarator for Windows.
-#ifdef WIN32
-# ifdef RACEENGINECLIENT_DLL
-#  define RACEENGINECLIENT_API __declspec(dllexport)
-# else
-#  define RACEENGINECLIENT_API __declspec(dllimport)
-# endif
-#else
-# define RACEENGINECLIENT_API
-#endif
+#include "racescreens.h"
 
-#endif /* _RACEENGINECLIENT_H_ */ 
+
+RACESCREENS_API void *ReRaceSelectInit(void *precMenu);
+
+#endif /* _RACESELECTMENU_H_ */ 
+
+
+

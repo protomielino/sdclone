@@ -17,12 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
-
-#include <cstdio>
-
 #include <tgfclient.h>
-#include <racemain.h>
 
+#include <raceengine.h>
 #include <raceselectmenu.h>
 #include <playerconfig.h>
 
@@ -34,12 +31,13 @@
 
 void *MenuHandle = 0;
 
-tModList *RacemanModLoaded = 0;
+// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
+//tModList *RacemanModLoaded = 0;
 
 static void
 onPlayerConfigMenuActivate(void * /* dummy */)
 {
-   /* Here, we need to call OptionOptionInit each time the firing button
+    /* Here, we need to call OptionOptionInit each time the firing button
        is pressed, and not only once at the Main menu initialization,
        because the previous menu has to be saved (ESC, Back) and because it can be this menu,
        as well as the Raceman menu */
@@ -67,8 +65,9 @@ onCreditsMenuActivate(void * /* dummy */)
 static void
 onMainMenuActivate(void * /* dummy */)
 {
-    if (RacemanModLoaded)
-		GfModUnloadList(&RacemanModLoaded);
+	// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
+    // if (RacemanModLoaded)
+	// 	GfModUnloadList(&RacemanModLoaded);
 }
 
 /*
@@ -118,7 +117,11 @@ MainMenuInit(void)
     GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit the game", exitMenu, GfuiScreenActivate, NULL);
 
     // Register the ExitMenu init func in the race engine.
-    ReSetExitMenuInitFunc(ExitMenuInit);
+	RaceEngine::self().setExitMenuInitFunc(ExitMenuInit);
+
+	// Notify the race screens of the race engine existence.
+	// TODO: Move this to main().
+	RmSetRaceEngine(RaceEngine::self());
 	
     return 0;
 }

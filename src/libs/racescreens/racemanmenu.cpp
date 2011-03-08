@@ -39,14 +39,9 @@
 #include <cars.h>
 
 #include <playerconfig.h>
-#include <racescreens.h>
 #include <network.h>
 
-#include "racesituation.h"
-#include "racemain.h"
-#include "raceinit.h"
-#include "racestate.h"
-
+#include "racescreens.h"
 #include "raceenginemenus.h"
 #include "networkingmenu.h"
 
@@ -94,7 +89,7 @@ static void
 reSaveRaceToConfigFile(const char *filename)
 {
 	// Note: No need to write the main file here, already done at the end of race configuration.
-	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	const GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 
 	// Determine the full path-name of the target race config file (add .xml ext. if not there).
 	std::ostringstream ossTgtFileName;
@@ -112,7 +107,7 @@ reSaveRaceToConfigFile(const char *filename)
 static void
 reLoadRaceFromConfigFile(const char *filename)
 {
-	GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 
 	// Determine the full path-name of the selected race config file.
 	std::ostringstream ossSelFileName;
@@ -136,10 +131,10 @@ reLoadRaceFromConfigFile(const char *filename)
 		pRaceMan->reset(hparmRaceMan, /* bClosePrevHdle= */ true);
 
 		// (Re-)initialize the race from the selected race manager.
-		ReGetRace()->load(pRaceMan);
+		RmRaceEngine().race()->load(pRaceMan);
 
 		// Notify the race engine of the changes (this is a non-interactive config., actually).
-		ReRaceConfigure(/* bInteractive */ false);
+		RmRaceEngine().configureRace(/* bInteractive */ false);
 	}
 	
 	// Update GUI.
@@ -149,7 +144,7 @@ reLoadRaceFromConfigFile(const char *filename)
 static void
 reLoadRaceFromResultsFile(const char *filename)
 {
-	GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 
 	// Determine the full path-name of the result file.
 	std::ostringstream ossResFileName;
@@ -162,10 +157,10 @@ reLoadRaceFromResultsFile(const char *filename)
 		GfParmReadFile(ossResFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	if (hparmResults)
 	{
-		ReGetRace()->load(pRaceMan, hparmResults);
+		RmRaceEngine().race()->load(pRaceMan, hparmResults);
 
 		// Restore the race from the result file.
-		ReRaceRestore(hparmResults);
+		RmRaceEngine().restoreRace(hparmResults);
 	}
 	
 	// Update GUI.
@@ -185,11 +180,11 @@ reOnActivate(void * /* dummy */)
 static void
 reOnRaceDataChanged()
 {
-	GfRace* pRace = ReGetRace();
+	GfRace* pRace = RmRaceEngine().race();
 	const GfRaceManager* pRaceMan = pRace->getManager();
 
 	// Get the currently selected track for the race (should never fail, unless no track at all).
-	const GfTrack* pTrack = ReGetRace()->getTrack();
+	const GfTrack* pTrack = pRace->getTrack();
 
 	// Set title (race type + track name).
 	std::ostringstream ossText;
@@ -216,8 +211,8 @@ reOnRaceDataChanged()
 			   bIsMultiEvent && pRaceMan->hasResultsFiles() ? GFUI_ENABLE : GFUI_DISABLE);
 
 	// Show/Hide "Start / Resume race" buttons as needed.
-	const std::vector<GfDriver*>& vecCompetitors = ReGetRace()->getCompetitors();
-	const bool bWasLoadedFromResults = ReGetRace()->getResultsDescriptorHandle() != 0;
+	const std::vector<GfDriver*>& vecCompetitors = pRace->getCompetitors();
+	const bool bWasLoadedFromResults = pRace->getResultsDescriptorHandle() != 0;
 	GfuiVisibilitySet(ScrHandle, StartNewRaceButtonId,
 					  !vecCompetitors.empty() && !bWasLoadedFromResults
 					  ? GFUI_VISIBLE : GFUI_INVISIBLE);
@@ -269,7 +264,7 @@ reOnPlayerConfig(void * /* dummy */)
 static void
 reOnLoadRaceFromConfigFile(void *pPrevMenu)
 {
-	GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 	
 	fs.title = pRaceMan->getName();
 	fs.mode = RmFSModeLoad;
@@ -284,7 +279,7 @@ reOnLoadRaceFromConfigFile(void *pPrevMenu)
 static void
 reOnLoadRaceFromResultsFile(void *pPrevMenu)
 {
-	GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 	
 	fs.title = pRaceMan->getName();
 	fs.mode = RmFSModeLoad;
@@ -299,7 +294,7 @@ reOnLoadRaceFromResultsFile(void *pPrevMenu)
 static void
 reOnSaveRaceToConfigFile(void *pPrevMenu)
 {
-	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	const GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 	
 	// Fill-in file selection descriptor
 	fs.title = pRaceMan->getName();
@@ -316,6 +311,18 @@ reOnSaveRaceToConfigFile(void *pPrevMenu)
 	GfuiScreenActivate(RmFileSelect(&fs));
 }
 
+static void
+reStartNewRace(void * /* dummy */)
+{
+	RmRaceEngine().startNewRace();
+}
+
+static void
+reResumeRace(void * /* dummy */)
+{
+	RmRaceEngine().resumeRace();
+}
+
 // Init. function for the current menu -----------------------------------------------------
 int
 ReRacemanMenu()
@@ -324,17 +331,19 @@ ReRacemanMenu()
 	// TODO: Integrate better the networking menu system in the race config. menu system
 	//       (merge the ReNetworkClientConnectMenu and ReNetworkHostMenu into this race man menu,
 	//        after adding some more features / controls ? because they look similar).
-	if (!strcmp(ReInfo->_reName, "Online Race"))
+	tRmInfo* reInfo = RmRaceEngine().data();
+	if (!strcmp(reInfo->_reName, "Online Race"))
 	{
 		// Temporary, as long as the networking menu are not ported to tgfdata.
 		
 		// Force any needed fix on the specified track for the race (may not exist)
-		const GfTrack* pTrack = ReGetRace()->getTrack();
+		const GfTrack* pTrack = RmRaceEngine().race()->getTrack();
 		GfLogDebug("Using track %s for Online Race", pTrack->getName().c_str());
 
-		// Synchronize ReInfo->params with ReGetRace() state, in case the track was fixed.
-		if (ReGetRace()->isDirty())
-			ReGetRace()->store(); // Save data to params.
+		// Synchronize reInfo->params with RmRaceEngine().race() state,
+		// in case the track was fixed.
+		if (RmRaceEngine().race()->isDirty())
+			RmRaceEngine().race()->store(); // Save data to params.
 		
 		// End of temporary.
 
@@ -365,7 +374,7 @@ ReRacemanMenu()
 	if (ScrHandle)
 		GfuiScreenRelease(ScrHandle);
 
-	const GfRaceManager* pRaceMan = ReGetRace()->getManager();
+	const GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
 
 	// Create screen, load menu XML descriptor and create static controls.
 	ScrHandle = GfuiScreenCreateEx(NULL, NULL, reOnActivate, 
@@ -389,7 +398,7 @@ ReRacemanMenu()
 						NULL, reOnPlayerConfig);
 	
 	CreateButtonControl(ScrHandle, menuXMLDescHdle, "PreviousButton",
-						ReInfo->_reMenuScreen, GfuiScreenActivate);
+						reInfo->_reMenuScreen, GfuiScreenActivate);
 
 	// Create "Load / Resume / Save race" buttons.
 	SaveRaceConfigButtonId =
@@ -405,10 +414,10 @@ ReRacemanMenu()
 	// Create "Resume / Start race" buttons.
 	ResumeRaceButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "ResumeRaceButton",
-							NULL, ReResumeRace);
+							NULL, reResumeRace);
 	StartNewRaceButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "StartNewRaceButton",
-							NULL, ReStartNewRace);
+							NULL, reStartNewRace);
 
 	// Track outline image.
 	TrackOutlineImageId =
@@ -425,9 +434,9 @@ ReRacemanMenu()
 	// Register keyboard shortcuts.
 	GfuiMenuDefaultKeysAdd(ScrHandle);
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Start the race",
-			   NULL, ReStartNewRace, NULL);
+			   NULL, reStartNewRace, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Back to the Main menu",
-			   ReInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+			   reInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
 	// Activate screen.
 	GfuiScreenActivate(ScrHandle);

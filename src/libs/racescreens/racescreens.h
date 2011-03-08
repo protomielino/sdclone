@@ -26,6 +26,7 @@
 #define __RACESCREENS_H__
 
 #include <raceman.h>
+#include <iraceengine.h> // IRaceEngine
 
 #include <tgfclient.h> // tfuiCalback
 
@@ -83,7 +84,7 @@ typedef struct RmFileSelect
 RACESCREENS_API void RmTrackSelect(void * /* vs */);
 
 RACESCREENS_API void RmDriversSelect(void * /* vs */);
-extern void RmDriverSelect(void * /* vs */);
+//extern void RmDriverSelect(void * /* vs */);
 
 RACESCREENS_API void RmPitMenuStart(tCarElt * /* car */, tfuiCallback /* callback */);
 
@@ -123,6 +124,9 @@ RACESCREENS_API void RmRaceParamsMenu(void *vrp);
 RACESCREENS_API void RmShowStandings(void *prevHdle, tRmInfo *info, int start = 0);
 
 RACESCREENS_API void* RmFileSelect(void *vs);
+
+RACESCREENS_API void RmSetRaceEngine(IRaceEngine& raceEngine);
+RACESCREENS_API IRaceEngine& RmRaceEngine();
 
 #endif /* __RACESCREENS_H__ */
 

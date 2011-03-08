@@ -220,7 +220,7 @@ ReRaceRestore(void* hparmResults)
 
 // Start a new race for the previously configured race manager
 void
-ReStartNewRace(void * /* dummy */)
+ReStartNewRace()
 {
 	// Save the race settings to the race manager file is anything changed.
 	if (PReRace->isDirty())
@@ -242,7 +242,7 @@ ReStartNewRace(void * /* dummy */)
 
 // Resume the previously restored race from a results file
 void
-ReResumeRace(void * /* dummy */)
+ReResumeRace()
 {
 	// Fire standings screen.
 	RmShowStandings(ReInfo->_reGameScreen, ReInfo);

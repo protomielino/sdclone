@@ -28,16 +28,12 @@
 
 #include <portability.h>
 #include <tgfclient.h>
-#include <gui.h> // tGfuiScreen, Debug, to be removed
 
 #include <raceman.h>
 
-#include <racescreens.h>
-
 #include <race.h>
 
-#include "racesituation.h"
-#include "raceinit.h"
+#include "racescreens.h"
 
 #include "raceenginemenus.h"
 
@@ -51,7 +47,8 @@ static tRmRaceParam    rp;
 static void
 reConfigBack(void)
 {
-	void* params = ReInfo->params;
+	tRmInfo* reInfo = RmRaceEngine().data();
+	void* params = reInfo->params;
 
 	/* Go back one step in the conf */
 	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 
@@ -110,7 +107,8 @@ ReConfigRunState(bool bStart)
 	char	path[256];
 	int		curConf;
 	const char	*conf;
-	void	*params = ReInfo->params;
+	tRmInfo* reInfo = RmRaceEngine().data();
+	void	*params = reInfo->params;
 
 	// TODO: Replace any read/write to params to get/set from/to race/raceman instances ?
 	
@@ -121,9 +119,9 @@ ReConfigRunState(bool bStart)
 	// If configuration finished, save race config to disk and go back to the raceman menu.
 	curConf = (int)GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
 	if (curConf > GfParmGetEltNb(params, RM_SECT_CONF)) {
-		GfLogInfo("%s configuration finished.\n", ReInfo->_reName);
-		ReGetRace()->store(); // Save race data to params.
-		GfParmWriteFile(NULL, params, ReInfo->_reName); // Save params to disk.
+		GfLogInfo("%s configuration finished.\n", reInfo->_reName);
+		RmRaceEngine().race()->store(); // Save race data to params.
+		GfParmWriteFile(NULL, params, reInfo->_reName); // Save params to disk.
 		GfuiScreenActivate(ReGetRacemanMenuHandle()); // Back to the race manager menu
 		return;
 	}
@@ -139,7 +137,7 @@ ReConfigRunState(bool bStart)
 	}
 
 	// Normal configuration steps :
-	GfLogInfo("%s configuration now in #%d '%s' stage.\n", ReInfo->_reName, curConf, conf);
+	GfLogInfo("%s configuration now in #%d '%s' stage.\n", reInfo->_reName, curConf, conf);
 	
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
 		
@@ -150,21 +148,20 @@ ReConfigRunState(bool bStart)
 		} else {
 			ts.prevScreen = reConfigBackHookInit();
 		}
-		ts.pRace = ReGetRace();
-		ts.trackItf = ReInfo->_reTrackItf;
+		ts.pRace = RmRaceEngine().race();
+		ts.trackItf = reInfo->_reTrackItf;
 		RmTrackSelect(&ts);
 
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
 		
 		// Drivers select menu
 		ds.nextScreen = reConfigHookInit();
-		tGfuiScreen* pNextScreen = (tGfuiScreen*)ds.nextScreen;
 		if (curConf == 1) {
 			ds.prevScreen = ReGetRacemanMenuHandle();
 		} else {
 			ds.prevScreen = reConfigBackHookInit();
 		}
-		ds.pRace = ReGetRace();
+		ds.pRace = RmRaceEngine().race();
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
@@ -176,7 +173,7 @@ ReConfigRunState(bool bStart)
 		} else {
 			rp.prevScreen = reConfigBackHookInit();
 		}
-		rp.pRace = ReGetRace();
+		rp.pRace = RmRaceEngine().race();
 		rp.session = GfParmGetStr(params, path, RM_ATTR_RACE, RM_VAL_ANYRACE);
 		RmRaceParamsMenu(&rp);
 	}
