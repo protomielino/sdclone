@@ -25,7 +25,10 @@
 
 
 void *menuHandle = NULL;
-tModList *RacemanModLoaded = (tModList*)NULL;
+
+// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
+//tModList *RacemanModLoaded = (tModList*)NULL;
+
 std::string g_strFile;
 
 void LoadMenuScreen();
@@ -40,9 +43,10 @@ endofprog(void * /* dummy */)
 static void
 PreviewMenuActivate(void * /* dummy */)
 {
-    if (RacemanModLoaded) {
-	GfModUnloadList(&RacemanModLoaded);
-    }
+// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
+//    if (RacemanModLoaded) {
+//	GfModUnloadList(&RacemanModLoaded);
+//    }
 }
 
 int ReadControl(void *param,std::string strType,const char *pControlName)

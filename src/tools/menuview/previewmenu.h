@@ -25,7 +25,9 @@
 #endif
 
 extern void *menuHandle;
-extern tModList *RacemanModLoaded;
+
+// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
+//extern tModList *RacemanModLoaded;
 
 extern int PreviewMenuInit(const char *pFile);
 extern int PreviewMenuRun(void);

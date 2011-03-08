@@ -3,7 +3,7 @@ PROJECT(menuview)
 
 SET(MENUVIEW_SOURCES main.cpp previewmenu.cpp)
 
-ADD_SDLIB_INCLUDEDIR(client robottools tgf tgfclient math portability)
+ADD_SDLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 ADD_INTERFACE_INCLUDEDIR()
@@ -22,7 +22,7 @@ IF (WIN32)
 ENDIF(WIN32)
 
 
-ADD_SDLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview robottools tgf tgfclient client)
+ADD_SDLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}menuview robottools tgf tgfclient)
 
 
 IF(OPENGL_FOUND)

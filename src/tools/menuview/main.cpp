@@ -17,26 +17,28 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <config.h>
+#include <string>
 
-#ifdef WIN32
+#ifdef _MSC_VER
 #include <windows.h>
-#include <direct.h>
 #include <shlobj.h>
 #endif
 
 #include <portability.h>
 
+#include <tgf.h>
+#include <tgfclient.h>
+
 #ifdef WIN32
-#include "windowsspec.h"
+#include <windowsspec.h>
 #else
-#include "linuxspec.h"
+#include <linuxspec.h>
 #endif
 
-#include <client.h>
+//#include <client.h>
 
-#include "mainmenu.h"
-#include "splash.h"
+//#include "mainmenu.h"
+//#include "splash.h"
 #include "previewmenu.h"
 
 

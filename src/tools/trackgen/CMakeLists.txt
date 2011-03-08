@@ -30,7 +30,7 @@ IF (WIN32)
 	ADD_EXECUTABLE(${SD_TOOLS_EXECPREFIX}trackgen ${TRACKGEN_SOURCES} ../../windows/windowsspec.cpp)
 ENDIF(WIN32)
 
-ADD_SDLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen robottools tgf tgfclient client)
+ADD_SDLIB_LIBRARY(${SD_TOOLS_EXECPREFIX}trackgen robottools tgf tgfclient)
 
 IF(OPENGL_FOUND)
 	TARGET_LINK_LIBRARIES(${SD_TOOLS_EXECPREFIX}trackgen ${OPENGL_LIBRARY})
