@@ -10,13 +10,13 @@ SET(CONFSCREENS_HEADERS confscreens.h controlconfig.h playerconfig.h
 SET(CONFSCREENS_SOURCES controlconfig.cpp playerconfig.cpp displayconfig.cpp graphconfig.cpp
                         joystickconfig.cpp mouseconfig.cpp openglconfig.cpp
                         simuconfig.cpp soundconfig.cpp aiconfig.cpp
-	                    carsettingsmenu.cpp hostsettingsmenu.cpp
-	                    ${CONFSCREENS_HEADERS})
+                        carsettingsmenu.cpp hostsettingsmenu.cpp
+                        ${CONFSCREENS_HEADERS})
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient tgfdata networking)
-INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
+#ADD_SDL_INCLUDEDIR()
 
 IF(WIN32)
 	INCLUDE_DIRECTORIES(src/windows/include)
@@ -40,7 +40,7 @@ ADD_LIBRARY(confscreens SHARED ${CONFSCREENS_SOURCES})
 ADD_SDLIB_LIBRARY(confscreens
                   tgf tgfclient tgfdata networking)
 
-ADD_PLIB_LIBRARY(confscreens ul)
+#ADD_PLIB_LIBRARY(confscreens ul)
 
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS confscreens)

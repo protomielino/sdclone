@@ -26,6 +26,7 @@
 
 #include <iraceengine.h>
 
+
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
 # ifdef RACEENGINE_DLL
@@ -37,50 +38,56 @@
 # define RACEENGINE_API
 #endif
 
+
 class RACEENGINE_API RaceEngine : public IRaceEngine
 {
 public:
-// #include <racesituation.h>
-	virtual tRmInfo* data();
 
-// #include <racemain.h>
-	virtual void setExitMenuInitFunc(void* (*func)(void*));
-
-// #include <raceinit.h>
-	virtual void startNewRace();
-	virtual void resumeRace();
-
+	// Implementation of IRaceEngine.
 	virtual void initialize();
 	virtual void shutdown();
+
+	virtual void setUserInterface(IUserInterface& userItf);
+
+	virtual void initializeState(void *prevMenu);
+	virtual void updateState();
+	virtual void applyState(int state);
 
 	virtual void selectRaceman(GfRaceManager* pRaceMan);
 	virtual void restoreRace(void* hparmResults);
 	virtual void configureRace(bool bInteractive = true);
 
-	virtual GfRace* race();
+	virtual void startNewRace();
+	virtual void resumeRace();
 
-// #include <racestate.h>
-	virtual void initializeState(void *prevMenu);
-	virtual void updateState();
-	virtual void applyState(int state);
-
-// #include <raceupdate.h>
+	virtual void accelerateTime(double fMultFactor);
 	virtual void start();
 	virtual void stop();
 #ifdef DEBUG
 	virtual void step(double dt);
 #endif
 
+	virtual GfRace* race();
+	virtual struct RmInfo* data();
+
 	// Accessor to the singleton.
-	static IRaceEngine& self();
+	static RaceEngine& self();
+
+	// Accessor to the user interface.
+	IUserInterface& userInterface();
 
 protected:
 
 	// Protected constructor to avoid instanciation outside of self().
 	RaceEngine();
 	
+protected:
+
 	// The singleton.
 	static RaceEngine* _pSelf;
+
+	// The user interface.
+	IUserInterface* _piUserItf;
 };
 
 #endif /* _RACEENGINE_H_ */ 

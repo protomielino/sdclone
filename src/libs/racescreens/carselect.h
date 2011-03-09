@@ -24,15 +24,13 @@
 
 #include <tgfclient.h>
 
-#include "racescreens.h"
-
 class GfRace;
 class GfDriverSkin;
 class GfDriver;
 class GfCar;
 
 
-class RACESCREENS_API RmCarSelectMenu : public GfuiMenuScreen
+class RmCarSelectMenu : public GfuiMenuScreen
 {
 public:
 

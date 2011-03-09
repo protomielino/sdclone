@@ -40,8 +40,7 @@
 #include <racemanagers.h>
 #include <race.h>
 
-#include <racescreens.h>
-#include <racegl.h>
+#include "raceengine.h"
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -102,9 +101,6 @@ ReInit(void)
 	// Initialize GfTracks' track module interface (needed for some track infos).
 	GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
 
-	/* The graphic modules isn't loaded at this moment, so make sure _reGraphicItf equals NULL */
-	//memset (&ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf)); // Already done by calloc.
-
 	// Initialize the movie capture system.
 	tRmMovieCapture *capture = &(ReInfo->movieCapture);
 	capture->enabled =
@@ -133,7 +129,7 @@ ReInit(void)
 
 	// Set ReStateManage as the event loop "display" call-back when the race will actually start
 	// (will be actually used after something like GfuiScreenActivate(ReInfo->_reGameScreen)).
-	ReInfo->_reGameScreen = ReHookInit();
+	ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceEventLoopHook();
 }
 
 
@@ -245,7 +241,7 @@ void
 ReResumeRace()
 {
 	// Fire standings screen.
-	RmShowStandings(ReInfo->_reGameScreen, ReInfo);
+	RaceEngine::self().userInterface().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
 }
 
 
@@ -506,7 +502,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
 
   isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
 
-  /*Extended is forced for humans, so no need to increase robotIdx*/
+  /* Extended is forced for humans, so no need to increase robotIdx */
   if (!normal_carname && !isHuman) 
     robotIdx += curModInfo->index;
 
@@ -737,7 +733,7 @@ ReInitCars(void)
 
   /* Get the number of cars (= drivers) racing */
   nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
-  GfOut("Loading %d cars\n", nCars);
+  GfLogTrace("Loading %d cars\n", nCars);
 
   FREEZ(ReInfo->carList);
   ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
@@ -780,11 +776,11 @@ ReInitCars(void)
 		  {
             GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
 			snprintf(buf, sizeof(buf), "Error: May be no driver, or some parameters are out of bound");
-	        RmLoadingScreenSetText(buf);
+	        RaceEngine::self().userInterface().addLoadingMessage(buf);
 			snprintf(buf, sizeof(buf), "       Have a look to the console window to get the detailed error messages");
-	        RmLoadingScreenSetText(buf);
+	        RaceEngine::self().userInterface().addLoadingMessage(buf);
 			snprintf(buf, sizeof(buf), "       Will go back to the config menu in 10 s");
-	        RmLoadingScreenSetText(buf);
+	        RaceEngine::self().userInterface().addLoadingMessage(buf);
 			
 			// Wait some time to allow the user to read the message!
             GfSleep(10.0); // 10 seconds
@@ -882,7 +878,7 @@ void ReInitGraphics()
 void
 ReRaceCleanup(void)
 {
-  ReInfo->_reGameScreen = ReHookInit();
+  ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceEventLoopHook();
   ReInfo->_reSimItf.shutdown();
   if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) 
   {

@@ -14,9 +14,9 @@ ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(confscreens tgf tgfclient raceengine racescreens math)
-ADD_SDL_INCLUDEDIR()
-ADD_ENET_INCLUDEDIR()
+ADD_SDLIB_INCLUDEDIR(confscreens racescreens tgf tgfclient math)
+#ADD_SDL_INCLUDEDIR()
+#ADD_ENET_INCLUDEDIR()
 
 # Disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -31,7 +31,7 @@ ENDIF(WIN32)
 ADD_LIBRARY(client SHARED ${CLIENT_SOURCES})
 
 ADD_SDLIB_LIBRARY(client 
-                  tgfclient robottools confscreens raceengine racescreens)
+                  tgfclient robottools confscreens racescreens)
 
 ADD_OPENGL_LIBRARY(client)
 ADD_SDL_LIBRARY(client)

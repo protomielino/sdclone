@@ -6,13 +6,13 @@ SET(RACEENGINE_SOURCES raceengine.cpp
                        racecareer.cpp raceupdate.cpp racenetwork.cpp racecars.cpp
                        raceinit.cpp racemain.cpp
                        racetrack.cpp raceresults.cpp racesimusimu.cpp 
-                       racestate.cpp racesituation.cpp 
+                       racestate.cpp racesituation.cpp racemessage.cpp
                        raceutil.cpp
                        raceengine.h 
                        racecareer.h raceupdate.h racenetwork.h racecars.h
                        raceinit.h 
                        racetrack.h raceresults.h racesimusimu.h 
-                       racestate.h racesituation.h 
+                       racestate.h racesituation.h racemessage.h
                        raceutil.h)
 
 ADD_SD_DEFINITIONS()
@@ -21,9 +21,9 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 
 ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfclient tgfdata
-                     racescreens networking)
+                     networking)
 
-INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
+ADD_SDL_INCLUDEDIR()
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
@@ -42,7 +42,7 @@ ADD_LIBRARY(raceengine SHARED ${RACEENGINE_SOURCES})
 
 ADD_SDLIB_LIBRARY(raceengine
                   tgf tgfclient tgfdata robottools
-                  racescreens networking)
+                  networking)
 
 IF(WIN32)
     SD_INSTALL_FILES(BIN TARGETS raceengine)

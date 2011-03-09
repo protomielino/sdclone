@@ -21,15 +21,17 @@
 
 #ifdef WIN32
 #include <windows.h>
-#include <direct.h>
 #include <shlobj.h>
-#include <cstdlib>
 #endif
 
+#include <portability.h>
 #include <tgf.h>
 #include <tgfclient.h>
+
+#include <raceengine.h>
+#include <legacymenu.h>
+
 #include <client.h>
-#include <portability.h>
 
 #include "windowsspec.h"
 
@@ -152,6 +154,12 @@ main(int argc, char *argv[])
 
     GfScrInit(argc, argv);  /* init screen */
 
+	// Give the menu system to the race engine.
+	RaceEngine::self().setUserInterface(LegacyMenu::self());
+
+	// Give the race engine to the menu system.
+	LegacyMenu::self().setRaceEngine(RaceEngine::self());
+	
     if (MenuEntry())         /* launch the game */
     {
         GfelMainLoop();   /* Main event loop */

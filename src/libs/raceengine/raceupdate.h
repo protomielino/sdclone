@@ -30,9 +30,10 @@ extern void ReInitUpdaters();
 extern void ReInitCarGraphics();
 extern void ReShutdownUpdaters();
 
-extern void ReStart(void);
-extern void ReStop(void);
-extern int  ReUpdate(void);
+extern void ReAccelerateTime(double fMultFactor);
+extern void ReStart();
+extern void ReStop();
+extern int  ReUpdate();
 
 #ifdef DEBUG
 extern void ReOneStep(double dt);

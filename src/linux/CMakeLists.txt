@@ -5,7 +5,7 @@ SET(SD_SOURCES main.cpp linuxspec.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(client tgf tgfclient)
+ADD_SDLIB_INCLUDEDIR(client tgf tgfclient raceengine racescreens)
 
 # Disable developer warning
 IF (COMMAND cmake_policy)

@@ -40,9 +40,8 @@
 #include <hostsettingsmenu.h>
 #include <carsettingsmenu.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
-#include "raceenginemenus.h"
-#include "networkingmenu.h"
 
 
 int g_readystatus[MAXNETWORKPLAYERS];
@@ -195,7 +194,7 @@ UpdateNetworkPlayers()
 	if (pNetwork->GetRefreshDisplay() == false)
 		return;
 
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
 	//Set current driver that camera will look at
 	pNetwork->SetCurrentDriver();
@@ -351,7 +350,7 @@ reNetworkClientDisconnect(void * /* dummy */)
 	if (GetClient())
 		GetClient()->Disconnect();
 
-	GfuiScreenActivate(RmRaceEngine().data()->_reMenuScreen);
+	GfuiScreenActivate(LegacyMenu::self().raceEngine().data()->_reMenuScreen);
 
 }
 
@@ -450,7 +449,7 @@ ClientIdle(void)
 		if (GetClient()->PrepareToRace())
 		{
 			GetClient()->SetLocalDrivers();
-			RmRaceEngine().startNewRace();
+			LegacyMenu::self().raceEngine().startNewRace();
 		}
 
 		if (!GetClient()->IsConnected())
@@ -481,7 +480,7 @@ NetworkRaceInfo()
 	}
 
 	//Look up race info
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	void *params = reInfo->params =
 		GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
@@ -502,7 +501,7 @@ static void OnActivateNetworkClient(void *)
 static void
 OnActivateNetworkHost(void *)
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
 	MutexData *pNData = GetNetwork()->LockNetworkData();
 	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
@@ -523,7 +522,7 @@ OnActivateNetworkHost(void *)
 static void
 reNetworkServerDisconnect(void * /* dummy */)
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
 	GfLogInfo("Disconnecting all clients\n");
 	if (GetServer())
@@ -626,7 +625,7 @@ ReNetworkHostMenu(void * /* dummy */)
 static void
 ShowWaitingToConnectScreen()
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
 	if (racemanMenuHdle) 
 	{
@@ -773,7 +772,7 @@ NetworkClientMenu(void * /* dummy */)
 {
 	const char	*str;
 
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
 	LookupPlayerSetup(g_strDriver,g_strCar);
 
@@ -829,7 +828,7 @@ void ReNetworkMenu(void *)
 {
     const char	*str;
 
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
 	if (GetNetwork())
 	{
@@ -879,7 +878,7 @@ ServerPrepareStartNetworkRace(void * /* dummy */)
 
 	//restore the idle function
 	GfelSetIdleCB(GfuiIdle);
-	RmRaceEngine().startNewRace();
+	LegacyMenu::self().raceEngine().startNewRace();
 }
 
 // Retrieve the Driver instance with given index in the human module interface list

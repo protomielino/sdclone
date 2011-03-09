@@ -1,0 +1,105 @@
+/***************************************************************************
+
+    file        : legacymenu.h
+    copyright   : (C) 2010 by Jean-Philippe Meuret                        
+    email       : pouillot@users.sourceforge.net   
+    version     : $Id$                                  
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+ 
+/** @file    
+    		The race engine implementation of its ILegacymenu interface
+    @version    $Id$
+*/
+
+#ifndef _LEGACYMENU_H_
+#define _LEGACYMENU_H_
+
+#include <iuserinterface.h>
+
+
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef RACESCREENS_DLL
+//# ifdef LEGACYMENU_DLL // Soon !
+#  define LEGACYMENU_API __declspec(dllexport)
+# else
+#  define LEGACYMENU_API __declspec(dllimport)
+# endif
+#else
+# define LEGACYMENU_API
+#endif
+
+
+class LEGACYMENU_API LegacyMenu : public IUserInterface
+{
+public:
+
+	// Implementation of IuserInterface.
+	virtual void *createRaceScreen();
+	virtual void *createRaceEventLoopHook();
+	virtual void setRaceMessage(const char *msg);
+	virtual void setRaceBigMessage(const char *msg);
+
+	virtual void activateLoadingScreen(const char *title, const char *bgimg);
+	virtual void addLoadingMessage(const char *text);
+	virtual void shutdownLoadingScreen();
+
+	virtual int activateRacemanMenu();
+	virtual int activateNextEventMenu();
+
+	virtual void activateStartRaceMenu(struct RmInfo *info, void *startScr, void *abortScr);
+	virtual void *activateStopRaceMenu(const char* title,
+									   const char* label1, const char* tip1, void *screen1,
+									   const char* label2, const char* tip2, void *screen2,
+									   const char* label3 = 0, const char* tip3 = 0, void *screen3 = 0,
+									   const char* label4 = 0, const char* tip4 = 0, void *screen4 = 0,
+									   const char* label5 = 0, const char* tip5 = 0, void *screen5 = 0);
+
+	virtual void activatePitMenu(struct CarElt *car, void (*callback)(void*));
+
+	virtual void *createResultsMenu();
+	virtual void activateResultsMenu(void *prevHdle, struct RmInfo *reInfo);
+	virtual void setResultsMenuTrackName(const char *trackName);
+	virtual void setResultsMenuTitle(const char *title);
+	virtual void addResultsMenuLine(const char *text);
+	virtual void setResultsMenuLine(const char *text, int line, int clr);
+	virtual void removeResultsMenuLine(int line);
+	virtual void showResultsMenuContinueButton();
+	virtual int  getResultsMenuLineCount();
+	virtual void eraseResultsMenu();
+
+	virtual void activateStandingsMenu(void *prevHdle, struct RmInfo *info, int start = 0);
+
+	virtual void setRaceEngine(IRaceEngine& raceEngine);
+
+	// Accessor to the singleton.
+	static LegacyMenu& self();
+
+	// Accessor to the race engine.
+	IRaceEngine& raceEngine();
+
+protected:
+
+	// Protected constructor to avoid instanciation outside of self().
+	LegacyMenu();
+	
+protected:
+
+	// The singleton.
+	static LegacyMenu* _pSelf;
+
+	// The race engine.
+	IRaceEngine* _piRaceEngine;
+};
+
+#endif /* _LEGACYMENU_H_ */ 

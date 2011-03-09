@@ -17,7 +17,7 @@ endif(COMMAND cmake_policy)
 ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
 include_directories(../libs)
-ADD_SDLIB_LIBRARY(speed-dreams-2 client tgf)
+ADD_SDLIB_LIBRARY(speed-dreams-2 client raceengine racescreens tgf)
 
 SD_INSTALL_FILES(INCLUDE FILES osspec.h)
 

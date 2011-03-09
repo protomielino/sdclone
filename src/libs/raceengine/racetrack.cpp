@@ -17,16 +17,9 @@
  ***************************************************************************/
 
 /** @file   
-    		
+    		Track related functions
     @author	    Xavier Bertaux
     @version	$Id$
-*/
-
-/* Changes by wdbee :
-   - #define RAIN_VAL_LITTLE, RAIN_VAL_NORMAL, RAIN_VAL_HEAVY in raceweather.h
-     to make it usable by robots (moved to interfaces/track by Jean-Philippe).
-   - curSurf->kFrictionDry = curSurf->kFriction; 
-     Store initial value for calculation of the rain intensity.
 */
 
 #include <cstdlib>
@@ -39,7 +32,7 @@
 #include <raceman.h>
 #include <track.h>
 
-#include <racescreens.h>
+#include "raceengine.h"
 
 #include "racesituation.h"
 #include "raceinit.h"
@@ -79,7 +72,7 @@ ReTrackInit(void)
 	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
 
 	snprintf(buf, sizeof(buf), "Loading track %s", ReInfo->track->name);
-	RmLoadingScreenSetText(buf);
+	RaceEngine::self().userInterface().addLoadingMessage(buf);
 
 	reTrackInitTimeOfDay();
 	reTrackInitWeather();
@@ -105,7 +98,7 @@ reTrackDump(const tTrack *track, int verbose)
 	
 	snprintf(buf, sizeof(buf), "  by %s (%.0f m long, %.0f m wide) ...", 
 			 track->authors, track->length, track->width);
-	RmLoadingScreenSetText(buf);
+	RaceEngine::self().userInterface().addLoadingMessage(buf);
 
 	GfLogInfo("++++++++++++ Track ++++++++++++\n");
 	GfLogInfo("Name     = %s\n", track->name);

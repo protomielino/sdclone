@@ -32,9 +32,9 @@
 #include <robot.h>
 #include <robottools.h>
 
-#include <racemessage.h>
-#include <racegl.h>
+#include "raceengine.h"
 
+#include "racemessage.h"
 #include "racesituation.h"
 #include "raceupdate.h"
 #include "raceresults.h"
@@ -520,7 +520,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					sprintf(msg,"lap: %02d   time: %s  best: %s  top spd: %.2f    min spd: %.2f    damage: %d",
 						car->_laps - 1, t1, t2,
 						info->topSpd * 3.6, info->botSpd * 3.6, car->_dammage);
-					ReResScreenAddText(msg);
+					RaceEngine::self().userInterface().addResultsMenuLine(msg);
 					free(t1);
 					free(t2);
 				}

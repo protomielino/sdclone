@@ -21,6 +21,8 @@
     @version    $Id$
 */
 
+#include <iuserinterface.h>
+
 #include "racesituation.h"
 #include "racemain.h"
 #include "raceinit.h"
@@ -33,33 +35,20 @@
 // The singleton.
 RaceEngine* RaceEngine::_pSelf = 0;
 
+RaceEngine& RaceEngine::self()
+{
+	if (!_pSelf)
+		_pSelf = new RaceEngine;
+	
+	return *_pSelf;
+}
 
 RaceEngine::RaceEngine()
+: _piUserItf(0)
 {
 }
 
-// From racesituation.
-tRmInfo* RaceEngine::data()
-{
-	return ::ReSituation();
-}
-
-// From racemain
-void RaceEngine::setExitMenuInitFunc(void* (*func)(void*))
-{
-	::ReSetExitMenuInitFunc(func);
-}
-
-// From raceinit
-void RaceEngine::startNewRace()
-{
-	::ReStartNewRace();
-}
-void RaceEngine::resumeRace()
-{
-	::ReResumeRace();
-}
-
+// Implementation of IRaceEngine.
 void RaceEngine::initialize(void)
 {
 	::ReInit();
@@ -69,25 +58,11 @@ void RaceEngine::shutdown(void)
 	::ReShutdown();
 }
 
-void RaceEngine::selectRaceman(GfRaceManager* pRaceMan)
+void RaceEngine::setUserInterface(IUserInterface& userItf)
 {
-	::ReRaceSelectRaceman(pRaceMan);
-}
-void RaceEngine::restoreRace(void* hparmResults)
-{
-	::ReRaceRestore(hparmResults);
-}
-void RaceEngine::configureRace(bool bInteractive)
-{
-	::ReRaceConfigure(bInteractive);
+	_piUserItf = &userItf;
 }
 
-GfRace* RaceEngine::race()
-{
-	return ::ReGetRace();
-}
-
-// From racestate
 void RaceEngine::initializeState(void *prevMenu)
 {
 	::ReStateInit(prevMenu);
@@ -103,7 +78,36 @@ void RaceEngine::applyState(int state)
 	::ReStateApply((void*)state);
 }
 
-// From raceupdate
+void RaceEngine::selectRaceman(GfRaceManager* pRaceMan)
+{
+	::ReRaceSelectRaceman(pRaceMan);
+}
+
+void RaceEngine::restoreRace(void* hparmResults)
+{
+	::ReRaceRestore(hparmResults);
+}
+
+void RaceEngine::configureRace(bool bInteractive)
+{
+	::ReRaceConfigure(bInteractive);
+}
+
+void RaceEngine::startNewRace()
+{
+	::ReStartNewRace();
+}
+
+void RaceEngine::resumeRace()
+{
+	::ReResumeRace();
+}
+
+void RaceEngine::accelerateTime(double fMultFactor)
+{
+	::ReAccelerateTime(fMultFactor);
+}
+
 void RaceEngine::start(void)
 {
 	::ReStart();
@@ -121,13 +125,18 @@ void RaceEngine::step(double dt)
 }
 #endif
 
-// Accessor to the singleton.
-IRaceEngine& RaceEngine::self()
+GfRace* RaceEngine::race()
 {
-	if (!_pSelf)
-		_pSelf = new RaceEngine;
-	
-	return *_pSelf;
+	return ::ReGetRace();
 }
 
- 
+tRmInfo* RaceEngine::data()
+{
+	return ::ReSituation();
+}
+
+// Accessor to the user interface.
+IUserInterface& RaceEngine::userInterface()
+{
+	return *_piUserItf;
+}

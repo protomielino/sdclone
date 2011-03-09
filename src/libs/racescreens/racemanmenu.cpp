@@ -41,9 +41,8 @@
 #include <playerconfig.h>
 #include <network.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
-#include "raceenginemenus.h"
-#include "networkingmenu.h"
 
 
 // Raceman menu.
@@ -89,7 +88,7 @@ static void
 reSaveRaceToConfigFile(const char *filename)
 {
 	// Note: No need to write the main file here, already done at the end of race configuration.
-	const GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	const GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
 	// Determine the full path-name of the target race config file (add .xml ext. if not there).
 	std::ostringstream ossTgtFileName;
@@ -107,7 +106,7 @@ reSaveRaceToConfigFile(const char *filename)
 static void
 reLoadRaceFromConfigFile(const char *filename)
 {
-	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
 	// Determine the full path-name of the selected race config file.
 	std::ostringstream ossSelFileName;
@@ -131,10 +130,10 @@ reLoadRaceFromConfigFile(const char *filename)
 		pRaceMan->reset(hparmRaceMan, /* bClosePrevHdle= */ true);
 
 		// (Re-)initialize the race from the selected race manager.
-		RmRaceEngine().race()->load(pRaceMan);
+		LegacyMenu::self().raceEngine().race()->load(pRaceMan);
 
 		// Notify the race engine of the changes (this is a non-interactive config., actually).
-		RmRaceEngine().configureRace(/* bInteractive */ false);
+		LegacyMenu::self().raceEngine().configureRace(/* bInteractive */ false);
 	}
 	
 	// Update GUI.
@@ -144,7 +143,7 @@ reLoadRaceFromConfigFile(const char *filename)
 static void
 reLoadRaceFromResultsFile(const char *filename)
 {
-	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
 	// Determine the full path-name of the result file.
 	std::ostringstream ossResFileName;
@@ -157,10 +156,10 @@ reLoadRaceFromResultsFile(const char *filename)
 		GfParmReadFile(ossResFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	if (hparmResults)
 	{
-		RmRaceEngine().race()->load(pRaceMan, hparmResults);
+		LegacyMenu::self().raceEngine().race()->load(pRaceMan, hparmResults);
 
 		// Restore the race from the result file.
-		RmRaceEngine().restoreRace(hparmResults);
+		LegacyMenu::self().raceEngine().restoreRace(hparmResults);
 	}
 	
 	// Update GUI.
@@ -180,7 +179,7 @@ reOnActivate(void * /* dummy */)
 static void
 reOnRaceDataChanged()
 {
-	GfRace* pRace = RmRaceEngine().race();
+	GfRace* pRace = LegacyMenu::self().raceEngine().race();
 	const GfRaceManager* pRaceMan = pRace->getManager();
 
 	// Get the currently selected track for the race (should never fail, unless no track at all).
@@ -264,7 +263,7 @@ reOnPlayerConfig(void * /* dummy */)
 static void
 reOnLoadRaceFromConfigFile(void *pPrevMenu)
 {
-	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 	
 	fs.title = pRaceMan->getName();
 	fs.mode = RmFSModeLoad;
@@ -279,7 +278,7 @@ reOnLoadRaceFromConfigFile(void *pPrevMenu)
 static void
 reOnLoadRaceFromResultsFile(void *pPrevMenu)
 {
-	GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 	
 	fs.title = pRaceMan->getName();
 	fs.mode = RmFSModeLoad;
@@ -294,7 +293,7 @@ reOnLoadRaceFromResultsFile(void *pPrevMenu)
 static void
 reOnSaveRaceToConfigFile(void *pPrevMenu)
 {
-	const GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	const GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 	
 	// Fill-in file selection descriptor
 	fs.title = pRaceMan->getName();
@@ -314,13 +313,13 @@ reOnSaveRaceToConfigFile(void *pPrevMenu)
 static void
 reStartNewRace(void * /* dummy */)
 {
-	RmRaceEngine().startNewRace();
+	LegacyMenu::self().raceEngine().startNewRace();
 }
 
 static void
 reResumeRace(void * /* dummy */)
 {
-	RmRaceEngine().resumeRace();
+	LegacyMenu::self().raceEngine().resumeRace();
 }
 
 // Init. function for the current menu -----------------------------------------------------
@@ -331,19 +330,19 @@ ReRacemanMenu()
 	// TODO: Integrate better the networking menu system in the race config. menu system
 	//       (merge the ReNetworkClientConnectMenu and ReNetworkHostMenu into this race man menu,
 	//        after adding some more features / controls ? because they look similar).
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	if (!strcmp(reInfo->_reName, "Online Race"))
 	{
 		// Temporary, as long as the networking menu are not ported to tgfdata.
 		
 		// Force any needed fix on the specified track for the race (may not exist)
-		const GfTrack* pTrack = RmRaceEngine().race()->getTrack();
+		const GfTrack* pTrack = LegacyMenu::self().raceEngine().race()->getTrack();
 		GfLogDebug("Using track %s for Online Race", pTrack->getName().c_str());
 
-		// Synchronize reInfo->params with RmRaceEngine().race() state,
+		// Synchronize reInfo->params with LegacyMenu::self().raceEngine().race() state,
 		// in case the track was fixed.
-		if (RmRaceEngine().race()->isDirty())
-			RmRaceEngine().race()->store(); // Save data to params.
+		if (LegacyMenu::self().raceEngine().race()->isDirty())
+			LegacyMenu::self().raceEngine().race()->store(); // Save data to params.
 		
 		// End of temporary.
 
@@ -374,7 +373,7 @@ ReRacemanMenu()
 	if (ScrHandle)
 		GfuiScreenRelease(ScrHandle);
 
-	const GfRaceManager* pRaceMan = RmRaceEngine().race()->getManager();
+	const GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
 	// Create screen, load menu XML descriptor and create static controls.
 	ScrHandle = GfuiScreenCreateEx(NULL, NULL, reOnActivate, 

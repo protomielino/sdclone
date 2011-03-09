@@ -32,13 +32,10 @@
 
 
 /*********************************************************
- * 2, 3, 4 or 5 buttons "Quit race" screens
+ * 2, 3, 4 or 5 buttons "Stop race" screens
  */
 
-static void *twoStateHdle = 0;
-static void *triStateHdle = 0;
-static void *fourStateHdle = 0;
-static void *fiveStateHdle = 0;
+static void *QuitHdle[5] = { 0, 0, 0, 0, 0 };
 
 // Descriptor for 1 button.
 typedef struct {
@@ -49,9 +46,9 @@ typedef struct {
 
 } tButtonDesc;
 
-// Generic N state "quit race" screen creation and activation.
+// "Stop race" screen creation and activation.
 static void *
-rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
+rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 {
     void *screenHdle = 0;
         
@@ -69,18 +66,19 @@ rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, in
     // Create specified buttons, left aligned.
     for (int nButInd = 0; nButInd < nButtons; nButInd++)
     {
-        int id = GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
-				      aButtons[nButInd].screen, GFUI_ALIGN_HL_VB, GfuiScreenActivate);
+        const int id =
+			GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
+								 aButtons[nButInd].screen, GFUI_ALIGN_HL_VB, GfuiScreenActivate);
 
-	GfuiButtonShowBox(screenHdle,id,false);
-	Color c, fc, pc;
-	c.red  = 1.0;   c.green  = 1.0; c.blue  = 1.0; c.alpha  = 1.0;
-	fc.red = 1.0;   fc.green = 0.8; fc.blue = 0.0; fc.alpha = 1.0;
-	pc.red = 0.902; pc.green = 0.1; pc.blue = 0.2; pc.alpha = 1.0;
+		GfuiButtonShowBox(screenHdle, id, false);
+		Color c, fc, pc;
+		c.red  = 1.0;   c.green  = 1.0; c.blue  = 1.0; c.alpha  = 1.0;
+		fc.red = 1.0;   fc.green = 0.8; fc.blue = 0.0; fc.alpha = 1.0;
+		pc.red = 0.902; pc.green = 0.1; pc.blue = 0.2; pc.alpha = 1.0;
 
-        GfuiButtonSetColor(screenHdle,id,c);
-        GfuiButtonSetFocusColor(screenHdle,id,fc);
-        GfuiButtonSetPushedColor(screenHdle,id,pc);
+        GfuiButtonSetColor(screenHdle, id, c);
+        GfuiButtonSetFocusColor(screenHdle, id, fc);
+        GfuiButtonSetPushedColor(screenHdle, id, pc);
     }
 
     // Close menu XML descriptor.
@@ -97,120 +95,44 @@ rmNStateScreen(const char *title, const tButtonDesc aButtons[], int nButtons, in
     return screenHdle;
 }
 
-// 2 state "quit race" screen creation and activation.
+// "quit race" screen creation and activation.
 void *
-RmTwoStateScreen(
-        const char *title,
-        const char *label1, const char *tip1, void *screen1,
-        const char *label2, const char *tip2, void *screen2)
+RmStopRaceScreen(const char *title,
+				 const char *label1, const char *tip1, void *screen1,
+				 const char *label2, const char *tip2, void *screen2,
+				 const char *label3, const char *tip3, void *screen3,
+				 const char *label4, const char *tip4, void *screen4,
+				 const char *label5, const char *tip5, void *screen5)
 {
-    static const int nButtons = 2;
-    const tButtonDesc aButtons[nButtons]  =
-    {
-        { label1, tip1, screen1 },
-        { label2, tip2, screen2 }
-    };
-        
-    if (twoStateHdle) {
-        GfuiScreenRelease(twoStateHdle);
-    }
-        
-    twoStateHdle = rmNStateScreen(title, aButtons, nButtons, 1);
-    
-    return twoStateHdle;
-}
-
-
-// 3 state "quit race" screen creation and activation.
-void *
-RmTriStateScreen(
-        const char *title,
-        const char *label1, const char *tip1, void *screen1,
-        const char *label2, const char *tip2, void *screen2,
-        const char *label3, const char *tip3, void *screen3)
-{
-    static const int nButtons = 3;
-    const tButtonDesc aButtons[nButtons]  =
-    {
-        { label1, tip1, screen1 },
-        { label2, tip2, screen2 },
-        { label3, tip3, screen3 }
-    };
-        
-    if (triStateHdle) {
-        GfuiScreenRelease(triStateHdle);
-    }
-        
-    triStateHdle = rmNStateScreen(title, aButtons, nButtons, 2);
-    
-    return triStateHdle;
-}
-
-// 4 state "quit race" screen creation and activation.
-void *
-RmFourStateScreen(
-        const char *title,
-        const char *label1, const char *tip1, void *screen1,
-        const char *label2, const char *tip2, void *screen2,
-        const char *label3, const char *tip3, void *screen3,
-        const char *label4, const char *tip4, void *screen4)
-{
-    static const int nButtons = 4;
-    const tButtonDesc aButtons[nButtons]  =
+    const tButtonDesc aButtons[5] =
     {
         { label1, tip1, screen1 },
         { label2, tip2, screen2 },
         { label3, tip3, screen3 },
-        { label4, tip4, screen4 }
+        { label4, tip4, screen4 },
+        { label5, tip5, screen5 }
     };
+	
+    int nButtons = 2;
+	if (label3 && tip3 && screen3)
+	{
+		nButtons++;
+		if (label4 && tip4 && screen4)
+		{
+			nButtons++;
+			if (label5 && tip5 && screen5)
+				nButtons++;
+		}
+	}
         
-    if (fourStateHdle) {
-        GfuiScreenRelease(fourStateHdle);
-    }
+    if (QuitHdle[nButtons-1])
+        GfuiScreenRelease(QuitHdle[nButtons-1]);
         
-    fourStateHdle = rmNStateScreen(title, aButtons, nButtons, 3);
+    QuitHdle[nButtons-1] = rmStopRaceScreen(title, aButtons, nButtons, nButtons-1);
     
-    return fourStateHdle;
+    return QuitHdle[nButtons-1];
 }
 
-void *
-RmFiveStateScreen(char const *title,
-		  char const *label1, char const *tip1, void *screen1,
-		  char const *label2, char const *tip2, void *screen2,
-		  char const *label3, char const *tip3, void *screen3,
-		  char const *label4, char const *tip4, void *screen4,
-		  char const *label5, char const *tip5, void *screen5)
-{
-    if (fiveStateHdle) {
-	GfuiScreenRelease(fiveStateHdle);
-    }
-    fiveStateHdle = GfuiMenuScreenCreate(title);
-    GfuiScreenAddBgImg(fiveStateHdle, "data/img/splash-quit.jpg");
-
-    GfuiMenuButtonCreate(fiveStateHdle,
-			 label2, tip2, screen2,
-			 GFUI_ALIGN_HL_VB,GfuiScreenActivate);
-
-    GfuiMenuButtonCreate(fiveStateHdle,
-			 label3, tip3, screen3,
-			 GFUI_ALIGN_HL_VB,GfuiScreenActivate);
-
-    GfuiMenuButtonCreate(fiveStateHdle,
-			 label4, tip4, screen4,
-			 GFUI_ALIGN_HL_VB,GfuiScreenActivate);
-    
-    GfuiMenuButtonCreate(fiveStateHdle,
-			 label5, tip5, screen5,
-			 GFUI_ALIGN_HL_VB,GfuiScreenActivate);
-
-    GfuiAddKey(fiveStateHdle, GFUIK_ESCAPE, tip5, screen5, GfuiScreenActivate, NULL);
-    GfuiAddKey(fiveStateHdle, GFUIK_F1, "Help", fiveStateHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(fiveStateHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
-
-    GfuiScreenActivate(fiveStateHdle);
-
-    return fiveStateHdle;
-}
 /*********************************************************
  * Start race screen
  */

@@ -17,12 +17,11 @@
  ***************************************************************************/
 
 /** @file   
-    		
+    		The Race Engine State Automaton
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
 
-/* The Race Engine State Automaton */
 #include <cstdlib>
 #include <cstdio>
 
@@ -30,9 +29,7 @@
 
 #include <raceman.h>
 
-#include <racescreens.h>
-#include <racegl.h>
-#include <raceenginemenus.h>
+#include "raceengine.h"
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -43,14 +40,17 @@
 
 #include "racestate.h"
 
-static void *mainMenu;
+
+// Never used ?
+//static void *reMainMenu;
 
 
 /* State Automaton Init */
 void
 ReStateInit(void *prevMenu)
 {
-	mainMenu = prevMenu;
+// Never used ?
+//	reMainMenu = prevMenu;
 }
 
 
@@ -66,7 +66,7 @@ ReStateManage(void)
 			case RE_STATE_CONFIG:
 				GfLogInfo("%s now in CONFIG state\n", ReInfo->_reName);
 				/* Display the race specific menu */
-				mode = ReRacemanMenu();
+				mode = RaceEngine::self().userInterface().activateRacemanMenu();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_EVENT_INIT;
 				}
@@ -185,15 +185,8 @@ ReStateManage(void)
 			ReInfo->_reState = RE_STATE_CONFIG;
 			mode = RM_SYNC;
 		}
-//	} while ((mode & (RM_SYNC | RM_QUIT)) == RM_SYNC);
 	} while ((mode & RM_SYNC) == RM_SYNC);
 
-/* Will not happen any longer
-	if (mode & RM_QUIT) {
-		GfScrShutdown();
-		exit (0);		// brutal isn't it ? 
-	}
-*/
 	if (mode & RM_ACTIVGAMESCR) {
 		GfuiScreenActivate(ReInfo->_reGameScreen);
 	}

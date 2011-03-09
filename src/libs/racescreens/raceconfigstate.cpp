@@ -33,9 +33,8 @@
 
 #include <race.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
-
-#include "raceenginemenus.h"
 
 
 // Data for the race configuration menus.
@@ -47,7 +46,7 @@ static tRmRaceParam    rp;
 static void
 reConfigBack(void)
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	void* params = reInfo->params;
 
 	/* Go back one step in the conf */
@@ -107,7 +106,7 @@ ReConfigRunState(bool bStart)
 	char	path[256];
 	int		curConf;
 	const char	*conf;
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	void	*params = reInfo->params;
 
 	// TODO: Replace any read/write to params to get/set from/to race/raceman instances ?
@@ -120,7 +119,7 @@ ReConfigRunState(bool bStart)
 	curConf = (int)GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
 	if (curConf > GfParmGetEltNb(params, RM_SECT_CONF)) {
 		GfLogInfo("%s configuration finished.\n", reInfo->_reName);
-		RmRaceEngine().race()->store(); // Save race data to params.
+		LegacyMenu::self().raceEngine().race()->store(); // Save race data to params.
 		GfParmWriteFile(NULL, params, reInfo->_reName); // Save params to disk.
 		GfuiScreenActivate(ReGetRacemanMenuHandle()); // Back to the race manager menu
 		return;
@@ -148,7 +147,7 @@ ReConfigRunState(bool bStart)
 		} else {
 			ts.prevScreen = reConfigBackHookInit();
 		}
-		ts.pRace = RmRaceEngine().race();
+		ts.pRace = LegacyMenu::self().raceEngine().race();
 		ts.trackItf = reInfo->_reTrackItf;
 		RmTrackSelect(&ts);
 
@@ -161,7 +160,7 @@ ReConfigRunState(bool bStart)
 		} else {
 			ds.prevScreen = reConfigBackHookInit();
 		}
-		ds.pRace = RmRaceEngine().race();
+		ds.pRace = LegacyMenu::self().raceEngine().race();
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
@@ -173,7 +172,7 @@ ReConfigRunState(bool bStart)
 		} else {
 			rp.prevScreen = reConfigBackHookInit();
 		}
-		rp.pRace = RmRaceEngine().race();
+		rp.pRace = LegacyMenu::self().raceEngine().race();
 		rp.session = GfParmGetStr(params, path, RM_ATTR_RACE, RM_VAL_ANYRACE);
 		RmRaceParamsMenu(&rp);
 	}

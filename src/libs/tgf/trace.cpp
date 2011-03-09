@@ -74,7 +74,7 @@ gfTraceInit(void)
 
 #ifdef TRACE_OUT
 
-TGF_API void GfLogSetStream(FILE* fStream)
+void GfLogSetStream(FILE* fStream)
 {
     if (fStream)
     {
@@ -122,7 +122,7 @@ TGF_API void GfLogSetStream(FILE* fStream)
     }
 }
 
-TGF_API void GfLogSetFile(const char* pszFileName)
+void GfLogSetFile(const char* pszFileName)
 {
 	FILE* fStream = fopen(pszFileName, "w");
     if (fStream)
@@ -147,7 +147,7 @@ TGF_API void GfLogSetFile(const char* pszFileName)
 	}
 }
 
-TGF_API void GfLogSetLevelThreshold(int nLevel)
+void GfLogSetLevelThreshold(int nLevel)
 {
     gfLogLevelThreshold = nLevel;
 
@@ -167,7 +167,7 @@ TGF_API void GfLogSetLevelThreshold(int nLevel)
 
 #endif // TRACE_OUT
 
-TGF_API void GfLogFatal(const char *pszFmt, ...)
+void GfLogFatal(const char *pszFmt, ...)
 {
 #ifdef TRACE_OUT
     if (gfLogLevelThreshold >= gfLogFatal)
@@ -194,7 +194,7 @@ TGF_API void GfLogFatal(const char *pszFmt, ...)
 
 #ifdef TRACE_OUT
 
-TGF_API void GfLogError(const char *pszFmt, ...)
+void GfLogError(const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= gfLogError)
     {
@@ -213,7 +213,7 @@ TGF_API void GfLogError(const char *pszFmt, ...)
     }
 }
 
-TGF_API void GfLogWarning(const char *pszFmt, ...)
+void GfLogWarning(const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= gfLogWarning)
     {
@@ -232,7 +232,7 @@ TGF_API void GfLogWarning(const char *pszFmt, ...)
     }
 }
 
-TGF_API void GfLogInfo(const char *pszFmt, ...)
+void GfLogInfo(const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= gfLogInfo)
     {
@@ -251,7 +251,7 @@ TGF_API void GfLogInfo(const char *pszFmt, ...)
     }
 }
 
-TGF_API void GfLogTrace(const char *pszFmt, ...)
+void GfLogTrace(const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= gfLogTrace)
     {
@@ -270,7 +270,7 @@ TGF_API void GfLogTrace(const char *pszFmt, ...)
     }
 }
 
-TGF_API void GfLogDebug(const char *pszFmt, ...)
+void GfLogDebug(const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= gfLogDebug)
     {
@@ -289,7 +289,7 @@ TGF_API void GfLogDebug(const char *pszFmt, ...)
     }
 }
 
-TGF_API void GfLogMessage(int nLevel, const char *pszFmt, ...)
+void GfLogMessage(int nLevel, const char *pszFmt, ...)
 {
     if (gfLogLevelThreshold >= nLevel)
     {

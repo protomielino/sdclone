@@ -33,8 +33,8 @@
 #include <racemanagers.h>
 #include <race.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
-#include "raceselectmenu.h"
 
 
 static void *reRaceSelectHandle = NULL;
@@ -49,8 +49,8 @@ reOnActivate(void * /* dummy */)
 	GfLogTrace("Entering Race Mode Select menu\n");
 
     /* Race engine init */
-    RmRaceEngine().initialize();
-    RmRaceEngine().data()->_reMenuScreen = reRaceSelectHandle;
+    LegacyMenu::self().raceEngine().initialize();
+    LegacyMenu::self().raceEngine().data()->_reMenuScreen = reRaceSelectHandle;
 }
 
 /* Exit from Race engine */
@@ -58,7 +58,7 @@ static void
 reOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
-    RmRaceEngine().shutdown();
+    LegacyMenu::self().raceEngine().shutdown();
 }
 
 
@@ -97,13 +97,13 @@ reOnSelectRaceMan(void *pvRaceManTypeIndex)
 
 	if (pSelRaceMan)
 	{
-		RmRaceEngine().selectRaceman(pSelRaceMan);
+		LegacyMenu::self().raceEngine().selectRaceman(pSelRaceMan);
 		
 		// (Re-)initialize the currrent race configuration from the selected race manager.
-		RmRaceEngine().race()->load(pSelRaceMan);
+		LegacyMenu::self().raceEngine().race()->load(pSelRaceMan);
 
 		// Start the race configuration menus sequence.
-		RmRaceEngine().configureRace(/* bInteractive */ true);
+		LegacyMenu::self().raceEngine().configureRace(/* bInteractive */ true);
 	}
 	else
 	{
@@ -205,7 +205,7 @@ ReRaceSelectInit(void *prevMenu)
 			   prevMenu, reOnRaceSelectShutdown, NULL);
 
     // Give the race engine the menu to come back to.
-    RmRaceEngine().initializeState(reRaceSelectHandle);
+    LegacyMenu::self().raceEngine().initializeState(reRaceSelectHandle);
 
     return reRaceSelectHandle;
 }

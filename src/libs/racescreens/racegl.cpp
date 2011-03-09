@@ -31,10 +31,8 @@
 #include <raceman.h>
 #include <robot.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
-
-#include "racemessage.h"
-#include "racegl.h"
 
 
 static void	*reScreenHandle = 0;
@@ -57,7 +55,7 @@ reIdle(void)
 static void
 reDisplay(void)
 {
-    RmRaceEngine().updateState();
+    LegacyMenu::self().raceEngine().updateState();
 }
 
 static void
@@ -70,9 +68,9 @@ reScreenActivate(void * /* dummy */)
     GfelSetDisplayCB(reDisplay);
 
 	// Resync race engine if it is not paused or stopped
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
     if (!(reInfo->s->_raceState & RM_RACE_PAUSED)) {
-	RmRaceEngine().start(); 			/* resynchro */
+	LegacyMenu::self().raceEngine().start(); 			/* resynchro */
     }
 
     GfelPostRedisplay();
@@ -81,14 +79,14 @@ reScreenActivate(void * /* dummy */)
 static void
 ReBoardInfo(void * /* vboard */)
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
     if (reInfo->s->_raceState & RM_RACE_PAUSED) {
 	reInfo->s->_raceState &= ~RM_RACE_PAUSED;
-	RmRaceEngine().start();
+	LegacyMenu::self().raceEngine().start();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
     } else {
 	reInfo->s->_raceState |= RM_RACE_PAUSED;
-	RmRaceEngine().stop();
+	LegacyMenu::self().raceEngine().stop();
 	GfuiVisibilitySet(reScreenHandle, rePauseId, 1);
     }
 }
@@ -96,7 +94,7 @@ ReBoardInfo(void * /* vboard */)
 static void
 reSkipPreStart(void * /* dummy */)
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
     if (reInfo->s->currentTime < -1.0) {
 	reInfo->s->currentTime = -1.0;
 	reInfo->_reLastTime = -1.0;
@@ -104,38 +102,15 @@ reSkipPreStart(void * /* dummy */)
 }
 
 static void
-reTimeMod (void *vcmd)
+reTimeMod (void *pvMultFactor)
 {
-	char buf[32];
-    long cmd = (long)vcmd;
-    
-	tRmInfo* reInfo = RmRaceEngine().data();
-    switch ((int)cmd) {
-    case 0:
-	reInfo->_reTimeMult *= 2.0;
-	if (reInfo->_reTimeMult > 64.0) {
-	    reInfo->_reTimeMult = 64.0;
-	}
-	break;
-    case 1:
-	reInfo->_reTimeMult *= 0.5;
-	if (reInfo->_reTimeMult < 0.25) {
-	    reInfo->_reTimeMult = 0.25;
-	}
-	break;
-    case 2:
-    default:
-	reInfo->_reTimeMult = 1.0;
-	break;
-    }
-    sprintf(buf, "Time x%.2f", 1.0 / reInfo->_reTimeMult);
-    ReRaceMsgSet(reInfo, buf, 5); // TODO: Thread-safe access to reInfo in multi-threaded mode !
+	LegacyMenu::self().raceEngine().accelerateTime(*(double*)pvMultFactor);
 }
 
 static void
 reMovieCapture(void * /* dummy */)
 {
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	tRmMovieCapture	*capture = &(reInfo->movieCapture);
 
     if (!capture->enabled || reInfo->_displayMode == RM_DISP_MODE_NONE || reInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
@@ -154,7 +129,7 @@ reMovieCapture(void * /* dummy */)
     } else {
 	GfLogInfo("Stopping movie capture\n");
 	reInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	RmRaceEngine().start();
+	LegacyMenu::self().raceEngine().start();
     }
 
 }
@@ -168,13 +143,13 @@ reHideShowMouseCursor(void * /* dummy */)
 static void
 reApplyState(void *pvState)
 {
-    RmRaceEngine().applyState((int)(long)pvState);
+    LegacyMenu::self().raceEngine().applyState((int)(long)pvState);
 }
 
 static void
 reOneStep(void *pvState)
 {
-    RmRaceEngine().step((int)(long)pvState);
+    LegacyMenu::self().raceEngine().step((int)(long)pvState);
 }
 
 static void
@@ -183,9 +158,13 @@ reAddKeys(void)
     GfuiAddKey(reScreenHandle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reScreenHandle, '-', "Slow down Time",    (void*)0, reTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)1, reTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '.', "Restore Real Time", (void*)2, reTimeMod, NULL);
+	double fSlowDownFactor = 2.0;
+    GfuiAddKey(reScreenHandle, '-', "Slow down Time",    &fSlowDownFactor, reTimeMod, NULL);
+	double fAccelerateFactor = 0.5;
+    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   &fAccelerateFactor, reTimeMod, NULL);
+	double fRealTimeFactor = 0.0;
+    GfuiAddKey(reScreenHandle, '.', "Restore Real Time", &fRealTimeFactor, reTimeMod, NULL);
+	
     GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, reApplyState, NULL);
     /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, reApplyState, NULL); */
@@ -282,7 +261,7 @@ ReScreenShutdown(void)
 static void
 reHookActivate(void * /* dummy */)
 {
-    RmRaceEngine().updateState();
+    LegacyMenu::self().raceEngine().updateState();
 }
 
 void *
@@ -298,6 +277,7 @@ ReHookInit(void)
 }
 
 
+// Never called.
 void
 ReHookShutdown(void)
 {
@@ -363,7 +343,7 @@ reContDisplay(void)
 static void
 reResCont(void * /* dummy */)
 {
-    RmRaceEngine().updateState();
+    LegacyMenu::self().raceEngine().updateState();
 }
 
 static void
@@ -387,7 +367,7 @@ ReResScreenInit(void)
 	GfuiScreenRelease(reResScreenHdle);
     }
 
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
     // Create screen, load menu XML descriptor and create static controls.
     reResScreenHdle = GfuiScreenCreateEx(black, 0, reResScreenActivate, 0, reResScreenShutdown, 0);
@@ -436,7 +416,7 @@ ReResScreenSetTrackName(const char *pszTrackName)
 {
     if (reResScreenHdle) {
 		char pszTitle[128];
-		tRmInfo* reInfo = RmRaceEngine().data();
+		tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 		snprintf(pszTitle, sizeof(pszTitle), "%s on %s",
 				 aRaceTypeNames[reInfo->s->_raceType], pszTrackName);
 		GfuiLabelSetText(reResScreenHdle, reResMainTitleId, pszTitle);

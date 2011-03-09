@@ -19,9 +19,7 @@
 
 #include <tgfclient.h>
 
-#include <raceengine.h>
 #include <racescreens.h>
-#include <raceselectmenu.h>
 #include <playerconfig.h>
 
 #include "mainmenu.h"
@@ -117,13 +115,6 @@ MainMenuInit(void)
     GfuiMenuDefaultKeysAdd(MenuHandle);
     GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit the game", exitMenu, GfuiScreenActivate, NULL);
 
-    // Register the ExitMenu init func in the race engine.
-	RaceEngine::self().setExitMenuInitFunc(ExitMenuInit);
-
-	// Notify the race screens of the race engine existence.
-	// TODO: Move this to main().
-	RmSetRaceEngine(RaceEngine::self());
-	
     return 0;
 }
 

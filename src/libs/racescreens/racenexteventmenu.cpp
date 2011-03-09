@@ -31,7 +31,8 @@
 #include <raceman.h>
 #include <tgfclient.h>
 
-#include "raceenginemenus.h"
+#include "legacymenu.h"
+#include "racescreens.h"
 
 
 // New track menu.
@@ -40,7 +41,7 @@ static void	*ScrHandle = NULL;
 static void
 reStateManage(void * /* dummy */)
 {
-	RmRaceEngine().updateState();
+	LegacyMenu::self().raceEngine().updateState();
 }
 
 int
@@ -48,7 +49,7 @@ ReNextEventMenu(void)
 {
 	char buf[128];
 
-	tRmInfo* reInfo = RmRaceEngine().data();
+	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	void	*params = reInfo->params;
 	void	*results = reInfo->results;
 	int		raceNumber;

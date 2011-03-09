@@ -1,9 +1,9 @@
 /***************************************************************************
-                 iraceengine.h -- Tools for module interface management
+                 iraceengine.h -- Interface for any race engine
 
     created              : Mon Mar 7 19:32:14 CEST 2011
     copyright            : (C) 2011 by Jean-Philippe Meuret                         
-    web                  : jpmeuret@free.fr
+    web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
 
@@ -17,15 +17,14 @@
  ***************************************************************************/
 
 /** @file   
-    	Interface for a race engine
+    	Interface for any race engine
     @version	$Id$
 */
-
-// TODO: Rename all the member functions (first lower case letter, remove ReRace, ...)
 
 #ifndef __IRACEENGINE__H__
 #define __IRACEENGINE__H__
 
+class IUserInterface;
 struct RmInfo;
 class GfRaceManager;
 class GfRace;
@@ -34,36 +33,35 @@ class GfRace;
 class IRaceEngine
 {
 public:
-// From racesituation
-	virtual struct RmInfo* data() = 0;
-
-// From racemain
-	virtual void setExitMenuInitFunc(void* (*func)(void*)) = 0;
-
-// From raceinit
-	virtual void startNewRace() = 0;
-	virtual void resumeRace() = 0;
 
 	virtual void initialize() = 0;
 	virtual void shutdown() = 0;
+
+	virtual void setUserInterface(IUserInterface& userItf) = 0;
+
+	virtual void initializeState(void *prevMenu) = 0;
+	virtual void updateState() = 0;
+	virtual void applyState(int state) = 0;
 
 	virtual void selectRaceman(GfRaceManager* pRaceMan) = 0;
 	virtual void restoreRace(void* hparmResults) = 0;
 	virtual void configureRace(bool bInteractive = true) = 0;
 
-	virtual GfRace* race() = 0;
+	virtual void startNewRace() = 0;
+	virtual void resumeRace() = 0;
 
-// From racestate
-	virtual void initializeState(void *prevMenu) = 0;
-	virtual void updateState() = 0;
-	virtual void applyState(int state) = 0;
-
-// From raceupdate
+	virtual void accelerateTime(double fMultFactor) = 0;
 	virtual void start() = 0;
 	virtual void stop() = 0;
 #ifdef DEBUG
 	virtual void step(double dt) = 0;
 #endif
+
+	virtual GfRace* race() = 0;
+	virtual struct RmInfo* data() = 0;
+
 };
+
+#include <iuserinterface.h>
 
 #endif // __IRACEENGINE__H__

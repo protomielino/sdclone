@@ -28,8 +28,7 @@
 #include <robot.h>
 #include <network.h>
 
-#include <raceenginemenus.h>
-#include <racegl.h>
+#include "raceengine.h"
 
 #include "raceutil.h" // RmGetFeaturesList
 #include "racesituation.h"
@@ -198,7 +197,7 @@ ReRaceEventInit(void)
 	ReInfo->_reRaceName = ReGetCurrentRaceName();
 	GfLogInfo("Starting %s session\n", ReInfo->_reRaceName);
 
-	RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
+	RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	
 	ReInfo->s->_features = RmGetFeaturesList(params);
 
@@ -207,7 +206,7 @@ ReRaceEventInit(void)
 	ReEventInitResults();
 
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-		ReNextEventMenu();
+		RaceEngine::self().userInterface().activateNextEventMenu();
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
 	return RM_SYNC | RM_NEXT_STEP;
@@ -320,7 +319,7 @@ reRaceRealStart(void)
 	//Load simulation engine
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
 	snprintf(buf, sizeof(buf), "Loading simulation engine (%s) ...", dllname);
-	RmLoadingScreenSetText(buf);
+	RaceEngine::self().userInterface().addLoadingMessage(buf);
 	snprintf(path, sizeof(path), "%smodules/simu/%s.%s", GfLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, path, &ReRaceModList)) 
 		return RM_QUIT;
@@ -342,7 +341,7 @@ reRaceRealStart(void)
 
 	/* Blind mode or not */
 	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	ReInfo->_reGameScreen = ReScreenInit();
+	ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceScreen();
 	//foundHuman = 0;
 
 	//Check if there is a human in the current race
@@ -356,16 +355,16 @@ reRaceRealStart(void)
 	if (foundHuman != 1) { /* No human in current race */
 		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_INVISIBLE)) {
 			ReInfo->_displayMode = RM_DISP_MODE_NONE;
-			ReInfo->_reGameScreen = ReResScreenInit();
+			ReInfo->_reGameScreen = RaceEngine::self().userInterface().createResultsMenu();
 		} else if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0) {
 			if (foundHuman == 2) { /* Human in driver list, but not in current race */
 				if (ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) {
 					ReInfo->_displayMode = RM_DISP_MODE_NONE;
-					ReInfo->_reGameScreen = ReResScreenInit();
+					ReInfo->_reGameScreen = RaceEngine::self().userInterface().createResultsMenu();
 				} /* Else: normally visible */
 			} else {
 				ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
-				ReInfo->_reGameScreen = ReResScreenInit();
+				ReInfo->_reGameScreen = RaceEngine::self().userInterface().createResultsMenu();
 			}//if foundHuman == 2
 		}
 	}//if foundHuman != 1
@@ -373,7 +372,7 @@ reRaceRealStart(void)
 	//If neither a qualification, nor a practice and has results, load race splash
 	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) ||
 	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)) {
-		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
+		RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	}
 
 	//Load drivers for the race
@@ -383,7 +382,7 @@ reRaceRealStart(void)
 		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		snprintf(buf, sizeof(buf), "Loading driver %s (%s) ...",
 				 s->cars[i]->_name, GfParmGetName(carHdle));
-		RmLoadingScreenSetText(buf);
+		RaceEngine::self().userInterface().addLoadingMessage(buf);
 		if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) { //Tell robots they are to start a new race
 			robot = s->cars[i]->robot;
 			GfPoolMove( &s->cars[i]->_newRaceMemPool, &oldPool );
@@ -405,7 +404,7 @@ reRaceRealStart(void)
 	}
 
 	//All cars start with max brakes on
-	RmLoadingScreenSetText("Running Prestart ...");
+	RaceEngine::self().userInterface().addLoadingMessage("Running Prestart ...");
 	for (i = 0; i < s->_ncars; i++) {
 		memset(&(s->cars[i]->ctrl), 0, sizeof(tCarCtrl));
 		s->cars[i]->ctrl.brakeCmd = 1.0;
@@ -420,9 +419,9 @@ reRaceRealStart(void)
 		} else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && s->_ncars > 1) {
 			ReUpdatePracticeCurRes(s->cars[0]);
 		} else {
-			ReResScreenSetTrackName(ReInfo->track->name);
+			RaceEngine::self().userInterface().setResultsMenuTrackName(ReInfo->track->name);
 			snprintf(buf, sizeof(buf), "%s (%s)", s->cars[0]->_name, s->cars[0]->_carName);
-			ReResScreenSetTitle(buf);
+			RaceEngine::self().userInterface().setResultsMenuTitle(buf);
 		}
 	}//if displayMode != normal
 
@@ -448,19 +447,19 @@ reRaceRealStart(void)
 	ReInitUpdaters();
 	
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
-		RmLoadingScreenSetText("Loading cars ...");
+		RaceEngine::self().userInterface().addLoadingMessage("Loading cars ...");
 		ReInitCarGraphics();
 	}
 
 	if (GetNetwork())
 	{
-		RmLoadingScreenSetText("Preparing online race ...");
+		RaceEngine::self().userInterface().addLoadingMessage("Preparing online race ...");
 		
 		GetNetwork()->RaceInit(ReInfo->s);
 		GetNetwork()->SetRaceActive(true);
 	}
 
-	RmLoadingScreenSetText("Ready.");
+	RaceEngine::self().userInterface().addLoadingMessage("Ready.");
 
 	GfuiScreenActivate(ReInfo->_reGameScreen);
 
@@ -521,10 +520,10 @@ ReRaceStart(void)
 		// Race loading screen
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
-			RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
-			RmLoadingScreenSetText("Preparing Starting Grid ...");
+			RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
+			RaceEngine::self().userInterface().addLoadingMessage("Preparing Starting Grid ...");
 		} else {
-			RmLoadingScreenShutdown();
+			RaceEngine::self().userInterface().shutdownLoadingScreen();
 		}
 
 		// Propagate competitor drivers info to the real race starting grid
@@ -545,8 +544,8 @@ ReRaceStart(void)
 	}
 	else
 	{
-		RmLoadingScreenStart(ReInfo->_reName, "data/img/splash-raceload.jpg");
-		RmLoadingScreenSetText("Preparing Starting Grid ...");
+		RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
+		RaceEngine::self().userInterface().addLoadingMessage("Preparing Starting Grid ...");
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		
@@ -636,8 +635,8 @@ ReRaceStart(void)
 	//ReTrackUpdate();
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {
-		RmLoadingScreenShutdown();
-		RmDisplayStartRace(ReInfo, StartRaceHookInit(), AbandonRaceHookInit());
+		RaceEngine::self().userInterface().shutdownLoadingScreen();
+		RaceEngine::self().userInterface().activateStartRaceMenu(ReInfo, StartRaceHookInit(), AbandonRaceHookInit());
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
 
@@ -744,37 +743,45 @@ ReRaceStop(void)
 	{
 		if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 		{
-			StopScrHandle = RmFourStateScreen("Race Stopped",
-						"Abandon Race", "Abort current race", AbortRaceHookInit(),
-						"Resume Race", "Return to Race", BackToRaceHookInit(),
-						"Skip Session", "Skip Session", SkipSessionHookInit(),
-						"Quit Game", "Quit the game", QuitHookInit());
-		} else 
-		{
-			StopScrHandle = RmTriStateScreen("Race Stopped",
-						"Abandon Race", "Abort current race", AbortRaceHookInit(),
-						"Resume Race", "Return to Race", BackToRaceHookInit(),
-						"Quit Game", "Quit the game", QuitHookInit());
+			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
+				("Race Stopped",
+				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
+				 "Resume Race", "Return to Race", BackToRaceHookInit(),
+				 "Skip Session", "Skip Session", SkipSessionHookInit(),
+				 "Quit Game", "Quit the game", QuitHookInit());
 		}
-	} else 
+		else 
+		{
+			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
+				("Race Stopped",
+				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
+				 "Resume Race", "Return to Race", BackToRaceHookInit(),
+				 "Quit Game", "Quit the game", QuitHookInit());
+		}
+	}
+	else 
 	{
 		if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 		{
-			StopScrHandle = RmFiveStateScreen("Race Stopped",
-						"Restart Race", "Restart the current race", RestartRaceHookInit(),
-						"Abandon Race", "Abort current race", AbortRaceHookInit(),
-						"Resume Race", "Return to Race", BackToRaceHookInit(),
-						"Skip Session", "Skip Session", SkipSessionHookInit(),
-						"Quit Game", "Quit the game", QuitHookInit());
-		} else 
+			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
+				("Race Stopped",
+				 "Restart Race", "Restart the current race", RestartRaceHookInit(),
+				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
+				 "Resume Race", "Return to Race", BackToRaceHookInit(),
+				 "Skip Session", "Skip Session", SkipSessionHookInit(),
+				 "Quit Game", "Quit the game", QuitHookInit());
+		}
+		else 
 		{
-			StopScrHandle = RmFourStateScreen("Race Stopped",
-						"Restart Race", "Restart the current race", RestartRaceHookInit(),
-						"Abandon Race", "Abort current race", AbortRaceHookInit(),
-						"Resume Race", "Return to Race", BackToRaceHookInit(),
-						"Quit Game", "Quit the game", QuitHookInit());
+			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
+				("Race Stopped",
+				 "Restart Race", "Restart the current race", RestartRaceHookInit(),
+				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
+				 "Resume Race", "Return to Race", BackToRaceHookInit(),
+				 "Quit Game", "Quit the game", QuitHookInit());
 		}
 	}
+	
 	return RM_ASYNC | RM_NEXT_STEP;
 }
 

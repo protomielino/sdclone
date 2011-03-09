@@ -23,36 +23,20 @@
     @version	$Id$
 */
 
-#include <cstdlib>
+#include <raceman.h>
 
-#include <portability.h>
-#include <tgfclient.h>
+#include "raceengine.h"
 
-#include "racescreens.h"
-#include "racegl.h"
 #include "racemessage.h"
 
-
-static char	buf[1024];
-static double	msgDisp;
-static double	bigMsgDisp;
 
 void
 ReRaceMsgUpdate(tRmInfo* pReInfo)
 {
-	if (pReInfo->_reMessage)
-	{
-		ReSetRaceMsg(pReInfo->_reMessage);
-	}		
-	else
-		ReSetRaceMsg(0);
+	IUserInterface& userItf = RaceEngine::self().userInterface();
 	
-	if (pReInfo->_reBigMessage)
-	{
-		ReSetRaceMsg(pReInfo->_reBigMessage);
-	}		
-	else
-		ReSetRaceBigMsg(0);
+	userItf.setRaceMessage(pReInfo->_reMessage);
+	userItf.setRaceBigMessage(pReInfo->_reBigMessage);
 }
 
 void

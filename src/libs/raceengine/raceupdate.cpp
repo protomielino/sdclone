@@ -35,16 +35,15 @@
 #include <robot.h>
 #include <raceman.h>
 
-#include <racescreens.h>
-#include <racegl.h>
-#include <racemessage.h>
+#include "raceengine.h"
 
 #include "raceresults.h"
 #include "racesimusimu.h"
-
+#include "racemessage.h"
 #include "racesituation.h"
 #include "racenetwork.h"
 #include "racecars.h"
+
 #include "raceupdate.h"
 
 
@@ -264,7 +263,7 @@ int reSituationUpdater::threadLoop()
 	if (_bThreadAffinity)
 		GfSetThreadAffinity(NUpdaterCPUId);
 
-	GfOut("SituationUpdater thread is started.\n");
+	GfLogInfo("SituationUpdater thread is started.\n");
 	
 	do
 	{
@@ -283,7 +282,7 @@ int reSituationUpdater::threadLoop()
 			if (!bRunning)
 			{
 				bRunning = true;
-				GfOut("SituationUpdater thread is running.\n");
+				GfLogInfo("SituationUpdater thread is running.\n");
 			}
 			
 			realTime = GfTimeClock();
@@ -310,7 +309,7 @@ int reSituationUpdater::threadLoop()
 			if (bRunning)
 			{
 				bRunning = false;
-				GfOut("SituationUpdater thread is paused.\n");
+				GfLogInfo("SituationUpdater thread is paused.\n");
 			}
 		}
 			
@@ -322,7 +321,7 @@ int reSituationUpdater::threadLoop()
 	}
 	while (!bEnd);
 
-	GfOut("SituationUpdater thread has been terminated.\n");
+	GfLogInfo("SituationUpdater thread has been terminated.\n");
 	
 	return 0;
 }
@@ -390,7 +389,7 @@ reSituationUpdater::reSituationUpdater(tRmInfo* pReInfo)
 		_pUpdateThread = 0;
 	}
 
-	GfOut("SituationUpdater initialized (%sseparate thread, CPU affinity %s).\n",
+	GfLogInfo("SituationUpdater initialized (%sseparate thread, CPU affinity %s).\n",
 	      (_bThreaded ? "" : "no "), (_bThreadAffinity ? "On" : "Off"));
 }
 
@@ -415,7 +414,7 @@ bool reSituationUpdater::lockData(const char* pszLocker)
 	
 	const bool bStatus = SDL_mutexP(_pDataMutex) == 0;
 	if (!bStatus)
-		GfOut("%s : Failed to lock data mutex\n", pszLocker);
+		GfLogInfo("%s : Failed to lock data mutex\n", pszLocker);
 
 	return bStatus;
 }
@@ -427,7 +426,7 @@ bool reSituationUpdater::unlockData(const char* pszLocker)
 	
 	const bool bStatus = SDL_mutexV(_pDataMutex) == 0;
 	if (!bStatus)
-		GfOut("%s : Failed to unlock data mutex\n", pszLocker);
+		GfLogInfo("%s : Failed to unlock data mutex\n", pszLocker);
 
 	return bStatus;
 }
@@ -435,7 +434,7 @@ bool reSituationUpdater::unlockData(const char* pszLocker)
 
 void reSituationUpdater::start()
 {
-	GfOut("Starting race engine.\n");
+	GfLogInfo("Starting race engine.\n");
 
 	// Lock the race engine data.
 	lockData("reSituationUpdater::start");
@@ -453,7 +452,7 @@ void reSituationUpdater::start()
 
 void reSituationUpdater::stop()
 {
-	GfOut("Stopping race engine.\n");
+	GfLogInfo("Stopping race engine.\n");
 
 	// Lock the race engine data.
 	lockData("reSituationUpdater::stop");
@@ -470,7 +469,7 @@ int reSituationUpdater::terminate()
 {
 	int status = 0;
 	
-	GfOut("Terminating race engine.\n");
+	GfLogInfo("Terminating race engine.\n");
 
 	// Lock the race engine data.
 	lockData("reSituationUpdater::terminate");
@@ -703,6 +702,8 @@ int reMainUpdater::operator()(void)
 	//       as long as we don't have finished the planned race engine code cleanup.
 	
     GfProfStartProfile("ReUpdate");
+
+	IUserInterface& userItf = RaceEngine::self().userInterface();
 	
 	switch (ReInfo->_displayMode)
 	{
@@ -763,7 +764,7 @@ int reMainUpdater::operator()(void)
 				ReStop();
 
 				// Then open the pit menu (will return in ReCarsUpdateCarPitCmd).
-				RmPitMenuStart(_pReInfo->_reInPitMenuCar, reOnBackFromPitMenu);
+				userItf.activatePitMenu(_pReInfo->_reInPitMenuCar, reOnBackFromPitMenu);
 			}
 			else
 			{
@@ -841,6 +842,21 @@ void ReInitUpdaters()
 void ReInitCarGraphics(void)
 {
 	mainUpdater->initCarGraphics();
+}
+
+void ReAccelerateTime(double fMultFactor)
+{
+	ReInfo->_reTimeMult *= fMultFactor;
+	if (fMultFactor == 0.0)
+	    ReInfo->_reTimeMult = 1.0;
+	else if (ReInfo->_reTimeMult > 64.0)
+	    ReInfo->_reTimeMult = 64.0;
+	else if (ReInfo->_reTimeMult < 0.25)
+	    ReInfo->_reTimeMult = 0.25;
+
+	char buf[32];
+    sprintf(buf, "Time x%.2f", 1.0 / ReInfo->_reTimeMult);
+    ReRaceMsgSet(ReInfo, buf, 5); // TODO: Thread-safe access to ReInfo in multi-threaded mode !
 }
 
 void ReStart(void)

@@ -25,7 +25,7 @@
 #include <network.h>
 #include <tgfclient.h>
 
-#include <racegl.h>
+#include "raceengine.h"
 
 #include "racesituation.h"
 #include "racenetwork.h"
@@ -215,12 +215,12 @@ ReNetworkWaitReady()
 	int mode = RM_SYNC;
 	if (bWaitFinished)
 	{
-		ReSetRaceBigMsg("");
+		RaceEngine::self().userInterface().setRaceBigMessage("");
 		mode |= RM_NEXT_STEP;
 	}
 	else
 	{
-		ReSetRaceBigMsg("Waiting for online players");
+		RaceEngine::self().userInterface().setRaceBigMessage("Waiting for online players");
 		GfuiDisplay();
 		ReInfo->_reGraphicItf.refresh(ReInfo->s);
 		GfelPostRedisplay();	/* Callback -> reDisplay */
