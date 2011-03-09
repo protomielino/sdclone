@@ -16,11 +16,8 @@ SET(CONFSCREENS_SOURCES controlconfig.cpp playerconfig.cpp displayconfig.cpp gra
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient tgfdata networking)
-#ADD_SDL_INCLUDEDIR()
-
-IF(WIN32)
-	INCLUDE_DIRECTORIES(src/windows/include)
-ENDIF(WIN32)
+ADD_PLIB_INCLUDEDIR()
+ADD_ENET_INCLUDEDIR()
 
 IF(WIN32)
 	# DLL export stuff under Windows (to avoid .def file)
@@ -39,8 +36,6 @@ ADD_LIBRARY(confscreens SHARED ${CONFSCREENS_SOURCES})
 
 ADD_SDLIB_LIBRARY(confscreens
                   tgf tgfclient tgfdata networking)
-
-#ADD_PLIB_LIBRARY(confscreens ul)
 
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS confscreens)

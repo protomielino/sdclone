@@ -1,13 +1,12 @@
 INCLUDE(../../cmake/macros.cmake)
 PROJECT(speed-dreams)
 
-ADD_PLIB_INCLUDEDIR()
-
 SET(SD_SOURCES main.cpp windowsspec.cpp speed-dreams.rc ../../data/data/icons/icon.ico)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(client tgf tgfclient portability)
+ADD_SDLIB_INCLUDEDIR(client raceengine racescreens tgf tgfclient portability)
+ADD_PLIB_INCLUDEDIR()
 
 #disable developer warning
 if (COMMAND cmake_policy)
@@ -16,7 +15,6 @@ endif(COMMAND cmake_policy)
 
 ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
-include_directories(../libs)
 ADD_SDLIB_LIBRARY(speed-dreams-2 client raceengine racescreens tgf)
 
 SD_INSTALL_FILES(INCLUDE FILES osspec.h)

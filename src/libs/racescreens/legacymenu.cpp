@@ -42,12 +42,12 @@ LegacyMenu::LegacyMenu()
 // Implementation of IUserInterface.
 void *LegacyMenu::createRaceScreen()
 {
-	::ReScreenInit();
+	return ::ReScreenInit();
 }
 
 void *LegacyMenu::createRaceEventLoopHook()
 {
-	::ReHookInit();
+	return ::ReHookInit();
 }
 
 void LegacyMenu::setRaceMessage(const char *msg)
@@ -75,11 +75,11 @@ void LegacyMenu::shutdownLoadingScreen()
 
 int LegacyMenu::activateRacemanMenu()
 {
-	::ReRacemanMenu();
+	return ::ReRacemanMenu();
 }
 int LegacyMenu::activateNextEventMenu()
 {
-	::ReNextEventMenu();
+	return ::ReNextEventMenu();
 }
 
 void LegacyMenu::activateStartRaceMenu(tRmInfo *reInfo, void *startScr, void *abortScr)
@@ -94,7 +94,7 @@ void *LegacyMenu::activateStopRaceMenu(const char* title,
 									   const char* label4, const char* tip4, void *screen4,
 									   const char* label5, const char* tip5, void *screen5)
 {
-	::RmStopRaceScreen(title,
+	return ::RmStopRaceScreen(title,
 					   label1, tip1, screen1, label2, tip2, screen2,
 					   label3, tip3, screen3, label4, tip4, screen4,
 					   label5, tip5, screen5);
@@ -107,7 +107,7 @@ void LegacyMenu::activatePitMenu(tCarElt *car, tfuiCallback callback)
 
 void *LegacyMenu::createResultsMenu()
 {
-	::ReResScreenInit();
+	return ::ReResScreenInit();
 }
 void LegacyMenu::activateResultsMenu(void *prevHdle, tRmInfo *reInfo)
 {
@@ -139,7 +139,7 @@ void LegacyMenu::showResultsMenuContinueButton()
 }
 int  LegacyMenu::getResultsMenuLineCount()
 {
-	::ReResGetLines();
+	return ::ReResGetLines();
 }
 void LegacyMenu::eraseResultsMenu()
 {

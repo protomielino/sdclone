@@ -7,16 +7,16 @@ SET(CLIENT_SOURCES creditsmenu.cpp entry.cpp exitmenu.cpp mainmenu.cpp
                    client.h creditsmenu.h exitmenu.h mainmenu.h
                    optionsmenu.h splash.h)
 IF(WIN32)
-	#errno.cpp should only be included in Windows
-	#(it fails to compile when added in Linux)
+	#errno.cpp should only be included under Windows
+	#(it fails to compile when added under Linux)
 	SET(CLIENT_SOURCES ${CLIENT_SOURCES} errno.cpp)
 ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(confscreens racescreens tgf tgfclient math)
-#ADD_SDL_INCLUDEDIR()
-#ADD_ENET_INCLUDEDIR()
+ADD_SDL_INCLUDEDIR()
+ADD_PLIB_INCLUDEDIR()
 
 # Disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -33,9 +33,7 @@ ADD_LIBRARY(client SHARED ${CLIENT_SOURCES})
 ADD_SDLIB_LIBRARY(client 
                   tgfclient robottools confscreens racescreens)
 
-ADD_OPENGL_LIBRARY(client)
 ADD_SDL_LIBRARY(client)
-ADD_OPENAL_LIBRARY(client)
 
 IF(WIN32)
 	#joystick library
@@ -47,5 +45,6 @@ IF(WIN32)
 ELSE(WIN32)
 	SD_INSTALL_FILES(LIB lib TARGETS client)
 ENDIF(WIN32)
+
 SD_INSTALL_FILES(INCLUDE FILES client.h exitmenu.h)
 

@@ -15,8 +15,7 @@ SET(RACESCREENS_SOURCES carselect.cpp driverselect.cpp fileselect.cpp
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability confscreens networking tgf tgfclient tgfdata math robottools)
-
-#ADD_SDL_INCLUDEDIR()
+ADD_PLIB_INCLUDEDIR()
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
@@ -35,8 +34,6 @@ ADD_LIBRARY(racescreens SHARED ${RACESCREENS_SOURCES})
 
 ADD_SDLIB_LIBRARY(racescreens
                   confscreens networking tgf tgfclient tgfdata robottools)
-
-#ADD_PLIB_LIBRARY(racescreens ul)
 
 IF(WIN32)
     SD_INSTALL_FILES(BIN TARGETS racescreens)
