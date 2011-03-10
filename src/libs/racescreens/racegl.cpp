@@ -146,11 +146,13 @@ reApplyState(void *pvState)
     LegacyMenu::self().raceEngine().applyState((int)(long)pvState);
 }
 
+#ifdef DEBUG
 static void
 reOneStep(void *pvState)
 {
     LegacyMenu::self().raceEngine().step((int)(long)pvState);
 }
+#endif
 
 static void
 reAddKeys(void)
