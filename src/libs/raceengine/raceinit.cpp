@@ -194,7 +194,7 @@ ReRaceConfigure(bool bInteractive)
 	ReInfo->mainParams = ReInfo->params = PReRace->getManager()->getDescriptorHandle();
 	
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
 	
 	// Enter CONFIG state if interactive mode.
 	if (bInteractive)
@@ -211,7 +211,7 @@ ReRaceRestore(void* hparmResults)
 	ReInfo->_reRaceName = PReRace->getSessionName().c_str(); //ReInfo->_reName;
 
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
 }
 
 // Start a new race for the previously configured race manager
@@ -299,10 +299,10 @@ initStartingGrid(void)
     a = 0;
     b = ReInfo->track->width;
   }
-  wi2 = ReInfo->track->width * 0.5;
+  wi2 = ReInfo->track->width * 0.5f;
 
   rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
-  rows = (int)GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_ROWS, (char*)NULL, rows);
+  rows = (int)GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_ROWS, (char*)NULL, (tdble)rows);
   d1 = GfParmGetNum(params, path, RM_ATTR_TOSTART, (char*)NULL, 10);
   d1 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_TOSTART, (char*)NULL, d1);
   d2 = GfParmGetNum(params, path, RM_ATTR_COLDIST, (char*)NULL, 10);
@@ -310,7 +310,7 @@ initStartingGrid(void)
   d3 = GfParmGetNum(params, path, RM_ATTR_COLOFFSET, (char*)NULL, 5);
   d3 = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_COLOFFSET, (char*)NULL, d3);
   speedInit = GfParmGetNum(params, path, RM_ATTR_INITSPEED, (char*)NULL, 0.0);
-  heightInit = GfParmGetNum(params, path, RM_ATTR_INITHEIGHT, (char*)NULL, 0.3);
+  heightInit = GfParmGetNum(params, path, RM_ATTR_INITHEIGHT, (char*)NULL, 0.3f);
   heightInit = GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_INITHEIGHT, (char*)NULL, heightInit);
 
   if (rows < 1) {
@@ -422,11 +422,11 @@ initPits(void)
             // captured a bit too easy or too hard.
             if (pit->freeCarIndex == 0) {
               pit->pitCarIndex = TR_PIT_STATE_FREE;
-              pit->lmin = pit->pos.seg->lgfromstart + pit->pos.toStart - pits->len / 2.0 + car->_dimension_x / 2.0;
+              pit->lmin = pit->pos.seg->lgfromstart + pit->pos.toStart - pits->len / 2.0f + car->_dimension_x / 2.0f;
               if (pit->lmin > ReInfo->track->length) {
                 pit->lmin -= ReInfo->track->length;
               }
-              pit->lmax = pit->pos.seg->lgfromstart + pit->pos.toStart + pits->len / 2.0 - car->_dimension_x / 2.0;
+              pit->lmax = pit->pos.seg->lgfromstart + pit->pos.toStart + pits->len / 2.0f - car->_dimension_x / 2.0f;
               if (pit->lmax > ReInfo->track->length) {
                 pit->lmax -= ReInfo->track->length;
               }
