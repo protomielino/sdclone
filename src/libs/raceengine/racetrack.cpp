@@ -77,7 +77,7 @@ ReTrackInit(void)
 	reTrackInitTimeOfDay();
 	reTrackInitWeather();
 
-	reTrackDump(ReInfo->track, 0.0);
+	reTrackDump(ReInfo->track, 0);
 
 	// Make the graphics engine aware of the possibly changed track.
 	if (ReInfo->_reGraphicItf.inittrack)
@@ -234,7 +234,7 @@ reTrackInitTimeOfDay(void)
 		{
 			time_t t = time(0);
 			struct tm *ptm = localtime(&t);
-			trackLocal->timeofday = ptm->tm_hour * 3600 + ptm->tm_min * 60 + ptm->tm_sec;
+			trackLocal->timeofday = ptm->tm_hour * 3600.0f + ptm->tm_min * 60.0f + ptm->tm_sec;
 			GfLogDebug("  Now time of day\n");
 			break;
 		}
