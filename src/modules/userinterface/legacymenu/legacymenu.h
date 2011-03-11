@@ -46,6 +46,8 @@ public:
 	// Implementation of IUserInterface.
 	virtual bool activate();
 	
+	virtual void* createExitMenu(void* prevHdle);
+
 	virtual void *createRaceScreen();
 	virtual void *createRaceEventLoopHook();
 	virtual void setRaceMessage(const char *msg);

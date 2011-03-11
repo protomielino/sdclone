@@ -19,6 +19,7 @@
 #include <iraceengine.h>
 
 #include "client.h"
+#include "exitmenu.h"
 #include "racescreens.h"
 
 #include "legacymenu.h"
@@ -44,6 +45,11 @@ LegacyMenu::LegacyMenu()
 bool LegacyMenu::activate()
 {
 	return ::MenuEntry();
+}
+
+void* LegacyMenu::createExitMenu(void* prevHdle)
+{
+	return ::ExitMenuInit(prevHdle);
 }
 
 void *LegacyMenu::createRaceScreen()

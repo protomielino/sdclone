@@ -35,6 +35,8 @@ public:
 
 	//! Activation of the user interface (splash if any, main menu ...).
 	virtual bool activate() = 0;
+
+	virtual void* createExitMenu(void* prevHdle) = 0;
 	
 	virtual void *createRaceScreen() = 0;
 	virtual void *createRaceEventLoopHook() = 0;

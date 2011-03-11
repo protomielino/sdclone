@@ -45,7 +45,6 @@ INCLUDE_DIRECTORIES(. ${MS} ${CS} ${RS})
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math portability tgf tgfclient tgfdata networking)
-#ADD_SDLIB_INCLUDEDIR(robottools) ????
 ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 ADD_ENET_INCLUDEDIR()
@@ -76,7 +75,6 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_SDLIB_LIBRARY(legacymenu tgf tgfclient tgfdata networking)
-#ADD_SDLIB_LIBRARY(legacymenu robottools) ????
 
 # Temporary installation as a normal lib, as long as not a real module.
 #SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)

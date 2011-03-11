@@ -102,9 +102,14 @@ reSkipPreStart(void * /* dummy */)
 }
 
 static void
-reTimeMod (void *pvMultFactor)
+reTimeMod (void *pvCmd)
 {
-	LegacyMenu::self().raceEngine().accelerateTime(*(double*)pvMultFactor);
+	double fMultFactor = 0.0; // The mult. factor for resetting "real time" simulation step.
+	if ((long)pvCmd > 0)
+		fMultFactor = 0.5; // Accelerate time means reduce the simulation time step.
+	else if ((long)pvCmd < 0)
+		fMultFactor = 2.0; // Slow-down time means increase the simulation time step.
+	LegacyMenu::self().raceEngine().accelerateTime(fMultFactor);
 }
 
 static void
@@ -160,12 +165,9 @@ reAddKeys(void)
     GfuiAddKey(reScreenHandle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-	double fSlowDownFactor = 2.0;
-    GfuiAddKey(reScreenHandle, '-', "Slow down Time",    &fSlowDownFactor, reTimeMod, NULL);
-	double fAccelerateFactor = 0.5;
-    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   &fAccelerateFactor, reTimeMod, NULL);
-	double fRealTimeFactor = 0.0;
-    GfuiAddKey(reScreenHandle, '.', "Restore Real Time", &fRealTimeFactor, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '-', "Slow down Time",    (void*)-1, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)+1, reTimeMod, NULL);
+    GfuiAddKey(reScreenHandle, '.', "Restore Real Time", (void*)0, reTimeMod, NULL);
 	
     GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
     GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, reApplyState, NULL);

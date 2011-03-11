@@ -31,18 +31,6 @@
 
 class GfRace;
 
-// DLL exported symbols declarator for Windows.
-#ifdef WIN32
-# ifdef RACESCREENS_DLL
-#  define extern __declspec(dllexport)
-# else
-#  define extern __declspec(dllimport)
-# endif
-#else
-# define extern
-#endif
-
-
 typedef struct RmTrackSelect
 {
 	GfRace      *pRace; /* The race to update */

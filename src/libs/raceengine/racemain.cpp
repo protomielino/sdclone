@@ -703,19 +703,12 @@ RestartRaceHookInit(void)
 static void	*QuitHookHandle = 0;
 static void	*StopScrHandle = 0;
 
-static void* (*ExitMenuInitFunc)(void*) = 0;
-
-void ReSetExitMenuInitFunc(void* (*func)(void*))
-{
-	ExitMenuInitFunc = func;
-}
-
 static void
 QuitHookActivate(void * /* dummy */)
 {
 	if (StopScrHandle) 
 	{
-		GfuiScreenActivate(ExitMenuInitFunc(StopScrHandle));
+		GfuiScreenActivate(RaceEngine::self().userInterface().createExitMenu(StopScrHandle));
 	}
 }
 

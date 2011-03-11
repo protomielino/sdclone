@@ -6,6 +6,7 @@ SET(SD_SOURCES main.cpp windowsspec.cpp speed-dreams.rc ../../data/data/icons/ic
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(legacymenu raceengine tgf tgfclient portability)
+ADD_PLIB_INCLUDEDIR()
 
 #disable developer warning
 if (COMMAND cmake_policy)
