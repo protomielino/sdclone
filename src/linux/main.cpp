@@ -28,8 +28,6 @@
 #include <raceengine.h>
 #include <legacymenu.h>
 
-#include <client.h>
-
 #include "linuxspec.h"
 
 
@@ -156,19 +154,19 @@ main(int argc, char *argv[])
 
     GfScrInit(argc, argv);     /* init screen */
 
-	// Give the menu system to the race engine.
+	// Set the menu system as the user interface for the race engine.
 	RaceEngine::self().setUserInterface(LegacyMenu::self());
 
-	// Give the race engine to the menu system.
+	// Set the race engine for the menu system.
 	LegacyMenu::self().setRaceEngine(RaceEngine::self());
 	
-    if (MenuEntry())         /* launch the game */
+    if (LegacyMenu::self().activate()) // Enter the user interface.
     {
-        GfelMainLoop();   /* Main event loop */
+        GfelMainLoop();   // Main event loop
         exit(0);
     }
 
     GfLogFatal("Exiting from Speed Dreams for some fatal reason (see above).\n");
-    exit(1);                 /* If we got here, something bad happened ... */          
+    exit(1);                 // If we got here, something bad happened
 }
 

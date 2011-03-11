@@ -33,6 +33,9 @@ class IUserInterface
 {
 public:
 
+	//! Activation of the user interface (splash if any, main menu ...).
+	virtual bool activate() = 0;
+	
 	virtual void *createRaceScreen() = 0;
 	virtual void *createRaceEventLoopHook() = 0;
 	virtual void setRaceMessage(const char *msg) = 0;

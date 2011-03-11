@@ -20,8 +20,8 @@
 #include <map>
 #include <vector>
 
-
 #include <tgfclient.h>
+
 
 // Max number of screen lines in a credits page.
 static const unsigned MaxScreenLinesPerPage = 16;

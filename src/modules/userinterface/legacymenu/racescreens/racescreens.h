@@ -34,12 +34,12 @@ class GfRace;
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
 # ifdef RACESCREENS_DLL
-#  define RACESCREENS_API __declspec(dllexport)
+#  define extern __declspec(dllexport)
 # else
-#  define RACESCREENS_API __declspec(dllimport)
+#  define extern __declspec(dllimport)
 # endif
 #else
-# define RACESCREENS_API
+# define extern
 #endif
 
 
@@ -118,7 +118,7 @@ extern void* ReGetRacemanMenuHandle();
 extern void ReConfigRunState(bool bStart = false);
 
 // From raceselectmenu.
-RACESCREENS_API void *ReRaceSelectInit(void *precMenu);
+extern void *ReRaceSelectInit(void *precMenu);
 
 // From racegl.
 extern void *ReScreenInit(void);

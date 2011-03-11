@@ -1,7 +1,7 @@
 /***************************************************************************
 
-    file                 : graphconfig.h
-    created              : Sun Jun  9 17:36:18 CEST 2002
+    file                 : joystickconfig.h
+    created              : Wed Mar 21 23:06:29 CET 2001
     copyright            : (C) 2001 by Eric Espié
     email                : Eric.Espie@torcs.org
     version              : $Id$
@@ -23,15 +23,16 @@
     @version	$Id$
 */
 
-#ifndef _GRAPHCONFIG_H_
-#define _GRAPHCONFIG_H_
+#ifndef _JOYSTICKCONFIG_H_
+#define _JOYSTICKCONFIG_H_
 
 #include "confscreens.h"
 
 
-CONFSCREENS_API void *GraphMenuInit(void *prevMenu);
+/* nextMenu : the menu to go to when "next" button is pressed */
+extern void *JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
-#endif /* _GRAPHCONFIG_H_ */ 
+#endif /* _JOYSTICKCONFIG_H_ */ 
 
 
 

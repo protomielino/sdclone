@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : confscreens.h
-    created              : Sat Mar 18 23:33:01 CET 2000
-    copyright            : (C) 2000 by Eric Espie
-    email                : torcs@free.fr
-    version              : $Id$
+    file        : soundconfig.h
+    created     : Thu Dec 12 15:11:55 CET 2004
+    copyright   : (C) 2004 Bernhard Wymann
+    email       : berniw@bluewin.ch
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,25 +16,18 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/**
-    @defgroup	confscreens	Configuration screens.
-    Menu screens for configuration.
+
+/** @file
+
+    @version	$Id$
 */
 
-#ifndef __CONFSCREENS_H__
-#define __CONFSCREENS_H__
+#ifndef _SOUNDCONFIG_H_
+#define _SOUNDCONFIG_H_
 
-// DLL exported symbols declarator for Windows.
-#ifdef WIN32
-# ifdef CONFSCREENS_DLL
-#  define CONFSCREENS_API __declspec(dllexport)
-# else
-#  define CONFSCREENS_API __declspec(dllimport)
-# endif
-#else
-# define CONFSCREENS_API
-#endif
+#include "confscreens.h"
 
-#endif /* __CONFSCREENS_H__ */
 
+extern void *SoundMenuInit(void *prevMenu);
+
+#endif // _SOUNDCONFIG_H_

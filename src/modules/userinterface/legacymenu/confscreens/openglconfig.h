@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : torcs.h
-    created              : Sat Mar 18 23:49:33 CET 2000
-    copyright            : (C) 2000 by Eric Espie
-    email                : torcs@free.fr
-    version              : $Id$
+    file        : openglconfig.cpp
+    created     : Fri Jun 3 12:52:07 CET 2004
+    copyright   : (C) 2005 Bernhard Wymann
+    email       : berniw@bluewin.ch
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,25 +16,21 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
-#ifndef _CLIENT_H_
-#define _CLIENT_H_
 
-// DLL exported symbols declarator for Windows.
-#ifdef WIN32
-# ifdef CLIENT_DLL
-#  define CLIENT_API __declspec(dllexport)
-# else
-#  define CLIENT_API __declspec(dllimport)
-# endif
-#else
-# define CLIENT_API
-#endif
+/** @file
 
-CLIENT_API bool MenuEntry(void);
+    @version	$Id$
+*/
 
-#endif /* _CLIENT_H_ */ 
+#ifndef _OPENGLCONFIG_H_
+#define _OPENGLCONFIG_H_
+
+#include "confscreens.h"
 
 
+extern void *OpenGLMenuInit(void *prevMenu);
 
+extern void OpenGLLoadSelectedFeatures();
+extern void OpenGLStoreSelectedFeatures();
+
+#endif // _OPENGLCONFIG_H_

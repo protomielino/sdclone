@@ -24,7 +24,7 @@
 #include "confscreens.h"
 
 
-class CONFSCREENS_API CarSettingsMenu : public GfuiMenuScreen
+class CarSettingsMenu : public GfuiMenuScreen
 {
 public:
 

@@ -2,11 +2,11 @@
 
     file        : controlconfig.h
     created     : Wed Mar 12 22:09:01 CET 2003
-    copyright   : (C) 2003 by Eric Espi�                        
+    copyright   : (C) 2003 by Eric Espie
     email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    version     : $Id$
 
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -31,9 +31,9 @@
 
 /* Gear change mode */
 typedef enum { GEAR_MODE_NONE = 0, GEAR_MODE_AUTO = 1, 
-	       GEAR_MODE_SEQ  = 2, GEAR_MODE_GRID = 4 } tGearChangeMode;
+			   GEAR_MODE_SEQ  = 2, GEAR_MODE_GRID = 4 } tGearChangeMode;
 
-CONFSCREENS_API void *ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
+extern void *ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode gearChangeMode);
 
 /* Load control settings for player of given index (the current one if 0) 
    from preferences (if given parm handle is null, use current) */

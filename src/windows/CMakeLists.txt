@@ -5,21 +5,20 @@ SET(SD_SOURCES main.cpp windowsspec.cpp speed-dreams.rc ../../data/data/icons/ic
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_OSSPEC_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(client raceengine racescreens tgf tgfclient portability)
-ADD_PLIB_INCLUDEDIR()
+ADD_SDLIB_INCLUDEDIR(legacymenu raceengine tgf tgfclient portability)
 
 #disable developer warning
 if (COMMAND cmake_policy)
-	cmake_policy(SET CMP0003 NEW)
+    cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
 ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
-ADD_SDLIB_LIBRARY(speed-dreams-2 client raceengine racescreens tgf)
-
-SD_INSTALL_FILES(INCLUDE FILES osspec.h)
+ADD_SDLIB_LIBRARY(speed-dreams-2 legacymenu raceengine tgf)
 
 SD_INSTALL_FILES(BIN TARGETS speed-dreams-2)
+
+SD_INSTALL_FILES(INCLUDE FILES osspec.h)
 
 # Install OpenAL and SDL DLLs close to Speed Dreams executable
 FIND_PACKAGE(OpenAL)

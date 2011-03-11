@@ -16,24 +16,28 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
 #ifdef WIN32
 #include <windows.h>
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif
 #endif
-#include <stdio.h>
+
+#include <cstdio>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #include "version.h"
 #endif
+
 #include <SDL/SDL.h>
 #include <tgfclient.h>
 #include <glfeatures.h>
 
 #include "splash.h"
 #include "mainmenu.h"
+
 
 static int s_imgWidth, s_imgHeight; // Real image size (from image file).
 static int s_imgPow2Width, s_imgPow2Height; // Smallest possible containing 2^N x 2^P.

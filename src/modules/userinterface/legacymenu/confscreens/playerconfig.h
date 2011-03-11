@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : mouseconfig.h
-    created     : Thu Mar 13 21:29:35 CET 2003
-    copyright   : (C) 2003 by Eric Espié                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    file                 : playerconfig.h
+    created              : Wed Apr 26 22:20:10 CEST 2000
+    copyright            : (C) 2000 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -16,23 +16,13 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
-    		
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
-*/
 
-#ifndef _MOUSECONFIG_H_
-#define _MOUSECONFIG_H_
+#ifndef _PLAYERCONFIG_H_
+#define _PLAYERCONFIG_H_
 
 #include "confscreens.h"
 
 
-/* nextMenu : the menu to go to when "next" button is pressed */
-CONFSCREENS_API void *MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
+extern void *PlayerConfigMenuInit(void *prevMenu);
 
-#endif /* _MOUSECONFIG_H_ */ 
-
-
-
+#endif /* _PLAYERCONFIG_H_ */ 

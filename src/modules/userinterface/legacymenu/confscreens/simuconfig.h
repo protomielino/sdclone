@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : exitmenu.h
-    created              : Sat Mar 18 23:42:22 CET 2000
-    copyright            : (C) 2000 by Eric Espie
-    email                : torcs@free.fr
-    version              : $Id$
+    file        : simuconfig.h
+    created     : Wed Nov  3 21:48:57 CET 2004
+    copyright   : (C) 2004 by Eric Espié                        
+    email       : eric.espie@free.fr 
+    version     : $Id$                                  
 
  ***************************************************************************/
 
@@ -17,17 +17,20 @@
  *                                                                         *
  ***************************************************************************/
  
+/** @file    
+    		
+    @version	$Id$
+*/
 
-#ifndef _EXITMENU_H_
-#define _EXITMENU_H_
+#ifndef _SIMUCONFIG_H_
+#define _SIMUCONFIG_H_
 
-#include "client.h"
+#include "confscreens.h"
 
 
-CLIENT_API void* ExitMenuInit(void *menu);
-CLIENT_API void* MainExitMenuInit(void *mainMenu);
+extern void *SimuMenuInit(void *prevMenu);
 
-#endif /* _EXITMENU_H_ */ 
+#endif /* _SIMUCONFIG_H_ */ 
 
 
 

@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    file        : simuconfig.h
-    created     : Wed Nov  3 21:48:57 CET 2004
-    copyright   : (C) 2004 by Eric Espié                        
-    email       : eric.espie@free.fr 
+    file        : mouseconfig.h
+    created     : Thu Mar 13 21:29:35 CET 2003
+    copyright   : (C) 2003 by Eric Espié                        
+    email       : eric.espie@torcs.org   
     version     : $Id$                                  
 
  ***************************************************************************/
@@ -19,18 +19,20 @@
  
 /** @file    
     		
+    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
 
-#ifndef _SIMUCONFIG_H_
-#define _SIMUCONFIG_H_
+#ifndef _MOUSECONFIG_H_
+#define _MOUSECONFIG_H_
 
 #include "confscreens.h"
 
 
-CONFSCREENS_API void *SimuMenuInit(void *prevMenu);
+/* nextMenu : the menu to go to when "next" button is pressed */
+extern void *MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
-#endif /* _SIMUCONFIG_H_ */ 
+#endif /* _MOUSECONFIG_H_ */ 
 
 
 

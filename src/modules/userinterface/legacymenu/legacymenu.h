@@ -29,8 +29,7 @@
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef RACESCREENS_DLL
-//# ifdef LEGACYMENU_DLL // Soon !
+# ifdef LEGACYMENU_DLL
 #  define LEGACYMENU_API __declspec(dllexport)
 # else
 #  define LEGACYMENU_API __declspec(dllimport)
@@ -44,7 +43,9 @@ class LEGACYMENU_API LegacyMenu : public IUserInterface
 {
 public:
 
-	// Implementation of IuserInterface.
+	// Implementation of IUserInterface.
+	virtual bool activate();
+	
 	virtual void *createRaceScreen();
 	virtual void *createRaceEventLoopHook();
 	virtual void setRaceMessage(const char *msg);

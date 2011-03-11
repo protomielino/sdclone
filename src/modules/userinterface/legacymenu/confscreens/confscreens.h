@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : openglconfig.cpp
-    created     : Fri Jun 3 12:52:07 CET 2004
-    copyright   : (C) 2005 Bernhard Wymann
-    email       : berniw@bluewin.ch
-    version     : $Id$
+    file                 : confscreens.h
+    created              : Sat Mar 18 23:33:01 CET 2000
+    copyright            : (C) 2000 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -16,21 +16,14 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
-
-/** @file
-
-    @version	$Id$
+ 
+/**
+    @defgroup	confscreens	Configuration screens.
+    Menu screens for configuration.
 */
 
-#ifndef _OPENGLCONFIG_H_
-#define _OPENGLCONFIG_H_
+#ifndef __CONFSCREENS_H__
+#define __CONFSCREENS_H__
 
-#include "confscreens.h"
+#endif /* __CONFSCREENS_H__ */
 
-
-CONFSCREENS_API void *OpenGLMenuInit(void *prevMenu);
-
-CONFSCREENS_API void OpenGLLoadSelectedFeatures();
-CONFSCREENS_API void OpenGLStoreSelectedFeatures();
-
-#endif // _OPENGLCONFIG_H_

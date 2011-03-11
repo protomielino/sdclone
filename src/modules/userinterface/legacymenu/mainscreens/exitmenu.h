@@ -1,9 +1,9 @@
 /***************************************************************************
 
-    file                 : joystickconfig.h
-    created              : Wed Mar 21 23:06:29 CET 2001
-    copyright            : (C) 2001 by Eric Espié
-    email                : Eric.Espie@torcs.org
+    file                 : exitmenu.h
+    created              : Sat Mar 18 23:42:22 CET 2000
+    copyright            : (C) 2000 by Eric Espie
+    email                : torcs@free.fr
     version              : $Id$
 
  ***************************************************************************/
@@ -17,22 +17,17 @@
  *                                                                         *
  ***************************************************************************/
  
-/** @file    
-    		
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
-    @version	$Id$
-*/
 
-#ifndef _JOYSTICKCONFIG_H_
-#define _JOYSTICKCONFIG_H_
+#ifndef _EXITMENU_H_
+#define _EXITMENU_H_
 
-#include "confscreens.h"
+#include "client.h"
 
 
-/* nextMenu : the menu to go to when "next" button is pressed */
-CONFSCREENS_API void *JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
+extern void* ExitMenuInit(void *menu);
+extern void* MainExitMenuInit(void *mainMenu);
 
-#endif /* _JOYSTICKCONFIG_H_ */ 
+#endif /* _EXITMENU_H_ */ 
 
 
 

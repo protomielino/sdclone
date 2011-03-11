@@ -17,8 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cstdio>
-
 #include <tgfclient.h>
 
 #include <displayconfig.h>

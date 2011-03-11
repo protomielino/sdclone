@@ -24,7 +24,7 @@
 #include "confscreens.h"
 
 
-class CONFSCREENS_API HostSettingsMenu : public GfuiMenuScreen
+class HostSettingsMenu : public GfuiMenuScreen
 {
 public:
 	HostSettingsMenu();
@@ -42,7 +42,7 @@ protected:
 	static void onPlayerReady(void *p);
 
 protected:
-	static  std::string m_strCarCat;
+	static std::string m_strCarCat;
 	static bool m_bCollisions;
 	static bool m_bHumanHost;
 

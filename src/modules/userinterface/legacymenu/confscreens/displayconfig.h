@@ -104,6 +104,6 @@ private:
 #endif	
 };
 
-CONFSCREENS_API void* DisplayMenuInit(void* pPreviousMenu);
+extern void* DisplayMenuInit(void* pPreviousMenu);
 
 #endif //_DISPLAYCONFIG_H_

@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : soundconfig.h
-    created     : Thu Dec 12 15:11:55 CET 2004
-    copyright   : (C) 2004 Bernhard Wymann
-    email       : berniw@bluewin.ch
-    version     : $Id$
+    file                 : client.h
+    created              : Sat Mar 18 23:49:33 CET 2000
+    copyright            : (C) 2000 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -16,18 +16,11 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+ 
+#ifndef _CLIENT_H_
+#define _CLIENT_H_
 
-/** @file
+extern bool MenuEntry(void);
 
-    @version	$Id$
-*/
-
-#ifndef _SOUNDCONFIG_H_
-#define _SOUNDCONFIG_H_
-
-#include "confscreens.h"
-
-
-CONFSCREENS_API void *SoundMenuInit(void *prevMenu);
-
-#endif // _SOUNDCONFIG_H_
+#endif /* _CLIENT_H_ */ 

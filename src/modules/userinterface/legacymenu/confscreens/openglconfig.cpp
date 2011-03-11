@@ -79,6 +79,8 @@ static void	*ScrHandle = NULL;
 static void	*PrevHandle = NULL;
 
 
+// TODO: Why not moving this to tgfclient ? or the graphics engine ? or tgfdata ?
+// Load the selected OpenGL features from the graphic parameter file.
 void OpenGLLoadSelectedFeatures()
 {
 	char buf[512];
@@ -124,7 +126,8 @@ void OpenGLLoadSelectedFeatures()
 }
 
 
-// Save the choosen values in the corresponding parameter file.
+// TODO: Why not moving this to tgfclient ? or the graphics engine ? or tgfdata ?
+// Save the selected OpenGL features to the graphic parameter file.
 void OpenGLStoreSelectedFeatures()
 {
 	// Save settings to graph.xml

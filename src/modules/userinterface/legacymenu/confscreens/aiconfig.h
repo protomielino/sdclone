@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file                 : playerconfig.h
-    created              : Wed Apr 26 22:20:10 CEST 2000
-    copyright            : (C) 2000 by Eric Espie
-    email                : torcs@free.fr
-    version              : $Id$
+    file        : aiconfig.h
+    created     : Sat Dec  26 12:00:00 CET 2009
+	copyright   : (C) 2009 The Speed Dreams Team
+	web         : speed-dreams.sourceforge.net
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -16,13 +16,20 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+ 
+/** @file    
+    		
+    @version	$Id$
+*/
 
-#ifndef _PLAYERCONFIG_H_
-#define _PLAYERCONFIG_H_
+#ifndef _AICONFIG_H_
+#define _AICONFIG_H_
 
 #include "confscreens.h"
 
+extern void *AIMenuInit(void *prevMenu);
 
-CONFSCREENS_API void *PlayerConfigMenuInit(void *prevMenu);
+#endif /* _AICONFIG_H_ */ 
 
-#endif /* _PLAYERCONFIG_H_ */ 
+
+

@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : aiconfig.h
-    created     : Sat Dec  26 12:00:00 CET 2009
-	copyright   : (C) 2009 The Speed Dreams Team
-	web         : speed-dreams.sourceforge.net
-    version     : $Id$
+    file                 : graphconfig.h
+    created              : Sun Jun  9 17:36:18 CEST 2002
+    copyright            : (C) 2001 by Eric Espié
+    email                : Eric.Espie@torcs.org
+    version              : $Id$
 
  ***************************************************************************/
 
@@ -19,18 +19,19 @@
  
 /** @file    
     		
+    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
 
-#ifndef _AICONFIG_H_
-#define _AICONFIG_H_
+#ifndef _GRAPHCONFIG_H_
+#define _GRAPHCONFIG_H_
 
 #include "confscreens.h"
 
 
-CONFSCREENS_API void *AIMenuInit(void *prevMenu);
+extern void *GraphMenuInit(void *prevMenu);
 
-#endif /* _AICONFIG_H_ */ 
+#endif /* _GRAPHCONFIG_H_ */ 
 
 
 

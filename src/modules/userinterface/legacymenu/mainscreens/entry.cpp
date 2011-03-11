@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #include <tgfclient.h>
 #include <glfeatures.h>
 
@@ -36,7 +35,7 @@
  *	None
  *
  * Return
- *	true on success, false in anything bad happened.
+ *	true on success, false if anything bad happened.
  *
  * Remarks
  *	

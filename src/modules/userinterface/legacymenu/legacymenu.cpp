@@ -18,6 +18,7 @@
  
 #include <iraceengine.h>
 
+#include "client.h"
 #include "racescreens.h"
 
 #include "legacymenu.h"
@@ -40,6 +41,11 @@ LegacyMenu::LegacyMenu()
 }
 
 // Implementation of IUserInterface.
+bool LegacyMenu::activate()
+{
+	return ::MenuEntry();
+}
+
 void *LegacyMenu::createRaceScreen()
 {
 	return ::ReScreenInit();
