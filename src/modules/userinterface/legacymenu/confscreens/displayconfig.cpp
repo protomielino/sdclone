@@ -314,8 +314,10 @@ void DisplayMenu::resetScreenSizes()
 		_aScreenSizes =
 			GfScrGetSupportedSizes(_nColorDepth, _eDisplayMode == eFullScreen, &_nNbScreenSizes);
 	if (_eVideoDetectMode == eManual || _aScreenSizes == (tScreenSize*)-1 || _aScreenSizes == 0)
+	{
 		_aScreenSizes = aDefScreenSizes;
 		_nNbScreenSizes = nDefScreenSizes;
+	}
 
 	// Update combo-box with new possible sizes.
 	const int nComboId = GetDynamicControlId("ScreenSizeCombo");
