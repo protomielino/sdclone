@@ -281,7 +281,7 @@ gfuiEditboxAction(int mouse)
     tGfuiEditbox	*editbox;
     int			relX;
     char		buf[256];
-    uint		i;
+    unsigned	i;
 
     object = GfuiScreen->hasFocus;
     if (object->state == GFUI_DISABLE) {

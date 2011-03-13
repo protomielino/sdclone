@@ -30,7 +30,7 @@ typedef struct
 //glFont structure (DO NOT MODIFY)
 typedef struct
 {
-    uint Tex;
+    unsigned Tex;
     int TexWidth, TexHeight;
     int IntStart, IntEnd;
     GLFONTCHAR *Char;

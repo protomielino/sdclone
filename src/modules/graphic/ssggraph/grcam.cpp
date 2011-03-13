@@ -29,6 +29,7 @@
 #include <GL/glu.h>
 #endif
 
+#include <portability.h>
 #include <robottools.h>
 #include <glfeatures.h>
 #include "grcam.h"

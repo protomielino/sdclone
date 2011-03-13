@@ -102,7 +102,7 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	FILE *Input;
 	char *TexBytes;
 	int	Num;
-	uint Tex;
+	unsigned Tex;
 
 	font = NULL;
 	size = 8.0;

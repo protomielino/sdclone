@@ -158,10 +158,6 @@ static char *strndup(const char *str, int len)
 #define M_SQRT2    1.41421356237309504880
 #define M_SQRT1_2  0.707106781186547524401
 
-// Basic type aliases
-#define uint unsigned int
-#define uchar unsigned char
-
 #endif // _MSC_VER
 
 #endif // _SD_PORTABILITY_H_
