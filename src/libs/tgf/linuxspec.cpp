@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+// Note: This code is intended to be compiled ONLY under Linuxes / BSDs / Mac OS X.
 
 #include <cstddef>
 #include <string>
@@ -44,9 +45,9 @@
 #include <pthread.h>
 #endif
 
-#include <tgf.h>
+#include "tgf.h"
 
-#include <os.h>
+#include "os.h"
 
 
 /*

@@ -21,10 +21,15 @@
     @version	$Id$
     @ingroup OS
 */
-#ifdef WIN32
-#include <windows.h>
-#endif
+
 #include "tgf.h"
+
+#ifdef WIN32
+#include "windowsspec.h"
+#else
+#include "linuxspec.h"
+#endif	
+
 #include "os.h"
 
 
@@ -37,6 +42,12 @@ tGfOs GfOs = {0};
 void
 gfOsInit(void)
 {
+	// Initialise OS-specific functions
+#ifdef WIN32
+    WindowsSpecInit();
+#else
+    LinuxSpecInit();
+#endif	
 }
 
 

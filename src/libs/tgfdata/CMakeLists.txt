@@ -5,7 +5,6 @@ INCLUDE(../../../cmake/macros.cmake)
 ADD_PLIB_INCLUDEDIR()
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability txml math tgf)
 
 SET(TGFDATA_HEADERS cars.h tracks.h racemanagers.h race.h drivers.h tgfdata.h)

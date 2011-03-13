@@ -31,8 +31,6 @@
 #include <raceengine.h>
 #include <legacymenu.h>
 
-#include "windowsspec.h"
-
 
 static void
 init_args(int argc, char **argv)
@@ -145,8 +143,6 @@ main(int argc, char *argv[])
     GfInit();
 
     init_args(argc, argv);
-
-    WindowsSpecInit();      /* init specific windows functions */
 
     GfFileSetup();          /* Update user settings files from installed ones */
 

@@ -35,7 +35,6 @@ SET(SIMUV2.1_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
 
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 INCLUDE_DIRECTORIES(SOLID-2.0/include)

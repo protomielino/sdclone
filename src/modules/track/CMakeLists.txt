@@ -3,7 +3,6 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(TRACK_SOURCES track.cpp track3.cpp track4.cpp trackitf.cpp trackutil.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math tgf robottools)
 

@@ -18,7 +18,6 @@ SET(RACEENGINE_SOURCES raceengine.cpp
 ADD_SD_DEFINITIONS()
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 
 ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfclient tgfdata
                      networking)

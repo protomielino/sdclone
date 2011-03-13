@@ -20,12 +20,6 @@
 #ifndef _WINDOWSSPEC_H_
 #define _WINDOWSSPEC_H_
 
-#ifndef _WIN32
-#error Hey ! Where Is _WIN32 ??
-#endif
-
-#include <windows.h>
-
 extern void WindowsSpecInit(void);
 
 #endif /* _WINDOWSSPEC_H_ */ 

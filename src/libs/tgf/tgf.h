@@ -32,11 +32,11 @@
 #include <climits>
 #include <cmath>
 
-#include <osspec.h>
+#include "osspec.h"
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef TGF_DLL
+# ifdef tgf_EXPORTS
 #  define TGF_API __declspec(dllexport)
 # else
 #  define TGF_API __declspec(dllimport)

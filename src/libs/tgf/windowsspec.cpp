@@ -17,6 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
+// Note: This code is intended to be compiled ONLY under Windows.
 
 #include <cstddef>
 #include <sys/types.h>
@@ -25,8 +26,8 @@
 #include <io.h>
 #include <windows.h>
 
-#include <tgf.h>
-#include <os.h>
+#include "tgf.h"
+#include "os.h"
 
 #ifdef _MSC_VER
 #pragma warning(disable:4996) // std::_Copy_opt was declared as disaproved because unsafe

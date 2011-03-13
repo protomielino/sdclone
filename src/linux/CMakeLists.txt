@@ -1,10 +1,9 @@
 INCLUDE(../../cmake/macros.cmake)
 PROJECT(speed-dreams)
 
-SET(SD_SOURCES main.cpp linuxspec.cpp)
+SET(SD_SOURCES main.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(legacymenu raceengine tgf tgfclient)
 
 # Disable developer warning
@@ -19,6 +18,4 @@ ADD_SDLIB_LIBRARY(speed-dreams-2 legacymenu raceengine tgf)
 ADD_DL_LIBRARY(speed-dreams-2)
 
 SD_INSTALL_FILES(BIN TARGETS speed-dreams-2)
-
-SD_INSTALL_FILES(INCLUDE FILES osspec.h)
 

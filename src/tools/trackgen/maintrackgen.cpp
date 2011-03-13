@@ -22,24 +22,29 @@
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <ctype.h>
 #include <cstring>
+
 #ifndef WIN32
 #include <unistd.h>
 #endif
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
+
 #ifndef WIN32
 #include <getopt.h>
 #endif
-#include <math.h>
+
+#include <cmath>
+
 #include <plib/ul.h>
 #include <plib/ssg.h>
-
 #include <SDL/SDL.h>
+
 #include <config.h>
 #include <tgfclient.h>
 #include <track.h>
@@ -49,6 +54,7 @@
 #include "objects.h"
 #include "elevation.h"
 #include "trackgen.h"
+
 
 float	GridStep = 40.0;
 float	TrackStep = 5.0;
@@ -296,16 +302,11 @@ void init_args(int argc, char **argv)
 	exit(1);
     }
 }
-#ifndef WIN32
-extern void LinuxSpecInit(void);
-#else
-extern void WindowsSpecInit(void);
-#endif
 
 int
 main(int argc, char **argv)
 {
-    //GfInit(); Not useful here (apart if we want the trace system)
+    GfInit();
 
     init_args(argc, argv);
 
@@ -321,13 +322,8 @@ main(int argc, char **argv)
 
     //ssgInit();
     
-#ifndef WIN32
-    LinuxSpecInit();
-#else
-    WindowsSpecInit();
-#endif
-
-    Generate();
+	Generate();
+	
     return 0;
 }
 

@@ -3,7 +3,6 @@ INCLUDE(../../../cmake/macros.cmake)
 #PROJECT(robottools)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability tgf math)
 INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
 

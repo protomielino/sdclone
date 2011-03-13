@@ -3,8 +3,6 @@ INCLUDE(../../../cmake/macros.cmake)
 #PROJECT(tgfclient)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
-
 ADD_SDLIB_INCLUDEDIR(tgf math portability)
 ADD_SDL_INCLUDEDIR()
 ADD_JPEG_INCLUDEDIR()

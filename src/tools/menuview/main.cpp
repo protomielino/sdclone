@@ -29,16 +29,6 @@
 #include <tgf.h>
 #include <tgfclient.h>
 
-#ifdef WIN32
-#include <windowsspec.h>
-#else
-#include <linuxspec.h>
-#endif
-
-//#include <client.h>
-
-//#include "mainmenu.h"
-//#include "splash.h"
 #include "previewmenu.h"
 
 
@@ -136,23 +126,17 @@ void ShowMenu(const char *pMenuFile)
 int
 main(int argc, char *argv[])
 {
-    //GfInit(); Not useful here (apart if we want the trace system)
+    GfInit();
 
     init_args(argc, argv);
 
     GfFileSetup();          /* Update user settings files from an old version */
 
-#ifdef WIN32
-    WindowsSpecInit();      /* init specific windows functions */
-#else
-	LinuxSpecInit();
-#endif
-
     GfScrInit(argc, argv);  /* init screen */
 
 	if (g_strMenuFile == "")
 	{
-		printf("No menu file specified\nUSAGE\nsd-menuview menufile.xml\n");
+		printf("Error: No menu file specified\nUSAGE:\n  sd-menuview menufile.xml\n");
 		return 0;
 	}
 

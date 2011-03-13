@@ -6,7 +6,6 @@ SET(SIMUV3_SOURCES SimulationOptions.cpp aero.cpp axle.cpp brake.cpp
                    transmission.cpp wheel.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math tgf robottools portability)
 INCLUDE_DIRECTORIES(../simuv2.1/SOLID-2.0/include)

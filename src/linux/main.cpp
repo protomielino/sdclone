@@ -28,8 +28,6 @@
 #include <raceengine.h>
 #include <legacymenu.h>
 
-#include "linuxspec.h"
-
 
 static void
 init_args(int argc, char **argv)
@@ -148,8 +146,6 @@ main(int argc, char *argv[])
 
     init_args(argc, argv);
 
-    LinuxSpecInit();         /* init specific linux functions */
-        
     GfFileSetup();           /* Update user settings files from installed ones */
 
     GfScrInit(argc, argv);     /* init screen */

@@ -21,24 +21,26 @@
 #ifndef __OSSPEC__H__
 #define __OSSPEC__H__
 
-/* Files Extensions */
-#define TRKEXT	"xml"
-#define DLLEXT	"dll"
+// Common file name extensions
+#define TRKEXT	 "xml"
 #define PARAMEXT ".xml"
+
+// Windows -----------------------------------------------------------------
+#ifdef WIN32
 
 #ifndef _WIN32
 #error Hey ! Where is _WIN32 ??
 #endif
 
-#include <cstring>
-#ifdef WIN32
-#	define uint unsigned int
-#	define uchar unsigned char
-#	define execlp _execlp
-#	define strncasecmp strnicmp
-#	define strcasecmp stricmp
-#endif // WIN32
+// File name extensions
+#define DLLEXT	"dll"
 
-#define M_PI (3.1415926535897932384626433832795)
+// Linux -------------------------------------------------------------------
+#else // WIN32
+
+// File name extensions
+#define DLLEXT	 "so"
+
+#endif // WIN32
 
 #endif /* __OSSPEC__H__ */ 

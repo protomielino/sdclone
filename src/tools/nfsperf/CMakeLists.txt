@@ -3,7 +3,6 @@ INCLUDE(../../../cmake/macros.cmake)
 PROJECT(nfsperf)
 
 SET(NFSPERF_SOURCES mainnfsperf.cpp)
-ADD_OSSPEC_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(tgf)
 
 IF (COMMAND cmake_policy)

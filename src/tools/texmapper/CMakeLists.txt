@@ -6,7 +6,6 @@ SET(TEXMAPPER_SOURCES maintexmapper.cpp ssgSaveAC.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(tgf tgfclient)
-ADD_OSSPEC_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 
 #disable developer warning
