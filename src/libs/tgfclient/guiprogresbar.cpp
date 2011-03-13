@@ -15,12 +15,12 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdlib.h>
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include <cstdlib>
+
 #include "tgfclient.h"
+
 #include "gui.h"
+
 
 /** Create a new progress bar
     This kind of image is not clickable.

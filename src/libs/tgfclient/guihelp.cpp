@@ -26,7 +26,6 @@
 #include <cstdlib>
 
 #ifdef WIN32
-#include <windows.h>
 #ifndef HAVE_CONFIG_H
 #define HAVE_CONFIG_H
 #endif

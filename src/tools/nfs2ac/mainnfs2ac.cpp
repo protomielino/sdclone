@@ -24,10 +24,10 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-//#include <unistd.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+
 #include <fcntl.h>
 #include <memory.h>
 

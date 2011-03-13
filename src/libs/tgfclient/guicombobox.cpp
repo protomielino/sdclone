@@ -18,10 +18,6 @@
 #include <cstdlib>
 #include <cstring>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include <SDL/SDL.h>
 
 #include "gui.h"

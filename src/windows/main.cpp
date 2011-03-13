@@ -19,11 +19,6 @@
 
 #include <config.h>
 
-#ifdef WIN32
-#include <windows.h>
-#include <shlobj.h>
-#endif
-
 #include <portability.h>
 #include <tgf.h>
 #include <tgfclient.h>

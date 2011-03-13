@@ -27,13 +27,11 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 #include "tgfclient.h"
 #include "gui.h"
 #include "guifont.h"
+
 
 void
 gfuiScrListInit(void)

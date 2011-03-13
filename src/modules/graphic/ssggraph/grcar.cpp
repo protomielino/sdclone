@@ -17,10 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include <portability.h> // snprintf
 #include <glfeatures.h>
 #include <robottools.h> //RELAXATION

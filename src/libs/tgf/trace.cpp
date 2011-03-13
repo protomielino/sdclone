@@ -31,7 +31,7 @@
 #include <cstring>
 #include <ctime>
 
-#if (defined(_WIN32) || defined(WIN32))
+#ifdef WIN32
 #include <windows.h>
 #include <windowsx.h>
 #ifndef HAVE_CONFIG_H
@@ -39,7 +39,7 @@
 #endif
 #else
 #include <sys/param.h>
-#endif // _WIN32 || WIN32
+#endif // WIN32
 
 #ifdef HAVE_CONFIG_H
 #include "version.h"

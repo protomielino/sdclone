@@ -21,12 +21,16 @@
 #include <windows.h>
 #include <io.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
+
+#include <cstdio>
+#include <cstdlib>
+
 #ifndef WIN32
 #include <getopt.h>
 #endif
+
 #include <tgf.h>
+
 char	*catfile = NULL;
 const char	*infile = "carp.txt";
 const char	*outfile = "carp.xml";

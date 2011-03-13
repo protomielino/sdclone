@@ -21,10 +21,6 @@
 #ifndef _MAINMENU_H_
 #define _MAINMENU_H_
 
-#if _WIN32
-#include <windows.h>
-#endif
-
 #include <tgfclient.h>
 
 extern void *menuHandle;

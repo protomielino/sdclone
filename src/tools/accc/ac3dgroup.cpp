@@ -22,18 +22,15 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <ctype.h>
 #include <cstring>
+#include <cmath>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-#include <math.h>
-#ifdef WIN32
-#include <windows.h>
-#endif
-#include "portability.h"
+#include <portability.h>
 #include "accc.h"
 
 

@@ -23,8 +23,8 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <ctype.h>
 #include <cstring>
 #ifndef WIN32
@@ -32,7 +32,7 @@
 #else
 #include <windows.h>
 #endif
-#include <math.h>
+#include <cmath>
 #include <plib/ssg.h>
 
 #include <tgfclient.h>

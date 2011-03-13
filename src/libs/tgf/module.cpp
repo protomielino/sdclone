@@ -50,9 +50,6 @@
     @version	$Id$
     @ingroup	module
 */
-#ifdef WIN32
-#include <windows.h>
-#endif
 #include "tgf.h"
 #include "os.h"
 

@@ -24,16 +24,13 @@
 */
 
 #include "network.h"
-#ifdef _WIN32
-#include <windows.h>
-#endif
 
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <cmath>
 #include <map>
 #include <vector>
-#include <math.h>
 
 #include <portability.h>
 #include <tgfclient.h>

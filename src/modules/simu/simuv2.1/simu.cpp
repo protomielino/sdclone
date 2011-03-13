@@ -17,19 +17,15 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <memory.h>
-#include <math.h>
-#ifdef WIN32
-#include <windows.h>
-#include <float.h>
-#define isnan _isnan
-#endif
+#include <cmath>
 
-#include "portability.h"
+#include <portability.h>
 #include <tgf.h>
 #include <robottools.h>
+
 #include "sim.h"
 
 tCar *SimCarTable = 0;

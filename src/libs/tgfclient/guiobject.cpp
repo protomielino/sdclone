@@ -18,12 +18,11 @@
 
 
 #include <cstring>
-#ifdef WIN32
-#include <windows.h>
-#endif
+#include <string>
+
 #include "tgfclient.h"
 #include "gui.h"
-#include <string>
+
 
 static int g_mouseOffsetX = 0;
 static int g_mouseOffsetY = 0;

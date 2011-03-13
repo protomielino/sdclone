@@ -20,10 +20,6 @@
 // Control nbr of draws: Set to 4
 // Deleted unused code
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include <plib/ssg.h>
 
 #include "grcarlight.h"

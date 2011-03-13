@@ -37,10 +37,6 @@
 #  pragma warning (disable:4251) // class XXX needs a DLL interface ...
 #endif
 
-#ifdef WIN32
-#  include <windows.h>
-#endif // WIN32
-
 #ifdef __APPLE__
 #  include <js.h>
 #else

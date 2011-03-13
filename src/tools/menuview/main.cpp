@@ -21,7 +21,6 @@
 
 #ifdef _MSC_VER
 #include <windows.h>
-#include <shlobj.h>
 #endif
 
 #include <portability.h>

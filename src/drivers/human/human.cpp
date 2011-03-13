@@ -37,10 +37,6 @@
 #include <vector>
 #include <string>
 
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
 #include <portability.h>
 #include <tgfclient.h>
 #include <robottools.h>	//Rt*

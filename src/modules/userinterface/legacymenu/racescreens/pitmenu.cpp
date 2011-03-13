@@ -24,9 +24,6 @@
     @version	$Id$
 */
 #include <cstdlib>
-#ifdef WIN32
-#include <windows.h>
-#endif
 
 #include <tgfclient.h>
 #include <car.h>

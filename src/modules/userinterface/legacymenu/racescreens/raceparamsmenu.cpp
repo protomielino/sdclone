@@ -29,10 +29,6 @@
 #include <cstring>
 #include <sstream>
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
 #include <portability.h>
 #include <tgfclient.h>
 
