@@ -836,6 +836,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   char buf[32];
   
   index = car->index; /* current car's index */
+
+  //RPM
   curInst = &(grCarInfo[index].instrument[0]);
   
   glEnable(GL_BLEND);
@@ -865,7 +867,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glRotatef(val, 0, 0, 1);
   glCallList(curInst->needleList);
   glPopMatrix();
-  
+
+  //Show gear
   if (car->_gear <= 0)
     snprintf(buf, sizeof(buf), "%s", car->_gear == 0 ? "N" : "R");
   else
@@ -875,6 +878,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   
   glTranslatef(-centerAnchor, -BOTTOM_ANCHOR, 0);
 
+  //Speedo
   curInst = &(grCarInfo[index].instrument[1]);
   
   glEnable(GL_BLEND);
@@ -887,12 +891,13 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   }
   glCallList(curInst->CounterList);
   glBindTexture(GL_TEXTURE_2D, 0);
-  
+
+  //Reverse speed should show on needle, too
   val = (*(curInst->monitored) - curInst->minValue) / curInst->maxValue;
+  if (val < 0.0)
+    val *= -1.0;
   if (val > 1.0) {
     val = 1.0;
-  } else if (val < 0.0) {
-    val = 0.0;
   }
   val = curInst->minAngle + val * curInst->maxAngle;
   
@@ -903,7 +908,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glRotatef(val, 0, 0, 1);
   glCallList(curInst->needleList);
   glPopMatrix();
-  
+
+  //Digital speedo
   if (curInst->digital) {
     // Do not add "%3d" or something, because the digital font DOES NOT SUPPORT BLANKS!!!!
     snprintf(buf, sizeof(buf), "%d", abs((int)(car->_speed_x * 3.6)));
@@ -912,7 +918,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   }
 
   glTranslatef(-centerAnchor, -BOTTOM_ANCHOR, 0);
-  
+
+  //Fuel and damage meter
   if (counterFlag == 1){
     float *clr;
     if (car->_fuel < 5.0f) {
