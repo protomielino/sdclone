@@ -81,4 +81,13 @@ extern class cGrScreen* grGetCurrentScreen(void);
 
 extern tdble grLodFactorValue;
 
+class cGrFrameInfo
+{
+ public:
+	double fInstFps;        // "Instant" frame rate (average along a 1 second shifting window).
+	double fAvgFps;         // Average frame rate (since the beginning of the race).
+	unsigned nInstFrames;   // Nb of frames since the last "instant" FPS refresh time
+	unsigned nTotalFrames;  // Total nb of frames since initView
+};
+
 #endif /* _GRMAIN_H_ */ 

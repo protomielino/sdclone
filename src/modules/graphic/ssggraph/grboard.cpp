@@ -46,7 +46,7 @@ static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
 
 #define NB_BOARDS 3
 #define NB_LBOARDS  5 //# of leaderboard states
-#define NB_DEBUG  3
+#define NB_DEBUG  4
 
 // Boards work on a OrthoCam with fixed height of 600, width flows
 // with split screen(s) and can be limited to 'board width' % of screen
@@ -167,15 +167,15 @@ cGrBoard::selectBoard(int val)
  * Displays debug information in the top right corner.
  * It is a 3-state display, states as follows:
  * 0 - Don't display any info
- * 1 - Display the FPS only
- * 2 - Display FPS, the segment the car is on, car's distance from startline, current camera
+ * 1 - Display the mean and instant FPS
+ * 2 - Like 2 + the absolute frame counter
+ * 3 - Like 2 + the segment the car is on, car's distance from startline, current camera
  * 
- * @param instFps Instant frame rate value to display
- * @param avgFps Average frame rate value to display
+ * @param frame Frame info to display
  * @param car The current car
  */
 void
-cGrBoard::grDispDebug(float instFps, float avgFps, tCarElt *car)
+cGrBoard::grDispDebug(const tCarElt *car, const cGrFrameInfo* frame)
 {
   char buf[BUFSIZE];
   int x, y, dy;
@@ -186,10 +186,16 @@ cGrBoard::grDispDebug(float instFps, float avgFps, tCarElt *car)
   dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
 
   //Display frame rates (instant and average)
-  snprintf(buf, sizeof(buf), "FPS: %.1f(%.1f)", instFps, avgFps);
+  snprintf(buf, sizeof(buf), "FPS: %.1f(%.1f)", frame->fInstFps, frame->fAvgFps);
   GfuiPrintString(buf, grWhite, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
 
-  if(debugFlag == 2) {  //Only display detailed information in Debug Mode 2
+  if(debugFlag == 2) {  //Only display detailed information in Debug Mode > 1
+    //Display frame counter
+    y -= dy;
+    snprintf(buf, sizeof(buf),  "Frm: %u", frame->nTotalFrames);
+    GfuiPrintString(buf, grWhite, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
+      
+  } else if(debugFlag == 3) {  //Only display detailed information in Debug Mode > 1
     //Display segment name
     y -= dy;
     snprintf(buf, sizeof(buf),  "Seg: %s", car->_trkPos.seg->name);
@@ -1189,8 +1195,8 @@ void cGrBoard::grGetLapsTime(tSituation *s, tCarElt *car,
   }
 }
 
-void cGrBoard::refreshBoard(tSituation *s, float instFps, float avgFps,
-              bool forceArcade, tCarElt *currCar, bool isCurrScreen)
+void cGrBoard::refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
+							bool forceArcade, tCarElt *currCar, bool isCurrScreen)
 {
   grDispMisc(isCurrScreen);
   
@@ -1198,7 +1204,7 @@ void cGrBoard::refreshBoard(tSituation *s, float instFps, float avgFps,
     grDispArcade(currCar, s);
   } else {
     if (debugFlag)
-      grDispDebug(instFps, avgFps, currCar);
+      grDispDebug(currCar, frameInfo);
     if (GFlag)
       grDispGGraph(currCar);
     if (boardFlag)

@@ -23,6 +23,7 @@
 #include "grcam.h"		//Cameras
 
 class cGrBoard;
+class cGrFrameInfo;
 
 class cGrScreen {
 	protected:
@@ -63,7 +64,7 @@ class cGrScreen {
 		inline void deactivate(void) { active = false; }
 		inline void setZoom(const long zoom) { curCam->setZoom(zoom); }
 		int  isInScreen(int x, int y);
-		void update(tSituation *s, float instFps, float avgFps);
+		void update(tSituation *s, const cGrFrameInfo* frameInfo);
 		void camDraw(tSituation *s);
 		void updateCurrent(tSituation *s);
 

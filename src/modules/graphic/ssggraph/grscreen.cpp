@@ -300,7 +300,7 @@ void cGrScreen::camDraw(tSituation *s)
 
 
 /* Update screen display */
-void cGrScreen::update(tSituation *s, float instFps, float avgFps)
+void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 {
 	if (!active) {
 		return;
@@ -381,7 +381,7 @@ void cGrScreen::update(tSituation *s, float instFps, float avgFps)
 	glDisable(GL_TEXTURE_2D);
 	
 	TRACE_GL("cGrScreen::update glDisable(GL_DEPTH_TEST)");
-	board->refreshBoard(s, instFps, avgFps, false, curCar,
+	board->refreshBoard(s, frameInfo, false, curCar,
 						grNbActiveScreens > 1 && grGetCurrentScreen() == this);
 	TRACE_GL("cGrScreen::update display boards");
 	

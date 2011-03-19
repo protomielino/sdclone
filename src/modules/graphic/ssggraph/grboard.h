@@ -24,6 +24,7 @@
 #include <raceman.h>	//tSituation
 
 class cGrTrackMap;
+class cGrFrameInfo;
 
 #include <string>
 #include <vector>
@@ -48,7 +49,7 @@ class cGrBoard
     std::vector<std::string> sShortNames;
 		
  private:
-    void grDispDebug(float instFps, float avgFps, tCarElt *car);
+    void grDispDebug(const tCarElt *car, const cGrFrameInfo* frame);
     void grDispGGraph(tCarElt *car);
     void grDispCarBoard1(tCarElt *car, tSituation *s);
     void grDispMisc(bool bCurrentScreen);
@@ -80,7 +81,7 @@ class cGrBoard
     void initBoardCar(tCarElt *car);
     inline cGrTrackMap *getTrackMap() { return trackMap; }
 
-    void refreshBoard(tSituation *s, float instFps, float avgFps,
+    void refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
 					  bool forceArcade, tCarElt *currCar, bool isCurrScreen);
     void loadDefaults(tCarElt *curCar);
 };

@@ -57,13 +57,10 @@ ssgContext grContext;
 class cGrScreen *grScreens[GR_NB_MAX_SCREEN] = {NULL, NULL, NULL, NULL};
 tdble grLodFactorValue = 1.0;
 
-// FPS indicator variables.
-static float grInstFps; // Instant frame rate (average along a 1 second shifting window).
-static float grAvgFps; // Average frame rate (since the beginning of the race).
-static double dFPSPrevTime;
-static int nFPSFrames;
-static int nFPSTotalFrames;
-static int nFPSTotalSeconds;
+// Frame/FPS info.
+static cGrFrameInfo frameInfo;
+static double fFPSPrevInstTime;   // Last "instant" FPS refresh time
+static unsigned nFPSTotalSeconds; // Total duration since initView
 
 // Mouse coords graphics backend to screen ratios.
 static float fMouseRatioX, fMouseRatioY;
@@ -269,12 +266,12 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     fMouseRatioX = width / 640.0;
     fMouseRatioY = height / 480.0;
 
-    dFPSPrevTime = GfTimeClock();
-    nFPSFrames = 0;
-    nFPSTotalFrames = 0;
+    frameInfo.fInstFps = 0.0;
+    frameInfo.fAvgFps = 0.0;
+    frameInfo.nInstFrames = 0;
+    frameInfo.nTotalFrames = 0;
+	fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
-    grInstFps = 0;
-    grAvgFps = 0;
 
     if (!grHandle)
     {
@@ -338,16 +335,16 @@ refresh(tSituation *s)
     GfProfStartProfile("refresh");
 
 	// Compute FPS indicators every second.
-    nFPSFrames++;
-    nFPSTotalFrames++;
+    frameInfo.nInstFrames++;
     const double dCurTime = GfTimeClock();
-	const double dDeltaTime = dCurTime - dFPSPrevTime;
+	const double dDeltaTime = dCurTime - fFPSPrevInstTime;
     if (dDeltaTime > 1.0) {
 		++nFPSTotalSeconds;
-		grInstFps = nFPSFrames / dDeltaTime;
-		nFPSFrames = 0;
-		dFPSPrevTime = dCurTime;
-		grAvgFps = (tdble)nFPSTotalFrames / nFPSTotalSeconds;
+		fFPSPrevInstTime = dCurTime;
+		frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
+		frameInfo.nTotalFrames += frameInfo.nInstFrames;
+		frameInfo.nInstFrames = 0;
+		frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
     }
 
     TRACE_GL("refresh: start");
@@ -370,7 +367,7 @@ refresh(tSituation *s)
     GfProfStopProfile("grDrawBackground/glClear");
 
     for (i = 0; i < grNbActiveScreens; i++) {
-		grScreens[i]->update(s, grInstFps, grAvgFps);
+		grScreens[i]->update(s, &frameInfo);
     }
 
     grUpdateSmoke(s->currentTime);
@@ -507,7 +504,7 @@ shutdownCars(void)
 
 	if (nFPSTotalSeconds > 0)
 		GfLogTrace("Average FPS: %.2f\n",
-				   (double)nFPSTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - dFPSPrevTime));
+				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
 int
