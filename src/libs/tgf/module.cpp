@@ -1,11 +1,11 @@
 /***************************************************************************
                       module.cpp -- Dynamic module management                                
                              -------------------                                         
-    created              : Fri Aug 13 22:25:53 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
- ***************************************************************************/
+    created              : Mod Mar 14 20:32:14 CEST 2011
+    copyright            : (C) 2011 by Jean-Philippe Meuret
+    web                  : http://www.speed-dreams.org
+    version              : $Id$
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -18,136 +18,185 @@
 
 /** @file   
     		Dynamic module management.
-    		This is the interface to load/unload the shared libraries (or DLLs).
-		<br>Two modes are allowed, the access by filename, of the access by entire directory.
-		<br>When the directory mode is used, the filenames are not known by advance, this
-		<br>allow more flexibility at runtime.
-		<br>
-		<br>The generic information can be retrieved, without keeping the DLL loaded, through GfModInfo and GfModInfoDir.
-		<br>
-		<br>The gfid parameter is used to differentiate the modules using different includes.
-		<br>This functionality is not used yet.
-		<br>
-		<br>Loaded module information is stored in a linked list in the following way :
-		<br>- the list can be empty at the beginning, but this is not needed,
-		<br>- GfModInfo and GfModLoad add loaded module info at the head of the list,
-		<br>  in order to have easy access to this info on return
-		<br>- GfModInfoDir and GfModLoadDir keep the list sorted by module priority
-		<br>- For a given list, if a DLL is requested to be loaded multiple times,
-		<br>  it will be loaded only once, unless different path-names
-		<br>  are used each time (ex: with absolute and the relative path-name)
-		<br>
-		<br>The process of "loading a module" named "mod" includes the following actions :
-		<br>- load the associated DLL
-		<br>- ask the DLL if it holds a "modMaxNbItf" entry, and call it if yes,
-		<br>  to get the maximum number of interfaces of the module (default = 10)
-		<br>- allocate the array of "module interface info" structures with that size
-		<br>- call the (mandatory) module entry "mod" with such allocated array as a parameter,
-		<br>  in order for the module to initialize its internal data
-		<br>
-		<br>This API is not used for shared libraries linked statically at compilation time.
-    @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
     @ingroup	module
 */
-#include "tgf.h"
-#include "os.h"
 
-void
-gfModInit(void)
+#include "tgf.hpp"
+
+#ifdef WIN32
+# include <windows.h>
+# define dlopen(soFileName) (void*)LoadLibrary(soFileName)
+# define dlsym(pvoid) GetProcAddress((HMODULE)pvoid)
+# define dlclose(pvoid) !FreeLibrary((HMODULE)pvoid)
+# define soLibHandle(handle) (void*)handle
+#else
+# include <dlfcn.h>
+# define dlopen(soFileName) dlopen(soFileName, RTLD_LAZY)
+# define soLibHandle(handle) handle
+#endif
+
+// Name and type of the 2 extern "C" module interface functions.
+typedef int (*tModOpenFunc)(const char*, void*); // Returns 0 on success, !0 otherwise.
+static const char* pszOpenModuleFuncName = "GfModuleOpen";
+
+typedef int (*tModCloseFunc)(); // Returns 0 on success, !0 otherwise.
+static const char* pszCloseModuleFuncName = "GfModuleClose";
+
+// Error code decoder.
+static std::string lastDLErrorString()
+{
+	std::string strError;
+	
+#ifdef WIN32
+
+    // Retrieve the system error message for the last-error code
+    LPVOID lpMsgBuf;
+    DWORD dw = GetLastError(); 
+	
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+				  FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+				  NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+				  (LPTSTR) &lpMsgBuf, 0, NULL );
+
+	strError = (const char*)lpMsgBuf;
+	
+    LocalFree(lpMsgBuf);
+
+#else
+
+	strError = dlerror();
+
+#endif
+
+	return strError;
+}
+
+// The (static) table of loaded modules and their associated shared library.
+std::map<std::string, GfModule*> GfModule::_mapModulesByLibName;
+
+GfModule::GfModule(const std::string& strShLibName, void* hShLibHandle)
+: _strShLibName(strShLibName), _hShLibHandle(hShLibHandle)
 {
 }
 
-/** Load the specified DLL.
-    @ingroup	module
-    @param	gfid	Mask for version checking
-    @param	dllname	File name of the DLL
-    @param	modlist	List of module description structure where to add loaded module info
-    @return	>=0 Number of modules loaded
-		<br>-1 Error
-    @warning	The loaded module info is added/moved to the head of modlist
-    @see	tModList
- */
-int
-GfModLoad(unsigned int gfid, const char *dllname, tModList **modlist)
+GfModule::~GfModule()
 {
-    if (GfOs.modLoad) {
-	return GfOs.modLoad(gfid, dllname, modlist);
-    } else {
-	return -1;
-    }
 }
 
-/** Load the DLLs in the specified directory.
-    @ingroup	module
-    @param	gfid	Mask for version checking
-    @param	dir	Directory name where to find the DLLs
-    @param	modlist	List of module description structure where to add loaded modules info
-    @return	>=0 Number of modules loaded
-		<br>-1 Error
-    @warning	modlist is kept sorted by module priority
- */
-int
-GfModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
+GfModule* GfModule::load(const std::string& strShLibName)
 {
-    if (GfOs.modLoadDir) {
-	return GfOs.modLoadDir(gfid, dir, modlist);
-    } else {
-	return -1;
-    }
+	// Don't load shared libraries twice
+	// Warning: Only checked through the give nlibrary file path-name ...
+	if (_mapModulesByLibName.find(strShLibName) != _mapModulesByLibName.end())
+	{
+		GfLogDebug("Not re-loading module %s (already done)\n", strShLibName.c_str());
+		return _mapModulesByLibName[strShLibName];
+	}
+
+	// Try and open the shared library.
+	void* hSOLib = dlopen(strShLibName.c_str());
+	if (!hSOLib)
+	{
+		GfLogError("Failed to load library %s (%s)\n",
+				   strShLibName.c_str(), lastDLErrorString().c_str());
+		return 0;
+	}
+
+	// Try and get the module opening function.
+	tModOpenFunc modOpenFunc = (tModOpenFunc)dlsym(hSOLib, pszOpenModuleFuncName);
+    if (!modOpenFunc)
+    {
+		GfLogError("Library %s doesn't export any '%s' function' ; module NOT loaded\n",
+				   strShLibName.c_str(), pszOpenModuleFuncName);
+		dlclose(hSOLib);
+		return 0;
+	}
+
+	// Call the module opening function (must instanciate the module and register_ it on success).
+	if (modOpenFunc(strShLibName.c_str(), hSOLib))
+	{
+		GfLogError("Library %s '%s' function call failed ; module NOT loaded\n",
+				   strShLibName.c_str(), pszOpenModuleFuncName);
+		dlclose(hSOLib);
+		return 0;
+	}
+
+	// Check if the module was successfully register_ed.
+	if (_mapModulesByLibName.find(strShLibName) == _mapModulesByLibName.end())
+	{
+		GfLogError("Library %s '%s' function failed to register the open module ; NOT loaded\n",
+				   strShLibName.c_str(), pszOpenModuleFuncName);
+		dlclose(hSOLib);
+		return 0;
+	}
+
+	// Yesssss !
+	GfLogTrace("Module %s loaded\n", strShLibName.c_str());
+
+	return _mapModulesByLibName[strShLibName];
 }
 
-/** Unload the DLLs of a list.
-    @ingroup	module
-    @param	modlist	List of DLLs to unload
-    @return	0 Ok
-		<br>-1 Error
- */
-int
-GfModUnloadList(tModList **modlist)
+bool GfModule::unload()
 {
-    if (GfOs.modUnloadList) {
-	return GfOs.modUnloadList(modlist);
-    } else {
-	return -1;
-    }
+	if (_mapModulesByLibName.find(_strShLibName) == _mapModulesByLibName.end())
+	{
+		GfLogError("Can't unload not yet loaded module %s\n", _strShLibName.c_str());
+		return false;
+	}
+
+	// Try and get the module closing function.
+	tModCloseFunc modCloseFunc = (tModCloseFunc)dlsym(_hShLibHandle, pszCloseModuleFuncName);
+    if (!modCloseFunc)
+    {
+		GfLogWarning("Library %s doesn't export any '%s' function' ; not called\n",
+					 _strShLibName.c_str(), pszCloseModuleFuncName);
+	}
+
+	// Call the module closing function (must delete the module instance).
+	if (modCloseFunc())
+	{
+		GfLogWarning("Library %s '%s' function call failed ; going on\n",
+					 _strShLibName.c_str(), pszCloseModuleFuncName);
+	}
+
+	// Unregister the module.
+	_mapModulesByLibName.erase(_strShLibName);
+	
+	// Try and close the shared library.
+	if (dlclose(_hShLibHandle))
+	{
+		GfLogWarning("Failed to unload library %s (%s) ; \n",
+					 _strShLibName.c_str(), lastDLErrorString().c_str());
+		return false;
+	}
+	
+	GfLogTrace("Module %s unloaded\n", _strShLibName.c_str());
+
+	return true;
 }
 
-/** Get the generic information of the specified DLL (unload the DLL afterwards).
-    @ingroup	module
-    @param	gfid	Mask for version control
-    @param	dllname	File name of the DLL
-    @param	modlist	List of module description structure where to add loaded modules info
-    @return	>=0	Number of modules infoed
-		<br>-1 Error
-    @warning	The loaded module info is added/moved to the head of modlist
- */
-int
-GfModInfo(unsigned int gfid, const char *dllname, tModList **modlist)
+bool GfModule::register_(GfModule* pModule)
 {
-    if (GfOs.modInfo) {
-	return GfOs.modInfo(gfid, dllname, modlist);
-    } else {
-	return -1;
-    }
+	bool status = false;
+	
+	if (pModule)
+	{
+		if (_mapModulesByLibName.find(pModule->getSharedLibName()) != _mapModulesByLibName.end())
+		{
+			GfLogError("Can't register another module in %s\n", pModule->getSharedLibName().c_str());
+		}
+		else
+		{
+			_mapModulesByLibName[pModule->getSharedLibName()] = pModule;
+			status = true;
+		}
+	}
+
+	return status;
 }
 
-/** Get the generic module information of the DLLs of the specified directory (unload the DLLs afterwards).
-    @ingroup	module
-    @param	gfid	Mask for version checking
-    @param	dir	Directory name where to find the DLLs
-    @param	level	if 0, load dir/ *.so/dll ; if 1, load dir/(subdir)/(subdir).so/dll for any (subdir)
-    @param	modlist	List of module description structure where to add loaded modules info
-    @return	>=0	Number of modules infoed
-		<br>-1 Error
-    @warning	modlist is kept sorted by module priority
- */
-int
-GfModInfoDir(unsigned int gfid, const char *dir, int level, tModList **modlist)
+const std::string& GfModule::getSharedLibName() const
 {
-    if (GfOs.modInfoDir) {
-	return GfOs.modInfoDir(gfid, dir, level, modlist);
-    } else {
-	return -1;
-    }
+	return _strShLibName;
 }

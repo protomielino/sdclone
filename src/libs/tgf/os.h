@@ -20,7 +20,8 @@
 #define _OS__H_
 
 #include "tgf.h"
-     
+
+
 /* dynamic module (dll) interfaces */
 typedef int (*tfModLoad)(unsigned int, const char*, tModList **);
 typedef int (*tfModLoadDir)(unsigned int, const char*, tModList **);

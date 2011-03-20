@@ -1,5 +1,5 @@
 /***************************************************************************
-                   modinfo.h -- Tools for module interface management
+                   modinfo.h -- Tools for legacy module interface management
 
     created              : Fri Aug 13 22:32:14 CEST 1999
     copyright            : (C) 2008 by Jean-Philippe Meuret                         
@@ -17,7 +17,7 @@
  ***************************************************************************/
 
 /** @file   
-    	Tools for module interface management.
+    	Tools for legacy module interface management.
     @author	<a href=mailto:jpmeuret@free.fr>Jean-Philippe Meuret</a>
     @version	$Id$
 */

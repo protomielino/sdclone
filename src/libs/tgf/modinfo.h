@@ -52,7 +52,7 @@ typedef struct ModWelcomeIn {
 
 /** Welcome information that a module gives back at load time */
 typedef struct ModWelcomeOut {
-    unsigned int	maxNbItf;	/**< name = identifier of the module */
+    unsigned int	maxNbItf;	/**< Max number of interfaces */
 } tModWelcomeOut;
 
 /** initialisation of the function table 
