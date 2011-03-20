@@ -180,7 +180,7 @@ main(int argc, char *argv[])
 	}
 	
 	// If we got here, something bad happened
-    GfLogError("Exiting from Speed Dreams for some fatal reason (see above).\n");
+    GfLogFatal("Exiting from Speed Dreams for some fatal reason (see above).\n");
     exit(1); // If we got here, something bad happened
 }
 

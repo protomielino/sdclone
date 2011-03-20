@@ -187,8 +187,12 @@ void GfLogFatal(const char *pszFmt, ...)
     }
 #endif // TRACE_OUT
 
-    // GfScrShutdown();
-    assert(0);
+#ifdef WIN32
+	MessageBox(NULL, "Please contact the maintenance team\n"
+			   "and notify them about the error messages in the console",
+			   TEXT("Fatal error"), MB_OK|MB_ICONERROR|MB_SETFOREGROUND);
+#endif
+
     exit(1);
 }
 
