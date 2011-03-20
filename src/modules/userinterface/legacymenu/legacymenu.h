@@ -31,7 +31,7 @@
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef LEGACYMENU_DLL
+# ifdef legacymenu_EXPORTS
 #  define LEGACYMENU_API __declspec(dllexport)
 # else
 #  define LEGACYMENU_API __declspec(dllimport)
@@ -42,8 +42,8 @@
 
 
 // The C interface of the module.
-LEGACYMENU_API extern "C" int GfModuleOpen(const char* pszShLibName, void* hShLibHandle);
-LEGACYMENU_API extern "C" int GfModuleClose();
+extern "C" int LEGACYMENU_API openGfModule(const char* pszShLibName, void* hShLibHandle);
+extern "C" int LEGACYMENU_API closeGfModule();
 
 // The module main class (inherits GfModule, and implements IUserInterface).
 class LEGACYMENU_API LegacyMenu : public GfModule, public IUserInterface
@@ -112,8 +112,8 @@ protected:
 	IRaceEngine* _piRaceEngine;
 
 	// Make the C interface functions nearly member functions.
-	friend LEGACYMENU_API int GfModuleOpen(const char* pszShLibName, void* hShLibHandle);
-	friend LEGACYMENU_API int GfModuleClose();
+	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
+	friend int closeGfModule();
 };
 
 #endif /* _LEGACYMENU_H_ */ 

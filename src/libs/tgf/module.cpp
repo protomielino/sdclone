@@ -26,9 +26,9 @@
 
 #ifdef WIN32
 # include <windows.h>
-# define dlopen(soFileName) (void*)LoadLibrary(soFileName)
-# define dlsym(pvoid) GetProcAddress((HMODULE)pvoid)
-# define dlclose(pvoid) !FreeLibrary((HMODULE)pvoid)
+# define dlopen(pszShLibFileName) (void*)LoadLibrary(pszShLibFileName)
+# define dlsym(pvHandle, pszFuncName) GetProcAddress((HMODULE)pvHandle, pszFuncName)
+# define dlclose(pvHandle) !FreeLibrary((HMODULE)pvHandle)
 # define soLibHandle(handle) (void*)handle
 #else
 # include <dlfcn.h>
@@ -38,10 +38,10 @@
 
 // Name and type of the 2 extern "C" module interface functions.
 typedef int (*tModOpenFunc)(const char*, void*); // Returns 0 on success, !0 otherwise.
-static const char* pszOpenModuleFuncName = "GfModuleOpen";
+static const char* pszOpenModuleFuncName = "openGfModule";
 
 typedef int (*tModCloseFunc)(); // Returns 0 on success, !0 otherwise.
-static const char* pszCloseModuleFuncName = "GfModuleClose";
+static const char* pszCloseModuleFuncName = "closeGfModule";
 
 // Error code decoder.
 static std::string lastDLErrorString()
@@ -109,7 +109,7 @@ GfModule* GfModule::load(const std::string& strShLibName)
     {
 		GfLogError("Library %s doesn't export any '%s' function' ; module NOT loaded\n",
 				   strShLibName.c_str(), pszOpenModuleFuncName);
-		dlclose(hSOLib);
+		(void)dlclose(hSOLib);
 		return 0;
 	}
 
@@ -118,7 +118,7 @@ GfModule* GfModule::load(const std::string& strShLibName)
 	{
 		GfLogError("Library %s '%s' function call failed ; module NOT loaded\n",
 				   strShLibName.c_str(), pszOpenModuleFuncName);
-		dlclose(hSOLib);
+		(void)dlclose(hSOLib);
 		return 0;
 	}
 
@@ -127,7 +127,7 @@ GfModule* GfModule::load(const std::string& strShLibName)
 	{
 		GfLogError("Library %s '%s' function failed to register the open module ; NOT loaded\n",
 				   strShLibName.c_str(), pszOpenModuleFuncName);
-		dlclose(hSOLib);
+		(void)dlclose(hSOLib);
 		return 0;
 	}
 

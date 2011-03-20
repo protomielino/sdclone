@@ -28,7 +28,7 @@
 // The LegacyMenu singleton.
 LegacyMenu* LegacyMenu::_pSelf = 0;
 
-int GfModuleOpen(const char* pszShLibName, void* hShLibHandle)
+int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
 	// Instanciate the (only) module instance.
 	LegacyMenu::_pSelf = new LegacyMenu(pszShLibName, hShLibHandle);
@@ -41,7 +41,7 @@ int GfModuleOpen(const char* pszShLibName, void* hShLibHandle)
 	return LegacyMenu::_pSelf ? 0 : 1;
 }
 
-int GfModuleClose()
+int closeGfModule()
 {
 	// Delete the (only) module instance.
 	delete LegacyMenu::_pSelf;
@@ -53,7 +53,7 @@ int GfModuleClose()
 
 LegacyMenu& LegacyMenu::self()
 {
-	// Pre-condition : 1 successfull GfModuleOpen call.
+	// Pre-condition : 1 successfull openGfModule call.
 	return *_pSelf;
 }
 

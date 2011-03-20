@@ -24,6 +24,11 @@
 #ifndef __TGF__HPP__
 #define __TGF__HPP__
 
+#ifdef _MSC_VER
+// Disable useless MSVC warnings
+#  pragma warning (disable:4251) // class XXX needs a DLL interface ...
+#endif
+
 #include <string>
 #include <map>
 
