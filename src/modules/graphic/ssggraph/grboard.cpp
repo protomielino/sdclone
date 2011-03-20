@@ -171,11 +171,12 @@ cGrBoard::selectBoard(int val)
  * 2 - Like 2 + the absolute frame counter
  * 3 - Like 2 + the segment the car is on, car's distance from startline, current camera
  * 
- * @param frame Frame info to display
+ * @param s The current situation
  * @param car The current car
+ * @param frame Frame info to display
  */
 void
-cGrBoard::grDispDebug(const tCarElt *car, const cGrFrameInfo* frame)
+cGrBoard::grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInfo* frame)
 {
   char buf[BUFSIZE];
   int x, y, dy;
@@ -193,6 +194,11 @@ cGrBoard::grDispDebug(const tCarElt *car, const cGrFrameInfo* frame)
     //Display frame counter
     y -= dy;
     snprintf(buf, sizeof(buf),  "Frm: %u", frame->nTotalFrames);
+    GfuiPrintString(buf, grWhite, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
+	
+    //Display simulation time
+    y -= dy;
+    snprintf(buf, sizeof(buf),  "Time: %.f", s->currentTime);
     GfuiPrintString(buf, grWhite, GFUI_FONT_SMALL_C, x, y, GFUI_ALIGN_HL_VB);
       
   } else if(debugFlag == 3) {  //Only display detailed information in Debug Mode > 1
@@ -1204,7 +1210,7 @@ void cGrBoard::refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
     grDispArcade(currCar, s);
   } else {
     if (debugFlag)
-      grDispDebug(currCar, frameInfo);
+      grDispDebug(s, currCar, frameInfo);
     if (GFlag)
       grDispGGraph(currCar);
     if (boardFlag)

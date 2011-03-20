@@ -4,7 +4,7 @@ PROJECT(speed-dreams)
 SET(SD_SOURCES main.cpp speed-dreams.rc ../../data/data/icons/icon.ico)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(legacymenu raceengine tgf tgfclient portability)
+ADD_SDLIB_INCLUDEDIR(raceengine tgf tgfclient portability)
 ADD_PLIB_INCLUDEDIR()
 
 #disable developer warning
@@ -14,7 +14,7 @@ endif(COMMAND cmake_policy)
 
 ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
-ADD_SDLIB_LIBRARY(speed-dreams-2 legacymenu raceengine tgf)
+ADD_SDLIB_LIBRARY(speed-dreams-2 raceengine tgf)
 
 SD_INSTALL_FILES(BIN TARGETS speed-dreams-2)
 

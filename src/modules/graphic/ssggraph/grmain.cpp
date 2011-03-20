@@ -336,13 +336,13 @@ refresh(tSituation *s)
 
 	// Compute FPS indicators every second.
     frameInfo.nInstFrames++;
+	frameInfo.nTotalFrames++;
     const double dCurTime = GfTimeClock();
 	const double dDeltaTime = dCurTime - fFPSPrevInstTime;
     if (dDeltaTime > 1.0) {
 		++nFPSTotalSeconds;
 		fFPSPrevInstTime = dCurTime;
 		frameInfo.fInstFps = frameInfo.nInstFrames / dDeltaTime;
-		frameInfo.nTotalFrames += frameInfo.nInstFrames;
 		frameInfo.nInstFrames = 0;
 		frameInfo.fAvgFps = (double)frameInfo.nTotalFrames / nFPSTotalSeconds;
     }

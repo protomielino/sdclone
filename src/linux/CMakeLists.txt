@@ -4,7 +4,7 @@ PROJECT(speed-dreams)
 SET(SD_SOURCES main.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(legacymenu raceengine tgf tgfclient)
+ADD_SDLIB_INCLUDEDIR(raceengine tgf tgfclient)
 
 # Disable developer warning
 IF (COMMAND cmake_policy)
@@ -13,7 +13,7 @@ ENDIF(COMMAND cmake_policy)
 
 ADD_EXECUTABLE(speed-dreams-2 ${SD_SOURCES})
 
-ADD_SDLIB_LIBRARY(speed-dreams-2 legacymenu raceengine tgf)
+ADD_SDLIB_LIBRARY(speed-dreams-2 raceengine tgf)
 
 ADD_DL_LIBRARY(speed-dreams-2)
 

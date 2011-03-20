@@ -63,10 +63,9 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_LIBRARY(legacymenu SHARED ${LEGACYMENU_SOURCES})
 
-# Temporary, will be needed when a real module.
-#IF(UNIX)
-#    SET_TARGET_PROPERTIES(legacymenu PROPERTIES PREFIX "")
-#ENDIF(UNIX)
+IF(UNIX)
+    SET_TARGET_PROPERTIES(legacymenu PROPERTIES PREFIX "")
+ENDIF(UNIX)
 
 IF(WIN32)
     # Joystick library
@@ -75,15 +74,4 @@ ENDIF(WIN32)
 
 ADD_SDLIB_LIBRARY(legacymenu tgf tgfclient tgfdata networking)
 
-# Temporary installation as a normal lib, as long as not a real module.
-#SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)
-IF(WIN32)
-    SD_INSTALL_FILES(BIN TARGETS legacymenu)
-ELSE(WIN32)
-    SD_INSTALL_FILES(LIB lib TARGETS legacymenu)
-ENDIF(WIN32)
-
-# This should normally no more be useful when a real module.
-#SD_INSTALL_FILES(INCLUDE FILES ${MS}/client.h ${MS}/exitmenu.h)
-#SD_INSTALL_FILES(INCLUDE FILES racescreens.h legacymenu.h)
-#SD_INSTALL_FILES(INCLUDE FILES ${CONFSCREENS_HEADERS})
+SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)

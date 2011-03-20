@@ -49,7 +49,7 @@ class cGrBoard
     std::vector<std::string> sShortNames;
 		
  private:
-    void grDispDebug(const tCarElt *car, const cGrFrameInfo* frame);
+    void grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInfo* frame);
     void grDispGGraph(tCarElt *car);
     void grDispCarBoard1(tCarElt *car, tSituation *s);
     void grDispMisc(bool bCurrentScreen);

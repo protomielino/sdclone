@@ -26,6 +26,8 @@
 
 #include <iuserinterface.h>
 
+#include <tgf.hpp>
+
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -39,7 +41,12 @@
 #endif
 
 
-class LEGACYMENU_API LegacyMenu : public IUserInterface
+// The C interface of the module.
+LEGACYMENU_API extern "C" int GfModuleOpen(const char* pszShLibName, void* hShLibHandle);
+LEGACYMENU_API extern "C" int GfModuleClose();
+
+// The module main class (inherits GfModule, and implements IUserInterface).
+class LEGACYMENU_API LegacyMenu : public GfModule, public IUserInterface
 {
 public:
 
@@ -93,8 +100,8 @@ public:
 
 protected:
 
-	// Protected constructor to avoid instanciation outside of self().
-	LegacyMenu();
+	// Protected constructor to avoid instanciation outside (but friends).
+	LegacyMenu(const std::string& strShLibName, void* hShLibHandle);
 	
 protected:
 
@@ -103,6 +110,10 @@ protected:
 
 	// The race engine.
 	IRaceEngine* _piRaceEngine;
+
+	// Make the C interface functions nearly member functions.
+	friend LEGACYMENU_API int GfModuleOpen(const char* pszShLibName, void* hShLibHandle);
+	friend LEGACYMENU_API int GfModuleClose();
 };
 
 #endif /* _LEGACYMENU_H_ */ 

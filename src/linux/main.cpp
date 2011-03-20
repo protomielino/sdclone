@@ -21,12 +21,14 @@
 
 #include <cstdlib>
 #include <cstring>
+#include <string>
+#include <sstream>
 
-#include <tgf.h>
+#include <tgf.hpp>
 #include <tgfclient.h>
 
 #include <raceengine.h>
-#include <legacymenu.h>
+#include <iuserinterface.h>
 
 
 static void
@@ -146,23 +148,45 @@ main(int argc, char *argv[])
 
     init_args(argc, argv);
 
-    GfFileSetup();           /* Update user settings files from installed ones */
+    GfFileSetup(); // Update user settings files from installed ones
 
-    GfScrInit(argc, argv);     /* init screen */
+    GfScrInit(argc, argv); // Initialize the screen
 
-	// Set the menu system as the user interface for the race engine.
-	RaceEngine::self().setUserInterface(LegacyMenu::self());
+	// Load the user interface module.
+	std::ostringstream ossModLibName;
+	ossModLibName << GfLibDir() << "modules/userinterface/" << "legacymenu" << '.' << DLLEXT;
+	GfModule* pmodUserItf = GfModule::load(ossModLibName.str());
 
-	// Set the race engine for the menu system.
-	LegacyMenu::self().setRaceEngine(RaceEngine::self());
+	// Check that it implements IUserInterface.
+	IUserInterface* piUserItf = 0;
+	if (pmodUserItf)
+	{
+		piUserItf = pmodUserItf->getInterface<IUserInterface>();
+	}
+
+	// Initialize the race engine and the user interface module.
+	if (piUserItf)
+	{
+		RaceEngine::self().setUserInterface(*piUserItf);
+		piUserItf->setRaceEngine(RaceEngine::self());
+	}
 	
-    if (LegacyMenu::self().activate()) // Enter the user interface.
-    {
-        GfelMainLoop();   // Main event loop
-        exit(0);
-    }
+	// Enter the user interface.
+	if (piUserItf && piUserItf->activate())
+	{
+		// Main event loop
+		GfelMainLoop();
 
-    GfLogFatal("Exiting from Speed Dreams for some fatal reason (see above).\n");
-    exit(1);                 // If we got here, something bad happened
+		// Unload the user interface module.
+		pmodUserItf->unload();
+		
+		// The end.
+		GfLogInfo("Exiting normaly from Speed Dreams.\n");
+		exit(0);
+	}
+	
+	// If we got here, something bad happened
+    GfLogError("Exiting from Speed Dreams for some fatal reason (see above).\n");
+    exit(1);
 }
 

@@ -25,19 +25,40 @@
 #include "legacymenu.h"
 
 
-// The singleton.
+// The LegacyMenu singleton.
 LegacyMenu* LegacyMenu::_pSelf = 0;
+
+int GfModuleOpen(const char* pszShLibName, void* hShLibHandle)
+{
+	// Instanciate the (only) module instance.
+	LegacyMenu::_pSelf = new LegacyMenu(pszShLibName, hShLibHandle);
+
+	// Register it to the GfModule module manager if OK.
+	if (LegacyMenu::_pSelf)
+		GfModule::register_(LegacyMenu::_pSelf);
+
+	// Report about success or error.
+	return LegacyMenu::_pSelf ? 0 : 1;
+}
+
+int GfModuleClose()
+{
+	// Delete the (only) module instance.
+	delete LegacyMenu::_pSelf;
+	LegacyMenu::_pSelf = 0;
+
+	// Always successfull.
+	return 0;
+}
 
 LegacyMenu& LegacyMenu::self()
 {
-	if (!_pSelf)
-		_pSelf = new LegacyMenu;
-	
+	// Pre-condition : 1 successfull GfModuleOpen call.
 	return *_pSelf;
 }
 
-LegacyMenu::LegacyMenu()
-: _piRaceEngine(0)
+LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
+: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0)
 {
 }
 
