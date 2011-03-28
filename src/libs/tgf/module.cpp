@@ -137,66 +137,88 @@ GfModule* GfModule::load(const std::string& strShLibName)
 	return _mapModulesByLibName[strShLibName];
 }
 
-bool GfModule::unload()
+bool GfModule::unload(GfModule*& pModule)
 {
-	if (_mapModulesByLibName.find(_strShLibName) == _mapModulesByLibName.end())
-	{
-		GfLogError("Can't unload not yet loaded module %s\n", _strShLibName.c_str());
-		return false;
-	}
-
 	// Try and get the module closing function.
-	tModCloseFunc modCloseFunc = (tModCloseFunc)dlsym(_hShLibHandle, pszCloseModuleFuncName);
+	std::string strShLibName = pModule->getSharedLibName();
+	void* hShLibHandle = pModule->getSharedLibHandle();
+	tModCloseFunc modCloseFunc = (tModCloseFunc)dlsym(hShLibHandle, pszCloseModuleFuncName);
     if (!modCloseFunc)
     {
 		GfLogWarning("Library %s doesn't export any '%s' function' ; not called\n",
-					 _strShLibName.c_str(), pszCloseModuleFuncName);
+					 strShLibName.c_str(), pszCloseModuleFuncName);
 	}
 
 	// Call the module closing function (must delete the module instance).
 	if (modCloseFunc())
 	{
 		GfLogWarning("Library %s '%s' function call failed ; going on\n",
-					 _strShLibName.c_str(), pszCloseModuleFuncName);
+					 strShLibName.c_str(), pszCloseModuleFuncName);
 	}
-
-	// Unregister the module.
-	_mapModulesByLibName.erase(_strShLibName);
+	
+	// Make it clear that the passed pointer is no more usable (it was deleted).
+	pModule = 0; 
 	
 	// Try and close the shared library.
-	if (dlclose(_hShLibHandle))
+	if (dlclose(hShLibHandle))
 	{
 		GfLogWarning("Failed to unload library %s (%s) ; \n",
-					 _strShLibName.c_str(), lastDLErrorString().c_str());
+					 strShLibName.c_str(), lastDLErrorString().c_str());
 		return false;
 	}
 	
-	GfLogTrace("Module %s unloaded\n", _strShLibName.c_str());
+	GfLogTrace("Module %s unloaded\n", strShLibName.c_str());
 
 	return true;
 }
 
-bool GfModule::register_(GfModule* pModule)
+bool GfModule::register_(GfModule* pModule) // Can't use 'register' as it is a C++ keyword.
 {
-	bool status = false;
+	bool bStatus = false;
 	
 	if (pModule)
 	{
 		if (_mapModulesByLibName.find(pModule->getSharedLibName()) != _mapModulesByLibName.end())
 		{
-			GfLogError("Can't register another module in %s\n", pModule->getSharedLibName().c_str());
+			GfLogError("Can only register 1 module from %s\n", pModule->getSharedLibName().c_str());
 		}
 		else
 		{
 			_mapModulesByLibName[pModule->getSharedLibName()] = pModule;
-			status = true;
+			bStatus = true;
 		}
 	}
 
-	return status;
+	return bStatus;
+}
+
+bool GfModule::unregister(GfModule* pModule)
+{
+	bool bStatus = false;
+	
+	if (pModule)
+	{
+		if (_mapModulesByLibName.find(pModule->getSharedLibName()) == _mapModulesByLibName.end())
+		{
+			GfLogError("Can't unregister module in %s (not yet registered)\n", 
+					   pModule->getSharedLibName().c_str());
+		}
+		else
+		{
+			_mapModulesByLibName.erase(pModule->getSharedLibName());
+			bStatus = true;
+		}
+	}
+
+	return bStatus;
 }
 
 const std::string& GfModule::getSharedLibName() const
 {
 	return _strShLibName;
+}
+
+void* GfModule::getSharedLibHandle() const
+{
+	return _hShLibHandle;
 }

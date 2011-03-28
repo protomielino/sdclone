@@ -36,11 +36,17 @@
 
 
 //****************************************
-// New dynamicaly loadable modules system
-// * 1 module per shared library
-// * the shared library exports 2 extern "C" functions :
-//   - bool initializeModule(); // TODO: find a different name (legacy welcome modules)
-//   - bool terminateModule(); // Idem
+// New dynamically loadable modules system
+// - 1 and only 1 module per shared library,
+// - a module is a GfModule-derived class instance (and even a singleton),
+// - the shared library exports 2 extern 'C' functions :
+//   - int openGfModule(const char* pszShLibName, void* hShLibHandle) :
+//     it must instanciate the module class (new), register the module instance (register_),
+//     initialize / allocate any needed internal resource and finally return 0
+//     if everything is OK, non-0 otherwise;
+//   - int closeGfModule() :
+//     it must release any allocated resource, unregister the module instance (unregister),
+//     and finally return 0, non-0 otherwise.
 
 class TGF_API GfModule
 {
@@ -49,8 +55,8 @@ class TGF_API GfModule
 	//! Load a module from the given module library file.
 	static GfModule* load(const std::string& strShLibName);
 
-	//! Unload a module and the associated library (supposed to contain no other module).
-	virtual bool unload();
+	//! Delete a module and unload the associated library (supposed to contain no other module).
+	static bool unload(GfModule*& pModule);
 
 	//! Get the module as a pointer to the given interface (aka "facet").
 	template <class Interface>
@@ -73,6 +79,14 @@ class TGF_API GfModule
 	//! Get the asssociated shared library path-name.
 	const std::string& getSharedLibName() const;
 		
+	//! Get the asssociated shared library handle.
+	void* getSharedLibHandle() const;
+		
+ protected:
+
+	//! Unregister a module instance.
+	static bool unregister(GfModule* pModule);
+	
  protected:
 
 	//! The table of loaded modules and their associated shared library (key = file name).
