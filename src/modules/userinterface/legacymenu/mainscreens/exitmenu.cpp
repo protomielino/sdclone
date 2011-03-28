@@ -19,6 +19,8 @@
 
 #include <tgfclient.h>
 
+#include "legacymenu.h"
+
 #include "exitmenu.h"
 #include "mainmenu.h"
 
@@ -29,10 +31,7 @@ static void *exitMainMenuHandle = NULL;
 static void 
 onAcceptExit(void * /* dummy */)
 {
-    GfProfStopActiveProfiles();
-    GfProfPrintReport();
-    GfScrShutdown();
-    exit(0);
+	LegacyMenu::self().quit();
 }
 
 void* exitMenuInit(void *prevMenu, void *menuHandle)

@@ -1,9 +1,9 @@
 /***************************************************************************
 
     file        : legacymenu.h
-    copyright   : (C) 2010 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
-    version     : $Id$                                  
+    copyright   : (C) 2011 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -17,7 +17,7 @@
  ***************************************************************************/
  
 /** @file    
-    		The race engine implementation of its ILegacymenu interface
+    		The "legacy menu" user interface module
     @version    $Id$
 */
 
@@ -53,10 +53,16 @@ public:
 	// Implementation of IUserInterface.
 	virtual bool activate();
 	
-	virtual void* createExitMenu(void* prevHdle);
+	virtual void quit();
+	
+	virtual void shutdown();
+
+	virtual void update();
 
 	virtual void *createRaceScreen();
+	virtual void captureRaceScreen(const char* pszTargetFilename);
 	virtual void *createRaceEventLoopHook();
+
 	virtual void setRaceMessage(const char *msg);
 	virtual void setRaceBigMessage(const char *msg);
 
@@ -64,16 +70,13 @@ public:
 	virtual void addLoadingMessage(const char *text);
 	virtual void shutdownLoadingScreen();
 
+	virtual void activateGameScreen();
+	
 	virtual int activateRacemanMenu();
 	virtual int activateNextEventMenu();
 
-	virtual void activateStartRaceMenu(struct RmInfo *info, void *startScr, void *abortScr);
-	virtual void *activateStopRaceMenu(const char* title,
-									   const char* label1, const char* tip1, void *screen1,
-									   const char* label2, const char* tip2, void *screen2,
-									   const char* label3 = 0, const char* tip3 = 0, void *screen3 = 0,
-									   const char* label4 = 0, const char* tip4 = 0, void *screen4 = 0,
-									   const char* label5 = 0, const char* tip5 = 0, void *screen5 = 0);
+	virtual void activateStartRaceMenu();
+	virtual void activateStopRaceMenu();
 
 	virtual void activatePitMenu(struct CarElt *car, void (*callback)(void*));
 

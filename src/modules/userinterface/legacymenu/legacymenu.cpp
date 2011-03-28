@@ -18,6 +18,8 @@
  
 #include <iraceengine.h>
 
+#include <tgfclient.h>
+
 #include "client.h"
 #include "exitmenu.h"
 #include "racescreens.h"
@@ -43,11 +45,15 @@ int openGfModule(const char* pszShLibName, void* hShLibHandle)
 
 int closeGfModule()
 {
+	// Unregister it from the GfModule module manager.
+	if (LegacyMenu::_pSelf)
+		GfModule::unregister(LegacyMenu::_pSelf);
+
 	// Delete the (only) module instance.
 	delete LegacyMenu::_pSelf;
 	LegacyMenu::_pSelf = 0;
 
-	// Always successfull.
+	// Report about success or error.
 	return 0;
 }
 
@@ -62,35 +68,67 @@ LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 {
 }
 
-// Implementation of IUserInterface.
+// Implementation of IUserInterface ****************************************
 bool LegacyMenu::activate()
 {
-	return ::MenuEntry();
+	// Initialize the screen.
+	bool bStatus = GfScrInit();
+
+	if (bStatus)
+		
+		// Enter the menu system.
+		bStatus = ::MenuEntry();
+
+	return bStatus;
 }
 
-void* LegacyMenu::createExitMenu(void* prevHdle)
+void LegacyMenu::quit()
 {
-	return ::ExitMenuInit(prevHdle);
+	// Quit the event loop next time.
+    GfelQuit();
+}
+
+void LegacyMenu::shutdown()
+{
+	// Shutdown the screen.
+    GfScrShutdown();
+}
+
+void LegacyMenu::update()
+{
+	// Note: For the moment, the graphics engine related stuff is not there ... WIP.
+	
+	// Update the menu part of the GUI if requested.
+	if (raceEngine().data()->_refreshDisplay)
+		GfuiDisplay();
+
+	// Request that the GUI is redisplayed at the end of next event loop.
+	GfelPostRedisplay();
 }
 
 void *LegacyMenu::createRaceScreen()
 {
-	return ::ReScreenInit();
+	return ::RmScreenInit();
+}
+
+void LegacyMenu::captureRaceScreen(const char* pszTargetFilename)
+{
+    ::RmScreenCapture(pszTargetFilename);
 }
 
 void *LegacyMenu::createRaceEventLoopHook()
 {
-	return ::ReHookInit();
+	return ::RmHookInit();
 }
 
 void LegacyMenu::setRaceMessage(const char *msg)
 {
-	::ReSetRaceMsg(msg);
+	::RmSetRaceMsg(msg);
 }
 
 void LegacyMenu::setRaceBigMessage(const char *msg)
 {
-	::ReSetRaceBigMsg(msg);
+	::RmSetRaceBigMsg(msg);
 }
 
 void LegacyMenu::activateLoadingScreen(const char *title, const char *bgimg)
@@ -106,31 +144,28 @@ void LegacyMenu::shutdownLoadingScreen()
 	::RmLoadingScreenShutdown();
 }
 
+void LegacyMenu::activateGameScreen()
+{
+	::RmGameScreen();
+}
+
 int LegacyMenu::activateRacemanMenu()
 {
-	return ::ReRacemanMenu();
+	return ::RmRacemanMenu();
 }
 int LegacyMenu::activateNextEventMenu()
 {
-	return ::ReNextEventMenu();
+	return ::RmNextEventMenu();
 }
 
-void LegacyMenu::activateStartRaceMenu(tRmInfo *reInfo, void *startScr, void *abortScr)
+void LegacyMenu::activateStartRaceMenu()
 {
-	::RmDisplayStartRace(reInfo, startScr, abortScr);
+	::RmDisplayStartRace();
 }
 
-void *LegacyMenu::activateStopRaceMenu(const char* title,
-									   const char* label1, const char* tip1, void *screen1,
-									   const char* label2, const char* tip2, void *screen2,
-									   const char* label3, const char* tip3, void *screen3,
-									   const char* label4, const char* tip4, void *screen4,
-									   const char* label5, const char* tip5, void *screen5)
+void LegacyMenu::activateStopRaceMenu()
 {
-	return ::RmStopRaceScreen(title,
-					   label1, tip1, screen1, label2, tip2, screen2,
-					   label3, tip3, screen3, label4, tip4, screen4,
-					   label5, tip5, screen5);
+	::RmStopRaceScreen();
 }
 
 void LegacyMenu::activatePitMenu(tCarElt *car, tfuiCallback callback)
@@ -140,7 +175,7 @@ void LegacyMenu::activatePitMenu(tCarElt *car, tfuiCallback callback)
 
 void *LegacyMenu::createResultsMenu()
 {
-	return ::ReResScreenInit();
+	return ::RmResScreenInit();
 }
 void LegacyMenu::activateResultsMenu(void *prevHdle, tRmInfo *reInfo)
 {
@@ -148,35 +183,35 @@ void LegacyMenu::activateResultsMenu(void *prevHdle, tRmInfo *reInfo)
 }
 void LegacyMenu::setResultsMenuTrackName(const char *trackName)
 {
-	::ReResScreenSetTrackName(trackName);
+	::RmResScreenSetTrackName(trackName);
 }
 void LegacyMenu::setResultsMenuTitle(const char *title)
 {
-	::ReResScreenSetTitle(title);
+	::RmResScreenSetTitle(title);
 }
 void LegacyMenu::addResultsMenuLine(const char *text)
 {
-	::ReResScreenAddText(text);
+	::RmResScreenAddText(text);
 }
 void LegacyMenu::setResultsMenuLine(const char *text, int line, int clr)
 {
-	::ReResScreenSetText(text, line, clr);
+	::RmResScreenSetText(text, line, clr);
 }
 void LegacyMenu::removeResultsMenuLine(int line)
 {
-	::ReResScreenRemoveText(line);
+	::RmResScreenRemoveText(line);
 }
 void LegacyMenu::showResultsMenuContinueButton()
 {
-	::ReResShowCont();
+	::RmResShowCont();
 }
 int  LegacyMenu::getResultsMenuLineCount()
 {
-	return ::ReResGetLines();
+	return ::RmResGetLines();
 }
 void LegacyMenu::eraseResultsMenu()
 {
-	::ReResEraseScreen();
+	::RmResEraseScreen();
 }
 
 void LegacyMenu::activateStandingsMenu(void *prevHdle, tRmInfo *reInfo, int start)

@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file        : racegl.cpp
+    file        : racerunningmenus.cpp
     created     : Sat Nov 16 18:22:00 CET 2002
     copyright   : (C) 2002 by Eric Espie
     email       : eric.espie@torcs.org   
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file   
-    		
+    		The menus for when the race is running
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
@@ -35,11 +35,10 @@
 #include "racescreens.h"
 
 
-static void	*reScreenHandle = 0;
-static void	*reHookHandle = 0;
-static int	rePauseId;
-static int	reMsgId;
-static int	reBigMsgId;
+static void	*rmScreenHandle = 0;
+static int	rmPauseId;
+static int	rmMsgId;
+static int	rmBigMsgId;
 
 static float black[4] = {0.0, 0.0, 0.0, 0.0};
 
@@ -47,52 +46,52 @@ static float black[4] = {0.0, 0.0, 0.0, 0.0};
  * Normal race screen (3D animated scene mode = non "blind" mode)
  */
 static void
-reIdle(void)
+rmIdle()
 {
     // Do nothing.
 }
 
 static void
-reDisplay(void)
+rmDisplay()
 {
     LegacyMenu::self().raceEngine().updateState();
 }
 
 static void
-reScreenActivate(void * /* dummy */)
+rmScreenActivate(void * /* dummy */)
 {
     // Set a real idle function (other than 0) doing nothing, 
     // otherwise GfelMainLoop will replace it by 1ms idle wait
-    GfelSetIdleCB(reIdle);
+    GfelSetIdleCB(rmIdle);
 
-    GfelSetDisplayCB(reDisplay);
+    GfelSetDisplayCB(rmDisplay);
 
 	// Resync race engine if it is not paused or stopped
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
     if (!(reInfo->s->_raceState & RM_RACE_PAUSED)) {
-	LegacyMenu::self().raceEngine().start(); 			/* resynchro */
+		LegacyMenu::self().raceEngine().start(); 			/* resynchro */
     }
 
     GfelPostRedisplay();
 }
 
 static void
-ReBoardInfo(void * /* vboard */)
+RmBoardInfo(void * /* vboard */)
 {
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
     if (reInfo->s->_raceState & RM_RACE_PAUSED) {
 	reInfo->s->_raceState &= ~RM_RACE_PAUSED;
 	LegacyMenu::self().raceEngine().start();
-	GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
+	GfuiVisibilitySet(rmScreenHandle, rmPauseId, 0);
     } else {
 	reInfo->s->_raceState |= RM_RACE_PAUSED;
 	LegacyMenu::self().raceEngine().stop();
-	GfuiVisibilitySet(reScreenHandle, rePauseId, 1);
+	GfuiVisibilitySet(rmScreenHandle, rmPauseId, 1);
     }
 }
 
 static void
-reSkipPreStart(void * /* dummy */)
+rmSkipPreStart(void * /* dummy */)
 {
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
     if (reInfo->s->currentTime < -1.0) {
@@ -102,7 +101,7 @@ reSkipPreStart(void * /* dummy */)
 }
 
 static void
-reTimeMod (void *pvCmd)
+rmTimeMod (void *pvCmd)
 {
 	double fMultFactor = 0.0; // The mult. factor for resetting "real time" simulation step.
 	if ((long)pvCmd > 0)
@@ -113,7 +112,7 @@ reTimeMod (void *pvCmd)
 }
 
 static void
-reMovieCapture(void * /* dummy */)
+rmMovieCapture(void * /* dummy */)
 {
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	tRmMovieCapture	*capture = &(reInfo->movieCapture);
@@ -140,50 +139,52 @@ reMovieCapture(void * /* dummy */)
 }
 
 static void
-reHideShowMouseCursor(void * /* dummy */)
+rmHideShowMouseCursor(void * /* dummy */)
 {
     GfuiMouseToggleVisibility();
 }
 
 static void
-reApplyState(void *pvState)
+rmApplyState(void *pvState)
 {
     LegacyMenu::self().raceEngine().applyState((int)(long)pvState);
 }
 
 #ifdef DEBUG
 static void
-reOneStep(void *pvState)
+rmOneStep(void *pvState)
 {
     LegacyMenu::self().raceEngine().step((int)(long)pvState);
 }
 #endif
 
 static void
-reAddKeys(void)
+rmAddKeys()
 {
-    GfuiAddKey(reScreenHandle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(reScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", rmScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reScreenHandle, '-', "Slow down Time",    (void*)-1, reTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '+', "Accelerate Time",   (void*)+1, reTimeMod, NULL);
-    GfuiAddKey(reScreenHandle, '.', "Restore Real Time", (void*)0, reTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '-', "Slow down Time",    (void*)-1, rmTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '+', "Accelerate Time",   (void*)+1, rmTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '.', "Restore Real Time", (void*)0, rmTimeMod, NULL);
 	
-    GfuiAddKey(reScreenHandle, 'p', "Pause Race",        (void*)0, ReBoardInfo, NULL);
-    GfuiAddKey(reScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, reApplyState, NULL);
-    /* GfuiAddKey(reScreenHandle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, reApplyState, NULL); */
-    GfuiAddKey(reScreenHandle, ' ', "Skip Pre-start",    (void*)0, reSkipPreStart, NULL);
+    GfuiAddKey(rmScreenHandle, 'p', "Pause Race",        (void*)0, RmBoardInfo, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+    GfuiAddKey(rmScreenHandle, 'q', "Quit Game, Save Nothing",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
+    GfuiAddKey(rmScreenHandle, ' ', "Skip Pre-start",    (void*)0, rmSkipPreStart, NULL);
+	
 #ifdef DEBUG
-	// WARNING: Certainly won't work with multi-threading On/Auto ...
-    //GfuiAddKey(reScreenHandle, '0', "One step simulation",    (void*)1, reOneStep, NULL);
+	// WARNING: Sure this won't work with multi-threading On/Auto ...
+    //GfuiAddKey(rmScreenHandle, '0', "One step simulation",    (void*)1, rmOneStep, NULL);
 #endif
-    GfuiAddKey(reScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, reMovieCapture, NULL);
-    GfuiAddKey(reScreenHandle, 'o', "Hide / Show mouse cursor",   (void*)0, reHideShowMouseCursor, NULL);
+	
+    GfuiAddKey(rmScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, rmMovieCapture, NULL);
+    GfuiAddKey(rmScreenHandle, 'o', "Hide / Show mouse cursor",   (void*)0, rmHideShowMouseCursor, NULL);
 }
 
 
 void
-ReSetRaceMsg(const char *msg)
+RmSetRaceMsg(const char *msg)
 {
     static char *curMsg = 0;
 
@@ -196,15 +197,15 @@ ReSetRaceMsg(const char *msg)
 		free(curMsg);
     if (msg) {
 		curMsg = strdup(msg);
-		GfuiLabelSetText(reScreenHandle, reMsgId, curMsg);
+		GfuiLabelSetText(rmScreenHandle, rmMsgId, curMsg);
     } else {
 		curMsg = 0;
-		GfuiLabelSetText(reScreenHandle, reMsgId, "");
+		GfuiLabelSetText(rmScreenHandle, rmMsgId, "");
     }
 }
 
 void
-ReSetRaceBigMsg(const char *msg)
+RmSetRaceBigMsg(const char *msg)
 {
     static char *curMsg = 0;
     
@@ -216,79 +217,72 @@ ReSetRaceBigMsg(const char *msg)
 		free(curMsg);
     if (msg) {
 		curMsg = strdup(msg);
-		GfuiLabelSetText(reScreenHandle, reBigMsgId, curMsg);
+		GfuiLabelSetText(rmScreenHandle, rmBigMsgId, curMsg);
     } else {
 		curMsg = 0;
-		GfuiLabelSetText(reScreenHandle, reBigMsgId, "");
+		GfuiLabelSetText(rmScreenHandle, rmBigMsgId, "");
     }
 }
 
 void *
-ReScreenInit(void)
+RmScreenInit()
 {
     // Release screen if was initialized.
-    ReScreenShutdown();
+    RmScreenShutdown();
 
     // Create screen, load menu XML descriptor and create static controls.
-    reScreenHandle = GfuiScreenCreateEx(black, 0, reScreenActivate, 0, 0, 0);
+    rmScreenHandle = GfuiScreenCreateEx(black, 0, rmScreenActivate, 0, 0, 0);
     void *menuXMLDescHdle = LoadMenuXML("raceglscreen.xml");
-    CreateStaticControls(menuXMLDescHdle, reScreenHandle);
+    CreateStaticControls(menuXMLDescHdle, rmScreenHandle);
 
     // Create Message, BigMessage and Pause labels.
-    reMsgId = CreateLabelControl(reScreenHandle, menuXMLDescHdle, "message");
-    rePauseId = CreateLabelControl(reScreenHandle, menuXMLDescHdle, "pause");
-    reBigMsgId = CreateLabelControl(reScreenHandle, menuXMLDescHdle, "bigmessage");
+    rmMsgId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "message");
+    rmPauseId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "pause");
+    rmBigMsgId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "bigmessage");
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Register keyboard shortcuts.
-    reAddKeys();
+    rmAddKeys();
 
     // Hide the Pause label for the moment.
-    GfuiVisibilitySet(reScreenHandle, rePauseId, 0);
+    GfuiVisibilitySet(rmScreenHandle, rmPauseId, 0);
 
-    return reScreenHandle;
+    return rmScreenHandle;
 }
 
+void
+RmScreenCapture(const char* pszTargetFilename)
+{
+    GfScrCaptureAsPNG(pszTargetFilename);
+}
 
 void
-ReScreenShutdown(void)
+RmScreenShutdown()
 {
-    if (reScreenHandle) {
-	GfuiScreenRelease(reScreenHandle);
-	reScreenHandle = 0;
+    if (rmScreenHandle) {
+		GfuiScreenRelease(rmScreenHandle);
+		rmScreenHandle = 0;
     }
 }
 
 
 static void
-reHookActivate(void * /* dummy */)
+rmHookActivate(void * /* dummy */)
 {
     LegacyMenu::self().raceEngine().updateState();
 }
 
 void *
-ReHookInit(void)
+RmHookInit()
 {
-    if (reHookHandle) {
-	return reHookHandle;
-    }
-    
-    reHookHandle = GfuiHookCreate(0, reHookActivate);
+	static void	*rmHookHandle = 0;
+	
+    if (!rmHookHandle)
+		rmHookHandle = GfuiHookCreate(0, rmHookActivate);
 
-    return reHookHandle;
-}
-
-
-// Never called.
-void
-ReHookShutdown(void)
-{
-    if (reHookHandle) {
-	GfuiHookRelease(reHookHandle);
-	reHookHandle = 0;
-    }
+    return rmHookHandle;
 }
 
 /**************************************************************************
@@ -298,46 +292,46 @@ static const int NMaxResultLines = 21;
 
 static float	white[4]   = {1.0, 1.0, 1.0, 1.0};
 static float	red[4]     = {1.0, 0.0, 0.0, 1.0};
-static float	*reColor[] = {white, red};
+static float	*rmColor[] = {white, red};
 
 static const char *aRaceTypeNames[3] = {"Practice", "Qualifications", "Race"};
 
-static void	*reResScreenHdle = 0;
+static void	*rmResScreenHdle = 0;
 
-static int	reResMainTitleId;
-static int	reResTitleId;
-static int	reResMsgId[NMaxResultLines];
+static int	rmResMainTitleId;
+static int	rmResTitleId;
+static int	rmResMsgId[NMaxResultLines];
 
-static int	reResMsgClr[NMaxResultLines];
-static char	*reResMsg[NMaxResultLines];
+static int	rmResMsgClr[NMaxResultLines];
+static char	*rmResMsg[NMaxResultLines];
 
-static int	reCurLine;
+static int	rmCurLine;
 
 static void
-reAddResKeys(void)
+rmAddResKeys()
 {
-    GfuiAddKey(reResScreenHdle, GFUIK_F1,  "Help", reScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(reResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_F1,  "Help", rmScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, reApplyState, NULL);
-    /* GfuiAddKey(reResScreenHdle, 'q', "Exit from Game",     (void*)RE_STATE_EXIT, reApplyState, NULL); */
+    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+    GfuiAddKey(rmResScreenHdle, 'q', "Quit Game, Save Nothing", (void*)RE_STATE_EXIT, rmApplyState, NULL);
 }
 
 static void
-reResScreenActivate(void * /* dummy */)
+rmResScreenActivate(void * /* dummy */)
 {
     // Set a real idle function (other than 0) doing nothing, 
     // otherwise GfelMainLoop will replace it by a 1ms idle wait
-    GfelSetIdleCB(reIdle);
+    GfelSetIdleCB(rmIdle);
 
-    GfelSetDisplayCB(reDisplay);
+    GfelSetDisplayCB(rmDisplay);
     GfuiDisplay();
     GfelPostRedisplay();
 }
 
 
 static void
-reContDisplay(void)
+rmContDisplay()
 {
     GfuiDisplay();
     GfelPostRedisplay();
@@ -345,60 +339,57 @@ reContDisplay(void)
 
 
 static void
-reResCont(void * /* dummy */)
+rmResCont(void * /* dummy */)
 {
     LegacyMenu::self().raceEngine().updateState();
 }
 
 static void
-reResScreenShutdown(void * /* dummy */)
+rmResScreenShutdown(void * /* dummy */)
 {
-    int		i;
-
-    for (i = 1; i < NMaxResultLines; i++) {
-	FREEZ(reResMsg[i]);
-    }
+    for (int i = 1; i < NMaxResultLines; i++)
+		FREEZ(rmResMsg[i]);
 }
 
 void *
-ReResScreenInit(void)
+RmResScreenInit()
 {
     int		i;
     int		y, dy;
     const char	*img;
 
-    if (reResScreenHdle) {
-	GfuiScreenRelease(reResScreenHdle);
+    if (rmResScreenHdle) {
+	GfuiScreenRelease(rmResScreenHdle);
     }
 
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 
     // Create screen, load menu XML descriptor and create static controls.
-    reResScreenHdle = GfuiScreenCreateEx(black, 0, reResScreenActivate, 0, reResScreenShutdown, 0);
+    rmResScreenHdle = GfuiScreenCreateEx(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
     void *menuXMLDescHdle = LoadMenuXML("raceblindscreen.xml");
-    CreateStaticControls(menuXMLDescHdle, reResScreenHdle);
+    CreateStaticControls(menuXMLDescHdle, rmResScreenHdle);
 
     // Create variable main title (race type/stage) label.
-    reResMainTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "title");
-    GfuiLabelSetText(reResScreenHdle, reResMainTitleId, aRaceTypeNames[reInfo->s->_raceType]);
+    rmResMainTitleId = CreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "title");
+    GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, aRaceTypeNames[reInfo->s->_raceType]);
 
     // Create background image if any specified.
     img = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
     if (img) {
-	GfuiScreenAddBgImg(reResScreenHdle, img);
+	GfuiScreenAddBgImg(rmResScreenHdle, img);
     }
     
     // Create variable subtitle (driver and race name, lap number) label.
-    reResTitleId = CreateLabelControl(reResScreenHdle, menuXMLDescHdle, "subtitle");
+    rmResTitleId = CreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "subtitle");
 
     // Create result lines (1 label for each).
     // TODO: Get layout, color, ... info from menuXMLDescHdle when available.
     y = 400;
     dy = 378 / NMaxResultLines;
     for (i = 0; i < NMaxResultLines; i++) {
-	FREEZ(reResMsg[i]);
-	reResMsgClr[i] = 0;
-	reResMsgId[i] = GfuiLabelCreate(reResScreenHdle, "", GFUI_FONT_MEDIUM_C, 20, y, 
+	FREEZ(rmResMsg[i]);
+	rmResMsgClr[i] = 0;
+	rmResMsgId[i] = GfuiLabelCreate(rmResScreenHdle, "", GFUI_FONT_MEDIUM_C, 20, y, 
 									GFUI_ALIGN_HL_VB, 120, white);
 	y -= dy;
     }
@@ -407,110 +398,116 @@ ReResScreenInit(void)
     GfParmReleaseHandle(menuXMLDescHdle);
     
     // Register keyboard shortcuts.
-    reAddResKeys();
+    rmAddResKeys();
 
     // Initialize current result line.
-    reCurLine = 0;
+    rmCurLine = 0;
 
-    return reResScreenHdle;
+    return rmResScreenHdle;
 }
 
 void
-ReResScreenSetTrackName(const char *pszTrackName)
+RmResScreenSetTrackName(const char *pszTrackName)
 {
-    if (reResScreenHdle) {
+    if (rmResScreenHdle) {
 		char pszTitle[128];
 		tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 		snprintf(pszTitle, sizeof(pszTitle), "%s on %s",
 				 aRaceTypeNames[reInfo->s->_raceType], pszTrackName);
-		GfuiLabelSetText(reResScreenHdle, reResMainTitleId, pszTitle);
+		GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, pszTitle);
     }
 }
 
 void
-ReResScreenSetTitle(const char *pszTitle)
+RmResScreenSetTitle(const char *pszTitle)
 {
-    if (reResScreenHdle) {
-		GfuiLabelSetText(reResScreenHdle, reResTitleId, pszTitle);
+    if (rmResScreenHdle) {
+		GfuiLabelSetText(rmResScreenHdle, rmResTitleId, pszTitle);
     }
 }
 
 void
-ReResScreenAddText(const char *text)
+RmResScreenAddText(const char *text)
 {
     int		i;
 
-    if (reCurLine == NMaxResultLines) {
-	free(reResMsg[0]);
+    if (rmCurLine == NMaxResultLines) {
+	free(rmResMsg[0]);
 	for (i = 1; i < NMaxResultLines; i++) {
-	    reResMsg[i - 1] = reResMsg[i];
-	    GfuiLabelSetText(reResScreenHdle, reResMsgId[i - 1], reResMsg[i]);
+	    rmResMsg[i - 1] = rmResMsg[i];
+	    GfuiLabelSetText(rmResScreenHdle, rmResMsgId[i - 1], rmResMsg[i]);
 	}
-	reCurLine--;
+	rmCurLine--;
     }
-    reResMsg[reCurLine] = strdup(text);
-    GfuiLabelSetText(reResScreenHdle, reResMsgId[reCurLine], reResMsg[reCurLine]);
-    reCurLine++;
+    rmResMsg[rmCurLine] = strdup(text);
+    GfuiLabelSetText(rmResScreenHdle, rmResMsgId[rmCurLine], rmResMsg[rmCurLine]);
+    rmCurLine++;
 }
 
 void
-ReResScreenSetText(const char *text, int line, int clr)
+RmResScreenSetText(const char *text, int line, int clr)
 {
     if (line < NMaxResultLines) {
-	FREEZ(reResMsg[line]);
-	reResMsg[line] = strdup(text);
+	FREEZ(rmResMsg[line]);
+	rmResMsg[line] = strdup(text);
 	if ((clr >= 0) && (clr < 2)) {
-	    reResMsgClr[line] = clr;
+	    rmResMsgClr[line] = clr;
 	} else {
-	    reResMsgClr[line] = 0;
+	    rmResMsgClr[line] = 0;
 	}
-	GfuiLabelSetText(reResScreenHdle, reResMsgId[line], reResMsg[line]);
-	GfuiLabelSetColor(reResScreenHdle, reResMsgId[line], reColor[reResMsgClr[line]]);
+	GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], rmResMsg[line]);
+	GfuiLabelSetColor(rmResScreenHdle, rmResMsgId[line], rmColor[rmResMsgClr[line]]);
     }
 }
 
 int
-ReResGetLines(void)
+RmResGetLines()
 {
     return NMaxResultLines;
 }
 
 void
-ReResEraseScreen(void)
+RmResEraseScreen()
 {
     int i;
 
     for (i = 0; i < NMaxResultLines; i++) {
-	ReResScreenSetText("", i, 0);
+	RmResScreenSetText("", i, 0);
     }
 }
 
 
 void
-ReResScreenRemoveText(int line)
+RmResScreenRemoveText(int line)
 {
     if (line < NMaxResultLines) {
-	FREEZ(reResMsg[line]);
-	GfuiLabelSetText(reResScreenHdle, reResMsgId[line], "");
+	FREEZ(rmResMsg[line]);
+	GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], "");
     }
 }
 
 void
-ReResShowCont(void)
+RmResShowCont()
 {
 
-    GfuiButtonCreate(reResScreenHdle,
+    GfuiButtonCreate(rmResScreenHdle,
 		     "Continue",
 		     GFUI_FONT_LARGE_C,
 		     320, 15, GFUI_BTNSZ,
 		     GFUI_ALIGN_HC_VB,
-		     0, 0, reResCont,
+		     0, 0, rmResCont,
 		     NULL, (tfuiCallback)NULL,
 		     (tfuiCallback)NULL);
-    GfuiAddKey(reResScreenHdle, GFUIK_RETURN,  "Continue", 0, reResCont, NULL);
-    GfuiAddKey(reResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, reResCont, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_RETURN,  "Continue", 0, rmResCont, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, rmResCont, NULL);
 
-    GfelSetDisplayCB(reContDisplay);
+    GfelSetDisplayCB(rmContDisplay);
     GfelPostRedisplay();
 }
 
+//************************************************************
+void
+RmGameScreen()
+{
+	GfuiScreenActivate(LegacyMenu::self().raceEngine().data()->_reGameScreen);
+}

@@ -44,6 +44,7 @@
 
 #include "racesituation.h"
 #include "racemain.h"
+#include "raceupdate.h"
 #include "racestate.h"
 #include "raceresults.h"
 #include "racecareer.h"
@@ -134,6 +135,20 @@ ReInit(void)
 
 
 /* Race Engine Exit */
+int
+ReExit(void)
+{
+	// Stop and shutdown the race engine.
+	ReStop();
+	ReShutdown();
+	
+	// Notify the user interface.
+	RaceEngine::self().userInterface().quit();
+
+	return RM_QUIT;
+}
+
+/* Race Engine clean shutdown */
 void ReShutdown(void)
 {
 	if (!ReInfo)

@@ -36,16 +36,16 @@
 
 
 // New track menu.
-static void	*ScrHandle = NULL;
+static void	*rmScrHandle = NULL;
 
 static void
-reStateManage(void * /* dummy */)
+rmStateManage(void * /* dummy */)
 {
 	LegacyMenu::self().raceEngine().updateState();
 }
 
 int
-ReNextEventMenu(void)
+RmNextEventMenu(void)
 {
 	char buf[128];
 
@@ -55,27 +55,27 @@ ReNextEventMenu(void)
 	int		raceNumber;
 	int		 xx;
 
-	if (ScrHandle) {
-		GfuiScreenRelease(ScrHandle);
+	if (rmScrHandle) {
+		GfuiScreenRelease(rmScrHandle);
 	}
 
 	// Create screen, load menu XML descriptor and create static controls.
-	ScrHandle = GfuiScreenCreateEx(NULL, 
+	rmScrHandle = GfuiScreenCreateEx(NULL, 
 								  NULL, (tfuiCallback)NULL, 
 								  NULL, (tfuiCallback)NULL, 
 								  1);
 	void *menuXMLDescHdle = LoadMenuXML("racenexteventmenu.xml");
-	CreateStaticControls(menuXMLDescHdle, ScrHandle);
+	CreateStaticControls(menuXMLDescHdle, rmScrHandle);
 
 	// Create background image from race params.
 	const char* pszBGImg = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
 	if (pszBGImg) {
-		GfuiScreenAddBgImg(ScrHandle, pszBGImg);
+		GfuiScreenAddBgImg(rmScrHandle, pszBGImg);
 	}
 
 	// Create variable title label from race params.
-	int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");
-	GfuiLabelSetText(ScrHandle, titleId, reInfo->_reName);
+	int titleId = CreateLabelControl(rmScrHandle, menuXMLDescHdle, "titlelabel");
+	GfuiLabelSetText(rmScrHandle, titleId, reInfo->_reName);
 
 	// Calculate which race of the series this is
 	raceNumber = 1;
@@ -93,23 +93,23 @@ ReNextEventMenu(void)
 			 (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) :
 			 GfParmGetEltNb(params, RM_SECT_TRACKS), 
 			 reInfo->track->name);
-	int subTitleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "subtitlelabel");
-	GfuiLabelSetText(ScrHandle, subTitleId, buf);
+	int subTitleId = CreateLabelControl(rmScrHandle, menuXMLDescHdle, "subtitlelabel");
+	GfuiLabelSetText(rmScrHandle, subTitleId, buf);
 
 	// Create Start and Abandon buttons.
-	CreateButtonControl(ScrHandle, menuXMLDescHdle, "startbutton", NULL, reStateManage);
-	CreateButtonControl(ScrHandle, menuXMLDescHdle, "abandonbutton", reInfo->_reMenuScreen, GfuiScreenActivate);
+	CreateButtonControl(rmScrHandle, menuXMLDescHdle, "startbutton", NULL, rmStateManage);
+	CreateButtonControl(rmScrHandle, menuXMLDescHdle, "abandonbutton", reInfo->_reMenuScreen, GfuiScreenActivate);
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
 	
 	// Register keyboard shortcuts.
-	GfuiMenuDefaultKeysAdd(ScrHandle);
-	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Start Event", NULL, reStateManage, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Abandon", reInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+	GfuiMenuDefaultKeysAdd(rmScrHandle);
+	GfuiAddKey(rmScrHandle, GFUIK_RETURN, "Start Event", NULL, rmStateManage, NULL);
+	GfuiAddKey(rmScrHandle, GFUIK_ESCAPE, "Abandon", reInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 
 	// Activate screen.
-	GfuiScreenActivate(ScrHandle);
+	GfuiScreenActivate(rmScrHandle);
 
 	return RM_ASYNC | RM_NEXT_STEP;
 }

@@ -31,7 +31,7 @@
 
 
 static void
-init_args(int argc, char **argv)
+parseOptions(int argc, char **argv)
 {
 	// Determine and store run-time install root dir.
 	GfInitInstallDir(argv[0]);
@@ -138,13 +138,18 @@ init_args(int argc, char **argv)
 int
 main(int argc, char *argv[])
 {
+	// Initialize the gaming framework.
     GfInit();
+	
+    // Initialize the event loop management layer.
+	// TODO: Move this into GfInit when guieventloop moved to tgf (WIP).
+    GfelInitialize();
 
-    init_args(argc, argv);
+	// Parse command line options.
+    parseOptions(argc, argv);
 
-    GfFileSetup(); // Update user settings files from installed ones
-
-    GfScrInit(argc, argv); // Initialize the screen
+	// Update user settings files from installed ones.
+    GfFileSetup();
 
 	// Load the user interface module.
 	std::ostringstream ossModLibName;
@@ -165,17 +170,27 @@ main(int argc, char *argv[])
 		piUserItf->setRaceEngine(RaceEngine::self());
 	}
 	
-	// Enter the user interface.
-	if (piUserItf && piUserItf->activate())
+	if (piUserItf)
 	{
-		// Main event loop
-		GfelMainLoop();
-
+		// Enter the user interface.
+		if (piUserItf->activate())
+		{
+			// Main event loop.
+			GfelMainLoop();
+		}
+		
+		// Shutdown the user interface.
+		piUserItf->shutdown();
+		piUserItf = 0;
+		
 		// Unload the user interface module.
-		pmodUserItf->unload();
+		GfModule::unload(pmodUserItf);
+		
+		// Shutdown the gaming framework.
+		GfLogInfo("Exiting normaly from Speed Dreams.\n");
+		GfShutdown();
 		
 		// The end.
-		GfLogInfo("Exiting normaly from Speed Dreams.\n");
 		exit(0);
 	}
 	

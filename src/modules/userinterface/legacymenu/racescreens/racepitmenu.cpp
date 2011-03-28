@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : pitmenu.cpp
+    file                 : racepitmenu.cpp
     created              : Mon Apr 24 18:16:37 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file   
-    		Pit menu command
+    		Pit menu for human drivers
     @ingroup	racemantools
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$

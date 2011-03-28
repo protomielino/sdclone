@@ -21,6 +21,7 @@
 
 #include <SDL/SDL.h>
 
+#include "tgf.h"
 #include "tgfclient.h"
 
 
@@ -72,6 +73,9 @@ class EventLoop
 	//! Force a call to the "redisplay/refresh" callback function. 
 	void forceReDisplay();
 
+	//! Request the event loop to terminate on next loop. 
+	void quit();
+
   private: // Member functions.
 
 	//! Translation function from SDL key to unicode if possible (or SDL key sym otherwise)
@@ -101,6 +105,7 @@ class EventLoop
 	void (*_reshapeCB)(int width, int height);
 
 	// Variables
+	bool _bQuit; // Flag to go to the end of event loop.
 	bool _bReDisplay; // Flag to say if a redisplay is necessary.
 	std::map<Uint32, Uint16> _mapUnicodes; // Unicode for each typed SDL key sym + modifier
 };
@@ -111,7 +116,7 @@ class EventLoop
 	before being first used.
 
 	Example of classic implementation that doesn't work with some compilers
-	like ... kakuri ? (but known to work with Linux GCC 4.4, MSVC 2005, MSVC 2008):
+	like for ... kakuri ? (but known to work with Linux GCC 4.4, MSVC 2005, MSVC 2008):
 	
 	static std::map<Uint32, Uint16> g_mapUnicodes;
 	int getKeyUnicode(const SDL_keysym& sdlKeySym)
@@ -147,6 +152,8 @@ EventLoop::EventLoop()
 	_timerCB = 0;
 	_keyboardUpCB = 0;
 
+	_bQuit = false;
+	
 	_bReDisplay = false;
 	
 	SDL_EnableUNICODE(/*enable=*/1); // For keyboard "key press" event key code translation
@@ -223,6 +230,11 @@ void EventLoop::forceReDisplay()
 		_displayCB();
 }
 
+void EventLoop::quit()
+{
+	_bQuit = true;
+}
+
 // Translation function from SDL key to unicode if possible (or SDL key sym otherwise)
 // As the unicode is not available on KEYUP events, we store it on KEYDOWN event,
 // (and then, we can get it on KEYUP event, that ALWAYS come after a KEYDOWN event).
@@ -258,10 +270,10 @@ void EventLoop::operator()(void)
 	SDL_Event event; // Event structure
 	
 	// Check for events
-	while(true)
+	while (!_bQuit)
 	{  	
 		// Loop until there are no events left on the queue
-		while (SDL_PollEvent(&event))
+		while (!_bQuit && SDL_PollEvent(&event))
 		{
 		    // Process the appropiate event type
 			switch(event.type)
@@ -332,8 +344,8 @@ void EventLoop::operator()(void)
 					break;
 
 				case SDL_QUIT:
-					
-					exit(0);
+
+					_bQuit = true;
 					break;
 				
 				case SDL_VIDEOEXPOSE:
@@ -344,24 +356,27 @@ void EventLoop::operator()(void)
 			}
 		}
 
-		// Refresh display if needed
-		if (_bReDisplay)
+		if (!_bQuit)
 		{
-			_bReDisplay = false;
-			if (_displayCB)
-				_displayCB();
+			// Refresh display if needed
+			if (_bReDisplay)
+			{
+				_bReDisplay = false;
+				if (_displayCB)
+					_displayCB();
+			}
+			
+			// Call Idle callback if any
+			if (_idleCB)
+				_idleCB();
+			
+			// ... otherwise let CPU take breath (and fans stay at low and quiet speed)
+			else
+				SDL_Delay(1); // ms.
 		}
-
-		// Call Idle callback if any
-		if (_idleCB)
-			_idleCB();
-
-		// ... otherwise let CPU take breath (and fans stay at low and quiet speed)
-		else
-			SDL_Delay(1); // ms.
 	}
 
-
+	GfLogTrace("Quitting event loop.\n");
 }
 
 /** Initialize the event loop management layer
@@ -507,4 +522,16 @@ GfelMainLoop(void)
 {
 	gfelEventLoop()();
 }
+
+/** Request the event loop to terminate on next loop
+    
+     @ingroup	gui
+*/
+
+void 
+GfelQuit()
+{
+	gfelEventLoop().quit();
+}
+
 

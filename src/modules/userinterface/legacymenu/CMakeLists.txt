@@ -26,14 +26,14 @@ SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
                         ${CS}/carsettingsmenu.h ${CS}/hostsettingsmenu.h)
 
 SET(RS racescreens)
-SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp 
+SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
-                        ${RS}/raceconfigstate.cpp 
-                        ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/carselect.cpp 
-                        ${RS}/raceparamsmenu.cpp 
-                        ${RS}/loadingscreen.cpp ${RS}/racegl.cpp 
-                        ${RS}/pitmenu.cpp ${RS}/miscscreens.cpp 
-                        ${RS}/results.cpp ${RS}/racenexteventmenu.cpp
+                        ${RS}/raceconfigstate.cpp
+                        ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/carselect.cpp
+                        ${RS}/raceparamsmenu.cpp
+			${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
+                        ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
+                        ${RS}/raceresultsmenus.cpp ${RS}/racenexteventmenu.cpp
                         ${RS}/racescreens.h ${RS}/carselect.h)
 
 SET(LEGACYMENU_SOURCES ${MAINSCREENS_SOURCES} 

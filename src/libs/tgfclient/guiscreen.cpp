@@ -325,7 +325,7 @@ static void gfScrReshapeViewport(int width, int height)
     GfScrCenY = height / 2;
 }
 
-void GfScrInit(int argc, char *argv[])
+bool GfScrInit(void)
 {
 	char 	buf[512];
     int		xw, yw;
@@ -340,7 +340,10 @@ void GfScrInit(int argc, char *argv[])
 
 	// Initialize SDL video subsystem (and exit if not supported).
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
-		GfLogFatal("Couldn't initialize SDL video sub-system (%s)\n", SDL_GetError());
+	{
+		GfLogError("Couldn't initialize SDL video sub-system (%s)\n", SDL_GetError());
+		return false;
+	}
 
 	// Query system video capabilities.
 	// Note: Does not work very well as long as you don't force SDL to use
@@ -362,8 +365,8 @@ void GfScrInit(int argc, char *argv[])
 	
 	if (!sdlVideoInfo)
 	{
-		GfLogWarning("Could not SDL_GetVideoInfo (%s)\n", SDL_GetError());
-		return;
+		GfLogError("Could not SDL_GetVideoInfo (%s)\n", SDL_GetError());
+		return false;
 	}
 	
 	char pszDriverName[32];
@@ -385,10 +388,6 @@ void GfScrInit(int argc, char *argv[])
     fscr = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
 
     vinit = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
-
-    // Initialize game interface to SDL.
-    GfelInitialize();
-    atexit(SDL_Quit);
 
 	// Set window/icon captions
 	sprintf(buf, "Speed Dreams %s", VERSION_LONG);
@@ -524,9 +523,9 @@ void GfScrInit(int argc, char *argv[])
 	// Failed : No way ... no more ideas !
 	if (!ScreenSurface)
 	{
-		GfLogFatal("Unable to get any compatible video mode"
+		GfLogError("Unable to get any compatible video mode"
 				   " (fallback resolution not supported) : giving up !\n\n");
-		exit(1);
+		return false;
 	}
 
 	GfParmReleaseHandle(handle);
@@ -585,6 +584,8 @@ void GfScrInit(int argc, char *argv[])
 
 	// Initialize Open GL feature management layer
 	//TODO:gfglCheckGLFeatures();
+
+	return true;
 }
 
 /** Shutdown the screen

@@ -22,11 +22,6 @@
     @version	$Id$
 */
 
-#include <cstdlib>
-#include <cstdio>
-
-#include <tgfclient.h>
-
 #include <raceman.h>
 
 #include "raceengine.h"
@@ -41,16 +36,10 @@
 #include "racestate.h"
 
 
-// Never used ?
-//static void *reMainMenu;
-
-
 /* State Automaton Init */
 void
 ReStateInit(void *prevMenu)
 {
-// Never used ?
-//	reMainMenu = prevMenu;
 }
 
 
@@ -161,43 +150,44 @@ ReStateManage(void)
 				break;
 
 			case RE_STATE_SHUTDOWN:
-			case RE_STATE_ERROR:
 				GfLogInfo("%s now in SHUTDOWN state\n", ReInfo->_reName);
-				/* Back to race menu */
+				/* Back to the race manager menu */
+				ReInfo->_reState = RE_STATE_CONFIG;
+				mode = RM_SYNC;
+				break;
+
+			case RE_STATE_ERROR:
+				// If this state is set, there was a serious error:
+				// I.e. no driver in the race (no one selected OR parameters out of range!
+				// Instead of exit(0) go back to the config mode to allow to read the 
+				// error messages in the console window!
+				// TODO: Define another screen showing the error messages instead of
+				// only having it in the console window!
+				GfLogInfo("%s now in ERROR state\n", ReInfo->_reName);
+				/* Back to race manager menu */
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;
 				break;
 
 			case RE_STATE_EXIT:
-				GfScrShutdown();
-				exit (0);		/* brutal isn't it ? */
+				// Exit the race engine.
+				mode = ReExit();
 				break;
 		}
 
-		// If this mode is set, there was a serious error:
-		// I.e. no driver in the race (no one selected OR parameters out of range!
-		// Instead of exit(0) go back to the config mode to allow to read the 
-		// error messages in the console window!
-		// TODO: Define another screen showing the error messages instead of
-		// only having it in the console window!
-		if (mode & RM_QUIT) {
-			GfScrShutdown();
-			ReInfo->_reState = RE_STATE_CONFIG;
+		if (mode & RM_ERROR) {
+			GfLogError("Race engine error (see above messages)\n");
+			ReInfo->_reState = RE_STATE_ERROR;
 			mode = RM_SYNC;
 		}
 	} while ((mode & RM_SYNC) == RM_SYNC);
-
-	if (mode & RM_ACTIVGAMESCR) {
-		GfuiScreenActivate(ReInfo->_reGameScreen);
-	}
 }
 
 /* Change and Execute a New State  */
 void
-ReStateApply(void *vstate)
+ReStateApply(void *pvState)
 {
-	long state = (long)vstate;
+	ReInfo->_reState = (int)(long)pvState;
 
-	ReInfo->_reState = (int)state;
 	ReStateManage();
 }

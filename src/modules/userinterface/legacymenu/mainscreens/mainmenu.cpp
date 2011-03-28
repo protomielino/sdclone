@@ -46,7 +46,7 @@ onPlayerConfigMenuActivate(void * /* dummy */)
 static void
 onRaceSelectMenuActivate(void * /* dummy */)
 {
-    GfuiScreenActivate(ReRaceSelectInit(MenuHandle));
+    GfuiScreenActivate(RmRaceSelectInit(MenuHandle));
 }
 
 static void

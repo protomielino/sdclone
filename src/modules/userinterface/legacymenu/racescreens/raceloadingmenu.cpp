@@ -1,7 +1,7 @@
 /***************************************************************************
 
-    file                 : loadingscreen.cpp
-    created              : Sun Feb 25 00:34:46 /etc/localtime 2001
+    file                 : raceloadingmenu.cpp
+    created              : Sun Feb 25 00:34:46 2001
     copyright            : (C) 2000 by Eric Espie
     email                : eric.espie@torcs.org
     version              : $Id$
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file
-    		This is a Loading... screen management.
+    		The menu for when the race is running
     @ingroup	racemantools		
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$

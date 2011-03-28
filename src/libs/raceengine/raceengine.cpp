@@ -93,6 +93,7 @@ void RaceEngine::configureRace(bool bInteractive)
 	::ReRaceConfigure(bInteractive);
 }
 
+//************************************************************
 void RaceEngine::startNewRace()
 {
 	::ReStartNewRace();
@@ -103,6 +104,38 @@ void RaceEngine::resumeRace()
 	::ReResumeRace();
 }
 
+//************************************************************
+void RaceEngine::startRace()
+{
+	::ReRaceRealStart();
+}
+
+void RaceEngine::abandonRace()
+{
+	::ReRaceAbandon();
+}
+
+void RaceEngine::abortRace()
+{
+	::ReRaceAbort();
+}
+
+void RaceEngine::skipRaceSession()
+{
+	::ReRaceSkipSession();
+}
+
+void RaceEngine::continueRace()
+{
+	::ReRaceContinue();
+}
+
+void RaceEngine::restartRace()
+{
+	::ReRaceRestart();
+}
+
+//************************************************************
 void RaceEngine::accelerateTime(double fMultFactor)
 {
 	::ReAccelerateTime(fMultFactor);
@@ -125,6 +158,7 @@ void RaceEngine::step(double dt)
 }
 #endif
 
+//************************************************************
 GfRace* RaceEngine::race()
 {
 	return ::ReGetRace();

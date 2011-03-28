@@ -41,7 +41,6 @@ extern void gfDirInit(void);
 extern void gfModInit(void);
 extern void gfOsInit(void);
 extern void gfParamInit(void);
-extern void gfRlstInit(void);
 
 
 /*
@@ -445,11 +444,25 @@ void GfInit(void)
 	// Initialize random generator.
 	srand((unsigned)time(NULL));
 	
-	// Initialize SDL subsystems usefull for TGF.
+	// Initialize SDL useful subsystems (some others may be initialized in tgfclient).
 	if (SDL_Init(SDL_INIT_TIMER) < 0)
 		GfLogFatal("Couldn't initialize SDL(timer) (%s)\n", SDL_GetError());
 }
 
+
+/** Shutdown the gaming framework.
+    @ingroup	tgf
+    @return	None
+ */
+void GfShutdown(void)
+{
+	// Shudown SDL.
+	SDL_Quit();
+
+	// Shutdown the active profilers and dump the report if any.
+	GfProfStopActiveProfiles();
+    GfProfPrintReport();
+}
 
 /** Restart the gaming framework (restart the current process).
     @ingroup	tgf

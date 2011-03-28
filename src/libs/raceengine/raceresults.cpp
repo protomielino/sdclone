@@ -29,8 +29,6 @@
 #include <string>
 
 #include <portability.h>
-#include <tgfclient.h>
-
 #include <robot.h>
 
 #include "raceengine.h"

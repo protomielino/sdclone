@@ -23,10 +23,11 @@
 */
 
 #include <portability.h>
-#include <tgfclient.h>
 
 #include <robot.h>
 #include <network.h>
+
+#include <tgfclient.h> // TODO: Remove when GfScrGetSize no more needed.
 
 #include "raceengine.h"
 
@@ -66,41 +67,18 @@ ReHumanInGroup()
 
 
 /***************************************************************/
-/* ABANDON RACE HOOK */
 
-static void *AbandonRaceHookHandle = 0;
-
-static void
-AbandonRaceHookActivate(void * /* vforce */)
+void ReRaceAbandon()
 {
 	// Shutdown current event.
 	ReEventShutdown();
 
 	// Return to race menu
 	ReInfo->_reState = RE_STATE_CONFIG;
-
-	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
 
-static void *
-AbandonRaceHookInit(void)
+void ReRaceAbort()
 {
-	if (AbandonRaceHookHandle) {
-		return AbandonRaceHookHandle;
-	}
-
-	AbandonRaceHookHandle = GfuiHookCreate(0, AbandonRaceHookActivate);
-
-	return AbandonRaceHookHandle;
-}
-
-static void *AbortRaceHookHandle = 0;
-
-static void
-AbortRaceHookActivate(void * /* dummy */)
-{
-	GfuiScreenActivate(ReInfo->_reGameScreen);
-
 	ReShutdownUpdaters();
 
 	ReInfo->_reSimItf.shutdown();
@@ -129,36 +107,9 @@ AbortRaceHookActivate(void * /* dummy */)
 	ReInfo->_reState = RE_STATE_CONFIG;
 }
 
-static void *
-AbortRaceHookInit(void)
+void ReRaceSkipSession()
 {
-	if (AbortRaceHookHandle) {
-		return AbortRaceHookHandle;
-	}
-
-	AbortRaceHookHandle = GfuiHookCreate(0, AbortRaceHookActivate);
-
-	return AbortRaceHookHandle;
-}
-static void	*SkipSessionHookHandle = 0;
-
-static void
-SkipSessionHookActivate(void * /* dummy */)
-{
-	GfuiScreenActivate(ReInfo->_reGameScreen);
 	ReInfo->_reState = RE_STATE_RACE_END;
-}
-
-static void *
-SkipSessionHookInit(void)
-{
-	if (SkipSessionHookHandle) {
-		return SkipSessionHookHandle;
-	}
-
-	SkipSessionHookHandle = GfuiHookCreate(0, SkipSessionHookActivate);
-
-	return SkipSessionHookHandle;
 }
 
 int
@@ -209,6 +160,7 @@ ReRaceEventInit(void)
 		RaceEngine::self().userInterface().activateNextEventMenu();
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
+	
 	return RM_SYNC | RM_NEXT_STEP;
 }
 
@@ -231,7 +183,7 @@ RePreRace(void)
 	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
 	GfParmSetVariable (ReInfo->params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
 	if (!raceName) {
-		return RM_QUIT;
+		return RM_ERROR;
 	}
 
 	if (strcmp(GfParmGetStr(params, raceName, RM_ATTR_ENABLED, RM_VAL_YES), RM_VAL_NO) == 0) {
@@ -299,8 +251,8 @@ RePreRace(void)
 }
 
 /* return state mode */
-static int
-reRaceRealStart(void)
+int
+ReRaceRealStart(void)
 {
 	int i, j;
 	int sw, sh, vw, vh;
@@ -322,7 +274,7 @@ reRaceRealStart(void)
 	RaceEngine::self().userInterface().addLoadingMessage(buf);
 	snprintf(path, sizeof(path), "%smodules/simu/%s.%s", GfLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, path, &ReRaceModList)) 
-		return RM_QUIT;
+		return RM_ERROR;
 	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);
 
 	//Check if there is a human on the driver list
@@ -336,7 +288,7 @@ reRaceRealStart(void)
 
 	//Initialize & place cars
 	if (ReInitCars()) {
-		return RM_QUIT;
+		return RM_ERROR;
 	}
 
 	/* Blind mode or not */
@@ -434,7 +386,7 @@ reRaceRealStart(void)
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
 	ReInfo->s->_raceState = RM_RACE_STARTING;
 
-	GfScrGetSize(&sw, &sh, &vw, &vh);
+	GfScrGetSize(&sw, &sh, &vw, &vh); // Last tgfclient dependency.
 	if (ReInfo->_reGraphicItf.initview)
 		ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
 
@@ -461,34 +413,10 @@ reRaceRealStart(void)
 
 	RaceEngine::self().userInterface().addLoadingMessage("Ready.");
 
-	GfuiScreenActivate(ReInfo->_reGameScreen);
+	RaceEngine::self().userInterface().activateGameScreen();
 
 	return RM_SYNC | RM_NEXT_STEP;
-}//reRaceRealStart
-
-
-/***************************************************************/
-/* START RACE HOOK */
-
-static void	*StartRaceHookHandle = 0;
-
-static void
-StartRaceHookActivate(void * /* dummy */)
-{
-	reRaceRealStart();
-}
-
-static void *
-StartRaceHookInit(void)
-{
-	if (StartRaceHookHandle) {
-		return StartRaceHookHandle;
-	}
-
-	StartRaceHookHandle = GfuiHookCreate(0, StartRaceHookActivate);
-
-	return StartRaceHookHandle;
-}
+}//ReRaceRealStart
 
 /* return state mode */
 int
@@ -560,7 +488,7 @@ ReRaceStart(void)
 			
 			prevRaceName = ReGetPrevRaceName();
 			if (!prevRaceName) {
-				return RM_QUIT;
+				return RM_ERROR;
 			}
 
 			for (i = 1; i < nCars + 1; i++) {
@@ -588,7 +516,7 @@ ReRaceStart(void)
 
 			prevRaceName = ReGetPrevRaceName();
 			if (!prevRaceName) {
-				return RM_QUIT;
+				return RM_ERROR;
 			}
 
 			for (i = 1; i < nCars + 1; i++) {
@@ -636,144 +564,33 @@ ReRaceStart(void)
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {
 		RaceEngine::self().userInterface().shutdownLoadingScreen();
-		RaceEngine::self().userInterface().activateStartRaceMenu(ReInfo, StartRaceHookInit(), AbandonRaceHookInit());
+		RaceEngine::self().userInterface().activateStartRaceMenu();
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
 
-	return reRaceRealStart();
+	return ReRaceRealStart();
 }
 
-/***************************************************************/
-/* BACK TO RACE HOOK */
-
-static void	*BackToRaceHookHandle = 0;
-
-static void
-BackToRaceHookActivate(void * /* dummy */)
+void ReRaceContinue()
 {
 	ReInfo->_reState = RE_STATE_RACE;
-
-	GfuiScreenActivate(ReInfo->_reGameScreen);
 }
 
-static void *
-BackToRaceHookInit(void)
-{
-	if (BackToRaceHookHandle) {
-		return BackToRaceHookHandle;
-	}
-
-	BackToRaceHookHandle = GfuiHookCreate(0, BackToRaceHookActivate);
-
-	return BackToRaceHookHandle;
-}
-
-/***************************************************************/
-/* RESTART RACE HOOK */
-
-static void	*RestartRaceHookHandle = 0;
-
-static void
-RestartRaceHookActivate(void * /* dummy */)
+void ReRaceRestart()
 {
 	ReShutdownUpdaters();
 
 	ReRaceCleanup();
 	
 	ReInfo->_reState = RE_STATE_PRE_RACE;
-
-	GfuiScreenActivate(ReInfo->_reGameScreen);
-}
-
-static void *
-RestartRaceHookInit(void)
-{
-	if (RestartRaceHookHandle) {
-		return RestartRaceHookHandle;
-	}
-
-	RestartRaceHookHandle = GfuiHookCreate(0, RestartRaceHookActivate);
-
-	return RestartRaceHookHandle;
-}
-
-/***************************************************************/
-/* QUIT HOOK */
-
-static void	*QuitHookHandle = 0;
-static void	*StopScrHandle = 0;
-
-static void
-QuitHookActivate(void * /* dummy */)
-{
-	if (StopScrHandle) 
-	{
-		GfuiScreenActivate(RaceEngine::self().userInterface().createExitMenu(StopScrHandle));
-	}
-}
-
-static void *
-QuitHookInit(void)
-{
-	if (QuitHookHandle) 
-	{
-		return QuitHookHandle;
-	}
-
-	QuitHookHandle = GfuiHookCreate(0, QuitHookActivate);
-
-	return QuitHookHandle;
 }
 
 int
 ReRaceStop(void)
 {
-	void	*params = ReInfo->params;
-
 	ReStop();
 
-	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
-	{
-		if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
-		{
-			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
-				("Race Stopped",
-				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
-				 "Resume Race", "Return to Race", BackToRaceHookInit(),
-				 "Skip Session", "Skip Session", SkipSessionHookInit(),
-				 "Quit Game", "Quit the game", QuitHookInit());
-		}
-		else 
-		{
-			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
-				("Race Stopped",
-				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
-				 "Resume Race", "Return to Race", BackToRaceHookInit(),
-				 "Quit Game", "Quit the game", QuitHookInit());
-		}
-	}
-	else 
-	{
-		if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
-		{
-			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
-				("Race Stopped",
-				 "Restart Race", "Restart the current race", RestartRaceHookInit(),
-				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
-				 "Resume Race", "Return to Race", BackToRaceHookInit(),
-				 "Skip Session", "Skip Session", SkipSessionHookInit(),
-				 "Quit Game", "Quit the game", QuitHookInit());
-		}
-		else 
-		{
-			StopScrHandle = RaceEngine::self().userInterface().activateStopRaceMenu
-				("Race Stopped",
-				 "Restart Race", "Restart the current race", RestartRaceHookInit(),
-				 "Abandon Race", "Abort current race", AbortRaceHookInit(),
-				 "Resume Race", "Return to Race", BackToRaceHookInit(),
-				 "Quit Game", "Quit the game", QuitHookInit());
-		}
-	}
+	RaceEngine::self().userInterface().activateStopRaceMenu();
 	
 	return RM_ASYNC | RM_NEXT_STEP;
 }
@@ -916,11 +733,7 @@ ReEventShutdown(void)
 		}
 	} while( true );
 	
-	if (curTrkIdx != 1 || careerMode) {
-		ret =  RM_NEXT_RACE;
-	} else {
-		ret =  RM_NEXT_STEP;
-	}
+	ret = (curTrkIdx != 1 || careerMode) ? RM_NEXT_RACE : RM_NEXT_STEP;
 
 	if (nbTrk != 1) {
 		ReDisplayStandings();

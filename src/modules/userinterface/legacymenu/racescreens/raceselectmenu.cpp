@@ -37,25 +37,25 @@
 #include "racescreens.h"
 
 
-static void *reRaceSelectHandle = NULL;
+static void *rmRaceSelectHandle = NULL;
 
-static std::map<std::string, int> reMapSubTypeComboIds;
+static std::map<std::string, int> rmMapSubTypeComboIds;
 
 
 /* Called when the menu is activated */
 static void
-reOnActivate(void * /* dummy */)
+rmOnActivate(void * /* dummy */)
 {
 	GfLogTrace("Entering Race Mode Select menu\n");
 
     /* Race engine init */
     LegacyMenu::self().raceEngine().initialize();
-    LegacyMenu::self().raceEngine().data()->_reMenuScreen = reRaceSelectHandle;
+    LegacyMenu::self().raceEngine().data()->_reMenuScreen = rmRaceSelectHandle;
 }
 
 /* Exit from Race engine */
 static void
-reOnRaceSelectShutdown(void *prevMenu)
+rmOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
     LegacyMenu::self().raceEngine().shutdown();
@@ -63,7 +63,7 @@ reOnRaceSelectShutdown(void *prevMenu)
 
 
 static void
-reOnSelectRaceMan(void *pvRaceManTypeIndex)
+rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 {
 	// Get the race managers with the given type
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();
@@ -75,8 +75,8 @@ reOnSelectRaceMan(void *pvRaceManTypeIndex)
 	GfRaceManager* pSelRaceMan = 0;
 	if (vecRaceMans.size() > 1)
 	{
-		const int nSubTypeComboId = reMapSubTypeComboIds[strRaceManType];
-		const char* pszSelSubType = GfuiComboboxGetText(reRaceSelectHandle, nSubTypeComboId);
+		const int nSubTypeComboId = rmMapSubTypeComboIds[strRaceManType];
+		const char* pszSelSubType = GfuiComboboxGetText(rmRaceSelectHandle, nSubTypeComboId);
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
 		{
@@ -112,24 +112,24 @@ reOnSelectRaceMan(void *pvRaceManTypeIndex)
 }
 
 static void
-reOnChangeRaceMan(tComboBoxInfo *)
+rmOnChangeRaceMan(tComboBoxInfo *)
 {
 }
 
 /* Initialize the single player menu */
 void *
-ReRaceSelectInit(void *prevMenu)
+RmRaceSelectInit(void *prevMenu)
 {
-    if (reRaceSelectHandle) 
-		return reRaceSelectHandle;
+    if (rmRaceSelectHandle) 
+		return rmRaceSelectHandle;
     
     // Create screen, load menu XML descriptor and create static controls.
-    reRaceSelectHandle = GfuiScreenCreateEx((float*)NULL, 
-											NULL, reOnActivate, 
+    rmRaceSelectHandle = GfuiScreenCreateEx((float*)NULL, 
+											NULL, rmOnActivate, 
 											NULL, (tfuiCallback)NULL, 
 											1);
     void *hMenuXMLDesc = LoadMenuXML("raceselectmenu.xml");
-    CreateStaticControls(hMenuXMLDesc, reRaceSelectHandle);
+    CreateStaticControls(hMenuXMLDesc, rmRaceSelectHandle);
 
     // Create the raceman type buttons and sub-type combo-boxes (if any).
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();
@@ -147,9 +147,9 @@ ReRaceSelectInit(void *prevMenu)
 		std::string strButtonCtrlName(*itRaceManType);
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
-		int n = CreateButtonControl(reRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
+		int n = CreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
 									(void*)(itRaceManType - vecRaceManTypes.begin()),
-									reOnSelectRaceMan);
+									rmOnSelectRaceMan);
 		GfLogDebug("CreateButtonControl(%d, '%s')\n", n, strButtonCtrlName.c_str());
 
 		// Look for sub-types : if any, we have a sub-type combo box for this type.
@@ -171,41 +171,41 @@ ReRaceSelectInit(void *prevMenu)
 		std::string strComboCtrlName(*itRaceManType);
 		strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
 		strComboCtrlName += "Combo";
-		reMapSubTypeComboIds[*itRaceManType] =
-			CreateComboboxControl(reRaceSelectHandle, hMenuXMLDesc,
-								  strComboCtrlName.c_str(), 0, reOnChangeRaceMan);
-		GfLogDebug("CreateComboboxControl(%d, '%s')\n", reMapSubTypeComboIds[*itRaceManType], strComboCtrlName.c_str());
+		rmMapSubTypeComboIds[*itRaceManType] =
+			CreateComboboxControl(rmRaceSelectHandle, hMenuXMLDesc,
+								  strComboCtrlName.c_str(), 0, rmOnChangeRaceMan);
+		GfLogDebug("CreateComboboxControl(%d, '%s')\n", rmMapSubTypeComboIds[*itRaceManType], strComboCtrlName.c_str());
 
 		// Add one item in the combo for each race manager of this type.
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
 		{
-			GfuiComboboxAddText(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType],
+			GfuiComboboxAddText(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType],
 								(*itRaceMan)->getSubType().c_str());
 			GfLogDebug("ReRaceSelectInit : SubType %s : \n", (*itRaceMan)->getSubType().c_str());
 		}
 
 		// Select the first one by default.
-		GfuiComboboxSetPosition(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], 0);
+		GfuiComboboxSetPosition(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType], 0);
 
 		// Disable combo if only one race manager.
 		if (vecRaceMans.size() == 1)
-			GfuiEnable(reRaceSelectHandle, reMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
+			GfuiEnable(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
 	}
 	
     // Create Back button
-    CreateButtonControl(reRaceSelectHandle, hMenuXMLDesc, "BackButton",
-						prevMenu, reOnRaceSelectShutdown);
+    CreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, "BackButton",
+						prevMenu, rmOnRaceSelectShutdown);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hMenuXMLDesc);
     
     // Register keyboard shortcuts.
-    GfuiMenuDefaultKeysAdd(reRaceSelectHandle);
-    GfuiAddKey(reRaceSelectHandle, GFUIK_ESCAPE, "Back To Main Menu",
-			   prevMenu, reOnRaceSelectShutdown, NULL);
+    GfuiMenuDefaultKeysAdd(rmRaceSelectHandle);
+    GfuiAddKey(rmRaceSelectHandle, GFUIK_ESCAPE, "Back To Main Menu",
+			   prevMenu, rmOnRaceSelectShutdown, NULL);
 
     // Give the race engine the menu to come back to.
-    LegacyMenu::self().raceEngine().initializeState(reRaceSelectHandle);
+    LegacyMenu::self().raceEngine().initializeState(rmRaceSelectHandle);
 
-    return reRaceSelectHandle;
+    return rmRaceSelectHandle;
 }

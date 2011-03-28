@@ -28,7 +28,6 @@
 #include <portability.h>
 #include <raceman.h>
 #include <network.h>
-#include <tgfclient.h>
 #include <robot.h>
 #include <robottools.h>
 

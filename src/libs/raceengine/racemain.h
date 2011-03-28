@@ -26,18 +26,22 @@
 #ifndef _RACEMAIN_H_
 #define _RACEMAIN_H_
 
-//typedef void* (*tMenuInitFunc)(void*);
-
-extern void ReSetExitMenuInitFunc(void* (*func)(void*));
-
 extern bool ReHumanInGroup();
-extern int  ReRaceEventInit(void);
-extern int  RePreRace(void);
-extern int  ReRaceStart(void);
-extern int  ReRaceStop(void);
-extern int  ReRaceEnd(void);
-extern int  RePostRace(void);
-extern int  ReEventShutdown(void);
+
+extern int  ReRaceEventInit();
+extern int  RePreRace();
+extern int  ReRaceStart();
+extern int  ReRaceRealStart();
+extern int  ReRaceStop();
+extern int  ReRaceEnd();
+extern int  RePostRace();
+extern int  ReEventShutdown();
+
+extern void ReRaceAbandon();
+extern void ReRaceAbort();
+extern void ReRaceSkipSession();
+extern void ReRaceContinue();
+extern void ReRaceRestart();
 
 #endif /* _RACEMAIN_H_ */ 
 

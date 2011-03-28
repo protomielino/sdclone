@@ -1,10 +1,10 @@
 /***************************************************************************
 
-    file        : miscscreens.cpp
+    file        : racestartmenu.cpp
     created     : Sun Dec  8 13:01:47 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                        
-    email       : eric.espie@torcs.org   
-    version     : $Id$                                  
+    copyright   : (C) 2002 by Eric Espie
+    email       : eric.espie@torcs.org
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file   
-                
+                The race start menu
     @author     <a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version    $Id$
 */
@@ -28,115 +28,49 @@
 #include <tgfclient.h>
 #include <robot.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
 
 
-/*********************************************************
- * 2, 3, 4 or 5 buttons "Stop race" screens
- */
-
-static void *QuitHdle[5] = { 0, 0, 0, 0, 0 };
-
-// Descriptor for 1 button.
-typedef struct {
-    
-    const char *label;  // Label to display.
-    const char *tip;    // Tip displayed when mouse hover.
-    void       *screen; // Screen to activate if clicked.
-
-} tButtonDesc;
-
-// "Stop race" screen creation and activation.
-static void *
-rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
+// Abandon race hook ******************************************************
+static void
+rmAbandonRaceHookActivate(void * /* vforce */)
 {
-    void *screenHdle = 0;
-        
-    // Create screen, load menu XML descriptor and create static controls.
-    screenHdle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
-
-    void *menuXMLDescHdle = LoadMenuXML("stopracemenu.xml");
-
-    CreateStaticControls(menuXMLDescHdle, screenHdle);
-
-    // Create variable title label.
-    int titleId = CreateLabelControl(screenHdle, menuXMLDescHdle, "titlelabel");
-    GfuiLabelSetText(screenHdle, titleId, title);
-
-    // Create specified buttons, left aligned.
-    for (int nButInd = 0; nButInd < nButtons; nButInd++)
-    {
-        const int id =
-			GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
-								 aButtons[nButInd].screen, GFUI_ALIGN_HL_VB, GfuiScreenActivate);
-
-		GfuiButtonShowBox(screenHdle, id, false);
-		Color c, fc, pc;
-		c.red  = 1.0;   c.green  = 1.0; c.blue  = 1.0; c.alpha  = 1.0;
-		fc.red = 1.0;   fc.green = 0.8; fc.blue = 0.0; fc.alpha = 1.0;
-		pc.red = 0.902; pc.green = 0.1; pc.blue = 0.2; pc.alpha = 1.0;
-
-        GfuiButtonSetColor(screenHdle, id, c);
-        GfuiButtonSetFocusColor(screenHdle, id, fc);
-        GfuiButtonSetPushedColor(screenHdle, id, pc);
-    }
-
-    // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
-    
-    // Register keyboard shortcuts.
-    GfuiMenuDefaultKeysAdd(screenHdle);
-    GfuiAddKey(screenHdle, GFUIK_ESCAPE, aButtons[nCancelIndex].tip, 
-               aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
-
-    // Activate the created screen.
-    GfuiScreenActivate(screenHdle);
-
-    return screenHdle;
-}
-
-// "quit race" screen creation and activation.
-void *
-RmStopRaceScreen(const char *title,
-				 const char *label1, const char *tip1, void *screen1,
-				 const char *label2, const char *tip2, void *screen2,
-				 const char *label3, const char *tip3, void *screen3,
-				 const char *label4, const char *tip4, void *screen4,
-				 const char *label5, const char *tip5, void *screen5)
-{
-    const tButtonDesc aButtons[5] =
-    {
-        { label1, tip1, screen1 },
-        { label2, tip2, screen2 },
-        { label3, tip3, screen3 },
-        { label4, tip4, screen4 },
-        { label5, tip5, screen5 }
-    };
+	LegacyMenu::self().raceEngine().abandonRace();
 	
-    int nButtons = 2;
-	if (label3 && tip3 && screen3)
-	{
-		nButtons++;
-		if (label4 && tip4 && screen4)
-		{
-			nButtons++;
-			if (label5 && tip5 && screen5)
-				nButtons++;
-		}
-	}
-        
-    if (QuitHdle[nButtons-1])
-        GfuiScreenRelease(QuitHdle[nButtons-1]);
-        
-    QuitHdle[nButtons-1] = rmStopRaceScreen(title, aButtons, nButtons, nButtons-1);
-    
-    return QuitHdle[nButtons-1];
+	RmGameScreen();
 }
 
-/*********************************************************
- * Start race screen
- */
+static void *
+rmAbandonRaceHookInit(void)
+{
+	static void *pvAbandonRaceHookHandle = 0;
 
+	if (!pvAbandonRaceHookHandle)
+		pvAbandonRaceHookHandle = GfuiHookCreate(0, rmAbandonRaceHookActivate);
+
+	return pvAbandonRaceHookHandle;
+}
+
+// Start race hook ******************************************************
+static void
+rmStartRaceHookActivate(void * /* dummy */)
+{
+	LegacyMenu::self().raceEngine().startRace();
+}
+
+static void *
+rmStartRaceHookInit(void)
+{
+	static void	*pvStartRaceHookHandle = 0;
+
+	if (!pvStartRaceHookHandle)
+		pvStartRaceHookHandle = GfuiHookCreate(0, rmStartRaceHookActivate);
+
+	return pvStartRaceHookHandle;
+}
+
+// The menu itself ******************************************************
 static const int NMaxLines = 20;
 
 typedef struct 
@@ -150,7 +84,7 @@ typedef struct
 static tStartRaceCall   nextStartRace, prevStartRace;
 static void             *rmScrHdle = 0;
 
-static void rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start);
+static void rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start = 0);
 
 static void
 rmChgStartScreen(void *vpsrc)
@@ -162,7 +96,7 @@ rmChgStartScreen(void *vpsrc)
     GfuiScreenRelease(prevScr);
 }
 
-static void
+void
 rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 {
     static char path[1024];
@@ -312,9 +246,10 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
     GfuiScreenActivate(rmScrHdle);
 }
 
-
 void
-RmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr)
+RmDisplayStartRace()
 {
-    rmDisplayStartRace(info, startScr, abortScr, 0);
+	rmDisplayStartRace(LegacyMenu::self().raceEngine().data(),
+					   rmStartRaceHookInit(), rmAbandonRaceHookInit());
 }
+

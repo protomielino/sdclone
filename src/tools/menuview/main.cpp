@@ -127,22 +127,26 @@ main(int argc, char *argv[])
 {
     GfInit();
 
+    GfelInitialize();
+
     init_args(argc, argv);
 
     GfFileSetup();          /* Update user settings files from an old version */
 
-    GfScrInit(argc, argv);  /* init screen */
+    GfScrInit();  /* init screen */
 
 	if (g_strMenuFile == "")
 	{
 		printf("Error: No menu file specified\nUSAGE:\n  sd-menuview menufile.xml\n");
-		return 0;
+		exit(1);
 	}
 
 	ShowMenu(g_strMenuFile.c_str());
 
     GfelMainLoop();          /* event loop */
 
-    return 0;	            /* just for the compiler, never reached */
+    GfShutdown();
+
+    exit(0);	            /* just for the compiler, never reached */
 }
 

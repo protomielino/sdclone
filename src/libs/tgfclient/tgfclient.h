@@ -78,7 +78,7 @@ typedef struct ScreenSize
     int height; // Height in pixels.
 } tScreenSize;
 
-TGFCLIENT_API void GfScrInit(int argc, char *argv[]);
+TGFCLIENT_API bool GfScrInit(void);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
 TGFCLIENT_API unsigned char* GfScrCaptureAsImage(int* viewW, int *viewH);
@@ -586,6 +586,7 @@ TGFCLIENT_API void GfelSetTimerCB(unsigned int millis, void (*func)(int value));
 // Event loop management
 TGFCLIENT_API void GfelPostRedisplay(void);
 TGFCLIENT_API void GfelForceRedisplay();
+TGFCLIENT_API void GfelQuit();
 
 // The event loop itself (never returns)
 TGFCLIENT_API void GfelMainLoop(void);

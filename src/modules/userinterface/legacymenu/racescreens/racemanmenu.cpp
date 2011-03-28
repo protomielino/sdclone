@@ -65,27 +65,27 @@ static int CompetitorsScrollListId;
 static std::vector<std::string> VecCompetitorsInfo;
 
 // Pre-declarations of local functions.
-static void reOnRaceDataChanged();
+static void rmOnRaceDataChanged();
 
 // Accessors to the menu handle -------------------------------------------------------------
-void ReSetRacemanMenuHandle(void * handle)
+void RmSetRacemanMenuHandle(void * handle)
 {
 	ScrHandle = handle;
 }
-void* ReGetRacemanMenuHandle()
+void* RmGetRacemanMenuHandle()
 {
 	return ScrHandle;
 }
 
 void
-ReConfigureRace(void * /* dummy */)
+RmConfigureRace(void * /* dummy */)
 {
-	ReConfigRunState(/*bStart=*/true);
+	RmConfigRunState(/*bStart=*/true);
 }
 
 // Callbacks for the File Select menu --------------------------------------------------------
 static void
-reSaveRaceToConfigFile(const char *filename)
+rmSaveRaceToConfigFile(const char *filename)
 {
 	// Note: No need to write the main file here, already done at the end of race configuration.
 	const GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
@@ -104,7 +104,7 @@ reSaveRaceToConfigFile(const char *filename)
 }
 
 static void
-reLoadRaceFromConfigFile(const char *filename)
+rmLoadRaceFromConfigFile(const char *filename)
 {
 	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
@@ -137,11 +137,11 @@ reLoadRaceFromConfigFile(const char *filename)
 	}
 	
 	// Update GUI.
-	reOnRaceDataChanged();
+	rmOnRaceDataChanged();
 }
 
 static void
-reLoadRaceFromResultsFile(const char *filename)
+rmLoadRaceFromResultsFile(const char *filename)
 {
 	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
@@ -163,21 +163,21 @@ reLoadRaceFromResultsFile(const char *filename)
 	}
 	
 	// Update GUI.
-	reOnRaceDataChanged();
+	rmOnRaceDataChanged();
 }
 
 // Callbacks for the current menu ------------------------------------------------------------
 static void
-reOnActivate(void * /* dummy */)
+rmOnActivate(void * /* dummy */)
 {
 	GfLogTrace("Entering Race Manager menu\n");
 
 	// Update GUI.
-	reOnRaceDataChanged();
+	rmOnRaceDataChanged();
 }
 
 static void
-reOnRaceDataChanged()
+rmOnRaceDataChanged()
 {
 	GfRace* pRace = LegacyMenu::self().raceEngine().race();
 	const GfRaceManager* pRaceMan = pRace->getManager();
@@ -240,7 +240,7 @@ reOnRaceDataChanged()
 }
 
 static void
-reOnSelectCompetitor(void * /* dummy */)
+rmOnSelectCompetitor(void * /* dummy */)
 {
 	// TODO: Display some details somewhere about the selected competitor ?
 	GfDriver* pComp = 0;
@@ -251,7 +251,7 @@ reOnSelectCompetitor(void * /* dummy */)
 }
 
 static void
-reOnPlayerConfig(void * /* dummy */)
+rmOnPlayerConfig(void * /* dummy */)
 {
 	/* Here, we need to call OptionOptionInit each time the firing button
 	   is pressed, and not only once at the Raceman menu initialization,
@@ -261,14 +261,14 @@ reOnPlayerConfig(void * /* dummy */)
 }
 
 static void
-reOnLoadRaceFromConfigFile(void *pPrevMenu)
+rmOnLoadRaceFromConfigFile(void *pPrevMenu)
 {
 	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 	
 	fs.title = pRaceMan->getName();
 	fs.mode = RmFSModeLoad;
 	fs.path = pRaceMan->getSavedConfigsDir();
-	fs.select = reLoadRaceFromConfigFile;
+	fs.select = rmLoadRaceFromConfigFile;
 	fs.prevScreen = pPrevMenu;
 
 	// Fire the file selection menu.
@@ -276,14 +276,14 @@ reOnLoadRaceFromConfigFile(void *pPrevMenu)
 }
 
 static void
-reOnLoadRaceFromResultsFile(void *pPrevMenu)
+rmOnLoadRaceFromResultsFile(void *pPrevMenu)
 {
 	GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 	
 	fs.title = pRaceMan->getName();
 	fs.mode = RmFSModeLoad;
 	fs.path = pRaceMan->getResultsDir();
-	fs.select = reLoadRaceFromResultsFile;
+	fs.select = rmLoadRaceFromResultsFile;
 	fs.prevScreen = pPrevMenu;
 
 	// Fire the file selection menu.
@@ -291,7 +291,7 @@ reOnLoadRaceFromResultsFile(void *pPrevMenu)
 }
 
 static void
-reOnSaveRaceToConfigFile(void *pPrevMenu)
+rmOnSaveRaceToConfigFile(void *pPrevMenu)
 {
 	const GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 	
@@ -304,31 +304,31 @@ reOnSaveRaceToConfigFile(void *pPrevMenu)
 	fs.path += "config/raceman/";
 	fs.path += pRaceMan->getId();
 
-	fs.select = reSaveRaceToConfigFile;
+	fs.select = rmSaveRaceToConfigFile;
 
 	// Fire the file selection menu.
 	GfuiScreenActivate(RmFileSelect(&fs));
 }
 
 static void
-reStartNewRace(void * /* dummy */)
+rmStartNewRace(void * /* dummy */)
 {
 	LegacyMenu::self().raceEngine().startNewRace();
 }
 
 static void
-reResumeRace(void * /* dummy */)
+rmResumeRace(void * /* dummy */)
 {
 	LegacyMenu::self().raceEngine().resumeRace();
 }
 
 // Init. function for the current menu -----------------------------------------------------
 int
-ReRacemanMenu()
+RmRacemanMenu()
 {
 	// Special case of the online race, not yet migrated to using tgfdata.
 	// TODO: Integrate better the networking menu system in the race config. menu system
-	//       (merge the ReNetworkClientConnectMenu and ReNetworkHostMenu into this race man menu,
+	//       (merge the RmNetworkClientConnectMenu and RmNetworkHostMenu into this race man menu,
 	//        after adding some more features / controls ? because they look similar).
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
 	if (!strcmp(reInfo->_reName, "Online Race"))
@@ -352,19 +352,19 @@ ReRacemanMenu()
 			{
 				if (IsClient())
 				{
-					ReNetworkClientConnectMenu(NULL);
+					RmNetworkClientConnectMenu(NULL);
 					return RM_ASYNC | RM_NEXT_STEP;
 				}
 				else if (IsServer())
 				{
-					ReNetworkHostMenu(NULL);
+					RmNetworkHostMenu(NULL);
 					return RM_ASYNC | RM_NEXT_STEP;
 				}
 			}
 		}
 		else
 		{
-			ReNetworkMenu(NULL);
+			RmNetworkMenu(NULL);
 			return RM_ASYNC | RM_NEXT_STEP;
 		}
 	}
@@ -376,7 +376,7 @@ ReRacemanMenu()
 	const GfRaceManager* pRaceMan = LegacyMenu::self().raceEngine().race()->getManager();
 
 	// Create screen, load menu XML descriptor and create static controls.
-	ScrHandle = GfuiScreenCreateEx(NULL, NULL, reOnActivate, 
+	ScrHandle = GfuiScreenCreateEx(NULL, NULL, rmOnActivate, 
 										 NULL, (tfuiCallback)NULL, 1);
 	void *menuXMLDescHdle = LoadMenuXML("racemanmenu.xml");
 	
@@ -392,9 +392,9 @@ ReRacemanMenu()
 
 	// Create Configure race, Configure players and Back buttons.
 	CreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigureRaceButton",
-						NULL, ReConfigureRace);
+						NULL, RmConfigureRace);
 	CreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
-						NULL, reOnPlayerConfig);
+						NULL, rmOnPlayerConfig);
 	
 	CreateButtonControl(ScrHandle, menuXMLDescHdle, "PreviousButton",
 						reInfo->_reMenuScreen, GfuiScreenActivate);
@@ -402,21 +402,21 @@ ReRacemanMenu()
 	// Create "Load / Resume / Save race" buttons.
 	SaveRaceConfigButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveRaceConfigButton",
-							ScrHandle, reOnSaveRaceToConfigFile);
+							ScrHandle, rmOnSaveRaceToConfigFile);
 	LoadRaceConfigButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceConfigButton",
-							ScrHandle, reOnLoadRaceFromConfigFile);
+							ScrHandle, rmOnLoadRaceFromConfigFile);
 	LoadRaceResultsButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceResultsButton",
-							ScrHandle, reOnLoadRaceFromResultsFile);
+							ScrHandle, rmOnLoadRaceFromResultsFile);
 
 	// Create "Resume / Start race" buttons.
 	ResumeRaceButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "ResumeRaceButton",
-							NULL, reResumeRace);
+							NULL, rmResumeRace);
 	StartNewRaceButtonId =
 		CreateButtonControl(ScrHandle, menuXMLDescHdle, "StartNewRaceButton",
-							NULL, reStartNewRace);
+							NULL, rmStartNewRace);
 
 	// Track outline image.
 	TrackOutlineImageId =
@@ -425,7 +425,7 @@ ReRacemanMenu()
 	// Competitors scroll-list
 	CompetitorsScrollListId =
 		CreateScrollListControl(ScrHandle, menuXMLDescHdle, "CompetitorsScrollList",
-								NULL, reOnSelectCompetitor);
+								NULL, rmOnSelectCompetitor);
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
@@ -433,7 +433,7 @@ ReRacemanMenu()
 	// Register keyboard shortcuts.
 	GfuiMenuDefaultKeysAdd(ScrHandle);
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Start the race",
-			   NULL, reStartNewRace, NULL);
+			   NULL, rmStartNewRace, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Back to the Main menu",
 			   reInfo->_reMenuScreen, GfuiScreenActivate, NULL);
 

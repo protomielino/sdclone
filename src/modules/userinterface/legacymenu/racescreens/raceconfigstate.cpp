@@ -44,64 +44,59 @@ static tRmRaceParam    rp;
 
 
 static void
-reConfigBack(void)
+rmConfigBack(void)
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
-	void* params = reInfo->params;
+	void* params = LegacyMenu::self().raceEngine().data()->params;
 
 	/* Go back one step in the conf */
 	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 
 				 GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1) - 2);
 
-	ReConfigRunState();
+	RmConfigRunState();
 }
 
 
 /***************************************************************/
 /* Callback hooks used only to run the automaton on activation */
-static void	*configHookHandle = 0;
-
 static void
-configHookActivate(void * /* dummy */)
+rmConfigHookActivate(void * /* dummy */)
 {
-	ReConfigRunState();
+	RmConfigRunState();
 }
 
 static void *
-reConfigHookInit(void)
+rmConfigHookInit(void)
 {
-	if (configHookHandle)
-		return configHookHandle;
+	static void	*pvConfigHookHandle = 0;
 
-	configHookHandle = GfuiHookCreate(0, configHookActivate);
+	if (!pvConfigHookHandle)
+		pvConfigHookHandle = GfuiHookCreate(0, rmConfigHookActivate);
 
-	return configHookHandle;
+	return pvConfigHookHandle;
 }
 
 /***************************************************************/
 /* Config Back Hook */
 
-static void	*ConfigBackHookHandle = 0;
-
 static void
-ConfigBackHookActivate(void * /* dummy */)
+rmConfigBackHookActivate(void * /* dummy */)
 {
-	reConfigBack();
+	rmConfigBack();
 }
 
 static void *
-reConfigBackHookInit(void)
+rmConfigBackHookInit(void)
 {
-	if (ConfigBackHookHandle)
-		return ConfigBackHookHandle;
+	static void	*pvConfigBackHookHandle = 0;
 
-	ConfigBackHookHandle = GfuiHookCreate(0, ConfigBackHookActivate);
+	if (!pvConfigBackHookHandle)
+		pvConfigBackHookHandle = GfuiHookCreate(0, rmConfigBackHookActivate);
 
-	return ConfigBackHookHandle;
+	return pvConfigBackHookHandle;
 }
 
 void
-ReConfigRunState(bool bStart)
+RmConfigRunState(bool bStart)
 {
 	char	path[256];
 	int		curConf;
@@ -121,7 +116,7 @@ ReConfigRunState(bool bStart)
 		GfLogInfo("%s configuration finished.\n", reInfo->_reName);
 		LegacyMenu::self().raceEngine().race()->store(); // Save race data to params.
 		GfParmWriteFile(NULL, params, reInfo->_reName); // Save params to disk.
-		GfuiScreenActivate(ReGetRacemanMenuHandle()); // Back to the race manager menu
+		GfuiScreenActivate(RmGetRacemanMenuHandle()); // Back to the race manager menu
 		return;
 	}
 
@@ -131,7 +126,7 @@ ReConfigRunState(bool bStart)
 	if (!conf) {
 		GfLogError("No '%s' field in '%s' section of %s\n",
 				   RM_ATTR_TYPE, path, GfParmGetFileName(params));
-		GfuiScreenActivate(ReGetRacemanMenuHandle()); /* Back to the race manager menu */
+		GfuiScreenActivate(RmGetRacemanMenuHandle()); /* Back to the race manager menu */
 		return;
 	}
 
@@ -141,11 +136,11 @@ ReConfigRunState(bool bStart)
 	if (!strcmp(conf, RM_VAL_TRACKSEL)) {
 		
 		// Track Select Menu 
-		ts.nextScreen = reConfigHookInit();
+		ts.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
-			ts.prevScreen = ReGetRacemanMenuHandle();
+			ts.prevScreen = RmGetRacemanMenuHandle();
 		} else {
-			ts.prevScreen = reConfigBackHookInit();
+			ts.prevScreen = rmConfigBackHookInit();
 		}
 		ts.pRace = LegacyMenu::self().raceEngine().race();
 		ts.trackItf = reInfo->_reTrackItf;
@@ -154,11 +149,11 @@ ReConfigRunState(bool bStart)
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
 		
 		// Drivers select menu
-		ds.nextScreen = reConfigHookInit();
+		ds.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
-			ds.prevScreen = ReGetRacemanMenuHandle();
+			ds.prevScreen = RmGetRacemanMenuHandle();
 		} else {
-			ds.prevScreen = reConfigBackHookInit();
+			ds.prevScreen = rmConfigBackHookInit();
 		}
 		ds.pRace = LegacyMenu::self().raceEngine().race();
 		RmDriversSelect(&ds);
@@ -166,11 +161,11 @@ ReConfigRunState(bool bStart)
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
 		
 		// Race (= session) Options menu
-		rp.nextScreen = reConfigHookInit();
+		rp.nextScreen = rmConfigHookInit();
 		if (curConf == 1) {
-			rp.prevScreen = ReGetRacemanMenuHandle();
+			rp.prevScreen = RmGetRacemanMenuHandle();
 		} else {
-			rp.prevScreen = reConfigBackHookInit();
+			rp.prevScreen = rmConfigBackHookInit();
 		}
 		rp.pRace = LegacyMenu::self().raceEngine().race();
 		rp.session = GfParmGetStr(params, path, RM_ATTR_RACE, RM_VAL_ANYRACE);

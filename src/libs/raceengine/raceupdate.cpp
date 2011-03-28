@@ -31,7 +31,6 @@
 
 #include <portability.h>
 #include <network.h>
-#include <tgfclient.h>
 #include <robot.h>
 #include <raceman.h>
 
@@ -682,9 +681,10 @@ void reMainUpdater::captureScreen(void)
 	char filename[256];
     tRmMovieCapture	*capture = &(_pReInfo->movieCapture);
     
-    sprintf(filename, "%s/sd-%4.4d-%8.8d.png", capture->outputBase,
-			capture->currentCapture, capture->currentFrame++);
-    GfScrCaptureAsPNG(filename);
+    snprintf(filename, sizeof(filename), "%s/sd-%4.4d-%8.8d.png", capture->outputBase,
+			 capture->currentCapture, capture->currentFrame++);
+	
+    RaceEngine::self().userInterface().captureRaceScreen(filename);
 }
 
 
@@ -692,7 +692,7 @@ void reMainUpdater::onBackFromPitMenu(tCarElt *car)
 {
 	_pSituationUpdater->updateCarPitCmd(car->index, &car->pitcmd);
 
-	GfuiScreenActivate(_pReInfo->_reGameScreen);
+	RaceEngine::self().userInterface().activateGameScreen();
 }
 
 int reMainUpdater::operator()(void)
@@ -808,13 +808,9 @@ int reMainUpdater::operator()(void)
 
 	ReNetworkCheckEndOfRace();
 
-	// Display new frame.
-	if (ReInfo->_refreshDisplay)
-		GfuiDisplay();
-	
-	// Schedule next call by the event loop (through reDisplay).
-	GfelPostRedisplay();
-			
+	// Update the GUI and Schedule next call by the event loop (through reDisplay).
+	RaceEngine::self().userInterface().update();
+
 	GfProfStopProfile("ReUpdate");
 
     return RM_ASYNC;

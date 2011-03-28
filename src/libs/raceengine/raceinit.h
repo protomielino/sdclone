@@ -34,6 +34,7 @@ extern void ReStartNewRace(void);
 extern void ReResumeRace(void);
 
 extern void ReInit(void);
+extern int  ReExit();
 extern void ReShutdown(void);
 
 extern void ReRaceSelectRaceman(GfRaceManager* pRaceMan);

@@ -23,6 +23,7 @@
 
 #include <tgfclient.h>
 
+#include "legacymenu.h"
 #include "displayconfig.h"
 
 
@@ -114,14 +115,14 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
     // Save display settings.
     pMenu->storeSettings();
 
-    // Release screen allocated resources.
-    GfScrShutdown();
+    // Shutdown the user interface.
+	LegacyMenu::self().shutdown();
 
     // Restart the game.
-	GfRestart(GfuiMouseIsHWPresent());
+    GfRestart(GfuiMouseIsHWPresent());
 
-	// TODO: A nice system to get back to previous display settings if the chosen ones
-	//       keep the game from really restarting (ex: unsupported full screen size) ?
+    // TODO: A nice system to get back to previous display settings if the chosen ones
+    //       keep the game from really restarting (ex: unsupported full screen size) ?
 }
 
 void DisplayMenu::onCancel(void *pDisplayMenu)

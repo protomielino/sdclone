@@ -35,10 +35,16 @@ public:
 
 	//! Activation of the user interface (splash if any, main menu ...).
 	virtual bool activate() = 0;
-
-	virtual void* createExitMenu(void* prevHdle) = 0;
 	
+	virtual void quit() = 0;
+	
+	virtual void shutdown() = 0;
+
+	virtual void update() = 0;
+
 	virtual void *createRaceScreen() = 0;
+	virtual void captureRaceScreen(const char* pszTargetFilename) = 0;
+	
 	virtual void *createRaceEventLoopHook() = 0;
 	virtual void setRaceMessage(const char *msg) = 0;
 	virtual void setRaceBigMessage(const char *msg) = 0;
@@ -47,16 +53,13 @@ public:
 	virtual void addLoadingMessage(const char *text) = 0;
 	virtual void shutdownLoadingScreen() = 0;
 
+	virtual void activateGameScreen() = 0;
+
 	virtual int activateRacemanMenu() = 0;
 	virtual int activateNextEventMenu() = 0;
 
-	virtual void activateStartRaceMenu(struct RmInfo *info, void *startScr, void *abortScr) = 0;
-	virtual void *activateStopRaceMenu(const char* title,
-									   const char* label1, const char* tip1, void *screen1,
-									   const char* label2, const char* tip2, void *screen2,
-									   const char* label3 = 0, const char* tip3 = 0, void *screen3 = 0,
-									   const char* label4 = 0, const char* tip4 = 0, void *screen4 = 0,
-									   const char* label5 = 0, const char* tip5 = 0, void *screen5 = 0) = 0;
+	virtual void activateStartRaceMenu() = 0;
+	virtual void activateStopRaceMenu() = 0;
 
 	virtual void activatePitMenu(struct CarElt *car, void (*callback)(void*)) = 0;
 

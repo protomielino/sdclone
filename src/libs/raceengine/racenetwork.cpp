@@ -23,7 +23,6 @@
 */
 
 #include <network.h>
-#include <tgfclient.h>
 
 #include "raceengine.h"
 
@@ -221,9 +220,11 @@ ReNetworkWaitReady()
 	else
 	{
 		RaceEngine::self().userInterface().setRaceBigMessage("Waiting for online players");
-		GfuiDisplay();
+
+		ReInfo->_refreshDisplay = 1;
+		RaceEngine::self().userInterface().update();
+
 		ReInfo->_reGraphicItf.refresh(ReInfo->s);
-		GfelPostRedisplay();	/* Callback -> reDisplay */
 	}
 
 	return mode;

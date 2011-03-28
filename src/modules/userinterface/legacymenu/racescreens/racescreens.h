@@ -29,6 +29,7 @@
 
 #include <tgfclient.h> // tfuiCallback
 
+
 class GfRace;
 
 typedef struct RmTrackSelect
@@ -75,19 +76,15 @@ extern void RmPitMenuStart(tCarElt * /* car */, tfuiCallback /* callback */);
 
 extern void RmLoadingScreenStart(const char * /* text */, const char * /* bgimg */);
 extern void RmLoadingScreenSetText(const char * /* text */);
-extern void RmLoadingScreenShutdown(void);
+extern void RmLoadingScreenShutdown();
+
+extern void RmGameScreen();
 
 extern void RmShowResults(void * /* prevHdle */, tRmInfo * /* info */);
 
-extern void *RmStopRaceScreen(char const *title,
-									   char const *label1, char const *tip1, void *screen1,
-									   char const *label2, char const *tip2, void *screen2,
-									   char const *label3 = 0, char const *tip3 = 0, void *screen3 = 0,
-									   char const *label4 = 0, char const *tip4 = 0, void *screen4 = 0,
-									   char const *label5 = 0, char const *tip5 = 0, void *screen5 = 0);
+extern void RmStopRaceScreen();
 
-extern void RmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr);
-
+extern void RmDisplayStartRace();
 
 extern void RmRaceParamsMenu(void *vrp);
 
@@ -96,40 +93,41 @@ extern void RmShowStandings(void *prevHdle, tRmInfo *info, int start = 0);
 extern void* RmFileSelect(void *vs);
 
 // From racemanmenus.
-extern int ReRacemanMenu();
-extern int ReNextEventMenu(void);
-extern void ReConfigureRace(void * /* dummy */);
-extern void ReSetRacemanMenuHandle(void * handle);
+extern int RmRacemanMenu();
+extern int RmNextEventMenu();
+extern void RmConfigureRace(void * /* dummy */);
+extern void RmSetRacemanMenuHandle(void * handle);
 
-extern void* ReGetRacemanMenuHandle();
+extern void* RmGetRacemanMenuHandle();
 
-extern void ReConfigRunState(bool bStart = false);
+extern void RmConfigRunState(bool bStart = false);
 
 // From raceselectmenu.
-extern void *ReRaceSelectInit(void *precMenu);
+extern void *RmRaceSelectInit(void *precMenu);
 
-// From racegl.
-extern void *ReScreenInit(void);
-extern void  ReScreenShutdown(void);
-extern void *ReHookInit(void);
-extern void ReHookShutdown(void);
-extern void ReSetRaceMsg(const char *msg);
-extern void ReSetRaceBigMsg(const char *msg);
+// From racerunningmenus.
+extern void *RmScreenInit();
+extern void RmScreenCapture(const char* pszTargetFilename);
+extern void  RmScreenShutdown();
+extern void *RmHookInit();
 
-extern void *ReResScreenInit(void);
-extern void ReResScreenSetTrackName(const char *trackName);
-extern void ReResScreenSetTitle(const char *title);
-extern void ReResScreenAddText(const char *text);
-extern void ReResScreenSetText(const char *text, int line, int clr);
-extern void ReResScreenRemoveText(int line);
-extern void ReResShowCont(void);
-extern int  ReResGetLines(void);
-extern void ReResEraseScreen(void);
+extern void RmSetRaceMsg(const char *msg);
+extern void RmSetRaceBigMsg(const char *msg);
+
+extern void *RmResScreenInit();
+extern void RmResScreenSetTrackName(const char *trackName);
+extern void RmResScreenSetTitle(const char *title);
+extern void RmResScreenAddText(const char *text);
+extern void RmResScreenSetText(const char *text, int line, int clr);
+extern void RmResScreenRemoveText(int line);
+extern void RmResShowCont();
+extern int  RmResGetLines();
+extern void RmResEraseScreen();
 
 // From networkingmenu.
-extern void ReNetworkClientConnectMenu(void *pVoid);
-extern void ReNetworkMenu(void * /* dummy */);
-extern void ReNetworkHostMenu(void * /* dummy */);
+extern void RmNetworkClientConnectMenu(void *pVoid);
+extern void RmNetworkMenu(void * /* dummy */);
+extern void RmNetworkHostMenu(void * /* dummy */);
 
 
 

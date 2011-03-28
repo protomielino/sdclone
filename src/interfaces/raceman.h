@@ -51,8 +51,8 @@ typedef int (*tfRmRunState) (struct RmInfo *);
 #define RM_NEXT_RACE		0x00000200
 #define RM_NEXT_EVENT		0x00000400
 
-#define RM_ACTIVGAMESCR		0x01000000
-#define RM_QUIT			0x40000000
+#define RM_QUIT			0x10000000
+#define RM_ERROR			0x2000000
 
 
 #define RCM_MAX_DT_SIMU		0.002

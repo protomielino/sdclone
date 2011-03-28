@@ -50,6 +50,13 @@ public:
 	virtual void startNewRace() = 0;
 	virtual void resumeRace() = 0;
 
+	virtual void startRace() = 0;
+	virtual void abandonRace() = 0;
+	virtual void abortRace() = 0;
+	virtual void skipRaceSession() = 0;
+	virtual void continueRace() = 0;
+	virtual void restartRace() = 0;
+
 	virtual void accelerateTime(double fMultFactor) = 0;
 	virtual void start() = 0;
 	virtual void stop() = 0;
