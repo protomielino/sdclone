@@ -73,6 +73,7 @@ extern class cGrScreen* grGetCurrentScreen(void);
 
 #define GR_SPLIT_ADD	0
 #define GR_SPLIT_REM	1
+#define GR_SPLIT_ARR	2
 
 #define GR_NEXT_SCREEN	0
 #define GR_PREV_SCREEN	1

@@ -90,6 +90,7 @@
 //#define GR_ATT_DYNAMICWEATHER	"dynamic weather"
 
 #define GR_ATT_NB_SCREENS	"number of screens"
+#define GR_ATT_ARR_SCREENS	"arrangement of screens"
 #define GR_ATT_CUR_DRV		"current driver"
 
 #define GR_SCT_PLAYABLE_DOV     "Playable Cameras Distance of Views"
