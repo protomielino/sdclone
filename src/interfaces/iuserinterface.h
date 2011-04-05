@@ -76,6 +76,16 @@ public:
 
 	virtual void activateStandingsMenu(void *prevHdle, struct RmInfo *info, int start = 0) = 0;
 
+	// Graphics engine control.
+	virtual bool initializeGraphics() = 0;
+	virtual bool loadTrackGraphics(struct Track* pTrack) = 0;
+	virtual bool loadCarsGraphics(struct Situation *pSituation) = 0;
+	virtual bool setupGraphicsView() = 0;
+	virtual void updateGraphicsView(struct Situation *pSituation) = 0;
+	virtual void unloadCarsGraphics() = 0;
+	virtual void unloadTrackGraphics() = 0;
+	virtual void shutdownGraphics() = 0;
+
 	virtual void setRaceEngine(IRaceEngine& raceEngine) = 0;
 };
 

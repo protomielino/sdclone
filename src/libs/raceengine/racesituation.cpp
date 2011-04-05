@@ -89,7 +89,8 @@ tRmInfo* ReSituationAllocInit(const tRmInfo* pSource)
 	// Assign level 2 constants in raceEngineInfo field.
 	pTarget->_reParam = pSource->_reParam; // Not used / written by updater.
 	pTarget->_reTrackItf = pSource->_reTrackItf; // Not used / written by updater.
-	pTarget->_reGraphicItf = pSource->_reGraphicItf; // Not used / written by updater.
+	// TODO : Remove (old graphics setup)
+	//	pTarget->_reGraphicItf = pSource->_reGraphicItf; // Not used / written by updater.
 	pTarget->_reSimItf = pSource->_reSimItf; // Not used / written by updater.
 	pTarget->_reGameScreen = pSource->_reGameScreen; // Nor changed nor shared during the race.
 	pTarget->_reMenuScreen = pSource->_reMenuScreen; // Nor changed nor shared during the race.

@@ -28,6 +28,7 @@
 
 #include <tgf.hpp>
 
+class IGraphicsEngine;
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -93,6 +94,15 @@ public:
 
 	virtual void activateStandingsMenu(void *prevHdle, struct RmInfo *info, int start = 0);
 
+	// Graphics engine control.
+	virtual bool initializeGraphics();
+	virtual bool loadTrackGraphics(struct Track* pTrack);
+	virtual bool loadCarsGraphics(struct Situation *pSituation);
+	virtual bool setupGraphicsView();
+	virtual void updateGraphicsView(struct Situation *pSituation);
+	virtual void unloadCarsGraphics();
+	virtual void unloadTrackGraphics();
+	virtual void shutdownGraphics();
 	virtual void setRaceEngine(IRaceEngine& raceEngine);
 
 	// Accessor to the singleton.
@@ -113,6 +123,9 @@ protected:
 
 	// The race engine.
 	IRaceEngine* _piRaceEngine;
+
+	// The graphics engine.
+	IGraphicsEngine* _piGraphicsEngine;
 
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);

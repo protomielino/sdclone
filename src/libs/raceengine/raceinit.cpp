@@ -157,9 +157,9 @@ void ReShutdown(void)
 	/* Free previous situation */
 	ReInfo->_reTrackItf.trkShutdown();
 
+	// Unload modules.
     GfModUnloadList(&reEventModList);
-
-    memset( &ReInfo->_reGraphicItf, 0, sizeof(tGraphicItf) );
+	RaceEngine::self().userInterface().shutdownGraphics();
 
     if (ReInfo->results) 
     {
@@ -866,43 +866,35 @@ ReInitCars(void)
 
 /**
  * This function initializes the graphics.
- * This function must be called after the cars are loaded and the track is loaded.
+ * It must be called after the cars are loaded and the track is loaded.
  * The track will be unloaded if the event ends. The graphics module is kept open
  * if more than one race is driven.
  */
 void ReInitGraphics()
 {
-  char const *dllname;
-  char key[256];
+	// Initialize the graphics engine.
+	if (RaceEngine::self().userInterface().initializeGraphics())
+	{
+		// Initialize the track graphics.
+		RaceEngine::self().userInterface().loadTrackGraphics(ReInfo->track);
 
-  /* Check if the module is already loaded */
-  if (ReInfo->_reGraphicItf.refresh)
-    return; /* Module is already loaded: don't load again */
-    
-  /* Load the graphic module */
-  GfLogInfo("Loading Graphic Engine...\n");
-  dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "graphic", "");
-  snprintf(key, sizeof(key), "%smodules/graphic/%s.%s", GfLibDir(), dllname, DLLEXT);
-  if (GfModLoad(0, key, &reEventModList))
-	  return;
-  reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reGraphicItf);
-
-  ReInfo->_reGraphicItf.inittrack(ReInfo->track);
+		// Initialize the graphics view.
+		RaceEngine::self().userInterface().setupGraphicsView();
+	}
 }
 
 void
 ReRaceCleanup(void)
 {
   ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceEventLoopHook();
+
   ReInfo->_reSimItf.shutdown();
+
   if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) 
-  {
-    if (ReInfo->_reGraphicItf.shutdowncars)
-      ReInfo->_reGraphicItf.shutdowncars();
-    else
-      GfLogError("WARNING: normal race display but graphical module not loaded !\n" );
-  }
+	  RaceEngine::self().userInterface().unloadCarsGraphics();
+
   ReStoreRaceResults(ReInfo->_reRaceName);
+
   ReRaceCleanDrivers();
 }
 

@@ -27,7 +27,8 @@
 #define _RACEUPDATE_H_
 
 extern void ReInitUpdaters();
-extern void ReInitCarGraphics();
+// TODO: Remove (old graphics setup): code moved into ReRaceRealStart
+//extern void ReInitCarGraphics();
 extern void ReShutdownUpdaters();
 
 extern void ReAccelerateTime(double fMultFactor);

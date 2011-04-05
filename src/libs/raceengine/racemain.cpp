@@ -27,8 +27,6 @@
 #include <robot.h>
 #include <network.h>
 
-#include <tgfclient.h> // TODO: Remove when GfScrGetSize no more needed.
-
 #include "raceengine.h"
 
 #include "raceutil.h" // RmGetFeaturesList
@@ -82,13 +80,14 @@ void ReRaceAbort()
 	ReShutdownUpdaters();
 
 	ReInfo->_reSimItf.shutdown();
-	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
-		if (ReInfo->_reGraphicItf.shutdowncars)
-			ReInfo->_reGraphicItf.shutdowncars();
-	}
 
-	if (ReInfo->_reGraphicItf.shutdowntrack)
-		ReInfo->_reGraphicItf.shutdowntrack();
+	// TODO: Move these 2 unloadXXGrahics calls to the user interface module ?
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
+		RaceEngine::self().userInterface().unloadCarsGraphics();
+
+	// TODO: only if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) ?
+	RaceEngine::self().userInterface().unloadTrackGraphics();
+	
 	ReRaceCleanDrivers();
 
 	if (GetNetwork())
@@ -255,7 +254,6 @@ int
 ReRaceRealStart(void)
 {
 	int i, j;
-	int sw, sh, vw, vh;
 	tRobotItf *robot;
 	tReCarInfo *carInfo;
 	const char *dllname;
@@ -294,7 +292,6 @@ ReRaceRealStart(void)
 	/* Blind mode or not */
 	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
 	ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceScreen();
-	//foundHuman = 0;
 
 	//Check if there is a human in the current race
 	for (i = 0; i < s->_ncars; i++) {
@@ -345,11 +342,12 @@ ReRaceRealStart(void)
 	carInfo = ReInfo->_reCarInfo;
 	RtTeamManagerStart();
 
-	/* Initialize graphical module */
+	// Initialize graphics engine
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL
 		|| ReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
 		ReInitGraphics();
 
+	// Initialize physics engine
 	ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
 	for (i = 0; i < s->_ncars; i++) {
 		carInfo[i].prevTrkPos = s->cars[i]->_trkPos;
@@ -386,10 +384,6 @@ ReRaceRealStart(void)
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
 	ReInfo->s->_raceState = RM_RACE_STARTING;
 
-	GfScrGetSize(&sw, &sh, &vw, &vh); // Last tgfclient dependency.
-	if (ReInfo->_reGraphicItf.initview)
-		ReInfo->_reGraphicItf.initview((sw-vw)/2, (sh-vh)/2, vw, vh, GR_VIEW_STD, ReInfo->_reGameScreen);
-
 	ReInfo->_reInPitMenuCar = 0;
 	ReInfo->_reMessage = 0;
 	ReInfo->_reMessageEnd = 0.0;
@@ -397,10 +391,11 @@ ReRaceRealStart(void)
 	ReInfo->_reBigMessageEnd = 0.0;
 	
 	ReInitUpdaters();
-	
+
+	// Initalize cars graphics.
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		RaceEngine::self().userInterface().addLoadingMessage("Loading cars ...");
-		ReInitCarGraphics();
+		RaceEngine::self().userInterface().loadCarsGraphics(ReInfo->s);
 	}
 
 	if (GetNetwork())

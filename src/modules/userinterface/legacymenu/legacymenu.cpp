@@ -16,7 +16,11 @@
  *                                                                         *
  ***************************************************************************/
  
+#include <string>
+#include <sstream>
+
 #include <iraceengine.h>
+#include <igraphicsengine.h>
 
 #include <tgfclient.h>
 
@@ -64,7 +68,7 @@ LegacyMenu& LegacyMenu::self()
 }
 
 LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
-: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0)
+: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0), _piGraphicsEngine(0)
 {
 }
 
@@ -217,6 +221,85 @@ void LegacyMenu::eraseResultsMenu()
 void LegacyMenu::activateStandingsMenu(void *prevHdle, tRmInfo *reInfo, int start)
 {
 	::RmShowStandings(prevHdle, reInfo, start);
+}
+
+// Graphics engine control.
+bool LegacyMenu::initializeGraphics()
+{
+	// Check if the module is already loaded, and do nothing more if so.
+	if (_piGraphicsEngine)
+		return true;
+
+	// Load the graphics module
+	std::ostringstream ossModLibName;
+	ossModLibName << GfLibDir() << "modules/graphic/"
+				  << GfParmGetStr(_piRaceEngine->data()->_reParam, "Modules", "graphic", "")
+				  << '.' << DLLEXT;
+	GfModule* pmodGrEngine = GfModule::load(ossModLibName.str());
+
+	// Check that it implements IGraphicsEngine.
+	if (pmodGrEngine)
+		_piGraphicsEngine = pmodGrEngine->getInterface<IGraphicsEngine>();
+	if (!_piGraphicsEngine)
+		GfLogError("IGraphicsEngine not implemented by %s\n", ossModLibName.str().c_str());
+
+	return _piGraphicsEngine != 0;
+}
+
+bool LegacyMenu::loadTrackGraphics(struct Track* pTrack)
+{
+	return _piGraphicsEngine ? _piGraphicsEngine->loadTrack(pTrack) : false;
+}
+
+bool LegacyMenu::loadCarsGraphics(struct Situation *pSituation)
+{
+	return _piGraphicsEngine ? _piGraphicsEngine->loadCars(pSituation) : false;
+}
+
+bool LegacyMenu::setupGraphicsView()
+{
+	// Initialize the graphics view.
+	if (!_piGraphicsEngine)
+		return false;
+	
+	// Retrieve the screen dimensions.
+	int sw, sh, vw, vh;
+	GfScrGetSize(&sw, &sh, &vw, &vh);
+	
+	// Setup the graphics view.
+	return _piGraphicsEngine->setupView((sw-vw)/2, (sh-vh)/2, vw, vh,
+										_piRaceEngine->data()->_reGameScreen);
+}
+void LegacyMenu::updateGraphicsView(struct Situation *pSituation)
+{
+	if (_piGraphicsEngine)
+		_piGraphicsEngine->updateView(pSituation);
+}
+
+void LegacyMenu::unloadCarsGraphics()
+{
+	if (_piGraphicsEngine)
+		_piGraphicsEngine->unloadCars();
+}
+
+void LegacyMenu::unloadTrackGraphics()
+{
+	if (_piGraphicsEngine)
+		_piGraphicsEngine->unloadTrack();
+}
+
+void LegacyMenu::shutdownGraphics()
+{
+	// Do nothing if the module has already been unloaded.
+	if (!_piGraphicsEngine)
+		return;
+
+	// Unload the graphics module.
+	GfModule* pmodGrEngine = dynamic_cast<GfModule*>(_piGraphicsEngine);
+	GfModule::unload(pmodGrEngine);
+
+	// And remember it was.
+	_piGraphicsEngine = 0;
 }
 
 void LegacyMenu::setRaceEngine(IRaceEngine& raceEngine)

@@ -224,7 +224,7 @@ ReNetworkWaitReady()
 		ReInfo->_refreshDisplay = 1;
 		RaceEngine::self().userInterface().update();
 
-		ReInfo->_reGraphicItf.refresh(ReInfo->s);
+		RaceEngine::self().userInterface().updateGraphicsView(ReInfo->s);
 	}
 
 	return mode;

@@ -26,6 +26,7 @@
 #include <plib/ssg.h>
 #include <glfeatures.h> // GfglFeatures
 #include <robot.h>	//ROB_SECT_ARBITRARY
+#include <graphic.h>
 
 #include "grmain.h"
 #include "grshadow.h"
@@ -358,8 +359,6 @@ grSwitchMirror(void * /* dummy */)
     grGetCurrentScreen()->switchMirror();
 }
 
-//bool
-//SsgGraph::initView(int x, int y, int width, int height, void* pMenuScreen)
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
@@ -391,7 +390,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     	grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     }
 
+	// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
+	 	grScreens[i] = new cGrScreen(i);
 		grScreens[i]->initBoard ();
     }
 
@@ -440,8 +441,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 }
 
 
-//void
-//SsgGraph::updateView(tSituation* s)
 int
 refresh(tSituation *s)
 {
@@ -493,8 +492,6 @@ refresh(tSituation *s)
     return 0;
 }
 
-//bool
-//SsgGraph::initCars(tSituation* s)
 int
 initCars(tSituation *s)
 {
@@ -585,8 +582,6 @@ initCars(tSituation *s)
     return 0; // true;
 }
 
-//void
-//SsgGraph::shutdownCars()
 void
 shutdownCars(void)
 {
@@ -628,8 +623,6 @@ shutdownCars(void)
 				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
-//bool
-//SsgGraph::initTrack(tTrack* pTrack)
 int
 initTrack(tTrack *track)
 {
@@ -641,16 +634,10 @@ initTrack(tTrack *track)
 	if (grNbActiveScreens > 0)
 		grLoadScene(track);
 
-	for (int i = 0; i < GR_NB_MAX_SCREEN; i++) {
-		grScreens[i] = new cGrScreen(i);
-	}
-
-	return 0; // true;
+	return 0;
 }
 
 
-//void
-//SsgGraph::shutdownTrack()
 void
 shutdownTrack(void)
 {

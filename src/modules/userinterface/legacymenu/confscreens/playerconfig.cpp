@@ -26,6 +26,7 @@
 #include <tgfclient.h>
 #include <robot.h>
 #include <playerpref.h>
+#include <graphic.h>
 #include <gui.h>
 
 #include "controlconfig.h"

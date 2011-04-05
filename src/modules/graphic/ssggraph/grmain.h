@@ -21,13 +21,15 @@
 #define _GRMAIN_H_
 
 #include <plib/ssg.h>	//ssgContect
-#include <raceman.h>	//tSituation
 
 #ifdef WIN32
 #include <windows.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #endif
+
+#include <graphic.h>
+#include <raceman.h>	//tSituation
 
 
 #ifdef WIN32

@@ -79,9 +79,10 @@ ReTrackInit(void)
 
 	reTrackDump(ReInfo->track, 0);
 
+	// TODO: Remove (old graphics setup, and anyway : not needed ?)
 	// Make the graphics engine aware of the possibly changed track.
-	if (ReInfo->_reGraphicItf.inittrack)
-		ReInfo->_reGraphicItf.inittrack(ReInfo->track);
+	// if (ReInfo->_reGraphicItf.inittrack)
+	// 	ReInfo->_reGraphicItf.inittrack(ReInfo->track);
 
 	return 0;
 }//ReTrackInit
@@ -415,8 +416,10 @@ reTrackUpdatePhysics(void)
 int
 ReTrackShutdown(void)
 {
-	if (ReInfo->_reGraphicItf.shutdowntrack)
-		ReInfo->_reGraphicItf.shutdowntrack();
+	// TODO: Remove (old graphics setup)
+	// if (ReInfo->_reGraphicItf.shutdowntrack)
+	// 	ReInfo->_reGraphicItf.shutdowntrack();
+	RaceEngine::self().userInterface().unloadTrackGraphics();
 
 	return 0;
 }

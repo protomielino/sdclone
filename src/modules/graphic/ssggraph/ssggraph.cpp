@@ -17,130 +17,105 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#else
-#include <GL/gl.h>
-#endif
+#include "ssggraph.h"
 
 #include "grmain.h"
 #include "grtexture.h"
 
-#ifdef DMALLOC
-#include "dmalloc.h"
-#endif
 
-// Default SSG loader options for ssgInit (workaround try for ssggraph crash at re-load time).
-static ssgLoaderOptions* DefaultSSGLoaderOptions = 0;
+// The SsgGraph: singleton.
+SsgGraph* SsgGraph::_pSelf = 0;
 
-
-static int
-graphInit(int /* idx */, void *pt)
+int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
-    tGraphicItf *itf = (tGraphicItf*)pt;
-    
-    itf->inittrack     = initTrack;
-    itf->initcars      = initCars;
-    itf->initview      = initView;
-    itf->refresh       = refresh;
-    itf->shutdowncars  = shutdownCars;
-    itf->shutdowntrack = shutdownTrack;
-    //itf->bendcar       = bendCar;
-    return 0;
+	// Instanciate the (only) module instance.
+	SsgGraph::_pSelf = new SsgGraph(pszShLibName, hShLibHandle);
+
+	// Register it to the GfModule module manager if OK.
+	if (SsgGraph::_pSelf)
+		GfModule::register_(SsgGraph::_pSelf);
+
+	// Report about success or error.
+	return SsgGraph::_pSelf ? 0 : 1;
 }
 
-/*
- * Function
- *	moduleWelcome
- *
- * Description
- *	First function of the module called at load time :
- *      - the caller gives the module some information about its run-time environment
- *      - the module gives the caller some information about what he needs
- *
- * Parameters
- *	welcomeIn  : Run-time info given by the module loader at load time
- *	welcomeOut : Module run-time information returned to the called
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	MUST be called before moduleInitialize()
- */
-extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
-
+int closeGfModule()
 {
-    welcomeOut->maxNbItf = 1;
+	// Unregister it from the GfModule module manager.
+	if (SsgGraph::_pSelf)
+		GfModule::unregister(SsgGraph::_pSelf);
+	
+	// Delete the (only) module instance.
+	delete SsgGraph::_pSelf;
+	SsgGraph::_pSelf = 0;
 
-    return 0;
+	// Report about success or error.
+	return 0;
 }
 
-/*
- * Function
- *	moduleInitialize
- *
- * Description
- *	Module entry point
- *
- * Parameters
- *	modInfo : Module interfaces info array to fill-in
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	
- */
-extern "C" int moduleInitialize(tModInfo *modInfo)
+SsgGraph& SsgGraph::self()
 {
-    modInfo->name = "ssggraph";		        		/* name of the module (short) */
-    modInfo->desc = "The graphics module built on top of PLib ssg";	/* description of the module (can be long) */
-    modInfo->fctInit = graphInit;				/* init function */
-    modInfo->gfId = 1;						/* v 1  */
-    modInfo->index = 0;
+	// Pre-condition : 1 successfull openGfModule call.
+	return *_pSelf;
+}
 
-	// Override default SSG loader option with ours
+SsgGraph::SsgGraph(const std::string& strShLibName, void* hShLibHandle)
+: GfModule(strShLibName, hShLibHandle)
+{
+	// Override the default SSG loader options object with our's
 	// (workaround try for ssggraph crash at re-load time).
-	DefaultSSGLoaderOptions = new ssgLoaderOptions;
-	ssgSetCurrentOptions(DefaultSSGLoaderOptions);
+	_pDefaultSSGLoaderOptions = new ssgLoaderOptions;
+	ssgSetCurrentOptions(_pDefaultSSGLoaderOptions);
 
-	// Initialize PLib SSG layer.
+	// Initialize the PLib SSG layer.
     ssgInit();
 
 	//Setup image loaders
 	grRegisterCustomSGILoader();
-
-    return 0;
 }
 
-/*
- * Function
- *	moduleTerminate
- *
- * Description
- *	Module exit point
- *
- * Parameters
- *	None
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	
- */
-extern "C" int moduleTerminate()
+SsgGraph::~SsgGraph()
 {
-	delete DefaultSSGLoaderOptions;
-	
-    return 0;
+	// Terminate the PLib SSG layer.
+	delete _pDefaultSSGLoaderOptions;
 }
 
+// Implementation of IGraphicsEngine ****************************************
+bool SsgGraph::loadTrack(tTrack* pTrack)
+{
+	return ::initTrack(pTrack) == 0;
+}
+
+bool SsgGraph::loadCars(tSituation* pSituation)
+{ 
+	return ::initCars(pSituation) == 0;
+}
+
+bool SsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
+{
+	return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
+}
+
+void SsgGraph::updateView(tSituation* pSituation)
+{
+	::refresh(pSituation);
+}
+
+void SsgGraph::shutdownView()
+{
+}
+
+void SsgGraph::unloadCars()
+{
+	::shutdownCars();
+}
+
+void SsgGraph::unloadTrack()
+{
+	::shutdownTrack();
+}
+
+// void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
+// {
+// 	::bendCar(index, poc, force, count);
+// }
