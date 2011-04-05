@@ -32,7 +32,7 @@
 # define soLibHandle(handle) (void*)handle
 #else
 # include <dlfcn.h>
-# define dlopen(soFileName) dlopen(soFileName, RTLD_LAZY)
+# define dlopen(soFileName) dlopen(soFileName, RTLD_LAZY|RTLD_GLOBAL)
 # define soLibHandle(handle) handle
 #endif
 
