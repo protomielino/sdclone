@@ -40,7 +40,7 @@ IF(UNIX)
     SET_TARGET_PROPERTIES(ssggraph PROPERTIES PREFIX "")
 ENDIF(UNIX)
 
-ADD_PLIB_LIBRARY(ssggraph ssg ul sg sl ssg ssgaux)
+ADD_PLIB_LIBRARY(ssggraph ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(ssggraph)
 
 ADD_SDLIB_LIBRARY(ssggraph tgf tgfclient robottools)
