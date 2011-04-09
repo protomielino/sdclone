@@ -36,7 +36,7 @@
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef tgf_EXPORTS
+# ifdef TGF_DLL
 #  define TGF_API __declspec(dllexport)
 # else
 #  define TGF_API __declspec(dllimport)

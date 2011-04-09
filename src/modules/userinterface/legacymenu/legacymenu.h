@@ -32,7 +32,7 @@ class IGraphicsEngine;
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef legacymenu_EXPORTS
+# ifdef LEGACYMENU_DLL
 #  define LEGACYMENU_API __declspec(dllexport)
 # else
 #  define LEGACYMENU_API __declspec(dllimport)

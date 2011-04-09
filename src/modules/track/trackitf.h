@@ -28,7 +28,7 @@
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef track_EXPORTS
+# ifdef TRACK_DLL
 #  define TRACK_API __declspec(dllexport)
 # else
 #  define TRACK_API __declspec(dllimport)
