@@ -290,7 +290,6 @@ extern "C" int moduleInitialize(tModInfo *modInfo)
     // Open and load the networkhuman drivers params file
     sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GfLocalDir());
     drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-    char stopped = FALSE;
     
     sprintf(buf, "%sdrivers/networkhuman/networkhuman.xml", GfLocalDir());
     void *DrvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);

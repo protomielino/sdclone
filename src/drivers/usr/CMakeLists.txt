@@ -20,6 +20,7 @@ SET(ROBOT_SOURCES
   src/driver.cpp
   src/linalg.h
   src/mod.h
+  src/mod.cpp
   src/opponent.h
   src/opponent.cpp
   src/pit.h

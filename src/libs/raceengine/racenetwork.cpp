@@ -36,9 +36,9 @@ reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 	tDynPt *pDynCG = NULL;
 	pDynCG = ReInfo->_reSimItf.getsimcartable(pCt->startRank);
 
-	double errX = pDynCG->pos.x-pCt->DynGCg.pos.x;
-	double errY = pDynCG->pos.y-pCt->DynGCg.pos.y;
-	double errZ = pDynCG->pos.z-pCt->DynGCg.pos.z;
+	// double errX = pDynCG->pos.x-pCt->DynGCg.pos.x;
+	// double errY = pDynCG->pos.y-pCt->DynGCg.pos.y;
+	// double errZ = pDynCG->pos.z-pCt->DynGCg.pos.z;
 
 	int idx = GetNetwork()->GetCarIndex(pCt->startRank,ReInfo->s);
 	
@@ -143,7 +143,6 @@ ReNetworkOneStep()
 	pNData->m_vecCarCtrls.clear();
 
 	//do car status updates if needed
-	CarStatus *pStatus = NULL;
 	numCars = pNData->m_vecCarStatus.size();
 	time = 0.0f;
 
@@ -167,7 +166,6 @@ ReNetworkOneStep()
 	}
 
 	//do lap status updates if needed
-	LapStatus *pLapStatus = NULL;
 	numCars = 0;
 	time = 0.0f;
 	numCars = pNData->m_vecLapStatus.size();

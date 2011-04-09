@@ -144,11 +144,11 @@ GetTrackName(const char *category, const char *trackName)
     return name;
 }
 
-static void
-onChangeCarCategory(void * pData)
-{
-	
-}
+// Never used : remove ?
+// static void
+// onChangeCarCategory(void * pData)
+// {
+// }
 
 static std::string
 GetTrackPreviewFileName(const char *pszCategory, const char *pszTrack)
@@ -369,7 +369,6 @@ CheckDriversCategory()
 		GfCars::self()->getCarIdsInCategory(strCarCat);
 
 	//Make sure all cars are in the correct category or force change of car
-	Driver *pDrivers = NULL;
 	unsigned int count = 0;
 	ServerMutexData *pSData = GetServer()->LockServerData();
 
@@ -481,16 +480,17 @@ NetworkRaceInfo()
 
 	//Look up race info
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
-	void *params = reInfo->params =
+	reInfo->params =
 		GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 }
 
-static void
-NetworkDisplay(void)
-{
-}
+// Never used : remove ?
+// static void
+// NetworkDisplay(void)
+// {
+// }
 
 static void OnActivateNetworkClient(void *)
 {

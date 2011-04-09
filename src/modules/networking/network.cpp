@@ -614,15 +614,13 @@ void Network::ReadLapStatusPacket(ENetPacket *pPacket)
 	unsigned char *pData = &pPacket->data[1];
 	
 	LapStatus lstatus;
-	//time
-	double packettime=0;
 	memcpy(&lstatus,pData,sizeof(lstatus));
 	
 	MutexData *pNData = LockNetworkData();
 	bool bFound = false;
 	for (unsigned int i=0;i<pNData->m_vecLapStatus.size();i++)
 	{
-		if (pNData->m_vecLapStatus[i].startRank = lstatus.startRank)
+		if (pNData->m_vecLapStatus[i].startRank == lstatus.startRank)
 		{
 			bFound = true;
 			pNData->m_vecLapStatus[i] = lstatus;
@@ -878,10 +876,11 @@ bool AddressMatch(ENetAddress &a1,ENetAddress &a2)
 	return false;
 };
 
-static int
-networkInit(int /* idx */, void *pt)
-{
-    return 0;
-}
+// Never used : remove ?
+// static int
+// networkInit(int /* idx */, void *pt)
+// {
+//     return 0;
+// }
 
 

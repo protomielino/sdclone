@@ -370,7 +370,6 @@ GfTrack* GfTracks::getFirstUsableTrack(const std::string& strFromCatId,
 	nSearchDir = nSearchDir > 0 ? +1 : -1;
 	
 	// Retrieve and check category.
-	const std::vector<std::string>& vecCatIds = GfTracks::self()->getCategoryIds();
 	std::vector<std::string>::const_iterator itFromCat =
 		std::find(_pPrivate->vecCatIds.begin(), _pPrivate->vecCatIds.end(), strFromCatId);
 	if (itFromCat == _pPrivate->vecCatIds.end())

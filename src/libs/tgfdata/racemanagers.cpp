@@ -489,7 +489,7 @@ const std::string& GfRaceManager::getSubType() const
 	return _strSubType;
 }
 
-const int GfRaceManager::getPriority() const
+int GfRaceManager::getPriority() const
 {
 	return _nPriority;
 }
@@ -546,9 +546,7 @@ GfTrack* GfRaceManager::getEventTrack(unsigned nEventIndex)
 
 	if (!_vecEventTrackIds.empty())
 	{
-		if (nEventIndex < 0)
-			nEventIndex = 0;
-		else if (nEventIndex >= _vecEventTrackIds.size())
+		if (nEventIndex >= _vecEventTrackIds.size())
 			nEventIndex = _vecEventTrackIds.size() - 1;
 	
 		pTrack =
@@ -566,9 +564,7 @@ void GfRaceManager::setEventTrack(unsigned nEventIndex, GfTrack* pTrack)
 	if (!pTrack || _vecEventTrackIds.empty())
 		return;
 	
-	if (nEventIndex < 0)
-		nEventIndex = 0;
-	else if (nEventIndex >= _vecEventTrackIds.size())
+	if (nEventIndex >= _vecEventTrackIds.size())
 		nEventIndex = _vecEventTrackIds.size() - 1;
 
 	_vecEventTrackIds[nEventIndex] = pTrack->getId();
@@ -588,9 +584,7 @@ GfTrack* GfRaceManager::getPreviousEventTrack(unsigned nEventIndex)
 
 	if (!_vecEventTrackIds.empty())
 	{
-		if (nEventIndex < 0)
-			nEventIndex = 0;
-		else if (nEventIndex >= _vecEventTrackIds.size())
+		if (nEventIndex >= _vecEventTrackIds.size())
 			nEventIndex = _vecEventTrackIds.size() - 1;
 
 		if (nEventIndex >= 1)

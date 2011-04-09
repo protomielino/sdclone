@@ -1299,7 +1299,7 @@ void TDriver::Drive()
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
 
-  double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
+  /*double TrackRollangle = */ oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
 //  cTimeSum[0] += RtDuration(StartTimeStamp);
 
   AvoidOtherCars(oLanePoint.Crv,Close,oLetPass); // General avoiding
@@ -2614,7 +2614,7 @@ void TDriver::BrakingForceRegulator()
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
 //  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
-  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
+  	      /*double Friction = */ oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
 		  oLastPosIdx = PosIdx;
 	    }
   	  }
@@ -2683,7 +2683,7 @@ void TDriver::BrakingForceRegulatorAvoid()
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
 //  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.5);
-  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
+  	      /*double Friction = */oTrackDesc.LearnFriction(PosIdx, Delta, 0.9);
   		  oLastPosIdx = PosIdx;
 	    }
 	  }
@@ -2746,7 +2746,7 @@ void TDriver::BrakingForceRegulatorTraffic()
 	    if (fabs(Err) > 8.0)
   	    {
 	      double Delta = - Sign(Err) * MAX(0.01,(fabs(Err) - 8.0)/50.0);
-  	      double Friction = oTrackDesc.LearnFriction(PosIdx, Delta, 0.90);
+  	      /*double Friction = */oTrackDesc.LearnFriction(PosIdx, Delta, 0.90);
   		  oLastPosIdx = PosIdx;
 	    }
 	  }

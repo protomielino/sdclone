@@ -151,11 +151,11 @@ rmApplyState(void *pvState)
 }
 
 #ifdef DEBUG
-static void
-rmOneStep(void *pvState)
-{
-    LegacyMenu::self().raceEngine().step((int)(long)pvState);
-}
+// static void
+// rmOneStep(void *pvState)
+// {
+//     LegacyMenu::self().raceEngine().step((int)(long)pvState);
+// }
 #endif
 
 static void

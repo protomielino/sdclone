@@ -652,7 +652,6 @@ void GfRace::store()
 	}
 	
 	// Save focused competitor data to the raceman params.
-	const GfDriver* pFocComp = getFocusedCompetitor();
 	GfParmSetStr(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSED,
 				 _pPrivate->strFocusedModuleName.c_str());
 	GfParmSetNum(hparmRaceMan, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL,
@@ -887,8 +886,6 @@ bool GfRace::moveCompetitor(GfDriver* pComp, int nDeltaPlace)
 
 bool GfRace::removeAllCompetitors()
 {
-	const bool bAnyRemoved = !_pPrivate->vecCompetitors.empty();
-
 	_pPrivate->vecCompetitors.clear();
 
 	// Now we are no more consistent with the race params (in memory).

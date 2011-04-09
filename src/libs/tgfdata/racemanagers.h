@@ -49,7 +49,7 @@ public:
 	const std::string& getName() const;
 	const std::string& getType() const;
 	const std::string& getSubType() const;
-	const int getPriority() const;
+	int getPriority() const;
 
 	bool isNetwork() const;
 	bool acceptsDriverType(const std::string& strType) const;

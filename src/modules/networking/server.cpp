@@ -82,6 +82,11 @@ void Server::ResetNetwork()
 				GfLogTrace ("Disconnection succeeded.");
 				bDisconnect=true;
 				break;
+				
+			case ENET_EVENT_TYPE_NONE:
+			case ENET_EVENT_TYPE_CONNECT:
+				// Do nothing.
+				break;
 			}
 		}
 
@@ -792,6 +797,10 @@ bool Server::listen()
             /* Reset the peer's client information. */
 
             event.peer -> data = NULL;
+			break;
+			
+		case ENET_EVENT_TYPE_NONE:
+			// Do nothing.
 			break;
         }
     }

@@ -85,12 +85,12 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
     /* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
     if ((curMod = GfModIsInList(sopath, *modlist)) != 0)
     {
-      GfOut("Module %s already loaded\n", sopath);
+      GfLogInfo("Module %s already loaded\n", sopath);
       GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
       return 0;
     }
 
-    GfOut("Loading module %s\n", sopath);
+    GfLogInfo("Loading module %s\n", sopath);
     
     /* Load the shared library */
     handle = dlopen(sopath, RTLD_LAZY);
@@ -106,13 +106,13 @@ linuxModLoad(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 	else 
 	{
 	    dlclose(handle);
-	    GfError("linuxModLoad: Module init function failed %s\n", sopath);
+	    GfLogError("linuxModLoad: Module init function failed %s\n", sopath);
 	    return -1;
 	}
     }
     else
     {
-	GfError("linuxModLoad: ...  %s\n", dlerror());
+	GfLogError("linuxModLoad: ...  %s\n", dlerror());
 	return -1;
     }
     
@@ -155,12 +155,12 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
     /* Try and avoid loading the same module twice (WARNING: Only checks sopath equality !) */
     if ((curMod = GfModIsInList(sopath, *modlist)) != 0)
     {
-      GfOut("Module %s already requested\n", sopath);
+      GfLogInfo("Module %s already requested\n", sopath);
       GfModMoveToListHead(curMod, modlist); // Force module to be the first in the list.
       return infoSts;
     }
 
-    GfOut("Querying module %s\n", sopath);
+    GfLogTrace("Querying module %s\n", sopath);
 
     /* Load the shared library */
     handle = dlopen(sopath, RTLD_LAZY);
@@ -180,7 +180,7 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
 	} 
 	else 
 	{
-	    GfOut("linuxModInfo: Module init function failed %s\n", sopath);
+	    GfLogError("linuxModInfo: Module init function failed %s\n", sopath);
 	    infoSts = -1;
 	}
 
@@ -189,7 +189,7 @@ linuxModInfo(unsigned int /* gfid */, const char *sopath, tModList **modlist)
     } 
     else 
     {
-	GfError("linuxModInfo: ...  %s\n", dlerror());
+	GfLogError("linuxModInfo: ...  %s\n", dlerror());
 	infoSts = -1;
     }
     
@@ -246,7 +246,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		if (!GfModIsInList(sopath, *modlist))
 		{
 		    /* Load the shared library */
-		    GfOut("Loading module %s\n", sopath);
+		    GfLogInfo("Loading module %s\n", sopath);
 		    handle = dlopen(sopath, RTLD_LAZY);
 		    if (handle)
 		    {
@@ -268,7 +268,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
 		    }
 		    else
 		    {
-		        GfOut("linuxModLoadDir: ...  %s\n", dlerror());
+		        GfLogError("linuxModLoadDir: ...  %s\n", dlerror());
 			modnb = -1;
 			break;
 		    }
@@ -279,7 +279,7 @@ linuxModLoadDir(unsigned int gfid, const char *dir, tModList **modlist)
     }
     else 
     {
-	GfOut("linuxModLoadDir: ... Couldn't open the directory %s\n", dir);
+	GfLogError("linuxModLoadDir: ... Couldn't open the directory %s\n", dir);
 	modnb = -1;
     }
 
@@ -343,12 +343,12 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 		if (!GfModIsInList(sopath, *modlist))
 		{
 		    /* Load the shared library */
-		    GfOut("Querying module %s\n", sopath);
+		    GfLogTrace("Querying module %s\n", sopath);
 		    handle = dlopen(sopath, RTLD_LAZY);
 		    if (handle)
 		    {
 			/* Initialize the module */
-		        GfOut("Request info for %s\n", sopath);
+		        GfLogTrace("Request info for %s\n", sopath);
 		        if (GfModInitialize(handle, sopath, GfIdAny, &curMod) == 0)
 			{
 			    if (curMod) /* Retained against gfid */
@@ -367,7 +367,7 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 		    } 
 		    else 
 		    {
-		        GfOut("linuxModInfoDir: ...  %s\n", dlerror());
+		        GfLogError("linuxModInfoDir: ...  %s\n", dlerror());
 		    }
 		}
 	    }
@@ -376,7 +376,7 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
     } 
     else 
     {
-	GfOut("linuxModInfoDir: ... Couldn't open the directory %s.\n", dir);
+	GfLogError("linuxModInfoDir: ... Couldn't open the directory %s.\n", dir);
 	return -1;
     }
 
@@ -424,7 +424,7 @@ linuxModUnloadList(tModList **modlist)
 	// Comment out for valgrind runs, be aware that the driving with the keyboard does
 	// just work to first time this way.
 	dlclose(curMod->handle);
-	GfOut("Unloaded module %s\n", curMod->sopath);
+	GfLogInfo("Unloaded module %s\n", curMod->sopath);
 
 	GfModInfoFreeNC(curMod->modInfo, curMod->modInfoSize);
 	free(curMod->sopath);
@@ -661,11 +661,11 @@ unsigned linuxGetNumberOfCPUs()
 
 		if (nCPUs < 1)
 		{
-			GfOut("Could not get the number of CPUs here ; assuming only 1\n");
+			GfLogWarning("Could not get the number of CPUs here ; assuming only 1\n");
 			nCPUs = 1;
 		}
 		else
-			GfOut("Detected %d CPUs\n", nCPUs);
+			GfLogInfo("Detected %d CPUs\n", nCPUs);
 	}
 
 	return nCPUs;
@@ -707,7 +707,7 @@ linuxSetThreadAffinity(int nCPUId)
 // MacOS X, FreeBSD, OpenBSD, NetBSD, etc ...
 #if defined(__APPLE__) || defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__NetBSD__)
 
-    GfOut("Warning: Thread affinity not yet implemented on Mac OS X or BSD.\n");
+    GfLogWarning("Thread affinity not yet implemented on Mac OS X or BSD.\n");
 	// TODO.
 
 // Linux, Solaris, AIX ... with NPTL (Native POSIX Threads Library)
@@ -723,7 +723,7 @@ linuxSetThreadAffinity(int nCPUId)
 	{
 		// No special affinity on any CPU => set "system" affinity mask
 		// (1 bit for each installed CPU).
-		for (int nCPUIndex = 0; nCPUIndex < linuxGetNumberOfCPUs(); nCPUIndex++)
+		for (int nCPUIndex = 0; (unsigned)nCPUIndex < linuxGetNumberOfCPUs(); nCPUIndex++)
 		{
 			CPU_SET(nCPUIndex, &nThreadAffinityMask);
 		}
@@ -737,13 +737,13 @@ linuxSetThreadAffinity(int nCPUId)
     // Set the affinity mask for the current thread ("stick" it to the target core).
 	if (pthread_setaffinity_np(hCurrThread, sizeof(nThreadAffinityMask), &nThreadAffinityMask))
     {
-        GfError("Failed to set current pthread (handle=0x%X) affinity on CPU(s) %s (%s)\n",
-                hCurrThread, cpuSet2String(&nThreadAffinityMask).c_str(), strerror(errno));
+        GfLogError("Failed to set current pthread (handle=0x%X) affinity on CPU(s) %s (%s)\n",
+				   hCurrThread, cpuSet2String(&nThreadAffinityMask).c_str(), strerror(errno));
         return false;
     }
     else
-        GfOut("Affinity set on CPU(s) %s for current pthread (handle=0x%X)\n",
-              cpuSet2String(&nThreadAffinityMask).c_str(), hCurrThread);
+        GfLogInfo("Affinity set on CPU(s) %s for current pthread (handle=0x%X)\n",
+				  cpuSet2String(&nThreadAffinityMask).c_str(), hCurrThread);
 
     return true;
 
@@ -751,7 +751,7 @@ linuxSetThreadAffinity(int nCPUId)
 #else
 
 #warning "linuxspec.cpp::linuxSetThreadAffinity : Unsupported Linux OS"
-    GfOut("Warning: Thread affinity not yet implemented on this unknown Unix.\n");
+    GfLogWarning("Thread affinity not yet implemented on this unknown Unix.\n");
 
 #endif
 

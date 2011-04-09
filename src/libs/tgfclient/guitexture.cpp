@@ -157,7 +157,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	}
 	
 	// Check if we can read from it.
-	if (fread(buf, 1, nPNGBytesToCheck, fp) != nPNGBytesToCheck) {
+	if (fread(buf, 1, nPNGBytesToCheck, fp) != (int)nPNGBytesToCheck) {
 		GfError("GfTexReadImageFromPNG(%s) : Can't read file\n", filename);
 		fclose(fp);
 		return (unsigned char *)NULL;
@@ -306,7 +306,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 	// (as some pixels in the buffer won't be written by the PNG reader,
 	//  we have to initialize them, and force at least the alpha channel to 0 = transparent).
 	// TODO (Optimization) : Only initialize the pixels that are not overwritten by png_read_image.
-	if (tgt_width > (int)src_width || tgt_height > (int)src_height)
+	if (tgt_width > src_width || tgt_height > src_height)
 		memset(image_ptr, 0x00, tgt_height * tgt_rowbytes);
 	png_read_image(png_ptr, row_pointers);
 
@@ -363,8 +363,6 @@ unsigned char *
 GfTexReadImageFromJPEG(const char *filename, float screen_gamma, int *pWidth, int *pHeight, 
 					   int *pPow2Width, int *pPow2Height)
 {
-	unsigned char *pBuffer = NULL;
-
 	//const double dStartTime = GfTimeClock(); // Start measuring elapsed time.
 
 	// Try and open the source image file.

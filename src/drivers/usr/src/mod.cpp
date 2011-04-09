@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : mod.h
+    file                 : mod.cpp
     created              : Wed May 14 19:53:00 CET 2003
     copyright            : (C) 2003-2004 by Bernhard Wymann
     email                : berniw@bluewin.ch
@@ -17,25 +17,47 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _MOD_H_
-#define _MOD_H_
+#include "mod.h"
 
-#define LMOD_DATA 200
 
-typedef struct {
-  double dval;
-  int ival;
-  int divstart;
-  int divend;
-} LRLModData;
+void AddMod( LRLMod *mod, int divstart, int divend, double dval, int ival )
+{
+ if (!mod) return;
 
-typedef struct {
-  LRLModData data[LMOD_DATA];
-  int used;
-} LRLMod;
+ mod->data[mod->used].divstart = divstart;
+ mod->data[mod->used].divend = divend;
+ mod->data[mod->used].dval = dval;
+ mod->data[mod->used].ival = ival;
+ mod->used++;
+}
 
-extern void AddMod( LRLMod *mod, int divstart, int divend, double dval, int ival );
-extern double GetModD( LRLMod *mod, int div );
-extern int GetModI( LRLMod *mod, int div );
 
-#endif
+double GetModD( LRLMod *mod, int div )
+{
+ int i;
+
+ if (!mod)
+  return 0.0;
+
+ for (i=0; i<mod->used; i++)
+ {
+  if (div >= mod->data[i].divstart && div <= mod->data[i].divend)
+   return mod->data[i].dval;
+ }
+ return 0.0;
+}
+
+int GetModI( LRLMod *mod, int div )
+{
+ int i;
+
+ if (!mod)
+  return 0;
+
+ for (i=0; i<mod->used; i++)
+ {
+  if (div >= mod->data[i].divstart && div <= mod->data[i].divend)
+   return mod->data[i].ival;
+ }
+ return 0;
+}

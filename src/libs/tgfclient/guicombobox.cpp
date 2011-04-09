@@ -295,7 +295,7 @@ GfuiComboboxGetText(void *scr, int id)
     
 	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
 	
-    if (combo && combo->pInfo->nPos >= 0 && combo->pInfo->nPos < combo->pInfo->vecChoices.size())
+    if (combo && combo->pInfo->nPos < combo->pInfo->vecChoices.size())
 		pszText = combo->pInfo->vecChoices[combo->pInfo->nPos].c_str();
 
 	return pszText;

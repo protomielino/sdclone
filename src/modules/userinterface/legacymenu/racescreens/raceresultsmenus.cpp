@@ -280,11 +280,14 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     GfuiLabelCreate(rmScrHdle, "Pits",   GFUI_FONT_MEDIUM_C, xPStp, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
     y -= 20;
 
-    //Get total laps, winner time, number of cars
-    sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
-    int totLaps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);
-    sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, 1);
-    tdble refTime = GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0);
+	// Never used : remove ?
+    //Get total laps, winner time
+    //sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
+    //int totLaps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);
+    //sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, 1);
+    //tdble refTime = GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0);
+
+    //Get number of cars
     sprintf(path, "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
     int nbCars = (int)GfParmGetEltNb(results, path);
     

@@ -83,6 +83,11 @@ void Client::ResetNetwork()
             GfLogTrace ("Network disconnection succeeded.");
 			bDisconnect=true;
             break;
+			
+		case ENET_EVENT_TYPE_NONE:
+		case ENET_EVENT_TYPE_CONNECT:
+			// Do nothing.
+			break;
         }
     }
     
@@ -341,7 +346,7 @@ void Client::SendServerTimeRequest()
                                               ENET_PACKET_FLAG_UNSEQUENCED);
 
 	int result = enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket);
-
+	assert(result ==0);
 }
 
 double Client::WaitForRaceStart()
@@ -351,8 +356,7 @@ double Client::WaitForRaceStart()
 		SDL_Delay(20);
 	}
 
-	double time = GfTimeClock()-m_racestarttime;
-	return time;
+	return GfTimeClock()-m_racestarttime;
 }
 
 
@@ -416,14 +420,19 @@ bool Client::listenHost(ENetHost * pHost)
             break;
            
         case ENET_EVENT_TYPE_DISCONNECT:
-		if(event.peer == m_pServer)
-		{
-			m_bConnected = false;
-            /* Reset the peer's client information. */
-			GfLogTrace("Server disconnected\n");
-		}
-
+			if(event.peer == m_pServer)
+			{
+				m_bConnected = false;
+				/* Reset the peer's client information. */
+				GfLogTrace("Server disconnected\n");
+			}
+			
             event.peer -> data = NULL;
+			break;
+			
+		case ENET_EVENT_TYPE_NONE:
+			// Do nothing.
+			break;
         }
     }
 

@@ -146,7 +146,7 @@ static char BufPathXMLRel[BUFSIZE];              // Robot's xml-filename
 static const char* RobPathXMLRel = BufPathXMLRel;// relative to install. dir
 // Robot's absolute dir
 static char BufPathDir[BUFSIZE];                 // Robot's dir 
-static const char* RobPathDir = BufPathDir;      // Pointer to robot's dir
+//static const char* RobPathDir = BufPathDir;      // Pointer to robot's dir
 // Robot's absolute xml-filename
 static char BufPathXML[BUFSIZE];                 // Robot's xml-filename
 static const char* RobPathXML = BufPathXML;      // Pointer to xml-filename
@@ -431,7 +431,7 @@ extern "C" int moduleWelcome
 {
 	if (welcomeIn->itfVerMajor >= 1)
 	{
-		if (welcomeIn->itfVerMinor >= 0)
+		//if (welcomeIn->itfVerMinor >= 0) // Always true !
           return moduleWelcomeV1_00(welcomeIn, welcomeOut);
 	}
 

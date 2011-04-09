@@ -38,7 +38,7 @@ const tdble grSkyDomeNeutralFOVDistance = 20000.0f; // Not the smallest, a mediu
 static const int NbBackgroundFaces = 36; //Background faces
 static const float BackgroundDistance = 1.0f;
 
-static const int grSkyDomeDistThresh = 12000; // No dynamic sky below that value.
+static const unsigned grSkyDomeDistThresh = 12000; // No dynamic sky below that value.
 
 static const int NMaxStars = 1000;
 static const int NMaxPlanets = 0; //No planets displayed for the moment
@@ -392,7 +392,7 @@ grLoadBackground(void)
 	// Load graphic options for the background.
 	grSkyDomeDistance =
 		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
-	if (grSkyDomeDistance > 0 && grSkyDomeDistance < grSkyDomeDistThresh)
+	if (grSkyDomeDistance < grSkyDomeDistThresh)
 		grSkyDomeDistance = grSkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
 
 	grDynamicTime = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, GR_ATT_DYNAMICTIME_DISABLED), GR_ATT_DYNAMICTIME_ENABLED) == 0; 
@@ -797,7 +797,6 @@ grUpdateSky(double currentTime)
 	static double lastTime = -10.0f;
 	static ulClock ck ;
 	ck.update () ;
-	double t = ck.getAbsTime();
 	double dt1 = ck.getDeltaTime();
 	if( currentTime < lastTime ) 
 	{
@@ -808,7 +807,6 @@ grUpdateSky(double currentTime)
 
 	// Update sun position (?)
 	int current = (int)floor( ( currentTime + 10.0f ) / 60.0f );
-	double dt = currentTime - lastTime;
 	
 	sgVec3 solposn;
 	//sgSetVec3(solposn, 0, 0, 0);				  

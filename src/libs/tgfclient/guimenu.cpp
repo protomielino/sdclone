@@ -402,10 +402,12 @@ ReadBoolean(void *param,const char *pControlName,const char *pszFieldName, bool 
 {
         const char* pszValue = GfParmGetStr(param, pControlName, pszFieldName, 0);
         if (pszValue)
+		{
 			if (!strcmp(pszValue, "yes") || !strcmp(pszValue, "true"))
                 return true;
 			else if (!strcmp(pszValue, "no") || !strcmp(pszValue, "false"))
                 return false;
+		}
 
         return bDefault;
 }

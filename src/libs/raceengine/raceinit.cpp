@@ -664,7 +664,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       snprintf(buf2, sizeof(buf2), "categories/%s.xml", elt->_category);
       cathdle = GfParmReadFile(buf2, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	  int errorcode = 0;
-      if (errorcode = GfParmCheckHandle(cathdle, carhdle)) 
+      if ((errorcode = GfParmCheckHandle(cathdle, carhdle))) 
 	  {
         switch (errorcode)
 		{

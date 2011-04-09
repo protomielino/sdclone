@@ -504,7 +504,10 @@ public:
     }
 };
 
-/*class cGrSun 
+// Not used.
+#if 0
+
+class cGrSun 
 {
     ssgTransform *sun_transform;
     ssgSimpleState *sun_state; 
@@ -558,7 +561,7 @@ public:
 		     double rightAscension, double declination,
 		     double sun_dist, double lat, double alt_asl, double sun_angle );*/
 
- /*   bool reposition( sgVec3 p, double sun_angle ) 
+    bool reposition( sgVec3 p, double sun_angle ) 
     {
        return reposition ( p, angle, sun_right_ascension, sun_declination, sun_body_dist ); 
     }
@@ -570,7 +573,9 @@ public:
 
     // return the texture id of the sun halo texture
     inline GLuint get_texture_id() { return ohalo_state->getTextureHandle(); }
-};*/
+};
+
+#endif
 
 
 #endif

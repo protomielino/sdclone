@@ -15,8 +15,6 @@ SET(RACEENGINE_SOURCES raceengine.cpp
                        racestate.h racesituation.h racemessage.h
                        raceutil.h)
 
-ADD_SD_DEFINITIONS()
-
 ADD_INTERFACE_INCLUDEDIR()
 
 ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfclient tgfdata

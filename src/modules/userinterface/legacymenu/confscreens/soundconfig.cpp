@@ -22,8 +22,8 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #include <tgfclient.h>
@@ -32,7 +32,6 @@
 #include "soundconfig.h"
 #include "gui.h"
 
-static float LabelColor[] = {1.0, 0.0, 1.0, 1.0};
 
 // list of options.
 static const char *soundOptionList[] = {GR_ATT_SOUND_STATE_OPENAL,

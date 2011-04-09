@@ -393,7 +393,8 @@ void GfCar::load(void* hparmCar)
 		GfParmGetNum(hparmCar, SECT_FRNTAXLE, PRM_XPOS, 0, 0.0f);
 	const tdble fRearAxleXpos = 
 		GfParmGetNum(hparmCar, SECT_REARAXLE, PRM_XPOS, 0, 0.0f);
-	const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0f - _fFrontRearMassRatio) * fRearAxleXpos;
+	// Never used : remove ?
+	//const tdble fGCXpos = _fFrontRearMassRatio * fFrontAxleXpos + (1.0f - _fFrontRearMassRatio) * fRearAxleXpos;
 	const tdble fTotalFrontClift = 2 * fFrontClift + 4.92f * fFrontWingArea * sin(fFrontWingAngle);
 	const tdble fTotalRearClift = 2 * fRearClift + 4.92f * fRearWingArea * sin(fRearWingAngle);
 	const tdble fFrontAeroLoad = fRefCarSpeed2 *

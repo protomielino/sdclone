@@ -40,7 +40,7 @@ static tStateList *statelist;
 static ssgBranch *lightBranch;
 static tTrackLights trackLights;
 
-static void setOnOff( tLightInfo *light, char onoff );
+//static void setOnOff( tLightInfo *light, char onoff );
 
 static void calcNorm( sgVec3 topleft, sgVec3 bottomright, sgVec3 *result )
 {

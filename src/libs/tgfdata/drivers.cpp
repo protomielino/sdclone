@@ -258,7 +258,8 @@ void GfDrivers::print() const
 
 // GfDriverSkin class ---------------------------------------------------------------
 
-GfDriverSkin::GfDriverSkin(const std::string& strName) : _strName(strName), _bfTargets(0)
+GfDriverSkin::GfDriverSkin(const std::string& strName)
+: _bfTargets(0), _strName(strName)
 {
 }
 
@@ -333,7 +334,8 @@ static const int NRobotFeatures = sizeof(RobotFeatures) / sizeof(RobotFeatures[0
 
 GfDriver::GfDriver(const std::string& strModName, int nItfIndex,
 				   const std::string& strName, void* hparmRobot)
-: _strModName(strModName), _strName(strName), _nItfIndex(nItfIndex), _bIsHuman(false), _pCar(0)
+: _strName(strName), _strModName(strModName), _nItfIndex(nItfIndex),
+  _bIsHuman(false), _pCar(0), _fSkillLevel(-1.0), _nFeatures(0)
 {
 	load(hparmRobot);
 }

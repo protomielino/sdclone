@@ -427,8 +427,7 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
     
 	CreateComboboxControl("ScreenSizeCombo", this, onChangeScreenSize);
 
-	const int nColorDepthComboId =
-		CreateComboboxControl("ColorDepthCombo", this, onChangeColorDepth);
+	CreateComboboxControl("ColorDepthCombo", this, onChangeColorDepth);
 
 	const int nDisplayModeComboId =
 		CreateComboboxControl("DisplayModeCombo", this, onChangeDisplayMode);

@@ -25,6 +25,7 @@
 #include <unistd.h> // getcwd, access
 #endif
 
+#include <cstdio>
 #include <cerrno>
 #include <ctime>
 #include <cstring>
@@ -685,10 +686,12 @@ char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen)
 
 	// Add a trailing '/' if not present.
 	if (pszPath[strlen(pszPath)-1] != '/')
+	{
 		if (strlen(pszPath) < nMaxPathLen - 1)
 			strcat(pszPath, "/");
 		else
 			GfLogFatal("Path '%s' too long ; could not normalize\n", pszPath);
+	}
 
 	return pszPath;
 }
@@ -864,7 +867,7 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	// If the path to the folder where the executable is stored ends with SD_BINDIR,
 	// then the install dir path ends right at the beginning of SD_BINDIR.
 	char* pBinDir = strstr(gfInstallDir, SD_BINDIR);
-	if (pBinDir - gfInstallDir == strlen(gfInstallDir) - strlen(SD_BINDIR))
+	if (pBinDir - gfInstallDir == (long)(strlen(gfInstallDir) - strlen(SD_BINDIR)))
 	{
 		*pBinDir = 0;
 	}	

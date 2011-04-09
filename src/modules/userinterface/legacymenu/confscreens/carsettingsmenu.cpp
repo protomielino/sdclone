@@ -74,12 +74,12 @@ bool CarSettingsMenu::Init(void* pMenu,const char *pszCar)
     CreateStaticControls();
     
 	int carCatId = CreateComboboxControl("modelcombo",NULL,CarPickCB);
-	int skinId = CreateComboboxControl("skincombo",NULL,NULL);
-	int carImageId = CreateStaticImageControl("carpreviewimage");
-	int progressId = CreateProgressbarControl("topspeedprogress");
-	int accelerationId = CreateProgressbarControl("accelerationprogress");
-	int handlingId = CreateProgressbarControl("handlingprogress");
-	int brakingId = CreateProgressbarControl("brakingprogress");
+	CreateComboboxControl("skincombo",NULL,NULL);
+	CreateStaticImageControl("carpreviewimage");
+	CreateProgressbarControl("topspeedprogress");
+	CreateProgressbarControl("accelerationprogress");
+	CreateProgressbarControl("handlingprogress");
+	CreateProgressbarControl("brakingprogress");
 
 	const std::vector<std::string> vecCarRealNames =
 		GfCars::self()->getCarNamesInCategory(strCarCat);

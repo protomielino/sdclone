@@ -79,12 +79,14 @@ parseOptions(int argc, char **argv)
         else if (!strncmp(argv[i], "-r", 2))
         {
             if (++i < argc)
+			{
                 if (!strncmp(argv[i], "stderr", 6))
                     GfLogSetStream(stderr);
                 else if (!strncmp(argv[i], "stdout", 6))
                     GfLogSetStream(stdout);
                 else
                     GfLogSetFile(argv[i]);
+			}
         }
 
         // Next arg (even if current not recognized).

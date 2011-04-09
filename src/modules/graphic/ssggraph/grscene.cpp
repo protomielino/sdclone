@@ -75,13 +75,12 @@ int preScene(ssgEntity *e)
 int
 grInitScene(void)
 {
-	char buf[256];
-	void *hndl = grTrackHandle;
-	ssgLight *light = ssgGetLight(0);
+	//ssgLight *light = ssgGetLight(0);
 	
 	// Load graphic options if not already done.
 	if(!grHandle) 
 	{
+		char buf[256];
 		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	}//if grHandle

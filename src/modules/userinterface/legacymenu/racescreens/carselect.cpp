@@ -148,7 +148,7 @@ void RmCarSelectMenu::onCancelCB(void *pCarSelectMenu)
 }
 
 RmCarSelectMenu::RmCarSelectMenu()
-: GfuiMenuScreen("carselectmenu.xml"), _nCurSkinIndex(0), _pDriver(0)
+: GfuiMenuScreen("carselectmenu.xml"), _pRace(0), _pDriver(0), _nCurSkinIndex(0)
 {
 }
 

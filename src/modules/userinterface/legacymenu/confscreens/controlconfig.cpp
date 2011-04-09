@@ -331,14 +331,6 @@ getMovedAxis(void)
 
 /* Game event loop idle function : For collecting input devices actions */
 static void
-IdleAcceptMouseClicks(void)
-{
-    AcceptMouseClicks = 1;
-    GfelSetIdleCB(0);
-}
-
-/* Game event loop idle function : For collecting input devices actions */
-static void
 IdleWaitForInput(void)
 {
     int		mask;
