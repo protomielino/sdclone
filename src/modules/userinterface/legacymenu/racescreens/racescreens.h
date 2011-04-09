@@ -27,6 +27,8 @@
 
 #include <raceman.h>
 
+#include <itrackloader.h>
+
 #include <tgfclient.h> // tfuiCallback
 
 
@@ -37,7 +39,7 @@ typedef struct RmTrackSelect
 	GfRace      *pRace; /* The race to update */
     void        *prevScreen;	/* Race manager screen to go back */
     void        *nextScreen;	/* Race manager screen to go after select */
-    tTrackItf	trackItf;	/* Track module interface */
+    ITrackLoader	*piTrackLoader;	/* Track loader */
 } tRmTrackSelect;
 
 typedef struct RmDriverSelect

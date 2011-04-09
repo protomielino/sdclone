@@ -16,25 +16,27 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
- 
+
 #ifndef _TRACKINC_H__
 #define _TRACKINC_H__
 
-
-extern void TrackShutdown(void);
-extern void ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
-extern void ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
+#include <track.h>
 
 extern tTrack *TrackBuildv1(const char *trackfile);
 extern tTrack *TrackBuildEx(const char *trackfile);
+extern void TrackShutdown(void);
+
+extern void ReadTrack3(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
+extern void ReadTrack4(tTrack *theTrack, void *TrackHandle, tRoadCam **camList, int ext);
+
+extern tRoadCam *TrackGetCamList(void);
+
 extern tdble TrackHeightG(tTrackSeg *seg, tdble x, tdble y);
 extern tdble TrackHeightL(tTrkLocPos *p);
 extern void TrackGlobal2Local(tTrackSeg *segment, tdble X, tdble Y, tTrkLocPos *p, int sides);
 extern void TrackLocal2Global(tTrkLocPos *p, tdble *X, tdble *Y);
 extern void TrackSideNormal(tTrackSeg*, tdble, tdble, int, t3Dd*);
 extern void TrackSurfaceNormal(tTrkLocPos *p, t3Dd *norm);
-extern tRoadCam *TrackGetCamList(void);
 extern tdble TrackSpline(tdble p0, tdble p1, tdble t0, tdble t1, tdble t);
 
 

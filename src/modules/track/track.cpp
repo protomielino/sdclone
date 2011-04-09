@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
@@ -25,9 +24,9 @@
 #include <cmath>
 
 #include <raceman.h>
-#include <tgf.h>
-#include <track.h>
+
 #include "trackinc.h"
+
 
 static const tdble DEGPRAD = (tdble)(180.0 / PI);   /* degrees per radian */
 

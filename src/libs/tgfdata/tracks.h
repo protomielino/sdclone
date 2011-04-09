@@ -29,9 +29,9 @@
 #include <string>
 #include <vector>
 
-#include "tgfdata.h"
+#include <itrackloader.h>
 
-struct TrackItf;
+#include "tgfdata.h"
 
 
 // Information on one track.
@@ -100,8 +100,8 @@ public:
 	// Accessor to the unique instance of the singleton.
 	static GfTracks* self();
 
-	struct TrackItf* getTrackInterface() const;
-	void setTrackInterface(struct TrackItf* pTrackItf);
+	ITrackLoader* getTrackLoader() const;
+	void setTrackLoader(ITrackLoader* piTrackLoader);
 	
  	const std::vector<std::string>& getCategoryIds() const;
  	const std::vector<std::string>& getCategoryNames() const;

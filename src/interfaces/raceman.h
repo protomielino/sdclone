@@ -105,9 +105,6 @@ typedef struct Situation {
 /** Race Engine */
 typedef struct 
 {
-    tTrackItf	trackItf;
-	// TODO: Remove (old graphics setup)
-    //tGraphicItf	graphicItf;
     tSimItf	simItf;
 } tRaceModIft;
 
@@ -172,9 +169,6 @@ typedef struct
 
 #define _reState	raceEngineInfo.state
 #define _reParam	raceEngineInfo.param
-#define _reTrackItf	raceEngineInfo.itf.trackItf
-// TODO: Remove (old graphics setup)
-//#define _reGraphicItf	raceEngineInfo.itf.graphicItf
 #define _reSimItf	raceEngineInfo.itf.simItf
 #define _reGameScreen	raceEngineInfo.gameScreen
 #define _reMenuScreen	raceEngineInfo.menuScreen

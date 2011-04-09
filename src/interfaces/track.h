@@ -274,7 +274,8 @@ typedef struct SegExt
 
 
 /** Surface */
-typedef struct trackSurface {
+typedef struct trackSurface
+{
     struct trackSurface *next;	/**< Next surface in list */
 
     const char *material;	/**< Type of material used */
@@ -292,7 +293,8 @@ typedef struct trackSurface {
 
 
 /** Barrier */
-typedef struct trackBarrier {
+typedef struct trackBarrier
+{
     int			style;	/**< Barrier style */
     tdble		width;	/**< Barrier width */
     tdble		height;	/**< Barrier height */
@@ -309,7 +311,8 @@ typedef struct trackBarrier {
     The reference angle is the orientation of the first segment of the track.
     @ingroup trackstruct
 */
-typedef struct trackSeg {
+typedef struct trackSeg
+{
     char *name;			/**< Segment name */
     int	id;			/**< Segment number */
 
@@ -451,7 +454,7 @@ typedef struct trackSeg {
 #define TR_TOLEFT	2
 
 /** Location on the track in local coordinates */
-typedef struct
+typedef struct TrkLocPos
 {
     tTrackSeg	*seg;		/**< Track segment */
     int		type;		/**< Type of description:
@@ -486,7 +489,7 @@ typedef struct TrackOwnPit
 } tTrackOwnPit;
 
 /** Pits Info Structure */
-typedef struct 
+typedef struct tTrackPitInfo
 {
 	int type;		/**< Type of Pit:
 				   - TR_PIT_NONE
@@ -517,7 +520,7 @@ typedef struct
 	int driversPitsNb;		/**< Number of drivers */
 } tTrackPitInfo;
 
-typedef struct
+typedef struct TurnMarksInfo
 {
     tdble	height;
     tdble	width;
@@ -550,7 +553,7 @@ typedef struct GraphicLightInfo
     tdble blue;
 } tGraphicLightInfo;
 
-typedef struct 
+typedef struct TrackGraphicInfo
 {
     const char	*model3d;	/**< Name of the track 3D model file (.ac/.acc) */
     const char	*background;	/**< Name of the background image file (.png) */
@@ -633,31 +636,6 @@ typedef struct Track
 
 	tTrackLocalInfo local; /**< Local info (weather, timeof day ...) */
 } tTrack;
-
-
-
-typedef tTrack*(*tfTrackBuild)(const char*);
-typedef tdble(*tfTrackHeightG)(tTrackSeg*, tdble, tdble);
-typedef tdble(*tfTrackHeightL)(tTrkLocPos*);
-typedef void(*tfTrackGlobal2Local)(tTrackSeg* /*seg*/, tdble /*X*/, tdble /*Y*/, tTrkLocPos* /*pos*/, int /*sides*/);
-typedef void(*tfTrackLocal2Global)(tTrkLocPos*, tdble *, tdble *);
-typedef void(*tfTrackSideNormal)(tTrackSeg*, tdble, tdble, int, t3Dd*);
-typedef void(*tfTrackSurfaceNormal)(tTrkLocPos *, t3Dd*);
-typedef void(*tfTrackShutdown)(void);
-
-typedef struct TrackItf
-{
-    tfTrackBuild		trkBuild;		/* build track structure for simu */
-    tfTrackBuild		trkBuildEx;		/* build with graphic extensions  */
-    tfTrackHeightG		trkHeightG;
-    tfTrackHeightL		trkHeightL;
-    tfTrackGlobal2Local		trkGlobal2Local;
-    tfTrackLocal2Global		trkLocal2Global;
-    tfTrackSideNormal   	trkSideNormal;
-    tfTrackSurfaceNormal	trkSurfaceNormal;
-    tfTrackShutdown		trkShutdown;
-} tTrackItf;
-
 
 /* For Type 3 tracks (now obsolete) */
 

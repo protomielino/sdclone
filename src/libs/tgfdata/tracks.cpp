@@ -22,7 +22,7 @@
 #include <algorithm>
 
 #include <tgf.h>
-#include <track.h>
+#include <itrackloader.h>
 
 #include "tracks.h"
 
@@ -32,7 +32,7 @@ class GfTracks::Private
 {
 public:
 
-	Private() : pTrackItf(0) {};
+	Private() : piTrackLoader(0) {}
 	
 public:
 	
@@ -49,7 +49,7 @@ public:
 	std::vector<std::string> vecCatNames;
 
 	// Track module interface (needed to get some tracks properties).
-	tTrackItf* pTrackItf;
+	ITrackLoader* piTrackLoader;
 };
 
 
@@ -172,14 +172,14 @@ GfTracks::GfTracks()
 	print(false); // No verbose here, otherwise infinite recursion.
 }
 
-tTrackItf* GfTracks::getTrackInterface() const
+ITrackLoader* GfTracks::getTrackLoader() const
 {
-	return _pPrivate->pTrackItf;
+	return _pPrivate->piTrackLoader;
 }
 
-void GfTracks::setTrackInterface(tTrackItf* pTrackItf)
+void GfTracks::setTrackLoader(ITrackLoader* piTrackLoader)
 {
-	_pPrivate->pTrackItf = pTrackItf;
+	_pPrivate->piTrackLoader = piTrackLoader;
 }
 
 const std::vector<std::string>& GfTracks::getCategoryIds() const
@@ -576,15 +576,15 @@ void GfTrack::setMaxNumOfPitSlots(int nPitSlots)
 bool GfTrack::load() const
 {
 	// Check if the track loader is ready.
-	tTrackItf* pTrackItf = GfTracks::self()->getTrackInterface();
-    if (!pTrackItf)
+	ITrackLoader* piTrackLoader = GfTracks::self()->getTrackLoader();
+    if (!piTrackLoader)
 	{
 		GfLogError("Track loader not yet initialized ; failed to load any track\n");
         return false;
     }
 	
     // Load track data from the XML file.
-    tTrack* pTrack = pTrackItf->trkBuild(_strDescFile.c_str());
+    tTrack* pTrack = piTrackLoader->load(_strDescFile.c_str());
     if (!pTrack)
 	{
 		GfLogWarning("Unusable track %s : failed to build track data from %s\n",
@@ -612,7 +612,7 @@ bool GfTrack::load() const
 	_nMaxPitSlots = pTrack->pits.nMaxPits;
 
     // Unload track data.
-    pTrackItf->trkShutdown();
+    piTrackLoader->unload();
 
 	// Now, the track seems usable (hm ... OK, we didn't check the 3D file contents ...).
 	_bUsable = true;

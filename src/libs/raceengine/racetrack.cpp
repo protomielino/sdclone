@@ -32,6 +32,8 @@
 #include <raceman.h>
 #include <track.h>
 
+#include <tracks.h>
+
 #include "raceengine.h"
 
 #include "racesituation.h"
@@ -69,7 +71,7 @@ ReTrackInit(void)
 		return -1;
 
 	snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
-	ReInfo->track = ReInfo->_reTrackItf.trkBuild(buf);
+	ReInfo->track = GfTracks::self()->getTrackLoader()->load(buf);
 
 	snprintf(buf, sizeof(buf), "Loading track %s", ReInfo->track->name);
 	RaceEngine::self().userInterface().addLoadingMessage(buf);

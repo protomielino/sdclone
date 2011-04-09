@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 
 #include <tgf.h>
 #include <track.h>

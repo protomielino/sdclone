@@ -28,13 +28,17 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <sstream>
 #include <map>
 
-#include <portability.h>
+#include <itrackloader.h>
 #include <raceman.h>
 #include <robot.h>
 #include <teammanager.h>
 #include <robottools.h>
+
+#include <portability.h>
+#include <tgf.hpp>
 
 #include <tracks.h>
 #include <racemanagers.h>
@@ -93,14 +97,20 @@ ReInit(void)
 
 	// Load and initialize the track loader module.
 	GfLogInfo("Loading Track Loader ...\n");
-	const char* dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
-	snprintf(buf, sizeof(buf), "%smodules/track/%s.%s", GfLibDir(), dllname, DLLEXT);
-	if (GfModLoad(0, buf, &reEventModList))
+	std::ostringstream ossModLibName;
+	const char* pszModName = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
+	ossModLibName << GfLibDir() << "modules/track/" << pszModName << '.' << DLLEXT;
+	GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
+
+	// Check that it implements ITrackLoader.
+	ITrackLoader* piTrkLoader = 0;
+	if (pmodTrkLoader)
+		piTrkLoader = pmodTrkLoader->getInterface<ITrackLoader>();
+	if (!piTrkLoader)
 		return;
-	reEventModList->modInfo->fctInit(reEventModList->modInfo->index, &ReInfo->_reTrackItf);
 
 	// Initialize GfTracks' track module interface (needed for some track infos).
-	GfTracks::self()->setTrackInterface(&ReInfo->_reTrackItf);
+	GfTracks::self()->setTrackLoader(piTrkLoader);
 
 	// Initialize the movie capture system.
 	tRmMovieCapture *capture = &(ReInfo->movieCapture);
@@ -151,16 +161,23 @@ ReExit(void)
 /* Race Engine clean shutdown */
 void ReShutdown(void)
 {
-	if (!ReInfo)
-		return;
+    if (!ReInfo)
+        return;
 
-	/* Free previous situation */
-	ReInfo->_reTrackItf.trkShutdown();
+	// Unload the track.
+	ITrackLoader* piTrkLoader = GfTracks::self()->getTrackLoader();
+    piTrkLoader->unload();
 
-	// Unload modules.
+    // Unload the Simu, Track loader and Graphics modules.
     GfModUnloadList(&reEventModList);
-	RaceEngine::self().userInterface().shutdownGraphics();
+    
+    GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(piTrkLoader);
+	GfModule::unload(pmodTrkLoader);
+	GfTracks::self()->setTrackLoader(0);
 
+    RaceEngine::self().userInterface().shutdownGraphics();
+
+	// Free ReInfo memory.
     if (ReInfo->results) 
     {
 		if (ReInfo->mainResults != ReInfo->results)

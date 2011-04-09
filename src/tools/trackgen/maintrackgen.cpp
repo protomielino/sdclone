@@ -26,6 +26,9 @@
 #include <cstdlib>
 #include <ctype.h>
 #include <cstring>
+#include <cmath>
+
+#include <sstream>
 
 #ifndef WIN32
 #include <unistd.h>
@@ -39,15 +42,14 @@
 #include <getopt.h>
 #endif
 
-#include <cmath>
-
 #include <plib/ul.h>
 #include <plib/ssg.h>
 #include <SDL/SDL.h>
 
 #include <config.h>
+#include <tgf.hpp>
 #include <tgfclient.h>
-#include <track.h>
+#include <itrackloader.h>
 
 #include "ac3d.h"
 #include "easymesh.h"
@@ -74,7 +76,7 @@ void		*TrackHandle;
 void		*CfgHandle;
 
 tTrack		*Track;
-tTrackItf	TrackItf;
+ITrackLoader*	PiTrackLoader;
 
 int		TrackOnly;
 int		JustCalculate;
@@ -334,7 +336,6 @@ main(int argc, char **argv)
 static void
 Generate(void)
 {
-	const char *trackdllname;
 	const char *extName;
 	const char *libdir = GfLibDir();
 	const char *datadir = GfDataDir();
@@ -352,15 +353,18 @@ Generate(void)
 	sprintf(buf, "%s", CFG_FILE);
 	CfgHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	trackdllname = GfParmGetStr(CfgHandle, "Modules", "track", "track");
-	sprintf(buf, "%smodules/track/%s.%s", libdir, trackdllname, DLLEXT);
-	if (GfModLoad(TRK_IDENT, buf, &modlist) < 0) {
-		GfFatal("Failed to find the track module %s", buf);
-	}
+	// Load and initialize the track loader module.
+	GfLogInfo("Loading Track Loader ...\n");
+	std::ostringstream ossModLibName;
+	ossModLibName << GfLibDir() << "modules/track/" << "track" << '.' << DLLEXT;
+	GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
 
-	if (modlist->modInfo->fctInit(modlist->modInfo->index, &TrackItf)) {
-		GfFatal("Failed to init the track module %s", buf);
-	}
+	// Check that it implements ITrackLoader.
+	ITrackLoader* PiTrackLoader = 0;
+	if (pmodTrkLoader)
+		PiTrackLoader = pmodTrkLoader->getInterface<ITrackLoader>();
+	if (!PiTrackLoader)
+		return;
 
 	// This is the track definition.
 	sprintf(trackdef, "%stracks/%s/%s/%s.xml", datadir, TrackCategory, TrackName, TrackName);
@@ -371,7 +375,7 @@ Generate(void)
 	}
 
 	// Build the track structure with graphic extensions.
-	Track = TrackItf.trkBuildEx(trackdef);
+	Track = PiTrackLoader->load(trackdef, true);
 
 	if (!JustCalculate) {
 		// Get the output file radix.

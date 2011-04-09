@@ -17,134 +17,94 @@
  *                                                                         *
  ***************************************************************************/
 
-
-#include <cstdlib>
-#ifdef _WIN32
-#include <windows.h>
-#endif
-
-#include <tgf.h>
-#include <track.h>
+#include "trackitf.h"
 #include "trackinc.h"
 
 
-#ifdef _WIN32
-BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
-{
-    return TRUE;
-}
-#endif
+// The TrackModule singleton.
+TrackModule* TrackModule::_pSelf = 0;
 
-/*
- * Function
- *	trackInit
- *
- * Description
- *	init the menus
- *
- * Parameters
- *	
- *
- * Return
- *	
- *
- * Remarks
- *	
- */
-static int
-trackInit(int /* index */, void *pt)
+int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
-    tTrackItf	*ptf = (tTrackItf*)pt;
-    
-    ptf->trkBuild         = TrackBuildv1;
-    ptf->trkBuildEx       = TrackBuildEx;
-    ptf->trkHeightG       = TrackHeightG;
-    ptf->trkHeightL       = TrackHeightL;
-    ptf->trkGlobal2Local  = TrackGlobal2Local;
-    ptf->trkLocal2Global  = TrackLocal2Global;
-    ptf->trkSideNormal    = TrackSideNormal;
-    ptf->trkSurfaceNormal = TrackSurfaceNormal;
-    ptf->trkShutdown      = TrackShutdown;
-    
-    return 0;
+	// Instanciate the (only) module instance.
+	TrackModule::_pSelf = new TrackModule(pszShLibName, hShLibHandle);
+
+	// Register it to the GfModule module manager if OK.
+	if (TrackModule::_pSelf)
+		GfModule::register_(TrackModule::_pSelf);
+
+	// Report about success or error.
+	return TrackModule::_pSelf ? 0 : 1;
 }
 
-
-/*
- * Function
- *	moduleWelcome
- *
- * Description
- *	First function of the module called at load time :
- *      - the caller gives the module some information about its run-time environment
- *      - the module gives the caller some information about what he needs
- *
- * Parameters
- *	welcomeIn  : Run-time info given by the module loader at load time
- *	welcomeOut : Module run-time information returned to the called
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	MUST be called before moduleInitialize()
- */
-extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
+int closeGfModule()
 {
-    welcomeOut->maxNbItf = 1;
+	// Unregister it from the GfModule module manager.
+	if (TrackModule::_pSelf)
+		GfModule::unregister(TrackModule::_pSelf);
+	
+	// Delete the (only) module instance.
+	delete TrackModule::_pSelf;
+	TrackModule::_pSelf = 0;
 
-    return 0;
+	// Report about success or error.
+	return 0;
 }
 
-/*
- * Function
- *	moduleInitialize
- *
- * Description
- *	Module entry point
- *
- * Parameters
- *	modInfo : Module interfaces info array to fill-in
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	
- */
-extern "C" int moduleInitialize(tModInfo *modInfo)
+TrackModule& TrackModule::self()
 {
-    modInfo->name = "trackv1";		/* name of the module (short) */
-    modInfo->desc = "Track V1.0";	/* description of the module (can be long) */
-    modInfo->fctInit = trackInit;	/* init function */
-    modInfo->gfId = TRK_IDENT;		/* always loaded  */
-    modInfo->index = 0;
-
-    return 0;
+	// Pre-condition : 1 successfull openGfModule call.
+	return *_pSelf;
 }
 
-/*
- * Function
- *	moduleTerminate
- *
- * Description
- *	Module exit point
- *
- * Parameters
- *	None
- *
- * Return
- *	0, if no error occured 
- *	non 0, otherwise
- *
- * Remarks
- *	
- */
-extern "C" int moduleTerminate()
+TrackModule::TrackModule(const std::string& strShLibName, void* hShLibHandle)
+: GfModule(strShLibName, hShLibHandle)
 {
-    return 0;
+}
+
+TrackModule::~TrackModule()
+{
+}
+
+// Implementation of ITrackLoader***********************************
+struct Track* TrackModule::load(const char* filename, bool grExts)
+{
+	return grExts ? ::TrackBuildEx(filename) : ::TrackBuildv1(filename);
+}
+
+void TrackModule::unload()
+{
+	::TrackShutdown();
 }
 
 
+// Implementation of ITrack ****************************************
+//tdble TrackModule::globalHeight(tTrackSeg* seg, tdble x, tdble y)
+//{
+//	return TrackHeightG(seg, x, y);
+//}
+//
+//tdble TrackModule::localHeight(tTrkLocPos* pos)
+//{
+//	return TrackHeightL(pos);
+//}
+//
+//void TrackModule::global2Local(tTrackSeg* seg, tdble x, tdble y, tTrkLocPos* pos, int sides)
+//{
+//	TrackGlobal2Local(seg, x, y, pos, sides);
+//}
+//
+//void TrackModule::local2Global(tTrkLocPos* pos, tdble* x, tdble* y)
+//{
+//	TrackLocal2Global(pos, x, y);
+//}
+//
+//void TrackModule::sideNormal(tTrackSeg* seg, tdble x, tdble y, int side, t3Dd* norm)
+//{
+//	TrackSideNormal(seg, x, y, side, norm);
+//}
+//
+//void TrackModule::surfaceNormal(tTrkLocPos* pos, t3Dd* norm)
+//{
+//	TrackSurfaceNormal(pos, norm);
+//}

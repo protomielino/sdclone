@@ -32,6 +32,7 @@
 #include <raceman.h>
 
 #include <race.h>
+#include <tracks.h>
 
 #include "legacymenu.h"
 #include "racescreens.h"
@@ -143,7 +144,7 @@ RmConfigRunState(bool bStart)
 			ts.prevScreen = rmConfigBackHookInit();
 		}
 		ts.pRace = LegacyMenu::self().raceEngine().race();
-		ts.trackItf = reInfo->_reTrackItf;
+		ts.piTrackLoader = GfTracks::self()->getTrackLoader();
 		RmTrackSelect(&ts);
 
 	} else if (!strcmp(conf, RM_VAL_DRVSEL)) {
