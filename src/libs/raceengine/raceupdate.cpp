@@ -612,6 +612,9 @@ public:
 	//! Constructor.
 	reMainUpdater(reSituationUpdater* pSituUpdater);
 
+	//! Initialize the graphics engine about cars.
+	void initCarGraphics(void);
+
 	//! Return from pit menu
 	void onBackFromPitMenu(tCarElt *car);
 
@@ -668,6 +671,18 @@ reMainUpdater::reMainUpdater(reSituationUpdater* pSituUpdater)
 #endif
 }
 
+void reMainUpdater::initCarGraphics(void)
+{
+	RaceEngine::self().userInterface().loadCarsGraphics(_pReInfo->s);
+}
+
+void reMainUpdater::onBackFromPitMenu(tCarElt *car)
+{
+	_pSituationUpdater->updateCarPitCmd(car->index, &car->pitcmd);
+
+	RaceEngine::self().userInterface().activateGameScreen();
+}
+
 void reMainUpdater::captureScreen(void)
 {
 	char filename[256];
@@ -677,14 +692,6 @@ void reMainUpdater::captureScreen(void)
 			 capture->currentCapture, capture->currentFrame++);
 	
     RaceEngine::self().userInterface().captureRaceScreen(filename);
-}
-
-
-void reMainUpdater::onBackFromPitMenu(tCarElt *car)
-{
-	_pSituationUpdater->updateCarPitCmd(car->index, &car->pitcmd);
-
-	RaceEngine::self().userInterface().activateGameScreen();
 }
 
 int reMainUpdater::operator()(void)
@@ -825,6 +832,11 @@ void ReInitUpdaters()
 	GfSchedConfigureEventLog("raceupdate", "situCopy", 10000, 0.0);
 	GfSchedConfigureEventLog("raceupdate", "robots",   10000, 0.0);
 	GfSchedConfigureEventLog("raceupdate", "physics",  10000, 0.0);
+}
+
+void ReInitCarGraphics(void)
+{
+	mainUpdater->initCarGraphics();
 }
 
 void ReAccelerateTime(double fMultFactor)

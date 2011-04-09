@@ -395,7 +395,7 @@ ReRaceRealStart(void)
 	// Initalize cars graphics.
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
 		RaceEngine::self().userInterface().addLoadingMessage("Loading cars ...");
-		RaceEngine::self().userInterface().loadCarsGraphics(ReInfo->s);
+		ReInitCarGraphics();
 	}
 
 	if (GetNetwork())
