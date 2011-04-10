@@ -310,6 +310,7 @@ static void manageStartLights( tTrackLights *startlights, tSituation *s, char ph
 
 void grTrackLightInit()
 {
+	statelist = NULL;
 	lightBranch = new ssgBranch();
 	TrackLightAnchor->addKid( lightBranch );
 	memset( &trackLights, 0, sizeof( tTrackLights ) );
@@ -318,7 +319,7 @@ void grTrackLightInit()
 
 void grTrackLightUpdate( tSituation *s )
 {
-	 char phase = ( (int)floor( fmod( s->currentTime + 120.0f, (double)0.3f ) / 0.3f ) % 2 ) + 1;
+	char phase = ( (int)floor( fmod( s->currentTime + 120.0f, (double)0.3f ) / 0.3f ) % 2 ) + 1;
 	manageStartLights( &trackLights, s, phase );
 }
 
