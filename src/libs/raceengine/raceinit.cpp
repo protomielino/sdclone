@@ -894,9 +894,6 @@ void ReInitGraphics()
 	{
 		// Initialize the track graphics.
 		RaceEngine::self().userInterface().loadTrackGraphics(ReInfo->track);
-
-		// Initialize the graphics view.
-		RaceEngine::self().userInterface().setupGraphicsView();
 	}
 }
 

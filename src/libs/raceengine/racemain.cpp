@@ -289,7 +289,7 @@ ReRaceRealStart(void)
 		return RM_ERROR;
 	}
 
-	/* Blind mode or not */
+	// Blind mode or not
 	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
 	ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceScreen();
 
@@ -342,24 +342,24 @@ ReRaceRealStart(void)
 	carInfo = ReInfo->_reCarInfo;
 	RtTeamManagerStart();
 
-	// Initialize graphics engine
+	// Initialize the graphics engine
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL
 		|| ReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
 		ReInitGraphics();
 
-	// Initialize physics engine
+	// Initialize the physics engine
 	ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
 	for (i = 0; i < s->_ncars; i++) {
 		carInfo[i].prevTrkPos = s->cars[i]->_trkPos;
 	}
 
-	//All cars start with max brakes on
+	// All cars start with max brakes on
 	RaceEngine::self().userInterface().addLoadingMessage("Running Prestart ...");
 	for (i = 0; i < s->_ncars; i++) {
 		memset(&(s->cars[i]->ctrl), 0, sizeof(tCarCtrl));
 		s->cars[i]->ctrl.brakeCmd = 1.0;
 	}
-	for (j = 0; j < ((int)(1.0 / RCM_MAX_DT_SIMU)); j++) {
+	for (j = 0; j < (int)(1.0 / RCM_MAX_DT_SIMU); j++) {
 		ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
 	}
 
@@ -380,9 +380,12 @@ ReRaceRealStart(void)
 	if (GetNetwork())
 		ReInfo->s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
 	else
-		ReInfo->s->currentTime = -2.0;	//we start 2 seconds before the start
+		ReInfo->s->currentTime = -2.0;	//we start 2 seconds before the real race start
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
 	ReInfo->s->_raceState = RM_RACE_STARTING;
+
+	// Initialize the graphics view.
+	RaceEngine::self().userInterface().setupGraphicsView();
 
 	ReInfo->_reInPitMenuCar = 0;
 	ReInfo->_reMessage = 0;
