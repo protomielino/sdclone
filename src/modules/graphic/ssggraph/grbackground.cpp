@@ -216,7 +216,7 @@ grInitBackground(void)
 		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData);
 		
 		//Add the Sun itself
-        TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), grSkyDomeDistance, true);
+        	TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), grSkyDomeDistance, true);
 		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
@@ -231,11 +231,11 @@ grInitBackground(void)
 		// Add the Moon
 		TheCelestBodies[eCBMoon] = TheSky->addBody ( "data/textures/moon.rgba",NULL, (2500 / div), grSkyDomeDistance);
 		if ( grSunDeclination < 0 )
-			grMoonDeclination = 3.0 + (rand() % 25);
+			grMoonDeclination = 3.0 + (rand() % 40);
 		else
-			grMoonDeclination = -(rand() % 45) + 10;
+			grMoonDeclination = -(rand() % 180) + 90;
 
-		const float moonAscension = (float)(rand() % 240);
+		const float moonAscension = (float)(rand() % 359);
 		
 		TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
 		TheCelestBodies[eCBMoon]->setRightAscension ( DEG2RAD(moonAscension) );
