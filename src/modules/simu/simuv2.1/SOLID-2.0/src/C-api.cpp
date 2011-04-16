@@ -156,6 +156,9 @@ void dtVertexIndices(DtPolyType type, DtCount count,
       }
       else poly = new Polyhedron(currentComplex->getBase(), count, indices);
       break;
+    default:
+      poly = 0;
+      break;
     }
     polyList.push_back(poly);
   }

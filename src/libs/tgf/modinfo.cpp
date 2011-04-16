@@ -163,7 +163,7 @@ void GfModInfoFreeNC(tModInfoNC *array, int maxItf)
 int GfModInitialize(tSOHandle soHandle, const char *soPath, unsigned int gfid, tModList **mod)
 {
     tfModInfoWelcome    fModInfoWelcome; /* function to exchange  information with the module at welcome time */
-    tfModInfoInitialize	fModInfoInit;	 /* init function of the module */
+    tfModInfoInitialize	fModInfoInit = 0;	 /* init function of the module */
     int   initSts = 0;	 /* returned status */
     int	  retained = 1;
     char  soName[256];

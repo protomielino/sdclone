@@ -332,8 +332,8 @@ void Client::SendReadyToStartPacket()
                                               datasize, 
                                               ENET_PACKET_FLAG_RELIABLE);
 
-	int result = enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket);
-	assert(result ==0);
+	if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket))
+		GfLogError("SendReadyToStartPacket : enet_peer_send failed\n");
 }
 
 
@@ -345,8 +345,8 @@ void Client::SendServerTimeRequest()
                                               1, 
                                               ENET_PACKET_FLAG_UNSEQUENCED);
 
-	int result = enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket);
-	assert(result ==0);
+	if (enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket))
+		GfLogError("SendServerTimeRequest : enet_peer_send failed\n");
 }
 
 double Client::WaitForRaceStart()

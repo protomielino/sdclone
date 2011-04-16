@@ -210,6 +210,8 @@ SimWheelUpdateRide(tCar *car, int index)
 		//	wheel->susp.x = wheel->rideHeight = wheel->susp.spring.packers; 
 		wheel->susp.fx = 0.0;
 		wheel->state = wheel->state | SIM_SUSP_COMP;
+		// WARNING: Which exact value for max_extend in this case ?
+		max_extend = 0.0; // Line added after GCC warned about "might not be initialized" in non-debug builds !
     }
 
 	wheel->rideHeight = max_extend;
