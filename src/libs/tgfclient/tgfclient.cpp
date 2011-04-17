@@ -1,11 +1,11 @@
 /***************************************************************************
-                          tgf.cpp -- The Gaming Framework                            
+                          tgfclient.cpp -- The Gaming Framework UI
                              -------------------                                         
     created              : Fri Aug 13 22:31:43 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
- ***************************************************************************/
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -17,10 +17,9 @@
  ***************************************************************************/
 
 #include "gui.h"
-#include "guimenu.h"
 
-void GfInitClient(void)
+
+void GfuiInit(void)
 {
     gfuiInit();
-    gfMenuInit();
 }

@@ -36,7 +36,7 @@
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef TGF_DLL
+# ifdef tgf_EXPORTS
 #  define TGF_API __declspec(dllexport)
 # else
 #  define TGF_API __declspec(dllimport)
@@ -732,6 +732,10 @@ TGF_API tdble GfFormCalcFunc(void *cmd, void *parmHandle, char*path);
 TGF_API char GfFormCalcFuncNew(void *cmd, void *parmHandle, char const* path, char *boolean, int *integer, tdble *number, char ** string);
 TGF_API void GfFormFreeCommand(void *cmd);
 TGF_API void GfFormFreeCommandNew(void *cmd);
+
+// Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
+#define GF_MAX_KEYCODE	0x1FF
+
 
 #endif /* __TGF__H__ */
 

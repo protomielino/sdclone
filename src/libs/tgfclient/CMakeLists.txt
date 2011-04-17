@@ -13,8 +13,8 @@ SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
                       guiimage.cpp guimenu.cpp guiscrollbar.cpp guitexture.cpp
                       tgfclient.cpp gui.cpp guiedit.cpp guihelp.cpp
                       guilabel.cpp guiobject.cpp guiscrollist.cpp 
-                      guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp
-                      guiscreen.cpp guieventloop.cpp 
+                      guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
+                      guiscreen.cpp guieventloop.cpp guiapplication.cpp 
                       glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h )
 
 #disable developer warning
@@ -48,7 +48,7 @@ ADD_PLIB_LIBRARY(tgfclient ul sg js)
 ADD_SDL_LIBRARY(tgfclient)
 
 IF(WIN32)
-    # joystick library
+#joystick library
     TARGET_LINK_LIBRARIES(tgfclient winmm)
 ENDIF(WIN32)
 
@@ -64,7 +64,6 @@ IF(UNIX)
 ELSE(UNIX)
     SD_INSTALL_FILES(BIN TARGETS tgfclient)
 ENDIF(UNIX)
-
 
 SD_INSTALL_FILES(DATA config USER config FILES screen.xml)
 

@@ -25,128 +25,87 @@
 
 #include <portability.h>
 
-#include <tgf.h>
 #include <tgfclient.h>
 
 #include "previewmenu.h"
 
 
-std::string g_strMenuFile;
-
-
-static void
-init_args(int argc, char **argv)
+class Application : public GfuiApplication
 {
-    const char *localdir = 0;
-    const char *libdir = 0;
-    const char *datadir = 0;
-    const char *bindir = 0;
+ public:
 
-	// Determine and store run-time install root dir.
-	GfInitInstallDir(argv[0]);
-
-	// Parse command line args.
-    int i = 1;
-	while (i < argc) 
+	//! Constructor.
+	Application(int argc, char **argv)
+	: GfuiApplication("MenuView", "XML menu viewer", argc, argv)
 	{
-		// -l option : User settings dir (named "local dir")
-		if (!strncmp(argv[i], "-l", 2))
+		// Help about the specific options.
+		_optionsHelp.lstSyntaxLines.push_back("<menu file>");
+		_optionsHelp.lstExplainLines.push_back("- <menu file> : the menu XML file to load");
+	}
+
+	//! Parse the command line options.
+	bool parseOptions()
+	{
+		// First the standard ones.
+		if (!GfuiApplication::parseOptions())
+			return false;
+		
+		// Then the specific ones.
+		if (!_lstOptionsLeft.empty())
 		{
-			if (++i < argc)
-				localdir = GfSetLocalDir(argv[i]);
-		}
-		// -L option : Libraries dir (root dir of the tree where loadable modules are installed)
-		else if (!strncmp(argv[i], "-L", 2))
-		{
-			if (++i < argc)
-				libdir = GfSetLibDir(argv[i]);
-		}
-		// -D option : Data dir (root dir of the data tree)
-		else if (!strncmp(argv[i], "-D", 2))
-		{
-			if (++i < argc)
-				datadir = GfSetDataDir(argv[i]);
-		}
-		// -B option : Binaries dir (the dir where game exe and DLLs are installed)
-		else if (!strncmp(argv[i], "-B", 2))
-		{
-			if (++i < argc)
-				bindir = GfSetBinDir(argv[i]);
-		}
-		// -m option : Allow the hardware mouse cursor
-		else if (!strncmp(argv[i], "-m", 2))
-		{
-			GfuiMouseSetHWPresent();
+			_strMenuFile = _lstOptionsLeft.front();
 		}
 		else
 		{
-			g_strMenuFile = argv[i];
+			printUsage("No file specified.");
+			return false;
 		}
-
-		// Next arg (even if current not recognized).
-		i++;
+		
+		return true;
 	}
-	
-    // If any of the Speed-Dreams dirs not run-time specified / empty, 
-    // use associated compile-time variable SD_XXDIR to get default value
-    if (!(localdir && strlen(localdir)))
-		localdir = GfSetLocalDir(SD_LOCALDIR);
-	if (!(libdir && strlen(libdir)))
-		libdir = GfSetLibDir(SD_LIBDIR);
-    if (!(bindir && strlen(bindir)))
-		bindir = GfSetBinDir(SD_BINDIR);
-    if (!(datadir && strlen(datadir)))
-		datadir = GfSetDataDir(SD_DATADIR);
-	
-    // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
-    if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
- 	|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
-    {
-		GfTrace("SD_LOCALDIR : '%s'\n", SD_LOCALDIR);
-		GfTrace("SD_LIBDIR   : '%s'\n", SD_LIBDIR);
-		GfTrace("SD_BINDIR   : '%s'\n", SD_BINDIR);
-		GfTrace("SD_DATADIR  : '%s'\n", SD_DATADIR);
-		GfFatal("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
-		exit(1);
-    }
 
-    // If "data dir" specified in any way, cd to it.
-    if (datadir && strlen(datadir))
-		chdir(datadir);
-}
-
-void ShowMenu(const char *pMenuFile)
-{
-	GfInitClient();
-	PreviewMenuInit(pMenuFile);
-	PreviewMenuRun();
-}
-
-int
-main(int argc, char *argv[])
-{
-    GfInit();
-
-    GfelInitialize();
-
-    init_args(argc, argv);
-
-    GfFileSetup();          /* Update user settings files from an old version */
-
-    GfScrInit();  /* init screen */
-
-	if (g_strMenuFile == "")
+	//! Activate the GUI.
+	void showMenu()
 	{
-		printf("Error: No menu file specified\nUSAGE:\n  sd-menuview menufile.xml\n");
-		exit(1);
+		PreviewMenuInit(_strMenuFile.c_str());
+		PreviewMenuRun();
 	}
+	
+ private:
+	
+	std::string _strMenuFile;
+};
 
-	ShowMenu(g_strMenuFile.c_str());
+int main(int argc, char *argv[])
+{
+	// Create the MenuView application
+	Application app(argc, argv);
+	
+	// Parse the command line options
+    if (!app.parseOptions())
+		app.exit(1);
 
-    GfelMainLoop();          /* event loop */
+	// Update user settings files from installed ones.
+    app.updateUserSettings();
 
-    GfShutdown();
+    // Initialize the event loop management layer.
+	GfuiEventLoop* pEventLoop = new GfuiEventLoop;
+	app.setEventLoop(pEventLoop);
 
-    exit(0);	            /* just for the compiler, never reached */
+	// Setup the window / screen and menu infrastructure (needs an event loop).
+    if (!app.setupWindow())
+		app.exit(1);
+
+	// Display the menu.
+	app.showMenu();
+	
+	// App. event loop.
+	app.eventLoop()();
+
+	// That's all.
+    app.exit(0);
+
+	// Make the compiler happy (never reached).
+	return 0;
 }
 

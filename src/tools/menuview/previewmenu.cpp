@@ -18,7 +18,8 @@
  ***************************************************************************/
 
 
-#include <stdio.h>
+#include <cstdio>
+
 #include <tgfclient.h>
 
 #include "previewmenu.h"
@@ -26,27 +27,19 @@
 
 void *menuHandle = NULL;
 
-// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
-//tModList *RacemanModLoaded = (tModList*)NULL;
-
 std::string g_strFile;
 
 void LoadMenuScreen();
 
 static void 
-endofprog(void * /* dummy */)
+onQuit(void * /* dummy */)
 {
-    GfScrShutdown();
-    exit(0);
+    GfuiApp().eventLoop().postQuit();
 }
 
 static void
 PreviewMenuActivate(void * /* dummy */)
 {
-// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
-//    if (RacemanModLoaded) {
-//	GfModUnloadList(&RacemanModLoaded);
-//    }
 }
 
 int ReadControl(void *param,std::string strType,const char *pControlName)
@@ -113,8 +106,8 @@ LoadMenuScreen()
     CreateStaticControls(param,menuHandle);
 	ShowDynamicControls(param);
     GfuiAddKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
-    GfuiAddKey(menuHandle, 'Q', "Quit", 0, endofprog, NULL);
-    GfuiAddKey(menuHandle, 'q', "Quit", 0, endofprog, NULL);
+    GfuiAddKey(menuHandle, 'Q', "Quit", 0, onQuit, NULL);
+    GfuiAddKey(menuHandle, 'q', "Quit", 0, onQuit, NULL);
     GfParmReleaseHandle(param);
 
 }

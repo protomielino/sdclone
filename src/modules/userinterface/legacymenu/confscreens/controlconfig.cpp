@@ -28,6 +28,7 @@
 #include <cstring>
 #include <string>
 
+#include <tgf.hpp>
 #include <tgfclient.h>
 #include <track.h>
 #include <robot.h>
@@ -307,7 +308,7 @@ onKeyAction(int key, int /* modifier */, int state)
 	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
     }
 
-    GfelSetIdleCB(0);
+    GfuiApp().eventLoop().setIdleCB(0);
     InputWaited = 0;
     updateButtonText();
     return 1;
@@ -329,6 +330,15 @@ getMovedAxis(void)
     return Index;
 }
 
+// Not used anymore : remove ?
+/* Game event loop idle function : For collecting input devices actions */
+// static void
+// IdleAcceptMouseClicks(void)
+// {
+//     AcceptMouseClicks = 1;
+//     GfuiApp().eventLoop().setIdleCB(0);
+// }
+
 /* Game event loop idle function : For collecting input devices actions */
 static void
 IdleWaitForInput(void)
@@ -345,13 +355,13 @@ IdleWaitForInput(void)
     for (i = 0; i < 3; i++) {
 	if (MouseInfo.edgedn[i]) {
 	    AcceptMouseClicks = 0;
-	    GfelSetIdleCB(0);
+	    GfuiApp().eventLoop().setIdleCB(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_BUT, i);
 	    Cmd[CurrentCmd].ref.index = i;
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_BUT;
 	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	    GfelPostRedisplay();
+	    GfuiApp().eventLoop().postRedisplay();
 	    updateButtonText();
 	    return;
 	}
@@ -360,13 +370,13 @@ IdleWaitForInput(void)
     /* Check for a mouse axis moved */
     for (i = 0; i < 4; i++) {
 	if (MouseInfo.ax[i] > 20.0) {
-	    GfelSetIdleCB(0);
+	    GfuiApp().eventLoop().setIdleCB(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_AXIS, i);
 	    Cmd[CurrentCmd].ref.index = i;
 	    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_MOUSE_AXIS;
 	    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	    GfelPostRedisplay();
+	    GfuiApp().eventLoop().postRedisplay();
 	    updateButtonText();
 	    return;
 	}
@@ -381,13 +391,13 @@ IdleWaitForInput(void)
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Button i fired */
-		    GfelSetIdleCB(0);
+		    GfuiApp().eventLoop().setIdleCB(0);
 		    InputWaited = 0;
 		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + 32 * index);
 		    Cmd[CurrentCmd].ref.index = i + 32 * index;
 		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_BUT;
 		    GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-		    GfelPostRedisplay();
+		    GfuiApp().eventLoop().postRedisplay();
 		    JoyButtons[index] = b;
 		    updateButtonText();
 		    return;
@@ -400,13 +410,13 @@ IdleWaitForInput(void)
     /* detect joystick movement */
     axis = getMovedAxis();
     if (axis != -1) {
-	GfelSetIdleCB(0);
+	GfuiApp().eventLoop().setIdleCB(0);
 	InputWaited = 0;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
 	Cmd[CurrentCmd].ref.index = axis;
 	str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
 	GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 	updateButtonText();
 	return;
     }
@@ -454,7 +464,7 @@ onPush(void *vi)
     memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
 
     /* Now, wait for input device actions */
-    GfelSetIdleCB(IdleWaitForInput);
+    GfuiApp().eventLoop().setIdleCB(IdleWaitForInput);
 }
 
 static void

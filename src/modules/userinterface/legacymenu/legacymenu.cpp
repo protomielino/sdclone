@@ -22,6 +22,7 @@
 #include <iraceengine.h>
 #include <igraphicsengine.h>
 
+#include <tgf.hpp>
 #include <tgfclient.h>
 
 #include "client.h"
@@ -75,27 +76,18 @@ LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 // Implementation of IUserInterface ****************************************
 bool LegacyMenu::activate()
 {
-	// Initialize the screen.
-	bool bStatus = GfScrInit();
-
-	if (bStatus)
-		
-		// Enter the menu system.
-		bStatus = ::MenuEntry();
-
-	return bStatus;
+	return ::MenuEntry();
 }
 
 void LegacyMenu::quit()
 {
 	// Quit the event loop next time.
-    GfelQuit();
+	GfuiApp().eventLoop().postQuit();
 }
 
 void LegacyMenu::shutdown()
 {
-	// Shutdown the screen.
-    GfScrShutdown();
+	// Nothing to do here.
 }
 
 void LegacyMenu::update()
@@ -107,7 +99,7 @@ void LegacyMenu::update()
 		GfuiDisplay();
 
 	// Request that the GUI is redisplayed at the end of next event loop.
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 void *LegacyMenu::createRaceScreen()

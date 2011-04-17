@@ -28,6 +28,7 @@
 #include <string>
 
 #include <portability.h>
+#include <tgf.hpp>
 #include <tgfclient.h>
 
 #include <raceman.h>
@@ -144,10 +145,11 @@ GetTrackName(const char *category, const char *trackName)
     return name;
 }
 
-// Never used : remove ?
+// Not used for the moment.
 // static void
 // onChangeCarCategory(void * pData)
 // {
+	
 // }
 
 static std::string
@@ -323,7 +325,7 @@ UpdateNetworkPlayers()
 	}
 
 	pNetwork->SetRefreshDisplay(false);
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 
 	if (IsClient())
 	{	
@@ -419,7 +421,7 @@ HostServerIdle(void)
 
 		}
 
-		GfelPostRedisplay();
+		GfuiApp().eventLoop().postRedisplay();
 	}
 	
     /* Let CPU take breath (and fans stay at low and quiet speed) */
@@ -442,7 +444,7 @@ ClientIdle(void)
 		{
 			//Update the screen
 			UpdateNetworkPlayers();
-			GfelPostRedisplay();
+			GfuiApp().eventLoop().postRedisplay();
 		}
 
 		if (GetClient()->PrepareToRace())
@@ -456,7 +458,7 @@ ClientIdle(void)
 			rmNetworkClientDisconnect(NULL);
 		}
 
-		GfelPostRedisplay();
+		GfuiApp().eventLoop().postRedisplay();
 	}
 	
     /* Let CPU take breath (and fans stay at low and quiet speed) */
@@ -486,7 +488,7 @@ NetworkRaceInfo()
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 }
 
-// Never used : remove ?
+// Not used for the moment.
 // static void
 // NetworkDisplay(void)
 // {
@@ -494,7 +496,7 @@ NetworkRaceInfo()
 
 static void OnActivateNetworkClient(void *)
 {
-	GfelSetIdleCB(ClientIdle);
+	GfuiApp().eventLoop().setIdleCB(ClientIdle);
 }
 
 
@@ -515,7 +517,7 @@ OnActivateNetworkHost(void *)
 	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	GfelSetIdleCB(HostServerIdle);	
+	GfuiApp().eventLoop().setIdleCB(HostServerIdle);	
 	GetServer()->SetRefreshDisplay(true);
 }
 
@@ -646,7 +648,7 @@ ShowWaitingToConnectScreen()
 
 	GfuiTitleCreate(racemanMenuHdle, "Trying to Connect to Server...", 30);
 	GfuiScreenActivate(racemanMenuHdle);
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 void
@@ -721,7 +723,7 @@ RmNetworkClientConnectMenu(void * /* dummy */)
 
 	UpdateNetworkPlayers();
 	GfuiScreenActivate(racemanMenuHdle);
-	GfelSetIdleCB(ClientIdle);
+	GfuiApp().eventLoop().setIdleCB(ClientIdle);
 }
 
 static void 
@@ -878,7 +880,7 @@ ServerPrepareStartNetworkRace(void * /* dummy */)
 	GetServer()->SendPrepareToRacePacket();
 
 	//restore the idle function
-	GfelSetIdleCB(GfuiIdle);
+	GfuiApp().eventLoop().setIdleCB(GfuiIdle);
 	LegacyMenu::self().raceEngine().startNewRace();
 }
 

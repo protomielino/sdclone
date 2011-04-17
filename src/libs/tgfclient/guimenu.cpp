@@ -35,7 +35,7 @@
 #include "guimenu.h"
 
 void
-gfMenuInit(void)
+gfuiMenuInit(void)
 {
 }
 

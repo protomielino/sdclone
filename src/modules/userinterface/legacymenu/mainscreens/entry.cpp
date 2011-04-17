@@ -17,7 +17,6 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <tgfclient.h>
 #include <glfeatures.h>
 
 #include "client.h"
@@ -44,11 +43,10 @@ bool
 MenuEntry(void)
 {
     // Initialize gaming framework UI.
-    GfInitClient();
-	GfglFeatures::self()->setSelectionLoader(OpenGLLoadSelectedFeatures);
-	GfglFeatures::self()->setSelectionStorer(OpenGLStoreSelectedFeatures);
-	GfglFeatures::self()->loadSelection();
+    GfglFeatures::self()->setSelectionLoader(OpenGLLoadSelectedFeatures);
+    GfglFeatures::self()->setSelectionStorer(OpenGLStoreSelectedFeatures);
+    GfglFeatures::self()->loadSelection();
 
-    // Open the splash screen, load menus in "backgroud" and finally open the main menu.
+    // Open the splash screen, load menus in "background" and finally open the main menu.
     return SplashScreen();
 }

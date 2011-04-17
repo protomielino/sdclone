@@ -785,11 +785,11 @@ Uint32 network_callbackfunc(Uint32 interval, void *param)
 
 bool NetworkInit()
 {
-	// Initialize SDL.
-	if ( SDL_Init(SDL_INIT_TIMER) < 0 ) {
-		GfLogTrace("NetworkInit : Couldn't initialize SDL: %s\n", SDL_GetError());
-		return false;
-	}
+	// Initialize SDL : not needed, as already done in GfInit.
+//	if ( SDL_InitSubSystem(SDL_INIT_TIMER) < 0 ) {
+//		GfLogTrace("NetworkInit : Couldn't initialize SDL: %s\n", SDL_GetError());
+//		return false;
+//	}
 
 	g_bInit = true;
 

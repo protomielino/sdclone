@@ -26,6 +26,7 @@
 #include <cstdio>
 
 #include <portability.h>
+#include <tgf.hpp>
 #include <tgfclient.h>
 
 #include <raceman.h>
@@ -51,6 +52,7 @@ rmIdle()
     // Do nothing.
 }
 
+// TODO: Is this really a _display_ call-back =:-?
 static void
 rmDisplay()
 {
@@ -61,10 +63,10 @@ static void
 rmScreenActivate(void * /* dummy */)
 {
     // Set a real idle function (other than 0) doing nothing, 
-    // otherwise GfelMainLoop will replace it by 1ms idle wait
-    GfelSetIdleCB(rmIdle);
+    // otherwise the event loop will replace it by 1ms idle wait
+    GfuiApp().eventLoop().setIdleCB(rmIdle);
 
-    GfelSetDisplayCB(rmDisplay);
+    GfuiApp().eventLoop().setDisplayCB(rmDisplay);
 
 	// Resync race engine if it is not paused or stopped
 	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
@@ -72,7 +74,7 @@ rmScreenActivate(void * /* dummy */)
 		LegacyMenu::self().raceEngine().start(); 			/* resynchro */
     }
 
-    GfelPostRedisplay();
+    GfuiApp().eventLoop().postRedisplay();
 }
 
 static void
@@ -150,13 +152,12 @@ rmApplyState(void *pvState)
     LegacyMenu::self().raceEngine().applyState((int)(long)pvState);
 }
 
-#ifdef DEBUG
+// Not used : see below the commented-out call.
 // static void
 // rmOneStep(void *pvState)
 // {
 //     LegacyMenu::self().raceEngine().step((int)(long)pvState);
 // }
-#endif
 
 static void
 rmAddKeys()
@@ -173,10 +174,8 @@ rmAddKeys()
     GfuiAddKey(rmScreenHandle, 'q', "Quit Game, Save Nothing",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
     GfuiAddKey(rmScreenHandle, ' ', "Skip Pre-start",    (void*)0, rmSkipPreStart, NULL);
 	
-#ifdef DEBUG
 	// WARNING: Sure this won't work with multi-threading On/Auto ...
     //GfuiAddKey(rmScreenHandle, '0', "One step simulation",    (void*)1, rmOneStep, NULL);
-#endif
 	
     GfuiAddKey(rmScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, rmMovieCapture, NULL);
     GfuiAddKey(rmScreenHandle, 'o', "Hide / Show mouse cursor",   (void*)0, rmHideShowMouseCursor, NULL);
@@ -321,12 +320,12 @@ static void
 rmResScreenActivate(void * /* dummy */)
 {
     // Set a real idle function (other than 0) doing nothing, 
-    // otherwise GfelMainLoop will replace it by a 1ms idle wait
-    GfelSetIdleCB(rmIdle);
+    // otherwise the event loop will replace it by a 1ms idle wait
+    GfuiApp().eventLoop().setIdleCB(rmIdle);
 
-    GfelSetDisplayCB(rmDisplay);
+    GfuiApp().eventLoop().setDisplayCB(rmDisplay);
     GfuiDisplay();
-    GfelPostRedisplay();
+    GfuiApp().eventLoop().postRedisplay();
 }
 
 
@@ -334,7 +333,7 @@ static void
 rmContDisplay()
 {
     GfuiDisplay();
-    GfelPostRedisplay();
+    GfuiApp().eventLoop().postRedisplay();
 }
 
 
@@ -501,8 +500,8 @@ RmResShowCont()
     GfuiAddKey(rmResScreenHdle, GFUIK_RETURN,  "Continue", 0, rmResCont, NULL);
     GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, rmResCont, NULL);
 
-    GfelSetDisplayCB(rmContDisplay);
-    GfelPostRedisplay();
+    GfuiApp().eventLoop().setDisplayCB(rmContDisplay);
+    GfuiApp().eventLoop().postRedisplay();
 }
 
 //************************************************************

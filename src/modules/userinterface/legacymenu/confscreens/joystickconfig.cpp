@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <cstring>
 
+#include <tgf.hpp>
 #include <tgfclient.h>
 
 #include "controlconfig.h"
@@ -172,9 +173,9 @@ Idle2(void)
 		    /* Button fired */
 		    JoyCalAutomaton();
 		    if (CalState >= NbCalSteps) {
-			GfelSetIdleCB(0);
+			GfuiApp().eventLoop().setIdleCB(0);
 		    }
-		    GfelPostRedisplay();
+		    GfuiApp().eventLoop().postRedisplay();
 		    JoyButtons[index] = b;
 		    return;
 		}
@@ -207,8 +208,8 @@ onActivate(void * /* dummy */)
 
     CalState = 0;
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
-    GfelSetIdleCB(Idle2);
-    GfelPostRedisplay();
+    GfuiApp().eventLoop().setIdleCB(Idle2);
+    GfuiApp().eventLoop().postRedisplay();
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (Joystick[index]) {
 	    Joystick[index]->read(&JoyButtons[index], &JoyAxis[index * GFCTRL_JOY_MAX_AXES]); /* initial value */

@@ -578,9 +578,9 @@ bool GfScrInit(void)
 	// Initialize the Open GL viewport.
 	gfScrReshapeViewport(winX, winY);
 
-	//
-	GfelPostRedisplay();
-	GfelSetReshapeCB(gfScrReshapeViewport);
+	// Setup the event loop about the new display.
+	GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
+	GfuiApp().eventLoop().postRedisplay();
 
 	// Initialize Open GL feature management layer
 	//TODO:gfglCheckGLFeatures();

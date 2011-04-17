@@ -1,11 +1,11 @@
 /***************************************************************************
-                    tgfclient.h -- Interface file for The Gaming Framework                                    
-                             -------------------                                         
+                    tgfclient.h -- Interface file for The Gaming Framework
+                             -------------------
     created              : Fri Aug 13 22:32:14 CEST 1999
-    copyright            : (C) 1999 by Eric Espie                         
-    email                : torcs@free.fr   
-    version              : $Id$                                  
- ***************************************************************************/
+    copyright            : (C) 1999 by Eric Espie
+    email                : torcs@free.fr
+    version              : $Id$
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -44,7 +44,7 @@
 #endif
 #include <SDL/SDL_keysym.h>
 
-#include <tgf.h>
+#include <tgf.hpp>
 
 #include "guiscreen.h"
 
@@ -65,7 +65,7 @@
  * Initialization   *
  ********************/
 
-TGFCLIENT_API void GfInitClient(void);
+TGFCLIENT_API void GfuiInit(void);
 
 
 /******************** 
@@ -173,10 +173,10 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 // Add needed other GFUIK_* here or above.
 
 // Maximun value of a key code (Has to be the least greater  2^N - 1 >= SDLK_LAST)
-#define GFUIK_MAX	0x1FF
+#define GFUIK_MAX	GF_MAX_KEYCODE
 
 #if (GFUIK_MAX < SDLK_LAST)
-# error SDLK_MAX has grown too much, please increase GFUIK_MAX to the least greater power of 2 minus 1.
+# error SDLK_MAX has grown too much, please increase GF_MAX_KEYCODE to the least greater power of 2 minus 1.
 #endif
 
 
@@ -560,36 +560,99 @@ TGFCLIENT_API void GfctrlMouseInitCenter(void);
 TGFCLIENT_API tCtrlRef *GfctrlGetRefByName(const char *name);
 TGFCLIENT_API const char *GfctrlGetNameByRef(int type, int index);
 
+//****************************************
+// The GUI event loop class
 
-/************************
- * Event loop interface *
- ************************/
+class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
+{
+  public: // Member functions.
 
-// Callbacks initialization
-TGFCLIENT_API void GfelInitialize();
+	//! Constructor
+	GfuiEventLoop();
 
-// Specific callbacks setup
-TGFCLIENT_API void GfelSetKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y));
-TGFCLIENT_API void GfelSetKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y));
+	//! Destructor
+	virtual ~GfuiEventLoop();
 
-TGFCLIENT_API void GfelSetMouseButtonCB(void (*func)(int button, int state, int x, int y));
-TGFCLIENT_API void GfelSetMouseMotionCB(void (*func)(int x, int y));
-TGFCLIENT_API void GfelSetMousePassiveMotionCB(void (*func)(int x, int y));
+	//! The real event loop function.
+	virtual void operator()(void);
 
-TGFCLIENT_API void GfelSetIdleCB(void (*func)(void));
+	//! Set the "mouse button pressed" callback function.
+	void setMouseButtonCB(void (*func)(int button, int state, int x, int y));
 
-TGFCLIENT_API void GfelSetDisplayCB(void (*func)(void));
-TGFCLIENT_API void GfelSetReshapeCB(void (*func)(int width, int height));
+	//! Set the "mouse motion with button pressed" callback function.
+	void setMouseMotionCB(void (*func)(int x, int y));
 
-TGFCLIENT_API void GfelSetTimerCB(unsigned int millis, void (*func)(int value));
+	//! Set the "mouse motion without button pressed" callback function.
+	void setMousePassiveMotionCB(void (*func)(int x, int y));
 
-// Event loop management
-TGFCLIENT_API void GfelPostRedisplay(void);
-TGFCLIENT_API void GfelForceRedisplay();
-TGFCLIENT_API void GfelQuit();
+	//! Set the "redisplay/refresh" callback function. 
+	void setDisplayCB(void (*func)(void));
 
-// The event loop itself (never returns)
-TGFCLIENT_API void GfelMainLoop(void);
+	//! Set the "reshape" callback function with given new screen/window geometry.
+	void setReshapeCB(void (*func)(int width, int height));
+
+	//! Post a "redisplay/refresh" event to the event loop. 
+	void postRedisplay(void);
+
+	//! Force a call to the "redisplay/refresh" callback function. 
+	void forceRedisplay();
+
+  protected:
+	
+	//! Process a keyboard event.
+	void injectKeyboardEvent(int code, int modifier, int state,
+							 int unicode, int x = 0, int y = 0);
+	
+	//! Process a mouse motion event.
+	void injectMouseMotionEvent(int state, int x, int y);
+	
+	//! Process a mouse button event.
+	void injectMouseButtonEvent(int button, int state, int x, int y);
+
+	//! Process a redisplay event.
+	void redisplay();
+	
+  private: // Member data.
+
+	//! Private data (pimp pattern).
+	class Private;
+	Private* _pPrivate;
+};
+
+//****************************************
+// GUI Application base class
+
+class TGFCLIENT_API GfuiApplication : public GfApplication
+{
+ public:
+
+	//! Constructor.
+	GfuiApplication(const char* pszName, const char* pszDesc, int argc = 0, char **argv = 0);
+
+	//! Parse the command line options (updates _lstOptionsLeft).
+	bool parseOptions();
+
+	//! Setup the window / screen and menu infrastructure.
+	bool setupWindow(bool bNoMenu = false);
+
+	//! Application event loop.
+	GfuiEventLoop& eventLoop();
+	
+	//! Exit from the app.
+	virtual void exit(int nStatusCode = 0);
+
+ protected:
+
+	//! True if setupWindow was successfull.
+	bool _bWindowUp;
+};
+
+
+//! Shortcut to the application singleton.
+inline TGFCLIENT_API GfuiApplication& GfuiApp()
+{
+	return dynamic_cast<GfuiApplication&>(GfApplication::self());
+}
 
 #endif /* __TGFCLIENT__H__ */
 

@@ -7,7 +7,7 @@ ADD_SDL_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(txml portability)
 
 SET(TGF_HEADERS os.h tgf.h tgf.hpp modinfo.h osspec.h)
-SET(TGF_SOURCES directory.cpp file.cpp filesetup.cpp 
+SET(TGF_SOURCES application.cpp eventloop.cpp directory.cpp file.cpp filesetup.cpp 
                 formula.cpp hash.cpp module.cpp legacymodule.cpp modinfo.cpp os.cpp
                 params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp)
 

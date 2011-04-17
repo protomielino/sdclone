@@ -35,9 +35,11 @@
 #include <raceman.h>
 
 #include <portability.h>
+#include <tgf.hpp>
 
 #include "tgfclient.h"
 #include "gui.h"
+#include "guimenu.h"
 
 
 tGfuiScreen	*GfuiScreen;	/* current screen */
@@ -107,6 +109,7 @@ gfuiInit(void)
 	gfuiObjectInit();
 	gfuiColorInit();
 	gfuiLoadFonts();
+	gfuiMenuInit();
 }
 
 Color 
@@ -148,7 +151,7 @@ GfuiIdle(void)
 			/* button down */
 			gfuiUpdateFocus();
 			gfuiMouseAction((void*)0);
-			GfelPostRedisplay();
+			GfuiApp().eventLoop().postRedisplay();
 		}
 	}
 }
@@ -355,7 +358,7 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 				break;
 		}
 	}
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 static void
@@ -385,7 +388,7 @@ gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 		} while (curKey != GfuiScreen->userKeys);
 	}
 	
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 /** Get the mouse information (position and buttons)
@@ -436,7 +439,7 @@ gfuiMouseButton(int button, int state, int x, int y)
 			gfuiUpdateFocus();
 			gfuiMouseAction((void*)1);
 		}
-		GfelPostRedisplay();
+		GfuiApp().eventLoop().postRedisplay();
 	}
 }
 
@@ -447,7 +450,7 @@ gfuiMouseMotion(int x, int y)
 	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	gfuiUpdateFocus();
 	gfuiMouseAction((void*)(1 - GfuiScreen->mouse));
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 	DelayRepeat = REPEAT1;
 }
 
@@ -457,7 +460,7 @@ gfuiMousePassiveMotion(int x, int y)
 	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	gfuiUpdateFocus();
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 /** Tell if the screen is active or not.
@@ -484,12 +487,12 @@ GfuiScreenActivate(void *screen)
 	
 	GfuiScreen = (tGfuiScreen*)screen;
 	
-  	GfelSetKeyboardDownCB(gfuiKeyboardDown);
-	GfelSetKeyboardUpCB(gfuiKeyboardUp);
-   	GfelSetMouseButtonCB(gfuiMouseButton);
-	GfelSetMouseMotionCB(gfuiMouseMotion);
-	GfelSetMousePassiveMotionCB(gfuiMousePassiveMotion);
-	GfelSetIdleCB(0);
+  	GfuiApp().eventLoop().setKeyboardDownCB(gfuiKeyboardDown);
+	GfuiApp().eventLoop().setKeyboardUpCB(gfuiKeyboardUp);
+   	GfuiApp().eventLoop().setMouseButtonCB(gfuiMouseButton);
+	GfuiApp().eventLoop().setMouseMotionCB(gfuiMouseMotion);
+	GfuiApp().eventLoop().setMousePassiveMotionCB(gfuiMousePassiveMotion);
+	GfuiApp().eventLoop().setIdleCB(0);
 
 	if (GfuiScreen->keyAutoRepeat)
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -502,11 +505,11 @@ GfuiScreenActivate(void *screen)
 		{
 			gfuiSelectNext(NULL);
 		}
-		GfelSetDisplayCB(GfuiDisplay);
+		GfuiApp().eventLoop().setDisplayCB(GfuiDisplay);
 	} 
 	else 
 	{
-		GfelSetDisplayCB(GfuiDisplayNothing);
+		GfuiApp().eventLoop().setDisplayCB(GfuiDisplayNothing);
 	}
 	
 	if (GfuiScreen->onActivate)
@@ -515,7 +518,7 @@ GfuiScreenActivate(void *screen)
 	if (GfuiScreen->onlyCallback == 0) 
 	{
 		GfuiDisplay();
-		GfelPostRedisplay();
+		GfuiApp().eventLoop().postRedisplay();
 	}
 }
 
@@ -545,13 +548,13 @@ GfuiScreenDeactivate(void)
 	
 	GfuiScreen = (tGfuiScreen*)NULL;
 	
-  	GfelSetKeyboardDownCB(0);
- 	GfelSetKeyboardUpCB(0);
-	GfelSetMouseButtonCB(0);
-  	GfelSetMouseMotionCB(0);
-	GfelSetMousePassiveMotionCB(0);
- 	GfelSetIdleCB(0);
- 	GfelSetDisplayCB(GfuiDisplayNothing);
+  	GfuiApp().eventLoop().setKeyboardDownCB(0);
+ 	GfuiApp().eventLoop().setKeyboardUpCB(0);
+	GfuiApp().eventLoop().setMouseButtonCB(0);
+  	GfuiApp().eventLoop().setMouseMotionCB(0);
+	GfuiApp().eventLoop().setMousePassiveMotionCB(0);
+ 	GfuiApp().eventLoop().setIdleCB(0);
+ 	GfuiApp().eventLoop().setDisplayCB(GfuiDisplayNothing);
 }
 
 /** Create a new screen.

@@ -27,6 +27,7 @@
 #include <cstdlib>
 #include <cstring>
 
+#include <tgf.hpp>
 #include <tgfclient.h>
 
 #include "controlconfig.h"
@@ -124,10 +125,10 @@ MouseCalAutomaton(void)
     CalState = GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	GfelSetIdleCB(Idle2);
+	GfuiApp().eventLoop().setIdleCB(Idle2);
     } else {
-	GfelSetIdleCB(0);
-	GfelPostRedisplay();
+	GfuiApp().eventLoop().setIdleCB(0);
+	GfuiApp().eventLoop().postRedisplay();
     }
 }
 
@@ -157,7 +158,7 @@ IdleMouseInit(void)
     memset(&MouseInfo, 0, sizeof(MouseInfo));
     GfctrlMouseGetCurrent(&MouseInfo);
     GfctrlMouseInitCenter();
-    GfelSetIdleCB(Idle2);
+    GfuiApp().eventLoop().setIdleCB(Idle2);
 }
 
 static void
@@ -167,7 +168,7 @@ onActivate(void * /* dummy */)
     GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	GfelSetIdleCB(IdleMouseInit);
+	GfuiApp().eventLoop().setIdleCB(IdleMouseInit);
 	GfctrlMouseCenter();
     }
 }

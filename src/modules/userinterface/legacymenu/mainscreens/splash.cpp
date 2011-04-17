@@ -31,6 +31,7 @@
 #endif
 
 #include <SDL/SDL.h>
+#include <tgf.hpp>
 #include <tgfclient.h>
 #include <glfeatures.h>
 
@@ -267,11 +268,11 @@ bool SplashScreen(void)
 		GfTexFreeTexture(s_texture); 
 
 	// Get screen gamma from graphics configuration.
-	// static char buf[512];
-	// sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	// void* handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	// float screen_gamma =
-	// 	(float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
+	//static char buf[512];
+	//sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	//void* handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	//float screen_gamma =
+	//	(float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
 	
 	// Load splash texture from file.
 	s_texture = GfTexReadTexture("data/img/splash.jpg",
@@ -281,11 +282,11 @@ bool SplashScreen(void)
 	MainMenuReady = 0;
 
 	// Setup event loop callbacks.
-	GfelSetDisplayCB(splashDisplay);
-	GfelSetKeyboardDownCB(splashKey);
-	GfelSetTimerCB(7000, splashTimer);
-	GfelSetMouseButtonCB(splashMouse);
-	GfelSetIdleCB(splashIdle);
+	GfuiApp().eventLoop().setDisplayCB(splashDisplay);
+	GfuiApp().eventLoop().setKeyboardDownCB(splashKey);
+	GfuiApp().eventLoop().setTimerCB(7000, splashTimer);
+	GfuiApp().eventLoop().setMouseButtonCB(splashMouse);
+	GfuiApp().eventLoop().setIdleCB(splashIdle);
     
 	return true;
 }
