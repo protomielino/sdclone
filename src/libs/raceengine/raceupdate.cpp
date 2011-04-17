@@ -246,7 +246,7 @@ int reSituationUpdaterThreadLoop(void *pUpdater)
 int reSituationUpdater::threadLoop()
 {
 	// Wait delay for each loop, from bRunning value (index 0 = false, 1 = true).
-	static const double KWaitDelayMS[2] = { 1.0, RCM_MAX_DT_SIMU * 1000 / 10 };
+	static const unsigned KWaitDelayMS[2] = { 1, (unsigned)(RCM_MAX_DT_SIMU * 1000 / 10) };
 
 	// Termination flag.
 	bool bEnd = false;

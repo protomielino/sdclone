@@ -58,7 +58,7 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 			car->_scheduledEventTime = s->currentTime + info->totalPitTime;
 			ReInfo->_reSimItf.reconfig(car);
 			for (i=0; i<4; i++) {
-				car->_tyreCondition(i) = 1.01;
+				car->_tyreCondition(i) = 1.01f;
 				car->_tyreT_in(i) = 50.0;
 				car->_tyreT_mid(i) = 50.0;
 				car->_tyreT_out(i) = 50.0;
@@ -508,7 +508,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				car->_lapsBehindLeader = 0;
 				car->_timeBehindPrev = 0;
 			}
-			info->sTime = s->currentTime;
+			info->sTime = (tdble)s->currentTime;
 			switch (ReInfo->s->_raceType) {
 			case RM_TYPE_PRACTICE:
 				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {

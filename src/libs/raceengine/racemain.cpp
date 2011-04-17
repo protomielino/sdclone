@@ -179,7 +179,7 @@ RePreRace(void)
 	
 	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
 	GfParmRemoveVariable (ReInfo->params, "/", "eventNb");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1 : 0);
+	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
 	GfParmSetVariable (ReInfo->params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
 	if (!raceName) {
 		return RM_ERROR;
@@ -192,7 +192,7 @@ RePreRace(void)
 			GfLogDebug( "||||++|||| NOT LAST RACE!\n" );
 			curRaceIdx++;
 			GfLogTrace("Race Nb %d\n", curRaceIdx);
-			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, curRaceIdx);
+			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, (tdble)curRaceIdx);
 	
 			return RM_SYNC | RM_NEXT_RACE;
 		}
@@ -617,7 +617,7 @@ ReRaceEnd(void)
 			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 			return ReDisplayResults();
 		}
-		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, curDrvIdx);
+		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 		return RM_SYNC | RM_NEXT_RACE;
 	}
 
@@ -636,7 +636,7 @@ RePostRace(void)
 	if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
 		curRaceIdx++;
 		GfLogInfo("Race Nb %d\n", curRaceIdx);
-		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, curRaceIdx);
+		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, (tdble)curRaceIdx);
 		ReUpdateStandings();
 		return RM_SYNC | RM_NEXT_RACE;
 	}
@@ -681,7 +681,7 @@ ReEventShutdown(void)
 			}
 		}
 
-		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, curTrkIdx);
+		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
 
 		if (strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0) {
 			careerMode = TRUE;
