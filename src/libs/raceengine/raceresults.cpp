@@ -292,7 +292,7 @@ ReStoreRaceResults(const char *race)
 			
 				GfParmSetStr(results, path, RE_ATTR_MODULE, car->_modName);
 				GfParmSetNum(results, path, RE_ATTR_IDX, NULL, (tdble)car->_moduleIndex);
-				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, (tdble)(car->index + 1));
+				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, car->index + 1);
 				GfParmSetNum(results, path, RM_ATTR_EXTENDED, NULL,
 							 GfParmGetNum(params, path2, RM_ATTR_EXTENDED, NULL, 0));
 				GfParmSetStr(results, path, ROB_ATTR_CAR, car->_carName);
