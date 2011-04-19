@@ -344,7 +344,11 @@ bool GfScrInit(void)
 		GfLogError("Couldn't initialize SDL video sub-system (%s)\n", SDL_GetError());
 		return false;
 	}
-
+	
+	// Enable unicode translation for SDL key press events, even if already done before
+	// (SDL_InitSubSystem(SDL_INIT_VIDEO) seems to break it).
+	SDL_EnableUNICODE(/*enable=*/1);
+	
 	// Query system video capabilities.
 	// Note: Does not work very well as long as you don't force SDL to use
 	//       a special hardware driver ... which we don't want at all (the default is the one).

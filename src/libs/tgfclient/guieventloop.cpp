@@ -52,6 +52,7 @@ GfuiEventLoop::Private::Private()
 // GfuiEventLoop class ============================================================
 
 GfuiEventLoop::GfuiEventLoop()
+: GfEventLoop()
 {
 	_pPrivate = new Private;
 }

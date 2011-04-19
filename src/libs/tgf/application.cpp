@@ -58,8 +58,8 @@ GfApplication::GfApplication(const char* pszName, const char* pszDesc, int argc,
 	_pSelf = this;
 	
 	// Initialize the gaming framework.
-    GfInit();
-	
+	GfInit();
+
 	// Store the command line options.
 	if (argv)
 		for (int i = 0; i < argc; i++)

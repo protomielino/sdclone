@@ -20,7 +20,7 @@
 
 
 GfuiApplication::GfuiApplication(const char* pszName, const char* pszDesc, int argc, char **argv)
-: GfApplication(pszName ? pszName : "GfuiApplication", pszDesc, argc, argv)
+: GfApplication((pszName ? pszName : "GfuiApplication"), pszDesc, argc, argv)
 {
 	// Help about the options.
 	_optionsHelp.lstSyntaxLines.push_back("[-m|--hardmouse]");

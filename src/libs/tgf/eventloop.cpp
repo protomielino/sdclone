@@ -62,17 +62,14 @@ private: // Private data members.
 	std::map<Uint32, Uint16> _mapUnicodes;
 };
 
-//! Initialization flag for the underlying software layers.
-bool GfEventLoop::Private::_bInitialized = 0;
-
-
 GfEventLoop::Private::Private()
 : cbKeyboardDown(0), cbKeyboardUp(0), cbIdle(0), cbTimer(0), bQuit(false)
 {
-	if (!_bInitialized)
+	static bool bInitialized = false;
+	if (!bInitialized)
 	{
 		SDL_EnableUNICODE(/*enable=*/1); // For keyboard "key press" event key code translation
-		_bInitialized = true;
+		bInitialized = true;
 	}
 }
 
@@ -85,23 +82,28 @@ GfEventLoop::Private::Private()
 // Known issues (TODO): No support for Caps and NumLock keys ... don't use them !
 int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
 {
-	int keyUnicode;
-	
+	// Generate the key Id from its code and modifier.
 	const Uint32 keyId = ((Uint32)code & 0x1FF) | (((Uint32)modifier) << 9);
-	
+
+	// Search it in our unicode map.
     const std::map<Uint32, Uint16>::const_iterator itUnicode = _mapUnicodes.find(keyId);
-    
+
+	// If not found, update the map for next times.
+	int keyUnicode;
     if (itUnicode == _mapUnicodes.end())
 	{
 		// Truncate unicodes above GF_MAX_KEYCODE (no need for more).
 		keyUnicode = unicode ? (unicode & GF_MAX_KEYCODE) : code;
 		_mapUnicodes[keyId] = keyUnicode;
-		//GfLogDebug("translateKeySym: New key id=0x%08X, unicode=%d (%d)\n",
-		//		   keyId, keyUnicode, _mapUnicodes.size());
+		//GfLogDebug("translateKeySym(c=%d, m=%d, u=%d) : New key id=0x%08X, unicode=%d (%d)\n",
+		//		   code, modifier, unicode, keyId, keyUnicode, _mapUnicodes.size());
 	}
+
+	// If found, get the unicode from the map.
 	else
 		keyUnicode = (*itUnicode).second;
 
+	// Done.
 	return keyUnicode;
 }
 
