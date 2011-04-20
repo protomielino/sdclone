@@ -392,7 +392,7 @@ grLoadBackground(void)
 	// Load graphic options for the background.
 	grSkyDomeDistance =
 		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
-	if (grSkyDomeDistance < grSkyDomeDistThresh)
+	if (grSkyDomeDistance > 0 && grSkyDomeDistance < grSkyDomeDistThresh)
 		grSkyDomeDistance = grSkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
 
 	grDynamicTime = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, GR_ATT_DYNAMICTIME_DISABLED), GR_ATT_DYNAMICTIME_ENABLED) == 0; 
