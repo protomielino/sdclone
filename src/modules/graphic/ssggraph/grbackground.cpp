@@ -230,10 +230,10 @@ grInitBackground(void)
 
 		// Add the Moon
 		TheCelestBodies[eCBMoon] = TheSky->addBody ( "data/textures/moon.rgba",NULL, (2500 / div), grSkyDomeDistance);
-		if ( grSunDeclination < 0 )
+		if ( grSunDeclination > 180 )
 			grMoonDeclination = 3.0 + (rand() % 40);
 		else
-			grMoonDeclination = -(rand() % 180) + 90;
+			grMoonDeclination = (rand() % 270);
 
 		const float moonAscension = (float)(rand() % 359);
 		
