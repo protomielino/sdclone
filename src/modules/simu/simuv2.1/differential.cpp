@@ -48,9 +48,12 @@ SimDifferentialConfig(void *hdle, const char *section, tDifferential *differenti
     } else {
         differential->type = DIFF_NONE; 
     }
+    
+    if (differential->efficiency > 1.0f) {differential->efficiency = 1.0f;}
+    if (differential->efficiency < 0.0f) {differential->efficiency = 0.0f;}
 
     differential->feedBack.I = differential->I * differential->ratio * differential->ratio +
-        (differential->inAxis[0]->I + differential->inAxis[1]->I) / differential->efficiency;
+        (differential->inAxis[0]->I + differential->inAxis[1]->I);
 }
 
 
@@ -67,7 +70,7 @@ updateSpool(tCar *car, tDifferential *differential, int first)
     tdble   I;
     tdble   inTq, brkTq;
     
-    DrTq = differential->in.Tq;
+    DrTq = differential->in.Tq * differential->efficiency;
 
     I = differential->outAxis[0]->I + differential->outAxis[1]->I;
     inTq = differential->inAxis[0]->Tq + differential->inAxis[1]->Tq;
@@ -116,7 +119,7 @@ SimDifferentialUpdate(tCar *car, tDifferential *differential, int first)
         return;
     }
 
-    DrTq = differential->in.Tq;
+    DrTq = differential->in.Tq * differential->efficiency;
 
     spinVel0 = differential->inAxis[0]->spinVel;
     spinVel1 = differential->inAxis[1]->spinVel;
