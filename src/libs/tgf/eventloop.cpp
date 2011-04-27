@@ -46,7 +46,7 @@ class GfEventLoop::Private
 	void (*cbKeyboardDown)(int key, int modifiers, int x, int y);
 	void (*cbKeyboardUp)(int key, int modifiers, int x, int y);
 	
-	void (*cbIdle)(void);
+	void (*cbRecompute)(void);
 	
 	void (*cbTimer)(int value);
 	
@@ -63,7 +63,7 @@ private: // Private data members.
 };
 
 GfEventLoop::Private::Private()
-: cbKeyboardDown(0), cbKeyboardUp(0), cbIdle(0), cbTimer(0), bQuit(false)
+: cbKeyboardDown(0), cbKeyboardUp(0), cbRecompute(0), cbTimer(0), bQuit(false)
 {
 	static bool bInitialized = false;
 	if (!bInitialized)
@@ -182,8 +182,8 @@ void GfEventLoop::operator()()
 
 		if (!_pPrivate->bQuit)
 		{
-			// Spend idle time as requested.
-			spendIdleTime();
+			// Recompute if anything to.
+			recompute();
 		}
 	}
 
@@ -200,9 +200,9 @@ void GfEventLoop::setKeyboardUpCB(void (*func)(int key, int modifiers, int x, in
 	_pPrivate->cbKeyboardUp = func;
 }
 
-void GfEventLoop::setIdleCB(void (*func)(void))
+void GfEventLoop::setRecomputeCB(void (*func)(void))
 {
-	_pPrivate->cbIdle = func;
+	_pPrivate->cbRecompute = func;
 }
 
 void GfEventLoop::setTimerCB(unsigned int millis, void (*func)(int value))
@@ -221,13 +221,14 @@ bool GfEventLoop::quitRequested() const
 	return _pPrivate->bQuit;
 }
 
-void GfEventLoop::spendIdleTime()
+void GfEventLoop::recompute()
 {
-	// Call Idle callback if any.
-	if (_pPrivate->cbIdle)
-		_pPrivate->cbIdle();
+	// Call the 'recompute' callback if any.
+	if (_pPrivate->cbRecompute)
+		_pPrivate->cbRecompute();
 	
-	// ... otherwise let CPU take breath (and fans stay at low and quiet speed)
+	// ... otherwise let the CPU take breath (and fans stay at low and quiet speed,
+	// which would not be the case if really doing nothing).
 	else
 		SDL_Delay(1); // ms.
 }

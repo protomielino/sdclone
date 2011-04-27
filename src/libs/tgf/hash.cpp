@@ -2,7 +2,7 @@
 
     file        : hash.cpp
     created     : Sat Dec 14 16:40:15 CET 2002
-    copyright   : (C) 2002 by Eric Espi�                        
+    copyright   : (C) 2002 by Eric Espie                       
     email       : eric.espie@torcs.org   
     version     : $Id$                                  
 
@@ -25,6 +25,7 @@
 */
 
 #include "tgf.h"
+#include "portability.h"
 
 typedef struct HashElem
 {

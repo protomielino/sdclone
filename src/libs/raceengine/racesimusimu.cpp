@@ -24,6 +24,7 @@
 #include <raceman.h>
 
 #include "racesituation.h"
+#include "racecars.h"
 
 #include "racesimusimu.h"
 
@@ -237,5 +238,7 @@ void ReSimuSimu()
 
 	for( xx = 0; xx < ReInfo->s->_ncars; ++xx )
 		ReInfo->s->cars[ xx ]->_state |= RM_CAR_STATE_FINISH;
+
+	ReCarsSortCars();
 }
 

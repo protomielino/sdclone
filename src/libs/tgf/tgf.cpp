@@ -28,6 +28,7 @@
 #include <cstdio>
 #include <cerrno>
 #include <ctime>
+#include <cmath>
 #include <cstring>
 
 #include <SDL/SDL.h>
@@ -313,10 +314,15 @@ void GfPoolMove(tMemoryPool* oldpool, tMemoryPool* newpool)
 		(*newpool)->pool = newpool;
 }
 
-#ifdef WIN32
+/*********************************
+ * Memory debug tools            *
+ *********************************/
+
+// <esppat>
+#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+
 #include <crtdbg.h>
 #include <assert.h>
-
 
 void * _tgf_win_malloc(size_t size)
 {
@@ -409,7 +415,9 @@ char * _tgf_win_strdup(const char * str)
 
 	return s;
 }
-#endif // WIN32
+#endif // (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
+// </esppat>
+
 
 // Build a new path string compatible with current OS and usable as a command line arg.
 static char* gfPathBuildCommandLineArg(const char *path)

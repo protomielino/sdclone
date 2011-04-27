@@ -17,15 +17,18 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cmath>
+#include <cstdio>
 #include <cstring>
 
 #include <tgf.h>
+#include <portability.h>
 #include <robottools.h>
 #include <track.h>
+
 #include "trackinc.h"
+
 
 static tdble	xmin, xmax, ymin, ymax, zmin, zmax;
 

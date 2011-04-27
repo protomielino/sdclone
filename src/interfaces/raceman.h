@@ -30,8 +30,6 @@
 #include <tgf.h>
 #include <car.h>
 #include <track.h>
-// TODO: Remove (old graphics setup)
-//#include <graphic.h>
 #include <simu.h>
 
 #define RCM_IDENT 0
@@ -72,7 +70,7 @@ typedef struct {
 #define RM_RACE_STARTING	0X00000008
 #define RM_RACE_PRESTART	0X00000010
 #define RM_RACE_PAUSED		0X40000000
-    int			type;		/**< Race type */
+    int			type;		/**< Race session type */
 #define RM_TYPE_PRACTICE	0 /* Please keep the order */
 #define RM_TYPE_QUALIF		1
 #define RM_TYPE_RACE		2
@@ -136,6 +134,13 @@ typedef struct
     tdble	fuel;
 } tReCarInfo;
 
+typedef enum
+{
+	RM_DISP_MODE_NONE,
+	RM_DISP_MODE_NORMAL,
+	RM_DISP_MODE_SIMU_SIMU
+} RmEDisplayMode;
+
 /** Race Engine Information.
    @image	html raceenginestate.gif
  */
@@ -150,17 +155,12 @@ typedef struct
     const char		*name;
     const char		*raceName;
     tReCarInfo		*carInfo;
-    double		curTime;
-    double		lastTime;
+    double		curTime; // Explain please.
+    double		lastRobTime; // Last time the robots were rbDrive'd.
     double		timeMult;
     int			running;
-#define RM_DISP_MODE_NORMAL	0
-#define RM_DISP_MODE_CAPTURE	1
-#define RM_DISP_MODE_NONE	2
-#define RM_DISP_MODE_SIMU_SIMU	3
-    int			displayMode;
-    int			refreshDisplay;
-    tCarElt		*inPitMenuCar; // The car entering the pit menu.
+    RmEDisplayMode			displayMode;
+    tCarElt		*pitRequester; // The car asking for pit (stopped in the slot).
 	char		*message;
     double		messageEnd;
 	char		*bigMessage;
@@ -179,10 +179,9 @@ typedef struct
 #define _reCurTime	raceEngineInfo.curTime
 #define _reTimeMult	raceEngineInfo.timeMult
 #define _reRunning	raceEngineInfo.running
-#define _reLastTime	raceEngineInfo.lastTime
+#define _reLastRobTime	raceEngineInfo.lastRobTime
 #define _displayMode	raceEngineInfo.displayMode
-#define _refreshDisplay	raceEngineInfo.refreshDisplay
-#define _reInPitMenuCar	raceEngineInfo.inPitMenuCar
+#define _rePitRequester	raceEngineInfo.pitRequester
 #define _reMessage	raceEngineInfo.message
 #define _reMessageEnd	raceEngineInfo.messageEnd
 #define _reBigMessage	raceEngineInfo.bigMessage
@@ -197,18 +196,6 @@ typedef struct RmCarRules
 {
     int			ruleState;
 } tRmCarRules;
-
-typedef struct RmMovieCapture
-{
-    int		enabled;
-    int		state;
-    double	deltaSimu;
-    double	deltaFrame;
-    double	lastFrame;
-    char	*outputBase;
-    int		currentCapture;
-    int		currentFrame;
-} tRmMovieCapture;
 
 
 /**
@@ -226,7 +213,6 @@ typedef struct RmInfo
     tModList		**modList;	/**< drivers loaded */
     tRmCarRules		*rules;		/**< by car rules */
     tRaceEngineInfo	raceEngineInfo;
-    tRmMovieCapture	movieCapture;
 } tRmInfo;
 
 /*

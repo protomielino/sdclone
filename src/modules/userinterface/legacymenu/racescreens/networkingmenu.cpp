@@ -196,7 +196,7 @@ UpdateNetworkPlayers()
 	if (pNetwork->GetRefreshDisplay() == false)
 		return;
 
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	//Set current driver that camera will look at
 	pNetwork->SetCurrentDriver();
@@ -352,8 +352,7 @@ rmNetworkClientDisconnect(void * /* dummy */)
 	if (GetClient())
 		GetClient()->Disconnect();
 
-	GfuiScreenActivate(LegacyMenu::self().raceEngine().data()->_reMenuScreen);
-
+	GfuiScreenActivate(LmRaceEngine().inData()->_reMenuScreen);
 }
 
 
@@ -450,7 +449,7 @@ ClientIdle(void)
 		if (GetClient()->PrepareToRace())
 		{
 			GetClient()->SetLocalDrivers();
-			LegacyMenu::self().raceEngine().startNewRace();
+			LmRaceEngine().startNewRace();
 		}
 
 		if (!GetClient()->IsConnected())
@@ -481,7 +480,7 @@ NetworkRaceInfo()
 	}
 
 	//Look up race info
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 	reInfo->params =
 		GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
@@ -496,14 +495,14 @@ NetworkRaceInfo()
 
 static void OnActivateNetworkClient(void *)
 {
-	GfuiApp().eventLoop().setIdleCB(ClientIdle);
+	GfuiApp().eventLoop().setRecomputeCB(ClientIdle);
 }
 
 
 static void
 OnActivateNetworkHost(void *)
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	MutexData *pNData = GetNetwork()->LockNetworkData();
 	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
@@ -517,14 +516,14 @@ OnActivateNetworkHost(void *)
 	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
-	GfuiApp().eventLoop().setIdleCB(HostServerIdle);	
+	GfuiApp().eventLoop().setRecomputeCB(HostServerIdle);	
 	GetServer()->SetRefreshDisplay(true);
 }
 
 static void
 rmNetworkServerDisconnect(void * /* dummy */)
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	GfLogInfo("Disconnecting all clients\n");
 	if (GetServer())
@@ -627,7 +626,7 @@ RmNetworkHostMenu(void * /* dummy */)
 static void
 ShowWaitingToConnectScreen()
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	if (racemanMenuHdle) 
 	{
@@ -723,7 +722,7 @@ RmNetworkClientConnectMenu(void * /* dummy */)
 
 	UpdateNetworkPlayers();
 	GfuiScreenActivate(racemanMenuHdle);
-	GfuiApp().eventLoop().setIdleCB(ClientIdle);
+	GfuiApp().eventLoop().setRecomputeCB(ClientIdle);
 }
 
 static void 
@@ -774,7 +773,7 @@ NetworkClientMenu(void * /* dummy */)
 {
 	const char	*str;
 
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	LookupPlayerSetup(g_strDriver,g_strCar);
 
@@ -831,7 +830,7 @@ RmNetworkMenu(void *)
 {
     const char	*str;
 
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	if (GetNetwork())
 	{
@@ -880,8 +879,8 @@ ServerPrepareStartNetworkRace(void * /* dummy */)
 	GetServer()->SendPrepareToRacePacket();
 
 	//restore the idle function
-	GfuiApp().eventLoop().setIdleCB(GfuiIdle);
-	LegacyMenu::self().raceEngine().startNewRace();
+	GfuiApp().eventLoop().setRecomputeCB(GfuiIdle);
+	LmRaceEngine().startNewRace();
 }
 
 // Retrieve the Driver instance with given index in the human module interface list

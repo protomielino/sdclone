@@ -88,36 +88,33 @@ extern void RmStopRaceScreen();
 
 extern void RmDisplayStartRace();
 
-extern void RmRaceParamsMenu(void *vrp);
+extern void RmRaceParamsMenu(void* vrp);
 
-extern void RmShowStandings(void *prevHdle, tRmInfo *info, int start = 0);
+extern void RmShowStandings(void* prevHdle, tRmInfo *info, int start = 0);
 
-extern void* RmFileSelect(void *vs);
+extern void* RmFileSelect(void* vs);
 
 // From racemanmenus.
 extern int RmRacemanMenu();
 extern int RmNextEventMenu();
-extern void RmConfigureRace(void * /* dummy */);
-extern void RmSetRacemanMenuHandle(void * handle);
+extern void RmConfigureRace(void*  /* dummy */);
+extern void RmSetRacemanMenuHandle(void*  handle);
 
 extern void* RmGetRacemanMenuHandle();
 
 extern void RmConfigRunState(bool bStart = false);
 
 // From raceselectmenu.
-extern void *RmRaceSelectInit(void *precMenu);
+extern void* RmRaceSelectInit(void* precMenu);
 
 // From racerunningmenus.
-extern void *RmScreenInit();
-extern void RmScreenCapture(const char* pszTargetFilename);
-extern void  RmScreenShutdown();
-extern void *RmHookInit();
+extern void* RmScreenInit();
+extern void RmScreenShutdown();
+extern void* RmHookInit();
+extern bool RmCheckPitRequest();
 
-extern void RmSetRaceMsg(const char *msg);
-extern void RmSetRaceBigMsg(const char *msg);
-
-extern void *RmResScreenInit();
-extern void RmResScreenSetTrackName(const char *trackName);
+extern void* RmResScreenInit();
+extern void RmResScreenSetTrackName(int nSessionType, const char *trackName);
 extern void RmResScreenSetTitle(const char *title);
 extern void RmResScreenAddText(const char *text);
 extern void RmResScreenSetText(const char *text, int line, int clr);
@@ -127,9 +124,9 @@ extern int  RmResGetLines();
 extern void RmResEraseScreen();
 
 // From networkingmenu.
-extern void RmNetworkClientConnectMenu(void *pVoid);
-extern void RmNetworkMenu(void * /* dummy */);
-extern void RmNetworkHostMenu(void * /* dummy */);
+extern void RmNetworkClientConnectMenu(void* pVoid);
+extern void RmNetworkMenu(void* /* dummy */);
+extern void RmNetworkHostMenu(void* /* dummy */);
 
 
 

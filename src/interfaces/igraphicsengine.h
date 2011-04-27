@@ -34,7 +34,7 @@ public:
 	virtual bool loadTrack(struct Track* pTrack) = 0;
 	virtual bool loadCars(struct Situation *pSituation) = 0;
 	virtual bool setupView(int x, int y, int width, int height, void* pMenuScreen) = 0;
-	virtual void updateView(struct Situation *pSituation) = 0;
+	virtual void redrawView(struct Situation *pSituation) = 0;
 	virtual void shutdownView() = 0;
 	virtual void unloadCars() = 0;
 	virtual void unloadTrack() = 0;

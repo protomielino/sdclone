@@ -81,12 +81,13 @@ void ReRaceAbort()
 
 	ReInfo->_reSimItf.shutdown();
 
-	// TODO: Move these 2 unloadXXGrahics calls to the user interface module ?
+	// TODO: Move these 3 XXGraphicsYY calls to the user interface module ?
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
-		RaceEngine::self().userInterface().unloadCarsGraphics();
-
-	// TODO: only if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) ?
-	RaceEngine::self().userInterface().unloadTrackGraphics();
+	{
+		ReUI().unloadCarsGraphics();
+		ReUI().shutdownGraphicsView();
+		ReUI().unloadTrackGraphics();
+	}
 	
 	ReRaceCleanDrivers();
 
@@ -100,7 +101,7 @@ void ReRaceAbort()
 	// Return to race menu
 	if (ReInfo->params != ReInfo->mainParams)
 	{
-		GfParmReleaseHandle (ReInfo->params);
+		GfParmReleaseHandle(ReInfo->params);
 		ReInfo->params = ReInfo->mainParams;
 	}
 	ReInfo->_reState = RE_STATE_CONFIG;
@@ -147,7 +148,7 @@ ReRaceEventInit(void)
 	ReInfo->_reRaceName = ReGetCurrentRaceName();
 	GfLogInfo("Starting %s session\n", ReInfo->_reRaceName);
 
-	RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
+	ReUI().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	
 	ReInfo->s->_features = RmGetFeaturesList(params);
 
@@ -156,7 +157,7 @@ ReRaceEventInit(void)
 	ReEventInitResults();
 
 	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1) {
-		RaceEngine::self().userInterface().activateNextEventMenu();
+		ReUI().activateNextEventMenu();
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
 	
@@ -266,34 +267,30 @@ ReRaceRealStart(void)
 	tMemoryPool oldPool = NULL;
 	void* carHdle;
 
-	//Load simulation engine
+	// Load simulation engine
 	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
 	snprintf(buf, sizeof(buf), "Loading simulation engine (%s) ...", dllname);
-	RaceEngine::self().userInterface().addLoadingMessage(buf);
+	ReUI().addLoadingMessage(buf);
 	snprintf(path, sizeof(path), "%smodules/simu/%s.%s", GfLibDir (), dllname, DLLEXT);
 	if (GfModLoad(0, path, &ReRaceModList)) 
 		return RM_ERROR;
 	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);
 
-	//Check if there is a human on the driver list
+	// Check if there is a human in the driver list
 	foundHuman = ReHumanInGroup() ? 2 : 0;
 
-	//Set _displayMode here because then robot->rbNewTrack isn't called. This is a lot faster for simusimu
+	// TODO: Replace this _displayMode dirty hack by adding a new bSimuSimu arg to ReInitCars ?
+	// Set _displayMode here because then robot->rbNewTrack isn't called. This is a lot faster for simusimu
 	if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0 && foundHuman == 0)
 		ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
 	else
 		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
 
-	//Initialize & place cars
-	if (ReInitCars()) {
+	// Initialize & place cars
+	if (ReInitCars())
 		return RM_ERROR;
-	}
 
-	// Blind mode or not
-	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceScreen();
-
-	//Check if there is a human in the current race
+	// Check if there is a human in the current race
 	for (i = 0; i < s->_ncars; i++) {
 		if (s->cars[i]->_driverType == RM_DRV_HUMAN) {
 			foundHuman = 1;
@@ -301,37 +298,58 @@ ReRaceRealStart(void)
 		}//if human
 	}//for i
 
-	if (foundHuman != 1) { /* No human in current race */
-		if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_INVISIBLE)) {
+	// Determine the display mode.
+	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
+
+	if (foundHuman != 1)
+	{
+		// No human in current race
+		const std::string strDispMode =
+			GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE);
+		if (strDispMode == RM_VAL_INVISIBLE)
+		{
 			ReInfo->_displayMode = RM_DISP_MODE_NONE;
-			ReInfo->_reGameScreen = RaceEngine::self().userInterface().createResultsMenu();
-		} else if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0) {
-			if (foundHuman == 2) { /* Human in driver list, but not in current race */
-				if (ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) {
+		}
+		else if (strDispMode == RM_VAL_SIMUSIMU)
+		{
+			// Human in driver list ...
+			if (foundHuman == 2)
+			{
+				// ... but not in current race
+				if (ReInfo->s->_raceType == RM_TYPE_QUALIF
+					|| ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+				{
 					ReInfo->_displayMode = RM_DISP_MODE_NONE;
-					ReInfo->_reGameScreen = RaceEngine::self().userInterface().createResultsMenu();
 				} /* Else: normally visible */
-			} else {
+			}
+			else
+			{
 				ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
-				ReInfo->_reGameScreen = RaceEngine::self().userInterface().createResultsMenu();
 			}//if foundHuman == 2
 		}
 	}//if foundHuman != 1
 
-	//If neither a qualification, nor a practice and has results, load race splash
-	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE) ||
-	((int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)) {
-		RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
+	// Create the game screen according to the actual display mode.
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
+		ReInfo->_reGameScreen = ReUI().createRaceScreen();
+	else
+		ReInfo->_reGameScreen = ReUI().createResultsMenu();
+	
+	// If neither a qualification, nor a practice, or else 1st driver, activate race loading screen.
+	if (!(ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+		|| (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)
+	{
+		ReUI().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
 	}
 
-	//Load drivers for the race
+	// Load drivers for the race
 	for (i = 0; i < s->_ncars; i++) {
 		snprintf(buf, sizeof(buf), "cars/%s/%s.xml",
 				 s->cars[i]->_carName, s->cars[i]->_carName);
 		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		snprintf(buf, sizeof(buf), "Loading driver %s (%s) ...",
 				 s->cars[i]->_name, GfParmGetName(carHdle));
-		RaceEngine::self().userInterface().addLoadingMessage(buf);
+		ReUI().addLoadingMessage(buf);
 		if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) { //Tell robots they are to start a new race
 			robot = s->cars[i]->robot;
 			GfPoolMove( &s->cars[i]->_newRaceMemPool, &oldPool );
@@ -342,11 +360,23 @@ ReRaceRealStart(void)
 	carInfo = ReInfo->_reCarInfo;
 	RtTeamManagerStart();
 
+	// TODO: Try and move this into the user interface module,
+	//       right after it called ReRaceStart ?
 	// Initialize the graphics engine
-	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL
-		|| ReInfo->_displayMode == RM_DISP_MODE_CAPTURE)
-		ReInitGraphics();
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
+	{
+		// It must be done after the cars are loaded and the track is loaded.
+		// The track will be unloaded if the event ends.
+		// The graphics module is kept open if more than one race is driven.
 
+		// Initialize the graphics engine.
+		if (ReUI().initializeGraphics())
+		{
+			// Initialize the track graphics.
+			ReUI().loadTrackGraphics(ReInfo->track);
+		}
+	}
+	
 	// Initialize the physics engine
 	ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
 	for (i = 0; i < s->_ncars; i++) {
@@ -354,7 +384,7 @@ ReRaceRealStart(void)
 	}
 
 	// All cars start with max brakes on
-	RaceEngine::self().userInterface().addLoadingMessage("Running Prestart ...");
+	ReUI().addLoadingMessage("Running Prestart ...");
 	for (i = 0; i < s->_ncars; i++) {
 		memset(&(s->cars[i]->ctrl), 0, sizeof(tCarCtrl));
 		s->cars[i]->ctrl.brakeCmd = 1.0;
@@ -369,25 +399,28 @@ ReRaceRealStart(void)
 		} else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && s->_ncars > 1) {
 			ReUpdatePracticeCurRes(s->cars[0]);
 		} else {
-			RaceEngine::self().userInterface().setResultsMenuTrackName(ReInfo->track->name);
+			ReUI().setResultsMenuTrackName(ReInfo->s->_raceType, ReInfo->track->name);
 			snprintf(buf, sizeof(buf), "%s (%s)", s->cars[0]->_name, s->cars[0]->_carName);
-			RaceEngine::self().userInterface().setResultsMenuTitle(buf);
+			ReUI().setResultsMenuTitle(buf);
 		}
 	}//if displayMode != normal
 
 	ReInfo->_reTimeMult = 1.0;
-	ReInfo->_reLastTime = -1.0;
+	ReInfo->_reLastRobTime = -1.0;
 	if (GetNetwork())
 		ReInfo->s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
 	else
-		ReInfo->s->currentTime = -2.0;	//we start 2 seconds before the real race start
+		ReInfo->s->currentTime = -2.0;	// We start 2 seconds before the real race start
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
 	ReInfo->s->_raceState = RM_RACE_STARTING;
 
+	// TODO: Try and move this into the user interface module,
+	//       right after it called ReRaceStart ?
 	// Initialize the graphics view.
-	RaceEngine::self().userInterface().setupGraphicsView();
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
+		ReUI().setupGraphicsView();
 
-	ReInfo->_reInPitMenuCar = 0;
+	ReInfo->_rePitRequester = 0;
 	ReInfo->_reMessage = 0;
 	ReInfo->_reMessageEnd = 0.0;
 	ReInfo->_reBigMessage = 0;
@@ -395,23 +428,27 @@ ReRaceRealStart(void)
 	
 	ReInitUpdaters();
 
-	// Initalize cars graphics.
-	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) {
-		RaceEngine::self().userInterface().addLoadingMessage("Loading cars ...");
-		ReInitCarGraphics();
+	// TODO: Try and move this into the user interface module,
+	//       right after it called ReRaceStart ?
+	// Initialize cars graphics.
+	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
+	{
+		ReUI().addLoadingMessage("Loading cars ...");
+		
+		ReUI().loadCarsGraphics(ReOutputSituation()->s);
 	}
 
 	if (GetNetwork())
 	{
-		RaceEngine::self().userInterface().addLoadingMessage("Preparing online race ...");
+		ReUI().addLoadingMessage("Preparing online race ...");
 		
-		GetNetwork()->RaceInit(ReInfo->s);
+		GetNetwork()->RaceInit(ReOutputSituation()->s);
 		GetNetwork()->SetRaceActive(true);
 	}
 
-	RaceEngine::self().userInterface().addLoadingMessage("Ready.");
+	ReUI().addLoadingMessage("Ready.");
 
-	RaceEngine::self().userInterface().activateGameScreen();
+	ReUI().activateGameScreen();
 
 	return RM_SYNC | RM_NEXT_STEP;
 }//ReRaceRealStart
@@ -436,7 +473,7 @@ ReRaceStart(void)
 	ReInfo->_reCarInfo =
 		(tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
 
-	GfLogInfo("Starting %s %s session on %s\n", ReInfo->_reName, raceName, ReInfo->track->name);
+	GfLogInfo("Starting %s %s session at %s\n", ReInfo->_reName, raceName, ReInfo->track->name);
 
 	// Drivers starting order
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
@@ -446,10 +483,10 @@ ReRaceStart(void)
 		// Race loading screen
 		i = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (i == 1) {
-			RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
-			RaceEngine::self().userInterface().addLoadingMessage("Preparing Starting Grid ...");
+			ReUI().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
+			ReUI().addLoadingMessage("Preparing Starting Grid ...");
 		} else {
-			RaceEngine::self().userInterface().shutdownLoadingScreen();
+			ReUI().shutdownLoadingScreen();
 		}
 
 		// Propagate competitor drivers info to the real race starting grid
@@ -470,8 +507,9 @@ ReRaceStart(void)
 	}
 	else
 	{
-		RaceEngine::self().userInterface().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
-		RaceEngine::self().userInterface().addLoadingMessage("Preparing Starting Grid ...");
+		// Race loading screen
+		ReUI().activateLoadingScreen(ReInfo->_reName, "data/img/splash-raceload.jpg");
+		ReUI().addLoadingMessage("Preparing Starting Grid ...");
 
 		gridType = GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		
@@ -561,17 +599,12 @@ ReRaceStart(void)
 	//ReTrackUpdate();
 
 	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES)) {
-		RaceEngine::self().userInterface().shutdownLoadingScreen();
-		RaceEngine::self().userInterface().activateStartRaceMenu();
+		ReUI().shutdownLoadingScreen();
+		ReUI().activateStartRaceMenu();
 		return RM_ASYNC | RM_NEXT_STEP;
 	}
 
 	return ReRaceRealStart();
-}
-
-void ReRaceContinue()
-{
-	ReInfo->_reState = RE_STATE_RACE;
 }
 
 void ReRaceRestart()
@@ -588,7 +621,7 @@ ReRaceStop(void)
 {
 	ReStop();
 
-	RaceEngine::self().userInterface().activateStopRaceMenu();
+	ReUI().activateStopRaceMenu();
 	
 	return RM_ASYNC | RM_NEXT_STEP;
 }
@@ -607,6 +640,9 @@ ReRaceEnd(void)
 	if (GetNetwork())
 		GetNetwork()->RaceDone();
 
+	// If we are at the end of a qualification or practice session,
+	// select the next competitor : it is his turn for the session.
+	// If no more competitor, display the results of the session for all the competitors.
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& !(ReInfo->s->_features & RM_FEATURE_TIMEDSESSION)) 
 	{
@@ -618,9 +654,12 @@ ReRaceEnd(void)
 			return ReDisplayResults();
 		}
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
+
+		// Next competitor.
 		return RM_SYNC | RM_NEXT_RACE;
 	}
 
+	// Otherwise, display the results of the session for all the competitors
 	return ReDisplayResults();
 }
 
@@ -664,6 +703,9 @@ ReEventShutdown(void)
 	char first = TRUE;
 
 	ReTrackShutdown();
+
+	ReUI().unloadTrackGraphics();
+	ReUI().shutdownGraphicsView();
 
 	do {
 		nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);

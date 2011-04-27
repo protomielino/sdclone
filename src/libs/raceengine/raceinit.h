@@ -43,8 +43,6 @@ extern void ReRaceConfigure(bool bInteractive = true);
 
 extern int  ReInitCars(void);
 
-extern void ReInitGraphics(void);
-
 extern void ReRaceCleanup(void);
 extern void ReRaceCleanDrivers(void);
 
@@ -53,6 +51,14 @@ extern char *ReGetCurrentRaceName(void);
 extern char *ReGetPrevRaceName(void);
 
 extern tModList *ReRaceModList;
+
+// The race situation data structure.
+// WIP: Remove this global variable that anyone can wildly change
+//      and replace the read/write instruction everywhere
+//      by calls to the functions of ReSituation::self().
+extern tRmInfo *ReInfo;
+
+//extern tRmInfo* ReSituation();
 
 // The race (temporarily partly duplicates ReInfo, as long as not merged together).
 extern GfRace* ReGetRace();

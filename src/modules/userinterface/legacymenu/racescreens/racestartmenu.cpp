@@ -36,7 +36,7 @@
 static void
 rmAbandonRaceHookActivate(void * /* vforce */)
 {
-	LegacyMenu::self().raceEngine().abandonRace();
+	LmRaceEngine().abandonRace();
 	
 	RmGameScreen();
 }
@@ -56,7 +56,7 @@ rmAbandonRaceHookInit(void)
 static void
 rmStartRaceHookActivate(void * /* dummy */)
 {
-	LegacyMenu::self().raceEngine().startRace();
+	LmRaceEngine().startRace();
 }
 
 static void *
@@ -115,6 +115,8 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
     void        *params = info->params;
     const char  *race = info->_reRaceName;
     
+	GfLogTrace("Entering Start Race menu\n");
+	
     // Create screen, load menu XML descriptor and create static controls.
     rmScrHdle = GfuiScreenCreate();
 
@@ -249,7 +251,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 void
 RmDisplayStartRace()
 {
-	rmDisplayStartRace(LegacyMenu::self().raceEngine().data(),
+	rmDisplayStartRace(LmRaceEngine().inData(),
 					   rmStartRaceHookInit(), rmAbandonRaceHookInit());
 }
 

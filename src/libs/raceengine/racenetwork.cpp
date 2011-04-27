@@ -76,7 +76,6 @@ reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 
 	//Car physics
 //	ReInfo->_reSimItf.updatesimcartable(pCt->DynGCg,pCt->startRank);
-
 }
 
 static void
@@ -185,13 +184,13 @@ ReNetworkOneStep()
 int
 ReNetworkWaitReady()
 {
-	bool bWaitFinished = false;
-	
+	// No wait if not an online race.
 	if (!GetNetwork())
-		bWaitFinished = true;
+		return RM_SYNC | RM_NEXT_STEP;
 
-	// If network race wait for other players and start when the server says too
-	else if (GetClient())
+	// If network race, wait for other players and start when the server tells to
+	bool bWaitFinished = false;
+	if (GetClient())
 	{
 		GetClient()->SendReadyToStartPacket();
 		ReInfo->s->currentTime = GetClient()->WaitForRaceStart();
@@ -209,23 +208,17 @@ ReNetworkWaitReady()
 		}
 	}
 
-	int mode = RM_SYNC;
 	if (bWaitFinished)
 	{
-		RaceEngine::self().userInterface().setRaceBigMessage("");
-		mode |= RM_NEXT_STEP;
+		ReSituation::self().setRaceMessage("", -1/*always*/, /*big=*/true);
+		return RM_SYNC | RM_NEXT_STEP;
 	}
 	else
 	{
-		RaceEngine::self().userInterface().setRaceBigMessage("Waiting for online players");
-
-		ReInfo->_refreshDisplay = 1;
-		RaceEngine::self().userInterface().update();
-
-		RaceEngine::self().userInterface().updateGraphicsView(ReInfo->s);
+		ReSituation::self().setRaceMessage("Waiting for online players",
+										   -1/*always*/, /*big=*/true);
+		return RM_ASYNC;
 	}
-
-	return mode;
 }
 
 void

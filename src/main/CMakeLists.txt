@@ -10,7 +10,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(raceengine tgf tgfclient portability)
+ADD_SDLIB_INCLUDEDIR(raceengine tgf tgfclient math portability)
 ADD_PLIB_INCLUDEDIR()
 
 # Disable developer warning

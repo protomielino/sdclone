@@ -19,10 +19,14 @@
 
 // Note: This code is intended to be compiled ONLY under Linuxes / BSDs / Mac OS X.
 
+#include <cstdlib>
 #include <cstddef>
+#include <cstdarg>
+#include <climits>
+#include <cstring>
+#include <cerrno>
 #include <string>
 #include <sstream>
-#include <cerrno>
 
 #include <sys/types.h>
 #include <dirent.h>

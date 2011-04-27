@@ -93,7 +93,7 @@ typedef struct
     
     tdble       upside_down_timer;
     tDynPt	restPos;	/* target rest position after the car is broken */
-    tRmInfo     *ReInfo;
+//    tRmInfo     *ReInfo; // Not used til now.
     int		collisionAware;
     SimulationOptions* options;
 } tCar;

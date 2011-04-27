@@ -21,6 +21,8 @@
     		Mathematical formula interpreter
 */
 
+#include <cmath>
+
 #include <portability.h>
 
 #include "tgf.h"

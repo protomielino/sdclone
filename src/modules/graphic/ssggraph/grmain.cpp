@@ -48,14 +48,14 @@ int grMaxTextureUnits = 0;
 tdble grMaxDammage = 10000.0;
 int grNbCars = 0;
 
-void *grHandle = NULL;
-void *grTrackHandle = NULL;
+void *grHandle = 0;
+void *grTrackHandle = 0;
 
 int grWinx, grWiny, grWinw, grWinh;
 
 tgrCarInfo *grCarInfo;
 ssgContext grContext;
-class cGrScreen *grScreens[GR_NB_MAX_SCREEN] = {NULL, NULL, NULL, NULL};
+cGrScreen *grScreens[GR_NB_MAX_SCREEN] = { 0, 0, 0, 0 };
 tdble grLodFactorValue = 1.0;
 
 // Frame/FPS info.
@@ -393,7 +393,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 	// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
 	 	grScreens[i] = new cGrScreen(i);
-		grScreens[i]->initBoard ();
+		grScreens[i]->initBoard();
     }
 
     GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
@@ -425,7 +425,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '<',            "Zoom Out",          (void*)GR_ZOOM_OUT,	grSetZoom, NULL);
     GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, grSplitScreen, NULL);
     GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
-    GfuiAddKey(screen, '_',            "Split Screen Arangement", (void*)GR_SPLIT_ARR, grSplitScreen, NULL);
+    GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)GR_SPLIT_ARR, grSplitScreen, NULL);
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",     (void*)0, grSelectTrackMap, NULL);
 
@@ -619,7 +619,7 @@ shutdownCars(void)
 	}
 
 	if (nFPSTotalSeconds > 0)
-		GfLogTrace("Average FPS: %.2f\n",
+		GfLogTrace("Average frame rate: %.2f F/s\n",
 				   (double)frameInfo.nTotalFrames/((double)nFPSTotalSeconds + GfTimeClock() - fFPSPrevInstTime));
 }
 
@@ -641,16 +641,24 @@ initTrack(tTrack *track)
 void
 shutdownTrack(void)
 {
-	int	i;
-
 	grShutdownScene();
+	
 	grShutdownState();
 
-	for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
-		if (grScreens[i]) {
-			delete grScreens[i];
-			grScreens[i] = NULL;
-		}
+	if (grTrackHandle)
+	{
+		GfParmReleaseHandle(grTrackHandle);
+		grTrackHandle = 0;
+	}
+}
+
+void
+shutdownView(void)
+{
+	for (int i = 0; i < GR_NB_MAX_SCREEN; i++)
+	{
+		delete grScreens[i];
+		grScreens[i] = 0;
 	}
 }
 

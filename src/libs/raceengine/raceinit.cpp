@@ -64,6 +64,9 @@ static tModList *reEventModList = 0;
 // Modules ... ?
 tModList *ReRaceModList = 0;
 
+// The race situation
+tRmInfo	*ReInfo = 0;
+
 // The race (temporary partially duplicates ReInfo, as long as not merged).
 static GfRace* PReRace = 0;
 
@@ -77,6 +80,8 @@ GfRace* ReGetRace()
 void
 ReInit(void)
 {
+	GfLogInfo("Initializing race engine.\n");
+
 	// If not already done, instanciate the race object.
 	if (!PReRace)
 		PReRace = new GfRace();
@@ -85,8 +90,7 @@ ReInit(void)
 	ReShutdown();
 
 	// Allocate race engine info structures.
-	ReInfo = (tRmInfo *)calloc(1, sizeof(tRmInfo));
-	ReInfo->s = (tSituation *)calloc(1, sizeof(tSituation));
+	ReInfo = ReSituation::self().data();
 	ReInfo->modList = &ReRaceModList;
 
 	// Load Race engine params.
@@ -112,35 +116,9 @@ ReInit(void)
 	// Initialize GfTracks' track module interface (needed for some track infos).
 	GfTracks::self()->setTrackLoader(piTrkLoader);
 
-	// Initialize the movie capture system.
-	tRmMovieCapture *capture = &(ReInfo->movieCapture);
-	capture->enabled =
-		strcmp(GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE,
-							RM_VAL_NO),
-			   RM_VAL_NO) ? 1 : 0;
-	if (!capture->enabled)
-	{
-		capture->outputBase = 0;
-		GfLogInfo("Movie capture disabled\n");
-	}
-	else
-	{
-		capture->state = 0;
-		capture->deltaFrame = 1.0 / GfParmGetNum(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 25.0);
-		capture->deltaSimu = RCM_MAX_DT_SIMU;
-		char pszDefOutputBase[256];
-		snprintf(pszDefOutputBase, sizeof(pszDefOutputBase), "%s%s",
-				 GfLocalDir(), GfParmGetStr(ReInfo->_reParam, RM_SECT_MOVIE_CAPTURE,
-											RM_ATT_CAPTURE_OUT_DIR, "captures"));
-		capture->outputBase = strdup(pszDefOutputBase);
-		GfDirCreate(pszDefOutputBase); // In case not already done.
-		GfLogInfo("Movie capture enabled (%.0f FPS, PNG frames in %s)\n", 
-				  1.0 / capture->deltaFrame, capture->outputBase);
-	}
-
 	// Set ReStateManage as the event loop "display" call-back when the race will actually start
 	// (will be actually used after something like GfuiScreenActivate(ReInfo->_reGameScreen)).
-	ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceEventLoopHook();
+	ReInfo->_reGameScreen = ReUI().createRaceEventLoopHook();
 }
 
 
@@ -153,7 +131,7 @@ ReExit(void)
 	ReShutdown();
 	
 	// Notify the user interface.
-	RaceEngine::self().userInterface().quit();
+	ReUI().quit();
 
 	return RM_QUIT;
 }
@@ -163,6 +141,8 @@ void ReShutdown(void)
 {
     if (!ReInfo)
         return;
+
+	GfLogInfo("Terminating race engine.\n");
 
 	// Unload the track.
 	ITrackLoader* piTrkLoader = GfTracks::self()->getTrackLoader();
@@ -175,29 +155,11 @@ void ReShutdown(void)
 	GfModule::unload(pmodTrkLoader);
 	GfTracks::self()->setTrackLoader(0);
 
-    RaceEngine::self().userInterface().shutdownGraphics();
+    ReUI().shutdownGraphics(); // => onRaceEngineShutdown ?
 
 	// Free ReInfo memory.
-    if (ReInfo->results) 
-    {
-		if (ReInfo->mainResults != ReInfo->results)
-			GfParmReleaseHandle(ReInfo->mainResults);
-		GfParmReleaseHandle(ReInfo->results);
-    }
-    if (ReInfo->_reParam)
-		GfParmReleaseHandle(ReInfo->_reParam);
-    if (ReInfo->params != ReInfo->mainParams) 
-    {
-		GfParmReleaseHandle(ReInfo->params);
-		ReInfo->params = ReInfo->mainParams;
-    }
-    if (ReInfo->movieCapture.outputBase)
-		free(ReInfo->movieCapture.outputBase);
-    free(ReInfo->s);
-    free(ReInfo->carList);
-    free(ReInfo->rules);
-    
-    FREEZ(ReInfo);
+	ReSituation::terminate();
+	ReInfo = 0;
 }
 
 // Select the given manager for the race.
@@ -273,7 +235,7 @@ void
 ReResumeRace()
 {
 	// Fire standings screen.
-	RaceEngine::self().userInterface().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
+	ReUI().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
 }
 
 
@@ -449,8 +411,8 @@ initPits(void)
           {
             // Assign car to pit.
             pit->car[pit->freeCarIndex] = car;
-            // If this is the first car set up more pit values, assumtion: the whole team
-            // uses the same car. If not met it does not matter much, but the car might be
+            // If this is the first car, set up more pit values ; assumption: the whole team
+            // uses the same car. If not met, it does not matter much, but the car might be
             // captured a bit too easy or too hard.
             if (pit->freeCarIndex == 0) {
               pit->pitCarIndex = TR_PIT_STATE_FREE;
@@ -765,7 +727,7 @@ ReInitCars(void)
 
   /* Get the number of cars (= drivers) racing */
   nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
-  GfLogTrace("Loading %d cars\n", nCars);
+  GfLogTrace("Loading %d car(s)\n", nCars);
 
   FREEZ(ReInfo->carList);
   ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
@@ -808,11 +770,11 @@ ReInitCars(void)
 		  {
             GfLogError("No descriptor file for robot %s or parameter errors (1)\n", robotModuleName);
 			snprintf(buf, sizeof(buf), "Error: May be no driver, or some parameters are out of bound");
-	        RaceEngine::self().userInterface().addLoadingMessage(buf);
+	        ReUI().addLoadingMessage(buf);
 			snprintf(buf, sizeof(buf), "       Have a look to the console window to get the detailed error messages");
-	        RaceEngine::self().userInterface().addLoadingMessage(buf);
+	        ReUI().addLoadingMessage(buf);
 			snprintf(buf, sizeof(buf), "       Will go back to the config menu in 10 s");
-	        RaceEngine::self().userInterface().addLoadingMessage(buf);
+	        ReUI().addLoadingMessage(buf);
 			
 			// Wait some time to allow the user to read the message!
             GfSleep(10.0); // 10 seconds
@@ -866,46 +828,34 @@ ReInitCars(void)
   {
     ReInfo->s->cars[i] = &(ReInfo->carList[i]);
   }
-  ReInfo->_reInPitMenuCar = 0;
+  ReInfo->_rePitRequester = 0;
 
   // TODO: reconsider splitting the call into one for cars, track and maybe other objects.
   // I stuff for now anything into one call because collision detection works with the same
   // library on all objects, so it is a bit dangerous to distribute the handling to various
   // locations (because the library maintains global state like a default collision handler etc.).
-    ReInfo->_reSimItf.init(nCars, ReInfo->track);
+  ReInfo->_reSimItf.init(nCars, ReInfo->track);
 
-    initStartingGrid();
+  initStartingGrid();
 
-    initPits();
+  initPits();
 
-    return 0;
-}
-
-/**
- * This function initializes the graphics.
- * It must be called after the cars are loaded and the track is loaded.
- * The track will be unloaded if the event ends. The graphics module is kept open
- * if more than one race is driven.
- */
-void ReInitGraphics()
-{
-	// Initialize the graphics engine.
-	if (RaceEngine::self().userInterface().initializeGraphics())
-	{
-		// Initialize the track graphics.
-		RaceEngine::self().userInterface().loadTrackGraphics(ReInfo->track);
-	}
+  return 0;
 }
 
 void
 ReRaceCleanup(void)
 {
-  ReInfo->_reGameScreen = RaceEngine::self().userInterface().createRaceEventLoopHook();
+  ReInfo->_reGameScreen = ReUI().createRaceEventLoopHook();
 
   ReInfo->_reSimItf.shutdown();
 
-  if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL) 
-	  RaceEngine::self().userInterface().unloadCarsGraphics();
+  if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
+  {
+    ReUI().unloadCarsGraphics();
+	ReUI().shutdownGraphicsView();
+	ReUI().unloadTrackGraphics();
+  }
 
   ReStoreRaceResults(ReInfo->_reRaceName);
 

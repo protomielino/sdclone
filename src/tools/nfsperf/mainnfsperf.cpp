@@ -30,6 +30,8 @@
 #endif
 
 #include <tgf.h>
+#include <portability.h>
+
 
 char	*catfile = NULL;
 const char	*infile = "carp.txt";

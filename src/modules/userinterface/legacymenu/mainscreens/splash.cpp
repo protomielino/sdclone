@@ -282,11 +282,11 @@ bool SplashScreen(void)
 	MainMenuReady = 0;
 
 	// Setup event loop callbacks.
-	GfuiApp().eventLoop().setDisplayCB(splashDisplay);
+	GfuiApp().eventLoop().setRedisplayCB(splashDisplay);
 	GfuiApp().eventLoop().setKeyboardDownCB(splashKey);
 	GfuiApp().eventLoop().setTimerCB(7000, splashTimer);
 	GfuiApp().eventLoop().setMouseButtonCB(splashMouse);
-	GfuiApp().eventLoop().setIdleCB(splashIdle);
+	GfuiApp().eventLoop().setRecomputeCB(splashIdle);
     
 	return true;
 }

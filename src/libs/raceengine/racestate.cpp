@@ -55,7 +55,7 @@ ReStateManage(void)
 			case RE_STATE_CONFIG:
 				GfLogInfo("%s now in CONFIG state\n", ReInfo->_reName);
 				/* Display the race specific menu */
-				mode = RaceEngine::self().userInterface().activateRacemanMenu();
+				mode = ReUI().activateRacemanMenu();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_EVENT_INIT;
 				}
@@ -87,6 +87,7 @@ ReStateManage(void)
 				mode = ReRaceStart();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_NETWORK_WAIT;
+					GfLogInfo("%s now in NETWORK_WAIT state\n", ReInfo->_reName);
 				}
 				break;
 
@@ -95,6 +96,7 @@ ReStateManage(void)
 				if (mode & RM_NEXT_STEP) {
 					/* Not an online race, or else all online players ready */
 					ReInfo->_reState = RE_STATE_RACE;
+					GfLogInfo("%s now in RACE_START state\n", ReInfo->_reName);
 				}
 				break;
 

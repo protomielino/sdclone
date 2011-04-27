@@ -74,7 +74,7 @@ ReTrackInit(void)
 	ReInfo->track = GfTracks::self()->getTrackLoader()->load(buf);
 
 	snprintf(buf, sizeof(buf), "Loading track %s", ReInfo->track->name);
-	RaceEngine::self().userInterface().addLoadingMessage(buf);
+	ReUI().addLoadingMessage(buf);
 
 	reTrackInitTimeOfDay();
 	reTrackInitWeather();
@@ -96,7 +96,7 @@ reTrackDump(const tTrack *track, int verbose)
 	
 	snprintf(buf, sizeof(buf), "  by %s (%.0f m long, %.0f m wide) ...", 
 			 track->authors, track->length, track->width);
-	RaceEngine::self().userInterface().addLoadingMessage(buf);
+	ReUI().addLoadingMessage(buf);
 
 	GfLogInfo("++++++++++++ Track ++++++++++++\n");
 	GfLogInfo("Name     = %s\n", track->name);
@@ -413,8 +413,6 @@ reTrackUpdatePhysics(void)
 int
 ReTrackShutdown(void)
 {
-	RaceEngine::self().userInterface().unloadTrackGraphics();
-
 	return 0;
 }
 

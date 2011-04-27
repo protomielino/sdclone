@@ -23,6 +23,7 @@
 */
 
 #include <cstring>
+#include <climits>
 
 #ifdef WIN32
 #include <windows.h>
@@ -31,7 +32,10 @@
 #include <dlfcn.h>
 #endif
 
-#include "tgf.h" // To get malloc/calloc/free replacements under Windows
+#include <portability.h>
+
+#include "tgf.h"
+
 
 #ifdef WIN32
 #define dlsym   GetProcAddress

@@ -26,11 +26,11 @@
 #define __TGF__H__
 
 #include <cstdio>
-#include <cstdlib>
-#include <cstdarg>
-#include <cstring>
-#include <climits>
-#include <cmath>
+//#include <cstdlib>
+//#include <cstdarg>
+//#include <cstring>
+//#include <climits>
+//#include <cmath>
 
 #include "osspec.h"
 
@@ -199,7 +199,8 @@ TGF_API void GfPoolMove(tMemoryPool* oldPool, tMemoryPool* newPool);
  *********************************/
 
 // <esppat>
-#ifdef WIN32
+//#define TGF_ALLOC_DEBUG 1
+#if (defined(WIN32) && defined(TGF_ALLOC_DEBUG))
 
 #define malloc _tgf_win_malloc
 #define calloc _tgf_win_calloc

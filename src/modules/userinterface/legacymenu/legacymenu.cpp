@@ -90,51 +90,26 @@ void LegacyMenu::shutdown()
 	// Nothing to do here.
 }
 
-void LegacyMenu::update()
-{
-	// Note: For the moment, the graphics engine related stuff is not there ... WIP.
-	
-	// Update the menu part of the GUI if requested.
-	if (raceEngine().data()->_refreshDisplay)
-		GfuiDisplay();
-
-	// Request that the GUI is redisplayed at the end of next event loop.
-	GfuiApp().eventLoop().postRedisplay();
-}
-
-void *LegacyMenu::createRaceScreen()
+void* LegacyMenu::createRaceScreen()
 {
 	return ::RmScreenInit();
 }
 
-void LegacyMenu::captureRaceScreen(const char* pszTargetFilename)
-{
-    ::RmScreenCapture(pszTargetFilename);
-}
-
-void *LegacyMenu::createRaceEventLoopHook()
+void* LegacyMenu::createRaceEventLoopHook()
 {
 	return ::RmHookInit();
 }
 
-void LegacyMenu::setRaceMessage(const char *msg)
-{
-	::RmSetRaceMsg(msg);
-}
-
-void LegacyMenu::setRaceBigMessage(const char *msg)
-{
-	::RmSetRaceBigMsg(msg);
-}
-
-void LegacyMenu::activateLoadingScreen(const char *title, const char *bgimg)
+void LegacyMenu::activateLoadingScreen(const char* title, const char* bgimg)
 {
 	::RmLoadingScreenStart(title, bgimg);
 }
-void LegacyMenu::addLoadingMessage(const char *msg)
+
+void LegacyMenu::addLoadingMessage(const char* msg)
 {
 	::RmLoadingScreenSetText(msg);
 }
+
 void LegacyMenu::shutdownLoadingScreen()
 {
 	::RmLoadingScreenShutdown();
@@ -164,32 +139,27 @@ void LegacyMenu::activateStopRaceMenu()
 	::RmStopRaceScreen();
 }
 
-void LegacyMenu::activatePitMenu(tCarElt *car, tfuiCallback callback)
-{
-	::RmPitMenuStart(car, callback);
-}
-
-void *LegacyMenu::createResultsMenu()
+void* LegacyMenu::createResultsMenu()
 {
 	return ::RmResScreenInit();
 }
-void LegacyMenu::activateResultsMenu(void *prevHdle, tRmInfo *reInfo)
+void LegacyMenu::activateResultsMenu(void* prevHdle, tRmInfo* reInfo)
 {
 	::RmShowResults(prevHdle, reInfo);
 }
-void LegacyMenu::setResultsMenuTrackName(const char *trackName)
+void LegacyMenu::setResultsMenuTrackName(int nSessionType, const char* trackName)
 {
-	::RmResScreenSetTrackName(trackName);
+	::RmResScreenSetTrackName(nSessionType, trackName);
 }
-void LegacyMenu::setResultsMenuTitle(const char *title)
+void LegacyMenu::setResultsMenuTitle(const char* title)
 {
 	::RmResScreenSetTitle(title);
 }
-void LegacyMenu::addResultsMenuLine(const char *text)
+void LegacyMenu::addResultsMenuLine(const char* text)
 {
 	::RmResScreenAddText(text);
 }
-void LegacyMenu::setResultsMenuLine(const char *text, int line, int clr)
+void LegacyMenu::setResultsMenuLine(const char* text, int line, int clr)
 {
 	::RmResScreenSetText(text, line, clr);
 }
@@ -210,7 +180,7 @@ void LegacyMenu::eraseResultsMenu()
 	::RmResEraseScreen();
 }
 
-void LegacyMenu::activateStandingsMenu(void *prevHdle, tRmInfo *reInfo, int start)
+void LegacyMenu::activateStandingsMenu(void* prevHdle, tRmInfo* reInfo, int start)
 {
 	::RmShowStandings(prevHdle, reInfo, start);
 }
@@ -225,7 +195,7 @@ bool LegacyMenu::initializeGraphics()
 	// Load the graphics module
 	std::ostringstream ossModLibName;
 	ossModLibName << GfLibDir() << "modules/graphic/"
-				  << GfParmGetStr(_piRaceEngine->data()->_reParam, "Modules", "graphic", "")
+				  << GfParmGetStr(_piRaceEngine->inData()->_reParam, "Modules", "graphic", "")
 				  << '.' << DLLEXT;
 	GfModule* pmodGrEngine = GfModule::load(ossModLibName.str());
 
@@ -243,7 +213,7 @@ bool LegacyMenu::loadTrackGraphics(struct Track* pTrack)
 	return _piGraphicsEngine ? _piGraphicsEngine->loadTrack(pTrack) : false;
 }
 
-bool LegacyMenu::loadCarsGraphics(struct Situation *pSituation)
+bool LegacyMenu::loadCarsGraphics(struct Situation* pSituation)
 {
 	return _piGraphicsEngine ? _piGraphicsEngine->loadCars(pSituation) : false;
 }
@@ -260,13 +230,13 @@ bool LegacyMenu::setupGraphicsView()
 	
 	// Setup the graphics view.
 	return _piGraphicsEngine->setupView((sw-vw)/2, (sh-vh)/2, vw, vh,
-										_piRaceEngine->data()->_reGameScreen);
+										_piRaceEngine->inData()->_reGameScreen);
 }
-void LegacyMenu::updateGraphicsView(struct Situation *pSituation)
-{
-	if (_piGraphicsEngine)
-		_piGraphicsEngine->updateView(pSituation);
-}
+// void LegacyMenu::updateGraphicsView(struct Situation* pSituation)
+// {
+// 	if (_piGraphicsEngine)
+// 		_piGraphicsEngine->updateView(pSituation);
+// }
 
 void LegacyMenu::unloadCarsGraphics()
 {
@@ -278,6 +248,12 @@ void LegacyMenu::unloadTrackGraphics()
 {
 	if (_piGraphicsEngine)
 		_piGraphicsEngine->unloadTrack();
+}
+
+void LegacyMenu::shutdownGraphicsView()
+{
+	if (_piGraphicsEngine)
+		_piGraphicsEngine->shutdownView();
 }
 
 void LegacyMenu::shutdownGraphics()
@@ -303,6 +279,12 @@ void LegacyMenu::setRaceEngine(IRaceEngine& raceEngine)
 IRaceEngine& LegacyMenu::raceEngine()
 {
 	return *_piRaceEngine;
+}
+
+// Accessor to the graphics engine.
+IGraphicsEngine* LegacyMenu::graphicsEngine()
+{
+	return _piGraphicsEngine;
 }
 
 

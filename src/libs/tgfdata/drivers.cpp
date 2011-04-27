@@ -22,6 +22,8 @@
 #include <sstream>
 #include <algorithm>
 
+#include <portability.h>
+
 #include <robot.h>
 
 #include "cars.h"

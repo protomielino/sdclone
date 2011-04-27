@@ -308,7 +308,7 @@ onKeyAction(int key, int /* modifier */, int state)
 	GfParmSetStr(PrefHdle, CurrentSection, Cmd[CurrentCmd].name, name);
     }
 
-    GfuiApp().eventLoop().setIdleCB(0);
+    GfuiApp().eventLoop().setRecomputeCB(0);
     InputWaited = 0;
     updateButtonText();
     return 1;
@@ -336,7 +336,7 @@ getMovedAxis(void)
 // IdleAcceptMouseClicks(void)
 // {
 //     AcceptMouseClicks = 1;
-//     GfuiApp().eventLoop().setIdleCB(0);
+//     GfuiApp().eventLoop().setRecomputeCB(0);
 // }
 
 /* Game event loop idle function : For collecting input devices actions */
@@ -355,7 +355,7 @@ IdleWaitForInput(void)
     for (i = 0; i < 3; i++) {
 	if (MouseInfo.edgedn[i]) {
 	    AcceptMouseClicks = 0;
-	    GfuiApp().eventLoop().setIdleCB(0);
+	    GfuiApp().eventLoop().setRecomputeCB(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_BUT, i);
 	    Cmd[CurrentCmd].ref.index = i;
@@ -370,7 +370,7 @@ IdleWaitForInput(void)
     /* Check for a mouse axis moved */
     for (i = 0; i < 4; i++) {
 	if (MouseInfo.ax[i] > 20.0) {
-	    GfuiApp().eventLoop().setIdleCB(0);
+	    GfuiApp().eventLoop().setRecomputeCB(0);
 	    InputWaited = 0;
 	    str = GfctrlGetNameByRef(GFCTRL_TYPE_MOUSE_AXIS, i);
 	    Cmd[CurrentCmd].ref.index = i;
@@ -391,7 +391,7 @@ IdleWaitForInput(void)
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Button i fired */
-		    GfuiApp().eventLoop().setIdleCB(0);
+		    GfuiApp().eventLoop().setRecomputeCB(0);
 		    InputWaited = 0;
 		    str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_BUT, i + 32 * index);
 		    Cmd[CurrentCmd].ref.index = i + 32 * index;
@@ -410,7 +410,7 @@ IdleWaitForInput(void)
     /* detect joystick movement */
     axis = getMovedAxis();
     if (axis != -1) {
-	GfuiApp().eventLoop().setIdleCB(0);
+	GfuiApp().eventLoop().setRecomputeCB(0);
 	InputWaited = 0;
 	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
 	Cmd[CurrentCmd].ref.index = axis;
@@ -464,7 +464,7 @@ onPush(void *vi)
     memcpy(JoyAxisCenter, JoyAxis, sizeof(JoyAxisCenter));
 
     /* Now, wait for input device actions */
-    GfuiApp().eventLoop().setIdleCB(IdleWaitForInput);
+    GfuiApp().eventLoop().setRecomputeCB(IdleWaitForInput);
 }
 
 static void

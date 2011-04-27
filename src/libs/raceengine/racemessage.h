@@ -18,7 +18,7 @@
  ***************************************************************************/
  
 /** @file    
-    		
+    	    Race message management. Don't use directly, call ReSituation::setRaceMessage.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -28,10 +28,9 @@
 
 struct RmInfo;
 
-extern void ReRaceMsgUpdate(struct RmInfo* pReInfo);
 extern void ReRaceMsgManage(struct RmInfo* pReInfo);
-extern void ReRaceMsgSet(struct RmInfo* pReInfo, const char *msg, double life);
-extern void ReRaceMsgSetBig(struct RmInfo* pReInfo, const char *msg, double life);
+extern void ReRaceMsgSet(struct RmInfo* pReInfo, const char *msg, double life = -1);
+extern void ReRaceMsgSetBig(struct RmInfo* pReInfo, const char *msg, double life = -1);
 
 
 #endif /* _RACEMESSAGE_H_ */ 

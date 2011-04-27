@@ -152,7 +152,7 @@ SimConfig(tCarElt *carElt, tRmInfo* ReInfo)
     car->trkPos = carElt->_trkPos;
     car->ctrl   = &carElt->ctrl;
     car->params = carElt->_carHandle;
-    car->ReInfo = ReInfo;
+//    car->ReInfo = ReInfo; // Not used til now.
     SimCarConfig(car);
 
     SimCarCollideConfig(car);

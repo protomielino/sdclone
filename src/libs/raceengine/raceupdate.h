@@ -27,10 +27,10 @@
 #define _RACEUPDATE_H_
 
 extern void ReInitUpdaters();
-extern void ReInitCarGraphics();
 extern void ReShutdownUpdaters();
 
-extern void ReAccelerateTime(double fMultFactor);
+extern bool ReSetSchedulingSpecs(double fSimuRate, double fOutputRate = 0);
+
 extern void ReStart();
 extern void ReStop();
 extern int  ReUpdate();
@@ -38,6 +38,8 @@ extern int  ReUpdate();
 #ifdef DEBUG
 extern void ReOneStep(double dt);
 #endif
+
+extern const tRmInfo* ReOutputSituation();
 
 #endif /* _RACEUPDATE_H_ */ 
 

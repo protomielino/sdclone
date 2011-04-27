@@ -244,7 +244,7 @@ void init_graphics ()
 
  
     /* Callbacks */
-    GfuiApp().eventLoop().setDisplayCB(Display);
+    GfuiApp().eventLoop().setRedisplayCB(Display);
     
     /*
       Initialise SSG

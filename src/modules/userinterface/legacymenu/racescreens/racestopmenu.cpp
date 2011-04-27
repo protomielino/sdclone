@@ -28,7 +28,7 @@ rmAbortRaceHookActivate(void * /* dummy */)
 {
 	RmGameScreen();
 
-	LegacyMenu::self().raceEngine().abortRace();
+	LmRaceEngine().abortRace();
 }
 
 static void *
@@ -48,7 +48,7 @@ rmSkipSessionHookActivate(void * /* dummy */)
 {
 	RmGameScreen();
 
-	LegacyMenu::self().raceEngine().skipRaceSession();
+	LmRaceEngine().skipRaceSession();
 }
 
 static void *
@@ -66,7 +66,7 @@ rmSkipSessionHookInit(void)
 static void
 rmBackToRaceHookActivate(void * /* dummy */)
 {
-	LegacyMenu::self().raceEngine().continueRace();
+	LmRaceEngine().start();
 	
 	RmGameScreen();
 }
@@ -86,7 +86,7 @@ rmBackToRaceHookInit(void)
 static void
 rmRestartRaceHookActivate(void * /* dummy */)
 {
-	LegacyMenu::self().raceEngine().restartRace();
+	LmRaceEngine().restartRace();
 	
 	RmGameScreen();
 }
@@ -109,9 +109,7 @@ static void
 rmQuitHookActivate(void * /* dummy */)
 {
 	if (rmStopScrHandle) 
-	{
 		GfuiScreenActivate(ExitMenuInit(rmStopScrHandle));
-	}
 }
 
 static void *
@@ -228,8 +226,8 @@ rmStopRaceScreen(const char *title,
 void
 RmStopRaceScreen()
 {
-	void* params = LegacyMenu::self().raceEngine().data()->params;
-	const char* pszRaceName = LegacyMenu::self().raceEngine().data()->_reRaceName;
+	void* params = LmRaceEngine().outData()->params;
+	const char* pszRaceName = LmRaceEngine().outData()->_reRaceName;
 
 	if (!strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
 	{

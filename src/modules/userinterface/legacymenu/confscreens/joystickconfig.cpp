@@ -173,7 +173,7 @@ Idle2(void)
 		    /* Button fired */
 		    JoyCalAutomaton();
 		    if (CalState >= NbCalSteps) {
-			GfuiApp().eventLoop().setIdleCB(0);
+			GfuiApp().eventLoop().setRecomputeCB(0);
 		    }
 		    GfuiApp().eventLoop().postRedisplay();
 		    JoyButtons[index] = b;
@@ -208,7 +208,7 @@ onActivate(void * /* dummy */)
 
     CalState = 0;
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
-    GfuiApp().eventLoop().setIdleCB(Idle2);
+    GfuiApp().eventLoop().setRecomputeCB(Idle2);
     GfuiApp().eventLoop().postRedisplay();
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
 	if (Joystick[index]) {

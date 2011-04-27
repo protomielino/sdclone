@@ -120,9 +120,8 @@ grLoadScene(tTrack *track)
 	const char		*acname;
 	ssgEntity		*desc;
 
-	if (grMaxTextureUnits == 0) {
+	if (grMaxTextureUnits == 0)
 		grInitMultiTex();
-	}
 
 	grssgSetCurrentOptions(&options);
 
@@ -132,6 +131,7 @@ grLoadScene(tTrack *track)
 		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	}//if grHandle
 
+	//GfLogDebug("grLoadScene(track=%p)\n", track);
 	grTrack = track;
 
 	// Build scene.
@@ -209,10 +209,10 @@ grDrawScene()
 void
 grShutdownScene(void)
 {
-	if (TheScene) {
-		delete TheScene;
-		TheScene = 0;
-	}
+	grTrack = 0;
+
+	delete TheScene;
+	TheScene = 0;
 
 	grShutdownBackground();
 

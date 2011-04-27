@@ -21,7 +21,7 @@
     @version    $Id$
 */
 
-#include <iuserinterface.h>
+#include <car.h> // tCarPitCmd.
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -125,22 +125,12 @@ void RaceEngine::skipRaceSession()
 	::ReRaceSkipSession();
 }
 
-void RaceEngine::continueRace()
-{
-	::ReRaceContinue();
-}
-
 void RaceEngine::restartRace()
 {
 	::ReRaceRestart();
 }
 
 //************************************************************
-void RaceEngine::accelerateTime(double fMultFactor)
-{
-	::ReAccelerateTime(fMultFactor);
-}
-
 void RaceEngine::start(void)
 {
 	::ReStart();
@@ -164,13 +154,37 @@ GfRace* RaceEngine::race()
 	return ::ReGetRace();
 }
 
-tRmInfo* RaceEngine::data()
+// TODO: Remove when safe dedicated setters ready.
+tRmInfo* RaceEngine::inData()
 {
-	return ::ReSituation();
+	return ReSituation::self().data(); // => ReInfo
+}
+
+const tRmInfo* RaceEngine::outData() const
+{
+	return ::ReOutputSituation();
 }
 
 // Accessor to the user interface.
 IUserInterface& RaceEngine::userInterface()
 {
 	return *_piUserItf;
+}
+
+//************************************************************
+// WIP : dedicated situation setters.
+
+bool RaceEngine::setSchedulingSpecs(double fSimuRate, double fOutputRate)
+{
+	return ::ReSetSchedulingSpecs(fSimuRate, fOutputRate);
+}
+
+void RaceEngine::accelerateTime(double fMultFactor)
+{
+	ReSituation::self().accelerateTime(fMultFactor);
+}
+
+void RaceEngine::setPitCommand(int nCarIndex, const struct CarPitCmd* pPitCmd)
+{
+	ReSituation::self().setPitCommand(nCarIndex, pPitCmd);
 }

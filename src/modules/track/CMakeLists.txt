@@ -5,7 +5,7 @@ SET(TRACK_SOURCES track.cpp track3.cpp track4.cpp trackitf.cpp trackutil.cpp
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(math tgf robottools)
+ADD_SDLIB_INCLUDEDIR(math tgf portability robottools)
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)

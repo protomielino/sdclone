@@ -3,7 +3,7 @@ INCLUDE(../../../cmake/macros.cmake)
 SET(TELEMETRY_SOURCES telemetryitf.cpp telemetry.cpp)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(tgf)
+ADD_SDLIB_INCLUDEDIR(tgf portability)
 
 ADD_LIBRARY(telemetry SHARED ${TELEMETRY_SOURCES})
 IF(UNIX)

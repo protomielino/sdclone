@@ -292,7 +292,7 @@ ReStoreRaceResults(const char *race)
 			
 				GfParmSetStr(results, path, RE_ATTR_MODULE, car->_modName);
 				GfParmSetNum(results, path, RE_ATTR_IDX, NULL, (tdble)car->_moduleIndex);
-				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, car->index + 1);
+				sprintf(path2, "%s/%d", RM_SECT_DRIVERS_RACING, car->index + 1 );
 				GfParmSetNum(results, path, RM_ATTR_EXTENDED, NULL,
 							 GfParmGetNum(params, path2, RM_ATTR_EXTENDED, NULL, 0));
 				GfParmSetStr(results, path, ROB_ATTR_CAR, car->_carName);
@@ -459,12 +459,12 @@ ReUpdateQualifCurRes(tCarElt *car)
 	double		time_left;
 	
 
-	RaceEngine::self().userInterface().setResultsMenuTrackName(ReInfo->track->name);
+	ReUI().setResultsMenuTrackName(ReInfo->s->_raceType, ReInfo->track->name);
 
 	if (ReInfo->s->_ncars == 1)
 	{
-		RaceEngine::self().userInterface().eraseResultsMenu();
-		maxLines = RaceEngine::self().userInterface().getResultsMenuLineCount();
+		ReUI().eraseResultsMenu();
+		maxLines = ReUI().getResultsMenuLineCount();
 		
 		snprintf(buf, sizeof(buf), "cars/%s/%s.xml", car->_carName, car->_carName);
 		carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
@@ -474,7 +474,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 			snprintf(buf, sizeof(buf), "%s (%s)", car->_name, carName);
 		else
 			snprintf(buf, sizeof(buf), "%s (%s) - Lap %d", car->_name, carName, car->_laps);
-		RaceEngine::self().userInterface().setResultsMenuTitle(buf);
+		ReUI().setResultsMenuTitle(buf);
 		
 		printed = 0;
 		sprintf(path, "%s/%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
@@ -487,7 +487,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 					tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 					sprintf(buf, "%d - %s - %s (%s)", i, tmp_str, car->_name, carName);
 					free(tmp_str);
-					RaceEngine::self().userInterface().setResultsMenuLine(buf, i - 1, 1);
+					ReUI().setResultsMenuLine(buf, i - 1, 1);
 					printed = 1;
 				}
 			}
@@ -495,24 +495,23 @@ ReUpdateQualifCurRes(tCarElt *car)
 			sprintf(buf, "%d - %s - %s (%s)", i + printed, tmp_str, GfParmGetStr(results, path, RE_ATTR_NAME, ""),
 			                                  GfParmGetStr(results, path, RE_ATTR_CAR, ""));
 			free (tmp_str);
-			RaceEngine::self().userInterface().setResultsMenuLine(buf, i - 1 + printed, 0);
+			ReUI().setResultsMenuLine(buf, i - 1 + printed, 0);
 		}
 	
 		if (!printed) {
 			tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 			sprintf(buf, "%d - %s - %s (%s)", i, tmp_str, car->_name, carName);
 			free(tmp_str);
-			RaceEngine::self().userInterface().setResultsMenuLine(buf, i - 1, 1);
+			ReUI().setResultsMenuLine(buf, i - 1, 1);
 		}
 	
 		GfParmReleaseHandle(carparam);
-		ReInfo->_refreshDisplay = 1;
 	}
 	else
 	{
 		nCars = ReInfo->s->_ncars;
-		if (nCars > RaceEngine::self().userInterface().getResultsMenuLineCount())
-			nCars = RaceEngine::self().userInterface().getResultsMenuLineCount();
+		if (nCars > ReUI().getResultsMenuLineCount())
+			nCars = ReUI().getResultsMenuLineCount();
 		if (ReInfo->s->_totTime > ReInfo->s->currentTime)
 		{
 			time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
@@ -523,7 +522,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 		{
 			sprintf( buf, "%d laps", ReInfo->s->_totLaps );
 		}
-		RaceEngine::self().userInterface().setResultsMenuTitle(buf);
+		ReUI().setResultsMenuTitle(buf);
 		
 		for (xx = 0; xx < nCars; ++xx) {
 			car = ReInfo->s->cars[ xx ];
@@ -547,10 +546,9 @@ ReUpdateQualifCurRes(tCarElt *car)
 					free(tmp_str);
 				}
 			}
-			RaceEngine::self().userInterface().setResultsMenuLine(buf, xx, 0);
+			ReUI().setResultsMenuLine(buf, xx, 0);
 			FREEZ(carName);
 		}
-		ReInfo->_refreshDisplay = 1;
 	}
 }
 
@@ -565,10 +563,10 @@ ReUpdateRaceCurRes()
     char *tmp_str;
     double time_left;
 
-	RaceEngine::self().userInterface().setResultsMenuTrackName(ReInfo->track->name);
+	ReUI().setResultsMenuTrackName(ReInfo->s->_raceType, ReInfo->track->name);
     ncars = ReInfo->s->_ncars;
-    if (ncars > RaceEngine::self().userInterface().getResultsMenuLineCount())
-    	ncars = RaceEngine::self().userInterface().getResultsMenuLineCount();
+    if (ncars > ReUI().getResultsMenuLineCount())
+    	ncars = ReUI().getResultsMenuLineCount();
     if (ReInfo->s->_totTime > ReInfo->s->currentTime)
     {
     	time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
@@ -578,7 +576,7 @@ ReUpdateRaceCurRes()
     {
     	sprintf( buf, "%d laps", ReInfo->s->_totLaps );
     }
-    RaceEngine::self().userInterface().setResultsMenuTitle(buf);
+    ReUI().setResultsMenuTitle(buf);
 
     for (xx = 0; xx < ncars; ++xx) {
     	car = ReInfo->s->cars[ xx ];
@@ -610,10 +608,9 @@ ReUpdateRaceCurRes()
 		    sprintf(buf, "%d -    %d Laps - %s (%s)", xx + 1, car->_lapsBehindLeader, car->_name, carName);
 	    }
 	}
-	RaceEngine::self().userInterface().setResultsMenuLine(buf, xx, 0);
+	ReUI().setResultsMenuLine(buf, xx, 0);
 	FREEZ(carName);
     }
-    ReInfo->_refreshDisplay = 1;
 }
 
 void
@@ -636,14 +633,15 @@ ReDisplayResults(void)
     void	*params = ReInfo->params;
     ReCalculateClassPoints (ReInfo->_reRaceName);
 
-    if ((!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPRES, RM_VAL_YES), RM_VAL_YES)) || (ReInfo->_displayMode == RM_DISP_MODE_NORMAL))
+    if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPRES, RM_VAL_YES), RM_VAL_YES)
+		|| ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
 	{
-		RaceEngine::self().userInterface().activateResultsMenu(ReInfo->_reGameScreen, ReInfo);
+		ReUI().activateResultsMenu(ReInfo->_reGameScreen, ReInfo);
     }
 	else 
     {
     	return RM_SYNC | RM_NEXT_STEP;
-		//RaceEngine::self().userInterface().showResultsMenuContinueButton();
+		//ReUI().showResultsMenuContinueButton();
     }
 
     return RM_ASYNC | RM_NEXT_STEP;
@@ -653,5 +651,5 @@ ReDisplayResults(void)
 void
 ReDisplayStandings(void)
 {
-    RaceEngine::self().userInterface().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
+    ReUI().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
 }

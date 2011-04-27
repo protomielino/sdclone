@@ -49,8 +49,8 @@ rmOnActivate(void * /* dummy */)
 	GfLogTrace("Entering Race Mode Select menu\n");
 
     /* Race engine init */
-    LegacyMenu::self().raceEngine().initialize();
-    LegacyMenu::self().raceEngine().data()->_reMenuScreen = rmRaceSelectHandle;
+    LmRaceEngine().initialize();
+    LmRaceEngine().inData()->_reMenuScreen = rmRaceSelectHandle;
 }
 
 /* Exit from Race engine */
@@ -58,7 +58,7 @@ static void
 rmOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
-    LegacyMenu::self().raceEngine().shutdown();
+    LmRaceEngine().shutdown();
 }
 
 
@@ -97,17 +97,17 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 
 	if (pSelRaceMan)
 	{
-		LegacyMenu::self().raceEngine().selectRaceman(pSelRaceMan);
+		LmRaceEngine().selectRaceman(pSelRaceMan);
 		
 		// (Re-)initialize the currrent race configuration from the selected race manager.
-		LegacyMenu::self().raceEngine().race()->load(pSelRaceMan);
+		LmRaceEngine().race()->load(pSelRaceMan);
 
 		// Start the race configuration menus sequence.
-		LegacyMenu::self().raceEngine().configureRace(/* bInteractive */ true);
+		LmRaceEngine().configureRace(/* bInteractive */ true);
 	}
 	else
 	{
-		GfLogDebug("No such race manager (type '%s')\n", strRaceManType.c_str());
+		GfLogError("No such race manager (type '%s')\n", strRaceManType.c_str());
 	}
 }
 
@@ -141,16 +141,14 @@ RmRaceSelectInit(void *prevMenu)
 		// Get the racemanagers with this type
 		const std::vector<GfRaceManager*> vecRaceMans =
 			GfRaceManagers::self()->getRaceManagersWithType(itRaceManType->c_str());
-		GfLogDebug("ReRaceSelectInit : Type %s (%u)\n", itRaceManType->c_str(), vecRaceMans.size());
 
 		// Create the race manager type button.
 		std::string strButtonCtrlName(*itRaceManType);
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
-		int n = CreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
-									(void*)(itRaceManType - vecRaceManTypes.begin()),
-									rmOnSelectRaceMan);
-		GfLogDebug("CreateButtonControl(%d, '%s')\n", n, strButtonCtrlName.c_str());
+		CreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
+							(void*)(itRaceManType - vecRaceManTypes.begin()),
+							rmOnSelectRaceMan);
 
 		// Look for sub-types : if any, we have a sub-type combo box for this type.
 		bool bCreateCombo = false;
@@ -174,14 +172,12 @@ RmRaceSelectInit(void *prevMenu)
 		rmMapSubTypeComboIds[*itRaceManType] =
 			CreateComboboxControl(rmRaceSelectHandle, hMenuXMLDesc,
 								  strComboCtrlName.c_str(), 0, rmOnChangeRaceMan);
-		GfLogDebug("CreateComboboxControl(%d, '%s')\n", rmMapSubTypeComboIds[*itRaceManType], strComboCtrlName.c_str());
 
 		// Add one item in the combo for each race manager of this type.
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
 		{
 			GfuiComboboxAddText(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType],
 								(*itRaceMan)->getSubType().c_str());
-			GfLogDebug("ReRaceSelectInit : SubType %s : \n", (*itRaceMan)->getSubType().c_str());
 		}
 
 		// Select the first one by default.
@@ -205,7 +201,7 @@ RmRaceSelectInit(void *prevMenu)
 			   prevMenu, rmOnRaceSelectShutdown, NULL);
 
     // Give the race engine the menu to come back to.
-    LegacyMenu::self().raceEngine().initializeState(rmRaceSelectHandle);
+    LmRaceEngine().initializeState(rmRaceSelectHandle);
 
     return rmRaceSelectHandle;
 }

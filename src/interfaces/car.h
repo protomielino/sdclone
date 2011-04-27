@@ -249,7 +249,6 @@ typedef struct {
 #define RM_CAR_STATE_ENDRACE_CALLED	0x00001000				/**< Endrace called so robot freed a part of its data */
 #define RM_CAR_STATE_SIMU_NO_MOVE	0x00010000 				/**< Simulation without car move (i.e. clutch applied and no wheel move)  */
     tPosd	corner[4];
-
 } tPublicCar;
 /* structure access */
 #define _DynGC		pub.DynGC
@@ -290,6 +289,7 @@ typedef struct {
 	tdble Fy;
 	tdble Fz;
 } tWheelState;
+/* structure access */
 #define _ride(i)	priv.wheel[i].relPos.z
 #define _brakeTemp(i)	priv.wheel[i].brakeTemp
 #define _wheelSpinVel(i) priv.wheel[i].spinVel
@@ -303,7 +303,6 @@ typedef struct {
 #define _tyreT_mid(i) priv.wheel[i].temp_mid
 #define _tyreT_out(i) priv.wheel[i].temp_out
 #define _tyreCondition(i) priv.wheel[i].condition
-
 
 #define MAX_GEARS	10	/* including reverse and neutral */
 
@@ -430,7 +429,7 @@ typedef struct {
 struct RobotItf;
 
 /** Command issued by the car during pit stop */
-typedef struct 
+typedef struct CarPitCmd
 {
     tdble		fuel;
     int			repair;
@@ -438,6 +437,7 @@ typedef struct
 #define RM_PIT_STOPANDGO	1
     int			stopType;
 } tCarPitCmd;
+/* structure access */
 #define _pitFuel	pitcmd.fuel
 #define _pitRepair	pitcmd.repair
 #define _pitStopType	pitcmd.stopType
@@ -458,8 +458,6 @@ typedef struct CarElt
     struct RobotItf	*robot;	/**< private */
     struct CarElt	*next;
 } tCarElt;
-
-
 
 /* Sections in XML description files */
 

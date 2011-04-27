@@ -18,10 +18,14 @@
  ***************************************************************************/
 
 /** @file   
-    		
+    		Race message management. Don't use directly, call ReSituation::setRaceMessage.
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
+
+#include <limits>
+
+#include <portability.h>
 
 #include <raceman.h>
 
@@ -29,15 +33,8 @@
 
 #include "racemessage.h"
 
-
-void
-ReRaceMsgUpdate(tRmInfo* pReInfo)
-{
-	IUserInterface& userItf = RaceEngine::self().userInterface();
-	
-	userItf.setRaceMessage(pReInfo->_reMessage);
-	userItf.setRaceBigMessage(pReInfo->_reBigMessage);
-}
+// Avoid C lib <cstdlib> "max" to overload <limits> ones.
+#undef max
 
 void
 ReRaceMsgManage(tRmInfo* pReInfo)
@@ -58,23 +55,25 @@ ReRaceMsgManage(tRmInfo* pReInfo)
 void
 ReRaceMsgSet(tRmInfo* pReInfo, const char *msg, double life)
 {
+	//GfLogDebug("ReRaceMsgSet('%s', %.2fs)\n", msg ? msg : "<null>", life);
     if (pReInfo->_reMessage)
 		free(pReInfo->_reMessage);
-    if (msg)
-		pReInfo->_reMessage = strdup(msg);
-    else
-		pReInfo->_reMessage = 0;
-	pReInfo->_reMessageEnd = pReInfo->_reCurTime + life;
+	pReInfo->_reMessage = msg ? strdup(msg) : 0;
+	if (life < 0)
+		pReInfo->_reMessageEnd = std::numeric_limits<double>::max();
+	else
+		pReInfo->_reMessageEnd = pReInfo->_reCurTime + life;
 }
 
 void
 ReRaceMsgSetBig(tRmInfo* pReInfo, const char *msg, double life)
 {
+	//GfLogDebug("ReRaceMsgSetBig('%s', %.2fs)\n", msg ? msg : "<null>", life);
     if (pReInfo->_reBigMessage)
 		free(pReInfo->_reBigMessage);
-    if (msg)
-		pReInfo->_reBigMessage = strdup(msg);
-    else
-		pReInfo->_reBigMessage = 0;
-	pReInfo->_reBigMessageEnd = pReInfo->_reCurTime + life;
+	pReInfo->_reBigMessage = msg ? strdup(msg) : 0;
+	if (life < 0)
+		pReInfo->_reBigMessageEnd = std::numeric_limits<double>::max();
+	else
+		pReInfo->_reBigMessageEnd = pReInfo->_reCurTime + life;
 }

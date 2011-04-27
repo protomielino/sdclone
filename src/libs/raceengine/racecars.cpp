@@ -33,7 +33,6 @@
 
 #include "raceengine.h"
 
-#include "racemessage.h"
 #include "racesituation.h"
 #include "raceupdate.h"
 #include "raceresults.h"
@@ -49,8 +48,8 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 	tCarPenalty *penalty;
 	int i;
 
-	//GfLogDebug("ReCarsUpdateCarPitTime(%s) : typ=%d, fuel=%f, rep=%d\n",
-	//		   car->_name, car->_pitStopType, car->_pitFuel, car->_pitRepair);
+	// GfLogDebug("ReCarsUpdateCarPitTime(%s) : typ=%d, fuel=%f, rep=%d\n",
+	// 		   car->_name, car->_pitStopType, car->_pitFuel, car->_pitRepair);
 
 	switch (car->_pitStopType) {
 		case RM_PIT_REPAIR:
@@ -59,9 +58,9 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 			ReInfo->_reSimItf.reconfig(car);
 			for (i=0; i<4; i++) {
 				car->_tyreCondition(i) = 1.01f;
-				car->_tyreT_in(i) = 50.0;
-				car->_tyreT_mid(i) = 50.0;
-				car->_tyreT_out(i) = 50.0;
+				car->_tyreT_in(i) = 50.0f;
+				car->_tyreT_mid(i) = 50.0f;
+				car->_tyreT_out(i) = 50.0f;
 			}
 			GfLogInfo("%s in repair pit stop for %.1f s (refueling by %.1f l, repairing by %d).\n",
 					  car->_name, info->totalPitTime, car->_pitFuel, car->_pitRepair);
@@ -91,14 +90,14 @@ reCarsSchedulePitMenu(tCarElt *car)
 {
 	// Do nothing if one car is already scheduled for the pit menu
 	// (this one will have to wait for the current one exiting from the menu)
-	if (ReInfo->_reInPitMenuCar)
+	if (ReInfo->_rePitRequester)
 	{
 		GfLogInfo("%s would like to pit, but the pit menu is already in use.\n", car->_name);
 		return;
 	}
 
 	// Otherwise, "post" a pit menu request for this car.
-	ReInfo->_reInPitMenuCar = car;
+	ReInfo->_rePitRequester = car;
 }
 
 
@@ -117,7 +116,7 @@ reCarsAddPenalty(tCarElt *car, int penalty)
 	else if (penalty == RM_PENALTY_DISQUALIFIED)
 		sprintf(msg, "%s disqualified", car->_name);
 
-	ReRaceMsgSet(ReInfo, msg, 5);
+	ReSituation::self().setRaceMessage(msg, 5);
 
 	/* If disqualified, remove the car from the track */
 	if (penalty == RM_PENALTY_DISQUALIFIED)
@@ -231,14 +230,14 @@ reCarsApplyRaceRules(tCarElt *car)
 				switch (penalty->penalty) {
 					case RM_PENALTY_DRIVETHROUGH:
 						sprintf(msg, "%s Drive Through penalty clearing", car->_name);
-						ReRaceMsgSet(ReInfo, msg, 5);
+						ReSituation::self().setRaceMessage(msg, 5);
 						rules->ruleState |= RM_PNST_DRIVETHROUGH;
 						GfLogInfo("%s might get its Drive Through Penalty cleared.\n", car->_name);
 						break;
 					case RM_PENALTY_STOPANDGO:
 					case RM_PENALTY_10SEC_STOPANDGO:
 						sprintf(msg, "%s Stop and Go penalty clearing", car->_name);
-						ReRaceMsgSet(ReInfo, msg, 5);
+						ReSituation::self().setRaceMessage(msg, 5);
 						rules->ruleState |= RM_PNST_STOPANDGO;
 						GfLogInfo("%s might get its Stop And Go Penalty cleared.\n", car->_name);
 						break;
@@ -264,7 +263,7 @@ reCarsApplyRaceRules(tCarElt *car)
 			//     and everything went well in the clearing process til then.
 			if (rules->ruleState & (RM_PNST_DRIVETHROUGH | RM_PNST_STOPANDGO_OK)) {
 				sprintf(msg, "%s penalty cleared", car->_name);
-				ReRaceMsgSet(ReInfo, msg, 5);
+				ReSituation::self().setRaceMessage(msg, 5);
 				penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
 				reCarsRemovePenalty(car, penalty);
 				GfLogInfo("%s %s penalty cleared.\n", car->_name,
@@ -359,7 +358,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					car->_state &= ~RM_CAR_STATE_PIT;
 					car->_pit->pitCarIndex = TR_PIT_STATE_FREE;
 					sprintf(msg, "%s pit stop %.1f s", car->_name, info->totalPitTime);
-					ReRaceMsgSet(ReInfo, msg, 5);
+					ReSituation::self().setRaceMessage(msg, 5);
 					GfLogInfo("%s exiting pit (%.1f s elapsed).\n", car->_name, info->totalPitTime);
 				} else {
 					sprintf(car->ctrl.msg[2], "In pits %.1f s",
@@ -416,7 +415,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					}
 					info->startPitTime = s->currentTime;
 					sprintf(msg, "%s in pits", car->_name);
-					ReRaceMsgSet(ReInfo, msg, 5);
+					ReSituation::self().setRaceMessage(msg, 5);
 					GfLogInfo("%s entering in pit slot.\n", car->_name);
 					if (car->robot->rbPitCmd(car->robot->index, car, s) == ROB_PIT_MENU) {
 						// the pit cmd is modified by menu.
@@ -512,14 +511,13 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 			switch (ReInfo->s->_raceType) {
 			case RM_TYPE_PRACTICE:
 				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {
-					ReInfo->_refreshDisplay = 1;
 					char *t1, *t2;
 					t1 = GfTime2Str(car->_lastLapTime, "  ", false, 2);
 					t2 = GfTime2Str(car->_bestLapTime, "  ", false, 2);
 					sprintf(msg,"lap: %02d   time: %s  best: %s  top spd: %.2f    min spd: %.2f    damage: %d",
 						car->_laps - 1, t1, t2,
 						info->topSpd * 3.6, info->botSpd * 3.6, car->_dammage);
-					RaceEngine::self().userInterface().addResultsMenuLine(msg);
+					ReUI().addResultsMenuLine(msg);
 					free(t1);
 					free(t2);
 				}
@@ -566,7 +564,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 			if (ReInfo->s->_raceType == RM_TYPE_RACE) {
 				if (car->_pos == 1) {
 				sprintf(msg, "Winner %s", car->_name);
-				ReRaceMsgSetBig(ReInfo, msg, 10);
+				ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
 				if (GetServer())
 					{
 					GetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
@@ -589,7 +587,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					}
 				}
 				sprintf(msg, "%s finished %d%s", car->_name, car->_pos, numSuffix);
-				ReRaceMsgSet(ReInfo, msg, 5);
+				ReSituation::self().setRaceMessage(msg, 5);
 				}
 			}
 			}

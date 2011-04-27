@@ -68,7 +68,7 @@ cGrScreen::~cGrScreen()
 	class cGrCamera *cam;
 	
 	for (i = 0; i < 10; i++) {
-		while ((cam =  GF_TAILQ_FIRST(&cams[i])) != 0) {
+		while ((cam =  GF_TAILQ_FIRST(&cams[i]))) {
 			cam->remove(&cams[i]);
 			delete cam;
 		}
@@ -78,16 +78,12 @@ cGrScreen::~cGrScreen()
 	delete mirrorCam;
 	delete bgCam;
 	
-	if (board != NULL) {
-		board->shutdown ();
-	}
+	if (board)
+		board->shutdown();
+	delete board; // 'delete 0' is safe.
+	board = 0;
 	
 	FREEZ(cars);
-	
-	if (board != NULL) {
-		delete board;
-		board = NULL;
-	}
 }
 
 void

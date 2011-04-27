@@ -40,7 +40,6 @@ extern int  ReEventShutdown();
 extern void ReRaceAbandon();
 extern void ReRaceAbort();
 extern void ReRaceSkipSession();
-extern void ReRaceContinue();
 extern void ReRaceRestart();
 
 #endif /* _RACEMAIN_H_ */ 

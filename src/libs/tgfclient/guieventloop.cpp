@@ -150,11 +150,11 @@ void GfuiEventLoop::operator()()
 
 		if (!quitRequested())
 		{
-			// Refresh display if needed.
+			// Recompute if anything to.
+			recompute();
+
+			// Redisplay if anything to.
 			redisplay();
-			
-			// Spend idle time as requested.
-			spendIdleTime();
 		}
 	}
 
@@ -176,7 +176,7 @@ void GfuiEventLoop::setMousePassiveMotionCB(void (*func)(int x, int y))
 	_pPrivate->cbMousePassiveMotion = func;
 }
 
-void GfuiEventLoop::setDisplayCB(void (*func)(void))
+void GfuiEventLoop::setRedisplayCB(void (*func)(void))
 {
 	_pPrivate->cbDisplay = func;
 }
@@ -203,7 +203,7 @@ void GfuiEventLoop::redisplay()
 	if (_pPrivate->bRedisplay)
 	{
 		// Acknowledge the request
-		// (Note: do it before forceRedisplay(), in case it calls postRedisplay()).
+		// (Note: do it before forceRedisplay(), in case it calls postRedisplay() ;-).
 		_pPrivate->bRedisplay = false;
 
 		// Really call the redisplay call-back if any.

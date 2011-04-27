@@ -125,9 +125,9 @@ MouseCalAutomaton(void)
     CalState = GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	GfuiApp().eventLoop().setIdleCB(Idle2);
+	GfuiApp().eventLoop().setRecomputeCB(Idle2);
     } else {
-	GfuiApp().eventLoop().setIdleCB(0);
+	GfuiApp().eventLoop().setRecomputeCB(0);
 	GfuiApp().eventLoop().postRedisplay();
     }
 }
@@ -158,7 +158,7 @@ IdleMouseInit(void)
     memset(&MouseInfo, 0, sizeof(MouseInfo));
     GfctrlMouseGetCurrent(&MouseInfo);
     GfctrlMouseInitCenter();
-    GfuiApp().eventLoop().setIdleCB(Idle2);
+    GfuiApp().eventLoop().setRecomputeCB(Idle2);
 }
 
 static void
@@ -168,7 +168,7 @@ onActivate(void * /* dummy */)
     GetNextAxis();
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
     if (CalState < 4) {
-	GfuiApp().eventLoop().setIdleCB(IdleMouseInit);
+	GfuiApp().eventLoop().setRecomputeCB(IdleMouseInit);
 	GfctrlMouseCenter();
     }
 }

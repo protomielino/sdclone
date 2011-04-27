@@ -67,14 +67,13 @@ static string st; //This is the line we will display in the bottom
 
 cGrBoard::cGrBoard (int myid) {
   id = myid;
-  trackMap = NULL;
+  trackMap = 0;
 }
 
 
 cGrBoard::~cGrBoard () {
-  if(trackMap != NULL)
-    delete trackMap;
-  trackMap = NULL;
+  delete trackMap;
+  trackMap = 0;
 }
 
 
@@ -950,20 +949,18 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
 void
 cGrBoard::initBoard(void)
 {
-  if (trackMap == NULL) {
+  if (!trackMap) {
     trackMap = new cGrTrackMap();
   }
 }
 
 void
 cGrBoard::shutdown(void)
-{                                                                                                                                                                                                                                                                         
-  if (trackMap != NULL) {
-    delete trackMap;
-    trackMap = NULL;
-  }
+{
+  delete trackMap; // 'delete 0' is safe.
+  trackMap = 0;
   
-  //Resetting scrolling leaderboard variables
+  // Reset scrolling leaderboard variables
   sShortNames.clear();
   st.clear();
   iStart = 0;

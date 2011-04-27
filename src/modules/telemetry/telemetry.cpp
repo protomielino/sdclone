@@ -17,14 +17,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <stdio.h>
 #include <memory.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 
 #include <tgf.h>
+#include <portability.h>
 #include <telemetry.h>
 
 #include "tlm.h"

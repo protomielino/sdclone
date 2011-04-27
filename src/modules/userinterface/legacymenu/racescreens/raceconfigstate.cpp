@@ -47,7 +47,7 @@ static tRmRaceParam    rp;
 static void
 rmConfigBack(void)
 {
-	void* params = LegacyMenu::self().raceEngine().data()->params;
+	void* params = LmRaceEngine().inData()->params;
 
 	/* Go back one step in the conf */
 	GfParmSetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 
@@ -102,7 +102,7 @@ RmConfigRunState(bool bStart)
 	char	path[256];
 	int		curConf;
 	const char	*conf;
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 	void	*params = reInfo->params;
 
 	// TODO: Replace any read/write to params to get/set from/to race/raceman instances ?
@@ -115,7 +115,7 @@ RmConfigRunState(bool bStart)
 	curConf = (int)GfParmGetNum(params, RM_SECT_CONF, RM_ATTR_CUR_CONF, NULL, 1);
 	if (curConf > GfParmGetEltNb(params, RM_SECT_CONF)) {
 		GfLogInfo("%s configuration finished.\n", reInfo->_reName);
-		LegacyMenu::self().raceEngine().race()->store(); // Save race data to params.
+		LmRaceEngine().race()->store(); // Save race data to params.
 		GfParmWriteFile(NULL, params, reInfo->_reName); // Save params to disk.
 		GfuiScreenActivate(RmGetRacemanMenuHandle()); // Back to the race manager menu
 		return;
@@ -143,7 +143,7 @@ RmConfigRunState(bool bStart)
 		} else {
 			ts.prevScreen = rmConfigBackHookInit();
 		}
-		ts.pRace = LegacyMenu::self().raceEngine().race();
+		ts.pRace = LmRaceEngine().race();
 		ts.piTrackLoader = GfTracks::self()->getTrackLoader();
 		RmTrackSelect(&ts);
 
@@ -156,7 +156,7 @@ RmConfigRunState(bool bStart)
 		} else {
 			ds.prevScreen = rmConfigBackHookInit();
 		}
-		ds.pRace = LegacyMenu::self().raceEngine().race();
+		ds.pRace = LmRaceEngine().race();
 		RmDriversSelect(&ds);
 
 	} else if (!strcmp(conf, RM_VAL_RACECONF)) {
@@ -168,7 +168,7 @@ RmConfigRunState(bool bStart)
 		} else {
 			rp.prevScreen = rmConfigBackHookInit();
 		}
-		rp.pRace = LegacyMenu::self().raceEngine().race();
+		rp.pRace = LmRaceEngine().race();
 		rp.session = GfParmGetStr(params, path, RM_ATTR_RACE, RM_VAL_ANYRACE);
 		RmRaceParamsMenu(&rp);
 	}

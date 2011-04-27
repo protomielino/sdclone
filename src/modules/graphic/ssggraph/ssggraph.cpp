@@ -83,39 +83,47 @@ SsgGraph::~SsgGraph()
 // Implementation of IGraphicsEngine ****************************************
 bool SsgGraph::loadTrack(tTrack* pTrack)
 {
+	//GfLogDebug("SsgGraph::loadTrack\n");
 	return ::initTrack(pTrack) == 0;
 }
 
 bool SsgGraph::loadCars(tSituation* pSituation)
 { 
+	//GfLogDebug("SsgGraph::loadCars\n");
 	return ::initCars(pSituation) == 0;
 }
 
 bool SsgGraph::setupView(int x, int y, int width, int height, void* pMenuScreen)
 {
+	//GfLogDebug("SsgGraph::setupView\n");
 	return ::initView(x, y, width, height, GR_VIEW_STD, pMenuScreen) == 0;
 }
 
-void SsgGraph::updateView(tSituation* pSituation)
+void SsgGraph::redrawView(tSituation* pSituation)
 {
 	::refresh(pSituation);
-}
-
-void SsgGraph::shutdownView()
-{
-}
-
-void SsgGraph::unloadCars()
-{
-	::shutdownCars();
-}
-
-void SsgGraph::unloadTrack()
-{
-	::shutdownTrack();
 }
 
 // void SsgGraph::bendCar(int index, sgVec3 poc, sgVec3 force, int count)
 // {
 // 	::bendCar(index, poc, force, count);
 // }
+
+void SsgGraph::unloadCars()
+{
+	//GfLogDebug("SsgGraph::unloadCars\n");
+	::shutdownCars();
+}
+
+void SsgGraph::unloadTrack()
+{
+	//GfLogDebug("SsgGraph::unloadTrack\n");
+	::shutdownTrack();
+}
+
+void SsgGraph::shutdownView()
+{
+	//GfLogDebug("SsgGraph::shutdownView\n");
+	::shutdownView();
+}
+

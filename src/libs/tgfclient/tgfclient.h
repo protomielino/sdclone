@@ -243,6 +243,8 @@ TGFCLIENT_API void GfuiScreenAddBgImg(void *scr, const char *filename);
 TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction);
 TGFCLIENT_API void GfuiInitWindowPositionAndSize(int x, int y, int w, int h);
+
+TGFCLIENT_API void GfuiRedraw(void);
 TGFCLIENT_API void GfuiSwapBuffers(void);
 
 class TGFCLIENT_API GfuiMenuScreen
@@ -423,7 +425,7 @@ TGFCLIENT_API void GfuiEditboxSetColor(void *scr, int id,Color color);
 TGFCLIENT_API void GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor);
 
 
-/* Scrolling lists */
+/* Scroll lists */
 TGFCLIENT_API int GfuiScrollListCreate(void *scr, int font, int x, int y, int align,
                                 int width, int height, int scrollbar, void *userDataOnSelect, tfuiCallback onSelect);
 TGFCLIENT_API int GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData);
@@ -573,7 +575,7 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
 	//! Destructor
 	virtual ~GfuiEventLoop();
 
-	//! The real event loop function.
+	//! The real event loop function : 1) process events, 2) do the 'computing' job, 3) do the 'displaying' job.
 	virtual void operator()(void);
 
 	//! Set the "mouse button pressed" callback function.
@@ -586,7 +588,7 @@ class TGFCLIENT_API GfuiEventLoop : public GfEventLoop
 	void setMousePassiveMotionCB(void (*func)(int x, int y));
 
 	//! Set the "redisplay/refresh" callback function. 
-	void setDisplayCB(void (*func)(void));
+	void setRedisplayCB(void (*func)(void));
 
 	//! Set the "reshape" callback function with given new screen/window geometry.
 	void setReshapeCB(void (*func)(int width, int height));

@@ -156,11 +156,21 @@ GfuiIdle(void)
 	}
 }
 
-/** Display callback for the GUI event loop.
+/** Display callback for the GUI event loop (redraws the current screen and swaps buffers).
      @ingroup	gui
  */
 void
 GfuiDisplay(void)
+{
+	GfuiRedraw();
+	GfuiSwapBuffers();
+}
+
+/** Redraw the current screen
+     @ingroup	gui
+ */
+void
+GfuiRedraw(void)
 {
 	tGfuiObject	*curObj;
 	
@@ -266,7 +276,6 @@ GfuiDisplay(void)
 		GfuiDrawCursor();
 
 	glDisable(GL_BLEND);
-	GfuiSwapBuffers();
 }
 
 /** Hide the mouse cursor
@@ -492,7 +501,7 @@ GfuiScreenActivate(void *screen)
    	GfuiApp().eventLoop().setMouseButtonCB(gfuiMouseButton);
 	GfuiApp().eventLoop().setMouseMotionCB(gfuiMouseMotion);
 	GfuiApp().eventLoop().setMousePassiveMotionCB(gfuiMousePassiveMotion);
-	GfuiApp().eventLoop().setIdleCB(0);
+	GfuiApp().eventLoop().setRecomputeCB(0);
 
 	if (GfuiScreen->keyAutoRepeat)
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
@@ -505,11 +514,11 @@ GfuiScreenActivate(void *screen)
 		{
 			gfuiSelectNext(NULL);
 		}
-		GfuiApp().eventLoop().setDisplayCB(GfuiDisplay);
+		GfuiApp().eventLoop().setRedisplayCB(GfuiDisplay);
 	} 
 	else 
 	{
-		GfuiApp().eventLoop().setDisplayCB(GfuiDisplayNothing);
+		GfuiApp().eventLoop().setRedisplayCB(GfuiDisplayNothing);
 	}
 	
 	if (GfuiScreen->onActivate)
@@ -553,8 +562,8 @@ GfuiScreenDeactivate(void)
 	GfuiApp().eventLoop().setMouseButtonCB(0);
   	GfuiApp().eventLoop().setMouseMotionCB(0);
 	GfuiApp().eventLoop().setMousePassiveMotionCB(0);
- 	GfuiApp().eventLoop().setIdleCB(0);
- 	GfuiApp().eventLoop().setDisplayCB(GfuiDisplayNothing);
+ 	GfuiApp().eventLoop().setRecomputeCB(0);
+ 	GfuiApp().eventLoop().setRedisplayCB(GfuiDisplayNothing);
 }
 
 /** Create a new screen.

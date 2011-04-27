@@ -27,6 +27,8 @@
 
 #include <cerrno>
 #include <cstdio>
+#include <cstdlib>
+#include <cstdarg>
 #include <cassert>
 #include <cstring>
 #include <ctime>

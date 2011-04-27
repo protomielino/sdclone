@@ -23,12 +23,14 @@
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
+
 #include <cstdlib>
 
 #include <tgfclient.h>
 #include <car.h>
 #include <raceman.h>
 
+#include "legacymenu.h"
 #include "racescreens.h"
 
 
@@ -138,4 +140,32 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 
     // Activate the created screen.
     GfuiScreenActivate(menuHandle);
+}
+
+// Pit menu return callback.
+static void
+rmOnBackFromPitMenu(void *pvcar)
+{
+	const tCarElt* car = (tCarElt*)pvcar;
+	LmRaceEngine().setPitCommand(car->index, &car->pitcmd);
+
+	RmGameScreen();
+}
+
+bool
+RmCheckPitRequest()
+{
+	// If one (human) driver is in pit, switch the display loop to the pit menu.
+	if (LmRaceEngine().outData()->_rePitRequester)
+	{
+		// First, stop the race engine.
+		LmRaceEngine().stop();
+
+		// Then open the pit menu (will return in ReCarsUpdateCarPitCmd).
+		RmPitMenuStart(LmRaceEngine().outData()->_rePitRequester, rmOnBackFromPitMenu);
+
+		return true;
+	}
+
+	return false;
 }

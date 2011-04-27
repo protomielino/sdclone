@@ -82,347 +82,360 @@ cGrTrackMap::cGrTrackMap()
 	viewmode = TRACK_MAP_NORMAL_WITH_OPPONENTS;
 
 	// For all views we need the same track texture, so create it just once.
-	if (isinitalized) {
+	if (isinitalized)
 		return;
-	} else {
-		// Initialize colors for the various car "dots".
-		initColors();
+	
+	// GfLogDebug("cGrTrackMap::cGrTrackMap() : Initializing track map texture\n");
 
-		tTrack *track = grTrack;
-		tTrackSeg* first = track->seg;
-		tTrackSeg* seg = first;
+	// Initialize colors for the various car "dots".
+	initColors();
 
-		// Search the maximum/minimum x/y values of the track (axis aligned bounding box),
-		// to compute later the texture parameters and to be able to place the cars (dots)
-		// correct. The impementation is inefficient, but it's just executed one time per
-		// race, so it doesn't matter.
-		track_min_x = FLT_MAX;
-		track_max_x = -FLT_MAX;
-		track_min_y = FLT_MAX;
-		track_max_y = -FLT_MAX;
+	tTrack *track = grTrack;
+	tTrackSeg* first = track->seg;
+	tTrackSeg* seg = first;
 
-		do {
-			// We analyse the straight and turns different, because (read on)
-			if (seg->type == TR_STR) {
-				// Straights are trivial, because the corners are sufficient to create a
-				// bounding box.
-				// TODO: If CCW/CW is known, you just need to check one side (the outside).
-				// TODO: More effiecient checking.
-				checkAndSetMinimum(track_min_x, seg->vertex[TR_SL].x);
-				checkAndSetMinimum(track_min_x, seg->vertex[TR_SR].x);
-				checkAndSetMinimum(track_min_y, seg->vertex[TR_SL].y);
-				checkAndSetMinimum(track_min_y, seg->vertex[TR_SR].y);
+	// Search the maximum/minimum x/y values of the track (axis aligned bounding box),
+	// to compute later the texture parameters and to be able to place the cars (dots)
+	// correct. The impementation is inefficient, but it's just executed one time per
+	// race, so it doesn't matter.
+	track_min_x = FLT_MAX;
+	track_max_x = -FLT_MAX;
+	track_min_y = FLT_MAX;
+	track_max_y = -FLT_MAX;
 
-				checkAndSetMaximum(track_max_x, seg->vertex[TR_SL].x);
-				checkAndSetMaximum(track_max_x, seg->vertex[TR_SR].x);
-				checkAndSetMaximum(track_max_y, seg->vertex[TR_SL].y);
-				checkAndSetMaximum(track_max_y, seg->vertex[TR_SR].y);
-			} else {
-				// Turns are not that easy, think of a definition of a circle or an arc. If you
-				// just consider the corners the bounding box might be any order too small
-				// or too big.
-				// To avoid that we create intermediate steps, such that we get a defined
-				// accuracy (e.g. 5 meters).
-				float curseglen = 0.0;
-				float dphi = RESOLUTION / seg->radius;
-				double xc = seg->center.x;
-				double yc = seg->center.y;
-				dphi = (seg->type == TR_LFT) ? dphi : -dphi;
-				float phi = 0.0;
+	do {
+		// We analyse the straight and turns different, because (read on)
+		if (seg->type == TR_STR) {
+			// Straights are trivial, because the corners are sufficient to create a
+			// bounding box.
+			// TODO: If CCW/CW is known, you just need to check one side (the outside).
+			// TODO: More efficient checking.
+			checkAndSetMinimum(track_min_x, seg->vertex[TR_SL].x);
+			checkAndSetMinimum(track_min_x, seg->vertex[TR_SR].x);
+			checkAndSetMinimum(track_min_y, seg->vertex[TR_SL].y);
+			checkAndSetMinimum(track_min_y, seg->vertex[TR_SR].y);
 
-				while (curseglen < seg->length) {
-					float cs = cos(phi), ss = sin(phi);
-					// TODO: If CCW/CW is known, you just need to check one side (the outside).
-					float lx, ly, rx, ry;
-					lx = seg->vertex[TR_SL].x * cs - seg->vertex[TR_SL].y * ss - xc * cs + yc * ss + xc;
-					ly = seg->vertex[TR_SL].x * ss + seg->vertex[TR_SL].y * cs - xc * ss - yc * cs + yc;
-
-					rx = seg->vertex[TR_SR].x * cs - seg->vertex[TR_SR].y * ss - xc * cs + yc * ss + xc;
-					ry = seg->vertex[TR_SR].x * ss + seg->vertex[TR_SR].y * cs - xc * ss - yc * cs + yc;
-
-					// TODO: More efficient checking.
-					checkAndSetMinimum(track_min_x, lx);
-					checkAndSetMinimum(track_min_x, rx);
-					checkAndSetMinimum(track_min_y, ly);
-					checkAndSetMinimum(track_min_y, ry);
-
-					checkAndSetMaximum(track_max_x, lx);
-					checkAndSetMaximum(track_max_x, rx);
-					checkAndSetMaximum(track_max_y, ly);
-					checkAndSetMaximum(track_max_y, ry);
-
-					curseglen += RESOLUTION;
-					phi += dphi;
-				}
-			}
-			seg = seg->next;
-		} while (seg != first);
-
-		// Compute the maximum possible texture size possible to create the track texture.
-		// TODO: use pbuffer if available or subdivide and render/readback in multiple passes.
-		int texturesize = 1;
-		int maxtexturesize = MIN(grWinw, grWinh);
-		while (texturesize <= maxtexturesize) {
-			texturesize <<= 1;
-		}
-		texturesize >>= 1;
-
-		// Get maximum OpenGL texture size and reduce texturesize if necessary.
-		int maxOpenGLtexturesize;
-		glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxOpenGLtexturesize);
-		if (texturesize > maxOpenGLtexturesize) {
-			texturesize = maxOpenGLtexturesize;
-		}
-
-		// Compute an estimate of the overall width and height of the track in [m].
-		track_width = track_max_x - track_min_x;
-		track_height = track_max_y - track_min_y;
-
-		// Compute the final line width to draw the track.
-		float linewidth = MIN(MAXLINEWIDTH, MINLINEWIDTH*4000.0/MAX(track_width, track_height));
-		linewidth = linewidth*(texturesize/512.0);
-
-		// Compute a first estimate of the pixel to distance ratio.
-		ratio = texturesize/MAX(track_width, track_height);
-
-		// Compute final minimum/maximum values.
-		track_max_x = track_max_x + RESOLUTION + linewidth/ratio;
-		track_max_y = track_max_y + RESOLUTION + linewidth/ratio;
-		track_min_x = track_min_x - RESOLUTION - linewidth/ratio;
-		track_min_y = track_min_y - RESOLUTION - linewidth/ratio;
-
-		// Compute final ratio, width and height.
-		track_width = track_max_x - track_min_x;
-		track_height = track_max_y - track_min_y;
-		ratio = texturesize/MAX(track_width, track_height);
-
-		// Compute the ratios
-		if (track_width >= track_height) {
-			track_x_ratio = 1.0;
-			track_y_ratio = track_height/track_width;
+			checkAndSetMaximum(track_max_x, seg->vertex[TR_SL].x);
+			checkAndSetMaximum(track_max_x, seg->vertex[TR_SR].x);
+			checkAndSetMaximum(track_max_y, seg->vertex[TR_SL].y);
+			checkAndSetMaximum(track_max_y, seg->vertex[TR_SR].y);
 		} else {
-			track_y_ratio = 1.0;
-			track_x_ratio = track_width/track_height;
+			// Turns are not that easy, think of a definition of a circle or an arc. If you
+			// just consider the corners the bounding box might be any order too small
+			// or too big.
+			// To avoid that we create intermediate steps, such that we get a defined
+			// accuracy (e.g. 5 meters).
+			float curseglen = 0.0;
+			float dphi = RESOLUTION / seg->radius;
+			double xc = seg->center.x;
+			double yc = seg->center.y;
+			dphi = (seg->type == TR_LFT) ? dphi : -dphi;
+			float phi = 0.0;
+
+			while (curseglen < seg->length) {
+				float cs = cos(phi), ss = sin(phi);
+				// TODO: If CCW/CW is known, you just need to check one side (the outside).
+				float lx, ly, rx, ry;
+				lx = seg->vertex[TR_SL].x * cs - seg->vertex[TR_SL].y * ss - xc * cs + yc * ss + xc;
+				ly = seg->vertex[TR_SL].x * ss + seg->vertex[TR_SL].y * cs - xc * ss - yc * cs + yc;
+
+				rx = seg->vertex[TR_SR].x * cs - seg->vertex[TR_SR].y * ss - xc * cs + yc * ss + xc;
+				ry = seg->vertex[TR_SR].x * ss + seg->vertex[TR_SR].y * cs - xc * ss - yc * cs + yc;
+
+				// TODO: More efficient checking.
+				checkAndSetMinimum(track_min_x, lx);
+				checkAndSetMinimum(track_min_x, rx);
+				checkAndSetMinimum(track_min_y, ly);
+				checkAndSetMinimum(track_min_y, ry);
+
+				checkAndSetMaximum(track_max_x, lx);
+				checkAndSetMaximum(track_max_x, rx);
+				checkAndSetMaximum(track_max_y, ly);
+				checkAndSetMaximum(track_max_y, ry);
+
+				curseglen += RESOLUTION;
+				phi += dphi;
+			}
 		}
+		seg = seg->next;
+	} while (seg != first);
 
-		isinitalized = true;
+	// Compute the maximum possible texture size possible to create the track texture.
+	// TODO: use pbuffer if available or subdivide and render/readback in multiple passes.
+	int texturesize = 1;
+	int maxtexturesize = MIN(grWinw, grWinh);
+	while (texturesize <= maxtexturesize) {
+		texturesize <<= 1;
+	}
+	texturesize >>= 1;
 
-		// Now we are ready to render the track into the framebuffer (backbuffer).
-		// Clear the framebuffer (backbuffer), make it "transparent" (alpha = 0.0).
-		glFinish();
-		glClearColor(0.0, 0.0, 0.0, 0.0);
-		glClear(GL_COLOR_BUFFER_BIT);
+	// Get maximum OpenGL texture size and reduce texturesize if necessary.
+	int maxOpenGLtexturesize;
+	glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxOpenGLtexturesize);
+	if (texturesize > maxOpenGLtexturesize) {
+		texturesize = maxOpenGLtexturesize;
+	}
 
-		// Set transformations and projection such that one pixel is one unit.
-		glViewport (grWinx, grWiny, grWinw, grWinh);
-		glMatrixMode(GL_MODELVIEW);
-		glPushMatrix();
-		glLoadIdentity();
+	// Compute an estimate of the overall width and height of the track in [m].
+	track_width = track_max_x - track_min_x;
+	track_height = track_max_y - track_min_y;
 
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		gluOrtho2D(0.0, grWinw, 0.0, grWinh);
-		glMatrixMode(GL_MODELVIEW);
+	// Compute the final line width to draw the track.
+	float linewidth = MIN(MAXLINEWIDTH, MINLINEWIDTH*4000.0/MAX(track_width, track_height));
+	linewidth = linewidth*(texturesize/512.0);
 
-		// Now draw the track as quad strip. The reason for that is that drawing with
-		// glEnable(GL_LINE_SMOOTH) and glHint(GL_LINE_SMOOTH_HINT, GL_NICEST) caused problems
-		// with the alpha channel.
-		float halflinewidth = linewidth/2.0;
-		bool firstvert = true;
-		float xf1, yf1 , xf2, yf2;
-		xf1 = yf1 = xf2 = yf2 = 0.0;
-		glBegin(GL_QUAD_STRIP);
-		seg = first;
-		do {
-			if (seg->type == TR_STR) {
-				// Draw a straight.
-				// Compute global coordinate on track middle.
-				float xm = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x) / 2.0;
-				float ym = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y) / 2.0;
-				xm = (xm - track_min_x)*ratio;
-				ym = (ym - track_min_y)*ratio;
+	// Compute a first estimate of the pixel to distance ratio.
+	ratio = texturesize/MAX(track_width, track_height);
 
-				// Compute normal to the track middle.
-				float xn = seg->vertex[TR_SL].x - seg->vertex[TR_SR].x;
-				float yn = seg->vertex[TR_SL].y - seg->vertex[TR_SR].y;
+	// Compute final minimum/maximum values.
+	track_max_x = track_max_x + RESOLUTION + linewidth/ratio;
+	track_max_y = track_max_y + RESOLUTION + linewidth/ratio;
+	track_min_x = track_min_x - RESOLUTION - linewidth/ratio;
+	track_min_y = track_min_y - RESOLUTION - linewidth/ratio;
+
+	// Compute final ratio, width and height.
+	track_width = track_max_x - track_min_x;
+	track_height = track_max_y - track_min_y;
+	ratio = texturesize/MAX(track_width, track_height);
+
+	// Compute the ratios
+	if (track_width >= track_height) {
+		track_x_ratio = 1.0;
+		track_y_ratio = track_height/track_width;
+	} else {
+		track_y_ratio = 1.0;
+		track_x_ratio = track_width/track_height;
+	}
+
+	isinitalized = true;
+
+	// GfLogDebug("cGrTrackMap::cGrTrackMap() : xMin=%.2f, xMax=%.2f, yMin=%.2f, yMax=%.2f\n",
+	// 		   track_min_x, track_max_x, track_min_y, track_max_y);
+	// GfLogDebug("cGrTrackMap::cGrTrackMap() : ratio=%.3f\n", ratio);
+	// GfLogDebug("cGrTrackMap::cGrTrackMap() : xWin=%d, yWin=%d, wWin=%d, hWin=%d\n",
+	// 		   grWinx, grWiny, grWinw, grWinh);
+
+	// Now we are ready to render the track into the framebuffer (backbuffer).
+	// Clear the framebuffer (backbuffer), make it "transparent" (alpha = 0.0).
+	glFinish();
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT);
+
+	// Set transformations and projection such that one pixel is one unit.
+	glViewport (grWinx, grWiny, grWinw, grWinh);
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluOrtho2D(0.0, grWinw, 0.0, grWinh);
+	glMatrixMode(GL_MODELVIEW);
+
+	// Now draw the track as quad strip. The reason for that is that drawing with
+	// glEnable(GL_LINE_SMOOTH) and glHint(GL_LINE_SMOOTH_HINT, GL_NICEST) caused problems
+	// with the alpha channel.
+	float halflinewidth = linewidth/2.0;
+	bool firstvert = true;
+	float xf1, yf1 , xf2, yf2;
+	xf1 = yf1 = xf2 = yf2 = 0.0;
+	glBegin(GL_QUAD_STRIP);
+	seg = first;
+	do {
+		if (seg->type == TR_STR) {
+			// Draw a straight.
+			// Compute global coordinate on track middle.
+			float xm = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x) / 2.0;
+			float ym = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y) / 2.0;
+			xm = (xm - track_min_x)*ratio;
+			ym = (ym - track_min_y)*ratio;
+
+			// Compute normal to the track middle.
+			float xn = seg->vertex[TR_SL].x - seg->vertex[TR_SR].x;
+			float yn = seg->vertex[TR_SL].y - seg->vertex[TR_SR].y;
+			float length = sqrt(xn*xn+yn*yn);
+			xn /= length;
+			yn /= length;
+
+			// Compute the new points.
+			float x1 = (xm - xn*halflinewidth);
+			float y1 = (ym - yn*halflinewidth);
+			float x2 = (xm + xn*halflinewidth);
+			float y2 = (ym + yn*halflinewidth);
+
+			if (firstvert) {
+				firstvert = false;
+				xf1 = x1;
+				yf1 = y1;
+				xf2 = x2;
+				yf2 = y2;
+			}
+			glVertex2f(x1, y1);
+			glVertex2f(x2, y2);
+			// GfLogDebug("  Straight: x1=%.2f, y1=%.2f, x2=%.2f, y2=%.2f\n",
+			// 		   x1, y1, x2, y2);
+		} else {
+			// To draw the turns correctly, we subdivide them again, like above.
+			float curseglen = 0.0;
+			float dphi = RESOLUTION / seg->radius;
+			double xc = seg->center.x;
+			double yc = seg->center.y;
+			dphi = (seg->type == TR_LFT) ? dphi : -dphi;
+			float mx = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x) / 2.0;
+			float my = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y) / 2.0;
+			float phi = 0.0;
+
+			while (curseglen < seg->length) {
+				float cs = cos(phi), ss = sin(phi);
+				float x = mx * cs - my * ss - xc * cs + yc * ss + xc;
+				float y = mx * ss + my * cs - xc * ss - yc * cs + yc;
+
+				float xn = x - xc;
+				float yn = y - yc;
 				float length = sqrt(xn*xn+yn*yn);
 				xn /= length;
 				yn /= length;
 
-				// Compute the new points.
-				float x1 = (xm - xn*halflinewidth);
-				float y1 = (ym - yn*halflinewidth);
-				float x2 = (xm + xn*halflinewidth);
-				float y2 = (ym + yn*halflinewidth);
+				x = (x - track_min_x)*ratio;
+				y = (y - track_min_y)*ratio;
 
-				if (firstvert) {
-					firstvert = false;
-					xf1 = x1;
-					yf1 = y1;
-					xf2 = x2;
-					yf2 = y2;
-				}
-				glVertex2f(x1, y1);
-				glVertex2f(x2, y2);
-			} else {
-				// To draw the turns correct we subdivide them again, like above.
-				float curseglen = 0.0;
-				float dphi = RESOLUTION / seg->radius;
-				double xc = seg->center.x;
-				double yc = seg->center.y;
-				dphi = (seg->type == TR_LFT) ? dphi : -dphi;
-				float mx = (seg->vertex[TR_SL].x + seg->vertex[TR_SR].x) / 2.0;
-				float my = (seg->vertex[TR_SL].y + seg->vertex[TR_SR].y) / 2.0;
-			    float phi = 0.0;
+				float x1 = (x + xn*halflinewidth);
+				float y1 = (y + yn*halflinewidth);
+				float x2 = (x - xn*halflinewidth);
+				float y2 = (y - yn*halflinewidth);
 
-				while (curseglen < seg->length) {
-					float cs = cos(phi), ss = sin(phi);
-					float x = mx * cs - my * ss - xc * cs + yc * ss + xc;
-					float y = mx * ss + my * cs - xc * ss - yc * cs + yc;
-
-					float xn = x - xc;
-					float yn = y - yc;
-					float length = sqrt(xn*xn+yn*yn);
-					xn /= length;
-					yn /= length;
-
-					x = (x - track_min_x)*ratio;
-					y = (y - track_min_y)*ratio;
-
-					float x1 = (x + xn*halflinewidth);
-					float y1 = (y + yn*halflinewidth);
-					float x2 = (x - xn*halflinewidth);
-					float y2 = (y - yn*halflinewidth);
-
-					if (seg->type == TR_LFT) {
-						glVertex2f(x1, y1);
-						glVertex2f(x2, y2);
-						if (firstvert) {
-							firstvert = false;
-							xf1 = x1;
-							yf1 = y1;
-							xf2 = x2;
-							yf2 = y2;
-						}
-					} else {
-						glVertex2f(x2, y2);
-						glVertex2f(x1, y1);
-						if (firstvert) {
-							firstvert = false;
-							xf1 = x2;
-							yf1 = y2;
-							xf2 = x1;
-							yf2 = y1;
-						}
+				if (seg->type == TR_LFT) {
+					glVertex2f(x1, y1);
+					glVertex2f(x2, y2);
+					// GfLogDebug("  CurveL: x1=%.2f, y1=%.2f, x2=%.2f, y2=%.2f\n",
+					// 		   x1, y1, x2, y2);
+					if (firstvert) {
+						firstvert = false;
+						xf1 = x1;
+						yf1 = y1;
+						xf2 = x2;
+						yf2 = y2;
 					}
-
-					curseglen += RESOLUTION;
-					phi += dphi;
+				} else {
+					glVertex2f(x2, y2);
+					glVertex2f(x1, y1);
+					// GfLogDebug("  CurveR: x1=%.2f, y1=%.2f, x2=%.2f, y2=%.2f\n",
+					// 		   x1, y1, x2, y2);
+					if (firstvert) {
+						firstvert = false;
+						xf1 = x2;
+						yf1 = y2;
+						xf2 = x1;
+						yf2 = y1;
+					}
 				}
-			}
-			seg = seg->next;
-		} while (seg != first);
 
-		if (!firstvert) {
-			glVertex2f(xf1, yf1);
-			glVertex2f(xf2, yf2);
+				curseglen += RESOLUTION;
+				phi += dphi;
+			}
+		}
+		seg = seg->next;
+	} while (seg != first);
+
+	if (!firstvert) {
+		glVertex2f(xf1, yf1);
+		glVertex2f(xf2, yf2);
+	}
+	glEnd();
+
+	// Read track picture into memory to be able to generate mipmaps. I read back an RGBA
+	// image because I don't know yet what people want to add to the map, so RGBA is most
+	// flexible to add things like start line, elevation coloring etc.
+	// Do not use GL_ALPHA or GL_LUMINANCE to save memory, somehow this leads to a
+	// performance penalty (at least on NVidia cards).
+	GLuint *trackImage = (GLuint*) malloc(texturesize*texturesize*sizeof(GLuint));
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	glReadBuffer(GL_BACK);
+	glReadPixels(0, 0, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
+
+	// Check if the color buffer has alpha, if not fix the texture. Black gets
+	// replaced by transparent black, so don't draw black in the texture, you
+	// won't see anything.
+	int alphasize;
+	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE,&alphasize);
+	if (alphasize == 0) {
+		// There is no alpha, so we fix it manually. Because we added a little border
+		// around the track map the first pixel should always contain the clearcolor.
+		//GfLogDebug("  No alpha layer\n");
+		GLuint clearcolor = trackImage[0];
+		int i;
+		for (i = 0; i < texturesize*texturesize; i++) {
+			if (trackImage[i] == clearcolor) {
+				// Assumption: transparent black is 0, portable?
+				trackImage[i] = 0;
+			}
+		}
+	}
+
+	// Finally copy the created image of the track from the framebuffer into the texture.
+	glGenTextures (1, &mapTexture);
+	glBindTexture(GL_TEXTURE_2D, mapTexture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+
+	// If GL_ARB_texture_compression is available at runtime and selected, (try to) compress the
+	// texture. This is done with the specification of the internal format to
+	// GL_COMPRESSED_RGBA_ARB.
+	if (GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)) {
+		// This texture contains mostly the clear color value and should therefore
+		// compress well even with high quality.
+		glHint(GL_TEXTURE_COMPRESSION_HINT_ARB, GL_NICEST);
+		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_COMPRESSED_RGBA_ARB, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
+		// The following commented code is just for testing purposes.
+		/* int compressed;
+		  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB, &compressed);
+		  if (compressed == GL_TRUE) {
+		  int csize;
+		  GfLogDebug("    compression succesful!\n");
+		  glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &csize);
+		  GfLogDebug("    compression ratio: %d to %d\n", csize, texturesize*texturesize*sizeof(GLuint));
+		  } */
+	} else {
+		// GL_ARB_texture_compression not available at runtime or not selected, fallback.
+		gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
+	}
+
+	// Free the memory of the initial texture.
+	free(trackImage);
+
+	// Init the position and size of the map in the window.
+	map_x = -10;
+	map_y = -40;
+	map_size = 170;
+
+	// Restore some state.
+	glPopMatrix();
+
+	// Compile the car "dot" display list.
+	cardot = glGenLists(1);
+	if (cardot) {
+		glNewList(cardot, GL_COMPILE);
+		glBegin(GL_TRIANGLE_FAN);
+		// The center.
+		glVertex2f(0.0, 0.0);
+		// The border.
+		int i;
+		const int borderpoints = 8;
+		halflinewidth = halflinewidth*float(map_size)/float(texturesize);
+		for (i = 0; i < borderpoints + 1; i++) {
+			float phi = 2.0*PI*float(i)/float(borderpoints);
+			glVertex2f(halflinewidth*cos(phi), halflinewidth*sin(phi));
 		}
 		glEnd();
-
-		// Read track picture into memory to be able to generate mipmaps. I read back an RGBA
-		// image because I don't know yet what people want to add to the map, so RGBA is most
-		// flexible to add things like start line, elevation coloring etc.
-		// Do not use GL_ALPHA or GL_LUMINANCE to save memory, somehow this leads to a
-		// performance penalty (at least on NVidia cards).
-		GLuint *trackImage = (GLuint*) malloc(texturesize*texturesize*sizeof(GLuint));
-		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		glPixelStorei(GL_PACK_ALIGNMENT, 1);
-		glReadBuffer(GL_BACK);
-		glReadPixels(0, 0, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
-
-		// Check if the color buffer has alpha, if not fix the texture. Black gets
-		// replaced by transparent black, so don't draw black in the texture, you
-		// won't see anything.
-		int alphasize;
-		SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE,&alphasize);
-		if (alphasize==0) {
-			// There is no alpha, so we fix it manually. Because we added a little border
-			// around the track map the first pixel should always contain the
-			// clearcolor.
-			GLuint clearcolor = trackImage[0];
-			int i;
-			for (i = 0; i < texturesize*texturesize; i++) {
-				if (trackImage[i] == clearcolor) {
-					// Assumption: transparent black is 0, portable?
-					trackImage[i] = 0;
-				}
-			}
-		}
-
-		// Finally copy the created image of the track from the framebuffer into the texture.
-		glGenTextures (1, &mapTexture);
-		glBindTexture(GL_TEXTURE_2D, mapTexture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-
-
-		// If GL_ARB_texture_compression is available at runtime and selected, (try to) compress the
-		// texture. This is done with the specification of the internal format to
-		// GL_COMPRESSED_RGBA_ARB.
-		if (GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)) {
-			// This texture contains mostly the clear color value and should therefore
-			// compress well even with high quality.
-			glHint(GL_TEXTURE_COMPRESSION_HINT_ARB, GL_NICEST);
-			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_COMPRESSED_RGBA_ARB, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
-			// The following commented code is just for testing purposes.
-			/*int compressed;
-			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_ARB, &compressed);
-			if (compressed == GL_TRUE) {
-				int csize;
-				printf("compression succesful!\n");
-				glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_IMAGE_SIZE_ARB, &csize);
-				printf("compression ratio: %d to %d\n", csize, texturesize*texturesize*sizeof(GLuint));
-			}*/
-		} else {
-			// GL_ARB_texture_compression not available at runtime or not selected, fallback.
-			gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, texturesize, texturesize, GL_RGBA, GL_BYTE, trackImage);
-		}
-
-		// Free the memory of the initial texture.
-		free(trackImage);
-
-		// Init the position and size of the map in the window.
-		map_x = -10;
-		map_y = -40;
-		map_size = 170;
-
-		// Restore some state.
-		glPopMatrix();
-
-		// Compile the car "dot" display list.
-		cardot = glGenLists(1);
-		if (cardot != 0) {
-			glNewList(cardot, GL_COMPILE);
-			glBegin(GL_TRIANGLE_FAN);
-			// The center.
-			glVertex2f(0.0, 0.0);
-			// The border.
-			int i;
-			const int borderpoints = 8;
-			halflinewidth = halflinewidth*float(map_size)/float(texturesize);
-			for (i = 0; i < borderpoints + 1; i++) {
-				float phi = 2.0*PI*float(i)/float(borderpoints);
-				glVertex2f(halflinewidth*cos(phi), halflinewidth*sin(phi));
-			}
-			glEnd();
-			glEndList();
-		}
-
-		// Clear the screen, that in case of a delay the track is not visible.
-		glClear(GL_COLOR_BUFFER_BIT);
+		glEndList();
 	}
+
+	// Clear the screen, that in case of a delay the track is not visible.
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 
@@ -431,16 +444,17 @@ cGrTrackMap::~cGrTrackMap()
 {
 	// We have just one track texture object, so delete it just once.
 	if (isinitalized) {
+		//GfLogDebug("cGrTrackMap::~cGrTrackMap() : deleting track map texture\n");
 		glDeleteTextures(1, &mapTexture);
 		isinitalized = false;
-		if (cardot != 0) {
+		if (cardot) {
 			glDeleteLists(cardot, 1);
 		}
 	}
 }
 
 
-// Walk trough the different available display modes
+// Walk through the different available display modes
 void cGrTrackMap::selectTrackMap()
 {
 	viewmode <<= 1;
@@ -491,7 +505,6 @@ void cGrTrackMap::display(
 	if (viewmode & (TRACK_MAP_NORMAL | TRACK_MAP_NORMAL_WITH_OPPONENTS)) {
 		drawCar(currentCar, currentCarColor, x, y);
 	}
-
 }
 
 

@@ -41,7 +41,7 @@ static void	*rmScrHandle = NULL;
 static void
 rmStateManage(void * /* dummy */)
 {
-	LegacyMenu::self().raceEngine().updateState();
+	LmRaceEngine().updateState();
 }
 
 int
@@ -49,7 +49,7 @@ RmNextEventMenu(void)
 {
 	char buf[128];
 
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 	void	*params = reInfo->params;
 	void	*results = reInfo->results;
 	int		raceNumber;
@@ -59,6 +59,8 @@ RmNextEventMenu(void)
 		GfuiScreenRelease(rmScrHandle);
 	}
 
+	GfLogTrace("Entering Next Event menu\n");
+	
 	// Create screen, load menu XML descriptor and create static controls.
 	rmScrHandle = GfuiScreenCreateEx(NULL, 
 								  NULL, (tfuiCallback)NULL, 

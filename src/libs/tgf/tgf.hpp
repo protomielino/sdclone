@@ -113,19 +113,19 @@ class TGF_API GfEventLoop
 	//! Destructor
 	virtual ~GfEventLoop();
 
-	//! The real event loop function.
+	//! The real event loop function : 1) process keyboard events, 2) do the 'computing' job.
 	virtual void operator()(void);
 
 	//! Set the "key pressed" callback function.
 	void setKeyboardDownCB(void (*func)(int key, int modifiers, int x, int y));
 
-	//! Set the "key realeased" callback function.
+	//! Set the "key released" callback function.
 	void setKeyboardUpCB(void (*func)(int key, int modifiers, int x, int y));
 
-	//! Set the "idle" callback function (run at the end of _every_ event loop).
-	void setIdleCB(void (*func)(void));
+	//! Set the "recompute" callback function (run at the end of _every_ event loop).
+	void setRecomputeCB(void (*func)(void));
 
-	//! Set a timer callback function with given delay.
+	//! Set a one-shot timer callback function with given delay.
 	void setTimerCB(unsigned int millis, void (*func)(int value));
 
 	//! Request the event loop to terminate on next loop. 
@@ -140,8 +140,8 @@ class TGF_API GfEventLoop
 	//! Is a quit request pending ?
 	bool quitRequested() const;
 
-	//! Spend the idle time (idle CB or sleep).
-	void spendIdleTime();
+	//! Do the 'computing' job of the loop (call the recompute CB or sleep).
+	void recompute();
 	
   private: // Member data.
 

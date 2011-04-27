@@ -22,8 +22,10 @@
     @author	<a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version	$Id$
 */
+
 #include <cstdlib>
 #include <cstdio>
+#include <sstream>
 
 #include <portability.h>
 #include <tgf.hpp>
@@ -43,62 +45,271 @@ static int	rmBigMsgId;
 
 static float black[4] = {0.0, 0.0, 0.0, 0.0};
 
+
+// Uncomment to activate FPS limiter at compile-time.
+//#define UseFPSLimiter true
+
+#ifdef UseFPSLimiter
+
+// Forced max. graphics update rate (Hz) (0 means no maximum).
+static double FPSLimMaxRate = 0;
+
+// Last time a real graphics update was done (only used if FPSLimMaxRate).
+static double FPSLimLastTime = 0;
+
+#endif
+
+static void
+rmUpdateRaceEngine()
+{
+    LmRaceEngine().updateState();
+}
+
 /**************************************************************************
  * Normal race screen (3D animated scene mode = non "blind" mode)
  */
-static void
-rmIdle()
+
+// Current values for the menu messages.
+static std::string rmStrCurMsg;
+static std::string rmStrCurBigMsg;
+
+// Flag to know if the menu state has been changed (and thus needs a redraw+redisplay).
+static bool rmbMenuChanged = false;
+
+struct RmMovieCapture
 {
-    // Do nothing.
+    int		enabled;
+    int		active;
+    double	simuRate; // Hz
+    double	frameRate; // Hz
+    char*	outputBase;
+    int		currentCapture;
+    int		currentFrame;
+};
+
+
+static RmMovieCapture rmMovieCapture =
+{
+	false, // enabled
+	false, // active
+	0.0,   // simuRate
+	0.0,   // frameRate
+	0,     // outputBase
+	0,     // currentCapture
+	0      // currentFrame
+};
+				  
+static void
+rmInitMovieCapture()
+{
+	// Don't do it twice.
+	if (rmMovieCapture.outputBase)
+		return;
+
+	// But do it the first time.
+	char buf[256];
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
+
+	void* hparmRaceEng = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
+
+	rmMovieCapture.enabled =
+		strcmp(GfParmGetStr(hparmRaceEng, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE,
+							RM_VAL_NO),
+			   RM_VAL_NO) ? true : false;
+	if (!rmMovieCapture.enabled)
+	{
+		rmMovieCapture.outputBase = 0;
+		GfLogInfo("Movie capture disabled (see raceengine.xml)\n");
+	}
+	else
+	{
+		rmMovieCapture.active = false;
+		rmMovieCapture.frameRate =
+			GfParmGetNum(hparmRaceEng, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 25.0);
+		rmMovieCapture.simuRate = 1.0 / RCM_MAX_DT_SIMU;
+		char pszDefOutputBase[256];
+		snprintf(pszDefOutputBase, sizeof(pszDefOutputBase), "%s%s",
+				 GfLocalDir(), GfParmGetStr(hparmRaceEng, RM_SECT_MOVIE_CAPTURE,
+											RM_ATT_CAPTURE_OUT_DIR, "captures"));
+		rmMovieCapture.outputBase = strdup(pszDefOutputBase);
+		GfDirCreate(pszDefOutputBase); // In case not already done.
+		GfLogInfo("Movie capture enabled (%.0f FPS, PNG frames in %s)\n", 
+				  rmMovieCapture.frameRate, rmMovieCapture.outputBase);
+	}
 }
 
-// TODO: Is this really a _display_ call-back =:-?
 static void
-rmDisplay()
+rmCaptureScreen()
 {
-    LegacyMenu::self().raceEngine().updateState();
+	char filename[256];
+    
+    snprintf(filename, sizeof(filename), "%s/sd-%4.4d-%8.8d.png", rmMovieCapture.outputBase,
+			 rmMovieCapture.currentCapture, rmMovieCapture.currentFrame++);
+	
+    GfScrCaptureAsPNG(filename);
+}
+
+static void
+rmUpdateRaceMessages()
+{
+	if (!rmScreenHandle)
+		return;
+
+	// Set the new text for the "message" label if it changed.
+	const char *pszMsg = LmRaceEngine().outData()->_reMessage;
+	if ((pszMsg && rmStrCurMsg != pszMsg) || (!pszMsg && !rmStrCurMsg.empty()))
+	{
+		rmStrCurMsg = pszMsg ? pszMsg : "";
+		GfuiLabelSetText(rmScreenHandle, rmMsgId, rmStrCurMsg.c_str());
+		
+		// The menu changed.
+		rmbMenuChanged = true;
+	}
+	
+	// Set the new text for the "big message" label if it changed.
+	const char *pszBigMsg = LmRaceEngine().outData()->_reBigMessage;
+	if ((pszBigMsg && rmStrCurBigMsg != pszBigMsg) || (!pszBigMsg && !rmStrCurBigMsg.empty()))
+	{
+		rmStrCurBigMsg = pszBigMsg ? pszBigMsg : "";
+		GfuiLabelSetText(rmScreenHandle, rmBigMsgId, rmStrCurBigMsg.c_str());
+		
+		// The menu changed.
+		rmbMenuChanged = true;
+	}
+}
+
+static void
+rmRedisplay()
+{
+	// Process any pending (human) pit request.
+	const bool bPitRequested = RmCheckPitRequest();
+	
+#ifdef UseFPSLimiter
+	// Auto FPS limitation if specified and if not capturing frames.
+	if (FPSLimMaxRate > 0 && !rmMovieCapture.active)
+	{
+		// If too early to refresh graphics, do nothing more than wait a little.
+		const double dCurrentTime = GfTimeClock();
+		if (dCurrentTime < FPSLimLastTime + 1.0 / FPSLimMaxRate)
+		{
+			// Wait a little, to let the CPU take breath.
+			// Note : Theorical resolution is 1ms, but actual one is from far more
+			//        (10-15ms under Windows, even worse under Linux ?)
+			//        which explains a lower than expected actual FPS mean.
+			GfSleep(0.001);
+
+			// Only giving back control to the scheduler gives good results
+			// as for the actual mean FPS, but keeps the CPU 100 % (not very cool).
+			//GfSleep(0.0);
+			
+			// Request an update in the next event loop though.
+			GfuiApp().eventLoop().postRedisplay();
+			
+			return;
+		}
+
+		// Otherwise, last update time is now : go on with graphics update.
+		FPSLimLastTime = dCurrentTime;
+	}
+#endif
+
+	// Redraw the graphics part of the GUI if requested.
+	const bool bUpdateGraphics =
+		LmRaceEngine().outData()->_displayMode == RM_DISP_MODE_NORMAL
+		&& !bPitRequested && LmGraphicsEngine();
+	
+	if (bUpdateGraphics)
+	{
+		//GfSchedBeginEvent("raceupdate", "graphics");
+		LmGraphicsEngine()->redrawView(LmRaceEngine().outData()->s);
+		//GfSchedEndEvent("raceupdate", "graphics");
+	}
+
+	// Synchronize the menu with the race messages if any changed.
+	rmUpdateRaceMessages();
+
+	// Redraw the menu part of the GUI
+	// (always necessary if the graphics were redrawn first).
+	if (bUpdateGraphics || rmbMenuChanged)
+		GfuiRedraw();
+
+	// Really do the display work.
+	if (bUpdateGraphics || rmbMenuChanged)
+		GfuiSwapBuffers();
+
+	// The menu changes has now been taken into account.
+	rmbMenuChanged = false;
+
+	// Capture the newly displayed frame if movie capture mode.
+	if (rmMovieCapture.active)
+		rmCaptureScreen();
+
+	// Request an redisplay in the next event loop.
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 static void
 rmScreenActivate(void * /* dummy */)
 {
-    // Set a real idle function (other than 0) doing nothing, 
-    // otherwise the event loop will replace it by 1ms idle wait
-    GfuiApp().eventLoop().setIdleCB(rmIdle);
+	// Configure the FPS limiter if active.
+#ifdef UseFPSLimiter
+	
+	// Get the max. refresh rate from the screen config params file.
+	std::ostringstream ossConfFile;
+	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
+	void* hparmScrConf = GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD);
+	FPSLimLastTime = 0.0;
+	FPSLimMaxRate =
+		GfParmGetNum(hparmScrConf, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, 0.0);
+	if (FPSLimMaxRate)
+		GfLogInfo("FPS limiter is on (%.1f Hz).\n", FPSLimMaxRate);
+	else
+		GfLogInfo("FPS limiter is off.\n");
+	
+	GfParmReleaseHandle(hparmScrConf);
+	
+#endif
 
-    GfuiApp().eventLoop().setDisplayCB(rmDisplay);
+	// Deactivate the movie capture mode in any case.
+	rmMovieCapture.active = false;
+	
+	// Configure the event loop.
+	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
+    GfuiApp().eventLoop().setRedisplayCB(rmRedisplay);
 
-	// Resync race engine if it is not paused or stopped
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
-    if (!(reInfo->s->_raceState & RM_RACE_PAUSED)) {
-		LegacyMenu::self().raceEngine().start(); 			/* resynchro */
-    }
+	// Resynchronize the race engine.
+	LmRaceEngine().start();
 
+	// Request a redisplay for the next event loop.
     GfuiApp().eventLoop().postRedisplay();
+	
+	// The menu changed.
+	rmbMenuChanged = true;
 }
 
 static void
-RmBoardInfo(void * /* vboard */)
+rmRacePause(void * /* vboard */)
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
-    if (reInfo->s->_raceState & RM_RACE_PAUSED) {
-	reInfo->s->_raceState &= ~RM_RACE_PAUSED;
-	LegacyMenu::self().raceEngine().start();
-	GfuiVisibilitySet(rmScreenHandle, rmPauseId, 0);
+    if (LmRaceEngine().outData()->s->_raceState & RM_RACE_PAUSED) {
+		LmRaceEngine().start();
+		GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
     } else {
-	reInfo->s->_raceState |= RM_RACE_PAUSED;
-	LegacyMenu::self().raceEngine().stop();
-	GfuiVisibilitySet(rmScreenHandle, rmPauseId, 1);
+		LmRaceEngine().stop();
+		GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_VISIBLE);
     }
+	
+	// The menu changed.
+	rmbMenuChanged = true;
 }
 
 static void
 rmSkipPreStart(void * /* dummy */)
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	// TODO: move this to a new LmRaceEngine().skipRacePreStart() ...
+	tRmInfo* reInfo = LmRaceEngine().inData();
     if (reInfo->s->currentTime < -1.0) {
-	reInfo->s->currentTime = -1.0;
-	reInfo->_reLastTime = -1.0;
+		reInfo->s->currentTime = -1.0;
+		reInfo->_reLastRobTime = -1.0;
     }
 }
 
@@ -110,34 +321,47 @@ rmTimeMod (void *pvCmd)
 		fMultFactor = 0.5; // Accelerate time means reduce the simulation time step.
 	else if ((long)pvCmd < 0)
 		fMultFactor = 2.0; // Slow-down time means increase the simulation time step.
-	LegacyMenu::self().raceEngine().accelerateTime(fMultFactor);
+	LmRaceEngine().accelerateTime(fMultFactor);
 }
 
 static void
-rmMovieCapture(void * /* dummy */)
+rmToggleMovieCapture(void * /* dummy */)
 {
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
-	tRmMovieCapture	*capture = &(reInfo->movieCapture);
-
-    if (!capture->enabled || reInfo->_displayMode == RM_DISP_MODE_NONE || reInfo->_displayMode == RM_DISP_MODE_SIMU_SIMU) 
+    if (!rmMovieCapture.enabled) 
     {
-	GfLogWarning("Movie capture is not enabled : command ignored\n");
-	return;
+		GfLogWarning("Movie capture is not enabled : command ignored\n");
+		return;
     }
     
-    capture->state = 1 - capture->state;
-    if (capture->state) {
-	GfLogInfo("Starting movie capture\n");
-	capture->currentFrame = 0;
-	capture->currentCapture++;
-	capture->lastFrame = GfTimeClock() - capture->deltaFrame;
-	reInfo->_displayMode = RM_DISP_MODE_CAPTURE;
-    } else {
-	GfLogInfo("Stopping movie capture\n");
-	reInfo->_displayMode = RM_DISP_MODE_NORMAL;
-	LegacyMenu::self().raceEngine().start();
+    if (LmRaceEngine().outData()->_displayMode != RM_DISP_MODE_NORMAL)
+    {
+		GfLogWarning("Movie capture is available only in normal display mode : command ignored\n");
+		return;
     }
-
+    
+    rmMovieCapture.active = !rmMovieCapture.active;
+    if (rmMovieCapture.active)
+	{
+		// Try and change the race engine scheduling scheme for movie capture.
+		if (LmRaceEngine().setSchedulingSpecs(rmMovieCapture.simuRate, rmMovieCapture.frameRate))
+		{
+			rmMovieCapture.currentFrame = 0;
+			rmMovieCapture.currentCapture++;
+			GfLogInfo("Starting movie capture\n");
+		}
+		else
+		{
+			// Not supported (multi-threaded mode).
+			rmMovieCapture.active = false;
+			GfLogWarning("Movie capture not supported in multi-threaded mode : command ignored\n");
+		}
+    }
+	else
+	{
+		GfLogInfo("Stopping movie capture\n");
+		LmRaceEngine().setSchedulingSpecs(1.0 / RCM_MAX_DT_SIMU);
+		LmRaceEngine().start(); // Resynchronize the race engine.
+    }
 }
 
 static void
@@ -149,14 +373,14 @@ rmHideShowMouseCursor(void * /* dummy */)
 static void
 rmApplyState(void *pvState)
 {
-    LegacyMenu::self().raceEngine().applyState((int)(long)pvState);
+    LmRaceEngine().applyState((int)(long)pvState);
 }
 
 // Not used : see below the commented-out call.
 // static void
 // rmOneStep(void *pvState)
 // {
-//     LegacyMenu::self().raceEngine().step((int)(long)pvState);
+//     LmRaceEngine().step((int)(long)pvState);
 // }
 
 static void
@@ -169,7 +393,7 @@ rmAddKeys()
     GfuiAddKey(rmScreenHandle, '+', "Accelerate Time",   (void*)+1, rmTimeMod, NULL);
     GfuiAddKey(rmScreenHandle, '.', "Restore Real Time", (void*)0, rmTimeMod, NULL);
 	
-    GfuiAddKey(rmScreenHandle, 'p', "Pause Race",        (void*)0, RmBoardInfo, NULL);
+    GfuiAddKey(rmScreenHandle, 'p', "Pause Race",        (void*)0, rmRacePause, NULL);
     GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
     GfuiAddKey(rmScreenHandle, 'q', "Quit Game, Save Nothing",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
     GfuiAddKey(rmScreenHandle, ' ', "Skip Pre-start",    (void*)0, rmSkipPreStart, NULL);
@@ -177,55 +401,16 @@ rmAddKeys()
 	// WARNING: Sure this won't work with multi-threading On/Auto ...
     //GfuiAddKey(rmScreenHandle, '0', "One step simulation",    (void*)1, rmOneStep, NULL);
 	
-    GfuiAddKey(rmScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, rmMovieCapture, NULL);
+    GfuiAddKey(rmScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, rmToggleMovieCapture, NULL);
     GfuiAddKey(rmScreenHandle, 'o', "Hide / Show mouse cursor",   (void*)0, rmHideShowMouseCursor, NULL);
-}
-
-
-void
-RmSetRaceMsg(const char *msg)
-{
-    static char *curMsg = 0;
-
-	// If nothing to change, don't change anything.
-	if ((!curMsg && !msg) || (curMsg && msg && !strcmp(curMsg, msg)))
-		return;
-
-	// Otherwise, set the new text for the label.
-    if (curMsg)
-		free(curMsg);
-    if (msg) {
-		curMsg = strdup(msg);
-		GfuiLabelSetText(rmScreenHandle, rmMsgId, curMsg);
-    } else {
-		curMsg = 0;
-		GfuiLabelSetText(rmScreenHandle, rmMsgId, "");
-    }
-}
-
-void
-RmSetRaceBigMsg(const char *msg)
-{
-    static char *curMsg = 0;
-    
-	// If nothing to change, don't change anything.
-	if ((!curMsg && !msg) || (curMsg && msg && !strcmp(curMsg, msg)))
-		return;
-	
-    if (curMsg)
-		free(curMsg);
-    if (msg) {
-		curMsg = strdup(msg);
-		GfuiLabelSetText(rmScreenHandle, rmBigMsgId, curMsg);
-    } else {
-		curMsg = 0;
-		GfuiLabelSetText(rmScreenHandle, rmBigMsgId, "");
-    }
 }
 
 void *
 RmScreenInit()
 {
+	// Initialize the movie capture system.
+	rmInitMovieCapture();
+	
     // Release screen if was initialized.
     RmScreenShutdown();
 
@@ -236,8 +421,8 @@ RmScreenInit()
 
     // Create Message, BigMessage and Pause labels.
     rmMsgId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "message");
-    rmPauseId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "pause");
     rmBigMsgId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "bigmessage");
+    rmPauseId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "pause");
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
@@ -249,12 +434,6 @@ RmScreenInit()
     GfuiVisibilitySet(rmScreenHandle, rmPauseId, 0);
 
     return rmScreenHandle;
-}
-
-void
-RmScreenCapture(const char* pszTargetFilename)
-{
-    GfScrCaptureAsPNG(pszTargetFilename);
 }
 
 void
@@ -270,7 +449,7 @@ RmScreenShutdown()
 static void
 rmHookActivate(void * /* dummy */)
 {
-    LegacyMenu::self().raceEngine().updateState();
+    rmUpdateRaceEngine();
 }
 
 void *
@@ -293,7 +472,7 @@ static float	white[4]   = {1.0, 1.0, 1.0, 1.0};
 static float	red[4]     = {1.0, 0.0, 0.0, 1.0};
 static float	*rmColor[] = {white, red};
 
-static const char *aRaceTypeNames[3] = {"Practice", "Qualifications", "Race"};
+static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
 
 static void	*rmResScreenHdle = 0;
 
@@ -306,41 +485,53 @@ static char	*rmResMsg[NMaxResultLines];
 
 static int	rmCurLine;
 
-static void
-rmAddResKeys()
-{
-    GfuiAddKey(rmResScreenHdle, GFUIK_F1,  "Help", rmScreenHandle, GfuiHelpScreen, NULL);
-    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+// Flag to know if the menu state has been changed (and thus needs a redraw+redisplay).
+static bool rmbResMenuChanged = false;
 
-    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
-    GfuiAddKey(rmResScreenHdle, 'q', "Quit Game, Save Nothing", (void*)RE_STATE_EXIT, rmApplyState, NULL);
+static void
+rmResRedisplay()
+{
+	// Redraw the menu part of the GUI if necessary.
+	if (rmbResMenuChanged)
+		GfuiRedraw();
+
+	// Really do the display work.
+	if (rmbResMenuChanged)
+		GfuiSwapBuffers();
+
+	// The menu changes has now been taken into account.
+	rmbResMenuChanged = false;
+	
+	// Request an redisplay in the next event loop.
+	GfuiApp().eventLoop().postRedisplay();
 }
 
 static void
 rmResScreenActivate(void * /* dummy */)
 {
-    // Set a real idle function (other than 0) doing nothing, 
-    // otherwise the event loop will replace it by a 1ms idle wait
-    GfuiApp().eventLoop().setIdleCB(rmIdle);
+	// Configure the event loop.
+    GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
+    GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
 
-    GfuiApp().eventLoop().setDisplayCB(rmDisplay);
-    GfuiDisplay();
-    GfuiApp().eventLoop().postRedisplay();
+	// Request a redisplay for the next event loop.
+	GfuiApp().eventLoop().postRedisplay();
+	
+	// The menu changed.
+	rmbResMenuChanged = true;
 }
-
 
 static void
 rmContDisplay()
 {
     GfuiDisplay();
+	
     GfuiApp().eventLoop().postRedisplay();
 }
-
 
 static void
 rmResCont(void * /* dummy */)
 {
-    LegacyMenu::self().raceEngine().updateState();
+    rmUpdateRaceEngine();
 }
 
 static void
@@ -350,18 +541,23 @@ rmResScreenShutdown(void * /* dummy */)
 		FREEZ(rmResMsg[i]);
 }
 
-void *
+static void
+rmAddResKeys()
+{
+    GfuiAddKey(rmResScreenHdle, GFUIK_F1,  "Help", rmResScreenHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+
+    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+    GfuiAddKey(rmResScreenHdle, 'q', "Quit Game, Save Nothing", (void*)RE_STATE_EXIT, rmApplyState, NULL);
+}
+
+void*
 RmResScreenInit()
 {
-    int		i;
-    int		y, dy;
-    const char	*img;
+	if (rmResScreenHdle)
+		GfuiScreenRelease(rmResScreenHdle);
 
-    if (rmResScreenHdle) {
-	GfuiScreenRelease(rmResScreenHdle);
-    }
-
-	tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
+	tRmInfo* reInfo = LmRaceEngine().inData();
 
     // Create screen, load menu XML descriptor and create static controls.
     rmResScreenHdle = GfuiScreenCreateEx(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
@@ -370,27 +566,27 @@ RmResScreenInit()
 
     // Create variable main title (race type/stage) label.
     rmResMainTitleId = CreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "title");
-    GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, aRaceTypeNames[reInfo->s->_raceType]);
+    GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, aSessionTypeNames[reInfo->s->_raceType]);
 
     // Create background image if any specified.
-    img = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
-    if (img) {
-	GfuiScreenAddBgImg(rmResScreenHdle, img);
-    }
+    const char* img = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
+    if (img)
+		GfuiScreenAddBgImg(rmResScreenHdle, img);
     
     // Create variable subtitle (driver and race name, lap number) label.
     rmResTitleId = CreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "subtitle");
 
     // Create result lines (1 label for each).
     // TODO: Get layout, color, ... info from menuXMLDescHdle when available.
-    y = 400;
-    dy = 378 / NMaxResultLines;
-    for (i = 0; i < NMaxResultLines; i++) {
-	FREEZ(rmResMsg[i]);
-	rmResMsgClr[i] = 0;
-	rmResMsgId[i] = GfuiLabelCreate(rmResScreenHdle, "", GFUI_FONT_MEDIUM_C, 20, y, 
-									GFUI_ALIGN_HL_VB, 120, white);
-	y -= dy;
+    int	y = 400;
+    int	dy = 378 / NMaxResultLines;
+    for (int i = 0; i < NMaxResultLines; i++)
+	{
+		FREEZ(rmResMsg[i]);
+		rmResMsgClr[i] = 0;
+		rmResMsgId[i] = GfuiLabelCreate(rmResScreenHdle, "", GFUI_FONT_MEDIUM_C, 20, y, 
+										GFUI_ALIGN_HL_VB, 120, white);
+		y -= dy;
     }
 
     // Close menu XML descriptor.
@@ -406,56 +602,72 @@ RmResScreenInit()
 }
 
 void
-RmResScreenSetTrackName(const char *pszTrackName)
+RmResScreenSetTrackName(int nSessionType, const char *pszTrackName)
 {
-    if (rmResScreenHdle) {
-		char pszTitle[128];
-		tRmInfo* reInfo = LegacyMenu::self().raceEngine().data();
-		snprintf(pszTitle, sizeof(pszTitle), "%s on %s",
-				 aRaceTypeNames[reInfo->s->_raceType], pszTrackName);
-		GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, pszTitle);
-    }
+    if (!rmResScreenHdle)
+		return;
+	
+	char pszTitle[128];
+	snprintf(pszTitle, sizeof(pszTitle), "%s at %s",
+			 aSessionTypeNames[nSessionType], pszTrackName);
+	GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, pszTitle);
+	
+	// The menu changed.
+	rmbResMenuChanged = true;
 }
 
 void
 RmResScreenSetTitle(const char *pszTitle)
 {
-    if (rmResScreenHdle) {
-		GfuiLabelSetText(rmResScreenHdle, rmResTitleId, pszTitle);
-    }
+    if (!rmResScreenHdle)
+		return;
+	
+	GfuiLabelSetText(rmResScreenHdle, rmResTitleId, pszTitle);
+	
+	// The menu changed.
+	rmbResMenuChanged = true;
 }
 
 void
 RmResScreenAddText(const char *text)
 {
-    int		i;
-
-    if (rmCurLine == NMaxResultLines) {
-	free(rmResMsg[0]);
-	for (i = 1; i < NMaxResultLines; i++) {
-	    rmResMsg[i - 1] = rmResMsg[i];
-	    GfuiLabelSetText(rmResScreenHdle, rmResMsgId[i - 1], rmResMsg[i]);
-	}
-	rmCurLine--;
+    if (!rmResScreenHdle)
+		return;
+	
+    if (rmCurLine == NMaxResultLines)
+	{
+		free(rmResMsg[0]);
+		for (int i = 1; i < NMaxResultLines; i++)
+		{
+			rmResMsg[i - 1] = rmResMsg[i];
+			GfuiLabelSetText(rmResScreenHdle, rmResMsgId[i - 1], rmResMsg[i]);
+		}
+		rmCurLine--;
     }
     rmResMsg[rmCurLine] = strdup(text);
     GfuiLabelSetText(rmResScreenHdle, rmResMsgId[rmCurLine], rmResMsg[rmCurLine]);
     rmCurLine++;
+	
+	// The menu changed.
+	rmbResMenuChanged = true;
 }
 
 void
 RmResScreenSetText(const char *text, int line, int clr)
 {
-    if (line < NMaxResultLines) {
-	FREEZ(rmResMsg[line]);
-	rmResMsg[line] = strdup(text);
-	if ((clr >= 0) && (clr < 2)) {
-	    rmResMsgClr[line] = clr;
-	} else {
-	    rmResMsgClr[line] = 0;
-	}
-	GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], rmResMsg[line]);
-	GfuiLabelSetColor(rmResScreenHdle, rmResMsgId[line], rmColor[rmResMsgClr[line]]);
+    if (!rmResScreenHdle)
+		return;
+	
+    if (line < NMaxResultLines)
+	{
+		FREEZ(rmResMsg[line]);
+		rmResMsg[line] = strdup(text);
+		rmResMsgClr[line] = (clr >= 0 && clr < 2) ? clr : 0;
+		GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], rmResMsg[line]);
+		GfuiLabelSetColor(rmResScreenHdle, rmResMsgId[line], rmColor[rmResMsgClr[line]]);
+
+		// The menu changed.
+		rmbResMenuChanged = true;
     }
 }
 
@@ -468,39 +680,44 @@ RmResGetLines()
 void
 RmResEraseScreen()
 {
-    int i;
-
-    for (i = 0; i < NMaxResultLines; i++) {
-	RmResScreenSetText("", i, 0);
-    }
+    if (!rmResScreenHdle)
+		return;
+	
+    for (int i = 0; i < NMaxResultLines; i++)
+		RmResScreenSetText("", i, 0);
+	
+	// The menu changed.
+	rmbResMenuChanged = true;
 }
 
 
 void
 RmResScreenRemoveText(int line)
 {
-    if (line < NMaxResultLines) {
-	FREEZ(rmResMsg[line]);
-	GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], "");
+    if (!rmResScreenHdle)
+		return;
+	
+    if (line < NMaxResultLines)
+	{
+		FREEZ(rmResMsg[line]);
+		GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], "");
+		
+		// The menu changed.
+		rmbResMenuChanged = true;
     }
 }
 
 void
 RmResShowCont()
 {
-
-    GfuiButtonCreate(rmResScreenHdle,
-		     "Continue",
-		     GFUI_FONT_LARGE_C,
-		     320, 15, GFUI_BTNSZ,
-		     GFUI_ALIGN_HC_VB,
-		     0, 0, rmResCont,
-		     NULL, (tfuiCallback)NULL,
-		     (tfuiCallback)NULL);
+    GfuiButtonCreate(rmResScreenHdle, "Continue", GFUI_FONT_LARGE_C,
+					 320, 15, GFUI_BTNSZ, GFUI_ALIGN_HC_VB, 0, 0, rmResCont,
+					 NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
     GfuiAddKey(rmResScreenHdle, GFUIK_RETURN,  "Continue", 0, rmResCont, NULL);
     GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, rmResCont, NULL);
 
-    GfuiApp().eventLoop().setDisplayCB(rmContDisplay);
+    GfuiApp().eventLoop().setRedisplayCB(rmContDisplay);
+	
     GfuiApp().eventLoop().postRedisplay();
 }
 
@@ -508,5 +725,5 @@ RmResShowCont()
 void
 RmGameScreen()
 {
-	GfuiScreenActivate(LegacyMenu::self().raceEngine().data()->_reGameScreen);
+	GfuiScreenActivate(LmRaceEngine().inData()->_reGameScreen);
 }

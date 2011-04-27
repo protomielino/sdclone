@@ -55,12 +55,13 @@ extern void *grTrackHandle;
 extern ssgContext grContext;
 extern int grNbCars;
 
-extern int  initView(int x, int y, int width, int height, int flag, void *screen);
+extern int  initTrack(tTrack *track);
 extern int  initCars(tSituation *s);
+extern int  initView(int x, int y, int width, int height, int flag, void *screen);
 extern int  refresh(tSituation *s);
 extern void shutdownCars(void);
-extern int  initTrack(tTrack *track);
 extern void shutdownTrack(void);
+extern void shutdownView(void);
 //extern void bendCar (int index, sgVec3 poc, sgVec3 force, int cnt);
 
 extern int grMaxTextureUnits;

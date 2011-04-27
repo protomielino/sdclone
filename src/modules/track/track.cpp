@@ -24,6 +24,7 @@
 #include <cmath>
 
 #include <raceman.h>
+#include <portability.h>
 
 #include "trackinc.h"
 

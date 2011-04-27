@@ -25,6 +25,7 @@
 #define _LEGACYMENU_H_
 
 #include <iuserinterface.h>
+#include <igraphicsengine.h>
 
 #include <tgf.hpp>
 
@@ -58,17 +59,11 @@ public:
 	
 	virtual void shutdown();
 
-	virtual void update();
+	virtual void* createRaceScreen();
+	virtual void* createRaceEventLoopHook();
 
-	virtual void *createRaceScreen();
-	virtual void captureRaceScreen(const char* pszTargetFilename);
-	virtual void *createRaceEventLoopHook();
-
-	virtual void setRaceMessage(const char *msg);
-	virtual void setRaceBigMessage(const char *msg);
-
-	virtual void activateLoadingScreen(const char *title, const char *bgimg);
-	virtual void addLoadingMessage(const char *text);
+	virtual void activateLoadingScreen(const char* title, const char* bgimg);
+	virtual void addLoadingMessage(const char* text);
 	virtual void shutdownLoadingScreen();
 
 	virtual void activateGameScreen();
@@ -79,44 +74,51 @@ public:
 	virtual void activateStartRaceMenu();
 	virtual void activateStopRaceMenu();
 
-	virtual void activatePitMenu(struct CarElt *car, void (*callback)(void*));
-
-	virtual void *createResultsMenu();
-	virtual void activateResultsMenu(void *prevHdle, struct RmInfo *reInfo);
-	virtual void setResultsMenuTrackName(const char *trackName);
-	virtual void setResultsMenuTitle(const char *title);
-	virtual void addResultsMenuLine(const char *text);
-	virtual void setResultsMenuLine(const char *text, int line, int clr);
+	virtual void* createResultsMenu();
+	virtual void activateResultsMenu(void* prevHdle, struct RmInfo* reInfo);
+	virtual void setResultsMenuTrackName(int nSessionType, const char* trackName);
+	virtual void setResultsMenuTitle(const char* title);
+	virtual void addResultsMenuLine(const char* text);
+	virtual void setResultsMenuLine(const char* text, int line, int clr);
 	virtual void removeResultsMenuLine(int line);
 	virtual void showResultsMenuContinueButton();
 	virtual int  getResultsMenuLineCount();
 	virtual void eraseResultsMenu();
 
-	virtual void activateStandingsMenu(void *prevHdle, struct RmInfo *info, int start = 0);
+	virtual void activateStandingsMenu(void* prevHdle, struct RmInfo* info, int start = 0);
 
 	// Graphics engine control.
 	virtual bool initializeGraphics();
 	virtual bool loadTrackGraphics(struct Track* pTrack);
-	virtual bool loadCarsGraphics(struct Situation *pSituation);
+	virtual bool loadCarsGraphics(struct Situation* pSituation);
 	virtual bool setupGraphicsView();
-	virtual void updateGraphicsView(struct Situation *pSituation);
+	virtual void shutdownGraphicsView();
 	virtual void unloadCarsGraphics();
 	virtual void unloadTrackGraphics();
 	virtual void shutdownGraphics();
+	
+	// Setter for the race engine.
 	virtual void setRaceEngine(IRaceEngine& raceEngine);
 
 	// Accessor to the singleton.
 	static LegacyMenu& self();
 
-	// Accessor to the race engine.
+	//! Accessor to the race engine.
 	IRaceEngine& raceEngine();
+
+	//! Accessor to the race engine.
+	IGraphicsEngine* graphicsEngine();
 
 protected:
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	LegacyMenu(const std::string& strShLibName, void* hShLibHandle);
 	
-protected:
+	// Make the C interface functions nearly member functions.
+	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
+	friend int closeGfModule();
+
+ protected:
 
 	// The singleton.
 	static LegacyMenu* _pSelf;
@@ -126,10 +128,18 @@ protected:
 
 	// The graphics engine.
 	IGraphicsEngine* _piGraphicsEngine;
-
-	// Make the C interface functions nearly member functions.
-	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
-	friend int closeGfModule();
 };
 
+//! Shortcut to the race engine.
+inline extern IRaceEngine& LmRaceEngine()
+{
+	return LegacyMenu::self().raceEngine();
+}
+				  
+//! Shortcut to the graphics engine.
+inline extern IGraphicsEngine* LmGraphicsEngine()
+{
+	return LegacyMenu::self().graphicsEngine();
+}
+				  
 #endif /* _LEGACYMENU_H_ */ 

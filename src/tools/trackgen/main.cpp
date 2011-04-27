@@ -48,7 +48,7 @@
 
 #include <config.h>
 #include <tgf.hpp>
-//#include <tgfclient.h>
+#include <portability.h>
 #include <itrackloader.h>
 
 #include "ac3d.h"
