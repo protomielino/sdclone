@@ -1025,8 +1025,24 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				              car->_wheelRadius(FRNT_LFT) / 2.0;
 				break;
 			case eRWD:
-				drivespeed = (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) *
-				              car->_wheelRadius(REAR_LFT) / 2.0;
+                // ADJUSTMENTS TO RWD Asr:-
+                // Originally this purely returned the speed of the wheels, which when the speed of
+                // the car is subtracted below provides the degree of slip, which is then used to
+                // reduce the amount of accelerator.
+                //
+                // The new calculation below reduces the degree to which the difference between wheel
+                // and car speed affects slip, and instead looks at the SlipAccel and SlipSide values,
+                // which are more important as they signify an impending loss of control.  The SlipSide
+                // value is reduced the faster the car's travelling, as usually it matters most in the
+                // low to mid speed ranges.
+
+				drivespeed = (((car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) - 30) *
+				              car->_wheelRadius(REAR_LFT) +
+                              -(car->_wheelSlipAccel(REAR_RGT)) +
+                              -(car->_wheelSlipAccel(REAR_LFT)) +
+                              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(8, 80-fabs(car->_speed_x))/4) +
+                              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(8, 80-fabs(car->_speed_x))/4))
+                             / 2.0;
 				break;
 		}
 
