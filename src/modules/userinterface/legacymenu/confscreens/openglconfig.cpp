@@ -85,14 +85,15 @@ void OpenGLLoadSelectedFeatures()
 {
 	char buf[512];
 
-	// Read OpenGL configuration from graph.xml, and select relevant OpenGL features.
+	// Read OpenGL configuration from graph.xml, and select relevant OpenGL features
+	// (by default, select the max possible values for supported features).
 	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
 	void* paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// 1) Texture compression.
 	const char* pszTexComp =
 		GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION,
-					 GR_ATT_TEXTURECOMPRESSION_DISABLED);
+					 GR_ATT_TEXTURECOMPRESSION_ENABLED);
 	GfglFeatures::self()->select(GfglFeatures::TextureCompression,
 								 strcmp(pszTexComp, GR_ATT_TEXTURECOMPRESSION_ENABLED) ? false : true);
 
@@ -110,7 +111,7 @@ void OpenGLLoadSelectedFeatures()
 	// 3) Multi-texturing.
 	const char* pszMultiTex =
 		GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MULTITEXTURING,
-					 GR_ATT_MULTITEXTURING_DISABLED);
+					 GR_ATT_MULTITEXTURING_ENABLED);
 	GfglFeatures::self()->select(GfglFeatures::MultiTexturing,
 								 strcmp(pszMultiTex, GR_ATT_MULTITEXTURING_ENABLED) ? false : true);
 
