@@ -41,8 +41,6 @@ extern PFNGLACTIVETEXTUREARBPROC   glActiveTextureARB ;
 extern PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB ;
 #endif
 
-extern int grInitMultiTex();
-
 extern int grWinx, grWiny, grWinw, grWinh;
 extern int grVectFlag;
 extern int grVectDispFlag[];

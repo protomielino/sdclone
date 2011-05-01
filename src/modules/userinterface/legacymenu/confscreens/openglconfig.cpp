@@ -18,25 +18,28 @@
  ***************************************************************************/
 
 /** @file
-
+             Open GL options menu
     @version	$Id$
 */
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
+#include <vector>
+#include <sstream>
 
-#include <graphic.h>
 #include <portability.h>
 #include <tgfclient.h>
 #include <glfeatures.h>
 
+#include "legacymenu.h"
 #include "openglconfig.h"
 
 				  
 // Texture compression.
 static const char *ATextureCompTexts[] =
-	{GR_ATT_TEXTURECOMPRESSION_DISABLED, GR_ATT_TEXTURECOMPRESSION_ENABLED};
+	{GfSCR_ATT_TEXTURECOMPRESSION_DISABLED, GfSCR_ATT_TEXTURECOMPRESSION_ENABLED};
 static const int NTextureComps =
 	sizeof(ATextureCompTexts) / sizeof(ATextureCompTexts[0]);
 static int NCurTextureCompIndex = 0;
@@ -50,11 +53,11 @@ static int NMaxTextureSizes = sizeof(AMaxTextureSizeTexts) / sizeof(AMaxTextureS
 static int NCurMaxTextureSizeIndex = 0;
 static int MaxTextureSizeLabelId;
 
-static const int NDefaultTextSize = 64; // In case everything goes wrong.
+static const int NDefaultTextureSize = 64; // In case everything goes wrong.
 
 // Multi-texturing.
 static const char *AMultiTextureTexts[] =
-	{GR_ATT_MULTITEXTURING_DISABLED, GR_ATT_MULTITEXTURING_ENABLED};
+	{GfSCR_ATT_MULTITEXTURING_DISABLED, GfSCR_ATT_MULTITEXTURING_ENABLED};
 static const int NMultiTextures =
 	sizeof(AMultiTextureTexts) / sizeof(AMultiTextureTexts[0]);
 static int NCurMultiTextureIndex = 0;
@@ -63,11 +66,9 @@ static int MultiTextureLabelId;
 static int MultiTextureLeftButtonId;
 static int MultiTextureRightButtonId;
 
-// Multi-sampling.
-static const char *AMultiSampleTexts[] =
-	{GR_ATT_MULTISAMPLING_DISABLED, GR_ATT_MULTISAMPLING_ENABLED};
-static const int NMultiSamples =
-	sizeof(AMultiSampleTexts) / sizeof(AMultiSampleTexts[0]);
+// Multi-sampling (initialized in OpenGLMenuInit).
+static std::vector<std::string> VecMultiSampleTexts;
+static int NMultiSamples = 0;
 static int NCurMultiSampleIndex = 0;
 
 static int MultiSampleLabelId;
@@ -78,100 +79,49 @@ static int MultiSampleRightButtonId;
 static void	*ScrHandle = NULL;
 static void	*PrevHandle = NULL;
 
-
-// TODO: Why not moving this to tgfclient ? or the graphics engine ? or tgfdata ?
-// Load the selected OpenGL features from the graphic parameter file.
-void OpenGLLoadSelectedFeatures()
-{
-	char buf[512];
-
-	// Read OpenGL configuration from graph.xml, and select relevant OpenGL features
-	// (by default, select the max possible values for supported features).
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-	void* paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-	// 1) Texture compression.
-	const char* pszTexComp =
-		GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION,
-					 GR_ATT_TEXTURECOMPRESSION_ENABLED);
-	GfglFeatures::self()->select(GfglFeatures::TextureCompression,
-								 strcmp(pszTexComp, GR_ATT_TEXTURECOMPRESSION_ENABLED) ? false : true);
-
-	// 2) Max texture size.
-	const int sizelimit =
-		GfglFeatures::self()->getSupported(GfglFeatures::TextureMaxSize);
-	int tsize =
-		(int)GfParmGetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MAXTEXTURESIZE,
-						  (char*)NULL, (tdble)sizelimit);
-	if (tsize > sizelimit)
-		tsize = sizelimit;
-
-	GfglFeatures::self()->select(GfglFeatures::TextureMaxSize, tsize);
-
-	// 3) Multi-texturing.
-	const char* pszMultiTex =
-		GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MULTITEXTURING,
-					 GR_ATT_MULTITEXTURING_ENABLED);
-	GfglFeatures::self()->select(GfglFeatures::MultiTexturing,
-								 strcmp(pszMultiTex, GR_ATT_MULTITEXTURING_ENABLED) ? false : true);
-
-	// 4) Multi-sampling.
-	const char* pszMultiSamp =
-		GfParmGetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MULTISAMPLING,
-					 GR_ATT_MULTISAMPLING_DISABLED);
-	GfglFeatures::self()->select(GfglFeatures::MultiSampling,
-								 strcmp(pszMultiSamp, GR_ATT_MULTISAMPLING_ENABLED) ? false : true);
-
-	// Close graphic params.
-	GfParmReleaseHandle(paramHandle);
-}
-
-
-// TODO: Why not moving this to tgfclient ? or the graphics engine ? or tgfdata ?
-// Save the selected OpenGL features to the graphic parameter file.
-void OpenGLStoreSelectedFeatures()
-{
-	// Save settings to graph.xml
-	char buf[512];
-	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
-	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-	GfParmSetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_TEXTURECOMPRESSION,
-				 GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)
-				 ? GR_ATT_TEXTURECOMPRESSION_ENABLED : GR_ATT_TEXTURECOMPRESSION_DISABLED);
-	GfParmSetNum(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MAXTEXTURESIZE, (char*)NULL,
-				 (tdble)GfglFeatures::self()->getSelected(GfglFeatures::TextureMaxSize));
-	GfParmSetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MULTITEXTURING,
-				 GfglFeatures::self()->isSelected(GfglFeatures::MultiTexturing)
-				 ? GR_ATT_MULTITEXTURING_ENABLED : GR_ATT_MULTITEXTURING_DISABLED);
-	GfParmSetStr(paramHandle, GR_SCT_GLFEATURES, GR_ATT_MULTISAMPLING,
-				 GfglFeatures::self()->isSelected(GfglFeatures::MultiSampling)
-				 ? GR_ATT_MULTISAMPLING_ENABLED : GR_ATT_MULTISAMPLING_DISABLED);
-
-	GfParmWriteFile(NULL, paramHandle, "graph");
-	GfParmReleaseHandle(paramHandle);
-}
+static bool BMultiSamplingWasSelected = false;
+static int BPrevMultiSamplingSamples = 0;
 
 static void onAccept(void *)
 {
 	// Store current state of settings to the GL features layer.
-	GfglFeatures::self()->select(GfglFeatures::TextureCompression,
+	GfglFeatures::self().select(GfglFeatures::TextureCompression,
 								 strcmp(ATextureCompTexts[NCurTextureCompIndex],
-										GR_ATT_TEXTURECOMPRESSION_ENABLED) ? false : true);
-	GfglFeatures::self()->select(GfglFeatures::TextureMaxSize,
+										GfSCR_ATT_TEXTURECOMPRESSION_ENABLED) ? false : true);
+	GfglFeatures::self().select(GfglFeatures::TextureMaxSize,
 								 AMaxTextureSizeTexts[NCurMaxTextureSizeIndex]);
-	GfglFeatures::self()->select(GfglFeatures::MultiTexturing,
+	GfglFeatures::self().select(GfglFeatures::MultiTexturing,
 								 strcmp(AMultiTextureTexts[NCurMultiTextureIndex],
-										GR_ATT_MULTITEXTURING_ENABLED) ? false : true);
-	GfglFeatures::self()->select(GfglFeatures::MultiSampling,
-								 strcmp(AMultiSampleTexts[NCurMultiSampleIndex],
-										GR_ATT_MULTISAMPLING_ENABLED) ? false : true);
+										GfSCR_ATT_MULTITEXTURING_ENABLED) ? false : true);
+	GfglFeatures::self().select(GfglFeatures::MultiSampling,
+								VecMultiSampleTexts[NCurMultiSampleIndex]
+								!= GfSCR_ATT_MULTISAMPLING_DISABLED);
+	if (VecMultiSampleTexts[NCurMultiSampleIndex] != GfSCR_ATT_MULTISAMPLING_DISABLED)
+		GfglFeatures::self().select(GfglFeatures::MultiSamplingSamples,
+									(int)pow(2, NCurMultiSampleIndex));
 
 	// Store settings from the GL features layer to the graph.xml file.
-	GfglFeatures::self()->storeSelection();
+	GfglFeatures::self().storeSelection();
 	
 	// Return to previous screen.
 	GfuiScreenActivate(PrevHandle);
+
+	// But actually restart the game if the multi-sampling feature settings changed
+	// (we can't change this without re-initializing the video mode).
+	if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) != BMultiSamplingWasSelected
+		|| GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples) != BPrevMultiSamplingSamples)
+	{
+		// TODO: Simply call GfuiApp().restart() (when it is implemented ;-).
+		
+		// Shutdown the user interface.
+		LegacyMenu::self().shutdown();
+		
+		// Restart the game.
+		GfRestart(GfuiMouseIsHWPresent());
+
+		// TODO: A nice system to get back to previous display settings if the chosen ones
+		//       keep the game from really restarting (ex: unsupported full screen size) ?
+	}
 }
 
 // Toggle texture compression state enabled/disabled.
@@ -192,7 +142,8 @@ static void changeMultiTextureState(void *vp)
 static void changeMultiSampleState(void *vp)
 {
 	NCurMultiSampleIndex = (NCurMultiSampleIndex + (int)(long)vp + NMultiSamples) % NMultiSamples;
-	GfuiLabelSetText(ScrHandle, MultiSampleLabelId, AMultiSampleTexts[NCurMultiSampleIndex]);
+	GfuiLabelSetText(ScrHandle, MultiSampleLabelId,
+					 VecMultiSampleTexts[NCurMultiSampleIndex].c_str());
 }
 
 
@@ -203,9 +154,11 @@ static void changeMaxTextureSizeState(void *vp)
 
 	long delta = (long)vp;
 	NCurMaxTextureSizeIndex += delta;
-	if (NCurMaxTextureSizeIndex < 0) {
+	if (NCurMaxTextureSizeIndex < 0)
+	{
 		NCurMaxTextureSizeIndex = NMaxTextureSizes - 1;
-	} else if (NCurMaxTextureSizeIndex >= NMaxTextureSizes) {
+	} else if (NCurMaxTextureSizeIndex >= NMaxTextureSizes)
+	{
 		NCurMaxTextureSizeIndex= 0;
 	}
 
@@ -221,13 +174,15 @@ static void onActivate(void * /* dummy */)
 
 	// Initialize current state and GUI from the GL features layer.
 	// 1) Texture compression.
-	if (GfglFeatures::self()->isSupported(GfglFeatures::TextureCompression))
+	if (GfglFeatures::self().isSupported(GfglFeatures::TextureCompression))
 	{
 		const char *pszTexComp =
-			GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)
-			? GR_ATT_TEXTURECOMPRESSION_ENABLED : GR_ATT_TEXTURECOMPRESSION_DISABLED;
-		for (i = 0; i < NTextureComps; i++) {
-			if (!strcmp(pszTexComp, ATextureCompTexts[i])) {
+			GfglFeatures::self().isSelected(GfglFeatures::TextureCompression)
+			? GfSCR_ATT_TEXTURECOMPRESSION_ENABLED : GfSCR_ATT_TEXTURECOMPRESSION_DISABLED;
+		for (i = 0; i < NTextureComps; i++)
+		{
+			if (!strcmp(pszTexComp, ATextureCompTexts[i]))
+			{
 				NCurTextureCompIndex = i;
 				break;
 			}
@@ -245,13 +200,15 @@ static void onActivate(void * /* dummy */)
 
 	// 2) Max texture size.
 	int sizelimit =
-		GfglFeatures::self()->getSupported(GfglFeatures::TextureMaxSize);
+		GfglFeatures::self().getSupported(GfglFeatures::TextureMaxSize);
 	int tsize =
-		GfglFeatures::self()->getSelected(GfglFeatures::TextureMaxSize);
+		GfglFeatures::self().getSelected(GfglFeatures::TextureMaxSize);
 
 	int maxsizenb = 0;
-	for (i = 0; i < NMaxTextureSizes; i++) {
-		if (AMaxTextureSizeTexts[i] <= sizelimit) {
+	for (i = 0; i < NMaxTextureSizes; i++)
+	{
+		if (AMaxTextureSizeTexts[i] <= sizelimit)
+		{
 			maxsizenb = i;
 		} else {
 			break;
@@ -262,19 +219,24 @@ static void onActivate(void * /* dummy */)
 	NMaxTextureSizes = maxsizenb + 1;
 
 	bool found = false;
-	for (i = 0; i < NMaxTextureSizes; i++) {
-		if (AMaxTextureSizeTexts[i] == tsize) {
+	for (i = 0; i < NMaxTextureSizes; i++)
+	{
+		if (AMaxTextureSizeTexts[i] == tsize)
+		{
 			NCurMaxTextureSizeIndex = i;
 			found = true;
 			break;
 		}
 	}
 
-	if (!found) {
+	if (!found)
+	{
 		// Should never come here if there is no bug in OpenGL.
-		tsize = NDefaultTextSize;
-		for (i = 0; i < NMaxTextureSizes; i++) {
-			if (AMaxTextureSizeTexts[i] == tsize) {
+		tsize = NDefaultTextureSize;
+		for (i = 0; i < NMaxTextureSizes; i++)
+		{
+			if (AMaxTextureSizeTexts[i] == tsize)
+			{
 				NCurMaxTextureSizeIndex = i;
 				break;
 			}
@@ -285,13 +247,15 @@ static void onActivate(void * /* dummy */)
 	GfuiLabelSetText(ScrHandle, MaxTextureSizeLabelId, valuebuf);
 	
 	// 3) Multi-texturing.
-	if (GfglFeatures::self()->isSupported(GfglFeatures::MultiTexturing))
+	if (GfglFeatures::self().isSupported(GfglFeatures::MultiTexturing))
 	{
 		const char *pszMultiTex =
-			GfglFeatures::self()->isSelected(GfglFeatures::MultiTexturing)
-			? GR_ATT_MULTITEXTURING_ENABLED : GR_ATT_MULTITEXTURING_DISABLED;
-		for (i = 0; i < NMultiTextures; i++) {
-			if (!strcmp(pszMultiTex, AMultiTextureTexts[i])) {
+			GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing)
+			? GfSCR_ATT_MULTITEXTURING_ENABLED : GfSCR_ATT_MULTITEXTURING_DISABLED;
+		for (i = 0; i < NMultiTextures; i++)
+		{
+			if (!strcmp(pszMultiTex, AMultiTextureTexts[i]))
+			{
 				NCurMultiTextureIndex = i;
 				break;
 			}
@@ -307,21 +271,29 @@ static void onActivate(void * /* dummy */)
 		GfuiLabelSetText(ScrHandle, MultiTextureLabelId, "Not supported");
 	}
 	
-	// 4) Multi-sampling.
-	if (GfglFeatures::self()->isSupported(GfglFeatures::MultiSampling))
+	// 4) Multi-sampling (anti-aliasing).
+	if (GfglFeatures::self().isSupported(GfglFeatures::MultiSampling))
 	{
-		const char *pszMultiSamp =
-			GfglFeatures::self()->isSelected(GfglFeatures::MultiSampling)
-			? GR_ATT_MULTISAMPLING_ENABLED : GR_ATT_MULTISAMPLING_DISABLED;
-		for (i = 0; i < NMultiSamples; i++) {
-			if (!strcmp(pszMultiSamp, AMultiSampleTexts[i])) {
-				NCurMultiSampleIndex = i;
-				break;
+		BMultiSamplingWasSelected =
+			GfglFeatures::self().isSelected(GfglFeatures::MultiSampling);
+		BPrevMultiSamplingSamples =
+			GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples);
+
+		if (!BMultiSamplingWasSelected)
+			NCurMultiSampleIndex = 0;
+		else
+		{
+			NCurMultiSampleIndex = 0;
+			int nSamples = 1;
+			while (nSamples < BPrevMultiSamplingSamples)
+			{
+				NCurMultiSampleIndex++;
+				nSamples *= 2;
 			}
 		}
 
 		GfuiLabelSetText(ScrHandle, MultiSampleLabelId,
-						 AMultiSampleTexts[NCurMultiSampleIndex]);
+						 VecMultiSampleTexts[NCurMultiSampleIndex].c_str());
 	}
 	else
 	{
@@ -336,54 +308,53 @@ static void onActivate(void * /* dummy */)
 void* OpenGLMenuInit(void *prevMenu)
 {
 	// Has screen already been created?
-	if (ScrHandle) {
+	if (ScrHandle)
 		return ScrHandle;
-	}
 
 	PrevHandle = prevMenu;
 
 	ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-	void *param = LoadMenuXML("opengloptionsmenu.xml");
-	CreateStaticControls(param,ScrHandle);
+	void *hparmMenu = LoadMenuXML("opengloptionsmenu.xml");
+	CreateStaticControls(hparmMenu,ScrHandle);
 
 	// Texture compression.
 	TextureCompLeftButtonId =
-		CreateButtonControl(ScrHandle, param, "TextureCompressionLeftArrowButton", (void*)-1,
+		CreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionLeftArrowButton", (void*)-1,
 							changeTextureCompressionState);
 	TextureCompRightButtonId =
-		CreateButtonControl(ScrHandle, param, "TextureCompressionRightArrowButton", (void*)+1,
+		CreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionRightArrowButton", (void*)+1,
 							changeTextureCompressionState);
-	TextureCompLabelId = CreateLabelControl(ScrHandle,param,"TextureCompressionLabel");
+	TextureCompLabelId = CreateLabelControl(ScrHandle,hparmMenu,"TextureCompressionLabel");
 
 	// Texture sizing.
-	CreateButtonControl(ScrHandle,param,"MaxTextureSizeLeftArrowButton", (void*)-1,
+	CreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeLeftArrowButton", (void*)-1,
 						changeMaxTextureSizeState);
-	CreateButtonControl(ScrHandle,param,"MaxTextureSizeRightArrowButton", (void*)+1,
+	CreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeRightArrowButton", (void*)+1,
 						changeMaxTextureSizeState);
-	MaxTextureSizeLabelId = CreateLabelControl(ScrHandle,param,"MaxTextureSizeLabel");
+	MaxTextureSizeLabelId = CreateLabelControl(ScrHandle,hparmMenu,"MaxTextureSizeLabel");
 
 	// Multi-texturing.
 	MultiTextureLeftButtonId =
-		CreateButtonControl(ScrHandle, param, "MultiTextureLeftArrowButton", (void*)-1,
+		CreateButtonControl(ScrHandle, hparmMenu, "MultiTextureLeftArrowButton", (void*)-1,
 							changeMultiTextureState);
 	MultiTextureRightButtonId =
-		CreateButtonControl(ScrHandle, param, "MultiTextureRightArrowButton", (void*)+1,
+		CreateButtonControl(ScrHandle, hparmMenu, "MultiTextureRightArrowButton", (void*)+1,
 							changeMultiTextureState);
-	MultiTextureLabelId = CreateLabelControl(ScrHandle,param,"MultiTextureLabel");
+	MultiTextureLabelId = CreateLabelControl(ScrHandle,hparmMenu,"MultiTextureLabel");
 
 	// Multi-sampling.
 	MultiSampleLeftButtonId =
-		CreateButtonControl(ScrHandle, param, "MultiSampleLeftArrowButton", (void*)-1,
+		CreateButtonControl(ScrHandle, hparmMenu, "MultiSampleLeftArrowButton", (void*)-1,
 							changeMultiSampleState);
 	MultiSampleRightButtonId =
-		CreateButtonControl(ScrHandle, param, "MultiSampleRightArrowButton", (void*)+1,
+		CreateButtonControl(ScrHandle, hparmMenu, "MultiSampleRightArrowButton", (void*)+1,
 							changeMultiSampleState);
-	MultiSampleLabelId = CreateLabelControl(ScrHandle,param,"MultiSampleLabel");
+	MultiSampleLabelId = CreateLabelControl(ScrHandle,hparmMenu,"MultiSampleLabel");
 
-	CreateButtonControl(ScrHandle,param,"AcceptButton",NULL, onAccept);
-	CreateButtonControl(ScrHandle,param,"CancelButton",prevMenu, GfuiScreenActivate);
+	CreateButtonControl(ScrHandle,hparmMenu,"AcceptButton",NULL, onAccept);
+	CreateButtonControl(ScrHandle,hparmMenu,"CancelButton",prevMenu, GfuiScreenActivate);
 
-	GfParmReleaseHandle(param);
+	GfParmReleaseHandle(hparmMenu);
 
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, onAccept, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
@@ -393,5 +364,24 @@ void* OpenGLMenuInit(void *prevMenu)
 	GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Increase Texture Size Limit", (void*)1, changeMaxTextureSizeState, NULL);
 	GfuiAddKey(ScrHandle, ' ', "Toggle Texture Compression", (void*)1, changeTextureCompressionState, NULL);
 
+	// Initialize multi-sampling levels.
+	NMultiSamples = 1;
+	VecMultiSampleTexts.push_back(GfSCR_ATT_MULTISAMPLING_DISABLED);
+	if (GfglFeatures::self().isSupported(GfglFeatures::MultiSampling)
+		&& GfglFeatures::self().getSupported(GfglFeatures::MultiSamplingSamples) > 1)
+	{
+		const int nMaxSamples =
+			GfglFeatures::self().getSupported(GfglFeatures::MultiSamplingSamples);
+		NMultiSamples += (int)(log(nMaxSamples) / log(2));
+		std::ostringstream ossVal;
+		for (int nVal = 2; nVal <= nMaxSamples; nVal *= 2)
+		{
+			ossVal.str("");
+			ossVal << nVal << "x";
+			VecMultiSampleTexts.push_back(ossVal.str());
+		}
+		GfLogDebug("OpenGLMenuInit: nMaxSamples=%d, NMultiSamples=%d, VecMultiSampleTexts.size=%u\n", nMaxSamples, NMultiSamples, VecMultiSampleTexts.size());
+	}
+	
 	return ScrHandle;
 }

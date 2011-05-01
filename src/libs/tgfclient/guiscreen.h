@@ -33,8 +33,6 @@
 
 #define GFSCR_SECT_PROP		"Screen Properties"
 
-#define GFSCR_ATT_X		"x"
-#define GFSCR_ATT_Y		"y"
 #define GFSCR_ATT_BPP		"bpp"
 #define GFSCR_ATT_WIN_X		"window width"
 #define GFSCR_ATT_WIN_Y		"window height"
@@ -88,6 +86,23 @@
 #define GFSCR_ATTR_BLUE		"blue"
 #define GFSCR_ATTR_ALPHA	"alpha"
 
+#define GfSCR_SECT_GLFEATURES			"OpenGL Features"
+
+#define GfSCR_ATT_TEXTURECOMPRESSION		"texture compression"
+#define GfSCR_ATT_TEXTURECOMPRESSION_ENABLED	"enabled"
+#define GfSCR_ATT_TEXTURECOMPRESSION_DISABLED	"disabled"
+
+#define GfSCR_ATT_MAXTEXTURESIZE		"max texture size"
+
+#define GfSCR_ATT_MULTITEXTURING		"multi-texturing"
+#define GfSCR_ATT_MULTITEXTURING_ENABLED	"enabled"
+#define GfSCR_ATT_MULTITEXTURING_DISABLED	"disabled"
+
+#define GfSCR_ATT_MULTISAMPLING		"multi-sampling"
+#define GfSCR_ATT_MULTISAMPLING_ENABLED	"enabled"
+#define GfSCR_ATT_MULTISAMPLING_DISABLED	"disabled"
+
+#define GfSCR_ATT_MULTISAMPLING_SAMPLES		"multi-sampling samples"
 
 SDL_Surface* gfScrGetScreenSurface();
 

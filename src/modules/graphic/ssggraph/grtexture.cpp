@@ -285,7 +285,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 	GLint ww;
 
 	GLint textureTargetFormat;
-	if (GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)) {
+	if (GfglFeatures::self().isSelected(GfglFeatures::TextureCompression)) {
 		//GfTrace("COMPRESSOR: ");
 
 		switch (zsize) {
@@ -311,7 +311,7 @@ bool grMakeMipMaps (GLubyte *image, int xsize, int ysize, int zsize, int mipmap)
 		//GfTrace("NON COMPRESSOR\n");
 	}
 
-	const int tlimit = GfglFeatures::self()->getSelected(GfglFeatures::TextureMaxSize);
+	const int tlimit = GfglFeatures::self().getSelected(GfglFeatures::TextureMaxSize);
 
 	do {
 		if (xsize > tlimit || ysize > tlimit) {

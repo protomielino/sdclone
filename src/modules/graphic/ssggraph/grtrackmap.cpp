@@ -385,7 +385,7 @@ cGrTrackMap::cGrTrackMap()
 	// If GL_ARB_texture_compression is available at runtime and selected, (try to) compress the
 	// texture. This is done with the specification of the internal format to
 	// GL_COMPRESSED_RGBA_ARB.
-	if (GfglFeatures::self()->isSelected(GfglFeatures::TextureCompression)) {
+	if (GfglFeatures::self().isSelected(GfglFeatures::TextureCompression)) {
 		// This texture contains mostly the clear color value and should therefore
 		// compress well even with high quality.
 		glHint(GL_TEXTURE_COMPRESSION_HINT_ARB, GL_NICEST);

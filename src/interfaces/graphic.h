@@ -36,21 +36,6 @@
 #define GR_ATT_SOUND_STATE_DISABLED	"disabled"
 #define GR_ATT_SOUND_VOLUME	        "volume"
 
-#define GR_SCT_GLFEATURES			"OpenGL Features"
-#define GR_ATT_TEXTURECOMPRESSION		"texture compression"
-#define GR_ATT_TEXTURECOMPRESSION_ENABLED	"enabled"
-#define GR_ATT_TEXTURECOMPRESSION_DISABLED	"disabled"
-
-#define GR_ATT_MAXTEXTURESIZE		"max texture size"
-
-#define GR_ATT_MULTISAMPLING		"multi-sampling"
-#define GR_ATT_MULTISAMPLING_ENABLED	"enabled"
-#define GR_ATT_MULTISAMPLING_DISABLED	"disabled"
-
-#define GR_ATT_MULTITEXTURING		"multi-texturing"
-#define GR_ATT_MULTITEXTURING_ENABLED	"enabled"
-#define GR_ATT_MULTITEXTURING_DISABLED	"disabled"
-
 #define GR_SCT_DISPMODE		"Display Mode"
 #define GR_ATT_CAM		"camera"
 #define GR_ATT_CAM_HEAD		"camera head list"

@@ -110,8 +110,6 @@ grInitScene(void)
 }//grInitScene
 
 
-static grssgLoaderOptions options(/*bDoMipMap*/true);
-
 int
 grLoadScene(tTrack *track)
 {
@@ -119,11 +117,6 @@ grLoadScene(tTrack *track)
 	void		*hndl = grTrackHandle;
 	const char		*acname;
 	ssgEntity		*desc;
-
-	if (grMaxTextureUnits == 0)
-		grInitMultiTex();
-
-	grssgSetCurrentOptions(&options);
 
 	// Load graphic options if not already done.
 	if(!grHandle) {
@@ -215,8 +208,6 @@ grShutdownScene(void)
 	TheScene = 0;
 
 	grShutdownBackground();
-
-	options.endLoad();
 }//grShutdownScene
 
 

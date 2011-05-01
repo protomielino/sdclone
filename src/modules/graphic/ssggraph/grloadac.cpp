@@ -1221,9 +1221,6 @@ ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options 
 static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* options )
 {
 
-  if (grMaxTextureUnits==0)
-      grInitMultiTex();
-
   char filename [ 1024 ] ;
   current_options -> makeModelPath ( filename, fname ) ;
 

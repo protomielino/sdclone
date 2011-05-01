@@ -96,7 +96,6 @@ static tScreenSize ADefScreenSizes[] =
 	{  928,  696 },
 	{  960,  600 },
 	{  960,  720 },
-	{  960, 1200 },
 	{ 1024,  600 },
 	{ 1024,  768 },
 	{ 1152,  768 },
@@ -327,17 +326,6 @@ static void gfScrReshapeViewport(int width, int height)
 
 bool GfScrInit(void)
 {
-	char 	buf[512];
-    int		xw, yw;
-    int		winX, winY;
-    void	*handle;
-    const char	*fscr;
-    const char	*vinit;
-    SDL_Surface *icon;
-
-    int		maxfreq;
-    int		depth;
-
 	// Initialize SDL video subsystem (and exit if not supported).
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
@@ -374,25 +362,30 @@ bool GfScrInit(void)
 	}
 	
 	char pszDriverName[32];
-	GfLogTrace("SDL video driver : '%s'\n", SDL_VideoDriverName(pszDriverName, 32));
-	//GfLogTrace("  Hardware acceleration : %s\n", sdlVideoInfo->hw_available ? "true" : "false");
-	//GfLogTrace("  Total video memory    : %u Kb\n", sdlVideoInfo->video_mem);
-	GfLogTrace("Maximum pixel depth : %d bits\n", sdlVideoInfo->vfmt->BitsPerPixel);
+	GfLogInfo("SDL video backend info :\n");
+	GfLogInfo("  Driver                : %s\n", SDL_VideoDriverName(pszDriverName, 32));
+	GfLogInfo("  Maximum color depth   : %d bits\n", sdlVideoInfo->vfmt->BitsPerPixel);
+	// These ones don't report actually real values on some configurations.
+	// GfLogInfo("  Hardware acceleration : %s\n", sdlVideoInfo->hw_available ? "Yes" : "No");
+	// GfLogInfo("  Total video memory    : %u Kb\n", sdlVideoInfo->video_mem);
 
 	// Get graphical settings from config file.
+	char buf[512];
     sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-    handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    xw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, 800);
-    yw = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, 600);
-    winX = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, xw);
-    winY = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, yw);
-    depth = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, 32);
-    maxfreq = (int)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, 160);
+    void* hparmScreen = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	
+    int winX = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, 800);
+    int winY = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
+    int depth = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, 32);
+    //int maxfreq = (int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, 160);
+    const std::string strFullScreen =
+		GfParmGetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
+    const std::string strVideoInit =
+		GfParmGetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
 
-    fscr = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
-
-    vinit = GfParmGetStr(handle, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
-
+	// Load Open GL settings from config file.
+	GfglFeatures::self().loadSelection();
+	
 	// Set window/icon captions
 	sprintf(buf, "Speed Dreams %s", VERSION_LONG);
 	SDL_WM_SetCaption(buf, buf);
@@ -400,169 +393,256 @@ bool GfScrInit(void)
 	// Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
 	// as BMP doesn't support transparency).
 	sprintf(buf, "%sdata/icons/icon.bmp", GfDataDir());
-	if ((icon = SDL_LoadBMP(buf)))
+    SDL_Surface* surfIcon = SDL_LoadBMP(buf);
+	if (surfIcon)
 	{
-	    SDL_SetColorKey(icon, SDL_SRCCOLORKEY, SDL_MapRGB(icon->format, 0, 0, 0));
-	    SDL_WM_SetIcon(icon, 0);
-	    SDL_FreeSurface(icon);
+	    SDL_SetColorKey(surfIcon, SDL_SRCCOLORKEY, SDL_MapRGB(surfIcon->format, 0, 0, 0));
+	    SDL_WM_SetIcon(surfIcon, 0);
+	    SDL_FreeSurface(surfIcon);
 	}
 
-	// Set full screen mode if required.
+	// Set full screen mode if selected.
 	int videomode = SDL_OPENGL; // What about SDL_DOUBLEBUFFER ?
-	if (!strcmp(fscr, "yes"))
+	if (strFullScreen == "yes")
 		videomode |= SDL_FULLSCREEN;
  
 	// Video initialization with best possible settings.
-	// TODO: Shouldn't we use only SDL_SetVideoMode here, and move SDL_GL_SetAttribute
-	//       into the graphics engine ? Do we need multi-sampling in menus ?
 	ScreenSurface = 0;
-	if (strcmp(vinit, GFSCR_VAL_VINIT_BEST) == 0) 
+	if (strVideoInit == GFSCR_VAL_VINIT_BEST) 
 	{
-		// TODO: Check for better than default multi-sampling level
-		//       through SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, level);
-		// Could not get it automatically detected till now.
+		GfLogInfo("Detecting 'best possible mode' for video initialization.\n");
 
-		/* Set the minimum requirements for the OpenGL window */
+		// Set the minimum requirements for the OpenGL window
 		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-		// Try to get "best" videomode with default anti-aliasing support :
-		// 24 bit z-buffer with alpha channel.
+		// Try to get "best" videomode with maximum anti-aliasing support :
+		// 24 bit z-buffer with alpha channel
+		// (even if not selected : we 1st detect what we can do at most).
 		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		
+		// Detect the max supported number of samples.
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-		ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
-
-		// Failed : try without anti-aliasing.
-		if (!ScreenSurface)
+		int nSamples = 32; // Hard coded max value for the moment.
+		while (!ScreenSurface && nSamples > 1)
 		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nSamples);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+			{
+				GfLogTrace("Can't get a video mode for a 24+8 bit "
+						   "%dx anti-aliased double-buffer\n", nSamples);
+				nSamples /= 2;
+			}
 		}
 
-		// Failed : try with anti-aliasing, but without alpha channel.
+		// Store the detected anti-aliasing supported features.
+		GfglFeatures::self().setSupported(GfglFeatures::MultiSampling, ScreenSurface != 0);
+		if (ScreenSurface)
+			GfglFeatures::self().setSupported(GfglFeatures::MultiSamplingSamples, nSamples);
+
+		if (ScreenSurface)
+			SDL_FreeSurface(ScreenSurface);
+		
+		// Then, back to the user selection (may have been updated by the detection above).
+		GfLogInfo("Trying user selected 'best possible mode' for video initialization.\n");
+
+		if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
+		{
+			nSamples = GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nSamples);
+			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 24+8 bit "
+						   "%dx anti-aliased double-buffer\n", nSamples);
+		}
+		else
+		{
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 1);
+			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 24+8 bit double-buffer\n");
+		}
+
+		// Failed : try with anti-aliasing if selected, but without alpha channel.
 		if (!ScreenSurface)
 		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+			if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 24 bit anti-aliased double-buffer\n");
 		}
 
-		// Failed : try without anti-aliasing, and without alpha channel.
-		if (!ScreenSurface)
+		// Failed : try without anti-aliasing if selected, and without alpha channel.
+		if (!ScreenSurface && GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
 		{
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 24 bit double-buffer\n");
 		}
 
-		// Failed : try 16 bit z-buffer and back with alpha channel and anti-aliasing.
+		// Failed : try 16 bit z-buffer and back with alpha channel and anti-aliasing if selected.
 		if (!ScreenSurface)
 		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 16);
+			if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 16+8 bit anti-aliased double-buffer\n");
 		}
 
-		// Failed : try without anti-aliasing.
-		if (!ScreenSurface)
+		// Failed : try without anti-aliasing if selected.
+		if (!ScreenSurface && GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
 		{
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 16+8 bit double-buffer\n");
 		}
 
-		// Failed : try with anti-aliasing, but without alpha channel.
+		// Failed : try with anti-aliasing if selected, but without alpha channel.
 		if (!ScreenSurface)
 		{
-			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
+			if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
+				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 16 bit anti-aliased double-buffer\n");
 		}
 
-		// Failed : try without anti-aliasing, and without alpha channel.
-		if (!ScreenSurface)
+		// Failed : try without anti-aliasing if selected, and without alpha channel.
+		if (!ScreenSurface && GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
 		{
 			SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
 			ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+			if (!ScreenSurface)
+				GfLogTrace("Can't get a video mode for a 16 bit double-buffer\n");
 		}
 
-		// Failed : Give up but say why.
+		// Failed : Change display / Open GL settings and restart.
 		if (!ScreenSurface)
 		{
-		  GfLogWarning("The minimum display requirements are not fulfilled :\n");
-		  GfLogWarning("We need a double buffered RGB visual with a 16 bit depth buffer at least.\n");
+			// Retry without anti-aliasing if selected if it was requested.
+			if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling))
+			{
+				GfLogWarning("Failed to setup best supported video mode : "
+							 "retrying without anti-aliasing at all ...\n");
+				GfglFeatures::self().select(GfglFeatures::MultiSampling, false);
+				GfglFeatures::self().storeSelection(hparmScreen);
+			}
+			
+			// Otherwise, retry a "compatible" = "all defaults" initialization mode.
+			else if (strFullScreen == "yes")
+			{
+			   
+				GfLogWarning("Failed to setup full-screen best supported video mode : "
+							 "retrying in windowed mode ...\n");
+				GfParmSetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
+				GfParmWriteFile(NULL, hparmScreen, "Screen");
+			}
+			
+			// Otherwise, retry a "compatible" = "all defaults" initialization mode.
+			else
+			{
+			   
+				GfLogWarning("Failed to setup best supported video mode : "
+							 "falling back to a more compatible default mode ...\n");
+				GfParmSetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_VINIT,
+							 GFSCR_VAL_VINIT_COMPATIBLE);
+				GfParmWriteFile(NULL, hparmScreen, "Screen");
+			}
+			
+			GfParmReleaseHandle(hparmScreen);
+			GfRestart(); // Never returns.
 		}
 	}
+	else
+	{
+		// Store the detected anti-aliasing supported features.
+		GfglFeatures::self().setSupported(GfglFeatures::MultiSampling, false);
+		GfglFeatures::self().setSupported(GfglFeatures::MultiSamplingSamples, -1);
+	}
+	
+	GfParmReleaseHandle(hparmScreen);
 
 	// Video initialization with generic compatible settings.
 	if (!ScreenSurface)
 	{
-		GfLogInfo("Trying generic video initialization with requested size and color depth, fallback.\n\n");
+		GfLogInfo("Trying 'default compatible' mode for video initialization.\n");
 		ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+		if (!ScreenSurface)
+			GfLogTrace("Can't get a %s%dx%dx%d compatible video mode\n",
+					   strFullScreen == "yes" ? "full-screen " : "", winX, winY, depth);
+	}
+
+	// Failed : Try and remove the full-screen requirement if present ...
+	if (!ScreenSurface && strFullScreen == "yes")
+	{
+		videomode &= ~SDL_FULLSCREEN;
+		ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+		if (!ScreenSurface)
+			GfLogTrace("Can't get a non-full-screen %dx%dx%d compatible video mode\n",
+					   winX, winY, depth);
 	}
 
 	// Failed : Try with a lower fallback size  : should be supported everywhere ...
 	if (!ScreenSurface)
 	{
-		GfLogError("Unable to get compatible video mode with requested size and color depth\n\n");
 		winX = ADefScreenSizes[0].width;
 		winY = ADefScreenSizes[0].height;
-		GfLogInfo("Trying generic video initialization with fallback size %dx%d and requested color depth.\n\n",
-				  winX, winY);
 		ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+		if (!ScreenSurface)
+			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n", winX, winY, depth);
 	}
 
 	// Failed : Try with a lower fallback color depth : should be supported everywhere ...
 	if (!ScreenSurface)
 	{
-		GfLogError("Unable to get compatible video mode with fallback size and requested color depth\n\n");
 		depth = ADefScreenColorDepths[0];
-		GfLogInfo("Trying generic video initialization with fallback size %dx%d and color depth %d.\n\n",
-				  winX, winY, depth);
 		ScreenSurface = SDL_SetVideoMode(winX, winY, depth, videomode);
+		if (!ScreenSurface)
+			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n", winX, winY, depth);
 	}
 
 	// Failed : No way ... no more ideas !
 	if (!ScreenSurface)
 	{
 		GfLogError("Unable to get any compatible video mode"
-				   " (fallback resolution not supported) : giving up !\n\n");
+				   " (fallback resolution / color depth not supported) : giving up !\n\n");
 		return false;
 	}
 
-	GfParmReleaseHandle(handle);
-
+	// If we get here, that's because we succeeded in getting a valid video mode :-)
+	
 	// Save view geometry and screen center.
-    GfViewWidth = xw;
-    GfViewHeight = yw;
-    GfScrCenX = xw / 2;
-    GfScrCenY = yw / 2;
+    GfViewWidth = winX;
+    GfViewHeight = winY;
+    GfScrCenX = winX / 2;
+    GfScrCenY = winY / 2;
 
-	// Report video mode and OpenGL features finally obtained.
-	GfLogInfo("Current video mode :\n");
+	// Report about selected SDL video mode.
+	GfLogInfo("Selected SDL video mode :\n");
  	GfLogInfo("  Full screen : %s\n", (videomode & SDL_FULLSCREEN) ? "Yes" : "No");
  	GfLogInfo("  Size        : %dx%d\n", winX, winY);
- 	GfLogInfo("  Color depth : %d\n", depth);
+ 	GfLogInfo("  Color depth : %d bits\n", depth);
 	
-	int glAlpha, glDepth, glDblBuff, glMSamp, glMSampLevel;
-	SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &glAlpha);
-	SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &glDepth);
-	SDL_GL_GetAttribute(SDL_GL_DOUBLEBUFFER, &glDblBuff);
-	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &glMSamp);
-	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &glMSampLevel);
+	// Initialize the Open GL feature management layer and report about the supported features
+	// (may appear double work for anti-aliasing support - see above -
+	//  but we can't check such support before a successfull call to SDL_SetVideoMode()).
+    GfglFeatures::self().checkSupport();
 
-	// TODO: Is anti-aliasing really related to video mode initialization ?
-	//       What about moving this to gfglCheckGLFeatures and enable it later ?
-	GfLogInfo("Enabled OpenGL features :\n");
- 	GfLogInfo("  Double-buffer : %s", glDblBuff ? "Yes" : "No\n");
-	if (glDblBuff)
-		GfLogInfo(" (%d bits)\n", glDepth);
- 	GfLogInfo("  Alpha-channel : %s\n", glAlpha ? "Yes" : "No");
- 	GfLogInfo("  Anti-aliasing : %s", glMSamp ? "Yes" : "No\n");
-	if (glMSamp)
-		GfLogInfo("   (multi-sampling level %d)\n", glMSampLevel);
+	// Report about the actually selected support, after checking support.
+    GfglFeatures::self().dumpSelection();
 
 #ifdef WIN32
 	// Under Windows, give an initial position to the window if not full-screen mode
@@ -585,9 +665,6 @@ bool GfScrInit(void)
 	// Setup the event loop about the new display.
 	GfuiApp().eventLoop().setReshapeCB(gfScrReshapeViewport);
 	GfuiApp().eventLoop().postRedisplay();
-
-	// Initialize Open GL feature management layer
-	//TODO:gfglCheckGLFeatures();
 
 	return true;
 }
@@ -671,7 +748,7 @@ int GfScrCaptureAsPNG(const char *filename)
 		free(img);
 
 	if (!nStatus)
-		GfLogDebug("Captured screen to %s (capture=%.3f s, PNG=%.3f s)\n",
+		GfLogTrace("Captured screen to %s (capture=%.3f s, PNG=%.3f s)\n",
 				   filename, dCaptureDuration, dFileWriteDuration);
 	else
 		GfLogError("Failed to capture screen to %s\n", filename);

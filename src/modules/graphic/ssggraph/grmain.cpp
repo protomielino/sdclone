@@ -36,6 +36,7 @@
 #include "grscreen.h"
 #include "grscene.h"
 #include "grsound.h"
+#include "grloadac.h"
 #include "grutil.h"
 #include "grcarlight.h"
 #include "grboard.h"
@@ -73,7 +74,9 @@ int grNbArrangeScreens = 0;
 // Current screen index.
 static int nCurrentScreenIndex = 0;
 
+static grssgLoaderOptions options(/*bDoMipMap*/true);
 
+// TODO: Move this to glfeatures.
 #ifdef WIN32
 PFNGLMULTITEXCOORD2FARBPROC glMultiTexCoord2fARB = NULL;
 PFNGLMULTITEXCOORD2FVARBPROC glMultiTexCoord2fvARB = NULL;
@@ -82,15 +85,21 @@ PFNGLCLIENTACTIVETEXTUREARBPROC glClientActiveTextureARB = NULL;
 #endif
 
 
-// Set up OpenGL for multi-texturing support
-int grInitMultiTex(void)
+// Set up OpenGL features from user settings.
+static void setupOpenGLFeatures(void)
 {
-	grMaxTextureUnits = 1;
+	static bool bInitialized = false;
 	
-	if (GfglFeatures::self()->isSelected(GfglFeatures::MultiTexturing))
+	// Don't do it twice.
+    if (bInitialized)
+		return;
+	
+	// Multi-texturing.
+	grMaxTextureUnits = 1;
+	if (GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing))
 	{
 		// Use the selected number of texture units.
-		grMaxTextureUnits = GfglFeatures::self()->getSelected(GfglFeatures::MultiTexturingUnits);
+		grMaxTextureUnits = GfglFeatures::self().getSelected(GfglFeatures::MultiTexturingUnits);
 
 #ifdef WIN32
 		// Retrieve the addresses of multi-texturing functions under Windows
@@ -102,8 +111,9 @@ int grInitMultiTex(void)
 		glMultiTexCoord2fvARB = (PFNGLMULTITEXCOORD2FVARBPROC)wglGetProcAddress("glMultiTexCoord2fvARB");
 #endif
 	}
-	
-	return grMaxTextureUnits;
+
+	// Done once and for all.
+	bInitialized = true;
 }
 
 
@@ -365,10 +375,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 	char buf[256];
     int i;
 
-	// TODO: Is this needed, as already done in initTrack ?
-    if (grMaxTextureUnits==0)
-		grInitMultiTex();
-    
     grWinx = x;
     grWiny = y;
     grWinw = width;
@@ -630,6 +636,11 @@ initTrack(tTrack *track)
 	// TODO: Find a solution to init the graphics first independent of objects.
 	grContext.makeCurrent();
 
+	setupOpenGLFeatures();
+    
+	grssgSetCurrentOptions(&options);
+
+	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	if (grNbActiveScreens > 0)
 		grLoadScene(track);
@@ -641,15 +652,19 @@ initTrack(tTrack *track)
 void
 shutdownTrack(void)
 {
+	// Do the real track termination job.
 	grShutdownScene();
-	
-	grShutdownState();
 
 	if (grTrackHandle)
 	{
 		GfParmReleaseHandle(grTrackHandle);
 		grTrackHandle = 0;
 	}
+
+	// And then the context termination job (should not be there, see initTrack).
+	options.endLoad();
+	
+	grShutdownState();
 }
 
 void

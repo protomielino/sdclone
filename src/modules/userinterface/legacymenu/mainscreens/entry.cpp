@@ -17,10 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <glfeatures.h>
-
 #include "client.h"
-#include "openglconfig.h"
 #include "splash.h"
 
 /*
@@ -42,11 +39,6 @@
 bool
 MenuEntry(void)
 {
-    // Initialize gaming framework UI.
-    GfglFeatures::self()->setSelectionLoader(OpenGLLoadSelectedFeatures);
-    GfglFeatures::self()->setSelectionStorer(OpenGLStoreSelectedFeatures);
-    GfglFeatures::self()->loadSelection();
-
     // Open the splash screen, load menus in "background" and finally open the main menu.
     return SplashScreen();
 }

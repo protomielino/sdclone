@@ -115,6 +115,8 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
     // Save display settings.
     pMenu->storeSettings();
 
+	// TODO: Simply call GfuiApp().restart() (when it is implemented ;-).
+		
     // Shutdown the user interface.
 	LegacyMenu::self().shutdown();
 
@@ -185,8 +187,8 @@ void DisplayMenu::loadSettings()
 	_eDisplayMode = strcmp(pszFullScreen, GFSCR_VAL_YES) ? eWindowed : eFullScreen;
 
 	// Screen / window size.
-	_nScreenWidth = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_X, NULL, 800);
-	_nScreenHeight = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_Y, NULL, 600);
+	_nScreenWidth = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, NULL, 800);
+	_nScreenHeight = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, NULL, 600);
 	
 	// Video initialization mode : Compatible or Best.
 	const char *pszVideoInitMode =
@@ -214,8 +216,6 @@ void DisplayMenu::storeSettings() const
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// Write new settings.
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_X, (char*)NULL, _nScreenWidth);
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_Y, (char*)NULL, _nScreenHeight);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
 	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, _nColorDepth);
@@ -234,6 +234,12 @@ void DisplayMenu::storeSettings() const
 	const char* pszDisplMode =
 		(_eDisplayMode == eFullScreen) ? GFSCR_VAL_YES : GFSCR_VAL_NO;
 	GfParmSetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, pszDisplMode);
+
+	// Deselect anti-aliasing from the Open GL settings if 'compatible' mode
+	// selected for the video initialization (anti-aliasing not supported in this mode).
+	if (_eVideoInitMode == eCompatible)
+		GfParmSetStr(hScrConfParams, GfSCR_SECT_GLFEATURES, GfSCR_ATT_MULTISAMPLING,
+					 GfSCR_ATT_MULTISAMPLING_DISABLED);
 	
 	// Write and release screen config params file.
 	GfParmWriteFile(NULL, hScrConfParams, "Screen");
