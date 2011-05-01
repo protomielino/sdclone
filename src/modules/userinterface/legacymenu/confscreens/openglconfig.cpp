@@ -98,7 +98,7 @@ static void onAccept(void *)
 								!= GfSCR_ATT_MULTISAMPLING_DISABLED);
 	if (VecMultiSampleTexts[NCurMultiSampleIndex] != GfSCR_ATT_MULTISAMPLING_DISABLED)
 		GfglFeatures::self().select(GfglFeatures::MultiSamplingSamples,
-									(int)pow(2, NCurMultiSampleIndex));
+									(int)pow(2.0, (double)NCurMultiSampleIndex));
 
 	// Store settings from the GL features layer to the graph.xml file.
 	GfglFeatures::self().storeSelection();
@@ -303,7 +303,6 @@ static void onActivate(void * /* dummy */)
 	}
 }
 
-
 // OpenGL menu
 void* OpenGLMenuInit(void *prevMenu)
 {
@@ -372,7 +371,7 @@ void* OpenGLMenuInit(void *prevMenu)
 	{
 		const int nMaxSamples =
 			GfglFeatures::self().getSupported(GfglFeatures::MultiSamplingSamples);
-		NMultiSamples += (int)(log(nMaxSamples) / log(2));
+		NMultiSamples += (int)(log((double)nMaxSamples) / log(2.0));
 		std::ostringstream ossVal;
 		for (int nVal = 2; nVal <= nMaxSamples; nVal *= 2)
 		{
@@ -380,7 +379,6 @@ void* OpenGLMenuInit(void *prevMenu)
 			ossVal << nVal << "x";
 			VecMultiSampleTexts.push_back(ossVal.str());
 		}
-		GfLogDebug("OpenGLMenuInit: nMaxSamples=%d, NMultiSamples=%d, VecMultiSampleTexts.size=%u\n", nMaxSamples, NMultiSamples, VecMultiSampleTexts.size());
 	}
 	
 	return ScrHandle;
