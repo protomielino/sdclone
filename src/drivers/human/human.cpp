@@ -980,7 +980,9 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	if (HCtx[idx]->paramAsr) 
 	{
-	    	tdble trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
+		tdble origaccel = car->_accelCmd;
+#if 0
+		tdble trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
 		tdble angle = trackangle - car->_yaw;
 		NORM_PI_PI(angle);
 
@@ -992,8 +994,6 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		else if (car->_trkPos.seg->type == TR_RGT && angle > 0.0)
 			maxaccel = MIN(car->_accelCmd, MIN(0.6, angle));
 
-		tdble origaccel = car->_accelCmd;
-#if 0
 		tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
 		NORM_PI_PI(skidAng);
 
@@ -1004,12 +1004,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		}
 #endif
 
+#if 0
 		tdble steer = MIN(fabs(car->_steerCmd), fabs(car->_steerCmd+car->_yaw_rate/3));
 		if (steer > 0.1 && fabs(car->_speed_x) > 7.0)
 		{
 			tdble decel = ((steer-0.1) * (1.0 + steer) * 0.8);
 			car->_accelCmd = MIN(car->_accelCmd, MAX(0.35, 1.0 - decel));
 		}
+#endif
 
 		tdble drivespeed = 0.0;
 		switch (HCtx[idx]->driveTrain)
@@ -1025,24 +1027,33 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				              car->_wheelRadius(FRNT_LFT) / 2.0;
 				break;
 			case eRWD:
-                // ADJUSTMENTS TO RWD Asr:-
-                // Originally this purely returned the speed of the wheels, which when the speed of
-                // the car is subtracted below provides the degree of slip, which is then used to
-                // reduce the amount of accelerator.
-                //
-                // The new calculation below reduces the degree to which the difference between wheel
-                // and car speed affects slip, and instead looks at the SlipAccel and SlipSide values,
-                // which are more important as they signify an impending loss of control.  The SlipSide
-                // value is reduced the faster the car's travelling, as usually it matters most in the
-                // low to mid speed ranges.
+				// ADJUSTMENTS TO RWD Asr:-
+				// Originally this purely returned the speed of the wheels, which when the speed of
+				// the car is subtracted below provides the degree of slip, which is then used to
+				// reduce the amount of accelerator.
+				//
+				// The new calculation below reduces the degree to which the difference between wheel
+				// and car speed affects slip, and instead looks at the SlipAccel and SlipSide values,
+				// which are more important as they signify an impending loss of control.  The SlipSide
+				// value is reduced the faster the car's travelling, as usually it matters most in the
+				// low to mid speed ranges.  We also take into account the difference between the
+				// player's steer command and the actual yaw rate of the vehicle - where the player
+				// is steering against the yaw rate, we decrease the amount of acceleration to stop
+				// tirespin sending the rear wheels into a spinout.
+
+				bool  steer_correct = (fabs(car->_yaw_rate) > fabs(car->_steerCmd) ||
+				                       (car->_yaw_rate < 0.0 && car->_steerCmd > 0.0) ||
+				                       (car->_yaw_rate > 0.0 && car->_steerCmd < 0.0));
+				tdble steer_diff    = fabs(car->_yaw_rate - car->_steerCmd);
 
 				drivespeed = (((car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) - 30) *
 				              car->_wheelRadius(REAR_LFT) +
-                              -(car->_wheelSlipAccel(REAR_RGT)) +
-                              -(car->_wheelSlipAccel(REAR_LFT)) +
-                              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(8, 80-fabs(car->_speed_x))/4) +
-                              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(8, 80-fabs(car->_speed_x))/4))
-                             / 2.0;
+				              (steer_correct ? (steer_diff * fabs(car->_yaw_rate) * 12) : 0.0) +
+				              -(car->_wheelSlipAccel(REAR_RGT)) +
+				              -(car->_wheelSlipAccel(REAR_LFT)) +
+				              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(4, 80-fabs(car->_speed_x))/8) +
+				              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(4, 80-fabs(car->_speed_x))/8))
+				             / 2.0;
 				break;
 		}
 
