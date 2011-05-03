@@ -16,17 +16,16 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #include <sstream>
 #include <limits>
 
 #include <SDL/SDL.h>
 
-//#include "guiscreen.h"
 #include "glfeatures.h"
 
 // Avoid C lib <cstdlib> "max" to overload <limits> ones.
 #undef min
+
 
 static const char* pszNoUnit = 0;
 
@@ -204,12 +203,33 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 		
 				// Anti-aliasing : detect the max supported number of samples
 				// (assumed to be <= 32).
+#ifndef WIN32
 				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+#endif
 				int nMaxMultiSamples = 32; // Hard coded max value for the moment.
 				while (!pWinSurface && nMaxMultiSamples > 1)
 				{
+					// Set the anti-aliasing attributes and setup the video mode.
+#ifdef WIN32
+					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+#endif
 					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
 					pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
+
+					// Now check if we have a video mode, and if it actually features
+					// what we specified.
+#ifdef WIN32
+					int nActualSampleBuffers = 0;
+					SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
+					int nActualMultiSamples = 0;
+					SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
+// 					GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
+// 							   nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
+
+					// If not, try a lower number of samples.
+					if (nActualSampleBuffers == 0 || nActualMultiSamples != nMaxMultiSamples)
+						pWinSurface = 0;
+#endif
 					if (!pWinSurface)
 					{
 						GfLogTrace("%d+%d bit %dx anti-aliased double-buffer not supported\n",
@@ -269,9 +289,11 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 	int nValue;
 	SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nValue);
 	_mapSupportedBool[MultiSampling] = nValue != 0;
+	//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS) = %d\n", nValue);
 	if (nValue)
 	{
 		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nValue);
+		//GfLogDebug("SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES) = %d\n", nValue);
 		if (nValue > 1)
 			_mapSupportedInt[MultiSamplingSamples] = nValue;
 		else
