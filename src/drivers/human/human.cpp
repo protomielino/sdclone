@@ -981,37 +981,6 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	if (HCtx[idx]->paramAsr) 
 	{
 		tdble origaccel = car->_accelCmd;
-#if 0
-		tdble trackangle = RtTrackSideTgAngleL(&(car->_trkPos));
-		tdble angle = trackangle - car->_yaw;
-		NORM_PI_PI(angle);
-
-		tdble maxaccel = 0.0;
-		if (car->_trkPos.seg->type == TR_STR)
-			maxaccel = MIN(car->_accelCmd, 0.2);
-		else if (car->_trkPos.seg->type == TR_LFT && angle < 0.0)
-			maxaccel = MIN(car->_accelCmd, MIN(0.6, -angle));
-		else if (car->_trkPos.seg->type == TR_RGT && angle > 0.0)
-			maxaccel = MIN(car->_accelCmd, MIN(0.6, angle));
-
-		tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
-		NORM_PI_PI(skidAng);
-
-		if (car->_speed_x > 5 && fabs(skidAng) > 0.2)
-		{
-			car->_accelCmd = MIN(car->_accelCmd, 0.15 + 0.70 * cos(skidAng));
-			car->_accelCmd = MAX(car->_accelCmd, maxaccel);
-		}
-#endif
-
-#if 0
-		tdble steer = MIN(fabs(car->_steerCmd), fabs(car->_steerCmd+car->_yaw_rate/3));
-		if (steer > 0.1 && fabs(car->_speed_x) > 7.0)
-		{
-			tdble decel = ((steer-0.1) * (1.0 + steer) * 0.8);
-			car->_accelCmd = MIN(car->_accelCmd, MAX(0.35, 1.0 - decel));
-		}
-#endif
 
 		tdble drivespeed = 0.0;
 		switch (HCtx[idx]->driveTrain)
@@ -1041,18 +1010,20 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				// is steering against the yaw rate, we decrease the amount of acceleration to stop
 				// tirespin sending the rear wheels into a spinout.
 
+				tdble friction = MIN(car->_wheelSeg(REAR_RGT)->surface->kFriction, car->_wheelSeg(REAR_LFT)->surface->kFriction) - 0.2;
+				if (friction < 1.0) friction *= MAX(0.6, friction);
 				bool  steer_correct = (fabs(car->_yaw_rate) > fabs(car->_steerCmd) ||
 				                       (car->_yaw_rate < 0.0 && car->_steerCmd > 0.0) ||
 				                       (car->_yaw_rate > 0.0 && car->_steerCmd < 0.0));
 				tdble steer_diff    = fabs(car->_yaw_rate - car->_steerCmd);
 
-				drivespeed = (((car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) - 30) *
+				drivespeed = (((car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) - (20 * friction)) *
 				              car->_wheelRadius(REAR_LFT) +
-				              (steer_correct ? (steer_diff * fabs(car->_yaw_rate) * 12) : 0.0) +
+				              (steer_correct ? (steer_diff * fabs(car->_yaw_rate) * (8 / friction)) : 0.0) +
 				              -(car->_wheelSlipAccel(REAR_RGT)) +
 				              -(car->_wheelSlipAccel(REAR_LFT)) +
-				              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(4, 80-fabs(car->_speed_x))/8) +
-				              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(4, 80-fabs(car->_speed_x))/8))
+				              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(4, 80-fabs(car->_speed_x))/(8 * friction)) +
+				              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(4, 80-fabs(car->_speed_x))/(8 * friction)))
 				             / 2.0;
 				break;
 		}
