@@ -176,6 +176,9 @@ class TGF_API GfApplication
 	void setEventLoop(GfEventLoop* pEventLoop);
 	GfEventLoop& eventLoop();
 
+	//! Restart the app.
+	virtual void restart();
+
 	//! Exit from the app.
 	virtual void exit(int nStatusCode = 0);
 	

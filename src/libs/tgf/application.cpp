@@ -128,20 +128,33 @@ GfEventLoop& GfApplication::eventLoop()
     return *_pEventLoop;
 }
 
+void GfApplication::restart()
+{
+	// Shutdown the gaming framework.
+	GfShutdown();
+
+	// Delete the event loop if any.
+	delete _pEventLoop;
+
+	// Restart.
+	GfRestart();
+}
+
 void GfApplication::exit(int nStatusCode)
 {
+	// Shutdown the gaming framework.
+	GfShutdown();
+
+	// Delete the event loop if any.
+	delete _pEventLoop;
+
+	// Trace what we are doing.
 	if (!nStatusCode)
 		GfLogInfo("Exiting normally from %s.\n", _strName.c_str());
 	else
 		std::cerr << "Exiting from " << _strName
 				  << " after some error occurred (see above)." << std::endl;
 
-	// Shutdown the gaming framework.
-	GfShutdown();
-
-	// Delete the event loop if any.
-	delete _pEventLoop;
-	
 	// The end.
 	::exit(nStatusCode);
 }

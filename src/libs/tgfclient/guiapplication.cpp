@@ -59,6 +59,7 @@ bool GfuiApplication::parseOptions()
 bool GfuiApplication::setupWindow(bool bNoMenu)
 {
 	// Initialize the window/screen.
+	_bWindowUp = true; // In case, GfScrInit() would call restart() ...
 	_bWindowUp = GfScrInit();
 
 	// Initialize the UI menu infrastructure.
@@ -77,6 +78,25 @@ GfuiEventLoop& GfuiApplication::eventLoop()
 	}
 	
     return *dynamic_cast<GfuiEventLoop*>(_pEventLoop);
+}
+
+void GfuiApplication::restart()
+{
+	// Shutdown the window/screen.
+	if (_bWindowUp)
+	{
+		GfScrShutdown();
+		_bWindowUp = false;
+	}
+
+	// Shutdown the gaming framework.
+	GfShutdown();
+
+	// Delete the event loop if any.
+	delete _pEventLoop;
+
+	// Restart.
+	GfRestart(GfuiMouseIsHWPresent());
 }
 
 void GfuiApplication::exit(int nStatusCode)

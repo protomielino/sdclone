@@ -81,6 +81,7 @@ typedef struct ScreenSize
 TGFCLIENT_API bool GfScrInit(void);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
+TGFCLIENT_API bool GfScrToggleFullScreen();
 TGFCLIENT_API unsigned char* GfScrCaptureAsImage(int* viewW, int *viewH);
 TGFCLIENT_API int GfScrCaptureAsPNG(const char *filename);
 
@@ -640,6 +641,9 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
 	//! Application event loop.
 	GfuiEventLoop& eventLoop();
 	
+	//! Restart the app.
+	virtual void restart();
+
 	//! Exit from the app.
 	virtual void exit(int nStatusCode = 0);
 
