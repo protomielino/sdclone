@@ -18,16 +18,13 @@
  ***************************************************************************/
  
 /** @file    
-    		
+    		Constants for screen / Open GL features config file
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
 
 #ifndef _GUISCREEN_H_
 #define _GUISCREEN_H_
-
-#include <SDL/SDL_video.h>
-
 
 #define GFSCR_CONF_FILE		"config/screen.xml"
 
@@ -37,10 +34,11 @@
 #define GFSCR_ATT_WIN_X		"window width"
 #define GFSCR_ATT_WIN_Y		"window height"
 #define GFSCR_ATT_MAXREFRESH	"maximum refresh frequency"
-#define GFSCR_ATT_FSCR		"fullscreen"
+#define GFSCR_ATT_FSCR		"full-screen"
 #define GFSCR_VAL_YES		"yes"
 #define GFSCR_VAL_NO		"no"
 #define GFSCR_ATT_GAMMA		"gamma"
+#define GFSCR_ATT_ALPHACHANNEL		"alpha channel"
 
 #define GFSCR_ATT_VDETECT			"video mode detect"
 #define GFSCR_VAL_VDETECT_AUTO		"auto"
@@ -86,25 +84,37 @@
 #define GFSCR_ATTR_BLUE		"blue"
 #define GFSCR_ATTR_ALPHA	"alpha"
 
-#define GfSCR_SECT_GLFEATURES			"OpenGL Features"
+// Open GL user-selected features
+#define GFSCR_SECT_GLSELFEATURES			"OpenGL Selected Features"
 
-#define GfSCR_ATT_TEXTURECOMPRESSION		"texture compression"
-#define GfSCR_ATT_TEXTURECOMPRESSION_ENABLED	"enabled"
-#define GfSCR_ATT_TEXTURECOMPRESSION_DISABLED	"disabled"
+#define GFSCR_ATT_TEXTURECOMPRESSION		"texture compression"
+#define GFSCR_ATT_TEXTURECOMPRESSION_ENABLED	"enabled"
+#define GFSCR_ATT_TEXTURECOMPRESSION_DISABLED	"disabled"
 
-#define GfSCR_ATT_MAXTEXTURESIZE		"max texture size"
+#define GFSCR_ATT_MAXTEXTURESIZE		"max texture size"
 
-#define GfSCR_ATT_MULTITEXTURING		"multi-texturing"
-#define GfSCR_ATT_MULTITEXTURING_ENABLED	"enabled"
-#define GfSCR_ATT_MULTITEXTURING_DISABLED	"disabled"
+#define GFSCR_ATT_MULTITEXTURING		"multi-texturing"
+#define GFSCR_ATT_MULTITEXTURING_ENABLED	"enabled"
+#define GFSCR_ATT_MULTITEXTURING_DISABLED	"disabled"
 
-#define GfSCR_ATT_MULTISAMPLING		"multi-sampling"
-#define GfSCR_ATT_MULTISAMPLING_ENABLED	"enabled"
-#define GfSCR_ATT_MULTISAMPLING_DISABLED	"disabled"
+#define GFSCR_ATT_MULTISAMPLING		"multi-sampling"
+#define GFSCR_ATT_MULTISAMPLING_ENABLED	"enabled"
+#define GFSCR_ATT_MULTISAMPLING_DISABLED	"disabled"
 
-#define GfSCR_ATT_MULTISAMPLING_SAMPLES		"multi-sampling samples"
+#define GFSCR_ATT_MULTISAMPLINGSAMPLES		"multi-sampling samples"
 
-SDL_Surface* gfScrGetScreenSurface();
+// Open GL auto-detected features
+#define GFSCR_SECT_GLDETFEATURES			"OpenGL Detected Features"
+
+#define GFSCR_ATT_DOUBLEBUFFER		"double buffer"
+#define GFSCR_ATT_COLORDEPTH		"color depth"
+#define GFSCR_ATT_ALPHADEPTH		"alpha depth"
+#define GFSCR_ATT_RECTANGLETEXTURES		"rectangle textures"
+#define GFSCR_ATT_NONPOTTEXTURES		"non-pot textures"
+#define GFSCR_ATT_MULTITEXTURINGUNITS		"multi-texturing units"
+
+// Open GL detection specs
+#define GFSCR_SECT_GLDETSPECS			"OpenGL Detection Specs"
 
 #endif /* _GUISCREEN_H_ */ 
 

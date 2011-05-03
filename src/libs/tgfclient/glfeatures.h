@@ -52,9 +52,8 @@
    
    A feature that is not supported can not be selected (or enabled).
    A feature that is selected is not necessarily enabled (not done here).
-   
-   Warning: GfglFeatures::checkSupport() mustn't be used before the 1st successfull call
-            to SDL_SetVideoMode() (needs an up-and-running frame buffer).
+   Integer features must follow an "increasing order" : a value better value is greater,
+   and thus a selected value can't be greater than a supported one.
 */
 
 class TGFCLIENT_API GfglFeatures
@@ -64,19 +63,33 @@ class TGFCLIENT_API GfglFeatures
 	// Access to the unique instance.
 	static GfglFeatures& self();
 
-	// Load selected features from the config file (default = GFSCR_CONF_FILE).
+	// Check best supported OpenGL features, and store report to the config file
+	// (default = GFSCR_CONF_FILE). May restart the game.
+	bool checkBestSupport(int nWidth, int nHeight, int nDepth,
+						  bool bAlpha, bool bFullScreen, void* hparmConfig = 0);
+
+	// Detect standard supported features. Don't restart the game.
+	// Precondiftion: SDL_setVideoMode(...)
+	void detectStandardSupport();
+
+	// Dump detected supported features (in the current trace stream).
+	void dumpSupport() const;
+	
+	// Load user-selected features from the config file (default = GFSCR_CONF_FILE).
+	// Precondiftion: checkBestSupport() or checkStandardSupport().
 	void loadSelection(void* hparmConfig = 0);
 	
-	// Check supported features (ask OpenGL), and update selection as needed.
-	// Warning: Must not be called before any successfull call to SDL_SetVideoMode()
-	void checkSupport();
-
-	// Store selected features to the config file (default = GFSCR_CONF_FILE).
+	// Store user-selected features to the config file (default = GFSCR_CONF_FILE).
+	// Precondiftion: loadSelection()
 	void storeSelection(void* hparmConfig = 0) const;
 	
-	// Dump selected features (in the current trace stream).
+	// Dump user-selected features (in the current trace stream).
 	void dumpSelection() const;
-	
+
+	// Dump info about the underlying hardware
+	// Precondiftion: SDL_setVideoMode(...)
+	void dumpHardwareInfo() const;
+
 	// Bool-valued features.
 	enum EFeatureBool
 	{
@@ -90,9 +103,10 @@ class TGFCLIENT_API GfglFeatures
 	void select(EFeatureBool eFeature, bool bSelected);
 	bool isSelected(EFeatureBool eFeature) const;
 	bool isSupported(EFeatureBool eFeature) const;
-	void setSupported(EFeatureBool eFeature, bool bSupported);
+	//void setSupported(EFeatureBool eFeature, bool bSupported);
 
-	// Integer-valued features (WARNING: For the moment, -1 means "not supported").
+	// Integer-valued features (use InvalidInt for the "not supported" / "not selected" cases).
+	static int InvalidInt;
 	enum EFeatureInt
 	{
 		ColorDepth, AlphaDepth,
@@ -103,25 +117,42 @@ class TGFCLIENT_API GfglFeatures
 	void select(EFeatureInt eFeature, int nSelectedValue);
 	int getSelected(EFeatureInt eFeature) const;
 	int getSupported(EFeatureInt eFeature) const;
-	void setSupported(EFeatureInt eFeature, int nSupportedValue);
+	//void setSupported(EFeatureInt eFeature, int nSupportedValue);
 
 	// Get the pointer to the named OpenGL extension function.
 	static void* getProcAddress(const char* pszName);
 	
  private:
 	
-	GfglFeatures(); // Singleton pattern => private constructor.
+	//! Singleton pattern => private constructor.
+	GfglFeatures();
 
+	// Update supported OpenGL features according to the given frame buffer specs.
+	bool detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
+						   bool& bAlpha, bool& bFullScreen);
+
+	bool loadSupport(int &nWidth, int &nHeight, int &nDepth,
+					 bool &bAlpha, bool &bFullScreen, void* hparmConfig = 0);
+
+	void storeSupport(int nWidth, int nHeight, int nDepth,
+					  bool bAlpha, bool bFullScreen, void* hparmConfig = 0);
+
+	static void* openConfigFile();
+	static void closeConfigFile(void* hparmConfig, bool bWrite = false);
+	
  private:
 
-	// The unique instance.
+	//! The unique instance (singleton pattern).
 	static GfglFeatures* _pSelf;
 
-	// Maps of supported features (bool and int-valued).
+	//! The config files params pointer.
+	//void* hparmConfig;
+	
+	//! Maps of supported features (bool and int-valued).
 	std::map<EFeatureBool, bool> _mapSupportedBool;
 	std::map<EFeatureInt, int>   _mapSupportedInt;
 
-	// Maps of selected features (bool and int-valued).
+	//! Maps of selected features (bool and int-valued).
 	std::map<EFeatureBool, bool> _mapSelectedBool;
 	std::map<EFeatureInt, int>   _mapSelectedInt;
 };

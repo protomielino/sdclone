@@ -115,13 +115,11 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
     // Save display settings.
     pMenu->storeSettings();
 
-	// TODO: Simply call GfuiApp().restart() (when it is implemented ;-).
-		
     // Shutdown the user interface.
 	LegacyMenu::self().shutdown();
 
     // Restart the game.
-    GfRestart(GfuiMouseIsHWPresent());
+    GfuiApp().restart();
 
     // TODO: A nice system to get back to previous display settings if the chosen ones
     //       keep the game from really restarting (ex: unsupported full screen size) ?
@@ -238,8 +236,8 @@ void DisplayMenu::storeSettings() const
 	// Deselect anti-aliasing from the Open GL settings if 'compatible' mode
 	// selected for the video initialization (anti-aliasing not supported in this mode).
 	if (_eVideoInitMode == eCompatible)
-		GfParmSetStr(hScrConfParams, GfSCR_SECT_GLFEATURES, GfSCR_ATT_MULTISAMPLING,
-					 GfSCR_ATT_MULTISAMPLING_DISABLED);
+		GfParmSetStr(hScrConfParams, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTISAMPLING,
+					 GFSCR_ATT_MULTISAMPLING_DISABLED);
 	
 	// Write and release screen config params file.
 	GfParmWriteFile(NULL, hScrConfParams, "Screen");

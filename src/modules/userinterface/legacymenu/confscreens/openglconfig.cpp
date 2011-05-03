@@ -39,7 +39,7 @@
 				  
 // Texture compression.
 static const char *ATextureCompTexts[] =
-	{GfSCR_ATT_TEXTURECOMPRESSION_DISABLED, GfSCR_ATT_TEXTURECOMPRESSION_ENABLED};
+	{GFSCR_ATT_TEXTURECOMPRESSION_DISABLED, GFSCR_ATT_TEXTURECOMPRESSION_ENABLED};
 static const int NTextureComps =
 	sizeof(ATextureCompTexts) / sizeof(ATextureCompTexts[0]);
 static int NCurTextureCompIndex = 0;
@@ -57,7 +57,7 @@ static const int NDefaultTextureSize = 64; // In case everything goes wrong.
 
 // Multi-texturing.
 static const char *AMultiTextureTexts[] =
-	{GfSCR_ATT_MULTITEXTURING_DISABLED, GfSCR_ATT_MULTITEXTURING_ENABLED};
+	{GFSCR_ATT_MULTITEXTURING_DISABLED, GFSCR_ATT_MULTITEXTURING_ENABLED};
 static const int NMultiTextures =
 	sizeof(AMultiTextureTexts) / sizeof(AMultiTextureTexts[0]);
 static int NCurMultiTextureIndex = 0;
@@ -87,16 +87,16 @@ static void onAccept(void *)
 	// Store current state of settings to the GL features layer.
 	GfglFeatures::self().select(GfglFeatures::TextureCompression,
 								 strcmp(ATextureCompTexts[NCurTextureCompIndex],
-										GfSCR_ATT_TEXTURECOMPRESSION_ENABLED) ? false : true);
+										GFSCR_ATT_TEXTURECOMPRESSION_ENABLED) ? false : true);
 	GfglFeatures::self().select(GfglFeatures::TextureMaxSize,
 								 AMaxTextureSizeTexts[NCurMaxTextureSizeIndex]);
 	GfglFeatures::self().select(GfglFeatures::MultiTexturing,
 								 strcmp(AMultiTextureTexts[NCurMultiTextureIndex],
-										GfSCR_ATT_MULTITEXTURING_ENABLED) ? false : true);
+										GFSCR_ATT_MULTITEXTURING_ENABLED) ? false : true);
 	GfglFeatures::self().select(GfglFeatures::MultiSampling,
 								VecMultiSampleTexts[NCurMultiSampleIndex]
-								!= GfSCR_ATT_MULTISAMPLING_DISABLED);
-	if (VecMultiSampleTexts[NCurMultiSampleIndex] != GfSCR_ATT_MULTISAMPLING_DISABLED)
+								!= GFSCR_ATT_MULTISAMPLING_DISABLED);
+	if (VecMultiSampleTexts[NCurMultiSampleIndex] != GFSCR_ATT_MULTISAMPLING_DISABLED)
 		GfglFeatures::self().select(GfglFeatures::MultiSamplingSamples,
 									(int)pow(2.0, (double)NCurMultiSampleIndex));
 
@@ -111,14 +111,12 @@ static void onAccept(void *)
 	if (GfglFeatures::self().isSelected(GfglFeatures::MultiSampling) != BMultiSamplingWasSelected
 		|| GfglFeatures::self().getSelected(GfglFeatures::MultiSamplingSamples) != BPrevMultiSamplingSamples)
 	{
-		// TODO: Simply call GfuiApp().restart() (when it is implemented ;-).
-		
 		// Shutdown the user interface.
 		LegacyMenu::self().shutdown();
 		
 		// Restart the game.
-		GfRestart(GfuiMouseIsHWPresent());
-
+		GfuiApp().restart();
+		
 		// TODO: A nice system to get back to previous display settings if the chosen ones
 		//       keep the game from really restarting (ex: unsupported full screen size) ?
 	}
@@ -178,7 +176,7 @@ static void onActivate(void * /* dummy */)
 	{
 		const char *pszTexComp =
 			GfglFeatures::self().isSelected(GfglFeatures::TextureCompression)
-			? GfSCR_ATT_TEXTURECOMPRESSION_ENABLED : GfSCR_ATT_TEXTURECOMPRESSION_DISABLED;
+			? GFSCR_ATT_TEXTURECOMPRESSION_ENABLED : GFSCR_ATT_TEXTURECOMPRESSION_DISABLED;
 		for (i = 0; i < NTextureComps; i++)
 		{
 			if (!strcmp(pszTexComp, ATextureCompTexts[i]))
@@ -251,7 +249,7 @@ static void onActivate(void * /* dummy */)
 	{
 		const char *pszMultiTex =
 			GfglFeatures::self().isSelected(GfglFeatures::MultiTexturing)
-			? GfSCR_ATT_MULTITEXTURING_ENABLED : GfSCR_ATT_MULTITEXTURING_DISABLED;
+			? GFSCR_ATT_MULTITEXTURING_ENABLED : GFSCR_ATT_MULTITEXTURING_DISABLED;
 		for (i = 0; i < NMultiTextures; i++)
 		{
 			if (!strcmp(pszMultiTex, AMultiTextureTexts[i]))
@@ -365,7 +363,7 @@ void* OpenGLMenuInit(void *prevMenu)
 
 	// Initialize multi-sampling levels.
 	NMultiSamples = 1;
-	VecMultiSampleTexts.push_back(GfSCR_ATT_MULTISAMPLING_DISABLED);
+	VecMultiSampleTexts.push_back(GFSCR_ATT_MULTISAMPLING_DISABLED);
 	if (GfglFeatures::self().isSupported(GfglFeatures::MultiSampling)
 		&& GfglFeatures::self().getSupported(GfglFeatures::MultiSamplingSamples) > 1)
 	{

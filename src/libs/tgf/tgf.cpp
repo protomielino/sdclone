@@ -465,20 +465,24 @@ void GfInit(void)
  */
 void GfShutdown(void)
 {
+	GfLogDebug("Shutting down gaming framework.\n");
+	
 	// Shudown SDL.
 	SDL_Quit();
 
 	// Shutdown the active profilers and dump the report if any.
 	GfProfStopActiveProfiles();
-    GfProfPrintReport();
+	GfProfPrintReport();
 }
 
 /** Restart the gaming framework (restart the current process).
     @ingroup	tgf
     @param	bHardwareMouse	If true, use hardware mouse cursor
     @return	None
-    @warning	Never returns (restart the process).
+    @warning	GfShutdown should be called before ; never returns (restart the process).
  */
+
+// TODO: Move this to the GfApplication/GfuiApplication separate scheme.
 void GfRestart(bool bHardwareMouse)
 {
     int retcode = 0;
@@ -549,7 +553,7 @@ void GfRestart(bool bHardwareMouse)
 	
     // Finally, last null arg.
     args[argInd] = 0;
-	  
+
     // Exec the command : restart the game (simply replacing current process)
     GfLogInfo("Restarting ");
     for (i = 0; args[i]; i++)
