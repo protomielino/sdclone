@@ -1,6 +1,6 @@
 ################################################################################################
 # this Macro find a generic dependency, handling debug suffix
-# all the paramenter are required, in case of lists, use "" in calling
+# all the parameters are required ; in case of lists, use "" when calling
 ################################################################################################
 
 MACRO(FIND_DEPENDENCY DEPNAME INCLUDEFILE LIBRARY_NAMES SEARCHPATHLIST DEBUGSUFFIX)
@@ -30,7 +30,7 @@ MACRO(FIND_DEPENDENCY DEPNAME INCLUDEFILE LIBRARY_NAMES SEARCHPATHLIST DEBUGSUFF
     MARK_AS_ADVANCED("${DEPNAME}_LIBRARY")
     #MESSAGE(" ${DEPNAME}_LIBRARY = '${${DEPNAME}_LIBRARY}'")
 
-    SET( ${DEPNAME}_FOUND "NO" )
+    SET(${DEPNAME}_FOUND "NO" )
     IF(${DEPNAME}_INCLUDE_DIR AND ${DEPNAME}_LIBRARY)
       SET( ${DEPNAME}_FOUND "YES" )
     ENDIF(${DEPNAME}_INCLUDE_DIR AND ${DEPNAME}_LIBRARY)
@@ -67,25 +67,30 @@ MACRO(SEARCH_3RDPARTY OSG_3RDPARTY_BIN)
         IF(ZLIB_FOUND)
             FIND_DEPENDENCY(PNG png.h "libpng;libpng13" ${OSG_3RDPARTY_BIN} "D")
             IF(PNG_FOUND)
-                #forcing subsequent FindPNG stuff to not search for other variables.... kind of a hack 
+                #force subsequent FindPNG stuff not to search for other variables ... kind of a hack 
                 SET(PNG_PNG_INCLUDE_DIR ${PNG_INCLUDE_DIR} CACHE FILEPATH "")
                 MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR)
             ENDIF(PNG_FOUND)
         ENDIF(ZLIB_FOUND)        
 ENDMACRO(SEARCH_3RDPARTY OSG_3RDPARTY_BIN)
 
-
-
-
 ################################################################################################
-# this is code for handling optional 3DPARTY usage
+# this is code for handling optional 3DPARTY usage (mainly under Windows)
 ################################################################################################
 
-OPTION(USE_3DPARTY_BIN "Set to ON to use 3rdParty prebuilt dependencies located side of Speed Dreams sources.  Use OFF for avoiding." ON)
-IF(USE_3DPARTY_BIN)
+OPTION(SDEXT_USE_CUSTOM_3DPARTY "Set to ON to use 3rdParty prebuilt API located in <PROJECT_SOURCE_DIR>/../3rdparty" ON)
+MARK_AS_ADVANCED(SDEXT_USE_CUSTOM_3DPARTY)
+
+IF(SDEXT_USE_CUSTOM_3DPARTY)
     GET_FILENAME_COMPONENT(PARENT_DIR ${PROJECT_SOURCE_DIR} PATH)
-    SET(ACTUAL_3DPARTY_DIR "${PARENT_DIR}/3rdparty" CACHE PATH "Location of 3rdParty dependencies")
-    IF(EXISTS ${ACTUAL_3DPARTY_DIR})
-        SEARCH_3RDPARTY(${ACTUAL_3DPARTY_DIR})
-    ENDIF(EXISTS ${ACTUAL_3DPARTY_DIR})
-ENDIF(USE_3DPARTY_BIN)
+    SET(SDEXT_CUSTOM_3DPARTY_DIR "${PARENT_DIR}/3rdparty" CACHE PATH 
+        "Location of 3rdParty dependencies")
+    IF(EXISTS ${SDEXT_CUSTOM_3DPARTY_DIR})
+        SEARCH_3RDPARTY(${SDEXT_CUSTOM_3DPARTY_DIR})
+    ENDIF(EXISTS ${SDEXT_CUSTOM_3DPARTY_DIR})
+
+    # Not very useful if not Windows.
+    IF(NOT WIN32)
+        MARK_AS_ADVANCED(SDEXT_CUSTOM_3DPARTY_DIR)
+    ENDIF(NOT WIN32)
+ENDIF(SDEXT_USE_CUSTOM_3DPARTY)
