@@ -1746,7 +1746,7 @@ GfParmWriteFileSDHeader (const char *file, void *parmHandle, const char *name, c
     @return	none
 */
 void
-GfParmRemove (void *parmHandle, char *sectionName, char *paramName)
+GfParmRemove (void *parmHandle, const char *sectionName, const char *paramName)
 {
     struct parmHandle *handle = (struct parmHandle *)parmHandle;
     struct parmHeader *conf;
