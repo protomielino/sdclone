@@ -25,6 +25,8 @@
 //#include "guiscreen.h"
 #include "glfeatures.h"
 
+// Avoid C lib <cstdlib> "max" to overload <limits> ones.
+#undef min
 
 static const char* pszNoUnit = 0;
 
