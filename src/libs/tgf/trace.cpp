@@ -47,7 +47,7 @@
 #include "version.h"
 #endif
 
-#include "tgf.h"
+#include "tgf.hpp"
 
 
 // Log levels.
@@ -195,7 +195,7 @@ void GfLogFatal(const char *pszFmt, ...)
 			   TEXT("Fatal error"), MB_OK|MB_ICONERROR|MB_SETFOREGROUND);
 #endif
 
-    exit(1);
+    GfApp().exit(1);
 }
 
 #ifdef TRACE_OUT
