@@ -204,16 +204,43 @@ SimWheelUpdateRide(tCar *car, int index)
 		wheel->susp.fx = adjRadius - adjRadius/rel_normal.z;
 		wheel->susp.fy = 0.0;
 		//wheel->susp.x = wheel->rideHeight =
-		max_extend =	adjRadius + ((dZ)*normal.z - adjRadius)/rel_normal.z;
+		max_extend = adjRadius + ((dZ)*normal.z - adjRadius)/rel_normal.z;
     } else {
 		//wheel->susp.x = wheel->rideHeight = (wheel->pos.z - Zroad);
 		//	wheel->susp.x = wheel->rideHeight = wheel->susp.spring.packers; 
 		wheel->susp.fx = 0.0;
 		wheel->state = wheel->state | SIM_SUSP_COMP;
-		// WARNING: Which exact value for max_extend in this case ?
-		max_extend = 0.0; // Line added after GCC warned about "might not be initialized" in non-debug builds !
+		max_extend = 0.0;
     }
 
+	/* Note from Christos about the 'max_extend' variable set right above :
+	   This variable's name a left-over from simuv2. It has a slightly extended use.
+	   Perhaps the name should be changed.
+
+	   In simuv2, when the suspension was fully compressed then the suspension reaction
+	   was ignored, the car speed was set to be tangential to the track,
+	   and the car height was set to be just above the track.
+
+	   Now it basically signifies that the car is not a 'normal' regime, meaning either:
+	   a) The suspension is maxed out, and perhaps the car is touching the ground.
+	   b) The car has rolled over more than a certain amount.
+
+	   In either case, the collision code is used to see how to react.
+	   In the collision code, we check if the car is upright :
+	   
+	   If the car is upright:
+	   * If the car is not very low, then the simuv2 approach is used.
+	   * If the car is under the track (beyond a margin) then damages are taken
+	     and there is some friction.
+	   If the car is not upright, then we use the collision code with the ground.
+
+	   Now, this collision code with the ground (collidez) seems to be somewhat problematic,
+	   but I do not know why. Virtually the same code is used for collisions with the walls,
+	   and there the car behaves nicely.
+	   
+	   Possibly there is a mixup with the frames of reference.
+	*/
+	
 	wheel->rideHeight = max_extend;
 
     wheel->bump_force = 0.0; // force of the wheel bumping up into the frame
