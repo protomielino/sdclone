@@ -2,7 +2,7 @@
 <!-- 
     file          : e-track-2.xml
     created       : 28 Mar 2008 
-    last modified : 23 Oct 2010
+    last modified : 04 May 2010
     copyright     : (C) 2008-2010 Wolf-Dieter Beelitz
 -->
 <!--    This program is free software; you can redistribute it and/or modify  -->
@@ -21,8 +21,8 @@
 		<attnum name="pit exit length" min="-2000" max="2000" val="0.0"/>
 		<attnum name="pit lat offset" min="-5" max="5" val="0.0"/>
 		<attnum name="pit long offset" min="-5" max="5" val="0.0"/>
-		<attnum name="pit scale brake" val="1.0"/>
-		<attnum name="pit stop dist" val="1.5"/>
+		<attnum name="pit scale brake" val="0.75"/>
+		<attnum name="pit stop dist" val="3.0"/>
 		<attnum name="start side" val="0.1"/>
 		<attnum name="no avoid" val="25"/>
 		<attnum name="scale_brake" min="0.1" max="2.0" val="1.00"/>
