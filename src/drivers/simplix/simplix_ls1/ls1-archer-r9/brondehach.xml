@@ -16,11 +16,11 @@
 
 <params name="ls1-archer-r9">
   <section name="Front Wing">
-    <attnum name="angle" unit="deg" val="21"/>
+    <attnum name="angle" unit="deg" val="10"/>
   </section>
 
   <section name="Rear Wing">
-    <attnum name="angle" unit="deg" val="24"/>
+    <attnum name="angle" unit="deg" val="22"/>
   </section>
 
   <section name="Rear Differential">
@@ -41,19 +41,19 @@
   </section>
 
   <section name="Front Right Suspension">
-    <attnum name="bellcrank" val="0.86"/>
+    <attnum name="spring" min="100" max="410" unit="kN/m" val="100"/>
   </section>
 
   <section name="Front Left Suspension">
-    <attnum name="bellcrank" val="0.86"/>
+    <attnum name="spring" min="100" max="410" unit="kN/m" val="100"/>
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="bellcrank" val="1.65"/>
+    <attnum name="spring" min="90" max="410" unit="kN/m" val="160"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="bellcrank" val="1.65"/>
+    <attnum name="spring" min="90" max="410" unit="kN/m" val="160"/>
   </section>
 
   <section name="simplix private">

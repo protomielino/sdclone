@@ -3239,7 +3239,7 @@ double TDriver::FilterStart(double Speed)
     Speed *= MAX(0.6,(1.0 - (oCar->race.pos - 1) * Offset));
   }
 
-  // For unknown trakcs do not limit speed to much
+  // For unknown tracks do not limit speed to much
   if(!oStrategy->GoToPit() && (Speed < 12.0))
     Speed = 12.0;
 
@@ -3358,8 +3358,8 @@ double TDriver::FilterTCL(double Accel)
 {
   if (!oRain)
   {
-    if (DistanceRaced < 50)                      // Not at start
-      return Accel;
+    //if (DistanceRaced < 50)                      // Not at start
+    //  return Accel;
   }
 
   if(fabs(CarSpeedLong) < 0.001)                 // Only if driving faster
