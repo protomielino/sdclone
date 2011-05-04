@@ -193,10 +193,10 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
       http://sourceforge.net/project/showfiles.php?group_id=239111 
       (it contains necessary 3rd party libs compiled with/for MSVC 2005)
   c.  Extract from the zip file the "3rdParty" directory to directory level where speed-dreams is installed.  
-      Example: If sources are in c:\sdl-port, then extract 3rd party zip in c:\ => c:\3rdParty directory.
+      Example: If sources are in c:\gamesources\speed-dreams, then extract 3rd party zip in c:\ => c:\gamesources\3rdParty directory.
   d.  Startup CMake and set "Where is the source code" and "Where to build the binaries" 
       to the path where Speed-Dreams sources are installed.
-      Example: If sources are in c:\sdl-port, specify c:\sdl-port for the 2 fields.
+      Example: If sources are in c:\gamesources\speed-dreams, specify c:\gamesources\speed-dreams for the 2 fields.
   e.  Press "Configure" button  and select the desired compiler.
       Re-press the "Configure" button until the "OK" button is no more greyed.
   f.  Press "OK" button.  CMake will generate the solution file "speed-dreams.sln"
