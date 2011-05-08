@@ -408,291 +408,298 @@ grLoadBackground(void)
 	grFilePath = buf;
 	grGammaValue = 1.8;
 	grMipMap = 0;
-	bool UseEnvPng = false;   // Avoid crash with missing env.rgb files (i.e. Wheel-1)
-	bool DoNotUseEnv = false; // Avoid crash with missing env.png
 
+	// Load static background if no sky dome.
 	const tTrackGraphicInfo *graphic = &grTrack->graphic;
-	glClearColor(graphic->bgColor[0], graphic->bgColor[1], graphic->bgColor[2], 1.0);
+	TheBackground = 0;
+	if (!grSkyDomeDistance || grTrack->skyversion < 1)
+	{
+		GfLogInfo("Loading static background (type %d)\n", graphic->bgtype);
 
-	TheBackground = new ssgRoot();
-	clr[0] = clr[1] = clr[2] = 1.0 / (1.0 + 1.0 * grTrack->local.rain);
-	clr[3] = 1.0;
-	nrm[0] = nrm[2] = 0.0;
-	nrm[1] = 1.0;
+		glClearColor(graphic->bgColor[0], graphic->bgColor[1], graphic->bgColor[2], 1.0);
 
-	z1 = -0.5;
-	z2 = 1.0;
+		TheBackground = new ssgRoot();
+		clr[0] = clr[1] = clr[2] = 1.0 / (1.0 + 1.0 * grTrack->local.rain);
+		clr[3] = 1.0;
+		nrm[0] = nrm[2] = 0.0;
+		nrm[1] = 1.0;
+
+		z1 = -0.5;
+		z2 = 1.0;
 	
-	grBackgroundType = graphic->bgtype;
-	switch (grBackgroundType) {
-		case TR_BACKGROUND_TYPE_0: //-----------------------------------------------------------
-			bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-			bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-			bg_clr = new ssgColourArray(1);
-			bg_nrm = new ssgNormalArray(1);
-			bg_clr->add(clr);
-			bg_nrm->add(nrm);
+		grBackgroundType = graphic->bgtype;
+		switch (grBackgroundType) {
+			case TR_BACKGROUND_TYPE_0: //-----------------------------------------------------------
+				bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+				bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+				bg_clr = new ssgColourArray(1);
+				bg_nrm = new ssgNormalArray(1);
+				bg_clr->add(clr);
+				bg_nrm->add(nrm);
 	
-			for (i = 0; i < NbBackgroundFaces + 1; i++) {
-				alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-				texLen = (float)i / (float)NbBackgroundFaces;
+				for (i = 0; i < NbBackgroundFaces + 1; i++) {
+					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+					texLen = (float)i / (float)NbBackgroundFaces;
 
-				x = BackgroundDistance * cos(alpha);
-				y = BackgroundDistance * sin(alpha);
+					x = BackgroundDistance * cos(alpha);
+					y = BackgroundDistance * sin(alpha);
 	    
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z1;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0;
-				bg_tex->add(tex);
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z1;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0;
+					bg_tex->add(tex);
 
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z2;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 1.0;
-				bg_tex->add(tex);
-			}//for i
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z2;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 1.0;
+					bg_tex->add(tex);
+				}//for i
 			
-			bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-			bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-			bg_st->disable(GL_LIGHTING);
-			bg->setState(bg_st);
-			bg->setCullFace(0);
-			TheBackground->addKid(bg);
-			break;	//case 1
+				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+				bg_st->disable(GL_LIGHTING);
+				bg->setState(bg_st);
+				bg->setCullFace(0);
+				TheBackground->addKid(bg);
+				break;	//case 1
 
-		case TR_BACKGROUND_TYPE_2: //-----------------------------------------------------------
-			bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-			bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-			bg_clr = new ssgColourArray(1);
-			bg_nrm = new ssgNormalArray(1);
-			bg_clr->add(clr);
-			bg_nrm->add(nrm);
+			case TR_BACKGROUND_TYPE_2: //-----------------------------------------------------------
+				bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+				bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+				bg_clr = new ssgColourArray(1);
+				bg_nrm = new ssgNormalArray(1);
+				bg_clr->add(clr);
+				bg_nrm->add(nrm);
 
-			for (i = 0; i < NbBackgroundFaces / 4 + 1; i++) {
-				alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-				texLen = (float)i / (float)NbBackgroundFaces;
+				for (i = 0; i < NbBackgroundFaces / 4 + 1; i++) {
+					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+					texLen = (float)i / (float)NbBackgroundFaces;
 	    
-				x = BackgroundDistance * cos(alpha);
-				y = BackgroundDistance * sin(alpha);
+					x = BackgroundDistance * cos(alpha);
+					y = BackgroundDistance * sin(alpha);
 	    
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z1;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0;
-				bg_tex->add(tex);
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z1;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0;
+					bg_tex->add(tex);
 
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z2;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0.5;
-				bg_tex->add(tex);
-			}//for i
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z2;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0.5;
+					bg_tex->add(tex);
+				}//for i
 		
-			bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-			bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-			bg_st->disable(GL_LIGHTING);
-			bg->setState(bg_st);
-			bg->setCullFace(0);
-			TheBackground->addKid(bg);
+				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+				bg_st->disable(GL_LIGHTING);
+				bg->setState(bg_st);
+				bg->setCullFace(0);
+				TheBackground->addKid(bg);
 
 
-			bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-			bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-			bg_clr = new ssgColourArray(1);
-			bg_nrm = new ssgNormalArray(1);
-			bg_clr->add(clr);
-			bg_nrm->add(nrm);
+				bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+				bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+				bg_clr = new ssgColourArray(1);
+				bg_nrm = new ssgNormalArray(1);
+				bg_clr->add(clr);
+				bg_nrm->add(nrm);
 
-			for (i = NbBackgroundFaces/4; i < NbBackgroundFaces / 2 + 1; i++) {
-				alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-				texLen = (float)i / (float)NbBackgroundFaces;
+				for (i = NbBackgroundFaces/4; i < NbBackgroundFaces / 2 + 1; i++) {
+					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+					texLen = (float)i / (float)NbBackgroundFaces;
 	    
-				x = BackgroundDistance * cos(alpha);
-				y = BackgroundDistance * sin(alpha);
+					x = BackgroundDistance * cos(alpha);
+					y = BackgroundDistance * sin(alpha);
 				
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z1;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0.5;
-				bg_tex->add(tex);
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z1;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0.5;
+					bg_tex->add(tex);
 
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z2;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 1.0;
-				bg_tex->add(tex);
-			}//for i
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z2;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 1.0;
+					bg_tex->add(tex);
+				}//for i
 			
-			bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-			bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-			bg_st->disable(GL_LIGHTING);
-			bg->setState(bg_st);
-			bg->setCullFace(0);
-			TheBackground->addKid(bg);
+				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+				bg_st->disable(GL_LIGHTING);
+				bg->setState(bg_st);
+				bg->setCullFace(0);
+				TheBackground->addKid(bg);
 
 
-			bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-			bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-			bg_clr = new ssgColourArray(1);
-			bg_nrm = new ssgNormalArray(1);
+				bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+				bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+				bg_clr = new ssgColourArray(1);
+				bg_nrm = new ssgNormalArray(1);
 
-			bg_clr->add(clr);
-			bg_nrm->add(nrm);
+				bg_clr->add(clr);
+				bg_nrm->add(nrm);
 
-			for (i = NbBackgroundFaces / 2; i < 3 * NbBackgroundFaces / 4 + 1; i++) {
-				alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-				texLen = (float)i / (float)NbBackgroundFaces;
+				for (i = NbBackgroundFaces / 2; i < 3 * NbBackgroundFaces / 4 + 1; i++) {
+					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+					texLen = (float)i / (float)NbBackgroundFaces;
 	    
-				x = BackgroundDistance * cos(alpha);
-				y = BackgroundDistance * sin(alpha);
+					x = BackgroundDistance * cos(alpha);
+					y = BackgroundDistance * sin(alpha);
 	    
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z1;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0.0;
-				bg_tex->add(tex);
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z1;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0.0;
+					bg_tex->add(tex);
 
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z2;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0.5;
-				bg_tex->add(tex);
-			}//for i
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z2;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0.5;
+					bg_tex->add(tex);
+				}//for i
 	
-			bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-			bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-			bg_st->disable(GL_LIGHTING);
-			bg->setState(bg_st);
-			bg->setCullFace(0);
-			TheBackground->addKid(bg);
+				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+				bg_st->disable(GL_LIGHTING);
+				bg->setState(bg_st);
+				bg->setCullFace(0);
+				TheBackground->addKid(bg);
 
 
-			bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-			bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-			bg_clr = new ssgColourArray(1);
-			bg_nrm = new ssgNormalArray(1);
+				bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+				bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+				bg_clr = new ssgColourArray(1);
+				bg_nrm = new ssgNormalArray(1);
 
-			bg_clr->add(clr);
-			bg_nrm->add(nrm);
+				bg_clr->add(clr);
+				bg_nrm->add(nrm);
 
-			for(i = 3 * NbBackgroundFaces / 4; i < NbBackgroundFaces + 1; i++) {
-				alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
-				texLen = (float)i / (float)NbBackgroundFaces;
+				for(i = 3 * NbBackgroundFaces / 4; i < NbBackgroundFaces + 1; i++) {
+					alpha = (float)i * 2 * PI / (float)NbBackgroundFaces;
+					texLen = (float)i / (float)NbBackgroundFaces;
 				
-				x = BackgroundDistance * cos(alpha);
-				y = BackgroundDistance * sin(alpha);
+					x = BackgroundDistance * cos(alpha);
+					y = BackgroundDistance * sin(alpha);
 				
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z1;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 0.5;
-				bg_tex->add(tex);
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z1;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 0.5;
+					bg_tex->add(tex);
 
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z2;
-				bg_vtx->add(vtx);
-				tex[0] = texLen*4.0;
-				tex[1] = 1.0;
-				bg_tex->add(tex);
-			}//for i
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z2;
+					bg_vtx->add(vtx);
+					tex[0] = texLen*4.0;
+					tex[1] = 1.0;
+					bg_tex->add(tex);
+				}//for i
 		
-			bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-			bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-			bg_st->disable(GL_LIGHTING);
-			bg->setState(bg_st);
-			bg->setCullFace(0);
-			TheBackground->addKid(bg);
+				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+				bg_st->disable(GL_LIGHTING);
+				bg->setState(bg_st);
+				bg->setCullFace(0);
+				TheBackground->addKid(bg);
 
-			break;	//case 2
+				break;	//case 2
 
-		case TR_BACKGROUND_TYPE_4: //-----------------------------------------------------------
-			z1 = -1.0;
-			z2 = 1.0;
+			case TR_BACKGROUND_TYPE_4: //-----------------------------------------------------------
+				z1 = -1.0;
+				z2 = 1.0;
 
-			bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
-			bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
-			bg_clr = new ssgColourArray(1);
-			bg_nrm = new ssgNormalArray(1);
-			bg_clr->add(clr);
-			bg_nrm->add(nrm);
+				bg_vtx = new ssgVertexArray(NbBackgroundFaces + 1);
+				bg_tex = new ssgTexCoordArray(NbBackgroundFaces + 1);
+				bg_clr = new ssgColourArray(1);
+				bg_nrm = new ssgNormalArray(1);
+				bg_clr->add(clr);
+				bg_nrm->add(nrm);
 
-			for (i = 0; i < NbBackgroundFaces + 1; i++) {
-				alpha = (double)i * 2 * PI / (double)NbBackgroundFaces;
-				texLen = 1.0 - (float)i / (float)NbBackgroundFaces;
+				for (i = 0; i < NbBackgroundFaces + 1; i++) {
+					alpha = (double)i * 2 * PI / (double)NbBackgroundFaces;
+					texLen = 1.0 - (float)i / (float)NbBackgroundFaces;
 	    
-				x = BackgroundDistance * cos(alpha);
-				y = BackgroundDistance * sin(alpha);
+					x = BackgroundDistance * cos(alpha);
+					y = BackgroundDistance * sin(alpha);
 	    
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z1;
-				bg_vtx->add(vtx);
-				tex[0] = texLen;
-				tex[1] = 0;
-				bg_tex->add(tex);
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z1;
+					bg_vtx->add(vtx);
+					tex[0] = texLen;
+					tex[1] = 0;
+					bg_tex->add(tex);
 
-				vtx[0] = x;
-				vtx[1] = y;
-				vtx[2] = z2;
-				bg_vtx->add(vtx);
-				tex[0] = texLen;
-				tex[1] = 1.0;
-				bg_tex->add(tex);
-			}//for i
+					vtx[0] = x;
+					vtx[1] = y;
+					vtx[2] = z2;
+					bg_vtx->add(vtx);
+					tex[0] = texLen;
+					tex[1] = 1.0;
+					bg_tex->add(tex);
+				}//for i
 	
-			bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
-			bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
-			bg_st->disable(GL_LIGHTING);
-			bg->setState(bg_st);
-			bg->setCullFace(0);
-			TheBackground->addKid(bg);
-			break;//case 4
+				bg = new ssgVtxTable(GL_TRIANGLE_STRIP, bg_vtx, bg_nrm, bg_tex, bg_clr);
+				bg_st = (ssgSimpleState*)grSsgLoadTexState(graphic->background);
+				bg_st->disable(GL_LIGHTING);
+				bg->setState(bg_st);
+				bg->setCullFace(0);
+				TheBackground->addKid(bg);
+				break;//case 4
 
-		default:
-			GfLogError("Unsupported background type %d\n", graphic->bgtype);
-			break;
-	}//switch grBackgroundType
-
-	/* Lens Flares */
+			default:
+				GfLogError("Unsupported background type %d\n", graphic->bgtype);
+				break;
+		}//switch grBackgroundType
+	} //if (!grSkyDomeDistance || grTrack->skyversion < 1)
+	
+	// Lens Flares
 	SunAnchor = new ssgBranch;
 	TheScene->addKid(SunAnchor);
 
-	//Environment Mapping Settings
+	// Environment Mapping Settings
+	bool bUseEnvPng = false;   // Avoid crash with missing env.rgb files (i.e. Wheel-1)
+	bool bDoNotUseEnv = false; // Avoid crash with missing env.png
 	grEnvSelector = new ssgStateSelector(graphic->envnb);
 	for (i = 0; i < graphic->envnb; i++) {
 		GfLogTrace("Loading %d Environment Mapping Image %s\n", i, graphic->env[i]);
 		envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
         // Avoid crash with missing env.rgb files (i.e. Wheel-1)
-		if (envst == NULL) {
+		if (!envst) {
 			GfLogWarning("Failed : trying fallback env.png\n");
 			envst = (ssgSimpleState*)grSsgLoadTexState("env.png");
-			if (envst == NULL) {
+			if (!envst) {
 				GfLogError("No usable Environment Mapping Image for #%d : stop displaying graphics!\n", i);
-				DoNotUseEnv = true;
+				bDoNotUseEnv = true;
 				break;
 			}
 			else
-				UseEnvPng = true;
+				bUseEnvPng = true;
 		}
 		envst->enable(GL_BLEND);
 		grEnvSelector->setStep(i, envst);
@@ -702,16 +709,15 @@ grLoadBackground(void)
 	grEnvSelector->selectStep(0); //mandatory !!!
   
 	// Avoid crash with missing env.rgb files (i.e. Wheel-1)
-	if (UseEnvPng)
-		grEnvState=(grMultiTexState*)grSsgEnvTexState("env.png");
-	else {
-		if (DoNotUseEnv)
-			GfLogError("No env.png found!\n");
-		else
-			grEnvState=(grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
-	}
-	grEnvShadowState=(grMultiTexState*)grSsgEnvTexState("envshadow.png");
-	if (grEnvShadowState == NULL) {
+	if (bUseEnvPng)
+		grEnvState = (grMultiTexState*)grSsgEnvTexState("env.png");
+	else if (bDoNotUseEnv)
+		GfLogError("No env.png found!\n");
+	else
+		grEnvState = (grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
+
+	grEnvShadowState = (grMultiTexState*)grSsgEnvTexState("envshadow.png");
+	if (!grEnvShadowState) {
 		ulSetError ( UL_WARNING, "grscene:initBackground Failed to open envshadow.png for reading") ;
 		ulSetError ( UL_WARNING, "        mandatory for top env mapping (should be in the .xml !!) ") ;
 		ulSetError ( UL_WARNING, "        copy the envshadow.png from 'chemisay' to the track you selected ") ;
@@ -721,10 +727,10 @@ grLoadBackground(void)
 	}//if grEnvShadowState
     
 	grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.png");
-	if(grEnvShadowStateOnCars == NULL)
+	if(!grEnvShadowStateOnCars)
 		grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.rgb");
   
-	if(grEnvShadowStateOnCars == NULL) {
+	if(!grEnvShadowStateOnCars) {
 		ulSetError ( UL_WARNING, "grscene:initBackground Failed to open shadow2.png/rgb for reading") ;
 		ulSetError ( UL_WARNING, "        no shadow mapping on cars for this track ") ;
 	}//if grEnvShadowStateOnCars
@@ -767,6 +773,9 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 void
 grDrawStaticBackground(cGrCamera *cam, cGrBackgroundCam *bgCam) 
 {
+	if (!TheBackground)
+		return;
+	
 	TRACE_GL("grDrawStaticBackground: ssgCullAndDraw start");
 
 	bgCam->update(cam);
