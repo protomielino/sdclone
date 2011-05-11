@@ -953,12 +953,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			if (car->_speed_x > 5 && fabs(skidAng) > 0.2)
 				brake1 = MIN(car->_brakeCmd, 0.10 + 0.70 * cos(skidAng));
 
+#if 0
 			// reduce brake if car steering sharply
 			if (fabs(car->_steerCmd) > 0.1)
 			{
 				tdble decel = ((fabs(car->_steerCmd)-0.1) * (1.0 + fabs(car->_steerCmd)) * 0.2);
 				brake2 = MIN(car->_brakeCmd, MAX(0.35, 1.0 - decel));
 			}
+#endif
 
 			const tdble abs_slip = 1.0;
 			const tdble abs_range = 9.0;
@@ -966,12 +968,11 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			// reduce brake if wheels are slipping
 			slip = 0;
 			for (i = 0; i < 4; i++) {
-				slip += car->_wheelSpinVel(i) * car->_wheelRadius(i);
+				slip = MAX(slip, car->_speed_x - (car->_wheelSpinVel(i) * car->_wheelRadius(i)));
 			}
-			slip = car->_speed_x - slip/4.0f;
 
 			if (slip > abs_slip)
-				brake3 = MAX(MIN(0.35, car->_brakeCmd), car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range) * 0.7);
+				brake3 = MAX(MIN(0.35, car->_brakeCmd), car->_brakeCmd - MIN(car->_brakeCmd*0.8, (slip - abs_slip) / abs_range));
 
 			car->_brakeCmd = MIN(brake1, MIN(brake2, brake3));
 		}
@@ -1020,8 +1021,8 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				drivespeed = (((car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) - (20 * friction)) *
 				              car->_wheelRadius(REAR_LFT) +
 				              (steer_correct ? (steer_diff * fabs(car->_yaw_rate) * (8 / friction)) : 0.0) +
-				              -(car->_wheelSlipAccel(REAR_RGT)) +
-				              -(car->_wheelSlipAccel(REAR_LFT)) +
+				              MAX(0.0, (-(car->_wheelSlipAccel(REAR_RGT)) - friction)) +
+				              MAX(0.0, (-(car->_wheelSlipAccel(REAR_LFT)) - friction)) +
 				              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(4, 80-fabs(car->_speed_x))/(8 * friction)) +
 				              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(4, 80-fabs(car->_speed_x))/(8 * friction)))
 				             / 2.0;
