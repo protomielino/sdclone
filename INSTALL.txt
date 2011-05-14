@@ -149,7 +149,6 @@ The Speed Dreams Team.
 3 - Runtime options
 
 * -m Use hardware mouse cursor (better on full-screen mode)
-* -s Disable muti-texturing (runs faster)
 
 4 - Getting Help
 
@@ -161,7 +160,7 @@ or the Tracker (visit <http://sourceforge.net/projects/speed-dreams> for that).
 
 5 - Installation from SVN (developer level only !)
 
-Before you start make you aware that the SVN trunk / branches might crash or even not compile
+Before you start, make you aware that the SVN trunk / branches might crash or even not compile
 sometimes. If you want to get it anyway, follow the instructions at
 http://sourceforge.net/svn/?group_id=239111
 
@@ -198,13 +197,18 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
       to the path where Speed-Dreams sources are installed.
       Example: If sources are in c:\gamesources\speed-dreams, specify c:\gamesources\speed-dreams for the 2 fields.
   e.  Press "Configure" button  and select the desired compiler.
-      Re-press the "Configure" button until the "OK" button is no more greyed.
-  f.  Press "OK" button.  CMake will generate the solution file "speed-dreams.sln"
+      Press the "Configure" button again, until the "OK" button is no more greyed.
+  f.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams.sln"
       and associated project files (*.vcproj)
   g.  Load speed-dreams.sln in MSVC IDE.
   h.  Build the whole Solution (Build / Build Solution)
   i.  Build the INSTALL project (right click on it and select Build).
-  j.  Double-click on speed-dreams.exe in c:\Program Files\speed-dreams\bin
+  j.  Double-click on speed-dreams-2.exe in c:\Program Files\speed-dreams-2\bin
+
+ Note: First-ever startups sometimes fail to correctly write the necesary stuff
+       into <My documents>\speed-dreams-2.settings and this prevents the game from starting.
+       If this happens, simply remove the <My documents>\speed-dreams-2.settings folder
+       with Windows explorer, and restart the game : it should now work.
 
  Note: You might also have to install MSVC 2005/2008 redistribuable (ask M$, yes it's free !)
 
