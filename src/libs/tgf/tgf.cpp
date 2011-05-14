@@ -473,6 +473,9 @@ void GfShutdown(void)
 	// Shutdown the active profilers and dump the report if any.
 	GfProfStopActiveProfiles();
 	GfProfPrintReport();
+
+	// Shutdown the params system.
+	GfParmShutdown();
 }
 
 /** Restart the gaming framework (restart the current process).

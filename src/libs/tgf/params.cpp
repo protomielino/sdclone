@@ -1762,6 +1762,37 @@ GfParmRemove (void *parmHandle, const char *sectionName, const char *paramName)
 }
 
 
+/** Remove a section with given path.
+    @ingroup	conf
+    @param	handle	handle of parameters
+    @param	path	path of section
+    @return	0 Ok
+		<br>-1 Error
+ */
+int
+GfParmRemoveSection (void *handle, const char *path)
+{
+    struct parmHandle *parmHandle = (struct parmHandle *)handle;
+    struct parmHeader *conf;
+    struct section *section;
+
+    if ((parmHandle == NULL) || (parmHandle->magic != PARM_MAGIC)) {
+		GfLogError ("GfParmRemoveSection: bad handle (%p)\n", parmHandle);
+		return -1;
+    }
+
+	conf = parmHandle->conf;
+
+    section = (struct section *)GfHashGetStr (conf->sectionHash, path);
+    if (!section) {
+      GfLogError ("GfParmRemoveSection: Section \"%s\" not found\n", path);
+	return -1;
+    }
+    removeSection (conf, section);
+    return 0;
+}
+
+
 static void parmClean (struct parmHeader *conf)
 {
 	struct section	*section;
@@ -1868,8 +1899,9 @@ void GfParmReleaseHandle (void *parmHandle)
 static void
 evalUnit (char *unit, tdble *dest, int invert)
 {
+	// TODO: Use a static std::map<const char*, tdble> to make this code faster ?
     tdble coeff = 1.0;
-    
+	
     // SI units.
     if (strcmp(unit, "m") == 0) return;
     if (strcmp(unit, "N") == 0) return;
@@ -1882,7 +1914,7 @@ evalUnit (char *unit, tdble *dest, int invert)
     if ((strcmp(unit, "l") == 0) || (strcmp(unit, "litre") == 0)) return;
 
     // Non-SI units conversion
-	// (please keep the order of the following tests : it is staticstically optimized).
+	// (please keep the order of the following tests : it is statistically optimized).
     if (strcmp(unit, "deg") == 0) {
 	coeff = (float) (M_PI/180.0); /* rad */
     } else if ((strcmp(unit, "lbs") == 0)  || (strcmp(unit, "lb") == 0)) {
@@ -2168,10 +2200,10 @@ GfParmGetEltNb (void *handle, const char *path)
     @ingroup	paramsdata
     @param	handle	handle of parameters
     @param	path	path of section
-    @return	0 if doesn't exist, not 0 otherwise.
+    @return	0 if doesn't exist, 1 otherwise.
  */
 int
-GfParmExists (void *handle, const char *path)
+GfParmExistsSection (void *handle, const char *path)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
     struct parmHeader *conf;
@@ -2186,7 +2218,7 @@ GfParmExists (void *handle, const char *path)
 
     section = (struct section *)GfHashGetStr (conf->sectionHash, path);
 
-	return section != 0;
+	return section != 0 ? 1 : 0;
 }
 
 

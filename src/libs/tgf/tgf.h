@@ -367,7 +367,8 @@ TGF_API void *GfParmMergeHandles(void *ref, void *tgt, int mode);
 TGF_API int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
 
 TGF_API void GfParmRemove(void *handle, const char *path, const char *key);
-TGF_API int GfParmExists(void *handle, const char *path);
+TGF_API int GfParmRemoveSection (void *handle, const char *path);
+TGF_API int GfParmExistsSection(void *handle, const char *path);
 TGF_API int GfParmGetEltNb(void *handle, const char *path);
 TGF_API int GfParmListSeekFirst(void *handle, const char *path);
 TGF_API int GfParmListSeekNext(void *handle, const char *path);
@@ -379,6 +380,8 @@ TGF_API int GfParmListClean(void *handle, const char *path);
 TGF_API void GfParmSetVariable(void *handle, char const *path, char const *key, tdble val);
 TGF_API void GfParmRemoveVariable(void *handle, char const *path, char const *key);
 TGF_API tdble GfParmGetVariable(void *handle, char const *path, char const *key);
+
+TGF_API void GfParmShutdown (void);
 
 /********************************************************************************
  * Log/Trace Interface                                                          *

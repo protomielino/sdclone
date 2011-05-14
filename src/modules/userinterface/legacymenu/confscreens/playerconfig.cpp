@@ -332,7 +332,7 @@ PutPlayerSettings(unsigned index)
 			GraphHdle = GfParmReadFile(pszGraphFileName, GFPARM_RMODE_REREAD);
 		}
 
-		if (GfParmExists(GraphHdle, drvDispSecPath)) { // Change section name.
+		if (GfParmExistsSection(GraphHdle, drvDispSecPath)) { // Change section name.
 			GfParmListRenameElt(GraphHdle, GR_SCT_DISPMODE, pszOldDispName, player->dispName());
 		}
 
