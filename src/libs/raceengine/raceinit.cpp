@@ -618,8 +618,9 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     snprintf(buf, sizeof(buf), "cars/%s/%s.xml", elt->_carName, elt->_carName);
     carhdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     category = GfParmGetStr(carhdle, SECT_CAR, PRM_CATEGORY, NULL);
-    GfLogTrace("Loading/merging %s specs for %s ...\n", elt->_carName, curModInfo->name);
     if (category) {
+	  GfLogTrace("Checking/Merging %s specs into %s base setup for %s ...\n",
+				 category, elt->_carName, curModInfo->name);
       strncpy(elt->_category, category, MAX_NAME_LEN - 1);
       elt->_category[MAX_NAME_LEN - 1] = 0;
       /* Read Car Category specifications */
@@ -671,6 +672,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       else
         handle = NULL;
       if (handle) {
+		GfLogTrace("Checking/Merging %s specific setup into %s setup.\n",
+				   curModInfo->name, elt->_carName);
         if (GfParmCheckHandle(carhdle, handle)) {
           GfLogError("Bad Car parameters for driver %s\n", elt->_name);
           return NULL;
@@ -678,7 +681,9 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         handle = GfParmMergeHandles(carhdle, handle,
                                     GFPARM_MMODE_SRC | GFPARM_MMODE_DST | GFPARM_MMODE_RELSRC | GFPARM_MMODE_RELDST);
       } else {
-        handle = carhdle;
+		GfLogTrace("Keeping %s setup as is for %s (no specific setup).\n",
+				   elt->_carName, curModInfo->name);
+		handle = carhdle;
       }
       elt->_carHandle = handle;
 
