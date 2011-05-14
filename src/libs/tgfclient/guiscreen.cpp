@@ -387,26 +387,56 @@ bool GfScrInit(void)
 	// GfLogInfo("  Hardware acceleration : %s\n", sdlVideoInfo->hw_available ? "Yes" : "No");
 	// GfLogInfo("  Total video memory    : %u Kb\n", sdlVideoInfo->video_mem);
 
-	// Get selected frame buffer specs from config file.
+	// Get selected frame buffer specs from config file
+	// 1) Load the config file
 	char pszConfigFilename[256];
     sprintf(pszConfigFilename, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
     void* hparmScreen = GfParmReadFile(pszConfigFilename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	
+
+	// 2) Check / update test state of any 'in-test' specs.
+	if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
+	{
+		// Remove the 'in-test' specs if the test failed (we are stil in the 'in progress'
+		// test state because the game crashed during the test).
+		if (std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+									 GFSCR_VAL_INPROGRESS)) == GFSCR_VAL_INPROGRESS)
+		{
+			GfLogInfo("Reverting to last validated screen specs, as last test failed.\n");
+			GfParmRemoveSection(hparmScreen, GFSCR_SECT_INTESTPROPS);
+		}
+
+		// If the test has not yet been done, mark it as in-progress
+		// and write the config file to disk, in case the test makes the game crash.
+		else
+		{
+			GfLogInfo("Testing new screen specs : let's see what's happening ...\n");
+			GfParmSetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+						 GFSCR_VAL_INPROGRESS);
+			GfParmWriteFile(NULL, hparmScreen, "Screen");
+		}
+	}
+
+	// 3) Select the 'in-test' specs if present, otherwise the 'validated' ones.
+	const char* pszScrPropSec =
+		GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS)
+		? GFSCR_SECT_INTESTPROPS : GFSCR_SECT_VALIDPROPS;
+
+	// 4) Read the specs.
     int nWinWidth =
-		(int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, 800);
+		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_X, (char*)NULL, 800);
     int nWinHeight =
-		(int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
+		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
     int nTotalDepth =
-		(int)GfParmGetNum(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, 32);
+		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_BPP, (char*)NULL, 32);
     bool bAlphaChannel =
-		std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_ALPHACHANNEL,
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
 								 GFSCR_VAL_YES))
 		== GFSCR_VAL_YES;
 	bool bFullScreen =
-		std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO))
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO))
 		== GFSCR_VAL_YES;
-    bool bBestVideoInitMode =
-		std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_VINIT,
+    bool bTryBestVInitMode =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
 								 GFSCR_VAL_VINIT_BEST))
 		== GFSCR_VAL_VINIT_BEST;
 
@@ -417,18 +447,15 @@ bool GfScrInit(void)
 			
 	// If specified, try best possible settings.
 	PScreenSurface = 0;
-	if (bBestVideoInitMode) 
+	if (bTryBestVInitMode) 
 	{
 		GfLogInfo("Trying 'best possible mode' for video initialization.\n");
 
 		// Detect best supported features for the specified frame buffer specs.
 		// Warning: Restarts the game if the frame buffer specs changed since last call.
-		bBestVideoInitMode =
-			GfglFeatures::self().checkBestSupport(nWinWidth, nWinHeight, nTotalDepth,
-												  bAlphaChannel, bFullScreen, hparmScreen);
-
-		// If successfull detection, setup the user-selected mode.
-		if (bBestVideoInitMode)
+		// If specified and possible, setup the best possible settings.
+		if (GfglFeatures::self().checkBestSupport(nWinWidth, nWinHeight, nTotalDepth,
+			 									  bAlphaChannel, bFullScreen, hparmScreen))
 		{
 			// Load Open GL user settings from the config file.
 			GfglFeatures::self().loadSelection();
@@ -460,35 +487,44 @@ bool GfScrInit(void)
 			}
 
 			// Try the video mode with these parameters : should always work
-			// (unless you upgraded you hardware / OS and didn't clear your config file).
+			// (unless you downgraded you hardware / OS and didn't clear your config file).
 			PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
-			
-			if (!PScreenSurface)
+		}
+
+		// If best mode not supported, or test actually failed,
+		// revert to a supported mode (restart the game).
+		if (!PScreenSurface)
+		{
+			GfLogWarning("Failed to setup best supported video mode "
+						 "whereas previously detected !\n");
+			GfLogWarning("Tip: You should remove your %s%s file and restart,\n",
+						 GfLocalDir(), GFSCR_CONF_FILE);
+			GfLogWarning("     if something changed in your OS"
+						 " or video hardware/driver configuration.\n");
+
+			// If testing new screen specs, remember that the test failed
+			// in order to revert to the previous validated specs on restart.
+			if (std::string(pszScrPropSec) == GFSCR_SECT_INTESTPROPS)
 			{
-				// Should not happen, as we tested it in checkBestSupport ...
-				GfLogWarning("Failed to setup best supported video mode "
-							 "whereas previously detected !\n");
-				GfLogWarning("Falling back to a more compatible default mode ...\n");
-				GfLogInfo("Tip: You should remove your %s%s file and restart,\n",
-						  GfLocalDir(), GFSCR_CONF_FILE);
-				GfLogInfo("     if something changed in your OS"
-						  " or video hardware/driver configuration.\n");
-
-				// Forcing compatible video init. mode.
-				GfParmSetStr(hparmScreen, GFSCR_SECT_PROP, GFSCR_ATT_VINIT,
-							 GFSCR_VAL_VINIT_COMPATIBLE);
-				GfParmWriteFile(NULL, hparmScreen, "Screen");
-				GfParmReleaseHandle(hparmScreen);
-
-				// And restart the game.
-				GfuiApp().restart(); // Never returns.
+				GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_TESTSTATE,
+							 GFSCR_VAL_FAILED);
 			}
+				
+			// Force compatible video init. mode if not testing a new video mode.
+			else
+			{
+				GfLogWarning("Falling back to a more compatible default mode ...\n");
+				GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
+							 GFSCR_VAL_VINIT_COMPATIBLE);
+			}
+			GfParmWriteFile(NULL, hparmScreen, "Screen");
+			GfParmReleaseHandle(hparmScreen);
+
+			// And restart the game.
+			GfuiApp().restart(); // Never returns.
 		}
 	}
-
-	// No more need for the config file.
-	GfParmReleaseHandle(hparmScreen);
-
+	
 	// Video initialization with generic compatible settings.
 	if (!PScreenSurface)
 	{
@@ -507,6 +543,10 @@ bool GfScrInit(void)
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a non-full-screen %dx%dx%d compatible video mode\n",
 					   nWinWidth, nWinHeight, nTotalDepth);
+		
+		// Update screen specs.
+		GfParmSetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
 	}
 
 	// Failed : Try with a lower fallback size  : should be supported everywhere ...
@@ -518,6 +558,11 @@ bool GfScrInit(void)
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n",
 					   nWinWidth, nWinHeight, nTotalDepth);
+		
+		// Update screen specs.
+		GfParmSetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_X, 0, (tdble)nWinWidth);
+		GfParmSetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, 0, (tdble)nWinHeight);
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
 	}
 
 	// Failed : Try with a lower fallback color depth : should be supported everywhere ...
@@ -528,7 +573,14 @@ bool GfScrInit(void)
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a %dx%dx%d compatible video mode\n",
 					   nWinWidth, nWinHeight, nTotalDepth);
+		
+		// Update screen specs.
+		GfParmSetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_BPP, 0, (tdble)nTotalDepth);
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
 	}
+
+	// Close the config file.
+	GfParmReleaseHandle(hparmScreen);
 
 	// Failed : No way ... no more ideas !
 	if (!PScreenSurface)
@@ -541,16 +593,14 @@ bool GfScrInit(void)
 	// If we get here, that's because we succeeded in getting a valid video mode :-)
 	
 	// If 'compatible mode' selected, detect only standard Open GL features
-	// and load settings from the config file.
-	if (!bBestVideoInitMode) 
+	// and load OpenGL settings from the config file.
+	if (!bTryBestVInitMode) 
 	{
 		GfglFeatures::self().detectStandardSupport();
-		
 		GfglFeatures::self().dumpSupport();
-		
 		GfglFeatures::self().loadSelection();
 	}
-	
+
 	// Save view geometry and screen center.
     GfViewWidth = nWinWidth;
     GfViewHeight = nWinHeight;
@@ -600,8 +650,71 @@ bool GfScrInit(void)
 void GfScrShutdown(void)
 {
 	GfLogTrace("Shutting down screen.\n");
-	
+
+	// Shutdown SDL video sub-system.
 	SDL_QuitSubSystem(SDL_INIT_VIDEO);
+
+	// If there's an 'in-test' screen properties section in the config file,
+	// * if the test state is 'to do', do nothing (will be taken care of in next GfScrInit),
+	// * if the test state is 'in progress', validate the new screen properties,
+	// * if the test state is 'failed', revert to the validated screen properties.
+	char pszConfigFilename[256];
+    sprintf(pszConfigFilename, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+    void* hparmScreen = GfParmReadFile(pszConfigFilename, GFPARM_RMODE_STD);
+
+	if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
+	{
+		if (std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+									 GFSCR_VAL_INPROGRESS)) == GFSCR_VAL_INPROGRESS)
+		{
+			GfLogInfo("Validating new screen specs (test was successful).\n");
+		
+			// Copy the 'in test' props to the 'validated' ones.
+			GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_WIN_X, 0,
+						 GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, 0, 800));
+			GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_WIN_Y, 0,
+						 GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, 0, 600));
+			GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_BPP, 0,
+						 GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_BPP, 0, 32));
+			// GfParmSetNum(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, 0,
+			// 			 GfParmGetNum(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, 0, 0));
+			GfParmSetStr(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_VDETECT,
+						 GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VDETECT, GFSCR_VAL_VDETECT_AUTO));
+			const  char* pszVInitMode =
+				GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VINIT,
+							 GFSCR_VAL_VINIT_COMPATIBLE);
+			GfParmSetStr(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_VINIT, pszVInitMode);
+			GfParmSetStr(hparmScreen, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_FSCR,
+						 GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_FSCR, GFSCR_VAL_NO));
+			// Store OpenGL settings if best video init mode selected
+			// (because loadSelection can changed them).
+			if (std::string(pszVInitMode) == GFSCR_VAL_VINIT_BEST)
+				GfglFeatures::self().storeSelection(hparmScreen);
+		}
+		else if (std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+										  GFSCR_VAL_INPROGRESS)) == GFSCR_VAL_FAILED)
+		{
+			GfLogInfo("Canceling new screen specs, back to old ones (test failed).\n");
+		}
+
+
+		if (std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+									 GFSCR_VAL_INPROGRESS)) != GFSCR_VAL_TODO)
+		{
+			// Remove the 'in-test' section.
+			GfParmRemoveSection(hparmScreen, GFSCR_SECT_INTESTPROPS);
+		
+			// Write the screen config file to disk.
+			GfParmWriteFile(NULL, hparmScreen, "Screen");
+		}
+		else
+		{
+			GfLogInfo("New screen specs will be tested when restarting.\n");
+		}
+	}
+	
+	// Release screen config params file.
+	GfParmReleaseHandle(hparmScreen);
 }
 
 

@@ -120,9 +120,6 @@ void DisplayMenu::onAccept(void *pDisplayMenu)
 
     // Restart the game.
     GfuiApp().restart();
-
-    // TODO: A nice system to get back to previous display settings if the chosen ones
-    //       keep the game from really restarting (ex: unsupported full screen size) ?
 }
 
 void DisplayMenu::onCancel(void *pDisplayMenu)
@@ -164,40 +161,46 @@ void DisplayMenu::updateControls()
 
 void DisplayMenu::loadSettings()
 {
-	// Load screen config params file.
+	// Open screen config params file.
 	std::ostringstream ossConfFile;
 	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams =
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	// Select the screen properties to edit : the 'in-test' ones if present,
+	// otherwise the 'validated' ones.
+	const char* pszScrPropSec =
+		GfParmExistsSection(hScrConfParams, GFSCR_SECT_INTESTPROPS)
+		? GFSCR_SECT_INTESTPROPS : GFSCR_SECT_VALIDPROPS;
 	
 	// Video detection mode : Auto or Manual.
 	const char *pszVideoDetectMode =
-		GfParmGetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_VDETECT, GFSCR_VAL_VDETECT_AUTO);
+		GfParmGetStr(hScrConfParams, pszScrPropSec, GFSCR_ATT_VDETECT, GFSCR_VAL_VDETECT_AUTO);
 	_eVideoDetectMode =
 		strcmp(pszVideoDetectMode, GFSCR_VAL_VDETECT_AUTO) ? eManual : eAuto;
 
 	// Color depth (bits per pixel, alpha included).
-	_nColorDepth = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_BPP, NULL, 32);
+	_nColorDepth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_BPP, NULL, 32);
 
 	// Display mode : Full-screen or Windowed.
 	const char *pszFullScreen =
-		GfParmGetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
+		GfParmGetStr(hScrConfParams, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO);
 	_eDisplayMode = strcmp(pszFullScreen, GFSCR_VAL_YES) ? eWindowed : eFullScreen;
 
 	// Screen / window size.
-	_nScreenWidth = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, NULL, 800);
-	_nScreenHeight = (int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, NULL, 600);
+	_nScreenWidth = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_X, NULL, 800);
+	_nScreenHeight = (int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_WIN_Y, NULL, 600);
 	
 	// Video initialization mode : Compatible or Best.
 	const char *pszVideoInitMode =
-		GfParmGetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
+		GfParmGetStr(hScrConfParams, pszScrPropSec, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_COMPATIBLE);
 	_eVideoInitMode =
 		strcmp(pszVideoInitMode, GFSCR_VAL_VINIT_COMPATIBLE) ? eBestPossible : eCompatible;
 
 #ifndef NoMaxRefreshRate
 	// Max. refresh rate (Hz).
 	_nMaxRefreshRate =
-		(int)GfParmGetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, 0);
+		(int)GfParmGetNum(hScrConfParams, pszScrPropSec, GFSCR_ATT_MAXREFRESH, NULL, 0);
 #endif	
 	
 	// Release screen config params file.
@@ -207,34 +210,38 @@ void DisplayMenu::loadSettings()
 // Save graphical settings to XML file.
 void DisplayMenu::storeSettings() const
 {
-	// Load screen config params file.
+	// Open screen config params file.
 	std::ostringstream ossConfFile;
 	ossConfFile << GfLocalDir() << GFSCR_CONF_FILE;
 	void* hScrConfParams =
 		GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	// Write new settings.
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_BPP, (char*)NULL, _nColorDepth);
+	// Write new screen properties to the 'in-test' section, with 'to do' test state
+	// (will become 'validated' after a succesfull restart, once we are sure they are OK :
+	//  see guiscreen::GfScrShutdown).
+	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE, GFSCR_VAL_TODO);
+	
+	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, (char*)NULL, _nScreenWidth);
+	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, (char*)NULL, _nScreenHeight);
+	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_BPP, (char*)NULL, _nColorDepth);
 #ifndef NoMaxRefreshRate
-	GfParmSetNum(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, (char*)NULL, _nMaxRefreshRate);
+	GfParmSetNum(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_MAXREFRESH, (char*)NULL, _nMaxRefreshRate);
 #endif	
 
 	const char* pszVDetectMode =
 		(_eVideoDetectMode == eAuto) ? GFSCR_VAL_VDETECT_AUTO : GFSCR_VAL_VDETECT_MANUAL;
-	GfParmSetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_VDETECT, pszVDetectMode);
+	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VDETECT, pszVDetectMode);
 
 	const char* pszVInitMode =
 		(_eVideoInitMode == eCompatible) ? GFSCR_VAL_VINIT_COMPATIBLE : GFSCR_VAL_VINIT_BEST;
-	GfParmSetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, pszVInitMode);
+	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VINIT, pszVInitMode);
 
 	const char* pszDisplMode =
 		(_eDisplayMode == eFullScreen) ? GFSCR_VAL_YES : GFSCR_VAL_NO;
-	GfParmSetStr(hScrConfParams, GFSCR_SECT_PROP, GFSCR_ATT_FSCR, pszDisplMode);
+	GfParmSetStr(hScrConfParams, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_FSCR, pszDisplMode);
 
-	// Deselect anti-aliasing from the Open GL settings if 'compatible' mode
-	// selected for the video initialization (anti-aliasing not supported in this mode).
+	// Deselect anti-aliasing from the Open GL settings if 'compatible' mode selected
+	// for the video initialization (anti-aliasing not supported in this mode).
 	if (_eVideoInitMode == eCompatible)
 		GfParmSetStr(hScrConfParams, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTISAMPLING,
 					 GFSCR_ATT_MULTISAMPLING_DISABLED);

@@ -28,7 +28,8 @@
 
 #define GFSCR_CONF_FILE		"config/screen.xml"
 
-#define GFSCR_SECT_PROP		"Screen Properties"
+#define GFSCR_SECT_VALIDPROPS		"Validated Screen Properties"
+#define GFSCR_SECT_INTESTPROPS		"In-Test Screen Properties"
 
 #define GFSCR_ATT_BPP		"bpp"
 #define GFSCR_ATT_WIN_X		"window width"
@@ -39,6 +40,11 @@
 #define GFSCR_VAL_NO		"no"
 #define GFSCR_ATT_GAMMA		"gamma"
 #define GFSCR_ATT_ALPHACHANNEL		"alpha channel"
+
+#define GFSCR_ATT_TESTSTATE		"test state"
+#define GFSCR_VAL_TODO		"to do"
+#define GFSCR_VAL_INPROGRESS		"in progress"
+#define GFSCR_VAL_FAILED		"failed"
 
 #define GFSCR_ATT_VDETECT			"video mode detect"
 #define GFSCR_VAL_VDETECT_AUTO		"auto"

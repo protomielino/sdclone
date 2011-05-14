@@ -445,41 +445,10 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 	if (_mapSupportedBool.empty() && _mapSupportedInt.empty())
 	{
 		// Frame buffer specs.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_WIN_X);
-		GfParmRemove(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_WIN_Y);
-		GfParmRemove(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_BPP);
-		GfParmRemove(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_ALPHACHANNEL);
-		GfParmRemove(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_FSCR);
+		GfParmRemoveSection(hparm, GFSCR_SECT_GLDETSPECS);
 	
 		// Supported values.
-		// 1) Double-buffer.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_DOUBLEBUFFER);
-
-		// 2) Color buffer depth.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_COLORDEPTH);
-
-		// 3) Alpha-channel depth.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_ALPHADEPTH);
-
-		// 4) Max texture size.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MAXTEXTURESIZE);
-		
-		// 5) Texture compression.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_TEXTURECOMPRESSION);
-		
-		// 6) Multi-texturing.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTITEXTURING);
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTITEXTURINGUNITS);
-
-		// 7) Rectangle textures).
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_RECTANGLETEXTURES);
-
-		// 8) Non-power-of-2 textures.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_NONPOTTEXTURES);
-
-		// 9) Multi-sampling.
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTISAMPLING);
-		GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTISAMPLINGSAMPLES);
+		GfParmRemoveSection(hparm, GFSCR_SECT_GLDETFEATURES);
 	}
 
 	// If there's support for anything, store it.
@@ -601,16 +570,22 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 		{
 			// Write new user settings about the frame buffer specs
 			// (the detection process might have down-casted them ...).
-			GfParmSetNum(hparm, GFSCR_SECT_PROP, GFSCR_ATT_WIN_X, pszNoUnit,
+			// Note: Sure the specs are in the 'in-test' state here,
+			//       otherwise they would not have changed.
+			GfParmSetNum(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_X, pszNoUnit,
 						 (tdble)nDetWidth);
-			GfParmSetNum(hparm, GFSCR_SECT_PROP, GFSCR_ATT_WIN_Y, pszNoUnit,
+			GfParmSetNum(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_WIN_Y, pszNoUnit,
 						 (tdble)nDetHeight);
-			GfParmSetNum(hparm, GFSCR_SECT_PROP, GFSCR_ATT_BPP, pszNoUnit,
+			GfParmSetNum(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_BPP, pszNoUnit,
 						 (tdble)nDetDepth);
-			GfParmSetStr(hparm, GFSCR_SECT_PROP, GFSCR_ATT_ALPHACHANNEL,
+			GfParmSetStr(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_ALPHACHANNEL,
 						 bDetAlpha ? GFSCR_VAL_YES : GFSCR_VAL_NO);
-			GfParmSetStr(hparm, GFSCR_SECT_PROP, GFSCR_ATT_FSCR,
+			GfParmSetStr(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_FSCR,
 						 bDetFullScreen ? GFSCR_VAL_YES : GFSCR_VAL_NO);
+
+			// But make sure they are not validated yet at restart (only next time if OK).
+			GfParmSetStr(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+						 GFSCR_VAL_TODO);
 
 			// Write new params to config file.
 			GfParmWriteFile(NULL, hparm, "Screen");
@@ -749,7 +724,7 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 	if (!hparmConfig)
 		closeConfigFile(hparm);
 	
-	// Display what we have selected.
+	// Display what we have really selected (after checking / fixing to supported values).
 	dumpSelection();
 }
 
@@ -787,7 +762,26 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 
 	// Force 'best possible' mode for video initialization when anti-aliasing selected
 	if (isSelected(MultiSampling))
-	 	GfParmSetStr(hparm, GFSCR_SECT_PROP, GFSCR_ATT_VINIT, GFSCR_VAL_VINIT_BEST);
+	{
+		// Use the 'in-test' specs if present, and reset the test state
+		// (force a new validation).
+		if (GfParmExistsSection(hparm, GFSCR_SECT_INTESTPROPS))
+		{
+			GfParmSetStr(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
+						 GFSCR_VAL_INPROGRESS);
+			GfParmSetStr(hparm, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_VINIT,
+						 GFSCR_VAL_VINIT_BEST);
+		}
+
+		// Otherwise, use the 'validated' specs ... no new validation needed
+		// (if we can en/disable multi-sampling, it means that we already checked
+		//  that it was possible, and how much).
+		else
+		{
+			GfParmSetStr(hparm, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_VINIT,
+						 GFSCR_VAL_VINIT_BEST);
+		}
+	}
 	
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
@@ -835,13 +829,6 @@ bool GfglFeatures::isSelected(EFeatureBool eFeature) const
 	return itFeature == _mapSelectedBool.end() ? false : itFeature->second;
 }
 
-// void GfglFeatures::setSupported(EFeatureBool eFeature, bool bSupported)
-// {
-// 	_mapSupportedBool[eFeature] = bSupported;
-// 	if (!bSupported && isSelected(eFeature))
-// 		_mapSelectedBool[eFeature] = false; // Deselect if selected and not supported.
-// }
-
 bool GfglFeatures::isSupported(EFeatureBool eFeature) const
 {
 	const std::map<EFeatureBool, bool>::const_iterator itFeature =
@@ -866,13 +853,6 @@ int GfglFeatures::getSelected(EFeatureInt eFeature) const
 		_mapSelectedInt.find(eFeature);
 	return itFeature == _mapSelectedInt.end() ? InvalidInt : itFeature->second;
 }
-
-// void GfglFeatures::setSupported(EFeatureInt eFeature, int nSupportedValue)
-// {
-// 	_mapSupportedInt[eFeature] = nSupportedValue;
-// 	if (getSelected(eFeature) > nSupportedValue) // Selected can't be greater than supported.
-// 		_mapSelectedInt[eFeature] = nSupportedValue;
-// }
 
 int GfglFeatures::getSupported(EFeatureInt eFeature) const
 {

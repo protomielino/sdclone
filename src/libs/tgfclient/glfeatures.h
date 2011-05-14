@@ -103,7 +103,6 @@ class TGFCLIENT_API GfglFeatures
 	void select(EFeatureBool eFeature, bool bSelected);
 	bool isSelected(EFeatureBool eFeature) const;
 	bool isSupported(EFeatureBool eFeature) const;
-	//void setSupported(EFeatureBool eFeature, bool bSupported);
 
 	// Integer-valued features (use InvalidInt for the "not supported" / "not selected" cases).
 	static int InvalidInt;
@@ -117,7 +116,6 @@ class TGFCLIENT_API GfglFeatures
 	void select(EFeatureInt eFeature, int nSelectedValue);
 	int getSelected(EFeatureInt eFeature) const;
 	int getSupported(EFeatureInt eFeature) const;
-	//void setSupported(EFeatureInt eFeature, int nSupportedValue);
 
 	// Get the pointer to the named OpenGL extension function.
 	static void* getProcAddress(const char* pszName);

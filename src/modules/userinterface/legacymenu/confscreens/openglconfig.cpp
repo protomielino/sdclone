@@ -100,7 +100,7 @@ static void onAccept(void *)
 		GfglFeatures::self().select(GfglFeatures::MultiSamplingSamples,
 									(int)pow(2.0, (double)NCurMultiSampleIndex));
 
-	// Store settings from the GL features layer to the graph.xml file.
+	// Store settings from the GL features layer to the screen.xml file.
 	GfglFeatures::self().storeSelection();
 	
 	// Return to previous screen.
@@ -116,9 +116,6 @@ static void onAccept(void *)
 		
 		// Restart the game.
 		GfuiApp().restart();
-		
-		// TODO: A nice system to get back to previous display settings if the chosen ones
-		//       keep the game from really restarting (ex: unsupported full screen size) ?
 	}
 }
 

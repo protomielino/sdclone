@@ -582,7 +582,7 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 			PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 #if (ReadGammaFromSettingsFile)
     handle = GfParmReadFile(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
+    screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
     GfParmReleaseHandle(handle);
 #else
 	screen_gamma = 2.0;
@@ -632,7 +632,7 @@ GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
 	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	void *handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	const float screen_gamma =
-		(float)GfParmGetNum(handle, GFSCR_SECT_PROP, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
+		(float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
 	GfParmReleaseHandle(handle);
 
 	// Load the image buffer from the file (JPEG 888 / PNG 8888)

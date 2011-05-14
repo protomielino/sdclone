@@ -260,7 +260,7 @@ rmScreenActivate(void * /* dummy */)
 	void* hparmScrConf = GfParmReadFile(ossConfFile.str().c_str(), GFPARM_RMODE_STD);
 	FPSLimLastTime = 0.0;
 	FPSLimMaxRate =
-		GfParmGetNum(hparmScrConf, GFSCR_SECT_PROP, GFSCR_ATT_MAXREFRESH, NULL, 0.0);
+		GfParmGetNum(hparmScrConf, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_MAXREFRESH, NULL, 0.0);
 	if (FPSLimMaxRate)
 		GfLogInfo("FPS limiter is on (%.1f Hz).\n", FPSLimMaxRate);
 	else
