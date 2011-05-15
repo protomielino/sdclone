@@ -73,7 +73,7 @@ ReTrackInit(void)
 	snprintf(buf, sizeof(buf), "tracks/%s/%s/%s.%s", catName, trackName, trackName, TRKEXT);
 	ReInfo->track = GfTracks::self()->getTrackLoader()->load(buf);
 
-	snprintf(buf, sizeof(buf), "Loading track %s", ReInfo->track->name);
+	snprintf(buf, sizeof(buf), "Loading %s track", ReInfo->track->name);
 	ReUI().addLoadingMessage(buf);
 
 	reTrackInitTimeOfDay();

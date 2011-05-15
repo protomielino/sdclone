@@ -361,7 +361,7 @@ ReRaceRealStart(void)
 		snprintf(buf, sizeof(buf), "cars/%s/%s.xml",
 				 s->cars[i]->_carName, s->cars[i]->_carName);
 		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
-		snprintf(buf, sizeof(buf), "Loading driver %s (%s) ...",
+		snprintf(buf, sizeof(buf), "Loading %s driver (%s) ...",
 				 s->cars[i]->_name, GfParmGetName(carHdle));
 		ReUI().addLoadingMessage(buf);
 		if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) { //Tell robots they are to start a new race
@@ -386,7 +386,7 @@ ReRaceRealStart(void)
 		// Initialize the graphics engine.
 		if (ReUI().initializeGraphics())
 		{
-			snprintf(buf, sizeof(buf), "Loading graphics for track %s ...",
+			snprintf(buf, sizeof(buf), "Loading graphics for %s track ...",
 					 ReInfo->track->name);
 			ReUI().addLoadingMessage(buf);
 
