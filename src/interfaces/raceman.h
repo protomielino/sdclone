@@ -30,7 +30,6 @@
 #include <tgf.h>
 #include <car.h>
 #include <track.h>
-#include <simu.h>
 
 #define RCM_IDENT 0
 
@@ -100,12 +99,7 @@ typedef struct Situation {
     tCarElt		**cars;		/**< list of cars */ 
 } tSituation;
 
-/** Race Engine */
-typedef struct 
-{
-    tSimItf	simItf;
-} tRaceModIft;
-
+/** Race Engine states */
 #define RE_STATE_CONFIG			0
 #define RE_STATE_EVENT_INIT		1
 #define RE_STATE_PRE_RACE		3
@@ -148,7 +142,6 @@ typedef struct
 {
     int			state;
     void		*param;
-    tRaceModIft		itf;
     void		*gameScreen;
     void		*menuScreen;
     const char		*filename;
@@ -210,7 +203,7 @@ typedef struct RmInfo
     void		*mainParams;    /**< Stays the same even if params change because of more xml-files per raceman */
     void		*results;	/**< Race results */
     void		*mainResults;   /**< Stays the same even if params change because of more xml-files per raceman */
-    tModList		**modList;	/**< drivers loaded */
+    tModList		**robModList;	/**< robot modules loaded */
     tRmCarRules		*rules;		/**< by car rules */
     tRaceEngineInfo	raceEngineInfo;
 } tRmInfo;

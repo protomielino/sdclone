@@ -29,6 +29,7 @@
 #include "sim.h"
 #include "timeanalysis.h"
 
+
 extern double timer_coordinate_transform;
 extern double timer_reaction;
 extern double timer_angles;
@@ -38,11 +39,17 @@ extern double timer_force_calculation;
 extern double timer_wheel_to_car;
 extern double access_times;
 
+
 tCar *SimCarTable = 0;
 
 tdble SimDeltaTime;
 
-int SimTelemetry;
+int SimTelemetry = -1;
+
+t3Dd vectStart[16];
+t3Dd vectEnd[16];
+
+static tTrack* PTrack = 0;
 
 static int SimNbCars = 0;
 static double simu_total_time = 0.0f;
@@ -51,9 +58,6 @@ static double simu_init_time = 0.0f;
 double SimTicks = 0.0;  // Time measurement of CalculateTorque 
 double SimTicks2 = 0.0; // Time measurement of CalculateTorque2
 double SimTicksRtTrackSurfaceNormalL = 0.0; // Time measurement of RtTrackSurfaceNormalL
-
-t3Dd vectStart[16];
-t3Dd vectEnd[16];
 
 #define MEANNB 0
 #define MEANW  1
@@ -138,7 +142,7 @@ ctrlCheck(tCar *car)
 
 /* Initial configuration */
 void
-SimConfig(tCarElt *carElt, tRmInfo* ReInfo)
+SimConfig(tCarElt *carElt)
 {
 	RtInitTimer();
 
@@ -152,7 +156,6 @@ SimConfig(tCarElt *carElt, tRmInfo* ReInfo)
     car->trkPos = carElt->_trkPos;
     car->ctrl   = &carElt->ctrl;
     car->params = carElt->_carHandle;
-//    car->ReInfo = ReInfo; // Not used til now.
     SimCarConfig(car);
 
     SimCarCollideConfig(car);
@@ -327,10 +330,14 @@ RemoveCar(tCar *car, tSituation *s)
 
 }
 
-
+void
+SimCarTelemetry(int nCarIndex, bool bOn)
+{
+    SimTelemetry = bOn ? nCarIndex : -1;
+}
 
 void
-SimUpdate(tSituation *s, double deltaTime, int telemetry)
+SimUpdate(tSituation *s, double deltaTime)
 {
     int		i;
     int		ncar;
@@ -341,7 +348,6 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 
 	double timestamp_start = GfTimeClock();
     SimDeltaTime = (float)deltaTime;
-    SimTelemetry = 0;//telemetry;
     for (ncar = 0; ncar < s->_ncars; ncar++) {
 		SimCarTable[ncar].collision = 0;
 		SimCarTable[ncar].blocked = 0;
@@ -543,6 +549,130 @@ SimShutdown(void)
 		free(SimCarTable);
 		SimCarTable = 0;
     }
-    GfOut("#Total Time RtTrackSurfaceNormalL used: %g sec\n",SimTicksRtTrackSurfaceNormalL/1000.0);  // Profiling test
+
+	PTrack = 0;
+	
+	// Profiling test
+    GfOut("#Total Time RtTrackSurfaceNormalL used: %g sec\n",SimTicksRtTrackSurfaceNormalL/1000.0);
 }
 
+/* Used for network games to update client physics */
+void 
+UpdateSimCarTable(tDynPt DynGCG,int index)
+{
+	tCar *pCar = SimCarTable;
+	pCar[index].DynGCg = DynGCG;
+}
+
+/* Used for network games get current physics values*/
+tDynPt * 
+GetSimCarTable(int index)
+{
+	tCar *pCar = SimCarTable;
+	return &pCar[index].DynGCg;
+}
+
+
+void
+SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
+{
+    int		i;
+    tCarElt 	*carElt;
+    tCar 	*car;
+    sgVec3	P;
+	static const float UPSIDE_DOWN_TIMEOUT = 5.0f;
+
+    SimDeltaTime = (float)deltaTime;
+	SimCarTable[index].collision = 0;
+	SimCarTable[index].blocked = 0;
+    
+	car = &(SimCarTable[index]);
+	carElt = car->carElt;
+
+	CHECK(car);
+	ctrlCheck(car);
+	CHECK(car);
+	SimSteerUpdate(car);
+	CHECK(car);
+	SimGearboxUpdate(car);
+	CHECK(car);
+	SimEngineUpdateTq(car);
+	CHECK(car);
+
+	SimCarUpdateWheelPos(car);
+	CHECK(car);
+
+	SimBrakeSystemUpdate(car);
+	CHECK(car);
+	SimAeroUpdate(car, s);
+	CHECK(car);
+	for (i = 0; i < 2; i++){
+		SimWingUpdate(car, i, s);
+	}
+	CHECK(car);
+	for (i = 0; i < 4; i++){
+		SimWheelUpdateRide(car, i);
+	}
+	CHECK(car);
+	for (i = 0; i < 2; i++){
+		SimAxleUpdate(car, i);
+	}
+	CHECK(car);
+	for (i = 0; i < 4; i++){
+		SimWheelUpdateForce(car, i);
+	}
+	CHECK(car);
+
+	SimTransmissionUpdate(car);
+	CHECK(car);
+		
+	SimWheelUpdateRotation(car);
+	CHECK(car);
+	SimCarUpdate(car, s);
+	CHECK(car);
+
+	/* copy back the data to carElt */
+
+	carElt->pub.DynGC = car->DynGC;
+	carElt->pub.DynGCg = car->DynGCg;
+#if 0
+	sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
+					RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+#else
+	sgQuatToMatrix (carElt->pub.posMat, car->posQuat);
+	carElt->pub.posMat[3][0] = car->DynGCg.pos.x;
+	carElt->pub.posMat[3][1] = car->DynGCg.pos.y;
+	carElt->pub.posMat[3][2] = car->DynGCg.pos.z - carElt->_statGC_z;
+	carElt->pub.posMat[0][3] =  SG_ZERO ;
+	carElt->pub.posMat[1][3] =  SG_ZERO ;
+	carElt->pub.posMat[2][3] =  SG_ZERO ;
+	carElt->pub.posMat[3][3] =  SG_ONE ;
+	
+	carElt->_yaw = car->DynGC.pos.az;
+	carElt->_roll = car->DynGC.pos.ax;
+	carElt->_pitch = car->DynGC.pos.ay;
+	
+#endif
+	carElt->_trkPos = car->trkPos;
+	for (i = 0; i < 4; i++) {
+		carElt->priv.wheel[i].relPos = car->wheel[i].relPos;
+		//carElt->priv.wheel[i].visible_z = RtTrackHeightL_smooth(&car->wheel[i].trkPos); //- car->DynGCg.pos.z;
+		carElt->_wheelSeg(i) = car->wheel[i].trkPos.seg;
+		carElt->_brakeTemp(i) = car->wheel[i].brake.temp;
+		carElt->pub.corner[i] = car->corner[i].pos;
+		
+	}
+	carElt->_gear = car->transmission.gearbox.gear;
+	carElt->_enginerpm = car->engine.rads;
+	carElt->_fuel = car->fuel;
+	carElt->priv.collision |= car->collision;
+	carElt->_dammage = car->dammage;
+	
+	P[0] = -carElt->_statGC_x;
+	P[1] = -carElt->_statGC_y;
+	P[2] = -carElt->_statGC_z;
+	sgXformPnt3(P, carElt->_posMat);
+	carElt->_pos_X = P[0];
+	carElt->_pos_Y = P[1];
+	carElt->_pos_Z = P[2];
+}

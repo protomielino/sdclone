@@ -50,7 +50,7 @@ extern char *ReGetCurrentRaceName(void);
 
 extern char *ReGetPrevRaceName(void);
 
-extern tModList *ReRaceModList;
+extern tModList *ReRacingRobotsModList;
 
 // The race situation data structure.
 // WIP: Remove this global variable that anyone can wildly change

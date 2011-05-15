@@ -55,7 +55,8 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 		case RM_PIT_REPAIR:
 			info->totalPitTime = 2.0f + fabs((double)(car->_pitFuel)) / 8.0f + (tdble)(fabs((double)(car->_pitRepair))) * 0.007f;
 			car->_scheduledEventTime = s->currentTime + info->totalPitTime;
-			ReInfo->_reSimItf.reconfig(car);
+			RePhysicsEngine().reconfigureCar(car);
+
 			for (i=0; i<4; i++) {
 				car->_tyreCondition(i) = 1.01f;
 				car->_tyreT_in(i) = 50.0f;

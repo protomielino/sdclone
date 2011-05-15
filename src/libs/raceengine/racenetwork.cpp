@@ -33,8 +33,7 @@
 static void
 reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 {
-	tDynPt *pDynCG = NULL;
-	pDynCG = ReInfo->_reSimItf.getsimcartable(pCt->startRank);
+	tDynPt *pDynCG = RePhysicsEngine().getCar(pCt->startRank);
 
 	// double errX = pDynCG->pos.x-pCt->DynGCg.pos.x;
 	// double errY = pDynCG->pos.y-pCt->DynGCg.pos.y;
@@ -68,14 +67,14 @@ reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 				step = timeDelta;
 
 			timeDelta-=step;
-			ReInfo->_reSimItf.singleupdate(pCt->startRank,step,ReInfo->s);
+			RePhysicsEngine().updateCar(ReInfo->s, step, pCt->startRank);
 		}
 	}
 
 	//GfLogTrace("Network position error is %lf %lf %lf and delta is %lf\n",errX,errY,errZ,timeDelta);
 
 	//Car physics
-//	ReInfo->_reSimItf.updatesimcartable(pCt->DynGCg,pCt->startRank);
+//	RePhysicsEngine().setCar(pCt->DynGCg, pCt->startRank);
 }
 
 static void

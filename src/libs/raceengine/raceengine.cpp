@@ -171,6 +171,19 @@ IUserInterface& RaceEngine::userInterface()
 	return *_piUserItf;
 }
 
+// Set the physics engine.
+void RaceEngine::setPhysicsEngine(IPhysicsEngine* piPhysEngine)
+{
+	_piPhysEngine = piPhysEngine;
+}
+
+// Accessor to the physics engine.
+IPhysicsEngine& RaceEngine::physicsEngine()
+{
+	return *_piPhysEngine;
+}
+
+
 //************************************************************
 // WIP : dedicated situation setters.
 

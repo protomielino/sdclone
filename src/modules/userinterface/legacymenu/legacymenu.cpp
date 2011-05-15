@@ -202,8 +202,11 @@ bool LegacyMenu::initializeGraphics()
 	// Check that it implements IGraphicsEngine.
 	if (pmodGrEngine)
 		_piGraphicsEngine = pmodGrEngine->getInterface<IGraphicsEngine>();
-	if (!_piGraphicsEngine)
+	if (pmodGrEngine && !_piGraphicsEngine)
+	{
+		GfModule::unload(pmodGrEngine);
 		GfLogError("IGraphicsEngine not implemented by %s\n", ossModLibName.str().c_str());
+	}
 
 	return _piGraphicsEngine != 0;
 }

@@ -20,27 +20,30 @@
 #ifndef _SIMFCT_H_
 #define _SIMFCT_H_
 
-#include <math.h>
-#include <stdio.h>
-#include <string.h>
-#ifdef WIN32
-#include <float.h>
-#define isnan _isnan
-#endif
+#include <cmath>
+#include <cstdio>
+#include <cstring>
 
+#include <portability.h>
 #include <tgf.h>
 #include <track.h>
 #include <car.h>
 #include <raceman.h>
-#include <simu.h>
-#include "carstruct.h"
 #include <robottools.h>
 
-extern void SimConfig(tCarElt *carElt, tRmInfo* ReInfo);
+#include "carstruct.h"
+
+
+extern void SimConfig(tCarElt *carElt);
 extern void SimReConfig(tCarElt *carElt);
-extern void SimUpdate(tSituation*, double deltaTime, int telemetry);
+extern void SimUpdate(tSituation*, double deltaTime);
 extern void SimInit(int nbcars, tTrack* track);
 extern void SimShutdown(void);
+
+extern void SimCarTelemetry(int nCarIndex, bool bOn = true);
+extern void UpdateSimCarTable(tDynPt DynGCG, int index);
+extern void SimUpdateSingleCar(int index, double deltaTime, tSituation *s);
+extern tDynPt* GetSimCarTable(int index);
 
 extern void SimAxleConfig(tCar *car, int index);
 extern void SimAxleUpdate(tCar *car, int index);

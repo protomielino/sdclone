@@ -24,6 +24,7 @@
 #ifndef _RACEENGINE_H_
 #define _RACEENGINE_H_
 
+#include <iphysicsengine.h>
 #include <iraceengine.h>
 
 
@@ -92,6 +93,12 @@ public:
 	// Accessor to the user interface.
 	IUserInterface& userInterface();
 
+	// Set the physics engine.
+	void setPhysicsEngine(IPhysicsEngine* piPhysEngine);
+
+	// Accessor to the physics engine.
+	IPhysicsEngine& physicsEngine();
+
 protected:
 
 	// Protected constructor to avoid instanciation outside of self().
@@ -104,12 +111,21 @@ protected:
 
 	// The user interface.
 	IUserInterface* _piUserItf;
+
+	// The physics engine.
+	IPhysicsEngine* _piPhysEngine;
 };
 
 //! Shortcut to the user interface.
 inline extern IUserInterface& ReUI()
 {
 	return RaceEngine::self().userInterface();
+}
+				  
+//! Shortcut to the physics engine.
+inline extern IPhysicsEngine& RePhysicsEngine()
+{
+	return RaceEngine::self().physicsEngine();
 }
 				  
 #endif /* _RACEENGINE_H_ */ 

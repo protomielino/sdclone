@@ -17,13 +17,10 @@
  ***************************************************************************/
 
 /** @file   
-        
+        Race initialization routines
     @author <a href=mailto:eric.espie@torcs.org>Eric Espie</a>
     @version  $Id$
 */
-
-
-/* Race initialization routines */
 
 #include <cstdlib>
 #include <cstdio>
@@ -56,25 +53,23 @@
 #include "raceinit.h"
 
 
-static const char *level_str[] =
+static const char *aPszSkillLevelNames[] =
 	{ ROB_VAL_ROOKIE, ROB_VAL_AMATEUR, ROB_VAL_SEMI_PRO, ROB_VAL_PRO };
+static const int NSkillLevels = (int)(sizeof(aPszSkillLevelNames)/sizeof(char*));
 
-static tModList *reEventModList = 0;
-
-// Modules ... ?
-tModList *ReRaceModList = 0;
+// The list of robot modules loaded for the race.
+tModList *ReRacingRobotsModList = 0;
 
 // The race situation
 tRmInfo	*ReInfo = 0;
 
-// The race (temporary partially duplicates ReInfo, as long as not merged).
+// The race (temporary partial duplicate of ReInfo, as long as not merged).
 static GfRace* PReRace = 0;
 
 GfRace* ReGetRace()
 {
 	return PReRace;
 }
-
 
 /* Race Engine Initialization */
 void
@@ -91,7 +86,7 @@ ReInit(void)
 
 	// Allocate race engine info structures.
 	ReInfo = ReSituation::self().data();
-	ReInfo->modList = &ReRaceModList;
+	ReInfo->robModList = &ReRacingRobotsModList;
 
 	// Load Race engine params.
 	char buf[256];
@@ -110,8 +105,11 @@ ReInit(void)
 	ITrackLoader* piTrkLoader = 0;
 	if (pmodTrkLoader)
 		piTrkLoader = pmodTrkLoader->getInterface<ITrackLoader>();
-	if (!piTrkLoader)
+	if (pmodTrkLoader && !piTrkLoader)
+	{
+		GfModule::unload(pmodTrkLoader);
 		return;
+	}
 
 	// Initialize GfTracks' track module interface (needed for some track infos).
 	GfTracks::self()->setTrackLoader(piTrkLoader);
@@ -148,13 +146,21 @@ void ReShutdown(void)
 	ITrackLoader* piTrkLoader = GfTracks::self()->getTrackLoader();
     piTrkLoader->unload();
 
-    // Unload the Simu, Track loader and Graphics modules.
-    GfModUnloadList(&reEventModList);
-    
-    GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(piTrkLoader);
-	GfModule::unload(pmodTrkLoader);
-	GfTracks::self()->setTrackLoader(0);
+    // Unload the Physics engine, Track loader and Graphics modules if not already done.
+    GfModule* pmodPhysEngine = dynamic_cast<GfModule*>(&RePhysicsEngine());
+	if (pmodPhysEngine)
+	{
+		GfModule::unload(pmodPhysEngine);
+		RaceEngine::self().setPhysicsEngine(0);
+	}
 
+    GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(piTrkLoader);
+	if (pmodTrkLoader)
+	{
+		GfModule::unload(pmodTrkLoader);
+		GfTracks::self()->setTrackLoader(0);
+	}
+	
     ReUI().shutdownGraphics(); // => onRaceEngineShutdown ?
 
 	// Free ReInfo memory.
@@ -342,7 +348,8 @@ initStartingGrid(void)
     car->_pos_Z = RtTrackHeightL(&(car->_trkPos)) + heightInit;
 
     NORM0_2PI(car->_yaw);
-    ReInfo->_reSimItf.config(car, ReInfo);
+
+	RePhysicsEngine().configureCar(car);
   }
 }
 
@@ -491,7 +498,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   int robotIdx = relativeRobotIdx;
 
   /* good robot found */
-  curModInfo = &((*(ReInfo->modList))->modInfo[modindex]);
+  curModInfo = &((*(ReInfo->robModList))->modInfo[modindex]);
   GfLogInfo("Driver's name: %s\n", curModInfo->name);
 
   isHuman = strcmp( cardllname, "human" ) == 0 || strcmp( cardllname, "networkhuman" ) == 0;
@@ -593,8 +600,8 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
       elt->_raceNumber += elt->_moduleIndex;
     elt->_skillLevel = 0;
     str = GfParmGetStr(robhdle, path, ROB_ATTR_LEVEL, ROB_VAL_SEMI_PRO);
-    for(k = 0; k < (int)(sizeof(level_str)/sizeof(char*)); k++) {
-      if (strcmp(level_str[k], str) == 0) {
+    for(k = 0; k < NSkillLevels; k++) {
+      if (strcmp(aPszSkillLevelNames[k], str) == 0) {
         elt->_skillLevel = k;
         break;
       }
@@ -752,7 +759,7 @@ ReInitCars(void)
     snprintf(path, sizeof(path), "%sdrivers/%s/%s.%s", GfLibDir(), robotModuleName, robotModuleName, DLLEXT);
 
     /* Load the robot shared library */
-    if (GfModLoad(CAR_IDENT, path, ReInfo->modList)) 
+    if (GfModLoad(CAR_IDENT, path, ReInfo->robModList)) 
     {
       GfLogError("Failed to load robot module %s\n", path);
       continue;
@@ -765,9 +772,9 @@ ReInitCars(void)
     {
       /* Search for the index of the racing driver in the list of interfaces
          of the module */
-      for (j = 0; j < (*(ReInfo->modList))->modInfoSize; j++) 
+      for (j = 0; j < (*(ReInfo->robModList))->modInfoSize; j++) 
       {
-        if ((*(ReInfo->modList))->modInfo[j].name && (*(ReInfo->modList))->modInfo[j].index == robotIdx) 
+        if ((*(ReInfo->robModList))->modInfo[j].name && (*(ReInfo->robModList))->modInfo[j].index == robotIdx) 
         {
           /* We have the right driver : load it */
           elt = reLoadSingleCar( index, i, j, robotIdx, TRUE, robotModuleName );
@@ -800,12 +807,12 @@ ReInitCars(void)
       if (robhdle && ( strcmp( robotModuleName, "human" ) == 0 || strcmp( robotModuleName, "networkhuman" ) == 0 ) )
       {
         /* Human driver */
-        elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->modList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
+        elt = reLoadSingleCar( index, i, robotIdx - (*(ReInfo->robModList))->modInfo[0].index, robotIdx, FALSE, robotModuleName );
       }
       else if (robhdle && ( strcmp( GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "foo" ),
                               GfParmGetStr( robhdle, ROB_SECT_ARBITRARY, ROB_ATTR_TEAM, "bar" ) ) == 0 ) )
       {
-        elt = reLoadSingleCar( index, i, (*(ReInfo->modList))->modInfoSize, robotIdx, FALSE, robotModuleName );
+        elt = reLoadSingleCar( index, i, (*(ReInfo->robModList))->modInfoSize, robotIdx, FALSE, robotModuleName );
       }
       else
         GfLogError("No descriptor for robot %s (2)\n", robotModuleName );
@@ -839,7 +846,7 @@ ReInitCars(void)
   // I stuff for now anything into one call because collision detection works with the same
   // library on all objects, so it is a bit dangerous to distribute the handling to various
   // locations (because the library maintains global state like a default collision handler etc.).
-  ReInfo->_reSimItf.init(nCars, ReInfo->track);
+  RePhysicsEngine().initialize(nCars, ReInfo->track);
 
   initStartingGrid();
 
@@ -853,7 +860,7 @@ ReRaceCleanup(void)
 {
   ReInfo->_reGameScreen = ReUI().createRaceEventLoopHook();
 
-  ReInfo->_reSimItf.shutdown();
+  RePhysicsEngine().shutdown();
 
   if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
   {
@@ -896,7 +903,7 @@ ReRaceCleanDrivers(void)
   FREEZ(ReInfo->s->cars);
   ReInfo->s->cars = 0;
   ReInfo->s->_ncars = 0;
-  GfModUnloadList(&ReRaceModList);
+  GfModUnloadList(&ReRacingRobotsModList);
 }
 
 // Get the name of the current "race"

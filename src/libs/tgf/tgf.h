@@ -26,11 +26,6 @@
 #define __TGF__H__
 
 #include <cstdio>
-//#include <cstdlib>
-//#include <cstdarg>
-//#include <cstring>
-//#include <climits>
-//#include <cmath>
 
 #include "osspec.h"
 
@@ -138,7 +133,8 @@ typedef struct {
 /** 6 DOF position.
     @ingroup definitions
 */
-typedef struct {
+typedef struct Posd
+{
     tdble	x;		/**< x coordinate */
     tdble	y;		/**< y coordinate */
     tdble	z;		/**< z coordinate */
@@ -150,7 +146,7 @@ typedef struct {
 /** Dynamic point structure.
     @ingroup definitions
 */
-typedef struct 
+typedef struct DynPt
 {
     tPosd pos; /**< position */
     tPosd vel; /**< velocity */
@@ -158,7 +154,7 @@ typedef struct
 } tDynPt;
 
 /** Forces and moments */
-typedef struct
+typedef struct Forces
 {
     t3Dd F; /**< Forces */
     t3Dd M; /**< Moments */

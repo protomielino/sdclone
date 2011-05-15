@@ -28,16 +28,19 @@
 
 #include "sim.h"
 
+
 tCar *SimCarTable = 0;
 
 tdble SimDeltaTime;
 
-int SimTelemetry;
-
-static int SimNbCars = 0;
+int SimTelemetry = -1;
 
 t3Dd vectStart[16];
 t3Dd vectEnd[16];
+
+static tTrack *PTrack = 0;
+
+static int SimNbCars = 0;
 
 #define MEANNB 0
 #define MEANW  1
@@ -121,7 +124,7 @@ ctrlCheck(tCar *car)
 
 /* Initial configuration */
 void
-SimConfig(tCarElt *carElt, RmInfo *info)
+SimConfig(tCarElt *carElt)
 {
     tCar *car = &(SimCarTable[carElt->index]);
 
@@ -135,7 +138,7 @@ SimConfig(tCarElt *carElt, RmInfo *info)
 
     SimCarConfig(car);
 
-    SimCarCollideConfig(car, info->track);
+    SimCarCollideConfig(car, PTrack);
     sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
 		    RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
 }
@@ -305,10 +308,14 @@ RemoveCar(tCar *car, tSituation *s)
 	car->restPos.vel.ay = dang / travelTime;
 }
 
-
+void
+SimCarTelemetry(int nCarIndex, bool bOn)
+{
+    SimTelemetry = bOn ? nCarIndex : -1;
+}
 
 void
-SimUpdate(tSituation *s, double deltaTime, int telemetry)
+SimUpdate(tSituation *s, double deltaTime)
 {
 	int i;
 	int ncar;
@@ -316,7 +323,6 @@ SimUpdate(tSituation *s, double deltaTime, int telemetry)
 	tCar *car;
 	
 	SimDeltaTime = deltaTime;
-	SimTelemetry = telemetry;
 	for (ncar = 0; ncar < s->_ncars; ncar++) {
 		SimCarTable[ncar].collision = 0;
 		SimCarTable[ncar].blocked = 0;
@@ -430,7 +436,8 @@ SimInit(int nbcars, tTrack* track)
 {
     SimNbCars = nbcars;
     SimCarTable = (tCar*)calloc(nbcars, sizeof(tCar));
-    SimCarCollideInit(track);
+	PTrack = track;
+    SimCarCollideInit(PTrack);
 }
 
 void
@@ -448,6 +455,8 @@ SimShutdown(void)
 	free(SimCarTable);
 	SimCarTable = 0;
     }
+
+	PTrack = 0;
 }
 
 /* Used for network games to update client physics */
@@ -481,7 +490,6 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	
 	car = &(SimCarTable[index]);
 	carElt = car->carElt;
-	
 
 	CHECK(car);
 	ctrlCheck(car);
@@ -522,17 +530,12 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	SimCarUpdate(car, s);
 	CHECK(car);
 	
-	
-	car = &(SimCarTable[index]);
-	CHECK(car);
-	carElt = car->carElt;
-
 	/* copy back the data to carElt */
 
 	carElt->pub.DynGC = car->DynGC;
 	carElt->pub.DynGCg = car->DynGCg;
 	sgMakeCoordMat4(carElt->pub.posMat, carElt->_pos_X, carElt->_pos_Y, carElt->_pos_Z - carElt->_statGC_z,
-			RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+					RAD2DEG(carElt->_yaw), RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
 	carElt->_trkPos = car->trkPos;
 	for (i = 0; i < 4; i++) {
 		carElt->priv.wheel[i].relPos = car->wheel[i].relPos;
@@ -545,6 +548,5 @@ SimUpdateSingleCar(int index, double deltaTime,tSituation *s)
 	carElt->_fuel = car->fuel;
 	carElt->priv.collision |= car->collision;
 	carElt->_dammage = car->dammage;
-
 }
 

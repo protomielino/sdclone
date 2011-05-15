@@ -34,6 +34,8 @@
 #include <robot.h>
 #include <raceman.h>
 
+#include "raceengine.h"
+
 #include "racecars.h"
 #include "racesituation.h"
 
@@ -293,15 +295,15 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	if (GetNetwork())
 		ReNetworkOneStep();
 
-	GfProfStartProfile("_reSimItf.update*");
+	GfProfStartProfile("physicsEngine.update*");
 	GfSchedBeginEvent("raceupdate", "physics");
-	pCurrReInfo->_reSimItf.update(s, deltaTimeIncrement, -1);
+	RePhysicsEngine().updateSituation(s, deltaTimeIncrement);
 	bool bestLapChanged = false;
 	for (int i = 0; i < s->_ncars; i++)
 		ReCarsManageCar(s->cars[i], bestLapChanged);
 
 	GfSchedEndEvent("raceupdate", "physics");
-	GfProfStopProfile("_reSimItf.update*");
+	GfProfStopProfile("physicsEngine.update*");
 	
 	ReCarsSortCars();
 
@@ -563,8 +565,7 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
 	pTarget->mainParams = pSource->mainParams; // Never read/written during the race.
 	pTarget->results = pSource->results; // Never read/written during the race.
 	pTarget->mainResults = pSource->mainResults; // Never read/written during the race.
-	pTarget->modList = pSource->modList; // Not used / written by updater.
-	// pTarget->movieCapture = pSource->movieCapture; // Not used by updater.
+	pTarget->robModList = pSource->robModList; // Not used / written by updater.
 
 	// Assign level 2 constants and initialize lists in carList field.
 	for (int nCarInd = 0; nCarInd < _nInitDrivers; nCarInd++)
@@ -590,7 +591,6 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
 		
 	// Assign level 2 constants in raceEngineInfo field.
 	pTarget->_reParam = pSource->_reParam; // Not used / written by updater.
-	pTarget->_reSimItf = pSource->_reSimItf; // Not used / written by updater.
 	pTarget->_reGameScreen = pSource->_reGameScreen; // Nor changed nor shared during the race.
 	pTarget->_reMenuScreen = pSource->_reMenuScreen; // Nor changed nor shared during the race.
 	pTarget->_reFilename = pSource->_reFilename; // Not used during the race.

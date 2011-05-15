@@ -22,7 +22,10 @@
     @version	$Id$
 */
 
+#include <sstream>
+
 #include <portability.h>
+#include <tgf.hpp>
 
 #include <robot.h>
 #include <network.h>
@@ -79,7 +82,7 @@ void ReRaceAbort()
 {
 	ReShutdownUpdaters();
 
-	ReInfo->_reSimItf.shutdown();
+	RePhysicsEngine().shutdown();
 
 	// TODO: Move these 3 XXGraphicsYY calls to the user interface module ?
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
@@ -257,8 +260,6 @@ ReRaceRealStart(void)
 	int i, j;
 	tRobotItf *robot;
 	tReCarInfo *carInfo;
-	const char *dllname;
-	char path[256];
 	char buf[128];
 	int foundHuman;
 	void *params = ReInfo->params;
@@ -267,14 +268,27 @@ ReRaceRealStart(void)
 	tMemoryPool oldPool = NULL;
 	void* carHdle;
 
-	// Load simulation engine
-	dllname = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
-	snprintf(buf, sizeof(buf), "Loading simulation engine (%s) ...", dllname);
+	// Load the physics engine
+	const char* pszModName = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
+	snprintf(buf, sizeof(buf), "Loading physics engine (%s) ...", pszModName);
 	ReUI().addLoadingMessage(buf);
-	snprintf(path, sizeof(path), "%smodules/simu/%s.%s", GfLibDir (), dllname, DLLEXT);
-	if (GfModLoad(0, path, &ReRaceModList)) 
+
+	std::ostringstream ossModLibName;
+	ossModLibName << GfLibDir() << "modules/simu/" << pszModName << '.' << DLLEXT;
+	GfModule* pmodPhysEngine = GfModule::load(ossModLibName.str());
+	IPhysicsEngine* piPhysEngine = 0;
+	if (pmodPhysEngine)
+	{
+		piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
+		if (piPhysEngine) // Check that it implements IPhysicsEngine.
+			RaceEngine::self().setPhysicsEngine(piPhysEngine);
+	}
+
+	if (pmodPhysEngine && !piPhysEngine)
+		GfModule::unload(pmodPhysEngine);
+
+	if (!pmodPhysEngine)
 		return RM_ERROR;
-	ReRaceModList->modInfo->fctInit(ReRaceModList->modInfo->index, &ReInfo->_reSimItf);
 
 	// Check if there is a human in the driver list
 	foundHuman = ReHumanInGroup() ? 2 : 0;
@@ -361,7 +375,7 @@ ReRaceRealStart(void)
 	RtTeamManagerStart();
 
 	// TODO: Try and move this into the user interface module,
-	//       right after it called ReRaceStart ?
+	//       right after it calls ReRaceStart ?
 	// Initialize the graphics engine
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
 	{
@@ -378,7 +392,8 @@ ReRaceRealStart(void)
 	}
 	
 	// Initialize the physics engine
-	ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
+	RePhysicsEngine().updateSituation(s, RCM_MAX_DT_SIMU);
+
 	for (i = 0; i < s->_ncars; i++) {
 		carInfo[i].prevTrkPos = s->cars[i]->_trkPos;
 	}
@@ -390,7 +405,7 @@ ReRaceRealStart(void)
 		s->cars[i]->ctrl.brakeCmd = 1.0;
 	}
 	for (j = 0; j < (int)(1.0 / RCM_MAX_DT_SIMU); j++) {
-		ReInfo->_reSimItf.update(s, RCM_MAX_DT_SIMU, -1);
+		RePhysicsEngine().updateSituation(s, RCM_MAX_DT_SIMU);
 	}
 
 	if (ReInfo->_displayMode != RM_DISP_MODE_NORMAL) {
