@@ -386,6 +386,10 @@ ReRaceRealStart(void)
 		// Initialize the graphics engine.
 		if (ReUI().initializeGraphics())
 		{
+			snprintf(buf, sizeof(buf), "Loading graphics for track %s ...",
+					 ReInfo->track->name);
+			ReUI().addLoadingMessage(buf);
+
 			// Initialize the track graphics.
 			ReUI().loadTrackGraphics(ReInfo->track);
 		}
@@ -448,7 +452,7 @@ ReRaceRealStart(void)
 	// Initialize cars graphics.
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
 	{
-		ReUI().addLoadingMessage("Loading cars ...");
+		ReUI().addLoadingMessage("Loading graphics for all cars ...");
 		
 		ReUI().loadCarsGraphics(ReOutputSituation()->s);
 	}
