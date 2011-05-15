@@ -478,13 +478,12 @@ void grCustomizePits(void) {
         ThePits->addKid(pit);
 
         // Let's draw the logo
-        // Load logo texture (.rgb first, for backwards compatibility,
-        // then .png)
-        const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+        // Load logo texture (.png first, then .rgb for backwards compatibility)
+        const std::string strRGBLogoFileName = strLogoFileName + ".png";
         ssgState *stLogo = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(),
                                         buf, FALSE, FALSE, FALSE);
         if (!stLogo) {
-          const std::string strPNGLogoFileName = strLogoFileName + ".png";
+          const std::string strPNGLogoFileName = strLogoFileName + ".rgb";
           stLogo = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf,
                                         FALSE, FALSE);
         }

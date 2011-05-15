@@ -116,7 +116,7 @@ grInitSmoke(const int index)
 		// add temp object to get a reference on the states
 		if (!mst) {
 			sprintf(buf, "data/textures;data/img;.");
-			mst = (ssgSimpleState*)grSsgLoadTexStateEx("smoke.rgb", buf, FALSE, FALSE);
+			mst = (ssgSimpleState*)grSsgLoadTexStateEx("smoke.png", buf, FALSE, FALSE);
 			if (mst) {
 				mst->disable(GL_LIGHTING);
 				mst->enable(GL_BLEND);
@@ -128,7 +128,7 @@ grInitSmoke(const int index)
 
 		if (!mstf0) {
 			sprintf(buf, "data/textures;data/img;.");
-			mstf0 = (ssgSimpleState*)grSsgLoadTexStateEx("fire0.rgb", buf, FALSE, FALSE);
+			mstf0 = (ssgSimpleState*)grSsgLoadTexStateEx("fire0.png", buf, FALSE, FALSE);
 			if (mstf0) {
 				mstf0->disable(GL_LIGHTING);
 				mstf0->enable(GL_BLEND);
@@ -140,7 +140,7 @@ grInitSmoke(const int index)
 
 		if (!mstf1) {
 			sprintf(buf, "data/textures;data/img;.");
-			mstf1 = (ssgSimpleState*)grSsgLoadTexStateEx("fire1.rgb", buf, FALSE, FALSE);
+			mstf1 = (ssgSimpleState*)grSsgLoadTexStateEx("fire1.png", buf, FALSE, FALSE);
 			if (mstf1) {
 				mstf1->disable(GL_LIGHTING);
 				mstf1->enable(GL_BLEND);

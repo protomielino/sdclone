@@ -225,10 +225,11 @@ void grInitCarlight(int index)
 		theCarslight[i].lightAnchor= new ssgBranch();
 	}
 
+	sprintf(buf, "data/textures;data/img;.");
+	
 	if (!frontlight1) {
-		sprintf(buf, "data/textures;data/img;.");
-		frontlight1 = (ssgSimpleState*)grSsgLoadTexStateEx("frontlight1.rgb", buf, FALSE, FALSE);
-		if (frontlight1 != NULL) {
+		frontlight1 = (ssgSimpleState*)grSsgLoadTexStateEx("frontlight1.png", buf, FALSE, FALSE);
+		if (frontlight1) {
 			frontlight1->disable(GL_LIGHTING);
 			frontlight1->enable(GL_BLEND);
 			frontlight1->disable(GL_CULL_FACE);
@@ -238,9 +239,8 @@ void grInitCarlight(int index)
 	}
 
 	if (!frontlight2) {
-		sprintf(buf, "data/textures;data/img;.");
-		frontlight2 = (ssgSimpleState*)grSsgLoadTexStateEx("frontlight2.rgb", buf, FALSE, FALSE);
-		if (frontlight2 != NULL) {
+		frontlight2 = (ssgSimpleState*)grSsgLoadTexStateEx("frontlight2.png", buf, FALSE, FALSE);
+		if (frontlight2) {
 			frontlight2->disable(GL_LIGHTING);
 			frontlight2->enable(GL_BLEND);
 			frontlight2->disable(GL_CULL_FACE);
@@ -250,9 +250,8 @@ void grInitCarlight(int index)
 	}
 
 	if (!rearlight1) {
-		sprintf(buf, "data/textures;data/img;.");
-		rearlight1 = (ssgSimpleState*)grSsgLoadTexStateEx("rearlight1.rgb", buf, FALSE, FALSE);
-		if (rearlight1 != NULL) {
+		rearlight1 = (ssgSimpleState*)grSsgLoadTexStateEx("rearlight1.png", buf, FALSE, FALSE);
+		if (rearlight1) {
 			rearlight1->disable(GL_LIGHTING);
 			rearlight1->enable(GL_BLEND);
 			rearlight1->disable(GL_CULL_FACE);
@@ -262,9 +261,8 @@ void grInitCarlight(int index)
 	}
 
 	if (!rearlight2) {
-		sprintf(buf, "data/textures;data/img;.");
-		rearlight2 = (ssgSimpleState*)grSsgLoadTexStateEx("rearlight2.rgb", buf, FALSE, FALSE);
-		if (rearlight2 != NULL) {
+		rearlight2 = (ssgSimpleState*)grSsgLoadTexStateEx("rearlight2.png", buf, FALSE, FALSE);
+		if (rearlight2) {
 			rearlight2->disable(GL_LIGHTING);
 			rearlight2->enable(GL_BLEND);
 			rearlight2->disable(GL_CULL_FACE);
@@ -274,9 +272,8 @@ void grInitCarlight(int index)
 	}
 
 	if (!breaklight1) {
-		sprintf(buf, "data/textures;data/img;.");
-		breaklight1 = (ssgSimpleState*)grSsgLoadTexStateEx("breaklight1.rgb", buf, FALSE, FALSE);
-		if (breaklight1 != NULL) {
+		breaklight1 = (ssgSimpleState*)grSsgLoadTexStateEx("breaklight1.png", buf, FALSE, FALSE);
+		if (breaklight1) {
 			breaklight1->disable(GL_LIGHTING);
 			breaklight1->enable(GL_BLEND);
 			breaklight1->disable(GL_CULL_FACE);
@@ -286,9 +283,8 @@ void grInitCarlight(int index)
 	}
 
 	if (!breaklight2) {
-		sprintf(buf, "data/textures;data/img;.");
-		breaklight2 = (ssgSimpleState*)grSsgLoadTexStateEx("breaklight2.rgb", buf, FALSE, FALSE);
-		if (breaklight2 != NULL) {
+		breaklight2 = (ssgSimpleState*)grSsgLoadTexStateEx("breaklight2.png", buf, FALSE, FALSE);
+		if (breaklight2) {
 			breaklight2->disable(GL_LIGHTING);
 			breaklight2->enable(GL_BLEND);
 			breaklight2->disable(GL_CULL_FACE);

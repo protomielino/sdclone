@@ -70,7 +70,7 @@ grInitSkidmarks(const tCarElt *car)
 				// add texture
 				skidState->enable(GL_TEXTURE_2D);
 				skidState->setColourMaterial(GL_AMBIENT_AND_DIFFUSE);
-				skidState->setTexture ("data/textures/grey-tracks.rgb", TRUE, TRUE, TRUE);
+				skidState->setTexture ("data/textures/grey-tracks.png", TRUE, TRUE, TRUE);
 			}//if skidState
 		}//if skidState NULL
 
