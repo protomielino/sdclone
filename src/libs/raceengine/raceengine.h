@@ -93,8 +93,9 @@ public:
 	// Accessor to the user interface.
 	IUserInterface& userInterface();
 
-	// Set the physics engine.
-	void setPhysicsEngine(IPhysicsEngine* piPhysEngine);
+	// Physics engine management.
+	bool loadPhysicsEngine();
+	void unloadPhysicsEngine();
 
 	// Accessor to the physics engine.
 	IPhysicsEngine& physicsEngine();

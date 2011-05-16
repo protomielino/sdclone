@@ -21,7 +21,15 @@
     @version    $Id$
 */
 
+#include <sstream>
+
+#include <tgf.hpp>
+
+#include <itrackloader.h>
+#include <iphysicsengine.h>
 #include <car.h> // tCarPitCmd.
+
+#include <tracks.h>
 
 #include "racesituation.h"
 #include "racemain.h"
@@ -44,18 +52,80 @@ RaceEngine& RaceEngine::self()
 }
 
 RaceEngine::RaceEngine()
-: _piUserItf(0)
+: _piUserItf(0), _piPhysEngine(0)
 {
 }
 
 // Implementation of IRaceEngine.
 void RaceEngine::initialize(void)
 {
+	GfLogInfo("Initializing race engine.\n");
+
+	// Cleanup everything in case no yet done.
+	shutdown();
+	
+	// Internal init.
 	::ReInit();
+
+	// Load and initialize the track loader module.
+	GfLogInfo("Loading Track Loader ...\n");
+	std::ostringstream ossModLibName;
+	const char* pszModName =
+		GfParmGetStr(ReSituation::self().data()->_reParam, "Modules", "track", "");
+	ossModLibName << GfLibDir() << "modules/track/" << pszModName << '.' << DLLEXT;
+	GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
+
+	// Check that it implements ITrackLoader.
+	ITrackLoader* piTrkLoader = 0;
+	if (pmodTrkLoader)
+		piTrkLoader = pmodTrkLoader->getInterface<ITrackLoader>();
+	if (pmodTrkLoader && !piTrkLoader)
+	{
+		GfModule::unload(pmodTrkLoader);
+		return;
+	}
+
+	// Initialize GfTracks' track module interface (needed for some track infos).
+	GfTracks::self()->setTrackLoader(piTrkLoader);
 }
+
 void RaceEngine::shutdown(void)
 {
+	GfLogInfo("Terminating race engine.\n");
+
+	// Internal cleanup.
 	::ReShutdown();
+
+	// Unload the track if not already done.
+	ITrackLoader* piTrkLoader = GfTracks::self()->getTrackLoader();
+	if (piTrkLoader)
+		piTrkLoader->unload();
+
+    // Unload the Track loader module if not already done.
+	if (piTrkLoader)
+	{
+		GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(piTrkLoader);
+		if (pmodTrkLoader)
+		{
+			GfModule::unload(pmodTrkLoader);
+			GfTracks::self()->setTrackLoader(0);
+		}
+	}
+
+    // Unload the Physics engine module if not already done.
+	if (_piPhysEngine)
+	{
+		GfModule* pmodPhysEngine = dynamic_cast<GfModule*>(_piPhysEngine);
+		if (pmodPhysEngine)
+		{
+			GfModule::unload(pmodPhysEngine);
+			_piPhysEngine = 0;
+		}
+	}
+	
+    // Shutdown the Graphics modules if not already done.
+	if (_piUserItf)
+		_piUserItf->shutdownGraphics(); // => onRaceEngineShutdown ?
 }
 
 void RaceEngine::setUserInterface(IUserInterface& userItf)
@@ -171,10 +241,41 @@ IUserInterface& RaceEngine::userInterface()
 	return *_piUserItf;
 }
 
-// Set the physics engine.
-void RaceEngine::setPhysicsEngine(IPhysicsEngine* piPhysEngine)
+// Physics engine management.
+bool RaceEngine::loadPhysicsEngine()
 {
-	_piPhysEngine = piPhysEngine;
+    // Load the Physics engine module if not already done.
+	if (_piPhysEngine)
+		return true;
+
+	const char* pszModName =
+		GfParmGetStr(ReSituation::self().data()->_reParam, "Modules", "simu", "");
+	std::ostringstream ossLoadMsg;
+	ossLoadMsg << "Loading physics engine (" << pszModName<< ") ...";
+	if (_piUserItf)
+		_piUserItf->addLoadingMessage(ossLoadMsg.str().c_str());
+
+	std::ostringstream ossModLibName;
+	ossModLibName << GfLibDir() << "modules/simu/" << pszModName << '.' << DLLEXT;
+	GfModule* pmodPhysEngine = GfModule::load(ossModLibName.str());
+	if (pmodPhysEngine)
+		_piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
+	if (pmodPhysEngine && !_piPhysEngine)
+		GfModule::unload(pmodPhysEngine);
+
+	return _piPhysEngine ? true : false;
+}
+
+void RaceEngine::unloadPhysicsEngine()
+{
+    // Unload the Physics engine module if not already done.
+	if (!_piPhysEngine)
+		return;
+	
+	GfModule* pmodPhysEngine = dynamic_cast<GfModule*>(_piPhysEngine);
+	if (pmodPhysEngine)
+		GfModule::unload(pmodPhysEngine);
+	_piPhysEngine = 0;
 }
 
 // Accessor to the physics engine.

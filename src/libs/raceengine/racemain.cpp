@@ -25,7 +25,6 @@
 #include <sstream>
 
 #include <portability.h>
-#include <tgf.hpp>
 
 #include <robot.h>
 #include <network.h>
@@ -83,6 +82,7 @@ void ReRaceAbort()
 	ReShutdownUpdaters();
 
 	RePhysicsEngine().shutdown();
+	RaceEngine::self().unloadPhysicsEngine();
 
 	// TODO: Move these 3 XXGraphicsYY calls to the user interface module ?
 	if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
@@ -269,27 +269,9 @@ ReRaceRealStart(void)
 	void* carHdle;
 
 	// Load the physics engine
-	const char* pszModName = GfParmGetStr(ReInfo->_reParam, "Modules", "simu", "");
-	snprintf(buf, sizeof(buf), "Loading physics engine (%s) ...", pszModName);
-	ReUI().addLoadingMessage(buf);
-
-	std::ostringstream ossModLibName;
-	ossModLibName << GfLibDir() << "modules/simu/" << pszModName << '.' << DLLEXT;
-	GfModule* pmodPhysEngine = GfModule::load(ossModLibName.str());
-	IPhysicsEngine* piPhysEngine = 0;
-	if (pmodPhysEngine)
-	{
-		piPhysEngine = pmodPhysEngine->getInterface<IPhysicsEngine>();
-		if (piPhysEngine) // Check that it implements IPhysicsEngine.
-			RaceEngine::self().setPhysicsEngine(piPhysEngine);
-	}
-
-	if (pmodPhysEngine && !piPhysEngine)
-		GfModule::unload(pmodPhysEngine);
-
-	if (!pmodPhysEngine)
+	if (!RaceEngine::self().loadPhysicsEngine())
 		return RM_ERROR;
-
+		
 	// Check if there is a human in the driver list
 	foundHuman = ReHumanInGroup() ? 2 : 0;
 

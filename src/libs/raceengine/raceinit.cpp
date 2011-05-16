@@ -28,7 +28,6 @@
 #include <sstream>
 #include <map>
 
-#include <itrackloader.h>
 #include <raceman.h>
 #include <robot.h>
 #include <teammanager.h>
@@ -37,7 +36,6 @@
 #include <portability.h>
 #include <tgf.hpp>
 
-#include <tracks.h>
 #include <racemanagers.h>
 #include <race.h>
 
@@ -75,14 +73,9 @@ GfRace* ReGetRace()
 void
 ReInit(void)
 {
-	GfLogInfo("Initializing race engine.\n");
-
 	// If not already done, instanciate the race object.
 	if (!PReRace)
 		PReRace = new GfRace();
-
-	// Shutdown the previous race engine if any.
-	ReShutdown();
 
 	// Allocate race engine info structures.
 	ReInfo = ReSituation::self().data();
@@ -91,28 +84,7 @@ ReInit(void)
 	// Load Race engine params.
 	char buf[256];
 	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
-
 	ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-	// Load and initialize the track loader module.
-	GfLogInfo("Loading Track Loader ...\n");
-	std::ostringstream ossModLibName;
-	const char* pszModName = GfParmGetStr(ReInfo->_reParam, "Modules", "track", "");
-	ossModLibName << GfLibDir() << "modules/track/" << pszModName << '.' << DLLEXT;
-	GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
-
-	// Check that it implements ITrackLoader.
-	ITrackLoader* piTrkLoader = 0;
-	if (pmodTrkLoader)
-		piTrkLoader = pmodTrkLoader->getInterface<ITrackLoader>();
-	if (pmodTrkLoader && !piTrkLoader)
-	{
-		GfModule::unload(pmodTrkLoader);
-		return;
-	}
-
-	// Initialize GfTracks' track module interface (needed for some track infos).
-	GfTracks::self()->setTrackLoader(piTrkLoader);
 
 	// Set ReStateManage as the event loop "display" call-back when the race will actually start
 	// (will be actually used after something like GfuiScreenActivate(ReInfo->_reGameScreen)).
@@ -126,7 +98,7 @@ ReExit(void)
 {
 	// Stop and shutdown the race engine.
 	ReStop();
-	ReShutdown();
+	RaceEngine::self().shutdown();
 	
 	// Notify the user interface.
 	ReUI().quit();
@@ -139,29 +111,6 @@ void ReShutdown(void)
 {
     if (!ReInfo)
         return;
-
-	GfLogInfo("Terminating race engine.\n");
-
-	// Unload the track.
-	ITrackLoader* piTrkLoader = GfTracks::self()->getTrackLoader();
-    piTrkLoader->unload();
-
-    // Unload the Physics engine, Track loader and Graphics modules if not already done.
-    GfModule* pmodPhysEngine = dynamic_cast<GfModule*>(&RePhysicsEngine());
-	if (pmodPhysEngine)
-	{
-		GfModule::unload(pmodPhysEngine);
-		RaceEngine::self().setPhysicsEngine(0);
-	}
-
-    GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(piTrkLoader);
-	if (pmodTrkLoader)
-	{
-		GfModule::unload(pmodTrkLoader);
-		GfTracks::self()->setTrackLoader(0);
-	}
-	
-    ReUI().shutdownGraphics(); // => onRaceEngineShutdown ?
 
 	// Free ReInfo memory.
 	ReSituation::terminate();
@@ -861,6 +810,7 @@ ReRaceCleanup(void)
   ReInfo->_reGameScreen = ReUI().createRaceEventLoopHook();
 
   RePhysicsEngine().shutdown();
+  RaceEngine::self().unloadPhysicsEngine();
 
   if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
   {
