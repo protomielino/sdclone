@@ -580,7 +580,6 @@ SimUpdateSingleCar(int index, double deltaTime, tSituation *s)
     tCarElt 	*carElt;
     tCar 	*car;
     sgVec3	P;
-	static const float UPSIDE_DOWN_TIMEOUT = 5.0f;
 
     SimDeltaTime = (float)deltaTime;
 	SimCarTable[index].collision = 0;
