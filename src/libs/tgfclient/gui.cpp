@@ -48,7 +48,7 @@ tMouseInfo	GfuiMouse;
 
 int		GfuiMouseHW = 0;
 
-float		GfuiColor[GFUI_COLORNB][4];
+float		gfuiColors[GFUI_COLORNB][4];
 static		char buf[1024];
 
 
@@ -84,7 +84,7 @@ gfuiColorInit(void)
 	for (i = 0; i < GFUI_COLORNB; i++) {
 		for (j = 0; j < 4; j++) {
 			sprintf(buf, "%s/%s/%s", GFSCR_SECT_MENUCOL, GFSCR_LIST_COLORS, clr[i]);
-			GfuiColor[i][j] = GfParmGetNum(hdle, buf, rgba[j], (char*)NULL, 1.0);
+			gfuiColors[i][j] = GfParmGetNum(hdle, buf, rgba[j], (char*)NULL, 1.0);
 		}
 	}
 
@@ -112,10 +112,10 @@ gfuiInit(void)
 	gfuiMenuInit();
 }
 
-Color 
-GetColor(const float* color)
+GfuiColor 
+gfuiGetColor(const float* color)
 {
-     Color c;
+     GfuiColor c;
      c.red = color[0];
      c.green = color[1];
      c.blue = color[2];
@@ -206,9 +206,9 @@ GfuiRedraw(void)
 		glDisable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor3f(GfuiColor[GFUI_BASECOLORBGIMAGE][0], 
-			  GfuiColor[GFUI_BASECOLORBGIMAGE][1],
-			  GfuiColor[GFUI_BASECOLORBGIMAGE][2]);
+		glColor3f(gfuiColors[GFUI_BASECOLORBGIMAGE][0], 
+			  gfuiColors[GFUI_BASECOLORBGIMAGE][1],
+			  gfuiColors[GFUI_BASECOLORBGIMAGE][2]);
 		glBindTexture(GL_TEXTURE_2D, GfuiScreen->bgImage);
 
 		// Get real 2^N x 2^P texture size (may have been 0 padded at load time
@@ -581,10 +581,10 @@ GfuiScreenCreate(void)
 	screen->width = 640.0;
 	screen->height = 480.0;
 
-	screen->bgColor = GetColor(&GfuiColor[GFUI_BGCOLOR][0]);
+	screen->bgColor = gfuiGetColor(&gfuiColors[GFUI_BGCOLOR][0]);
 
-	screen->mouseColor[0] = &(GfuiColor[GFUI_MOUSECOLOR1][0]);
-	screen->mouseColor[1] = &(GfuiColor[GFUI_MOUSECOLOR2][0]);
+	screen->mouseColor[0] = &(gfuiColors[GFUI_MOUSECOLOR1][0]);
+	screen->mouseColor[1] = &(gfuiColors[GFUI_MOUSECOLOR2][0]);
 
 	screen->mouseAllowed = 1;
 	
@@ -620,13 +620,13 @@ GfuiScreenCreateEx(float *bgColor,
 	screen->height = 480.0;
 	
 	if (bgColor != NULL) {
-		screen->bgColor = GetColor(bgColor);
+		screen->bgColor = gfuiGetColor(bgColor);
 	} else {
-		screen->bgColor = GetColor(&GfuiColor[GFUI_BGCOLOR][0]);
+		screen->bgColor = gfuiGetColor(&gfuiColors[GFUI_BGCOLOR][0]);
 	}
 
-	screen->mouseColor[0] = &(GfuiColor[GFUI_MOUSECOLOR1][0]);
-	screen->mouseColor[1] = &(GfuiColor[GFUI_MOUSECOLOR2][0]);
+	screen->mouseColor[0] = &(gfuiColors[GFUI_MOUSECOLOR1][0]);
+	screen->mouseColor[1] = &(gfuiColors[GFUI_MOUSECOLOR2][0]);
 	screen->onActivate = onActivate;
 	screen->userActData = userDataOnActivate;
 	screen->onDeactivate = onDeactivate;

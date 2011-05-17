@@ -35,7 +35,7 @@ class RmCarSelectMenu : public GfuiMenuScreen
 public:
 
 	RmCarSelectMenu();
-	void RunMenu(GfRace* pRace, GfDriver* pDriver);
+	void runMenu(GfRace* pRace, GfDriver* pDriver);
 	
 	std::string resetCarCategoryComboBox(const std::string& strSelCatName = "");
 	GfCar* resetCarModelComboBox(const std::string& strCatName,
@@ -47,7 +47,7 @@ public:
 
 protected:
 	
-	bool Initialize();
+	bool initialize();
 
 	void setDriver(GfDriver* pDriver);
 	const GfDriver* getDriver() const;

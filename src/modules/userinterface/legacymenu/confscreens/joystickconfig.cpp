@@ -250,26 +250,26 @@ JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
     // Create screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreateEx(NULL, NULL, onActivate, NULL, NULL, 1);
 
-    void *menuXMLDescHdle = LoadMenuXML("joystickconfigmenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("joystickconfigmenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, ScrHandle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
 
     // Create joystick axis label controls (axis name, axis Id, axis min value, axis max value)
     for (i = 0; i < NbMaxCalAxis; i++) {
 	sprintf(pszBuf, "%saxislabel", LabName[i]);
-	LabAxisId[i] = CreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
+	LabAxisId[i] = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
 	sprintf(pszBuf, "%sminlabel", LabName[i]);
-	LabMinId[i] = CreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
+	LabMinId[i] = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
 	sprintf(pszBuf, "%smaxlabel", LabName[i]);
-	LabMaxId[i] = CreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
+	LabMaxId[i] = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, pszBuf);
     }
 
     // Create instruction variable label.
-    InstId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
+    InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
     // Create Back and Reset buttons.
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
+    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
+    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);

@@ -120,12 +120,12 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
     // Create screen, load menu XML descriptor and create static controls.
     rmScrHdle = GfuiScreenCreate();
 
-    void *menuXMLDescHdle = LoadMenuXML("startracemenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("startracemenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, rmScrHdle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScrHdle);
 
     // Create variable title label.
-    int titleId = CreateLabelControl(rmScrHdle, menuXMLDescHdle, "titlelabel");
+    int titleId = GfuiMenuCreateLabelControl(rmScrHdle, menuXMLDescHdle, "titlelabel");
     GfuiLabelSetText(rmScrHdle, titleId, race);
 
     // Create background image if any.
@@ -138,7 +138,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
     if (!strcmp(GfParmGetStr(params, race, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES)) {
 
         // Create starting grid subtitle label.
-        CreateLabelControl(rmScrHdle, menuXMLDescHdle, "subtitlelabel");
+        GfuiMenuCreateLabelControl(rmScrHdle, menuXMLDescHdle, "subtitlelabel");
 
         sprintf(path, "%s/%s", race, RM_SECT_STARTINGGRID);
         rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
@@ -211,7 +211,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             prevStartRace.start    = start - NMaxLines;
 
             // Create Previous page button and associated keyboard shortcut if needed.
-            CreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
+            GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
                                 (void*)&prevStartRace, rmChgStartScreen);
             GfuiAddKey(rmScrHdle, GFUIK_PAGEUP, "Previous drivers", 
                         (void*)&prevStartRace, rmChgStartScreen, NULL);
@@ -224,7 +224,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
             nextStartRace.start    = start + NMaxLines;
 
             // Create Next page button and associated keyboard shortcut if needed.
-            CreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
+            GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
                                 (void*)&nextStartRace, rmChgStartScreen);
             GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Drivers", 
                         (void*)&nextStartRace, rmChgStartScreen, NULL);
@@ -232,8 +232,8 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
     }
         
     // Create Start and Abandon buttons.
-    CreateButtonControl(rmScrHdle, menuXMLDescHdle, "startbutton", startScr, GfuiScreenReplace);
-    CreateButtonControl(rmScrHdle, menuXMLDescHdle, "abandonbutton", abortScr, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "startbutton", startScr, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "abandonbutton", abortScr, GfuiScreenReplace);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);

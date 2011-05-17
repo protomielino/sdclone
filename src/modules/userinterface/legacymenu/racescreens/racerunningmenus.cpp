@@ -416,13 +416,13 @@ RmScreenInit()
 
     // Create screen, load menu XML descriptor and create static controls.
     rmScreenHandle = GfuiScreenCreateEx(black, 0, rmScreenActivate, 0, 0, 0);
-    void *menuXMLDescHdle = LoadMenuXML("raceglscreen.xml");
-    CreateStaticControls(menuXMLDescHdle, rmScreenHandle);
+    void *menuXMLDescHdle = GfuiMenuLoad("raceglscreen.xml");
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScreenHandle);
 
     // Create Message, BigMessage and Pause labels.
-    rmMsgId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "message");
-    rmBigMsgId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "bigmessage");
-    rmPauseId = CreateLabelControl(rmScreenHandle, menuXMLDescHdle, "pause");
+    rmMsgId = GfuiMenuCreateLabelControl(rmScreenHandle, menuXMLDescHdle, "message");
+    rmBigMsgId = GfuiMenuCreateLabelControl(rmScreenHandle, menuXMLDescHdle, "bigmessage");
+    rmPauseId = GfuiMenuCreateLabelControl(rmScreenHandle, menuXMLDescHdle, "pause");
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);
@@ -561,11 +561,11 @@ RmResScreenInit()
 
     // Create screen, load menu XML descriptor and create static controls.
     rmResScreenHdle = GfuiScreenCreateEx(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
-    void *menuXMLDescHdle = LoadMenuXML("raceblindscreen.xml");
-    CreateStaticControls(menuXMLDescHdle, rmResScreenHdle);
+    void *menuXMLDescHdle = GfuiMenuLoad("raceblindscreen.xml");
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, rmResScreenHdle);
 
     // Create variable main title (race type/stage) label.
-    rmResMainTitleId = CreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "title");
+    rmResMainTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "title");
     GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, aSessionTypeNames[reInfo->s->_raceType]);
 
     // Create background image if any specified.
@@ -574,7 +574,7 @@ RmResScreenInit()
 		GfuiScreenAddBgImg(rmResScreenHdle, img);
     
     // Create variable subtitle (driver and race name, lap number) label.
-    rmResTitleId = CreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "subtitle");
+    rmResTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "subtitle");
 
     // Create result lines (1 label for each).
     // TODO: Get layout, color, ... info from menuXMLDescHdle when available.

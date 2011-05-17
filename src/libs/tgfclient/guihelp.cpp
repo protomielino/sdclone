@@ -39,8 +39,8 @@
 
 
 static void	*scrHandle;
-static float	*fgColor1 = &(GfuiColor[GFUI_HELPCOLOR1][0]);
-static float	*fgColor2 = &(GfuiColor[GFUI_HELPCOLOR2][0]);
+static float	*fgColor1 = &(gfuiColors[GFUI_HELPCOLOR1][0]);
+static float	*fgColor2 = &(gfuiColors[GFUI_HELPCOLOR2][0]);
 
 void
 gfuiHelpInit(void)
@@ -60,9 +60,9 @@ GfuiHelpScreen(void *prevScreen)
     // Create screen, load menu XML descriptor and create static controls.
     scrHandle = GfuiScreenCreate();
     
-    void *menuXMLDescHdle = LoadMenuXML("helpmenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("helpmenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, scrHandle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, scrHandle);
 
     // Create 2 columns table for the keyboard shortcuts explainations
     const int dx = 80;
@@ -126,10 +126,10 @@ GfuiHelpScreen(void *prevScreen)
     
 
     // Create Back button.
-    CreateButtonControl(scrHandle, menuXMLDescHdle, "backbutton", prevScreen, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(scrHandle, menuXMLDescHdle, "backbutton", prevScreen, GfuiScreenActivate);
 
     // Create version label.
-    const int versionId = CreateLabelControl(scrHandle, menuXMLDescHdle, "versionlabel");
+    const int versionId = GfuiMenuCreateLabelControl(scrHandle, menuXMLDescHdle, "versionlabel");
     GfuiLabelSetText(scrHandle, versionId, VERSION_LONG);
 
     // Close menu XML descriptor.

@@ -66,8 +66,8 @@ RmNextEventMenu(void)
 								  NULL, (tfuiCallback)NULL, 
 								  NULL, (tfuiCallback)NULL, 
 								  1);
-	void *menuXMLDescHdle = LoadMenuXML("racenexteventmenu.xml");
-	CreateStaticControls(menuXMLDescHdle, rmScrHandle);
+	void *menuXMLDescHdle = GfuiMenuLoad("racenexteventmenu.xml");
+	GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScrHandle);
 
 	// Create background image from race params.
 	const char* pszBGImg = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
@@ -76,7 +76,7 @@ RmNextEventMenu(void)
 	}
 
 	// Create variable title label from race params.
-	int titleId = CreateLabelControl(rmScrHandle, menuXMLDescHdle, "titlelabel");
+	int titleId = GfuiMenuCreateLabelControl(rmScrHandle, menuXMLDescHdle, "titlelabel");
 	GfuiLabelSetText(rmScrHandle, titleId, reInfo->_reName);
 
 	// Calculate which race of the series this is
@@ -95,12 +95,12 @@ RmNextEventMenu(void)
 			 (int)GfParmGetNum(params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, -1 ) :
 			 GfParmGetEltNb(params, RM_SECT_TRACKS), 
 			 reInfo->track->name);
-	int subTitleId = CreateLabelControl(rmScrHandle, menuXMLDescHdle, "subtitlelabel");
+	int subTitleId = GfuiMenuCreateLabelControl(rmScrHandle, menuXMLDescHdle, "subtitlelabel");
 	GfuiLabelSetText(rmScrHandle, subTitleId, buf);
 
 	// Create Start and Abandon buttons.
-	CreateButtonControl(rmScrHandle, menuXMLDescHdle, "startbutton", NULL, rmStateManage);
-	CreateButtonControl(rmScrHandle, menuXMLDescHdle, "abandonbutton", reInfo->_reMenuScreen, GfuiScreenActivate);
+	GfuiMenuCreateButtonControl(rmScrHandle, menuXMLDescHdle, "startbutton", NULL, rmStateManage);
+	GfuiMenuCreateButtonControl(rmScrHandle, menuXMLDescHdle, "abandonbutton", reInfo->_reMenuScreen, GfuiScreenActivate);
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);

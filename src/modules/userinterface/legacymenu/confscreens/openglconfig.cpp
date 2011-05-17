@@ -308,45 +308,45 @@ void* OpenGLMenuInit(void *prevMenu)
 	PrevHandle = prevMenu;
 
 	ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-	void *hparmMenu = LoadMenuXML("opengloptionsmenu.xml");
-	CreateStaticControls(hparmMenu,ScrHandle);
+	void *hparmMenu = GfuiMenuLoad("opengloptionsmenu.xml");
+	GfuiMenuCreateStaticControls(hparmMenu,ScrHandle);
 
 	// Texture compression.
 	TextureCompLeftButtonId =
-		CreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionLeftArrowButton", (void*)-1,
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionLeftArrowButton", (void*)-1,
 							changeTextureCompressionState);
 	TextureCompRightButtonId =
-		CreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionRightArrowButton", (void*)+1,
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "TextureCompressionRightArrowButton", (void*)+1,
 							changeTextureCompressionState);
-	TextureCompLabelId = CreateLabelControl(ScrHandle,hparmMenu,"TextureCompressionLabel");
+	TextureCompLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"TextureCompressionLabel");
 
 	// Texture sizing.
-	CreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeLeftArrowButton", (void*)-1,
+	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeLeftArrowButton", (void*)-1,
 						changeMaxTextureSizeState);
-	CreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeRightArrowButton", (void*)+1,
+	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"MaxTextureSizeRightArrowButton", (void*)+1,
 						changeMaxTextureSizeState);
-	MaxTextureSizeLabelId = CreateLabelControl(ScrHandle,hparmMenu,"MaxTextureSizeLabel");
+	MaxTextureSizeLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MaxTextureSizeLabel");
 
 	// Multi-texturing.
 	MultiTextureLeftButtonId =
-		CreateButtonControl(ScrHandle, hparmMenu, "MultiTextureLeftArrowButton", (void*)-1,
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiTextureLeftArrowButton", (void*)-1,
 							changeMultiTextureState);
 	MultiTextureRightButtonId =
-		CreateButtonControl(ScrHandle, hparmMenu, "MultiTextureRightArrowButton", (void*)+1,
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiTextureRightArrowButton", (void*)+1,
 							changeMultiTextureState);
-	MultiTextureLabelId = CreateLabelControl(ScrHandle,hparmMenu,"MultiTextureLabel");
+	MultiTextureLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MultiTextureLabel");
 
 	// Multi-sampling.
 	MultiSampleLeftButtonId =
-		CreateButtonControl(ScrHandle, hparmMenu, "MultiSampleLeftArrowButton", (void*)-1,
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleLeftArrowButton", (void*)-1,
 							changeMultiSampleState);
 	MultiSampleRightButtonId =
-		CreateButtonControl(ScrHandle, hparmMenu, "MultiSampleRightArrowButton", (void*)+1,
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleRightArrowButton", (void*)+1,
 							changeMultiSampleState);
-	MultiSampleLabelId = CreateLabelControl(ScrHandle,hparmMenu,"MultiSampleLabel");
+	MultiSampleLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MultiSampleLabel");
 
-	CreateButtonControl(ScrHandle,hparmMenu,"AcceptButton",NULL, onAccept);
-	CreateButtonControl(ScrHandle,hparmMenu,"CancelButton",prevMenu, GfuiScreenActivate);
+	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"AcceptButton",NULL, onAccept);
+	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"CancelButton",prevMenu, GfuiScreenActivate);
 
 	GfParmReleaseHandle(hparmMenu);
 

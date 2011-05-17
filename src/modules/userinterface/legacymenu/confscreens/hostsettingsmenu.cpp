@@ -34,16 +34,16 @@ bool HostSettingsMenu::m_bCollisions = true;
 bool HostSettingsMenu::m_bHumanHost = true;
 
 
-void HostSettingsMenu::onActCB(void *p)
+void HostSettingsMenu::onActivate(void *p)
 {
 }
 
-void HostSettingsMenu::CarControlCB(tComboBoxInfo *pInfo)
+void HostSettingsMenu::onCarControl(tComboBoxInfo *pInfo)
 {
 	m_strCarCat = pInfo->vecChoices[pInfo->nPos];
 }
 
-void HostSettingsMenu::CarCollideCB(tComboBoxInfo *pInfo)
+void HostSettingsMenu::onCarCollide(tComboBoxInfo *pInfo)
 {
 	if (pInfo->vecChoices[pInfo->nPos] == "Off")
 		m_bCollisions = false;
@@ -51,7 +51,7 @@ void HostSettingsMenu::CarCollideCB(tComboBoxInfo *pInfo)
 		m_bCollisions = true;
 
 }
-void HostSettingsMenu::humanHostCB(tComboBoxInfo *pInfo)
+void HostSettingsMenu::onHumanHost(tComboBoxInfo *pInfo)
 {
 	if (pInfo->vecChoices[pInfo->nPos] == "Yes")
 		m_bHumanHost = true;
@@ -65,13 +65,13 @@ void HostSettingsMenu::onPlayerReady(void *p)
 	//TODO
 }
 
-void HostSettingsMenu::onAcceptCB(void *p)
+void HostSettingsMenu::onAccept(void *p)
 {
 	GetServer()->SetHostSettings(m_strCarCat.c_str(),m_bCollisions);
 	GfuiScreenActivate(pPrevMenu);
 }
 
-void HostSettingsMenu::onCancelCB(void *p)
+void HostSettingsMenu::onCancel(void *p)
 {
 	GfuiScreenActivate(pPrevMenu);
 }
@@ -81,22 +81,22 @@ HostSettingsMenu::HostSettingsMenu()
 {
 }
 
-bool HostSettingsMenu::Init(void* pMenu)
+bool HostSettingsMenu::initialize(void* pMenu)
 {
 	GetNetwork()->GetHostSettings(m_strCarCat,m_bCollisions);
 
 	pPrevMenu = pMenu;
 
-	void* pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActCB, 
+	void* pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActivate, 
 										   NULL, (tfuiCallback)NULL, 
 										   1);
-	SetMenuHandle(pMenuHandle);
+	setMenuHandle(pMenuHandle);
 
-    OpenXMLDescriptor();
+    openXMLDescriptor();
     
-    CreateStaticControls();
+    createStaticControls();
 
-	int carCatId = CreateComboboxControl("carcatcombobox",NULL,CarControlCB);
+	int carCatId = createComboboxControl("carcatcombobox",NULL, onCarControl);
 	const std::vector<std::string>& vecCategories = GfCars::self()->getCategoryIds();
 	
 	int CatIndex = 0;
@@ -109,20 +109,20 @@ bool HostSettingsMenu::Init(void* pMenu)
 
 	GfuiComboboxSetSelectedIndex(pMenuHandle,carCatId,CatIndex);
 
-	int collId = CreateComboboxControl("carcollidecombobox",NULL,CarCollideCB);
+	int collId = createComboboxControl("carcollidecombobox",NULL,onCarCollide);
 	GfuiComboboxAddText(pMenuHandle,collId,"On");
 	GfuiComboboxAddText(pMenuHandle,collId,"Off");
 
-	int humanHostId = CreateComboboxControl("hosthumanplayercombobox",NULL,humanHostCB);
+	int humanHostId = createComboboxControl("hosthumanplayercombobox",NULL,onHumanHost);
 	GfuiComboboxAddText(pMenuHandle,humanHostId,"Yes");
 	GfuiComboboxAddText(pMenuHandle,humanHostId,"No");
 
 	GfuiComboboxSetSelectedIndex(pMenuHandle,humanHostId,0);
 
-    CreateButtonControl("accept",NULL,onAcceptCB);
-    CreateButtonControl("cancel",NULL,onCancelCB);
+    createButtonControl("accept",NULL,onAccept);
+    createButtonControl("cancel",NULL,onCancel);
 
-    CloseXMLDescriptor();
+    closeXMLDescriptor();
 
 	return true;
 }

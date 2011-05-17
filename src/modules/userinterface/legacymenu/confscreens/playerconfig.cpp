@@ -828,46 +828,46 @@ PlayerConfigMenuInit(void *prevMenu)
 
     /* Create the screen, load menu XML descriptor and create static controls */
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
-    void *param = LoadMenuXML("playerconfigmenu.xml");
-    CreateStaticControls(param,ScrHandle);
+    void *param = GfuiMenuLoad("playerconfigmenu.xml");
+    GfuiMenuCreateStaticControls(param,ScrHandle);
 
     /* Player scroll list */
-    ScrollList = CreateScrollListControl(ScrHandle,param,"playerscrolllist",NULL, onSelect);
+    ScrollList = GfuiMenuCreateScrollListControl(ScrHandle,param,"playerscrolllist",NULL, onSelect);
 
     /* New, copy and delete player buttons */
-    CreateButtonControl(ScrHandle,param,"new",NULL,NewPlayer);
-    CreateButtonControl(ScrHandle,param,"copy",NULL,CopyPlayer);
-    CreateButtonControl(ScrHandle,param,"delete",NULL,DeletePlayer);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"new",NULL,NewPlayer);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"copy",NULL,CopyPlayer);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"delete",NULL,DeletePlayer);
 
     /* Access to control screen button */
-    CreateButtonControl(ScrHandle,param,"controls",NULL,ConfControls);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"controls",NULL,ConfControls);
 
     /* Player name editbox */
-    NameEditId = CreateEditControl(ScrHandle,param,"nameedit",NULL,NULL,ChangeName);
+    NameEditId = GfuiMenuCreateEditControl(ScrHandle,param,"nameedit",NULL,NULL,ChangeName);
 
     /* Player skill level "combobox" (left arrow, label, right arrow) */
-    CreateButtonControl(ScrHandle,param,"levelleftarrow",(void*)0, ChangeLevel);
-    CreateButtonControl(ScrHandle,param,"levelrightarrow",(void*)1, ChangeLevel);
-    SkillEditId = CreateLabelControl(ScrHandle,param,"skillstext");
+    GfuiMenuCreateButtonControl(ScrHandle,param,"levelleftarrow",(void*)0, ChangeLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"levelrightarrow",(void*)1, ChangeLevel);
+    SkillEditId = GfuiMenuCreateLabelControl(ScrHandle,param,"skillstext");
 
     /* Races and pits numbers editboxes (Must they really stay here ?) */
-    RaceNumEditId = CreateEditControl(ScrHandle,param,"racenumedit",NULL,NULL,ChangeNum);
-    PitsEditId = CreateEditControl(ScrHandle,param,"pitstopedit",NULL,NULL,ChangePits);
+    RaceNumEditId = GfuiMenuCreateEditControl(ScrHandle,param,"racenumedit",NULL,NULL,ChangeNum);
+    PitsEditId = GfuiMenuCreateEditControl(ScrHandle,param,"pitstopedit",NULL,NULL,ChangePits);
     
     /* Gear changing mode and associated "combobox" (left arrow, label, right arrow) */
-    CreateButtonControl(ScrHandle,param,"gearleftarrow",(void*)0, ChangeGearChange);
-    CreateButtonControl(ScrHandle,param,"gearrightarrow",(void*)1, ChangeGearChange);
-    GearChangeEditId = CreateLabelControl(ScrHandle,param,"geartext");
+    GfuiMenuCreateButtonControl(ScrHandle,param,"gearleftarrow",(void*)0, ChangeGearChange);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"gearrightarrow",(void*)1, ChangeGearChange);
+    GearChangeEditId = GfuiMenuCreateLabelControl(ScrHandle,param,"geartext");
 
     /* Gear changing auto-reverse flag and associated "combobox" (left arrow, label, right arrow) */
-    AutoReverseLabelId = CreateLabelControl(ScrHandle,param,"autoreversetext");
-    AutoReverseLeftId = CreateButtonControl(ScrHandle,param,"autoleftarrow",(void*)-1, ChangeReverse);
-    AutoReverseRightId = CreateButtonControl(ScrHandle,param,"autorightarrow",(void*)1, ChangeReverse);
-    AutoReverseEditId = CreateLabelControl(ScrHandle,param,"autotext");
+    AutoReverseLabelId = GfuiMenuCreateLabelControl(ScrHandle,param,"autoreversetext");
+    AutoReverseLeftId = GfuiMenuCreateButtonControl(ScrHandle,param,"autoleftarrow",(void*)-1, ChangeReverse);
+    AutoReverseRightId = GfuiMenuCreateButtonControl(ScrHandle,param,"autorightarrow",(void*)1, ChangeReverse);
+    AutoReverseEditId = GfuiMenuCreateLabelControl(ScrHandle,param,"autotext");
 
     // Accept and Cancel buttons.
-    CreateButtonControl(ScrHandle,param,"accept",NULL, SavePlayerList);
-    CreateButtonControl(ScrHandle,param,"cancel",NULL, QuitPlayerConfig);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"accept",NULL, SavePlayerList);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"cancel",NULL, QuitPlayerConfig);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(param);

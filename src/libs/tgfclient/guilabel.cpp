@@ -59,9 +59,9 @@ gfuiLabelInit(void)
                     <br>0 for the text width (from the font specs and maxlen).
     @param	font	Font id
     @param	bgColor	Pointer to static RGBA background color array
-                    <br>0 for GfuiColor[GFUI_BGCOLOR] 
+                    <br>0 for gfuiColors[GFUI_BGCOLOR] 
     @param	fgColor	Pointer on static RGBA foreground color array
-                    <br>0 for GfuiColor[GFUI_LABELCOLOR] 
+                    <br>0 for gfuiColors[GFUI_LABELCOLOR] 
     @param	bgFocusColor	Pointer to static RGBA focused background color array
                     <br>0 for bgColor
     @param	fgFocusColor	Pointer on static RGBA focused foreground color array
@@ -84,10 +84,10 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     strncpy(label->text, text, maxlen);
     label->maxlen = maxlen;
     
-    label->bgColor = GetColor(bgColor ? bgColor : &(GfuiColor[GFUI_BGCOLOR][0]));
-    label->fgColor = GetColor(fgColor ? fgColor : &(GfuiColor[GFUI_LABELCOLOR][0]));
-    label->bgFocusColor = bgFocusColor ? GetColor(bgFocusColor) : label->bgColor;
-    label->fgFocusColor = fgFocusColor ? GetColor(fgFocusColor) : label->fgColor;
+    label->bgColor = gfuiGetColor(bgColor ? bgColor : &(gfuiColors[GFUI_BGCOLOR][0]));
+    label->fgColor = gfuiGetColor(fgColor ? fgColor : &(gfuiColors[GFUI_LABELCOLOR][0]));
+    label->bgFocusColor = bgFocusColor ? gfuiGetColor(bgFocusColor) : label->bgColor;
+    label->fgFocusColor = fgFocusColor ? gfuiGetColor(fgFocusColor) : label->fgColor;
 
     label->font = gfuiFont[font];
     if (width == 0)
@@ -193,7 +193,7 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
     
     label = &(object->u.label);
 	gfuiLabelInit(label, text, maxlen, x, y, align, 0, font,
-				  screen->bgColor.GetPtr(), fgColor, screen->bgColor.GetPtr(), fgFocusColor, 
+				  screen->bgColor.toFloatRGBA(), fgColor, screen->bgColor.toFloatRGBA(), fgFocusColor, 
 				  userDataOnFocus, onFocus, onFocusLost);
 
 	const int width = gfuiFont[font]->getWidth((const char *)text);
@@ -274,7 +274,7 @@ int
 GfuiTipCreate(void *scr, const char *text, int maxlen)
 {
     return GfuiLabelCreate(scr, text, GFUI_FONT_SMALL, g_tipX, g_tipY,
-						   GFUI_ALIGN_HC_VB, maxlen, &(GfuiColor[GFUI_TIPCOLOR][0]));
+						   GFUI_ALIGN_HC_VB, maxlen, &(gfuiColors[GFUI_TIPCOLOR][0]));
 }
 
 /** Add a Title to the screen.
@@ -290,7 +290,7 @@ int
 GfuiTitleCreate(void *scr, const char *text, int maxlen)
 {
     return GfuiLabelCreate(scr, text, GFUI_FONT_BIG, 320, 440,
-						   GFUI_ALIGN_HC_VB, maxlen, &(GfuiColor[GFUI_TITLECOLOR][0]));
+						   GFUI_ALIGN_HC_VB, maxlen, &(gfuiColors[GFUI_TITLECOLOR][0]));
 }
 
 /** Change the text of a label.
@@ -362,7 +362,7 @@ GfuiLabelSetText(void *scr, int id, const char *text)
 void
 gfuiLabelSetColor(tGfuiLabel *label, const float *color)
 {
-	label->fgColor = GetColor((float*)color);
+	label->fgColor = gfuiGetColor((float*)color);
 }
 
 /** Change the color of a label object.
@@ -392,7 +392,7 @@ void
 gfuiLabelDraw(tGfuiLabel *label, int focus)
 {
 	// Draw the text, according to the state/focus.
-    glColor4fv(focus ? label->fgFocusColor.GetPtr() : label->fgColor.GetPtr());
+    glColor4fv(focus ? label->fgFocusColor.toFloatRGBA() : label->fgColor.toFloatRGBA());
     gfuiPrintString(label->x, label->y, label->font, label->text);
 }
 
@@ -408,7 +408,7 @@ gfuiDrawLabel(tGfuiObject *obj)
 	// Draw the background if visible.
     if (label->bgColor.alpha)
 	{
-		glColor4fv(obj->focus ? label->bgFocusColor.GetPtr() : label->bgColor.GetPtr());
+		glColor4fv(obj->focus ? label->bgFocusColor.toFloatRGBA() : label->bgColor.toFloatRGBA());
 		glBegin(GL_QUADS);
 		glVertex2i(obj->xmin, obj->ymin);
 		glVertex2i(obj->xmin, obj->ymax);

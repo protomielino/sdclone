@@ -28,24 +28,22 @@ class HostSettingsMenu : public GfuiMenuScreen
 {
 public:
 	HostSettingsMenu();
-	bool Init(void *pPrevMenu);
-	void Activate(void* p);
+	bool initialize(void *pPrevMenu);
 	
 protected:
 	//callback functions must be static
-	static void onActCB(void *p);
-	static void onAcceptCB(void *p);
-	static void onCancelCB(void *p);
-	static void CarControlCB(tComboBoxInfo * pInfo);
-	static void CarCollideCB(tComboBoxInfo * pInfo);
-	static void humanHostCB(tComboBoxInfo *pChoices);
+	static void onActivate(void *p);
+	static void onAccept(void *p);
+	static void onCancel(void *p);
+	static void onCarControl(tComboBoxInfo * pInfo);
+	static void onCarCollide(tComboBoxInfo * pInfo);
+	static void onHumanHost(tComboBoxInfo *pChoices);
 	static void onPlayerReady(void *p);
 
 protected:
 	static std::string m_strCarCat;
 	static bool m_bCollisions;
 	static bool m_bHumanHost;
-
 };
 
 #endif /* _HOSTSETTINGSMENU_H_ */ 

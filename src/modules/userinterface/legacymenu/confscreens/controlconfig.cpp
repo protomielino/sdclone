@@ -567,8 +567,8 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     /* Create screen */
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void *param = LoadMenuXML("controlconfigmenu.xml");
-    CreateStaticControls(param,ScrHandle);
+    void *param = GfuiMenuLoad("controlconfigmenu.xml");
+    GfuiMenuCreateStaticControls(param,ScrHandle);
 
     /* Default keyboard shortcuts */
     GfuiMenuDefaultKeysAdd(ScrHandle);
@@ -576,33 +576,33 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     /* For each control (in Cmd array), create the associated label and editbox */
     for (i = 0; i < MaxCmd; i++) 
     {
-	Cmd[i].labelId = CreateLabelControl(ScrHandle,param,Cmd[i].name);
+	Cmd[i].labelId = GfuiMenuCreateLabelControl(ScrHandle,param,Cmd[i].name);
 	std::string strCmdEdit(Cmd[i].name);
 	strCmdEdit += " button";
-	Cmd[i].Id = CreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
+	Cmd[i].Id = GfuiMenuCreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
 	}
     
     /* Steer Sensibility label and associated editbox */
-    CreateLabelControl(ScrHandle,param,"Steer Sensitivity");
-    SteerSensEditId = CreateEditControl(ScrHandle,param,"Steer Sensitivity Edit",NULL,NULL,onSteerSensChange);
+    GfuiMenuCreateLabelControl(ScrHandle,param,"Steer Sensitivity");
+    SteerSensEditId = GfuiMenuCreateEditControl(ScrHandle,param,"Steer Sensitivity Edit",NULL,NULL,onSteerSensChange);
 
     /* Steer Dead Zone label and associated editbox */
-    DeadZoneLabelId = CreateLabelControl(ScrHandle,param,"Steer Dead Zone");
-    DeadZoneEditId = CreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
+    DeadZoneLabelId = GfuiMenuCreateLabelControl(ScrHandle,param,"Steer Dead Zone");
+    DeadZoneEditId = GfuiMenuCreateEditControl(ScrHandle,param,"Steer Dead Zone Edit",NULL,NULL,onDeadZoneChange);
 
     /* Steer Speed Sensibility label and associated editbox */
-    CreateLabelControl(ScrHandle,param,"Steer Speed Sensitivity");
-    SteerSpeedSensEditId = CreateEditControl(ScrHandle,param,"Steer Speed Sensitivity Edit",NULL,NULL,onSteerSpeedSensChange);
+    GfuiMenuCreateLabelControl(ScrHandle,param,"Steer Speed Sensitivity");
+    SteerSpeedSensEditId = GfuiMenuCreateEditControl(ScrHandle,param,"Steer Speed Sensitivity Edit",NULL,NULL,onSteerSpeedSensChange);
 
     /* Save button and associated keyboard shortcut */
-    CreateButtonControl(ScrHandle,param,"save",PrevScrHandle,onSave);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"save",PrevScrHandle,onSave);
     GfuiAddKey(ScrHandle, GFUIK_RETURN /* Return */, "Save", PrevScrHandle, onSave, NULL);
 
     /* Mouse calibration screen access button */
-    CalibrateButtonId = CreateButtonControl(ScrHandle,param,"calibrate",NULL, DevCalibrate);
+    CalibrateButtonId = GfuiMenuCreateButtonControl(ScrHandle,param,"calibrate",NULL, DevCalibrate);
 
     /* Cancel button and associated keyboard shortcut */
-    CreateButtonControl(ScrHandle,param,"cancel",PrevScrHandle,onQuit);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"cancel",PrevScrHandle,onQuit);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", PrevScrHandle, onQuit, NULL);
 
     /* General callback for keyboard keys */

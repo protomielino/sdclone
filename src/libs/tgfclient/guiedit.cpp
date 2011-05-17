@@ -73,22 +73,22 @@ GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width
     editbox->onFocus = onFocus;
     editbox->onFocusLost = onFocusLost;
 
-    editbox->bgColor[0] =  GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
-    editbox->bgColor[1] =  GetColor(&(GfuiColor[GFUI_BGBTNENABLED][0]));
-    editbox->bgColor[2] =  GetColor(&(GfuiColor[GFUI_BGBTNCLICK][0]));
-    editbox->bgFocusColor[0] =  GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
-    editbox->bgFocusColor[1] =  GetColor(&(GfuiColor[GFUI_BGBTNFOCUS][0]));
-    editbox->bgFocusColor[2] =  GetColor(&(GfuiColor[GFUI_BGBTNCLICK][0]));
-    editbox->fgColor[0] =  GetColor(&(GfuiColor[GFUI_EDITBOXCOLOR][0]));
-    editbox->fgColor[1] =  GetColor(&(GfuiColor[GFUI_EDITBOXCOLOR][0]));
-    editbox->fgColor[2] =  GetColor(&(GfuiColor[GFUI_EDITBOXCOLOR][0]));
+    editbox->bgColor[0] =  gfuiGetColor(&(gfuiColors[GFUI_BGBTNDISABLED][0]));
+    editbox->bgColor[1] =  gfuiGetColor(&(gfuiColors[GFUI_BGBTNENABLED][0]));
+    editbox->bgColor[2] =  gfuiGetColor(&(gfuiColors[GFUI_BGBTNCLICK][0]));
+    editbox->bgFocusColor[0] =  gfuiGetColor(&(gfuiColors[GFUI_BGBTNDISABLED][0]));
+    editbox->bgFocusColor[1] =  gfuiGetColor(&(gfuiColors[GFUI_BGBTNFOCUS][0]));
+    editbox->bgFocusColor[2] =  gfuiGetColor(&(gfuiColors[GFUI_BGBTNCLICK][0]));
+    editbox->fgColor[0] =  gfuiGetColor(&(gfuiColors[GFUI_EDITBOXCOLOR][0]));
+    editbox->fgColor[1] =  gfuiGetColor(&(gfuiColors[GFUI_EDITBOXCOLOR][0]));
+    editbox->fgColor[2] =  gfuiGetColor(&(gfuiColors[GFUI_EDITBOXCOLOR][0]));
 
-    editbox->fgFocusColor[0] =  GetColor(&(GfuiColor[GFUI_EDITBOXCOLOR][0]));
-    editbox->fgFocusColor[1] =  GetColor(&(GfuiColor[GFUI_EDITBOXCOLOR][0]));
-    editbox->fgFocusColor[2] =  GetColor(&(GfuiColor[GFUI_EDITBOXCOLOR][0]));
-    editbox->cursorColor[0] =  GetColor(&(GfuiColor[GFUI_EDITCURSORCLR][0]));
-    editbox->cursorColor[1] =  GetColor(&(GfuiColor[GFUI_EDITCURSORCLR][1]));
-    editbox->cursorColor[2] =  GetColor(&(GfuiColor[GFUI_EDITCURSORCLR][2]));
+    editbox->fgFocusColor[0] =  gfuiGetColor(&(gfuiColors[GFUI_EDITBOXCOLOR][0]));
+    editbox->fgFocusColor[1] =  gfuiGetColor(&(gfuiColors[GFUI_EDITBOXCOLOR][0]));
+    editbox->fgFocusColor[2] =  gfuiGetColor(&(gfuiColors[GFUI_EDITBOXCOLOR][0]));
+    editbox->cursorColor[0] =  gfuiGetColor(&(gfuiColors[GFUI_EDITCURSORCLR][0]));
+    editbox->cursorColor[1] =  gfuiGetColor(&(gfuiColors[GFUI_EDITCURSORCLR][1]));
+    editbox->cursorColor[2] =  gfuiGetColor(&(gfuiColors[GFUI_EDITCURSORCLR][2]));
     
 
     label = &(editbox->label);
@@ -160,7 +160,7 @@ GfuiEditboxGetFocused(void)
 
 
 void
-GfuiEditboxSetColor(void *scr, int id,Color color)
+GfuiEditboxSetColor(void *scr, int id, const GfuiColor& color)
 {
 
     tGfuiObject *curObject;
@@ -189,7 +189,7 @@ GfuiEditboxSetColor(void *scr, int id,Color color)
 }
 
 void
-GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor)
+GfuiEditboxSetFocusColor(void *scr, int id, const GfuiColor& focuscolor)
 {
 
     tGfuiObject *curObject;
@@ -221,8 +221,8 @@ gfuiDrawEditbox(tGfuiObject *obj)
 {
     tGfuiLabel		*label;
     tGfuiEditbox	*editbox;
-    Color		fgColor;
-    Color		bgColor;
+    GfuiColor		fgColor;
+    GfuiColor		bgColor;
 
     editbox = &(obj->u.editbox);
     if (obj->state == GFUI_DISABLE) {
@@ -238,7 +238,7 @@ gfuiDrawEditbox(tGfuiObject *obj)
 	bgColor = editbox->bgColor[editbox->state];
     }
 
-    glColor4fv(bgColor.GetPtr());
+    glColor4fv(bgColor.toFloatRGBA());
     glBegin(GL_QUADS);
     glVertex2i(obj->xmin, obj->ymin);
     glVertex2i(obj->xmin, obj->ymax);
@@ -246,7 +246,7 @@ gfuiDrawEditbox(tGfuiObject *obj)
     glVertex2i(obj->xmax, obj->ymin);
     glEnd();
     
-    glColor4fv(fgColor.GetPtr());
+    glColor4fv(fgColor.toFloatRGBA());
     glBegin(GL_LINE_STRIP);
     glVertex2i(obj->xmin, obj->ymin);
     glVertex2i(obj->xmin, obj->ymax);
@@ -256,12 +256,12 @@ gfuiDrawEditbox(tGfuiObject *obj)
     glEnd();	
     
     label = &(editbox->label);
-    glColor4fv(fgColor.GetPtr());
+    glColor4fv(fgColor.toFloatRGBA());
     gfuiPrintString(label->x, label->y, label->font, label->text);
     
     if ((obj->state != GFUI_DISABLE) && (obj->focus)) {
 	/* draw cursor */
-	glColor3fv(editbox->cursorColor[editbox->state].GetPtr());
+	glColor3fv(editbox->cursorColor[editbox->state].toFloatRGBA());
 	glBegin(GL_LINES);
 	glVertex2i(editbox->cursorx, editbox->cursory1);
 	glVertex2i(editbox->cursorx, editbox->cursory2);

@@ -29,14 +29,13 @@ class CarSettingsMenu : public GfuiMenuScreen
 public:
 
 	CarSettingsMenu();
-	bool Init(void *pPrevMenu,const char *pzaCar);
-	void Activate(void* p);
+	bool initialize(void *pPrevMenu,const char *pzaCar);
 protected:
 	//callback functions must be static
-	static void onActCB(void *p);
-	static void onAcceptCB(void *p);
-	static void onCancelCB(void *p);
-	static void CarPickCB(tComboBoxInfo * pInfo);
+	static void onActivate(void *p);
+	static void onAccept(void *p);
+	static void onCancel(void *p);
+	static void onCarPick(tComboBoxInfo * pInfo);
 
 	static std::string m_strCar;
 };

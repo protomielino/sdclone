@@ -161,17 +161,17 @@ void * SoundMenuInit(void *prevMenu)
 
 	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-	void *param = LoadMenuXML("soundmenu.xml");
-	CreateStaticControls(param,scrHandle);
+	void *param = GfuiMenuLoad("soundmenu.xml");
+	GfuiMenuCreateStaticControls(param,scrHandle);
 
-	CreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
-	CreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
+	GfuiMenuCreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
 
-	SoundOptionId = CreateLabelControl(scrHandle,param,"soundlabel");
-	CreateButtonControl(scrHandle,param,"accept",NULL,saveSoundOption);
-	CreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+	SoundOptionId = GfuiMenuCreateLabelControl(scrHandle,param,"soundlabel");
+	GfuiMenuCreateButtonControl(scrHandle,param,"accept",NULL,saveSoundOption);
+	GfuiMenuCreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
-	VolumeValueId = CreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
+	VolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
 
 	GfParmReleaseHandle(param);
     

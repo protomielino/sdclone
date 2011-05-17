@@ -128,8 +128,8 @@ RmRaceSelectInit(void *prevMenu)
 											NULL, rmOnActivate, 
 											NULL, (tfuiCallback)NULL, 
 											1);
-    void *hMenuXMLDesc = LoadMenuXML("raceselectmenu.xml");
-    CreateStaticControls(hMenuXMLDesc, rmRaceSelectHandle);
+    void *hMenuXMLDesc = GfuiMenuLoad("raceselectmenu.xml");
+    GfuiMenuCreateStaticControls(hMenuXMLDesc, rmRaceSelectHandle);
 
     // Create the raceman type buttons and sub-type combo-boxes (if any).
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();
@@ -146,7 +146,7 @@ RmRaceSelectInit(void *prevMenu)
 		std::string strButtonCtrlName(*itRaceManType);
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
-		CreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
+		GfuiMenuCreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
 							(void*)(itRaceManType - vecRaceManTypes.begin()),
 							rmOnSelectRaceMan);
 
@@ -170,7 +170,7 @@ RmRaceSelectInit(void *prevMenu)
 		strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
 		strComboCtrlName += "Combo";
 		rmMapSubTypeComboIds[*itRaceManType] =
-			CreateComboboxControl(rmRaceSelectHandle, hMenuXMLDesc,
+			GfuiMenuCreateComboboxControl(rmRaceSelectHandle, hMenuXMLDesc,
 								  strComboCtrlName.c_str(), 0, rmOnChangeRaceMan);
 
 		// Add one item in the combo for each race manager of this type.
@@ -189,7 +189,7 @@ RmRaceSelectInit(void *prevMenu)
 	}
 	
     // Create Back button
-    CreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, "BackButton",
+    GfuiMenuCreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, "BackButton",
 						prevMenu, rmOnRaceSelectShutdown);
 
     // Close menu XML descriptor.

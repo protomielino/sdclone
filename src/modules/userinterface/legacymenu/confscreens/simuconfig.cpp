@@ -175,25 +175,25 @@ SimuMenuInit(void *prevMenu)
 
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void *menuDescHdle = LoadMenuXML("simulationmenu.xml");
-    CreateStaticControls(menuDescHdle, ScrHandle);
+    void *menuDescHdle = GfuiMenuLoad("simulationmenu.xml");
+    GfuiMenuCreateStaticControls(menuDescHdle, ScrHandle);
 
-    SimuVersionId = CreateLabelControl(ScrHandle,menuDescHdle,"simulabel");
-    CreateButtonControl(ScrHandle, menuDescHdle, "simuleftarrow", (void*)-1, onChangeSimuVersion);
-    CreateButtonControl(ScrHandle, menuDescHdle, "simurightarrow", (void*)1, onChangeSimuVersion);
+    SimuVersionId = GfuiMenuCreateLabelControl(ScrHandle,menuDescHdle,"simulabel");
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "simuleftarrow", (void*)-1, onChangeSimuVersion);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "simurightarrow", (void*)1, onChangeSimuVersion);
 
-    MultiThreadSchemeId = CreateLabelControl(ScrHandle, menuDescHdle, "mthreadlabel");
+    MultiThreadSchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "mthreadlabel");
 
-    CreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", (void*)-1, onChangeMultiThreadScheme);
-    CreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", (void*)1, onChangeMultiThreadScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "mthreadleftarrow", (void*)-1, onChangeMultiThreadScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "mthreadrightarrow", (void*)1, onChangeMultiThreadScheme);
 
-    ThreadAffinitySchemeId = CreateLabelControl(ScrHandle, menuDescHdle, "threadafflabel");
+    ThreadAffinitySchemeId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "threadafflabel");
 
-    CreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", (void*)-1, onChangeThreadAffinityScheme);
-    CreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", (void*)1, onChangeThreadAffinityScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffleftarrow", (void*)-1, onChangeThreadAffinityScheme);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "threadaffrightarrow", (void*)1, onChangeThreadAffinityScheme);
 	
-    CreateButtonControl(ScrHandle, menuDescHdle, "accept", PrevScrHandle, storeSimuCfg);
-    CreateButtonControl(ScrHandle, menuDescHdle, "cancel", PrevScrHandle, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "accept", PrevScrHandle, storeSimuCfg);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "cancel", PrevScrHandle, GfuiScreenActivate);
 
 
     GfParmReleaseHandle(menuDescHdle);

@@ -254,28 +254,28 @@ RmTrackSelect(void *vs)
     ScrHandle =
 		GfuiScreenCreateEx((float*)NULL, NULL, rmtsActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void *hparmMenu = LoadMenuXML("trackselectmenu.xml");
-    CreateStaticControls(hparmMenu, ScrHandle);
+    void *hparmMenu = GfuiMenuLoad("trackselectmenu.xml");
+    GfuiMenuCreateStaticControls(hparmMenu, ScrHandle);
 
-    CreateButtonControl(ScrHandle, hparmMenu, "trackcatleftarrow",(void*)-1, rmtsTrackCatPrevNext);
-    CreateButtonControl(ScrHandle, hparmMenu, "trackcatrightarrow",(void*)1, rmtsTrackCatPrevNext);
-    CategoryEditId = CreateLabelControl(ScrHandle, hparmMenu, "trackcatlabel");
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatleftarrow",(void*)-1, rmtsTrackCatPrevNext);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatrightarrow",(void*)1, rmtsTrackCatPrevNext);
+    CategoryEditId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "trackcatlabel");
 
-    CreateButtonControl(ScrHandle, hparmMenu, "trackleftarrow", (void*)-1, rmtsTrackPrevNext);
-    CreateButtonControl(ScrHandle, hparmMenu, "trackrightarrow", (void*)1, rmtsTrackPrevNext);
-    NameEditId = CreateLabelControl(ScrHandle, hparmMenu, "tracklabel");
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackleftarrow", (void*)-1, rmtsTrackPrevNext);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackrightarrow", (void*)1, rmtsTrackPrevNext);
+    NameEditId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "tracklabel");
 
-    OutlineImageId = CreateStaticImageControl(ScrHandle, hparmMenu, "outlineimage");
+    OutlineImageId = GfuiMenuCreateStaticImageControl(ScrHandle, hparmMenu, "outlineimage");
 
-    CreateButtonControl(ScrHandle, hparmMenu, "nextbutton", NULL, rmtsSelect);
-    CreateButtonControl(ScrHandle, hparmMenu, "previousbutton", MenuData->prevScreen, rmtsDeactivate);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "nextbutton", NULL, rmtsSelect);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "previousbutton", MenuData->prevScreen, rmtsDeactivate);
 
-    DescLine1LabelId = CreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel");
-    DescLine2LabelId = CreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel2");
-    LengthLabelId = CreateLabelControl(ScrHandle, hparmMenu, "lengthlabel");
-    WidthLabelId = CreateLabelControl(ScrHandle, hparmMenu, "widthlabel");
-    MaxPitsLabelId = CreateLabelControl(ScrHandle, hparmMenu, "pitslabel");
-    AuthorLabelId = CreateLabelControl(ScrHandle, hparmMenu, "authorlabel");
+    DescLine1LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel");
+    DescLine2LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel2");
+    LengthLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "lengthlabel");
+    WidthLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "widthlabel");
+    MaxPitsLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "pitslabel");
+    AuthorLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "authorlabel");
 
     GfParmReleaseHandle(hparmMenu);
 

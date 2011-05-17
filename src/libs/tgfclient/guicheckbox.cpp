@@ -241,7 +241,7 @@ GfuiCheckboxSetChecked(void *scr, int id, bool bChecked)
 }
 
 void
-GfuiCheckboxSetTextColor(void *scr, int id, Color color)
+GfuiCheckboxSetTextColor(void *scr, int id, const GfuiColor& color)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
@@ -254,7 +254,7 @@ GfuiCheckboxSetTextColor(void *scr, int id, Color color)
 		if (curObject->widget == GFUI_CHECKBOX) 
 		{
 			tGfuiCheckbox *Check = &(curObject->u.checkbox);
-			GfuiLabelSetColor(Check->scr,Check->labelId,color.GetPtr());
+			GfuiLabelSetColor(Check->scr,Check->labelId,color.toFloatRGBA());
 		}
 		return;
 	    }

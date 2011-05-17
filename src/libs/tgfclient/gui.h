@@ -24,8 +24,9 @@
 #include "guifont.h"
 
 
+// Predefined colors (array and indexes).
 #define GFUI_COLORNB	26
-extern float	GfuiColor[GFUI_COLORNB][4];
+extern float	gfuiColors[GFUI_COLORNB][4];
 
 #define GFUI_BGCOLOR		0
 #define GFUI_TITLECOLOR		1
@@ -54,19 +55,22 @@ extern float	GfuiColor[GFUI_COLORNB][4];
 #define GFUI_LABELCOLOROPTIONS 24
 #define GFUI_TABLEHEADER 25
 
+extern GfuiColor gfuiGetColor(const float* color);
+extern GfuiColor gfuiGetColor(int index); // index from GFUI_* "named" indexes above.
+
+
 #define GFUI_IMAGE		200
 
 #define MAX_STATIC_IMAGES 5
 
-Color GetColor(const float* color);
-
+/* Label */
 typedef struct
 {
     char	*text;		/* text */
-    Color	bgColor;	/* RGBA */
-    Color	fgColor;
-    Color	bgFocusColor;
-    Color	fgFocusColor;
+    GfuiColor	bgColor;	/* RGBA */
+    GfuiColor	fgColor;
+    GfuiColor	bgFocusColor;
+    GfuiColor	fgFocusColor;
     GfuiFontClass	*font;		/* ttf font */
 
     int	x, y;		/* label position */
@@ -78,7 +82,7 @@ typedef struct
     tfuiCallback	onFocusLost;
 } tGfuiLabel;
 
-/* button state */
+/* Button state */
 #define GFUI_BTN_DISABLE	0
 #define GFUI_BTN_RELEASED	1
 #define GFUI_BTN_PUSHED		2
@@ -87,14 +91,13 @@ typedef struct
 #define GFUI_BTN_PUSH		0
 #define GFUI_BTN_STATE		1
 
-
 typedef struct
 {
     tGfuiLabel	label;
-    Color bgColor[3];
-    Color fgColor[3];
-    Color bgFocusColor[3];
-    Color fgFocusColor[3];
+    GfuiColor bgColor[3];
+    GfuiColor fgColor[3];
+    GfuiColor bgFocusColor[3];
+    GfuiColor fgFocusColor[3];
 
     unsigned int	state;
     int			buttonType;
@@ -159,10 +162,10 @@ typedef struct GfuiListElement
 typedef struct
 {
     int			sbPos;
-    Color	bgColor[3];
-    Color	fgColor[3];
-    Color	bgSelectColor[3];
-    Color	fgSelectColor[3];
+    GfuiColor	bgColor[3];
+    GfuiColor	fgColor[3];
+    GfuiColor	bgSelectColor[3];
+    GfuiColor	fgSelectColor[3];
 
     GfuiFontClass	*font;
     tGfuiListElement	*elts;
@@ -187,11 +190,11 @@ typedef struct
 typedef struct
 {
     tGfuiLabel	label;
-    Color    cursorColor[3];
-    Color    bgColor[3];
-    Color    fgColor[3];
-    Color    bgFocusColor[3];
-    Color    fgFocusColor[3];
+    GfuiColor    cursorColor[3];
+    GfuiColor    bgColor[3];
+    GfuiColor    fgColor[3];
+    GfuiColor    bgFocusColor[3];
+    GfuiColor    fgFocusColor[3];
     int			state;
     int			cursorx;
     int			cursory1;
@@ -210,7 +213,7 @@ typedef struct
 	void *scr;
 	tComboBoxInfo *pInfo;
 
-    Color fgColor[3];
+    GfuiColor fgColor[3];
     int	comboType;
     void		*userDataOnFocus;
     tfuiCallback	onFocus;
@@ -224,7 +227,7 @@ typedef struct
 	void *scr;
 	tCheckBoxInfo *pInfo;
 
-    Color fgColor[3];
+    GfuiColor fgColor[3];
 	int checkId;
 	int uncheckId;
 
@@ -298,7 +301,7 @@ typedef struct GfuiKey
 typedef struct 
 {
     float		width, height; /* in menu/screen objects coordinate system */
-    Color		bgColor; /* RGBA */
+    GfuiColor		bgColor; /* RGBA */
     GLuint		bgImage; /* Should always be 2^N x 2^P  (for low-end graphic hardwares) */
     int			bgWidth, bgHeight; /* Original bg image size (may be not 2^N x 2^P) */
 

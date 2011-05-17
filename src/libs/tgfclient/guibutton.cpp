@@ -358,18 +358,18 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
     button->focused = 0;
     button->pushed = 0;
 
-    button->bgColor[0] = GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
-    button->bgColor[1] = GetColor(&(GfuiColor[GFUI_BGBTNENABLED][0]));
-    button->bgColor[2] = GetColor(&(GfuiColor[GFUI_BGBTNCLICK][0]));
-    button->bgFocusColor[0] = GetColor(&(GfuiColor[GFUI_BGBTNDISABLED][0]));
-    button->bgFocusColor[1] = GetColor(&(GfuiColor[GFUI_BGBTNFOCUS][0]));
-    button->bgFocusColor[2] = GetColor(&(GfuiColor[GFUI_BGBTNCLICK][0]));
-    button->fgColor[0] = GetColor(&(GfuiColor[GFUI_BTNDISABLED][0]));
-    button->fgColor[1] = GetColor(&(GfuiColor[GFUI_BTNENABLED][0]));
-    button->fgColor[2] = GetColor(&(GfuiColor[GFUI_BTNCLICK][0]));
-    button->fgFocusColor[0] = GetColor(&(GfuiColor[GFUI_BTNDISABLED][0]));
-    button->fgFocusColor[1] = GetColor(&(GfuiColor[GFUI_BTNFOCUS][0]));
-    button->fgFocusColor[2] = GetColor(&(GfuiColor[GFUI_BTNCLICK][0]));
+    button->bgColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNDISABLED][0]));
+    button->bgColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNENABLED][0]));
+    button->bgColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNCLICK][0]));
+    button->bgFocusColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNDISABLED][0]));
+    button->bgFocusColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNFOCUS][0]));
+    button->bgFocusColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNCLICK][0]));
+    button->fgColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BTNDISABLED][0]));
+    button->fgColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BTNENABLED][0]));
+    button->fgColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BTNCLICK][0]));
+    button->fgFocusColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BTNDISABLED][0]));
+    button->fgFocusColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BTNFOCUS][0]));
+    button->fgFocusColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BTNCLICK][0]));
 
 	gfuiLabelInit(&button->label, text, 100, x, y - gfuiFont[font]->getDescender(), align, width,
 				  font, 0, 0, 0, 0, 0, 0, 0);
@@ -448,7 +448,7 @@ GfuiButtonShowBox(void *scr, int id, bool bShow)
     @param	color	New colour of the button
  */
 void
-GfuiButtonSetColor(void *scr, int id, Color color)
+GfuiButtonSetColor(void *scr, int id, const GfuiColor& color)
 {
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
@@ -512,7 +512,7 @@ GfuiButtonSetImage(void *scr, int id, int x, int y, int w, int h,
     @param	focuscolor	New focus colour of the button
  */
 void
-GfuiButtonSetFocusColor(void *scr, int id, Color focuscolor)
+GfuiButtonSetFocusColor(void *scr, int id, const GfuiColor& focuscolor)
 {
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
@@ -529,7 +529,7 @@ GfuiButtonSetFocusColor(void *scr, int id, Color focuscolor)
     @param	pushcolor	New pushed colour of the button
  */
 void
-GfuiButtonSetPushedColor(void *scr, int id, Color pushcolor)
+GfuiButtonSetPushedColor(void *scr, int id, const GfuiColor& pushcolor)
 {
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
@@ -572,8 +572,8 @@ GfuiButtonGetFocused(void)
 void
 gfuiDrawButton(tGfuiObject *obj)
 {
-	Color fgColor;
-	Color bgColor;
+	GfuiColor fgColor;
+	GfuiColor bgColor;
 
 	// Determine the fore/background colors, according to the state/focus.
 	tGfuiButton *button = &(obj->u.button);
@@ -590,14 +590,14 @@ gfuiDrawButton(tGfuiObject *obj)
 
 	// Draw the bouding box / background if specified and visible.
 	if (bgColor.alpha && button->bShowBox) {
-		glColor4fv(bgColor.GetPtr());
+		glColor4fv(bgColor.toFloatRGBA());
 		glBegin(GL_QUADS);
 		glVertex2i(obj->xmin, obj->ymin);
 		glVertex2i(obj->xmin, obj->ymax);
 		glVertex2i(obj->xmax, obj->ymax);
 		glVertex2i(obj->xmax, obj->ymin);
 		glEnd();
-		glColor4fv(fgColor.GetPtr());
+		glColor4fv(fgColor.toFloatRGBA());
 		glBegin(GL_LINE_STRIP);
 		glVertex2i(obj->xmin, obj->ymin);
 		glVertex2i(obj->xmin, obj->ymax);
@@ -654,7 +654,7 @@ gfuiDrawButton(tGfuiObject *obj)
 
 	// Draw the label.
 	tGfuiLabel *label = &(button->label);
-	glColor4fv(fgColor.GetPtr());
+	glColor4fv(fgColor.toFloatRGBA());
 	gfuiPrintString(label->x, label->y, label->font, label->text);
 }//gfuiDrawButton
 

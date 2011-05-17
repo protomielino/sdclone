@@ -357,11 +357,11 @@ RmRaceParamsMenu(void *vrp)
 	
     // Create the screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);   
-    void *menuXMLDescHdle = LoadMenuXML("raceparamsmenu.xml");
-    CreateStaticControls(menuXMLDescHdle,ScrHandle);
+    void *menuXMLDescHdle = GfuiMenuLoad("raceparamsmenu.xml");
+    GfuiMenuCreateStaticControls(menuXMLDescHdle,ScrHandle);
 
     // Create the variable title label.
-    int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");
+    int titleId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");
 	std::string strTitle(MenuData->session);
 	strTitle += " Options";
     GfuiLabelSetText(ScrHandle, titleId, strTitle.c_str());
@@ -369,7 +369,7 @@ RmRaceParamsMenu(void *vrp)
 	// Create the "nothing to configure here" label if actually nothing configurable.
 	if (!rmrpConfMask)
 	{
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "nooptionlabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "nooptionlabel");
 	}
 	
     // Otherwise, create and initialize the race length configuration controls.
@@ -395,7 +395,7 @@ RmRaceParamsMenu(void *vrp)
 			rmrpLaps += (int)floor((tdble)rmrpDuration / 1.5f + 0.5f);
 
 		// Create Race distance label.
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "distancelabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "distancelabel");
 		
 		// Create and initialize Race distance edit.
 		if (rmrpDistance == 0) 
@@ -408,12 +408,12 @@ RmRaceParamsMenu(void *vrp)
 			rmrpLaps = 0;
 		}
 		
-		rmrpDistEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "distanceedit",
+		rmrpDistEditId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, "distanceedit",
 										   NULL, NULL, rmrpUpdDist);
 		GfuiEditboxSetString(ScrHandle,rmrpDistEditId,buf);
 		
 		// Create Laps label.
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "lapslabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "lapslabel");
 		
 		// Create and initialize Laps edit.
 		if (rmrpLaps == 0) 
@@ -425,14 +425,14 @@ RmRaceParamsMenu(void *vrp)
 			snprintf(buf, sizeof(buf), "%d", rmrpLaps);
 		}
 		
-		rmrpLapsEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "lapsedit",
+		rmrpLapsEditId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, "lapsedit",
 										   NULL, NULL, rmrpUpdLaps);
 		GfuiEditboxSetString(ScrHandle,rmrpLapsEditId,buf);
 		
 		if (rmrpFeatures & RM_FEATURE_TIMEDSESSION)
 		{
 			// Create Session time label.
-			CreateLabelControl(ScrHandle, menuXMLDescHdle, "durationlabel");
+			GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "durationlabel");
 			
 			// Create and initialize Session time edit.
 			if (rmrpDuration <= 0) 
@@ -448,7 +448,7 @@ RmRaceParamsMenu(void *vrp)
 			}
 			
 			rmrpDurationEditId =
-				CreateEditControl(ScrHandle, menuXMLDescHdle, "durationedit",
+				GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, "durationedit",
 								  NULL, NULL, rmrpUpdDuration);
 			GfuiEditboxSetString(ScrHandle,rmrpDurationEditId,buf);
 		}
@@ -463,15 +463,15 @@ RmRaceParamsMenu(void *vrp)
 			rmrpTimeOfDay = pRaceSessionParams->eTimeOfDaySpec;
 		
 		// Create Time of day label.
-		CreateLabelControl(ScrHandle,menuXMLDescHdle,"timeofdaylabel");
+		GfuiMenuCreateLabelControl(ScrHandle,menuXMLDescHdle,"timeofdaylabel");
 
 		// Create and initialize Time of day combo-box-like control.
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayleftarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayleftarrow",
 							(void*)-1, rmChangeTimeOfDay);
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayrightarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "timeofdayrightarrow",
 							(void*)1, rmChangeTimeOfDay);
 			
-		rmrpTimeOfDayEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "timeofdayedit");
+		rmrpTimeOfDayEditId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "timeofdayedit");
 		GfuiLabelSetText(ScrHandle, rmrpTimeOfDayEditId, TimeOfDayValues[rmrpTimeOfDay]);
     }
 	
@@ -484,17 +484,17 @@ RmRaceParamsMenu(void *vrp)
 			rmrpClouds = pRaceSessionParams->eCloudsSpec;
 			
 		// Create Cloud cover label.
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "cloudslabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "cloudslabel");
 
 		// Create and initialize Cloud cover combo-box-like control.
 		rmrpCloudsLeftArrowId =
-			CreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsleftarrow",
+			GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsleftarrow",
 								(void*)-1, rmChangeClouds);
 		rmrpCloudsRightArrowId =
-			CreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsrightarrow",
+			GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "cloudsrightarrow",
 								(void*)+1, rmChangeClouds);
 			
-		rmrpCloudsEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "cloudsedit");
+		rmrpCloudsEditId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "cloudsedit");
 		GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 	}
 	
@@ -507,15 +507,15 @@ RmRaceParamsMenu(void *vrp)
 			rmrpRain = pRaceSessionParams->eRainSpec;
 			
 		// Create Rain label.
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "rainlabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "rainlabel");
 
 		// Create and initialize Rain combo-box-like control.
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "rainleftarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "rainleftarrow",
 							(void*)-1, rmChangeRain);
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "rainrightarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "rainrightarrow",
 							(void*)1, rmChangeRain);
 			
-		rmrpRainEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "rainedit");
+		rmrpRainEditId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "rainedit");
 		GfuiLabelSetText(ScrHandle, rmrpRainEditId, RainValues[rmrpRain]);
 			
 		rmChangeRain(0); // Make cloud cover settings compatible if needed.
@@ -530,20 +530,20 @@ RmRaceParamsMenu(void *vrp)
 			rmrpDispMode = pRaceSessionParams->eDisplayMode;
 
 		// Create Display mode label.
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "displaylabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "displaylabel");
 
 		// Create and initialize Display mode combo-box-like control.
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "displayleftarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "displayleftarrow",
 							(void*)-1, rmChangeDisplayMode);
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "displayrightarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "displayrightarrow",
 							(void*)+1, rmChangeDisplayMode);
-		rmrpDispModeEditId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "displayedit");
+		rmrpDispModeEditId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "displayedit");
 		GfuiLabelSetText(ScrHandle, rmrpDispModeEditId, DispModeValues[rmrpDispMode]);
     }
 	
     // Create Accept and Cancel buttons
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, rmrpValidate);
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "previousbutton",
+    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, rmrpValidate);
+    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "previousbutton",
 						MenuData->prevScreen, rmrpDeactivate);
     
     // Close menu XML descriptor.

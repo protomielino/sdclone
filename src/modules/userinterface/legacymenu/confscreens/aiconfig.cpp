@@ -120,15 +120,15 @@ AIMenuInit(void *prevMenu)
 
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-	void *param = LoadMenuXML("aiconfigmenu.xml");
-    CreateStaticControls(param,ScrHandle);
+	void *param = GfuiMenuLoad("aiconfigmenu.xml");
+    GfuiMenuCreateStaticControls(param,ScrHandle);
 
-    CreateButtonControl(ScrHandle,param,"skillleftarrow",(void*)-1,ChangeSkillLevel);
-    CreateButtonControl(ScrHandle,param,"skillrightarrow",(void*)1,ChangeSkillLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"skillleftarrow",(void*)-1,ChangeSkillLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"skillrightarrow",(void*)1,ChangeSkillLevel);
 
-    SkillLevelId = CreateLabelControl(ScrHandle,param,"skilllabel");
-    CreateButtonControl(ScrHandle,param,"accept",prevMenu,SaveSkillLevel);
-    CreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+    SkillLevelId = GfuiMenuCreateLabelControl(ScrHandle,param,"skilllabel");
+    GfuiMenuCreateButtonControl(ScrHandle,param,"accept",prevMenu,SaveSkillLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
     

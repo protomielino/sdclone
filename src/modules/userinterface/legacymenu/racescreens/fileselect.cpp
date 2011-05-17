@@ -129,26 +129,26 @@ RmFileSelect(void *pFileSelect)
 	// Create screen, load menu XML descriptor and create static controls.
 	ScrHandle = GfuiScreenCreateEx(NULL, NULL, rmOnActivate, NULL, NULL, 1);
 
-	void *menuXMLDescHdle = LoadMenuXML("fileselectmenu.xml");
+	void *menuXMLDescHdle = GfuiMenuLoad("fileselectmenu.xml");
 
-	CreateStaticControls(menuXMLDescHdle, ScrHandle);
+	GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
 
 	// Create variable title label.
-	const int titleId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "TitleLabel");
+	const int titleId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "TitleLabel");
 	GfuiLabelSetText(ScrHandle, titleId, RmFs->title.c_str());
 	
 	// Create the Scroll List containing the File list
-	FilesScrollListId = CreateScrollListControl(ScrHandle, menuXMLDescHdle, "FilesScrollList",
+	FilesScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuXMLDescHdle, "FilesScrollList",
 											   NULL, rmOnClickOnFile);
 
 	// Create the filename edit box
-    FileNameEditId = CreateEditControl(ScrHandle, menuXMLDescHdle, "SelectedFileNameEdit",
+    FileNameEditId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, "SelectedFileNameEdit",
 									   NULL, NULL, rmOnChangeFileName);
 
 	// Create Load/Save and Cancel buttons.
-	LoadButtonId = CreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadButton", NULL, rmOnSelect);
-	SaveButtonId = CreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveButton", NULL, rmOnSelect);
-	CreateButtonControl(ScrHandle, menuXMLDescHdle, "CancelButton", NULL, rmOnDeactivate);
+	LoadButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadButton", NULL, rmOnSelect);
+	SaveButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveButton", NULL, rmOnSelect);
+	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "CancelButton", NULL, rmOnDeactivate);
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);

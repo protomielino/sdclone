@@ -98,17 +98,17 @@ MainMenuInit(void)
 				    NULL, (tfuiCallback)NULL, 
 				    1);
 
-    void *menuDescHdle = LoadMenuXML("mainmenu.xml");
+    void *menuDescHdle = GfuiMenuLoad("mainmenu.xml");
 
-    CreateStaticControls(menuDescHdle, MenuHandle);
+    GfuiMenuCreateStaticControls(menuDescHdle, MenuHandle);
 
     //Add buttons and create based on xml
-    CreateButtonControl(MenuHandle, menuDescHdle, "race", NULL, onRaceSelectMenuActivate);
-    CreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
-    CreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
-    CreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "race", NULL, onRaceSelectMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);
     void* exitMenu = MainExitMenuInit(MenuHandle);
-    CreateButtonControl(MenuHandle, menuDescHdle, "quit", exitMenu, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "quit", exitMenu, GfuiScreenActivate);
 
     GfParmReleaseHandle(menuDescHdle);
 

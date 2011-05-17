@@ -110,13 +110,13 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
     // Create screen, load menu XML descriptor and create static controls.
     void* pageScrHdle = GfuiScreenCreate();
 
-    void *menuXMLDescHdle = LoadMenuXML("creditsmenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("creditsmenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, pageScrHdle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, pageScrHdle);
 
     // Create title label from chapter name
     sprintf(buf, "Credits - %s", chapName);
-    const int titleId = CreateLabelControl(pageScrHdle, menuXMLDescHdle, "title");
+    const int titleId = GfuiMenuCreateLabelControl(pageScrHdle, menuXMLDescHdle, "title");
     GfuiLabelSetText(pageScrHdle, titleId, buf);
     
     // Get columns info (names, width and line index) and display column titles
@@ -204,14 +204,14 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	    PrevPageRequest.startChapterIndex = startChapterIndex - 1;
 	    PrevPageRequest.startLineIndex    = -1;
 	}
-	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "previouspagearrow",
+	GfuiMenuCreateButtonControl(pageScrHdle, menuXMLDescHdle, "previouspagearrow",
 			    (void*)&PrevPageRequest, creditsPageChange);
 	GfuiAddKey(pageScrHdle, GFUIK_PAGEUP, "Previous page", 
 		    (void*)&PrevPageRequest, creditsPageChange, NULL);
     }
     
     // Add "Continue" button (credits screen exit).
-    CreateButtonControl(pageScrHdle, menuXMLDescHdle, "backbutton", RetScrHdle, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(pageScrHdle, menuXMLDescHdle, "backbutton", RetScrHdle, GfuiScreenReplace);
     
     // Add "Next page" button if not the last page.
     if (nLineInd < nLinesInChapter || startChapterIndex + 1 < nChapters) 
@@ -227,7 +227,7 @@ static void* creditsPageCreate(int startChapterIndex, int startLineIndex)
 	    NextPageRequest.startChapterIndex = startChapterIndex + 1;
 	    NextPageRequest.startLineIndex    = 0;
 	}
-	CreateButtonControl(pageScrHdle, menuXMLDescHdle, "nextpagearrow",
+	GfuiMenuCreateButtonControl(pageScrHdle, menuXMLDescHdle, "nextpagearrow",
 			    (void*)&NextPageRequest, creditsPageChange);
 	GfuiAddKey(pageScrHdle, GFUIK_PAGEDOWN, "Next Page", 
 		    (void*)&NextPageRequest, creditsPageChange, NULL);

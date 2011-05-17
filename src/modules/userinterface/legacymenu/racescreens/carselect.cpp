@@ -47,7 +47,7 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	const GfCar* pCurCar = pDriver->getCar();
 
 	// Initialize the GUI contents.
-	GfuiLabelSetText(pMenu->GetMenuHandle(), pMenu->GetDynamicControlId("DriverNameLabel"),
+	GfuiLabelSetText(pMenu->getMenuHandle(), pMenu->getDynamicControlId("DriverNameLabel"),
 					 pDriver->getName().c_str());
 	const std::string strSelCatName = pMenu->resetCarCategoryComboBox(pCurCar->getCategoryName());
 	pCurCar = pMenu->resetCarModelComboBox(strSelCatName, pCurCar->getName());
@@ -59,7 +59,7 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 const GfCar* RmCarSelectMenu::getSelectedCarModel() const
 {
 	const char* pszSelCarName =
-		GfuiComboboxGetText(GetMenuHandle(), GetDynamicControlId("ModelCombo"));
+		GfuiComboboxGetText(getMenuHandle(), getDynamicControlId("ModelCombo"));
 
 	if (pszSelCarName)
 		return GfCars::self()->getCarWithName(pszSelCarName);
@@ -135,7 +135,7 @@ void RmCarSelectMenu::onAcceptCB(void *pCarSelectMenu)
 		pDriver->setCar(pMenu->getSelectedCarModel());
 	
 	// Back to previous screen.
-	GfuiScreenActivate(pMenu->GetPreviousMenuHandle());
+	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 }
 
 void RmCarSelectMenu::onCancelCB(void *pCarSelectMenu)
@@ -144,7 +144,7 @@ void RmCarSelectMenu::onCancelCB(void *pCarSelectMenu)
 	const RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
 
 	// Back to previous screen.
-	GfuiScreenActivate(pMenu->GetPreviousMenuHandle());
+	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 }
 
 RmCarSelectMenu::RmCarSelectMenu()
@@ -154,7 +154,7 @@ RmCarSelectMenu::RmCarSelectMenu()
 
 std::string RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
 {
-	const int nCatComboId = GetDynamicControlId("CategoryCombo");
+	const int nCatComboId = getDynamicControlId("CategoryCombo");
 
 	// Retrieve the available car categories.
 	const std::vector<std::string>& vecCatNames = GfCars::self()->getCategoryNames();
@@ -162,25 +162,25 @@ std::string RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelC
 
 	// Load the combo-box from their names (and determine the requested category index).
 	unsigned nCurCatIndex = 0;
-	GfuiComboboxClear(GetMenuHandle(), nCatComboId);
+	GfuiComboboxClear(getMenuHandle(), nCatComboId);
 	for (unsigned nCatIndex = 0; nCatIndex < vecCatNames.size(); nCatIndex++)
 	{
 		if (getRace()->acceptsCarCategory(vecCatIds[nCatIndex]))
 		{
-			GfuiComboboxAddText(GetMenuHandle(), nCatComboId, vecCatNames[nCatIndex].c_str());
+			GfuiComboboxAddText(getMenuHandle(), nCatComboId, vecCatNames[nCatIndex].c_str());
 			if (!strSelCatName.empty() && vecCatNames[nCatIndex] == strSelCatName)
 				nCurCatIndex = nCatIndex;
 		}
 	}
 	
 	// Select the requested category in the combo-box.
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nCatComboId, nCurCatIndex);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nCatComboId, nCurCatIndex);
 
 	// Disable the combo-box for non human drivers (robot drivers can't change their car),
 	// or if it contains only 1 category.
-	GfuiEnable(GetMenuHandle(), nCatComboId,
+	GfuiEnable(getMenuHandle(), nCatComboId,
 			   getDriver()->isHuman()
-			   && GfuiComboboxGetNumberOfChoices(GetMenuHandle(), nCatComboId) > 1
+			   && GfuiComboboxGetNumberOfChoices(getMenuHandle(), nCatComboId) > 1
 			   ? GFUI_ENABLE : GFUI_DISABLE);
 	
 	//GfLogDebug("resetCarCategoryComboBox(%s) : cur=%d\n",
@@ -193,7 +193,7 @@ std::string RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelC
 GfCar* RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 											  const std::string& strSelCarName)
 {
-	const int nModelComboId = GetDynamicControlId("ModelCombo");
+	const int nModelComboId = getDynamicControlId("ModelCombo");
 
 	// Retrieve car models in the selected category.
 	const std::vector<GfCar*> vecCarsInCat =	
@@ -201,23 +201,23 @@ GfCar* RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 
 	// Load the combo-box from their real names (and determine the selected model index).
 	unsigned nCurrCarIndexInCat = 0;
-	GfuiComboboxClear(GetMenuHandle(), nModelComboId);
+	GfuiComboboxClear(getMenuHandle(), nModelComboId);
 	for (unsigned nCarIndex = 0; nCarIndex < vecCarsInCat.size(); nCarIndex++)
 	{
-		GfuiComboboxAddText(GetMenuHandle(), nModelComboId,
+		GfuiComboboxAddText(getMenuHandle(), nModelComboId,
 							vecCarsInCat[nCarIndex]->getName().c_str());
 		if (!strSelCarName.empty() && vecCarsInCat[nCarIndex]->getName() == strSelCarName)
 			nCurrCarIndexInCat = nCarIndex;
 	}
 
 	// Select the right car in the combo-box.
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nModelComboId, nCurrCarIndexInCat);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nModelComboId, nCurrCarIndexInCat);
 
 	// Disable the combo-box for non human drivers (robot drivers can't change their car).
 	// or if it contains only 1 model.
-	GfuiEnable(GetMenuHandle(), nModelComboId,
+	GfuiEnable(getMenuHandle(), nModelComboId,
 			   getDriver()->isHuman()
-			   && GfuiComboboxGetNumberOfChoices(GetMenuHandle(), nModelComboId) > 1
+			   && GfuiComboboxGetNumberOfChoices(getMenuHandle(), nModelComboId) > 1
 			   ? GFUI_ENABLE : GFUI_DISABLE);
 	
 	//GfLogDebug("resetCarModelComboBox(cat=%s, selCar=%s) : cur=%d (nCarsInCat=%d)\n",
@@ -249,26 +249,26 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 		ossSpecValue << "(" << nFRMassPercent << "% front)";
 	else
 		ossSpecValue << "(" << 100 - nFRMassPercent << "% rear)";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MassLabel"),
+	GfuiLabelSetText(getMenuHandle(), getDynamicControlId("MassLabel"),
 					 ossSpecValue.str().c_str());
 
 	ossSpecValue.str("");
 	ossSpecValue << pszDriveWheels[pSelCar->getDriveTrain()] << " WD, "
 				 << pSelCar->getGearsCount() << " gears";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("DriveTrainLabel"),
+	GfuiLabelSetText(getMenuHandle(), getDynamicControlId("DriveTrainLabel"),
 					 ossSpecValue.str().c_str());
 
 	ossSpecValue.str("");
 	ossSpecValue << std::fixed << std::setprecision(0)
 				 << pSelCar->getMaxPower() / 75 / G << " bhp ("
 				 << pSelCar->getMaxPowerSpeed() * 30.0 / PI << " rpm)";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxPowerLabel"),
+	GfuiLabelSetText(getMenuHandle(), getDynamicControlId("MaxPowerLabel"),
 					 ossSpecValue.str().c_str());
 	
 	ossSpecValue.str("");
 	ossSpecValue << pSelCar->getMaxTorque() << " N.m ("
 				 << pSelCar->getMaxTorqueSpeed() * 30.0 / PI << " rpm)";
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("MaxTorqueLabel"),
+	GfuiLabelSetText(getMenuHandle(), getDynamicControlId("MaxTorqueLabel"),
 					 ossSpecValue.str().c_str());
 
 	ossSpecValue.str("");
@@ -289,18 +289,18 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 	if (ossSpecValue.str().empty())
 		ossSpecValue << "missing information";
 	
-	GfuiLabelSetText(GetMenuHandle(), GetDynamicControlId("EngineLabel"),
+	GfuiLabelSetText(getMenuHandle(), getDynamicControlId("EngineLabel"),
 					 ossSpecValue.str().c_str());
 	
-	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("TopSpeedProgress"),
+	GfuiProgressbarSetValue(getMenuHandle(), getDynamicControlId("TopSpeedProgress"),
 							pSelCar->getTopSpeed() * 3.6f);
-	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("PowerMassRatioProgress"),
+	GfuiProgressbarSetValue(getMenuHandle(), getDynamicControlId("PowerMassRatioProgress"),
 							pSelCar->getMaxPower() / 75 / G / pSelCar->getMass());
-	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("LowSpeedGripProgress"),
+	GfuiProgressbarSetValue(getMenuHandle(), getDynamicControlId("LowSpeedGripProgress"),
 							pSelCar->getLowSpeedGrip());
-	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("HighSpeedGripProgress"),
+	GfuiProgressbarSetValue(getMenuHandle(), getDynamicControlId("HighSpeedGripProgress"),
 							pSelCar->getHighSpeedGrip());
-	GfuiProgressbarSetValue(GetMenuHandle(), GetDynamicControlId("CorneringProgress"),
+	GfuiProgressbarSetValue(getMenuHandle(), getDynamicControlId("CorneringProgress"),
 							pSelCar->getInvertedZAxisInertia());
 	
 	GfLogDebug("%s : topSp=%.1f, powMass=%.2f, lowSpGrip=%.1f, highSpGrip=%.1f, 1/ZInertia=%.5f\n",
@@ -313,7 +313,7 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 void RmCarSelectMenu::resetSkinComboBox(const std::string& strCarName,
 										const GfDriverSkin* pSelSkin)
 {
-	const int nSkinComboId = GetDynamicControlId("SkinCombo");
+	const int nSkinComboId = getDynamicControlId("SkinCombo");
 
 	// Get really available skins and previews for this car and current driver.
 	const std::string strCarId =
@@ -321,43 +321,43 @@ void RmCarSelectMenu::resetSkinComboBox(const std::string& strCarName,
 	_vecPossSkins = getDriver()->getPossibleSkins(strCarId);
 		
 	// Load the skin list in the combo-box (and determine the selected skin index).
-	GfuiComboboxClear(GetMenuHandle(), nSkinComboId);
+	GfuiComboboxClear(getMenuHandle(), nSkinComboId);
 	_nCurSkinIndex = 0;
 	std::vector<GfDriverSkin>::const_iterator itSkin;
 	for (itSkin = _vecPossSkins.begin(); itSkin != _vecPossSkins.end(); itSkin++)
 	{
 		const std::string strDispSkinName =
 			itSkin->getName().empty() ? "standard" : itSkin->getName();
-		GfuiComboboxAddText(GetMenuHandle(), nSkinComboId, strDispSkinName.c_str());
+		GfuiComboboxAddText(getMenuHandle(), nSkinComboId, strDispSkinName.c_str());
 		if (pSelSkin && itSkin->getName() == pSelSkin->getName())
 			_nCurSkinIndex = itSkin - _vecPossSkins.begin();
 	}
 
 	// Select the right skin in the combo-box.
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nSkinComboId, _nCurSkinIndex);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nSkinComboId, _nCurSkinIndex);
 
 	// Desactivate the combo if only 1 skin, activate it otherwise.
-	GfuiEnable(GetMenuHandle(), nSkinComboId,
+	GfuiEnable(getMenuHandle(), nSkinComboId,
 			   _vecPossSkins.size() > 1 ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
 void RmCarSelectMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 {
-	const int nCarImageId = GetDynamicControlId("PreviewImage");
+	const int nCarImageId = getDynamicControlId("PreviewImage");
 
 	// Load the preview image.
 	if (GfFileExists(selSkin.getCarPreviewFileName().c_str()))
-		GfuiStaticImageSet(GetMenuHandle(), nCarImageId, selSkin.getCarPreviewFileName().c_str(),
+		GfuiStaticImageSet(getMenuHandle(), nCarImageId, selSkin.getCarPreviewFileName().c_str(),
 						   /* index= */ 0, /* canDeform= */false);
 	else
-		GfuiStaticImageSet(GetMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
+		GfuiStaticImageSet(getMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
 }
 
-void RmCarSelectMenu::RunMenu(GfRace* pRace, GfDriver* pDriver)
+void RmCarSelectMenu::runMenu(GfRace* pRace, GfDriver* pDriver)
 {
 	// Initialize if not already done.
-	if (!GetMenuHandle())
-		Initialize();
+	if (!getMenuHandle())
+		initialize();
 	
 	// Store target race.
 	setRace(pRace);
@@ -366,49 +366,49 @@ void RmCarSelectMenu::RunMenu(GfRace* pRace, GfDriver* pDriver)
 	setDriver(pDriver);
 
 	// Normally expected job.
-	GfuiMenuScreen::RunMenu();
+	GfuiMenuScreen::runMenu();
 }
 
-bool RmCarSelectMenu::Initialize()
+bool RmCarSelectMenu::initialize()
 {
 	// Create the menu and all its controls.
-	CreateMenuEx(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
+	createMenuEx(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
 
-    OpenXMLDescriptor();
+    openXMLDescriptor();
     
-    CreateStaticControls();
+    createStaticControls();
     
-	CreateLabelControl("DriverNameLabel");
+	createLabelControl("DriverNameLabel");
 	
-	CreateComboboxControl("CategoryCombo", this, onChangeCategory);
-	CreateComboboxControl("ModelCombo", this, onChangeModel);
-	CreateComboboxControl("SkinCombo", this, onChangeSkin);
+	createComboboxControl("CategoryCombo", this, onChangeCategory);
+	createComboboxControl("ModelCombo", this, onChangeModel);
+	createComboboxControl("SkinCombo", this, onChangeSkin);
 	
-	CreateStaticImageControl("PreviewImage");
+	createStaticImageControl("PreviewImage");
 	
-	CreateLabelControl("DriveTrainLabel");
-	CreateLabelControl("MaxPowerLabel");
-	CreateLabelControl("MaxTorqueLabel");
-	CreateLabelControl("MassLabel");
-	CreateLabelControl("EngineLabel");
+	createLabelControl("DriveTrainLabel");
+	createLabelControl("MaxPowerLabel");
+	createLabelControl("MaxTorqueLabel");
+	createLabelControl("MassLabel");
+	createLabelControl("EngineLabel");
 	
-	CreateProgressbarControl("TopSpeedProgress");
-	CreateProgressbarControl("PowerMassRatioProgress");
-	CreateProgressbarControl("HighSpeedGripProgress");
-	CreateProgressbarControl("LowSpeedGripProgress");
-	CreateProgressbarControl("CorneringProgress");
+	createProgressbarControl("TopSpeedProgress");
+	createProgressbarControl("PowerMassRatioProgress");
+	createProgressbarControl("HighSpeedGripProgress");
+	createProgressbarControl("LowSpeedGripProgress");
+	createProgressbarControl("CorneringProgress");
 
-    CreateButtonControl("GarageButton", this, onGarageCB);
-	CreateButtonControl("AcceptButton", this, onAcceptCB);
-    CreateButtonControl("CancelButton", this, onCancelCB);
+    createButtonControl("GarageButton", this, onGarageCB);
+	createButtonControl("AcceptButton", this, onAcceptCB);
+    createButtonControl("CancelButton", this, onCancelCB);
 
-    CloseXMLDescriptor();
+    closeXMLDescriptor();
 
     // Keyboard shortcuts.
-    AddShortcut(GFUIK_ESCAPE, "Cancel", this, onCancelCB, NULL);
-    AddShortcut(GFUIK_RETURN, "Accept", this, onAcceptCB, NULL);
-    AddShortcut(GFUIK_F1, "Help", GetMenuHandle(), GfuiHelpScreen, NULL);
-    AddShortcut(GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
+    addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancelCB, NULL);
+    addShortcut(GFUIK_RETURN, "Accept", this, onAcceptCB, NULL);
+    addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, NULL);
+    addShortcut(GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     // TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
     //GfuiAddKey(ScrHandle, GFUIK_UP, "Move Up", this, onChangeModel, NULL);
 

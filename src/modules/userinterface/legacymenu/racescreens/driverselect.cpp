@@ -317,8 +317,8 @@ rmdsCarSelectMenu(void *pPreviousMenu)
 {
 	if (PCurrentDriver)
 	{
-		CarSelectMenu.SetPreviousMenuHandle(pPreviousMenu);
-		CarSelectMenu.RunMenu(MenuData->pRace, PCurrentDriver);
+		CarSelectMenu.setPreviousMenuHandle(pPreviousMenu);
+		CarSelectMenu.runMenu(MenuData->pRace, PCurrentDriver);
 	}
 }
 
@@ -610,53 +610,53 @@ RmDriversSelect(void *vs)
     // Create screen, background image and title
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmdsActivate, NULL, (tfuiCallback)NULL, 1);
     
-    void *menuDescHdle = LoadMenuXML("driverselectmenu.xml");
-    CreateStaticControls(menuDescHdle, ScrHandle);
+    void *menuDescHdle = GfuiMenuLoad("driverselectmenu.xml");
+    GfuiMenuCreateStaticControls(menuDescHdle, ScrHandle);
 
-    CompetitorsScrollListId = CreateScrollListControl(ScrHandle, menuDescHdle, "competitorsscrolllist", NULL, rmdsClickOnDriver);
-    CandidatesScrollListId = CreateScrollListControl(ScrHandle, menuDescHdle, "candidatesscrolllist", NULL, rmdsClickOnDriver);
+    CompetitorsScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuDescHdle, "competitorsscrolllist", NULL, rmdsClickOnDriver);
+    CandidatesScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuDescHdle, "candidatesscrolllist", NULL, rmdsClickOnDriver);
 
 	
     // Car category filtering "combobox" (left arrow, label, right arrow)
 	const int nCatPrevButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "carcategoryleftarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carcategoryleftarrow",
 							(void*)-1, rmdsChangeCarCategory);
 	const int nCatNextButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "carcategoryrightarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carcategoryrightarrow",
 							(void*)1, rmdsChangeCarCategory);
-    CarCategoryEditId = CreateLabelControl(ScrHandle, menuDescHdle, "carcategorytext");
+    CarCategoryEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "carcategorytext");
     
     // Driver type filtering "combobox" (left arrow, label, right arrow)
 	const int nDrvTypPrevButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "drivertypeleftarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "drivertypeleftarrow",
 							(void*)-1, rmdsChangeDriverType);
 	const int nDrvTypNextButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "drivertyperightarrow",
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "drivertyperightarrow",
 							(void*)1, rmdsChangeDriverType);
-    DriverTypeEditId = CreateLabelControl(ScrHandle, menuDescHdle, "drivertypetext");
+    DriverTypeEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "drivertypetext");
 
     // Scroll-lists manipulation buttons
-    CreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", (void*)-1, rmdsMoveCompetitor);
-    CreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", (void*)1, rmdsMoveCompetitor);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", (void*)-1, rmdsMoveCompetitor);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", (void*)1, rmdsMoveCompetitor);
 	
     SelectButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
     DeselectButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "deselectbutton", 0, rmdsSelectDeselectDriver);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "deselectbutton", 0, rmdsSelectDeselectDriver);
     RemoveAllButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsRemoveAllCompetitors);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "removeallbutton", 0, rmdsRemoveAllCompetitors);
     SelectRandomButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "selectrandombutton", 0, rmdsSelectRandomCandidates);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "selectrandombutton", 0, rmdsSelectRandomCandidates);
     ShuffleButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "shufflebutton", 0, rmdsShuffleCompetitors);
 
     // Skin selection "combobox" (left arrow, label, right arrow)
-    SkinLeftButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", (void*)-1, rmdsChangeSkin);
-    SkinRightButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "skinrightarrow", (void*)1, rmdsChangeSkin);
-    SkinEditId = CreateLabelControl(ScrHandle, menuDescHdle, "skintext");
+    SkinLeftButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", (void*)-1, rmdsChangeSkin);
+    SkinRightButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinrightarrow", (void*)1, rmdsChangeSkin);
+    SkinEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "skintext");
 
     // Car preview image
-    CarImageId = CreateStaticImageControl(ScrHandle, menuDescHdle, "carpreviewimage");
+    CarImageId = GfuiMenuCreateStaticImageControl(ScrHandle, menuDescHdle, "carpreviewimage");
     GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 
 	// Initialize the car category Ids and names for the driver filter system.
@@ -703,18 +703,18 @@ RmDriversSelect(void *vs)
 	
     // Current Driver Info
     CurrentDriverTypeLabelId =
-		CreateLabelControl(ScrHandle, menuDescHdle, "currentdrivertypelabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "currentdrivertypelabel");
     CurrentDriverCarCategoryLabelId =
-		CreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarcategorylabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarcategorylabel");
     CurrentDriverCarLabelId =
-		CreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarlabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarlabel");
     
     // Next, Previous and Change Car buttons
     NextButtonId =
-		CreateButtonControl(ScrHandle, menuDescHdle, "nextmenubutton", NULL, rmdsNextMenu);
-    CreateButtonControl(ScrHandle, menuDescHdle, "previousmenubutton",
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "nextmenubutton", NULL, rmdsNextMenu);
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "previousmenubutton",
 						MenuData->prevScreen, rmdsPreviousMenu);
-    ChangeCarButtonId = CreateButtonControl(ScrHandle, menuDescHdle, "carselectbutton",
+    ChangeCarButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carselectbutton",
 											ScrHandle, rmdsCarSelectMenu);
 	GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_DISABLE);
 

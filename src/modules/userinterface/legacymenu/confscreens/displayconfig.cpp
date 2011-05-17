@@ -128,26 +128,26 @@ void DisplayMenu::onCancel(void *pDisplayMenu)
 	const DisplayMenu* pMenu = static_cast<DisplayMenu*>(pDisplayMenu);
 
 	// Back to previous screen.
-	GfuiScreenActivate(pMenu->GetPreviousMenuHandle());
+	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 }
 
 void DisplayMenu::updateControls()
 {
 	resetColorDepths();
 	
-	int nControlId = GetDynamicControlId("DisplayModeCombo");
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nControlId, _eDisplayMode);
+	int nControlId = getDynamicControlId("DisplayModeCombo");
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eDisplayMode);
 	
 	resetScreenSizes();
 	
-	nControlId = GetDynamicControlId("VideoDetectModeCombo");
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nControlId, _eVideoDetectMode);
+	nControlId = getDynamicControlId("VideoDetectModeCombo");
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eVideoDetectMode);
 
-	nControlId = GetDynamicControlId("VideoInitModeCombo");
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nControlId, _eVideoInitMode);
+	nControlId = getDynamicControlId("VideoInitModeCombo");
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, _eVideoInitMode);
 
 #ifndef NoMaxRefreshRate
-	nControlId = GetDynamicControlId("MaxRefreshRateCombo");
+	nControlId = getDynamicControlId("MaxRefreshRateCombo");
 	int nMaxRefRateIndex = 0; // Defaults to None.
 	for (int nMaxRefRateInd = 0; nMaxRefRateInd < NMaxRefreshRates; nMaxRefRateInd++)
 		if (_nMaxRefreshRate <= AMaxRefreshRates[nMaxRefRateInd])
@@ -155,7 +155,7 @@ void DisplayMenu::updateControls()
 			nMaxRefRateIndex = nMaxRefRateInd;
 			break;
 		}
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nControlId, nMaxRefRateIndex);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nControlId, nMaxRefRateIndex);
 #endif	
 }
 
@@ -288,14 +288,14 @@ void DisplayMenu::resetColorDepths()
 	}
 	
 	// Update combo-box with new possible color depths.
-	const int nComboId = GetDynamicControlId("ColorDepthCombo");
-	GfuiComboboxClear(GetMenuHandle(), nComboId);
+	const int nComboId = getDynamicControlId("ColorDepthCombo");
+	GfuiComboboxClear(getMenuHandle(), nComboId);
 	std::ostringstream ossColorDepth;
 	for (int nColorDepthInd = 0; nColorDepthInd < _nNbColorDepths; nColorDepthInd++)
 	{
 		ossColorDepth.str("");
 		ossColorDepth << _aColorDepths[nColorDepthInd];
-		GfuiComboboxAddText(GetMenuHandle(), nComboId, ossColorDepth.str().c_str());
+		GfuiComboboxAddText(getMenuHandle(), nComboId, ossColorDepth.str().c_str());
 	}
 	
 	// Try and find the closest color depth to the current choice in the new list.
@@ -311,7 +311,7 @@ void DisplayMenu::resetColorDepths()
 	_nColorDepth = _aColorDepths[nColorDepthIndex];
 	
 	// Select the found one in the combo-box.
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nComboId, nColorDepthIndex);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, nColorDepthIndex);
 }
 
 void DisplayMenu::resetScreenSizes()
@@ -332,14 +332,14 @@ void DisplayMenu::resetScreenSizes()
 	}
 
 	// Update combo-box with new possible sizes.
-	const int nComboId = GetDynamicControlId("ScreenSizeCombo");
-	GfuiComboboxClear(GetMenuHandle(), nComboId);
+	const int nComboId = getDynamicControlId("ScreenSizeCombo");
+	GfuiComboboxClear(getMenuHandle(), nComboId);
 	std::ostringstream ossSize;
 	for (int nSizeIndex = 0; nSizeIndex < _nNbScreenSizes; nSizeIndex++)
 	{
 		ossSize.str("");
 		ossSize << _aScreenSizes[nSizeIndex].width << " x " << _aScreenSizes[nSizeIndex].height;
-		GfuiComboboxAddText(GetMenuHandle(), nComboId, ossSize.str().c_str());
+		GfuiComboboxAddText(getMenuHandle(), nComboId, ossSize.str().c_str());
 	}
 	
 	// Try and find the closest screen size to the current choice in the new list.
@@ -372,7 +372,7 @@ void DisplayMenu::resetScreenSizes()
 	_nScreenHeight = _aScreenSizes[nScreenSizeIndex].height;
 	
 	// Select the found one in the combo-box.
-	GfuiComboboxSetSelectedIndex(GetMenuHandle(), nComboId, nScreenSizeIndex);
+	GfuiComboboxSetSelectedIndex(getMenuHandle(), nComboId, nScreenSizeIndex);
 }
 
 void DisplayMenu::setScreenSizeIndex(int nIndex)
@@ -427,60 +427,60 @@ DisplayMenu::DisplayMenu()
 bool DisplayMenu::initialize(void *pPreviousMenu)
 {
 	// Save the menu to return to.
-	SetPreviousMenuHandle(pPreviousMenu);
+	setPreviousMenuHandle(pPreviousMenu);
 
 	// Create the menu and all its controls.
-	CreateMenuEx(NULL, this, onActivate, NULL, (tfuiCallback)NULL, 1);
+	createMenuEx(NULL, this, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    OpenXMLDescriptor();
+    openXMLDescriptor();
     
-    CreateStaticControls();
+    createStaticControls();
     
-	CreateComboboxControl("ScreenSizeCombo", this, onChangeScreenSize);
+	createComboboxControl("ScreenSizeCombo", this, onChangeScreenSize);
 
-	CreateComboboxControl("ColorDepthCombo", this, onChangeColorDepth);
+	createComboboxControl("ColorDepthCombo", this, onChangeColorDepth);
 
 	const int nDisplayModeComboId =
-		CreateComboboxControl("DisplayModeCombo", this, onChangeDisplayMode);
+		createComboboxControl("DisplayModeCombo", this, onChangeDisplayMode);
 
 #ifndef NoMaxRefreshRate
 	const int nMaxRefRateComboId =
-		CreateComboboxControl("MaxRefreshRateCombo", this, onChangeMaxRefreshRate);
+		createComboboxControl("MaxRefreshRateCombo", this, onChangeMaxRefreshRate);
 #endif	
 
 	const int nVideoDetectComboId =
-		CreateComboboxControl("VideoDetectModeCombo", this, onChangeVideoDetectMode);
+		createComboboxControl("VideoDetectModeCombo", this, onChangeVideoDetectMode);
 
 	const int nVideoInitComboId =
-		CreateComboboxControl("VideoInitModeCombo", this, onChangeVideoInitMode);
+		createComboboxControl("VideoInitModeCombo", this, onChangeVideoInitMode);
 
-	CreateButtonControl("ApplyButton", this, onAccept);
-	CreateButtonControl("CancelButton", this, onCancel);
+	createButtonControl("ApplyButton", this, onAccept);
+	createButtonControl("CancelButton", this, onCancel);
 
-	AddShortcut(GFUIK_RETURN, "Apply", this, onAccept, 0);
-	AddShortcut(GFUIK_ESCAPE, "Cancel", this, onCancel, 0);
+	addShortcut(GFUIK_RETURN, "Apply", this, onAccept, 0);
+	addShortcut(GFUIK_ESCAPE, "Cancel", this, onCancel, 0);
     // TODO Keyboard shortcuts: Add support for shortcuts in GfuiCombobox ?
-	//AddShortcut(GFUIK_LEFT, "Previous Resolution", this, onChangeScreenSize, 0);
-	//AddShortcut(GFUIK_RIGHT, "Next Resolution", this, onChangeScreenSize, 0);
-	AddShortcut(GFUIK_F1, "Help", GetMenuHandle(), GfuiHelpScreen, 0);
-	AddShortcut(GFUIK_F12, "Screen-Shot", 0, GfuiScreenShot, 0);
+	//addShortcut(GFUIK_LEFT, "Previous Resolution", this, onChangeScreenSize, 0);
+	//addShortcut(GFUIK_RIGHT, "Next Resolution", this, onChangeScreenSize, 0);
+	addShortcut(GFUIK_F1, "Help", getMenuHandle(), GfuiHelpScreen, 0);
+	addShortcut(GFUIK_F12, "Screen-Shot", 0, GfuiScreenShot, 0);
 
-    CloseXMLDescriptor();
+    closeXMLDescriptor();
 
 	// Load constant value lists in combo-boxes.
 	// 1) Color depths combo : not constant, as depends on selected video detection mode.
 	
 	// 2) Display modes combo.
 	for (int nDispModeInd = 0; nDispModeInd < nDisplayModes; nDispModeInd++)
-		GfuiComboboxAddText(GetMenuHandle(), nDisplayModeComboId, ADisplayModes[nDispModeInd]);
+		GfuiComboboxAddText(getMenuHandle(), nDisplayModeComboId, ADisplayModes[nDispModeInd]);
 
 	// 3) Video detection modes combo.
 	for (int nVDetectModeInd = 0; nVDetectModeInd < nVideoDetectModes; nVDetectModeInd++)
-		GfuiComboboxAddText(GetMenuHandle(), nVideoDetectComboId, AVideoDetectModes[nVDetectModeInd]);
+		GfuiComboboxAddText(getMenuHandle(), nVideoDetectComboId, AVideoDetectModes[nVDetectModeInd]);
 
 	// 4) Video initialization modes combo.
 	for (int nVInitModeInd = 0; nVInitModeInd < nVideoInitModes; nVInitModeInd++)
-		GfuiComboboxAddText(GetMenuHandle(), nVideoInitComboId, AVideoInitModes[nVInitModeInd]);
+		GfuiComboboxAddText(getMenuHandle(), nVideoInitComboId, AVideoInitModes[nVInitModeInd]);
 
 	// 5) Screen sizes combo : not constant, as depends on selected color depth and display mode.
 
@@ -494,7 +494,7 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 			ossMaxRefRate << AMaxRefreshRates[nRefRateInd];
 		else
 			ossMaxRefRate << "None";
-		GfuiComboboxAddText(GetMenuHandle(), nMaxRefRateComboId, ossMaxRefRate.str().c_str());
+		GfuiComboboxAddText(getMenuHandle(), nMaxRefRateComboId, ossMaxRefRate.str().c_str());
 	}
 #endif	
 
@@ -514,7 +514,7 @@ void* DisplayMenuInit(void *pPreviousMenu)
 		PDisplayMenu->initialize(pPreviousMenu);
 	}
 
-	return PDisplayMenu->GetMenuHandle();
+	return PDisplayMenu->getMenuHandle();
 }
 
 

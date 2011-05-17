@@ -145,12 +145,12 @@ rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, 
     // Create screen, load menu XML descriptor and create static controls.
     screenHdle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
 
-    void *menuXMLDescHdle = LoadMenuXML("stopracemenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("stopracemenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, screenHdle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, screenHdle);
 
     // Create variable title label.
-    int titleId = CreateLabelControl(screenHdle, menuXMLDescHdle, "titlelabel");
+    int titleId = GfuiMenuCreateLabelControl(screenHdle, menuXMLDescHdle, "titlelabel");
     GfuiLabelSetText(screenHdle, titleId, title);
 
     // Create specified buttons, left aligned.
@@ -161,7 +161,7 @@ rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, 
 								 aButtons[nButInd].screen, GFUI_ALIGN_HL_VB, GfuiScreenActivate);
 
 		GfuiButtonShowBox(screenHdle, id, false);
-		Color c, fc, pc;
+		GfuiColor c, fc, pc;
 		c.red  = 1.0;   c.green  = 1.0; c.blue  = 1.0; c.alpha  = 1.0;
 		fc.red = 1.0;   fc.green = 0.8; fc.blue = 0.0; fc.alpha = 1.0;
 		pc.red = 0.902; pc.green = 0.1; pc.blue = 0.2; pc.alpha = 1.0;

@@ -75,12 +75,12 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
     // Create screen, load menu XML descriptor and create static controls.
     MenuHandle = GfuiScreenCreateEx(BGColor, NULL, NULL, NULL, rmDeativate, 0);
 
-    void *menuXMLDescHdle = LoadMenuXML("loadingscreen.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("loadingscreen.xml");
 
-    CreateStaticControls(menuXMLDescHdle, MenuHandle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, MenuHandle);
 
     // Create variable title label.
-    int titleId = CreateLabelControl(MenuHandle, menuXMLDescHdle, "titlelabel");
+    int titleId = GfuiMenuCreateLabelControl(MenuHandle, menuXMLDescHdle, "titlelabel");
     GfuiLabelSetText(MenuHandle, titleId, title);
     
     // Create one label for each text line (TODO: Get layout constants from XML when available)

@@ -378,53 +378,53 @@ RmRacemanMenu()
 	// Create screen, load menu XML descriptor and create static controls.
 	ScrHandle = GfuiScreenCreateEx(NULL, NULL, rmOnActivate, 
 										 NULL, (tfuiCallback)NULL, 1);
-	void *menuXMLDescHdle = LoadMenuXML("racemanmenu.xml");
+	void *menuXMLDescHdle = GfuiMenuLoad("racemanmenu.xml");
 	
-	CreateStaticControls(menuXMLDescHdle, ScrHandle);
+	GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
 
 	// Create and initialize static title label (race mode name).
 	const int nRaceModeTitleLabelId =
-		CreateLabelControl(ScrHandle, menuXMLDescHdle, "RaceModeTitleLabel");
+		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "RaceModeTitleLabel");
 	GfuiLabelSetText(ScrHandle, nRaceModeTitleLabelId, pRaceMan->getName().c_str());
 
 	// Create variable title label (track name).
-	TrackTitleLabelId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "TrackTitleLabel");
+	TrackTitleLabelId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "TrackTitleLabel");
 
 	// Create Configure race, Configure players and Back buttons.
-	CreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigureRaceButton",
+	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigureRaceButton",
 						NULL, RmConfigureRace);
-	CreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
+	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
 						NULL, rmOnPlayerConfig);
 	
-	CreateButtonControl(ScrHandle, menuXMLDescHdle, "PreviousButton",
+	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "PreviousButton",
 						reInfo->_reMenuScreen, GfuiScreenActivate);
 
 	// Create "Load / Resume / Save race" buttons.
 	SaveRaceConfigButtonId =
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveRaceConfigButton",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveRaceConfigButton",
 							ScrHandle, rmOnSaveRaceToConfigFile);
 	LoadRaceConfigButtonId =
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceConfigButton",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceConfigButton",
 							ScrHandle, rmOnLoadRaceFromConfigFile);
 	LoadRaceResultsButtonId =
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceResultsButton",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceResultsButton",
 							ScrHandle, rmOnLoadRaceFromResultsFile);
 
 	// Create "Resume / Start race" buttons.
 	ResumeRaceButtonId =
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "ResumeRaceButton",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ResumeRaceButton",
 							NULL, rmResumeRace);
 	StartNewRaceButtonId =
-		CreateButtonControl(ScrHandle, menuXMLDescHdle, "StartNewRaceButton",
+		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "StartNewRaceButton",
 							NULL, rmStartNewRace);
 
 	// Track outline image.
 	TrackOutlineImageId =
-		CreateStaticImageControl(ScrHandle, menuXMLDescHdle, "TrackOutlineImage");
+		GfuiMenuCreateStaticImageControl(ScrHandle, menuXMLDescHdle, "TrackOutlineImage");
 
 	// Competitors scroll-list
 	CompetitorsScrollListId =
-		CreateScrollListControl(ScrHandle, menuXMLDescHdle, "CompetitorsScrollList",
+		GfuiMenuCreateScrollListControl(ScrHandle, menuXMLDescHdle, "CompetitorsScrollList",
 								NULL, rmOnSelectCompetitor);
 
 	// Close menu XML descriptor.

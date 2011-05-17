@@ -264,31 +264,31 @@ GraphMenuInit(void* prevMenu)
 
     ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void* param = LoadMenuXML("graphicconfig.xml");
+    void* param = GfuiMenuLoad("graphicconfig.xml");
 
-    CreateStaticControls(param,ScrHandle);
+    GfuiMenuCreateStaticControls(param,ScrHandle);
 
-    FovEditId = CreateEditControl(ScrHandle, param, "fovedit", NULL, NULL, ChangeFov);
-    SmokeEditId = CreateEditControl(ScrHandle, param, "smokeedit", NULL, NULL, ChangeSmoke);
-    SkidEditId = CreateEditControl(ScrHandle, param, "skidedit", NULL, NULL, ChangeSkid);
-    LodFactorEditId = CreateEditControl(ScrHandle, param, "lodedit", NULL, NULL, ChangeLodFactor);
+    FovEditId = GfuiMenuCreateEditControl(ScrHandle, param, "fovedit", NULL, NULL, ChangeFov);
+    SmokeEditId = GfuiMenuCreateEditControl(ScrHandle, param, "smokeedit", NULL, NULL, ChangeSmoke);
+    SkidEditId = GfuiMenuCreateEditControl(ScrHandle, param, "skidedit", NULL, NULL, ChangeSkid);
+    LodFactorEditId = GfuiMenuCreateEditControl(ScrHandle, param, "lodedit", NULL, NULL, ChangeLodFactor);
 
-    CreateButtonControl(ScrHandle, param, "skydomedistleftarrow", (void*)-1, ChangeSkyDomeDist);
-    CreateButtonControl(ScrHandle, param, "skydomedistrightarrow", (void*)1, ChangeSkyDomeDist);
-    SkyDomeDistLabelId = CreateLabelControl(ScrHandle, param, "skydomedistlabel");
+    GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistleftarrow", (void*)-1, ChangeSkyDomeDist);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistrightarrow", (void*)1, ChangeSkyDomeDist);
+    SkyDomeDistLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "skydomedistlabel");
     
     DynamicTimeLeftButtonId =
-		CreateButtonControl(ScrHandle, param, "dynamictimeleftarrow", (void*)-1, ChangeDynamicTime);
+		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamictimeleftarrow", (void*)-1, ChangeDynamicTime);
     DynamicTimeRightButtonId =
-		CreateButtonControl(ScrHandle, param, "dynamictimerightarrow", (void*)1, ChangeDynamicTime);
-    DynamicTimeLabelId = CreateLabelControl(ScrHandle, param, "dynamictimelabel");
+		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamictimerightarrow", (void*)1, ChangeDynamicTime);
+    DynamicTimeLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "dynamictimelabel");
     
-    CreateButtonControl(ScrHandle, param, "precipdensityleftarrow", (void*)-1, ChangePrecipDensity);
-    CreateButtonControl(ScrHandle, param, "precipdensityrightarrow", (void*)1, ChangePrecipDensity);
-    PrecipDensityLabelId = CreateLabelControl(ScrHandle, param, "precipdensitylabel");
+    GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityleftarrow", (void*)-1, ChangePrecipDensity);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityrightarrow", (void*)1, ChangePrecipDensity);
+    PrecipDensityLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "precipdensitylabel");
 
-    CreateButtonControl(ScrHandle, param, "accept", prevMenu, SaveGraphicOptions);
-    CreateButtonControl(ScrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "accept", prevMenu, SaveGraphicOptions);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "cancel", prevMenu, GfuiScreenActivate);
     
     GfParmReleaseHandle(param);
     

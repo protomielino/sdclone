@@ -254,42 +254,42 @@ public:
 	GfuiMenuScreen(const char* pszXMLDescFile);
 	virtual ~GfuiMenuScreen();
 
-	void CreateMenu();
-	void CreateMenuEx(float *bgColor, 
+	void createMenu();
+	void createMenuEx(float *bgColor, 
 					  void *userDataOnActivate, tfuiCallback onActivate, 
 					  void *userDataOnDeactivate, tfuiCallback onDeactivate, 
 					  int mouseAllowed);
-	void SetMenuHandle(void* hdle);
-	void* GetMenuHandle() const;
-	void SetPreviousMenuHandle(void* hdle);
-	void* GetPreviousMenuHandle() const;
+	void setMenuHandle(void* hdle);
+	void* getMenuHandle() const;
+	void setPreviousMenuHandle(void* hdle);
+	void* getPreviousMenuHandle() const;
 
-	bool OpenXMLDescriptor();
+	bool openXMLDescriptor();
 
-	bool CreateStaticControls();
+	bool createStaticControls();
 
-	int CreateButtonControl(const char *pszName, void *userData, tfuiCallback onPush);
-	int CreateButtonControlEx(const char *pszName, void *userData, tfuiCallback onPush,
+	int createButtonControl(const char *pszName, void *userData, tfuiCallback onPush);
+	int createButtonControlEx(const char *pszName, void *userData, tfuiCallback onPush,
 							  void *userDataOnFocus, tfuiCallback onFocus,
 							  tfuiCallback onFocusLost);
-	int CreateStaticImageControl(const char *pszName);
-	int CreateLabelControl(const char *pszName);
-	int CreateEditControl(const char *pszName, void *userDataOnFocus, tfuiCallback onFocus,
+	int createStaticImageControl(const char *pszName);
+	int createLabelControl(const char *pszName);
+	int createEditControl(const char *pszName, void *userDataOnFocus, tfuiCallback onFocus,
 						  tfuiCallback onFocusLost);
-	int CreateScrollListControl(const char *pszName,void *userData, tfuiCallback onSelect);
-	int CreateComboboxControl(const char *pszName, void *userData, tfuiComboboxCallback onChange);
-	int CreateCheckboxControl(const char *pszName, void *userData, tfuiCheckboxCallback onChange);
-	int CreateProgressbarControl(const char *pszName);
+	int createScrollListControl(const char *pszName,void *userData, tfuiCallback onSelect);
+	int createComboboxControl(const char *pszName, void *userData, tfuiComboboxCallback onChange);
+	int createCheckboxControl(const char *pszName, void *userData, tfuiCheckboxCallback onChange);
+	int createProgressbarControl(const char *pszName);
 	
-	int GetDynamicControlId(const char *pszName) const;
+	int getDynamicControlId(const char *pszName) const;
 
-	void AddDefaultShortcuts();
-	void AddShortcut(int key, const char *descr, void *userData,
+	void addDefaultShortcuts();
+	void addShortcut(int key, const char *descr, void *userData,
 					 tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 	
-	bool CloseXMLDescriptor();
+	bool closeXMLDescriptor();
 	
-	void RunMenu();
+	void runMenu();
 
 private:
 	struct gfuiMenuPrivateData* m_priv;
@@ -311,6 +311,15 @@ TGFCLIENT_API void GfuiMouseToggleVisibility(void);
 TGFCLIENT_API void GfuiMouseSetHWPresent(void);
 TGFCLIENT_API bool GfuiMouseIsHWPresent(void);
 
+
+/* Color management */
+class TGFCLIENT_API GfuiColor
+{
+  public:
+    inline const float *toFloatRGBA() const { return (float*)this; }
+  public:
+    float red, green, blue, alpha;
+};
 
 /* All widgets */
 #define GFUI_VISIBLE    1       /**< Object visibility flag  */
@@ -364,27 +373,33 @@ TGFCLIENT_API int GfuiGrButtonCreate(void *scr, const char *disabled, const char
 									 int x, int y, int width, int height, int align, int mouse,
 									 void *userDataOnPush, tfuiCallback onPush, 
 									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+
+TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
+		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
+		   void *userDataOnPush, tfuiCallback onPush, 
+		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+
+TGFCLIENT_API void GfuiButtonShowBox(void *scr, int id,bool bShow);
+TGFCLIENT_API void GfuiButtonSetColor(void *scr, int id, const GfuiColor& color);
+TGFCLIENT_API void GfuiButtonSetFocusColor(void *scr, int id, const GfuiColor& focuscolor);
+TGFCLIENT_API void GfuiButtonSetPushedColor(void *scr, int id, const GfuiColor& pushcolor);
+TGFCLIENT_API void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+
+/* Progress bars */
+TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
+										const char *pszProgressbackImg, const char *progressbarimg,
+										int align,float min,float max,float value, 
+										void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API void GfuiProgressbarSetValue(void *scr, int id, float value);
+
+/* Combo Boxes */
 TGFCLIENT_API int GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 									 int align ,int style, const char *pszText,
 									 const float *fgColor, const float *fgFocusColor,
 									 void* userData, tfuiComboboxCallback onChange,
 									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y,
-									 int imagewidth, int imageheight, int align, int style,
-									 const char *pszText, bool bChecked,
-									 void* userData, tfuiCheckboxCallback onChange,
-									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-
-
-class TGFCLIENT_API Color
-{
-  public:
-    float red, green, blue, alpha;
-    const float *GetPtr() const { return (float*)this; }
-};
-
 TGFCLIENT_API unsigned int GfuiComboboxAddText(void *scr, int id, const char *text);
-TGFCLIENT_API void GfuiComboboxSetTextColor(void *scr, int id, const Color& color);
+TGFCLIENT_API void GfuiComboboxSetTextColor(void *scr, int id, const GfuiColor& color);
 TGFCLIENT_API void GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index);
 TGFCLIENT_API void GfuiComboboxSetPosition(void *scr, int id, unsigned int pos);
 TGFCLIENT_API unsigned int GfuiComboboxGetPosition(void *scr, int id);
@@ -392,24 +407,12 @@ TGFCLIENT_API const char* GfuiComboboxGetText(void *scr, int id);
 TGFCLIENT_API void GfuiComboboxClear(void *scr, int id);
 TGFCLIENT_API unsigned GfuiComboboxGetNumberOfChoices(void *scr, int id);
 
-TGFCLIENT_API int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
-										const char *pszProgressbackImg, const char *progressbarimg,
-										int align,float min,float max,float value, 
-										void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API void GfuiProgressbarSetValue(void *scr, int id, float value);
-
-
-TGFCLIENT_API int GfuiGrButtonCreateEx(void *scr, const char *disabled, const char *enabled, const char *focused, const char *pushed,
-		   int x, int y, int imageWidth,int imageHeight,int align, int mouse,
-		   void *userDataOnPush, tfuiCallback onPush, 
-		   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-
-
-TGFCLIENT_API void GfuiButtonShowBox(void *scr, int id,bool bShow);
-TGFCLIENT_API void GfuiButtonSetColor(void *scr, int id, Color color);
-TGFCLIENT_API void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
-TGFCLIENT_API void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
-TGFCLIENT_API void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+/* Check Boxes */
+TGFCLIENT_API int GfuiCheckboxCreate(void *scr, int font, int x, int y,
+									 int imagewidth, int imageheight, int align, int style,
+									 const char *pszText, bool bChecked,
+									 void* userData, tfuiCheckboxCallback onChange,
+									 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 TGFCLIENT_API void GfuiCheckboxSetChecked(void *scr, int id, bool bChecked);
 
 
@@ -422,8 +425,8 @@ TGFCLIENT_API int GfuiEditboxCreate(void *scr, const char *text, int font, int x
 TGFCLIENT_API int GfuiEditboxGetFocused(void);
 TGFCLIENT_API char *GfuiEditboxGetString(void *scr, int id);
 TGFCLIENT_API void GfuiEditboxSetString(void *scr, int id, const char *text);
-TGFCLIENT_API void GfuiEditboxSetColor(void *scr, int id,Color color);
-TGFCLIENT_API void GfuiEditboxSetFocusColor(void *scr, int id,Color focuscolor);
+TGFCLIENT_API void GfuiEditboxSetColor(void *scr, int id, const GfuiColor& color);
+TGFCLIENT_API void GfuiEditboxSetFocusColor(void *scr, int id, const GfuiColor& focuscolor);
 
 
 /* Scroll lists */
@@ -440,8 +443,8 @@ TGFCLIENT_API bool GfuiScrollListClearSelection(void *scr, int Id);
 TGFCLIENT_API const char *GfuiScrollListGetElement(void *scr, int Id, int index, void **userData);
 TGFCLIENT_API int GfuiScrollListGetNumberOfElements(void *scr, int Id);
 TGFCLIENT_API void GfuiScrollListShowElement(void *scr, int Id, int index);
-TGFCLIENT_API void GfuiScrollListSetColor(void *scr, int id,Color color);
-TGFCLIENT_API void GfuiScrollListSetSelectColor(void *scr, int id,Color color);
+TGFCLIENT_API void GfuiScrollListSetColor(void *scr, int id, const GfuiColor& color);
+TGFCLIENT_API void GfuiScrollListSetSelectColor(void *scr, int id, const GfuiColor& color);
 
 
 /* Scroll bars */
@@ -471,24 +474,18 @@ TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void *menu, const char *text, c
  * New XML based Menu Management Interface *
  *******************************************/
 
-TGFCLIENT_API void *LoadMenuXML(const char *pFilePath);
-TGFCLIENT_API bool CreateStaticControls(void *param,void *menuHandle);
+TGFCLIENT_API void *GfuiMenuLoad(const char *pFilePath);
+TGFCLIENT_API bool GfuiMenuCreateStaticControls(void *param,void *menuHandle);
 
-TGFCLIENT_API int CreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onPush);
-TGFCLIENT_API int CreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onPush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int CreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
-TGFCLIENT_API int CreateLabelControl(void *menuHandle,void *param,const char *pControlName);
-TGFCLIENT_API int CreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int CreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onSelect);
-TGFCLIENT_API int CreateComboboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiComboboxCallback onChange);
-TGFCLIENT_API int CreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiCheckboxCallback onChange);
-TGFCLIENT_API int CreateProgressbarControl(void *menuHandle,void *param,const char *pControlName);
-
-TGFCLIENT_API void GfuiButtonShowBox(void *scr, int id,bool bShow);
-TGFCLIENT_API void GfuiButtonSetColor(void *scr, int id,Color color);
-TGFCLIENT_API void GfuiButtonSetFocusColor(void *scr, int id,Color focuscolor);
-TGFCLIENT_API void GfuiButtonSetPushedColor(void *scr, int id,Color pushcolor);
-TGFCLIENT_API void GfuiButtonSetImage(void *scr,int id,int x,int y,int w,int h,const char *disableFile,const char *enableFile,const char*focusedFile,const char *pushedFile);
+TGFCLIENT_API int GfuiMenuCreateButtonControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onPush);
+TGFCLIENT_API int GfuiMenuCreateButtonControlEx(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onPush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiMenuCreateStaticImageControl(void *menuHandle,void *param,const char *pControlName);
+TGFCLIENT_API int GfuiMenuCreateLabelControl(void *menuHandle,void *param,const char *pControlName);
+TGFCLIENT_API int GfuiMenuCreateEditControl(void *menuHandle,void *param,const char *pControlName,void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiMenuCreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onSelect);
+TGFCLIENT_API int GfuiMenuCreateComboboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiComboboxCallback onChange);
+TGFCLIENT_API int GfuiMenuCreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiCheckboxCallback onChange);
+TGFCLIENT_API int GfuiMenuCreateProgressbarControl(void *menuHandle,void *param,const char *pControlName);
 
 /*****************************
  * Texture / image interface *

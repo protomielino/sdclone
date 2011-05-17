@@ -103,34 +103,34 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
     // Create screen, load menu XML descriptor and create static controls.
     menuHandle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
 
-    void *menuXMLDescHdle = LoadMenuXML("pitmenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("pitmenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, menuHandle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, menuHandle);
 
     // Create labels for driver name, remaining laps and remaining fuel.
-    int driverNameId = CreateLabelControl(menuHandle, menuXMLDescHdle, "drivernamelabel");
+    int driverNameId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "drivernamelabel");
     GfuiLabelSetText(menuHandle, driverNameId, car->_name);
 
-    int remainLapsId = CreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
+    int remainLapsId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
     sprintf(buf, "%d", car->_remainingLaps);
     GfuiLabelSetText(menuHandle, remainLapsId, buf);
 
-    int remainFuelId = CreateLabelControl(menuHandle, menuXMLDescHdle, "remainingfuellabel");
+    int remainFuelId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingfuellabel");
     sprintf(buf, "%.1f l", car->_fuel);
     GfuiLabelSetText(menuHandle, remainFuelId, buf);
 
     // Create edit boxes for fuel and repair amounts.
-    fuelId = CreateEditControl(menuHandle, menuXMLDescHdle, "fuelamountedit", NULL, NULL, rmUpdtFuel);
+    fuelId = GfuiMenuCreateEditControl(menuHandle, menuXMLDescHdle, "fuelamountedit", NULL, NULL, rmUpdtFuel);
     sprintf(buf, "%.1f", car->pitcmd.fuel);
     GfuiEditboxSetString(menuHandle, fuelId, buf);
 
-    repairId = CreateEditControl(menuHandle, menuXMLDescHdle, "repairamountedit", NULL, NULL, rmUpdtRepair);
+    repairId = GfuiMenuCreateEditControl(menuHandle, menuXMLDescHdle, "repairamountedit", NULL, NULL, rmUpdtRepair);
     sprintf(buf, "%d", (int)car->pitcmd.repair);
     GfuiEditboxSetString(menuHandle, repairId, buf);
 
     // Create Back and Reset buttons.
-    CreateButtonControl(menuHandle, menuXMLDescHdle, "repairbutton", NULL, rmRepair);
-    CreateButtonControl(menuHandle, menuXMLDescHdle, "stopgobutton", NULL, rmStopAndGo);
+    GfuiMenuCreateButtonControl(menuHandle, menuXMLDescHdle, "repairbutton", NULL, rmRepair);
+    GfuiMenuCreateButtonControl(menuHandle, menuXMLDescHdle, "stopgobutton", NULL, rmStopAndGo);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);

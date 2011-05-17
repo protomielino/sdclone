@@ -76,17 +76,17 @@ OptionsMenuInit(void *prevMenu)
 
     MenuHandle = GfuiScreenCreateEx((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);
 
-    void *param = LoadMenuXML("optionsmenu.xml");
+    void *param = GfuiMenuLoad("optionsmenu.xml");
 
-    CreateStaticControls(param,MenuHandle);
+    GfuiMenuCreateStaticControls(param,MenuHandle);
     
-    CreateButtonControl(MenuHandle, param, "display", NULL, onDisplayMenuActivate);
-    CreateButtonControl(MenuHandle, param, "graphic", NULL, onGraphMenuActivate);
-    CreateButtonControl(MenuHandle, param, "opengl", NULL, onOpenGLMenuActivate);
-    CreateButtonControl(MenuHandle, param, "sound", NULL, onSoundMenuActivate);
-    CreateButtonControl(MenuHandle, param, "simulation", NULL, onSimuMenuActivate);
-    CreateButtonControl(MenuHandle, param, "ai", NULL, onAIMenuActivate);
-    CreateButtonControl(MenuHandle, param, "back", prevMenu, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onDisplayMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "graphic", NULL, onGraphMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "opengl", NULL, onOpenGLMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "sound", NULL, onSoundMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "simulation", NULL, onSimuMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "ai", NULL, onAIMenuActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "back", prevMenu, GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
 

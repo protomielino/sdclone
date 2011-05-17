@@ -45,24 +45,24 @@ PreviewMenuActivate(void * /* dummy */)
 int ReadControl(void *param,std::string strType,const char *pControlName)
 {
 	if ((strType == "textbutton")||(strType =="imagebutton"))
-		return CreateButtonControl(menuHandle,param,pControlName,0,NULL);
+		return GfuiMenuCreateButtonControl(menuHandle,param,pControlName,0,NULL);
 	else if (strType == "editbox")
-		return CreateEditControl(menuHandle,param,pControlName,0,NULL,NULL);
+		return GfuiMenuCreateEditControl(menuHandle,param,pControlName,0,NULL,NULL);
 	else if (strType == "label")
-		return CreateLabelControl(menuHandle,param,pControlName);
+		return GfuiMenuCreateLabelControl(menuHandle,param,pControlName);
 	else if (strType == "staticimage")
-		return CreateStaticImageControl(menuHandle,param,pControlName);
+		return GfuiMenuCreateStaticImageControl(menuHandle,param,pControlName);
 	else if (strType == "combobox")
 	{
-		int id = CreateComboboxControl(menuHandle,param,pControlName,0,NULL);
+		int id = GfuiMenuCreateComboboxControl(menuHandle,param,pControlName,0,NULL);
 		return id;
 	}
 	else if (strType == "scrolllist")
-		return CreateScrollListControl(menuHandle,param,pControlName,0,NULL);
+		return GfuiMenuCreateScrollListControl(menuHandle,param,pControlName,0,NULL);
 	else if (strType == "checkbox")
-		return  CreateCheckboxControl(menuHandle,param,pControlName,0,NULL);
+		return  GfuiMenuCreateCheckboxControl(menuHandle,param,pControlName,0,NULL);
 	else if (strType == "progressbar")
-		return  CreateProgressbarControl(menuHandle,param,pControlName);
+		return  GfuiMenuCreateProgressbarControl(menuHandle,param,pControlName);
 
 	return -1;
 }
@@ -103,7 +103,7 @@ LoadMenuScreen()
 	if (param == NULL)
 		param = GfParmReadFileLocal(g_strFile.c_str(), GFPARM_RMODE_REREAD);
 
-    CreateStaticControls(param,menuHandle);
+    GfuiMenuCreateStaticControls(param,menuHandle);
 	ShowDynamicControls(param);
     GfuiAddKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
     GfuiAddKey(menuHandle, 'Q', "Quit", 0, onQuit, NULL);

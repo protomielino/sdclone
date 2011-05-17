@@ -187,16 +187,16 @@ MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
     // Create screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreateEx(NULL, NULL, onActivate, NULL, NULL, 1);
 
-    void *menuXMLDescHdle = LoadMenuXML("mouseconfigmenu.xml");
+    void *menuXMLDescHdle = GfuiMenuLoad("mouseconfigmenu.xml");
 
-    CreateStaticControls(menuXMLDescHdle, ScrHandle);
+    GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
 
     // Create instruction variable label.
-    InstId = CreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
+    InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
     // Create Back and Reset buttons.
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
-    CreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
+    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
+    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);

@@ -253,14 +253,14 @@ GfuiComboboxSetSelectedIndex(void *scr, int id, unsigned int index)
 }
 
 void
-GfuiComboboxSetTextColor(void *scr, int id, const Color& color)
+GfuiComboboxSetTextColor(void *scr, int id, const GfuiColor& color)
 {
     tGfuiObject* object = gfuiGetObject(scr, id);
 
     if (object && object->widget == GFUI_COMBOBOX)
 	{
 		tGfuiCombobox* combo = &(object->u.combobox);
-		gfuiLabelSetColor(&combo->label, color.GetPtr());
+		gfuiLabelSetColor(&combo->label, color.toFloatRGBA());
 	}
 }
 
