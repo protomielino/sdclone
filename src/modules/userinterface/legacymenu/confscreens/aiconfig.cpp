@@ -118,7 +118,7 @@ AIMenuInit(void *prevMenu)
     }
     PrevHandle = prevMenu;
 
-    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+    ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
 	void *param = GfuiMenuLoad("aiconfigmenu.xml");
     GfuiMenuCreateStaticControls(param,ScrHandle);

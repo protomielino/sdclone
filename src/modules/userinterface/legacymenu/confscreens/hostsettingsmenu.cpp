@@ -87,7 +87,7 @@ bool HostSettingsMenu::initialize(void* pMenu)
 
 	pPrevMenu = pMenu;
 
-	void* pMenuHandle = GfuiScreenCreateEx(NULL,NULL,onActivate, 
+	void* pMenuHandle = GfuiScreenCreate(NULL,NULL,onActivate, 
 										   NULL, (tfuiCallback)NULL, 
 										   1);
 	setMenuHandle(pMenuHandle);

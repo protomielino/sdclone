@@ -93,7 +93,7 @@ MainMenuInit(void)
     if (MenuHandle)
         return 0;
 
-    MenuHandle = GfuiScreenCreateEx((float*)NULL, 
+    MenuHandle = GfuiScreenCreate((float*)NULL, 
 				    NULL, onMainMenuActivate, 
 				    NULL, (tfuiCallback)NULL, 
 				    1);

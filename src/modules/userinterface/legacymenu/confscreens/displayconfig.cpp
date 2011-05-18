@@ -430,7 +430,7 @@ bool DisplayMenu::initialize(void *pPreviousMenu)
 	setPreviousMenuHandle(pPreviousMenu);
 
 	// Create the menu and all its controls.
-	createMenuEx(NULL, this, onActivate, NULL, (tfuiCallback)NULL, 1);
+	createMenu(NULL, this, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     openXMLDescriptor();
     

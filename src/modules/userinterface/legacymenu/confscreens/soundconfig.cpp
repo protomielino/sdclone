@@ -159,7 +159,7 @@ void * SoundMenuInit(void *prevMenu)
 
 	prevHandle = prevMenu;
 
-	scrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+	scrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
 	void *param = GfuiMenuLoad("soundmenu.xml");
 	GfuiMenuCreateStaticControls(param,scrHandle);

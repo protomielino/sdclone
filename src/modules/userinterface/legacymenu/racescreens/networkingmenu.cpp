@@ -572,7 +572,7 @@ RmNetworkHostMenu(void * /* dummy */)
 	GfuiScreenRelease(racemanMenuHdle);
     }
 
-    racemanMenuHdle = GfuiScreenCreateEx(NULL, 
+    racemanMenuHdle = GfuiScreenCreate(NULL, 
 					 NULL, (tfuiCallback)OnActivateNetworkHost, 
 					 NULL, (tfuiCallback)NULL, 
 					 1);
@@ -632,7 +632,7 @@ ShowWaitingToConnectScreen()
 	{
 		GfuiScreenRelease(racemanMenuHdle);
 	}
-	racemanMenuHdle = GfuiScreenCreateEx(NULL, 
+	racemanMenuHdle = GfuiScreenCreate(NULL, 
 						NULL, (tfuiCallback) NULL, 
 						NULL, (tfuiCallback)NULL, 
 						1);
@@ -678,7 +678,7 @@ RmNetworkClientConnectMenu(void * /* dummy */)
 	GfuiScreenRelease(racemanMenuHdle);
 	}
 
-	racemanMenuHdle = GfuiScreenCreateEx(NULL, 
+	racemanMenuHdle = GfuiScreenCreate(NULL, 
 					NULL, (tfuiCallback)OnActivateNetworkClient, 
 					NULL, (tfuiCallback)NULL, 
 					1);
@@ -780,7 +780,7 @@ NetworkClientMenu(void * /* dummy */)
 	if (racemanMenuHdle) {
 		GfuiScreenRelease(racemanMenuHdle);
 	}
-	racemanMenuHdle = GfuiScreenCreateEx(NULL, 
+	racemanMenuHdle = GfuiScreenCreate(NULL, 
 										 NULL, (tfuiCallback)NULL, 
 										 NULL, (tfuiCallback)NULL, 
 										 1);
@@ -837,7 +837,7 @@ RmNetworkMenu(void *)
 		GetNetwork()->ResetNetwork();
 	}
 
-    racemanMenuHdle = GfuiScreenCreateEx(NULL, 
+    racemanMenuHdle = GfuiScreenCreate(NULL, 
 					 NULL, (tfuiCallback)NULL, 
 					 NULL, (tfuiCallback)NULL, 
 					 1);

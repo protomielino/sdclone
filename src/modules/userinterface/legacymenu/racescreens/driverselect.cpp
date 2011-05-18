@@ -608,7 +608,7 @@ RmDriversSelect(void *vs)
     MenuData = (tRmDriverSelect*)vs;
 
     // Create screen, background image and title
-    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, rmdsActivate, NULL, (tfuiCallback)NULL, 1);
+    ScrHandle = GfuiScreenCreate((float*)NULL, NULL, rmdsActivate, NULL, (tfuiCallback)NULL, 1);
     
     void *menuDescHdle = GfuiMenuLoad("driverselectmenu.xml");
     GfuiMenuCreateStaticControls(menuDescHdle, ScrHandle);

@@ -415,7 +415,7 @@ RmScreenInit()
     RmScreenShutdown();
 
     // Create screen, load menu XML descriptor and create static controls.
-    rmScreenHandle = GfuiScreenCreateEx(black, 0, rmScreenActivate, 0, 0, 0);
+    rmScreenHandle = GfuiScreenCreate(black, 0, rmScreenActivate, 0, 0, 0);
     void *menuXMLDescHdle = GfuiMenuLoad("raceglscreen.xml");
     GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScreenHandle);
 
@@ -560,7 +560,7 @@ RmResScreenInit()
 	tRmInfo* reInfo = LmRaceEngine().inData();
 
     // Create screen, load menu XML descriptor and create static controls.
-    rmResScreenHdle = GfuiScreenCreateEx(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
+    rmResScreenHdle = GfuiScreenCreate(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
     void *menuXMLDescHdle = GfuiMenuLoad("raceblindscreen.xml");
     GfuiMenuCreateStaticControls(menuXMLDescHdle, rmResScreenHdle);
 

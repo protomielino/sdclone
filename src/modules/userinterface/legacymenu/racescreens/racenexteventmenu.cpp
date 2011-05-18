@@ -62,7 +62,7 @@ RmNextEventMenu(void)
 	GfLogTrace("Entering Next Event menu\n");
 	
 	// Create screen, load menu XML descriptor and create static controls.
-	rmScrHandle = GfuiScreenCreateEx(NULL, 
+	rmScrHandle = GfuiScreenCreate(NULL, 
 								  NULL, (tfuiCallback)NULL, 
 								  NULL, (tfuiCallback)NULL, 
 								  1);

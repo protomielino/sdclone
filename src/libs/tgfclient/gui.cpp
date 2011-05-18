@@ -124,6 +124,12 @@ gfuiGetColor(const float* color)
      return c;
 }
 
+// index from GFUI_* "named" indexes above.
+GfuiColor gfuiGetColor(int index)
+{
+	return gfuiGetColor(gfuiColors[index]);
+}
+
 
 /** Dummy display function for the event loop.
     Declare this function to the event loop if nothing is to be displayed
@@ -566,33 +572,6 @@ GfuiScreenDeactivate(void)
  	GfuiApp().eventLoop().setRedisplayCB(GfuiDisplayNothing);
 }
 
-/** Create a new screen.
-    @ingroup	gui
-    @return	New screen instance
-		<br>NULL if Error
- */
-void *
-GfuiScreenCreate(void)
-{
-	tGfuiScreen	*screen;
-	
-	screen = (tGfuiScreen*)calloc(1, sizeof(tGfuiScreen));
-	
-	screen->width = 640.0;
-	screen->height = 480.0;
-
-	screen->bgColor = gfuiGetColor(&gfuiColors[GFUI_BGCOLOR][0]);
-
-	screen->mouseColor[0] = &(gfuiColors[GFUI_MOUSECOLOR1][0]);
-	screen->mouseColor[1] = &(gfuiColors[GFUI_MOUSECOLOR2][0]);
-
-	screen->mouseAllowed = 1;
-	
-	screen->keyAutoRepeat = 1; // Default key auto-repeat on.
- 
-	return (void*)screen;
-}
-
 /** Create a screen.
     @ingroup	gui
     @param	bgColor			pointer on color array (RGBA) (if NULL default color is used)
@@ -606,12 +585,11 @@ GfuiScreenCreate(void)
     @bug	Only black background work well
  */
 void *
-GfuiScreenCreateEx(float *bgColor,
-		   void *userDataOnActivate, tfuiCallback onActivate, 
-		   void *userDataOnDeactivate, tfuiCallback onDeactivate,
-		   int mouseAllowed)
+GfuiScreenCreate(float *bgColor,
+				 void *userDataOnActivate, tfuiCallback onActivate, 
+				 void *userDataOnDeactivate, tfuiCallback onDeactivate,
+				 int mouseAllowed)
 {
-
 	tGfuiScreen	*screen;
 	
 	screen = (tGfuiScreen*)calloc(1, sizeof(tGfuiScreen));
@@ -619,7 +597,7 @@ GfuiScreenCreateEx(float *bgColor,
 	screen->width = 640.0;
 	screen->height = 480.0;
 	
-	if (bgColor != NULL) {
+	if (bgColor) {
 		screen->bgColor = gfuiGetColor(bgColor);
 	} else {
 		screen->bgColor = gfuiGetColor(&gfuiColors[GFUI_BGCOLOR][0]);

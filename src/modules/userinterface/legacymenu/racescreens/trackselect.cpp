@@ -252,7 +252,7 @@ RmTrackSelect(void *vs)
 
 	// Create screen menu and controls.
     ScrHandle =
-		GfuiScreenCreateEx((float*)NULL, NULL, rmtsActivate, NULL, (tfuiCallback)NULL, 1);
+		GfuiScreenCreate((float*)NULL, NULL, rmtsActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *hparmMenu = GfuiMenuLoad("trackselectmenu.xml");
     GfuiMenuCreateStaticControls(hparmMenu, ScrHandle);

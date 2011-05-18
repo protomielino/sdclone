@@ -101,7 +101,7 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 	GfLogInfo("Entering Pit menu\n");
 
     // Create screen, load menu XML descriptor and create static controls.
-    menuHandle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
+    menuHandle = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
 
     void *menuXMLDescHdle = GfuiMenuLoad("pitmenu.xml");
 

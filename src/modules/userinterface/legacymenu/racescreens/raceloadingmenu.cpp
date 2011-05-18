@@ -73,7 +73,7 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
     }
 
     // Create screen, load menu XML descriptor and create static controls.
-    MenuHandle = GfuiScreenCreateEx(BGColor, NULL, NULL, NULL, rmDeativate, 0);
+    MenuHandle = GfuiScreenCreate(BGColor, NULL, NULL, NULL, rmDeativate, 0);
 
     void *menuXMLDescHdle = GfuiMenuLoad("loadingscreen.xml");
 

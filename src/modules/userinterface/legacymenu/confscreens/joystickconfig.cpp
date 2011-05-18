@@ -248,7 +248,7 @@ JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
     }
     
     // Create screen, load menu XML descriptor and create static controls.
-    ScrHandle = GfuiScreenCreateEx(NULL, NULL, onActivate, NULL, NULL, 1);
+    ScrHandle = GfuiScreenCreate(NULL, NULL, onActivate, NULL, NULL, 1);
 
     void *menuXMLDescHdle = GfuiMenuLoad("joystickconfigmenu.xml");
 

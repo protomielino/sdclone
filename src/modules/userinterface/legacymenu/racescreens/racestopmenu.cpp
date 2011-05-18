@@ -143,7 +143,7 @@ rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, 
     void *screenHdle = 0;
         
     // Create screen, load menu XML descriptor and create static controls.
-    screenHdle = GfuiScreenCreateEx(NULL, NULL, NULL, NULL, NULL, 1);
+    screenHdle = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
 
     void *menuXMLDescHdle = GfuiMenuLoad("stopracemenu.xml");
 

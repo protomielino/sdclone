@@ -358,18 +358,18 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
     button->focused = 0;
     button->pushed = 0;
 
-    button->bgColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNDISABLED][0]));
-    button->bgColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNENABLED][0]));
-    button->bgColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNCLICK][0]));
-    button->bgFocusColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNDISABLED][0]));
-    button->bgFocusColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNFOCUS][0]));
-    button->bgFocusColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BGBTNCLICK][0]));
-    button->fgColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BTNDISABLED][0]));
-    button->fgColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BTNENABLED][0]));
-    button->fgColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BTNCLICK][0]));
-    button->fgFocusColor[0] = gfuiGetColor(&(gfuiColors[GFUI_BTNDISABLED][0]));
-    button->fgFocusColor[1] = gfuiGetColor(&(gfuiColors[GFUI_BTNFOCUS][0]));
-    button->fgFocusColor[2] = gfuiGetColor(&(gfuiColors[GFUI_BTNCLICK][0]));
+    button->bgColor[0] = gfuiGetColor(GFUI_BGBTNDISABLED);
+    button->bgColor[1] = gfuiGetColor(GFUI_BGBTNENABLED);
+    button->bgColor[2] = gfuiGetColor(GFUI_BGBTNCLICK);
+    button->bgFocusColor[0] = gfuiGetColor(GFUI_BGBTNDISABLED);
+    button->bgFocusColor[1] = gfuiGetColor(GFUI_BGBTNFOCUS);
+    button->bgFocusColor[2] = gfuiGetColor(GFUI_BGBTNCLICK);
+    button->fgColor[0] = gfuiGetColor(GFUI_BTNDISABLED);
+    button->fgColor[1] = gfuiGetColor(GFUI_BTNENABLED);
+    button->fgColor[2] = gfuiGetColor(GFUI_BTNCLICK);
+    button->fgFocusColor[0] = gfuiGetColor(GFUI_BTNDISABLED);
+    button->fgFocusColor[1] = gfuiGetColor(GFUI_BTNFOCUS);
+	button->fgFocusColor[2] = gfuiGetColor(GFUI_BTNCLICK);
 
 	gfuiLabelInit(&button->label, text, 100, x, y - gfuiFont[font]->getDescender(), align, width,
 				  font, 0, 0, 0, 0, 0, 0, 0);

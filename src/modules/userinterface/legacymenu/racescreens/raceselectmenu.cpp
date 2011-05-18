@@ -124,7 +124,7 @@ RmRaceSelectInit(void *prevMenu)
 		return rmRaceSelectHandle;
     
     // Create screen, load menu XML descriptor and create static controls.
-    rmRaceSelectHandle = GfuiScreenCreateEx((float*)NULL, 
+    rmRaceSelectHandle = GfuiScreenCreate((float*)NULL, 
 											NULL, rmOnActivate, 
 											NULL, (tfuiCallback)NULL, 
 											1);

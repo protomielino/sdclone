@@ -565,7 +565,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 	Joystick[jsInd] = 0;
 
     /* Create screen */
-    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+    ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *param = GfuiMenuLoad("controlconfigmenu.xml");
     GfuiMenuCreateStaticControls(param,ScrHandle);
@@ -579,7 +579,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
 	Cmd[i].labelId = GfuiMenuCreateLabelControl(ScrHandle,param,Cmd[i].name);
 	std::string strCmdEdit(Cmd[i].name);
 	strCmdEdit += " button";
-	Cmd[i].Id = GfuiMenuCreateButtonControlEx(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
+	Cmd[i].Id = GfuiMenuCreateButtonControl(ScrHandle,param,strCmdEdit.c_str(),(void*)i,onPush,NULL,(tfuiCallback)NULL,onFocusLost);
 	}
     
     /* Steer Sensibility label and associated editbox */

@@ -94,7 +94,7 @@ ReloadMenuScreen(void *)
 void
 LoadMenuScreen()
 {
-    menuHandle = GfuiScreenCreateEx((float*)NULL, 
+    menuHandle = GfuiScreenCreate((float*)NULL, 
 				    NULL, PreviewMenuActivate, 
 				    NULL, (tfuiCallback)NULL, 
 				    1);

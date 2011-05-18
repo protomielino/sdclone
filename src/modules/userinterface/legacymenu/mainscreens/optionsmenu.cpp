@@ -74,7 +74,7 @@ OptionsMenuInit(void *prevMenu)
     if (MenuHandle) 
 		return MenuHandle;
 
-    MenuHandle = GfuiScreenCreateEx((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);
+    MenuHandle = GfuiScreenCreate((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);
 
     void *param = GfuiMenuLoad("optionsmenu.xml");
 

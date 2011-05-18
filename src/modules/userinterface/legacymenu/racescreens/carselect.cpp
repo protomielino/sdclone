@@ -372,7 +372,7 @@ void RmCarSelectMenu::runMenu(GfRace* pRace, GfDriver* pDriver)
 bool RmCarSelectMenu::initialize()
 {
 	// Create the menu and all its controls.
-	createMenuEx(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
+	createMenu(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
 
     openXMLDescriptor();
     

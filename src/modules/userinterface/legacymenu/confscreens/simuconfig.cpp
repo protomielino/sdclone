@@ -173,7 +173,7 @@ SimuMenuInit(void *prevMenu)
     }
     PrevScrHandle = prevMenu;
 
-    ScrHandle = GfuiScreenCreateEx((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
+    ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *menuDescHdle = GfuiMenuLoad("simulationmenu.xml");
     GfuiMenuCreateStaticControls(menuDescHdle, ScrHandle);
