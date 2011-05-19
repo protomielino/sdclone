@@ -1013,18 +1013,21 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 				tdble friction = MIN(car->_wheelSeg(REAR_RGT)->surface->kFriction, car->_wheelSeg(REAR_LFT)->surface->kFriction) - 0.2;
 				if (friction < 1.0) friction *= MAX(0.6, friction);
-				bool  steer_correct = (fabs(car->_yaw_rate) > fabs(car->_steerCmd) ||
+
+				bool  steer_correct = (fabs(car->_yaw_rate) > fabs(car->_steerCmd * MAX(4.0, car->_speed_x/12.0) * friction) ||
 				                       (car->_yaw_rate < 0.0 && car->_steerCmd > 0.0) ||
 				                       (car->_yaw_rate > 0.0 && car->_steerCmd < 0.0));
 				tdble steer_diff    = fabs(car->_yaw_rate - car->_steerCmd);
+
+				tdble slipf = (steer_correct ? 8 * friction : 15 * friction);
 
 				drivespeed = (((car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) - (20 * friction)) *
 				              car->_wheelRadius(REAR_LFT) +
 				              (steer_correct ? (steer_diff * fabs(car->_yaw_rate) * (8 / friction)) : 0.0) +
 				              MAX(0.0, (-(car->_wheelSlipAccel(REAR_RGT)) - friction)) +
 				              MAX(0.0, (-(car->_wheelSlipAccel(REAR_LFT)) - friction)) +
-				              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(4, 80-fabs(car->_speed_x))/(8 * friction)) +
-				              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(4, 80-fabs(car->_speed_x))/(8 * friction)))
+				              fabs(car->_wheelSlipSide(REAR_RGT) * MAX(4, 80-fabs(car->_speed_x))/slipf) +
+				              fabs(car->_wheelSlipSide(REAR_LFT) * MAX(4, 80-fabs(car->_speed_x))/slipf))
 				             / 2.0;
 				break;
 		}
