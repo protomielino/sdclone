@@ -140,10 +140,8 @@ typedef struct {
 static void*
 rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 {
-    void *screenHdle = 0;
-        
     // Create screen, load menu XML descriptor and create static controls.
-    screenHdle = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
+    void *screenHdle = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
 
     void *menuXMLDescHdle = GfuiMenuLoad("stopracemenu.xml");
 
@@ -154,11 +152,14 @@ rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, 
     GfuiLabelSetText(screenHdle, titleId, title);
 
     // Create specified buttons, left aligned.
+    const int xpos = 270;
+    int ypos = 380;
     for (int nButInd = 0; nButInd < nButtons; nButInd++)
     {
         const int id =
 			GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
-								 aButtons[nButInd].screen, GFUI_ALIGN_HL_VB, GfuiScreenActivate);
+								 aButtons[nButInd].screen, GfuiScreenActivate, 
+								 xpos, ypos, GFUI_FONT_LARGE, GFUI_ALIGN_HL_VB);
 
 		GfuiButtonShowBox(screenHdle, id, false);
 		GfuiColor c, fc, pc;
@@ -169,6 +170,8 @@ rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, 
         GfuiButtonSetColor(screenHdle, id, c);
         GfuiButtonSetFocusColor(screenHdle, id, fc);
         GfuiButtonSetPushedColor(screenHdle, id, pc);
+
+		ypos -= 30;
     }
 
     // Close menu XML descriptor.

@@ -63,7 +63,6 @@ GfuiMenuDefaultKeysAdd(void *scr)
     GfuiAddKey(scr, GFUIK_PAGEDOWN, "Select Next Entry", NULL, gfuiSelectNext, NULL);
     GfuiAddKey(scr, GFUIK_F1, "Help", scr, GfuiHelpScreen, NULL);
     GfuiAddKey(scr, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-    
 }
 
 /** Create a new menu screen.
@@ -76,7 +75,7 @@ GfuiMenuDefaultKeysAdd(void *scr)
 void *
 GfuiMenuScreenCreate(const char *title)
 {
-    void        *scr;
+    void *scr;
 
     scr = GfuiScreenCreate();
     GfuiTitleCreate(scr, title, strlen(title));
@@ -98,44 +97,6 @@ onFocusLostHideTip(void *cbinfo)
     GfuiVisibilitySet(((tMnuCallbackInfo*)cbinfo)->screen, ((tMnuCallbackInfo*)cbinfo)->labelId, 0);
 }
 
-
-/** Add a button to a menu screen.
-    @ingroup    gui
-    @param      scr             Screen (menu) handle
-    @param      text            Text of the button
-    @param      tip             Text of the tip displayed when the button is focused
-    @param      userData        Parameter of the Push function
-    @param      style           Alignment horizontally/vertically
-    @param      onpush          Callback when the button is pushed
-    @return     Button 3
- */
-int
-GfuiMenuButtonCreate(void *scr, const char *text, const char *tip,
-        void *userData, const int style, tfuiCallback onpush)
-{
-    int nbItems = ((tGfuiScreen*)scr)->nbItems++;
-    if (nbItems > 22) {
-        GfTrace("Too many items in that menu !!!\n");
-        return -1;
-    }
-    
-    int xpos = 270;
-    int ypos = 380 - 30 * (nbItems % 11);
-
-    tMnuCallbackInfo *cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
-    cbinfo->screen = scr;
-    cbinfo->labelId = GfuiTipCreate(scr, tip, strlen(tip));
-
-    GfuiVisibilitySet(scr, cbinfo->labelId, 0);
-    
-    int bId = GfuiButtonCreate(scr, text, GFUI_FONT_LARGE, xpos, ypos, GFUI_BTNSZ, style, 0,
-							   userData, onpush,
-							   (void*)cbinfo, onFocusShowTip, onFocusLostHideTip);
-
-    return bId;
-}//GfuiMenuButtonCreate
-
-
 /** Add a button to a menu screen.
     @ingroup    gui
     @param      scr             Screen (menu) handle
@@ -143,28 +104,17 @@ GfuiMenuButtonCreate(void *scr, const char *text, const char *tip,
     @param      tip             Text of the tip displayed when the button is focused
     @param      userData        Parameter of the Push function
     @param      onpush          Callback when the button is pushed
+    @param      align           Alignment horizontally/vertically
     @return     Button Id
  */
 int
-GfuiMenuButtonCreateEx(void *scr, const char *text, const char *tip, void *userData, tfuiCallback onpush,int xpos,int ypos,int fontSize,int align)
+GfuiMenuButtonCreate(void *scr, const char *text, const char *tip,
+					 void *userDataOnPush, tfuiCallback onPush,
+					 int xpos, int ypos, int fontSize, int align)
 {
     tMnuCallbackInfo    *cbinfo;
-    //int                       xpos, ypos;
-    //int                       nbItems = ((tGfuiScreen*)scr)->nbItems++;
     int                 bId;
 
-/*
-    if (nbItems < 11) {
-        ypos = ypos - 30 * nbItems;
-    } else {
-        if (nbItems > 22) {
-            GfTrace("Too many items in that menu !!!\n");
-            return -1;
-        }
-        //xpos = 380;
-        ypos = ypos - 30 * (nbItems - 11);
-    }
-*/
     cbinfo = (tMnuCallbackInfo*)calloc(1, sizeof(tMnuCallbackInfo));
     cbinfo->screen = scr;
     cbinfo->labelId = GfuiTipCreate(scr, tip, strlen(tip));
@@ -172,7 +122,7 @@ GfuiMenuButtonCreateEx(void *scr, const char *text, const char *tip, void *userD
     GfuiVisibilitySet(scr, cbinfo->labelId, 0);
     
     bId = GfuiButtonCreate(scr, text, fontSize, xpos, ypos, GFUI_BTNSZ, align, 0,
-                           userData, onpush,
+                           userDataOnPush, onPush,
                            (void*)cbinfo, onFocusShowTip, onFocusLostHideTip);
 
     return bId;
@@ -359,7 +309,7 @@ readBoolean(void *param,const char *pControlName,const char *pszFieldName, bool 
 }
 
 static int 
-createStaticImage(void *menuHandle,void *param,const char *pControlName)
+createStaticImage(void *menuHandle, void *param, const char *pControlName)
 {
 	const char* pszImage = GfParmGetStr(param, pControlName, "image", "");
 
@@ -390,7 +340,7 @@ createStaticImage(void *menuHandle,void *param,const char *pControlName)
 }
 
 static int 
-createBackgroundImage(void *menuHandle,void *param,const char *pControlName)
+createBackgroundImage(void *menuHandle, void *param, const char *pControlName)
 {
 	const char* pszImage = GfParmGetStr(param, pControlName, "image", "");
 	GfuiScreenAddBgImg(menuHandle, pszImage);
@@ -398,7 +348,7 @@ createBackgroundImage(void *menuHandle,void *param,const char *pControlName)
 }
 
 int
-GfuiMenuCreateStaticImageControl(void *menuHandle,void *param,const char *pControlName)
+GfuiMenuCreateStaticImageControl(void *menuHandle, void *param, const char *pControlName)
 {
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
@@ -407,7 +357,7 @@ GfuiMenuCreateStaticImageControl(void *menuHandle,void *param,const char *pContr
 }
 
 static int 
-createLabel(void *menuHandle,void *param,const char *pControlName)
+createLabel(void *menuHandle, void *param, const char *pControlName)
 {
 	if (strcmp(GfParmGetStr(param, pControlName, "type", ""), "label"))
 	{
@@ -454,7 +404,7 @@ createLabel(void *menuHandle,void *param,const char *pControlName)
 
 
 int 
-GfuiMenuCreateLabelControl(void *menuHandle,void *param,const char *pControlName)
+GfuiMenuCreateLabelControl(void *menuHandle, void *param, const char *pControlName)
 {
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
@@ -463,7 +413,7 @@ GfuiMenuCreateLabelControl(void *menuHandle,void *param,const char *pControlName
 }
 
 int 
-CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
+CreateTextButtonControl(void *menuHandle, void *param, const char *pControlName,void *userData, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	const char* pszTip = GfParmGetStr(param, pControlName, "tip", 0);
 	if (pszTip && strlen(pszTip) > 0)
@@ -535,7 +485,7 @@ CreateTextButtonControl(void *menuHandle,void *param,const char *pControlName,vo
 }
 
 int 
-CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
+CreateImageButtonControl(void *menuHandle, void *param, const char *pControlName,void *userData, tfuiCallback onpush, void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	const char* pszTip = GfParmGetStr(param, pControlName, "tip", "");
 
@@ -576,7 +526,7 @@ CreateImageButtonControl(void *menuHandle,void *param,const char *pControlName,v
 }
 
 int 
-GfuiMenuCreateButtonControl(void *menuHandle,void *param,const char *pControlName,
+GfuiMenuCreateButtonControl(void *menuHandle, void *param, const char *pControlName,
 							void *userDataOnPush, tfuiCallback onPush,
 							void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -656,7 +606,7 @@ GfuiMenuCreateEditControl(void *menuHandle, void *param, const char *pControlNam
 }
 
 int 
-GfuiMenuCreateComboboxControl(void *menuHandle,void *param,const char *pControlName,void *userData,tfuiComboboxCallback onChange)
+GfuiMenuCreateComboboxControl(void *menuHandle, void *param, const char *pControlName,void *userData,tfuiComboboxCallback onChange)
 {
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
@@ -719,7 +669,7 @@ GfuiMenuCreateComboboxControl(void *menuHandle,void *param,const char *pControlN
 }
 
 int 
-GfuiMenuCreateScrollListControl(void *menuHandle,void *param,const char *pControlName,void *userData, tfuiCallback onSelect)
+GfuiMenuCreateScrollListControl(void *menuHandle, void *param, const char *pControlName,void *userData, tfuiCallback onSelect)
 {
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
@@ -762,7 +712,7 @@ GfuiMenuCreateScrollListControl(void *menuHandle,void *param,const char *pContro
 }
 
 int 
-GfuiMenuCreateCheckboxControl(void *menuHandle,void *param,const char *pControlName,void* userData,tfuiCheckboxCallback onChange)
+GfuiMenuCreateCheckboxControl(void *menuHandle, void *param, const char *pControlName,void* userData,tfuiCheckboxCallback onChange)
 {
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;
@@ -832,7 +782,7 @@ GfuiMenuCreateCheckboxControl(void *menuHandle,void *param,const char *pControlN
 
 
 int 
-GfuiMenuCreateProgressbarControl(void *menuHandle,void *param,const char *pControlName)
+GfuiMenuCreateProgressbarControl(void *menuHandle, void *param, const char *pControlName)
 {
 	std::string strControlName("dynamiccontrols/");
 	strControlName += pControlName;

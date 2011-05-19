@@ -341,7 +341,7 @@ TGFCLIENT_API void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_DIGIT         8
 TGFCLIENT_API int GfuiLabelCreate(void* scr, const char* text,
 								  int font, int x, int y, int align, int maxlen, 
-								  const float* fgColorPtr = 0, const float* fgFocusColorPtr = 0,
+								  const float* fgColor = 0, const float* fgFocusColor = 0,
 								  void* userDataOnFocus = 0, tfuiCallback onFocus = 0, tfuiCallback onFocusLost = 0);
 
 TGFCLIENT_API void GfuiSetTipPosition(int x,int y);
@@ -463,11 +463,14 @@ TGFCLIENT_API void GfuiStaticImageSetActive(void* scr, int id, int index);
 
 TGFCLIENT_API void* GfuiMenuScreenCreate(const char* title);
 TGFCLIENT_API void  GfuiMenuDefaultKeysAdd(void* scr);
-TGFCLIENT_API int   GfuiMenuButtonCreate(void* menu, const char* text, const char* tip, void* userData, const int style, tfuiCallback onpush);
+TGFCLIENT_API int   GfuiMenuButtonCreate(void *scr, const char *text, const char *tip,
+										 void *userDataOnPush, tfuiCallback onPush,
+										 int xpos, int ypos,
+										 int fontSize = GFUI_FONT_LARGE, int align = GFUI_ALIGN_HC_VB);
 TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void* scr, const char* text, const char* tip,
 												 void* userData, tfuiCallback onpush,
 												 int xpos = 320, int ypos = 40,
-												 int fontSize = GFUI_BTNSZ, int align = GFUI_ALIGN_HC_VB);
+												 int fontSize = GFUI_FONT_LARGE, int align = GFUI_ALIGN_HC_VB);
 
 /*******************************************
  * New XML based Menu Management Interface *
@@ -486,6 +489,7 @@ TGFCLIENT_API int GfuiMenuCreateScrollListControl(void* menuHandle, void* param,
 TGFCLIENT_API int GfuiMenuCreateComboboxControl(void* menuHandle, void* param, const char* pControlName, void* userData,tfuiComboboxCallback onChange);
 TGFCLIENT_API int GfuiMenuCreateCheckboxControl(void* menuHandle, void* param, const char* pControlName, void* userData, tfuiCheckboxCallback onChange);
 TGFCLIENT_API int GfuiMenuCreateProgressbarControl(void* menuHandle, void* param, const char* pControlName);
+
 
 /*****************************
  * Texture / image interface *

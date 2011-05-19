@@ -853,16 +853,17 @@ RmNetworkMenu(void *)
     str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
     if (str) {
 	GfuiTitleCreate(racemanMenuHdle, str, strlen(str));
-	
     }
 
     GfuiMenuButtonCreate(racemanMenuHdle,
 			 "Host Online Race", "Host a race",
-			 NULL, GFUI_ALIGN_HL_VB, RmNetworkHostMenu);
+			 NULL, RmNetworkHostMenu, 
+			 270, 380, GFUI_FONT_LARGE, GFUI_ALIGN_HL_VB);
 
     GfuiMenuButtonCreate(racemanMenuHdle,
 			 "Connect to Online Race", "Connect to a race on Internet or Network",
-			 NULL, GFUI_ALIGN_HL_VB, NetworkClientMenu);
+			 NULL, NetworkClientMenu, 
+			 270, 350, GFUI_FONT_LARGE, GFUI_ALIGN_HL_VB);
 
     GfuiMenuBackQuitButtonCreate(racemanMenuHdle,
 				 "Back", "Return to previous Menu",
