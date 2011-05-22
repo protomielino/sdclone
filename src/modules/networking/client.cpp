@@ -41,21 +41,18 @@ Client::~Client()
 {
 	ResetNetwork();
 	SetClient(false);
-
-
 }
 
- void Client::Disconnect()
- {
+void Client::Disconnect()
+{
 	m_bConnected = false;
-
+	
 	ResetNetwork();
 	SetClient(false);
- }
+}
 
 void Client::ResetNetwork()
 {
-
 	if (m_pClient == NULL)
 		return;
 
@@ -133,18 +130,18 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 	m_pClient = NULL;
 	m_pHost = NULL;
 
-	#if (ENET_VERSION >= 0x010300)
-          m_pClient = enet_host_create (NULL /* create a client host */,
-                  MAXNETWORKPLAYERS, 
-                  0, /*channel limit*/
-                  0/* downstream bandwidth */,
-                  0/* upstream bandwidth */);
-        #else
-          m_pClient = enet_host_create (NULL /* create a client host */,
-                  MAXNETWORKPLAYERS, 
-                  0/* downstream bandwidth */,
-                  0/* upstream bandwidth */);
-        #endif
+#if (ENET_VERSION >= 0x010300)
+	m_pClient = enet_host_create (NULL /* create a client host */,
+								  MAXNETWORKPLAYERS, 
+								  0, /*channel limit*/
+								  0/* downstream bandwidth */,
+								  0/* upstream bandwidth */);
+#else
+	m_pClient = enet_host_create (NULL /* create a client host */,
+								  MAXNETWORKPLAYERS, 
+								  0/* downstream bandwidth */,
+								  0/* upstream bandwidth */);
+#endif
 
     if (m_pClient == NULL)
     {
@@ -155,36 +152,37 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 
     ENetAddress caddress;
     caddress.host = ENET_HOST_ANY;
+	
     /* Bind the server to port*/
     caddress.port = SPEEDDREAMSPEERPORT;
 
-    #if (ENET_VERSION >= 0x010300)
-        m_pHost = enet_host_create (&caddress /* create a peer host */,
-                    MAXNETWORKPLAYERS, 
-                    0, /*channel limit*/
-                    0/* downstream bandwidth */,
-                    0/* upstream bandwidth */);
-    #else
-        m_pHost = enet_host_create (&caddress /* create a peer host */,
-                    MAXNETWORKPLAYERS, 
-                    0/* downstream bandwidth */,
-                    0/* upstream bandwidth */);
-    #endif
+#if (ENET_VERSION >= 0x010300)
+	m_pHost = enet_host_create (&caddress /* create a peer host */,
+								MAXNETWORKPLAYERS, 
+								0, /*channel limit*/
+								0/* downstream bandwidth */,
+								0/* upstream bandwidth */);
+#else
+	m_pHost = enet_host_create (&caddress /* create a peer host */,
+								MAXNETWORKPLAYERS, 
+								0/* downstream bandwidth */,
+								0/* upstream bandwidth */);
+#endif
     if(m_pHost==NULL)
     {
-	//try the other ports
-	for (int i=1;i<5;i++)
-	{
-		caddress.port++;
-                #if (ENET_VERSION >= 0x010300)
-    		    m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0,0);
-                #else
-    		    m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0);
-                #endif
-		if(m_pHost)
-			break;
-
-	}
+		//try the other ports
+		for (int i=1;i<5;i++)
+		{
+			caddress.port++;
+#if (ENET_VERSION >= 0x010300)
+			m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0,0);
+#else
+			m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0);
+#endif
+			if(m_pHost)
+				break;
+		
+		}
 
 		if (m_pHost == NULL)
 		{
@@ -200,7 +198,7 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
     address.port = port;
 	
     /* Initiate the connection, allocating the two channels 0 and 1. */
-	GfLogError ("Initiating network connection to host %s:%d ...\n", pAddress, port);
+	GfLogError ("Initiating network connection to host '%s:%d' ...\n", pAddress, port);
     #if (ENET_VERSION >= 0x010300)
         m_pServer = enet_host_connect (m_pClient, & address, 2, 0);
     #else
@@ -227,6 +225,8 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
     {
 		m_bConnected = false;
 		ResetNetwork();
+		GfLogError ("Network connection refused.\n");
+		return false;
     }
 
 	m_eClientAccepted = PROCESSINGCLIENT;
@@ -235,9 +235,7 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 	//Wait for server to accept or reject 
 	GfLogInfo ("Sent local driver info to the network server : waiting ...\n");
 	while(m_eClientAccepted == PROCESSINGCLIENT)
-	{
 		SDL_Delay(50);
-	}
 
 	if (m_eClientAccepted == CLIENTREJECTED)
 	{
