@@ -88,8 +88,7 @@ bool HostSettingsMenu::initialize(void* pMenu)
 	pPrevMenu = pMenu;
 
 	void* pMenuHandle = GfuiScreenCreate(NULL,NULL,onActivate, 
-										   NULL, (tfuiCallback)NULL, 
-										   1);
+										 NULL, (tfuiCallback)NULL, 1);
 	setMenuHandle(pMenuHandle);
 
     openXMLDescriptor();
@@ -109,18 +108,21 @@ bool HostSettingsMenu::initialize(void* pMenu)
 
 	GfuiComboboxSetSelectedIndex(pMenuHandle,carCatId,CatIndex);
 
-	int collId = createComboboxControl("carcollidecombobox",NULL,onCarCollide);
+	int collId = createComboboxControl("carcollidecombobox", NULL, onCarCollide);
 	GfuiComboboxAddText(pMenuHandle,collId,"On");
 	GfuiComboboxAddText(pMenuHandle,collId,"Off");
 
-	int humanHostId = createComboboxControl("hosthumanplayercombobox",NULL,onHumanHost);
+	int humanHostId = createComboboxControl("hosthumanplayercombobox", NULL, onHumanHost);
 	GfuiComboboxAddText(pMenuHandle,humanHostId,"Yes");
 	GfuiComboboxAddText(pMenuHandle,humanHostId,"No");
 
 	GfuiComboboxSetSelectedIndex(pMenuHandle,humanHostId,0);
 
-    createButtonControl("accept",NULL,onAccept);
-    createButtonControl("cancel",NULL,onCancel);
+    createButtonControl("accept", NULL, onAccept);
+    createButtonControl("cancel", NULL, onCancel);
+
+	addDefaultShortcuts();
+    addShortcut(GFUIK_ESCAPE, "Back to previous menu", 0, 0, onCancel);
 
     closeXMLDescriptor();
 

@@ -21,11 +21,11 @@
 #define __MENU__H__
 
 
-typedef struct
+typedef struct MenuCallbackInfo
 {
-    void	*screen;
+    void*	screen;
     int		labelId;
-} tMnuCallbackInfo;
+} tMenuCallbackInfo;
 
 
 extern void gfuiMenuInit(void);

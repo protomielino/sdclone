@@ -135,6 +135,20 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 #define GFUI_HORI_SCROLLBAR     0
 #define GFUI_VERT_SCROLLBAR     1
 
+// Values for creating menu controls from templates (indicate template value).
+#define GFUI_TPL_TEXT         (const char*)-1
+#define GFUI_TPL_TIP          (const char*)-1
+#define GFUI_TPL_FONTID       (int)-1
+#define GFUI_TPL_X            (int)INT_MAX
+#define GFUI_TPL_Y            (int)INT_MAX
+#define GFUI_TPL_WIDTH        (int)INT_MAX
+#define GFUI_TPL_HEIGHT       (int)INT_MAX
+#define GFUI_TPL_MAXLEN       (int)-1
+#define GFUI_TPL_ALIGN        (int)-1
+#define GFUI_TPL_COLOR        (const float*)-1
+#define GFUI_TPL_FOCUSCOLOR   (const float*)-1
+#define GFUI_TPL_PUSHEDCOLOR  (const float*)-1
+
 // Some keyboard key / special key codes, to avoid SDLK constants everywhere.
 #define GFUIK_BACKSPACE	SDLK_BACKSPACE
 #define GFUIK_TAB	SDLK_TAB
@@ -271,8 +285,34 @@ public:
 	int createButtonControl(const char* pszName, void* userData, tfuiCallback onPush,
 							void* userDataOnFocus = 0, tfuiCallback onFocus = 0,
 							tfuiCallback onFocusLost = 0);
+	int createTextButtonControl(const char* pszName, void* userDataOnPush, tfuiCallback onPush,
+								void* userDataOnFocus, tfuiCallback onFocus,
+								tfuiCallback onFocusLost,
+								bool bFromTemplate = false,
+								const char* text = GFUI_TPL_TEXT, const char* tip = GFUI_TPL_TIP,
+								int x = GFUI_TPL_X, int y = GFUI_TPL_Y,
+								int width = GFUI_TPL_WIDTH,
+								int font = GFUI_TPL_FONTID, int align = GFUI_TPL_ALIGN, 
+								const float* fgColor = GFUI_TPL_COLOR,
+								const float* fgFocusColor = GFUI_TPL_FOCUSCOLOR,
+								const float* fgPushedColor = GFUI_TPL_PUSHEDCOLOR);
+	int createImageButtonControl(const char* pszName,
+								 void* userDataOnPush, tfuiCallback onPush,
+								 void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost,
+								 bool bFromTemplate = false,
+								 const char* tip = GFUI_TPL_TEXT,
+								 int x = GFUI_TPL_X, int y = GFUI_TPL_Y,
+								 int width = GFUI_TPL_WIDTH, int height = GFUI_TPL_HEIGHT,
+								 int align = GFUI_TPL_ALIGN);
 	int createStaticImageControl(const char* pszName);
-	int createLabelControl(const char* pszName);
+	int createLabelControl(const char* pszName,
+						   bool bFromTemplate = false,
+						   const char* pszText = GFUI_TPL_TEXT,
+						   int nX = GFUI_TPL_X, int nY = GFUI_TPL_Y,
+						   int nFontId = GFUI_TPL_FONTID,
+						   int nAignId = GFUI_TPL_ALIGN, int nMaxLen = GFUI_TPL_MAXLEN, 
+						   const float* aFgColor = GFUI_TPL_COLOR,
+						   const float* aFgFocusColor = GFUI_TPL_FOCUSCOLOR);
 	int createEditControl(const char* pszName, void* userDataOnFocus, tfuiCallback onFocus,
 						  tfuiCallback onFocusLost);
 	int createScrollListControl(const char* pszName,void* userData, tfuiCallback onSelect);
@@ -315,9 +355,11 @@ TGFCLIENT_API bool GfuiMouseIsHWPresent(void);
 class TGFCLIENT_API GfuiColor
 {
   public:
+	static GfuiColor build(float r, float g, float b, float a = 1.0)
+	{ GfuiColor c; c.red = r; c.green = g; c.blue = b; c.alpha = a; return c; }
     inline const float *toFloatRGBA() const { return (float*)this; }
   public:
-    float red, green, blue, alpha;
+    float red, green, blue, alpha; // Each inside [0, 1].
 };
 
 /* All widgets */
@@ -463,33 +505,62 @@ TGFCLIENT_API void GfuiStaticImageSetActive(void* scr, int id, int index);
 
 TGFCLIENT_API void* GfuiMenuScreenCreate(const char* title);
 TGFCLIENT_API void  GfuiMenuDefaultKeysAdd(void* scr);
-TGFCLIENT_API int   GfuiMenuButtonCreate(void *scr, const char *text, const char *tip,
-										 void *userDataOnPush, tfuiCallback onPush,
-										 int xpos, int ypos,
-										 int fontSize = GFUI_FONT_LARGE, int align = GFUI_ALIGN_HC_VB);
-TGFCLIENT_API int   GfuiMenuBackQuitButtonCreate(void* scr, const char* text, const char* tip,
-												 void* userData, tfuiCallback onpush,
-												 int xpos = 320, int ypos = 40,
-												 int fontSize = GFUI_FONT_LARGE, int align = GFUI_ALIGN_HC_VB);
 
 /*******************************************
  * New XML based Menu Management Interface *
  *******************************************/
 
 TGFCLIENT_API void* GfuiMenuLoad(const char* pFilePath);
-TGFCLIENT_API bool GfuiMenuCreateStaticControls(void* param,void* menuHandle);
+TGFCLIENT_API bool GfuiMenuCreateStaticControls(void* hparm,void* hscr);
 
-TGFCLIENT_API int GfuiMenuCreateButtonControl(void* menuHandle, void* param, const char* pControlName,
+TGFCLIENT_API int GfuiMenuCreateButtonControl(void* hscr, void* hparm, const char* pszName,
 											  void* userDataOnPush, tfuiCallback onPush,
 											  void* userDataOnFocus = 0, tfuiCallback onFocus = 0, tfuiCallback onFocusLost = 0);
-TGFCLIENT_API int GfuiMenuCreateStaticImageControl(void* menuHandle, void* param, const char* pControlName);
-TGFCLIENT_API int GfuiMenuCreateLabelControl(void* menuHandle, void* param, const char* pControlName);
-TGFCLIENT_API int GfuiMenuCreateEditControl(void* menuHandle, void* param, const char* pControlName,void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
-TGFCLIENT_API int GfuiMenuCreateScrollListControl(void* menuHandle, void* param, const char* pControlName, void* userData, tfuiCallback onSelect);
-TGFCLIENT_API int GfuiMenuCreateComboboxControl(void* menuHandle, void* param, const char* pControlName, void* userData,tfuiComboboxCallback onChange);
-TGFCLIENT_API int GfuiMenuCreateCheckboxControl(void* menuHandle, void* param, const char* pControlName, void* userData, tfuiCheckboxCallback onChange);
-TGFCLIENT_API int GfuiMenuCreateProgressbarControl(void* menuHandle, void* param, const char* pControlName);
+TGFCLIENT_API int GfuiMenuCreateTextButtonControl(void* hscr, void* hparm, const char* pszName,
+												  void* userDataOnPush, tfuiCallback onPush,
+												  void* userDataOnFocus = 0, tfuiCallback onFocus = 0, tfuiCallback onFocusLost = 0,
+												  bool bFromTemplate = false,
+												  const char* text = GFUI_TPL_TEXT,
+												  const char* tip = GFUI_TPL_TIP,
+												  int x = GFUI_TPL_X, int y = GFUI_TPL_Y,
+												  int width = GFUI_TPL_WIDTH,
+												  int font = GFUI_TPL_FONTID, int align = GFUI_TPL_ALIGN, 
+												  const float* fgColor = GFUI_TPL_COLOR,
+												  const float* fgFocusColor = GFUI_TPL_FOCUSCOLOR,
+												  const float* fgPushedColor = GFUI_TPL_PUSHEDCOLOR);
+TGFCLIENT_API int GfuiMenuCreateImageButtonControl(void* hscr, void* hparm, const char* pszName,
+												   void* userDataOnPush, tfuiCallback onPush,
+												   void* userDataOnFocus = 0, tfuiCallback onFocus = 0, tfuiCallback onFocusLost = 0,
+												   bool bFromTemplate = false,
+												   const char* tip = GFUI_TPL_TIP,
+												   int x = GFUI_TPL_X, int y = GFUI_TPL_Y,
+												   int width = GFUI_TPL_WIDTH,
+												   int height = GFUI_TPL_HEIGHT,
+												   int align = GFUI_TPL_ALIGN);
+TGFCLIENT_API int GfuiMenuCreateStaticImageControl(void* hscr, void* hparm, const char* pszName);
+TGFCLIENT_API int GfuiMenuCreateLabelControl(void* hscr, void* hparm, const char* pszName,
+											 bool bFromTemplate = false,
+											 const char* text = GFUI_TPL_TEXT,
+											 int x = GFUI_TPL_X, int y = GFUI_TPL_Y,
+											 int font = GFUI_TPL_FONTID,
+											 int align = GFUI_TPL_ALIGN,
+											 int maxlen = GFUI_TPL_MAXLEN, 
+											 const float* fgColor = GFUI_TPL_COLOR,
+											 const float* fgFocusColor = GFUI_TPL_FOCUSCOLOR);
+TGFCLIENT_API int GfuiMenuCreateEditControl(void* hscr, void* hparm, const char* pszName,
+											void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
+TGFCLIENT_API int GfuiMenuCreateScrollListControl(void* hscr, void* hparm, const char* pszName,
+												  void* userData, tfuiCallback onSelect);
+TGFCLIENT_API int GfuiMenuCreateComboboxControl(void* hscr, void* hparm, const char* pszName,
+												void* userData,tfuiComboboxCallback onChange);
+TGFCLIENT_API int GfuiMenuCreateCheckboxControl(void* hscr, void* hparm, const char* pszName,
+												void* userData, tfuiCheckboxCallback onChange);
+TGFCLIENT_API int GfuiMenuCreateProgressbarControl(void* hscr, void* hparm, const char* pszName);
 
+TGFCLIENT_API tdble GfuiMenuGetNumProperty(void* hparm, const char* pszName,
+										   tdble nDefVal, const char* pszUnit = 0);
+TGFCLIENT_API const char* GfuiMenuGetStrProperty(void* hparm, const char* pszName,
+												 const char* pszDefVal);
 
 /*****************************
  * Texture / image interface *

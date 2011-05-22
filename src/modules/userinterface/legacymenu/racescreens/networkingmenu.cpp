@@ -85,7 +85,7 @@ CarSettingsMenu g_CarMenu;
 
 static void GetHumanDriver(Driver &driver,int index);
 static void ServerPrepareStartNetworkRace(void *pVoid);
-static void NetworkClientMenu(void * /* dummy */);
+static void NetworkClientConnectMenu(void * /* dummy */);
 
 
 static void SetReadyStatus(int index,bool bStatus)
@@ -535,11 +535,11 @@ rmNetworkServerDisconnect(void * /* dummy */)
 static void
 rmCarSettingsMenu(void *pMenu)
 {
-	g_CarMenu.initialize(pMenu,g_strCar.c_str());
-
-	RmSetRacemanMenuHandle(g_CarMenu.getMenuHandle());
-
-	g_CarMenu.runMenu();
+	// Commented-out as long as this menu is not finished / merged with carselect one.
+	
+	// g_CarMenu.initialize(pMenu,g_strCar.c_str());
+	// RmSetRacemanMenuHandle(g_CarMenu.getMenuHandle());
+	// g_CarMenu.runMenu();
 }
 
 static void
@@ -568,20 +568,15 @@ RmNetworkHostMenu(void * /* dummy */)
 		}
 	}
 
-    if (racemanMenuHdle) {
-	GfuiScreenRelease(racemanMenuHdle);
-    }
+    if (racemanMenuHdle)
+		GfuiScreenRelease(racemanMenuHdle);
 
-    racemanMenuHdle = GfuiScreenCreate(NULL, 
-					 NULL, (tfuiCallback)OnActivateNetworkHost, 
-					 NULL, (tfuiCallback)NULL, 
-					 1);
+    racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback)OnActivateNetworkHost, 
+									   NULL, (tfuiCallback)NULL, 1);
 
     void *mparam = GfuiMenuLoad("networkhostmenu.xml");
 
     GfuiMenuCreateStaticControls(mparam,racemanMenuHdle);
-
-    GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
 	RmSetRacemanMenuHandle(racemanMenuHdle);
 
@@ -608,16 +603,30 @@ RmNetworkHostMenu(void * /* dummy */)
 		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
     }
 
-	g_ReadyCheckboxId = GfuiMenuCreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",NULL,onHostPlayerReady);
-	g_HostSettingsButtonId = GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"networkhostsettings",racemanMenuHdle,rmNetworkHostSettingsMenu);
-	g_RaceSetupId = GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"racesetup",racemanMenuHdle,RmConfigureRace);
-	g_CarSetupButtonId = GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,rmCarSettingsMenu);
+	g_ReadyCheckboxId =
+		GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
+									  NULL, onHostPlayerReady);
+	g_HostSettingsButtonId =
+		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "networkhostsettings",
+									racemanMenuHdle, rmNetworkHostSettingsMenu);
+	g_RaceSetupId =
+		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "racesetup",
+									racemanMenuHdle, RmConfigureRace);
+	g_CarSetupButtonId =
+		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "garage",
+									racemanMenuHdle, rmCarSettingsMenu);
 
-	GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"start race",NULL,ServerPrepareStartNetworkRace);
-	g_CancelButtonId = GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"cancel",NULL,rmNetworkServerDisconnect);
+	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "start race",
+								NULL, ServerPrepareStartNetworkRace);
+	g_CancelButtonId = GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "cancel",
+												   NULL, rmNetworkServerDisconnect);
 
     GfParmReleaseHandle(mparam);
 	
+    GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+    GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
+			   0, 0, rmNetworkServerDisconnect);
+
 	UpdateNetworkPlayers();
 
     GfuiScreenActivate(racemanMenuHdle);
@@ -632,10 +641,8 @@ ShowWaitingToConnectScreen()
 	{
 		GfuiScreenRelease(racemanMenuHdle);
 	}
-	racemanMenuHdle = GfuiScreenCreate(NULL, 
-						NULL, (tfuiCallback) NULL, 
-						NULL, (tfuiCallback)NULL, 
-						1);
+	racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback) NULL, 
+									   NULL, (tfuiCallback)NULL,  1);
 	void *params = reInfo->params;
 	const char *str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
 	if (str) 
@@ -651,7 +658,7 @@ ShowWaitingToConnectScreen()
 }
 
 void
-RmNetworkClientConnectMenu(void * /* dummy */)
+RmNetworkClientMenu(void * /* dummy */)
 {
 	ShowWaitingToConnectScreen();
 	
@@ -667,21 +674,18 @@ RmNetworkClientConnectMenu(void * /* dummy */)
 		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
 		{
 			//failed so back to connect menu
-			NetworkClientMenu(NULL);
+			NetworkClientConnectMenu(NULL);
 			return;
 		}
 
 		//GetClient()->SendDriverInfoPacket(&driver);
 	}
 
-	if (racemanMenuHdle) {
-	GfuiScreenRelease(racemanMenuHdle);
-	}
+	if (racemanMenuHdle)
+		GfuiScreenRelease(racemanMenuHdle);
 
-	racemanMenuHdle = GfuiScreenCreate(NULL, 
-					NULL, (tfuiCallback)OnActivateNetworkClient, 
-					NULL, (tfuiCallback)NULL, 
-					1);
+	racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback)OnActivateNetworkClient, 
+									   NULL, (tfuiCallback)NULL, 1);
 
     void *mparam = GfuiMenuLoad("networkclientmenu.xml");
 	GfuiMenuCreateStaticControls(mparam,racemanMenuHdle);
@@ -712,10 +716,16 @@ RmNetworkClientConnectMenu(void * /* dummy */)
 		GfuiLabelSetText(racemanMenuHdle,g_carNames[i],"");
 	}
 
-	g_ReadyCheckboxId = GfuiMenuCreateCheckboxControl(racemanMenuHdle,mparam,"playerreadycheckbox",NULL,onClientPlayerReady);
-	g_CarSetupButtonId = GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"car",racemanMenuHdle,rmCarSettingsMenu);
+	g_ReadyCheckboxId =
+		GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
+									  NULL, onClientPlayerReady);
+	g_CarSetupButtonId =
+		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "garage",
+									racemanMenuHdle, rmCarSettingsMenu);
 
-	g_DisconnectButtonId = GfuiMenuCreateButtonControl(racemanMenuHdle,mparam,"disconnect",NULL,rmNetworkClientDisconnect);
+	g_DisconnectButtonId =
+		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "disconnect",
+									NULL,rmNetworkClientDisconnect);
 
 
 	GfParmReleaseHandle(mparam);
@@ -769,106 +779,84 @@ LookupPlayerSetup(std::string & strDriver,std::string & strCar)
 }
 
 static void
-NetworkClientMenu(void * /* dummy */)
+NetworkClientConnectMenu(void * /* dummy */)
 {
-	const char	*str;
-
 	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	LookupPlayerSetup(g_strDriver,g_strCar);
 
-	if (racemanMenuHdle) {
+	if (racemanMenuHdle)
 		GfuiScreenRelease(racemanMenuHdle);
-	}
-	racemanMenuHdle = GfuiScreenCreate(NULL, 
-										 NULL, (tfuiCallback)NULL, 
-										 NULL, (tfuiCallback)NULL, 
-										 1);
 
-	void *params = reInfo->params;
-	str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
-	if (str) {
-		GfuiScreenAddBgImg(racemanMenuHdle, str);
-	}
-    
-	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+	racemanMenuHdle = GfuiScreenCreate(NULL, NULL, (tfuiCallback)NULL, 
+									   NULL, (tfuiCallback)NULL, 1);
 
-	GfuiTitleCreate(racemanMenuHdle, "Connect to Host", 15);
-
-	int x,x2,x3,x4,y,dy;
-	x = 20;
-	x2 = 170;
-	x3 = x2 + 100;
-	x4 = x2 + 200;
-	y = 370;
-	dy = 30;
+    void *mparam = GfuiMenuLoad("networkclientconnectmenu.xml");
 	
-	
-	GfuiLabelCreate(racemanMenuHdle, "IP Address:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-	g_IPEditId = GfuiEditboxCreate(racemanMenuHdle, "", GFUI_FONT_MEDIUM_C,
-					x2+10, y, 180, 16, NULL, (tfuiCallback)NULL, ChangeIP);
+	GfuiMenuCreateStaticControls(mparam, racemanMenuHdle);
 
-	y-=dy;
+	g_IPEditId = GfuiMenuCreateEditControl(racemanMenuHdle, mparam, "IPAddrEdit",
+										   0, 0, ChangeIP);
 
 	char namebuf[255];
-	sprintf(namebuf,"%s",g_strDriver.c_str());
-	GfuiLabelCreate(racemanMenuHdle, "Name:", GFUI_FONT_MEDIUM, x, y, GFUI_ALIGN_HL_VB, 0);
-	g_NameId = GfuiEditboxCreate(racemanMenuHdle, namebuf, GFUI_FONT_MEDIUM_C, x2+10, y, 180,16,NULL,(tfuiCallback)NULL,ChangeName);
-
-	GfuiButtonCreate(racemanMenuHdle, "Connect", GFUI_FONT_LARGE, 210, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	NULL, RmNetworkClientConnectMenu, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	snprintf(namebuf, sizeof(namebuf), "%s", g_strDriver.c_str());
+	g_NameId = GfuiMenuCreateEditControl(racemanMenuHdle, mparam, "PlayerNameEdit",
+										 0, 0, ChangeName);
+	GfuiEditboxSetString(racemanMenuHdle, g_NameId, namebuf);
 	
-	GfuiButtonCreate(racemanMenuHdle, "Back", GFUI_FONT_LARGE, 430, 40, 150, GFUI_ALIGN_HC_VB, GFUI_MOUSE_UP,
-	reInfo->_reMenuScreen, GfuiScreenActivate, NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "ConnectButton",
+								0, RmNetworkClientMenu);
+	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "BackButton",
+								reInfo->_reMenuScreen, GfuiScreenActivate);
+	
+	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+    GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
+			   reInfo->_reMenuScreen, 0, GfuiScreenActivate);
+
+    GfParmReleaseHandle(mparam);
 	
 	GfuiScreenActivate(racemanMenuHdle);
-
 }
 
 void
 RmNetworkMenu(void *)
 {
-    const char	*str;
-
-	tRmInfo* reInfo = LmRaceEngine().inData();
+ 	tRmInfo* reInfo = LmRaceEngine().inData();
+	void *params = reInfo->params;
 
 	if (GetNetwork())
 	{
 		GetNetwork()->ResetNetwork();
 	}
 
-    racemanMenuHdle = GfuiScreenCreate(NULL, 
-					 NULL, (tfuiCallback)NULL, 
-					 NULL, (tfuiCallback)NULL, 
-					 1);
+    racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback)NULL, 
+									   NULL, (tfuiCallback)NULL, 1);
 
-	void *params = reInfo->params;
-    str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
-    if (str) {
-	GfuiScreenAddBgImg(racemanMenuHdle, str);
-    }
-    
+    void *mparam = GfuiMenuLoad("networkmenu.xml");
+
+    GfuiMenuCreateStaticControls(mparam, racemanMenuHdle);
+
+    const int nTitleLabelId =
+		GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, "TitleLabel");
+    const char* pszTitle = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
+    if (pszTitle)
+		GfuiLabelSetText(racemanMenuHdle, nTitleLabelId, pszTitle);
+	
+	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "HostButton",
+								0, RmNetworkHostMenu);
+
+	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "JoinButton",
+								0, NetworkClientConnectMenu);
+
+	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "BackButton",
+								reInfo->_reMenuScreen, GfuiScreenActivate);
+
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
+    GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
+			   reInfo->_reMenuScreen, 0, GfuiScreenActivate);
 
-    str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, 0);
-    if (str) {
-	GfuiTitleCreate(racemanMenuHdle, str, strlen(str));
-    }
-
-    GfuiMenuButtonCreate(racemanMenuHdle,
-			 "Host Online Race", "Host a race",
-			 NULL, RmNetworkHostMenu, 
-			 270, 380, GFUI_FONT_LARGE, GFUI_ALIGN_HL_VB);
-
-    GfuiMenuButtonCreate(racemanMenuHdle,
-			 "Connect to Online Race", "Connect to a race on Internet or Network",
-			 NULL, NetworkClientMenu, 
-			 270, 350, GFUI_FONT_LARGE, GFUI_ALIGN_HL_VB);
-
-    GfuiMenuBackQuitButtonCreate(racemanMenuHdle,
-				 "Back", "Return to previous Menu",
-				 reInfo->_reMenuScreen, GfuiScreenActivate);
-
+    GfParmReleaseHandle(mparam);
+	
     GfuiScreenActivate(racemanMenuHdle);
 }
 
@@ -876,6 +864,7 @@ static void
 ServerPrepareStartNetworkRace(void * /* dummy */)
 {
 	GetServer()->SetLocalDrivers();
+	
 	//Tell all clients to prepare to race and wait for response from all clients
 	GetServer()->SendPrepareToRacePacket();
 

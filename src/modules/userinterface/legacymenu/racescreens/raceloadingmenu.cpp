@@ -34,15 +34,16 @@
 #include "racescreens.h"
 
 
-static const	unsigned NbTextLines = 23;
+static int NTextLines = 0;
 
-static float	BGColor[4] = {0.0, 0.0, 0.0, 0.0};
-static float	FGColors[NbTextLines][4];
+static float BGColor[4] = {0.0, 0.0, 0.0, 0.0};
 
-static void		*MenuHandle = NULL;
-static int		 TextLineIds[NbTextLines];
-static char		*TextLines[NbTextLines] = {0};
-static int		 CurTextLineIdx;
+static void* HScreen = 0;
+
+static float** FGColors = 0;
+static int*	TextLineIds = 0;
+static char** TextLines = 0;
+static int CurTextLineIdx;
 
 
 static void
@@ -60,63 +61,87 @@ rmDeativate(void * /* dummy */)
 void
 RmLoadingScreenStart(const char *title, const char *bgimg)
 {
-    int unsigned i;
-    int		y;
-
-    if (GfuiScreenIsActive(MenuHandle)) {
-	/* Already active */
-	return;
+    if (GfuiScreenIsActive(HScreen)) {
+		/* Already active */
+		return;
     }
     
-    if (MenuHandle) {
-	GfuiScreenRelease(MenuHandle);
-    }
+    if (HScreen)
+		GfuiScreenRelease(HScreen);
 
     // Create screen, load menu XML descriptor and create static controls.
-    MenuHandle = GfuiScreenCreate(BGColor, NULL, NULL, NULL, rmDeativate, 0);
+    HScreen = GfuiScreenCreate(BGColor, NULL, NULL, NULL, rmDeativate, 0);
 
-    void *menuXMLDescHdle = GfuiMenuLoad("loadingscreen.xml");
+    void *hmenu = GfuiMenuLoad("loadingscreen.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, MenuHandle);
+    GfuiMenuCreateStaticControls(hmenu, HScreen);
 
     // Create variable title label.
-    int titleId = GfuiMenuCreateLabelControl(MenuHandle, menuXMLDescHdle, "titlelabel");
-    GfuiLabelSetText(MenuHandle, titleId, title);
-    
-    // Create one label for each text line (TODO: Get layout constants from XML when available)
-    for (i = 0, y = 400; i < NbTextLines; i++, y -= 16) {
-	FGColors[i][0] = FGColors[i][1] = FGColors[i][2] = 1.0;
-	FGColors[i][3] = (float)i * 0.0421 + 0.2;
-	TextLineIds[i] = GfuiLabelCreate(MenuHandle, "", GFUI_FONT_MEDIUM_C, 60, y, 
-									 GFUI_ALIGN_HL_VB, 100, FGColors[i]);
-	if (TextLines[i]) {
-	    /* free old text */
-	    free(TextLines[i]);
-	    TextLines[i] = NULL;
-	}
+    int titleId = GfuiMenuCreateLabelControl(HScreen, hmenu, "titlelabel");
+    GfuiLabelSetText(HScreen, titleId, title);
+
+	// Get layout / coloring properties.
+    NTextLines = (int)GfuiMenuGetNumProperty(hmenu, "nLines", 20);
+    const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
+    const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 16);
+    const float alpha0 = GfuiMenuGetNumProperty(hmenu, "alpha0", 0.2);
+    const float alphaSlope = GfuiMenuGetNumProperty(hmenu, "alphaSlope", 0.0421);
+
+	// Allocate line info arrays.
+	FGColors = (float**)calloc(NTextLines, sizeof(float*));
+	TextLines = (char**)calloc(NTextLines, sizeof(char*));
+	TextLineIds = (int*)calloc(NTextLines, sizeof(int));
+
+	// Create one label for each text line
+	int y = yTopLine;
+    for (int i = 0; i < NTextLines; i++)
+	{
+		// Create and set the color for this line.
+		FGColors[i] = (float*)calloc(4, sizeof(float));
+		FGColors[i][0] = FGColors[i][1] = FGColors[i][2] = 1.0;
+		FGColors[i][3] = (float)i * alphaSlope + alpha0;
+
+		// Create the control from the template.
+		TextLineIds[i] =
+			GfuiMenuCreateLabelControl(HScreen, hmenu, "line", true, // from template
+									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_ALIGN,
+									   GFUI_TPL_MAXLEN, FGColors[i]);
+
+		// Next line if not last.
+		y -= yLineShift;
     }
 
     CurTextLineIdx = 0;
     
     // Add background image.
-    if (bgimg) {
-	GfuiScreenAddBgImg(MenuHandle, bgimg);
-    }
+    if (bgimg)
+		GfuiScreenAddBgImg(HScreen, bgimg);
 
     // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
+    GfParmReleaseHandle(hmenu);
     
     // Display screen.
-    GfuiScreenActivate(MenuHandle);
+    GfuiScreenActivate(HScreen);
     GfuiDisplay();
 }
 
 void
 RmLoadingScreenShutdown(void)
 {
-    if (MenuHandle) {
-	GfuiScreenRelease(MenuHandle);
-	MenuHandle = 0;
+    if (HScreen)
+	{
+		for (int i = 0; i < NTextLines; i++)
+		{
+			free(FGColors[i]);
+			if (TextLines[i])
+				free(TextLines[i]);
+		}
+		freez(FGColors);
+		freez(TextLines);
+		freez(TextLineIds);
+		
+		GfuiScreenRelease(HScreen);
+		HScreen = 0;
     }
 }
 
@@ -129,30 +154,30 @@ RmLoadingScreenShutdown(void)
 void
 RmLoadingScreenSetText(const char *text)
 {
-    int		i, j;
+    GfLogTrace("%s\n", text);
     
-    GfOut("%s\n", text);
-    
-    if (MenuHandle) {
-	if (TextLines[CurTextLineIdx]) {
-	    free(TextLines[CurTextLineIdx]);
-	}
-	if (text) {
-	    TextLines[CurTextLineIdx] = strdup(text);
-	    CurTextLineIdx = (CurTextLineIdx + 1) % NbTextLines;
-	}
+    if (HScreen)
+	{
+		if (TextLines[CurTextLineIdx])
+			free(TextLines[CurTextLineIdx]);
+		if (text)
+		{
+			TextLines[CurTextLineIdx] = strdup(text);
+			CurTextLineIdx = (CurTextLineIdx + 1) % NTextLines;
+		}
 	
-	i = CurTextLineIdx;
-	j = 0;
-	do {
-	    if (TextLines[i]) {
-		GfuiLabelSetText(MenuHandle, TextLineIds[j], TextLines[i]);
-	    }
-	    j++;
-	    i = (i + 1) % NbTextLines;
-	} while (i != CurTextLineIdx);
+		int i = CurTextLineIdx;
+		int j = 0;
+		do
+		{
+			if (TextLines[i])
+				GfuiLabelSetText(HScreen, TextLineIds[j], TextLines[i]);
+			j++;
+			i = (i + 1) % NTextLines;
+		}
+		while (i != CurTextLineIdx);
 	
-	GfuiDisplay();
+		GfuiDisplay();
     }
 }
  

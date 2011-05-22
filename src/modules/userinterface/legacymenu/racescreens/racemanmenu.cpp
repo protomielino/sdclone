@@ -328,7 +328,7 @@ RmRacemanMenu()
 {
 	// Special case of the online race, not yet migrated to using tgfdata.
 	// TODO: Integrate better the networking menu system in the race config. menu system
-	//       (merge the RmNetworkClientConnectMenu and RmNetworkHostMenu into this race man menu,
+	//       (merge the RmNetworkClientMenu and RmNetworkHostMenu into this race man menu,
 	//        after adding some more features / controls ? because they look similar).
 	tRmInfo* reInfo = LmRaceEngine().inData();
 	if (!strcmp(reInfo->_reName, "Online Race"))
@@ -352,7 +352,7 @@ RmRacemanMenu()
 			{
 				if (IsClient())
 				{
-					RmNetworkClientConnectMenu(NULL);
+					RmNetworkClientMenu(NULL);
 					return RM_ASYNC | RM_NEXT_STEP;
 				}
 				else if (IsServer())

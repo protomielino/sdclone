@@ -124,7 +124,7 @@ extern int  RmResGetLines();
 extern void RmResEraseScreen();
 
 // From networkingmenu.
-extern void RmNetworkClientConnectMenu(void* pVoid);
+extern void RmNetworkClientMenu(void* pVoid);
 extern void RmNetworkMenu(void* /* dummy */);
 extern void RmNetworkHostMenu(void* /* dummy */);
 

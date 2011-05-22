@@ -307,12 +307,20 @@ gfuiLabelSetText(tGfuiLabel *label, const char *text)
     if (!text)
 		return;
 
-	// Update the text.
+	// Reallocate label->text if maxlen is nul (in case label->text is empty).
 	const int prevWidth = label->font->getWidth((const char *)label->text);
-    strncpy(label->text, text, label->maxlen);
+ 	if (label->maxlen <= 0)
+	{
+		free(label->text);
+		label->maxlen = strlen(text);
+		label->text = (char*)calloc(label->maxlen+1, 1);
+	}
+	
+	// Update the text.
+   strncpy(label->text, text, label->maxlen);
 	
 	// Update the text position.
-	const int width = label->font->getWidth((const char *)text);
+	const int width = label->font->getWidth((const char *)label->text);
 	switch(label->align&0xF0)
 	{
 		case GFUI_ALIGN_HL_VB /* LEFT */:

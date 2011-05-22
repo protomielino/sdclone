@@ -39,8 +39,7 @@
 
 
 static void	*scrHandle;
-static float	*fgColor1 = &(gfuiColors[GFUI_HELPCOLOR1][0]);
-static float	*fgColor2 = &(gfuiColors[GFUI_HELPCOLOR2][0]);
+
 
 void
 gfuiHelpInit(void)
@@ -60,17 +59,20 @@ GfuiHelpScreen(void *prevScreen)
     // Create screen, load menu XML descriptor and create static controls.
     scrHandle = GfuiScreenCreate();
     
-    void *menuXMLDescHdle = GfuiMenuLoad("helpmenu.xml");
+    void *hmenu = GfuiMenuLoad("helpmenu.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, scrHandle);
+    GfuiMenuCreateStaticControls(hmenu, scrHandle);
 
-    // Create 2 columns table for the keyboard shortcuts explainations
-    const int dx = 80;
-    const int xs  = 30;
-    const int dy  = -12;
-    int ys  = 380;
-    const int xn = 330;
-    int yn  = 380;
+	// Get menu properties.
+	const int nXLeftColumn = (int)GfuiMenuGetNumProperty(hmenu, "xLeftColumn", 30);
+	const int nXRightColumn = (int)GfuiMenuGetNumProperty(hmenu, "xRightColumn", 330);
+	const int nNameFieldWidth = (int)GfuiMenuGetNumProperty(hmenu, "nameFieldWidth", 80);
+	const int nLineShift = (int)GfuiMenuGetNumProperty(hmenu, "lineShift", 12);
+	const int nYTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 380);
+
+    // Create 2 columns table for the keyboard shortcuts explanations
+    int ys = nYTopLine;
+    int yn = nYTopLine;
     
     tGfuiKey *curKey = pscr->userKeys;
     do {
@@ -102,19 +104,19 @@ GfuiHelpScreen(void *prevScreen)
 				case GFUIK_DELETE:
 				case GFUIK_CLEAR:
 				case GFUIK_PAUSE:
-					GfuiLabelCreate(scrHandle, curKey->name, GFUI_FONT_SMALL_C,
-									xs, ys, GFUI_ALIGN_HL_VB, 0, fgColor1);
-					GfuiLabelCreate(scrHandle, curKey->descr, GFUI_FONT_SMALL_C,
-									xs + dx, ys, GFUI_ALIGN_HL_VB, 0, fgColor2);
-					ys += dy;
+					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyName", true, // from template
+											   curKey->name, nXLeftColumn, ys);
+					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyDesc", true, // from template
+											   curKey->descr, nXLeftColumn + nNameFieldWidth, ys);
+					ys -= nLineShift;
 					break;
 
 				default:
-					GfuiLabelCreate(scrHandle, curKey->name, GFUI_FONT_SMALL_C,
-									xn, yn, GFUI_ALIGN_HL_VB, 0, fgColor1);
-					GfuiLabelCreate(scrHandle, curKey->descr, GFUI_FONT_SMALL_C,
-									xn + dx, yn, GFUI_ALIGN_HL_VB, 0, fgColor2);
-					yn += dy;
+					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyName", true, // from template
+											   curKey->name, nXRightColumn, yn);
+					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyDesc", true, // from template
+											   curKey->descr, nXRightColumn + nNameFieldWidth, yn);
+					yn -= nLineShift;
 					break;
 			}
 		}
@@ -126,14 +128,14 @@ GfuiHelpScreen(void *prevScreen)
     
 
     // Create Back button.
-    GfuiMenuCreateButtonControl(scrHandle, menuXMLDescHdle, "backbutton", prevScreen, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", prevScreen, GfuiScreenActivate);
 
     // Create version label.
-    const int versionId = GfuiMenuCreateLabelControl(scrHandle, menuXMLDescHdle, "versionlabel");
+    const int versionId = GfuiMenuCreateLabelControl(scrHandle, hmenu, "versionlabel");
     GfuiLabelSetText(scrHandle, versionId, VERSION_LONG);
 
     // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
+    GfParmReleaseHandle(hmenu);
     
     // Add keyboard shortcuts.
     GfuiAddKey(scrHandle, GFUIK_ESCAPE, "", prevScreen, GfuiScreenReplace, NULL);

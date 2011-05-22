@@ -130,90 +130,87 @@ static void *QuitHdle[5] = { 0, 0, 0, 0, 0 };
 // Descriptor for 1 button.
 typedef struct {
     
-    const char *label;  // Label to display.
-    const char *tip;    // Tip displayed when mouse hover.
+    const char* role;  // Button role.
     void       *screen; // Screen to activate if clicked.
 
 } tButtonDesc;
 
 // Generic function for creating and activating the menu.
 static void*
-rmStopRaceScreen(const char *title, const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
+rmStopRaceScreen(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 {
     // Create screen, load menu XML descriptor and create static controls.
-    void *screenHdle = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
+    void *hscreen = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
 
-    void *menuXMLDescHdle = GfuiMenuLoad("stopracemenu.xml");
+    void *hmenu = GfuiMenuLoad("stopracemenu.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, screenHdle);
+    GfuiMenuCreateStaticControls(hmenu, hscreen);
 
-    // Create variable title label.
-    int titleId = GfuiMenuCreateLabelControl(screenHdle, menuXMLDescHdle, "titlelabel");
-    GfuiLabelSetText(screenHdle, titleId, title);
-
-    // Create specified buttons, left aligned.
-    const int xpos = 270;
-    int ypos = 380;
+    // Create buttons from menu properties and button template.
+    const int xpos = (int)GfuiMenuGetNumProperty(hmenu, "xButton", 270);
+    const int dy = (int)GfuiMenuGetNumProperty(hmenu, "buttonShift", 30);
+	int ypos = (int)GfuiMenuGetNumProperty(hmenu, "yTopButton", 380);
+	char pszPropName[64];
+	const char* pszCancelTip = "";
     for (int nButInd = 0; nButInd < nButtons; nButInd++)
     {
-        const int id =
-			GfuiMenuButtonCreate(screenHdle, aButtons[nButInd].label, aButtons[nButInd].tip, 
-								 aButtons[nButInd].screen, GfuiScreenActivate, 
-								 xpos, ypos, GFUI_FONT_LARGE, GFUI_ALIGN_HL_VB);
+		// Get text and tip from button role and menu properties.
+		sprintf(pszPropName, "%s.text", aButtons[nButInd].role);
+		const char* pszText = GfuiMenuGetStrProperty(hmenu, pszPropName, "");
+		sprintf(pszPropName, "%s.tip", aButtons[nButInd].role);
+		const char* pszTip = GfuiMenuGetStrProperty(hmenu, pszPropName, "");
+		if (nButInd == nCancelIndex)
+			pszCancelTip = pszTip;
+		
+		// Create the button from the template.
+		GfuiMenuCreateTextButtonControl(hscreen, hmenu, "button",
+										aButtons[nButInd].screen, GfuiScreenActivate, 0, 0, 0,
+										true, // From template.
+										pszText, pszTip, xpos, ypos);
 
-		GfuiButtonShowBox(screenHdle, id, false);
-		GfuiColor c, fc, pc;
-		c.red  = 1.0;   c.green  = 1.0; c.blue  = 1.0; c.alpha  = 1.0;
-		fc.red = 1.0;   fc.green = 0.8; fc.blue = 0.0; fc.alpha = 1.0;
-		pc.red = 0.902; pc.green = 0.1; pc.blue = 0.2; pc.alpha = 1.0;
-
-        GfuiButtonSetColor(screenHdle, id, c);
-        GfuiButtonSetFocusColor(screenHdle, id, fc);
-        GfuiButtonSetPushedColor(screenHdle, id, pc);
-
-		ypos -= 30;
+		// Next button if not last.
+		ypos -= dy;
     }
 
     // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
+    GfParmReleaseHandle(hmenu);
     
     // Register keyboard shortcuts.
-    GfuiMenuDefaultKeysAdd(screenHdle);
-    GfuiAddKey(screenHdle, GFUIK_ESCAPE, aButtons[nCancelIndex].tip, 
-               aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
+    GfuiMenuDefaultKeysAdd(hscreen);
+    GfuiAddKey(hscreen, GFUIK_ESCAPE, pszCancelTip,
+			   aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
 
     // Activate the created screen.
-    GfuiScreenActivate(screenHdle);
+    GfuiScreenActivate(hscreen);
 
-    return screenHdle;
+    return hscreen;
 }
 
 // Simpler front-end function for creating and activating the menu.
 static void*
-rmStopRaceScreen(const char *title,
-				 const char *label1, const char *tip1, void *screen1,
-				 const char *label2, const char *tip2, void *screen2,
-				 const char *label3 = 0, const char *tip3 = 0, void *screen3 = 0,
-				 const char *label4 = 0, const char *tip4 = 0, void *screen4 = 0,
-				 const char *label5 = 0, const char *tip5 = 0, void *screen5 = 0)
+rmStopRaceScreen(const char *buttonRole1, void *screen1,
+				 const char *buttonRole2, void *screen2,
+				 const char *buttonRole3 = 0, void *screen3 = 0,
+				 const char *buttonRole4 = 0, void *screen4 = 0,
+				 const char *buttonRole5 = 0, void *screen5 = 0)
 {
     const tButtonDesc aButtons[5] =
     {
-        { label1, tip1, screen1 },
-        { label2, tip2, screen2 },
-        { label3, tip3, screen3 },
-        { label4, tip4, screen4 },
-        { label5, tip5, screen5 }
+        { buttonRole1, screen1 },
+        { buttonRole2, screen2 },
+        { buttonRole3, screen3 },
+        { buttonRole4, screen4 },
+        { buttonRole5, screen5 }
     };
 	
     int nButtons = 2;
-	if (label3 && tip3 && screen3)
+	if (buttonRole3 && screen3)
 	{
 		nButtons++;
-		if (label4 && tip4 && screen4)
+		if (buttonRole4 && screen4)
 		{
 			nButtons++;
-			if (label5 && tip5 && screen5)
+			if (buttonRole5 && screen5)
 				nButtons++;
 		}
 	}
@@ -221,7 +218,7 @@ rmStopRaceScreen(const char *title,
     if (QuitHdle[nButtons-1])
         GfuiScreenRelease(QuitHdle[nButtons-1]);
         
-    QuitHdle[nButtons-1] = rmStopRaceScreen(title, aButtons, nButtons, nButtons-1);
+    QuitHdle[nButtons-1] = rmStopRaceScreen(aButtons, nButtons, nButtons-1);
     
     return QuitHdle[nButtons-1];
 }
@@ -238,20 +235,18 @@ RmStopRaceScreen()
 		{
 			rmStopScrHandle =
 				rmStopRaceScreen
-				    ("Race Stopped",
-					 "Abandon Race", "Abort current race", rmAbortRaceHookInit(),
-					 "Resume Race", "Return to Race", rmBackToRaceHookInit(),
-					 "Skip Session", "Skip Session", rmSkipSessionHookInit(),
-					 "Quit Game", "Quit the game", rmQuitHookInit());
+				    ("abort", rmAbortRaceHookInit(),
+					 "resume", rmBackToRaceHookInit(),
+					 "skip", rmSkipSessionHookInit(),
+					 "quit", rmQuitHookInit());
 		}
 		else 
 		{
 			rmStopScrHandle =
 				rmStopRaceScreen
-				    ("Race Stopped",
-					 "Abandon Race", "Abort current race", rmAbortRaceHookInit(),
-					 "Resume Race", "Return to Race", rmBackToRaceHookInit(),
-					 "Quit Game", "Quit the game", rmQuitHookInit());
+				    ("abort", rmAbortRaceHookInit(),
+					 "resume", rmBackToRaceHookInit(),
+					 "quit", rmQuitHookInit());
 		}
 	}
 	else 
@@ -260,22 +255,20 @@ RmStopRaceScreen()
 		{
 			rmStopScrHandle =
 				rmStopRaceScreen
-				    ("Race Stopped",
-					 "Restart Race", "Restart the current race", rmRestartRaceHookInit(),
-					 "Abandon Race", "Abort current race", rmAbortRaceHookInit(),
-					 "Resume Race", "Return to Race", rmBackToRaceHookInit(),
-					 "Skip Session", "Skip Session", rmSkipSessionHookInit(),
-					 "Quit Game", "Quit the game", rmQuitHookInit());
+				    ("restart", rmRestartRaceHookInit(),
+					 "abort", rmAbortRaceHookInit(),
+					 "resume", rmBackToRaceHookInit(),
+					 "skip", rmSkipSessionHookInit(),
+					 "quit", rmQuitHookInit());
 		}
 		else 
 		{
 			rmStopScrHandle =
 				rmStopRaceScreen
-				    ("Race Stopped",
-					 "Restart Race", "Restart the current race", rmRestartRaceHookInit(),
-					 "Abandon Race", "Abort current race", rmAbortRaceHookInit(),
-					 "Resume Race", "Return to Race", rmBackToRaceHookInit(),
-					 "Quit Game", "Quit the game", rmQuitHookInit());
+				    ("restart", rmRestartRaceHookInit(),
+					 "abort", rmAbortRaceHookInit(),
+					 "resume", rmBackToRaceHookInit(),
+					 "quit", rmQuitHookInit());
 		}
 	}
 }
