@@ -957,7 +957,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 					if (pitBuildingsStart == NULL)
 						pitBuildingsStart = pitStart;
 					mSeg = pitBuildingsStart->prev;
-					mSeg = mSeg->next;
+					//mSeg = mSeg->next;
 
 					bool		changeSeg = true;
 					tdble		offset = 0;
@@ -1001,7 +1001,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 
 						//RtTrackLocal2Global expects toStart as a length in meters for straight,
 						//and as an angle in radian for curves
-						tdble pitCenter = toStart; //+ pits->len / 2.0;
+						tdble pitCenter = toStart + pits->len / 2.0;
 						switch(mSeg->type) {
 							case TR_STR:
 								pits->driversPits[i].pos.toStart = pitCenter;
