@@ -587,10 +587,10 @@ void TDriver::AdjustDriving(
 
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_OUT,0,1) != 0)
 	  UseAccelOut();
-/*
+  /*
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_FILTER,0,0) != 0)
 	  UseFilterAccel();
-*/
+  */
   oOmegaAhead = Param.Fix.oLength;
   oInitialBrakeCoeff = oBrakeCoeff[0];
 
@@ -1336,10 +1336,6 @@ void TDriver::Drive()
 	oMaxAccel.Measurement                        // get samples
 	  (CarSpeedLong,CarAccelLong);
 */
-  // Filters for brake
-  oBrake = FilterBrake(oBrake);
-  oBrake = FilterBrakeSpeed(oBrake);
-  oBrake = FilterABS(oBrake);
   if (oBrake == 0.0)
   {
     // Filters for throttle
@@ -1347,7 +1343,15 @@ void TDriver::Drive()
     oAccel = FilterDrifting(oAccel);
     oAccel = FilterTrack(oAccel);
     oAccel = FilterTCL(oAccel);
-    //oAccel = FilterAccel(oAccel);
+	if (oUseFilterAccel)
+      oAccel = FilterAccel(oAccel);
+  }
+  else
+  {
+    // Filters for brake
+    oBrake = FilterBrake(oBrake);
+    oBrake = FilterBrakeSpeed(oBrake);
+    oBrake = FilterABS(oBrake);
   }
 
   // Keep history
@@ -3347,6 +3351,8 @@ double TDriver::FilterBrakeSpeed(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterAccel(double Accel)
 {
+  if (Accel > oLastAccel + 0.05)
+	Accel = oLastAccel + 0.05;
   return Accel;
 }
 //==========================================================================*
@@ -3401,7 +3407,8 @@ double TDriver::FilterTCL(double Accel)
 
   if (Slip > oTclSlip)                           // Decrease accel if needed
   {
-	float MinAccel = (float) (0.2 * Accel);
+//	float MinAccel = (float) (0.2 * Accel);
+	float MinAccel = (float) (0.05 * Accel);
 	Accel -= MIN(Accel, (Slip - oTclSlip)/oTclRange);
 	Accel = MAX(MinAccel,Accel);
   }
