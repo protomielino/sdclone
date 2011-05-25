@@ -237,50 +237,29 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     static char		buf[256];
     static char		path[512];
     char		*str;
-    static float	fgcolor[4] = {1.0, 0.0, 1.0, 1.0};
-    static float  green[4] = {0.196, 0.804, 0.196, 1.0};//Lime green, #32CD32
-    static float	orange[4] = {0.953, 0.518, 0.0, 1.0};//Tangerine, #F28500
-    static float	white[4] = {1.0, 1.0, 1.0, 1.0};
     
 	GfLogTrace("Entering Race Results menu\n");
 
-    //Screen title
+    // Create screen, load menu XML descriptor and create static controls.
     rmScrHdle = GfuiScreenCreate();
     void *hmenu = GfuiMenuLoad("raceresultsmenu.xml");
     GfuiMenuCreateStaticControls(hmenu,rmScrHdle);
 
+    // Create variable title label.
     sprintf(buf, "%s", info->track->name);
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "racetitle");
+    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "RaceTitle");
     GfuiLabelSetText(rmScrHdle, subTitleId, buf);
-
   
-    //Column positions
-    const int xRank = 10;
-    const int xAdv = 35;
-    const int xDriver = 55;
-    const int xType = 195;
-    const int xCar  = 255;
-    const int xTotal = 435;
-    const int xBest = 500;
-    const int xLaps = 525;
-    const int xTSpd = 555;
-    const int xDamg = 595;
-    const int xPStp = 625;
-    
-    //Heading
-    int y = 400;
-    GfuiLabelCreate(rmScrHdle, "Rk",     GFUI_FONT_MEDIUM_C, xRank, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Adv",    GFUI_FONT_MEDIUM_C, xAdv, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Driver", GFUI_FONT_MEDIUM_C, xDriver+10, y, GFUI_ALIGN_HL_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Type",   GFUI_FONT_MEDIUM_C, xType+10, y, GFUI_ALIGN_HL_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Car",    GFUI_FONT_MEDIUM_C, xCar+10, y, GFUI_ALIGN_HL_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Total",  GFUI_FONT_MEDIUM_C, xTotal-15, y, GFUI_ALIGN_HR_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Best",   GFUI_FONT_MEDIUM_C, xBest-15, y, GFUI_ALIGN_HR_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Laps",   GFUI_FONT_MEDIUM_C, xLaps-10, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "T.Sp.",  GFUI_FONT_MEDIUM_C, xTSpd-5, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Dam.",   GFUI_FONT_MEDIUM_C, xDamg-5, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
-    GfuiLabelCreate(rmScrHdle, "Pits",   GFUI_FONT_MEDIUM_C, xPStp, y, GFUI_ALIGN_HC_VB, 0, fgcolor);
-    y -= 20;
+	// Get layout properties.
+    NMaxResultLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 15);
+    const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
+    const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
+	const GfuiColor cPlaceGain =
+		GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "colorGainedPlaces", "0x32CD32"));
+	const float* acPlaceGain = cPlaceGain.toFloatRGBA();
+	const GfuiColor cPlaceLoss =
+		GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "colorLostPlaces", "0xF28500"));
+	const float* acPlaceLoss = cPlaceLoss.toFloatRGBA();
 
 	// Never used : remove ?
     //Get total laps, winner time
@@ -293,67 +272,73 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     sprintf(path, "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
     int nbCars = (int)GfParmGetEltNb(results, path);
     
-    int i;
+	// Display the result table.
+    int y = yTopLine;
+	int i;
     for (i = start; i < MIN(start + NMaxResultLines, nbCars); i++) {
         sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
         int laps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);//Laps covered
 
         //Rank
         sprintf(buf, "%d", i+1);
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xRank, y, GFUI_ALIGN_HC_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
+								   buf, GFUI_TPL_X, y);
 
         //Advance (The num.attrib 'index' holds the starting position)
         int advance = (int)(GfParmGetNum(results, path, RE_ATTR_INDEX, NULL, 0)) - i;
-        //sprintf(buf, "%s%d", advance > 0 ? "^" : (advance < 0 ? "!" : "<"), abs(advance));
         sprintf(buf, "%d", advance);
-        const float *c = advance > 0 ? green : (advance < 0 ? orange : white);
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xAdv, y, GFUI_ALIGN_HC_VB, 0, c);
+        const float *aColor =
+			advance > 0 ? acPlaceGain : (advance < 0 ? acPlaceLoss : GFUI_TPL_COLOR);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Advance", true, // From template.
+								   buf, GFUI_TPL_X, y,
+								   GFUI_TPL_FONTID, GFUI_TPL_ALIGN, GFUI_TPL_MAXLEN, aColor);
 
         //Driver name
-        GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_FONT_MEDIUM_C,
-        xDriver, y, GFUI_ALIGN_HL_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverName", true, // From template.
+								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
 
         //Driver type
         rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xType, y, GFUI_ALIGN_HL_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverType", true, // From template.
+								   buf, GFUI_TPL_X, y);
 
         //Car
-        GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, ""), GFUI_FONT_MEDIUM_C,
-        xCar, y, GFUI_ALIGN_HL_VB, 0);
-
-        GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_NAME, NULL), GFUI_FONT_MEDIUM_C, xDriver, y, GFUI_ALIGN_HL_VB, 0);
-        rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, NULL), buf, sizeof(buf));
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C, xType, y, GFUI_ALIGN_HL_VB, 0);
-        GfuiLabelCreate(rmScrHdle, GfParmGetStr(results, path, RE_ATTR_CAR, NULL), GFUI_FONT_MEDIUM_C,
-      xCar, y, GFUI_ALIGN_HL_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "CarModel", true, // From template.
+								   GfParmGetStr(results, path, RE_ATTR_CAR, ""), GFUI_TPL_X, y);
 
         //Total Time 
-        str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), "  ", false, 2); 
-        GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,  xTotal, y, GFUI_ALIGN_HR_VB, 0); 
+        str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), 0, false, 3); 
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TotalTime", true, // From template.
+								   str, GFUI_TPL_X, y);
         free(str);
         
         //Best lap
-        str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);
-        GfuiLabelCreate(rmScrHdle, str, GFUI_FONT_MEDIUM_C,  xBest, y, GFUI_ALIGN_HR_VB, 0);
+        str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), 0, false, 3);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "BestLapTime", true, // From template.
+								   str, GFUI_TPL_X, y);
         free(str);
         
         //Laps covered
         sprintf(buf, "%d", laps);
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xLaps, y, GFUI_ALIGN_HC_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Laps", true, // From template.
+								   buf, GFUI_TPL_X, y);
         
         //Top speed
         sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xTSpd, y, GFUI_ALIGN_HC_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TopSpeed", true, // From template.
+								   buf, GFUI_TPL_X, y);
         
         //Damage
         sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)));
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xDamg, y, GFUI_ALIGN_HC_VB, 0);
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Damages", true, // From template.
+								   buf, GFUI_TPL_X, y);
         
         //Pitstops
         sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_NB_PIT_STOPS, NULL, 0)));
-        GfuiLabelCreate(rmScrHdle, buf, GFUI_FONT_MEDIUM_C,  xPStp, y, GFUI_ALIGN_HC_VB, 0);
-        
-        y -= 15;  //Line feed
+		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Pits", true, // From template.
+								   buf, GFUI_TPL_X, y);
+
+        y -= yLineShift;  //Line feed
     }//for i
 
     //If it is not the first screen of the results, show a 'Prev' button
@@ -361,23 +346,23 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         RmPrevRace.prevHdle = prevHdle;
         RmPrevRace.info     = info;
         RmPrevRace.start    = start - NMaxResultLines;
-        GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "previouspagearrow",
+        GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "PreviousPageArrow",
           (void*)&RmPrevRace, rmChgRaceScreen);
         GfuiAddKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgRaceScreen, NULL);
     }//if start
 
     // Add "Continue" button
-    GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "continuebutton", prevHdle, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "ContinueButton", prevHdle, GfuiScreenReplace);
     
     //Create 'save' button in the bottom right
-    //rmSaveId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "savebutton", info, rmSaveRes);
+    //rmSaveId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "SaveButton", info, rmSaveRes);
 
     //If we did not display all the results yet, let's show a 'Next' button
     if (i < nbCars) {
         RmNextRace.prevHdle = prevHdle;
         RmNextRace.info     = info;
         RmNextRace.start    = start + NMaxResultLines;
-        GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "nextpagearrow", (void*)&RmNextRace, rmChgRaceScreen);
+        GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "NextPageArrow", (void*)&RmNextRace, rmChgRaceScreen);
         GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgRaceScreen, NULL);
     }//if i
 
@@ -387,7 +372,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     GfuiAddKey(rmScrHdle, GFUIK_F12, "Take a Screen Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(rmScrHdle, GFUIK_F1, "Help", rmScrHdle, GfuiHelpScreen, NULL);
 
-      //Show!
+	//Show!
     GfuiScreenActivate(rmScrHdle);
 }//rmRaceResults
 
