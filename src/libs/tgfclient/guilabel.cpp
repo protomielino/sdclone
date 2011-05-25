@@ -84,10 +84,10 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     strncpy(label->text, text, maxlen);
     label->maxlen = maxlen;
     
-    label->bgColor = gfuiGetColor(bgColor ? bgColor : &(gfuiColors[GFUI_BGCOLOR][0]));
-    label->fgColor = gfuiGetColor(fgColor ? fgColor : &(gfuiColors[GFUI_LABELCOLOR][0]));
-    label->bgFocusColor = bgFocusColor ? gfuiGetColor(bgFocusColor) : label->bgColor;
-    label->fgFocusColor = fgFocusColor ? gfuiGetColor(fgFocusColor) : label->fgColor;
+    label->bgColor = GfuiColor::build(bgColor ? bgColor : gfuiColors[GFUI_BGCOLOR]);
+    label->fgColor = GfuiColor::build(fgColor ? fgColor : gfuiColors[GFUI_LABELCOLOR]);
+    label->bgFocusColor = bgFocusColor ? GfuiColor::build(bgFocusColor) : label->bgColor;
+    label->fgFocusColor = fgFocusColor ? GfuiColor::build(fgFocusColor) : label->fgColor;
 
     label->font = gfuiFont[font];
     if (width == 0)
@@ -370,7 +370,7 @@ GfuiLabelSetText(void *scr, int id, const char *text)
 void
 gfuiLabelSetColor(tGfuiLabel *label, const float *color)
 {
-	label->fgColor = gfuiGetColor((float*)color);
+	label->fgColor = GfuiColor::build(color);
 }
 
 /** Change the color of a label object.

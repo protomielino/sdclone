@@ -152,10 +152,10 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int align, int width, in
     object->ymax = y + height;
 
     scrollist = &(object->u.scrollist);
-    scrollist->fgColor[0] = gfuiGetColor(GFUI_FGSCROLLIST);
-    scrollist->bgColor[0] = gfuiGetColor(GFUI_BGSCROLLIST);
-    scrollist->fgSelectColor[0] = gfuiGetColor(GFUI_FGSELSCROLLIST);
-    scrollist->bgSelectColor[0] = gfuiGetColor(GFUI_BGSELSCROLLIST);
+    scrollist->fgColor[0] = GfuiColor::build(GFUI_FGSCROLLIST);
+    scrollist->bgColor[0] = GfuiColor::build(GFUI_BGSCROLLIST);
+    scrollist->fgSelectColor[0] = GfuiColor::build(GFUI_FGSELSCROLLIST);
+    scrollist->bgSelectColor[0] = GfuiColor::build(GFUI_BGSELSCROLLIST);
     scrollist->font = gfuiFont[font];
     scrollist->nbVisible = height / (scrollist->font->getDescender() + scrollist->font->getHeight());
     scrollist->selectedElt = -1;

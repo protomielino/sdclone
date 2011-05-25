@@ -55,10 +55,6 @@ extern float	gfuiColors[GFUI_COLORNB][4];
 #define GFUI_LABELCOLOROPTIONS 24
 #define GFUI_TABLEHEADER 25
 
-extern GfuiColor gfuiGetColor(const float* color);
-extern GfuiColor gfuiGetColor(int index); // index from GFUI_* "named" indexes above.
-
-
 #define GFUI_IMAGE		200
 
 #define MAX_STATIC_IMAGES 5

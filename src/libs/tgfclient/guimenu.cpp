@@ -221,23 +221,12 @@ getControlColor(void* hparm, const char* pszPath, const char* pszField,
 	if (!pszValue)
 		return false;
 
-	char* pszMore = (char*)pszValue;
-	unsigned long uColor = strtol(pszValue, &pszMore, 0);
-	if (*pszMore == '\0')
-	{
-		color.alpha = 1.0;
-		// color.alpha = (uColor & 0xFF) / 255.0;
-		// uColor >>= 8;
-		color.blue = (uColor & 0xFF) / 255.0;
-		uColor >>= 8;
-		color.green = (uColor & 0xFF) / 255.0;
-		uColor >>= 8;
-		color.red = (uColor & 0xFF) / 255.0;
-		// GfLogDebug("getControlColor(%s) = RGBA(%.1f,%.1f,%.1f,%.1f) \n",
-		// 		   pszPath, color.red, color.green, color.blue, color.alpha);
-	}
-	
-	return *pszMore == '\0';
+	color = GfuiColor::build(pszValue);
+
+	// GfLogDebug("getControlColor(%s) = RGBA(%.1f,%.1f,%.1f,%.1f) \n",
+	// 		   pszPath, color.red, color.green, color.blue, color.alpha);
+
+	return true;
 }
 
 

@@ -73,23 +73,23 @@ GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width
     editbox->onFocus = onFocus;
     editbox->onFocusLost = onFocusLost;
 
-    editbox->bgColor[0] = gfuiGetColor(GFUI_BGBTNDISABLED);
-    editbox->bgColor[1] = gfuiGetColor(GFUI_BGBTNENABLED);
-    editbox->bgColor[2] = gfuiGetColor(GFUI_BGBTNCLICK);
-    editbox->bgFocusColor[0] = gfuiGetColor(GFUI_BGBTNDISABLED);
-    editbox->bgFocusColor[1] = gfuiGetColor(GFUI_BGBTNFOCUS);
-    editbox->bgFocusColor[2] = gfuiGetColor(GFUI_BGBTNCLICK);
+    editbox->bgColor[0] = GfuiColor::build(GFUI_BGBTNDISABLED);
+    editbox->bgColor[1] = GfuiColor::build(GFUI_BGBTNENABLED);
+    editbox->bgColor[2] = GfuiColor::build(GFUI_BGBTNCLICK);
+    editbox->bgFocusColor[0] = GfuiColor::build(GFUI_BGBTNDISABLED);
+    editbox->bgFocusColor[1] = GfuiColor::build(GFUI_BGBTNFOCUS);
+    editbox->bgFocusColor[2] = GfuiColor::build(GFUI_BGBTNCLICK);
 	
-    editbox->fgColor[0] = gfuiGetColor(GFUI_EDITBOXCOLOR);
-    editbox->fgColor[1] = gfuiGetColor(GFUI_EDITBOXCOLOR);
-    editbox->fgColor[2] = gfuiGetColor(GFUI_EDITBOXCOLOR);
-    editbox->fgFocusColor[0] = gfuiGetColor(GFUI_EDITBOXCOLOR);
-    editbox->fgFocusColor[1] = gfuiGetColor(GFUI_EDITBOXCOLOR);
-    editbox->fgFocusColor[2] = gfuiGetColor(GFUI_EDITBOXCOLOR);
+    editbox->fgColor[0] = GfuiColor::build(GFUI_EDITBOXCOLOR);
+    editbox->fgColor[1] = GfuiColor::build(GFUI_EDITBOXCOLOR);
+    editbox->fgColor[2] = GfuiColor::build(GFUI_EDITBOXCOLOR);
+    editbox->fgFocusColor[0] = GfuiColor::build(GFUI_EDITBOXCOLOR);
+    editbox->fgFocusColor[1] = GfuiColor::build(GFUI_EDITBOXCOLOR);
+    editbox->fgFocusColor[2] = GfuiColor::build(GFUI_EDITBOXCOLOR);
 											   
-    editbox->cursorColor[0] = gfuiGetColor(GFUI_EDITCURSORCLR);
-    editbox->cursorColor[1] = gfuiGetColor(GFUI_EDITCURSORCLR);
-    editbox->cursorColor[2] = gfuiGetColor(GFUI_EDITCURSORCLR);
+    editbox->cursorColor[0] = GfuiColor::build(GFUI_EDITCURSORCLR);
+    editbox->cursorColor[1] = GfuiColor::build(GFUI_EDITCURSORCLR);
+    editbox->cursorColor[2] = GfuiColor::build(GFUI_EDITCURSORCLR);
     
 
     label = &(editbox->label);

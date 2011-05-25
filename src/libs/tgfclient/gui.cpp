@@ -113,23 +113,65 @@ gfuiInit(void)
 }
 
 GfuiColor 
-gfuiGetColor(const float* color)
+GfuiColor::build(const float* afColor)
 {
      GfuiColor c;
-     c.red = color[0];
-     c.green = color[1];
-     c.blue = color[2];
-     c.alpha = color[3];
+	 
+     c.red = afColor[0];
+     c.green = afColor[1];
+     c.blue = afColor[2];
+     c.alpha = afColor[3];
 
      return c;
 }
 
 // index from GFUI_* "named" indexes above.
-GfuiColor gfuiGetColor(int index)
+GfuiColor
+GfuiColor::build(int index)
 {
-	return gfuiGetColor(gfuiColors[index]);
+	return build(gfuiColors[index]);
 }
 
+GfuiColor
+GfuiColor::build(float r, float g, float b, float a)
+{
+	GfuiColor c;
+	
+	c.red = r;
+	c.green = g;
+	c.blue = b;
+	c.alpha = a;
+	
+	return c;
+}
+
+GfuiColor
+GfuiColor::build(const char* pszHexRGBA)
+{
+	GfuiColor color;
+	
+	char* pszMore = (char*)pszHexRGBA;
+	unsigned long uColor = strtol(pszHexRGBA, &pszMore, 0);
+	if (*pszMore == '\0')
+	{
+		// TODO: Add real support for customizable alpha channel.
+		color.alpha = 1.0;
+		// color.alpha = (uColor & 0xFF) / 255.0;
+		// uColor >>= 8;
+		color.blue = (uColor & 0xFF) / 255.0;
+		uColor >>= 8;
+		color.green = (uColor & 0xFF) / 255.0;
+		uColor >>= 8;
+		color.red = (uColor & 0xFF) / 255.0;
+	}
+	else
+	{
+		color = build(1, 1, 1, 1);
+		GfLogWarning("Bad color RGBA hex string '%s'; assuming white\n", pszHexRGBA);
+	}
+
+	return color;
+}
 
 /** Dummy display function for the event loop.
     Declare this function to the event loop if nothing is to be displayed
@@ -597,11 +639,7 @@ GfuiScreenCreate(float *bgColor,
 	screen->width = 640.0;
 	screen->height = 480.0;
 	
-	if (bgColor) {
-		screen->bgColor = gfuiGetColor(bgColor);
-	} else {
-		screen->bgColor = gfuiGetColor(&gfuiColors[GFUI_BGCOLOR][0]);
-	}
+	screen->bgColor = bgColor ? GfuiColor::build(bgColor) : GfuiColor::build(GFUI_BGCOLOR);
 
 	screen->mouseColor[0] = &(gfuiColors[GFUI_MOUSECOLOR1][0]);
 	screen->mouseColor[1] = &(gfuiColors[GFUI_MOUSECOLOR2][0]);
