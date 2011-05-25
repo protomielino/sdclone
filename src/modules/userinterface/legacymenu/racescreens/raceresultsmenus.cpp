@@ -118,7 +118,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	GfLogTrace("Entering Practice Results menu\n");
 
     void *hmenu = GfuiMenuLoad("practiceresultsmenu.xml");
-    GfuiMenuCreateStaticControls(hmenu, rmScrHdle);
+    GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title labels.
     snprintf(buf, sizeof(buf), "Practice Results on %s", info->track->name);
@@ -243,7 +243,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     // Create screen, load menu XML descriptor and create static controls.
     rmScrHdle = GfuiScreenCreate();
     void *hmenu = GfuiMenuLoad("raceresultsmenu.xml");
-    GfuiMenuCreateStaticControls(hmenu,rmScrHdle);
+    GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title label.
     sprintf(buf, "%s", info->track->name);
@@ -406,7 +406,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 
     rmScrHdle = GfuiScreenCreate();
     void *hmenu = GfuiMenuLoad("qualifsresultsmenu.xml");
-    GfuiMenuCreateStaticControls(hmenu,rmScrHdle);
+    GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     sprintf(buf, "%s", info->track->name);
     const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "racetitle");
@@ -524,7 +524,7 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	rmScrHdle = GfuiScreenCreate();
 
 	void *hmenu = GfuiMenuLoad("standingsmenu.xml");
-	GfuiMenuCreateStaticControls(hmenu,rmScrHdle);
+	GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
 	//Set title
 	sprintf(buf, "%s Standings", race);

@@ -829,7 +829,7 @@ PlayerConfigMenuInit(void *prevMenu)
     /* Create the screen, load menu XML descriptor and create static controls */
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
     void *param = GfuiMenuLoad("playerconfigmenu.xml");
-    GfuiMenuCreateStaticControls(param,ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, param);
 
     /* Player scroll list */
     ScrollList = GfuiMenuCreateScrollListControl(ScrHandle,param,"playerscrolllist",NULL, onSelect);

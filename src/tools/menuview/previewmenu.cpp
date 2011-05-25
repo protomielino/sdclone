@@ -103,7 +103,7 @@ LoadMenuScreen()
 	if (param == NULL)
 		param = GfParmReadFileLocal(g_strFile.c_str(), GFPARM_RMODE_REREAD);
 
-    GfuiMenuCreateStaticControls(param,menuHandle);
+    GfuiMenuCreateStaticControls(menuHandle, param);
 	ShowDynamicControls(param);
     GfuiAddKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
     GfuiAddKey(menuHandle, 'Q', "Quit", 0, onQuit, NULL);

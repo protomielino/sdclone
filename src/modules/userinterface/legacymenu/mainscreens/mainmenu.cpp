@@ -100,7 +100,7 @@ MainMenuInit(void)
 
     void *menuDescHdle = GfuiMenuLoad("mainmenu.xml");
 
-    GfuiMenuCreateStaticControls(menuDescHdle, MenuHandle);
+    GfuiMenuCreateStaticControls(MenuHandle, menuDescHdle);
 
     //Add buttons and create based on xml
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "race", NULL, onRaceSelectMenuActivate);

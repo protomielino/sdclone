@@ -162,7 +162,7 @@ void * SoundMenuInit(void *prevMenu)
 	scrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
 	void *param = GfuiMenuLoad("soundmenu.xml");
-	GfuiMenuCreateStaticControls(param,scrHandle);
+	GfuiMenuCreateStaticControls(scrHandle, param);
 
 	GfuiMenuCreateButtonControl(scrHandle,param,"soundleftarrow",(void*)-1,changeSoundState);
 	GfuiMenuCreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);

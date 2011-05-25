@@ -110,7 +110,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 
 	void *hmenu = GfuiMenuLoad("creditsmenu.xml");
 
-	GfuiMenuCreateStaticControls(hmenu, hscrPage);
+	GfuiMenuCreateStaticControls(hscrPage, hmenu);
 
 	// Create title label from chapter name
 	sprintf(buf, "Credits - %s", chapName);

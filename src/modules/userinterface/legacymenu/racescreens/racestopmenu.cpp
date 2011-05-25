@@ -144,7 +144,7 @@ rmStopRaceScreen(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 
     void *hmenu = GfuiMenuLoad("stopracemenu.xml");
 
-    GfuiMenuCreateStaticControls(hmenu, hscreen);
+    GfuiMenuCreateStaticControls(hscreen, hmenu);
 
     // Create buttons from menu properties and button template.
     const int xpos = (int)GfuiMenuGetNumProperty(hmenu, "xButton", 270);

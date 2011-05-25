@@ -513,7 +513,7 @@ TGFCLIENT_API void  GfuiMenuDefaultKeysAdd(void* scr);
  *******************************************/
 
 TGFCLIENT_API void* GfuiMenuLoad(const char* pFilePath);
-TGFCLIENT_API bool GfuiMenuCreateStaticControls(void* hparm,void* hscr);
+TGFCLIENT_API bool GfuiMenuCreateStaticControls(void* hscr, void* hparm);
 
 TGFCLIENT_API int GfuiMenuCreateButtonControl(void* hscr, void* hparm, const char* pszName,
 											  void* userDataOnPush, tfuiCallback onPush,

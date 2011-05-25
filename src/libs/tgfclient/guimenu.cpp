@@ -913,7 +913,7 @@ GfuiMenuCreateProgressbarControl(void* hscr, void* hparm, const char* pszName)
 }
 
 bool 
-GfuiMenuCreateStaticControls(void* hparm, void* hscr)
+GfuiMenuCreateStaticControls(void* hscr, void* hparm)
 {
 	if (!hparm)
 	{
@@ -1057,7 +1057,7 @@ bool GfuiMenuScreen::createStaticControls()
 		return false;
 	
 	return m_priv->menuHdle && m_priv->xmlDescParmHdle
-		&& ::GfuiMenuCreateStaticControls(m_priv->xmlDescParmHdle, m_priv->menuHdle);
+		   && ::GfuiMenuCreateStaticControls(m_priv->menuHdle, m_priv->xmlDescParmHdle);
 }
 
 int GfuiMenuScreen::createButtonControl(const char* pszName,

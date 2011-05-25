@@ -358,7 +358,7 @@ RmRaceParamsMenu(void *vrp)
     // Create the screen, load menu XML descriptor and create static controls.
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, NULL, NULL, (tfuiCallback)NULL, 1);   
     void *menuXMLDescHdle = GfuiMenuLoad("raceparamsmenu.xml");
-    GfuiMenuCreateStaticControls(menuXMLDescHdle,ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
     // Create the variable title label.
     int titleId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "titlelabel");

@@ -67,7 +67,7 @@ RmNextEventMenu(void)
 								  NULL, (tfuiCallback)NULL, 
 								  1);
 	void *menuXMLDescHdle = GfuiMenuLoad("racenexteventmenu.xml");
-	GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScrHandle);
+	GfuiMenuCreateStaticControls(rmScrHandle, menuXMLDescHdle);
 
 	// Create background image from race params.
 	const char* pszBGImg = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);

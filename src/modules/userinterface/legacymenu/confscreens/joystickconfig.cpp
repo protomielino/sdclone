@@ -252,7 +252,7 @@ JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     void *menuXMLDescHdle = GfuiMenuLoad("joystickconfigmenu.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
     // Create joystick axis label controls (axis name, axis Id, axis min value, axis max value)
     for (i = 0; i < NbMaxCalAxis; i++) {

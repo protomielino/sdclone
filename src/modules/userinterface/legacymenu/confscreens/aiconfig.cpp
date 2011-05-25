@@ -22,14 +22,15 @@
     @version	$Id$
 */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #include <tgfclient.h>
 #include <robot.h>
 #include <portability.h>
 
 #include "aiconfig.h"
+
 
 static const char* AIGlobalSkillFilePathName = "config/raceman/extra/skill.xml";
 
@@ -121,7 +122,7 @@ AIMenuInit(void *prevMenu)
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
 	void *param = GfuiMenuLoad("aiconfigmenu.xml");
-    GfuiMenuCreateStaticControls(param,ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, param);
 
     GfuiMenuCreateButtonControl(ScrHandle,param,"skillleftarrow",(void*)-1,ChangeSkillLevel);
     GfuiMenuCreateButtonControl(ScrHandle,param,"skillrightarrow",(void*)1,ChangeSkillLevel);

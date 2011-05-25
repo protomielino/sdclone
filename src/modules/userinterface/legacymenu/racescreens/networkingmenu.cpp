@@ -576,7 +576,7 @@ RmNetworkHostMenu(void * /* dummy */)
 
     void *mparam = GfuiMenuLoad("networkhostmenu.xml");
 
-    GfuiMenuCreateStaticControls(mparam,racemanMenuHdle);
+    GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
 
 	RmSetRacemanMenuHandle(racemanMenuHdle);
 
@@ -688,7 +688,7 @@ RmNetworkClientMenu(void * /* dummy */)
 									   NULL, (tfuiCallback)NULL, 1);
 
     void *mparam = GfuiMenuLoad("networkclientmenu.xml");
-	GfuiMenuCreateStaticControls(mparam,racemanMenuHdle);
+	GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
 
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
@@ -793,7 +793,7 @@ NetworkClientConnectMenu(void * /* dummy */)
 
     void *mparam = GfuiMenuLoad("networkclientconnectmenu.xml");
 	
-	GfuiMenuCreateStaticControls(mparam, racemanMenuHdle);
+	GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
 
 	g_IPEditId = GfuiMenuCreateEditControl(racemanMenuHdle, mparam, "IPAddrEdit",
 										   0, 0, ChangeIP);
@@ -834,7 +834,7 @@ RmNetworkMenu(void *)
 
     void *mparam = GfuiMenuLoad("networkmenu.xml");
 
-    GfuiMenuCreateStaticControls(mparam, racemanMenuHdle);
+    GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
 
     const int nTitleLabelId =
 		GfuiMenuCreateLabelControl(racemanMenuHdle, mparam, "TitleLabel");

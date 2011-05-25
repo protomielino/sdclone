@@ -44,7 +44,7 @@ void* exitMenuInit(void *prevMenu, void *menuHandle)
 
     void *param = GfuiMenuLoad("exitmenu.xml");
 
-    GfuiMenuCreateStaticControls(param,menuHandle);
+    GfuiMenuCreateStaticControls(menuHandle, param);
     GfuiMenuCreateButtonControl(menuHandle, param, "yesquit", NULL, onAcceptExit);
     GfuiMenuCreateButtonControl(menuHandle, param, "nobacktogame", prevMenu, GfuiScreenActivate);
 

@@ -380,7 +380,7 @@ RmRacemanMenu()
 										 NULL, (tfuiCallback)NULL, 1);
 	void *menuXMLDescHdle = GfuiMenuLoad("racemanmenu.xml");
 	
-	GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
+	GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
 	// Create and initialize static title label (race mode name).
 	const int nRaceModeTitleLabelId =

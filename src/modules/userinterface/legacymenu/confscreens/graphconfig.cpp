@@ -266,7 +266,7 @@ GraphMenuInit(void* prevMenu)
 
     void* param = GfuiMenuLoad("graphicconfig.xml");
 
-    GfuiMenuCreateStaticControls(param,ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, param);
 
     FovEditId = GfuiMenuCreateEditControl(ScrHandle, param, "fovedit", NULL, NULL, ChangeFov);
     SmokeEditId = GfuiMenuCreateEditControl(ScrHandle, param, "smokeedit", NULL, NULL, ChangeSmoke);

@@ -105,7 +105,7 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 
     void *menuXMLDescHdle = GfuiMenuLoad("pitmenu.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, menuHandle);
+    GfuiMenuCreateStaticControls(menuHandle, menuXMLDescHdle);
 
     // Create labels for driver name, remaining laps and remaining fuel.
     int driverNameId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "drivernamelabel");

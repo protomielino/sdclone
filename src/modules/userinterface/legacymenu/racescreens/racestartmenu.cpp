@@ -122,7 +122,7 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 
     void *menuXMLDescHdle = GfuiMenuLoad("startracemenu.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScrHdle);
+    GfuiMenuCreateStaticControls(rmScrHdle, menuXMLDescHdle);
 
     // Create variable title label.
     int titleId = GfuiMenuCreateLabelControl(rmScrHdle, menuXMLDescHdle, "titlelabel");

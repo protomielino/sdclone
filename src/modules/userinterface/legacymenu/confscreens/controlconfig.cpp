@@ -568,7 +568,7 @@ ControlMenuInit(void *prevMenu, void *prefHdle, unsigned index, tGearChangeMode 
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *param = GfuiMenuLoad("controlconfigmenu.xml");
-    GfuiMenuCreateStaticControls(param,ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, param);
 
     /* Default keyboard shortcuts */
     GfuiMenuDefaultKeysAdd(ScrHandle);

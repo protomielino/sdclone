@@ -189,7 +189,7 @@ MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
 
     void *menuXMLDescHdle = GfuiMenuLoad("mouseconfigmenu.xml");
 
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
     // Create instruction variable label.
     InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");

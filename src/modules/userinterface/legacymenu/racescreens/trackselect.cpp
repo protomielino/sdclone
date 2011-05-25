@@ -255,7 +255,7 @@ RmTrackSelect(void *vs)
 		GfuiScreenCreate((float*)NULL, NULL, rmtsActivate, NULL, (tfuiCallback)NULL, 1);
 
     void *hparmMenu = GfuiMenuLoad("trackselectmenu.xml");
-    GfuiMenuCreateStaticControls(hparmMenu, ScrHandle);
+    GfuiMenuCreateStaticControls( ScrHandle, hparmMenu);
 
     GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatleftarrow",(void*)-1, rmtsTrackCatPrevNext);
     GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "trackcatrightarrow",(void*)1, rmtsTrackCatPrevNext);

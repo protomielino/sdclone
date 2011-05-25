@@ -309,7 +309,7 @@ void* OpenGLMenuInit(void *prevMenu)
 
 	ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 	void *hparmMenu = GfuiMenuLoad("opengloptionsmenu.xml");
-	GfuiMenuCreateStaticControls(hparmMenu,ScrHandle);
+	GfuiMenuCreateStaticControls(ScrHandle, hparmMenu);
 
 	// Texture compression.
 	TextureCompLeftButtonId =

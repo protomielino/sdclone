@@ -129,7 +129,7 @@ RmRaceSelectInit(void *prevMenu)
 											NULL, (tfuiCallback)NULL, 
 											1);
     void *hMenuXMLDesc = GfuiMenuLoad("raceselectmenu.xml");
-    GfuiMenuCreateStaticControls(hMenuXMLDesc, rmRaceSelectHandle);
+    GfuiMenuCreateStaticControls(rmRaceSelectHandle, hMenuXMLDesc);
 
     // Create the raceman type buttons and sub-type combo-boxes (if any).
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();

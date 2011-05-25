@@ -417,7 +417,7 @@ RmScreenInit()
     // Create screen, load menu XML descriptor and create static controls.
     rmScreenHandle = GfuiScreenCreate(black, 0, rmScreenActivate, 0, 0, 0);
     void *menuXMLDescHdle = GfuiMenuLoad("raceglscreen.xml");
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, rmScreenHandle);
+    GfuiMenuCreateStaticControls(rmScreenHandle, menuXMLDescHdle);
 
     // Create Message, BigMessage and Pause labels.
     rmMsgId = GfuiMenuCreateLabelControl(rmScreenHandle, menuXMLDescHdle, "message");
@@ -562,7 +562,7 @@ RmResScreenInit()
     // Create screen, load menu XML descriptor and create static controls.
     rmResScreenHdle = GfuiScreenCreate(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
     void *menuXMLDescHdle = GfuiMenuLoad("raceblindscreen.xml");
-    GfuiMenuCreateStaticControls(menuXMLDescHdle, rmResScreenHdle);
+    GfuiMenuCreateStaticControls(rmResScreenHdle, menuXMLDescHdle);
 
     // Create variable main title (race type/stage) label.
     rmResMainTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "title");

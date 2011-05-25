@@ -611,7 +611,7 @@ RmDriversSelect(void *vs)
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, rmdsActivate, NULL, (tfuiCallback)NULL, 1);
     
     void *menuDescHdle = GfuiMenuLoad("driverselectmenu.xml");
-    GfuiMenuCreateStaticControls(menuDescHdle, ScrHandle);
+    GfuiMenuCreateStaticControls(ScrHandle, menuDescHdle);
 
     CompetitorsScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuDescHdle, "competitorsscrolllist", NULL, rmdsClickOnDriver);
     CandidatesScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuDescHdle, "candidatesscrolllist", NULL, rmdsClickOnDriver);

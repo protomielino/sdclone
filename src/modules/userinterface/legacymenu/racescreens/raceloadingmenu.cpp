@@ -74,7 +74,7 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
 
     void *hmenu = GfuiMenuLoad("loadingscreen.xml");
 
-    GfuiMenuCreateStaticControls(hmenu, HScreen);
+    GfuiMenuCreateStaticControls(HScreen, hmenu);
 
     // Create variable title label.
     int titleId = GfuiMenuCreateLabelControl(HScreen, hmenu, "titlelabel");

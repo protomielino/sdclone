@@ -61,7 +61,7 @@ GfuiHelpScreen(void *prevScreen)
     
     void *hmenu = GfuiMenuLoad("helpmenu.xml");
 
-    GfuiMenuCreateStaticControls(hmenu, scrHandle);
+    GfuiMenuCreateStaticControls(scrHandle, hmenu);
 
 	// Get menu properties.
 	const int nXLeftColumn = (int)GfuiMenuGetNumProperty(hmenu, "xLeftColumn", 30);

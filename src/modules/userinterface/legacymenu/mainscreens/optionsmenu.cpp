@@ -78,7 +78,7 @@ OptionsMenuInit(void *prevMenu)
 
     void *param = GfuiMenuLoad("optionsmenu.xml");
 
-    GfuiMenuCreateStaticControls(param,MenuHandle);
+    GfuiMenuCreateStaticControls(MenuHandle, param);
     
     GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onDisplayMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, param, "graphic", NULL, onGraphMenuActivate);
