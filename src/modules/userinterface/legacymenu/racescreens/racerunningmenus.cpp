@@ -478,12 +478,14 @@ static void	*rmResScreenHdle = 0;
 
 static int	rmResMainTitleId;
 static int	rmResTitleId;
-static int	rmResMsgId[NMaxResultLines];
+static int*	rmResMsgId = 0;
 
-static int	rmResMsgClr[NMaxResultLines];
-static char	*rmResMsg[NMaxResultLines];
+static int*	rmResMsgClr = 0;
+static char** rmResMsg = 0;
 
 static int	rmCurLine;
+
+static int rmNMaxResLines = 0; // Initialized at menu-load time.
 
 // Flag to know if the menu state has been changed (and thus needs a redraw+redisplay).
 static bool rmbResMenuChanged = false;
@@ -537,7 +539,7 @@ rmResCont(void * /* dummy */)
 static void
 rmResScreenShutdown(void * /* dummy */)
 {
-    for (int i = 1; i < NMaxResultLines; i++)
+    for (int i = 1; i < rmNMaxResLines; i++)
 		FREEZ(rmResMsg[i]);
 }
 
@@ -561,11 +563,11 @@ RmResScreenInit()
 
     // Create screen, load menu XML descriptor and create static controls.
     rmResScreenHdle = GfuiScreenCreate(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
-    void *menuXMLDescHdle = GfuiMenuLoad("raceblindscreen.xml");
-    GfuiMenuCreateStaticControls(rmResScreenHdle, menuXMLDescHdle);
+    void *hmenu = GfuiMenuLoad("raceblindscreen.xml");
+    GfuiMenuCreateStaticControls(rmResScreenHdle, hmenu);
 
     // Create variable main title (race type/stage) label.
-    rmResMainTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "title");
+    rmResMainTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Title");
     GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, aSessionTypeNames[reInfo->s->_raceType]);
 
     // Create background image if any specified.
@@ -574,23 +576,40 @@ RmResScreenInit()
 		GfuiScreenAddBgImg(rmResScreenHdle, img);
     
     // Create variable subtitle (driver and race name, lap number) label.
-    rmResTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, menuXMLDescHdle, "subtitle");
+    rmResTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "SubTitle");
+
+	// Get layout properties, except for nMaxResultLines (see below).
+    const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
+    const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
+
+	// Allocate line info arrays once and for all, if not already done.
+	if (!rmResMsgId)
+	{
+		// Load nMaxResultLines only the first time (ignore any later change,
+		// otherwize, we'd have to realloc the line info arrays).
+		rmNMaxResLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 20);
+		
+		rmResMsgId = (int*)calloc(rmNMaxResLines, sizeof(int));
+		rmResMsg = (char**)calloc(rmNMaxResLines, sizeof(char*));
+		rmResMsgClr = (int*)calloc(rmNMaxResLines, sizeof(int));
+	}
 
     // Create result lines (1 label for each).
-    // TODO: Get layout, color, ... info from menuXMLDescHdle when available.
-    int	y = 400;
-    int	dy = 378 / NMaxResultLines;
-    for (int i = 0; i < NMaxResultLines; i++)
+    // TODO: Get layout, color, ... info from hmenu when available.
+    int	y = yTopLine;
+    for (int i = 0; i < rmNMaxResLines; i++)
 	{
 		FREEZ(rmResMsg[i]);
 		rmResMsgClr[i] = 0;
-		rmResMsgId[i] = GfuiLabelCreate(rmResScreenHdle, "", GFUI_FONT_MEDIUM_C, 20, y, 
-										GFUI_ALIGN_HL_VB, 120, white);
-		y -= dy;
+		rmResMsgId[i] =
+			GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Line", true, // from template
+									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_ALIGN,
+									   GFUI_TPL_MAXLEN);
+		y -= yLineShift;
     }
 
     // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
+    GfParmReleaseHandle(hmenu);
     
     // Register keyboard shortcuts.
     rmAddResKeys();
@@ -634,10 +653,10 @@ RmResScreenAddText(const char *text)
     if (!rmResScreenHdle)
 		return;
 	
-    if (rmCurLine == NMaxResultLines)
+    if (rmCurLine == rmNMaxResLines)
 	{
 		free(rmResMsg[0]);
-		for (int i = 1; i < NMaxResultLines; i++)
+		for (int i = 1; i < rmNMaxResLines; i++)
 		{
 			rmResMsg[i - 1] = rmResMsg[i];
 			GfuiLabelSetText(rmResScreenHdle, rmResMsgId[i - 1], rmResMsg[i]);
@@ -658,7 +677,7 @@ RmResScreenSetText(const char *text, int line, int clr)
     if (!rmResScreenHdle)
 		return;
 	
-    if (line < NMaxResultLines)
+    if (line < rmNMaxResLines)
 	{
 		FREEZ(rmResMsg[line]);
 		rmResMsg[line] = strdup(text);
@@ -674,7 +693,7 @@ RmResScreenSetText(const char *text, int line, int clr)
 int
 RmResGetLines()
 {
-    return NMaxResultLines;
+    return rmNMaxResLines;
 }
 
 void
@@ -683,7 +702,7 @@ RmResEraseScreen()
     if (!rmResScreenHdle)
 		return;
 	
-    for (int i = 0; i < NMaxResultLines; i++)
+    for (int i = 0; i < rmNMaxResLines; i++)
 		RmResScreenSetText("", i, 0);
 	
 	// The menu changed.
@@ -697,7 +716,7 @@ RmResScreenRemoveText(int line)
     if (!rmResScreenHdle)
 		return;
 	
-    if (line < NMaxResultLines)
+    if (line < rmNMaxResLines)
 	{
 		FREEZ(rmResMsg[line]);
 		GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], "");
