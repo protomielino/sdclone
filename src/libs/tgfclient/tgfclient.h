@@ -356,7 +356,7 @@ class TGFCLIENT_API GfuiColor
 {
   public:
 	static GfuiColor build(float r, float g, float b, float a = 1.0);
-	static GfuiColor build(const char* pszHexRGBA); // Ex: Tangerine "0xF28500FF"
+	static GfuiColor build(const char* pszARGB); // Ex: Semi-translucent tangerine "0x80F28500"
 	static GfuiColor build(const float* color);
 	static GfuiColor build(int index); // index from GFUI_* "named" indexes in gui.h.
     inline const float *toFloatRGBA() const { return (float*)this; }

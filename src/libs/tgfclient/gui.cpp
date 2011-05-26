@@ -145,29 +145,36 @@ GfuiColor::build(float r, float g, float b, float a)
 	return c;
 }
 
+// Expect a 32 bit unsigned integer string, 10/8/16 base, C syntax)
+// Ex: "0xE47A96C2", "1285698774", "0765223412563"
 GfuiColor
-GfuiColor::build(const char* pszHexRGBA)
+GfuiColor::build(const char* pszARGB)
 {
 	GfuiColor color;
 	
-	char* pszMore = (char*)pszHexRGBA;
-	unsigned long uColor = strtol(pszHexRGBA, &pszMore, 0);
+	char* pszMore = (char*)pszARGB;
+	unsigned long uColor = strtol(pszARGB, &pszMore, 0);
 	if (*pszMore == '\0')
 	{
-		// TODO: Add real support for customizable alpha channel.
-		color.alpha = 1.0;
-		// color.alpha = (uColor & 0xFF) / 255.0;
-		// uColor >>= 8;
+		// Blue channel.
 		color.blue = (uColor & 0xFF) / 255.0;
 		uColor >>= 8;
+		
+		// Green channel.
 		color.green = (uColor & 0xFF) / 255.0;
+		
+		// Red channel.
 		uColor >>= 8;
 		color.red = (uColor & 0xFF) / 255.0;
+
+		// Alpha channel : assume 1.0 if not specified or 0x00.
+		uColor >>= 8;
+		color.alpha = (uColor & 0xFF) ? (uColor & 0xFF) / 255.0 : 1.0;
 	}
 	else
 	{
 		color = build(1, 1, 1, 1);
-		GfLogWarning("Bad color RGBA hex string '%s'; assuming white\n", pszHexRGBA);
+		GfLogWarning("Bad color ARGB string '%s'; assuming white\n", pszARGB);
 	}
 
 	return color;
