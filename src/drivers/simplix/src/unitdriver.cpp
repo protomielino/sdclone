@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.02.13
+// Last changed : 2011.05.26
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.00.001
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -1366,7 +1366,7 @@ void TDriver::Drive()
   oCar->ctrl.steer = (float) oSteer;
 
   //int Idx = oTrackDesc.IndexFromPos(Pos);
-  //GfOut("#%d: %g P:%.0f(%d) A: %g B: %g C: %g G: %d S: %g\n",oIndex,CurrSimTime,Pos,Idx,oAccel,oBrake,oClutch,oGear,oSteer);
+  //GfOut("#%d: P:%.0f(%d) A: %g B: %g C: %g G: %d S: %g\n",oIndex,Pos,Idx,oCar->ctrl.accelCmd,oCar->ctrl.brakeCmd,oCar->ctrl.clutchCmd,oCar->ctrl.gear,oCar->ctrl.steer);
 /*
   if (oDoAvoid)
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;        // Only small lights on
@@ -3339,6 +3339,9 @@ double TDriver::FilterSkillBrake(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterBrakeSpeed(double Brake)
 {
+	if (Param.Fix.oCa < 0.01) 
+  	  return Brake;
+
 	float WF = (float) (Param.Tmp.oMass * G / Param.Fix.oCa);
 	float F2 = WF + 10000;
 	float F1 = (float) (WF + oCurrSpeed * oCurrSpeed);
@@ -3352,7 +3355,7 @@ double TDriver::FilterBrakeSpeed(double Brake)
 double TDriver::FilterAccel(double Accel)
 {
   if (Accel > oLastAccel + 0.05)
-	Accel = oLastAccel + 0.05;
+	Accel = MIN(1.0,oLastAccel + 0.05);
   return Accel;
 }
 //==========================================================================*

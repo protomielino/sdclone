@@ -8,10 +8,14 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2010.11.06
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000 
+// Version      : 3.00.001 
+//--------------------------------------------------------------------------*
+// V3.00.001 (SimuV2.1):
+// Needed changes to be able to control cars for simuV2.1
+// - Still work in progress
 //--------------------------------------------------------------------------*
 // V2.00.01 (Speed Dreams - Career mode):
 // Uses new Speed Dreams Interfaces and was extended to use career mode
