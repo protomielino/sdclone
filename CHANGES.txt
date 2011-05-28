@@ -154,7 +154,7 @@ Race engine :
 * #330 (D16) Complete the new Career racing mode for 2.0 (WIP) 
 * #258 New TimeOfDay, CloudCover and RainFall configurable options for all the races
 * #301 New "Wet track" race/robot feature (for filtering actual race features from competitors),
-       but no robot supports it for the moment (WIP)
+       but only simplix_trb1 robot supports it for the moment (WIP)
 * #314 Made the track surfaces wet mu model simpler, for robots race line computation 
        compatibility.
 * Added a race-type-customizable filtering system for the car categories and driver types
