@@ -32,7 +32,7 @@
 #include "gui.h"
 
 void
-gfuiScrollBarInit(void)
+gfuiInitScrollBar(void)
 {
 }
 

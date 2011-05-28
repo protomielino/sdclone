@@ -54,12 +54,11 @@
 #define GFSCR_VAL_VINIT_COMPATIBLE	"compatible"
 #define GFSCR_VAL_VINIT_BEST		"best"
 
-#define GFSCR_SECT_MENUCOL	"Menu Colors"
+#define GFSCR_SECT_MENUSETTINGS	"Menu Settings"
 
 #define GFSCR_LIST_COLORS	"colors"
 
 #define GFSCR_ELT_BGCOLOR	"background"
-#define GFSCR_ELT_TITLECOLOR	"title"
 #define GFSCR_ELT_BGBTNFOCUS	"background focused button"
 #define GFSCR_ELT_BGBTNCLICK	"background pushed button"
 #define GFSCR_ELT_BGBTNENABLED	"background enabled button"
@@ -70,25 +69,35 @@
 #define GFSCR_ELT_BTNDISABLED	"disabled button"
 #define GFSCR_ELT_LABELCOLOR	"label"
 #define GFSCR_ELT_TIPCOLOR	"tip"
-#define GFSCR_ELT_MOUSECOLOR1	"mouse 1"
-#define GFSCR_ELT_MOUSECOLOR2	"mouse 2"
-#define GFSCR_ELT_HELPCOLOR1	"help key"
-#define GFSCR_ELT_HELPCOLOR2	"help description"
 #define GFSCR_ELT_BGSCROLLIST	"background scroll list"
 #define GFSCR_ELT_SCROLLIST	"scroll list"
 #define GFSCR_ELT_BGSELSCROLLIST "background selected scroll list"
 #define GFSCR_ELT_SELSCROLLIST	"selected scroll list"
-#define GFSCR_ELT_EDITCURSORCLR	"edit box cursor color"
-#define GFSCR_ELT_LABELCOLORDRIVERCONFIG "driver config label color"
-#define GFSCR_ELT_BASECOLORBGIMAGE "base color background image"
 #define GFSCR_ELT_EDITBOXCOLOR "edit box color"
-#define GFSCR_ELt_LABELCOLOROPTIONS "label color options"
-#define GFSCR_ELT_TABLEHEADER "table header"
+#define GFSCR_ELT_EDITCURSORCLR	"edit box cursor color"
+#define GFSCR_ELT_BASECOLORBGIMAGE "base color background image"
 
 #define GFSCR_ATTR_RED		"red"
 #define GFSCR_ATTR_GREEN	"green"
 #define GFSCR_ATTR_BLUE		"blue"
 #define GFSCR_ATTR_ALPHA	"alpha"
+
+#define GFSCR_SECT_TIP	"tip"
+
+#define GFSCR_ATT_FONT			"font"
+#define GFSCR_ATT_ALIGN			"align"
+#define GFSCR_ATT_X			"x"
+#define GFSCR_ATT_Y			"y"
+#define GFSCR_ATT_WIDTH		"width"
+
+// Mouse cursor
+#define GFSCR_SECT_MOUSECURSOR			"Mouse Cursor"
+
+#define GFSCR_ATT_IMAGEFILE				"image file"
+#define GFSCR_ATT_WIDTH				"width"
+#define GFSCR_ATT_HEIGHT				"height"
+#define GFSCR_ATT_XOFFSET				"x offset"
+#define GFSCR_ATT_YOFFSET				"y offset"
 
 // Open GL user-selected features
 #define GFSCR_SECT_GLSELFEATURES			"OpenGL Selected Features"

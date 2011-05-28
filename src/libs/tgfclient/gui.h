@@ -29,35 +29,27 @@
 extern float	gfuiColors[GFUI_COLORNB][4];
 
 #define GFUI_BGCOLOR		0
-#define GFUI_TITLECOLOR		1
-#define GFUI_BGBTNFOCUS		2
-#define GFUI_BGBTNCLICK		3
-#define GFUI_BGBTNENABLED	4
-#define GFUI_BGBTNDISABLED	5
-#define GFUI_BTNFOCUS		6
-#define GFUI_BTNCLICK		7
-#define GFUI_BTNENABLED		8
-#define GFUI_BTNDISABLED	9
-#define GFUI_LABELCOLOR		10
-#define GFUI_TIPCOLOR		11
-#define GFUI_MOUSECOLOR1	12
-#define GFUI_MOUSECOLOR2	13
-#define GFUI_HELPCOLOR1		14
-#define GFUI_HELPCOLOR2		15
-#define GFUI_BGSCROLLIST	16
-#define GFUI_FGSCROLLIST	17
-#define GFUI_BGSELSCROLLIST	18
-#define GFUI_FGSELSCROLLIST	19
-#define GFUI_EDITCURSORCLR	20
-#define GFUI_LABELCOLORDRIVER   21
-#define GFUI_BASECOLORBGIMAGE   22
-#define GFUI_EDITBOXCOLOR 23
-#define GFUI_LABELCOLOROPTIONS 24
-#define GFUI_TABLEHEADER 25
+#define GFUI_BGBTNFOCUS		1
+#define GFUI_BGBTNCLICK		2
+#define GFUI_BGBTNENABLED	3
+#define GFUI_BGBTNDISABLED	4
+#define GFUI_BTNFOCUS		5
+#define GFUI_BTNCLICK		6
+#define GFUI_BTNENABLED		7
+#define GFUI_BTNDISABLED	8
+#define GFUI_LABELCOLOR		9
+#define GFUI_TIPCOLOR		10
+#define GFUI_BGSCROLLIST	11
+#define GFUI_FGSCROLLIST	12
+#define GFUI_BGSELSCROLLIST	13
+#define GFUI_FGSELSCROLLIST	14
+#define GFUI_EDITBOXCOLOR	15
+#define GFUI_EDITCURSORCLR	16
+#define GFUI_BASECOLORBGIMAGE   17
 
 #define GFUI_IMAGE		200
 
-#define MAX_STATIC_IMAGES 5
+#define GFUI_MAXSTATICIMAGES	5
 
 /* Label */
 typedef struct
@@ -250,7 +242,7 @@ typedef struct
     int srcWidth, srcHeight; // Dimensions of the source image file (pixels).
 	bool canDeform;
 	unsigned int activeimage;
-	GLuint	texture[MAX_STATIC_IMAGES];
+	GLuint	texture[GFUI_MAXSTATICIMAGES];
 } tGfuiImage;
 
 typedef struct GfuiObject
@@ -322,7 +314,6 @@ typedef struct
     /* mouse handling */
     int			mouse;
     int			mouseAllowed;
-    float		*mouseColor[2];
 
     /* menu specific */
     int			nbItems;
@@ -342,7 +333,7 @@ extern void gfuiReleaseObject(tGfuiObject *curObject);
 extern void GfuiDrawCursor();
 extern void GfuiDraw(tGfuiObject *obj);;
 extern void gfuiUpdateFocus();
-extern void gfuiPrintString(int x, int y, GfuiFontClass *font, const char *string);
+extern void gfuiDrawString(int x, int y, GfuiFontClass *font, const char *string);
 extern void gfuiMouseAction(void *action);
 extern void gfuiSelectNext(void *);
 extern void gfuiSelectPrev(void *);
@@ -374,12 +365,14 @@ extern void gfuiLabelDraw(tGfuiLabel *label, int focus);
 extern void gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus);
 
 extern void gfuiInit(void);
-extern void gfuiButtonInit(void);
-extern void gfuiHelpInit(void);
-extern void gfuiLabelInit(void);
-extern void gfuiObjectInit(void);
-extern void gfuiEditboxInit(void);
-extern void gfuiComboboxInit(void);
+extern void gfuiInitButton(void);
+extern void gfuiInitHelp(void);
+extern void gfuiInitLabel(void);
+extern void gfuiInitObject(void);
+extern void gfuiInitEditbox(void);
+extern void gfuiInitCombobox(void);
+extern void gfuiInitScrollBar(void);
+extern void gfuiInitScrollList(void);
 
 extern void gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
 						  int x, int y, int align, int width, int font,

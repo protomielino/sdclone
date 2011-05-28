@@ -373,7 +373,8 @@ TGFCLIENT_API int GfuiVisibilitySet(void* scr, int id, int visible);
 TGFCLIENT_API int GfuiEnable(void* scr, int id, int flag);
 TGFCLIENT_API void GfuiUnSelectCurrent(void);
 
-/* Labels */
+/* Font management */
+// Font Ids
 #define GFUI_FONT_BIG           0
 #define GFUI_FONT_LARGE         1
 #define GFUI_FONT_MEDIUM        2
@@ -383,6 +384,13 @@ TGFCLIENT_API void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_MEDIUM_C      6
 #define GFUI_FONT_SMALL_C       7
 #define GFUI_FONT_DIGIT         8
+
+TGFCLIENT_API int  GfuiFontHeight(int font);
+TGFCLIENT_API int  GfuiFontWidth(int font, const char* text);
+TGFCLIENT_API void GfuiDrawString(const char* text, float* fgColor,
+								  int font, int x, int y, int align);
+
+/* Labels */
 TGFCLIENT_API int GfuiLabelCreate(void* scr, const char* text,
 								  int font, int x, int y, int align, int maxlen, 
 								  const float* fgColor = 0, const float* fgFocusColor = 0,
@@ -390,16 +398,9 @@ TGFCLIENT_API int GfuiLabelCreate(void* scr, const char* text,
 
 TGFCLIENT_API void GfuiSetTipPosition(int x,int y);
 TGFCLIENT_API int GfuiTipCreate(void* scr, const char* text, int maxlen);
-TGFCLIENT_API int GfuiTitleCreate(void* scr, const char* text, int maxlen);
 
 TGFCLIENT_API void GfuiLabelSetText(void* scr, int id, const char* text);
 TGFCLIENT_API void GfuiLabelSetColor(void* scr, int id, const float*  colorPtr);
-
-TGFCLIENT_API void GfuiPrintString(const char* text, float* fgColor,
-								   int font, int x, int y, int align);
-TGFCLIENT_API int  GfuiFontHeight(int font);
-TGFCLIENT_API int  GfuiFontWidth(int font, const char* text);
-
 
 /* Buttons */
 #define GFUI_BTNSZ      300
@@ -505,7 +506,6 @@ TGFCLIENT_API void GfuiStaticImageSetActive(void* scr, int id, int index);
  * Menu Management Interface *
  *****************************/
 
-TGFCLIENT_API void* GfuiMenuScreenCreate(const char* title);
 TGFCLIENT_API void  GfuiMenuDefaultKeysAdd(void* scr);
 
 /*******************************************

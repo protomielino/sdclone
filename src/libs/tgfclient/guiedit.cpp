@@ -32,7 +32,7 @@
 #include "guifont.h"
 
 void
-gfuiEditboxInit(void)
+gfuiInitEditbox(void)
 {
 }
 
@@ -258,7 +258,7 @@ gfuiDrawEditbox(tGfuiObject *obj)
     
     label = &(editbox->label);
     glColor4fv(fgColor.toFloatRGBA());
-    gfuiPrintString(label->x, label->y, label->font, label->text);
+    gfuiDrawString(label->x, label->y, label->font, label->text);
     
     if ((obj->state != GFUI_DISABLE) && (obj->focus)) {
 	/* draw cursor */

@@ -24,7 +24,7 @@
 
 
 void
-gfuiComboboxInit(void)
+gfuiInitCombobox(void)
 {
 }
 

@@ -241,7 +241,7 @@ void grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
 	char  buf[256];
 	
 	grWriteTimeBuf(buf, sec, sgn);
-	GfuiPrintString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
+	GfuiDrawString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
 }
 
 

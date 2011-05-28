@@ -62,20 +62,21 @@ static const tdble REPEAT2 = 0.2;
 
 
 static void
-gfuiColorInit(void)
+gfuiInitColor(void)
 {
 	void *hdle;
 	int  i, j;
 	const char *rgba[4] = {GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA};
 	
-	const char *clr[GFUI_COLORNB] = {
-		GFSCR_ELT_BGCOLOR, GFSCR_ELT_TITLECOLOR, GFSCR_ELT_BGBTNFOCUS, GFSCR_ELT_BGBTNCLICK,
-		GFSCR_ELT_BGBTNENABLED, GFSCR_ELT_BGBTNDISABLED, GFSCR_ELT_BTNFOCUS, GFSCR_ELT_BTNCLICK,
-		GFSCR_ELT_BTNENABLED, GFSCR_ELT_BTNDISABLED, GFSCR_ELT_LABELCOLOR, GFSCR_ELT_TIPCOLOR,
-		GFSCR_ELT_MOUSECOLOR1, GFSCR_ELT_MOUSECOLOR2, GFSCR_ELT_HELPCOLOR1, GFSCR_ELT_HELPCOLOR2,
+	const char *clr[GFUI_COLORNB] =
+	{
+		GFSCR_ELT_BGCOLOR,
+		GFSCR_ELT_BGBTNFOCUS, GFSCR_ELT_BGBTNCLICK,	GFSCR_ELT_BGBTNENABLED, GFSCR_ELT_BGBTNDISABLED,
+		GFSCR_ELT_BTNFOCUS, GFSCR_ELT_BTNCLICK, GFSCR_ELT_BTNENABLED, GFSCR_ELT_BTNDISABLED,
+		GFSCR_ELT_LABELCOLOR, GFSCR_ELT_TIPCOLOR,
 		GFSCR_ELT_BGSCROLLIST, GFSCR_ELT_SCROLLIST, GFSCR_ELT_BGSELSCROLLIST, GFSCR_ELT_SELSCROLLIST,
-		GFSCR_ELT_EDITCURSORCLR, GFSCR_ELT_LABELCOLORDRIVERCONFIG, GFSCR_ELT_BASECOLORBGIMAGE, GFSCR_ELT_EDITBOXCOLOR,
-		GFSCR_ELt_LABELCOLOROPTIONS, GFSCR_ELT_TABLEHEADER
+		GFSCR_ELT_EDITBOXCOLOR, GFSCR_ELT_EDITCURSORCLR,
+		GFSCR_ELT_BASECOLORBGIMAGE
 	};
 
 	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
@@ -83,7 +84,7 @@ gfuiColorInit(void)
 
 	for (i = 0; i < GFUI_COLORNB; i++) {
 		for (j = 0; j < 4; j++) {
-			sprintf(buf, "%s/%s/%s", GFSCR_SECT_MENUCOL, GFSCR_LIST_COLORS, clr[i]);
+			sprintf(buf, "%s/%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_LIST_COLORS, clr[i]);
 			gfuiColors[i][j] = GfParmGetNum(hdle, buf, rgba[j], (char*)NULL, 1.0);
 		}
 	}
@@ -102,14 +103,17 @@ gfuiColorInit(void)
 void
 gfuiInit(void)
 {
-	gfuiButtonInit();
-	gfuiComboboxInit();
-	gfuiHelpInit();
-	gfuiLabelInit();
-	gfuiObjectInit();
-	gfuiColorInit();
+	gfuiInitObject();
+	gfuiInitColor();
 	gfuiLoadFonts();
-	gfuiMenuInit();
+	gfuiInitButton();
+	gfuiInitCombobox();
+	gfuiInitEditbox();
+	gfuiInitScrollBar();
+	gfuiInitScrollList();
+	gfuiInitLabel();
+	gfuiInitHelp();
+	gfuiInitMenu();
 }
 
 GfuiColor 
@@ -262,8 +266,8 @@ GfuiRedraw(void)
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		glColor3f(gfuiColors[GFUI_BASECOLORBGIMAGE][0], 
-			  gfuiColors[GFUI_BASECOLORBGIMAGE][1],
-			  gfuiColors[GFUI_BASECOLORBGIMAGE][2]);
+				  gfuiColors[GFUI_BASECOLORBGIMAGE][1],
+				  gfuiColors[GFUI_BASECOLORBGIMAGE][2]);
 		glBindTexture(GL_TEXTURE_2D, GfuiScreen->bgImage);
 
 		// Get real 2^N x 2^P texture size (may have been 0 padded at load time
@@ -648,8 +652,6 @@ GfuiScreenCreate(float *bgColor,
 	
 	screen->bgColor = bgColor ? GfuiColor::build(bgColor) : GfuiColor::build(GFUI_BGCOLOR);
 
-	screen->mouseColor[0] = &(gfuiColors[GFUI_MOUSECOLOR1][0]);
-	screen->mouseColor[1] = &(gfuiColors[GFUI_MOUSECOLOR2][0]);
 	screen->onActivate = onActivate;
 	screen->userActData = userDataOnActivate;
 	screen->onDeactivate = onDeactivate;

@@ -635,25 +635,19 @@ RmNetworkHostMenu(void * /* dummy */)
 static void
 ShowWaitingToConnectScreen()
 {
-	tRmInfo* reInfo = LmRaceEngine().inData();
-
 	if (racemanMenuHdle) 
-	{
 		GfuiScreenRelease(racemanMenuHdle);
-	}
+
 	racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback) NULL, 
 									   NULL, (tfuiCallback)NULL,  1);
-	void *params = reInfo->params;
-	const char *str = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_BGIMG, 0);
-	if (str) 
-	{
-		GfuiScreenAddBgImg(racemanMenuHdle, str);
-	}
+
+    void *mparam = GfuiMenuLoad("networkwaitconnectmenu.xml");
+	GfuiMenuCreateStaticControls(racemanMenuHdle, mparam);
 	    
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
 
-	GfuiTitleCreate(racemanMenuHdle, "Trying to Connect to Server...", 30);
 	GfuiScreenActivate(racemanMenuHdle);
+
 	GfuiApp().eventLoop().postRedisplay();
 }
 
@@ -700,6 +694,7 @@ RmNetworkClientMenu(void * /* dummy */)
 	g_catHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"carcatname");
 
 	g_OutlineId = GfuiMenuCreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
+	
 	//Show players
 	for (int i = 0; i < MAXNETWORKPLAYERS; i++) 
 	{
@@ -727,11 +722,12 @@ RmNetworkClientMenu(void * /* dummy */)
 		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "disconnect",
 									NULL,rmNetworkClientDisconnect);
 
-
 	GfParmReleaseHandle(mparam);
 
 	UpdateNetworkPlayers();
+	
 	GfuiScreenActivate(racemanMenuHdle);
+	
 	GfuiApp().eventLoop().setRecomputeCB(ClientIdle);
 }
 

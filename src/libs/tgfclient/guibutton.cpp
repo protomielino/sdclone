@@ -28,7 +28,7 @@
 
 
 void
-gfuiButtonInit(void)
+gfuiInitButton(void)
 {
 
 }
@@ -655,7 +655,7 @@ gfuiDrawButton(tGfuiObject *obj)
 	// Draw the label.
 	tGfuiLabel *label = &(button->label);
 	glColor4fv(fgColor.toFloatRGBA());
-	gfuiPrintString(label->x, label->y, label->font, label->text);
+	gfuiDrawString(label->x, label->y, label->font, label->text);
 }//gfuiDrawButton
 
 

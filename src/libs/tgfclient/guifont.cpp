@@ -242,7 +242,7 @@ int GfuiFontClass::getDescender() const
 }
 
 
-void GfuiFontClass::output(int X, int Y, const char* text)
+void GfuiFontClass::drawString(int X, int Y, const char* text)
 {
 	int		Length, i;
 	GLFONTCHAR	*Char;

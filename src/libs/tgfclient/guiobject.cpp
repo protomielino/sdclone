@@ -24,45 +24,49 @@
 #include "gui.h"
 
 
-static int g_mouseOffsetX = 0;
-static int g_mouseOffsetY = 0;
-static int g_mouseH = 20;
-static int g_mouseW = 20;
-static GLuint g_mouseImage = 0;
+// Mouse cursor graphic properties.
+static int NMouseCursorXOffset = 0;
+static int NMouseCursorYOffset = 0;
+static int NMouseCursorHeight = 20;
+static int NMouseCursorWidth = 20;
+static GLuint NMouseCursorTexture = 0;
+
 
 void
-gfuiObjectInit(void)
+gfuiInitObject(void)
 {
 	//Read mouse pointer settings
-	char buf[1024];
-	void *param;
-
+	char buf[512];
 	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	void *param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	static const char* pszSec = "Mouse Pointer";
-	g_mouseOffsetX = (int)GfParmGetNum(param, pszSec,"offsetX", (char*)NULL, 0.0);
-	g_mouseOffsetY = (int)GfParmGetNum(param, pszSec,"offsetY", (char*)NULL, 0.0);
-	g_mouseH = (int)GfParmGetNum(param, pszSec,"height", (char*)NULL, 20.0);
-	g_mouseW = (int)GfParmGetNum(param, pszSec,"width", (char*)NULL, 20.0);
+	NMouseCursorXOffset =
+		(int)GfParmGetNum(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_XOFFSET, (char*)NULL, 0.0);
+	NMouseCursorYOffset =
+		(int)GfParmGetNum(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_YOFFSET, (char*)NULL, 0.0);
+	NMouseCursorHeight =
+		(int)GfParmGetNum(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_HEIGHT, (char*)NULL, 20.0);
+	NMouseCursorWidth =
+		(int)GfParmGetNum(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_WIDTH, (char*)NULL, 20.0);
 
-	const char* pszImage = GfParmGetStr(param, pszSec, "image", "data/img/mouse.png");
-	g_mouseImage = GfTexReadTexture(pszImage);
+	const char* pszImageFile =
+		GfParmGetStr(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_IMAGEFILE, "data/img/mouse.png");
+	NMouseCursorTexture = GfTexReadTexture(pszImageFile);
 }
 
 void 
-gfuiPrintString(int x, int y, GfuiFontClass *font, const char *string)
+gfuiDrawString(int x, int y, GfuiFontClass *font, const char *string)
 {
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.1) ;
-    font->output(x, y, string);
+    font->drawString(x, y, string);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_TEXTURE_2D);
 }
 
-void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, int align)
+void GfuiDrawString(const char *text, float *fgColor, int font, int x, int y, int align)
 {
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -71,13 +75,13 @@ void GfuiPrintString(const char *text, float *fgColor, int font, int x, int y, i
 	glColor4fv(fgColor);
 	switch(align&0xF0) {
 		case 0x00 /* LEFT */:
-			gfuiFont[font]->output(x, y, text);
+			gfuiFont[font]->drawString(x, y, text);
 			break;
 		case 0x10 /* CENTER */:
-			gfuiFont[font]->output(x - gfuiFont[font]->getWidth(text) / 2, y, text);
+			gfuiFont[font]->drawString(x - gfuiFont[font]->getWidth(text) / 2, y, text);
 			break;
 		case 0x20 /* RIGHT */:
-			gfuiFont[font]->output(x - gfuiFont[font]->getWidth(text), y, text);
+			gfuiFont[font]->drawString(x - gfuiFont[font]->getWidth(text), y, text);
 			break;
 	}
 	glDisable(GL_ALPHA_TEST);
@@ -97,16 +101,13 @@ int GfuiFontWidth(int font, const char *text)
 void
 GfuiDrawCursor()
 {
-    float xf = (float)(GfuiMouse.X);
-    float yf = (float)(GfuiMouse.Y);
-
-	int xmin = g_mouseOffsetX+xf;
-	int ymin = g_mouseOffsetY+yf;
-	int xmax = xmin+g_mouseW;
-	int ymax = ymin-g_mouseH;
-
+	const int xmin = NMouseCursorXOffset + GfuiMouse.X;
+	const int ymin = NMouseCursorYOffset + GfuiMouse.Y;
+	const int xmax = xmin + NMouseCursorWidth;
+	const int ymax = ymin - NMouseCursorHeight;
 
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
 	//set color to mix with image
 	glColor3f(1.0,1.0,1.0);
 
@@ -114,26 +115,25 @@ GfuiDrawCursor()
 	glEnable(GL_TEXTURE_2D);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	
-	glBindTexture(GL_TEXTURE_2D,g_mouseImage);
+	glBindTexture(GL_TEXTURE_2D, NMouseCursorTexture);
 	glBegin(GL_QUADS);
 
-	glTexCoord2f (0.0, 1.0);
+	glTexCoord2f(0.0, 1.0);
 	glVertex2i(xmin, ymin);
 	
-	glTexCoord2f (0.0, 0.0);
+	glTexCoord2f(0.0, 0.0);
 	glVertex2i(xmin, ymax);
 	
-	glTexCoord2f (1.0, 0.0);
+	glTexCoord2f(1.0, 0.0);
 	glVertex2i(xmax, ymax);
 	
-	glTexCoord2f (1.0, 1.0);
+	glTexCoord2f(1.0, 1.0);
 	glVertex2i(xmax, ymin);
 
 	glEnd();
 
 	glDisable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
 }
 
 void

@@ -59,7 +59,7 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 	object->id = screen->curId++;
 
 	image = &(object->u.image);
-	for (int i=0;i<MAX_STATIC_IMAGES;i++)
+	for (int i=0;i<GFUI_MAXSTATICIMAGES;i++)
 		image->texture[i] = 0;
 
 	image->activeimage = 0;
@@ -204,7 +204,7 @@ gfuiReleaseImage(tGfuiObject *obj)
 
 	image = &(obj->u.image);
 
-	for (int i=0;i<MAX_STATIC_IMAGES;i++)
+	for (int i=0;i<GFUI_MAXSTATICIMAGES;i++)
 		GfTexFreeTexture(image->texture[i]);
 
 	free(obj);

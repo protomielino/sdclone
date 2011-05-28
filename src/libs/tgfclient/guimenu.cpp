@@ -34,10 +34,29 @@
 #include "gui.h"
 #include "guimenu.h"
 
+
 void
-gfuiMenuInit(void)
+gfuiInitMenu(void)
 {
 }
+
+static void
+onFocusShowTip(void* cbinfo)
+{
+    GfuiVisibilitySet(((tMenuCallbackInfo*)cbinfo)->screen,
+					  ((tMenuCallbackInfo*)cbinfo)->labelId, GFUI_VISIBLE);
+}
+
+static void
+onFocusLostHideTip(void* cbinfo)
+{
+    GfuiVisibilitySet(((tMenuCallbackInfo*)cbinfo)->screen,
+					  ((tMenuCallbackInfo*)cbinfo)->labelId, GFUI_INVISIBLE);
+}
+
+/***********************************************************************************
+ * Menu XML descriptor management
+*/
 
 /** Add the default menu keyboard callback to a screen.
     The keys are:
@@ -65,44 +84,6 @@ GfuiMenuDefaultKeysAdd(void* scr)
     GfuiAddKey(scr, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 }
 
-/** Create a new menu screen.
-    Set the title of the menu
-    Add the default keyboard callbacks to the menu.
-    @ingroup    gui
-    @param      title   title of the screen
-    @return     Handle of the menu
- */
-void* 
-GfuiMenuScreenCreate(const char* title)
-{
-    void* scr;
-
-    scr = GfuiScreenCreate();
-    GfuiTitleCreate(scr, title, strlen(title));
-
-    GfuiMenuDefaultKeysAdd(scr);
-
-    return scr;
-}
-
-static void
-onFocusShowTip(void* cbinfo)
-{
-    GfuiVisibilitySet(((tMenuCallbackInfo*)cbinfo)->screen,
-					  ((tMenuCallbackInfo*)cbinfo)->labelId, GFUI_VISIBLE);
-}
-
-static void
-onFocusLostHideTip(void* cbinfo)
-{
-    GfuiVisibilitySet(((tMenuCallbackInfo*)cbinfo)->screen,
-					  ((tMenuCallbackInfo*)cbinfo)->labelId, GFUI_INVISIBLE);
-}
-
-/***********************************************************************************
- * Menu XML descriptor management
-*/
-
 // Font size map : Gives the integer size from the size name.
 typedef std::map<std::string, int> TMapFontSize;
 static const TMapFontSize::value_type AMapFontSize[] = 
@@ -122,8 +103,8 @@ static const TMapFontSize::value_type AMapFontSize[] =
 
 static const TMapFontSize MapFontSize(AMapFontSize, AMapFontSize + sizeof(AMapFontSize) / sizeof(TMapFontSize::value_type)); 
 
-static int
-getFontId(const char* pszFontName)
+int
+gfuiMenuGetFontId(const char* pszFontName)
 {
     const TMapFontSize::const_iterator itFontId = MapFontSize.find(pszFontName);
     
@@ -133,7 +114,7 @@ getFontId(const char* pszFontName)
         return GFUI_FONT_MEDIUM; // Default font.
 }
 
-// Alignment map : Gives the integer size from the size name.
+// Alignment map : Gives the integer bit field value from the name.
 typedef std::map<std::string, int> TMapAlign;
 static const TMapAlign::value_type AMapAlign[] = 
 { 
@@ -150,26 +131,7 @@ static const TMapAlign::value_type AMapAlign[] =
 
 static const TMapAlign MapAlign(AMapAlign, AMapAlign + sizeof(AMapAlign) / sizeof(TMapAlign::value_type)); 
 
-static int 
-getAlignment(const char* pszAlH, const char* pszAlV)
-{
-    std::string strAlign(pszAlH);
-    if (!pszAlH || strlen(pszAlH) == 0)
-        strAlign += "left"; // Default horizontal alignment
-    strAlign += '.';
-    strAlign += pszAlV;
-    if (!pszAlV || strlen(pszAlV) == 0)
-        strAlign += "bottom"; // Default bottom alignment
-    
-    const TMapAlign::const_iterator itAlign = MapAlign.find(strAlign);
-    
-    if (itAlign != MapAlign.end())
-        return (*itAlign).second;
-    else
-        return GFUI_ALIGN_HL_VB; // Default alignment.
-}
-
-// Horizontal alignment map : Gives the integer value from the name.
+// Horizontal alignment map : Gives the integer bit field value from the name.
 typedef std::map<std::string, int> TMapHorizAlign;
 static const TMapHorizAlign::value_type AMapHorizAlign[] = 
 { 
@@ -180,15 +142,36 @@ static const TMapHorizAlign::value_type AMapHorizAlign[] =
 
 static const TMapHorizAlign MapHorizAlign(AMapHorizAlign, AMapHorizAlign + sizeof(AMapHorizAlign) / sizeof(TMapHorizAlign::value_type)); 
 
-static int 
-getHAlignment(const char* pszAlignH)
+int 
+gfuiMenuGetAlignment(const char* pszAlH, const char* pszAlV)
 {
-    const TMapHorizAlign::const_iterator itHorizAlign = MapHorizAlign.find(pszAlignH);
+    std::string strAlign(pszAlH);
+    if (strlen(pszAlH) == 0)
+        strAlign += "left"; // Default horizontal alignment
+	
+	if (pszAlV)
+	{
+		strAlign += '.';
+		strAlign += pszAlV;
+		if (!pszAlV || strlen(pszAlV) == 0)
+			strAlign += "bottom"; // Default bottom alignment
     
-    if (itHorizAlign != MapHorizAlign.end())
-        return (*itHorizAlign).second;
-    else
-        return 0; // Default horizontal alignement = left.
+		const TMapAlign::const_iterator itAlign = MapAlign.find(strAlign);
+		
+		if (itAlign != MapAlign.end())
+			return (*itAlign).second;
+		else
+			return GFUI_ALIGN_HL_VB; // Default alignment.
+	}
+	else
+	{
+		const TMapHorizAlign::const_iterator itHorizAlign = MapHorizAlign.find(strAlign);
+    
+		if (itHorizAlign != MapHorizAlign.end())
+			return (*itHorizAlign).second;
+		else
+			return GFUI_ALIGN_HL_VB; // Default horizontal alignement = left.
+	}
 }
 
 // Scrollbar position map : Gives the integer value from the name.
@@ -202,15 +185,35 @@ static const TMapScrollBarPos::value_type AMapScrollBarPos[] =
 
 static const TMapScrollBarPos MapScrollBarPos(AMapScrollBarPos, AMapScrollBarPos + sizeof(AMapScrollBarPos) / sizeof(TMapScrollBarPos::value_type)); 
 
-static int 
-getScrollBarPosition(const char* pszPos)
+int 
+gfuiMenuGetScrollBarPosition(const char* pszSBPos)
 {
-    const TMapScrollBarPos::const_iterator itScrollBarPos = MapScrollBarPos.find(pszPos);
+    const TMapScrollBarPos::const_iterator itScrollBarPos = MapScrollBarPos.find(pszSBPos);
     
     if (itScrollBarPos != MapScrollBarPos.end())
         return (*itScrollBarPos).second;
     else
         return GFUI_SB_NONE; // Default horizontal alignement = left.
+}
+
+bool 
+gfuiMenuGetBoolean(const char* pszValue, bool bDefault)
+{
+	if (pszValue)
+	{
+		if (!strcmp(pszValue, "yes") || !strcmp(pszValue, "true"))
+			return true;
+		else if (!strcmp(pszValue, "no") || !strcmp(pszValue, "false"))
+			return false;
+	}
+
+	return bDefault;
+}
+
+static bool 
+getControlBoolean(void* hparm, const char* pszPath, const char* pszFieldName, bool bDefault)
+{
+	return gfuiMenuGetBoolean(GfParmGetStr(hparm, pszPath, pszFieldName, 0));
 }
 
 static bool
@@ -229,22 +232,6 @@ getControlColor(void* hparm, const char* pszPath, const char* pszField,
 	return true;
 }
 
-
-static bool 
-getControlBoolean(void* hparm, const char* pszPath, const char* pszFieldName, bool bDefault)
-{
-	const char* pszValue = GfParmGetStr(hparm, pszPath, pszFieldName, 0);
-	if (pszValue)
-	{
-		if (!strcmp(pszValue, "yes") || !strcmp(pszValue, "true"))
-			return true;
-		else if (!strcmp(pszValue, "no") || !strcmp(pszValue, "false"))
-			return false;
-	}
-
-	return bDefault;
-}
-
 static int 
 createStaticImage(void* hscr, void* hparm, const char* pszName)
 {
@@ -257,13 +244,13 @@ createStaticImage(void* hscr, void* hparm, const char* pszName)
 
 	const char* pszAlignH = GfParmGetStr(hparm, pszName, "alignH", "");
 	const char* pszAlignV = GfParmGetStr(hparm, pszName, "alignV", "");
-	const int alignment = getAlignment(pszAlignH,pszAlignV);
+	const int alignment = gfuiMenuGetAlignment(pszAlignH,pszAlignV);
 	const bool canDeform = getControlBoolean(hparm, pszName, "canDeform", true);
 
 	int id = GfuiStaticImageCreate(hscr,x,y,w,h,pszImage,alignment,canDeform);
 
 	char pszImageFieldName[32];
-	for (int i=2; i<= MAX_STATIC_IMAGES;i++)
+	for (int i=2; i<= GFUI_MAXSTATICIMAGES;i++)
 	{
 		sprintf(pszImageFieldName, "image%i", i);
 		const char* pszFileName = GfParmGetStr(hparm, pszName, pszImageFieldName, 0);
@@ -318,12 +305,12 @@ createLabel(void* hscr, void* hparm, const char* pszPath,
 		? y : (int)GfParmGetNum(hparm, pszPath, "y", NULL, 0);
 	const int nFontId = 
 		bFromTemplate && font != GFUI_TPL_FONTID
-		? font : getFontId(GfParmGetStr(hparm, pszPath, "font", ""));
+		? font : gfuiMenuGetFontId(GfParmGetStr(hparm, pszPath, "font", ""));
 	const char* pszAlignH = GfParmGetStr(hparm, pszPath, "alignH", "");
 	const char* pszAlignV = GfParmGetStr(hparm, pszPath, "alignV", "");
 	const int nAlign = 
 		bFromTemplate && align != GFUI_TPL_ALIGN
-		? align : getAlignment(pszAlignH, pszAlignV);
+		? align : gfuiMenuGetAlignment(pszAlignH, pszAlignV);
 	int nMaxLen = 
 		bFromTemplate && maxlen != GFUI_TPL_MAXLEN
 		? maxlen : (int)GfParmGetNum(hparm, pszPath, "maxlen", NULL, 0);
@@ -418,13 +405,13 @@ createTextButton(void* hscr, void* hparm, const char* pszPath,
 		nWidth = GFUI_BTNSZ;
 	const int nFontId = 
 		bFromTemplate && font != GFUI_TPL_FONTID
-		? font : getFontId(GfParmGetStr(hparm, pszPath, "font", ""));
+		? font : gfuiMenuGetFontId(GfParmGetStr(hparm, pszPath, "font", ""));
 	const char* pszAlignH = GfParmGetStr(hparm, pszPath, "alignH", "");
 	// TODO: Fix vertical alignement issue (only the default 'bottom' works).
 	//const char* pszAlignV = GfParmGetStr(hparm, pszPath, "alignV", "");
 	const int nAlign = 
 		bFromTemplate && align != GFUI_TPL_ALIGN
-		? align : getHAlignment(pszAlignH); //getAlignment(pszAlignH, pszAlignV);
+		? align : gfuiMenuGetAlignment(pszAlignH); //gfuiMenuGetAlignment(pszAlignH, pszAlignV);
 	
 	GfuiColor color;
 	const float* aColor = 0;
@@ -537,7 +524,7 @@ createImageButton(void* hscr, void* hparm, const char* pszPath,
 	const char* pszAlignV = GfParmGetStr(hparm, pszPath, "alignV", "");
 	const int nAlign = 
 		bFromTemplate && align != GFUI_TPL_ALIGN
-		? align : getAlignment(pszAlignH, pszAlignV);
+		? align : gfuiMenuGetAlignment(pszAlignH, pszAlignV);
 
 	if (strlen(pszTip) > 0)
 	{
@@ -662,7 +649,7 @@ GfuiMenuCreateEditControl(void* hscr, void* hparm, const char* pszName,
 	const int x = (int)GfParmGetNum(hparm,strControlPath.c_str(),"x",NULL,0.0);
 	const int y = (int)GfParmGetNum(hparm,strControlPath.c_str(),"y",NULL,0.0);
 	const char* pszFontName = GfParmGetStr(hparm, strControlPath.c_str(), "font", "");
-	const int font = getFontId(pszFontName);
+	const int font = gfuiMenuGetFontId(pszFontName);
         
 	int width = (int)GfParmGetNum(hparm,strControlPath.c_str(),"width",NULL,0.0);
 	if (width == 0)
@@ -702,11 +689,11 @@ GfuiMenuCreateComboboxControl(void* hscr, void* hparm, const char* pszName,void*
 	const int y = (int)GfParmGetNum(hparm,strControlPath.c_str(),"y",NULL,0.0);
 
 	std::string strFontName = GfParmGetStr(hparm, strControlPath.c_str(), "font", "");
-	const int font = getFontId(strFontName.c_str());
+	const int font = gfuiMenuGetFontId(strFontName.c_str());
 
 	const char*  pszAlignH = GfParmGetStr(hparm, strControlPath.c_str(), "alignH", "");
 	const char*  pszAlignV = GfParmGetStr(hparm, strControlPath.c_str(), "alignV", "");
-	const int align = getAlignment(pszAlignH,pszAlignV);
+	const int align = gfuiMenuGetAlignment(pszAlignH,pszAlignV);
 
 	
 	int width = (int)GfParmGetNum(hparm,strControlPath.c_str(),"width",NULL,0.0);
@@ -768,14 +755,14 @@ GfuiMenuCreateScrollListControl(void* hscr, void* hparm, const char* pszName,voi
 	const int h = (int)GfParmGetNum(hparm,strControlPath.c_str(),"height",NULL,0.0);
         
 	const char* pszFontName = GfParmGetStr(hparm, strControlPath.c_str(), "font", "");
-	const int font = getFontId(pszFontName);
+	const int font = gfuiMenuGetFontId(pszFontName);
 
 	const char* pszAlignH = GfParmGetStr(hparm, pszName, "alignH", "");
 	const char* pszAlignV = GfParmGetStr(hparm, pszName, "alignV", "");
-	const int alignment = getAlignment(pszAlignH,pszAlignV);
+	const int alignment = gfuiMenuGetAlignment(pszAlignH,pszAlignV);
 
 	const char* pszScrollBarPos = GfParmGetStr(hparm,strControlPath.c_str(),"scrollbarposition","none");
-	int scrollbarpos = getScrollBarPosition(pszScrollBarPos);
+	int scrollbarpos = gfuiMenuGetScrollBarPosition(pszScrollBarPos);
 
 	int id = GfuiScrollListCreate(hscr, font,x,y,alignment,w,h,scrollbarpos,userData,onSelect);
 
@@ -812,13 +799,13 @@ GfuiMenuCreateCheckboxControl(void* hscr, void* hparm, const char* pszName,void*
 	y = (int)GfParmGetNum(hparm,strControlPath.c_str(),"y",NULL,0.0);
 
 	std::string strFontName = GfParmGetStr(hparm, strControlPath.c_str(), "font", "");
-	font = getFontId(strFontName.c_str());
+	font = gfuiMenuGetFontId(strFontName.c_str());
 
     const char* pszText = GfParmGetStr(hparm, strControlPath.c_str(), "text", "");
 
 	const char*  pszAlignH = GfParmGetStr(hparm, strControlPath.c_str(), "alignH", "");
 	const char*  pszAlignV = GfParmGetStr(hparm, strControlPath.c_str(), "alignV", "");
-	int align = getAlignment(pszAlignH,pszAlignV);
+	int align = gfuiMenuGetAlignment(pszAlignH,pszAlignV);
 
 	
 	imagewidth = (int)GfParmGetNum(hparm,strControlPath.c_str(),"imagewidth",NULL,0.0);
@@ -885,7 +872,7 @@ GfuiMenuCreateProgressbarControl(void* hscr, void* hparm, const char* pszName)
 	const float min = GfParmGetNum(hparm, strControlPath.c_str(), "min",NULL,0.0);
 	const float max = GfParmGetNum(hparm, strControlPath.c_str(), "max",NULL,100.0);
 	const float value = GfParmGetNum(hparm, strControlPath.c_str(), "value",NULL,100.0);
-	const int alignment = getAlignment(pszAlignH,pszAlignV);
+	const int alignment = gfuiMenuGetAlignment(pszAlignH,pszAlignV);
 	
 	const char* pszTip = GfParmGetStr(hparm, strControlPath.c_str(), "tip", "");
 	

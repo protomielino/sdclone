@@ -28,7 +28,12 @@ typedef struct MenuCallbackInfo
 } tMenuCallbackInfo;
 
 
-extern void gfuiMenuInit(void);
+extern void gfuiInitMenu(void);
+
+extern int gfuiMenuGetFontId(const char* pszFontName);
+extern int gfuiMenuGetAlignment(const char* pszAlH, const char* pszAlV = 0);
+extern int gfuiMenuGetScrollBarPosition(const char* pszSBPos);
+extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 
 #endif /* __MENU__H__ */ 
 

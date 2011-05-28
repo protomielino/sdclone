@@ -16,9 +16,10 @@
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
 
-<params name="Screen" version="1.4">
+<params name="Screen" version="1.5">
 
   <section name="Validated Screen Properties">
+
     <attnum name="window width" val="800"/>
     <attnum name="window height" val="600"/>
     <attnum name="bpp" val="32"/>
@@ -27,51 +28,55 @@
     <attnum name="gamma" val="2"/>
     <attstr name="video mode detect" in="auto,manual" val="auto"/>
     <attstr name="video mode init" in="compatible,best" val="compatible"/>
+
   </section>
 
   <section name="Menu Font">
+
     <attstr name="name" val="liberation-sans-bold.glf"/>
     <attnum name="size big" val="250"/>
     <attnum name="size large" val="230"/>
     <attnum name="size medium" val="180"/>
     <attnum name="size small" val="150"/>
+
   </section>
 
   <section name="Console Font">
+
     <attstr name="name" val="b7.glf"/>
     <attnum name="size big" val="14"/>
     <attnum name="size large" val="10"/>
     <attnum name="size medium" val="6"/>
     <attnum name="size small" val="5"/>
+
   </section>
 
   <section name="Digital Font">
+
     <attstr name="name" val="digital.glf"/>
     <attnum name="size big" val="6"/>
+
   </section>
 
-  <section name="Mouse Pointer">
+  <section name="Mouse Cursor">
+
     <attstr name="image" val="data/img/mouse.png"/>
     <attnum name="offsetX" val="0"/>
     <attnum name="offsetY" val="0"/>
     <attnum name="width" val="16"/>
     <attnum name="height" val="16"/>
+
   </section>
 
-  <section name="Menu Colors">
+  <section name="Menu Settings">
+
     <section name="colors">
+
       <section name="background">
         <attnum name="red" val="0"/>
         <attnum name="green" val="0"/>
         <attnum name="blue" val="0"/>
         <attnum name="alpha" val="0.01"/>
-      </section>
-
-      <section name="title">
-        <attnum name="red" val="1"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
       </section>
 
       <section name="background focused button">
@@ -130,7 +135,21 @@
         <attnum name="alpha" val="1"/>
       </section>
 
-      <section name="background scroll list">
+       <section name="label">
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
+      <section name="tip">
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="0.8"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
+     <section name="background scroll list">
         <attnum name="red" val="0"/>
         <attnum name="green" val="0"/>
         <attnum name="blue" val="0"/>
@@ -158,59 +177,17 @@
         <attnum name="alpha" val="1"/>
       </section>
 
-      <section name="label">
+      <section name="edit box color">
         <attnum name="red" val="1"/>
         <attnum name="green" val="1"/>
         <attnum name="blue" val="1"/>
         <attnum name="alpha" val="1"/>
       </section>
 
-      <section name="tip">
-        <attnum name="red" val="0"/>
-        <attnum name="green" val="0.8"/>
-        <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
-      <section name="mouse 1">
-        <attnum name="red" val="0.4"/>
-        <attnum name="green" val="0.4"/>
-        <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
-      <section name="mouse 2">
-        <attnum name="red" val="0.25"/>
-        <attnum name="green" val="0.59"/>
-        <attnum name="blue" val="0.95"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
-      <section name="help key">
+      <section name="edit box cursor color">
         <attnum name="red" val="1"/>
         <attnum name="green" val="1"/>
         <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
-      <section name="help description">
-        <attnum name="red" val="1"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
-      <section name="driver config label color">
-        <attnum name="red" val="0"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="0"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
-      <section name="label color options">
-        <attnum name="red" val="0"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="0"/>
         <attnum name="alpha" val="1"/>
       </section>
 
@@ -221,30 +198,26 @@
         <attnum name="alpha" val="1"/>
       </section>
 
-      <section name="edit box color">
-        <attnum name="red" val="1"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
-      </section>
+    </section>
 
-      <section name="table header">
-        <attnum name="red" val="0"/>
-        <attnum name="green" val="0.8"/>
-        <attnum name="blue" val="1"/>
-        <attnum name="alpha" val="1"/>
-      </section>
-
+    <section name="tip">
+      <attnum name="x" val="320"/>
+      <attnum name="y" val="15"/>
+      <attnum name="width" val="620"/>
+      <attstr name="align" val="center"/>
+      <attstr name="font" val="small"/>
     </section>
 
   </section>
 
   <section name="OpenGL Selected Features">
+
     <attstr name="texture compression" val="enabled"/>
     <attnum name="max texture size" val="8192"/>
     <attstr name="multi-texturing" val="enabled"/>
     <attstr name="multi-sampling" val="enabled"/>
     <attstr name="multi-sampling samples" val="8"/>
+
   </section>
 
 </params>

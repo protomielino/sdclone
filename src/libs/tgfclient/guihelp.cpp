@@ -42,7 +42,7 @@ static void	*scrHandle;
 
 
 void
-gfuiHelpInit(void)
+gfuiInitHelp(void)
 {
 }
 

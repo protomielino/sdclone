@@ -27,14 +27,33 @@
 #include <cstring>
 
 #include "gui.h"
+#include "guimenu.h"
 
-static int g_tipX = 320;
-static int g_tipY = 15;
+
+static int NTipX = 320;
+static int NTipY = 15;
+static int NTipWidth = 620;
+static int NTipFontId = GFUI_FONT_SMALL;
+static int NTipAlign = GFUI_ALIGN_HC_VB;
 
 
 void
-gfuiLabelInit(void)
+gfuiInitLabel(void)
 {
+	char path[512];
+
+	// Get tip layout properties from the screen config file.
+	sprintf(path, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TIP);
+	NTipX = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_X, 0, 320.0);
+	NTipY = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_Y, 0, 10.0);
+	NTipWidth = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_WIDTH, 0, 640.0);
+	NTipFontId = gfuiMenuGetFontId(GfParmGetStr(hparmScr, path, GFSCR_ATT_FONT, "small"));
+	NTipAlign = gfuiMenuGetAlignment(GfParmGetStr(hparmScr, path, GFSCR_ATT_ALIGN, "center"));
+
+	GfParmReleaseHandle(hparmScr);
 }
 
 /** Initialize a label
@@ -255,14 +274,6 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
     return object->id;
 }
 
-// TODO: Move this to gfuiscreen and generalize tip management at the gfuiobject level !
-void
-GfuiSetTipPosition(int x,int y)
-{
-	g_tipX = x;
-	g_tipY = y;
-}
-
 /** Add a Tip (generally associated with a button).
     @param	scr	Screen where to add the label
     @param	text	Text of the label
@@ -273,24 +284,8 @@ GfuiSetTipPosition(int x,int y)
 int
 GfuiTipCreate(void *scr, const char *text, int maxlen)
 {
-    return GfuiLabelCreate(scr, text, GFUI_FONT_SMALL, g_tipX, g_tipY,
-						   GFUI_ALIGN_HC_VB, maxlen, &(gfuiColors[GFUI_TIPCOLOR][0]));
-}
-
-/** Add a Title to the screen.
-    @ingroup	gui
-    @param	scr	Screen where to add the label
-    @param	text	Text of the title
-    @param	maxlen	Maximum length of the button string (used when the label is changed)
-    			<br>0 for the text length.
-    @return	label Id
-    @see	GfuiSetLabelText
- */
-int
-GfuiTitleCreate(void *scr, const char *text, int maxlen)
-{
-    return GfuiLabelCreate(scr, text, GFUI_FONT_BIG, 320, 440,
-						   GFUI_ALIGN_HC_VB, maxlen, &(gfuiColors[GFUI_TITLECOLOR][0]));
+    return GfuiLabelCreate(scr, text, NTipFontId, NTipX, NTipY,
+						   NTipAlign, maxlen, gfuiColors[GFUI_TIPCOLOR]);
 }
 
 /** Change the text of a label.
@@ -401,7 +396,7 @@ gfuiLabelDraw(tGfuiLabel *label, int focus)
 {
 	// Draw the text, according to the state/focus.
     glColor4fv(focus ? label->fgFocusColor.toFloatRGBA() : label->fgColor.toFloatRGBA());
-    gfuiPrintString(label->x, label->y, label->font, label->text);
+    gfuiDrawString(label->x, label->y, label->font, label->text);
 }
 
 /** Actually draw the given label object.

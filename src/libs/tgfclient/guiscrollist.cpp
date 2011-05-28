@@ -34,7 +34,7 @@
 
 
 void
-gfuiScrListInit(void)
+gfuiInitScrollList(void)
 {
 }
 
@@ -736,7 +736,7 @@ gfuiDrawScrollist(tGfuiObject *obj)
 				break;
 			}
 			y -= h;
-			gfuiPrintString(x+5, y, scrollist->font, elt->label);
+			gfuiDrawString(x+5, y, scrollist->font, elt->label);
 		} while (elt != scrollist->elts);
 	}
 

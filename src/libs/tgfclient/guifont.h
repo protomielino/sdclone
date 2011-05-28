@@ -49,7 +49,7 @@ public:
 
   void create(int point_size);
 
-  void output(int x, int y, const char* text);
+  void drawString(int x, int y, const char* text);
 
   int getWidth(const char* text);
   int getHeight() const;
