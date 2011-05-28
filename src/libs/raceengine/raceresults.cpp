@@ -313,7 +313,11 @@ ReStoreRaceResults(const char *race)
 				car = s->cars[0];
 				sprintf(path, "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, race);
 				GfParmSetStr(results, path, RM_ATTR_DRVNAME, car->_name);
-				GfParmSetStr(results, path, RE_ATTR_CAR, car->_carName);
+				sprintf(buf, "cars/%s/%s.xml", car->_carName, car->_carName);
+				carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
+				carName = GfParmGetName(carparam);
+				GfParmSetStr(results, path, RE_ATTR_CAR, carName);
+				GfParmReleaseHandle(carparam);
 				break;
 			}
 			/* Otherwise, fall through */

@@ -26,6 +26,7 @@
 
 #include <portability.h>
 #include <tgfclient.h>
+#include <drivers.h>
 
 #include "racescreens.h"
 
@@ -68,20 +69,6 @@ rmChgPracticeScreen(void *vprc)
     GfuiScreenRelease(prevScr);
 }
 
-void rmGetDriverType(const char* moduleName, char* driverType, size_t maxSize)
-{
-    char* pos;
-
-    strncpy(driverType, moduleName, maxSize);
-    driverType[maxSize-1] = 0; // Ensure 0 termination
-
-    // Parse module name for last '_' char : 
-    // assumed to be the separator between type and instance name for ubiquitous robots (ex: simplix)
-    pos = strrchr(driverType, '_');
-    if (pos)
-		*pos = 0;
-}
-
 static void
 rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 {
@@ -106,7 +93,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title labels.
-    snprintf(buf, sizeof(buf), "Practice Results on %s", info->track->name);
+    snprintf(buf, sizeof(buf), "Practice Results at %s", info->track->name);
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
     GfuiLabelSetText(rmScrHdle, titleId, buf);
  
@@ -114,7 +101,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     snprintf(buf, sizeof(buf), "%s (%s)", GfParmGetStr(results, path, RM_ATTR_DRVNAME, NULL),
 			 GfParmGetStr(results, path, RM_ATTR_CAR, NULL));
 
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "PlayerTitle");
+    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
     GfuiLabelSetText(rmScrHdle, subTitleId, buf);
  
 	// Get layout properties.
@@ -140,13 +127,13 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 								   buf, GFUI_TPL_X, y);
 
 		/* Time */
-		str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), "  ", false, 2);;
+		str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0), "  ", false, 3);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "LapTime", true, // From template.
 								   str, GFUI_TPL_X, y);
 		free(str);
 
 		/* Best Lap Time */
-		str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 2);;
+		str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 3);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "BestTime", true, // From template.
 								   str, GFUI_TPL_X, y);
 		free(str);
@@ -232,7 +219,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 
     // Create variable title label.
     sprintf(buf, "%s", info->track->name);
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "RaceTitle");
+    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
     GfuiLabelSetText(rmScrHdle, subTitleId, buf);
   
 	// Get layout properties.
@@ -283,9 +270,9 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
 
         //Driver type
-        rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
+        const std::string strModName = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverType", true, // From template.
-								   buf, GFUI_TPL_X, y);
+								   GfDriver::getType(strModName).c_str(), GFUI_TPL_X, y);
 
         //Car
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "CarModel", true, // From template.
@@ -391,7 +378,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 
     // Create variable title label.
     sprintf(buf, "%s", info->track->name);
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "RaceTitle");
+    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
     GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 	// Get layout properties.
@@ -423,9 +410,9 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
 
         //Driver type
-        rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
+        const std::string strModName = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverType", true, // From template.
-								   buf, GFUI_TPL_X, y);
+								   GfDriver::getType(strModName).c_str(), GFUI_TPL_X, y);
 
         //Car
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "CarModel", true, // From template.
@@ -512,8 +499,8 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
     // Create variable title label.
 	//Set title
 	sprintf(buf, "%s Standings", info->_reRaceName);
-	const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "RaceTitle");
-	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
+	const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
+	GfuiLabelSetText(rmScrHdle, titleId, buf);
 
 	// Get layout properties.
     const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 15);
@@ -536,9 +523,9 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 								   GfParmGetStr(results, path, RE_ATTR_NAME, ""), GFUI_TPL_X, y);
 
         //Driver type
-        rmGetDriverType(GfParmGetStr(results, path, RE_ATTR_MODULE, ""), buf, sizeof(buf));
+        const std::string strModName = GfParmGetStr(results, path, RE_ATTR_MODULE, "");
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverType", true, // From template.
-								   buf, GFUI_TPL_X, y);
+								   GfDriver::getType(strModName).c_str(), GFUI_TPL_X, y);
 
         //Car
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "CarModel", true, // From template.

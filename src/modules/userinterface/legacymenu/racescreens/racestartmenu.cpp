@@ -27,6 +27,7 @@
 
 #include <tgfclient.h>
 #include <robot.h>
+#include <drivers.h> // GfDriver::getType
 
 #include "legacymenu.h"
 #include "racescreens.h"
@@ -71,8 +72,6 @@ rmStartRaceHookInit(void)
 }
 
 // The menu itself ******************************************************
-static const int NMaxLines = 20;
-
 typedef struct 
 {
     void        *startScr;
@@ -99,144 +98,148 @@ rmChgStartScreen(void *vpsrc)
 void
 rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 {
-    static char path[1024];
-    int         nCars;
-    int         i;
-    int         y;
-    int         x, dx;
-    int         rows, curRow;
-    const char  *img;
-    const char  *name;
-    int         robotIdx;
-    int         extended;
-    void        *robhdle;
-    void        *carHdle;
-    const char  *carName;
+    static char path[512];
+    static char buf[64];
     void        *params = info->params;
-    const char  *race = info->_reRaceName;
+    const char  *raceName = info->_reRaceName;
     
 	GfLogTrace("Entering Start Race menu\n");
 	
     // Create screen, load menu XML descriptor and create static controls.
     rmScrHdle = GfuiScreenCreate();
-
-    void *menuXMLDescHdle = GfuiMenuLoad("startracemenu.xml");
-
-    GfuiMenuCreateStaticControls(rmScrHdle, menuXMLDescHdle);
+    void *hmenu = GfuiMenuLoad("startracemenu.xml");
+    GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title label.
-    int titleId = GfuiMenuCreateLabelControl(rmScrHdle, menuXMLDescHdle, "titlelabel");
-    GfuiLabelSetText(rmScrHdle, titleId, race);
+    int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TitleLabel");
+    GfuiLabelSetText(rmScrHdle, titleId, raceName);
 
     // Create background image if any.
-    img = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_STARTIMG, 0);
-    if (img) {
+    const char* img = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_STARTIMG, 0);
+    if (img)
         GfuiScreenAddBgImg(rmScrHdle, img);
-    }
         
     // Create starting grid labels if specified in race params.
-    if (!strcmp(GfParmGetStr(params, race, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES)) {
-
+    if (!strcmp(GfParmGetStr(params, raceName, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES))
+	{
         // Create starting grid subtitle label.
-        GfuiMenuCreateLabelControl(rmScrHdle, menuXMLDescHdle, "subtitlelabel");
+        GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitleLabel");
 
-        sprintf(path, "%s/%s", race, RM_SECT_STARTINGGRID);
-        rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
-                
+		// Get layout properties.
+		const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxLines", 15);
+		const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
+		const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
+
         // Create drivers info table.
-        dx = 0;
-        x = 40;
-        y = 400;
-        curRow = 0;
-        nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
-                
-        for (i = start; i < MIN(start + NMaxLines, nCars); i++)
+//         snprintf(path, sizeof(path), "%s/%s", raceName, RM_SECT_STARTINGGRID);
+//         const int rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
+        const int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
+        int y = yTopLine;
+		int i = start;
+        for (; i < MIN(start + nMaxLines, nCars); i++)
 		{
             /* Find starting driver's name */
-            sprintf(path, "%s/%d", RM_SECT_DRIVERS_RACING, i + 1);
-            name = GfParmGetStr(info->params, path, RM_ATTR_MODULE, "");
-            robotIdx = (int)GfParmGetNum(info->params, path, RM_ATTR_IDX, NULL, 0);
-            extended = GfParmGetNum(info->params, path, RM_ATTR_EXTENDED, NULL, 0);
-            carName = NULL;
-            robhdle = NULL;
-
-            if( extended )
-            {
-                sprintf(path, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, name, extended, robotIdx);
-                carName = GfParmGetStr(info->params, path, RM_ATTR_CARNAME, NULL);
-            }
-            else
-            {
-                sprintf(path, "%sdrivers/%s/%s.xml", GfLocalDir(), name, name);
-                robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
-                if (!robhdle)
-				{
-                    sprintf(path, "drivers/%s/%s.xml", name, name);
-                    robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
-                }
+            snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i + 1);
+            const char* modName = GfParmGetStr(info->params, path, RM_ATTR_MODULE, "");
+            const int robotIdx = (int)GfParmGetNum(info->params, path, RM_ATTR_IDX, NULL, 0);
+            const int extended = (int)GfParmGetNum(info->params, path, RM_ATTR_EXTENDED, NULL, 0);
+			
+            void* robhdle = 0;
+			snprintf(path, sizeof(path), "%sdrivers/%s/%s.xml", GfLocalDir(), modName, modName);
+			robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
+			if (!robhdle)
+			{
+				snprintf(path, sizeof(path), "drivers/%s/%s.xml", modName, modName);
+				robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
+			}
   
-                if (robhdle)
-				{
-                    sprintf(path, "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-                    name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<none>");
-                    carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "");
-                }
-            }
-
-            if( carName )
+            const char* name = modName;
+			if (robhdle)
+			{
+				snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
+				name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<not found>");
+			}
+			
+            const char* carName = 0;
+			if (extended)
+			{
+				snprintf(path, sizeof(path), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, modName, extended, robotIdx);
+				carName = GfParmGetStr(info->params, path, RM_ATTR_CARNAME, "<not found>");
+			}
+			else if (robhdle)
+			{
+				carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "<not found>");
+			}
+			
+			void* carHdle = 0;
+            if (carName)
             {
-                sprintf(path, "cars/%s/%s.xml", carName, carName);
+                snprintf(path, sizeof(path), "cars/%s/%s.xml", carName, carName);
                 carHdle = GfParmReadFile(path, GFPARM_RMODE_STD);
                 carName = GfParmGetName(carHdle);
-                        
-                sprintf(path, "%d - %s - (%s)", i + 1, name, carName);
-                GfuiLabelCreate(rmScrHdle, path, GFUI_FONT_MEDIUM_C,
-                                x + curRow * dx, y, GFUI_ALIGN_HL_VB, 0);
+			}
+			
+			//Rank
+			snprintf(buf, sizeof(buf), "%d", i+1);
+			GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
+									   buf, GFUI_TPL_X, y);
+			
+			//Driver name
+			GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverName", true, // From template.
+									   name, GFUI_TPL_X, y);
+			
+			//Driver type
+			GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverType", true, // From template.
+									   GfDriver::getType(modName).c_str(), GFUI_TPL_X, y);
+			
+			//Car model
+			GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "CarModel", true, // From template.
+									   carName ? carName : "<not found>", GFUI_TPL_X, y);
 
-                GfParmReleaseHandle(carHdle);
-            }
+            y -= yLineShift;
 
-            curRow = (curRow + 1) % rows;
-            y -= 15;
-
-			// Release robhdle only when no more need for read strings (like carname).
+			// Release params handles only when no more need for read strings (like carname).
+			if (carHdle)
+				GfParmReleaseHandle(carHdle);
 			if (robhdle)
 				GfParmReleaseHandle(robhdle);
         }
                 
-        if (start > 0) {
+        if (start > 0)
+		{
             prevStartRace.startScr = startScr;
             prevStartRace.abortScr = abortScr;
             prevStartRace.info     = info;
-            prevStartRace.start    = start - NMaxLines;
+            prevStartRace.start    = start - nMaxLines;
 
             // Create Previous page button and associated keyboard shortcut if needed.
-            GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "previouspagearrow",
-                                (void*)&prevStartRace, rmChgStartScreen);
+            GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "PreviousPageArrow",
+										(void*)&prevStartRace, rmChgStartScreen);
             GfuiAddKey(rmScrHdle, GFUIK_PAGEUP, "Previous drivers", 
-                        (void*)&prevStartRace, rmChgStartScreen, NULL);
+					   (void*)&prevStartRace, rmChgStartScreen, NULL);
         }
                 
-        if (i < nCars) {
+        if (i < nCars)
+		{
             nextStartRace.startScr = startScr;
             nextStartRace.abortScr = abortScr;
             nextStartRace.info     = info;
-            nextStartRace.start    = start + NMaxLines;
+            nextStartRace.start    = start + nMaxLines;
 
             // Create Next page button and associated keyboard shortcut if needed.
-            GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "nextpagearrow",
-                                (void*)&nextStartRace, rmChgStartScreen);
+            GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "NextPageArrow",
+										(void*)&nextStartRace, rmChgStartScreen);
             GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Drivers", 
-                        (void*)&nextStartRace, rmChgStartScreen, NULL);
+					   (void*)&nextStartRace, rmChgStartScreen, NULL);
         }
     }
         
     // Create Start and Abandon buttons.
-    GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "startbutton", startScr, GfuiScreenReplace);
-    GfuiMenuCreateButtonControl(rmScrHdle, menuXMLDescHdle, "abandonbutton", abortScr, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "StartButton", startScr, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "AbandonButton", abortScr, GfuiScreenReplace);
 
     // Close menu XML descriptor.
-    GfParmReleaseHandle(menuXMLDescHdle);
+    GfParmReleaseHandle(hmenu);
     
     // Register keyboard shortcuts.
     GfuiAddKey(rmScrHdle, GFUIK_RETURN, "Start", startScr, GfuiScreenReplace, NULL);

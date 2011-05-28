@@ -466,11 +466,7 @@ RmHookInit()
 /**************************************************************************
  * Result only screen (blind mode)
  */
-static const int NMaxResultLines = 21;
-
-static float	white[4]   = {1.0, 1.0, 1.0, 1.0};
-static float	red[4]     = {1.0, 0.0, 0.0, 1.0};
-static float	*rmColor[] = {white, red};
+static float rmColors[2][4]; // Initialized at menu-load time (2 RGBA float color arrays).
 
 static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
 
@@ -478,10 +474,10 @@ static void	*rmResScreenHdle = 0;
 
 static int	rmResMainTitleId;
 static int	rmResTitleId;
-static int*	rmResMsgId = 0;
+static int*	rmResMsgId = 0; // Initialized at menu-load time.
 
-static int*	rmResMsgClr = 0;
-static char** rmResMsg = 0;
+static int*	rmResMsgClr = 0; // Initialized at menu-load time.
+static char** rmResMsg = 0; // Initialized at menu-load time.
 
 static int	rmCurLine;
 
@@ -585,9 +581,15 @@ RmResScreenInit()
 	// Allocate line info arrays once and for all, if not already done.
 	if (!rmResMsgId)
 	{
-		// Load nMaxResultLines only the first time (ignore any later change,
+		// Load nMaxResultLines/colors only the first time (ignore any later change,
 		// otherwize, we'd have to realloc the line info arrays).
 		rmNMaxResLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 20);
+		const GfuiColor cNormal =
+			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "lineColorNormal", "0x0000FF"));
+		const GfuiColor cHighlighted =
+			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "lineColorHighlighted", "0x00FF00"));
+		memcpy(rmColors[0], cNormal.toFloatRGBA(), sizeof(rmColors[0]));
+		memcpy(rmColors[1], cHighlighted.toFloatRGBA(), sizeof(rmColors[0]));
 		
 		rmResMsgId = (int*)calloc(rmNMaxResLines, sizeof(int));
 		rmResMsg = (char**)calloc(rmNMaxResLines, sizeof(char*));
@@ -683,7 +685,7 @@ RmResScreenSetText(const char *text, int line, int clr)
 		rmResMsg[line] = strdup(text);
 		rmResMsgClr[line] = (clr >= 0 && clr < 2) ? clr : 0;
 		GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], rmResMsg[line]);
-		GfuiLabelSetColor(rmResScreenHdle, rmResMsgId[line], rmColor[rmResMsgClr[line]]);
+		GfuiLabelSetColor(rmResScreenHdle, rmResMsgId[line], rmColors[rmResMsgClr[line]]);
 
 		// The menu changed.
 		rmbResMenuChanged = true;

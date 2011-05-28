@@ -434,19 +434,26 @@ const GfDriverSkin& GfDriver::getSkin() const
 	return _skin;
 }
 
+std::string GfDriver::getType(const std::string& strModName)
+{
+	std::string strType;
+	
+	// Parse module name for last '_' char : assumed to be the separator between type
+	// and instance name for ubiquitous robots (ex: simplix)
+	const size_t nTruncPos = strModName.rfind('_');
+	if (nTruncPos == std::string::npos)
+		strType = strModName; // Copy.
+	else
+		strType = strModName.substr(0, nTruncPos); // Copy + truncate.
+
+	return strType;
+}
+
 const std::string& GfDriver::getType() const
 {
 	if (_strType.empty())
-	{
-		// Parse module name for last '_' char : assumed to be the separator between type
-		// and instance name for ubiquitous robots (ex: simplix)
-		size_t nTruncPos = _strModName.rfind('_');
-		if (nTruncPos == std::string::npos)
-			_strType = _strModName; // Copy.
-		else
-			_strType = _strModName.substr(0, nTruncPos); // Copy + truncate.
-	}
-
+		_strType = getType(_strModName);
+	
 	return _strType;
 	
 }

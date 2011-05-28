@@ -85,6 +85,9 @@ public:
 	void setCar(const GfCar* pCar);
 	void setSkin(const GfDriverSkin& skin);
 
+	//! Compute a driver type from a driver module name.
+	static std::string getType(const std::string& strModName);
+
 	//! Get the possible skins using the same search path as the graphics engine.
 	std::vector<GfDriverSkin> getPossibleSkins(const std::string& strAltCarId = "") const;
 
