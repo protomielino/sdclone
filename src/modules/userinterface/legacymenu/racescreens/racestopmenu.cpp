@@ -172,14 +172,14 @@ rmStopRaceScreen(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 		ypos -= dy;
     }
 
-    // Close menu XML descriptor.
-    GfParmReleaseHandle(hmenu);
-    
     // Register keyboard shortcuts.
     GfuiMenuDefaultKeysAdd(hscreen);
     GfuiAddKey(hscreen, GFUIK_ESCAPE, pszCancelTip,
 			   aButtons[nCancelIndex].screen, GfuiScreenActivate, NULL);
 
+    // Close menu XML descriptor.
+    GfParmReleaseHandle(hmenu);
+    
     // Activate the created screen.
     GfuiScreenActivate(hscreen);
 
