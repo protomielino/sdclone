@@ -193,7 +193,7 @@ ReNetworkWaitReady()
 	{
 		GetClient()->SendReadyToStartPacket();
 		ReInfo->s->currentTime = GetClient()->WaitForRaceStart();
-		GfLogInfo("Client beginning race in %lf seconds!\n", ReInfo->s->currentTime);
+		GfLogInfo("Client beginning race in %lf seconds!\n", - ReInfo->s->currentTime);
 		bWaitFinished = true;
 	}
 	
@@ -202,7 +202,7 @@ ReNetworkWaitReady()
 		if (GetServer()->ClientsReadyToRace())
 		{
 			ReInfo->s->currentTime = GetServer()->WaitForRaceStart();
-			GfLogInfo("Server beginning race in %lf seconds!\n", ReInfo->s->currentTime);
+			GfLogInfo("Server beginning race in %lf seconds!\n", - ReInfo->s->currentTime);
 			bWaitFinished = true;
 		}
 	}

@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Online Race" version="1.19">
+<params name="Online Race" version="1.20">
 
     <section name="Header">
       <attstr name="name" val="Online Race"/>
@@ -42,7 +42,7 @@
     </section>
 
     <section name="Online Race">
-      <attnum name="distance" val="0"/>
+      <attnum name="laps" val="10"/>
       <attstr name="type" val="race"/>
       <attstr name="starting order" val="drivers list"/>
       <attstr name="restart" val="yes"/>

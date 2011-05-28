@@ -218,7 +218,7 @@ UpdateNetworkPlayers()
 	sprintf(buf, "%s", strTrackName.c_str());
 	GfuiLabelSetText(racemanMenuHdle,g_trackHd,buf);
 	
-	int laps = (int)GfParmGetNum(reInfo->params, reInfo->_reName,"laps", "",0);
+	int laps = (int)GfParmGetNum(reInfo->params, reInfo->_reName,"laps", "", 1);
 	sprintf(buf, "%i", laps);
 	GfuiLabelSetText(racemanMenuHdle,g_lapsHd,buf);
 
@@ -506,9 +506,7 @@ OnActivateNetworkHost(void *)
 
 	MutexData *pNData = GetNetwork()->LockNetworkData();
 	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
-	{
 		pNData->m_vecReadyStatus[i] = false;
-	};
 
 	GetNetwork()->UnlockNetworkData();
 
@@ -557,6 +555,8 @@ rmNetworkHostSettingsMenu(void *pMenu)
 void
 RmNetworkHostMenu(void * /* dummy */)
 {
+	GfLogTrace("Entering Network Host menu.\n");
+	
 	if (!GetNetwork())
 	{
 		SetServer(true);
@@ -588,6 +588,7 @@ RmNetworkHostMenu(void * /* dummy */)
 	g_catHd = GfuiMenuCreateLabelControl(racemanMenuHdle,mparam,"carcatname");
     
 	g_OutlineId = GfuiMenuCreateStaticImageControl(racemanMenuHdle,mparam,"outlineimage");
+	
 	//Show players
     for (int i = 0; i < MAXNETWORKPLAYERS; i++) 
 	{
@@ -635,6 +636,8 @@ RmNetworkHostMenu(void * /* dummy */)
 static void
 ShowWaitingToConnectScreen()
 {
+	GfLogTrace("Entering Network Wait Connection menu.\n");
+	
 	if (racemanMenuHdle) 
 		GfuiScreenRelease(racemanMenuHdle);
 
@@ -654,6 +657,8 @@ ShowWaitingToConnectScreen()
 void
 RmNetworkClientMenu(void * /* dummy */)
 {
+	GfLogTrace("Entering Network Client menu.\n");
+	
 	ShowWaitingToConnectScreen();
 	
 	if (!GetClient())
@@ -777,6 +782,8 @@ LookupPlayerSetup(std::string & strDriver,std::string & strCar)
 static void
 NetworkClientConnectMenu(void * /* dummy */)
 {
+	GfLogTrace("Entering Network Client Connect menu.\n");
+	
 	tRmInfo* reInfo = LmRaceEngine().inData();
 
 	LookupPlayerSetup(g_strDriver,g_strCar);
@@ -817,6 +824,8 @@ NetworkClientConnectMenu(void * /* dummy */)
 void
 RmNetworkMenu(void *)
 {
+	GfLogTrace("Entering Network menu.\n");
+	
  	tRmInfo* reInfo = LmRaceEngine().inData();
 	void *params = reInfo->params;
 

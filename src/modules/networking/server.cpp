@@ -241,7 +241,7 @@ void Server::GenerateDriversForXML()
 
 	void *params = GfParmReadFileLocal(m_strRaceXMLFile.c_str(),GFPARM_RMODE_STD);
 	assert(params);
-
+	
 	const char *pName =GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 
     int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
@@ -252,11 +252,8 @@ void Server::GenerateDriversForXML()
 	{
 		Driver driver;
 		ReadDriverData(driver,i,params);
-		if ((strcmp(driver.module,NETWORKROBOT)!=0)
-			&&(strcmp(driver.module,HUMANROBOT)!=0))
-		{
+		if (strcmp(driver.module,NETWORKROBOT)	&& strcmp(driver.module,HUMANROBOT))
 			vecRDrivers.push_back(driver);
-		}
 	}
 
 	//Recreate drivers section robots first
@@ -955,7 +952,7 @@ void Server::SendFinishTimePacket()
 	double time = pNData->m_finishTime;
 	UnlockNetworkData();
 
-	GfLogInfo("Server finish time is %lf",time);
+	GfLogInfo("Server finish time is %lf\n",time);
 
 	memcpy(pData,&time,sizeof(time));
 	pData+=sizeof(time);
