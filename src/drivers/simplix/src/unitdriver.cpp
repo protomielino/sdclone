@@ -12,7 +12,7 @@
 // Last changed : 2011.05.26
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.001
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -806,7 +806,7 @@ void TDriver::AdjustPitting(PCarHandle Handle)
 
   oTestPitStop = (int)
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_TEST_STOP,0,0);
-  //GfOut("#TestPitStop %d\n",oTestPitStop);
+  GfOut("#TestPitStop %d\n",oTestPitStop);
   // ... Adjust pitting
 };
 //==========================================================================*
@@ -1387,6 +1387,13 @@ void TDriver::Drive()
   //else
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
   //GfOut("v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv);
+/*
+  const int N = oTrackDesc.Count();
+  int Idx = oTrackDesc.IndexFromPos(Pos);
+  double TrackTurnangle1 = oRacingLine[0].CalcTrackTurnangle((Idx + N - 30) % N, Idx);
+  double TrackTurnangle2 = oRacingLine[0].CalcTrackTurnangle(Idx, (Idx + 30) % N);
+  GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2);
+*/
 }
 //==========================================================================*
 
@@ -1620,7 +1627,7 @@ void TDriver::FindRacinglines()
       {                                          // using car parameters
 	    //GfOut("# ... adjust pit path %d ...\n",I);
         oStrategy->oPit->oPitLane[I].MakePath
-	      (oPitLoad[I],&oRacingLine[I], Param, I);
+	      (oPitLoad[I],oStrategy,&oRacingLine[I], Param, I);
 
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
@@ -1628,7 +1635,7 @@ void TDriver::FindRacinglines()
 	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
 	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
 	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
-	  oStrategy->oDistToSwitch = MaxPitDist + 100; // Distance to pit entry
+	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
 	}
   }
 
@@ -1685,7 +1692,8 @@ void TDriver::InitCarModells()
   Param.Fix.oWidth = CarWidth;                   // width of car
   Param.oCarParam2 = Param.oCarParam;            // Copy to avoid set
   Param.oCarParam2.oScaleMu =                    // Adjust mu scale to
-	MIN(0.95, 0.9 * Param.oCarParam.oScaleMu);   //   be able to avoid
+//	MIN(0.95, 0.9 * Param.oCarParam.oScaleMu);   //   be able to avoid
+	MIN(0.5, 0.9 * Param.oCarParam.oScaleMu);    //   be able to avoid
   Param.oCarParam3 = Param.oCarParam;            // Copy to pit set
 }
 //==========================================================================*
@@ -2383,13 +2391,21 @@ void TDriver::GearTronic()
 //--------------------------------------------------------------------------*
 void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 {
+/*
+  if (oStrategy->GoToPit()) 
+    GfOut("*");
+  else if (oStrategy->oPit->oPitLane[Path].ContainsPos(Pos)) 
+	GfOut("#");
+  else
+    GfOut("O");
+*/
   if (oStrategy->oPit != NULL 
 	&& oStrategy->oPit->HasPits()
 	&& !oStrategy->oWasInPit
 	&& oStrategy->GoToPit() 
 	&& oStrategy->oPit->oPitLane[Path].ContainsPos(Pos))
   {
-    //GfOut("#+");
+    //GfOut("+");
     oStrategy->oPit->oPitLane[Path].GetLanePoint(Pos, LanePoint);
 	oLookScale = 0.05;
 	oOmegaScale = 0.2;
@@ -2402,7 +2418,7 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
 	&& oStrategy->oWasInPit
 	&& oStrategy->oPit->oPitLane[Path].ContainsPos(Pos))
   {
-    //GfOut("#-");
+    //GfOut("-");
     oStrategy->oPit->oPitLane[Path].GetLanePoint(Pos, LanePoint);
 	oLookScale = 0.02;
 	oOmegaScale = 0.2;
@@ -2412,7 +2428,7 @@ void TDriver::GetLanePoint(int Path, double Pos, TLanePoint& LanePoint)
   }
   else
   {
-    //GfOut("#*");
+    //GfOut("=");
     oRacingLine[Path].GetLanePoint(Pos, LanePoint);
 	oLookScale = oLookAheadFactor;
 	oOmegaScale = oOmegaAheadFactor;
@@ -3183,6 +3199,10 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   Target = RunAround.AvoidTo                     // Which way we should take
     (Coll,oCar,*this,oDoAvoid);                  //   depending on opponents
 
+  float ExitOffset = float
+	(oStrategy->oPit->oDistToPitEnd 
+	+ Param.Pit.oExitLength);
+
   if (oStrategy->StartPitEntry(Ratio))           // If entrering pit
   {
 	if (!oDoAvoid)                               // If no avoiding needed
@@ -3191,7 +3211,7 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
 	  oDoAvoid = true;                           // side to make pit stop
 	}
   }
-  else if (oStrategy->StopPitEntry(Param.Pit.oExitLength)) // back to track
+  else if (oStrategy->StopPitEntry(ExitOffset))  // back to track
   {
 	if (!oDoAvoid)                                // If no avoiding needed
 	{
@@ -3244,8 +3264,8 @@ double TDriver::FilterStart(double Speed)
   }
 
   // For unknown tracks do not limit speed to much
-  if(!oStrategy->GoToPit() && (Speed < 12.0))
-    Speed = 12.0;
+  if(!oStrategy->GoToPit() && (Speed < 10.0))
+    Speed = 10.0;
 
   return Speed;
 }
@@ -3730,7 +3750,7 @@ double TDriver::CalcCrv_simplix_SC(double Crv)
     return 1.0;
 }
 //==========================================================================*
-
+/*
 //==========================================================================*
 // simplix_36GP
 //--------------------------------------------------------------------------*
@@ -3744,13 +3764,25 @@ double TDriver::CalcCrv_simplix_36GP(double Crv)
       return 1.0;
 	else
       return ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
-/*
-	{
-      double Value = ((1+Crv) * (400 + Offset)/(1/Crv + Offset));
-	  GfOut("%.5f\n",Value);
-	  return MIN(1.25,Value);
-	}
+  }
+  else
+    return 1.0;
+}
+//==========================================================================*
 */
+//==========================================================================*
+// simplix_36GP
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_36GP(double Crv)
+{
+  double Offset = 1300;
+
+  if (oCrvComp)
+  {
+    if (Crv < 0.0085) 
+      return 1.0;
+	else
+      return MIN(1.5,MAX(1.0,((1+Crv) * (400 + Offset)/(1/Crv + Offset))));
   }
   else
     return 1.0;

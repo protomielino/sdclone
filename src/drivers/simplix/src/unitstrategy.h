@@ -9,10 +9,10 @@
 //
 // File         : unitstrategy.h
 // Created      : 2007.02.20
-// Last changed : 2009.07.25
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -85,6 +85,7 @@ class TAbstractStrategy
 	{
 	  PIT_NONE,
 	  PIT_BEFORE,
+	  PIT_PREPARE,
 	  PIT_ENTER,
 	  PIT_ASKED,
 	  PIT_SERVICE,

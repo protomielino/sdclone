@@ -61,6 +61,7 @@
 #include "unittrack.h"
 #include "unitcarparam.h"
 #include "unitfixcarparam.h"
+#include "unitcubicspline.h"
 
 //==========================================================================*
 // Class TLane
@@ -99,7 +100,12 @@ class TLane
 	};
 
   public:
-	TLane();
+    static const int TA_N = 10;                  // Nbr of points
+    double TA_X[TA_N];                           // X-coordinates
+    double TA_Y[TA_N];                           // Y-coordinates
+    double TA_S[TA_N];                           // Directions
+
+    TLane();
 	virtual ~TLane();
 
 	virtual TLane& operator= (const TLane& Lane);
@@ -153,11 +159,13 @@ class TLane
 	double CalcTrackRollangle(double TrackPos);
 	double CalcTrackTurnangle(int P, int Q);
 
+
   protected:
 	TTrackDescription* oTrack;                   // TORCS track data
 	TPathPt* oPathPoints;                        // Points in this lane
 	TFixCarParam oFixCarParam;                   // Copy of car params
 	TCarParam oCarParam;                         // Copy of car params
+	TCubicSpline oTurnScale;                     // Scale of turns
     int Dummy;
 };
 //==========================================================================*

@@ -9,10 +9,10 @@
 //
 // File         : unitpit.h
 // Created      : 2007.02.20
-// Last changed : 2009.02.01
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -53,6 +53,7 @@
 #include "unittrack.h"
 #include "unitclothoid.h"
 #include "unitparam.h"
+#include "unitstrategy.h"
 
 //==========================================================================*
 // Klasse TPitLane
@@ -81,11 +82,12 @@ class TPitLane : public TClothoidLane
 	void Init(PtCarElt Car);                     // Initialize oCar
     void MakePath                                // Build pitlane
 	  (char* Filename,
+	  TAbstractStrategy* Strategy,
 	  TClothoidLane* BasePath,
 	  const TParam& Param,
 	  int Index);
     void SmoothPitPath
-      (/*const TParam& Param*/);
+      (const TParam& Param);
 
 	bool InPitSection(double TrackPos) const;
 	bool CanStop(double TrackPos) const;
@@ -114,6 +116,7 @@ class TPit
 	bool oInPitLane;			 		         // We are still in the pitlane.
 	float oPitEntry;				  	         // Distance to start line of the pit entry.
 	float oPitExit;					             // Distance to the start line of the pit exit.
+	double oDistToPitEnd;                        // Remaining len of pitlane
 
 	float oSpeedLimitSqr;			             // Pit speed limit squared.
 	float oSpeedLimit;				             // Pit speed limit.

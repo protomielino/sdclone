@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.02.12
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -252,7 +252,7 @@ double TFixCarParam::CalcBraking
 //==========================================================================*
 
 //==========================================================================*
-// Calculate decceleration in pitlane
+// Calculate deceleration in pitlane
 //--------------------------------------------------------------------------*
 double	TFixCarParam::CalcBrakingPit
   (TCarParam& CarParam,                          // Lane specific parameters
@@ -289,6 +289,9 @@ double	TFixCarParam::CalcBrakingPit
 
   Crv *= oDriver->CalcCrv(fabs(Crv));
 
+  if (Crvz > 0)
+	Crvz = 0; 
+
   double Gdown = G * cos(TrackRollAngle);
   double Glat  = G * sin(TrackRollAngle);
   double Gtan  = 0;	
@@ -320,8 +323,8 @@ double	TFixCarParam::CalcBrakingPit
 	double Acc = CarParam.oScaleBrakePit * Ftanroad 
 	  / oTmpCarParam->oMass;
 
-	if (TDriver::UseGPBrakeLimit)
-	  Acc = MAX(Acc,TDriver::BrakeLimit/2);
+//	if (TDriver::UseGPBrakeLimit)
+//	  Acc = MAX(Acc,TDriver::BrakeLimit/2);
 
 	double Inner = MAX(0, V * V - 2 * Acc * Dist);
 	double OldU = U;
@@ -397,9 +400,6 @@ double TFixCarParam::CalcMaxSpeed
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
 
-//  if (fabs(AbsCrv) > 1/45.0)
-//    Speed *= 0.89;                               // Filter hairpins
-
   if (fabs(AbsCrv) > 1/40.0)
     Speed *= 0.70;                               // Filter hairpins
   else if (fabs(AbsCrv) > 1/45.0)
@@ -407,8 +407,19 @@ double TFixCarParam::CalcMaxSpeed
   else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
     Speed = 112;                                 
 
-  if (Speed < 11.0)
-	  Speed =  11.0;
+  if (AbsCrv0 < 1/10.0)
+  {
+	if (TDriver::UseGPBrakeLimit)
+	{
+      if (Speed < 10.0)
+    	  Speed = 10.0;
+	}
+	else
+	{
+      if (Speed < 12.0)
+    	  Speed = 12.0;
+	}
+  }
 
   return Speed;
 }

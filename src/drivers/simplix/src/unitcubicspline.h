@@ -2,15 +2,17 @@
 // unitcubicspline.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
-// Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
+// Cubic spline
+// Kubischer Spline
 //
-// Datei    : unitcubicspline.h
-// Erstellt : 25.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitcubicspline.h
+// Created      : 2007.11.25
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -46,9 +48,14 @@
 class TCubicSpline  
 {
   public:
+	TCubicSpline();                              // Default constructor
 	TCubicSpline                                 // Constructor
-	  (int Count, const double* X, const double* Y, const double* S);
+	  (int Count, const double* X, 
+	  const double* Y, const double* S);
 	~TCubicSpline();
+
+	void Init(int Count, const double* X, 
+		const double* Y, const double* S);
 
 	double CalcOffset(double X) const;           // Get offset
 	double CalcGradient(double X) const;         // Get gradient

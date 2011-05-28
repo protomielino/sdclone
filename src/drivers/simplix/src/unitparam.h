@@ -9,10 +9,10 @@
 //
 // File         : unitparam.h
 // Created      : 2007.04.11
-// Last changed : 2009.07.12
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:

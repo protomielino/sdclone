@@ -46,11 +46,44 @@
 #include "unitcubicspline.h"
 
 //==========================================================================*
+// Default constructor
+//--------------------------------------------------------------------------*
+TCubicSpline::TCubicSpline()
+{
+  oCount = 0;
+  oSegs = NULL;
+  oCubics = NULL;
+}
+//==========================================================================*
+
+//==========================================================================*
 // Constructor
 //--------------------------------------------------------------------------*
 TCubicSpline::TCubicSpline
   (int Count, const double* X, const double* Y, const double* S)
 {
+  oCount = Count;
+  oSegs = new double[oCount];
+  oCubics = new TCubic[oCount - 1];
+
+  for (int I = 0; I < oCount; I++)
+  {
+ 	oSegs[I] = X[I];
+	if (I + 1 < oCount)
+	oCubics[I].Set( X[I], Y[I], S[I], X[I+1], Y[I+1], S[I+1]);
+  }
+}
+//==========================================================================*
+
+//==========================================================================*
+// Initialization
+//--------------------------------------------------------------------------*
+void TCubicSpline::Init
+  (int Count, const double* X, const double* Y, const double* S)
+{
+  delete [] oSegs;
+  delete [] oCubics;
+
   oCount = Count;
   oSegs = new double[oCount];
   oCubics = new TCubic[oCount - 1];

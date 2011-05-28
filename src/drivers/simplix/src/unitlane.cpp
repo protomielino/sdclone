@@ -9,10 +9,10 @@
 //
 // File         : unitlane.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.09.25
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.001
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -65,6 +65,7 @@
 #include "unitglobal.h"
 #include "unitcommon.h"
 
+#include "unitcubicspline.h"
 #include "unitdriver.h"
 #include "unitlane.h"
 #include "unitlinalg.h"
@@ -114,6 +115,14 @@ void TLane::SetLane(const TLane& Lane)
   oPathPoints = new TPathPt[Count];
 
   memcpy(oPathPoints, Lane.oPathPoints, Count * sizeof(*oPathPoints));
+
+  for (int I = 0; I < TA_N; I++)
+  {
+    TA_X[I] = Lane.TA_X[I];
+    TA_Y[I] = Lane.TA_Y[I];
+    TA_S[I] = Lane.TA_S[I];
+  }
+  oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);
 }
 //==========================================================================*
 
@@ -293,6 +302,44 @@ void TLane::Initialise
   }
   CalcCurvaturesXY();
   CalcCurvaturesZ();
+
+  TA_X[0] = 0.0;
+  TA_X[1] = 0.4;
+  TA_X[2] = 0.5;
+  TA_X[3] = 0.6;
+  TA_X[4] = 0.7;
+  TA_X[5] = 0.8;
+  TA_X[6] = 0.9;
+  TA_X[7] = 1.0;
+  TA_X[8] = 1.1;
+  TA_X[9] = 10.0;
+/*
+  TA_Y[0] = 1.0;
+  TA_Y[1] = 1.0;
+  TA_Y[2] = 0.995;
+  TA_Y[3] = 0.97;
+  TA_Y[4] = 0.9;
+  TA_Y[5] = 0.7;
+  TA_Y[6] = 0.5;
+  TA_Y[7] = 0.35;
+  TA_Y[8] = 0.305;
+  TA_Y[9] = 0.30;
+*/
+  TA_Y[0] = 1.0;
+  TA_Y[1] = 1.0;
+  TA_Y[2] = 1.0;
+  TA_Y[3] = 0.995;
+  TA_Y[4] = 0.97;
+  TA_Y[5] = 0.9;
+  TA_Y[6] = 0.7;
+  TA_Y[7] = 0.55;
+  TA_Y[8] = 0.505;
+  TA_Y[9] = 0.50;
+
+  TA_S[0] = 0.0;
+  TA_S[9] = 0.0;
+
+  oTurnScale.Init(TA_N,TA_X,TA_Y,TA_S);         
 }
 //==========================================================================*
 
@@ -390,9 +437,20 @@ void TLane::CalcMaxSpeeds
 	  oTrack->Friction(P)*Factor,
   	  TrackRollAngle);
 
-    double TrackTurnangle = CalcTrackTurnangle(P, (P + 50) % N);
-    if (TrackTurnangle > 0.7)
-		Speed *= 0.75;
+	if (TDriver::UseGPBrakeLimit)
+	{
+
+      //double TrackTurnangle1 = CalcTrackTurnangle(P, (P + 30) % N);
+      //double TrackTurnangle2 = 0.7 * CalcTrackTurnangle((P + N - 30) % N, P);
+      //double TrackTurnangle = MAX(fabs(TrackTurnangle1),fabs(TrackTurnangle2));
+	  //Speed *= oTurnScale.CalcOffset(TrackTurnangle);
+	}
+	else
+	{
+      double TrackTurnangle = CalcTrackTurnangle(P, (P + 50) % N);
+      if (TrackTurnangle > 0.7)
+	    Speed *= 0.75;
+	}
 
 	if (Speed < 5)
 		Speed = 5.0;
@@ -481,8 +539,9 @@ void TLane::PropagatePitBreaking
 	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
 	  double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
 
-	  double Factor = 1.0 - MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
-	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit);
+//	  double Factor = 1.0 - MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
+//	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit);
+	  double Friction = oTrack->Friction(P);
 
 	  double U = oFixCarParam.CalcBraking(
         oCarParam,
@@ -502,7 +561,7 @@ void TLane::PropagatePitBreaking
 	  //GfOut("I:%d P:%d Q:%d F:%g U:%g S:%g\n",I,P,Q,Factor,U,oPathPoints[P].Speed);
 
 	  if (oPathPoints[P].FlyHeight > 0.1)
-		oPathPoints[P].Speed = oPathPoints[Q].Speed;
+	    oPathPoints[P].Speed = oPathPoints[Q].Speed;
 	}
   }
 }

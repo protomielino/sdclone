@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.03.06
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //

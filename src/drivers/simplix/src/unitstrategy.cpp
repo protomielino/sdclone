@@ -9,10 +9,10 @@
 //
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2010.11.06
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -400,7 +400,8 @@ double TSimpleStrategy::SetFuelAtRaceStart
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::GoToPit()
 {
-  return ((oState >= PIT_ENTER) && (oState <= PIT_GONE));
+//return ((oState >= PIT_ENTER) && (oState <= PIT_GONE));
+  return ((oState >= PIT_PREPARE) && (oState <= PIT_GONE));
 };
 //==========================================================================*
 
@@ -411,9 +412,10 @@ bool TSimpleStrategy::StartPitEntry(float& Ratio)
 {
   float DLong, DLat;                             // Dist to Pit
   RtDistToPit(oCar,oTrack,&DLong,&DLat);
-  if (GoToPit() && (DLong < oPit->oPitLane->PitDist()))
+//  if (GoToPit() && (DLong < oPit->oPitLane->PitDist()))
+  if (GoToPit() && (DLong < oDistToSwitch))
   {
-    Ratio = (float) (1.0 - MAX(0.0,(DLong-100)/oPit->oPitLane->PitDist()));
+    Ratio = (float) (1.0 - MAX(0.0,(DLong-100)/oDistToSwitch));
     return true;
   }
   else
@@ -521,6 +523,15 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 
 	case PIT_BEFORE:
       // We are somewhere on the track and got the flag to go to pit
+	  if (oFuelChecked && oGoToPit)
+	  { // If we reache pit entry and flag is still set
+	    // switch to the pitlane
+		oState = PIT_PREPARE;
+	  }
+	  break;
+
+	case PIT_PREPARE:
+      // We are near the pit entry on the track and got the flag to go to pit
 	  if (oPit->oPitLane[0].InPitSection(TrackPos) && oGoToPit)
 	  { // If we reache pit entry and flag is still set
 	    // switch to the pitlane
@@ -529,7 +540,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  break;
 
 	case PIT_ENTER:
-      // We are on the pitlane and drive to out pit
+      // We are on the pitlane and drive to our pit
  	  if (!oPit->oPitLane[0].CanStop(TrackPos))
 	  { // We have to wait, till we reached the point to stop
 	    if (oDriver->CurrSpeed() < 3)
