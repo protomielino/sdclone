@@ -98,7 +98,8 @@ ROBOT_DATA(NAME usr_ls1 PREFIX usr_ls1
 SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
                   ls2-bavaria-g3gtr ls2-boxer-96rsr
                   ls2-cavallo-360r ls2-condor-c400r
-                  ls2-mt900r ls2-sprite ls2-vector ls2-xkr
+		  ls2-morley-R900 ls2-sprite-gts
+		  ls2-vortex-gt ls2-lynx-xkr
                   tracks)
 
 ROBOT_DATA(NAME usr_ls2 PREFIX usr_ls2
