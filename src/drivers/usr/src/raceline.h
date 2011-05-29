@@ -265,16 +265,17 @@ class LRaceLine {
   void GetSteerPoint( double lookahead, vec2f *rt, double offset = -100.0, double time = -1.0 );
   void GetRLSteerPoint( vec2f *rt, double *offset, double time );
   int isOnLine();
-  double correctLimit(double avoidsteer, double racesteer);
+  double correctLimit(double avoidsteer, double racesteer, int insideline);
   double getAvoidSpeedDiff( float distance );
   double getK1999Steer() { return k1999steer; }
   double getRInverse(int div);
   double getRInverse() { return getRInverse(Next); }
-  void getOpponentInfo(double distance, double *aspeed, double *rInv);
+  void getOpponentInfo(double distance, int rl, double *aspeed, double *rInv, double offset = -1000.0);
   double getRLMarginRgt(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginRgt, div ); }
   double getRLMarginLft(int divadvance) { int div=(Next+divadvance)%Divs; return GetModD( tRLMarginLft, div ); }
   double getAvoidSteer(double offset, LRaceLineData *data);
   void NoAvoidSteer() { lastNasteer = lastNksteer; }
+  double calcAvoidSpeed( double offset, double rInv, double speed, double rlspeed );
 
 
   // interpolation...

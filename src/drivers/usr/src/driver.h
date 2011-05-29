@@ -49,7 +49,7 @@ class AbstractStrategy;
 enum { TEAM_FRIEND=1, TEAM_FOE };
 enum { avoidleft=1, avoidright=2, avoidside=4, avoidsideclosing=8, avoidback=16 };
 enum { debug_steer=1, debug_overtake=2, debug_brake=4 };
-enum { USR_TRB1=1, USR_SC, USR_LS1, USR_36GP };
+enum { USR_TRB1=1, USR_SC, USR_LS1, USR_LS2, USR_36GP };
 
 class Driver {
 	public:
@@ -107,6 +107,7 @@ class Driver {
 		void calcSpeed();
 		float adjustOffset( float offset );
 		bool canOvertake( Opponent *o, double *mincatchdist, bool outside, bool lenient );
+		bool canOvertake2( Opponent *o, int avoidingside );
 		double getFollowDistance();
 
 		float filterTeam(float accel);

@@ -1392,7 +1392,36 @@ void LRaceLine::NewRace(tCarElt* newcar, tSituation *s)
  avgerror = 0.0;
 } 
 
-void LRaceLine::getOpponentInfo(double distance, double *aSpeed, double *rInv)
+double LRaceLine::calcAvoidSpeed(double offset, double rInv, double speed, double rlspeed)
+{
+ if (fabs(rInv) < 0.0001)
+ {
+  // treat as a straight
+  return speed;
+ }
+ else if (rInv < 0.0)
+ {
+  // right hand bend, less speed on right side
+  if (offset < 0.0)
+   speed = MAX(speed * 0.8, speed - fabs(rInv) * fabs(offset*1.5) * 25);
+  //else
+  // speed = MIN(speed * 1.2, speed + fabs(rInv) * fabs(offset*1.5) * 25);
+ }
+ else
+ {
+  // left hand bend, less speed on left side
+  if (offset > 0.0)
+   speed = MAX(speed * 0.8, speed - fabs(rInv) * offset*1.5 * 25);
+  //else
+  // speed = MIN(speed * 1.25, speed + fabs(rInv) * fabs(offset*1.5) * 25);
+ }
+
+ speed = MIN(speed, rlspeed);
+
+ return speed;
+}
+
+void LRaceLine::getOpponentInfo(double distance, int rl, double *aSpeed, double *rInv, double offset)
 {
  int dist = int(distance / DivLength);
  double rinv = SRL[SRLidx].tRInverse[Next];
@@ -1403,8 +1432,16 @@ void LRaceLine::getOpponentInfo(double distance, double *aSpeed, double *rInv)
   int div = (Next + i) % Divs;
   if (fabs(SRL[SRLidx].tRInverse[div]) > fabs(rinv))
    rinv = SRL[SRLidx].tRInverse[div];
-  if (tSpeed[LINE_MID][div] < aspd)
-   aspd = tSpeed[LINE_MID][div];
+
+  if (offset < -999.0)
+  {
+   aspd = MIN(aspd, calcAvoidSpeed( offset, rinv, tSpeed[rl][div], tSpeed[rl][div] ));
+  }
+  else
+  {
+   if (tSpeed[rl][div] < aspd)
+    aspd = tSpeed[rl][div];
+  }
  }
 
  *aSpeed = aspd;
@@ -1677,7 +1714,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  if ((SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toMiddle > 0.0) ||
      (SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toMiddle < 0.0))
  {
-  data->lookahead *= MAX(1.0, MIN(3.6, 1.0 + (MIN(2.6, fabs(car->_trkPos.toMiddle) / (seg->width/2)) / 2) * (1.0 + fabs(SRL[SRLidx].tRInverse[Next]) * 65.0 + car->_speed_x/120.0)));
+  //data->lookahead *= MAX(1.0, MIN(3.6, 1.0 + (MIN(2.6, fabs(car->_trkPos.toMiddle) / (seg->width/2)) / 2) * (1.0 + fabs(SRL[SRLidx].tRInverse[Next]) * 65.0 + car->_speed_x/120.0)));
  }
  else if ((SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toRight < 5.0) ||
           (SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toLeft < 5.0))
@@ -1712,7 +1749,6 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   data->avspeed = MAX(ATargetSpeed, tSpeed[LINE_MID][avnext]);
  else
   data->avspeed = MAX(ATargetSpeed, tSpeed[LINE_MID][avnext] - data->overtakecaution/8);
- data->slowavspeed = MAX(data->avspeed-3.0, data->avspeed*0.9);
 
  c0 = (SRL[SRLidx].tx[Next] - SRL[SRLidx].tx[Index]) * (SRL[SRLidx].tx[Next] - X) +
       (SRL[SRLidx].ty[Next] - SRL[SRLidx].ty[Index]) * (SRL[SRLidx].ty[Next] - Y);
@@ -1781,6 +1817,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  {
   // inside raceline
   data->insideline = 1;
+  data->avspeed = MAX(data->avspeed, data->speed);
  }
  else if (tSpeed[LINE_RL][Next] >= tSpeed[LINE_RL][This] && 
           ((SRL[SRLidx].tRInverse[Next] > 0.0 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[This] && car->_trkPos.toLeft > SRL[SRLidx].tLane[Next]*SRL[SRLidx].Width+1.0) ||
@@ -1819,6 +1856,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
  data->speedchange = tSpeed[LINE_RL][Next] - tSpeed[LINE_RL][This];
  data->accel_redux = 0.0;
+ data->slowavspeed = calcAvoidSpeed( car->_trkPos.toMiddle, SRL[SRLidx].tRInverse[Next], data->avspeed, data->speed );
+ data->avspeed = MAX(data->avspeed, data->slowavspeed);
 
  if (!SteerMod)
  {
@@ -2295,22 +2334,25 @@ int LRaceLine::findNextCorner( double *nextCRinverse )
  return prefer_side;
 }
 
-double LRaceLine::correctLimit(double avoidsteer, double racesteer)
+double LRaceLine::correctLimit(double avoidsteer, double racesteer, int insideline)
 {
  //double nlane2left = SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width;
  double tbump = BumpCaution;//GetModD( tBump, This ) * 4;
+ double factor = (insideline ? 50 : 200);
+
+ double limit = 0.04 - MIN(0.039, MAX(20.0, 100.0 - car->_speed_x) / 3000);
 
  // correct would take us in the opposite direction to a corner - correct less!
  if ((SRL[SRLidx].tRInverse[Next] > 0.001 && avoidsteer > racesteer) ||
      (SRL[SRLidx].tRInverse[Next] < -0.001 && avoidsteer < racesteer))
-  return MAX(0.2, MIN(1.0, 1.0 - fabs(SRL[SRLidx].tRInverse[Next]) * 100.0 - tbump));
+  return MAX(0.001, MIN(limit, limit - (fabs(SRL[SRLidx].tRInverse[Next]) * 200.0 + tbump)));
 
  // correct would take us in the opposite direction to a corner - correct less (but not as much as above)
  int nnext = (Next + (int) (car->_speed_x/3)) % Divs;
  //double nnlane2left = SRL[SRLidx].tLane[nnext] * SRL[SRLidx].Width;
  if ((SRL[SRLidx].tRInverse[nnext] > 0.001 && avoidsteer > racesteer) ||
      (SRL[SRLidx].tRInverse[nnext] < -0.001 && avoidsteer < racesteer))
-  return MAX(0.3, MIN(1.0, 1.0 - fabs(SRL[SRLidx].tRInverse[nnext]) * 40.0 - tbump));
+  return MAX(0.001, MIN(limit, limit - (fabs(SRL[SRLidx].tRInverse[nnext]) * 140.0 + tbump)));
 
  // ok, we're not inside the racing line.  Check and see if we're outside it and turning 
  // into a corner, in which case we want to correct more to try and get closer to the
@@ -2320,9 +2362,10 @@ double LRaceLine::correctLimit(double avoidsteer, double racesteer)
  //     (tRInverse[LINE_RL][Next] < -0.001 && tLane[Next] > tLane[This] && car->_trkPos.toLeft < nlane2left - 2.0)))
  // return MAX(1.0, MIN(2.5, (1.0 + fabs(tRInverse[LINE_RL][Next])*2) - tbump));
  //else
-  return MAX(0.5, 1.0 - MAX(fabs(data->rlangle), fabs(data->rInverse*70)));
+
+ // return MAX(0.5, 1.0 - MAX(fabs(data->rlangle), fabs(data->rInverse*70)));
  
- return 1.0;
+ return limit;
 }
 
 double LRaceLine::getAvoidSpeedDiff( float distance )

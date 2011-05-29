@@ -137,6 +137,12 @@ void SetupUSR_trb1() {
   robot_type = USR_TRB1;
 };
 
+// Schismatic init for usr_ls2
+void SetupUSR_ls2() {
+  // Add usr_ls2 specific initialization here
+  robot_type = USR_LS2;
+};
+
 
 // Schismatic init for usr_sc
 void SetupUSR_sc() {
@@ -190,6 +196,19 @@ extern "C" int usr_sc(tModInfo *ModInfo) {
   return ret;
 }
 
+
+// Schismatic entry point for usr_ls2
+extern "C" int usr_ls2(tModInfo *ModInfo) {
+  int ret = -1;
+  setRobotName("usr_ls2");
+  robot_type = USR_LS2;
+  void *robot_settings = getFileHandle();
+  if (robot_settings) {
+    ret = usr(ModInfo);
+  }
+  
+  return ret;
+}
 
 // Schismatic entry point for usr_ls1
 extern "C" int usr_ls1(tModInfo *ModInfo) {
@@ -287,6 +306,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
 		SetupUSR_sc();
   else if (strncmp(robot_name,"usr_ls1", strlen("usr_ls1")) == 0)
 		SetupUSR_ls1();
+  else if (strncmp(robot_name,"usr_ls2", strlen("usr_ls2")) == 0)
+		SetupUSR_ls2();
   else if (strncmp(robot_name,"usr_36GP", strlen("usr_36GP")) == 0)
 		SetupUSR_36GP();
 
