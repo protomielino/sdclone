@@ -3,6 +3,7 @@ INCLUDE(../../cmake/macros.cmake)
 # Official robots.
 ADD_SUBDIRECTORY(human)
 ADD_SUBDIRECTORY(networkhuman)
+ADD_SUBDIRECTORY(kilo2008)
 ADD_SUBDIRECTORY(simplix)
 ADD_SUBDIRECTORY(usr)
 
