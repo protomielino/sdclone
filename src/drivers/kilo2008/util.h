@@ -26,6 +26,7 @@ extern bool BetweenStrict(const double val, const double min, const double max);
 extern bool BetweenLoose(const double val, const double min, const double max);
 extern double sign(const double d);
 
+#if 0 // doesn't compile in Vis Studio 2010
 // until nullptr is defined...
 const class {   // this is a const object...
  public:
@@ -38,6 +39,7 @@ const class {   // this is a const object...
  private:                     // whose address can't be taken
   void operator&() const;     // NOLINT(runtime/operator)
 } nullptr = {};               // and whose name is nullptr
+#endif
 
 
 
