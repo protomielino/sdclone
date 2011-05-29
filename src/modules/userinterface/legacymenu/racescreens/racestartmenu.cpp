@@ -31,6 +31,7 @@
 
 #include "legacymenu.h"
 #include "racescreens.h"
+#include "portability.h"
 
 
 // Abandon race hook ******************************************************
