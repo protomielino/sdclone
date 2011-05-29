@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.05.26
+// Last changed : 2011.05.29
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -315,7 +315,6 @@ private:
     int oStuckCounter;                           // Tick counter
     PSysFoo oSysFooStuckX;                       // Positionsüberwachung in X
     PSysFoo oSysFooStuckY;                       // und Y
-    int oTestPitStop;                            // Test pit stop
 	float oTrackAngle;                           // Direction of track
     double oTargetSpeed;                         // Target speed for speed controller
 	double oTclRange;                            // TCL range
@@ -378,6 +377,8 @@ private:
     unsigned int oRandomSeed;                    // seed of generator
 	
   public:
+    int oTestPitStop;                            // Test pit stop
+
 	static double LengthMargin;                  // Length margin
 	static bool Qualification;                   // Flag qualifying
 	bool oStanding;                              // Fahrzeug steht#

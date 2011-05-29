@@ -9,10 +9,10 @@
 //
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.05.26
+// Last changed : 2011.05.29
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -139,7 +139,6 @@ bool TSimpleStrategy::NeedPitStop()
     FuelConsum = oFuelPerM;                      //   use it
 
   bool Result = RtTeamNeedPitStop(oDriver->TeamIndex(), FuelConsum, RepairWanted(cPIT_DAMMAGE));
-
 #else
   if (CarPit == NULL)                            // Ist eine Box vorhanden?
     return false;                                //   Wenn nicht, Pech!
@@ -218,6 +217,9 @@ bool TSimpleStrategy::NeedPitStop()
 	}
   };
 #endif
+
+  if (oDriver->oTestPitStop)                     // If defined, try
+    Result = true;                               //   to stop in pit
 
   if (Result)
   {

@@ -2,15 +2,17 @@
 // unitlane.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
+// Lane
 // Fahrspur
 //
-// Datei    : unitlane.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitlane.h
+// Created      : 2007.11.17
+// Last changed : 2011.05.29
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -105,7 +107,9 @@ class TLane
     double TA_Y[TA_N];                           // Y-coordinates
     double TA_S[TA_N];                           // Directions
 
-    TLane();
+	TPathPt* oPathPoints;                        // Points in this lane
+
+	TLane();
 	virtual ~TLane();
 
 	virtual TLane& operator= (const TLane& Lane);
@@ -162,7 +166,6 @@ class TLane
 
   protected:
 	TTrackDescription* oTrack;                   // TORCS track data
-	TPathPt* oPathPoints;                        // Points in this lane
 	TFixCarParam oFixCarParam;                   // Copy of car params
 	TCarParam oCarParam;                         // Copy of car params
 	TCubicSpline oTurnScale;                     // Scale of turns

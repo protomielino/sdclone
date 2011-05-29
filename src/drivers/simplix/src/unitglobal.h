@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.cpp
 // Created      : 2007.11.17
-// Last changed : 2011.05.28
+// Last changed : 2011.05.29
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 117 // Force new calculation
+#define RL_VERSION 118 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*

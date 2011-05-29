@@ -2,17 +2,17 @@
 // unitpit.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Pit ans pitlane
 // Box und Boxengasse
 //
 // File         : unitpit.h
 // Created      : 2007.02.20
-// Last changed : 2011.05.26
+// Last changed : 2011.05.29
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //

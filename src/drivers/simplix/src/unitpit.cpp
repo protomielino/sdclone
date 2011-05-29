@@ -9,10 +9,10 @@
 //
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.05.26
+// Last changed : 2011.05.29
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -303,9 +303,9 @@ void TPitLane::MakePath
   oStoppingDist = Param.Pit.oStoppingDist;       // Distance to brake
   oPitStopOffset = Param.Pit.oLongOffset;        // Offset for fine tuning
   oCarParam.oScaleBrake =                        // Limit brake to be used
-	MIN(0.10f,CarParam.oScaleBrake);             //   in pitlane
+	MAX(0.10f,CarParam.oScaleBrake);             //   in pitlane
   oCarParam.oScaleMu =                           // Scale friction estimation
-	MIN(0.10f,CarParam.oScaleMu);                //   of pitlane
+	MAX(0.10f,CarParam.oScaleMu);                //   of pitlane
 
   // Get the distance of pit to middle of the track
   double PitLaneOffset =                         // Offset of the pitlane
@@ -457,48 +457,6 @@ void TPitLane::MakePath
     //GfOut("Spline: %g/%g\n",SplineX,oPathPoints[I].Offset);
   }
 
-/*
-  // What we have now is the path for a pass through penalty!
-  // TODO: Save it for use in pro mode
-
-  // Now we use the complete pitlane with the pit itself
-  if (!Param.Pit.oUseFirstPit || !FirstPit)      // If needed, means if we
-  {                                              // do not use the first pit
-    Y[3] = Sign *                                // we have to set the pit 
-	  (fabs(PitInfo->driversPits->pos.toMiddle)  // offset
-	  + Param.Pit.oLatOffset);                   // 
-
-    GfOut("\n");
-    GfOut("Spline points :\n");
-    GfOut("oPitEntryPos  : %g/%g\n",X[0],Y[0]);
-    GfOut("oPitStartPos  : %g/%g\n",X[1],Y[1]);
-    GfOut("oPitStartSteer: %g/%g\n",X[2],Y[2]);
-    GfOut("oPitPos       : %g/%g\n",X[3],Y[3]);
-    GfOut("oPitStopSteer : %g/%g\n",X[4],Y[4]);
-    GfOut("oPitEndPos    : %g/%g\n",X[5],Y[5]);
-    GfOut("oPitExitPos   : %g/%g\n",X[6],Y[6]);
-
-    // Calculate the splines to the pit and out of it
-    TCubicSpline Spline(NPOINTS, X, Y, S);         
-
-    // Section with speedlimit, keep it
-    Idx0 = oTrack->IndexFromPos(oPitStartPos);     // Index to first point
-    Idx1 = oTrack->IndexFromPos(oPitEndPos);       // Index to last point
-
-    // Change offsets to go to the pit
-    for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)
-    {
-      double SplineX =                             // Station in spline coordinates
-	    ToSplinePos(oTrack->Section(I).DistFromStart);
-      oPathPoints[I].Offset =                      // Offset lateral to track
-	    Spline.CalcOffset(SplineX);
-      oPathPoints[I].Point =                       // Recalculate point coordinates
-	    oPathPoints[I].CalcPt();                   //   from offset
-      oPathPoints[I].Fix = true;
-      //GfOut("Spline: %g/%g\n",SplineX,oPathPoints[I].Offset);
-    }
-  }
-*/
   // Prepare speed calculation with changed path
   int FwdRange = 110;
   CalcFwdAbsCrv(FwdRange);
@@ -541,17 +499,37 @@ void TPitLane::MakePath
 
   oStopPos = StopPos;
   oPitStopPos = oPathPoints[oStopIdx].Dist();
+  GfOut("#\n");
+  GfOut("#\n");
+  GfOut("#StopPos: %d (%.2f m)\n",oStopIdx,oStopPos);
 
   // Set target speed at stop position
   oPathPoints[oStopIdx].MaxSpeed = oPathPoints[oStopIdx].Speed = 1.0;
 
-  // Distance of pit entry to pit stop point
-  oPitDist = oPitStopPos - oPitEntryPos;
-  if (oPitDist < 0)
-    oPitDist += oTrack->Length();
-
   // Calculate braking
   PropagatePitBreaking((tdble) oPitStopPos,(tdble) Param.oCarParam.oScaleMu);
+
+  // Look for point to decide to go to pit
+  Idx0 = oTrack->IndexFromPos(oPitEntryPos);
+  double DeltaSpeed;
+  int Steps = 0;
+  do
+  {
+    Idx0 = (Idx0 + NSEG - 1) % NSEG;
+    DeltaSpeed = 
+	  MIN(BasePath->oPathPoints[Idx0].Speed,BasePath->oPathPoints[Idx0].AccSpd) - 
+	  oPathPoints[Idx0].Speed;
+    //GfOut("#DeltaSpeed: %d (%.2f km/h)(%.1f km/h)(%.1f km/h)\n",Idx0,DeltaSpeed*3.6,oPathPoints[Idx0].Speed*3.6,BasePath->oPathPoints[Idx0].Speed*3.6);
+  } while ((DeltaSpeed > 1.0) && (++Steps < NSEG));
+  GfOut("#Steps to pit entry: %d\n",Steps);
+
+  // Distance of pit entry to pit stop point
+  oPitDist = oPitStopPos - oPathPoints[Idx0].Dist();
+  GfOut("#Pit dist      : %.2f\n",oPitDist);
+  if (oPitDist < 0)
+    oPitDist += oTrack->Length();
+  GfOut("#Pit dist norm.: %.2f\n",oPitDist);
+
 }
 //==========================================================================*
 

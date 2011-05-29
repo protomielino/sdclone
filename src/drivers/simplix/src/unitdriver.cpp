@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.05.26
+// Last changed : 2011.05.29
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.00.003
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -1264,22 +1264,6 @@ void TDriver::DriveLast()
 //--------------------------------------------------------------------------*
 void TDriver::Drive()
 {
-/** /
-  if (CarLaps == 1 + oIndex)
-    oTestPitStop = 1;
-  else
-    oTestPitStop = 0;
-/ **/
-/*
-  if(!Qualification)
-  {
-    if (CarLaps > 1)
-      oTestPitStop = 1;
-  }
-*/
-  if (oTestPitStop)                              // If defined, try
-    oStrategy->TestPitStop();                    //   to stop in pit
-
   Propagation(CarLaps);                          // Propagation
   oLastLap = CarLaps;
 
@@ -1299,17 +1283,17 @@ void TDriver::Drive()
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
 
-  /*double TrackRollangle = */ oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
-//  cTimeSum[0] += RtDuration(StartTimeStamp);
+  //double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
+  //cTimeSum[0] += RtDuration(StartTimeStamp);
 
   AvoidOtherCars(oLanePoint.Crv,Close,oLetPass); // General avoiding
 
-//  cTimeSum[1] += RtDuration(StartTimeStamp);
+  //cTimeSum[1] += RtDuration(StartTimeStamp);
 
   oSteer = Steering();                           // Steering
   oSteer = FilterSteerSpeed(oSteer);             // Steering
 
-//  cTimeSum[2] += RtDuration(StartTimeStamp);
+  //cTimeSum[2] += RtDuration(StartTimeStamp);
 
   if(Close)                                      // If opponents are close
   {
@@ -1357,7 +1341,9 @@ void TDriver::Drive()
   // Keep history
   oLastSteer = oSteer;
   oLastAccel = oAccel;
+  oLastBrake = oBrake;
   oLastDriftAngle = oDriftAngle;
+
   // Tell TORCS what we want do do
   oCar->ctrl.accelCmd = (float) oAccel;
   oCar->ctrl.brakeCmd = (float) oBrake;
@@ -1365,19 +1351,25 @@ void TDriver::Drive()
   oCar->ctrl.gear = oGear;
   oCar->ctrl.steer = (float) oSteer;
 
-  //int Idx = oTrackDesc.IndexFromPos(Pos);
-  //GfOut("#%d: P:%.0f(%d) A: %g B: %g C: %g G: %d S: %g\n",oIndex,Pos,Idx,oCar->ctrl.accelCmd,oCar->ctrl.brakeCmd,oCar->ctrl.clutchCmd,oCar->ctrl.gear,oCar->ctrl.steer);
-/*
+/** /
+  if (oIndex == 10)
+  {
+//    int Idx = oTrackDesc.IndexFromPos(Pos);
+//    GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,oCar->ctrl.accelCmd,oCar->ctrl.brakeCmd,oCar->ctrl.clutchCmd,oCar->ctrl.gear,oCar->ctrl.steer);
+    GfOut("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",oCar->ctrl.accelCmd,oCar->ctrl.brakeCmd,oCar->ctrl.clutchCmd,oCar->ctrl.steer,oCar->ctrl.gear);
+  }
+/ **/
   if (oDoAvoid)
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;        // Only small lights on
   else
     oCar->ctrl.lightCmd = RM_LIGHT_HEAD1;        // Only big lights on
+/*
   oCar->ctrl.lightCmd =                          // All front lights on
     RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
-*/
+
   oCar->ctrl.lightCmd =                          // All front lights on
     RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;             // All rear lights on
-
+*/
   if (!Qualification)                            // Don't use pit while
     oStrategy->CheckPitState(0.6f);              //  qualification
 
@@ -1386,6 +1378,7 @@ void TDriver::Drive()
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f H:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcHairpin_simplix_36GP(fabs(oLanePoint.Crv)));
   //else
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
+  //GfOut("v:(%.1f)%.1f km/h\n",oTargetSpeed*3.6,oCurrSpeed*3.6);
   //GfOut("v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv);
 /*
   const int N = oTrackDesc.Count();
@@ -1410,13 +1403,14 @@ int TDriver::PitCmd()
   oCar->pitcmd.repair = oStrategy->PitRepair();  // and to repair
   oCar->pitcmd.stopType = RM_PIT_REPAIR;         // Set repair flag
 
+/* This info is now shown by SD
   if (oCar->pitcmd.repair > 0)                   // If repairing, show
     GfOut("#%s repairing: %d damage\n",           // who and how much
 	  oBotName,oCar->pitcmd.repair);
   if (oCar->pitcmd.fuel > 0.0)                   // If refueling
     GfOut("#%s refueling: %.2f\n",                // show who and how much
 	  oBotName,oCar->pitcmd.fuel);
-
+*/
   oFuelNeeded += oCar->pitcmd.fuel;
   oRepairNeeded += oCar->pitcmd.repair;
 
@@ -2677,8 +2671,6 @@ void TDriver::BrakingForceRegulator()
   }
 
   oBrake *= (1 + MAX(0.0,(oCurrSpeed - 40.0)/40.0));
-
-  oLastBrake = oBrake;
   oLastTargetSpeed = oTargetSpeed;
 }
 //==========================================================================*
@@ -2782,9 +2774,8 @@ void TDriver::BrakingForceRegulatorTraffic()
   {
 	int	B = (int) MIN(NBR_BRAKECOEFF,(floor(oCurrSpeed/2)));
 	oAccel = 0;
-	oBrake = MAX(0, MIN(oBrakeCoeff[B] * Diff * Diff, oBrakeForceMax));
+	oBrake = MAX(0, MIN(1.2 * oBrakeCoeff[B] * Diff * Diff, oBrakeForceMax));
 	oLastBrakeCoefIndex = B;
-	oLastBrake = oBrake;
 	oLastTargetSpeed = 0;
 
 	if ((oBrake > 0) && (oBrake < oBrakeForceMax))
@@ -2869,9 +2860,11 @@ void TDriver::EvaluateCollisionFlags(
 	//double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
 	double ColTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 2.4;
 	//double CatTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
-	double CatTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
+//	double CatTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
+	double CatTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
 	//double CacTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
-	double CacTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
+//	double CacTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
+	double CacTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
 	bool Catching =
 	  ((OppInfo.CatchTime < ColTime) && OppInfo.GotFlags(F_COLLIDE))
 	  || ((OppInfo.CatchTime < CatTime) && OppInfo.GotFlags(F_CATCHING))
@@ -2893,8 +2886,8 @@ void TDriver::EvaluateCollisionFlags(
 	  bool AvoidR = OppInfo.State.CarDistLat > 0 && SpaceL;
 
 	  if (Catching)
-//	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
-	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 1.0 : 0.5;
+	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
+//	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 1.0 : 0.5;
 
 	  if (fabs(Crv) < MaxSpdCrv)
 	  {
@@ -3339,6 +3332,10 @@ double TDriver::FilterBrake(double Brake)
     double DriftAngle = MAX(MIN(oDriftAngle * 2, PI),-PI);
     Brake *= MAX(0.1, cos(DriftAngle));
   }
+
+  if (oLastAccel > 0)
+    return MIN(0.10,Brake);
+
   return Brake;
 }
 //==========================================================================*
@@ -3435,7 +3432,7 @@ double TDriver::FilterTCL(double Accel)
 	Accel -= MIN(Accel, (Slip - oTclSlip)/oTclRange);
 	Accel = MAX(MinAccel,Accel);
   }
-  return Accel;
+  return MIN(1.0,Accel);
 }
 //==========================================================================*
 
@@ -3452,7 +3449,7 @@ double TDriver::FilterLetPass(double Accel)
 	else
       Accel = MIN(Accel, 0.5);
   }
-  return Accel;
+  return MIN(1.0,Accel);
 }
 //==========================================================================*
 
@@ -3467,9 +3464,11 @@ double TDriver::FilterDrifting(double Accel)
   // Decrease accelleration while drifting
   double DriftAngle = MAX(MIN(oDriftAngle * 1.75, PI - 0.01),-PI + 0.01);
   if (oDriftAngle > oLastDriftAngle)
-    return Accel / (oDriftFactor * 150 * ( 1 - cos(DriftAngle)));
+    Accel /= (oDriftFactor * 150 * ( 1 - cos(DriftAngle)));
   else
-    return Accel / (oDriftFactor * 50 * ( 1 - cos(DriftAngle)));
+    Accel /= (oDriftFactor * 50 * ( 1 - cos(DriftAngle)));
+
+  return MIN(1.0,Accel);
 }
 //==========================================================================*
 
@@ -3486,7 +3485,7 @@ double TDriver::FilterTrack(double Accel)
 
     Accel *= oSideReduction;
   }
-  return Accel;
+  return MIN(1.0,Accel);
 }
 //==========================================================================*
 

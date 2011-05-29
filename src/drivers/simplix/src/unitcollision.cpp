@@ -3,14 +3,16 @@
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
 // A robot for Speed Dreams Version 1.4.0
+//--------------------------------------------------------------------------*
+// Information about collisions to avoid
 // Informationen über drohende Kollisionen
 //
 // File         : unitcollision.cpp
 // Created      : 2007.11.25
-// Last changed : 2008.12.21
-// Copyright    : © 2007-2008 Wolf-Dieter Beelitz
+// Last changed : 2011.05.26
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.00.002
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -155,7 +157,7 @@ double TCollision::AvoidTo
 	}
     else
 	{
-	  if ((Coll.MinLSideDist < 3.0) || (Coll.MinRSideDist < 3.0))
+	  if ((Coll.MinLSideDist < 2.5) || (Coll.MinRSideDist < 2.5))
         DoAvoid = true;                          // Avoid to side
 /*
       if (DoAvoid)

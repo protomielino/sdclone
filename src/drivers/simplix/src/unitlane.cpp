@@ -539,9 +539,8 @@ void TLane::PropagatePitBreaking
 	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
 	  double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
 
-//	  double Factor = 1.0 - MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
-//	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit);
-	  double Friction = oTrack->Friction(P);
+	  double Factor = MIN(1.0,fabs(oPathPoints[Q].Dist() - PitStopPos) / oFixCarParam.oPitBrakeDist);
+	  double Friction = oTrack->Friction(P) * (Factor * ScaleMu + (1 - Factor) * oCarParam.oScaleBrakePit * ScaleMu);
 
 	  double U = oFixCarParam.CalcBraking(
         oCarParam,
@@ -558,10 +557,11 @@ void TLane::PropagatePitBreaking
 	  if (oPathPoints[P].Speed > U)
 		oPathPoints[P].Speed = oPathPoints[P].AccSpd = U;
 
-	  //GfOut("I:%d P:%d Q:%d F:%g U:%g S:%g\n",I,P,Q,Factor,U,oPathPoints[P].Speed);
-
 	  if (oPathPoints[P].FlyHeight > 0.1)
 	    oPathPoints[P].Speed = oPathPoints[Q].Speed;
+
+      //GfOut("I:%d P:%d Q:%d F:%.3f U:%.2f S:%.2f\n",I,P,Q,Factor,U*3.6,oPathPoints[P].Speed*3.6);
+
 	}
   }
 }
