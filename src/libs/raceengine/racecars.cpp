@@ -373,6 +373,8 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
 				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage))
 		{
+			sprintf(car->ctrl.msg[2], "Pit request");
+
 			tdble lgFromStart = car->_trkPos.seg->lgfromstart;
 			
 			switch (car->_trkPos.seg->type) {
@@ -424,6 +426,32 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					} else {
 						ReCarsUpdateCarPitTime(car);
 					}
+				}
+				else
+				{   // The cars speed or offset is out of accepted range
+					// Show the user/developper the reason of the issue
+					double Offset = (toBorder + wseg) - (ReInfo->track->pits.width - car->_dimension_y / 2.0);
+  				    if (Offset >= 0.0)
+						// The car's position across the track is out of accepted range 
+						sprintf(car->ctrl.msg[2], "Offset: %.02f\n",Offset);
+					double MaxSpeed = MAX(fabs(car->_speed_x),fabs(car->_speed_y));
+  				    if (MaxSpeed >= 1.0)
+						// The car's speed is out of accepted range 
+						sprintf(car->ctrl.msg[2], "Speed: %.02f\n",MaxSpeed);
+				}
+			}
+			else
+			{	// The car's position along the track is out of accepted range
+				// Show the user/developper the reason of the issue
+				if (car->_pit->lmin > lgFromStart)
+				{
+				  double Delta = car->_pit->lmin - lgFromStart;
+				  sprintf(car->ctrl.msg[2], "Still to go: %0.2f m" ,Delta);
+				}
+				else if (car->_pit->lmax < lgFromStart)
+				{
+  				  double Delta = lgFromStart - car->_pit->lmax;
+				  sprintf(car->ctrl.msg[2], "Overrun: %0.2f m" ,Delta);
 				}
 			}
 		}
