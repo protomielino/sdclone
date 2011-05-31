@@ -919,7 +919,7 @@ void Driver::drive(tSituation *s)
     car->_gearCmd = getGear();
     calcSpeed();
     car->_brakeCmd = filterABS(filterBrakeSpeed(filterBColl(filterBPit(getBrake()))));
-    if (car->_brakeCmd == 0.0f) {
+    if (car->_brakeCmd <= 0.001f) {
       car->_accelCmd = filterTCL(filterTrk(filterTeam(filterOverlap(getAccel()))));
     } else {
       car->_accelCmd = 0.0f;
@@ -1206,40 +1206,43 @@ int Driver::getGear()
   if (car->_gear <= 0) {
     return 1;
   }
-#if 0
-  // Hymie gear changing
-  float speed = currentspeed;
-  float *tRatio = car->_gearRatio + car->_gearOffset;
-  float rpm = (float) ((speed + 0.5) * tRatio[car->_gear] / car->_wheelRadius(2));
-  float down_rpm = (float) (car->_gear > 1 ? (speed + 0.5) * tRatio[car->_gear-1] / car->_wheelRadius(2) : rpm);
+  if (1 || car->_gear > 2)
+  {
+    // Hymie gear changing
+    float speed = currentspeed;
+    float *tRatio = car->_gearRatio + car->_gearOffset;
+    float rpm = (float) ((speed + 0.5) * tRatio[car->_gear] / car->_wheelRadius(2));
+    float down_rpm = (float) (car->_gear > 1 ? (speed + 0.5) * tRatio[car->_gear-1] / car->_wheelRadius(2) : rpm);
 
-  float rcu = (car->_gear < 6 && car->_gear >= 0 ? GearRevsChangeUp[car->_gear] : RevsChangeUp);
-  float rcd = (car->_gear < 6 && car->_gear >= 0 ? GearRevsChangeDown[car->_gear] : RevsChangeDown);
-  float rcm = (car->_gear < 6 && car->_gear >= 0 ? GearRevsChangeDownMax[car->_gear] : RevsChangeDownMax);
+    float rcu = (car->_gear < 6 && car->_gear >= 0 ? GearRevsChangeUp[car->_gear] : RevsChangeUp);
+    float rcd = (car->_gear < 6 && car->_gear >= 0 ? GearRevsChangeDown[car->_gear] : RevsChangeDown);
+    float rcm = (car->_gear < 6 && car->_gear >= 0 ? GearRevsChangeDownMax[car->_gear] : RevsChangeDownMax);
 
-  if (rpm + MAX(0.0, (double) (car->_gear-3) * (car->_gear-3)*5) > car->_enginerpmMax * rcu && car->_gear < MaxGear)
-    car->_gearCmd = car->_gear + 1;
+    if (rpm + MAX(0.0, (double) (car->_gear-3) * (car->_gear-3)*10) > car->_enginerpmMax * rcu && car->_gear < MaxGear)
+      car->_gearCmd = car->_gear + 1;
 
-  if (car->_gear > 1 &&
-      rpm < car->_enginerpmMax * rcd &&
-      down_rpm < car->_enginerpmMax * rcm)
-    car->_gearCmd = car->_gear - 1;
-#else
-  // BT gear changing
-  float gr_up = car->_gearRatio[car->_gear + car->_gearOffset];
-  float omega = car->_enginerpmRedLine/gr_up;
-  float wr = car->_wheelRadius(2);
-
-  if (omega*wr*SHIFT < car->_speed_x) {
-    car->_gearCmd = car->_gear + 1;
-  } else {
-    float gr_down = car->_gearRatio[car->_gear + car->_gearOffset - 1];
-    omega = car->_enginerpmRedLine/gr_down;
-    if (car->_gear > 1 && omega*wr*SHIFT > car->_speed_x + SHIFT_MARGIN) {
+    if (car->_gear > 1 &&
+        rpm < car->_enginerpmMax * rcd &&
+        down_rpm < car->_enginerpmMax * rcm)
       car->_gearCmd = car->_gear - 1;
+  }
+  else
+  {
+    // BT gear changing
+    float gr_up = car->_gearRatio[car->_gear + car->_gearOffset];
+    float omega = car->_enginerpmRedLine/gr_up;
+    float wr = car->_wheelRadius(2);
+
+    if (omega*wr*SHIFT < car->_speed_x) {
+      car->_gearCmd = car->_gear + 1;
+    } else {
+      float gr_down = car->_gearRatio[car->_gear + car->_gearOffset - 1];
+      omega = car->_enginerpmRedLine/gr_down;
+      if (car->_gear > 1 && omega*wr*SHIFT > car->_speed_x + SHIFT_MARGIN) {
+        car->_gearCmd = car->_gear - 1;
+      }
     }
   }
-#endif
   
   return car->_gearCmd;
 }
@@ -3440,10 +3443,10 @@ float Driver::filterABS(float brake)
 
   //brake = MAX(MIN(origbrake, collision ? 0.15f :0.05f), brake - MAX(fabs(angle), fabs(car->_yaw_rate) / 2));
   brake = (float) (MAX(MIN(origbrake, (collision ? MAX(0.05f, (5.0-collision)/30) : 0.05f)), brake - fabs(angle-speedangle)*0.3));
-#endif
 
   if (fbrakecmd)
     brake = MAX(brake, fbrakecmd);
+#endif
 
   return brake;
 }
@@ -3452,7 +3455,7 @@ float Driver::filterABS(float brake)
 // TCL filter for accelerator pedal.
 float Driver::filterTCL(float accel)
 {
-  if (simtime < 2.0)
+  if (simtime < 0.7)
     return accel;
 
   accel = MIN(1.0f, accel);

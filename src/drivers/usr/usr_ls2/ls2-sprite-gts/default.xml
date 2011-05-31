@@ -34,13 +34,13 @@
 		<attnum name="accel exit" min="0.0" max="10.0" val="0.50"/>
 		<attnum name="turn decel" min="0" max="2" val="0.8"/>
 		<attnum name="curve factor" min="0" max="2" val="0.13"/>
-		<attnum name="accel curve" min="0" max="2" val="1.20"/>
+		<attnum name="accel curve" min="0" max="2" val="1.16"/>
 		<attnum name="accel curve limit" min="0" max="6" val="1.5"/>
 		<attnum name="brake curve" min="0" max="2" val="0.80"/>
 		<attnum name="brake curve limit" min="0" max="6" val="3"/>
-		<attnum name="revs change up" min="0" max="2" val="0.86"/>
-		<attnum name="revs change down" min="0" max="2" val="0.66"/>
-		<attnum name="revs change down max" min="0" max="2" val="0.76"/>
+		<attnum name="revs change up" min="0" max="2" val="0.76"/>
+		<attnum name="revs change down" min="0" max="2" val="0.60"/>
+		<attnum name="revs change down max" min="0" max="2" val="0.68"/>
 		<attnum name="steer skid" min="0" max="3" val="0.0"/>
 		<attnum name="steer gain" min="0" max="3" val="1.5"/>
 		<attnum name="max steer time" min="0.5" max="10" val="1.9"/>

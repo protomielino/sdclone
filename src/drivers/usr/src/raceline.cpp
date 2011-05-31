@@ -89,6 +89,7 @@ LRaceLine::LRaceLine() :
    BrakeDelay(20.0),
    BrakeDelayX(1.0),
    BrakeMod(1.0),
+   BrakePower(0.5),
    IntMargin(1.5),
    ExtMargin(2.0),
    AvoidSpeedAdjust(0.0),
@@ -330,6 +331,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  BrakeDelay = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE, (char *)NULL, 35.0f );
  BrakeDelayX = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BASE_BRAKE_X, (char *)NULL, 1.0f );
  BrakeMod = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_MOD, (char *)NULL, 1.0f );
+ BrakePower = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_POWER, (char *)NULL, 0.5f );
  SteerMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_STEER_MOD, (char *)NULL, 0.0f );
  MaxSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MAX_STEER_TIME, (char *)NULL, 1.5f );
  MinSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MIN_STEER_TIME, (char *)NULL, 1.0f );
@@ -944,7 +946,7 @@ void LRaceLine::CalcZCurvature(int rl)
   if (slope < 0.0)
    SRL[rl].tBrakeFriction[i] = 1.0 + MAX(-0.4, slope/10);
   else
-   SRL[rl].tBrakeFriction[i] = 1.0 + slope/20;
+   SRL[rl].tBrakeFriction[i] = 1.0 + slope/40;
  }
 }
 
@@ -1197,22 +1199,31 @@ void LRaceLine::ComputeSpeed(int rl)
 
   if (tSpeed[rf][i] > tSpeed[rf][next])
   {
-   if (BrakeMod > 0.1)
+   double nspeed = tSpeed[rf][next];
+
+   if (BrakeMod > 0.5)
    {
-    double bspd = (MIN(100.0, tSpeed[rf][next]) - 30.0) / 60 + fabs(SRL[rl].tRInverse[next])*40;
+    tSpeed[rf][i] = MIN(tSpeed[rf][i],
+      tSpeed[rf][next] + (BrakePower * MAX(0.2, (100.0 - tSpeed[rf][next])/50)) * 
+        (fabs(SRL[rl].tRInverse[next]) > 0.001 ? MAX(0.1, 1.0 - fabs(SRL[rl].tRInverse[next]*80)) : 1.0) *
+        SRL[rl].tBrakeFriction[i]);
+   }
+   else if (BrakeMod > 0.1)
+   {
+    double bspd = MAX(0.0, (MIN(100.0, tSpeed[rf][next]) - 30.0)) / 80 + fabs(SRL[rl].tRInverse[next])*40;
     tSpeed[rf][i] = MIN(tSpeed[rf][i], 
-       tSpeed[rf][next] + MAX(0.1, 
+       nspeed + MAX(0.1, 
        ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*7)) 
         * SRL[rl].tBrakeFriction[i]
-        * MAX(bd/4.0, bd / ((tSpeed[rf][next]*(tSpeed[rf][next]/20))/20))) 
-        * (MAX(0.2, 1.0 - (tSpeed[rf][next] > 30.0 ? bspd*(bspd+0.2)  : 0.0)) * BrakeMod)));
+        * MAX(bd/4.0, bd / ((nspeed*(nspeed/20))/20))) 
+        * (MAX(0.2, 1.0 - (nspeed > 30.0 ? bspd*(bspd+0.2)  : 0.0)) * BrakeMod)));
    }
    else
    {
-    tSpeed[rf][i] = MIN(tSpeed[rf][i], tSpeed[rf][next] + MAX(0.1, 
+    tSpeed[rf][i] = MIN(tSpeed[rf][i], nspeed + MAX(0.1, 
                         ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*8)) 
                          * SRL[rl].tBrakeFriction[i]
-                         * MAX(bd/4.0, bd / ((tSpeed[rf][next]*(tSpeed[rf][next]/20))/20)))));
+                         * MAX(bd/4.0, bd / ((nspeed*(nspeed/20))/20)))));
    }
   }
  }

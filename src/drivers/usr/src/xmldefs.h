@@ -50,6 +50,7 @@
 #define PRV_BASE_BRAKE        "base brake"
 #define PRV_BASE_BRAKE_X      "base brake factor"
 #define PRV_BRAKE_MOD         "brake mod"
+#define PRV_BRAKE_POWER       "brake power"
 #define PRV_SPEED_LIMIT       "speed limit"
 #define PRV_RACELINE_DEBUG    "raceline debug"
 #define PRV_ACCEL_EXIT        "accel exit"

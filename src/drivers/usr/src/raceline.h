@@ -148,6 +148,7 @@ class LRaceLine {
   double BrakeDelay;
   double BrakeDelayX;
   double BrakeMod;
+  double BrakePower;
   double IntMargin;
   double ExtMargin;
   double AvoidSpeedAdjust;
