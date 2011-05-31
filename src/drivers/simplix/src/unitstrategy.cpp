@@ -59,6 +59,8 @@
 //--------------------------------------------------------------------------*
 const float TSimpleStrategy::cMAX_FUEL_PER_METER = 0.0008f;
 const int TSimpleStrategy::cPIT_DAMMAGE = 5000;
+const short int NEEDED_MAJOR_VERSION = 1;
+const short int NEEDED_MINOR_VERSION = 1;
 //==========================================================================*
 
 //==========================================================================*
@@ -240,13 +242,13 @@ void TAbstractStrategy::PitRelease()
 {
 #ifdef SPEED_DREAMS
   RtTeamReleasePit(oDriver->TeamIndex());
-  oCar->ctrl.raceCmd = 0;
+  CarRaceCmd = 0;
 #else
   TTeamManager::TTeam* Team = oDriver->GetTeam();
   if (Team->PitState == CarDriverIndex)          // Box für mich reserviert?
   {
     Team->PitState = PIT_IS_FREE;
-    oCar->ctrl.raceCmd = 0;
+    CarRaceCmd = 0;
   }
 #endif
 };
@@ -402,7 +404,6 @@ double TSimpleStrategy::SetFuelAtRaceStart
 //--------------------------------------------------------------------------*
 bool TSimpleStrategy::GoToPit()
 {
-//return ((oState >= PIT_ENTER) && (oState <= PIT_GONE));
   return ((oState >= PIT_PREPARE) && (oState <= PIT_GONE));
 };
 //==========================================================================*
@@ -414,7 +415,7 @@ bool TSimpleStrategy::StartPitEntry(float& Ratio)
 {
   float DLong, DLat;                             // Dist to Pit
   RtDistToPit(oCar,oTrack,&DLong,&DLat);
-//  if (GoToPit() && (DLong < oPit->oPitLane->PitDist()))
+
   if (GoToPit() && (DLong < oDistToSwitch))
   {
     Ratio = (float) (1.0 - MAX(0.0,(DLong-100)/oDistToSwitch));
@@ -547,9 +548,9 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  { // We have to wait, till we reached the point to stop
 	    if (oDriver->CurrSpeed() < 3)
 		{
-	      oCar->ctrl.accelCmd =                    // a little throttle
-			  MAX(0.05f,oCar->ctrl.accelCmd);
-	      oCar->ctrl.brakeCmd = 0.0;               // Start braking
+	      CarAccelCmd =                          // a little throttle
+			  MAX(0.05f,CarAccelCmd);
+	      CarBrakeCmd = 0.0;                     // Start braking
 		  //GfOut("#PIT_ENTER: Wait %g (%g)\n",TrackPos,oDriver->CurrSpeed());
 		}
 		else
@@ -570,9 +571,9 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
   	    //GfOut("#PIT_ASKED: CanStop %g (%g)\n",TrackPos,oDriver->CurrSpeed());
 		oDriver->oStanding = true;               // For motion survey!
         oPitTicker = 0;                          // Start service timer
-	    oCar->ctrl.accelCmd = 0;                 // release throttle
-	    oCar->ctrl.brakeCmd = 1.0;               // Start braking
-	    oCar->ctrl.raceCmd = RM_CMD_PIT_ASKED;   // Tell TORCS to service us! To test oPitTicker comment out
+	    CarAccelCmd = 0;                         // release throttle
+	    CarBrakeCmd = 1.0;                       // Start braking
+	    CarRaceCmd = RM_CMD_PIT_ASKED;           // Tell TORCS to service us! To test oPitTicker comment out
 	    oState = PIT_SERVICE;                    
 	  }
 	  else
@@ -589,9 +590,9 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 		  //GfOut("#ToShort 1: %g\n",TrackPos);
 	      if (oDriver->CurrSpeed() < 3)
 		  {
-	        oCar->ctrl.accelCmd =                    // a little throttle
-			  MAX(0.05f,oCar->ctrl.accelCmd);
-	        oCar->ctrl.brakeCmd = 0.0;               // Start braking
+	        CarAccelCmd =                        // a little throttle
+			  MAX(0.05f,CarAccelCmd);
+	        CarBrakeCmd = 0.0;                   // Start braking
 		  }
 		}
 	  }
@@ -601,11 +602,59 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
       // Wait to reach standstill to get service from TORCS
 	  oDriver->oStanding = true;                 // Keep motion survey quiet
 	  oPitTicker++;                              // Check time to start service
-	  if (oPitTicker > 150)                      // Check Timer
-	  { // If we have to wait to long
-		  //GfOut("#oPitTicker: %d\n",oPitTicker);
-	    PitRelease();                            // Something went wrong, we have 
-	    oState = PIT_EXIT_WAIT;                  // to leave and release pit for teammate
+	  if (oPitTicker > 10)                       // Check Timer
+	  { // If we have to wait
+		// GfOut("#oPitTicker: %d\n",oPitTicker);
+		tTeamDriver* TeamDriver = RtTeamDriverByCar(oCar); 
+		short int Major = RtTeamManagerGetMajorVersion();
+		short int Minor = RtTeamManagerGetMinorVersion();
+		if ((TeamDriver)
+		  && (
+		    (Major > NEEDED_MAJOR_VERSION) 
+		    || (Major = NEEDED_MAJOR_VERSION) && (Minor >= NEEDED_MINOR_VERSION)))
+		{
+			//GfOut("#Pitting issues %s\n",oDriver->GetBotName());
+			//GfOut("#StillToGo : %.2f m\n",TeamDriver->StillToGo);
+			//GfOut("#MoreOffset: %.2f m\n",TeamDriver->MoreOffset);
+			//GfOut("#TooFastBy : %.2f m/s\n",TeamDriver->TooFastBy);
+
+			// Learn from the response
+			if (fabs(TeamDriver->StillToGo) > 0.0)
+			{
+	          //CarSteerCmd = 0.0;                 // Straight on
+			  if (fabs(CarSpeedLong) < 1.0)
+			  {
+	            CarAccelCmd =                    // a little throttle
+			      MAX(0.005f,CarAccelCmd);
+	            CarBrakeCmd = 0.0;                 // No braking
+  			    //GfOut("#Accel     : %.2f\n",CarAccelCmd);
+			  }
+			  else
+			  {
+	            CarBrakeCmd = 0.1f;              // Braking
+  			    //GfOut("#Brake     : %.2f\n",CarBrakeCmd);
+			  }
+	          CarClutchCmd = 0.5;                // Press clutch
+			  if (TeamDriver->StillToGo > 0)
+	            CarGearCmd = 1;                  // First gear
+			  else
+	            CarGearCmd = -1;                 // reverse gear
+			}
+			else
+			{
+// 			    GfOut("#Stopped\n");
+	            CarAccelCmd = 0.0;               // Stop throttle
+	            CarBrakeCmd = 1.0;               // Lock brake
+	            CarClutchCmd = 0.0;              // Release clutch
+	            CarGearCmd = 1;                  // First gear
+			}
+		}
+
+  	    if (oPitTicker > 300)                    // Check Timer
+		{ // If we have to wait too long
+	      PitRelease();                          // Something went wrong, we have 
+	      oState = PIT_EXIT_WAIT;                // to leave and release pit for teammate
+		}
 	  }
 	  else if (oPit->oPitLane[0].Overrun(TrackPos))
 	  { // If we couldn't stop in place
@@ -616,10 +665,10 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 	  else
 	  { // There is nothing that hampers TORCS to service us
   	    //GfOut("#PIT_SERVICE: %g (%g)\n",TrackPos,oDriver->CurrSpeed());
-		oCar->ctrl.lightCmd = 0;                 // No lights on
-        oCar->ctrl.accelCmd = 0;                 // No throttle
-	    oCar->ctrl.brakeCmd = 1.0;               // Still braking
-	    oCar->ctrl.raceCmd = RM_CMD_PIT_ASKED;   // Tell TORCS to service us! To test oPitTicker comment out
+		CarLightCmd = 0;                         // No lights on
+        CarAccelCmd = 0;                         // No throttle
+	    CarBrakeCmd = 1.0;                       // Still braking
+	    CarRaceCmd = RM_CMD_PIT_ASKED;           // Tell TORCS to service us! To test oPitTicker comment out
         // oState is set to next state in PitRepair()!
 		// If TORCS doesn't service us, no call to PitRepair() is done!
 		// We run into timeout! (oPitTicker)
@@ -640,24 +689,24 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
   		  //GfOut("#PIT_EXIT: mts%g (mdb%gm)\n",oMinTimeSlot,oMinDistBack);
 	      oState = PIT_EXIT;
 		}
-		oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;    // Only small lights on           
-		oCar->ctrl.accelCmd = 0.0;               
-	    oCar->ctrl.brakeCmd = 1.0;               
+		CarLightCmd = RM_LIGHT_HEAD2;            // Only small lights on           
+		CarAccelCmd = 0.0;               
+	    CarBrakeCmd = 1.0;               
 	  }
 	  else
 	  {
-		oCar->ctrl.lightCmd = RM_LIGHT_HEAD1;    // Only big lights on           
+		CarLightCmd = RM_LIGHT_HEAD1;             // Only big lights on           
 	    oState = PIT_EXIT;
 	  }
 	  break;
 
 	case PIT_EXIT:
       // We are still in the box
-	  oDriver->oStanding = true;                 // Keep motion survey quiet
-      oGoToPit = false;                          // Service is finished, lets go
-	  oCar->ctrl.accelCmd = 0.5;                 // Press throttle
-	  oCar->ctrl.brakeCmd = 0;                   // Release brake
-	  PitRelease();                              // Release pit for teammate
+	  oDriver->oStanding = true;                  // Keep motion survey quiet
+      oGoToPit = false;                           // Service is finished, lets go
+	  CarAccelCmd = 0.5;                          // Press throttle
+	  CarBrakeCmd = 0;                            // Release brake
+	  PitRelease();                               // Release pit for teammate
 	  if (oDriver->CurrSpeed() > 5)
 	    oState = PIT_GONE;                          
 	  break;
@@ -666,7 +715,7 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
       // We are on our path back to the track
 	  if (!oPit->oPitLane[0].InPitSection(TrackPos))
 	  { // If we reached the end of the pitlane
-        oCar->ctrl.lightCmd = RM_LIGHT_HEAD1 |   // All lights on
+        CarLightCmd = RM_LIGHT_HEAD1 |           // All lights on
 			RM_LIGHT_HEAD2;                      
 		oState = PIT_NONE;                       // Switch to default mode 
 	  }

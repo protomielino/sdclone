@@ -294,7 +294,6 @@ private:
 	double oCurrSpeed;                           // Currend speed
 	double oGearEff[MAX_GEARS];                  // Efficiency of gears
 	int oExtended;                               // Information if this robot is extended (oExtended = 1) or not (oExtended = 0).
-	int oIndex;                                  // index of own driver
 	int oLastGear;                               // Last gear
     bool oLetPass;                               // Let opoonent pass
 	double oLookAhead;                           // Look ahead base value
@@ -377,6 +376,7 @@ private:
     unsigned int oRandomSeed;                    // seed of generator
 	
   public:
+	int oIndex;                                  // index of own driver
     int oTestPitStop;                            // Test pit stop
 
 	static double LengthMargin;                  // Length margin

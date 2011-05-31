@@ -30,6 +30,7 @@
 #include <network.h>
 #include <robot.h>
 #include <robottools.h>
+#include <teammanager.h>
 
 #include "raceengine.h"
 
@@ -429,29 +430,58 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				}
 				else
 				{   // The cars speed or offset is out of accepted range
-					// Show the user/developper the reason of the issue
-					double Offset = (toBorder + wseg) - (ReInfo->track->pits.width - car->_dimension_y / 2.0);
+					// Show the user/developer/robot the reason of the issue
+  				    tTeamDriver* TeamDriver = RtTeamDriverByCar(car);
+					if (TeamDriver)
+					{
+					  TeamDriver->StillToGo  = 0.0;
+					  TeamDriver->MoreOffset = 0.0;
+					  TeamDriver->TooFastBy  = 0.0;
+					}
+
+					float Offset = (float) ((toBorder + wseg) - (ReInfo->track->pits.width - car->_dimension_y / 2.0));
   				    if (Offset >= 0.0)
+					{
 						// The car's position across the track is out of accepted range 
 						sprintf(car->ctrl.msg[2], "Offset: %.02f\n",Offset);
-					double MaxSpeed = MAX(fabs(car->_speed_x),fabs(car->_speed_y));
-  				    if (MaxSpeed >= 1.0)
+						if (TeamDriver)
+						  TeamDriver->MoreOffset = Offset;
+					}
+
+					float TooFastBy = MAX(fabs(car->_speed_x),fabs(car->_speed_y));
+  				    if (TooFastBy >= 1.0)
+					{
 						// The car's speed is out of accepted range 
-						sprintf(car->ctrl.msg[2], "Speed: %.02f\n",MaxSpeed);
+						sprintf(car->ctrl.msg[2], "Speed: %.02f\n",TooFastBy);
+						if (TeamDriver)
+						  TeamDriver->TooFastBy = TooFastBy;
+					}
 				}
 			}
 			else
 			{	// The car's position along the track is out of accepted range
-				// Show the user/developper the reason of the issue
+				// Show the user/developer/robot the reason of the issue
+				tTeamDriver* TeamDriver = RtTeamDriverByCar(car);
+				if (TeamDriver)
+				{
+				  TeamDriver->StillToGo  = 0.0;
+				  TeamDriver->MoreOffset = 0.0;
+				  TeamDriver->TooFastBy  = 0.0;
+				}
+
 				if (car->_pit->lmin > lgFromStart)
 				{
-				  double Delta = car->_pit->lmin - lgFromStart;
-				  sprintf(car->ctrl.msg[2], "Still to go: %0.2f m" ,Delta);
+				  float StillToGo = car->_pit->lmin - lgFromStart;
+				  sprintf(car->ctrl.msg[2], "Still to go: %0.2f m" ,StillToGo);
+				  if (TeamDriver)
+				    TeamDriver->StillToGo = StillToGo;
 				}
 				else if (car->_pit->lmax < lgFromStart)
 				{
-  				  double Delta = lgFromStart - car->_pit->lmax;
-				  sprintf(car->ctrl.msg[2], "Overrun: %0.2f m" ,Delta);
+  				  float StillToGo = lgFromStart - car->_pit->lmax;
+				  sprintf(car->ctrl.msg[2], "Overrun: %0.2f m" ,StillToGo);
+				  if (TeamDriver)
+				    TeamDriver->StillToGo = -StillToGo;
 				}
 			}
 		}

@@ -1251,11 +1251,11 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
 //--------------------------------------------------------------------------*
 void TDriver::DriveLast()
 {
-  oCar->ctrl.accelCmd = (float) oAccel;
-  oCar->ctrl.brakeCmd = (float) oBrake;
-  oCar->ctrl.clutchCmd = (float) oClutch;
-  oCar->ctrl.gear = oGear;
-  oCar->ctrl.steer = (float) oSteer;
+  CarAccelCmd = (float) oAccel;
+  CarBrakeCmd = (float) oBrake;
+  CarClutchCmd = (float) oClutch;
+  CarGearCmd = oGear;
+  CarSteerCmd = (float) oSteer;
 }
 //==========================================================================*
 
@@ -1345,29 +1345,29 @@ void TDriver::Drive()
   oLastDriftAngle = oDriftAngle;
 
   // Tell TORCS what we want do do
-  oCar->ctrl.accelCmd = (float) oAccel;
-  oCar->ctrl.brakeCmd = (float) oBrake;
-  oCar->ctrl.clutchCmd = (float) oClutch;
-  oCar->ctrl.gear = oGear;
-  oCar->ctrl.steer = (float) oSteer;
+  CarAccelCmd = (float) oAccel;
+  CarBrakeCmd = (float) oBrake;
+  CarClutchCmd = (float) oClutch;
+  CarGearCmd = oGear;
+  CarSteerCmd = (float) oSteer;
 
 /** /
   if (oIndex == 10)
   {
 //    int Idx = oTrackDesc.IndexFromPos(Pos);
-//    GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,oCar->ctrl.accelCmd,oCar->ctrl.brakeCmd,oCar->ctrl.clutchCmd,oCar->ctrl.gear,oCar->ctrl.steer);
-    GfOut("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",oCar->ctrl.accelCmd,oCar->ctrl.brakeCmd,oCar->ctrl.clutchCmd,oCar->ctrl.steer,oCar->ctrl.gear);
+//    GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
+    GfOut("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarSteerCmd,CarGearCmd);
   }
 / **/
   if (oDoAvoid)
-    oCar->ctrl.lightCmd = RM_LIGHT_HEAD2;        // Only small lights on
+    CarLightCmd = RM_LIGHT_HEAD2;                // Only small lights on
   else
-    oCar->ctrl.lightCmd = RM_LIGHT_HEAD1;        // Only big lights on
+    CarLightCmd = RM_LIGHT_HEAD1;                // Only big lights on
 /*
-  oCar->ctrl.lightCmd =                          // All front lights on
+  CarLightCmd =                                  // All front lights on
     RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
-  oCar->ctrl.lightCmd =                          // All front lights on
+  CarLightCmd =                                  // All front lights on
     RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;             // All rear lights on
 */
   if (!Qualification)                            // Don't use pit while
@@ -1630,6 +1630,7 @@ void TDriver::FindRacinglines()
 	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
 	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
+	  GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
 	}
   }
 

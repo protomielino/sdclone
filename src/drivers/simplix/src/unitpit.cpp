@@ -395,7 +395,6 @@ void TPitLane::MakePath
   S[6] = -tan(Point.Angle                        // and direction at the
 	- oTrack->ForwardAngle(oPitExitPos));        // TORCS end of pitlane
 
-  // First use a generic path through the pitlane without the pit itself
   if (Param.Pit.oUseFirstPit && FirstPit)        // If allowed and possible
   {                                              // we will use a special path to
 	Y[3] = Y[2] = Y[1] = Sign *                  // the first pit with
@@ -404,14 +403,13 @@ void TPitLane::MakePath
   }
   else                                           // All other pits
   {                                              // have to be reached over
-//    Y[3] = Y[2] = Y[1] = Sign *                  // a path defined here
     Y[2] = Y[1] = Sign *                         // a path defined here
 	  (PitLaneOffset -                           // Sign gives the side of the pits
 	  Param.Pit.oLaneEntryOffset * F[Index]);    // and we correct the TORCS offset
 
 	Y[3] = Sign *                                // we have to set the pit 
-	  (fabs(PitInfo->driversPits->pos.toMiddle)  // offset
-	  + Param.Pit.oLatOffset);                   // 
+	  (fabs(PitInfo->driversPits->pos.toMiddle   // offset
+	  + Param.Pit.oLatOffset));                  // oLatOffset > 0 -> more to out side
   }
 
   Y[5] = Y[4] = Sign *                           // Leaving the own pit, we will
@@ -441,10 +439,6 @@ void TPitLane::MakePath
     double SplineX =                             // Station in spline coordinates
 	  ToSplinePos(oTrack->Section(I).DistFromStart);
 
-	// Restrict to length of spline
-	if (SplineX > X[6])
-		SplineX = X[6];
-
 	// Calculate offset to side depending on pit side
     if (Sign < 0) 
       SplineY = MAX(PreSpline.CalcOffset(SplineX),-(oPathPoints[I].WPitToL - 1.3));
@@ -471,7 +465,7 @@ void TPitLane::MakePath
   // Allowed speed in pitlane itself
   for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)
   {
-    double Speed = MIN(oPathPoints[I].Speed, PitInfo->speedLimit - 0.5);
+    double Speed = MIN(oPathPoints[I].Speed, PitInfo->speedLimit - 0.75);
     oPathPoints[I].MaxSpeed = oPathPoints[I].Speed = Speed;
   }
 
@@ -516,16 +510,15 @@ void TPitLane::MakePath
   do
   {
     Idx0 = (Idx0 + NSEG - 1) % NSEG;
-    DeltaSpeed = 
-	  MIN(BasePath->oPathPoints[Idx0].Speed,BasePath->oPathPoints[Idx0].AccSpd) - 
-	  oPathPoints[Idx0].Speed;
-    //GfOut("#DeltaSpeed: %d (%.2f km/h)(%.1f km/h)(%.1f km/h)\n",Idx0,DeltaSpeed*3.6,oPathPoints[Idx0].Speed*3.6,BasePath->oPathPoints[Idx0].Speed*3.6);
+	double TrackSpeed =
+	  MIN(BasePath->oPathPoints[Idx0].Speed,BasePath->oPathPoints[Idx0].AccSpd);
+    DeltaSpeed = TrackSpeed - oPathPoints[Idx0].Speed;
   } while ((DeltaSpeed > 1.0) && (++Steps < NSEG));
   GfOut("#Steps to pit entry: %d\n",Steps);
 
-  // Distance of pit entry to pit stop point
+  // Distance before pit to decide for pitstop
   oPitDist = oPitStopPos - oPathPoints[Idx0].Dist();
-  GfOut("#Pit dist      : %.2f\n",oPitDist);
+  //GfOut("#Pit dist      : %.2f\n",oPitDist);
   if (oPitDist < 0)
     oPitDist += oTrack->Length();
   GfOut("#Pit dist norm.: %.2f\n",oPitDist);

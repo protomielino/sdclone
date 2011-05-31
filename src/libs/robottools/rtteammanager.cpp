@@ -1,10 +1,11 @@
 /***************************************************************************
 
     file                 : rtteammanager.cpp
-    created              : Sun Feb 22 28:43:00 CET 2009
-    copyright            : (C) 2009 by Wolf-Dieter Beelitz
+    created              : Sun Feb 22 23:43:00 CET 2009
+    last changed         : Sun May 29 23:00:00 CET 2011
+    copyright            : (C) 2009-2011 by Wolf-Dieter Beelitz
     email                : wdb@wdbee.de
-    version              : 
+    version              : 1.1
 
  ***************************************************************************/
 
@@ -107,6 +108,10 @@ tTeamDriver* RtTeamDriver()
 	TeamDriver->MinLaps = 1;
 	TeamDriver->LapsRemaining = 99;
 
+	// V1.1
+	TeamDriver->StillToGo = 0.0;
+	TeamDriver->MoreOffset = 0.0;
+	TeamDriver->TooFastBy = 0.0;
 
 	return TeamDriver;
 };
@@ -790,4 +795,31 @@ void RtTeamManagerDump(int DumpMode)
 	}
 
 	GfOut("\n\nTM: <<< RtTeamManagerDump\n\n");
+}
+
+// V1.1
+// Get the TeamDriver by car
+//
+extern tTeamDriver* RtTeamDriverByCar(CarElt* const Car)
+{
+	if (RtTM == NULL)
+		return NULL;
+
+	if (RtTM->Drivers == NULL)
+	{
+		return NULL;
+	}
+	else
+	{
+		// Look for the car
+		tTeamDriver* TeamDriver = RtTM->TeamDrivers;
+		while (TeamDriver)
+		{
+			if (TeamDriver->Car == Car)
+				return TeamDriver;
+			
+			TeamDriver = TeamDriver->Next;
+		}
+	}
+	return NULL;
 }
