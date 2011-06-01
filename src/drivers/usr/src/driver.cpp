@@ -2098,8 +2098,9 @@ bool Driver::canOvertake2( Opponent *o, int avoidingside )
   }
 
   oAspeed = MIN(oAspeed, o->getSpeed()+2.0);
+  oAspeed = MAX(oAspeed, car->_speed_x - MIN(distance, o->getTimeImpact())/2);
 
-  if (oAspeed > o->getSpeed())
+  if (oAspeed >= o->getSpeed())  // speed on avoidside of opponent is fast enough
   {
     if (DebugMsg & debug_overtake)
       fprintf(stderr,"-> %s: OVERTAKE2 ospd=%.1f oAspd=%.1f\n",ocar->_name,o->getSpeed(),oAspeed);
@@ -2130,6 +2131,7 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
   speed = MIN(avspeed, (speed + MAX(0.0, (30.0 - distance) * MAX(0.1, 1.0 - MAX(0.0, rInv-0.001)*80))));
   double ospeed = o->getSpeed();
   oAspeed = MIN(oAspeed, ospeed+2.0);
+  oAspeed = MAX(oAspeed, car->_speed_x - MIN(distance, o->getTimeImpact())/2);
   double timeLimit = 3.0 - MIN(2.4, rInv * 1000);
 
   if (*mincatchdist > speed - ospeed)
@@ -2142,10 +2144,10 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
     return false;
   }
 
-  if (speed > ospeed + 2*overtakecaution + fabs(rInv) * 500 && 
-      oAspeed > ospeed && 
-      (o->getTimeImpact() * (1.0+overtakecaution) < timeLimit ||
-       distance < MAX(3.0, speed/7)))
+  if (speed > ospeed + 2*overtakecaution + fabs(rInv) * 500 &&   // our speed quicker than opponent
+      oAspeed > ospeed &&                                        // avoid speed quicker than opponent
+      (o->getTimeImpact() * (1.0+overtakecaution) < timeLimit || // approaching opponent quickly
+       distance < MAX(3.0, speed/5)))                            // close behind opponent
   {
     // faster than opponent, overtake
     *mincatchdist = speed - ospeed;

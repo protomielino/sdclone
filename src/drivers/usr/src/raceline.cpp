@@ -2192,12 +2192,12 @@ double LRaceLine::getAvoidSteer(double offset, LRaceLineData *data)
  //double offline = MIN(2.0, MAX(-2.0, (offset - car->_trkPos.toMiddle)));
  //targetAngle -= offline/15;
 
- double steer_direction = targetAngle - (car->_yaw + car->_yaw_rate/(15-MIN(8, car->_speed_x/10)));
+ double steer_direction = targetAngle - (car->_yaw + car->_yaw_rate/15); //(15-MIN(8, car->_speed_x/10)));
  NORM_PI_PI(steer_direction);
 
  steer = steer_direction / car->_steerLock;
 
- double nextangle = data->angle + car->_yaw_rate/3;
+ double nextangle = data->angle + car->_yaw_rate/4;
 
  if (fabs(nextangle) > fabs(data->speedangle))
  {
@@ -2356,14 +2356,24 @@ double LRaceLine::correctLimit(double avoidsteer, double racesteer, int insideli
  // correct would take us in the opposite direction to a corner - correct less!
  if ((SRL[SRLidx].tRInverse[Next] > 0.001 && avoidsteer > racesteer) ||
      (SRL[SRLidx].tRInverse[Next] < -0.001 && avoidsteer < racesteer))
-  return MAX(0.001, MIN(limit, limit - (fabs(SRL[SRLidx].tRInverse[Next]) * 200.0 + tbump)));
+ {
+  limit = MAX(0.001, MIN(limit, limit - (fabs(SRL[SRLidx].tRInverse[Next]) * 200.0 + tbump)));
+ }
+ else
+ {
+  // correct would take us in the opposite direction to a corner - correct less (but not as much as above)
+  int nnext = (Next + (int) (car->_speed_x/3)) % Divs;
+  //double nnlane2left = SRL[SRLidx].tLane[nnext] * SRL[SRLidx].Width;
+  if ((SRL[SRLidx].tRInverse[nnext] > 0.001 && avoidsteer > racesteer) ||
+      (SRL[SRLidx].tRInverse[nnext] < -0.001 && avoidsteer < racesteer))
+   limit = MAX(0.001, MIN(limit, limit - (fabs(SRL[SRLidx].tRInverse[nnext]) * 140.0 + tbump)));
+ }
 
- // correct would take us in the opposite direction to a corner - correct less (but not as much as above)
- int nnext = (Next + (int) (car->_speed_x/3)) % Divs;
- //double nnlane2left = SRL[SRLidx].tLane[nnext] * SRL[SRLidx].Width;
- if ((SRL[SRLidx].tRInverse[nnext] > 0.001 && avoidsteer > racesteer) ||
-     (SRL[SRLidx].tRInverse[nnext] < -0.001 && avoidsteer < racesteer))
-  return MAX(0.001, MIN(limit, limit - (fabs(SRL[SRLidx].tRInverse[nnext]) * 140.0 + tbump)));
+ if ((avoidsteer > racesteer && car->_yaw_rate < 0.0) || (avoidsteer < racesteer && car->_yaw_rate > 0.0))
+ {
+  // avoid oversteering back towards raceline
+  limit = MAX(0.001, limit - (fabs(car->_yaw_rate) * car->_speed_x) / 100.0);
+ }
 
  // ok, we're not inside the racing line.  Check and see if we're outside it and turning 
  // into a corner, in which case we want to correct more to try and get closer to the
