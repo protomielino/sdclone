@@ -81,6 +81,7 @@ typedef struct ob {
   int kids;
   point_t loc;
   int attrSurf;
+  int attrMat;
   char * texture;
   char * texture1;
   char * texture2;

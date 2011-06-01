@@ -434,6 +434,7 @@ int terrainSplitOb (ob_t **object)
       
 	tob->textarray=(double *) malloc(sizeof(tcoord_t)* numtri*2);
 	tob->attrSurf=(*object)->attrSurf;
+	tob->attrMat=(*object)->attrMat;
 
 	memcpy(tob->vertex, pttmp,n*sizeof(point_t));  
 	memcpy(tob->snorm, snorm,n*sizeof(point_t));  
@@ -660,12 +661,14 @@ int splitOb (ob_t **object)
 	tob->vertexarray=(tcoord_t *) malloc(sizeof(tcoord_t)* numtri*3);
 	tob->textarray=(double *) malloc(sizeof(tcoord_t)* numtri*2);
 	tob->attrSurf=(*object)->attrSurf;
+	tob->attrMat=(*object)->attrMat;
 	if ((*object)->data) {
 	    tob->data=strdup((*object)->data);
 	} else {
 	    tob->data=NULL;
 	}
 	attrSurf=tob->attrSurf;
+	attrMat=tob->attrMat;
 	memcpy(tob->vertexarray, vatmp,numtri*3*sizeof(tcoord_t));
 	memcpy(tob->vertex, pttmp,n*sizeof(point_t));
 	memcpy(tob->snorm, snorm,n*sizeof(point_t));      
@@ -727,6 +730,7 @@ int doKids(char *Line, ob_t *object, mat_t *material)
 	object->next->norm=(point_t*)malloc(sizeof(point_t)*numrefstotal*3);
 	object->next->snorm=(point_t*)malloc(sizeof(point_t)*numrefstotal*3);
 	object->next->attrSurf=attrSurf;
+	object->next->attrMat=attrMat;
 	attrSurf=0x20;
 	memset(object->next->snorm,0,sizeof(point_t )*numrefstotal*3);
 	memset(object->next->norm,0,sizeof(point_t )*numrefstotal*3);
@@ -1591,7 +1595,7 @@ int printOb(ob_t * ob)
 		fprintf (ofile,"SURF 0x%2x\n",ob->attrSurf);
 	    else
 		fprintf (ofile,"SURF 0x20\n");
-	    fprintf (ofile,"mat %d\n",attrMat);
+	    fprintf (ofile,"mat %d\n",ob->attrMat);
 	    fprintf (ofile,"refs 3\n");
 	    /* GUIONS */
 	    if (multitex==0) {
@@ -2906,7 +2910,7 @@ void stripifyOb(ob_t * object,int writeit)
 		    } else {
 			fprintf (ofile,"SURF 0x24\n");
 		    }
-		    fprintf (ofile,"mat %d\n",attrMat);
+		    fprintf (ofile,"mat %d\n",object->attrMat);
 		    fprintf (ofile,"refs %d\n",StripLength[i]);
 		    if(multitex==0)
 			{
@@ -4023,6 +4027,7 @@ ob_t * mergeObject (ob_t *ob1,ob_t * ob2, char * nameS)
     tobS->textarray2=(double *) malloc(sizeof(tcoord_t)* numtri*2*3);
     tobS->textarray3=(double *) malloc(sizeof(tcoord_t)* numtri*2*3);
     tobS->attrSurf=ob1->attrSurf;
+    tobS->attrMat=ob1->attrMat;
     tobS->name=(char *) malloc(strlen(nameS)+1);
     tobS->texture=strdup(nameS);
     tobS->type= ob1->type ? strdup(ob1->type) : NULL;
@@ -4268,6 +4273,7 @@ int mergeSplitted (ob_t **object)
 	    memset(tobS->norm,0,sizeof(point_t )*numtri*3);
 	    tobS->textarray=(double *) malloc(sizeof(tcoord_t)* numtri*2*3);
 	    tobS->attrSurf=tob->attrSurf;
+	    tobS->attrMat=tob->attrMat;
 	    tobS->name=(char *) malloc(strlen(nameS)+1);
 	    tobS->texture=strdup(nameS);
 	    tobS->type= tob->type ? strdup(tob->type) : NULL;
