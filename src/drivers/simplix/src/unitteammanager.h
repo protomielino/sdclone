@@ -2,16 +2,16 @@
 // unitteammanager.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Teammanager
 //
 // File         : unitteammanager.h
 // Created      : 25.11.2007
-// Last changed : 2009.07.11
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:

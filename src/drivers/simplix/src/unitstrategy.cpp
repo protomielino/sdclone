@@ -6,13 +6,13 @@
 //--------------------------------------------------------------------------*
 // Pitstop strategy
 // Boxenstop-Strategie
-//
+// 
 // File         : unitstrategy.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf dem erweiterten Robot-Tutorial bt
 //
@@ -609,9 +609,8 @@ void TSimpleStrategy::CheckPitState(float PitScaleBrake)
 		short int Major = RtTeamManagerGetMajorVersion();
 		short int Minor = RtTeamManagerGetMinorVersion();
 		if ((TeamDriver)
-		  && (
-		    (Major > NEEDED_MAJOR_VERSION) 
-		    || (Major = NEEDED_MAJOR_VERSION) && (Minor >= NEEDED_MINOR_VERSION)))
+		  && ((Major > NEEDED_MAJOR_VERSION) 
+		    || ((Major = NEEDED_MAJOR_VERSION) && (Minor >= NEEDED_MINOR_VERSION))))
 		{
 			//GfOut("#Pitting issues %s\n",oDriver->GetBotName());
 			//GfOut("#StillToGo : %.2f m\n",TeamDriver->StillToGo);

@@ -9,10 +9,10 @@
 //
 // File         : unitcommon.cpp
 // Created      : 2007.11.25
-// Last changed : 2010.11.12
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // This unit is based on the robot mouse_2006 
 // Diese Unit basiert auf dem Roboter mouse_2006

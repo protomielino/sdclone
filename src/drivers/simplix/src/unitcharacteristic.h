@@ -2,15 +2,16 @@
 // unitcharacteristic.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
 // Angepasste (angelernte) Kennlinie
 //
-// Datei    : unitcharacteristic.h
-// Erstellt : 17.11.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitcharacteristic.h
+// Created      : 2007.11.17
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Diese Version wurde mit MS Visual C++ 2005 Express Edition entwickelt.
 //--------------------------------------------------------------------------*

@@ -2,17 +2,17 @@
 // unitopponent.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams-Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Opponents
 // Rivalen (und Teammitglieder)
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2010.01.30
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //

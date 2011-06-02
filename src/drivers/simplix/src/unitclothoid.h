@@ -2,17 +2,17 @@
 // unitclothoid.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Lane clothoide like
 // Fahrspur clothoidenähnlich
 //
 // File         : unitclothoid.h
 // Created      : 2007.11.17
-// Last changed : 2010.10.17
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*

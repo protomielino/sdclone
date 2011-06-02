@@ -2,16 +2,17 @@
 // unitlinalg.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
 // Hilfsfunktionen für 2D- und 3D-Vektoren
 // (C++-Portierung der Unit UnitLinAlg.pas)
 //
-// Datei    : unitlinalg.h
-// Erstellt : 20.02.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitlinalg.h
+// Created      : 2007.11.20
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:

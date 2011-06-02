@@ -2,17 +2,17 @@
 // unitfixcarparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Constant parameters of the car and calculations with it
 // Unveränderliche Parameter des Fahrzeugs und Nebenrechnungen
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -411,21 +411,27 @@ double TFixCarParam::CalcMaxSpeed
   {
 	if (TDriver::UseGPBrakeLimit)
 	{
-      if (Speed < 10.0)
-    	  Speed = 10.0;
+      if (Speed < 7.0)
+    	  Speed = 7.0;
 	}
 	else
 	{
       if (Speed < 12.0)
     	  Speed = 12.0;
 	}
-      if (Speed < 12.0)
-    	  Speed = 12.0;
   }
   else
   {
-    if (Speed < 8.0)
-      Speed = 8.0;
+	if (TDriver::UseGPBrakeLimit)
+	{
+      if (Speed < 5.0)
+        Speed = 5.0;
+	}
+	else
+	{
+      if (Speed < 12.0)
+    	  Speed = 12.0;
+	}
   }
 
   return Speed;

@@ -2,15 +2,16 @@
 // unitpitparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
-// Parameter der Box und der Anfahrt zur Box
-//
-// Datei    : unitpitparam.cpp
-// Erstellt : 11.04.2008
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
+// Interface to TORCS
+// 
+// File         : unitpitparam.cpp 
+// Created      : 2008.04.11
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*

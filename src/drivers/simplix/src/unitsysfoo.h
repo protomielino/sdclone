@@ -2,16 +2,16 @@
 // unitsysfoo.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
-// Systemfunktion
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
 // (C++-Portierung der Unit UnitSysFoo.pas)
 //
-// Datei    : unitsysfoo.h
-// Erstellt : 20.02.2007
-// Stand    : 24.11.2008
-// Copyright: © 2007-2008 Wolf-Dieter Beelitz
-// eMail    : wdb@wdbee.de
-// Version  : 1.01.000
+// File         : unitsysfoo.h
+// Created      : 2007.02.20
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// eMail        : wdb@wdbee.de
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Realisierung einer speziellen "Systemfunktion" zur einfachen und schnellen
 // Berechnung des Faltungsintegrals eines lineraren Systems.

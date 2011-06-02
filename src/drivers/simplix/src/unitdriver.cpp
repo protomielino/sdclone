@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -191,7 +191,7 @@ TDriver::TDriver(int Index):
   oAvoidScale(8.0),
   oAvoidWidth(0.5),
   oGoToPit(false),
-
+  oCloseYourEyes(false),
   oDriveTrainType(cDT_RWD),
   // oPIDCLine;
   oFlying(0),
@@ -756,11 +756,13 @@ void TDriver::AdjustPitting(PCarHandle Handle)
   //GfOut("#oUseSmoothPit %d\n",Param.Pit.oUseSmoothPit);
 
   Param.Pit.oLaneEntryOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_ENTRY,0,3.0f);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_ENTRY,0,
+	(float) Param.Pit.oLaneEntryOffset);
   //GfOut("#oLaneEntryOffset %g\n",Param.Pit.oLaneEntryOffset);
 
   Param.Pit.oLaneExitOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_EXIT,0,5.0f);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PITLANE_EXIT,0,
+	(float) Param.Pit.oLaneExitOffset);
   //GfOut("#oLaneExitOffset %g\n",Param.Pit.oLaneExitOffset);
 
   Param.Pit.oEntryLong =
@@ -776,11 +778,13 @@ void TDriver::AdjustPitting(PCarHandle Handle)
   //GfOut("#oExitLength %g\n",Param.Pit.oExitLength);
 
   Param.Pit.oLatOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LAT_OFFS,0,0.0);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LAT_OFFS,0,
+	(float) Param.Pit.oLatOffset);
   //GfOut("#Lateral Pit Offset %f\n",Param.Pit.oLatOffset);
 
   Param.Pit.oLongOffset =
-	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LONG_OFFS,0,0.0);
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_PIT_LONG_OFFS,0,
+	(float) Param.Pit.oLongOffset);
   //GfOut("#Longitudinal Pit  Offset %f\n",Param.Pit.oLongOffset);
 
   Param.oCarParam.oScaleBrakePit =
@@ -1020,6 +1024,21 @@ void TDriver::InitTrack
 	sizeof(TrackNameBuffer));                    // regarding length of buf.
   *strrchr(TrackNameBuffer, '.') = '\0';         // Truncate at point
   oTrackName = TrackNameBuffer;                  // Set pointer to buffer
+  if (strcmp(oTrackName,"monandgo") == 0)        // The force will be
+  {                                              // you even at monandgo!
+	oCloseYourEyes = true;                       
+    Param.Pit.oLatOffset = 0.5;
+    Param.Pit.oLongOffset = 0.0;
+	Param.Pit.oLaneEntryOffset = 4.0;
+	Param.Pit.oLaneExitOffset = 7.0;
+  }
+  else
+  {
+    Param.Pit.oLatOffset = 0.0;
+    Param.Pit.oLongOffset = 0.0;
+	Param.Pit.oLaneEntryOffset = 3.0;
+	Param.Pit.oLaneExitOffset = 5.0;
+  }
 
   // Read/merge car parms
   // First all params out of the common files
@@ -1282,6 +1301,8 @@ void TDriver::Drive()
   GetPosInfo(Pos,oLanePoint);                    // Info about pts on track
   oTargetSpeed = oLanePoint.Speed;				 // Target for speed control
   oTargetSpeed = FilterStart(oTargetSpeed);      // Filter Start
+  if (oTargetSpeed < 5)
+	  oTargetSpeed = 5.0;
 
   //double TrackRollangle = oRacingLine[oRL_FREE].CalcTrackRollangle(Pos);
   //cTimeSum[0] += RtDuration(StartTimeStamp);
@@ -1536,7 +1557,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1562,7 +1583,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1591,7 +1612,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1610,7 +1631,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1626,9 +1647,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
 	  GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
 	}
@@ -2545,6 +2566,14 @@ double TDriver::SteerAngle(TLanePoint& AheadPointInfo)
     AheadDist = oLastAheadDist + 0.05;
   oLastAheadDist = AheadDist;
   double AheadPos = oTrackDesc.CalcPos(oCar, AheadDist);
+
+  if (oCloseYourEyes)
+  {
+    if (oGoToPit && (oDistFromStart > 2995) && (oDistFromStart < 3021))
+      AheadPos = oTrackDesc.CalcPos(oCar, AheadDist + 65); 
+    if (oGoToPit && (oDistFromStart > 3020) && (oDistFromStart < 3060))
+	  return 0.0;
+  }
 
   // Get info about pts on track.
   GetPosInfo(AheadPos,AheadPointInfo);

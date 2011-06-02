@@ -2,17 +2,17 @@
 // unitglobal.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Global data types and definitions
 // Globale Datentypen und Definitionen
 //
-// File         : unitglobal.cpp
+// File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 118 // Force new calculation
+#define RL_VERSION 120 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -385,6 +385,26 @@ enum
 #define MAXPRESSURE "max pressure"
 #define INITIAL_BRAKE_PRESSURE 30000000.0
 #define INITIAL_BRAKE_SCALE 72.0
+
+#define X_StartEntry X[0]
+#define X_EndEntry X[1]
+#define X_StartPitlane X[2]
+#define X_StartPit X[3]
+#define X_Pit X[4]
+#define X_EndPit X[5]
+#define X_EndPitlane X[6]
+#define X_StartExit X[7]
+#define X_EndExit X[8]
+
+#define Y_StartEntry Y[0]
+#define Y_EndEntry Y[1]
+#define Y_StartPitlane Y[2]
+#define Y_StartPit Y[3]
+#define Y_Pit Y[4]
+#define Y_EndPit Y[5]
+#define Y_EndPitlane Y[6]
+#define Y_StartExit Y[7]
+#define Y_EndExit Y[8]
 // ... Internal parameters
 
 // Parameters of this robot ...

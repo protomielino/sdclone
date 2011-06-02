@@ -9,10 +9,10 @@
 //
 // File         : unitcubicspline.h
 // Created      : 2007.11.25
-// Last changed : 2011.05.26
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.002
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*

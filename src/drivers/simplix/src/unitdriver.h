@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -235,6 +235,7 @@ private:
 	double oAvoidScale;			                 // scale avoiding 
 	double oAvoidWidth;			                 // In m.
 	bool oGoToPit;                               // Enter pit flag
+	bool oCloseYourEyes;                         // Close your eyes for a while
 #ifdef SPEED_DREAMS
 #else
 	TTeamManager::TTeam* oTeam;                  // Team

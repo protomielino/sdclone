@@ -2,17 +2,17 @@
 // unitfixcarparam.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// A robot for Speed Dreams Version 1.4.0/2.X
+// A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
 // Unchanged parameters of car
 // Unveränderliche Parameter des Fahrzeugs
 //
 // File         : unitfixcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2010.10.16
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:

@@ -9,10 +9,10 @@
 //
 // File         : unitpit.h
 // Created      : 2007.02.20
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -65,8 +65,10 @@ class TPitLane : public TClothoidLane
 
 	double oPitDist;                             // Distance to decide
 	double oPitEndPos;                           // End of speed limit
-    double oPitEntryPos;                         // Start of pitlane
-	double oPitExitPos;                          // End of pitlane
+    double oPitEntryStartPos;                    // Start of pitlane entry
+    double oPitEntryEndPos;                      // End of pitlane entry
+	double oPitExitStartPos;                     // Start of pitlane exit
+	double oPitExitEndPos;                       // End of pitlane exit
 	double oPitStartPos;                         // Start of speed limit
 	double oPitStopPos;                          // Position of pit
 	double oStoppingDist;                        // Stopping distance

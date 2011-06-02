@@ -4,15 +4,15 @@
 // TORCS: "The Open Racing Car Simulator"
 // A robot for Speed Dreams-Version 1.4.0/2.X
 //--------------------------------------------------------------------------*
-// Pit ans pitlane
+// Pit and pitlane
 // Box und Boxengasse
-//
+// 
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.05.29
+// Last changed : 2011.06.02
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.00.003
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -44,6 +44,71 @@
 // GNU GPL (General Public License)
 // Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
+// WARNING:
+//
+// To calculate the racingline into and out of the pit we have to use the 
+// data that is provided by TORCS/SD. These values are defined by the track 
+// designers mostly having no knowledge about what we will get from the 
+// system to understand, what they want us to understand from their ideas.
+// There is no check, that the data of the track is consistent and usable.
+// So we have to expect all issues that can happen, because they will happen.
+// You don't belive? So look at the tracks and you will find things like pit 
+// entries or exits being blocked by pitwalls, pit entry/exit 
+// segments with a length below 3.2 m, pitlanes being so small, that we cannot
+// avoid opponents, values that are changed after the 3D model was generated 
+// resulting in showing wrong hints to the driver ...
+//
+// No, they do not want make our job harder as it is, they simply do not know 
+// what they are doing and if you ask, you get answers like "but is is the 
+// real track xyz and the pitlane in reality looks as it is defined here and 
+// I want to make is as realistic as possible, so it is impossible to make the
+// radius of the curve of the pitlane > 0.
+//
+// So we try to check everything and adjust the parameters to make the robot
+// able to drive on all tracks without manual adjustments. Yes, you heard right, 
+// on all tracks, even on tracks like corkscrew, longday or melvurn without 
+// setup the track parameters to correct values.
+//
+// What did you say? All means all? All means even monandgo?
+// But at monandgo the radius at pitlane is < 0 at some segments!
+// All is all?
+// Hmm ... OK, so drive into the pit entry, close the eyes for a moment 
+// and the force will lead you to your pit. You don't want to drive with 
+// closed eyes? But it is the easiest way to make it happen!
+// (look for oCloseYourEyes in the code of TDriver::SteerAngle).
+//
+// BTW, if you understand this as a little bit of scorching criticism on the 
+// ignorance of the track designers to real existing limiting conditions, I'm 
+// very sorry, but this is exactly what I mean.
+//
+// In opposite to the simplix for racers, this robot is not designed to win a 
+// championship. So let's accept, that the solution is not ideal for some 
+// tracks, but it should work on all tracks known so far.
+//
+// The basic information and the assumptions needed to do our job are:
+//
+// The section from the start of the first pit to the end of the last is called 
+// "the pitlane" here.
+//
+// PitInfo->driversPits->pos : center of the pit in m
+//
+// Distances:
+// PitInfo->width            : width of the pit in m
+// driversPits->pos.toMiddle : signed distance of the center of the pit to 
+//                             the the middle of the track in m
+//
+// PitInfo->side             : side of pits
+//
+// 
+// Assumptions:
+// Track width is constant!
+// Pitlane is a straight along the track!
+// Width of the pit is > width of our and the other cars!
+//
+// The part of the code you could be mostly interested in is 
+// void TPitLane::MakePath(...), here all the calculation is done.
+//--------------------------------------------------------------------------*
+
 #include "unitglobal.h"
 #include "unitcommon.h"
 
@@ -241,8 +306,8 @@ void TPitLane::SmoothPitPath
   int I;                                         // Loop counter
 
   int NSEG = oTrack->Count();                    // Number of sections in the path
-  int Idx0 = oTrack->IndexFromPos(oPitEntryPos); // First index and
-  int Idx1 = oTrack->IndexFromPos(oPitExitPos);  // last index to modify
+  int Idx0 = oTrack->IndexFromPos(oPitEntryStartPos);
+  int Idx1 = oTrack->IndexFromPos(oPitExitEndPos);  
 
   // Modify path for use of normal smoothing
   for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)
@@ -275,13 +340,13 @@ void TPitLane::MakePath
   }
 
   // 2. We have a place, let us build all we need to use it ...
-  const int NPOINTS = 7;                         // Nbr of points defined for pitlane
+  const int NPOINTS = 9;                         // Nbr of points defined
   double X[NPOINTS];                             // X-coordinates
   double Y[NPOINTS];                             // Y-coordinates
   double S[NPOINTS];                             // Directions
 
-  bool FirstPit = false;                         // Reset flag
   int I;                                         // Loop counter
+  bool FirstPit = false;                         // Reset flag
   TCarParam CarParam = Param.oCarParam3;         // Copy parameters
   TLane::SetLane(*BasePath);                     // Copy Pathpoints
   const tTrackPitInfo* PitInfo =                 // Get pit infos
@@ -291,15 +356,18 @@ void TPitLane::MakePath
   int Sign =                                     // Get the side of pits
 	(PitInfo->side == TR_LFT) ? -1 : 1;
 
-  // To be able to avoid in the pitlane we need he offsets
-  float F[3] = {0.5, 1.0, 0.0};                  // Avoid offsets
+  // To be able to avoid in the pitlane we need three lanes.
+  // To calculate the offsets we need to know the ranking
+  float F[3] = {0.5, 1.0, 0.0};                  // Lane offsets
   if (Sign < 0)                                  // If pits are on the
   {                                              // left side
-    F[1] = 0.0;                                  // swap
-    F[2] = 1.0;
+    F[1] = 0.0;                                  // swap the ranking
+    F[2] = 1.0;                                  // of the lane offsets
   }
 
-  // Different cars need different distances
+  // Different car types need different distances to stop, depending on their
+  // braking parameters. The simplix allows a manual fine tuning using some
+  // additional parameters.
   oStoppingDist = Param.Pit.oStoppingDist;       // Distance to brake
   oPitStopOffset = Param.Pit.oLongOffset;        // Offset for fine tuning
   oCarParam.oScaleBrake =                        // Limit brake to be used
@@ -307,34 +375,245 @@ void TPitLane::MakePath
   oCarParam.oScaleMu =                           // Scale friction estimation
 	MAX(0.10f,CarParam.oScaleMu);                //   of pitlane
 
-  // Get the distance of pit to middle of the track
+  // To define the offset of the pitlane from the middle of the track
+  // we use the distance of the center of the pit to middle of the track
+  // Here we assume that the width of the pit and the width of the cars is 
+  // in a relation, that we still have a safty margin between cars standing 
+  // not perfectly adjusted in the pit while we want to drive through
+  // the pitlane.
   double PitLaneOffset =                         // Offset of the pitlane
 	fabs(PitInfo->driversPits->pos.toMiddle)     //   from the middle of the
 	- PitInfo->width;                            //   track
 
-  // To get same steering angles the distance to start to steer to the pit
-  // depends on the side of the driven lane in the pitlane (from avoiding)
+  // To get nearly same steering angles the distance to start to steer to the 
+  // pit depends on the side of and the distance between the driven lanes in  
+  // the pitlane. We use three lanes, a left, a center and a right lane.
+  // Being alone we drive at the center lane. To avoid we can follow another.
+  // If the distance of the driven lane to the pit is larger, we have to 
+  // start to steer earlier. To calculate it, we use the factor Ratio.
   float Ratio = (float) (0.5 * 
 	  PitInfo->len / (fabs(PitInfo->driversPits->pos.toMiddle) - PitLaneOffset));
 
-  // Compute pit spline points along the track defined by TORCS/SD
-  X[0] = PitInfo->pitEntry->lgfromstart          // Start of Pitlane defined
-	  + Param.Pit.oEntryLong;                    //   our own offset along the track
-  X[1] = PitInfo->pitStart->lgfromstart;         // Start of speedlimit
-  X[3] = Pit->pos.seg->lgfromstart               // Center of our own pit
-	+ Pit->pos.toStart + oPitStopOffset;         //   with own offset along track
-  X[2] = X[3] - PitInfo->len                     // Start enter own pit here
-	- F[Index] * Ratio * Param.Pit.oLaneEntryOffset;
-  X[4] = X[3] + PitInfo->len                     // Leave own pit here
-	+ F[Index] * Ratio * Param.Pit.oLaneExitOffset;
-  X[5] = X[1] + PitInfo->nPitSeg * PitInfo->len; // End of speed limit
-  X[6] = PitInfo->pitExit->lgfromstart           // End of pitlane defind
-	+ PitInfo->pitExit->length                   //   and own offset along track
-	+ Param.Pit.oExitLong;
+  // Here we assume, that at a pit entry there is no barrier, means we expect 
+  // that there is a drivable side (Side->style = TR_PLAN).
+  // We will detect, if there is a pitwall between the track and the pitlane
+  // and the length we can use to enter the pitlane will be limited by it.
+  // If there is no pitwall we will stop at start of the speedlimit.
+  // Same is done for the pit exit, just in the opposite direction.
+  // BUT: If the track designer did not understand the definitions, we may find 
+  // a pitwall at the pit entry segment as well (i.e. at melvurn)!
+  // In this case we go backward and try to find the entry before.
 
-  oPitEntryPos = X[0];                           // Save this value as start of spline
+  // Get possible length for pit entry
+  tTrackSeg* Seg = PitInfo->pitEntry;
+  tTrackSeg* Side;
+  bool forward = true;
+  double EntryLength = 0;                        // Usable length of pit entry
 
-  // Normalizing spline segments to X[I+1] >= X[I] if startline is crossed
+  if (Sign < 0)                                  // Get side segment
+    Side = Seg->lside;
+  else
+    Side = Seg->rside;
+	  
+  if (Side != NULL)                              // If there is a side
+  {                                              // Check driveability
+	  if (Side->style != TR_PLAN)                // In case of a pitwall
+		  forward = false;                       // we have to go backward 
+  }
+
+  if (forward)                                   // If we can use the side
+    EntryLength += Seg->length;                  // add the length 
+
+  do                                             // loop over some segments
+  {
+	  if (forward)                               // Get next segment depending 
+	    Seg = Seg->next;                         // on the search direction
+	  else
+	    Seg = Seg->prev;
+
+	  if (Sign < 0)                              // Get side segemnt
+	    Side = Seg->lside;
+	  else
+	    Side = Seg->rside;
+
+      if ((Side == NULL)                         // In case of not drivable
+		|| (Side->raceInfo & (TR_SPEEDLIMIT | TR_PITLANE)) 
+		|| (Side->style != TR_PLAN))             // or not allowed to use
+		break;                                   // we got the end
+
+	  if (forward)                               // Dpending on the search 
+        EntryLength += Seg->length;              // direction we add the
+	  else                                       // segments length
+        EntryLength -= Seg->length;
+
+	  if (EntryLength < -150)                    // In case of backward we 
+		  break;                                 // assume we dont need more
+
+  } while (Side != NULL);                        // In case of no side we stop 
+
+
+  // Get possible length for pit exit
+  Seg = PitInfo->pitExit;
+  double ExitLength = 0;
+  //GfOut("ExitLength 0: %g\n",ExitLength);
+  double NotUsableLength = 0;
+  bool usable = false;
+  bool backward = true; 
+  double SearchLength = PitInfo->pitExit->lgfromstart 
+	- PitInfo->pitEnd->lgfromstart;
+
+  if (SearchLength < 0)
+	SearchLength += oTrack->Length();
+
+  do
+  {
+    if (Sign < 0)                                // Get side segment
+      Side = Seg->lside;
+    else
+      Side = Seg->rside;
+	  
+    if (Side != NULL)                            // If there is a side
+    {                                            // Check driveability
+	    if ((Side->style == TR_PLAN)             // In case of a barrier, 
+			&& (Side->endWidth > CarWidth))      // pitwall or elevated curbs
+	  	  usable = true ;                        // we have to go backward 
+    }
+
+    if (!usable)                                 // If we cannot use the side
+      NotUsableLength += Seg->length;            // add the length 
+
+	if (NotUsableLength > SearchLength - 1.0)
+	{
+		backward = false;
+		break;
+	}
+
+    if (!usable)                                 // If we cannot use the side
+	{
+      Seg = Seg->prev;
+	  ExitLength += Seg->length;     
+	  //GfOut("ExitLength 1: %g\n",ExitLength);
+	}
+
+  } while (!usable);
+
+  if (!usable)
+  {
+    Seg = PitInfo->pitExit;
+	ExitLength = SearchLength;
+    //GfOut("ExitLength 2: %g\n",ExitLength);
+	NotUsableLength = 0.0;
+  }
+ 
+  do
+  {
+	  if (backward)                              // Get next segment depending 
+	    Seg = Seg->prev;                         // on the search direction
+	  else
+	    Seg = Seg->next;
+
+	  if (Sign < 0)
+	    Side = Seg->lside;
+	  else
+	    Side = Seg->rside;
+
+      if ((Side == NULL) 
+		|| (Side->raceInfo & (TR_SPEEDLIMIT | TR_PITLANE)) 
+		|| (Side->style != TR_PLAN))
+		break;
+
+      ExitLength += Seg->length;               // add the length 
+      //GfOut("ExitLength 3: %g %g\n",Seg->length,ExitLength);
+
+  } while (Side != NULL);
+
+  // The simplix robot knows two parameters to define the distance of the
+  // driven lane from the basic pitlane.
+  // We use the convention, that the incoming cars will use the outer side,
+  // while the outgoing cars will use the inner one.
+  // The default values are 3 m at entry and 5 m at exit.
+  double LaneEntryOffset = Param.Pit.oLaneEntryOffset;
+  double LaneExitOffset = Param.Pit.oLaneExitOffset;
+
+  // To be able to drive at "modern" tracks, means tracks that do not respect
+  // the limitations of a TORCS pitlane, we define 9 leading points (instead 
+  // of 7 used by the classic robot tutorial written by Bernhard Wymann 
+  // (Thanks for this great work!).
+  // The Points are define by an X_ and an Y_ coordinate.
+  // The X_ coordinates are measured as distance along the track from the 
+  // startline. The Y_ coordinates are the local offsets from the middle of 
+  // the track.
+  // The first point is, where we leave the normal racningline, the last is
+  // where we will return to it (_StartEntry/_EndExit). 
+  // The next pair of points, the "new" points, are where we have to be at 
+  // the safe side of a pitwall. The second point is at the end of the pit 
+  // entry, the later at the end of a pitwall (_EndEntry/_StartExit)
+  // If we do not use the first pit, the next point is at the start of the 
+  // speedlimit, its counterpart at the end (_StartPitlane/_EndPitlane). 
+  // We will follow the lane through the pitlane until we have to steer into 
+  // the pit. The point to change the direction is calculated from the 
+  // position of our pit. Same is done for the point, where we will reach the 
+  // outgoing lane (_StartPit/_EndPit).
+  // The point we want to stop at is the pit (_Pit).
+  //
+  // Remember, we defined names for the points X[i], Y[i], but in loops we 
+  // use X[i], Y[i] instead.
+  //
+  // The pit racingline through these points is calculated using splines.
+  //
+
+  // Compute definitions for pit spline. We start with the X coordinates.
+  if (forward)
+  {
+    X_StartEntry =                               // Start of entry 
+	  PitInfo->pitEntry->lgfromstart             
+	  + Param.Pit.oEntryLong;                    
+    X_EndEntry =                                 // End of entry
+	  PitInfo->pitEntry->lgfromstart             
+	  + EntryLength
+	  + Param.Pit.oEntryLong;                    
+  }
+  else
+  {
+    X_StartEntry =                               // Start of entry
+	  PitInfo->pitEntry->lgfromstart             
+	  + EntryLength
+	  + Param.Pit.oEntryLong;                    
+    X_EndEntry =                                 // End of entry
+	  PitInfo->pitEntry->lgfromstart             
+	  + Param.Pit.oEntryLong;                    
+  }
+  X_StartPitlane =                               // Start of speedlimit
+	  PitInfo->pitStart->lgfromstart;            // mostly start of pitlane
+  X_Pit =                                        // Center of our own pit
+	  Pit->pos.seg->lgfromstart                  
+	  + Pit->pos.toStart + oPitStopOffset;       
+  X_StartPit =                                   // Start enter own pit here
+	  X_Pit - PitInfo->len                       
+	  - F[Index] * Ratio * LaneEntryOffset;
+  X_EndPit =                                     // Leave own pit here
+	  X_Pit + PitInfo->len                       
+	  + F[Index] * Ratio * LaneExitOffset;
+  X_EndPitlane =                                 // End of speed limit
+	  X_StartPitlane + PitInfo->nPitSeg * PitInfo->len; 
+  X_StartExit = 
+	  PitInfo->pitExit->lgfromstart              // Start of pitlane exit
+	  - ExitLength
+	  + Param.Pit.oExitLong;
+  X_EndExit =                                    // End of pitlane exit
+	  PitInfo->pitExit->lgfromstart              
+	  + PitInfo->pitExit->length 
+	  - NotUsableLength
+	  + Param.Pit.oExitLong;
+
+  oPitEntryStartPos = X_StartEntry;              // Save as start of spline
+
+  // In many cases the pits are defined along the start straight, so some 
+  // of our points are located before the start line, some are after it.
+  // To get correct distances, we have to correct the X_ values to be 
+  // strictly growing.
+  // Normalizing spline segments to X[I+1] >= X[I] even if startline is 
+  // crossed between.
   for (I = 1; I < NPOINTS; I++)
   {
     X[I] = ToSplinePos(X[I]);
@@ -342,116 +621,255 @@ void TPitLane::MakePath
   }
 
   // Now the dark side of TORCS and SD ...
+  // We discussed, that the normal order of the points is not correct if we
+  // use the first or the last pit. For the first pit the point to start 
+  // steering is before start of the speedlimit. At the end it is vice versa.
+  // But as described earlier, there are tracks having senceless definitons, 
+  // here we have to adjust our assumptions, means the X coordinates of the 
+  // points have to be manipulated to get a usefull pit racingline.
 
   // Fix start of pitlane point for first pit if necessary.
-  if (X[2] < X[1])
+  if (X_StartPit < X_StartPitlane)
   {
     FirstPit = true;                             // Hey we use the first pit!
-    X[1] = X[2] - 1.0;                           // Congratulation 
+    X_StartPitlane = X_StartPit - 1.0;           // Congratulation 
   }
 
   // Fix end of pitlane point for last pit if necessary.
-  if (X[5] < X[4])                               // May be this is not your race
-    X[5] = X[4] + 1.0;
+  if (X_EndPitlane < X_EndPit)                   // This is not your race!
+    X_EndPitlane = X_EndPit + 1.0;
 
   // Fix broken pit exit.
-  if (X[6] < X[5])
-    X[6] = X[5] + 50.0;
+  if (X_EndExit < X_EndPitlane)
+    X_EndExit = X_EndPitlane + 50.0;
 
-  // Recalculate spline segments to X[I+1] >= X[I] if startline is crossed
+  // In case we had to recalculate X coordinates, we have to make sure, 
+  // that they are still strictly growing.
   for (I = 1; I < NPOINTS; I++)
   {
     X[I] = ToSplinePos(X[I]);
     S[I] = 0.0;
   }
 
-  oPitEntryPos = X[0];                           // Save this values for later
-  oPitStartPos = X[1];                           // use
-  oPitEndPos   = X[5];
-  oPitExitPos  = X[6];
+  oPitEntryStartPos = X_StartEntry;              // Save this values for 
+  oPitEntryEndPos   = X_EndEntry;                // later use by name
+  oPitStartPos      = X_StartPitlane;            // and to restrict it     
+  oPitEndPos        = X_EndPitlane;              // to real track 
+  oPitExitStartPos  = X_StartExit;               // coordinates without
+  oPitExitEndPos    = X_EndExit;                 // changing the X[i]s
 
   // For tuning the exit we need to know the distance 
   // from pit to end of pitlane
   Strategy->oPit->oDistToPitEnd = 
-	oPitEndPos - X[3];
+	oPitEndPos - X_Pit;
 
-  // Get track positions from the spline station
-  if (oPitStartPos > oTrack->Length())           // Use normalized position
+  // The growing X coordinates are contained in the X[i] array, so we can 
+  // use the named positions to get the real track based distance from 
+  // startline. 
+  if (oPitEntryEndPos > oTrack->Length())        
+	  oPitEntryEndPos -= oTrack->Length();
+  if (oPitStartPos > oTrack->Length())           
 	  oPitStartPos -= oTrack->Length();
-  if (oPitEndPos > oTrack->Length())             // Use normalized position
+  if (oPitEndPos > oTrack->Length())             
 	  oPitEndPos -= oTrack->Length();
-  if (oPitExitPos > oTrack->Length())            // Use normalized position
-	  oPitExitPos -= oTrack->Length();
+  if (oPitExitStartPos > oTrack->Length())       
+	  oPitExitStartPos -= oTrack->Length();
+  if (oPitExitEndPos > oTrack->Length())         
+	  oPitExitEndPos -= oTrack->Length();
+
+  // I'm sorry to say, but there are tracks, where the pitlane is too small,
+  // to use the default values. Here we have to check our offsets.
+  double AvailableWidth;
+  double NeededWidth;
+  int Idx0;
+  int Idx1;
+
+  // For the car we need a width including a safty marging at sides.
+  // It is set to a large value, because of not driving perfectly at the
+  // racingline and the thickness of a pitwall.
+  float SafePassage = 4.0f + CarWidth;
+  // We have to be on the outer side of a pitwall.
+  NeededWidth = (SafePassage + oTrack->Width())/2.0; 
+  // We assume that we could go up to the TORCS defined pitlane.
+  AvailableWidth = MAX(PitLaneOffset,NeededWidth);
+
+  // Now we compare the possible offset against our default parameters
+  // If the offset would be impossible we define the available width at
+  // entry and the needed at exit.
+  if (LaneEntryOffset > fabs(PitLaneOffset - NeededWidth))
+	LaneEntryOffset = 0;
+
+  if (LaneExitOffset > fabs(PitLaneOffset - NeededWidth))
+	LaneExitOffset = AvailableWidth - NeededWidth;
 
   // Splice entry/exit of pit path into the base path provided.
+  // To avoid unwanted oscilliations, we have to go to a point 
+  // where the direction of the racingline does not show to the 
+  // opposite side!
   TLanePoint Point;                              // Data of the point
-  BasePath->GetLanePoint(oPitEntryPos, Point);   // as defined by TORCS
-  Y[0] = Point.Offset;                           // Lateral distance
-  S[0] = -tan(Point.Angle                        // Direction of our
-	- oTrack->ForwardAngle(oPitEntryPos));       //   basic racingline
+  double PreEntryStartPos = oPitEntryStartPos;
+  do
+  {
+    PreEntryStartPos -= 1.0;                     // go back the racningline
+    BasePath->GetLanePoint(PreEntryStartPos, Point); 
+    S[0] = -tan(Point.Angle                      // Direction of our
+	- oTrack->ForwardAngle(PreEntryStartPos));   //   basic racingline
+  }                                              // Force direction to be
+  while (fabs(S[0]) > 0.02f);                    // ~parallel to track!
+  Y_StartEntry = Point.Offset;                   // Lateral distance
 
-  BasePath->GetLanePoint(oPitExitPos, Point);    // As defined by TORCS
-  Y[6] = Point.Offset;                           // Lateral distance and
-  S[6] = -tan(Point.Angle                        // and direction at the
-	- oTrack->ForwardAngle(oPitExitPos));        // TORCS end of pitlane
+  // To avoid unwanted slow down of our car we have to go to a 
+  // point, where the direction of the racing line is nearly parallel 
+  // to the track
+  double PostExitEndPos = oPitExitEndPos;
+  do
+  {
+    PostExitEndPos += 1.0;
+    BasePath->GetLanePoint(PostExitEndPos, Point);  
+    S[8] = -tan(Point.Angle                      // Direction of the
+	  - oTrack->ForwardAngle(PostExitEndPos));   // racingline at the end
+  }                                              // Force direction to be
+  while (fabs(S[8]) > 0.02f);                    // ~parallel to track!
+    Y_EndExit = Point.Offset;                    // Lateral distance and
 
+
+  // If we have the first pit, we can often use a better way into the pit 
+  // driving directly to the pit
   if (Param.Pit.oUseFirstPit && FirstPit)        // If allowed and possible
-  {                                              // we will use a special path to
-	Y[3] = Y[2] = Y[1] = Sign *                  // the first pit with
-	  (fabs(PitInfo->driversPits->pos.toMiddle   //   TORCS defined offset
-	  - 0.5 + Param.Pit.oLatOffset));            //   and our own lateral offset
+  {                                              // we will use a special 
+	Y_Pit = Y_StartPit = Y_StartPitlane =        // path to the
+	  Sign *                                     // first pit with
+	  (fabs(PitInfo->driversPits->pos.toMiddle   // TORCS/SD defined offset
+	  + Param.Pit.oLatOffset));                  // and an own lateral offset
   }
   else                                           // All other pits
   {                                              // have to be reached over
-    Y[2] = Y[1] = Sign *                         // a path defined here
-	  (PitLaneOffset -                           // Sign gives the side of the pits
-	  Param.Pit.oLaneEntryOffset * F[Index]);    // and we correct the TORCS offset
+    Y_StartPit = Y_StartPitlane =                // a path defined here
+	  Sign * (PitLaneOffset -                    // Sign gives the side 
+	  LaneEntryOffset * F[Index]);               // of the pits   
 
-	Y[3] = Sign *                                // we have to set the pit 
-	  (fabs(PitInfo->driversPits->pos.toMiddle   // offset
-	  + Param.Pit.oLatOffset));                  // oLatOffset > 0 -> more to out side
+	Y_Pit = Sign *                               // Set the pit offset
+	  (fabs(PitInfo->driversPits->pos.toMiddle   // compensate steering 
+	  + 0.1 + Param.Pit.oLatOffset));            // LatOffset > 0 -> outer
   }
 
-  Y[5] = Y[4] = Sign *                           // Leaving the own pit, we will
-    (PitLaneOffset                               //   go to the pitlane and use
-    - Param.Pit.oLaneExitOffset * F[Index]);     //   an additional offset
+  Y_EndPitlane = Y_EndPit = Sign *               // Leaving the own pit, we 
+    (PitLaneOffset                               // will go to the pitlane 
+    - LaneExitOffset * F[Index]);                // and use additional offset
 
+  // Pit entry ...
+  int NSEG = oTrack->Count();                    // Nbr of sections in path
+  Idx0 = (oTrack->IndexFromPos(oPitEntryEndPos) + NSEG - 1) % NSEG;
+  NeededWidth = (SafePassage + oTrack->Width())/2.0; 
+  if (Sign < 0) 
+  {
+	AvailableWidth = MAX(oPathPoints[Idx0].WPitToL,oPathPoints[Idx0].WToL) 
+	  - CarWidth/2.0 - 1.0;
+    Y_EndEntry = -MAX((AvailableWidth + NeededWidth) / 2.0,NeededWidth);  
+  }
+  else 
+  {
+	AvailableWidth = MAX(oPathPoints[Idx0].WPitToR,oPathPoints[Idx0].WToR) 
+	  - CarWidth/2.0 - 1.0;
+    Y_EndEntry = MAX((AvailableWidth + NeededWidth) / 2.0,NeededWidth);  
+  }
+
+  // In case of a small distance between the points, we set them to the 
+  // same offset to avoid unwanted curves.
+  if (X_StartPitlane - X_EndEntry < 10.0)
+	  Y_EndEntry = Y_StartPitlane;
+
+  // Pit exit ...
+  Idx1 = (oTrack->IndexFromPos(oPitExitStartPos) + 1) % NSEG;;
+  if (Sign < 0) 
+  {
+	AvailableWidth = MAX(oPathPoints[Idx1].WPitToL,oPathPoints[Idx1].WToL)
+	  - CarWidth/2.0 - 1.0;
+	Y_StartExit = -MAX((AvailableWidth + 3*NeededWidth)/4.0,NeededWidth);    
+  }
+  else
+  {
+	AvailableWidth = MAX(oPathPoints[Idx1].WPitToR,oPathPoints[Idx1].WToR)
+	  - CarWidth/2.0 - 1.0;
+	Y_StartExit = MAX((AvailableWidth + 3*NeededWidth)/4.0,NeededWidth);    
+  }	
+
+  // In case of a small distance between the points, we set them to the 
+  // same offset to avoid unwanted curves.
+  if (X_StartExit - X_EndPitlane < 10.0)
+	  Y_StartExit = Y_EndPitlane;
+/*
+  for (int I = 0; I < 9; I++)
+  {
+	  GfOut("X[%d]: %g Y[%d]: %g S[%d]: %g\n",I,X[I],I,Y[I],I,S[I]);
+  }
+*/
   // Calculate the splines for entry and exit of pitlane
   TCubicSpline PreSpline(NPOINTS, X, Y, S);      
 
-  // Modify points in line path for pits ...
-  int NSEG = oTrack->Count();                    // Number of sections in the path
+  // Now we come to the more dirty details.
 
-  // Start at section with speedlimit
-  int Idx0 = oTrack->IndexFromPos(oPitStartPos); // Index to first point
-  int Idx1 = oTrack->IndexFromPos(oPitEndPos);   // Index to last point
-  for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)  // Set Flag, to keep the points
-	oPathPoints[I].Fix = true;                   //   while smooting
+  // In case of smoothing we start at section with speedlimit
+  //Idx0 = oTrack->IndexFromPos(oPitStartPos);     // Index to first point
+  //Idx1 = oTrack->IndexFromPos(oPitEndPos);       // Index to last point
+  // In case we want to use smoothing later, these points have to keep
+  //for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)  // Set Flag, to keep 
+  //  oPathPoints[I].Fix = true;                   //   while smooting
 
-  // Pit entry and pit exit as defined by TORCS/SD
-  Idx0 = (1 + oTrack->IndexFromPos(oPitEntryPos)) % NSEG;
-  Idx1 = oTrack->IndexFromPos(oPitExitPos);
+  // Section before pit entry
+  Idx0 = (1 + oTrack->IndexFromPos(PreEntryStartPos)) % NSEG;
+  Idx1 = (1 + oTrack->IndexFromPos(oPitEntryStartPos)) % NSEG;;
+  for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)
+  {
+	oPathPoints[I].Offset = Y_StartEntry;        // Offset lateral to track
+    oPathPoints[I].Point =                       // Recalculate points
+	  oPathPoints[I].CalcPt();                   // from offset
+  }
+
+  // Pit entry and pit exit as calculated
+  Idx0 = (1 + oTrack->IndexFromPos(oPitEntryStartPos)) % NSEG;
+  Idx1 = (1 + oTrack->IndexFromPos(PostExitEndPos)) % NSEG;;
 
   // Change offsets to go to the pitlane based on the splines
+  NeededWidth = (SafePassage + oTrack->Width())/2.0; 
   for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)
   {
     double SplineY;                              // Offset lateral to track
-    double SplineX =                             // Station in spline coordinates
-	  ToSplinePos(oTrack->Section(I).DistFromStart);
-
-	// Calculate offset to side depending on pit side
-    if (Sign < 0) 
-      SplineY = MAX(PreSpline.CalcOffset(SplineX),-(oPathPoints[I].WPitToL - 1.3));
-    else
-      SplineY = MIN(PreSpline.CalcOffset(SplineX),oPathPoints[I].WPitToR - 1.3);
+    double TrackX =                              // Station in track coords
+	  oTrack->Section(I).DistFromStart;
+    double SplineX = ToSplinePos(TrackX);        // Station in spline coords
+ 
+	if (SplineX >= X_EndExit)
+	  SplineY = Y_EndExit;                       // After/At the real exit
+	else
+	{
+ 	  // Calculate offset to side depending on pit side
+      // For all points along our pitlane racingline we have to check, 
+      // whether the designer did a good job or did restrict the usable 
+	  // offset too much.
+      if (Sign < 0) 
+	  {
+	    AvailableWidth = MAX(oPathPoints[I].WPitToL,oPathPoints[I].WToL) 
+			- CarWidth/2.0 - 0.01;
+        SplineY = MAX(PreSpline.CalcOffset(SplineX),
+			MIN(-AvailableWidth,-NeededWidth));
+	  }
+      else
+	  {
+	    AvailableWidth = MAX(oPathPoints[I].WPitToR,oPathPoints[I].WToR) 
+			- CarWidth/2.0 - 0.01;
+        SplineY = MIN(PreSpline.CalcOffset(SplineX),
+			MAX(AvailableWidth,NeededWidth));
+	  }
+	}
 
 	oPathPoints[I].Offset = SplineY;             // Offset lateral to track
-    oPathPoints[I].Point =                       // Recalculate point coordinates
-	  oPathPoints[I].CalcPt();                   //   from offset
-    //GfOut("Spline: %g/%g\n",SplineX,oPathPoints[I].Offset);
+    oPathPoints[I].Point =                       // Recalculate points
+	  oPathPoints[I].CalcPt();                   // from offset
+	//GfOut("Spline: %g: %g/%g %g\n",TrackX,SplineX,oPathPoints[I].Offset,SplineY);
   }
 
-  // Prepare speed calculation with changed path
+  // Prepare speed calculation with changed path (Simplix specific)
   int FwdRange = 110;
   CalcFwdAbsCrv(FwdRange);
   CalcCurvaturesXY();
@@ -459,6 +877,7 @@ void TPitLane::MakePath
   CalcMaxSpeeds(1);
 
   // Overwrite speed calculations at section with speed limit
+  // Here we assume that it is a straight!
   Idx0 = (oTrack->IndexFromPos(oPitStartPos) + NSEG - 5) % NSEG;
   Idx1 = (oTrack->IndexFromPos(oPitEndPos) + 1) % NSEG;
 
@@ -471,7 +890,7 @@ void TPitLane::MakePath
 
   // Save stop position
   double StopPos = Pit->pos.seg->lgfromstart     // As defined by TROCS/SD
-	+ Pit->pos.toStart + oPitStopOffset;         // with own offset along track#
+	+ Pit->pos.toStart + oPitStopOffset;         // with offset along track
 
   // Normalize it to be 0 >= StopPos > track length
   if (StopPos >= oTrack->Length())               
@@ -482,7 +901,7 @@ void TPitLane::MakePath
   // Section at pit stop
   oStopIdx = Idx0 = oTrack->IndexFromPos(StopPos);
 
-  // Set speed to restart faster
+  // Set speed to restart faster or at Aalborg
   for (I = 0; I < 15; I++)
   {
     Idx0 = (Idx0 + 1) % NSEG;
@@ -491,11 +910,8 @@ void TPitLane::MakePath
 	    PitInfo->speedLimit - 0.5;
   }
 
-  oStopPos = StopPos;
+  // This is where we stop in track coordinates
   oPitStopPos = oPathPoints[oStopIdx].Dist();
-  GfOut("#\n");
-  GfOut("#\n");
-  GfOut("#StopPos: %d (%.2f m)\n",oStopIdx,oStopPos);
 
   // Set target speed at stop position
   oPathPoints[oStopIdx].MaxSpeed = oPathPoints[oStopIdx].Speed = 1.0;
@@ -504,24 +920,22 @@ void TPitLane::MakePath
   PropagatePitBreaking((tdble) oPitStopPos,(tdble) Param.oCarParam.oScaleMu);
 
   // Look for point to decide to go to pit
-  Idx0 = oTrack->IndexFromPos(oPitEntryPos);
+  Idx0 = oTrack->IndexFromPos(oPitEntryStartPos);
   double DeltaSpeed;
   int Steps = 0;
   do
   {
     Idx0 = (Idx0 + NSEG - 1) % NSEG;
 	double TrackSpeed =
-	  MIN(BasePath->oPathPoints[Idx0].Speed,BasePath->oPathPoints[Idx0].AccSpd);
+	  MIN(BasePath->oPathPoints[Idx0].Speed,
+	  BasePath->oPathPoints[Idx0].AccSpd);
     DeltaSpeed = TrackSpeed - oPathPoints[Idx0].Speed;
   } while ((DeltaSpeed > 1.0) && (++Steps < NSEG));
-  GfOut("#Steps to pit entry: %d\n",Steps);
 
   // Distance before pit to decide for pitstop
   oPitDist = oPitStopPos - oPathPoints[Idx0].Dist();
-  //GfOut("#Pit dist      : %.2f\n",oPitDist);
   if (oPitDist < 0)
     oPitDist += oTrack->Length();
-  GfOut("#Pit dist norm.: %.2f\n",oPitDist);
 
 }
 //==========================================================================*
@@ -532,7 +946,8 @@ void TPitLane::MakePath
 bool TPitLane::InPitSection(double TrackPos) const
 {
   TrackPos = ToSplinePos(TrackPos);
-  return oPitEntryPos < TrackPos && TrackPos < ToSplinePos(oPitExitPos);
+  return oPitEntryStartPos < TrackPos 
+	  && TrackPos < ToSplinePos(oPitExitEndPos);
 }
 //==========================================================================*
 
@@ -567,7 +982,7 @@ bool TPitLane::Overrun(double TrackPos) const
 //--------------------------------------------------------------------------*
 double TPitLane::DistToPitEntry(double TrackPos) const
 {
-  double Dist = oPitEntryPos - TrackPos;
+  double Dist = oPitEntryStartPos - TrackPos;
   if (Dist < 0)
 	Dist += oTrack->Length();
   return Dist;
@@ -594,7 +1009,7 @@ double TPitLane::DistToPitStop(double TrackPos, bool Pitting) const
   }
   else
   {
-	Dist = oPitStopPos - oPitEntryPos;
+	Dist = oPitStopPos - oPitEntryStartPos;
 	if (Dist < 0)
 	  Dist += oTrack->Length();
 	  Dist += DistToPitEntry(TrackPos);
@@ -608,7 +1023,7 @@ double TPitLane::DistToPitStop(double TrackPos, bool Pitting) const
 //--------------------------------------------------------------------------*
 double TPitLane::ToSplinePos(double TrackPos) const
 {
-  if (TrackPos < oPitEntryPos)
+  if (TrackPos < oPitEntryStartPos)
 	TrackPos += oTrack->Length();
   return TrackPos;
 }

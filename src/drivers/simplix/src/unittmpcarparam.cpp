@@ -2,16 +2,17 @@
 // unittmpcarparam.cpp
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
 // Car parameters changing in time
 // Zeitlich variable Parameter des Fahrzeugs
-//
+// 
 // File         : unittmpcarparam.cpp
 // Created      : 2007.11.25
 // Last changed : 2009.07.25
 // Copyright    : © 2007-2009 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:

@@ -2,15 +2,17 @@
 // unitcommondata.h
 //--------------------------------------------------------------------------*
 // TORCS: "The Open Racing Car Simulator"
-// Roboter für TORCS-Version 1.3.0
-// Zentrale Klasse für das Fahren bzw. den Fahrer/Roboter
+// A robot for Speed Dreams-Version 1.4.0/2.X
+//--------------------------------------------------------------------------*
+// Common used data
+// Gemeinsam verwendete Daten
 //
 // File         : unitcommondata.h
 // Created      : 2007.11.17
-// Last changed : 1009.02.25
-// Copyright    : © 2007-2009 Wolf-Dieter Beelitz
+// Last changed : 2011.06.02
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 2.00.000
+// Version      : 3.01.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
