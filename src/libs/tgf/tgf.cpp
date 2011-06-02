@@ -622,7 +622,7 @@ tdble gfMean(tdble v, tMeanVal *pvt, int n, int w)
  */
 char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 {
-	char* buf = (char*)malloc(256*sizeof(char));
+	char* buf = (char*)malloc(((plus?strlen(plus):0)+9+prec+5)*sizeof(char));
 	
 	const char* sign = (sec < 0.0) ? "-" : (plus ? plus : "");
 	if (sec < 0.0)
