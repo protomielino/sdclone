@@ -311,7 +311,7 @@ reCarsApplyRaceRules(tCarElt *car)
 }
 
 void
-ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
+				  ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 {
 	char msg[128];
 	int i;
@@ -324,17 +324,14 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 	tReCarInfo *info = &(ReInfo->_reCarInfo[car->index]);
 
 	// Update top speeds.
-	if (car->_speed_x > car->_topSpeed) {
+	if (car->_speed_x > car->_topSpeed)
 		car->_topSpeed = car->_speed_x;
-	}
 
 	// (practice and qualification only).
-	if (car->_speed_x > info->topSpd) {
+	if (car->_speed_x > info->topSpd)
 		info->topSpd = car->_speed_x;
-	}
-	if (car->_speed_x < info->botSpd) {
+	if (car->_speed_x < info->botSpd)
 		info->botSpd = car->_speed_x;
-	}
 	
 	// Pitstop management.
 	if (car->_pit) {
@@ -342,11 +339,10 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 		// If the driver can ask for a pit, update control messages whether slot occupied or not.
 		if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED) {
 			// Pit already occupied?
-			if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE) {
+			if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
 				sprintf(car->ctrl.msg[2], "Can Pit");
-			} else {
+			else
 				sprintf(car->ctrl.msg[2], "Pit Occupied");
-			}
 			memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
 		}
 
@@ -368,10 +364,10 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				}
 			}
 			
-		// If the driver asks for a pit, check if the car is in the right conditions
-		// (position, speed, ...) and start up pitting process if so.
+			// If the driver asks for a pit, check if the car is in the right conditions
+			// (position, speed, ...) and start up pitting process if so.
 		} else if ((car->ctrl.raceCmd & RM_CMD_PIT_ASKED) &&
-					car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
+				   car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
 				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage))
 		{
 			sprintf(car->ctrl.msg[2], "Pit request");
@@ -506,165 +502,163 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 	
 	/* Start Line Crossing */
 	if (info->prevTrkPos.seg != car->_trkPos.seg) {
-	if ((info->prevTrkPos.seg->raceInfo & TR_LAST) && (car->_trkPos.seg->raceInfo & TR_START)) {
-		if (info->lapFlag == 0) {
-		if ((car->_state & RM_CAR_STATE_FINISH) == 0) {
-			car->_laps++;
+		
+		if ((info->prevTrkPos.seg->raceInfo & TR_LAST)
+			&& (car->_trkPos.seg->raceInfo & TR_START)) {
+			
+			if (info->lapFlag == 0) {
+				if ((car->_state & RM_CAR_STATE_FINISH) == 0) {
+					car->_laps++;
 
-			if (GetNetwork())
-				GetNetwork()->SendLapStatusPacket(car);
+					if (GetNetwork())
+						GetNetwork()->SendLapStatusPacket(car);
 
-			car->_remainingLaps--;
-			if (car->_pos == 1 && s->currentTime < s->_totTime && s->_raceType == RM_TYPE_RACE)
-			{
-				/* First car passed finish time before the time ends: increase the number of laps for everyone */
-				for (xx = 0; xx < s->_ncars; ++xx)
-					++ReInfo->s->cars[xx]->_remainingLaps;
-				++s->_totLaps;
-			}
-			car->_currentSector = 0;
-			if (car->_laps > 1) {
-			car->_lastLapTime = s->currentTime - info->sTime;
-			car->_curTime += car->_lastLapTime;
-			if (car->_bestLapTime != 0) {
-				car->_deltaBestLapTime = car->_lastLapTime - car->_bestLapTime;
-			}
-			if ((car->_lastLapTime < car->_bestLapTime) || (car->_bestLapTime == 0)) {
-				car->_bestLapTime = car->_lastLapTime;
-				memcpy(car->_bestSplitTime, car->_curSplitTime, sizeof(double)*(ReInfo->track->numberOfSectors - 1) );
-				if (s->_raceType != RM_TYPE_RACE && s->_ncars > 1)
-				{
-					/* Best lap time is made better. Update times behind leader */
-					bestLapChanged = true;
-					car->_timeBehindLeader = car->_bestLapTime - s->cars[0]->_bestLapTime;
-					if (car->_pos > 1)
+					car->_remainingLaps--;
+					if (car->_pos == 1 && s->currentTime < s->_totTime
+						&& s->_raceType == RM_TYPE_RACE)
 					{
-						car->_timeBehindPrev = car->_bestLapTime - s->cars[car->_pos - 1]->_bestLapTime;
+						/* First car passed finish time before the time ends: increase the number of laps for everyone */
+						for (xx = 0; xx < s->_ncars; ++xx)
+							++ReInfo->s->cars[xx]->_remainingLaps;
+						++s->_totLaps;
 					}
-					else
-					{
-						/* New best time for the leader: update the differences */
-						for (xx = 1; xx < s->_ncars; ++xx)
+					
+					car->_currentSector = 0;
+					if (car->_laps > 1) {
+						car->_lastLapTime = s->currentTime - info->sTime;
+						car->_curTime += car->_lastLapTime;
+						if (car->_bestLapTime != 0) {
+							car->_deltaBestLapTime = car->_lastLapTime - car->_bestLapTime;
+						}
+						if ((car->_lastLapTime < car->_bestLapTime) || (car->_bestLapTime == 0)) {
+							car->_bestLapTime = car->_lastLapTime;
+							memcpy(car->_bestSplitTime, car->_curSplitTime, sizeof(double)*(ReInfo->track->numberOfSectors - 1) );
+							if (s->_raceType != RM_TYPE_RACE && s->_ncars > 1)
+							{
+								/* Best lap time is made better. Update times behind leader */
+								bestLapChanged = true;
+								car->_timeBehindLeader = car->_bestLapTime - s->cars[0]->_bestLapTime;
+								if (car->_pos > 1)
+								{
+									car->_timeBehindPrev = car->_bestLapTime - s->cars[car->_pos - 1]->_bestLapTime;
+								}
+								else
+								{
+									/* New best time for the leader: update the differences */
+									for (xx = 1; xx < s->_ncars; ++xx)
+									{
+										if (s->cars[xx]->_bestLapTime > 0.0f)
+											s->cars[xx]->_timeBehindLeader = s->cars[xx]->_bestLapTime - car->_bestLapTime;
+									}
+								}
+								if (car->_pos + 1 < s->_ncars && s->cars[car->_pos+1]->_bestLapTime > 0.0f)
+									car->_timeBeforeNext = s->cars[car->_pos + 1]->_bestLapTime - car->_bestLapTime;
+								else
+									car->_timeBeforeNext = 0;
+							}
+						}
+						
+						if (car->_pos != 1 && s->_raceType == RM_TYPE_RACE) {
+							car->_timeBehindLeader = car->_curTime - s->cars[0]->_curTime;
+							car->_lapsBehindLeader = s->cars[0]->_laps - car->_laps;
+							car->_timeBehindPrev = car->_curTime - s->cars[car->_pos - 2]->_curTime;
+							s->cars[car->_pos - 2]->_timeBeforeNext = car->_timeBehindPrev;
+						} else if (s->_raceType == RM_TYPE_RACE) {
+							car->_timeBehindLeader = 0;
+							car->_lapsBehindLeader = 0;
+							car->_timeBehindPrev = 0;
+						}
+						
+						info->sTime = (tdble)s->currentTime;
+						switch (ReInfo->s->_raceType) {
+							case RM_TYPE_PRACTICE:
+								if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1)
+									ReUpdatePracticeCurRes(car, /*forceNew=*/true);
+								/* save the lap result */
+								if (s->_ncars == 1)
+									ReSavePracticeLap(car);
+								break;
+				
+							case RM_TYPE_QUALIF:
+								if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1)
+									ReUpdateQualifCurRes(car);
+								break;
+							case RM_TYPE_RACE:
+								if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
+									ReUpdateRaceCurRes();
+								break;
+						}
+					} else {
+						if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
 						{
-							if (s->cars[xx]->_bestLapTime > 0.0f)
-								s->cars[xx]->_timeBehindLeader = s->cars[xx]->_bestLapTime - car->_bestLapTime;
+							switch(s->_raceType)
+							{
+								case RM_TYPE_PRACTICE:
+									ReUpdatePracticeCurRes(car);
+									break;
+								case RM_TYPE_QUALIF:
+									ReUpdateQualifCurRes(car);
+									break;
+								case RM_TYPE_RACE:
+									ReUpdateRaceCurRes();
+									break;
+								default:
+									break;
+							}
+						}
+					}	
+	
+					info->topSpd = car->_speed_x;
+					info->botSpd = car->_speed_x;
+					if ((car->_remainingLaps < 0 && s->currentTime > s->_totTime) || (s->_raceState == RM_RACE_FINISHING)) {
+						car->_state |= RM_CAR_STATE_FINISH;
+						s->_raceState = RM_RACE_FINISHING;
+						if (ReInfo->s->_raceType == RM_TYPE_RACE) {
+							if (car->_pos == 1) {
+								sprintf(msg, "Winner %s", car->_name);
+								ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
+								if (GetServer())
+								{
+									GetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
+								}
+							} else {
+								const char *numSuffix = "th";
+								if (abs(12 - car->_pos) > 1) { /* leave suffix as 'th' for 11 to 13 */
+									switch (car->_pos % 10) {
+										case 1:
+											numSuffix = "st";
+											break;
+										case 2:
+											numSuffix = "nd";
+											break;
+										case 3:
+											numSuffix = "rd";
+											break;
+										default:
+											break;
+									}
+								}
+								sprintf(msg, "%s finished %d%s", car->_name, car->_pos, numSuffix);
+								ReSituation::self().setRaceMessage(msg, 5);
+							}
 						}
 					}
-					if (car->_pos + 1 < s->_ncars && s->cars[car->_pos+1]->_bestLapTime > 0.0f)
-						car->_timeBeforeNext = s->cars[car->_pos + 1]->_bestLapTime - car->_bestLapTime;
-					else
-						car->_timeBeforeNext = 0;
-				}
-			}
-			if (car->_pos != 1 && s->_raceType == RM_TYPE_RACE) {
-				car->_timeBehindLeader = car->_curTime - s->cars[0]->_curTime;
-				car->_lapsBehindLeader = s->cars[0]->_laps - car->_laps;
-				car->_timeBehindPrev = car->_curTime - s->cars[car->_pos - 2]->_curTime;
-				s->cars[car->_pos - 2]->_timeBeforeNext = car->_timeBehindPrev;
-			} else if (s->_raceType == RM_TYPE_RACE) {
-				car->_timeBehindLeader = 0;
-				car->_lapsBehindLeader = 0;
-				car->_timeBehindPrev = 0;
-			}
-			info->sTime = (tdble)s->currentTime;
-			switch (ReInfo->s->_raceType) {
-			case RM_TYPE_PRACTICE:
-				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {
-					char *t1, *t2;
-					t1 = GfTime2Str(car->_lastLapTime, "  ", false, 2);
-					t2 = GfTime2Str(car->_bestLapTime, "  ", false, 2);
-					sprintf(msg,"lap: %02d   time: %s  best: %s  top spd: %.2f    min spd: %.2f    damage: %d",
-						car->_laps - 1, t1, t2,
-						info->topSpd * 3.6, info->botSpd * 3.6, car->_dammage);
-					ReUI().addResultsMenuLine(msg);
-					free(t1);
-					free(t2);
-				}
-				/* save the lap result */
-				if (s->_ncars == 1)
-					ReSavePracticeLap(car);
-				break;
-				
-			case RM_TYPE_QUALIF:
-				if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1) {
-					ReUpdateQualifCurRes(car);
-				}
-				break;
-			case RM_TYPE_RACE:
-				if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
-					ReUpdateRaceCurRes();
-				break;
-			}
-		} else {
-			if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
-			{
-				switch(s->_raceType)
-				{
-				case RM_TYPE_PRACTICE:
-					ReUpdatePracticeCurRes(car);
-					break;
-				case RM_TYPE_QUALIF:
-					ReUpdateQualifCurRes(car);
-					break;
-				case RM_TYPE_RACE:
-					ReUpdateRaceCurRes();
-					break;
-				default:
-					break;
-				}
-			}
-		}	
-	
-			info->topSpd = car->_speed_x;
-			info->botSpd = car->_speed_x;
-			if ((car->_remainingLaps < 0 && s->currentTime > s->_totTime) || (s->_raceState == RM_RACE_FINISHING)) {
-			car->_state |= RM_CAR_STATE_FINISH;
-			s->_raceState = RM_RACE_FINISHING;
-			if (ReInfo->s->_raceType == RM_TYPE_RACE) {
-				if (car->_pos == 1) {
-				sprintf(msg, "Winner %s", car->_name);
-				ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
-				if (GetServer())
-					{
-					GetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
-					}
 				} else {
-				const char *numSuffix = "th";
-				if (abs(12 - car->_pos) > 1) { /* leave suffix as 'th' for 11 to 13 */
-					switch (car->_pos % 10) {
-					case 1:
-					numSuffix = "st";
-					break;
-					case 2:
-					numSuffix = "nd";
-					break;
-					case 3:
-					numSuffix = "rd";
-					break;
-					default:
-					break;
+					/* prevent infinite looping of cars around track, allow one lap after finish for the first car */
+					for (i = 0; i < s->_ncars; i++) {
+						s->cars[i]->_state |= RM_CAR_STATE_FINISH;
 					}
+					return;
 				}
-				sprintf(msg, "%s finished %d%s", car->_name, car->_pos, numSuffix);
-				ReSituation::self().setRaceMessage(msg, 5);
-				}
+			} else {
+				info->lapFlag--;
 			}
-			}
-		} else {
-			/* prevent infinite looping of cars around track, allow one lap after finish for the first car */
-			for (i = 0; i < s->_ncars; i++) {
-				s->cars[i]->_state |= RM_CAR_STATE_FINISH;
-			}
-			return;
 		}
-		} else {
-		info->lapFlag--;
+		if ((info->prevTrkPos.seg->raceInfo & TR_START)
+			&& (car->_trkPos.seg->raceInfo & TR_LAST)) {
+			/* going backward through the start line */
+			info->lapFlag++;
 		}
-	}
-	if ((info->prevTrkPos.seg->raceInfo & TR_START) && (car->_trkPos.seg->raceInfo & TR_LAST)) {
-		/* going backward through the start line */
-		info->lapFlag++;
-	}
 	}
 
 	// Apply race rules (penalties if enabled).
@@ -674,7 +668,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 	info->prevTrkPos = car->_trkPos;
 	car->_curLapTime = s->currentTime - info->sTime;
 	car->_distFromStartLine = car->_trkPos.seg->lgfromstart +
-	(car->_trkPos.seg->type == TR_STR ? car->_trkPos.toStart : car->_trkPos.toStart * car->_trkPos.seg->radius);
+		(car->_trkPos.seg->type == TR_STR ? car->_trkPos.toStart : car->_trkPos.toStart * car->_trkPos.seg->radius);
 	car->_distRaced = (car->_laps - 1) * ReInfo->track->length + car->_distFromStartLine;
 }
 

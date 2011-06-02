@@ -40,12 +40,12 @@ public:
 	
 	virtual void shutdown() = 0;
 
-	virtual void *createRaceScreen() = 0;
+	virtual void* createRaceScreen() = 0;
 	
-	virtual void *createRaceEventLoopHook() = 0;
+	virtual void* createRaceEventLoopHook() = 0;
 
-	virtual void activateLoadingScreen(const char *title, const char *bgimg) = 0;
-	virtual void addLoadingMessage(const char *text) = 0;
+	virtual void activateLoadingScreen(const char* title, const char* bgimg) = 0;
+	virtual void addLoadingMessage(const char* text) = 0;
 	virtual void shutdownLoadingScreen() = 0;
 
 	virtual void activateGameScreen() = 0;
@@ -56,24 +56,25 @@ public:
 	virtual void activateStartRaceMenu() = 0;
 	virtual void activateStopRaceMenu() = 0;
 
-	virtual void *createResultsMenu() = 0;
-	virtual void activateResultsMenu(void *prevHdle, struct RmInfo *reInfo) = 0;
-	virtual void setResultsMenuTrackName(int nSessionType, const char *trackName) = 0;
-	virtual void setResultsMenuTitle(const char *title) = 0;
-	virtual void addResultsMenuLine(const char *text) = 0;
-	virtual void setResultsMenuLine(const char *text, int line, int clr) = 0;
-	virtual void removeResultsMenuLine(int line) = 0;
-	virtual void showResultsMenuContinueButton() = 0;
-	virtual int  getResultsMenuLineCount() = 0;
-	virtual void eraseResultsMenu() = 0;
+	// Results table management.
+	virtual void* createResultsMenu() = 0;
+	virtual void activateResultsMenu(void* prevHdle, struct RmInfo* reInfo) = 0;
+	virtual void setResultsTableTitles(const char* pszTitle, const char* pszSubTitle) = 0;
+	virtual void setResultsTableHeader(const char* pszHeader) = 0;
+	virtual void addResultsTableRow(const char* pszText) = 0;
+	virtual void setResultsTableRow(int nIndex, const char* pszText,
+									bool bHighlight = false) = 0;
+	virtual void removeResultsTableRow(int nIndex) = 0;
+	virtual void eraseResultsTable() = 0;
+	virtual int  getResultsTableRowCount() const = 0;
 
-	virtual void activateStandingsMenu(void *prevHdle, struct RmInfo *info, int start = 0) = 0;
+	virtual void activateStandingsMenu(void* prevHdle, struct RmInfo* info, int start = 0) = 0;
 
 	// TODO: Move this to a new separate IGraphicsUserInterface interface ?
 	// Graphics engine control.
 	virtual bool initializeGraphics() = 0;
 	virtual bool loadTrackGraphics(struct Track* pTrack) = 0;
-	virtual bool loadCarsGraphics(struct Situation *pSituation) = 0;
+	virtual bool loadCarsGraphics(struct Situation* pSituation) = 0;
 	virtual bool setupGraphicsView() = 0;
 	virtual void shutdownGraphicsView() = 0;
 	virtual void unloadCarsGraphics() = 0;

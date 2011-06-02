@@ -139,43 +139,48 @@ void LegacyMenu::activateStopRaceMenu()
 	::RmStopRaceScreen();
 }
 
+// Results table management.
 void* LegacyMenu::createResultsMenu()
 {
 	return ::RmResScreenInit();
 }
+
 void LegacyMenu::activateResultsMenu(void* prevHdle, tRmInfo* reInfo)
 {
 	::RmShowResults(prevHdle, reInfo);
 }
-void LegacyMenu::setResultsMenuTrackName(int nSessionType, const char* trackName)
+
+void LegacyMenu::setResultsTableTitles(const char* pszTitle, const char* pszSubTitle)
 {
-	::RmResScreenSetTrackName(nSessionType, trackName);
+	::RmResScreenSetTitles(pszTitle, pszSubTitle);
 }
-void LegacyMenu::setResultsMenuTitle(const char* title)
+
+void LegacyMenu::setResultsTableHeader(const char* pszHeader)
 {
-	::RmResScreenSetTitle(title);
+	::RmResScreenSetHeader(pszHeader);
 }
-void LegacyMenu::addResultsMenuLine(const char* text)
+
+void LegacyMenu::addResultsTableRow(const char* pszText)
 {
-	::RmResScreenAddText(text);
+	::RmResScreenAddText(pszText);
 }
-void LegacyMenu::setResultsMenuLine(const char* text, int line, int clr)
+
+void LegacyMenu::setResultsTableRow(int nIndex, const char* pszText, bool bHighlight)
 {
-	::RmResScreenSetText(text, line, clr);
+	::RmResScreenSetText(pszText, nIndex, bHighlight ? 1 : 0);
 }
-void LegacyMenu::removeResultsMenuLine(int line)
+
+void LegacyMenu::removeResultsTableRow(int nIndex)
 {
-	::RmResScreenRemoveText(line);
+	::RmResScreenRemoveText(nIndex);
 }
-void LegacyMenu::showResultsMenuContinueButton()
+
+int LegacyMenu::getResultsTableRowCount() const
 {
-	::RmResShowCont();
+	return ::RmResGetRows();
 }
-int  LegacyMenu::getResultsMenuLineCount()
-{
-	return ::RmResGetLines();
-}
-void LegacyMenu::eraseResultsMenu()
+
+void LegacyMenu::eraseResultsTable()
 {
 	::RmResEraseScreen();
 }

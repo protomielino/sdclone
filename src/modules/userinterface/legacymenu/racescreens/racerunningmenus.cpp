@@ -25,6 +25,7 @@
 
 #include <cstdlib>
 #include <cstdio>
+#include <cctype>
 #include <sstream>
 
 #include <portability.h>
@@ -468,20 +469,19 @@ RmHookInit()
  */
 static float rmColors[2][4]; // Initialized at menu-load time (2 RGBA float color arrays).
 
-static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
-
 static void	*rmResScreenHdle = 0;
 
-static int	rmResMainTitleId;
 static int	rmResTitleId;
-static int*	rmResMsgId = 0; // Initialized at menu-load time.
+static int	rmResSubTitleId;
+static int	rmResHeaderId;
+static int*	rmResRowLabelId = 0; // Initialized at menu-load time.
 
-static int*	rmResMsgClr = 0; // Initialized at menu-load time.
-static char** rmResMsg = 0; // Initialized at menu-load time.
+static float** rmResRowColor = 0; // Initialized at menu-load time.
+static char** rmResRowText = 0; // Initialized at menu-load time.
 
-static int	rmCurLine;
+static int	rmCurRowIndex;
 
-static int rmNMaxResLines = 0; // Initialized at menu-load time.
+static int rmNMaxResRows = 0; // Initialized at menu-load time.
 
 // Flag to know if the menu state has been changed (and thus needs a redraw+redisplay).
 static bool rmbResMenuChanged = false;
@@ -518,25 +518,26 @@ rmResScreenActivate(void * /* dummy */)
 	rmbResMenuChanged = true;
 }
 
-static void
-rmContDisplay()
-{
-    GfuiDisplay();
+// Used only in commented-out RmResShowCont (see below) : remove ?
+// static void
+// rmContDisplay()
+// {
+//     GfuiDisplay();
 	
-    GfuiApp().eventLoop().postRedisplay();
-}
+//     GfuiApp().eventLoop().postRedisplay();
+// }
 
-static void
-rmResCont(void * /* dummy */)
-{
-    rmUpdateRaceEngine();
-}
+// static void
+// rmResCont(void * /* dummy */)
+// {
+//     rmUpdateRaceEngine();
+// }
 
 static void
 rmResScreenShutdown(void * /* dummy */)
 {
-    for (int i = 1; i < rmNMaxResLines; i++)
-		FREEZ(rmResMsg[i]);
+    for (int i = 1; i < rmNMaxResRows; i++)
+		FREEZ(rmResRowText[i]);
 }
 
 static void
@@ -562,9 +563,8 @@ RmResScreenInit()
     void *hmenu = GfuiMenuLoad("raceblindscreen.xml");
     GfuiMenuCreateStaticControls(rmResScreenHdle, hmenu);
 
-    // Create variable main title (race type/stage) label.
-    rmResMainTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Title");
-    GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, aSessionTypeNames[reInfo->s->_raceType]);
+    // Create variable main title (race session) label.
+    rmResTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Title");
 
     // Create background image if any specified.
     const char* img = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_RUNIMG, 0);
@@ -572,42 +572,44 @@ RmResScreenInit()
 		GfuiScreenAddBgImg(rmResScreenHdle, img);
     
     // Create variable subtitle (driver and race name, lap number) label.
-    rmResTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "SubTitle");
+    rmResSubTitleId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "SubTitle");
 
-	// Get layout properties, except for nMaxResultLines (see below).
-    const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
-    const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
+    // Create table header label.
+    rmResHeaderId = GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Header");
 
-	// Allocate line info arrays once and for all, if not already done.
-	if (!rmResMsgId)
+	// Get layout properties, except for nMaxResultRows (see below).
+    const int yTopRow = (int)GfuiMenuGetNumProperty(hmenu, "yTopRow", 400);
+    const int yRowShift = (int)GfuiMenuGetNumProperty(hmenu, "yRowShift", 20);
+
+	// Allocate row info arrays once and for all, if not already done.
+	if (!rmResRowLabelId)
 	{
-		// Load nMaxResultLines/colors only the first time (ignore any later change,
-		// otherwize, we'd have to realloc the line info arrays).
-		rmNMaxResLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 20);
+		// Load nMaxResultRows/colors only the first time (ignore any later change,
+		// otherwize, we'd have to realloc the row info arrays).
+		rmNMaxResRows = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultRows", 20);
 		const GfuiColor cNormal =
-			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "lineColorNormal", "0x0000FF"));
+			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "rowColorNormal", "0x0000FF"));
 		const GfuiColor cHighlighted =
-			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "lineColorHighlighted", "0x00FF00"));
+			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "rowColorHighlighted", "0x00FF00"));
 		memcpy(rmColors[0], cNormal.toFloatRGBA(), sizeof(rmColors[0]));
-		memcpy(rmColors[1], cHighlighted.toFloatRGBA(), sizeof(rmColors[0]));
+		memcpy(rmColors[1], cHighlighted.toFloatRGBA(), sizeof(rmColors[1]));
 		
-		rmResMsgId = (int*)calloc(rmNMaxResLines, sizeof(int));
-		rmResMsg = (char**)calloc(rmNMaxResLines, sizeof(char*));
-		rmResMsgClr = (int*)calloc(rmNMaxResLines, sizeof(int));
+		rmResRowLabelId = (int*)calloc(rmNMaxResRows, sizeof(int));
+		rmResRowText = (char**)calloc(rmNMaxResRows, sizeof(char*));
+		rmResRowColor = (float**)calloc(rmNMaxResRows, sizeof(float*));
 	}
 
-    // Create result lines (1 label for each).
-    // TODO: Get layout, color, ... info from hmenu when available.
-    int	y = yTopLine;
-    for (int i = 0; i < rmNMaxResLines; i++)
+    // Create result rows (1 label for each).
+    int	y = yTopRow;
+    for (int i = 0; i < rmNMaxResRows; i++)
 	{
-		FREEZ(rmResMsg[i]);
-		rmResMsgClr[i] = 0;
-		rmResMsgId[i] =
-			GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Line", true, // from template
+		FREEZ(rmResRowText[i]);
+		rmResRowColor[i] = rmColors[0];
+		rmResRowLabelId[i] =
+			GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Row", true, // from template
 									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_ALIGN,
-									   GFUI_TPL_MAXLEN);
-		y -= yLineShift;
+									   GFUI_TPL_MAXLEN, rmResRowColor[i]);
+		y -= yRowShift;
     }
 
     // Close menu XML descriptor.
@@ -616,37 +618,64 @@ RmResScreenInit()
     // Register keyboard shortcuts.
     rmAddResKeys();
 
-    // Initialize current result line.
-    rmCurLine = 0;
+    // Initialize current result row.
+    rmCurRowIndex = 0;
 
     return rmResScreenHdle;
 }
 
 void
-RmResScreenSetTrackName(int nSessionType, const char *pszTrackName)
+RmResScreenSetTitles(const char *pszTitle, const char *pszSubTitle)
 {
     if (!rmResScreenHdle)
 		return;
 	
-	char pszTitle[128];
-	snprintf(pszTitle, sizeof(pszTitle), "%s at %s",
-			 aSessionTypeNames[nSessionType], pszTrackName);
-	GfuiLabelSetText(rmResScreenHdle, rmResMainTitleId, pszTitle);
+	GfuiLabelSetText(rmResScreenHdle, rmResTitleId, pszTitle);
+	GfuiLabelSetText(rmResScreenHdle, rmResSubTitleId, pszSubTitle);
 	
 	// The menu changed.
 	rmbResMenuChanged = true;
 }
 
 void
-RmResScreenSetTitle(const char *pszTitle)
+RmResScreenSetHeader(const char *pszHeader)
 {
     if (!rmResScreenHdle)
 		return;
 	
-	GfuiLabelSetText(rmResScreenHdle, rmResTitleId, pszTitle);
+	GfuiLabelSetText(rmResScreenHdle, rmResHeaderId, pszHeader);
 	
 	// The menu changed.
 	rmbResMenuChanged = true;
+}
+
+// Cleanup the give row text :
+// * replace leading zeros in non-time columns.
+static char*
+rmCleanRowText(const char* pszText)
+{
+	char* pszTargetText = strdup(pszText);
+	char* pszSearchText = strdup(pszText);
+	char* pszToken = strtok(pszSearchText, " ");
+	while (pszToken)
+	{
+		if (!strchr(pszToken, ':')) // Leave time fields unchanged.
+		{
+			unsigned nLead0s = 0;
+			while (nLead0s + 1 < strlen(pszToken)
+				   && pszToken[nLead0s] == '0' && isdigit(pszToken[nLead0s+1]))
+				nLead0s++;
+			while (nLead0s != 0)
+			{
+				pszTargetText[pszToken - pszSearchText + nLead0s - 1] = ' ';
+				nLead0s--;
+			}
+		}
+		pszToken = strtok(0, " ");
+	}
+	free(pszSearchText);
+	
+	return pszTargetText;
 }
 
 void
@@ -655,37 +684,37 @@ RmResScreenAddText(const char *text)
     if (!rmResScreenHdle)
 		return;
 	
-    if (rmCurLine == rmNMaxResLines)
+    if (rmCurRowIndex == rmNMaxResRows)
 	{
-		free(rmResMsg[0]);
-		for (int i = 1; i < rmNMaxResLines; i++)
+		free(rmResRowText[0]);
+		for (int i = 1; i < rmNMaxResRows; i++)
 		{
-			rmResMsg[i - 1] = rmResMsg[i];
-			GfuiLabelSetText(rmResScreenHdle, rmResMsgId[i - 1], rmResMsg[i]);
+			rmResRowText[i - 1] = rmResRowText[i];
+			GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[i - 1], rmResRowText[i]);
 		}
-		rmCurLine--;
+		rmCurRowIndex--;
     }
-    rmResMsg[rmCurLine] = strdup(text);
-    GfuiLabelSetText(rmResScreenHdle, rmResMsgId[rmCurLine], rmResMsg[rmCurLine]);
-    rmCurLine++;
+    rmResRowText[rmCurRowIndex] = rmCleanRowText(text);
+    GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[rmCurRowIndex], rmResRowText[rmCurRowIndex]);
+    rmCurRowIndex++;
 	
 	// The menu changed.
 	rmbResMenuChanged = true;
 }
 
 void
-RmResScreenSetText(const char *text, int line, int clr)
+RmResScreenSetText(const char *text, int row, int clr)
 {
     if (!rmResScreenHdle)
 		return;
 	
-    if (line < rmNMaxResLines)
+    if (row >= 0 && row < rmNMaxResRows)
 	{
-		FREEZ(rmResMsg[line]);
-		rmResMsg[line] = strdup(text);
-		rmResMsgClr[line] = (clr >= 0 && clr < 2) ? clr : 0;
-		GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], rmResMsg[line]);
-		GfuiLabelSetColor(rmResScreenHdle, rmResMsgId[line], rmColors[rmResMsgClr[line]]);
+		FREEZ(rmResRowText[row]);
+		rmResRowText[row] = rmCleanRowText(text);
+		rmResRowColor[row] = (clr >= 0 && clr < 2) ? rmColors[clr] : rmColors[0];
+		GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[row], rmResRowText[row]);
+		GfuiLabelSetColor(rmResScreenHdle, rmResRowLabelId[row], rmResRowColor[row]);
 
 		// The menu changed.
 		rmbResMenuChanged = true;
@@ -693,18 +722,18 @@ RmResScreenSetText(const char *text, int line, int clr)
 }
 
 int
-RmResGetLines()
+RmResGetRows()
 {
-    return rmNMaxResLines;
+    return rmNMaxResRows;
 }
 
 void
 RmResEraseScreen()
 {
-    if (!rmResScreenHdle)
+	if (!rmResScreenHdle)
 		return;
 	
-    for (int i = 0; i < rmNMaxResLines; i++)
+	for (int i = 0; i < rmNMaxResRows; i++)
 		RmResScreenSetText("", i, 0);
 	
 	// The menu changed.
@@ -713,34 +742,35 @@ RmResEraseScreen()
 
 
 void
-RmResScreenRemoveText(int line)
+RmResScreenRemoveText(int row)
 {
-    if (!rmResScreenHdle)
+	if (!rmResScreenHdle)
 		return;
 	
-    if (line < rmNMaxResLines)
+	if (row < rmNMaxResRows)
 	{
-		FREEZ(rmResMsg[line]);
-		GfuiLabelSetText(rmResScreenHdle, rmResMsgId[line], "");
+		FREEZ(rmResRowText[row]);
+		GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[row], "");
 		
 		// The menu changed.
 		rmbResMenuChanged = true;
     }
 }
 
-void
-RmResShowCont()
-{
-    GfuiButtonCreate(rmResScreenHdle, "Continue", GFUI_FONT_LARGE_C,
-					 320, 15, GFUI_BTNSZ, GFUI_ALIGN_HC_VB, 0, 0, rmResCont,
-					 NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
-    GfuiAddKey(rmResScreenHdle, GFUIK_RETURN,  "Continue", 0, rmResCont, NULL);
-    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, rmResCont, NULL);
-
-    GfuiApp().eventLoop().setRedisplayCB(rmContDisplay);
-	
-    GfuiApp().eventLoop().postRedisplay();
-}
+// Never used : remove ?
+//void
+//RmResShowCont()
+//{
+//    GfuiButtonCreate(rmResScreenHdle, "Continue", GFUI_FONT_LARGE_C,
+//					 320, 15, GFUI_BTNSZ, GFUI_ALIGN_HC_VB, 0, 0, rmResCont,
+//					 NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
+//    GfuiAddKey(rmResScreenHdle, GFUIK_RETURN,  "Continue", 0, rmResCont, NULL);
+//    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, rmResCont, NULL);
+//
+//    GfuiApp().eventLoop().setRedisplayCB(rmContDisplay);
+//	
+//    GfuiApp().eventLoop().postRedisplay();
+//}
 
 //************************************************************
 void

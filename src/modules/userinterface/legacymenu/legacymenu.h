@@ -74,16 +74,16 @@ public:
 	virtual void activateStartRaceMenu();
 	virtual void activateStopRaceMenu();
 
+	// Results table management.
 	virtual void* createResultsMenu();
 	virtual void activateResultsMenu(void* prevHdle, struct RmInfo* reInfo);
-	virtual void setResultsMenuTrackName(int nSessionType, const char* trackName);
-	virtual void setResultsMenuTitle(const char* title);
-	virtual void addResultsMenuLine(const char* text);
-	virtual void setResultsMenuLine(const char* text, int line, int clr);
-	virtual void removeResultsMenuLine(int line);
-	virtual void showResultsMenuContinueButton();
-	virtual int  getResultsMenuLineCount();
-	virtual void eraseResultsMenu();
+	virtual void setResultsTableTitles(const char* pszTitle, const char* pszSubTitle);
+	virtual void setResultsTableHeader(const char* pszHeader);
+	virtual void addResultsTableRow(const char* pszText);
+	virtual void setResultsTableRow(int nIndex, const char* pszText, bool bHighlight = false);
+	virtual void removeResultsTableRow(int nIndex);
+	virtual void eraseResultsTable();
+	virtual int  getResultsTableRowCount() const;
 
 	virtual void activateStandingsMenu(void* prevHdle, struct RmInfo* info, int start = 0);
 

@@ -45,6 +45,8 @@
 #include "racemain.h"
 
 
+static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
+
 //Utility
 
 /** 
@@ -400,9 +402,13 @@ ReRaceRealStart(void)
 		} else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && s->_ncars > 1) {
 			ReUpdatePracticeCurRes(s->cars[0]);
 		} else {
-			ReUI().setResultsMenuTrackName(ReInfo->s->_raceType, ReInfo->track->name);
+			static const char* pszTableHeader = "Rank    Time     Driver               Car";
 			snprintf(buf, sizeof(buf), "%s (%s)", s->cars[0]->_name, s->cars[0]->_carName);
-			ReUI().setResultsMenuTitle(buf);
+			char pszSubTitle[128];
+			snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s", 
+					 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+			ReUI().setResultsTableTitles(buf, pszSubTitle);
+			ReUI().setResultsTableHeader(pszTableHeader);
 		}
 	}//if displayMode != normal
 

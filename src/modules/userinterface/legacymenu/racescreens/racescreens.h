@@ -114,13 +114,13 @@ extern void* RmHookInit();
 extern bool RmCheckPitRequest();
 
 extern void* RmResScreenInit();
-extern void RmResScreenSetTrackName(int nSessionType, const char *trackName);
-extern void RmResScreenSetTitle(const char *title);
-extern void RmResScreenAddText(const char *text);
-extern void RmResScreenSetText(const char *text, int line, int clr);
-extern void RmResScreenRemoveText(int line);
-extern void RmResShowCont();
-extern int  RmResGetLines();
+extern void RmResScreenSetTitles(const char *pszTitle, const char *pszSubTitle);
+extern void RmResScreenSetHeader(const char *pszHeader);
+extern void RmResScreenAddText(const char *pszText);
+extern void RmResScreenSetText(const char *pszText, int nRowIndex, int nColorIndex);
+extern void RmResScreenRemoveText(int nRowIndex);
+//extern void RmResShowCont(); // Never used : remove ?
+extern int  RmResGetRows();
 extern void RmResEraseScreen();
 
 // From networkingmenu.

@@ -150,7 +150,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 
 		/* Damages in current lap + (total so far) */
 		damages =  (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)); 
-		sprintf(buf, "%d (%d)", damages - NLastLapDamages, damages); 
+		sprintf(buf, "%d (%d)", damages ? damages - NLastLapDamages : 0, damages); 
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Damages", true, // From template.
 								   buf, GFUI_TPL_X, y);
 		NLastLapDamages = damages; 
@@ -162,22 +162,22 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 		RmPrevRace.prevHdle = prevHdle;
 		RmPrevRace.info     = info;
 		RmPrevRace.start    = start - nMaxLines;
-		GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "previouspagearrow",
+		GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "PreviousPageArrow",
 									(void*)&RmPrevRace, rmChgPracticeScreen);
 		GfuiAddKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgPracticeScreen, NULL);
     }
     
     // Add "Continue" button
-    GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "continuebutton", prevHdle, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "ContinueButton", prevHdle, GfuiScreenReplace);
     
     //Create 'save' button in the bottom right
-    //rmSaveButtonId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "savebutton", info, rmSaveRes);
+    //rmSaveButtonId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "SaveButton", info, rmSaveRes);
     
     if (i < totLaps) {
 		RmNextRace.prevHdle = prevHdle;
 		RmNextRace.info     = info;
 		RmNextRace.start    = start + nMaxLines;
-		GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "nextpagearrow",
+		GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "NextPageArrow",
 									(void*)&RmNextRace, rmChgPracticeScreen);
 		GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgPracticeScreen, NULL);
     }
