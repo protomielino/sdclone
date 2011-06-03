@@ -481,13 +481,36 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
     while (psegside != NULL)
     {
      if (psegside->style == TR_WALL || psegside->style == TR_FENCE)
-      margin = MAX(0.0, margin - (psegCurrent->type == TR_STR ? 0.5 : 1.0));
+     {
+      if (psegCurrent->type == TR_STR)
+      {
+       margin = MAX(0.0, margin - 0.5);
+      }
+      else
+      {
+       if ((psegCurrent->type == TR_LFT && side == TR_SIDE_LFT) ||
+           (psegCurrent->type == TR_RGT && side == TR_SIDE_RGT))
+        margin = MAX(0.0, margin - 1.5);
+       else
+        margin = MAX(0.0, margin - 0.5);
+      }
+     }
  
-     if (psegside->style != TR_PLAN ||
-         psegside->surface->kFriction < psegCurrent->surface->kFriction*0.8 ||
-         psegside->surface->kRoughness > MAX(0.02, psegCurrent->surface->kRoughness*1.2) ||
-         psegside->surface->kRollRes > MAX(0.005, psegCurrent->surface->kRollRes*1.2))
+     if (psegside->style == TR_WALL || psegside->style == TR_FENCE)
       break;
+
+     if (psegside->style == TR_PLAN && 
+         (psegside->surface->kFriction < psegCurrent->surface->kFriction*0.8 ||
+         (psegside->surface->kRoughness > MAX(0.02, psegCurrent->surface->kRoughness+0.05)) ||
+         (psegside->surface->kRollRes > MAX(0.005, psegCurrent->surface->kRollRes+0.03))))
+      break;
+
+      if (psegside->style == TR_CURB &&
+          (psegside->surface->kFriction >= psegCurrent->surface->kFriction * 0.9 &&
+           psegside->surface->kRoughness <= psegCurrent->surface->kRoughness + 0.05 &&
+           psegside->surface->kRollRes <= psegCurrent->surface->kRollRes * 0.03 &&
+           psegside->height <= psegside->width/10))
+       break;
  
      if (ptrack->pits.type != TR_PIT_NONE)
      {
@@ -510,9 +533,12 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 
      double thiswidth = MIN(psegside->startWidth, psegside->endWidth) * 1.0;
      if (psegCurrent->type == TR_STR)
-     if ((side == TR_SIDE_LFT && (psegCurrent->type == TR_RGT || psegCurrent->next->type != TR_LFT)) ||
-         (side == TR_SIDE_RGT && (psegCurrent->type == TR_LFT || psegCurrent->next->type != TR_RGT)))
-      thiswidth *= 0.6;
+     if ((side == TR_SIDE_LFT && psegCurrent->type == TR_LFT && psegside->style == TR_CURB) ||
+         (side == TR_SIDE_RGT && psegCurrent->type == TR_RGT && psegside->style == TR_CURB))
+      thiswidth *= 0.5;
+     else if ((side == TR_SIDE_LFT && (psegCurrent->type == TR_RGT || psegCurrent->next->type != TR_LFT)) ||
+              (side == TR_SIDE_RGT && (psegCurrent->type == TR_LFT || psegCurrent->next->type != TR_RGT)))
+      thiswidth *= 0.8;
      margin += thiswidth;
      psegside = psegside->side[side];
     }
@@ -940,7 +966,15 @@ void LRaceLine::CalcZCurvature(int rl)
    if (rl == LINE_MID)
     camber *= 2;
   }
-  double slope = camber + zd/3 * SlopeFactor;
+  double slope = camber + zd/3 * SlopeFactor; 
+  if (rl != LINE_RL)
+  {
+   if (slope < 0.0) 
+    slope *= 1.4;
+   else
+    slope *= 0.7;
+  }
+
   SRL[rl].tFriction[i] *= 1.0 + MAX(-0.4, slope);
 
   if (slope < 0.0)
