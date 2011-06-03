@@ -35,30 +35,31 @@ public:
 
 	//! Activation of the user interface (splash if any, main menu ...).
 	virtual bool activate() = 0;
-	
+
+	//! Request exit of the event loop.
 	virtual void quit() = 0;
-	
+
+	//! Termination of the user interface.
 	virtual void shutdown() = 0;
 
-	virtual void* createRaceScreen() = 0;
-	
-	virtual void* createRaceEventLoopHook() = 0;
+	// Race state change notifications.
+	virtual void onRaceConfiguring() = 0;
+	virtual void onRaceEventInitializing() = 0;
+	virtual void onRaceEventStarting() = 0;
+	virtual void onRaceInitializing() = 0;
+	virtual void onRaceStarting() = 0;
+	virtual void onRaceLoadingDrivers() = 0;
+	virtual void onRaceDriversLoaded() = 0;
+	virtual void onRaceSimulationReady() = 0;
+	virtual void onRaceStarted() = 0;
+	virtual void onRaceInterrupted() = 0;
+	virtual void onRaceFinished() = 0;
+	virtual void onRaceEventFinished() = 0;
 
-	virtual void activateLoadingScreen(const char* title, const char* bgimg) = 0;
-	virtual void addLoadingMessage(const char* text) = 0;
-	virtual void shutdownLoadingScreen() = 0;
+	// Loading messages management.
+	virtual void addLoadingMessage(const char* pszText) = 0;
 
-	virtual void activateGameScreen() = 0;
-
-	virtual int activateRacemanMenu() = 0;
-	virtual int activateNextEventMenu() = 0;
-
-	virtual void activateStartRaceMenu() = 0;
-	virtual void activateStopRaceMenu() = 0;
-
-	// Results table management.
-	virtual void* createResultsMenu() = 0;
-	virtual void activateResultsMenu(void* prevHdle, struct RmInfo* reInfo) = 0;
+	// Blind-race results table management.
 	virtual void setResultsTableTitles(const char* pszTitle, const char* pszSubTitle) = 0;
 	virtual void setResultsTableHeader(const char* pszHeader) = 0;
 	virtual void addResultsTableRow(const char* pszText) = 0;
@@ -68,19 +69,11 @@ public:
 	virtual void eraseResultsTable() = 0;
 	virtual int  getResultsTableRowCount() const = 0;
 
-	virtual void activateStandingsMenu(void* prevHdle, struct RmInfo* info, int start = 0) = 0;
+	// Results and standings tables.
+	virtual void showResults() = 0;
+	virtual void showStandings() = 0;
 
-	// TODO: Move this to a new separate IGraphicsUserInterface interface ?
-	// Graphics engine control.
-	virtual bool initializeGraphics() = 0;
-	virtual bool loadTrackGraphics(struct Track* pTrack) = 0;
-	virtual bool loadCarsGraphics(struct Situation* pSituation) = 0;
-	virtual bool setupGraphicsView() = 0;
-	virtual void shutdownGraphicsView() = 0;
-	virtual void unloadCarsGraphics() = 0;
-	virtual void unloadTrackGraphics() = 0;
-	virtual void shutdownGraphics() = 0;
-
+	//! Race engine setter.
 	virtual void setRaceEngine(IRaceEngine& raceEngine) = 0;
 };
 

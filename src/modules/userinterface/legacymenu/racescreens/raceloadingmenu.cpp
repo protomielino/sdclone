@@ -61,10 +61,8 @@ rmDeativate(void * /* dummy */)
 void
 RmLoadingScreenStart(const char *title, const char *bgimg)
 {
-    if (GfuiScreenIsActive(HScreen)) {
-		/* Already active */
+    if (GfuiScreenIsActive(HScreen))
 		return;
-    }
     
     if (HScreen)
 		GfuiScreenRelease(HScreen);
@@ -156,28 +154,31 @@ RmLoadingScreenSetText(const char *text)
 {
     GfLogTrace("%s\n", text);
     
-    if (HScreen)
+    if (!HScreen)
 	{
-		if (TextLines[CurTextLineIdx])
-			free(TextLines[CurTextLineIdx]);
-		if (text)
-		{
-			TextLines[CurTextLineIdx] = strdup(text);
-			CurTextLineIdx = (CurTextLineIdx + 1) % NTextLines;
-		}
+		GfLogWarning("Can't display loading message : loading screen not created.\n");
+		return;
+	}
 	
-		int i = CurTextLineIdx;
-		int j = 0;
-		do
-		{
-			if (TextLines[i])
-				GfuiLabelSetText(HScreen, TextLineIds[j], TextLines[i]);
-			j++;
-			i = (i + 1) % NTextLines;
-		}
-		while (i != CurTextLineIdx);
+	if (TextLines[CurTextLineIdx])
+		free(TextLines[CurTextLineIdx]);
+	if (text)
+	{
+		TextLines[CurTextLineIdx] = strdup(text);
+		CurTextLineIdx = (CurTextLineIdx + 1) % NTextLines;
+	}
 	
-		GfuiDisplay();
-    }
+	int i = CurTextLineIdx;
+	int j = 0;
+	do
+	{
+		if (TextLines[i])
+			GfuiLabelSetText(HScreen, TextLineIds[j], TextLines[i]);
+		j++;
+		i = (i + 1) % NTextLines;
+	}
+	while (i != CurTextLineIdx);
+	
+	GfuiDisplay();
 }
  

@@ -676,23 +676,16 @@ ReSavePracticeLap(tCarElt *car)
 }
 
 int
-ReDisplayResults(void)
+ReShowResults(void)
 {
     void* params = ReInfo->params;
     ReCalculateClassPoints (ReInfo->_reRaceName);
 
     if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPRES, RM_VAL_YES), RM_VAL_YES)
 		|| ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
-		ReUI().activateResultsMenu(ReInfo->_reGameScreen, ReInfo);
+		ReUI().showResults();
 	else 
     	return RM_SYNC | RM_NEXT_STEP;
 
     return RM_ASYNC | RM_NEXT_STEP;
-}
-
-
-void
-ReDisplayStandings(void)
-{
-    ReUI().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
 }

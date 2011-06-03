@@ -323,7 +323,7 @@ rmResumeRace(void * /* dummy */)
 }
 
 // Init. function for the current menu -----------------------------------------------------
-int
+void
 RmRacemanMenu()
 {
 	// Special case of the online race, not yet migrated to using tgfdata.
@@ -353,19 +353,19 @@ RmRacemanMenu()
 				if (IsClient())
 				{
 					RmNetworkClientMenu(NULL);
-					return RM_ASYNC | RM_NEXT_STEP;
+					return;
 				}
 				else if (IsServer())
 				{
 					RmNetworkHostMenu(NULL);
-					return RM_ASYNC | RM_NEXT_STEP;
+					return;
 				}
 			}
 		}
 		else
 		{
 			RmNetworkMenu(NULL);
-			return RM_ASYNC | RM_NEXT_STEP;
+			return;
 		}
 	}
 
@@ -397,18 +397,18 @@ RmRacemanMenu()
 						NULL, rmOnPlayerConfig);
 	
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "PreviousButton",
-						reInfo->_reMenuScreen, GfuiScreenActivate);
+						RmRaceSelectMenuHandle, GfuiScreenActivate);
 
 	// Create "Load / Resume / Save race" buttons.
 	SaveRaceConfigButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "SaveRaceConfigButton",
-							ScrHandle, rmOnSaveRaceToConfigFile);
+									ScrHandle, rmOnSaveRaceToConfigFile);
 	LoadRaceConfigButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceConfigButton",
-							ScrHandle, rmOnLoadRaceFromConfigFile);
+									ScrHandle, rmOnLoadRaceFromConfigFile);
 	LoadRaceResultsButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadRaceResultsButton",
-							ScrHandle, rmOnLoadRaceFromResultsFile);
+									ScrHandle, rmOnLoadRaceFromResultsFile);
 
 	// Create "Resume / Start race" buttons.
 	ResumeRaceButtonId =
@@ -435,10 +435,8 @@ RmRacemanMenu()
 	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Start the race",
 			   NULL, rmStartNewRace, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Back to the Main menu",
-			   reInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+			   RmRaceSelectMenuHandle, GfuiScreenActivate, NULL);
 
 	// Activate screen.
 	GfuiScreenActivate(ScrHandle);
-
-	return RM_ASYNC | RM_NEXT_STEP;
 }

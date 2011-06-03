@@ -352,7 +352,7 @@ rmNetworkClientDisconnect(void * /* dummy */)
 	if (GetClient())
 		GetClient()->Disconnect();
 
-	GfuiScreenActivate(LmRaceEngine().inData()->_reMenuScreen);
+	GfuiScreenActivate(RmRaceSelectMenuHandle);
 }
 
 
@@ -521,13 +521,11 @@ OnActivateNetworkHost(void *)
 static void
 rmNetworkServerDisconnect(void * /* dummy */)
 {
-	tRmInfo* reInfo = LmRaceEngine().inData();
-
 	GfLogInfo("Disconnecting all clients\n");
 	if (GetServer())
 		GetServer()->Disconnect();
 
-	GfuiScreenActivate(reInfo->_reMenuScreen);
+	GfuiScreenActivate(RmRaceSelectMenuHandle);
 }
 
 static void
@@ -784,8 +782,6 @@ NetworkClientConnectMenu(void * /* dummy */)
 {
 	GfLogTrace("Entering Network Client Connect menu.\n");
 	
-	tRmInfo* reInfo = LmRaceEngine().inData();
-
 	LookupPlayerSetup(g_strDriver,g_strCar);
 
 	if (racemanMenuHdle)
@@ -810,11 +806,11 @@ NetworkClientConnectMenu(void * /* dummy */)
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "ConnectButton",
 								0, RmNetworkClientMenu);
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "BackButton",
-								reInfo->_reMenuScreen, GfuiScreenActivate);
+								RmRaceSelectMenuHandle, GfuiScreenActivate);
 	
 	GfuiMenuDefaultKeysAdd(racemanMenuHdle);
     GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
-			   reInfo->_reMenuScreen, 0, GfuiScreenActivate);
+			   RmRaceSelectMenuHandle, 0, GfuiScreenActivate);
 
     GfParmReleaseHandle(mparam);
 	
@@ -854,11 +850,11 @@ RmNetworkMenu(void *)
 								0, NetworkClientConnectMenu);
 
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "BackButton",
-								reInfo->_reMenuScreen, GfuiScreenActivate);
+								RmRaceSelectMenuHandle, GfuiScreenActivate);
 
     GfuiMenuDefaultKeysAdd(racemanMenuHdle);
     GfuiAddKey(racemanMenuHdle, GFUIK_ESCAPE, "Back to previous menu",
-			   reInfo->_reMenuScreen, 0, GfuiScreenActivate);
+			   RmRaceSelectMenuHandle, 0, GfuiScreenActivate);
 
     GfParmReleaseHandle(mparam);
 	

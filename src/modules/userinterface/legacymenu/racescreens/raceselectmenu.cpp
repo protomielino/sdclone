@@ -37,7 +37,9 @@
 #include "racescreens.h"
 
 
-static void *rmRaceSelectHandle = NULL;
+// The Race Select menu.
+void *RmRaceSelectMenuHandle = NULL;
+
 
 static std::map<std::string, int> rmMapSubTypeComboIds;
 
@@ -48,9 +50,7 @@ rmOnActivate(void * /* dummy */)
 {
 	GfLogTrace("Entering Race Mode Select menu\n");
 
-    /* Race engine init */
     LmRaceEngine().initialize();
-    LmRaceEngine().inData()->_reMenuScreen = rmRaceSelectHandle;
 }
 
 /* Exit from Race engine */
@@ -58,7 +58,10 @@ static void
 rmOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
+	
     LmRaceEngine().shutdown();
+	
+	LegacyMenu::self().shutdownGraphics();
 }
 
 
@@ -76,7 +79,7 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 	if (vecRaceMans.size() > 1)
 	{
 		const int nSubTypeComboId = rmMapSubTypeComboIds[strRaceManType];
-		const char* pszSelSubType = GfuiComboboxGetText(rmRaceSelectHandle, nSubTypeComboId);
+		const char* pszSelSubType = GfuiComboboxGetText(RmRaceSelectMenuHandle, nSubTypeComboId);
 		std::vector<GfRaceManager*>::const_iterator itRaceMan;
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
 		{
@@ -120,16 +123,16 @@ rmOnChangeRaceMan(tComboBoxInfo *)
 void *
 RmRaceSelectInit(void *prevMenu)
 {
-    if (rmRaceSelectHandle) 
-		return rmRaceSelectHandle;
+    if (RmRaceSelectMenuHandle) 
+		return RmRaceSelectMenuHandle;
     
     // Create screen, load menu XML descriptor and create static controls.
-    rmRaceSelectHandle = GfuiScreenCreate((float*)NULL, 
+    RmRaceSelectMenuHandle = GfuiScreenCreate((float*)NULL, 
 											NULL, rmOnActivate, 
 											NULL, (tfuiCallback)NULL, 
 											1);
     void *hMenuXMLDesc = GfuiMenuLoad("raceselectmenu.xml");
-    GfuiMenuCreateStaticControls(rmRaceSelectHandle, hMenuXMLDesc);
+    GfuiMenuCreateStaticControls(RmRaceSelectMenuHandle, hMenuXMLDesc);
 
     // Create the raceman type buttons and sub-type combo-boxes (if any).
 	const std::vector<std::string>& vecRaceManTypes = GfRaceManagers::self()->getTypes();
@@ -146,7 +149,7 @@ RmRaceSelectInit(void *prevMenu)
 		std::string strButtonCtrlName(*itRaceManType);
 		strButtonCtrlName.erase(std::remove(strButtonCtrlName.begin(), strButtonCtrlName.end(), ' '), strButtonCtrlName.end()); // Such a pain to remove spaces !
 		strButtonCtrlName += "Button";
-		GfuiMenuCreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
+		GfuiMenuCreateButtonControl(RmRaceSelectMenuHandle, hMenuXMLDesc, strButtonCtrlName.c_str(),
 							(void*)(itRaceManType - vecRaceManTypes.begin()),
 							rmOnSelectRaceMan);
 
@@ -170,38 +173,38 @@ RmRaceSelectInit(void *prevMenu)
 		strComboCtrlName.erase(std::remove(strComboCtrlName.begin(), strComboCtrlName.end(), ' '), strComboCtrlName.end()); // Such a pain to remove spaces !
 		strComboCtrlName += "Combo";
 		rmMapSubTypeComboIds[*itRaceManType] =
-			GfuiMenuCreateComboboxControl(rmRaceSelectHandle, hMenuXMLDesc,
+			GfuiMenuCreateComboboxControl(RmRaceSelectMenuHandle, hMenuXMLDesc,
 								  strComboCtrlName.c_str(), 0, rmOnChangeRaceMan);
 
 		// Add one item in the combo for each race manager of this type.
 		for (itRaceMan = vecRaceMans.begin(); itRaceMan != vecRaceMans.end(); itRaceMan++)
 		{
-			GfuiComboboxAddText(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType],
+			GfuiComboboxAddText(RmRaceSelectMenuHandle, rmMapSubTypeComboIds[*itRaceManType],
 								(*itRaceMan)->getSubType().c_str());
 		}
 
 		// Select the first one by default.
-		GfuiComboboxSetPosition(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType], 0);
+		GfuiComboboxSetPosition(RmRaceSelectMenuHandle, rmMapSubTypeComboIds[*itRaceManType], 0);
 
 		// Disable combo if only one race manager.
 		if (vecRaceMans.size() == 1)
-			GfuiEnable(rmRaceSelectHandle, rmMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
+			GfuiEnable(RmRaceSelectMenuHandle, rmMapSubTypeComboIds[*itRaceManType], GFUI_DISABLE);
 	}
 	
     // Create Back button
-    GfuiMenuCreateButtonControl(rmRaceSelectHandle, hMenuXMLDesc, "BackButton",
-						prevMenu, rmOnRaceSelectShutdown);
+    GfuiMenuCreateButtonControl(RmRaceSelectMenuHandle, hMenuXMLDesc, "BackButton",
+								prevMenu, rmOnRaceSelectShutdown);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hMenuXMLDesc);
     
     // Register keyboard shortcuts.
-    GfuiMenuDefaultKeysAdd(rmRaceSelectHandle);
-    GfuiAddKey(rmRaceSelectHandle, GFUIK_ESCAPE, "Back To Main Menu",
+    GfuiMenuDefaultKeysAdd(RmRaceSelectMenuHandle);
+    GfuiAddKey(RmRaceSelectMenuHandle, GFUIK_ESCAPE, "Back To Main Menu",
 			   prevMenu, rmOnRaceSelectShutdown, NULL);
 
     // Give the race engine the menu to come back to.
-    LmRaceEngine().initializeState(rmRaceSelectHandle);
+    LmRaceEngine().initializeState(RmRaceSelectMenuHandle);
 
-    return rmRaceSelectHandle;
+    return RmRaceSelectMenuHandle;
 }

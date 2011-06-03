@@ -122,10 +122,6 @@ void RaceEngine::shutdown(void)
 			_piPhysEngine = 0;
 		}
 	}
-	
-    // Shutdown the Graphics modules if not already done.
-	if (_piUserItf)
-		_piUserItf->shutdownGraphics(); // => onRaceEngineShutdown ?
 }
 
 void RaceEngine::setUserInterface(IUserInterface& userItf)

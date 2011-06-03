@@ -162,8 +162,8 @@ void ReSituation::accelerateTime(double fMultFactor)
 	    _pReInfo->_reTimeMult = 1.0;
 	else if (_pReInfo->_reTimeMult > 64.0)
 	    _pReInfo->_reTimeMult = 64.0;
-	else if (_pReInfo->_reTimeMult < 0.25)
-	    _pReInfo->_reTimeMult = 0.25;
+	else if (_pReInfo->_reTimeMult < 0.0625)
+	    _pReInfo->_reTimeMult = 0.0625;
 
 	std::ostringstream ossTimeMult;
 	ossTimeMult << "Time x" << std::setprecision(2) << 1.0 / _pReInfo->_reTimeMult;
@@ -560,11 +560,11 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
 	pTarget->rules = (tRmCarRules*)calloc(_nInitDrivers, sizeof(tRmCarRules));
 
 	// Assign level 1 constants.
-	pTarget->track = pSource->track; // Only read during the race.
-	pTarget->params = pSource->params; // Never read/written during the race.
-	pTarget->mainParams = pSource->mainParams; // Never read/written during the race.
-	pTarget->results = pSource->results; // Never read/written during the race.
-	pTarget->mainResults = pSource->mainResults; // Never read/written during the race.
+	pTarget->track = pSource->track; // Only read during race.
+	pTarget->params = pSource->params; // Never read/written during race.
+	pTarget->mainParams = pSource->mainParams; // Never read/written during race.
+	pTarget->results = pSource->results; // Never read/written during race.
+	pTarget->mainResults = pSource->mainResults; // Never read/written during race.
 	pTarget->robModList = pSource->robModList; // Not used / written by updater.
 
 	// Assign level 2 constants and initialize lists in carList field.
@@ -578,9 +578,9 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
 
 		GF_TAILQ_INIT(&(pTgtCar->_penaltyList)); // Not used by the graphics engine.
 
-		memcpy(&pTgtCar->info, &pSrcCar->info, sizeof(tInitCar)); // Not changed + only read during the race.
-		memcpy(&pTgtCar->priv, &pSrcCar->priv, sizeof(tPrivCar)); // Partly only read during the race ; other copied in vars below.
-		pTgtCar->robot = pSrcCar->robot; // Not changed + only read during the race.
+		memcpy(&pTgtCar->info, &pSrcCar->info, sizeof(tInitCar)); // Not changed + only read during race.
+		memcpy(&pTgtCar->priv, &pSrcCar->priv, sizeof(tPrivCar)); // Partly only read during race ; other copied in vars below.
+		pTgtCar->robot = pSrcCar->robot; // Not changed + only read during race.
 	}
 
 	// Allocate level 2 structures in s field.
@@ -591,11 +591,9 @@ tRmInfo* ReSituationUpdater::initSituation(const tRmInfo* pSource)
 		
 	// Assign level 2 constants in raceEngineInfo field.
 	pTarget->_reParam = pSource->_reParam; // Not used / written by updater.
-	pTarget->_reGameScreen = pSource->_reGameScreen; // Nor changed nor shared during the race.
-	pTarget->_reMenuScreen = pSource->_reMenuScreen; // Nor changed nor shared during the race.
-	pTarget->_reFilename = pSource->_reFilename; // Not used during the race.
-	pTarget->_reName = pSource->_reName; // Not changed + only read during the race.
-	pTarget->_reRaceName = pSource->_reRaceName; // Not changed + only read during the race.
+	pTarget->_reFilename = pSource->_reFilename; // Not used during race.
+	pTarget->_reName = pSource->_reName; // Not changed + only read during race.
+	pTarget->_reRaceName = pSource->_reRaceName; // Not changed + only read during race.
 
 	return pTarget;
 }

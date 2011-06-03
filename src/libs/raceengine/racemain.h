@@ -28,6 +28,7 @@
 
 extern bool ReHumanInGroup();
 
+extern int  ReConfigure();
 extern int  ReRaceEventInit();
 extern int  RePreRace();
 extern int  ReRaceStart();
@@ -35,7 +36,7 @@ extern int  ReRaceRealStart();
 extern int  ReRaceStop();
 extern int  ReRaceEnd();
 extern int  RePostRace();
-extern int  ReEventShutdown();
+extern int  ReRaceEventShutdown();
 
 extern void ReRaceAbandon();
 extern void ReRaceAbort();

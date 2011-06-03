@@ -149,7 +149,7 @@ rmOnBackFromPitMenu(void *pvcar)
 	const tCarElt* car = (tCarElt*)pvcar;
 	LmRaceEngine().setPitCommand(car->index, &car->pitcmd);
 
-	RmGameScreen();
+	LegacyMenu::self().activateGameScreen();
 }
 
 bool

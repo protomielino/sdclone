@@ -85,10 +85,6 @@ ReInit(void)
 	char buf[256];
 	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 	ReInfo->_reParam = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-
-	// Set ReStateManage as the event loop "display" call-back when the race will actually start
-	// (will be actually used after something like GfuiScreenActivate(ReInfo->_reGameScreen)).
-	ReInfo->_reGameScreen = ReUI().createRaceEventLoopHook();
 }
 
 
@@ -190,7 +186,7 @@ void
 ReResumeRace()
 {
 	// Fire standings screen.
-	ReUI().activateStandingsMenu(ReInfo->_reGameScreen, ReInfo);
+	ReUI().showStandings();
 }
 
 
@@ -807,17 +803,8 @@ ReInitCars(void)
 void
 ReRaceCleanup(void)
 {
-  ReInfo->_reGameScreen = ReUI().createRaceEventLoopHook();
-
   RePhysicsEngine().shutdown();
   RaceEngine::self().unloadPhysicsEngine();
-
-  if (ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
-  {
-    ReUI().unloadCarsGraphics();
-	ReUI().shutdownGraphicsView();
-	ReUI().unloadTrackGraphics();
-  }
 
   ReStoreRaceResults(ReInfo->_reRaceName);
 

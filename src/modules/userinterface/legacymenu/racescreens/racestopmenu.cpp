@@ -26,7 +26,7 @@
 static void
 rmAbortRaceHookActivate(void * /* dummy */)
 {
-	RmGameScreen();
+	LegacyMenu::self().activateGameScreen();
 
 	LmRaceEngine().abortRace();
 }
@@ -46,7 +46,7 @@ rmAbortRaceHookInit(void)
 static void
 rmSkipSessionHookActivate(void * /* dummy */)
 {
-	RmGameScreen();
+	LegacyMenu::self().activateGameScreen();
 
 	LmRaceEngine().skipRaceSession();
 }
@@ -68,7 +68,7 @@ rmBackToRaceHookActivate(void * /* dummy */)
 {
 	LmRaceEngine().start();
 	
-	RmGameScreen();
+	LegacyMenu::self().activateGameScreen();
 }
 
 static void *
@@ -87,8 +87,6 @@ static void
 rmRestartRaceHookActivate(void * /* dummy */)
 {
 	LmRaceEngine().restartRace();
-	
-	RmGameScreen();
 }
 
 static void *

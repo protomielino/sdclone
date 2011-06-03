@@ -54,8 +54,8 @@ ReStateManage(void)
 		switch (ReInfo->_reState) {
 			case RE_STATE_CONFIG:
 				GfLogInfo("%s now in CONFIG state\n", ReInfo->_reName);
-				/* Display the race specific menu */
-				mode = ReUI().activateRacemanMenu();
+				/* Race configuration */
+				mode = ReConfigure();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_EVENT_INIT;
 				}
@@ -143,7 +143,7 @@ ReStateManage(void)
 			case RE_STATE_EVENT_SHUTDOWN:
 				GfLogInfo("%s now in EVENT_SHUTDOWN state\n", ReInfo->_reName);
 
-				mode = ReEventShutdown();
+				mode = ReRaceEventShutdown();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_SHUTDOWN;
 				} else if (mode & RM_NEXT_RACE) {

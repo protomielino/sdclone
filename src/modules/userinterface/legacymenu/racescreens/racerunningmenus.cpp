@@ -217,12 +217,12 @@ rmRedisplay()
 	// Redraw the graphics part of the GUI if requested.
 	const bool bUpdateGraphics =
 		LmRaceEngine().outData()->_displayMode == RM_DISP_MODE_NORMAL
-		&& !bPitRequested && LmGraphicsEngine();
+		&& !bPitRequested && LegacyMenu::self().graphicsEngine();
 	
 	if (bUpdateGraphics)
 	{
 		//GfSchedBeginEvent("raceupdate", "graphics");
-		LmGraphicsEngine()->redrawView(LmRaceEngine().outData()->s);
+		LegacyMenu::self().redrawGraphicsView(LmRaceEngine().outData()->s);
 		//GfSchedEndEvent("raceupdate", "graphics");
 	}
 
@@ -448,18 +448,18 @@ RmScreenShutdown()
 
 
 static void
-rmHookActivate(void * /* dummy */)
+rmActivateReUpdateStateHook(void * /* dummy */)
 {
     rmUpdateRaceEngine();
 }
 
 void *
-RmHookInit()
+RmInitReUpdateStateHook()
 {
 	static void	*rmHookHandle = 0;
 	
     if (!rmHookHandle)
-		rmHookHandle = GfuiHookCreate(0, rmHookActivate);
+		rmHookHandle = GfuiHookCreate(0, rmActivateReUpdateStateHook);
 
     return rmHookHandle;
 }
@@ -771,10 +771,3 @@ RmResScreenRemoveText(int row)
 //	
 //    GfuiApp().eventLoop().postRedisplay();
 //}
-
-//************************************************************
-void
-RmGameScreen()
-{
-	GfuiScreenActivate(LmRaceEngine().inData()->_reGameScreen);
-}

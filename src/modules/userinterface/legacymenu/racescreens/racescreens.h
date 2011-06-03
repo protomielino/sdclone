@@ -95,8 +95,8 @@ extern void RmShowStandings(void* prevHdle, tRmInfo *info, int start = 0);
 extern void* RmFileSelect(void* vs);
 
 // From racemanmenus.
-extern int RmRacemanMenu();
-extern int RmNextEventMenu();
+extern void RmRacemanMenu();
+extern void RmNextEventMenu();
 extern void RmConfigureRace(void*  /* dummy */);
 extern void RmSetRacemanMenuHandle(void*  handle);
 
@@ -110,7 +110,7 @@ extern void* RmRaceSelectInit(void* precMenu);
 // From racerunningmenus.
 extern void* RmScreenInit();
 extern void RmScreenShutdown();
-extern void* RmHookInit();
+extern void* RmInitReUpdateStateHook();
 extern bool RmCheckPitRequest();
 
 extern void* RmResScreenInit();
@@ -128,6 +128,8 @@ extern void RmNetworkClientMenu(void* pVoid);
 extern void RmNetworkMenu(void* /* dummy */);
 extern void RmNetworkHostMenu(void* /* dummy */);
 
+// The Race Select menu.
+extern void *RmRaceSelectMenuHandle;
 
 
 #endif /* __RACESCREENS_H__ */

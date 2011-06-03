@@ -44,7 +44,7 @@ rmStateManage(void * /* dummy */)
 	LmRaceEngine().updateState();
 }
 
-int
+void
 RmNextEventMenu(void)
 {
 	char buf[128];
@@ -100,7 +100,7 @@ RmNextEventMenu(void)
 
 	// Create Start and Abandon buttons.
 	GfuiMenuCreateButtonControl(rmScrHandle, menuXMLDescHdle, "StartButton", NULL, rmStateManage);
-	GfuiMenuCreateButtonControl(rmScrHandle, menuXMLDescHdle, "AbandonButton", reInfo->_reMenuScreen, GfuiScreenActivate);
+	GfuiMenuCreateButtonControl(rmScrHandle, menuXMLDescHdle, "AbandonButton", RmRaceSelectMenuHandle, GfuiScreenActivate);
 
 	// Close menu XML descriptor.
 	GfParmReleaseHandle(menuXMLDescHdle);
@@ -108,11 +108,9 @@ RmNextEventMenu(void)
 	// Register keyboard shortcuts.
 	GfuiMenuDefaultKeysAdd(rmScrHandle);
 	GfuiAddKey(rmScrHandle, GFUIK_RETURN, "Start Event", NULL, rmStateManage, NULL);
-	GfuiAddKey(rmScrHandle, GFUIK_ESCAPE, "Abandon", reInfo->_reMenuScreen, GfuiScreenActivate, NULL);
+	GfuiAddKey(rmScrHandle, GFUIK_ESCAPE, "Abandon", RmRaceSelectMenuHandle, GfuiScreenActivate, NULL);
 
 	// Activate screen.
 	GfuiScreenActivate(rmScrHandle);
-
-	return RM_ASYNC | RM_NEXT_STEP;
 }
 

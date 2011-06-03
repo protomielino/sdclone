@@ -122,16 +122,15 @@ RmFileSelect(void *pFileSelect)
 {
 	RmFs = (tRmFileSelect*)pFileSelect;
 
-	if (ScrHandle) {
+	if (ScrHandle)
 		return ScrHandle;
-	}
 
 	// Create screen, load menu XML descriptor and create static controls.
 	ScrHandle = GfuiScreenCreate(NULL, NULL, rmOnActivate, NULL, NULL, 1);
 
 	void *menuXMLDescHdle = GfuiMenuLoad("fileselectmenu.xml");
 
-	GfuiMenuCreateStaticControls(menuXMLDescHdle, ScrHandle);
+	GfuiMenuCreateStaticControls(ScrHandle, menuXMLDescHdle);
 
 	// Create variable title label.
 	const int titleId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "TitleLabel");
@@ -139,11 +138,11 @@ RmFileSelect(void *pFileSelect)
 	
 	// Create the Scroll List containing the File list
 	FilesScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuXMLDescHdle, "FilesScrollList",
-											   NULL, rmOnClickOnFile);
+														NULL, rmOnClickOnFile);
 
 	// Create the filename edit box
     FileNameEditId = GfuiMenuCreateEditControl(ScrHandle, menuXMLDescHdle, "SelectedFileNameEdit",
-									   NULL, NULL, rmOnChangeFileName);
+											   NULL, NULL, rmOnChangeFileName);
 
 	// Create Load/Save and Cancel buttons.
 	LoadButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "LoadButton", NULL, rmOnSelect);

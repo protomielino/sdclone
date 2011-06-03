@@ -25,11 +25,12 @@
 #define _LEGACYMENU_H_
 
 #include <iuserinterface.h>
-#include <igraphicsengine.h>
 
 #include <tgf.hpp>
 
 class IGraphicsEngine;
+struct Situation;
+
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
@@ -50,33 +51,36 @@ extern "C" int LEGACYMENU_API closeGfModule();
 // The module main class (inherits GfModule, and implements IUserInterface).
 class LEGACYMENU_API LegacyMenu : public GfModule, public IUserInterface
 {
+	// Implementation of IUserInterface.
 public:
 
-	// Implementation of IUserInterface.
+	//! Activation of the user interface (splash if any, main menu ...).
 	virtual bool activate();
 	
+	//! Request exit of the event loop.
 	virtual void quit();
 	
+	//! Termination of the user interface.
 	virtual void shutdown();
 
-	virtual void* createRaceScreen();
-	virtual void* createRaceEventLoopHook();
-
-	virtual void activateLoadingScreen(const char* title, const char* bgimg);
-	virtual void addLoadingMessage(const char* text);
-	virtual void shutdownLoadingScreen();
-
-	virtual void activateGameScreen();
+	// Race state change notifications.
+	virtual void onRaceConfiguring();
+	virtual void onRaceEventInitializing();
+	virtual void onRaceEventStarting();
+	virtual void onRaceInitializing();
+	virtual void onRaceStarting();
+	virtual void onRaceLoadingDrivers();
+	virtual void onRaceDriversLoaded();
+	virtual void onRaceSimulationReady();
+	virtual void onRaceStarted();
+	virtual void onRaceInterrupted();
+	virtual void onRaceFinished();
+	virtual void onRaceEventFinished();
 	
-	virtual int activateRacemanMenu();
-	virtual int activateNextEventMenu();
+	// Loading messages management.
+	virtual void addLoadingMessage(const char* pszText);
 
-	virtual void activateStartRaceMenu();
-	virtual void activateStopRaceMenu();
-
-	// Results table management.
-	virtual void* createResultsMenu();
-	virtual void activateResultsMenu(void* prevHdle, struct RmInfo* reInfo);
+	// Blind-race results table management.
 	virtual void setResultsTableTitles(const char* pszTitle, const char* pszSubTitle);
 	virtual void setResultsTableHeader(const char* pszHeader);
 	virtual void addResultsTableRow(const char* pszText);
@@ -85,20 +89,14 @@ public:
 	virtual void eraseResultsTable();
 	virtual int  getResultsTableRowCount() const;
 
-	virtual void activateStandingsMenu(void* prevHdle, struct RmInfo* info, int start = 0);
+	// Results and standings tables.
+	virtual void showResults();
+	virtual void showStandings();
 
-	// Graphics engine control.
-	virtual bool initializeGraphics();
-	virtual bool loadTrackGraphics(struct Track* pTrack);
-	virtual bool loadCarsGraphics(struct Situation* pSituation);
-	virtual bool setupGraphicsView();
-	virtual void shutdownGraphicsView();
-	virtual void unloadCarsGraphics();
-	virtual void unloadTrackGraphics();
-	virtual void shutdownGraphics();
-	
 	// Setter for the race engine.
 	virtual void setRaceEngine(IRaceEngine& raceEngine);
+
+public:
 
 	// Accessor to the singleton.
 	static LegacyMenu& self();
@@ -106,10 +104,21 @@ public:
 	//! Accessor to the race engine.
 	IRaceEngine& raceEngine();
 
-	//! Accessor to the race engine.
+	// Graphics engine control.
+	void redrawGraphicsView(struct Situation* pSituation);
+	void shutdownGraphics();
+
+	// Loading screen management.
+	virtual void activateLoadingScreen();
+	virtual void shutdownLoadingScreen();
+
+	//! Game screen management.
+	void activateGameScreen();
+
+	//! Accessor to the graphics engine.
 	IGraphicsEngine* graphicsEngine();
 
-protected:
+ protected:
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	LegacyMenu(const std::string& strShLibName, void* hShLibHandle);
@@ -118,6 +127,16 @@ protected:
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
 
+	// Graphics engine control.
+	bool initializeGraphics();
+	bool loadTrackGraphics(struct Track* pTrack);
+	bool loadCarsGraphics(struct Situation* pSituation);
+	bool setupGraphicsView();
+	void shutdownGraphicsView();
+	void unloadCarsGraphics();
+	void unloadTrackGraphics();
+	
+	
  protected:
 
 	// The singleton.
@@ -128,18 +147,18 @@ protected:
 
 	// The graphics engine.
 	IGraphicsEngine* _piGraphicsEngine;
+
+	// The "Race Engine update state" hook (a GfuiScreenActivate'able object).
+	void* _hscrReUpdateStateHook;
+	
+	// The game screen.
+	void* _hscrGame;
 };
 
 //! Shortcut to the race engine.
 inline extern IRaceEngine& LmRaceEngine()
 {
 	return LegacyMenu::self().raceEngine();
-}
-				  
-//! Shortcut to the graphics engine.
-inline extern IGraphicsEngine* LmGraphicsEngine()
-{
-	return LegacyMenu::self().graphicsEngine();
 }
 				  
 #endif /* _LEGACYMENU_H_ */ 

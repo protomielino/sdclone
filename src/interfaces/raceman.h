@@ -142,8 +142,6 @@ typedef struct
 {
     int			state;
     void		*param;
-    void		*gameScreen;
-    void		*menuScreen;
     const char		*filename;
     const char		*name;
     const char		*raceName;
@@ -163,8 +161,6 @@ typedef struct
 #define _reState	raceEngineInfo.state
 #define _reParam	raceEngineInfo.param
 #define _reSimItf	raceEngineInfo.itf.simItf
-#define _reGameScreen	raceEngineInfo.gameScreen
-#define _reMenuScreen	raceEngineInfo.menuScreen
 #define _reFilename	raceEngineInfo.filename
 #define _reName		raceEngineInfo.name
 #define _reRaceName	raceEngineInfo.raceName

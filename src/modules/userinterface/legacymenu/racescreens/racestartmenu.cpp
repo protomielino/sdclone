@@ -40,7 +40,7 @@ rmAbandonRaceHookActivate(void * /* vforce */)
 {
 	LmRaceEngine().abandonRace();
 	
-	RmGameScreen();
+	LegacyMenu::self().activateGameScreen();
 }
 
 static void *
