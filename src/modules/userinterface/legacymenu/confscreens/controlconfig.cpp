@@ -48,26 +48,26 @@ static char	CurrentSection[256];
 
 /* Control command information */
 static tCmdInfo Cmd[] = {
-    {HM_ATT_LEFTSTEER,  {1,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_LEFTSTEER_MIN,  0, HM_ATT_LEFTSTEER_MAX,  0, HM_ATT_LEFTSTEER_POW,  1.0, 1},
-    {HM_ATT_RIGHTSTEER, {2,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_RIGHTSTEER_MIN, 0, HM_ATT_RIGHTSTEER_MAX, 0, HM_ATT_RIGHTSTEER_POW, 1.0, 1},
-    {HM_ATT_THROTTLE,   {1,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_THROTTLE_MIN,   0, HM_ATT_THROTTLE_MAX,   0, HM_ATT_THROTTLE_POW,   1.0, 1},
-    {HM_ATT_BRAKE,      {2,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_BRAKE_MIN,      0, HM_ATT_BRAKE_MAX,      0, HM_ATT_BRAKE_POW,      1.0, 1},
-    {HM_ATT_CLUTCH,     {3,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_CLUTCH_MIN,     0, HM_ATT_CLUTCH_MAX,     0, HM_ATT_CLUTCH_POW,     1.0, 1},
-    {HM_ATT_ABS_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_ASR_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_SPDLIM_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_LIGHT1_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_R,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_N,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_DN_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_UP_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_1,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_2,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_3,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_4,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_5,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-    {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1}
+    {HM_ATT_LEFTSTEER,  {1,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_LEFTSTEER_MIN,  0, HM_ATT_LEFTSTEER_MAX,  0, HM_ATT_LEFTSTEER_POW,  1.0, 1, HM_ATT_PREF_AXIS, 0},
+    {HM_ATT_RIGHTSTEER, {2,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_RIGHTSTEER_MIN, 0, HM_ATT_RIGHTSTEER_MAX, 0, HM_ATT_RIGHTSTEER_POW, 1.0, 1, HM_ATT_PREF_AXIS, 0},
+    {HM_ATT_THROTTLE,   {1,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_THROTTLE_MIN,   0, HM_ATT_THROTTLE_MAX,   0, HM_ATT_THROTTLE_POW,   1.0, 1, HM_ATT_PREF_AXIS, 0},
+    {HM_ATT_BRAKE,      {2,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_BRAKE_MIN,      0, HM_ATT_BRAKE_MAX,      0, HM_ATT_BRAKE_POW,      1.0, 1, HM_ATT_PREF_AXIS, 0},
+    {HM_ATT_CLUTCH,     {3,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_CLUTCH_MIN,     0, HM_ATT_CLUTCH_MAX,     0, HM_ATT_CLUTCH_POW,     1.0, 1, HM_ATT_PREF_AXIS, 0},
+    {HM_ATT_ABS_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_ASR_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_SPDLIM_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_LIGHT1_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_R,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_N,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_DN_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_UP_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_1,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_2,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_3,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_4,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_5,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0}
 };
 
 static const int MaxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
@@ -315,13 +315,13 @@ onKeyAction(int key, int /* modifier */, int state)
 }
 
 static int
-getMovedAxis(void)
+getMovedAxis(int joy_number)
 {
     int		i;
     int		Index = -1;
     float	maxDiff = 0.3;
 
-    for (i = 0; i < GFCTRL_JOY_MAX_AXES * GFCTRL_JOY_NUMBER; i++) {
+    for (i = GFCTRL_JOY_MAX_AXES * joy_number; i < GFCTRL_JOY_MAX_AXES * (joy_number+1); i++) {
 	if (maxDiff < fabs(JoyAxis[i] - JoyAxisCenter[i])) {
 	    maxDiff = fabs(JoyAxis[i] - JoyAxisCenter[i]);
 	    Index = i;
@@ -387,9 +387,46 @@ IdleWaitForInput(void)
 	if (Joystick[index]) {
 	    Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 
+            /* check for joystick movement as well */
+            axis = getMovedAxis(index);
+
+	    /* Allow a little extra time to detect button */
+	    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_PREF_BUT) {
+		GfSleep(0.1);
+   		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
+	    }
+
 	    /* Joystick buttons */
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
+		    /* Allow a little extra time to detect axis movement */
+		    if (axis == -1 && Cmd[CurrentCmd].pref != HM_ATT_PREF_AXIS) {
+    			GfSleep(0.1);
+	    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
+            		axis = getMovedAxis(index);
+		    }
+
+		    /* Give preference to axis if happening at same time */
+		    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_PREF_BUT) {
+			Cmd[CurrentCmd].pref = HM_ATT_PREF_BUT;
+			Cmd[CurrentCmd].butIgnore = i + 32 * index;
+
+			GfuiApp().eventLoop().setRecomputeCB(0);
+			InputWaited = 0;
+			Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
+			Cmd[CurrentCmd].ref.index = axis;
+			str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
+			GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
+			GfuiApp().eventLoop().postRedisplay();
+			updateButtonText();
+			return;
+		    }
+
+		    if (axis != -1 && Cmd[CurrentCmd].pref == HM_ATT_PREF_BUT) {
+			Cmd[CurrentCmd].pref = HM_ATT_PREF_AXIS;
+		    }
+		    Cmd[CurrentCmd].butIgnore = 0;
+
 		    /* Button i fired */
 		    GfuiApp().eventLoop().setRecomputeCB(0);
 		    InputWaited = 0;
@@ -404,21 +441,21 @@ IdleWaitForInput(void)
 		}
 	    }
 	    JoyButtons[index] = b;
-	}
-    }
 
-    /* detect joystick movement */
-    axis = getMovedAxis();
-    if (axis != -1) {
-	GfuiApp().eventLoop().setRecomputeCB(0);
-	InputWaited = 0;
-	Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
-	Cmd[CurrentCmd].ref.index = axis;
-	str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
-	GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-	GfuiApp().eventLoop().postRedisplay();
-	updateButtonText();
-	return;
+	    /* Axis movement detected, but without button */
+	    if (axis != -1) {
+		Cmd[CurrentCmd].butIgnore = 0;
+		GfuiApp().eventLoop().setRecomputeCB(0);
+		InputWaited = 0;
+		Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
+		Cmd[CurrentCmd].ref.index = axis;
+		str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
+		GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
+		GfuiApp().eventLoop().postRedisplay();
+		updateButtonText();
+		return;
+	    }
+	}
     }
 
     /* Let CPU take breath (and fans stay at low and quiet speed) */

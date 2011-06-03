@@ -170,6 +170,10 @@ Idle2(void)
 	    /* Joystick buttons */
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
+		    /* Check whether to ignore */
+		    if(Cmd[CalState + CmdOffset].butIgnore == i + 32 * index)
+			break;
+
 		    /* Button fired */
 		    JoyCalAutomaton();
 		    if (CalState >= NbCalSteps) {

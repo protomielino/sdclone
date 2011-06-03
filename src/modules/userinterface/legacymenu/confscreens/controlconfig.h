@@ -58,6 +58,8 @@ typedef struct
     const char	*powName;
     float	pow;
     int		keyboardPossible;
+    int		pref;
+    int		butIgnore;
 } tCmdInfo;
 
 #endif /* _CONTROLCONFIG_H_ */ 

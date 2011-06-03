@@ -122,6 +122,9 @@
 #define HM_VAL_MOUSE	"mouse"
 #define HM_VAL_KEYBOARD	"keyboard"
 
+#define HM_ATT_PREF_BUT  0
+#define HM_ATT_PREF_AXIS 1
+
 #endif /* _PLAYERPREF_H_ */ 
 
 
