@@ -49,7 +49,7 @@
         <attstr name="desc" val=""></attstr>
         <attstr name="team" val="Anime Age Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
-        <attstr name="car name" val="ls2-morley-R900"></attstr>
+        <attstr name="car name" val="ls2-morley-r900"></attstr>
         <attnum name="race number" val="12"></attnum>
         <attnum name="red" val="1.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
