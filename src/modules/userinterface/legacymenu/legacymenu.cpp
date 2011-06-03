@@ -23,6 +23,7 @@
 #include <igraphicsengine.h>
 
 #include <tgf.hpp>
+#include <portability.h>
 #include <tgfclient.h>
 
 #include "client.h"
