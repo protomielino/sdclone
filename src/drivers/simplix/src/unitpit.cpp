@@ -455,15 +455,17 @@ void TPitLane::MakePath
   // Get possible length for pit exit
   Seg = PitInfo->pitExit;
   double ExitLength = 0;
-  //GfOut("ExitLength 0: %g\n",ExitLength);
   double NotUsableLength = 0;
   bool usable = false;
   bool backward = true; 
   double SearchLength = PitInfo->pitExit->lgfromstart 
 	- PitInfo->pitEnd->lgfromstart;
+  //GfOut("ExitLength 0: %d %s %.3f %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength,SearchLength);
 
   if (SearchLength < 0)
 	SearchLength += oTrack->Length();
+
+  //GfOut("ExitLength 0: %d %s %.3f %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength,SearchLength);
 
   do
   {
@@ -474,6 +476,7 @@ void TPitLane::MakePath
 	  
     if (Side != NULL)                            // If there is a side
     {                                            // Check driveability
+        //GfOut("Side 1: %d %d %.3f\n",Seg->id,Side->style,Side->endWidth);
 	    if ((Side->style == TR_PLAN)             // In case of a barrier, 
 			&& (Side->endWidth > CarWidth))      // pitwall or elevated curbs
 	  	  usable = true ;                        // we have to go backward 
@@ -484,6 +487,7 @@ void TPitLane::MakePath
 
 	if (NotUsableLength > SearchLength - 1.0)
 	{
+        //GfOut("NotUsableLength 1: %.3f\n",NotUsableLength);
 		backward = false;
 		break;
 	}
@@ -492,7 +496,7 @@ void TPitLane::MakePath
 	{
       Seg = Seg->prev;
 	  ExitLength += Seg->length;     
-	  //GfOut("ExitLength 1: %g\n",ExitLength);
+	  //GfOut("ExitLength 1: %d %s %.3f %.3f\n",Seg->id,Seg->name,Seg->length,ExitLength);
 	}
 
   } while (!usable);
@@ -504,7 +508,23 @@ void TPitLane::MakePath
     //GfOut("ExitLength 2: %g\n",ExitLength);
 	NotUsableLength = 0.0;
   }
- 
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// WARNING:
+//------------------------------
+// If we do not use the variable
+// backward here, it's value
+// is wrong for next use in 
+// release mode while it is OK
+// in debug mode. So there is
+// an optimization used, that
+// is not allowed here!
+  if (backward)   
+    GfOut("backward\n");
+  else
+    GfOut("foreward\n");
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
   do
   {
 	  if (backward)                              // Get next segment depending 
@@ -523,7 +543,7 @@ void TPitLane::MakePath
 		break;
 
       ExitLength += Seg->length;               // add the length 
-      //GfOut("ExitLength 3: %g %g\n",Seg->length,ExitLength);
+	  //GfOut("ExitLength 3: %d %s %.3f %.3f (%d %d)\n",Seg->id,Seg->name,Seg->length,ExitLength,Side->style,Side->raceInfo);
 
   } while (Side != NULL);
 
