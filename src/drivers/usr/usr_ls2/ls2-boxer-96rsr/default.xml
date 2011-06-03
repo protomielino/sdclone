@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
 	<section name="private">
-		<attnum name="min corner inverse" min="0" max="2" val="0.0013"/>
+		<attnum name="min corner inverse" min="0" max="2" val="0.0006"/>
 		<attnum name="increase corner inverse" min="0" max="2" val="0.045"/>
 		<attnum name="add avoid speed" min="-20" max="20" val="0.0"/>
 		<attnum name="avoid speed factor" min="-20" max="20" val="0.76"/>
