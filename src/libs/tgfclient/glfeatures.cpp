@@ -179,8 +179,8 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 
 	SDL_Surface* pWinSurface = 0;
 
-	int nAlphaChannel;
-	int nCurrDepth;
+	int nAlphaChannel = bAlpha ? 1 : 0;
+	int nCurrDepth = nDepth;
 	int nFullScreen = bFullScreen ? 1 : 0;
 	while (!pWinSurface && nFullScreen >= 0)
 	{
