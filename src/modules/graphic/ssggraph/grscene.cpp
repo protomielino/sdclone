@@ -260,20 +260,16 @@ void grCustomizePits(void) {
             GfLogTrace("Using skinned pit door logo %s\n", strLogoFileName.c_str());
           }
 		  
-          // Load logo texture (look for .png first, then .rgb, for backward compatibility).
-		  const std::string strPNGLogoFileName = strLogoFileName + ".png";
-          st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf, FALSE, FALSE, skinnedLogo);
-          if (!st) {
-            const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
-            st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, FALSE);
-          }
+          // Load logo texture (only rgbs - pngs cause pit transparency bug # 387)
+	  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+          st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, skinnedLogo);
         }  // if pits->driverPits[i].car[0]
 
-		// If no car in the pit, or logo file not found, hope for the .png in data/textures.
+	// If no car in the pit, or logo file not found, hope for the .rgb in data/textures.
         if (!st) {
           snprintf(buf, sizeof(buf), "data/textures");
-		  const std::string strPNGLogoFileName = strLogoFileName + ".png";
-		  st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf, FALSE, FALSE, TRUE);
+		  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+		  st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, TRUE);
         }
         reinterpret_cast<ssgSimpleState*>(st)->setShininess(50);
 
