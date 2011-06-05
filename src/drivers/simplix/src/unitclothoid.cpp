@@ -9,10 +9,10 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -381,7 +381,9 @@ void TClothoidLane::SetOffset
   double Margin = oFixCarParam.oWidth / 2;
   double WL = -P->WtoL() + Margin;
   double WR = P->WtoR() - Margin;
-  double BorderInner = oFixCarParam.oBorderInner + MAX(0.0,MIN(oFixCarParam.oMaxBorderInner, oFixCarParam.oBorderScale * fabs(Crv) - 1));
+  double BorderInner = oFixCarParam.oBorderInner 
+	  + MAX(0.0,MIN(oFixCarParam.oMaxBorderInner, 
+	  oFixCarParam.oBorderScale * fabs(Crv) - 1));
   double BorderOuter = oFixCarParam.oBorderOuter;
 
   if (Crv >= 0) // turn to left
@@ -394,13 +396,13 @@ void TClothoidLane::SetOffset
 	else if (LaneType == ltRight)
 	{
 	  T = MAX(T,WL);
- 	  T = MIN(T,WR - P->BufR - BorderOuter);
+ 	  T = MIN(T,WR - BorderOuter);
 	}
 	else
 	{
 	  WL += BorderInner;
 	  T = MAX(T,WL);
- 	  T = MIN(T,WR - P->BufR - BorderOuter);
+ 	  T = MIN(T,WR - BorderOuter);
 	}
   }
   else // turn to right
@@ -408,7 +410,7 @@ void TClothoidLane::SetOffset
     if (LaneType == ltLeft)
 	{
 	  T = MIN(T,WR);
-	  T = MAX(T,WL + P->BufL + BorderOuter);
+	  T = MAX(T,WL + BorderOuter);
 	}
 	else if (LaneType == ltRight)
 	{
@@ -419,7 +421,7 @@ void TClothoidLane::SetOffset
 	{
   	  WR -= BorderInner;
 	  T = MIN(T,WR);
-	  T = MAX(T,WL + P->BufL + BorderOuter);
+	  T = MAX(T,WL + BorderOuter);
 	}
   }
 
@@ -716,11 +718,15 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
     return false;
   }
 
+  void* Start = &(oPathPoints[0]);
+  void* End = &(oPathPoints[0].MaxSpeed);
+  int UsedLen = ((char *) End) - ((char *) Start);
+
   int N;
   fread(&N,sizeof(int),1,F);
   for (int I = 0; I < N; I++)
   {
-    fread(&(oPathPoints[I]),sizeof(TPathPt),1,F);
+    fread(&(oPathPoints[I]),UsedLen,1,F);
 	const TSection& Sec = (*oTrack)[I];
 	oPathPoints[I].Sec = &Sec;
   }
@@ -751,8 +757,13 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int N = oTrack->Count();
   fwrite(&N,sizeof(int),1,F);
 
+  //GfOut("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
+  void* Start = &(oPathPoints[0]);
+  void* End = &(oPathPoints[0].MaxSpeed);
+  int UsedLen = ((char *) End) - ((char *) Start);
+  //GfOut("\n\n\nUsedLen (TPathPt Part 1): %d\n\n\n",UsedLen);
   for (int I = 0; I < N; I++)
-    fwrite(&(oPathPoints[I]),sizeof(TPathPt),1,F);
+    fwrite(&(oPathPoints[I]),UsedLen,1,F);
   fclose(F);
 }
 //==========================================================================*

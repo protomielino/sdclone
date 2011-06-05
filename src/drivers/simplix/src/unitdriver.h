@@ -457,11 +457,13 @@ private:
 
 	void CalcSkilling_simplix();
 	void CalcSkilling_simplix_LS1();
+	void CalcSkilling_simplix_LS2();
 	void CalcSkilling_simplix_MPA1();
 	void CalcSkilling_simplix_SC();
 
 	double CalcFriction_simplix_Identity(double Crv);
 	double CalcFriction_simplix_TRB1(double Crv);
+	double CalcFriction_simplix_LS2(double Crv);
 
 	double CalcCrv_simplix(double Crv);
 	double CalcCrv_simplix_Identity(double Crv);
@@ -469,8 +471,7 @@ private:
 	double CalcCrv_simplix_36GP(double Crv);
 	double CalcCrv_simplix_LS1(double Crv);
 
-	double CalcHairpin_simplix_Identity(double Crv);
-	double CalcHairpin_simplix_LS1(double Crv);
+	double CalcHairpin_simplix_Identity(double Crv); 
 
 	void UseFilterAccel(){oUseFilterAccel = true;};
 	void UseAccelOut(){oUseAccelOut = true;};

@@ -9,10 +9,10 @@
 //
 // File         : unitlane.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -218,6 +218,13 @@ void TLane::Initialise
   oCarParam = CarParam;                          // Copy car params
   oFixCarParam = FixCarParam;                    // Copy car params
 
+  // To avoid uninitialized alignment bytes within the allocated memory for 
+  // linux compilers not doing this initialization without our explizit 
+  // request we should fill it with zeros. Otherwise we would get valgrind
+  // warnings writing the data to file using only one memory block per
+  // path point.
+  memset(oPathPoints, 0, Track->Count() * sizeof(*oPathPoints));
+
   if (MaxLeft < 999.0)
   {
     for (int I = 0; I < Track->Count(); I++)
@@ -233,13 +240,13 @@ void TLane::Initialise
 	  oPathPoints[I].Speed = 10;
 	  oPathPoints[I].AccSpd = 10;
 	  oPathPoints[I].FlyHeight = 0;
-	  oPathPoints[I].BufL	= 0;
-	  oPathPoints[I].BufR	= 0;
+//	  oPathPoints[I].BufL	= 0;
+//	  oPathPoints[I].BufR	= 0;
 	  oPathPoints[I].NextCrv = 0.0;
-	  oPathPoints[I].WToL = MaxLeft;
-  	  oPathPoints[I].WToR = Sec.WidthToRight;
-	  oPathPoints[I].WPitToL = Sec.PitWidthToLeft;
-      oPathPoints[I].WPitToR = Sec.PitWidthToRight;
+	  oPathPoints[I].WToL = (float) MaxLeft;
+  	  oPathPoints[I].WToR = (float) Sec.WidthToRight;
+	  oPathPoints[I].WPitToL = (float) Sec.PitWidthToLeft;
+      oPathPoints[I].WPitToR = (float) Sec.PitWidthToRight;
 	  oPathPoints[I].Fix = false;
     }
     oPathPoints[0].WToL = oPathPoints[1].WToL;
@@ -260,13 +267,13 @@ void TLane::Initialise
 	  oPathPoints[I].Speed = 10;
 	  oPathPoints[I].AccSpd	= 10;
 	  oPathPoints[I].FlyHeight = 0;
-	  oPathPoints[I].BufL = 0;
-	  oPathPoints[I].BufR = 0;
+//	  oPathPoints[I].BufL = 0;
+//	  oPathPoints[I].BufR = 0;
 	  oPathPoints[I].NextCrv = 0.0;
-	  oPathPoints[I].WToL = Sec.WidthToLeft;
-	  oPathPoints[I].WToR = MaxRight;
-      oPathPoints[I].WPitToL = Sec.PitWidthToLeft;
-      oPathPoints[I].WPitToR = Sec.PitWidthToRight;
+	  oPathPoints[I].WToL = (float) Sec.WidthToLeft;
+	  oPathPoints[I].WToR = (float) MaxRight;
+      oPathPoints[I].WPitToL = (float) Sec.PitWidthToLeft;
+      oPathPoints[I].WPitToR = (float) Sec.PitWidthToRight;
 	  oPathPoints[I].Fix = false;
     }
     oPathPoints[0].WToL = oPathPoints[1].WToL;
@@ -287,13 +294,13 @@ void TLane::Initialise
 	  oPathPoints[I].Speed = 10;
 	  oPathPoints[I].AccSpd = 10;
 	  oPathPoints[I].FlyHeight = 0;
-	  oPathPoints[I].BufL	= 0;
-	  oPathPoints[I].BufR	= 0;
+//	  oPathPoints[I].BufL	= 0;
+//	  oPathPoints[I].BufR	= 0;
 	  oPathPoints[I].NextCrv = 0.0;
-      oPathPoints[I].WToL = Sec.WidthToLeft;
-	  oPathPoints[I].WToR = Sec.WidthToRight;
-      oPathPoints[I].WPitToL = Sec.PitWidthToLeft;
-      oPathPoints[I].WPitToR = Sec.PitWidthToRight;
+      oPathPoints[I].WToL = (float) Sec.WidthToLeft;
+	  oPathPoints[I].WToR = (float) Sec.WidthToRight;
+      oPathPoints[I].WPitToL = (float) Sec.PitWidthToLeft;
+      oPathPoints[I].WPitToR = (float) Sec.PitWidthToRight;
 	  oPathPoints[I].Fix = false;
     }
     oPathPoints[0].WToL = oPathPoints[1].WToL;
@@ -365,7 +372,7 @@ void TLane::CalcCurvaturesXY(int Start, int Step)
 	int	Pp = (P - Step + N) % N;                 // Prev Point
 	int	Pn = (P + Step) % N;                     // Next Point
 
-	oPathPoints[P].Crv =
+	oPathPoints[P].Crv = (float)
 	  TUtils::CalcCurvatureXY(
 	    oPathPoints[Pp].CalcPt(),
 	    oPathPoints[P].CalcPt(),
@@ -396,7 +403,7 @@ void TLane::CalcCurvaturesZ(int Start, int Step)
 	int	Pp = (P - Step + N) % N;                 // Prev Point
 	int	Pn = (P + Step) % N;                     // Next Point
 
-	oPathPoints[P].CrvZ = 6 * TUtils::CalcCurvatureZ(
+	oPathPoints[P].CrvZ = 6 * (float) TUtils::CalcCurvatureZ(
 	  oPathPoints[Pp].CalcPt(),
       oPathPoints[P].CalcPt(),
 	  oPathPoints[Pn].CalcPt());
@@ -688,7 +695,7 @@ void TLane::CalcFwdAbsCrv(int Range, int Step)
 	P -= Step;
   }
 
-  oPathPoints[0].NextCrv = TotalCrv / Count;
+  oPathPoints[0].NextCrv = (float) (TotalCrv / Count);
   TotalCrv += fabs(oPathPoints[0].Crv);
   TotalCrv -= fabs(oPathPoints[Q].Crv);
 
@@ -699,7 +706,7 @@ void TLane::CalcFwdAbsCrv(int Range, int Step)
 
   while (P > 0)
   {
-	oPathPoints[P].NextCrv = TotalCrv / Count;
+	oPathPoints[P].NextCrv = (float) (TotalCrv / Count);
 	TotalCrv += fabs(oPathPoints[P].Crv);
 	TotalCrv -= fabs(oPathPoints[Q].Crv);
 

@@ -9,10 +9,10 @@
 //
 // File         : unitlane.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
@@ -74,25 +74,28 @@ class TLane
   public:
 	struct TPathPt
 	{
-		const TSection*	Sec;		             // Track seg that contains this Seg
+		// Part 1: These data will be stored and reused from others as well
 		TVec3d Center;                           // Lane specific center
-		double Crv;	 		                     // Curvature in xy
-		//double CrvRated;	                     // Curvature in xy
-		double CrvZ;			                 // Curvature in z direction... e.g. bumps
-		double Offset;                           // Offset from centre point
 		TVec3d Point;                            // Actual point (same as CalcPt())
-		double MaxSpeed;                         // Max speed through this point
-		double Speed;                            // Speed through this point (braking only)
-		double AccSpd;                           // Speed through this point, with modelled accel
-		double FlyHeight;                        // Predicted height of car above track (flying)
-		double BufL;		                     // Buffer from left for safety
-		double BufR;		                     // Buffer from right for safety
-		double NextCrv;                          // Cuvature comming next
-		double WToL;                             // Lane specfic width to left
-		double WToR;                             // Lane specfic width to right 
-		double WPitToL;                          // Lane specfic width to left
-		double WPitToR;                          // Lane specfic width to right 
+		float Offset;                            // Offset from centre point
+		float Crv;	 		                     // Curvature in xy
+		float CrvZ;			                     // Curvature in z direction... e.g. bumps
+		float NextCrv;                           // Cuvature comming next
+		float WToL;                              // Lane specfic width to left
+		float WToR;                              // Lane specfic width to right 
+		float WPitToL;                           // Lane specfic width to left
+		float WPitToR;                           // Lane specfic width to right 
 		bool Fix;
+
+		// Part 2: These data could be stored, but is recalculated from others
+		// (So we don't have to store it)
+		double MaxSpeed;                         // Max speed through this point
+		double AccSpd;                           // Speed through this point, with modelled accel
+		double Speed;                            // Speed through this point (braking only)
+		double FlyHeight;                        // Predicted height of car above track (flying)
+
+		// Part 3: These data may not be used from others (pointers)
+		const TSection*	Sec;		             // Track seg that contains this Seg
 
 		double Dist() const {return Sec->DistFromStart;}
 		double WtoL() const {return WToL;}

@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -1071,10 +1071,15 @@ void TDriver::InitTrack
   snprintf(Buf,sizeof(Buf),"%s/tracks/%s.xml",
     BaseParamPath,oTrackName);
   Handle = TUtils::MergeParamFile(Handle,Buf);
+  GfOut("#\n");
+  GfOut("#\n");
+  GfOut("#\n");
   double ScaleBrake = GfParmGetNum(Handle,TDriver::SECT_PRIV,
 	  PRV_SCALE__BRAKE,NULL,0.80f);
+  //GfOut("#ScaleBrake: %.1f\n",ScaleBrake);
   double ScaleMu = GfParmGetNum(Handle,TDriver::SECT_PRIV,
 	  PRV_SCALE__MU,NULL,0.95f);
+  //GfOut("#ScaleMu: %.1f\n",ScaleMu);
 
   // Override params for car type with params of track
   snprintf(Buf,sizeof(Buf),"%s/%s/%s.xml",
@@ -1379,18 +1384,18 @@ void TDriver::Drive()
 //    GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
     GfOut("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarSteerCmd,CarGearCmd);
   }
-/ **/
+/** /
   if (oDoAvoid)
     CarLightCmd = RM_LIGHT_HEAD2;                // Only small lights on
   else
     CarLightCmd = RM_LIGHT_HEAD1;                // Only big lights on
-/*
-  CarLightCmd =                                  // All front lights on
-    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
   CarLightCmd =                                  // All front lights on
-    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;             // All rear lights on
+    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 */
+  CarLightCmd =                                  // All front lights on
+    RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;             // All rear lights on
+
   if (!Qualification)                            // Don't use pit while
     oStrategy->CheckPitState(0.6f);              //  qualification
 
@@ -1651,7 +1656,7 @@ void TDriver::FindRacinglines()
 	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
 	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
-	  GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
+	  //GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
 	}
   }
 
@@ -2321,8 +2326,8 @@ void TDriver::InitAdaptiveShiftLevels()
 		{
           ToRpm[J] = RpmNext;
 		  oShift[J] = Rpm * 0.98;
-		  GfOut("#TqNext > Tq\n");
-  		  GfOut("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
+		  //GfOut("#TqNext > Tq\n");
+  		  //GfOut("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
 		  break;
 		}
  	    Rpm += 1;
@@ -3878,6 +3883,47 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
 //==========================================================================*
 
 //==========================================================================*
+// simplix_ls2
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction_simplix_LS2(const double Crv)
+{
+  double AbsCrv = fabs(Crv);
+
+  if (AbsCrv > 1/12.0)
+	oXXX = 0.60;
+  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
+	oXXX = 0.65;
+  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
+	oXXX = 0.75;
+  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
+	oXXX = 0.83;
+  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
+	oXXX = 0.90;
+  else
+	oXXX = MIN(1.0,oXXX+0.0003);
+
+    double FrictionFactor = 0.95;
+
+  if (AbsCrv > 0.10)
+    FrictionFactor = 0.44;
+  else if (AbsCrv > 0.05)
+    FrictionFactor = 0.53;
+  else if (AbsCrv > 0.045)
+    FrictionFactor = 0.74;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.83;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.92;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.93;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.95;
+
+  return FrictionFactor * oXXX;
+}
+//==========================================================================*
+
+//==========================================================================*
 // simplix_TRB1
 // simplix_GP36
 //--------------------------------------------------------------------------*
@@ -3900,6 +3946,17 @@ void TDriver::CalcSkilling_simplix()
 // simplix_ls1
 //--------------------------------------------------------------------------*
 void TDriver::CalcSkilling_simplix_LS1()
+{
+	oSkillGlobal = oSkillGlobal/10.0;
+	oSkillDriver = oSkillDriver/3.0;
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix_ls2
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling_simplix_LS2()
 {
 	oSkillGlobal = oSkillGlobal/10.0;
 	oSkillDriver = oSkillDriver/3.0;

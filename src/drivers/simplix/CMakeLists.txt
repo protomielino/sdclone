@@ -9,6 +9,7 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     simplix_sca simplix_scb 
                     simplix_36GP 
                     simplix_ls1 
+                    simplix_ls2 
                     simplix_mp5 
                     my_simplix_0 my_simplix_1 my_simplix_2 my_simplix_3 my_simplix_4
                     my_simplix_5 my_simplix_6 my_simplix_7 my_simplix_8 my_simplix_9)
@@ -82,7 +83,7 @@ SET(ROBOT_SOURCES
 )
 
 # Official-only simplix instances.
-SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_mp5)
+SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5)
 
 IF(NOT OPTION_OFFICIAL_ONLY)
 
@@ -140,6 +141,14 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13
 
 ROBOT_DATA(NAME simplix_ls1 PREFIX simplix_ls1 
            FILES simplix_ls1.xml default.xml logo.rgb readme.txt
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+# LS2 
+SET(ROBOT_SUBDIRS 0
+                  ls2-bavaria-g3gtr
+			tracks)
+
+ROBOT_DATA(NAME simplix_ls2 PREFIX simplix_ls2 
+           FILES simplix_ls2.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
 
 # TRB1

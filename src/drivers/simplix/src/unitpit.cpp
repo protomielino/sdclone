@@ -9,10 +9,10 @@
 // 
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -479,7 +479,7 @@ void TPitLane::MakePath
         //GfOut("Side 1: %d %d %.3f\n",Seg->id,Side->style,Side->endWidth);
 	    if ((Side->style == TR_PLAN)             // In case of a barrier, 
 			&& (Side->endWidth > CarWidth))      // pitwall or elevated curbs
-	  	  usable = true ;                        // we have to go backward 
+	  	  usable = true;                         // we have to go backward 
     }
 
     if (!usable)                                 // If we cannot use the side
@@ -509,21 +509,21 @@ void TPitLane::MakePath
 	NotUsableLength = 0.0;
   }
 
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// WARNING:
-//------------------------------
-// If we do not use the variable
-// backward here, it's value
-// is wrong for next use in 
-// release mode while it is OK
-// in debug mode. So there is
-// an optimization used, that
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+// WARNING: 
+// In case the optimization is activated for release mode:
+//--------------------------------------------------------
+// If we do not use the variable backward here, it's value
+// is wrong for next use in release mode while it is OK
+// in debug mode. So there is an optimization used, that
 // is not allowed here!
+// To get more details look here 
+// > http://support.microsoft.com/kb/925792/en-us
   if (backward)   
     GfOut("backward\n");
   else
     GfOut("foreward\n");
-//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+//<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
   do
   {
@@ -841,7 +841,7 @@ void TPitLane::MakePath
   Idx1 = (1 + oTrack->IndexFromPos(oPitEntryStartPos)) % NSEG;;
   for (I = Idx0; I != Idx1; I = (I + 1) % NSEG)
   {
-	oPathPoints[I].Offset = Y_StartEntry;        // Offset lateral to track
+	oPathPoints[I].Offset = (float) Y_StartEntry;// Offset lateral to track
     oPathPoints[I].Point =                       // Recalculate points
 	  oPathPoints[I].CalcPt();                   // from offset
   }
@@ -883,7 +883,7 @@ void TPitLane::MakePath
 	  }
 	}
 
-	oPathPoints[I].Offset = SplineY;             // Offset lateral to track
+	oPathPoints[I].Offset = (float) SplineY;    // Offset lateral to track
     oPathPoints[I].Point =                       // Recalculate points
 	  oPathPoints[I].CalcPt();                   // from offset
 	//GfOut("Spline: %g: %g/%g %g\n",TrackX,SplineX,oPathPoints[I].Offset,SplineY);

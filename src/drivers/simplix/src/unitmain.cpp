@@ -8,11 +8,15 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
+// V3.01.001 (SimuV2.1):
+// Reworked racingline structure to reduce file size (83% less).
+// Support for ls2 cars
+//
 // V3.01.000 (SimuV2.1):
 // Needed changes to be able to control cars for simuV2.1
 // Totally reworked pitting
@@ -20,7 +24,6 @@
 //--------------------------------------------------------------------------*
 // V2.00.01 (Speed Dreams - Career mode):
 // Uses new Speed Dreams Interfaces and was extended to use career mode
-// - Still work in progress
 //--------------------------------------------------------------------------*
 // V2.00 (Speed Dreams):
 // Uses new Speed Dreams Interfaces
@@ -316,6 +319,18 @@ void SetUpSimplix_ls1()
 //==========================================================================*
 
 //==========================================================================*
+// Schismatic entry point for simplix_ls2
+//--------------------------------------------------------------------------*
+void SetUpSimplix_ls2()
+{
+	cRobotType = RTYPE_SIMPLIX_LS2;
+	SetParameters(NBBOTS, "ls2-bavaria-g3gtr");
+    TDriver::AdvancedParameters = true;
+    TDriver::UseBrakeLimit = true;
+};
+//==========================================================================*
+
+//==========================================================================*
 // Schismatic entry point for simplix_MP5
 //--------------------------------------------------------------------------*
 void SetUpSimplix_mp5()
@@ -415,6 +430,8 @@ int moduleWelcomeV1_00
 		SetUpSimplix_mpa1();
 	else if (strncmp(RobName,"simplix_ls1",strlen("simplix_ls1")) == 0)
 		SetUpSimplix_ls1();
+	else if (strncmp(RobName,"simplix_ls2",strlen("simplix_ls2")) == 0)
+		SetUpSimplix_ls2();
 	else if (strncmp(RobName,"simplix_mp5",strlen("simplix_mp5")) == 0)
 		SetUpSimplix_mp5();
 	else 
@@ -672,6 +689,16 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.90f,0.90f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.50f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_LS2)
+  {
+    //GfOut("#cRobotType == RTYPE_SIMPLIX_LS2\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix_LS2;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LS2;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_MP5)
   {
@@ -983,7 +1010,23 @@ extern "C" int simplix_ls1(tModInfo *ModInfo)
   if (!RobotSettings)
 	  return -1;
 
-  SetParameters(10, "ls1-ciclon-rgt");
+  SetParameters(10, "ls1-archer-r9");
+  TDriver::AdvancedParameters = true;
+  TDriver::UseBrakeLimit = true;
+  return simplixEntryPoint(ModInfo,RobotSettings);
+};
+//==========================================================================*
+
+//==========================================================================*
+// Schismatic entry point for simplix_ls2
+//--------------------------------------------------------------------------*
+extern "C" int simplix_ls2(tModInfo *ModInfo)
+{
+  void *RobotSettings = GetFileHandle("simplix_ls2");
+  if (!RobotSettings)
+	  return -1;
+
+  SetParameters(1, "ls2-bavaria-g3gtr");
   TDriver::AdvancedParameters = true;
   TDriver::UseBrakeLimit = true;
   return simplixEntryPoint(ModInfo,RobotSettings);

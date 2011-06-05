@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 120 // Force new calculation
+#define RL_VERSION 121 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -106,7 +106,8 @@
 #define RTYPE_SIMPLIX_36GP 3                     // Robot type simplix_36GP
 #define RTYPE_SIMPLIX_MPA1 4					 // Robot type simplix_mpa1
 #define RTYPE_SIMPLIX_LS1  5					 // Robot type simplix_ls1
-#define RTYPE_SIMPLIX_MP5  6					 // Robot type simplix_mp5
+#define RTYPE_SIMPLIX_LS2  6					 // Robot type simplix_ls2
+#define RTYPE_SIMPLIX_MP5  7					 // Robot type simplix_mp5
 //==========================================================================*
 
 //==========================================================================*
