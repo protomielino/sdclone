@@ -431,7 +431,10 @@ void TLane::CalcMaxSpeeds
 	int P = (Start + I) % N;
 	int Q = (P + 1) % N;
 
+    TVec3d Delta = oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt();
+    double Dist = TUtils::VecLenXY(Delta);
     double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+    double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
     double Factor = 1.0;
 		 
 	double Speed = oFixCarParam.CalcMaxSpeed(
@@ -442,7 +445,8 @@ void TLane::CalcMaxSpeeds
 //      oPathPoints[Q].CrvRated,
 	  oPathPoints[P].CrvZ,
 	  oTrack->Friction(P)*Factor,
-  	  TrackRollAngle);
+  	  TrackRollAngle,
+  	  TrackTiltAngle);
 
 	if (TDriver::UseGPBrakeLimit)
 	{
@@ -594,14 +598,15 @@ void TLane::PropagateAcceleration
 	{
 	  // see if we need to adjust spd[Q] to make it possible
 	  //   to speed up to spd[P] from spd[Q].
-  	  double Dist = TUtils::VecLenXY(
-		oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt());
+      TVec3d Delta = oPathPoints[P].CalcPt() - oPathPoints[Q].CalcPt();
+      double Dist = TUtils::VecLenXY(Delta);
 
 	  double K = (oPathPoints[P].Crv + oPathPoints[Q].Crv) * 0.5;
 	  if (fabs(K) > 0.0001)
 	    Dist = 2 * asin(0.5 * Dist * K) / K;
 
 	  double TrackRollAngle = atan2(oPathPoints[P].Norm().z, 1);
+	  double TrackTiltAngle = 1.1 * atan2(Delta.z, Dist);
 
 	  double V = oFixCarParam.CalcAcceleration(
 	    oPathPoints[P].Crv,
@@ -611,7 +616,8 @@ void TLane::PropagateAcceleration
 		oPathPoints[P].AccSpd,
 		Dist,
 		oTrack->Friction(P),
-		TrackRollAngle);
+		TrackRollAngle,
+		TrackTiltAngle);
 
 		//if (oPathPoints[Q].AccSpd > V)
 		oPathPoints[Q].AccSpd = MIN(V,oPathPoints[Q].Speed);

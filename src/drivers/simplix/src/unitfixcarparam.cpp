@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -108,7 +108,8 @@ double TFixCarParam::CalcAcceleration(
   double Speed,                                  // Speed
   double Dist,                                   // Distance P0 P1
   double Friction,                               // Friction
-  double TrackRollAngle) const                   // Track roll angle
+  double TrackRollAngle,                         // Track roll angle
+  double TrackTiltAngle) const                   // Track tilt angle
 {
   double MU = Friction * oTyreMu;
   double CD = oCdBody * 
@@ -121,7 +122,7 @@ double TFixCarParam::CalcAcceleration(
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat = G * sin(TrackRollAngle);
-  double Gtan = 0;	// TODO: track pitch angle.
+  double Gtan  = - G * sin(TrackTiltAngle);
 
   double U = Speed;
   double V = U;
@@ -181,8 +182,7 @@ double TFixCarParam::CalcBraking
     Friction *= 0.95;
 
   double Crv = (0.3*Crv0 + 0.9*Crv1);
-  double Crvz = -(0.25*Crvz0 + 0.75*Crvz1);
-  //Friction *= AdjustFriction(Crv);
+  double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
   Friction *= oDriver->CalcFriction(Crv);
 
   double Mu = Friction * oTyreMu;
@@ -200,11 +200,11 @@ double TFixCarParam::CalcBraking
   Crv *= oDriver->CalcCrv(fabs(Crv));
 
   if (Crvz > 0)
-	Crvz = 0; 
+    Crvz = 0; 
 
   double Gdown = G * cos(TrackRollAngle) * cos(TrackTiltAngle);
   double Glat  = fabs(G * sin(TrackRollAngle));
-  double Gtan  = G * sin(TrackTiltAngle);
+  double Gtan  = - G * sin(TrackTiltAngle);
 
   double V = Speed;
   double U = V;
@@ -216,7 +216,8 @@ double TFixCarParam::CalcBraking
 	double AvgV2 = AvgV * AvgV;
 
 	double Froad;
-	double Fdown = oTmpCarParam->oMass * Gdown + (oTmpCarParam->oMass * Crvz + oCaGroundEffect) * AvgV2;
+	double Fdown = oTmpCarParam->oMass * Gdown 
+		+ (oTmpCarParam->oMass * Crvz + oCaGroundEffect) * AvgV2;
 	double Ffrnt = oCaFrontWing * AvgV2;
 	double Frear = oCaRearWing * AvgV2;
 
@@ -236,7 +237,8 @@ double TFixCarParam::CalcBraking
     
 	if (TDriver::UseBrakeLimit)
 	{
-      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale * (fabs(Crv) - TDriver::BrakeLimitBase));
+      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
+		  * (fabs(Crv) - TDriver::BrakeLimitBase));
 	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
 	}
 
@@ -263,7 +265,8 @@ double	TFixCarParam::CalcBrakingPit
   double Speed,                                  // Speed
   double Dist,                                   // Distance P0 P1
   double Friction,                               // Friction
-  double TrackRollAngle) const                   // Track roll angle
+  double TrackRollAngle,                         // Track roll angle
+  double TrackTiltAngle) const                   // Track tilt angle
 {
   if (Speed > 180/3.6)
     Friction *= 0.90;
@@ -272,7 +275,6 @@ double	TFixCarParam::CalcBrakingPit
 
   double Crv = (0.3*Crv0 + 0.9*Crv1);
   double Crvz = (0.25*Crvz0 + 0.75*Crvz1);
-  //Friction *= AdjustFriction(Crv);
   Friction *= oDriver->CalcFriction(Crv);
 
   double Mu = Friction * oTyreMu;
@@ -294,7 +296,7 @@ double	TFixCarParam::CalcBrakingPit
 
   double Gdown = G * cos(TrackRollAngle);
   double Glat  = G * sin(TrackRollAngle);
-  double Gtan  = 0;	
+  double Gtan  = - G * sin(TrackTiltAngle);
 
   double V = Speed;
   double U = V;
@@ -305,7 +307,8 @@ double	TFixCarParam::CalcBrakingPit
 	double AvgV2 = AvgV * AvgV;
 
 	double Froad;
-	double Fdown = oTmpCarParam->oMass * Gdown + (oTmpCarParam->oMass * Crvz + oCaGroundEffect) * AvgV2;
+	double Fdown = oTmpCarParam->oMass * Gdown 
+		+ (oTmpCarParam->oMass * Crvz + oCaGroundEffect) * AvgV2;
 	double Ffrnt = oCaFrontWing * AvgV2;
 	double Frear = oCaRearWing * AvgV2;
 
@@ -323,8 +326,12 @@ double	TFixCarParam::CalcBrakingPit
 	double Acc = CarParam.oScaleBrakePit * Ftanroad 
 	  / oTmpCarParam->oMass;
 
-//	if (TDriver::UseGPBrakeLimit)
-//	  Acc = MAX(Acc,TDriver::BrakeLimit/2);
+	if (TDriver::UseBrakeLimit)
+	{
+      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
+		  * (fabs(Crv) - TDriver::BrakeLimitBase));
+	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
+	}
 
 	double Inner = MAX(0, V * V - 2 * Acc * Dist);
 	double OldU = U;
@@ -346,7 +353,8 @@ double TFixCarParam::CalcMaxSpeed
   double Crv1,                                   // Curvature in xy at P
   double CrvZ,                                   // Curvature in z at P
   double Friction,                               // Friction
-  double TrackRollAngle) const                   // Track roll angle
+  double TrackRollAngle,                         // Track roll angle
+  double TrackTiltAngle) const                   // Track tilt angle
 {
   // Here we calculate the theoretical maximum speed at a point on the
   // path. This takes into account the curvature of the path (crv), the
@@ -366,6 +374,10 @@ double TFixCarParam::CalcMaxSpeed
   double AbsCrv1 = MAX(0.001, fabs(Crv1));
   double AbsCrv = AbsCrv0;
   double factor = 1.0;
+
+  if (AbsCrv < 1/200.0)
+	CrvZ *= 0.001;
+
   if (AbsCrv > AbsCrv1)
   {
 	if (oDriver->oUseAccelOut)
@@ -377,7 +389,7 @@ double TFixCarParam::CalcMaxSpeed
 	factor = 0.985;
     AbsCrv *= oDriver->CalcCrv(AbsCrv);
   }
-  //Friction *= AdjustFriction(AbsCrv);
+
   Friction *= oDriver->CalcFriction(AbsCrv);
 
   double Den;
@@ -393,7 +405,8 @@ double TFixCarParam::CalcMaxSpeed
   Mu = MIN(MuF,MuR) / oTmpCarParam->oSkill;
 
   Den = (AbsCrv - ScaleBump * CrvZ)
-    - (oCaFrontWing * MuF + oCaRearWing * MuR + oCaGroundEffect * Mu) / oTmpCarParam->oMass;
+    - (oCaFrontWing * MuF + oCaRearWing * MuR 
+	+ oCaGroundEffect * Mu) / oTmpCarParam->oMass;
 
   if (Den < 0.00001)
    Den = 0.00001;

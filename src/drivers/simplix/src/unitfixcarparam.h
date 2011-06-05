@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.04
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.01.001
 //--------------------------------------------------------------------------*
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
@@ -58,7 +58,8 @@ class TFixCarParam
 	   double Crv1, double Crvz1,
 	   double Speed, double Dist, 
 	   double Friction,
-	   double TrackRollAngle) const;
+	   double TrackRollAngle,
+       double TrackTiltAngle) const;                
 
 	double CalcBraking
 	  (TCarParam& CarParam,									    
@@ -75,7 +76,8 @@ class TFixCarParam
 	   double Crv1, double Crvz1,
 	   double Speed, double Dist, 
 	   double Friction,
-	   double TrackRollAngle) const;
+	   double TrackRollAngle,
+       double TrackTiltAngle) const;                
 
 	double CalcMaxSpeed
 	  (TCarParam& CarParam,									    
@@ -83,7 +85,8 @@ class TFixCarParam
 	   double Crv1,
 	   double Crvz, 
 	   double KFriction,
-	   double TrackRollAngle) const;                                  
+	   double TrackRollAngle,
+       double TrackTiltAngle) const;                
 
 	double CalcMaxLateralF
 	  (									    

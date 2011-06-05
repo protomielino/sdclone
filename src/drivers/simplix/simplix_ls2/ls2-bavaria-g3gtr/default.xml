@@ -64,7 +64,7 @@
 
 	<section name="Brake System">
 		<attnum name="front-rear brake repartition" min="0.3" max="0.7" val="0.57"/>
-		<attnum name="max pressure" unit="kPa" min="100" max="150000" val="30000"/>
+		<attnum name="max pressure" unit="kPa" min="100" max="150000" val="15000"/>
 	</section>
 
 	<section name="Front Anti-Roll Bar">
@@ -167,9 +167,9 @@
 		<attnum name="drift factor" min="1.0" max="10.0" val="1.0"/>
 		<attnum name="lookaheadfactor" min="0.0" max="0.5" val="0.10"/>
 		<attnum name="scale steer" min="0.1" max="2.0" val="0.8"/>
-		<attnum name="brake limit" val="-9.9"/>
-		<attnum name="scale brake" min="0" max="2" val="0.76"/>
-		<attnum name="scale mu" min="0" max="5" val="0.81"/>
+		<attnum name="brake limit" val="-12.5"/>
+		<attnum name="scale brake" min="0" max="2" val="0.91"/>
+		<attnum name="scale mu" min="0" max="5" val="0.82"/>
 		<attnum name="scale brake rain" min="0" max="1" val="1.0"/>
 		<attnum name="scale mu rain" min="0" max="1" val="1.0"/>
     		<attnum name="scale bump" val="0.3"/>
@@ -177,8 +177,8 @@
 
             <!-- Use the parameters below to tune the robots 
                  detection of the car's limits while qualification -->
-		<attnum name="qualy brake" min="0" max="2" val="0.78"/>
-		<attnum name="qualy mu" min="0" max="2" val="0.85"/>
+		<attnum name="qualy brake" min="0" max="2" val="0.93"/>
+		<attnum name="qualy mu" min="0" max="2" val="0.87"/>
 
             <!-- Do not change the parameters below 
                  unless you really know what you are doing -->

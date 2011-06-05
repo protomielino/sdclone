@@ -366,7 +366,7 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
 	  TVec3d P3 = L3->Point;
 
 	  double T = L0->Offset + L1->Offset + L2->Offset;
-	  L1->Offset = T/3;
+	  L1->Offset = (float) (T/3);
     }
   }
 }
@@ -427,9 +427,9 @@ void TClothoidLane::SetOffset
 
   if (!(P->Fix))
   {
-    P->Offset = T;
+    P->Offset = (float) T;
     P->Point = P->CalcPt();
-    P->Crv = TUtils::CalcCurvatureXY(PP->Point, P->Point, PN->Point);
+    P->Crv = (float) TUtils::CalcCurvatureXY(PP->Point, P->Point, PN->Point);
   }
 }
 //==========================================================================*
