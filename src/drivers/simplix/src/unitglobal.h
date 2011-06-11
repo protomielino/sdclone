@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.04
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 121 // Force new calculation
+#define RL_VERSION 122 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
@@ -449,6 +449,8 @@ enum
 #define PRV_SCALE_BRAKE      "scale brake"        // Scale brake force
 #define PRV_SCALE_BUMP       "scale bump"         // Scale bump detection inside
 #define PRV_SCALE_BUMPOUTER  "scale bump outer"   // Scale bump detection outside
+#define PRV_LIMIT_SIDE_USE   "limit side use"     // Limit side use
+#define PRV_LIMIT_SIDE_WIDTH "limit side width"   // Limit side use width
 #define PRV_SCALE_MU         "scale mu"           // Scale friction calculation 
 #define PRV_SCALE__MU        "scale_mu"           // Scale friction calculation 
 #define PRV_SCALE_FRICTION	 "scale friction"     // Scale friction calculation 
@@ -459,6 +461,8 @@ enum
 
 #define PRV_SCALE_MIN_MU     "scale min mu"
 #define PRV_SCALE_STEER	     "scale steer"
+
+#define PRV_UGLY_CRVZ        "ugly crvz"          // Use stiff crv
 
 #define PRV_SIDE_MU          "side mu"            // Scale friction calculation for sides
 #define PRV_RAIN_MU          "scale mu rain"      // Scale friction calculation for sides

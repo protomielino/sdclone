@@ -9,10 +9,10 @@
 //
 // File         : unitlane.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.04
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -461,6 +461,8 @@ void TLane::CalcMaxSpeeds
       double TrackTurnangle = CalcTrackTurnangle(P, (P + 50) % N);
       if (TrackTurnangle > 0.7)
 	    Speed *= 0.75;
+      if (TrackTurnangle < 0.2)
+	    Speed *= 1.05;
 	}
 
 	if (Speed < 5)

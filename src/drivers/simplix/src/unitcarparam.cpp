@@ -8,10 +8,10 @@
 //
 // File         : unitcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem Roboter mouse_2006
 //
@@ -54,7 +54,10 @@ TCarParam::TCarParam():
   oScaleBump(0.4f),
   oScaleBumpOuter(0.6f),
   oScaleBumpLeft(0),
-  oScaleBumpRight(0)
+  oScaleBumpRight(0),
+  oLimitSideUse(false), 
+  oLimitSideWidth(1.5),
+  oUglyCrvZ(-0.0035)
 {
 }
 //==========================================================================*
@@ -80,6 +83,9 @@ TCarParam& TCarParam::operator= (const TCarParam& CarParam)
   oScaleBumpOuter = CarParam.oScaleBumpOuter;
   oScaleBumpLeft = CarParam.oScaleBumpLeft;
   oScaleBumpRight = CarParam.oScaleBumpRight;
+  oLimitSideUse = CarParam.oLimitSideUse;
+  oLimitSideWidth = CarParam.oLimitSideWidth;
+  oUglyCrvZ = CarParam.oUglyCrvZ;
 
   return *this;
 }

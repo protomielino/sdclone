@@ -8,10 +8,14 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2011.06.04
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 3.02.000
+//--------------------------------------------------------------------------*
+// V3.02.000 (SimuV2.1):
+// Reworked racingline calculation
+//
 //--------------------------------------------------------------------------*
 // V3.01.001 (SimuV2.1):
 // Reworked racingline structure to reduce file size (83% less).

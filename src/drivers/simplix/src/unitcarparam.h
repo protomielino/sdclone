@@ -8,10 +8,10 @@
 //
 // File         : unitcarparam.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem Roboter mouse_2006
 //
@@ -60,6 +60,11 @@ class TCarParam
 
 	double oScaleBumpLeft;                       // Bump sensitivity
 	double oScaleBumpRight;                      // Bump sensitivity
+
+	bool oLimitSideUse;                          // Use of sides limited?
+	double oLimitSideWidth;                      // Use of sides limited to
+
+	double oUglyCrvZ;                            // Use stiff crv
 
 };
 //==========================================================================*

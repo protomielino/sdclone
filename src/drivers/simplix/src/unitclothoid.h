@@ -9,10 +9,10 @@
 //
 // File         : unitclothoid.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -112,7 +112,7 @@ class TClothoidLane : public TLane
 
 	void SmoothPath
 	  (/*TTrackDescription* pTrack,*/
-	   /* const TParam& Param, */
+	   const TParam& Param, 
 	   const TOptions& Opts);
 
     bool SaveToFile(const char* Filename);       // Save to file
@@ -162,7 +162,8 @@ class TClothoidLane : public TLane
 	void OptimisePath
 	  (int Step,
 	   int NIterations,
-	   double BumpMod /*,
+	   double BumpMod,
+	   double UglyCrvZ/*,
 	   bool Smooth*/);
 	int GetWeather();
 

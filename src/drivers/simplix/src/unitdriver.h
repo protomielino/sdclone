@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.02
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -411,6 +411,7 @@ private:
     double oJumping;                             // Car is jumping
     double oJumpOffset;                          // Offset for calculation of jumps
 	bool oFirstJump;
+	double oStartSteerFactor;
 
 	static int NBBOTS;                           // Nbr of cars
     double CurrSimTime;                          // Current simulation time

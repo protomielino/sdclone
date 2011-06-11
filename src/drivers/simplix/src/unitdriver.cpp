@@ -198,7 +198,7 @@ TDriver::TDriver(int Index):
   oNbrCars(0),
   oOwnOppIdx(0),
   // oOpponents
-  oAvoidRange(0.9),
+  oAvoidRange(0.99),
   oAvoidRangeDelta(0.0),
   oAvoidOffset(0.0),
   oAvoidOffsetDelta(0.0),
@@ -258,7 +258,7 @@ TDriver::TDriver(int Index):
   oShiftMargin(0),
   oShiftCounter(0),
   oSituation(NULL),
-  oStartDistance(50.0),
+  oStartDistance(150.0),
   oStartRPM(100.0),
   oStuckCounter(0),
   oSysFooStuckX(NULL),
@@ -349,7 +349,8 @@ TDriver::TDriver(int Index):
   oDryCode(0),
   oJumping(0),
   oJumpOffset(0.0),
-  oFirstJump(true)
+  oFirstJump(true),
+  oStartSteerFactor(0.0)
 {
 //  //GfOut("#TDriver::TDriver() >>>\n");
   int I;
@@ -524,6 +525,24 @@ void TDriver::AdjustDriving(
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_BUMPOUTER,NULL,
 	(float) Param.oCarParam.oScaleBump);
   //GfOut("#Scale Bump Outer: %g\n",Param.oCarParam.oScaleBumpOuter);
+
+  Param.oCarParam.oLimitSideUse =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_USE,NULL,
+	(float) 0) > 0;
+  if (Param.oCarParam.oLimitSideUse)
+    GfOut("#Limit side use: true\n");
+  else
+    GfOut("#Limit side use: false\n");
+
+  Param.oCarParam.oLimitSideWidth =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_LIMIT_SIDE_WIDTH,NULL,
+	1.5f);
+  GfOut("#Limit side width: %g\n",Param.oCarParam.oLimitSideWidth);
+
+  Param.oCarParam.oUglyCrvZ =
+	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_UGLY_CRVZ,NULL,
+	-1.0);
+  GfOut("#Ugly CrvZ: %g\n",Param.oCarParam.oUglyCrvZ);
 
   Param.oCarParam.oScaleMu = ScaleMu *
 	GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_SCALE_MU,NULL,
@@ -1236,7 +1255,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   TeamInfo();                                    // Find team info
 
   oFlying = 0;                                   // Initialize Flags
-  oAvoidRange = 0.9;                             // Relative avoiding offset
+  oAvoidRange = 0.999999;                        // Relative avoiding offset
   oAvoidRangeDelta = 0.0;                        // Avoiding range change
   oAvoidOffset = CalcPathTarget                  // Get initial offset
 	(oTrackDesc.CalcPos(oCar), -CarToMiddle);    // from start grid
@@ -1406,13 +1425,15 @@ void TDriver::Drive()
   //  GfOut("t:%.2f s v:(%.1f)%.1f km/h A:%.3f C:%.3f G:%d R:%.1f F:%.3f\n",CurrSimTime,oTargetSpeed*3.6,oCurrSpeed*3.6,oAccel,oClutch,oGear,1/oLanePoint.Crv,CalcCrv_simplix_36GP(fabs(oLanePoint.Crv)));
   //GfOut("v:(%.1f)%.1f km/h\n",oTargetSpeed*3.6,oCurrSpeed*3.6);
   //GfOut("v:(%.1f)%.1f km/h R:%.3f m c:%.3f 1/m z:%.3f 1/m\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1/oLanePoint.Crv,oLanePoint.Crv,oLanePoint.Crvz);
-/*
-  const int N = oTrackDesc.Count();
+/** /
   int Idx = oTrackDesc.IndexFromPos(Pos);
+  GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
+  const int N = oTrackDesc.Count();
   double TrackTurnangle1 = oRacingLine[0].CalcTrackTurnangle((Idx + N - 30) % N, Idx);
   double TrackTurnangle2 = oRacingLine[0].CalcTrackTurnangle(Idx, (Idx + 30) % N);
-  GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2);
-*/
+  GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
+  GfOut("v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
+/* */
 }
 //==========================================================================*
 
@@ -1562,7 +1583,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1588,7 +1609,7 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
-    //oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+    oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1617,7 +1638,7 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
-      //oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+      oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1636,7 +1657,7 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
-      //oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+      oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1652,9 +1673,9 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
-	  //oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
-	  //oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
+	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
+	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
 	  //GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
 	}
@@ -2326,8 +2347,8 @@ void TDriver::InitAdaptiveShiftLevels()
 		{
           ToRpm[J] = RpmNext;
 		  oShift[J] = Rpm * 0.98;
-		  //GfOut("#TqNext > Tq\n");
-  		  //GfOut("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
+		  GfOut("#TqNext > Tq\n");
+  		  GfOut("#%d/%d: %g(%g) -> %g(%g)\n", J,I, Rpm*RpmFactor,Tq,RpmNext*RpmFactor,TqNext);
 		  break;
 		}
  	    Rpm += 1;
@@ -2335,10 +2356,10 @@ void TDriver::InitAdaptiveShiftLevels()
 
   }
   
-  //GfOut("\n#Gear change summary:\n");
-  //for (J = 1; J < oLastGear; J++)
-  //  GfOut("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
-  //    J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
+  GfOut("\n#Gear change summary:\n");
+  for (J = 1; J < oLastGear; J++)
+    GfOut("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
+      J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
 
   free(DataPoints);
   free(Edesc);
@@ -2609,7 +2630,10 @@ double TDriver::SteerAngle(TLanePoint& AheadPointInfo)
   // control offset from path.
   oPIDCLine.oP = 1.0;
   oPIDCLine.oD = 10;
-  Angle -= 0.15 * atan(oPIDCLine.Sample(Delta));
+  if (oStartSteerFactor < 0.15)
+    oStartSteerFactor += 0.0002;
+  double Factor = MIN(0.15,oStartSteerFactor);
+  Angle -= Factor * atan(oPIDCLine.Sample(Delta));
 
   return Angle;
 }
@@ -3022,10 +3046,10 @@ bool TDriver::TargetReached(double Target, double AvoidTarget)
 void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
 {
   // Scale limits of change of lateral movement (accellerations/velocities)
-  double RangeAccMax = 0.0005 * Scale;           // Range accelleration and
-  double RangeVelMax = 0.005 * Scale;            // velocity per sim.step
-  double OffsetAccMax = 0.00015 * Scale;         // Offset accelleration and
-  double OffsetVelMax = 0.1 * Scale;             // velocity per sim.step
+  double RangeAccMax = 0.00012 * Scale;          // Range accelleration and
+  double RangeVelMax = 0.35 * Scale;             // velocity per sim.step
+  double OffsetAccMax = 0.00010 * Scale;         // Offset accelleration and
+  double OffsetVelMax = 0.35 * Scale;            // velocity per sim.step
 
   double AvoidTarget = 0;                        // Assume come back to RL
   if (DoAvoid)                                   // But if needed
@@ -3062,13 +3086,13 @@ void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
   double OldAvoidRange = oAvoidRange;            // Save old range
   oAvoidRange -= oAvoidRangeDelta;               // Set new range
 
-  if ((oAvoidRange > 0.9995)                     // If close to Max
+  if ((oAvoidRange > 0.99995)                    // If close to Max
 	&& (oAvoidRangeDelta < 0))                   // fix range and change
   {
     oAvoidRange = 1.0;                           // Max reached
 	oAvoidRangeDelta = 0.0;                      // Stop changing
   }
-  else if((oAvoidRange <= 0.0005)                // If close to Min
+  else if((oAvoidRange <= 0.00005)               // If close to Min
 	&& (oAvoidRangeDelta > 0))                   // fix range and change
   {
 	oAvoidRange = 0.0;                           // Min reached
@@ -3105,13 +3129,13 @@ void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
   double OldAvoidOffset = oAvoidOffset;          // Save old offset
     oAvoidOffset += oAvoidOffsetDelta;           // Set new offset
 
-  if ((oAvoidOffset < -0.99)                     // If close to Min
+  if ((oAvoidOffset < -0.99995)                  // If close to Min
 	&& (Target < 0))                             // of target dir
   {
 	oAvoidOffset = -1;                           // Min reached
 	oAvoidOffsetDelta = 0.0;                     // Stop changing
   }
-  else if ((oAvoidOffset > 0.99)                 // If close to Max
+  else if ((oAvoidOffset > 0.99995)              // If close to Max
 	&& (Target > 0))                             // of target dir
   {
 	oAvoidOffset = 1;                            // Max reached
@@ -3122,6 +3146,7 @@ void TDriver::Runaround(double Scale, double Target, bool DoAvoid)
 	oAvoidOffset = Target;                       // Target reached
  	oAvoidOffsetDelta = 0.0;                     // Stop changing
   }
+  //GfOut("Avoid R/O %.3f/%.3f\n",oAvoidRange,oAvoidOffset);
 }
 //==========================================================================*
 
@@ -3235,17 +3260,30 @@ void TDriver::AvoidOtherCars(double K, bool& IsClose, bool& IsLapper)
   {
 	if (!oDoAvoid)                               // If no avoiding needed
 	{
-      Target = Ratio * PitSide();                // Bring us to the correct
+      Target = - Ratio * PitSide();                // Bring us to the correct
 	  oDoAvoid = true;                           // side to make pit stop
 	}
   }
   else if (oStrategy->StopPitEntry(ExitOffset))  // back to track
   {
-	if (!oDoAvoid)                                // If no avoiding needed
+	if (!oDoAvoid)                               // If no avoiding needed
 	{
-      Target = PitSide();                        // Bring us to the correct
+      Target = - PitSide();                        // Bring us to the correct
 	  oDoAvoid = true;                           // side to make pit stop
 	}
+  }
+
+  if (((Coll.Flags & F_CATCHING) != 0)
+	&& oGoToPit)
+  {
+    oDoAvoid = true;                             // Let's avoid
+    Target = - PitSide();                        // to the correct side
+  }
+  else if (((Coll.Flags & F_CATCHING) != 0)
+	&& oStrategy->oWasInPit)
+  {
+    oDoAvoid = true;                             // Let's avoid
+    Target = PitSide();                          // to the correct side
   }
 
   if (oTestLane > 0)

@@ -169,7 +169,7 @@ double TCollision::AvoidTo
 	}
 
     DoAvoid = true;                              // Avoid to side
-    Offset = Me.CalcPathTarget                     // Use offset to
+    Offset = Me.CalcPathTarget                   // Use offset to
       (DistanceFromStartLine, Offset);           //   find target
     //GfOut("DoAvoid Offset1: %g\n",Offset);
     return Offset; 

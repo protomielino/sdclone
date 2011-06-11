@@ -10,10 +10,10 @@
 // 
 // File         : unittrack.cpp 
 // Created      : 2007.11.17
-// Last changed : 2009.02.30
-// Copyright    : © 2007-2010 Wolf-Dieter Beelitz
+// Last changed : 2011.06.07
+// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Stellt Funktionen zur Streckenbeschreibung zur Verfügung
 //--------------------------------------------------------------------------*
@@ -480,9 +480,11 @@ void TTrackDescription::InitTrack
 	const double MAX_ROUGH =                     // max usable rough
 //      MAX(0.005, Seg->surface->kRoughness * 1.2);
       MAX(0.025, Seg->surface->kRoughness * 1.2);
+//      MAX(0.100, Seg->surface->kRoughness * 1.5);
 	const double MAX_RESIST =                    // max usable resistance
 //	  MAX(0.02, Seg->surface->kRollRes * 1.2);
 	  MAX(0.05, Seg->surface->kRollRes * 1.2);
+//	  MAX(0.10, Seg->surface->kRollRes * 1.5);
 	const double SLOPE = Seg->Kzw;               // Slope of segment
 
 	for (int S = 0; S < 2; S++)                  // Look at both sides
@@ -587,9 +589,12 @@ void TTrackDescription::InitTrack
 		  }
 		  else if (PSide->surface->kFriction < Seg->surface->kFriction)
 		  {
-			WCurb = MIN(WCurb,1.5);
-			W = MIN(W,1.5);
-			ExtraW = MIN(ExtraW,1.5);
+			if (CarParam.oLimitSideUse)
+			{
+			  WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
+			  W = MIN(W,CarParam.oLimitSideWidth);
+			  ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
+			}
 			//Done = true;
 		  }
 		}

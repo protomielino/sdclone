@@ -9,10 +9,10 @@
 // 
 // File         : unitpit.cpp
 // Created      : 2007.02.20
-// Last changed : 2011.06.04
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Diese Unit basiert auf dem erweiterten Robot-Tutorial bt
 //
@@ -318,7 +318,7 @@ void TPitLane::SmoothPitPath
 
   // Smooth pit path
   float BumpMode = (float) Param.oCarParam.oScaleBump;
-  SmoothPath(TClothoidLane::TOptions(BumpMode));
+  SmoothPath(Param,TClothoidLane::TOptions(BumpMode));
 }
 //==========================================================================*
 
@@ -381,7 +381,7 @@ void TPitLane::MakePath
   // in a relation, that we still have a safty margin between cars standing 
   // not perfectly adjusted in the pit while we want to drive through
   // the pitlane.
-  double PitLaneOffset =                         // Offset of the pitlane
+  double PitLaneOffset =                         // Offset of the pitlane 
 	fabs(PitInfo->driversPits->pos.toMiddle)     //   from the middle of the
 	- PitInfo->width;                            //   track
 
@@ -407,6 +407,7 @@ void TPitLane::MakePath
   // Get possible length for pit entry
   tTrackSeg* Seg = PitInfo->pitEntry;
   tTrackSeg* Side;
+  //tTrackSeg* NextSide;
   bool forward = true;
   double EntryLength = 0;                        // Usable length of pit entry
 
@@ -476,9 +477,20 @@ void TPitLane::MakePath
 	  
     if (Side != NULL)                            // If there is a side
     {                                            // Check driveability
+/*
+		double AvailableWidth = Side->startWidth;
+		if (Sign < 0)                            // Get next side segment
+			NextSide = Side->lside;              // and add the width
+		else                                     // if there is
+			NextSide = Side->rside;              // additional side
+		if (NextSide != NULL)                    // available
+			AvailableWidth += NextSide->startWidth;
+
         //GfOut("Side 1: %d %d %.3f\n",Seg->id,Side->style,Side->endWidth);
-	    if ((Side->style == TR_PLAN)             // In case of a barrier, 
-			&& (Side->endWidth > CarWidth))      // pitwall or elevated curbs
+	    if ((Side->style == TR_PLAN)             // In case of a barrier,
+			&& (AvailableWidth > CarWidth))      // pitwall or too small 
+*/
+	    if (Side->style == TR_PLAN)              // In case of a barrier,
 	  	  usable = true;                         // we have to go backward 
     }
 

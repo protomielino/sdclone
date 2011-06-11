@@ -9,10 +9,10 @@
 //
 // File         : unitclothoid.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.04
+// Last changed : 2011.06.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 3.02.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -123,7 +123,7 @@ void TClothoidLane::MakeSmoothPath(
 	//GfOut("Step: %d\n",Step);
  	for (int I = 0; I < L; I++)
 	{
-	  OptimisePath(Step, Delta, 0);
+		OptimisePath(Step, Delta, 0, Param.oCarParam.oUglyCrvZ);
 	}
     Step >>= 1;
   }
@@ -142,7 +142,7 @@ void TClothoidLane::MakeSmoothPath(
 	  //GfOut("Step: %d\n",Step);
   	  for (int I = 0; I < L; I++)
 	  {
-		OptimisePath(Step, Delta, Opts.BumpMod);
+		OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
 		CalcCurvaturesZ();
 		CalcFwdAbsCrv(FwdRange);
 		CalcMaxSpeeds(Step);
@@ -186,7 +186,7 @@ bool TClothoidLane::LoadSmoothPath(
 //--------------------------------------------------------------------------*
 void TClothoidLane::SmoothPath(
 /*  TTrackDescription* Track,*/
-/*  const TParam& Param, */
+  const TParam& Param, 
   const TOptions& Opts)
 {
   int FwdRange = 110;
@@ -202,7 +202,7 @@ void TClothoidLane::SmoothPath(
     //GfOut("Step: %d\n",Step);
     for (int I = 0; I < L; I++)
 	{
-	  OptimisePath(Step, Delta, Opts.BumpMod /*, Opts.Smooth*/);
+	  OptimisePath(Step, Delta, Opts.BumpMod, Param.oCarParam.oUglyCrvZ);
 	  CalcCurvaturesZ();
 	  CalcFwdAbsCrv(FwdRange);
 	  CalcMaxSpeeds(Step);
@@ -581,7 +581,7 @@ void TClothoidLane::Optimise
 // Optimize Lane
 //--------------------------------------------------------------------------*
 void TClothoidLane::OptimisePath
-  (int Step, int NIterations, double BumpMod /*, bool Smooth */)
+  (int Step, int NIterations, double BumpMod, double UglyCrvZ/*, bool Smooth */)
 {
   const int Count = oTrack->Count();
 
@@ -613,7 +613,11 @@ void TClothoidLane::OptimisePath
 	  int Index = (K + Count - 3 * Step) % Count;
       double Factor = 1.016f;
 
-	  if (LFly->FlyHeight > 0.035)
+	  if (LFly->CrvZ < UglyCrvZ)
+	  {
+		Optimise(Factor/10, L3, L0, L1, L2, L4, L5, L6, BumpMod);
+	  }
+	  else if (LFly->FlyHeight > 0.035)
 	  {
 		Optimise(Factor/100, L3, L0, L1, L2, L4, L5, L6, BumpMod);
 	  }
