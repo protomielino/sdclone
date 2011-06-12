@@ -105,15 +105,14 @@ static int NbDrivers = -1;
 
 // List of permited gear changes with hbox transmission
 // prevents mis-selection with thumbstick
-// Note 'N' selectable from any gear
-//                              from ->   654321NR,    To
-const static int hboxChanges[] = {      0b00000010,  // R
-                                        0b00101011,  // 1
-                                        0b01010111,  // 2
-                                        0b10101010,  // 3
-                                        0b01010010,  // 4
-                                        0b10100010,  // 5
-                                        0b01010010   // 6
+// Note 'N' selectable from any gear from ..... 654321NR ... to :
+const static int hboxChanges[] = {   0x02, // 0b00000010,  // R
+                                     0x2B, // 0b00101011,  // 1
+                                     0x57, // 0b01010111,  // 2
+                                     0xAA, // 0b10101010,  // 3
+                                     0x52, // 0b01010010,  // 4
+                                     0xA2, // 0b10100010,  // 5
+                                     0x52  // 0b01010010   // 6
                                 };
 
 #ifdef _WIN32
