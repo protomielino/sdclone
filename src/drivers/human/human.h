@@ -31,7 +31,7 @@
 #include <car.h>
 
 
-typedef enum { eTransAuto, eTransSeq, eTransGrid } eTransmission;
+typedef enum { eTransAuto, eTransSeq, eTransGrid, eTransHbox } eTransmission;
 
 typedef enum { eRWD, eFWD, e4WD } eDriveTrain;
 

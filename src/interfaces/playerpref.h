@@ -102,6 +102,14 @@
 #define HM_ATT_CLUTCH_POW	"clutch power"
 #define HM_ATT_CLUTCH_DEAD	"clutch dead zone"
 
+#define HM_ATT_HBOX_X		"hbox x"
+#define HM_ATT_HBOX_X_MIN	"hbox x min"
+#define HM_ATT_HBOX_X_MAX	"hbox x max"
+
+#define HM_ATT_HBOX_Y		"hbox y"
+#define HM_ATT_HBOX_Y_MIN	"hbox y min"
+#define HM_ATT_HBOX_Y_MAX	"hbox y max"
+
 #define	HM_SECT_PREF	"Preferences"
 
 #define HM_LIST_DRV	"Drivers"
@@ -114,6 +122,7 @@
 #define HM_VAL_AUTO	"auto"
 #define HM_VAL_SEQ	"sequential"
 #define HM_VAL_GRID	"grid"
+#define HM_VAL_HBOX	"hbox"
 
 #define HM_VAL_YES	"yes"
 #define HM_VAL_NO	"no"

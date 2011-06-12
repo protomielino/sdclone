@@ -179,6 +179,8 @@ public:
 	  gearChangeStr = HM_VAL_AUTO;
 	} else if (_gearchangemode == GEAR_MODE_GRID) {
 	  gearChangeStr = HM_VAL_GRID;
+	} else if (_gearchangemode == GEAR_MODE_HBOX) {
+	  gearChangeStr = HM_VAL_HBOX;
 	} else {
 	  gearChangeStr = HM_VAL_SEQ;
 	}
@@ -613,6 +615,8 @@ GenPlayerList(void)
 	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_AUTO);
 	} else if (!strcmp(str, HM_VAL_GRID)) {
 	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_GRID);
+	} else if (!strcmp(str, HM_VAL_HBOX)) {
+	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_HBOX);
 	} else {
 	    PlayersInfo[i]->setGearChangeMode(GEAR_MODE_SEQ);
 	} /* Note: Deprecated "manual" value (after R1.3.0) smoothly converted to "sequential" (backward compatibility) */
@@ -776,9 +780,11 @@ ChangeGearChange(void *vp)
     tGearChangeMode gearChangeMode = (*CurrPlayer)->gearChangeMode();
     if (vp == 0) {
 	if (gearChangeMode == GEAR_MODE_AUTO) {
-	    gearChangeMode = GEAR_MODE_GRID;
+	    gearChangeMode = GEAR_MODE_HBOX;
 	} else if (gearChangeMode == GEAR_MODE_SEQ) {
 	    gearChangeMode = GEAR_MODE_AUTO;
+	} else if (gearChangeMode == GEAR_MODE_HBOX) {
+	    gearChangeMode = GEAR_MODE_GRID;
 	}
 	else {
 	    gearChangeMode = GEAR_MODE_SEQ;
@@ -788,6 +794,8 @@ ChangeGearChange(void *vp)
 	    gearChangeMode = GEAR_MODE_SEQ;
 	} else if (gearChangeMode == GEAR_MODE_SEQ) {
 	    gearChangeMode = GEAR_MODE_GRID;
+	} else if (gearChangeMode == GEAR_MODE_GRID) {
+	    gearChangeMode = GEAR_MODE_HBOX;
 	}
 	else {
 	    gearChangeMode = GEAR_MODE_AUTO;

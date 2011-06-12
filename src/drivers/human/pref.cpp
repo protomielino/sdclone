@@ -50,7 +50,9 @@ tControlCmd	CmdControlRef[] = {
     {HM_ATT_LIGHT1_CMD, GFCTRL_TYPE_NOT_AFFECTED, -1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
     {HM_ATT_CLUTCH,      GFCTRL_TYPE_JOY_AXIS, 1, HM_ATT_CLUTCH_MIN,      0.0, 0.0, HM_ATT_CLUTCH_MAX,      1.0, HM_ATT_CLUTCH_SENS,    1.0, HM_ATT_CLUTCH_POW,    2.0, NULL, 0.0, NULL, 0.0},
     {HM_ATT_SPDLIM_CMD,  GFCTRL_TYPE_NOT_AFFECTED, -1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
-    {HM_ATT_EBRAKE_CMD, GFCTRL_TYPE_JOY_BUT,       19, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0}
+    {HM_ATT_EBRAKE_CMD, GFCTRL_TYPE_JOY_BUT,       19, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
+    {HM_ATT_HBOX_X,     GFCTRL_TYPE_NOT_AFFECTED, -1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0},
+    {HM_ATT_HBOX_Y,     GFCTRL_TYPE_NOT_AFFECTED, -1, NULL, 0.0, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0, NULL, 0.0}
 };
 
 const int NbCmdControl = sizeof(CmdControlRef) / sizeof(CmdControlRef[0]);
@@ -92,6 +94,8 @@ HmReadPrefs(const int index)
 		HCtx[idx]->transmission = eTransAuto;
 	else if (!strcmp(prm, HM_VAL_SEQ))
 		HCtx[idx]->transmission = eTransSeq;
+	else if (!strcmp(prm, HM_VAL_HBOX))
+		HCtx[idx]->transmission = eTransHbox;
 	else
 		HCtx[idx]->transmission = eTransGrid;
 

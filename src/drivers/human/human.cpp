@@ -103,6 +103,19 @@ static std::vector<std::string> VecNames;
 // Number of human drivers (initialized by moduleWelcome).
 static int NbDrivers = -1;
 
+// List of permited gear changes with hbox transmission
+// prevents mis-selection with thumbstick
+// Note 'N' selectable from any gear
+//                              from ->   654321NR,    To
+const static int hboxChanges[] = {      0b00000010,  // R
+                                        0b00101011,  // 1
+                                        0b01010111,  // 2
+                                        0b10101010,  // 3
+                                        0b01010010,  // 4
+                                        0b10100010,  // 5
+                                        0b01010010   // 6
+                                };
+
 #ifdef _WIN32
 /* Must be present under MS Windows */
 BOOL WINAPI DllEntryPoint (HINSTANCE hDLL, DWORD dwReason, LPVOID Reserved)
@@ -1155,7 +1168,7 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		}
 	}
 
-	/* manual shift direct */
+	/* manual shift direct (button for each gear) */
 	else if (HCtx[idx]->transmission == eTransGrid)
 	{
 		/* Go to neutral gear if any gear command released (edge down) */
@@ -1179,6 +1192,49 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 				car->_gearCmd = i - CMD_GEAR_N;
 			}
 		}
+	}
+
+	/* H-Box selector using XY axis of joy/thumbstick */
+	else if (HCtx[idx]->transmission == eTransHbox)
+	{
+		// Used to test bitfield of allowable changes
+		int hboxGearTest = 1 << (car->_gear + 1);
+		float ax0, ay0;
+
+		ax0 = joyInfo->ax[cmd[CMD_HBOX_X].val];
+		ay0 = joyInfo->ax[cmd[CMD_HBOX_Y].val];
+
+		if (ax0 > 0.33) {
+			if (ay0 < -0.66 && hboxChanges[5] & hboxGearTest)
+				car->_gearCmd = 5;
+
+			if (car->_speed_x < 10) {
+				/* 'R' Only selectable at low speed */
+				if (ay0 > 0.66 && hboxChanges[0] & hboxGearTest)
+					car->_gearCmd = -1;
+			} else {
+				/* '6' Only selectable at high speed */
+				if (ay0 > 0.66 && hboxChanges[6] & hboxGearTest)
+					car->_gearCmd = 6;
+			}
+		} else if (ax0 < -0.33) {
+			if (ay0 < -0.66 && hboxChanges[1] & hboxGearTest)
+				car->_gearCmd = 1;
+			if (ay0 > 0.66 && hboxChanges[2] & hboxGearTest)
+				car->_gearCmd = 2;
+		} else {
+			if (ay0 < -0.66 && hboxChanges[3] & hboxGearTest)
+				car->_gearCmd = 3;
+			if (ay0 > 0.66 && hboxChanges[4] & hboxGearTest)
+				car->_gearCmd = 4;
+		}
+
+		/* 'N' selectable from any gear */
+		if (ay0 < 0.33 && ay0 > -0.33 && ax0 > -0.5 && ax0 < -0.33)
+			car->_gearCmd = 0;
+		/* Extended 'N' area when using clutch to allow 'jumping' gears */
+		if (ay0 < 0.33 && ay0 > -0.33 && ax0 > -0.5 && ax0 < 0.5 && HCtx[idx]->autoClutch == 0)
+			car->_gearCmd = 0;
 	}
 
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
