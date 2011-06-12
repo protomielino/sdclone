@@ -36,9 +36,9 @@
 static const int SkyDomeDistValues[] = {0, 12000, 20000, 40000, 80000};
 static const int NbSkyDomeDistValues = sizeof(SkyDomeDistValues) / sizeof(SkyDomeDistValues[0]);
 
-static const char* DynamicTimeValues[] =
-	{ GR_ATT_DYNAMICTIME_DISABLED, GR_ATT_DYNAMICTIME_ENABLED };
-static const int NbDynamicTimeValues = sizeof(DynamicTimeValues) / sizeof(DynamicTimeValues[0]);
+static const char* DynamicSkyDomeValues[] =
+	{ GR_ATT_DYNAMICSKYDOME_DISABLED, GR_ATT_DYNAMICSKYDOME_ENABLED };
+static const int NbDynamicSkyDomeValues = sizeof(DynamicSkyDomeValues) / sizeof(DynamicSkyDomeValues[0]);
 static const int PrecipDensityValues[] = {0, 20, 40, 60, 80, 100};
 static const int NbPrecipDensityValues = sizeof(PrecipDensityValues) / sizeof(PrecipDensityValues[0]);
 
@@ -49,7 +49,7 @@ static int	SmokeEditId;
 static int	SkidEditId;
 static int	LodFactorEditId;
 static int	SkyDomeDistLabelId;
-static int	DynamicTimeLabelId, DynamicTimeLeftButtonId, DynamicTimeRightButtonId;
+static int	DynamicSkyDomeLabelId, DynamicSkyDomeLeftButtonId, DynamicSkyDomeRightButtonId;
 static int	PrecipDensityLabelId;
 
 static int	FovFactorValue = 100;
@@ -57,7 +57,7 @@ static int	SmokeValue = 300;
 static int	SkidValue = 20;
 static tdble	LodFactorValue = 1.0;
 static int 	SkyDomeDistIndex = 0;
-static int 	DynamicTimeIndex = 0;
+static int 	DynamicSkyDomeIndex = 0;
 static int 	PrecipDensityIndex = NbPrecipDensityValues - 1;
 
 static char	buf[512];
@@ -83,7 +83,7 @@ SaveGraphicOptions(void *prevMenu)
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_MAXSTRIPBYWHEEL, NULL, SkidValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, LodFactorValue);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, SkyDomeDistValues[SkyDomeDistIndex]);
-    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, DynamicTimeValues[DynamicTimeIndex]);
+    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, DynamicSkyDomeValues[DynamicSkyDomeIndex]);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", PrecipDensityValues[PrecipDensityIndex]);
     
     GfParmWriteFile(NULL, grHandle, "graph");
@@ -134,18 +134,18 @@ LoadGraphicOptions()
 
 	if (nSkyDomeDist > 0)
 	{
-		DynamicTimeIndex = 0; // Default value index, in case file value not found in list.
-		const char* pszDynamicTime =
-			GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, GR_ATT_DYNAMICTIME_DISABLED);
-		for (int i = 0; i < NbDynamicTimeValues; i++) 
+		DynamicSkyDomeIndex = 0; // Default value index, in case file value not found in list.
+		const char* pszDynamicSkyDome =
+			GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED);
+		for (int i = 0; i < NbDynamicSkyDomeValues; i++) 
 		{
-			if (!strcmp(pszDynamicTime, DynamicTimeValues[i]))
+			if (!strcmp(pszDynamicSkyDome, DynamicSkyDomeValues[i]))
 			{
-				DynamicTimeIndex = i;
+				DynamicSkyDomeIndex = i;
 				break;
 			}
 		}
-		GfuiLabelSetText(ScrHandle, DynamicTimeLabelId, DynamicTimeValues[DynamicTimeIndex]);
+		GfuiLabelSetText(ScrHandle, DynamicSkyDomeLabelId, DynamicSkyDomeValues[DynamicSkyDomeIndex]);
 	}
 	else
 	{
@@ -214,11 +214,11 @@ ChangeSkid(void* /* dummy */)
 }
 
 static void
-ChangeDynamicTime(void* vp)
+ChangeDynamicSkyDome(void* vp)
 {
     const long delta = (long)vp;
-    DynamicTimeIndex = (DynamicTimeIndex + NbDynamicTimeValues + delta) % NbDynamicTimeValues;
-    GfuiLabelSetText(ScrHandle, DynamicTimeLabelId, DynamicTimeValues[DynamicTimeIndex]);
+    DynamicSkyDomeIndex = (DynamicSkyDomeIndex + NbDynamicSkyDomeValues + delta) % NbDynamicSkyDomeValues;
+    GfuiLabelSetText(ScrHandle, DynamicSkyDomeLabelId, DynamicSkyDomeValues[DynamicSkyDomeIndex]);
 } 
 
 static void
@@ -229,15 +229,15 @@ ChangeSkyDomeDist(void* vp)
     snprintf(buf, sizeof(buf), "%d", SkyDomeDistValues[SkyDomeDistIndex]);
     GfuiLabelSetText(ScrHandle, SkyDomeDistLabelId, buf);
 
-	const bool bLockDynamicTime = SkyDomeDistValues[SkyDomeDistIndex] == 0;
-	if (bLockDynamicTime)
+	const bool bLockDynamicSkyDome = SkyDomeDistValues[SkyDomeDistIndex] == 0;
+	if (bLockDynamicSkyDome)
 	{
-		DynamicTimeIndex = 0;
-		ChangeDynamicTime(0);
+		DynamicSkyDomeIndex = 0;
+		ChangeDynamicSkyDome(0);
 	}
-	const int nArrowsVisibility = bLockDynamicTime ? GFUI_INVISIBLE : GFUI_VISIBLE;
-	GfuiVisibilitySet(ScrHandle, DynamicTimeLeftButtonId, nArrowsVisibility);
-	GfuiVisibilitySet(ScrHandle, DynamicTimeRightButtonId, nArrowsVisibility);
+	const int nArrowsVisibility = bLockDynamicSkyDome ? GFUI_INVISIBLE : GFUI_VISIBLE;
+	GfuiVisibilitySet(ScrHandle, DynamicSkyDomeLeftButtonId, nArrowsVisibility);
+	GfuiVisibilitySet(ScrHandle, DynamicSkyDomeRightButtonId, nArrowsVisibility);
 } 
 
 static void
@@ -277,11 +277,11 @@ GraphMenuInit(void* prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle, param, "skydomedistrightarrow", (void*)1, ChangeSkyDomeDist);
     SkyDomeDistLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "skydomedistlabel");
     
-    DynamicTimeLeftButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamictimeleftarrow", (void*)-1, ChangeDynamicTime);
-    DynamicTimeRightButtonId =
-		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamictimerightarrow", (void*)1, ChangeDynamicTime);
-    DynamicTimeLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "dynamictimelabel");
+    DynamicSkyDomeLeftButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomeleftarrow", (void*)-1, ChangeDynamicSkyDome);
+    DynamicSkyDomeRightButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "dynamicskydomerightarrow", (void*)1, ChangeDynamicSkyDome);
+    DynamicSkyDomeLabelId = GfuiMenuCreateLabelControl(ScrHandle, param, "dynamicskydomelabel");
     
     GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityleftarrow", (void*)-1, ChangePrecipDensity);
     GfuiMenuCreateButtonControl(ScrHandle, param, "precipdensityrightarrow", (void*)1, ChangePrecipDensity);

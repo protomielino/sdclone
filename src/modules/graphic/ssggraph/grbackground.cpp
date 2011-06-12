@@ -70,7 +70,7 @@ unsigned grSkyDomeDistance = 0;
 
 // Some private global variables.
 //static int grDynamicWeather = 0;
-static bool grDynamicTime = false;
+static bool grDynamicSkyDome = false;
 static int grBackgroundType = 0;
 static float grSunDeclination = 0.0f;
 static float grMoonDeclination = 0.0f;
@@ -106,11 +106,11 @@ grInitBackground(void)
 	void *hndl = grTrackHandle;
 	ssgLight *light = ssgGetLight(0);
 	
-	/* If no dynamic sky is set, or the track skyversion doesn't support dynamic sky,
-	   we set up a static one */
+	// If no realistic sky dome requested, or if the track skyversion doesn't support it,
+	// we set up a static - texture-based - background
 	if (!grSkyDomeDistance || grTrack->skyversion < 1) 
 	{
-		GfLogInfo("Setting up static sky\n");
+		GfLogInfo("Setting up static background (mono-texture sky and landscape)\n");
 
 		GLfloat matSpecular[]       = {0.3, 0.3, 0.3, 1.0};
 		GLfloat matShininess[]      = {50.0};
@@ -167,13 +167,14 @@ grInitBackground(void)
 		  }*/
 	}
 	
-	/** If dynamic sky is needed, we create the Sun, the Moon, some stars and the clouds */
+	// If realistic sky dome is requested,
+	// we create the Sun, the Moon, some stars and the clouds
 	else 
 	{
-		GfLogInfo("Setting up dynamic sky :\n");
-
 		static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = { 1, 3, 5, 7, 8 };
 		static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
+
+		GfLogInfo("Setting up realistic %s sky dome :\n", grDynamicSkyDome ? "dynamic" : "static");
 
 		int div = 80000 / grSkyDomeDistance; //grSkyDomeDistance > 0 so cannot div0
 		ssgSetNearFar(1, grSkyDomeDistance);
@@ -181,18 +182,10 @@ grInitBackground(void)
 		// Determine time of day (seconds since 00:00).
 		const int timeOfDay = (int)grTrack->local.timeofday;
 
-		// Add random stars when relevant.
-		/*if (timeOfDay < 7 * 3600 || timeOfDay > 17 * 3600)
-		{
-			if (timeOfDay < 5 * 3600 || timeOfDay > 19 * 3600)
-				NStars = NMaxStars;
-			else
-				NStars = NMaxStars / 2;
-		}
-		else
-			NStars = 0;*/
-		NStars = NMaxStars; // Stars must be initialized same in day not only in the night
-			
+		// Add random stars (can't optimize from real time of day,
+		// in case grDynamicSkyDome - that is dynamic time of day -
+		// and also simply because it'd be complicated to take care of actual lattitude).
+		NStars = NMaxStars;
 		if (AStarsData)
 			delete [] AStarsData;
 		AStarsData = new sgdVec3[NStars];
@@ -216,7 +209,7 @@ grInitBackground(void)
 		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData);
 		
 		//Add the Sun itself
-        	TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), grSkyDomeDistance, true);
+		TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", (2500 / div), grSkyDomeDistance, /*isSun=*/true);
 		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
@@ -260,14 +253,15 @@ grInitBackground(void)
 		cloudLayers[0]->setDirection(45);
 		GfLogInfo("  Cloud cover : 1 layer, texture=%s, speed=60, direction=45\n", buf);
     
-		// Set up the light source to the Sun position?
-    	sgVec3 solposn;
-    	sgSetVec3(solposn, 0, 0, 0);
-				  
-    	light->setPosition(solposn);
-		static ulClock ck;
-		double dt = ck.getDeltaTime();
-    	TheSky->repositionFlat(solposn, 0, dt);    
+		// Set up the light source to the Sun position.
+		sgCoord sunPosition;
+		TheCelestBodies[eCBSun]->getPosition(&sunPosition);
+    	light->setPosition(sunPosition.xyz);
+
+		// Initialize the whole sky dome.
+		sgVec3 viewPos;
+		sgSetVec3(viewPos, 0, 0, 0);				  
+		TheSky->repositionFlat(viewPos, 0, 0);    
 
 		//Setup visibility according to rain if any
 		// TODO: Does visibility really decrease when rain gets heavier ????
@@ -293,11 +287,11 @@ grInitBackground(void)
 				break;
 		}//switch Rain
 		
-		TheSky->modifyVisibility( visibility, (float)dt);
+		TheSky->modifyVisibility( visibility, 0);
     
 		//Setup overall light level according to rain if any
-		double sol_angle = TheCelestBodies[eCBSun]->getAngle();
-		double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
+		const double sol_angle = TheCelestBodies[eCBSun]->getAngle();
+		const double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 		double scene_brightness = pow(sky_brightness, 0.5);
         
 		if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
@@ -327,7 +321,8 @@ grInitBackground(void)
 		CloudsColor[2] = FogColor[2] = BaseFogColor[2] * (float)sky_brightness;
 		CloudsColor[3] = FogColor[3] = BaseFogColor[3];
 	
-		TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, NPlanets, APlanetsData, NStars, AStarsData);
+		TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle,
+						NPlanets, APlanetsData, NStars, AStarsData);
 	
 		sgCoord solpos;
 		TheCelestBodies[eCBSun]->getPosition(&solpos);
@@ -389,19 +384,17 @@ grLoadBackground(void)
 	ssgNormalArray	*bg_nrm;
 	ssgSimpleState	*bg_st;
 
-	// Load graphic options for the background.
+	// Load graphic options for the sky dome / background.
 	grSkyDomeDistance =
 		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
 	if (grSkyDomeDistance > 0 && grSkyDomeDistance < grSkyDomeDistThresh)
 		grSkyDomeDistance = grSkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
-
-	grDynamicTime = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICTIME, GR_ATT_DYNAMICTIME_DISABLED), GR_ATT_DYNAMICTIME_ENABLED) == 0; 
+	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
 
 	//grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
 			
-	GfLogInfo("Graphic options : Sky dome distance = %d m, dynamic time = %s\n",
-			  grSkyDomeDistance, grDynamicTime ? "true" : "false");
-
+	GfLogInfo("Graphic options : Sky dome : distance = %d m, dynamic = %s\n",
+			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
 
 	snprintf(buf, sizeof(buf), "tracks/%s/%s;data/img;data/textures;.",
 			grTrack->category, grTrack->internalname);
@@ -744,10 +737,6 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 
 	if (grSkyDomeDistance && grTrack->skyversion > 0) 
 	{
-		// Commenting these 2 lines fixes #266 (Splitscreen completely white with Skydome enabled)
-		//glClearColor(FogColor[0], FogColor[1], FogColor[2], FogColor[3]);
-		//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		const GLfloat fog_exp2_density = (float)sqrt_m_log01 / TheSky->getVisibility();
 		glEnable(GL_FOG);
 		//glFogf(GL_FOG_START, fogStart);
@@ -788,63 +777,59 @@ grDrawStaticBackground(cGrCamera *cam, cGrBackgroundCam *bgCam)
 void
 grPostDrawSky(void) 
 {
-	if (grSkyDomeDistance && grTrack->skyversion > 0) 
-	{
+	if (grSkyDomeDistance && grTrack->skyversion > 0)
 		TheSky->postDraw(grSkyDomeDistance);
-	}
 }//grPostDrawSky
 
 // Update the sky when time changes
 void
 grUpdateSky(double currentTime)
 {
-	if (!grDynamicTime)
+	// Nothing to do if static sky dome.
+	if (!grDynamicSkyDome)
 		return;
 
-	// Update last update time.
 	static int lastchecked = -100;
 	static double lastTime = -10.0f;
-	static ulClock ck ;
-	ck.update () ;
-	double dt1 = ck.getDeltaTime();
-	if( currentTime < lastTime ) 
+
+	// ???????
+	if( currentTime < lastTime )
 	{
 		lastchecked = -100;
 		lastTime = currentTime;
 		return;
 	}
 
-	// Update sun position (?)
+	// At each call, update possibly high speed objects of the sky dome : the clouds.
+ 	sgVec3 viewPos;
+ 	sgSetVec3(viewPos, 0, 0, 0); // Shouldn't this be the actual screen camera position ?
+	TheSky->repositionFlat(viewPos, 0, currentTime - lastTime);    
+
+	// Check if time to update low speed objects : sun and moon.
 	int current = (int)floor( ( currentTime + 10.0f ) / 60.0f );
-	
-	sgVec3 solposn;
-	//sgSetVec3(solposn, 0, 0, 0);				  
-	//ssgGetLight(0)->setPosition(solposn);
-	//TheSky->repositionFlat(solposn, 0, dt1 );
-	TheSky->repositionFlat(solposn , 0, dt1);
-	//TheSky->modifyVisibility(solposn, (float)dt1);
 	lastTime = currentTime;
 	if( current == lastchecked )
 		return;
 	lastchecked = current;
 
-	GfLogDebug("Updating sky (dynamic time)\n");
+	// Update sun and moon, and thus global lightning / coloring parameters of the scene.
+	//GfLogDebug("Updating slow objects of the dynamic sky dome (sun and moon)\n");
 	
-	// Update sun position
+	// 1) Update sun position
 	grSunDeclination += 0.25f; // TODO: Is this delta value realistic ?
 	if (grSunDeclination >= 360.0f)
 		grSunDeclination = 0.0f;
 	
 	TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination) );
 
-	// Update moon position
+	// 2) Update moon position
 	grMoonDeclination += 0.25f; // TODO: Is this delta value realistic ?
 	if (grMoonDeclination >= 360.0f)
 		grMoonDeclination = 0.0f;
 	
 	TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
 
-	// Update scene color and light
+	// 3) Update scene color and light
 	double sol_angle = TheCelestBodies[eCBSun]->getAngle();
 	double sky_brightness = (1.0 + cos(sol_angle)) / 2.0;
 	double scene_brightness = pow(sky_brightness, 0.5);
@@ -854,33 +839,33 @@ grUpdateSky(double currentTime)
 	SkyColor[2] = BaseSkyColor[2] * (float)sky_brightness;
 	SkyColor[3] = BaseSkyColor[3];
 
-	/* set cloud and fog color */
+	// 3a)cloud and fog color
 	CloudsColor[0] = FogColor[0] = BaseFogColor[0] * (float)sky_brightness;
 	CloudsColor[1] = FogColor[1] = BaseFogColor[1] * (float)sky_brightness;
 	CloudsColor[2] = FogColor[2] = BaseFogColor[2] * (float)sky_brightness;
 	CloudsColor[3] = FogColor[3] = BaseFogColor[3];
 
-	/* repaint the sky (simply update geometrical, color, ... state, no actual redraw) */
-	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, NPlanets, APlanetsData, NStars, AStarsData);
+	// 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
+	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle,
+					NPlanets, APlanetsData, NStars, AStarsData);
 
+	// 3c) update the main light position (it's at the sun position !)
 	sgCoord solpos;
 	TheCelestBodies[eCBSun]-> getPosition(&solpos);
 	ssgGetLight(0)-> setPosition(solpos.xyz);	
 
+	// 3c) update scene colors.
 	SceneAmbiant[0] = BaseAmbiant[0] * (float)scene_brightness;
 	SceneAmbiant[1] = BaseAmbiant[1] * (float)scene_brightness;
 	SceneAmbiant[2] = BaseAmbiant[2] * (float)scene_brightness;
-	SceneAmbiant[3] = 1.0;
 	
 	SceneDiffuse[0] = BaseDiffuse[0] * (float)scene_brightness;
 	SceneDiffuse[1] = BaseDiffuse[1] * (float)scene_brightness;
 	SceneDiffuse[2] = BaseDiffuse[2] * (float)scene_brightness;
-	SceneDiffuse[3] = 1.0;
 	
 	SceneSpecular[0] = BaseSpecular[0] * (float)scene_brightness;
 	SceneSpecular[1] = BaseSpecular[1] * (float)scene_brightness;
 	SceneSpecular[2] = BaseSpecular[2] * (float)scene_brightness;
-	SceneSpecular[3] = 1.0;
 }//grUpdateSky
 
 void

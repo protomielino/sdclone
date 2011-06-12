@@ -42,7 +42,7 @@ class cGrCamera
     int			drawCurrent;	/* flag to draw the current car */
     int			drawDriver;	/* flag to draw the driver */
     int			drawBackground;	/* flag to draw the background */
-    int			mirrorAllowed;	/* flag to allox the display of mirror */
+    int			mirrorAllowed;	/* flag to allow the display of mirror */
 
  protected:
     sgVec3 speed;

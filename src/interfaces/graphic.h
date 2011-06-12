@@ -65,10 +65,10 @@
 #define GR_ATT_FOVFACT		"fov factor"
 #define GR_ATT_LODFACTOR	"LOD Factor"
 #define GR_ATT_SKYDOMEDISTANCE		"sky dome distance"
+#define GR_ATT_DYNAMICSKYDOME	"dynamic sky dome"
+#define GR_ATT_DYNAMICSKYDOME_ENABLED	"enabled"
+#define GR_ATT_DYNAMICSKYDOME_DISABLED	"disabled"
 #define GR_ATT_PRECIPDENSITY	"precipitation density"
-#define GR_ATT_DYNAMICTIME	"dynamic time"
-#define GR_ATT_DYNAMICTIME_ENABLED	"enabled"
-#define GR_ATT_DYNAMICTIME_DISABLED	"disabled"
 //#define GR_ATT_DYNAMICWEATHER	"dynamic weather"
 
 #define GR_ATT_NB_SCREENS	"number of screens"
