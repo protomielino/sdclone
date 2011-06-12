@@ -24,9 +24,6 @@
 #ifndef __IGRAPHICSENGINE__H__
 #define __IGRAPHICSENGINE__H__
 
-#include <graphic.h>
-
-
 class IGraphicsEngine
 {
 public:

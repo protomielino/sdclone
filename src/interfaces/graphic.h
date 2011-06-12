@@ -21,9 +21,6 @@
 #ifndef _GRAPHV1_H_
 #define _GRAPHV1_H_
 
-#include <track.h>
-#include <car.h>
-
 #define GRX_IDENT	0
 
 #define GR_PARAM_FILE		"config/graph.xml"
@@ -94,38 +91,6 @@
 #define GR_ATT_REAR_MAP1        "Rear Level Map 1"
 #define GR_ATT_REAR_MAP2        "Rear Level Map 2"
 #define GR_ATT_REAR_MAP3        "Rear Level Map 3"
-
-
-/* graphic functions prototypes */
-
-struct Situation;
-
-typedef int (*tfGraphicInitTrack)(tTrack *);
-typedef int (*tfGraphicInitCars)(struct Situation *); 
-typedef int (*tfGraphicInitView)(int /*x*/, int /*y*/, int /*width*/, int /*height*/, int /*flag*/, void * /*screen*/);
-#define GR_VIEW_STD  0 /* full screen view */
-#define GR_VIEW_PART 1 /* partial screen view (scissor test) */
-
-typedef int (*tfGraphicRefresh)(struct Situation *);
-typedef void (*tfGraphicShutdwnCars)(void);
-typedef void (*tfGraphicShutdwnTrack)(void);
-
-class ssgEntity;
-typedef void (*tfGraphicBendCar) (int /*index*/, sgVec3 /*poc*/, sgVec3 /*force*/, int /*cnt*/);
-
-/* Interface with the graphic lib */
-typedef struct {
-    tfGraphicInitTrack	    inittrack;	    /* Graphic init function */
-    tfGraphicInitView       initview;       /* Graphic init function */
-    tfGraphicInitCars	    initcars;	    /* Graphic init function */
-    tfGraphicRefresh	    refresh;	    /* Graphic refresh function */
-    tfGraphicShutdwnCars    shutdowncars;   /* Graphic shutdown function */
-    tfGraphicShutdwnTrack   shutdowntrack;  /* Graphic shutdown function */
-	//tfGraphicBendCar        bendcar;
-} tGraphicItf;
-
-
-    
 
 #endif /* _GRAPHV1_H_ */ 
 
