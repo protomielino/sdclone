@@ -21,7 +21,9 @@
 
 #include <robottools.h>	//RtXXX()
 #include <portability.h> // snprintf
-#include <glfeatures.h> // snprintf
+#include <glfeatures.h>
+
+#include <plib/ssgAux.h>
 
 #include "grscene.h"
 #include "grmain.h"
@@ -64,8 +66,6 @@ grMultiTexState	*grEnvState = NULL;
 grMultiTexState	*grEnvShadowState = NULL;
 grMultiTexState	*grEnvShadowStateOnCars = NULL;
 
-ssgBranch *SunAnchor = NULL;
-
 unsigned grSkyDomeDistance = 0;
 
 // Some private global variables.
@@ -74,6 +74,8 @@ static bool grDynamicSkyDome = false;
 static int grBackgroundType = 0;
 static float grSunDeclination = 0.0f;
 static float grMoonDeclination = 0.0f;
+
+static ssgBranch *SunAnchor = NULL;
 
 static ssgRoot *TheBackground = NULL;
 static ssgTransform *TheSun = NULL;
@@ -156,15 +158,14 @@ grInitBackground(void)
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
 		
-		/*if (!SUN) 
-		  {
-		  ssgaLensFlare      *sun_obj      = NULL ;
-		  sun_obj  = new ssgaLensFlare () ;
-		  TheSun   = new ssgTransform ;
-		  TheSun-> setTransform( solposn ) ;
-		  TheSun-> addKid( sun_obj  ) ;
-		  SunAnchor-> addKid(TheSun) ;
-		  }*/
+		if (!TheSun)
+		{
+			ssgaLensFlare *sun_obj = new ssgaLensFlare();
+			TheSun = new ssgTransform;
+			TheSun->setTransform(lightPosition);
+			TheSun->addKid(sun_obj);
+			SunAnchor->addKid(TheSun);
+		}
 	}
 	
 	// If realistic sky dome is requested,
@@ -669,12 +670,13 @@ grLoadBackground(void)
 				GfLogError("Unsupported background type %d\n", graphic->bgtype);
 				break;
 		}//switch grBackgroundType
+		
+		// Lens Flares when no sky dome (realistic sky dome will use another system when ready).
+		SunAnchor = new ssgBranch;
+		TheScene->addKid(SunAnchor);
+
 	} //if (!grSkyDomeDistance || grTrack->skyversion < 1)
 	
-	// Lens Flares
-	SunAnchor = new ssgBranch;
-	TheScene->addKid(SunAnchor);
-
 	// Environment Mapping Settings
 	bool bUseEnvPng = false;   // Avoid crash with missing env.rgb files (i.e. Wheel-1)
 	bool bDoNotUseEnv = false; // Avoid crash with missing env.png
@@ -876,29 +878,27 @@ grShutdownBackground(void)
 		TheSky = 0;
 	}
 	
-	if (TheSun) {
-		delete TheSun;
+	if (TheSun)
 		TheSun = 0;
-	}
 	
 	if (grEnvState) {
 		ssgDeRefDelete(grEnvState);
-		grEnvState = NULL;
+		grEnvState = 0;
 	}
 	
 	if (grEnvShadowState) {
 		ssgDeRefDelete(grEnvShadowState);
-		grEnvShadowState = NULL;
+		grEnvShadowState = 0;
 	}
 	
 	if (grEnvShadowStateOnCars) {
 		ssgDeRefDelete(grEnvShadowStateOnCars);
-		grEnvShadowStateOnCars = NULL;
+		grEnvShadowStateOnCars = 0;
 	}
 	
 	if(grEnvSelector) {
 		delete grEnvSelector;
-		grEnvSelector = NULL;
+		grEnvSelector = 0;
 	}
 
 }//grShutdownBackground

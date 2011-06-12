@@ -37,7 +37,6 @@ extern int grWrldMaxSize;
 extern tTrack *grTrack;
 
 extern ssgRoot *TheScene;
-extern ssgBranch *SunAnchor;
 extern ssgBranch *LandAnchor;
 extern ssgBranch *CarsAnchor;
 extern ssgBranch *ShadowAnchor;
