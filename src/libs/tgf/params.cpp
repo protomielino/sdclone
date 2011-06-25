@@ -845,11 +845,15 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 
 		if (curParam->min > curParam->valnum) 
 		{
+			GfLogWarning("Param '%s' : Loaded value (%f) < min (%f); fixing the min\n",
+						 shortName, curParam->valnum, curParam->min);
 			curParam->min = curParam->valnum;
 		}
 
 		if (curParam->max < curParam->valnum) 
 		{
+			GfLogWarning("Param '%s' : Loaded value (%f) > max (%f); fixing the max\n",
+						 shortName, curParam->valnum, curParam->max);
 			curParam->max = curParam->valnum;
 		}
 
