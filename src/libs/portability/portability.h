@@ -130,6 +130,7 @@ static char *strndup(const char *str, int len)
 #define chdir _chdir
 #define getcwd _getcwd
 #define chmod _chmod
+#define hypot _hypot
 
 #ifdef mkdir
 #undef mkdir
