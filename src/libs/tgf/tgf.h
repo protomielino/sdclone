@@ -360,6 +360,7 @@ TGF_API int GfParmCheckHandle(void *ref, void *tgt);
 #define GFPARM_MMODE_RELSRC	4 /**< release ref after the merge */
 #define GFPARM_MMODE_RELDST	8 /**< release tgt after the merge */
 TGF_API void *GfParmMergeHandles(void *ref, void *tgt, int mode);
+TGF_API void *GfParmMergeFiles(void *ref,  const char *fileName);
 TGF_API int GfParmGetNumBoundaries(void *handle, char *path, char *key, tdble *min, tdble *max);
 
 TGF_API void GfParmRemove(void *handle, const char *path, const char *key);

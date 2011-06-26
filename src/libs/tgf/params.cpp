@@ -3698,6 +3698,30 @@ GfParmMergeHandles(void *ref, void *tgt, int mode)
     return (void*)parmHandleOut;
 }
 
+/** Merge two parameters sets into a new one.
+    @ingroup	paramsfile
+    @param		ref	reference handle
+    @fileName	filename of the new parameter file
+    @return	The new handle containing the merge.
+    @see	GfParmCheckHandle
+ */
+void* GfParmMergeFiles(void * params, const char* fileName)
+{
+  void * newParams =							 // Open setup file
+	GfParmReadFile(fileName, GFPARM_RMODE_STD);
+
+  if(newParams == NULL)                          // Return old one,
+    return params;                               //   if new one is empty
+
+  if(params == NULL)                             // Return new one,
+    return newParams;                            //   if old one is empty
+
+  return GfParmMergeHandles(params, newParams,   // Merge setup files
+    GFPARM_MMODE_SRC
+	| GFPARM_MMODE_DST
+	| GFPARM_MMODE_RELSRC
+	| GFPARM_MMODE_RELDST);
+} // GfParamMergeFile
 
 /** Get the min and max of a numerical parameter.
     @ingroup	paramsdata
@@ -3790,4 +3814,3 @@ safeFOpen(const char *fileName, const char *mode)
     return fopen(fileName, mode);
 	
 }//safeFOpen
-
