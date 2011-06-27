@@ -38,7 +38,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 ADD_LIBRARY(raceengine SHARED ${RACEENGINE_SOURCES})
 
 ADD_SDLIB_LIBRARY(raceengine
-                  tgf tgfclient tgfdata robottools
+                  tgf tgfdata robottools
                   networking)
 
 IF(WIN32)
