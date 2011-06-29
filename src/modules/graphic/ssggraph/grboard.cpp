@@ -1544,7 +1544,8 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 }//grDispLeaderBoardScroll
 
 
-#define LEADERBOARD_LINE_SCROLL_TIME 0.07
+#define LEADERBOARD_LINE_SCROLL_RATE 80	// pixels per second
+#define LEADERBOARD_LINE_SCROLL_DELAY 5	// seconds
 /** 
  * grDispLeaderBoardScrollLine
  * 
@@ -1561,43 +1562,9 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
   if(iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0)
     grMakeThreeLetterNames(s);
   
-  //At first, get the current time
-  if(iTimer == 0 || s->currentTime < iTimer)
+  //At first, get the current time and rebuild the ScrollLine text
+  if(iTimer == 0 || s->currentTime < iTimer) {
     iTimer = s->currentTime;
-    
-  //Scrolling needed?
-  if(s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME) {
-    //When in initial position, show it fixed (no scroll) for some secs.
-    if((iStringStart == 0 && s->currentTime >= iTimer + LEADERBOARD_LINE_SCROLL_TIME * 20)
-      || (iStringStart > 0)) {
-        iTimer = s->currentTime;
-        ++iStringStart;
-      }//if iStringStart
-  }//if currentTime
-    
-  //Coords, limits
-  int x = leftAnchor + 5;
-  int x2 = rightAnchor - 5;
-  int y = BOTTOM_ANCHOR;
-
-  int dy = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
-  //int dx = GfuiFontWidth(GFUI_FONT_SMALL_C, "W");
-  //int iLen = (x2 - x) / dx; //# of chars to display
-  
-  //Set up drawing area
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
-  glBegin(GL_QUADS);
-  glColor4f(0.1, 0.1, 0.1, 0.8);
-  glVertex2f(x, y);
-  glVertex2f(x2, y);
-  glVertex2f(x2, y + dy);
-  glVertex2f(x, y + dy);
-  glEnd();
-  glDisable(GL_BLEND);
-
-  //Are we at the end of the scrolled string? If yes, let's regenerate it
-  if(st.empty() || (iStringStart == (int)st.size())) {
     st.clear();
     /*!The roster holds the driver's position, name and difference
      * *at the time* the leader starts a new lap.
@@ -1629,11 +1596,32 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
     }//for i
 
     st.assign(osRoster.str());
-  }//if st.empty || iStringStart > size
+  }
+    
+  int offset = (s->currentTime - iTimer - LEADERBOARD_LINE_SCROLL_DELAY) * LEADERBOARD_LINE_SCROLL_RATE;
+  if (offset < 0) offset = 0;
+
+  int dy = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
+  int dx = GfuiFontWidth(GFUI_FONT_SMALL_C, "W") * st.size();
   
-  //Display the line
-  GfuiDrawString(st.c_str() + iStringStart, grWhite, GFUI_FONT_MEDIUM_C, x, y, GFUI_ALIGN_HL_VB);
-  iStringStart = iStringStart % st.size();
+  //Set up drawing area
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
+  glBegin(GL_QUADS);
+  glColor4f(0.1, 0.1, 0.1, 0.8);
+  glVertex2f(leftAnchor, BOTTOM_ANCHOR);
+  glVertex2f(rightAnchor, BOTTOM_ANCHOR);
+  glVertex2f(rightAnchor, BOTTOM_ANCHOR + dy);
+  glVertex2f(leftAnchor,  BOTTOM_ANCHOR + dy);
+  glEnd();
+  glDisable(GL_BLEND);
+
+  // Check if scrolling is completed
+  if (offset > dx + 5) 
+    iTimer = 0;
+  else
+    //Display the line
+    GfuiDrawString(st.c_str(), grWhite, GFUI_FONT_MEDIUM_C, 5 - offset, BOTTOM_ANCHOR, GFUI_ALIGN_HL_VB);
 }//grDispLeaderBoardScrollLine
 
 
