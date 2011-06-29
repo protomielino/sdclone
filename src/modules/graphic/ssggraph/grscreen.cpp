@@ -350,9 +350,12 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 		mirrorCam->store ();
 	}
 	
+	glEnable(GL_SCISSOR_TEST);
 	glViewport(scrx, scry, scrw, scrh);
+	glScissor(scrx, scry, scrw, scrh);
 	dispCam = curCam;
 	camDraw(s);
+	glDisable(GL_SCISSOR_TEST);
 	
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glDisable(GL_CULL_FACE);
