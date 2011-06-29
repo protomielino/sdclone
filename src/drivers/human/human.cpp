@@ -779,7 +779,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	car->_steerCmd = leftSteer + rightSteer;
 
-#define GLANCERATE 5	// speed at which the driver turns his head
+#define GLANCERATE 12 	// speed at which the driver turns his head, radians per sec -> ~1/3s to full glance
 	newGlance = car->_glance;
 
 	if ((cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_LEFTGLANCE].val])
@@ -803,8 +803,10 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			if (newGlance > 0) newGlance = 0;
 		}
 	}
-	if (newGlance > PI/2) newGlance=PI/2;
-	if (newGlance < -PI/2) newGlance=-PI/2;
+
+	// limit glance to 120 degrees either way
+	if (newGlance > 2*PI/3) newGlance=2*PI/3;
+	if (newGlance < -2*PI/3) newGlance=-2*PI/3;
 
 	car->_glance = newGlance;
 
