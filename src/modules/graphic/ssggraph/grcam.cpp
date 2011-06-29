@@ -276,8 +276,8 @@ class cGrCarCamInside : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	P[0] = car->_drvPos_x + 30.0;
-	P[1] = car->_drvPos_y;
+	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance);
 	P[2] = car->_drvPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -290,6 +290,11 @@ class cGrCarCamInside : public cGrPerspCamera
 	    PreA -= 2*PI;
 	}
 	RELAXATION(A, PreA, 4.0f);
+
+	// ignore if glancing left/right
+	if (car->_glance != 0)
+		A = 0;
+
 	const tdble CosA = cos(A);
 	const tdble SinA = sin(A);
 
