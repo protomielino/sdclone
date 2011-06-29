@@ -480,8 +480,8 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	P[0] = car->_bonnetPos_x + 30.0;
-	P[1] = car->_bonnetPos_y;
+	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
 

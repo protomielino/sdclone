@@ -67,6 +67,8 @@ extern const std::string Yn[];
 #define CMD_EBRAKE	19
 #define	CMD_HBOX_X	20
 #define	CMD_HBOX_Y	21
+#define CMD_LEFTGLANCE	22
+#define CMD_RIGHTGLANCE	23
 
 extern void HmReadPrefs(const int index);
 

@@ -249,6 +249,7 @@ typedef struct {
 #define RM_CAR_STATE_ENDRACE_CALLED	0x00001000				/**< Endrace called so robot freed a part of its data */
 #define RM_CAR_STATE_SIMU_NO_MOVE	0x00010000 				/**< Simulation without car move (i.e. clutch applied and no wheel move)  */
     tPosd	corner[4];
+    tdble       glance;         /* Glance angle degrees, left -ve, right +ve */
 } tPublicCar;
 /* structure access */
 #define _DynGC		pub.DynGC
@@ -272,6 +273,7 @@ typedef struct {
 #define _corner_x(i)	pub.corner[i].ax
 #define _corner_y(i)	pub.corner[i].ay
 #define _posMat		pub.posMat
+#define _glance		pub.glance
 
 /** Dynamic wheel information */
 typedef struct {

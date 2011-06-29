@@ -545,6 +545,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	tdble throttle;
 	tdble leftSteer;
 	tdble rightSteer;
+	tdble newGlance;;
 #if (BINCTRL_STEERING == JEPZ || BINCTRL_STEERING == JPM)
 	tdble sensFrac, speedFrac;
 #endif
@@ -778,6 +779,34 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	car->_steerCmd = leftSteer + rightSteer;
 
+#define GLANCERATE 5	// speed at which the driver turns his head
+	newGlance = car->_glance;
+
+	if ((cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_LEFTGLANCE].val])
+	    || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_LEFTGLANCE].val])
+	    || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LEFTGLANCE].val)].state))
+	{
+		newGlance = newGlance - GLANCERATE * s->deltaTime;
+	} else if ((cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_RIGHTGLANCE].val])
+	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_RIGHTGLANCE].val])
+	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_RIGHTGLANCE].val)].state))
+	{
+		newGlance = newGlance + GLANCERATE * s->deltaTime;
+	} else {
+		// return view to center
+		if (newGlance > 0) {
+			newGlance = newGlance - GLANCERATE * s->deltaTime;
+			if (newGlance < 0) newGlance = 0;
+		}
+		if (newGlance < 0) {
+			newGlance = newGlance + GLANCERATE * s->deltaTime;
+			if (newGlance > 0) newGlance = 0;
+		}
+	}
+	if (newGlance > PI/2) newGlance=PI/2;
+	if (newGlance < -PI/2) newGlance=-PI/2;
+
+	car->_glance = newGlance;
 
 	switch (cmd[CMD_BRAKE].type) {
 		case GFCTRL_TYPE_JOY_AXIS:

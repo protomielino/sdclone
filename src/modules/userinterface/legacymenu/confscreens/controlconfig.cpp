@@ -69,7 +69,9 @@ static tCmdInfo Cmd[] = {
     {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
     {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
     {HM_ATT_HBOX_X,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_X_MIN, -1, HM_ATT_HBOX_X_MAX, 1, 0, 0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_HBOX_Y,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_Y_MIN, -1, HM_ATT_HBOX_Y_MAX, 1, 0, 0, 1, HM_ATT_PREF_AXIS, 0}
+    {HM_ATT_HBOX_Y,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_Y_MIN, -1, HM_ATT_HBOX_Y_MAX, 1, 0, 0, 1, HM_ATT_PREF_AXIS, 0},
+    {HM_ATT_LEFTGLANCE, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
+    {HM_ATT_RIGHTGLANCE,{-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0}
 };
 
 static const int MaxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
@@ -104,7 +106,9 @@ static tCmdDispInfo CmdDispInfo[] = {
     {                                  GEAR_MODE_GRID                  }, // GEAR_6,   
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // EBRAKE_CMD
     {                                                   GEAR_MODE_HBOX }, // GEAR_X,   
-    {                                                   GEAR_MODE_HBOX }  // GEAR_Y,   
+    {                                                   GEAR_MODE_HBOX }, // GEAR_Y,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // LEFTGLANCE,
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // RIGHTGLANCE
 };
 
 static jsJoystick	*Joystick[GFCTRL_JOY_NUMBER];

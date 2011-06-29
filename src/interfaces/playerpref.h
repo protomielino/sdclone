@@ -110,6 +110,9 @@
 #define HM_ATT_HBOX_Y_MIN	"hbox y min"
 #define HM_ATT_HBOX_Y_MAX	"hbox y max"
 
+#define HM_ATT_LEFTGLANCE       "left glance"
+#define HM_ATT_RIGHTGLANCE      "right glance"
+
 #define	HM_SECT_PREF	"Preferences"
 
 #define HM_LIST_DRV	"Drivers"
