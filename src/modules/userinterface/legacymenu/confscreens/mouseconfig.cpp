@@ -43,7 +43,7 @@ static const char *Instructions[] = {
     "Move Mouse for maximum right steer then press a button",
     "Move Mouse for full throttle then press a button",
     "Move Mouse for full brake then press a button",
-    "Calibration terminated",
+    "Mouse calibration completed",
     "Calibration failed"
 };
 
@@ -62,16 +62,24 @@ static void *ScrHandle = NULL;
 
 // Next menu screen handle.
 static void* NextMenuHandle = NULL;
+static void* PrevMenuHandle = NULL;
 
 // Screen controls Ids
 static int InstId;
+
+static int NextBut = 0;
+static int CancelBut = 0;
+static int DoneBut = 0;
 
 
 static void
 onNext(void * /* dummy */)
 {
     /* Back to previous screen */
-    GfuiScreenActivate(NextMenuHandle);
+    if (CalState == 4 && NextMenuHandle != NULL)
+	GfuiScreenActivate(NextMenuHandle);
+    else
+	GfuiScreenActivate(PrevMenuHandle);
 }
 
 static int
@@ -130,6 +138,15 @@ MouseCalAutomaton(void)
 	GfuiApp().eventLoop().setRecomputeCB(0);
 	GfuiApp().eventLoop().postRedisplay();
     }
+
+    /* Change button appearance when done */
+    if (CalState == 4) {
+	GfuiEnable(ScrHandle, CancelBut, GFUI_DISABLE);
+	if (DoneBut)
+	   GfuiEnable(ScrHandle, DoneBut, GFUI_ENABLE);
+	else
+	   GfuiEnable(ScrHandle, NextBut, GFUI_ENABLE);
+    }
 }
 
 static void
@@ -171,14 +188,21 @@ onActivate(void * /* dummy */)
 	GfuiApp().eventLoop().setRecomputeCB(IdleMouseInit);
 	GfctrlMouseCenter();
     }
+
+    GfuiEnable(ScrHandle, CancelBut, GFUI_ENABLE);
+    if (DoneBut)
+	GfuiEnable(ScrHandle, DoneBut, GFUI_DISABLE);
+    else
+	GfuiEnable(ScrHandle, NextBut, GFUI_DISABLE);
 }
 
 void *
-MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
+MouseCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 {
     Cmd = cmd;
     MaxCmd = maxcmd;
     NextMenuHandle = nextMenu;
+    PrevMenuHandle = prevMenu;
     
     if (ScrHandle) {
 	return ScrHandle;
@@ -195,8 +219,17 @@ MouseCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
     InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
     // Create Back and Reset buttons.
-    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
+
+    if (nextMenu != NULL) {
+	NextBut = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
+	GfuiEnable(ScrHandle, NextBut, GFUI_DISABLE);
+    } else {
+	DoneBut = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "donebutton", NULL, onNext);
+	GfuiEnable(ScrHandle, DoneBut, GFUI_DISABLE);
+    }
+
+    CancelBut = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "cancelbutton", NULL, onNext);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);

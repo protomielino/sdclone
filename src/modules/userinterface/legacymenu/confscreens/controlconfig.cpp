@@ -559,26 +559,21 @@ onActivate(void * /* dummy */)
 static void
 DevCalibrate(void * /* dummy */)
 {
-    void* firstCalMenu = 0;
+    void* nextCalMenu = NULL;
 
     // No need to reload command settings from preference on return
     ReloadValues = 0;
 
     // Create calibration "wizard" (1 menu for each device to calibrate
-    if (MouseCalNeeded) {
-	if (JoyCalNeeded) {
-	    void* nextCalMenu = JoyCalMenuInit(ScrHandle, Cmd, MaxCmd);
-	    firstCalMenu = MouseCalMenuInit(nextCalMenu, Cmd, MaxCmd);
-	} else {
-	    firstCalMenu = MouseCalMenuInit(ScrHandle, Cmd, MaxCmd);
-	}
-    } else if (JoyCalNeeded) {
-	firstCalMenu = JoyCalMenuInit(ScrHandle, Cmd, MaxCmd);
-    }
+    if (JoyCalNeeded)
+	nextCalMenu = JoyCalMenuInit(ScrHandle, nextCalMenu, Cmd, MaxCmd);
+
+    if (MouseCalNeeded)
+	nextCalMenu = MouseCalMenuInit(ScrHandle, nextCalMenu, Cmd, MaxCmd);
 	 
     // Activate first wizard screen
-    if (firstCalMenu)
-	GfuiScreenActivate(firstCalMenu);
+    if (nextCalMenu)
+	GfuiScreenActivate(nextCalMenu);
 }
 
 

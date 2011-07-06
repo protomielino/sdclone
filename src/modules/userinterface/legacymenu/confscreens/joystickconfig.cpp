@@ -52,7 +52,7 @@ static const char *Instructions[] = {
     "Apply full throttle and press a button",
     "Apply full brake and press a button",
     "Apply full clutch then press a button",
-    "Calibration is successfully terminated",
+    "Joystick calibration completed",
     "Calibration failed"
 };
 
@@ -74,6 +74,7 @@ static void *ScrHandle = NULL;
 
 // Next menu screen handle.
 static void* NextMenuHandle = NULL;
+static void* PrevMenuHandle = NULL;
 
 // Screen controls Ids
 static int InstId;
@@ -82,7 +83,9 @@ static int LabAxisId[NbMaxCalAxis];
 static int LabMinId[NbMaxCalAxis];
 static int LabMaxId[NbMaxCalAxis];
 
-
+static int NextBut = 0;
+static int CancelBut = 0;
+static int DoneBut = 0;;
 
 static void
 onNext(void * /* dummy */)
@@ -97,7 +100,10 @@ onNext(void * /* dummy */)
 	}
 
     /* Back to previous screen */
-    GfuiScreenActivate(NextMenuHandle);
+    if (CalState == NbCalSteps && NextMenuHandle != NULL)
+	GfuiScreenActivate(NextMenuHandle);
+    else
+	GfuiScreenActivate(PrevMenuHandle);
 }
 
 static void advanceStep (void)
@@ -150,9 +156,19 @@ JoyCalAutomaton(void)
 	sprintf(buf, "%.2g", JoyAxis[axis]*1.1);
 	GfuiLabelSetText(ScrHandle, LabMaxId[CalState - 2], buf);
 	advanceStep();
+
 	break;
     }
     GfuiLabelSetText(ScrHandle, InstId, Instructions[CalState]);
+
+    /* Change button appearance when done */
+    if (CalState == NbCalSteps) {
+	GfuiEnable(ScrHandle, CancelBut, GFUI_DISABLE);
+	if (DoneBut)
+	   GfuiEnable(ScrHandle, DoneBut, GFUI_ENABLE);
+	else
+	   GfuiEnable(ScrHandle, NextBut, GFUI_ENABLE);
+    }
 }
 
 
@@ -234,17 +250,24 @@ onActivate(void * /* dummy */)
 	GfuiLabelSetText(ScrHandle, LabMinId[i], "");
  	GfuiLabelSetText(ScrHandle, LabMaxId[i], "");
     }
+
+    GfuiEnable(ScrHandle, CancelBut, GFUI_ENABLE);
+    if (DoneBut)
+	GfuiEnable(ScrHandle, DoneBut, GFUI_DISABLE);
+    else
+	GfuiEnable(ScrHandle, NextBut, GFUI_DISABLE);
 }
 
 
 void *
-JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
+JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd)
 {
     int i;
     char pszBuf[64];
 
     Cmd = cmd;
     MaxCmd = maxcmd;
+    PrevMenuHandle = prevMenu;
     NextMenuHandle = nextMenu;
 
     if (ScrHandle) {
@@ -271,9 +294,18 @@ JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd)
     // Create instruction variable label.
     InstId = GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "instructionlabel");
     
-    // Create Back and Reset buttons.
-    GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
+    // Create Cancel and Reset buttons.
     GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "resetbutton", NULL, onActivate);
+
+    if (nextMenu != NULL) {
+	NextBut = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "nextbutton", NULL, onNext);
+	GfuiEnable(ScrHandle, NextBut, GFUI_DISABLE);
+    } else {
+	DoneBut = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "donebutton", NULL, onNext);
+	GfuiEnable(ScrHandle, DoneBut, GFUI_DISABLE);
+    }
+
+    CancelBut = GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "cancelbutton", NULL, onNext);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(menuXMLDescHdle);

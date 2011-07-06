@@ -30,7 +30,7 @@
 
 
 /* nextMenu : the menu to go to when "next" button is pressed */
-extern void *JoyCalMenuInit(void *nextMenu, tCmdInfo *cmd, int maxcmd);
+extern void *JoyCalMenuInit(void *prevMenu, void *nextMenu, tCmdInfo *cmd, int maxcmd);
 
 #endif /* _JOYSTICKCONFIG_H_ */ 
 
