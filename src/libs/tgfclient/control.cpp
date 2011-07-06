@@ -69,6 +69,17 @@ static const char *GfJoyAxis[] = {
     "AXIS0-7", "AXIS1-7", "AXIS2-7", "AXIS3-7", "AXIS4-7", "AXIS5-7", "AXIS6-7", "AXIS7-7", "AXIS8-7", "AXIS9-7", "AXIS10-7", "AXIS11-7"
 };
 
+static const char *GfJoyAtob[] = {
+    "ATOB0-0", "ATOB1-0", "ATOB2-0", "ATOB3-0", "ATOB4-0", "ATOB5-0", "ATOB6-0", "ATOB7-0", "ATOB8-0", "ATOB9-0", "ATOB10-0", "ATOB11-0",
+    "ATOB0-1", "ATOB1-1", "ATOB2-1", "ATOB3-1", "ATOB4-1", "ATOB5-1", "ATOB6-1", "ATOB7-1", "ATOB8-1", "ATOB9-1", "ATOB10-1", "ATOB11-1",
+    "ATOB0-2", "ATOB1-2", "ATOB2-2", "ATOB3-2", "ATOB4-2", "ATOB5-2", "ATOB6-2", "ATOB7-2", "ATOB8-2", "ATOB9-2", "ATOB10-2", "ATOB11-2",
+    "ATOB0-3", "ATOB1-3", "ATOB2-3", "ATOB3-3", "ATOB4-3", "ATOB5-3", "ATOB6-3", "ATOB7-3", "ATOB8-3", "ATOB9-3", "ATOB10-3", "ATOB11-3",
+    "ATOB0-4", "ATOB1-4", "ATOB2-4", "ATOB3-4", "ATOB4-4", "ATOB5-4", "ATOB6-4", "ATOB7-4", "ATOB8-4", "ATOB9-4", "ATOB10-4", "ATOB11-4",
+    "ATOB0-5", "ATOB1-5", "ATOB2-5", "ATOB3-5", "ATOB4-5", "ATOB5-5", "ATOB6-5", "ATOB7-5", "ATOB8-5", "ATOB9-5", "ATOB10-5", "ATOB11-5",
+    "ATOB0-6", "ATOB1-6", "ATOB2-6", "ATOB3-6", "ATOB4-6", "ATOB5-6", "ATOB6-6", "ATOB7-6", "ATOB8-6", "ATOB9-6", "ATOB10-6", "ATOB11-6",
+    "ATOB0-7", "ATOB1-7", "ATOB2-7", "ATOB3-7", "ATOB4-7", "ATOB5-7", "ATOB6-7", "ATOB7-7", "ATOB8-7", "ATOB9-7", "ATOB10-7", "ATOB11-7"
+};
+
 static const char *GfMouseBtn[] = {"MOUSE_LEFT_BTN", "MOUSE_MIDDLE_BTN", "MOUSE_RIGHT_BTN"}; 
 
 static const char *GfMouseAxis[] = {"MOUSE_LEFT", "MOUSE_RIGHT", "MOUSE_UP", "MOUSE_DOWN"};
@@ -111,6 +122,7 @@ static tgfKeyBinding GfKey[] = {
 
 static int gfmaxJoyButton	= sizeof(GfJoyBtn)	/ sizeof(GfJoyBtn[0]);
 static int gfmaxJoyAxis		= sizeof(GfJoyAxis)	/ sizeof(GfJoyAxis[0]);
+static int gfmaxJoyAtob		= sizeof(GfJoyAtob)	/ sizeof(GfJoyAtob[0]);
 static int gfmaxMouseButton	= sizeof(GfMouseBtn)	/ sizeof(GfMouseBtn[0]);
 static int gfmaxMouseAxis	= sizeof(GfMouseAxis)	/ sizeof(GfMouseAxis[0]);
 static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
@@ -148,6 +160,13 @@ GfctrlGetRefByName(const char *name)
 	if (strcmp(name, GfJoyAxis[i]) == 0) {
 	    ref.index = i;
 	    ref.type = GFCTRL_TYPE_JOY_AXIS;
+	    return &ref;
+	}
+    }
+    for (i = 0; i < gfmaxJoyAtob; i++) {
+	if (strcmp(name, GfJoyAtob[i]) == 0) {
+	    ref.index = i;
+	    ref.type = GFCTRL_TYPE_JOY_ATOB;
 	    return &ref;
 	}
     }
@@ -202,6 +221,13 @@ GfctrlGetNameByRef(int type, int index)
     case GFCTRL_TYPE_JOY_AXIS:
 	if (index < gfmaxJoyAxis) {
 	    return GfJoyAxis[index];
+	} else {
+	    return NULL;
+	}
+	break;
+    case GFCTRL_TYPE_JOY_ATOB:
+	if (index < gfmaxJoyAtob) {
+	    return GfJoyAtob[index];
 	} else {
 	    return NULL;
 	}

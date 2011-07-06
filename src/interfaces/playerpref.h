@@ -38,18 +38,37 @@
 #define HM_ATT_CONTROL		"control"
 
 #define HM_ATT_UP_SHFT		"up shift"
+#define HM_ATT_UP_SHFT_MIN	"up shift min"
+#define HM_ATT_UP_SHFT_MAX	"up shift max"
 #define HM_ATT_DN_SHFT		"down shift"
+#define HM_ATT_DN_SHFT_MIN	"down shift min"
+#define HM_ATT_DN_SHFT_MAX	"down shift max"
 #define HM_ATT_ASR_CMD		"ASR cmd"
+#define HM_ATT_ASR_MIN		"ASR min"
+#define HM_ATT_ASR_MAX		"ASR max"
 #define HM_ATT_ABS_CMD		"ABS cmd"
+#define HM_ATT_ABS_MIN		"ABS min"
+#define HM_ATT_ABS_MAX		"ABS max"
 #define HM_ATT_EBRAKE_CMD	"ebrake cmd"
+#define HM_ATT_EBRAKE_MIN	"ebrake min"
+#define HM_ATT_EBRAKE_MAX	"ebrake max"
 
 #define HM_ATT_LIGHT1_CMD	"Light1 cmd"
+#define HM_ATT_LIGHT1_MIN	"Light1 min"
+#define HM_ATT_LIGHT1_MAX	"Light1 max"
 #define HM_ATT_SPDLIM_CMD	"Speed Limiter"
+#define HM_ATT_SPDLIM_MIN	"Speed Limiter min"
+#define HM_ATT_SPDLIM_MAX	"Speed Limiter max"
 
 #define HM_ATT_AUTOREVERSE	"auto reverse"
 
 #define HM_ATT_GEAR_R		"reverse gear"
+#define HM_ATT_GEAR_R_MIN	"reverse gear min"
+#define HM_ATT_GEAR_R_MAX	"reverse gear max"
 #define HM_ATT_GEAR_N		"neutral gear"
+#define HM_ATT_GEAR_N_MIN	"neutral gear min"
+#define HM_ATT_GEAR_N_MAX	"neutral gear max"
+
 #define HM_ATT_GEAR_1		"1st gear"
 #define HM_ATT_GEAR_2		"2nd gear"
 #define HM_ATT_GEAR_3		"3rd gear"
@@ -93,7 +112,6 @@
 #define HM_ATT_BRAKE_SENS	"brake sensitivity"
 #define HM_ATT_BRAKE_POW	"brake power"
 #define HM_ATT_BRAKE_DEAD	"brake dead zone"
-#define HM_ATT_EBRAKE		"ebrake"
 
 #define HM_ATT_CLUTCH		"clutch"
 #define HM_ATT_CLUTCH_MIN	"clutch min"
@@ -111,7 +129,11 @@
 #define HM_ATT_HBOX_Y_MAX	"hbox y max"
 
 #define HM_ATT_LEFTGLANCE       "left glance"
+#define HM_ATT_L_GLANCE_MIN     "left glance min"
+#define HM_ATT_L_GLANCE_MAX     "left glance max"
 #define HM_ATT_RIGHTGLANCE      "right glance"
+#define HM_ATT_R_GLANCE_MIN     "right glance min"
+#define HM_ATT_R_GLANCE_MAX     "right glance max"
 
 #define	HM_SECT_PREF	"Preferences"
 
@@ -134,8 +156,10 @@
 #define HM_VAL_MOUSE	"mouse"
 #define HM_VAL_KEYBOARD	"keyboard"
 
-#define HM_ATT_PREF_BUT  0
-#define HM_ATT_PREF_AXIS 1
+#define HM_ATT_JOY_PREF_BUT  0
+#define HM_ATT_JOY_PREF_AXIS 1
+#define HM_ATT_JOY_REQ_BUT   2
+#define HM_ATT_JOY_REQ_AXIS  3
 
 #endif /* _PLAYERPREF_H_ */ 
 

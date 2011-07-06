@@ -592,9 +592,21 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		lastKeyUpdate = s->currentTime;
 	}
 
+	// Perform mapping of axis->buttons functions
+	for (dummy=0; dummy <= CMD_RIGHTGLANCE; dummy++) {
+	    if (cmd[dummy].type == GFCTRL_TYPE_JOY_ATOB) {
+		if (joyInfo->ax[cmd[dummy].val] >= cmd[dummy].min && joyInfo->ax[cmd[dummy].val] <= cmd[dummy].max) {
+		   // Abuse deadZone to store state; 1=just pressed, 2=held
+		   if (cmd[dummy].deadZone < 2) cmd[dummy].deadZone++;
+		} else cmd[dummy].deadZone = 0;
+	    }
+	}
+	
+
 	if ((cmd[CMD_ABS].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_ABS].val])
 	    || (cmd[CMD_ABS].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_ABS].val])
-	    || (cmd[CMD_ABS].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_ABS].val)].edgeUp))
+	    || (cmd[CMD_ABS].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_ABS].val)].edgeUp)
+	    || (cmd[CMD_ABS].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_ABS].deadZone == 1))
 	{
 		HCtx[idx]->paramAbs = !HCtx[idx]->paramAbs;
 		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
@@ -604,7 +616,8 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	if ((cmd[CMD_ASR].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_ASR].val])
 	    || (cmd[CMD_ASR].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_ASR].val])
-	    || (cmd[CMD_ASR].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_ASR].val)].edgeUp))
+	    || (cmd[CMD_ASR].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_ASR].val)].edgeUp)
+	    || (cmd[CMD_ASR].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_ASR].deadZone == 1))
 	{
 		HCtx[idx]->paramAsr = !HCtx[idx]->paramAsr;
 		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
@@ -617,7 +630,8 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	if ((cmd[CMD_SPDLIM].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_SPDLIM].val])
 	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_SPDLIM].val])
-	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_SPDLIM].val)].edgeUp))
+	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_SPDLIM].val)].edgeUp)
+	    || (cmd[CMD_SPDLIM].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_SPDLIM].deadZone == 1))
 	{
 		speedLimiter = !speedLimiter;
 	}
@@ -626,7 +640,8 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	if ((cmd[CMD_LIGHT1].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_LIGHT1].val])
 	    || (cmd[CMD_LIGHT1].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_LIGHT1].val])
-	    || (cmd[CMD_LIGHT1].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LIGHT1].val)].edgeUp))
+	    || (cmd[CMD_LIGHT1].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LIGHT1].val)].edgeUp)
+	    || (cmd[CMD_LIGHT1].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_LIGHT1].deadZone == 1))
 	{
 		if (HCtx[idx]->lightCmd & RM_LIGHT_HEAD1) {
 			HCtx[idx]->lightCmd &= ~(RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2);
@@ -784,12 +799,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	if ((cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_LEFTGLANCE].val])
 	    || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_LEFTGLANCE].val])
-	    || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LEFTGLANCE].val)].state))
+	    || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_LEFTGLANCE].val)].state)
+	    || (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_LEFTGLANCE].deadZone != 0))
 	{
 		newGlance = newGlance - GLANCERATE * s->deltaTime;
 	} else if ((cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_RIGHTGLANCE].val])
 	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_RIGHTGLANCE].val])
-	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_RIGHTGLANCE].val)].state))
+	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_RIGHTGLANCE].val)].state)
+	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_RIGHTGLANCE].deadZone != 0))
 	{
 		newGlance = newGlance + GLANCERATE * s->deltaTime;
 	} else {
@@ -891,7 +908,8 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	// Ebrake here so that it can override the clutch control
 	if ((cmd[CMD_EBRAKE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_EBRAKE].val])
 	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_EBRAKE].val])
-	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_EBRAKE].val)].state == GFUI_KEY_DOWN))
+	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_EBRAKE].val)].state == GFUI_KEY_DOWN)
+	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_EBRAKE].deadZone != 0))
 	{
 		car->_ebrakeCmd = 1;
 		if (HCtx[idx]->autoClutch)
@@ -1164,7 +1182,8 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		/* Up shifting command */
 		if ((cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_UP_SHFT].val])
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_UP_SHFT].val])
-		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp))
+		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp)
+		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_UP_SHFT].deadZone == 1))
 		{
 			if (HCtx[idx]->seqShftAllowNeutral || car->_gearCmd > -1)
 				car->_gearCmd++;
@@ -1173,7 +1192,8 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		/* Down shifting command */
 		if ((cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_DN_SHFT].val])
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_DN_SHFT].val])
-		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp))
+		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp)
+		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_DN_SHFT].deadZone == 1))
 		{
 			if (HCtx[idx]->seqShftAllowNeutral || car->_gearCmd > 1)
 				car->_gearCmd--;
@@ -1182,7 +1202,8 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		/* Neutral gear command */
 		if ((cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_N].val])
 		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_N].val])
-		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_N].val)].edgeUp))
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_N].val)].edgeUp)
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_N].deadZone == 1))
 		{
 			car->_gearCmd = 0;
 		}
@@ -1190,7 +1211,8 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		/* Reverse gear command */
 		if ((cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_R].val])
 		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_R].val])
-		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_R].val)].edgeUp))
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_R].val)].edgeUp)
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_R].deadZone == 1))
 		{
 			/* Only allow Reverse to be selected at low speed (~40kmph) or from neutral */
 			if (car->_speed_x < 10 || car->_gear == 0) 
@@ -1308,7 +1330,8 @@ drive_at(int index, tCarElt* car, tSituation *s)
 		/* manual shift */
 		if ((cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_UP_SHFT].val])
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_UP_SHFT].val])
-		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp))
+		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp)
+		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_UP_SHFT].deadZone == 1))
 		{
 			car->_gearCmd++;
 			HCtx[idx]->manual = true;
@@ -1316,7 +1339,8 @@ drive_at(int index, tCarElt* car, tSituation *s)
 
 		if ((cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_DN_SHFT].val])
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_DN_SHFT].val])
-		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp))
+		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp)
+		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_DN_SHFT].deadZone == 1))
 		{
 			car->_gearCmd--;
 			HCtx[idx]->manual = true;
@@ -1338,7 +1362,8 @@ drive_at(int index, tCarElt* car, tSituation *s)
 		for (int i = CMD_GEAR_R; i < CMD_GEAR_2; i++) {
 			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[i].val])
 			    || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[i].val])
-			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].edgeUp))
+			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].edgeUp)
+			    || (cmd[i].type == GFCTRL_TYPE_JOY_ATOB && cmd[i].deadZone == 1))
 			{
 				car->_gearCmd = i - CMD_GEAR_N;
 				HCtx[idx]->manual = false;

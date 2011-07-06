@@ -37,6 +37,7 @@
 #include "controlconfig.h"
 #include "mouseconfig.h"
 #include "joystickconfig.h"
+#include "joy2butconfig.h"
 
 
 static void *ScrHandle = NULL;
@@ -48,30 +49,30 @@ static char	CurrentSection[256];
 
 /* Control command information */
 static tCmdInfo Cmd[] = {
-    {HM_ATT_LEFTSTEER,  {1,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_LEFTSTEER_MIN,  0, HM_ATT_LEFTSTEER_MAX,  0, HM_ATT_LEFTSTEER_POW,  1.0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_RIGHTSTEER, {2,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_RIGHTSTEER_MIN, 0, HM_ATT_RIGHTSTEER_MAX, 0, HM_ATT_RIGHTSTEER_POW, 1.0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_THROTTLE,   {1,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_THROTTLE_MIN,   0, HM_ATT_THROTTLE_MAX,   0, HM_ATT_THROTTLE_POW,   1.0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_BRAKE,      {2,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_BRAKE_MIN,      0, HM_ATT_BRAKE_MAX,      0, HM_ATT_BRAKE_POW,      1.0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_CLUTCH,     {3,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_CLUTCH_MIN,     0, HM_ATT_CLUTCH_MAX,     0, HM_ATT_CLUTCH_POW,     1.0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_ABS_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_ASR_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_SPDLIM_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_LIGHT1_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_R,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_N,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_DN_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_UP_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_1,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_2,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_3,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_4,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_5,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_HBOX_X,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_X_MIN, -1, HM_ATT_HBOX_X_MAX, 1, 0, 0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_HBOX_Y,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_Y_MIN, -1, HM_ATT_HBOX_Y_MAX, 1, 0, 0, 1, HM_ATT_PREF_AXIS, 0},
-    {HM_ATT_LEFTGLANCE, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0},
-    {HM_ATT_RIGHTGLANCE,{-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_PREF_BUT, 0}
+    {HM_ATT_LEFTSTEER,  {1,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_LEFTSTEER_MIN,  0, HM_ATT_LEFTSTEER_MAX,  0, HM_ATT_LEFTSTEER_POW,  1.0, 1, HM_ATT_JOY_PREF_AXIS, 0},
+    {HM_ATT_RIGHTSTEER, {2,  GFCTRL_TYPE_MOUSE_AXIS},   0, 0, HM_ATT_RIGHTSTEER_MIN, 0, HM_ATT_RIGHTSTEER_MAX, 0, HM_ATT_RIGHTSTEER_POW, 1.0, 1, HM_ATT_JOY_PREF_AXIS, 0},
+    {HM_ATT_THROTTLE,   {1,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_THROTTLE_MIN,   0, HM_ATT_THROTTLE_MAX,   0, HM_ATT_THROTTLE_POW,   1.0, 1, HM_ATT_JOY_PREF_AXIS, 0},
+    {HM_ATT_BRAKE,      {2,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_BRAKE_MIN,      0, HM_ATT_BRAKE_MAX,      0, HM_ATT_BRAKE_POW,      1.0, 1, HM_ATT_JOY_PREF_AXIS, 0},
+    {HM_ATT_CLUTCH,     {3,  GFCTRL_TYPE_MOUSE_BUT},    0, 0, HM_ATT_CLUTCH_MIN,     0, HM_ATT_CLUTCH_MAX,     0, HM_ATT_CLUTCH_POW,     1.0, 1, HM_ATT_JOY_PREF_AXIS, 0},
+    {HM_ATT_ABS_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_ABS_MIN,        0, HM_ATT_ABS_MAX,        0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_ASR_CMD,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_ASR_MIN,        0, HM_ATT_ASR_MAX,        0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_SPDLIM_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_SPDLIM_MIN,     0, HM_ATT_SPDLIM_MAX,     0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_LIGHT1_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_LIGHT1_MIN,     0, HM_ATT_LIGHT1_MAX,     0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_R,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_GEAR_R_MIN,     0, HM_ATT_GEAR_R_MAX,     0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_N,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_GEAR_N_MIN,     0, HM_ATT_GEAR_N_MAX,     0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_DN_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_DN_SHFT_MIN,    0, HM_ATT_DN_SHFT_MAX,    0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_UP_SHFT,    {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_UP_SHFT_MIN,    0, HM_ATT_UP_SHFT_MAX,    0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_1,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_2,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_3,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_4,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_5,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_GEAR_6,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, 0, 0, 0, 0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_EBRAKE_MIN,      0, HM_ATT_EBRAKE_MAX,    0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_HBOX_X,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_X_MIN, -1, HM_ATT_HBOX_X_MAX, 1, 0, 0, 1, HM_ATT_JOY_REQ_AXIS, 0},
+    {HM_ATT_HBOX_Y,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_Y_MIN, -1, HM_ATT_HBOX_Y_MAX, 1, 0, 0, 1, HM_ATT_JOY_REQ_AXIS, 0},
+    {HM_ATT_LEFTGLANCE, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_L_GLANCE_MIN,    0, HM_ATT_L_GLANCE_MAX,  0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
+    {HM_ATT_RIGHTGLANCE,{-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_R_GLANCE_MIN,    0, HM_ATT_R_GLANCE_MAX,  0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0}
 };
 
 static const int MaxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
@@ -136,6 +137,7 @@ static int AcceptMouseClicks = 1;
 
 static int MouseCalNeeded;
 static int JoyCalNeeded;
+static int Joy2butCalNeeded;
 
 static void
 onSteerSensChange(void * /* dummy */)
@@ -232,6 +234,7 @@ updateButtonText(void)
     /* No calibration / no dead zone needed for the moment (but let's check this ...) */
     MouseCalNeeded = 0;
     JoyCalNeeded   = 0;
+    Joy2butCalNeeded   = 0;
 
     /* For each control: */
     for (cmdInd = 0; cmdInd < MaxCmd; cmdInd++) {
@@ -249,6 +252,8 @@ updateButtonText(void)
 	    MouseCalNeeded = 1;
 	} else if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_JOY_AXIS) {
 	    JoyCalNeeded = 1;
+	} else if (Cmd[cmdInd].ref.type == GFCTRL_TYPE_JOY_ATOB) {
+	    Joy2butCalNeeded = 1;
 	}
     }
 
@@ -278,7 +283,7 @@ updateButtonText(void)
     /* Show / hide mouse / joystick calibration button,
        according to the detected input device actions */
     GfuiVisibilitySet(ScrHandle, CalibrateButtonId, 
-		      MouseCalNeeded|JoyCalNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
+		      MouseCalNeeded|JoyCalNeeded|Joy2butCalNeeded ? GFUI_VISIBLE : GFUI_INVISIBLE);
 	
     /* Show / hide dead zone label /editbox,
        according to the detected input device actions */
@@ -399,7 +404,7 @@ IdleWaitForInput(void)
             axis = getMovedAxis(index);
 
 	    /* Allow a little extra time to detect button */
-	    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_PREF_BUT) {
+	    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_AXIS) {
 		GfSleep(0.1);
    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 	    }
@@ -408,30 +413,25 @@ IdleWaitForInput(void)
 	    for (i = 0, mask = 1; i < 32; i++, mask *= 2) {
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Allow a little extra time to detect axis movement */
-		    if (axis == -1 && Cmd[CurrentCmd].pref != HM_ATT_PREF_AXIS) {
+		    if (axis == -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT) {
     			GfSleep(0.1);
 	    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
             		axis = getMovedAxis(index);
 		    }
 
-		    /* Give preference to axis if happening at same time */
-		    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_PREF_BUT) {
-			Cmd[CurrentCmd].pref = HM_ATT_PREF_BUT;
+		    /* Choose to use AXIS type... */
+		    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_PREF_BUT && 
+			    Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT) {
+			if (Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_AXIS)
+			    Cmd[CurrentCmd].pref = HM_ATT_JOY_PREF_BUT;
+
 			Cmd[CurrentCmd].butIgnore = i + 32 * index;
 
-			GfuiApp().eventLoop().setRecomputeCB(0);
-			InputWaited = 0;
-			Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
-			Cmd[CurrentCmd].ref.index = axis;
-			str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
-			GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
-			GfuiApp().eventLoop().postRedisplay();
-			updateButtonText();
-			return;
+			goto configure_for_joy_axis;
 		    }
 
-		    if (axis != -1 && Cmd[CurrentCmd].pref == HM_ATT_PREF_BUT) {
-			Cmd[CurrentCmd].pref = HM_ATT_PREF_AXIS;
+		    if (axis != -1 && Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_BUT) {
+			Cmd[CurrentCmd].pref = HM_ATT_JOY_PREF_AXIS;
 		    }
 		    Cmd[CurrentCmd].butIgnore = 0;
 
@@ -450,12 +450,20 @@ IdleWaitForInput(void)
 	    }
 	    JoyButtons[index] = b;
 
-	    /* Axis movement detected, but without button */
+	    /* Axis movement detected without button */
 	    if (axis != -1) {
 		Cmd[CurrentCmd].butIgnore = 0;
+
+configure_for_joy_axis:
 		GfuiApp().eventLoop().setRecomputeCB(0);
 		InputWaited = 0;
-		Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
+
+		if (Cmd[CurrentCmd].pref == HM_ATT_JOY_REQ_BUT) 
+		    /* Map axis to a button type */
+		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_ATOB;
+		else
+		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_AXIS;
+
 		Cmd[CurrentCmd].ref.index = axis;
 		str = GfctrlGetNameByRef(GFCTRL_TYPE_JOY_AXIS, axis);
 		GfuiButtonSetText (ScrHandle, Cmd[CurrentCmd].Id, str);
@@ -565,6 +573,9 @@ DevCalibrate(void * /* dummy */)
     ReloadValues = 0;
 
     // Create calibration "wizard" (1 menu for each device to calibrate
+    if (Joy2butCalNeeded)
+	nextCalMenu = Joy2butCalMenuInit(ScrHandle, nextCalMenu, Cmd, MaxCmd);
+
     if (JoyCalNeeded)
 	nextCalMenu = JoyCalMenuInit(ScrHandle, nextCalMenu, Cmd, MaxCmd);
 

@@ -588,6 +588,7 @@ TGFCLIENT_API unsigned GfTexReadTexture(const char* filename, int* pWidth = 0, i
 #define GFCTRL_TYPE_KEYBOARD            3
 #define GFCTRL_TYPE_MOUSE_BUT           4
 #define GFCTRL_TYPE_MOUSE_AXIS          5
+#define GFCTRL_TYPE_JOY_ATOB            6
 
 typedef struct
 {
