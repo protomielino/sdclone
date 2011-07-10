@@ -84,7 +84,7 @@ gfuiRightArrow(void *idv)
 
 int
 GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
-				   int align, int style, const char *pszText,
+				   const char *pszText, int maxlen,
 				   const float *fgColor, const float *fgFocusColor,
 				   void *userData, tfuiComboboxCallback onChange, 
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
@@ -111,86 +111,45 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	combobox->pInfo->userData = userData;
 	combobox->scr = scr;
 
-	const int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-	
-    switch (align) {
-		case GFUI_ALIGN_HR_VB:
-			object->xmin = x - width;
-			object->xmax = x;
-			object->ymin = y;
-			object->ymax = y + height;
-			break;
-		case GFUI_ALIGN_HR_VC:
-			object->xmin = x - width;
-			object->xmax = x;
-			object->ymin = y - height / 2;
-			object->ymax = y + height / 2;
-			break;
-		case GFUI_ALIGN_HR_VT:
-			object->xmin = x - width;
-			object->xmax = x;
-			object->ymin = y - height;
-			object->ymax = y;
-			break;
-		case GFUI_ALIGN_HC_VB:
-			object->xmin = x - width / 2;
-			object->xmax = x + width / 2;
-			object->ymin = y;
-			object->ymax = y + height;
-			break;
-		case GFUI_ALIGN_HC_VC:
-			object->xmin = x - width / 2;
-			object->xmax = x + width / 2;
-			object->ymin = y - height / 2;
-			object->ymax = y + height / 2;
-			break;
-		case GFUI_ALIGN_HC_VT:
-			object->xmin = x - width / 2;
-			object->xmax = x + width / 2;
-			object->ymin = y - height;
-			object->ymax = y;
-			break;
-		case GFUI_ALIGN_HL_VB:
-			object->xmin = x;
-			object->xmax = x + width;
-			object->ymin = y;
-			object->ymax = y + height;
-			break;
-		case GFUI_ALIGN_HL_VC:
-			object->xmin = x;
-			object->xmax = x + width;
-			object->ymin = y - height / 2;
-			object->ymax = y + height / 2;
-			break;
-		case GFUI_ALIGN_HL_VT:
-			object->xmin = x;
-			object->xmax = x + width;
-			object->ymin = y - height;
-			object->ymax = y;
-			break;
-		default:
-			break;
-    }
-
-	// Initialize the label child.
-	int xm = object->xmin + (object->xmax - object->xmin) / 2;
-	int ym = object->ymin + (object->ymax - object->ymin) / 2;
-
-	gfuiLabelInit(&combobox->label, pszText, 100, xm, ym, GFUI_ALIGN_HC_VC, 0,
-				  font, 0, fgColor, 0, fgFocusColor, 0, 0, 0);
-
 	// Initialize the left and right arrow button children.
+	// Warning: All the arrow images are supposed to be the same size.
 	// TODO: Make graphic properties XML-customizable (images, ...)
 	gfuiGrButtonInit(&combobox->leftButton,
 					 "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
 					 "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
-					 object->xmin, ym, GFUI_ALIGN_HL_VC, 0, 0, GFUI_MOUSE_UP,
+					 x, y, 0, 0, GFUI_MOUSE_UP,
 					 (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
 	gfuiGrButtonInit(&combobox->rightButton,
 					 "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
 					 "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
-					 object->xmax, ym, GFUI_ALIGN_HR_VC, 0, 0, GFUI_MOUSE_UP,
+					 x + width - combobox->leftButton.width, y, 0, 0, GFUI_MOUSE_UP,
 					 (void*)(object->id), gfuiRightArrow, 0, 0, 0);
+
+	// Compute total height (text or buttons)
+	int height = gfuiFont[font]->getHeight();
+	if (height < combobox->leftButton.height)
+		height = combobox->leftButton.height;
+
+	// Fix button y coordinate if text is higher than the buttons
+	else
+		combobox->leftButton.y = combobox->rightButton.y =
+			y + (gfuiFont[font]->getHeight() - combobox->leftButton.height) / 2;
+
+	// Bounding box
+	object->xmin = x;
+	object->xmax = x + width;
+	object->ymin = y;
+	object->ymax = y + height;
+
+	// Initialize the label child (beware of y if the buttons are higher than the text).
+	int yl = y;
+	if (height > gfuiFont[font]->getHeight())
+		yl += (height -  gfuiFont[font]->getHeight()) / 2;
+		
+	gfuiLabelInit(&combobox->label, pszText, maxlen,
+				  x + combobox->leftButton.width, yl,
+				  width - 2 * combobox->leftButton.width, GFUI_ALIGN_HC,
+				  font, 0, fgColor, 0, fgFocusColor, 0, 0, 0);
 
 	// Add the combo control to the display list.
     gfuiAddObject(screen, object);
@@ -201,7 +160,8 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 void
 gfuiDrawCombobox(tGfuiObject *obj)
 {
-	gfuiLabelDraw(&obj->u.combobox.label, obj->focus);
+	gfuiLabelDraw(&obj->u.combobox.label,
+				  obj->focus ? obj->u.combobox.label.fgFocusColor : obj->u.combobox.label.fgColor);
 	gfuiGrButtonDraw(&obj->u.combobox.leftButton, obj->state, obj->focus);
 	gfuiGrButtonDraw(&obj->u.combobox.rightButton, obj->state, obj->focus);
 }

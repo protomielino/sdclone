@@ -17,8 +17,6 @@
 
 #include <cstdlib>
 
-#include "tgfclient.h"
-
 #include "gui.h"
 
 
@@ -32,14 +30,19 @@
     @param	h	Height of the image on the screen
     @param	pszprogressbackimg	Filename on the image use for behind progress bar (png)
     @param	pszprogressbarimg	Filename on the image use for progress bar will be scaled bar (png)
-	@param align image alignment
-    @return	Image Id
+    @param	min	Min value
+    @param	max	Max value
+    @param	value	Initial value
+    @param	userDataOnFocus	Parameter to the Focus (and lost) callback
+    @param	onFocus		Focus callback function
+    @param	onFocusLost	Focus Lost callback function
+	@return	Control Id
 		<br>-1 Error
     @warning	the image must be square and its size must be a power of 2.
 */
 int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
 						  const char *pszProgressbackImg, const char *progressbarimg,
-						  int align, float min, float max, float value, 
+						  float min, float max, float value, 
 						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	tGfuiProgressbar *progress;
@@ -72,64 +75,10 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
     progress->onFocus = onFocus;
     progress->onFocusLost = onFocusLost;
 
-    switch (align) {
-    case GFUI_ALIGN_HR_VB:
-	object->xmin = x - w;
-	object->xmax = x;
-	object->ymin = y;
-	object->ymax = y + h;
-	break;
-    case GFUI_ALIGN_HR_VC:
-	object->xmin = x - w;
-	object->xmax = x;
-	object->ymin = y - h / 2;
-	object->ymax = y + h / 2;
-	break;
-    case GFUI_ALIGN_HR_VT:
-	object->xmin = x - w;
-	object->xmax = x;
-	object->ymin = y - h;
-	object->ymax = y;
-	break;
-    case GFUI_ALIGN_HC_VB:
-	object->xmin = x - w / 2;
-	object->xmax = x + w / 2;
-	object->ymin = y;
-	object->ymax = y + h;
-	break;
-    case GFUI_ALIGN_HC_VC:
-	object->xmin = x - w / 2;
-	object->xmax = x + w / 2;
-	object->ymin = y - h / 2;
-	object->ymax = y + h / 2;
-	break;
-    case GFUI_ALIGN_HC_VT:
-	object->xmin = x - w / 2;
-	object->xmax = x + w / 2;
-	object->ymin = y - h;
-	object->ymax = y;
-	break;
-    case GFUI_ALIGN_HL_VB:
 	object->xmin = x;
 	object->xmax = x + w;
 	object->ymin = y;
 	object->ymax = y + h;
-	break;
-    case GFUI_ALIGN_HL_VC:
-	object->xmin = x;
-	object->xmax = x + w;
-	object->ymin = y - h / 2;
-	object->ymax = y + h / 2;
-	break;
-    case GFUI_ALIGN_HL_VT:
-	object->xmin = x;
-	object->xmax = x + w;
-	object->ymin = y - h;
-	object->ymax = y;
-	break;
-    default:
-	break;
-    }
 
 	gfuiAddObject(screen, object);
 

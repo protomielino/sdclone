@@ -607,8 +607,8 @@ RmResScreenInit()
 		rmResRowColor[i] = rmColors[0];
 		rmResRowLabelId[i] =
 			GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Row", true, // from template
-									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_ALIGN,
-									   GFUI_TPL_MAXLEN, rmResRowColor[i]);
+									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_WIDTH,
+									   GFUI_TPL_ALIGN, GFUI_TPL_MAXLEN, rmResRowColor[i]);
 		y -= yRowShift;
     }
 
@@ -762,7 +762,7 @@ RmResScreenRemoveText(int row)
 //RmResShowCont()
 //{
 //    GfuiButtonCreate(rmResScreenHdle, "Continue", GFUI_FONT_LARGE_C,
-//					 320, 15, GFUI_BTNSZ, GFUI_ALIGN_HC_VB, 0, 0, rmResCont,
+//					 320, 15, GFUI_BTNSZ, GFUI_ALIGN_HC, 0, 0, rmResCont,
 //					 NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 //    GfuiAddKey(rmResScreenHdle, GFUIK_RETURN,  "Continue", 0, rmResCont, NULL);
 //    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Continue", 0, rmResCont, NULL);

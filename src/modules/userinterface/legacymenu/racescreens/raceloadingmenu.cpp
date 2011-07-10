@@ -102,8 +102,8 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
 		// Create the control from the template.
 		TextLineIds[i] =
 			GfuiMenuCreateLabelControl(HScreen, hmenu, "line", true, // from template
-									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_ALIGN,
-									   GFUI_TPL_MAXLEN, FGColors[i]);
+									   "", GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_WIDTH,
+									   GFUI_TPL_ALIGN, GFUI_TPL_MAXLEN, FGColors[i]);
 
 		// Next line if not last.
 		y -= yLineShift;

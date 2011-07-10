@@ -392,12 +392,12 @@ RmRacemanMenu()
 
 	// Create Configure race, Configure players and Back buttons.
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigureRaceButton",
-						NULL, RmConfigureRace);
+								NULL, RmConfigureRace);
 	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "ConfigurePlayersButton",
-						NULL, rmOnPlayerConfig);
+								NULL, rmOnPlayerConfig);
 	
-	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "PreviousButton",
-						RmRaceSelectMenuHandle, GfuiScreenActivate);
+	GfuiMenuCreateButtonControl(ScrHandle, menuXMLDescHdle, "BackButton",
+								RmRaceSelectMenuHandle, GfuiScreenActivate);
 
 	// Create "Load / Resume / Save race" buttons.
 	SaveRaceConfigButtonId =

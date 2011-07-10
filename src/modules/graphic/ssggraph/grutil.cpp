@@ -225,23 +225,24 @@ grSsgLoadTexStateEx(const char *img, const char *filepath,
 /*
  * 
  * name: grWriteTime
- * Formats and outputs the time as a string.
+ * Formats and outputs the time as a right aligned string.
  * 
  * @param color: colour to use
  * @param font: font to use
- * @param x: X coord to start output
- * @param y: Y coord to start output
+ * @param x: X coord of the left side of the bounding box
+ * @param y: Y coord to bottom side of the bounding box
+ * @param width: width of the bounding box
  * @param sec: time to format, in seconds
  * @param sgn: whether use +/- signs or not
  * 
  * @return
  */
-void grWriteTime(float *color, int font, int x, int y, tdble sec, int sgn)
+void grWriteTime(float *color, int font, int x, int y, int width, tdble sec, int sgn)
 {
 	char  buf[256];
 	
 	grWriteTimeBuf(buf, sec, sgn);
-	GfuiDrawString(buf, color, font, x, y, GFUI_ALIGN_HR_VB);
+	GfuiDrawString(buf, color, font, x, y, width, GFUI_ALIGN_HR);
 }
 
 
@@ -271,19 +272,19 @@ void grWriteTimeBuf(char *buf, tdble sec, int sgn)
 		}
     }
 
-    int h = (int)(sec / 3600.0);
+    const int h = (int)(sec / 3600.0);
     sec -= 3600 * h;
-    int m = (int)(sec / 60.0);
+    const int m = (int)(sec / 60.0);
     sec -= 60 * m;
-    int s = (int)(sec);
+    const int s = (int)(sec);
     sec -= s;
-    int c = (int)floor((sec) * 100.0);
+    const int ms = (int)floor(sec * 1000.0);
     if (h) {
-			sprintf(buf, "%s%2.2d:%2.2d:%2.2d:%2.2d", sign,h,m,s,c);
+		sprintf(buf, "%s%2.2d:%2.2d:%2.2d:%3.3d", sign,h,m,s,ms);
     } else if (m) {
-			sprintf(buf, "   %s%2.2d:%2.2d:%2.2d", sign,m,s,c);
+		sprintf(buf, "   %s%2.2d:%2.2d:%3.3d", sign,m,s,ms);
     } else {
-			sprintf(buf, "      %s%2.2d:%2.2d", sign,s,c);
+		sprintf(buf, "      %s%2.2d:%3.3d", sign,s,ms);
     }
 }
 

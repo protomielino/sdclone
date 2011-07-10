@@ -570,7 +570,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 			if (car->_state & RM_CAR_STATE_DNF) {
 				snprintf(buf, sizeof(buf), "out               %-20s %-20s", car->_name, carName);
 			} else if (car->_bestLapTime <= 0.0f) {
-				snprintf(buf, sizeof(buf), " %2d        --:--  %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d        --:---  %-20s %-20s",
 						 xx + 1, car->_name, carName);
 			} else {
 				if (xx == 0)
@@ -631,7 +631,7 @@ ReUpdateRaceCurRes()
 			snprintf(buf, sizeof(buf), "out               %-20s %-20s", car->_name, carName);
 		} else if (car->_timeBehindLeader == 0.0f) {
 			if (xx != 0)
-				snprintf(buf, sizeof(buf), " %2d        --:-- %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d        --:--- %-20s %-20s",
 						 xx + 1, car->_name, carName);
 			else
 				snprintf(buf, sizeof(buf), " %2d     %3d laps  %-20s %-20s",

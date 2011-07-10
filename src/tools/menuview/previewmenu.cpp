@@ -21,6 +21,7 @@
 #include <cstdio>
 
 #include <tgfclient.h>
+#include <guimenu.h>
 
 #include "previewmenu.h"
 
@@ -42,45 +43,47 @@ PreviewMenuActivate(void * /* dummy */)
 {
 }
 
-int ReadControl(void *param,std::string strType,const char *pControlName)
+int ReadControl(void *menuHdle, void *param, std::string strType, const char *pControlName)
 {
-	if ((strType == "textbutton")||(strType =="imagebutton"))
+	if (strType == GFMNU_TYPE_TEXT_BUTTON || strType == GFMNU_TYPE_IMAGE_BUTTON)
 		return GfuiMenuCreateButtonControl(menuHandle,param,pControlName,0,NULL);
-	else if (strType == "editbox")
+	else if (strType == GFMNU_TYPE_EDIT_BOX)
 		return GfuiMenuCreateEditControl(menuHandle,param,pControlName,0,NULL,NULL);
-	else if (strType == "label")
+	else if (strType == GFMNU_TYPE_LABEL)
 		return GfuiMenuCreateLabelControl(menuHandle,param,pControlName);
-	else if (strType == "staticimage")
+	else if (strType == GFMNU_TYPE_STATIC_IMAGE)
 		return GfuiMenuCreateStaticImageControl(menuHandle,param,pControlName);
-	else if (strType == "combobox")
+	else if (strType == GFMNU_TYPE_COMBO_BOX)
+		return GfuiMenuCreateComboboxControl(menuHandle,param,pControlName,0,NULL);
+	else if (strType == GFMNU_TYPE_SCROLL_LIST)
 	{
-		int id = GfuiMenuCreateComboboxControl(menuHandle,param,pControlName,0,NULL);
+		const int id = GfuiMenuCreateScrollListControl(menuHandle,param,pControlName,0,NULL);
+		GfuiScrollListInsertElement(menuHdle, id, "Item 1", 0, NULL);
+		GfuiScrollListInsertElement(menuHdle, id, "Item 2", 0, NULL);
+		GfuiScrollListInsertElement(menuHdle, id, "Item 3", 0, NULL);
 		return id;
 	}
-	else if (strType == "scrolllist")
-		return GfuiMenuCreateScrollListControl(menuHandle,param,pControlName,0,NULL);
-	else if (strType == "checkbox")
-		return  GfuiMenuCreateCheckboxControl(menuHandle,param,pControlName,0,NULL);
-	else if (strType == "progressbar")
-		return  GfuiMenuCreateProgressbarControl(menuHandle,param,pControlName);
+	else if (strType == GFMNU_TYPE_CHECK_BOX)
+		return GfuiMenuCreateCheckboxControl(menuHandle,param,pControlName,0,NULL);
+	else if (strType == GFMNU_TYPE_PROGRESS_BAR)
+		return GfuiMenuCreateProgressbarControl(menuHandle,param,pControlName);
 
 	return -1;
 }
 
-void ShowDynamicControls(void *param)
+void ShowDynamicControls(void *menuHdle, void *param)
 {
 
-	if (GfParmListSeekFirst(param,"dynamiccontrols") == 0)
+	if (GfParmListSeekFirst(param, GFMNU_SECT_DYNAMIC_CONTROLS) == 0)
+	{
+		do
 		{
-			do
-			{
-				std::string strControlName = GfParmListGetCurEltName (param,"dynamiccontrols");
-				std::string strType = GfParmGetCurStr(param,"dynamiccontrols","type","");
-				ReadControl(param,strType,strControlName.c_str());
-			} while (GfParmListSeekNext(param,"dynamiccontrols") == 0);
-		}
-
-
+			std::string strControlName =
+				GfParmListGetCurEltName (param, GFMNU_SECT_DYNAMIC_CONTROLS);
+			std::string strType = GfParmGetCurStr(param, GFMNU_SECT_DYNAMIC_CONTROLS, "type", "");
+			ReadControl(menuHdle, param,strType,strControlName.c_str());
+		} while (GfParmListSeekNext(param, GFMNU_SECT_DYNAMIC_CONTROLS) == 0);
+	}
 }
 
 void
@@ -95,21 +98,24 @@ void
 LoadMenuScreen()
 {
     menuHandle = GfuiScreenCreate((float*)NULL, 
-				    NULL, PreviewMenuActivate, 
-				    NULL, (tfuiCallback)NULL, 
-				    1);
+								  NULL, PreviewMenuActivate, 
+								  NULL, (tfuiCallback)NULL, 
+								  1);
 
 	void *param = GfParmReadFile(g_strFile.c_str(), GFPARM_RMODE_REREAD);
-	if (param == NULL)
+	if (!param)
 		param = GfParmReadFileLocal(g_strFile.c_str(), GFPARM_RMODE_REREAD);
 
     GfuiMenuCreateStaticControls(menuHandle, param);
-	ShowDynamicControls(param);
-    GfuiAddKey(menuHandle, GFUIK_F5, "reload", NULL, ReloadMenuScreen, NULL);
+	
+	ShowDynamicControls(menuHandle, param);
+
+	GfuiAddKey(menuHandle, GFUIK_F5, "Re-load", NULL, ReloadMenuScreen, NULL);
     GfuiAddKey(menuHandle, 'Q', "Quit", 0, onQuit, NULL);
     GfuiAddKey(menuHandle, 'q', "Quit", 0, onQuit, NULL);
-    GfParmReleaseHandle(param);
+    GfuiAddKey(menuHandle, GFUIK_ESCAPE, "Quit", 0, onQuit, NULL);
 
+	GfParmReleaseHandle(param);
 }
 
 int

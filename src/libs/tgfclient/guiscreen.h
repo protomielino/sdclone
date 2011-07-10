@@ -54,6 +54,7 @@
 #define GFSCR_VAL_VINIT_COMPATIBLE	"compatible"
 #define GFSCR_VAL_VINIT_BEST		"best"
 
+// Default settngs or menus / controls
 #define GFSCR_SECT_MENUSETTINGS	"Menu Settings"
 
 #define GFSCR_LIST_COLORS	"colors"
@@ -73,8 +74,13 @@
 #define GFSCR_ELT_SCROLLIST	"scroll list"
 #define GFSCR_ELT_BGSELSCROLLIST "background selected scroll list"
 #define GFSCR_ELT_SELSCROLLIST	"selected scroll list"
-#define GFSCR_ELT_EDITBOXCOLOR "edit box color"
-#define GFSCR_ELT_EDITCURSORCLR	"edit box cursor color"
+#define GFSCR_ELT_BGEDITFOCUS	"background focused editbox"
+#define GFSCR_ELT_BGEDITENABLED	"background enabled editbox"
+#define GFSCR_ELT_BGEDITDISABLED	"background disabled editbox"
+#define GFSCR_ELT_EDITFOCUS	"focused editbox"
+#define GFSCR_ELT_EDITENABLED	"enabled editbox"
+#define GFSCR_ELT_EDITDISABLED	"disabled editbox"
+#define GFSCR_ELT_EDITCURSORCLR	"editbox cursor color"
 #define GFSCR_ELT_BASECOLORBGIMAGE "base color background image"
 
 #define GFSCR_ATTR_RED		"red"
@@ -89,6 +95,15 @@
 #define GFSCR_ATT_X			"x"
 #define GFSCR_ATT_Y			"y"
 #define GFSCR_ATT_WIDTH		"width"
+
+#define GFSCR_SECT_EDITBOX	"editbox"
+
+#define GFSCR_ATT_HPADDING			"h-padding"
+#define GFSCR_ATT_VPADDING			"v-padding"
+
+#define GFSCR_SECT_TEXTBUTTON	"text button"
+
+#define GFSCR_SECT_IMAGEBUTTON	"image button"
 
 // Mouse cursor
 #define GFSCR_SECT_MOUSECURSOR			"Mouse Cursor"

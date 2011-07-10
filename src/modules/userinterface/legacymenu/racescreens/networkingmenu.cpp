@@ -114,8 +114,8 @@ static void EnableMenuClientButtons(bool bChecked)
 {
 	// Disable/enable menu selections
 	const int isEnabled = bChecked ? GFUI_ENABLE : GFUI_DISABLE;
-	GfuiEnable(racemanMenuHdle, g_CarSetupButtonId,isEnabled);
-	GfuiEnable(racemanMenuHdle, g_DisconnectButtonId,isEnabled);
+	GfuiEnable(racemanMenuHdle, g_CarSetupButtonId, isEnabled);
+	GfuiEnable(racemanMenuHdle, g_DisconnectButtonId, isEnabled);
 }
 
 static void onClientPlayerReady(tCheckBoxInfo* pInfo)
@@ -531,11 +531,9 @@ rmNetworkServerDisconnect(void * /* dummy */)
 static void
 rmCarSettingsMenu(void *pMenu)
 {
-	// Commented-out as long as this menu is not finished / merged with carselect one.
-	
-	// g_CarMenu.initialize(pMenu,g_strCar.c_str());
-	// RmSetRacemanMenuHandle(g_CarMenu.getMenuHandle());
-	// g_CarMenu.runMenu();
+	g_CarMenu.initialize(pMenu,g_strCar.c_str());
+	RmSetRacemanMenuHandle(g_CarMenu.getMenuHandle());
+	g_CarMenu.runMenu();
 }
 
 static void
@@ -611,9 +609,12 @@ RmNetworkHostMenu(void * /* dummy */)
 	g_RaceSetupId =
 		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "racesetup",
 									racemanMenuHdle, RmConfigureRace);
+	// Garage button disabled as long as the "car settings menu"
+	// is not finished / merged with the "car select" one.
 	g_CarSetupButtonId =
 		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "garage",
 									racemanMenuHdle, rmCarSettingsMenu);
+	//GfuiEnable(racemanMenuHdle, g_CarSetupButtonId, GFUI_DISABLE);
 
 	GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "start race",
 								NULL, ServerPrepareStartNetworkRace);
@@ -717,9 +718,12 @@ RmNetworkClientMenu(void * /* dummy */)
 	g_ReadyCheckboxId =
 		GfuiMenuCreateCheckboxControl(racemanMenuHdle, mparam, "playerreadycheckbox",
 									  NULL, onClientPlayerReady);
+	// Garage button disabled as long as the "car settings menu"
+	// is not finished / merged with the "car select" one.
 	g_CarSetupButtonId =
 		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "garage",
 									racemanMenuHdle, rmCarSettingsMenu);
+	//GfuiEnable(racemanMenuHdle, g_CarSetupButtonId, GFUI_DISABLE);
 
 	g_DisconnectButtonId =
 		GfuiMenuCreateButtonControl(racemanMenuHdle, mparam, "disconnect",

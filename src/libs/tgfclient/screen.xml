@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
 
-<params name="Screen" version="1.5">
+<params name="Screen" version="1.6">
 
   <section name="Validated Screen Properties">
 
@@ -129,10 +129,10 @@
       </section>
 
       <section name="disabled button">
-        <attnum name="red" val="0.1"/>
-        <attnum name="green" val="0.1"/>
-        <attnum name="blue" val="0.3"/>
-        <attnum name="alpha" val="1"/>
+        <attnum name="red" val="0.3"/>
+        <attnum name="green" val="0.3"/>
+        <attnum name="blue" val="1.0"/>
+        <attnum name="alpha" val="0.5"/>
       </section>
 
        <section name="label">
@@ -167,7 +167,7 @@
         <attnum name="red" val="0"/>
         <attnum name="green" val="0"/>
         <attnum name="blue" val="0"/>
-        <attnum name="alpha" val="1"/>
+        <attnum name="alpha" val="0"/>
       </section>
 
       <section name="selected scroll list">
@@ -177,17 +177,52 @@
         <attnum name="alpha" val="1"/>
       </section>
 
-      <section name="edit box color">
+      <section name="background focused editbox">
+        <attnum name="red" val="0.25"/>
+        <attnum name="green" val="0.59"/>
+        <attnum name="blue" val="0.95"/>
+        <attnum name="alpha" val="0.25"/>
+      </section>
+
+      <section name="background enabled editbox">
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="0"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="0"/>
+      </section>
+
+      <section name="background disabled editbox">
+        <attnum name="red" val="0"/>
+        <attnum name="green" val="0"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="0"/>
+      </section>
+
+      <section name="focused editbox">
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="0.8"/>
+        <attnum name="blue" val="0"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
+      <section name="enabled editbox">
         <attnum name="red" val="1"/>
         <attnum name="green" val="1"/>
         <attnum name="blue" val="1"/>
         <attnum name="alpha" val="1"/>
       </section>
 
-      <section name="edit box cursor color">
+      <section name="disabled editbox">
+        <attnum name="red" val="0.3"/>
+        <attnum name="green" val="0.3"/>
+        <attnum name="blue" val="1.0"/>
+        <attnum name="alpha" val="0.5"/>
+      </section>
+
+      <section name="editbox cursor color">
         <attnum name="red" val="1"/>
-        <attnum name="green" val="1"/>
-        <attnum name="blue" val="1"/>
+        <attnum name="green" val="0.8"/>
+        <attnum name="blue" val="0"/>
         <attnum name="alpha" val="1"/>
       </section>
 
@@ -201,11 +236,26 @@
     </section>
 
     <section name="tip">
-      <attnum name="x" val="320"/>
-      <attnum name="y" val="15"/>
+      <attnum name="x" val="10"/>
+      <attnum name="y" val="10"/>
       <attnum name="width" val="620"/>
       <attstr name="align" val="center"/>
       <attstr name="font" val="small"/>
+    </section>
+
+    <section name="editbox">
+      <attnum name="v-padding" val="2"/>
+      <attnum name="h-padding" val="10"/>
+    </section>
+
+    <section name="text button">
+      <attnum name="v-padding" val="5"/>
+      <attnum name="h-padding" val="10"/>
+    </section>
+
+    <section name="image button">
+      <attnum name="v-padding" val="0"/>
+      <attnum name="h-padding" val="0"/>
     </section>
 
   </section>

@@ -6,7 +6,7 @@
     email                : torcs@free.fr   
     version              : $Id$                                  
 
- ***************************************************************************/
+***************************************************************************/
 
 /***************************************************************************
  *                                                                         *
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file   
-    		GUI scroll-list management.
+	GUI scroll-list management.
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
     @ingroup	gui
@@ -46,17 +46,17 @@ gfuiScroll(tScrollBarInfo *sinfo)
     
     object = gfuiGetObject(GfuiScreen, (long)(sinfo->userData));
     if (object == NULL) {
-	return;
+		return;
     }
     if (object->widget != GFUI_SCROLLIST) {
-	return;
+		return;
     }
     scrollist = &(object->u.scrollist);
 
     scrollist->firstVisible = sinfo->pos;
     if ((scrollist->selectedElt < scrollist->firstVisible) ||
-	(scrollist->selectedElt > scrollist->firstVisible + scrollist->nbVisible)) {
-	scrollist->selectedElt = -1;
+		(scrollist->selectedElt > scrollist->firstVisible + scrollist->nbVisible)) {
+		scrollist->selectedElt = -1;
     }
 }
 
@@ -69,21 +69,21 @@ gfuiScrollListNextElt (tGfuiObject *object)
 
     scrollist->selectedElt++;
     if (scrollist->selectedElt == scrollist->nbElts) {
-	scrollist->selectedElt = scrollist->nbElts - 1;
-	return;
+		scrollist->selectedElt = scrollist->nbElts - 1;
+		return;
     }
     if (scrollist->onSelect) {
-	scrollist->onSelect(scrollist->userDataOnSelect);
+		scrollist->onSelect(scrollist->userDataOnSelect);
     }
     if (scrollist->selectedElt == scrollist->firstVisible + scrollist->nbVisible) {
-	/* Scroll down */
-	if (scrollist->firstVisible + scrollist->nbVisible < scrollist->nbElts) {
-	    scrollist->firstVisible++;
-	    if (scrollist->scrollBar) {
-		GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-				    scrollist->nbVisible, scrollist->firstVisible);
-	    }
-	}
+		/* Scroll down */
+		if (scrollist->firstVisible + scrollist->nbVisible < scrollist->nbElts) {
+			scrollist->firstVisible++;
+			if (scrollist->scrollBar) {
+				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+									scrollist->nbVisible, scrollist->firstVisible);
+			}
+		}
     }
 }
 
@@ -96,21 +96,21 @@ gfuiScrollListPrevElt (tGfuiObject *object)
 
     scrollist->selectedElt--;
     if (scrollist->selectedElt < 0) {
-	scrollist->selectedElt = 0;
-	return;
+		scrollist->selectedElt = 0;
+		return;
     }
     if (scrollist->onSelect) {
-	scrollist->onSelect(scrollist->userDataOnSelect);
+		scrollist->onSelect(scrollist->userDataOnSelect);
     }
     if (scrollist->selectedElt < scrollist->firstVisible) {
-	/* Scroll down */
-	if (scrollist->firstVisible > 0) {
-	    scrollist->firstVisible--;
-	    if (scrollist->scrollBar) {
-		GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-				    scrollist->nbVisible, scrollist->firstVisible);
-	    }
-	}
+		/* Scroll down */
+		if (scrollist->firstVisible > 0) {
+			scrollist->firstVisible--;
+			if (scrollist->scrollBar) {
+				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+									scrollist->nbVisible, scrollist->firstVisible);
+			}
+		}
     }
 }
 
@@ -121,20 +121,20 @@ gfuiScrollListPrevElt (tGfuiObject *object)
     @param	font	Current font
     @param	x	X Position
     @param	y	Y Position
-    @param	align	Box Alignement (Horizontal and Vertical)
-    @param	width	Width of the box
-    @param	height	Height of the box
+    @param	width	Total width of the box
+    @param	height	Total height of the box
     @param	scrollBarPos	Position of the scrollbar:
-			<br>GFUI_SB_NONE	No scroll bar
-			<br>GFUI_SB_RIGHT	Right scroll bar
-			<br>GFUI_SB_LEFT	Left scroll bar
+	<br>GFUI_SB_NONE	No scroll bar
+	<br>GFUI_SB_RIGHT	Right scroll bar
+	<br>GFUI_SB_LEFT	Left scroll bar
     @param	userDataOnSelect	User data to pass to the onSelect callback
     @param	onSelect		Callback when the selection is done 
     @return	Scroll List Id
- */
+*/
 int
-GfuiScrollListCreate(void *scr, int font, int x, int y, int align, int width, int height,
-		     int scrollBarPos, void *userDataOnSelect, tfuiCallback onSelect)
+GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
+					 int scrollBarPos, int scrollBarWidth,
+					 void *userDataOnSelect, tfuiCallback onSelect)
 {
     tGfuiScrollList	*scrollist;
     tGfuiObject		*object;
@@ -157,25 +157,31 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int align, int width, in
     scrollist->fgSelectColor[0] = GfuiColor::build(GFUI_FGSELSCROLLIST);
     scrollist->bgSelectColor[0] = GfuiColor::build(GFUI_BGSELSCROLLIST);
     scrollist->font = gfuiFont[font];
-    scrollist->nbVisible = height / (scrollist->font->getDescender() + scrollist->font->getHeight());
+    scrollist->nbVisible = height / scrollist->font->getHeight();
     scrollist->selectedElt = -1;
     scrollist->userDataOnSelect = userDataOnSelect;
     scrollist->onSelect = onSelect;
 
     switch (scrollBarPos) {
-    case GFUI_SB_NONE:
-	break;
-    case GFUI_SB_RIGHT:
-	scrollist->scrollBar = GfuiScrollBarCreate(scr, x + width, y, GFUI_ALIGN_HL_VB, height, GFUI_VERT_SCROLLBAR, 
-						   0, 10, 10, 10, (void *)(object->id), gfuiScroll);
-	break;
-    case GFUI_SB_LEFT:
-	scrollist->scrollBar = GfuiScrollBarCreate(scr, x, y, GFUI_ALIGN_HR_VB, height, GFUI_VERT_SCROLLBAR, 
-						   0, 10, 10, 10, (void *)(object->id), gfuiScroll);
-	break;
+		case GFUI_SB_NONE:
+			break;
+		case GFUI_SB_RIGHT:
+			scrollist->scrollBar =
+				GfuiScrollBarCreate(scr, x + width, y, height, scrollBarWidth,
+									GFUI_VERT_SCROLLBAR, 
+									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
+			break;
+		case GFUI_SB_LEFT:
+			scrollist->scrollBar =
+				GfuiScrollBarCreate(scr, x - scrollBarWidth, y, height, scrollBarWidth,
+									GFUI_VERT_SCROLLBAR, 
+									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
+			break;
     }
+	
     gfuiAddObject(screen, object);
-    return object->id;
+
+	return object->id;
 }
 
 static void
@@ -185,27 +191,27 @@ gfuiScrollListInsElt(tGfuiScrollList *scrollist, tGfuiListElement *elt, int inde
     int			i;
 
     if (scrollist->elts == NULL) {
-	scrollist->elts = elt;
-	elt->next = elt;
-	elt->prev = elt;
+		scrollist->elts = elt;
+		elt->next = elt;
+		elt->prev = elt;
     } else {
-	cur = scrollist->elts;
-	i = 0;
-	do {
-	    if (i == index) {
-		break;
-	    }
-	    cur = cur->next;
-	    i++;
-	} while (cur != scrollist->elts);
+		cur = scrollist->elts;
+		i = 0;
+		do {
+			if (i == index) {
+				break;
+			}
+			cur = cur->next;
+			i++;
+		} while (cur != scrollist->elts);
 	
-	elt->next = cur->next;
-	cur->next = elt;
-	elt->prev = cur;
-	elt->next->prev = elt;
-	if ((cur == scrollist->elts) && (index != 0)) {
-	    scrollist->elts = elt;
-	}
+		elt->next = cur->next;
+		cur->next = elt;
+		elt->prev = cur;
+		elt->next->prev = elt;
+		if ((cur == scrollist->elts) && (index != 0)) {
+			scrollist->elts = elt;
+		}
     }
 }
 
@@ -216,26 +222,26 @@ gfuiScrollListRemElt(tGfuiScrollList *scrollist, int index)
     int			i;
 
     if (scrollist->elts == NULL) {
-	return (tGfuiListElement *)NULL;
+		return (tGfuiListElement *)NULL;
     }
     cur = scrollist->elts;
     i = 0;
     do {
-	cur = cur->next;
-	if (i == index) {
-	    break;
-	}
-	i++;
+		cur = cur->next;
+		if (i == index) {
+			break;
+		}
+		i++;
     } while (cur != scrollist->elts);
 
     cur->next->prev = cur->prev;
     cur->prev->next = cur->next;
     if (cur == scrollist->elts) {
-	if (cur->next == cur) {
-	    scrollist->elts = (tGfuiListElement *)NULL;
-	} else {
-	    scrollist->elts = cur->prev;
-	}
+		if (cur->next == cur) {
+			scrollist->elts = (tGfuiListElement *)NULL;
+		} else {
+			scrollist->elts = cur->prev;
+		}
     }
     
     return cur;
@@ -244,32 +250,26 @@ gfuiScrollListRemElt(tGfuiScrollList *scrollist, int index)
 /** Set the selected element from the scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	selectElement   Index of the element to select
     @return	<br>false if no such element, true otherwise
- */
+*/
 bool
-GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
+GfuiScrollListSetSelectedElement(void *scr, int id, unsigned int selectElement)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return false;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return false;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return -1;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
     if (selectElement >= (unsigned)scrollist->nbElts)
-	return false;
+		return false;
 
     scrollist->selectedElt = selectElement;
     
     if (scrollist->onSelect)
-	scrollist->onSelect(scrollist->userDataOnSelect);
+		scrollist->onSelect(scrollist->userDataOnSelect);
 
     return true;
 }
@@ -277,23 +277,17 @@ GfuiScrollListSetSelectedElement(void *scr, int Id, unsigned int selectElement)
 /** Clear the selection of the scroll list (no more selected element).
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @return	<br>false if any error, true otherwise
- */
+*/
 bool
-GfuiScrollListClearSelection(void *scr, int Id)
+GfuiScrollListClearSelection(void *scr, int id)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return false;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return false;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return -1;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
     scrollist->selectedElt = -1;
     
@@ -303,48 +297,37 @@ GfuiScrollListClearSelection(void *scr, int Id)
 /** Get the selected element from the scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	userData	address of the userData of the element to retrieve
     @return	Name of the retrieved element
-		<br>NULL if Error
- */
+	<br>NULL if Error
+*/
 const char *
-GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData)
+GfuiScrollListGetSelectedElement(void *scr, int id, void **userData)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
-    const char		*name;
-    int			i;
-    
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return (const char*)NULL;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return (const char*)NULL;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return (const char*)NULL;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
-    if (scrollist->selectedElt == -1) {
-	return (const char*)NULL;
-    }
+    if (scrollist->selectedElt == -1)
+		return (const char*)NULL;
 
-    if (scrollist->elts == NULL) {
-	return (const char*)NULL;
-    }
+    if (scrollist->elts == NULL)
+		return (const char*)NULL;
 
-    elt = scrollist->elts;
-    i = 0;
+	tGfuiListElement* elt = scrollist->elts;
+    int i = 0;
     do {
-	elt = elt->next;
-	if (i == scrollist->selectedElt) {
-	    break;
-	}
-	i++;
+		elt = elt->next;
+		if (i == scrollist->selectedElt) {
+			break;
+		}
+		i++;
     } while (elt != scrollist->elts);
     
-    name = elt->name;
+    const char* name = elt->name;
     *userData = elt->userData;
     
     return name;
@@ -353,73 +336,58 @@ GfuiScrollListGetSelectedElement(void *scr, int Id, void **userData)
 /** Get the number of elements from the scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @return	Current number of elements
-		<br>-1 if Error
- */
+	<br>-1 if Error
+*/
 int
-GfuiScrollListGetNumberOfElements(void *scr, int Id)
+GfuiScrollListGetNumberOfElements(void *scr, int id)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return -1;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return -1;
-    }
-    scrollist = &(object->u.scrollist);
-
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return -1;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
+		
 	return scrollist->nbElts;
 }
 
 /** Get the specified element from the scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	index		Position where to get the element
     @param	userData	address of the userData of the element to retrieve
     @return	Name of the retrieved element
-		<br>NULL if Error
- */
+	<br>NULL if Error
+*/
 const char *
-GfuiScrollListGetElement(void *scr, int Id, int index, void **userData)
+GfuiScrollListGetElement(void *scr, int id, int index, void **userData)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
-    const char		*name;
-    int			i;
-
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return (const char*)NULL;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return (const char*)NULL;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return (const char*)NULL;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
     if ((index < 0) || (index > scrollist->nbElts - 1)) {
-	return (const char*)NULL;
+		return (const char*)NULL;
     }
 
     if (scrollist->elts == NULL) {
-	return (const char*)NULL;
+		return (const char*)NULL;
     }
-    elt = scrollist->elts;
-    i = 0;
+    tGfuiListElement* elt = scrollist->elts;
+    int i = 0;
     do {
-	elt = elt->next;
-	if (i == index) {
-	    break;
-	}
-	i++;
+		elt = elt->next;
+		if (i == index) {
+			break;
+		}
+		i++;
     } while (elt != scrollist->elts);    
 
-    name = elt->name;
+    const char* name = elt->name;
     *userData = elt->userData;
     
     return name;
@@ -428,40 +396,31 @@ GfuiScrollListGetElement(void *scr, int Id, int index, void **userData)
 /** Extract the selected element from the scroll list (removed).
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	userData	address of the userData of the element to retrieve
     @return	Name of the extracted element
-		<br>NULL if Error
- */
+	<br>NULL if Error
+*/
 const char *
-GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData)
+GfuiScrollListExtractSelectedElement(void *scr, int id, void **userData)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
-    const char		*name;
-    
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return (const char*)NULL;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return (const char*)NULL;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return (const char*)NULL;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
-    if (scrollist->selectedElt == -1) {
-	return (const char*)NULL;
-    }
+    if (scrollist->selectedElt == -1)
+		return (const char*)NULL;
 
-    elt = gfuiScrollListRemElt(scrollist, scrollist->selectedElt);
+    tGfuiListElement* elt = gfuiScrollListRemElt(scrollist, scrollist->selectedElt);
     
     scrollist->nbElts--;
     if (scrollist->selectedElt > scrollist->nbElts - 1) {
-	scrollist->selectedElt--;
+		scrollist->selectedElt--;
     }
 
-    name = elt->name;
+    const char* name = elt->name;
     *userData = elt->userData;
     free(elt);
     
@@ -471,62 +430,48 @@ GfuiScrollListExtractSelectedElement(void *scr, int Id, void **userData)
 /** Extract the specified element from the scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	index		Position where to extract the element
     @param	userData	address of the userData of the element to retrieve
     @return	Name of the extracted element
-		<br>NULL if Error
- */
+	<br>NULL if Error
+*/
 const char *
-GfuiScrollListExtractElement(void *scr, int Id, int index, void **userData)
+GfuiScrollListExtractElement(void *scr, int id, int index, void **userData)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
-    const char		*name;
-    
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return (const char*)NULL;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return (const char*)NULL;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return (const char*)NULL;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
-    if ((index < 0) || (index > scrollist->nbElts - 1)) {
-	return (const char*)NULL;
-    }
+    if (index < 0 || index > scrollist->nbElts - 1)
+		return (const char*)NULL;
 
-    elt = gfuiScrollListRemElt(scrollist, index);
+    tGfuiListElement* elt = gfuiScrollListRemElt(scrollist, index);
     
     scrollist->nbElts--;
     if (scrollist->selectedElt > scrollist->nbElts - 1) {
-	scrollist->selectedElt--;
+		scrollist->selectedElt--;
     }
 
-    name = elt->name;
+    const char* name = elt->name;
     *userData = elt->userData;
     free(elt);
     
     return name;
 }
 
-
 void
 GfuiScrollListClear(void *scr, int id)
 {
-    tGfuiObject	*object;
-    tGfuiScrollList *scrollist;
-    tGfuiListElement *elt;
-    
-    object = gfuiGetObject(scr, id);
-    if (!object || object->widget != GFUI_SCROLLIST) {
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
 		return;
-    }
 	
-    scrollist = &(object->u.scrollist);
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
 
+    tGfuiListElement *elt;
     while ((elt = gfuiScrollListRemElt(scrollist, 0))) {
 		free(elt);
     }
@@ -535,34 +480,26 @@ GfuiScrollListClear(void *scr, int id)
     scrollist->selectedElt = -1;
 }
 
-
 /** Insert an element in a scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	element		New element
     @param	index		Position where to insert the element
     @param	userData	User defined data
     @return	<tt>0 ... </tt>Ok
-		<br><tt>-1 .. </tt>Error
- */
+	<br><tt>-1 .. </tt>Error
+*/
 int
-GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, void *userData)
+GfuiScrollListInsertElement(void *scr, int id, const char *element, int index, void *userData)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    tGfuiListElement	*elt;
+	tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return -1;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
     
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return -1;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return -1;
-    }
-    scrollist = &(object->u.scrollist);
-    
-    elt = (tGfuiListElement*)calloc(1, sizeof(tGfuiListElement));
+    tGfuiListElement* elt = (tGfuiListElement*)calloc(1, sizeof(tGfuiListElement));
     elt->name = element;
     elt->label = elt->name;  /* TODO LENGTH !!!!!*/
     elt->userData = userData;
@@ -571,130 +508,83 @@ GfuiScrollListInsertElement(void *scr, int Id, const char *element, int index, v
     gfuiScrollListInsElt(scrollist, elt, index);
 
     scrollist->nbElts++;
-    if (scrollist->scrollBar) {
-	GfuiScrollBarPosSet(scr, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-			    scrollist->nbVisible, scrollist->firstVisible);
-    }
+    if (scrollist->scrollBar)
+		GfuiScrollBarPosSet(scr, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+							scrollist->nbVisible, scrollist->firstVisible);
+
     return 0;
 }
 
 /** Scroll the list in order to show a given element.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	index		Position of the element to show
- */
-void GfuiScrollListShowElement(void *scr, int Id, int index)
+*/
+void
+GfuiScrollListShowElement(void *scr, int id, int index)
 {
-    tGfuiObject		*object;
-    tGfuiScrollList	*scrollist;
-    int				oldFirstVisible;
-    
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return;
-    }
-    scrollist = &(object->u.scrollist);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+	if (!object || object->widget != GFUI_SCROLLIST)
+		return;
+
+    tGfuiScrollList* scrollist = &(object->u.scrollist);
     
     if (scrollist->nbElts <= 0)
-	return;
+		return;
     
-    if (index < 0) {
-      index = 0;
-    } else if (index >= scrollist->nbElts) {
-      index = scrollist->nbElts - 1;
-    }
+    if (index < 0)
+		index = 0;
+    else if (index >= scrollist->nbElts)
+		index = scrollist->nbElts - 1;
 
-    oldFirstVisible = scrollist->firstVisible;
-    if (index < scrollist->firstVisible) {
+    int oldFirstVisible = scrollist->firstVisible;
+    if (index < scrollist->firstVisible)
         scrollist->firstVisible = index;
-    } else if (index >= scrollist->firstVisible + scrollist->nbVisible) {
+    else if (index >= scrollist->firstVisible + scrollist->nbVisible)
         scrollist->firstVisible = index - scrollist->nbVisible + 1;
-    }
 
-    if (scrollist->firstVisible != oldFirstVisible && scrollist->scrollBar) {
+    if (scrollist->firstVisible != oldFirstVisible && scrollist->scrollBar)
         GfuiScrollBarPosSet(scr, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-			    scrollist->nbVisible, scrollist->firstVisible);
-    }
+							scrollist->nbVisible, scrollist->firstVisible);
 }
 
 void
-GfuiScrollListSetColor(void *scr, int id, const GfuiColor& color)
+GfuiScrollListSetColors(void *scr, int id, const GfuiColor& color, const GfuiColor& selectColor)
 {
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_SCROLLIST) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.scrollist.fgColor[0] = color;
-		    curObject->u.scrollist.fgColor[1] = color;
-		    curObject->u.scrollist.fgColor[2] = color;
-
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
+    tGfuiObject* object = gfuiGetObject(scr, id);
+	if (!object || object->widget != GFUI_SCROLLIST)
 		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
+
+    tGfuiScrollList* scrollist = &(object->u.scrollist);
+    
+	// Note : Only [0] used.
+	if (color.alpha)
+		scrollist->fgColor[0] = color;
+	if (selectColor.alpha)
+		scrollist->fgSelectColor[0] = selectColor;
 }
 
-
-void
-GfuiScrollListSetSelectColor(void *scr, int id, const GfuiColor& color)
-{
-
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_SCROLLIST) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.scrollist.fgSelectColor[0] = color;
-		    curObject->u.scrollist.fgSelectColor[1] = color;
-		    curObject->u.scrollist.fgSelectColor[2] = color;
-
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
-}
 
 void
 gfuiDrawScrollist(tGfuiObject *obj)
 {
-	tGfuiScrollList	*scrollist;
-	tGfuiListElement	*elt;
-	GfuiColor			fgColor;
-	GfuiColor			bgColor;
-	int			h, x, y;
-	int			index;
+	tGfuiScrollList* scrollist = &(obj->u.scrollist);
 
-	scrollist = &(obj->u.scrollist);
+	GfuiColor fgColor;
+	GfuiColor bgColor;
+	if (scrollist->selectedElt < 0)
+	{
+		fgColor = scrollist->fgColor[0];
+		bgColor = scrollist->bgColor[0];
+	}
+	else
+	{
+		fgColor = scrollist->fgSelectColor[0];
+		bgColor = scrollist->bgSelectColor[0];
+	}
 
-	fgColor = scrollist->fgColor[0];
-	bgColor = scrollist->bgColor[0];
-
-	if (bgColor.alpha != 0.0) {
+	if (bgColor.alpha) {
 		glBegin(GL_QUADS);
 		glColor4fv(bgColor.toFloatRGBA());
 		glVertex2i(obj->xmin, obj->ymin);
@@ -714,12 +604,12 @@ gfuiDrawScrollist(tGfuiObject *obj)
 	glEnd();
 
 
-	h = scrollist->font->getDescender() + scrollist->font->getHeight();
-	x = obj->xmin;
-	y = obj->ymax;
-	index = 0;
-	elt = scrollist->elts;
-	if (elt != NULL) {
+	const int h = scrollist->font->getHeight();
+	const int x = obj->xmin;
+	int y = obj->ymax;
+	int index = 0;
+	tGfuiListElement* elt = scrollist->elts;
+	if (elt) {
 		do {
 			elt = elt->next;
 			if (index < scrollist->firstVisible) {
@@ -739,25 +629,20 @@ gfuiDrawScrollist(tGfuiObject *obj)
 			gfuiDrawString(x+5, y, scrollist->font, elt->label);
 		} while (elt != scrollist->elts);
 	}
-
-
 }
 
+// Make all scroll-lists having no more selected element
 void
 gfuiScrollListDeselectAll(void)
 {
-    tGfuiObject *curObject;
-
-    curObject = GfuiScreen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->widget == GFUI_SCROLLIST) {
-		curObject->u.scrollist.selectedElt = -1;
-	    }
-	} while (curObject != GfuiScreen->objects);
+    tGfuiObject* curObject = GfuiScreen->objects;
+    if (curObject) {
+		do {
+			curObject = curObject->next;
+			if (curObject->widget == GFUI_SCROLLIST)
+				curObject->u.scrollist.selectedElt = -1;
+		} while (curObject != GfuiScreen->objects);
     }
-
 }
 
 
@@ -768,58 +653,55 @@ gfuiScrollListAction(int mouse)
     tGfuiScrollList	*scrollist;
     int			relY;
 
-    if (mouse == 0) {
+    if (mouse)
+		return;
+	
 	/* button down */
 	gfuiScrollListDeselectAll();
 	object = GfuiScreen->hasFocus;
 	scrollist = &(object->u.scrollist);
 	relY = object->ymax - GfuiMouse.Y;
-	relY = scrollist->firstVisible + relY / (scrollist->font->getDescender() + scrollist->font->getHeight()) + 1;
+	relY = scrollist->firstVisible + relY / scrollist->font->getHeight() + 1;
 	if (relY > scrollist->nbElts) {
-	    scrollist->selectedElt = -1;
-	    return;
+		scrollist->selectedElt = -1;
+		return;
 	}
+
 	scrollist->selectedElt = relY - 1;
-	if (scrollist->onSelect) {
-	    scrollist->onSelect(scrollist->userDataOnSelect);
-	}
-    }
+	
+	if (scrollist->onSelect)
+		scrollist->onSelect(scrollist->userDataOnSelect);
 }
 
 /** Move the selected element within the scroll list.
     @ingroup	gui
     @param	scr		Current screen
-    @param	Id		Scroll list Id
+    @param	id		Scroll list Id
     @param	delta		displacement
     @return	<tt>0 ... </tt>Ok
-		<br><tt>-1 .. </tt>Error
- */
+	<br><tt>-1 .. </tt>Error
+*/
 int
-GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta)
+GfuiScrollListMoveSelectedElement(void *scr, int id, int delta)
 {
     tGfuiObject		*object;
     tGfuiScrollList	*scrollist;
     int			newPos;
     tGfuiListElement	*elt;
     
-    object = gfuiGetObject(scr, Id);
-    if (object == NULL) {
-	return -1;
-    }
-    if (object->widget != GFUI_SCROLLIST) {
-	return -1;
-    }
+    object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return -1;
+
     scrollist = &(object->u.scrollist);
 
-    if (scrollist->selectedElt == -1) {
-	return -1;
-    }
+    if (scrollist->selectedElt == -1)
+		return -1;
     
     newPos = scrollist->selectedElt + delta;
     
-    if ((newPos < 0) || (newPos > scrollist->nbElts - 1)) {
-	return -1;
-    }
+    if (newPos < 0 || newPos > scrollist->nbElts - 1)
+		return -1;
     
     elt = gfuiScrollListRemElt(scrollist, scrollist->selectedElt);
     
@@ -828,23 +710,23 @@ GfuiScrollListMoveSelectedElement(void *scr, int Id, int delta)
     scrollist->selectedElt = newPos;
 
     if (scrollist->selectedElt == scrollist->firstVisible + scrollist->nbVisible) {
-	/* Scroll down */
-	if (scrollist->firstVisible + scrollist->nbVisible < scrollist->nbElts) {
-	    scrollist->firstVisible++;
-	    if (scrollist->scrollBar) {
-		GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-				    scrollist->nbVisible, scrollist->firstVisible);
-	    }
-	}
+		/* Scroll down */
+		if (scrollist->firstVisible + scrollist->nbVisible < scrollist->nbElts) {
+			scrollist->firstVisible++;
+			if (scrollist->scrollBar) {
+				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+									scrollist->nbVisible, scrollist->firstVisible);
+			}
+		}
     } else if (scrollist->selectedElt < scrollist->firstVisible) {
-	/* Scroll down */
-	if (scrollist->firstVisible > 0) {
-	    scrollist->firstVisible--;
-	    if (scrollist->scrollBar) {
-		GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
-				    scrollist->nbVisible, scrollist->firstVisible);
-	    }
-	}
+		/* Scroll down */
+		if (scrollist->firstVisible > 0) {
+			scrollist->firstVisible--;
+			if (scrollist->scrollBar) {
+				GfuiScrollBarPosSet(GfuiScreen, scrollist->scrollBar, 0, MAX(scrollist->nbElts - scrollist->nbVisible, 0),
+									scrollist->nbVisible, scrollist->firstVisible);
+			}
+		}
     }
     
     return 0;
@@ -859,7 +741,7 @@ gfuiReleaseScrollist(tGfuiObject *curObject)
 
     scrollist = &(curObject->u.scrollist);
     while ((elt = gfuiScrollListRemElt(scrollist, 0)) != NULL) {
-	free(elt);
+		free(elt);
     }
     free(curObject);
 }

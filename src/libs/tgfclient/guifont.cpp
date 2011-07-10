@@ -61,7 +61,6 @@ void swap32(unsigned int *p, unsigned int size)
 #endif
 #endif
 
-
 void gfuiLoadFonts(void)
 {
 	void *param;
@@ -72,7 +71,6 @@ void gfuiLoadFonts(void)
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "b5.glf"));
-	//sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "liberation-sans.glf"));
 
 	for(i = 0; i < 4; i++) {
 		size = (int)GfParmGetNum(param, "Menu Font", keySize[i], (char*)NULL, 10.0);
@@ -96,7 +94,6 @@ void gfuiLoadFonts(void)
 	GfParmReleaseHandle(param);
 }
 
-
 GfuiFontClass::GfuiFontClass(char *FileName)
 {
 	FILE *Input;
@@ -108,18 +105,18 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	size = 8.0;
 
 	//Open font file
-	if ((Input = fopen(FileName, "rb")) == NULL) {
+	if (!(Input = fopen(FileName, "rb"))) {
 		perror(FileName);
 		return;
 	}
 
-	if ((font = (GLFONT *)malloc(sizeof(GLFONT))) == NULL) {
+	if (!(font = (GLFONT *)malloc(sizeof(GLFONT))))
 		return;
-	}
 
 	//Read glFont structure
 	//fread(font, sizeof(GLFONT), 1, Input);
 	fread(font, 24, 1, Input); // for IA64...
+	//GfLogDebug("Font(%s) : texW=%d, texH=%d\n", FileName, font->TexWidth, font->TexHeight);
 
 #ifndef WIN32
 #if BYTE_ORDER == BIG_ENDIAN
@@ -143,9 +140,15 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 
 #ifndef WIN32
 #if BYTE_ORDER == BIG_ENDIAN
-	swap32((unsigned int *) font->Char, sizeof(GLFONTCHAR) * Num);
+	swap32((unsigned int *)font->Char, sizeof(GLFONTCHAR) * Num);
 #endif
 #endif
+
+	// Trace font info.
+	// GfLogDebug("  %d chars\n", Num);
+	// GfLogDebug("    %d : dx=%f, dy=%f\n", font->IntStart, font->Char[0].dx, font->Char[0].dy);
+	// GfLogDebug("    %d : dx=%f, dy=%f\n", font->IntStart+2, font->Char[2].dx, font->Char[2].dy);
+	// GfLogDebug("    %d : dx=%f, dy=%f\n", font->IntStart+Num-1, font->Char[Num-1].dx, font->Char[Num-1].dy);
 
 	//Get texture size
 	Num = font->TexWidth * font->TexHeight * 2;
@@ -164,6 +167,7 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	//Save texture number
 	glGenTextures(1, &Tex);
 	font->Tex = Tex;
+	
 	//Set texture attributes
 	glBindTexture(GL_TEXTURE_2D, Tex);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -184,7 +188,6 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	return;
 }
 
-
 GfuiFontClass::~GfuiFontClass()
 {
 	if (font) {
@@ -194,12 +197,11 @@ GfuiFontClass::~GfuiFontClass()
 	}
 }
 
-
 void GfuiFontClass::create(int point_size)
 {
+	//GfLogDebug("size = %d pts, %d pixels\n", point_size, (int)(font->Char[2].dy * point_size));
 	size = point_size;
 }
-
 
 int GfuiFontClass::getWidth(const char* text)
 {
@@ -207,9 +209,8 @@ int GfuiFontClass::getWidth(const char* text)
 	GLFONTCHAR *Char;
 	float width = 0;
 
-	if (font == NULL) {
+	if (!font)
 		return 0;
-	}
 
 	//Get length of string
 	Length = strlen(text);
@@ -218,29 +219,30 @@ int GfuiFontClass::getWidth(const char* text)
 	for (i = 0; i < Length; i++) {
 		//Get pointer to glFont character
 		Char = &font->Char[(int)((unsigned char)text[i]) - font->IntStart];
-		float w2 = Char->dx * size;
-		width = width + w2;
-		//width += Char->dx * size;
+		width += Char->dx * size;
 	}
 
 	return (int)width;
 }
 
-
+// Get total height (descender included).
 int GfuiFontClass::getHeight() const
 {
-	if (font == NULL) return 0;
-	return (const int)(font->Char[0].dy * size);
+	if (!font)
+		return 0;
+	
+	// All chars of the font have the same dy (except 1st and last in liberation-sans-bold ?).
+	return (int)(font->Char[2].dy * size);
 }
-
 
 int GfuiFontClass::getDescender() const
 {
-	if (font == NULL) return 0;
-	return 0;
-	return (const int)(font->Char[0].dy * size / 2.0);
+	if (!font)
+		return 0;
+	
+	// All chars of the font have the same dy (except 1st and last in liberation-sans-bold ?).
+	return (int)(font->Char[2].dy * size / 3.0);
 }
-
 
 void GfuiFontClass::drawString(int X, int Y, const char* text)
 {
@@ -250,7 +252,8 @@ void GfuiFontClass::drawString(int X, int Y, const char* text)
 	float	y = (float)Y;
 
 	//Return if we don't have a valid glFont
-	if (font == NULL) return;
+	if (!font)
+		return;
 
 	//Get length of string
 	Length = strlen(text);

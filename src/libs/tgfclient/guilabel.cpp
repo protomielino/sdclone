@@ -30,11 +30,11 @@
 #include "guimenu.h"
 
 
-static int NTipX = 320;
-static int NTipY = 15;
+static int NTipX = 10;
+static int NTipY = 10;
 static int NTipWidth = 620;
 static int NTipFontId = GFUI_FONT_SMALL;
-static int NTipAlign = GFUI_ALIGN_HC_VB;
+static int NTipAlign = GFUI_ALIGN_HC;
 
 
 void
@@ -47,9 +47,9 @@ gfuiInitLabel(void)
 	void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TIP);
-	NTipX = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_X, 0, 320.0);
+	NTipX = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_X, 0, 10.0);
 	NTipY = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_Y, 0, 10.0);
-	NTipWidth = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_WIDTH, 0, 640.0);
+	NTipWidth = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_WIDTH, 0, 620.0);
 	NTipFontId = gfuiMenuGetFontId(GfParmGetStr(hparmScr, path, GFSCR_ATT_FONT, "small"));
 	NTipAlign = gfuiMenuGetAlignment(GfParmGetStr(hparmScr, path, GFSCR_ATT_ALIGN, "center"));
 
@@ -64,18 +64,13 @@ gfuiInitLabel(void)
                     <br>0 for the text length.
     @param	x	Position of the label on the screen (pixels)
     @param	y	Position of the label on the screen (pixels)
-    @param	align	Alignment:
-    			<br>GFUI_ALIGN_HR_VB	horizontal right, vertical bottom
-    			<br>GFUI_ALIGN_HR_VC	horizontal right, vertical center
-    			<br>GFUI_ALIGN_HR_VT	horizontal right, vertical top
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical bottom
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical center
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical top
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical bottom
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical center
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical top
+    @param	width	Width of the label on the screen (pixels, for alignment maintenance)
+    @param	align	Horizontal alignment:
+    			<br>GFUI_ALIGN_HR	right
+    			<br>GFUI_ALIGN_HC	center
+    			<br>GFUI_ALIGN_HL	left
     @param	width	Width (pixels) of the display bounding box
-                    <br>0 for the text width (from the font specs and maxlen).
+                    <br>0 for the actual text width (from the font specs).
     @param	font	Font id
     @param	bgColor	Pointer to static RGBA background color array
                     <br>0 for gfuiColors[GFUI_BGCOLOR] 
@@ -92,7 +87,7 @@ gfuiInitLabel(void)
  */
 void
 gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
-			  int x, int y, int align, int width, int font,
+			  int x, int y, int width, int align, int font,
 			  const float *bgColor, const float *fgColor,
 			  const float *bgFocusColor, const float *fgFocusColor,
 			  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
@@ -107,65 +102,20 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     label->fgColor = GfuiColor::build(fgColor ? fgColor : gfuiColors[GFUI_LABELCOLOR]);
     label->bgFocusColor = bgFocusColor ? GfuiColor::build(bgFocusColor) : label->bgColor;
     label->fgFocusColor = fgFocusColor ? GfuiColor::build(fgFocusColor) : label->fgColor;
-
+	
     label->font = gfuiFont[font];
-    if (width == 0)
-		width = gfuiFont[font]->getWidth((const char *)text);
-	const int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-    
+    if (width <= 0)
+		width = gfuiFont[font]->getWidth(text);
+	label->width = width;
 	label->align = align;
+	label->x = x;
+	label->y = y;
 	
     label->userDataOnFocus = userDataOnFocus;
     label->onFocus = onFocus;
     label->onFocusLost = onFocusLost;
 	
-    switch(align)
-	{
-		case GFUI_ALIGN_HL_VB:
-			label->x = x;
-			label->y = y - gfuiFont[font]->getDescender();
-			break;
-
-		case GFUI_ALIGN_HL_VC:
-			label->x = x;
-			label->y = y - height / 2;
-			break;
-
-		case GFUI_ALIGN_HL_VT:
-			label->x = x;
-			label->y = y;
-			break;
-
-		case GFUI_ALIGN_HC_VB:
-			label->x = x - width / 2;
-			label->y = y - gfuiFont[font]->getDescender();
-			break;
-
-		case GFUI_ALIGN_HC_VC:
-			label->x = x - width / 2;
-			label->y = y - height / 2;
-			break;
-
-		case GFUI_ALIGN_HC_VT:
-			label->x = x - width / 2;
-			label->y = y;
-			break;
-
-		case GFUI_ALIGN_HR_VB:
-			label->x = x - width;
-			label->y = y - gfuiFont[font]->getDescender();
-			break;
-
-		case GFUI_ALIGN_HR_VC:
-			label->x = x - width;
-			label->y = y - height / 2;
-			break;
-
-		case GFUI_ALIGN_HR_VT:
-			label->x = x - width;
-			label->y = y;
-			break;
-	}
+	// GfLogDebug("gfuiLabelInit('%s', font %d) : height=%d\n", text, font, gfuiFont[font]->getHeight());
 }
 
 /** Create a new label
@@ -175,16 +125,10 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     @param	font	Font id
     @param	x	Position of the label on the screen
     @param	y	Position of the label on the screen
-    @param	align	Alignment:
-    			<br>GFUI_ALIGN_HR_VB	horizontal right, vertical bottom
-    			<br>GFUI_ALIGN_HR_VC	horizontal right, vertical center
-    			<br>GFUI_ALIGN_HR_VT	horizontal right, vertical top
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical bottom
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical center
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical top
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical bottom
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical center
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical top
+    @param	align	Horizontal alignment:
+    			<br>GFUI_ALIGN_HR	right
+    			<br>GFUI_ALIGN_HC	center
+    			<br>GFUI_ALIGN_HL	left
     @param	maxlen	Maximum length of the button string (used when the label is changed)
     			<br>0 for the text length.
     @param	fgColor	Pointer on static RGBA color array (0 => default)
@@ -196,7 +140,8 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
     @see	GfuiSetLabelText
  */
 int 
-GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, int maxlen,
+GfuiLabelCreate(void *scr, const char *text, int font, int x, int y,
+				int width, int align, int maxlen,
 				const float *fgColor, const float *fgFocusColor,
 				void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -211,60 +156,16 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
     object->id = screen->curId++;
     
     label = &(object->u.label);
-	gfuiLabelInit(label, text, maxlen, x, y, align, 0, font,
-				  screen->bgColor.toFloatRGBA(), fgColor, screen->bgColor.toFloatRGBA(), fgFocusColor, 
+	gfuiLabelInit(label, text, maxlen, x, y, width, align, font,
+				  screen->bgColor.toFloatRGBA(), fgColor,
+				  screen->bgColor.toFloatRGBA(), fgFocusColor, 
 				  userDataOnFocus, onFocus, onFocusLost);
 
-	const int width = gfuiFont[font]->getWidth((const char *)text);
-	const int height = gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-
-	switch(align)
-	{
-		case GFUI_ALIGN_HL_VB:
-			object->xmin = x;
-			object->ymin = y;
-			break;
-
-		case GFUI_ALIGN_HL_VC:
-			object->xmin = x;
-			object->ymin = y - height / 2;
-			break;
-
-		case GFUI_ALIGN_HL_VT:
-			object->xmin = x;
-			object->ymin = y;
-			break;
-
-		case GFUI_ALIGN_HC_VB:
-			object->xmin = x - width / 2;
-			object->ymin = y;
-			break;
-
-		case GFUI_ALIGN_HC_VC:
-			object->xmin = x - width / 2;
-			object->ymin = y - height / 2;
-			break;
-
-		case GFUI_ALIGN_HC_VT:
-			object->xmin = x - width / 2;
-			object->ymin = y;
-			break;
-
-		case GFUI_ALIGN_HR_VB:
-			object->xmin = x - width;
-			object->ymin = y;
-			break;
-
-		case GFUI_ALIGN_HR_VC:
-			object->xmin = x - width;
-			object->ymin = y - height / 2;
-			break;
-
-		case GFUI_ALIGN_HR_VT:
-			object->xmin = x - width;
-			object->ymin = y;
-			break;
-	}
+	width = label->width;
+	const int height = gfuiFont[font]->getHeight();
+	
+	object->xmin = x;
+	object->ymin = y;
 
 	object->xmax = object->xmin + width;
 	object->ymax = object->ymin + height;
@@ -284,7 +185,7 @@ GfuiLabelCreate(void *scr, const char *text, int font, int x, int y, int align, 
 int
 GfuiTipCreate(void *scr, const char *text, int maxlen)
 {
-    return GfuiLabelCreate(scr, text, NTipFontId, NTipX, NTipY,
+    return GfuiLabelCreate(scr, text, NTipFontId, NTipX, NTipY, NTipWidth,
 						   NTipAlign, maxlen, gfuiColors[GFUI_TIPCOLOR]);
 }
 
@@ -303,7 +204,6 @@ gfuiLabelSetText(tGfuiLabel *label, const char *text)
 		return;
 
 	// Reallocate label->text if maxlen is nul (in case label->text is empty).
-	const int prevWidth = label->font->getWidth((const char *)label->text);
  	if (label->maxlen <= 0)
 	{
 		free(label->text);
@@ -313,21 +213,6 @@ gfuiLabelSetText(tGfuiLabel *label, const char *text)
 	
 	// Update the text.
    strncpy(label->text, text, label->maxlen);
-	
-	// Update the text position.
-	const int width = label->font->getWidth((const char *)label->text);
-	switch(label->align&0xF0)
-	{
-		case GFUI_ALIGN_HL_VB /* LEFT */:
-			// No change.
-			break;
-		case GFUI_ALIGN_HC_VB /* CENTER */:
-			label->x += (prevWidth - width) / 2;
-			break;
-		case GFUI_ALIGN_HR_VB /* RIGHT */:
-			label->x += prevWidth - width;
-			break;
-	}
 }
 
 /** Change the text of a label.
@@ -349,10 +234,6 @@ GfuiLabelSetText(void *scr, int id, const char *text)
 		
 		// Update the text.
 		gfuiLabelSetText(label, text);
-
-		// Update the bounding box.
-		object->xmin = label->x;
-		object->xmax = object->xmin + label->font->getWidth((const char *)text);
 	}
 }
 
@@ -381,22 +262,72 @@ GfuiLabelSetColor(void *scr, int id, const float* color)
     tGfuiObject* object = gfuiGetObject(scr, id);
     
     if (object && object->widget == GFUI_LABEL)
-	{
 		gfuiLabelSetColor(&object->u.label, color);
-	}
 }
 
+
+/** Determine the actual text X coordinate.
+    @ingroup	gui
+    @param	obj	label to query
+    @return	X coordinate of the text
+ */
+int
+gfuiLabelGetTextX(tGfuiLabel *label)
+{
+	int xText = label->x;
+    switch(label->align & GFUI_ALIGN_HMASK)
+	{
+		case GFUI_ALIGN_HL:
+			// Nothing more to add / substract.
+			break;
+
+		case GFUI_ALIGN_HC:
+			xText += (label->width - label->font->getWidth(label->text)) / 2;
+			break;
+
+		case GFUI_ALIGN_HR:
+			xText += label->width - label->font->getWidth(label->text);
+			break;
+
+		default:
+			break;
+	}
+
+	return xText;
+}
 
 /** Actually draw the given label.
     @ingroup	gui
     @param	obj	label to draw
  */
 void
-gfuiLabelDraw(tGfuiLabel *label, int focus)
+gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
 {
-	// Draw the text, according to the state/focus.
-    glColor4fv(focus ? label->fgFocusColor.toFloatRGBA() : label->fgColor.toFloatRGBA());
-    gfuiDrawString(label->x, label->y, label->font, label->text);
+	// Select the right color from the state/focus.
+    glColor4fv(color.toFloatRGBA());
+
+	// Determine the actual (bottom left corner) coordinates where to draw the text.
+	int x;
+    switch(label->align & GFUI_ALIGN_HMASK)
+	{
+		case GFUI_ALIGN_HL:
+			x = label->x;
+			break;
+
+		case GFUI_ALIGN_HC:
+			x = label->x + (label->width - label->font->getWidth(label->text)) / 2;
+			break;
+
+		case GFUI_ALIGN_HR:
+			x = label->x + label->width - label->font->getWidth(label->text);
+			break;
+
+		default:
+			x = label->x;
+			break;
+	}
+
+    gfuiDrawString(x, label->y, label->font, label->text);
 }
 
 /** Actually draw the given label object.
@@ -421,7 +352,7 @@ gfuiDrawLabel(tGfuiObject *obj)
     }
 
 	// Draw the label text itself.
-    gfuiLabelDraw(label, obj->focus);
+    gfuiLabelDraw(label, obj->focus ? label->fgFocusColor : label->fgColor);
 }
 
 void

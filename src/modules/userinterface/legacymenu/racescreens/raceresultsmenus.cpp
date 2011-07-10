@@ -262,8 +262,8 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         const float *aColor =
 			advance > 0 ? acPlaceGain : (advance < 0 ? acPlaceLoss : GFUI_TPL_COLOR);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Advance", true, // From template.
-								   buf, GFUI_TPL_X, y,
-								   GFUI_TPL_FONTID, GFUI_TPL_ALIGN, GFUI_TPL_MAXLEN, aColor);
+								   buf, GFUI_TPL_X, y, GFUI_TPL_FONTID, GFUI_TPL_WIDTH,
+								   GFUI_TPL_ALIGN, GFUI_TPL_MAXLEN, aColor);
 
         //Driver name
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "DriverName", true, // From template.

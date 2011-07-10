@@ -90,7 +90,7 @@ rmRepair(void* /* dummy */)
 void
 RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 {
-    char buf[32];
+    char buf[128];
 
     rmCar = car;
     rmCallback = callback;
@@ -107,28 +107,30 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 
     GfuiMenuCreateStaticControls(menuHandle, menuXMLDescHdle);
 
-    // Create labels for driver name, remaining laps and remaining fuel.
-    int driverNameId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "drivernamelabel");
-    GfuiLabelSetText(menuHandle, driverNameId, car->_name);
+    // Create variable title label.
+    int titleId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "titlelabel");
+    snprintf(buf, sizeof(buf), "Pit Stop for %s", car->_name);
+    GfuiLabelSetText(menuHandle, titleId, buf);
 
+   // Create labels for remaining laps and remaining fuel.
     int remainLapsId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
-    sprintf(buf, "%d", car->_remainingLaps);
+    snprintf(buf, sizeof(buf), "%d", car->_remainingLaps);
     GfuiLabelSetText(menuHandle, remainLapsId, buf);
 
     int remainFuelId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingfuellabel");
-    sprintf(buf, "%.1f l", car->_fuel);
+    snprintf(buf, sizeof(buf), "%.1f", car->_fuel);
     GfuiLabelSetText(menuHandle, remainFuelId, buf);
 
     // Create edit boxes for fuel and repair amounts.
     fuelId = GfuiMenuCreateEditControl(menuHandle, menuXMLDescHdle, "fuelamountedit", NULL, NULL, rmUpdtFuel);
-    sprintf(buf, "%.1f", car->pitcmd.fuel);
+    snprintf(buf, sizeof(buf), "%.1f", car->pitcmd.fuel);
     GfuiEditboxSetString(menuHandle, fuelId, buf);
 
     repairId = GfuiMenuCreateEditControl(menuHandle, menuXMLDescHdle, "repairamountedit", NULL, NULL, rmUpdtRepair);
-    sprintf(buf, "%d", (int)car->pitcmd.repair);
+    snprintf(buf, sizeof(buf), "%d", (int)car->pitcmd.repair);
     GfuiEditboxSetString(menuHandle, repairId, buf);
 
-    // Create Back and Reset buttons.
+    // Create Repair and Stop&Go buttons.
     GfuiMenuCreateButtonControl(menuHandle, menuXMLDescHdle, "repairbutton", NULL, rmRepair);
     GfuiMenuCreateButtonControl(menuHandle, menuXMLDescHdle, "stopgobutton", NULL, rmStopAndGo);
 

@@ -66,22 +66,23 @@ gfuiDrawString(int x, int y, GfuiFontClass *font, const char *string)
     glDisable(GL_TEXTURE_2D);
 }
 
-void GfuiDrawString(const char *text, float *fgColor, int font, int x, int y, int align)
+void GfuiDrawString(const char *text, float *fgColor, int font,
+					int x, int y, int width, int hAlign)
 {
 	glEnable(GL_TEXTURE_2D);
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glEnable(GL_ALPHA_TEST);
 	glAlphaFunc(GL_GREATER, 0.1) ;
 	glColor4fv(fgColor);
-	switch(align&0xF0) {
-		case 0x00 /* LEFT */:
+	switch(hAlign & GFUI_ALIGN_HMASK) {
+		case GFUI_ALIGN_HL:
 			gfuiFont[font]->drawString(x, y, text);
 			break;
-		case 0x10 /* CENTER */:
-			gfuiFont[font]->drawString(x - gfuiFont[font]->getWidth(text) / 2, y, text);
+		case GFUI_ALIGN_HC:
+			gfuiFont[font]->drawString(x + (width - gfuiFont[font]->getWidth(text)) / 2, y, text);
 			break;
-		case 0x20 /* RIGHT */:
-			gfuiFont[font]->drawString(x - gfuiFont[font]->getWidth(text), y, text);
+		case GFUI_ALIGN_HR:
+			gfuiFont[font]->drawString(x + width - gfuiFont[font]->getWidth(text), y, text);
 			break;
 	}
 	glDisable(GL_ALPHA_TEST);
@@ -184,13 +185,8 @@ GfuiDraw(tGfuiObject *obj)
 static int
 gfuiMouseIn(tGfuiObject *obj)
 {
-    if ((GfuiMouse.X >= obj->xmin) &&
-	(GfuiMouse.X <= obj->xmax) &&
-	(GfuiMouse.Y >= obj->ymin) &&
-	(GfuiMouse.Y <= obj->ymax)) {
-	return 1;
-    }
-    return 0;
+    return (GfuiMouse.X >= obj->xmin && GfuiMouse.X <= obj->xmax
+			&& GfuiMouse.Y >= obj->ymin && GfuiMouse.Y <= obj->ymax) ? 1 : 0;
 }
 
 /** Remove the focus on the current element.
@@ -402,29 +398,23 @@ gfuiSelectNext(void * /* dummy */)
 	startObject = GfuiScreen->objects;
     }
     if (startObject == NULL) {
-		//GfLogDebug("gfuiSelectNext : No start object\n");
 	return;
     }
     curObject = startObject;
     do {
 	switch (curObject->widget) {
 	case GFUI_SCROLLIST:
-		//GfLogDebug("gfuiSelectNext : gfuiScrollListNextElt\n");
 	    gfuiScrollListNextElt(curObject);
 	    break;
 	    
 	default:
 	    curObject = curObject->next;
-		//GfLogDebug("gfuiSelectNext : curObject(id=%d, widget=%d, focusMode=%d, state=%d, visible=%d) : ",
-		//		   curObject->id, curObject->widget, curObject->focusMode, curObject->state, curObject->visible);
 	    if ((curObject->focusMode != GFUI_FOCUS_NONE) &&
 		(curObject->state != GFUI_DISABLE) &&
 		(curObject->visible)) {
-		//GfLogDebug("got focus\n");
 		gfuiSetFocus(curObject);
 		return;
 	    }
-		//GfLogDebug("skipped\n");
 	    break;
 	}
     } while (curObject != startObject);    
@@ -440,7 +430,6 @@ gfuiSelectPrev(void * /* dummy */)
     if (startObject == NULL) {
 	startObject = GfuiScreen->objects;
 	if (startObject == NULL) {
-		//GfLogDebug("gfuiSelectPrev : No start object\n");
 	    return;
 	}
 	startObject = startObject->next;
@@ -449,22 +438,17 @@ gfuiSelectPrev(void * /* dummy */)
     do {
 	switch (curObject->widget) {
 	case GFUI_SCROLLIST:
-		//GfLogDebug("gfuiSelectPrev : gfuiScrollListNextElt\n");
 	    gfuiScrollListPrevElt(curObject);
 	    break;
 
 	default:
 	    curObject = curObject->prev;
-		//GfLogDebug("gfuiSelectPrev : curObject(id=%d, widget=%d, focusMode=%d, state=%d, visible=%d) : ",
-		//		   curObject->id, curObject->widget, curObject->focusMode, curObject->state, curObject->visible);
 	    if ((curObject->focusMode != GFUI_FOCUS_NONE) &&
 		(curObject->state != GFUI_DISABLE) &&
 		(curObject->visible)) {
-		//GfLogDebug("got focus\n");
 		gfuiSetFocus(curObject);
 		return;
 	    }
-		//GfLogDebug("skipped\n");
 	    break;
 	}
     } while (curObject != startObject);

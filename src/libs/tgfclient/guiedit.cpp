@@ -31,9 +31,37 @@
 #include "gui.h"
 #include "guifont.h"
 
+
+static int NHPadding = 10;
+static int NVPadding = 5;
+
+
 void
 gfuiInitEditbox(void)
 {
+	char path[512];
+
+	// Get tip layout properties from the screen config file.
+	sprintf(path, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_EDITBOX);
+	NHPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 10.0);
+	NVPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0,  5.0);
+}
+
+/* recalc cursorx with cursorIdx */
+static void
+gfuiEditboxRecalcCursor(tGfuiObject *obj)
+{
+    tGfuiEditbox* editbox = &(obj->u.editbox);
+    tGfuiLabel* label = &(editbox->label);
+	
+    char buf[256];
+    strncpy(buf, label->text, editbox->cursorIdx);
+    buf[editbox->cursorIdx] = '\0';
+	
+	editbox->cursorx = gfuiLabelGetTextX(label) + label->font->getWidth(buf);
 }
 
 /** Add a editbox to a screen.
@@ -52,193 +80,145 @@ gfuiInitEditbox(void)
 		<br>-1 Error
  */
 int
-GfuiEditboxCreate(void *scr, const char *text, int font, int x, int y, int width, int maxlen,
-		  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
+GfuiEditboxCreate(void *scr, const char *text, int font,
+				  int x, int y, int width, int maxlen, int align,
+				  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-    tGfuiEditbox	*editbox;
-    tGfuiLabel		*label;
-    tGfuiObject		*object;
-    tGfuiScreen		*screen = (tGfuiScreen*)scr;
+    tGfuiScreen* screen = (tGfuiScreen*)scr;
 
-
-    object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
+    tGfuiObject* object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
     object->widget = GFUI_EDITBOX;
     object->focusMode = GFUI_FOCUS_MOUSE_CLICK;
     object->id = screen->curId++;
     object->visible = 1;
     
-    editbox = &(object->u.editbox);
+    tGfuiEditbox* editbox = &(object->u.editbox);
     editbox->state = GFUI_BTN_RELEASED;
     editbox->userDataOnFocus = userDataOnFocus;
     editbox->onFocus = onFocus;
     editbox->onFocusLost = onFocusLost;
 
-    editbox->bgColor[0] = GfuiColor::build(GFUI_BGBTNDISABLED);
-    editbox->bgColor[1] = GfuiColor::build(GFUI_BGBTNENABLED);
-    editbox->bgColor[2] = GfuiColor::build(GFUI_BGBTNCLICK);
-    editbox->bgFocusColor[0] = GfuiColor::build(GFUI_BGBTNDISABLED);
-    editbox->bgFocusColor[1] = GfuiColor::build(GFUI_BGBTNFOCUS);
-    editbox->bgFocusColor[2] = GfuiColor::build(GFUI_BGBTNCLICK);
+    editbox->bgColor[0] = GfuiColor::build(GFUI_BGEDITDISABLED);
+    editbox->bgColor[1] = GfuiColor::build(GFUI_BGEDITENABLED);
+    editbox->bgColor[2] = GfuiColor::build(GFUI_BGEDITENABLED);
+    editbox->bgFocusColor[0] = GfuiColor::build(GFUI_BGEDITDISABLED);
+    editbox->bgFocusColor[1] = GfuiColor::build(GFUI_BGEDITFOCUS);
+    editbox->bgFocusColor[2] = GfuiColor::build(GFUI_BGEDITFOCUS);
 	
-    editbox->fgColor[0] = GfuiColor::build(GFUI_EDITBOXCOLOR);
-    editbox->fgColor[1] = GfuiColor::build(GFUI_EDITBOXCOLOR);
-    editbox->fgColor[2] = GfuiColor::build(GFUI_EDITBOXCOLOR);
-    editbox->fgFocusColor[0] = GfuiColor::build(GFUI_EDITBOXCOLOR);
-    editbox->fgFocusColor[1] = GfuiColor::build(GFUI_EDITBOXCOLOR);
-    editbox->fgFocusColor[2] = GfuiColor::build(GFUI_EDITBOXCOLOR);
-											   
+    editbox->fgColor[0] = GfuiColor::build(GFUI_EDITDISABLED);
+    editbox->fgColor[1] = GfuiColor::build(GFUI_EDITENABLED);
+    editbox->fgColor[2] = GfuiColor::build(GFUI_EDITENABLED);
+    editbox->fgFocusColor[0] = GfuiColor::build(GFUI_EDITDISABLED);
+    editbox->fgFocusColor[1] = GfuiColor::build(GFUI_EDITFOCUS);
+	editbox->fgFocusColor[2] = GfuiColor::build(GFUI_EDITFOCUS);
+
     editbox->cursorColor[0] = GfuiColor::build(GFUI_EDITCURSORCLR);
     editbox->cursorColor[1] = GfuiColor::build(GFUI_EDITCURSORCLR);
     editbox->cursorColor[2] = GfuiColor::build(GFUI_EDITCURSORCLR);
     
+    tGfuiLabel* label = &(editbox->label);
+	gfuiLabelInit(label, text, maxlen, x + NHPadding, y + NVPadding,
+				  width - 2 * NHPadding, align, font, 0, 0, 0, 0, 0, 0, 0);
+	
+	maxlen = label->maxlen;
 
-    label = &(editbox->label);
-    if (maxlen == 0) maxlen = strlen(text);
-    label->text = (char*)calloc(1, maxlen+1);
-    strncpy(label->text, text, maxlen+1);
-    label->font = gfuiFont[font];
-    label->maxlen = maxlen;
-    label->userDataOnFocus = 0;
-    label->onFocus = 0;
-    label->onFocusLost = 0;
-
-    if (width == 0) {
-	char *buf;
-	int  i;
-	buf = (char*)malloc(maxlen+1);
-	if (buf == NULL) return -1;
-	for (i = 0; i < maxlen; i++) buf[i] = 'W';
-	buf[i] = '\0';
-	width = gfuiFont[font]->getWidth((const char *)buf);
-	free(buf);
+    if (width <= 0)
+	{
+		char* buf = (char*)malloc(maxlen+1);
+		for (int i = 0; i < maxlen; i++)
+			buf[i] = 'W';
+		buf[maxlen] = '\0';
+		width = gfuiFont[font]->getWidth((const char *)buf) + 2*NHPadding;
+		free(buf);
     }
 
-    label->align = GFUI_ALIGN_HL_VC;
-    label->x = object->xmin = x;
-    label->y = y - 2 * gfuiFont[font]->getDescender();
+    object->xmin = x;
     object->ymin = y;
     object->xmax = x + width;
-    object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-    editbox->cursory1 = object->ymin + 2;
-    editbox->cursory2 = object->ymax - 2;
-    editbox->cursorx = label->x;
+    object->ymax = y + gfuiFont[font]->getHeight() + 2*NVPadding;
+	
+    editbox->cursory1 = object->ymin + NVPadding / 2;
+    editbox->cursory2 = object->ymax - NVPadding / 2;
+	editbox->cursorIdx = (int)strlen(label->text);
+	gfuiEditboxRecalcCursor(object);
     
-#define HORIZ_MARGIN 10
-    object->xmin -= HORIZ_MARGIN;
-    object->xmax += HORIZ_MARGIN;
-
     gfuiAddObject(screen, object);
+
     return object->id;
 }
 
 
-/** Get the Id of the editbox focused in the current screen.
-    @ingroup	gui
-    @return	Editbox Id
-		<br>-1 if no editbox or no screen or the focus is not on a editbox
- */
-int
-GfuiEditboxGetFocused(void)
+void
+GfuiEditboxSetColors(void *scr, int id, const GfuiColor& color,
+					 const GfuiColor& focusedColor, const GfuiColor& disabledColor)
 {
-    tGfuiObject *curObject;
-
-    if (GfuiScreen != NULL) {
-	curObject = GfuiScreen->objects;
-	if (curObject != NULL) {
-	    do {
-		curObject = curObject->next;
-		if (curObject->focus) {
-		    if (curObject->widget == GFUI_EDITBOX) {
-			return curObject->id;
-		    }
-		    return -1;
-		}
-	    } while (curObject != GfuiScreen->objects);
+    tGfuiObject* object = gfuiGetObject(scr, id);
+	if (!object || object->widget != GFUI_EDITBOX)
+		return;
+	
+	if (color.alpha)
+	{
+		object->u.editbox.fgColor[1] = color;
+		object->u.editbox.fgColor[2] = color;
 	}
-    }
-    return -1;
-}
-
-
-void
-GfuiEditboxSetColor(void *scr, int id, const GfuiColor& color)
-{
-
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_EDITBOX) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.editbox.fgColor[0] = color;
-		    curObject->u.editbox.fgColor[1] = color;
-		    curObject->u.editbox.fgColor[2] = color;
-
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
-		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
+	if (disabledColor.alpha)
+	{
+		object->u.editbox.fgColor[0] = disabledColor;
+		object->u.editbox.fgFocusColor[0] = disabledColor;
+	}
+	if (focusedColor.alpha)
+	{
+		object->u.editbox.fgFocusColor[1] = focusedColor;
+		object->u.editbox.fgFocusColor[2] = focusedColor;
+	}
 }
 
 void
-GfuiEditboxSetFocusColor(void *scr, int id, const GfuiColor& focuscolor)
+GfuiEditboxSetBGColors(void *scr, int id, const GfuiColor& color,
+					   const GfuiColor& focusedColor, const GfuiColor& disabledColor)
 {
+    tGfuiObject* object = gfuiGetObject(scr, id);
 
-    tGfuiObject *curObject;
-    tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    int oldmin, oldmax;
-    
-    curObject = screen->objects;
-    if (curObject != NULL) {
-	do {
-	    curObject = curObject->next;
-	    if (curObject->id == id) {
-		if (curObject->widget == GFUI_EDITBOX) {
-		    oldmax = curObject->xmax;
-		    oldmin = curObject->xmin;
-		    curObject->u.editbox.bgFocusColor[0] = focuscolor;
-		    curObject->u.editbox.bgFocusColor[1] = focuscolor;
-		    curObject->u.editbox.bgFocusColor[2] = focuscolor;
-		    curObject->xmax = oldmax;
-		    curObject->xmin = oldmin;
-		}
+	if (!object || object->widget != GFUI_EDITBOX)
 		return;
-	    }
-	} while (curObject != screen->objects);
-    }    
+
+	if (color.alpha)
+	{
+		object->u.editbox.bgColor[1] = color;
+		object->u.editbox.bgColor[2] = color;
+	}
+	if (disabledColor.alpha)
+	{
+		object->u.editbox.bgColor[0] = disabledColor;
+		object->u.editbox.bgFocusColor[0] = disabledColor;
+	}
+	if (focusedColor.alpha)
+	{
+		object->u.editbox.bgFocusColor[1] = focusedColor;
+		object->u.editbox.bgFocusColor[2] = focusedColor;
+	}
 }
 
 void
 gfuiDrawEditbox(tGfuiObject *obj)
 {
-    tGfuiLabel		*label;
-    tGfuiEditbox	*editbox;
-    GfuiColor		fgColor;
-    GfuiColor		bgColor;
 
-    editbox = &(obj->u.editbox);
-    if (obj->state == GFUI_DISABLE) {
-	editbox->state = GFUI_BTN_DISABLE;
-    } else {
-	editbox->state = GFUI_BTN_RELEASED;
+    tGfuiEditbox* editbox = &(obj->u.editbox);
+	editbox->state = (obj->state == GFUI_DISABLE) ? GFUI_BTN_DISABLE : GFUI_BTN_RELEASED;
+
+    GfuiColor fgColor, bgColor;
+    if (obj->focus)
+	{
+		fgColor = editbox->fgFocusColor[editbox->state];
+		bgColor = editbox->bgFocusColor[editbox->state];
     }
-    if (obj->focus) {
-	fgColor = editbox->fgFocusColor[editbox->state];
-	bgColor = editbox->bgFocusColor[editbox->state];
-    } else {
-	fgColor = editbox->fgColor[editbox->state];
-	bgColor = editbox->bgColor[editbox->state];
+	else
+	{
+		fgColor = editbox->fgColor[editbox->state];
+		bgColor = editbox->bgColor[editbox->state];
     }
 
+	// Draw background
     glColor4fv(bgColor.toFloatRGBA());
     glBegin(GL_QUADS);
     glVertex2i(obj->xmin, obj->ymin);
@@ -246,7 +226,10 @@ gfuiDrawEditbox(tGfuiObject *obj)
     glVertex2i(obj->xmax, obj->ymax);
     glVertex2i(obj->xmax, obj->ymin);
     glEnd();
-    
+
+	// Draw box
+	// GfLogDebug("gfuiDrawEditbox: state=%d, fgColor=(%f,%f,%f,%f)\n",
+	// 		   editbox->state, fgColor.red, fgColor.green, fgColor.blue, fgColor.alpha);
     glColor4fv(fgColor.toFloatRGBA());
     glBegin(GL_LINE_STRIP);
     glVertex2i(obj->xmin, obj->ymin);
@@ -256,17 +239,18 @@ gfuiDrawEditbox(tGfuiObject *obj)
     glVertex2i(obj->xmin, obj->ymin);
     glEnd();	
     
-    label = &(editbox->label);
-    glColor4fv(fgColor.toFloatRGBA());
-    gfuiDrawString(label->x, label->y, label->font, label->text);
+	// Draw label
+    tGfuiLabel* label = &(editbox->label);
+    gfuiLabelDraw(label, fgColor);
     
-    if ((obj->state != GFUI_DISABLE) && (obj->focus)) {
-	/* draw cursor */
-	glColor3fv(editbox->cursorColor[editbox->state].toFloatRGBA());
-	glBegin(GL_LINES);
-	glVertex2i(editbox->cursorx, editbox->cursory1);
-	glVertex2i(editbox->cursorx, editbox->cursory2);
-	glEnd();
+	// Draw cursor if enabled and focused
+    if (obj->state != GFUI_DISABLE && obj->focus)
+	{
+		glColor3fv(editbox->cursorColor[editbox->state].toFloatRGBA());
+		glBegin(GL_LINES);
+		glVertex2i(editbox->cursorx, editbox->cursory1);
+		glVertex2i(editbox->cursorx, editbox->cursory2);
+		glEnd();
     }
 }
 
@@ -274,141 +258,115 @@ gfuiDrawEditbox(tGfuiObject *obj)
 void
 gfuiEditboxAction(int mouse)
 {
-    tGfuiObject		*object;
-    tGfuiLabel		*label;
-    tGfuiEditbox	*editbox;
-    int			relX;
-    char		buf[256];
-    unsigned	i;
+    tGfuiObject* object = GfuiScreen->hasFocus;
+    if (object->state == GFUI_DISABLE)
+		return;
 
-    object = GfuiScreen->hasFocus;
-    if (object->state == GFUI_DISABLE) {
-	return;
-    }
-    
-    if (mouse == 2) { /* enter key */
-	gfuiSelectNext(GfuiScreen);
-    } else if (mouse == 0) { /* mouse down */
-	editbox = &(object->u.editbox);
-	label = &(editbox->label);
-	/* Set the cursor position */
-	relX = GfuiMouse.X - label->x;
-	for (i = 0; i < strlen(label->text); i++){
-	    buf[i] = label->text[i];
-	    buf[i+1] = '\0';
-	    if (relX < label->font->getWidth((const char *)buf)) {
-		break;
-	    }
-	}
-	editbox->cursorIdx = i;
-	if (i == 0) {
-	    editbox->cursorx = label->x;
-	} else {
-	    buf[i] = '\0';
-	    editbox->cursorx = label->x + label->font->getWidth((const char *)buf);
-	}
+	/* enter key */
+    if (mouse == 2)
+		gfuiSelectNext(GfuiScreen);
+
+	/* mouse down */
+	else if (mouse == 0)
+	{
+		tGfuiEditbox* editbox = &(object->u.editbox);
+		tGfuiLabel* label = &(editbox->label);
+		
+		/* Set the cursor position */
+		const int relX = GfuiMouse.X - gfuiLabelGetTextX(label);
+		char buf[256];
+		unsigned i;
+		for (i = 0; i < strlen(label->text); i++)
+		{
+			buf[i] = label->text[i];
+			buf[i+1] = '\0';
+			if (relX < label->font->getWidth((const char *)buf))
+				break;
+		}
+		editbox->cursorIdx = i;
+
+		// Recompute cursorx from cursorIdx
+		gfuiEditboxRecalcCursor(object);
     }
 }
-
-/* recalc cursorx with cursorIdx */
-static void
-gfuiEditboxRecalcCursor(tGfuiObject *obj)
-{
-    char		buf[256];
-    tGfuiEditbox	*editbox;
-    tGfuiLabel		*label;
-
-    editbox = &(obj->u.editbox);
-    label = &(editbox->label);
-    strncpy(buf, label->text, editbox->cursorIdx);
-    buf[editbox->cursorIdx] = '\0';
-    editbox->cursorx = label->x + label->font->getWidth((const char *)buf);
-}
-
 
 void
 gfuiEditboxKey(tGfuiObject *obj, int key, int modifier)
 {
-    tGfuiEditbox	*editbox;
-    tGfuiLabel		*label;
-    char		*p1, *p2;
-    int			i1, i2;
+    if (obj->state == GFUI_DISABLE)
+		return;
 
-    if (obj->state == GFUI_DISABLE) {
-	return;
-    }
-
-    //printf("gfuiEditboxKey(k=%d, m=%04x)\n", key, modifier);
-
-    editbox = &(obj->u.editbox);
-    label = &(editbox->label);
+    tGfuiEditbox* editbox = &(obj->u.editbox);
+    tGfuiLabel* label = &(editbox->label);
 
 	if (!(modifier & (KMOD_CTRL|KMOD_ALT)))
 	{
-	  switch (key) 
-	  {
-	  // Move keys.
-	  case GFUIK_RIGHT:
-	    editbox->cursorIdx++;
-	    if (editbox->cursorIdx > (int)strlen(label->text)) 
-	    {
-		editbox->cursorIdx--;
-	    }
-	    break;
-	  case GFUIK_LEFT:
-	    editbox->cursorIdx--;
-	    if (editbox->cursorIdx < 0) 
-	    {
-		editbox->cursorIdx = 0;
-	    }
-	    break;
-	  case GFUIK_HOME:
-	    editbox->cursorIdx = 0;
-	    break;
-	  case GFUIK_END:
-	    editbox->cursorIdx = (int)strlen(label->text);
-	    break;
+		char* p1, *p2;
+		int	i1, i2;
+		switch (key) 
+		{
+			// Move keys.
+			case GFUIK_RIGHT:
+				editbox->cursorIdx++;
+				if (editbox->cursorIdx > (int)strlen(label->text)) 
+				{
+					editbox->cursorIdx--;
+				}
+				break;
+			case GFUIK_LEFT:
+				editbox->cursorIdx--;
+				if (editbox->cursorIdx < 0) 
+				{
+					editbox->cursorIdx = 0;
+				}
+				break;
+			case GFUIK_HOME:
+				editbox->cursorIdx = 0;
+				break;
+			case GFUIK_END:
+				editbox->cursorIdx = (int)strlen(label->text);
+				break;
 
-	  // Edition keys
-	  case GFUIK_DELETE:
-	    if (editbox->cursorIdx < (int)strlen(label->text)) 
-	    {
-		p1 = &(label->text[editbox->cursorIdx]);
-		p2 = &(label->text[editbox->cursorIdx+1]);
-		while ( *p1 != '\0' ) 
-		    *p1++ = *p2++;
-	    }
-	    break;
-	  case GFUIK_BACKSPACE:
-	    if (editbox->cursorIdx > 0) 
-	    {
-		p1 = &(label->text[editbox->cursorIdx-1]);
-		p2 = &(label->text[editbox->cursorIdx]);
-		while ( *p1 != '\0' ) 
-		    *p1++ = *p2++;
-		editbox->cursorIdx--;
-	    }
-	    break;
+				// Edition keys
+			case GFUIK_DELETE:
+				if (editbox->cursorIdx < (int)strlen(label->text)) 
+				{
+					p1 = &(label->text[editbox->cursorIdx]);
+					p2 = &(label->text[editbox->cursorIdx+1]);
+					while ( *p1 != '\0' ) 
+						*p1++ = *p2++;
+				}
+				break;
+			case GFUIK_BACKSPACE:
+				if (editbox->cursorIdx > 0) 
+				{
+					p1 = &(label->text[editbox->cursorIdx-1]);
+					p2 = &(label->text[editbox->cursorIdx]);
+					while ( *p1 != '\0' ) 
+						*p1++ = *p2++;
+					editbox->cursorIdx--;
+				}
+				break;
 		
-	  default:
-	    // Normal char keys
-	    if (key >= ' ' && key < 127) 
-	    {
-	      if ((int)strlen(label->text) < label->maxlen) 
-	      {
-		    i2 = (int)strlen(label->text) + 1;
-		    i1 = i2 - 1;
-		    while (i2 > editbox->cursorIdx) 
-		    {
-		        label->text[i2] = label->text[i1];
-		        i1--;
-		        i2--;
-		    }
-		    label->text[editbox->cursorIdx] = key;
-		    editbox->cursorIdx++;
-	      }
-	    }
-	  }
+			default:
+				// Normal char keys
+				if (key >= ' ' && key < 127) 
+				{
+					if ((int)strlen(label->text) < label->maxlen) 
+					{
+						i2 = (int)strlen(label->text) + 1;
+						i1 = i2 - 1;
+						while (i2 > editbox->cursorIdx) 
+						{
+							label->text[i2] = label->text[i1];
+							i1--;
+							i2--;
+						}
+						label->text[editbox->cursorIdx] = key;
+						editbox->cursorIdx++;
+					}
+				}
+		}
 	}
 
     gfuiEditboxRecalcCursor(obj);
@@ -423,19 +381,13 @@ gfuiEditboxKey(tGfuiObject *obj, int key, int modifier)
 char *
 GfuiEditboxGetString(void *scr, int id)
 {
-    tGfuiObject		*curObject;
-    tGfuiEditbox	*editbox;
-    tGfuiLabel		*label;
+	tGfuiObject* curObject = gfuiGetObject(scr, id);
     
-    curObject = gfuiGetObject(scr, id);
-    
-    if ((curObject == NULL) || (curObject->widget != GFUI_EDITBOX)) 
-    {
-	return (char*)NULL;
-    }
+    if (!curObject || curObject->widget != GFUI_EDITBOX)
+		return 0;
 
-    editbox = &(curObject->u.editbox);
-    label = &(editbox->label);
+    tGfuiEditbox* editbox = &(curObject->u.editbox);
+    tGfuiLabel* label = &(editbox->label);
     
     return label->text;
 }
@@ -449,19 +401,13 @@ GfuiEditboxGetString(void *scr, int id)
  */
 void GfuiEditboxSetString(void *scr, int id, const char *text)
 {
-    tGfuiObject		*curObject;
-    tGfuiEditbox	*editbox;
-    tGfuiLabel		*label;
+    tGfuiObject* curObject = gfuiGetObject(scr, id);
     
-    curObject = gfuiGetObject(scr, id);
-    
-    if ((curObject == NULL) || (curObject->widget != GFUI_EDITBOX)) 
-    {
-	return;
-    }
+    if (!curObject || curObject->widget != GFUI_EDITBOX) 
+		return;
 
-    editbox = &(curObject->u.editbox);
-    label = &(editbox->label);
+    tGfuiEditbox* editbox = &(curObject->u.editbox);
+    tGfuiLabel* label = &(editbox->label);
 
     strncpy(label->text, text, label->maxlen);
 }
@@ -470,11 +416,9 @@ void GfuiEditboxSetString(void *scr, int id, const char *text)
 void
 gfuiReleaseEditbox(tGfuiObject *curObject)
 {
-    tGfuiEditbox	*editbox;
-    tGfuiLabel		*label;
-
-    editbox = &(curObject->u.editbox);
-    label = &(editbox->label);
+    tGfuiEditbox* editbox = &(curObject->u.editbox);
+    tGfuiLabel* label = &(editbox->label);
+	
     free(label->text);
     free(curObject);
 }

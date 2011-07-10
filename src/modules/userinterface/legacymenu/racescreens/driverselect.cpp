@@ -709,10 +709,10 @@ RmDriversSelect(void *vs)
     CurrentDriverCarLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "currentdrivercarlabel");
     
-    // Next, Previous and Change Car buttons
+    // Next, Back and Change Car buttons
     NextButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "nextmenubutton", NULL, rmdsNextMenu);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "previousmenubutton",
+    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "backbutton",
 						MenuData->prevScreen, rmdsPreviousMenu);
     ChangeCarButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carselectbutton",
 											ScrHandle, rmdsCarSelectMenu);

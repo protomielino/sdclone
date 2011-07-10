@@ -51,7 +51,7 @@ GfTrack* PCurTrack;
 static int CategoryEditId;
 static int NameEditId;
 static int OutlineImageId;
-static int AuthorLabelId;
+static int AuthorsLabelId;
 static int LengthLabelId;
 static int WidthLabelId;
 static int DescLine1LabelId;
@@ -109,7 +109,7 @@ rmtsUpdateTrackInfo(void)
     GfuiLabelSetText(ScrHandle, DescLine2LabelId, strDescLine2.c_str());
 
     // 2) Authors
-    GfuiLabelSetText(ScrHandle, AuthorLabelId, PCurTrack->getAuthors().c_str());
+    GfuiLabelSetText(ScrHandle, AuthorsLabelId, PCurTrack->getAuthors().c_str());
 
     // 3) Width.
 	std::ostringstream ossData;
@@ -268,14 +268,14 @@ RmTrackSelect(void *vs)
     OutlineImageId = GfuiMenuCreateStaticImageControl(ScrHandle, hparmMenu, "outlineimage");
 
     GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "nextbutton", NULL, rmtsSelect);
-    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "previousbutton", MenuData->prevScreen, rmtsDeactivate);
+    GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "backbutton", MenuData->prevScreen, rmtsDeactivate);
 
     DescLine1LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel");
-    DescLine2LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel2");
+    DescLine2LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "description2label");
     LengthLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "lengthlabel");
     WidthLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "widthlabel");
     MaxPitsLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "pitslabel");
-    AuthorLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "authorlabel");
+    AuthorsLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "authorslabel");
 
     GfParmReleaseHandle(hparmMenu);
 

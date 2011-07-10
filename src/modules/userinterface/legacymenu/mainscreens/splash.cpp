@@ -231,7 +231,7 @@ static void splashDisplay( void )
 	gluOrtho2D(0, 640, 0, 480);
 	
 	static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
-	GfuiDrawString(VERSION_LONG, grWhite, GFUI_FONT_SMALL_C, 640-8, 8, GFUI_ALIGN_HR_VB);
+	GfuiDrawString(VERSION_LONG, grWhite, GFUI_FONT_SMALL_C, 440-8, 8, 200, GFUI_ALIGN_HR);
 #endif
 
 	GfuiSwapBuffers();

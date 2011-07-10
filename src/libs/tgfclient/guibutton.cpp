@@ -26,20 +26,44 @@
 
 #include "gui.h"
 
+// Text buttons padding (outside of the text label)
+static int NHTxtPadding = 10;
+static int NVTxtPadding = 5;
+
+// Image buttons padding (outside of the image)
+static int NHImgPadding = 0;
+static int NVImgPadding = 0;
 
 void
 gfuiInitButton(void)
 {
+	char path[512];
 
+	// Get default layout properties from the screen config file.
+	// 1) Tips.
+	sprintf(path, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	void* hparmScr = GfParmReadFile(path, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+
+	// 2) Text buttons.
+	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_TEXTBUTTON);
+	NHTxtPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 10.0);
+	NVTxtPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0,  5.0);
+
+	// 3) Image buttons.
+	sprintf(path, "%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_SECT_IMAGEBUTTON);
+	NHImgPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_HPADDING, 0, 0.0);
+	NVImgPadding = (int)GfParmGetNum(hparmScr, path, GFSCR_ATT_VPADDING, 0, 0.0);
 }
 
-/** Initialize a graphical button.
+/** Initialize an image button.
     @ingroup	gui
     @param	button		The button to initialize
     @param	disabled	filename of the image when the button is disabled
     @param	enabled		filename of the image when the button is enabled
     @param	focused		filename of the image when the button is focused
     @param	pushed		filename of the image when the button is pushed
+    @param	x		X position on screen (0 = left)
+    @param	y		Y position on screen (0 = bottom)
     @param	width		Width on the screen (0 = image width)
     @param	height		Height on the screen (0 = image height)
     @param	mouse		Mouse behavior:
@@ -56,7 +80,7 @@ gfuiInitButton(void)
 void
 gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enabled,
 				 const char *focused, const char *pushed,
-				 int x, int y, int align, int width, int height, int mouse,
+				 int x, int y, int width, int height, int mouse,
 				 void *userDataOnPush, tfuiCallback onPush, 
 				 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -71,57 +95,8 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
 	// Warning: All the images are supposed to be the same size.
 	button->width = width <= 0 ? w : width;
 	button->height = height <= 0 ? h : height;
-
-	button->align = align;
-
-    switch(align)
-	{
-		case GFUI_ALIGN_HL_VB:
-			button->x = x;
-			button->y = y;
-			break;
-
-		case GFUI_ALIGN_HL_VC:
-			button->x = x;
-			button->y = y - button->height / 2;
-			break;
-
-		case GFUI_ALIGN_HL_VT:
-			button->x = x;
-			button->y = y - button->height;
-			break;
-
-		case GFUI_ALIGN_HC_VB:
-			button->x = x - button->width / 2;
-			button->y = y;
-			break;
-
-		case GFUI_ALIGN_HC_VC:
-			button->x = x - button->width / 2;
-			button->y = y - button->height / 2;
-			break;
-
-		case GFUI_ALIGN_HC_VT:
-			button->x = x - button->width / 2;
-			button->y = y - button->height;
-			break;
-
-		case GFUI_ALIGN_HR_VB:
-			button->x = x - button->width;
-			button->y = y;
-			break;
-
-		case GFUI_ALIGN_HR_VC:
-			button->x = x - button->width;
-			button->y = y - button->height / 2;
-			break;
-
-		case GFUI_ALIGN_HR_VT:
-			button->x = x - button->width;
-			button->y = y - button->height;
-			break;
-	}
-
+	button->x = x;
+	button->y = y;
     button->buttonType = GFUI_BTN_PUSH;
     button->mouseBehaviour = mouse;
 
@@ -132,7 +107,7 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
     button->onFocusLost = onFocusLost;
 }
 
-/** Add a graphical button to a screen.
+/** Add an image button to a screen.
     @ingroup	gui
     @param	scr		Screen
     @param	disabled	filename of the image when the button is disabled
@@ -141,9 +116,8 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
     @param	pushed		filename of the image when the button is pushed
     @param	x		X position on screen (0 = left)
     @param	y		Y position on screen (0 = bottom)
-    @param	width		Width on the screen (0 = image width)
-    @param	height		Height on the screen (0 = image height)
-    @param	align		Button alignment
+    @param	width		Width on the screen (0 = image width + h-padding)
+    @param	height		Height on the screen (0 = image height + v-padding)
     @param	mouse		Mouse behavior:
                         <br>GFUI_MOUSE_UP Action performed when the mouse right button is released
                         <br>GFUI_MOUSE_DOWN Action performed when the mouse right button is pushed
@@ -159,84 +133,31 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
 int
 GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
 				   const char *focused, const char *pushed,
-				   int x, int y, int width, int height, int align, int mouse,
+				   int x, int y, int width, int height, int mouse, bool padding,
 				   void *userDataOnPush, tfuiCallback onPush, 
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-    tGfuiGrButton	*button;
-    tGfuiObject		*object;
-    tGfuiScreen		*screen = (tGfuiScreen*)scr;
+    tGfuiScreen* screen = (tGfuiScreen*)scr;
     
-    object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
+    tGfuiObject* object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
     object->widget = GFUI_GRBUTTON;
     object->focusMode = GFUI_FOCUS_MOUSE_MOVE;
     object->id = screen->curId++;
     object->visible = 1;
-    
-    button = &(object->u.grbutton);
+
+	const int hPadding = padding ? NHImgPadding : 0;
+	const int vPadding = padding ? NVImgPadding : 0;
+	
+    tGfuiGrButton* button = &(object->u.grbutton);
 	gfuiGrButtonInit(button, disabled, enabled, focused, pushed,
-					 x, y, align, width, height, mouse,
+					 x + hPadding, y + vPadding,
+					 width - 2 * hPadding, height - 2 * vPadding, mouse,
 					 userDataOnPush, onPush, userDataOnFocus, onFocus, onFocusLost);
 
-    switch (align)
-	{
-		case GFUI_ALIGN_HR_VB:
-			object->xmin = x - button->width;
-			object->xmax = x;
-			object->ymin = y;
-			object->ymax = y + button->height;
-			break;
-		case GFUI_ALIGN_HR_VC:
-			object->xmin = x - button->width;
-			object->xmax = x;
-			object->ymin = y - button->height / 2;
-			object->ymax = y + button->height / 2;
-			break;
-		case GFUI_ALIGN_HR_VT:
-			object->xmin = x - button->width;
-			object->xmax = x;
-			object->ymin = y - button->height;
-			object->ymax = y;
-			break;
-		case GFUI_ALIGN_HC_VB:
-			object->xmin = x - button->width / 2;
-			object->xmax = x + button->width / 2;
-			object->ymin = y;
-			object->ymax = y + button->height;
-			break;
-		case GFUI_ALIGN_HC_VC:
-			object->xmin = x - button->width / 2;
-			object->xmax = x + button->width / 2;
-			object->ymin = y - button->height / 2;
-			object->ymax = y + button->height / 2;
-			break;
-		case GFUI_ALIGN_HC_VT:
-			object->xmin = x - button->width / 2;
-			object->xmax = x + button->width / 2;
-			object->ymin = y - button->height;
-			object->ymax = y;
-			break;
-		case GFUI_ALIGN_HL_VB:
-			object->xmin = x;
-			object->xmax = x + button->width;
-			object->ymin = y;
-			object->ymax = y + button->height;
-			break;
-		case GFUI_ALIGN_HL_VC:
-			object->xmin = x;
-			object->xmax = x + button->width;
-			object->ymin = y - button->height / 2;
-			object->ymax = y + button->height / 2;
-			break;
-		case GFUI_ALIGN_HL_VT:
-			object->xmin = x;
-			object->xmax = x + button->width;
-			object->ymin = y - button->height;
-			object->ymax = y;
-			break;
-		default:
-			break;
-    }
+	object->xmin = x;
+	object->xmax = x + button->width + 2 * hPadding;
+	object->ymin = y;
+	object->ymax = y + button->height + 2 * vPadding;
 
     gfuiAddObject(screen, object);
 	
@@ -251,18 +172,12 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
     @param	x		X position on screen
     @param	y		Y position on screen (0 = bottom)
     @param	width		width of the button (0 = text size)
-    @param	align		Button alignment:
-    			<br>GFUI_ALIGN_HR_VB	horizontal right, vertical bottom
-    			<br>GFUI_ALIGN_HR_VC	horizontal right, vertical center
-    			<br>GFUI_ALIGN_HR_VT	horizontal right, vertical top
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical bottom
-    			<br>GFUI_ALIGN_HC_VC	horizontal center, vertical center
-    			<br>GFUI_ALIGN_HC_VT	horizontal center, vertical top
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical bottom
-    			<br>GFUI_ALIGN_HL_VC	horizontal left, vertical center
-    			<br>GFUI_ALIGN_HL_VT	horizontal left, vertical top
+    @param	textAlign		Horizontal text alignment inside the button:
+    			<br>GFUI_ALIGN_HR	right
+    			<br>GFUI_ALIGN_HC	center
+    			<br>GFUI_ALIGN_HL	left
     @param	mouse		Mouse behavior:
-    				<br>GFUI_MOUSE_UP Action performed when the mouse right button is released
+    			<br>GFUI_MOUSE_UP Action performed when the mouse right button is released
 				<br>GFUI_MOUSE_DOWN Action performed when the mouse right button is pushed
     @param	userDataOnPush	Parameter to the Push callback
     @param	onPush		Push callback function
@@ -273,12 +188,13 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
 		<br>-1 Error
  */
 int
-GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width, int align, int mouse,
-		      void *userDataOnPush, tfuiCallback onPush, 
-		      void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
+GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int width,
+					  int textHAlign, int mouse,
+					  void *userDataOnPush, tfuiCallback onPush, 
+					  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
-	int id = GfuiButtonCreate(scr, text, font, x, y, width, align, mouse, userDataOnPush, onPush, userDataOnFocus,
-	onFocus, onFocusLost);
+	int id = GfuiButtonCreate(scr, text, font, x, y, width, textHAlign, mouse,
+							  userDataOnPush, onPush, userDataOnFocus, onFocus, onFocusLost);
 
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	tGfuiObject *curObject = screen->objects;
@@ -298,7 +214,7 @@ GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int w
 }//GfuiButtonStateCreate
 
 
-/** Add a button to a screen.
+/** Add a text button to a screen.
     @ingroup	gui
     @param	scr		Screen
     @param	text		Button label
@@ -306,18 +222,12 @@ GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int w
     @param	x		X position on screen
     @param	y		Y position on screen (0 = bottom)
     @param	width		width of the button (0 = text size)
-    @param	align		Button alignment:
-    			<br>GFUI_ALIGN_HR_VB	horizontal right, vertical bottom
-    			<br>GFUI_ALIGN_HR_VC	horizontal right, vertical center
-    			<br>GFUI_ALIGN_HR_VT	horizontal right, vertical top
-    			<br>GFUI_ALIGN_HC_VB	horizontal center, vertical bottom
-    			<br>GFUI_ALIGN_HC_VC	horizontal center, vertical center
-    			<br>GFUI_ALIGN_HC_VT	horizontal center, vertical top
-    			<br>GFUI_ALIGN_HL_VB	horizontal left, vertical bottom
-    			<br>GFUI_ALIGN_HL_VC	horizontal left, vertical center
-    			<br>GFUI_ALIGN_HL_VT	horizontal left, vertical top
+    @param	textHAlign		Horizontal text alignment inside the button:
+    			<br>GFUI_ALIGN_HR	right
+    			<br>GFUI_ALIGN_HC	center
+    			<br>GFUI_ALIGN_HL	left
     @param	mouse		Mouse behavior:
-    				<br>GFUI_MOUSE_UP Action performed when the mouse right button is released
+    			<br>GFUI_MOUSE_UP Action performed when the mouse right button is released
 				<br>GFUI_MOUSE_DOWN Action performed when the mouse right button is pushed
     @param	userDataOnPush	Parameter to the Push callback
     @param	onPush		Push callback function
@@ -328,7 +238,7 @@ GfuiButtonStateCreate(void *scr, const char *text, int font, int x, int y, int w
 		<br>-1 Error
  */
 int
-GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width, int align,
+GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width, int textHAlign,
 				 int mouse, void *userDataOnPush, tfuiCallback onPush, 
 				 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -371,38 +281,23 @@ GfuiButtonCreate(void *scr, const char *text, int font, int x, int y, int width,
     button->fgFocusColor[1] = GfuiColor::build(GFUI_BTNFOCUS);
 	button->fgFocusColor[2] = GfuiColor::build(GFUI_BTNCLICK);
 
-	gfuiLabelInit(&button->label, text, 100, x, y - gfuiFont[font]->getDescender(), align, width,
-				  font, 0, 0, 0, 0, 0, 0, 0);
+	button->imgX = 0;
+	button->imgY = 0;
+	button->imgWidth = 0;
+	button->imgHeight = 0;
+
+	gfuiLabelInit(&button->label, text, 0, x + NHTxtPadding, y + NVTxtPadding,
+				  width - 2 * NHTxtPadding, textHAlign, font, 0, 0, 0, 0, 0, 0, 0);
 	
     if (width <= 0)
-		width = gfuiFont[font]->getWidth((const char *)text);
+		width = button->label.width + 2*NHTxtPadding;
 
-    switch(align&0xF0)
-	{
-		case GFUI_ALIGN_HL_VB /* LEFT */:
-			object->xmin = x;
-			object->ymin = y;
-			object->xmax = x + width;
-			object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-			break;
-		case GFUI_ALIGN_HC_VB /* CENTER */:
-			object->xmin = x - width / 2;
-			object->ymin = y;
-			object->xmax = x + width / 2;
-			object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-			break;
-		case GFUI_ALIGN_HR_VB /* RIGHT */:
-			object->xmin = x - width;
-			object->ymin = y;
-			object->xmax = x;
-			object->ymax = y + gfuiFont[font]->getHeight() - gfuiFont[font]->getDescender();
-			break;
-    }
-	static const int HORIZ_MARGIN = 10;
-    object->xmin -= HORIZ_MARGIN;
-    object->xmax += HORIZ_MARGIN;
+	object->xmin = x;
+	object->ymin = y;
+	object->xmax = x + width;
+	object->ymax = y + gfuiFont[font]->getHeight() + 2*NVTxtPadding;
 
-    gfuiAddObject(screen, object);
+	gfuiAddObject(screen, object);
 	
     return object->id;
 }
@@ -418,9 +313,7 @@ GfuiButtonSetText(void *scr, int id, const char *text)
 {
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
-	{
 		gfuiLabelSetText(&(object->u.button.label), text);
-	}
 }//GfuiButtonSetText
 
 
@@ -435,30 +328,35 @@ GfuiButtonShowBox(void *scr, int id, bool bShow)
 {
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
-	{
 		object->u.button.bShowBox = bShow;
-	}
 }//GfuiButtonShowBox
 
 
-/** Change the colour of a button.
+/** Change the foregound colours of a button.
     @ingroup	gui
     @param	scr	Screen
     @param	id	Button Id
-    @param	color	New colour of the button
+    @param	color	New colour
+    @param	focusColor	New focused-state colour
+    @param	pushColor	New pushed-state colour
  */
 void
-GfuiButtonSetColor(void *scr, int id, const GfuiColor& color)
+GfuiButtonSetColors(void *scr, int id,
+					const GfuiColor& color, const GfuiColor& focusColor, const GfuiColor& pushColor)
 {
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
 	{
-		object->u.button.fgColor[1] = color;
+		if (color.alpha)
+			object->u.button.fgColor[1] = color;
+		if (focusColor.alpha)
+			object->u.button.fgFocusColor[1] = focusColor;
+		if (pushColor.alpha)
+			object->u.button.fgFocusColor[2] = pushColor;
 	}
 }//GfuiButtonSetColor
 
-
-/** Define button images for different states.
+/** Define text button images for different states.
     @ingroup	gui
     @param	scr	Screen
     @param	id	Button Id
@@ -473,28 +371,28 @@ GfuiButtonSetColor(void *scr, int id, const GfuiColor& color)
 */
 void
 GfuiButtonSetImage(void *scr, int id, int x, int y, int w, int h,
-	const char *disableFile, const char *enableFile,
-	const char *focusedFile, const char *pushedFile)
+				   const char *disabledFile, const char *enabledFile,
+				   const char *focusedFile, const char *pushedFile)
 {
-	GLuint disable = 0;
-	GLuint enable = 0;
+	GLuint disabled = 0;
+	GLuint enabled = 0;
 	GLuint focused = 0;
 	GLuint pushed = 0;
 
-	if (strlen(disableFile) != 0)
-		disable = GfTexReadTexture(disableFile);
-	if (strlen(enableFile) != 0)
-		enable = GfTexReadTexture(enableFile);
-	if (strlen(focusedFile) != 0)
+	if (disabledFile && strlen(disabledFile) > 0)
+		disabled = GfTexReadTexture(disabledFile);
+	if (enabledFile && strlen(enabledFile) > 0)
+		enabled = GfTexReadTexture(enabledFile);
+	if (focusedFile && strlen(focusedFile) > 0)
 		focused = GfTexReadTexture(focusedFile);
-	if (strlen(pushedFile) != 0)
+	if (pushedFile && strlen(pushedFile) > 0)
 		pushed = GfTexReadTexture(pushedFile);
 
 	tGfuiObject *object = gfuiGetObject(scr, id);
 	if (object && object->widget == GFUI_BUTTON)
 	{
-		object->u.button.disabled = disable;
-		object->u.button.enabled = enable;
+		object->u.button.disabled = disabled;
+		object->u.button.enabled = enabled;
 		object->u.button.focused = focused;
 		object->u.button.pushed = pushed;
 		object->u.button.imgX = x;
@@ -505,67 +403,7 @@ GfuiButtonSetImage(void *scr, int id, int x, int y, int w, int h,
 }//GfuiButtonSetImage
 
 
-/** Change the focused colour of a button.
-    @ingroup	gui
-    @param	scr	Screen
-    @param	id	Button Id
-    @param	focuscolor	New focus colour of the button
- */
-void
-GfuiButtonSetFocusColor(void *scr, int id, const GfuiColor& focuscolor)
-{
-	tGfuiObject *object = gfuiGetObject(scr, id);
-	if (object && object->widget == GFUI_BUTTON)
-	{
-		object->u.button.fgFocusColor[1] = focuscolor;
-	}
-}//GfuiButtonSetFocusColor
-
-
-/** Change the pushed colour of a button.
-    @ingroup	gui
-    @param	scr	Screen
-    @param	id	Button Id
-    @param	pushcolor	New pushed colour of the button
- */
-void
-GfuiButtonSetPushedColor(void *scr, int id, const GfuiColor& pushcolor)
-{
-	tGfuiObject *object = gfuiGetObject(scr, id);
-	if (object && object->widget == GFUI_BUTTON)
-	{
-		object->u.button.fgFocusColor[2] = pushcolor;
-	}    
-}//GfuiButtonSetPushedColor
-
-
-/** Get the Id of the button focused in the current screen.
-    @ingroup	gui
-    @return	Button Id
-		<br>-1 if no button or no screen or the focus is not on a button
- */
-int
-GfuiButtonGetFocused(void)
-{
-	if (GfuiScreen) {
-		tGfuiObject *curObject = GfuiScreen->objects;
-		if (curObject) {
-			do {
-				curObject = curObject->next;
-				if (curObject->focus) {
-					if (curObject->widget == GFUI_BUTTON) {
-						return curObject->id;
-					}
-				return -1;
-				}
-			} while (curObject != GfuiScreen->objects);
-		}
-	}
-	return -1;
-}//GfuiButtonGetFocused
-
-
-/** Actually draw the given button object.
+/** Actually draw the given text button object.
     @ingroup	gui
     @param	obj	button object to draw
  */
@@ -577,19 +415,23 @@ gfuiDrawButton(tGfuiObject *obj)
 
 	// Determine the fore/background colors, according to the state/focus.
 	tGfuiButton *button = &(obj->u.button);
-	if (obj->state == GFUI_DISABLE) {
+	if (obj->state == GFUI_DISABLE)
 		button->state = GFUI_BTN_DISABLE;
-		}
-	if (obj->focus) {
+
+	if (obj->focus)
+	{
 		fgColor = button->fgFocusColor[button->state];
 		bgColor = button->bgFocusColor[button->state];
-	} else {
+	}
+	else
+	{
 		fgColor = button->fgColor[button->state];
 		bgColor = button->bgColor[button->state];
 	}//if obj->focus
 
-	// Draw the bouding box / background if specified and visible.
-	if (bgColor.alpha && button->bShowBox) {
+	// Draw the bounding box / background if specified and visible.
+	if (bgColor.alpha && button->bShowBox)
+	{
 		glColor4fv(bgColor.toFloatRGBA());
 		glBegin(GL_QUADS);
 		glVertex2i(obj->xmin, obj->ymin);
@@ -609,24 +451,24 @@ gfuiDrawButton(tGfuiObject *obj)
 
 	// Draw the image if any, according to the state/focus.
 	GLuint img = 0;
-	if (obj->state == GFUI_DISABLE) {
+	if (obj->state == GFUI_DISABLE)
 		img = button->disabled;
-	} else if (button->state == GFUI_BTN_PUSHED) {
+	else if (button->state == GFUI_BTN_PUSHED)
 		img = button->pushed;
-	} else if (obj->focus) {
+	else if (obj->focus)
 		img = button->focused;
-	} else {
+	else
 		img = button->enabled;
-	}
 
-	if (img) {
+	if (img)
+	{
 		const int x1 = obj->xmin + button->imgX;
 		const int x2 = x1 + button->imgWidth;
 		const int y1 = obj->ymin + button->imgY;
 		const int y2 = y1 + button->imgHeight;
 
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-		glColor3f(1.0,1.0,1.0); //set color to mix with image
+		glColor3f(1.0, 1.0, 1.0); //set color to mix with image
 
 		glEnable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
@@ -635,17 +477,17 @@ gfuiDrawButton(tGfuiObject *obj)
 		glBindTexture(GL_TEXTURE_2D, img);
 		glBegin(GL_QUADS);
 
-		glTexCoord2f (0.0, 0.0);
-		glVertex2i(x1,y1);
+		glTexCoord2f(0.0, 0.0);
+		glVertex2i(x1, y1);
 
-		glTexCoord2f (0.0, 1.0);
-		glVertex2i(x1,y2);
+		glTexCoord2f(0.0, 1.0);
+		glVertex2i(x1, y2);
 
-		glTexCoord2f (1.0, 1.0);
-		glVertex2i(x2,y2);
+		glTexCoord2f(1.0, 1.0);
+		glVertex2i(x2, y2);
 
-		glTexCoord2f (1.0, 0.0);
-		glVertex2i(x2,y1);
+		glTexCoord2f(1.0, 0.0);
+		glVertex2i(x2, y1);
 
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
@@ -654,12 +496,11 @@ gfuiDrawButton(tGfuiObject *obj)
 
 	// Draw the label.
 	tGfuiLabel *label = &(button->label);
-	glColor4fv(fgColor.toFloatRGBA());
-	gfuiDrawString(label->x, label->y, label->font, label->text);
+	gfuiLabelDraw(label, fgColor);
 }//gfuiDrawButton
 
 
-/** Actually draw the given graphical button.
+/** Actually draw the given image button.
     @ingroup	gui
     @param	obj	graphical button to draw
  */
@@ -668,15 +509,14 @@ gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus)
 {
 	// Determine the image to draw, according to the state/focus.
 	GLuint img;
-	if (state == GFUI_DISABLE) {
+	if (state == GFUI_DISABLE)
 		img = button->disabled;
-	} else if (button->state == GFUI_BTN_PUSHED) {
+	else if (button->state == GFUI_BTN_PUSHED)
 		img = button->pushed;
-	} else if (focus) {
+	else if (focus)
 		img = button->focused;
-	} else {
+	else
 		img = button->enabled;
-	}
 
 	// Draw the image.
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -714,7 +554,7 @@ gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus)
 */
 }
 
-/** Actually draw the given graphical button object.
+/** Actually draw the given image button object.
     @ingroup	gui
     @param	obj	button object to draw
  */
@@ -821,9 +661,7 @@ void
 gfuiButtonAction(int action)
 {
 	if (GfuiScreen->hasFocus->state == GFUI_DISABLE) 
-	{
 		return;
-    }
 
 	tGfuiButton	*button = &(GfuiScreen->hasFocus->u.button);
 
@@ -895,7 +733,7 @@ gfuiButtonAction(int action)
 void
 gfuiReleaseButton(tGfuiObject *obj)
 {
-	tGfuiButton *button = &(obj->u.button);;
+	tGfuiButton *button = &(obj->u.button);
 
 	GfTexFreeTexture(button->disabled);
 	GfTexFreeTexture(button->enabled);

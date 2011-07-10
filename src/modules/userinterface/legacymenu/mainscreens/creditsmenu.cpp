@@ -113,9 +113,8 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	GfuiMenuCreateStaticControls(hscrPage, hmenu);
 
 	// Create title label from chapter name
-	sprintf(buf, "Credits - %s", chapName);
-	const int titleId = GfuiMenuCreateLabelControl(hscrPage, hmenu, "title");
-	GfuiLabelSetText(hscrPage, titleId, buf);
+	const int titleId = GfuiMenuCreateLabelControl(hscrPage, hmenu, "subtitle");
+	GfuiLabelSetText(hscrPage, titleId, chapName);
 
 	// Get menu properties.
 	const int nMaxLinesPerPage =
@@ -154,14 +153,13 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			// We need 1 more screen line for the current credits record ?
 			x0 += xRecordLineShift;
 			x = x0;
-			y -= yLineShift;
+			//y -= yLineShift;
 			nLinesPerRecord++;
 		} 
 	
 		const char* colId = GfParmListGetCurEltName(hparmCredits, buf);
-		GfLogDebug("createPage(%s): colId='%s'\n", buf, colId);
 		// GfuiLabelCreate(hscrPage, column.name, GFUI_FONT_MEDIUM_C, 
-		// 				x, y, GFUI_ALIGN_HL_VB, 0, colNameColor);
+		// 				x, y, GFUI_ALIGN_HL, 0, colNameColor);
 		x += column.width;
 		orderedColumnIds.push_back(colId);
 		columns.insert(std::pair<const char*, tColumnDesc>(colId, column));
@@ -178,7 +176,6 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 		 nRecordInd++)
 	{
 		x0 = x = xLeft1stCol;
-		y -= yRecordShift;
 		sprintf(buf, "chapters/%d/records/%d", startChapterIndex, nRecordInd);
 		std::vector<const char*>::const_iterator colIdIter;
 		for (colIdIter = orderedColumnIds.begin(); colIdIter != orderedColumnIds.end(); colIdIter++)
@@ -197,7 +194,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 									   colValue, x, y);
 			x += columns[*colIdIter].width;
 		}
-		while (GfParmListSeekNext(hparmCredits, buf) == 0);
+		y -= yRecordShift;
 	}
 
 	// Close credits file
@@ -217,14 +214,14 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			PrevPageRequest.startChapterIndex = startChapterIndex - 1;
 			PrevPageRequest.startRecordIndex  = -1;
 		}
-		GfuiMenuCreateButtonControl(hscrPage, hmenu, "previouspagearrow",
+		GfuiMenuCreateButtonControl(hscrPage, hmenu, "previous page arrow",
 									(void*)&PrevPageRequest, creditsPageChange);
 		GfuiAddKey(hscrPage, GFUIK_PAGEUP, "Previous page", 
 				   (void*)&PrevPageRequest, creditsPageChange, NULL);
 	}
 	
 	// Add "Continue" button (credits screen exit).
-	GfuiMenuCreateButtonControl(hscrPage, hmenu, "backbutton",
+	GfuiMenuCreateButtonControl(hscrPage, hmenu, "back button",
 								RetScrHdle, GfuiScreenReplace);
 	
 	// Add "Next page" button if not the last page.
@@ -241,7 +238,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			NextPageRequest.startChapterIndex = startChapterIndex + 1;
 			NextPageRequest.startRecordIndex  = 0;
 		}
-		GfuiMenuCreateButtonControl(hscrPage, hmenu, "nextpagearrow",
+		GfuiMenuCreateButtonControl(hscrPage, hmenu, "next page arrow",
 									(void*)&NextPageRequest, creditsPageChange);
 		GfuiAddKey(hscrPage, GFUIK_PAGEDOWN, "Next Page", 
 				   (void*)&NextPageRequest, creditsPageChange, NULL);

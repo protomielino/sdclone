@@ -25,27 +25,32 @@
 
 
 // Predefined colors (array and indexes).
-#define GFUI_COLORNB	26
+#define GFUI_COLORNB	23
 extern float	gfuiColors[GFUI_COLORNB][4];
 
-#define GFUI_BGCOLOR		0
-#define GFUI_BGBTNFOCUS		1
-#define GFUI_BGBTNCLICK		2
-#define GFUI_BGBTNENABLED	3
-#define GFUI_BGBTNDISABLED	4
-#define GFUI_BTNFOCUS		5
-#define GFUI_BTNCLICK		6
-#define GFUI_BTNENABLED		7
-#define GFUI_BTNDISABLED	8
-#define GFUI_LABELCOLOR		9
-#define GFUI_TIPCOLOR		10
-#define GFUI_BGSCROLLIST	11
-#define GFUI_FGSCROLLIST	12
-#define GFUI_BGSELSCROLLIST	13
-#define GFUI_FGSELSCROLLIST	14
-#define GFUI_EDITBOXCOLOR	15
-#define GFUI_EDITCURSORCLR	16
-#define GFUI_BASECOLORBGIMAGE   17
+#define GFUI_BGCOLOR			 0
+#define GFUI_BGBTNFOCUS		 	 1
+#define GFUI_BGBTNCLICK			 2
+#define GFUI_BGBTNENABLED	 	 3
+#define GFUI_BGBTNDISABLED		 4
+#define GFUI_BTNFOCUS			 5
+#define GFUI_BTNCLICK			 6
+#define GFUI_BTNENABLED			 7
+#define GFUI_BTNDISABLED		 8
+#define GFUI_LABELCOLOR			 9
+#define GFUI_TIPCOLOR			10
+#define GFUI_BGSCROLLIST		11
+#define GFUI_FGSCROLLIST		12
+#define GFUI_BGSELSCROLLIST		13
+#define GFUI_FGSELSCROLLIST		14
+#define GFUI_BGEDITFOCUS		15
+#define GFUI_BGEDITENABLED		16
+#define GFUI_BGEDITDISABLED		17
+#define GFUI_EDITFOCUS			18
+#define GFUI_EDITENABLED		19
+#define GFUI_EDITDISABLED		20
+#define GFUI_EDITCURSORCLR		21
+#define GFUI_BASECOLORBGIMAGE	22
 
 #define GFUI_IMAGE		200
 
@@ -54,14 +59,15 @@ extern float	gfuiColors[GFUI_COLORNB][4];
 /* Label */
 typedef struct
 {
-    char	*text;		/* text */
-    GfuiColor	bgColor;	/* RGBA */
+    char	*text;		// text
+    GfuiColor	bgColor;	// RGBA
     GfuiColor	fgColor;
     GfuiColor	bgFocusColor;
     GfuiColor	fgFocusColor;
-    GfuiFontClass	*font;		/* ttf font */
+    GfuiFontClass	*font;		// ttf font (is this really true ?)
 
-    int	x, y;		/* label position */
+    int	x, y;		// position of the left bottom corner
+    int	width;		// with of the "bounding box for alignment (text may overlap)
     int	align;
     int	maxlen;
 
@@ -96,10 +102,10 @@ typedef struct
     tfuiCallback	onFocus;
     tfuiCallback	onFocusLost;
     
-    int imgX,imgY;
-    int imgWidth,imgHeight;
+    int imgX, imgY;
+    int imgWidth, imgHeight;
 
-    //if skin used
+    // if skin used
     GLuint disabled;
     GLuint enabled;
     GLuint focused;
@@ -112,15 +118,14 @@ typedef struct
 {
     unsigned int	state;
 
-    //Texture handles
+    // Texture handles
     GLuint disabled;
     GLuint enabled;
     GLuint focused;
     GLuint pushed;
     
-    int	x, y;		/* image position */
-    int	align;
-    int			width, height;
+    int			x, y;		// Image position
+    int			width, height; // Image size
     int			buttonType;
     int			mouseBehaviour;
     void		*userDataOnPush;
@@ -257,16 +262,16 @@ typedef struct GfuiObject
     int		xmax, ymax;
     union
     {
-	tGfuiLabel	label;
-	tGfuiButton	button;
-	tGfuiGrButton	grbutton;
-	tGfuiScrollList scrollist;
-	tGfuiScrollBar	scrollbar;
-	tGfuiEditbox	editbox;
-	tGfuiImage	image;
-	tGfuiCombobox combobox;
-	tGfuiCheckbox checkbox;
-	tGfuiProgressbar progressbar;
+		tGfuiLabel	label;
+		tGfuiButton	button;
+		tGfuiGrButton	grbutton;
+		tGfuiScrollList scrollist;
+		tGfuiScrollBar	scrollbar;
+		tGfuiEditbox	editbox;
+		tGfuiImage	image;
+		tGfuiCombobox combobox;
+		tGfuiCheckbox checkbox;
+		tGfuiProgressbar progressbar;
     } u;
     struct GfuiObject	*next;
     struct GfuiObject	*prev;
@@ -360,8 +365,9 @@ extern void gfuiDrawProgressbar(tGfuiObject *obj);
 
 extern void gfuiLabelSetText(tGfuiLabel *label, const char *text);
 extern void gfuiLabelSetColor(tGfuiLabel *label, const float *color);
+extern int gfuiLabelGetTextX(tGfuiLabel *label);
 
-extern void gfuiLabelDraw(tGfuiLabel *label, int focus);
+extern void gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color);
 extern void gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus);
 
 extern void gfuiInit(void);
@@ -375,13 +381,13 @@ extern void gfuiInitScrollBar(void);
 extern void gfuiInitScrollList(void);
 
 extern void gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
-						  int x, int y, int align, int width, int font,
+						  int x, int y, int width, int align, int font,
 						  const float *bgColor, const float *fgColor,
 						  const float *bgFocusColor, const float *fgFocusColor,
 						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 extern void gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enabled,
 							 const char *focused, const char *pushed,
-							 int x, int y, int align, int width, int height, int mouse,
+							 int x, int y, int width, int height, int mouse,
 							 void *userDataOnPush, tfuiCallback onPush, 
 							 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 

@@ -24,8 +24,8 @@
 */
 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #include <tgf.hpp>
@@ -131,7 +131,7 @@ JoyCalAutomaton(void)
 	Cmd[CalState + CmdOffset].min = JoyAxis[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].pow = 1.0;
-	sprintf(buf, "%.2g", JoyAxis[axis]);
+	sprintf(buf, "%.2f", JoyAxis[axis]);
 	GfuiLabelSetText(ScrHandle, LabMinId[0], buf);
 	advanceStep();
 	break;
@@ -140,7 +140,7 @@ JoyCalAutomaton(void)
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
 	Cmd[CalState + CmdOffset].pow = 1.0;
-	sprintf(buf, "%.2g", JoyAxis[axis]);
+	sprintf(buf, "%.2f", JoyAxis[axis]);
 	GfuiLabelSetText(ScrHandle, LabMaxId[0], buf);
 	advanceStep();
 	break;
@@ -151,9 +151,9 @@ JoyCalAutomaton(void)
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxis[axis]*1.1;
 	Cmd[CalState + CmdOffset].pow = 1.2;
-	sprintf(buf, "%.2g", JoyAxisCenter[axis]);
+	sprintf(buf, "%.2f", JoyAxisCenter[axis]);
 	GfuiLabelSetText(ScrHandle, LabMinId[CalState - 2], buf);
-	sprintf(buf, "%.2g", JoyAxis[axis]*1.1);
+	sprintf(buf, "%.2f", JoyAxis[axis]*1.1);
 	GfuiLabelSetText(ScrHandle, LabMaxId[CalState - 2], buf);
 	advanceStep();
 

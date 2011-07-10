@@ -64,26 +64,27 @@ static const tdble REPEAT2 = 0.2;
 static void
 gfuiInitColor(void)
 {
-	void *hdle;
-	int  i, j;
-	const char *rgba[4] = {GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA};
+	static const char *rgba[4] =
+		{ GFSCR_ATTR_RED, GFSCR_ATTR_GREEN, GFSCR_ATTR_BLUE, GFSCR_ATTR_ALPHA };
 	
-	const char *clr[GFUI_COLORNB] =
+	static const char *clr[GFUI_COLORNB] =
 	{
 		GFSCR_ELT_BGCOLOR,
 		GFSCR_ELT_BGBTNFOCUS, GFSCR_ELT_BGBTNCLICK,	GFSCR_ELT_BGBTNENABLED, GFSCR_ELT_BGBTNDISABLED,
 		GFSCR_ELT_BTNFOCUS, GFSCR_ELT_BTNCLICK, GFSCR_ELT_BTNENABLED, GFSCR_ELT_BTNDISABLED,
 		GFSCR_ELT_LABELCOLOR, GFSCR_ELT_TIPCOLOR,
 		GFSCR_ELT_BGSCROLLIST, GFSCR_ELT_SCROLLIST, GFSCR_ELT_BGSELSCROLLIST, GFSCR_ELT_SELSCROLLIST,
-		GFSCR_ELT_EDITBOXCOLOR, GFSCR_ELT_EDITCURSORCLR,
+		GFSCR_ELT_BGEDITFOCUS, GFSCR_ELT_BGEDITENABLED, GFSCR_ELT_BGEDITDISABLED,
+		GFSCR_ELT_EDITFOCUS, GFSCR_ELT_EDITENABLED, GFSCR_ELT_EDITDISABLED,
+		GFSCR_ELT_EDITCURSORCLR,
 		GFSCR_ELT_BASECOLORBGIMAGE
 	};
 
 	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	hdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	void* hdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	for (i = 0; i < GFUI_COLORNB; i++) {
-		for (j = 0; j < 4; j++) {
+	for (int i = 0; i < GFUI_COLORNB; i++) {
+		for (int j = 0; j < 4; j++) {
 			sprintf(buf, "%s/%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_LIST_COLORS, clr[i]);
 			gfuiColors[i][j] = GfParmGetNum(hdle, buf, rgba[j], (char*)NULL, 1.0);
 		}
@@ -91,10 +92,9 @@ gfuiInitColor(void)
 
 	GfParmReleaseHandle(hdle);
 	
-	/* Remove the X11/Windows cursor  */
-	if (!GfuiMouseHW) {
+	// Remove the X11/Windows cursor if required.
+	if (!GfuiMouseHW)
 		SDL_ShowCursor(SDL_DISABLE);
-	}
 	
 	GfuiMouseVisible = 1;
 }
@@ -119,14 +119,10 @@ gfuiInit(void)
 GfuiColor 
 GfuiColor::build(const float* afColor)
 {
-     GfuiColor c;
-	 
-     c.red = afColor[0];
-     c.green = afColor[1];
-     c.blue = afColor[2];
-     c.alpha = afColor[3];
-
-     return c;
+	 if (afColor)
+		 return build(afColor[0], afColor[1], afColor[2], afColor[3]);
+	 else
+		 return build(0, 0, 0, 0);
 }
 
 // index from GFUI_* "named" indexes above.
@@ -149,38 +145,48 @@ GfuiColor::build(float r, float g, float b, float a)
 	return c;
 }
 
-// Expect a 32 bit unsigned integer string, 10/8/16 base, C syntax)
+// Expects a 32 bit unsigned integer string, 10/8/16 base, C syntax)
 // Ex: "0xE47A96C2", "1285698774", "0765223412563"
 GfuiColor
 GfuiColor::build(const char* pszARGB)
 {
 	GfuiColor color;
-	
-	char* pszMore = (char*)pszARGB;
-	unsigned long uColor = strtol(pszARGB, &pszMore, 0);
-	if (*pszMore == '\0')
-	{
-		// Blue channel.
-		color.blue = (uColor & 0xFF) / 255.0;
-		uColor >>= 8;
-		
-		// Green channel.
-		color.green = (uColor & 0xFF) / 255.0;
-		
-		// Red channel.
-		uColor >>= 8;
-		color.red = (uColor & 0xFF) / 255.0;
 
-		// Alpha channel : assume 1.0 if not specified or 0x00.
-		uColor >>= 8;
-		color.alpha = (uColor & 0xFF) ? (uColor & 0xFF) / 255.0 : 1.0;
+	if (pszARGB)
+	{
+		char* pszMore = (char*)pszARGB;
+		unsigned long uColor = strtoul(pszARGB, &pszMore, 0);
+		if (*pszMore == '\0')
+		{
+			// Blue channel.
+			color.blue = (uColor & 0xFF) / 255.0;
+		
+			// Green channel.
+			uColor >>= 8;
+			color.green = (uColor & 0xFF) / 255.0;
+		
+			// Red channel.
+			uColor >>= 8;
+			color.red = (uColor & 0xFF) / 255.0;
+
+			// Alpha channel : assume 1.0 if not specified or 0x00.
+			uColor >>= 8;
+			color.alpha = (uColor & 0xFF) ? (uColor & 0xFF) / 255.0 : 1.0;
+		}
+		else
+		{
+			color = build(1, 1, 1, 1);
+			GfLogWarning("Bad color ARGB string '%s'; assuming white\n", pszARGB);
+		}
 	}
 	else
 	{
-		color = build(1, 1, 1, 1);
-		GfLogWarning("Bad color ARGB string '%s'; assuming white\n", pszARGB);
+		color = build(0, 0, 0, 0);
 	}
 
+	// GfLogDebug("GfuiColor::build(%s) = r=%f, g=%f, b=%f, a=%f\n",
+	// 		   pszARGB ? pszARGB : "<null>", color.red, color.green, color.blue, color.alpha);
+	
 	return color;
 }
 

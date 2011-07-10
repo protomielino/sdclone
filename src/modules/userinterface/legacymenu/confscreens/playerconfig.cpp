@@ -854,9 +854,9 @@ PlayerConfigMenuInit(void *prevMenu)
     NameEditId = GfuiMenuCreateEditControl(ScrHandle,param,"nameedit",NULL,NULL,ChangeName);
 
     /* Player skill level "combobox" (left arrow, label, right arrow) */
-    GfuiMenuCreateButtonControl(ScrHandle,param,"levelleftarrow",(void*)0, ChangeLevel);
-    GfuiMenuCreateButtonControl(ScrHandle,param,"levelrightarrow",(void*)1, ChangeLevel);
-    SkillEditId = GfuiMenuCreateLabelControl(ScrHandle,param,"skillstext");
+    GfuiMenuCreateButtonControl(ScrHandle,param,"skillleftarrow",(void*)0, ChangeLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"skillrightarrow",(void*)1, ChangeLevel);
+    SkillEditId = GfuiMenuCreateLabelControl(ScrHandle,param,"skilltext");
 
     /* Races and pits numbers editboxes (Must they really stay here ?) */
     RaceNumEditId = GfuiMenuCreateEditControl(ScrHandle,param,"racenumedit",NULL,NULL,ChangeNum);

@@ -40,12 +40,11 @@
     @param	w	Width of the image on the screen
     @param	h	Height of the image on the screen
     @param	name	Filename on the source image (png)
-	@param align Image alignment (default: GFUI_ALIGN_HL_VB)
 	@param canDeform If true, full X and Y autoscale, otherwise, keep aspect ratio but cut sides or top/bottom to fill target w,h rectangle (default: true)
     @return	Image Id
 		<br>-1 Error*/
 int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *name,
-						  int align, bool canDeform)
+						  bool canDeform)
 {
 	int pow2Width, pow2Height;
 	tGfuiImage *image;
@@ -76,64 +75,10 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 		return -1;
 	}
 
-	switch (align) {
-		case GFUI_ALIGN_HR_VB:
-			object->xmin = x - w;
-			object->xmax = x;
-			object->ymin = y;
-			object->ymax = y + h;
-			break;
-		case GFUI_ALIGN_HR_VC:
-			object->xmin = x - w;
-			object->xmax = x;
-			object->ymin = y - h / 2;
-			object->ymax = y + h / 2;
-			break;
-		case GFUI_ALIGN_HR_VT:
-			object->xmin = x - w;
-			object->xmax = x;
-			object->ymin = y - h;
-			object->ymax = y;
-			break;
-		case GFUI_ALIGN_HC_VB:
-			object->xmin = x - w / 2;
-			object->xmax = x + w / 2;
-			object->ymin = y;
-			object->ymax = y + h;
-			break;
-		case GFUI_ALIGN_HC_VC:
-			object->xmin = x - w / 2;
-			object->xmax = x + w / 2;
-			object->ymin = y - h / 2;
-			object->ymax = y + h / 2;
-			break;
-		case GFUI_ALIGN_HC_VT:
-			object->xmin = x - w / 2;
-			object->xmax = x + w / 2;
-			object->ymin = y - h;
-			object->ymax = y;
-			break;
-		case GFUI_ALIGN_HL_VB:
-			object->xmin = x;
-			object->xmax = x + w;
-			object->ymin = y;
-			object->ymax = y + h;
-			break;
-		case GFUI_ALIGN_HL_VC:
-			object->xmin = x;
-			object->xmax = x + w;
-			object->ymin = y - h / 2;
-			object->ymax = y + h / 2;
-			break;
-		case GFUI_ALIGN_HL_VT:
-			object->xmin = x;
-			object->xmax = x + w;
-			object->ymin = y - h;
-			object->ymax = y;
-			break;
-		default:
-			break;
-    }
+	object->xmin = x;
+	object->xmax = x + w;
+	object->ymin = y;
+	object->ymax = y + h;
 
 	gfuiAddObject(screen, object);
 
@@ -165,7 +110,7 @@ void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index, boo
 					GfTexFreeTexture(image->texture[index]);
 					image->canDeform = canDeform;
 					// We don't use returned POT width and height, but passing non NULL pointers
-					// for them enforce POT sizes for the loaded texture.
+					// for them enforces POT sizes for the loaded texture.
 					image->texture[index] =
 						GfTexReadTexture(name, &image->srcWidth, &image->srcHeight,
 										 &pow2Width, &pow2Height);
