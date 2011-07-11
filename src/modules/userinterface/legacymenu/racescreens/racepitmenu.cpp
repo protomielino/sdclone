@@ -26,6 +26,8 @@
 
 #include <cstdlib>
 
+#include <portability.h>
+
 #include <tgfclient.h>
 #include <car.h>
 #include <raceman.h>

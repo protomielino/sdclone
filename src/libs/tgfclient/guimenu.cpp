@@ -30,6 +30,8 @@
 #include <string>
 #include <map>
 
+#include <portability.h>
+
 #include "tgfclient.h"
 #include "gui.h"
 #include "guimenu.h"
