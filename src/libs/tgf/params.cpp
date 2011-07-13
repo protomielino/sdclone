@@ -30,6 +30,7 @@
 #include <cmath>
 #include <ctime>
 #include <sys/stat.h>
+#include <float.h>
 
 #ifdef WIN32
 #include <io.h>
@@ -821,16 +822,6 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 			goto bailout;
 		}
 
-		if (!min) 
-		{
-			min = val;
-		}
-
-		if (!max) 
-		{
-			max = val;
-		}
-
 		curParam = addParam (conf, parmHandle->curSection, shortName, val);
 		if (!curParam) 
 		{
@@ -840,8 +831,20 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 
 		curParam->type = P_NUM;
 		curParam->valnum = getValNumFromStr (val);
-		curParam->min    = getValNumFromStr (min);
-		curParam->max    = getValNumFromStr (max);
+
+		if (min)
+			curParam->min    = getValNumFromStr (min);
+		else 
+			curParam->min = -FLT_MAX;
+
+		if (max) {
+			curParam->max    = getValNumFromStr (max);
+			if (curParam->min > curParam->max) {
+				curParam->max = curParam->min;
+				curParam->min = getValNumFromStr (max);
+			}
+		} else 
+			curParam->max = FLT_MAX;
 
 		if (curParam->min > curParam->valnum) 
 		{
@@ -3455,23 +3458,34 @@ insertParamMerge (struct parmHandle *parmHandle, char *path, struct param *param
 	if (param->unit) {
 	    paramNew->unit = strdup (param->unit);
 	}
-	if (param->min < paramRef->min) {
+
+	if (param->min <= paramRef->min && param->max >= paramRef->min) {
 	    num = paramRef->min;
-	} else {
+	} else if (paramRef->min <= param->min && paramRef->max >= param->min) {
 	    num = param->min;
+	} else {
+	    num = paramRef->min;
+	    GfLogError("insertParamMerge: Incompatible ranges \"%s\": using %f for min\n", paramNew->fullName, num);
 	}
 	paramNew->min = num;
-	if (param->max > paramRef->max) {
+
+	if (param->max >= paramRef->max && param->min <= paramRef->max) {
 	    num = paramRef->max;
-	} else {
+	} else if (paramRef->max >= param->max && paramRef->min <= param->max) {
 	    num = param->max;
+	} else {
+	    num = paramRef->max;
+	    GfLogError("insertParamMerge: Incompatible ranges \"%s\": using %f for max\n", paramNew->fullName, num);
 	}
 	paramNew->max = num;
+
 	num = param->valnum;
 	if (num < paramNew->min) {
+	    GfLogError("insertParamMerge: Fixing parameter \"%s\": %f -> %f\n", paramNew->fullName, num, paramNew->min);
 	    num = paramNew->min;
 	}
 	if (num > paramNew->max) {
+	    GfLogError("insertParamMerge: Fixing parameter \"%s\": %f -> %f\n", paramNew->fullName, num, paramNew->max);
 	    num = paramNew->max;
 	}
 	paramNew->valnum = num;
