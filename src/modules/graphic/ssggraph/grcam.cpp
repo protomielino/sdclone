@@ -122,9 +122,11 @@ void cGrPerspCamera::setProjection(void)
 void cGrPerspCamera::setModelView(void)
 {
   sgMat4 mat;
+
   grMakeLookAtMat4(mat, eye, center, up);
   
   grContext.setCamera(mat);
+  glFrontFace( GL_CCW );
 }
 
 void cGrPerspCamera::loadDefaults(char *attr)
@@ -534,6 +536,68 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 	eye[2] = p[2];
 
 	P[0] = car->_bonnetPos_x + 30.0;
+	P[1] = car->_bonnetPos_y;
+	P[2] = car->_bonnetPos_z;
+	sgXformPnt3(P, car->_posMat);
+
+	center[0] = P[0];
+	center[1] = P[1];
+	center[2] = P[2];
+
+	up[0] = car->_posMat[2][0];
+	up[1] = car->_posMat[2][1];
+	up[2] = car->_posMat[2][2];
+
+	speed[0] =car->pub.DynGCg.vel.x;
+	speed[1] =car->pub.DynGCg.vel.y;
+	speed[2] =car->pub.DynGCg.vel.z;
+    }
+};
+
+class cGrCarCamBehindReverse : public cGrPerspCamera
+{
+ public:
+    cGrCarCamBehindReverse (class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
+			    float myfovy, float myfovymin, float myfovymax,
+			    float myfnear, float myffar = 1500.0,
+			    float myfogstart = 1400.0, float myfogend = 1500.0)
+	: cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+			 myfovy, myfovymin, myfovymax,
+			 myfnear, myffar, myfogstart, myfogend) {
+    }
+
+	void setModelView(void)
+	{
+	  sgMat4 mat, mat2, mirror;
+
+	  grMakeLookAtMat4(mat, eye, center, up);
+
+#define M(row,col)  mirror[row][col]
+	  M(0,0) = 1.0;  M(0,1) = 0.0;  M(0,2) = 0.0;  M(0,3) = 0.0;
+	  M(1,0) = 0.0;  M(1,1) =-1.0;  M(1,2) = 0.0;  M(1,3) = 0.0;
+	  M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
+	  M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
+#undef M
+	  sgMultMat4(mat2, mat, mirror);
+
+	  grContext.setCamera(mat2);
+	  glFrontFace( GL_CW );
+	}
+
+    void update(tCarElt *car, tSituation *s) 
+    {
+	sgVec3 P, p;
+	
+	p[0] = car->_bonnetPos_x - (car->_dimension_x/2);
+	p[1] = car->_bonnetPos_y;
+	p[2] = car->_bonnetPos_z;
+	sgXformPnt3(p, car->_posMat);
+	
+	eye[0] = p[0];
+	eye[1] = p[1];
+	eye[2] = p[2];
+
+	P[0] = car->_bonnetPos_x;
 	P[1] = car->_bonnetPos_y;
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
@@ -1469,6 +1533,22 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam->add(&cams[c]);
     id++;
 
+    /* cam F2 = just behind the car; camera looking back  */
+    cam = new cGrCarCamBehindReverse(myscreen,
+				      id,
+				      0,	/* drawCurr */
+				      1,	/* drawBG  */
+				      67.5,	/* fovy */
+				      50.0,	/* fovymin */
+				      95.0,	/* fovymax */
+				      0.3,	/* near */
+				      600.0 * fovFactor,	/* far */
+				      300.0 * fovFactor,	/* fogstart */
+				      600.0 * fovFactor	/* fogend */
+				      );
+    cam->add(&cams[c]);
+    id++;
+
     /* cam F2 = behind the car, very near */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1505,7 +1585,8 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      25.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
-    
+
+
     /* F3 */
     c++;
     GF_TAILQ_INIT(&cams[c]);
