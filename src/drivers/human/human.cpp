@@ -905,6 +905,10 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	if (car->_clutchCmd != 0.0f)
 		HCtx[idx]->autoClutch = false;
 
+	// Linear delay of autoclutch
+	if (HCtx[idx]->clutchtime > 0.0f)
+		HCtx[idx]->clutchtime -= s->deltaTime;
+
 	// Ebrake here so that it can override the clutch control
 	if ((cmd[CMD_EBRAKE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_EBRAKE].val])
 	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_EBRAKE].val])
@@ -1135,15 +1139,15 @@ static tdble
 getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
 {
 	tdble ret = 0.0f;
+	float max_clutchtime;
 	
 	if (newGear != 0 && newGear < car->_gearNb) {
+		max_clutchtime = 0.332f - ((tdble) newGear / 65.0f);
+	
 		if (newGear != gear)
-			HCtx[idx]->clutchtime = 0.332f - ((tdble) newGear / 65.0f);
+			HCtx[idx]->clutchtime = max_clutchtime;
 
-		if (HCtx[idx]->clutchtime > 0.0f)
-			HCtx[idx]->clutchtime -= RCM_MAX_DT_ROBOTS;
-			
-		ret = 2.0f * HCtx[idx]->clutchtime;
+		ret = HCtx[idx]->clutchtime / max_clutchtime;
 	}//if newGear
 	
 	return ret;
