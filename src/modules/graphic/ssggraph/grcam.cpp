@@ -561,7 +561,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
 			    float myfovy, float myfovymin, float myfovymax,
 			    float myfnear, float myffar = 1500.0,
 			    float myfogstart = 1400.0, float myfogend = 1500.0)
-	: cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+	: cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 0,
 			 myfovy, myfovymin, myfovymax,
 			 myfnear, myffar, myfogstart, myfogend) {
     }
@@ -1493,7 +1493,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      75.5,	/* fovy */
 			      50.0,	/* fovymin */
 			      95.0,	/* fovymax */
-			      0.3,	/* near */
+			      0.03,	/* near */
 			      600.0 * fovFactor,	/* far */
 			      300.0 * fovFactor,	/* fogstart */
 			      600.0 * fovFactor	/* fogend */
