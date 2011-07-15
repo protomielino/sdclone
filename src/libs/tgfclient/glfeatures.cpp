@@ -207,6 +207,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 				while (!pWinSurface && nMaxMultiSamples > 1)
 				{
 					// Set the anti-aliasing attributes and setup the video mode.
+					GfLogTrace("Trying %dx anti-aliasing\n", nMaxMultiSamples);
 					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
 					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
 					pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);

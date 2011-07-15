@@ -396,7 +396,7 @@ bool GfScrInit(void)
 	// 2) Check / update test state of any 'in-test' specs.
 	if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
 	{
-		// Remove the 'in-test' specs if the test failed (we are stil in the 'in progress'
+		// Remove the 'in-test' specs if the test failed (we are still in the 'in progress'
 		// test state because the game crashed during the test).
 		if (std::string(GfParmGetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
 									 GFSCR_VAL_INPROGRESS)) == GFSCR_VAL_INPROGRESS)
@@ -405,15 +405,17 @@ bool GfScrInit(void)
 			GfParmRemoveSection(hparmScreen, GFSCR_SECT_INTESTPROPS);
 		}
 
-		// If the test has not yet been done, mark it as in-progress
-		// and write the config file to disk, in case the test makes the game crash.
+		// If the test has not yet been done, mark it as 'in progress'
 		else
 		{
 			GfLogInfo("Testing new screen specs : let's see what's happening ...\n");
 			GfParmSetStr(hparmScreen, GFSCR_SECT_INTESTPROPS, GFSCR_ATT_TESTSTATE,
 						 GFSCR_VAL_INPROGRESS);
-			GfParmWriteFile(NULL, hparmScreen, "Screen");
 		}
+		
+		// Write the config file to disk (in case the forthcoming test makes the game crash,
+		// or in order the Options / Display menu shows the actual current settings).
+		GfParmWriteFile(NULL, hparmScreen, "Screen");
 	}
 
 	// 3) Select the 'in-test' specs if present, otherwise the 'validated' ones.
