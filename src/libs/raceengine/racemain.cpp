@@ -621,7 +621,7 @@ ReRaceEnd(void)
 	// select the next competitor : it is his turn for the session.
 	// If no more competitor, display the results of the session for all the competitors.
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-		&& !(ReInfo->s->_features & RM_FEATURE_TIMEDSESSION)) 
+		&& ReInfo->s->_totTime < 0.0f)
 	{
 		curDrvIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		curDrvIdx++;
