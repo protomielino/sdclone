@@ -1444,21 +1444,30 @@ xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 			s += sprintf (s, "%s<attnum name=\"%s\"", outCtrl->indent, curParam->name);
 			if (curParam->unit)
 			{
-			    if ((curParam->min != curParam->valnum) || (curParam->max != curParam->valnum)) 
+			    if ((curParam->min != curParam->valnum) && (curParam->min != -FLT_MAX)) 
 			    {
-				s += sprintf (s, " min=\"%g\" max=\"%g\"", 
-					GfParmSI2Unit (curParam->unit, curParam->min),
+				s += sprintf (s, " min=\"%g\"",
+					GfParmSI2Unit (curParam->unit, curParam->min));
+			    }
+			    if ((curParam->max != curParam->valnum) && (curParam->max != FLT_MAX)) 
+			    {
+				s += sprintf (s, " max=\"%g\"", 
 					GfParmSI2Unit (curParam->unit, curParam->max));
 			    }
+
 			    s += sprintf (s, " unit=\"%s\" val=\"%g\"/>\n",
 				curParam->unit, GfParmSI2Unit (curParam->unit, curParam->valnum));
 			} else 
 			{
-			    if ((curParam->min != curParam->valnum) || (curParam->max != curParam->valnum)) 
+			    if ((curParam->min != curParam->valnum) && (curParam->min != -FLT_MAX)) 
 			    {
-				s += sprintf (s, " min=\"%g\" max=\"%g\"", 
-					curParam->min, curParam->max);
+				s += sprintf (s, " min=\"%g\"", curParam->min);
 			    }
+			    if ((curParam->max != curParam->valnum) && (curParam->max != FLT_MAX)) 
+			    {
+				s += sprintf (s, " max=\"%g\"", curParam->max);
+			    }
+
 			    s += sprintf (s, " val=\"%g\"/>\n", curParam->valnum);
 			}
 			outCtrl->curParam = GF_TAILQ_NEXT (curParam, linkParam);
