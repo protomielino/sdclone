@@ -271,6 +271,9 @@ rmScreenActivate(void * /* dummy */)
 	
 #endif
 
+	// Hide the on-screen pause indicator in case it is visible.
+	GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
+
 	// Deactivate the movie capture mode in any case.
 	rmMovieCapture.active = false;
 	
