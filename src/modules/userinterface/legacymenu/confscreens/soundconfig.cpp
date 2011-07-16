@@ -112,33 +112,22 @@ static void saveSoundOption(void *)
 // Toggle sound state openal/plib/disabled.
 static void changeSoundState(void *vp)
 {
-	if (vp == 0) {
-		curOption--;
-		if (curOption < 0) {
-	    	curOption = nbOptions - 1;
-		}
-	} else {
-		curOption++;
-		if (curOption == nbOptions) {
-	    curOption = 0;
-	}
-    }
+	curOption = (curOption + (int)(long)vp + nbOptions) % nbOptions;
+
     GfuiLabelSetText(scrHandle, SoundOptionId, soundOptionList[curOption]);
 }
 
 // Volume
 static void changeVolume(void * )
 {
-    char	*val;
-    char buf[256];
-    val = GfuiEditboxGetString(scrHandle, VolumeValueId);
+    char* val = GfuiEditboxGetString(scrHandle, VolumeValueId);
     sscanf(val, "%g", &VolumeValue);
-    if (VolumeValue > 100.0f) {
-	VolumeValue = 100.0f;
-    } 
-    else if (VolumeValue < 0.0f) {
-	VolumeValue = 0.0f;
-    }
+    if (VolumeValue > 100.0f)
+		VolumeValue = 100.0f;
+    else if (VolumeValue < 0.0f)
+		VolumeValue = 0.0f;
+	
+    char buf[32];
     sprintf(buf, "%g", VolumeValue);
     GfuiEditboxSetString(scrHandle, VolumeValueId, buf);
 }
@@ -150,7 +139,7 @@ static void onActivate(void * /* dummy */)
 
 
 // Sound menu
-void * SoundMenuInit(void *prevMenu)
+void* SoundMenuInit(void *prevMenu)
 {
 	// Has screen already been created?
 	if (scrHandle) {
@@ -179,7 +168,7 @@ void * SoundMenuInit(void *prevMenu)
 	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
-	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)0, changeSoundState, NULL);
+	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)-1, changeSoundState, NULL);
 	GfuiAddKey(scrHandle, GFUIK_RIGHT, "Next Option in list", (void*)1, changeSoundState, NULL);
 
 	return scrHandle;
