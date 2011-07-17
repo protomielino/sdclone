@@ -32,7 +32,7 @@ tdble CalculateTorque (tEngine* engine, tdble rads)
 	tdble rpm_min = -1.0;
 	tdble alpha = 0.0;
 	for (int i = 0; i < curve->nbPts; i++) {
-		if (rads > curve->data[i].rads) { 
+		if (rads > curve->data[i].rads) {
 			Tmin = curve->data[i].Tq;
 			rpm_min = curve->data[i].rads;
 			if (i<engine->curve.nbPts) {
@@ -58,14 +58,14 @@ tdble CalculateTorque2 (tEngine* engine, tdble rads)
 	tdble rpm_min = curve->data[i].rads;
 	tdble rpm_max = curve->data[i+1].rads;
 
-	if (rads > rpm_max) { 
+	if (rads > rpm_max) {
 		if (i < curve->nbPts) {
 			rpm_min = rpm_max;
 			engine->lastInterval = ++i;
 			rpm_max = curve->data[i+1].rads;
 		}
 	}
-	else if (rads < rpm_min) { 
+	else if (rads < rpm_min) {
 		if (i > 0) {
 			rpm_max = rpm_min;
 			engine->lastInterval = --i;
@@ -74,7 +74,7 @@ tdble CalculateTorque2 (tEngine* engine, tdble rads)
 	}
 
 	// In case of large changes of rads
-	if ((rads < rpm_min) || (rads > rpm_max)) 
+	if ((rads < rpm_min) || (rads > rpm_max))
 		return CalculateTorque2 (engine, rads);
 	else {
 	  tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
@@ -85,8 +85,8 @@ tdble CalculateTorque2 (tEngine* engine, tdble rads)
 /*
   For profiling tests:
 
-  Call CalculateTorque3 instead of CalculateTorque2 
-  to get the times without overlapping 
+  Call CalculateTorque3 instead of CalculateTorque2
+  to get the times without overlapping
   caused by recursive calls to CalculateTorque2 */
 
 tdble CalculateTorque3 (tEngine* engine, tdble rads)
@@ -100,14 +100,14 @@ tdble CalculateTorque3 (tEngine* engine, tdble rads)
 	tdble rpm_min = curve->data[i].rads;
 	tdble rpm_max = curve->data[i+1].rads;
 
-	if (rads > rpm_max) { 
+	if (rads > rpm_max) {
 		if (i < curve->nbPts) {
 			rpm_min = rpm_max;
 			engine->lastInterval = ++i;
 			rpm_max = curve->data[i+1].rads;
 		}
 	}
-	else if (rads < rpm_min) { 
+	else if (rads < rpm_min) {
 		if (i > 0) {
 			rpm_max = rpm_min;
 			engine->lastInterval = --i;
@@ -118,7 +118,7 @@ tdble CalculateTorque3 (tEngine* engine, tdble rads)
 	tdble Tq;
 
 	// In case of large changes of rads
-	if ((rads < rpm_min) || (rads > rpm_max)) 
+	if ((rads < rpm_min) || (rads > rpm_max))
 		Tq = CalculateTorque2 (engine, rads);
 	else {
 	  tdble alpha = (rads - rpm_min) / (rpm_max - rpm_min);
@@ -162,7 +162,7 @@ SimEngineConfig(tCar *car)
     sprintf(idx, "%s/%s", SECT_ENGINE, ARR_DATAPTS);
     car->engine.curve.nbPts = GfParmGetEltNb(hdle, idx);
     edesc = (struct tEdesc*)malloc((car->engine.curve.nbPts + 1) * sizeof(struct tEdesc));
-    
+
     for (i = 0; i < car->engine.curve.nbPts; i++) {
 		sprintf(idx, "%s/%s/%d", SECT_ENGINE, ARR_DATAPTS, i+1);
 		edesc[i].rpm = GfParmGetNum(hdle, idx, PRM_RPM, (char*)NULL, car->engine.revsMax);
@@ -170,7 +170,7 @@ SimEngineConfig(tCar *car)
     }
     edesc[i].rpm = edesc[i - 1].rpm;
     edesc[i].tq  = edesc[i].tq;
-    
+
     maxTq = 0;
 	car->engine.curve.maxPw = 0;
     car->engine.curve.data = (tEngineCurveElem *)malloc(car->engine.curve.nbPts * sizeof(tEngineCurveElem));
@@ -178,7 +178,7 @@ SimEngineConfig(tCar *car)
     for(i = 0; i < car->engine.curve.nbPts; i++) {
 		data = &(car->engine.curve.data[i]);
 
-		data->rads = edesc[i].rpm; 
+		data->rads = edesc[i].rpm;
 		if ((data->rads>=car->engine.tickover)
 			&& (edesc[i].tq > maxTq)
 			&& (data->rads < car->engine.revsLimiter)) {
@@ -204,7 +204,7 @@ SimEngineConfig(tCar *car)
 	//	car->carElt->_enginerpmMaxTq * (30.0 / M_PI),
 	//	car->carElt->_engineMaxPw * 0.001,
 	//	car->carElt->_enginerpmMaxPw * (30.0 / M_PI)
-	//	); 
+	//	);
 	float X=urandom();
     car->engine.rads = X*car->engine.tickover+(1-X)*car->engine.revsMax;
 
@@ -240,10 +240,7 @@ SimEngineUpdateTq(tCar *car)
 		car->ctrl->accelCmd = 0.0;
     }
 
-
-	if (engine->rads > engine->revsMax) {
-		engine->rads = engine->revsMax;
-	}
+    engine->rads = MIN(engine->rads, engine->revsMax);
     const tdble static_friction = 0.1f;
 	tdble EngBrkK = curve->TqAtMaxPw * engine->brakeCoeff * (static_friction + (1.0f - static_friction)*(engine->rads) / (engine->revsMax));
 
@@ -272,17 +269,13 @@ SimEngineUpdateTq(tCar *car)
 		if (engine->rads > engine->tickover) {
 			engine->Tq -= EngBrkK;
 		}
-		tdble cons = Tq_cur * 0.75f;
 
+		tdble cons = Tq_cur * 0.75f;
 		if (cons > 0) {
 			car->fuel -= (float)(cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime);
 		}
-		if (car->fuel <= 0.0) {
-			car->fuel = 0.0;
-		}
-		return;
-
-    } 
+        car->fuel = MAX(car->fuel, 0.0);
+    }
 }
 
 /*
@@ -307,7 +300,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
     tEngine		*engine = &(car->engine);
     float		freerads;
     float		transfer;
-    
+
 #if 0
     if (car->fuel <= 0.0) {
 		clutch->state = CLUTCH_APPLIED;
@@ -330,7 +323,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 	}
 	engine->exhaust_pressure*=.9f;
 
-	
+
 	car->carElt->priv.smoke += 5.0f*engine->exhaust_pressure;
 	car->carElt->priv.smoke *= exp(-0.0001f * engine->rads);
 #if 0
@@ -338,7 +331,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 		//car->carElt->priv.smoke += engine->exhaust_pressure;//engine->exhaust_refract;
 		engine->exhaust_pressure -= engine->exhaust_refract;
 		engine->exhaust_refract = 0.05;
-	} 
+	}
 	if (engine->exhaust_refract<0.01) {
 		engine->exhaust_refract = 0.01;
 		car->carElt->priv.smoke = 0.0;
@@ -357,7 +350,7 @@ SimEngineUpdateRpm(tCar *car, tdble axleRpm)
 	tdble sdI = dI;
 
 	if (sdI>1.0) sdI = 1.0;
-    
+
 	engine->I_joint = (float)(engine->I_joint*(1.0-alpha) +  alpha*trans->curI);
 
     if ((clutch->transferValue > 0.01) && (trans->gearbox.gear)) {

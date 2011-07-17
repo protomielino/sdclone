@@ -32,8 +32,8 @@ SimEngineConfig(tCar *car)
 		tdble rpm;
 		tdble tq;
 	} *edesc;
-	
-	
+
+
 	car->engine.revsLimiter = GfParmGetNum(hdle, SECT_ENGINE, PRM_REVSLIM, (char*)NULL, 800);
 	car->carElt->_enginerpmRedLine = car->engine.revsLimiter;
 	car->engine.revsMax     = GfParmGetNum(hdle, SECT_ENGINE, PRM_REVSMAX, (char*)NULL, 1000);
@@ -51,7 +51,7 @@ SimEngineConfig(tCar *car)
 	sprintf(idx, "%s/%s", SECT_ENGINE, ARR_DATAPTS);
 	car->engine.curve.nbPts = GfParmGetEltNb(hdle, idx);
 	edesc = (struct tEdesc*)malloc((car->engine.curve.nbPts + 1) * sizeof(struct tEdesc));
-	
+
 	for (i = 0; i < car->engine.curve.nbPts; i++) {
 		sprintf(idx, "%s/%s/%d", SECT_ENGINE, ARR_DATAPTS, i+1);
 		edesc[i].rpm = GfParmGetNum(hdle, idx, PRM_RPM, (char*)NULL, car->engine.revsMax);
@@ -59,13 +59,13 @@ SimEngineConfig(tCar *car)
 	}
 	edesc[i].rpm = edesc[i - 1].rpm;
 	edesc[i].tq  = edesc[i - 1].tq;
-	
+
 	maxTq = 0;
 	car->engine.curve.maxPw = 0;
 	car->engine.curve.data = (tEngineCurveElem *)malloc(car->engine.curve.nbPts * sizeof(tEngineCurveElem));
 	for(i = 0; i < car->engine.curve.nbPts; i++) {
 		data = &(car->engine.curve.data[i]);
-		
+
 		data->rads = edesc[i+1].rpm;
 		if ((data->rads>=car->engine.tickover)
 			&& (edesc[i+1].tq > maxTq)
@@ -80,21 +80,21 @@ SimEngineConfig(tCar *car)
 			car->engine.curve.maxPw = data->rads * edesc[i+1].tq;
 			car->engine.curve.rpmMaxPw = data->rads;
 		}
-	
+
 		data->a = (edesc[i+1].tq - edesc[i].tq) / (edesc[i+1].rpm - edesc[i].rpm);
 		data->b = edesc[i].tq - data->a * edesc[i].rpm;
 	}
-	
+
 	car->engine.curve.maxTq = maxTq;
 	car->carElt->_engineMaxTq = maxTq;
 	car->carElt->_enginerpmMaxTq = rpmMaxTq;
 	car->carElt->_engineMaxPw = car->engine.curve.maxPw;
 	car->carElt->_enginerpmMaxPw = car->engine.curve.rpmMaxPw;
-	
+
 	car->engine.rads = car->engine.tickover;
-	
+
 	free(edesc);
-	
+
 	/* check engine brake */
 	if ( car->engine.brakeCoeff < 0.0 )
 	   {car->engine.brakeCoeff = 0.0;}
@@ -116,7 +116,7 @@ SimEngineUpdateTq(tCar *car)
 		engine->Tq = 0;
 		return;
 	}
-	
+
 	// set clutch on when engine revs too low
 	if (engine->rads < engine->tickover) {
 		clutch->state = CLUTCH_APPLIED;
@@ -124,17 +124,10 @@ SimEngineUpdateTq(tCar *car)
 		//		engine->rads = engine->tickover;
 	}
 
-    if ((car->fuel <= 0.0) || (car->carElt->_state & (RM_CAR_STATE_BROKEN | RM_CAR_STATE_ELIMINATED))) {
-		car->ctrl->accelCmd = 0.0;
-    }
-
-
-	if (engine->rads > engine->revsMax) {
-		engine->rads = engine->revsMax;
-	}
+    engine->rads = MIN(engine->rads, engine->revsMax);
 	tdble EngBrkK = engine->brakeLinCoeff * engine->rads;
 
-    if ( (engine->rads < engine->tickover) || 
+    if ( (engine->rads < engine->tickover) ||
          ( (engine->rads == engine->tickover) && (car->ctrl->accelCmd <= 1e-6) ) ) {
 		engine->Tq = 0.0f;
 		engine->rads = engine->tickover;
@@ -156,17 +149,13 @@ SimEngineUpdateTq(tCar *car)
 		if (alpha <= 1e-6) {
 			engine->Tq -= engine->brakeCoeff;
 		}
-		
+
 		tdble cons = Tq_cur * 0.75f;
 		if (cons > 0) {
 			car->fuel -= cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime;
 		}
-		if (car->fuel <= 0.0) {
-			car->fuel = 0.0;
-		}
-		return;
-
-    } 
+        car->fuel = MAX(car->fuel, 0.0);
+    }
 }
 
 /*
@@ -191,15 +180,15 @@ tClutch *clutch = &(trans->clutch);
 tEngine *engine = &(car->engine);
 float freerads;
 float transfer;
-	
-	
+
+
 if (car->fuel <= 0.0) {
 engine->rads = 0;
 clutch->state = CLUTCH_APPLIED;
 clutch->transferValue = 0.0;
 return 0.0;
 }
-	
+
 freerads = engine->rads;
 freerads += engine->Tq / engine->I * SimDeltaTime;
 {
@@ -215,7 +204,7 @@ freerads += engine->Tq / engine->I * SimDeltaTime;
     car->carElt->priv.smoke += 5.0f*engine->exhaust_pressure;
     car->carElt->priv.smoke *= 0.99f;
 }
-	
+
 
 // This is a method for the joint torque that the engine experiences
 // to be changed smoothly and not instantaneously.
