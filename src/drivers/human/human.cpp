@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    		
+/** @file
+
     @author	<a href=mailto:torcs@free.fr>Eric Espie</a>
     @version	$Id$
 */
@@ -47,7 +47,7 @@
 #include "human.h"
 
 
-static const int FuelReserve = 5;
+static const int FuelReserve = 3;
 static const tdble MaxFuelPerMeter = 0.0008;	// [kg/m] fuel consumption.
 
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
@@ -145,7 +145,7 @@ shutdown(const int index)
 
 
 /**
- * 
+ *
  *	InitFuncPt
  *
  *	Robot functions initialisation.
@@ -199,7 +199,7 @@ InitFuncPt(int index, void *pt)
 
 
 /**
- * 
+ *
  * moduleWelcome
  *
  * First function of the module called at load time :
@@ -218,7 +218,7 @@ moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
-	// Count the number of human drivers registered in the params 
+	// Count the number of human drivers registered in the params
 	NbDrivers = -1;
 	if (drvInfo) {
 		const char *driver;
@@ -238,13 +238,13 @@ moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 
 
 /**
- * 
+ *
  * moduleInitialize
  *
  * Module entry point
  *
  * @param modInfo	administrative info on module
- * @return 0 if no error occured, -1 if any error occured 
+ * @return 0 if no error occured, -1 if any error occured
  */
 extern "C" int
 moduleInitialize(tModInfo *modInfo)
@@ -259,7 +259,7 @@ moduleInitialize(tModInfo *modInfo)
 
 	// Clear the local driver name vector
 	VecNames.clear();
-    
+
 	// Open and load the human drivers params file
 	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
@@ -283,10 +283,10 @@ moduleInitialize(tModInfo *modInfo)
 				modInfo++;
 			}//if strlen
 		}//for i
-	
+
 		GfParmReleaseHandle(drvInfo);	// Release in case we got it.
 	}//if drvInfo
-   
+
 	return 0;
 }//moduleInitialize
 
@@ -380,9 +380,9 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 
 	//Initial fuel fill computation
 	SetFuelAtRaceStart(track, carParmHandle, s, idx);
-	
+
 	speedLimit = curTrack->pits.speedLimit;
-	
+
 	if(drvInfo) {
 		GfParmReleaseHandle(drvInfo);
 	}
@@ -396,7 +396,7 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
  * @param index
  * @param car
  * @param s situation provided by the sim
- * 
+ *
  */
 void
 newrace(int index, tCarElt* car, tSituation *s)
@@ -449,7 +449,7 @@ newrace(int index, tCarElt* car, tSituation *s)
 
 	// Determine cluch mode : auto or "manual" (footual ;-?).
 	tControlCmd	*cmd = HCtx[idx]->cmdControl;
-	if (cmd[CMD_CLUTCH].type != GFCTRL_TYPE_JOY_AXIS && 
+	if (cmd[CMD_CLUTCH].type != GFCTRL_TYPE_JOY_AXIS &&
 			cmd[CMD_CLUTCH].type != GFCTRL_TYPE_MOUSE_AXIS)
 		HCtx[idx]->autoClutch = true;
 	else
@@ -471,7 +471,7 @@ newrace(int index, tCarElt* car, tSituation *s)
 				keyIndex++;
 			}
 		}//KEYBOARD
-		
+
 	}//for i
 
 }//newrace
@@ -550,7 +550,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	tdble sensFrac, speedFrac;
 #endif
 	int scrw, scrh, dummy;
-	
+
 	const int idx = index - 1;
 	tControlCmd *cmd = HCtx[idx]->cmdControl;
 	static bool firstTime = true;
@@ -601,7 +601,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		} else cmd[dummy].deadZone = 0;
 	    }
 	}
-	
+
 
 	if ((cmd[CMD_ABS].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_ABS].val])
 	    || (cmd[CMD_ABS].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_ABS].val])
@@ -713,7 +713,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				if (leftSteer > 1.0) leftSteer = 1.0;
 				if (leftSteer < 0.0) leftSteer = 0.0;
 			}
-#endif			
+#endif
 			HCtx[idx]->prevLeftSteer = leftSteer;
 			break;
 		default:
@@ -971,7 +971,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		if (s->currentTime > 1.0)
 		{
 			static const tdble inc_rate = 0.2f;
-		
+
 			tdble d_brake = car->_brakeCmd - HCtx[idx]->pbrake;
 			if (fabs(d_brake) > inc_rate && car->_brakeCmd > HCtx[idx]->pbrake)
 				car->_brakeCmd =
@@ -979,7 +979,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		}
 		HCtx[idx]->pbrake = car->_brakeCmd;
 	}
-	
+
 	if (cmd[CMD_THROTTLE].type == GFCTRL_TYPE_JOY_BUT
 		|| cmd[CMD_THROTTLE].type == GFCTRL_TYPE_MOUSE_BUT
 		|| cmd[CMD_THROTTLE].type == GFCTRL_TYPE_KEYBOARD)
@@ -987,7 +987,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		if (s->currentTime > 1.0)
 		{
 			static const tdble inc_rate = 0.2f;
-			
+
 			tdble d_accel = car->_accelCmd - HCtx[idx]->paccel;
 			if (fabs(d_accel) > inc_rate && car->_accelCmd > HCtx[idx]->paccel)
 				car->_accelCmd =
@@ -1003,7 +1003,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		car->_accelCmd = brake;
 	}
 
-	if (HCtx[idx]->paramAbs) 
+	if (HCtx[idx]->paramAbs)
 	{
 		if (fabs(car->_speed_x) > 10.0 && car->_brakeCmd > 0.0)
 		{
@@ -1044,7 +1044,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	}
 
 
-	if (HCtx[idx]->paramAsr) 
+	if (HCtx[idx]->paramAsr)
 	{
 		tdble origaccel = car->_accelCmd;
 
@@ -1055,7 +1055,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				drivespeed = ((car->_wheelSpinVel(FRNT_RGT) + car->_wheelSpinVel(FRNT_LFT)) *
 				              car->_wheelRadius(FRNT_LFT) +
 				              (car->_wheelSpinVel(REAR_RGT) + car->_wheelSpinVel(REAR_LFT)) *
-				              car->_wheelRadius(REAR_LFT)) / 4.0; 
+				              car->_wheelRadius(REAR_LFT)) / 4.0;
 				break;
 			case eFWD:
 				drivespeed = (car->_wheelSpinVel(FRNT_RGT) + car->_wheelSpinVel(FRNT_LFT)) *
@@ -1140,16 +1140,16 @@ getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
 {
 	tdble ret = 0.0f;
 	float max_clutchtime;
-	
+
 	if (newGear != 0 && newGear < car->_gearNb) {
 		max_clutchtime = 0.332f - ((tdble) newGear / 65.0f);
-	
+
 		if (newGear != gear)
 			HCtx[idx]->clutchtime = max_clutchtime;
 
 		ret = HCtx[idx]->clutchtime / max_clutchtime;
 	}//if newGear
-	
+
 	return ret;
 }//getAutoClutch
 
@@ -1168,7 +1168,7 @@ getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
  *
  *
  * Remarks
- *	
+ *
  */
 static void
 drive_mt(int index, tCarElt* car, tSituation *s)
@@ -1219,7 +1219,7 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_R].deadZone == 1))
 		{
 			/* Only allow Reverse to be selected at low speed (~40kmph) or from neutral */
-			if (car->_speed_x < 10 || car->_gear == 0) 
+			if (car->_speed_x < 10 || car->_gear == 0)
 				car->_gearCmd = -1;
 		}
 	}
@@ -1309,10 +1309,10 @@ drive_mt(int index, tCarElt* car, tSituation *s)
  *
  *
  * Return
- *	
+ *
  *
  * Remarks
- *	
+ *
  */
 static void
 drive_at(int index, tCarElt* car, tSituation *s)
@@ -1419,7 +1419,7 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 
 	tdble planned_stops = 1.0
       + MAX(HCtx[idx]->nbPitStopProg - HCtx[idx]->nbPitStops, 0);  //Planned pitstops still ahead
-	
+
   //Need this amount of extra fuel to finish the race
   tdble fuel = ( MaxFuelPerMeter
       * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart)
@@ -1467,8 +1467,11 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     fuel_requested = initial_fuel;
   } else {
     // We must load and calculate parameters.
-    tdble fuel_per_lap = track->length * MaxFuelPerMeter;
-    tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f);
+    const tdble fuel_cons_factor = GfParmGetNum(*carParmHandle,
+                                            SECT_ENGINE, PRM_FUELCONS,
+                                            NULL, 1.0f);
+    tdble fuel_per_lap = track->length * MaxFuelPerMeter * fuel_cons_factor;
+    tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f);// + FuelReserve;
     // aimed at timed sessions:
     fuel_for_race +=  fuel_per_lap / 60.0 * MAX(s->_totTime, 0);
     // divide qty by planned pitstops:
