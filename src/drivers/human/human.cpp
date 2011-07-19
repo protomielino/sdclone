@@ -1484,7 +1484,7 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     fuel_requested = MIN(fuel_for_race, tank_capacity);
   }
 
-  GfLogInfo("Human #%d : Starting race seesion with %.1f l of fuel (%s)\n",
+  GfLogInfo("Human #%d : Starting race session with %.1f l of fuel (%s)\n",
 			idx, fuel_requested, initial_fuel ? "as explicitely stated" : "computed");
 
   GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL, fuel_requested);
