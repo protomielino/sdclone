@@ -1420,17 +1420,18 @@ pitcmd(int index, tCarElt* car, tSituation *s)
 	tdble planned_stops = 1.0
       + MAX(HCtx[idx]->nbPitStopProg - HCtx[idx]->nbPitStops, 0);  //Planned pitstops still ahead
 
-  //Need this amount of extra fuel to finish the race
-  tdble fuel = ( MaxFuelPerMeter
-      * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart)
-      + 2.7f / 60.0f * MAX(s->_totTime, 0) )
-    / planned_stops
-    - car->_fuel;
+	//Need this amount of extra fuel to finish the race
+	tdble fuel =
+		( MaxFuelPerMeter
+		  * (curTrack->length * car->_remainingLaps + car->_trkPos.seg->lgfromstart)
+		  + 2.7f / 60.0f * MAX(s->_totTime, 0) )
+		/ planned_stops
+		- car->_fuel;
 
-  //No need to check for limits as curr_fuel cannot be bigger
-  //than the tank capacity
+	//No need to check for limits as curr_fuel cannot be bigger
+	//than the tank capacity
 	car->_pitFuel = MAX(MIN(curr_fuel, fuel), 0);
-
+	
 	HCtx[idx]->lastPitStopLap = car->_laps;
 
 	car->_pitRepair = (int)car->_dammage;
@@ -1467,9 +1468,8 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     fuel_requested = initial_fuel;
   } else {
     // We must load and calculate parameters.
-    const tdble fuel_cons_factor = GfParmGetNum(*carParmHandle,
-                                            SECT_ENGINE, PRM_FUELCONS,
-                                            NULL, 1.0f);
+    const tdble fuel_cons_factor =
+		GfParmGetNum(*carParmHandle, SECT_ENGINE, PRM_FUELCONS, NULL, 1.0f);
     tdble fuel_per_lap = track->length * MaxFuelPerMeter * fuel_cons_factor;
     tdble fuel_for_race = fuel_per_lap * (s->_totLaps + 1.0f);// + FuelReserve;
     // aimed at timed sessions:
@@ -1479,10 +1479,13 @@ static void SetFuelAtRaceStart(tTrack* track, void **carParmHandle,
     // add some reserve:
     //fuel_for_race += FuelReserve;
 
-    const tdble tank_capacity = GfParmGetNum(*carParmHandle, SECT_CAR,
-                                              PRM_TANK, NULL, 100.0f);
+    const tdble tank_capacity =
+		GfParmGetNum(*carParmHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
     fuel_requested = MIN(fuel_for_race, tank_capacity);
   }
+
+  GfLogInfo("Human #%d : Starting race seesion with %.1f l of fuel (%s)\n",
+			idx, fuel_requested, initial_fuel ? "as explicitely stated" : "computed");
 
   GfParmSetNum(*carParmHandle, SECT_CAR, PRM_FUEL, NULL, fuel_requested);
 }  // SetFuelAtRaceStart
