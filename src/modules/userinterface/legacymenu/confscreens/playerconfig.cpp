@@ -368,13 +368,19 @@ PutPlayerSettings(unsigned index)
     GfParmSetNum(PrefHdle, drvSectionPath, HM_ATT_NBPITS, (char*)NULL, (tdble)player->nbPitStops());
     GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_AUTOREVERSE, Yn[player->autoReverse()]);
     
-    /* Allow neutral gear in sequential mode if nor reverse nor neutral gear command defined */
+    /* Allow neutral gear in sequential mode if neutral gear command not defined */
     if (player->gearChangeMode() == GEAR_MODE_SEQ
-	&& (!strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_R, "-"), "-")
-	    || !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_N, "-"), "-")))
+	    && !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_N, "-"), "-"))
         GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_YES);
     else
         GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_NO);
+
+    /* Allow reverse gear in sequential mode if reverse gear command not defined */
+    if (player->gearChangeMode() == GEAR_MODE_SEQ
+	    && !strcmp(GfParmGetStr(PrefHdle, drvSectionPath, HM_ATT_GEAR_R, "-"), "-"))
+        GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_REVERSE, HM_VAL_YES);
+    else
+        GfParmSetStr(PrefHdle, drvSectionPath, HM_ATT_SEQSHFT_ALLOW_REVERSE, HM_VAL_NO);
     
     /* Release gear lever goes neutral in grid mode if no neutral gear command defined */
     if (player->gearChangeMode() == GEAR_MODE_GRID

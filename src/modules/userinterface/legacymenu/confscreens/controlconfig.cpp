@@ -748,15 +748,19 @@ void ControlPutSettings(void *prefHdle, unsigned index, tGearChangeMode gearChan
     if (gearChangeMode == GEAR_MODE_NONE)
         gearChangeMode = GearChangeMode;
 
-    /* Allow neutral gear in sequential mode if nor reverse nor neutral gear command defined */
-    pszReverseCmd = GfctrlGetNameByRef(Cmd[ICmdReverseGear].ref.type, Cmd[ICmdReverseGear].ref.index);
+    /* Allow neutral gear in sequential mode if neutral gear command not defined */
     pszNeutralCmd = GfctrlGetNameByRef(Cmd[ICmdNeutralGear].ref.type, Cmd[ICmdNeutralGear].ref.index);
-    if (gearChangeMode == GEAR_MODE_SEQ
-	&& (!pszReverseCmd || !strcmp(pszReverseCmd, "-")
-	    || !pszNeutralCmd || !strcmp(pszNeutralCmd, "-")))
+    if (gearChangeMode == GEAR_MODE_SEQ && (!pszNeutralCmd || !strcmp(pszNeutralCmd, "-")))
 	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_YES);
     else
 	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, HM_VAL_NO);
+
+    /* Allow reverse gear in sequential mode if reverse gear command not defined */
+    pszReverseCmd = GfctrlGetNameByRef(Cmd[ICmdReverseGear].ref.type, Cmd[ICmdReverseGear].ref.index);
+    if (gearChangeMode == GEAR_MODE_SEQ && (!pszReverseCmd || !strcmp(pszReverseCmd, "-")))
+	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_REVERSE, HM_VAL_YES);
+    else
+	GfParmSetStr(prefHdle, CurrentSection, HM_ATT_SEQSHFT_ALLOW_REVERSE, HM_VAL_NO);
 
     /* Release gear lever goes neutral in grid mode if no neutral gear command defined */
     if (gearChangeMode == GEAR_MODE_GRID

@@ -1189,8 +1189,13 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp)
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_UP_SHFT].deadZone == 1))
 		{
-			if (HCtx[idx]->seqShftAllowNeutral || car->_gearCmd > -1)
+			if (car->_gearCmd > -1)
 				car->_gearCmd++;
+			else if (HCtx[idx]->seqShftAllowNeutral && car->_gearCmd == -1)
+				car->_gearCmd = 0;
+			/* always allow up shift out of reverse to improve game play */
+			else if (car->_gearCmd == -1)
+				car->_gearCmd = 1;
 		}
 
 		/* Down shifting command */
@@ -1199,8 +1204,12 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp)
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_DN_SHFT].deadZone == 1))
 		{
-			if (HCtx[idx]->seqShftAllowNeutral || car->_gearCmd > 1)
+			if (car->_gearCmd > 1)
 				car->_gearCmd--;
+			else if (HCtx[idx]->seqShftAllowNeutral && car->_gearCmd == 1)
+				car->_gearCmd = 0;
+			else if (HCtx[idx]->seqShftAllowReverse && car->_gearCmd < 2)
+				car->_gearCmd = -1;
 		}
 
 		/* Neutral gear command */

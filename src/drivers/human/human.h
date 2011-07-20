@@ -59,6 +59,7 @@ typedef struct HumanContext
     bool		paramAbs;
     bool		relButNeutral;
     bool		seqShftAllowNeutral;
+    bool		seqShftAllowReverse;
     bool		autoReverse;
     eDriveTrain	driveTrain;
     int			autoClutch;

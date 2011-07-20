@@ -81,6 +81,7 @@
 
 /* Tell if the sequential shifter can go to neutral */
 #define HM_ATT_SEQSHFT_ALLOW_NEUTRAL "sequential shifter allow neutral"
+#define HM_ATT_SEQSHFT_ALLOW_REVERSE "sequential shifter allow reverse"
 
 #define HM_ATT_STEER_SENS	"steer sensitivity"
 #define HM_ATT_STEER_POW	"steer power"

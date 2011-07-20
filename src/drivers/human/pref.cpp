@@ -206,6 +206,10 @@ HmReadPrefs(const int index)
 	prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, Yn[HCtx[idx]->seqShftAllowNeutral].c_str());
 	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_SEQSHFT_ALLOW_NEUTRAL, prm);
 	HCtx[idx]->seqShftAllowNeutral = (prm == Yn[0]);
+
+	prm = GfParmGetStr(PrefHdle, defaultSettings, HM_ATT_SEQSHFT_ALLOW_REVERSE, Yn[HCtx[idx]->seqShftAllowReverse].c_str());
+	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_SEQSHFT_ALLOW_REVERSE, prm);
+	HCtx[idx]->seqShftAllowReverse = (prm == Yn[0]);
 	
 	prm = GfParmGetStr(PrefHdle, sstring, HM_ATT_AUTOREVERSE, Yn[HCtx[idx]->autoReverse].c_str());
 	HCtx[idx]->autoReverse = (prm == Yn[0]);
