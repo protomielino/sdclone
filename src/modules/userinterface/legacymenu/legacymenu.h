@@ -29,6 +29,7 @@
 #include <tgf.hpp>
 
 class IGraphicsEngine;
+class ISoundEngine;
 struct Situation;
 
 
@@ -117,6 +118,9 @@ public:
 
 	//! Accessor to the graphics engine.
 	IGraphicsEngine* graphicsEngine();
+
+	//! Accessor to the sound engine.
+	ISoundEngine* soundEngine();
 
  protected:
 

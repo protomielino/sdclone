@@ -11,9 +11,14 @@
 #ifndef CAR_SOUND_DATA_H
 #define CAR_SOUND_DATA_H
 
-//#include <vector>
+#include <raceman.h>
 
 #include "QSoundChar.h"
+
+#include "SoundInterface.h"
+
+class Sound;
+
 
 typedef struct WheelSoundData_
 {
@@ -28,7 +33,7 @@ protected:
 	sgVec3 listener_position;
 	sgVec3 position;
 	sgVec3 speed;
-	TorcsSound* engine_sound;
+	Sound* engine_sound;
 	SoundInterface* sound_interface;
 	void calculateAttenuation (tCarElt* car);
 	void calculateEngineSound (tCarElt* car);
@@ -58,9 +63,9 @@ public:
 	int prev_gear;
 
 	CarSoundData (int id, SoundInterface* sound_interface);
-	void setEngineSound (TorcsSound* engine_sound, float rpm_scale);
+	void setEngineSound (Sound* engine_sound, float rpm_scale);
 	void setTurboParameters (bool turbo_on, float turbo_rpm, float turbo_lag);
-	TorcsSound* getEngineSound () {return engine_sound;}
+	Sound* getEngineSound () {return engine_sound;}
 	void copyEngPri (SoundPri& epri) 	{epri = eng_pri;}
 	void setCarPosition (sgVec3 p)
 	{

@@ -1,5 +1,6 @@
 #ifndef SOUND_DEFINES_H
 #define SOUND_DEFINES_H
+
 #ifndef M_PI
 #define EX_PI 3.1415926535
 #else

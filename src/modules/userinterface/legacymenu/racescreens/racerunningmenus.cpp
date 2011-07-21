@@ -32,6 +32,7 @@
 #include <tgf.hpp>
 #include <tgfclient.h>
 
+#include <isoundengine.h>
 #include <raceman.h>
 #include <robot.h>
 
@@ -274,6 +275,10 @@ rmScreenActivate(void * /* dummy */)
 	// Hide the on-screen pause indicator in case it is visible.
 	GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
 
+	// Reset normal sound volume in any case.
+	if (LegacyMenu::self().soundEngine())
+		LegacyMenu::self().soundEngine()->mute(false);
+	
 	// Deactivate the movie capture mode in any case.
 	rmMovieCapture.active = false;
 	
@@ -294,11 +299,22 @@ rmScreenActivate(void * /* dummy */)
 static void
 rmRacePause(void * /* vboard */)
 {
-    if (LmRaceEngine().outData()->s->_raceState & RM_RACE_PAUSED) {
+    if (LmRaceEngine().outData()->s->_raceState & RM_RACE_PAUSED)
+	{
+		if (LegacyMenu::self().soundEngine())
+			LegacyMenu::self().soundEngine()->mute(false);
+
 		LmRaceEngine().start();
+
 		GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
-    } else {
+    }
+	else
+	{
+		if (LegacyMenu::self().soundEngine())
+			LegacyMenu::self().soundEngine()->mute(true);
+
 		LmRaceEngine().stop();
+
 		GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_VISIBLE);
     }
 	

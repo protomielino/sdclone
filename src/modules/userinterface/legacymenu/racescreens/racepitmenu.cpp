@@ -29,7 +29,9 @@
 #include <portability.h>
 
 #include <tgfclient.h>
+
 #include <car.h>
+#include <isoundengine.h>
 #include <raceman.h>
 
 #include "legacymenu.h"
@@ -162,6 +164,10 @@ RmCheckPitRequest()
 	// If one (human) driver is in pit, switch the display loop to the pit menu.
 	if (LmRaceEngine().outData()->_rePitRequester)
 	{
+		// Mute sound.
+		if (LegacyMenu::self().soundEngine())
+			LegacyMenu::self().soundEngine()->mute(true);
+
 		// First, stop the race engine.
 		LmRaceEngine().stop();
 

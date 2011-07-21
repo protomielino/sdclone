@@ -60,7 +60,7 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     
     attenuation = 0.0f;
 }
-void CarSoundData::setEngineSound (TorcsSound* engine_sound, float rpm_scale)
+void CarSoundData::setEngineSound (Sound* engine_sound, float rpm_scale)
 {
     this->engine_sound = engine_sound;
     base_frequency = rpm_scale;
@@ -344,8 +344,6 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
     if (car->_state & RM_CAR_STATE_NO_SIMU) {
         return;
     }
-                
-
         
     int collision  = car->priv.collision;
     if (collision) {

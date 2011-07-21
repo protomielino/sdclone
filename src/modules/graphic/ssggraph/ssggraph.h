@@ -25,6 +25,7 @@
 #define _SSGGRAPH_H_
 
 #include <igraphicsengine.h>
+#include <isoundengine.h>
 
 #include <tgf.hpp>
 
@@ -47,8 +48,9 @@ class ssgLoaderOptions;
 extern "C" int SSGGRAPH_API openGfModule(const char* pszShLibName, void* hShLibHandle);
 extern "C" int SSGGRAPH_API closeGfModule();
 
-// The module main class (Singleton, inherits GfModule, and implements IGraphicsEngine).
-class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine
+// The module main class
+// (Singleton, inherits GfModule, and implements IGraphicsEngine and ISoundEngine).
+class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine, public ISoundEngine
 {
  public:
 
@@ -61,6 +63,9 @@ class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine
 	virtual void shutdownView();
 	virtual void unloadCars();
 	virtual void unloadTrack();
+
+	// Implementation of ISoundEngine.
+	virtual void mute(bool bOn = true);
 
 	// Accessor to the singleton.
 	static SsgGraph& self();

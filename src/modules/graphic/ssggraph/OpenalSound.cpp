@@ -1,7 +1,7 @@
 // -*- Mode: c++ -*-
 /***************************************************************************
-    file                 : TorcsSound.cpp
-    created              : Tue Apr 5 19:57:35 CEST 2005
+    file                 : Sound.cpp
+    created              : Tue Jul 18 19:57:35 CEST 2011
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
     version              : $Id$
@@ -19,275 +19,14 @@
 
 #include <SDL/SDL.h>
 
-#include "TorcsSound.h"
-#include "SoundInterface.h"
+#include <tgf.h>
+
+#include "OpenalSoundInterface.h"
+#include "OpenalSound.h"
 
 
-/// Set the volume \note effect not consistent across backends
-void TorcsSound::setVolume(float vol)
-{
-	this->volume = vol;
-}
-
-/// Set the pitch \note Effect not consistent across backends
-void TorcsSound::setPitch(float pitch)
-{
-	this->pitch = pitch;
-}
-
-/// Set the filter \note Effect not consistent across backends
-void TorcsSound::setLPFilter(float lp)
-{
-	this->lowpass = lp;
-}
-
-/// Create a new PLib sound. It requires a scheduler to be set up
-/// and a filename to read data from.
-PlibTorcsSound::PlibTorcsSound(slScheduler* sched,
-			       const char* filename,
-			       int flags,
-			       bool loop) : TorcsSound (flags)
-{
-	this->sched = sched;
-	this->loop = loop;
-	MAX_VOL = 1.0f;
-	sample = new slSample (filename, sched);
-	if (flags & ACTIVE_VOLUME) {
-		volume_env = new slEnvelope(1, SL_SAMPLE_ONE_SHOT);
-	}
-	if (flags & ACTIVE_PITCH) {
-		pitch_env = new slEnvelope(1, SL_SAMPLE_ONE_SHOT);
-	}
-	if (flags & ACTIVE_LP_FILTER) {
-		lowpass_env = new slEnvelope(1, SL_SAMPLE_ONE_SHOT);
-	}
-	if (loop) {
-		sched->loopSample (sample);
-	}
-	if (flags & ACTIVE_VOLUME) {
-		sched->addSampleEnvelope (sample, 0, VOLUME_SLOT, volume_env,
-					  SL_VOLUME_ENVELOPE);
-	}
-	if (flags & ACTIVE_PITCH) {
-		sched->addSampleEnvelope (sample, 0, PITCH_SLOT, pitch_env,
-					  SL_PITCH_ENVELOPE);
-	}
-	if (flags & ACTIVE_LP_FILTER) {
-		sched->addSampleEnvelope(sample, 0, FILTER_SLOT, lowpass_env,
-					 SL_FILTER_ENVELOPE);
-	}
-	if (flags & ACTIVE_VOLUME) {
-		volume_env->setStep(0, 0.0f, 0.0f);
-	}
-	if (flags & ACTIVE_PITCH) {
-		pitch_env->setStep(0, 0.0f, 1.0f);
-	}
-	if (flags & ACTIVE_LP_FILTER) {
-		lowpass_env->setStep(0, 0.0, 1.0f);
-	}
-	volume = 0.0f;
-	pitch = 1.0f;
-	lowpass = 1.0f;
-	playing = false;
-	paused = false;
-}
-
-/// Destructor.
-PlibTorcsSound::~PlibTorcsSound()
-{
-	sched->stopSample(sample);
-	if (flags & ACTIVE_VOLUME) {
-		sched->addSampleEnvelope(sample, 0, VOLUME_SLOT, NULL,
-					 SL_NULL_ENVELOPE);
-		delete volume_env;
-	}
-	if (flags & ACTIVE_PITCH) {
-		sched->addSampleEnvelope(sample, 0, PITCH_SLOT, NULL,
-					 SL_NULL_ENVELOPE);
-		delete pitch_env;
-	}
-	if (flags & ACTIVE_LP_FILTER) {
-		sched->addSampleEnvelope(sample, 0, FILTER_SLOT, NULL,
-					 SL_NULL_ENVELOPE);
-		delete lowpass_env;
-	}
-	delete sample;
-}
-
-/** Set the volume.  Since plib does not support envelopes for
- * one-shot samples, we pre-adjust their volume
- */
-void PlibTorcsSound::setVolume(float vol)
-{
-	if (vol > MAX_VOL) {
-		vol = MAX_VOL;
-	}
-	this->volume = vol;
-
-    if (loop==false) {
-        sample->adjustVolume (vol);
-    }
-}
-
-/// Start the sample
-void PlibTorcsSound::play()
-{
-	start();
-}
-
-/// Start the sample
-void PlibTorcsSound::start()
-{
-	// TODO: consistency check?
-	if (loop) {
-		if (playing == false) {
-			playing = true;
-			sched->loopSample (sample);
-		}
-	} else {
-		playing = true;
-		sched->playSample (sample);
-	}
-}
-
-/// Stop the sample
-void PlibTorcsSound::stop()
-{
-	if (playing == true) {
-		playing = false;
-		sched->stopSample (sample);
-	}
-}
-
-/// Resume a paused sample.
-void PlibTorcsSound::resume()
-{
-	sched->resumeSample (sample);
-	paused = false;
-}
-
-/// Pause a sample
-void PlibTorcsSound::pause()
-{
-	sched->pauseSample (sample);
-	paused = true;
-}
-
-
-/** Update the plib sounds.
- * This should be called as often as possible from the main sound code,
- * probably by looping through all the sounds used.
- */
-void PlibTorcsSound::update()
-{
-	if (flags & ACTIVE_VOLUME) {
-		volume_env->setStep(0, 0.0f, volume);
-	}
-	if (flags & ACTIVE_PITCH) {
-		pitch_env->setStep(0, 0.0f, pitch);
-
-	}
-	if (flags & ACTIVE_LP_FILTER) {
-		lowpass_env->setStep(0, 0.0f, lowpass);
-	}
-}
-
-/// Create a sound source
-TorcsSoundSource::TorcsSoundSource()
-{
-	a = 0.0;
-	f = 1.0;
-	lp = 1.0;
-}
-
-/** Calculate environmental parameters for current situation.
- *
- * At the moment this
- */
-
-void TorcsSoundSource::update()
-{
-	// Get relative speed/position vector
-	sgVec3 u;
-	sgVec3 p;
-	float u_rel = 0.0f;
-	float u_rel_src = 0.0f;
-	float u_rel_lis = 0.0f;
-	float p_rel = 0.0f;
-	int i;
-	for (i=0; i<3; i++) {
-		u[i] = u_src[i] - u_lis[i];
-		p[i] = p_src[i] -  p_lis[i];
-		p_rel += p[i]*p[i];
-	}
-    
-	a = 1.0;
-	f = 1.0f;
-	lp = 1.0f;
-
-	// Only the vector component on the LOV is significant
-	//    u_rel = sqrt(u_rel);
-	p_rel = 0.01f + sqrt(p_rel);
-	float p_cosx = p[0]/p_rel;
-	float p_cosy = p[1]/p_rel;
-	float p_cosz = p[2]/p_rel;
-	float p_x_comp = u[0]*p_cosx;
-	float p_y_comp = u[1]*p_cosy;
-	float p_z_comp = u[2]*p_cosz;
-	float p_x_src = u_src[0]*p_cosx;
-	float p_y_src = u_src[1]*p_cosy;
-	float p_z_src = u_src[2]*p_cosz;
-	float p_x_lis = u_lis[0]*p_cosx;
-	float p_y_lis = u_lis[1]*p_cosy;
-	float p_z_lis = u_lis[2]*p_cosz;
-	u_rel = (p_y_comp + p_x_comp + p_z_comp);
-	u_rel_src = (p_y_src + p_x_src + p_z_src);
-	u_rel_lis = (p_y_lis + p_x_lis + p_z_lis);
-	if (fabs(u_rel)>=0.9f*SPEED_OF_SOUND) {
-		// Cut-off sound when relative speed approaches speed of sound.
-		a = 0.0f;
-		f = 1.0f;
-		lp = 1.0f;
-	} else {
-		// attenuate and filter sound with distance
-		// and shift pitch with speed
-		float ref = 5.0f;
-		float rolloff = 0.5f;
-		float atten = ref / ( ref + rolloff * (p_rel - ref));
-		//f = SPEED_OF_SOUND/(SPEED_OF_SOUND+u_rel);
-		f = (tdble)((SPEED_OF_SOUND - u_rel_src)/(SPEED_OF_SOUND - u_rel_lis));
-		a = atten;
-		float atten_filter = MIN (atten, 1.0f);
-		lp = exp(atten_filter - 1.0f);
-	}
-
-}
-
-/** Set source position and velocity.
- */
-void TorcsSoundSource::setSource(sgVec3 p, sgVec3 u)
-{
-	for (int i=0; i<3; i++) {
-		p_src[i] = p[i];
-		u_src[i] = u[i];
-	}
-}
-
-/** Set listener position and velocity.
- */
-void TorcsSoundSource::setListener (sgVec3 p, sgVec3 u)
-{
-	for (int i=0; i<3; i++) {
-		p_lis[i] = p[i];
-		u_lis[i] = u[i];
-	}
-}
-
-/** Create a new torcs sound
- * 
- *
- */
-OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* sitf, int flags, bool loop, bool static_pool)
+OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
+						 int flags, bool loop, bool static_pool)
 {
 
 	this->loop = loop;
@@ -449,7 +188,7 @@ OpenalTorcsSound::OpenalTorcsSound(const char* filename, OpenalSoundInterface* s
 	}
 }
 
-OpenalTorcsSound::~OpenalTorcsSound()
+OpenalSound::~OpenalSound()
 {
 	if (alIsSource(source)) {
 		alSourceStop (source);
@@ -460,23 +199,23 @@ OpenalTorcsSound::~OpenalTorcsSound()
 	}
 }
 
-void OpenalTorcsSound::setVolume (float vol)
+void OpenalSound::setVolume (float vol)
 {
 	this->volume = vol;
 }
 
-void OpenalTorcsSound::setPitch(float pitch)
+void OpenalSound::setPitch(float pitch)
 {
 	this->pitch = pitch;
 }
 
-void OpenalTorcsSound::setLPFilter(float lp)
+void OpenalSound::setLPFilter(float lp)
 {
 	this->lowpass = lp;
 }
 
 
-void OpenalTorcsSound::setReferenceDistance(float dist)
+void OpenalSound::setReferenceDistance(float dist)
 {
 	if (static_pool) {
 		if (is_enabled) {
@@ -491,7 +230,7 @@ void OpenalTorcsSound::setReferenceDistance(float dist)
 }
 
 
-void OpenalTorcsSound::setSource (sgVec3 p, sgVec3 u)
+void OpenalSound::setSource (sgVec3 p, sgVec3 u)
 {
 	for (int i=0; i<3; i++) {
 		source_position[i] = p[i];
@@ -500,7 +239,7 @@ void OpenalTorcsSound::setSource (sgVec3 p, sgVec3 u)
 }
 
 
-void OpenalTorcsSound::getSource(sgVec3 p, sgVec3 u)
+void OpenalSound::getSource(sgVec3 p, sgVec3 u)
 {
 	for (int i=0; i<3; i++) {
 		p[i] = source_position[i];
@@ -509,12 +248,12 @@ void OpenalTorcsSound::getSource(sgVec3 p, sgVec3 u)
 }
 
 
-void OpenalTorcsSound::play()
+void OpenalSound::play()
 {
 	start();
 }
 
-void OpenalTorcsSound::start()
+void OpenalSound::start()
 {
 	if (static_pool) {
 		if (is_enabled) {
@@ -553,7 +292,7 @@ void OpenalTorcsSound::start()
 }
 
 
-void OpenalTorcsSound::stop()
+void OpenalSound::stop()
 {
 	if (static_pool) {
 		if (is_enabled) {
@@ -573,7 +312,7 @@ void OpenalTorcsSound::stop()
 	}
 }
 
-void OpenalTorcsSound::resume()
+void OpenalSound::resume()
 {
 	if (paused==true) {
 		paused = false;
@@ -581,14 +320,14 @@ void OpenalTorcsSound::resume()
 }
 
 
-void OpenalTorcsSound::pause()
+void OpenalSound::pause()
 {
 	if (paused==false) {
 		paused = true;
 	}
 }
 
-void OpenalTorcsSound::update ()
+void OpenalSound::update ()
 {
     ALfloat zero_velocity[3] = {0.0f, 0.0f, 0.0f};
 	if (static_pool) {

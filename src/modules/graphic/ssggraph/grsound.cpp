@@ -17,12 +17,12 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #include "grsound.h"
 
 #include "grmain.h"
 #include "grcam.h"
-#include "SoundInterface.h"
+#include "OpenalSoundInterface.h"
+#include "PlibSoundInterface.h"
 #include "CarSoundData.h"
 
 
@@ -109,7 +109,7 @@ void grInitSound(tSituation* s, int ncars)
 		}
 
 		car_sound_data[car->index] = new CarSoundData (car->index, sound_interface);
-		TorcsSound* engine_sound = sound_interface->addSample(filename, ACTIVE_VOLUME | ACTIVE_PITCH | ACTIVE_LP_FILTER, true, false);
+		Sound* engine_sound = sound_interface->addSample(filename, ACTIVE_VOLUME | ACTIVE_PITCH | ACTIVE_LP_FILTER, true, false);
 		car_sound_data[i]->setEngineSound (engine_sound, rpm_scale);
 	
 		// TURBO PARAMS
@@ -234,4 +234,9 @@ grRefreshSound(tSituation *s, cGrCamera	*camera)
 	}
 
 	return 0.0f;
+}
+
+void grMuteSound(bool bOn)
+{
+	sound_interface->mute(bOn);
 }

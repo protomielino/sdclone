@@ -17,6 +17,8 @@
 
 #include <tgfclient.h>
 
+#include <isoundengine.h>
+
 #include "legacymenu.h"
 #include "exitmenu.h"
 #include "racescreens.h"
@@ -227,6 +229,10 @@ RmStopRaceScreen()
 	void* params = LmRaceEngine().outData()->params;
 	const char* pszRaceName = LmRaceEngine().outData()->_reRaceName;
 
+	// Mute sound.
+	if (LegacyMenu::self().soundEngine())
+		LegacyMenu::self().soundEngine()->mute();
+	
 	if (!strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_ALLOW_RESTART, RM_VAL_NO), RM_VAL_NO)) 
 	{
 		if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 

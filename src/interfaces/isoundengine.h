@@ -1,12 +1,10 @@
-// -*- Mode: c++ -*-
 /***************************************************************************
+                 isoundengine.h -- Interface for sound engines
 
-    file                 : grsound.h
-    created              : Thu Aug 17 23:57:35 CEST 2000
-    copyright            : (C) 2000-2004 by Eric Espie, Christos Dimitrakakis
-    email                : torcs@free.fr
+    created              : Mon Mar 28 19:48:14 CEST 2011
+    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    web                  : http://www.speed-dreams.org
     version              : $Id$
-
  ***************************************************************************/
 
 /***************************************************************************
@@ -18,15 +16,21 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _GRSOUND_H_
-#define _GRSOUND_H_
+/** @file   
+    	Interface for sound engines
+		Only embryonic, as long as we don't have a real separate sound engine
+		(for the moment, it is inside the graphics engine)
+    @version	$Id$
+*/
 
-#include <raceman.h>	//tSituation
-class cGrCamera;	//Declared in ""grcam.h"
+#ifndef __ISOUNDENGINE__H__
+#define __ISOUNDENGINE__H__
 
-extern void grInitSound(tSituation* s, int ncars);
-extern void grShutdownSound(int ncars);
-extern float grRefreshSound(tSituation *s, cGrCamera *camera);
-extern void grMuteSound(bool bOn = true);
+class ISoundEngine
+{
+public:
 
-#endif /* _GRSOUND_H_ */ 
+	virtual void mute(bool bOn = true) = 0;
+};
+
+#endif // __ISOUNDENGINE__H__

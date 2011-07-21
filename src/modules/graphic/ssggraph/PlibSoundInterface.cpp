@@ -17,10 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "SoundInterface.h"
-#include "TorcsSound.h"
 #include "CarSoundData.h"
 
+#include "PlibSound.h"
+#include "PlibSoundInterface.h"
 
 
 PlibSoundInterface::PlibSoundInterface(float sampling_rate, int n_channels) : SoundInterface (sampling_rate, n_channels)
@@ -59,7 +59,7 @@ PlibSoundInterface::~PlibSoundInterface()
 void PlibSoundInterface::setNCars(int n_cars)
 {
 	engpri = new SoundPri[n_cars];
-	car_src = new TorcsSoundSource[n_cars];
+	car_src = new SoundSource[n_cars];
 }
 
 slScheduler* PlibSoundInterface::getScheduler()
@@ -67,11 +67,11 @@ slScheduler* PlibSoundInterface::getScheduler()
 	return sched;
 }
 
-TorcsSound* PlibSoundInterface::addSample (const char* filename, int flags, bool loop, bool static_pool)
+Sound* PlibSoundInterface::addSample(const char* filename, int flags, bool loop, bool static_pool)
 {
-	PlibTorcsSound* sound = new PlibTorcsSound (sched, filename, flags, loop);
-    sound->setVolume (2.0f*global_gain);
-	sound_list.push_back ((TorcsSound*) sound);
+	PlibSound* sound = new PlibSound(sched, filename, flags, loop);
+    sound->setVolume(getGlobalGain());
+	sound_list.push_back ((Sound*) sound);
 	return sound;
 }
 	
@@ -95,20 +95,19 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 		engpri[id].a = car_src[id].a;
 	}
 
-	qsort ((void*) engpri, n_cars, sizeof(SoundPri), &sortSndPriority);
+	qsort((void*) engpri, n_cars, sizeof(SoundPri), &sortSndPriority);
 
 	for (i = 0; i<n_cars; i++) {
 		int id = engpri[i].id;
-		TorcsSound* engine = car_sound_data[id]->getEngineSound();
+		Sound* engine = car_sound_data[id]->getEngineSound();
 		if (i>=NB_ENGINE_SOUND) {
 			engine->setVolume (0.0f);
 			engine->pause();
-			//printf ("Pausing %d (%d)\n", id, i);
 		} else {
 			engine->resume();
 			engine->setLPFilter(car_src[id].lp*car_sound_data[id]->engine.lp);
 			engine->setPitch(car_src[id].f*car_sound_data[id]->engine.f);
-			engine->setVolume(global_gain*car_src[id].a*car_sound_data[id]->engine.a);
+			engine->setVolume(0.5f*getGlobalGain()*car_src[id].a*car_sound_data[id]->engine.a);
 			engine->update();
 		}
 	}
@@ -132,8 +131,8 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 		WheelSoundData* sound_data = car_sound_data[id]->wheel;
 		float mod_a = car_src[id].a;
 		float mod_f = car_src[id].f;
-		skid_sound[i]->setVolume (global_gain*sound_data[i].skid.a * mod_a);
-		skid_sound[i]->setPitch (sound_data[i].skid.f * mod_f);
+		skid_sound[i]->setVolume(0.5f*getGlobalGain()*sound_data[i].skid.a * mod_a);
+		skid_sound[i]->setPitch(sound_data[i].skid.f * mod_f);
 		skid_sound[i]->update();
 #if 0
 		if (sound_data[i].skid.a > VOLUME_CUTOFF) {
@@ -147,32 +146,32 @@ void PlibSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgVec
 	
 	// other looping sounds
 	road.snd = road_ride_sound;
-	SortSingleQueue (car_sound_data, &road, n_cars);
-	SetMaxSoundCar (car_sound_data, &road);
+	sortSingleQueue (car_sound_data, &road, n_cars);
+	setMaxSoundCar (car_sound_data, &road);
 
 	grass.snd = grass_ride_sound;
-	SortSingleQueue (car_sound_data, &grass, n_cars);
-	SetMaxSoundCar (car_sound_data, &grass);
+	sortSingleQueue (car_sound_data, &grass, n_cars);
+	setMaxSoundCar (car_sound_data, &grass);
 
 	grass_skid.snd = grass_skid_sound;
-	SortSingleQueue (car_sound_data, &grass_skid, n_cars);
-	SetMaxSoundCar (car_sound_data, &grass_skid);
+	sortSingleQueue (car_sound_data, &grass_skid, n_cars);
+	setMaxSoundCar (car_sound_data, &grass_skid);
 
 	metal_skid.snd = metal_skid_sound;
-	SortSingleQueue (car_sound_data, &metal_skid, n_cars);
-	SetMaxSoundCar (car_sound_data, &metal_skid);
+	sortSingleQueue (car_sound_data, &metal_skid, n_cars);
+	setMaxSoundCar (car_sound_data, &metal_skid);
 
 	backfire_loop.snd = backfire_loop_sound;
-	SortSingleQueue (car_sound_data, &backfire_loop, n_cars);
-	SetMaxSoundCar (car_sound_data, &backfire_loop);
+	sortSingleQueue (car_sound_data, &backfire_loop, n_cars);
+	setMaxSoundCar (car_sound_data, &backfire_loop);
 
 	turbo.snd = turbo_sound;
-	SortSingleQueue (car_sound_data, &turbo, n_cars);
-	SetMaxSoundCar (car_sound_data, &turbo);
+	sortSingleQueue (car_sound_data, &turbo, n_cars);
+	setMaxSoundCar (car_sound_data, &turbo);
 
 	axle.snd = axle_sound;
-	SortSingleQueue (car_sound_data, &axle, n_cars);
-	SetMaxSoundCar (car_sound_data, &axle);
+	sortSingleQueue (car_sound_data, &axle, n_cars);
+	setMaxSoundCar (car_sound_data, &axle);
 
 
 	// One-off sounds
@@ -231,19 +230,19 @@ int sortSndPriority(const void* a, const void* b)
 }
 
 
-void PlibSoundInterface::SetMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
+void PlibSoundInterface::setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
 {
 	int id = smap->id;
 	//float max_vol = smap->max_vol;
 	QSoundChar CarSoundData::*p2schar = smap->schar;
 	QSoundChar* schar = &(car_sound_data[id]->*p2schar);
-	TorcsSound* snd = smap->snd;
+	Sound* snd = smap->snd;
 
-	snd->setVolume (global_gain * schar->a * car_src[id].a);
-	snd->setPitch (schar->f * car_src[id].f);
+	snd->setVolume(0.5f*getGlobalGain() * schar->a * car_src[id].a);
+	snd->setPitch(schar->f * car_src[id].f);
 	snd->update();
 #if 0
-	f (max_vol > VOLUME_CUTOFF) {
+	if (max_vol > VOLUME_CUTOFF) {
 		snd->start();
 	} else {
 		snd->stop();

@@ -17,9 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "SoundInterface.h"
 #include "CarSoundData.h"
-#include "TorcsSound.h"
+
+#include "OpenalSound.h"
+#include "OpenalSoundInterface.h"
 
 
 /// Define this to use the OpenAL Doppler.
@@ -29,7 +30,8 @@ const int OpenalSoundInterface::OSI_MIN_DYNAMIC_SOURCES = 4;
 
 
 
-OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels): SoundInterface (sampling_rate, n_channels)
+OpenalSoundInterface::OpenalSoundInterface(float sampling_rate, int n_channels)
+: SoundInterface(sampling_rate, n_channels)
 {
 	int error;
 	car_src = NULL;
@@ -175,14 +177,15 @@ OpenalSoundInterface::~OpenalSoundInterface()
 void OpenalSoundInterface::setNCars(int n_cars)
 {
 	engpri = new SoundPri[n_cars];
-	car_src = new TorcsSoundSource[n_cars];
+	car_src = new SoundSource[n_cars];
 }
 
 
-TorcsSound* OpenalSoundInterface::addSample (const char* filename, int flags, bool loop, bool static_pool)
+Sound* OpenalSoundInterface::addSample (const char* filename, int flags, bool loop, bool static_pool)
 {
-	TorcsSound* sound = new OpenalTorcsSound (filename, this, flags, loop, static_pool);
-	sound_list.push_back (sound);
+	Sound* sound = new OpenalSound(filename, this, flags, loop, static_pool);
+    sound->setVolume(1.0f);
+	sound_list.push_back(sound);
 	return sound;
 }
 	
@@ -209,7 +212,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
     alListenerfv(AL_VELOCITY, zeros);
 #endif
 	alListenerfv(AL_ORIENTATION, listener_orientation );
-	alListenerf(AL_GAIN, getGlobalGain());
+	alListenerf(AL_GAIN, getGlobalGain()); // Multiplier applied to the gain of each source
 
 	for (i = 0; i<n_cars; i++) {
 		car_sound_data[i]->copyEngPri(engpri[i]);
@@ -224,9 +227,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 		engpri[id].a = car_src[id].a;
 	}
 
-
-	qsort ((void*) engpri, n_cars, sizeof(SoundPri), &sortSndPriority);
-
+	qsort((void*) engpri, n_cars, sizeof(SoundPri), &sortSndPriority);
 
 	int nsrc = MIN(sourcepool->getNbSources(), n_engine_sounds);
 
@@ -239,15 +240,16 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 		CarSoundData* sound_data = car_sound_data[id];
 		sound_data->getCarPosition(p);
 		sound_data->getCarSpeed(u);
-		TorcsSound* engine = sound_data->getEngineSound();
+		Sound* engine = sound_data->getEngineSound();
 		engine->setSource(p, u);
 #ifdef USE_OPENAL_DOPPLER
-		engine->setPitch (sound_data->engine.f);
+		engine->setPitch(sound_data->engine.f);
 #else
-		engine->setPitch (car_src[id].f*sound_data->engine.f);
+		engine->setPitch(car_src[id].f*sound_data->engine.f);
 #endif
-		engine->setVolume ((tdble)(sound_data->engine.a * 1.5 * exp(sound_data->engine.lp-1.0)));
+		// For the moment, simulate LP filter by tweaking the volume (can't wait EXT_EFX !)
 		//engine->setLPFilter(sound_data->engine.lp);
+		engine->setVolume((tdble)(sound_data->engine.a * exp(1.3*sound_data->engine.lp-1.3)));
 
 		engine->update();
 		if (i < nsrc) {
@@ -274,14 +276,14 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	for (i = 0; i<4; i++) {
 		int id = max_skid_id[i];
 		WheelSoundData* sound_data = car_sound_data[id]->wheel;
-		skid_sound[i]->setSource (sound_data[i].p, sound_data[i].u);
-		skid_sound[i]->setVolume (sound_data[i].skid.a);
+		skid_sound[i]->setSource(sound_data[i].p, sound_data[i].u);
+		skid_sound[i]->setVolume(sound_data[i].skid.a);
 #ifdef USE_OPENAL_DOPPLER
         /// \note Why MIN() here?
 		skid_sound[i]->setPitch (MIN(sound_data[i].skid.f, 1.0f));
 #else
 		float mod_f = car_src[id].f;
-		skid_sound[i]->setPitch (sound_data[i].skid.f * mod_f);
+		skid_sound[i]->setPitch(sound_data[i].skid.f * mod_f);
 #endif
 		skid_sound[i]->update();
 		if (sound_data[i].skid.a > VOLUME_CUTOFF) {
@@ -294,38 +296,38 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	
 	// other looping sounds
 	road.snd = road_ride_sound;
-	SortSingleQueue (car_sound_data, &road, n_cars);
-	SetMaxSoundCar (car_sound_data, &road);
+	sortSingleQueue (car_sound_data, &road, n_cars);
+	setMaxSoundCar (car_sound_data, &road);
 
 	grass.snd = grass_ride_sound;
-	SortSingleQueue (car_sound_data, &grass, n_cars);
-	SetMaxSoundCar (car_sound_data, &grass);
+	sortSingleQueue (car_sound_data, &grass, n_cars);
+	setMaxSoundCar (car_sound_data, &grass);
 
 	grass_skid.snd = grass_skid_sound;
-	SortSingleQueue (car_sound_data, &grass_skid, n_cars);
-	SetMaxSoundCar (car_sound_data, &grass_skid);
+	sortSingleQueue (car_sound_data, &grass_skid, n_cars);
+	setMaxSoundCar (car_sound_data, &grass_skid);
 
 	metal_skid.snd = metal_skid_sound;
-	SortSingleQueue (car_sound_data, &metal_skid, n_cars);
-	SetMaxSoundCar (car_sound_data, &metal_skid);
+	sortSingleQueue (car_sound_data, &metal_skid, n_cars);
+	setMaxSoundCar (car_sound_data, &metal_skid);
 
 	backfire_loop.snd = backfire_loop_sound;
-	SortSingleQueue (car_sound_data, &backfire_loop, n_cars);
-	SetMaxSoundCar (car_sound_data, &backfire_loop);
+	sortSingleQueue (car_sound_data, &backfire_loop, n_cars);
+	setMaxSoundCar (car_sound_data, &backfire_loop);
 
 	backfire_loop.snd = backfire_loop_sound;
-	SortSingleQueue (car_sound_data, &backfire_loop, n_cars);
-	SetMaxSoundCar (car_sound_data, &backfire_loop);
+	sortSingleQueue (car_sound_data, &backfire_loop, n_cars);
+	setMaxSoundCar (car_sound_data, &backfire_loop);
 
 	turbo.snd = turbo_sound;
-	SortSingleQueue (car_sound_data, &turbo, n_cars);
-	SetMaxSoundCar (car_sound_data, &turbo);
+	sortSingleQueue (car_sound_data, &turbo, n_cars);
+	setMaxSoundCar (car_sound_data, &turbo);
 
 	axle.snd = axle_sound;
-	SortSingleQueue (car_sound_data, &axle, n_cars);
-	SetMaxSoundCar (car_sound_data, &axle);
+	sortSingleQueue (car_sound_data, &axle, n_cars);
+	setMaxSoundCar (car_sound_data, &axle);
 
-	// One-off sounds
+	// On-off sounds
 	for (id = 0; id<n_cars; id++) {
 		CarSoundData* sound_data = car_sound_data[id];
 		sgVec3 p;
@@ -404,13 +406,13 @@ bool OpenalSoundInterface::getStaticSource(ALuint *source)
 	}
 }
 
-void OpenalSoundInterface::SetMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
+void OpenalSoundInterface::setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
 {
 	int id = smap->id;
 	float max_vol = smap->max_vol;
 	QSoundChar CarSoundData::*p2schar = smap->schar;
 	QSoundChar* schar = &(car_sound_data[id]->*p2schar);
-	TorcsSound* snd = smap->snd;
+	Sound* snd = smap->snd;
 
 	sgVec3 p;
 	sgVec3 u = {0.0f, 0.0f, 0.0f};
@@ -433,3 +435,17 @@ void OpenalSoundInterface::SetMaxSoundCar(CarSoundData** car_sound_data, QueueSo
 		snd->stop();
 	}
 }
+
+SharedSourcePool* OpenalSoundInterface::getSourcePool(void)
+{
+	return sourcepool;
+}
+
+void OpenalSoundInterface::mute(bool bOn)
+{
+	SoundInterface::mute(bOn);
+
+	// Needed in case update() is not called right after this.
+	alListenerf(AL_GAIN, getGlobalGain());
+}
+

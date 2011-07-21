@@ -1,8 +1,10 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h 
-                     OpenalSoundInterface.cpp PlibSoundInterface.cpp
-                     SoundInterface.cpp SoundInterface.h TorcsSound.cpp TorcsSound.h 
+                     Sound.cpp Sound.h PlibSound.cpp PlibSound.h OpenalSound.cpp OpenalSound.h
+                     SoundInterface.cpp SoundInterface.h
+                     PlibSoundInterface.cpp PlibSoundInterface.h 
+                     OpenalSoundInterface.cpp OpenalSoundInterface.h 
                      grCelestialBody.cpp grCloudLayer.cpp grSky.cpp grSky.h
                      grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
                      grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h

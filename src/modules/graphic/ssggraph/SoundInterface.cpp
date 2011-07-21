@@ -20,6 +20,7 @@
 #include "SoundInterface.h"
 #include "CarSoundData.h"
 
+
 SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 {
 	this->sampling_rate = sampling_rate;
@@ -45,17 +46,19 @@ SoundInterface::SoundInterface(float sampling_rate, int n_channels)
 	
 	n_engine_sounds = n_channels - 12;
 
-	int MAX_N_ENGINE_SOUNDS = 8;
-	if (n_engine_sounds<1) {
+	static const int MAX_N_ENGINE_SOUNDS = 8;
+	if (n_engine_sounds < 1) {
 		n_engine_sounds = 1;
-		fprintf (stderr, "Warning: maybe insufficient channels\n");
+		fprintf (stderr, "Warning: maybe not enough available channels\n");
 	} else if (n_engine_sounds > MAX_N_ENGINE_SOUNDS) {
 		n_engine_sounds = MAX_N_ENGINE_SOUNDS;
 	}
+	
 	global_gain = 1.0f;
+	silent = false;
 }
 
-void SoundInterface::SortSingleQueue (CarSoundData** car_sound_data, QueueSoundMap* smap, int n_cars)
+void SoundInterface::sortSingleQueue (CarSoundData** car_sound_data, QueueSoundMap* smap, int n_cars)
 {
 	float max_vol = 0.0f;
 	int max_id = 0;
@@ -73,13 +76,13 @@ void SoundInterface::SortSingleQueue (CarSoundData** car_sound_data, QueueSoundM
 	smap->max_vol = max_vol;
 }
 
-void SoundInterface::SetMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
+void SoundInterface::setMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap* smap)
 {
 	int id = smap->id;
 	float max_vol = smap->max_vol;
 	QSoundChar CarSoundData::*p2schar = smap->schar;
 	QSoundChar* schar = &(car_sound_data[id]->*p2schar);
-	TorcsSound* snd = smap->snd;
+	Sound* snd = smap->snd;
 
 	sgVec3 p;
 	sgVec3 u;
@@ -95,4 +98,106 @@ void SoundInterface::SetMaxSoundCar(CarSoundData** car_sound_data, QueueSoundMap
 	} else {
 		snd->stop();
 	}
+}
+
+void SoundInterface::initSharedSourcePool()
+{
+}
+
+void SoundInterface::setSkidSound (const char* sound_name)
+{
+	for (int i=0; i<4; i++) {
+		Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+		skid_sound[i] = sound;
+	}
+
+}
+void SoundInterface::setRoadRideSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	road_ride_sound = sound;
+}
+void SoundInterface::setGrassRideSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	grass_ride_sound = sound;
+}
+void SoundInterface::setGrassSkidSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	grass_skid_sound = sound;
+}
+void SoundInterface::setMetalSkidSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	metal_skid_sound = sound;
+}
+void SoundInterface::setAxleSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	axle_sound = sound;
+}
+void SoundInterface::setTurboSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	turbo_sound = sound;
+}
+void SoundInterface::setBackfireLoopSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
+	backfire_loop_sound = sound;
+}
+void SoundInterface::setCrashSound (const char* sound_name, int index)
+{
+	Sound* sound = addSample (sound_name, 0, false);
+	assert (index>=0 && index<NB_CRASH_SOUND);
+	crash_sound[index] = sound;
+}
+
+void SoundInterface::setBangSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, 0, false);
+	bang_sound = sound;
+}
+
+void SoundInterface::setBottomCrashSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, 0, false);
+	bottom_crash_sound = sound;
+}
+
+void SoundInterface::setBackfireSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, 0, false);
+	backfire_sound = sound;
+}
+
+void SoundInterface::setGearChangeSound (const char* sound_name)
+{
+	Sound* sound = addSample (sound_name, 0, false);
+	gear_change_sound = sound;
+}
+
+float SoundInterface::getGlobalGain() const
+{ 
+	return silent ? 0 : global_gain; 
+}
+
+void SoundInterface::setGlobalGain(float g) 
+{
+	if (g < 0)
+		g = 0.0f;
+	else if (g > 1.0f)
+		g = 1.0f;
+	
+	global_gain = g;
+
+	GfLogInfo("Sound global gain set to %.2f\n", global_gain);
+}
+
+void SoundInterface::mute(bool bOn)
+{
+	silent = bOn;
+	
+	GfLogInfo("Sound %s\n", silent ? "paused" : "restored");
 }

@@ -21,6 +21,7 @@
 
 #include <iraceengine.h>
 #include <igraphicsengine.h>
+#include <isoundengine.h>
 
 #include <tgf.hpp>
 #include <portability.h>
@@ -404,4 +405,10 @@ IRaceEngine& LegacyMenu::raceEngine()
 IGraphicsEngine* LegacyMenu::graphicsEngine()
 {
 	return _piGraphicsEngine;
+}
+
+// Accessor to the sound engine.
+ISoundEngine* LegacyMenu::soundEngine()
+{
+	return dynamic_cast<ISoundEngine*>(_piGraphicsEngine);
 }
