@@ -192,7 +192,7 @@ HmReadPrefs(const int index)
 		if (cmdCtrl[cmd].min > cmdCtrl[cmd].max)
 			std::swap(cmdCtrl[cmd].min, cmdCtrl[cmd].max);
 	
-		cmdCtrl[cmd].deadZone = (cmdCtrl[cmd].max - cmdCtrl[cmd].min) * cmdCtrl[cmd].deadZone;
+		//cmdCtrl[cmd].deadZone = (cmdCtrl[cmd].max - cmdCtrl[cmd].min) * cmdCtrl[cmd].deadZone;
 		
 		if (cmdCtrl[cmd].type == GFCTRL_TYPE_MOUSE_AXIS)
 			HCtx[idx]->mouseControlUsed = 1;

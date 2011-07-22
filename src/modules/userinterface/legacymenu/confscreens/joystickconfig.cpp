@@ -128,9 +128,15 @@ JoyCalAutomaton(void)
 	break;
     case 1:
 	axis = Cmd[CalState + CmdOffset].ref.index;
-	Cmd[CalState + CmdOffset].min = JoyAxis[axis];
-	Cmd[CalState + CmdOffset].max = JoyAxisCenter[axis];
-	Cmd[CalState + CmdOffset].pow = 1.0;
+	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
+	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
+
+	// record the polarity of the turn action
+	if (Cmd[CalState + CmdOffset].max >= Cmd[CalState + CmdOffset].min)
+		Cmd[CalState + CmdOffset].pow = 1.0;
+	else
+		Cmd[CalState + CmdOffset].pow = -1.0;
+
 	sprintf(buf, "%.2f", JoyAxis[axis]);
 	GfuiLabelSetText(ScrHandle, LabMinId[0], buf);
 	advanceStep();
@@ -139,7 +145,13 @@ JoyCalAutomaton(void)
 	axis = Cmd[CalState + CmdOffset].ref.index;
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
-	Cmd[CalState + CmdOffset].pow = 1.0;
+
+	// record the polarity of the turn action
+	if (Cmd[CalState + CmdOffset].max >= Cmd[CalState + CmdOffset].min)
+		Cmd[CalState + CmdOffset].pow = 1.0;
+	else
+		Cmd[CalState + CmdOffset].pow = -1.0;
+
 	sprintf(buf, "%.2f", JoyAxis[axis]);
 	GfuiLabelSetText(ScrHandle, LabMaxId[0], buf);
 	advanceStep();
@@ -149,7 +161,7 @@ JoyCalAutomaton(void)
     case 5:
 	axis = Cmd[CalState + CmdOffset].ref.index;
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
-	Cmd[CalState + CmdOffset].max = JoyAxis[axis]*1.1;
+	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
 	Cmd[CalState + CmdOffset].pow = 1.2;
 	sprintf(buf, "%.2f", JoyAxisCenter[axis]);
 	GfuiLabelSetText(ScrHandle, LabMinId[CalState - 2], buf);

@@ -652,13 +652,30 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	switch (cmd[CMD_LEFTSTEER].type) {
 		case GFCTRL_TYPE_JOY_AXIS:
-			ax0 = joyInfo->ax[cmd[CMD_LEFTSTEER].val] + cmd[CMD_LEFTSTEER].deadZone;
+			ax0 = joyInfo->ax[cmd[CMD_LEFTSTEER].val];
+
+			// limit and normalise
 			if (ax0 > cmd[CMD_LEFTSTEER].max) {
 				ax0 = cmd[CMD_LEFTSTEER].max;
 			} else if (ax0 < cmd[CMD_LEFTSTEER].min) {
 				ax0 = cmd[CMD_LEFTSTEER].min;
 			}
-			leftSteer = -SIGN(ax0) * cmd[CMD_LEFTSTEER].pow * pow(fabs(ax0), 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 100.0);
+			ax0 = (ax0 - cmd[CMD_LEFTSTEER].min) / (cmd[CMD_LEFTSTEER].max - cmd[CMD_LEFTSTEER].min);
+
+			// pow used to indicate the polarity of 'more turn'
+			if (cmd[CMD_LEFTSTEER].pow > 0)
+				ax0 = ax0 - cmd[CMD_LEFTSTEER].deadZone;
+			else 
+				ax0 = 1 - ax0 - cmd[CMD_LEFTSTEER].deadZone;
+	
+			if (ax0 < 0) ax0 = 0;
+
+			if (1 - cmd[CMD_LEFTSTEER].deadZone != 0)
+				ax0 = ax0 / (1 - cmd[CMD_LEFTSTEER].deadZone);
+			else
+				ax0 = 0;
+
+			leftSteer = fabs(cmd[CMD_LEFTSTEER].pow) * pow(ax0, 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 100.0);
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_LEFTSTEER].val] - cmd[CMD_LEFTSTEER].deadZone;
@@ -723,13 +740,30 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	switch (cmd[CMD_RIGHTSTEER].type) {
 		case GFCTRL_TYPE_JOY_AXIS:
-			ax0 = joyInfo->ax[cmd[CMD_RIGHTSTEER].val] - cmd[CMD_RIGHTSTEER].deadZone;
+			ax0 = joyInfo->ax[cmd[CMD_RIGHTSTEER].val];
+
+			// limit and normalise
 			if (ax0 > cmd[CMD_RIGHTSTEER].max) {
 				ax0 = cmd[CMD_RIGHTSTEER].max;
 			} else if (ax0 < cmd[CMD_RIGHTSTEER].min) {
 				ax0 = cmd[CMD_RIGHTSTEER].min;
 			}
-			rightSteer = -SIGN(ax0) * cmd[CMD_RIGHTSTEER].pow * pow(fabs(ax0), 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 100.0);
+			ax0 = (ax0 - cmd[CMD_RIGHTSTEER].min) / (cmd[CMD_RIGHTSTEER].max - cmd[CMD_RIGHTSTEER].min);
+
+			// pow used to indicate the polarity of 'more turn'
+			if (cmd[CMD_RIGHTSTEER].pow > 0)
+				ax0 = ax0 - cmd[CMD_RIGHTSTEER].deadZone;
+			else 
+				ax0 = 1 - ax0 - cmd[CMD_RIGHTSTEER].deadZone;
+	
+			if (ax0 < 0) ax0 = 0;
+
+			if (1 - cmd[CMD_RIGHTSTEER].deadZone != 0)
+				ax0 = ax0 / (1 - cmd[CMD_RIGHTSTEER].deadZone);
+			else
+				ax0 = 0;
+
+			rightSteer = -1 * fabs(cmd[CMD_RIGHTSTEER].pow) * pow(ax0, 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 100.0);
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_RIGHTSTEER].val] - cmd[CMD_RIGHTSTEER].deadZone;
