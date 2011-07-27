@@ -675,7 +675,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			else
 				ax0 = 0;
 
-			leftSteer = fabs(cmd[CMD_LEFTSTEER].pow) * pow(ax0, 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 100.0);
+			leftSteer = fabs(cmd[CMD_LEFTSTEER].pow) * pow(ax0, 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0 + cmd[CMD_LEFTSTEER].spdSens * sqrt(pow(car->_speed_x,2) + pow(car->_speed_y,2)) / 100.0);
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_LEFTSTEER].val] - cmd[CMD_LEFTSTEER].deadZone;
@@ -685,7 +685,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_LEFTSTEER].min;
 			}
 			ax0 = ax0 * cmd[CMD_LEFTSTEER].pow;
-			leftSteer = pow(fabs(ax0), 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0f + cmd[CMD_LEFTSTEER].spdSens * car->_speed_x / 1000.0);
+			leftSteer = pow(fabs(ax0), 1.0f / cmd[CMD_LEFTSTEER].sens) / (1.0f + cmd[CMD_LEFTSTEER].spdSens * sqrt(pow(car->_speed_x,2) + pow(car->_speed_y,2)) / 1000.0);
 			break;
 		case GFCTRL_TYPE_KEYBOARD:
 		case GFCTRL_TYPE_JOY_BUT:
@@ -763,7 +763,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 			else
 				ax0 = 0;
 
-			rightSteer = -1 * fabs(cmd[CMD_RIGHTSTEER].pow) * pow(ax0, 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 100.0);
+			rightSteer = -1 * fabs(cmd[CMD_RIGHTSTEER].pow) * pow(ax0, 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0 + cmd[CMD_RIGHTSTEER].spdSens * sqrt(pow(car->_speed_x,2) + pow(car->_speed_y,2)) / 100.0);
 			break;
 		case GFCTRL_TYPE_MOUSE_AXIS:
 			ax0 = mouseInfo->ax[cmd[CMD_RIGHTSTEER].val] - cmd[CMD_RIGHTSTEER].deadZone;
@@ -773,7 +773,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				ax0 = cmd[CMD_RIGHTSTEER].min;
 			}
 			ax0 = ax0 * cmd[CMD_RIGHTSTEER].pow;
-			rightSteer = - pow(fabs(ax0), 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0f + cmd[CMD_RIGHTSTEER].spdSens * car->_speed_x / 1000.0);
+			rightSteer = - pow(fabs(ax0), 1.0f / cmd[CMD_RIGHTSTEER].sens) / (1.0f + cmd[CMD_RIGHTSTEER].spdSens * sqrt(pow(car->_speed_x,2) + pow(car->_speed_y,2)) / 1000.0);
 			break;
 		case GFCTRL_TYPE_KEYBOARD:
 		case GFCTRL_TYPE_JOY_BUT:
