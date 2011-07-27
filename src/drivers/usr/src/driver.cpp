@@ -2091,7 +2091,6 @@ bool Driver::canOvertake2( Opponent *o, int avoidingside )
   double oAspeed, oRInv;
 
   double distance = o->getDistance() * MAX(0.5, 1.0 - (ocar->_pos > car->_pos ? MIN(o->getDistance()/2, 3.0) : 0.0));
-  double speed = currentspeed + MAX(0.0, (10.0 - distance)/2);
 
   if (avoidingside == TR_RGT)
   {
@@ -2479,7 +2478,6 @@ fprintf(stderr,"%s SIDE %s, NO MOVE AT ALL! %.1f\n",car->_name,ocar->_name,myoff
 
             tCarElt *ocar = o->getCarPtr();
             avoidingside = (car->_trkPos.toLeft > ocar->_trkPos.toLeft ? TR_LFT : TR_RGT);
-            double distance = o->getDistance();
 
             if (avoidingside != TR_STR)
             {
@@ -2513,10 +2511,9 @@ fprintf(stderr," SWITCH 1 from %c to %c\n",(avoidingside==TR_LFT?'L':'R'),(newsi
       if (o || mode != mode_avoiding) break;
     }
 
-    if (o != NULL) 
+    if (o != NULL)
     {
       tCarElt *ocar = o->getCarPtr();
-      double distance = o->getDistance();
       double sidedist = fabs(ocar->_trkPos.toLeft - car->_trkPos.toLeft);
 
       // work out what offset to steer for
