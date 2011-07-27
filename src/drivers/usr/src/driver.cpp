@@ -869,6 +869,12 @@ void Driver::drive(tSituation *s)
   laststeer = car->_steerCmd;
   memset(&car->ctrl, 0, sizeof(tCarCtrl));
 
+  /* USR stores pit positions in car->_lightCmd, so we shift
+   * that information 2 pos left and flip on the real
+   * light commands. (All lights on) */
+  car->_lightCmd = ((int)cmd_light << 2)
+                          | RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+
   skipcount++;
 
   if (skipcount > SKIPLIMIT)
@@ -891,7 +897,6 @@ void Driver::drive(tSituation *s)
         car->_steerCmd = cmd_steer;
         car->_gearCmd = cmd_gear;
         car->_clutchCmd = cmd_clutch;
-        car->_lightCmd = (int)cmd_light;
         return;
       }
     }
@@ -961,7 +966,9 @@ void Driver::drive(tSituation *s)
   cmd_steer = car->_steerCmd;
   cmd_clutch = car->_clutchCmd;
   cmd_gear = car->_gearCmd;
-  cmd_light = (float)car->_lightCmd;
+  /* USR pit positions are now in car->_lightCmd, on positions 2 and 3
+   * from the right, so we get that information shifting 2 pos right */
+  cmd_light = (float)(car->_lightCmd >> 2);
 }
 
 
