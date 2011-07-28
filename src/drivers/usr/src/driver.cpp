@@ -60,7 +60,7 @@ enum { STUCK_REVERSE = 1, STUCK_FORWARD = 2 };
 
 // Static variables.
 Cardata *Driver::cardata = NULL;
-
+static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
 Driver::Driver(int index, const int robot_type) :
     NoTeamWaiting(0),
@@ -871,9 +871,8 @@ void Driver::drive(tSituation *s)
 
   /* USR stores pit positions in car->_lightCmd, so we shift
    * that information 2 pos left and flip on the real
-   * light commands. (All lights on) */
-  car->_lightCmd = ((int)cmd_light << 2)
-                          | RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+   * light commands. (Situation-aware) */
+  car->_lightCmd = ((int)cmd_light << 2) | current_light;
 
   skipcount++;
 
@@ -1270,6 +1269,18 @@ void Driver::setMode( int newmode )
     avoidtime = simtime;
 
   mode = newmode;
+
+  switch (newmode) {
+    case mode_normal:
+      current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+      break;
+    case mode_pitting:
+      current_light = RM_LIGHT_HEAD2;
+      break;
+    case mode_avoiding:
+      current_light = RM_LIGHT_HEAD1;
+      break;
+  }
 }
 
 void Driver::calcSkill()
