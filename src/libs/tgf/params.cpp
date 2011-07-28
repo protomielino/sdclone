@@ -835,7 +835,7 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 		if (min)
 			curParam->min    = getValNumFromStr (min);
 		else 
-			curParam->min = -FLT_MAX;
+			curParam->min = getValNumFromStr (val);
 
 		if (max) {
 			curParam->max    = getValNumFromStr (max);
@@ -844,7 +844,7 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 				curParam->min = getValNumFromStr (max);
 			}
 		} else 
-			curParam->max = FLT_MAX;
+			curParam->max = getValNumFromStr (val);
 
 		if (curParam->min > curParam->valnum) 
 		{
