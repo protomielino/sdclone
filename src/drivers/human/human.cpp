@@ -593,7 +593,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	}
 
 	// Perform mapping of axis->buttons functions
-	for (dummy=0; dummy <= CMD_RIGHTGLANCE; dummy++) {
+	for (dummy=0; dummy <= CMD_END_OF_LIST; dummy++) {
 	    if (cmd[dummy].type == GFCTRL_TYPE_JOY_ATOB) {
 		if (joyInfo->ax[cmd[dummy].val] >= cmd[dummy].min && joyInfo->ax[cmd[dummy].val] <= cmd[dummy].max) {
 		   // Abuse deadZone to store state; 1=just pressed, 2=held

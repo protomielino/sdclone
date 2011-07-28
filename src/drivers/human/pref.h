@@ -70,6 +70,8 @@ extern const std::string Yn[];
 #define CMD_LEFTGLANCE	22
 #define CMD_RIGHTGLANCE	23
 
+#define CMD_END_OF_LIST 23	/* Change this to same value as last item */
+
 extern void HmReadPrefs(const int index);
 
 #endif /* _PREF_H_ */ 
