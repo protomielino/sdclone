@@ -696,7 +696,8 @@ ReCarsSortCars(void)
 	
 	s->cars[i]->_prevFromStartLine = s->cars[i]->_distFromStartLine;
 
-	if (s->cars[i]->_wrongWayTime < s->currentTime) {
+	if (s->cars[i]->_wrongWayTime < s->currentTime 
+		&& sqrt(pow(s->cars[i]->_speed_x, 2) + pow(s->cars[i]->_speed_y,2)) > 10) {
 	    sprintf(msg, "%s Wrong Way", s->cars[i]->_name);
 	    ReSituation::self().setRaceMessage(msg, 1);
 	}
