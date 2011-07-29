@@ -187,6 +187,8 @@ typedef struct {
     tTrackOwnPit 	*pit;
     int			event;
     tCarPenaltyHead	penaltyList;	/**< List of current penalties */
+    tdble		prevFromStartLine;
+    double		wrongWayTime;
 } tCarRaceInfo;
 /* structure access */
 #define _bestLapTime		race.bestLapTime
@@ -212,6 +214,8 @@ typedef struct {
 #define _scheduledEventTime	race.scheduledEventTime
 #define _event			race.event
 #define _penaltyList		race.penaltyList
+#define _prevFromStartLine	race.prevFromStartLine
+#define _wrongWayTime		race.wrongWayTime
 
 /** Public info on the cars */
 typedef struct {

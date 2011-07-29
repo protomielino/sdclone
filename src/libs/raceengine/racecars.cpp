@@ -680,6 +680,7 @@ ReCarsSortCars(void)
     tCarElt	*car;
     int		allfinish;
     tSituation	*s = ReInfo->s;
+    char msg[128];
 
     if ((s->cars[0]->_state & RM_CAR_STATE_FINISH) == 0) {
 	allfinish = 0;
@@ -687,6 +688,20 @@ ReCarsSortCars(void)
 	allfinish = 1;
     }
     
+    // Check cars are driving the right way around track
+    for (i = 0; i < s->_ncars; i++) {
+	if (s->cars[i]->_prevFromStartLine < s->cars[i]->_distFromStartLine) {
+	    s->cars[i]->_wrongWayTime = s->currentTime + 5.0;
+	}
+	
+	s->cars[i]->_prevFromStartLine = s->cars[i]->_distFromStartLine;
+
+	if (s->cars[i]->_wrongWayTime < s->currentTime) {
+	    sprintf(msg, "%s Wrong Way", s->cars[i]->_name);
+	    ReSituation::self().setRaceMessage(msg, 1);
+	}
+    }
+
     for (i = 1; i < s->_ncars; i++) {
 	j = i;
 	while (j > 0) {
