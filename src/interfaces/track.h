@@ -24,14 +24,14 @@
     @ingroup	trackstruct
 */
 
- 
+
 #ifndef _TRACKV1_H_
 #define _TRACKV1_H_
 
 #include <tgf.h>
 #include <linalg_t.h>
 
-				  
+
 #define TRK_IDENT	0	/* from 0x01 to 0xFF */
 
 /* Parameters strings for track files */
@@ -190,8 +190,8 @@
 #define TRK_ATT_DOVFACTOR	"DoV factor"
 
 #define TRK_SECT_PITS		"Pits"
-#define TRK_ATT_MAX_PITS    "max pits"             
-#define TRK_ATT_BUILDINGS_START "start buildings"  
+#define TRK_ATT_MAX_PITS    "max pits"
+#define TRK_ATT_BUILDINGS_START "start buildings"
 #define TRK_ATT_PIT_STYLE	"pit style"
 #define TRK_ATT_ENTRY		"entry"
 #define TRK_ATT_EXIT		"exit"
@@ -391,6 +391,12 @@ typedef struct trackSeg
 #define TR_XE	5		/**< X End angle */
 #define TR_CS   6		/**< Center start angle */
 
+    /* Straight segment directions, precalculated at track load time.
+     * They are used frequently by rt* functions, so this can
+     * optimize track handling a bit. */
+    tdble sin;			/**< = sin(seg->angle[TR_ZS]) */
+    tdble cos;			/**< = cos(seg->angle[TR_ZS]) */
+
     /* constants used to find the height of a point */
     tdble Kzl;		/* long constant */
     tdble Kzw;		/* width constant */
@@ -569,7 +575,7 @@ typedef struct TrackGraphicInfo
     tGraphicLightInfo	*lights;
 } tTrackGraphicInfo;
 
-/** Track local information 
+/** Track local information
     @ingroup trackstruct
 */
 typedef struct TrackLocalInfo
@@ -590,20 +596,20 @@ typedef struct TrackLocalInfo
 #define TR_CLOUDS_MANY   3
 #define TR_CLOUDS_FULL   4
 #define TR_CLOUDS_RANDOM 5 // Must not be used in the clouds field. Race engine only.
-	
+
     int rain;  /**< Rain strength / strength spec (warning : consistency with RM_VAL_RAIN_*) */
 #define TR_RAIN_NONE 0
 #define TR_RAIN_LITTLE 1
 #define TR_RAIN_MEDIUM 2
 #define TR_RAIN_HEAVY  3
 #define TR_RAIN_RANDOM 4 // Must not be used in the rain field. Race engine only.
-	
+
     int water;	/**< Water "level" on the ground (very simple constant model) */
 #define TR_WATER_NONE	0
 #define TR_WATER_LITTLE	1
 #define TR_WATER_SOME	2
 #define TR_WATER_MUCH	3
-	
+
 } tTrackLocalInfo;
 
 /** Track structure
@@ -692,7 +698,7 @@ typedef struct Track
 
 #define TRK_ATT_FINISH	"finish segment"
 
-#endif /* _TRACKV1_H_ */ 
+#endif /* _TRACKV1_H_ */
 
 
 

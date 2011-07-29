@@ -1454,6 +1454,8 @@ case TR_STR:
 /* straight */
 curSeg->type = TR_STR;
 curSeg->length = curLength;
+curSeg->sin = sin(alf);								// Precalculate these
+curSeg->cos = cos(alf);
 
 newxr = xr + curLength * cos(alf);      /* find end coordinates */
 newyr = yr + curLength * sin(alf);
@@ -1503,6 +1505,8 @@ curSeg->radiusr = radius + wi2;
 curSeg->radiusl = radius - wi2;
 curSeg->arc = curArc;
 curSeg->length = curLength;
+curSeg->sin = 0.0;	//Not used for curves
+curSeg->cos = 0.0;
 
 innerradius = radius - wi2; /* left side aligned */
 cenx = xl - innerradius * sin(alf);  /* compute center location: */
@@ -1569,6 +1573,8 @@ curSeg->radiusr = radius - wi2;
 curSeg->radiusl = radius + wi2;
 curSeg->arc = curArc;
 curSeg->length = curLength;
+curSeg->sin = 0.0;	//Not used for curves
+curSeg->cos = 0.0;
 
 innerradius = radius - wi2; /* right side aligned */
 cenx = xr + innerradius * sin(alf);  /* compute center location */
