@@ -121,6 +121,7 @@ Cardata *KDriver::cardata_ = NULL;
 double KDriver::current_sim_time_;
 static char const *WheelSect[4] = { SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL,
                         SECT_REARRGTWHEEL, SECT_REARLFTWHEEL };
+static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
 #define DEFAULTCARTYPE "trb1-cavallo-360rb"
 
@@ -158,6 +159,9 @@ void KDriver::drive(tSituation * s) {
   Update(s);
   // sprintf(car_->_msgCmd[0], "%d", (int)(car_->_distFromStartLine));
   // memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
+
+  // Situation-dependent light commands
+  car_->_lightCmd = current_light;
 
   string sMsg;
   if (IsStuck()) {
@@ -1660,6 +1664,18 @@ void KDriver::set_mode(int newmode) {
       correct_limit_ = 1000.0;
     }
     mode_ = newmode;
+
+    switch (newmode) {
+      case PITTING:
+        current_light = RM_LIGHT_HEAD2;
+        break;
+      case AVOIDING:
+        current_light = RM_LIGHT_HEAD1;
+        break;
+      default:
+        current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+        break;
+    }
   }  // mode_ != newmode
 }  // set_mode
 
