@@ -643,21 +643,8 @@ RtTrackSurfaceNormalL(tTrkLocPos *p, t3Dd *norm)
 tdble
 RtGetDistFromStart(tCarElt *car)
 {
-    tTrackSeg	*seg;
-    tdble	lg;
-
-    seg = car->_trkPos.seg;
-    lg = seg->lgfromstart;
-
-    switch (seg->type) {
-    case TR_STR:
-	lg += car->_trkPos.toStart;
-	break;
-    default:
-	lg += car->_trkPos.toStart * seg->radius;
-	break;
-    }
-    return lg;
+    tTrkLocPos *p = &(car->_trkPos);
+    return RtGetDistFromStart2(p);
 }
 
 /** Get the distance from the start lane.
