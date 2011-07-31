@@ -66,9 +66,11 @@ void KStrategy::SetFuelAtRaceStart(const tTrack * const t,
                                     const tSituation * const s,
                                     const int index) {
   // Load and set parameters.
+  const tdble fuel_cons_factor =
+    GfParmGetNum(*carParmHandle, SECT_ENGINE, PRM_FUELCONS, NULL, 1.0f);
   const double fuel =
     GfParmGetNum(*carParmHandle, KILO_SECT_PRIV, KILO_ATT_FUELPERLAP,
-         NULL, t->length * MAX_FUEL_PER_METER);
+         NULL, t->length * MAX_FUEL_PER_METER * fuel_cons_factor);
   expected_fuel_per_lap_ = fuel;
   // Pittime is pittime without refuel.
   pittime_ = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,

@@ -55,7 +55,7 @@ using ::std::list;
 
 static int
   pitstatus[128] = { 0 };
-static double colour[] = {1.0, 0.0, 0.0, 0.0};
+//static double colour[] = {1.0, 0.0, 0.0, 0.0};
 
 // Constants
 
@@ -123,7 +123,7 @@ static char const *WheelSect[4] = { SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL,
                         SECT_REARRGTWHEEL, SECT_REARLFTWHEEL };
 static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
-#define DEFAULTCARTYPE "trb1-cavallo-360rb"
+#define DEFAULTCARTYPE "nogood" //"trb1-cavallo-360rb"
 
 #define SLOW_TRACK_LIMIT 2.4
 #define FAST_TRACK_LIMIT 4.0
@@ -155,41 +155,37 @@ KDriver::~KDriver() {
  * @param[in] s Situation provided by the sim.
  */
 void KDriver::drive(tSituation * s) {
+  /*
+   * Update
+   * if isStuck
+   *  Unstuck
+   * else
+   *  Drive
+   */
   memset(&car_->ctrl, 0, sizeof(tCarCtrl));
   Update(s);
-  // sprintf(car_->_msgCmd[0], "%d", (int)(car_->_distFromStartLine));
-  // memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
-
   // Situation-dependent light commands
   car_->_lightCmd = current_light;
 
-  string sMsg;
   if (IsStuck()) {
-    car_->_steerCmd = - my_cardata_->getCarAngle() / car_->_steerLock;
-    car_->_gearCmd = -1;     // Reverse gear.
-    car_->_accelCmd = 1.0;   // 100% accelerator pedal.
-    car_->_brakeCmd = 0.0;   // No brakes.
-    car_->_clutchCmd = 0.0;  // Full clutch (gearbox connected with engine).
-    sMsg = "Truagh :(";
+    Unstuck();
   } else {
     car_->_steerCmd = GetSteer(s);
     car_->_gearCmd = GetGear();
     CalcSpeed();
-    car_->_brakeCmd =
-      FilterABS(FilterBrakeSpeed(FilterBColl(FilterBPit(GetBrake()))));
+    car_->_brakeCmd = GetBrake();
 
     if (car_->_brakeCmd == 0.0) {
       car_->_accelCmd = FilterTCL(FilterTrk(FilterOverlap(GetAccel())));
-      sMsg = "Thig comhla ruinn!";
     } else {
       car_->_accelCmd = 0.0;
-      sMsg = "Sguir!";
+      car_->_brakeCmd = FilterABS(FilterBrakeSpeed(FilterBColl(FilterBPit(GetBrake()))));
     }
     car_->_clutchCmd = GetClutch();
   }  // if IsStuck
 
-  snprintf(car_->_msgCmd[0], RM_MSG_LEN, "%s", sMsg.c_str());
-  memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
+  //~ snprintf(car_->_msgCmd[0], RM_MSG_LEN, "%s", sMsg.c_str());
+  //~ memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
 
   last_steer_ = car_->_steerCmd;
   last_mode_ = mode_;
@@ -310,7 +306,7 @@ double KDriver::GetOffset() {
   // Check for side collision
   o = opponents_->GetSidecollOpp(car_);
   if (o != NULL) {
-    set_mode(AVOIDING);
+    SetMode(AVOIDING);
     return FilterSidecollOffset(o, incfactor);
   }
 
@@ -371,7 +367,7 @@ double KDriver::FilterOverlappedOffset(const Opponent *o) {
       my_offset_ -= OVERTAKE_OFFSET_INC * rgt_inc_ / 1;  // 2;
     }
   }
-  set_mode(BEING_OVERLAPPED);
+  SetMode(BEING_OVERLAPPED);
 
   my_offset_ = MIN(avoid_lft_offset_, MAX(avoid_rgt_offset_, my_offset_));
   return my_offset_;
@@ -462,7 +458,7 @@ Opponent* KDriver::GetTakeoverOpp() {
  * @return      new offset. Equals member 'my_offset_'
  */
 double KDriver::FilterTakeoverOffset(const Opponent *o) {
-  set_mode(AVOIDING);
+  SetMode(AVOIDING);
   tCarElt *ocar = o->car_ptr();
 
   // Compute the opponent's distance to the middle.
@@ -480,12 +476,12 @@ double KDriver::FilterTakeoverOffset(const Opponent *o) {
       || (car_->_trkPos.toLeft > ocar->_trkPos.toLeft
           && (sidedist < sidemargin || o->HasState(OPP_COLL)))) {
     my_offset_ -= OVERTAKE_OFFSET_INC * rgt_inc_;
-    set_avoid_left();
+    SetAvoidLeft();
   } else if (otm < -(ocar->_trkPos.seg->width - 5.0)
               || (car_->_trkPos.toLeft < ocar->_trkPos.toLeft
                   && (sidedist < sidemargin || o->HasState(OPP_COLL)))) {
     my_offset_ += OVERTAKE_OFFSET_INC * lft_inc_;
-    set_avoid_right();
+    SetAvoidRight();
   } else {
     // If the opponent is near the middle we try to move the offset toward
     // the inside of the expected turn.
@@ -537,10 +533,10 @@ double KDriver::FilterTakeoverOffset(const Opponent *o) {
     if (sidedist < sidemargin || o->HasState(OPP_COLL)) {
       if (lenleft > lenright) {
         my_offset_ += OVERTAKE_OFFSET_INC * lft_inc_;  // * 0.7;
-        set_avoid_right();
+        SetAvoidRight();
       } else {
         my_offset_ -= OVERTAKE_OFFSET_INC * rgt_inc_;  // * 0.7;
-        set_avoid_left();
+        SetAvoidLeft();
       }  // if lenleft > lenright
     }  // if sidedist
   }  // if opp near middle
@@ -595,7 +591,7 @@ double KDriver::FilterSidecollOffset(const Opponent *o,
     }
   }
 
-  oppOnRight ? set_avoid_right() : set_avoid_left();
+  oppOnRight ? SetAvoidRight() : SetAvoidLeft();
   avoid_mode_ |= AVOIDSIDE;
 
   my_offset_ = MIN(max_offset_, MAX(min_offset_, my_offset_));
@@ -671,7 +667,14 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
     ssSection << ROB_SECT_ROBOTS << "/" << ROB_LIST_INDEX << "/" << INDEX;
     car_type_ = GfParmGetStr(carHandle, ssSection.str().c_str(),
         ROB_ATTR_CAR, DEFAULTCARTYPE);
-  }  // if carType empty
+
+    //Fallback mechanism
+    if (car_type_ == DEFAULTCARTYPE) {
+      char indexstr[32];
+      RtGetCarindexString(INDEX, "kilo2008", true, indexstr, 32);
+      car_type_ = indexstr;
+      }
+    }  // if carType empty
 #ifdef KDRIVER_DEBUG
   cout << "Cartype: " << car_type_ << endl;
 #endif
@@ -892,7 +895,7 @@ void KDriver::newRace(tCarElt * car, tSituation * s) {
 
   // set initial mode
   // we set it to CORRECTING so the robot will steer towards the raceline
-  set_mode(CORRECTING);
+  SetMode(CORRECTING);
   last_mode_ = CORRECTING;
 
   // search for this car's index
@@ -1024,24 +1027,32 @@ void KDriver::MergeCarSetups(void **oldHandle, void *newHandle) const {
  * 
  */
 void KDriver::InitCa() {
-  double rearWingArea =
+  double rear_wing_area =
     GfParmGetNum(car_->_carHandle, SECT_REARWING, PRM_WINGAREA, NULL, 0.0);
-  double rearWingAngle =
+  double rear_wing_angle =
     GfParmGetNum(car_->_carHandle, SECT_REARWING, PRM_WINGANGLE, NULL, 0.0);
-  double wingCa = 1.23 * rearWingArea * sin(rearWingAngle);
+  double front_wing_area =
+    GfParmGetNum(car_->_carHandle, SECT_FRNTWING, PRM_WINGAREA, NULL, 0.0);
+  double front_wing_angle =
+    GfParmGetNum(car_->_carHandle, SECT_FRNTWING, PRM_WINGANGLE, NULL, 0.0);
+
+  front_wing_area *= sin(front_wing_angle);
+  rear_wing_area *= sin(rear_wing_angle);
+  double wing_ca = 1.23 * (front_wing_area + rear_wing_area);
 
   double cl =
     GfParmGetNum(car_->_carHandle, SECT_AERODYNAMICS, PRM_FCL, NULL, 0.0) +
     GfParmGetNum(car_->_carHandle, SECT_AERODYNAMICS, PRM_RCL, NULL, 0.0);
 
   double h = 0.0;
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 4; ++i)
     h += GfParmGetNum(car_->_carHandle, WheelSect[i],
                         PRM_RIDEHEIGHT, NULL, 0.2);
   h *= 1.5;
   h = pow(h, 4);
   h = 2.0 * exp(-3.0 * h);
-  CA = h * cl + 4.0 * wingCa;
+  CA = h * cl + 4.0 * wing_ca;
+  //TODO (kilo): ground effect (h * cl)
 }  // InitCa
 
 
@@ -1052,10 +1063,10 @@ void KDriver::InitCa() {
 void KDriver::InitCw() {
   double cx = GfParmGetNum(car_->_carHandle, SECT_AERODYNAMICS,
                             PRM_CX, NULL, 0.0);
-  double frontArea = GfParmGetNum(car_->_carHandle, SECT_AERODYNAMICS,
+  double front_area = GfParmGetNum(car_->_carHandle, SECT_AERODYNAMICS,
                                   PRM_FRNTAREA, NULL, 0.0);
 
-  CW = 0.645 * cx * frontArea;
+  CW = 0.645 * cx * front_area;
 }  // InitCw
 
 
@@ -1489,7 +1500,7 @@ double KDriver::GetSteer(tSituation *s) {
           && race_offset_ > avoid_rgt_offset_))) {
     // we're avoiding, but trying to steer somewhere the raceline takes us.
     // hence we'll just correct towards the raceline instead.
-    set_mode(CORRECTING);
+    SetMode(CORRECTING);
   }
 
   if (mode_ == CORRECTING
@@ -1501,7 +1512,7 @@ double KDriver::GetSteer(tSituation *s) {
           || car_->_speed_x < 10.0) && raceline_->isOnLine()))) {
     // we're CORRECTING & are now close enough to the raceline to
     // switch back to 'normal' mode...
-    set_mode(NORMAL);
+    SetMode(NORMAL);
   }
 
   if (mode_ == NORMAL) {
@@ -1588,10 +1599,10 @@ vec2f KDriver::TargetPoint() {
   double offset = GetOffset();
   double pitoffset = pit_->CalcPitOffset(-100.0, fromstart);
   if ((pit_->pit_planned() || pit_->in_pitlane()) && pitoffset != -100.0) {
-    set_mode(PITTING);
+    SetMode(PITTING);
     offset = my_offset_ = pitoffset;
   } else if (mode_ == PITTING) {
-    set_mode(CORRECTING);
+    SetMode(CORRECTING);
   }
 
   vec2f s;
@@ -1657,7 +1668,7 @@ inline double KDriver::GetDistToSegEnd() const {
 }  // GetDistToSegEnd
 
 
-void KDriver::set_mode(int newmode) {
+void KDriver::SetMode(int newmode) {
   if (mode_ != newmode) {
     if (mode_ == NORMAL || mode_ == PITTING) {
       correct_timer_ = sim_time_ + 7.0;
@@ -1677,7 +1688,7 @@ void KDriver::set_mode(int newmode) {
         break;
     }
   }  // mode_ != newmode
-}  // set_mode
+}  // SetMode
 
 
 /** 
@@ -1865,3 +1876,12 @@ double KDriver::InitSkill(tSituation * s) {
 
   return skill_;
 }   // InitSkill
+
+
+void KDriver::Unstuck() {
+  car_->_steerCmd = - my_cardata_->getCarAngle() / car_->_steerLock;
+  car_->_gearCmd = -1;     // Reverse gear.
+  car_->_accelCmd = 1.0;   // 100% accelerator pedal.
+  car_->_brakeCmd = 0.0;   // No brakes.
+  car_->_clutchCmd = 0.0;  // Full clutch (gearbox connected with engine).
+}

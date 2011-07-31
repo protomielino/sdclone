@@ -127,16 +127,17 @@ class KDriver {
   // 'own' utilities
   void Update(tSituation * s);
   bool IsStuck();
+  void Unstuck();
   inline double GetDistToSegEnd() const;
   void CheckPitStatus(tSituation *s);
   void * LoadDefaultSetup() const;
   void MergeCarSetups(void **oldHandle, void *newHandle) const;
-  void set_avoid_right() { avoid_mode_ |= AVOIDRIGHT; }
-  void set_avoid_left()  { avoid_mode_ |= AVOIDLEFT; }
-  double width() const  { return my_cardata_->getWidthOnTrack(); }
-  double mass() const   { return CARMASS + car_->_fuel; }
+  inline void SetAvoidRight() { avoid_mode_ |= AVOIDRIGHT; }
+  inline void SetAvoidLeft()  { avoid_mode_ |= AVOIDLEFT; }
+  inline double width() const  { return my_cardata_->getWidthOnTrack(); }
+  inline double mass() const   { return CARMASS + car_->_fuel; }
   double current_speed_sqr() const { return car_->_speed_x * car_->_speed_x; }
-  void set_mode(int newmode);
+  void SetMode(int newmode);
 
   // Opponent handling
   Opponent * GetTakeoverOpp();
