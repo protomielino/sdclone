@@ -292,7 +292,7 @@ GraphMenuInit(void* prevMenu)
     
     GfParmReleaseHandle(param);
     
-    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, SaveGraphicOptions, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", prevMenu, SaveGraphicOptions, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
