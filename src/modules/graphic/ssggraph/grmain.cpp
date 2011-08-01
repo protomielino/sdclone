@@ -473,7 +473,7 @@ refresh(tSituation *s)
     grRefreshSound(s, grGetCurrentScreen()->getCurCamera());
     GfProfStopProfile("grRefreshSound*");
 
-	// WIP #132 (D13) : Moved car collision damage propagation from grcar::grDrawCar.
+	// Moved car collision damage propagation from grcar::grDrawCar.
 	// Because it has to be done only once per graphics update, whereas grDrawCar
 	// is called once for each car and for each screen.
 	grPropagateDamage(s);

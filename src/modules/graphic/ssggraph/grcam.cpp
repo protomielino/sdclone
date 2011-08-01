@@ -17,21 +17,10 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
 #include <portability.h>
 #include <robottools.h>
 #include <glfeatures.h>
+
 #include "grcam.h"
 #include "grmain.h"
 #include "grscreen.h"	//cGrScreen
@@ -1398,7 +1387,7 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 			}
 		    }
 
-			// WIP #132 (D13) note : If sound is not disabled, car->priv.collision 
+			// WARNING : If sound is not disabled, car->priv.collision 
 			// already equals to 0 (see grRefreshSound, where it is forced to 0).
 			// This means we probably have a bug here ...
 		    if (car->priv.collision) {
@@ -1435,14 +1424,6 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 		if (last_current != current) {
 		    lastEventTime = s->currentTime;
 		    lastViewTime = s->currentTime;
-
-			// WIP #132 (D13) : Try and move collision event acknowledgement
-			// from the graphics engine to the race engine (needed for multi-threading).
-			// Note : If sound is not disabled, car->priv.collision already equals to 0
-			// (see grRefreshSound, where it is forced to 0).
-		    //for (i = 0; i < grNbCars; i++) {
-			//s->cars[i]->priv.collision = 0;
-		    //}
 		}
 	    }
 	}

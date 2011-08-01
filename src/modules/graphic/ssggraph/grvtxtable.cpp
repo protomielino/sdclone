@@ -18,14 +18,7 @@
 
 #include <plib/ssg.h>
 
-#ifdef WIN32
-#include <GL/glext.h>
-#endif
-#ifdef __APPLE__
-#include <OpenGL/glu.h>
-#else
-#include <GL/glu.h>
-#endif
+#include <glfeatures.h>
 
 #include "grvtxtable.h"
 #include "grmain.h"

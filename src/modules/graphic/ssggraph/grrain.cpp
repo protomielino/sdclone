@@ -1,19 +1,24 @@
-// grRain.cpp
-// (c)2009 Xavier Bertaux - xavier@torcs-ng.fr 
-// Based on
-// precipitation rendering code by Simgear Team - www.simgear.org
+/***************************************************************************
 
-#ifdef WIN32
-#include <windows.h>
-#endif
+    file                 : grrain.cpp
+    created              : March 2009
+    copyright            : (C) 2009 Xavier Bertaux
+    version              : $Id$
 
-#if defined(__APPLE__)
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
+***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+// Based on precipitation rendering code by Simgear Team - www.simgear.org
+
+#include <glfeatures.h>
 
 #include <plib/ssg.h>
 #include <plib/ssgAux.h>

@@ -28,9 +28,6 @@
 
 static int soundInitialized = 0;
 
-// WIP #132 (D13) : see grRefreshSound.
-//static double lastUpdated;
-
 static SoundInterface* sound_interface = NULL;
 static CarSoundData** car_sound_data = NULL;
 
@@ -44,7 +41,7 @@ static const char *soundPlibStr = GR_ATT_SOUND_STATE_PLIB;
 
 void grInitSound(tSituation* s, int ncars)
 {
-	char	buf[256];
+	char buf[256];
 
 	// Check if we want sound (sound.xml).
 	char fnbuf[1024];
@@ -63,10 +60,6 @@ void grInitSound(tSituation* s, int ncars)
 	GfParmReleaseHandle(paramHandle);
 	paramHandle = NULL;
 
-
-	// WIP #132 (D13) : see grRefreshSound.
-	//lastUpdated = -1000.0;
-	
 	switch (sound_mode) {
 	case OPENAL_MODE:
 		sound_interface = new OpenalSoundInterface (44100, 32);
@@ -129,8 +122,6 @@ void grInitSound(tSituation* s, int ncars)
 		float turbo_lag = GfParmGetNum(handle, SECT_ENGINE, PRM_TURBO_LAG, NULL, 1.0f);
 		car_sound_data[i]->setTurboParameters (turbo_on, turbo_rpm, turbo_lag);
 	}
-
-
 	
 	sound_interface->setSkidSound("data/sound/skid_tyres.wav");
 	sound_interface->setRoadRideSound("data/sound/road-ride.wav");
@@ -165,7 +156,7 @@ grShutdownSound(int ncars)
     GfLogInfo("Shutting down sound engine\n");
 
     if (sound_mode == DISABLED) {
-	return;
+		return;
     }
 
     if (!soundInitialized) {
@@ -177,7 +168,7 @@ grShutdownSound(int ncars)
 
     if (__slPendingError) {
 		GfLogError("Plib: The following error was ignored: %s\n", __slPendingError);
-		__slPendingError = 0;	/* ARG!!! ugly ugly bad thing... but should not occur anymore now */
+		__slPendingError = 0; // ARG!!! ugly ugly bad thing... but should not occur anymore now
     }
 }
 
@@ -189,21 +180,6 @@ grRefreshSound(tSituation *s, cGrCamera	*camera)
 	if (sound_mode == DISABLED) {
 		return 0.0f;
 	}
-
-	// WIP #132 (D13) : Try and move collision event acknowledgement
-	// from the graphics engine to the race engine (needed for multi-threading).
-	// Meaning that we assume ANY collision event is taken into account
-	// at the next graphics update.
-	// So we can't keep this "at most 50 times a second" for the sounds,
-	// as then we could lose some collision sounds if the frame rate is over 50 Hz.
-	
-	// 	// Update sound at most 50 times a second.
-	// 	const double UPDATE_DT = 0.02;
-	// 	if (s->currentTime - lastUpdated < UPDATE_DT) {
-	// 		return 0.0f;
-	// 	}
-	// 	lastUpdated = s->currentTime;
-
 
 	// TODO: Fix for a lot of cars. 
 	// I guess in this implementation we can change the Update() call to have _ncars = 1?
@@ -238,5 +214,13 @@ grRefreshSound(tSituation *s, cGrCamera	*camera)
 
 void grMuteSound(bool bOn)
 {
+    if (sound_mode == DISABLED) {
+		return;
+    }
+
+    if (!soundInitialized) {
+		return;
+    }
+
 	sound_interface->mute(bOn);
 }

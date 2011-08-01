@@ -504,9 +504,6 @@ grPropagateDamage (tSituation *s)
 			tCollisionState* collision_state = &car->priv.collision_state;
 			grPropagateDamage(grCarInfo[car->index].carEntity,
 							  collision_state->pos, collision_state->force, 0);
-			// WIP #132 (D13) : Try and move collision event acknowledgement
-			// from the graphics engine to the race engine (needed for multi-threading).
-			//collision_state->collision_count = 0;
 		}
 	}
 }
@@ -1059,16 +1056,6 @@ grDrawCar(tSituation *s, tCarElt *car, tCarElt *curCar, int dispCarFlag, int dis
 
 	index = car->index;
 
-	// WIP #132 (D13) : Moved car collision damage propagation to grMain::refresh.
-	// Because it has to be done only once per graphics update, whereas grDrawCar
-	// is called once for each car and for each screen.
-	// 	if (car->priv.collision_state.collision_count > 0) {
-	// 		tCollisionState* collision_state = &car->priv.collision_state;
-	// 		grPropagateDamage (grCarInfo[index].carEntity,
-	// 						   collision_state->pos, collision_state->force, 0);
-	// 		collision_state->collision_count = 0;
-	// 	}
-	
 	grCarInfo[index].distFromStart=grGetDistToStart(car);
 	grCarInfo[index].envAngle=RAD2DEG(car->_yaw);
 
