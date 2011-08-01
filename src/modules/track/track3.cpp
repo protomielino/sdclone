@@ -276,6 +276,8 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 	    switch(curSeg->type) {
 	    case TR_STR:
 		curBorder->length = curSeg->length;
+		curBorder->cos = curSeg->cos;
+		curBorder->sin = curSeg->sin;
 
 		switch(side) {
 		case 1:
@@ -509,6 +511,8 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
 	    switch(curSeg->type) {
 	    case TR_STR:
 		curSide->length = curSeg->length;
+		curSide->cos = curSeg->cos;
+		curSide->sin = curSeg->sin;
 
 		switch(side) {
 		case 1:
