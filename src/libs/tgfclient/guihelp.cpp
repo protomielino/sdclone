@@ -37,13 +37,23 @@
 
 #include "gui.h"
 
-
-static void	*scrHandle;
-
+static int NRecursions = 0;
 
 void
 gfuiInitHelp(void)
 {
+}
+
+static void
+onActivate(void* /* dummy */)
+{
+	NRecursions++;
+}
+
+static void
+onDeactivate(void* /* dummy */)
+{
+	NRecursions--;
 }
 
 /** Generate a help screen.
@@ -55,9 +65,9 @@ void
 GfuiHelpScreen(void *prevScreen)
 {
     tGfuiScreen	*pscr = (tGfuiScreen*)prevScreen;
-    
+
     // Create screen, load menu XML descriptor and create static controls.
-    scrHandle = GfuiScreenCreate();
+    void* scrHandle = GfuiScreenCreate(0, 0, onActivate, 0, onDeactivate);
     
     void *hmenu = GfuiMenuLoad("helpmenu.xml");
 
@@ -128,7 +138,7 @@ GfuiHelpScreen(void *prevScreen)
     
 
     // Create Back button.
-    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", prevScreen, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", prevScreen, GfuiScreenReplace);
 
     // Create version label.
     const int versionId = GfuiMenuCreateLabelControl(scrHandle, hmenu, "versionlabel");
@@ -138,12 +148,13 @@ GfuiHelpScreen(void *prevScreen)
     GfParmReleaseHandle(hmenu);
     
     // Add keyboard shortcuts.
-    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddKey(scrHandle, GFUIK_RETURN, "", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddKey(scrHandle, GFUIK_F1, "", prevScreen, GfuiScreenReplace, NULL);
-
-    GfuiMenuDefaultKeysAdd(scrHandle);
+    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Back to the menu", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddKey(scrHandle, GFUIK_RETURN, "Back to the menu", prevScreen, GfuiScreenReplace, NULL);
+	if (NRecursions == 0)
+		GfuiAddKey(scrHandle, GFUIK_F1, "Help on Help menu", scrHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(scrHandle, GFUIK_F12, "Screen-shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(scrHandle, GFUIK_UP, "Select previous entry", NULL, gfuiSelectPrev, NULL);
+    GfuiAddKey(scrHandle, GFUIK_DOWN, "Select next entry", NULL, gfuiSelectNext, NULL);
 
     GfuiScreenActivate(scrHandle);
 }
-
