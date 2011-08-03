@@ -697,9 +697,13 @@ ReCarsSortCars(void)
 	s->cars[i]->_prevFromStartLine = s->cars[i]->_distFromStartLine;
 
 	if (s->cars[i]->_wrongWayTime < s->currentTime 
-		&& sqrt(pow(s->cars[i]->_speed_x, 2) + pow(s->cars[i]->_speed_y,2)) > 10) {
+		&& sqrt(pow(s->cars[i]->_speed_x, 2) + pow(s->cars[i]->_speed_y,2)) > 10 
+		&& s->cars[i]->_driverType == RM_DRV_HUMAN
+		&& s->cars[i]->_state != RM_CAR_STATE_ELIMINATED) {
 	    sprintf(msg, "%s Wrong Way", s->cars[i]->_name);
-	    ReSituation::self().setRaceMessage(msg, 1);
+	    ReSituation::self().setRaceMessage(msg, 2);
+	    // prevent flickering occuring by 'short timing', assuming > 10fps
+	    s->cars[i]->_wrongWayTime = s->currentTime + 1.9;
 	}
     }
 
