@@ -48,6 +48,7 @@ class cGrScreen {
 		int scrx, scry, scrw, scrh;
 		float viewRatio;
 		int fakeWidth;
+		int boardWidth;
 	
 		bool active;								// Is the screen activated.
 		bool selectNextFlag;

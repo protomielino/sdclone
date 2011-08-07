@@ -131,8 +131,11 @@ void cGrScreen::activate(int x, int y, int w, int h)
 	}
 
 	if (mirrorCam) {
+		// mirror width adjusted to fit boards
 		mirrorCam->setViewport (scrx, scry, scrw, scrh);
-		mirrorCam->setPos (scrx + scrw / 4, scry +  5 * scrh / 6 - scrh / 10, scrw / 2, scrh / 6);
+		mirrorCam->setPos (scrx + scrw / 2 - (scrw * boardWidth /400), 
+			scry +  5 * scrh / 6 - scrh / 10, 
+			(scrw * boardWidth /200), scrh / 6);
 	}
 	if (curCam) {
 		curCam->limitFov ();
@@ -372,8 +375,11 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	glDisable(GL_TEXTURE_2D);
 	
 	TRACE_GL("cGrScreen::update glDisable(GL_DEPTH_TEST)");
+	glEnable(GL_SCISSOR_TEST);
+	glScissor(scrx + (scrw * (100 - boardWidth)/200), scry, scrw * boardWidth / 100, scrh);
 	board->refreshBoard(s, frameInfo, false, curCar,
 						grNbActiveScreens > 1 && grGetCurrentScreen() == this);
+	glDisable(GL_SCISSOR_TEST);
 	TRACE_GL("cGrScreen::update display boards");
 	
 	GfProfStopProfile("grDisp**");
@@ -423,6 +429,11 @@ void cGrScreen::loadParams(tSituation *s)
 	curCamHead	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM_HEAD, NULL, (tdble)curCamHead);
 	camNum	= (int)GfParmGetNum(grHandle, path2, GR_ATT_CAM, NULL, (tdble)camNum);
 	mirrorFlag	= (int)GfParmGetNum(grHandle, path2, GR_ATT_MIRROR, NULL, (tdble)mirrorFlag);
+
+	// Get board width (needed for scissor)
+	boardWidth      = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARDWIDTH, NULL, 100);
+	if (boardWidth < 0 || boardWidth > 100)
+		boardWidth = 100;
 
 	// Retrieve the "current camera".
 	cam = GF_TAILQ_FIRST(&cams[curCamHead]);
