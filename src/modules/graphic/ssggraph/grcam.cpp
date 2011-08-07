@@ -210,6 +210,13 @@ void cGrOrthoCamera::setModelView(void)
 void cGrBackgroundCam::update(cGrCamera *curCam)
 {
     static float BACKGROUND_FOVY_CUTOFF = 60.0f;
+
+    if (curCam->getDrawBackground() == 2)
+        mirrorBackground = 1;
+    else
+        mirrorBackground = 0;
+
+
     memcpy(&eye, curCam->getPosv(), sizeof(eye));
     memcpy(&center, curCam->getCenterv(), sizeof(center));
     sgSubVec3(center, center, eye);
@@ -222,6 +229,26 @@ void cGrBackgroundCam::update(cGrCamera *curCam)
         fovy = BACKGROUND_FOVY_CUTOFF;
     }
     memcpy(&up, curCam->getUpv(), sizeof(up));
+}
+
+void cGrBackgroundCam::setModelView(void)
+{
+  sgMat4 mat, mat2, mirror;
+
+  grMakeLookAtMat4(mat, eye, center, up);
+
+  if (mirrorBackground) {
+    // Scenery drawn as per mirror
+#define M(row,col)  mirror[row][col]
+    M(0,0) = 1.0;  M(0,1) = 0.0;  M(0,2) = 0.0;  M(0,3) = 0.0;
+    M(1,0) = 0.0;  M(1,1) =-1.0;  M(1,2) = 0.0;  M(1,3) = 0.0;
+    M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
+    M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
+#undef M
+    sgMultMat4(mat2, mat, mirror);
+    grContext.setCamera(mat2);
+  } else
+    grContext.setCamera(mat);
 }
 
 
@@ -1518,7 +1545,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
     cam = new cGrCarCamBehindReverse(myscreen,
 				      id,
 				      0,	/* drawCurr */
-				      1,	/* drawBG  */
+				      2,	/* drawBG mirrored */
 				      67.5,	/* fovy */
 				      50.0,	/* fovymin */
 				      95.0,	/* fovymax */

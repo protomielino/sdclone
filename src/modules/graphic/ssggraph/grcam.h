@@ -49,7 +49,7 @@ class cGrCamera
     sgVec3 eye;
     sgVec3 center;
     sgVec3 up;
-		int Speed;
+    int Speed;
     class cGrScreen	*screen;	/* screen where the camera is attached */
     
  public:
@@ -218,6 +218,8 @@ class cGrOrthoCamera : public cGrCamera
 
 class cGrBackgroundCam : public cGrPerspCamera
 {
+ private:
+    int			mirrorBackground;
  public:
     cGrBackgroundCam(class cGrScreen *myscreen)
 	: cGrPerspCamera(myscreen, 0, 0, 0, 1, 0,
@@ -225,6 +227,7 @@ class cGrBackgroundCam : public cGrPerspCamera
 			 0.1f, 2000.0f, 100000.0f, 100000.0f) {
     }
     
+    void setModelView(void);
     void update(tCarElt *car, tSituation *s) {}
 
     void update(cGrCamera *curCam);
