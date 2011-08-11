@@ -266,6 +266,10 @@ SimCarUpdateSpeed(tCar *car)
 	car->DynGC.vel.x = car->DynGCg.vel.x * Cosz + car->DynGCg.vel.y * Sinz;
 	car->DynGC.vel.y = -car->DynGCg.vel.x * Sinz + car->DynGCg.vel.y * Cosz;
 	car->DynGC.vel.z = car->DynGCg.vel.z;
+
+        /* 2D speed */
+        car->DynGC.vel.xy = sqrt(car->DynGCg.vel.x * car->DynGCg.vel.x  + 
+                 car->DynGCg.vel.y * car->DynGCg.vel.y);
 }
 
 void

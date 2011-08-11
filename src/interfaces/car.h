@@ -267,6 +267,7 @@ typedef struct {
 #define _speed_x	pub.DynGC.vel.x
 #define _speed_y	pub.DynGC.vel.y
 #define _speed_z	pub.DynGC.vel.z
+#define _speed_xy	pub.DynGC.vel.xy
 #define _accel_x	pub.DynGC.acc.x
 #define _accel_y	pub.DynGC.acc.y
 #define _accel_z	pub.DynGC.acc.z

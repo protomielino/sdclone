@@ -138,6 +138,7 @@ typedef struct Posd
     tdble	x;		/**< x coordinate */
     tdble	y;		/**< y coordinate */
     tdble	z;		/**< z coordinate */
+    tdble	xy;		/**< combined 2D xy coordinate */
     tdble	ax;		/**< angle along x axis */
     tdble	ay;		/**< angle along y axis */
     tdble	az;		/**< angle along z axis */

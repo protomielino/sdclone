@@ -348,7 +348,7 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
     int collision  = car->priv.collision;
     if (collision) {
         if (collision & 1) {
-            skid_metal.a = (tdble)(sqrt(car->_speed_x * car->_speed_x + car->_speed_y * car->_speed_y)*0.01);
+            skid_metal.a = (tdble)(car->_speed_xy * 0.01);
             skid_metal.f = (tdble)(.5+0.5*skid_metal.a);
             drag_collision.f = skid_metal.f;
         } else {
