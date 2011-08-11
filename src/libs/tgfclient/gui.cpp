@@ -307,9 +307,9 @@ GfuiRedraw(void)
 		} else {
 			// If aspect ratio of view is larger than image's one, 
 			// "cut off" top and bottom.
-			const GLfloat tdy = GfuiScreen->bgHeight * (1.0f / rfactor - 1.0f) / bgPow2Height / 2.0f;
-			ty1 += tdy;
-			ty2 -= tdy;
+			const GLfloat tdy = GfuiScreen->bgHeight * rfactor / bgPow2Height / 2.0f;
+			ty2 = (ty1+1)/2 + tdy;
+			ty1 = (ty1+1)/2 - tdy;
 		}
 
 		// Display texture.
