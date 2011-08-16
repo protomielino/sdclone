@@ -99,6 +99,15 @@ SimEngineConfig(tCar *car)
 	if ( car->engine.brakeCoeff < 0.0 )
 	   {car->engine.brakeCoeff = 0.0;}
 	car->engine.brakeCoeff *= maxTq;
+	/*sanity check of rev limits*/
+	if (car->engine.revsMax > car->engine.curve.data[car->engine.curve.nbPts-1].rads) {
+	    car->engine.revsMax = car->engine.curve.data[car->engine.curve.nbPts-1].rads;
+	    GfLogWarning("Revs maxi bigger than the maximum RPM in the curve data.\nIt is set to %g.\n",car->engine.revsMax);
+	}
+	if (car->engine.revsLimiter > car->engine.revsMax) {
+	    car->engine.revsLimiter = car->engine.revsMax;
+	    GfLogWarning("Revs limiter is bigger than revs maxi.\nIt is set to %g.\n",car->engine.revsLimiter);
+	}
 }
 
 /* Update torque output with engine rpm and accelerator command */
