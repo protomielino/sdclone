@@ -1,10 +1,21 @@
 INCLUDE(../../cmake/macros.cmake)
 
-FILE(GLOB files_xml *.xml)
-FILE(GLOB files_xmls *.xmls)
+SD_INSTALL_FILES(DATA config/raceman USER config/raceman 
+                 FILES practice.xml quickrace.xml
+                       singleevent-challenge.xml singleevent-endurance.xml
+                       championship.xml championship-supercars.xml 
+                       career.xml 
+                       career_supercars.xmls)
 
-SD_INSTALL_FILES(DATA config/raceman USER config/raceman FILES ${files_xml}
-	${files_xmls})
-SD_INSTALL_FILES(DATA config/raceman/extra USER config/raceman/extra FILES
-	extra/skill.xml)
+SD_INSTALL_FILES(DATA config/raceman/extra USER config/raceman/extra 
+                 FILES extra/skill.xml)
+
+# Work-in-progress / unofficial race modes.
+IF(NOT OPTION_OFFICIAL_ONLY)
+
+  SD_INSTALL_FILES(DATA config/raceman USER config/raceman 
+                   FILES networkrace.xml
+                         championship-mpa1.xml 
+                         career_ls1.xmls)
+ENDIF()
 
