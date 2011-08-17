@@ -150,6 +150,14 @@ void LRaceLine::SplitTrack(const tTrack * const ptrack,
             )
             break;
 
+          // Avoid too high curbs
+          if (psegSide->style == TR_CURB &&
+            (psegSide->surface->kFriction >= psegCurrent->surface->kFriction * 0.9 &&
+             psegSide->surface->kRoughness <= psegCurrent->surface->kRoughness + 0.05 &&
+             psegSide->surface->kRollRes <= psegCurrent->surface->kRollRes * 0.03 &&
+             psegSide->height <= psegSide->width / 10))
+          break;
+
           // Do not use the side if it is the pitlane, grumpy stewards...
           if (pPits->type != TR_PIT_NONE) {
             // if we plan to use the side the pit is on, too
@@ -444,8 +452,9 @@ void LRaceLine::StepInterpolate(int iMin, int iMax, int Step, int rl) {
                             seg_[iMin].ty[rl], iMax % divs_, rl);
   double ir1 = rinverse(iMin, seg_[iMax % divs_].tx[rl],
                             seg_[iMax % divs_].ty[rl], next, rl);
+  double range = static_cast<double>(iMax - iMin);
   for (int k = iMax; --k > iMin;) {
-    double x = static_cast<double>(k - iMin) / static_cast<double>(iMax - iMin);
+    double x = static_cast<double>(k - iMin) / range;
     double TargetRInverse = x * ir1 + (1 - x) * ir0;
     AdjustRadius(iMin, k, iMax % divs_, TargetRInverse, rl);
   }
@@ -476,9 +485,9 @@ void LRaceLine::InitTrack(const tTrack * const track, void **parm_handle,
   corner_accel_ = GfParmGetNum(*parm_handle, KILO_SECT_PRIV,
                                       KILO_ATT_CORNERACC, NULL, 1.0);
   int_margin_ = GfParmGetNum(*parm_handle, KILO_SECT_PRIV,
-                                      KILO_ATT_INTMARG, NULL, 1.0);
+                                      KILO_ATT_INTMARG, NULL, 0.5);
   ext_margin_ = GfParmGetNum(*parm_handle, KILO_SECT_PRIV,
-                                      KILO_ATT_EXTMARG, NULL, 2.0);
+                                      KILO_ATT_EXTMARG, NULL, 1.0);
   brake_delay_ = GfParmGetNum(*parm_handle, KILO_SECT_PRIV,
                                       KILO_ATT_BRDELAY, NULL, 10.0);
   security_radius_ = GfParmGetNum(*parm_handle, KILO_SECT_PRIV,

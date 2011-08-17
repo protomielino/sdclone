@@ -55,7 +55,9 @@ using ::std::list;
 
 static int
   pitstatus[128] = { 0 };
-//static double colour[] = {1.0, 0.0, 0.0, 0.0};
+#if 0
+static double colour[] = {1.0, 0.0, 0.0, 0.0};
+#endif
 
 // Constants
 
@@ -123,7 +125,7 @@ static char const *WheelSect[4] = { SECT_FRNTRGTWHEEL, SECT_FRNTLFTWHEEL,
                         SECT_REARRGTWHEEL, SECT_REARLFTWHEEL };
 static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 
-#define DEFAULTCARTYPE "nogood" //"trb1-cavallo-360rb"
+#define DEFAULTCARTYPE "nogood"   // "trb1-cavallo-360rb"
 
 #define SLOW_TRACK_LIMIT 2.4
 #define FAST_TRACK_LIMIT 4.0
@@ -175,16 +177,26 @@ void KDriver::drive(tSituation * s) {
     car_->_brakeCmd = GetBrake();
 
     if (car_->_brakeCmd == 0.0) {
-      car_->_accelCmd = FilterAccel(FilterTCL(FilterTrk(FilterOverlap(GetAccel()))));
+      car_->_accelCmd = FilterAccel(
+                          FilterTCL(
+                            FilterTrk(
+                              FilterOverlap(
+                                GetAccel()))));
     } else {
       car_->_accelCmd = 0.0;
-      car_->_brakeCmd = FilterABS(FilterBrakeSpeed(FilterBColl(FilterBPit(GetBrake()))));
+      car_->_brakeCmd = FilterABS(
+                          FilterBrakeSpeed(
+                            FilterBColl(
+                              FilterBPit(
+                                GetBrake()))));
     }
     car_->_clutchCmd = GetClutch();
   }  // if IsStuck
 
-  //~ snprintf(car_->_msgCmd[0], RM_MSG_LEN, "%s", sMsg.c_str());
-  //~ memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
+#if 0
+  snprintf(car_->_msgCmd[0], RM_MSG_LEN, "%s", sMsg.c_str());
+  memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
+#endif
 
   last_steer_ = car_->_steerCmd;
   last_accel_ = car_->_accelCmd;
@@ -625,7 +637,7 @@ double KDriver::FilterSidecollOffset(const Opponent *o,
  */
 void KDriver::initTrack(tTrack * t, void *carHandle,
                         void **carParmHandle, tSituation * s) {
-  InitSkill(s);   //Read & calculate skilling info
+  InitSkill(s);   // Read & calculate skilling info
 
   stringstream buf;
 
@@ -670,7 +682,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
     car_type_ = GfParmGetStr(carHandle, ssSection.str().c_str(),
         ROB_ATTR_CAR, DEFAULTCARTYPE);
 
-    //Fallback mechanism
+    // Fallback mechanism
     if (car_type_ == DEFAULTCARTYPE) {
       char indexstr[32];
       RtGetCarindexString(INDEX, "kilo2008", true, indexstr, 32);
@@ -829,9 +841,9 @@ double KDriver::FilterBColl(const double brake) {
           > o->distance()) {  // Damn, too close, brake hard!!!
         accel_cmd_ = 0.0;
         ret = 1.0;
-      } // if BrakeDist
-    } //if o
-  }  // if sim_time_
+      }   // if BrakeDist
+    }   // if o
+  }   // if sim_time_
 
   return ret;
 }  // FilterBColl
@@ -937,7 +949,7 @@ void KDriver::CalcSpeed() {
 
   double x = (10 + car_->_speed_x) * (speed - car_->_speed_x) / 200;
 
-  //Let's see if we must accelerate or brake a bit.
+  // Let's see if we must accelerate or brake a bit.
   if (x > 0.0)
     accel_cmd_ = x;
   else
@@ -1054,7 +1066,7 @@ void KDriver::InitCa() {
   h = pow(h, 4);
   h = 2.0 * exp(-3.0 * h);
   CA = h * cl + 4.0 * wing_ca;
-  //TODO (kilo): ground effect (h * cl)
+  // TODO(kilo): ground effect (h * cl)
 }  // InitCa
 
 
@@ -1339,8 +1351,7 @@ double KDriver::CalcAvoidSteer(const double targetAngle) {
     double maxspeedfactor = minspeedfactor;
     double rInverse = raceline_->rinverse();
 
-    //TODO (kilo) check for +/- rInverse!!!
-    //!!!!!!!!!!!!!!!!!!!!!!!!!
+    // TODO(kilo): check for +/- rInverse!!!
     if (rInverse > 0.0) {
       minspeedfactor = MAX(minspeedfactor / 3, minspeedfactor - rInverse * 80);
       maxspeedfactor = MAX(maxspeedfactor / 3, maxspeedfactor + rInverse * 20);
@@ -1398,7 +1409,7 @@ double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
         (((120.0 - speed()) / 6000)
         * (0.5 + MIN(fabs(avoidsteer), fabs(racesteer)) / 10)));
 
-  //TODO (kilo) check if START_TIME is enough
+  // TODO(kilo): check if START_TIME is enough
   if (mode_ == CORRECTING && sim_time_ > START_TIME) {
     // move steering towards racesteer...
     if (correct_limit_ < 900.0) {
@@ -1499,8 +1510,11 @@ double KDriver::GetSteer(tSituation *s) {
   }
 
   bool angle_ok = fabs(angle_) < 0.2f && fabs(race_steer_) < 0.4f;
-  bool steer_ok = (race_steer_ < last_steer_ + 0.05 && race_steer_ > last_steer_ - 0.05); //fabs(last_steer_ - race_steer_) < 0.05
-  double skid = (car_->_skid[0] + car_->_skid[1] + car_->_skid[2] + car_->_skid[3]) / 2;
+  bool steer_ok = (race_steer_ < last_steer_ + 0.05 &&
+                    race_steer_ > last_steer_ - 0.05);
+  // fabs(last_steer_ - race_steer_) < 0.05
+  double skid = (car_->_skid[0] + car_->_skid[1]
+                  + car_->_skid[2] + car_->_skid[3]) / 2;
   if (mode_ == CORRECTING
       && (last_mode_ == NORMAL
           || (angle_ok
@@ -1511,9 +1525,9 @@ double KDriver::GetSteer(tSituation *s) {
                 < car_->_trkPos.seg->width / 2 - 1.0)
                 || car_->_speed_x < 10.0)
               && raceline_->isOnLine()
-              )//angle_ok
-          )//last_mode
-        ) {//mode
+              )  // angle_ok
+          )  // last_mode
+        ) {  // mode
     // we're CORRECTING & are now close enough to the raceline to
     // switch back to 'normal' mode...
     SetMode(NORMAL);
@@ -1521,13 +1535,13 @@ double KDriver::GetSteer(tSituation *s) {
   }
 
   if (mode_ == NORMAL) {
-    //~ if (car_->_distRaced < 100.0 && car_->_pos == 1) {
-      //~ steer = race_steer_;//race_steer_ * 0.5;
-      //~ last_nsa_steer_ = race_steer_ * 0.8;
-    //~ } else {
+    // if (car_->_distRaced < 100.0 && car_->_pos == 1) {
+      // steer = race_steer_;//race_steer_ * 0.5;
+      // last_nsa_steer_ = race_steer_ * 0.8;
+    // } else {
       steer = race_steer_;
       last_nsa_steer_ = race_steer_ * 0.8;
-    //~ }
+    // }
   } else {
     if (mode_ != CORRECTING) {
       correct_limit_ = 1000.0;
@@ -1537,9 +1551,10 @@ double KDriver::GetSteer(tSituation *s) {
       steer = SmoothSteering(CorrectSteering(avoidsteer, race_steer_));
     }  // mode != CORRECTING
 
-    if (fabs(angle_) >= 1.6) {
-      steer = (steer > 0.0) ? 1.0 : -1.0;
-    }
+    // TODO(kilo): Isnt the same limiting code used
+    // in raceline::GetRacelinedata???
+    if (fabs(angle_) >= 1.6)
+      steer = sign(steer);
   }  // mode != NORMAL
 
 #if 0
@@ -1643,7 +1658,7 @@ vec2f KDriver::TargetPoint() {
     n.normalize();
     t = s + static_cast<float>(arcsign) * static_cast<float>(offset) * n;
 
-    //TODO (kilo) unreachable code, mode_ != PITTING returns before
+    // TODO(kilo): unreachable code, mode_ != PITTING returns before
     if (mode_ != PITTING) {
       // bugfix - calculates target point a different way, thus
       // bypassing an error in the BT code that sometimes made
@@ -1680,8 +1695,8 @@ inline double KDriver::GetDistToSegEnd() const {
 
 
 void KDriver::SetMode(int newmode) {
-  //~ if (car_->_distRaced < 30.0 && car_->_pos == 1)
-    //~ newmode = NORMAL;
+  // if (car_->_distRaced < 30.0 && car_->_pos == 1)
+    // newmode = NORMAL;
 
   if (mode_ != newmode) {
     if (mode_ == NORMAL || mode_ == PITTING) {
