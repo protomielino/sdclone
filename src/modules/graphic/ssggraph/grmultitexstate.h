@@ -25,7 +25,7 @@ class grMultiTexState : public grManagedState
 {
 	public:
 		~grMultiTexState() {}
-		virtual void apply(int unit);
+		virtual void apply(int unit, bool bFlag = false);
 };
 
 #endif // __GRMULTI

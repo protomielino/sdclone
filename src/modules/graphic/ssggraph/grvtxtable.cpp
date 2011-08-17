@@ -99,6 +99,8 @@ ssgBase *grVtxTable::clone (int clone_flags)
 
 grVtxTable::grVtxTable (int _numMapLevel,int _mapLevel)
 {
+	//GfLogDebug("grVtxTable::grVtxTable(default TABLE, nml=%d, ml=%d)\n", _numMapLevel, _mapLevel);
+
 	numMapLevel = _numMapLevel;
 	mapLevelBitmap = _mapLevel;
 	indexCar = -1;
@@ -126,6 +128,8 @@ grVtxTable::grVtxTable (GLenum ty, ssgVertexArray   *vl,
 			 ssgColourArray   *cl,
 			 int _indexCar) : ssgVtxTable(ty, vl, nl, tl, cl)
 {
+	//GfLogDebug("grVtxTable::grVtxTable(ARRAY, nml=%d, ml=%d)\n", _numMapLevel, _mapLevel);
+
 	type = ssgTypeVtxTable();
 	numMapLevel = _numMapLevel;
 	mapLevelBitmap =_mapLevel;
@@ -157,6 +161,8 @@ grVtxTable::grVtxTable (GLenum ty, ssgVertexArray   *vl,
 			 ssgColourArray   *cl,
 			 int _indexCar) : ssgVtxTable(ty, vl, nl, tl, cl)
 {
+	//GfLogDebug("grVtxTable::grVtxTable(TABLE, nml=%d, ml=%d)\n", _numMapLevel, _mapLevel);
+
 	type = ssgTypeVtxTable ();
 	numMapLevel = _numMapLevel;
 	mapLevelBitmap = _mapLevel;
@@ -365,7 +371,7 @@ void grVtxTable::draw_geometry_for_a_car ()
 		grEnvShadowState->apply(2);
 	}
 
-	grEnvState->apply(1);
+	grEnvState->apply(1, true);
 	glActiveTextureARB(GL_TEXTURE1_ARB);
 	glEnable(GL_TEXTURE_2D);
 	glMatrixMode(GL_TEXTURE);
@@ -435,6 +441,8 @@ void grVtxTable::draw_geometry_for_a_car ()
 
 void grVtxTable::draw_geometry_array ()
 {
+	TRACE_GL("draw_geometry_array: start");
+
 	int num_colours   = getNumColours();
 	int num_normals   = getNumNormals();
 	int num_texcoords = getNumTexCoords();
@@ -528,11 +536,15 @@ void grVtxTable::draw_geometry_array ()
 	if (grMaxTextureUnits > 1) {
 		glActiveTextureARB(GL_TEXTURE0_ARB);
 	}
+	
+	TRACE_GL("draw_geometry_array: end");
 }
 
 
 void grVtxTable::draw_geometry_for_a_car_array ()
 {
+	TRACE_GL("draw_geometry_for_a_car_array: start");
+
 	int num_colours   = getNumColours();
 	int num_normals   = getNumNormals();
 	int num_texcoords = getNumTexCoords();
@@ -609,7 +621,7 @@ void grVtxTable::draw_geometry_for_a_car_array ()
 	}
 
 
-	grEnvState->apply(1);
+	grEnvState->apply(1, true);
 	glActiveTextureARB(GL_TEXTURE1_ARB);
 	glEnable(GL_TEXTURE_2D);
 	glMatrixMode(GL_TEXTURE);
@@ -705,4 +717,6 @@ void grVtxTable::draw_geometry_for_a_car_array ()
 	}
 
 	glActiveTextureARB (GL_TEXTURE0_ARB);
+	
+	TRACE_GL("draw_geometry_for_a_car_array: end");
 }

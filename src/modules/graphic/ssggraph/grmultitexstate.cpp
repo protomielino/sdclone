@@ -31,29 +31,71 @@ extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB ;
 #include "dmalloc.h"
 #endif
 
-void grMultiTexState::apply (int unit)
+// Apply the state to the give texture unit GL_TEXTURE<unit>_ARB
+// Temporary bFlag argument for testing (see calls in grvtxtable.cpp).
+void grMultiTexState::apply(int unit, bool bFlag)
 {
-  if (unit==0) {
-      glActiveTextureARB ( GL_TEXTURE0_ARB ) ;
-      glEnable ( GL_TEXTURE_2D ) ;  /* Enables the second texture map. */
-      glBindTexture ( GL_TEXTURE_2D, ssgSimpleState::getTextureHandle() ) ;
-  } else if (unit==1) {
-      glActiveTextureARB ( GL_TEXTURE1_ARB ) ;
-      glEnable ( GL_TEXTURE_2D ) ;  /* Enables the second texture map. */
-      /* glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);*/
-      /*glBlendFunc(GL_ZERO, GL_SRC_COLOR);*/
-      glBindTexture ( GL_TEXTURE_2D, ssgSimpleState::getTextureHandle() ) ;
-  } else if (unit==2) {
-      glActiveTextureARB ( GL_TEXTURE2_ARB ) ;
-      glEnable ( GL_TEXTURE_2D ) ;  /* Enables the second texture map. */
-      glBindTexture ( GL_TEXTURE_2D, ssgSimpleState::getTextureHandle() ) ;
-  } else if (unit==3) {
-      glActiveTextureARB ( GL_TEXTURE3_ARB ) ;
-      glEnable ( GL_TEXTURE_2D ) ;  /* Enables the second texture map. */
-      glBindTexture ( GL_TEXTURE_2D, ssgSimpleState::getTextureHandle() ) ;
-  } else {
-      /*glActiveTextureARB ( GL_TEXTURE0_ARB ) ;*/
-      glBindTexture ( GL_TEXTURE_2D, getTextureHandle() ) ;
-      _ssgCurrentContext->getState()->setTexture ( getTexture () ) ;  
-  }
+	switch(unit)
+	{
+		// Tracks & cars : "base" texture from .ac/.acc
+		case 0:
+			glActiveTextureARB(GL_TEXTURE0_ARB);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
+			break;
+
+		// Tracks : "tiled" texture from .ac/.acc
+		// Cars : horizontal reflexion = projection of track objects = grEnvState
+		case 1:
+			glActiveTextureARB(GL_TEXTURE1_ARB);
+			glEnable(GL_TEXTURE_2D);
+			// glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			// glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
+			if (bFlag)
+			{
+				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); // OK, = default.
+				
+				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); // Bad
+
+				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_BLEND); // Bad
+				//static const float aColor[4] = { 1.0, 1.0, 1.0, 1.0 };
+				//glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, aColor);
+
+				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); // Bad
+
+				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_ADD); // Bad
+
+				
+				//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE); // Needs more params
+			}
+			break;
+
+		// Tracks : "skids" texture from .ac/.acc
+		// Cars : vertical reflexion = projection of the clouds = grEnvStateShadowState
+		case 2:
+			glActiveTextureARB(GL_TEXTURE2_ARB);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
+			if (bFlag)
+			{
+			}
+			break;
+
+		// Tracks : "shad" texture from .ac/.acc
+		// Cars : track objects shadows = vertical projection = grEnvShadowStateOnCars
+		case 3:
+			glActiveTextureARB(GL_TEXTURE3_ARB);
+			glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
+			break;
+
+		// Should never be used
+		default:
+			GfLogWarning("grMultiTexState@%p::apply(unit=%d) : "
+						 "No support for this texture unit ; redirecting to current\n");
+			// glActiveTextureARB(GL_TEXTURE0_ARB);
+			glBindTexture(GL_TEXTURE_2D, getTextureHandle());
+			_ssgCurrentContext->getState()->setTexture(getTexture());  
+	}
 }
