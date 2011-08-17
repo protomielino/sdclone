@@ -324,7 +324,9 @@ double KDriver::GetOffset() {
 
 
   // no-one to avoid, work back towards raceline
-  if (mode_ != NORMAL && fabs(my_offset_ - race_offset_) > 1.0) {
+  if (sim_time_ > START_TIME * 4
+      && mode_ != NORMAL
+      && fabs(my_offset_ - race_offset_) > 1.0) {
     if (my_offset_ > race_offset_ + OVERTAKE_OFFSET_INC * rgt_inc_ / 4) {
       my_offset_ -= OVERTAKE_OFFSET_INC * rgt_inc_ / 4;
     } else if (my_offset_ < race_offset_ + OVERTAKE_OFFSET_INC * lft_inc_ / 4) {
@@ -1337,12 +1339,14 @@ double KDriver::CalcAvoidSteer(const double targetAngle) {
     double maxspeedfactor = minspeedfactor;
     double rInverse = raceline_->rinverse();
 
+    //TODO (kilo) check for +/- rInverse!!!
+    //!!!!!!!!!!!!!!!!!!!!!!!!!
     if (rInverse > 0.0) {
       minspeedfactor = MAX(minspeedfactor / 3, minspeedfactor - rInverse * 80);
       maxspeedfactor = MAX(maxspeedfactor / 3, maxspeedfactor + rInverse * 20);
     } else {
-      maxspeedfactor = MAX(maxspeedfactor / 3, maxspeedfactor + rInverse * 80);
       minspeedfactor = MAX(minspeedfactor / 3, minspeedfactor + rInverse * 20);
+      maxspeedfactor = MAX(maxspeedfactor / 3, maxspeedfactor - rInverse * 80);
     }  // if rInverse
 
     steer = MAX(last_nsa_steer_ - minspeedfactor,
@@ -1383,6 +1387,9 @@ double KDriver::CalcAvoidSteer(const double targetAngle) {
 
 
 double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
+  if (sim_time_ < 15.0 && car_->_speed_x < 20.0)
+    return avoidsteer;
+
   double steer = avoidsteer;
   // double accel = MIN(0.0, car_->_accel_x);
   double act_speed = MAX(50.0, speed());
@@ -1420,11 +1427,6 @@ double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
     steer = (racesteer > steer)
       ? MIN(racesteer, steer + changelimit)
       : MAX(racesteer, steer - changelimit);
-    /* steer = MIN(racesteer,
-     *              steer + (((155.0 - speed) / 10000.0) * correctspeed));
-     * steer = MAX(racesteer,
-     *              steer - (((155.0-speed)/10000) * correctspeed));
-     */
     correct_limit_ = (steer - racesteer);  // * 1.08;
   }  // if mode=correcting
 
@@ -1496,21 +1498,36 @@ double KDriver::GetSteer(tSituation *s) {
     SetMode(CORRECTING);
   }
 
+  bool angle_ok = fabs(angle_) < 0.2f && fabs(race_steer_) < 0.4f;
+  bool steer_ok = (race_steer_ < last_steer_ + 0.05 && race_steer_ > last_steer_ - 0.05); //fabs(last_steer_ - race_steer_) < 0.05
+  double skid = (car_->_skid[0] + car_->_skid[1] + car_->_skid[2] + car_->_skid[3]) / 2;
   if (mode_ == CORRECTING
       && (last_mode_ == NORMAL
-          || (fabs(angle_) < 0.2f && fabs(race_steer_) < 0.4f
-          && fabs(last_steer_ - race_steer_) < 0.05
-          && ((fabs(car_->_trkPos.toMiddle)
+          || (angle_ok
+              && (sim_time_ > 15.0 || car_->_speed_x > 20)
+              && skid < 0.1
+              && steer_ok
+              && ((fabs(car_->_trkPos.toMiddle)
                 < car_->_trkPos.seg->width / 2 - 1.0)
-          || car_->_speed_x < 10.0) && raceline_->isOnLine()))) {
+                || car_->_speed_x < 10.0)
+              && raceline_->isOnLine()
+              )//angle_ok
+          )//last_mode
+        ) {//mode
     // we're CORRECTING & are now close enough to the raceline to
     // switch back to 'normal' mode...
     SetMode(NORMAL);
+    steer = race_steer_;
   }
 
   if (mode_ == NORMAL) {
-    steer = race_steer_;
-    last_nsa_steer_ = race_steer_ * 0.8;
+    //~ if (car_->_distRaced < 100.0 && car_->_pos == 1) {
+      //~ steer = race_steer_;//race_steer_ * 0.5;
+      //~ last_nsa_steer_ = race_steer_ * 0.8;
+    //~ } else {
+      steer = race_steer_;
+      last_nsa_steer_ = race_steer_ * 0.8;
+    //~ }
   } else {
     if (mode_ != CORRECTING) {
       correct_limit_ = 1000.0;
@@ -1663,6 +1680,9 @@ inline double KDriver::GetDistToSegEnd() const {
 
 
 void KDriver::SetMode(int newmode) {
+  //~ if (car_->_distRaced < 30.0 && car_->_pos == 1)
+    //~ newmode = NORMAL;
+
   if (mode_ != newmode) {
     if (mode_ == NORMAL || mode_ == PITTING) {
       correct_timer_ = sim_time_ + 7.0;
