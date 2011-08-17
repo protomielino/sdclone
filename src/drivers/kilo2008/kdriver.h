@@ -105,7 +105,7 @@ class KDriver {
 
   // Steering
   double GetSteer(tSituation * s);
-  double CalcSteer(double targetAngle, int rl);
+  double CalcAvoidSteer(const double targetAngle);
   double CorrectSteering(double avoidsteer, double racesteer);
   double SmoothSteering(double steercmd);
   double GetOffset();
@@ -119,6 +119,7 @@ class KDriver {
   double FilterBrakeSpeed(double brake);
   double FilterBColl(double brake);
   double FilterOverlap(double accel);
+  double FilterAccel(const double accel);
 
   // Gear/clutch
   int GetGear();
@@ -201,6 +202,7 @@ class KDriver {
   double brake_cmd_;        // brake pedal command [0..1]
   double race_steer_;       // steer command to get to raceline
   double last_steer_;       // previous steer command
+  double last_accel_;       // previous accel command
   double last_nsa_steer_;
 
   // Handling traffic

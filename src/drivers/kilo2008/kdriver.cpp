@@ -128,12 +128,11 @@ static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 #define SLOW_TRACK_LIMIT 2.4
 #define FAST_TRACK_LIMIT 4.0
 
+#define START_TIME 2.0
+
 
 KDriver::KDriver(int index) {
   INDEX = index;
-  rgt_inc_ = lft_inc_ = 0.0;
-  min_offset_ = max_offset_ = 0.0;
-  r_inverse_ = 0.0;
 }
 
 
@@ -176,7 +175,7 @@ void KDriver::drive(tSituation * s) {
     car_->_brakeCmd = GetBrake();
 
     if (car_->_brakeCmd == 0.0) {
-      car_->_accelCmd = FilterTCL(FilterTrk(FilterOverlap(GetAccel())));
+      car_->_accelCmd = FilterAccel(FilterTCL(FilterTrk(FilterOverlap(GetAccel()))));
     } else {
       car_->_accelCmd = 0.0;
       car_->_brakeCmd = FilterABS(FilterBrakeSpeed(FilterBColl(FilterBPit(GetBrake()))));
@@ -188,6 +187,7 @@ void KDriver::drive(tSituation * s) {
   //~ memcpy(car_->_msgColorCmd, colour, sizeof(car_->_msgColorCmd));
 
   last_steer_ = car_->_steerCmd;
+  last_accel_ = car_->_accelCmd;
   last_mode_ = mode_;
 }  // drive
 
@@ -332,7 +332,7 @@ double KDriver::GetOffset() {
     }
   }  // if mode_
 
-  if (sim_time_ > 2.0) {
+  if (sim_time_ > START_TIME) {
     if (my_offset_ > race_offset_) {
       my_offset_ = MAX(race_offset_,
                         my_offset_ - OVERTAKE_OFFSET_INC * incfactor / 2);
@@ -818,21 +818,17 @@ void KDriver::CheckPitStatus(tSituation *s) {
 double KDriver::FilterBColl(const double brake) {
   double ret = brake;
 
-  if (sim_time_ >= 1.5) {
+  if (sim_time_ >= START_TIME) {
     double mu = car_->_trkPos.seg->surface->kFriction;
-    for (list<Opponent>::iterator it = opponents_->begin();
-          it != opponents_->end();
-          ++it) {
-      if (it->HasState(OPP_COLL)) {  // Endangered species
-        if (BrakeDist(it->speed(), mu)
-              + MIN(1.0, 0.5 + MAX(0.0, (speed() - it->speed()) / 4))
-            > it->distance()) {  // Damn, too close, brake hard!!!
-          accel_cmd_ = 0.0;
-          ret = 1.0;
-          break;
-        }  // if BrakeDist
-      }  // if state OPP_COLL
-    }  // for it
+    Opponent *o = opponents_->GetOppByState(OPP_COLL);
+    if (o != NULL) {  // Endangered species nearby
+      if (BrakeDist(o->speed(), mu)
+          + MIN(1.0, 0.5 + MAX(0.0, (speed() - o->speed()) / 4.0))
+          > o->distance()) {  // Damn, too close, brake hard!!!
+        accel_cmd_ = 0.0;
+        ret = 1.0;
+      } // if BrakeDist
+    } //if o
   }  // if sim_time_
 
   return ret;
@@ -869,9 +865,13 @@ void KDriver::newRace(tCarElt * car, tSituation * s) {
   stuck_counter_ = 0;
   clutch_time_ = 0.0;
   old_lookahead_ = last_steer_ = last_nsa_steer_ = 0.0;
+  last_accel_ = 0.0;
   car_ = car;
   CARMASS = GfParmGetNum(car_->_carHandle, SECT_CAR,
                           PRM_MASS, NULL, 1000.0);
+  rgt_inc_ = lft_inc_ = 0.0;
+  min_offset_ = max_offset_ = 0.0;
+  r_inverse_ = 0.0;
   my_offset_ = 0.0;
   sim_time_ = correct_timer_ = 0.0;
   correct_limit_ = 1000.0;
@@ -1126,7 +1126,7 @@ double KDriver::FilterTCL_4WD() {
 double KDriver::FilterTCL(const double accel) {
   double ret = accel;
 
-  if (sim_time_ >= 3.0) {
+  if (sim_time_ >= START_TIME) {
     ret = MIN(1.0, accel);
     double accel1 = ret, accel2 = ret, accel3 = ret;
 
@@ -1304,36 +1304,30 @@ double KDriver::FilterBPit(double brake) {
 }  // FilterBPit
 
 
-double KDriver::CalcSteer(double targetAngle, int rl) {
+double KDriver::CalcAvoidSteer(const double targetAngle) {
   double rearskid = MAX(0.0,
                         MAX(car_->_skid[2], car_->_skid[3])
                         - MAX(car_->_skid[0], car_->_skid[1]))
                         + MAX(car_->_skid[2], car_->_skid[3])
                           * fabs(angle_) * 0.9;
 
-  double angle_correction = 0.0;
-  double factor = (rl ? 1.4f : (mode_ == CORRECTING ? 1.1f : 1.2f));
-  if (angle_ < 0.0)
-    angle_correction = MAX(angle_,
+  double factor = (mode_ == CORRECTING ? 1.1f : 1.2f);
+  double angle_correction = MAX(angle_,
                             MIN(0.0, angle_ / 2.0)
                               / MAX(15.0, 70.0 - car_->_speed_x) * factor);
-  else
-    angle_correction = MIN(angle_,
-                            MAX(0.0, angle_ / 2.0)
-                              / MAX(15.0, 70.0 - car_->_speed_x) * factor);
-
-  double steer_direction = targetAngle - car_->_yaw + angle_correction;
-  NORM_PI_PI(steer_direction);
+  angle_correction *= angle_ < 0.0 ? 1.0 : -1.0;
+  double steer = targetAngle - car_->_yaw + angle_correction;
+  NORM_PI_PI(steer);
 
   if (car_->_speed_x > 10.0) {
     double speedsteer = (80.0 - MIN(70.0, MAX(40.0, speed()))) /
           ((185.0 * MIN(1.0, car_->_steerLock / 0.785)) +
           (185.0 * (MIN(1.3, MAX(1.0, 1.0 + rearskid))) - 185.0));
-    if (fabs(steer_direction) > speedsteer)
-      steer_direction = MAX(-speedsteer, MIN(speedsteer, steer_direction));
+    if (fabs(steer) > speedsteer)
+      steer = MAX(-speedsteer, MIN(speedsteer, steer));
   }
 
-  double steer = steer_direction / car_->_steerLock;
+  steer /= car_->_steerLock;
 
   // smooth steering. check for separate function for this!
   if (mode_ != PITTING) {
@@ -1385,7 +1379,7 @@ double KDriver::CalcSteer(double targetAngle, int rl) {
   }
 
   return steer;
-}  // CalcSteer
+}  // CalcAvoidSteer
 
 
 double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
@@ -1397,7 +1391,8 @@ double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
         (((120.0 - speed()) / 6000)
         * (0.5 + MIN(fabs(avoidsteer), fabs(racesteer)) / 10)));
 
-  if (mode_ == CORRECTING && sim_time_ > 2.0) {
+  //TODO (kilo) check if START_TIME is enough
+  if (mode_ == CORRECTING && sim_time_ > START_TIME) {
     // move steering towards racesteer...
     if (correct_limit_ < 900.0) {
       if (steer < racesteer) {
@@ -1408,8 +1403,8 @@ double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
         steer = (correct_limit_ <= 0.0)
           ? racesteer
           : MAX(racesteer, MIN(steer, racesteer + correct_limit_));
-      }
-    }
+      }   // if steer
+    }   // if correct_limit_
 
     act_speed -= car_->_accel_x / 10;
     act_speed = MAX(55.0, MIN(150.0, act_speed + (pow(act_speed , 2) / 55.0)));
@@ -1480,15 +1475,13 @@ double KDriver::GetSteer(tSituation *s) {
 
   double targetAngle =
     atan2(target.y - car_->_pos_Y, target.x - car_->_pos_X);
-  double avoidsteer = CalcSteer(targetAngle, 0);
+  double avoidsteer = CalcAvoidSteer(targetAngle);
 
   if (mode_ == PITTING)
     return avoidsteer;
 
   targetAngle =
     atan2(race_target.y - car_->_pos_Y, race_target.x - car_->_pos_X);
-  // uncomment the following if we want to use BT steering rather than K1999
-  // race_steer_ = CalcSteer( targetAngle, 1 );
 
   if (mode_ == AVOIDING &&
      (!avoid_mode_
@@ -1633,6 +1626,7 @@ vec2f KDriver::TargetPoint() {
     n.normalize();
     t = s + static_cast<float>(arcsign) * static_cast<float>(offset) * n;
 
+    //TODO (kilo) unreachable code, mode_ != PITTING returns before
     if (mode_ != PITTING) {
       // bugfix - calculates target point a different way, thus
       // bypassing an error in the BT code that sometimes made
@@ -1885,3 +1879,19 @@ void KDriver::Unstuck() {
   car_->_brakeCmd = 0.0;   // No brakes.
   car_->_clutchCmd = 0.0;  // Full clutch (gearbox connected with engine).
 }
+
+
+/**
+ * FilterAccel
+ * Avoids too hard throttle surges.
+ *
+ * @param[in] accel Original throttle command
+ * @return Limited throttle value
+ */
+double KDriver::FilterAccel(const double accel) {
+  double ret = accel;
+  if (accel > last_accel_ + 0.05)
+    ret = MIN(1.0, last_accel_ + 0.05);
+  return ret;
+}   // FilterAccel
+
