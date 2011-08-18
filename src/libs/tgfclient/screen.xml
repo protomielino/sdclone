@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
 
-<params name="Screen" version="1.6">
+<params name="Screen" version="1.7">
 
   <section name="Validated Screen Properties">
 
@@ -233,6 +233,13 @@
         <attnum name="alpha" val="1"/>
       </section>
 
+      <section name="progress outline color">
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="1"/>
+      </section>
+
     </section>
 
     <section name="tip">
@@ -244,18 +251,18 @@
     </section>
 
     <section name="editbox">
-      <attnum name="v-padding" val="2"/>
-      <attnum name="h-padding" val="10"/>
+      <attnum name="v padding" val="2"/>
+      <attnum name="h padding" val="10"/>
     </section>
 
     <section name="text button">
-      <attnum name="v-padding" val="5"/>
-      <attnum name="h-padding" val="10"/>
+      <attnum name="v padding" val="5"/>
+      <attnum name="h padding" val="10"/>
     </section>
 
     <section name="image button">
-      <attnum name="v-padding" val="0"/>
-      <attnum name="h-padding" val="0"/>
+      <attnum name="v padding" val="0"/>
+      <attnum name="h padding" val="0"/>
     </section>
 
   </section>

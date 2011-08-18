@@ -163,8 +163,6 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
     scrollist->onSelect = onSelect;
 
     switch (scrollBarPos) {
-		case GFUI_SB_NONE:
-			break;
 		case GFUI_SB_RIGHT:
 			scrollist->scrollBar =
 				GfuiScrollBarCreate(scr, x + width, y, height, scrollBarWidth,
@@ -176,6 +174,9 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
 				GfuiScrollBarCreate(scr, x - scrollBarWidth, y, height, scrollBarWidth,
 									GFUI_VERT_SCROLLBAR, 
 									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
+			break;
+		case GFUI_SB_NONE:
+		default:
 			break;
     }
 	

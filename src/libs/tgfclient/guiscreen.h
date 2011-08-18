@@ -98,8 +98,8 @@
 
 #define GFSCR_SECT_EDITBOX	"editbox"
 
-#define GFSCR_ATT_HPADDING			"h-padding"
-#define GFSCR_ATT_VPADDING			"v-padding"
+#define GFSCR_ATT_HPADDING			"h padding"
+#define GFSCR_ATT_VPADDING			"v padding"
 
 #define GFSCR_SECT_TEXTBUTTON	"text button"
 

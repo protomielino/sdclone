@@ -215,7 +215,7 @@ gfuiMenuGetBoolean(const char* pszValue, bool bDefault)
 static bool 
 getControlBoolean(void* hparm, const char* pszPath, const char* pszFieldName, bool bDefault)
 {
-	return gfuiMenuGetBoolean(GfParmGetStr(hparm, pszPath, pszFieldName, 0));
+	return gfuiMenuGetBoolean(GfParmGetStr(hparm, pszPath, pszFieldName, 0), bDefault);
 }
 
 static GfuiColor
@@ -231,8 +231,8 @@ createStaticImage(void* hscr, void* hparm, const char* pszName)
 
 	const int x = (int)GfParmGetNum(hparm, pszName, GFMNU_ATTR_X, NULL, 0.0);
 	const int y = (int)GfParmGetNum(hparm, pszName, GFMNU_ATTR_Y, NULL, 0.0);
-	const int w = (int)GfParmGetNum(hparm, pszName, GFMNU_ATTR_WIDTH, NULL, 0.0);
-	const int h = (int)GfParmGetNum(hparm, pszName, GFMNU_ATTR_HEIGHT, NULL, 0.0);
+	const int w = (int)GfParmGetNum(hparm, pszName, GFMNU_ATTR_WIDTH, NULL, 100.0);
+	const int h = (int)GfParmGetNum(hparm, pszName, GFMNU_ATTR_HEIGHT, NULL, 100.0);
 
 	const bool canDeform = getControlBoolean(hparm, pszName, GFMNU_ATTR_CAN_DEFORM, true);
 
@@ -754,8 +754,8 @@ GfuiMenuCreateScrollListControl(void* hscr, void* hparm, const char* pszName,voi
 
 	const int x = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_X, NULL, 0.0);
 	const int y = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_Y, NULL, 0.0);
-	const int w = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_WIDTH, NULL, 0.0);
-	const int h = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_HEIGHT, NULL, 0.0);
+	const int w = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_WIDTH, NULL, 100.0);
+	const int h = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_HEIGHT, NULL, 100.0);
         
 	const char* pszFontName = GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_FONT, "");
 	const int font = gfuiMenuGetFontId(pszFontName);
@@ -812,7 +812,7 @@ GfuiMenuCreateCheckboxControl(void* hscr, void* hparm, const char* pszName,void*
 	    imageheight = 30; // TODO: Get default from screen.xml
 
     const bool bChecked =
-		getControlBoolean(hparm, strControlPath.c_str(), GFMNU_ATTR_CHECKED, true);
+		getControlBoolean(hparm, strControlPath.c_str(), GFMNU_ATTR_CHECKED, false);
 
 	const char* pszTip = GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_TIP, "");
 	
@@ -861,16 +861,21 @@ GfuiMenuCreateProgressbarControl(void* hscr, void* hparm, const char* pszName)
 	const char* pszImage =
 		GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_IMAGE, "data/img/progressbar.png");
 	const char* pszBgImage =
-		GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_BG_IMAGE, "data/img/progressbackground.png");
+		GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_BG_IMAGE, "data/img/progressbar-bg.png");
 	
+	const float* aOutlineColor = 0;
+	const GfuiColor color = getControlColor(hparm, strControlPath.c_str(), GFMNU_ATTR_COLOR);
+	if (color.alpha)
+		aOutlineColor = color.toFloatRGBA();
+
 	const int x = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_X, NULL, 0.0);
 	const int y = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_Y, NULL, 0.0);
-	const int w = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_WIDTH, NULL, 0.0);
-	const int h = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_HEIGHT, NULL, 0.0);
+	const int w = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_WIDTH, NULL, 100.0);
+	const int h = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_HEIGHT, NULL, 20.0);
 	
 	const float min = GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_MIN, NULL, 0.0);
 	const float max = GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_MAX, NULL, 100.0);
-	const float value = GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_VALUE, NULL, 100.0);
+	const float value = GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_VALUE, NULL, 50.0);
 	
 	const char* pszTip = GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_TIP, "");
 	
@@ -889,7 +894,7 @@ GfuiMenuCreateProgressbarControl(void* hscr, void* hparm, const char* pszName)
 		onFocusLost = onFocusLostHideTip;
 	}
 
-	int id = GfuiProgressbarCreate(hscr, x, y, w, h, pszBgImage, pszImage,
+	int id = GfuiProgressbarCreate(hscr, x, y, w, h, pszBgImage, pszImage, aOutlineColor,
 								   min, max, value, userDataOnFocus, onFocus, onFocusLost);
 	
 	return id;

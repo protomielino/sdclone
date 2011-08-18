@@ -28,8 +28,9 @@
     @param	y	Position of the bottom of the image on the screen
     @param	w	Width of the image on the screen
     @param	h	Height of the image on the screen
-    @param	pszprogressbackimg	Filename on the image use for behind progress bar (png)
-    @param	pszprogressbarimg	Filename on the image use for progress bar will be scaled bar (png)
+    @param	pszBgImg	Filename on the image use for behind progress bar (png/jpeg)
+    @param	pszImg	Filename on the image use for progress bar will be scaled bar (png/jpeg)
+    @param	outlineColor	Color of the outline
     @param	min	Min value
     @param	max	Max value
     @param	value	Initial value
@@ -41,7 +42,8 @@
     @warning	the image must be square and its size must be a power of 2.
 */
 int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
-						  const char *pszProgressbackImg, const char *progressbarimg,
+						  const char *pszBgImg, const char *pszImg,
+						  const float* outlineColor,
 						  float min, float max, float value, 
 						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -57,11 +59,19 @@ int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
 
 	progress = &(object->u.progressbar);
 
-	progress->progressbarimage = GfTexReadTexture(progressbarimg);
-	if (!progress->progressbarimage) {
+	progress->fgImage = GfTexReadTexture(pszImg);
+	if (!progress->fgImage) {
 		free(object);
 		return -1;
 	}
+
+	progress->bgImage = GfTexReadTexture(pszBgImg);
+	if (!progress->bgImage) {
+		free(object);
+		return -1;
+	}
+
+    progress->outlineColor = GfuiColor::build(outlineColor ? outlineColor : gfuiColors[GFUI_PROGRESSCOLOR]);
 
 	progress->min = min;
 	progress->max = max;
@@ -114,7 +124,7 @@ gfuiReleaseProgressbar(tGfuiObject *obj)
 	tGfuiProgressbar *progress;
 
 	progress = &(obj->u.progressbar);
-	GfTexFreeTexture(progress->progressbarimage);
+	GfTexFreeTexture(progress->fgImage);
 	freez(progress->userDataOnFocus);
 
 	free(obj);
@@ -127,36 +137,50 @@ gfuiDrawProgressbar(tGfuiObject *obj)
 
 	progress = &(obj->u.progressbar);
 
-    glColor4f(1.0,1.0,1.0,0.25);
-    glBegin(GL_QUADS);
-    glVertex2i(obj->xmin, obj->ymin);
-    glVertex2i(obj->xmin, obj->ymax);
-    glVertex2i(obj->xmax, obj->ymax);
-    glVertex2i(obj->xmax, obj->ymin);
-    glEnd();
+    // glColor4f(1.0, 1.0, 1.0, 0.25);
+    // glBegin(GL_QUADS);
+    // glVertex2i(obj->xmin, obj->ymin);
+    // glVertex2i(obj->xmin, obj->ymax);
+    // glVertex2i(obj->xmax, obj->ymax);
+    // glVertex2i(obj->xmax, obj->ymin);
+    // glEnd();
 
-	//calculate and draw progress bar
-	const float width = obj->xmax- obj->xmin;
+	// Calculate and draw progress bar
+	const float width = obj->xmax - obj->xmin;
 	const float range = progress->max - progress->min;
 	const float umax = (progress->value - progress->min) / range;
-	const float endx = obj->xmin+(width*umax);
+	const float endx = obj->xmin + width*umax;
 
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-	glBindTexture(GL_TEXTURE_2D,progress->progressbarimage );
+
+	// Foreground image from min to value
+	glBindTexture(GL_TEXTURE_2D, progress->fgImage);
 
     glBegin(GL_TRIANGLE_STRIP);
-	glColor4f(1.0, 1.0, 1.0, 1.0);
+	//glColor4f(1.0, 1.0, 1.0, 1.0);
 	glTexCoord2f(0.0, 0.0); glVertex2f(obj->xmin, obj->ymin);
 	glTexCoord2f(0.0, 1.0); glVertex2f(obj->xmin, obj->ymax);
 	glTexCoord2f(umax, 0.0); glVertex2f(endx, obj->ymin);
 	glTexCoord2f(umax, 1.0); glVertex2f(endx, obj->ymax);
     glEnd();
+
+	// Background image from value to max
+	glBindTexture(GL_TEXTURE_2D, progress->bgImage);
+
+    glBegin(GL_TRIANGLE_STRIP);
+	//glColor4f(1.0, 1.0, 1.0, 1.0);
+	glTexCoord2f(umax, 0.0); glVertex2f(endx, obj->ymin);
+	glTexCoord2f(umax, 1.0); glVertex2f(endx, obj->ymax);
+	glTexCoord2f(1.0, 0.0); glVertex2f(obj->xmax, obj->ymin);
+	glTexCoord2f(1.0, 1.0); glVertex2f(obj->xmax, obj->ymax);
+    glEnd();
+
     glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
 
-	//draw outline
-	glColor4f(1.0,0.0,0.0,1.0);
+	// Draw outline
+    glColor4fv(progress->outlineColor.toFloatRGBA());
 	glBegin(GL_LINE_STRIP);
     glVertex2i(obj->xmin, obj->ymin);
     glVertex2i(obj->xmin, obj->ymax);

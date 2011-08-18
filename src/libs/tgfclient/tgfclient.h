@@ -411,7 +411,7 @@ TGFCLIENT_API void GfuiSetTipPosition(int x,int y);
 TGFCLIENT_API int GfuiTipCreate(void* scr, const char* text, int maxlen);
 
 TGFCLIENT_API void GfuiLabelSetText(void* scr, int id, const char* text);
-TGFCLIENT_API void GfuiLabelSetColor(void* scr, int id, const float*  colorPtr);
+TGFCLIENT_API void GfuiLabelSetColor(void* scr, int id, const float* color);
 
 /* Buttons */
 #define GFUI_BTNSZ      300
@@ -439,6 +439,7 @@ TGFCLIENT_API void GfuiButtonSetImage(void* scr, int id, int x, int y, int w, in
 /* Progress bars */
 TGFCLIENT_API int GfuiProgressbarCreate(void* scr, int x, int y, int w, int h,
 										const char* pszProgressbackImg, const char* progressbarimg,
+										const float* outlineColor,
 										float min, float max, float value, 
 										void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 TGFCLIENT_API void GfuiProgressbarSetValue(void* scr, int id, float value);

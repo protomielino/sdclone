@@ -25,7 +25,7 @@
 
 
 // Predefined colors (array and indexes).
-#define GFUI_COLORNB	23
+#define GFUI_COLORNB	24
 extern float	gfuiColors[GFUI_COLORNB][4];
 
 #define GFUI_BGCOLOR			 0
@@ -51,6 +51,7 @@ extern float	gfuiColors[GFUI_COLORNB][4];
 #define GFUI_EDITDISABLED		20
 #define GFUI_EDITCURSORCLR		21
 #define GFUI_BASECOLORBGIMAGE	22
+#define GFUI_PROGRESSCOLOR		23
 
 #define GFUI_IMAGE		200
 
@@ -230,7 +231,10 @@ typedef struct
 typedef struct
 {
 	void *scr;
-	GLuint progressbarimage;
+	GLuint fgImage;
+	GLuint bgImage;
+    GfuiColor outlineColor;
+
 	float min;
 	float max;
 	float value;

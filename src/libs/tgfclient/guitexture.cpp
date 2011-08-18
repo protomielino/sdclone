@@ -614,7 +614,7 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 	return 0;
 }
 
-/** Read a PNG RGBA 8888 / JPEG RGB 888 image into a RGBA 888 OpenGL 2D texture.
+/** Read a PNG RGBA 8888 / JPEG RGB 888 image into a RGBA 8888 OpenGL 2D texture.
     @ingroup	img
     @param	filename	file name of the image
     @param	pWidth	read image original width (pixels)
