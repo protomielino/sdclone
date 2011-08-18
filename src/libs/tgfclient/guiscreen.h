@@ -82,6 +82,7 @@
 #define GFSCR_ELT_EDITDISABLED	"disabled editbox"
 #define GFSCR_ELT_EDITCURSORCLR	"editbox cursor color"
 #define GFSCR_ELT_BASECOLORBGIMAGE "base color background image"
+#define GFSCR_ELT_PROGRESSCOLOR "progress outline color"
 
 #define GFSCR_ATTR_RED		"red"
 #define GFSCR_ATTR_GREEN	"green"
