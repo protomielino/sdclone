@@ -100,11 +100,9 @@ rmOnSelectRaceMan(void *pvRaceManTypeIndex)
 
 	if (pSelRaceMan)
 	{
+		// Give the selected race manager to the race engine.
 		LmRaceEngine().selectRaceman(pSelRaceMan);
 		
-		// (Re-)initialize the currrent race configuration from the selected race manager.
-		LmRaceEngine().race()->load(pSelRaceMan);
-
 		// Start the race configuration menus sequence.
 		LmRaceEngine().configureRace(/* bInteractive */ true);
 	}

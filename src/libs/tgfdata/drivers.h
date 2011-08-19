@@ -124,6 +124,9 @@ public:
 	// Accessor to the unique instance of the singleton.
 	static GfDrivers* self();
 
+	// Reload drivers data from files.
+	void reload();
+
 	unsigned getCount() const;
  	const std::vector<std::string>& getTypes() const;
 
@@ -140,7 +143,10 @@ protected:
 	// Protected constructor and destructor : clients can not use them.
 	GfDrivers();
 	~GfDrivers();
-	
+
+	// Clear all data.
+	void clear();
+
 protected:
 
 	// The singleton itself.

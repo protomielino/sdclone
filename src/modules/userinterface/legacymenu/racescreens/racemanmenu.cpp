@@ -46,10 +46,13 @@
 
 
 // Raceman menu.
-static void	*ScrHandle = NULL;
+static void	*ScrHandle = 0;
 
 // Data for the race configuration menus.
-static tRmFileSelect   fs;
+static tRmFileSelect FileSelectData;
+
+// Flag to know if the Player Config menu has been open from here.
+static bool PlayerConfigOpen = false;
 
 // Menu control Ids
 static int TrackTitleLabelId;
@@ -172,6 +175,20 @@ rmOnActivate(void * /* dummy */)
 {
 	GfLogTrace("Entering Race Manager menu\n");
 
+	// If we are coming back from the Player Config menu, update the race data
+	// (some human drivers = players may have appeared, disappeared or been renamed).
+	if (PlayerConfigOpen)
+	{
+		// Reload the race from disk.
+		GfRace* pRace = LmRaceEngine().race();
+		GfRaceManager* pRaceMan = pRace->getManager();
+		void* hparmResults = pRace->getResultsDescriptorHandle();
+		pRace->load(pRaceMan, hparmResults);
+
+		// End of "back from Player Config menu" in any case.
+		PlayerConfigOpen = false;
+	}
+
 	// Update GUI.
 	rmOnRaceDataChanged();
 }
@@ -258,6 +275,9 @@ rmOnPlayerConfig(void * /* dummy */)
 	   because the previous menu has to be saved (ESC, Back) and because it can be this menu,
 	   as well as the Main menu */
 	GfuiScreenActivate(PlayerConfigMenuInit(ScrHandle));
+
+	// Keep this in mind for when we go back here.
+	PlayerConfigOpen = true;
 }
 
 static void
@@ -265,14 +285,14 @@ rmOnLoadRaceFromConfigFile(void *pPrevMenu)
 {
 	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
 	
-	fs.title = pRaceMan->getName();
-	fs.mode = RmFSModeLoad;
-	fs.path = pRaceMan->getSavedConfigsDir();
-	fs.select = rmLoadRaceFromConfigFile;
-	fs.prevScreen = pPrevMenu;
+	FileSelectData.title = pRaceMan->getName();
+	FileSelectData.mode = RmFSModeLoad;
+	FileSelectData.path = pRaceMan->getSavedConfigsDir();
+	FileSelectData.select = rmLoadRaceFromConfigFile;
+	FileSelectData.prevScreen = pPrevMenu;
 
 	// Fire the file selection menu.
-	GfuiScreenActivate(RmFileSelect(&fs));
+	GfuiScreenActivate(RmFileSelect(&FileSelectData));
 }
 
 static void
@@ -280,14 +300,14 @@ rmOnLoadRaceFromResultsFile(void *pPrevMenu)
 {
 	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
 	
-	fs.title = pRaceMan->getName();
-	fs.mode = RmFSModeLoad;
-	fs.path = pRaceMan->getResultsDir();
-	fs.select = rmLoadRaceFromResultsFile;
-	fs.prevScreen = pPrevMenu;
+	FileSelectData.title = pRaceMan->getName();
+	FileSelectData.mode = RmFSModeLoad;
+	FileSelectData.path = pRaceMan->getResultsDir();
+	FileSelectData.select = rmLoadRaceFromResultsFile;
+	FileSelectData.prevScreen = pPrevMenu;
 
 	// Fire the file selection menu.
-	GfuiScreenActivate(RmFileSelect(&fs));
+	GfuiScreenActivate(RmFileSelect(&FileSelectData));
 }
 
 static void
@@ -296,18 +316,18 @@ rmOnSaveRaceToConfigFile(void *pPrevMenu)
 	const GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
 	
 	// Fill-in file selection descriptor
-	fs.title = pRaceMan->getName();
-	fs.prevScreen = pPrevMenu;
-	fs.mode = RmFSModeSave;
+	FileSelectData.title = pRaceMan->getName();
+	FileSelectData.prevScreen = pPrevMenu;
+	FileSelectData.mode = RmFSModeSave;
 
-	fs.path = GfLocalDir();
-	fs.path += "config/raceman/";
-	fs.path += pRaceMan->getId();
+	FileSelectData.path = GfLocalDir();
+	FileSelectData.path += "config/raceman/";
+	FileSelectData.path += pRaceMan->getId();
 
-	fs.select = rmSaveRaceToConfigFile;
+	FileSelectData.select = rmSaveRaceToConfigFile;
 
 	// Fire the file selection menu.
-	GfuiScreenActivate(RmFileSelect(&fs));
+	GfuiScreenActivate(RmFileSelect(&FileSelectData));
 }
 
 static void

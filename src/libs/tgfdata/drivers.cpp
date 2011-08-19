@@ -62,17 +62,28 @@ GfDrivers *GfDrivers::self()
 
 GfDrivers::~GfDrivers()
 {
+	clear();
+}
+
+void GfDrivers::clear()
+{
+	_pPrivate->mapDriversByKey.clear();
+	_pPrivate->vecTypes.clear();
+	_pPrivate->vecCarCategoryIds.clear();
+
 	std::vector<GfDriver*>::const_iterator itDriver;
 	for (itDriver = _pPrivate->vecDrivers.begin();
 		 itDriver != _pPrivate->vecDrivers.end(); itDriver++)
 		delete *itDriver;
+	_pPrivate->vecDrivers.clear();
 }
 
-GfDrivers::GfDrivers()
+void GfDrivers::reload()
 {
-	_pPrivate = new GfDrivers::Private;
-
-	// Load robot modules from the "drivers" installed folder.
+	// Clear all.
+	clear();
+	
+	// (Re)Load robot modules from the "drivers" installed folder.
 	std::string strDriversDirName(GfLibDir());
 	strDriversDirName += "drivers";
 
@@ -101,12 +112,14 @@ GfDrivers::GfDrivers()
 		std::ostringstream ossRobotFileName;
 		ossRobotFileName << GfLocalDir() << "drivers/" << strModName
 						 << '/' << strModName << PARAMEXT;
-		void *hparmRobot = GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD);
+		void *hparmRobot =
+			GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 		if (!hparmRobot)
 		{
 			ossRobotFileName.str("");
 			ossRobotFileName << "drivers/" << strModName << '/' << strModName << PARAMEXT;
-			hparmRobot = GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD);
+			hparmRobot =
+				GfParmReadFile(ossRobotFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 		}
 		if (!hparmRobot)
 		{
@@ -180,8 +193,7 @@ GfDrivers::GfDrivers()
 		}
 		
 		// Close driver module descriptor file if open
-		if (hparmRobot)
-			GfParmReleaseHandle(hparmRobot);
+		GfParmReleaseHandle(hparmRobot);
 		
 	} while (pCurModule != lstDriverModules);
 
@@ -194,6 +206,13 @@ GfDrivers::GfDrivers()
 
 	// Trace what we got.
 	print();
+}
+
+GfDrivers::GfDrivers()
+{
+	_pPrivate = new GfDrivers::Private;
+
+	reload();
 }
 
 unsigned GfDrivers::getCount() const
@@ -235,6 +254,7 @@ void GfDrivers::print() const
 	GfLogTrace("Driver base : %d types, %d car categories, %d drivers\n",
 			   _pPrivate->vecTypes.size(), _pPrivate->vecCarCategoryIds.size(),
 			   _pPrivate->vecDrivers.size());
+	
 	std::vector<std::string>::const_iterator itType;
 	for (itType = _pPrivate->vecTypes.begin(); itType != _pPrivate->vecTypes.end(); itType++)
 	{

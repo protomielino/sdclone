@@ -129,6 +129,9 @@ ReRaceSelectRaceman(GfRaceManager* pRaceMan)
 	// Re-init. race engine info about the race manager (= the race mode / type / class).
 	ReInfo->_reName = pRaceMan->getName().c_str();
 	ReInfo->_reFilename = pRaceMan->getId().c_str();
+
+	// (Re-)initialize the currrent race configuration from the selected race manager.
+	PReRace->load(pRaceMan);
 }
 
 // Start configuring the race
