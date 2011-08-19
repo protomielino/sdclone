@@ -1619,7 +1619,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
     iTimer = 0;
   else
     //Display the line
-    GfuiDrawString(st.c_str(), grWhite, GFUI_FONT_MEDIUM_C, 5 - offset, BOTTOM_ANCHOR);
+    GfuiDrawString(st.c_str(), grWhite, GFUI_FONT_MEDIUM_C, leftAnchor + 5 - offset, BOTTOM_ANCHOR);
 }//grDispLeaderBoardScrollLine
 
 
