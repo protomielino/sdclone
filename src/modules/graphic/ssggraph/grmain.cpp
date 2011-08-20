@@ -43,6 +43,9 @@
 #include "grtracklight.h"
 #include "grbackground.h"
 
+// Tool for debugging the car texturing mode (see grmultitexstate.cpp)
+const int grCarTexturingModes = 4;
+int grCarTexturingMode = 0;
 
 int grMaxTextureUnits = 0;
 
@@ -352,6 +355,13 @@ grSelectTrackMap(void * /* vp */)
 }
 
 static void
+grChangeCarTexturingMode(void * /* vp */)
+{
+	grCarTexturingMode = (grCarTexturingMode + 1) % grCarTexturingModes;
+	GfLogDebug("Car texturing mode = %d\n", grCarTexturingMode);
+}
+
+static void
 grPrevCar(void * /* dummy */)
 {
     grGetCurrentScreen()->selectPrevCar();
@@ -433,7 +443,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
     GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)GR_SPLIT_ARR, grSplitScreen, NULL);
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
-    GfuiAddKey(screen, 'm',            "Track Maps",     (void*)0, grSelectTrackMap, NULL);
+    GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);
+
+	GfuiAddKey(screen, GFUIK_RETURN,   "Change Car Texturing Mode",  (void*)0, grChangeCarTexturingMode, NULL);
 
     grAdaptScreenSize();
 
