@@ -174,7 +174,11 @@ void KDriver::drive(tSituation * s) {
     car_->_steerCmd = GetSteer(s);
     car_->_gearCmd = GetGear();
     CalcSpeed();
-    car_->_brakeCmd = GetBrake();
+    car_->_brakeCmd = FilterABS(
+                        FilterBrakeSpeed(
+                          FilterBColl(
+                            FilterBPit(
+                              GetBrake()))));
 
     if (car_->_brakeCmd == 0.0) {
       car_->_accelCmd = FilterAccel(
@@ -184,11 +188,6 @@ void KDriver::drive(tSituation * s) {
                                 GetAccel()))));
     } else {
       car_->_accelCmd = 0.0;
-      car_->_brakeCmd = FilterABS(
-                          FilterBrakeSpeed(
-                            FilterBColl(
-                              FilterBPit(
-                                GetBrake()))));
     }
     car_->_clutchCmd = GetClutch();
   }  // if IsStuck
