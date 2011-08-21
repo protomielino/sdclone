@@ -161,6 +161,14 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 #define GFUI_TPL_FOCUSCOLOR   (const float*)-1
 #define GFUI_TPL_PUSHEDCOLOR  (const float*)-1
 
+// Some keyboard key modifier codes, to avoid SDLK constants everywhere.
+// Note: Don't care with the L here, for tgfclient, it means L or R (no difference).
+#define GFUIM_NONE       KMOD_NONE
+#define GFUIM_CTRL       KMOD_LCTRL
+#define GFUIM_SHIFT      KMOD_LSHIFT
+#define GFUIM_ALT        KMOD_LALT
+#define GFUIM_META       KMOD_LMETA
+
 // Some keyboard key / special key codes, to avoid SDLK constants everywhere.
 #define GFUIK_BACKSPACE	SDLK_BACKSPACE
 #define GFUIK_TAB	SDLK_TAB
@@ -261,6 +269,8 @@ TGFCLIENT_API void GfuiScreenDeactivate(void);
 TGFCLIENT_API void* GfuiHookCreate(void *userDataOnActivate, tfuiCallback onActivate);
 TGFCLIENT_API void GfuiHookRelease(void *hook);
 TGFCLIENT_API void GfuiAddKey(void *scr, int key, const char *descr,
+							  void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
+TGFCLIENT_API void GfuiAddKey(void *scr, int key, int modifier, const char *descr,
 							  void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 TGFCLIENT_API void GfuiRegisterKey(int key, const char *descr,
 								   void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);

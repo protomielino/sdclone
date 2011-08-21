@@ -404,9 +404,7 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 	
 	/* User-preempted key */
 	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_DOWN)) 
-	{
 		return;
-	}
 	
 	/* Now look at the user's defined keys */
 	if (GfuiScreen->userKeys) {
@@ -414,7 +412,7 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-			if (curKey->key == key && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0))
+			if (curKey->key == key && curKey->modifier == modifier)
 			{
 				if (curKey->onPress)
 					curKey->onPress(curKey->userData);
@@ -422,7 +420,8 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 			}
 		} while (curKey != GfuiScreen->userKeys);
 	}
-	
+
+	// Edit-box management (TODO: Should at least partly have priority on user's keys).
 	obj = GfuiScreen->hasFocus;
 	if (obj) 
 	{
@@ -433,6 +432,7 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 				break;
 		}
 	}
+
 	GfuiApp().eventLoop().postRedisplay();
 }
 
@@ -443,9 +443,7 @@ gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 	
 	/* User-preempted key */
 	if (GfuiScreen->onKeyAction && GfuiScreen->onKeyAction(key, modifier, GFUI_KEY_UP)) 
-	{
 		return;
-	}
 	
 	/* Now look at the user's defined keys */
 	if (GfuiScreen->userKeys) 
@@ -454,7 +452,7 @@ gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-			if (curKey->key == key && (curKey->modifier == 0 || (curKey->modifier & modifier) != 0)) 
+			if (curKey->key == key && curKey->modifier == modifier) 
 			{
 				if (curKey->onRelease)
 					curKey->onRelease(curKey->userData);
@@ -781,6 +779,7 @@ GfuiRegisterKey(int key, const char *descr, void *userData,
     @ingroup	gui
     @param	scr		Target screen
     @param	key		Key code : the ASCII code when possible (for 'a', '_', '[' ...), or else the tgfclient::GFUIK_* value for special keys) ; Always in [0, GFUIK_MAX]
+    @param	modifier	Key modifiers (GFUIM_NONE or GFUIM_XX|GFUIM_YY|...)
     @param	descr		Description for help screen
     @param	userData	Parameter to the callback function
     @param	onKeyPressed	Callback function
@@ -790,120 +789,149 @@ void
 GfuiAddKey(void *scr, int key, const char *descr, void *userData,
 		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
-	// TODO: Support for modifier ?
-	tGfuiKey	*curKey;
-	tGfuiScreen	*screen = (tGfuiScreen*)scr;
-	char	buf[32];
+	GfuiAddKey(scr, key, GFUIM_NONE, descr, userData, onKeyPressed, onKeyReleased);
+}
 
+void
+GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
+		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
+{
 	// Allocate a key entry for the key list
-	curKey = (tGfuiKey*)calloc(1, sizeof(tGfuiKey));
+	tGfuiKey* curKey = (tGfuiKey*)calloc(1, sizeof(tGfuiKey));
 	curKey->key = key;
+	curKey->modifier = modifier;
 	curKey->userData = userData;
 	curKey->onPress = onKeyPressed;
 	curKey->onRelease = onKeyReleased;
 
-	// Set the key description and name.
+	// Set the key description.
 	curKey->descr = descr ? strdup(descr) : strdup("");
 
+	// Set the key user-friendly name.
+	// 1) The modifiers (see GfEventLoop : we never get a KMOD_RXX here, only KMOD_LXX)
+	char pszModString[32];
+	pszModString[0] = '\0';
+	if (modifier)
+	{
+		if (modifier & GFUIM_SHIFT)
+			strncat(pszModString, "Shift-", sizeof(pszModString));
+		if (modifier & GFUIM_CTRL)
+			strncat(pszModString, "Ctrl-", sizeof(pszModString));
+		if (modifier & GFUIM_ALT)
+			strncat(pszModString, "Alt-", sizeof(pszModString));
+		if (modifier & GFUIM_META)
+			strncat(pszModString, "Meta-", sizeof(pszModString));
+	}
+
+	// 2) The key itself
+	char pszKeyString[16];
 	switch(key) {
 		case GFUIK_BACKSPACE:
-			curKey->name = strdup("Backspace");
+			strncpy(pszKeyString, "Backspace", sizeof(pszKeyString));
 			break;
 		case GFUIK_TAB:
-			curKey->name = strdup("Tab");
+			strncpy(pszKeyString, "Tab", sizeof(pszKeyString));
 			break;
 		case GFUIK_RETURN:
-			curKey->name = strdup("Enter");
+			strncpy(pszKeyString, "Enter", sizeof(pszKeyString));
 			break;
 		case GFUIK_ESCAPE:
-			curKey->name = strdup("Escape");
+			strncpy(pszKeyString, "Escape", sizeof(pszKeyString));
 			break;
 		case GFUIK_SPACE:
-			curKey->name = strdup("Space");
+			strncpy(pszKeyString, "Space", sizeof(pszKeyString));
 			break;
 		case GFUIK_F1:
-			curKey->name = strdup("F1");
+			strncpy(pszKeyString, "F1", sizeof(pszKeyString));
 			break;
 		case GFUIK_F2:
-			curKey->name = strdup("F2");
+			strncpy(pszKeyString, "F2", sizeof(pszKeyString));
 			break;
 		case GFUIK_F3:
-			curKey->name = strdup("F3");
+			strncpy(pszKeyString, "F3", sizeof(pszKeyString));
 			break;
 		case GFUIK_F4:
-			curKey->name = strdup("F4");
+			strncpy(pszKeyString, "F4", sizeof(pszKeyString));
 			break;
 		case GFUIK_F5:
-			curKey->name = strdup("F5");
+			strncpy(pszKeyString, "F5", sizeof(pszKeyString));
 			break;
 		case GFUIK_F6:
-			curKey->name = strdup("F6");
+			strncpy(pszKeyString, "F6", sizeof(pszKeyString));
 			break;
 		case GFUIK_F7:
-			curKey->name = strdup("F7");
+			strncpy(pszKeyString, "F7", sizeof(pszKeyString));
 			break;
 		case GFUIK_F8:
-			curKey->name = strdup("F8");
+			strncpy(pszKeyString, "F8", sizeof(pszKeyString));
 			break;
 		case GFUIK_F9:
-			curKey->name = strdup("F9");
+			strncpy(pszKeyString, "F9", sizeof(pszKeyString));
 			break;
 		case GFUIK_F10:
-			curKey->name = strdup("F10");
+			strncpy(pszKeyString, "F10", sizeof(pszKeyString));
 			break;
 		case GFUIK_F11:
-			curKey->name = strdup("F11");
+			strncpy(pszKeyString, "F11", sizeof(pszKeyString));
 			break;
 		case GFUIK_F12:
-			curKey->name = strdup("F12");
+			strncpy(pszKeyString, "F12", sizeof(pszKeyString));
 			break;
 		case GFUIK_LEFT:
-			curKey->name = strdup("Left Arrow");
+			strncpy(pszKeyString, "Left Arrow", sizeof(pszKeyString));
 			break;
 		case GFUIK_UP:
-			curKey->name = strdup("Up Arrow");
+			strncpy(pszKeyString, "Up Arrow", sizeof(pszKeyString));
 			break;
 		case GFUIK_RIGHT:
-			curKey->name = strdup("Right Arrow");
+			strncpy(pszKeyString, "Right Arrow", sizeof(pszKeyString));
 			break;
 		case GFUIK_DOWN:
-			curKey->name = strdup("Down Arrow");
+			strncpy(pszKeyString, "Down Arrow", sizeof(pszKeyString));
 			break;
 		case GFUIK_PAGEUP:
-			curKey->name = strdup("Page Up");
+			strncpy(pszKeyString, "Page Up", sizeof(pszKeyString));
 			break;
 		case GFUIK_PAGEDOWN:
-			curKey->name = strdup("Page Down");
+			strncpy(pszKeyString, "Page Down", sizeof(pszKeyString));
 			break;
 		case GFUIK_HOME:
-			curKey->name = strdup("Home");
+			strncpy(pszKeyString, "Home", sizeof(pszKeyString));
 			break;
 		case GFUIK_END:
-			curKey->name = strdup("End");
+			strncpy(pszKeyString, "End", sizeof(pszKeyString));
 			break;
 		case GFUIK_INSERT:
-			curKey->name = strdup("Insert");
+			strncpy(pszKeyString, "Insert", sizeof(pszKeyString));
 			break;
 		case GFUIK_DELETE:
-			curKey->name = strdup("Delete");
+			strncpy(pszKeyString, "Delete", sizeof(pszKeyString));
 			break;
 		case GFUIK_CLEAR:
-			curKey->name = strdup("Clear");
+			strncpy(pszKeyString, "Clear", sizeof(pszKeyString));
 			break;
 		case GFUIK_PAUSE:
-			curKey->name = strdup("Pause");
+			strncpy(pszKeyString, "Pause", sizeof(pszKeyString));
 			break;
 		default:
 			if (key >= ' ' && key < 127)
-				sprintf(buf, "%c", (char)key);
+				snprintf(pszKeyString, sizeof(pszKeyString), "%c", (char)key);
 			else
-				sprintf(buf, "0x%X", key);
-			curKey->name = strdup(buf);
+				snprintf(pszKeyString, sizeof(pszKeyString), "0x%X", key);
 			break;
 	}
 
+	// 3) Concatenate the modifiers string and the key string
+	curKey->name = (char*)malloc((1+strlen(pszModString)+strlen(pszKeyString))*sizeof(char));
+	snprintf(curKey->name, (1+strlen(pszModString)+strlen(pszKeyString))*sizeof(char),
+			 "%s%s", pszModString, pszKeyString);
+
+	//GfLogDebug("GfuiAddKey(k=%d, m=%d, d=%s) : mod='%s', key='%s', UFN='%s'\n",
+	//		   key, modifier, descr, pszModString, pszKeyString, curKey->name);
+	
 	// Add the new key entry in the key list if not already in,
 	// or else replace the previous definition.
+	tGfuiScreen* screen = (tGfuiScreen*)scr;
 	if (!screen->userKeys) {
 		screen->userKeys = curKey->next = curKey;
 	} else {
@@ -912,12 +940,11 @@ GfuiAddKey(void *scr, int key, const char *descr, void *userData,
 		tGfuiKey* curKey2 = screen->userKeys;
 		do {
 			// Found => replace with the new definition.
-			if (curKey2->key == key) {
+			if (curKey2->key == key && curKey2->modifier == modifier) {
 				free(curKey2->name);
 				curKey2->name = curKey->name;
 				free(curKey2->descr);
 				curKey2->descr = curKey->descr;
-				curKey2->modifier = curKey->modifier;
 				curKey2->userData = curKey->userData;
 				curKey2->onPress = curKey->onPress;
 				curKey2->onRelease = curKey->onRelease;

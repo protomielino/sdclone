@@ -437,8 +437,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '1',            "Driver Board",      (void*)0, grSelectBoard, NULL);
     GfuiAddKey(screen, '9',            "Mirror",            (void*)0, grSwitchMirror, NULL);
     GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);
-    GfuiAddKey(screen, '>',            "Zoom In",           (void*)GR_ZOOM_IN,	grSetZoom, NULL);
-    GfuiAddKey(screen, '<',            "Zoom Out",          (void*)GR_ZOOM_OUT,	grSetZoom, NULL);
+    GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 grSetZoom, NULL);
+    GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, grSetZoom, NULL);
     GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, grSplitScreen, NULL);
     GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
     GfuiAddKey(screen, '_',            "Split Screen Arrangement", (void*)GR_SPLIT_ARR, grSplitScreen, NULL);
