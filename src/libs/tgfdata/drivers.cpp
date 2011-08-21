@@ -538,7 +538,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 										const std::string& strFolderPath,
 										std::vector<GfDriverSkin>& vecPossSkins) const
 {
-	//GfLogDebug("  getPossibleSkinsInFolder(car=%s, car=%s) ...\n",
+	//GfLogDebug("  getPossibleSkinsInFolder(%s, %s) ...\n",
 	//		   strCarId.c_str(), strFolderPath.c_str());
 
 	// Search for skinned livery files, and associated preview files if any.
@@ -770,6 +770,11 @@ std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCa
 	std::ostringstream ossDirPath;
 	ossDirPath << GfLocalDir() << "drivers/" << _strModName
 			   << '/' << _nItfIndex << '/' << strCarId;
+	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
+
+	ossDirPath.str("");
+	ossDirPath << GfLocalDir() << "drivers/" << _strModName
+			   << '/' << _nItfIndex;
 	getPossibleSkinsInFolder(strCarId, ossDirPath.str(), vecPossSkins);
 
 	ossDirPath.str("");

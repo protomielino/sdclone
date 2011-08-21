@@ -125,7 +125,6 @@ rmdsHighlightDriver(const GfDriver* pDriver)
 			//GfLogDebug("Highlighting competitor #%d '%s'\n",
 			//		   curDrvIndex, pCompetitor->getName().c_str());
 			GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId, index);
-			rmdsClickOnDriver(0);
 			return;
 		}
 		index++;
@@ -140,7 +139,6 @@ rmdsHighlightDriver(const GfDriver* pDriver)
 		{
 			//GfLogDebug("Highlighting candidate #%d '%s'\n", curDrvIndex, name);
 			GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, index);
-			rmdsClickOnDriver(0);
 			return;
 		}
 		index++;
@@ -616,7 +614,6 @@ RmDriversSelect(void *vs)
     CompetitorsScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuDescHdle, "competitorsscrolllist", NULL, rmdsClickOnDriver);
     CandidatesScrollListId = GfuiMenuCreateScrollListControl(ScrHandle, menuDescHdle, "candidatesscrolllist", NULL, rmdsClickOnDriver);
 
-	
     // Car category filtering "combobox" (left arrow, label, right arrow)
 	const int nCatPrevButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carcategoryleftarrow",
@@ -713,7 +710,7 @@ RmDriversSelect(void *vs)
     NextButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "nextmenubutton", NULL, rmdsNextMenu);
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "backbutton",
-						MenuData->prevScreen, rmdsPreviousMenu);
+								MenuData->prevScreen, rmdsPreviousMenu);
     ChangeCarButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carselectbutton",
 											ScrHandle, rmdsCarSelectMenu);
 	GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_DISABLE);
@@ -727,7 +724,7 @@ RmDriversSelect(void *vs)
 	// Fill-in the competitors scroll-list.
 	rmdsReloadCompetitorsScrollList();
 	
-	// Initialize the currently highlighted driver
+	// Initialize the currently highlighted competitor (and scroll the list if needed to show him)
 	// (the 1st human driver, or else of the 1st driver).
 	PCurrentDriver = 0;
 	std::vector<GfDriver*> vecCompetitors = MenuData->pRace->getCompetitors();
@@ -747,12 +744,8 @@ RmDriversSelect(void *vs)
 	}
 
 	if (PCurrentDriver)
-	{
-		GfuiScrollListSetSelectedElement(ScrHandle, CompetitorsScrollListId,
-										 itComp - vecCompetitors.begin());
 		GfuiScrollListShowElement(ScrHandle, CompetitorsScrollListId,
 								  itComp - vecCompetitors.begin());
-	}
 
 	// Display the menu.
     GfuiScreenActivate(ScrHandle);
@@ -807,6 +800,7 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 										(void*)(*itCandidate));
     }
 
+			   
     // Show first element of the list if any.
     GfuiScrollListShowElement(ScrHandle, CandidatesScrollListId, 0);
 }

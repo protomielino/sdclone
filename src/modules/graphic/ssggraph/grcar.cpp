@@ -653,7 +653,8 @@ grInitCar(tCarElt *car)
 
 	GfOut("[gr] Init(%d) car %s for driver %s index %d\n", index, car->_carName, car->_modName, car->_driverIndex);
 
-	/* Set textures search path : 0) driver level specified, in the user settings
+	/* Set textures search path for (?) rear/front/brake lights, exhaust fires and wheels :
+	   0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common textures */
 	grFilePath = (char*)malloc(nMaxTexPathSize);
 	lg = 0;
@@ -662,6 +663,9 @@ grInitCar(tCarElt *car)
 	if (bMasterModel)
 		lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
 					   GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+	
+	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d;",
+				   GfLocalDir(), car->_modName, car->_driverIndex);
 	
 	lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
 				   GfLocalDir(), car->_modName, car->_carName);
@@ -718,7 +722,8 @@ grInitCar(tCarElt *car)
 	DBG_SET_NAME(carBody, "LOD", index, 0);
 	LODSel->addKid(carBody);
 
-	/* Set textures/models search path : 0) driver level specified, in the user settings
+	/* Set 3D model search path and textures search path for the ones applied on the model :
+	   0) driver level specified, in the user settings
 	   1) driver level specified, 2) car level specified, 3) common models / textures */
 	lg = 0;
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
@@ -726,6 +731,9 @@ grInitCar(tCarElt *car)
 	if (bMasterModel)
 		lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
 					   GfLocalDir(), car->_modName, car->_driverIndex, car->_masterModel);
+	
+	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d;",
+				   GfLocalDir(), car->_modName, car->_driverIndex);
 	
 	lg += snprintf(buf + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%s;",
 				   GfLocalDir(), car->_modName, car->_carName);
