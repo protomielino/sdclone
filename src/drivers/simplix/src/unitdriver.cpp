@@ -242,7 +242,6 @@ TDriver::TDriver(int Index):
   oCurrSpeed(0),
   // oGearEff,
   oExtended(0),
-  oIndex(0),
   oLastGear(0),
   oLetPass(false),
   oLookAhead(5.0),
@@ -263,7 +262,6 @@ TDriver::TDriver(int Index):
   oStuckCounter(0),
   oSysFooStuckX(NULL),
   oSysFooStuckY(NULL),
-  oTestPitStop(0),
   oTrackAngle(0.0),
   oTargetSpeed(0.0),
   oTclRange(10.0),
@@ -319,6 +317,8 @@ TDriver::TDriver(int Index):
   oDecelAdjustTarget(1.0),
   oDecelAdjustPerc(1.0),
   oRandomSeed(0),
+  oIndex(0),
+  oTestPitStop(0),
   //LengthMargin
   //Qualification
   oStanding(true),
@@ -1403,7 +1403,7 @@ void TDriver::Drive()
 //    GfOut("#%d: P:%.0f(%d) A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",oIndex,Pos,Idx,CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
     GfOut("#A:%.4f B:%.4f C:%.4f S: %.4f G:%d\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarSteerCmd,CarGearCmd);
   }
-/** /
+
   if (oDoAvoid)
     CarLightCmd = RM_LIGHT_HEAD2;                // Only small lights on
   else
@@ -1433,7 +1433,7 @@ void TDriver::Drive()
   double TrackTurnangle2 = oRacingLine[0].CalcTrackTurnangle(Idx, (Idx + 30) % N);
   GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
   GfOut("v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
-/* */
+ */
 }
 //==========================================================================*
 

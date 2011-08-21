@@ -533,13 +533,15 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 
      double thiswidth = MIN(psegside->startWidth, psegside->endWidth) * 1.0;
      if (psegCurrent->type == TR_STR)
-     if ((side == TR_SIDE_LFT && psegCurrent->type == TR_LFT && psegside->style == TR_CURB) ||
-         (side == TR_SIDE_RGT && psegCurrent->type == TR_RGT && psegside->style == TR_CURB))
-      thiswidth *= 0.5;
-     else if ((side == TR_SIDE_LFT && (psegCurrent->type == TR_RGT || psegCurrent->next->type != TR_LFT)) ||
-              (side == TR_SIDE_RGT && (psegCurrent->type == TR_LFT || psegCurrent->next->type != TR_RGT)))
-      thiswidth *= 0.8;
-     margin += thiswidth;
+	 {
+		 if ((side == TR_SIDE_LFT && psegCurrent->type == TR_LFT && psegside->style == TR_CURB) ||
+			 (side == TR_SIDE_RGT && psegCurrent->type == TR_RGT && psegside->style == TR_CURB))
+			 thiswidth *= 0.5;
+		 else if ((side == TR_SIDE_LFT && (psegCurrent->type == TR_RGT || psegCurrent->next->type != TR_LFT)) ||
+				  (side == TR_SIDE_RGT && (psegCurrent->type == TR_LFT || psegCurrent->next->type != TR_RGT)))
+			 thiswidth *= 0.8;
+	 }
+	 margin += thiswidth;
      psegside = psegside->side[side];
     }
 
@@ -1645,7 +1647,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  // Find index in data arrays
  //
  data = pdata;
- tTrackSeg *seg = car->_trkPos.seg;
+ //tTrackSeg *seg = car->_trkPos.seg;
  int SegId = car->_trkPos.seg->id;
  double dist = car->_trkPos.toStart;
  if (dist < 0)
@@ -2383,7 +2385,7 @@ double LRaceLine::correctLimit(double avoidsteer, double racesteer, int insideli
 {
  //double nlane2left = SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width;
  double tbump = BumpCaution;//GetModD( tBump, This ) * 4;
- double factor = (insideline ? 50 : 200);
+ //double factor = (insideline ? 50 : 200);
 
  double limit = 0.04 - MIN(0.039, MAX(20.0, 100.0 - car->_speed_x) / 3000);
 
