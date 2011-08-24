@@ -392,7 +392,7 @@
       <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix II"/>
-      <attstr name="car name" val="sc-boxer-96" />
+      <attstr name="car name" val="sc-cavallo-360" />
     </section>
 
     <section name="3">
@@ -400,7 +400,7 @@
       <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix III"/>
-      <attstr name="car name" val="sc-boxer-96" />
+      <attstr name="car name" val="sc-fmc-gt4" />
     </section>
 
     <section name="4">
@@ -408,7 +408,7 @@
       <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix IV"/>
-      <attstr name="car name" val="sc-boxer-96" />
+      <attstr name="car name" val="sc-lynx-220" />
     </section>
 
     <section name="5">
@@ -416,7 +416,7 @@
       <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix V"/>
-      <attstr name="car name" val="sc-boxer-96" />
+      <attstr name="car name" val="sc-murasama-nsx" />
     </section>
 
     <section name="6">
@@ -424,7 +424,7 @@
       <attstr name="module" val="simplix_sc"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix VI"/>
-      <attstr name="car name" val="sc-boxer-96" />
+      <attstr name="car name" val="sc-spirit-300" />
     </section>
 
   </section>

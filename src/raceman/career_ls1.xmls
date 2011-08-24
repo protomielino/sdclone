@@ -384,7 +384,7 @@
       <attstr name="module" val="simplix"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix I"/>
-      <attstr name="car name" val="ls1-vulture-v6r" />
+      <attstr name="car name" val="ls1-archer-r9" />
     </section>
 
     <section name="2">
@@ -392,7 +392,7 @@
       <attstr name="module" val="simplix_ls1"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix II"/>
-      <attstr name="car name" val="ls1-vulture-v6r" />
+      <attstr name="car name" val="ls1-cavallo-570s1" />
     </section>
 
     <section name="3">
@@ -400,7 +400,7 @@
       <attstr name="module" val="simplix_ls1"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix III"/>
-      <attstr name="car name" val="ls1-vulture-v6r" />
+      <attstr name="car name" val="ls1-newcastle-fury" />
     </section>
 
     <section name="4">
@@ -408,7 +408,7 @@
       <attstr name="module" val="simplix_ls1"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix IV"/>
-      <attstr name="car name" val="ls1-vulture-v6r" />
+      <attstr name="car name" val="ls1-taipan-ltsr" />
     </section>
 
     <section name="5">
@@ -416,7 +416,7 @@
       <attstr name="module" val="simplix_ls1"/>
       <attnum name="extended" val="1"/>
       <attstr name="name" val="simplix V"/>
-      <attstr name="car name" val="ls1-vulture-v6r" />
+      <attstr name="car name" val="ls1-toro-rgt" />
     </section>
 
     <section name="6">
