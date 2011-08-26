@@ -26,6 +26,7 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <cstdarg>
 #include <cerrno>
 #include <cmath>
 #include <ctime>
@@ -3203,7 +3204,7 @@ GfParmSetFormula (void *handle, char const *path, char const *key, char const *v
     @warning	The key is created is necessary
  */
 int
-GfParmSetCurFormula(void *handle, char const *path, char const *key, char *val)
+GfParmSetCurFormula(void *handle, char const *path, char const *key, char const *val)
 {
     struct parmHandle *parmHandle = (struct parmHandle *)handle;
     struct parmHeader *conf;
@@ -3339,6 +3340,273 @@ void GfParmSetVariable(void *handle, char const *path, char const *key, tdble va
     val_ptr = (tdble*)GfHashGetStr(conf->variableHash, pathdup );
     free(pathdup);
 }
+
+static char const* GfParmMakePathKey( char const* path, va_list arg, char const **key )
+{
+    static char buffer[1024];
+
+    vsnprintf( buffer, 1024, path, arg );
+
+    char *lastSlash = strrchr( buffer, '/' );
+
+    if( lastSlash != NULL && key )
+    {
+        *key = lastSlash + 1;
+        lastSlash = '\0';
+    }
+    else if( key )
+    {
+        *key = "";
+    }
+    return buffer;
+}
+
+static char const* GfParmMakePathFromPathKey( char const* path, va_list arg )
+{
+    static char buffer[1024];
+	
+    vsnprintf( buffer, 1024, path, arg );
+
+    char *lastSlash = strrchr( buffer, '/' );
+    if( lastSlash != NULL )
+        lastSlash = '\0';
+    return buffer;
+}
+
+static char const* GfParmMakePathFromPath( char const* path, va_list arg )
+{
+    static char buffer[1024];
+
+    vsnprintf( buffer, 1024, path, arg );
+
+    return buffer;
+}
+
+const char *GfParmGetStrf(void *handle, const char *deflt, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    char const* ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetStr( handle, path, key, deflt );
+    va_end( arg );
+
+    return ret;
+}
+
+char *GfParmGetStrNCf(void *handle, char *deflt, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    char *ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetStrNC( handle, path, key, deflt );
+    va_end( arg );
+
+    return ret;
+}
+
+const char *GfParmGetCurStrf(void *handle, const char *deflt, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    char const* ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetCurStr( handle, path, key, deflt );
+    va_end( arg );
+
+    return ret;
+}
+
+char *GfParmGetCurStrNCf(void *handle, char *deflt, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    char* ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetCurStrNC( handle, path, key, deflt );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmSetStrf(void *handle, const char *val, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmSetStr( handle, path, key, val );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmSetCurStrf(void *handle, const char *val, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmSetCurStr( handle, path, key, val );
+    va_end( arg );
+
+    return ret;
+}
+
+tdble GfParmGetNumf(void *handle, const char *unit, tdble deflt, char const* format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    tdble ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetNum( handle, path, key, unit, deflt );
+    va_end( arg );
+
+    return ret;
+}
+
+tdble GfParmGetCurNumf(void *handle, const char *unit, tdble deflt, char const* format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    tdble ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetCurNum( handle, path, key, unit, deflt );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmSetNumf(void *handle, const char *unit, tdble val, char const* format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmSetNum( handle, path, key, unit, val );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmSetCurNumf(void *handle, const char *unit, tdble val, char const* format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmSetCurNum( handle, path, key, unit, val );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmIsFormulaf(void *handle, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmIsFormula( handle, path, key);
+    va_end( arg );
+
+    return ret;
+}
+
+char* GfParmGetFormulaf(void *handle, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    char* ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetFormula( handle, path, key );
+    va_end( arg );
+
+    return ret;
+}
+
+char* GfParmGetCurFormulaf(void *handle, char const *format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    char *ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmGetCurFormula( handle, path, key );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmSetFormulaf(void* handle, char const *formula, char const* format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmSetFormula( handle, path, key, formula );
+    va_end( arg );
+
+    return ret;
+}
+
+int GfParmSetCurFormulaf(void* handle, char const *formula, char const* format, ...)
+{
+    va_list arg;
+    char const* path;
+    char const* key;
+    int ret;
+
+    va_start( arg, format );
+    path = GfParmMakePathKey( format, arg, &key );
+    ret = GfParmSetCurFormula( handle, path, key, formula );
+    va_end( arg );
+
+    return ret;
+}
+
 
 /** Check a parameter set against another.
     @ingroup	paramsfile

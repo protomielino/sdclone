@@ -140,7 +140,7 @@ struct Tag
  
 static void skip_spaces ( char **s )
 {
-  while ( **s == ' ' || **s == '\t' )
+  while ( **s == ' ' || **s == '\t' || **s == '\r' )
     (*s)++ ;
 }
 
@@ -172,6 +172,9 @@ static void skip_quotes ( char **s )
 static int search ( Tag *tags, char *s )
 {
   skip_spaces ( & s ) ;
+
+  if ( *s == '\0' )
+  	return PARSE_CONT; /* skip empty lines */
 
   for ( int i = 0 ; tags[i].token != NULL ; i++ )
     if ( ulStrNEqual ( tags[i].token, s, strlen(tags[i].token) ) )

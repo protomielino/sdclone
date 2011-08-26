@@ -379,6 +379,35 @@ TGF_API void GfParmSetVariable(void *handle, char const *path, char const *key, 
 TGF_API void GfParmRemoveVariable(void *handle, char const *path, char const *key);
 TGF_API tdble GfParmGetVariable(void *handle, char const *path, char const *key);
 
+/* get string parameter value */
+TGF_API const char *GfParmGetStrf(void *handle, const char *deflt, char const *path, ...);
+TGF_API char *GfParmGetStrNCf(void *handle, char *deflt, char const *path, ...);
+/* get string parameter value */
+TGF_API const char *GfParmGetCurStrf(void *handle, const char *deflt, char const *path, ...);
+TGF_API char *GfParmGetCurStrNCf(void *handle, char *deflt, char const *path, ...);
+/* set string parameter value */
+TGF_API int GfParmSetStrf(void *handle, const char *val, char const *path, ...);
+/* set string parameter value */
+TGF_API int GfParmSetCurStrf(void *handle, const char *val, char const *path, ...);
+
+/* get num parameter value */
+TGF_API tdble GfParmGetNumf(void *handle, const char *unit, tdble deflt, char const* path, ...);
+/* get num parameter value */
+TGF_API tdble GfParmGetCurNumf(void *handle, const char *unit, tdble deflt, char const* path, ...);
+/* set num parameter value */
+TGF_API int GfParmSetNumf(void *handle, const char *unit, tdble val, char const* path, ...);
+/* set num parameter value */
+TGF_API int GfParmSetCurNumf(void *handle, const char *unit, tdble val, char const* path, ...);
+
+/* is formula */
+TGF_API int GfParmIsFormulaf(void *handle, char const *path, ...);
+/* get formula */
+TGF_API char* GfParmGetFormulaf(void *hanlde, char const *path, ...);
+TGF_API char* GfParmGetCurFormulaf(void *hanlde, char const *path, ...);
+/* set formula */
+TGF_API int GfParmSetFormulaf(void* hanlde, char const *formula, char const* path, ...);
+TGF_API int GfParmSetCurFormulaf(void* hanlde, char const *formula, char const* path, ...);
+
 TGF_API void GfParmShutdown (void);
 
 /********************************************************************************
