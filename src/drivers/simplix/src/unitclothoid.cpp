@@ -695,11 +695,17 @@ int TClothoidLane::GetWeather()
 bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 {
   FILE* F = fopen(TrackLoad, "rb");
+  size_t readSize;
   if (F == 0)
     return false;
 
   int K;
-  fread(&K,sizeof(int),1,F);
+  readSize = fread(&K,sizeof(int),1,F);
+  if( readSize < 1 )
+  {
+  	fclose(F);
+	return false;
+  }
   if (K > 0)
   {
     fclose(F);
@@ -707,7 +713,12 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   }
 
   int Version;
-  fread(&Version,sizeof(int),1,F);
+  readSize = fread(&Version,sizeof(int),1,F);
+  if(readSize < 1)
+  {
+  	fclose(F);
+	return false;
+  }
   if (Version < RL_VERSION)
   {
     fclose(F);
@@ -715,7 +726,12 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   }
 
   int Weather;
-  fread(&Weather,sizeof(int),1,F);
+  readSize = fread(&Weather,sizeof(int),1,F);
+  if(readSize < 1)
+  {
+  	fclose(F);
+	return false;
+  }
   if (Weather != GetWeather())
   {
     fclose(F);
@@ -727,12 +743,22 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
   int UsedLen = ((char *) End) - ((char *) Start);
 
   int N;
-  fread(&N,sizeof(int),1,F);
+  readSize = fread(&N,sizeof(int),1,F);
+  if(readSize < 1)
+  {
+  	fclose(F);
+	return false;
+  }
   for (int I = 0; I < N; I++)
   {
-    fread(&(oPathPoints[I]),UsedLen,1,F);
-	const TSection& Sec = (*oTrack)[I];
-	oPathPoints[I].Sec = &Sec;
+    readSize = fread(&(oPathPoints[I]),UsedLen,1,F);
+    if(readSize < 1)
+    {
+      fclose(F);
+      return false;
+    }
+    const TSection& Sec = (*oTrack)[I];
+    oPathPoints[I].Sec = &Sec;
   }
   fclose(F);
 
@@ -746,20 +772,29 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 void TClothoidLane::SavePointsToFile(const char* TrackLoad)
 {
   FILE* F = fopen(TrackLoad, "wb");
+  bool error = false;
+  size_t writeSize;
   if (F == 0)
     return;
 
   int K = 0;
-  fwrite(&K,sizeof(int),1,F);
-
+  writeSize = fwrite(&K,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
   int Version = RL_VERSION;
-  fwrite(&Version,sizeof(int),1,F);
+  writeSize = fwrite(&Version,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
 
   int Weather = GetWeather();
-  fwrite(&Weather,sizeof(int),1,F);
+  writeSize = fwrite(&Weather,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
 
   int N = oTrack->Count();
-  fwrite(&N,sizeof(int),1,F);
+  writeSize = fwrite(&N,sizeof(int),1,F);
+  if( writeSize < 1)
+    error = true;
 
   //GfOut("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
   void* Start = &(oPathPoints[0]);
@@ -767,7 +802,11 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   int UsedLen = ((char *) End) - ((char *) Start);
   //GfOut("\n\n\nUsedLen (TPathPt Part 1): %d\n\n\n",UsedLen);
   for (int I = 0; I < N; I++)
-    fwrite(&(oPathPoints[I]),UsedLen,1,F);
+  {
+    writeSize = fwrite(&(oPathPoints[I]),UsedLen,1,F);
+    if( writeSize < 1)
+      error = true;
+  }
   fclose(F);
 }
 //==========================================================================*

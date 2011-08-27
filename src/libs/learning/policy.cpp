@@ -485,6 +485,7 @@ void DiscretePolicy::Reset ()
 void DiscretePolicy::loadFile (char* f)
 {
 	FILE* fh = NULL;
+	size_t readSize;
 	fh = fopen (f, "rb");
 	if (fh==NULL) {
 		fprintf (stderr, "Failed to read file %s\n", f);
@@ -495,13 +496,19 @@ void DiscretePolicy::loadFile (char* f)
 	const char* close_tag="END";
 	int n_read_states, n_read_actions;
 
-	fread((void *) rtag, sizeof (char), strlen (start_tag)+1, fh);
+	readSize = fread((void *) rtag, sizeof (char), strlen (start_tag)+1, fh);
+	if( readSize < strlen(start_tag)+1 )
+		fprintf(stderr, "Error when reading file");
 	if (strcmp (rtag, start_tag)) {
 		fprintf (stderr, "Could not find starting tag\n");
 		return;
 	}
-	fread((void *) &n_read_states, sizeof(int), 1, fh);
-	fread((void *) &n_read_actions, sizeof(int), 1, fh);
+	readSize = fread((void *) &n_read_states, sizeof(int), 1, fh);
+	if( readSize < 1 )
+		fprintf(stderr, "Error when reading file");
+	readSize = fread((void *) &n_read_actions, sizeof(int), 1, fh);
+	if( readSize < 1 )
+		fprintf(stderr, "Error when reading file");
 	
 	if ((n_read_states!=n_states)||(n_read_actions!=n_actions)) {
 		fprintf (stderr, "File has %dx%d space! Aborting read.\n", n_read_states, n_read_actions);
@@ -511,7 +518,9 @@ void DiscretePolicy::loadFile (char* f)
 
 	int i, j;
 	for (i=0; i<n_states; i++) {
-		fread((void *) Q[i], sizeof(real), n_actions, fh);
+		readSize = fread((void *) Q[i], sizeof(real), n_actions, fh);
+		if( readSize < (int unsigned)n_actions )
+			fprintf(stderr, "Error when reading file");
 		for (j=0; j<n_actions; j++) {
 			if ((fabs (Q[i][j])>100.0)||(isnan(Q[i][j]))) {
 				printf ("l: %d %d %f\n", i,j,Q[i][j]);
@@ -536,7 +545,9 @@ void DiscretePolicy::loadFile (char* f)
 
 
 
-	fread((void *) rtag, sizeof (char), strlen (close_tag)+1, fh);
+	readSize = fread((void *) rtag, sizeof (char), strlen (close_tag)+1, fh);
+	if( readSize < strlen(close_tag)+1 )
+		fprintf(stderr, "Error when reading file");
 	if (strcmp (rtag, close_tag)) {
 		fprintf (stderr, "Could not find ending tag\n");
 		fclose (fh);
@@ -550,6 +561,7 @@ void DiscretePolicy::loadFile (char* f)
 /// Save policy to a file.
 void DiscretePolicy::saveFile (char* f) {
 	FILE* fh = NULL;
+	size_t writeSize;
 	fh = fopen (f, "wb");
 	if (fh==NULL) {
 		fprintf (stderr, "Failed to write to file %s\n", f);
@@ -559,18 +571,28 @@ void DiscretePolicy::saveFile (char* f) {
 	const char* start_tag="QSA";
 	const char* close_tag="END";
 
-	fwrite((void *) start_tag, sizeof (char), strlen (start_tag)+1, fh);
-	fwrite((void *) &n_states, sizeof(int), 1, fh);
-	fwrite((void *) &n_actions, sizeof(int), 1, fh);
+	writeSize = fwrite((void *) start_tag, sizeof (char), strlen (start_tag)+1, fh);
+	if( writeSize < strlen(start_tag)+1)
+		fprintf( stderr, "Failed to write all data to file %s\n", f);
+	writeSize = fwrite((void *) &n_states, sizeof(int), 1, fh);
+	if( writeSize < 1)
+		fprintf( stderr, "Failed to write all data to file %s\n", f);
+	writeSize = fwrite((void *) &n_actions, sizeof(int), 1, fh);
+	if( writeSize < 1)
+		fprintf( stderr, "Failed to write all data to file %s\n", f);
 	for (int i=0; i<n_states; i++) {
-		fwrite((void *) Q[i], sizeof(real), n_actions, fh);
+		writeSize = fwrite((void *) Q[i], sizeof(real), n_actions, fh);
+		if( writeSize < (int unsigned)n_actions)
+			fprintf( stderr, "Failed to write all data to file %s\n", f);
 		for (int j=0; j<n_actions; j++) {
 			if ((fabs (Q[i][j])>100.0)||(isnan(Q[i][j]))) {
 				printf ("s: %d %d %f\n", i,j,Q[i][j]);
 			}
 		}
 	}
-	fwrite((void *) close_tag, sizeof (char), strlen (start_tag)+1, fh);
+	writeSize = fwrite((void *) close_tag, sizeof (char), strlen (start_tag)+1, fh);
+	if( writeSize < strlen(start_tag)+1)
+		fprintf( stderr, "Failed to write all data to file %s\n", f);
 	fclose (fh);
 }
 

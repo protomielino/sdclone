@@ -3361,7 +3361,7 @@ static char const* GfParmMakePathKey( char const* path, va_list arg, char const 
     return buffer;
 }
 
-static char const* GfParmMakePathFromPathKey( char const* path, va_list arg )
+/*static char const* GfParmMakePathFromPathKey( char const* path, va_list arg )
 {
     static char buffer[1024];
 	
@@ -3380,7 +3380,7 @@ static char const* GfParmMakePathFromPath( char const* path, va_list arg )
     vsnprintf( buffer, 1024, path, arg );
 
     return buffer;
-}
+}*/
 
 const char *GfParmGetStrf(void *handle, const char *deflt, char const *format, ...)
 {

@@ -2770,9 +2770,11 @@ void stripifyOb(ob_t * object,int writeit)
     stripein = fopen(filename,"r");
 #else
     sprintf(command, "stripe %s >/dev/null", filename);
-    system(command);
+    if(system(command)<0)
+        printf("Calling stripe failed");
     sprintf(command, "rm %s", filename);
-    system(command);
+    if(system(command)<0)
+        printf("Calling stripe failed");
     strcat(filename, "f");
     stripein = fopen("temp.objf","r");
 #endif

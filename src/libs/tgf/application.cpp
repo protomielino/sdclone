@@ -288,8 +288,16 @@ bool GfApplication::parseOptions()
 	// TODO: Move this to the main ?
     // If "data dir" specified in any way, cd to it.
     if (datadir && strlen(datadir))
-		chdir(datadir);
+    {
+        if(!chdir(datadir))
+	{
+            GfLogTrace("SD_DATADIR  : '%s'\n", GfDataDir());
+            GfLogError("Could not start Speed Dreams : could not change directory to the datadir\n\n");
+	    return false;
+	}
+	    
+    }
 
-	return true;
+    return true;
 }
 

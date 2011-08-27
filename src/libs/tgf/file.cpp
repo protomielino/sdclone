@@ -101,6 +101,7 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 	FILE *in;
 	FILE *out;
 	size_t size;
+	size_t writeSize;
 	int errnum;
 	bool res = true;
 	
@@ -155,12 +156,18 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 		size = fread( buf, 1, 1024, in );
 		if( size > 0 )
 		{
-			fwrite( buf, 1, size, out );
+			writeSize = fwrite( buf, 1, size, out );
 			if( ferror( out ) )
 			{
 				errnum = errno; // Get errno before it is overwritten by some system call.
 				GfLogError("Failed to write data to %s when creating it from %s (%s).\n",
 						   pszTgtName, pszSrcName, strerror(errnum));
+				res = false;
+				break;
+			}
+			else if( size != writeSize )
+			{
+				GfLogError("Failed to write all data to %s when creating it from %s.\n", pszTgtName, pszSrcName );
 				res = false;
 				break;
 			}

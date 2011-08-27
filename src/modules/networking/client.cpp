@@ -640,6 +640,7 @@ void Client::ReadFilePacket(ENetPacket *pPacket)
 
 	unsigned char *pData = &pPacket->data[1];
 	short len;
+	size_t writeSize;
 	memcpy(&len,pData,sizeof(short));
 	pData+=sizeof(short);
 	char file[255];
@@ -655,9 +656,10 @@ void Client::ReadFilePacket(ENetPacket *pPacket)
 	sprintf(filepath, "%s%s", GfLocalDir(), file);
 	FILE *pFile = fopen(filepath,"w+b");
 	GfLogTrace("Reading file packet: File- %s\n",filepath);
-	fwrite(pData,filesize,1,pFile);
+	writeSize = fwrite(pData,filesize,1,pFile);
+	if( writeSize <= 0 )
+		GfLogTrace("Not all bytes are send to file");
 	fclose(pFile);
-
 }
 
 void Client::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)

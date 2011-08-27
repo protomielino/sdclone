@@ -98,8 +98,9 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 {
 	FILE *Input;
 	char *TexBytes;
-	int	Num;
+	int unsigned	Num;
 	unsigned Tex;
+	size_t readSize;
 
 	font = NULL;
 	size = 8.0;
@@ -115,7 +116,9 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 
 	//Read glFont structure
 	//fread(font, sizeof(GLFONT), 1, Input);
-	fread(font, 24, 1, Input); // for IA64...
+	readSize = fread(font, 24, 1, Input); // for IA64...
+	if( readSize <= 0 )
+		GfLogWarning( "Not all bytes are succesfully read" );
 	//GfLogDebug("Font(%s) : texW=%d, texH=%d\n", FileName, font->TexWidth, font->TexHeight);
 
 #ifndef WIN32
@@ -136,7 +139,9 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	}
 
     //Read glFont characters
-	fread(font->Char, sizeof(GLFONTCHAR), Num, Input);
+	readSize = fread(font->Char, sizeof(GLFONTCHAR), Num, Input);
+	if( readSize <= 0 )
+		GfLogWarning( "Not all bytes are succesfully read" );
 
 #ifndef WIN32
 #if BYTE_ORDER == BIG_ENDIAN
@@ -160,7 +165,9 @@ GfuiFontClass::GfuiFontClass(char *FileName)
 	}
 
 	//Read texture data
-	fread(TexBytes, sizeof(char), Num, Input);
+	readSize = fread(TexBytes, sizeof(char), Num, Input);
+	if( readSize < Num )
+		GfLogWarning( "Not all bytes are succesfully read" );
 
 	fclose(Input);
 

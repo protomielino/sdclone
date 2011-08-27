@@ -205,7 +205,8 @@ TlmStopMonitoring(void)
     GfOut("Telemetry: stop monitoring\n");
 
     sprintf(buf, "sh %s", TlmData.cmdfile);
-    system(buf);
+    if(system(buf) < 0)
+        GfOut("Telemetry: calling shell script failed");
     free(TlmData.cmdfile);
 }
 

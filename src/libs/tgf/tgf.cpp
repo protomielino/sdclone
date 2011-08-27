@@ -776,7 +776,8 @@ static char* makeRunTimeDirPath(const char* srcPath)
 			strcpy(tgtPath, gfInstallDir);
 		else
 		{
-			getcwd(tgtPath, bufSize);
+			if(!getcwd(tgtPath, bufSize))
+				GfLogError("Could not get the current working directory");
 			strcat(tgtPath, "/");
 		}
 		if (!strcmp(srcPath, "."))
@@ -874,7 +875,10 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	// If no PATH, cannot work if we are not in the executable folder.
 	else
 	{
-		getcwd(pszPath, 512);
+		if(!getcwd(pszPath, 512))
+		{
+			GfLogError("Could not get the current working directory");
+		}
 	}
 
 	gfInstallDir = makeRunTimeDirPath(pszPath);
@@ -890,7 +894,11 @@ void GfInitInstallDir(const char *pszExecutablePath)
 	// (quite strange : the executable is not in SD_BINDIR ? When can this happen ?).
 	else
 	{
-		getcwd(pszPath, 512);
+		if(!getcwd(pszPath, 512))
+		{
+			GfLogError("Could not get the current working directory");
+		}
+
 		gfInstallDir = makeRunTimeDirPath(pszPath);
 	}
 	

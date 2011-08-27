@@ -62,6 +62,12 @@ onCreditsMenuActivate(void * /* dummy */)
 }
 
 static void
+onExitMenuActivate(void * /*dummy*/)
+{
+    GfuiScreenActivate(ExitMenuInit(MenuHandle));
+}
+
+static void
 onMainMenuActivate(void * /* dummy */)
 {
 	// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
@@ -107,13 +113,12 @@ MainMenuInit(void)
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);
-    void* exitMenu = MainExitMenuInit(MenuHandle);
-    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "quit", exitMenu, GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "quit", NULL, onExitMenuActivate);
 
     GfParmReleaseHandle(menuDescHdle);
 
     GfuiMenuDefaultKeysAdd(MenuHandle);
-    GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit the game", exitMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit the game", NULL, onExitMenuActivate, NULL);
 
     return 0;
 }
