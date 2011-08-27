@@ -95,8 +95,8 @@ int GfEventLoop::Private::translateKeySym(int code, int modifier, int unicode)
 		// Truncate unicodes above GF_MAX_KEYCODE (no need for more).
 		keyUnicode = unicode ? (unicode & GF_MAX_KEYCODE) : code;
 		_mapUnicodes[keyId] = keyUnicode;
-		GfLogDebug("translateKeySym(c=%d, m=%d, u=%d) : New key id=0x%08X, unicode=%d (%d)\n",
-				   code, modifier, unicode, keyId, keyUnicode, _mapUnicodes.size());
+		//GfLogDebug("translateKeySym(c=%d, m=%d, u=%d) : New key id=0x%08X, unicode=%d (%d)\n",
+		//		   code, modifier, unicode, keyId, keyUnicode, _mapUnicodes.size());
 	}
 
 	// If found, get the unicode from the map.
