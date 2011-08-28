@@ -412,7 +412,13 @@ gfuiKeyboardDown(int key, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-			if (curKey->key == key && curKey->modifier == modifier)
+
+			// Ignore Shift modifier when printable unicode,
+			// as the unicode generator already took care of it.
+			if (curKey->key == key
+				&& (curKey->modifier == modifier
+					|| (curKey->modifier == (modifier & (~GFUIM_SHIFT))
+						&& key >= ' ' && key <= 'z')))
 			{
 				if (curKey->onPress)
 					curKey->onPress(curKey->userData);
@@ -452,7 +458,10 @@ gfuiKeyboardUp(int key, int modifier, int /* x */, int /* y */)
 		do 
 		{
 			curKey = curKey->next;
-			if (curKey->key == key && curKey->modifier == modifier) 
+			if (curKey->key == key
+				&& (curKey->modifier == modifier
+					|| (curKey->modifier == (modifier & (~GFUIM_SHIFT))
+						&& key >= ' ' && key <= 'z'))) 
 			{
 				if (curKey->onRelease)
 					curKey->onRelease(curKey->userData);

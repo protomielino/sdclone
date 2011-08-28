@@ -119,7 +119,7 @@ Uint32 GfEventLoop::Private::callTimerCB(Uint32 interval, void *pEvLoopPriv)
 
 
 // GfEventLoop class ============================================================
-
+ 
 GfEventLoop::GfEventLoop()
 {
 	_pPrivate = new Private;
@@ -143,22 +143,22 @@ void GfEventLoop::injectKeyboardEvent(int code, int modifier, int state,
 		if (modifier & KMOD_RSHIFT)
 		{
 			modifier |= KMOD_LSHIFT;
-			modifier &= ~KMOD_LSHIFT;
+			modifier &= ~KMOD_RSHIFT;
 		}
 		if (modifier & KMOD_RCTRL)
 		{
 			modifier |= KMOD_LCTRL;
-			modifier &= ~KMOD_LCTRL;
+			modifier &= ~KMOD_RCTRL;
 		}
 		if (modifier & KMOD_RALT)
 		{
 			modifier |= KMOD_LALT;
-			modifier &= ~KMOD_LALT;
+			modifier &= ~KMOD_RALT;
 		}
 		if (modifier & KMOD_RMETA)
 		{
 			modifier |= KMOD_LMETA;
-			modifier &= ~KMOD_LMETA;
+			modifier &= ~KMOD_RMETA;
 		}
 	}
 
