@@ -43,9 +43,8 @@
 #include "grtracklight.h"
 #include "grbackground.h"
 
-// Tool for debugging the car texturing mode (see grmultitexstate.cpp)
-const int grCarTexturingModes = 4;
-int grCarTexturingMode = 0;
+#include "grmultitexstate.h" // grCarTexturing*
+
 
 int grMaxTextureUnits = 0;
 
@@ -355,10 +354,29 @@ grSelectTrackMap(void * /* vp */)
 }
 
 static void
-grChangeCarTexturingMode(void * /* vp */)
+grChangeCarTexturingMode(void* vpTexUnit)
 {
-	grCarTexturingMode = (grCarTexturingMode + 1) % grCarTexturingModes;
-	GfLogDebug("Car texturing mode = %d\n", grCarTexturingMode);
+	const int nTexUnit = (int)(long)vpTexUnit;
+	switch(nTexUnit)
+	{
+		case 1:
+			grCarTexturingTrackEnvMode =
+				(grCarTexturingTrackEnvMode + 1) % grCarTexturingModes;
+			break;
+		case 2:
+			grCarTexturingSkyShadowsMode =
+				(grCarTexturingSkyShadowsMode + 1) % grCarTexturingModes;
+			break;
+		case 3:
+			grCarTexturingTrackShadowsMode =
+				(grCarTexturingTrackShadowsMode + 1) % grCarTexturingModes;
+			break;
+		default:
+			break;
+	}
+	
+	GfLogDebug("Car multi-texturing mode : %d,%d,%d\n", grCarTexturingTrackEnvMode,
+			   grCarTexturingSkyShadowsMode, grCarTexturingTrackShadowsMode);
 }
 
 static void
@@ -445,7 +463,12 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);
 
-	GfuiAddKey(screen, GFUIK_RETURN,   "Change Car Texturing Mode",  (void*)0, grChangeCarTexturingMode, NULL);
+	GfuiAddKey(screen, GFUIK_F1, GFUIM_SHIFT, "Change Car Texturing Track Env. Mode",
+			   (void*)1, grChangeCarTexturingMode, NULL);
+	GfuiAddKey(screen, GFUIK_F2, GFUIM_SHIFT, "Change Car Texturing Sky Shadows Mode",
+			   (void*)2, grChangeCarTexturingMode, NULL);
+	GfuiAddKey(screen, GFUIK_F3, GFUIM_SHIFT, "Change Car Texturing Track Shadows Mode",
+			   (void*)3, grChangeCarTexturingMode, NULL);
 
     grAdaptScreenSize();
 
@@ -454,6 +477,9 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     grInitScene();
 
     grLodFactorValue = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_LODFACTOR, NULL, 1.0);
+
+	GfLogDebug("Car multi-texturing mode : %d,%d,%d\n", grCarTexturingTrackEnvMode,
+			   grCarTexturingSkyShadowsMode, grCarTexturingTrackShadowsMode);
 
     return 0; // true;
 }

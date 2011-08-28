@@ -368,7 +368,7 @@ void grVtxTable::draw_geometry_for_a_car ()
 		glLoadIdentity();
 		glMultMatrixf((float *)mat);
 		glMatrixMode(GL_MODELVIEW);
-		grEnvShadowState->apply(2);
+		grEnvShadowState->apply(2, true);
 	}
 
 	grEnvState->apply(1, true);
@@ -571,7 +571,7 @@ void grVtxTable::draw_geometry_for_a_car_array ()
 		glLoadIdentity();
 		glMultMatrixf((float *)mat);
 		glMatrixMode(GL_MODELVIEW);
-		grEnvShadowState->apply(2);
+		grEnvShadowState->apply(2, true);
 	}
 
 	if (mapLevelBitmap <= LEVELC3 && grEnvShadowStateOnCars) {
@@ -617,7 +617,7 @@ void grVtxTable::draw_geometry_for_a_car_array ()
 		glMultMatrixf((float *)mat2);
 
 		glMatrixMode(GL_MODELVIEW);
-		grEnvShadowStateOnCars->apply(3);
+		grEnvShadowStateOnCars->apply(3, true);
 	}
 
 

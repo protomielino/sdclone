@@ -94,7 +94,4 @@ class cGrFrameInfo
 	unsigned nTotalFrames;  // Total nb of frames since initView
 };
 
-extern const int grCarTexturingModes;
-extern int grCarTexturingMode;
-
 #endif /* _GRMAIN_H_ */ 
