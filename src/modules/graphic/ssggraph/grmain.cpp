@@ -456,6 +456,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, '9',            "Mirror",            (void*)0, grSwitchMirror, NULL);
     GfuiAddKey(screen, '0',            "Arcade Board",      (void*)5, grSelectBoard, NULL);
     GfuiAddKey(screen, '+', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 grSetZoom, NULL);
+    GfuiAddKey(screen, '=', GFUIM_CTRL, "Zoom In",           (void*)GR_ZOOM_IN,	 grSetZoom, NULL);
     GfuiAddKey(screen, '-', GFUIM_CTRL, "Zoom Out",          (void*)GR_ZOOM_OUT, grSetZoom, NULL);
     GfuiAddKey(screen, '(',            "Split Screen",   (void*)GR_SPLIT_ADD, grSplitScreen, NULL);
     GfuiAddKey(screen, ')',            "UnSplit Screen", (void*)GR_SPLIT_REM, grSplitScreen, NULL);
@@ -463,6 +464,7 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);
 
+	// For experimenting the car multi-texturing blending modes (see grmutlitexstate.cpp).
 	GfuiAddKey(screen, GFUIK_F1, GFUIM_SHIFT, "Change Car Texturing Track Env. Mode",
 			   (void*)1, grChangeCarTexturingMode, NULL);
 	GfuiAddKey(screen, GFUIK_F2, GFUIM_SHIFT, "Change Car Texturing Sky Shadows Mode",
