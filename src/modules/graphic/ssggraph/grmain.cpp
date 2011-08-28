@@ -430,8 +430,8 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
 		grScreens[i]->initBoard();
     }
 
-    GfuiAddKey(screen, GFUIK_HOME,     "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
-    GfuiAddKey(screen, GFUIK_END,      "Zoom Minimum", (void*)GR_ZOOM_MIN,	grSetZoom, NULL);
+    GfuiAddKey(screen, GFUIK_END,      "Zoom Maximum", (void*)GR_ZOOM_MAX,	grSetZoom, NULL);
+    GfuiAddKey(screen, GFUIK_HOME,     "Zoom Minimum", (void*)GR_ZOOM_MIN,	grSetZoom, NULL);
     GfuiAddKey(screen, '*',            "Zoom Default", (void*)GR_ZOOM_DFLT,	grSetZoom, NULL);
 
     GfuiAddKey(screen, GFUIK_PAGEUP,   "Select Previous Car", (void*)0, grPrevCar, NULL);
