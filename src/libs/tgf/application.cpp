@@ -22,6 +22,7 @@
     @ingroup	tgf
 */
 
+#include <cerrno>
 #include <iostream>
 
 #include <config.h>
@@ -290,12 +291,11 @@ bool GfApplication::parseOptions()
     if (datadir && strlen(datadir))
     {
         if(chdir(datadir))
-	{
-            GfLogTrace("SD_DATADIR  : '%s'\n", GfDataDir());
-            GfLogError("Could not start Speed Dreams : could not change directory to the datadir\n\n");
-	    return false;
-	}
-
+        {
+            GfLogError("Could not start Speed Dreams : failed to cd to the datadir '%s' (%s)\n",
+                       datadir, strerror(errno));
+            return false;
+        }
     }
 
     return true;
