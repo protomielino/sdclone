@@ -66,30 +66,36 @@ void gfuiLoadFonts(void)
 	void *param;
 	int	size;
 	int	i;
+	int nFontId = 0;
 
 	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "b5.glf"));
-
-	for(i = 0; i < 4; i++) {
+	for(i = 0; i < 4; i++, nFontId++) {
 		size = (int)GfParmGetNum(param, "Menu Font", keySize[i], (char*)NULL, 10.0);
-		gfuiFont[i] = new GfuiFontClass(buf);
-		gfuiFont[i]->create(size);
+		gfuiFont[nFontId] = new GfuiFontClass(buf);
+		gfuiFont[nFontId]->create(size);
+	}
+
+	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Text Font", "name", "b6.glf"));
+	for(i = 0; i < 4; i++, nFontId++) {
+		size = (int)GfParmGetNum(param, "Text Font", keySize[i], (char*)NULL, 10.0);
+		gfuiFont[nFontId] = new GfuiFontClass(buf);
+		gfuiFont[nFontId]->create(size);
 	}
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Console Font", "name", "b7.glf"));
-
-	for(i = 0; i < 4; i++) {
+	for(i = 0; i < 4; i++, nFontId++) {
 		size = (int)GfParmGetNum(param, "Console Font", keySize[i], (char*)NULL, 10.0);
-		gfuiFont[i+4] = new GfuiFontClass(buf);
-		gfuiFont[i+4]->create(size);
+		gfuiFont[nFontId] = new GfuiFontClass(buf);
+		gfuiFont[nFontId]->create(size);
 	}
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Digital Font", "name", "digital.glf"));
 	size = (int)GfParmGetNum(param, "Digital Font", keySize[0], (char*)NULL, 8.0);
-	gfuiFont[8] = new GfuiFontClass(buf);
-	gfuiFont[8]->create(size);
+	gfuiFont[nFontId] = new GfuiFontClass(buf);
+	gfuiFont[nFontId]->create(size);
 
 	GfParmReleaseHandle(param);
 }

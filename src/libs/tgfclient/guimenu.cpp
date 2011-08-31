@@ -100,6 +100,11 @@ static const TMapFontSize::value_type AMapFontSize[] =
     TMapFontSize::value_type("medium_c", GFUI_FONT_MEDIUM_C),
     TMapFontSize::value_type("small_c",  GFUI_FONT_SMALL_C),
 
+    TMapFontSize::value_type("big_t",    GFUI_FONT_BIG_T),
+    TMapFontSize::value_type("large_t",  GFUI_FONT_LARGE_T),
+    TMapFontSize::value_type("medium_t", GFUI_FONT_MEDIUM_T),
+    TMapFontSize::value_type("small_t",  GFUI_FONT_SMALL_T),
+
     TMapFontSize::value_type("digit",    GFUI_FONT_DIGIT),
 };
 
