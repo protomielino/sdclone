@@ -82,9 +82,6 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	static char	buf[maxBufSize];
 	static char	buf2[maxBufSize];
 
-	// TODO: Get 'colNameColor' property value from XML when available.
-	//	static float colNameColor[4] = {1.0, 0.0, 1.0, 1.0};
-
 	// Open and parse credits file
 	sprintf(buf, "%s%s", GfDataDir(), "credits.xml");
 	void* hparmCredits = GfParmReadFile(buf, GFPARM_RMODE_REREAD);
@@ -200,7 +197,10 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	// Close credits file
 	GfParmReleaseHandle(hparmCredits);
 	
-	// Create "Previous page" button if not the first page.
+	// Create "Previous page" button, and disable it if not the first page.
+	const int nPrevButId =
+		GfuiMenuCreateButtonControl(hscrPage, hmenu, "previous page arrow",
+									(void*)&PrevPageRequest, creditsPageChange);
 	if (startRecordIndex > 0 || startChapterIndex > 0)
 	{
 		PrevPageRequest.prevPageScrHdle = hscrPage;
@@ -214,17 +214,22 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			PrevPageRequest.startChapterIndex = startChapterIndex - 1;
 			PrevPageRequest.startRecordIndex  = -1;
 		}
-		GfuiMenuCreateButtonControl(hscrPage, hmenu, "previous page arrow",
-									(void*)&PrevPageRequest, creditsPageChange);
 		GfuiAddKey(hscrPage, GFUIK_PAGEUP, "Previous page", 
 				   (void*)&PrevPageRequest, creditsPageChange, NULL);
+	}
+	else
+	{
+		GfuiEnable(hscrPage, nPrevButId, GFUI_DISABLE);
 	}
 	
 	// Add "Continue" button (credits screen exit).
 	GfuiMenuCreateButtonControl(hscrPage, hmenu, "back button",
 								RetScrHdle, GfuiScreenReplace);
 	
-	// Add "Next page" button if not the last page.
+	// Add "Next page" button, and disable it  if not the last page.
+	const int nNextButId =
+		GfuiMenuCreateButtonControl(hscrPage, hmenu, "next page arrow",
+									(void*)&NextPageRequest, creditsPageChange);
 	if (nRecordInd < nRecordsInChapter || startChapterIndex + 1 < nChapters) 
 	{
 		NextPageRequest.prevPageScrHdle = hscrPage;
@@ -238,10 +243,12 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			NextPageRequest.startChapterIndex = startChapterIndex + 1;
 			NextPageRequest.startRecordIndex  = 0;
 		}
-		GfuiMenuCreateButtonControl(hscrPage, hmenu, "next page arrow",
-									(void*)&NextPageRequest, creditsPageChange);
 		GfuiAddKey(hscrPage, GFUIK_PAGEDOWN, "Next Page", 
 				   (void*)&NextPageRequest, creditsPageChange, NULL);
+	}
+	else
+	{
+		GfuiEnable(hscrPage, nNextButId, GFUI_DISABLE);
 	}
 
 	GfParmReleaseHandle(hmenu);
