@@ -410,6 +410,8 @@ TGFCLIENT_API void GfuiUnSelectCurrent(void);
 #define GFUI_FONT_SMALL_T      11
 #define GFUI_FONT_DIGIT        12
 
+#define GFUI_FONT_NB	       13 // Warning: Keep always this sync'd with GFUI_FONT_* above !
+
 TGFCLIENT_API int  GfuiFontHeight(int font);
 TGFCLIENT_API int  GfuiFontWidth(int font, const char* text);
 TGFCLIENT_API void GfuiDrawString(const char* text, float* fgColor, int font,

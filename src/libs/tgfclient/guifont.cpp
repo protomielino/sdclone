@@ -39,8 +39,7 @@
 				  
 static char buf[1024];
 
-#define FONT_NB	9
-GfuiFontClass *gfuiFont[FONT_NB];
+GfuiFontClass *gfuiFont[GFUI_FONT_NB];
 const char *keySize[4] = { "size big", "size large", "size medium", "size small" };
 
 
@@ -66,34 +65,49 @@ void gfuiLoadFonts(void)
 	void *param;
 	int	size;
 	int	i;
-	int nFontId = 0;
+	int nFontId;
 
 	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "b5.glf"));
+	GfLogTrace("Loading font 'Menu Font' from %s : Sizes", buf);
+	nFontId = GFUI_FONT_BIG;
 	for(i = 0; i < 4; i++, nFontId++) {
 		size = (int)GfParmGetNum(param, "Menu Font", keySize[i], (char*)NULL, 10.0);
+		GfLogTrace(" %d,", size);
 		gfuiFont[nFontId] = new GfuiFontClass(buf);
 		gfuiFont[nFontId]->create(size);
 	}
-
-	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Text Font", "name", "b6.glf"));
-	for(i = 0; i < 4; i++, nFontId++) {
-		size = (int)GfParmGetNum(param, "Text Font", keySize[i], (char*)NULL, 10.0);
-		gfuiFont[nFontId] = new GfuiFontClass(buf);
-		gfuiFont[nFontId]->create(size);
-	}
+	GfLogTrace("\n");
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Console Font", "name", "b7.glf"));
+	GfLogTrace("Loading font 'Console Font' from %s : Sizes", buf);
+	nFontId = GFUI_FONT_BIG_C;
 	for(i = 0; i < 4; i++, nFontId++) {
 		size = (int)GfParmGetNum(param, "Console Font", keySize[i], (char*)NULL, 10.0);
+		GfLogTrace(" %d,", size);
 		gfuiFont[nFontId] = new GfuiFontClass(buf);
 		gfuiFont[nFontId]->create(size);
 	}
+	GfLogTrace("\n");
+
+	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Text Font", "name", "b6.glf"));
+	GfLogTrace("Loading font 'Text Font' from %s : Sizes", buf);
+	nFontId = GFUI_FONT_BIG_T;
+	for(i = 0; i < 4; i++, nFontId++) {
+		size = (int)GfParmGetNum(param, "Text Font", keySize[i], (char*)NULL, 10.0);
+		GfLogTrace(" %d,", size);
+		gfuiFont[nFontId] = new GfuiFontClass(buf);
+		gfuiFont[nFontId]->create(size);
+	}
+	GfLogTrace("\n");
 
 	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Digital Font", "name", "digital.glf"));
+	GfLogTrace("Loading font 'Digital Font' from %s : Sizes", buf);
+	nFontId = GFUI_FONT_DIGIT;
 	size = (int)GfParmGetNum(param, "Digital Font", keySize[0], (char*)NULL, 8.0);
+	GfLogTrace(" %d\n", size);
 	gfuiFont[nFontId] = new GfuiFontClass(buf);
 	gfuiFont[nFontId]->create(size);
 
