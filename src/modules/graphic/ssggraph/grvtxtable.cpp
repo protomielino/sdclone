@@ -128,7 +128,8 @@ grVtxTable::grVtxTable (GLenum ty, ssgVertexArray   *vl,
 			 ssgColourArray   *cl,
 			 int _indexCar) : ssgVtxTable(ty, vl, nl, tl, cl)
 {
-	//GfLogDebug("grVtxTable::grVtxTable(ARRAY, nml=%d, ml=%d)\n", _numMapLevel, _mapLevel);
+	//GfLogDebug("grVtxTable::grVtxTable(ARRAY, nml=%d, ml=%d, tl1=%p)\n",
+	//		   _numMapLevel, _mapLevel, tl1);
 
 	type = ssgTypeVtxTable();
 	numMapLevel = _numMapLevel;
@@ -161,7 +162,8 @@ grVtxTable::grVtxTable (GLenum ty, ssgVertexArray   *vl,
 			 ssgColourArray   *cl,
 			 int _indexCar) : ssgVtxTable(ty, vl, nl, tl, cl)
 {
-	//GfLogDebug("grVtxTable::grVtxTable(TABLE, nml=%d, ml=%d)\n", _numMapLevel, _mapLevel);
+	//GfLogDebug("grVtxTable::grVtxTable(TABLE, nml=%d, ml=%d, tl1=%p)\n",
+	//		   _numMapLevel, _mapLevel, tl1);
 
 	type = ssgTypeVtxTable ();
 	numMapLevel = _numMapLevel;
@@ -415,10 +417,13 @@ void grVtxTable::draw_geometry_for_a_car ()
 
 		if (num_texcoords > 1) {
 			glMultiTexCoord2fvARB(GL_TEXTURE0_ARB, tx[i]);
-			if (mapLevelBitmap <= LEVELC2) {
+			// #439 : Seel below : test tx2 in any case ...
+			if (tx2 && mapLevelBitmap <= LEVELC2) {
 				glMultiTexCoord2fvARB(GL_TEXTURE2_ARB, tx2[i]);
 			}
-			glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, tx1[i]);
+			// #439 : Don't know why, but sometimes (agl-kart), tx1=0
+			if (tx1)
+				glMultiTexCoord2fvARB(GL_TEXTURE1_ARB, tx1[i]);
 		}
 		glVertex3fv(vx[i]);
 	}
