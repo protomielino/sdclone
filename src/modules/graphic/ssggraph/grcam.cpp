@@ -173,11 +173,11 @@ void cGrPerspCamera::setZoom(int cmd)
 	}
 	break;
 
-    case GR_ZOOM_MAX:
+    case GR_ZOOM_MIN:
 	fovy = fovymax;
 	break;
 
-    case GR_ZOOM_MIN:
+    case GR_ZOOM_MAX:
 	fovy = fovymin;
 	break;
 
