@@ -646,6 +646,8 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 		while (pCurIntFile != pIntFileList);
 	}
 	
+	GfDirFreeList(pIntFileList, NULL);
+	
 	// Search for skinned logo files if any.
 	tFList *pLogoFileList =
 		GfDirGetListFiltered(strFolderPath.c_str(), pszLogoTexName, pszLogoTexExt);

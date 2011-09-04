@@ -160,6 +160,8 @@ GfTracks::GfTracks()
 			_pPrivate->mapTracksById[pszTrackId] = pTrack;
 		}
 		while ((pTrackFolder = pTrackFolder->next) != lstTrackFolders);
+		
+		GfDirFreeList(lstTrackFolders, NULL, true, true);
 	} 
 	while ((pCatFolder = pCatFolder->next) != lstCatFolders);
 	
