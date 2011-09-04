@@ -404,9 +404,18 @@ rmApplyState(void *pvState)
 // }
 
 static void
+rmOpenHelpScreen(void * /* dummy */)
+{
+	if (LegacyMenu::self().soundEngine())
+		LegacyMenu::self().soundEngine()->mute(true);
+	
+	GfuiHelpScreen(rmScreenHandle);
+}
+
+static void
 rmAddKeys()
 {
-    GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", rmScreenHandle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", NULL, rmOpenHelpScreen, NULL);
     GfuiAddKey(rmScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
 
     GfuiAddKey(rmScreenHandle, '-', "Slow down Time",    (void*)-1, rmTimeMod, NULL);
