@@ -9,10 +9,10 @@
 //
 // File         : unitfixcarparam.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.07
+// Last changed : 2011.09.07
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 3.03.000
 //--------------------------------------------------------------------------*
 // Ein erweiterter TORCS-Roboters
 //--------------------------------------------------------------------------*
@@ -176,6 +176,28 @@ double TFixCarParam::CalcBraking
   double TrackRollAngle,                         // Track roll angle
   double TrackTiltAngle) const                   // Track tilt angle
 {
+/*
+	Friction *= 0.5 + CarParam.oScaleBrake / 2.0;
+
+    double Mu_F = Friction * oTyreMuFront;
+	double Mu_R = Friction * oTyreMuRear;
+	double Mu = MIN(Mu_F,Mu_R);
+
+	double Ca = MIN(oCaFrontWing,oCaRearWing);
+	//double Cw = oCdBody * (1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
+	double Cw = 0; // Brake while slip streaming!
+
+	double Cos = cos(TrackTiltAngle);
+	double Sin = sin(TrackTiltAngle);
+	double C = Mu * G * (cos(TrackRollAngle) * Cos - Sin);
+	double D = (Ca * Mu + Cw) / oTmpCarParam->oMass;
+	double E = MAX(0.01,Dist * (1 - 50 * fabs(Crv0)));
+
+	double V = ((C + Speed * Speed * D)/exp(-2*D*E) - C)/D;
+
+	return (float) MAX(sqrt(V),Speed);
+*/
+/**/
   if (Speed > 180/3.6)
     Friction *= 0.90;
   else
@@ -237,8 +259,12 @@ double TFixCarParam::CalcBraking
     
 	if (TDriver::UseBrakeLimit)
 	{
-      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
-		  * (fabs(Crv) - TDriver::BrakeLimitBase));
+//      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
+//		  * (fabs(Crv) - TDriver::BrakeLimitBase));
+	  double Radius = 1.0 / fabs(Crv);
+	  double factor = MIN(1.0,MAX(0.333, (Radius - 200.0 / 100.0)));
+	  if (Radius < 25.0)
+		  factor /= 3;
 	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
 	}
 
@@ -250,6 +276,7 @@ double TFixCarParam::CalcBraking
   }
 
   return U;
+/**/
 }
 //==========================================================================*
 
@@ -328,8 +355,12 @@ double	TFixCarParam::CalcBrakingPit
 
 	if (TDriver::UseBrakeLimit)
 	{
-      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
-		  * (fabs(Crv) - TDriver::BrakeLimitBase));
+//      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
+//		  * (fabs(Crv) - TDriver::BrakeLimitBase));
+	  double Radius = 1.0 / fabs(Crv);
+	  double factor = MIN(1.0,MAX(0.333, (Radius - 200.0 / 100.0)));
+	  if (Radius < 25.0)
+		  factor /= 3;
 	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
 	}
 
@@ -413,19 +444,35 @@ double TFixCarParam::CalcMaxSpeed
 
   double Speed = factor * sqrt((Cos * G * Mu + Sin * G * SGN(Crv0)) / Den);
 
-  if (fabs(AbsCrv) > 1/40.0)
-    Speed *= 0.70;                               // Filter hairpins
-  else if (fabs(AbsCrv) > 1/45.0)
-    Speed *= 0.84;                               // Filter hairpins
-  else if (Speed > 112)                          // (111,11 m/s = 400 km/h)
-    Speed = 112;                                 
+  if (TDriver::UseGPBrakeLimit)
+  {
+    if (fabs(AbsCrv) > 1/15.0)
+      Speed *= 0.20;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/25.0)
+      Speed *= 0.30;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/40.0)
+      Speed *= 0.70;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/45.0)
+      Speed *= 0.84;                             // Filter hairpins
+    else if (Speed > 112)                        // (111,11 m/s = 400 km/h)
+      Speed = 112;                                 
+  }
+  else
+  {
+    if (fabs(AbsCrv) > 1/40.0)
+      Speed *= 0.70;                             // Filter hairpins
+    else if (fabs(AbsCrv) > 1/45.0)
+      Speed *= 0.84;                             // Filter hairpins
+    else if (Speed > 112)                        // (111,11 m/s = 400 km/h)
+      Speed = 112;                                 
+  }
 
   if (AbsCrv0 < 1/10.0)
   {
 	if (TDriver::UseGPBrakeLimit)
 	{
-      if (Speed < 7.0)
-    	  Speed = 7.0;
+      if (Speed < 6.0)
+    	  Speed = 6.0;
 	}
 	else
 	{
@@ -437,8 +484,8 @@ double TFixCarParam::CalcMaxSpeed
   {
 	if (TDriver::UseGPBrakeLimit)
 	{
-      if (Speed < 5.0)
-        Speed = 5.0;
+      if (Speed < 3.0)
+        Speed = 3.0;
 	}
 	else
 	{

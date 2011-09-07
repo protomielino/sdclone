@@ -9,10 +9,10 @@
 //
 // File         : unitglobal.h
 // Created      : 2007.11.17
-// Last changed : 2011.06.07
+// Last changed : 2011.09.06
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 3.03.000
 //--------------------------------------------------------------------------*
 // This program was developed and tested on windows XP
 // There are no known Bugs, but:
@@ -411,6 +411,7 @@ enum
 // Parameters of this robot ...
 //#define PRV_ACCEL_FILTER     "accel filter"
 #define PRV_ACCEL_OUT        "accel out"
+#define PRV_ACCEL_DELTA      "accel delta"
 #define PRV_FORCE_LANE       "force lane"         // Force lane for tests
 #define PRV_SKILL            "skill"              // Car specific skilling
 

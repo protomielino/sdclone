@@ -130,6 +130,7 @@ class TLane
 	  const TCarParam& CarParam,
 	  double MaxLeft = FLT_MAX,
 	  double MaxRight = FLT_MAX);
+	void SmmothLane();
 
 	const TPathPt& PathPoints(int Index) const;
 

@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.06.07
+// Last changed : 2011.09.06
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 3.03.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -397,6 +397,7 @@ private:
 	float oBumpMode;                             //
 	int oTestLane;
     bool oUseFilterAccel;
+	float oDeltaAccel;                           //
     bool oUseAccelOut;
 	float oSideScaleMu;
 	float oSideScaleBrake;

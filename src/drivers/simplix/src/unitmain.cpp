@@ -8,14 +8,16 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2011.06.07
+// Last changed : 2011.09.06
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.02.000
+// Version      : 3.03.000
+//--------------------------------------------------------------------------*
+// V3.03.000 (SimuV2.1):
+// Braking for GP36 cars
 //--------------------------------------------------------------------------*
 // V3.02.000 (SimuV2.1):
 // Reworked racingline calculation
-//
 //--------------------------------------------------------------------------*
 // V3.01.001 (SimuV2.1):
 // Reworked racingline structure to reduce file size (83% less).
@@ -670,7 +672,7 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_36GP;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.85f,0.85f);
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
     cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.75f);
     cInstances[Index-IndexOffset].cRobot->UseFilterAccel();
   }

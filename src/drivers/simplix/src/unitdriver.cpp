@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.06.04
+// Last changed : 2011.09.06
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.001
+// Version      : 3.03.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -336,6 +336,7 @@ TDriver::TDriver(int Index):
   oBumpMode(1),
   oTestLane(0),
   oUseFilterAccel(false),
+  oDeltaAccel(0.05f),
   oUseAccelOut(false),
   oSideScaleMu(0.97f),
   oSideScaleBrake(0.97f),
@@ -610,6 +611,8 @@ void TDriver::AdjustDriving(
   if (GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_FILTER,0,0) != 0)
 	  UseFilterAccel();
   */
+  oDeltaAccel = GfParmGetNum(Handle,TDriver::SECT_PRIV,PRV_ACCEL_DELTA,0,oDeltaAccel);
+
   oOmegaAhead = Param.Fix.oLength;
   oInitialBrakeCoeff = oBrakeCoeff[0];
 
@@ -1433,6 +1436,8 @@ void TDriver::Drive()
   double TrackTurnangle2 = oRacingLine[0].CalcTrackTurnangle(Idx, (Idx + 30) % N);
   GfOut("v:(%.1f)%.1f km/h A1:%.3f A2:%.3f CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,TrackTurnangle1,TrackTurnangle2,oLanePoint.Crvz);
   GfOut("v:(%.1f)%.1f km/h CZ:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,oLanePoint.Crvz);
+  GfOut("#A: %.4f B: %.4f C: %.4f G: %d S: %.4f\n",CarAccelCmd,CarBrakeCmd,CarClutchCmd,CarGearCmd,CarSteerCmd);
+  GfOut("#v:(%.2f)%.1f km/h Radius:%.4f\n",oTargetSpeed*3.6,oCurrSpeed*3.6,1.0/oLanePoint.Crv);
  */
 }
 //==========================================================================*
@@ -3444,8 +3449,8 @@ double TDriver::FilterBrakeSpeed(double Brake)
 //--------------------------------------------------------------------------*
 double TDriver::FilterAccel(double Accel)
 {
-  if (Accel > oLastAccel + 0.05)
-	Accel = MIN(1.0,oLastAccel + 0.05);
+  if (Accel > oLastAccel + oDeltaAccel)
+	Accel = MIN(1.0,oLastAccel + oDeltaAccel);
   return Accel;
 }
 //==========================================================================*
