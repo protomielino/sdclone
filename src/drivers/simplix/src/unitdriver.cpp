@@ -2922,13 +2922,16 @@ void TDriver::EvaluateCollisionFlags(
 
 	double MaxSpdCrv = Param.Fix.CalcMaxSpeedCrv();
 	//double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
-	double ColTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 2.4;
+//	double ColTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 2.4;
+	double ColTime = fabs(Crv) > MaxSpdCrv ? 4.0 : 4.8;
 	//double CatTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
 //	double CatTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
-	double CatTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
+//	double CatTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
+	double CatTime = fabs(Crv) > MaxSpdCrv ? 6.0 : 16.0;
 	//double CacTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
 //	double CacTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
-	double CacTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
+//	double CacTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
+	double CacTime = fabs(Crv) > MaxSpdCrv ? 6.0 : 16.0;
 	bool Catching =
 	  ((OppInfo.CatchTime < ColTime) && OppInfo.GotFlags(F_COLLIDE))
 	  || ((OppInfo.CatchTime < CatTime) && OppInfo.GotFlags(F_CATCHING))

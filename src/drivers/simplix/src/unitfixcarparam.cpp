@@ -176,28 +176,6 @@ double TFixCarParam::CalcBraking
   double TrackRollAngle,                         // Track roll angle
   double TrackTiltAngle) const                   // Track tilt angle
 {
-/*
-	Friction *= 0.5 + CarParam.oScaleBrake / 2.0;
-
-    double Mu_F = Friction * oTyreMuFront;
-	double Mu_R = Friction * oTyreMuRear;
-	double Mu = MIN(Mu_F,Mu_R);
-
-	double Ca = MIN(oCaFrontWing,oCaRearWing);
-	//double Cw = oCdBody * (1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
-	double Cw = 0; // Brake while slip streaming!
-
-	double Cos = cos(TrackTiltAngle);
-	double Sin = sin(TrackTiltAngle);
-	double C = Mu * G * (cos(TrackRollAngle) * Cos - Sin);
-	double D = (Ca * Mu + Cw) / oTmpCarParam->oMass;
-	double E = MAX(0.01,Dist * (1 - 50 * fabs(Crv0)));
-
-	double V = ((C + Speed * Speed * D)/exp(-2*D*E) - C)/D;
-
-	return (float) MAX(sqrt(V),Speed);
-*/
-/**/
   if (Speed > 180/3.6)
     Friction *= 0.90;
   else
@@ -215,7 +193,7 @@ double TFixCarParam::CalcBraking
   Mu_R = Friction * oTyreMuRear;
   Mu = MIN(Mu_F,Mu_R);
 
-  // From TORCS:
+  // From SD:
   double Cd = oCdBody * 
 	(1.0 + oTmpCarParam->oDamage / 10000.0) + oCdWing;
 
@@ -259,12 +237,8 @@ double TFixCarParam::CalcBraking
     
 	if (TDriver::UseBrakeLimit)
 	{
-//      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
-//		  * (fabs(Crv) - TDriver::BrakeLimitBase));
 	  double Radius = 1.0 / fabs(Crv);
-	  double factor = MIN(1.0,MAX(0.333, (Radius - 200.0 / 100.0)));
-	  if (Radius < 25.0)
-		  factor /= 3;
+	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
 	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
 	}
 
@@ -355,12 +329,8 @@ double	TFixCarParam::CalcBrakingPit
 
 	if (TDriver::UseBrakeLimit)
 	{
-//      double factor = 1.0 - MAX(0.0,TDriver::BrakeLimitScale 
-//		  * (fabs(Crv) - TDriver::BrakeLimitBase));
 	  double Radius = 1.0 / fabs(Crv);
-	  double factor = MIN(1.0,MAX(0.333, (Radius - 200.0 / 100.0)));
-	  if (Radius < 25.0)
-		  factor /= 3;
+	  double factor = MIN(1.0,MAX(0.39, (Radius - 190.0) / 100.0));
 	  Acc = MAX(Acc,TDriver::BrakeLimit * factor);
 	}
 
