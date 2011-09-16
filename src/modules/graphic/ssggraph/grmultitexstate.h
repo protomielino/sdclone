@@ -25,7 +25,7 @@ class grMultiTexState : public grManagedState
 {
 	public:
 		~grMultiTexState() {}
-		virtual void apply(int unit, bool bFlag = false);
+		virtual void apply(int unit, bool bAltEnv = false);
 };
 
 // Car multi-texturing modes, for testing/debugging purpose (see grmain.cpp::initView()).

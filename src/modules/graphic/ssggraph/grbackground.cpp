@@ -60,6 +60,15 @@ static const sgVec4 BaseSpecular     = { 0.3f, 0.3f, 0.3f, 1.0f } ;
 static int NStars = 0;
 static int NPlanets = 0;
 
+static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = { 1, 3, 5, 7, 8 };
+static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
+
+static const char* AEnvShadowKeys[] =
+{ "no-cloud", "few-clouds", "scarce-clouds", "many-clouds", "full-cover",
+  "full-cover-rain", "night" };
+static const int NEnvShadowFullCoverRainIndex = 5; // Index in AEnvShadowKeys
+static const int NEnvShadowNightIndex = 6; // Index in AEnvShadowKeys
+
 // Some exported global variables.
 ssgStateSelector *grEnvSelector = NULL;
 grMultiTexState	*grEnvState = NULL;
@@ -172,9 +181,6 @@ grInitBackground(void)
 	// we create the Sun, the Moon, some stars and the clouds
 	else 
 	{
-		static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = { 1, 3, 5, 7, 8 };
-		static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
-
 		GfLogInfo("Setting up realistic %s sky dome :\n", grDynamicSkyDome ? "dynamic" : "static");
 
 		int div = 80000 / grSkyDomeDistance; //grSkyDomeDistance > 0 so cannot div0
@@ -238,10 +244,6 @@ grInitBackground(void)
 				  grMoonDeclination, moonAscension);
 
 		// Add the cloud layers
-		if (grTrack->local.clouds < 0)
-			grTrack->local.clouds = 0;
-		else if(grTrack->local.clouds >= NCloudsTextureIndices)
-			grTrack->local.clouds = NCloudsTextureIndices - 1;
 		const int cloudsTextureIndex = CloudsTextureIndices[grTrack->local.clouds];
 
 		cGrCloudLayer *cloudLayers[NMaxCloudLayers];
@@ -676,8 +678,17 @@ grLoadBackground(void)
 		TheScene->addKid(SunAnchor);
 
 	} //if (!grSkyDomeDistance || grTrack->skyversion < 1)
+	else
+	{
+		// Check / fix the cloud cover index, in any case.
+		if (grTrack->local.clouds < 0)
+			grTrack->local.clouds = 0;
+		else if(grTrack->local.clouds >= NCloudsTextureIndices)
+			grTrack->local.clouds = NCloudsTextureIndices - 1;
+	}
 	
 	// Environment Mapping Settings
+	// 1) Horizontal reflexions of the track objects (env.png & co)
 	bool bUseEnvPng = false;   // Avoid crash with missing env.rgb files (i.e. Wheel-1)
 	bool bDoNotUseEnv = false; // Avoid crash with missing env.png
 	grEnvSelector = new ssgStateSelector(graphic->envnb);
@@ -711,24 +722,53 @@ grLoadBackground(void)
 	else
 		grEnvState = (grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
 
-	grEnvShadowState = (grMultiTexState*)grSsgEnvTexState("envshadow.png");
+	// 2) Sky shadows (vertical) (envshadow-xxx.png), according to the weather conditions
+	grEnvShadowState = 0;
+	int nEnvShadowIndex = -1; // Default = not depending on weather conds.
+	if (!grSkyDomeDistance || grTrack->skyversion < 1)
+	{
+		// Static / texture-based sky case.
+		if (grTrack->local.rain > 0) // Rain => full cloud cover.
+			nEnvShadowIndex = NEnvShadowFullCoverRainIndex;
+	}
+	else
+	{
+		// Realistic sky dome case.
+		// TODO: Find a solution for the "dynamic time" case (not correctly supported here).
+		if (grTrack->local.timeofday < 6*60*60 || grTrack->local.timeofday > 18*60*60)
+			nEnvShadowIndex = NEnvShadowNightIndex;
+		else if (grTrack->local.rain > 0) // Rain => full cloud cover.
+			nEnvShadowIndex = NEnvShadowFullCoverRainIndex;
+		else
+			nEnvShadowIndex = grTrack->local.clouds;
+	}
+	if (nEnvShadowIndex >= 0)
+	{
+		char pszEnvFile[64];
+		snprintf(pszEnvFile, sizeof(pszEnvFile), "envshadow-%s.png", AEnvShadowKeys[nEnvShadowIndex]);
+		grEnvShadowState = (grMultiTexState*)grSsgEnvTexState(pszEnvFile);
+		if (!grEnvShadowState)
+			GfLogWarning("%s not found ; falling back to weather-independant sky shadows"
+						 " from envshadow.png\n", pszEnvFile);
+	}
+	if (!grEnvShadowState)
+		grEnvShadowState = (grMultiTexState*)grSsgEnvTexState("envshadow.png");
 	if (!grEnvShadowState) {
-		ulSetError ( UL_WARNING, "grscene:initBackground Failed to open envshadow.png for reading") ;
-		ulSetError ( UL_WARNING, "        mandatory for top env mapping (should be in the .xml !!) ") ;
-		ulSetError ( UL_WARNING, "        copy the envshadow.png from 'chemisay' to the track you selected ") ;
-		ulSetError ( UL_WARNING, "        (sorry for exiting, but it would have actually crashed).") ;
+		GfLogError("envshadow.png not found ; exiting !\n");
+		GfLogError("(mandatory for top env mapping (should be in <track>.xml or data/textures ;\n");
+		GfLogError(" copy the envshadow.png from 'chemisay' to the track you selected ;\n");
+		GfLogError(" sorry for exiting, but it would have actually crashed)\n");
 		GfScrShutdown();
 		exit(-1);
 	}//if grEnvShadowState
     
+	// 3) Vertical shadows of track objects on the cars (shadow2.png)
 	grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.png");
 	if(!grEnvShadowStateOnCars)
 		grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.rgb");
   
-	if(!grEnvShadowStateOnCars) {
-		ulSetError ( UL_WARNING, "grscene:initBackground Failed to open shadow2.png/rgb for reading") ;
-		ulSetError ( UL_WARNING, "        no shadow mapping on cars for this track ") ;
-	}//if grEnvShadowStateOnCars
+	if(!grEnvShadowStateOnCars)
+		GfLogWarning("shadow2.png/rgb not found ; no shadow mapping on cars for this track\n");
 }//grLoadBackground
 
 void
