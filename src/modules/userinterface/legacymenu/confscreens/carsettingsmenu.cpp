@@ -43,7 +43,7 @@ void CarSettingsMenu::onCarPick(tComboBoxInfo *pInfo)
 void CarSettingsMenu::onAccept(void *p)
 {
 	GfCar *pCar = GfCars::self()->getCarWithName(m_strCar);
-	GetNetwork()->SetCarInfo(pCar->getId().c_str());
+	NetGetNetwork()->SetCarInfo(pCar->getId().c_str());
 	GfuiScreenActivate(pPrevMenu);
 }
 
@@ -61,7 +61,7 @@ bool CarSettingsMenu::initialize(void* pMenu,const char *pszCar)
 {
 	std::string strCarCat;
 	bool bCollisions;
-	GetNetwork()->GetHostSettings(strCarCat,bCollisions);
+	NetGetNetwork()->GetHostSettings(strCarCat,bCollisions);
 	pPrevMenu = pMenu;
 
 	void* pMenuHandle = GfuiScreenCreate(NULL,NULL,onActivate, 

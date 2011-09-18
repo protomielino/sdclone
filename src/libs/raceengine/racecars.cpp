@@ -510,8 +510,8 @@ void
 				if ((car->_state & RM_CAR_STATE_FINISH) == 0) {
 					car->_laps++;
 
-					if (GetNetwork())
-						GetNetwork()->SendLapStatusPacket(car);
+					if (NetGetNetwork())
+						NetGetNetwork()->SendLapStatusPacket(car);
 
 					car->_remainingLaps--;
 					if (car->_pos == 1 && s->currentTime < s->_totTime
@@ -617,9 +617,9 @@ void
 							if (car->_pos == 1) {
 								sprintf(msg, "Winner %s", car->_name);
 								ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
-								if (GetServer())
+								if (NetGetServer())
 								{
-									GetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
+									NetGetServer()->SetFinishTime(s->currentTime+FINISHDELAY);
 								}
 							} else {
 								const char *numSuffix = "th";

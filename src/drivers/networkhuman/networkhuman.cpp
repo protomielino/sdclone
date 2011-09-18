@@ -244,8 +244,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* wel
 	while (strlen(driver) > 0);
 
 	
-	if (GetNetwork())
-		g_activeDriver = GetNetwork()->GetNetworkHumanIdx()-1;
+	if (NetGetNetwork())
+		g_activeDriver = NetGetNetwork()->GetNetworkHumanIdx()-1;
 
 	// Release in case we got it.
 	GfParmReleaseHandle(drvInfo);
@@ -1159,7 +1159,7 @@ static void drive_at(int index, tCarElt* car, tSituation *s)
 	int idx = index - 1;
 	tControlCmd	*cmd;
 
-	if (GetNetwork())
+	if (NetGetNetwork())
 	{
 		if (g_activeDriver!=idx)
 			return;

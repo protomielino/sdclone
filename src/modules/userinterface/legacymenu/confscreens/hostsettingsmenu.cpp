@@ -67,7 +67,7 @@ void HostSettingsMenu::onPlayerReady(void *p)
 
 void HostSettingsMenu::onAccept(void *p)
 {
-	GetServer()->SetHostSettings(m_strCarCat.c_str(),m_bCollisions);
+	NetGetServer()->SetHostSettings(m_strCarCat.c_str(),m_bCollisions);
 	GfuiScreenActivate(pPrevMenu);
 }
 
@@ -83,7 +83,7 @@ HostSettingsMenu::HostSettingsMenu()
 
 bool HostSettingsMenu::initialize(void* pMenu)
 {
-	GetNetwork()->GetHostSettings(m_strCarCat,m_bCollisions);
+	NetGetNetwork()->GetHostSettings(m_strCarCat,m_bCollisions);
 
 	pPrevMenu = pMenu;
 

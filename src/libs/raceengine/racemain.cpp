@@ -97,8 +97,8 @@ void ReRaceAbort()
 
 	ReRaceCleanDrivers();
 
-	if (GetNetwork())
-		GetNetwork()->Disconnect();
+	if (NetGetNetwork())
+		NetGetNetwork()->Disconnect();
 
 	FREEZ(ReInfo->_reCarInfo);
 	
@@ -399,8 +399,8 @@ ReRaceRealStart(void)
 	// More initializations.
 	ReInfo->_reTimeMult = 1.0;
 	ReInfo->_reLastRobTime = -1.0;
-	if (GetNetwork())
-		ReInfo->s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
+	if (NetGetNetwork())
+		ReInfo->s->currentTime = GfTimeClock() - NetGetNetwork()->GetRaceStartTime();
 	else
 		ReInfo->s->currentTime = -2.0;	// We start 2 seconds before the real race start
 	ReInfo->s->deltaTime = RCM_MAX_DT_SIMU;
@@ -418,12 +418,12 @@ ReRaceRealStart(void)
 	ReUI().onRaceSimulationReady();
 
 	// Initialize the network if needed.
-	if (GetNetwork())
+	if (NetGetNetwork())
 	{
 		ReUI().addLoadingMessage("Preparing online race ...");
 		
-		GetNetwork()->RaceInit(ReOutputSituation()->s);
-		GetNetwork()->SetRaceActive(true);
+		NetGetNetwork()->RaceInit(ReOutputSituation()->s);
+		NetGetNetwork()->SetRaceActive(true);
 	}
 
 	// Notify the UI that the race is now started.
@@ -614,8 +614,8 @@ ReRaceEnd(void)
 	
 	ReRaceCleanup();
 
-	if (GetNetwork())
-		GetNetwork()->RaceDone();
+	if (NetGetNetwork())
+		NetGetNetwork()->RaceDone();
 
 	// If we are at the end of a qualification or practice session,
 	// select the next competitor : it is his turn for the session.

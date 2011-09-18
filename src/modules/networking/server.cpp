@@ -24,31 +24,30 @@
 #include "robotxml.h" 
 
 
-Server::Server()
+NetServer::NetServer()
 {
 	if (enet_initialize () != 0)
     {
         GfLogError ("An error occurred while initializing ENet.\n");
 		assert(false);
-        
     }
 
 	m_strClass = "server";
 }
 
-Server::~Server()
+NetServer::~NetServer()
 {
 	ResetNetwork();
-	SetServer(false);
+	NetSetServer(false);
 }
 
-void Server::Disconnect()
+void NetServer::Disconnect()
  {
 	ResetNetwork();
-	SetServer(false);
+	NetSetServer(false);
  }
 
-void Server::ResetNetwork()
+void NetServer::ResetNetwork()
 {
 	if (m_pServer)
 	{
@@ -112,7 +111,7 @@ void Server::ResetNetwork()
 	}
 }
 
-bool Server::IsConnected()
+bool NetServer::IsConnected()
 {
 	if (m_pServer)
 		return true;
@@ -120,7 +119,7 @@ bool Server::IsConnected()
 	return false;
 }
 
-bool Server::Start(int port)
+bool NetServer::Start(int port)
 {
 	SetRaceInfoChanged(true);
 	m_bPrepareToRace = false;
@@ -166,12 +165,12 @@ bool Server::Start(int port)
 }
 
 
-bool Server::ClientsReadyToRace()
+bool NetServer::ClientsReadyToRace()
 {
 	return m_bBeginRace;
 }
 
-void Server::WaitForClientsStartPacket()
+void NetServer::WaitForClientsStartPacket()
 {
 	while (!m_bBeginRace)
 	{
@@ -179,7 +178,7 @@ void Server::WaitForClientsStartPacket()
 	}
 }
 
-void Server::SendStartTimePacket(int &startTime)
+void NetServer::SendStartTimePacket(int &startTime)
 {
 	unsigned char packetId = RACESTARTTIME_PACKET;
 
@@ -200,7 +199,7 @@ void Server::SendStartTimePacket(int &startTime)
 	delete [] pData;
 	GfLogInfo("Server Start time is %lf\n",m_racestarttime);
 }
-double Server::WaitForRaceStart()
+double NetServer::WaitForRaceStart()
 {
 	int startTime;
 	SendStartTimePacket(startTime);
@@ -212,16 +211,16 @@ double Server::WaitForRaceStart()
 	return time;
 }
 
-void Server::ClearDrivers()
+void NetServer::ClearDrivers()
 {
 	LockServerData()->m_vecNetworkPlayers.clear();
 	LockServerData()->Unlock();
 	GenerateDriversForXML();
-	Dump("Server::ClearDrivers");
+	Dump("NetServer::ClearDrivers");
 }
 
 
-void Server::SetHostSettings(const char *pszCarCat,bool bCollisions)
+void NetServer::SetHostSettings(const char *pszCarCat,bool bCollisions)
 {
 	assert(m_strRaceXMLFile!="");
 
@@ -235,7 +234,7 @@ void Server::SetHostSettings(const char *pszCarCat,bool bCollisions)
 }
 
 
-void Server::GenerateDriversForXML()
+void NetServer::GenerateDriversForXML()
 {
 	assert(m_strRaceXMLFile!="");
 
@@ -247,10 +246,10 @@ void Server::GenerateDriversForXML()
     int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 	
 	//Gather vector of all non human drivers
-	std::vector<Driver> vecRDrivers;
+	std::vector<NetDriver> vecRDrivers;
 	for (int i=1;i<=nCars;i++)
 	{
-		Driver driver;
+		NetDriver driver;
 		ReadDriverData(driver,i,params);
 		if (strcmp(driver.module,NETWORKROBOT)	&& strcmp(driver.module,HUMANROBOT))
 			vecRDrivers.push_back(driver);
@@ -268,7 +267,7 @@ void Server::GenerateDriversForXML()
     }
 
 	//And then add the networkhuman drivers
-	ServerMutexData *pSData = LockServerData();
+	NetServerMutexData *pSData = LockServerData();
 	for (int i=0;i<(int)pSData->m_vecNetworkPlayers.size();i++)
 	{
 		int index = i+1+vecRDrivers.size();
@@ -283,7 +282,7 @@ void Server::GenerateDriversForXML()
 	GfParmWriteFileLocal(m_strRaceXMLFile.c_str(), params, pName);
 }
 
-void Server::SetLocalDrivers()
+void NetServer::SetLocalDrivers()
 {
 	m_setLocalDrivers.clear();
 
@@ -300,10 +299,10 @@ void Server::SetLocalDrivers()
 
     int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);	
 	//Gather vector of all non human drivers
-	std::vector<Driver> vecRDrivers;
+	std::vector<NetDriver> vecRDrivers;
 	for (int i=1;i<=nCars;i++)
 	{
-		Driver driver;
+		NetDriver driver;
 		ReadDriverData(driver,i,params);
 		if ((strcmp(driver.module,NETWORKROBOT)!=0)
 			&&(strcmp(driver.module,HUMANROBOT)!=0))
@@ -314,36 +313,36 @@ void Server::SetLocalDrivers()
 	}
 }
 
-void Server::OverrideDriverReady(int idx,bool bReady)
+void NetServer::OverrideDriverReady(int idx,bool bReady)
 {
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
 
-	Dump("Server::OverrideDriverReady");
+	Dump("NetServer::OverrideDriverReady");
 
 	SetRaceInfoChanged(true);
 }
-void Server::SetDriverReady(bool bReady)
+void NetServer::SetDriverReady(bool bReady)
 {
 	int idx = GetDriverIdx();
 
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
 
-	Dump("Server::SetDriverReady");
+	Dump("NetServer::SetDriverReady");
 
 	SendDriversReadyPacket();
 }
 
 
-void Server::UpdateDriver(Driver & driver)
+void NetServer::UpdateDriver(NetDriver & driver)
 {
 	assert(m_strRaceXMLFile!="");
 	bool bNewDriver = true;
 
-	ServerMutexData *pSData = LockServerData();
+	NetServerMutexData *pSData = LockServerData();
 
 	// Search for the driver in m_vecNetworkPlayers, and update its car name if found.
 	for(unsigned int i=0;i<pSData->m_vecNetworkPlayers.size();i++)
@@ -368,7 +367,7 @@ void Server::UpdateDriver(Driver & driver)
 
 		pSData->m_vecNetworkPlayers.push_back(driver);
 		
-		MutexData *pNData = LockNetworkData();
+		NetMutexData *pNData = LockNetworkData();
 		pNData->m_vecReadyStatus.push_back(false);
 		UnlockNetworkData();
 	}
@@ -380,14 +379,14 @@ void Server::UpdateDriver(Driver & driver)
 
 	UnlockServerData();
 	
-	Dump("Server::UpdateDriver");
+	Dump("NetServer::UpdateDriver");
 
 	SetRaceInfoChanged(true);
 }
 
-void Server::SetCarInfo(const char *pszName)
+void NetServer::SetCarInfo(const char *pszName)
 {
-	std::vector<Driver> vecDrivers;
+	std::vector<NetDriver> vecDrivers;
 
 	RobotXml robotxml;
 	robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
@@ -403,15 +402,15 @@ void Server::SetCarInfo(const char *pszName)
 	}
 }
 
-void Server::CreateNetworkRobotFile()
+void NetServer::CreateNetworkRobotFile()
 {
 	RobotXml rXml;
-	ServerMutexData *pSData = LockServerData();
+	NetServerMutexData *pSData = LockServerData();
 	rXml.CreateRobotFile("networkhuman",pSData->m_vecNetworkPlayers);
 	UnlockServerData();
 }
 
-void Server::RemoveDriver(ENetEvent event)
+void NetServer::RemoveDriver(ENetEvent event)
 {
 	int playerStartIndex;
 	ENetAddress address = event.peer->address;
@@ -421,7 +420,7 @@ void Server::RemoveDriver(ENetEvent event)
 
     GfLogTrace ("Client Player Info disconnect from %s\n",hostName); 
 	
-	std::vector<Driver>::iterator p;
+	std::vector<NetDriver>::iterator p;
 
 	if (m_vecWaitForPlayers.size()>0)
 	{
@@ -444,7 +443,7 @@ void Server::RemoveDriver(ENetEvent event)
 	}
 
 	//look for driver id
-	ServerMutexData *pSData = LockServerData();
+	NetServerMutexData *pSData = LockServerData();
 	for (p = pSData->m_vecNetworkPlayers.begin();p!=pSData->m_vecNetworkPlayers.end();p++)
 	{
 		if (p->client)
@@ -479,7 +478,7 @@ void Server::RemoveDriver(ENetEvent event)
 	UnlockServerData();
 }
 
-bool Server::SendPlayerAcceptedPacket(ENetPeer * pPeer)
+bool NetServer::SendPlayerAcceptedPacket(ENetPeer * pPeer)
 {
 
 	//Send to client requesting connection
@@ -502,7 +501,7 @@ bool Server::SendPlayerAcceptedPacket(ENetPeer * pPeer)
 	return false;
 }
 
-bool Server::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
+bool NetServer::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
 {
 	unsigned int l = strReason.length();
 	
@@ -531,11 +530,11 @@ bool Server::SendPlayerRejectedPacket(ENetPeer * pPeer,std::string strReason)
 	return false;
 }
 
-void Server::SendDriversReadyPacket()
+void NetServer::SendDriversReadyPacket()
 {
 	
 	unsigned char packetId = ALLDRIVERREADY_PACKET;
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 
 	int rsize = pNData->m_vecReadyStatus.size();
 	int datasize = 1+sizeof(rsize)+sizeof(bool)*rsize;
@@ -564,7 +563,7 @@ void Server::SendDriversReadyPacket()
 	m_bRefreshDisplay = true;
 }
 
-void Server::SendRaceSetupPacket()
+void NetServer::SendRaceSetupPacket()
 {
 	unsigned char packetId = RACEINFOCHANGE_PACKET;
 	int datasize = 1;
@@ -585,7 +584,7 @@ void Server::SendRaceSetupPacket()
 }
 
 
-void Server::ReadDriverReadyPacket(ENetPacket *pPacket)
+void NetServer::ReadDriverReadyPacket(ENetPacket *pPacket)
 {
     GfLogTrace ("Read Driver Ready Packet\n"); 
 	
@@ -595,28 +594,28 @@ void Server::ReadDriverReadyPacket(ENetPacket *pPacket)
 	bool bReady;
 	memcpy(&bReady,&pPacket->data[spot],sizeof(bReady));
 	
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
 
 	SendDriversReadyPacket();
 }
 
-void Server::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
+void NetServer::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
 {
-	assert(pPacket->dataLength==(sizeof(Driver)+1));
+	assert(pPacket->dataLength==(sizeof(NetDriver)+1));
 	
-	Driver driver;
+	NetDriver driver;
 
 	char hostName[256];
 	enet_address_get_host_ip (&driver.address,hostName,256);
 
     GfLogTrace ("Client Player Info connected from %s\n",hostName); 
 
-	memcpy(&driver,&pPacket->data[1],sizeof(Driver));
+	memcpy(&driver,&pPacket->data[1],sizeof(NetDriver));
 
 	//Make sure player name is unique otherwise disconnect player
-	ServerMutexData *pSData = LockServerData();
+	NetServerMutexData *pSData = LockServerData();
 	for(unsigned int i=0;i<pSData->m_vecNetworkPlayers.size();i++)
 	{
 		if (strcmp(driver.name,pSData->m_vecNetworkPlayers[i].name)==0)
@@ -639,7 +638,7 @@ void Server::ReadDriverInfoPacket(ENetPacket *pPacket, ENetPeer * pPeer)
 
 
 //Used to verify that all clients are still connected
-void Server::PingClients()
+void NetServer::PingClients()
 {
     ENetPeer * pCurrentPeer;
 
@@ -656,7 +655,7 @@ void Server::PingClients()
 
 
 //Here you are Xavier a dynamic weather packet
-void Server::SendWeatherPacket()
+void NetServer::SendWeatherPacket()
 {
 	GfLogTrace("Sending Weather Packet\n");
 	
@@ -671,7 +670,7 @@ void Server::SendWeatherPacket()
 	BroadcastPacket(pWeatherPacket,RELIABLECHANNEL);
 }
 
-void Server::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
+void NetServer::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
 {
 	GfLogTrace("Sending Time Packet\n");
 	int packetSize = 1+sizeof(double);
@@ -699,7 +698,7 @@ void Server::SendTimePacket(ENetPacket *pPacketRec, ENetPeer * pPeer)
 //Do not use this to send large files
 //In future maybe change to TCP based
 //64k file size limit
-void Server::SendFilePacket(const char *pszFile)
+void NetServer::SendFilePacket(const char *pszFile)
 {
 	char filepath[255];
 	sprintf(filepath, "%s%s", GfLocalDir(), pszFile);
@@ -752,7 +751,7 @@ void Server::SendFilePacket(const char *pszFile)
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 }
 
-bool Server::listen()
+bool NetServer::listen()
 {
 	if (!m_pServer)
 		return false;
@@ -809,7 +808,7 @@ bool Server::listen()
 }
 
 //Remove disconnected player from race track
-void Server::RemovePlayerFromRace(unsigned int idx)
+void NetServer::RemovePlayerFromRace(unsigned int idx)
 {
 	GfLogTrace("Removing disconnected player\n");
 	std::vector<CarStatusPacked> vecCarStatus;
@@ -824,7 +823,7 @@ void Server::RemovePlayerFromRace(unsigned int idx)
 	cstatus.state = RM_CAR_STATE_ELIMINATED;
 	cstatus.time = m_currentTime;
 	
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_vecCarStatus.push_back(cstatus);
 	UnlockNetworkData();
 
@@ -868,7 +867,7 @@ void Server::RemovePlayerFromRace(unsigned int idx)
 	delete [] pDataStart;
 }
 
-void Server::ReadPacket(ENetEvent event)
+void NetServer::ReadPacket(ENetEvent event)
 {
 	ENetPacket *pPacket = event.packet;
 	assert(pPacket->dataLength>=1);
@@ -891,7 +890,7 @@ void Server::ReadPacket(ENetEvent event)
 			memcpy(&l,pData,sizeof(l));
 			pData+=sizeof(l);
 			memcpy(name,pData,l);
-			std::vector<Driver>::iterator p;
+			std::vector<NetDriver>::iterator p;
 			p = m_vecWaitForPlayers.begin();
 			while(p!=m_vecWaitForPlayers.end())
 			{
@@ -937,7 +936,7 @@ void Server::ReadPacket(ENetEvent event)
     enet_packet_destroy (event.packet);
 }
 
-void Server::SendFinishTimePacket()
+void NetServer::SendFinishTimePacket()
 {
 	GfLogTrace("Sending finish Time Packet\n");
 	
@@ -948,7 +947,7 @@ void Server::SendFinishTimePacket()
 	unsigned char packetId = FINISHTIME_PACKET;
 	memcpy(pData,&packetId,1);
 	pData++;
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	double time = pNData->m_finishTime;
 	UnlockNetworkData();
 
@@ -963,10 +962,10 @@ void Server::SendFinishTimePacket()
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 }
 
-void Server::SendPrepareToRacePacket()
+void NetServer::SendPrepareToRacePacket()
 {
 	//Add all players to list except the server player
-	ServerMutexData *pSData = LockServerData();
+	NetServerMutexData *pSData = LockServerData();
 	for (int i=0;i<(int)pSData->m_vecNetworkPlayers.size();i++)
 	{
 		if (pSData->m_vecNetworkPlayers[i].client)
@@ -989,42 +988,42 @@ void Server::SendPrepareToRacePacket()
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 }
 
-void Server::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
+void NetServer::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
 {
 	enet_host_broadcast (m_pHost, channel, pPacket);
 	m_activeNetworkTime = GfTimeClock();
 }
 
-void Server::SetFinishTime(double time)
+void NetServer::SetFinishTime(double time)
 {
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_finishTime = time;
 	UnlockNetworkData();
 	SendFinishTimePacket();
 }
 
-int Server::NumberofPlayers()
+int NetServer::NumberofPlayers()
 { 
 	int n = LockServerData()->m_vecNetworkPlayers.size();
 	UnlockServerData();
 	return n;
 }
 
-ServerMutexData * Server::LockServerData() 
+NetServerMutexData * NetServer::LockServerData() 
 {
 	m_ServerData.Lock();
 	return & m_ServerData;
 }
 
-void Server::UnlockServerData()
+void NetServer::UnlockServerData()
 {
 	m_ServerData.Unlock();
 }
 
-void Server::Dump(const char* pszCaller)
+void NetServer::Dump(const char* pszCaller)
 {
-	MutexData *pNData = LockNetworkData();
-	ServerMutexData *pSData = LockServerData();
+	NetMutexData *pNData = LockNetworkData();
+	NetServerMutexData *pSData = LockServerData();
 
 	GfLogDebug("%s : vecReady:%u, vecPlayers:%u\n", 
 			   pszCaller, pNData->m_vecReadyStatus.size(), pSData->m_vecNetworkPlayers.size());

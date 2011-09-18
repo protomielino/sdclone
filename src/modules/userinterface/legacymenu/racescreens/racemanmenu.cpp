@@ -366,16 +366,16 @@ RmRacemanMenu()
 		
 		// End of temporary.
 
-		if (GetNetwork())
+		if (NetGetNetwork())
 		{
-			if (GetNetwork()->IsConnected())
+			if (NetGetNetwork()->IsConnected())
 			{
-				if (IsClient())
+				if (NetIsClient())
 				{
 					RmNetworkClientMenu(NULL);
 					return;
 				}
-				else if (IsServer())
+				else if (NetIsServer())
 				{
 					RmNetworkHostMenu(NULL);
 					return;

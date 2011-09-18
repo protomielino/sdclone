@@ -39,7 +39,7 @@ reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 	// double errY = pDynCG->pos.y-pCt->DynGCg.pos.y;
 	// double errZ = pDynCG->pos.z-pCt->DynGCg.pos.z;
 
-	int idx = GetNetwork()->GetCarIndex(pCt->startRank,ReInfo->s);
+	int idx = NetGetNetwork()->GetCarIndex(pCt->startRank,ReInfo->s);
 	
 	//Car controls (steering,gas,brake, gear
 	tCarElt *pCar = ReInfo->s->cars[idx];
@@ -80,7 +80,7 @@ reNetworkSetCarPhysics(double timeDelta,CarControlsData *pCt)
 static void
 reNetworkSetCarStatus(CarStatus *pStatus)
 {
-	int idx = GetNetwork()->GetCarIndex(pStatus->startRank,ReInfo->s);
+	int idx = NetGetNetwork()->GetCarIndex(pStatus->startRank,ReInfo->s);
 
 	tCarElt *pCar = ReInfo->s->cars[idx];
 
@@ -99,7 +99,7 @@ reNetworkSetCarStatus(CarStatus *pStatus)
 static void
 reNetworkSetLapStatus(LapStatus *pStatus)
 {
-	int idx = GetNetwork()->GetCarIndex(pStatus->startRank,ReInfo->s);
+	int idx = NetGetNetwork()->GetCarIndex(pStatus->startRank,ReInfo->s);
 
 	tCarElt *pCar = ReInfo->s->cars[idx];
 	pCar->race.bestLapTime = pStatus->bestLapTime;
@@ -118,7 +118,7 @@ ReNetworkOneStep()
 	int numCars = 0;
 	double time = 0.0f;
 	
-	MutexData *pNData = GetNetwork()->LockNetworkData();
+	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
 
 	numCars = pNData->m_vecCarCtrls.size();
 	if (numCars>0)
@@ -137,7 +137,7 @@ ReNetworkOneStep()
 		}
 	}
 
-	GetNetwork()->SetCurrentTime(s->currentTime);
+	NetGetNetwork()->SetCurrentTime(s->currentTime);
 	pNData->m_vecCarCtrls.clear();
 
 	//do car status updates if needed
@@ -177,31 +177,31 @@ ReNetworkOneStep()
 
 	pNData->m_vecLapStatus.clear();
 
-	GetNetwork()->UnlockNetworkData();
+	NetGetNetwork()->UnlockNetworkData();
 }
 
 int
 ReNetworkWaitReady()
 {
 	// No wait if not an online race.
-	if (!GetNetwork())
+	if (!NetGetNetwork())
 		return RM_SYNC | RM_NEXT_STEP;
 
 	// If network race, wait for other players and start when the server tells to
 	bool bWaitFinished = false;
-	if (GetClient())
+	if (NetGetClient())
 	{
-		GetClient()->SendReadyToStartPacket();
-		ReInfo->s->currentTime = GetClient()->WaitForRaceStart();
+		NetGetClient()->SendReadyToStartPacket();
+		ReInfo->s->currentTime = NetGetClient()->WaitForRaceStart();
 		GfLogInfo("Client beginning race in %lf seconds!\n", - ReInfo->s->currentTime);
 		bWaitFinished = true;
 	}
 	
-	else if (GetServer())
+	else if (NetGetServer())
 	{
-		if (GetServer()->ClientsReadyToRace())
+		if (NetGetServer()->ClientsReadyToRace())
 		{
-			ReInfo->s->currentTime = GetServer()->WaitForRaceStart();
+			ReInfo->s->currentTime = NetGetServer()->WaitForRaceStart();
 			GfLogInfo("Server beginning race in %lf seconds!\n", - ReInfo->s->currentTime);
 			bWaitFinished = true;
 		}
@@ -224,6 +224,6 @@ void
 ReNetworkCheckEndOfRace()
 {
 	// Check for end of online race.
-	if (GetNetwork() && GetNetwork()->FinishRace(ReInfo->s->currentTime))
+	if (NetGetNetwork() && NetGetNetwork()->FinishRace(ReInfo->s->currentTime))
 		ReInfo->s->_raceState = RM_RACE_ENDED;
 }

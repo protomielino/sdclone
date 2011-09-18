@@ -18,16 +18,16 @@
  ***************************************************************************/
 
 #include <cstdio>
+
 #include <SDL/SDL.h>
+
 #include "network.h"
 #include "robotxml.h"
 
-Client::Client()
+NetClient::NetClient()
 {
 	if (enet_initialize () != 0)
-    {
         GfLogError ("An error occurred while initializing ENet.\n");
-    }
 
 	m_strClass = "client";
 	m_pServer = NULL;
@@ -37,21 +37,21 @@ Client::Client()
 }
 
 
-Client::~Client()
+NetClient::~NetClient()
 {
 	ResetNetwork();
-	SetClient(false);
+	NetSetClient(false);
 }
 
-void Client::Disconnect()
+void NetClient::Disconnect()
 {
 	m_bConnected = false;
 	
 	ResetNetwork();
-	SetClient(false);
+	NetSetClient(false);
 }
 
-void Client::ResetNetwork()
+void NetClient::ResetNetwork()
 {
 	if (m_pClient == NULL)
 		return;
@@ -93,7 +93,7 @@ void Client::ResetNetwork()
     if (!bDisconnect)
 		enet_peer_reset (m_pServer);
 
-	SetClient(false);
+	NetSetClient(false);
 
     ENetPeer * pCurrentPeer1;
 
@@ -115,7 +115,7 @@ void Client::ResetNetwork()
 
 }
 
-bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
+bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDriver)
 {
 	m_bTimeSynced = false;
 	m_bPrepareToRace = false;
@@ -249,17 +249,17 @@ bool Client::ConnectToServer(const char *pAddress,int port, Driver *pDriver)
 	return m_bConnected;
 }
 
-bool Client::IsConnected()
+bool NetClient::IsConnected()
 {
 	return m_bConnected;
 }
 
-void Client::SetDriverReady(bool bReady)
+void NetClient::SetDriverReady(bool bReady)
 {
 	// Get local driver index in the race driver list
 	int idx = GetDriverIdx();
 
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
 
@@ -285,17 +285,17 @@ void Client::SetDriverReady(bool bReady)
 		return;
 }
 
-bool Client::SendDriverInfoPacket(Driver *pDriver)
+bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
 {
 	SetDriverName(pDriver->name);
 	pDriver->address.port = m_pHost->address.port;
 
 	unsigned char  packetId = PLAYERINFO_PACKET;
-	int datasize = sizeof(Driver)+1;
+	int datasize = sizeof(NetDriver)+1;
 
 	unsigned char *pData = new unsigned char[datasize];
 	memcpy(&pData[0],&packetId,1);
-	memcpy(&pData[1],pDriver,sizeof(Driver));
+	memcpy(&pData[1],pDriver,sizeof(NetDriver));
 
 	ENetPacket * pPacket = enet_packet_create (pData, 
                                               datasize, 
@@ -309,7 +309,7 @@ bool Client::SendDriverInfoPacket(Driver *pDriver)
 	return false;
 }
 
-void Client::SendReadyToStartPacket()
+void NetClient::SendReadyToStartPacket()
 {
 	
 	std::string strDName = GetDriverName();
@@ -335,7 +335,7 @@ void Client::SendReadyToStartPacket()
 }
 
 
-void Client::SendServerTimeRequest()
+void NetClient::SendServerTimeRequest()
 {
 	m_packetsendtime = GfTimeClock(); 
 	unsigned char packetId = SERVER_TIME_REQUEST_PACKET;
@@ -347,7 +347,7 @@ void Client::SendServerTimeRequest()
 		GfLogError("SendServerTimeRequest : enet_peer_send failed\n");
 }
 
-double Client::WaitForRaceStart()
+double NetClient::WaitForRaceStart()
 {
 	while(!m_bBeginRace)
 	{
@@ -358,7 +358,7 @@ double Client::WaitForRaceStart()
 }
 
 
-void Client::ReadStartTimePacket(ENetPacket *pPacket)
+void NetClient::ReadStartTimePacket(ENetPacket *pPacket)
 {
 	GfLogTrace("Recieved the start race Packet\n");
 	unsigned char *pData = &pPacket->data[1];
@@ -371,19 +371,19 @@ void Client::ReadStartTimePacket(ENetPacket *pPacket)
 	
 }
 
-void Client::ReadPlayerRejectedPacket(ENetPacket *pPacket)
+void NetClient::ReadPlayerRejectedPacket(ENetPacket *pPacket)
 {
 	m_eClientAccepted = CLIENTREJECTED;
 	GfLogWarning ("Server rejected connection.\n");
 }
 
-void Client::ReadPlayerAcceptedPacket(ENetPacket *pPacket)
+void NetClient::ReadPlayerAcceptedPacket(ENetPacket *pPacket)
 {
 	m_eClientAccepted = CLIENTACCEPTED;
 	GfLogTrace ("Server accepted connection.\n");
 }
 
-bool Client::listenHost(ENetHost * pHost)
+bool NetClient::listenHost(ENetHost * pHost)
 {
 	if (pHost == NULL)
 		return false;
@@ -438,7 +438,7 @@ bool Client::listenHost(ENetHost * pHost)
 
 }
 
-bool Client::listen()
+bool NetClient::listen()
 {
 	if (!m_bConnected)
 		return false;
@@ -450,7 +450,7 @@ bool Client::listen()
 }
 
 
-void Client::ReadPacket(ENetEvent event)
+void NetClient::ReadPacket(ENetEvent event)
 {
 	ENetPacket *pPacket = event.packet;
 	assert(pPacket->dataLength>=1);
@@ -513,7 +513,7 @@ void Client::ReadPacket(ENetEvent event)
     enet_packet_destroy (event.packet);
 }
 
-void Client::ReadPrepareToRacePacket(ENetPacket *pPacket)
+void NetClient::ReadPrepareToRacePacket(ENetPacket *pPacket)
 {
 	GfLogTrace("Recieved the start race Packet\n");
 
@@ -525,14 +525,14 @@ void Client::ReadPrepareToRacePacket(ENetPacket *pPacket)
 
 
 }
-void Client::ReadRaceSetupPacket(ENetPacket *pPacket)
+void NetClient::ReadRaceSetupPacket(ENetPacket *pPacket)
 {
 	GfLogTrace("\nRecieving race setup\n");
 
 	SetRaceInfoChanged(true);
 }
 
-void Client::ConnectToDriver(Driver driver)
+void NetClient::ConnectToDriver(NetDriver driver)
 {
 	char hostName[256];
 	enet_address_get_host_ip (&driver.address,hostName,256);
@@ -590,17 +590,17 @@ void Client::ConnectToDriver(Driver driver)
 
 }
 
-void Client::ReadWeatherPacket(ENetPacket *pPacket)
+void NetClient::ReadWeatherPacket(ENetPacket *pPacket)
 {
 	//TODO Xavier read in weather data
 }
-void Client::ReadAllDriverReadyPacket(ENetPacket *pPacket)
+void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
 {
 	unsigned char *pData = &pPacket->data[1];
 	int rsize;
 	memcpy(&rsize,pData,sizeof(rsize));
 	pData+=sizeof(rsize);
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	pNData->m_vecReadyStatus.clear();
 	pNData->m_vecReadyStatus.resize(rsize);
 	bool *pReady = (bool*)pData;
@@ -613,17 +613,17 @@ void Client::ReadAllDriverReadyPacket(ENetPacket *pPacket)
 	GfLogTrace("Recieved All Driver Ready Packet\n");
 }
 
-void Client::ReadFinishTimePacket(ENetPacket *pPacket)
+void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
 {
 	unsigned char *pData = &pPacket->data[1];
 	
-	MutexData *pNData = LockNetworkData();
+	NetMutexData *pNData = LockNetworkData();
 	memcpy(&pNData->m_finishTime,pData,sizeof(pNData->m_finishTime));
 	UnlockNetworkData();
 	GfOut("Recieved finish time packet\n");
 }
 
-void Client::ReadTimePacket(ENetPacket *pPacket)
+void NetClient::ReadTimePacket(ENetPacket *pPacket)
 {
 	double curTime = GfTimeClock();
 	m_lag = (curTime-m_packetsendtime)/2.0;
@@ -635,7 +635,7 @@ void Client::ReadTimePacket(ENetPacket *pPacket)
 	m_servertimedifference = curTime-time;
 	m_bTimeSynced = true;
 }
-void Client::ReadFilePacket(ENetPacket *pPacket)
+void NetClient::ReadFilePacket(ENetPacket *pPacket)
 {
 
 	unsigned char *pData = &pPacket->data[1];
@@ -662,7 +662,7 @@ void Client::ReadFilePacket(ENetPacket *pPacket)
 	fclose(pFile);
 }
 
-void Client::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
+void NetClient::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
 {
 	ENetPacket * pHostPacket = enet_packet_create (pPacket->data, 
                                               pPacket->dataLength, 
@@ -677,9 +677,9 @@ void Client::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)
 	m_activeNetworkTime = GfTimeClock();
 }
 
-void Client::SetCarInfo(const char *pszName)
+void NetClient::SetCarInfo(const char *pszName)
 {
-	std::vector<Driver> vecDrivers;
+	std::vector<NetDriver> vecDrivers;
 
 	RobotXml robotxml;
 	robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
@@ -694,9 +694,9 @@ void Client::SetCarInfo(const char *pszName)
 	}
 }
 
-void Client::ConnectToClients()
+void NetClient::ConnectToClients()
 {
-	std::vector<Driver> vecDrivers;
+	std::vector<NetDriver> vecDrivers;
 
 	RobotXml robotxml;
 	robotxml.ReadRobotDrivers(NETWORKROBOT,vecDrivers);
@@ -708,7 +708,7 @@ void Client::ConnectToClients()
 
 }
 
-void Client::SetLocalDrivers()
+void NetClient::SetLocalDrivers()
 {
 	m_setLocalDrivers.clear();
 	m_driverIdx = GetDriverIdx();

@@ -28,7 +28,7 @@ RobotXml::RobotXml()
 {
 }
 
-bool RobotXml::CreateRobotFile(const char*pRobotName,std::vector<Driver> &vecDrivers)
+bool RobotXml::CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vecDrivers)
 {
  	char buf[255];
 	sprintf(buf,"drivers/%s/%s.xml",pRobotName,pRobotName);
@@ -69,7 +69,7 @@ bool RobotXml::CreateRobotFile(const char*pRobotName,std::vector<Driver> &vecDri
 	return true;
 }
 
-bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<Driver> &vecDrivers)
+bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &vecDrivers)
 {
  	char buf[255];
 	sprintf(buf,"drivers/%s/%s.xml",pRobotName,pRobotName);
@@ -84,7 +84,7 @@ bool RobotXml::ReadRobotDrivers(const char*pRobotName,std::vector<Driver> &vecDr
 	for (int i= 1;i<=nPlayers;i++)
 	{
 		sprintf(path2, "Robots/index/%i",i);
-		Driver driver;
+		NetDriver driver;
 		strncpy(driver.name,GfParmGetStr(params, path2, "name",NULL),64);
 		std::string strClient = GfParmGetStr(params, path2, "client",NULL);
 		if (strClient == "yes")

@@ -83,7 +83,7 @@ static std::string g_strHostIP = "127.0.0.1";
 HostSettingsMenu g_HostMenu;
 CarSettingsMenu g_CarMenu;
 
-static void GetHumanDriver(Driver &driver,int index);
+static void GetHumanDriver(NetDriver &driver,int index);
 static void ServerPrepareStartNetworkRace(void *pVoid);
 static void NetworkClientConnectMenu(void * /* dummy */);
 
@@ -105,8 +105,8 @@ static void EnableMenuHostButtons(bool bChecked)
 
 static void onHostPlayerReady(tCheckBoxInfo* pInfo)
 {
-	SetReadyStatus(GetNetwork()->GetDriverIdx()-1, pInfo->bChecked);
-	GetNetwork()->SetDriverReady(pInfo->bChecked);
+	SetReadyStatus(NetGetNetwork()->GetDriverIdx()-1, pInfo->bChecked);
+	NetGetNetwork()->SetDriverReady(pInfo->bChecked);
 	EnableMenuHostButtons(pInfo->bChecked);
 }
 
@@ -120,8 +120,8 @@ static void EnableMenuClientButtons(bool bChecked)
 
 static void onClientPlayerReady(tCheckBoxInfo* pInfo)
 {
-	SetReadyStatus(GetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
-	GetNetwork()->SetDriverReady(pInfo->bChecked);
+	SetReadyStatus(NetGetNetwork()->GetDriverIdx()-1,pInfo->bChecked);
+	NetGetNetwork()->SetDriverReady(pInfo->bChecked);
 	EnableMenuClientButtons(pInfo->bChecked);
 }
 
@@ -191,7 +191,7 @@ GetTrackOutlineFileName(const char *pszCategory,const char *pszTrack)
 static void 
 UpdateNetworkPlayers()
 {
-	Network *pNetwork = GetNetwork();
+	NetNetwork *pNetwork = NetGetNetwork();
 
 	if (pNetwork->GetRefreshDisplay() == false)
 		return;
@@ -202,7 +202,7 @@ UpdateNetworkPlayers()
 	pNetwork->SetCurrentDriver();
 
 	//reload xml file
-	GetNetwork()->SetRaceXMLFile("config/raceman/networkrace.xml");
+	NetGetNetwork()->SetRaceXMLFile("config/raceman/networkrace.xml");
 	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 
@@ -230,7 +230,7 @@ UpdateNetworkPlayers()
 	// Update category info
 	std::string strCarCat;
 	bool bCollisions;
-	GetNetwork()->GetHostSettings(strCarCat,bCollisions);
+	NetGetNetwork()->GetHostSettings(strCarCat,bCollisions);
 	GfuiLabelSetText(racemanMenuHdle,g_catHd,strCarCat.c_str());
 
 	//fill in player data
@@ -280,9 +280,9 @@ UpdateNetworkPlayers()
 		// 1) make the networking module take care of the robot drivers too
 		//    (in m_vecReadyStatus, m_vecNetworkPlayers, ...)
 		// 2) make the networking _menu_ only take care of the networkhuman drivers.
-		MutexData *pNData = GetNetwork()->LockNetworkData();
+		NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
 		bool bReady = pNData->m_vecReadyStatus[i-1];
-		GetNetwork()->UnlockNetworkData();
+		NetGetNetwork()->UnlockNetworkData();
 
 		int readyindex = 0;
 		if (bReady)
@@ -291,14 +291,14 @@ UpdateNetworkPlayers()
 			bEveryoneReadyToRace = false;
 
 		bool bLocalPlayer = false;
-		if (strcmp(GetNetwork()->GetDriverName(),name)==0)
+		if (strcmp(NetGetNetwork()->GetDriverName(),name)==0)
 		{
 			bLocalPlayer = true;
 			pColor = &green[0];
 			g_strCar = strRealCar;
 			//Make sure checkbox matches ready state
 			GfuiCheckboxSetChecked(racemanMenuHdle, g_ReadyCheckboxId, bReady);
-			if (GetClient())
+			if (NetGetClient())
 				EnableMenuClientButtons(bReady);
 			else
 				EnableMenuHostButtons(bReady);
@@ -327,17 +327,17 @@ UpdateNetworkPlayers()
 	pNetwork->SetRefreshDisplay(false);
 	GfuiApp().eventLoop().postRedisplay();
 
-	if (IsClient())
+	if (NetIsClient())
 	{	
-		GetClient()->ConnectToClients();
+		NetGetClient()->ConnectToClients();
 
-		if (!GetClient()->TimeSynced())
+		if (!NetGetClient()->TimeSynced())
 		{
-			GetClient()->SendServerTimeRequest();
+			NetGetClient()->SendServerTimeRequest();
 		}
 	}
 
-	if (IsServer())
+	if (NetIsServer())
 	{
 		if (bEveryoneReadyToRace && nCars > 1)
 			ServerPrepareStartNetworkRace(NULL);
@@ -349,8 +349,8 @@ static void
 rmNetworkClientDisconnect(void * /* dummy */)
 {
 	GfOut("Disconnecting from server\n");
-	if (GetClient())
-		GetClient()->Disconnect();
+	if (NetGetClient())
+		NetGetClient()->Disconnect();
 
 	GfuiScreenActivate(RmRaceSelectMenuHandle);
 }
@@ -362,7 +362,7 @@ CheckDriversCategory()
 	bool bDriversChange = false;
 	std::string strCarCat;
 	bool bCollisions;
-	GetNetwork()->GetHostSettings(strCarCat,bCollisions);
+	NetGetNetwork()->GetHostSettings(strCarCat,bCollisions);
 	if (strCarCat =="All")
 		return;
 
@@ -371,7 +371,7 @@ CheckDriversCategory()
 
 	//Make sure all cars are in the correct category or force change of car
 	unsigned int count = 0;
-	ServerMutexData *pSData = GetServer()->LockServerData();
+	NetServerMutexData *pSData = NetGetServer()->LockServerData();
 
 	count = pSData->m_vecNetworkPlayers.size();
 	for (unsigned int i=0;i<count;i++)
@@ -382,38 +382,38 @@ CheckDriversCategory()
 			//Pick first car in categroy
 			strncpy(pSData->m_vecNetworkPlayers[i].car,vecCars[0].c_str(),64);
 			bDriversChange = true;
-			GetServer()->OverrideDriverReady(pSData->m_vecNetworkPlayers[i].idx,false);
+			NetGetServer()->OverrideDriverReady(pSData->m_vecNetworkPlayers[i].idx,false);
 		}
 	}
 
 	if(bDriversChange)
 	{
-		GetServer()->CreateNetworkRobotFile();
+		NetGetServer()->CreateNetworkRobotFile();
 	}
 	
-	//GetServer()->UnlockDrivers();
-	GetServer()->UnlockServerData();
+	//NetGetServer()->UnlockDrivers();
+	NetGetServer()->UnlockServerData();
 }
 
 static void
 HostServerIdle(void)
 {
 	GfuiIdle();
-	if (IsServer())
+	if (NetIsServer())
 	{
-		if (GetServer()->GetRaceInfoChanged())
+		if (NetGetServer()->GetRaceInfoChanged())
 		{
 			CheckDriversCategory();
 			//Send to clients all of the xml files we modified and client needs to reload
-			GetServer()->SendFilePacket("drivers/networkhuman/networkhuman.xml");
-			GetServer()->SendFilePacket("config/raceman/networkrace.xml");
-			GetServer()->SendRaceSetupPacket();
-			GetServer()->SendDriversReadyPacket();
-			GetServer()->SetRaceInfoChanged(false);
+			NetGetServer()->SendFilePacket("drivers/networkhuman/networkhuman.xml");
+			NetGetServer()->SendFilePacket("config/raceman/networkrace.xml");
+			NetGetServer()->SendRaceSetupPacket();
+			NetGetServer()->SendDriversReadyPacket();
+			NetGetServer()->SetRaceInfoChanged(false);
 		}
 		else
 		{
-			if (GetServer()->GetRefreshDisplay())
+			if (NetGetServer()->GetRefreshDisplay())
 			{
 				UpdateNetworkPlayers();
 			}
@@ -432,27 +432,27 @@ static void
 ClientIdle(void)
 {
 	GfuiIdle();
-	if (IsClient())
+	if (NetIsClient())
 	{
-		if (!GetClient()->TimeSynced())
+		if (!NetGetClient()->TimeSynced())
 		{
-			GetClient()->SendServerTimeRequest();
+			NetGetClient()->SendServerTimeRequest();
 		}
 
-		if (GetClient()->GetRefreshDisplay())
+		if (NetGetClient()->GetRefreshDisplay())
 		{
 			//Update the screen
 			UpdateNetworkPlayers();
 			GfuiApp().eventLoop().postRedisplay();
 		}
 
-		if (GetClient()->PrepareToRace())
+		if (NetGetClient()->PrepareToRace())
 		{
-			GetClient()->SetLocalDrivers();
+			NetGetClient()->SetLocalDrivers();
 			LmRaceEngine().startNewRace();
 		}
 
-		if (!GetClient()->IsConnected())
+		if (!NetGetClient()->IsConnected())
 		{
 			rmNetworkClientDisconnect(NULL);
 		}
@@ -467,16 +467,16 @@ ClientIdle(void)
 static void
 NetworkRaceInfo()
 {
-	GetServer()->SetRaceXMLFile("config/raceman/networkrace.xml");
+	NetGetServer()->SetRaceXMLFile("config/raceman/networkrace.xml");
 
-	Driver driver;
-	std::string strName = GetServer()->GetDriverName();
+	NetDriver driver;
+	std::string strName = NetGetServer()->GetDriverName();
 	if (strName =="")
 	{
 		GetHumanDriver(driver,1);
 		driver.client = false;
-		GetServer()->UpdateDriver(driver);
-		GetServer()->SetDriverName(driver.name);
+		NetGetServer()->UpdateDriver(driver);
+		NetGetServer()->SetDriverName(driver.name);
 	}
 
 	//Look up race info
@@ -504,26 +504,26 @@ OnActivateNetworkHost(void *)
 {
 	tRmInfo* reInfo = LmRaceEngine().inData();
 
-	MutexData *pNData = GetNetwork()->LockNetworkData();
+	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
 	for (unsigned int i=0;i<pNData->m_vecReadyStatus.size();i++)
 		pNData->m_vecReadyStatus[i] = false;
 
-	GetNetwork()->UnlockNetworkData();
+	NetGetNetwork()->UnlockNetworkData();
 
-	GetServer()->SetRaceInfoChanged(true);
+	NetGetServer()->SetRaceInfoChanged(true);
 	reInfo->params = GfParmReadFileLocal("config/raceman/networkrace.xml",GFPARM_RMODE_REREAD);
 	assert(reInfo->params);
 	reInfo->_reName = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "");
 	GfuiApp().eventLoop().setRecomputeCB(HostServerIdle);	
-	GetServer()->SetRefreshDisplay(true);
+	NetGetServer()->SetRefreshDisplay(true);
 }
 
 static void
 rmNetworkServerDisconnect(void * /* dummy */)
 {
 	GfLogInfo("Disconnecting all clients\n");
-	if (GetServer())
-		GetServer()->Disconnect();
+	if (NetGetServer())
+		NetGetServer()->Disconnect();
 
 	GfuiScreenActivate(RmRaceSelectMenuHandle);
 }
@@ -553,13 +553,13 @@ RmNetworkHostMenu(void * /* dummy */)
 {
 	GfLogTrace("Entering Network Host menu.\n");
 	
-	if (!GetNetwork())
+	if (!NetGetNetwork())
 	{
-		SetServer(true);
-		SetClient(false);
-		if (!GetServer()->Start(SPEEDDREAMSPORT))
+		NetSetServer(true);
+		NetSetClient(false);
+		if (!NetGetServer()->Start(SPEEDDREAMSPORT))
 		{
-			SetServer(false);
+			NetSetServer(false);
 			return;
 		}
 	}
@@ -660,23 +660,23 @@ RmNetworkClientMenu(void * /* dummy */)
 	
 	ShowWaitingToConnectScreen();
 	
-	if (!GetClient())
+	if (!NetGetClient())
 	{
-		SetServer(false);
-		SetClient(true);
+		NetSetServer(false);
+		NetSetClient(true);
 
-		Driver driver;
+		NetDriver driver;
 		GetHumanDriver(driver,1);
 		driver.client = true;
 		strcpy(driver.name,g_strDriver.c_str());
-		if (!GetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
+		if (!NetGetClient()->ConnectToServer((char*)g_strHostIP.c_str(),SPEEDDREAMSPORT,&driver))
 		{
 			//failed so back to connect menu
 			NetworkClientConnectMenu(NULL);
 			return;
 		}
 
-		//GetClient()->SendDriverInfoPacket(&driver);
+		//NetGetClient()->SendDriverInfoPacket(&driver);
 	}
 
 	if (racemanMenuHdle)
@@ -829,9 +829,9 @@ RmNetworkMenu(void *)
  	tRmInfo* reInfo = LmRaceEngine().inData();
 	void *params = reInfo->params;
 
-	if (GetNetwork())
+	if (NetGetNetwork())
 	{
-		GetNetwork()->ResetNetwork();
+		NetGetNetwork()->ResetNetwork();
 	}
 
     racemanMenuHdle = GfuiScreenCreate(NULL,  NULL, (tfuiCallback)NULL, 
@@ -868,19 +868,19 @@ RmNetworkMenu(void *)
 static void
 ServerPrepareStartNetworkRace(void * /* dummy */)
 {
-	GetServer()->SetLocalDrivers();
+	NetGetServer()->SetLocalDrivers();
 	
 	//Tell all clients to prepare to race and wait for response from all clients
-	GetServer()->SendPrepareToRacePacket();
+	NetGetServer()->SendPrepareToRacePacket();
 
 	//restore the idle function
 	GfuiApp().eventLoop().setRecomputeCB(GfuiIdle);
 	LmRaceEngine().startNewRace();
 }
 
-// Retrieve the Driver instance with given index in the human module interface list
+// Retrieve the NetDriver instance with given index in the human module interface list
 static void
-GetHumanDriver(Driver &driver,int index)
+GetHumanDriver(NetDriver &driver,int index)
 {
 	char buf[255];
 	sprintf(buf,"drivers/human/human.xml");

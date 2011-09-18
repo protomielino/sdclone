@@ -142,10 +142,11 @@ struct CarStatusPacked
 
 
 //Holds driver values 
-class DLLEXPORT Driver
+class DLLEXPORT NetDriver
 {
 public:
-	Driver();
+	NetDriver();
+	~NetDriver() {}
 	ENetAddress address;
 	unsigned short hostPort;
 	
@@ -171,11 +172,11 @@ struct CarSetup
 struct SDL_mutex;
 
 //Put data here that is read by the network thread and the main thread
-class DLLEXPORT MutexData
+class DLLEXPORT NetMutexData
 {
 public:
-	MutexData();
-	virtual ~MutexData();
+	NetMutexData();
+	virtual ~NetMutexData();
 
 	void Lock();
 	void Unlock();
@@ -190,26 +191,26 @@ public:
 };
 
 //Put data here that is read by the network thread and the main thread
-class DLLEXPORT ServerMutexData 
+class DLLEXPORT NetServerMutexData 
 {
 public:
 	void Init();
-	ServerMutexData();
-	virtual ~ServerMutexData();
+	NetServerMutexData();
+	virtual ~NetServerMutexData();
 	
 	void Lock();
 	void Unlock();
 	
 	SDL_mutex *m_networkMutex;
-	std::vector<Driver> m_vecNetworkPlayers;
+	std::vector<NetDriver> m_vecNetworkPlayers;
 };
 
-class DLLEXPORT Network
+class DLLEXPORT NetNetwork
 {
 public:
-	Network();
+	NetNetwork();
 
-	virtual ~Network();
+	virtual ~NetNetwork();
 
 	void SetCurrentTime(double time) {m_currentTime = time;}
 	bool IsServerMode(); 
@@ -248,8 +249,8 @@ public:
 	double GetRaceStartTime(){return m_racestarttime;}
 	std::string GetNetworkDriverName();
 	void SetRaceXMLFile(char const *pXMLFile);
-	void ReadDriverData(Driver &player,int index,void *param);
-	void WriteDriverData(Driver player,int index,void *param);
+	void ReadDriverData(NetDriver &player,int index,void *param);
+	void WriteDriverData(NetDriver player,int index,void *param);
 	int GetPlayerCarIndex(tSituation *s);
 
 	void ClearLocalDrivers();
@@ -262,7 +263,7 @@ public:
 
 	virtual bool FinishRace(double time) ;
 
-	MutexData * LockNetworkData() ;
+	NetMutexData * LockNetworkData() ;
 	void UnlockNetworkData();
 
 protected:
@@ -291,7 +292,7 @@ protected:
 	double m_sendCarDataTime;
 	double m_currentTime;
 
-	MutexData m_NetworkData;
+	NetMutexData m_NetworkData;
 
 
 	std::map<int,int>	m_mapRanks;
@@ -305,21 +306,21 @@ protected:
 
 };
 
-class DLLEXPORT Client: public Network
+class DLLEXPORT NetClient: public NetNetwork
 {
 public:
-	Client();
-	~Client();
+	NetClient();
+	~NetClient();
 
 	virtual void Disconnect();
 	virtual void ResetNetwork();
 	virtual bool IsConnected();
 
-	bool ConnectToServer(const char *pAddress,int port, Driver *pDriver);
+	bool ConnectToServer(const char *pAddress,int port, NetDriver *pDriver);
 	virtual bool listen();
 
 	//Packets
-	bool SendDriverInfoPacket(Driver *pDriver);
+	bool SendDriverInfoPacket(NetDriver *pDriver);
 	virtual void SendDriverReadyPacket(){};
 	void SendReadyToStartPacket();
 	double WaitForRaceStart();
@@ -348,7 +349,7 @@ protected:
 	void ReadPlayerRejectedPacket(ENetPacket *pPacket);
 	void ReadPlayerAcceptedPacket(ENetPacket *pPacket);
 
-	void ConnectToDriver(Driver driver);
+	void ConnectToDriver(NetDriver driver);
 
 	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
 
@@ -366,11 +367,11 @@ protected:
 
 };
 
-class DLLEXPORT Server : public Network
+class DLLEXPORT NetServer : public NetNetwork
 {
 public:
-	Server();
-	~Server();
+	NetServer();
+	~NetServer();
 
 	virtual void Disconnect();
 	virtual void ResetNetwork();
@@ -399,10 +400,10 @@ public:
 	double WaitForRaceStart();
 	void UpdateClientCarInfo(tSituation *s);
 
-	void UpdateDriver(Driver & player);
+	void UpdateDriver(NetDriver & player);
 
 	int  NumberofPlayers();
-	Driver GetPlayer(int i);
+	NetDriver GetPlayer(int i);
 	void ClearDrivers();
 	void RemoveDriver(ENetEvent event);
 	void CreateNetworkRobotFile();
@@ -414,7 +415,7 @@ public:
 	void SetFinishTime(double time);
 	void RemovePlayerFromRace(unsigned int idx);
 
-	ServerMutexData * LockServerData();
+	NetServerMutexData * LockServerData();
 	void UnlockServerData();
 	
 protected:
@@ -425,12 +426,12 @@ protected:
 	void ReadPacket(ENetEvent event);
 	
 
-	ServerMutexData m_ServerData;
+	NetServerMutexData m_ServerData;
 	virtual void BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel);
 	void Dump(const char* pszCaller);
 
 
-	std::vector<Driver> m_vecWaitForPlayers;
+	std::vector<NetDriver> m_vecWaitForPlayers;
 
     ENetHost * m_pServer;
 
@@ -441,14 +442,14 @@ protected:
 bool AddNetworkTimer();
 bool RemoveNetworkTimer();
 
-extern DLLEXPORT void SetServer(bool bStatus);
-extern DLLEXPORT void SetClient(bool bStatus);
-extern DLLEXPORT bool IsServer();
-extern DLLEXPORT bool IsClient();
+extern DLLEXPORT void NetSetServer(bool bStatus);
+extern DLLEXPORT void NetSetClient(bool bStatus);
+extern DLLEXPORT bool NetIsServer();
+extern DLLEXPORT bool NetIsClient();
 
-extern DLLEXPORT Server *GetServer();
-extern DLLEXPORT Client *GetClient();
-extern DLLEXPORT Network *GetNetwork();
+extern DLLEXPORT NetServer *NetGetServer();
+extern DLLEXPORT NetClient *NetGetClient();
+extern DLLEXPORT NetNetwork *NetGetNetwork();
 void NetworkListen();
 
 bool AddressMatch(ENetAddress &a1,ENetAddress &a2);

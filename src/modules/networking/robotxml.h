@@ -29,8 +29,8 @@ class RobotXml
 public:
 	RobotXml();
 	
-	bool CreateRobotFile(const char*pRobotName,std::vector<Driver> &vecDriver);
-	bool ReadRobotDrivers(const char*pRobotName,std::vector<Driver> &vecDrivers);
+	bool CreateRobotFile(const char*pRobotName,std::vector<NetDriver> &vecDriver);
+	bool ReadRobotDrivers(const char*pRobotName,std::vector<NetDriver> &vecDrivers);
 };
 
 #endif // ROBOTXML_H

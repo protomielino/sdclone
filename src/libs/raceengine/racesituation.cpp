@@ -227,12 +227,12 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	// Race messages life cycle management.
 	ReRaceMsgManage(pCurrReInfo);
 	
-	if (GetNetwork())
+	if (NetGetNetwork())
 	{
 		// Resync clock in case computer falls behind
 		if (s->currentTime < 0.0)
 		{
-			s->currentTime = GfTimeClock() - GetNetwork()->GetRaceStartTime();
+			s->currentTime = GfTimeClock() - NetGetNetwork()->GetRaceStartTime();
 		}
 
 		if (s->currentTime < -2.0)
@@ -292,7 +292,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	GfProfStopProfile("rbDrive*");
 
 
-	if (GetNetwork())
+	if (NetGetNetwork())
 		ReNetworkOneStep();
 
 	GfProfStartProfile("physicsEngine.update*");
@@ -379,8 +379,8 @@ int ReSituationUpdater::threadLoop()
 			GfProfStopProfile("reOneStep*");
 		
 			// Send car physics to network if needed
-			if (GetNetwork())
-				GetNetwork()->SendCarControlsPacket(pCurrReInfo->s);
+			if (NetGetNetwork())
+				NetGetNetwork()->SendCarControlsPacket(pCurrReInfo->s);
 		}
 		
 		// 3) If not time to terminate, and not running, do nothing.
@@ -894,8 +894,8 @@ void ReSituationUpdater::computeCurrentStep()
 	GfProfStopProfile("reOneStep*");
 		
 	// Send car physics to network if needed
-	if (GetNetwork())
-		GetNetwork()->SendCarControlsPacket(pCurrReInfo->s);
+	if (NetGetNetwork())
+		NetGetNetwork()->SendCarControlsPacket(pCurrReInfo->s);
 }
 
 bool ReSituationUpdater::setSchedulingSpecs(double fSimuRate, double fOutputRate)
