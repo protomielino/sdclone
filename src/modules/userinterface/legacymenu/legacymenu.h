@@ -140,7 +140,6 @@ public:
 	void unloadCarsGraphics();
 	void unloadTrackGraphics();
 	
-	
  protected:
 
 	// The singleton.
@@ -157,6 +156,10 @@ public:
 	
 	// The game screen.
 	void* _hscrGame;
+
+	// The graphics state.
+	enum { eTrackLoaded = 0x1, eCarsLoaded = 0x2, eViewSetup = 0x4 };
+	unsigned _bfGraphicsState;
 };
 
 //! Shortcut to the race engine.

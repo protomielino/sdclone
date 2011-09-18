@@ -72,7 +72,7 @@ LegacyMenu& LegacyMenu::self()
 
 LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 : GfModule(strShLibName, hShLibHandle), _piRaceEngine(0), _piGraphicsEngine(0),
-  _hscrReUpdateStateHook(0), _hscrGame(0)
+  _hscrReUpdateStateHook(0), _hscrGame(0), _bfGraphicsState(0)
 {
 }
 
@@ -90,7 +90,14 @@ void LegacyMenu::quit()
 
 void LegacyMenu::shutdown()
 {
-	// Nothing to do here.
+	// Shutdown graphics in caserelevant and not already done.
+	if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
+	{
+		unloadCarsGraphics();
+		shutdownGraphicsView();
+		unloadTrackGraphics();
+		shutdownGraphics();
+	}
 }
 
 void LegacyMenu::activateLoadingScreen()
@@ -324,16 +331,28 @@ bool LegacyMenu::initializeGraphics()
 		GfLogError("IGraphicsEngine not implemented by %s\n", ossModLibName.str().c_str());
 	}
 
+	_bfGraphicsState = 0;
+
 	return _piGraphicsEngine != 0;
 }
 
 bool LegacyMenu::loadTrackGraphics(struct Track* pTrack)
 {
-	return _piGraphicsEngine ? _piGraphicsEngine->loadTrack(pTrack) : false;
+	if (!_piGraphicsEngine)
+		return false;
+
+	_bfGraphicsState |= eTrackLoaded;
+	
+	return _piGraphicsEngine->loadTrack(pTrack);
 }
 
 bool LegacyMenu::loadCarsGraphics(struct Situation* pSituation)
 {
+	if (!_piGraphicsEngine)
+		return false;
+
+	_bfGraphicsState |= eCarsLoaded;
+	
 	return _piGraphicsEngine ? _piGraphicsEngine->loadCars(pSituation) : false;
 }
 
@@ -347,32 +366,54 @@ bool LegacyMenu::setupGraphicsView()
 	int sw, sh, vw, vh;
 	GfScrGetSize(&sw, &sh, &vw, &vh);
 	
+	_bfGraphicsState |= eViewSetup;
+	
 	// Setup the graphics view.
 	return _piGraphicsEngine->setupView((sw-vw)/2, (sh-vh)/2, vw, vh, _hscrGame);
 }
 
 void LegacyMenu::redrawGraphicsView(struct Situation* pSituation)
 {
-	if (_piGraphicsEngine)
-		_piGraphicsEngine->redrawView(pSituation);
+	if (!_piGraphicsEngine)
+		return;
+	
+	_piGraphicsEngine->redrawView(pSituation);
 }
 
 void LegacyMenu::unloadCarsGraphics()
 {
-	if (_piGraphicsEngine)
+	if (!_piGraphicsEngine)
+		return;
+	
+	if (_bfGraphicsState & eCarsLoaded)
+	{
 		_piGraphicsEngine->unloadCars();
+		_bfGraphicsState &= ~eCarsLoaded;
+	}
 }
 
 void LegacyMenu::unloadTrackGraphics()
 {
-	if (_piGraphicsEngine)
+	if (!_piGraphicsEngine)
+		return;
+	
+	if (_bfGraphicsState & eTrackLoaded)
+	{
 		_piGraphicsEngine->unloadTrack();
+		_bfGraphicsState &= ~eTrackLoaded;
+	}
 }
 
 void LegacyMenu::shutdownGraphicsView()
 {
-	if (_piGraphicsEngine)
+	if (!_piGraphicsEngine)
+		return;
+	
+	if (_bfGraphicsState & eViewSetup)
+	{
 		_piGraphicsEngine->shutdownView();
+		_bfGraphicsState &= ~eViewSetup;
+	}
 }
 
 void LegacyMenu::shutdownGraphics()
@@ -387,6 +428,11 @@ void LegacyMenu::shutdownGraphics()
 
 	// And remember it was.
 	_piGraphicsEngine = 0;
+
+	// A little consistency check.
+	if (_bfGraphicsState)
+		GfLogWarning("Graphics engine shutdown procedure not smartly completed (state = 0x%x)\n",
+					 _bfGraphicsState);
 }
 
 //=========================================================================
