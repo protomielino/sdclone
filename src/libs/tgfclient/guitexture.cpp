@@ -186,7 +186,7 @@ GfTexReadImageFromPNG(const char *filename, float screen_gamma, int *pWidth, int
 		return (unsigned char *)NULL;
 	}
 	
-	if (setjmp(png_ptr->jmpbuf))
+	if (setjmp(png_jmpbuf(png_ptr)))
 	{
 		// Free all of the memory associated with the png_ptr and info_ptr
 		png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp)NULL);
@@ -571,7 +571,7 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 		return -1;
 	}
 	
-	if (setjmp(png_ptr->jmpbuf)) {    
+	if (setjmp(png_jmpbuf(png_ptr))) {    
 		png_destroy_write_struct(&png_ptr, &info_ptr);
 		fclose(fp);
 		return -1;
