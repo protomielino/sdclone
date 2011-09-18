@@ -25,10 +25,9 @@
 
 #include <tgf.hpp>
 
-#include <itrackloader.h>
-#include <iphysicsengine.h>
 #include <car.h> // tCarPitCmd.
 
+#include <race.h>
 #include <tracks.h>
 
 #include "racesituation.h"
@@ -52,20 +51,20 @@ RaceEngine& RaceEngine::self()
 }
 
 RaceEngine::RaceEngine()
-: _piUserItf(0), _piPhysEngine(0)
+: _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
 {
 }
 
 // Implementation of IRaceEngine.
-void RaceEngine::initialize(void)
+void RaceEngine::reset(void)
 {
-	GfLogInfo("Initializing race engine.\n");
+	GfLogInfo("Resetting race engine.\n");
 
 	// Cleanup everything in case no yet done.
-	shutdown();
+	cleanup();
 	
 	// Internal init.
-	::ReInit();
+	::ReReset();
 
 	// Load and initialize the track loader module.
 	GfLogInfo("Loading Track Loader ...\n");
@@ -76,38 +75,37 @@ void RaceEngine::initialize(void)
 	GfModule* pmodTrkLoader = GfModule::load(ossModLibName.str());
 
 	// Check that it implements ITrackLoader.
-	ITrackLoader* piTrkLoader = 0;
 	if (pmodTrkLoader)
-		piTrkLoader = pmodTrkLoader->getInterface<ITrackLoader>();
-	if (pmodTrkLoader && !piTrkLoader)
+		_piTrkLoader = pmodTrkLoader->getInterface<ITrackLoader>();
+	if (pmodTrkLoader && !_piTrkLoader)
 	{
 		GfModule::unload(pmodTrkLoader);
 		return;
 	}
 
 	// Initialize GfTracks' track module interface (needed for some track infos).
-	GfTracks::self()->setTrackLoader(piTrkLoader);
+	GfTracks::self()->setTrackLoader(_piTrkLoader);
 }
 
-void RaceEngine::shutdown(void)
+void RaceEngine::cleanup(void)
 {
-	GfLogInfo("Terminating race engine.\n");
+	GfLogInfo("Cleaning up race engine.\n");
 
 	// Internal cleanup.
-	::ReShutdown();
+	::ReCleanup();
 
-	// Unload the track if not already done.
-	ITrackLoader* piTrkLoader = GfTracks::self()->getTrackLoader();
-	if (piTrkLoader)
-		piTrkLoader->unload();
-
-    // Unload the Track loader module if not already done.
-	if (piTrkLoader)
+	// Unload the track and then the Track loader module if not already done.
+	if (_piTrkLoader)
 	{
-		GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(piTrkLoader);
+		// Unload the track.
+		_piTrkLoader->unload();
+
+		// Unload the Track loader module.
+		GfModule* pmodTrkLoader = dynamic_cast<GfModule*>(_piTrkLoader);
 		if (pmodTrkLoader)
 		{
 			GfModule::unload(pmodTrkLoader);
+			_piTrkLoader = 0;
 			GfTracks::self()->setTrackLoader(0);
 		}
 	}
@@ -122,6 +120,21 @@ void RaceEngine::shutdown(void)
 			_piPhysEngine = 0;
 		}
 	}
+}
+
+void RaceEngine::shutdown(void)
+{
+	delete _pSelf;
+	_pSelf = 0;
+}
+
+RaceEngine::~RaceEngine()
+{
+	cleanup();
+
+	GfLogInfo("Shutting down race engine.\n");
+
+	delete _pRace;
 }
 
 void RaceEngine::setUserInterface(IUserInterface& userItf)
@@ -217,7 +230,7 @@ void RaceEngine::step(double dt)
 //************************************************************
 GfRace* RaceEngine::race()
 {
-	return ::ReGetRace();
+	return _pRace;
 }
 
 // TODO: Remove when safe dedicated setters ready.
@@ -272,6 +285,12 @@ void RaceEngine::unloadPhysicsEngine()
 	if (pmodPhysEngine)
 		GfModule::unload(pmodPhysEngine);
 	_piPhysEngine = 0;
+}
+
+// Accessor to the track loader.
+ITrackLoader& RaceEngine::trackLoader()
+{
+	return *_piTrkLoader;
 }
 
 // Accessor to the physics engine.

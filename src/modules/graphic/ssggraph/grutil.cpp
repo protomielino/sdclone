@@ -100,9 +100,9 @@ void grShutdownState(void)
 	curr = stateList;
 	while (curr != NULL) {
 		next = curr->next;
-		//GfTrace("Still in list : %s\n", curr->name);
+		//GfLogTrace("Still in list : %s\n", curr->name);
 		free(curr->name);
-		//ssgDeRefDelete(curr->state);
+		//ssgDeRefDelete(curr->state); // Not needed, as in scene graph (?).
 		free(curr);
 		curr = next;
 	}

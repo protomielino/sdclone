@@ -57,11 +57,20 @@ GfCars *GfCars::self()
 	return _pSelf;
 }
 
+void GfCars::shutdown()
+{
+	delete _pSelf;
+	_pSelf = 0;
+}
+
 GfCars::~GfCars()
 {
 	std::vector<GfCar*>::const_iterator itCar;
 	for (itCar = _pPrivate->vecCars.begin(); itCar != _pPrivate->vecCars.end(); itCar++)
 		delete *itCar;
+	
+	delete _pPrivate;
+	_pPrivate = 0;
 }
 
 GfCars::GfCars()

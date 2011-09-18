@@ -44,6 +44,9 @@ public:
 	//! Constructor.
 	GfRace();
 
+	//! Destructor.
+	~GfRace();
+
 	//! Load from the given race manager params and results file if specified.
 	void load(GfRaceManager* pRaceMan, void* hparmResults = 0);
 

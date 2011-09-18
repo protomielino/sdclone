@@ -35,7 +35,8 @@ class IRaceEngine
 {
 public:
 
-	virtual void initialize() = 0;
+	virtual void reset() = 0;
+	virtual void cleanup() = 0;
 	virtual void shutdown() = 0;
 
 	virtual void setUserInterface(IUserInterface& userItf) = 0;

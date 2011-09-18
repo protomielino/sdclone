@@ -123,6 +123,7 @@ public:
 
 	// Accessor to the unique instance of the singleton.
 	static GfDrivers* self();
+	static void shutdown();
 
 	// Reload drivers data from files.
 	void reload();
@@ -146,7 +147,7 @@ protected:
 
 	// Clear all data.
 	void clear();
-
+	
 protected:
 
 	// The singleton itself.

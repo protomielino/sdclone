@@ -100,6 +100,14 @@ GfRace::GfRace()
 	_pPrivate = new GfRace::Private;
 }
 
+GfRace::~GfRace()
+{
+	clear();
+	
+	delete _pPrivate;
+	_pPrivate = 0;
+}
+
 void GfRace::clear()
 {
 	_pPrivate->pRaceMan = 0;

@@ -337,6 +337,20 @@ extern tGfuiScreen	*GfuiScreen;
 extern tMouseInfo	 GfuiMouse;
 extern int		 GfuiMouseHW;
 
+extern void gfuiInit(void);
+extern void gfuiInitButton(void);
+extern void gfuiInitHelp(void);
+extern void gfuiInitLabel(void);
+extern void gfuiInitObject(void);
+extern void gfuiInitEditbox(void);
+extern void gfuiInitCombobox(void);
+extern void gfuiInitScrollBar(void);
+extern void gfuiInitScrollList(void);
+extern void gfctrlJoyInit(void);
+
+extern void gfuiShutdown(void);
+extern void gfctrlJoyShutdown(void);
+
 extern void gfuiReleaseObject(tGfuiObject *curObject);
 
 extern void GfuiDrawCursor();
@@ -373,16 +387,6 @@ extern int gfuiLabelGetTextX(tGfuiLabel *label);
 
 extern void gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color);
 extern void gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus);
-
-extern void gfuiInit(void);
-extern void gfuiInitButton(void);
-extern void gfuiInitHelp(void);
-extern void gfuiInitLabel(void);
-extern void gfuiInitObject(void);
-extern void gfuiInitEditbox(void);
-extern void gfuiInitCombobox(void);
-extern void gfuiInitScrollBar(void);
-extern void gfuiInitScrollList(void);
 
 extern void gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
 						  int x, int y, int width, int align, int font,

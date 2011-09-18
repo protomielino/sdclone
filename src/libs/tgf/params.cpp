@@ -1322,14 +1322,14 @@ static char* handleEntities(char *s, const char* val)
 static int
 xmlGetOuputLine (struct parmHandle *parmHandle, char *buffer, int /* size */)
 {
-    	struct parmOutput	*outCtrl = &(parmHandle->outCtrl);
-    	struct parmHeader	*conf = parmHandle->conf;
-    	struct section		*curSection;
+    struct parmOutput	*outCtrl = &(parmHandle->outCtrl);
+   	struct parmHeader	*conf = parmHandle->conf;
+    struct section		*curSection;
    	struct param		*curParam;
    	struct within		*curWithin;
    	char			*s, *t;
 
-    	while (1) 
+    while (1) 
 	{
 	switch (outCtrl->state) 
 	{

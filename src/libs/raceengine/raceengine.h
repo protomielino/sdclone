@@ -26,6 +26,7 @@
 
 #include <iphysicsengine.h>
 #include <iraceengine.h>
+#include <itrackloader.h>
 
 
 // DLL exported symbols declarator for Windows.
@@ -45,7 +46,8 @@ class RACEENGINE_API RaceEngine : public IRaceEngine
 public:
 
 	// Implementation of IRaceEngine.
-	virtual void initialize();
+	virtual void reset();
+	virtual void cleanup();
 	virtual void shutdown();
 
 	virtual void setUserInterface(IUserInterface& userItf);
@@ -97,13 +99,17 @@ public:
 	bool loadPhysicsEngine();
 	void unloadPhysicsEngine();
 
+	// Accessor to the track loader.
+	ITrackLoader& trackLoader();
+
 	// Accessor to the physics engine.
 	IPhysicsEngine& physicsEngine();
 
 protected:
 
-	// Protected constructor to avoid instanciation outside of self().
+	// Protected constructor and destructor : clients can not use them.
 	RaceEngine();
+	~RaceEngine();
 	
 protected:
 
@@ -113,8 +119,14 @@ protected:
 	// The user interface.
 	IUserInterface* _piUserItf;
 
+	// The track loader.
+	ITrackLoader* _piTrkLoader;
+	
 	// The physics engine.
 	IPhysicsEngine* _piPhysEngine;
+
+	// The race.
+	GfRace* _pRace;
 };
 
 //! Shortcut to the user interface.
@@ -127,6 +139,12 @@ inline extern IUserInterface& ReUI()
 inline extern IPhysicsEngine& RePhysicsEngine()
 {
 	return RaceEngine::self().physicsEngine();
+}
+				  
+//! Shortcut to the track loader.
+inline extern ITrackLoader& ReTrackLoader()
+{
+	return RaceEngine::self().trackLoader();
 }
 				  
 #endif /* _RACEENGINE_H_ */ 

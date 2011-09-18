@@ -23,3 +23,10 @@ void GfuiInit(void)
 {
     gfuiInit();
 }
+
+void GfuiShutdown(void)
+{
+    gfuiShutdown();
+	
+	GfScrShutdown();
+}

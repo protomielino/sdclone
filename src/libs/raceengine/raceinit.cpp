@@ -61,23 +61,11 @@ tModList *ReRacingRobotsModList = 0;
 // The race situation
 tRmInfo	*ReInfo = 0;
 
-// The race (temporary partial duplicate of ReInfo, as long as not merged).
-static GfRace* PReRace = 0;
-
-GfRace* ReGetRace()
-{
-	return PReRace;
-}
-
-/* Race Engine Initialization */
+// Race Engine reset
 void
-ReInit(void)
+ReReset(void)
 {
-	// If not already done, instanciate the race object.
-	if (!PReRace)
-		PReRace = new GfRace();
-
-	// Allocate race engine info structures.
+	// Allocate race engine info structures if not already done.
 	ReInfo = ReSituation::self().data();
 	ReInfo->robModList = &ReRacingRobotsModList;
 
@@ -88,22 +76,8 @@ ReInit(void)
 }
 
 
-/* Race Engine Exit */
-int
-ReExit(void)
-{
-	// Stop and shutdown the race engine.
-	ReStop();
-	RaceEngine::self().shutdown();
-	
-	// Notify the user interface.
-	ReUI().quit();
-
-	return RM_QUIT;
-}
-
-/* Race Engine clean shutdown */
-void ReShutdown(void)
+// Race Engine cleanup
+void ReCleanup(void)
 {
     if (!ReInfo)
         return;
@@ -111,6 +85,20 @@ void ReShutdown(void)
 	// Free ReInfo memory.
 	ReSituation::terminate();
 	ReInfo = 0;
+}
+
+// Race Engine Exit
+int
+ReExit(void)
+{
+	// Stop and cleanup the race engine.
+	ReStop();
+	RaceEngine::self().cleanup();
+	
+	// Notify the user interface.
+	ReUI().quit();
+
+	return RM_QUIT;
 }
 
 // Select the given manager for the race.
@@ -131,7 +119,7 @@ ReRaceSelectRaceman(GfRaceManager* pRaceMan)
 	ReInfo->_reFilename = pRaceMan->getId().c_str();
 
 	// (Re-)initialize the currrent race configuration from the selected race manager.
-	PReRace->load(pRaceMan);
+	RaceEngine::self().race()->load(pRaceMan);
 }
 
 // Start configuring the race
@@ -139,10 +127,11 @@ void
 ReRaceConfigure(bool bInteractive)
 {
 	// Update race engine info.
-	ReInfo->mainParams = ReInfo->params = PReRace->getManager()->getDescriptorHandle();
+	ReInfo->mainParams = ReInfo->params =
+		RaceEngine::self().race()->getManager()->getDescriptorHandle();
 	
-	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
+	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
+	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
 	
 	// Enter CONFIG state if interactive mode.
 	if (bInteractive)
@@ -154,12 +143,13 @@ void
 ReRaceRestore(void* hparmResults)
 {
 	// Update race engine info.
-	ReInfo->mainParams = ReInfo->params = PReRace->getManager()->getDescriptorHandle();
-	ReInfo->mainResults = ReInfo->results = PReRace->getResultsDescriptorHandle();
-	ReInfo->_reRaceName = PReRace->getSessionName().c_str(); //ReInfo->_reName;
+	GfRace* pRace = RaceEngine::self().race();
+	ReInfo->mainParams = ReInfo->params = pRace->getManager()->getDescriptorHandle();
+	ReInfo->mainResults = ReInfo->results = pRace->getResultsDescriptorHandle();
+	ReInfo->_reRaceName = pRace->getSessionName().c_str(); //ReInfo->_reName;
 
-	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
+	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
+	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
 }
 
 // Start a new race for the previously configured race manager
@@ -167,9 +157,9 @@ void
 ReStartNewRace()
 {
 	// Save the race settings to the race manager file is anything changed.
-	if (PReRace->isDirty())
+	if (RaceEngine::self().race()->isDirty())
 	{
-		PReRace->store(); // Save data to params.
+		RaceEngine::self().race()->store(); // Save data to params.
 		GfParmWriteFile(NULL, ReInfo->params, ReInfo->_reName); // Save params to disk.
 	}
 

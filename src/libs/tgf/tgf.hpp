@@ -166,6 +166,12 @@ class TGF_API GfApplication
 	//! Destructor.
 	virtual ~GfApplication();
 
+	//! Name accessor.
+	const std::string& name() const;
+	
+	//! Description accessor.
+	const std::string& description() const;
+
 	//! Parse the command line options (updates _lstOptionsLeft).
 	bool parseOptions();
 
@@ -179,9 +185,6 @@ class TGF_API GfApplication
 	//! Restart the app.
 	virtual void restart();
 
-	//! Exit from the app.
-	virtual void exit(int nStatusCode = 0);
-	
  protected:
 
 	//! Print a short help about using the command line.

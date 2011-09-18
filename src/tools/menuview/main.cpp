@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 	
 	// Parse the command line options
     if (!app.parseOptions())
-		app.exit(1);
+		return 1;
 
 	// Update user settings files from installed ones.
     app.updateUserSettings();
@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 
 	// Setup the window / screen and menu infrastructure (needs an event loop).
     if (!app.setupWindow())
-		app.exit(1);
+		return 1;
 
 	// Display the menu.
 	app.showMenu();
@@ -103,9 +103,6 @@ int main(int argc, char *argv[])
 	app.eventLoop()();
 
 	// That's all.
-    app.exit(0);
-
-	// Make the compiler happy (never reached).
 	return 0;
 }
 

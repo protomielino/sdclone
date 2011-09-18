@@ -52,7 +52,7 @@ GfApplication::GfApplication(const char* pszName, const char* pszDesc, int argc,
 	if (_pSelf)
 	{
 		GfLogError("More than one GfApplication instance ; exiting");
-		_pSelf->exit(1);
+		::exit(1);
 	}
 
 	// Register oneself as the one.
@@ -103,9 +103,14 @@ GfApplication::GfApplication(const char* pszName, const char* pszDesc, int argc,
 #endif
 }
 
-GfApplication::~GfApplication()
+const std::string& GfApplication::name() const
 {
-	_pSelf = 0;
+	return _strName;
+}
+
+const std::string& GfApplication::description() const
+{
+	return _strDesc;
 }
 
 void GfApplication::updateUserSettings()
@@ -121,10 +126,7 @@ void GfApplication::setEventLoop(GfEventLoop* pEventLoop)
 GfEventLoop& GfApplication::eventLoop()
 {
 	if (!_pEventLoop)
-	{
-		GfLogError("GfApplication has no event loop ; exiting\n");
-		exit(1);
-	}
+		GfLogError("GfApplication has no event loop ; crashing !\n");
 	
     return *_pEventLoop;
 }
@@ -139,25 +141,6 @@ void GfApplication::restart()
 
 	// Restart.
 	GfRestart();
-}
-
-void GfApplication::exit(int nStatusCode)
-{
-	// Shutdown the gaming framework.
-	GfShutdown();
-
-	// Delete the event loop if any.
-	delete _pEventLoop;
-
-	// Trace what we are doing.
-	if (!nStatusCode)
-		GfLogInfo("Exiting normally from %s.\n", _strName.c_str());
-	else
-		std::cerr << "Exiting from " << _strName
-				  << " after some error occurred (see above)." << std::endl;
-
-	// The end.
-	::exit(nStatusCode);
 }
 
 void GfApplication::printUsage(const char* pszErrMsg) const
@@ -201,7 +184,7 @@ bool GfApplication::parseOptions()
 		if (*itOpt == "-h" || *itOpt == "--help")
         {
 			printUsage();
-			exit(0);
+			return false;
         }
         // Local dir (root dir of the tree where user settings files are stored)
         else if (*itOpt == "-ld" || *itOpt == "--localdir")
@@ -301,3 +284,15 @@ bool GfApplication::parseOptions()
     return true;
 }
 
+GfApplication::~GfApplication()
+{
+	// Shutdown the gaming framework.
+	GfShutdown();
+
+	// Delete the event loop if any.
+	delete _pEventLoop;
+	_pEventLoop = 0;
+
+	// Really shutdown the singleton.
+	_pSelf = 0;
+}

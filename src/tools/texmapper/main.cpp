@@ -656,7 +656,7 @@ bool Application::parseOptions(int argc, char** argv)
 				switch (option_index) {
 					case 0:
 						printUsage();
-						exit(0);
+						::exit(0);
 						return true;
 					default:
 						printUsage();
@@ -666,7 +666,7 @@ bool Application::parseOptions(int argc, char** argv)
 
 			case 'h':
 				printUsage();
-				exit(0);
+				::exit(0);
 				return true;
 			case 'f':
 				InputFileName = strdup(optarg);
@@ -728,30 +728,27 @@ int main(int argc, char **argv)
 	Application app;
 	
 	// Parse the command line options
-    if (!app.parseOptions(argc, argv))
-		app.exit(1);
+	if (!app.parseOptions(argc, argv))
+		return 1;
 
-    // Initialize the event loop management layer.
+	// Initialize the event loop management layer.
 	GfuiEventLoop* pEventLoop = new GfuiEventLoop;
 	app.setEventLoop(pEventLoop);
 
 	// Setup the window / screen and menu infrastructure (needs an event loop).
-    if (!app.setupWindow(/*bNoMenu=*/true))
-		app.exit(1);
+	if (!app.setupWindow(/*bNoMenu=*/true))
+		return 1;
 
 	//
-    load_params();
+	load_params();
 	
-    init_graphics();
+	init_graphics();
 
-    load_database();
+	load_database();
 
 	// App. event loop.
 	app.eventLoop()();
 
 	// That's all.
-    app.exit(0);
-
-	// Make the compiler happy (never reached).
 	return 0;
 }

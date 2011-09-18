@@ -10,7 +10,7 @@ IF(WIN32)
 ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
-ADD_SDLIB_INCLUDEDIR(raceengine tgf tgfclient math portability)
+ADD_SDLIB_INCLUDEDIR(tgf tgfclient tgfdata raceengine math portability)
 ADD_PLIB_INCLUDEDIR()
 
 # Disable developer warning
@@ -20,7 +20,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES})
 
-ADD_SDLIB_LIBRARY(${_TARGET_NAME} raceengine tgf tgfclient)
+ADD_SDLIB_LIBRARY(${_TARGET_NAME} tgf tgfclient tgfdata raceengine)
 IF(LINUX)
     ADD_DL_LIBRARY(${_TARGET_NAME})
 ENDIF(LINUX)

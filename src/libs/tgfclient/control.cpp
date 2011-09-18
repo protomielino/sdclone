@@ -129,7 +129,7 @@ static int gfmaxKey		= sizeof(GfKey)		/ sizeof(GfKey[0]);
 
 static int gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
 
-static jsJoystick *js[GFCTRL_JOY_NUMBER] = {NULL};
+static jsJoystick *Joysticks[GFCTRL_JOY_NUMBER] = {NULL};
 
 
 /** Get a control reference by its name
@@ -265,28 +265,39 @@ GfctrlGetNameByRef(int type, int index)
 }
 
 
-static void
-gfJoyFirstInit(void)
+// First time (lazy) initialization.
+void
+gfctrlJoyInit(void)
 {
-    int index;
-    
     gfctrlJoyPresent = GFCTRL_JOY_NONE;
 
-    for (index = 0; index < GFCTRL_JOY_NUMBER; index++) {
-	if (js[index] == NULL) {
-	    js[index] = new jsJoystick(index);
-	}
+    for (int index = 0; index < GFCTRL_JOY_NUMBER; index++) {
+		if (!Joysticks[index]) {
+			Joysticks[index] = new jsJoystick(index);
+		}
     
-	if (js[index]->notWorking()) {
-	    /* don't configure the joystick */
-	    js[index] = NULL;
-	} else {
-	    gfctrlJoyPresent = GFCTRL_JOY_PRESENT;
-	}
+		// Don't configure the joystick if it doesn't work
+		if (Joysticks[index]->notWorking()) {
+			delete Joysticks[index];
+			Joysticks[index] = 0;
+		} else {
+			gfctrlJoyPresent = GFCTRL_JOY_PRESENT;
+		}
     }
 }
 
-/** Initialize the joystick control
+// Shutdown time.
+void
+gfctrlJoyShutdown(void)
+{
+	if (gfctrlJoyPresent != GFCTRL_JOY_UNTESTED)
+		for (int index = 0; index < GFCTRL_JOY_NUMBER; index++)
+			delete Joysticks[index];
+
+	gfctrlJoyPresent = GFCTRL_JOY_UNTESTED;
+}
+
+/** Create the joystick control
     @ingroup	ctrl
     @return	pointer on a tCtrlJoyInfo structure
 		<br>0 .. if no joystick present
@@ -295,15 +306,12 @@ gfJoyFirstInit(void)
     @see	tCtrlJoyInfo
 */
 tCtrlJoyInfo *
-GfctrlJoyInit(void)
+GfctrlJoyCreate(void)
 {
-    tCtrlJoyInfo	*joyInfo = NULL;
+    if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED)
+		gfctrlJoyInit();
 
-    if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED) {
-	gfJoyFirstInit();
-    }
-
-    joyInfo = (tCtrlJoyInfo *)calloc(1, sizeof(tCtrlJoyInfo));
+    tCtrlJoyInfo* joyInfo = (tCtrlJoyInfo *)calloc(1, sizeof(tCtrlJoyInfo));
     
     return joyInfo;
 }
@@ -316,35 +324,34 @@ GfctrlJoyInit(void)
 void
 GfctrlJoyRelease(tCtrlJoyInfo *joyInfo)
 {
-    FREEZ(joyInfo);
+    free(joyInfo);
 }
 
 
-/** Check if a joystick is present
+/** Check if any joystick is present
     @ingroup	ctrl
     @return	GFCTRL_JOY_NONE	if no joystick
 		<br>GFCTRL_JOY_PRESENT if a joystick is present
 */
 int
-GfctrlJoyIsPresent(void)
+GfctrlJoyIsAnyPresent(void)
 {
-    if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED) {
-	gfJoyFirstInit();
-    }
+    if (gfctrlJoyPresent == GFCTRL_JOY_UNTESTED)
+		gfctrlJoyInit();
 
     return gfctrlJoyPresent;
 }
 
 
-/** Get the joystick current values
+/** Get the current state of the joysticks
     @ingroup	ctrl
-    @param	joyInfo	joystick structure
+    @param	joyInfo	Target joystick structure
     @return	<tt>0 ... </tt>Ok
 		<br><tt>-1 .. </tt>Error
     @note	The tCtrlJoyInfo structure is updated with the new values
 */
 int
-GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo)
+GfctrlJoyGetCurrentStates(tCtrlJoyInfo *joyInfo)
 {
     int			ind;
     int			i;
@@ -353,8 +360,8 @@ GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo)
 
     if (gfctrlJoyPresent == GFCTRL_JOY_PRESENT) {
     	for (ind = 0; ind < GFCTRL_JOY_NUMBER; ind++) {
-	    if (js[ind]) {
-		js[ind]->read(&b, &(joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind]));
+	    if (Joysticks[ind]) {
+		Joysticks[ind]->read(&b, &(joyInfo->ax[GFCTRL_JOY_MAX_AXES * ind]));
 
 		/* Joystick buttons */
 		for (i = 0, mask = 1; i < GFCTRL_JOY_MAX_BUTTONS; i++, mask *= 2) {
@@ -384,9 +391,6 @@ GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo)
     return 0;
 }
 
-
-
-
 /** Initialize the mouse control
     @ingroup	ctrl
     @return	pointer on a tCtrlMouseInfo structure
@@ -395,11 +399,9 @@ GfctrlJoyGetCurrent(tCtrlJoyInfo *joyInfo)
     @see	GfctrlMouseRelease
 */
 tCtrlMouseInfo *
-GfctrlMouseInit(void)
+GfctrlMouseCreate(void)
 {
-    tCtrlMouseInfo	*mouseInfo = NULL;
-
-    mouseInfo = (tCtrlMouseInfo *)calloc(1, sizeof(tCtrlMouseInfo));
+    tCtrlMouseInfo* mouseInfo = (tCtrlMouseInfo *)calloc(1, sizeof(tCtrlMouseInfo));
 
     return mouseInfo;
 }
@@ -412,7 +414,7 @@ GfctrlMouseInit(void)
 void
 GfctrlMouseRelease(tCtrlMouseInfo *mouseInfo)
 {
-    FREEZ(mouseInfo);
+    free(mouseInfo);
 }
 
 static tMouseInfo refMouse;
@@ -425,7 +427,7 @@ static tMouseInfo refMouse;
     @note	The tCtrlMouseInfo structure is updated with the new values
 */
 int
-GfctrlMouseGetCurrent(tCtrlMouseInfo *mouseInfo)
+GfctrlMouseGetCurrentState(tCtrlMouseInfo *mouseInfo)
 {
     float	mouseMove;
     tMouseInfo	*mouse;

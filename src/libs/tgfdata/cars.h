@@ -109,6 +109,7 @@ public:
 
 	// Accessor to the unique instance of the singleton.
 	static GfCars* self();
+	static void shutdown();
 	
 	const std::vector<std::string>& getCategoryIds() const;
 	const std::vector<std::string>& getCategoryNames() const;
@@ -128,7 +129,7 @@ protected:
 	// Protected constructor and destructor : clients can not use them.
 	GfCars();
 	~GfCars();
-	
+
 protected:
 
 	// The singleton itself.

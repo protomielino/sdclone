@@ -122,7 +122,7 @@ typedef int (*tfModInfoTerminate)(void);	/* last function called in the module *
 TGF_API tModInfo *GfModInfoAllocate(int maxItf);
 
 /* Free the module interfaces info array */
-TGF_API void GfModInfoFree(tModInfo *array, int maxItf);
+TGF_API void GfModInfoFree(tModInfo *array);
 
 /* Free the module interfaces info array */
 TGF_API void GfModInfoFreeNC(tModInfoNC *array, int maxItf);

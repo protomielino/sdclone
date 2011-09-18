@@ -99,6 +99,7 @@ public:
 
 	// Accessor to the unique instance of the singleton.
 	static GfTracks* self();
+	static void shutdown();
 
 	ITrackLoader* getTrackLoader() const;
 	void setTrackLoader(ITrackLoader* piTrackLoader);

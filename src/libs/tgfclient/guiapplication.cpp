@@ -85,7 +85,7 @@ void GfuiApplication::restart()
 	// Shutdown the window/screen.
 	if (_bWindowUp)
 	{
-		GfScrShutdown();
+		GfuiShutdown();
 		_bWindowUp = false;
 	}
 
@@ -99,15 +99,14 @@ void GfuiApplication::restart()
 	GfRestart(GfuiMouseIsHWPresent());
 }
 
-void GfuiApplication::exit(int nStatusCode)
+GfuiApplication::~GfuiApplication()
 {
 	// Shutdown the window/screen.
 	if (_bWindowUp)
 	{
-		GfScrShutdown();
+		GfuiShutdown();
 		_bWindowUp = false;
 	}
 
-	// Let the base class finish the job.
-	GfApplication::exit(nStatusCode);
+	// Note: GfApplication (base class) destructor called now.
 }

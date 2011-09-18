@@ -107,7 +107,7 @@ MouseCalAutomaton(void)
     switch (CalState) {
     case 0:
     case 1:
-	GfctrlMouseGetCurrent(&MouseInfo);
+	GfctrlMouseGetCurrentState(&MouseInfo);
 	axv = MouseInfo.ax[Cmd[CmdOffset + CalState].ref.index];
 	if (fabs(axv) < 0.01) {
 	    return;		/* ignore no move input */
@@ -118,7 +118,7 @@ MouseCalAutomaton(void)
 
     case 2:
     case 3:
-	GfctrlMouseGetCurrent(&MouseInfo);
+	GfctrlMouseGetCurrentState(&MouseInfo);
 	axv = MouseInfo.ax[Cmd[CmdOffset + CalState].ref.index];
 	if (fabs(axv) < 0.01) {
 	    return;		/* ignore no move input */
@@ -154,7 +154,7 @@ Idle2(void)
 {
     int	i;
 
-    GfctrlMouseGetCurrent(&MouseInfo);
+    GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Check for a mouse button pressed */
     for (i = 0; i < 3; i++) {
@@ -173,7 +173,7 @@ IdleMouseInit(void)
 {
     /* Get the center mouse position  */
     memset(&MouseInfo, 0, sizeof(MouseInfo));
-    GfctrlMouseGetCurrent(&MouseInfo);
+    GfctrlMouseGetCurrentState(&MouseInfo);
     GfctrlMouseInitCenter();
     GfuiApp().eventLoop().setRecomputeCB(Idle2);
 }

@@ -57,12 +57,21 @@ GfRaceManagers *GfRaceManagers::self()
 	return _pSelf;
 }
 
+void GfRaceManagers::shutdown()
+{
+	delete _pSelf;
+	_pSelf = 0;
+}
+
 GfRaceManagers::~GfRaceManagers()
 {
 	std::vector<GfRaceManager*>::const_iterator itRaceMan;
 	for (itRaceMan = _pPrivate->vecRaceMans.begin();
 		 itRaceMan != _pPrivate->vecRaceMans.end(); itRaceMan++)
 		delete *itRaceMan;
+
+	delete _pPrivate;
+	_pPrivate = 0;
 }
 
 static bool hasHigherPriority(const GfRaceManager* pLeft, const GfRaceManager* pRight)

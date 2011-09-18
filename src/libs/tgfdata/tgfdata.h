@@ -41,6 +41,14 @@
 #  pragma warning (disable:4251) // class XXX needs a DLL interface ...
 #endif
 
+// Global management of the race data manager.
+class TGFDATA_API GfData
+{
+ public:
+	static void initialize();
+	static void shutdown();
+};
+
 #endif /* __TGFDATA__H__ */
 
 

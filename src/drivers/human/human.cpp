@@ -167,11 +167,11 @@ InitFuncPt(int index, void *pt)
 	// Initialize mouse and joystick controls backend if not already done.
 	if (!firstTime) {
 		firstTime = true;
-		joyInfo = GfctrlJoyInit();
+		joyInfo = GfctrlJoyCreate();
 		if (joyInfo) {
 			joyPresent = true;
 		}//if joyInfo
-		mouseInfo = GfctrlMouseInit();
+		mouseInfo = GfctrlMouseCreate();
 	}//if !firstTime
 
 	/* Allocate a new context for that player */
@@ -271,11 +271,11 @@ moduleInitialize(tModInfo *modInfo)
 			std::string driver =GfParmGetStr(drvInfo, sstring, "name", "");
 			if (driver.size() > 0) {
 				VecNames.push_back(driver); // Don't rely on GfParm allocated data
-				char *pName = new char[VecNames[i].size()+1];
-				memset((void*)pName,0,VecNames[i].size()+1);
-				strncpy(pName,VecNames[i].c_str(),VecNames[i].size());
-				modInfo->name = pName;
-				//modInfo->name    = VecNames[i].c_str();	/* name of the module (short) */
+				// char *pName = new char[VecNames[i].size()+1];
+				// memset((void*)pName,0,VecNames[i].size()+1);
+				// strncpy(pName,VecNames[i].c_str(),VecNames[i].size());
+				// modInfo->name = pName;
+				modInfo->name    = VecNames[i].c_str();	/* name of the module (short) */
 				modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
 				modInfo->fctInit = InitFuncPt;	/* init function */
 				modInfo->gfId    = ROB_IDENT;	/* supported framework version */
@@ -301,7 +301,13 @@ moduleInitialize(tModInfo *modInfo)
 extern "C" int
 moduleTerminate()
 {
-	VecNames.clear();	//Free local copy of driver names
+	std::vector<tHumanContext*>::iterator itDrvCtx = HCtx.begin();
+	while (itDrvCtx != HCtx.end())
+	{
+		free(*itDrvCtx);
+		itDrvCtx++;
+	}
+
 	return 0;
 }//moduleTerminate
 
@@ -585,10 +591,10 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		updateKeys();
 
 		if (joyPresent) {
-			GfctrlJoyGetCurrent(joyInfo);
+			GfctrlJoyGetCurrentStates(joyInfo);
 		}
 
-		GfctrlMouseGetCurrent(mouseInfo);
+		GfctrlMouseGetCurrentState(mouseInfo);
 		lastKeyUpdate = s->currentTime;
 	}
 

@@ -166,8 +166,12 @@ OpenalSoundInterface::~OpenalSoundInterface()
 		delete sound_list[i];
 	}
 	delete [] engpri;
-	alcDestroyContext (cc);
-	alcCloseDevice (dev);
+
+	alcMakeContextCurrent(0);
+	alcDestroyContext(cc);
+
+	if (!alcCloseDevice(dev))
+		GfLogError("Failed to close OpenAL device: %s\n", alcGetString(dev, alcGetError(dev)));
 
 	if (car_src) {
 		delete [] car_src;

@@ -195,7 +195,7 @@ void GfLogFatal(const char *pszFmt, ...)
 			   TEXT("Fatal error"), MB_OK|MB_ICONERROR|MB_SETFOREGROUND);
 #endif
 
-    GfApp().exit(1);
+    ::exit(1);
 }
 
 #ifdef TRACE_OUT

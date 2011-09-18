@@ -175,7 +175,7 @@ bool Application::parseOptions()
         if (*itOpt == "-v" || *itOpt == "--version")
         {
 			printf("%s\n", _strDesc.c_str());
-			exit(0);
+			::exit(0);
 		}
 		else if (*itOpt == "-a")
         {
@@ -211,7 +211,7 @@ bool Application::parseOptions()
 			else
 			{
 				printUsage("Track name expected after -n");
-				exit(1);
+				return false;
 			}
 		}
 		else if (*itOpt == "-E")
@@ -222,7 +222,7 @@ bool Application::parseOptions()
 			else
 			{
 				printUsage("Save elevation option # expected after -E");
-				exit(1);
+				return false;
 			}
 			TrackOnly = 0;
 		}
@@ -234,7 +234,7 @@ bool Application::parseOptions()
 			else
 			{
 				printUsage("Track category expected after -c");
-				exit(1);
+				return false;
 			}
 		}
 		else if (*itOpt == "-H")
@@ -245,7 +245,7 @@ bool Application::parseOptions()
 			else
 			{
 				printUsage("Nb of height steps expected after -H");
-				exit(1);
+				return false;
 			}
 		}
 		else
@@ -253,14 +253,14 @@ bool Application::parseOptions()
 			std::ostringstream ossMsg;
 			ossMsg << "Unsupported option << " << *itOpt;
 			printUsage(ossMsg.str().c_str());
-			exit(1);
+			return false;
 		}
     }
 
 	if (!TrackName || !TrackCategory)
 	{
 		printUsage("No track name or category specified");
-		exit(1);
+		return false;
     }
 
 	return true;
@@ -297,7 +297,7 @@ void Application::generate()
 	TrackHandle = GfParmReadFile(trackdef, GFPARM_RMODE_STD);
 	if (!TrackHandle) {
 		fprintf(stderr, "Cannot find %s\n", trackdef);
-		exit(1);
+		::exit(1);
 	}
 
 	// Build the track structure with graphic extensions.
@@ -398,13 +398,13 @@ int main(int argc, char **argv)
 	
 	// Parse the command line options
     if (!app.parseOptions())
-		app.exit(1);
+		return 1;
 
 	// Why initialize the video / window caption / SDL_Quit ? Really needed ?
     if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
 	{
         GfLogError("Couldn't initialize SDL video subsystem: %s\n", SDL_GetError());
-        app.exit(1);
+        return 1;
     }
 
     atexit(SDL_Quit);
@@ -415,8 +415,5 @@ int main(int argc, char **argv)
 	app.generate();
 	
  	// That's all.
-	app.exit(0);
-	
-	// Make the compiler happy (never reached).
 	return 0;
 }

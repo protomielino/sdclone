@@ -693,7 +693,7 @@ grLoadBackground(void)
 	bool bDoNotUseEnv = false; // Avoid crash with missing env.png
 	grEnvSelector = new ssgStateSelector(graphic->envnb);
 	for (i = 0; i < graphic->envnb; i++) {
-		GfLogTrace("Loading %d Environment Mapping Image %s\n", i, graphic->env[i]);
+		GfLogTrace("Loading #%d track-specific env. mapping image :\n", i+1);
 		envst = (ssgSimpleState*)grSsgLoadTexState(graphic->env[i]);
         // Avoid crash with missing env.rgb files (i.e. Wheel-1)
 		if (!envst) {
@@ -715,6 +715,7 @@ grLoadBackground(void)
 	grEnvSelector->selectStep(0); //mandatory !!!
   
 	// Avoid crash with missing env.rgb files (i.e. Wheel-1)
+	GfLogTrace("Loading global env. mapping image :\n");
 	if (bUseEnvPng)
 		grEnvState = (grMultiTexState*)grSsgEnvTexState("env.png");
 	else if (bDoNotUseEnv)
@@ -723,6 +724,7 @@ grLoadBackground(void)
 		grEnvState = (grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
 
 	// 2) Sky shadows (vertical) (envshadow-xxx.png), according to the weather conditions
+	GfLogTrace("Loading sky shadow mapping image :\n");
 	grEnvShadowState = 0;
 	int nEnvShadowIndex = -1; // Default = not depending on weather conds.
 	if (!grSkyDomeDistance || grTrack->skyversion < 1)
@@ -763,6 +765,7 @@ grLoadBackground(void)
 	}//if grEnvShadowState
     
 	// 3) Vertical shadows of track objects on the cars (shadow2.png)
+	GfLogTrace("Loading track shadows mapping image :\n");
 	grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.png");
 	if(!grEnvShadowStateOnCars)
 		grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.rgb");

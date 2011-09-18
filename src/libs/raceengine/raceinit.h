@@ -27,15 +27,14 @@
 #define _RACEINIT_H_
 
 class GfRaceManager;
-class GfRace;
 
 
 extern void ReStartNewRace(void);
 extern void ReResumeRace(void);
 
-extern void ReInit(void);
+extern void ReReset(void);
+extern void ReCleanup(void);
 extern int  ReExit();
-extern void ReShutdown(void);
 
 extern void ReRaceSelectRaceman(GfRaceManager* pRaceMan);
 extern void ReRaceRestore(void* hparmResults);
@@ -57,11 +56,6 @@ extern tModList *ReRacingRobotsModList;
 //      and replace the read/write instruction everywhere
 //      by calls to the functions of ReSituation::self().
 extern tRmInfo *ReInfo;
-
-//extern tRmInfo* ReSituation();
-
-// The race (temporarily partly duplicates ReInfo, as long as not merged together).
-extern GfRace* ReGetRace();
 
 #endif /* _RACEINIT_H_ */ 
 

@@ -60,9 +60,18 @@ GfDrivers *GfDrivers::self()
 	return _pSelf;
 }
 
+void GfDrivers::shutdown()
+{
+	delete _pSelf;
+	_pSelf = 0;
+}
+
 GfDrivers::~GfDrivers()
 {
 	clear();
+	
+	delete _pPrivate;
+	_pPrivate = 0;
 }
 
 void GfDrivers::clear()
@@ -607,7 +616,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 		while (pCurLiveryFile != pLiveryFileList);
 	}
 	
-	GfDirFreeList(pLiveryFileList, NULL);
+	GfDirFreeList(pLiveryFileList, NULL, true, true);
 	
 	// Search for skinned interior files, if any.
 	std::string strInteriorPrefix(strCarId);
@@ -646,7 +655,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 		while (pCurIntFile != pIntFileList);
 	}
 	
-	GfDirFreeList(pIntFileList, NULL);
+	GfDirFreeList(pIntFileList, NULL, true, true);
 	
 	// Search for skinned logo files if any.
 	tFList *pLogoFileList =
@@ -682,7 +691,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 		while (pCurLogoFile != pLogoFileList);
 	}
 	
-	GfDirFreeList(pLogoFileList, NULL);
+	GfDirFreeList(pLogoFileList, NULL, true, true);
 	
 	// Search for skinned 3D wheel files if any.
 	tFList *pWheel3DFileList =
@@ -717,7 +726,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 		while (pCurWheel3DFile != pWheel3DFileList);
 	}
 	
-	GfDirFreeList(pWheel3DFileList, NULL);
+	GfDirFreeList(pWheel3DFileList, NULL, true, true);
 	
 	// Search for skinned driver files if any.
 	tFList *pDriverFileList =
@@ -752,7 +761,7 @@ void GfDriver::getPossibleSkinsInFolder(const std::string& strCarId,
 		while (pCurDriverFile != pDriverFileList);
 	}
 	
-	GfDirFreeList(pDriverFileList, NULL);
+	GfDirFreeList(pDriverFileList, NULL, true, true);
 }
 
 std::vector<GfDriverSkin> GfDriver::getPossibleSkins(const std::string& strAltCarId) const

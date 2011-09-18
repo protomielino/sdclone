@@ -50,7 +50,7 @@ rmOnActivate(void * /* dummy */)
 {
 	GfLogTrace("Entering Race Mode Select menu\n");
 
-    LmRaceEngine().initialize();
+    LmRaceEngine().reset();
 }
 
 /* Exit from Race engine */
@@ -59,7 +59,7 @@ rmOnRaceSelectShutdown(void *prevMenu)
 {
     GfuiScreenActivate(prevMenu);
 	
-    LmRaceEngine().shutdown();
+    LmRaceEngine().cleanup();
 	
 	LegacyMenu::self().shutdownGraphics();
 }

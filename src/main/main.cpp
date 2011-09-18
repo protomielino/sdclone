@@ -18,11 +18,13 @@
  ***************************************************************************/
 
 #include <string>
+#include <iostream>
 #include <sstream>
 
 #include <portability.h>
 #include <tgfclient.h>
 
+#include <tgfdata.h>
 #include <raceengine.h>
 #include <iuserinterface.h>
 
@@ -59,18 +61,26 @@ main(int argc, char *argv[])
 	
 	// Parse the command line options
     if (!app.parseOptions())
-		app.exit(1);
+	{
+		std::cerr << "Exiting from " << app.name()
+				  << " after some error occurred (see above)." << std::endl;
+		return 1;
+	}
 
 	// Update user settings files from installed ones.
     app.updateUserSettings();
 
-    // Initialize the event loop management layer.
+   // Initialize the event loop management layer.
 	GfuiEventLoop* pEventLoop = new GfuiEventLoop;
 	app.setEventLoop(pEventLoop);
 
 	// Setup the window / screen and menu infrastructure (needs an event loop).
     if (!app.setupWindow())
-		app.exit(1);
+	{
+		std::cerr << "Exiting from " << app.name()
+				  << " after some error occurred (see above)." << std::endl;
+		return 1;
+	}
 
 	// Load the user interface module.
 	std::ostringstream ossModLibName;
@@ -84,9 +94,10 @@ main(int argc, char *argv[])
 		piUserItf = pmodUserItf->getInterface<IUserInterface>();
 	}
 
-	// Initialize the race engine and the user interface module.
+ 	// Initialize the race engine and the user interface module.
 	if (piUserItf)
 	{
+		GfData::initialize();
 		RaceEngine::self().setUserInterface(*piUserItf);
 		piUserItf->setRaceEngine(RaceEngine::self());
 	}
@@ -102,15 +113,23 @@ main(int argc, char *argv[])
 		
 		// Shutdown the user interface.
 		piUserItf->shutdown();
+
+		// Shutdown the race engine.
+		RaceEngine::self().shutdown();
+		GfData::shutdown();
 		
 		// Unload the user interface module.
 		GfModule::unload(pmodUserItf);
 	}
 	
  	// That's all.
-    app.exit(piUserItf ? 0 : 1);
-
-	// Make the compiler happy (never reached).
-	return 0;
+	// Trace what we are doing.
+	if (piUserItf)
+		GfLogInfo("Exiting normally from %s.\n", app.name().c_str());
+	else
+		std::cerr << "Exiting from " << app.name()
+				  << " after some error occurred (see above)." << std::endl;
+	
+	return piUserItf ? 0 : 1;
 }
 

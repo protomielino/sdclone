@@ -63,12 +63,21 @@ GfTracks *GfTracks::self()
 	return _pSelf;
 }
 
+void GfTracks::shutdown()
+{
+	delete _pSelf;
+	_pSelf = 0;
+}
+
 GfTracks::~GfTracks()
 {
 	std::vector<GfTrack*>::const_iterator itTrack;
 	for (itTrack = _pPrivate->vecTracks.begin();
 		 itTrack != _pPrivate->vecTracks.end(); itTrack++)
 		delete *itTrack;
+
+	delete _pPrivate;
+	_pPrivate = 0;
 }
 
 GfTracks::GfTracks()

@@ -362,7 +362,7 @@ IdleWaitForInput(void)
     const char	*str;
     int		axis;
 
-    GfctrlMouseGetCurrent(&MouseInfo);
+    GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Check for a mouse button pressed */
     for (i = 0; i < 3; i++) {
@@ -508,7 +508,7 @@ onPush(void *vi)
     /* Read initial mouse status */
     GfctrlMouseInitCenter();
     memset(&MouseInfo, 0, sizeof(MouseInfo));
-    GfctrlMouseGetCurrent(&MouseInfo);
+    GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Read initial joysticks status */
     for (index = 0; index < GFCTRL_JOY_NUMBER; index++)

@@ -166,12 +166,12 @@ InitFuncPt(int index, void *pt)
 
 	if (!firstTime) {
 		firstTime = 1;
-		joyInfo = GfctrlJoyInit();
+		joyInfo = GfctrlJoyCreate();
 		if (joyInfo) {
 			joyPresent = 1;
 		}
 
-		mouseInfo = GfctrlMouseInit();
+		mouseInfo = GfctrlMouseCreate();
 	}
 
 
@@ -634,10 +634,10 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		updateKeys(idx);
 
 		if (joyPresent) {
-			GfctrlJoyGetCurrent(joyInfo);
+			GfctrlJoyGetCurrentStates(joyInfo);
 		}
 
-		GfctrlMouseGetCurrent(mouseInfo);
+		GfctrlMouseGetCurrentState(mouseInfo);
 		lastKeyUpdate = s->currentTime;
 	}
 

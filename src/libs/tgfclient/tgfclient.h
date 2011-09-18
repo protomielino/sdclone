@@ -61,11 +61,12 @@
 #endif
 
 
-/******************** 
- * Initialization   *
- ********************/
+/****************************** 
+ * Initialization / Shutdown  *
+ ******************************/
 
 TGFCLIENT_API void GfuiInit(void);
+TGFCLIENT_API void GfuiShutdown(void);
 
 
 /******************** 
@@ -645,10 +646,10 @@ typedef struct
     int         levelup[GFCTRL_JOY_MAX_BUTTONS * GFCTRL_JOY_NUMBER]; /**< Button state (1 = up) */
 } tCtrlJoyInfo;
 
-TGFCLIENT_API tCtrlJoyInfo* GfctrlJoyInit(void);
-TGFCLIENT_API int GfctrlJoyIsPresent(void);
-TGFCLIENT_API int GfctrlJoyGetCurrent(tCtrlJoyInfo* joyInfo);
+TGFCLIENT_API int GfctrlJoyIsAnyPresent(void);
+TGFCLIENT_API tCtrlJoyInfo* GfctrlJoyCreate(void);
 TGFCLIENT_API void GfctrlJoyRelease(tCtrlJoyInfo* joyInfo);
+TGFCLIENT_API int GfctrlJoyGetCurrentStates(tCtrlJoyInfo* joyInfo);
 
 
 /** Mouse information structure */
@@ -660,11 +661,12 @@ typedef struct
     float       ax[4];          /**< mouse axis position (mouse considered as a joystick) */
 } tCtrlMouseInfo;
 
-TGFCLIENT_API tCtrlMouseInfo* GfctrlMouseInit(void);
-TGFCLIENT_API int GfctrlMouseGetCurrent(tCtrlMouseInfo* mouseInfo);
+TGFCLIENT_API tCtrlMouseInfo* GfctrlMouseCreate(void);
 TGFCLIENT_API void GfctrlMouseRelease(tCtrlMouseInfo* mouseInfo);
+TGFCLIENT_API int GfctrlMouseGetCurrentState(tCtrlMouseInfo* mouseInfo);
 TGFCLIENT_API void GfctrlMouseCenter(void);
 TGFCLIENT_API void GfctrlMouseInitCenter(void);
+
 TGFCLIENT_API tCtrlRef* GfctrlGetRefByName(const char* name);
 TGFCLIENT_API const char* GfctrlGetNameByRef(int type, int index);
 
@@ -737,6 +739,9 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
 	//! Constructor.
 	GfuiApplication(const char* pszName, const char* pszDesc, int argc = 0, char** argv = 0);
 
+	//! Destructor.
+	virtual ~GfuiApplication();
+	
 	//! Parse the command line options (updates _lstOptionsLeft).
 	bool parseOptions();
 
@@ -748,9 +753,6 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
 	
 	//! Restart the app.
 	virtual void restart();
-
-	//! Exit from the app.
-	virtual void exit(int nStatusCode = 0);
 
  protected:
 

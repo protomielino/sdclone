@@ -115,6 +115,14 @@ gfuiInit(void)
 	gfuiInitLabel();
 	gfuiInitHelp();
 	gfuiInitMenu();
+
+	//gfctrlJoyInit(); // Not here ; done later on the fly, when really needed.
+}
+
+void
+gfuiShutdown(void)
+{
+	gfctrlJoyShutdown();
 }
 
 GfuiColor 
