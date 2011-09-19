@@ -649,6 +649,7 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 	if (parmHandle->flag & PARM_HANDLE_FLAG_PARSE_ERROR) 
 	{
 		// parse error occured, ignore.
+		GfLogWarning("xmlStartElement: parsing error ; ignoring\n");
 		return;
 	}
 
@@ -667,6 +668,8 @@ static void xmlStartElement (void *userData , const char *name, const char **att
 	if (!strcmp(name, "params")) 
 	{
 		parmHandle->curSection = conf->rootSection;
+		if (parmHandle->curSection->fullName)
+			freez(parmHandle->curSection->fullName);
 		parmHandle->curSection->fullName = strdup ("");
 
 		if (!parmHandle->curSection->fullName) 
