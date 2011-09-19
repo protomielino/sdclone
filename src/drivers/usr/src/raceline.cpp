@@ -1409,6 +1409,7 @@ void LRaceLine::FreeTrack(bool freeall)
  if (tSkidAccel) free(tSkidAccel);
  if (tAccelExit) free(tAccelExit);
  if (tSkidCorrection) free(tSkidCorrection);
+ if (tBumpCaution) free(tBumpCaution);
 
  tSpeed = NULL;
  tLaneShift = NULL;

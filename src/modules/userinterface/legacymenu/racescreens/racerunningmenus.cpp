@@ -564,7 +564,7 @@ rmResScreenActivate(void * /* dummy */)
 static void
 rmResScreenShutdown(void * /* dummy */)
 {
-    for (int i = 1; i < rmNMaxResRows; i++)
+    for (int i = 0; i < rmNMaxResRows; i++)
 		FREEZ(rmResRowText[i]);
 }
 
@@ -677,7 +677,7 @@ RmResScreenSetHeader(const char *pszHeader)
 	rmbResMenuChanged = true;
 }
 
-// Cleanup the give row text :
+// Cleanup the given row text :
 // * replace leading zeros in non-time columns.
 static char*
 rmCleanRowText(const char* pszText)
