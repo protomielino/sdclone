@@ -63,9 +63,9 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
 {
     if (GfuiScreenIsActive(HScreen))
 		return;
-    
-    if (HScreen)
-		GfuiScreenRelease(HScreen);
+
+	if (HScreen)
+		RmLoadingScreenShutdown();
 
     // Create screen, load menu XML descriptor and create static controls.
     HScreen = GfuiScreenCreate(BGColor, NULL, NULL, NULL, rmDeativate, 0);
@@ -161,7 +161,7 @@ RmLoadingScreenSetText(const char *text)
 	}
 	
 	if (TextLines[CurTextLineIdx])
-		free(TextLines[CurTextLineIdx]);
+		freez(TextLines[CurTextLineIdx]);
 	if (text)
 	{
 		TextLines[CurTextLineIdx] = strdup(text);
