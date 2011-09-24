@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Endurance Race" version="1.18">
+<params name="Endurance Race" version="1.19">
 
   <section name="Header">
     <attstr name="name" val="Endurance Race"/>
@@ -139,12 +139,12 @@
 
     <section name="1">
       <attnum name="idx" val="3"/>
-      <attstr name="module" val="usr_trb1"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="2">
       <attnum name="idx" val="3"/>
-      <attstr name="module" val="simplix_trb1"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="3">

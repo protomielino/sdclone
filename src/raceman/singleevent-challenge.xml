@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Challenge Race" version="1.6">
+<params name="Challenge Race" version="1.7">
 
   <section name="Header">
     <attstr name="name" val="Challenge Race"/>
@@ -193,12 +193,12 @@
 
     <section name="1">
       <attnum name="idx" val="1"/>
-      <attstr name="module" val="usr_trb1"/>
+      <attstr name="module" val="usr_sc"/>
     </section>
 
     <section name="2">
       <attnum name="idx" val="4"/>
-      <attstr name="module" val="simplix_trb1"/>
+      <attstr name="module" val="simplix_sc"/>
     </section>
 
     <section name="3">
