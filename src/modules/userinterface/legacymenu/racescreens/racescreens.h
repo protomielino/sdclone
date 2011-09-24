@@ -114,6 +114,7 @@ extern void* RmInitReUpdateStateHook();
 extern bool RmCheckPitRequest();
 
 extern void* RmResScreenInit();
+extern void RmResScreenShutdown();
 extern void RmResScreenSetTitles(const char *pszTitle, const char *pszSubTitle);
 extern void RmResScreenSetHeader(const char *pszHeader);
 extern void RmResScreenAddText(const char *pszText);

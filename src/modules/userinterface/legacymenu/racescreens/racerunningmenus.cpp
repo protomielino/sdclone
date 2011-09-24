@@ -562,23 +562,24 @@ rmResScreenActivate(void * /* dummy */)
 // }
 
 static void
-rmResScreenShutdown(void * /* dummy */)
+rmResScreenDeactivate(void * /* dummy */)
 {
-	freez(rmResRowLabelId);
-    for (int i = 0; i < rmNMaxResRows; i++)
-		freez(rmResRowText[i]);
-	freez(rmResRowText);
-	freez(rmResRowColor);
+	if (rmResRowText)
+		for (int i = 1; i < rmNMaxResRows; i++)
+			freez(rmResRowText[i]);
 }
 
-static void
-rmAddResKeys()
+void
+RmResScreenShutdown()
 {
-    GfuiAddKey(rmResScreenHdle, GFUIK_F1,  "Help", rmResScreenHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
-
-    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
-    GfuiAddKey(rmResScreenHdle, 'q', "Quit Game, Save Nothing", (void*)RE_STATE_EXIT, rmApplyState, NULL);
+	freez(rmResRowLabelId);
+	if (rmResRowText)
+	{
+		for (int i = 0; i < rmNMaxResRows; i++)
+			free(rmResRowText[i]);
+		freez(rmResRowText);
+	}
+	freez(rmResRowColor);
 }
 
 void*
@@ -590,7 +591,7 @@ RmResScreenInit()
 	tRmInfo* reInfo = LmRaceEngine().inData();
 
     // Create screen, load menu XML descriptor and create static controls.
-    rmResScreenHdle = GfuiScreenCreate(black, 0, rmResScreenActivate, 0, rmResScreenShutdown, 0);
+    rmResScreenHdle = GfuiScreenCreate(black, 0, rmResScreenActivate, 0, rmResScreenDeactivate, 0);
     void *hmenu = GfuiMenuLoad("raceblindscreen.xml");
     GfuiMenuCreateStaticControls(rmResScreenHdle, hmenu);
 
@@ -612,23 +613,29 @@ RmResScreenInit()
     const int yTopRow = (int)GfuiMenuGetNumProperty(hmenu, "yTopRow", 400);
     const int yRowShift = (int)GfuiMenuGetNumProperty(hmenu, "yRowShift", 20);
 
-	// Allocate row info arrays.
-	rmNMaxResRows = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultRows", 20);
-	const GfuiColor cNormal =
-		GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "rowColorNormal", "0x0000FF"));
-	const GfuiColor cHighlighted =
-		GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "rowColorHighlighted", "0x00FF00"));
-	memcpy(rmColors[0], cNormal.toFloatRGBA(), sizeof(rmColors[0]));
-	memcpy(rmColors[1], cHighlighted.toFloatRGBA(), sizeof(rmColors[1]));
+	// Allocate row info arrays, if not already done.
+	if (!rmResRowLabelId)
+	{
+		// Load nMaxResultRows/colors only the first time (ignore any later change,
+		// otherwize, we'd have to realloc the row info arrays).
+		rmNMaxResRows = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultRows", 20);
+		const GfuiColor cNormal =
+			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "rowColorNormal", "0x0000FF"));
+		const GfuiColor cHighlighted =
+			GfuiColor::build(GfuiMenuGetStrProperty(hmenu, "rowColorHighlighted", "0x00FF00"));
+		memcpy(rmColors[0], cNormal.toFloatRGBA(), sizeof(rmColors[0]));
+		memcpy(rmColors[1], cHighlighted.toFloatRGBA(), sizeof(rmColors[1]));
 	
-	rmResRowLabelId = (int*)calloc(rmNMaxResRows, sizeof(int));
-	rmResRowText = (char**)calloc(rmNMaxResRows, sizeof(char*));
-	rmResRowColor = (float**)calloc(rmNMaxResRows, sizeof(float*));
+		rmResRowLabelId = (int*)calloc(rmNMaxResRows, sizeof(int));
+		rmResRowText = (char**)calloc(rmNMaxResRows, sizeof(char*));
+		rmResRowColor = (float**)calloc(rmNMaxResRows, sizeof(float*));
+	}
 
     // Create result rows (1 label for each).
     int	y = yTopRow;
     for (int i = 0; i < rmNMaxResRows; i++)
 	{
+		freez(rmResRowText[i]);
 		rmResRowColor[i] = rmColors[0];
 		rmResRowLabelId[i] =
 			GfuiMenuCreateLabelControl(rmResScreenHdle, hmenu, "Row", true, // from template
@@ -641,7 +648,11 @@ RmResScreenInit()
     GfParmReleaseHandle(hmenu);
     
     // Register keyboard shortcuts.
-    rmAddResKeys();
+    GfuiAddKey(rmResScreenHdle, GFUIK_F1, "Help", rmResScreenHdle, GfuiHelpScreen, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+
+    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE, "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+    GfuiAddKey(rmResScreenHdle, 'q', "Quit Game, Save Nothing", (void*)RE_STATE_EXIT, rmApplyState, NULL);
 
     // Initialize current result row.
     rmCurRowIndex = 0;
@@ -719,8 +730,7 @@ RmResScreenAddText(const char *text)
 		}
 		rmCurRowIndex--;
     }
-	if (rmResRowText[rmCurRowIndex])
-		freez(rmResRowText[rmCurRowIndex]);
+	free(rmResRowText[rmCurRowIndex]);
     rmResRowText[rmCurRowIndex] = rmCleanRowText(text);
     GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[rmCurRowIndex], rmResRowText[rmCurRowIndex]);
     rmCurRowIndex++;
@@ -737,7 +747,7 @@ RmResScreenSetText(const char *text, int row, int clr)
 	
     if (row >= 0 && row < rmNMaxResRows)
 	{
-		freez(rmResRowText[row]);
+		free(rmResRowText[row]);
 		rmResRowText[row] = rmCleanRowText(text);
 		rmResRowColor[row] = (clr >= 0 && clr < 2) ? rmColors[clr] : rmColors[0];
 		GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[row], rmResRowText[row]);

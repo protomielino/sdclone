@@ -137,12 +137,19 @@ void LegacyMenu::onRaceInitializing()
 		&& pReInfo->s->_totTime < 0.0f) // <= What's this time test for ?
 	{
 		if ((int)GfParmGetNum(pReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, 0, 1) == 1)
+		{
+			//GfLogDebug("LegacyMenu::onRaceInitializing() => RmLoadingScreenStart\n");
 			activateLoadingScreen();
+		}
 		else
+		{
+			//GfLogDebug("LegacyMenu::onRaceInitializing() => RmLoadingScreenShutdown\n");
 			shutdownLoadingScreen();
+		}
 	}
 	else
 	{
+		//GfLogDebug("LegacyMenu::onRaceInitializing() => RmLoadingScreenStart\n");
 		activateLoadingScreen();
 	}
 }
@@ -153,6 +160,7 @@ void LegacyMenu::onRaceStarting()
 	tRmInfo* pReInfo = _piRaceEngine->inData();
 	if (!strcmp(GfParmGetStr(pReInfo->params, pReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES))
 	{
+		//GfLogDebug("LegacyMenu::onRaceStarting() => RmLoadingScreenShutdown\n");
 		::RmLoadingScreenShutdown();
 	
 		::RmDisplayStartRace();
@@ -171,8 +179,10 @@ void LegacyMenu::onRaceLoadingDrivers()
 	if (!(_piRaceEngine->inData()->s->_raceType == RM_TYPE_QUALIF
 		  || _piRaceEngine->inData()->s->_raceType == RM_TYPE_PRACTICE)
 		|| (int)GfParmGetNum(_piRaceEngine->inData()->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)
-		
+	{
+		//GfLogDebug("LegacyMenu::onRaceLoadingDrivers() => RmLoadingScreenStart\n");
 		::RmLoadingScreenStart(_piRaceEngine->inData()->_reName, "data/img/splash-raceload.jpg");
+	}
 }
 
 void LegacyMenu::onRaceDriversLoaded()
@@ -229,6 +239,10 @@ void LegacyMenu::onRaceFinished()
 		unloadCarsGraphics();
 		shutdownGraphicsView();
 		unloadTrackGraphics();
+	}
+	else
+	{
+		RmResScreenShutdown();
 	}
 }
 
