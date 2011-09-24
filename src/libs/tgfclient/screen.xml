@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
 
-<params name="Screen" version="1.8">
+<params name="Screen" version="1.9">
 
   <section name="Validated Screen Properties">
 
@@ -33,7 +33,7 @@
 
   <section name="Menu Font">
 
-    <attstr name="name" val="liberation-sans-bold.glf"/>
+    <attstr name="name" val="jura-normal.glf"/>
     <attnum name="size big" val="250"/>
     <attnum name="size large" val="230"/>
     <attnum name="size medium" val="180"/>
@@ -43,7 +43,7 @@
 
   <section name="Text Font">
 
-    <attstr name="name" val="liberation-sans-normal.glf"/>
+    <attstr name="name" val="droid-sans-normal.glf"/>
     <attnum name="size big" val="320"/>
     <attnum name="size large" val="230"/>
     <attnum name="size medium" val="175"/>
@@ -53,11 +53,11 @@
 
   <section name="Console Font">
 
-    <attstr name="name" val="b7.glf"/>
-    <attnum name="size big" val="14"/>
-    <attnum name="size large" val="10"/>
-    <attnum name="size medium" val="6"/>
-    <attnum name="size small" val="5"/>
+    <attstr name="name" val="droid-sans-bold.glf"/>
+    <attnum name="size big" val="320"/>
+    <attnum name="size large" val="230"/>
+    <attnum name="size medium" val="175"/>
+    <attnum name="size small" val="150"/>
 
   </section>
 
