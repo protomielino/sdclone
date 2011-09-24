@@ -1,4 +1,4 @@
-Release notes for Speed Dreams 2.0.0 Alpha 3.
+Release notes for Speed Dreams 2.0.0 Beta 1.
 ---------------------------------------------
 Here are the summarized changes since 1.4.0
 (More details for associated milestone 2.0.0 here : 
@@ -13,9 +13,93 @@ http://sourceforge.net/apps/trac/speed-dreams/wiki/ActualFeaturePlanFor20
 More technical details about the work in progress for some tasks here :
 http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
 
+Changes since 2.0.0 Alpha 3 released in 2.0.0 Beta 1.
+-----------------------------------------------------
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-b1@3934??????.
+
+The rework of the parameters of all our cars is nearly done, there is only some tweaking needed about the Supercars to keep them drivable by the robots.
+The robots setup rework has been started, but only the Simplix 36 GP are done (plus the Simplix LS1 Archer R9).
+The reflexions on cars were made really better.
+
+<3832
+
+Tracks:
+* New Show-room track for shooting car previews
+* Compressed .xcf source art-work files to .xcf.bz2 for saving space / time
+* Dirt-3 renamed to the more correct Garguree name
+*
+*
+*
+*
+*
+
+Cars:
+* Final fine tuned 36 GP setups for Simu V2.1
+* Final fine tuned LS1 setups for Simu V2.1
+* Removed the LS1 Cavallo 570 S1 from the set (might come back later)
+* Many improved and new LS1 liveries
+* Final fine tuned MP5 cars for Simu V2.1 (fmc, fmc-speedy and fmc-drift), but some liveries are still lacking
+* New SC liveries (Lynx, Boxer, Murasama)
+* many preview files for the Driver Select and Car Select menus, shot from the new dedicated Show-room track
+* Revised material colors for all cars for nicer reflexion effects
+* Compressed .xcf source art-work files to .xcf.bz2 for saving space / time
+* #332 Fixed min/max parameter value management when merging params files
+       Work-in-progress fixing of the car category limits (done for MP5)
+* Fixed engine "formal" and audio specs for the SC Lynx (+turbo) and SC Spirit (3L V6)
+
+Robots:
+* Simplix 36 GP setups
+* 
+* 
+* 
+* 
+
+Menus:
+* New high-res. antialiased fonts, not the final ones, but close to.
+* many car preview files for the Driver Select and Car Select menus
+* #160 Pause sound when pausing a race (whetever the way : help menu or stop menu)
+* #148 Ctrl-+ (=Ctrl-=) / Ctrl-- for zooming in/out (was < and >), Home/End for max/min zooming
+* 
+* 
+* 
+ 
+
+Graphics engine / Race screen :
+* More shiny vertical reflexion on cars (the faked sky shadows = envshadow maps are now added ; they were multiplied)
+* Specific envshadow maps (sky reflexion) for each sky dome state (for each cloud cover, + rain and night)
+* 
+* 
+* 
+* 
+
+Race engine :
+* #436 Fixed career car links (team/drivers)
+* 
+* 
+* 
+
+Simulation engine (Simu V2.1) :
+* 
+* 
+* 
+* 
+* 
+
+Build system :
+* #331 The base Windows installer now donwloads the other packages when requested and needed ; if already downloaded, just runs them
+* 
+* 
+* 
+* 
+
+Other:
+* #446 (#451) Fixed many minor memory leaks (some big ones are still there) and made the app. behave more smartly (about memory, modules, ... etc ...) when exiting by any means
+* 
+ 
+
 Changes since 2.0.0 Alpha 2 released in 2.0.0 Alpha 3
 -----------------------------------------------------
-This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a2@3412.
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-a3@3412.
 
 We started the most important work for 2.0 : a full rework of the parameters
 of all our cars, towards realism (as for parameter values as for the handling).
