@@ -58,7 +58,7 @@ problem in the FAQ before you file a bug or contact us. Have fun,
 The Speed Dreams Team.
 
 
-2 - Installation from all in one Tarball
+2 - Installation from all in one tarball
 
   a - uncompress the tarball :
 
@@ -112,12 +112,14 @@ The Speed Dreams Team.
 
         Usefull CMake variables for Speed Dreams :
 
-        - SD_LOCALDIR:STRING		: User settings dir for run-time (def: ~/.speed-dreams-2)
+        - OPTION_OFFICIAL_ONLY:BOOL	: Build/install only official contents (def: OFF)
         - OPTION_DEBUG:BOOL			: Full run-time traces if ON (def: OFF)
         - OPTION_TRACE_LEVEL:STRING : Run-time traces level integer threshold, 
                                       only if OPTION_DEBUG (traces with higher level are 
                                       not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 
                                                    4=Trace, 5=Debug, ...) (def: 5)
+
+        - SD_LOCALDIR:STRING		: User settings dir for run-time (def: ~/.speed-dreams-2)
         - CMAKE_PREFIX_PATH:STRING	: Path prefixes for additional 3rdParty libraries (def:empty)
                                       (use /usr/local if you compiled some 3rdParty libs yourself).
         - CMAKE_INSTALL_PREFIX:PATH	: Install path (def: /usr/local)
@@ -209,8 +211,6 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
        into <My documents>\speed-dreams-2.settings and this prevents the game from starting.
        If this happens, simply remove the <My documents>\speed-dreams-2.settings folder
        with Windows explorer, and restart the game : it should now work.
-
- Note: You might also have to install MSVC 2005/2008 redistribuable (ask M$, yes it's free !)
 
  Note: This should also work with MSVC 2008. For MSVC 2003, you'll probably need to rebuild
        a dedicated 3rdParty package for this compiler

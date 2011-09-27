@@ -1,11 +1,14 @@
 Top TODO list (some may be included in 2.0.0, some others not):
 ---------------------------------------------------------------
 
+Note: This material is not yet integrated into our Wiki, but should.
+      See http://sourceforge.net/apps/trac/speed-dreams, Developers corner.
+
 Cars:
 - move RGB files to PNG for lower disk footprint
 - improve damage management (see Andrews ideas in the the devel list,
   under the title "Thoughts on collision damage").
-- fix to high wheel inertia on many (if not all) models.
+- fix too high wheel inertia on many (if not all) models.
   See the devel list post "Low speeds".
 
 Menus:
@@ -21,9 +24,6 @@ Menus:
   * add support for keyboard shorcut XML description
     (with defaults like for F1, F12 ... and also customizable ones).
   * add support for dynamic background image.
-  * add support for menu specific property/value in the XML file, 
-    to remove hard-coded constants from the menu C++ code
-    (Ex: x, y positions for non-always there controls ... see creditsmenu.cpp)
   * move the whole thing to a GfuiXMLMenuDescriptor class, for nice access
     to menu properties, controls, objects ... by their name or index (in the XML file)
 
@@ -31,25 +31,18 @@ Robots:
 -
 
 Program: 
-- Simu V3 : integrate Christos' improvements from Torcs CVS HEAD :
-   * 1. Discovered that corner velocities are not correctly calculated
-     2. Stabilised CollideZ() code - removed corner velocity from calculation
-        of reaction forces.
-   * updated the viscous coupler so that it is symmetric (July 2009)
-   * Changed some things in the rolling resistance calculation (July 2009).
-     Now it works as advertised, i.e. sand is sticky!
-- network gaming - work in progress (Brian)
-- just load ssggraph once to avoid weird crashes when going back to the options
-  menu and coming back to the race (just the Linux version was affected, and even
-  this just under special conditions, the Windows version does not work the same
-  way concerning this) - Back-port from Torcs r1-3-1 branch
+- network gaming - take over Brian's unfinished work, or restart from scratch
+  (using graphics data transmission rather than physics one,
+   see devel list discussions)
 - as we want to increase the details (cars, tracks, ...), think about better and deeper
   management of the level of detail, filtering-out objects that are not in the focus
   of the camera (if not already done somewhere ?), from a "high" level for close objects
   to a "low" level for very far objects, with 1 ou 2 intermediate distance levels.
   As an example, use the auto-generated 3D wheel model for low levels (decrease its details),
   and the designer-shipped one for high level (increase its details : more round wheels).
-- replay feature - Work in progress by Adam Skoblinski
+  => rather rewrite the graphics engine from scratch with some modern engine
+     like OSG, Ogre3D, Irrlicht ...
+- replay feature - Work in progress by Adam Skoblinski (no news for at least 1 year now)
 
 Other:
 - finish the Mac OS X port (with CMake) : ~95% done.  Compiles completely but does not run. 
@@ -63,12 +56,14 @@ TODO for 2.0.0 or after (some are current on sdl-port and career branches)
 Cars:
 - move textures to PNG for saving disk space / download time
 - create / setup new LMP1 car set (Andrew)
-- setup new Indy car set (converted by Xavier from GP4 game)
-- complete / setup F1 car set (including Formula One by Andrew Sumner,
+- setup new MPA1 (RL = Indy) car set (converted by Xavier from GP4 game)
+- complete / setup MP1 (RL = F1) car set (including Formula One by Andrew Sumner,
   F1-torcs by Vincente Marti, and models converted by Xavier from GP4 game)
   BUT: what about Manfariel's F1 2009 models?
 - add petrol, bewy and mf1 to SuperCars set, as proposed by Wolf-Dieter
-  BUT: There are still no front-engined cars!!
+  BUT: There are still no front-engined cars!
+  => see also discussion on dropping the TRB1 set and reuse its nice models
+     in other existing / future sets.
 - check in the Pacejka book to see if the way mu is computed from tire load
   (= tire load sensitivity) is OK (simu V2 / wheel.cpp / SimWheelUpdateForce function)
 - ALL CARS: create LOD models to reduce graphical stress in big-grid races or on low-spec CPUs
@@ -76,7 +71,8 @@ Cars:
 - rework the current stock car model to the newer model 'Car of Tomorrow'
 - Hillclimb car with over 800 bhp?
   BUT: Is it fun?
-- increase volume of backfire sound and gear shift sound
+- increase volume of backfire sound and gear shift sound (OpenAL)
+- implement low-pass filter (OpenAL extensions)
 
 Robots:
 - setup USR and Simplix robots for reworked 4WD carset.
@@ -85,8 +81,6 @@ Robots:
 - setup USR and Simplix robots for completed F1 carset.
 
 Menus:
-- add options in the Open GL menu to enable/disable multi-sampling
-  and change the "multi-sampling level (?)".
 - Smart 3D view showing the selected car when choosing it
 
 
@@ -113,7 +107,8 @@ Program:
   the extra-grip and replace it by driving assistance) and to scale driver assistance
   availability / capabilities ;
   add also something for preventing you from smashing into the back of the car in front
-  (see Haruna's detailed post on the subject and associated thread http://sourceforge.net/mailarchive/forum.php?thread_name=e17477d90904182050lc339f5cy6b4908ed8dc1723%40mail.gmail.com&forum_name=speed-dreams-devel)
+  (see Haruna's detailed post on the subject
+   and associated thread http://sourceforge.net/mailarchive/forum.php?thread_name=e17477d90904182050lc339f5cy6b4908ed8dc1723%40mail.gmail.com&forum_name=speed-dreams-devel)
 - introduce AI vs AI duel tournament mode for casual robot programmers (similar to 
   R-TYPE FINAL's 'VS AI' mode); with varying car types, tracks, and robot competence
 - Add co-driver/navigator signals and sounds for dirt and certain road tracks to be
