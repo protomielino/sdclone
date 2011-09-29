@@ -5,15 +5,15 @@ WARNING: Only intended for developers who'll build Speed Dreams from sources.
 
 I - Pre-requisites
 
-II - Linux Installation from Sources
+II - Linux Installation from sources
 
   1 - Introduction
   2 - Runtime options
   3 - Getting Help
-  4 - Installation from all in one Tarball
+  4 - Installation from all-in-one tarball
   5 - Installation from SVN
 
-III - Windows Installation from Sources
+III - Windows Installation from sources
 
   1 - Cmake and MS VC++ 2005 (8) / 2008 (9) on Windows XP 32
   2 - MS VC++ 6 no more supported
@@ -46,31 +46,36 @@ II - Linux installation from sources
 
 1 - Introduction
 
-There are several ways to install Speed Dreams:
-- from all in one tarball.
-- from modular packages.
+There are several ways to build and install Speed Dreams:
+- from the all-in-one tarball.
 - from SVN (just for developers!).
 
 Pick just one of the above options. If you have trouble during the installation
-have a look in the FAQ on the above sites. In case you get stuck learn how to report the
-problem in the FAQ before you file a bug or contact us. Have fun,
+have a look in the FAQ on the above sites. In case you get stuck,
+please learn how to report the problem in the FAQ before filing a bug or contact us.
+
+Have fun,
 
 The Speed Dreams Team.
 
 
-2 - Installation from all in one tarball
+2 - Installation from the all-in-one tarball
 
-  a - uncompress the tarball :
+  a - get the all-in-one source tarball : please go to our SF.net download page :
+          http://sourceforge.net/projects/speed-dreams/files/2.0.0
+      you should find some speed-dreams-2.0.0-xxx-src.tar.7z archive :-)
+
+  b - uncompress the tarball :
 
      . if bzip2-compressed (the old way) :
 
-         $ tar xfvj speed-dreams-xxx.tar.bz2
+      $ tar xfvj speed-dreams-xxx.tar.bz2
 
      . if 7z-compressed (the new way) :
 
       $ 7zr x -so speed-dreams-xxx.tar.7z | tar xvf -
 
-  b - configure :
+  c - configure :
 
     1.  cd to the path where Speed Dreams sources are installed.
 
@@ -82,7 +87,12 @@ The Speed Dreams Team.
 
       - for a Release build using default 3rd party libs
 
-        $ cmake .
+        $ cmake -D OPTION_OFFICIAL_ONLY:BOOL=ON .
+
+        Note: This "OFFICIAL_ONLY" stuff is mandatory, otherwise
+              you'll get errors saying that some (unofficial contents)
+              folders are missing, just because the all-in-one tarball
+              does not includes them.
 
       - you may also want to override some default settings :
 
@@ -92,8 +102,7 @@ The Speed Dreams Team.
 
             $ cmake -D SD_LOCALDIR:STRING=~/dev/.sd-settings \
                     -D CMAKE_PREFIX_PATH:STRING=/usr/local
-                    -D CMAKE_BUILD_TYPE:STRING=Debug \
-                    -D OPTION_OFFICIAL_ONLY:BOOL=OFF
+                    -D CMAKE_BUILD_TYPE:STRING=Debug
 
         or else you can use ccmake to change the variables interactively :
 
@@ -112,18 +121,18 @@ The Speed Dreams Team.
 
         Usefull CMake variables for Speed Dreams :
 
-        - OPTION_OFFICIAL_ONLY:BOOL	: Build/install only official contents (def: OFF)
-        - OPTION_DEBUG:BOOL			: Full run-time traces if ON (def: OFF)
+        - OPTION_OFFICIAL_ONLY:BOOL : Build/install only official contents (def: OFF)
+        - OPTION_DEBUG:STRING       : Full run-time traces if ON (def: ON)
         - OPTION_TRACE_LEVEL:STRING : Run-time traces level integer threshold, 
                                       only if OPTION_DEBUG (traces with higher level are 
                                       not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 
                                                    4=Trace, 5=Debug, ...) (def: 5)
 
-        - SD_LOCALDIR:STRING		: User settings dir for run-time (def: ~/.speed-dreams-2)
-        - CMAKE_PREFIX_PATH:STRING	: Path prefixes for additional 3rdParty libraries (def:empty)
+        - SD_LOCALDIR:STRING        : User settings dir for run-time (def: ~/.speed-dreams-2)
+        - CMAKE_PREFIX_PATH:STRING  : Path prefixes for additional 3rdParty libraries (def:empty)
                                       (use /usr/local if you compiled some 3rdParty libs yourself).
-        - CMAKE_INSTALL_PREFIX:PATH	: Install path (def: /usr/local)
-        - CMAKE_BUILD_TYPE:STRING	: Debug, Release, RelWithDebInfo, MinSizeRel (def: Release)
+        - CMAKE_INSTALL_PREFIX:PATH : Install path (def: /usr/local)
+        - CMAKE_BUILD_TYPE:STRING   : Debug, Release, RelWithDebInfo, MinSizeRel (def: Release)
 
         Tips reported about some issues :
         - sometimes, ENET_INCLUDE_DIR is not detected correctly, resulting in something like
@@ -132,35 +141,22 @@ The Speed Dreams Team.
           one in /usr/include. Removing the "enet" postfix from ENET_INCLUDE_DIR should fix this
           (in cmake command line or interactively in ccmake).
 
-  c - build and install:
+  d - build:
 
-    Simply use: 
-
-      $ make && sudo make install
+      $ make
   
-  d - run Speed-Dreams
+  e - install:
 
-    if default CMake settings were kept, Speed Dreams is normally installed in /usr/local :
+      $ sudo make install
+  
+      Notes:
+      * sudo is only useful if your install PREFIX is a read-only folder (like default /usr/local)
+      * sudo configuration : you may ask your system administrator to enable you to run
+        'sudo make install' ; if he doesn't know how, you can tell him/her
+        to add a line like this in /etc/sudoers (or something less permissive ;-) :
+           <your login name>    ALL=(ALL) NOPASSWD: ALL
 
-      $ speed-dreams-2
-      
-    or, if /usr/local/games not already in your PATH :
-      
-      $ /usr/local/games/speed-dreams-2
-
-3 - Runtime options
-
-* -m Use hardware mouse cursor (better on full-screen mode)
-
-4 - Getting Help
-
-During the game press F1. For more in depth information visit www.torcs.org,
-you find there a lot of information, look at the documentation section on
-the left, have as well a look into the list of howto's. 
-If you are stuck please report problems through speed-dreams-users mailing list
-or the Tracker (visit <http://sourceforge.net/projects/speed-dreams> for that).
-
-5 - Installation from SVN (developer level only !)
+3 - Installation from SVN (developer level only !)
 
 Before you start, make you aware that the SVN trunk / branches might crash or even not compile
 sometimes. If you want to get it anyway, follow the instructions at
@@ -174,38 +170,68 @@ For the moment,
   you can get the "1.4.x" release maintenance branch current state through :
   svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/branches/1.4.x speed-dreams-1.4.x
 - we make release tags under the "tags" root dir ; as an exemple,
-  you can get the "1.4.0" release through :
-  svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/1.4.0 speed-dreams-1.4.0
+  you can get the "2.0.0 Beta 1" pre-release through :
+  svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-b1 speed-dreams-2.0.0-b1
 
 See configure, build and install method above (2)
 (note however that branches/1.4.x and tags/1.4.0 are not built through cmake :
  please refer to the dedicated INSTALL file for these).
 
+4 - Run Speed-Dreams
+
+If the default CMake settings were kept, Speed Dreams is normally installed in /usr/local :
+
+  $ speed-dreams-2
+      
+or, if /usr/local/games not already in your PATH :
+      
+  $ /usr/local/games/speed-dreams-2
+
+Runtime options
+
+ -m Use hardware mouse cursor (better on full-screen mode)
+
+7 - Getting Help
+
+During the game, press F1 at any time. 
+If you are stuck please report problems through speed-dreams-users mailing list
+or our bug tracker at http://sourceforge.net/apps/trac/speed-dreams/report.
+
 
 II - Windows installation from sources
 ---------------------------------------
 
-1) Cmake and MS VC++ 2005 (8) / 2008 (9) on Windows XP 32
+1) Cmake and MinGW : We want it ! Who can help us in this MinGW porting work :-?
+
+2) Cmake and MS VC++ 2005 (8) / 2008 (9) on Windows XP 32
 
 Note: If you use an "Express" version, don't forget to install also the Windows SDK.
 
   a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
-  b.  Download the "MSVC 2005" release of the "3rdParty" package on SF.net
+  b.  Download the all-in-one source tarball from SF.net
+      http://sourceforge.net/projects/speed-dreams/files/2.0.0
+      (speed-dreams-2.0.0-xxx-src.tar.7z)
+  c.  Extract its contents to your local disk (7Zip is an excellent tool for that).
+  d.  Download the "MSVC 2005" release of the "3rdParty" package on SF.net
       http://sourceforge.net/project/showfiles.php?group_id=239111 
       (it contains necessary 3rd party libs compiled with/for MSVC 2005)
-  c.  Extract from the zip file the "3rdParty" directory to directory level where speed-dreams is installed.  
-      Example: If sources are in c:\gamesources\speed-dreams, then extract 3rd party zip in c:\ => c:\gamesources\3rdParty directory.
-  d.  Startup CMake and set "Where is the source code" and "Where to build the binaries" 
+  e.  Extract from the zip file the "3rdParty" directory to where speed-dreams sources
+      are installed.  
+      Example: If sources are in c:\gamesources\speed-dreams\2.0.0-b1, 
+               then extract 3rd party zip in c:\ => c:\gamesources\3rdParty
+  f.  Startup CMake and set "Where is the source code" and "Where to build the binaries" 
       to the path where Speed-Dreams sources are installed.
-      Example: If sources are in c:\gamesources\speed-dreams, specify c:\gamesources\speed-dreams for the 2 fields.
-  e.  Press "Configure" button  and select the desired compiler.
+      Example: If sources are in c:\gamesources\speed-dreams\2.0.0-b1,
+               specify c:\gamesources\speed-dreams\2.0.0-b1 for the 2 fields.
+  g.  Press "Configure" button  and select the desired compiler.
       Press the "Configure" button again, until the "OK" button is no more greyed.
-  f.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams.sln"
+  h.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams.sln"
       and associated project files (*.vcproj)
-  g.  Load speed-dreams.sln in MSVC IDE.
-  h.  Build the whole Solution (Build / Build Solution)
-  i.  Build the INSTALL project (right click on it and select Build).
-  j.  Double-click on speed-dreams-2.exe in c:\Program Files\speed-dreams-2\bin
+  i.  Load speed-dreams.sln in MSVC IDE.
+  j.  Select the build configuration (Debug, Release, ...).
+  k.  Build the whole Solution (Build / Build Solution)
+  l.  Build the 'INSTALL' project (right click on it and select Build).
+  m.  Double-click on speed-dreams-2.exe in c:\Program Files\speed-dreams-2\bin
 
  Note: First-ever startups sometimes fail to correctly write the necesary stuff
        into <My documents>\speed-dreams-2.settings and this prevents the game from starting.
@@ -224,8 +250,6 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
         or be ready for headaches.
 
 
-2) MinGW : We want it ! Who can take care of the port :-?
-
 3) MS VC++ 6 : No more supported.
 
 III - FreeBSD installation from sources
@@ -235,7 +259,7 @@ Mostly the same as for "Linux installation from sources" ...
 
 Some specific details though :
 
-2 - Installation from all in one Tarball
+2 - Installation from all-in-one Tarball
 
   b - build and install:
 
