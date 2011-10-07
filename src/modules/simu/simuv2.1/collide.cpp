@@ -113,7 +113,7 @@ void SimCarCollideXYScene(tCar *car)
 		initDotProd = nx * corner->vel.x + ny * corner->vel.y;
 
 		// Compute dmgDotProd (base value for later damage) with a heuristic.
-		tdble absvel = MAX(1.0, sqrt(car->DynGCg.vel.x*car->DynGCg.vel.x + car->DynGCg.vel.y*car->DynGCg.vel.y));
+		tdble absvel = (tdble) (MAX(1.0, sqrt(car->DynGCg.vel.x*car->DynGCg.vel.x + car->DynGCg.vel.y*car->DynGCg.vel.y)));
 		tdble GCgnormvel = car->DynGCg.vel.x*nx + car->DynGCg.vel.y*ny;
 		tdble cosa = GCgnormvel/absvel;
 		tdble dmgDotProd = GCgnormvel*cosa;
@@ -128,13 +128,13 @@ void SimCarCollideXYScene(tCar *car)
 		static tdble VELMAX = 6.0f;
 		car->DynGCg.vel.az -= dotprod2 * dotProd / VELSCALE;
 		if (fabs(car->DynGCg.vel.az) > VELMAX) {
-			car->DynGCg.vel.az = SIGN(car->DynGCg.vel.az) * VELMAX;
+			car->DynGCg.vel.az = (tdble) (SIGN(car->DynGCg.vel.az) * VELMAX);
 		}
 
 		// Dammage.
 		dotProd = initDotProd;
 		if (dotProd < 0.0f && (car->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
-			dmg = curBarrier->surface->kDammage * fabs(0.5*dmgDotProd*dmgDotProd) * simDammageFactor[car->carElt->_skillLevel];
+			dmg = (tdble) (curBarrier->surface->kDammage * fabs(0.5*dmgDotProd*dmgDotProd) * simDammageFactor[car->carElt->_skillLevel]);
 			car->dammage += (int)dmg;
 		} else {
 			dmg = 0.0f;
@@ -241,7 +241,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
 	sgVec2 tmpv;
 	
-	sgScaleVec2(tmpv, n, MIN(distpab, 0.05));
+	sgScaleVec2(tmpv, n, (float) MIN(distpab, 0.05));
 	// No "for" loop here because of subtle difference AddVec/SubVec. 
 	if (car[0]->blocked == 0 && !(car[0]->carElt->_state & RM_CAR_STATE_NO_SIMU)) {
 		sgAddVec2((float*)&(car[0]->DynGCg.pos), tmpv);
@@ -291,8 +291,8 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 		}
 
 		if ((car[i]->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
-			float dammage = (CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[car[i]->carElt->_skillLevel]);
-			dammage *= MIN(1.5, dammage / 500.0);
+			float dammage = (float)((CAR_DAMMAGE * fabs(j) * damFactor * simDammageFactor[car[i]->carElt->_skillLevel]));
+			dammage *= (float)(MIN(1.5, dammage / 500.0));
 			if (dammage < 10)
 				dammage = 0;
 			car[i]->dammage += (int)(dammage);
@@ -315,7 +315,7 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 
 		static float VELMAX = 3.0f;
 		if (fabs(car[i]->VelColl.az) > VELMAX) {
-			car[i]->VelColl.az = SIGN(car[i]->VelColl.az) * VELMAX;
+			car[i]->VelColl.az = (tdble)(SIGN(car[i]->VelColl.az) * VELMAX);
 		}
 
 		sgCopyVec2((float*)&(car[i]->VelColl.x), v2a);
@@ -323,8 +323,8 @@ static void SimCarCollideResponse(void * /*dummy*/, DtObjectRef obj1, DtObjectRe
 		// Move the car for the collision lib.
 		tCarElt *carElt = car[i]->carElt;
 		sgMakeCoordMat4(carElt->pub.posMat, car[i]->DynGCg.pos.x, car[i]->DynGCg.pos.y,
-						car[i]->DynGCg.pos.z - carElt->_statGC_z, RAD2DEG(carElt->_yaw),
-						RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+						car[i]->DynGCg.pos.z - carElt->_statGC_z, (float) RAD2DEG(carElt->_yaw),
+						(float) RAD2DEG(carElt->_roll), (float) RAD2DEG(carElt->_pitch));
 		dtSelectObject(car[i]);
 		dtLoadIdentity();
 		dtTranslate(-carElt->_statGC_x, -carElt->_statGC_y, 0.0f);
@@ -433,15 +433,15 @@ static void SimCarWallCollideResponse(void *clientdata, DtObjectRef obj1, DtObje
 
 	static float VELMAX = 3.0f;
 	if (fabs(car->VelColl.az) > VELMAX) {
-		car->VelColl.az = SIGN(car->VelColl.az) * VELMAX;
+		car->VelColl.az = (float) (SIGN(car->VelColl.az) * VELMAX);
 	}
 
 	sgCopyVec2((float*)&(car->VelColl.x), v2a);
 
 	// Move the car for the collision lib.
 	sgMakeCoordMat4(carElt->pub.posMat, car->DynGCg.pos.x, car->DynGCg.pos.y,
-					car->DynGCg.pos.z - carElt->_statGC_z, RAD2DEG(carElt->_yaw),
-					RAD2DEG(carElt->_roll), RAD2DEG(carElt->_pitch));
+					car->DynGCg.pos.z - carElt->_statGC_z, (float) RAD2DEG(carElt->_yaw),
+					(float) RAD2DEG(carElt->_roll), (float) RAD2DEG(carElt->_pitch));
 	dtSelectObject(car);
 	dtLoadIdentity();
 	dtTranslate(-carElt->_statGC_x, -carElt->_statGC_y, 0.0f);
