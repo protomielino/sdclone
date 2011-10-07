@@ -135,7 +135,7 @@ void SegLearn::writeKarma()
 	}
 
 	// Create the directory and try to write data.
-	if (GfCreateDir(path) == GF_DIR_CREATED) {
+	if (GfDirCreate(path) == GF_DIR_CREATED) {
 		// Try to write data.
 		FILE *fd = fopen(filename, "wb");
 		if (fd != NULL) {
