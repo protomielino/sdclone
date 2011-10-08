@@ -42,7 +42,7 @@
 extern "C" int TRACK_API openGfModule(const char* pszShLibName, void* hShLibHandle);
 extern "C" int TRACK_API closeGfModule();
 
-// The module main class (Singleton, inherits GfModule, and implements IGraphicsEngine).
+// The module main class (Singleton, inherits GfModule, and implements ITrackLoader).
 class TRACK_API TrackModule : public GfModule, public ITrackLoader //, public ITrack
 {
  public:
@@ -80,7 +80,7 @@ class TRACK_API TrackModule : public GfModule, public ITrackLoader //, public IT
 	static TrackModule* _pSelf;
 };
 
-#endif /* _TRACKINC_H__ */ 
+#endif /* _TRACKITF_H__ */ 
 
 
 
