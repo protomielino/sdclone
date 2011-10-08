@@ -94,7 +94,7 @@ gfuiLabelInit(tGfuiLabel *label, const char *text, int maxlen,
 {
     if (maxlen <= 0)
 		maxlen = strlen(text);
-    label->text = (char*)calloc(maxlen+1, 1);
+    label->text = (char*)calloc(maxlen+1, sizeof(char));
     strncpy(label->text, text, maxlen);
     label->maxlen = maxlen;
     
@@ -208,11 +208,11 @@ gfuiLabelSetText(tGfuiLabel *label, const char *text)
 	{
 		free(label->text);
 		label->maxlen = strlen(text);
-		label->text = (char*)calloc(label->maxlen+1, 1);
+		label->text = (char*)calloc(label->maxlen+1, sizeof(char));
 	}
 	
 	// Update the text.
-   strncpy(label->text, text, label->maxlen);
+	strncpy(label->text, text, label->maxlen);
 }
 
 /** Change the text of a label.
