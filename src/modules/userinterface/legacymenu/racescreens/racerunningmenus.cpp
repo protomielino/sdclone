@@ -565,7 +565,7 @@ static void
 rmResScreenDeactivate(void * /* dummy */)
 {
 	if (rmResRowText)
-		for (int i = 1; i < rmNMaxResRows; i++)
+		for (int i = 0; i < rmNMaxResRows; i++)
 			freez(rmResRowText[i]);
 }
 
@@ -730,7 +730,10 @@ RmResScreenAddText(const char *text)
 		}
 		rmCurRowIndex--;
     }
-	free(rmResRowText[rmCurRowIndex]);
+	else
+	{
+		free(rmResRowText[rmCurRowIndex]);
+	}
     rmResRowText[rmCurRowIndex] = rmCleanRowText(text);
     GfuiLabelSetText(rmResScreenHdle, rmResRowLabelId[rmCurRowIndex], rmResRowText[rmCurRowIndex]);
     rmCurRowIndex++;
