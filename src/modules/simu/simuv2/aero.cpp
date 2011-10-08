@@ -60,21 +60,21 @@ SimAeroUpdate(tCar *car, tSituation *s)
 			otherCar = &(SimCarTable[i]);
 			otherYaw = otherCar->DynGCg.pos.az;
 			tmpsdpang = spdang - atan2(y - otherCar->DynGCg.pos.y, x - otherCar->DynGCg.pos.x);
-			NORM_PI_PI(tmpsdpang);
+			FLOAT_NORM_PI_PI(tmpsdpang);
 			dyaw = yaw - otherYaw;
-			NORM_PI_PI(dyaw);
+			FLOAT_NORM_PI_PI(dyaw);
 			if ((otherCar->DynGC.vel.x > 10.0) &&
 				(fabs(dyaw) < 0.1396)) {
 				if (fabs(tmpsdpang) > 2.9671) {	    /* 10 degrees */
 					/* behind another car */
-					tmpas = 1.0 - exp(- 2.0 * DIST(x, y, otherCar->DynGCg.pos.x, otherCar->DynGCg.pos.y) /
-									  (otherCar->aero.Cd * otherCar->DynGC.vel.x));
+					tmpas = (tdble) (1.0 - exp(- 2.0 * DIST(x, y, otherCar->DynGCg.pos.x, otherCar->DynGCg.pos.y) /
+									  (otherCar->aero.Cd * otherCar->DynGC.vel.x)));
 					if (tmpas < dragK) {
 						dragK = tmpas;
 					}
 				} else if (fabs(tmpsdpang) < 0.1396) {	    /* 8 degrees */
 					/* before another car [not sure how much the drag should be reduced in this case. In no case it should be lowered more than 50% I think. - Christos] */
-					tmpas = 1.0 - 0.5f * exp(- 8.0 * DIST(x, y, otherCar->DynGCg.pos.x, otherCar->DynGCg.pos.y) / (car->aero.Cd * car->DynGC.vel.x));
+					tmpas = (tdble) (1.0 - 0.5f * exp(- 8.0 * DIST(x, y, otherCar->DynGCg.pos.x, otherCar->DynGCg.pos.y) / (car->aero.Cd * car->DynGC.vel.x)));
 					if (tmpas < dragK) {
 						dragK = tmpas;
 					}
@@ -97,7 +97,7 @@ SimAeroUpdate(tCar *car, tSituation *s)
 		cosa = 0.0f;
 	}
 			
-    car->aero.drag = -SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK;
+    car->aero.drag = (tdble) (-SIGN(car->DynGC.vel.x) * car->aero.SCx2 * v2 * (1.0f + (tdble)car->dammage / 10000.0f) * dragK * dragK);
 
     hm = 1.5f * (car->wheel[0].rideHeight + car->wheel[1].rideHeight + car->wheel[2].rideHeight + car->wheel[3].rideHeight);
     hm = hm*hm;
@@ -145,7 +145,7 @@ SimWingUpdate(tCar *car, int index, tSituation* s)
         tdble sinaoa = sin(aoa);
 
         if (car->DynGC.vel.x > 0.0f) {
-            wing->forces.x = wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * sinaoa;
+            wing->forces.x = (tdble) (wing->Kx * vt2 * (1.0f + (tdble)car->dammage / 10000.0) * sinaoa);
             wing->forces.z = wing->Kz * vt2 * sinaoa;
         } else {
             wing->forces.x = wing->forces.z = 0.0f;

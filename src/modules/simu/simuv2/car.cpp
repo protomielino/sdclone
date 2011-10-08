@@ -43,11 +43,11 @@ SimCarConfig(tCar *car)
 	overallwidth     = GfParmGetNum(hdle, SECT_CAR, PRM_OVERALLWIDTH, (char*)NULL, car->dimension.y);
 	car->dimension.z = GfParmGetNum(hdle, SECT_CAR, PRM_HEIGHT, (char*)NULL, 1.2f);
 	car->mass        = GfParmGetNum(hdle, SECT_CAR, PRM_MASS, (char*)NULL, 1500);
-	car->Minv        = 1.0 / car->mass;
+	car->Minv        = (tdble) (1.0 / car->mass);
 	gcfr             = GfParmGetNum(hdle, SECT_CAR, PRM_FRWEIGHTREP, (char*)NULL, .5);
 	gcfrl            = GfParmGetNum(hdle, SECT_CAR, PRM_FRLWEIGHTREP, (char*)NULL, .5);
 	gcrrl            = GfParmGetNum(hdle, SECT_CAR, PRM_RRLWEIGHTREP, (char*)NULL, .5);
-	car->statGC.y    = - (gcfr * gcfrl + (1 - gcfr) * gcrrl) * car->dimension.y + car->dimension.y / 2.0;
+	car->statGC.y    = (tdble) (- (gcfr * gcfrl + (1 - gcfr) * gcrrl) * car->dimension.y + car->dimension.y / 2.0);
 	car->statGC.z    = GfParmGetNum(hdle, SECT_CAR, PRM_GCHEIGHT, (char*)NULL, .5);
 	
 	car->tank        = GfParmGetNum(hdle, SECT_CAR, PRM_TANK, (char*)NULL, 80);
@@ -64,9 +64,9 @@ SimCarConfig(tCar *car)
 		car->fuel = car->tank;
 	}
 	k = k * k;
-	car->Iinv.x = 12.0 / (car->mass * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z));
-	car->Iinv.y = 12.0 / (car->mass * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z));
-	car->Iinv.z = 12.0 / (car->mass * (car->dimension.y * car->dimension.y + k * car->dimension.x * car->dimension.x));
+	car->Iinv.x = (tdble) (12.0 / (car->mass * (car->dimension.y * car->dimension.y + car->dimension.z * car->dimension.z)));
+	car->Iinv.y = (tdble) (12.0 / (car->mass * (car->dimension.x * car->dimension.x + car->dimension.z * car->dimension.z)));
+	car->Iinv.z = (tdble) (12.0 / (car->mass * (car->dimension.y * car->dimension.y + k * car->dimension.x * car->dimension.x)));
 	
 	/* configure components */
 	w = car->mass * G;
@@ -112,30 +112,30 @@ SimCarConfig(tCar *car)
 		car->wheel[i].staticPos.x -= car->statGC.x;
 		car->wheel[i].staticPos.y -= car->statGC.y;
 	}
-	car->wheelbase = (car->wheel[FRNT_RGT].staticPos.x 
+	car->wheelbase = (tdble) ((car->wheel[FRNT_RGT].staticPos.x 
 				+ car->wheel[FRNT_LFT].staticPos.x
 				- car->wheel[REAR_RGT].staticPos.x
-				- car->wheel[REAR_LFT].staticPos.x) / 2.0;
-	car->wheeltrack = (-car->wheel[REAR_LFT].staticPos.y 
+				- car->wheel[REAR_LFT].staticPos.x) / 2.0);
+	car->wheeltrack = (tdble) ((-car->wheel[REAR_LFT].staticPos.y 
 				- car->wheel[FRNT_LFT].staticPos.y
 				+ car->wheel[FRNT_RGT].staticPos.y
-				+ car->wheel[REAR_RGT].staticPos.y) / 2.0;
+				+ car->wheel[REAR_RGT].staticPos.y) / 2.0);
 	
 	/* set corners pos */
-	car->corner[FRNT_RGT].pos.x = car->dimension.x * .5 - car->statGC.x;
-	car->corner[FRNT_RGT].pos.y = - overallwidth * .5 - car->statGC.y;
+	car->corner[FRNT_RGT].pos.x = (tdble) (car->dimension.x * .5 - car->statGC.x);
+	car->corner[FRNT_RGT].pos.y = (tdble) (- overallwidth * .5 - car->statGC.y);
 	car->corner[FRNT_RGT].pos.z = 0;
 	
-	car->corner[FRNT_LFT].pos.x = car->dimension.x * .5 - car->statGC.x;
-	car->corner[FRNT_LFT].pos.y = overallwidth * .5 - car->statGC.y;
+	car->corner[FRNT_LFT].pos.x = (tdble) (car->dimension.x * .5 - car->statGC.x);
+	car->corner[FRNT_LFT].pos.y = (tdble) (overallwidth * .5 - car->statGC.y);
 	car->corner[FRNT_LFT].pos.z = 0;
 	
-	car->corner[REAR_RGT].pos.x = - car->dimension.x * .5 - car->statGC.x;
-	car->corner[REAR_RGT].pos.y = - overallwidth * .5 - car->statGC.y;
+	car->corner[REAR_RGT].pos.x = (tdble) (- car->dimension.x * .5 - car->statGC.x);
+	car->corner[REAR_RGT].pos.y = (tdble) (- overallwidth * .5 - car->statGC.y);
 	car->corner[REAR_RGT].pos.z = 0;
 	
-	car->corner[REAR_LFT].pos.x = - car->dimension.x * .5 - car->statGC.x;
-	car->corner[REAR_LFT].pos.y = overallwidth * .5 - car->statGC.y;
+	car->corner[REAR_LFT].pos.x = (tdble) (- car->dimension.x * .5 - car->statGC.x);
+	car->corner[REAR_LFT].pos.y = (tdble) (overallwidth * .5 - car->statGC.y);
 	car->corner[REAR_LFT].pos.z = 0;
 }
 
@@ -157,15 +157,15 @@ SimCarUpdateForces(tCar *car)
 	
 	/* total mass */
 	m = car->mass + car->fuel;
-	minv = 1.0 / m;
+	minv = (tdble) (1.0 / m);
 	w = -m * G;
 	
 	/* Weight */
-	SinTheta = (-car->wheel[FRNT_RGT].zRoad - car->wheel[FRNT_LFT].zRoad
-		+ car->wheel[REAR_RGT].zRoad + car->wheel[REAR_LFT].zRoad) / (2.0 * car->wheelbase);
+	SinTheta = (tdble) ((-car->wheel[FRNT_RGT].zRoad - car->wheel[FRNT_LFT].zRoad
+		+ car->wheel[REAR_RGT].zRoad + car->wheel[REAR_LFT].zRoad) / (2.0 * car->wheelbase));
 	F.F.x = -w * SinTheta;
-	SinTheta = (-car->wheel[FRNT_RGT].zRoad - car->wheel[REAR_RGT].zRoad
-		+ car->wheel[FRNT_LFT].zRoad + car->wheel[REAR_LFT].zRoad) / (2.0 * car->wheeltrack);
+	SinTheta = (tdble) ((-car->wheel[FRNT_RGT].zRoad - car->wheel[REAR_RGT].zRoad
+		+ car->wheel[FRNT_LFT].zRoad + car->wheel[REAR_LFT].zRoad) / (2.0 * car->wheeltrack));
 	F.F.y = -w * SinTheta;
 	F.F.z = w; /* not 3D */
 	F.M.x = F.M.y = F.M.z = 0;
@@ -218,7 +218,7 @@ SimCarUpdateForces(tCar *car)
 	if ((R * car->wheelbase / 2.0 * car->Iinv.z) > fabs(car->DynGCg.vel.az)) {
 		Rm = car->DynGCg.vel.az / car->Iinv.z;
 	} else {
-		Rm = SIGN(car->DynGCg.vel.az) * R * car->wheelbase / 2.0;
+		Rm = (tdble) (SIGN(car->DynGCg.vel.az) * R * car->wheelbase / 2.0);
 	}
 	
 	/* compute accelerations */
@@ -256,7 +256,7 @@ SimCarUpdateSpeed(tCar *car)
 	
 	/* spin limitation */
 	if (fabs(car->DynGCg.vel.az) > 9.0) {
-		car->DynGCg.vel.az = SIGN(car->DynGCg.vel.az) * 9.0;
+		car->DynGCg.vel.az = (tdble) (SIGN(car->DynGCg.vel.az) * 9.0);
 	}
 		
 	car->DynGC.vel.ax = car->DynGCg.vel.ax;
@@ -321,7 +321,7 @@ SimCarUpdatePos(tCar *car)
 	car->DynGCg.pos.ay += car->DynGCg.vel.ay * SimDeltaTime;
 	car->DynGCg.pos.az += car->DynGCg.vel.az * SimDeltaTime;
 		
-	NORM_PI_PI(car->DynGCg.pos.az);
+	FLOAT_NORM_PI_PI(car->DynGCg.pos.az);
 	
 	if (car->DynGCg.pos.ax > aMax) car->DynGCg.pos.ax = aMax;
 	if (car->DynGCg.pos.ax < -aMax) car->DynGCg.pos.ax = -aMax;
@@ -400,8 +400,8 @@ SimTelemetryOut(tCar *car)
 	printf("sx:%f sa:%f w:%f ", car->wheel[i].sx, car->wheel[i].sa, car->wheel[i].spinVel);
 	printf("fx:%f fy:%f fz:%f\n", car->wheel[i].forces.x, car->wheel[i].forces.y, car->wheel[i].forces.z);
 	}
-	Fzf = (car->aero.lift[0] + car->wing[0].forces.z) / 9.81;
-	Fzr = (car->aero.lift[1] + car->wing[1].forces.z) / 9.81;
+	Fzf = (tdble) ((car->aero.lift[0] + car->wing[0].forces.z) / 9.81);
+	Fzr = (tdble) ((car->aero.lift[1] + car->wing[1].forces.z) / 9.81);
 	printf("Aero Fx:%f Fz:%f Fzf=%f Fzr=%f ratio=%f\n", car->aero.drag / 9.81, Fzf + Fzr,
 		Fzf, Fzr, (Fzf + Fzr) / (car->aero.drag + 0.1) * 9.81);
 	

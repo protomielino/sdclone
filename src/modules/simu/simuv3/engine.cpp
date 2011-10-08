@@ -284,7 +284,7 @@ SimEngineUpdateTq(tCar *car)
 		if (cons > 0) {
 			car->fuel -= (float)(cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime);
 		}
-        car->fuel = MAX(car->fuel, 0.0);
+        car->fuel = (tdble) (MAX(car->fuel, 0.0));
     }
 }
 

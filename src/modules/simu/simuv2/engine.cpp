@@ -145,9 +145,9 @@ SimEngineUpdateTq(tCar *car)
 
 		tdble cons = Tq_cur * 0.75f;
 		if (cons > 0) {
-			car->fuel -= cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime;
+			car->fuel -= (tdble) (cons * engine->rads * engine->fuelcons * 0.0000001 * SimDeltaTime);
 		}
-        car->fuel = MAX(car->fuel, 0.0);
+        car->fuel = (tdble) MAX(car->fuel, 0.0);
     }
 }
 
@@ -215,7 +215,7 @@ freerads += engine->Tq / engine->I * SimDeltaTime;
  }
 
  float alpha = 0.1f; // transition coefficient
- engine->I_joint = engine->I_joint*(1.0-alpha) +  alpha*trans->curI;
+ engine->I_joint = (tdble) (engine->I_joint*(1.0-alpha) +  alpha*trans->curI);
 
  // only use these values when the clutch is engaged or the gear
  // has changed.
@@ -223,8 +223,8 @@ freerads += engine->Tq / engine->I * SimDeltaTime;
 
      transfer = clutch->transferValue * clutch->transferValue * clutch->transferValue * clutch->transferValue;
 
-     ttq = dI* tanh(0.01*(axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer) -engine->rads))*100.0;
-     engine->rads = (1.0-sdI) * (axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer)) + sdI *(engine->rads + ((ttq)*SimDeltaTime)/(engine->I));
+     ttq = (tdble) (dI* tanh(0.01*(axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer) -engine->rads))*100.0);
+     engine->rads = (tdble) ((1.0-sdI) * (axleRpm * trans->curOverallRatio * transfer + freerads * (1.0-transfer)) + sdI *(engine->rads + ((ttq)*SimDeltaTime)/(engine->I)));
      if (engine->rads < 0.0) {
          engine->rads = 0;
          engine->Tq = 0.0;

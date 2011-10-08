@@ -88,6 +88,13 @@ do {						\
 	while ((x) < 0) { (x) += 2*PI; } 	\
 } while (0)
 
+/** Angle normalization between 0 and 2 * PI */
+#define FLOAT_NORM0_2PI(x) 				\
+do {						\
+	while ((x) > (tdble)(2*PI)) { (x) -= (tdble) (2*PI); }	\
+	while ((x) < 0) { (x) += (tdble)(2*PI); } 	\
+} while (0)
+
 /** Angle normalization between -PI and PI */
 #define NORM_PI_PI(x) 				\
 do {						\

@@ -285,7 +285,7 @@ initStartingGrid(void)
     }
     car->_pos_Z = RtTrackHeightL(&(car->_trkPos)) + heightInit;
 
-    NORM0_2PI(car->_yaw);
+    FLOAT_NORM0_2PI(car->_yaw);
 
 	RePhysicsEngine().configureCar(car);
   }
