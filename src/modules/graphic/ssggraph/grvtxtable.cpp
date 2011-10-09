@@ -99,7 +99,8 @@ ssgBase *grVtxTable::clone (int clone_flags)
 
 grVtxTable::grVtxTable (int _numMapLevel,int _mapLevel)
 {
-	//GfLogDebug("grVtxTable::grVtxTable(default TABLE, nml=%d, ml=%d)\n", _numMapLevel, _mapLevel);
+	//GfLogDebug("grVtxTable::grVtxTable(default TABLE, nml=%d, ml=%d)\n",
+	//		   _numMapLevel, _mapLevel);
 
 	numMapLevel = _numMapLevel;
 	mapLevelBitmap = _mapLevel;

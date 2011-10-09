@@ -78,6 +78,7 @@ static int              totalstripe=0;
 static int		usenormal = 0;
 static int		nv;
 static int		isacar = TRUE;
+static int		isawheel = TRUE;
 static int              usestrip=TRUE;
 static int              usegroup=TRUE;
 static int              mapLevel;
@@ -275,7 +276,7 @@ static ssgState *get_state ( _ssgMaterial *mat )
   if (isaWindow) {
       st -> enable  ( GL_BLEND );
       st -> setTranslucent () ;
-  } else if (isacar) {
+  } else if (isacar || isawheel) {
       st -> enable  ( GL_BLEND );
       st -> setOpaque () ;
   } else if ( mat -> rgb[3] < 0.99 ) {
@@ -927,7 +928,7 @@ static int do_refs( char *s )
 
 #ifdef NORMAL_TEST
 	/* GUIONS TEST that draw all the normals of a car */
-	if(isacar == TRUE) {
+	if(isacar || isawheel) {
 		ssgVertexArray *vlinelist = new ssgVertexArray(nv*2);
 		for (i = 0; i < nv; i++) {
 			sgVec3 tv;
@@ -946,7 +947,7 @@ static int do_refs( char *s )
 	if (numMapLevel > grMaxTextureUnits) {
 		numMapLevel = grMaxTextureUnits;
 	}
-	if (isacar == TRUE) {
+	if (isacar) {
 		mapLevel=LEVELC;
 		if (tlist1 && grMaxTextureUnits > 1) {
 			mapLevel = LEVELC2;
@@ -956,7 +957,11 @@ static int do_refs( char *s )
 			mapLevel = LEVELC3;
 			numMapLevel = 3;
 		}
+	} else if (isawheel) {
+		mapLevel = LEVEL0;
+		numMapLevel = 1;
 	}
+		
 #define VTXARRAY_GUIONS
 #ifdef VTXARRAY_GUIONS
 	if (usestrip == FALSE)
@@ -1072,7 +1077,7 @@ static int do_kids ( char *s )
 		/* check the number of texture units */
 		if (numMapLevel>grMaxTextureUnits)
 			numMapLevel=grMaxTextureUnits;
-		if (isacar==TRUE) {
+		if (isacar) {
 			mapLevel=LEVELC;
 			if (tlist1 && grMaxTextureUnits>2) {
 				mapLevel=LEVELC2;
@@ -1082,6 +1087,9 @@ static int do_kids ( char *s )
 				mapLevel=LEVELC3;
 				numMapLevel=3;
 			}
+		} else if (isawheel) {
+			mapLevel = LEVEL0;
+			numMapLevel = 1;
 		}
 		/*ssgVtxArray* vtab = new ssgVtxArray ( gltype,
 		vlist, nrm, tlist0, col , vertlist) ;*/
@@ -1152,8 +1160,44 @@ ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* optio
 {
 
   isacar=TRUE;
+  isawheel=FALSE;
   usestrip=FALSE;
   indexCar=index;
+  t_xmax=-999999.0;
+  t_ymax=-999999.0;
+  t_xmin=+999999.0;
+  t_ymin=+999999.0;
+
+  GfLogTrace("Loading %s\n", fname);
+
+  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
+  
+  if ( obj == NULL )
+    return NULL ;
+  
+  /* Do some simple optimisations */
+
+  ssgBranch *model = new ssgBranch () ;
+  model -> addKid ( obj ) ;
+  if(usestrip==FALSE)
+    {
+      /*myssgFlatten(obj);*/
+      ssgFlatten    ( obj ) ;
+      ssgStripify   ( model ) ;
+    }
+  carTrackRatioX= (t_xmax-t_xmin)/(shad_xmax-shad_xmin);
+  carTrackRatioY= (t_ymax-t_ymin)/(shad_ymax-shad_ymin);
+  return model ;
+
+}
+
+ssgEntity *grssgCarWheelLoadAC3D ( const char *fname, const grssgLoaderOptions* options, int carIndex )
+{
+
+  isacar=FALSE;
+  isawheel=TRUE;
+  usestrip=FALSE;
+  indexCar=carIndex;
   t_xmax=-999999.0;
   t_ymax=-999999.0;
   t_xmin=+999999.0;
@@ -1185,6 +1229,7 @@ ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* optio
 ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options )
 {
   isacar=FALSE;
+  isawheel=FALSE;
   usegroup=FALSE;
   usestrip=FALSE;
 

@@ -63,7 +63,10 @@ class grssgLoaderOptions : public ssgLoaderOptions
 extern void grssgSetCurrentOptions(grssgLoaderOptions* options);
 
 //! Load a car AC3D model from a file
-extern ssgEntity *grssgCarLoadAC3D(const char *fname, const grssgLoaderOptions* options, int index);
+extern ssgEntity *grssgCarLoadAC3D(const char *fname, const grssgLoaderOptions* options, int carIndex);
+
+//! Load a car wheel AC3D model from a file
+extern ssgEntity *grssgCarWheelLoadAC3D(const char *fname, const grssgLoaderOptions* options, int carIndex);
 
 //! Load an AC3D model from a file
 extern ssgEntity *grssgLoadAC3D(const char *fname, const grssgLoaderOptions* options);

@@ -234,7 +234,7 @@ initWheel(tCarElt *car, int wheel_index, const char *wheel_mod_name)
 	    ssgEntity *whl3d = 0;
 	    if (wheel_mod_name && strlen(wheel_mod_name)) {
 			snprintf(wheel_file_name, 32, "%s%d.acc", wheel_mod_name, j);
-			whl3d = grssgCarLoadAC3D(wheel_file_name, NULL, car->index);
+			whl3d = grssgCarWheelLoadAC3D(wheel_file_name, NULL, car->index);
 	    }
 
 	    // If we have a 3D wheel, use it, otherwise use auto- generated wheel...
