@@ -96,7 +96,7 @@ void LegacyMenu::shutdown()
 		unloadCarsGraphics();
 		shutdownGraphicsView();
 		unloadTrackGraphics();
-		shutdownGraphics();
+		shutdownGraphics(/*bUnloadModule=*/true);
 	}
 }
 
@@ -430,22 +430,25 @@ void LegacyMenu::shutdownGraphicsView()
 	}
 }
 
-void LegacyMenu::shutdownGraphics()
+void LegacyMenu::shutdownGraphics(bool bUnloadModule)
 {
 	// Do nothing if the module has already been unloaded.
 	if (!_piGraphicsEngine)
 		return;
 
-	// Unload the graphics module.
-	GfModule* pmodGrEngine = dynamic_cast<GfModule*>(_piGraphicsEngine);
-	GfModule::unload(pmodGrEngine);
+	if (bUnloadModule)
+	{
+		// Unload the graphics module.
+		GfModule* pmodGrEngine = dynamic_cast<GfModule*>(_piGraphicsEngine);
+		GfModule::unload(pmodGrEngine);
 
-	// And remember it was.
-	_piGraphicsEngine = 0;
+		// And remember it was.
+		_piGraphicsEngine = 0;
+	}
 
 	// A little consistency check.
 	if (_bfGraphicsState)
-		GfLogWarning("Graphics engine shutdown procedure not smartly completed (state = 0x%x)\n",
+		GfLogWarning("Graphics shutdown procedure not smartly completed (state = 0x%x)\n",
 					 _bfGraphicsState);
 }
 

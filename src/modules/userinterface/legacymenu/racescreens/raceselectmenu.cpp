@@ -61,7 +61,7 @@ rmOnRaceSelectShutdown(void *prevMenu)
 	
     LmRaceEngine().cleanup();
 	
-	LegacyMenu::self().shutdownGraphics();
+	LegacyMenu::self().shutdownGraphics(/*bUnloadModule=*/true);
 }
 
 

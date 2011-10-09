@@ -52,7 +52,7 @@ extern "C" int LEGACYMENU_API closeGfModule();
 // The module main class (inherits GfModule, and implements IUserInterface).
 class LEGACYMENU_API LegacyMenu : public GfModule, public IUserInterface
 {
-	// Implementation of IUserInterface.
+// Implementation of IUserInterface.
 public:
 
 	//! Activation of the user interface (splash if any, main menu ...).
@@ -97,6 +97,7 @@ public:
 	// Setter for the race engine.
 	virtual void setRaceEngine(IRaceEngine& raceEngine);
 
+// Other services.
 public:
 
 	// Accessor to the singleton.
@@ -107,7 +108,7 @@ public:
 
 	// Graphics engine control.
 	void redrawGraphicsView(struct Situation* pSituation);
-	void shutdownGraphics();
+	void shutdownGraphics(bool bUnloadModule = true);
 
 	// Loading screen management.
 	virtual void activateLoadingScreen();
