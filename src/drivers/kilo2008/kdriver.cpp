@@ -133,7 +133,8 @@ static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 #define START_TIME 2.0
 
 
-KDriver::KDriver(int index) {
+KDriver::KDriver(int index) :
+  mode_(NORMAL) {
   INDEX = index;
 }
 
