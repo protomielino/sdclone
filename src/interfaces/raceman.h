@@ -282,7 +282,7 @@ typedef struct RmInfo
 #define RM_ATTR_INITSPEED	"initial speed"
 #define RM_ATTR_INITHEIGHT	"initial height"
 #define RM_ATTR_SHOW_RACE	"show race"
-#define RM_ATTR_MAX_DMG		"maximum dammage"
+#define RM_ATTR_MAX_DMG		"maximum damage"
 #define RM_ATTR_DISTANCE	"distance"
 #define RM_ATTR_LAPS		"laps"
 #define RM_ATTR_SESSIONTIME	"sessiontime"
@@ -458,12 +458,12 @@ typedef struct RmInfo
 #define RE_ATTR_SESSIONTIME	"session time"
 #define RE_ATTR_TOP_SPEED	"top speed"
 #define RE_ATTR_BOT_SPEED	"bottom speed"
-#define RE_ATTR_DAMMAGES	"dammages"
-#define RE_ATTR_NB_PIT_STOPS	"pits stops"
+#define RE_ATTR_DAMMAGES	"damages"
+#define RE_ATTR_NB_PIT_STOPS	"pit stops"
 #define RE_ATTR_POINTS		"points"
 #define RE_SECT_CLASSPOINTS	"Class Points"
 
-#endif /* _RACEMANV1_H_ */ 
+#endif /* _RACEMANV1_H_ */
 
 
 
