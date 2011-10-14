@@ -478,6 +478,18 @@ void cGrTrackMap::display(
 		return;
 	}
 
+	// Ticket #471
+	// Each map style has 2 modes - single and plus opponents.
+	// It should skip the 'opponents mode' if there are none
+	// (ie. in practice, or qualification).
+	if (situation->_ncars == 1	 // the car is alone
+			&& (viewmode & (TRACK_MAP_NORMAL_WITH_OPPONENTS
+											| TRACK_MAP_PAN_WITH_OPPONENTS
+											| TRACK_MAP_PAN_ALIGNED_WITH_OPPONENTS))) {
+			selectTrackMap();		//skip onto next map mode
+	}		//if _ncars
+	// end Ticket #471
+
 	// Compute track map position.
 	int x = Winx + Winw + map_x - (int) (map_size*track_x_ratio);
 	int y = Winy + Winh + map_y - (int) (map_size*track_y_ratio);
