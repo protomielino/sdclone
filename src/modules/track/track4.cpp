@@ -944,19 +944,16 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 			case TR_PIT_NO_BUILDING:
 			case TR_PIT_ON_TRACK_SIDE:
 				{//dummy for eliminating warnings of locally declared variables cross-jumping with cases
-					//pits->type     = TR_PIT_ON_TRACK_SIDE;
 					pits->nPitSeg  = 0;
 					if (pitStart->lgfromstart > pitEnd->lgfromstart) {
 						pits->nPitSeg = (int)((theTrack->length - pitStart->lgfromstart
-							+ pitEnd->lgfromstart + pitEnd->length /*+ pits->len / 2.0*/) / pits->len);
+							+ pitEnd->lgfromstart + pitEnd->length + pits->len / 2.0) / pits->len);
 					} else {
 						pits->nPitSeg = (int)((pitEnd->lgfromstart + pitEnd->length
-							- pitStart->lgfromstart /*+ pits->len / 2.0*/) / pits->len);
+							- pitStart->lgfromstart + pits->len / 2.0) / pits->len);
 					}
 					pits->nMaxPits = MIN(pits->nPitSeg,(int)GfParmGetNum(TrackHandle, path2, TRK_ATT_MAX_PITS, (char*)NULL, (tdble) pits->nPitSeg));
 					pits->driversPits = (tTrackOwnPit*)calloc(pits->nPitSeg, sizeof(tTrackOwnPit));
-					//GfOut("pits->nPitSeg: %d\n",pits->nPitSeg); 
-					//GfOut("pits->nMaxPits: %d\n",pits->nMaxPits); 
 
 					if (pitBuildingsStart == NULL)
 						pitBuildingsStart = pitStart;
@@ -1047,17 +1044,15 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 							case TR_RGT:
 								curSeg = mSeg->rside;
 								curSeg2 = curSeg->rside;
-								if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
-									//GfOut("mSeg: %s PitBuilding R\n",mSeg->name); 
+								if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) {
 									mSeg->barrier[0]->style = TR_PITBUILDING;
 								}
 								break;
-								
+
 							case TR_LFT:
 								curSeg = mSeg->lside;
 								curSeg2 = curSeg->lside;
-								if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) { 
-									//GfOut("mSeg: %s PitBuilding L\n",mSeg->name); 
+								if ((mSeg != pitBuildingsStart->prev) && (mSeg != pitEnd->next)) {
 									mSeg->barrier[1]->style = TR_PITBUILDING;
 								}
 								break;
@@ -1065,19 +1060,16 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 
 						if ((mSeg != pitStart->prev) && (mSeg != pitEnd->next)) {
 							curSeg->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
-							//GfOut("mSeg: %s SL\n",mSeg->name); 
 							if (curSeg2) {
 								curSeg2->raceInfo |= TR_PIT | TR_SPEEDLIMIT;
 							}
 						} else if (mSeg == pitStart->prev) {
 							curSeg->raceInfo |= TR_PITSTART;
-							//GfOut("mSeg: %s PitStart\n",mSeg->name); 
 							if (curSeg2) {
 								curSeg2->raceInfo |= TR_PITSTART;
 							}
 						} else if (mSeg == pitEnd->next) {
 							curSeg->raceInfo |= TR_PITEND;
-							//GfOut("mSeg: %s PitEnd\n",mSeg->name); 
 							if (curSeg2) {
 								curSeg2->raceInfo |= TR_PITEND;
 							}
@@ -1089,9 +1081,6 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 			case TR_PIT_ON_SEPARATE_PATH:
 				//NOT IMPLEMENTED YET
 				break;
-
-			//~ case TR_PIT_NO_BUILDING:
-				//~ break;
 
 			case TR_PIT_NONE:
 				//No action needed
