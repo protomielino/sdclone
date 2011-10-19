@@ -129,6 +129,7 @@ class cGrTrackMap
 
 		// Holds the current view (look at TRACK_MAP_*).
 		int viewmode;
+		tSituation *situ;
 
 		// Draw the track full visible and static.
 		void drawTrackNormal(int x, int y);

@@ -84,11 +84,15 @@ cGrTrackMap::cGrTrackMap()
 	// For all views we need the same track texture, so create it just once.
 	if (isinitalized)
 		return;
-	
+
 	// GfLogDebug("cGrTrackMap::cGrTrackMap() : Initializing track map texture\n");
 
 	// Initialize colors for the various car "dots".
 	initColors();
+
+	// Cannot reach the current situation yet.
+	// Will be available after the first call of 'display'.
+	situ = NULL;
 
 	tTrack *track = grTrack;
 	tTrackSeg* first = track->seg;
@@ -458,6 +462,20 @@ cGrTrackMap::~cGrTrackMap()
 void cGrTrackMap::selectTrackMap()
 {
 	viewmode <<= 1;
+
+	// Ticket #471
+	// Each map style has 2 modes - single and plus opponents.
+	// It should skip the 'opponents mode' if there are none
+	// (ie. in practice, or qualification).
+	if (situ &&
+			situ->_ncars == 1	 // the car is alone
+			&& (viewmode & (TRACK_MAP_NORMAL_WITH_OPPONENTS
+											| TRACK_MAP_PAN_WITH_OPPONENTS
+											| TRACK_MAP_PAN_ALIGNED_WITH_OPPONENTS))) {
+			viewmode <<= 1;		//skip onto next map mode
+	}		//if _ncars
+	// end Ticket #471
+
 	if (viewmode > TRACK_MAP_MASK) {
 		viewmode = TRACK_MAP_NONE;
 	}
@@ -474,21 +492,11 @@ void cGrTrackMap::display(
 	int Winh
 )
 {
+	situ = situation;
+
 	if (viewmode == TRACK_MAP_NONE) {
 		return;
 	}
-
-	// Ticket #471
-	// Each map style has 2 modes - single and plus opponents.
-	// It should skip the 'opponents mode' if there are none
-	// (ie. in practice, or qualification).
-	if (situation->_ncars == 1	 // the car is alone
-			&& (viewmode & (TRACK_MAP_NORMAL_WITH_OPPONENTS
-											| TRACK_MAP_PAN_WITH_OPPONENTS
-											| TRACK_MAP_PAN_ALIGNED_WITH_OPPONENTS))) {
-			selectTrackMap();		//skip onto next map mode
-	}		//if _ncars
-	// end Ticket #471
 
 	// Compute track map position.
 	int x = Winx + Winw + map_x - (int) (map_size*track_x_ratio);
