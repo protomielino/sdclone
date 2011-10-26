@@ -441,7 +441,7 @@ void LegacyMenu::shutdownGraphics(bool bUnloadModule)
 		// Unload the graphics module.
 		GfModule* pmodGrEngine = dynamic_cast<GfModule*>(_piGraphicsEngine);
 #ifndef UNLOAD_SSGGRAPH
-		if (pmodGrEngine->getSharedLibName().find("ssggraph") == std::npos)
+		if (pmodGrEngine->getSharedLibName().find("ssggraph") == std::string::npos)
 #endif
 		GfModule::unload(pmodGrEngine);
 
