@@ -8,10 +8,10 @@ I - Pre-requisites
 II - Linux Installation from sources
 
   1 - Introduction
-  2 - Runtime options
-  3 - Getting Help
-  4 - Installation from all-in-one tarball
-  5 - Installation from SVN
+  2 - Installation from the all-in-one tarball
+  3 - Installation from SVN (developer level only !)
+  4 - Run Speed-Dreams
+  5 - Getting Help
 
 III - Windows Installation from sources
 
@@ -122,12 +122,18 @@ The Speed Dreams Team.
         Usefull CMake variables for Speed Dreams :
 
         - OPTION_OFFICIAL_ONLY:BOOL : Build/install only official contents (def: OFF)
-        - OPTION_DEBUG:STRING       : Full run-time traces if ON (def: ON)
+        - OPTION_DEBUG:BOOL         : Debug symbols even in Release builds if ON (def: ON)
+        - OPTION_TRACE:BOOL         : Full run-time traces if ON (def: ON)
         - OPTION_TRACE_LEVEL:STRING : Run-time traces level integer threshold, 
                                       only if OPTION_DEBUG (traces with higher level are 
                                       not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 
                                                    4=Trace, 5=Debug, ...) (def: 5)
-
+        - OPTION_UNLOAD_SSGGRAPH:BOOL : The 'ssggraph' graphics engine module will never be 
+                                        unloaded if OFF (def: ON)
+                                        Usefull under some Linux configurations where this
+                                        unloading badly crashes XOrg, or simply makes SD crash
+                                        because PLib is shipped as a set of shared libraries.
+ 
         - SD_LOCALDIR:STRING        : User settings dir for run-time (def: ~/.speed-dreams-2)
         - CMAKE_PREFIX_PATH:STRING  : Path prefixes for additional 3rdParty libraries (def:empty)
                                       (use /usr/local if you compiled some 3rdParty libs yourself).
@@ -191,7 +197,7 @@ Runtime options
 
  -m Use hardware mouse cursor (better on full-screen mode)
 
-7 - Getting Help
+5 - Getting Help
 
 During the game, press F1 at any time. 
 If you are stuck please report problems through speed-dreams-users mailing list
