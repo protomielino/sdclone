@@ -961,11 +961,13 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
   IF(NOT _ALREADY_DONE)
 
     # CMake options.
-    SET(OPTION_OFFICIAL_ONLY false CACHE BOOL "Build / install only officially released contents)")
+    SET(OPTION_OFFICIAL_ONLY false CACHE BOOL "Build / install only officially released contents")
 
-    SET(OPTION_DEBUG true CACHE BOOL "Enable traces into the console or log file")
+    SET(OPTION_DEBUG true CACHE BOOL "Enable debug symbols even in Release build")
 
-    SET(OPTION_TRACE_LEVEL "5" CACHE STRING "Trace level integer threshold, only if OPTION_DEBUG (traces with higher level are not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)")
+    SET(OPTION_TRACE true CACHE BOOL "Enable traces into the console or log file")
+
+    SET(OPTION_TRACE_LEVEL "5" CACHE STRING "Trace level integer threshold, only if OPTION_TRACE (traces with higher level are not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...)")
 
     SET(OPTION_PROFILER false CACHE BOOL "Enable profiler")
   
@@ -974,6 +976,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(UNIX)
       SET(OPTION_XRANDR true CACHE BOOL "XrandR")  
       SET(OPTION_GLEXTPROTOTYPES true CACHE BOOL "Enable prototypes in glext.h")
+      SET(OPTION_UNLOAD_SSGGRAPH true CACHE BOOL "If false, never unload ssggraph module (useful on some Linuxes to avoid XOrg crashes)")  
     ENDIF(UNIX)
 
     # Compiler definitions.
@@ -985,8 +988,11 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     ENDIF(MSVC)
 
     IF(OPTION_DEBUG)
-      ADD_DEFINITIONS(-DDEBUG -DTRACE_OUT)
+      ADD_DEFINITIONS(-DDEBUG)
     ENDIF(OPTION_DEBUG)
+    IF(OPTION_TRACE)
+      ADD_DEFINITIONS(-DTRACE_OUT)
+    ENDIF(OPTION_TRACE)
     IF(OPTION_TRACE_LEVEL)
       ADD_DEFINITIONS(-DTRACE_LEVEL=${OPTION_TRACE_LEVEL})
     ENDIF(OPTION_TRACE_LEVEL)
@@ -1003,6 +1009,10 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     IF(OPTION_GLEXTPROTOTYPES)
       ADD_DEFINITIONS(-DGL_GLEXT_PROTOTYPES)
     ENDIF(OPTION_GLEXTPROTOTYPES)
+
+    IF(OPTION_UNLOAD_SSGGRAPH)
+      ADD_DEFINITIONS(-DUNLOAD_SSGGRAPH)
+    ENDIF(OPTION_UNLOAD_SSGGRAPH)
 
     # Define for code that needs Torcs backward compatibility
     ADD_DEFINITIONS(-DSPEED_DREAMS)
