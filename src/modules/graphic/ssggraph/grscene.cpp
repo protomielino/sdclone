@@ -221,7 +221,7 @@ void grCustomizePits(void)
 
   tTrackPitInfo *pits = &(grTrack->pits);
 
-  /* draw the pit identification */
+  // Draw the pit identification on the wall if any.
   switch (pits->type) {
     case TR_PIT_ON_TRACK_SIDE:
 	  GfLogTrace("Creating track side pit buildings (%d slots) ...\n", pits->nMaxPits);
@@ -283,6 +283,7 @@ void grCustomizePits(void)
         }
         reinterpret_cast<ssgSimpleState*>(st)->setShininess(50);
 
+		// Determine the position of the pit wall, and its normal vector.
         tdble x, y;
         t3Dd normalvector;
         RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y,
@@ -301,7 +302,31 @@ void grCustomizePits(void)
 			pit_nrm->add(nrm);
 		}
 
-        // First, bottom vertex
+		// Pit wall texturing : the loaded 'logo*.rgb/.png' image file is supposed to consist
+		// of 4 distinct parts :
+		//
+		//  **************************************************** 1.0
+		//  *..................................................*
+		//  *.                                                .*
+		//  *.           Pit door (dots included)             .*
+		//  *.                                                .*
+		//  *.                                                .*
+		//  *..................................................*
+		//  ##########################$$$$$$$$$$$$$$$$$$$$$$$$$$ 0.33
+		//  #                        #$                        $
+		//  #      Team logo         #$     Team name          $
+		//  #                        #$                        $
+		//  ##########################$$$$$$$$$$$$$$$$$$$$$$$$$$ 0.0
+		//  0.0                     0.5                      1.0
+		//
+		// - the stars '*' : Left, top and right 1-pixel-wide line :
+		//   the pit wall (will be repeated respectively in the left, top and right
+		//   direction in order to cover the pit-wall outside of the rectangle of the pit-door
+		// - the dots '.' : the real pit door texture (actually includes the stars part)
+		// - the hashes '#' : the team name texture
+		// - the dollars '$' : the team logo texture
+		
+        // First, bottom vertex of the triangle strip
 		{
 			sgVec2 tex = { -0.7, 0.33 };
 			sgVec3 vtx = { x2, y2, z2 };
@@ -309,7 +334,7 @@ void grCustomizePits(void)
 			pit_vtx->add(vtx);
 		}
 
-        // First, top vertex
+        // First, top vertex of the triangle strip
 		{
 			sgVec2 tex = { -0.7, 1.1 };
 			sgVec3 vtx = { x2, y2, z2 + 4.8 };
@@ -320,7 +345,7 @@ void grCustomizePits(void)
         x2 -= pits->len * normalvector.y;
         y2 += pits->len * normalvector.x;
 
-        // Second, bottom vertex
+        // Second, bottom vertex of the triangle strip
 		{
 			sgVec2 tex = { 1.3, 0.33 };
 			sgVec3 vtx = { x2, y2, z2 };
@@ -328,7 +353,7 @@ void grCustomizePits(void)
 			pit_vtx->add(vtx);
 		}
 
-        // Second, top vertex
+        // Second, top vertex of the triangle strip
  		{
 			sgVec2 tex = { 1.3, 1.1 };
 			sgVec3 vtx = { x2, y2, z2 + 4.8 };
@@ -336,10 +361,15 @@ void grCustomizePits(void)
 			pit_vtx->add(vtx);
 		}
 
+		// Build-up the vertex array.
         ssgVtxTable *pit = new ssgVtxTable(GL_TRIANGLE_STRIP, pit_vtx,
                                             pit_nrm, pit_tex, pit_clr);
+
+		// Attach the texture state to it.
         pit->setState(st);
         pit->setCullFace(0);
+
+		// Done.
         ThePits->addKid(pit);
       }  // for i
       break;
