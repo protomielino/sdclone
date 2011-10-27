@@ -37,6 +37,8 @@
 #include "grutil.h"
 #include "grrain.h"
 
+// Uncomment to enable support for PNG logos for normal pit-building wall.
+//#define PNG_LOGO_SUPPORT 1
 
 // Some public global variables.
 int grWrldX;
@@ -211,7 +213,8 @@ grShutdownScene(void)
 }//grShutdownScene
 
 
-void grCustomizePits(void) {
+void grCustomizePits(void)
+{
   char buf[512];
   ThePits = new ssgBranch();
   PitsAnchor->addKid(ThePits);
@@ -219,11 +222,11 @@ void grCustomizePits(void) {
   tTrackPitInfo *pits = &(grTrack->pits);
 
   /* draw the pit identification */
-  GfOut("GrScene:: pits->type: %d\n", pits->type);
   switch (pits->type) {
     case TR_PIT_ON_TRACK_SIDE:
+	  GfLogTrace("Creating track side pit buildings (%d slots) ...\n", pits->nMaxPits);
       for (int i = 0; i < pits->nMaxPits; i++) {
-        // GfLogDebug("Pit Nbr: %d\n", i);
+		  //GfLogDebug("Pit Nbr: %d\n", i);
         ssgVertexArray *pit_vtx = new ssgVertexArray(4);
         ssgTexCoordArray *pit_tex = new ssgTexCoordArray(4);
         ssgColourArray *pit_clr = new ssgColourArray(1);
@@ -261,11 +264,18 @@ void grCustomizePits(void) {
           }
 		  
           // Load logo texture (only rgbs - pngs cause pit transparency bug # 387)
-	  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+#ifdef PNG_LOGO_SUPPORT
+		  const std::string strPNGLogoFileName = strLogoFileName + ".png";
+		  ssgState *st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(),
+		  									 buf, FALSE, FALSE, FALSE);
+#endif		  
+		  if (!st) {
+		  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
           st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, skinnedLogo);
+		  }
         }  // if pits->driverPits[i].car[0]
 
-	// If no car in the pit, or logo file not found, hope for the .rgb in data/textures.
+		// If no car in the pit, or logo file not found, hope for the .rgb in data/textures.
         if (!st) {
           snprintf(buf, sizeof(buf), "data/textures");
 		  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
@@ -280,56 +290,51 @@ void grCustomizePits(void) {
         RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y,
                             pits->side, &normalvector);
         tdble x2 = x - pits->width / 2.0 * normalvector.x
-          + pits->len / 2.0 * normalvector.y;
+			+ pits->len / 2.0 * normalvector.y;
         tdble y2 = y - pits->width / 2.0 * normalvector.y
-          - pits->len / 2.0 * normalvector.x;
+			- pits->len / 2.0 * normalvector.x;
         tdble z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
 
-        sgVec3 nrm;
-        nrm[0] = normalvector.x;
-        nrm[1] = normalvector.y;
-        nrm[2] = 0;
-        pit_nrm->add(nrm);
+        // Normal
+		{
+			sgVec3 nrm = {  normalvector.x, normalvector.y, 0 };
+			pit_nrm->add(nrm);
+		}
 
-        sgVec2 tex;
-        sgVec3 vtx;
-        tex[0] = -0.7;
-        tex[1] = 0.33;
-        vtx[0] = x2;
-        vtx[1] = y2;
-        vtx[2] = z2;
-        pit_tex->add(tex);
-        pit_vtx->add(vtx);
+        // First, bottom vertex
+		{
+			sgVec2 tex = { -0.7, 0.33 };
+			sgVec3 vtx = { x2, y2, z2 };
+			pit_tex->add(tex);
+			pit_vtx->add(vtx);
+		}
 
-        tex[0] = -0.7;
-        tex[1] = 1.1;
-        vtx[0] = x2;
-        vtx[1] = y2;
-        vtx[2] = z2 + 4.8;
-        pit_tex->add(tex);
-        pit_vtx->add(vtx);
+        // First, top vertex
+		{
+			sgVec2 tex = { -0.7, 1.1 };
+			sgVec3 vtx = { x2, y2, z2 + 4.8 };
+			pit_tex->add(tex);
+			pit_vtx->add(vtx);
+		}
 
-        x2 = x - pits->width / 2.0 * normalvector.x
-          - pits->len / 2.0 * normalvector.y;
-        y2 = y - pits->width / 2.0 * normalvector.y
-          + pits->len / 2.0 * normalvector.x;
-        z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
+        x2 -= pits->len * normalvector.y;
+        y2 += pits->len * normalvector.x;
 
-        tex[0] = 1.3;
-        tex[1] = 0.33;
-        vtx[0] = x2;
-        vtx[1] = y2;
-        vtx[2] = z2;
-        pit_tex->add(tex);
-        pit_vtx->add(vtx);
+        // Second, bottom vertex
+		{
+			sgVec2 tex = { 1.3, 0.33 };
+			sgVec3 vtx = { x2, y2, z2 };
+			pit_tex->add(tex);
+			pit_vtx->add(vtx);
+		}
 
-        tex[0] = 1.3;
-        tex[1] = 1.1;
-        vtx[0] = x2;
-        vtx[1] = y2;
-        vtx[2] = z2 + 4.8;
-        pit_tex->add(tex);
-        pit_vtx->add(vtx);
+        // Second, top vertex
+ 		{
+			sgVec2 tex = { 1.3, 1.1 };
+			sgVec3 vtx = { x2, y2, z2 + 4.8 };
+			pit_tex->add(tex);
+			pit_vtx->add(vtx);
+		}
 
         ssgVtxTable *pit = new ssgVtxTable(GL_TRIANGLE_STRIP, pit_vtx,
                                             pit_nrm, pit_tex, pit_clr);
@@ -341,6 +346,7 @@ void grCustomizePits(void) {
 
     case TR_PIT_NO_BUILDING:
       {
+	  GfLogTrace("Creating low pit wall (%d slots) ...\n", pits->nMaxPits);
       // This mode draws a white, low wall (about 3ft high) with logos
 
       // First we load the low wall's texture, as it is the same
@@ -475,12 +481,12 @@ void grCustomizePits(void) {
 
         // Let's draw the logo
         // Load logo texture (.png first, then .rgb for backwards compatibility)
-        const std::string strRGBLogoFileName = strLogoFileName + ".png";
-        ssgState *stLogo = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(),
+        const std::string strPNGLogoFileName = strLogoFileName + ".png";
+        ssgState *stLogo = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(),
                                         buf, FALSE, FALSE, FALSE);
         if (!stLogo) {
-          const std::string strPNGLogoFileName = strLogoFileName + ".rgb";
-          stLogo = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf,
+          const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+          stLogo = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf,
                                         FALSE, FALSE);
         }
         reinterpret_cast<ssgSimpleState*>(stLogo)->setShininess(50);
@@ -583,10 +589,13 @@ void grCustomizePits(void) {
 
     case TR_PIT_ON_SEPARATE_PATH:
       // Not implemented yet
+	  GfLogTrace("Creating separate path pits (%d slots) ...\n", pits->nMaxPits);
+	  GfLogWarning("Separate path pits are not yet implemented.\n");
       break;
 
     case TR_PIT_NONE:
       // Nothing to do
+	  GfLogTrace("Creating no pits.\n");
       break;
   }  // switch pit->type
 }  // grCustomizePits
