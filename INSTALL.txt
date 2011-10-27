@@ -121,31 +121,44 @@ The Speed Dreams Team.
 
         Usefull CMake variables for Speed Dreams :
 
-        - OPTION_OFFICIAL_ONLY:BOOL : Build/install only official contents (def: OFF)
-        - OPTION_DEBUG:BOOL         : Debug symbols even in Release builds if ON (def: ON)
-        - OPTION_TRACE:BOOL         : Full run-time traces if ON (def: ON)
-        - OPTION_TRACE_LEVEL:STRING : Run-time traces level integer threshold, 
-                                      only if OPTION_DEBUG (traces with higher level are 
-                                      not logged ; 0=Fatal, 1=Error, 2=Warning, 3=Info, 
-                                                   4=Trace, 5=Debug, ...) (def: 5)
-        - OPTION_UNLOAD_SSGGRAPH:BOOL : The 'ssggraph' graphics engine module will never be 
-                                        unloaded if OFF (def: ON)
-                                        Usefull under some Linux configurations where this
-                                        unloading badly crashes XOrg, or simply makes SD crash
-                                        because PLib is shipped as a set of shared libraries.
+        - CMAKE_BUILD_TYPE:STRING :
+            Debug, Release, RelWithDebInfo, MinSizeRel (def: Release)
+
+        - OPTION_OFFICIAL_ONLY:BOOL :
+            Build/install only official contents (def: OFF)
+
+        - OPTION_TRACE:BOOL :
+            Full run-time traces if ON (def: ON)
+        - OPTION_TRACE_LEVEL:STRING :
+            Run-time traces level integer threshold, only if OPTION_DEBUG
+            (traces with higher level are not logged ;
+             0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...) (def: 5)
+
+        - OPTION_UNLOAD_SSGGRAPH:BOOL :
+            The 'ssggraph' graphics engine module will never be unloaded if OFF (def: ON)
+            Usefull under some Linux configurations where this unloading badly crashes XOrg
+            (see http://sourceforge.net/apps/trac/speed-dreams/ticket/209),
+            or simply makes SD crash because PLib is shipped as a set of shared libraries
+            (see http://sourceforge.net/apps/trac/speed-dreams/ticket/459).
  
-        - SD_LOCALDIR:STRING        : User settings dir for run-time (def: ~/.speed-dreams-2)
-        - CMAKE_PREFIX_PATH:STRING  : Path prefixes for additional 3rdParty libraries (def:empty)
-                                      (use /usr/local if you compiled some 3rdParty libs yourself).
-        - CMAKE_INSTALL_PREFIX:PATH : Install path (def: /usr/local)
-        - CMAKE_BUILD_TYPE:STRING   : Debug, Release, RelWithDebInfo, MinSizeRel (def: Release)
+        - OPTION_DEBUG:BOOL :
+            Debug symbols even in Release builds if ON (def: ON)
+
+        - SD_LOCALDIR:STRING :
+            User settings dir for run-time (def: ~/.speed-dreams-2)
+
+        - CMAKE_PREFIX_PATH:STRING :
+            Path prefixes for additional 3rdParty libraries (def:empty)
+            (use /usr/local if you compiled some 3rdParty libs yourself).
+        - CMAKE_INSTALL_PREFIX:PATH :
+            Install path (def: /usr/local)
 
         Tips reported about some issues :
         - sometimes, ENET_INCLUDE_DIR is not detected correctly, resulting in something like
           /usr/include/enet or so, and, consequently, in bad compilation errors because
           /usr/include/enet contains a special time.h header file that conflicts with the standard
           one in /usr/include. Removing the "enet" postfix from ENET_INCLUDE_DIR should fix this
-          (in cmake command line or interactively in ccmake).
+          (in cmake command line or interactively through ccmake).
 
   d - build:
 
