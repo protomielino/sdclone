@@ -162,10 +162,10 @@ JoyCalAutomaton(void)
 	axis = Cmd[CalState + CmdOffset].ref.index;
 	Cmd[CalState + CmdOffset].min = JoyAxisCenter[axis];
 	Cmd[CalState + CmdOffset].max = JoyAxis[axis];
-	Cmd[CalState + CmdOffset].pow = 1.2;
+	Cmd[CalState + CmdOffset].pow = 1.0;
 	sprintf(buf, "%.2f", JoyAxisCenter[axis]);
 	GfuiLabelSetText(ScrHandle, LabMinId[CalState - 2], buf);
-	sprintf(buf, "%.2f", JoyAxis[axis]*1.1);
+	sprintf(buf, "%.2f", JoyAxis[axis]);
 	GfuiLabelSetText(ScrHandle, LabMaxId[CalState - 2], buf);
 	advanceStep();
 
