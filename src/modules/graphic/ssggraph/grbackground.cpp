@@ -70,10 +70,10 @@ static const int NEnvShadowFullCoverRainIndex = 5; // Index in AEnvShadowKeys
 static const int NEnvShadowNightIndex = 6; // Index in AEnvShadowKeys
 
 // Some exported global variables.
-ssgStateSelector *grEnvSelector = NULL;
-grMultiTexState	*grEnvState = NULL;
-grMultiTexState	*grEnvShadowState = NULL;
-grMultiTexState	*grEnvShadowStateOnCars = NULL;
+ssgStateSelector* grEnvSelector = 0;
+cgrMultiTexState* grEnvState = 0;
+cgrMultiTexState* grEnvShadowState = 0;
+cgrMultiTexState* grEnvShadowStateOnCars = 0;
 
 unsigned grSkyDomeDistance = 0;
 
@@ -717,11 +717,11 @@ grLoadBackground(void)
 	// Avoid crash with missing env.rgb files (i.e. Wheel-1)
 	GfLogTrace("Loading global env. mapping image :\n");
 	if (bUseEnvPng)
-		grEnvState = (grMultiTexState*)grSsgEnvTexState("env.png");
+		grEnvState = grSsgEnvTexState("env.png", cgrMultiTexState::modulate);
 	else if (bDoNotUseEnv)
 		GfLogError("No env.png found!\n");
 	else
-		grEnvState = (grMultiTexState*)grSsgEnvTexState(graphic->env[0]);
+		grEnvState = grSsgEnvTexState(graphic->env[0], cgrMultiTexState::modulate);
 
 	// 2) Sky shadows (vertical) (envshadow-xxx.png), according to the weather conditions
 	GfLogTrace("Loading sky shadow mapping image :\n");
@@ -748,13 +748,13 @@ grLoadBackground(void)
 	{
 		char pszEnvFile[64];
 		snprintf(pszEnvFile, sizeof(pszEnvFile), "envshadow-%s.png", AEnvShadowKeys[nEnvShadowIndex]);
-		grEnvShadowState = (grMultiTexState*)grSsgEnvTexState(pszEnvFile);
+		grEnvShadowState = grSsgEnvTexState(pszEnvFile, cgrMultiTexState::addColorModulateAlpha);
 		if (!grEnvShadowState)
 			GfLogWarning("%s not found ; falling back to weather-independant sky shadows"
 						 " from envshadow.png\n", pszEnvFile);
 	}
 	if (!grEnvShadowState)
-		grEnvShadowState = (grMultiTexState*)grSsgEnvTexState("envshadow.png");
+		grEnvShadowState = grSsgEnvTexState("envshadow.png", cgrMultiTexState::addColorModulateAlpha);
 	if (!grEnvShadowState) {
 		GfLogError("envshadow.png not found ; exiting !\n");
 		GfLogError("(mandatory for top env mapping (should be in <track>.xml or data/textures ;\n");
@@ -766,9 +766,9 @@ grLoadBackground(void)
     
 	// 3) Vertical shadows of track objects on the cars (shadow2.png)
 	GfLogTrace("Loading track shadows mapping image :\n");
-	grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.png");
+	grEnvShadowStateOnCars = grSsgEnvTexState("shadow2.png", cgrMultiTexState::modulate);
 	if(!grEnvShadowStateOnCars)
-		grEnvShadowStateOnCars = (grMultiTexState*)grSsgEnvTexState("shadow2.rgb");
+		grEnvShadowStateOnCars = grSsgEnvTexState("shadow2.rgb", cgrMultiTexState::modulate);
   
 	if(!grEnvShadowStateOnCars)
 		GfLogWarning("shadow2.png/rgb not found ; no shadow mapping on cars for this track\n");

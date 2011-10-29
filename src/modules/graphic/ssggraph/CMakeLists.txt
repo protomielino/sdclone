@@ -9,7 +9,9 @@ SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h
                      grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
                      grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
                      grcarlight.cpp grcarlight.h grmain.cpp grmain.h 
-                     grmultitexstate.cpp grmultitexstate.h grloadac.cpp grloadac.h grssgext.h
+                     grsimplestate.cpp grsimplestate.h 
+                     grmultitexstate.cpp grmultitexstate.h 
+                     grloadac.cpp grloadac.h grssgext.h
                      grscene.cpp grscene.h grbackground.cpp grbackground.h 
                      grscreen.cpp grscreen.h 
                      grshadow.cpp grshadow.h grskidmarks.cpp grskidmarks.h

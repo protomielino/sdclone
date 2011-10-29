@@ -1,3 +1,23 @@
+/***************************************************************************
+
+    file                 : grloadac.cpp
+    copyright            : (C) 2000 by Eric Espie
+    web                  : www.speed-dreams.org
+    version              : $Id$
+
+ ***************************************************************************/
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+
+/* A adapted version of the PLib AC3D loader */
+
 /*
      PLIB - A Suite of Portable Game Libraries
      Copyright (C) 2001  Steve Baker
@@ -17,11 +37,9 @@
      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
  
      For further information visit http://plib.sourceforge.net
-
-     $Id$
 */
 
-#include <zlib.h>
+#include <zlib.h> // gz*
 #include <plib/ssg.h>
 
 #include "grutil.h"
@@ -29,75 +47,91 @@
 #include "grssgext.h"
 #include "grvtxtable.h"
 #include "grmain.h"
-#include "grtexture.h"	//doMipMap
+#include "grtexture.h"	//doMipMap, cgrSimpleState, cgrMultiTexState
 
 
-int inGroup=0;
-
+// API for transparently loading .ac/.acc files, gzip-compressed or not.
 #define FGETS(buf, len, file) gzgets(file, buf, len)
 #define FGETC(file) gzgetc(file)
 #define FOPEN(path, mode) gzopen(path, mode)
 #define FCLOSE(fd) gzclose(fd)
 
+// Car to track X,Y bounding boxes ratios (see grcar.cpp).
+// Warning: Computed in grssgCarLoadAC3D from t_* of the loaded car and of the last loaded track
+//          (so, it works only if the track is loaded before all the cars).
+// TODO: Do the computation elsewhere, without such assumptions.
+double carTrackRatioX = 0;
+double carTrackRatioY = 0;
+
+// X,Y bounding box of the last loaded track model.
+// TODO: Store this elsewhere (in the car data if a car, track data is a track, ...).
+double shad_xmax;
+double shad_ymax;
+double shad_xmin;
+double shad_ymin;
+
+// AC3D loader own state ==============================================================
+// File descriptor.
+static gzFile loader_fd;
+
+// X, Y bounding box of the loaded model, whichever it is (car, track, ...).
 static double t_xmax;
 static double t_ymax;
 static double t_xmin;
 static double t_ymin;
 
-double shad_xmax;
-double shad_ymax;
-double shad_xmin;
-double shad_ymin;
-double carTrackRatioX=0;
-double carTrackRatioY=0;
-
-
-static gzFile loader_fd ;
-
-
 struct _ssgMaterial
 {
-  sgVec4 spec ;
-  sgVec4 emis ;
-  sgVec4 amb ;
-  sgVec4 rgb  ;
-  float  shi  ;
+  sgVec4 spec;
+  sgVec4 emis;
+  sgVec4 amb;
+  sgVec4 rgb;
+  float  shi;
 } ;
 
-static int		num_materials = 0 ;
-static sgVec3		*vtab  = NULL ;
-static sgVec3		*ntab  = NULL ;
-static sgVec2           *t0tab = NULL;
-static sgVec2           *t1tab = NULL;
-static sgVec2           *t2tab = NULL;
-static sgVec2           *t3tab = NULL;
-static ssgIndexArray    *vertlist=NULL;
-static ssgIndexArray    *striplist=NULL;
-static int              totalnv=0;
-static int              totalstripe=0;
-static int		usenormal = 0;
-static int		nv;
-static int		isacar = TRUE;
-static int		isawheel = TRUE;
-static int              usestrip=TRUE;
-static int              usegroup=TRUE;
-static int              mapLevel;
-static int              numMapLevel;
-static int              indexCar;
+static int num_materials = 0;
 
-static int		isaWindow;
+static sgVec3 *vtab  = 0;
+static sgVec3 *ntab  = 0;
 
-static grssgLoaderOptions	*current_options  = NULL ;
-static _ssgMaterial	*current_material = NULL ;
-static sgVec4		*current_colour   = NULL ;
-static ssgBranch	*current_branch   = NULL ;
-static char		*current_tfname   = NULL ;
-static char		*current_tbase    = NULL ;
-static char		*current_ttiled   = NULL ;
-static char		*current_tskids   = NULL ;
-static char		*current_tshad    = NULL ;
-static char		*current_data     = NULL ;
-#define NOTEXTURE "empty_texture_no_mapping"
+static sgVec2 *t0tab = 0;
+static sgVec2 *t1tab = 0;
+static sgVec2 *t2tab = 0;
+static sgVec2 *t3tab = 0;
+
+static ssgIndexArray *vertlist = 0;
+static ssgIndexArray *striplist = 0;
+
+static int totalnv = 0;
+static int totalstripe = 0;
+static int usenormal = FALSE;
+static int nv = 0;
+
+static int isacar = FALSE;
+static int isawheel = FALSE;
+static int isawindow = FALSE;
+static int usestrip = FALSE;
+static int usegroup = FALSE;
+static int inGroup = FALSE;
+
+static int numTexMaps;
+
+static int indexCar;
+
+static grssgLoaderOptions	*current_options = 0 ;
+static _ssgMaterial	*current_material = 0 ;
+static sgVec4		*current_colour = 0 ;
+static ssgBranch	*current_branch = 0 ;
+static char		*current_tfname = 0 ;
+static char		*current_tbase = 0 ;
+static char		*current_ttiled = 0 ;
+static char		*current_tskids = 0 ;
+static char		*current_tshad = 0 ;
+static char		*current_data = 0 ;
+
+static int last_num_kids = -1 ;
+static int current_flags = -1 ;
+
 #define MAX_MATERIALS 1000    /* This *ought* to be enough! */
 static _ssgMaterial   *mlist    [ MAX_MATERIALS ] ;
 static sgVec4         *clist    [ MAX_MATERIALS ] ;
@@ -106,6 +140,7 @@ static sgMat4 current_matrix ;
 static sgVec2 texrep ;
 static sgVec2 texoff ;
 
+// Parser state automaton "call-backs" ===================================================
 static int do_material ( char *s ) ;
 static int do_object   ( char *s ) ;
 static int do_name     ( char *s ) ;
@@ -128,17 +163,9 @@ static int do_obj_world ( char *s ) ;
 static int do_obj_poly  ( char *s ) ;
 static int do_obj_group ( char *s ) ;
 static int do_obj_light ( char *s ) ;
-/*static void myssgStripify ( ssgEntity *ent );*/
-#define PARSE_CONT   0
-#define PARSE_POP    1
 
-struct Tag
-{
-  const char *token ;
-  int (*func) ( char *s ) ;
-} ;
+// Parser internal utility functions ======================================================
 
- 
 static void skip_spaces ( char **s )
 {
   while ( **s == ' ' || **s == '\t' || **s == '\r' )
@@ -168,7 +195,14 @@ static void skip_quotes ( char **s )
     ulSetError ( UL_WARNING, "ac_to_gl: Expected double-quote ('\"') in '%s'", *s ) ;
 }
 
+#define PARSE_CONT   0
+#define PARSE_POP    1
 
+struct Tag
+{
+  const char *token ;
+  int (*func) ( char *s ) ;
+} ;
 
 static int search ( Tag *tags, char *s )
 {
@@ -177,7 +211,7 @@ static int search ( Tag *tags, char *s )
   if ( *s == '\0' )
   	return PARSE_CONT; /* skip empty lines */
 
-  for ( int i = 0 ; tags[i].token != NULL ; i++ )
+  for ( int i = 0 ; tags[i].token ; i++ )
     if ( ulStrNEqual ( tags[i].token, s, strlen(tags[i].token) ) )
     {
       s += strlen ( tags[i].token ) ;
@@ -192,6 +226,123 @@ static int search ( Tag *tags, char *s )
   return 0 ;  /* Should never get here */
 }
 
+static ssgState *get_simple_state ( _ssgMaterial *mat )
+{
+  cgrSimpleState *st = grStateFactory->getSimpleState();
+
+  st->setMaterial ( GL_SPECULAR, mat->spec ) ;
+  st->setMaterial ( GL_EMISSION, mat->emis ) ;
+  st->setMaterial ( GL_AMBIENT_AND_DIFFUSE, mat->amb ) ;
+  st->setShininess ( mat->shi ) ;
+
+  st->enable ( GL_COLOR_MATERIAL ) ;
+  st->setColourMaterial ( GL_AMBIENT_AND_DIFFUSE ) ;
+
+  st->enable  ( GL_LIGHTING ) ;
+
+  st->setShadeModel ( GL_SMOOTH ) ;
+
+  st->setAlphaClamp(0);
+
+  if (isawindow)
+  {
+      st->enable  ( GL_BLEND );
+      st->setTranslucent () ;
+  }
+  else if (isacar || isawheel)
+  {
+      st->enable  ( GL_BLEND );
+      st->setOpaque () ;
+  }
+  else if ( mat->rgb[3] < 0.99 )
+  {
+      st->enable ( GL_ALPHA_TEST ) ;
+      st->enable  ( GL_BLEND ) ;
+      st->setTranslucent () ;
+  }
+  else
+  {
+      st->disable ( GL_BLEND ) ;
+      st->setOpaque () ;
+  }
+
+  if (current_tfname)
+  {
+	  st->setTexture( current_options->createTexture(current_tfname) ) ;
+	  st->enable( GL_TEXTURE_2D ) ;
+
+	  if (strstr(current_tfname,"tree")
+		  || strstr(current_tfname,"trans-")
+		  || strstr(current_tfname,"arbor"))
+      {
+		  st->setAlphaClamp(0.65f);
+		  st->enable ( GL_ALPHA_TEST ) ;
+		  st->enable  ( GL_BLEND );
+      }
+  }
+  else
+  {
+	  st->disable ( GL_BLEND ) ;
+	  st->disable( GL_TEXTURE_2D ) ;
+  }
+
+  return st ;
+}
+
+static cgrMultiTexState *get_multi_texture_state ( char * name)
+{
+	if (!name)
+		return 0;
+
+	const cgrMultiTexState::tfnTexScheme fnTexScheme = 0; // Default "modulate" = "multiply" scheme.
+	cgrMultiTexState *st = grStateFactory->getMultiTexState(fnTexScheme);
+	
+	st->disable(GL_BLEND);
+	st->setOpaque();
+
+	if (name)
+	{
+		st->setTexture(current_options->createTexture(name));
+		st->enable(GL_TEXTURE_2D) ;
+
+		// Special case of tree and ?transparent? textures.
+		if (strstr(current_tfname, "tree")
+			|| strstr(current_tfname, "trans-")
+			|| strstr(current_tfname, "arbor"))
+		{
+			st->enable(GL_BLEND);
+			st->setAlphaClamp(0.7f);
+			st->enable(GL_ALPHA_TEST);
+		}
+	}
+	else
+	{
+		st->disable(GL_BLEND);
+		st->disable(GL_TEXTURE_2D);
+	}
+	
+	return st ;
+}
+
+static void setup_vertex_table_states(cgrVtxTable* vtab)
+{
+	vtab->setState ( get_simple_state ( current_material ) ) ;
+	vtab->setCullFace ( ! ( (current_flags>>4) & 0x02 ) ) ;
+	
+	// Don't create multi-texture states for cars (done differently).
+	// TODO: Move this car-specific multi-texture states setup here, for consistency ?
+	if (!isacar && !isawheel)
+	{
+		if (numTexMaps > 1)
+			vtab->setMultiTexState (0, get_multi_texture_state (current_ttiled ));
+		if (numTexMaps > 2)
+			vtab->setMultiTexState (1, get_multi_texture_state (current_tskids ));
+		if (numTexMaps > 3)
+			vtab->setMultiTexState (2, get_multi_texture_state (current_tshad ));
+	}
+}
+
+// Parser state automaton state/transition data ============================================
 static Tag top_tags [] =
 {
   { "MATERIAL", do_material },
@@ -213,20 +364,20 @@ static Tag object_tags [] =
   { "numsurf" , do_numsurf  },
   { "kids"    , do_kids     },
   { "crease"  , do_ignore   },
-  { NULL, NULL }
+  { 0, 0 }
 } ;
 
 static Tag surf_tag [] =
 {
   { "SURF"    , do_surf     },
-  { NULL, NULL }
+  { 0, 0 }
 } ;
 
 static Tag surface_tags [] =
 {
   { "mat"     , do_mat      },
   { "refs"    , do_refs     },
-  { NULL, NULL }
+  { 0, 0 }
 } ;
 
 static Tag obj_type_tags [] = 
@@ -235,9 +386,10 @@ static Tag obj_type_tags [] =
    { "poly" , do_obj_poly  }, 
    { "group", do_obj_group }, 
    { "light", do_obj_light }, 
-   { NULL, NULL } 
+   { 0, 0 } 
  } ; 
 
+// Parser call-backs and internal functions ===============================================
 #define OBJ_WORLD  0
 #define OBJ_POLY   1
 #define OBJ_GROUP  2
@@ -247,89 +399,6 @@ static int do_obj_world ( char * ) { return OBJ_WORLD ; }
 static int do_obj_poly  ( char * ) { return OBJ_POLY  ; }
 static int do_obj_group ( char * ) { return OBJ_GROUP ; }
 static int do_obj_light ( char * ) { return OBJ_LIGHT ; }
-static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* options );
-
-
-static int last_num_kids    = -1 ;
-static int current_flags    = -1 ;
-
-static ssgState *get_state ( _ssgMaterial *mat )
-{
-  //ssgSimpleState *st = new ssgSimpleState () ;
-  grManagedState *st = grStateFactory();
-
-  st -> setMaterial ( GL_SPECULAR, mat -> spec ) ;
-  st -> setMaterial ( GL_EMISSION, mat -> emis ) ;
-  st -> setMaterial ( GL_AMBIENT_AND_DIFFUSE, mat -> amb ) ;
-  st -> setShininess ( mat -> shi ) ;
-
-  st -> enable ( GL_COLOR_MATERIAL ) ;
-  st -> setColourMaterial ( GL_AMBIENT_AND_DIFFUSE ) ;
-
-  st -> enable  ( GL_LIGHTING ) ;
-
-  st -> setShadeModel ( GL_SMOOTH ) ;
-  //st -> setShadeModel ( GL_FLAT ) ;
-
-  st -> setAlphaClamp(0);
-
-  if (isaWindow) {
-      st -> enable  ( GL_BLEND );
-      st -> setTranslucent () ;
-  } else if (isacar || isawheel) {
-      st -> enable  ( GL_BLEND );
-      st -> setOpaque () ;
-  } else if ( mat -> rgb[3] < 0.99 ) {
-      st -> enable ( GL_ALPHA_TEST ) ;
-      st -> enable  ( GL_BLEND ) ;
-      st -> setTranslucent () ;
-  } else {
-      st -> disable ( GL_BLEND ) ;
-      st -> setOpaque () ;
-  }
-
-  if (current_tfname != NULL) {
-    st -> setTexture( current_options -> createTexture(current_tfname) ) ;
-    st -> enable( GL_TEXTURE_2D ) ;
-
-    if (strstr(current_tfname,"tree")!=NULL || strstr(current_tfname,"trans-")!=NULL || strstr(current_tfname,"arbor")!=NULL)
-      {
-	st->setAlphaClamp(0.65f);
-	st -> enable ( GL_ALPHA_TEST ) ;
-	st -> enable  ( GL_BLEND );
-      }
-  } else {
-    st -> disable  ( GL_BLEND ) ;
-    st -> disable( GL_TEXTURE_2D ) ;
-  }
-
-  return st ;
-}
-
-static ssgState *get_state_ext ( char * name)
-{
-	if (name==NULL) {
-		return NULL;
-	}
-	grMultiTexState *st = new grMultiTexState();
-	st->disable(GL_BLEND);
-	st->setOpaque();
-
-	if (name != NULL) {
-		st->setTexture(current_options->createTexture(name));
-		st->enable(GL_TEXTURE_2D) ;
-		if (strstr(current_tfname,"tree")!=NULL || strstr(current_tfname,"trans-")!=NULL || strstr(current_tfname,"arbor")!=NULL) {
-			st->enable(GL_BLEND);
-			st->setAlphaClamp(0.7f);
-			st->enable(GL_ALPHA_TEST);
-		}
-	} else {
-		st->disable(GL_BLEND);
-		st->disable(GL_TEXTURE_2D);
-	}
-	return st ;
-}
-
 
 static int do_material ( char *s )
 {
@@ -368,11 +437,11 @@ static int do_material ( char *s )
     sgCopyVec4 ( clist [ num_materials ][ 0 ], rgb ) ;
 
     current_material = mlist [ num_materials ] ;
-    sgCopyVec4 ( current_material -> spec, spec ) ;
-    sgCopyVec4 ( current_material -> emis, emis ) ;
-    sgCopyVec4 ( current_material -> rgb , rgb  ) ;
-    sgCopyVec4 ( current_material -> amb , amb  ) ;
-    current_material -> shi = (float) shi ;
+    sgCopyVec4 ( current_material->spec, spec ) ;
+    sgCopyVec4 ( current_material->emis, emis ) ;
+    sgCopyVec4 ( current_material->rgb , rgb  ) ;
+    sgCopyVec4 ( current_material->amb , amb  ) ;
+    current_material->shi = (float) shi ;
   }
 
   num_materials++ ;
@@ -382,11 +451,10 @@ static int do_material ( char *s )
 
 static int do_object   ( char * s  )
 {
-	//ssgBranch *current_branch_g = NULL;
 	int obj_type = search(obj_type_tags, s);
 
 	delete [] current_tfname;
-	current_tfname = NULL;
+	current_tfname = 0;
 
 	char buffer[1024];
 
@@ -398,8 +466,8 @@ static int do_object   ( char * s  )
 	ssgEntity *old_cb = current_branch ;
 
 	if (obj_type == OBJ_GROUP) {
-		ssgBranch *current_branch_g = NULL;
-		inGroup = 1;
+		ssgBranch *current_branch_g = 0;
+		inGroup = TRUE;
 		current_branch_g = new ssgBranchCb();
 		current_branch->addKid(current_branch_g);
 		current_branch = (ssgTransform*) current_branch_g;
@@ -407,17 +475,17 @@ static int do_object   ( char * s  )
 		extern int preScene(ssgEntity *e);
 		current_branch_g->setCallback(SSG_CALLBACK_PREDRAW, preScene);
     } else {
-		inGroup=0;
+		inGroup=FALSE;
 	}
 
 	ssgTransform *tr = new ssgTransform () ;
 
-	tr -> setTransform ( current_matrix ) ;
+	tr->setTransform ( current_matrix ) ;
 
-	current_branch -> addKid ( tr ) ;
+	current_branch->addKid ( tr ) ;
 	current_branch = tr ;
 
-	while ( FGETS ( buffer, 1024, loader_fd ) != NULL )
+	while ( FGETS ( buffer, 1024, loader_fd ) )
     	if ( search ( object_tags, buffer ) == PARSE_POP )
       		break ;
 
@@ -425,7 +493,7 @@ static int do_object   ( char * s  )
 
 	for ( int i = 0 ; i < num_kids ; i++ ) {
 		/* EE: bad hack for buggy .acc format... */
-		if (FGETS ( buffer, 1024, loader_fd ) != NULL )
+		if (FGETS ( buffer, 1024, loader_fd ) )
 			search ( top_tags, buffer ) ;
     	else
 			break;
@@ -438,34 +506,26 @@ static int do_object   ( char * s  )
 
 static int do_name ( char *s )
 {
-  char *q=NULL;
+  char *q=0;
   skip_quotes ( &s ) ;
 
-  /* Window flag */
-  if (!strncmp(s, "WI", 2)) {
-      isaWindow = TRUE;
-  } else {
-      isaWindow = FALSE;
-  }
+  // Detect special objects
+  isawindow = strncmp(s, "WI", 2) ? FALSE : TRUE;
 
   if (strstr(s,"__TKMN"))
     usegroup=TRUE;
 
   if (!strncmp(s, "TKMN",4))
-      {
+  {
 	q=strstr(s,"_g");
-	if (q!=NULL)
+	if (q)
 	  *q='\0';
-/* 	if (inGroup!=0) */
-/* 	  { */
-/* 	    printf("ingroup =%s\n",s); */
-/* 	  } */
-      }
+  }
 
   if (!strncmp(s, "DR", 2)) {
-      current_branch -> setName ( "DRIVER" );
+      current_branch->setName ( "DRIVER" );
   } else {
-      current_branch -> setName ( s ) ;
+      current_branch->setName ( s ) ;
   }
   
   return PARSE_CONT ;
@@ -474,7 +534,7 @@ static int do_name ( char *s )
 
 static int do_data     ( char *s )
 {
-  int len = strtol ( s, NULL, 0 ) ;
+  int len = strtol ( s, 0, 0 ) ;
 
   current_data = new char [ len + 1 ] ;
 
@@ -485,34 +545,33 @@ static int do_data     ( char *s )
 
   FGETC ( loader_fd ) ;  /* Final RETURN */
 
-  ssgBranch *br = current_options -> createBranch ( current_data ) ;
+  ssgBranch *br = current_options->createBranch ( current_data ) ;
 
-  if ( br != NULL )
+  if ( br )
   {
-    current_branch -> addKid ( br ) ;
+    current_branch->addKid ( br ) ;
     current_branch = br ;
   }
 
-  /* delete [] current_data ; */
-  current_data = NULL ;
+  current_data = 0 ;
 
   return PARSE_CONT ;
 }
 
+#define NOTEXTURE "empty_texture_no_mapping"
 
 static int do_texture  ( char *s )
 {
   char *p ;
 
-  if ( s == NULL || s[0] == '\0' )
-    current_tfname = NULL ;
+  if ( s == 0 || s[0] == '\0' )
+    current_tfname = 0 ;
   else
   {
-    if ((p=strstr(s," base"))!=NULL)
+    if ((p=strstr(s," base")))
     {
       *p='\0';
-      numMapLevel=1;
-      mapLevel=LEVEL0;
+      numTexMaps=1;
       delete [] current_tbase ;
       delete [] current_tfname ;
       delete [] current_ttiled ;
@@ -538,7 +597,7 @@ static int do_texture  ( char *s )
         strcpy ( current_tfname, s ) ;
       }
     }
-    else  if ((p=strstr(s," tiled"))!=NULL)
+    else  if ((p=strstr(s," tiled")))
     {
       *p='\0';
       delete [] current_ttiled ;
@@ -549,8 +608,7 @@ static int do_texture  ( char *s )
       current_tshad = 0;
       if (!strstr(s,NOTEXTURE))
       {
-        numMapLevel++;;
-        mapLevel|=LEVEL1;
+        numTexMaps++;;
         skip_quotes ( &s ) ;
         if (current_options->textureMapping())
         {
@@ -565,7 +623,7 @@ static int do_texture  ( char *s )
         }
       }
     }
-    else  if ((p=strstr(s," skids"))!=NULL)
+    else  if ((p=strstr(s," skids")))
     {
       *p='\0';
       delete [] current_tskids ;
@@ -574,8 +632,7 @@ static int do_texture  ( char *s )
       current_tshad = 0;
       if (!strstr(s,NOTEXTURE))
       {
-        numMapLevel++;;
-        mapLevel|=LEVEL2;
+        numTexMaps++;;
         skip_quotes ( &s ) ;
         if (current_options->textureMapping())
         {
@@ -590,15 +647,14 @@ static int do_texture  ( char *s )
         }
       }
     }
-    else  if ((p=strstr(s," shad"))!=NULL)
+    else  if ((p=strstr(s," shad")))
     {
       *p='\0';
       delete [] current_tshad ;
       current_tshad = 0;
       if (!strstr(s,NOTEXTURE))
       {
-        numMapLevel++;;
-        mapLevel|=LEVEL3;
+        numTexMaps++;;
         skip_quotes ( &s ) ;
         if (current_options->textureMapping())
         {
@@ -616,8 +672,7 @@ static int do_texture  ( char *s )
     else
     {
       skip_quotes ( &s ) ;
-      numMapLevel=1;
-      mapLevel=LEVEL0;
+      numTexMaps=1;
       delete [] current_tfname ;
       delete [] current_tbase ;
       current_tbase = 0;
@@ -648,7 +703,9 @@ static int do_texture  ( char *s )
 static int do_texrep ( char *s )
 {
   if ( sscanf ( s, "%f %f", & texrep [ 0 ], & texrep [ 1 ] ) != 2 )
+  {
     ulSetError ( UL_WARNING, "ac_to_gl: Illegal texrep record." ) ;
+  }
 
   return PARSE_CONT ;
 }
@@ -674,7 +731,7 @@ static int do_rot ( char *s )
         & current_matrix [ 2 ] [ 0 ], & current_matrix [ 2 ] [ 1 ], & current_matrix [ 2 ] [ 2 ] ) != 9 )
     ulSetError ( UL_WARNING, "ac_to_gl: Illegal rot record." ) ;
 
-  ((ssgTransform *)current_branch) -> setTransform ( current_matrix ) ;
+  ((ssgTransform *)current_branch)->setTransform ( current_matrix ) ;
   return PARSE_CONT ;
 }
 
@@ -685,7 +742,7 @@ static int do_loc      ( char *s )
 
   current_matrix [ 3 ][ 1 ] = - current_matrix [ 3 ][ 1 ] ;
   current_matrix [ 3 ][ 3 ] = 1.0f ;
-  ((ssgTransform *)current_branch) -> setTransform ( current_matrix ) ;
+  ((ssgTransform *)current_branch)->setTransform ( current_matrix ) ;
 
   return PARSE_CONT ;
 }
@@ -705,7 +762,7 @@ static int do_numvert  ( char *s )
 {
   char buffer [ 1024 ] ;
 
-  nv = strtol ( s, NULL, 0 ) ;
+  nv = strtol ( s, 0, 0 ) ;
  
   delete [] vtab ;
   delete [] ntab ;
@@ -732,7 +789,7 @@ static int do_numvert  ( char *s )
     if ( sscanf ( buffer, "%f %f %f %f %f %f",
                           &vtab[i][0], &vtab[i][1], &vtab[i][2],&ntab[i][0], &ntab[i][1], &ntab[i][2] ) != 6 )
       {
-	usenormal=0;
+	usenormal = FALSE;
 	if ( sscanf ( buffer, "%f %f %f",
 		      &vtab[i][0], &vtab[i][1], &vtab[i][2] ) != 3 )
 	  {
@@ -741,7 +798,7 @@ static int do_numvert  ( char *s )
       }
     else
       {
-	usenormal=1;
+	usenormal = TRUE;
 	float tmp  =  ntab[i][1] ;
 	ntab[i][1] = -ntab[i][2] ;
 	ntab[i][2] = tmp ;
@@ -768,7 +825,7 @@ static int do_numvert  ( char *s )
 
 static int do_numsurf  ( char *s )
 {
-  int ns = strtol ( s, NULL, 0 ) ;
+  int ns = strtol ( s, 0, 0 ) ;
 
   for ( int i = 0 ; i < ns ; i++ )
   {
@@ -783,11 +840,11 @@ static int do_numsurf  ( char *s )
 
 static int do_surf     ( char *s )
 {
-  current_flags = strtol ( s, NULL, 0 ) ;
+  current_flags = strtol ( s, 0, 0 ) ;
 
   char buffer [ 1024 ] ;
 
-  while ( FGETS ( buffer, 1024, loader_fd ) != NULL )
+  while ( FGETS ( buffer, 1024, loader_fd ) )
     if ( search ( surface_tags, buffer ) == PARSE_POP )
       break ;
 
@@ -797,7 +854,7 @@ static int do_surf     ( char *s )
 
 static int do_mat ( char *s )
 {
-  int mat = strtol ( s, NULL, 0 ) ;
+  int mat = strtol ( s, 0, 0 ) ;
 
   current_material = mlist [ mat ] ;
   current_colour   = clist [ mat ] ;
@@ -808,32 +865,35 @@ static int do_mat ( char *s )
 
 static int do_refs( char *s )
 {
-	int nrefs = strtol( s, NULL, 0 );
+	int nrefs = strtol( s, 0, 0 );
 	char buffer[1024];
 
 	if (nrefs == 0) {
 		return PARSE_POP ;
 	}
 
+	//GfLogDebug("do_refs(nm=%d) : ...\n", numTexMaps);
+
+	// Force numTexMaps for cars (texture states not read from the .ac/.acc).
+	if (isacar) {
+		numTexMaps = 4;
+	} else if (isawheel) {
+		numTexMaps = 1;
+	}
+		
+	// Check the number of texture units
+	if (numTexMaps > grMaxTextureUnits)
+	 	numTexMaps = grMaxTextureUnits;
+
 	ssgVertexArray *vlist = new ssgVertexArray(nrefs);
 	ssgTexCoordArray *tlist = new ssgTexCoordArray (nrefs);
-	ssgTexCoordArray *tlist1 = NULL;
-	ssgTexCoordArray *tlist2 = NULL;
-	ssgTexCoordArray *tlist3 = NULL;
-	//ssgIndexArray *vindices = new ssgIndexArray(nrefs);
+	ssgTexCoordArray *tlist1 = (numTexMaps > 1) ? new ssgTexCoordArray(nrefs) : 0;
+	ssgTexCoordArray *tlist2 = (numTexMaps > 2) ? new ssgTexCoordArray(nrefs) : 0;
+	ssgTexCoordArray *tlist3 = (numTexMaps > 3) ? new ssgTexCoordArray(nrefs) : 0;
 	ssgNormalArray *nrm = new ssgNormalArray(nrefs);
 
-	if (numMapLevel > 1) {
-		tlist1 = new ssgTexCoordArray(nrefs);
-	}
-	if (numMapLevel > 2) {
-		tlist2 = new ssgTexCoordArray(nrefs);
-	}
-	if (numMapLevel > 3) {
-		tlist3 = new ssgTexCoordArray(nrefs);
-	}
-
-	for (int i = 0; i < nrefs; i++) {
+	for (int i = 0; i < nrefs; i++)
+	{
 		FGETS(buffer, 1024, loader_fd);
 
 		int vtx;
@@ -841,12 +901,9 @@ static int do_refs( char *s )
 		sgVec2 tc1 = {0};
 		sgVec2 tc2 = {0};
 		sgVec2 tc3 = {0};
-		int tn=0;
-		tn= sscanf ( buffer, "%d %f %f %f %f %f %f %f %f", &vtx,
-			&tc[0],&tc[1],
-			&tc1[0],&tc1[1],
-			&tc2[0],&tc2[1],
-			&tc3[0],&tc3[1]);
+		int tn =
+			sscanf ( buffer, "%d %f %f %f %f %f %f %f %f", &vtx,
+					 &tc[0],&tc[1], &tc1[0],&tc1[1], &tc2[0],&tc2[1], &tc3[0],&tc3[1]);
 
 		if (tn < 3 )
 		{
@@ -858,7 +915,7 @@ static int do_refs( char *s )
 		tc[0] += texoff[0] ;
 		tc[1] += texoff[1] ;
 
-		tlist -> add ( tc ) ;
+		tlist->add ( tc ) ;
 		t0tab[vtx][0]=tc[0];
 		t0tab[vtx][1]=tc[1];
 
@@ -871,58 +928,55 @@ static int do_refs( char *s )
 		t3tab[vtx][0]=tc3[0];
 		t3tab[vtx][1]=tc3[1];
 
-		if (numMapLevel > 1) {
+		if (tlist1)
 			tlist1->add(tc1);
-		}
-		if (numMapLevel > 2) {
+		if (tlist2)
 			tlist2->add(tc2);
-		}
-		if (numMapLevel > 3) {
+		if (tlist3)
 			tlist3->add(tc3);
-		}
 
 		vlist->add(vtab[vtx]);
-		if (usenormal == 1) {
+		if (usenormal)
 			nrm->add(ntab[vtx]);
-		}
-		//vindices-> add (i);
 		vertlist->add(vtx);
 	}
-	#ifdef GUIONS
-	if (usenormal==1) {
+
+#ifdef GUIONS
+	if (usenormal)
 		printf("use normal\n");
-	}
-	#endif /* GUIONS */
+#endif /* GUIONS */
 
 	ssgColourArray *col = new ssgColourArray(1);
 
 	col->add(*current_colour);
 
-	sgVec3 nm;
-
-	if (usenormal == 0) {
-		if (nrefs < 3) {
+	if (!usenormal)
+	{
+		sgVec3 nm;
+		if (nrefs < 3)
 			sgSetVec3 (nm, 0.0f, 0.0f, 1.0f);
-		} else {
+		else
 			sgMakeNormal (nm, vlist->get(0), vlist->get(1), vlist->get(2));
-		}
-		nrm -> add ( nm ) ;
+		nrm->add ( nm ) ;
 	}
-
 
 	int type = ( current_flags & 0x0F ) ;
 	if ( type >= 0 && type <= 4 ) {
 		GLenum gltype = GL_TRIANGLES ;
 		switch ( type )
 		{
-		case 0 : gltype = GL_TRIANGLE_FAN ;
+			case 0 :
+				gltype = GL_TRIANGLE_FAN ;
 				break ;
-		case 1 : gltype = GL_LINE_LOOP ;
+			case 1 :
+				gltype = GL_LINE_LOOP ;
 				break ;
-		case 2 : gltype = GL_LINE_STRIP ;
+			case 2 :
+				gltype = GL_LINE_STRIP ;
 				break ;
-		case 4 : gltype = GL_TRIANGLE_STRIP ;
-			usestrip=TRUE;
+			case 4 :
+				gltype = GL_TRIANGLE_STRIP ;
+				usestrip=TRUE;
 				break ;
 	}
 
@@ -938,77 +992,32 @@ static int do_refs( char *s )
 			vlinelist->add(vtab[i]);
 			vlinelist->add(tv);
 		}
-		ssgVtxTable *vline = new ssgVtxTable(GL_LINES, vlinelist, NULL, NULL, NULL);
+		ssgVtxTable *vline = new ssgVtxTable(GL_LINES, vlinelist, 0, 0, 0);
 		current_branch->addKid(current_options->createLeaf(vline, 0));
 	}
 #endif
 
-	/* check the number of texture units */
-	if (numMapLevel > grMaxTextureUnits) {
-		numMapLevel = grMaxTextureUnits;
-	}
-	if (isacar) {
-		mapLevel=LEVELC;
-		if (tlist1 && grMaxTextureUnits > 1) {
-			mapLevel = LEVELC2;
-			numMapLevel = 2;
-		}
-		if (tlist2 && grMaxTextureUnits > 2) {
-			mapLevel = LEVELC3;
-			numMapLevel = 3;
-		}
-	} else if (isawheel) {
-		mapLevel = LEVEL0;
-		numMapLevel = 1;
-	}
-		
-#define VTXARRAY_GUIONS
-#ifdef VTXARRAY_GUIONS
-	if (usestrip == FALSE)
-#endif
+	if (!usestrip)
 	{
-		/* TEST
-		if (isacar==FALSE)
-		{numMapLevel=1;
-		mapLevel=LEVEL0;
-		}
-		*/
-		grVtxTable* vtab = new grVtxTable ( gltype,
-		vlist, nrm, tlist,tlist1,tlist2,tlist3,numMapLevel,mapLevel, col, indexCar ) ;
-		/* good */
-		/*ssgVtxArray* vtab = new ssgVtxArray ( gltype,
-		vlist, nrm, tlist, col , vindices) ;*/
+		cgrVtxTable* vtab;
+		if (isacar || isawheel)
+			vtab = new cgrVtxTableCarPart ( numTexMaps, indexCar, gltype, vlist,
+											nrm, tlist, tlist1, tlist2, tlist3, col ) ;
+		else
+			vtab = new cgrVtxTableTrackPart ( numTexMaps, gltype, vlist,
+											  nrm, tlist, tlist1, tlist2, tlist3, col ) ;
 
-		/*striplist-> add (nrefs);
-		grVtxTable* vtab = new grVtxTable ( gltype,
-							vlist,
-							striplist,
-							1,vertlist,
-							nrm, tlist,tlist1,tlist2,tlist3,numMapLevel,mapLevel, col, indexCar ) ;*/
+		setup_vertex_table_states(vtab);
+		
+		ssgLeaf* leaf = current_options->createLeaf ( vtab, 0 ) ;
 
-		/*printf("name ob =%s , numMapLevel =%d , maoLevel=%d \n",	current_branch -> getName (  ) ,numMapLevel, mapLevel);*/
-
-		vtab -> setState ( get_state ( current_material ) ) ;
-		vtab -> setCullFace ( ! ( (current_flags>>4) & 0x02 ) ) ;
-
-		if (numMapLevel>1)
-			vtab -> setState1 (get_state_ext (current_ttiled ));
-		if (numMapLevel>2)
-			vtab -> setState2 (get_state_ext (current_tskids ));
-		if (numMapLevel>3)
-			vtab -> setState3 (get_state_ext (current_tshad ));
-
-		ssgLeaf* leaf = current_options -> createLeaf ( vtab, 0 ) ;
-
-		if (leaf) {
+		if (leaf)
 			current_branch->addKid(leaf);
-		} else {
-			// TODO: delete leaf or vtab?
+		else
 			delete vtab;
-		}
 	}
-#ifdef VTXARRAY_GUIONS
-	else {
+	else
+	{
 		/* memorize the stripe index */
 		striplist-> add (nrefs);
 		totalstripe++;
@@ -1022,108 +1031,86 @@ static int do_refs( char *s )
 		tlist2 = 0;
 		delete tlist3;
 		tlist3 = 0;
-		/*delete vindices;
-		vindices = 0;*/
 		delete nrm;
 		nrm = 0;
 		}
-	#endif
 	}
 
-	if (col->getRef() == 0) {
+	if (col->getRef() == 0)
 		delete col;
-	}
+
 	return PARSE_POP ;
 }
 
 static int do_kids ( char *s )
 {
-	last_num_kids = strtol(s, NULL, 0);
+	last_num_kids = strtol(s, 0, 0);
 
-#ifdef VTXARRAY_GUIONS
-	if (last_num_kids == 0 && usestrip == TRUE && inGroup != 1) {
+	if (last_num_kids == 0 && usestrip && !inGroup)
+	{
 		ssgVertexArray *vlist = new ssgVertexArray(totalnv);
 		ssgNormalArray *nrm = new ssgNormalArray(totalnv);
+
+		// Force numTexMaps for cars (texture states not read from the .ac/.acc).
+		if (isacar) {
+			numTexMaps = 4;
+		} else if (isawheel) {
+			numTexMaps = 1;
+		}
+		
+		// Check the number of texture units
+		if (numTexMaps > grMaxTextureUnits)
+			numTexMaps = grMaxTextureUnits;
+
+		//GfLogDebug("do_kids(nm=%d) : ...\n", numTexMaps);
+
 		ssgTexCoordArray *tlist0 = new ssgTexCoordArray(totalnv);
-		ssgTexCoordArray *tlist1 = NULL;
-		ssgTexCoordArray *tlist2 = NULL;
-		ssgTexCoordArray *tlist3 = NULL;
-		/* if (numMapLevel>1) */
-		tlist1 = new ssgTexCoordArray(totalnv);
-		/* if (numMapLevel>2) */
-		tlist2 = new ssgTexCoordArray(totalnv);
-		/* if (numMapLevel>3) */
-		tlist3 = new ssgTexCoordArray(totalnv);
-      	for (int i = 0; i < totalnv; i++) {
-			tlist0 -> add ( t0tab[i] ) ;
-			/* if (numMapLevel>1) */
-			tlist1 -> add ( t1tab[i] ) ;
-			/* if (numMapLevel>2) */
-			tlist2 -> add ( t2tab[i] ) ;
-			/* if (numMapLevel>3) */
-			tlist3 -> add ( t3tab[i] ) ;
-			vlist -> add ( vtab[i] ) ;
-			if (usenormal==1) {
-				nrm -> add ( ntab[i] ) ;
-			}
+		ssgTexCoordArray *tlist1 = (numTexMaps > 1) ? new ssgTexCoordArray(totalnv) : 0;
+		ssgTexCoordArray *tlist2 = (numTexMaps > 2) ? new ssgTexCoordArray(totalnv) : 0;
+		ssgTexCoordArray *tlist3 = (numTexMaps > 3) ? new ssgTexCoordArray(totalnv) : 0;
+
+		// TODO: Check if no other faster method (preventing the loop)
+      	for (int i = 0; i < totalnv; i++)
+		{
+			tlist0->add ( t0tab[i] ) ;
+			if (tlist1)
+				tlist1->add ( t1tab[i] ) ;
+			if (tlist2)
+				tlist2->add ( t2tab[i] ) ;
+			if (tlist3)
+				tlist3->add ( t3tab[i] ) ;
+			vlist->add ( vtab[i] ) ;
+			if (usenormal)
+				nrm->add ( ntab[i] ) ;
 		}
 
 		ssgColourArray *col = new ssgColourArray ( 1 ) ;
-		col -> add ( *current_colour ) ;
+		col->add ( *current_colour ) ;
 
-		/* int type = ( current_flags & 0x0F ) ; */
-		GLenum gltype = GL_TRIANGLE_STRIP ;
+		const GLenum gltype = GL_TRIANGLE_STRIP ;
 
-		/* check the number of texture units */
-		if (numMapLevel>grMaxTextureUnits)
-			numMapLevel=grMaxTextureUnits;
-		if (isacar) {
-			mapLevel=LEVELC;
-			if (tlist1 && grMaxTextureUnits>2) {
-				mapLevel=LEVELC2;
-				numMapLevel=2;
-			}
-			if (tlist2 && grMaxTextureUnits>2){
-				mapLevel=LEVELC3;
-				numMapLevel=3;
-			}
-		} else if (isawheel) {
-			mapLevel = LEVEL0;
-			numMapLevel = 1;
-		}
-		/*ssgVtxArray* vtab = new ssgVtxArray ( gltype,
-		vlist, nrm, tlist0, col , vertlist) ;*/
-
-		grVtxTable* vtab = new grVtxTable ( gltype,
-					  vlist,
-					  striplist,
-					  totalstripe,
-					  vertlist,
-					  nrm,
-					  tlist0,tlist1,tlist2,tlist3,
-					  numMapLevel,mapLevel,
-					  col,
-					  indexCar ) ;
-      vtab -> setState ( get_state ( current_material ) ) ;
-      vtab -> setCullFace ( ! ( (current_flags>>4) & 0x02 ) ) ;
-      if (numMapLevel>1)
-	  vtab -> setState1 (get_state_ext (current_ttiled ));
-      if (numMapLevel>2)
-	  vtab -> setState2 (get_state_ext (current_tskids ));
-      if (numMapLevel>3)
-	  vtab -> setState3 (get_state_ext (current_tshad ));
-      ssgLeaf* leaf = current_options -> createLeaf ( vtab, 0 ) ;
-
-		if (leaf) {
-			current_branch -> addKid ( leaf ) ;
-		} else {
+		cgrVtxTable* vtab;
+		if (isacar || isawheel)
+			vtab = new cgrVtxTableCarPart ( numTexMaps, indexCar, gltype, vlist,
+											nrm, tlist0, tlist1, tlist2, tlist3, col,
+											striplist, totalstripe, vertlist ) ;
+		else
+			vtab = new cgrVtxTableTrackPart ( numTexMaps, gltype, vlist,
+											  nrm, tlist0, tlist1, tlist2, tlist3, col,
+											  striplist, totalstripe, vertlist ) ;
+		
+		setup_vertex_table_states(vtab);
+		
+		ssgLeaf* leaf = current_options->createLeaf ( vtab, 0 ) ;
+		
+		if (leaf)
+			current_branch->addKid ( leaf ) ;
+		else
 			delete vtab;
-		}
 	}
-#endif
 
-	numMapLevel=1;
-	mapLevel=LEVEL0;
+	numTexMaps = 1;
+	
 	return PARSE_POP ;
 }
 
@@ -1132,163 +1119,33 @@ static int do_ignore( char *s )
 	return PARSE_CONT ;
 }
 
-void myssgFlatten(ssgEntity *obj)
-{
+//================================================================================
+// Original PLib loader function for backwards compatibility ...
+// (except for ssgLoaderOptions => grssgLoaderOptions)
 
- if ( obj -> isAKindOf ( ssgTypeBranch() ) )
-  {
-    ssgBranch *br = (ssgBranch *) obj ;
-#ifdef WIN32
-    if (!strnicmp(br->getKid(0)->getName(), "tkmn",4))
-#else
-    if (!strncasecmp(br->getKid(0)->getName(), "tkmn",4))
-#endif
-      {
-	ssgFlatten(br->getKid(0));
-      }
-    else
-      {
-	for ( int i = 0 ; i < br -> getNumKids () ; i++ )
-	  ssgFlatten( br -> getKid ( i ) );
-      }
-  }
- return ;
-
-}
-
-ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* options,int index )
-{
-
-  isacar=TRUE;
-  isawheel=FALSE;
-  usestrip=FALSE;
-  indexCar=index;
-  t_xmax=-999999.0;
-  t_ymax=-999999.0;
-  t_xmin=+999999.0;
-  t_ymin=+999999.0;
-
-  GfLogTrace("Loading %s\n", fname);
-
-  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
-  
-  if ( obj == NULL )
-    return NULL ;
-  
-  /* Do some simple optimisations */
-
-  ssgBranch *model = new ssgBranch () ;
-  model -> addKid ( obj ) ;
-  if(usestrip==FALSE)
-    {
-      /*myssgFlatten(obj);*/
-      ssgFlatten    ( obj ) ;
-      ssgStripify   ( model ) ;
-    }
-  carTrackRatioX= (t_xmax-t_xmin)/(shad_xmax-shad_xmin);
-  carTrackRatioY= (t_ymax-t_ymin)/(shad_ymax-shad_ymin);
-  return model ;
-
-}
-
-ssgEntity *grssgCarWheelLoadAC3D ( const char *fname, const grssgLoaderOptions* options, int carIndex )
-{
-
-  isacar=FALSE;
-  isawheel=TRUE;
-  usestrip=FALSE;
-  indexCar=carIndex;
-  t_xmax=-999999.0;
-  t_ymax=-999999.0;
-  t_xmin=+999999.0;
-  t_ymin=+999999.0;
-
-  GfLogTrace("Loading %s\n", fname);
-
-  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
-  
-  if ( obj == NULL )
-    return NULL ;
-  
-  /* Do some simple optimisations */
-
-  ssgBranch *model = new ssgBranch () ;
-  model -> addKid ( obj ) ;
-  if(usestrip==FALSE)
-    {
-      /*myssgFlatten(obj);*/
-      ssgFlatten    ( obj ) ;
-      ssgStripify   ( model ) ;
-    }
-  carTrackRatioX= (t_xmax-t_xmin)/(shad_xmax-shad_xmin);
-  carTrackRatioY= (t_ymax-t_ymin)/(shad_ymax-shad_ymin);
-  return model ;
-
-}
-
-ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options )
-{
-  isacar=FALSE;
-  isawheel=FALSE;
-  usegroup=FALSE;
-  usestrip=FALSE;
-
-  t_xmax=-999999.0;
-  t_ymax=-999999.0;
-  t_xmin=+999999.0;
-  t_ymin=+999999.0;
-
-  GfOut("Loading %s\n", fname);
-
-  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
-
-  if ( obj == NULL )
-    return NULL ;
-
-
-  /* Do some simple optimisations */
-
-  ssgBranch *model = new ssgBranch () ;
-  model -> addKid ( obj ) ;
-  if ((usegroup==FALSE) && (usestrip==FALSE))
-    {
-	ssgFlatten    ( obj ) ;
-	ssgStripify   ( model ) ;
-    }
-  shad_xmax=t_xmax;
-  shad_ymax=t_ymax;
-  shad_xmin=t_xmin;
-  shad_ymin=t_ymin;
-
-  return model ;
-}
-
-/*
-  Original function for backwards compatibility... (except for ssgLoaderOptions => grssgLoaderOptions)
-*/
 static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* options )
 {
 
   char filename [ 1024 ] ;
-  current_options -> makeModelPath ( filename, fname ) ;
+  current_options->makeModelPath ( filename, fname ) ;
 
   num_materials = 0 ;
-  vtab = NULL ;
+  vtab = 0 ;
 
-  current_material = NULL ;
-  current_colour   = NULL ;
-  current_tfname   = NULL ;
-  current_branch   = NULL ;
+  current_material = 0 ;
+  current_colour   = 0 ;
+  current_tfname   = 0 ;
+  current_branch   = 0 ;
 
   sgSetVec2 ( texrep, 1.0, 1.0 ) ;
   sgSetVec2 ( texoff, 0.0, 0.0 ) ;
 
   loader_fd = FOPEN ( filename, "rb" ) ;
 
-  if ( loader_fd == NULL )
+  if ( !loader_fd )
   {
     ulSetError ( UL_WARNING, "ssgLoadAC: Failed to open '%s' for reading", filename ) ;
-    return NULL ;
+    return 0 ;
   }
 
   char buffer [ 1024 ] ;
@@ -1296,7 +1153,7 @@ static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* opt
 
   current_branch = new ssgTransform () ;
 
-  while ( FGETS ( buffer, 1024, loader_fd ) != NULL )
+  while ( FGETS ( buffer, 1024, loader_fd ) )
   {
     char *s = buffer ;
 
@@ -1318,7 +1175,7 @@ static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* opt
       {
         FCLOSE ( loader_fd ) ;
         ulSetError ( UL_WARNING, "ssgLoadAC: '%s' is not in AC3D format.", filename ) ;
-        return NULL ;
+        return 0 ;
       }
     }
     else
@@ -1326,7 +1183,7 @@ static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* opt
   }
 
   delete [] current_tfname;
-  current_tfname = NULL ;
+  current_tfname = 0 ;
   delete [] vtab ;
   vtab = 0;
 
@@ -1342,6 +1199,139 @@ static ssgEntity *myssgLoadAC ( const char *fname, const grssgLoaderOptions* opt
 
 }
 
+// Never used (calls are commented out) : remove ?
+/*
+void myssgFlatten(ssgEntity *obj)
+{
+
+ if ( obj->isAKindOf ( ssgTypeBranch() ) )
+  {
+    ssgBranch *br = (ssgBranch *) obj ;
+#ifdef WIN32
+    if (!strnicmp(br->getKid(0)->getName(), "tkmn",4))
+#else
+    if (!strncasecmp(br->getKid(0)->getName(), "tkmn",4))
+#endif
+      {
+	ssgFlatten(br->getKid(0));
+      }
+    else
+      {
+	for ( int i = 0 ; i < br->getNumKids () ; i++ )
+	  ssgFlatten( br->getKid ( i ) );
+      }
+  }
+ return ;
+ }
+*/
+
+// Loader public API ======================================================================
+
+ssgEntity *grssgCarLoadAC3D ( const char *fname, const grssgLoaderOptions* options,int index )
+{
+
+  isacar=TRUE;
+  isawheel=FALSE;
+  usestrip=FALSE;
+  indexCar=index;
+  t_xmax=-999999.0;
+  t_ymax=-999999.0;
+  t_xmin=+999999.0;
+  t_ymin=+999999.0;
+
+  GfLogTrace("Loading car %s\n", fname);
+
+  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
+  
+  if ( obj == 0 )
+    return 0 ;
+  
+  /* Do some simple optimisations */
+
+  ssgBranch *model = new ssgBranch () ;
+  model->addKid ( obj ) ;
+  if(usestrip==FALSE)
+  {
+    /*myssgFlatten(obj);*/
+    ssgFlatten    ( obj ) ;
+	ssgStripify   ( model ) ;
+  }
+  
+  carTrackRatioX = (t_xmax-t_xmin)/(shad_xmax-shad_xmin);
+  carTrackRatioY = (t_ymax-t_ymin)/(shad_ymax-shad_ymin);
+
+  return model ;
+}
+
+ssgEntity *grssgCarWheelLoadAC3D ( const char *fname, const grssgLoaderOptions* options, int carIndex )
+{
+
+  isacar=FALSE;
+  isawheel=TRUE;
+  usestrip=FALSE;
+  indexCar=carIndex;
+  t_xmax=-999999.0;
+  t_ymax=-999999.0;
+  t_xmin=+999999.0;
+  t_ymin=+999999.0;
+
+  GfLogTrace("Loading wheel %s\n", fname);
+
+  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
+  
+  if ( obj == 0 )
+    return 0 ;
+  
+  /* Do some simple optimisations */
+
+  ssgBranch *model = new ssgBranch () ;
+  model->addKid ( obj ) ;
+  if(!usestrip)
+  {
+    /*myssgFlatten(obj);*/
+    ssgFlatten    ( obj ) ;
+	ssgStripify   ( model ) ;
+  }
+
+  return model ;
+}
+
+ssgEntity *grssgLoadAC3D ( const char *fname, const grssgLoaderOptions* options )
+{
+  isacar=FALSE;
+  isawheel=FALSE;
+  usegroup=FALSE;
+  usestrip=FALSE;
+
+  t_xmax=-999999.0;
+  t_ymax=-999999.0;
+  t_xmin=+999999.0;
+  t_ymin=+999999.0;
+
+  GfOut("Loading %s\n", fname);
+
+  ssgEntity *obj = myssgLoadAC ( fname, options ) ;
+
+  if ( obj == 0 )
+    return 0 ;
+
+  /* Do some simple optimisations */
+  ssgBranch *model = new ssgBranch () ;
+  model->addKid ( obj ) ;
+  if (!usegroup && !usestrip)
+  {
+	ssgFlatten    ( obj ) ;
+	ssgStripify   ( model ) ;
+  }
+  
+  shad_xmax=t_xmax;
+  shad_ymax=t_ymax;
+  shad_xmin=t_xmin;
+  shad_ymin=t_ymin;
+
+  return model ;
+}
+
 // grssgLoaderOptions implementation =========================================
 
 grssgLoaderOptions::grssgLoaderOptions(bool bTextureMipMap)
@@ -1351,12 +1341,12 @@ grssgLoaderOptions::grssgLoaderOptions(bool bTextureMipMap)
 	
 void grssgLoaderOptions::makeModelPath(char* path, const char *fname) const
 {
-	ulFindFile(path, model_dir, fname, NULL) ;
+	ulFindFile(path, model_dir, fname, 0) ;
 }
 
 void grssgLoaderOptions::makeTexturePath(char* path, const char *fname) const
 {
-	ulFindFile(path, texture_dir, fname, NULL) ;
+	ulFindFile(path, texture_dir, fname, 0) ;
 }
 
 ssgTexture* grssgLoaderOptions::createTexture(char* tfname, int wrapu, int wrapv, int mipmap)

@@ -68,37 +68,34 @@ int grGetFilename(const char *filename, const char *filepath, char *buf)
 
 typedef struct stlist
 {
-    struct stlist	*next;
-    grManagedState *state;
-    char		*name;
+    struct stlist* next;
+    cgrSimpleState* state;
+    char* name;
 } stlist;
 
 
-static stlist * stateList = NULL;
+static stlist* stateList = NULL;
 
 
-static grManagedState * grGetState(const char *img)
+static cgrSimpleState* grGetState(const char *img)
 {
-    stlist	*curr;
-
-    curr = stateList;
-    while (curr != NULL) {
-	if (strcmp(curr->name, img) == 0) {
-	    return curr->state;
-	}
-	curr = curr->next;
+    stlist	*curr = stateList;
+    while (curr) {
+		if (strcmp(curr->name, img) == 0) {
+			return curr->state;
+		}
+		curr = curr->next;
     }
-    return NULL;
+    return 0;
 }
 
 
 void grShutdownState(void)
 {
-	stlist *curr;
 	stlist *next;
 
-	curr = stateList;
-	while (curr != NULL) {
+	stlist *curr = stateList;
+	while (curr) {
 		next = curr->next;
 		//GfLogTrace("Still in list : %s\n", curr->name);
 		free(curr->name);
@@ -106,11 +103,11 @@ void grShutdownState(void)
 		free(curr);
 		curr = next;
 	}
-	stateList = NULL;
+	stateList = 0;
 }
 
 
-static void grSetupState(grManagedState *st, char *buf)
+static void grSetupState(cgrSimpleState *st, char *buf)
 {
 	st->ref();			// cannot be removed
 	st->enable(GL_LIGHTING);
@@ -128,15 +125,13 @@ static void grSetupState(grManagedState *st, char *buf)
 }
 
 
-ssgState * grSsgLoadTexState(const char *img, int errIfNotFound)
+ssgState* grSsgLoadTexState(const char *img, int errIfNotFound)
 {
 	char buf[256];
-	const char *s;
-	grManagedState *st; 
 
 	// remove the directory
-	s = strrchr(img, '/');
-	if (s == NULL) {
+	const char* s = strrchr(img, '/');
+	if (!s) {
 		s = img;
 	} else {
 		s++;
@@ -148,56 +143,26 @@ ssgState * grSsgLoadTexState(const char *img, int errIfNotFound)
 		return NULL;
 	}
 
-	st = grGetState(buf);
-	if (st != NULL) {
+	cgrSimpleState* st = grGetState(buf);
+	if (st) {
 		return (ssgState*)st;
 	}
 
-	st = grStateFactory();
+	st = grStateFactory->getSimpleState();
 	grSetupState(st, buf);
 	st->setTexture(buf);
 	
 	return (ssgState*)st;
 }
 
-ssgState * grSsgEnvTexState(const char *img, int errIfNotFound)
+ssgState* grSsgLoadTexStateEx(const char *img, const char *filepath,
+							  int wrap, int mipmap, int errIfNotFound)
 {
 	char buf[256];
-	const char *s;
-	grMultiTexState *st;
-
-	// remove the directory
-	s = strrchr(img, '/');
-	if (s == NULL) {
-		s = img;
-	} else {
-		s++;
-    }
-
-	if (!grGetFilename(s, grFilePath, buf)) {
-		if (errIfNotFound)
-			GfLogError("Env. texture file %s not found in %s\n", s, grFilePath);
-		return NULL;
-    }
-
-	st = new grMultiTexState;
-	grSetupState(st, buf);
-	st->setTexture(buf);
-
-	return (ssgState*)st;
-}
-
-ssgState *
-grSsgLoadTexStateEx(const char *img, const char *filepath,
-					int wrap, int mipmap, int errIfNotFound)
-{
-	char buf[256];
-	const char *s;
-	grManagedState *st; 
 
 	// remove the directory path
-	s = strrchr(img, '/');
-	if (s == NULL) {
+	const char* s = strrchr(img, '/');
+	if (!s) {
 		s = img;
 	} else {
 		s++;
@@ -209,18 +174,42 @@ grSsgLoadTexStateEx(const char *img, const char *filepath,
 		return NULL;
 	}
 
-	st = grGetState(buf);
-	if (st != NULL) {
+	cgrSimpleState* st = grGetState(buf);
+	if (st) {
 		return (ssgState*)st;
 	}
 
-	st = grStateFactory();
+	st = grStateFactory->getSimpleState();
 	grSetupState(st, buf);
 	st->setTexture(buf, wrap, wrap, mipmap);
 
 	return (ssgState*)st;
 }
 
+cgrMultiTexState* grSsgEnvTexState(const char *img, cgrMultiTexState::tfnTexScheme fnTexScheme,
+								   int errIfNotFound)
+{
+	char buf[256];
+
+	// remove the directory
+	const char *s = strrchr(img, '/');
+	if (!s)
+		s = img;
+	else
+		s++;
+
+	if (!grGetFilename(s, grFilePath, buf)) {
+		if (errIfNotFound)
+			GfLogError("Env. texture file %s not found in %s\n", s, grFilePath);
+		return 0;
+    }
+
+	cgrMultiTexState* st = grStateFactory->getMultiTexState(fnTexScheme);
+	grSetupState(st, buf);
+	st->setTexture(buf);
+
+	return st;
+}
 
 /*
  * 

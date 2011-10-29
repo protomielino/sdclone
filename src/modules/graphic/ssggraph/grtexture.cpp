@@ -24,6 +24,8 @@
 
 #include <glfeatures.h> // GfglFeatures
 
+#include "grtexture.h"
+
 #include "grutil.h"
 
 
@@ -62,7 +64,22 @@ int doMipMap(const char *tfname, int mipmap)
 	return mipmap;
 }
 
+// cgrStateFactory class ========================================================
+// TODO: really manage shared textures (see obsolete grutil.cpp parts).
 
+cgrStateFactory* grStateFactory = new cgrStateFactory;
+
+cgrSimpleState* cgrStateFactory::getSimpleState()
+{
+	return new cgrSimpleState();
+}
+
+cgrMultiTexState* cgrStateFactory::getMultiTexState(cgrMultiTexState::tfnTexScheme fnTexScheme)
+{
+	return new cgrMultiTexState(fnTexScheme);
+}
+
+// SGI loader==================================================================
 /*
 	The latter parts are derived from plib (plib.sf.net) and have this license:
 
@@ -95,7 +112,7 @@ int doMipMap(const char *tfname, int mipmap)
 // SGI texture loading function.
 bool grLoadSGI(const char *fname, ssgTextureInfo* info)
 {
-	grSGIHeader *sgihdr = new grSGIHeader(fname, info);
+	cgrSGIHeader *sgihdr = new cgrSGIHeader(fname, info);
 	bool returnval = sgihdr->loadSGI_bool;
 	delete sgihdr;
 	return returnval;
@@ -113,9 +130,9 @@ void grRegisterCustomSGILoader(void)
 	ssgAddTextureFormat(".jpg", grLoadJpegTexture);
 }
 
-grSGIHeader::grSGIHeader(const char *fname, ssgTextureInfo* info)
+cgrSGIHeader::cgrSGIHeader(const char *fname, ssgTextureInfo* info)
 {
-	grSGIHeader *sgihdr = this;
+	cgrSGIHeader *sgihdr = this;
 
 	start = NULL;
 	leng = NULL;

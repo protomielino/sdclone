@@ -16,22 +16,52 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef __GRMULTI
-#define __GRMULTI
+#ifndef __GRMULTITEXSTATE
+#define __GRMULTITEXSTATE
 
-#include "grtexture.h"	//grManagedState
+#include "grsimplestate.h"	//cgrSimpleState
 
-class grMultiTexState : public grManagedState
+
+class cgrMultiTexState : public cgrSimpleState
 {
-	public:
-		~grMultiTexState() {}
-		virtual void apply(int unit, bool bAltEnv = false);
+ public:
+
+	//! Texturing scheme function.
+	typedef void (*tfnTexScheme)(void);
+
+	//! Constructor (use only below static texturing scheme functions for fnTexScheme).
+	cgrMultiTexState(tfnTexScheme fnTexScheme = 0);
+	
+	//! Set texturing scheme (use only below static functions).
+	void setTexScheme(tfnTexScheme fnTexScheme);
+	
+	// Apply the texture state to the given texture unit GL_TEXTURE<nUnit>_ARB
+	virtual void apply(GLint nUnit);
+
+	//! Useful texturing schemes.
+	static void modulate(); // Multiply color and alpha.
+	static void addColorModulateAlpha(); // Self explanatory.
+	
+	//! Other texturing schemes (tries).
+	static void interpolate(); // Interpolate using previous as coefficient.
+	static void interpolateConst(); // Interpolate using const RGBA as coefficient.
+	static void interpolateReverted(); // Same as interpolate, but prev/tex reverted
+	static void duplicate(); // Prev x 2 (ignore tex)
+	static void replace(); // Self explanatory.
+	static void decal(); // Self explanatory.
+	static void add(); // Self explanatory.
+	static void blend(); // Self explanatory.
+
+ protected:
+
+	//! Texturing scheme (among above static funtions).
+	tfnTexScheme _fnTexScheme;
 };
 
 // Car multi-texturing modes, for testing/debugging purpose (see grmain.cpp::initView()).
-extern const int grCarTexturingModes;
-extern int grCarTexturingTrackEnvMode; // Texturing unit 1.
-extern int grCarTexturingSkyShadowsMode; // Texturing unit 2.
-extern int grCarTexturingTrackShadowsMode; // Texturing unit 3.
+// extern const int grCarTexturingModes;
+// extern int grCarTexturingTrackEnvMode; // Texturing unit 1.
+// extern int grCarTexturingSkyShadowsMode; // Texturing unit 2.
+// extern int grCarTexturingTrackShadowsMode; // Texturing unit 3.
 
-#endif // __GRMULTI
+#endif // __GRMULTITEXSTATE

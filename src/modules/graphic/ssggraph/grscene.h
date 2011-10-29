@@ -48,9 +48,9 @@ extern ssgBranch *TrackLightAnchor;
 extern ssgBranch *ThePits;
 
 extern ssgStateSelector	*grEnvSelector;
-extern grMultiTexState	*grEnvState;
-extern grMultiTexState	*grEnvShadowState;
-extern grMultiTexState	*grEnvShadowStateOnCars;
+extern cgrMultiTexState	*grEnvState;
+extern cgrMultiTexState	*grEnvShadowState;
+extern cgrMultiTexState	*grEnvShadowStateOnCars;
 
 class cGrCamera;
 class cGrBackgroundCam;

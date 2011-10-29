@@ -21,10 +21,11 @@
 #define _GRUTIL_H_
 
 #include <cstdio>
+
 #include "grtexture.h"
 
 #if 1
-#define TRACE_GL(msg) { GLenum rc; if ((rc = glGetError()) != GL_NO_ERROR) printf("%s %s\n", msg, gluErrorString(rc)); }
+#define TRACE_GL(msg) { GLenum rc; if ((rc = glGetError()) != GL_NO_ERROR) GfLogWarning("%s %s\n", msg, gluErrorString(rc)); }
 #else
 #define TRACE_GL(msg)
 #endif
@@ -52,8 +53,9 @@ extern int	 grMipMap;
 extern char *grFilePath;	/* Multiple path (: separated) used to search for files */
 
 extern int grGetFilename(const char *filename, const char *filepath, char *buf);
-class ssgState;
-extern ssgState* grSsgEnvTexState(const char *img, int errIfNotFound = TRUE);
+extern cgrMultiTexState* grSsgEnvTexState(const char *img,
+										  cgrMultiTexState::tfnTexScheme fnTexScheme,
+										  int errIfNotFound = TRUE);
 extern ssgState* grSsgLoadTexState(const char *img, int errIfNotFound = TRUE);
 extern ssgState* grSsgLoadTexStateEx(const char *img, const char *filepath,
 									 int wrap, int mipmap, int errIfNotFound = TRUE);

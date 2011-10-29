@@ -27,6 +27,9 @@
 
 #include <plib/ssg.h>	// ssgXXX
 #include <tgfclient.h>
+
+#include "grsimplestate.h"	// cgrSimpleState
+#include "grmultitexstate.h"	// cgrMultiTexState
 #include "loadsgi.h"	// ssgSGIHeader
 
 
@@ -34,29 +37,18 @@ extern int doMipMap(const char *tfname, int mipmap);
 
 extern bool grMakeMipMaps(GLubyte *image, int xsize, int ysize, int zsize, int mipmap);
 
-// This state does currently not manage anything!
-// TODO: manage shared textures, obsolete grutil.cpp parts.
-class grManagedState : public ssgSimpleState {
-	public:
-		
-		virtual void setTexture(ssgTexture *tex) {
-			ssgSimpleState::setTexture(tex);
-		}
-
-		virtual void setTexture(const char *fname, int _wrapu = TRUE, int _wrapv = TRUE, int _mipmap = TRUE) {
-			_mipmap = doMipMap(fname, _mipmap);
-			ssgSimpleState::setTexture(fname, _wrapu, _wrapv, _mipmap);
-		}
-
-		virtual void setTexture(GLuint tex) {
-			printf("Obsolete call: setTexture(GLuint tex)\n");
-			ssgSimpleState::setTexture(tex);
-		}
+// The state factory.
+// TODO: really manage shared textures (see obsolete grutil.cpp parts).
+class cgrStateFactory
+{
+ public:
+	
+	cgrSimpleState* getSimpleState();
+	
+	cgrMultiTexState* getMultiTexState(cgrMultiTexState::tfnTexScheme fnTexScheme = 0);
 };
 
-
-// Managed state factory.
-inline grManagedState* grStateFactory(void) { return new grManagedState(); }
+extern cgrStateFactory* grStateFactory;
 
 // Register customized loader in plib.
 extern void grRegisterCustomSGILoader(void);
@@ -67,9 +59,12 @@ extern bool grLoadJpegTexture(const char *fname, ssgTextureInfo* info);
 // SGI loader class to call customized ssgMakeMipMaps. This is necessary because
 // of plib architecture which does not allow to customize the mipmap
 // generation.
-class grSGIHeader : public ssgSGIHeader {
-	public:
-		grSGIHeader(const char *fname, ssgTextureInfo* info);
+class cgrSGIHeader : public ssgSGIHeader
+{
+ public:
+	
+	cgrSGIHeader(const char *fname, ssgTextureInfo* info);
+	
 };
 
-#endif // _MK_TEXTURE_H_
+#endif // _GRTEXTURE_H_
