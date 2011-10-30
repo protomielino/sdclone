@@ -37,7 +37,8 @@
 #include "grutil.h"
 #include "grrain.h"
 
-// Uncomment to enable support for PNG logos for normal pit-building wall.
+// Uncomment to enable support for PNG logos for normal pit-building wall
+// (does not apply to the no-building pit, with the low wall, which already supports PNG).
 //#define PNG_LOGO_SUPPORT 1
 
 // Some public global variables.
@@ -45,7 +46,7 @@ int grWrldX;
 int grWrldY;
 int grWrldZ;
 int grWrldMaxSize;
-tTrack 	 *grTrack;
+tTrack *grTrack;
 
 // TheScene
 ssgRoot *TheScene = NULL;
@@ -266,8 +267,7 @@ void grCustomizePits(void)
           // Load logo texture (only rgbs - pngs cause pit transparency bug # 387)
 #ifdef PNG_LOGO_SUPPORT
 		  const std::string strPNGLogoFileName = strLogoFileName + ".png";
-		  ssgState *st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(),
-		  									 buf, FALSE, FALSE, FALSE);
+		  st = grSsgLoadTexStateEx(strPNGLogoFileName.c_str(), buf, FALSE, FALSE, FALSE);
 #endif		  
 		  if (!st) {
 		  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
@@ -325,6 +325,8 @@ void grCustomizePits(void)
 		// - the dots '.' : the real pit door texture (actually includes the stars part)
 		// - the hashes '#' : the team name texture
 		// - the dollars '$' : the team logo texture
+		//
+		// More details here : http://www.berniw.org/torcs/robot/ch6/pitlogo.html
 		
         // First, bottom vertex of the triangle strip
 		{
