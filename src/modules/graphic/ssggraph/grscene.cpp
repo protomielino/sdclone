@@ -283,25 +283,6 @@ void grCustomizePits(void)
         }
         reinterpret_cast<ssgSimpleState*>(st)->setShininess(50);
 
-		// Determine the position of the pit wall, and its normal vector.
-        tdble x, y;
-        t3Dd normalvector;
-        RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y,
-                            pits->driversPits[i].pos.type);
-        RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y,
-                            pits->side, &normalvector);
-        tdble x2 = x - pits->width / 2.0 * normalvector.x
-			+ pits->len / 2.0 * normalvector.y;
-        tdble y2 = y - pits->width / 2.0 * normalvector.y
-			- pits->len / 2.0 * normalvector.x;
-        tdble z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
-
-        // Normal
-		{
-			sgVec3 nrm = {  normalvector.x, normalvector.y, 0 };
-			pit_nrm->add(nrm);
-		}
-
 		// Pit wall texturing : the loaded 'logo*.rgb/.png' image file is supposed to consist
 		// of 4 distinct parts :
 		//
@@ -328,6 +309,27 @@ void grCustomizePits(void)
 		//
 		// More details here : http://www.berniw.org/torcs/robot/ch6/pitlogo.html
 		
+		// Determine the position of the pit wall, and its normal vector.
+        tdble x, y;
+        t3Dd normalvector;
+        RtTrackLocal2Global(&(pits->driversPits[i].pos), &x, &y,
+                            pits->driversPits[i].pos.type);
+        RtTrackSideNormalG(pits->driversPits[i].pos.seg, x, y,
+                            pits->side, &normalvector);
+		
+        // Normal
+		{
+			sgVec3 nrm = {  normalvector.x, normalvector.y, 0 };
+			pit_nrm->add(nrm);
+		}
+
+		// Determine the position of the first, bottom vertex of the triangle strip
+        tdble x2 = x - pits->width / 2.0 * normalvector.x
+			+ pits->len / 2.0 * normalvector.y;
+        tdble y2 = y - pits->width / 2.0 * normalvector.y
+			- pits->len / 2.0 * normalvector.x;
+        tdble z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
+
         // First, bottom vertex of the triangle strip
 		{
 			sgVec2 tex = { -0.7, 0.33 };
@@ -344,8 +346,10 @@ void grCustomizePits(void)
 			pit_vtx->add(vtx);
 		}
 
+		// Determine the position of the second, bottom vertex of the triangle strip
         x2 -= pits->len * normalvector.y;
         y2 += pits->len * normalvector.x;
+        z2 = RtTrackHeightG(pits->driversPits[i].pos.seg, x2, y2);
 
         // Second, bottom vertex of the triangle strip
 		{
