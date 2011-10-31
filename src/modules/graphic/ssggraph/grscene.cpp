@@ -283,6 +283,7 @@ void grCustomizePits(void)
         }
         st->setOpaque();
         reinterpret_cast<ssgSimpleState*>(st)->setShininess(50);
+        reinterpret_cast<ssgSimpleState*>(st)->disable(GL_BLEND);
 
 		// Pit wall texturing : the loaded 'logo*.rgb/.png' image file is supposed to consist
 		// of 4 distinct parts :
