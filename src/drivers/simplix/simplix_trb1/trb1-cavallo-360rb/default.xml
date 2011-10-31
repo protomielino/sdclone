@@ -154,7 +154,7 @@
     <attnum name="reserve" min="0" max="20000" val="2000"/>
     <attnum name="start fuel" min="-1" max="100" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="70"/>
-    <attnum name="lookaheadfactor" val="0.05"/>
+    <attnum name="lookaheadfactor" min="0.01" max="0.5" val="0.05"/>
     <attnum name="avoid width" min="0" max="3" val="0.5"/>
     <attnum name="drift factor" min="1" max="10" val="1.5"/>
     <attnum name="scale avoid" min="1" max="20" val="10"/>
