@@ -39,7 +39,7 @@
 
 // Uncomment to enable support for PNG logos for normal pit-building wall
 // (does not apply to the no-building pit, with the low wall, which already supports PNG).
-//#define PNG_LOGO_SUPPORT 1
+#define PNG_LOGO_SUPPORT 1
 
 // Some public global variables.
 int grWrldX;
@@ -278,9 +278,10 @@ void grCustomizePits(void)
 		// If no car in the pit, or logo file not found, hope for the .rgb in data/textures.
         if (!st) {
           snprintf(buf, sizeof(buf), "data/textures");
-		  const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
-		  st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, TRUE);
+          const std::string strRGBLogoFileName = strLogoFileName + ".rgb";
+          st = grSsgLoadTexStateEx(strRGBLogoFileName.c_str(), buf, FALSE, FALSE, TRUE);
         }
+        st->setOpaque();
         reinterpret_cast<ssgSimpleState*>(st)->setShininess(50);
 
 		// Pit wall texturing : the loaded 'logo*.rgb/.png' image file is supposed to consist
