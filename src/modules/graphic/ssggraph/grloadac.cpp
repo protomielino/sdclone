@@ -114,7 +114,8 @@ static int usestrip = FALSE;
 static int usegroup = FALSE;
 static int inGroup = FALSE;
 
-static int numTexMaps;
+static int numTexMaps;  // Number of active texture maps.
+static unsigned bfTexMaps; // 1 bit for each active texture map.
 
 static int indexCar;
 
@@ -228,6 +229,9 @@ static int search ( Tag *tags, char *s )
 
 static ssgState *get_simple_state ( _ssgMaterial *mat )
 {
+  // GfLogDebug("get_simple_state(%s) : Object '%s'\n",
+  // 			 (current_tfname ? current_tfname : "<nul>"), current_branch->getName());
+	
   cgrSimpleState *st = grStateFactory->getSimpleState();
 
   st->setMaterial ( GL_SPECULAR, mat->spec ) ;
@@ -289,12 +293,16 @@ static ssgState *get_simple_state ( _ssgMaterial *mat )
   return st ;
 }
 
-static cgrMultiTexState *get_multi_texture_state ( char * name)
+static cgrMultiTexState *get_multi_texture_state
+				          (char* name,
+						   cgrMultiTexState::tfnTexScheme fnTexScheme = cgrMultiTexState::modulate)
 {
+	// GfLogDebug("get_multi_texture_state(%s) : Object '%s'\n",
+	// 		   (name ? name : "<nul>"), current_branch->getName());
+	
 	if (!name)
 		return 0;
 
-	const cgrMultiTexState::tfnTexScheme fnTexScheme = 0; // Default "modulate" = "multiply" scheme.
 	cgrMultiTexState *st = grStateFactory->getMultiTexState(fnTexScheme);
 	
 	st->disable(GL_BLEND);
@@ -324,6 +332,12 @@ static cgrMultiTexState *get_multi_texture_state ( char * name)
 	return st ;
 }
 
+#define TEXMAP_BASE    (1<<0)
+#define TEXMAP_TILED   (1<<1)
+#define TEXMAP_SKIDS   (1<<2) // Actually the "raceline" layer.
+#define TEXMAP_SHADOWS (1<<3)
+#define TEXMAP_ALL     (TEXMAP_BASE | TEXMAP_TILED | TEXMAP_SKIDS | TEXMAP_SHADOWS)
+
 static void setup_vertex_table_states(cgrVtxTable* vtab)
 {
 	vtab->setState ( get_simple_state ( current_material ) ) ;
@@ -333,11 +347,11 @@ static void setup_vertex_table_states(cgrVtxTable* vtab)
 	// TODO: Move this car-specific multi-texture states setup here, for consistency ?
 	if (!isacar && !isawheel)
 	{
-		if (numTexMaps > 1)
+		if (bfTexMaps & TEXMAP_TILED)
 			vtab->setMultiTexState (0, get_multi_texture_state (current_ttiled ));
-		if (numTexMaps > 2)
+		if (bfTexMaps & TEXMAP_SKIDS)
 			vtab->setMultiTexState (1, get_multi_texture_state (current_tskids ));
-		if (numTexMaps > 3)
+		if (bfTexMaps & TEXMAP_SHADOWS)
 			vtab->setMultiTexState (2, get_multi_texture_state (current_tshad ));
 	}
 }
@@ -564,14 +578,15 @@ static int do_texture  ( char *s )
 {
   char *p ;
 
-  if ( s == 0 || s[0] == '\0' )
+  if ( s == 0 || s[0] == '\0')
     current_tfname = 0 ;
   else
   {
     if ((p=strstr(s," base")))
     {
       *p='\0';
-      numTexMaps=1;
+      numTexMaps = 1;
+	  bfTexMaps = TEXMAP_BASE;
       delete [] current_tbase ;
       delete [] current_tfname ;
       delete [] current_ttiled ;
@@ -606,9 +621,10 @@ static int do_texture  ( char *s )
       current_tskids = 0;
       delete [] current_tshad ;
       current_tshad = 0;
-      if (!strstr(s,NOTEXTURE))
+      if (!strstr(s,NOTEXTURE) && numTexMaps < grMaxTextureUnits)
       {
         numTexMaps++;;
+		bfTexMaps |= TEXMAP_TILED;
         skip_quotes ( &s ) ;
         if (current_options->textureMapping())
         {
@@ -630,9 +646,10 @@ static int do_texture  ( char *s )
       current_tskids = 0;
       delete [] current_tshad ;
       current_tshad = 0;
-      if (!strstr(s,NOTEXTURE))
+      if (!strstr(s,NOTEXTURE) && numTexMaps < grMaxTextureUnits)
       {
         numTexMaps++;;
+		bfTexMaps |= TEXMAP_SKIDS;
         skip_quotes ( &s ) ;
         if (current_options->textureMapping())
         {
@@ -652,9 +669,10 @@ static int do_texture  ( char *s )
       *p='\0';
       delete [] current_tshad ;
       current_tshad = 0;
-      if (!strstr(s,NOTEXTURE))
+      if (!strstr(s,NOTEXTURE) && numTexMaps < grMaxTextureUnits)
       {
         numTexMaps++;;
+		bfTexMaps |= TEXMAP_SHADOWS;
         skip_quotes ( &s ) ;
         if (current_options->textureMapping())
         {
@@ -672,7 +690,8 @@ static int do_texture  ( char *s )
     else
     {
       skip_quotes ( &s ) ;
-      numTexMaps=1;
+      numTexMaps = 1;
+	  bfTexMaps = TEXMAP_BASE;
       delete [] current_tfname ;
       delete [] current_tbase ;
       current_tbase = 0;
@@ -872,24 +891,26 @@ static int do_refs( char *s )
 		return PARSE_POP ;
 	}
 
-	//GfLogDebug("do_refs(nm=%d) : ...\n", numTexMaps);
+	// GfLogDebug("do_refs(nm=%d, m=0x%X) : ...\n", numTexMaps, bfTexMaps);
 
-	// Force numTexMaps for cars (texture states not read from the .ac/.acc).
+	// Force bfTexMaps for cars (texture states not read from the .ac/.acc).
 	if (isacar) {
-		numTexMaps = 4;
+		numTexMaps = 1;
+		bfTexMaps = TEXMAP_BASE;
+		for (int nTUIndex = 1; nTUIndex < MIN(grMaxTextureUnits, 4); nTUIndex++) {
+			numTexMaps++;
+			bfTexMaps |= (1<<nTUIndex);
+		}
 	} else if (isawheel) {
 		numTexMaps = 1;
+		bfTexMaps = TEXMAP_BASE;
 	}
-		
-	// Check the number of texture units
-	if (numTexMaps > grMaxTextureUnits)
-	 	numTexMaps = grMaxTextureUnits;
-
+	
 	ssgVertexArray *vlist = new ssgVertexArray(nrefs);
 	ssgTexCoordArray *tlist = new ssgTexCoordArray (nrefs);
-	ssgTexCoordArray *tlist1 = (numTexMaps > 1) ? new ssgTexCoordArray(nrefs) : 0;
-	ssgTexCoordArray *tlist2 = (numTexMaps > 2) ? new ssgTexCoordArray(nrefs) : 0;
-	ssgTexCoordArray *tlist3 = (numTexMaps > 3) ? new ssgTexCoordArray(nrefs) : 0;
+	ssgTexCoordArray *tlist1 = (bfTexMaps & (1<<1)) ? new ssgTexCoordArray(nrefs) : 0;
+	ssgTexCoordArray *tlist2 = (bfTexMaps & (1<<2)) ? new ssgTexCoordArray(nrefs) : 0;
+	ssgTexCoordArray *tlist3 = (bfTexMaps & (1<<3)) ? new ssgTexCoordArray(nrefs) : 0;
 	ssgNormalArray *nrm = new ssgNormalArray(nrefs);
 
 	for (int i = 0; i < nrefs; i++)
@@ -1016,6 +1037,9 @@ static int do_refs( char *s )
 		else
 			delete vtab;
 	}
+
+	// TODO: Simply avoid setting up vlist, tlist*, nrm ... if we delete them now ?
+	//       Through detecting usestrip condition earlier in this function ?
 	else
 	{
 		/* memorize the stripe index */
@@ -1051,23 +1075,25 @@ static int do_kids ( char *s )
 		ssgVertexArray *vlist = new ssgVertexArray(totalnv);
 		ssgNormalArray *nrm = new ssgNormalArray(totalnv);
 
-		// Force numTexMaps for cars (texture states not read from the .ac/.acc).
+		// Force bfTexMaps for cars (texture states not read from the .ac/.acc).
 		if (isacar) {
-			numTexMaps = 4;
+			numTexMaps = 1;
+			bfTexMaps = TEXMAP_BASE;
+			for (int nTUIndex = 1; nTUIndex < MIN(grMaxTextureUnits, 4); nTUIndex++) {
+				numTexMaps++;
+				bfTexMaps |= (1<<nTUIndex);
+			}
 		} else if (isawheel) {
 			numTexMaps = 1;
+			bfTexMaps = TEXMAP_BASE;
 		}
 		
-		// Check the number of texture units
-		if (numTexMaps > grMaxTextureUnits)
-			numTexMaps = grMaxTextureUnits;
-
-		//GfLogDebug("do_kids(nm=%d) : ...\n", numTexMaps);
+		// GfLogDebug("do_kids(nm=%d, m=0x%X) : ...\n", numTexMaps, bfTexMaps);
 
 		ssgTexCoordArray *tlist0 = new ssgTexCoordArray(totalnv);
-		ssgTexCoordArray *tlist1 = (numTexMaps > 1) ? new ssgTexCoordArray(totalnv) : 0;
-		ssgTexCoordArray *tlist2 = (numTexMaps > 2) ? new ssgTexCoordArray(totalnv) : 0;
-		ssgTexCoordArray *tlist3 = (numTexMaps > 3) ? new ssgTexCoordArray(totalnv) : 0;
+		ssgTexCoordArray *tlist1 = (bfTexMaps & (1<<1)) ? new ssgTexCoordArray(totalnv) : 0;
+		ssgTexCoordArray *tlist2 = (bfTexMaps & (1<<2)) ? new ssgTexCoordArray(totalnv) : 0;
+		ssgTexCoordArray *tlist3 = (bfTexMaps & (1<<3)) ? new ssgTexCoordArray(totalnv) : 0;
 
 		// TODO: Check if no other faster method (preventing the loop)
       	for (int i = 0; i < totalnv; i++)
@@ -1110,6 +1136,7 @@ static int do_kids ( char *s )
 	}
 
 	numTexMaps = 1;
+	bfTexMaps = TEXMAP_BASE;
 	
 	return PARSE_POP ;
 }

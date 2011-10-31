@@ -45,7 +45,8 @@ class cgrStateFactory
 	
 	cgrSimpleState* getSimpleState();
 	
-	cgrMultiTexState* getMultiTexState(cgrMultiTexState::tfnTexScheme fnTexScheme = 0);
+	cgrMultiTexState* getMultiTexState(cgrMultiTexState::tfnTexScheme fnTexScheme
+									   = cgrMultiTexState::modulate);
 };
 
 extern cgrStateFactory* grStateFactory;

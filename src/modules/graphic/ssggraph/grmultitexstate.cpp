@@ -25,22 +25,24 @@
 extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB ;
 #endif
 
-#include "grmultitexstate.h"
+#include <tgf.h>
 
-// Question: What for ?
-#ifdef DMALLOC
-#include "dmalloc.h"
-#endif
+#include "grmultitexstate.h"
 
 
 cgrMultiTexState::cgrMultiTexState(tfnTexScheme fnTexScheme)
 : _fnTexScheme(fnTexScheme)
 {
+	if (!_fnTexScheme)
+		GfLogError("cgrMultiTexState MUST be provided a texturing scheme function\n");
 }
 	
 void cgrMultiTexState::setTexScheme(tfnTexScheme fnTexScheme)
 {
 	_fnTexScheme = fnTexScheme;
+	
+	if (!_fnTexScheme)
+		GfLogError("cgrMultiTexState MUST be provided a texturing scheme function\n");
 }
 
 // Apply the texture state to the given texture unit GL_TEXTURE<nUnit>_ARB
@@ -49,8 +51,7 @@ void cgrMultiTexState::apply(GLint nUnit)
 	glActiveTextureARB(nUnit);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
-	if (_fnTexScheme)
-		_fnTexScheme();
+	_fnTexScheme(); // There MUST be a texturing scheme function, so no need to check.
 }
 
 // Standard "multiply" scheme.
@@ -60,7 +61,7 @@ void cgrMultiTexState::modulate()
 }
 
 // Name is self-explanatory.
-// =>Possible saturation
+// => Possible saturation
 void cgrMultiTexState::addColorModulateAlpha()
 {
 	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
@@ -78,6 +79,20 @@ void cgrMultiTexState::addColorModulateAlpha()
 	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE1_ALPHA, GL_TEXTURE);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND0_ALPHA, GL_SRC_ALPHA);
 	glTexEnvi(GL_TEXTURE_ENV, GL_OPERAND1_ALPHA, GL_SRC_ALPHA);
+}
+
+// "ignore" scheme : the source texture is ignored, the output is equal to the previous texture.
+void cgrMultiTexState::ignore()
+{
+	glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_COMBINE);
+	
+	// Replace Color.
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_RGB, GL_REPLACE);
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_RGB, GL_PREVIOUS);
+
+	// Replace Alpha.
+	glTexEnvi(GL_TEXTURE_ENV, GL_COMBINE_ALPHA, GL_REPLACE); 
+	glTexEnvi(GL_TEXTURE_ENV, GL_SOURCE0_ALPHA, GL_PREVIOUS);
 }
 
 // Interpolate between PREV and TEX, using TEX color as interpolation coef.
@@ -216,105 +231,4 @@ void cgrMultiTexState::blend()
 	static const float aColor[4] = { 1.0, 1.0, 1.0, 1.0 };
 	glTexEnvfv(GL_TEXTURE_ENV, GL_TEXTURE_ENV_COLOR, aColor);
 }
-			
-// Archives (TODO: remove) =========================================================
-#if 0
-
-// Tool for debugging the car texturing mode (see grmultitexstate.cpp)
-const int grCarTexturingModes = 6;
-int grCarTexturingTrackEnvMode = 0;
-int grCarTexturingSkyShadowsMode = 5;
-int grCarTexturingTrackShadowsMode = 0;
-
-static void applyAltTexEnv(int nModeNum)
-{
-	switch (nModeNum)
-	{
-		case 0:
-			cgrMultiTexState::schemeModulate();
-			break;
-
-		case 1:
-			cgrMultiTexState::interpolate();
-			break;
-			
-		case 2:
-			cgrMultiTexState::interpolateConst();
-			break;
-		
-		case 3:
-			cgrMultiTexState::interpolateReverted();
-			break;
-			
-		case 4:
-			cgrMultiTexState::duplicate();
-			break;
-			
-		case 5:
-			
-			cgrMultiTexState::schemeAddColorModulateAlpha();
-			break;
-			
-		default:
-			
-			GfLogError("Unsupported car multi-texturing mode %d\n", nModeNum);
-			
-			break;
-	}
-}
-
-
-// Apply the state to the given texture unit GL_TEXTURE<unit>_ARB
-// (use alternate texture env. mode if bAltEnv)
-void cgrMultiTexState::apply(int unit, bool bAltEnv)
-{
-	switch(unit)
-	{
-		// Tracks & cars : "base" texture from .ac/.acc
-		case 0:
-			glActiveTextureARB(GL_TEXTURE0_ARB);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
-			break;
-
-		// Tracks : "tiled" texture from .ac/.acc
-		// Cars : horizontal reflexion = projection of track objects = grEnvState
-		case 1:
-			glActiveTextureARB(GL_TEXTURE1_ARB);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
-			if (bAltEnv && grCarTexturingTrackEnvMode)
-				applyAltTexEnv(grCarTexturingTrackEnvMode);
-			break;
-
-		// Tracks : "skids" texture from .ac/.acc
-		// Cars : vertical reflexion = projection of the clouds = grEnvShadowState
-		case 2:
-			glActiveTextureARB(GL_TEXTURE2_ARB);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
-			if (bAltEnv && grCarTexturingSkyShadowsMode)
-				applyAltTexEnv(grCarTexturingSkyShadowsMode);
-			break;
-
-		// Tracks : "shad" texture from .ac/.acc
-		// Cars : track objects shadows = vertical projection = grEnvShadowStateOnCars
-		case 3:
-			glActiveTextureARB(GL_TEXTURE3_ARB);
-			glEnable(GL_TEXTURE_2D);
-			glBindTexture(GL_TEXTURE_2D, ssgSimpleState::getTextureHandle());
-			if (bAltEnv && grCarTexturingTrackShadowsMode)
-				applyAltTexEnv(grCarTexturingTrackShadowsMode);
-			break;
-
-		// Should never be used
-		default:
-			GfLogWarning("cgrMultiTexState@%p::apply(unit=%d) : "
-						 "No support for this texture unit ; redirecting to current\n");
-			// glActiveTextureARB(GL_TEXTURE0_ARB);
-			glBindTexture(GL_TEXTURE_2D, getTextureHandle());
-			_ssgCurrentContext->getState()->setTexture(getTexture());  
-	}
-}
-#endif
 

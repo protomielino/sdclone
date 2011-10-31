@@ -29,20 +29,13 @@ class cgrMultiTexState : public cgrSimpleState
 	//! Texturing scheme function.
 	typedef void (*tfnTexScheme)(void);
 
-	//! Constructor (use only below static texturing scheme functions for fnTexScheme).
-	cgrMultiTexState(tfnTexScheme fnTexScheme = 0);
-	
-	//! Set texturing scheme (use only below static functions).
-	void setTexScheme(tfnTexScheme fnTexScheme);
-	
-	// Apply the texture state to the given texture unit GL_TEXTURE<nUnit>_ARB
-	virtual void apply(GLint nUnit);
-
 	//! Useful texturing schemes.
 	static void modulate(); // Multiply color and alpha.
 	static void addColorModulateAlpha(); // Self explanatory.
 	
-	//! Other texturing schemes (tries).
+	static void ignore(); // Simply propagate previous (ignore source) : useful for debugging.
+
+	//! Other possible texturing schemes (not used, might be one day ; not exhaustive).
 	static void interpolate(); // Interpolate using previous as coefficient.
 	static void interpolateConst(); // Interpolate using const RGBA as coefficient.
 	static void interpolateReverted(); // Same as interpolate, but prev/tex reverted
@@ -52,16 +45,21 @@ class cgrMultiTexState : public cgrSimpleState
 	static void add(); // Self explanatory.
 	static void blend(); // Self explanatory.
 
+ public:
+
+	//! Constructor (use only above-defined functions as fnTexScheme).
+	cgrMultiTexState(tfnTexScheme fnTexScheme = modulate);
+	
+	//! Set texturing scheme (use only above-defined functions).
+	void setTexScheme(tfnTexScheme fnTexScheme);
+	
+	// Apply the texture state to the given texture unit GL_TEXTURE<nUnit>_ARB
+	virtual void apply(GLint nUnit);
+
  protected:
 
 	//! Texturing scheme (among above static funtions).
 	tfnTexScheme _fnTexScheme;
 };
-
-// Car multi-texturing modes, for testing/debugging purpose (see grmain.cpp::initView()).
-// extern const int grCarTexturingModes;
-// extern int grCarTexturingTrackEnvMode; // Texturing unit 1.
-// extern int grCarTexturingSkyShadowsMode; // Texturing unit 2.
-// extern int grCarTexturingTrackShadowsMode; // Texturing unit 3.
 
 #endif // __GRMULTITEXSTATE
