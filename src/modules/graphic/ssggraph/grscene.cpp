@@ -334,7 +334,7 @@ void grCustomizePits(void)
 
         // First, bottom vertex of the triangle strip
 		{
-			sgVec2 tex = { -0.7, 0.33 };
+			sgVec2 tex = { -0.7, 42.0 / 128 };
 			sgVec3 vtx = { x2, y2, z2 };
 			pit_tex->add(tex);
 			pit_vtx->add(vtx);
@@ -355,7 +355,7 @@ void grCustomizePits(void)
 
         // Second, bottom vertex of the triangle strip
 		{
-			sgVec2 tex = { 1.3, 0.33 };
+			sgVec2 tex = { -0.7 + 2.0, 42.0 / 128 };
 			sgVec3 vtx = { x2, y2, z2 };
 			pit_tex->add(tex);
 			pit_vtx->add(vtx);
@@ -363,7 +363,7 @@ void grCustomizePits(void)
 
         // Second, top vertex of the triangle strip
  		{
-			sgVec2 tex = { 1.3, 1.1 };
+			sgVec2 tex = { -0.7 + 2.0, 1.1 };
 			sgVec3 vtx = { x2, y2, z2 + 4.8 };
 			pit_tex->add(tex);
 			pit_vtx->add(vtx);
