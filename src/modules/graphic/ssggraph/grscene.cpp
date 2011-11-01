@@ -39,7 +39,7 @@
 
 // Uncomment to enable support for PNG logos for normal pit-building wall
 // (does not apply to the no-building pit, with the low wall, which already supports PNG).
-#define PNG_LOGO_SUPPORT 1
+//#define PNG_LOGO_SUPPORT 1
 
 // Some public global variables.
 int grWrldX;
