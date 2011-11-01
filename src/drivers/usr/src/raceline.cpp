@@ -35,6 +35,9 @@
 static SRaceLine SRL[5] = { { 0 } };
 static int SRLinit = 0;
 
+static SSegment sseg[200] = { { 0 } };
+static int sseg_used = 0;
+
 ////////////////////////////////////////////////////////////////////////////
 // Parameters
 ////////////////////////////////////////////////////////////////////////////
@@ -176,6 +179,53 @@ LRaceLine::LRaceLine() :
  if (!SRLinit)
   memset(SRL, 0, sizeof(SRL));
  SRLinit = 1;
+}
+
+void LRaceLine::InitTrackSSegments( tTrackSeg *pseg )
+{
+ tTrackSeg *psegorig = pseg;
+
+ if (sseg_used > 0)
+  return;
+
+ do {
+  if (pseg->type == TR_STR)
+  {
+   if (sseg[sseg_used].count > 0)
+    sseg_used++;
+   pseg = pseg->next;
+   continue;
+  }
+
+  if (pseg->type != sseg[sseg_used].type)
+  {
+   sseg_used++;
+   sseg[sseg_used].type = pseg->type;
+  }
+
+  if (pseg->type == TR_RGT)
+   sseg[sseg_used].radius = (sseg[sseg_used].count ? MIN(sseg[sseg_used].radius, pseg->radiusr) : pseg->radiusr);
+  else
+   sseg[sseg_used].radius = (sseg[sseg_used].count ? MIN(sseg[sseg_used].radius, pseg->radiusl) : pseg->radiusl);
+  sseg[sseg_used].arc += pseg->arc;
+  if (!sseg[sseg_used].count)
+   sseg[sseg_used].start_index = pseg->id;
+  sseg[sseg_used].end_index = pseg->id;
+  sseg[sseg_used].count++;
+  pseg = pseg->next;
+ } while (pseg != psegorig);
+}
+
+SSegment *LRaceLine::getSSegment( int index )
+{
+ for (int i=0; i<sseg_used; i++)
+ {
+  if (sseg[i].start_index <= index &&
+      sseg[i].end_index >= index)
+   return &sseg[i];
+ }
+
+ return NULL;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -462,11 +512,14 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 
  int i = 0;
 
+ InitTrackSSegments( ptrack->seg );
+
  do
  {
   int Divisions = 1 + int(psegCurrent->length / DivLength);
   double Step = psegCurrent->length / Divisions;
   double lmargin = 0.0, rmargin = 0.0;
+  SSegment *psseg = getSSegment(psegCurrent->id);
 
   //if (rl == LINE_MID)
    SetSegmentInfo(psegCurrent, Distance + Step, i, Step, rl);
@@ -482,35 +535,48 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
     {
      if (psegside->style == TR_WALL || psegside->style == TR_FENCE)
      {
-      if (psegCurrent->type == TR_STR)
+      if (psegCurrent->type != TR_STR)
       {
-       margin = MAX(0.0, margin - 0.5);
-      }
-      else
-      {
-       if ((psegCurrent->type == TR_LFT && side == TR_SIDE_LFT) ||
-           (psegCurrent->type == TR_RGT && side == TR_SIDE_RGT))
-        margin = MAX(0.0, margin - 1.5);
+       if (psseg->radius < 200.0 &&
+           ((psegCurrent->type == TR_LFT && side == TR_SIDE_LFT) ||
+            (psegCurrent->type == TR_RGT && side == TR_SIDE_RGT)))
+       {
+        margin = MAX(0.0, margin - (((200.0 - psseg->radius) + 50) * psseg->arc*psseg->arc)/220);
+       }
        else
         margin = MAX(0.0, margin - 0.5);
       }
+
+      break;
      }
  
-     if (psegside->style == TR_WALL || psegside->style == TR_FENCE)
-      break;
-
      if (psegside->style == TR_PLAN && 
          (psegside->surface->kFriction < psegCurrent->surface->kFriction*0.8 ||
          (psegside->surface->kRoughness > MAX(0.02, psegCurrent->surface->kRoughness+0.05)) ||
          (psegside->surface->kRollRes > MAX(0.005, psegCurrent->surface->kRollRes+0.03))))
       break;
 
-      if (psegside->style == TR_CURB &&
-          (psegside->surface->kFriction >= psegCurrent->surface->kFriction * 0.9 &&
-           psegside->surface->kRoughness <= psegCurrent->surface->kRoughness + 0.05 &&
-           psegside->surface->kRollRes <= psegCurrent->surface->kRollRes * 0.03 &&
-           psegside->height <= psegside->width/10))
-       break;
+     if (psegside->style == TR_CURB)
+     {
+      if ((side == TR_SIDE_LFT && psegCurrent->type == TR_LFT) || 
+          (side == TR_SIDE_RGT && psegCurrent->type == TR_RGT)) 
+      {
+       // inner corner curb, must be more strict
+       if (psegside->surface->kFriction < psegCurrent->surface->kFriction * 1.0 ||
+           psegside->surface->kRoughness > psegCurrent->surface->kRoughness + 0.02 ||
+           psegside->surface->kRollRes > psegCurrent->surface->kRollRes + 0.02 ||
+           psegside->height > psegside->width/15)
+         break;
+      }
+      else
+      {
+       if (psegside->surface->kFriction < psegCurrent->surface->kFriction * 0.9 ||
+           psegside->surface->kRoughness > psegCurrent->surface->kRoughness + 0.05 ||
+           psegside->surface->kRollRes > psegCurrent->surface->kRollRes + 0.03 ||
+           psegside->height > psegside->width/10)
+         break;
+      }
+     }
  
      if (ptrack->pits.type != TR_PIT_NONE)
      {

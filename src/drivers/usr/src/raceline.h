@@ -61,6 +61,15 @@ typedef struct {
 } SRaceLine;
 
 typedef struct {
+ double radius;
+ double arc;
+ int start_index;
+ int end_index;
+ int count;
+ int type;
+} SSegment;
+
+typedef struct {
   tSituation *s;
   double rInverse;
   double mInverse;
@@ -277,6 +286,9 @@ class LRaceLine {
   double getAvoidSteer(double offset, LRaceLineData *data);
   void NoAvoidSteer() { lastNasteer = lastNksteer; }
   double calcAvoidSpeed( double offset, double rInv, double speed, double rlspeed );
+
+  void InitTrackSSegments( tTrackSeg *pseg );
+  SSegment *getSSegment( int index );
 
 
   // interpolation...
