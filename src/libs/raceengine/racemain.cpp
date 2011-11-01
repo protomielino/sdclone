@@ -184,6 +184,7 @@ RePreRace(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	int curRaceIdx;
+	int laps;
 
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 	
@@ -211,27 +212,30 @@ RePreRace(void)
 		return RM_SYNC | RM_NEXT_RACE | RM_NEXT_STEP;
 	}
 
-	dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, 0);
-	if (dist < 0.001) {
-		ReInfo->s->_totLaps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, 30);
-	} else {
-		ReInfo->s->_totLaps = ((int)(dist / ReInfo->track->length)) + 1;
-	}
-	ReInfo->s->_totTime = GfParmGetNum(params, raceName, RM_ATTR_SESSIONTIME, NULL, -60.0f);
 	ReInfo->s->_maxDammage = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DMG, NULL, 10000);
-	ReInfo->s->_extraLaps = ReInfo->s->_totLaps;
-
+	ReInfo->s->_extraLaps = 0;
+	ReInfo->s->_totLaps = 30; /* Make sure it is initialized */
+	ReInfo->s->_totTime = GfParmGetNum(params, raceName, RM_ATTR_SESSIONTIME, NULL, -60.0f);
 	if (ReInfo->s->_totTime > 0.0f && ( ReInfo->s->_features & RM_FEATURE_TIMEDSESSION ) == 0 )
 	{
 		/* Timed session not supported: add 2 km for every minute */
-		ReInfo->s->_totLaps += (int)floor(ReInfo->s->_totTime * 2000.0f / ReInfo->track->length + 0.5f);
+		ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 2000.0f / ReInfo->track->length + 0.5f);
 		ReInfo->s->_totTime = -60.0f;
 	}
-
 	if (ReInfo->s->_totTime <= 0.0f)
 	{
 		ReInfo->s->_totTime = -60.0f;	/* Make sure that if no time is set, the set is far below zero */
-		ReInfo->s->_extraLaps = 0;
+		dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, 0.0);
+		if (dist >= 0.001) {
+			ReInfo->s->_totLaps = ((int)(dist / ReInfo->track->length)) + 1;
+		}
+		laps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, (tdble)ReInfo->s->_totLaps);
+		if (laps > 0 ) {
+			ReInfo->s->_totLaps = laps;
+		}
+	}
+	else {
+		ReInfo->s->_totLaps = 0;
 	}
 
 	raceType = GfParmGetStr(params, raceName, RM_ATTR_TYPE, RM_VAL_RACE);

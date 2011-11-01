@@ -384,15 +384,17 @@ RmRaceParamsMenu(void *vrp)
 			rmrpDuration = 0; // Default value.
 		else
 			rmrpDuration = pRaceSessionParams->nDuration;
-		if (rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION))
-			rmrpDistance += rmrpDuration / 30;
+		if (rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION) && rmrpDistance == 0)
+			rmrpDistance = rmrpDuration / 30;
 
 		if (pRaceSessionParams->nLaps < 0)
 			rmrpLaps = 0; // Default value.
-		else
+		else {
 			rmrpLaps = pRaceSessionParams->nLaps;
-		if (rmrpDistance == 0 && rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION))
-			rmrpLaps += (int)floor((tdble)rmrpDuration / 1.5f + 0.5f);
+			if (rmrpLaps > 0) rmrpDistance = 0;
+		}
+		if (rmrpDistance == 0 && rmrpLaps == 0 && rmrpDuration == 0)
+			rmrpLaps = 1;
 
 		// Create Race distance label.
 		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "distancelabel");
