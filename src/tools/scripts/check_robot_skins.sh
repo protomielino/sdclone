@@ -28,3 +28,7 @@ python check_robot_skins.py -d $drivers/simplix/simplix_trb1 -c $cars $versionin
 
 # Kilo2008
 python check_robot_skins.py -d $drivers/kilo2008/ -c $cars $versioning kilo2008.xml
+
+
+# Check the car models themselves
+python check_car_skins.py -c $cars $versioning

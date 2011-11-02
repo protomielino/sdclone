@@ -115,7 +115,7 @@ for item in list(p):
 
 			if (alternate_ver != None):
 				(preview,ext) = os.path.splitext(alternate)
-				preview_ver = check_version(".".join([preview, "jpg"]))
+				preview_ver = check_version("-".join([preview, "preview.jpg"]))
 
 				
 				print "Alternate:", os.path.basename(alternate)
