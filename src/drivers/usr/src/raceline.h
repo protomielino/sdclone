@@ -233,6 +233,7 @@ class LRaceLine {
   LRLMod *tAccelExit;
   LRLMod *tSkidCorrection;
   LRLMod *tBumpCaution;
+  LRLMod *tBrakeCurve;
   LRaceLineData *data;
 
   int fDirt;

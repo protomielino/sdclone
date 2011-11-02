@@ -158,6 +158,7 @@ class Driver {
 		float OversteerASR;
 		float BrakeMu;
 		float YawRateAccel;
+		int AccelMod;
 		unsigned int random_seed;
 		int DebugMsg;
 		int racetype;

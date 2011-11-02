@@ -75,6 +75,7 @@ Driver::Driver(int index, const int robot_type) :
     OversteerASR(0.7f),
     BrakeMu(1.0f),
     YawRateAccel(0.0f),
+    AccelMod(0),
     random_seed(0),
     DebugMsg(0),
     racetype(0),
@@ -574,6 +575,7 @@ void Driver::newRace(tCarElt* car, tSituation *s)
   OversteerASR = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_OVERSTEER_ASR, NULL, 0.4f);
   BrakeMu = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_BRAKE_MU, NULL, 1.0f);
   YawRateAccel = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_YAW_RATE_ACCEL, NULL, 0.0f);
+  AccelMod = (int) GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_ACCEL_MOD, NULL, 0.0f);
   fuelperlap = GfParmGetNum(car->_carHandle, SECT_PRIVATE, PRV_FUEL_PER_LAP, NULL, 5.0f);
   CARMASS = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_MASS, NULL, 1000.0f);
   maxfuel = GfParmGetNum(car->_carHandle, SECT_CAR, PRM_TANK, NULL, 100.0f);
@@ -838,10 +840,15 @@ void Driver::calcSpeed()
 
   if (x > 0)
   {
-    if (accelcmd < 100.0f)
-      accelcmd = MIN(accelcmd, (float) x * 1.5f);
+    if (AccelMod == 0 || !rldata->exiting)
+    {
+      if (accelcmd < 100.0f)
+        accelcmd = MIN(accelcmd, (float) x * 1.5f);
+      else
+        accelcmd = (float) x;
+    }
     else
-      accelcmd = (float) x;
+      accelcmd = 1.0f;
     accelcmd = (float)MAX(accelcmd, MinAccel);
   }
   else
@@ -954,8 +961,8 @@ void Driver::drive(tSituation *s)
   if (DebugMsg & debug_steer)
   {
     double skid = (car->_skid[0]+car->_skid[1]+car->_skid[2]+car->_skid[3])/2;
-    fprintf(stderr,"%d%c%c%c s%.2f k%.2f ss%.2f cl%.3f g%d->%d brk%.3f acc%.2f dec%.2f coll%.1f",mode,((mode==mode_avoiding)?'A':' '),(avoidmode==avoidleft?'L':(avoidmode==avoidright?'R':' ')),(mode==mode_correcting?'c':' '),car->_steerCmd,rldata->ksteer,stucksteer,correctlimit,car->_gear,car->_gearCmd,car->_brakeCmd,car->_accelCmd,rldata->decel,collision);
-    fprintf(stderr," spd%.1f|k%.1f|a%.1f/%.1f|t%.1f angle=%.2f/%.2f/%.2f yr=%.2f skid=%.2f acxy=%.2f/%.2f inv%.3f/%.3f slip=%.3f/%.3f %.3f/%.3f\n",(double)currentspeed,(double)rldata->speed,(double)rldata->avspeed,(double)rldata->slowavspeed,(double)getTrueSpeed(),angle,speedangle,rldata->rlangle,car->_yaw_rate,skid,car->_accel_x,car->_accel_y,nextCRinverse,rldata->mInverse,car->_wheelSpinVel(FRNT_RGT)*car->_wheelRadius(FRNT_RGT)-car->_speed_x,car->_wheelSpinVel(FRNT_LFT)*car->_wheelRadius(FRNT_LFT)-car->_speed_x,car->_wheelSpinVel(REAR_RGT)*car->_wheelRadius(REAR_RGT)-car->_speed_x,car->_wheelSpinVel(REAR_LFT)*car->_wheelRadius(REAR_LFT)-car->_speed_x);fflush(stderr);
+    fprintf(stderr,"%d%c%c%c s%.2f k%.2f ss%.2f cl%.3f g%d->%d brk%.3f acc%.2f dec%.2f coll%.1f %c",mode,((mode==mode_avoiding)?'A':' '),(avoidmode==avoidleft?'L':(avoidmode==avoidright?'R':' ')),(mode==mode_correcting?'c':' '),car->_steerCmd,rldata->ksteer,stucksteer,correctlimit,car->_gear,car->_gearCmd,car->_brakeCmd,car->_accelCmd,rldata->decel,collision,(rldata->closing?'c':'e'));
+    fprintf(stderr," spd%.1f|k%.1f|a%.1f|t%.1f angle=%.2f/%.2f/%.2f yr=%.2f skid=%.2f acxy=%.2f/%.2f inv%.3f/%.3f slip=%.3f/%.3f %.3f/%.3f\n",(double)currentspeed,(double)rldata->speed,(double)rldata->avspeed,(double)getTrueSpeed(),angle,speedangle,rldata->rlangle,car->_yaw_rate,skid,car->_accel_x,car->_accel_y,nextCRinverse,rldata->mInverse,car->_wheelSpinVel(FRNT_RGT)*car->_wheelRadius(FRNT_RGT)-car->_speed_x,car->_wheelSpinVel(FRNT_LFT)*car->_wheelRadius(FRNT_LFT)-car->_speed_x,car->_wheelSpinVel(REAR_RGT)*car->_wheelRadius(REAR_RGT)-car->_speed_x,car->_wheelSpinVel(REAR_LFT)*car->_wheelRadius(REAR_LFT)-car->_speed_x);fflush(stderr);
   }
 
   laststeer = car->_steerCmd;

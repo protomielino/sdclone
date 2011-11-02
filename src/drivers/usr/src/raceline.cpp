@@ -167,6 +167,7 @@ LRaceLine::LRaceLine() :
    tAccelExit(NULL),
    tSkidCorrection(NULL),
    tBumpCaution(NULL),
+   tBrakeCurve(NULL),
    fDirt(0),
    Next(0),
    This(0),
@@ -282,6 +283,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  tAccelExit = (LRLMod *) malloc( sizeof(LRLMod) );
  tSkidCorrection = (LRLMod *) malloc( sizeof(LRLMod) );
  tBumpCaution = (LRLMod *) malloc( sizeof(LRLMod) );
+ tBrakeCurve = (LRLMod *) malloc( sizeof(LRLMod) );
 
  memset(tSpeed[0], 0, (Divs+1) * sizeof(double));
  memset(tSpeed[1], 0, (Divs+1) * sizeof(double));
@@ -311,6 +313,7 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  memset(tAccelExit, 0, sizeof(LRLMod));
  memset(tSkidCorrection, 0, sizeof(LRLMod));
  memset(tBumpCaution, 0, sizeof(LRLMod));
+ memset(tBrakeCurve, 0, sizeof(LRLMod));
 
  CurveFactor = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_CURVE_FACTOR, (char *)NULL, 0.12f );
  SecurityZ = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_SECURITY, (char *)NULL, 0.00f );
@@ -435,6 +438,11 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
   double skidcorrect = GfParmGetNum(carhandle, SECT_PRIVATE, str, (char *) NULL, -100.0);
   if (skidcorrect > -10.0)
    AddMod( tSkidCorrection, div, enddiv, skidcorrect, 0 );
+
+  sprintf(str, "%d %s", i, PRV_BRAKE_CURVE);
+  double brake_curve = GfParmGetNum(carhandle, SECT_PRIVATE, str, (char *) NULL, 0.0);
+  if (brake_curve > 0.01 || brake_curve < -0.01)
+   AddMod( tBrakeCurve, div, enddiv, brake_curve, 0 );
 
   sprintf(str, "%d %s", i, PRV_BUMP_CAUTION);
   double bumpcaution = GfParmGetNum(carhandle, SECT_PRIVATE, str, (char *) NULL, 0.0);
@@ -841,7 +849,9 @@ void LRaceLine::Smooth(int Step, int rl)
      double curvefactor = (tcf != 0.0 ? tcf : CurveFactor);
      //double tcd = GetModD( tAccelCurveDampen, next );
      double ca = AccelCurveDampen;//(tcd > 0.0 ? tcd : AccelCurveDampen);
-     double cb = BrakeCurveDampen;
+     double cb = GetModD( tBrakeCurve, next );
+     if (cb < 0.1) cb = BrakeCurveDampen;
+
      if (ac1 < ac2) // curve is increasing
      {
       ri0 += curvefactor * (ri1 - ri0 * cb);
@@ -1103,6 +1113,7 @@ void LRaceLine::ComputeSpeed(int rl)
    }
   }
 
+  /*
   if (((SRL[rl].tRInverse[i] < -0.001 && SRL[rl].tLane[i] < SRL[rl].tLane[previ]) ||
        (SRL[rl].tRInverse[i] > 0.001 && SRL[rl].tLane[i] > SRL[rl].tLane[previ])))
   {
@@ -1117,6 +1128,7 @@ void LRaceLine::ComputeSpeed(int rl)
     cornerspeed *= ExitBoostX;
    }
   }
+  */
 
   int nnext = (i + 5) % Divs;
   //int next = (i + 1) % Divs;
@@ -1414,6 +1426,7 @@ void LRaceLine::FreeTrack(bool freeall)
  if (tAccelExit) free(tAccelExit);
  if (tSkidCorrection) free(tSkidCorrection);
  if (tBumpCaution) free(tBumpCaution);
+ if (tBrakeCurve) free(tBrakeCurve);
 
  tSpeed = NULL;
  tLaneShift = NULL;
@@ -1421,7 +1434,7 @@ void LRaceLine::FreeTrack(bool freeall)
  tRLMarginRgt = tRLMarginLft = tOTCaution = tRLSpeed = tRLBrake = tIntMargin = NULL;
  tExtMargin = tSecurity = tDecel = tADecel = tSpeedLimit =tCornerAccel = tAccelCurveDampen = NULL;
  tCurveFactor = tAvoidSpeed = tAvoidSpeedX = tAvoidBrake = tAvoidBrakeX = tAccelCurveOffset = tCarefulBrake = NULL;
- tSkidAccel = tAccelExit = tSkidCorrection = NULL;
+ tSkidAccel = tAccelExit = tSkidCorrection = tBrakeCurve = NULL;
 }
 
 
@@ -1877,6 +1890,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
       tSpeed[LINE_RL][nnext] >= tSpeed[LINE_RL][This])
   {
    data->exiting = 1;
+
+   TargetSpeed = data->speed = data->speed * ExitBoostX;
 
    if ((SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toLeft <= SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width + 1.0) ||
        (SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toLeft >= SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width - 1.0))
