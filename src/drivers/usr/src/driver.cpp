@@ -2172,7 +2172,8 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
     return false;
   }
 
-  if (speed > ospeed + 2*overtakecaution + fabs(rInv) * 500 &&   // our speed quicker than opponent
+  if ((speed > ospeed + 2*overtakecaution + fabs(rInv) * 500 ||  // our speed quicker than opponent
+       distance < 4.0 - (fabs(rInv) * 40)) &&                  // really close on a straight
       oAspeed > ospeed &&                                        // avoid speed quicker than opponent
       (o->getTimeImpact() * (1.0+overtakecaution) < timeLimit || // approaching opponent quickly
        distance < MAX(3.0, speed/5)))                            // close behind opponent
