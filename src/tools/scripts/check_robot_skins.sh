@@ -4,7 +4,7 @@
 # Uncommet for SVN version checking
 #versioning="-s"
 # of for Git-svn version checking
-versioning="-g"
+#versioning="-g"
 
 drivers="`pwd`/../../drivers/"
 cars="`pwd`/../../../data/cars/models/"

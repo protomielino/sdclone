@@ -87,7 +87,7 @@ for item in list(p):
 	standard_ver = check_version(standard)
 
 	if standard_ver:
-		preview = ".".join([os.sep.join([options.dir, number, car]), "jpg"])
+		preview = "-".join([os.sep.join([options.dir, number, car]), "preview.jpg"])
 		preview_ver = check_version(preview)
 
 		if (model_ver > standard_ver):
