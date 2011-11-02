@@ -64,6 +64,8 @@
 #define PRV_ACCEL_REDUX_X     "accel redux factor"
 #define PRV_BEGIN             "bgn"
 #define PRV_END               "end"
+#define PRV_OFFTRACK_ALLOWED  "offtrack allowed"
+#define PRV_OFFTRACK_RLIMIT   "rough limit"
 
 // driver values
 #define PRV_PIT_DAMAGE        "pit damage"

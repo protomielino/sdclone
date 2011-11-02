@@ -201,6 +201,9 @@ class LRaceLine {
   int Iterations;
   int SteerMod;
   int SRLidx;
+  int OfftrackAllowed;
+
+  double roughlimit;
 
   double **tSpeed;
   double *tLaneShift;

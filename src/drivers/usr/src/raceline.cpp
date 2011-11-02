@@ -139,6 +139,8 @@ LRaceLine::LRaceLine() :
    AccelCurveOffset(0),
    Iterations(100),
    SteerMod(0),
+   SRLidx(0),
+   OfftrackAllowed(1),
    tSpeed(NULL),
    tLaneShift(NULL),
    tRLMarginRgt(NULL),
@@ -333,6 +335,8 @@ void LRaceLine::AllocTrack( tTrack *ptrack )
  BrakeMod = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_MOD, (char *)NULL, 1.0f );
  BrakePower = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_BRAKE_POWER, (char *)NULL, 0.5f );
  SteerMod = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_STEER_MOD, (char *)NULL, 0.0f );
+ OfftrackAllowed = (int) GfParmGetNum( carhandle, SECT_PRIVATE, PRV_OFFTRACK_ALLOWED, (char *)NULL, 1.0f );
+ roughlimit = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_OFFTRACK_RLIMIT, (char *)NULL, 0.80f );
  MaxSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MAX_STEER_TIME, (char *)NULL, 1.5f );
  MinSteerTime = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_MIN_STEER_TIME, (char *)NULL, 1.0f );
  RaceLineDebug = GfParmGetNum( carhandle, SECT_PRIVATE, PRV_RACELINE_DEBUG, (char *)NULL, 0.0f ) ? true : false;
@@ -471,7 +475,7 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
   //if (rl == LINE_MID)
    SetSegmentInfo(psegCurrent, Distance + Step, i, Step, rl);
 
-  if (rl >= LINE_RL)
+  if (rl >= LINE_RL && OfftrackAllowed)
   {
    for (int side=0; side<2; side++)
    {
@@ -501,7 +505,7 @@ void LRaceLine::SplitTrack(tTrack *ptrack, int rl)
 
      if (psegside->style == TR_PLAN && 
          (psegside->surface->kFriction < psegCurrent->surface->kFriction*0.8 ||
-         (psegside->surface->kRoughness > MAX(0.02, psegCurrent->surface->kRoughness+0.05)) ||
+         (psegside->surface->kRoughness > MIN(roughlimit, MAX(0.02, psegCurrent->surface->kRoughness+0.05))) ||
          (psegside->surface->kRollRes > MAX(0.005, psegCurrent->surface->kRollRes+0.03))))
       break;
 
@@ -1791,7 +1795,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  }
 
  double ospeed = TargetSpeed, aspeed = ATargetSpeed;
- ATargetSpeed = (1 - c0) * tSpeed[LINE_MID][avnext] + c0 * tSpeed[LINE_MID][avindex];
+ ATargetSpeed = tSpeed[LINE_MID][avnext];//(1 - c0) * tSpeed[LINE_MID][avnext] + c0 * tSpeed[LINE_MID][avindex];
  data->avspeed = MAX(10.0, ATargetSpeed);
  if (!data->overtakecaution)
   data->avspeed = MAX(ATargetSpeed, tSpeed[LINE_MID][avnext]);
@@ -1817,8 +1821,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
  }
 
  data->speed = TargetSpeed;
- if (TargetSpeed > ospeed && ATargetSpeed < aspeed)
-  data->avspeed = ATargetSpeed = MAX(data->avspeed, aspeed * (TargetSpeed / ospeed));
+ //if (TargetSpeed > ospeed && ATargetSpeed < aspeed)
+ // data->avspeed = ATargetSpeed = MAX(data->avspeed, aspeed * (TargetSpeed / ospeed));
  data->avspeed = MAX(data->speed*0.6, MIN(data->speed+2.0, data->avspeed));
  
  double laneoffset = SRL[SRLidx].Width/2 - (SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width);
@@ -1860,19 +1864,6 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
 
  data->insideline = data->outsideline = 0;
- if ((SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toLeft <= SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width + 1.0) ||
-     (SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toLeft >= SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width - 1.0))
- {
-  // inside raceline
-  data->insideline = 1;
-  data->avspeed = MAX(data->avspeed, data->speed);
- }
- else if (tSpeed[LINE_RL][Next] >= tSpeed[LINE_RL][This] && 
-          ((SRL[SRLidx].tRInverse[Next] > 0.0 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[This] && car->_trkPos.toLeft > SRL[SRLidx].tLane[Next]*SRL[SRLidx].Width+1.0) ||
-           (SRL[SRLidx].tRInverse[Next] < 0.0 && SRL[SRLidx].tLane[Next] < SRL[SRLidx].tLane[This] && car->_trkPos.toLeft < SRL[SRLidx].tLane[Next]*SRL[SRLidx].Width-1.0)))
- {
-   data->outsideline = 1;
- }
 
  data->closing = data->exiting = 0;
  if ((SRL[SRLidx].tRInverse[Next] < -0.001 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[Index]) ||
@@ -1886,12 +1877,26 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
       tSpeed[LINE_RL][nnext] >= tSpeed[LINE_RL][This])
   {
    data->exiting = 1;
+
+   if ((SRL[SRLidx].tRInverse[Next] > 0.0 && car->_trkPos.toLeft <= SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width + 1.0) ||
+       (SRL[SRLidx].tRInverse[Next] < 0.0 && car->_trkPos.toLeft >= SRL[SRLidx].tLane[Next] * SRL[SRLidx].Width - 1.0))
+   {
+    // inside raceline
+    data->insideline = 1;
+    data->avspeed = MAX(data->avspeed, data->speed);
+   }
+   else if (tSpeed[LINE_RL][Next] >= tSpeed[LINE_RL][This] && 
+            ((SRL[SRLidx].tRInverse[Next] > 0.0 && SRL[SRLidx].tLane[Next] > SRL[SRLidx].tLane[This] && car->_trkPos.toLeft > SRL[SRLidx].tLane[Next]*SRL[SRLidx].Width+1.0) ||
+             (SRL[SRLidx].tRInverse[Next] < 0.0 && SRL[SRLidx].tLane[Next] < SRL[SRLidx].tLane[This] && car->_trkPos.toLeft < SRL[SRLidx].tLane[Next]*SRL[SRLidx].Width-1.0)))
+   {
+     data->outsideline = 1;
+   }
 #if 0
    double ae = GetModD( tAccelExit, This );
    if (ae > 0.0)
    {
-    data->speed += ae;
-    data->avspeed += MIN(ae, AvoidAccelExit);
+    data->speed *= ae;
+    data->avspeed *= MIN(ae, AvoidAccelExit);
    }
    else
    {
