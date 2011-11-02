@@ -95,8 +95,8 @@ static tCmdDispInfo CmdDispInfo[] = {
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // ASR_CMD,  
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // SPDLIM_CMD
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // LIGHT1_CMD
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID                  }, // GEAR_R,   
-    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID                  }, // GEAR_N,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // GEAR_R,   
+    { GEAR_MODE_AUTO | GEAR_MODE_SEQ | GEAR_MODE_GRID | GEAR_MODE_HBOX }, // GEAR_N,   
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ                                   }, // DN_SHFT,  
     { GEAR_MODE_AUTO | GEAR_MODE_SEQ                                   }, // UP_SHFT,  
     {                                  GEAR_MODE_GRID                  }, // GEAR_1,   

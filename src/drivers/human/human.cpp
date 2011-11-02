@@ -1340,6 +1340,26 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		/* Extended 'N' area when using clutch to allow 'jumping' gears */
 		if (ay0 < 0.33 && ay0 > -0.33 && ax0 > -0.5 && ax0 < 0.5 && HCtx[idx]->autoClutch == 0)
 			car->_gearCmd = 0;
+
+		/* Neutral gear command */
+		if ((cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_N].val])
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_N].val])
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_N].val)].edgeUp)
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_N].deadZone == 1))
+		{
+			car->_gearCmd = 0;
+		}
+
+		/* Reverse gear command */
+		if ((cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_R].val])
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_R].val])
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_R].val)].edgeUp)
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_R].deadZone == 1))
+		{
+			/* Only allow Reverse to be selected at low speed (~40kmph) or from neutral */
+			if (car->_speed_x < 10 || car->_gear == 0)
+				car->_gearCmd = -1;
+		}
 	}
 
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
