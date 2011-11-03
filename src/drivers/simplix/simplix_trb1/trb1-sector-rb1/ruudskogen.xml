@@ -2,8 +2,8 @@
 <!--
     file          : drivers/simplix_trb1/trb1-sector-rb1/ruudskogen
     created       : 02/21/11
-    last modified : 02/21/11
-    copyright     : (C) 2010 Wolf-Dieter Beelitz
+    last modified : 11/01/11
+    copyright     : (C) 2011 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
 -->
@@ -168,8 +168,8 @@
     <attnum name="scale bump outer" val="0.2775"/>
     <attnum name="scale brake" val="0.85"/>
     <attnum name="scale mu" val="0.93"/>
-    <attnum name="qualy brake" val="1.06"/>
-    <attnum name="qualy mu" val="0.97"/>
+    <attnum name="qualy brake" val="0.88"/>
+    <attnum name="qualy mu" val="0.95"/>
   </section>
 
 </params>

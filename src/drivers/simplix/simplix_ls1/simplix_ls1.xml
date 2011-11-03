@@ -87,7 +87,7 @@
 				<attnum name="green" val="0.6"></attnum>
 				<attnum name="blue" val="0.6"></attnum>
 			</section>
-
+<!--
 			<section name="6">
 				<attstr name="name" val="Emma Pergusa"></attstr>
 				<attstr name="desc" val="Borderline crazy and highly enthusiastic driver"></attstr>
@@ -111,7 +111,7 @@
 				<attnum name="green" val="0.5"></attnum>
 				<attnum name="blue" val="0.15"></attnum>
 			</section>
-
+-->
 			<section name="8">
 				<attstr name="name" val="Michael Brettmans"></attstr>
 				<attstr name="desc" val="Aggressive and relentless competitor"></attstr>

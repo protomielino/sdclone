@@ -168,8 +168,8 @@
     <attnum name="scale bump outer" val="0.0735"/>
     <attnum name="scale brake" val="0.85"/>
     <attnum name="scale mu" val="1.28"/>
-    <attnum name="qualy brake" val="1.02"/>
-    <attnum name="qualy mu" val="1.65"/>
+    <attnum name="qualy brake" val="0.92"/>
+    <attnum name="qualy mu" val="1.50"/>
   </section>
 
 </params>

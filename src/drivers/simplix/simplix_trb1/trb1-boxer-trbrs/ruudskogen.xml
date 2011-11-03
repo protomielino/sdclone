@@ -2,8 +2,8 @@
 <!--
     file          : drivers/simplix_trb1/trb1-boxer-trbrs/ruudskogen
     created       : 02/21/11
-    last modified : 02/21/11
-    copyright     : (C) 2010 Wolf-Dieter Beelitz
+    last modified : 11/01/11
+    copyright     : (C) 2011 Wolf-Dieter Beelitz
 
     SVN version   : $Id:$
 -->
@@ -154,7 +154,7 @@
     <attnum name="reserve" min="0" max="20000" val="2000"/>
     <attnum name="start fuel" min="-1" max="100" val="-1"/>
     <attnum name="fuelper100km" min="1" max="100" val="70"/>
-    <attnum name="lookaheadfactor" val="0.15"/>
+    <attnum name="lookaheadfactor" val="0.05"/>
     <attnum name="avoid width" min="0" max="3" val="0.5"/>
     <attnum name="drift factor" min="1" max="10" val="1.5"/>
     <attnum name="scale avoid" min="1" max="20" val="10"/>
@@ -168,8 +168,8 @@
     <attnum name="scale bump outer" val="0.5905"/>
     <attnum name="scale brake" val="0.90"/>
     <attnum name="scale mu" val="1.10"/>
-    <attnum name="qualy brake" val="0.98"/>
-    <attnum name="qualy mu" val="1.14"/>
+    <attnum name="qualy brake" val="0.90"/>
+    <attnum name="qualy mu" val="1.10"/>
   </section>
 
 </params>
