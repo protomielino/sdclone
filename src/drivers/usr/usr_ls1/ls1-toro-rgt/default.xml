@@ -62,8 +62,8 @@
 	</section>
 
 	<section name="Brake System">
-		<attnum name="front-rear brake repartition" min="0.3" max="0.7" val="0.60"/>
-		<attnum name="max pressure" unit="kPa" min="100" max="150000" val="34000"/>
+		<attnum name="front-rear brake repartition" min="0.3" max="0.7" val="0.55"/>
+		<attnum name="max pressure" unit="kPa" min="100" max="150000" val="30000"/>
 	</section>
 
 	<section name="Front Anti-Roll Bar">
@@ -156,8 +156,8 @@
 		<attnum name="base brake factor" min="0.0" max="50.0" val="1.00"/>
 		<attnum name="accel redux factor" min="-20" max="20" val="2.5"/>
 		<attnum name="base speed" min="0.0" max="50.0" val="15.30"/>
-		<attnum name="base brake" min="10.0" max="200.0" val="60.00"/>
-		<attnum name="brake mod" min="0.0" max="1.0" val="1.00"/>
+		<attnum name="base brake" min="10.0" max="200.0" val="48.00"/>
+		<attnum name="brake mod" min="0.0" max="1.0" val="0.30"/>
 		<attnum name="steer mod" min="0.0" max="1.0" val="1.00"/>
 		<attnum name="slope factor" min="0.0" max="1.0" val="0.15"/>
 		<attnum name="accel exit" min="0.0" max="10.0" val="1.40"/>
@@ -177,7 +177,7 @@
 		<attnum name="int margin" min="0" max="2" val="2.0"/>
 		<attnum name="ext margin" min="0" max="2" val="1.0"/>
 		<attnum name="no team waiting" min="0" max="2" val="1"/>
-		<attnum name="inc factor" min="0" max="5" val="0.75"/>
+		<attnum name="inc factor" min="0" max="5" val="1.05"/>
 		<attnum name="overtake caution" min="-20" max="20" val="0.2"/>
 		<attnum name="abs slip" min="0.5" max="4.5" val="4.0"/>
 		<attnum name="abs range" min="0.5" max="10.5" val="9.0"/>

@@ -77,7 +77,6 @@
 		<attnum name="base speed" min="0.0" max="50.0" val="16.60"/>
 		<attnum name="ext margin" min="0" max="2" val="0.5"/>
 		<attnum name="slope factor" min="0.0" max="1.0" val="0.30"/>
-		<attnum name="base brake" min="10.0" max="200.0" val="80.00"/>
 
 		<attnum name="3 bgn" val="10"/>
 		<attnum name="3 end" val="140"/>

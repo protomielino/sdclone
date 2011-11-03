@@ -1237,7 +1237,7 @@ void LRaceLine::ComputeSpeed(int rl)
 
  for (int i = Divs-1; --i >= 0;)
  {
-  int next = (i+1) % Divs;
+  int next = (i+1) % Divs, nnext = (i+2) % Divs, prev = ((i-1)+Divs) % Divs;
   double bd = brakedelay + GetModD( tRLBrake, i );
   if (rl == LINE_MID)
   {
@@ -1253,7 +1253,17 @@ void LRaceLine::ComputeSpeed(int rl)
   {
    double nspeed = tSpeed[rf][next];
 
-   if (BrakeMod > 0.5)
+   if (BrakeMod > 1.0)
+   {
+     double friction = SRL[rl].tBrakeFriction[i];
+
+     double dist = sqrt((SRL[rl].tx[next] - SRL[rl].tx[i]) * (SRL[rl].tx[next] - SRL[rl].tx[i]) +
+                 (SRL[rl].ty[next] - SRL[rl].ty[i]) * (SRL[rl].ty[next] - SRL[rl].ty[i]));
+
+     double slowrate = 15;//(15.0 - MIN(150.0, tSpeed[rf][next])/70.0)/2;
+     tSpeed[rf][i] = MIN(tSpeed[rf][i], tSpeed[rf][next] + (/*slowrate * friction * */ (dist) * bd)/1000);
+   }
+   else if (BrakeMod > 0.5)
    {
     tSpeed[rf][i] = MIN(tSpeed[rf][i],
       tSpeed[rf][next] + (BrakePower * MAX(0.2, (100.0 - tSpeed[rf][next])/50)) * 
@@ -1262,20 +1272,23 @@ void LRaceLine::ComputeSpeed(int rl)
    }
    else if (BrakeMod > 0.1)
    {
-    double bspd = MAX(0.0, (MIN(100.0, tSpeed[rf][next]) - 30.0)) / 80 + fabs(SRL[rl].tRInverse[next])*40;
+    double dist = sqrt((SRL[rl].tx[next] - SRL[rl].tx[i]) * (SRL[rl].tx[next] - SRL[rl].tx[i]) +
+                       (SRL[rl].ty[next] - SRL[rl].ty[i]) * (SRL[rl].ty[next] - SRL[rl].ty[i])) * 10;
+    double bspd = MAX(0.0, (MIN(140.0, tSpeed[rf][next]) - 30.0)) / 80 + fabs(SRL[rl].tRInverse[next])*40;
     tSpeed[rf][i] = MIN(tSpeed[rf][i], 
        nspeed + MAX(0.1, 
        ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*7)) 
         * SRL[rl].tBrakeFriction[i]
-        * MAX(bd/4.0, bd / ((nspeed*(nspeed/20))/20))) 
-        * (MAX(0.2, 1.0 - (nspeed > 30.0 ? bspd*(bspd+0.2)  : 0.0)) * BrakeMod)));
+        * MAX(bd/4.0, bd / ((nspeed*(nspeed/10))/20))) 
+        * (MAX(0.05, 1.0 - (nspeed > 30.0 ? bspd*(bspd+0.2)  : 0.0)) * BrakeMod)
+        * dist*0.75)/10);
    }
    else
    {
     tSpeed[rf][i] = MIN(tSpeed[rf][i], nspeed + MAX(0.1, 
                         ((0.1 - MIN(0.085, fabs(SRL[rl].tRInverse[next])*8)) 
                          * SRL[rl].tBrakeFriction[i]
-                         * MAX(bd/4.0, bd / ((nspeed*(nspeed/20))/20)))));
+                         * MAX(bd/10.0, bd / ((nspeed*(nspeed/4))/20)))));
    }
   }
  }

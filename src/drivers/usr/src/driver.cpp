@@ -2215,7 +2215,7 @@ float Driver::getOffset()
   //double incfactor = (MAX_INC_FACTOR*0.5 - MIN(incspeed/10, MAX_INC_FACTOR*0.5-0.5)) * 60 * IncFactor;
   //double incspeed = MIN(60.0, MAX(40.0, currentspeed)) - 10.0;
   //double incfactor = (MAX_INC_FACTOR - MIN(fabs(incspeed)/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * IncFactor;
-  double incfactor = (MAX_INC_FACTOR - MIN(40.0/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * IncFactor;
+  double incfactor = (MAX_INC_FACTOR - MIN(40.0/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * (IncFactor*2) * MAX(0.2, 1.0 - fabs(rldata->rInverse*60));
 
   //double rgtinc = incfactor * MIN(3.0, MAX(0.6, 1.0 + rldata->mInverse * (rldata->mInverse<0.0?-5:100)));
   //double lftinc = incfactor * MIN(3.0, MAX(0.6, 1.0 - rldata->mInverse * (rldata->mInverse>0.0?-5:100)));
@@ -2694,9 +2694,9 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
     {
       //double inc = OVERTAKE_OFFSET_INC * MIN(lftinc, rgtinc) * factor;
       if (myoffset < rldata->offset && myoffset < 2.0)
-        myoffset += (float) (MIN(rldata->offset-myoffset, OVERTAKE_OFFSET_INC * rgtinc/3 * factor));
+        myoffset += (float) (MIN(rldata->offset-myoffset, OVERTAKE_OFFSET_INC * rgtinc/5 * factor));
       else if (myoffset > rldata->offset && myoffset > 2.0)
-        myoffset -= (float) (MIN(myoffset-rldata->offset, OVERTAKE_OFFSET_INC * lftinc/3 * factor));
+        myoffset -= (float) (MIN(myoffset-rldata->offset, OVERTAKE_OFFSET_INC * lftinc/5 * factor));
     }
 
     maxoffset = MIN(moffset+OVERTAKE_OFFSET_INC*lftinc/2, Width/2 - (car->_dimension_y+SideMargin));

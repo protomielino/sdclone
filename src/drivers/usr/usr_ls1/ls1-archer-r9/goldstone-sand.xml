@@ -48,7 +48,7 @@
 	</section>
 
 	<section name="Front Anti-Roll Bar">
-		<attnum name="spring" unit="kN/m" min="0" max="50" val="10"/>
+		<attnum name="spring" unit="kN/m" min="0" max="50" val="8"/>
 	</section>
 
 	<section name="Rear Anti-Roll Bar">
@@ -62,6 +62,20 @@
 		<attnum name="ext margin" min="0" max="2" val="0.2"/>
 		<attnum name="accel curve" min="0" max="2" val="1.20"/>
 		<attnum name="accel curve limit" min="0" max="6" val="1.2"/>
+		<attnum name="base brake" min="10.0" max="200.0" val="55.00"/>
+		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>
+
+		<attnum name="0 bgn" val="890"/>
+		<attnum name="0 end" val="1170"/>
+		<attnum name="0 base brake" val="8"/>
+
+		<attnum name="1 bgn" val="2300"/>
+		<attnum name="1 end" val="2699"/>
+		<attnum name="1 base brake" val="10"/>
+
+		<attnum name="2 bgn" val="2700"/>
+		<attnum name="2 end" val="2770"/>
+		<attnum name="2 base speed" val="14"/>
 	</section>
 
 </params>
