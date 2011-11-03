@@ -1,5 +1,7 @@
 import os
 import glob
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 from optparse import OptionParser
 
 try:
@@ -16,8 +18,11 @@ except ImportError:
 
 parser = OptionParser()
 
-parser.set_defaults(cars=".", svn=None, git=None)
+parser.set_defaults(cars=".", config=None, run=None, svn=None, git=None)
 parser.add_option("-c",  "--cars", dest="cars", help="cars directory")
+parser.add_option("-C",  "--config", dest="config", help="path to 'speed-dreams-2' config directory")
+parser.add_option("-r",  "--run", dest="run", help="command to run SpeedDreams")
+
 if _has_pysvn:
 	parser.add_option("-s", "--svn", action="store_true", dest="svn", help="report svn version numbers")
 if _has_pygit:
@@ -48,7 +53,75 @@ def check_version(myfile):
         # Fall through when SVN/GIT not present
         return 1
 
+#---
 
+def get_screenshot(index, car, skin):
+	skin_done = False
+
+	if not options.config or not options.run:
+		return None
+
+	config_file = os.sep.join([options.config, "config/raceman/practice.xml"])
+
+	if not os.access(config_file, os.R_OK):
+		print "Can't find 'practice.xml' (", config_file, ","
+		return None
+
+	module = "human"
+
+	my_ele = ElementTree()
+	p = my_ele.parse(config_file)
+	q = p.findall("section")
+
+	for i in list(q):
+		if i.attrib["name"] == "Drivers" or i.attrib["name"] == "Drivers Start List":
+			for k in list(i):
+				if k.attrib["name"] == "focused module":
+					k.set("val", module)
+				if k.attrib["name"] == "focused idx":
+					k.set("val", index)
+
+			j = i.find("section")
+	
+			# modify attributes
+			for k in list(j):
+				if k.attrib["name"] == "idx":
+					k.set("val", index)
+				if k.attrib["name"] == "module":
+					k.set("val", module)
+				if k.attrib["name"] == "skin name":
+					skin_done = True
+					if skin:
+						k.set("val", skin)
+					else:
+						j.remove(k)
+
+			if not skin_done and skin:
+				# Need to add skin attribute
+				SubElement(j, "attstr", {'name':"skin name", 'val':skin})
+
+			'''
+			# dump attributes
+			for k in list(j):
+				print ":", k.attrib["name"], k.attrib["val"]
+			'''
+
+		if i.attrib["name"] == "Driver Info":
+			j = i.find("section/section/section")
+
+			for k in list(j):
+				if k.attrib["name"] == "car name":
+					k.set("val", car)
+
+	# Store the changes
+	my_ele.write(config_file)
+
+	# Run the game
+	os.system(options.run)
+
+	# return the filename of screen shot
+
+#---
 
 def check_dir(args, dirname, names):
 	car =  os.path.basename(dirname)
@@ -73,6 +146,7 @@ def check_dir(args, dirname, names):
 			# Checking for standard
 			standard = ".".join([os.sep.join([options.cars, car, car]), "png"])
 			standard_ver = check_version(standard)
+			screenshot = False
 
 			if standard_ver:
 				preview = "-".join([os.sep.join([options.cars, car, car]), "preview.jpg"])
@@ -85,10 +159,15 @@ def check_dir(args, dirname, names):
 
 				if (preview_ver == None):
 					print "Preview : Missing"
+					screenshot = True
 				elif (preview_ver < standard_ver):
 					print "Preview : Out of date"
+					screenshot = True
 				else:
 					print "Preview : OK"
+
+				if options.config and options.run and screenshot:
+					screenshot = get_screenshot("1", car, None)
 			else:
 				print "Standard: Missing"
 
@@ -98,22 +177,28 @@ def check_dir(args, dirname, names):
 			if (alternates != None):
 				for alternate in alternates:
 					alternate_ver=check_version(alternate)
+					screenshot = False
 
 					if (model_ver > alternate_ver):
 						print "Alternate:", os.path.basename(alternate), "ACC Model is newer"
 
 					if (alternate_ver != None):
-						(preview,ext) = os.path.splitext(alternate)
-						preview_ver = check_version("-".join([preview, "preview.jpg"]))
+						(filename,ext) = os.path.splitext(alternate)
+						preview = "-".join([filename, "preview.jpg"])
+						preview_ver = check_version(preview)
 
 						print "Alternate:", os.path.basename(alternate)
 						if (preview_ver == None):
 							print "Preview : Missing"
+							screenshot = True
 						elif (preview_ver < standard_ver):
 							print "Preview : Out of date"
+							screenshot = True
 						else:
 							print "Preview : OK"
 
+					if options.config and options.run and screenshot:
+						screenshot = get_screenshot("1", car, filename.rsplit("-",1)[1] )
 			print
 
 #---
