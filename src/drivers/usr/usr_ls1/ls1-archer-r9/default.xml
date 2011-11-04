@@ -185,7 +185,7 @@
 		<attnum name="side margin" min="0.0" max="4.0" val="1.0"/>
 		<attnum name="pit offset" min="-200.0" max="200.0" val="-50"/>
 		<attnum name="steer debug" min="-5" max="5" val="-1.0"/>
-		<attnum name="overtake debug" min="0" max="1" val="1"/>
+		<attnum name="overtake debug" min="0" max="1" val="0"/>
 		<attnum name="raceline debug" min="0" max="1" val="0"/>
 	</section>
 
