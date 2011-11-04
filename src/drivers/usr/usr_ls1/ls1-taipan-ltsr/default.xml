@@ -156,7 +156,7 @@
 		<attnum name="base speed factor" min="0.0" max="50.0" val="1.00"/>
 		<attnum name="base brake factor" min="0.0" max="50.0" val="1.00"/>
 		<attnum name="accel redux factor" min="-20" max="20" val="2.5"/>
-		<attnum name="base speed" min="0.0" max="50.0" val="15.00"/>
+		<attnum name="base speed" min="0.0" max="50.0" val="13.60"/>
 		<attnum name="base brake" min="0.0" max="200.0" val="48.00"/>
 		<attnum name="brake mod" min="0.0" max="2.0" val="0.30"/>
 		<attnum name="steer mod" min="0.0" max="1.0" val="1.00"/>
@@ -175,8 +175,8 @@
 		<attnum name="steer gain" min="0" max="3" val="1.2"/>
 		<attnum name="max steer time" min="0.5" max="10" val="2.0"/>
 		<attnum name="min steer time" min="0.5" max="10" val="1.77"/>
-		<attnum name="int margin" min="0" max="2" val="2.0"/>
-		<attnum name="ext margin" min="0" max="2" val="1.0"/>
+		<attnum name="int margin" min="0" max="4" val="2.0"/>
+		<attnum name="ext margin" min="0" max="4" val="1.0"/>
 		<attnum name="no team waiting" min="0" max="2" val="1"/>
 		<attnum name="inc factor" min="0" max="5" val="1.05"/>
 		<attnum name="overtake caution" min="-20" max="20" val="0.1"/>
