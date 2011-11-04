@@ -1,3 +1,4 @@
+
 import os
 import glob
 from xml.etree.ElementTree import ElementTree
@@ -16,12 +17,20 @@ try:
 except ImportError:
 	_has_pygit = False
 
+try:
+	import Image
+	_has_PIL = True
+except ImportError:
+	_has_PIL = False
+
 parser = OptionParser()
 
-parser.set_defaults(cars=".", config=None, run=None, svn=None, git=None)
+parser.set_defaults(cars=".", config=None, run=None, svn=None, git=None, proc=None, all=None)
 parser.add_option("-c",  "--cars", dest="cars", help="cars directory")
 parser.add_option("-C",  "--config", dest="config", help="path to 'speed-dreams-2' config directory")
 parser.add_option("-r",  "--run", dest="run", help="command to run SpeedDreams")
+parser.add_option("-p",  "--proc", dest="proc", help="command to process preview images")
+parser.add_option("-a",  "--all", action="store_true", dest="all", help="process all previews regardless")
 
 if _has_pysvn:
 	parser.add_option("-s", "--svn", action="store_true", dest="svn", help="report svn version numbers")
@@ -33,33 +42,40 @@ if _has_pygit:
 
 
 def check_version(myfile):
-        # Check myfile exists
-        if not os.access(myfile, os.R_OK):
-                return None
+	# Check myfile exists
+	if not os.access(myfile, os.R_OK):
+		return None
 
-        # Return SVN revision
-        if _has_pysvn and options.svn:
-                client = pysvn.Client()
-                entry = client.info(myfile)
-                return entry.commit_revision.number
+	# Return SVN revision
+	if _has_pysvn and options.svn:
+		client = pysvn.Client()
+		entry = client.info(myfile)
+		return entry.commit_revision.number
 
-        # Return GIT revision
-        if _has_pygit and options.git:
-                repo = Repo(myfile)
-                for line in repo.commits(path=myfile, max_count=1)[0].message.splitlines():
-                        if line.startswith("git-svn-id:"):
-                                return int(line.split("@", 1)[1].split(" ",1)[0])
+	# Return GIT revision
+	if _has_pygit and options.git:
+		repo = Repo(myfile)
+		commits = repo.commits(path=myfile, max_count=1)
+		if commits:
+			for line in commits[0].message.splitlines():
+				if line.startswith("git-svn-id:"):
+					return int(line.split("@", 1)[1].split(" ",1)[0])
+		else:
+			return -1
 
-        # Fall through when SVN/GIT not present
-        return 1
+	# Fall through when SVN/GIT not present
+	return 1
 
 #---
 
 def get_screenshot(index, car, skin):
-	skin_done = False
-
 	if not options.config or not options.run:
 		return None
+
+	if options.all:
+		skin_done = True
+	else:
+		skin_done = False
 
 	config_file = os.sep.join([options.config, "config/raceman/practice.xml"])
 
@@ -160,6 +176,8 @@ def check_dir(args, dirname, names):
 				if (preview_ver == None):
 					print "Preview : Missing"
 					screenshot = True
+				elif (preview_ver < 0):
+					print "Preview : Not in version control"
 				elif (preview_ver < standard_ver):
 					print "Preview : Out of date"
 					screenshot = True
@@ -168,6 +186,21 @@ def check_dir(args, dirname, names):
 
 				if options.config and options.run and screenshot:
 					screenshot = get_screenshot("1", car, None)
+
+					if options.proc:
+						# Call alternative script to process images
+						os.system(" ".join([options.run, preview]))
+					elif _has_PIL:
+						screenshot_files = os.listdir(os.sep.join([options.config,"screenshots"]))
+						if screenshot_files:
+							screenshot_file = screenshot_files[0]
+	
+							screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
+							scaled = screenshot.resize((800,500), Image.ANTIALIAS)
+							# scaled.MAXBLOCK=scaled.size[0]*scaled.size[1]
+
+							scaled.save(preview, quality=90, optimize=True, subsampling='4:4:4')
+							os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
 			else:
 				print "Standard: Missing"
 
@@ -191,6 +224,8 @@ def check_dir(args, dirname, names):
 						if (preview_ver == None):
 							print "Preview : Missing"
 							screenshot = True
+						elif (preview_ver < 0):
+							print "Preview : Not in version control"
 						elif (preview_ver < standard_ver):
 							print "Preview : Out of date"
 							screenshot = True
@@ -199,6 +234,21 @@ def check_dir(args, dirname, names):
 
 					if options.config and options.run and screenshot:
 						screenshot = get_screenshot("1", car, filename.rsplit("-",1)[1] )
+
+						if options.proc:
+							# Call alternative script to process images
+							os.system(" ".join([options.run, preview]))
+						elif _has_PIL:
+							screenshot_files = os.listdir(os.sep.join([options.config,"screenshots"]))
+							if screenshot_files:
+								screenshot_file = screenshot_files[0]
+
+								screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
+								scaled = screenshot.resize((800,500), Image.ANTIALIAS)
+								# scaled.MAXBLOCK=scaled.size[0]*scaled.size[1]
+
+								scaled.save(preview, quality=90, optimize=True, subsampling='4:4:4')
+								os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
 			print
 
 #---
