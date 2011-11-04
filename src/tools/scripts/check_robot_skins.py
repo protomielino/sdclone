@@ -62,7 +62,7 @@ def check_version(myfile):
 			for line in commits[0].message.splitlines():
 				if line.startswith("git-svn-id:"):
 					return int(line.split("@", 1)[1].split(" ",1)[0])
-		else;
+		else:
 			return -1
 
 	# Fall through when SVN/GIT not present
