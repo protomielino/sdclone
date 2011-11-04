@@ -46,7 +46,7 @@
 		<attnum name="steer gain" min="0" max="3" val="1.2"/>
 		<attnum name="max steer time" min="0.5" max="10" val="2.0"/>
 		<attnum name="min steer time" min="0.5" max="10" val="1.77"/>
-		<attnum name="int margin" min="0" max="2" val="2.0"/>
+		<attnum name="int margin" min="0" max="4" val="2.0"/>
 		<attnum name="ext margin" min="0" max="2" val="1.0"/>
 		<attnum name="no team waiting" min="0" max="2" val="1"/>
 		<attnum name="inc factor" min="0" max="5" val="1.05"/>
