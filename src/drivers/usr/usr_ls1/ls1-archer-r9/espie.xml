@@ -20,8 +20,9 @@
 	</section>
 
 	<section name="private">
-		<attnum name="base speed" val="16"/>
-		<attnum name="ext margin" min="0" max="2" val="0.3"/>
+		<attnum name="base speed factor" val="1.17"/>
+		<attnum name="base brake factor" val="1.26"/>
+		<attnum name="ext margin" min="0" max="2" val="0.7"/>
 	</section>
 
 </params>

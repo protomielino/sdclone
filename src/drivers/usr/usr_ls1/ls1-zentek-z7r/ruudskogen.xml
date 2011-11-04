@@ -27,7 +27,7 @@
 		<attnum name="int margin" min="0" max="2" val="1.0"/>
 		<attnum name="ext margin" min="0" max="2" val="0.4"/>
 		<attnum name="slope factor" val="0.40"/>
-		<attnum name="base speed" val="16.00"/>
+		<attnum name="base speed factor" val="1.10"/>
 
 		<attnum name="0 bgn" val="140"/>
 		<attnum name="0 end" val="190"/>

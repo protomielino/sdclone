@@ -33,7 +33,7 @@
 
 		<attnum name="0 bgn" val="750"/>
 		<attnum name="0 end" val="765"/>
-		<attnum name="0 base speed" val="12.0"/>
+		<attnum name="0 base speed" val="11.5"/>
 	</section>
 
 </params>

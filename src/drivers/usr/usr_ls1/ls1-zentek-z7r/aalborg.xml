@@ -25,10 +25,8 @@
 
 	<section name="private">
 		<attnum name="rough limit" min="0" max="2" val="0.02"/>
-		<attnum name="base speed" min="0.0" max="50.0" val="15.50"/>
 		<attnum name="int margin" min="0" max="2" val="0.8"/>
 		<attnum name="ext margin" min="0" max="2" val="0.2"/>
-		<attnum name="base speed" val="14.00"/>
 		<attnum name="base brake" val="55.00"/>
 		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>
 		<attnum name="offtrack allowed" val="0.0"/>

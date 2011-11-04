@@ -16,7 +16,7 @@
 
 <params name="Viper GTS-R" type="template">
 	<section name="Front Wing">
-		<attnum name="angle" unit="deg" min="6" max="10" val="6"/>
+		<attnum name="angle" unit="deg" min="6" max="10" val="9"/>
 	</section>
 
 	<section name="Rear Wing">
@@ -143,15 +143,16 @@
 
 	<section name="private">
 		<attnum name="accel mod" min="0" max="1" val="1"/>
-		<attnum name="min corner inverse" min="0" max="2" val="0.0017"/>
+		<attnum name="min corner inverse" min="0" max="2" val="0.0013"/>
 		<attnum name="add avoid speed" min="-20" max="20" val="-1.8"/>
 		<attnum name="exit boost factor" min="-20" max="20" val="1.00"/>
 		<attnum name="avoid exit boost factor" min="-20" max="20" val="1.2"/>
+		<attnum name="avoid brake factor" min="0" max="20" val="0.9"/>
 		<attnum name="brake margin" min="-20" max="20" val="1.8"/>
 		<attnum name="base speed factor" min="0.0" max="50.0" val="1.00"/>
 		<attnum name="base brake factor" min="0.0" max="50.0" val="1.00"/>
 		<attnum name="accel redux factor" min="-20" max="20" val="2.5"/>
-		<attnum name="base speed" min="0.0" max="50.0" val="14.50"/>
+		<attnum name="base speed" min="0.0" max="50.0" val="13.50"/>
 		<attnum name="base brake" min="10.0" max="200.0" val="59.00"/>
 		<attnum name="brake mod" min="0.0" max="1.0" val="0.25"/>
 		<attnum name="steer mod" min="0.0" max="1.0" val="1.00"/>
@@ -173,7 +174,7 @@
 		<attnum name="int margin" min="0" max="2" val="2.2"/>
 		<attnum name="ext margin" min="0" max="2" val="1.0"/>
 		<attnum name="no team waiting" min="0" max="2" val="1"/>
-		<attnum name="inc factor" min="0" max="5" val="0.95"/>
+		<attnum name="inc factor" min="0" max="5" val="0.90"/>
 		<attnum name="overtake caution" min="-20" max="20" val="0.2"/>
 		<attnum name="abs slip" min="0.5" max="4.5" val="4.0"/>
 		<attnum name="abs range" min="0.5" max="10.5" val="9.0"/>

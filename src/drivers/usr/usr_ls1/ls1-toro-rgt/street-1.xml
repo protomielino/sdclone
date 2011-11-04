@@ -17,7 +17,7 @@
 <params name="Viper GTS-R" type="template">
 	<section name="private">
 		<attnum name="int margin" min="0" max="2" val="1.2"/>
-		<attnum name="ext margin" min="0" max="2" val="0.2"/>
+		<attnum name="ext margin" min="0" max="2" val="0.8"/>
 		<attnum name="offtrack allowed" val="0.0"/>
 	</section>
 

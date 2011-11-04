@@ -25,7 +25,7 @@
 
 	<section name="private">
 		<attnum name="min corner inverse" min="0" max="2" val="0.0005"/>
-		<attnum name="base speed" min="0.0" max="50.0" val="18.00"/>
+		<attnum name="base speed factor" val="1.15"/>
 		<attnum name="offtrack allowed" val="0.0"/>
 
 	</section>

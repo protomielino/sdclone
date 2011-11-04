@@ -33,7 +33,7 @@
 
 	<section name="private">
 		<attnum name="bump caution" min="0.0" max="4.0" val="0.8"/>
-		<attnum name="base speed" val="13.10"/>
+		<attnum name="base speed factor" val="0.90"/>
 		<attnum name="offtrack allowed" val="0.0"/>
 		<attnum name="slope factor" val="0.30"/>
 	</section>

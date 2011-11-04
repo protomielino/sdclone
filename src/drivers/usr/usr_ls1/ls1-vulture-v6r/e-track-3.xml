@@ -17,7 +17,7 @@
 <params name="Viper GTS-R" type="template">
 	<section name="private">
 		<attnum name="ext margin" val="1.80"/>
-		<attnum name="base speed" val="14.20"/>
+		<attnum name="base speed factor" val="0.95"/>
 		<attnum name="slope factor" val="0.30"/>
 		<attnum name="base brake" min="10.0" max="200.0" val="60.00"/>
 		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>

@@ -26,7 +26,6 @@
 	<section name="private">
 		<attnum name="ext margin" val="1.80"/>
 		<attnum name="bump caution" min="0.0" max="4.0" val="0.2"/>
-		<attnum name="base speed" val="13.50"/>
 		<attnum name="offtrack allowed" val="0.0"/>
 		<attnum name="slope factor" val="0.30"/>
 		<attnum name="base brake" min="10.0" max="200.0" val="60.00"/>

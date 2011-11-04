@@ -27,7 +27,7 @@
 		<attnum name="rough limit" min="0" max="2" val="0.02"/>
 		<attnum name="int margin" min="0" max="2" val="0.8"/>
 		<attnum name="ext margin" min="0" max="2" val="0.2"/>
-		<attnum name="base speed" val="14.00"/>
+		<attnum name="base speed" val="1.03"/>
 		<attnum name="base brake" val="55.00"/>
 		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>
 		<attnum name="offtrack allowed" val="0.0"/>
@@ -43,7 +43,7 @@
 		<attnum name="2 bgn" val="160"/>
 		<attnum name="2 end" val="185"/>
 		<attnum name="2 int margin" val="1.2"/>
-		<attnum name="2 base speed" val="12.5"/>
+		<attnum name="2 base speed" val="12.0"/>
 	</section>
 
 </params>

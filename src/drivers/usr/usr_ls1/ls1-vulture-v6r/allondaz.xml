@@ -24,7 +24,7 @@
 	</section>
 
 	<section name="private">
-		<attnum name="base speed" min="0.0" max="50.0" val="15.00"/>
+		<attnum name="base speed factor" val="1.05"/>
 		<attnum name="base brake" min="10.0" max="200.0" val="60.00"/>
 		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>
 		<attnum name="tcl range" val="14"/>

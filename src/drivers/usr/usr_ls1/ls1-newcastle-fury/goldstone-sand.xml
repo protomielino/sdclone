@@ -57,7 +57,7 @@
 
 	<section name="private">
 		<attnum name="rough limit" min="0" max="2" val="0.02"/>
-		<attnum name="base speed" min="0.0" max="50.0" val="15.50"/>
+		<attnum name="base speed factor" val="1.12"/>
 		<attnum name="int margin" min="0" max="2" val="0.3"/>
 		<attnum name="ext margin" min="0" max="2" val="0.2"/>
 		<attnum name="accel curve" min="0" max="2" val="1.20"/>

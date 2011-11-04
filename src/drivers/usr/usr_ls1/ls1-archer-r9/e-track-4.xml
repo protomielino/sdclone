@@ -24,7 +24,7 @@
 	</section>
 
 	<section name="private">
-		<attnum name="base speed" val="12"/>
+		<attnum name="base speed factor" val="0.85"/>
 	</section>
 
 </params>

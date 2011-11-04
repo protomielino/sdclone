@@ -20,7 +20,7 @@
 	</section>
 
 	<section name="private">
-		<attnum name="base speed" val="15.0"/>
+		<attnum name="base speed factor" val="1.1"/>
 		<attnum name="ext margin" min="0" max="2" val="0.3"/>
 	</section>
 
