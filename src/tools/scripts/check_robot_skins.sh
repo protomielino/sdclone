@@ -21,7 +21,6 @@ python check_car_skins.py -c $cars $versioning $config $run
 
 # usr
 python check_robot_skins.py -d $drivers/usr/usr_36GP -c $cars $versioning $config $run usr_36GP.xml
-exit
 python check_robot_skins.py -d $drivers/usr/usr_ls1  -c $cars $versioning $config $run usr_ls1.xml
 python check_robot_skins.py -d $drivers/usr/usr_ls2  -c $cars $versioning $config $run usr_ls2.xml
 python check_robot_skins.py -d $drivers/usr/usr_sc   -c $cars $versioning $config $run usr_sc.xml
