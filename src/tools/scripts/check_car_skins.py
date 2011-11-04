@@ -18,8 +18,9 @@ except ImportError:
 	_has_pygit = False
 
 try:
-	import Image
+	from PIL import Image, ImageFile
 	_has_PIL = True
+	ImageFile.MAXBLOCK=2**20
 except ImportError:
 	_has_PIL = False
 
@@ -72,10 +73,7 @@ def get_screenshot(index, car, skin):
 	if not options.config or not options.run:
 		return None
 
-	if options.all:
-		skin_done = True
-	else:
-		skin_done = False
+	skin_done = False
 
 	config_file = os.sep.join([options.config, "config/raceman/practice.xml"])
 
@@ -162,7 +160,11 @@ def check_dir(args, dirname, names):
 			# Checking for standard
 			standard = ".".join([os.sep.join([options.cars, car, car]), "png"])
 			standard_ver = check_version(standard)
-			screenshot = False
+
+			if options.all:
+				screenshot = True
+			else:
+				screenshot = False
 
 			if standard_ver:
 				preview = "-".join([os.sep.join([options.cars, car, car]), "preview.jpg"])
@@ -197,7 +199,6 @@ def check_dir(args, dirname, names):
 	
 							screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
 							scaled = screenshot.resize((800,500), Image.ANTIALIAS)
-							# scaled.MAXBLOCK=scaled.size[0]*scaled.size[1]
 
 							scaled.save(preview, quality=90, optimize=True, subsampling='4:4:4')
 							os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
@@ -210,13 +211,22 @@ def check_dir(args, dirname, names):
 			if (alternates != None):
 				for alternate in alternates:
 					alternate_ver=check_version(alternate)
-					screenshot = False
+
+					if options.all:
+						screenshot = True
+					else:
+						screenshot = False
 
 					if (model_ver > alternate_ver):
 						print "Alternate:", os.path.basename(alternate), "ACC Model is newer"
 
 					if (alternate_ver != None):
 						(filename,ext) = os.path.splitext(alternate)
+						skin = filename.rsplit("-",1)[1]
+
+						if skin == "int" or skin == "speed" or skin == "rpm":
+							continue
+
 						preview = "-".join([filename, "preview.jpg"])
 						preview_ver = check_version(preview)
 
@@ -233,7 +243,7 @@ def check_dir(args, dirname, names):
 							print "Preview : OK"
 
 					if options.config and options.run and screenshot:
-						screenshot = get_screenshot("1", car, filename.rsplit("-",1)[1] )
+						screenshot = get_screenshot("1", car, skin)
 
 						if options.proc:
 							# Call alternative script to process images
@@ -245,7 +255,6 @@ def check_dir(args, dirname, names):
 
 								screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
 								scaled = screenshot.resize((800,500), Image.ANTIALIAS)
-								# scaled.MAXBLOCK=scaled.size[0]*scaled.size[1]
 
 								scaled.save(preview, quality=90, optimize=True, subsampling='4:4:4')
 								os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
