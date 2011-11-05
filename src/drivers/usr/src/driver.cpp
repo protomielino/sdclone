@@ -1958,8 +1958,8 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
     lookahead = (float) rldata->lookahead;
 
     double speed = MAX(20.0, MIN(45.0, currentspeed));// + MAX(0.0, car->_accel_x));
-    lookahead = (float) (LOOKAHEAD_CONST * 1.2 + speed * 0.75);
-    lookahead = MIN(lookahead, (float) (LOOKAHEAD_CONST + ((speed*(speed/7)) * 0.15)));
+    lookahead = (float) (LOOKAHEAD_CONST * 1.5 + speed * 0.45);
+    lookahead = MIN(lookahead, (float) (LOOKAHEAD_CONST + ((speed*(speed/10)) * 0.15)));
     lookahead *= SteerLookahead;
     double ri = (fabs(rldata->mInverse) < fabs(rldata->rInverse) ? rldata->mInverse : rldata->rInverse);
     //double amI = MIN(0.05, MAX(-0.05, (rldata->amInverse)));
@@ -1976,26 +1976,26 @@ vec2f Driver::getTargetPoint(bool use_lookahead, double targetoffset)
       {
         if (toMid < 0.0)
         {
-          cornerfx += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
-          time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
+          cornerfx += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40;
+          time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40;
         }
         else
         {
-          cornerfx -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30);
-          time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30 * modfactor);
+          cornerfx -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40);
+          time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40 * modfactor);
         }
       }
       else
       {
         if (toMid > 0.0)
         {
-          cornerfx += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
-          time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 50;
+          cornerfx += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40;
+          time_mod += famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40;
         }
         else
         {
-          cornerfx -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30);
-          time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 30 * modfactor);
+          cornerfx -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40);
+          time_mod -= MIN(0.7, famI * (MIN(track->width/2, fabs(toMid)) / track->width) * 40 * modfactor);
         }
       }
       lookahead *= (float)cornerfx;
@@ -2172,8 +2172,8 @@ bool Driver::canOvertake( Opponent *o, double *mincatchdist, bool outside, bool 
     return false;
   }
 
-  if ((speed > ospeed + 2*overtakecaution + fabs(rInv) * 500 ||  // our speed quicker than opponent
-       distance < 4.0 - (fabs(rInv) * 40)) &&                  // really close on a straight
+  if ((speed > ospeed + 2*overtakecaution + fabs(rInv) * 300 ||  // our speed quicker than opponent
+       distance < 4.0 - (fabs(rInv) * 40)) &&                    // really really close
       oAspeed > ospeed &&                                        // avoid speed quicker than opponent
       (o->getTimeImpact() * (1.0+overtakecaution) < timeLimit || // approaching opponent quickly
        distance < MAX(3.0, speed/5)))                            // close behind opponent
@@ -2215,13 +2215,13 @@ float Driver::getOffset()
   //double incfactor = (MAX_INC_FACTOR*0.5 - MIN(incspeed/10, MAX_INC_FACTOR*0.5-0.5)) * 60 * IncFactor;
   //double incspeed = MIN(60.0, MAX(40.0, currentspeed)) - 10.0;
   //double incfactor = (MAX_INC_FACTOR - MIN(fabs(incspeed)/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * IncFactor;
-  double incfactor = (MAX_INC_FACTOR - MIN(40.0/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * (IncFactor*2) * MAX(0.2, 1.0 - fabs(rldata->rInverse*60));
+  double incfactor = (MAX_INC_FACTOR - MIN(40.0/MAX_INC_FACTOR, (MAX_INC_FACTOR - 1.0f))) * (10.0f + MAX(0.0, (CA-1.9)*10)) * (IncFactor*2) * MAX(0.2, 1.0 - fabs(rldata->rInverse*90));
 
   //double rgtinc = incfactor * MIN(3.0, MAX(0.6, 1.0 + rldata->mInverse * (rldata->mInverse<0.0?-5:100)));
   //double lftinc = incfactor * MIN(3.0, MAX(0.6, 1.0 - rldata->mInverse * (rldata->mInverse>0.0?-5:100)));
   double ri = rldata->aInverse;
-  double rgtinc = incfactor * MIN(3.0, MAX(0.6, 1.0 + (ri < 0.0 ? ri*4 : ri*MAX(10.0, car->_speed_x-25)*2*OutSteerFactor)));
-  double lftinc = incfactor * MIN(3.0, MAX(0.6, 1.0 - (ri > 0.0 ? ri*4 : ri*MAX(10.0,car->_speed_x-25)*2*OutSteerFactor)));
+  double rgtinc = incfactor * MIN(3.0, MAX(0.6, 1.0 + (ri < 0.0 ? ri*4 : ri*MAX(5.0, car->_speed_x-25)*OutSteerFactor)));
+  double lftinc = incfactor * MIN(3.0, MAX(0.6, 1.0 - (ri > 0.0 ? ri*4 : ri*MAX(5.0,car->_speed_x-25)*OutSteerFactor)));
   
   //double reduce_movt = MAX(0.01, 1.0 - (MIN(1.0, fabs(laststeer))*2 * fabs(angle-speedangle)*3));
 #if 1
@@ -2686,7 +2686,7 @@ fprintf(stderr,"%s BEHIND %s (%d %d %d %d)\n",car->_name,ocar->_name,((o->getSta
     myoffset = (float) moffset;
 
 #if 1
-  // no-one to avoid, work back towards raceline
+  // no-one to avoid, work back towards raceline by correcting steering
   if (mode == mode_correcting && (simtime > 15.0 || car->_speed_x > 20) && simtime > CorrectDelay)
   {
     double factor = 0.25;//(fabs(car->_trkPos.toMiddle) < car->_trkPos.seg->width/2 + 2.0 ? 0.25 : 1.0);
@@ -3433,6 +3433,7 @@ float Driver::filterABS(float brake)
 {
   if (car->_speed_x < ABS_MINSPEED) return brake;
 
+  float absrange = (collision > 0.0 ? AbsRange * 0.7 : AbsRange);
   float brake1 = brake, brake2 = brake;
 
   double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
@@ -3446,7 +3447,7 @@ float Driver::filterABS(float brake)
     slip = MAX(slip, car->_speed_x - (car->_wheelSpinVel(i) * car->_wheelRadius(i)));
 
   if (slip > AbsSlip)
-    brake2 = (float) MAX(MIN(0.35f, brake), brake - MIN(brake*0.8f, (slip - AbsSlip) / AbsRange));
+    brake2 = (float) MAX(MIN(0.35f, brake), brake - MIN(brake*0.8f, (slip - AbsSlip) / absrange));
 
   brake = MIN(brake, MIN(brake1, brake2));
 #if 0
