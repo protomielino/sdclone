@@ -178,20 +178,18 @@ int
 RePreRace(void)
 {
 	char path[64];
-	tdble dist;
 	const char *raceName;
 	const char *raceType;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	int curRaceIdx;
-	int laps;
 
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 	
-	GfParmRemoveVariable (ReInfo->params, "/", "humanInGroup");
-	GfParmRemoveVariable (ReInfo->params, "/", "eventNb");
-	GfParmSetVariable (ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
-	GfParmSetVariable (ReInfo->params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
+	GfParmRemoveVariable (params, "/", "humanInGroup");
+	GfParmRemoveVariable (params, "/", "eventNb");
+	GfParmSetVariable (params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
+	GfParmSetVariable (params, "/", "eventNb", GfParmGetNum (ReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1.0 ) );
 	if (!raceName) {
 		return RM_ERROR;
 	}
@@ -212,32 +210,55 @@ RePreRace(void)
 		return RM_SYNC | RM_NEXT_RACE | RM_NEXT_STEP;
 	}
 
+	// Get session max dammages.
 	ReInfo->s->_maxDammage = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DMG, NULL, 10000);
-	ReInfo->s->_extraLaps = 0;
-	ReInfo->s->_totLaps = 30; /* Make sure it is initialized */
-	ReInfo->s->_totTime = GfParmGetNum(params, raceName, RM_ATTR_SESSIONTIME, NULL, -60.0f);
-	if (ReInfo->s->_totTime > 0.0f && ( ReInfo->s->_features & RM_FEATURE_TIMEDSESSION ) == 0 )
-	{
-		/* Timed session not supported: add 2 km for every minute */
-		ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 2000.0f / ReInfo->track->length + 0.5f);
+
+	// Get session duration (defaults to "All sessions" one, or else -60).
+	ReInfo->s->_totTime = GfParmGetNum(params, raceName, RM_ATTR_SESSIONTIME, NULL, -1);
+	if (ReInfo->s->_totTime < 0)
+		ReInfo->s->_totTime = GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_SESSIONTIME, NULL, -60.0f);
+
+	// Determine the actual session duration and/or number of laps.
+	ReInfo->s->_extraLaps = 0; // TODO: Does this is ever needed ?
+	ReInfo->s->_totLaps = 30; // Make sure it is initialized
+
+	if (ReInfo->s->_totTime > 0 && !(ReInfo->s->_features & RM_FEATURE_TIMEDSESSION)) {
+		// Timed session not supported: add 2 km for every minute
+		ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 2000.0f / 60.0f / ReInfo->track->length + 0.5f);
 		ReInfo->s->_totTime = -60.0f;
 	}
-	if (ReInfo->s->_totTime <= 0.0f)
-	{
-		ReInfo->s->_totTime = -60.0f;	/* Make sure that if no time is set, the set is far below zero */
-		dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, 0.0);
-		if (dist >= 0.001) {
-			ReInfo->s->_totLaps = ((int)(dist / ReInfo->track->length)) + 1;
+	
+	if (ReInfo->s->_totTime <= 0) {
+		// Make sure that if no time set, we set far below zero
+		ReInfo->s->_totTime = -60.0f;
+		
+		// Get session distance (defaults to "All sessions" one, or else 0).
+		tdble dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, -1);
+		if (dist < 0)
+			dist = GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_DISTANCE, NULL, 0);
+		
+		// If a (> 0) session distance was specified, deduce the number of laps
+		// in case the race settings don't specify it.
+		if (dist >= 0.001) { // Why not 'if (dist > 0)' ???
+			ReInfo->s->_totLaps = (int)(dist / ReInfo->track->length) + 1;
+			ReInfo->s->_extraLaps = ReInfo->s->_totLaps; // TODO: Does this is ever needed ?
 		}
-		laps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, (tdble)ReInfo->s->_totLaps);
+		
+		// Get the number of laps (defaults to "All sessions" one,
+		// or else the already computed one from the session distance, or 30).
+		int laps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, -1);
+		if (laps < 0)
+			laps = (int)GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_LAPS, NULL, (tdble)ReInfo->s->_totLaps);
 		if (laps > 0 ) {
 			ReInfo->s->_totLaps = laps;
+			ReInfo->s->_extraLaps = ReInfo->s->_totLaps; // TODO: Does this is ever needed ?
 		}
 	}
 	else {
 		ReInfo->s->_totLaps = 0;
 	}
 
+	// Get session type (race, qualification or practice).
 	raceType = GfParmGetStr(params, raceName, RM_ATTR_TYPE, RM_VAL_RACE);
 	if (!strcmp(raceType, RM_VAL_RACE)) {
 		ReInfo->s->_raceType = RM_TYPE_RACE;
@@ -247,16 +268,19 @@ RePreRace(void)
 		ReInfo->s->_raceType = RM_TYPE_PRACTICE;
 	}
 
-	if (ReInfo->s->_raceType != RM_TYPE_RACE && ReInfo->s->_extraLaps > 0)
-	{
-		/* During timed practice or qualification, there are no extra laps */
-		ReInfo->s->_extraLaps = 0;
-		ReInfo->s->_totLaps = 0;
+	// Correct extra laps (possible laps run after the winner arrived ?) :
+	// during timed practice or qualification, there are none.
+	if (ReInfo->s->_raceType != RM_TYPE_RACE && ReInfo->s->_totTime > 0) {
+		ReInfo->s->_extraLaps = 0; // TODO: Does this is ever needed ?
 	}
 
+	GfLogInfo("Race length : time=%.0fs, laps=%d (extra=%d)\n",
+			  ReInfo->s->_totTime, ReInfo->s->_totLaps, ReInfo->s->_extraLaps);
+	
+	// Initialize race state.
 	ReInfo->s->_raceState = 0;
 
-	/* Cleanup results */
+	// Cleanup results
 	snprintf(path, sizeof(path), "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, raceName);
 	GfParmListClean(results, path);
 
@@ -280,13 +304,20 @@ ReRaceRealStart(void)
 	// Load the physics engine
 	if (!RaceEngine::self().loadPhysicsEngine())
 		return RM_ERROR;
-		
+
+	// Get the session display mode (default to "All sessions" ones, or else "normal").
+	std::string strDispMode =
+		GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, "");
+	if (strDispMode.empty())
+		strDispMode =
+			GfParmGetStr(params, RM_VAL_ANYRACE, RM_ATTR_DISPMODE, RM_VAL_VISIBLE);
+
 	// Check if there is a human in the driver list
 	foundHuman = ReHumanInGroup() ? 2 : 0;
 
 	// TODO: Replace this _displayMode dirty hack by adding a new bSimuSimu arg to ReInitCars ?
 	// Set _displayMode here because then robot->rbNewTrack isn't called. This is a lot faster for simusimu
-	if (strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE), RM_VAL_SIMUSIMU) == 0 && foundHuman == 0)
+	if (strDispMode == RM_VAL_SIMUSIMU && foundHuman == 0)
 		ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
 	else
 		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
@@ -296,6 +327,7 @@ ReRaceRealStart(void)
 		return RM_ERROR;
 
 	// Check if there is a human in the current race
+	// TODO: Why is this computed again, after ReHumanInGroup(), and in a different way ???
 	for (i = 0; i < s->_ncars; i++) {
 		if (s->cars[i]->_driverType == RM_DRV_HUMAN) {
 			foundHuman = 1;
@@ -309,8 +341,6 @@ ReRaceRealStart(void)
 	if (foundHuman != 1)
 	{
 		// No human in current race
-		const std::string strDispMode =
-			GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPMODE, RM_VAL_VISIBLE);
 		if (strDispMode == RM_VAL_INVISIBLE)
 		{
 			ReInfo->_displayMode = RM_DISP_MODE_NONE;

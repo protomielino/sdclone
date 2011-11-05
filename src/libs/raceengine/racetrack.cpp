@@ -191,10 +191,14 @@ reTrackInitTimeOfDay(void)
 	
 	tTrackLocalInfo *trackLocal = &ReInfo->track->local;
 
-	// Load time of day settings for the race.
+	// Load time of day settings for the session
+	// (defaults to  "All sesions" one, or else "afternoon").
 	int timeofday = RM_IND_TIME_AFTERNOON;
 	const char* pszTimeOfDay =
-		GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_TIME_OF_DAY, RM_VAL_TIME_AFTERNOON);
+		GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_TIME_OF_DAY, 0);
+	if (!pszTimeOfDay)
+		 pszTimeOfDay =
+			 GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_TIME_OF_DAY, RM_VAL_TIME_AFTERNOON);
 	for (int i = 0; i < NTimeOfDayValues; i++)
 		if (!strcmp(pszTimeOfDay, TimeOfDayValues[i]))
 		{
@@ -264,10 +268,14 @@ reTrackInitWeather(void)
 
 	tTrackLocalInfo *trackLocal = &ReInfo->track->local;
 
-	// Load cloud cover settings for the race.
+	// Load cloud cover settings for the session
+	// (defaults to  "All sesions" one, or else "none").
 	int clouds = TR_CLOUDS_NONE;
 	const char* pszClouds =
-		GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_CLOUDS, RM_VAL_CLOUDS_NONE);
+		GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_CLOUDS, 0);
+	if (!pszClouds)
+		pszClouds =
+			GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_CLOUDS, RM_VAL_CLOUDS_NONE);
 	for (int i = 0; i < NCloudsValues; i++)
 		if (!strcmp(pszClouds, CloudsValues[i]))
 		{
@@ -275,12 +283,16 @@ reTrackInitWeather(void)
 			break;
 		}
 
-	// Load rain fall (and track dry/wet conditions) settings for the race if feature supported.
+	// Load rain fall (and track dry/wet conditions) settings for the session
+	// if feature supported (defaults to  "All sesions" one, or else "none").
 	int rain = TR_RAIN_NONE;
 	if (ReInfo->s->_features & RM_FEATURE_WETTRACK)
 	{
 		const char* pszRain =
-			GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
+			GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_RAIN, 0);
+		if (!pszRain)
+			pszRain =
+				GfParmGetStr(ReInfo->params, RM_VAL_ANYRACE, RM_ATTR_RAIN, RM_VAL_RAIN_NONE);
 		for (int i = 0; i < NRainValues; i++)
 			if (!strcmp(pszRain, RainValues[i]))
 			{

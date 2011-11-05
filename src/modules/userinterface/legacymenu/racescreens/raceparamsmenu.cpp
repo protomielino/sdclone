@@ -258,8 +258,8 @@ rmrpValidate(void * /* dummy */)
 	// And then update configurable race session parameters from the current local settings,
 	// if anything to configure (Don't change non-configurable parameters).
 	GfRace::Parameters* pRaceSessionParams =
-		MenuData->pRace->getParameters(MenuData->session, /* bUserConfig */ true);
-	if (pRaceSessionParams)
+		MenuData->pRace->getParameters(MenuData->session);
+	if (pRaceSessionParams && pRaceSessionParams->bfOptions)
 	{
 		if (rmrpConfMask & RM_CONF_RACE_LEN)
 		{
@@ -315,11 +315,8 @@ RmRaceParamsMenu(void *vrp)
 	// Update the conf mask according to the session params, graphics options and race features.
 	// 1) According to the availability of parameters for this session,.
 	GfRace::Parameters* pRaceSessionParams =
-		MenuData->pRace->getParameters(MenuData->session, /* bUserConfig */ true);
-	if (!pRaceSessionParams)
-		rmrpConfMask = 0;
-	else
-		rmrpConfMask = pRaceSessionParams->bfOptions;
+		MenuData->pRace->getParameters(MenuData->session);
+	rmrpConfMask = pRaceSessionParams ? pRaceSessionParams->bfOptions : 0;
 	
 	// 2) According to SkyDome settings.
 	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);

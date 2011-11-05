@@ -83,7 +83,7 @@ public:
 		ERainSpec eRainSpec;
 	};
 	
-	Parameters* getParameters(const std::string& strSessionName, bool bUserConfig = false) const;
+	Parameters* getParameters(const std::string& strSessionName) const;
 
 	int getSupportedFeatures() const;
 

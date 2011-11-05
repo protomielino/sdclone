@@ -170,7 +170,7 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 	}
 
 	// Load the parameters for all the referenced sessions, even if not user-configurable
-	// ("All Sessions" include, if any).
+	// ("All Sessions" included, if any).
 	// 1) Pre-load the parameters for user-configurable sessions.
  	const std::vector<std::string>& vecRefSessionNames = _pPrivate->pRaceMan->getSessionNames();
 	for (int nConfInd = 1; nConfInd <= GfParmGetEltNb(hparmRaceMan, RM_SECT_CONF); nConfInd++)
@@ -243,7 +243,7 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 	}
 	
 	// 3) Load the actual parameter values for each referenced session
-	//    (user-configurable or not, the "Any Race" one included if needed).
+	//    (user-configurable or not, the "All Sessions" one included if needed).
 	std::map<std::string, Parameters*>::iterator itSessionParams;
 	for (itSessionParams = _pPrivate->mapParametersBySession.begin();
 		 itSessionParams != _pPrivate->mapParametersBySession.end(); itSessionParams++)
@@ -299,12 +299,12 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 				break;
 			}
 
-// 		GfLogDebug("GfRace::load(...) : %s : opts=%02x, "
-// 				   "laps=%d, dist=%d, dur=%d, disp=%d, tod=%d, clds=%d, rain=%d\n",
-// 				   pszSessionName, pSessionParams->bfOptions,
-// 				   pSessionParams->nLaps, pSessionParams->nDistance, pSessionParams->nDuration,
-// 				   pSessionParams->eDisplayMode, pSessionParams->eTimeOfDaySpec,
-// 				   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
+ 		// GfLogDebug("GfRace::load(...) : %s : opts=%02x, "
+ 		// 		   "laps=%d, dist=%d, dur=%d, disp=%d, tod=%d, clds=%d, rain=%d\n",
+ 		// 		   pszSessionName, pSessionParams->bfOptions,
+ 		// 		   pSessionParams->nLaps, pSessionParams->nDistance, pSessionParams->nDuration,
+ 		// 		   pSessionParams->eDisplayMode, pSessionParams->eTimeOfDaySpec,
+ 		// 		   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
 	}
 
 	// Load the max number of competitors from the raceman params and / or the results file.
@@ -514,9 +514,6 @@ void GfRace::store()
 	// Save race manager level data.
 	_pPrivate->pRaceMan->store();
 	
-	// Get the parameters for "All Sessions" (warning: may not exist).
-	const Parameters* pAllSessionParams = getParameters(RM_VAL_ANYRACE);
-	
 	// Save the parameters for all the sessions :
 	// for a given parameter of a given non-"All Sessions" session,
 	// save the parameter value if valid, otherwise use the coresponding one's value
@@ -530,70 +527,55 @@ void GfRace::store()
 		const Parameters* pSessionParams = itSessionParams->second;
 		
 		// Write valid param. value for the current session,
-		// or else the one from the corresponding parameter of "All Sessions"
-		// if valid and if "All Sessions" is present.
+		// or remove the parameter if invalid value.
 		if (pSessionParams->nLaps >= 0)
 			GfParmSetNum(hparmRaceMan, pszSessionName, RM_ATTR_LAPS,
 						 (char*)NULL, (tdble)pSessionParams->nLaps);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->nLaps >= 0)
-			GfParmSetNum(hparmRaceMan, pszSessionName, RM_ATTR_LAPS,
-						 (char*)NULL, (tdble)pAllSessionParams->nLaps);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_LAPS);
 
 		if (pSessionParams->nDistance >= 0)
 			GfParmSetNum(hparmRaceMan, pszSessionName, RM_ATTR_DISTANCE,
 						 "km", (tdble)pSessionParams->nDistance);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->nDistance >= 0)
-			GfParmSetNum(hparmRaceMan, pszSessionName, RM_ATTR_DISTANCE,
-						 "km", (tdble)pAllSessionParams->nDistance);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_DISTANCE);
 		
 		if (pSessionParams->nDuration >= 0)
 			GfParmSetNum(hparmRaceMan, pszSessionName, RM_ATTR_SESSIONTIME,
 						 "s", (tdble)pSessionParams->nDuration);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->nDuration >= 0)
-			GfParmSetNum(hparmRaceMan, pszSessionName, RM_ATTR_SESSIONTIME,
-						 "s", (tdble)pAllSessionParams->nDuration);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_SESSIONTIME);
 		
 		if (pSessionParams->eDisplayMode != nDisplayModeNumber)
 			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_DISPMODE,
 						 DisplayModeNames[pSessionParams->eDisplayMode]);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->eDisplayMode != nDisplayModeNumber)
-			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_DISPMODE,
-						 DisplayModeNames[pAllSessionParams->eDisplayMode]);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_DISPMODE);
 		
 		if (pSessionParams->eTimeOfDaySpec != nTimeSpecNumber)
 			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_TIME_OF_DAY,
 						 TimeOfDaySpecNames[pSessionParams->eTimeOfDaySpec]);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->eTimeOfDaySpec != nTimeSpecNumber)
-			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_TIME_OF_DAY,
-						 TimeOfDaySpecNames[pAllSessionParams->eTimeOfDaySpec]);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_TIME_OF_DAY);
 		
 		if (pSessionParams->eCloudsSpec != nCloudsSpecNumber)
 			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_CLOUDS,
 						 CloudsSpecNames[pSessionParams->eCloudsSpec]);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->eCloudsSpec != nCloudsSpecNumber)
-			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_CLOUDS,
-						 CloudsSpecNames[pAllSessionParams->eCloudsSpec]);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_CLOUDS);
 		
 		if (pSessionParams->eRainSpec != nRainSpecNumber)
 			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_RAIN,
 						 RainSpecNames[pSessionParams->eRainSpec]);
-		else if (pAllSessionParams && pSessionParams != pAllSessionParams
-				 && pAllSessionParams->eRainSpec != nRainSpecNumber)
-			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_RAIN,
-						 RainSpecNames[pAllSessionParams->eRainSpec]);
+		else
+			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_RAIN);
 		
-// 		GfLogDebug("GfRace::store(...) : %s params : "
-// 				   "laps=%d, dist=%d, dur=%d, disp=%d, tod=%d, clds=%d, rain=%d\n",
-// 				   pszSessionName, pSessionParams->nLaps,
-// 				   pSessionParams->nDistance, pSessionParams->nDuration,
-// 				   pSessionParams->eDisplayMode, pSessionParams->eTimeOfDaySpec,
-// 				   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
+ 		// GfLogDebug("GfRace::store(...) : %s params : "
+ 		// 		   "laps=%d, dist=%d, dur=%d, disp=%d, tod=%d, clds=%d, rain=%d\n",
+ 		// 		   pszSessionName, pSessionParams->nLaps,
+ 		// 		   pSessionParams->nDistance, pSessionParams->nDuration,
+ 		// 		   pSessionParams->eDisplayMode, pSessionParams->eTimeOfDaySpec,
+ 		// 		   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
 	}
 	
 	// Clear the race starting grid.
@@ -679,16 +661,14 @@ GfRaceManager* GfRace::getManager() const
 	return _pPrivate->pRaceMan;
 }
 
-GfRace::Parameters* GfRace::getParameters(const std::string& strSessionName,
-										  bool bUserConfig) const
+GfRace::Parameters* GfRace::getParameters(const std::string& strSessionName) const
 {
 	Parameters* pParams = 0;
 	
 	std::map<std::string, Parameters*>::const_iterator itParams =
 		_pPrivate->mapParametersBySession.find(strSessionName);
 	if (itParams != _pPrivate->mapParametersBySession.end())
-		if (!bUserConfig || itParams->second->bfOptions)
-			pParams = itParams->second;
+		pParams = itParams->second;
 	
 	return pParams;
 }
