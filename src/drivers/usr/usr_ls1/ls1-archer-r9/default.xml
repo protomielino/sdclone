@@ -175,7 +175,7 @@
 		<attnum name="int margin" min="0" max="2" val="2.2"/>
 		<attnum name="ext margin" min="0" max="2" val="1.0"/>
 		<attnum name="no team waiting" min="0" max="2" val="1"/>
-		<attnum name="inc factor" min="0" max="5" val="0.90"/>
+		<attnum name="inc factor" min="0" max="5" val="1.10"/>
 		<attnum name="overtake caution" min="-20" max="20" val="0.2"/>
 		<attnum name="abs slip" min="0.5" max="4.5" val="4.0"/>
 		<attnum name="abs range" min="0.5" max="10.5" val="9.0"/>
