@@ -24,12 +24,9 @@
 	</section>
 
 	<section name="private">
-		<attnum name="rough limit" min="0" max="2" val="0.02"/>
 		<attnum name="int margin" min="0" max="2" val="0.8"/>
 		<attnum name="ext margin" min="0" max="2" val="0.2"/>
-		<attnum name="base speed factor" val="0.93"/>
-		<attnum name="base brake" val="55.00"/>
-		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>
+		<attnum name="base brake factor" val="1.10"/>
 		<attnum name="offtrack allowed" val="0.0"/>
 
 		<attnum name="0 bgn" val="280"/>
@@ -38,12 +35,21 @@
 
 		<attnum name="1 bgn" val="280"/>
 		<attnum name="1 end" val="305"/>
-		<attnum name="1 base speed" val="11"/>
+		<attnum name="1 base speed" val="10.6"/>
 
 		<attnum name="2 bgn" val="160"/>
 		<attnum name="2 end" val="185"/>
 		<attnum name="2 int margin" val="1.2"/>
-		<attnum name="2 base speed" val="12.2"/>
+		<attnum name="2 base speed" val="11.5"/>
+
+		<attnum name="3 bgn" val="790"/>
+		<attnum name="3 end" val="825"/>
+		<attnum name="3 int margin" val="1.2"/>
+		<attnum name="2 base speed" val="11.2"/>
+
+		<attnum name="4 bgn" val="450"/>
+		<attnum name="4 end" val="495"/>
+		<attnum name="4 ext margin" val="1.0"/>
 	</section>
 
 </params>
