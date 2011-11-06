@@ -653,12 +653,12 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 		glEnable(GL_TEXTURE_2D);
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
-	}
 
-	ttx = grCarInfo[_carIndex].distFromStart/50;
-	sgMakeTransMat4(mat, ttx, tty, ttz);
-	glMultMatrixf((float *)mat);
-	glMatrixMode(GL_MODELVIEW);
+		ttx = grCarInfo[_carIndex].distFromStart/50;
+		sgMakeTransMat4(mat, ttx, tty, ttz);
+		glMultMatrixf((float *)mat);
+		glMatrixMode(GL_MODELVIEW);
+	}
 
 	glActiveTextureARB(GL_TEXTURE0_ARB);
 	glEnable(GL_TEXTURE_2D);
