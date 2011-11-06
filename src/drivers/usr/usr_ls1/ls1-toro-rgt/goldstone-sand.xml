@@ -75,7 +75,7 @@
 
 		<attnum name="2 bgn" val="2700"/>
 		<attnum name="2 end" val="2770"/>
-		<attnum name="2 base speed" val="13.5"/>
+		<attnum name="2 base speed" val="12.5"/>
 	</section>
 
 </params>
