@@ -56,11 +56,11 @@
   </section>
 
   <section name="Rear Right Suspension">
-    <attnum name="spring" min="90" max="410" unit="kN/m" val="160"/>
+    <attnum name="spring" min="90" max="410" unit="kN/m" val="120"/>
   </section>
 
   <section name="Rear Left Suspension">
-    <attnum name="spring" min="90" max="410" unit="kN/m" val="160"/>
+    <attnum name="spring" min="90" max="410" unit="kN/m" val="120"/>
   </section>
 
 	<section name="Front Anti-Roll Bar">
@@ -74,7 +74,7 @@
 	<section name="private">
 		<attnum name="min corner inverse" min="0" max="2" val="0.0010"/>
 		<attnum name="rough limit" min="0" max="2" val="0.02"/>
-		<attnum name="base speed factor" val="1.15"/>
+		<attnum name="base speed factor" val="1.14"/>
 		<attnum name="ext margin" min="0" max="2" val="0.5"/>
 		<attnum name="slope factor" min="0.0" max="1.0" val="0.30"/>
 
@@ -84,7 +84,7 @@
 
 		<attnum name="2 bgn" val="1000"/>
 		<attnum name="2 end" val="1270"/>
-		<attnum name="2 base speed" val="13.6"/>
+		<attnum name="2 base speed" val="13.2"/>
 
 		<attnum name="1 bgn" val="1300"/>
 		<attnum name="1 end" val="1380"/>
@@ -94,6 +94,10 @@
 		<attnum name="0 end" val="1490"/>
 		<attnum name="0 rl left margin" val="4"/>
 		<attnum name="0 base speed" val="8"/>
+
+		<attnum name="4 bgn" val="330"/>
+		<attnum name="4 end" val="360"/>
+		<attnum name="4 int margin" val="2.4"/>
 	</section>
 
 </params>

@@ -78,13 +78,17 @@
 		<attnum name="ext margin" min="0" max="2" val="0.5"/>
 		<attnum name="slope factor" min="0.0" max="1.0" val="0.30"/>
 
+		<attnum name="4 bgn" val="330"/>
+		<attnum name="4 end" val="360"/>
+		<attnum name="4 int margin" val="2.2"/>
+
 		<attnum name="3 bgn" val="10"/>
 		<attnum name="3 end" val="140"/>
 		<attnum name="3 ext margin" val="2.5"/>
 
 		<attnum name="2 bgn" val="1000"/>
 		<attnum name="2 end" val="1270"/>
-		<attnum name="2 base speed" val="13"/>
+		<attnum name="2 base speed" val="12"/>
 
 		<attnum name="1 bgn" val="1300"/>
 		<attnum name="1 end" val="1380"/>

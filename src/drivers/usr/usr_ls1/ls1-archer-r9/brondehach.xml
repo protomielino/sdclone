@@ -84,7 +84,7 @@
 
 		<attnum name="2 bgn" val="1000"/>
 		<attnum name="2 end" val="1270"/>
-		<attnum name="2 base speed" val="13.5"/>
+		<attnum name="2 base speed" val="12.7"/>
 
 		<attnum name="1 bgn" val="1300"/>
 		<attnum name="1 end" val="1380"/>

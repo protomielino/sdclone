@@ -84,7 +84,7 @@
 
 		<attnum name="2 bgn" val="1000"/>
 		<attnum name="2 end" val="1270"/>
-		<attnum name="2 base speed" val="14"/>
+		<attnum name="2 base speed" val="13.3"/>
 
 		<attnum name="1 bgn" val="1300"/>
 		<attnum name="1 end" val="1380"/>
@@ -94,6 +94,10 @@
 		<attnum name="0 end" val="1490"/>
 		<attnum name="0 rl left margin" val="4"/>
 		<attnum name="0 base speed" val="8"/>
+
+		<attnum name="4 bgn" val="330"/>
+		<attnum name="4 end" val="360"/>
+		<attnum name="4 base speed" val="13"/>
 	</section>
 
 </params>
