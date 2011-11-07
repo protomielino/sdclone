@@ -26,6 +26,11 @@
 	<section name="private">
 		<attnum name="int margin" val="3"/>
 		<attnum name="ext margin" min="0" max="2" val="1.5"/>
+
+		<attnum name="bump caution" val="0.10"/>
+		<attnum name="base speed factor" val="1.05"/>
+		<attnum name="int margin" val="3"/>
+		<attnum name="ext margin" min="0" max="2" val="1.5"/>
 	</section>
 
 </params>
