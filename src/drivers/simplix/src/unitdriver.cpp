@@ -1343,23 +1343,29 @@ void TDriver::Drive()
 
   //cTimeSum[2] += RtDuration(StartTimeStamp);
 
-  if(Close)                                      // If opponents are close
+  if (oSituation->_raceState & RM_RACE_PRESTART) 
   {
-	BrakingForceRegulatorTraffic();              // Control breaking force
-  }
-  else if(oStrategy->GoToPit())                  // Going to pitlane
-  {
-	BrakingForceRegulatorTraffic();              // Control breaking force
+    oClutch = oClutchMax;
   }
   else
   {
-	if (oAvoidRange == 0.0)                      // Still avoiding?
-      BrakingForceRegulator();                   // Control breaking force
-	else
-	  BrakingForceRegulatorAvoid();              // Control breaking force
+    if(Close)                                    // If opponents are close
+    {
+	  BrakingForceRegulatorTraffic();            // Control breaking force
+    }
+    else if(oStrategy->GoToPit())                // Going to pitlane
+    {
+	  BrakingForceRegulatorTraffic();            // Control breaking force
+    }
+    else
+    {
+	  if (oAvoidRange == 0.0)                    // Still avoiding?
+        BrakingForceRegulator();                 // Control breaking force
+  	  else
+	    BrakingForceRegulatorAvoid();            // Control breaking force
+    }
+    Clutching();                                 // Tread/Release clutch
   }
-
-  Clutching();                                   // Tread/Release clutch
   GearTronic();                                  // Shift if needed
   Turning();                                     // Check driving direction
   FlightControl();                               // Prepare landing w. flying
@@ -2060,12 +2066,6 @@ double TDriver::NextGearRatio()
 //--------------------------------------------------------------------------*
 void TDriver::StartAutomatic()
 {
-  if (oSituation->_raceState & RM_RACE_PRESTART) 
-  {
-	oClutch = oClutchMax;
-	return;
-  }
-
   if ((CarGearCmd == 1) && (TDriver::CurrSimTime < 20))
   {
 	if (CarRpm < oStartRPM) 
@@ -2081,12 +2081,6 @@ void TDriver::StartAutomatic()
 //--------------------------------------------------------------------------*
 void TDriver::Clutching()
 {
-  if (TDriver::CurrSimTime < oSituation->deltaTime)
-  {
-    oClutch = oClutchMax;
-	return;
-  }
-
   if(oClutch > 0)
   {
     if (oGear < 2)
@@ -2401,7 +2395,7 @@ bool TDriver::EcoShift()
 //--------------------------------------------------------------------------*
 void TDriver::GearTronic()
 {
-  if (oJumping > 0.0)
+  if ((oJumping > 0.0) && (UsedGear > 0))
 	  return;
 
   if (IsTickover)

@@ -94,7 +94,7 @@
 // Racing line version marker 
 // (Increment if racinglines needs to be recalculated)
 //--------------------------------------------------------------------------*
-#define RL_VERSION 122 // Force new calculation
+#define RL_VERSION 123 // Force new calculation
 //==========================================================================*
 
 //==========================================================================*
