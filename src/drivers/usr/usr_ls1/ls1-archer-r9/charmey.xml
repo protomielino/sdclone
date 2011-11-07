@@ -25,12 +25,17 @@
 
 	<section name="private">
 		<attnum name="ext margin" val="1.80"/>
+		<attnum name="int margin" val="1.10"/>
 		<attnum name="bump caution" min="0.0" max="4.0" val="0.2"/>
 		<attnum name="base speed" val="13.60"/>
 		<attnum name="offtrack allowed" val="0.0"/>
 		<attnum name="slope factor" val="0.30"/>
+		<attnum name="base speed factor" val="0.93"/>
 		<attnum name="base brake" min="10.0" max="200.0" val="60.00"/>
-		<attnum name="avoid brake factor" min="-20" max="20" val="0.85"/>
+		
+		<attnum name="0 bgn" val="790"/>
+		<attnum name="0 end" val="840"/>
+		<attnum name="0 ext margin" val="3"/>
 	</section>
 
 </params>
