@@ -302,7 +302,7 @@ grInitBackground(void)
 		//Setup overall light level according to rain if any
 		const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();
 		const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-		float scene_brightness = (float)pow(sky_brightness, 0.5);
+		float scene_brightness = (float)pow(sky_brightness, 0.5f);
         
 		if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
 		{
@@ -892,7 +892,7 @@ grUpdateSky(double currentTime)
 	// 3) Update scene color and light
 	const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();
 	const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-	const float scene_brightness = (float)pow(sky_brightness, 0.5);
+	const float scene_brightness = (float)pow(sky_brightness, 0.5f);
 	
 	SkyColor[0] = BaseSkyColor[0] * sky_brightness;
 	SkyColor[1] = BaseSkyColor[1] * sky_brightness;
