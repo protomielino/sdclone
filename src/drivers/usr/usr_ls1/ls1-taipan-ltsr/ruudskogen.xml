@@ -24,28 +24,23 @@
 	</section>
 
 	<section name="private">
-		<attnum name="int margin" min="0" max="2" val="1.0"/>
-		<attnum name="ext margin" min="0" max="2" val="0.4"/>
+		<attnum name="ext margin" min="0" max="2" val="0.6"/>
 		<attnum name="slope factor" val="0.40"/>
-		<attnum name="base speed factor" val="1.10"/>
+		<attnum name="base speed factor" val="1.05"/>
 
 		<attnum name="0 bgn" val="140"/>
 		<attnum name="0 end" val="190"/>
-		<attnum name="0 base speed" val="11"/>
-		<attnum name="0 int margin" val="1.2"/>
+		<attnum name="0 base speed" val="10.0"/>
+		<attnum name="0 int margin" val="0.2"/>
 
 		<attnum name="1 bgn" val="530"/>
 		<attnum name="1 end" val="590"/>
-		<attnum name="1 base speed" val="11"/>
+		<attnum name="1 base speed" val="10.5"/>
 
-		<attnum name="3 bgn" val="1100"/>
-		<attnum name="3 end" val="1350"/>
-		<attnum name="3 int margin" val="4.5"/>
-
-		<attnum name="2 bgn" val="1300"/>
+		<attnum name="2 bgn" val="1350"/>
 		<attnum name="2 end" val="1550"/>
 		<attnum name="2 ext margin" val="1.5"/>
-		<attnum name="2 base speed" val="11"/>
+		<attnum name="2 base speed" val="10.5"/>
 	</section>
 
 </params>
