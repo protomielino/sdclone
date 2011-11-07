@@ -20,7 +20,7 @@
 	</section>
 
 	<section name="private">
-		<attnum name="base speed factor" val="0.83"/>
+		<attnum name="base speed factor" val="0.94"/>
 		<attnum name="base brake" val="60"/>
 	</section>
 
