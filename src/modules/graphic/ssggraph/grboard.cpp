@@ -1488,7 +1488,7 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
   glBegin(GL_QUADS);
   glColor4f(0.1, 0.1, 0.1, 0.8);
-  glVertex2f(x, y + 5);
+  glVertex2f(x, y - 5);
   glVertex2f(x + 175, y - 5);
   glVertex2f(x + 175, y + dy * (maxLines + 1));
   glVertex2f(x, y + dy * (maxLines + 1));
