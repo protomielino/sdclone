@@ -53,9 +53,9 @@ static const sgVec4 TranslucentWhite = { 1.0f, 1.0f, 1.0f, 0.8f } ;
 
 static const sgVec4 BaseSkyColor    = { 0.39f, 0.50f, 0.74f, 1.0f } ;
 
-static const sgVec4 BaseAmbiant      = { 0.2f, 0.2f, 0.2f, 1.0f } ;
-static const sgVec4 BaseDiffuse      = { 0.8f, 0.8f, 0.8f, 1.0f } ;
-static const sgVec4 BaseSpecular     = { 0.3f, 0.3f, 0.3f, 1.0f } ;
+static const sgVec4 BaseAmbiant      = { 0.35f, 0.35f, 0.40f, 1.0f } ;
+static const sgVec4 BaseDiffuse      = { 0.80f, 0.80f, 0.80f, 1.0f } ;
+static const sgVec4 BaseSpecular     = { 0.33f, 0.33f, 0.30f, 1.0f } ;
 
 static int NStars = 0;
 static int NPlanets = 0;
