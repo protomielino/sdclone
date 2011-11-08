@@ -654,7 +654,7 @@ void cgrVtxTableCarPart::draw_geometry_array ()
 		glMatrixMode(GL_TEXTURE);
 		glLoadIdentity();
 
-		ttx = grCarInfo[_carIndex].distFromStart/50;
+		ttx = grCarInfo[_carIndex].distFromStart/100;
 		sgMakeTransMat4(mat, ttx, tty, ttz);
 		glMultMatrixf((float *)mat);
 		glMatrixMode(GL_MODELVIEW);
