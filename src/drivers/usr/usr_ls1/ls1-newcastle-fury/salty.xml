@@ -24,9 +24,10 @@
 	</section>
 
 	<section name="private">
-		<attnum name="int margin" min="0" max="2" val="1.2"/>
-		<attnum name="ext margin" min="0" max="2" val="0.2"/>
+		<attnum name="int margin" min="0" max="2" val="1.4"/>
+		<attnum name="ext margin" min="0" max="2" val="0.8"/>
 		<attnum name="offtrack allowed" val="0.0"/>
+		<attnum name="base speed factor" val="0.94"/>
 
 	</section>
 
