@@ -24,7 +24,7 @@
 
 #include "sim.h"
 
-const tdble aMax = 0.35f; /*  */
+const tdble aMax = 1.0f; /*  */
 
 void
 SimCarConfig(tCar *car)
