@@ -69,6 +69,7 @@ class cGrBoard
     bool grGetSplitTime(tSituation *s, tCarElt *car, bool gap_inrace, double &time, int *laps_different, float **color);
     void grGetLapsTime(tSituation *s, tCarElt *car, char* result, char const** label) const;
     void grMakeThreeLetterNames(const tSituation *s);
+    void grSetupDrawingArea(int xl, int yb, int xr, int yt) const;
 		
  public:
     cGrBoard(int myid);

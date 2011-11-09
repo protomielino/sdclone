@@ -388,16 +388,7 @@ cGrBoard::grDispCarBoard1(tCarElt *car, tSituation *s)
   const int xr = x2 + dxc;
   dx = MAX(dx, (xr-x));
 
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
-  glBegin(GL_QUADS);
-  glColor4f(0.1, 0.1, 0.1, 0.8);
-  glVertex2f(x-5, y + dy);
-  glVertex2f(x+dx+5, y + dy);
-  glVertex2f(x+dx+5, y-5 - dy2 * 8 /* lines */);
-  glVertex2f(x-5, y-5 - dy2 * 8 /* lines */);
-  glEnd();
-  glDisable(GL_BLEND);
+  grSetupDrawingArea(x - 5, y + dy, x + dx + 5, y - 5 - dy2 * 8);
   
   GfuiDrawString(buf, grCarInfo[car->index].iconColor, GFUI_FONT_MEDIUM_C, x, y);
   y -= dy;
@@ -478,16 +469,7 @@ cGrBoard::grDispCarBoard2(tCarElt *car, tSituation *s)
     }
   }
   
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
-  glBegin(GL_QUADS);
-  glColor4f(0.1, 0.1, 0.1, 0.8);
-  glVertex2f(x - 5, y + dy);
-  glVertex2f(x + dx + 5, y + dy);
-  glVertex2f(x + dx + 5, y - 5 - dy2 * lines);
-  glVertex2f(x - 5, y - 5 - dy2 * lines);
-  glEnd();
-  glDisable(GL_BLEND);
+  grSetupDrawingArea(x - 5, y + dy, x + dx + 5, y - 5 - dy2 * lines);
   
   GfuiDrawString(buf, grCarInfo[car->index].iconColor, GFUI_FONT_MEDIUM_C, x, y);
   y -= dy;
@@ -752,17 +734,7 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
     const int maxLines = MIN(leaderNb, s->_ncars);  //Max # of lines to display (# of cars in race or max 10 by default)
     const int drawLaps = MIN(1, leaderFlag - 1);  //Display # of laps on top of the list?
 
-    //Set up drawing area
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
-    glBegin(GL_QUADS);
-    glColor4f(0.1, 0.1, 0.1, 0.8);
-    glVertex2f(x, y - 5);
-    glVertex2f(xr + 5, y - 5);
-    glVertex2f(xr + 5, y + dy * (maxLines + drawLaps));
-    glVertex2f(x, y + dy * (maxLines + drawLaps));
-    glEnd();
-    glDisable(GL_BLEND);
+    grSetupDrawingArea(x, y, xr + 5, y + dy * (maxLines + drawLaps));
     
     //Display current car in last line (ie is its position >= 10)?
     int drawCurrent = (current >= maxLines) ? 1 : 0;
@@ -1483,18 +1455,7 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
   const int dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
   const int maxLines = MIN(leaderNb, s->_ncars);  //Max # of lines to display (# of cars in race or max 10 by default)
   
-  //Set up drawing area
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
-  glBegin(GL_QUADS);
-  glColor4f(0.1, 0.1, 0.1, 0.8);
-  glVertex2f(x, y - 5);
-  glVertex2f(x + 175, y - 5);
-  glVertex2f(x + 175, y + dy * (maxLines + 1));
-  glVertex2f(x, y + dy * (maxLines + 1));
-  glEnd();
-  glDisable(GL_BLEND);
-
+  grSetupDrawingArea(x, y, x + 175, y + dy * (maxLines + 1));
 
   //The board is built from bottom up:
   //driver position #10/current is drawn first,
@@ -1606,16 +1567,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
   int dx = GfuiFontWidth(GFUI_FONT_SMALL_C, "W") * st.size();
   
   //Set up drawing area
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
-  glBegin(GL_QUADS);
-  glColor4f(0.1, 0.1, 0.1, 0.8);
-  glVertex2f(leftAnchor, BOTTOM_ANCHOR);
-  glVertex2f(rightAnchor, BOTTOM_ANCHOR);
-  glVertex2f(rightAnchor, BOTTOM_ANCHOR + dy);
-  glVertex2f(leftAnchor,  BOTTOM_ANCHOR + dy);
-  glEnd();
-  glDisable(GL_BLEND);
+  grSetupDrawingArea(leftAnchor, BOTTOM_ANCHOR, rightAnchor, BOTTOM_ANCHOR + dy);
 
   // Check if scrolling is completed
   if (offset > dx + 5) 
@@ -1739,3 +1691,29 @@ cGrBoard::grMakeThreeLetterNames(const tSituation *s)
   }//for i
   //3-letter name array ready to use!
 }//grMakeThreeLetterName
+
+
+/**
+ * Set up a drawing area to put textual info there.
+ *
+ * Draws a dark quadrangle on the given coords.
+ *
+ * @param xl X left
+ * @param yb Y bottom
+ * @param xr X right
+ * @param yt Y top
+ */
+void
+cGrBoard::grSetupDrawingArea(int xl, int yb, int xr, int yt) const
+{
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
+  glBegin(GL_QUADS);
+  glColor4f(0.1, 0.1, 0.1, 0.8);
+  glVertex2f(xl, yb);
+  glVertex2f(xr, yb);
+  glVertex2f(xr, yt);
+  glVertex2f(xl, yt);
+  glEnd();
+  glDisable(GL_BLEND);
+}
