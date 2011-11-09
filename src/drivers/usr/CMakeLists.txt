@@ -66,7 +66,7 @@ SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 
 ROBOT_DATA(NAME usr_trb1 PREFIX usr_trb1
            FILES usr_trb1.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ###################
 # USR_SC
@@ -78,7 +78,7 @@ SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12
 
 ROBOT_DATA(NAME usr_sc PREFIX usr_sc
            FILES usr_sc.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ###################
 # USR_LS1
@@ -91,7 +91,7 @@ SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 
 ROBOT_DATA(NAME usr_ls1 PREFIX usr_ls1
            FILES usr_ls1.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ###################
 # USR_LS2
@@ -105,7 +105,7 @@ SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 
 ROBOT_DATA(NAME usr_ls2 PREFIX usr_ls2
            FILES usr_ls2.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ###################
 # USR_36GP
@@ -118,7 +118,7 @@ SET(ROBOT_SUBDIRS 1 2 3 4 5 6 7 8 9 10 11 12
 
 ROBOT_DATA(NAME usr_36GP PREFIX usr_36GP
            FILES usr_36GP.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ###################
 # USR_RS
@@ -129,5 +129,5 @@ SET(ROBOT_SUBDIRS 1
 
 ROBOT_DATA(NAME usr_rs PREFIX usr_rs
            FILES usr_rs.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 

@@ -120,7 +120,7 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9
 
 ROBOT_DATA(NAME simplix_36GP PREFIX simplix_36GP 
            FILES simplix_36GP.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 # SuperCars
 SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 12 13
@@ -130,7 +130,7 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 12 13
 
 ROBOT_DATA(NAME simplix_sc PREFIX simplix_sc 
            FILES simplix_sc.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 # LS1 
 SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13
@@ -141,7 +141,7 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13
 
 ROBOT_DATA(NAME simplix_ls1 PREFIX simplix_ls1 
            FILES simplix_ls1.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 # LS2 
 SET(ROBOT_SUBDIRS 0
                   ls2-bavaria-g3gtr
@@ -149,7 +149,7 @@ SET(ROBOT_SUBDIRS 0
 
 ROBOT_DATA(NAME simplix_ls2 PREFIX simplix_ls2 
            FILES simplix_ls2.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 # TRB1
 SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
@@ -160,7 +160,7 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 
 ROBOT_DATA(NAME simplix_trb1 PREFIX simplix_trb1 
            FILES simplix_trb1.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 # MP5
 SET(ROBOT_SUBDIRS 0 1 2 3 4 5 
@@ -169,7 +169,7 @@ SET(ROBOT_SUBDIRS 0 1 2 3 4 5
 
 ROBOT_DATA(NAME simplix_mp5 PREFIX simplix_mp5 
            FILES simplix_mp5.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 # Work-in-progress / unofficial simplix instances.
 IF(NOT OPTION_OFFICIAL_ONLY)
@@ -181,6 +181,6 @@ IF(NOT OPTION_OFFICIAL_ONLY)
 
     ROBOT_DATA(NAME simplix_mpa1 PREFIX simplix_mpa1 
                FILES simplix_mpa1.xml default.xml logo.rgb readme.txt
-               SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+               SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ENDIF()

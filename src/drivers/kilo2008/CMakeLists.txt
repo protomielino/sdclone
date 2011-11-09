@@ -21,4 +21,4 @@ ROBOT_MODULE(NAME ${ROBOT_NAME}
 
 ROBOT_DATA(NAME ${ROBOT_NAME}
            FILES ${ROBOT_NAME}.xml default.xml logo.rgb
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png)
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
