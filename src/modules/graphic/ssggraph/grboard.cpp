@@ -751,15 +751,11 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
         i = j - 1;
       }//if drawCurrent
 
-      //Set colour of the currently displayed driver to that
-      //defined in the driver's XML file
-      float *clr; //colour to display driver name
-      if (i == current) {
-        clr = grCarInfo[car->index].iconColor;
-        drawCurrent = 0;
-      } else {
-        clr = grWhite;
-      }//if i
+      //Set colour of the drivers to that
+      //defined in the drivers' XML file.
+      //Current driver is white...
+      float *clr = (i == current)
+        ? grWhite : grCarInfo[s->cars[i]->index].iconColor;
 
       //Driver position + name
       snprintf(buf, sizeof(buf), "%3d: %s", i + 1, s->cars[i]->_name);
@@ -1429,8 +1425,7 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 {
   //Scrolling
   if(iTimer == 0 || s->currentTime < iTimer) iTimer = s->currentTime;
-  if(s->currentTime >= iTimer + LEADERBOARD_SCROLL_TIME)
-    {
+  if(s->currentTime >= iTimer + LEADERBOARD_SCROLL_TIME) {
       iTimer = s->currentTime;
       ++iStart;
       iStart = iStart % (s->_ncars + 1);  //Limit: number of cars + one separator line
@@ -1490,18 +1485,14 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
   }//for j
 
   //Write 'Lap X/Y' on top of the leader board
-  if (s->currentTime < s->_totTime)
-  {
+  if (s->currentTime < s->_totTime) {
     GfuiDrawString(" Laps:", grWhite, GFUI_FONT_SMALL_C, x, y);
     snprintf(buf, sizeof(buf), "%d", s->cars[0]->_laps);
-    GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
-  }
-  else
-  {
+  } else {
     GfuiDrawString(" Lap:", grWhite, GFUI_FONT_SMALL_C, x, y);
     snprintf(buf, sizeof(buf), "%d / %d", s->cars[0]->_laps, s->_totLaps);
-    GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
   }
+  GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
 }//grDispLeaderBoardScroll
 
 
