@@ -69,7 +69,7 @@ def check_version(myfile):
 
 #---
 
-def get_screenshot(index, car, skin):
+def get_screenshot(index, car, skin, skintargets):
 	if not options.config or not options.run:
 		return None
 
@@ -103,6 +103,8 @@ def get_screenshot(index, car, skin):
 					k.set("val", index)
 				if k.attrib["name"] == "module":
 					k.set("val", module)
+				if k.attrib["name"] == "skin targets":
+					k.set("val", skintargets)
 				if k.attrib["name"] == "skin name":
 					skin_done = True
 					if skin:
@@ -134,6 +136,19 @@ def get_screenshot(index, car, skin):
 	os.system(options.run)
 
 	# return the filename of screen shot
+
+#---
+
+def process_screenshot(preview):
+	screenshot_files = os.listdir(os.sep.join([options.config,"screenshots"]))
+	if screenshot_files:
+		screenshot_file = screenshot_files[0]
+
+		screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
+		scaled = screenshot.resize((800,500), Image.ANTIALIAS)
+
+		scaled.save(preview, quality=95, optimize=True, subsampling='4:4:4')
+		os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
 
 #---
 
@@ -187,25 +202,17 @@ def check_dir(args, dirname, names):
 					print "Preview : OK"
 
 				if options.config and options.run and screenshot:
-					screenshot = get_screenshot("1", car, None)
+					screenshot = get_screenshot("1", car, None, "1")
 
 					if options.proc:
 						# Call alternative script to process images
 						os.system(" ".join([options.run, preview]))
 					elif _has_PIL:
-						screenshot_files = os.listdir(os.sep.join([options.config,"screenshots"]))
-						if screenshot_files:
-							screenshot_file = screenshot_files[0]
-	
-							screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
-							scaled = screenshot.resize((800,500), Image.ANTIALIAS)
-
-							scaled.save(preview, quality=90, optimize=True, subsampling='4:4:4')
-							os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
+						process_screenshot(preview)
 			else:
 				print "Standard: Missing"
 
-			# Check for alternate skins (specific for driver)
+			# Check for alternate skins (specific for this car)
 			alternates = glob.glob("-".join([os.sep.join([options.cars, car, car]), "*.png"]))
 
 			if (alternates != None):
@@ -224,7 +231,7 @@ def check_dir(args, dirname, names):
 						(filename,ext) = os.path.splitext(alternate)
 						skin = filename.rsplit("-",1)[1]
 
-						if skin == "int" or skin == "speed" or skin == "rpm":
+						if skin == "int" or skin == "interior" or skin == "speed" or skin == "rpm":
 							continue
 
 						preview = "-".join([filename, "preview.jpg"])
@@ -243,21 +250,19 @@ def check_dir(args, dirname, names):
 							print "Preview : OK"
 
 					if options.config and options.run and screenshot:
-						screenshot = get_screenshot("1", car, skin)
+						wheelfile = "".join([os.sep.join([options.cars, car, "wheel3d-"]), skin, ".png"])
+						print "wheel file", wheelfile
+						if os.access(wheelfile, os.R_OK):
+							screenshot = get_screenshot("1", car, skin, "3")
+						else:
+							screenshot = get_screenshot("1", car, skin, "1")
 
 						if options.proc:
 							# Call alternative script to process images
 							os.system(" ".join([options.run, preview]))
 						elif _has_PIL:
-							screenshot_files = os.listdir(os.sep.join([options.config,"screenshots"]))
-							if screenshot_files:
-								screenshot_file = screenshot_files[0]
+							process_screenshot(preview)
 
-								screenshot = Image.open(os.sep.join([options.config, "screenshots", screenshot_file]))
-								scaled = screenshot.resize((800,500), Image.ANTIALIAS)
-
-								scaled.save(preview, quality=90, optimize=True, subsampling='4:4:4')
-								os.remove(os.sep.join([options.config, "screenshots", screenshot_file]))
 			print
 
 #---
