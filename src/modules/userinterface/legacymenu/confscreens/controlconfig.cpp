@@ -365,7 +365,7 @@ IdleWaitForInput(void)
     GfctrlMouseGetCurrentState(&MouseInfo);
 
     /* Check for a mouse button pressed */
-    for (i = 0; i < 3; i++) {
+    for (i = 0; i < 7; i++) {
 	if (MouseInfo.edgedn[i]) {
 	    AcceptMouseClicks = 0;
 	    GfuiApp().eventLoop().setRecomputeCB(0);

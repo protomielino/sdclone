@@ -361,7 +361,7 @@ typedef struct MouseInfo
 {
     int X;
     int Y;
-    int button[3];
+    int button[7];
 } tMouseInfo;
 
 TGFCLIENT_API tMouseInfo* GfuiMouseInfo(void);
@@ -655,9 +655,9 @@ TGFCLIENT_API int GfctrlJoyGetCurrentStates(tCtrlJoyInfo* joyInfo);
 /** Mouse information structure */
 typedef struct
 {
-    int         edgeup[3];      /**< Button transition from down (pressed) to up */
-    int         edgedn[3];      /**< Button transition from up to down */
-    int         button[3];      /**< Button state (1 = up) */
+    int         edgeup[7];      /**< Button transition from down (pressed) to up */
+    int         edgedn[7];      /**< Button transition from up to down */
+    int         button[7];      /**< Button state (1 = up) */
     float       ax[4];          /**< mouse axis position (mouse considered as a joystick) */
 } tCtrlMouseInfo;
 
