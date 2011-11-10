@@ -1033,8 +1033,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 				car->_accelCmd =
 					MIN(car->_accelCmd, HCtx[idx]->paccel + inc_rate*d_accel/fabs(d_accel));
 		}
-		HCtx[idx]->paccel = car->_accelCmd;
+
 	}
+
+	// Limit throttle when auto-shifting
+	if (HCtx[idx]->clutchtime > 0.0f && HCtx[idx]->autoClutch == true)
+		car->_accelCmd = MIN(car->_accelCmd, 0.6);
+
+	HCtx[idx]->paccel = car->_accelCmd;
 
 	if (HCtx[idx]->autoReverseEngaged) {
 		/* swap brake and throttle */
