@@ -275,6 +275,9 @@ class cGrCarCamMirror : public cGrPerspCamera
 #define GR_ZOOM_MIN 	3
 #define GR_ZOOM_DFLT    4
 
-extern void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fovFactor);
+// If fixedFar is not nul, the fovFactor is used for the far clip plane ;
+// otherwise, fixedFar is used.
+extern void grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
+									   tdble fovFactor, tdble fixedFar = 0);
 
 #endif /* _GRCAM_H_ */ 

@@ -1463,7 +1463,8 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 
 
 void
-grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fovFactor)
+grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
+						   tdble fovFactor, tdble fixedFar)
 {
     int			id;
     int			c;
@@ -1485,9 +1486,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				      50.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
-				      600.0 * fovFactor,	/* far */
-				      300.0 * fovFactor,	/* fogstart */
-				      600.0 * fovFactor	/* fogend */
+				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+				      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
     id++;
@@ -1502,9 +1503,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      50.0,	/* fovymin */
 			      95.0,	/* fovymax */
 			      0.03,	/* near */
-			      600.0 * fovFactor,	/* far */
-			      300.0 * fovFactor,	/* fogstart */
-			      600.0 * fovFactor	/* fogend */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+			      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 			      );
     cam->add(&cams[c]);
     id++;
@@ -1518,9 +1519,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				      50.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
-				      600.0 * fovFactor,	/* far */
-				      300.0 * fovFactor,	/* fogstart */
-				      600.0 * fovFactor	/* fogend */
+				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+				      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
     id++;
@@ -1534,9 +1535,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				      50.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
-				      600.0 * fovFactor,	/* far */
+				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
 				      300.0 * fovFactor,	/* fogstart */
-				      600.0 * fovFactor	/* fogend */
+				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
     id++;
@@ -1550,9 +1551,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				      50.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
-				      600.0 * fovFactor,	/* far */
-				      300.0 * fovFactor,	/* fogstart */
-				      600.0 * fovFactor	/* fogend */
+				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+				      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
     id++;
@@ -1568,9 +1569,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      6.0,	/* dist */
 			      2.0,	/* height */
 			      1.0,	/* near */
-			      600.0 * fovFactor,	/* far */
-			      300.0 * fovFactor,	/* fogstart */
-			      600.0 * fovFactor,	/* fogend */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
 			      0.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
@@ -1587,9 +1588,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      10.0,	/* dist */
 			      2.0,	/* height */
 			      1.0,	/* near */
-			      600.0 * fovFactor,	/* far */
-			      300.0 * fovFactor,	/* fogstart */
-			      600.0 * fovFactor,	/* fogend */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
 			      25.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
@@ -1611,9 +1612,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      20.0,	/* dist */
 			      4.0,	/* height */
 			      1.0,	/* near */
-			      600.0 * fovFactor,	/* far */
-			      300.0 * fovFactor,	/* fogstart */
-			      600.0 * fovFactor,	/* fogend */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
 			      15.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
@@ -1629,9 +1630,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			       95.0,	/* fovymax */
 			       30.0,	/* dist */
 			       1.0,	/* near */
-			       1000.0 * fovFactor,	/* far */
-			       500.0 * fovFactor,	/* fogstart */
-			       1000.0 * fovFactor	/* fogend */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			       );
     cam->add(&cams[c]);
     id++;
@@ -1647,9 +1648,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      8.0,	/* dist */
 			      .50,	/* height */
 			      .50,	/* near */
-			      600.0 * fovFactor,	/* far */
-			      300.0 * fovFactor,	/* fogstart */
-			      600.0 * fovFactor	/* fogend */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+			      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 			      );
     cam->add(&cams[c]);
     id++;
@@ -1664,9 +1665,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			     95.0,	/* fovymax */
 			     8.0,	/* dist */
 			     0.5,	/* near */
-			     1000.0 * fovFactor,	/* far */
-			     500.0 * fovFactor,	/* fogstart */
-			     1000.0 * fovFactor	/* fogend */
+			     fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			     fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			     fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			     );
     cam->add(&cams[c]);
 
@@ -1687,9 +1688,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    -20.0,	/* disty */
 			    3.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1706,9 +1707,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    20.0,	/* disty */
 			    3.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1725,9 +1726,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    0.0,	/* disty */
 			    3.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1744,9 +1745,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    0.0,	/* disty */
 			    3.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1763,9 +1764,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    -40.0,	/* disty */
 			    6.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1782,9 +1783,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    40.0,	/* disty */
 			    6.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1801,9 +1802,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    0.0,	/* disty */
 			    6.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
     id++;
@@ -1820,9 +1821,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			    0.0,	/* disty */
 			    6.0,	/* distz */
 			    1.0,	/* near */
-			    1000.0 * fovFactor,	/* far */
-			    500.0 * fovFactor,	/* fogstart */
-			    1000.0 * fovFactor	/* fogend */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			    fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			    fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			    );
     cam->add(&cams[c]);
 
@@ -1845,9 +1846,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  0,		/* axis */
 			  //200.0,	/* near */
 			  100.0,	/* near */
-			  1000.0 * fovFactor,/* far */
-			  500.0 * fovFactor,	/* fogstart */
-			  1000.0 * fovFactor	/* fogend */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+			  fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			  );
     cam->add(&cams[c]);
     id++;
@@ -1865,9 +1866,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  250.0,	/* distz */
 			  1,		/* axis */
 			  200.0,	/* near */
-			  1000.0 * fovFactor,/* far */
-			  500.0 * fovFactor,	/* fogstart */
-			  1000.0 * fovFactor	/* fogend */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+			  fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			  );
     cam->add(&cams[c]);
     id++;
@@ -1885,9 +1886,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  350.0,	/* distz */
 			  2,		/* axis */
 			  200.0,	/* near */
-			  1000.0 * fovFactor,/* far */
-			  500.0 * fovFactor,	/* fogstart */
-			  1000.0 * fovFactor	/* fogend */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+			  fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			  );
     cam->add(&cams[c]);
     id++;
@@ -1905,9 +1906,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			  400.0,	/* distz */
 			  3,		/* axis */
 			  200.0,	/* near */
-			  1000.0 * fovFactor,/* far */
-			  500.0 * fovFactor,	/* fogstart */
-			  1000.0 * fovFactor	/* fogend */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+			  fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			  fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			  );
     cam->add(&cams[c]);
 
@@ -1926,9 +1927,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			      60.0,	/* fovymax */
 			      120.0,	/* distz */
 			      100.0,	/* near */
-			      1500.0,/* far */
-			      10500.0,/* fogstart */
-			      20500.0	/* fogend */
+			      fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+			      fixedFar ? fixedFar/2 : 500.0 * fovFactor,/* fogstart */
+			      fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			      );
     cam->add(&cams[c]);
 
@@ -2067,9 +2068,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				  5.0,	/* fovymin */
 				  60.0,	/* fovymax */
 				  1.0,	/* near */
-				  1000.0 * fovFactor,/* far */
-				  500.0 * fovFactor,	/* fogstart */
-				  1000.0 * fovFactor	/* fogend */
+				  fixedFar ? fixedFar : 1000.0 * fovFactor,/* far */
+				  fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+				  fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 				  );
     cam->add(&cams[c]);
 
@@ -2087,9 +2088,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				1.0,		/* fovymin */
 				90.0,	/* fovymax */
 				1.0,		/* near */
-				1000.0 * fovFactor,	/* far */
-				500.0 * fovFactor,	/* fogstart */
-				1000.0 * fovFactor	/* fogend */
+				fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+				fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+				fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 				);
     cam->add(&cams[c]);
 
@@ -2107,9 +2108,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 			       1.0,		/* fovymin */
 			       90.0,	/* fovymax */
 			       1.0,		/* near */
-			       1000.0 * fovFactor,	/* far */
-			       500.0 * fovFactor,	/* fogstart */
-			       1000.0 * fovFactor	/* fogend */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			       );
     cam->add(&cams[c]);
 
@@ -2125,10 +2126,9 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams, tdble fo
 				   1.0,	/* fovymin */
 				   90.0,	/* fovymax */
 				   1.0,	/* near */
-				   1000.0 * fovFactor,	/* far */
-				   500.0 * fovFactor,	/* fogstart */
-				   1000.0 * fovFactor	/* fogend */
+				   fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+				   fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+				   fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 				   );
     cam->add(&cams[c]);
-
 }

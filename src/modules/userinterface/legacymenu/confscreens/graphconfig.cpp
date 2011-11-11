@@ -146,10 +146,14 @@ LoadGraphicOptions()
 			}
 		}
 		GfuiLabelSetText(ScrHandle, DynamicSkyDomeLabelId, DynamicSkyDomeValues[DynamicSkyDomeIndex]);
+
+		// FOV not taken into account when sky dome enabled.
+		GfuiEnable(ScrHandle, FovEditId, GFUI_DISABLE);
 	}
 	else
 	{
-		ChangeSkyDomeDist(0); // No dynamic time if no sky dome
+		// No dynamic time if no sky dome
+		ChangeSkyDomeDist(0);
 	}
 
     PrecipDensityIndex = NbPrecipDensityValues - 1; // Default value index, in case file value not found in list.
@@ -229,15 +233,29 @@ ChangeSkyDomeDist(void* vp)
     snprintf(buf, sizeof(buf), "%d", SkyDomeDistValues[SkyDomeDistIndex]);
     GfuiLabelSetText(ScrHandle, SkyDomeDistLabelId, buf);
 
-	const bool bLockDynamicSkyDome = SkyDomeDistValues[SkyDomeDistIndex] == 0;
-	if (bLockDynamicSkyDome)
+	// If realistic sky dome not enabled :
+	if (!SkyDomeDistValues[SkyDomeDistIndex])
 	{
+		// Disable dynamic time of day
 		DynamicSkyDomeIndex = 0;
 		ChangeDynamicSkyDome(0);
+
+		// Make it clear that it is
+		GfuiEnable(ScrHandle, DynamicSkyDomeLeftButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, DynamicSkyDomeRightButtonId, GFUI_DISABLE);
+
+		// Enable FOV editbox
+		GfuiEnable(ScrHandle, FovEditId, GFUI_ENABLE);
 	}
-	const int nArrowsVisibility = bLockDynamicSkyDome ? GFUI_INVISIBLE : GFUI_VISIBLE;
-	GfuiVisibilitySet(ScrHandle, DynamicSkyDomeLeftButtonId, nArrowsVisibility);
-	GfuiVisibilitySet(ScrHandle, DynamicSkyDomeRightButtonId, nArrowsVisibility);
+	else
+	{
+		// Enable changes of dynamic time of day
+		GfuiEnable(ScrHandle, DynamicSkyDomeLeftButtonId, GFUI_ENABLE);
+		GfuiEnable(ScrHandle, DynamicSkyDomeRightButtonId, GFUI_ENABLE);
+
+		// Enable FOV editbox
+		GfuiEnable(ScrHandle, FovEditId, GFUI_DISABLE);
+	}
 } 
 
 static void

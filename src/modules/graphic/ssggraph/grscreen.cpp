@@ -464,19 +464,18 @@ void cGrScreen::loadParams(tSituation *s)
 /* Create cameras */
 void cGrScreen::initCams(tSituation *s)
 {
+	// Get the factor of visibiity from the graphics settings and from the track.
 	tdble fovFactor = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_FOVFACT, (char*)NULL, 1.0);
 	fovFactor *= GfParmGetNum(grTrackHandle, TRK_SECT_GRAPH, TRK_ATT_FOVFACT, (char*)NULL, 1.0);
-	if (grSkyDomeDistance) {
-		// TODO: Don't roughly overwrite fovFactor with such a huge value without taking care
-		//       of graphic/track settings (see the proposal below).
-		fovFactor = (grSkyDomeDistance / 10);
 
-		// TODO: This formula is more consistent, but it prevents the sky dome from being visible.
-		//fovFactor *= grSkyDomeDistance / grSkyDomeNeutralFOVDistance;
-	}
-	GfLogTrace("Screen #%d : Factor of visibility = %.2f\n", id, fovFactor);
+	// If sky dome is enabled, we have a "fixed far" cut plane.
+	// Warning: In theory, 2*grSkyDomeDistance+1 should be enough, but it is not (why ?).
+	const tdble fixedFar = grSkyDomeDistance ? (2.1f * grSkyDomeDistance + 1.0f) : 0;
 	
-	if (boardCam == NULL) {
+	GfLogTrace("Screen #%d : FOV = %.2f, Far=%.0f\n", id, fovFactor, fixedFar);
+
+	// Board camera.
+	if (!boardCam) {
 		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
 		if (fakeWidth < 800)
 			fakeWidth = 800;
@@ -485,11 +484,13 @@ void cGrScreen::initCams(tSituation *s)
 		board->setWidth(fakeWidth);
 	}
 	
-	if (bgCam == NULL) {
+	// Background camera.
+	if (!bgCam) {
 		bgCam = new cGrBackgroundCam(this);
 	}
 	
-	if (mirrorCam == NULL) {
+	// Mirror camera.
+	if (!mirrorCam) {
 		mirrorCam = new cGrCarCamMirror(
 			this,
 			-1,
@@ -499,16 +500,15 @@ void cGrScreen::initCams(tSituation *s)
 			0.0,				// fovymin
 			360.0,				// fovymax
 			0.3,				// near
-			300.0 * fovFactor,	// far
-			200.0 * fovFactor,	// fogstart
-			300.0 * fovFactor	// fogend
+			fixedFar ? fixedFar : 300.0 * fovFactor, // far
+			fixedFar ? 2*fixedFar/3 : 200.0 * fovFactor,	// fogstart
+			fixedFar ? fixedFar : 300.0 * fovFactor	// fogend
 		);
 	}
 	
 	// Scene Cameras
 	memset(cams, 0, sizeof(cams));
-	
-	grCamCreateSceneCameraList(this, cams, fovFactor);
+	grCamCreateSceneCameraList(this, cams, fovFactor, fixedFar);
 	
 	cars = (tCarElt**)calloc(s->_ncars, sizeof (tCarElt*));
 	for (int i = 0; i < s->_ncars; i++) {
