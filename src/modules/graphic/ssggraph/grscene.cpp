@@ -395,6 +395,7 @@ void grCustomizePits(void)
                                               FALSE, FALSE, FALSE);
       reinterpret_cast<ssgSimpleState*>(stWall)->setShininess(100);
 
+      bool bHasLogo = false;
       // Loop over all the available pits
       for (int i = 0; i < pits->nMaxPits; i++) {
         tTrackOwnPit *act_pit = &(pits->driversPits[i]);
@@ -416,7 +417,7 @@ void grCustomizePits(void)
           // If we have more than one car in the pit,
           // use the team pit logo of driver 0.
           snprintf(buf, sizeof(buf),
-            "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;\\drivers/%s;data/textures",
+            "%sdrivers/%s/%d;%sdrivers/%s;drivers/%s/%d;drivers/%s",
             GfLocalDir(),
             act_pit->car[0]->_modName,
             act_pit->car[0]->_driverIndex,
@@ -435,8 +436,11 @@ void grCustomizePits(void)
             GfLogTrace("Using skinned pit door logo %s\n",
                         strLogoFileName.c_str());
           }
+	  bHasLogo = true;
         } else {
           snprintf(buf, sizeof(buf), "data/textures");
+	  strLogoFileName = "tr-bar-gr";
+	  bHasLogo = false;
         }  // if act_pit->car[0]
 
         // Let's draw the low wall
@@ -537,6 +541,12 @@ void grCustomizePits(void)
         pit_clr2->add(clr2);
         sgVec3 nrm2 = { normalvector.x, normalvector.y, 0.0 };
         pit_nrm2->add(nrm2);
+
+	// If bHasLogo is false, there is no team/driver logo,
+	// we should display a plain concrete wall then without decals.
+	// In that case strLogoFileName == strWallFileName,
+	//but we also must care for different coord mapping.
+
         // First, bottom vertex
         {
           sgVec2 tex = { 0.0, 0.0 };
@@ -547,7 +557,7 @@ void grCustomizePits(void)
 
         // First, top vertex
         {
-          sgVec2 tex = { 0.0, 0.33 };
+          sgVec2 tex = { 0.0, (bHasLogo ? 0.33 : 0.25) };
           sgVec3 vtx = { x2, y2, z2 + 0.9 };
           pit_tex2->add(tex);
           pit_vtx2->add(vtx);
@@ -563,7 +573,7 @@ void grCustomizePits(void)
 
         // Second, top vertex
         {
-          sgVec2 tex = { 1.0, 0.33 };
+          sgVec2 tex = { 1.0, (bHasLogo ? 0.33 : 0.25) };
           sgVec3 vtx = { x3, y3, z3 + 0.9 };
           pit_tex2->add(tex);
           pit_vtx2->add(vtx);
