@@ -59,36 +59,38 @@ class Sound
 	float pitch; ///< Current pitch
 	float lowpass; ///< Current low pass filter
 	bool loop; ///< Whether it's a looping sound
+	bool playing; ///< Sound is playing
+    bool paused; ///< sound is paused
 
  public:
 
-	/// Consruct a sound.
-	Sound(int flags = (ACTIVE_VOLUME|ACTIVE_PITCH))
-	{
-		this->flags = flags;
-	}
+	/// Construct a sound.
+	Sound(int flags = (ACTIVE_VOLUME|ACTIVE_PITCH), bool loop = false);
 	
     /// Destructor
-	virtual ~Sound() {}
+	virtual ~Sound();
 	
 	virtual void setVolume(float vol);
 	virtual void setPitch(float pitch);
 	virtual void setLPFilter(float lp);
-	virtual void setSource(sgVec3 p, sgVec3 u) {}
-	virtual float getVolume() {return volume;}
-	virtual float getPitch() {return pitch;}
-	virtual float getLPfilter() {return lowpass;}
-	virtual void setReferenceDistance (float dist) {}
-	virtual void getSource (sgVec3 p, sgVec3 u) {}
+	virtual void setSource(sgVec3 p, sgVec3 u);
+	virtual void setReferenceDistance (float dist);
 	//virtual void setListener(sgVec3 p, sgVec3 u) = 0;
+
+	virtual float getVolume() const;
+	virtual float getPitch() const;
+	virtual float getLPfilter() const;
+	virtual void getSource (sgVec3 p, sgVec3 u) const;
+
 	virtual void play() = 0;
 	virtual void start() = 0;
 	virtual void stop() = 0;
 	virtual void resume() = 0;
 	virtual void pause() = 0;
 	virtual void update() = 0;
-	virtual bool isPlaying() = 0;
-	virtual bool isPaused() = 0;
+	
+	virtual bool isPlaying() const;
+	virtual bool isPaused() const;
 };
 
 /** Sound source management.

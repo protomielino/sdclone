@@ -28,8 +28,10 @@ typedef struct WheelSoundData_
 } WheelSoundData;
 
 /// Manages the source sound of each individual car.
-class CarSoundData {
+class CarSoundData
+{
 protected:
+	
 	sgVec3 listener_position;
 	sgVec3 position;
 	sgVec3 speed;
@@ -41,7 +43,9 @@ protected:
 	void calculateTyreSound (tCarElt* car);
 	void calculateGearChangeSound (tCarElt* car);
 	void calculateCollisionSound (tCarElt* car);
+
 public:
+	
 	SoundPri eng_pri;
 	WheelSoundData wheel[4];
 	float attenuation; ///< global distance attenuation
@@ -62,46 +66,24 @@ public:
 	QSoundChar skid_metal;
 	int prev_gear;
 
-	CarSoundData (int id, SoundInterface* sound_interface);
-	void setEngineSound (Sound* engine_sound, float rpm_scale);
-	void setTurboParameters (bool turbo_on, float turbo_rpm, float turbo_lag);
-	Sound* getEngineSound () {return engine_sound;}
-	void copyEngPri (SoundPri& epri) 	{epri = eng_pri;}
-	void setCarPosition (sgVec3 p)
-	{
-		for (int i=0; i<3; i++) {
-			position[i] = p[i];
-		}
-	}
-	void setCarSpeed (sgVec3 u)
-	{
-		for (int i=0; i<3; i++) {
-			speed[i] = u[i];
-		}
-	}
-	void getCarPosition (sgVec3 p)
-	{
-		for (int i=0; i<3; i++) {
-			p[i] = position[i];
-		}
-	}
-	void getCarSpeed (sgVec3 u)
-	{
-		for (int i=0; i<3; i++) {
-			u[i] = speed[i];
-		}
-	}
-	void setListenerPosition (sgVec3 p)
-	{
-		for (int i=0; i<3; i++) {
-			listener_position[i] = p[i];
-		}
-	}
-	void update (tCarElt* car);
 	bool gear_changing;
 	bool bottom_crash;
 	bool bang;
 	bool crash;
+
+public:
+	
+	CarSoundData (int id, SoundInterface* sound_interface);
+	void setEngineSound (Sound* engine_sound, float rpm_scale);
+	void setTurboParameters (bool turbo_on, float turbo_rpm, float turbo_lag);
+	Sound* getEngineSound () const;
+	void copyEngPri (SoundPri& epri) const;
+	void setCarPosition (sgVec3 p);
+	void setCarSpeed (sgVec3 u);
+	void getCarPosition (sgVec3 p) const;
+	void getCarSpeed (sgVec3 u) const;
+	void setListenerPosition (sgVec3 p);
+	void update (tCarElt* car);
 };
 
 #endif /* CAR_SOUND_DATA_H */

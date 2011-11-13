@@ -174,11 +174,11 @@ grShutdownSound(int ncars)
 
 
 
-float
+void
 grRefreshSound(tSituation *s, cGrCamera	*camera)
 {
 	if (sound_mode == DISABLED) {
-		return 0.0f;
+		return;
 	}
 
 	// TODO: Fix for a lot of cars. 
@@ -208,8 +208,6 @@ grRefreshSound(tSituation *s, cGrCamera	*camera)
 		sound_interface->update (car_sound_data, s->_ncars, 
 					 *p_camera, *u_camera, c_camera, *a_camera);
 	}
-
-	return 0.0f;
 }
 
 void grMuteSound(bool bOn)

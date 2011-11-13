@@ -32,8 +32,6 @@ protected:
 	slEnvelope* pitch_env; ///< pitch envelope
 	slEnvelope* lowpass_env; ///< low pass filter envelope
 	slScheduler* sched; ///< plib sl scheduler (see sl.h)
-	bool playing; ///< Sound is playing
-    bool paused; ///< sound is paused
 public:
 	PlibSound(slScheduler* sched,
 			  const char* filename,
@@ -49,16 +47,6 @@ public:
 	virtual void resume();
 	virtual void pause();
 	virtual void update();
-    /// True if the sound is playing.
-	virtual bool isPlaying()
-	{
-		return playing;
-	}
-    /// Truye if the sound is paused.
-	virtual bool isPaused() 
-	{
-		return paused;
-	}
 };
 
 #endif

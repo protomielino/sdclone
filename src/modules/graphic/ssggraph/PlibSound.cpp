@@ -25,11 +25,9 @@
 /// Create a new PLib sound. It requires a scheduler to be set up
 /// and a filename to read data from.
 PlibSound::PlibSound(slScheduler* sched, const char* filename, int flags, bool loop)
-: Sound(flags)
+: Sound(flags, loop)
 {
 	this->sched = sched;
-	this->loop = loop;
-	MAX_VOL = 1.0f;
 	sample = new slSample (filename, sched);
 	if (flags & ACTIVE_VOLUME) {
 		volume_env = new slEnvelope(1, SL_SAMPLE_ONE_SHOT);
@@ -64,11 +62,6 @@ PlibSound::PlibSound(slScheduler* sched, const char* filename, int flags, bool l
 	if (flags & ACTIVE_LP_FILTER) {
 		lowpass_env->setStep(0, 0.0, 1.0f);
 	}
-	volume = 0.0f;
-	pitch = 1.0f;
-	lowpass = 1.0f;
-	playing = false;
-	paused = false;
 }
 
 /// Destructor.
@@ -119,7 +112,7 @@ void PlibSound::start()
 {
 	// TODO: consistency check?
 	if (loop) {
-		if (playing == false) {
+		if (!playing) {
 			playing = true;
 			sched->loopSample (sample);
 		}
@@ -132,7 +125,7 @@ void PlibSound::start()
 /// Stop the sample
 void PlibSound::stop()
 {
-	if (playing == true) {
+	if (playing) {
 		playing = false;
 		sched->stopSample (sample);
 	}

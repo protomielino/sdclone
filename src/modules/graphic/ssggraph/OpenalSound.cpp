@@ -27,14 +27,9 @@
 
 OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 						 int flags, bool loop, bool static_pool)
+: Sound(flags, loop)
 {
-
-	this->loop = loop;
-	this->flags = flags;
 	this->static_pool = static_pool;
-	volume = 0.0f;
-	pitch = 1.0f;
-	lowpass = 1.0f;
 	poolindex = -1;
 	itf = sitf;
 
@@ -43,9 +38,6 @@ OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 	REFERENCE_DISTANCE = 5.0f;
 	ROLLOFF_FACTOR = 0.5f;
 
-	playing = false;
-	paused = false;
-
 	int i;
 	for (i = 0; i<3; i++) {
 		source_position[i] = 0.0f;
@@ -53,7 +45,8 @@ OpenalSound::OpenalSound(const char* filename, OpenalSoundInterface* sitf,
 		zeroes[i] = 0.0f;
 	}
 
-	GfOut("OpenAL : Creating %s source from %s\n", static_pool ? "static" : "dynamic", filename);
+	GfLogTrace("OpenAL : Creating %s source from %s\n",
+			   static_pool ? "static" : "dynamic", filename);
 
 	int error = alGetError();
 	if (error != AL_NO_ERROR) {
@@ -214,7 +207,6 @@ void OpenalSound::setLPFilter(float lp)
 	this->lowpass = lp;
 }
 
-
 void OpenalSound::setReferenceDistance(float dist)
 {
 	if (static_pool) {
@@ -229,7 +221,6 @@ void OpenalSound::setReferenceDistance(float dist)
 	}
 }
 
-
 void OpenalSound::setSource (sgVec3 p, sgVec3 u)
 {
 	for (int i=0; i<3; i++) {
@@ -238,7 +229,6 @@ void OpenalSound::setSource (sgVec3 p, sgVec3 u)
 	}
 }
 
-
 void OpenalSound::getSource(sgVec3 p, sgVec3 u)
 {
 	for (int i=0; i<3; i++) {
@@ -246,7 +236,6 @@ void OpenalSound::getSource(sgVec3 p, sgVec3 u)
 		u[i] = source_velocity[i];
 	}
 }
-
 
 void OpenalSound::play()
 {
@@ -257,7 +246,7 @@ void OpenalSound::start()
 {
 	if (static_pool) {
 		if (is_enabled) {
-			if (playing==false) {
+			if (!playing) {
 				if (loop) {
 					playing = true;
 				}
@@ -281,7 +270,7 @@ void OpenalSound::start()
 			}
 
 			// play
-			if (playing==false) {
+			if (!playing) {
 				if (loop) {
 					playing = true;
 				}
@@ -291,12 +280,11 @@ void OpenalSound::start()
 	}
 }
 
-
 void OpenalSound::stop()
 {
 	if (static_pool) {
 		if (is_enabled) {
-			if (playing==true) {
+			if (playing) {
 				playing = false;
 				alSourceStop (source);
 			}
@@ -304,7 +292,7 @@ void OpenalSound::stop()
 	} else {
 		// Shared source.	
 		if (itf->getSourcePool()->releaseSource(this, &poolindex)) {
-			if (playing==true) {
+			if (playing) {
 				playing = false;
 				alSourceStop (source);
 			}
@@ -314,7 +302,7 @@ void OpenalSound::stop()
 
 void OpenalSound::resume()
 {
-	if (paused==true) {
+	if (paused) {
 		paused = false;
 	}
 }
@@ -322,14 +310,14 @@ void OpenalSound::resume()
 
 void OpenalSound::pause()
 {
-	if (paused==false) {
+	if (!paused) {
 		paused = true;
 	}
 }
 
 void OpenalSound::update ()
 {
-    ALfloat zero_velocity[3] = {0.0f, 0.0f, 0.0f};
+    static const ALfloat zero_velocity[3] = {0.0f, 0.0f, 0.0f};
 	if (static_pool) {
 		if (is_enabled) {
 			alSourcefv (source, AL_POSITION, source_position);

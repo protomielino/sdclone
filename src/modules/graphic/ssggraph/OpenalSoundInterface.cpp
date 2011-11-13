@@ -184,11 +184,10 @@ void OpenalSoundInterface::setNCars(int n_cars)
 	car_src = new SoundSource[n_cars];
 }
 
-
 Sound* OpenalSoundInterface::addSample (const char* filename, int flags, bool loop, bool static_pool)
 {
 	Sound* sound = new OpenalSound(filename, this, flags, loop, static_pool);
-    sound->setVolume(1.0f);
+    sound->setVolume(1.0f); // Will be automatically scaled down by the global gain.
 	sound_list.push_back(sound);
 	return sound;
 }
@@ -199,12 +198,12 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	ALfloat listener_pos[3];
 	ALfloat listener_speed[3];
 	ALfloat listener_orientation[6];
-    ALfloat zeros[] = {0.0f, 0.0f, 0.0f};
+    static const ALfloat zeros[] = {0.0f, 0.0f, 0.0f};
 	
 	int i;
 	for (i = 0; i<3; i++) {
 		listener_pos[i] = p_obs[i];
-		listener_speed[i] = 0;// u_obs[i];
+		listener_speed[i] = 0;// u_obs[i]; // TODO: Try restoring this, needed !
 		listener_orientation[i] = c_obs[i];
 		listener_orientation[i+3] = a_obs[i];
 	}
@@ -220,7 +219,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 
 	for (i = 0; i<n_cars; i++) {
 		car_sound_data[i]->copyEngPri(engpri[i]);
-		int id = engpri[i].id;
+		const int id = engpri[i].id;
 		sgVec3 p;
 		sgVec3 u;
 		car_sound_data[id]->getCarPosition(p);
@@ -233,12 +232,12 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 
 	qsort((void*) engpri, n_cars, sizeof(SoundPri), &sortSndPriority);
 
-	int nsrc = MIN(sourcepool->getNbSources(), n_engine_sounds);
+	const int nsrc = MIN(sourcepool->getNbSources(), n_engine_sounds);
 
 	// Reverse order is important to gain free sources from stopped engine sounds
 	// before attempting to start new ones.
 	for (i = n_cars - 1; i >= 0; i--) {
-		int id = engpri[i].id;
+		const int id = engpri[i].id;
 		sgVec3 p;
 		sgVec3 u;
 		CarSoundData* sound_data = car_sound_data[id];
@@ -297,7 +296,6 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 		}
 	}
 
-	
 	// other looping sounds
 	road.snd = road_ride_sound;
 	sortSingleQueue (car_sound_data, &road, n_cars);
@@ -332,10 +330,9 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 	setMaxSoundCar (car_sound_data, &axle);
 
 	// On-off sounds
+	sgVec3 p, u;
 	for (id = 0; id<n_cars; id++) {
-		CarSoundData* sound_data = car_sound_data[id];
-		sgVec3 p;
-		sgVec3 u = {0, 0, 0};
+		const CarSoundData* sound_data = car_sound_data[id];
 		if (sound_data->crash) {
 			if (++curCrashSnd>=NB_CRASH_SOUND) {
 				curCrashSnd = 0;
@@ -343,7 +340,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 			sound_data->getCarPosition(p);
 			sound_data->getCarSpeed(u);
 			crash_sound[curCrashSnd]->setSource (p, u);
-			crash_sound[curCrashSnd]->setVolume (1.0f);
+			crash_sound[curCrashSnd]->setVolume (1.0f); // Will be automatically scaled down by the global gain.
 			crash_sound[curCrashSnd]->setPitch (1.0f);
 			crash_sound[curCrashSnd]->update();
 			crash_sound[curCrashSnd]->start();
@@ -353,7 +350,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 			sound_data->getCarPosition(p);
 			sound_data->getCarSpeed(u);
 			bang_sound->setSource (p, u);
-			bang_sound->setVolume (1.0f);
+			bang_sound->setVolume (1.0f); // Will be automatically scaled down by the global gain.
 			bang_sound->setPitch (1.0f);
 			bang_sound->update();
 			bang_sound->start();
@@ -363,7 +360,7 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 			sound_data->getCarPosition(p);
 			sound_data->getCarSpeed(u);
 			bottom_crash_sound->setSource (p, u);
-			bottom_crash_sound->setVolume (1.0f);
+			bottom_crash_sound->setVolume (1.0f); // Will be automatically scaled down by the global gain.
 			bottom_crash_sound->setPitch (1.0f);
 			bottom_crash_sound->update();
 			bottom_crash_sound->start();
@@ -374,15 +371,13 @@ void OpenalSoundInterface::update(CarSoundData** car_sound_data, int n_cars, sgV
 			sound_data->getCarSpeed(u);
 			gear_change_sound->setSource (p, u);
 			gear_change_sound->setReferenceDistance (1.0f);
-			gear_change_sound->setVolume (1.0f);
+			gear_change_sound->setVolume (1.0f); // Will be automatically scaled down by the global gain.
 			gear_change_sound->setPitch (1.0f);
 			gear_change_sound->update();
 			gear_change_sound->start();
 		}
 	}
-
 }
-
 
 void OpenalSoundInterface::initSharedSourcePool(void)
 {
@@ -391,7 +386,6 @@ void OpenalSoundInterface::initSharedSourcePool(void)
 	GfLogInfo("  Static sources : %d\n", n_static_sources_in_use);
 	GfLogInfo("  Dynamic sources: %d\n", sourcepool->getNbSources());
 }
-
 
 bool OpenalSoundInterface::getStaticSource(ALuint *source)
 {

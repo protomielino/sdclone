@@ -23,6 +23,24 @@
 #include "SoundInterface.h"
 
 
+/// Construct a sound.
+Sound::Sound(int flags, bool loop)
+{
+	this->flags = flags;
+	MAX_VOL = 1.0f;
+	volume = 0.0f;
+	pitch = 1.0f;
+	lowpass = 1.0f;
+	this->loop = loop;
+	playing = false;
+	paused = false;
+}
+
+/// Destructor
+Sound::~Sound()
+{
+}
+
 /// Set the volume \note effect not consistent across backends
 void Sound::setVolume(float vol)
 {
@@ -39,6 +57,47 @@ void Sound::setPitch(float pitch)
 void Sound::setLPFilter(float lp)
 {
 	this->lowpass = lp;
+}
+
+void Sound::setSource(sgVec3 p, sgVec3 u)
+{
+}
+
+float Sound::getVolume() const
+{
+	return volume;
+}
+
+float Sound::getPitch() const
+{
+	return pitch;
+}
+
+float Sound::getLPfilter() const
+{
+	return lowpass;
+}
+
+void Sound::setReferenceDistance (float dist)
+{
+	// Do nothing implementation.
+}
+
+void Sound::getSource (sgVec3 p, sgVec3 u) const
+{
+	// Do nothing implementation.
+}
+
+/// True if the sound is playing.
+bool Sound::isPlaying() const
+{
+	return playing;
+}
+
+/// True if the sound is paused.
+bool Sound::isPaused()  const
+{
+	return paused;
 }
 
 /// Create a sound source
@@ -131,3 +190,4 @@ void SoundSource::setListener (sgVec3 p, sgVec3 u)
 		u_lis[i] = u[i];
 	}
 }
+

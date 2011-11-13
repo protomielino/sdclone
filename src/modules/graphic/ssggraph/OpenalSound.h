@@ -42,7 +42,6 @@ protected:
 	ALfloat zeroes[3]; ///< just a vector of 0s
 	ALfloat back[6]; ///< direction of back
 	ALfloat front[6]; ///< direction of front 
-	bool playing, paused;
 	ALfloat MAX_DISTANCE; ///< maximum allowed distance
 	ALfloat MAX_DISTANCE_LOW; ///< maximum allowed distance
 	ALfloat REFERENCE_DISTANCE; ///< reference distance for sound
@@ -70,16 +69,6 @@ public:
 	virtual void resume();
 	virtual void pause();
 	virtual void update();
-    /// Return true if playing
-	virtual bool isPlaying()
-	{
-		return playing;
-	}
-    /// Return true if paused.
-	virtual bool isPaused() 
-	{
-		return paused;
-	}
 };
 
 

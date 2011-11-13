@@ -60,6 +60,7 @@ CarSoundData::CarSoundData(int id, SoundInterface* sound_interface)
     
     attenuation = 0.0f;
 }
+
 void CarSoundData::setEngineSound (Sound* engine_sound, float rpm_scale)
 {
     this->engine_sound = engine_sound;
@@ -76,6 +77,52 @@ void CarSoundData::setTurboParameters (bool turbo_on, float turbo_rpm, float tur
         fprintf (stderr, "warning: turbo lag %f <= 0\n", turbo_lag);
     }
 }
+
+Sound* CarSoundData::getEngineSound () const
+{
+	return engine_sound;
+}
+
+void CarSoundData::copyEngPri (SoundPri& epri) const
+{
+	epri = eng_pri;
+}
+
+void CarSoundData::setCarPosition (sgVec3 p)
+{
+	for (int i=0; i<3; i++) {
+		position[i] = p[i];
+	}
+}
+
+void CarSoundData::setCarSpeed (sgVec3 u)
+{
+	for (int i=0; i<3; i++) {
+		speed[i] = u[i];
+	}
+}
+
+void CarSoundData::getCarPosition (sgVec3 p) const
+{
+	for (int i=0; i<3; i++) {
+		p[i] = position[i];
+	}
+}
+
+void CarSoundData::getCarSpeed (sgVec3 u) const
+{
+	for (int i=0; i<3; i++) {
+		u[i] = speed[i];
+	}
+}
+
+void CarSoundData::setListenerPosition (sgVec3 p)
+{
+	for (int i=0; i<3; i++) {
+		listener_position[i] = p[i];
+	}
+}
+
 void CarSoundData::update (tCarElt* car)
 {
     assert (car->index == eng_pri.id);
@@ -345,9 +392,9 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
         return;
     }
         
-    int collision  = car->priv.collision;
+    const int collision = car->priv.collision;
     if (collision) {
-        if (collision & 1) {
+        if (collision & SEM_COLLISION) {
             skid_metal.a = (tdble)(car->_speed_xy * 0.01);
             skid_metal.f = (tdble)(.5+0.5*skid_metal.a);
             drag_collision.f = skid_metal.f;
@@ -355,23 +402,23 @@ void CarSoundData::calculateCollisionSound (tCarElt* car)
             skid_metal.a = 0;
         }
 
-        if ((collision & 16 )) {
+        if (collision & SEM_COLLISION_Z_CRASH) {
             bottom_crash = true;
         }
 
-        if ((collision & 8 )) {
+        if (collision & SEM_COLLISION_Z) {
             bang = true;
         }
 
-        if (((collision & 1) ==0) ||
-            ((collision & 2)
-             &&(skid_metal.a >drag_collision.a))) {
+		// No crash sound if a dragging sound is already playing.
+        if (!(collision & SEM_COLLISION)
+			|| ((collision & SEM_COLLISION_XYSCENE) && skid_metal.a > drag_collision.a)) {
             crash = true;
         }
     }
 
     drag_collision.a = 0.9f*drag_collision.a + skid_metal.a;
-    if (drag_collision.a>1.0f) {
+    if (drag_collision.a > 1.0f) {
         drag_collision.a = 1.0f;
     }
     skid_metal.a = drag_collision.a;
