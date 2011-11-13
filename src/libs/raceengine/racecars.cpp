@@ -439,7 +439,7 @@ void
   				    if (Offset >= 0.0)
 					{
 						// The car's position across the track is out of accepted range 
-						sprintf(car->ctrl.msg[2], "Offset: %.02f\n",Offset);
+						sprintf(car->ctrl.msg[2], "Offset: %.02f",Offset);
 						if (TeamDriver)
 						  TeamDriver->MoreOffset = Offset;
 					}
@@ -448,7 +448,7 @@ void
   				    if (TooFastBy >= 1.0)
 					{
 						// The car's speed is out of accepted range 
-						sprintf(car->ctrl.msg[2], "Speed: %.02f\n",TooFastBy);
+						sprintf(car->ctrl.msg[2], "Speed: %.02f",TooFastBy);
 						if (TeamDriver)
 						  TeamDriver->TooFastBy = TooFastBy;
 					}
