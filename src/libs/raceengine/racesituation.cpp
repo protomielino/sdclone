@@ -808,6 +808,10 @@ void ReSituationUpdater::acknowledgeEvents()
 	for (int nCarInd = 0; nCarInd < pCurrReInfo->s->_ncars; nCarInd++)
 	{
 		tCarElt* pCar = pCurrReInfo->s->cars[nCarInd];
+		
+		//if (pCar->priv.collision)
+		//	GfLogDebug("Reset collision state of car #%d (was 0x%X)\n",
+		//			   nCarInd, pCar->priv.collision);
 		pCar->priv.collision = 0;
 		
 		// Note: This one is only for SimuV3, and not yet used actually
@@ -828,14 +832,14 @@ tRmInfo* ReSituationUpdater::getPreviousStep()
 {
 	if (!_bThreaded)
 	{
+		// No multi-threading : no need to really copy.
+		_pPrevReInfo = ReSituation::self().data();
+
 		// Acknowledge the collision and human pit events occurred
 		// since the last graphics update : we know now that they all have been processed
 		// or at least being processed by the graphics engine / menu system
 		// (the main thread's job).
 		acknowledgeEvents();
-			
-		// No multi-threading : no need to really copy.
-		_pPrevReInfo = ReSituation::self().data();
 	}
 	else
 	{
@@ -843,11 +847,11 @@ tRmInfo* ReSituationUpdater::getPreviousStep()
 		if (!ReSituation::self().lock("ReSituationUpdater::getPreviousStep"))
 			return 0;
 
-		// Acknowledge the collision and human pit events (see above).
-		acknowledgeEvents();
-
 		// Get the situation data.
 		copySituation(_pPrevReInfo, ReSituation::self().data());
+
+		// Acknowledge the collision and human pit events (see above).
+		acknowledgeEvents();
 
 		// Unlock the race engine data.
 		if (!ReSituation::self().unlock("ReSituationUpdater::getPreviousStep"))
