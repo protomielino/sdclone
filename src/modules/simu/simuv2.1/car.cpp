@@ -330,10 +330,22 @@ SimCarUpdatePos(tCar *car)
 		
 	FLOAT_NORM_PI_PI(car->DynGCg.pos.az);
 	
-	if (car->DynGCg.pos.ax > aMax) car->DynGCg.pos.ax = aMax;
-	if (car->DynGCg.pos.ax < -aMax) car->DynGCg.pos.ax = -aMax;
-	if (car->DynGCg.pos.ay > aMax) car->DynGCg.pos.ay = aMax;
-	if (car->DynGCg.pos.ay < -aMax) car->DynGCg.pos.ay = -aMax;
+	if (car->DynGCg.pos.ax > aMax) {
+		car->DynGCg.pos.ax = aMax;
+		car->DynGCg.vel.ax = 0;
+	}
+	if (car->DynGCg.pos.ax < -aMax) {
+		car->DynGCg.pos.ax = -aMax;
+		car->DynGCg.vel.ax = 0;
+	}
+	if (car->DynGCg.pos.ay > aMax) {
+		car->DynGCg.pos.ay = aMax;
+		car->DynGCg.vel.ay = 0;
+	}
+	if (car->DynGCg.pos.ay < -aMax) {
+		car->DynGCg.pos.ay = -aMax;
+		car->DynGCg.vel.ay = 0;
+	}
 	
 	car->DynGC.pos.x = car->DynGCg.pos.x;
 	car->DynGC.pos.y = car->DynGCg.pos.y;
