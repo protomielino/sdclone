@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.09.06
+// Last changed : 2011.11.13
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.03.000
@@ -81,6 +81,8 @@
 #include "unitpit.h"
 #include "unitstrategy.h"
 #include "unittrack.h"
+
+#define EXPORT_RACINGLINE
 
 //==========================================================================*
 // Statics
@@ -1594,7 +1596,9 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
+#ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+#endif
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
   else if (oSituation->_raceType == RM_TYPE_QUALIF)
@@ -1620,7 +1624,9 @@ void TDriver::FindRacinglines()
     oRacingLine[oRL_FREE].MakeSmoothPath         // Calculate a smooth path
 	  (&oTrackDesc, Param,                       // as main racingline
 	  TClothoidLane::TOptions(oBumpMode));
+#ifdef EXPORT_RACINGLINE
     oRacingLine[oRL_FREE].SaveToFile("RL_FREE.tk3");
+#endif
     oRacingLine[oRL_FREE].SavePointsToFile(oTrackLoad);
   }
 
@@ -1649,7 +1655,9 @@ void TDriver::FindRacinglines()
       oRacingLine[oRL_LEFT].MakeSmoothPath       // Avoid to left racingline
 	    (&oTrackDesc, Param,
 		TClothoidLane::TOptions(oBumpMode, FLT_MAX, -oAvoidWidth, true));
+#ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_LEFT].SaveToFile("RL_LEFT.tk3");
+#endif
       oRacingLine[oRL_LEFT].SavePointsToFile(oTrackLoadLeft);
 	}
 
@@ -1668,7 +1676,9 @@ void TDriver::FindRacinglines()
 	  oRacingLine[oRL_RIGHT].MakeSmoothPath      // Avoid to right racingline
 	    (&oTrackDesc, Param,
   	    TClothoidLane::TOptions(oBumpMode, -oAvoidWidth, FLT_MAX, true));
+#ifdef EXPORT_RACINGLINE
       oRacingLine[oRL_RIGHT].SaveToFile("RL_RIGHT.tk3");
+#endif
       oRacingLine[oRL_RIGHT].SavePointsToFile(oTrackLoadRight);
 	}
 
@@ -1684,9 +1694,11 @@ void TDriver::FindRacinglines()
 	    if (MaxPitDist < oStrategy->oPit->oPitLane[I].PitDist())
           MaxPitDist = oStrategy->oPit->oPitLane[I].PitDist();
 	  }
+#ifdef EXPORT_RACINGLINE
 	  oStrategy->oPit->oPitLane[oRL_FREE].SaveToFile("RL_PIT_FREE.tk3");
 	  oStrategy->oPit->oPitLane[oRL_LEFT].SaveToFile("RL_PIT_LEFT.tk3");
 	  oStrategy->oPit->oPitLane[oRL_RIGHT].SaveToFile("RL_PIT_RIGHT.tk3");
+#endif
 	  oStrategy->oDistToSwitch = MaxPitDist + 125; // Distance to pit entry
 	  //GfOut("\n\nDist to switch: %.02f\n\n", oStrategy->oDistToSwitch);
 	}
@@ -2898,6 +2910,9 @@ void TDriver::EvaluateCollisionFlags(
 	    MinVCatTime = MIN(MinVCatTime, VCatTime);
 	}
 
+	if (OppInfo.Flags & F_LAPPER)
+		IsLapper = true;
+
 	bool IgnoreTeamMate;
 	if (oTeamEnabled) 
 	{
@@ -2915,17 +2930,17 @@ void TDriver::EvaluateCollisionFlags(
 		MAX(0, OppInfo.AvoidLatchTime - oSituation->deltaTime);
 
 	double MaxSpdCrv = Param.Fix.CalcMaxSpeedCrv();
-	//double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
+	double ColTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 1.2;
 //	double ColTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 2.4;
-	double ColTime = fabs(Crv) > MaxSpdCrv ? 4.0 : 4.8;
-	//double CatTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
+//	double ColTime = fabs(Crv) > MaxSpdCrv ? 4.0 : 4.8;
+	double CatTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
 //	double CatTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
 //	double CatTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
-	double CatTime = fabs(Crv) > MaxSpdCrv ? 6.0 : 16.0;
-	//double CacTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
+//	double CatTime = fabs(Crv) > MaxSpdCrv ? 6.0 : 16.0;
+	double CacTime = fabs(Crv) > MaxSpdCrv ? 1.0 : 3.0;
 //	double CacTime = fabs(Crv) > MaxSpdCrv ? 2.0 : 6.0;
 //	double CacTime = fabs(Crv) > MaxSpdCrv ? 3.0 : 8.0;
-	double CacTime = fabs(Crv) > MaxSpdCrv ? 6.0 : 16.0;
+//	double CacTime = fabs(Crv) > MaxSpdCrv ? 6.0 : 16.0;
 	bool Catching =
 	  ((OppInfo.CatchTime < ColTime) && OppInfo.GotFlags(F_COLLIDE))
 	  || ((OppInfo.CatchTime < CatTime) && OppInfo.GotFlags(F_CATCHING))
@@ -3901,7 +3916,7 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
   else
 	oXXX = MIN(1.0,oXXX+0.0003);
 
-    double FrictionFactor = 0.95;
+  double FrictionFactor = 0.95;
 
   if (AbsCrv > 0.10)
     FrictionFactor = 0.44;
@@ -3915,6 +3930,51 @@ double TDriver::CalcFriction_simplix_TRB1(const double Crv)
     FrictionFactor = 0.92;
   else if (AbsCrv > 0.01)
     FrictionFactor = 0.93;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.95;
+
+  return FrictionFactor * oXXX;
+}
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction_simplix_LS1(const double Crv)
+{
+  double AbsCrv = fabs(Crv);
+/*
+  if (AbsCrv > 1/12.0)
+	oXXX = 0.60;
+  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
+	oXXX = 0.65;
+  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
+	oXXX = 0.75;
+  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
+	oXXX = 0.83;
+  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
+	oXXX = 0.90;
+  else
+	oXXX = MIN(1.0,oXXX+0.0003);
+*/
+  oXXX = 1.0;
+  double FrictionFactor = 0.95;
+
+  if (AbsCrv > 0.10) 
+//    FrictionFactor = 0.44;
+    FrictionFactor = 0.86;
+  else if (AbsCrv > 0.045)
+//    FrictionFactor = 0.74;
+    FrictionFactor = 0.88;
+  else if (AbsCrv > 0.03)
+//    FrictionFactor = 0.83;
+    FrictionFactor = 0.90;
+  else if (AbsCrv > 0.02)
+//    FrictionFactor = 0.92;
+    FrictionFactor = 0.92;
+  else if (AbsCrv > 0.01)
+//    FrictionFactor = 0.93;
+    FrictionFactor = 0.94;
   else if (AbsCrv > 0.005)
     FrictionFactor = 0.95;
 

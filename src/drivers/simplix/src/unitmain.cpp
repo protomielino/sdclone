@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2011.09.06
+// Last changed : 2011.11.08
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.03.000
@@ -693,8 +693,8 @@ static int InitFuncPt(int Index, void *Pt)
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_TRB1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
-    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.90f,0.90f);
-    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.50f);
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.70f);
   }
   else if (cRobotType == RTYPE_SIMPLIX_LS2)
   {

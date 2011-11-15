@@ -523,7 +523,11 @@ void TTrackDescription::InitTrack
 		{
 		  Done = true;                           // Last possible to use 
           WCurb = 0.8 * W;                       // Use 80%
-          WCurb = MIN(WCurb, 1.5);               // Keep a wheel on track
+          //WCurb =  W;                            // Use 100%
+		  if (outer)                             // If outer side
+            WCurb = MIN(WCurb, 1.5);             // Keep a wheel on track
+		  else
+            WCurb = MIN(WCurb, 1.5);             // Keep a wheel on track
 
 		  if (outer                              // If outer side and friction lower
 			&& (PSide->surface->kFriction < Seg->surface->kFriction))
@@ -539,20 +543,27 @@ void TTrackDescription::InitTrack
 	    else if (PSide->style == TR_CURB)        // On curbs without height
 		{
           WCurb = 0.8 * W;                       // Use 80%
+          //WCurb = W;                             // Use 100%
 		  if (pitlane)                           // if side along pitlane
 		  {
             WCurb = 0.15;                         
-		    Done = true;
+		    //Done = true;
 		  }
 		  else if (outer && (PSide->surface->kFriction < Seg->surface->kFriction))
 		  {
-		    WCurb = MIN(WCurb,1.5);              // Keep two wheels on track
-		    Done = true;
+		    //WCurb = MIN(WCurb,1.5);              // Keep two wheels on track
+		    //Done = true;
 		  }
+		  if (outer)                             // If outer side
+  	        WCurb = MIN(WCurb,1.5);              // Keep two wheels on track
+		  else
+  	        WCurb = MIN(WCurb,1.5);              // Keep two wheels on track
+	      Done = true;
 		}
 		else if (PSide->style == TR_PLAN)        // On plan
 		{
           WCurb = 0.8 * W;                       // Use 80%
+          //WCurb =  W;                            // Use 100%
 		  if ((InPit && (oPitSide == S))         // Exclude pits
 			|| (PSide->raceInfo & (TR_SPEEDLIMIT | TR_PITLANE)))
 		  {
@@ -591,17 +602,42 @@ void TTrackDescription::InitTrack
 		  {
 			if (CarParam.oLimitSideUse)
 			{
+		      if (outer)                         // If outer side
+			  {
+			    WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
+			    W = MIN(W,CarParam.oLimitSideWidth);
+			    ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
+			  }
+			  else
+			  {
+			    WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
+			    W = MIN(W,CarParam.oLimitSideWidth);
+			    ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
+			  }
+			  Done = true;
+			}
+		  }
+		  else if (CarParam.oLimitSideUse)
+		  {
+		    if (outer)                         // If outer side
+		    {
 			  WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
 			  W = MIN(W,CarParam.oLimitSideWidth);
 			  ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
 			}
-			//Done = true;
+			else
+		    {
+			  WCurb = MIN(WCurb,CarParam.oLimitSideWidth);
+			  W = MIN(W,CarParam.oLimitSideWidth);
+			  ExtraW = MIN(ExtraW,CarParam.oLimitSideWidth);
+			}
+			Done = true;
 		  }
 		}
 		else
 		{
 		  // Wall of some sort
-		  WCurb = (PSide->style >= TR_WALL) ? -1.0 : 0;
+		  WCurb = (PSide->style >= TR_WALL) ? -1.0 : 0.0;
 		  Done = true;
 		}
 

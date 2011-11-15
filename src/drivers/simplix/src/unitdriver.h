@@ -465,6 +465,7 @@ private:
 
 	double CalcFriction_simplix_Identity(double Crv);
 	double CalcFriction_simplix_TRB1(double Crv);
+	double CalcFriction_simplix_LS1(double Crv);
 	double CalcFriction_simplix_LS2(double Crv);
 
 	double CalcCrv_simplix(double Crv);

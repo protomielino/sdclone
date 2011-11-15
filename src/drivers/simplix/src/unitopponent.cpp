@@ -244,8 +244,8 @@ void TOpponent::Update(
   }
   
   if ((RelPos > 0) && (RelPos < 50))             // We just lapped back
-    LapBackTimer = 60.0;                         //   delay granting letpass
-  else if (RelPos < -100)                        // else if distance is too
+    LapBackTimer = 120.0;                        //   delay granting letpass
+  else if (RelPos < -30)                         // else if distance is too
     LapBackTimer = 0.0;                          //   long, forget it
 }
 //==========================================================================*
