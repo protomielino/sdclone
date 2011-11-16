@@ -51,7 +51,7 @@ tree = ElementTree().parse(os.sep.join([options.dir, args[0]]))
 p = tree.find("section/section")
 
 for item in list(p):
-	number = item.attrib["name"]
+	index = item.attrib["name"]
 
 	for driver in list(item):
 		if (driver.attrib["name"] == "name"):
@@ -60,11 +60,13 @@ for item in list(p):
 		if (driver.attrib["name"] == "car name"):
 			car = driver.attrib["val"]
 		
-	print number, ":", name, "(", car, ")"
+	print index, ":", name, "(", car, ")"
+
+	module = os.path.splitext(args[0])[0]
 
 	# Check acc model
 	model = ".".join([os.sep.join([options.cars, car, car]), "acc"])
-	path = os.sep.join([options.dir, number])
+	path = os.sep.join([options.dir, index])
 
-	check_skins.check_car(options, model, path, car)
+	check_skins.check_car(options, module, index, path, car, model)
 

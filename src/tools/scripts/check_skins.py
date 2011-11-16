@@ -51,7 +51,7 @@ def check_version(myfile):
 
 #---
 
-def get_screenshot(index, car, skin, skintargets):
+def get_screenshot(module, index, car, skin, skintargets):
 	if not options.config or not options.run:
 		return None
 
@@ -62,8 +62,6 @@ def get_screenshot(index, car, skin, skintargets):
 	if not os.access(config_file, os.R_OK):
 		print "Can't find 'practice.xml' (", config_file, ","
 		return None
-
-	module = "human"
 
 	my_ele = ElementTree()
 	p = my_ele.parse(config_file)
@@ -134,7 +132,7 @@ def process_screenshot(preview):
 
 #---
 
-def check_car(myoptions, model, path, car):
+def check_car(myoptions, module, index, path, car, model):
 	global options
 	options = myoptions
 
@@ -174,7 +172,7 @@ def check_car(myoptions, model, path, car):
 			print "Preview : OK"
 
 		if options.config and options.run and screenshot:
-			screenshot = get_screenshot("1", car, None, "1")
+			screenshot = get_screenshot(module, index, car, None, "1")
 
 			if options.proc:
 				# Call alternative script to process images
@@ -234,9 +232,9 @@ def check_car(myoptions, model, path, car):
 
 			if options.config and options.run and screenshot:
 				if os.access(wheelfile, os.R_OK):
-					screenshot = get_screenshot("1", car, skin, "3")
+					screenshot = get_screenshot(module, index, car, skin, "3")
 				else:
-					screenshot = get_screenshot("1", car, skin, "1")
+					screenshot = get_screenshot(module, index, car, skin, "1")
 
 				if options.proc:
 					# Call alternative script to process images

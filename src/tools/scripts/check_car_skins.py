@@ -53,7 +53,7 @@ def check_dir(args, dirname, names):
 			path = os.sep.join([options.cars, car])
 			model = ".".join([os.sep.join([path, car]), "acc"])
 
-			check_skins.check_car(options, model, path, root)
+			check_skins.check_car(options, "human", "1", path, root, model)
 
 #---
 
