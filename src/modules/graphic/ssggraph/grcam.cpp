@@ -1414,9 +1414,6 @@ class cGrCarCamRoadZoomTVD : public cGrCarCamRoadZoom
 			}
 		    }
 
-			// WARNING : If sound is not disabled, car->priv.collision 
-			// already equals to 0 (see grRefreshSound, where it is forced to 0).
-			// This means we probably have a bug here ...
 		    if (car->priv.collision) {
 			schedView[car->index].prio += grNbCars;
 			event = 1;
