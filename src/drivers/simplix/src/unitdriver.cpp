@@ -9,7 +9,7 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.11.13
+// Last changed : 2011.11.20
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.03.000
@@ -82,7 +82,7 @@
 #include "unitstrategy.h"
 #include "unittrack.h"
 
-#define EXPORT_RACINGLINE
+//#define EXPORT_RACINGLINE
 
 //==========================================================================*
 // Statics
@@ -2910,9 +2910,6 @@ void TDriver::EvaluateCollisionFlags(
 	    MinVCatTime = MIN(MinVCatTime, VCatTime);
 	}
 
-	if (OppInfo.Flags & F_LAPPER)
-		IsLapper = true;
-
 	bool IgnoreTeamMate;
 	if (oTeamEnabled) 
 	{
@@ -2965,7 +2962,7 @@ void TDriver::EvaluateCollisionFlags(
 	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
 //	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 1.0 : 0.5;
 
-	  if (fabs(Crv) < MaxSpdCrv)
+	  if ((fabs(Crv) < MaxSpdCrv) || OppInfo.GotFlags(F_DANGEROUS) || (oCurrSpeed < 0.7 * oTargetSpeed))
 	  {
 	    if (!AvoidL && !AvoidR)
 		{
@@ -2996,6 +2993,13 @@ void TDriver::EvaluateCollisionFlags(
 	else
 	  Coll.MinRSideDist = MIN(Coll.MinRSideDist,
 	    OppInfo.State.CarDistLat - OppInfo.State.MinDistLat);
+  }
+
+  if (OppInfo.Flags & F_LAPPER)
+  {	
+	  IsLapper = true;
+	  Coll.LappersBehind |= OppInfo.State.CarDistLat < 0 ? F_LEFT : F_RIGHT;
+	  //GfOut("F_LAPPER 2\n");
   }
 
   if (oTeamEnabled) 
@@ -3538,6 +3542,7 @@ double TDriver::FilterLetPass(double Accel)
       Accel = MIN(Accel, 0.3);
 	else
       Accel = MIN(Accel, 0.5);
+    //GfOut("LetPass %g\n",Accel);
   }
   return MIN(1.0,Accel);
 }

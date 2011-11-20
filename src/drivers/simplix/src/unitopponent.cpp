@@ -9,10 +9,10 @@
 //
 // File         : unitopponent.cpp
 // Created      : 2007.11.17
-// Last changed : 2011.06.02
+// Last changed : 2011.11.20
 // Copyright    : © 2007-2011 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.01.000
+// Version      : 3.03.000
 //--------------------------------------------------------------------------*
 // Teile diese Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -242,11 +242,12 @@ void TOpponent::Update(
 	    MinTimeSlot = T;
     }
   }
-  
+  /*
   if ((RelPos > 0) && (RelPos < 50))             // We just lapped back
-    LapBackTimer = 120.0;                        //   delay granting letpass
-  else if (RelPos < -30)                         // else if distance is too
+    LapBackTimer = 60.0;                         //   delay granting letpass
+  else if (RelPos < -50)                         // else if distance is too
     LapBackTimer = 0.0;                          //   long, forget it
+  */
 }
 //==========================================================================*
 
@@ -505,8 +506,12 @@ bool TOpponent::Classify(
 
 	  if ((oInfo.Flags & (F_REAR | F_AT_SIDE))
 		&& (MyCar->_laps < CarLaps)
- 	    && (OpState.CarDistLong > -10))
+		&& (MyCar->_laps > 1)
+ 	    && (OpState.CarDistLong > -50))
 	  {
+		oInfo.Flags |= F_LAPPER;                 // Let opponent pass
+		//GfOut("F_LAPPER 1\n");
+		/*
 		if (LapBackTimer == 0.0)
 		  oInfo.Flags |= F_LAPPER;                 // We are lapped
 		else
@@ -514,6 +519,7 @@ bool TOpponent::Classify(
           LapBackTimer -= oDeltaTime;
 	      LapBackTimer = MAX(0.0,LapBackTimer);
 		}
+		*/
 	  }
 	}
 

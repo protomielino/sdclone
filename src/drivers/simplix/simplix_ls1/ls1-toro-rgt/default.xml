@@ -17,11 +17,11 @@
 <params name="ls1-toro-rgt" type="template" mode="mw">
       <!-- Car parameters >>> -->
 	<section name="Front Wing">
-		<attnum name="angle" unit="deg" min="0" max="10" val="10"/>
+		<attnum name="angle" unit="deg" min="5" max="10" val="10"/>
 	</section>
 	
 	<section name="Rear Wing">
-		<attnum name="angle" unit="deg" min="0" max="19" val="19"/>
+		<attnum name="angle" unit="deg" min="4" max="21" val="19"/>
 	</section>
 
 	<section name="Gearbox">
