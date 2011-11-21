@@ -1048,7 +1048,7 @@ void TDriver::InitTrack
 	sizeof(TrackNameBuffer));                    // regarding length of buf.
   *strrchr(TrackNameBuffer, '.') = '\0';         // Truncate at point
   oTrackName = TrackNameBuffer;                  // Set pointer to buffer
-  if (strcmp(oTrackName,"monandgo") == 0)        // The force will be
+  if (strcmp(oTrackName,"monandgo") == 0)        // The force will be with
   {                                              // you even at monandgo!
 	oCloseYourEyes = true;                       
     Param.Pit.oLatOffset = 0.5;
