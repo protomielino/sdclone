@@ -18,27 +18,27 @@
     <section name="index">
 
       <section name="0">
-        <attstr name="name" val="mpa101_A"></attstr>
+        <attstr name="name" val="Thibault Gros"></attstr>
         <attstr name="desc" val="mpa101_A"></attstr>
-        <attstr name="team" val="simplix_mpa101"></attstr>
+        <attstr name="team" val="TRC"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="mpa1-murasama"></attstr>
-        <attnum name="race number" val="900"></attnum>
+        <attstr name="car name" val="mpa1-hartbill-2002"></attstr>
+        <attnum name="race number" val="1"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
         <attnum name="blue" val="1.0"></attnum>
       </section>
 
       <section name="1">
-        <attstr name="name" val="mpa101_B"></attstr>
+        <attstr name="name" val="Christophe Bouchard"></attstr>
         <attstr name="desc" val="mpa101_B"></attstr>
-        <attstr name="team" val="simplix_mpa101"></attstr>
+        <attstr name="team" val="TRC"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="mpa1-murasama"></attstr>
-        <attnum name="race number" val="901"></attnum>
-        <attnum name="red" val="0.2"></attnum>
-        <attnum name="green" val="0.4"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attstr name="car name" val="mpa1-hartbill-2002"></attstr>
+        <attnum name="race number" val="2"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.0"></attnum>
       </section>
 
       <section name="2">
@@ -48,9 +48,9 @@
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="mpa1-murasama"></attstr>
         <attnum name="race number" val="902"></attnum>
-        <attnum name="red" val="0.2"></attnum>
-        <attnum name="green" val="0.4"></attnum>
-        <attnum name="blue" val="1.0"></attnum>
+        <attnum name="red" val="1.0"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.0"></attnum>
       </section>
 
       <section name="3">
@@ -67,24 +67,24 @@
 <!--
 -->
       <section name="4">
-        <attstr name="name" val="mpa103_A"></attstr>
-        <attstr name="desc" val="mpa103_A"></attstr>
-        <attstr name="team" val="simplix_mpa103"></attstr>
+        <attstr name="name" val="Andy Lawson"></attstr>
+        <attstr name="desc" val="American Driver on Monoposto American type 1"></attstr>
+        <attstr name="team" val="Team Simplix"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="mpa1-murasama"></attstr>
-        <attnum name="race number" val="904"></attnum>
+        <attnum name="race number" val="32"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
         <attnum name="blue" val="1.0"></attnum>
       </section>
 
       <section name="5">
-        <attstr name="name" val="mpa103_B"></attstr>
-        <attstr name="desc" val="mpa103_B"></attstr>
-        <attstr name="team" val="simplix_mpa103"></attstr>
+        <attstr name="name" val="Luther Conley"></attstr>
+        <attstr name="desc" val="Best American driver on Monoposto American type 1"></attstr>
+        <attstr name="team" val="Team Simplix"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
         <attstr name="car name" val="mpa1-murasama"></attstr>
-        <attnum name="race number" val="905"></attnum>
+        <attnum name="race number" val="6"></attnum>
         <attnum name="red" val="0.2"></attnum>
         <attnum name="green" val="0.4"></attnum>
         <attnum name="blue" val="1.0"></attnum>
