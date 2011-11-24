@@ -291,6 +291,7 @@ static inline bool HOTless(ssgHit& g, ssgHit& h) {
 
 // Get height over terrain => hence HOT
 float grGetHOT(float x, float y) {
+  float ret = 0.0f;
 	sgMat4 invmat;
 	sgMakeIdentMat4(invmat);
 
@@ -300,10 +301,16 @@ float grGetHOT(float x, float y) {
 
 	sgVec3 test_vec = { 0 , 0 , 100000.0f };
 
-	ssgHit *results;
+  ssgHit *results = NULL;
 	int num_hits = ssgHOT (TheScene, test_vec, invmat, &results);
+  if (num_hits > 0) {
 	ssgHit *h = std::max_element(&results[0], &results[num_hits-1], HOTless);
-	return getPolyHOT(*h);
+	if (h != NULL)
+	  ret = getPolyHOT(*h);
+  } else {
+	GfLogWarning("grGetHOT: ssgHOT yielded 0 hits!\n");
+  }
+  return ret;
 } //  grGetHOT
 
 /*
