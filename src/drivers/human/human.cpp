@@ -1106,9 +1106,16 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	}
 
-	// Limit throttle when auto-shifting
-	if (HCtx[idx]->clutchtime > 0.0f && HCtx[idx]->autoClutch == true)
-		car->_accelCmd = MIN(car->_accelCmd, 0.6);
+	// automatically adjust throttle when auto-shifting
+	if (HCtx[idx]->clutchtime > 0.0f && HCtx[idx]->autoClutch == true) {
+		double rpm = car->_speed_xy * car->_gearRatio[car->_gear + car->_gearOffset] / car->_wheelRadius(2);
+
+		car->_accelCmd += (rpm - car->_enginerpm) * 4 / car->_enginerpmRedLine;
+		//GfOut("Desired rpms for gear %d = %f\n", car->_gear, rpm * 9.54);
+
+		car->_accelCmd = MIN(car->_accelCmd, 1.0);
+		car->_accelCmd = MAX(car->_accelCmd, 0.0);
+	}
 
 	HCtx[idx]->paccel = car->_accelCmd;
 
