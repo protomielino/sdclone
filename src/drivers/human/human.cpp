@@ -409,15 +409,85 @@ newrace(int index, tCarElt* car, tSituation *s)
 {
 	const int idx = index - 1;
 
+	// Have to read engine curve
+	char midx[64];
+	struct tEdesc
+	{
+		tdble rpm;
+		tdble tq;
+		tdble drpm;
+		tdble dtq;
+	} *Edesc;
+
+	sprintf(midx, "%s/%s", SECT_ENGINE, ARR_DATAPTS);
+  	int IMax = GfParmGetEltNb(car->_carHandle, midx);
+	//GfOut("IMax = %d\n", IMax);
+
+	Edesc = (struct tEdesc*) malloc((IMax + 1) * sizeof(struct tEdesc));
+
+	for (int i = 0; i < IMax; i++) {
+		sprintf(midx, "%s/%s/%d", SECT_ENGINE, ARR_DATAPTS, i+1);
+		Edesc[i].rpm = GfParmGetNum(car->_carHandle, midx, PRM_RPM, (char*) NULL, car->_enginerpmMax);
+		Edesc[i].tq = GfParmGetNum(car->_carHandle, midx, PRM_TQ, (char*) NULL, 0.0f);
+		Edesc[i].drpm = 0;
+		Edesc[i].dtq = 0;
+		if (i > 0) {
+			Edesc[i-1].drpm = Edesc[i].rpm - Edesc[i-1].rpm;
+			Edesc[i-1].dtq = Edesc[i].tq - Edesc[i-1].tq;
+		}
+		GfOut("rpm %f = tq %f \n", Edesc[i].rpm * 9.549, Edesc[i].tq);
+	}
+
 	// Initialize engine RPM shifting threshold table for automatic shifting mode.
 	for (int i = 0; i < MAX_GEARS; i++) {
-		if (car->_gearRatio[i] != 0) {
-			HCtx[idx]->shiftThld[i] = car->_enginerpmRedLine * car->_wheelRadius(2) * 0.85 / car->_gearRatio[i];
-			GfOut("Gear %d: Spd %f\n", i, HCtx[idx]->shiftThld[i] * 3.6);
-		} else {
-			HCtx[idx]->shiftThld[i] = 10000.0;
+		HCtx[idx]->shiftThld[i] = 10000.0;
+	}
+
+	// only calc for forward gears, excluding top gear
+	for (int i = 2; i < car->_gearNb; i++) {
+		double rpm;
+		double newrpm;
+		double curTorque = 0;
+		double nextTorque = 0;
+
+		if (car->_gearRatio[i] == 0)
+			continue;
+
+		// scan torque to see where changing up gives more power
+		for (rpm = car->_enginerpmMaxTq; rpm < car->_enginerpmRedLine; rpm += 10) {
+			curTorque = 0;
+			nextTorque = 0;
+
+			newrpm = rpm * car->_gearRatio[i+1] / car->_gearRatio[i];
+
+			for (int a = 0; a < IMax - 1; a++) {
+				if (rpm >= Edesc[a].rpm && rpm < Edesc[a+1].rpm) {
+					curTorque = (Edesc[a].tq + Edesc[a].dtq * (rpm - Edesc[a].rpm) / Edesc[a].drpm) * car->_gearRatio[i];
+					break;
+				}
+			}
+
+			for (int a = 0; a < IMax - 1; a++) {
+				if (newrpm >= Edesc[a].rpm && newrpm < Edesc[a+1].rpm) {
+					nextTorque = (Edesc[a].tq + Edesc[a].dtq * (newrpm - Edesc[a].rpm) / Edesc[a].drpm) * car->_gearRatio[i+1];
+					break;
+				}
+			}
+
+			if (nextTorque > curTorque) break;
 		}
-	}//for i
+
+#if 0
+		HCtx[idx]->shiftThld[i] = car->_enginerpmRedLine * car->_wheelRadius(2) * 0.85 / car->_gearRatio[i];
+		GfOut("Old - Gear %d: Change Up RPM %f = Speed %f\n", i-1, car->_enginerpmRedLine * 0.85 * 9.549, HCtx[idx]->shiftThld[i] * 3.6);
+#else
+		rpm = MIN(rpm, car->_enginerpmRedLine * 0.93);
+
+		HCtx[idx]->shiftThld[i] = rpm * car->_wheelRadius(2) / car->_gearRatio[i];
+		GfOut("New - Gear %d: Change Up RPM %f = Speed %f\n", i-1, rpm * 9.549, HCtx[idx]->shiftThld[i] * 3.6);
+#endif
+	}
+	free(Edesc);
 
 	// Center the mouse.
 	if (HCtx[idx]->mouseControlUsed) {
