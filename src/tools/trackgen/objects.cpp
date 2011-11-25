@@ -148,12 +148,15 @@ InitObjects(tTrack *track, void *TrackHandle)
 	curObj->color = (unsigned int)GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_COLOR, NULL, 0);
 	objName = GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_OBJECT, NULL);
 	if (!objName) {
-	    GfOut("Missing %s in %s/%s", TRK_ATT_OBJECT, TRK_SECT_OBJECTS, GfParmListGetCurEltName(TrackHandle, TRK_SECT_OBJECTS));
+	    GfOut("Missing %s in section %s/%s", TRK_ATT_OBJECT, TRK_SECT_OBJECTS, GfParmListGetCurEltName(TrackHandle, TRK_SECT_OBJECTS));
 	    exit(1);
 	}
 	
 	GetFilename(objName, search, buf);
 	curObj->obj = ssgLoadAC(buf);
+	if (!curObj->obj) {
+	    exit(1);
+	}
 	ssgFlatten(curObj->obj);
 	if (strcmp(GfParmGetCurStr(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_ORIENTATION_TYPE, ""), "random") == 0) {
 	    curObj->deltaHeight = GfParmGetCurNum(TrackHandle, TRK_SECT_OBJECTS, TRK_ATT_DH, NULL, 0);
