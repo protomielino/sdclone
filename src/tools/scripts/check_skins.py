@@ -165,6 +165,7 @@ def check_car(myoptions, module, index, path, car, model):
 			screenshot = True
 		elif (preview_ver < 0):
 			print "Preview : Not in version control"
+			screenshot = True
 		elif (preview_ver < standard_ver):
 			print "Preview : Out of date"
 			screenshot = True
@@ -224,6 +225,7 @@ def check_car(myoptions, module, index, path, car, model):
 					screenshot = True
 				elif (preview_ver < 0):
 					print "Preview : Not in version control"
+					screenshot = True
 				elif (preview_ver < standard_ver):
 					print "Preview : Out of date"
 					screenshot = True
