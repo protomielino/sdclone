@@ -45,8 +45,10 @@ GfApplication& GfApplication::self()
 	return *_pSelf;
 }
 
-GfApplication::GfApplication(const char* pszName, const char* pszDesc, int argc, char **argv)
-: _strName(pszName ? pszName : "GfApplication"), _strDesc(pszDesc ? pszDesc : ""), _pEventLoop(0)
+GfApplication::GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
+							 int argc, char **argv)
+: _strName(pszName ? pszName : "GfApplication"), _strDesc(pszDesc ? pszDesc : ""),
+  _strVersion(pszVersion ? pszVersion : ""), _pEventLoop(0)
 {
 	// Check that we are the only instance.
 	if (_pSelf)
@@ -61,44 +63,54 @@ GfApplication::GfApplication(const char* pszName, const char* pszDesc, int argc,
 	// Initialize the gaming framework.
 	GfInit();
 
-	// Store the command line options.
+	// Store the command line args.
 	if (argv)
 		for (int i = 0; i < argc; i++)
-			_lstOptions.push_back(argv[i]);
-	_lstOptionsLeft = _lstOptions;
+			_lstArgs.push_back(argv[i]);
 
-	// Help about the common options.
-	_optionsHelp.lstSyntaxLines.push_back("[-ld|--localdir <dir path>] [-Ld|--libdir <dir path>]");
-	_optionsHelp.lstSyntaxLines.push_back("[-Bd|--bindir <dir path>] [-Dd|--datadir <dir path>]");
-#ifdef TRACE_OUT
-	_optionsHelp.lstSyntaxLines.push_back("[-tl|--tracelevel <integer>]"
-										  " [-ts|--tracestream stdout|stderr|<file name>]");
-#endif
+	// Register the command line options (to be parsed).
+	registerOption("h", "help", /* nHasValue = */ false);
+	registerOption("v", "version", /* nHasValue = */ false);
+	registerOption("ld", "localdir", /* nHasValue = */ true);
+	registerOption("Ld", "libdir", /* nHasValue = */ true);
+	registerOption("Bd", "bindir", /* nHasValue = */ true);
+	registerOption("Dd", "datadir", /* nHasValue = */ true);
+	registerOption("tl", "tracelevel", /* nHasValue = */ true);
+	registerOption("ts", "tracestream", /* nHasValue = */ true);
 	
-	_optionsHelp.lstExplainLines.push_back
+	// Help about the command line options.
+	addOptionsHelpSyntaxLine("[-ld|--localdir <dir path>] [-Ld|--libdir <dir path>]");
+	addOptionsHelpSyntaxLine("[-Bd|--bindir <dir path>] [-Dd|--datadir <dir path>]");
+#ifdef TRACE_OUT
+	addOptionsHelpSyntaxLine("[-tl|--tracelevel <integer>]"
+							 " [-ts|--tracestream stdout|stderr|<file name>]");
+#endif
+	addOptionsHelpSyntaxLine("[-v|--version]");
+	
+	addOptionsHelpExplainLine
 		("- locadir : Root dir of the tree where user settings files are stored");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("            (default=" SD_LOCALDIR ")");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- libdir  : Root dir of the tree where loadable modules are installed");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("            (default=" SD_LIBDIR ")");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- bindir  : Dir where the game exe and DLLs are installed");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("            (default=" SD_BINDIR ")");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- datadir : Root dir of the data tree (cars, tracks, ...)");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("            (default=" SD_DATADIR ")");
 #ifdef TRACE_OUT
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- tracelevel  : Trace level threshold");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("                (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ... ; default=5)");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- tracestream : Target output stream for the traces");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("                (default=stderr)");
 #endif
 }
@@ -113,9 +125,14 @@ const std::string& GfApplication::description() const
 	return _strDesc;
 }
 
+const std::string& GfApplication::version() const
+{
+	return _strVersion;
+}
+
 void GfApplication::updateUserSettings()
 {
-    GfFileSetup();
+	GfFileSetup();
 }
 
 void GfApplication::setEventLoop(GfEventLoop* pEventLoop)
@@ -128,7 +145,7 @@ GfEventLoop& GfApplication::eventLoop()
 	if (!_pEventLoop)
 		GfLogError("GfApplication has no event loop ; crashing !\n");
 	
-    return *_pEventLoop;
+	return *_pEventLoop;
 }
 
 void GfApplication::restart()
@@ -148,17 +165,17 @@ void GfApplication::printUsage(const char* pszErrMsg) const
 	if (pszErrMsg)
 		std::cerr << std::endl << "Error: " << pszErrMsg << std::endl << std::endl;
 	
-	std::cerr << "Usage: " << _lstOptions.front() << " ..." << std::endl;
+	std::cerr << "Usage: " << _lstArgs.front() << " ..." << std::endl;
 
 	std::list<std::string>::const_iterator itSynLine = _optionsHelp.lstSyntaxLines.begin();
-    while (itSynLine != _optionsHelp.lstSyntaxLines.end())
+	while (itSynLine != _optionsHelp.lstSyntaxLines.end())
 	{
-		std::cerr << "       " << *itSynLine << std::endl;
+		std::cerr << "         " << *itSynLine << std::endl;
 		itSynLine++;
 	}
 
 	std::list<std::string>::const_iterator itExplLine = _optionsHelp.lstExplainLines.begin();
-    while (itExplLine != _optionsHelp.lstExplainLines.end())
+	while (itExplLine != _optionsHelp.lstExplainLines.end())
 	{
 		std::cerr << " " << *itExplLine << std::endl;
 		itExplLine++;
@@ -168,121 +185,228 @@ void GfApplication::printUsage(const char* pszErrMsg) const
 bool GfApplication::parseOptions()
 {
 	// Determine and store run-time install root dir.
-	GfInitInstallDir(_lstOptions.front().c_str());
+	GfInitInstallDir(_lstArgs.front().c_str());
 
-	// Parse options.
-    const char *localdir = 0;
-    const char *libdir = 0;
-    const char *datadir = 0;
-    const char *bindir = 0;
+	// Parse args, looking for registered options.
+	std::list<std::string>::const_iterator itArg = _lstArgs.begin();
+	for (itArg++; itArg != _lstArgs.end(); itArg++)
+	{
+		bool bArgEaten = false;
+		if (itArg->find('-') == 0)
+		{
+			// We've probably got an option flag : check this a bit more in depth.
+			std::list<Option>::iterator itOpt;
+			for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+			{
+				if (itOpt->strShortName == itArg->substr(1, std::string::npos)
+					|| itOpt->strLongName == itArg->substr(2, std::string::npos))
+				{
+					// We've got a registered option flag : check if there's a value arg or not.
+					if (itOpt->bHasValue)
+					{
+						itArg++;
+						if (itArg != _lstArgs.end() // Some extra arg available ...
+							&& itArg->find('-') != 0) // ... and not an option flag :
+						{
+							itOpt->strValue = *itArg; // We've got the value.
+						}
+						else
+						{
+							// Should have a value arg, but it's not there ... error !
+							printUsage();
+							return false;
+						}
+					}
 
-	std::list<std::string> lstNewOptionsLeft;
-	std::list<std::string>::const_iterator itOpt = _lstOptionsLeft.begin();
-    for (itOpt++; itOpt != _lstOptionsLeft.end(); itOpt++)
-    {
+					// Value or not, we've got an option, and we eat the arg(s) : done.
+					itOpt->bFound = true;
+					bArgEaten = true;
+					break;
+				}
+			}
+		}
+
+		// Save any ignored arg in the "remaining" list.
+		if (!bArgEaten)
+			_vecRemArgs.push_back(*itArg);
+	}
+	
+	// Interpret the detected command line options.
+	const char *pszLocalDir = 0;
+	const char *pszLibDir = 0;
+	const char *pszDataDir = 0;
+	const char *pszBinDir = 0;
+
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+	{
+		// Not found in the command line => ignore / default value.
+		if (!itOpt->bFound)
+			continue;
+		
 		// Help about command line
-		if (*itOpt == "-h" || *itOpt == "--help")
-        {
+		if (itOpt->strLongName == "help")
+		{
 			printUsage();
 			return false;
-        }
-        // Local dir (root dir of the tree where user settings files are stored)
-        else if (*itOpt == "-ld" || *itOpt == "--localdir")
-        {
-			itOpt++;
-			if (itOpt != _lstOptionsLeft.end())
-				localdir = GfSetLocalDir(itOpt->c_str());
-        }
-        // Libraries dir (root dir of the tree where loadable modules are installed)
-        else if (*itOpt == "-Ld" || *itOpt == "--libdir")
-        {
-			itOpt++;
-			if (itOpt != _lstOptionsLeft.end())
-				libdir = GfSetLibDir(itOpt->c_str());
-        }
-        // Binaries dir (the dir where the game exe and DLLs are installed)
-        else if (*itOpt == "-Bd" || *itOpt == "--bindir")
-        {
-			itOpt++;
-			if (itOpt != _lstOptionsLeft.end())
-				bindir = GfSetBinDir(itOpt->c_str());
-        }
-        // Data dir (root dir of the data tree)
-        else if (*itOpt == "-Dd" || *itOpt == "--datadir")
-        {
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end())
-                datadir = GfSetDataDir(itOpt->c_str());
-        }
-        // Trace level threshold (only #ifdef TRACE_OUT)
-        else if (*itOpt == "-tl" || *itOpt == "--tracelevel")
-        {
-            int nTraceLevel;
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end() && sscanf(itOpt->c_str(), "%d", &nTraceLevel) == 1)
-                GfLogSetLevelThreshold(nTraceLevel);
-        }
-        // Target trace stream (only #ifdef TRACE_OUT)
-        else if (*itOpt == "-ts" || *itOpt == "--tracestream")
-        {
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end())
+		}
+		// Version information
+		else if (itOpt->strLongName == "version")
+		{
+			std::cerr << _strName << ' ' << _strVersion << std::endl;
+			return false;
+		}
+		// Local dir (root dir of the tree where user settings files are stored)
+		else if (itOpt->strLongName == "localdir")
+		{
+			pszLocalDir = GfSetLocalDir(itOpt->strValue.c_str());
+		}
+		// Libraries dir (root dir of the tree where loadable modules are installed)
+		else if (itOpt->strLongName == "libdir")
+		{
+			pszLibDir = GfSetLibDir(itOpt->strValue.c_str());
+		}
+		// Binaries dir (the dir where the game exe and DLLs are installed)
+		else if (itOpt->strLongName == "bindir")
+		{
+			pszBinDir = GfSetBinDir(itOpt->strValue.c_str());
+		}
+		// Data dir (root dir of the data tree)
+		else if (itOpt->strLongName == "datadir")
+		{
+			pszDataDir = GfSetDataDir(itOpt->strValue.c_str());
+		}
+		// Trace level threshold (only #ifdef TRACE_OUT)
+		else if (itOpt->strLongName == "tracelevel")
+		{
+			int nTraceLevel;
+			if (sscanf(itOpt->strValue.c_str(), "%d", &nTraceLevel) == 1)
+				GfLogSetLevelThreshold(nTraceLevel);
+			else
 			{
-                if (*itOpt == "stderr")
-                    GfLogSetStream(stderr);
-                else if (*itOpt == "stdout")
-                    GfLogSetStream(stdout);
-                else
-                    GfLogSetFile(itOpt->c_str());
+				printUsage("Error: Could not convert trace level to an integer");
+				return false;
 			}
-        }
+		}
+		// Target trace stream (only #ifdef TRACE_OUT)
+		else if (itOpt->strLongName == "tracestream")
+		{
+			if (itOpt->strValue == "stderr")
+				GfLogSetStream(stderr);
+			else if (itOpt->strValue == "stdout")
+				GfLogSetStream(stdout);
+			else
+				GfLogSetFile(itOpt->strValue.c_str());
+		}
 		else
 		{
-			// Save this option : it is "left".
-			lstNewOptionsLeft.push_back(*itOpt);
+			// If we get here, this is normal : the derived classes might have declared
+			// specific options.
 		}
 	}
 
-	// Store the new list of left options after parsing.
-	_lstOptionsLeft = lstNewOptionsLeft;
-
-    // If any of the Speed-Dreams dirs not run-time specified / empty, 
-    // use associated compile-time variable SD_XXDIR to get default value
-    if (!(localdir && strlen(localdir)))
-		localdir = GfSetLocalDir(SD_LOCALDIR);
-	if (!(libdir && strlen(libdir)))
-		libdir = GfSetLibDir(SD_LIBDIR);
-    if (!(bindir && strlen(bindir)))
-		bindir = GfSetBinDir(SD_BINDIR);
-    if (!(datadir && strlen(datadir)))
-		datadir = GfSetDataDir(SD_DATADIR);
+	// If any of the Speed-Dreams dirs not run-time specified / empty, 
+	// use associated compile-time variable SD_XXDIR to get default value
+	if (!(pszLocalDir && strlen(pszLocalDir)))
+		pszLocalDir = GfSetLocalDir(SD_LOCALDIR);
+	if (!(pszLibDir && strlen(pszLibDir)))
+		pszLibDir = GfSetLibDir(SD_LIBDIR);
+	if (!(pszBinDir && strlen(pszBinDir)))
+		pszBinDir = GfSetBinDir(SD_BINDIR);
+	if (!(pszDataDir && strlen(pszDataDir)))
+		pszDataDir = GfSetDataDir(SD_DATADIR);
 	
-    // Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
-    if (!(localdir && strlen(localdir)) || !(libdir && strlen(libdir)) 
-		|| !(bindir && strlen(bindir)) || !(datadir && strlen(datadir)))
-    {
-        GfLogTrace("SD_LOCALDIR : '%s'\n", GfLocalDir());
-        GfLogTrace("SD_LIBDIR   : '%s'\n", GfLibDir());
-        GfLogTrace("SD_BINDIR   : '%s'\n", GfBinDir());
-        GfLogTrace("SD_DATADIR  : '%s'\n", GfDataDir());
-        GfLogError("Could not start Speed Dreams : at least 1 of local/data/lib/bin dir is empty\n\n");
-        return false;
-    }
+	// Check if ALL the Speed-dreams dirs have a usable value, and exit if not.
+	if (!(pszLocalDir && strlen(pszLocalDir)) || !(pszLibDir && strlen(pszLibDir)) 
+		|| !(pszBinDir && strlen(pszBinDir)) || !(pszDataDir && strlen(pszDataDir)))
+	{
+		GfLogTrace("SD_LOCALDIR : '%s'\n", GfLocalDir());
+		GfLogTrace("SD_LIBDIR   : '%s'\n", GfLibDir());
+		GfLogTrace("SD_BINDIR   : '%s'\n", GfBinDir());
+		GfLogTrace("SD_DATADIR  : '%s'\n", GfDataDir());
+		
+		GfLogError("Could not start %s :"
+				   " at least 1 of local/data/lib/bin dir is empty\n\n", _strName.c_str());
+		
+		return false;
+	}
 
-	// TODO: Move this to the main ?
-    // If "data dir" specified in any way, cd to it.
-    if (datadir && strlen(datadir))
-    {
-        if(chdir(datadir))
-        {
-            GfLogError("Could not start Speed Dreams : failed to cd to the datadir '%s' (%s)\n",
-                       datadir, strerror(errno));
-            return false;
-        }
-    }
-
-    return true;
+	return true;
 }
+
+void GfApplication::registerOption(const std::string& strShortName,
+								   const std::string& strLongName,
+								   bool bHasValue)
+{
+	_lstOptions.push_back(Option(strShortName, strLongName, bHasValue));
+}
+
+void GfApplication::addOptionsHelpSyntaxLine(const std::string& strTextLine)
+{
+	_optionsHelp.lstSyntaxLines.push_back(strTextLine);
+}
+
+void GfApplication::addOptionsHelpExplainLine(const std::string& strTextLine)
+{
+	_optionsHelp.lstExplainLines.push_back(strTextLine);
+}
+
+bool GfApplication::hasOption(const std::string& strLongName) const
+{
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+		if (itOpt->bFound && itOpt->strLongName == strLongName)
+			return true;
+
+	return false;
+}
+
+bool GfApplication::hasOption(const std::string& strLongName,
+							  std::string& strValue) const
+{
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+		if (itOpt->bFound && itOpt->strLongName == strLongName)
+		{
+			strValue = itOpt->strValue;
+			return true;
+		}
+
+	return false;
+}
+
+// bool GfApplication::hasUnregisteredOption(const std::string& strShortName,
+// 										  const std::string& strLongName) const
+// {
+// 	std::list<std::string>::const_iterator itArg;
+// 	for (itArg = _lstRemArgs.begin(); itArg != _lstRemArgs.end(); itArg++)
+// 		if (*itArg == "-" + strShortName || *itArg == "--" + strLongName)
+// 			return true;
+
+// 	return false;
+// }
+
+// bool GfApplication::hasUnregisteredOption(const std::string& strShortName,
+// 										  const std::string& strLongName,
+// 										  std::string& strValue) const
+// {
+// 	std::list<std::string>::const_iterator itArg;
+// 	for (itArg = _lstRemArgs.begin(); itArg != _lstRemArgs.end(); itArg++)
+// 		if (*itArg == "-" + strShortName || *itArg == "--" + strLongName)
+// 		{
+// 			itArg++;
+// 			if (itArg != _lstRemArgs.end() // Some extra arg available ...
+// 				&& itArg->find('-') != 0) // ... but not an option flag.
+// 			{
+// 				strValue = *itArg;
+// 				return true;
+// 			}
+// 			else
+// 				break; // Value not found. TODO: Error handling ?
+// 		}
+
+// 	return false;
+// }
 
 GfApplication::~GfApplication()
 {

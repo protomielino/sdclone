@@ -36,11 +36,11 @@ class Application : public GfuiApplication
 
 	//! Constructor.
 	Application(int argc, char **argv)
-	: GfuiApplication("MenuView", "XML menu viewer", argc, argv)
+	: GfuiApplication("MenuView", "<no version>", "XML menu viewer", argc, argv)
 	{
 		// Help about the specific options.
-		_optionsHelp.lstSyntaxLines.push_back("<menu file>");
-		_optionsHelp.lstExplainLines.push_back("- <menu file> : the menu XML file to load");
+		addOptionsHelpSyntaxLine("<menu file>");
+		addOptionsHelpExplainLine("- <menu file> : the menu XML file to load");
 	}
 
 	//! Parse the command line options.
@@ -51,9 +51,9 @@ class Application : public GfuiApplication
 			return false;
 		
 		// Then the specific ones.
-		if (!_lstOptionsLeft.empty())
+		if (!_vecRemArgs.empty())
 		{
-			_strMenuFile = _lstOptionsLeft.front();
+			_strMenuFile = _vecRemArgs.front();
 		}
 		else
 		{
@@ -61,6 +61,14 @@ class Application : public GfuiApplication
 			return false;
 		}
 		
+		// If "data dir" specified in any way, cd to it.
+		if(chdir(GfDataDir()))
+		{
+			GfLogError("Could not start %s : failed to cd to the datadir '%s' (%s)\n",
+					   name().c_str(), GfDataDir(), strerror(errno));
+			return false;
+		}
+
 		return true;
 	}
 
@@ -72,7 +80,8 @@ class Application : public GfuiApplication
 	}
 	
  private:
-	
+
+	//! The menu XML descriptor file to load.
 	std::string _strMenuFile;
 };
 

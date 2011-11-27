@@ -31,6 +31,7 @@
 
 #include <string>
 #include <list>
+#include <vector>
 #include <map>
 
 #include "tgf.h"
@@ -161,7 +162,8 @@ class TGF_API GfApplication
 	static GfApplication& self();
 	
 	//! Constructor.
-	GfApplication(const char* pszName, const char* pszDesc, int argc = 0, char **argv = 0);
+	GfApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
+				  int argc = 0, char **argv = 0);
 
 	//! Destructor.
 	virtual ~GfApplication();
@@ -169,11 +171,44 @@ class TGF_API GfApplication
 	//! Name accessor.
 	const std::string& name() const;
 	
+	//! Version accessor.
+	const std::string& version() const;
+	
 	//! Description accessor.
 	const std::string& description() const;
 
-	//! Parse the command line options (updates _lstOptionsLeft).
+	//! Add the given option to the automatically processed ones when parseOptions is called.
+	void registerOption(const std::string& strShortName,
+						const std::string& strLongName,
+						bool bHasValue);
+
+	//! Add a text line to the list of those which show the cmd line syntax when help is invoked.
+	void addOptionsHelpSyntaxLine(const std::string& strTextLine);
+
+	//! Add a text line to the list of those which explain the cmd line options when help is invoked.
+	void addOptionsHelpExplainLine(const std::string& strTextLine);
+	
+	//! Parse the command line for registered options.
 	bool parseOptions();
+
+	//! Check if we have the specified regsitered option in the command line.
+	bool hasOption(const std::string& strLongName) const; // No leading '--'
+
+	//! Check if we have the specified regsitered option in the command line, and get its value.
+	bool hasOption(const std::string& strLongName, // No leading '--'
+				   std::string& strValue) const;
+
+	//! Get the args remaining unprocessed after parseOptions.
+	const std::vector<std::string>& remainingArgs() const;
+
+	//! Check if we have the specified unregistered option in the command line.
+	// bool hasUnregisteredOption(const std::string& strShortName, // No leading '-'
+	// 						   const std::string& strLongName) const; // No leading '--'
+
+	//! Check if we have the specified unregistered option in the command line, and get its value.
+	// bool hasUnregisteredOption(const std::string& strShortName, // No leading '-'
+	// 						   const std::string& strLongName, // No leading '--'
+	// 						   std::string& strValue) const;
 
 	//! Update user settings files if obsolete.
 	void updateUserSettings();
@@ -198,15 +233,37 @@ class TGF_API GfApplication
 	//! The app. description.
 	std::string _strDesc;
 	
+	//! The app. version.
+	std::string _strVersion;
+	
 	//! The event loop.
 	GfEventLoop* _pEventLoop;
 	
-	//! The list of original command line options (setup in constructor).
-	std::list<std::string> _lstOptions;
+	//! The list of original command line args (setup in constructor).
+	std::list<std::string> _lstArgs;
 
-	//! The list of command line options that remain after having been parsed.
-	std::list<std::string> _lstOptionsLeft;
+	//! The vector of left command line args (ignored by by parseOptions).
+	std::vector<std::string> _vecRemArgs;
 
+	//! The registered options : to be parsed / parsed by parseOptions.
+	class Option
+	{
+	public:
+		std::string strShortName;
+		std::string strLongName;
+		bool bHasValue;
+		bool bFound;
+		std::string strValue;
+	public:
+		Option(const std::string& strShortName_, const std::string& strLongName_,
+			   bool bHasValue_ = false)
+			: strShortName(strShortName_), strLongName(strLongName_), bHasValue(bHasValue_),
+			  bFound(false)
+		{
+		}
+	};
+	std::list<Option> _lstOptions;
+	
 	//! The help syntax/explaination about the options (setup in constructor).
 	class OptionsHelp
 	{

@@ -19,48 +19,48 @@
 #include "tgfclient.h"
 
 
-GfuiApplication::GfuiApplication(const char* pszName, const char* pszDesc, int argc, char **argv)
-: GfApplication((pszName ? pszName : "GfuiApplication"), pszDesc, argc, argv)
+GfuiApplication::GfuiApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
+								 int argc, char **argv)
+: GfApplication((pszName ? pszName : "GfuiApplication"), pszVersion, pszDesc, argc, argv),
+  _bWindowUp(false)
 {
-	// Help about the options.
-	_optionsHelp.lstSyntaxLines.push_back("[-m|--hardmouse]");
-	_optionsHelp.lstExplainLines.push_back("- hardmouse : Use hardware mouse cursor");
+	// Register command line options.
+	registerOption("m", "hardmouse", /* nHasValue = */ false);
+	
+	// Help about these options.
+	addOptionsHelpSyntaxLine("[-m|--hardmouse]");
+	addOptionsHelpExplainLine("- hardmouse : Use hardware mouse cursor");
 }
 
 bool GfuiApplication::parseOptions()
 {
-	// First the standard ones.
+	// Parse command line for registered options, and interpret standard ones.
 	if (!GfApplication::parseOptions())
 		return false;
 
-	// Then the specific ones.
-	std::list<std::string> lstNewOptionsLeft;
-	std::list<std::string>::const_iterator itOpt;
-    for (itOpt = _lstOptionsLeft.begin(); itOpt != _lstOptionsLeft.end(); itOpt++)
-    {
-        // -m option : Allow the hardware mouse cursor
-        if (*itOpt == "-m" || *itOpt == "--hardmouse")
+	// Then interpret the specific ones.
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+	{
+		// Not found in the command line => ignore / default value.
+		if (!itOpt->bFound)
+			continue;
+		
+        // Allow the hardware mouse cursor
+		if (itOpt->strLongName == "hardmouse")
         {
 			GfuiMouseSetHWPresent();
         }
-		else
-		{
-			// Save this option : it is "left".
-			lstNewOptionsLeft.push_back(*itOpt);
-		}
 	}
-	
-	// Store the new list of left options after parsing.
-	_lstOptionsLeft = lstNewOptionsLeft;
 
 	return true;
 }
 
-bool GfuiApplication::setupWindow(bool bNoMenu)
+bool GfuiApplication::setupWindow(bool bNoMenu, int nWinWidth, int nWinHeight, int nFullScreen)
 {
 	// Initialize the window/screen.
 	_bWindowUp = true; // In case, GfScrInit() would call restart() ...
-	_bWindowUp = GfScrInit();
+	_bWindowUp = GfScrInit(nWinWidth, nWinHeight, nFullScreen);
 
 	// Initialize the UI menu infrastructure.
 	if (_bWindowUp && !bNoMenu)

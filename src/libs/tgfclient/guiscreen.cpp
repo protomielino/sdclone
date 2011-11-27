@@ -23,15 +23,11 @@
     @ingroup	screen
 */
 
-#ifdef WIN32
-#ifndef HAVE_CONFIG_H
-#define HAVE_CONFIG_H
-#endif
-#endif
-
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <sstream>
+
 #ifdef WIN32
 #include <windows.h>
 #include <process.h>
@@ -41,11 +37,6 @@
 
 #include <SDL/SDL.h>
 #include <SDL/SDL_video.h>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#include "version.h"
-#endif
 
 #include <portability.h>
 
@@ -325,7 +316,7 @@ static void gfScrReshapeViewport(int width, int height)
     GfScrCenY = height / 2;
 }
 
-bool GfScrInit(void)
+bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 {
 	// Initialize SDL video subsystem (and exit if not supported).
 	if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
@@ -339,15 +330,15 @@ bool GfScrInit(void)
 	SDL_EnableUNICODE(/*enable=*/1);
 	
 	// Set window/icon captions
-	char pszCaption[64];
-	sprintf(pszCaption, "Speed Dreams %s", VERSION_LONG);
-	SDL_WM_SetCaption(pszCaption, pszCaption);
+	std::ostringstream ossCaption;
+	ossCaption << GfuiApp().name() << ' ' << GfuiApp().version();
+	SDL_WM_SetCaption(ossCaption.str().c_str(), ossCaption.str().c_str());
 
 	// Set window icon (MUST be a 32x32 icon for Windows, and with black pixels as alpha ones, 
 	// as BMP doesn't support transparency).
-	char pszIconFilename[256];
-	sprintf(pszIconFilename, "%sdata/icons/icon.bmp", GfDataDir());
-    SDL_Surface* surfIcon = SDL_LoadBMP(pszIconFilename);
+	std::ostringstream ossIconFilename;
+	ossIconFilename << GfDataDir() << "data/icons/icon.bmp";
+	SDL_Surface* surfIcon = SDL_LoadBMP(ossIconFilename.str().c_str());
 	if (surfIcon)
 	{
 	    SDL_SetColorKey(surfIcon, SDL_SRCCOLORKEY, SDL_MapRGB(surfIcon->format, 0, 0, 0));
@@ -389,9 +380,10 @@ bool GfScrInit(void)
 
 	// Get selected frame buffer specs from config file
 	// 1) Load the config file
-	char pszConfigFilename[256];
-    sprintf(pszConfigFilename, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-    void* hparmScreen = GfParmReadFile(pszConfigFilename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	std::ostringstream ossConfigFilename;
+	ossConfigFilename << GfLocalDir() << GFSCR_CONF_FILE;
+	void* hparmScreen =
+		GfParmReadFile(ossConfigFilename.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	// 2) Check / update test state of any 'in-test' specs.
 	if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
@@ -423,20 +415,26 @@ bool GfScrInit(void)
 		GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS)
 		? GFSCR_SECT_INTESTPROPS : GFSCR_SECT_VALIDPROPS;
 
-	// 4) Read the specs.
-    int nWinWidth =
-		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_X, (char*)NULL, 800);
-    int nWinHeight =
-		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
+	// 4) Get/Read the specs.
+	if (nWinWidth < 0)
+		nWinWidth =
+			(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_X, (char*)NULL, 800);
+	if (nWinHeight < 0)
+		nWinHeight =
+			(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_WIN_Y, (char*)NULL, 600);
     int nTotalDepth =
 		(int)GfParmGetNum(hparmScreen, pszScrPropSec, GFSCR_ATT_BPP, (char*)NULL, 32);
     bool bAlphaChannel =
 		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_ALPHACHANNEL,
 								 GFSCR_VAL_YES))
 		== GFSCR_VAL_YES;
-	bool bFullScreen =
-		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO))
-		== GFSCR_VAL_YES;
+	bool bFullScreen;
+	if (nFullScreen < 0)
+		bFullScreen =
+			std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_FSCR, GFSCR_VAL_NO))
+			== GFSCR_VAL_YES;
+	else
+		bFullScreen = nFullScreen ? true : false;
     bool bTryBestVInitMode =
 		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
 								 GFSCR_VAL_VINIT_BEST))
@@ -660,9 +658,9 @@ void GfScrShutdown(void)
 	// * if the test state is 'to do', do nothing (will be taken care of in next GfScrInit),
 	// * if the test state is 'in progress', validate the new screen properties,
 	// * if the test state is 'failed', revert to the validated screen properties.
-	char pszConfigFilename[256];
-    sprintf(pszConfigFilename, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-    void* hparmScreen = GfParmReadFile(pszConfigFilename, GFPARM_RMODE_STD);
+	std::ostringstream ossConfigFilename;
+	ossConfigFilename << GfLocalDir() << GFSCR_CONF_FILE;
+	void* hparmScreen = GfParmReadFile(ossConfigFilename.str().c_str(), GFPARM_RMODE_STD);
 
 	if (GfParmExistsSection(hparmScreen, GFSCR_SECT_INTESTPROPS))
 	{

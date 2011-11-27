@@ -17,9 +17,9 @@
  *                                                                         *
  ***************************************************************************/
 
+#include <ctype.h>
 #include <cstdio>
 #include <cstdlib>
-#include <ctype.h>
 #include <cstring>
 #include <cmath>
 
@@ -29,8 +29,8 @@
 #endif
 
 #include <getopt.h>
+
 #include <plib/ssg.h>
-#include <SDL/SDL.h>
 
 #include "tgfclient.h"
 
@@ -43,7 +43,7 @@ void	*ParamHandle = NULL;
 
 FILE	*in, *out;
 
-int	ImgSize;
+int	ImgSize = 0;
 
 ssgEntity	*Root;
 
@@ -120,8 +120,7 @@ void print_mat4(char *title, sgMat4 m)
 /*
  * Read the faces from AC3D file
  */
-static ssgBranch *
-				  hookNode(char *s)
+static ssgBranch *hookNode(char *s)
 {
     int		i;
     tFace	*curFace;
@@ -152,7 +151,7 @@ void saveSkin(void)
     unsigned char	*img;
     
     img = (unsigned char*)malloc(ImgSize * ImgSize * 3);
-    if (img == NULL) {
+    if (!img) {
 		return;
     }
     glPixelStorei(GL_PACK_ROW_LENGTH, 0);
@@ -222,27 +221,6 @@ void Display(void)
 
 void init_graphics ()
 {
-    /*
-	  Initialise SDL
-    */
-
-    if ( SDL_InitSubSystem(SDL_INIT_VIDEO) < 0 ) {
-        printf("Couldn't initialize SDL video subsystem: %s\n", SDL_GetError());
-        return;
-    }
-
-    SDL_WM_SetCaption("texmapper", NULL);
-
-    SDL_GL_SetAttribute( SDL_GL_RED_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE, 8 );
-    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 24 );
-    SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER, 1 );
-    SDL_SetVideoMode( ImgSize, ImgSize, 24, SDL_OPENGL);
-    GfuiInitWindowPositionAndSize(0, 0, ImgSize, ImgSize);
-
- 
     /* Callbacks */
     GfuiApp().eventLoop().setRedisplayCB(Display);
     
@@ -286,9 +264,7 @@ void updt_bbox(ssgEntity *start, sgVec3 min, sgVec3 max)
     }
 }
 
-/*
- * Recalculate the bounding box of the faces
- */
+// Recalculate the bounding box of the faces
 void calc_bbox(void)
 {
     int		i, j;
@@ -494,17 +470,38 @@ void set_texture_coord(void)
     
 }
 
-
-/*
-  Load a simple database
-*/
+//  Load a simple database from the input AC3D file
 void load_database(void)
 {
-
     ssgLoaderOptions *loaderopt = new ssgLoaderOptions();
-    
+
+	// Determine the pathname of the folder where the model file is located.
+	char pszInFileDir[512];
+	strcpy(pszInFileDir, InputFileName);
+	char* pLastPathSep = strrchr(pszInFileDir, '/');
+#ifdef WIN32
+	if (!pLastPathSep)
+		pLastPathSep = strrchr(pszInFileDir, '\\');
+#endif
+	if (pLastPathSep)
+		*pLastPathSep = 0;
+	else
+		strcpy(pszInFileDir, ".");
+#ifdef WIN32
+	// Replace '\' by '/'
+	for (size_t i = 0; i < strlen(pszInFileDir); i++)
+		if (pszInFileDir[i] == '\\')
+			pszInFileDir[i] = '/';
+#endif
+	
+	// Texture and model search dir.
+	loaderopt->setTextureDir(pszInFileDir);
+	loaderopt->setModelDir(pszInFileDir);
+
+	//
     loaderopt->setCreateBranchCallback(hookNode);
-    
+
+	// Load the model
     Root = ssgLoadAC(InputFileName, loaderopt);
 
     fprintf(stderr, "%d branches found\n", BrNb);
@@ -513,6 +510,7 @@ void load_database(void)
     calc_coord();
 }
 
+//  Save the current database to the output AC3D file
 void save_database(void)
 {
     int i;
@@ -542,6 +540,7 @@ void save_database(void)
     myssgSaveAC(OutputFileName, b, SkinFileName);
 }
 
+// Load the mapping parameters from the input params file
 void load_params(void)
 {
     int		i, j;
@@ -605,32 +604,34 @@ class Application : public GfuiApplication
 public:
 
 	//! Constructor.
-	Application();
+	Application(int argc, char** argv);
 
 	//! Parse the command line options.
-	// TODO: Move to the GfApplication way of parsing options ?
 	bool parseOptions(int argc, char** argv);
+	
+	//! Setup the window / screen and menu infrastructure (Window specs got from screen.xml, unless specified as non-null).
+	bool setupWindow();
 };
 
 //! Constructor.
-Application::Application()
-: GfuiApplication("TexMapper", "Texture Auto Mapper 1.1")
+Application::Application(int argc, char** argv)
+: GfuiApplication("TexMapper", "1.1", "Texture Auto Mapper", argc, argv)
 {
 	// Ignore standard options.
 	_optionsHelp.lstSyntaxLines.clear();
 	_optionsHelp.lstExplainLines.clear();
 
 	// Keep only specific ones.
-	_optionsHelp.lstSyntaxLines.push_back
-		("[-h|--help] [-f <input acfile>] [-o <output acfile>] [-p <parameters>] [-s <file>]");
+	addOptionsHelpSyntaxLine("[-h|--help] [-f <in acfile>]");
+	addOptionsHelpSyntaxLine("[-o <out acfile>] [-p <parameters>] [-s <out skin file>]");
 	
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- <input acfile>  : input model file in AC3D format [car.ac]");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- <output acfile> : ouput model file in AC3D format [car-out.ac]");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- <parameters>    : parameters in XML format [texmapper.xml]");
-	_optionsHelp.lstExplainLines.push_back
+	addOptionsHelpExplainLine
 		("- <file>          : output skin file [skin.rgb]");
 }
 
@@ -638,11 +639,11 @@ Application::Application()
 // TODO: Move to the GfApplication way of parsing options ?
 bool Application::parseOptions(int argc, char** argv)
 {
-	// Store the executable name.
-	if (argc > 0)
-		_lstOptions.push_back(argv[0]);
-
-	// Parse options.
+	// First the standard ones.
+	if (!GfuiApplication::parseOptions())
+		return false;
+		
+	// Then the specific ones.
 	while (1) {
 		int option_index = 0;
 		static struct option long_options[] = { {"help", 0, 0, 0 } };
@@ -686,22 +687,22 @@ bool Application::parseOptions(int argc, char** argv)
 		}
 	}
 
-	if (!ulFileExists(InputFileName)) {
+	if (!GfFileExists(InputFileName)) {
 		InputFileName = "car.ac";
-		if (!ulFileExists(InputFileName)) {
+		if (!GfFileExists(InputFileName)) {
 			fprintf(stderr, "The Input AC3D file must be provided\n");
 			printUsage();
 			return false;
 		}
 	}
 
-	if (OutputFileName == NULL) {
+	if (!OutputFileName) {
 		OutputFileName = "car-out.ac";
 	}
 
-	if (!ulFileExists(ParamFileName)) {
+	if (!GfFileExists(ParamFileName)) {
 		ParamFileName = "texmapper.xml";
-		if (!ulFileExists(ParamFileName)) {
+		if (!GfFileExists(ParamFileName)) {
 			fprintf(stderr, "The parameters file is mandatory\n");
 			printUsage();
 			return false;
@@ -709,44 +710,56 @@ bool Application::parseOptions(int argc, char** argv)
 	}
 	
 	ParamHandle = GfParmReadFile(ParamFileName, GFPARM_RMODE_STD);
-	if (ParamHandle == NULL) {
+	if (!ParamHandle) {
 		fprintf(stderr, "The parameters file should not be empty\n");
 		printUsage();
 		return false;
 	}
 
-	if (SkinFileName == NULL) {
+	if (!SkinFileName) {
 		SkinFileName = "skin.rgb";
 	}
 		
 	return true;
 }
 
+bool Application::setupWindow()
+{
+	// Initialize the window/screen.
+	bool bWindowUp =
+		GfuiApplication::setupWindow(/*bNoMenu=*/true, ImgSize, ImgSize, /*nFullScreen=*/0);
+
+	init_graphics();
+
+	return bWindowUp;
+}
+
 int main(int argc, char **argv)
 {
 	// Create the application
-	Application app;
+	Application app(argc, argv);
 	
 	// Parse the command line options
 	if (!app.parseOptions(argc, argv))
 		return 1;
 
+	// Update user settings files from installed ones.
+    app.updateUserSettings();
+
 	// Initialize the event loop management layer.
 	GfuiEventLoop* pEventLoop = new GfuiEventLoop;
 	app.setEventLoop(pEventLoop);
 
-	// Setup the window / screen and menu infrastructure (needs an event loop).
-	if (!app.setupWindow(/*bNoMenu=*/true))
-		return 1;
-
-	//
+	// Load parameters.
 	load_params();
 	
-	init_graphics();
+	// Setup the window / screen (needs an event loop).
+	if (!app.setupWindow())
+		return 1;
 
 	load_database();
 
-	// App. event loop.
+	// App. event loop (until a Quit event happens).
 	app.eventLoop()();
 
 	// That's all.

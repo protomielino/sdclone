@@ -2681,8 +2681,10 @@ SaveMainTrack(FILE *curFd, int bump)
 void CalculateTrack(tTrack * Track, void *TrackHandle, int bump)
 {
 	TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
-	GfOut("Track step: %.2f ", TrackStep);
+	printf("Track step: %.2f ", TrackStep);
+	
 	InitScene(Track, TrackHandle, bump);
+	
 	printf("Calculation finished\n");
 }
 
@@ -2700,7 +2702,7 @@ GenerateTrack(tTrack * Track, void *TrackHandle, char *outFile, FILE *AllFd, int
     FILE *curFd;
     
     TrackStep = GfParmGetNum(TrackHandle, TRK_SECT_TERRAIN, TRK_ATT_TSTEP, NULL, TrackStep);
-    GfOut("Track step: %.2f ", TrackStep);
+    printf("Track step: %.2f ", TrackStep);
 
     InitScene(Track, TrackHandle, bump);
 

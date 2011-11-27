@@ -21,8 +21,6 @@
 #ifndef _EXITMENU_H_
 #define _EXITMENU_H_
 
-#include "client.h"
-
 
 extern void* ExitMenuInit(void *menu);
 extern void* MainExitMenuInit(void *mainMenu);

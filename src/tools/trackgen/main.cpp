@@ -111,149 +111,108 @@ public:
 
 //! Constructor.
 Application::Application(int argc, char** argv)
-: GfApplication("TrackGen", "Terrain generator for tracks 1.5.2.1", argc, argv)
+: GfApplication("TrackGen", "1.5.2.1", "Terrain generator for tracks", argc, argv)
 {
+	// Specific options.
+	registerOption("c", "category", /* nHasValue = */ true);
+	registerOption("n", "name", /* nHasValue = */ true);
+	registerOption("b", "bump", /* nHasValue = */ false);
+	registerOption("B", "noborder", /* nHasValue = */ false);
+	registerOption("a", "all", /* nHasValue = */ false);
+	registerOption("z", "calc", /* nHasValue = */ false);
+	registerOption("s", "split", /* nHasValue = */ false);
+	registerOption("S", "splitall", /* nHasValue = */ false);
+	registerOption("E", "saveelev", /* nHasValue = */ true);
+	registerOption("H", "height4", /* nHasValue = */ true);
+
 	// Help on specific options.
-	_optionsHelp.lstSyntaxLines.push_back
-		("-c category -n name [-a] [-m] [-s] [-S] [-E <n> [-H <nb>]]");
-	_optionsHelp.lstSyntaxLines.push_back
-		("[-h|--help] [-v|--version]");
+	addOptionsHelpSyntaxLine("-c|--category <cat> -n|--name <name> [-b|bump] [-B|--noborder]");
+	addOptionsHelpSyntaxLine("[-a|--all] [-z|--calc] [-s|split] [-S|splitall]");
+	addOptionsHelpSyntaxLine("[-E|--saveelev <#ef> [-H|height4 <#hs>]]");
 	
-    _optionsHelp.lstExplainLines.push_back
-		("-c category    : track category (road, speedway, dirt...)");
-    _optionsHelp.lstExplainLines.push_back
-		("-n name        : track name");
-    _optionsHelp.lstExplainLines.push_back
-		("-b             : draw bump track");
-    _optionsHelp.lstExplainLines.push_back
-		("-B             : Don't use terrain border (relief supplied int clockwise, ext CC)");
-    _optionsHelp.lstExplainLines.push_back
-		("-a             : draw all (default is track only)");
-    _optionsHelp.lstExplainLines.push_back
-		("-z             : Just calculate track parameters and exit");
-    _optionsHelp.lstExplainLines.push_back
-		("-s             : split the track and the terrain");
-    _optionsHelp.lstExplainLines.push_back
-		("-S             : split all");
-    _optionsHelp.lstExplainLines.push_back
-		("-E <n>         : save elevation file n");
-    _optionsHelp.lstExplainLines.push_back
-		("                  0: all elevatation files");
-    _optionsHelp.lstExplainLines.push_back
-		("                  1: elevation file of terrain + track");
-    _optionsHelp.lstExplainLines.push_back
-		("                  2: elevation file of terrain with track white");
-    _optionsHelp.lstExplainLines.push_back
-		("                  3: track only");
-    _optionsHelp.lstExplainLines.push_back
-		("                  4: track elevations with height steps");
-    _optionsHelp.lstExplainLines.push_back
-		("-H <nb>        : nb of height steps for 4th elevation file [30]");
+    addOptionsHelpExplainLine("<cat>    : track category (road, speedway, dirt...)");
+    addOptionsHelpExplainLine("<name>   : track name");
+    addOptionsHelpExplainLine("bump     : draw bump track");
+    addOptionsHelpExplainLine("noborder : don't use terrain border "
+							  "(relief supplied int clockwise, ext CC)");
+    addOptionsHelpExplainLine("all      : draw all (default is track only)");
+    addOptionsHelpExplainLine("calc     : only calculate track parameters and exit");
+    addOptionsHelpExplainLine("split    : split the track and the terrain");
+    addOptionsHelpExplainLine("splitall : split all");
+    addOptionsHelpExplainLine("<#ef>    : # of the elevation file to save");
+    addOptionsHelpExplainLine("  0: all elevation files");
+    addOptionsHelpExplainLine("  1: elevation file of terrain + track");
+    addOptionsHelpExplainLine("  2: elevation file of terrain with track white");
+    addOptionsHelpExplainLine("  3: track only");
+    addOptionsHelpExplainLine("  4: track elevations with height steps");
+    addOptionsHelpExplainLine("<#hs> : nb of height steps for 4th elevation file [30]");
 }
 
 // Parse the command line options.
 bool Application::parseOptions()
 {
-	// First the standard ones.
+	// Parse command line for registered options, and interpret standard ones.
 	if (!GfApplication::parseOptions())
 		return false;
 
-	// Then the specific ones.	
+	// Then interpret the specific ones.
+	TrackName = NULL;
+	TrackCategory = NULL;
     TrackOnly = 1;
 	JustCalculate = 0;
     MergeAll = 1;
     MergeTerrain = 1;
-    TrackName = NULL;
-    TrackCategory = NULL;
     DoSaveElevation = -1;
 
-	std::list<std::string> lstNewOptionsLeft;
-	std::list<std::string>::const_iterator itOpt;
-    for (itOpt = _lstOptionsLeft.begin(); itOpt != _lstOptionsLeft.end(); itOpt++)
-    {
-        // -m option : Allow the hardware mouse cursor
-        if (*itOpt == "-v" || *itOpt == "--version")
-        {
-			printf("%s\n", _strDesc.c_str());
-			::exit(0);
-		}
-		else if (*itOpt == "-a")
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+	{
+		// Not found in the command line => ignore / default value.
+		if (!itOpt->bFound)
+			continue;
+		
+        if (itOpt->strLongName == "all")
         {
 			TrackOnly = 0;
 		}
-		else if (*itOpt == "-z")
+		else if (itOpt->strLongName == "calc")
 		{
 			JustCalculate = 1;
 		}
-		else if (*itOpt == "-b")
+		else if (itOpt->strLongName == "bump")
 		{
 			Bump = 1;
 		}
-		else if (*itOpt == "-s")
+		else if (itOpt->strLongName == "split")
 		{
 			MergeAll = 0;
 			MergeTerrain = 1;
 		}
-		else if (*itOpt == "-B")
-		{
-			UseBorder = 0;
-		}
-		else if (*itOpt == "-S")
+		else if (itOpt->strLongName == "splitall")
 		{
 			MergeAll = 0;
 			MergeTerrain = 0;
 		}
-		else if (*itOpt == "-n")
+		else if (itOpt->strLongName == "noborder")
 		{
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end())
- 				TrackName = strdup(itOpt->c_str());
-			else
-			{
-				printUsage("Track name expected after -n");
-				return false;
-			}
+			UseBorder = 0;
 		}
-		else if (*itOpt == "-E")
+		else if (itOpt->strLongName == "name")
 		{
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end())
-				DoSaveElevation = strtol(itOpt->c_str(), NULL, 0);
-			else
-			{
-				printUsage("Save elevation option # expected after -E");
-				return false;
-			}
+			TrackName = strdup(itOpt->strValue.c_str());
+		}
+		else if (itOpt->strLongName == "saveelev")
+		{
+			DoSaveElevation = strtol(itOpt->strValue.c_str(), NULL, 0);
 			TrackOnly = 0;
 		}
-		else if (*itOpt == "-c")
+		else if (itOpt->strLongName == "category")
 		{
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end())
-				TrackCategory = strdup(itOpt->c_str());
-			else
-			{
-				printUsage("Track category expected after -c");
-				return false;
-			}
+			TrackCategory = strdup(itOpt->strValue.c_str());
 		}
-		else if (*itOpt == "-H")
+		else if (itOpt->strLongName == "steps4")
 		{
-			itOpt++;
-            if (itOpt != _lstOptionsLeft.end())
-				HeightSteps = strtol(itOpt->c_str(), NULL, 0);
-			else
-			{
-				printUsage("Nb of height steps expected after -H");
-				return false;
-			}
-		}
-		else
-		{
-			std::ostringstream ossMsg;
-			ossMsg << "Unsupported option << " << *itOpt;
-			printUsage(ossMsg.str().c_str());
-			return false;
+			HeightSteps = strtol(itOpt->strValue.c_str(), NULL, 0);
 		}
     }
 
@@ -265,10 +224,6 @@ bool Application::parseOptions()
 
 	return true;
 }
-
-// #ifdef WIN32
-// #define INSTBASE "./"
-// #endif
 
 void Application::generate()
 {
@@ -308,7 +263,7 @@ void Application::generate()
 		sprintf(buf2, "%stracks/%s/%s/%s", GfDataDir(), Track->category, Track->internalname, Track->internalname);
 		OutputFileName = strdup(buf2);
 
-		// Number of goups for the complete track.
+		// Number of groups for the complete track.
 		if (TrackOnly) {
 			sprintf(buf2, "%s.ac", OutputFileName);
 			// Track.
@@ -400,18 +355,15 @@ int main(int argc, char **argv)
     if (!app.parseOptions())
 		return 1;
 
-	// Why initialize the video / window caption / SDL_Quit ? Really needed ?
-    if (SDL_InitSubSystem(SDL_INIT_VIDEO) < 0)
+	// If "data dir" specified in any way, cd to it.
+	if(chdir(GfDataDir()))
 	{
-        GfLogError("Couldn't initialize SDL video subsystem: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    atexit(SDL_Quit);
-
-    SDL_WM_SetCaption(argv[1],NULL);
-	// End why ...
+		GfLogError("Could not start %s : failed to cd to the datadir '%s' (%s)\n",
+				   app.name().c_str(), GfDataDir(), strerror(errno));
+		return 1;
+	}
 	
+	// Do the requested job.
 	app.generate();
 	
  	// That's all.

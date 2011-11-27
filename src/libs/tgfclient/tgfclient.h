@@ -79,7 +79,7 @@ typedef struct ScreenSize
     int height; // Height in pixels.
 } tScreenSize;
 
-TGFCLIENT_API bool GfScrInit(void);
+TGFCLIENT_API bool GfScrInit(int nWinWidth = -1, int nWinHeight = -1, int nFullScreen = -1);
 TGFCLIENT_API void GfScrShutdown(void);
 TGFCLIENT_API void GfScrGetSize(int *scrW, int *scrH, int *viewW, int *viewH);
 TGFCLIENT_API bool GfScrToggleFullScreen();
@@ -737,7 +737,8 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
  public:
 
 	//! Constructor.
-	GfuiApplication(const char* pszName, const char* pszDesc, int argc = 0, char** argv = 0);
+	GfuiApplication(const char* pszName, const char* pszVersion, const char* pszDesc,
+					int argc = 0, char** argv = 0);
 
 	//! Destructor.
 	virtual ~GfuiApplication();
@@ -745,8 +746,8 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
 	//! Parse the command line options (updates _lstOptionsLeft).
 	bool parseOptions();
 
-	//! Setup the window / screen and menu infrastructure.
-	bool setupWindow(bool bNoMenu = false);
+	//! Setup the window / screen (+ menu infrastructure if specified) (with given size specs if >= 0, or from screen.xml).
+	bool setupWindow(bool bNoMenu = false, int nWinWidth = -1, int nWinHeight = -1, int nFullScreen = -1);
 
 	//! Application event loop.
 	GfuiEventLoop& eventLoop();

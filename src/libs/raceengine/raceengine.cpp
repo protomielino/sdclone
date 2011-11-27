@@ -27,6 +27,7 @@
 
 #include <car.h> // tCarPitCmd.
 
+#include <tgfdata.h>
 #include <race.h>
 #include <tracks.h>
 
@@ -53,6 +54,7 @@ RaceEngine& RaceEngine::self()
 RaceEngine::RaceEngine()
 : _piUserItf(0), _piTrkLoader(0), _piPhysEngine(0), _pRace(new GfRace())
 {
+	GfData::initialize();
 }
 
 // Implementation of IRaceEngine.
@@ -124,8 +126,12 @@ void RaceEngine::cleanup(void)
 
 void RaceEngine::shutdown(void)
 {
+	// Destroy the race engine itself.
 	delete _pSelf;
 	_pSelf = 0;
+
+	// Shutdown the data layer.
+	GfData::shutdown();
 }
 
 RaceEngine::~RaceEngine()

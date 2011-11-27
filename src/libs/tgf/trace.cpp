@@ -36,16 +36,9 @@
 #ifdef WIN32
 #include <windows.h>
 #include <windowsx.h>
-#ifndef HAVE_CONFIG_H
-#define HAVE_CONFIG_H
-#endif
 #else
 #include <sys/param.h>
 #endif // WIN32
-
-#ifdef HAVE_CONFIG_H
-#include "version.h"
-#endif
 
 #include "tgf.hpp"
 
@@ -111,7 +104,7 @@ void GfLogSetStream(FILE* fStream)
 		fprintf(gfLogStream, "%s Info    Date and time : %4d/%02d/%02d %02d:%02d:%02d\n",
 				pszClock, stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
 				stm->tm_hour, stm->tm_min, stm->tm_sec);
-		fprintf(gfLogStream, "%s Info    Version : %s\n", pszClock, VERSION_LONG);
+		fprintf(gfLogStream, "%s Info    Version : %s\n", pszClock, GfApp().version().c_str());
 		
 		// Trace current trace level threshold.
 		fprintf(gfLogStream, "%s Info    Current trace level threshold : ", pszClock);

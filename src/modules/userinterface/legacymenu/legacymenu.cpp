@@ -27,7 +27,9 @@
 #include <portability.h>
 #include <tgfclient.h>
 
-#include "client.h"
+#include <racemanagers.h>
+
+#include "splash.h"
 #include "exitmenu.h"
 #include "racescreens.h"
 
@@ -79,7 +81,37 @@ LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 // Implementation of IUserInterface ****************************************
 bool LegacyMenu::activate()
 {
-	return ::MenuEntry();
+	// Get the race to start, if any specified.
+	std::string strRaceToStart;
+	if (!GfApp().hasOption("startrace", strRaceToStart) || strRaceToStart.empty())
+		
+		// Open the splash screen, load menus in the background and finally open the main menu.
+		return SplashScreen();
+
+	// Or else run the selected race.
+	GfRaceManager* pSelRaceMan = GfRaceManagers::self()->getRaceManager(strRaceToStart);
+	if (pSelRaceMan)
+	{
+		// Reset the race engine state.
+		raceEngine().reset();
+
+		// Give the selected race manager to the race engine.
+		raceEngine().selectRaceman(pSelRaceMan);
+		
+		// Configure the new race.
+		raceEngine().configureRace(/* bInteractive */ false);
+
+		// Start the race engine state automaton
+		LmRaceEngine().startNewRace();
+	}
+	else
+	{
+		GfLogError("No such race manager '%s'\n", strRaceToStart.c_str());
+		
+		return false;
+	}
+
+	return true;
 }
 
 void LegacyMenu::quit()

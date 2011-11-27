@@ -17,18 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifdef WIN32
-#ifndef HAVE_CONFIG_H
-#define HAVE_CONFIG_H
-#endif
-#endif
-
 #include <cstdio>
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#include "version.h"
-#endif
 
 #include <SDL/SDL.h>
 #include <tgf.hpp>
@@ -225,14 +214,13 @@ static void splashDisplay( void )
 		glDisable(GL_TEXTURE_2D);
 	}
 		
-#ifdef HAVE_CONFIG_H
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluOrtho2D(0, 640, 0, 480);
 	
 	static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
-	GfuiDrawString(VERSION_LONG, grWhite, GFUI_FONT_SMALL_C, 440-8, 8, 200, GFUI_ALIGN_HR);
-#endif
+	GfuiDrawString(GfApp().version().c_str(), grWhite, GFUI_FONT_SMALL_C,
+				   440-8, 8, 200, GFUI_ALIGN_HR);
 
 	GfuiSwapBuffers();
 }

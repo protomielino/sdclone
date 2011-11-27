@@ -24,20 +24,102 @@
 #include <portability.h>
 #include <tgfclient.h>
 
-#include <tgfdata.h>
+#ifdef WIN32
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
+#endif
+#endif
+
+#ifdef HAVE_CONFIG_H
+#include "version.h"
+#endif
+
 #include <raceengine.h>
 #include <iuserinterface.h>
 
-class Application : public GfuiApplication
-{
- public:
 
-	//! Constructor.
-	Application(int argc, char **argv)
-	: GfuiApplication("Speed Dreams", "an Open Motorsport Sim", argc, argv)
-	{
-	}
-};
+//class NoGUIApplication : public GfApplication
+//{
+// public:
+//
+//	//! Constructor.
+//	NoGUIApplication(int argc, char **argv)
+//	: GfApplication("Speed Dreams", "an Open Motorsport Sim", argc, argv)
+//	{
+//	}
+//
+//	bool parseOptions()
+//	{
+//		// First the standard ones.
+//		if (!GfApplication::parseOptions())
+//			return false;
+//
+//		// Then the specific ones.
+//		std::list<std::string> lstNewOptionsLeft;
+//		std::list<std::string>::const_iterator itOpt;
+//		for (itOpt = _lstOptionsLeft.begin(); itOpt != _lstOptionsLeft.end(); itOpt++)
+//		{
+//			// Race to start.
+//			if (*itOpt == "-sr" || *itOpt == "--startrace")
+//			{
+//				itOpt++;
+//				if (itOpt != _lstOptionsLeft.end())
+//					strRaceToStart = *itOpt; ??????????????????
+//			}
+//			else
+//			{
+//				// Save this option : it is "left".
+//				lstNewOptionsLeft.push_back(*itOpt);
+//			}
+//		}
+//		
+//		// Store the new list of left options after parsing.
+//		_lstOptionsLeft = lstNewOptionsLeft;
+//		
+//		return true;
+//	}
+//};
+//
+//class GUIApplication : public GfuiApplication
+//{
+// public:
+//
+//	//! Constructor.
+//	Application(int argc, char **argv)
+//	: GfuiApplication("Speed Dreams", "an Open Motorsport Sim", argc, argv)
+//	{
+//	}
+//	
+//	bool parseOptions()
+//	{
+//		// // First the standard ones.
+//		// if (!GfApplication::parseOptions())
+//		// 	return false;
+//
+//		// // Then the specific ones.
+//		// std::list<std::string> lstNewOptionsLeft;
+//		// std::list<std::string>::const_iterator itOpt;
+//		// for (itOpt = _lstOptionsLeft.begin(); itOpt != _lstOptionsLeft.end(); itOpt++)
+//		// {
+//		// 	// Text-only
+//		// 	if (*itOpt == "-to" || *itOpt == "--textonly")
+//		// 	{
+//		// 		itOpt++;
+//		// 		_bTextOnly = true;
+//		// 	}
+//		// 	else
+//		// 	{
+//		// 		// Save this option : it is "left".
+//		// 		lstNewOptionsLeft.push_back(*itOpt);
+//		// 	}
+//		// }
+//		
+//		// // Store the new list of left options after parsing.
+//		// _lstOptionsLeft = lstNewOptionsLeft;
+//		
+//		return true;
+//	}
+//};
 
 /*
  * Function
@@ -47,44 +129,91 @@ class Application : public GfuiApplication
  *    Main function of the game
  *
  * Parameters
- *    argc Number of command line options, + 1 for the executable name
- *    argv Array of zero-terminated strings, 1 for each option
+ *    argc Number of command line args, + 1 for the executable name
+ *    argv Array of zero-terminated strings, 1 for each arg
  *
  * Return
- *    Never returns, exits with 0 status code if OK, non-0 otherwise.
+ *    0 status code if OK, non-0 otherwise.
  */
 int
 main(int argc, char *argv[])
 {
-	// Create the application
-	Application app(argc, argv);
+	// Look for the "text-only" option flag in the command-line args.
+	bool bTextOnly = false;
+	// WIP no-graphics features.
+	// for (int i = 1; i < argc; i++)
+	// 	if (!strcmp(argv[i], "-to") || !strcmp(argv[i], "--textonly"))
+	// 	{
+	// 		bTextOnly = true;
+	// 		break;
+	// 	}
+
+	// Create the application (graphical or text-only UI).
+	GfApplication* pApp;
+	if (bTextOnly)
+		pApp = new GfApplication("Speed Dreams", VERSION_LONG,
+								 "an Open Motorsport Sim", argc, argv);
+	else
+		pApp = new GfuiApplication("Speed Dreams", VERSION_LONG,
+								   "an Open Motorsport Sim", argc, argv);
+
+	// Register app. specific options and help text.
+	// WIP no-graphics / direct race start feature.
+	// pApp->registerOption("to", "textonly", /* nHasValue = */ false);
+	// pApp->registerOption("sr", "startrace", /* nHasValue = */ true);
 	
-	// Parse the command line options
-    if (!app.parseOptions())
+	// pApp->addOptionsHelpSyntaxLine("[-sr|--startrace <race name> [-to|--textonly] ]");
+	// pApp->addOptionsHelpExplainLine
+	// 	("- text-only : Run the specified race without any GUI (suitable for a headless computer)");
+	// pApp->addOptionsHelpExplainLine
+	// 	("- race name : Name without extension and dir path of the selected raceman file,");
+	// pApp->addOptionsHelpExplainLine
+	// 	("              among the .xml files in <user settings>/config/raceman (no default)");
+
+	// Parse the command line for registered options.
+    if (!pApp->parseOptions())
+		return 1;
+
+	// Some more checks about command line options.
+	std::string strRaceToStart;
+	if (bTextOnly && (!pApp->hasOption("startrace", strRaceToStart) || strRaceToStart.empty()))
 	{
-		std::cerr << "Exiting from " << app.name()
-				  << " after some error occurred (see above)." << std::endl;
+		std::cerr << "Exiting from " << pApp->name()
+				  << " because no race specified in text-only mode." << std::endl;
+		return 1;
+	}
+	
+	// If "data dir" specified in any way, cd to it.
+	if(chdir(GfDataDir()))
+	{
+		GfLogError("Could not start %s : failed to cd to the datadir '%s' (%s)\n",
+				   pApp->name().c_str(), GfDataDir(), strerror(errno));
 		return 1;
 	}
 
 	// Update user settings files from installed ones.
-    app.updateUserSettings();
+    pApp->updateUserSettings();
 
-   // Initialize the event loop management layer.
-	GfuiEventLoop* pEventLoop = new GfuiEventLoop;
-	app.setEventLoop(pEventLoop);
+   // Initialize the event loop management layer (graphical or text-only UI).
+	GfEventLoop* pEventLoop;
+	if (bTextOnly)
+		pEventLoop = new GfEventLoop;
+	else
+		pEventLoop = new GfuiEventLoop;
+	pApp->setEventLoop(pEventLoop);
 
-	// Setup the window / screen and menu infrastructure (needs an event loop).
-    if (!app.setupWindow())
+	// When there's a GUI, setup the window / screen and menu infrastructure.
+    if (!bTextOnly && !dynamic_cast<GfuiApplication*>(pApp)->setupWindow())
 	{
-		std::cerr << "Exiting from " << app.name()
+		std::cerr << "Exiting from " << pApp->name()
 				  << " after some error occurred (see above)." << std::endl;
 		return 1;
 	}
 
-	// Load the user interface module.
+	// Load the user interface module (graphical or text-only UI).
 	std::ostringstream ossModLibName;
-	ossModLibName << GfLibDir() << "modules/userinterface/" << "legacymenu" << '.' << DLLEXT;
+	ossModLibName << GfLibDir() << "modules/userinterface/"
+				  << (bTextOnly ?  "textonly" : "legacymenu") << '.' << DLLEXT;
 	GfModule* pmodUserItf = GfModule::load(ossModLibName.str());
 
 	// Check that it implements IUserInterface.
@@ -94,10 +223,9 @@ main(int argc, char *argv[])
 		piUserItf = pmodUserItf->getInterface<IUserInterface>();
 	}
 
- 	// Initialize the race engine and the user interface module.
+ 	// Initialize the race engine and the user interface modules.
 	if (piUserItf)
 	{
-		GfData::initialize();
 		RaceEngine::self().setUserInterface(*piUserItf);
 		piUserItf->setRaceEngine(RaceEngine::self());
 	}
@@ -107,8 +235,8 @@ main(int argc, char *argv[])
 		// Enter the user interface.
 		if (piUserItf->activate())
 		{
-			// Game event loop.
-			app.eventLoop()();
+			// Game event loop (when it returns, it's simply because we are exiting).
+			pApp->eventLoop()();
 		}
 		
 		// Shutdown the user interface.
@@ -116,18 +244,20 @@ main(int argc, char *argv[])
 
 		// Shutdown the race engine.
 		RaceEngine::self().shutdown();
-		GfData::shutdown();
 		
 		// Unload the user interface module.
 		GfModule::unload(pmodUserItf);
 	}
+
+	// Done with the app instance.
+	const std::string strAppName(pApp->name());
+	delete pApp;
 	
- 	// That's all.
-	// Trace what we are doing.
+ 	// That's all (but trace what we are doing).
 	if (piUserItf)
-		GfLogInfo("Exiting normally from %s.\n", app.name().c_str());
+		GfLogInfo("Exiting normally from %s.\n", strAppName.c_str());
 	else
-		std::cerr << "Exiting from " << app.name()
+		std::cerr << "Exiting from " << strAppName
 				  << " after some error occurred (see above)." << std::endl;
 	
 	return piUserItf ? 0 : 1;

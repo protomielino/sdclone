@@ -465,7 +465,7 @@ void GfInit(void)
  */
 void GfShutdown(void)
 {
-	GfLogDebug("Shutting down gaming framework.\n");
+	GfLogTrace("Shutting down gaming framework.\n");
 	
 	// Shudown SDL.
 	SDL_Quit();

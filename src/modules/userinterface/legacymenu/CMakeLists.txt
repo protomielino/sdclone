@@ -1,9 +1,9 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
 SET(MS mainscreens)
-SET(MAINSCREENS_SOURCES ${MS}/entry.cpp ${MS}/splash.cpp ${MS}/mainmenu.cpp
+SET(MAINSCREENS_SOURCES ${MS}/splash.cpp ${MS}/mainmenu.cpp
                         ${MS}/optionsmenu.cpp ${MS}/creditsmenu.cpp ${MS}/exitmenu.cpp 
-                        ${MS}/client.h ${MS}/splash.h ${MS}/mainmenu.h
+                        ${MS}/splash.h ${MS}/mainmenu.h
                         ${MS}/optionsmenu.h ${MS}/creditsmenu.h ${MS}/exitmenu.h)
 
 IF(WIN32)

@@ -25,17 +25,8 @@
 
 #include <cstdlib>
 
-#ifdef WIN32
-#ifndef HAVE_CONFIG_H
-#define HAVE_CONFIG_H
-#endif
-#endif
-
-#ifdef HAVE_CONFIG_H
-#include "version.h"
-#endif
-
 #include "gui.h"
+
 
 static int NRecursions = 0;
 
@@ -142,7 +133,7 @@ GfuiHelpScreen(void *prevScreen)
 
     // Create version label.
     const int versionId = GfuiMenuCreateLabelControl(scrHandle, hmenu, "versionlabel");
-    GfuiLabelSetText(scrHandle, versionId, VERSION_LONG);
+    GfuiLabelSetText(scrHandle, versionId, GfuiApp().version().c_str());
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(hmenu);
