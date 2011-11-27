@@ -53,7 +53,7 @@ gfuiInitObject(void)
 
 	const char* pszImageFile =
 		GfParmGetStr(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_IMAGEFILE, "data/img/mouse.png");
-	snprintf(buf sizeof(buf), "%s%s", GfDataDir(), pszImageFile);
+	snprintf(buf, sizeof(buf), "%s%s", GfDataDir(), pszImageFile);
 	NMouseCursorTexture = GfTexReadTexture(buf);
 }
 
