@@ -20,6 +20,8 @@
 #include <cstring>
 #include <string>
 
+#include <portability.h> // snprintf
+
 #include "tgfclient.h"
 #include "gui.h"
 
@@ -37,7 +39,7 @@ gfuiInitObject(void)
 {
 	//Read mouse pointer settings
 	char buf[512];
-	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	void *param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	NMouseCursorXOffset =
@@ -51,7 +53,8 @@ gfuiInitObject(void)
 
 	const char* pszImageFile =
 		GfParmGetStr(param, GFSCR_SECT_MOUSECURSOR, GFSCR_ATT_IMAGEFILE, "data/img/mouse.png");
-	NMouseCursorTexture = GfTexReadTexture(pszImageFile);
+	snprintf(buf sizeof(buf), "%s%s", GfDataDir(), pszImageFile);
+	NMouseCursorTexture = GfTexReadTexture(buf);
 }
 
 void 

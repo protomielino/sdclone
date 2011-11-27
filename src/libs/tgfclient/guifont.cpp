@@ -19,8 +19,8 @@
 /* This font manipulation is based on Brad Fish's glFont format and code.  */
 /* http://www.netxs.net/bfish/news.html                                    */
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <cstring>
 
 #if defined(__FreeBSD__) || defined(__APPLE__)
@@ -30,6 +30,8 @@
 #ifdef LINUX
 #include <endian.h>
 #endif
+
+#include <portability.h>
 
 #include "tgfclient.h"
 #include "glfeatures.h"
@@ -67,10 +69,11 @@ void gfuiLoadFonts(void)
 	int	i;
 	int nFontId;
 
-	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	param = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
-	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Menu Font", "name", "b5.glf"));
+	snprintf(buf, sizeof(buf), "%sdata/fonts/%s", GfDataDir(),
+			 GfParmGetStr(param, "Menu Font", "name", "b5.glf"));
 	GfLogTrace("Loading font 'Menu Font' from %s : Sizes", buf);
 	nFontId = GFUI_FONT_BIG;
 	for(i = 0; i < 4; i++, nFontId++) {
@@ -81,7 +84,8 @@ void gfuiLoadFonts(void)
 	}
 	GfLogTrace("\n");
 
-	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Console Font", "name", "b7.glf"));
+	snprintf(buf, sizeof(buf), "%sdata/fonts/%s", GfDataDir(),
+			 GfParmGetStr(param, "Console Font", "name", "b7.glf"));
 	GfLogTrace("Loading font 'Console Font' from %s : Sizes", buf);
 	nFontId = GFUI_FONT_BIG_C;
 	for(i = 0; i < 4; i++, nFontId++) {
@@ -92,7 +96,8 @@ void gfuiLoadFonts(void)
 	}
 	GfLogTrace("\n");
 
-	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Text Font", "name", "b6.glf"));
+	snprintf(buf, sizeof(buf), "%sdata/fonts/%s", GfDataDir(),
+			 GfParmGetStr(param, "Text Font", "name", "b6.glf"));
 	GfLogTrace("Loading font 'Text Font' from %s : Sizes", buf);
 	nFontId = GFUI_FONT_BIG_T;
 	for(i = 0; i < 4; i++, nFontId++) {
@@ -103,7 +108,8 @@ void gfuiLoadFonts(void)
 	}
 	GfLogTrace("\n");
 
-	sprintf(buf, "data/fonts/%s", GfParmGetStr(param, "Digital Font", "name", "digital.glf"));
+	snprintf(buf, sizeof(buf), "%sdata/fonts/%s", GfDataDir(),
+			 GfParmGetStr(param, "Digital Font", "name", "digital.glf"));
 	GfLogTrace("Loading font 'Digital Font' from %s : Sizes", buf);
 	nFontId = GFUI_FONT_DIGIT;
 	size = (int)GfParmGetNum(param, "Digital Font", keySize[0], (char*)NULL, 8.0);

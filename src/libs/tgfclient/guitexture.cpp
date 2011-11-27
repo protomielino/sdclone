@@ -38,6 +38,8 @@ extern "C"
     #include <jpeglib.h>
 }
 
+#include <portability.h> // snprintf
+
 #include "tgfclient.h"
 #include "glfeatures.h"
 
@@ -581,7 +583,9 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 	png_set_IHDR(png_ptr, info_ptr, width, height, 8, PNG_COLOR_TYPE_RGB,
 			PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 #if (ReadGammaFromSettingsFile)
-    handle = GfParmReadFile(GFSCR_CONF_FILE, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+	char pszConfFilename[256];
+	snprintf(pszscrConfFilename, sizeof(pszConfFilename), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+    handle = GfParmReadFile(pszConfFilename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
     GfParmReleaseHandle(handle);
 #else
@@ -629,7 +633,7 @@ GfTexReadTexture(const char *filename, int* pWidth, int* pHeight,
 {
 	// Get screen gamma value from graphics params.
 	char buf[256];
-	sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
 	void *handle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 	const float screen_gamma =
 		(float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
