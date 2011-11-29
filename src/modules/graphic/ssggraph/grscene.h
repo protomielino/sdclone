@@ -46,6 +46,7 @@ extern ssgBranch *SkidAnchor;
 extern ssgBranch *CarlightAnchor;
 extern ssgBranch *TrackLightAnchor;
 extern ssgBranch *ThePits;
+extern ssgBranch *BackSkyAnchor;
 
 extern ssgStateSelector	*grEnvSelector;
 extern cgrMultiTexState	*grEnvState;

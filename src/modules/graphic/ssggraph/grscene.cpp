@@ -61,6 +61,7 @@ ssgBranch *SkidAnchor = NULL;
 ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
+ssgBranch *BackSkyAnchor = NULL;
 
 // Must have (Question: What for ?)
 int preScene(ssgEntity *e)
@@ -165,6 +166,9 @@ grLoadScene(tTrack *track)
 	TrackLightAnchor = new ssgBranch;
 	TheScene->addKid(TrackLightAnchor);
 
+	BackSkyAnchor = new ssgBranch;
+	TheScene->addKid(BackSkyAnchor);
+
 	/* Load the background (horizon and sky) */
 	grLoadBackground();
 
@@ -189,6 +193,24 @@ grLoadScene(tTrack *track)
 
 	desc = grssgLoadAC3D(acname, NULL);
 	LandAnchor->addKid(desc);
+
+	grSkyDomeDistance =
+		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
+	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
+	{
+		acname = "background-sky.ac";
+		snprintf(buf, sizeof(buf), "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
+		ssgTexturePath(buf);
+		snprintf(buf, sizeof(buf), "data/objects");
+		ssgModelPath(buf);
+		
+		desc = grssgLoadAC3D(acname, NULL);
+		BackSkyAnchor->addKid(desc);
+
+		//sgCoord backskypos;
+		//sgSetCoord ( &backskypos, double(grWrldX/2), 0.0f, double(grWrldZ/2));
+	}
+
 
 	return 0;
 }//grLoadScene
