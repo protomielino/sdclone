@@ -544,12 +544,9 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 	png_uint_32 rowbytes;
 	int i;
 	unsigned char *cur_ptr;
-
-#define ReadGammaFromSettingsFile 0
-#if (ReadGammaFromSettingsFile)
-    void		*handle;
-#endif
 	float		screen_gamma;
+#define DEFGAMMA 1.0
+#define ReadGammaFromSettingsFile 1
 
 	if (!img) {
 		GfError("GfTexWriteImageToPNG(%s) : Null image buffer pointer\n", filename);
@@ -584,12 +581,12 @@ GfTexWriteImageToPNG(unsigned char *img, const char *filename, int width, int he
 			PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
 #if (ReadGammaFromSettingsFile)
 	char pszConfFilename[256];
-	snprintf(pszscrConfFilename, sizeof(pszConfFilename), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-    handle = GfParmReadFile(pszConfFilename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
+	snprintf(pszConfFilename, sizeof(pszConfFilename), "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
+    void *handle = GfParmReadFile(pszConfFilename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
+    screen_gamma = (float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, DEFGAMMA);
     GfParmReleaseHandle(handle);
 #else
-	screen_gamma = 2.0;
+	screen_gamma = DEFGAMMA;
 #endif
 	png_set_gAMA(png_ptr, info_ptr, screen_gamma);
 	/* png_set_bgr(png_ptr);    TO INVERT THE COLORS !!!! */
