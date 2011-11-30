@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
-<params name="Screen" version="1.10">
+<params name="Screen" version="1.11">
 
 	<section name="Validated Screen Properties">
 		<attnum name="window width" val="1024"/>
@@ -23,7 +23,7 @@
 		<attnum name="bpp" val="32"/>
 		<attstr name="full-screen" in="yes,no" val="no"/>
 		<attstr name="alpha channel" in="yes,no" val="yes"/>
-		<attnum name="gamma" val="2"/>
+		<attnum name="gamma" val="1"/>
 		<attstr name="video mode detect" in="auto,manual" val="auto"/>
 		<attstr name="video mode init" in="compatible,best" val="compatible"/>
 	</section>
