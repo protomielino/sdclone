@@ -37,6 +37,7 @@ python check_robot_skins.py -d $drivers/simplix/simplix_ls2  -c $cars $versionin
 python check_robot_skins.py -d $drivers/simplix/simplix_mp5  -c $cars $versioning $config $run $proc simplix_mp5.xml
 python check_robot_skins.py -d $drivers/simplix/simplix_sc   -c $cars $versioning $config $run $proc simplix_sc.xml
 python check_robot_skins.py -d $drivers/simplix/simplix_trb1 -c $cars $versioning $config $run $proc simplix_trb1.xml
+python check_robot_skins.py -d $drivers/simplix/simplix_mpa1 -c $cars $versioning $config $run $proc simplix_mpa1.xml
 
 # Kilo2008
 python check_robot_skins.py -d $drivers/kilo2008/ -c $cars $versioning $config $run $proc kilo2008.xml
