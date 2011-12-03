@@ -164,22 +164,41 @@ void GfApplication::restart()
 	delete _pEventLoop;
 
 	// Restart the process, using same command line args.
-	// 1) Allocate and populate the args array (last arg must be a null pointer).
+	// 1) The process executable path-name is the 1st arg left untouched.
+    GfLogInfo("Restarting :\n");
+    GfLogInfo("  Command : %s\n", _lstArgs.front().c_str());
+
+	// 2) Allocate and populate the args array (last arg must be a null pointer).
 	// TODO: Add an API for filtering the args (some might not be relevant for a restart).
-    GfLogInfo("Restarting ");
+    GfLogInfo("  Args    : ");
     char** apszArgs = (char**)malloc(sizeof(char*) * (_lstArgs.size() + 1));
+
 	unsigned nArgInd = 0;
 	std::list<std::string>::const_iterator itArg;
 	for (itArg = _lstArgs.begin(); itArg != _lstArgs.end(); itArg++)
 	{
-		// Simply copy each arg.
+#ifdef WIN32
+		// execvp will not automatically surround args with spaces inside with double quotes !
+		if (itArg->find(' ') != std::string::npos)
+		{
+			char pszArg[512];
+			snprintf(pszArg, sizeof(pszArg), "\"%s\"", itArg->c_str());
+			apszArgs[nArgInd] = strdup(pszArg);
+		}
+		else
+			apszArgs[nArgInd] = strdup(itArg->c_str());
+
+		GfLogInfo("%s ", apszArgs[nArgInd]);
+		
+#else
+		// execvp will automatically surround args with spaces inside with double quotes.
 		apszArgs[nArgInd] = strdup(itArg->c_str());
 
-		// execvp will surround args with spaces inside with double quotes.
 		if (itArg->find(' ') != std::string::npos)
 			GfLogInfo("\"%s\" ", itArg->c_str());
 		else
 			GfLogInfo("%s ", itArg->c_str());
+#endif
 
 		// Next arg.
 		nArgInd++;
@@ -187,10 +206,10 @@ void GfApplication::restart()
 	apszArgs[nArgInd] = 0;
     GfLogInfo("...\n\n");
 	
-    // 2) Exec the command : restart the game (simply replacing current process)
-    const int retcode = execvp(apszArgs[0], apszArgs);
+    // 3) Exec the command with its args (replacing current process).
+    const int retcode = execvp(_lstArgs.front().c_str(), apszArgs);
 
-    // If successfull restart, we never get there ... But if it failed ...
+    // If the restart was successfull, we never get there ... But if it failed ...
     GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
     for (nArgInd = 0; apszArgs[nArgInd]; nArgInd++)
 		free(apszArgs[nArgInd]);
