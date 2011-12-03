@@ -173,7 +173,6 @@ typedef struct Forces
  ******************************/
 TGF_API void GfInit(void);
 TGF_API void GfShutdown(void);
-TGF_API void GfRestart(bool bHardwareMouse = false);
 
 
 /************************************************************************

@@ -163,8 +163,40 @@ void GfApplication::restart()
 	// Delete the event loop if any.
 	delete _pEventLoop;
 
-	// Restart.
-	GfRestart();
+	// Restart the process, using same command line args.
+	// 1) Allocate and populate the args array (last arg must be a null pointer).
+	// TODO: Add an API for filtering the args (some might not be relevant for a restart).
+    GfLogInfo("Restarting ");
+    char** apszArgs = (char**)malloc(sizeof(char*) * (_lstArgs.size() + 1));
+	unsigned nArgInd = 0;
+	std::list<std::string>::const_iterator itArg;
+	for (itArg = _lstArgs.begin(); itArg != _lstArgs.end(); itArg++)
+	{
+		// Simply copy each arg.
+		apszArgs[nArgInd] = strdup(itArg->c_str());
+
+		// execvp will surround args with spaces inside with double quotes.
+		if (itArg->find(' ') != std::string::npos)
+			GfLogInfo("\"%s\" ", itArg->c_str());
+		else
+			GfLogInfo("%s ", itArg->c_str());
+
+		// Next arg.
+		nArgInd++;
+	}
+	apszArgs[nArgInd] = 0;
+    GfLogInfo("...\n\n");
+	
+    // 2) Exec the command : restart the game (simply replacing current process)
+    const int retcode = execvp(apszArgs[0], apszArgs);
+
+    // If successfull restart, we never get there ... But if it failed ...
+    GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
+    for (nArgInd = 0; apszArgs[nArgInd]; nArgInd++)
+		free(apszArgs[nArgInd]);
+    free(apszArgs);
+    
+    exit(1);
 }
 
 void GfApplication::printUsage(const char* pszErrMsg) const
@@ -198,6 +230,7 @@ bool GfApplication::parseOptions()
 	std::list<std::string>::const_iterator itArg = _lstArgs.begin();
 	for (itArg++; itArg != _lstArgs.end(); itArg++)
 	{
+        GfLogInfo("* [%s]\n", itArg->c_str());
 		bool bArgEaten = false;
 		if (itArg->find('-') == 0)
 		{

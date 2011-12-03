@@ -89,14 +89,8 @@ void GfuiApplication::restart()
 		_bWindowUp = false;
 	}
 
-	// Shutdown the gaming framework.
-	GfShutdown();
-
-	// Delete the event loop if any.
-	delete _pEventLoop;
-
-	// Restart.
-	GfRestart(GfuiMouseIsHWPresent());
+	// Up to the base class to complete the job.
+	GfApplication::restart();
 }
 
 GfuiApplication::~GfuiApplication()

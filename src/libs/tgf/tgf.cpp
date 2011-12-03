@@ -419,25 +419,6 @@ char * _tgf_win_strdup(const char * str)
 // </esppat>
 
 
-// Build a new path string compatible with current OS and usable as a command line arg.
-static char* gfPathBuildCommandLineArg(const char *path)
-{
-#ifdef WIN32
-  char *osPath = (char*)malloc(strlen(path)+3);
-  sprintf(osPath, "\"%s", path);
-  if (osPath[strlen(osPath)-1] == '/')
-    osPath[strlen(osPath)-1] = 0; // Remove trailing '/' for command line
-  strcat(osPath, "\"");
-#else
-  char *osPath = strdup(path);
-#endif //WIN32
-  
-  GfPathMakeOSCompatible(osPath);
-  
-  return osPath;
-}
-
-
 /** Initialize the gaming framework.
     @ingroup	tgf
     @return	None
@@ -478,100 +459,6 @@ void GfShutdown(void)
 	GfParmShutdown();
 }
 
-/** Restart the gaming framework (restart the current process).
-    @ingroup	tgf
-    @param	bHardwareMouse	If true, use hardware mouse cursor
-    @return	None
-    @warning	GfShutdown should be called before ; never returns (restart the process).
- */
-
-// TODO: Move this to the GfApplication/GfuiApplication separate scheme.
-void GfRestart(bool bHardwareMouse)
-{
-    int retcode = 0;
-    static const int CMDSIZE = 1024;
-    char cmd[CMDSIZE];
-
-    char** args;
-    int	i, nArgs;
-    int	argInd;
-
-    // Command name.
-    sprintf(cmd, "%sspeed-dreams-2", GfBinDir());
-#ifdef WIN32
-    strcat(cmd, ".exe");
-#endif
-    GfPathMakeOSCompatible(cmd);
-
-    // Compute number of args.
-    nArgs = 1; // Executable is always the first arg.
-    
-    if (bHardwareMouse)
-	  nArgs += 1;
-    if (GfLocalDir() && strlen(GfLocalDir()))
-	  nArgs += 2;
-    if (GfBinDir() && strlen(GfBinDir()))
-	  nArgs += 2;
-    if (GfLibDir() && strlen(GfLibDir()))
-	  nArgs += 2;
-    if (GfDataDir() && strlen(GfDataDir()))
-	  nArgs += 2;
-
-    nArgs++; // Last arg must be a null pointer.
-
-    // Allocate args array.
-    args = (char**)malloc(sizeof(char*)*nArgs);
-	
-    // First arg is the executable path-name.
-    argInd = 0;
-    args[argInd++] = gfPathBuildCommandLineArg(cmd);
-
-    // Then add subsequent args.
-    if (bHardwareMouse)
-        args[argInd++] = strdup("-m");
-    
-    if (GfLocalDir() && strlen(GfLocalDir()))
-    {
-        args[argInd++] = strdup("-l");
-		args[argInd++] = gfPathBuildCommandLineArg(GfLocalDir());
-    }
-
-    if (GfBinDir() && strlen(GfBinDir()))
-    {
-        args[argInd++] = strdup("-B");
-		args[argInd++] = gfPathBuildCommandLineArg(GfBinDir());
-    }
-	
-    if (GfLibDir() && strlen(GfLibDir()))
-    {
-        args[argInd++] = strdup("-L");
-		args[argInd++] = gfPathBuildCommandLineArg(GfLibDir());
-    }
-	
-    if (GfDataDir() && strlen(GfDataDir()))
-    {
-        args[argInd++] = strdup("-D");
-		args[argInd++] = gfPathBuildCommandLineArg(GfDataDir ());
-    }
-	
-    // Finally, last null arg.
-    args[argInd] = 0;
-
-    // Exec the command : restart the game (simply replacing current process)
-    GfLogInfo("Restarting ");
-    for (i = 0; args[i]; i++)
-        GfLogInfo("%s ", args[i]);
-    GfLogInfo("...\n");
-    retcode = execvp(cmd, args);
-
-    // If successfull, we never get here ... but if failed ...
-    GfLogError("Failed to restart (exit code %d, %s)\n", retcode, strerror(errno));
-    for (i = 0; args[i]; i++)
-		free(args[i]);
-    free(args);
-    
-    exit(1);
-}
 
 void gfMeanReset(tdble v, tMeanVal *pvt)
 {
@@ -622,7 +509,8 @@ tdble gfMean(tdble v, tMeanVal *pvt, int n, int w)
  */
 char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 {
-	char* buf = (char*)malloc(((plus?strlen(plus):0)+9+prec+5)*sizeof(char));
+	const int bufSize = (plus ? strlen(plus) : 0) + 9 + prec + 1 + 4; // 4 is for security.
+	char* buf = (char*)malloc(bufSize*sizeof(char));
 	
 	const char* sign = (sec < 0.0) ? "-" : (plus ? plus : "");
 	if (sec < 0.0)
@@ -648,11 +536,11 @@ char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 	const int f = (int)floor(sec * mult);
 
 	if (h || zeros) {
-		(void)sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%.*d", sign, h, m, s, prec, f);
+		(void)snprintf(buf, bufSize, "%s%2.2d:%2.2d:%2.2d.%.*d", sign, h, m, s, prec, f);
 	} else if (m) {
-		(void)sprintf(buf, "   %s%2.2d:%2.2d.%.*d", sign, m, s, prec, f);
+		(void)snprintf(buf, bufSize, "   %s%2.2d:%2.2d.%.*d", sign, m, s, prec, f);
 	} else {
-		(void)sprintf(buf, "      %s%2.2d.%.*d", sign, s, prec, f);
+		(void)snprintf(buf, bufSize, "      %s%2.2d.%.*d", sign, s, prec, f);
 	}
 	return buf;
 }
