@@ -5,11 +5,11 @@ INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR})
 SET(ROBOT_NAME "kilo2008")
 
 SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp opponent.cpp pit.cpp strategy.cpp
-    linalg.h opponent.h strategy.h pit.h cardata.h cardata.cpp spline.cpp 
+    linalg.h opponent.h strategy.h pit.h cardata.h cardata.cpp spline.cpp
     spline.h raceline.cpp raceline.h kdriver.cpp kdriver.h util.h util.cpp)
 
 SET(ROBOT_SUBDIRS
-    1 2 3 4 5 6 7 8 9 10
+    1 2 5 6 7 8 9 10 15 16
     tracks
     trb1-cavallo-360rb
     ls1-archer-r9
