@@ -3433,7 +3433,7 @@ float Driver::filterABS(float brake)
 {
   if (car->_speed_x < ABS_MINSPEED) return brake;
 
-  float absrange = (collision > 0.0 ? AbsRange * 0.7 : AbsRange);
+  float absrange = (collision > 0.0 ? AbsRange * 0.7f : AbsRange);
   float brake1 = brake, brake2 = brake;
 
   double skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
