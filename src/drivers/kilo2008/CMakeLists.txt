@@ -9,12 +9,13 @@ SET(ROBOT_SOURCES ${ROBOT_NAME}.cpp opponent.cpp pit.cpp strategy.cpp
     spline.h raceline.cpp raceline.h kdriver.cpp kdriver.h util.h util.cpp)
 
 SET(ROBOT_SUBDIRS
-    1 2 5 6 7 8 9 10
+    1 2 3 4 5 6 7 8 9 10
     tracks
     trb1-cavallo-360rb
     ls1-archer-r9
     ls1-cavallo-570s1
-    ls1-vulture-v6r)
+    ls1-vulture-v6r
+    mpa1-hartbill-2002)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME}
              SOURCES ${ROBOT_SOURCES})

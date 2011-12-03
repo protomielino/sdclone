@@ -61,10 +61,10 @@
       <section name="3">
         <attstr name="name" val="Pete K"></attstr>
         <attstr name="desc" val="Pete"></attstr>
-        <attstr name="team" val="Team Alba 2008"></attstr>
+        <attstr name="team" val="Team Alba 2011"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
-        <attstr name="car name" val="trb1-taipan-rb1"></attstr>
-        <attnum name="race number" val="73"></attnum>
+        <attstr name="car name" val="mpa1-hartbill-2002"></attstr>
+        <attnum name="race number" val="17"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
         <attnum name="blue" val="0.3"></attnum>
@@ -74,10 +74,10 @@
       <section name="4">
         <attstr name="name" val="Moira K"></attstr>
         <attstr name="desc" val="Moira"></attstr>
-        <attstr name="team" val="Team Alba 2008"></attstr>
+        <attstr name="team" val="Team Alba 2011"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
-        <attstr name="car name" val="trb1-taipan-rb1"></attstr>
-        <attnum name="race number" val="74"></attnum>
+        <attstr name="car name" val="mpa1-hartbill-2002"></attstr>
+        <attnum name="race number" val="18"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.8"></attnum>
         <attnum name="blue" val="0.3"></attnum>
@@ -120,7 +120,7 @@
         <attstr name="team" val="Team Polar Sand"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
         <attstr name="car name" val="ls1-cavallo-570s1"></attstr>
-        <attnum name="race number" val="77"></attnum>
+        <attnum name="race number" val="54"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
@@ -133,7 +133,7 @@
         <attstr name="team" val="Team Polar Sand"></attstr>
         <attstr name="author" val="Gabor Kmetyko"></attstr>
         <attstr name="car name" val="ls1-cavallo-570s1"></attstr>
-        <attnum name="race number" val="78"></attnum>
+        <attnum name="race number" val="53"></attnum>
         <attnum name="red" val="0.9"></attnum>
         <attnum name="green" val="0.9"></attnum>
         <attnum name="blue" val="0.1"></attnum>
