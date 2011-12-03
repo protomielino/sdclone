@@ -22,8 +22,7 @@
 #define _EXITMENU_H_
 
 
-extern void* ExitMenuInit(void *menu);
-extern void* MainExitMenuInit(void *mainMenu);
+extern void* ExitMenuInit(void *prevMenu);
 
 #endif /* _EXITMENU_H_ */ 
 

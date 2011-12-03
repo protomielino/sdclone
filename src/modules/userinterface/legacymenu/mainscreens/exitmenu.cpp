@@ -25,36 +25,12 @@
 #include "mainmenu.h"
 
 
-static void *exitmenuHandle = NULL;
-static void *exitMainMenuHandle = NULL;
+static void *MenuHandle = NULL;
 
 static void 
 onAcceptExit(void * /* dummy */)
 {
 	LegacyMenu::self().quit();
-}
-
-void* exitMenuInit(void *prevMenu, void *menuHandle)
-{
-    if (menuHandle) {
-		GfuiScreenRelease(menuHandle);
-    }
-
-    menuHandle = GfuiScreenCreate();
-
-    void *param = GfuiMenuLoad("exitmenu.xml");
-
-    GfuiMenuCreateStaticControls(menuHandle, param);
-    GfuiMenuCreateButtonControl(menuHandle, param, "yesquit", NULL, onAcceptExit);
-    GfuiMenuCreateButtonControl(menuHandle, param, "nobacktogame", prevMenu, GfuiScreenActivate);
-
-    GfParmReleaseHandle(param);
-    
-    GfuiMenuDefaultKeysAdd(menuHandle);
-    GfuiAddKey(menuHandle, GFUIK_RETURN, "Yes, quit the game", NULL, onAcceptExit, NULL);
-    GfuiAddKey(menuHandle, GFUIK_ESCAPE, "No, back to the game", prevMenu, GfuiScreenActivate, NULL);
-
-    return menuHandle;
 }
 
 /*
@@ -65,23 +41,34 @@ void* exitMenuInit(void *prevMenu, void *menuHandle)
  *	init the exit menus
  *
  * Parameters
- *	none
+ *	prevMenu : Handle of the menu to activate when cancelling the exit action.
  *
  * Return
- *	0 ok -1 nok
+ *	The menu handle
  *
  * Remarks
  *	
  */
-void* ExitMenuInit(void *menu)
-{
-	exitmenuHandle = exitMenuInit(menu, exitmenuHandle);
-	return exitmenuHandle;
-}
 
-
-void* MainExitMenuInit(void *mainMenu)
+void* ExitMenuInit(void *prevMenu)
 {
-	exitMainMenuHandle = exitMenuInit(mainMenu, exitMainMenuHandle);
-	return exitMainMenuHandle;
+    if (MenuHandle) {
+		GfuiScreenRelease(MenuHandle);
+    }
+
+    MenuHandle = GfuiScreenCreate();
+
+    void *param = GfuiMenuLoad("exitmenu.xml");
+
+    GfuiMenuCreateStaticControls(MenuHandle, param);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "yesquit", NULL, onAcceptExit);
+    GfuiMenuCreateButtonControl(MenuHandle, param, "nobacktogame", prevMenu, GfuiScreenActivate);
+
+    GfParmReleaseHandle(param);
+    
+    GfuiMenuDefaultKeysAdd(MenuHandle);
+    GfuiAddKey(MenuHandle, GFUIK_RETURN, "Yes, quit the game", NULL, onAcceptExit, NULL);
+    GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "No, back to the game", prevMenu, GfuiScreenActivate, NULL);
+
+    return MenuHandle;
 }
