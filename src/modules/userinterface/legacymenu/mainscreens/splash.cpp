@@ -17,23 +17,24 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cstdio>
-
 #include <SDL/SDL.h>
-#include <tgf.hpp>
+
 #include <tgfclient.h>
 #include <glfeatures.h>
 
 #include "splash.h"
-#include "mainmenu.h"
 
 
-static int s_imgWidth, s_imgHeight; // Real image size (from image file).
-static int s_imgPow2Width, s_imgPow2Height; // Smallest possible containing 2^N x 2^P.
-static GLuint s_texture = 0;
-static int SplashDisplaying;
-static int SplashTimedOut;
-static int MainMenuReady;
+static int splImgWidth, splImgHeight; // Real image size (from image file).
+static int splImgPow2Width, splImgPow2Height; // Smallest possible containing 2^N x 2^P.
+static GLuint splTextureId = 0;
+
+static bool splDisplaying = false;
+static bool splTimedOut = false;
+static bool splBackgroundWorkDone = false;
+static bool (*splBackgroundWork)(void) = 0;
+static bool (*splOnClosed)(void) = 0;
+
 
 /*
  * Function
@@ -53,13 +54,18 @@ static int MainMenuReady;
  */
 static void splashClose()
 {
-	if (!MainMenuReady)
+	// Don't close if background work not completed.
+	if (!splBackgroundWorkDone)
 		return;
-	
-	SplashDisplaying = 0;
-	glDeleteTextures(1, &s_texture);
-	s_texture = 0;
-	MainMenuRun();
+
+	// Completed ? OK, let's close.
+	splDisplaying = false;
+	glDeleteTextures(1, &splTextureId);
+	splTextureId = 0;
+
+	// And do what was specified.
+	if (splOnClosed)
+		splOnClosed();
 }
 
 /*
@@ -81,10 +87,22 @@ static void splashClose()
  */
 static void splashIdle()
 {
-	// A kind of background main menus loading (as it may me a bit long).
-	MainMenuInit();
-	MainMenuReady = 1;
-	if (SplashTimedOut)
+	// Do the specified work "in the background" if not already not.
+	if (!splBackgroundWorkDone && splBackgroundWork)
+	{
+		splBackgroundWork();
+
+		// And now it's done, remember it.
+		splBackgroundWorkDone = true;
+	}
+	else
+	{
+		// Wait a little, to let the CPU take breath.
+		GfSleep(0.001);
+	}
+
+	// Close if the splash screen delay is over.
+	if (splTimedOut)
 		splashClose();
 }
 
@@ -114,8 +132,8 @@ static void splashKey(int /* key */, int /* modifiers */, int /* x */, int /* y 
  *	splashTimer
  *
  * Description
- *	End of splash timer callback : can't close spash screen itself, as not run under the control
- *  of the thread that created it
+ *	End of splash timer callback : can't close splash screen itself,
+ *  as not run under the control of the thread that created it
  *
  * Parameters
  *	None
@@ -128,8 +146,9 @@ static void splashKey(int /* key */, int /* modifiers */, int /* x */, int /* y 
  */
 static void splashTimer(int /* value */)
 {
-	if (SplashDisplaying) 
-		SplashTimedOut = 1;
+	// The splash screen delay is now over.
+	if (splDisplaying) 
+		splTimedOut = true;
 }
 	
 
@@ -151,55 +170,53 @@ static void splashTimer(int /* value */)
  */
 static void splashDisplay( void )
 {
-	int ScrW, ScrH, ViewW, ViewH;
-	
-	SplashDisplaying = 1;
-	SplashTimedOut = 0;
+	splDisplaying = true;
 		
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_LIGHTING);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_ALPHA_TEST);
 	
-	GfScrGetSize(&ScrW, &ScrH, &ViewW, &ViewH);
+	int nScrW, nScrH, nViewW, nViewH;
+	GfScrGetSize(&nScrW, &nScrH, &nViewW, &nViewH);
 	
-	glViewport((ScrW-ViewW) / 2, (ScrH-ViewH) / 2, ViewW, ViewH);
+	glViewport((nScrW-nViewW) / 2, (nScrH-nViewH) / 2, nViewW, nViewH);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluOrtho2D(0, ScrW, 0, ScrH);
+	gluOrtho2D(0, nScrW, 0, nScrH);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 		
-	if (s_texture) 
+	if (splTextureId) 
 	{
 		// Prepare texture display.
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, s_texture);
+		glBindTexture(GL_TEXTURE_2D, splTextureId);
 
 		// Compute the initial width of the right area and the height of the bottom area
 		// of the texture that will not be displayed
 		// (We display only the top left rectangle of the quad texture
 		//  that corresponds to the original image).
 		GLfloat tx1 = 0.0f;
-		GLfloat tx2 = s_imgWidth / (GLfloat)s_imgPow2Width;
+		GLfloat tx2 = splImgWidth / (GLfloat)splImgPow2Width;
 
-		GLfloat ty1 = 1.0f - s_imgHeight / (GLfloat)s_imgPow2Height;
+		GLfloat ty1 = 1.0f - splImgHeight / (GLfloat)splImgPow2Height;
  		GLfloat ty2 = 1.0;
 
 		// Compute the width/height of the symetrical left/right / top/bottom
 		// areas of original image that will need to be clipped
 		// in order to keep its aspect ratio.
-		const GLfloat rfactor = s_imgWidth * (GLfloat)ViewH / s_imgHeight / (GLfloat)ViewW;
+		const GLfloat rfactor = splImgWidth * (GLfloat)nViewH / splImgHeight / (GLfloat)nViewW;
 
 		if (rfactor >= 1.0f) {
 			// If aspect ratio of view is smaller than image's one, "cut off" sides.
-			const GLfloat tdx = s_imgWidth * (rfactor - 1.0f) / s_imgPow2Width / 2.0f;
+			const GLfloat tdx = splImgWidth * (rfactor - 1.0f) / splImgPow2Width / 2.0f;
 			tx1 += tdx;
 			tx2 -= tdx;
 		} else {
 			// If aspect ratio of view is larger than image's one, 
 			// "cut off" top and bottom.
-			const GLfloat tdy = s_imgHeight * rfactor / s_imgPow2Height / 2.0f;
+			const GLfloat tdy = splImgHeight * rfactor / splImgPow2Height / 2.0f;
 			ty2 = (ty1+1)/2 + tdy;
 			ty1 = (ty1+1)/2 - tdy;
 		}
@@ -207,9 +224,9 @@ static void splashDisplay( void )
 		// Display texture.
 		glBegin(GL_QUADS);
 		glTexCoord2f(tx1, ty1); glVertex3f(0.0, 0.0, 0.0);
-		glTexCoord2f(tx1, ty2); glVertex3f(0.0, ScrH, 0.0);
-		glTexCoord2f(tx2, ty2); glVertex3f(ScrW, ScrH, 0.0);
-		glTexCoord2f(tx2, ty1); glVertex3f(ScrW, 0.0, 0.0);
+		glTexCoord2f(tx1, ty2); glVertex3f(0.0, nScrH, 0.0);
+		glTexCoord2f(tx2, ty2); glVertex3f(nScrW, nScrH, 0.0);
+		glTexCoord2f(tx2, ty1); glVertex3f(nScrW, 0.0, 0.0);
 		glEnd();
 		glDisable(GL_TEXTURE_2D);
 	}
@@ -219,7 +236,7 @@ static void splashDisplay( void )
 	gluOrtho2D(0, 640, 0, 480);
 	
 	static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
-	GfuiDrawString(GfApp().version().c_str(), grWhite, GFUI_FONT_SMALL_C,
+	GfuiDrawString(GfuiApp().version().c_str(), grWhite, GFUI_FONT_SMALL_C,
 				   440-8, 8, 200, GFUI_ALIGN_HR);
 
 	GfuiSwapBuffers();
@@ -237,43 +254,48 @@ static void splashMouse(int /* b */, int s, int /* x */, int /* y */)
  *	SplashScreen
  *
  * Description
- *	Display the splash screen and load the main menus in the background.
- *      On mouse click or 7 second time-out, open the main menu.
+ *	Display the splash screen and do some specified work in the background (fnBackWork).
+ *  Then close it and call the specified fnOnClosed function :
+ *  * on mouse click, or keyboard hit or 7 second time-out, if interactive,
+ *  * when fnBackWork returns, if not interactive.
  *
  * Parameters
- *	None
+ *	fnBackWork : function to call for background work (loading stuff, ...)
+ *  fnOnClosed : function to call when closing the splash screen.
+ *  bInteractive : if false, 
  *
  * Return
- *	true on success, false in anything bad happened.
+ *	true on success, false if anything bad happened.
  *
  * Remarks
  *	
  */
-bool SplashScreen(void)
+bool SplashScreen(bool (*fnBackWork)(void), bool (*fnOnClosed)(void), bool bInteractive)
 {
+	splBackgroundWork = fnBackWork;
+	splOnClosed = fnOnClosed;
+	splTimedOut = !bInteractive;
+
 	// Free splash texture if was loaded already.
-	if (s_texture) 
-		GfTexFreeTexture(s_texture); 
+	if (splTextureId) 
+		GfTexFreeTexture(splTextureId); 
 
-	// Get screen gamma from graphics configuration.
-	//static char buf[512];
-	//sprintf(buf, "%s%s", GfLocalDir(), GFSCR_CONF_FILE);
-	//void* handle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-	//float screen_gamma =
-	//	(float)GfParmGetNum(handle, GFSCR_SECT_VALIDPROPS, GFSCR_ATT_GAMMA, (char*)NULL, 2.0);
-	
 	// Load splash texture from file.
-	s_texture = GfTexReadTexture("data/img/splash.jpg",
-								 &s_imgWidth, &s_imgHeight, &s_imgPow2Width, &s_imgPow2Height);
+	splTextureId = GfTexReadTexture("data/img/splash.jpg", &splImgWidth, &splImgHeight,
+									&splImgPow2Width, &splImgPow2Height);
 
-	// Prevent MainMenuRun being called (by splashClose) before MainMenuInit (by splashIdle)
-	MainMenuReady = 0;
+	// Prevent fnOnClosed being called (by splashClose)
+	// before fnBackWork (called by splashIdle) is done.
+	splBackgroundWorkDone = false;
 
 	// Setup event loop callbacks.
 	GfuiApp().eventLoop().setRedisplayCB(splashDisplay);
-	GfuiApp().eventLoop().setKeyboardDownCB(splashKey);
-	GfuiApp().eventLoop().setTimerCB(7000, splashTimer);
-	GfuiApp().eventLoop().setMouseButtonCB(splashMouse);
+	if (bInteractive)
+	{
+		GfuiApp().eventLoop().setKeyboardDownCB(splashKey);
+		GfuiApp().eventLoop().setMouseButtonCB(splashMouse);
+		GfuiApp().eventLoop().setTimerCB(7000, splashTimer);
+	}
 	GfuiApp().eventLoop().setRecomputeCB(splashIdle);
     
 	return true;

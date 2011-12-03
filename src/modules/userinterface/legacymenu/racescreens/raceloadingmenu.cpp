@@ -61,7 +61,7 @@ rmDeativate(void * /* dummy */)
 void
 RmLoadingScreenStart(const char *title, const char *bgimg)
 {
-    if (GfuiScreenIsActive(HScreen))
+    if (HScreen && GfuiScreenIsActive(HScreen))
 		return;
 
 	if (HScreen)

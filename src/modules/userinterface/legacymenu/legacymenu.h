@@ -125,14 +125,14 @@ public:
 
  protected:
 
-	// Protected constructor to avoid instanciation outside (but friends).
+	//! Protected constructor to avoid instanciation outside (but friends).
 	LegacyMenu(const std::string& strShLibName, void* hShLibHandle);
 	
-	// Make the C interface functions nearly member functions.
+	//! Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
 
-	// Graphics engine control.
+	//! Graphics engine control.
 	bool initializeGraphics();
 	bool loadTrackGraphics(struct Track* pTrack);
 	bool loadCarsGraphics(struct Situation* pSituation);
@@ -140,30 +140,39 @@ public:
 	void shutdownGraphicsView();
 	void unloadCarsGraphics();
 	void unloadTrackGraphics();
+
+	//! Load stuff in the background of the splash screen (menus, XML data, ...).
+	static bool backLoad();
+
+	//! Activate the main menu.
+	static bool activateMainMenu();
 	
+	//! Direct race startup (race specified in command line args).
+	static bool startRace();
+
  protected:
 
-	// The singleton.
+	//! The singleton.
 	static LegacyMenu* _pSelf;
 
-	// The race engine.
+	//! The race engine.
 	IRaceEngine* _piRaceEngine;
 
-	// The graphics engine.
+	//! The graphics engine.
 	IGraphicsEngine* _piGraphicsEngine;
 
-	// The "Race Engine update state" hook (a GfuiScreenActivate'able object).
+	//! The "Race Engine update state" hook (a GfuiScreenActivate'able object).
 	void* _hscrReUpdateStateHook;
 	
-	// The game screen.
+	//! The game screen.
 	void* _hscrGame;
 
-	// The graphics state.
+	//! The graphics state.
 	enum { eTrackLoaded = 0x1, eCarsLoaded = 0x2, eViewSetup = 0x4 };
 	unsigned _bfGraphicsState;
 };
 
-//! Shortcut to the race engine.
+// Shortcut to the race engine.
 inline extern IRaceEngine& LmRaceEngine()
 {
 	return LegacyMenu::self().raceEngine();

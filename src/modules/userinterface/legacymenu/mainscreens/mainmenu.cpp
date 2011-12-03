@@ -28,10 +28,8 @@
 #include "creditsmenu.h"
 
 
-void *MenuHandle = 0;
+static void *MenuHandle = 0;
 
-// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
-//tModList *RacemanModLoaded = 0;
 
 static void
 onPlayerConfigMenuActivate(void * /* dummy */)
@@ -70,9 +68,6 @@ onExitMenuActivate(void * /*dummy*/)
 static void
 onMainMenuActivate(void * /* dummy */)
 {
-	// What's this ? RacemanModLoaded never set anywhere but initialized to 0 !
-    // if (RacemanModLoaded)
-	// 	GfModUnloadList(&RacemanModLoaded);
 }
 
 /*
@@ -92,12 +87,12 @@ onMainMenuActivate(void * /* dummy */)
  *	
  */
 
-int
+void *
 MainMenuInit(void)
 {
     // Initialize only once.
     if (MenuHandle)
-        return 0;
+        return MenuHandle;
 
     MenuHandle = GfuiScreenCreate((float*)NULL, 
 				    NULL, onMainMenuActivate, 
@@ -120,7 +115,7 @@ MainMenuInit(void)
     GfuiMenuDefaultKeysAdd(MenuHandle);
     GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "Quit the game", NULL, onExitMenuActivate, NULL);
 
-    return 0;
+    return MenuHandle;
 }
 
 /*
@@ -143,5 +138,6 @@ int
 MainMenuRun(void)
 {
     GfuiScreenActivate(MenuHandle);
+	
     return 0;
 }

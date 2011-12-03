@@ -30,6 +30,7 @@
 #include <racemanagers.h>
 
 #include "splash.h"
+#include "mainmenu.h"
 #include "exitmenu.h"
 #include "racescreens.h"
 
@@ -78,28 +79,47 @@ LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
 {
 }
 
-// Implementation of IUserInterface ****************************************
-bool LegacyMenu::activate()
+bool LegacyMenu::backLoad()
 {
-	// Get the race to start, if any specified.
-	std::string strRaceToStart;
-	if (!GfApp().hasOption("startrace", strRaceToStart) || strRaceToStart.empty())
-		
-		// Open the splash screen, load menus in the background and finally open the main menu.
-		return SplashScreen();
+	GfLogTrace("Pre-loading menu and game data ...\n");
 
-	// Or else run the selected race.
+	// Pre-load the main and race select menus
+	// (to be able to get back to them, even when directly starting a given race).
+	if (!RmRaceSelectInit(MainMenuInit()))
+		return false;
+
+	// Pre-load race managers, drivers, tracks, cars stuff.
+	if (!GfRaceManagers::self())
+		return false;
+
+	GfLogTrace("Pre-loading menu and game data completed.\n");
+
+	return true;
+}
+
+bool LegacyMenu::activateMainMenu()
+{
+	return MainMenuRun() == 0;
+}
+
+bool LegacyMenu::startRace()
+{
+	// Get the race to start.
+	std::string strRaceToStart;
+	if (!GfApp().hasOption("startrace", strRaceToStart))
+		return false;
+
 	GfRaceManager* pSelRaceMan = GfRaceManagers::self()->getRaceManager(strRaceToStart);
 	if (pSelRaceMan)
 	{
-		// Reset the race engine state.
-		raceEngine().reset();
+		// Initialize the race engine.
+		LmRaceEngine().reset();
 
 		// Give the selected race manager to the race engine.
-		raceEngine().selectRaceman(pSelRaceMan);
+		LmRaceEngine().selectRaceman(pSelRaceMan);
 		
 		// Configure the new race.
-		raceEngine().configureRace(/* bInteractive */ false);
+		LmRaceEngine().configureRace(/* bInteractive */ false);
 
 		// Start the race engine state automaton
 		LmRaceEngine().startNewRace();
@@ -114,6 +134,34 @@ bool LegacyMenu::activate()
 	return true;
 }
 
+// Implementation of IUserInterface ****************************************
+bool LegacyMenu::activate()
+{
+	bool (*fnSplashBackWork)(void) = LegacyMenu::backLoad;
+	bool (*fnOnSplashClosed)(void) = 0;
+	bool bInteractive = true;
+
+	// Get the race to start, if any specified.
+	std::string strRaceToStart;
+	if (!GfApp().hasOption("startrace", strRaceToStart) || strRaceToStart.empty())
+	{
+		// If not specified, simply open the splash screen, load the menus in the background
+		// and finally open the main menu.
+		fnOnSplashClosed = LegacyMenu::activateMainMenu;
+	}
+	
+	// Or else run the selected race.
+	else
+	{
+		// Open the splash screen, load some stuff in the background
+		// and finally start the specified race.
+		fnOnSplashClosed = LegacyMenu::startRace;
+		bInteractive = false;
+	}
+
+	return SplashScreen(fnSplashBackWork, fnOnSplashClosed, bInteractive);
+}
+
 void LegacyMenu::quit()
 {
 	// Quit the event loop next time.
@@ -122,7 +170,7 @@ void LegacyMenu::quit()
 
 void LegacyMenu::shutdown()
 {
-	// Shutdown graphics in caserelevant and not already done.
+	// Shutdown graphics in case relevant and not already done.
 	if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
 	{
 		unloadCarsGraphics();
@@ -170,18 +218,15 @@ void LegacyMenu::onRaceInitializing()
 	{
 		if ((int)GfParmGetNum(pReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, 0, 1) == 1)
 		{
-			//GfLogDebug("LegacyMenu::onRaceInitializing() => RmLoadingScreenStart\n");
 			activateLoadingScreen();
 		}
 		else
 		{
-			//GfLogDebug("LegacyMenu::onRaceInitializing() => RmLoadingScreenShutdown\n");
 			shutdownLoadingScreen();
 		}
 	}
 	else
 	{
-		//GfLogDebug("LegacyMenu::onRaceInitializing() => RmLoadingScreenStart\n");
 		activateLoadingScreen();
 	}
 }
@@ -192,7 +237,6 @@ void LegacyMenu::onRaceStarting()
 	tRmInfo* pReInfo = _piRaceEngine->inData();
 	if (!strcmp(GfParmGetStr(pReInfo->params, pReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES))
 	{
-		//GfLogDebug("LegacyMenu::onRaceStarting() => RmLoadingScreenShutdown\n");
 		::RmLoadingScreenShutdown();
 	
 		::RmDisplayStartRace();
@@ -212,7 +256,6 @@ void LegacyMenu::onRaceLoadingDrivers()
 		  || _piRaceEngine->inData()->s->_raceType == RM_TYPE_PRACTICE)
 		|| (int)GfParmGetNum(_piRaceEngine->inData()->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)
 	{
-		//GfLogDebug("LegacyMenu::onRaceLoadingDrivers() => RmLoadingScreenStart\n");
 		::RmLoadingScreenStart(_piRaceEngine->inData()->_reName, "data/img/splash-raceload.jpg");
 	}
 }

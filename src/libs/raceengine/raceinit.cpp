@@ -133,9 +133,9 @@ ReRaceConfigure(bool bInteractive)
 	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
 	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
 	
-	// Enter CONFIG state if interactive mode.
+	// Enter CONFIG state and return to the race engine automaton if interactive mode.
 	if (bInteractive)
-		ReStateApply(RE_STATE_CONFIG);
+		ReStateApply((void*)RE_STATE_CONFIG);
 }
 
 // Restore the race from the given results file
@@ -170,8 +170,8 @@ ReStartNewRace()
 	else
 		ReCareerNew();
 
-	// Return to the race engine automaton.
-	ReStateManage();
+	// Enter EVENT_INIT state and return to the race engine automaton.
+	ReStateApply((void*)RE_STATE_EVENT_INIT);
 }
 
 // Resume the previously restored race from a results file

@@ -21,12 +21,7 @@
 #ifndef _MAINMENU_H_
 #define _MAINMENU_H_
 
-#include <tgfclient.h>
-
-extern void *menuHandle;
-extern tModList *RacemanModLoaded;
-
-extern int MainMenuInit(void);
+extern void* MainMenuInit(void);
 extern int MainMenuRun(void);
 
 #endif /* _MAINMENU_H_ */ 

@@ -31,7 +31,7 @@
 #endif
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <raceengine.h>
@@ -59,7 +59,7 @@ main(int argc, char *argv[])
 	bool bTextOnly = false;
 	// WIP no-graphics features.
 	// for (int i = 1; i < argc; i++)
-	// 	if (!strcmp(argv[i], "-to") || !strcmp(argv[i], "--textonly"))
+	// 	if (!strcmp(argv[i], "-x") || !strcmp(argv[i], "--textonly"))
 	// 	{
 	// 		bTextOnly = true;
 	// 		break;
@@ -75,17 +75,18 @@ main(int argc, char *argv[])
 								   "an Open Motorsport Sim", argc, argv);
 
 	// Register app. specific options and help text.
-	// WIP no-graphics / direct race start feature.
+	// WIP no-graphics feature.
 	// pApp->registerOption("to", "textonly", /* nHasValue = */ false);
-	// pApp->registerOption("sr", "startrace", /* nHasValue = */ true);
+	pApp->registerOption("s", "startrace", /* nHasValue = */ true);
 	
 	// pApp->addOptionsHelpSyntaxLine("[-sr|--startrace <race name> [-to|--textonly] ]");
+	pApp->addOptionsHelpSyntaxLine("[-s|--startrace <race name>]");
 	// pApp->addOptionsHelpExplainLine
 	// 	("- text-only : Run the specified race without any GUI (suitable for a headless computer)");
-	// pApp->addOptionsHelpExplainLine
-	// 	("- race name : Name without extension and dir path of the selected raceman file,");
-	// pApp->addOptionsHelpExplainLine
-	// 	("              among the .xml files in <user settings>/config/raceman (no default)");
+	pApp->addOptionsHelpExplainLine
+	 	("- race name : Name without extension and dir path of the selected raceman file,");
+	pApp->addOptionsHelpExplainLine
+	 	("              among the .xml files in <user settings>/config/raceman (no default)");
 
 	// Parse the command line for registered options.
     if (!pApp->parseOptions())

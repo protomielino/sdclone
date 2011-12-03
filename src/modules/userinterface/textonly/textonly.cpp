@@ -84,8 +84,8 @@ bool TextOnlyUI::activate()
 	GfRaceManager* pSelRaceMan = GfRaceManagers::self()->getRaceManager(strRaceToStart);
 	if (pSelRaceMan)
 	{
-		// Reset the race engine state (TODO : Really needed, as one shot only ?)
-		//raceEngine().reset();
+		// Initialize the race engine.
+		raceEngine().reset();
 
 		// Give the selected race manager to the race engine.
 		raceEngine().selectRaceman(pSelRaceMan);

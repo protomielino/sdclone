@@ -21,7 +21,8 @@
 #ifndef _SPLASH_H_
 #define _SPLASH_H_
 
-extern bool SplashScreen(void);
+extern bool SplashScreen(bool (*fnBackWork)(void), bool (*fnOnClosed)(void),
+						 bool bInteractive = true);
 
 
 #endif /* _SPLASH_H_ */ 
