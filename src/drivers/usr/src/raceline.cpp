@@ -1097,7 +1097,7 @@ void LRaceLine::ComputeSpeed(int rl)
   double trlspeed = GetModD( tRLSpeed, i );
   double avspeed = GetModD( tAvoidSpeed, i );
   double avspeedx = GetModD( tAvoidSpeedX, i );
-  int previ = ((i - 1) + Divs) % Divs;
+  //int previ = ((i - 1) + Divs) % Divs;
   double cornerspeed = ((trlspeed > 0 ? trlspeed : CornerSpeed) + BaseCornerSpeed) * BaseCornerSpeedX * DefaultCornerSpeedX;
 
   if (rl == LINE_MID)
@@ -1237,7 +1237,8 @@ void LRaceLine::ComputeSpeed(int rl)
 
  for (int i = (Divs*2)-1; --i >= 0;)
  {
-  int next = (i+1) % Divs, nnext = (i+2) % Divs, prev = ((i-1)+Divs) % Divs, index = i % Divs;
+  int next = (i+1) % Divs, index = i % Divs;
+  //int nnext = (i+2) % Divs, prev = ((i-1)+Divs) % Divs;
   double bd = brakedelay + GetModD( tRLBrake, index );
   if (rl == LINE_MID)
   {
@@ -1255,12 +1256,12 @@ void LRaceLine::ComputeSpeed(int rl)
 
    if (BrakeMod > 1.0)
    {
-     double friction = SRL[rl].tBrakeFriction[index];
+	 //double friction = SRL[rl].tBrakeFriction[index];
 
      double dist = sqrt((SRL[rl].tx[next] - SRL[rl].tx[index]) * (SRL[rl].tx[next] - SRL[rl].tx[index]) +
                  (SRL[rl].ty[next] - SRL[rl].ty[index]) * (SRL[rl].ty[next] - SRL[rl].ty[index]));
 
-     double slowrate = 15;//(15.0 - MIN(150.0, tSpeed[rf][next])/70.0)/2;
+     //double slowrate = 15;//(15.0 - MIN(150.0, tSpeed[rf][next])/70.0)/2;
      tSpeed[rf][index] = MIN(tSpeed[rf][index], tSpeed[rf][next] + (/*slowrate * friction * */ (dist) * bd)/1000);
    }
    else if (BrakeMod > 0.5)
@@ -1820,7 +1821,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   c1 /= sum;
  }
 
- double ospeed = TargetSpeed, aspeed = ATargetSpeed;
+ //double ospeed = TargetSpeed, aspeed = ATargetSpeed;
  ATargetSpeed = tSpeed[LINE_MID][avnext];//(1 - c0) * tSpeed[LINE_MID][avnext] + c0 * tSpeed[LINE_MID][avindex];
  data->avspeed = MAX(10.0, ATargetSpeed);
  if (!data->overtakecaution)

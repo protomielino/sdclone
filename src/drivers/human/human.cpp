@@ -1107,7 +1107,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	}
 
 	// automatically adjust throttle when auto-shifting
-	if (HCtx[idx]->clutchtime > 0.0f && HCtx[idx]->autoClutch == true) {
+	if (HCtx[idx]->clutchtime > 0.0f && HCtx[idx]->autoClutch) {
 		double rpm = car->_speed_xy * car->_gearRatio[car->_gear + car->_gearOffset] / car->_wheelRadius(2);
 
 		car->_accelCmd += (rpm - car->_enginerpm) * 4 / car->_enginerpmRedLine;
@@ -1421,7 +1421,7 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		if (ay0 < 0.33 && ay0 > -0.33 && ax0 > -0.5 && ax0 < -0.33)
 			car->_gearCmd = 0;
 		/* Extended 'N' area when using clutch to allow 'jumping' gears */
-		if (ay0 < 0.33 && ay0 > -0.33 && ax0 > -0.5 && ax0 < 0.5 && HCtx[idx]->autoClutch == 0)
+		if (ay0 < 0.33 && ay0 > -0.33 && ax0 > -0.5 && ax0 < 0.5 && !HCtx[idx]->autoClutch)
 			car->_gearCmd = 0;
 
 		/* Neutral gear command */

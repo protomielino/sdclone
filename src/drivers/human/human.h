@@ -62,7 +62,7 @@ typedef struct HumanContext
     bool		seqShftAllowReverse;
     bool		autoReverse;
     eDriveTrain	driveTrain;
-    int			autoClutch;
+    bool		autoClutch;
     tControlCmd		*cmdControl;
     bool		mouseControlUsed;
     int			lightCmd;

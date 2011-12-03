@@ -42,8 +42,8 @@ SimAxleConfig(tCar *car, int index)
 
     axle->arbSusp.spring.K = -axle->arbSusp.spring.K;
 
-    car->wheel[index*2].feedBack.I += axle->I / 2.0;
-    car->wheel[index*2+1].feedBack.I += axle->I / 2.0;
+    car->wheel[index*2].feedBack.I += axle->I / 2.0f;
+    car->wheel[index*2+1].feedBack.I += axle->I / 2.0f;
 }
 
 void
@@ -54,7 +54,7 @@ SimAxleUpdate(tCar *car, int index)
     tdble str = car->wheel[index*2].susp.x;
     tdble stl = car->wheel[index*2+1].susp.x;
     tdble delta = stl - str;
-    tdble sgn = SIGN(delta);
+    tdble sgn = (tdble)SIGN(delta);
 
     axle->arbSusp.x = fabs(delta);
     tSpring *spring = &(axle->arbSusp.spring);

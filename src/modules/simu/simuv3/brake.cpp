@@ -30,7 +30,7 @@ SimBrakeConfig(void *hdle, const char *section, tBrake *brake)
     brake->coeff = diam * 0.5f * area * mu;
 
     brake->I = GfParmGetNum(hdle, section, PRM_INERTIA, (char*)NULL, 0.13f);
-    brake->radius = diam/2.0;
+    brake->radius = diam/2.0f;
 }
 
 void 
@@ -38,9 +38,9 @@ SimBrakeUpdate(tCar *car, tWheel *wheel, tBrake *brake)
 {
     brake->Tq = brake->coeff * brake->pressure;
 
-    brake->temp -= fabs(car->DynGC.vel.x) * 0.0001 + 0.0002;
+    brake->temp -= fabs(car->DynGC.vel.x) * 0.0001f + 0.0002f;
     if (brake->temp < 0 ) brake->temp = 0;
-    brake->temp += brake->pressure * brake->radius * fabs(wheel->spinVel) * 0.00000000005;
+    brake->temp += brake->pressure * brake->radius * fabs(wheel->spinVel) * 0.00000000005f;
     if (brake->temp > 1.0) brake->temp = 1.0;
 }
 

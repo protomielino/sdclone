@@ -353,7 +353,7 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 				// routine grTrackHeightL(tTrkLocPos *p), similar to 
 				// TrTrackHeightL(), but which aim to give the height
 				// of the graphical track.
-				tdble z_adjust = 0.95;
+				tdble z_adjust = 0.95f;
 				tdble contact_z = car->priv.wheel[i].relPos.z - car->_wheelRadius(i)*z_adjust; 
 
 				//One side
@@ -361,9 +361,9 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 				vtx[0] = car->priv.wheel[i].relPos.x - car->_tireHeight(i);
 				// Because of backface culling the winding of the triangles matters.
 				if (car->_speed_x > 0.0f) {
-					vtx[1] = car->priv.wheel[i].relPos.y + (sling_right + 1.0)*car->_tireWidth(i) / 2.0;
+					vtx[1] = car->priv.wheel[i].relPos.y + (sling_right + 1.0f)*car->_tireWidth(i) / 2.0f;
 				} else {
-					vtx[1] = car->priv.wheel[i].relPos.y + (sling_left - 1.0)* car->_tireWidth(i) / 2.0;
+					vtx[1] = car->priv.wheel[i].relPos.y + (sling_left - 1.0f)* car->_tireWidth(i) / 2.0f;
 				}//if car->_speed
 				vtx[2] = contact_z;
 				basevtx->add(vtx);
@@ -372,9 +372,9 @@ cGrSkidmarks::Update(const tCarElt* car, const double t)
 				//vtx[0] = car->priv.wheel[i].relPos.x - car->_tireHeight(i);
 				// Because of backface culling the winding of the triangles matters.
 				if (car->_speed_x > 0.0f) {
-					vtx[1] = car->priv.wheel[i].relPos.y + (sling_left - 1.0)* car->_tireWidth(i) / 2.0;
+					vtx[1] = car->priv.wheel[i].relPos.y + (sling_left - 1.0f)* car->_tireWidth(i) / 2.0f;
 				} else {
-					vtx[1] = car->priv.wheel[i].relPos.y + (sling_right + 1.0)*car->_tireWidth(i) / 2.0;
+					vtx[1] = car->priv.wheel[i].relPos.y + (sling_right + 1.0f)*car->_tireWidth(i) / 2.0f;
 				}
 				//vtx[2] = contact_z;
 				basevtx->add(vtx);
