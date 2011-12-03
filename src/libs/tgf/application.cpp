@@ -25,7 +25,16 @@
 #include <cerrno>
 #include <iostream>
 
+#ifdef WIN32
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
+#endif
+#endif
+
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <portability.h>
 
 #include "tgf.hpp"

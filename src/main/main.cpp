@@ -31,95 +31,12 @@
 #endif
 
 #ifdef HAVE_CONFIG_H
-#include "version.h"
+#include "config.h"
 #endif
 
 #include <raceengine.h>
 #include <iuserinterface.h>
 
-
-//class NoGUIApplication : public GfApplication
-//{
-// public:
-//
-//	//! Constructor.
-//	NoGUIApplication(int argc, char **argv)
-//	: GfApplication("Speed Dreams", "an Open Motorsport Sim", argc, argv)
-//	{
-//	}
-//
-//	bool parseOptions()
-//	{
-//		// First the standard ones.
-//		if (!GfApplication::parseOptions())
-//			return false;
-//
-//		// Then the specific ones.
-//		std::list<std::string> lstNewOptionsLeft;
-//		std::list<std::string>::const_iterator itOpt;
-//		for (itOpt = _lstOptionsLeft.begin(); itOpt != _lstOptionsLeft.end(); itOpt++)
-//		{
-//			// Race to start.
-//			if (*itOpt == "-sr" || *itOpt == "--startrace")
-//			{
-//				itOpt++;
-//				if (itOpt != _lstOptionsLeft.end())
-//					strRaceToStart = *itOpt; ??????????????????
-//			}
-//			else
-//			{
-//				// Save this option : it is "left".
-//				lstNewOptionsLeft.push_back(*itOpt);
-//			}
-//		}
-//		
-//		// Store the new list of left options after parsing.
-//		_lstOptionsLeft = lstNewOptionsLeft;
-//		
-//		return true;
-//	}
-//};
-//
-//class GUIApplication : public GfuiApplication
-//{
-// public:
-//
-//	//! Constructor.
-//	Application(int argc, char **argv)
-//	: GfuiApplication("Speed Dreams", "an Open Motorsport Sim", argc, argv)
-//	{
-//	}
-//	
-//	bool parseOptions()
-//	{
-//		// // First the standard ones.
-//		// if (!GfApplication::parseOptions())
-//		// 	return false;
-//
-//		// // Then the specific ones.
-//		// std::list<std::string> lstNewOptionsLeft;
-//		// std::list<std::string>::const_iterator itOpt;
-//		// for (itOpt = _lstOptionsLeft.begin(); itOpt != _lstOptionsLeft.end(); itOpt++)
-//		// {
-//		// 	// Text-only
-//		// 	if (*itOpt == "-to" || *itOpt == "--textonly")
-//		// 	{
-//		// 		itOpt++;
-//		// 		_bTextOnly = true;
-//		// 	}
-//		// 	else
-//		// 	{
-//		// 		// Save this option : it is "left".
-//		// 		lstNewOptionsLeft.push_back(*itOpt);
-//		// 	}
-//		// }
-//		
-//		// // Store the new list of left options after parsing.
-//		// _lstOptionsLeft = lstNewOptionsLeft;
-//		
-//		return true;
-//	}
-//};
 
 /*
  * Function

@@ -1,12 +1,12 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.0 FATAL_ERROR)
 
 # Speed Dreams project
-PROJECT(speed-dreams)
+PROJECT(speed-dreams-2)
 
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
 
-# 3rd Party Dependency Stuff
+# Pre-built 3rd Party under Windows.
 IF(WIN32)
 	INCLUDE(Find3rdPartyDependencies)
 ENDIF(WIN32)
@@ -94,9 +94,6 @@ ENDIF(NEED_SVN_REV)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/version.h.cmake
-               ${CMAKE_CURRENT_BINARY_DIR}/version.h)
 
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygen_config.cmake
 	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)

@@ -46,7 +46,16 @@
 #include <plib/ssg.h>
 #include <SDL/SDL.h>
 
+#ifdef WIN32
+#ifndef HAVE_CONFIG_H
+#define HAVE_CONFIG_H
+#endif
+#endif
+
+#ifdef HAVE_CONFIG_H
 #include <config.h>
+#endif
+
 #include <tgf.hpp>
 #include <portability.h>
 #include <itrackloader.h>

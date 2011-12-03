@@ -124,10 +124,14 @@
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #cmakedefine TIME_WITH_SYS_TIME 1
 
-/* Version number of package */
+/* Version numbers for package */
 #ifndef VERSION
 #define VERSION "${VERSION}"
 #endif //VERSION
+
+#ifndef VERSION_LONG
+#define VERSION_LONG "${VERSION_LONG}"
+#endif //VERSION_LONG
 
 /* Define to 1 if your processor stores words with the most significant byte
    first (like Motorola and SPARC, unlike Intel and VAX). */
