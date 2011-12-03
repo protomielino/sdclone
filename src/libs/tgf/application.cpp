@@ -80,19 +80,19 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 	// Register the command line options (to be parsed).
 	registerOption("h", "help", /* nHasValue = */ false);
 	registerOption("v", "version", /* nHasValue = */ false);
-	registerOption("ld", "localdir", /* nHasValue = */ true);
-	registerOption("Ld", "libdir", /* nHasValue = */ true);
-	registerOption("Bd", "bindir", /* nHasValue = */ true);
-	registerOption("Dd", "datadir", /* nHasValue = */ true);
-	registerOption("tl", "tracelevel", /* nHasValue = */ true);
-	registerOption("ts", "tracestream", /* nHasValue = */ true);
+	registerOption("l", "localdir", /* nHasValue = */ true);
+	registerOption("L", "libdir", /* nHasValue = */ true);
+	registerOption("B", "bindir", /* nHasValue = */ true);
+	registerOption("D", "datadir", /* nHasValue = */ true);
+	registerOption("e", "tracelevel", /* nHasValue = */ true);
+	registerOption("t", "tracestream", /* nHasValue = */ true);
 	
 	// Help about the command line options.
-	addOptionsHelpSyntaxLine("[-ld|--localdir <dir path>] [-Ld|--libdir <dir path>]");
-	addOptionsHelpSyntaxLine("[-Bd|--bindir <dir path>] [-Dd|--datadir <dir path>]");
+	addOptionsHelpSyntaxLine("[-l|--localdir <dir path>] [-L|--libdir <dir path>]");
+	addOptionsHelpSyntaxLine("[-B|--bindir <dir path>] [-D|--datadir <dir path>]");
 #ifdef TRACE_OUT
-	addOptionsHelpSyntaxLine("[-tl|--tracelevel <integer>]"
-							 " [-ts|--tracestream stdout|stderr|<file name>]");
+	addOptionsHelpSyntaxLine("[-e|--tracelevel <integer>]"
+							 " [-t|--tracestream stdout|stderr|<file name>]");
 #endif
 	addOptionsHelpSyntaxLine("[-v|--version]");
 	
@@ -114,13 +114,11 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 		("            (default=" SD_DATADIR ")");
 #ifdef TRACE_OUT
 	addOptionsHelpExplainLine
-		("- tracelevel  : Trace level threshold");
+		("- tracelevel  : Maximum level of displayed traces");
 	addOptionsHelpExplainLine
 		("                (0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ... ; default=5)");
 	addOptionsHelpExplainLine
-		("- tracestream : Target output stream for the traces");
-	addOptionsHelpExplainLine
-		("                (default=stderr)");
+		("- tracestream : Target output stream for the traces (default=stderr)");
 #endif
 }
 
@@ -347,6 +345,29 @@ void GfApplication::registerOption(const std::string& strShortName,
 								   const std::string& strLongName,
 								   bool bHasValue)
 {
+	// Check if no already registered option has same short or long name.
+	std::list<Option>::const_iterator itOpt;
+	for (itOpt = _lstOptions.begin(); itOpt != _lstOptions.end(); itOpt++)
+	{
+		if (itOpt->strShortName == strShortName)
+		{
+			GfLogError("Can't register option -%s/--%s "
+					   "with same short name as -%s/--%s ; ignoring.\n",
+					   strShortName.c_str(), strLongName.c_str(),
+					   itOpt->strShortName.c_str(), itOpt->strLongName.c_str());
+			return;
+		}
+		else if (itOpt->strLongName == strLongName)
+		{
+			GfLogError("Can't register option -%s/--%s "
+					   "with same long name as -%s/--%s ; ignoring.\n",
+					   strShortName.c_str(), strLongName.c_str(),
+					   itOpt->strShortName.c_str(), itOpt->strLongName.c_str());
+			return;
+		}
+	}
+
+	// All's right : register.
 	_lstOptions.push_back(Option(strShortName, strLongName, bHasValue));
 }
 
