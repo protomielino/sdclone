@@ -1554,7 +1554,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
 
-    /* cam F2 = just outside the car; camera fixed to car */
+    /* cam F2 = just outside the car, behind; camera fixed to car */
     cam = new cGrCarCamBehindFixedCar(myscreen,
 				      id,
 				      1,	/* drawCurr */
@@ -1587,7 +1587,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
-    /* cam F2 = inside, from the driver's eye, withOUT head movements (driver's view) */
+    /* cam F2 = inside, from the driver's eye, without head movements (driver's view) */
     cam = new cGrCarCamInsideDriverEye(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1629,7 +1629,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
 				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
-				      300.0 * fovFactor,	/* fogstart */
+				      fixedFar ? fixedFar : 300.0 * fovFactor,	/* fogstart */
 				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
@@ -1651,7 +1651,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
-    /* cam F2 = behind the car, very near */
+    /* cam F2 = behind the car, very near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
 			      1,	/* drawCurr */
@@ -1670,7 +1670,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
     
-    /* cam F2 = behind the car, near */
+    /* cam F2 = behind the car, near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
 			      1,	/* drawCurr */
