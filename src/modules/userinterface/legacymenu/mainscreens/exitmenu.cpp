@@ -67,7 +67,6 @@ void* ExitMenuInit(void *prevMenu)
     GfParmReleaseHandle(param);
     
     GfuiMenuDefaultKeysAdd(MenuHandle);
-    GfuiAddKey(MenuHandle, GFUIK_RETURN, "Yes, quit the game", NULL, onAcceptExit, NULL);
     GfuiAddKey(MenuHandle, GFUIK_ESCAPE, "No, back to the game", prevMenu, GfuiScreenActivate, NULL);
 
     return MenuHandle;
