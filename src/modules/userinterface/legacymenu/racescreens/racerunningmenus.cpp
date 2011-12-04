@@ -416,21 +416,21 @@ static void
 rmAddKeys()
 {
     GfuiAddKey(rmScreenHandle, GFUIK_F1,  "Help", NULL, rmOpenHelpScreen, NULL);
-    GfuiAddKey(rmScreenHandle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_F12, "Screen shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(rmScreenHandle, '-', "Slow down Time",    (void*)-1, rmTimeMod, NULL);
-    GfuiAddKey(rmScreenHandle, '+', "Accelerate Time",   (void*)+1, rmTimeMod, NULL);
-    GfuiAddKey(rmScreenHandle, '.', "Restore Real Time", (void*)0, rmTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '-', "Slow down time",    (void*)-1, rmTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '+', "Accelerate time",   (void*)+1, rmTimeMod, NULL);
+    GfuiAddKey(rmScreenHandle, '.', "Restore real time", (void*)0, rmTimeMod, NULL);
 	
     GfuiAddKey(rmScreenHandle, 'p', "Pause Race",        (void*)0, rmRacePause, NULL);
-    GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
-    GfuiAddKey(rmScreenHandle, 'q', "Quit Game, Save Nothing",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
-    GfuiAddKey(rmScreenHandle, ' ', "Skip Pre-start",    (void*)0, rmSkipPreStart, NULL);
+    GfuiAddKey(rmScreenHandle, GFUIK_ESCAPE,  "Stop current race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+    GfuiAddKey(rmScreenHandle, 'q', GFUIM_ALT, "Quit game now, save nothing",    (void*)RE_STATE_EXIT, rmApplyState, NULL);
+    GfuiAddKey(rmScreenHandle, ' ', "Skip pre-start",    (void*)0, rmSkipPreStart, NULL);
 	
 	// WARNING: Sure this won't work with multi-threading On/Auto ...
     //GfuiAddKey(rmScreenHandle, '0', "One step simulation",    (void*)1, rmOneStep, NULL);
 	
-    GfuiAddKey(rmScreenHandle, 'c', "Movie Capture (if enabled)", (void*)0, rmToggleMovieCapture, NULL);
+    GfuiAddKey(rmScreenHandle, 'c', "Movie capture (if enabled)", (void*)0, rmToggleMovieCapture, NULL);
     GfuiAddKey(rmScreenHandle, 'o', "Hide / Show mouse cursor",   (void*)0, rmHideShowMouseCursor, NULL);
 }
 
@@ -649,10 +649,12 @@ RmResScreenInit()
     
     // Register keyboard shortcuts.
     GfuiAddKey(rmResScreenHdle, GFUIK_F1, "Help", rmResScreenHdle, GfuiHelpScreen, NULL);
-    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen Shot", NULL, GfuiScreenShot, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_F12, "Screen shot", NULL, GfuiScreenShot, NULL);
 
-    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE, "Stop Current Race", (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
-    GfuiAddKey(rmResScreenHdle, 'q', "Quit Game, Save Nothing", (void*)RE_STATE_EXIT, rmApplyState, NULL);
+    GfuiAddKey(rmResScreenHdle, GFUIK_ESCAPE, "Stop current race",
+			   (void*)RE_STATE_RACE_STOP, rmApplyState, NULL);
+    GfuiAddKey(rmResScreenHdle, 'q', GFUIM_ALT, "Quit game now, save nothing",
+			   (void*)RE_STATE_EXIT, rmApplyState, NULL);
 
     // Initialize current result row.
     rmCurRowIndex = 0;
