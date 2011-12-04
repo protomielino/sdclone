@@ -246,10 +246,10 @@ bool GfApplication::parseOptions()
 	GfInitInstallDir(_lstArgs.front().c_str());
 
 	// Parse args, looking for registered options.
+	GfLogInfo("Parsing command line args (%d)\n", _lstArgs.size() - 1);
 	std::list<std::string>::const_iterator itArg = _lstArgs.begin();
 	for (itArg++; itArg != _lstArgs.end(); itArg++)
 	{
-        GfLogInfo("* [%s]\n", itArg->c_str());
 		bool bArgEaten = false;
 		if (itArg->find('-') == 0)
 		{
@@ -263,11 +263,14 @@ bool GfApplication::parseOptions()
 					// We've got a registered option flag : check if there's a value arg or not.
 					if (itOpt->bHasValue)
 					{
+						const std::string strFlag(*itArg);
 						itArg++;
 						if (itArg != _lstArgs.end() // Some extra arg available ...
 							&& itArg->find('-') != 0) // ... and not an option flag :
 						{
 							itOpt->strValue = *itArg; // We've got the value.
+							GfLogInfo("  %s %s : option '%s'\n", strFlag.c_str(),
+									  itArg->c_str(), itOpt->strLongName.c_str());
 						}
 						else
 						{
@@ -275,6 +278,11 @@ bool GfApplication::parseOptions()
 							printUsage();
 							return false;
 						}
+					}
+					else
+					{
+						GfLogInfo("  %s : option '%s'\n",
+								  itArg->c_str(), itOpt->strLongName.c_str());
 					}
 
 					// Value or not, we've got an option, and we eat the arg(s) : done.
@@ -287,7 +295,10 @@ bool GfApplication::parseOptions()
 
 		// Save any ignored arg in the "remaining" list.
 		if (!bArgEaten)
+		{
 			_vecRemArgs.push_back(*itArg);
+			GfLogInfo("  %s : not a registered option\n", itArg->c_str());
+		}
 	}
 	
 	// Interpret the detected command line options.
