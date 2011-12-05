@@ -117,6 +117,7 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
   void *pRobotSettings = GfParmReadFile(pathBuffer.c_str(), GFPARM_RMODE_STD);
 
   if (pRobotSettings) {  // robot settings XML could be read
+    NBBOTS = 0;
     ssBuf.str(string());
     ssBuf << ROB_SECT_ROBOTS << "/" << ROB_LIST_INDEX << "/" << 0;
 
@@ -138,20 +139,21 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
     // Loop over all possible drivers, clear all buffers,
     // save defined driver names and descriptions.
     Drivers.clear();
-    for (int i = 0; i < MAXNBBOTS; i++) {
+    for (int i = indexOffset; i < MAXNBBOTS + indexOffset; ++i) {
       ssBuf.str(string());  // Clear buffer
       ssBuf << ROB_SECT_ROBOTS << "/"
               << ROB_LIST_INDEX << "/"
-              << i + indexOffset;
+              << i;
 
       string sDriverName = GfParmGetStr(pRobotSettings, ssBuf.str().c_str(),
                                           ROB_ATTR_NAME, sUndefined);
+
       if (sDriverName != sUndefined) {
         // This driver is defined in robot's xml-file
         string sDriverDesc = GfParmGetStr(pRobotSettings, ssBuf.str().c_str(),
                                     ROB_ATTR_DESC, defaultBotDesc[i].c_str());
         Drivers.push_back(make_pair(sDriverName, sDriverDesc));
-        NBBOTS = i + 1;
+        ++NBBOTS;
       }  // if driver is defined
     }  // for i
   } else {  // if robot settings XML could not be read
