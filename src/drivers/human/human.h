@@ -43,7 +43,8 @@ typedef struct HumanContext
     tdble		shiftThld[MAX_GEARS+1];
     tdble		gear;
     tdble		distToStart;
-    float		clutchtime;
+    float		clutchTime;
+    float		maxClutchTime;
     float		clutchdelay;
     float		antiLock;
     float		antiSlip;

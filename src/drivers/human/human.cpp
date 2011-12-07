@@ -531,6 +531,23 @@ newrace(int index, tCarElt* car, tSituation *s)
 	else
 		HCtx[idx]->autoClutch = false;
 
+	// Set up the timing for the autoclutch
+	HCtx[idx]->maxClutchTime = GfParmGetNum(car->_carHandle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
+	switch (car->_skillLevel) {
+		case 0: // Rookie
+			HCtx[idx]->maxClutchTime *= 2;
+			break;
+		case 1: // Amateur
+			HCtx[idx]->maxClutchTime *= 1.6;
+			break;
+		case 2: // Semi-Pro
+			HCtx[idx]->maxClutchTime *= 1.2;
+			break;
+		default:
+		case 3: // Pro
+			break;
+	}
+
 	//GfOut("SteerCmd : Left : sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
 	//	  cmd[CMD_LEFTSTEER].sens, cmd[CMD_LEFTSTEER].spdSens, cmd[CMD_LEFTSTEER].deadZone);
 	//GfOut("SteerCmd : Right: sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
@@ -1016,8 +1033,8 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		HCtx[idx]->autoClutch = false;
 
 	// Linear delay of autoclutch
-	if (HCtx[idx]->clutchtime > 0.0f)
-		HCtx[idx]->clutchtime -= s->deltaTime;
+	if (HCtx[idx]->clutchTime > 0.0f)
+		HCtx[idx]->clutchTime -= s->deltaTime;
 
 	// Ebrake here so that it can override the clutch control
 	if ((cmd[CMD_EBRAKE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_EBRAKE].val])
@@ -1107,7 +1124,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	}
 
 	// automatically adjust throttle when auto-shifting
-	if (HCtx[idx]->clutchtime > 0.0f && HCtx[idx]->autoClutch) {
+	if (HCtx[idx]->clutchTime > 0.0f && HCtx[idx]->autoClutch) {
 		double rpm = car->_speed_xy * car->_gearRatio[car->_gear + car->_gearOffset] / car->_wheelRadius(2);
 
 		car->_accelCmd += (rpm - car->_enginerpm) * 4 / car->_enginerpmRedLine;
@@ -1262,15 +1279,12 @@ static tdble
 getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
 {
 	tdble ret = 0.0f;
-	float max_clutchtime;
 
 	if (newGear != 0 && newGear < car->_gearNb) {
-		max_clutchtime = 0.332f - ((tdble) newGear / 65.0f);
-
 		if (newGear != gear)
-			HCtx[idx]->clutchtime = max_clutchtime;
+			HCtx[idx]->clutchTime = HCtx[idx]->maxClutchTime;
 
-		ret = HCtx[idx]->clutchtime / max_clutchtime;
+		ret = HCtx[idx]->clutchTime / HCtx[idx]->maxClutchTime;
 	}//if newGear
 
 	return ret;
