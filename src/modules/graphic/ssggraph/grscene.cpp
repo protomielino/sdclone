@@ -62,6 +62,7 @@ ssgBranch *CarlightAnchor = NULL;
 ssgBranch *TrackLightAnchor = NULL;
 ssgBranch *ThePits = NULL;
 ssgBranch *BackSkyAnchor = NULL;
+ssgTransform *BackSkyLoc = NULL;
 
 // Must have (Question: What for ?)
 int preScene(ssgEntity *e)
@@ -167,7 +168,9 @@ grLoadScene(tTrack *track)
 	TheScene->addKid(TrackLightAnchor);
 
 	BackSkyAnchor = new ssgBranch;
-	TheScene->addKid(BackSkyAnchor);
+	BackSkyLoc = new ssgTransform;
+	BackSkyLoc->addKid(BackSkyAnchor);
+	TheScene->addKid(BackSkyLoc);
 
 	/* Load the background (horizon and sky) */
 	grLoadBackground();
@@ -207,8 +210,12 @@ grLoadScene(tTrack *track)
 		desc = grssgLoadAC3D(acname, NULL);
 		BackSkyAnchor->addKid(desc);
 
-		//sgCoord backskypos;
+		sgCoord BackSkypos;
 		//sgSetCoord ( &backskypos, double(grWrldX/2), 0.0f, double(grWrldZ/2));
+		sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
+		BackSkyLoc->setTransform(&BackSkypos);
+
+
 	}
 
 

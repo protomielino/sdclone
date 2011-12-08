@@ -270,7 +270,8 @@ grInitBackground(void)
 
 		// Initialize the whole sky dome.
 		sgVec3 viewPos;
-		sgSetVec3(viewPos, 0, 0, 0);				  
+		//sgSetVec3(viewPos, (track->max.x)/2, 0, (track->max.z)/2);
+		sgSetVec3(viewPos,grWrldX/2, grWrldY/2, 0);
 		TheSky->repositionFlat(viewPos, 0, 0);    
 
 		//Setup visibility according to rain if any
@@ -858,7 +859,8 @@ grUpdateSky(double currentTime)
 
 	// At each call, update possibly high speed objects of the sky dome : the clouds.
  	sgVec3 viewPos;
- 	sgSetVec3(viewPos, 0, 0, 0);
+ 	sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
+	//sgSetVec3(viewPos, 0, 0, 0);
 	TheSky->repositionFlat(viewPos, 0, currentTime - lastTimeHighSpeed);    
 
 	// Now, we are done for high speed objects.
