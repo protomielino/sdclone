@@ -303,31 +303,38 @@ gfuiLabelGetTextX(tGfuiLabel *label)
 void
 gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
 {
+    int of = 0;
+    int fw = (int) label->font->getWidth("o");
+
+    char *p = strtok((char *) label->text, "\t");
+
+    while (p != NULL)
+    {
 	// Select the right color from the state/focus.
-    glColor4fv(color.toFloatRGBA());
+	glColor4fv(color.toFloatRGBA());
 
 	// Determine the actual (bottom left corner) coordinates where to draw the text.
 	int x;
-    switch(label->align & GFUI_ALIGN_HMASK)
+	switch(label->align & GFUI_ALIGN_HMASK)
 	{
+		default:
 		case GFUI_ALIGN_HL:
-			x = label->x;
+			x = label->x + (fw * of);
 			break;
 
 		case GFUI_ALIGN_HC:
-			x = label->x + (label->width - label->font->getWidth(label->text)) / 2;
+			x = label->x + (fw * of) + (label->width - label->font->getWidth(label->text)) / 2;
 			break;
 
 		case GFUI_ALIGN_HR:
-			x = label->x + label->width - label->font->getWidth(label->text);
-			break;
-
-		default:
-			x = label->x;
+			x = label->x + (fw * of) + label->width - label->font->getWidth(label->text);
 			break;
 	}
 
-    gfuiDrawString(x, label->y, label->font, label->text);
+	gfuiDrawString(x, label->y, label->font, p);
+	of += strlen(p) + 1;
+	p = strtok(NULL, "\t");
+    }
 }
 
 /** Actually draw the given label object.

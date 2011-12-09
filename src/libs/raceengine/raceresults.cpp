@@ -475,7 +475,7 @@ ReUpdatePracticeCurRes(tCarElt *car, bool bForceNew)
 void
 ReUpdateQualifCurRes(tCarElt *car)
 {
-	static const char* pszTableHeader = "Rank    Time          Driver                     Car";
+	static const char* pszTableHeader = "Rank    \tTime          \tDriver                     \tCar";
 	int		i;
 	int		xx;
 	int		nCars;
@@ -516,13 +516,13 @@ ReUpdateQualifCurRes(tCarElt *car)
 			if (!printed && car->_bestLapTime != 0.0
 				&& car->_bestLapTime < GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0)) {
 				tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 3);
-				snprintf(buf, sizeof(buf), " %2d %-12s  %-20s %-20s", i, tmp_str, car->_name, carName);
+				snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s", i, tmp_str, car->_name, carName);
 				free(tmp_str);
 				ReUI().setResultsTableRow(i - 1, buf, /*highlight=*/true);
 				printed = 1;
 			}
 			tmp_str = GfTime2Str(GfParmGetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, 0), "  ", false, 3);
-			snprintf(buf, sizeof(buf), " %2d %-12s  %-20s %-20s",
+			snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s",
 					 i + printed, tmp_str, GfParmGetStr(results, path, RE_ATTR_NAME, ""),
 					 GfParmGetStr(results, path, RE_ATTR_CAR, ""));
 			free (tmp_str);
@@ -531,7 +531,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 	
 		if (!printed) {
 			tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 3);
-			snprintf(buf, sizeof(buf), " %2d %-12s  %-20s %-20s", i, tmp_str, car->_name, carName);
+			snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s", i, tmp_str, car->_name, carName);
 			free(tmp_str);
 			ReUI().setResultsTableRow(i - 1, buf, /*highlight=*/true);
 		}
