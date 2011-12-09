@@ -71,8 +71,8 @@ static tCmdInfo Cmd[] = {
     {HM_ATT_EBRAKE_CMD, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_EBRAKE_MIN,      0, HM_ATT_EBRAKE_MAX,    0, 0, 0, 1, HM_ATT_JOY_REQ_BUT, 0},
     {HM_ATT_HBOX_X,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_X_MIN, -1, HM_ATT_HBOX_X_MAX, 1, 0, 0, 1, HM_ATT_JOY_REQ_AXIS, 0},
     {HM_ATT_HBOX_Y,     {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_HBOX_Y_MIN, -1, HM_ATT_HBOX_Y_MAX, 1, 0, 0, 1, HM_ATT_JOY_REQ_AXIS, 0},
-    {HM_ATT_LEFTGLANCE, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_L_GLANCE_MIN,    0, HM_ATT_L_GLANCE_MAX,  0, 0, 0, 1, HM_ATT_JOY_PREF_AXIS, 0},
-    {HM_ATT_RIGHTGLANCE,{-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_R_GLANCE_MIN,    0, HM_ATT_R_GLANCE_MAX,  0, 0, 0, 1, HM_ATT_JOY_PREF_AXIS, 0}
+    {HM_ATT_LEFTGLANCE, {-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_L_GLANCE_MIN,    0, HM_ATT_L_GLANCE_MAX,  0, 0, 0, 1, HM_ATT_JOY_PREF_ANY, 0},
+    {HM_ATT_RIGHTGLANCE,{-1, GFCTRL_TYPE_NOT_AFFECTED}, 0, 0, HM_ATT_R_GLANCE_MIN,    0, HM_ATT_R_GLANCE_MAX,  0, 0, 0, 1, HM_ATT_JOY_PREF_ANY, 0}
 };
 
 static const int MaxCmd = sizeof(Cmd) / sizeof(Cmd[0]);
@@ -405,7 +405,7 @@ IdleWaitForInput(void)
 
 	    /* Allow a little extra time to detect button */
 	    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_AXIS) {
-		GfSleep(0.1);
+		GfSleep(0.3);
    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
 	    }
 
@@ -414,16 +414,20 @@ IdleWaitForInput(void)
 		if (((b & mask) != 0) && ((JoyButtons[index] & mask) == 0)) {
 		    /* Allow a little extra time to detect axis movement */
 		    if (axis == -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT) {
-    			GfSleep(0.1);
+    			GfSleep(0.3);
 	    		Joystick[index]->read(&b, &JoyAxis[index * GFCTRL_JOY_MAX_AXES]);
             		axis = getMovedAxis(index);
 		    }
 
 		    /* Choose to use AXIS type... */
 		    if (axis != -1 && Cmd[CurrentCmd].pref != HM_ATT_JOY_PREF_BUT && 
-			    Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT) {
+			    Cmd[CurrentCmd].pref != HM_ATT_JOY_REQ_BUT &&
+			    Cmd[CurrentCmd].pref != HM_ATT_JOY_PREF_LAST) {
+			// Toggle Prefered Type
 			if (Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_AXIS)
 			    Cmd[CurrentCmd].pref = HM_ATT_JOY_PREF_BUT;
+			if (Cmd[CurrentCmd].pref >= HM_ATT_JOY_PREF_ANY)
+			    Cmd[CurrentCmd].pref ++;
 
 			Cmd[CurrentCmd].butIgnore = i + 32 * index;
 
@@ -432,6 +436,9 @@ IdleWaitForInput(void)
 
 		    if (axis != -1 && Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_BUT) {
 			Cmd[CurrentCmd].pref = HM_ATT_JOY_PREF_AXIS;
+		    }
+		    if (axis != -1 && Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_LAST) {
+			Cmd[CurrentCmd].pref = HM_ATT_JOY_PREF_ANY;
 		    }
 		    Cmd[CurrentCmd].butIgnore = 0;
 
@@ -454,11 +461,19 @@ IdleWaitForInput(void)
 	    if (axis != -1) {
 		Cmd[CurrentCmd].butIgnore = 0;
 
+		// Toggle preference, when there is no button available
+		if (Cmd[CurrentCmd].pref >= HM_ATT_JOY_PREF_ANY)
+		    Cmd[CurrentCmd].pref ++;
+		if (Cmd[CurrentCmd].pref > HM_ATT_JOY_PREF_ANY1)
+		    Cmd[CurrentCmd].pref = HM_ATT_JOY_PREF_ANY;
+
 configure_for_joy_axis:
 		GfuiApp().eventLoop().setRecomputeCB(0);
 		InputWaited = 0;
 
-		if (Cmd[CurrentCmd].pref == HM_ATT_JOY_REQ_BUT) 
+		if (Cmd[CurrentCmd].pref == HM_ATT_JOY_REQ_BUT || 
+			Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_ANY ||
+			Cmd[CurrentCmd].pref == HM_ATT_JOY_PREF_LAST) 
 		    /* Map axis to a button type */
 		    Cmd[CurrentCmd].ref.type = GFCTRL_TYPE_JOY_ATOB;
 		else

@@ -161,6 +161,9 @@
 #define HM_ATT_JOY_PREF_AXIS 1
 #define HM_ATT_JOY_REQ_BUT   2
 #define HM_ATT_JOY_REQ_AXIS  3
+#define HM_ATT_JOY_PREF_ANY  4
+#define HM_ATT_JOY_PREF_ANY1 5
+#define HM_ATT_JOY_PREF_LAST 6
 
 #endif /* _PLAYERPREF_H_ */ 
 
