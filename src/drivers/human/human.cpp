@@ -934,8 +934,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_RIGHTGLANCE].val])
 	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_RIGHTGLANCE].val)].state)
 	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_RIGHTGLANCE].deadZone != 0))
-	{
+	{ 
 		newGlance = newGlance + GLANCERATE * s->deltaTime;
+	} else if (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] > 0)
+	{
+		newGlance = joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] * 2*PI/3;
+        } else if (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_LEFTGLANCE].val] < 0)
+	{
+		newGlance = joyInfo->ax[cmd[CMD_LEFTGLANCE].val] * 2*PI/3;
 	} else {
 		// return view to center
 		if (newGlance > 0) {
