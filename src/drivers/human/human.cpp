@@ -1346,12 +1346,12 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp)
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_UP_SHFT].deadZone == 1))
 		{
-			if (car->_gearCmd > -1)
+			if (car->_gear > -1)
 				car->_gearCmd++;
-			else if (HCtx[idx]->seqShftAllowNeutral && car->_gearCmd == -1)
+			else if (HCtx[idx]->seqShftAllowNeutral && car->_gear == -1)
 				car->_gearCmd = 0;
 			/* always allow up shift out of reverse to improve game play */
-			else if (car->_gearCmd == -1)
+			else if (car->_gear == -1)
 				car->_gearCmd = 1;
 		}
 
@@ -1361,11 +1361,11 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp)
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_DN_SHFT].deadZone == 1))
 		{
-			if (car->_gearCmd > 1)
+			if (car->_gear > 1)
 				car->_gearCmd--;
-			else if (HCtx[idx]->seqShftAllowNeutral && car->_gearCmd == 1)
+			else if (HCtx[idx]->seqShftAllowNeutral && car->_gear == 1)
 				car->_gearCmd = 0;
-			else if (HCtx[idx]->seqShftAllowReverse && car->_gearCmd < 2)
+			else if (HCtx[idx]->seqShftAllowReverse && car->_gear < 2)
 				car->_gearCmd = -1;
 		}
 
@@ -1511,20 +1511,26 @@ drive_at(int index, tCarElt* car, tSituation *s)
 
 	/* shift */
 	int gear = car->_gear;
-	if (gear > 0)	//return to auto-shift
-		HCtx[idx]->manual = false;
 	gear += car->_gearOffset;
 	car->_gearCmd = car->_gear;
 
-    if (!HCtx[idx]->autoReverse) {
+	if (!HCtx[idx]->autoReverse) {
 		/* manual shift */
 		if ((cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_UP_SHFT].val])
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_UP_SHFT].val])
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_UP_SHFT].val)].edgeUp)
 		    || (cmd[CMD_UP_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_UP_SHFT].deadZone == 1))
 		{
-			car->_gearCmd++;
-			HCtx[idx]->manual = true;
+			if (car->_gear == 0)
+				HCtx[idx]->manual = false; // switch back to auto gearbox
+			else
+				HCtx[idx]->manual = true;
+
+			if (!HCtx[idx]->seqShftAllowNeutral && car->_gear == -1) {
+				HCtx[idx]->manual = false; // switch back to auto gearbox
+				car->_gearCmd = 1;
+			} else
+				car->_gearCmd++;
 		}//CMD_UP_SHFT
 
 		if ((cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_DN_SHFT].val])
@@ -1532,11 +1538,42 @@ drive_at(int index, tCarElt* car, tSituation *s)
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_DN_SHFT].val)].edgeUp)
 		    || (cmd[CMD_DN_SHFT].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_DN_SHFT].deadZone == 1))
 		{
-			car->_gearCmd--;
-			HCtx[idx]->manual = true;
+			if (car->_gear > 1) {
+				car->_gearCmd--;
+				HCtx[idx]->manual = true;
+			} else if (HCtx[idx]->seqShftAllowNeutral && car->_gear == 1) {
+				car->_gearCmd = 0;
+				HCtx[idx]->manual = true;
+			} else if (HCtx[idx]->seqShftAllowReverse && car->_gear < 2) {
+				car->_gearCmd = -1;
+				HCtx[idx]->manual = true;
+			}
 		}//CMD_DN_SHFT
 
-		/* manual shift direct */
+		/* Neutral gear command */
+		if ((cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_N].val])
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_N].val])
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_N].val)].edgeUp)
+		    || (cmd[CMD_GEAR_N].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_N].deadZone == 1))
+		{
+			car->_gearCmd = 0;
+			HCtx[idx]->manual = true;
+		}
+
+		/* Reverse gear command */
+		if ((cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[CMD_GEAR_R].val])
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[CMD_GEAR_R].val])
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[CMD_GEAR_R].val)].edgeUp)
+		    || (cmd[CMD_GEAR_R].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_GEAR_R].deadZone == 1))
+		{
+			/* Only allow Reverse to be selected at low speed (~36kmph) or from neutral */
+			if (car->_speed_x < 10 || car->_gear == 0) {
+				car->_gearCmd = -1;
+				HCtx[idx]->manual = true;
+			}
+		}
+
+		/* manual shift direct ie. Reverse-Park-Drive*/
 		if (HCtx[idx]->relButNeutral) {
 			for (int i = CMD_GEAR_R; i < CMD_GEAR_2; i++) {
 				if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgedn[cmd[i].val])
@@ -1545,20 +1582,23 @@ drive_at(int index, tCarElt* car, tSituation *s)
 				{
 					car->_gearCmd = 0;
 					HCtx[idx]->manual = false;	//return to auto-shift
-				}//
-			}//for i
-		}//relButNeutral
+				}
+			}
+		}
 
+		/* Select the right gear if any gear command activated (edge up) */
 		for (int i = CMD_GEAR_R; i < CMD_GEAR_2; i++) {
 			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->edgeup[cmd[i].val])
 			    || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->edgeup[cmd[i].val])
-			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].edgeUp)
-			    || (cmd[i].type == GFCTRL_TYPE_JOY_ATOB && cmd[i].deadZone == 1))
+			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].edgeUp))
 			{
 				car->_gearCmd = i - CMD_GEAR_N;
-				HCtx[idx]->manual = false;
-    }
-		}//for i
+				if (car->_gearCmd > 0)
+					HCtx[idx]->manual = false;	//return to auto-shift
+				else
+					HCtx[idx]->manual = true;
+			}
+		}
 	}//if !autoReverse
 
 	/* auto shift */
