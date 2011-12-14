@@ -548,6 +548,10 @@ newrace(int index, tCarElt* car, tSituation *s)
 			break;
 	}
 
+	// Set up glancing
+	car->_oldglance = 0;
+	car->_glance = 0;
+
 	//GfOut("SteerCmd : Left : sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
 	//	  cmd[CMD_LEFTSTEER].sens, cmd[CMD_LEFTSTEER].spdSens, cmd[CMD_LEFTSTEER].deadZone);
 	//GfOut("SteerCmd : Right: sens=%4.1f, spSens=%4.2f, deadZ=%4.2f\n",
@@ -936,10 +940,10 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	    || (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_RIGHTGLANCE].deadZone != 0))
 	{ 
 		newGlance = newGlance + GLANCERATE * s->deltaTime;
-	} else if (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] > 0)
+	} else if (cmd[CMD_RIGHTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] > cmd[CMD_RIGHTGLANCE].min)
 	{
 		newGlance = joyInfo->ax[cmd[CMD_RIGHTGLANCE].val] * 2*PI/3;
-        } else if (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_LEFTGLANCE].val] < 0)
+        } else if (cmd[CMD_LEFTGLANCE].type == GFCTRL_TYPE_JOY_AXIS && joyInfo->ax[cmd[CMD_LEFTGLANCE].val] < cmd[CMD_LEFTGLANCE].max)
 	{
 		newGlance = joyInfo->ax[cmd[CMD_LEFTGLANCE].val] * 2*PI/3;
 	} else {
@@ -958,7 +962,17 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	if (newGlance > 2*PI/3) newGlance=2*PI/3;
 	if (newGlance < -2*PI/3) newGlance=-2*PI/3;
 
-	car->_glance = newGlance;
+	// Limit twitching between values
+	if (newGlance != 0) {
+		if (newGlance != car->_oldglance) {
+			car->_oldglance = car->_glance;
+			car->_glance = newGlance;
+		}
+	} else {
+		car->_oldglance = 0;
+		car->_glance = 0;
+	}
+
 
 	switch (cmd[CMD_BRAKE].type) {
 		case GFCTRL_TYPE_JOY_AXIS:
