@@ -167,7 +167,7 @@ grInitBackground(void)
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
 		
-		if (!TheSun)
+		if (!TheSun && grTrack->local.rain == 0)
 		{
 			ssgaLensFlare *sun_obj = new ssgaLensFlare();
 			TheSun = new ssgTransform;
@@ -681,9 +681,11 @@ grLoadBackground(void)
 				break;
 		}//switch grBackgroundType
 		
-		// Lens Flares when no sky dome (realistic sky dome will use another system when ready).
-		SunAnchor = new ssgBranch;
-		TheScene->addKid(SunAnchor);
+		if (!SunAnchor && grTrack->local.rain == 0) {
+			// Lens Flares when no sky dome (realistic sky dome will use another system when ready).
+			SunAnchor = new ssgBranch;
+			TheScene->addKid(SunAnchor);
+		}
 
 	} //if (!grSkyDomeDistance || grTrack->skyversion < 1)
 	else
