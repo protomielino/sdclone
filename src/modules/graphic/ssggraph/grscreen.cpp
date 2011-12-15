@@ -293,9 +293,12 @@ void cGrScreen::camDraw(tSituation *s)
 	GfProfStopProfile("grDrawScene*");
 
 	// Draw the precipitation if any.
-	// TODO: Is camSpeed always such ? For all cameras ? Why speed == 0 when no mirror ?
-	const double camSpeed = mirrorFlag ? curCar->_speed_x : 0.0f;
-	grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0, 0.0, 0.0, camSpeed);
+	if (dispCam->isMirrorAllowed() == 1) {
+		// angle the rain for 1st person views
+		grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0, 
+			curCar->_roll * SG_RADIANS_TO_DEGREES, 0.0, curCar->_speed_x);
+	} else
+		grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0, 0.0, 0.0, 0.0);
 }
 
 
