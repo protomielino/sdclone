@@ -243,6 +243,7 @@ void cGrScreen::camDraw(tSituation *s)
 	if (dispCam->getDrawBackground()) {
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 		grDrawStaticBackground(dispCam, bgCam);
 		glClear(GL_DEPTH_BUFFER_BIT);
 	}
