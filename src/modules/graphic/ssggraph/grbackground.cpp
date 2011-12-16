@@ -943,6 +943,9 @@ grShutdownBackground(void)
 	if (TheSun)
 		TheSun = 0;
 	
+	if (SunAnchor)
+		SunAnchor = 0;
+	
 	if (grEnvState) {
 		ssgDeRefDelete(grEnvState);
 		grEnvState = 0;
