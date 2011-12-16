@@ -1052,10 +1052,6 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	if (car->_clutchCmd != 0.0f)
 		HCtx[idx]->autoClutch = false;
 
-	// Linear delay of autoclutch
-	if (HCtx[idx]->clutchTime > 0.0f)
-		HCtx[idx]->clutchTime -= s->deltaTime;
-
 	// Ebrake here so that it can override the clutch control
 	if ((cmd[CMD_EBRAKE].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[CMD_EBRAKE].val])
 	    || (cmd[CMD_EBRAKE].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[CMD_EBRAKE].val])
@@ -1143,9 +1139,14 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 
 	}
 
+	// Linear delay of autoclutch
+	if (HCtx[idx]->clutchTime > 0.0f)
+		HCtx[idx]->clutchTime -= s->deltaTime;
+
 	// automatically adjust throttle when auto-shifting
-	if (HCtx[idx]->clutchTime > 0.0f && HCtx[idx]->autoClutch) {
-		double rpm = car->_speed_xy * car->_gearRatio[car->_gear + car->_gearOffset] / car->_wheelRadius(2);
+	if (HCtx[idx]->clutchTime > 0.0f && HCtx[idx]->autoClutch && car->_gear > 1 && car->_speed_xy > 10) {
+		// Target RPMs slightly above ideal match
+		double rpm = 1.1 * car->_speed_xy * car->_gearRatio[car->_gear + car->_gearOffset] / car->_wheelRadius(2);
 
 		car->_accelCmd += (rpm - car->_enginerpm) * 4 / car->_enginerpmRedLine;
 		//GfOut("Desired rpms for gear %d = %f\n", car->_gear, rpm * 9.54);
@@ -1303,6 +1304,10 @@ getAutoClutch(const int idx, int gear, int newGear, tCarElt *car)
 	if (newGear != 0 && newGear < car->_gearNb) {
 		if (newGear != gear)
 			HCtx[idx]->clutchTime = HCtx[idx]->maxClutchTime;
+
+		if (gear == 1 && car->_speed_xy < 10 && HCtx[idx]->clutchTime > 0)
+			// Hold clutch at 1/2 to allow a faster launch from stationary
+			HCtx[idx]->clutchTime = HCtx[idx]->maxClutchTime / 2;
 
 		ret = HCtx[idx]->clutchTime / HCtx[idx]->maxClutchTime;
 	}//if newGear
