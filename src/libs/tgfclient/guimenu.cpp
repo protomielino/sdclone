@@ -770,11 +770,14 @@ GfuiMenuCreateScrollListControl(void* hscr, void* hparm, const char* pszName,voi
 	const int scrollbarPos = gfuiMenuGetScrollBarPosition(pszScrollBarPos);
 	const int scrollbarWidth =
 		(int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_SCROLLBAR_WIDTH, NULL, 20.0);
+	const int scrollBarButHeight =
+		(int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_SCROLLBAR_BUTTONS_HEIGHT, NULL, 20.0);
 
 	const GfuiColor c = getControlColor(hparm, pszName, GFMNU_ATTR_COLOR);
 	const GfuiColor sc = getControlColor(hparm, pszName, GFMNU_ATTR_COLOR_SELECTED);
         
-	int id = GfuiScrollListCreate(hscr, font, x, y, w, h, scrollbarPos, scrollbarWidth,
+	int id = GfuiScrollListCreate(hscr, font, x, y, w, h,
+								  scrollbarPos, scrollbarWidth, scrollBarButHeight,
 								  userData, onSelect);
 
 	GfuiScrollListSetColors(hscr, id, c, sc);

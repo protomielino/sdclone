@@ -504,7 +504,7 @@ TGFCLIENT_API void GfuiEditboxSetBGColors(void *scr, int id, const GfuiColor& co
 
 /* Scroll lists */
 TGFCLIENT_API int GfuiScrollListCreate(void* scr, int font, int x, int y, int width, int height,
-									   int scrollBarPos, int scrollBarWidth,
+									   int scrollBarPos, int scrollBarWidth, int scrollBarButHeight,
 									   void* userDataOnSelect, tfuiCallback onSelect);
 TGFCLIENT_API int GfuiScrollListInsertElement(void* scr, int Id, const char* element, int index, void* userData);
 TGFCLIENT_API int GfuiScrollListMoveSelectedElement(void* scr, int Id, int delta);
@@ -520,7 +520,8 @@ TGFCLIENT_API void GfuiScrollListShowElement(void* scr, int Id, int index);
 TGFCLIENT_API void GfuiScrollListSetColors(void* scr, int id, const GfuiColor& color, const GfuiColor& selectColor);
 
 /* Scroll bars */
-TGFCLIENT_API int GfuiScrollBarCreate(void* scr, int x, int y, int width, int height,
+TGFCLIENT_API int GfuiScrollBarCreate(void* scr, int x, int y,
+									  int length, int thickness, int butLength,
 									  int orientation, int min, int max, int len, int start, 
 									  void* userData, tfuiSBCallback onScroll);
 TGFCLIENT_API void GfuiScrollBarPosSet(void* scr, int id, int min, int max, int len, int start);

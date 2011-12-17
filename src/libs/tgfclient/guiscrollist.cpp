@@ -119,21 +119,23 @@ gfuiScrollListPrevElt (tGfuiObject *object)
     @ingroup	gui
     @param	scr	Current screen
     @param	font	Current font
-    @param	x	X Position
-    @param	y	Y Position
-    @param	width	Total width of the box
-    @param	height	Total height of the box
+    @param	x	X Position (pixels)
+    @param	y	Y Position (pixels)
+    @param	width	Total width of the box (pixels)
+    @param	height	Total height of the box (pixels)
     @param	scrollBarPos	Position of the scrollbar:
 	<br>GFUI_SB_NONE	No scroll bar
 	<br>GFUI_SB_RIGHT	Right scroll bar
 	<br>GFUI_SB_LEFT	Left scroll bar
+    @param	scrollBarWidth	Width of the scroll-bar (pixels)
+    @param	scrollBarButHeight	Height of the scroll-bar buttons (pixels)
     @param	userDataOnSelect	User data to pass to the onSelect callback
     @param	onSelect		Callback when the selection is done 
     @return	Scroll List Id
 */
 int
 GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
-					 int scrollBarPos, int scrollBarWidth,
+					 int scrollBarPos, int scrollBarWidth, int scrollBarButHeight,
 					 void *userDataOnSelect, tfuiCallback onSelect)
 {
     tGfuiScrollList	*scrollist;
@@ -165,13 +167,15 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
     switch (scrollBarPos) {
 		case GFUI_SB_RIGHT:
 			scrollist->scrollBar =
-				GfuiScrollBarCreate(scr, x + width, y, height, scrollBarWidth,
+				GfuiScrollBarCreate(scr, x + width, y,
+									height, scrollBarWidth, scrollBarButHeight,
 									GFUI_VERT_SCROLLBAR, 
 									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
 			break;
 		case GFUI_SB_LEFT:
 			scrollist->scrollBar =
-				GfuiScrollBarCreate(scr, x - scrollBarWidth, y, height, scrollBarWidth,
+				GfuiScrollBarCreate(scr, x - scrollBarWidth, y,
+									height, scrollBarWidth, scrollBarButHeight,
 									GFUI_VERT_SCROLLBAR, 
 									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
 			break;

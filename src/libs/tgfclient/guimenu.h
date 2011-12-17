@@ -93,6 +93,7 @@ extern bool gfuiMenuGetBoolean(const char* pszValue, bool bDefault = false);
 
 #define GFMNU_ATTR_SCROLLBAR_POS "scrollbar pos"
 #define GFMNU_ATTR_SCROLLBAR_WIDTH "scrollbar width"
+#define GFMNU_ATTR_SCROLLBAR_BUTTONS_HEIGHT "scrollbar buttons height"
 
 #define GFMNU_ATTR_CAN_DEFORM "can deform"
 

@@ -83,16 +83,17 @@ gfuiScrollMinus(void *idv)
 /** Create a new scroll bar.
     @ingroup	gui
     @param	scr	Screen where to create the scroll bar
-    @param	x	X position
-    @param	y	Y position
-    @param	width	width (horiz) / height (vert) (arrows included)
-    @param	height	height (horiz) / width (vert) (arrows included)
+    @param	x	X position (pixels)
+    @param	y	Y position (pixels)
+    @param	length	Length on the screen (arrows included) (pixels)
+    @param	thickness	Thickness on the screen (pixels)
+    @param	butLength	Length of the buttons on the screen (pixels)
     @param	orientation	Scroll bar orientation:
 				<br>GFUI_HORI_SCROLLBAR	Horizontal
 				<br>GFUI_VERT_SCROLLBAR	Vertical
-    @param	min	Minimum value
-    @param	max	Maximum value
-    @param	len	Visible length
+    @param	min	Minimum value for the "current position"
+    @param	max	Maximum value for the "current position"
+    @param	visLen	Visible length (as of "position")
     @param	start	Starting position
     @param	userData	User data given to the call back function
     @param	onScroll	Call back function called when the position change
@@ -100,8 +101,8 @@ gfuiScrollMinus(void *idv)
 		<br>-1 Error
  */
 int
-GfuiScrollBarCreate(void *scr, int x, int y, int width, int height, int orientation,
-					int min, int max, int len, int start, 
+GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butLength,
+					int orientation, int min, int max, int visLen, int start, 
 					void *userData, tfuiSBCallback onScroll)
 {
     tGfuiScreen* screen = (tGfuiScreen*)scr;
@@ -123,13 +124,13 @@ GfuiScrollBarCreate(void *scr, int x, int y, int width, int height, int orientat
 			const int arrowButId =
 				GfuiGrButtonCreate(scr, "data/img/arrow-left.png", "data/img/arrow-left.png",
 								   "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
-								   x, y, 0, height, 1, false,
+								   x, y, butLength, thickness, 1, false,
 								   (void*)(object->id), gfuiScrollMinus,
 								   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 			const tGfuiGrButton* pArrowBut = &(gfuiGetObject(scr, arrowButId)->u.grbutton);
 			GfuiGrButtonCreate(scr, "data/img/arrow-right.png", "data/img/arrow-right.png",
 							   "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
-							   x + width - pArrowBut->width, y, 0, height, 1, false,
+							   x + length - pArrowBut->width, y, butLength, thickness, 1, false,
 							   (void*)(object->id), gfuiScrollPlus,
 							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
 			break;
@@ -139,15 +140,15 @@ GfuiScrollBarCreate(void *scr, int x, int y, int width, int height, int orientat
 			const int arrowButId =
 				GfuiGrButtonCreate(scr, "data/img/arrow-down.png", "data/img/arrow-down.png",
 								   "data/img/arrow-down-focused.png", "data/img/arrow-down-pushed.png",
-								   x, y, height, 0, 1, false,
+								   x, y, thickness, butLength, 1, false,
 								   (void*)(object->id), gfuiScrollPlus,
 								   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
 			const tGfuiGrButton* pArrowBut = &(gfuiGetObject(scr, arrowButId)->u.grbutton);
 			GfuiGrButtonCreate(scr, "data/img/arrow-up.png", "data/img/arrow-up.png",
 							   "data/img/arrow-up-focused.png", "data/img/arrow-up-pushed.png",
-							   x, y + width - pArrowBut->height, height, 0, 1, false,
+							   x, y + length - pArrowBut->height, thickness, butLength, 1, false,
 							   (void*)(object->id), gfuiScrollMinus,
-							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
+							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 			break;
 		}
 		default:
@@ -156,7 +157,7 @@ GfuiScrollBarCreate(void *scr, int x, int y, int width, int height, int orientat
     
     gfuiAddObject(screen, object);
 	
-    GfuiScrollBarPosSet(scr, object->id, min, max, len, start);
+    GfuiScrollBarPosSet(scr, object->id, min, max, visLen, start);
 	
     return object->id;
 }
