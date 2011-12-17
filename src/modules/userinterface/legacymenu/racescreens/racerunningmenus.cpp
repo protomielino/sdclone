@@ -535,9 +535,11 @@ rmResRedisplay()
 static void
 rmResScreenActivate(void * /* dummy */)
 {
+	GfLogInfo("Entering Result menu ...\n");
+	
 	// Configure the event loop.
-    GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
-    GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
+	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
+	GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
 
 	// Request a redisplay for the next event loop.
 	GfuiApp().eventLoop().postRedisplay();
@@ -564,9 +566,6 @@ rmResScreenActivate(void * /* dummy */)
 static void
 rmResScreenDeactivate(void * /* dummy */)
 {
-	if (rmResRowText)
-		for (int i = 0; i < rmNMaxResRows; i++)
-			freez(rmResRowText[i]);
 }
 
 void
