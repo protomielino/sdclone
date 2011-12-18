@@ -80,32 +80,24 @@ int reMainUpdater::operator()(void)
 {
 	GfProfStartProfile("ReUpdate");
 
-	switch (_pReInfo->_displayMode)
+	if (_pReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)
 	{
-		case RM_DISP_MODE_NORMAL:
-
-			// Get the situation for the previous step.
-			GfSchedBeginEvent("raceupdate", "situCopy");
-			_pReInfo = situationUpdater->getPreviousStep();
-			GfSchedEndEvent("raceupdate", "situCopy");
-
-			// Compute the situation for the current step (mono-threaded race engine)
-			// or do nothing (dual-threaded race engine : the updater thread does the job itself).
-			_pSituationUpdater->computeCurrentStep();
-			
-			break;
-	
-		case RM_DISP_MODE_NONE:
-			
-			_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
-			
-			break;
-
-		case RM_DISP_MODE_SIMU_SIMU:
-			
-			ReSimuSimu();
-
-			break;
+		ReSimuSimu();
+	}
+	else if (_pReInfo->_displayMode & RM_DISP_MODE_NORMAL)
+	{
+		// Get the situation for the previous step.
+		GfSchedBeginEvent("raceupdate", "situCopy");
+		_pReInfo = situationUpdater->getPreviousStep();
+		GfSchedEndEvent("raceupdate", "situCopy");
+		
+		// Compute the situation for the current step (mono-threaded race engine)
+		// or do nothing (dual-threaded race engine : the updater thread does the job itself).
+		_pSituationUpdater->computeCurrentStep();
+	}
+	else // No other choice than RM_DISP_MODE_NONE
+	{
+		_pSituationUpdater->runOneStep(RCM_MAX_DT_SIMU);
     }
 
 	ReNetworkCheckEndOfRace();

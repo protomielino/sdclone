@@ -45,8 +45,8 @@
 
 
 // Constants.
-static const char *DispModeValues[GfRace::nDisplayModeNumber] =
-	{ RM_VAL_VISIBLE, RM_VAL_INVISIBLE};
+static const int NDisplayModeNumber = 2;
+static const char *DispModeValues[NDisplayModeNumber] = { RM_VAL_INVISIBLE, RM_VAL_VISIBLE};
 static const char *TimeOfDayValues[GfRace::nTimeSpecNumber] = RM_VALS_TIME;
 static const char* CloudsValues[GfRace::nCloudsSpecNumber] = RM_VALS_CLOUDS;
 static const char *RainValues[GfRace::nRainSpecNumber] = RM_VALS_RAIN;
@@ -69,7 +69,7 @@ static unsigned rmrpConfMask;
 static int		rmrpDistance;
 static int		rmrpLaps;
 static int		rmrpDuration;
-static GfRace::EDisplayMode		rmrpDispMode;
+static unsigned		rmrpDispMode;
 static GfRace::ECloudsSpec		rmrpClouds;
 static GfRace::ETimeOfDaySpec	rmrpTimeOfDay;
 static GfRace::ERainSpec		rmrpRain;
@@ -191,8 +191,7 @@ rmChangeDisplayMode(void *vp)
 {
     const long delta = (int)(long)vp;
     rmrpDispMode = 
-		(GfRace::EDisplayMode)
-		((rmrpDispMode + GfRace::nDisplayModeNumber + delta) % GfRace::nDisplayModeNumber);
+		(rmrpDispMode + NDisplayModeNumber + delta) % NDisplayModeNumber;
     GfuiLabelSetText(ScrHandle, rmrpDispModeEditId, DispModeValues[rmrpDispMode]);
 }
 
@@ -286,7 +285,7 @@ rmrpValidate(void * /* dummy */)
 
 		if (rmrpConfMask & RM_CONF_DISP_MODE)
 		{
-			pRaceSessionParams->eDisplayMode = (GfRace::EDisplayMode)rmrpDispMode;
+			pRaceSessionParams->bfDisplayMode = rmrpDispMode;
 		}
 	}
 	
@@ -523,10 +522,10 @@ RmRaceParamsMenu(void *vrp)
 	// Create and initialize Display mode combo-box-like control.
     if (rmrpConfMask & RM_CONF_DISP_MODE) 
     {
-		if (pRaceSessionParams->eDisplayMode == GfRace::nDisplayModeNumber)
-			rmrpDispMode = GfRace::eDisplayNormal; // Default value.
+		if (pRaceSessionParams->bfDisplayMode == RM_DISP_MODE_UNDEFINED)
+			rmrpDispMode = RM_DISP_MODE_NORMAL; // Default value.
 		else
-			rmrpDispMode = pRaceSessionParams->eDisplayMode;
+			rmrpDispMode = pRaceSessionParams->bfDisplayMode & RM_DISP_MODE_NORMAL;
 
 		// Create Display mode label.
 		GfuiMenuCreateLabelControl(ScrHandle, menuXMLDescHdle, "displaylabel");

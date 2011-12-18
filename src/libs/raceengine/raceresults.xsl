@@ -1,19 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    file                 : credits.xml
+    created              : Thu Mar 19 22:00:00 CEST 2009
+    copyright            : (C) 2009 by Eugen Treise
+    web                  : speed-dreams.sourceforge.net
+    version              : $Id$
+-->
+
+<!-- This xsl file was made to format results-*.xml files, -->
+<!-- which are created by Speed Dreams after a race, into readable html files. -->
+<!-- Usage: Open results-*.xml file (it must have a reference to this file) -->
+<!--        in your browser, or use an xslt processor to convert the xml file -->
+<!--        to an html file. -->
+
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
 <xsl:output method="html"/>
-
-<!--	This xsl file was made to format results-*.xml files, which are created by torcs after a race, into readable html files. -->
-<!--	Usage: Open results-*.xml file (it must have a reference to this file) in your browser, or use an xslt processor to convert the xml file to a html file. -->
 
 <!-- Template for the params element -->
 <xsl:template match="/params">
 
 	<html>
-	<head><title>TORCS Race Results</title></head>
+	<head><title>Speed Dreams Race Results</title></head>
 	<body>
 
-	<p><A HREF="http://www.torcs.org">TORCS Home Page</A></p>
+	<p><A HREF="http://www.speed-dreams.org">Speed Dreams Home Page</A></p>
 
 	<!-- print Params attributes -->
 	<xsl:for-each select="@*">

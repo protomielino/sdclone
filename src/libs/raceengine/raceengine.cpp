@@ -26,6 +26,7 @@
 #include <tgf.hpp>
 
 #include <car.h> // tCarPitCmd.
+#include <raceman.h>
 
 #include <tgfdata.h>
 #include <race.h>
@@ -163,9 +164,9 @@ void RaceEngine::applyState(int state)
 	::ReStateApply((void*)state);
 }
 
-void RaceEngine::selectRaceman(GfRaceManager* pRaceMan)
+void RaceEngine::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
 {
-	::ReRaceSelectRaceman(pRaceMan);
+	::ReRaceSelectRaceman(pRaceMan, bKeepHumans);
 }
 
 void RaceEngine::restoreRace(void* hparmResults)
@@ -235,6 +236,11 @@ void RaceEngine::step(double dt)
 
 //************************************************************
 GfRace* RaceEngine::race()
+{
+	return _pRace;
+}
+
+const GfRace* RaceEngine::race() const
 {
 	return _pRace;
 }

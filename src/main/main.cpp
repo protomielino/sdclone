@@ -57,13 +57,12 @@ main(int argc, char *argv[])
 {
 	// Look for the "text-only" option flag in the command-line args.
 	bool bTextOnly = false;
-	// WIP no-graphics features.
-	// for (int i = 1; i < argc; i++)
-	// 	if (!strcmp(argv[i], "-x") || !strcmp(argv[i], "--textonly"))
-	// 	{
-	// 		bTextOnly = true;
-	// 		break;
-	// 	}
+	for (int i = 1; i < argc; i++)
+		if (!strcmp(argv[i], "-x") || !strcmp(argv[i], "--textonly"))
+		{
+			bTextOnly = true;
+			break;
+		}
 
 	// Create the application (graphical or text-only UI).
 	GfApplication* pApp;
@@ -75,18 +74,16 @@ main(int argc, char *argv[])
 								   "an Open Motorsport Sim", argc, argv);
 
 	// Register app. specific options and help text.
-	// WIP no-graphics feature.
-	// pApp->registerOption("to", "textonly", /* nHasValue = */ false);
 	pApp->registerOption("s", "startrace", /* nHasValue = */ true);
+	pApp->registerOption("x", "textonly", /* nHasValue = */ false);
 	
-	// pApp->addOptionsHelpSyntaxLine("[-sr|--startrace <race name> [-to|--textonly] ]");
-	pApp->addOptionsHelpSyntaxLine("[-s|--startrace <race name>]");
-	// pApp->addOptionsHelpExplainLine
-	// 	("- text-only : Run the specified race without any GUI (suitable for a headless computer)");
+	pApp->addOptionsHelpSyntaxLine("[-s|--startrace <race name> [-x|--textonly] ]");
 	pApp->addOptionsHelpExplainLine
-	 	("- race name : Name without extension and dir path of the selected raceman file,");
+	 	("- race name : Name without extension of the selected raceman file,");
 	pApp->addOptionsHelpExplainLine
 	 	("              among the .xml files in <user settings>/config/raceman (no default)");
+	pApp->addOptionsHelpExplainLine
+	 	("- text-only : Run the specified race without any GUI (suitable for a headless computer)");
 
 	// Parse the command line for registered options.
     if (!pApp->parseOptions())

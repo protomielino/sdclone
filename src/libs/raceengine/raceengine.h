@@ -56,7 +56,7 @@ public:
 	virtual void updateState();
 	virtual void applyState(int state);
 
-	virtual void selectRaceman(GfRaceManager* pRaceMan);
+	virtual void selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans = true);
 	virtual void restoreRace(void* hparmResults);
 	virtual void configureRace(bool bInteractive = true);
 
@@ -78,6 +78,7 @@ public:
 #endif
 
 	virtual GfRace* race();
+	virtual const GfRace* race() const;
 	
 	//! Temporary input / modifiable situation, for commanding the race engine from the outside
 	//! Aimed at being removed when dedicated setters are ready.

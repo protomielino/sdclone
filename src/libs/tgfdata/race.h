@@ -48,7 +48,7 @@ public:
 	~GfRace();
 
 	//! Load from the given race manager params and results file if specified.
-	void load(GfRaceManager* pRaceMan, void* hparmResults = 0);
+	void load(GfRaceManager* pRaceMan, bool bKeepHumans = true, void* hparmResults = 0);
 
 	//! Clear the race.
 	void clear();
@@ -58,11 +58,12 @@ public:
 
 	//! Is the race data consistent with the params from which it was loaded ?
 	bool isDirty() const;
+
+	//! Force dirtyness.
+	void setDirty(bool bIsDirty = true);
 	
 	GfRaceManager* getManager() const;
 
-	enum EDisplayMode { eDisplayNormal, eDisplayResultsOnly,
-						nDisplayModeNumber }; // Last = invalid value = nb of valid ones.
 	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
 						  eTimeDusk, eTimeNight, eTimeNow, eTimeFromTrack,
 						  nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
@@ -77,7 +78,7 @@ public:
 		int nLaps;
 		int nDistance; // km
 		int nDuration; // s
-		EDisplayMode eDisplayMode;
+		unsigned bfDisplayMode;
 		ETimeOfDaySpec eTimeOfDaySpec;
 		ECloudsSpec eCloudsSpec;
 		ERainSpec eRainSpec;
@@ -91,7 +92,10 @@ public:
 	const std::vector<std::string>& getAcceptedDriverTypes() const;
 	bool acceptsCarCategory(const std::string& strCatId) const;
 	const std::vector<std::string>& getAcceptedCarCategoryIds() const;
-	
+
+	//! For all sessions to "results-only" mode (SimuSimu mode unchanged).
+	void forceResultsOnly();
+
 	unsigned getCompetitorsCount() const;
 	const std::vector<GfDriver*>& getCompetitors() const;
 	bool hasHumanCompetitors() const;

@@ -353,7 +353,7 @@ rmToggleMovieCapture(void * /* dummy */)
 		return;
     }
     
-    if (LmRaceEngine().outData()->_displayMode != RM_DISP_MODE_NORMAL)
+    if (!(LmRaceEngine().outData()->_displayMode & RM_DISP_MODE_NORMAL))
     {
 		GfLogWarning("Movie capture is available only in normal display mode : command ignored\n");
 		return;

@@ -45,8 +45,6 @@
 #include "racemain.h"
 
 
-static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
-
 //Utility
 
 /** 
@@ -132,10 +130,10 @@ ReRaceEventInit(void)
 
 		/* Read the new params */
 		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-		GfLogDebug("Career : ReInfo->mainResults gives curfile = %s\n",
+		GfLogTrace("Career : MainResults give %s as the current file\n",
 				   GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
 		if (!params)
-			GfLogWarning( "Params weren't read correctly !!!\n" );
+			GfLogWarning( "Career : MainResults params weren't read correctly\n" );
 		params = ReInfo->params;
 
 		/* Close previous results */
@@ -148,7 +146,7 @@ ReRaceEventInit(void)
 		/* Read the new results */
 		ReInfo->results = GfParmReadFile( GfParmGetStr( params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
 		if (!ReInfo->results)
-			GfLogWarning( "Results weren't read correctly !!!\n" );
+			GfLogWarning( "Career : New results weren't read correctly\n" );
 	}
 
 	// Initialize the race session name.
@@ -163,14 +161,9 @@ ReRaceEventInit(void)
 	
 	ReEventInitResults();
 
-	if (GfParmGetEltNb(params, RM_SECT_TRACKS) > 1)
-	{
-		ReUI().onRaceEventStarting();
-		
-		return RM_ASYNC | RM_NEXT_STEP;
-	}
-	
-	return RM_SYNC | RM_NEXT_STEP;
+	const bool bGoOnLooping = ReUI().onRaceEventStarting();
+
+	return (bGoOnLooping ? RM_SYNC : RM_ASYNC) | RM_NEXT_STEP;
 }
 
 
@@ -195,12 +188,11 @@ RePreRace(void)
 	}
 
 	if (strcmp(GfParmGetStr(params, raceName, RM_ATTR_ENABLED, RM_VAL_YES), RM_VAL_NO) == 0) {
-		GfLogDebug( "||||++|||| NOT ENABLED!\n" );
+		GfLogTrace( "Race %s disabled\n",  raceName);
 		curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 		if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
-			GfLogDebug( "||||++|||| NOT LAST RACE!\n" );
 			curRaceIdx++;
-			GfLogTrace("Race Nb %d\n", curRaceIdx);
+			GfLogTrace( "Race %s is not the last one, but the #%d\n",  raceName, curRaceIdx);
 			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, (tdble)curRaceIdx);
 	
 			return RM_SYNC | RM_NEXT_RACE;
@@ -312,22 +304,38 @@ ReRaceRealStart(void)
 		strDispMode =
 			GfParmGetStr(params, RM_VAL_ANYRACE, RM_ATTR_DISPMODE, RM_VAL_VISIBLE);
 
+	if (strDispMode == RM_VAL_INVISIBLE)
+		ReInfo->_displayMode = RM_DISP_MODE_NONE;
+	else if (strDispMode == RM_VAL_VISIBLE)
+		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
+	else if (strDispMode == RM_VAL_SIMUSIMU)
+		ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
+	else
+	{
+		GfLogError("Unsupported display mode '%s' loaded from race file ; "
+				   "assuming 'normal'\n", strDispMode.c_str());
+		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
+	}
+
+	//GfLogDebug("ReRaceRealStart: Loaded dispMode=0x%x\n", ReInfo->_displayMode);
+	
 	// Check if there is a human in the driver list
 	foundHuman = ReHumanInGroup() ? 2 : 0;
 
-	// TODO: Replace this _displayMode dirty hack by adding a new bSimuSimu arg to ReInitCars ?
-	// Set _displayMode here because then robot->rbNewTrack isn't called. This is a lot faster for simusimu
-	if (strDispMode == RM_VAL_SIMUSIMU && foundHuman == 0)
-		ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
-	else
-		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-
+	// Reset SimuSimu bit if any human in the race.
+	// Note: Done here in order to make SimuSimu faster. 
+	if ((ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU) && foundHuman)
+	{
+		ReInfo->_displayMode &= ~RM_DISP_MODE_SIMU_SIMU;
+	}
+	
 	// Initialize & place cars
+	// Note: if SimuSimu display mode, robot->rbNewTrack isn't called. This is a lot faster.
 	if (ReInitCars())
 		return RM_ERROR;
 
 	// Check if there is a human in the current race
-	// TODO: Why is this computed again, after ReHumanInGroup(), and in a different way ???
+	// Warning: Don't move this before ReInitCars (initializes s->cars).
 	for (i = 0; i < s->_ncars; i++) {
 		if (s->cars[i]->_driverType == RM_DRV_HUMAN) {
 			foundHuman = 1;
@@ -335,47 +343,39 @@ ReRaceRealStart(void)
 		}//if human
 	}//for i
 
-	// Determine the display mode.
-	ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
-
-	if (foundHuman != 1)
+	// Force "normal" display mode if any human in the session
+	if (foundHuman == 1)
 	{
-		// No human in current race
-		if (strDispMode == RM_VAL_INVISIBLE)
-		{
-			ReInfo->_displayMode = RM_DISP_MODE_NONE;
-		}
-		else if (strDispMode == RM_VAL_SIMUSIMU)
-		{
-			// Human in driver list ...
-			if (foundHuman == 2)
-			{
-				// ... but not in current race
-				if (ReInfo->s->_raceType == RM_TYPE_QUALIF
-					|| ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-				{
-					ReInfo->_displayMode = RM_DISP_MODE_NONE;
-				} /* Else: normally visible */
-			}
-			else
-			{
-				ReInfo->_displayMode = RM_DISP_MODE_SIMU_SIMU;
-			}//if foundHuman == 2
-		}
-	}//if foundHuman != 1
+		ReInfo->_displayMode = RM_DISP_MODE_NORMAL;
+	}
+	// Force "result only" mode in Practice / Qualif. sessions without any human,
+	// but at least 1 in another session (why this ?), and SimuSimu bit on.
+	else if (foundHuman == 2 && (ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)
+		     && (ReInfo->s->_raceType == RM_TYPE_QUALIF
+				 || ReInfo->s->_raceType == RM_TYPE_PRACTICE))
+	{
+		ReInfo->_displayMode = RM_DISP_MODE_NONE;
+	}
 
+	//GfLogDebug("ReRaceRealStart: Final dispMode=0x%x\n", ReInfo->_displayMode);
+	
 	// Notify the UI that it's "race loading time".
 	ReUI().onRaceLoadingDrivers();
 
 	// Load drivers for the race
-	for (i = 0; i < s->_ncars; i++) {
+	for (i = 0; i < s->_ncars; i++)
+	{
 		snprintf(buf, sizeof(buf), "cars/%s/%s.xml",
 				 s->cars[i]->_carName, s->cars[i]->_carName);
 		carHdle = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		snprintf(buf, sizeof(buf), "Loading %s driver (%s) ...",
 				 s->cars[i]->_name, GfParmGetName(carHdle));
+		
 		ReUI().addLoadingMessage(buf);
-		if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) { //Tell robots they are to start a new race
+
+		if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
+		{
+			//Tell robots they are to start a new race
 			robot = s->cars[i]->robot;
 			GfPoolMove( &s->cars[i]->_newRaceMemPool, &oldPool );
 			robot->rbNewRace(robot->index, s->cars[i], s);
@@ -408,27 +408,8 @@ ReRaceRealStart(void)
 	for (j = 0; j < (int)(1.0 / RCM_MAX_DT_SIMU); j++)
 		RePhysicsEngine().updateSituation(s, RCM_MAX_DT_SIMU);
 
-	if (ReInfo->_displayMode != RM_DISP_MODE_NORMAL)
-	{
-		if (ReInfo->s->_raceType == RM_TYPE_QUALIF)
-		{
-			ReUpdateQualifCurRes(s->cars[0]);
-		}
-		else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && s->_ncars > 1)
-		{
-			ReUpdatePracticeCurRes(s->cars[0]);
-		}
-		else
-		{
-			static const char* pszTableHeader = "Rank    Time     Driver               Car";
-			snprintf(buf, sizeof(buf), "%s (%s)", s->cars[0]->_name, s->cars[0]->_carName);
-			char pszSubTitle[128];
-			snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s", 
-					 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
-			ReUI().setResultsTableTitles(buf, pszSubTitle);
-			ReUI().setResultsTableHeader(pszTableHeader);
-		}
-	}//if displayMode != normal
+	// Initialize current result manager.
+	ReInitCurRes();
 
 	// More initializations.
 	ReInfo->_reTimeMult = 1.0;
@@ -667,6 +648,7 @@ ReRaceEnd(void)
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 
 		// Next competitor.
+		GfLogDebug("ReRaceEnd: Sync + Next race\n");
 		return RM_SYNC | RM_NEXT_RACE;
 	}
 
@@ -788,10 +770,11 @@ ReRaceEventShutdown(void)
 	} while( true );
 	
 	int mode = (curTrkIdx != 1 || careerMode) ? RM_NEXT_RACE : RM_NEXT_STEP;
-	mode |= (nbTrk != 1) ? RM_ASYNC : RM_SYNC;
 	
 	if (nbTrk != 1)
-		ReUI().showStandings();
+		mode |= ReUI().showStandings() ? RM_SYNC : RM_ASYNC;
+	else
+		mode |= RM_SYNC;
 
 	if (mode & RM_NEXT_STEP)
 		FREEZ(ReInfo->_reCarInfo);

@@ -39,7 +39,8 @@ extern int  ReUpdate();
 extern void ReOneStep(double dt);
 #endif
 
-extern const tRmInfo* ReOutputSituation();
+struct RmInfo;
+extern const struct RmInfo* ReOutputSituation();
 
 #endif /* _RACEUPDATE_H_ */ 
 

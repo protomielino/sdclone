@@ -27,8 +27,6 @@
 
 #include <string>
 
-#include <raceman.h> // RmEDisplayMode
-
 #include "raceinit.h" // ReInfo.
 
 
@@ -53,7 +51,7 @@ public:
 	void setThreadSafe(bool bOn = true);
 
 	//! Safe accessors.
-	void setDisplayMode(RmEDisplayMode eDispMode);
+	void setDisplayMode(unsigned bfDispMode);
 	void accelerateTime(double fMultFactor);
 	void setRaceMessage(const std::string& strMsg, double fLifeTime = -1, bool bBig = false);
 	

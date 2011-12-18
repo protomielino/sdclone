@@ -144,11 +144,11 @@ tRmInfo* ReSituation::data()
 }
 
 // Safe accessors.
-void ReSituation::setDisplayMode(RmEDisplayMode eDispMode)
+void ReSituation::setDisplayMode(unsigned bfDispMode)
 {
 	lock("setDisplayMode");
 
-	_pReInfo->_displayMode = eDispMode;
+	_pReInfo->_displayMode = bfDispMode;
 	
 	unlock("setDisplayMode");
 }
@@ -189,7 +189,7 @@ void ReSituation::setPitCommand(int nCarIndex, const tCarPitCmd *pPitCmd)
 	lock("updateCarPitCmd");
 
 	// Retrieve the car in situation with 'nCarIndex' index.
-	GfLogDebug("ReSituation::updateCarPitCmd(i=%d)\n", nCarIndex);
+	//GfLogDebug("ReSituation::updateCarPitCmd(i=%d)\n", nCarIndex);
 	tCarElt* pCurrCar = 0;
 	for (int nCarInd = 0; nCarInd < _pReInfo->s->_ncars; nCarInd++)
 	{
@@ -307,7 +307,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 	
 	ReCarsSortCars();
 
-	/* Update results if a best lap changed */
+	// Update results if a best lap changed
 	if (pCurrReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars > 1 && bestLapChanged)
 	{
 		if (pCurrReInfo->s->_raceType == RM_TYPE_PRACTICE)

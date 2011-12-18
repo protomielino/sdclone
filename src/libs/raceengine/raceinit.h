@@ -36,7 +36,7 @@ extern void ReReset(void);
 extern void ReCleanup(void);
 extern int  ReExit();
 
-extern void ReRaceSelectRaceman(GfRaceManager* pRaceMan);
+extern void ReRaceSelectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans = true);
 extern void ReRaceRestore(void* hparmResults);
 extern void ReRaceConfigure(bool bInteractive = true);
 
@@ -55,7 +55,8 @@ extern tModList *ReRacingRobotsModList;
 // WIP: Remove this global variable that anyone can wildly change
 //      and replace the read/write instruction everywhere
 //      by calls to the functions of ReSituation::self().
-extern tRmInfo *ReInfo;
+struct RmInfo;
+extern struct RmInfo *ReInfo;
 
 #endif /* _RACEINIT_H_ */ 
 

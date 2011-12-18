@@ -103,7 +103,7 @@ ReExit(void)
 
 // Select the given manager for the race.
 void
-ReRaceSelectRaceman(GfRaceManager* pRaceMan)
+ReRaceSelectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)
 {
 	// Trace the chosen raceman full type.
 	std::string strFullType(pRaceMan->getType());
@@ -119,7 +119,7 @@ ReRaceSelectRaceman(GfRaceManager* pRaceMan)
 	ReInfo->_reFilename = pRaceMan->getId().c_str();
 
 	// (Re-)initialize the currrent race configuration from the selected race manager.
-	RaceEngine::self().race()->load(pRaceMan);
+	RaceEngine::self().race()->load(pRaceMan, bKeepHumans);
 }
 
 // Start configuring the race
@@ -179,7 +179,7 @@ void
 ReResumeRace()
 {
 	// Fire standings screen.
-	ReUI().showStandings();
+	(void)ReUI().showStandings();
 }
 
 
@@ -449,7 +449,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
   curRobot = (tRobotItf*)calloc(1, sizeof(tRobotItf));
 
   /* ... and initialize the driver */
-  if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) {
+  if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)) {
     curModInfo->fctInit(robotIdx, (void*)(curRobot));
   } else {
     curRobot->rbNewTrack = NULL;
@@ -608,7 +608,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
         GfParmWriteFile (0, handle, "Car names");
         GfParmReleaseHandle (handle);
       }
-      if (ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU)
+      if (!(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
       {
         GfPoolMove(&elt->_newTrackMemPool, &oldPool);
         curRobot->rbNewTrack(elt->_driverIndex, ReInfo->track, carhdle, &handle, ReInfo->s);
@@ -818,7 +818,7 @@ ReRaceCleanDrivers(void)
   {
     robot = ReInfo->s->cars[i]->robot;
     GfPoolMove( &ReInfo->s->cars[i]->_shutdownMemPool, &oldPool );
-    if (robot->rbShutdown && ReInfo->_displayMode != RM_DISP_MODE_SIMU_SIMU) 
+    if (robot->rbShutdown && !(ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU))
     {
       robot->rbShutdown(robot->index);
     }

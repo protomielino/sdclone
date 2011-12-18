@@ -311,7 +311,7 @@ reCarsApplyRaceRules(tCarElt *car)
 }
 
 void
-				  ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
+ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 {
 	char msg[128];
 	int i;
@@ -364,12 +364,11 @@ void
 				}
 			}
 			
-			// If the driver asks for a pit, check if the car is in the right conditions
-			// (position, speed, ...) and start up pitting process if so.
+		// If the driver asks for a pit, check if the car is in the right conditions
+		// (position, speed, ...) and start up pitting process if so.
 		} else if ((car->ctrl.raceCmd & RM_CMD_PIT_ASKED) &&
 				   car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
-				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage))
-		{
+				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage)) {
 			sprintf(car->ctrl.msg[2], "Pit request");
 
 			tdble lgFromStart = car->_trkPos.seg->lgfromstart;
@@ -491,7 +490,7 @@ void
 			/* Must pass at least one sector before the finish */
 			if (RtGetDistFromStart(car) > ReInfo->track->sectors[car->_currentSector])
 			{
-				/* It is in a new sector. Update split time */
+				/* It is in a new sector : update split time */
 				car->_curSplitTime[car->_currentSector] = car->_curLapTime;
 				++car->_currentSector;
 				continue;
@@ -507,7 +506,13 @@ void
 			&& (car->_trkPos.seg->raceInfo & TR_START)) {
 			
 			if (info->lapFlag == 0) {
-				if ((car->_state & RM_CAR_STATE_FINISH) == 0) {
+
+				// If the car has not yet finished the race :
+				if (!(car->_state & RM_CAR_STATE_FINISH)) {
+
+					// 1 more lap completed
+					// (Note: lap with index 0 finishes when the car crosses the start line the 1st time,
+					//        and is thus considered a real lap, whereas it is not).
 					car->_laps++;
 
 					if (NetGetNetwork())
@@ -535,7 +540,7 @@ void
 							memcpy(car->_bestSplitTime, car->_curSplitTime, sizeof(double)*(ReInfo->track->numberOfSectors - 1) );
 							if (s->_raceType != RM_TYPE_RACE && s->_ncars > 1)
 							{
-								/* Best lap time is made better. Update times behind leader */
+								/* Best lap time is made better : update times behind leader */
 								bestLapChanged = true;
 								car->_timeBehindLeader = car->_bestLapTime - s->cars[0]->_bestLapTime;
 								if (car->_pos > 1)
@@ -544,7 +549,7 @@ void
 								}
 								else
 								{
-									/* New best time for the leader: update the differences */
+									/* New best time for the leader : update the differences */
 									for (xx = 1; xx < s->_ncars; ++xx)
 									{
 										if (s->cars[xx]->_bestLapTime > 0.0f)
@@ -643,13 +648,21 @@ void
 							}
 						}
 					}
+					
+					// Notify the UI when a lap is completed (by the leader)
+					// and race results have been updated.
+					if (car->_pos == 1)
+						ReUI().onLapCompleted(car->_laps - 1);
+
 				} else {
-					/* prevent infinite looping of cars around track, allow one lap after finish for the first car */
+					// Prevent infinite looping of cars around track,
+					// allowing one lap after finish for the first car, but no more
 					for (i = 0; i < s->_ncars; i++) {
 						s->cars[i]->_state |= RM_CAR_STATE_FINISH;
 					}
 					return;
 				}
+
 			} else {
 				info->lapFlag--;
 			}
@@ -659,7 +672,8 @@ void
 			/* going backward through the start line */
 			info->lapFlag++;
 		}
-	}
+	} // Start Line Crossing
+
 
 	// Apply race rules (penalties if enabled).
 	reCarsApplyRaceRules(car);
@@ -678,16 +692,9 @@ ReCarsSortCars(void)
     int		i,j;
     int		xx;
     tCarElt	*car;
-    int		allfinish;
     tSituation	*s = ReInfo->s;
     char msg[128];
-
-    if ((s->cars[0]->_state & RM_CAR_STATE_FINISH) == 0) {
-	allfinish = 0;
-    } else {
-	allfinish = 1;
-    }
-    
+	
     // Check cars are driving the right way around track
     for (i = 0; i < s->_ncars; i++) {
 	if (s->cars[i]->_prevFromStartLine < s->cars[i]->_distFromStartLine) {
@@ -707,10 +714,11 @@ ReCarsSortCars(void)
 	}
     }
 
+	int allfinish = (s->cars[0]->_state & RM_CAR_STATE_FINISH) ? 1 : 0;
     for (i = 1; i < s->_ncars; i++) {
 	j = i;
 	while (j > 0) {
-	    if ((s->cars[j]->_state & RM_CAR_STATE_FINISH) == 0) {
+	    if (!(s->cars[j]->_state & RM_CAR_STATE_FINISH)) {
 		allfinish = 0;
 		if ((ReInfo->s->_raceType == RM_TYPE_RACE && s->cars[j]->_distRaced > s->cars[j-1]->_distRaced) ||
 		    (ReInfo->s->_raceType != RM_TYPE_RACE && s->cars[j]->_bestLapTime > 0.0f && ( s->cars[j]->_bestLapTime < s->cars[j-1]->_bestLapTime ||

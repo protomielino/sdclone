@@ -128,12 +128,11 @@ typedef struct
     tdble	fuel;
 } tReCarInfo;
 
-typedef enum
-{
-	RM_DISP_MODE_NONE,
-	RM_DISP_MODE_NORMAL,
-	RM_DISP_MODE_SIMU_SIMU
-} RmEDisplayMode;
+#define	RM_DISP_MODE_NONE    0x00
+#define	RM_DISP_MODE_NORMAL    0x01
+#define	RM_DISP_MODE_SIMU_SIMU 0x02
+#define	RM_DISP_MODE_NUMBER 4 // Possible combinations of the non-undefined modes
+#define	RM_DISP_MODE_UNDEFINED 0x04
 
 /** Race Engine Information.
    @image	html raceenginestate.gif
@@ -150,7 +149,7 @@ typedef struct
     double		lastRobTime; // Last time the robots were rbDrive'd.
     double		timeMult;
     int			running;
-    RmEDisplayMode			displayMode;
+    unsigned	displayMode; // Bit field (see RM_DISP_MODE_*)
     tCarElt		*pitRequester; // The car asking for pit (stopped in the slot).
 	char		*message;
     double		messageEnd;

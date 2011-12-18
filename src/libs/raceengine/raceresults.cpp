@@ -220,7 +220,7 @@ static void ReCalculateClassPoints(char const *race)
 	do {
 		snprintf( path2, sizeof(path2), "%s/%s", race, RM_SECT_CLASSPOINTS );
 		if (GfParmListSeekFirst( ReInfo->params, path2 ) != 0) {
-			GfLogDebug( "First not found (path2 = %s)\n", path2 );
+			GfLogDebug( "ReCalculateClassPoints: First not found in %s)\n", path2 );
 			continue;
 		}
 		do {
@@ -233,8 +233,8 @@ static void ReCalculateClassPoints(char const *race)
 			points = GfParmGetNum (ReInfo->results, path, RE_ATTR_POINTS, NULL, 0);
 			GfParmSetVariable (ReInfo->params, buf, "pos", (tdble)rank);
 			GfParmSetVariable (ReInfo->params, buf, "cars", (tdble)count);
-			GfLogDebug( "pos = %d; count = %d\n", rank, count);
-			GfLogDebug( "GfParmGetNum (..., %s, %s, NULL, 0)\n", buf, RM_ATTR_POINTS );
+			//GfLogDebug( "ReCalculateClassPoints: pos = %d; count = %d\n", rank, count);
+			//GfLogDebug( "ReCalculateClassPoints: GfParmGetNum (..., %s, %s, NULL, 0)\n", buf, RM_ATTR_POINTS );
 			points += ( GfParmGetNum (ReInfo->params, buf, RM_ATTR_POINTS, NULL, 0) /
 			            GfParmGetNum (ReInfo->params, RM_SECT_TRACKS, RM_ATTR_NUMBER, NULL, 1) );
 			GfParmRemoveVariable (ReInfo->params, buf, "pos");
@@ -439,6 +439,34 @@ ReStoreRaceResults(const char *race)
 				break;
 			}
 	}
+}
+
+void
+ReInitCurRes()
+{
+	if (ReInfo->_displayMode != RM_DISP_MODE_NORMAL)
+	{
+		if (ReInfo->s->_raceType == RM_TYPE_QUALIF)
+		{
+			ReUpdateQualifCurRes(ReInfo->s->cars[0]);
+		}
+		else if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && ReInfo->s->_ncars > 1)
+		{
+			ReUpdatePracticeCurRes(ReInfo->s->cars[0]);
+		}
+		else
+		{
+			static const char* pszTableHeader = "Rank    Time     Driver               Car";
+			char pszTitle[128];
+			snprintf(pszTitle, sizeof(pszTitle), "%s (%s)",
+					 ReInfo->s->cars[0]->_name, ReInfo->s->cars[0]->_carName);
+			char pszSubTitle[128];
+			snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s", 
+					 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+			ReUI().setResultsTableTitles(pszTitle, pszSubTitle);
+			ReUI().setResultsTableHeader(pszTableHeader);
+		}
+	}//if displayMode != normal
 }
 
 void
@@ -678,14 +706,16 @@ ReSavePracticeLap(tCarElt *car)
 int
 ReShowResults(void)
 {
-    void* params = ReInfo->params;
     ReCalculateClassPoints (ReInfo->_reRaceName);
 
-    if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_DISPRES, RM_VAL_YES), RM_VAL_YES)
+	int mode = RM_NEXT_STEP;
+    if (!strcmp(GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_DISPRES, RM_VAL_YES), RM_VAL_YES)
 		|| ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
-		ReUI().showResults();
-	else 
-    	return RM_SYNC | RM_NEXT_STEP;
+		mode |= ReUI().showResults() ? RM_SYNC : RM_ASYNC;
+	else
+		mode |= RM_SYNC;
 
-    return RM_ASYNC | RM_NEXT_STEP;
+	GfLogDebug("ReShowResults: %s + NextStep\n", (mode & RM_SYNC) ? "Sync" : "Async");
+
+	return mode;
 }

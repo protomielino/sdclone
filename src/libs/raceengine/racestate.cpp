@@ -36,15 +36,14 @@
 #include "racestate.h"
 
 
-/* State Automaton Init */
+// State Automaton Init
 void
 ReStateInit(void *prevMenu)
 {
 }
 
 
-/* State Automaton Management         */
-/* Called when a race menu is entered */
+// State Automaton Management
 void
 ReStateManage(void)
 {
@@ -54,7 +53,7 @@ ReStateManage(void)
 		switch (ReInfo->_reState) {
 			case RE_STATE_CONFIG:
 				GfLogInfo("%s now in CONFIG state\n", ReInfo->_reName);
-				/* Race configuration */
+				// Race configuration
 				mode = ReConfigure();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_EVENT_INIT;
@@ -63,7 +62,7 @@ ReStateManage(void)
 
 			case RE_STATE_EVENT_INIT:
 				GfLogInfo("%s now in EVENT_INIT state\n", ReInfo->_reName);
-				/* Load the event description (track and drivers list) */
+				// Load the event description (track and drivers list)
 				mode = ReRaceEventInit();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_PRE_RACE;
@@ -94,26 +93,26 @@ ReStateManage(void)
 			case RE_STATE_NETWORK_WAIT:
 				mode = ReNetworkWaitReady();
 				if (mode & RM_NEXT_STEP) {
-					/* Not an online race, or else all online players ready */
+					// Not an online race, or else all online players ready
 					ReInfo->_reState = RE_STATE_RACE;
-					GfLogInfo("%s now in RACE_START state\n", ReInfo->_reName);
+					GfLogInfo("%s now in RACE state\n", ReInfo->_reName);
 				}
 				break;
 
 			case RE_STATE_RACE:
 				mode = ReUpdate();
 				if (ReInfo->s->_raceState == RM_RACE_ENDED) {
-					/* Race is finished */
+					// Race is finished
 					ReInfo->_reState = RE_STATE_RACE_END;
 				} else if (mode & RM_END_RACE) {
-					/* Race was interrupted (paused) by the player */
+					// Race was interrupted (paused) by the player
 					ReInfo->_reState = RE_STATE_RACE_STOP;
 				}
 				break;
 
 			case RE_STATE_RACE_STOP:
 				GfLogInfo("%s now in RACE_STOP state\n", ReInfo->_reName);
-				/* Race was interrupted (paused) by the player */
+				// Race was interrupted (paused) by the player
 				mode = ReRaceStop();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_RACE_END;
@@ -142,7 +141,6 @@ ReStateManage(void)
 
 			case RE_STATE_EVENT_SHUTDOWN:
 				GfLogInfo("%s now in EVENT_SHUTDOWN state\n", ReInfo->_reName);
-
 				mode = ReRaceEventShutdown();
 				if (mode & RM_NEXT_STEP) {
 					ReInfo->_reState = RE_STATE_SHUTDOWN;
@@ -153,20 +151,19 @@ ReStateManage(void)
 
 			case RE_STATE_SHUTDOWN:
 				GfLogInfo("%s now in SHUTDOWN state\n", ReInfo->_reName);
-				/* Back to the race manager menu */
+				// Back to the race manager menu
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;
 				break;
 
 			case RE_STATE_ERROR:
 				// If this state is set, there was a serious error:
-				// I.e. no driver in the race (no one selected OR parameters out of range!
-				// Instead of exit(0) go back to the config mode to allow to read the 
-				// error messages in the console window!
+				// i.e. no driver in the race (no one selected OR parameters out of range)
+				// Error messages are normally dumped in the game trace stream !
 				// TODO: Define another screen showing the error messages instead of
 				// only having it in the console window!
 				GfLogInfo("%s now in ERROR state\n", ReInfo->_reName);
-				/* Back to race manager menu */
+				// Back to race manager menu
 				ReInfo->_reState = RE_STATE_CONFIG;
 				mode = RM_SYNC;
 				break;
@@ -182,10 +179,14 @@ ReStateManage(void)
 			ReInfo->_reState = RE_STATE_ERROR;
 			mode = RM_SYNC;
 		}
-	} while ((mode & RM_SYNC) == RM_SYNC);
+
+		//GfLogDebug("ReStateManage : New state 0x%X, %sing.\n",
+		//		   ReInfo->_reState, (mode & RM_SYNC) ? "loop" : "return");
+		
+	} while (mode & RM_SYNC);
 }
 
-/* Change and Execute a New State  */
+// Change and Execute a New State
 void
 ReStateApply(void *pvState)
 {

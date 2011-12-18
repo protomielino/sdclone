@@ -211,9 +211,17 @@ void LegacyMenu::onRaceEventInitializing()
 	activateLoadingScreen();
 }
 
-void LegacyMenu::onRaceEventStarting()
+bool LegacyMenu::onRaceEventStarting()
 {
-	::RmNextEventMenu();
+	tRmInfo* pReInfo = _piRaceEngine->inData();
+	if (GfParmGetEltNb(pReInfo->params, RM_SECT_TRACKS) > 1)
+	{
+		::RmNextEventMenu();
+
+		return false; // Tell the race engine state automaton to stop looping (enter the menu).
+	}
+		
+	return true; // Tell the race engine state automaton to go on looping.
 }
 
 void LegacyMenu::onRaceInitializing()
@@ -314,6 +322,14 @@ void LegacyMenu::onRaceStarted()
 	GfuiScreenActivate(_hscrGame);
 }
 
+void LegacyMenu::onLapCompleted(int nLapIndex)
+{
+	if (nLapIndex <= 0)
+		return;
+
+	GfLogInfo("Lap #%d completed.\n", nLapIndex);
+}
+
 void LegacyMenu::onRaceInterrupted()
 {
 	::RmStopRaceMenu();
@@ -379,7 +395,7 @@ void LegacyMenu::eraseResultsTable()
 	::RmResEraseScreen();
 }
 
-void LegacyMenu::showResults()
+bool LegacyMenu::showResults()
 {
 	// Create the "Race Engine update state" hook if not already done.
 	if (!_hscrReUpdateStateHook)
@@ -390,9 +406,11 @@ void LegacyMenu::showResults()
 
 	// Display the results menu (will activate the game screen on exit).
 	::RmShowResults(_hscrGame, _piRaceEngine->inData());
+
+	return false; // Tell the race engine state automaton to stop looping (enter the menu).
 }
 
-void LegacyMenu::showStandings()
+bool LegacyMenu::showStandings()
 {
 	// Create the "Race Engine update state" hook if not already done.
 	if (!_hscrReUpdateStateHook)
@@ -403,6 +421,9 @@ void LegacyMenu::showStandings()
 
 	// Display the standings menu (will activate the game screen on exit).
 	::RmShowStandings(_hscrGame, _piRaceEngine->inData(), 0);
+
+	// Tell the race engine state automaton to stop looping (enter the standings menu).
+	return false;
 }
 
 void LegacyMenu::activateGameScreen()

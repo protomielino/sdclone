@@ -159,7 +159,7 @@ rmLoadRaceFromResultsFile(const char *filename)
 		GfParmReadFile(ossResFileName.str().c_str(), GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
 	if (hparmResults)
 	{
-		LmRaceEngine().race()->load(pRaceMan, hparmResults);
+		LmRaceEngine().race()->load(pRaceMan, /*bKeepHumans=*/true, hparmResults);
 
 		// Restore the race from the result file.
 		LmRaceEngine().restoreRace(hparmResults);
@@ -183,7 +183,7 @@ rmOnActivate(void * /* dummy */)
 		GfRace* pRace = LmRaceEngine().race();
 		GfRaceManager* pRaceMan = pRace->getManager();
 		void* hparmResults = pRace->getResultsDescriptorHandle();
-		pRace->load(pRaceMan, hparmResults);
+		pRace->load(pRaceMan, /*bKeepHumans=*/true, hparmResults);
 
 		// End of "back from Player Config menu" in any case.
 		PlayerConfigOpen = false;
@@ -247,8 +247,8 @@ rmOnRaceDataChanged()
 		VecCompetitorsInfo.push_back(ossText.str());
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId,
 									VecCompetitorsInfo.back().c_str(), nCompIndex+1, (void*)pComp);
-		GfLogDebug("Added competitor %s (%s#%d)\n", ossText.str().c_str(),
-				   pComp->getModuleName().c_str(),  pComp->getInterfaceIndex());
+		//GfLogDebug("Added competitor %s (%s#%d)\n", ossText.str().c_str(),
+		//		   pComp->getModuleName().c_str(),  pComp->getInterfaceIndex());
 	}
 
 	// Show the driver at the pole position.
@@ -357,7 +357,7 @@ RmRacemanMenu()
 		
 		// Force any needed fix on the specified track for the race (may not exist)
 		const GfTrack* pTrack = LmRaceEngine().race()->getTrack();
-		GfLogDebug("Using track %s for Online Race", pTrack->getName().c_str());
+		GfLogTrace("Using track %s for Online Race", pTrack->getName().c_str());
 
 		// Synchronize reInfo->params with LmRaceEngine().race() state,
 		// in case the track was fixed.

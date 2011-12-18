@@ -67,13 +67,14 @@ public:
 	// Race state change notifications.
 	virtual void onRaceConfiguring();
 	virtual void onRaceEventInitializing();
-	virtual void onRaceEventStarting();
+	virtual bool onRaceEventStarting();
 	virtual void onRaceInitializing();
 	virtual void onRaceStarting();
 	virtual void onRaceLoadingDrivers();
 	virtual void onRaceDriversLoaded();
 	virtual void onRaceSimulationReady();
 	virtual void onRaceStarted();
+	virtual void onLapCompleted(int nLapIndex);
 	virtual void onRaceInterrupted();
 	virtual void onRaceFinished();
 	virtual void onRaceEventFinished();
@@ -91,8 +92,8 @@ public:
 	virtual int  getResultsTableRowCount() const;
 
 	// Results and standings tables.
-	virtual void showResults();
-	virtual void showStandings();
+	virtual bool showResults();
+	virtual bool showStandings();
 
 	// Setter for the race engine.
 	virtual void setRaceEngine(IRaceEngine& raceEngine);

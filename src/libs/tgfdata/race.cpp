@@ -34,8 +34,8 @@
 
 
 // Constants.
-static const char* DisplayModeNames[GfRace::nDisplayModeNumber] =
-	{ RM_VAL_VISIBLE, RM_VAL_INVISIBLE};
+static const char* DisplayModeNames[RM_DISP_MODE_NUMBER] =
+	{ RM_VAL_INVISIBLE, RM_VAL_VISIBLE, RM_VAL_SIMUSIMU, RM_VAL_SIMUSIMU };
 static const char* TimeOfDaySpecNames[GfRace::nTimeSpecNumber] = RM_VALS_TIME;
 static const char* CloudsSpecNames[GfRace::nCloudsSpecNumber] = RM_VALS_CLOUDS;
 static const char* RainSpecNames[GfRace::nRainSpecNumber] = RM_VALS_RAIN;
@@ -127,10 +127,10 @@ void GfRace::clear()
 	_pPrivate->hparmResults = 0;
 }
 
-void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
+void GfRace::load(GfRaceManager* pRaceMan, bool bKeepHumans, void* hparmResults)
 {
-//  	GfLogDebug("GfRace::load(mgr='%s', hRes=%s)\n", pRaceMan->getName().c_str(),
-//  			   hparmResults ? GfParmGetFileName(hparmResults) : "none");
+//  	GfLogDebug("GfRace::load(mgr='%s', humans=%d, hRes=%s)\n", pRaceMan->getName().c_str(),
+//  			   (int)bKeepHumans, hparmResults ? GfParmGetFileName(hparmResults) : "none");
 
 	// Clear the race.
 	clear();
@@ -261,13 +261,20 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 
 		const std::string strDispMode =
 			GfParmGetStr(hparmRaceMan, pszSessionName, RM_ATTR_DISPMODE, "");
-		pSessionParams->eDisplayMode = nDisplayModeNumber;
-		for (int i = 0; i < nDisplayModeNumber; i++)
-			if (strDispMode == DisplayModeNames[i])
-			{
-				pSessionParams->eDisplayMode = (EDisplayMode)i;
-				break;
-			}
+		if (strDispMode.empty())
+			pSessionParams->bfDisplayMode = RM_DISP_MODE_UNDEFINED;
+		else if (strDispMode == RM_VAL_INVISIBLE)
+			pSessionParams->bfDisplayMode = RM_DISP_MODE_NONE;
+		else if (strDispMode == RM_VAL_VISIBLE)
+			pSessionParams->bfDisplayMode = RM_DISP_MODE_NORMAL;
+		else if (strDispMode == RM_VAL_SIMUSIMU)
+			pSessionParams->bfDisplayMode = RM_DISP_MODE_SIMU_SIMU;
+		else
+		{
+			GfLogError("Unsupported display mode '%s' loaded from race file ; "
+					   "assuming 'normal' mode\n", strDispMode.c_str());
+			pSessionParams->bfDisplayMode = RM_DISP_MODE_NORMAL;
+		}
 
 		const std::string strTimeOfDaySpec =
 			GfParmGetStr(hparmRaceMan, pszSessionName, RM_ATTR_TIME_OF_DAY, "");
@@ -300,10 +307,10 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 			}
 
  		// GfLogDebug("GfRace::load(...) : %s : opts=%02x, "
- 		// 		   "laps=%d, dist=%d, dur=%d, disp=%d, tod=%d, clds=%d, rain=%d\n",
+ 		// 		   "laps=%d, dist=%d, dur=%d, disp=0x%x, tod=%d, clds=%d, rain=%d\n",
  		// 		   pszSessionName, pSessionParams->bfOptions,
  		// 		   pSessionParams->nLaps, pSessionParams->nDistance, pSessionParams->nDuration,
- 		// 		   pSessionParams->eDisplayMode, pSessionParams->eTimeOfDaySpec,
+ 		// 		   pSessionParams->bfDisplayMode, pSessionParams->eTimeOfDaySpec,
  		// 		   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
 	}
 
@@ -443,6 +450,19 @@ void GfRace::load(GfRaceManager* pRaceMan, void* hparmResults)
 			break;
 		}
 
+		// We've got it but can't keep it for the race,
+		// because we are requested to exclude humans from the race.
+		if (!bKeepHumans && pCompetitor->isHuman())
+		{
+			GfLogWarning("Ignoring '%s' (%s' #%d) : humans excluded from this race\n",
+						 pCompetitor->getName().c_str(), pszModName, nItfIndex);
+			
+			// We are no more consistent with the race params (in memory).
+			_pPrivate->bIsDirty = true;
+			
+			break;
+		}
+		
 		// We've got it and can keep it for the race => make it a competitor
 		const char* pszSkinName =
 			GfParmGetStr(hparmStartGrid, ossDrvSecPath.str().c_str(), RM_ATTR_SKINNAME, "");
@@ -546,9 +566,9 @@ void GfRace::store()
 		else
 			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_SESSIONTIME);
 		
-		if (pSessionParams->eDisplayMode != nDisplayModeNumber)
+		if (pSessionParams->bfDisplayMode != RM_DISP_MODE_UNDEFINED)
 			GfParmSetStr(hparmRaceMan, pszSessionName, RM_ATTR_DISPMODE,
-						 DisplayModeNames[pSessionParams->eDisplayMode]);
+						 DisplayModeNames[pSessionParams->bfDisplayMode]);
 		else
 			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_DISPMODE);
 		
@@ -571,10 +591,10 @@ void GfRace::store()
 			GfParmRemove(hparmRaceMan, pszSessionName, RM_ATTR_RAIN);
 		
  		// GfLogDebug("GfRace::store(...) : %s params : "
- 		// 		   "laps=%d, dist=%d, dur=%d, disp=%d, tod=%d, clds=%d, rain=%d\n",
+ 		// 		   "laps=%d, dist=%d, dur=%d, disp=0x%x, tod=%d, clds=%d, rain=%d\n",
  		// 		   pszSessionName, pSessionParams->nLaps,
  		// 		   pSessionParams->nDistance, pSessionParams->nDuration,
- 		// 		   pSessionParams->eDisplayMode, pSessionParams->eTimeOfDaySpec,
+ 		// 		   pSessionParams->bfDisplayMode, pSessionParams->eTimeOfDaySpec,
  		// 		   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
 	}
 	
@@ -656,6 +676,11 @@ bool GfRace::isDirty() const
 	return _pPrivate->bIsDirty || (_pPrivate->pRaceMan && _pPrivate->pRaceMan->isDirty());
 }
 
+void GfRace::setDirty(bool bIsDirty)
+{
+	_pPrivate->bIsDirty = bIsDirty;
+}
+
 GfRaceManager* GfRace::getManager() const
 {
 	return _pPrivate->pRaceMan;
@@ -722,6 +747,23 @@ const std::vector<std::string>& GfRace::getAcceptedCarCategoryIds() const
 		return _pPrivate->vecstrEmpty;
 
 	return _pPrivate->pRaceMan->getAcceptedCarCategoryIds();
+}
+
+void GfRace::forceResultsOnly()
+{
+	std::map<std::string, Parameters*>::iterator itSesParams;
+	for (itSesParams = _pPrivate->mapParametersBySession.begin();
+		 itSesParams != _pPrivate->mapParametersBySession.end(); itSesParams++)
+	{
+		GfRace::Parameters* pSesParams = itSesParams->second;
+		if (pSesParams->bfDisplayMode != RM_DISP_MODE_UNDEFINED)
+			pSesParams->bfDisplayMode &= ~RM_DISP_MODE_NORMAL;
+		else
+			pSesParams->bfDisplayMode = RM_DISP_MODE_NONE;
+	}
+	
+	// Now we are no more consistent with the race params (in memory).
+	_pPrivate->bIsDirty = true;
 }
 
 const std::vector<GfDriver*>& GfRace::getCompetitors() const

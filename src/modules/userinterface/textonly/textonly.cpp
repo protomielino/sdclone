@@ -17,8 +17,10 @@
  ***************************************************************************/
  
 #include <string>
+#include <vector>
 #include <sstream>
 
+#include <raceman.h>
 #include <iraceengine.h>
 
 #include <portability.h>
@@ -31,6 +33,17 @@
 
 // The TextOnlyUI singleton.
 TextOnlyUI* TextOnlyUI::_pSelf = 0;
+
+// The results table class.
+class TextOnlyUI::ResultsTable
+{
+ public:
+	std::string strTitle;
+	std::string strSubTitle;
+	std::string strHeader;
+	std::vector<std::string> vecLines;
+};
+
 
 int openGfModule(const char* pszShLibName, void* hShLibHandle)
 {
@@ -66,15 +79,13 @@ TextOnlyUI& TextOnlyUI::self()
 }
 
 TextOnlyUI::TextOnlyUI(const std::string& strShLibName, void* hShLibHandle)
-: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0)
+: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0), _pResTable(new ResultsTable)
 {
 }
 
 // Implementation of IUserInterface ****************************************
 bool TextOnlyUI::activate()
 {
-	// TODO: Make the LegacyMenu version work, and then adapt it here !!!!!!!!!!!
-
 	// Get the race to start.
 	std::string strRaceToStart;
 	if (!GfApp().hasOption("startrace", strRaceToStart) || strRaceToStart.empty())
@@ -88,10 +99,14 @@ bool TextOnlyUI::activate()
 		raceEngine().reset();
 
 		// Give the selected race manager to the race engine.
-		raceEngine().selectRaceman(pSelRaceMan);
+		raceEngine().selectRaceman(pSelRaceMan, /*bKeepHumans=*/false);
 		
-		// Configure the new race.
+		// Configure the new race (no user interaction needed).
 		raceEngine().configureRace(/* bInteractive */ false);
+
+		// Force "result-only" mode for all the sessions of the race with initial "normal" mode
+		// (don't change the ones with "simu simu" mode).
+		raceEngine().race()->forceResultsOnly();
 
 		// Start the race engine state automaton
 		raceEngine().startNewRace();
@@ -117,155 +132,170 @@ void TextOnlyUI::shutdown()
     raceEngine().cleanup();
 }
 
-void TextOnlyUI::addLoadingMessage(const char* pszText)
-{
-}
-
 void TextOnlyUI::onRaceConfiguring()
 {
-	// Force "result-only" mode for all the sessions of the race.
-	const std::vector<std::string> vecSessionNames =
-		raceEngine().race()->getManager()->getSessionNames();
-	std::vector<std::string>::const_iterator itSesName;
-	for (itSesName = vecSessionNames.begin(); itSesName != vecSessionNames.end(); itSesName++)
-	{
-		GfRace::Parameters* pSessionParams =
-			raceEngine().race()->getParameters(*itSesName);
-		//if (pRaceSessionParams->eDisplayMode != GfRace::nDisplayModeNumber)
-		pSessionParams->eDisplayMode = GfRace::eDisplayResultsOnly;
-	}
+	//GfLogDebug("TextOnlyUI::onRaceConfiguring()\n");
+
+	// When all the race events are over, the race engine state is set to CONFIG.
+	quit();
 }
 
 void TextOnlyUI::onRaceEventInitializing()
 {
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceEventInitializing()\n");
 }
 
-void TextOnlyUI::onRaceEventStarting()
+bool TextOnlyUI::onRaceEventStarting()
 {
+	GfLogDebug("TextOnlyUI::onRaceEventStarting()\n");
+
+	// Tell the race engine state automaton to go on looping.
+	return true;
 }
 
 void TextOnlyUI::onRaceInitializing()
 {
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceInitializing()\n");
 }
 
 void TextOnlyUI::onRaceStarting()
 {
-	// Switch to Start Race menu only if required.
-	// tRmInfo* pReInfo = _piRaceEngine->inData();
-	// if (!strcmp(GfParmGetStr(pReInfo->params, pReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES))
-	// {
-	// 	//GfLogDebug("TextOnlyUI::onRaceStarting() => RmLoadingScreenShutdown\n");
-	// 	::RmLoadingScreenShutdown();
-	
-	// 	::RmDisplayStartRace();
-	// }
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceStarting()\n");
 }
 
 void TextOnlyUI::onRaceLoadingDrivers()
 {
-	// // Create the game screen according to the actual display mode.
-	// if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
-	// 	_hscrGame = ::RmScreenInit();
-	// else
-	// 	_hscrGame = ::RmResScreenInit();
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceLoadingDrivers()\n");
 }
 
 void TextOnlyUI::onRaceDriversLoaded()
 {
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceDriversLoaded()\n");
 }
 
 void TextOnlyUI::onRaceSimulationReady()
 {
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceSimulationReady()\n");
+}
+
+void TextOnlyUI::updateRaceEngine()
+{
+    ToRaceEngine().updateState();
 }
 
 void TextOnlyUI::onRaceStarted()
 {
-	// Simply activate the game screen.
-	// GfuiScreenActivate(_hscrGame);
+	GfLogDebug("TextOnlyUI::onRaceStarted()\n");
+
+	// Configure the event loop : compute = update the race engine.
+	GfApp().eventLoop().setRecomputeCB(TextOnlyUI::updateRaceEngine);
+}
+
+void TextOnlyUI::onLapCompleted(int nLapIndex)
+{
+	if (nLapIndex <= 0)
+		return;
+
+	GfLogInfo("Lap #%d completed.\n", nLapIndex);
+	
+    // Dump the results table.
+	GfLogInfo("%s - %s\n", _pResTable->strTitle.c_str(), _pResTable->strSubTitle.c_str());
+	GfLogInfo("%s\n", _pResTable->strHeader.c_str());
+	
+	std::vector<std::string>::const_iterator itLine;
+	for (itLine = _pResTable->vecLines.begin(); itLine != _pResTable->vecLines.end(); itLine++)
+		GfLogInfo("%s\n", itLine->c_str());
 }
 
 void TextOnlyUI::onRaceInterrupted()
 {
-	// ::RmStopRaceScreen();
+	GfLogWarning("TextOnlyUI::onRaceInterrupted : Should never be called\n");
 }
 
 void TextOnlyUI::onRaceFinished()
 {
-	// if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL)
-	// {
-	// 	unloadCarsGraphics();
-	// 	shutdownGraphicsView();
-	// 	unloadTrackGraphics();
-	// }
-	// else
-	// {
-	// 	RmResScreenShutdown();
-	// }
+	GfLogDebug("TextOnlyUI::onRaceFinished()\n");
+	
+	// Configure the event loop : compute = nothing.
+	GfApp().eventLoop().setRecomputeCB(TextOnlyUI::updateRaceEngine);
 }
 
 void TextOnlyUI::onRaceEventFinished()
 {
+	// Actually nothing to do.
+	GfLogDebug("TextOnlyUI::onRaceEventFinished()\n");
+}
+
+void TextOnlyUI::addLoadingMessage(const char* pszText)
+{
+    GfLogTrace("%s\n", pszText);
 }
 
 void TextOnlyUI::setResultsTableTitles(const char* pszTitle, const char* pszSubTitle)
 {
-	// ::RmResScreenSetTitles(pszTitle, pszSubTitle);
+	_pResTable->strTitle = pszTitle;
+	_pResTable->strSubTitle = pszSubTitle;
+
+	if (_pResTable->vecLines.size() < (unsigned)getResultsTableRowCount())
+		_pResTable->vecLines.resize(getResultsTableRowCount());
 }
 
 void TextOnlyUI::setResultsTableHeader(const char* pszHeader)
 {
-	// ::RmResScreenSetHeader(pszHeader);
+	_pResTable->strHeader = pszHeader;
 }
 
 void TextOnlyUI::addResultsTableRow(const char* pszText)
 {
-	// ::RmResScreenAddText(pszText);
+	_pResTable->vecLines.push_back(pszText);
 }
 
 void TextOnlyUI::setResultsTableRow(int nIndex, const char* pszText, bool bHighlight)
 {
-	// ::RmResScreenSetText(pszText, nIndex, bHighlight ? 1 : 0);
+	_pResTable->vecLines[nIndex] = pszText;
+	if (bHighlight)
+		_pResTable->vecLines[nIndex] += " *";
 }
 
 void TextOnlyUI::removeResultsTableRow(int nIndex)
 {
-	// ::RmResScreenRemoveText(nIndex);
+	_pResTable->vecLines.erase(_pResTable->vecLines.begin() + nIndex);
 }
 
 int TextOnlyUI::getResultsTableRowCount() const
 {
-	return 0; //::RmResGetRows();
+	// Unlike the menu GUI, we are not limited in any way here
+	// (but of course the number of competitors).
+	return (int)raceEngine().race()->getCompetitorsCount();
 }
 
 void TextOnlyUI::eraseResultsTable()
 {
-	// ::RmResEraseScreen();
+	_pResTable->vecLines.clear();
 }
 
-void TextOnlyUI::showResults()
+bool TextOnlyUI::showResults()
 {
-	// // Create the "Race Engine update state" hook if not already done.
-	// if (!_hscrReUpdateStateHook)
-	// 	_hscrReUpdateStateHook = ::RmInitReUpdateStateHook();
-
-	// // This is now the "game" screen.
-	// _hscrGame = _hscrReUpdateStateHook;
-
-	// // Display the results menu (will activate the game screen on exit).
-	// ::RmShowResults(_hscrGame, _piRaceEngine->inData());
+	// TODO: Dump results table in the console, as done in RmShowResults ?
+	GfLogDebug("TextOnlyUI::showResults()\n");
+	
+	// Tell the race engine state automaton to go on looping.
+	return true;
 }
 
-void TextOnlyUI::showStandings()
+bool TextOnlyUI::showStandings()
 {
-	// // Create the "Race Engine update state" hook if not already done.
-	// if (!_hscrReUpdateStateHook)
-	// 	_hscrReUpdateStateHook = ::RmInitReUpdateStateHook();
-
-	// // This is now the "game" screen.
-	// _hscrGame = _hscrReUpdateStateHook;
-
-	// // Display the standings menu (will activate the game screen on exit).
-	// ::RmShowStandings(_hscrGame, _piRaceEngine->inData(), 0);
+	// TODO: Dump results table in the console, as done in RmShowStandings ?
+	GfLogDebug("TextOnlyUI::showStandings()\n");
+	
+	// Tell the race engine state automaton to go on looping.
+	return true;
 }
 
 //=========================================================================
@@ -274,8 +304,13 @@ void TextOnlyUI::setRaceEngine(IRaceEngine& raceEngine)
 	_piRaceEngine = &raceEngine;
 }
 
-// Accessor to the race engine.
+// Accessors to the race engine.
 IRaceEngine& TextOnlyUI::raceEngine()
+{
+	return *_piRaceEngine;
+}
+
+const IRaceEngine& TextOnlyUI::raceEngine() const
 {
 	return *_piRaceEngine;
 }

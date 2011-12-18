@@ -28,13 +28,20 @@
 
 
 extern void ReInitResults(void);
+
 extern void ReStoreRaceResults(const char *race);
+
 extern int  ReShowResults(void);
+
 extern void ReSavePracticeLap(tCarElt *car);
+
+extern void ReInitCurRes(void);
 extern void ReUpdatePracticeCurRes(tCarElt *car, bool bForceNew = false);
 extern void ReUpdateQualifCurRes(tCarElt *car);
 extern void ReUpdateRaceCurRes();
+
 extern void ReEventInitResults(void);
+
 extern void ReUpdateStandings();
 
 #endif /* _RACERESULTS_H_ */ 

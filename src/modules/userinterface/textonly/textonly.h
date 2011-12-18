@@ -62,13 +62,14 @@ public:
 	// Race state change notifications.
 	virtual void onRaceConfiguring();
 	virtual void onRaceEventInitializing();
-	virtual void onRaceEventStarting();
+	virtual bool onRaceEventStarting();
 	virtual void onRaceInitializing();
 	virtual void onRaceStarting();
 	virtual void onRaceLoadingDrivers();
 	virtual void onRaceDriversLoaded();
 	virtual void onRaceSimulationReady();
 	virtual void onRaceStarted();
+	virtual void onLapCompleted(int nLapIndex);
 	virtual void onRaceInterrupted();
 	virtual void onRaceFinished();
 	virtual void onRaceEventFinished();
@@ -86,8 +87,8 @@ public:
 	virtual int  getResultsTableRowCount() const;
 
 	// Results and standings tables.
-	virtual void showResults();
-	virtual void showStandings();
+	virtual bool showResults();
+	virtual bool showStandings();
 
 	// Setter for the race engine.
 	virtual void setRaceEngine(IRaceEngine& raceEngine);
@@ -98,25 +99,33 @@ public:
 	// Accessor to the singleton.
 	static TextOnlyUI& self();
 
-	//! Accessor to the race engine.
+	//! Accessors to the race engine.
 	IRaceEngine& raceEngine();
+	const IRaceEngine& raceEngine() const;
 
  protected:
 
-	// Protected constructor to avoid instanciation outside (but friends).
+	//! Protected constructor to avoid instanciation outside (but friends).
 	TextOnlyUI(const std::string& strShLibName, void* hShLibHandle);
 	
-	// Make the C interface functions nearly member functions.
+	//! Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
 
+	//! Recompute callback for the event loop.
+	static void updateRaceEngine();
+
  protected:
 
-	// The singleton.
+	//! The singleton.
 	static TextOnlyUI* _pSelf;
 
-	// The race engine.
+	//! The race engine.
 	IRaceEngine* _piRaceEngine;
+
+	//! The results table.
+	class ResultsTable;
+	ResultsTable* _pResTable;
 };
 
 //! Shortcut to the race engine.
