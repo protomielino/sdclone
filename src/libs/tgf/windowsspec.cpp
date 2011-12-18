@@ -293,7 +293,6 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
     tModList	*curMod;
     
     modnb = 0;
-    curMod = (tModList*)calloc(1, sizeof(tModList));
     
     /* open the current directory */
     _finddata_t FData;
@@ -437,7 +436,7 @@ windowsDirGetList(const char *dir)
     _finddata_t FData;
     char Dir_name[ 1024 ];
     sprintf( Dir_name, "%s\\*.*", dir );
-    GfLogDebug("Listing directory %s\n",dir);
+    //GfLogDebug("Listing directory %s\n",dir);
     long Dirent = _findfirst( Dir_name, &FData );
     if ( Dirent != -1 ) {
 	do {

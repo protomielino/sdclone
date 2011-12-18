@@ -84,9 +84,11 @@ extern void RmGameScreen();
 
 extern void RmShowResults(void * /* prevHdle */, tRmInfo * /* info */);
 
-extern void RmStopRaceScreen();
+extern void RmStopRaceMenu();
+extern void RmStopRaceMenuShutdown();
 
-extern void RmDisplayStartRace();
+extern void RmStartRaceMenu();
+extern void RmStartRaceMenuShutdown();
 
 extern void RmRaceParamsMenu(void* vrp);
 
@@ -111,6 +113,7 @@ extern void* RmRaceSelectInit(void* precMenu);
 extern void* RmScreenInit();
 extern void RmScreenShutdown();
 extern void* RmInitReUpdateStateHook();
+extern void RmShutdownReUpdateStateHook();
 extern bool RmCheckPitRequest();
 
 extern void* RmResScreenInit();

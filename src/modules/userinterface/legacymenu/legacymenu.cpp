@@ -109,8 +109,9 @@ bool LegacyMenu::startRace()
 	if (!GfApp().hasOption("startrace", strRaceToStart))
 		return false;
 
+	// And run it if there's such a race manager.
 	GfRaceManager* pSelRaceMan = GfRaceManagers::self()->getRaceManager(strRaceToStart);
-	if (pSelRaceMan)
+	if (pSelRaceMan) // Should never happen (checked in activate).
 	{
 		// Initialize the race engine.
 		LmRaceEngine().reset();
@@ -118,7 +119,7 @@ bool LegacyMenu::startRace()
 		// Give the selected race manager to the race engine.
 		LmRaceEngine().selectRaceman(pSelRaceMan);
 		
-		// Configure the new race.
+		// Configure the new race (but don't enter the config. menu tree).
 		LmRaceEngine().configureRace(/* bInteractive */ false);
 
 		// Start the race engine state automaton
@@ -178,6 +179,11 @@ void LegacyMenu::shutdown()
 		unloadTrackGraphics();
 		shutdownGraphics(/*bUnloadModule=*/true);
 	}
+
+	// Shutdown stuff that needs it.
+	::RmStopRaceMenuShutdown();
+	::RmStartRaceMenuShutdown();
+	::RmShutdownReUpdateStateHook();
 }
 
 void LegacyMenu::activateLoadingScreen()
@@ -212,6 +218,8 @@ void LegacyMenu::onRaceEventStarting()
 
 void LegacyMenu::onRaceInitializing()
 {
+	// Activate the loading screen only if not a practice or qualification session,
+	// or else if we are loading the 1st competitor of the race.
 	tRmInfo* pReInfo = _piRaceEngine->inData();
 	if ((pReInfo->s->_raceType == RM_TYPE_QUALIF || pReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& pReInfo->s->_totTime < 0.0f) // <= What's this time test for ?
@@ -233,13 +241,13 @@ void LegacyMenu::onRaceInitializing()
 
 void LegacyMenu::onRaceStarting()
 {
-	// Switch to Start Race menu only if required.
+	// Switch to Start Race menu only if required (no loading screen in this case).
 	tRmInfo* pReInfo = _piRaceEngine->inData();
 	if (!strcmp(GfParmGetStr(pReInfo->params, pReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES))
 	{
-		::RmLoadingScreenShutdown();
+		shutdownLoadingScreen();
 	
-		::RmDisplayStartRace();
+		::RmStartRaceMenu();
 	}
 }
 
@@ -251,12 +259,13 @@ void LegacyMenu::onRaceLoadingDrivers()
 	else
 		_hscrGame = ::RmResScreenInit();
 	
-	// If neither a qualification, nor a practice, or else 1st driver, activate race loading screen.
+	// If neither a qualification, nor a practice, or else 1st driver,
+	// activate race loading screen.
 	if (!(_piRaceEngine->inData()->s->_raceType == RM_TYPE_QUALIF
 		  || _piRaceEngine->inData()->s->_raceType == RM_TYPE_PRACTICE)
 		|| (int)GfParmGetNum(_piRaceEngine->inData()->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1) == 1)
 	{
-		::RmLoadingScreenStart(_piRaceEngine->inData()->_reName, "data/img/splash-raceload.jpg");
+		activateLoadingScreen();
 	}
 }
 
@@ -298,13 +307,16 @@ void LegacyMenu::onRaceSimulationReady()
 
 void LegacyMenu::onRaceStarted()
 {
-	// Simply activate the game screen.
+	// Shutdown the loading screen if not already done.
+	shutdownLoadingScreen();
+	
+	// Activate the game screen.
 	GfuiScreenActivate(_hscrGame);
 }
 
 void LegacyMenu::onRaceInterrupted()
 {
-	::RmStopRaceScreen();
+	::RmStopRaceMenu();
 }
 
 void LegacyMenu::onRaceFinished()
@@ -314,6 +326,7 @@ void LegacyMenu::onRaceFinished()
 		unloadCarsGraphics();
 		shutdownGraphicsView();
 		unloadTrackGraphics();
+		RmScreenShutdown();
 	}
 	else
 	{

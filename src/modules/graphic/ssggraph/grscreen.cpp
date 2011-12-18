@@ -485,7 +485,12 @@ void cGrScreen::initCams(tSituation *s)
 			fakeWidth = 800;
 
 		boardCam = new cGrOrthoCamera(this, 0, fakeWidth, 0, 600);
-		board->setWidth(fakeWidth);
+
+		//@Simon: This actually uses uninitialized 'boardWidth' data member
+		//        of the 'board' cGrBoard instance ('boardWidth' will be initialized
+		//        later, when cGrBoard::loadDefaults will be called by loadParams.
+		//        Is this line really needed (if yes, need to first init. 'boardWidth') ?
+		//board->setWidth(fakeWidth);
 	}
 	
 	// Background camera.

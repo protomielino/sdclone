@@ -33,9 +33,9 @@
 
 #include <SDL/SDL.h>
 
-#include "tgf.h"
+#include <portability.h>
 
-#include "portability.h"
+#include "tgf.h"
 
 
 extern void gfTraceInit(void);
@@ -44,6 +44,19 @@ extern void gfModInit(void);
 extern void gfOsInit(void);
 extern void gfParamInit(void);
 
+
+/* Game run-time folders :
+   - installDir : The folder containing the parent folder of the game executable
+   - localDir : User settings (should be ~/.speed-dreams or <My documents>/speed-dreams.settings)
+   - libDir   : Modules and shared libs installation folder (+ binaries under 'nixes)
+   - binDir   : Executables (and/or scripts under 'nixes) installation folder
+   - dataDir  : Static data (tracks, cars, textures, ...) installation folder
+*/
+static char* gfInstallDir = 0;
+static char* gfLocalDir = 0;
+static char* gfLibDir = 0;
+static char* gfDataDir = 0;
+static char* gfBinDir = 0;
 
 /*
  * Function
@@ -457,6 +470,13 @@ void GfShutdown(void)
 
 	// Shutdown the params system.
 	GfParmShutdown();
+
+	// Free local data.
+	freez(gfInstallDir);
+	freez(gfLocalDir);
+	freez(gfDataDir);
+	freez(gfLibDir);
+	freez(gfBinDir);
 }
 
 
@@ -598,19 +618,6 @@ char* GfPathNormalizeDir(char* pszPath, size_t nMaxPathLen)
 
 	return pszPath;
 }
-
-/* Game run-time folders :
-   - installDir : The folder containing the parent folder of the game executable
-   - localDir : User settings (should be ~/.speed-dreams or <My documents>/speed-dreams.settings)
-   - libDir   : Modules and shared libs installation folder (+ binaries under 'nixes)
-   - binDir   : Executables (and/or scripts under 'nixes) installation folder
-   - dataDir  : Static data (tracks, cars, textures, ...) installation folder
-*/
-static char* gfInstallDir = 0;
-static char* gfLocalDir = 0;
-static char* gfLibDir = 0;
-static char* gfDataDir = 0;
-static char* gfBinDir = 0;
 
 /* Translate a directory path into a run-time dir path :
    - ~ management, 

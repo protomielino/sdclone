@@ -83,7 +83,7 @@ void ReRaceAbandon()
 	ReRaceEventShutdown();
 
 	// Return to race configuration step
-	ReInfo->_reState = RE_STATE_CONFIG;
+	ReStateApply((void*)RE_STATE_CONFIG);
 }
 
 void ReRaceAbort()
@@ -109,12 +109,12 @@ void ReRaceAbort()
 	}
 
 	// Return to race configuration step
-	ReInfo->_reState = RE_STATE_CONFIG;
+	ReStateApply((void*)RE_STATE_CONFIG);
 }
 
 void ReRaceSkipSession()
 {
-	ReInfo->_reState = RE_STATE_RACE_END;
+	ReStateApply((void*)RE_STATE_RACE_END);
 }
 
 int
@@ -712,7 +712,7 @@ ReRaceEventShutdown(void)
 	char careerMode = FALSE;
 	char first = TRUE;
 
-	// Notify the UI that the race simulation is ready now.
+	// Notify the UI that the race event is over now.
 	ReUI().onRaceEventFinished();
 
 	// 

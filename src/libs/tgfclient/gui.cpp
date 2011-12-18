@@ -359,7 +359,8 @@ GfuiRedraw(void)
 void
 GfuiMouseHide(void)
 {
-    GfuiScreen->mouseAllowed = 0;
+	if (GfuiScreen)
+		GfuiScreen->mouseAllowed = 0;
 }
 
 /** Show the mouse cursor
@@ -369,7 +370,8 @@ GfuiMouseHide(void)
 void
 GfuiMouseShow(void)
 {
-    GfuiScreen->mouseAllowed = 1;
+	if (GfuiScreen)
+		GfuiScreen->mouseAllowed = 1;
 }
 
 /** Toggle the mouse cursor visibility
@@ -379,7 +381,8 @@ GfuiMouseShow(void)
 void
 GfuiMouseToggleVisibility(void)
 {
-    GfuiScreen->mouseAllowed = 1 - GfuiScreen->mouseAllowed;
+	if (GfuiScreen)
+		GfuiScreen->mouseAllowed = 1 - GfuiScreen->mouseAllowed;
 }
 
 /** Force the hardware mouse pointer
@@ -498,9 +501,12 @@ tMouseInfo *GfuiMouseInfo(void)
 */
 void GfuiMouseSetPos(int x, int y)
 {
-	SDL_WarpMouse(x,y);
-	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
-	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
+	if (GfuiScreen)
+	{
+		SDL_WarpMouse(x,y);
+		GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
+		GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
+	}
 }
 
 
@@ -570,7 +576,7 @@ gfuiMousePassiveMotion(int x, int y)
 int
 GfuiScreenIsActive(void *screen)
 {
-	return (GfuiScreen == screen);
+	return GfuiScreen == screen;
 }
 
 /** Activate a screen and make it current.
@@ -643,7 +649,8 @@ GfuiScreenReplace(void *screen)
 void
 GfuiScreenDeactivate(void)
 {
-	if (GfuiScreen->onDeactivate) GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
+	if (GfuiScreen->onDeactivate)
+		GfuiScreen->onDeactivate(GfuiScreen->userDeactData);
 	
 	GfuiScreen = (tGfuiScreen*)NULL;
 	
@@ -772,6 +779,9 @@ GfuiHookRelease(void *hook)
 void
 GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction)
 {
+	if (!scr)
+		return;
+	
 	tGfuiScreen	*screen = (tGfuiScreen*)scr;
 	
 	screen->onKeyAction = onKeyAction;
@@ -781,7 +791,7 @@ GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction)
 void
 GfuiKeyEventRegisterCurrent(tfuiKeyCallback onKeyAction)
 {
-	GfuiScreen->onKeyAction = onKeyAction;
+	GfuiKeyEventRegister(GfuiScreen, onKeyAction);
 }
 
 
@@ -822,6 +832,9 @@ void
 GfuiAddKey(void *scr, int key, int modifier, const char *descr, void *userData,
 		   tfuiCallback onKeyPressed, tfuiCallback onKeyReleased)
 {
+	if (!scr)
+		return;
+	
 	// Allocate a key entry for the key list
 	tGfuiKey* curKey = (tGfuiKey*)calloc(1, sizeof(tGfuiKey));
 	curKey->key = key;

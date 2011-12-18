@@ -46,12 +46,6 @@ static char** TextLines = 0;
 static int CurTextLineIdx;
 
 
-static void
-rmDeativate(void * /* dummy */)
-{
-}
-
-
 /** 
     @ingroup	racemantools
     @param	title	Screen title.
@@ -68,7 +62,7 @@ RmLoadingScreenStart(const char *title, const char *bgimg)
 		RmLoadingScreenShutdown();
 
     // Create screen, load menu XML descriptor and create static controls.
-    HScreen = GfuiScreenCreate(BGColor, NULL, NULL, NULL, rmDeativate, 0);
+    HScreen = GfuiScreenCreate(BGColor, NULL, NULL, NULL, NULL, 0);
 
     void *hmenu = GfuiMenuLoad("loadingscreen.xml");
 

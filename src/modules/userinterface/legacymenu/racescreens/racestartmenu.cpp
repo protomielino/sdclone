@@ -25,13 +25,13 @@
 
 #include <cstdio>
 
+#include <portability.h>
 #include <tgfclient.h>
 #include <robot.h>
 #include <drivers.h> // GfDriver::getType
 
 #include "legacymenu.h"
 #include "racescreens.h"
-#include "portability.h"
 
 
 // Abandon race hook ******************************************************
@@ -39,15 +39,13 @@ static void
 rmAbandonRaceHookActivate(void * /* vforce */)
 {
 	LmRaceEngine().abandonRace();
-	
-	LegacyMenu::self().activateGameScreen();
 }
+
+static void *pvAbandonRaceHookHandle = 0;
 
 static void *
 rmAbandonRaceHookInit(void)
 {
-	static void *pvAbandonRaceHookHandle = 0;
-
 	if (!pvAbandonRaceHookHandle)
 		pvAbandonRaceHookHandle = GfuiHookCreate(0, rmAbandonRaceHookActivate);
 
@@ -61,11 +59,11 @@ rmStartRaceHookActivate(void * /* dummy */)
 	LmRaceEngine().startRace();
 }
 
+static void	*pvStartRaceHookHandle = 0;
+
 static void *
 rmStartRaceHookInit(void)
 {
-	static void	*pvStartRaceHookHandle = 0;
-
 	if (!pvStartRaceHookHandle)
 		pvStartRaceHookHandle = GfuiHookCreate(0, rmStartRaceHookActivate);
 
@@ -84,7 +82,7 @@ typedef struct
 static tStartRaceCall   nextStartRace, prevStartRace;
 static void             *rmScrHdle = 0;
 
-static void rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start = 0);
+static void rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start = 0);
 
 static void
 rmChgStartScreen(void *vpsrc)
@@ -92,12 +90,12 @@ rmChgStartScreen(void *vpsrc)
     void                *prevScr = rmScrHdle;
     tStartRaceCall      *psrc = (tStartRaceCall*)vpsrc;
     
-    rmDisplayStartRace(psrc->info, psrc->startScr, psrc->abortScr, psrc->start);
+    rmStartRaceMenu(psrc->info, psrc->startScr, psrc->abortScr, psrc->start);
     GfuiScreenRelease(prevScr);
 }
 
 void
-rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
+rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 {
     static char path[512];
     static char buf[64];
@@ -253,9 +251,18 @@ rmDisplayStartRace(tRmInfo *info, void *startScr, void *abortScr, int start)
 }
 
 void
-RmDisplayStartRace()
+RmStartRaceMenu()
 {
-	rmDisplayStartRace(LmRaceEngine().inData(),
-					   rmStartRaceHookInit(), rmAbandonRaceHookInit());
+	rmStartRaceMenu(LmRaceEngine().inData(),
+					rmStartRaceHookInit(), rmAbandonRaceHookInit());
 }
 
+void
+RmStartRaceMenuShutdown()
+{
+	GfuiHookRelease(pvAbandonRaceHookHandle);
+	pvAbandonRaceHookHandle = 0;
+	
+	GfuiHookRelease(pvStartRaceHookHandle);
+	pvStartRaceHookHandle = 0;
+}

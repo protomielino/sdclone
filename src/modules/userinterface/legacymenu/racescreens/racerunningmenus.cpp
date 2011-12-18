@@ -481,15 +481,22 @@ rmActivateReUpdateStateHook(void * /* dummy */)
     rmUpdateRaceEngine();
 }
 
+static void	*pvUpdateStateHookHandle = 0;
+	
 void *
 RmInitReUpdateStateHook()
 {
-	static void	*rmHookHandle = 0;
-	
-    if (!rmHookHandle)
-		rmHookHandle = GfuiHookCreate(0, rmActivateReUpdateStateHook);
+    if (!pvUpdateStateHookHandle)
+		pvUpdateStateHookHandle = GfuiHookCreate(0, rmActivateReUpdateStateHook);
 
-    return rmHookHandle;
+    return pvUpdateStateHookHandle;
+}
+
+void
+RmShutdownReUpdateStateHook()
+{
+	GfuiHookRelease(pvUpdateStateHookHandle);
+	pvUpdateStateHookHandle = 0;
 }
 
 /**************************************************************************

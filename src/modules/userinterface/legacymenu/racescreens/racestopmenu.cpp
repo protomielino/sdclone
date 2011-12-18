@@ -28,16 +28,14 @@
 static void
 rmAbortRaceHookActivate(void * /* dummy */)
 {
-	LegacyMenu::self().activateGameScreen();
-
 	LmRaceEngine().abortRace();
 }
+
+static void *pvAbortRaceHookHandle = 0;
 
 static void *
 rmAbortRaceHookInit(void)
 {
-	static void *pvAbortRaceHookHandle = 0;
-
 	if (!pvAbortRaceHookHandle)
 		pvAbortRaceHookHandle = GfuiHookCreate(0, rmAbortRaceHookActivate);
 
@@ -48,16 +46,14 @@ rmAbortRaceHookInit(void)
 static void
 rmSkipSessionHookActivate(void * /* dummy */)
 {
-	LegacyMenu::self().activateGameScreen();
-
 	LmRaceEngine().skipRaceSession();
 }
+
+static void	*pvSkipSessionHookHandle = 0;
 
 static void *
 rmSkipSessionHookInit(void)
 {
-	static void	*pvSkipSessionHookHandle = 0;
-
 	if (!pvSkipSessionHookHandle)
 		pvSkipSessionHookHandle = GfuiHookCreate(0, rmSkipSessionHookActivate);
 
@@ -73,11 +69,11 @@ rmBackToRaceHookActivate(void * /* dummy */)
 	LegacyMenu::self().activateGameScreen();
 }
 
+static void	*pvBackToRaceHookHandle = 0;
+
 static void *
 rmBackToRaceHookInit(void)
 {
-	static void	*pvBackToRaceHookHandle = 0;
-
 	if (!pvBackToRaceHookHandle)
 		pvBackToRaceHookHandle = GfuiHookCreate(0, rmBackToRaceHookActivate);
 
@@ -91,11 +87,11 @@ rmRestartRaceHookActivate(void * /* dummy */)
 	LmRaceEngine().restartRace();
 }
 
+static void	*pvRestartRaceHookHandle = 0;
+
 static void *
 rmRestartRaceHookInit(void)
 {
-	static void	*pvRestartRaceHookHandle = 0;
-
 	if (!pvRestartRaceHookHandle)
 		pvRestartRaceHookHandle = GfuiHookCreate(0, rmRestartRaceHookActivate);
 
@@ -112,11 +108,11 @@ rmQuitHookActivate(void * /* dummy */)
 		GfuiScreenActivate(ExitMenuInit(rmStopScrHandle));
 }
 
+static void	*pvQuitHookHandle = 0;
+
 static void *
 rmQuitHookInit(void)
 {
-	static void	*pvQuitHookHandle = 0;
-
 	if (!pvQuitHookHandle)
 		pvQuitHookHandle = GfuiHookCreate(0, rmQuitHookActivate);
 
@@ -137,7 +133,7 @@ typedef struct {
 
 // Generic function for creating and activating the menu.
 static void*
-rmStopRaceScreen(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
+rmStopRaceMenu(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 {
     // Create screen, load menu XML descriptor and create static controls.
     void *hscreen = GfuiScreenCreate(NULL, NULL, NULL, NULL, NULL, 1);
@@ -188,11 +184,11 @@ rmStopRaceScreen(const tButtonDesc aButtons[], int nButtons, int nCancelIndex)
 
 // Simpler front-end function for creating and activating the menu.
 static void*
-rmStopRaceScreen(const char *buttonRole1, void *screen1,
-				 const char *buttonRole2, void *screen2,
-				 const char *buttonRole3 = 0, void *screen3 = 0,
-				 const char *buttonRole4 = 0, void *screen4 = 0,
-				 const char *buttonRole5 = 0, void *screen5 = 0)
+rmStopRaceMenu(const char *buttonRole1, void *screen1,
+			   const char *buttonRole2, void *screen2,
+			   const char *buttonRole3 = 0, void *screen3 = 0,
+			   const char *buttonRole4 = 0, void *screen4 = 0,
+			   const char *buttonRole5 = 0, void *screen5 = 0)
 {
     const tButtonDesc aButtons[5] =
     {
@@ -218,13 +214,13 @@ rmStopRaceScreen(const char *buttonRole1, void *screen1,
     if (QuitHdle[nButtons-1])
         GfuiScreenRelease(QuitHdle[nButtons-1]);
         
-    QuitHdle[nButtons-1] = rmStopRaceScreen(aButtons, nButtons, nButtons-1);
+    QuitHdle[nButtons-1] = rmStopRaceMenu(aButtons, nButtons, nButtons-1);
     
     return QuitHdle[nButtons-1];
 }
 
 void
-RmStopRaceScreen()
+RmStopRaceMenu()
 {
 	void* params = LmRaceEngine().outData()->params;
 	const char* pszRaceName = LmRaceEngine().outData()->_reRaceName;
@@ -238,7 +234,7 @@ RmStopRaceScreen()
 		if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 		{
 			rmStopScrHandle =
-				rmStopRaceScreen
+				rmStopRaceMenu
 				    ("abort", rmAbortRaceHookInit(),
 					 "resume", rmBackToRaceHookInit(),
 					 "skip", rmSkipSessionHookInit(),
@@ -247,7 +243,7 @@ RmStopRaceScreen()
 		else 
 		{
 			rmStopScrHandle =
-				rmStopRaceScreen
+				rmStopRaceMenu
 				    ("abort", rmAbortRaceHookInit(),
 					 "resume", rmBackToRaceHookInit(),
 					 "quit", rmQuitHookInit());
@@ -258,7 +254,7 @@ RmStopRaceScreen()
 		if (strcmp(GfParmGetStr(params, pszRaceName, RM_ATTR_MUST_COMPLETE, RM_VAL_YES), RM_VAL_YES)) 
 		{
 			rmStopScrHandle =
-				rmStopRaceScreen
+				rmStopRaceMenu
 				    ("restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
 					 "resume", rmBackToRaceHookInit(),
@@ -268,11 +264,30 @@ RmStopRaceScreen()
 		else 
 		{
 			rmStopScrHandle =
-				rmStopRaceScreen
+				rmStopRaceMenu
 				    ("restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
 					 "resume", rmBackToRaceHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 	}
+}
+
+void
+RmStopRaceMenuShutdown()
+{
+	GfuiHookRelease(pvAbortRaceHookHandle);
+	pvAbortRaceHookHandle = 0;
+	
+	GfuiHookRelease(pvSkipSessionHookHandle);
+	pvSkipSessionHookHandle = 0;
+	
+	GfuiHookRelease(pvBackToRaceHookHandle);
+	pvBackToRaceHookHandle = 0;
+	
+	GfuiHookRelease(pvRestartRaceHookHandle);
+	pvRestartRaceHookHandle = 0;
+	
+	GfuiHookRelease(pvQuitHookHandle);
+	pvQuitHookHandle = 0;
 }
