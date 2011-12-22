@@ -120,18 +120,18 @@ void cGrScreen::activate(int x, int y, int w, int h)
 	scrw = w;
 	scrh = h;
 	
-	if (boardCam) {
-		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
-		if (fakeWidth < 800)
-			fakeWidth = 800;
+	if (boardCam) delete boardCam;
 
-		delete boardCam;
-		boardCam = new cGrOrthoCamera(this, 0, fakeWidth, 0, 600);
-		board->setWidth(fakeWidth);
-	}
+	// Configure board to allocated screen size
+	fakeWidth = (int)((float) scrw * 600 / (float) scrh);
+	if (fakeWidth < 800)
+		fakeWidth = 800;
+
+	boardCam = new cGrOrthoCamera(this, 0, fakeWidth, 0, 600);
+	board->setWidth(fakeWidth);
 
 	if (mirrorCam) {
-		// mirror width adjusted to fit boards
+		// mirror width adjusted to fit board size
 		mirrorCam->setViewport (scrx, scry, scrw, scrh);
 		mirrorCam->setPos (scrx + scrw / 2 - (scrw * boardWidth /400), 
 			scry +  5 * scrh / 6 - scrh / 10, 
@@ -478,21 +478,6 @@ void cGrScreen::initCams(tSituation *s)
 	
 	GfLogTrace("Screen #%d : FOV = %.2f, Far=%.0f\n", id, fovFactor, fixedFar);
 
-	// Board camera.
-	if (!boardCam) {
-		fakeWidth = (int)((float) scrw * 600 / (float) scrh);
-		if (fakeWidth < 800)
-			fakeWidth = 800;
-
-		boardCam = new cGrOrthoCamera(this, 0, fakeWidth, 0, 600);
-
-		//@Simon: This actually uses uninitialized 'boardWidth' data member
-		//        of the 'board' cGrBoard instance ('boardWidth' will be initialized
-		//        later, when cGrBoard::loadDefaults will be called by loadParams.
-		//        Is this line really needed (if yes, need to first init. 'boardWidth') ?
-		//board->setWidth(fakeWidth);
-	}
-	
 	// Background camera.
 	if (!bgCam) {
 		bgCam = new cGrBackgroundCam(this);

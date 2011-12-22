@@ -438,8 +438,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     GfuiAddKey(screen, GFUIK_TAB,      "Next (split) Screen", (void*)GR_NEXT_SCREEN, grChangeScreen, NULL);
     GfuiAddKey(screen, 'm',            "Track Maps",          (void*)0, grSelectTrackMap, NULL);
 
-    grAdaptScreenSize();
-
 	GfLogInfo("Current screen is #%d (out of %d)\n", nCurrentScreenIndex, grNbActiveScreens);
 
     grInitScene();
