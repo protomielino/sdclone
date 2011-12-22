@@ -1585,58 +1585,65 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 string
 cGrBoard::grGenerateLeaderBoardEntry(const tCarElt* car, const tSituation* s, const bool isLeader) const
 {
-  string ret;
   char buf[BUFSIZE];
+  int lapsBehindLeader;
   
   //Display driver time / time behind leader / laps behind leader
   if(car->_state & RM_CAR_STATE_DNF)  {
-    //driver DNF
     snprintf(buf, sizeof(buf), "       out");
+    return buf;
   }
-  else if(car->_state & RM_CAR_STATE_PIT) {
-    //driver in pit
+
+  if(car->_state & RM_CAR_STATE_PIT) {
     snprintf(buf, sizeof(buf), "       PIT");
-  } else {
-    //no DNF nor in pit
-    if(isLeader) {
-      //This is the leader, put out his time
+    return buf;
+  }
+
+  //This is the leader, put out his time
+  if(isLeader) {
+    if (car->_bestLapTime == 0)
+      snprintf(buf, sizeof(buf), "       --:---");
+    else {
       if (s->_raceType == RM_TYPE_RACE || s->_ncars <= 1)
         grWriteTimeBuf(buf, car->_curTime, 0);
       else
-      {
-        if (car->_bestLapTime > 0)
-          grWriteTimeBuf(buf, car->_bestLapTime, 0);
-        else
-          snprintf(buf, sizeof(buf), "       --:---");
+        grWriteTimeBuf(buf, car->_bestLapTime, 0);
+    }
+    return buf;
+  }
+
+  //This is not the leader
+  lapsBehindLeader = car->_lapsBehindLeader;
+
+  if (car->_laps < s->cars[0]->_laps - 1) {
+    // need to do a little math as car->_lapsBehindLeader is only updated at finish line
+    lapsBehindLeader = s->cars[0]->_laps - car->_laps;
+
+    if (s->cars[0]->_distFromStartLine < car->_distFromStartLine)
+      lapsBehindLeader --;
+  }
+
+  switch(lapsBehindLeader) {
+    case 0: //Driver in same lap as leader or on first lap
+      if (car->_bestLapTime == 0 || car->_laps < s->cars[0]->_laps) {
+        snprintf(buf, sizeof(buf), "       --:---");
       }
-    } else {
-      //This is not the leader
-      switch(car->_lapsBehindLeader) {
-        case 0: //Driver in same lap as leader
-          if (car->_timeBehindLeader == 0 && (s->_raceType == RM_TYPE_RACE || car->_bestLapTime <= 0.0f)) {
-            //Cannot decide time behind, first lap or passed leader
-            snprintf(buf, sizeof(buf), "       --:---");
-          }
-          else {
-            //Can decide time behind
-            grWriteTimeBuf(buf, car->_timeBehindLeader, 1);
-          }
-          break;
-          
-        case 1: //1 lap behind leader
-          snprintf(buf, sizeof(buf), "+%3d Lap", car->_lapsBehindLeader);
-          break;
-          
-        default:  //N laps behind leader
-          snprintf(buf, sizeof(buf), "+%3d Laps", car->_lapsBehindLeader);
-          break;
-      }//switch 
-    }//not leader
-  }//driver not DNF or in pit
-  ret.assign(buf);
+      else {
+        grWriteTimeBuf(buf, car->_timeBehindLeader, 1);
+      }
+      break;
+      
+    case 1: //1 lap behind leader
+      snprintf(buf, sizeof(buf), "+%3d Lap", lapsBehindLeader);
+      break;
+      
+    default:  //N laps behind leader
+      snprintf(buf, sizeof(buf), "+%3d Laps", lapsBehindLeader);
+      break;
+  }
   
-  return ret;
-}//grGenerateLeaderBoardEntry
+  return buf;
+}
 
 
 /** 
