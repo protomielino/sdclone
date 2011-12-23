@@ -69,6 +69,10 @@
 #define GR_ATT_DYNAMICSKYDOME_ENABLED	"enabled"
 #define GR_ATT_DYNAMICSKYDOME_DISABLED	"disabled"
 #define GR_ATT_PRECIPDENSITY	"precipitation density"
+#define GR_ATT_BGSKY	"background skydome"
+#define GR_ATT_BGSKY_ENABLED	"enabled"
+#define GR_ATT_BGSKY_DISABLED	"disabled"
+#define GR_ATT_CLOUDLAYER	"cloudlayer"
 //#define GR_ATT_DYNAMICWEATHER	"dynamic weather"
 
 #define GR_ATT_NB_SCREENS	"number of screens"

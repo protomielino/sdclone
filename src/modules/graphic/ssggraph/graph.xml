@@ -27,8 +27,10 @@
     <attnum name="fov factor" unit="%" val="100"/>
     <attnum name="LOD Factor" val="1"/>
     <attnum name="sky dome distance" val="0"/>
-    <attstr name="dynamic time" val="disabled"/>
+    <attstr name="dynamic sky dome" val="disabled"/>
     <attnum name="precipitation density" unit="%" val="100"/>
+	<attnum name="cloudlayer" val="1"/>
+    <attstr name="background skydome" val="disabled"/>
   </section>
 
   <section name="Playable Cameras Distance of Views">
