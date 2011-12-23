@@ -243,7 +243,15 @@ cGrTrackMap::cGrTrackMap()
 	bool firstvert = true;
 	float xf1, yf1 , xf2, yf2;
 	xf1 = yf1 = xf2 = yf2 = 0.0;
+
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_TEXTURE_2D);
+	glDisable(GL_LIGHTING);
+	glColor4f(1.0, 1.0, 1.0, 1.0);
+
 	glBegin(GL_QUAD_STRIP);
+	
 	seg = first;
 	do {
 		if (seg->type == TR_STR) {
