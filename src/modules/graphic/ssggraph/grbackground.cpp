@@ -268,13 +268,13 @@ grInitBackground(void)
 		} else if (grNBCloudfield == 2)
 		{
 			snprintf(buf, sizeof(buf), "data/textures/scattered1.rgba", 1);
-			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 9000,
-											  40 / domeSizeRatio, 40 / domeSizeRatio);
+			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
+											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[0]->setSpeed(30);
 			cloudLayers[0]->setDirection(40);
 
 			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-			cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
+			cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[1]->setSpeed(60);
 			cloudLayers[1]->setDirection(45);
@@ -282,19 +282,19 @@ grInitBackground(void)
 		} else if (grNBCloudfield == 3)
 		{
 			snprintf(buf, sizeof(buf), "data/textures/scattered1.rgba", 1);
-			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 9000,
-											  40 / domeSizeRatio, 40 / domeSizeRatio);
+			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
+											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[0]->setSpeed(30);
 			cloudLayers[0]->setDirection(40);
 
 			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-			cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 5000,
-											  80 / domeSizeRatio, 80 / domeSizeRatio);
+			cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2000,
+											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[1]->setSpeed(60);
 			cloudLayers[1]->setDirection(45);
 
 			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-			cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
+			cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, 1000,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[2]->setSpeed(80);
 			cloudLayers[2]->setDirection(45);
