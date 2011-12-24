@@ -45,6 +45,7 @@ static const unsigned grSkyDomeDistThresh = 12000; // No dynamic sky below that 
 static const int NMaxStars = 1000;
 static const int NMaxPlanets = 0; //No planets displayed for the moment
 static const int NMaxCloudLayers = 3;
+
 enum {eCBSun = 0, eCBMoon, NMaxCelestianBodies};	// Celestial bodies in the sky.
 
 static const sgVec4 Black            = { 0.0f, 0.0f, 0.0f, 1.0f } ;
@@ -76,6 +77,7 @@ cgrMultiTexState* grEnvShadowState = 0;
 cgrMultiTexState* grEnvShadowStateOnCars = 0;
 
 unsigned grSkyDomeDistance = 0;
+int grNBCloudfield = 0;
 
 // Some private global variables.
 //static int grDynamicWeather = 0;
@@ -253,16 +255,52 @@ grInitBackground(void)
 
 		cGrCloudLayer *cloudLayers[NMaxCloudLayers];
 		snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-		if (grTrack->local.rain > 0)
+		if (grTrack->local.rain > 0 )
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 650,
 											  400 / domeSizeRatio, 400 / domeSizeRatio);
-		else
+		else if (grNBCloudfield == 1)
+		{
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 		cloudLayers[0]->setSpeed(60);
 		cloudLayers[0]->setDirection(45);
 		GfLogInfo("  Cloud cover : 1 layer, texture=%s, speed=60, direction=45\n", buf);
-    
+		} else if (grNBCloudfield == 2)
+		{
+			snprintf(buf, sizeof(buf), "data/textures/scattered1.rgba", 1);
+			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 9000,
+											  40 / domeSizeRatio, 40 / domeSizeRatio);
+			cloudLayers[0]->setSpeed(30);
+			cloudLayers[0]->setDirection(40);
+
+			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+			cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
+											  100 / domeSizeRatio, 100 / domeSizeRatio);
+			cloudLayers[1]->setSpeed(60);
+			cloudLayers[1]->setDirection(45);
+			GfLogInfo("  Cloud cover : 1 layer, texture=01, speed=30, direction=40\n  Cloud cover : 2 layer, texture=%s, speed=60, direction=45\n", buf);
+		} else if (grNBCloudfield == 3)
+		{
+			snprintf(buf, sizeof(buf), "data/textures/scattered1.rgba", 1);
+			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 9000,
+											  40 / domeSizeRatio, 40 / domeSizeRatio);
+			cloudLayers[0]->setSpeed(30);
+			cloudLayers[0]->setDirection(40);
+
+			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+			cloudLayers[1] = TheSky->addCloud(buf, grSkyDomeDistance, 5000,
+											  80 / domeSizeRatio, 80 / domeSizeRatio);
+			cloudLayers[1]->setSpeed(60);
+			cloudLayers[1]->setDirection(45);
+
+			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
+			cloudLayers[2] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
+											  100 / domeSizeRatio, 100 / domeSizeRatio);
+			cloudLayers[2]->setSpeed(80);
+			cloudLayers[2]->setDirection(45);
+			GfLogInfo("  Cloud cover : 1 layer, texture=01, speed=30, direction=40\n  Cloud cover : 2 layer, texture=%s, speed=60, direction=45\n Cloud cover : 3 layer, texture=%s, speed=80, direction=45\n", buf);
+		}
+
 		// Set up the light source to the Sun position.
 		sgCoord sunPosition;
 		TheCelestBodies[eCBSun]->getPosition(&sunPosition);
@@ -406,6 +444,11 @@ grLoadBackground(void)
 			
 	GfLogInfo("Graphic options : Sky dome : distance = %d m, dynamic = %s\n",
 			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
+
+	grNBCloudfield =
+		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, (char*)NULL, grNBCloudfield);
+
+	GfLogInfo("Graphic options : CloudField Number : = %d\n", grNBCloudfield);
 
 	snprintf(buf, sizeof(buf), "tracks/%s/%s;data/img;data/textures;.",
 			grTrack->category, grTrack->internalname);
