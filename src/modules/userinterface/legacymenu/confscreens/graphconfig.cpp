@@ -195,8 +195,6 @@ LoadGraphicOptions()
     snprintf(buf, sizeof(buf), "%d", PrecipDensityValues[PrecipDensityIndex]);
     GfuiLabelSetText(ScrHandle, PrecipDensityLabelId, buf);
 
-    GfParmReleaseHandle(grHandle);
-
     const int nCloudLayer =
 		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, 0);
     for (int i = 0; i < NbCloudLayernbValues; i++) 
