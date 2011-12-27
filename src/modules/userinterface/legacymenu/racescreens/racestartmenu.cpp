@@ -125,8 +125,6 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
         GfuiScreenAddBgImg(rmScrHdle, img);
         
     // Create starting grid labels if specified in race params.
-	GfLogDebug("rmStartRaceMenu: showGrid=%d\n",
-			   strcmp(GfParmGetStr(params, info->_reRaceName, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES) == 0);
     if (!strcmp(GfParmGetStr(params, info->_reRaceName, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES))
 	{
         // Create starting grid subtitle label.
@@ -143,7 +141,6 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
         //snprintf(path, sizeof(path), "%s/%s", info->_reRaceName, RM_SECT_STARTINGGRID);
         //const int rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
         const int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
-		GfLogDebug("rmStartRaceMenu: start=%d, nCars=%d, nMaxLines=%d\n", start, nCars, nMaxLines);
         int y = yTopLine;
 		int i = start;
         for (; i < MIN(start + nMaxLines, nCars); i++)
@@ -163,19 +160,23 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 				robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
 			}
   
-			GfLogDebug("  #%d : driver=%s\n", i, path);
-			
             const char* name = modName;
-            const char* carName = 0;
+ 			if (robhdle)
+			{
+				snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
+				name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, modName);
+			}
+
+			const char* carName = 0;
 			if (extended)
 			{
 				snprintf(path, sizeof(path), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, modName, extended, robotIdx);
 				carName = GfParmGetStr(info->params, path, RM_ATTR_CARNAME, "<not found>");
-				name = GfParmGetStr(info->params, path, ROB_ATTR_NAME, "<not found>");
+				if (name == modName)
+					name = GfParmGetStr(info->params, path, ROB_ATTR_NAME, "<not found>");
 			}
 			else if (robhdle)
 			{
-				name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<not found>");
 				carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "<not found>");
 			}
 			
