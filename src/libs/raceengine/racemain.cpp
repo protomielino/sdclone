@@ -130,7 +130,7 @@ ReRaceEventInit(void)
 
 		/* Read the new params */
 		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
-		GfLogTrace("Career : MainResults give %s as the current file\n",
+		GfLogTrace("Career : New params file is %s (from main results file)\n",
 				   GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
 		if (!params)
 			GfLogWarning( "Career : MainResults params weren't read correctly\n" );
@@ -357,7 +357,9 @@ ReRaceRealStart(void)
 		ReInfo->_displayMode = RM_DISP_MODE_NONE;
 	}
 
-	//GfLogDebug("ReRaceRealStart: Final dispMode=0x%x\n", ReInfo->_displayMode);
+	GfLogInfo("Display mode : %s\n",
+			  (ReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU) ? "SimuSimu" :
+			  ((ReInfo->_displayMode & RM_DISP_MODE_NORMAL) ? "Normal" : "Results-only"));
 	
 	// Notify the UI that it's "race loading time".
 	ReUI().onRaceLoadingDrivers();
@@ -457,17 +459,27 @@ ReRaceStart(void)
 	char path[128];
 	char path2[128];
 	char *prevRaceName;
-	const char *raceName = ReInfo->_reRaceName;
+	const char *sessionName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	int mode = 0;
+
+	// Trace race session identification (more to say for the Carer mode).
+	char pszSessionId[128];
+	if (!strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	{
+		const char* pszGroup = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
+		snprintf(pszSessionId, sizeof(pszSessionId), "%s %s %s", ReInfo->_reName, pszGroup, sessionName);
+	}
+	else
+		snprintf(pszSessionId, sizeof(pszSessionId), "%s %s", ReInfo->_reName, sessionName);
+	
+	GfLogInfo("Starting %s session at %s\n", pszSessionId, ReInfo->track->name);
 
 	// Reallocate and reset car info for the race.
 	FREEZ(ReInfo->_reCarInfo);
 	ReInfo->_reCarInfo =
 		(tReCarInfo*)calloc(GfParmGetEltNb(params, RM_SECT_DRIVERS), sizeof(tReCarInfo));
-
-	GfLogInfo("Starting %s %s session at %s\n", ReInfo->_reName, raceName, ReInfo->track->name);
 
 	ReUI().onRaceInitializing();
 	
@@ -512,9 +524,9 @@ ReRaceStart(void)
 		ReUI().addLoadingMessage("Preparing Starting Grid ...");
 
 		const char* gridType =
-			GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
+			GfParmGetStr(params, sessionName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		
-		int maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
+		int maxCars = (int)GfParmGetNum(params, sessionName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
 		
 		// Starting grid in the arrival order of the previous race (or qualification session)

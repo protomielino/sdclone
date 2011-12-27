@@ -82,6 +82,7 @@ int reMainUpdater::operator()(void)
 
 	if (_pReInfo->_displayMode & RM_DISP_MODE_SIMU_SIMU)
 	{
+		// Simulate the simulation.
 		ReSimuSimu();
 	}
 	else if (_pReInfo->_displayMode & RM_DISP_MODE_NORMAL)

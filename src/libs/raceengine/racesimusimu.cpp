@@ -182,9 +182,11 @@ static void ReSSStep( SimuSimuData *data )
 	}
 
 	//Check if race has ended
+	//GfLogDebug("ReSSStep: %s laps = %d / %d.\n", car->_name, car->_laps, ReInfo->s->_totLaps);
 	if( car->_laps >= ReInfo->s->_totLaps )
 	{
 		ReInfo->s->_raceState = RM_RACE_ENDED;
+		//GfLogDebug("ReSSStep: Race completed.\n");
 		return;
 	}
 

@@ -763,5 +763,6 @@ ReCarsSortCars(void)
     }
     if (allfinish) {
 	ReInfo->s->_raceState = RM_RACE_ENDED;
+	//GfLogDebug("ReCarsSortCars: Race completed.\n");
     }
 }

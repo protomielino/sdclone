@@ -208,7 +208,7 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 	drivers = (int)GfParmGetNum( curResult, RM_SECT_DRIVERS, RM_ATTR_MAXNUM, NULL, 10 );
 	GfParmListClean( curParam, RM_SECT_DRIVERS );
 
-	GfLogDebug("ReCareerNewAddDrivers: humans=%d\n", *humans);
+	GfLogDebug("ReCareerNewAddDrivers: %d drivers, with%s humans ...\n", drivers, *humans ? "" : "out");
 
 	for (xx = 0; xx < drivers; ++xx) {
 		if( *humans ) {
@@ -222,10 +222,10 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 			} while( true );
 
 			if( *humans ) {
-				GfLogDebug("ReCareerNewAddDrivers: xx=%d, human #%d, ext=%d\n", xx,
-						   GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_IDX, NULL, 1),
-						   GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_EXTENDED, NULL, 1));
 				/* Current one is a human */
+				GfLogDebug("  %d : human #%d, ext=%d\n", xx,
+						   (int)GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_IDX, NULL, 1),
+						   (int)GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_EXTENDED, NULL, 1));
 				sprintf( buf, "%s/%d", RM_SECT_DRIVERS, xx + 1 );
 				GfParmSetStr(curParam, buf, RM_ATTR_MODULE, "human");
 				GfParmSetNum(curParam, buf, RM_ATTR_IDX, NULL, GfParmGetCurNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_IDX, NULL, 1 ) );
@@ -245,6 +245,7 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 		}
 
 		/* Now it is certain that a bot should be added: no humans at this point */
+		GfLogDebug("  %d : simplix #%d, ext=%d\n", xx, xx, 1);
 		sprintf( buf, "%s/%d", RM_SECT_DRIVERS, xx + 1 );
 		path2 = strdup( buf );
 		GfParmSetStr(curParam, path2, RM_ATTR_MODULE, "simplix");
@@ -315,32 +316,34 @@ static void ReCareerNewDrivers()
 
 	curParam = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
 	if( !curParam ) {
-		GfLogError( "Could not open main Params\n" );
+		GfLogError( "ReCareerNewDrivers: Could not open main Params\n" );
 		return;
 	}
 	if( GfParmListSeekFirst(ReInfo->params, RM_SECT_DRIVERS) == 0 )
 		humans = TRUE;
 	else
 		humans = FALSE;
-	GfLogDebug("ReCareerNewDrivers: humans=%d (%s)\n", humans, GfParmGetFileName(ReInfo->params));
+	GfLogDebug("ReCareerNewDrivers: with%s humans (%s)\n", humans ? "" : "out", GfParmGetFileName(ReInfo->params));
 	GfLogDebug("ReCareerNewDrivers: curParam=%s\n", GfParmGetFileName(curParam));
 
 	if( GfParmListSeekFirst(ReInfo->params, RM_SECT_CLASSES) == 0 ) {
 		do {
 			nbGroups = (int)GfParmGetCurNum(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_NBGROUPS, NULL, 1);
+			GfLogDebug("ReCareerNewDrivers: class %s : %d groups\n",
+					   GfParmGetCurStr(ReInfo->params, RM_SECT_CLASSES, RM_ATTR_SUBFILE_SUFFIX, "???"), nbGroups);
 			for( xx  = 0; xx < nbGroups; ++xx ) {
 				curResult = GfParmReadFile( GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, "" ), GFPARM_RMODE_STD );
 				if( !curResult )
 				{
-					GfLogError( "Could not read a subfile\n" );
+					GfLogError( "ReCareerNewDrivers: Could not read a subfile\n" );
 				} else {
-					GfLogDebug("ReCareerNewDrivers: curResult=%s\n", GfParmGetFileName(curResult));
+					GfLogDebug("ReCareerNewDrivers: group %d : curResult=%s\n", xx, GfParmGetFileName(curResult));
 					ReCareerNewAddDrivers( curParam, curResult, &humans, classNb );
 					ReCareerNewAddTeams( curParam, curResult, xx, nbGroups );
 				}
 				tmp = GfParmReadFile( GfParmGetStr( curParam, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, "" ), GFPARM_RMODE_STD );
 				if( !tmp ) {
-					GfLogError( "Could not read next subparam\n" );
+					GfLogError( "ReCareerNewDrivers: Could not read next subparam\n" );
 					break;
 				}
 				GfParmWriteFile( NULL, curResult, NULL );
@@ -556,7 +559,7 @@ void ReCareerNextAddTeams( tGroupInfo *group, void *curParam, void *curResults )
 	group->teams = (tTeamInfo*)malloc( sizeof( tTeamInfo ) * group->nbTeams );
 
 	GfParmListSeekFirst( curResults, RE_SECT_TEAMINFO );
-	GfLogDebug( ">>>>>ReCareerNextAddTeams()\n" );
+	//GfLogDebug( "ReCareerNextAddTeams()\n" );
 	for( xx = 0; xx < group->nbTeams; ++xx ) {
 		group->teams[ xx ].name = strdup( GfParmListGetCurEltName( curResults, RE_SECT_TEAMINFO ) );
 		group->teams[ xx ].car_dname = strdup( GfParmGetCurStr( curResults, RE_SECT_TEAMINFO, ROB_ATTR_CAR, "" ) );
@@ -601,6 +604,8 @@ void ReCareerNextAddDrivers( tDriverInfo ***drivers, int *listLength, tCareerInf
 	
 	classPosition = (int**)malloc( sizeof(int*) * newNb );
 
+	GfLogDebug("ReCareerNextAddDrivers:\n");
+	
 	GfParmListSeekFirst( curParam, RM_SECT_DRIVERS );
 	for( xx = *listLength; xx < *listLength + newNb; ++xx ) {
 		newDrivers[ xx ] = (tDriverInfo*)malloc( sizeof( tDriverInfo ) );
@@ -612,6 +617,9 @@ void ReCareerNextAddDrivers( tDriverInfo ***drivers, int *listLength, tCareerInf
 		newDrivers[ xx ]->skill = GfParmGetNum( curParam, buf, RM_ATTR_SKILLLEVEL, NULL, 5.0f );
 		newDrivers[ xx ]->classPointList = (double*)malloc( sizeof( double ) * info->nbClasses );
 		newDrivers[ xx ]->sortValue = 0.0f;
+
+		GfLogDebug("  * %s #%d (%s)%s\n", newDrivers[ xx ]->module, newDrivers[ xx ]->idx, newDrivers[ xx ]->name,
+				   newDrivers[ xx ]->extended ? " extended" : "");
 
 		/* Get class points */
 		classPosition[ xx - *listLength ] = (int*)malloc( sizeof(int) * info->nbClasses );
@@ -942,6 +950,8 @@ static void ReCareerNextWrite( tCareerInfo *info )
 	for( xx = 0; xx < info->nbClasses; ++xx )
 		curGroup[ xx ] = 0;
 
+	//GfLogDebug("ReCareerNextWrite:\n");
+
 	curParam = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
 	firstfile = strdup( GfParmGetFileName( curParam ) );
 	do {
@@ -968,13 +978,17 @@ static void ReCareerNextWrite( tCareerInfo *info )
 				GfParmSetNum( curParam, buf, RM_ATTR_IDX, NULL, (tdble)curGroupPtr->teams[ zz ].drivers[ uu ]->idx );
 				GfParmSetNum( curParam, buf, RM_ATTR_EXTENDED, NULL, (tdble)curGroupPtr->teams[ zz ].drivers[ uu ]->extended );
 
+				//const tDriverInfo* pDriver = curGroupPtr->teams[ zz ].drivers[ uu ];
+				//GfLogDebug("  * %s #%d (%s)%s\n", pDriver->module, pDriver->idx, pDriver->name,
+				//		   pDriver->extended ? " extended" : "");
+				
 				/* Fill Driver Info */
 				snprintf( buf, 1024, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, curGroupPtr->teams[ zz ].drivers[ uu ]->module,
 				                                                        curGroupPtr->teams[ zz ].drivers[ uu ]->extended,
 											curGroupPtr->teams[ zz ].drivers[ uu ]->idx );
 				GfParmSetStr( curParam, buf, RM_ATTR_NAME, curGroupPtr->teams[ zz ].drivers[ uu ]->name );
 				GfParmSetStr( curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
-				GfLogDebug( "GfParmSetStr( %p, %s, %s, %s )\n", curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
+				//GfLogDebug( "GfParmSetStr( %p, %s, %s, %s )\n", curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
 				GfParmSetStr( curParam, buf, ROB_ATTR_TEAM, curGroupPtr->teams[ zz ].name );
 				GfParmSetNum( curParam, buf, RM_ATTR_SKILLLEVEL, NULL, (tdble)curGroupPtr->teams[ zz ].drivers[ uu ]->skill );
 				++yy;
