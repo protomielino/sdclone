@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Quick Race" type="param" mode="mw" version="1.19">
+<params name="Quick Race" type="param" mode="mw" version="1.20">
 
     <section name="Header">
       <attstr name="name" val="Quick Race"/>
@@ -115,12 +115,15 @@
           <attstr name="type" val="race length"/>
         </section>
         <section name="2">
-          <attstr name="type" val="time of day"/>
+          <attstr name="type" val="display mode"/>
         </section>
         <section name="3">
-          <attstr name="type" val="cloud cover"/>
+          <attstr name="type" val="time of day"/>
         </section>
         <section name="4">
+          <attstr name="type" val="cloud cover"/>
+        </section>
+        <section name="5">
           <attstr name="type" val="rain fall"/>
         </section>
       </section>
