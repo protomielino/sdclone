@@ -267,7 +267,7 @@ grInitBackground(void)
 		GfLogInfo("  Cloud cover : 1 layer, texture=%s, speed=60, direction=45\n", buf);
 		} else if (grNBCloudfield == 2)
 		{
-			snprintf(buf, sizeof(buf), "data/textures/scattered1.rgba", 1);
+			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[0]->setSpeed(30);
@@ -281,7 +281,7 @@ grInitBackground(void)
 			GfLogInfo("  Cloud cover : 1 layer, texture=01, speed=30, direction=40\n  Cloud cover : 2 layer, texture=%s, speed=60, direction=45\n", buf);
 		} else if (grNBCloudfield == 3)
 		{
-			snprintf(buf, sizeof(buf), "data/textures/scattered1.rgba", 1);
+			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
 			cloudLayers[0]->setSpeed(30);
