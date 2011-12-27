@@ -56,7 +56,8 @@ rmAbandonRaceHookInit(void)
 static void
 rmStartRaceHookActivate(void * /* dummy */)
 {
-	LmRaceEngine().startRace();
+	// TODO: Check error status ?
+	(void)LmRaceEngine().startRace();
 }
 
 static void	*pvStartRaceHookHandle = 0;

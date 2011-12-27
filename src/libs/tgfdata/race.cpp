@@ -598,8 +598,9 @@ void GfRace::store()
  		// 		   pSessionParams->eCloudsSpec, pSessionParams->eRainSpec);
 	}
 	
-	// Clear the race starting grid.
+	// Clear the drivers list and race starting grid.
     GfParmListClean(hparmRaceMan, RM_SECT_DRIVERS);
+    GfParmListClean(hparmRaceMan, RM_SECT_DRIVERS_RACING);
 
 	// And then rebuild it from the current Competitors list state
 	// (for each competitor, module name, interface index, car name if human,

@@ -31,7 +31,7 @@ extern void ReInitResults(void);
 
 extern void ReStoreRaceResults(const char *race);
 
-extern int  ReShowResults(void);
+extern void ReCalculateClassPoints(char const *race);
 
 extern void ReSavePracticeLap(tCarElt *car);
 

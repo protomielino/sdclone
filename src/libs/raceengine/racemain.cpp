@@ -91,7 +91,7 @@ void ReRaceAbort()
 	RePhysicsEngine().shutdown();
 	RaceEngine::self().unloadPhysicsEngine();
 
-	ReUI().onRaceFinished();
+	ReUI().onRaceFinishing();
 
 	ReRaceCleanDrivers();
 
@@ -446,6 +446,7 @@ ReRaceRealStart(void)
 
 	ReUI().onRaceStarted();
 
+	// And go on looping the race state automaton.
 	return RM_SYNC | RM_NEXT_STEP;
 }//ReRaceRealStart
 
@@ -459,6 +460,7 @@ ReRaceStart(void)
 	const char *raceName = ReInfo->_reRaceName;
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
+	int mode = 0;
 
 	// Reallocate and reset car info for the race.
 	FREEZ(ReInfo->_reCarInfo);
@@ -470,10 +472,20 @@ ReRaceStart(void)
 	ReUI().onRaceInitializing();
 	
 	// Drivers starting order
+	int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
-	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+	if (nCars == 0)
+	{
+		// This may happen, when playing with the text-only mode,
+		// and forgetting that huamn are automatically excluded then,
+		// or when getting back to the GUI mode, and not reconfiguring the competitors list.
+		GfLogError("No competitor in this race : cancelled.\n");
+		mode = RM_ERROR;
+	}
+	else if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& ReInfo->s->_totTime < 0.0f) // <= What's this time test for ?
 	{
+		// Qualification or Practice session => 1 driver at a time = the "current" one.
 		int nCurrDrvInd =
 			(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (nCurrDrvInd == 1)
@@ -502,7 +514,6 @@ ReRaceStart(void)
 		const char* gridType =
 			GfParmGetStr(params, raceName, RM_ATTR_START_ORDER, RM_VAL_DRV_LIST_ORDER);
 		
-		int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 		int maxCars = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
 		
@@ -587,19 +598,23 @@ ReRaceStart(void)
 	
 	//ReTrackUpdate();
 
-	ReUI().onRaceStarting();
-
-	if (!strcmp(GfParmGetStr(params, ReInfo->_reRaceName, RM_ATTR_SPLASH_MENU, RM_VAL_NO), RM_VAL_YES))
-		return RM_ASYNC | RM_NEXT_STEP;
-
-	return ReRaceRealStart();
+	if (!(mode & RM_ERROR))
+	{
+		// According to what the UI answers, start the race right now or not.
+		mode = RM_ASYNC | RM_NEXT_STEP;
+		const bool bGoOn = ReUI().onRaceStarting();
+		if (bGoOn)
+			mode = ReRaceRealStart();
+	}
+	
+	return mode;
 }
 
 void ReRaceRestart()
 {
 	ReShutdownUpdaters();
 
-	ReUI().onRaceFinished();
+	ReUI().onRaceFinishing();
 	
 	ReRaceCleanup();
 
@@ -625,35 +640,44 @@ ReRaceEnd(void)
 
 	ReShutdownUpdaters();
 
-	ReUI().onRaceFinished();
+	ReUI().onRaceFinishing();
 	
 	ReRaceCleanup();
 
 	if (NetGetNetwork())
 		NetGetNetwork()->RaceDone();
 
-	// If we are at the end of a qualification or practice session,
-	// select the next competitor : it is his turn for the session.
-	// If no more competitor, display the results of the session for all the competitors.
+	// If we are at the end of a qualification or practice session for a competitor,
+	// select the next competitor : it is his turn for the same session.
+	// If no more competitor, this is the end of the session for all the competitors.
+	bool bEndOfSession = true;
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& ReInfo->s->_totTime < 0.0f)
 	{
+		// Get the index of the current competitor (the one who just completed his race).
 		curDrvIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
-		curDrvIdx++;
-		if (curDrvIdx > GfParmGetEltNb(params, RM_SECT_DRIVERS)) 
-		{
-			GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
-			return ReShowResults();
-		}
-		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 
-		// Next competitor.
-		GfLogDebug("ReRaceEnd: Sync + Next race\n");
-		return RM_SYNC | RM_NEXT_RACE;
+		// Up to the next competitor now, if not the last one.
+		curDrvIdx++;
+		
+		if (curDrvIdx <= GfParmGetEltNb(params, RM_SECT_DRIVERS)) 
+			bEndOfSession = false;
+		else
+			curDrvIdx = 1; // Was the last one : end of session !
+
+		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 	}
 
-	// Otherwise, display the results of the session for all the competitors
-	return ReShowResults();
+	// Calculate class points if we just finished a session.
+	if (bEndOfSession)
+	{
+		ReCalculateClassPoints (ReInfo->_reRaceName);
+	}
+	
+	// Determine the new race state automation mode.
+	const bool bGoOn = ReUI().onRaceFinished(bEndOfSession);
+	
+	return (bEndOfSession ? RM_NEXT_STEP : RM_NEXT_RACE) | (bGoOn ? RM_SYNC : RM_ASYNC);
 }
 
 
@@ -694,8 +718,8 @@ ReRaceEventShutdown(void)
 	char careerMode = FALSE;
 	char first = TRUE;
 
-	// Notify the UI that the race event is over now.
-	ReUI().onRaceEventFinished();
+	// Notify the UI that the race event is finishing now.
+	ReUI().onRaceEventFinishing();
 
 	// 
 	ReTrackShutdown();
@@ -719,7 +743,8 @@ ReRaceEventShutdown(void)
 
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, (tdble)curTrkIdx);
 
-		if (strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0) {
+		// Career mode.
+		if (!strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES)) {
 			careerMode = TRUE;
 			lastRaceOfRound = strcmp(GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_YES), RM_VAL_YES) == 0;
 	
@@ -764,18 +789,16 @@ ReRaceEventShutdown(void)
 			}
 			first = FALSE;
 		} else {
-			/* Normal case: no subfiles, so free weekends possible, so nothing to check */
+			// Normal mode (no subfiles, so free weekends possible, so nothing to check)
 			break;
 		}
 	} while( true );
-	
-	int mode = (curTrkIdx != 1 || careerMode) ? RM_NEXT_RACE : RM_NEXT_STEP;
-	
-	if (nbTrk != 1)
-		mode |= ReUI().showStandings() ? RM_SYNC : RM_ASYNC;
-	else
-		mode |= RM_SYNC;
 
+	// Determine new race state automaton mode.
+	int mode = (curTrkIdx != 1 || careerMode) ? RM_NEXT_RACE : RM_NEXT_STEP;
+
+	mode |= ReUI().onRaceEventFinished(nbTrk != 1) ? RM_SYNC : RM_ASYNC;;
+	
 	if (mode & RM_NEXT_STEP)
 		FREEZ(ReInfo->_reCarInfo);
 

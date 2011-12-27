@@ -193,7 +193,8 @@ void RaceEngine::resumeRace()
 //************************************************************
 void RaceEngine::startRace()
 {
-	::ReRaceRealStart();
+	// TODO: Process error status ?
+	(void)::ReRaceRealStart();
 }
 
 void RaceEngine::abandonRace()

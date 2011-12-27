@@ -160,10 +160,12 @@ void TextOnlyUI::onRaceInitializing()
 	GfLogDebug("TextOnlyUI::onRaceInitializing()\n");
 }
 
-void TextOnlyUI::onRaceStarting()
+bool TextOnlyUI::onRaceStarting()
 {
-	// Actually nothing to do.
 	GfLogDebug("TextOnlyUI::onRaceStarting()\n");
+
+	// Tell the race engine state automaton to go on looping.
+	return true;
 }
 
 void TextOnlyUI::onRaceLoadingDrivers()
@@ -197,6 +199,11 @@ void TextOnlyUI::onRaceStarted()
 	GfApp().eventLoop().setRecomputeCB(TextOnlyUI::updateRaceEngine);
 }
 
+void TextOnlyUI::onRaceResuming()
+{
+	GfLogWarning("TextOnlyUI::onRaceResuming : Should never be called\n");
+}
+
 void TextOnlyUI::onLapCompleted(int nLapIndex)
 {
 	if (nLapIndex <= 0)
@@ -218,18 +225,44 @@ void TextOnlyUI::onRaceInterrupted()
 	GfLogWarning("TextOnlyUI::onRaceInterrupted : Should never be called\n");
 }
 
-void TextOnlyUI::onRaceFinished()
+void TextOnlyUI::onRaceFinishing()
 {
-	GfLogDebug("TextOnlyUI::onRaceFinished()\n");
+	GfLogDebug("TextOnlyUI::onRaceFinishing()\n");
 	
 	// Configure the event loop : compute = nothing.
-	GfApp().eventLoop().setRecomputeCB(TextOnlyUI::updateRaceEngine);
+	GfApp().eventLoop().setRecomputeCB(0);
 }
 
-void TextOnlyUI::onRaceEventFinished()
+bool TextOnlyUI::onRaceFinished(bool bEndOfSession)
+{
+	GfLogDebug("TextOnlyUI::onRaceFinished(%send of session)\n", bEndOfSession ? "" : "not ");
+
+	if (bEndOfSession)
+	{
+		// TODO: Dump results table in the console (something like RmShowResults) ?
+	}
+	
+	// Tell the race engine state automaton to go on looping.
+	return true;
+}
+
+void TextOnlyUI::onRaceEventFinishing()
 {
 	// Actually nothing to do.
-	GfLogDebug("TextOnlyUI::onRaceEventFinished()\n");
+	GfLogDebug("TextOnlyUI::onRaceEventFinishing()\n");
+}
+
+bool TextOnlyUI::onRaceEventFinished(bool bMultiEvent)
+{
+	GfLogDebug("TextOnlyUI::onRaceEventFinished(%smulti-event)\n", bMultiEvent ? "" : "not ");
+
+	if (bMultiEvent)
+	{
+		// TODO: Dump results table in the console (something like RmShowStandings) ?
+	}
+	
+	// Tell the race engine state automaton to go on looping.
+	return true;
 }
 
 void TextOnlyUI::addLoadingMessage(const char* pszText)
@@ -278,24 +311,6 @@ int TextOnlyUI::getResultsTableRowCount() const
 void TextOnlyUI::eraseResultsTable()
 {
 	_pResTable->vecLines.clear();
-}
-
-bool TextOnlyUI::showResults()
-{
-	// TODO: Dump results table in the console, as done in RmShowResults ?
-	GfLogDebug("TextOnlyUI::showResults()\n");
-	
-	// Tell the race engine state automaton to go on looping.
-	return true;
-}
-
-bool TextOnlyUI::showStandings()
-{
-	// TODO: Dump results table in the console, as done in RmShowStandings ?
-	GfLogDebug("TextOnlyUI::showStandings()\n");
-	
-	// Tell the race engine state automaton to go on looping.
-	return true;
 }
 
 //=========================================================================

@@ -47,15 +47,18 @@ public:
 	virtual void onRaceEventInitializing() = 0;
 	virtual bool onRaceEventStarting() = 0;
 	virtual void onRaceInitializing() = 0;
-	virtual void onRaceStarting() = 0;
+	virtual bool onRaceStarting() = 0;
 	virtual void onRaceLoadingDrivers() = 0;
 	virtual void onRaceDriversLoaded() = 0;
 	virtual void onRaceSimulationReady() = 0;
 	virtual void onRaceStarted() = 0;
+	virtual void onRaceResuming() = 0;
 	virtual void onLapCompleted(int nLapIndex) = 0;
 	virtual void onRaceInterrupted() = 0;
-	virtual void onRaceFinished() = 0;
-	virtual void onRaceEventFinished() = 0;
+	virtual void onRaceFinishing() = 0;
+	virtual bool onRaceFinished(bool bEndOfSession) = 0;
+	virtual void onRaceEventFinishing() = 0;
+	virtual bool onRaceEventFinished(bool bMultiEvent) = 0;
 
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText) = 0;
@@ -69,10 +72,6 @@ public:
 	virtual void removeResultsTableRow(int nIndex) = 0;
 	virtual void eraseResultsTable() = 0;
 	virtual int  getResultsTableRowCount() const = 0;
-
-	// Results and standings tables.
-	virtual bool showResults() = 0;
-	virtual bool showStandings() = 0;
 
 	//! Race engine setter.
 	virtual void setRaceEngine(IRaceEngine& raceEngine) = 0;

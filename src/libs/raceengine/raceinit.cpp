@@ -178,8 +178,7 @@ ReStartNewRace()
 void
 ReResumeRace()
 {
-	// Fire standings screen.
-	(void)ReUI().showStandings();
+	ReUI().onRaceResuming();
 }
 
 
@@ -503,7 +502,7 @@ static tCarElt* reLoadSingleCar( int carindex, int listindex, int modindex, int 
     elt->_modName[MAX_NAME_LEN - 1] = 0;
 
     //snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-    snprintf( path2, 256, "%s/%s/%d/%d", RM_SECT_DRIVERINFO, elt->_modName, normal_carname ? 0 : 1, elt->_moduleIndex );
+    snprintf( path2, sizeof(path2), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, elt->_modName, normal_carname ? 0 : 1, elt->_moduleIndex );
     if (normal_carname || elt->_driverType == RM_DRV_HUMAN)
       strncpy(elt->_name, GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "none"), MAX_NAME_LEN - 1);
     else

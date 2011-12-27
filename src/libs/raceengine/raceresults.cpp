@@ -202,7 +202,7 @@ ReUpdateStandings(void)
 	GfParmWriteFile(0, results, "Results");
 }//ReUpdateStandings
 
-static void ReCalculateClassPoints(char const *race)
+void ReCalculateClassPoints(char const *race)
 {
 	double points;
 	char *path3;
@@ -701,21 +701,4 @@ ReSavePracticeLap(tCarElt *car)
     GfParmSetNum(results, path, RE_ATTR_TOP_SPEED, NULL, info->topSpd);
     GfParmSetNum(results, path, RE_ATTR_BOT_SPEED, NULL, info->botSpd);
     GfParmSetNum(results, path, RE_ATTR_DAMMAGES, NULL, (tdble)car->_dammage);
-}
-
-int
-ReShowResults(void)
-{
-    ReCalculateClassPoints (ReInfo->_reRaceName);
-
-	int mode = RM_NEXT_STEP;
-    if (!strcmp(GfParmGetStr(ReInfo->params, ReInfo->_reRaceName, RM_ATTR_DISPRES, RM_VAL_YES), RM_VAL_YES)
-		|| ReInfo->_displayMode == RM_DISP_MODE_NORMAL)
-		mode |= ReUI().showResults() ? RM_SYNC : RM_ASYNC;
-	else
-		mode |= RM_SYNC;
-
-	GfLogDebug("ReShowResults: %s + NextStep\n", (mode & RM_SYNC) ? "Sync" : "Async");
-
-	return mode;
 }
