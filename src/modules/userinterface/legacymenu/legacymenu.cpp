@@ -188,7 +188,18 @@ void LegacyMenu::shutdown()
 
 void LegacyMenu::activateLoadingScreen()
 {
-	::RmLoadingScreenStart(_piRaceEngine->inData()->_reName, "data/img/splash-raceload.jpg");
+	tRmInfo* pReInfo = _piRaceEngine->inData();
+	
+	char pszTitle[128];
+	if (!strcmp(GfParmGetStr(pReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	{
+		const char* pszGroup = GfParmGetStr(pReInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
+		snprintf(pszTitle, sizeof(pszTitle), "%s - %s", pReInfo->_reName, pszGroup);
+	}
+	else
+		snprintf(pszTitle, sizeof(pszTitle), "%s", pReInfo->_reName);
+
+	::RmLoadingScreenStart(pszTitle, "data/img/splash-raceload.jpg");
 }
 
 void LegacyMenu::addLoadingMessage(const char* pszText)
@@ -220,6 +231,8 @@ bool LegacyMenu::onRaceEventStarting()
 
 		return false; // Tell the race engine state automaton to stop looping (enter the menu).
 	}
+
+	GfLogInfo("Not starting Next Event menu, as only one track to race on.\n");
 		
 	return true; // Tell the race engine state automaton to go on looping.
 }
@@ -260,6 +273,8 @@ bool LegacyMenu::onRaceStarting()
 	
 		::RmStartRaceMenu();
 	}
+	else
+		GfLogInfo("Not starting Start Race menu, as specified not to.\n");
 	
 	// Tell the race engine state automaton to stop looping
 	// if we enter the start menu, or else to go on.
@@ -387,6 +402,8 @@ bool LegacyMenu::onRaceFinished(bool bEndOfSession)
 		// Tell the race engine state automaton to stop looping (enter the menu).
 		return false;
 	}
+	
+	GfLogInfo("Not starting Results menu (not end of session, or specified not to, or blind mode).\n");
 		
 	return true;
 }
@@ -424,6 +441,8 @@ bool LegacyMenu::onRaceEventFinished(bool bMultiEvent)
 		// Tell the race engine state automaton to stop looping (enter the standings menu).
 		return false;
 	}
+
+	GfLogInfo("Not starting Standings menu , as non-multi-event race type.\n");
 	
 	// Tell the race engine state automaton to go on looping.
 	return true;

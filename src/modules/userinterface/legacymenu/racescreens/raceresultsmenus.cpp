@@ -36,13 +36,14 @@ static void	*rmScrHdle = NULL;
 
 static void rmPracticeResults(void *prevHdle, tRmInfo *info, int start);
 static void rmRaceResults(void *prevHdle, tRmInfo *info, int start);
-static void rmQualifResults(void *prevHdle, tRmInfo *info, int start);
+static void rmQualifResults(void *prevHdle, tRmInfo *info, const char*pszTitle, int start);
 
 typedef struct
 {
     void	*prevHdle;
     tRmInfo	*info;
     int		start;
+	const char	*title;
 } tRaceCall;
 
 tRaceCall	RmNextRace;
@@ -116,13 +117,13 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 	// Display the result table.
     y = yTopLine;
     
-    sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
+    snprintf(path, sizeof(path), "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
     const int totLaps = (int)GfParmGetEltNb(results, path);
     for (i = 0 + start; i < MIN(start + nMaxLines, totLaps); i++) {
-		sprintf(path, "%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, i + 1);
+		snprintf(path, sizeof(path), "%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, i + 1);
 
 		/* Lap */
-		sprintf(buf, "%d", i+1);
+		snprintf(buf, sizeof(buf), "%d", i+1);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "LapNumber", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
@@ -139,18 +140,18 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 		free(str);
 
 		/* Top Spd */
-		sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
+		snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TopSpeed", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
 		/* Min Spd */
-		sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_BOT_SPEED, NULL, 0) * 3.6));
+		snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_BOT_SPEED, NULL, 0) * 3.6));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "MinSpeed", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
 		/* Damages in current lap + (total so far) */
 		damages =  (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)); 
-		sprintf(buf, "%d (%d)", damages ? damages - NLastLapDamages : 0, damages); 
+		snprintf(buf, sizeof(buf), "%d (%d)", damages ? damages - NLastLapDamages : 0, damages); 
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Damages", true, // From template.
 								   buf, GFUI_TPL_X, y);
 		NLastLapDamages = damages; 
@@ -218,7 +219,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title label.
-    sprintf(buf, "%s", info->track->name);
+    snprintf(buf, sizeof(buf), "%s", info->track->name);
     const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
     GfuiLabelSetText(rmScrHdle, subTitleId, buf);
   
@@ -235,30 +236,30 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 
 	// Never used : remove ?
     //Get total laps, winner time
-    //sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
+    //snprintf(path, sizeof(path), "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
     //int totLaps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);
-    //sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, 1);
+    //snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, 1);
     //tdble refTime = GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0);
 
     //Get number of cars
-    sprintf(path, "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
+    snprintf(path, sizeof(path), "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
     int nbCars = (int)GfParmGetEltNb(results, path);
     
 	// Display the result table.
     int y = yTopLine;
 	int i;
     for (i = start; i < MIN(start + nMaxLines, nbCars); i++) {
-        sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
+        snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
         int laps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);//Laps covered
 
         //Rank
-        sprintf(buf, "%d", i+1);
+        snprintf(buf, sizeof(buf), "%d", i+1);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
         //Advance (The num.attrib 'index' holds the starting position)
         int advance = (int)(GfParmGetNum(results, path, RE_ATTR_INDEX, NULL, 0)) - i;
-        sprintf(buf, "%d", advance);
+        snprintf(buf, sizeof(buf), "%d", advance);
         const float *aColor =
 			advance > 0 ? acPlaceGain : (advance < 0 ? acPlaceLoss : GFUI_TPL_COLOR);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Advance", true, // From template.
@@ -291,22 +292,22 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
         free(str);
         
         //Laps covered
-        sprintf(buf, "%d", laps);
+        snprintf(buf, sizeof(buf), "%d", laps);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Laps", true, // From template.
 								   buf, GFUI_TPL_X, y);
         
         //Top speed
-        sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
+        snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TopSpeed", true, // From template.
 								   buf, GFUI_TPL_X, y);
         
         //Damage
-        sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)));
+        snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Damages", true, // From template.
 								   buf, GFUI_TPL_X, y);
         
         //Pitstops
-        sprintf(buf, "%d", (int)(GfParmGetNum(results, path, RE_ATTR_NB_PIT_STOPS, NULL, 0)));
+        snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_NB_PIT_STOPS, NULL, 0)));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Pits", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
@@ -355,12 +356,12 @@ rmChgQualifScreen(void *vprc)
     void		*prevScr = rmScrHdle;
     tRaceCall 	*prc = (tRaceCall*)vprc;
 
-    rmQualifResults(prc->prevHdle, prc->info, prc->start);
+    rmQualifResults(prc->prevHdle, prc->info, prc->title, prc->start);
     GfuiScreenRelease(prevScr);
 }
 
 static void
-rmQualifResults(void *prevHdle, tRmInfo *info, int start)
+rmQualifResults(void *prevHdle, tRmInfo *info, const char* pszTitle, int start)
 {
     void		*results = info->results;
     const char		*race = info->_reRaceName;
@@ -369,16 +370,20 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     static char		path[512];
     char		*str;
 
-	GfLogTrace("Entering Qualification Results menu\n");
+	GfLogTrace("Entering %s Results menu\n", pszTitle);
 
     // Create screen, load menu XML descriptor and create static controls.
     rmScrHdle = GfuiScreenCreate();
     void *hmenu = GfuiMenuLoad("qualifsresultsmenu.xml");
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
-    // Create variable title label.
-    sprintf(buf, "%s", info->track->name);
+    // Create variable title labels.
+    const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
+    snprintf(buf, sizeof(buf), "%s results", pszTitle);
+    GfuiLabelSetText(rmScrHdle, titleId, buf);
+
     const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
+    snprintf(buf, sizeof(buf), "%s", info->track->name);
     GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 	// Get layout properties.
@@ -387,21 +392,23 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
     const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
 
 	// Never used : remove ?
-    //sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, 1);
+    //snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, 1);
     //tdble refTime = GfParmGetNum(results, path, RE_ATTR_TIME, NULL, 0);
-    //sprintf(path, "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
+    //snprintf(path, sizeof(path), "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
     //const int totLaps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);
-    sprintf(path, "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
+    snprintf(path, sizeof(path), "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
     const int nbCars = (int)GfParmGetEltNb(results, path);
+	GfLogDebug("rmQualifResults: path=%s, file=%s\n", path, GfParmGetFileName(results));
+	GfLogDebug("rmQualifResults: start=%d, nbCars=%d, nMaxLines=%d\n", start, nbCars, nMaxLines);
 	
 	int y = yTopLine;
     for (i = start; i < MIN(start + nMaxLines, nbCars); i++) {
-		sprintf(path, "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
+		snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i + 1);
 		// Never used : remove ?
 		//const int laps = (int)GfParmGetNum(results, path, RE_ATTR_LAPS, NULL, 0);
 
         //Rank
-        sprintf(buf, "%d", i+1);
+        snprintf(buf, sizeof(buf), "%d", i+1);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
@@ -434,6 +441,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 		RmPrevRace.prevHdle = prevHdle;
 		RmPrevRace.info     = info;
 		RmPrevRace.start    = start - nMaxLines;
+		RmPrevRace.title    = pszTitle;
 		GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "PreviousPageArrow",
 									(void*)&RmPrevRace, rmChgQualifScreen);
 		GfuiAddKey(rmScrHdle, GFUIK_PAGEUP,   "Previous Results", (void*)&RmPrevRace, rmChgQualifScreen, NULL);
@@ -449,6 +457,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, int start)
 		RmNextRace.prevHdle = prevHdle;
 		RmNextRace.info     = info;
 		RmNextRace.start    = start + nMaxLines;
+		RmNextRace.title    = pszTitle;
 		GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "NextPageArrow",
 									(void*)&RmNextRace, rmChgQualifScreen);
 		GfuiAddKey(rmScrHdle, GFUIK_PAGEDOWN, "Next Results", (void*)&RmNextRace, rmChgQualifScreen, NULL);
@@ -496,11 +505,20 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	void *hmenu = GfuiMenuLoad("standingsmenu.xml");
 	GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
-    // Create variable title label.
-	//Set title
-	sprintf(buf, "%s Standings", info->_reRaceName);
+    // Create variable title labels.
 	const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
+	if (!strcmp(GfParmGetStr(info->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	{
+		const char* pszGroup = GfParmGetStr(info->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
+		snprintf(buf, sizeof(buf), "%s - %s", info->_reName, pszGroup);
+	}
+	else
+		snprintf(buf, sizeof(buf), "%s", info->_reName);
 	GfuiLabelSetText(rmScrHdle, titleId, buf);
+
+	snprintf(buf, sizeof(buf), "%s Standings", info->_reRaceName);
+	const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
+	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 	// Get layout properties.
     const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 15);
@@ -511,10 +529,10 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	int y = yTopLine;
 	const int nbCars = (int)GfParmGetEltNb(results, (char*)RE_SECT_STANDINGS);
 	for (i = start; i < MIN(start + nMaxLines, nbCars); i++) {
-		sprintf(path, "%s/%d", RE_SECT_STANDINGS, i + 1);
+		snprintf(path, sizeof(path), "%s/%d", RE_SECT_STANDINGS, i + 1);
 		
         //Rank
-        sprintf(buf, "%d", i+1);
+        snprintf(buf, sizeof(buf), "%d", i+1);
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Rank", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
@@ -533,7 +551,7 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 
 
 		//Points
-		sprintf(buf, "%d", (int)GfParmGetNum(results, path, RE_ATTR_POINTS, NULL, 0));
+		snprintf(buf, sizeof(buf), "%d", (int)GfParmGetNum(results, path, RE_ATTR_POINTS, NULL, 0));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Points", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
@@ -581,26 +599,39 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 void
 RmShowResults(void *prevHdle, tRmInfo *info)
 {
-    int nCars;
-    char buffer[128];
-
     switch (info->s->_raceType)
 	{
 		case RM_TYPE_PRACTICE:
+		{
+			char buffer[128];
 			snprintf(buffer, sizeof(buffer), "%s/%s", info->track->name, RE_SECT_DRIVERS);
-			nCars = GfParmGetEltNb( info->results, buffer );
-			if (nCars == 1)
-				rmPracticeResults(prevHdle, info, 0);
+			int nCars = GfParmGetEltNb(info->results, buffer);
+			bool bQualif = (nCars != 1);
+
+			// Career special case : Practice results show multiple cars,
+			// but only 1 driver, so no 'rank' section.
+			// TODO: Rather fix the Career code ?
+			if (bQualif)
+			{
+				snprintf(buffer, sizeof(buffer), "%s/%s/%s/%s", info->track->name, RE_SECT_RESULTS, info->_reRaceName, RE_SECT_RANK);
+				nCars = (int)GfParmGetEltNb(info->results, buffer);
+				GfLogDebug("RmShowResults: %d elements in %s\n", nCars, buffer);
+				bQualif = bQualif && (nCars != 0);
+			}
+			
+			if (bQualif)
+				rmQualifResults(prevHdle, info, "Practice", 0);
 			else
-				rmQualifResults(prevHdle, info, 0);
+				rmPracticeResults(prevHdle, info, 0);
 			break;
+		}
 
 		case RM_TYPE_RACE:
 			rmRaceResults(prevHdle, info, 0);
 			break;
 			
 		case RM_TYPE_QUALIF:
-			rmQualifResults(prevHdle, info, 0);
+			rmQualifResults(prevHdle, info, "Qualification", 0);
 			break;
     }//switch raceType
 }//RmShowResults

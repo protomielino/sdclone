@@ -56,8 +56,7 @@ rmAbandonRaceHookInit(void)
 static void
 rmStartRaceHookActivate(void * /* dummy */)
 {
-	// TODO: Check error status ?
-	(void)LmRaceEngine().startRace();
+	LmRaceEngine().startRace();
 }
 
 static void	*pvStartRaceHookHandle = 0;
@@ -99,9 +98,8 @@ void
 rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 {
     static char path[512];
-    static char buf[64];
+    static char buf[128];
     void        *params = info->params;
-    const char  *raceName = info->_reRaceName;
     
 	GfLogTrace("Entering Start Race menu\n");
 	
@@ -111,19 +109,30 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title label.
-    int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TitleLabel");
-    GfuiLabelSetText(rmScrHdle, titleId, raceName);
-
+    const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TitleLabel");
+	if (!strcmp(GfParmGetStr(info->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	{
+		const char* pszGroup = GfParmGetStr(info->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
+		snprintf(buf, sizeof(buf), "%s - %s", info->_reName, pszGroup);
+	}
+	else
+		snprintf(buf, sizeof(buf), "%s", info->_reName);
+    GfuiLabelSetText(rmScrHdle, titleId, buf);
+	
     // Create background image if any.
     const char* img = GfParmGetStr(params, RM_SECT_HEADER, RM_ATTR_STARTIMG, 0);
     if (img)
         GfuiScreenAddBgImg(rmScrHdle, img);
         
     // Create starting grid labels if specified in race params.
-    if (!strcmp(GfParmGetStr(params, raceName, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES))
+	GfLogDebug("rmStartRaceMenu: showGrid=%d\n",
+			   strcmp(GfParmGetStr(params, info->_reRaceName, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES) == 0);
+    if (!strcmp(GfParmGetStr(params, info->_reRaceName, RM_ATTR_DISP_START_GRID, RM_VAL_YES), RM_VAL_YES))
 	{
         // Create starting grid subtitle label.
-        GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitleLabel");
+        const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitleLabel");
+		snprintf(buf, sizeof(buf), "%s Starting grid", info->_reRaceName);
+		GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 		// Get layout properties.
 		const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxLines", 15);
@@ -131,14 +140,15 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 		const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
 
         // Create drivers info table.
-//         snprintf(path, sizeof(path), "%s/%s", raceName, RM_SECT_STARTINGGRID);
-//         const int rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
+        //snprintf(path, sizeof(path), "%s/%s", info->_reRaceName, RM_SECT_STARTINGGRID);
+        //const int rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
         const int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS_RACING);
+		GfLogDebug("rmStartRaceMenu: start=%d, nCars=%d, nMaxLines=%d\n", start, nCars, nMaxLines);
         int y = yTopLine;
 		int i = start;
         for (; i < MIN(start + nMaxLines, nCars); i++)
 		{
-            /* Find starting driver's name */
+            // Find starting driver's name
             snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS_RACING, i + 1);
             const char* modName = GfParmGetStr(info->params, path, RM_ATTR_MODULE, "");
             const int robotIdx = (int)GfParmGetNum(info->params, path, RM_ATTR_IDX, NULL, 0);
@@ -153,21 +163,19 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 				robhdle = GfParmReadFile(path, GFPARM_RMODE_STD);
 			}
   
-            const char* name = modName;
-			if (robhdle)
-			{
-				snprintf(path, sizeof(path), "%s/%s/%d", ROB_SECT_ROBOTS, ROB_LIST_INDEX, robotIdx);
-				name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<not found>");
-			}
+			GfLogDebug("  #%d : driver=%s\n", i, path);
 			
+            const char* name = modName;
             const char* carName = 0;
 			if (extended)
 			{
 				snprintf(path, sizeof(path), "%s/%s/%d/%d", RM_SECT_DRIVERINFO, modName, extended, robotIdx);
 				carName = GfParmGetStr(info->params, path, RM_ATTR_CARNAME, "<not found>");
+				name = GfParmGetStr(info->params, path, ROB_ATTR_NAME, "<not found>");
 			}
 			else if (robhdle)
 			{
+				name = GfParmGetStr(robhdle, path, ROB_ATTR_NAME, "<not found>");
 				carName = GfParmGetStr(robhdle, path, ROB_ATTR_CAR, "<not found>");
 			}
 			
