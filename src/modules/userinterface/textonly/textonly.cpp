@@ -277,6 +277,7 @@ void TextOnlyUI::setResultsTableTitles(const char* pszTitle, const char* pszSubT
 
 	if (_pResTable->vecLines.size() < (unsigned)getResultsTableRowCount())
 		_pResTable->vecLines.resize(getResultsTableRowCount());
+    GfLogDebug("TextOnlyUI::setResultsTableTitles : nMaxRows=%d\n", getResultsTableRowCount());
 }
 
 void TextOnlyUI::setResultsTableHeader(const char* pszHeader)
@@ -291,6 +292,13 @@ void TextOnlyUI::addResultsTableRow(const char* pszText)
 
 void TextOnlyUI::setResultsTableRow(int nIndex, const char* pszText, bool bHighlight)
 {
+	if (nIndex < 0 || nIndex >= (int)_pResTable->vecLines.size())
+	{
+		GfLogWarning("TextOnlyUI::setResultsTableRow : No such row %d in [0, %d] ; resizing.\n",
+					 nIndex, (int)_pResTable->vecLines.size() - 1);
+		_pResTable->vecLines.resize(nIndex + 1);
+	}
+		
 	_pResTable->vecLines[nIndex] = pszText;
 	if (bHighlight)
 		_pResTable->vecLines[nIndex] += " *";
@@ -298,6 +306,13 @@ void TextOnlyUI::setResultsTableRow(int nIndex, const char* pszText, bool bHighl
 
 void TextOnlyUI::removeResultsTableRow(int nIndex)
 {
+	if (nIndex < 0 || nIndex >= (int)_pResTable->vecLines.size())
+	{
+		GfLogWarning("TextOnlyUI::removeResultsTableRow : No such row %d in [0, %d] ; ignoring.\n",
+					 nIndex, (int)_pResTable->vecLines.size() - 1);
+		return;
+	}
+
 	_pResTable->vecLines.erase(_pResTable->vecLines.begin() + nIndex);
 }
 
@@ -305,7 +320,14 @@ int TextOnlyUI::getResultsTableRowCount() const
 {
 	// Unlike the menu GUI, we are not limited in any way here
 	// (but of course the number of competitors).
-	return (int)raceEngine().race()->getCompetitorsCount();
+	int nMaxRows = (int)raceEngine().race()->getCompetitorsCount();
+
+	// But with the Career mode, which has not been moved yet to using tgfdata (TODO),
+	// the number of competitors is not correctly initialized in tgfdata ...
+	if (nMaxRows <= 0)
+		nMaxRows = 50; // Whatever : if not enough, the result table will silently grow.
+
+	return nMaxRows;
 }
 
 void TextOnlyUI::eraseResultsTable()
