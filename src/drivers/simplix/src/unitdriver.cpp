@@ -2367,7 +2367,7 @@ void TDriver::InitAdaptiveShiftLevels()
 
   }
   
-  GfOut("\n#Gear change summary:\n");
+  GfOut("#Gear change summary:\n");
   for (J = 1; J < oLastGear; J++)
     GfOut("#%d: Rpm: %g(%g) -> Rpm: %g(%g)\n",
       J,oShift[J]*RpmFactor,oShift[J],ToRpm[J]*RpmFactor,ToRpm[J]);
