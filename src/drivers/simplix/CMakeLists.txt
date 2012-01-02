@@ -93,10 +93,10 @@ IF(NOT OPTION_OFFICIAL_ONLY)
 ENDIF()
 
 # The ubiquitous robot module and its clones.
-ROBOT_MODULE(NAME ${ROBOT_NAME}
-		     INTERFACE ${ROBOT_INTERFACE} 
-			 SOURCES ${ROBOT_SOURCES}
-			 CLONENAMES ${ROBOT_CLONES})
+ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.3.0 SOVERSION 1.0.0
+             INTERFACE ${ROBOT_INTERFACE}
+             SOURCES ${ROBOT_SOURCES}
+             CLONENAMES ${ROBOT_CLONES})
 
 # The data associated to the ubiquitous robot module and its clones.
 # simplix

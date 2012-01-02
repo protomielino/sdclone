@@ -195,14 +195,25 @@ ENDMACRO(GENERATE_ROBOT_DEF_FILE ROBOTNAME DEF_FILE)
 
 # Robot project definition (module build and install, without associated data)
 # Args:
-#  NAME    : Name of the robot
+#  NAME       : Name of the robot
 #  INTERFACE  : Robot Windows DLL Interface description (tells about exported symbols)
 #                 See GENERATE_ROBOT_DEF_FILE macro.
 #                 If not specified, defaults to "LEGACY_MIN" ; not used if MODULE used
-#  SOURCES  : List of files to use as build sources if any ; not needed if MODULE used
-#  CLONENAMES  : The names of the clones to generate
+#  SOURCES    : List of files to use as build sources if any ; not needed if MODULE used
+#  CLONENAMES : The names of the clones to generate
+#  VERSION    : The VERSION of the libraries to produce (robot and its clones) (def: $VERSION).
+#  SOVERSION  : The SOVERSION of the libraries to produce (in the ldconfig meaning) (def: 0.0.0).
+#
+# Example:
+#    ROBOT_MODULE(NAME simplix VERSION 3.0.5 SOVERSION 0.0.0
+#                 INTERFACE LEGACY WELCOME simplix_trb1 simplix_ls1 simplix_36GP
+#                 SOURCES simplix.cpp ...
+#                 CLONENAMES simplix_trb1 simplix_ls1 simplix_36GP)
 MACRO(ROBOT_MODULE)
+
   SET(RBM_SYNTAX "NAME,1,1,RBM_HAS_NAME,RBM_NAME")
+  SET(RBM_SYNTAX ${RBM_SYNTAX} "VERSION,0,1,RBM_HAS_VERSION,RBM_VERSION")
+  SET(RBM_SYNTAX ${RBM_SYNTAX} "SOVERSION,0,1,RBM_HAS_SOVERSION,RBM_SOVERSION")
   SET(RBM_SYNTAX ${RBM_SYNTAX} "INTERFACE,0,-1,RBM_HAS_INTERFACE,RBM_INTERFACE")
   SET(RBM_SYNTAX ${RBM_SYNTAX} "SOURCES,0,-1,RBM_HAS_SOURCES,RBM_SOURCES")
   SET(RBM_SYNTAX ${RBM_SYNTAX} "CLONENAMES,0,-1,RBM_HAS_CLONENAMES,RBM_CLONENAMES")
@@ -214,6 +225,16 @@ MACRO(ROBOT_MODULE)
   ENDIF()
   IF(NOT RBM_HAS_SOURCES OR NOT RBM_SOURCES)
     MESSAGE(FATAL_ERROR "Cannot build a robot module without sources / module to copy")
+  ENDIF()
+  IF(NOT RBM_HAS_VERSION OR NOT RBM_VERSION)
+    SET(RBM_VERSION ${VERSION})
+    MESSAGE(STATUS "No version specified for robot module ${RBM_NAME} ; using ${RBM_VERSION}")
+  ENDIF()
+  IF(NOT RBM_HAS_SOVERSION OR NOT RBM_SOVERSION)
+    IF(UNIX)
+      SET(RBM_SOVERSION 0.0.0)
+      MESSAGE(STATUS "No so-version specified for robot module ${RBM_NAME} ; using ${RBM_SOVERSION}")
+    ENDIF()
   ENDIF()
 
   PROJECT("robot_${RBM_NAME}")
@@ -233,34 +254,51 @@ MACRO(ROBOT_MODULE)
   ENDIF(WIN32)
 
   # Disable developer warning
-  if (COMMAND cmake_policy)
-    cmake_policy(SET CMP0003 NEW)
-  endIF(COMMAND cmake_policy)
+  IF (COMMAND cmake_policy)
+    CMAKE_POLICY(SET CMP0003 NEW)
+  ENDIF(COMMAND cmake_policy)
 
+  # Ignore some run-time libs to avoid MSVC link-time warnings and sometimes even crashes.
   IF(MSVC)
-    # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
       SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
   ENDIF(MSVC)
 
+  # The robot module is actually a shared library.
   ADD_LIBRARY(${RBM_NAME} SHARED ${RBM_SOURCES})
-  IF(UNIX)
+
+  # Customize shared library versions and file prefix.
+  SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
+  IF(UNIX) # Use ldconfig version naming scheme + no "lib" prefix under Linux
     SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES PREFIX "")
+    SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES SOVERSION ${RBM_SOVERSION})
   ENDIF(UNIX)
 
+  # Link/Run-time dependencies
   ADD_PLIB_LIBRARY(${RBM_NAME} sg)
   ADD_SDLIB_LIBRARY(${RBM_NAME} robottools)
 
+  # Install target robot module shared library
   SD_INSTALL_FILES(LIB drivers/${RBM_NAME} TARGETS ${RBM_NAME})
 
+  # Install clone robot modules shared libraries (use ldconfig version naming scheme under Linux)
   IF(RBM_HAS_CLONENAMES AND RBM_CLONENAMES)
-    GET_TARGET_PROPERTY(MODNAME ${RBM_NAME} LOCATION)
-    SET(MODPREFIX "")
-    SET(MODSUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+    GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LOCATION)
     FOREACH(CLONENAME ${RBM_CLONENAMES})
-      SET(CLONE_MODNAME ${MODPREFIX}${CLONENAME}${MODSUFFIX})
-      ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                         COMMAND ${CMAKE_COMMAND} -E copy ${MODNAME} ${CLONE_MODNAME})
-      SD_INSTALL_FILES(LIB drivers/${CLONENAME} FILES ${CLONE_MODNAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR})
+      SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+      IF(UNIX)
+        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
+        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
+                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
+        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                         FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
+      ELSE()
+        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC})
+        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                         FILES ${CLONE_MODLOC})
+      ENDIF()
     ENDFOREACH(CLONENAME ${RBM_CLONENAMES})
   ENDIF()
 
