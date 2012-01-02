@@ -1,12 +1,12 @@
 INCLUDE(../../cmake/macros.cmake)
 
-PROJECT(speed-dreams)
+PROJECT(speed-dreams-2)
 
 SET(_TARGET_NAME speed-dreams-2)
 
 SET(_SOURCES main.cpp)
 IF(WIN32)
-    SET(_SOURCES ${_SOURCES} speed-dreams.rc ../../data/data/icons/icon.ico)
+    SET(_SOURCES ${_SOURCES} main.rc resource.h ../../data/data/icons/icon.ico)
 ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
