@@ -198,7 +198,7 @@ def check_car(myoptions, module, index, path, car, model):
 
 			if (alternate_ver != None):
 				(filename,ext) = os.path.splitext(alternate)
-				skin = filename.rsplit("-",1)[1]
+				skin = filename.split(car+"-")[1]
 
 				# ignore commonly used textures
 				if skin == "int" or skin == "interior" or skin == "speed" or skin == "rpm":
