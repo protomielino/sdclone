@@ -25,6 +25,11 @@
 
 // cgrSimpleState class ========================================================
 
+cgrSimpleState::cgrSimpleState()
+: ssgSimpleState()
+{
+}
+
 void cgrSimpleState::setTexture(ssgTexture *tex)
 {
 	ssgSimpleState::setTexture(tex);

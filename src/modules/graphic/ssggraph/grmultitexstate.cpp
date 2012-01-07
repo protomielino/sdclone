@@ -31,7 +31,7 @@ extern PFNGLACTIVETEXTUREARBPROC glActiveTextureARB ;
 
 
 cgrMultiTexState::cgrMultiTexState(tfnTexScheme fnTexScheme)
-: _fnTexScheme(fnTexScheme)
+: cgrSimpleState(), _fnTexScheme(fnTexScheme)
 {
 	if (!_fnTexScheme)
 		GfLogError("cgrMultiTexState MUST be provided a texturing scheme function\n");
