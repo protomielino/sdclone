@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="LS1 Championship" type="param" mode="mw" version="1.5">
+<params name="LS1 Championship" type="param" mode="mw" version="1.6">
 
   <section name="Header">
     <attstr name="name" val="LS1 Championship"/>

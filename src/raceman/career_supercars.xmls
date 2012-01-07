@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../libs/tgf/params.dtd">
 
-<params name="Supercars Championship %A" type="param" mode="mw" version="1.4">
+<params name="Supercars Championship %A" type="param" mode="mw" version="1.5">
 
   <section name="Header">
     <attform name="name" val="#Supercars Championship # + toAlpha(number)"/>
