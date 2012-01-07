@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="graph" type="param" mode="mw" version="1.4">
+<params name="graph" type="param" mode="mw" version="1.5">
   <section name="Graphic">
     <attnum name="smoke value" val="300"/>
     <attnum name="smoke interval" val="0.01"/>
@@ -29,7 +29,7 @@
     <attnum name="sky dome distance" val="0"/>
     <attstr name="dynamic sky dome" val="disabled"/>
     <attnum name="precipitation density" unit="%" val="100"/>
-	<attnum name="cloudlayer" val="1"/>
+    <attnum name="cloudlayer" val="1"/>
     <attstr name="background skydome" val="disabled"/>
   </section>
 
