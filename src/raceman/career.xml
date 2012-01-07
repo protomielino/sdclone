@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Career" version="1.6">
+<params name="Career" version="1.7">
 
   <section name="Header">
     <attstr name="name" val="Career"/>
@@ -223,8 +223,6 @@
 
     </section>
 
-    <!-- TODO: Make it work !
-
     <section name="2">
       <attstr name="subfile" val="career_ls1.xmls"/>
       <attstr name="subfile suffix" val="ls1"/>
@@ -235,8 +233,6 @@
       </section>
 
     </section>
-
-    -->
 
   </section>
 

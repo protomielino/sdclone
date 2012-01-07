@@ -5,7 +5,7 @@ SD_INSTALL_FILES(DATA config/raceman USER config/raceman
                        singleevent-challenge.xml singleevent-endurance.xml
                        championship.xml championship-supercars.xml 
                        career.xml 
-                       career_supercars.xmls)
+                       career_supercars.xmls career_ls1.xmls)
 
 SD_INSTALL_FILES(DATA config/raceman/extra USER config/raceman/extra 
                  FILES extra/skill.xml)
@@ -15,7 +15,6 @@ IF(NOT OPTION_OFFICIAL_ONLY)
 
   SD_INSTALL_FILES(DATA config/raceman USER config/raceman 
                    FILES networkrace.xml
-                         championship-mpa1.xml 
-                         career_ls1.xmls)
+                         championship-mpa1.xml)
 ENDIF()
 
