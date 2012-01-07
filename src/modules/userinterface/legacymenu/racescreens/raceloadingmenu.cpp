@@ -150,7 +150,7 @@ RmLoadingScreenSetText(const char *text)
     
     if (!HScreen)
 	{
-		GfLogWarning("Can't display loading message : loading screen not created.\n");
+		//GfLogWarning("Can't display loading message : loading screen not created.\n");
 		return;
 	}
 	
