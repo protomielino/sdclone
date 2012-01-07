@@ -463,6 +463,7 @@ TGFCLIENT_API void GfuiProgressbarSetValue(void* scr, int id, float value);
 
 /* Combo Boxes */
 TGFCLIENT_API int GfuiComboboxCreate(void* scr, int font, int x, int y, int width,
+									 int arrowsWidth, int arrowsHeight,
 									 const char* pszText, int maxlen,
 									 const float* fgColor, const float* fgFocusColor,
 									 void* userData, tfuiComboboxCallback onChange,

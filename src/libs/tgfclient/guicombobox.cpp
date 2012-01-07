@@ -82,8 +82,32 @@ gfuiRightArrow(void *idv)
 		combobox->onChange(combobox->pInfo);
 }
 
+/** Add combo-box like control to a screen.
+    @ingroup	gui
+    @param	scr		Screen
+    @param	font	Font id
+    @param	x		X position on screen (0 = left)
+    @param	y		Y position on screen (0 = bottom)
+    @param	width		Width on the screen
+    @param	arrowsWidth		Width of the arrow buttons on the screen (0 = image width)
+    @param	arrowsHeight	Height of the arrow buttons on the screen (0 = image height)
+    @param	pszText	Text to display
+    @param	maxlen	Maximum length of the dsiaplyed text
+                    <br>0 for the text length.
+    @param	fgColor	Pointer on static RGBA color array (0 => default)
+    @param	fgFocusColor	Pointer on static RGBA focused color array (0 => fgColor)
+    @param	userData	User data attached to the combo-box
+    @param	onChange	Change callback function
+    @param	userDataOnFocus	Parameter to the Focus (and lost) callback
+    @param	onFocus		Focus callback function
+    @param	onFocusLost	Focus Lost callback function
+    @return	ComboBox Id
+		<br>-1 Error
+ */
+
 int
 GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
+				   int arrowsWidth, int arrowsHeight,
 				   const char *pszText, int maxlen,
 				   const float *fgColor, const float *fgFocusColor,
 				   void *userData, tfuiComboboxCallback onChange, 
@@ -113,17 +137,17 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 
 	// Initialize the left and right arrow button children.
 	// Warning: All the arrow images are supposed to be the same size.
-	// TODO: Make graphic properties XML-customizable (images, ...)
+	// TODO: Make image files customizable.
 	gfuiGrButtonInit(&combobox->leftButton,
 					 "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
 					 "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
-					 x, y, 0, 0, GFUI_MOUSE_UP,
-					 (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
+					 x, y, arrowsWidth, arrowsHeight,
+					 GFUI_MOUSE_UP,	 (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
 	gfuiGrButtonInit(&combobox->rightButton,
 					 "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
 					 "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
-					 x + width - combobox->leftButton.width, y, 0, 0, GFUI_MOUSE_UP,
-					 (void*)(object->id), gfuiRightArrow, 0, 0, 0);
+					 x + width - combobox->leftButton.width, y, arrowsWidth, arrowsHeight,
+					 GFUI_MOUSE_UP, (void*)(object->id), gfuiRightArrow, 0, 0, 0);
 
 	// Compute total height (text or buttons)
 	int height = gfuiFont[font]->getHeight();
@@ -144,7 +168,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	// Initialize the label child (beware of y if the buttons are higher than the text).
 	int yl = y;
 	if (height > gfuiFont[font]->getHeight())
-		yl += (height -  gfuiFont[font]->getHeight()) / 2;
+		yl += (height - gfuiFont[font]->getHeight()) / 2;
 		
 	gfuiLabelInit(&combobox->label, pszText, maxlen,
 				  x + combobox->leftButton.width, yl,

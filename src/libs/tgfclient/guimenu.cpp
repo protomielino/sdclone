@@ -695,15 +695,18 @@ GfuiMenuCreateComboboxControl(void* hscr, void* hparm, const char* pszName,
 
 	int id = -1;
 	
-	const int x = (int)GfParmGetNum(hparm,strControlPath.c_str(),GFMNU_ATTR_X,NULL,0.0);
-	const int y = (int)GfParmGetNum(hparm,strControlPath.c_str(),GFMNU_ATTR_Y,NULL,0.0);
+	const int x = (int)GfParmGetNum(hparm,strControlPath.c_str(), GFMNU_ATTR_X, NULL, 0.0);
+	const int y = (int)GfParmGetNum(hparm,strControlPath.c_str(), GFMNU_ATTR_Y, NULL, 0.0);
 
 	std::string strFontName = GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_FONT, "");
 	const int font = gfuiMenuGetFontId(strFontName.c_str());
 
-	int width = (int)GfParmGetNum(hparm,strControlPath.c_str(), GFMNU_ATTR_WIDTH,NULL,0.0);
+	int width = (int)GfParmGetNum(hparm,strControlPath.c_str(), GFMNU_ATTR_WIDTH, NULL, 0.0);
 	if (width == 0)
 	    width = 200;
+
+	const int nArrowsWidth = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_ARROWS_WIDTH, NULL, 0);
+	const int nArrowsHeight = (int)GfParmGetNum(hparm, strControlPath.c_str(), GFMNU_ATTR_ARROWS_HEIGHT, NULL, 0);
 
     const char* pszText = GfParmGetStr(hparm, strControlPath.c_str(), GFMNU_ATTR_TEXT, "");
 
@@ -737,7 +740,8 @@ GfuiMenuCreateComboboxControl(void* hscr, void* hparm, const char* pszName,
 	if (focusColor.alpha)
 		aFocusColor = focusColor.toFloatRGBA();
 	
-	id = GfuiComboboxCreate(hscr, font, x, y, width, pszText, maxlen, aColor, aFocusColor,
+	id = GfuiComboboxCreate(hscr, font, x, y, width, nArrowsWidth, nArrowsHeight,
+							pszText, maxlen, aColor, aFocusColor,
 							userData, onChange, userDataOnFocus, onFocus, onFocusLost);
 
 	return id;

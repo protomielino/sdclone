@@ -60,7 +60,7 @@ gfuiInitLabel(void)
     @ingroup	gui
     @param	label	The label to initialize
     @param	text	Text to display
-    @param	maxlen	Maximum length of the button string (used when the label is changed)
+    @param	maxlen	Maximum length of the displayed text (used when the label is changed)
                     <br>0 for the text length.
     @param	x	Position of the label on the screen (pixels)
     @param	y	Position of the label on the screen (pixels)
