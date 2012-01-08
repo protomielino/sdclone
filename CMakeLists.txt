@@ -53,6 +53,7 @@ ELSEIF(VERSION_IS_BRANCH)
 	SET(NEED_SVN_REV TRUE)
 ELSE(VERSION_IS_TAG)
 	MESSAGE("Warning: Could not determine version name from HeadURL ${HEAD_URL}")
+	SET(VERSION "0.0-unkown")
 ENDIF(VERSION_IS_TAG)
 
 #Try to get current revision
