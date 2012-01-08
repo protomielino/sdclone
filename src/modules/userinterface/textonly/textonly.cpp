@@ -146,7 +146,7 @@ void TextOnlyUI::onRaceEventInitializing()
 	GfLogDebug("TextOnlyUI::onRaceEventInitializing()\n");
 }
 
-bool TextOnlyUI::onRaceEventStarting()
+bool TextOnlyUI::onRaceEventStarting(bool careerNonHumanGroup)
 {
 	GfLogDebug("TextOnlyUI::onRaceEventStarting()\n");
 
@@ -252,7 +252,7 @@ void TextOnlyUI::onRaceEventFinishing()
 	GfLogDebug("TextOnlyUI::onRaceEventFinishing()\n");
 }
 
-bool TextOnlyUI::onRaceEventFinished(bool bMultiEvent)
+bool TextOnlyUI::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
 {
 	GfLogDebug("TextOnlyUI::onRaceEventFinished(%smulti-event)\n", bMultiEvent ? "" : "not ");
 

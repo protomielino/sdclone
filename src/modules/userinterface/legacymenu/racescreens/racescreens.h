@@ -74,7 +74,7 @@ extern void RmTrackSelect(void * /* vs */);
 
 extern void RmDriversSelect(void * /* vs */);
 
-extern void RmPitMenuStart(tCarElt * /* car */, tfuiCallback /* callback */);
+extern void RmPitMenuStart(tCarElt * /* car */, tSituation * /* situation */, tfuiCallback /* callback */);
 
 extern void RmLoadingScreenStart(const char * /* text */, const char * /* bgimg */);
 extern void RmLoadingScreenSetText(const char * /* text */);

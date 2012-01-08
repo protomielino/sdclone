@@ -523,14 +523,19 @@ tdble gfMean(tdble v, tMeanVal *pvt, int n, int w)
     @param	sec	Time to convert
     @param	plus	String to display as the positive sign (+) for positive values of time.
     @param	zeros	Flag to indicate if heading zeros are to be displayed or not.
-    @param	prec	Numer of figures to display after the decimal point (< 2 forced to 1).
+    @param	prec	Numer of figures to display after the decimal point.
     @return	Time string.
     @warning	The returned string has to be freed by the caller.
  */
 char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 {
+	//Check arguments
+	if( prec < 0)
+		prec = 0;
+
 	const int bufSize = (plus ? strlen(plus) : 0) + 9 + prec + 1 + 4; // 4 is for security.
 	char* buf = (char*)malloc(bufSize*sizeof(char));
+	char* secondsPrecision = (char*)malloc((prec+2)*sizeof(char));
 	
 	const char* sign = (sec < 0.0) ? "-" : (plus ? plus : "");
 	if (sec < 0.0)
@@ -555,13 +560,20 @@ char* GfTime2Str(double sec, const char* plus, bool zeros, int prec)
 		mult *= 10;
 	const int f = (int)floor(sec * mult);
 
+	//Fill the digits after the decimal of the seconds
+	if( prec > 0 )
+		snprintf( secondsPrecision, prec + 2, ".%.*d", prec, f );
+	else
+		strcpy(secondsPrecision, "");
+
 	if (h || zeros) {
-		(void)snprintf(buf, bufSize, "%s%2.2d:%2.2d:%2.2d.%.*d", sign, h, m, s, prec, f);
+		(void)snprintf(buf, bufSize, "%s%2.2d:%2.2d:%2.2d%s", sign, h, m, s, secondsPrecision);
 	} else if (m) {
-		(void)snprintf(buf, bufSize, "   %s%2.2d:%2.2d.%.*d", sign, m, s, prec, f);
+		(void)snprintf(buf, bufSize, "   %s%2.2d:%2.2d%s", sign, m, s, secondsPrecision);
 	} else {
-		(void)snprintf(buf, bufSize, "      %s%2.2d.%.*d", sign, s, prec, f);
+		(void)snprintf(buf, bufSize, "      %s%2.2d%s", sign, s, secondsPrecision);
 	}
+	free(secondsPrecision);
 	return buf;
 }
 

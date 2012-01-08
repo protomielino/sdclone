@@ -222,14 +222,22 @@ void LegacyMenu::onRaceEventInitializing()
 	activateLoadingScreen();
 }
 
-bool LegacyMenu::onRaceEventStarting()
+bool LegacyMenu::onRaceEventStarting(bool careerNonHumanGroup)
 {
 	tRmInfo* pReInfo = _piRaceEngine->inData();
 	if (GfParmGetEltNb(pReInfo->params, RM_SECT_TRACKS) > 1)
 	{
-		::RmNextEventMenu();
+		if( !careerNonHumanGroup )
+		{
+			::RmNextEventMenu();
 
-		return false; // Tell the race engine state automaton to stop looping (enter the menu).
+			return false; // Tell the race engine state automaton to stop looping (enter the menu).
+		}
+		else
+		{
+			GfLogInfo("Not starting Next Event menu, because there is no human in the race");
+			return true;
+		}
 	}
 
 	GfLogInfo("Not starting Next Event menu, as only one track to race on.\n");
@@ -431,9 +439,12 @@ void LegacyMenu::showStandings()
 	::RmShowStandings(_hscrGame, _piRaceEngine->inData(), 0);
 }
 
-bool LegacyMenu::onRaceEventFinished(bool bMultiEvent)
+bool LegacyMenu::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
 {
-	if (bMultiEvent)
+	//Only display the standings if both:
+	//  * there are multiple races for this championship
+	//  * the results are relevant for the user (which means: do not display in career-mode in non-human groups
+	if (bMultiEvent && !careerNonHumanGroup)
 	{
 		// Start the standings menu.
 		showStandings();

@@ -89,10 +89,11 @@ rmRepair(void* /* dummy */)
  * of fuel he wants and the number of damage he want to repair
  *
  * @param car The current car (pitcmd is modified on user decisions)
+ * @param s The current situation (used to calculate the remaining time)
  * @param callback The function which is called after the user made a decision
  */
 void
-RmPitMenuStart(tCarElt *car, tfuiCallback callback)
+RmPitMenuStart(tCarElt *car, tSituation *s, tfuiCallback callback)
 {
     char buf[128];
 
@@ -118,7 +119,17 @@ RmPitMenuStart(tCarElt *car, tfuiCallback callback)
 
    // Create labels for remaining laps and remaining fuel.
     int remainLapsId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
-    snprintf(buf, sizeof(buf), "%d", car->_remainingLaps);
+    if( s->_totTime > 0 && s->_totTime > s->currentTime ) /* Timed part of the timed session */
+    {
+    	if( s->_extraLaps > 0)
+    	    snprintf(buf, sizeof(buf), "%s + %d laps", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ), s->_extraLaps);
+	else
+    	    snprintf(buf, sizeof(buf), "%s", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ) );
+    }
+    else
+    {
+    	snprintf(buf, sizeof(buf), "%d", car->_remainingLaps); //Laps tot drive to win the race
+    }
     GfuiLabelSetText(menuHandle, remainLapsId, buf);
 
     int remainFuelId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingfuellabel");
@@ -172,7 +183,7 @@ RmCheckPitRequest()
 		LmRaceEngine().stop();
 
 		// Then open the pit menu (will return in ReCarsUpdateCarPitCmd).
-		RmPitMenuStart(LmRaceEngine().outData()->_rePitRequester, rmOnBackFromPitMenu);
+		RmPitMenuStart(LmRaceEngine().outData()->_rePitRequester, LmRaceEngine().outData()->s, rmOnBackFromPitMenu);
 
 		return true;
 	}

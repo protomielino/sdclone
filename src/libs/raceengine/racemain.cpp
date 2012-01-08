@@ -120,6 +120,8 @@ ReRaceEventInit(void)
 {
 	void *mainParams = ReInfo->mainParams;
 	void *params = ReInfo->params;
+
+	bool const careerMode = !strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES);
 	
 	/* Look if it is necessary to open another file */
 	if (strcmp(GfParmGetStr(mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0)
@@ -161,7 +163,7 @@ ReRaceEventInit(void)
 	
 	ReEventInitResults();
 
-	const bool bGoOnLooping = ReUI().onRaceEventStarting();
+	const bool bGoOnLooping = ReUI().onRaceEventStarting(careerMode && !ReHumanInGroup());
 
 	return (bGoOnLooping ? RM_SYNC : RM_ASYNC) | RM_NEXT_STEP;
 }
@@ -176,6 +178,7 @@ RePreRace(void)
 	void *params = ReInfo->params;
 	void *results = ReInfo->results;
 	int curRaceIdx;
+	int timedLapsReplacement = 0;
 
 	raceName = ReInfo->_reRaceName = ReGetCurrentRaceName();
 	
@@ -217,37 +220,35 @@ RePreRace(void)
 	if (ReInfo->s->_totTime > 0 && !(ReInfo->s->_features & RM_FEATURE_TIMEDSESSION)) {
 		// Timed session not supported: add 2 km for every minute
 		ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 2000.0f / 60.0f / ReInfo->track->length + 0.5f);
+		timedLapsReplacement = ReInfo->s->_totLaps;
 		ReInfo->s->_totTime = -60.0f;
 	}
 	
-	if (ReInfo->s->_totTime <= 0) {
-		// Make sure that if no time set, we set far below zero
+	// Timed session doesn't exclude addional laps after the time finishes
+	// Make sure that if no time set, we set far below zero
+	if(ReInfo->s->_totTime < 0.0f )
 		ReInfo->s->_totTime = -60.0f;
 		
-		// Get session distance (defaults to "All sessions" one, or else 0).
-		tdble dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, -1);
-		if (dist < 0)
-			dist = GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_DISTANCE, NULL, 0);
-		
-		// If a (> 0) session distance was specified, deduce the number of laps
-		// in case the race settings don't specify it.
-		if (dist >= 0.001) { // Why not 'if (dist > 0)' ???
-			ReInfo->s->_totLaps = (int)(dist / ReInfo->track->length) + 1;
-			ReInfo->s->_extraLaps = ReInfo->s->_totLaps; // TODO: Does this is ever needed ?
-		}
-		
-		// Get the number of laps (defaults to "All sessions" one,
-		// or else the already computed one from the session distance, or 30).
-		int laps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, -1);
-		if (laps < 0)
-			laps = (int)GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_LAPS, NULL, (tdble)ReInfo->s->_totLaps);
-		if (laps > 0 ) {
-			ReInfo->s->_totLaps = laps;
-			ReInfo->s->_extraLaps = ReInfo->s->_totLaps; // TODO: Does this is ever needed ?
-		}
+	// Get session distance (defaults to "All sessions" one, or else 0).
+	tdble dist = GfParmGetNum(params, raceName, RM_ATTR_DISTANCE, NULL, -1);
+	if (dist < 0)
+		dist = GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_DISTANCE, NULL, 0);
+	
+	// If a (> 0) session distance was specified, deduce the number of laps
+	// in case the race settings don't specify it.
+	if (dist >= 0.001) { // Why not 'if (dist > 0)' ???
+		ReInfo->s->_totLaps = (int)(dist / ReInfo->track->length) + 1 + timedLapsReplacement;
+		ReInfo->s->_extraLaps = ReInfo->s->_totLaps; // Extralaps are used to find out how many laps there are after the time is up in timed sessions
 	}
-	else {
-		ReInfo->s->_totLaps = 0;
+	
+	// Get the number of laps (defaults to "All sessions" one,
+	// or else the already computed one from the session distance, or 30).
+	int laps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, -1);
+	if (laps < 0)
+		laps = (int)GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_LAPS, NULL, (tdble)ReInfo->s->_totLaps);
+	if (laps > 0 ) {
+		ReInfo->s->_totLaps = laps + timedLapsReplacement;
+		ReInfo->s->_extraLaps = ReInfo->s->_totLaps; //Extralaps are used to find out how many laps there are after the time is up in timed sessions
 	}
 
 	// Get session type (race, qualification or practice).
@@ -263,7 +264,8 @@ RePreRace(void)
 	// Correct extra laps (possible laps run after the winner arrived ?) :
 	// during timed practice or qualification, there are none.
 	if (ReInfo->s->_raceType != RM_TYPE_RACE && ReInfo->s->_totTime > 0) {
-		ReInfo->s->_extraLaps = 0; // TODO: Does this is ever needed ?
+		ReInfo->s->_extraLaps = 0; //Extralaps are used to find out how many laps there are after the time is up in timed sessions
+		ReInfo->s->_totLaps = 0;
 	}
 
 	GfLogInfo("Race length : time=%.0fs, laps=%d (extra=%d)\n",
@@ -489,13 +491,14 @@ ReRaceStart(void)
 	if (nCars == 0)
 	{
 		// This may happen, when playing with the text-only mode,
-		// and forgetting that huamn are automatically excluded then,
+		// and forgetting that human are automatically excluded then,
 		// or when getting back to the GUI mode, and not reconfiguring the competitors list.
 		GfLogError("No competitor in this race : cancelled.\n");
 		mode = RM_ERROR;
 	}
 	else if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
-		&& ReInfo->s->_totTime < 0.0f) // <= What's this time test for ?
+		&& ReInfo->s->_totTime < 0.0f /* Timed session? */)
+	//Checks if there is only one driver per session allowed, so practice, qualification without timed session. 
 	{
 		// Qualification or Practice session => 1 driver at a time = the "current" one.
 		int nCurrDrvInd =
@@ -808,8 +811,9 @@ ReRaceEventShutdown(void)
 
 	// Determine new race state automaton mode.
 	int mode = (curTrkIdx != 1 || careerMode) ? RM_NEXT_RACE : RM_NEXT_STEP;
+	bool careerNonHumanGroup = careerMode && !ReHumanInGroup();
 
-	mode |= ReUI().onRaceEventFinished(nbTrk != 1) ? RM_SYNC : RM_ASYNC;;
+	mode |= ReUI().onRaceEventFinished(nbTrk != 1, careerNonHumanGroup) ? RM_SYNC : RM_ASYNC;;
 	
 	if (mode & RM_NEXT_STEP)
 		FREEZ(ReInfo->_reCarInfo);

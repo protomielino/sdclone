@@ -67,7 +67,7 @@ public:
 	// Race state change notifications.
 	virtual void onRaceConfiguring();
 	virtual void onRaceEventInitializing();
-	virtual bool onRaceEventStarting();
+	virtual bool onRaceEventStarting(bool careerNonHumanGroup);
 	virtual void onRaceInitializing();
 	virtual bool onRaceStarting();
 	virtual void onRaceLoadingDrivers();
@@ -80,7 +80,7 @@ public:
 	virtual void onRaceFinishing();
 	virtual bool onRaceFinished(bool bEndOfSession);
 	virtual void onRaceEventFinishing();
-	virtual bool onRaceEventFinished(bool bMultiEvent);
+	virtual bool onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup);
 	
 	// Loading messages management.
 	virtual void addLoadingMessage(const char* pszText);
