@@ -44,9 +44,9 @@
       <section name="2">
         <attstr name="name" val="Robert Ferdinand "></attstr>
         <attstr name="desc" val="mp5-fmc_C"></attstr>
-        <attstr name="team" val="simplix_mp5A"></attstr>
+        <attstr name="team" val="Team TRC"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="Team TRC"></attstr>
+        <attstr name="car name" val="mp5-fmc"></attstr>
         <attnum name="race number" val="2"></attnum>
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.4"></attnum>
@@ -56,9 +56,9 @@
 	<section name="3">
         <attstr name="name" val="Patrice Désiré "></attstr>
         <attstr name="desc" val="mp5-fmc_D"></attstr>
-        <attstr name="team" val="simplix_mp5A"></attstr>
+        <attstr name="team" val="Team TRC"></attstr>
         <attstr name="author" val="Wolf-Dieter Beelitz"></attstr>
-        <attstr name="car name" val="Team TRC"></attstr>
+        <attstr name="car name" val="mp5-fmc"></attstr>
         <attnum name="race number" val="3"></attnum>
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.4"></attnum>
