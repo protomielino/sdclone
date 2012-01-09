@@ -45,6 +45,15 @@
 #include "racemain.h"
 
 
+
+typedef struct
+{
+	char *racename;
+	int startpos;
+	int endpos;
+	int diffpos;
+}tReGridPart;
+
 //Utility
 
 /** 
@@ -454,6 +463,128 @@ ReRaceRealStart(void)
 	return RM_SYNC | RM_NEXT_STEP;
 }//ReRaceRealStart
 
+/* parse advanced starting order strings */
+/* grid part format: "sessionname[startpos:endpos]" */
+/* returns: 0, when failed to parse; 1, when successfully parsed */
+int
+ReParseStartingOrder(const char *StartingOrder, tReGridPart **pGridList, int nCars, int &nGridList)
+{
+	char path[128];
+	char *tempstr;
+	int curRaceIdx;
+	int i, nGL;
+	void  *params = ReInfo->params;
+	void  *results = ReInfo->results;
+	tReGridPart *GridList;
+	
+	/**/printf("REPARSESTARTINGORDER\n");
+	//input sanity check
+	if ((StartingOrder == NULL) || (nCars<1)){nGridList = 0; return 0;}
+	//find the number of parts, that is the number of '[' characters
+	nGL = 0;
+	i = 0;
+	while (StartingOrder[i] != '\0') {
+		if (StartingOrder[i] == '['){nGL++;}
+		i++;
+	}
+	printf("nGL=%d\n",nGL);
+	
+	curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
+	printf("curRaceIdx=%d\n",curRaceIdx);
+	// check whether it is a name of an earlier session
+	if (nGL == 0) {
+		printf("Check for name of an earlier session.\n");
+		for ( i = 1; i < curRaceIdx; i++ ) {
+			snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, i);
+			tempstr = GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
+			if (strcmp(tempstr, StartingOrder) == 0 ) {
+				GridList = new tReGridPart[1];
+				if (GridList == NULL){return 0;}
+				GridList[0].racename = tempstr;
+				GridList[0].startpos = 1;
+				GridList[0].endpos = nCars;
+				GridList[0].diffpos = 1;
+				nGridList = 1;
+				*pGridList = GridList;
+				printf("Name found.\n");
+				return 1;
+			}
+		}
+		//badly formatted GridList
+		printf("Badly formatted gridlist.\n");
+		nGridList = 0;
+		*pGridList = NULL;
+		return 0;
+	}
+	
+	// now try to parse it
+	char *tempstr2 = new char[strlen(StartingOrder)];
+	int stri;
+	int GLi = 0;
+	GridList = new tReGridPart[nGL];
+	printf("Try to parse it.\n");
+	for (i = 0; i < nGL; i++) {
+		//search for session name
+		stri = 0;
+		while (StartingOrder[GLi] != '[') {
+			tempstr2[stri] = StartingOrder[GLi];
+			stri++;
+			GLi++;
+		}
+		tempstr2[stri] = '\0';
+		GLi++;
+		GridList[i].racename = NULL;
+		for ( int j = 1; j < curRaceIdx; j++ ) {
+			snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, j);
+			tempstr = GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);
+			if (strcmp(tempstr, tempstr2) == 0 ) {
+				GridList[i].racename = tempstr;
+				printf("%d. sessions name was found.\n",i);
+				break;
+			}
+		}
+		if (GridList[i].racename == NULL) {
+			// failed to find session
+			nGridList = 0;
+			delete[] GridList;
+			delete[] tempstr2;
+			*pGridList = NULL;
+			printf("Failed to find name of %d. session",i);
+			return 0;
+		}
+		//find indexes
+		stri = 0;
+		while (StartingOrder[GLi] != ']') {
+			tempstr2[stri] = StartingOrder[GLi];
+			stri++;
+			GLi++;
+		}
+		tempstr2[stri] = '\0';
+		GLi++;
+		GridList[i].startpos = GridList[i].endpos = -1;
+		sscanf(tempstr2, "%d:%d", &(GridList[i].startpos), &(GridList[i].endpos));
+		printf("%d. startpos=%d, endpos=%d\n",i,GridList[i].startpos,GridList[i].endpos);
+		if (GridList[i].startpos <= 0) {
+			nGridList = 0;
+			delete[] GridList;
+			delete[] tempstr2;
+			*pGridList = NULL;
+			return 0;
+		} else if (GridList[i].endpos <= 0) {
+			GridList[i].endpos = GridList[i].startpos;
+		}
+		if (GridList[i].endpos < GridList[i].startpos)
+			{GridList[i].diffpos = -1;}
+		else {GridList[i].diffpos = 1;}
+	}
+	
+	delete[] tempstr2;
+	nGridList = nGL;
+	*pGridList = GridList;
+	printf("Starting order parsed successfully, %d parts were found.\n",nGL);
+	return 1;
+}
+
 /* return state mode */
 int
 ReRaceStart(void)
@@ -500,7 +631,7 @@ ReRaceStart(void)
 		&& ReInfo->s->_totTime < 0.0f /* Timed session? */)
 	//Checks if there is only one driver per session allowed, so practice, qualification without timed session. 
 	{
-		// Qualification or Practice session => 1 driver at a time = the "current" one.
+		// non-timed Qualification or Practice session => 1 driver at a time = the "current" one.
 		int nCurrDrvInd =
 			(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (nCurrDrvInd == 1)
@@ -531,6 +662,9 @@ ReRaceStart(void)
 		
 		int maxCars = (int)GfParmGetNum(params, sessionName, RM_ATTR_MAX_DRV, NULL, 100);
 		nCars = MIN(nCars, maxCars);
+		
+		tReGridPart *GridList = NULL;
+		int nGridList = 0;
 		
 		// Starting grid in the arrival order of the previous race (or qualification session)
 		if (!strcmp(gridType, RM_VAL_LAST_RACE_ORDER))
@@ -586,6 +720,90 @@ ReRaceStart(void)
 					GfParmSetStr(params, path2, RM_ATTR_SKINNAME,
 								 GfParmGetStr(results, path, RM_ATTR_SKINNAME, ""));
 			}
+		}
+
+		// Starting grid as a mix from the results of earlier sessions
+		else if (ReParseStartingOrder(gridType, &GridList, nCars, nGridList))
+		{
+			GfLogTrace("Starting grid as a mix from the results of earlier sessions\n");
+			
+			/**/
+			printf("ADVANCED GRID\n");
+			printf("%d parts\n",nGridList);
+			for (int m = 0; m < nGridList; m++)
+			{printf("%s,%d,%d,%d\n",GridList[m].racename,GridList[m].startpos,GridList[m].endpos,GridList[m].diffpos);
+			}
+			
+			int idx;
+			int gridpos = 1;
+			for (int i = 0; i < nGridList; i++) {
+				if (gridpos > nCars) {break;}
+				if (GridList[i].diffpos == -1) {//reversed
+					for ( int j = GridList[i].startpos; j >= GridList[i].endpos; j--) {
+						snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
+								ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
+						idx = GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
+						for (int k = 1; k < gridpos; k++) {
+							snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, k);
+							if ((GfParmGetNum(params, path2, RE_ATTR_IDX, NULL, 0) == idx ) && 
+							     (strcmp(GfParmGetStr(results, path, RE_ATTR_MODULE, ""),
+								         GfParmGetStr(params, path2, RE_ATTR_MODULE, "")) == 0) ) {
+								//oops: same car twice
+								GfLogWarning("The same car appears twice in the advanced grid!\n");
+								gridpos--;
+								break;
+							}
+						}
+						//adding car to the grid
+						snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, gridpos);
+						GfParmSetStr(params, path2, RM_ATTR_MODULE,
+									 GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
+						GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, idx);
+						GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL,
+									 GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+						GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL,
+									 GfParmGetNum(results, path, RM_ATTR_SKINTARGETS, NULL, 0));
+						if (GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0))
+							GfParmSetStr(params, path2, RM_ATTR_SKINNAME,
+										 GfParmGetStr(results, path, RM_ATTR_SKINNAME, ""));
+						printf("%d. pos from %d. pos, idx=%d\n",gridpos,j,idx);
+						gridpos++;
+					}
+				} else if (GridList[i].diffpos == 1){//straight order
+					for ( int j = GridList[i].startpos; j <= GridList[i].endpos; j++) {
+						snprintf(path, sizeof(path), "%s/%s/%s/%s/%d",
+								ReInfo->track->name, RE_SECT_RESULTS, GridList[i].racename, RE_SECT_RANK, j);
+						idx = GfParmGetNum(results, path, RE_ATTR_IDX, NULL, 0);
+						for (int k = 1; k < gridpos; k++) {
+							snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, k);
+							if ((GfParmGetNum(params, path2, RE_ATTR_IDX, NULL, 0) == idx ) && 
+							     (strcmp(GfParmGetStr(results, path, RE_ATTR_MODULE, ""),
+								         GfParmGetStr(params, path2, RE_ATTR_MODULE, "")) == 0) ) {
+								//oops: same car twice
+								GfLogWarning("The same car appears twice in the advanced grid!\n");
+								gridpos--;
+								break;
+							}
+						}
+						//adding car to the grid
+						snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, gridpos);
+						GfParmSetStr(params, path2, RM_ATTR_MODULE,
+									 GfParmGetStr(results, path, RE_ATTR_MODULE, ""));
+						GfParmSetNum(params, path2, RM_ATTR_IDX, NULL, idx);
+						GfParmSetNum(params, path2, RM_ATTR_EXTENDED, NULL,
+									 GfParmGetNum(results, path, RM_ATTR_EXTENDED, NULL, 0));
+						GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL,
+									 GfParmGetNum(results, path, RM_ATTR_SKINTARGETS, NULL, 0));
+						if (GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0))
+							GfParmSetStr(params, path2, RM_ATTR_SKINNAME,
+										 GfParmGetStr(results, path, RM_ATTR_SKINNAME, ""));
+						printf("%d. pos from %d. pos, idx=%d\n",gridpos,j,idx);
+						gridpos++;
+					}
+				}
+			}
+			//cleaning up memory
+			if (nGridList > 0){delete[] GridList;}
 		}
 
 		// Starting grid in the drivers list order
