@@ -164,7 +164,7 @@ ROBOT_DATA(NAME simplix_trb1 PREFIX simplix_trb1
 
 # MP5
 SET(ROBOT_SUBDIRS 0 1 2 3 4 5 
-                  mp5-fmc 
+                  mp5-fmc mp5-fmc-drift mp5-fmc-speedy
                   tracks)
 
 ROBOT_DATA(NAME simplix_mp5 PREFIX simplix_mp5 
