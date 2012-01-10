@@ -122,6 +122,7 @@
         <attstr name="features" val=""></attstr>
       </section>
 
+<!--
       <section name="9">
         <attstr name="name" val="Pavel Loginov"></attstr>
         <attstr name="desc" val=""></attstr>
@@ -147,6 +148,8 @@
         <attnum name="blue" val="0.7"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
+
+-->
 
       <section name="11">
         <attstr name="name" val="Hubert van der Bossche"></attstr>

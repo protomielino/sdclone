@@ -140,10 +140,10 @@ void GfDrivers::reload()
 		// For each driver (= interface) "in" the module
 		for (int nItfInd = 0; nItfInd < pCurModule->modInfoSize; nItfInd++)
 		{
-			// Ignore empty names 
+			// Ignore undefined drivers or showing an empty name
 			if (!pCurModule->modInfo[nItfInd].name || pCurModule->modInfo[nItfInd].name[0] == '\0')
 			{
-				GfLogWarning("Ignoring '%s' driver #%d (empty name)\n",
+				GfLogWarning("Ignoring '%s' driver #%d (not defined or empty name)\n",
 							 strModName.c_str(), nItfInd);
 				continue;
 			}
@@ -163,7 +163,7 @@ void GfDrivers::reload()
 								  << pCurModule->modInfo[nItfInd].index;
 					const char* pszCarId =
 						GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_CAR, "");
-					GfLogWarning("Changing '%s' driver '%s' (#%d) 's car to %s (default one %s not available)\n",
+					GfLogWarning("Changing '%s' driver '%s' (#%d) 's car to %s (default one '%s' not available)\n",
 								 strModName.c_str(), pCurModule->modInfo[nItfInd].name,
 								 pCurModule->modInfo[nItfInd].index, pSubstCar->getId().c_str(),
 								 pszCarId);
@@ -195,7 +195,7 @@ void GfDrivers::reload()
 							  << pCurModule->modInfo[nItfInd].index;
 				const char* pszCarId =
 					GfParmGetStr(hparmRobot, ossDrvSecPath.str().c_str(), ROB_ATTR_CAR, "");
-				GfLogWarning("Ignoring '%s' driver '%s' (#%d) (default car %s not available)\n",
+				GfLogWarning("Ignoring '%s' driver '%s' (#%d) (not defined or default car '%s' not available)\n",
 							 strModName.c_str(), pCurModule->modInfo[nItfInd].name,
 							 pCurModule->modInfo[nItfInd].index, pszCarId);
 			}
