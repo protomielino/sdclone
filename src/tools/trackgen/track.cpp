@@ -177,6 +177,10 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 				 * instead of center */
 				//RtTrackLocal2Global expects toStart as a length in meters for straight,
 				//and as an angle in radian for curves
+				//TODO(kilo)
+				//Proper handling of this should enable non-linear pitlanes.
+				//Postponed after 2.0
+#if 0
 				tdble pitCenter = toStart + pits->len / 2.0;
 				switch(curMainSeg->type) {
 					case TR_STR:
@@ -188,6 +192,9 @@ static void initPits(tTrack *theTrack, void *TrackHandle, tTrackPitInfo *pits) {
 						pits->driversPits[i].pos.toStart = pitCenter / curMainSeg->radius;
 						break;
 				}
+#endif
+				//TODO(kilo) get rid of following line when above feature is ready
+				curPos.toStart = toStart;
 
 				switch (pits->side) {
 					case TR_RGT:

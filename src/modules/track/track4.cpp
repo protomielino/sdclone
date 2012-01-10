@@ -1002,6 +1002,10 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 
 						//RtTrackLocal2Global expects toStart as a length in meters for straight,
 						//and as an angle in radian for curves
+						//TODO(kilo)
+						//Proper handling of this should enable non-linear pitlanes.
+						//Postponed after 2.0
+#if 0
 						tdble pitCenter = toStart + pits->len / 2.0f;
 						switch(mSeg->type) {
 							case TR_STR:
@@ -1013,6 +1017,12 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 								pits->driversPits[i].pos.toStart = pitCenter / mSeg->radius;
 								break;
 						}
+#endif
+						//TODO(kilo) get rid of following 3 lines when above feature is ready
+						pits->driversPits[i].pos.seg = mSeg; 
+						pits->driversPits[i].pos.toStart = (tdble)(toStart + pits->len / 2.0); 
+						printf("toStart: %s %.2f ", mSeg->name, pits->driversPits[i].pos.toStart); 						
+						
 						
 						switch (pits->side) {
 							case TR_RGT:
