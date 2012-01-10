@@ -516,7 +516,7 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		snprintf(buf, sizeof(buf), "%s", info->_reName);
 	GfuiLabelSetText(rmScrHdle, titleId, buf);
 
-	snprintf(buf, sizeof(buf), "%s Standings", info->_reRaceName);
+	snprintf(buf, sizeof(buf), "%s at %s - Standings", info->_reRaceName, info->track->name);
 	const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
 	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
