@@ -57,9 +57,9 @@ class LRaceLine;
 #define KILO_ATT_BRDELAY    "BrakeDelay"
 #define KILO_ATT_SECRAD     "SecurityRadius"
 #define KILO_ATT_PITOFFSET  "PitOffset"
-#define KILO_SECT_SKILL     "Skill"
-#define KILO_SKILL_LEVEL    "Level"
-#define KILO_SKILL_AGGRO    "Aggression"
+#define KILO_SECT_SKILL     "skill"
+#define KILO_SKILL_LEVEL    "level"
+#define KILO_SKILL_AGGRO    "aggression"
 
 
 enum { NORMAL = 1, AVOIDING, CORRECTING, PITTING, BEING_OVERLAPPED };

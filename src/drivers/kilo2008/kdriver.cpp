@@ -1867,7 +1867,7 @@ double KDriver::InitSkill(tSituation * s) {
 
     if (skillHandle) {
       globalSkill = GfParmGetNum(skillHandle, KILO_SECT_SKILL,
-                                 KILO_SKILL_LEVEL, NULL, 10.0);
+                                 KILO_SKILL_LEVEL, NULL, 0.0);
       globalSkill = MIN(10.0, MAX(0.0, globalSkill));
     }
 
