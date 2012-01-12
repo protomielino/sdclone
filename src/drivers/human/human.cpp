@@ -948,6 +948,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 		newGlance = joyInfo->ax[cmd[CMD_LEFTGLANCE].val] * 2*PI/3;
 	} else {
 		// return view to center
+		car->_oldglance = 0;
 		if (newGlance > 0) {
 			newGlance = newGlance - GLANCERATE * s->deltaTime;
 			if (newGlance < 0) newGlance = 0;
