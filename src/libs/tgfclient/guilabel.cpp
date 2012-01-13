@@ -306,7 +306,12 @@ gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
     int of = 0;
     int fw = (int) label->font->getWidth("o");
 
-    char *p = strtok((char *) label->text, "\t");
+    // Prevent strtok weirdness
+    char *save;
+    char text[128];
+    strncpy(text, (char *) label->text, 128);
+
+    char *p = strtok_r(text, "\t", &save);
 
     while (p != NULL)
     {
@@ -333,7 +338,7 @@ gfuiLabelDraw(tGfuiLabel *label, const GfuiColor& color)
 
 	gfuiDrawString(x, label->y, label->font, p);
 	of += strlen(p) + 1;
-	p = strtok(NULL, "\t");
+	p = strtok_r(NULL, "\t", &save);
     }
 }
 
