@@ -488,7 +488,7 @@ ReUpdatePracticeCurRes(tCarElt *car, bool bForceNew)
 		static int nLastLapDamages = 0;
 		if (car->_laps <= 2)
 			nLastLapDamages = 0;
-		snprintf(buf, sizeof(buf), "%.3d  \t%-12s \t%-12s    \t%5.1f    \t%5.1f   \t%.5d (%d)",
+		snprintf(buf, sizeof(buf), "%.3d  \t%-12s \t%-12s    \t%5.1f   \t%5.1f \t %.5d (%d)",
 				 car->_laps - 1, t1, t2, info->topSpd * 3.6, info->botSpd * 3.6,
 				 car->_dammage ? car->_dammage - nLastLapDamages : 0, car->_dammage);
 		nLastLapDamages = car->_dammage;
