@@ -1021,7 +1021,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 						//TODO(kilo) get rid of following 3 lines when above feature is ready
 						pits->driversPits[i].pos.seg = mSeg; 
 						pits->driversPits[i].pos.toStart = (tdble)(toStart + pits->len / 2.0); 
-						printf("toStart: %s %.2f ", mSeg->name, pits->driversPits[i].pos.toStart); 						
+						GfLogDebug("toStart: %s %.2f ", mSeg->name, pits->driversPits[i].pos.toStart); 						
 						
 						
 						switch (pits->side) {
@@ -1295,7 +1295,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 		segName = GfParmListGetCurEltName(TrackHandle, path);
 		if (ext) {
 			if (GfHashGetStr(segNameHash, segName)) {
-				printf(">>>>>>>>> DUPLICATED SEGMENT NAME \"%s\" PLEASE CHANGE IT !!!!\n", segName);
+				GfLogError("DUPLICATED SEGMENT NAME \"%s\" PLEASE CHANGE IT !!!!\n", segName);
 				exit(1);
 			}
 			GfHashAddStr(segNameHash, segName, segName);
@@ -1437,7 +1437,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 			curSeg->surface = surface;
 			curSeg->envIndex = envIndex;
 			curSeg->DoVfactor = DoVfactor;
-			/*printf("curseg id =%d factor =%f\n",curSeg->id,curSeg->DoVfactor);*/
+			/*GfLogDebug("curseg id =%d factor =%f\n",curSeg->id,curSeg->DoVfactor);*/
 			curSeg->lgfromstart = totLength;
 
 			if (ext && ind) {
@@ -1647,7 +1647,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 			curindex++;
 			curStep++;
 			if (type != TR_STR) {
-				/* 		printf("radius = %f arc = %f steps %d, length %f, stepslg %f\n", radius, RAD2DEG(curArc), steps, length, curLength); */
+				/* 		GfLogDebug("radius = %f arc = %f steps %d, length %f, stepslg %f\n", radius, RAD2DEG(curArc), steps, length, curLength); */
 				radius += dradius;
 			}
 		}
@@ -1658,7 +1658,7 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 		GfHashRelease(segNameHash, NULL);
 	}
 
-	/* printf("\n"); */
+	/* GfLogDebug("\n"); */
 
 
 	theTrack->seg = root;
