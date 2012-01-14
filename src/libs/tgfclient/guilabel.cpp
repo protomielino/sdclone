@@ -29,6 +29,8 @@
 #include "gui.h"
 #include "guimenu.h"
 
+#include "portability.h"
+
 
 static int NTipX = 10;
 static int NTipY = 10;

@@ -127,6 +127,8 @@ static char *strndup(const char *str, int len)
 #define strncasecmp strnicmp
 #define strcasecmp stricmp
 
+#define strtok_r strtok_s
+
 #define chdir _chdir
 #define getcwd _getcwd
 #define chmod _chmod
