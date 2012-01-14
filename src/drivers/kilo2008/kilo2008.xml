@@ -143,7 +143,7 @@
 
 -->
 
-      <section name="9">
+      <section name="7">
         <attstr name="name" val="Anders Nikolsen"></attstr>
         <attstr name="desc" val="Leaving 6 years of rally racing behind, this Norwegian guy will not ever fear drifting a bit..."></attstr>
         <attstr name="team" val="La-Vette Motorsports"></attstr>
@@ -156,7 +156,7 @@
         <attstr name="features" val=""></attstr>
       </section>
 
-      <section name="10">
+      <section name="8">
         <attstr name="name" val="Alberto Gonzalez"></attstr>
         <attstr name="desc" val="Team owner veteran Uruguayan pro who've spent 20 years in South American car racing - knows all the tips and tricks of car racing."></attstr>
         <attstr name="team" val="La-Vette Motorsports"></attstr>
@@ -227,7 +227,7 @@
       </section>
       -->
 
-      <section name="15">
+      <section name="9">
         <attstr name="name" val="Gilang Yudha"></attstr>
         <attstr name="desc" val="Indonesia"></attstr>
         <attstr name="team" val="Team Alba 2011"></attstr>
@@ -240,7 +240,7 @@
         <attstr name="features" val=""></attstr>
       </section>
 
-      <section name="16">
+      <section name="10">
         <attstr name="name" val="Dona Maria"></attstr>
         <attstr name="desc" val="Macau"></attstr>
         <attstr name="team" val="Team Alba 2011"></attstr>
