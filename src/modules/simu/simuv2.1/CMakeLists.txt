@@ -45,7 +45,8 @@ INCLUDE_DIRECTORIES(SOLID-2.0/include)
 
 ADD_LIBRARY(simuv2.1 SHARED ${SIMU_SOURCES})
 
-SET_TARGET_PROPERTIES(simuv2.1 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+#SET_TARGET_PROPERTIES(simuv2.1 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_SDLIB_LIBRARY(simuv2.1 tgf robottools solid)
 

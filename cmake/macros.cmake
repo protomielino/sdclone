@@ -203,6 +203,7 @@ ENDMACRO(GENERATE_ROBOT_DEF_FILE ROBOTNAME DEF_FILE)
 #  CLONENAMES : The names of the clones to generate
 #  VERSION    : The VERSION of the libraries to produce (robot and its clones) (def: $VERSION).
 #  SOVERSION  : The SOVERSION of the libraries to produce (in the ldconfig meaning) (def: 0.0.0).
+#               WARNING: Not taken into account for the moment : might not work with GCC 4.5 or +.
 #
 # Example:
 #    ROBOT_MODULE(NAME simplix VERSION 3.0.5 SOVERSION 0.0.0
@@ -267,11 +268,14 @@ MACRO(ROBOT_MODULE)
   ADD_LIBRARY(${RBM_NAME} SHARED ${RBM_SOURCES})
 
   # Customize shared library versions and file prefix.
-  SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
   IF(UNIX) # Use ldconfig version naming scheme + no "lib" prefix under Linux
-    SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES PREFIX "")
-    SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES SOVERSION ${RBM_SOVERSION})
-  ENDIF(UNIX)
+    SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES PREFIX "") 
+    # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+    #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
+    #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES SOVERSION ${RBM_SOVERSION})
+  ELSE()
+    SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
+  ENDIF()
 
   # Link/Run-time dependencies
   ADD_PLIB_LIBRARY(${RBM_NAME} sg)
@@ -285,7 +289,9 @@ MACRO(ROBOT_MODULE)
     GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LOCATION)
     FOREACH(CLONENAME ${RBM_CLONENAMES})
       SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-      IF(UNIX)
+      IF(FALSE)
+      #IF(UNIX)
+	# Might not work with GCC 4.5 or + (see above) 
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
                            COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
         ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD

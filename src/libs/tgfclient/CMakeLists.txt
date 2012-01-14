@@ -35,7 +35,8 @@ ENDIF(WIN32)
 
 ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
 
-SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+# Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
+#SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_PLIB_LIBRARY(tgfclient ul sg sl)
 ADD_SDLIB_LIBRARY(tgfclient tgf networking)
