@@ -11,14 +11,14 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="MP5 Race" version="1.0">
+<params name="MP5 Race" version="1.1">
 
   <section name="Header">
     <attstr name="name" val="MP5 Race"/>
     <attstr name="type" val="Single Event"/>
     <attstr name="subtype" val="MP5 Challenge"/>
     <attstr name="description" val="MP5 Challenge race"/>
-    <attnum name="priority" val="71"/>
+    <attnum name="priority" val="68"/>
     <attstr name="menu image" val="data/img/splash-chall.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
     <attstr name="start image" val="data/img/splash-challstart.jpg"/>
