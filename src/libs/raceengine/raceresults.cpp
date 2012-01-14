@@ -622,7 +622,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 void
 ReUpdateRaceCurRes()
 {
-	static const char* pszTableHeader = "Rank    Time          Driver                     Car";
+	static const char* pszTableHeader = "Rank    \tTime          \tDriver                   \tCar";
     int ncars;
     int xx;
     void *carparam;
@@ -662,28 +662,28 @@ ReUpdateRaceCurRes()
 			snprintf(buf, sizeof(buf), "out               %-20s %-20s", car->_name, carName);
 		} else if (car->_timeBehindLeader == 0.0f) {
 			if (xx != 0)
-				snprintf(buf, sizeof(buf), " %2d        --:--- %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d     \t   --:--- \t%-25s \t%-20s",
 						 xx + 1, car->_name, carName);
 			else
-				snprintf(buf, sizeof(buf), " %2d     %3d laps  %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d     \t%3d laps  \t%-25s \t%-20s",
 						 xx + 1, car->_laps - 1, car->_name, carName);
 		} else {
 			if (xx == 0) {
-				snprintf(buf, sizeof(buf), " %2d     %3d laps  %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d     \t%3d laps  \t%-25s \t%-20s",
 						 xx + 1, car->_laps - 1, car->_name, carName);
 			} else {
 				if (car->_lapsBehindLeader == 0)
 				{
 					tmp_str = GfTime2Str(car->_timeBehindLeader, "  ", false, 3);
-					snprintf(buf, sizeof(buf), " %2d %-12s  %-20s %-20s",
+					snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s",
 							 xx + 1, tmp_str, car->_name, carName);
 					free(tmp_str);
 				}
 				else if (car->_lapsBehindLeader == 1)
-					snprintf(buf, sizeof(buf), " %2d        1 lap  %-20s %-20s",
+					snprintf(buf, sizeof(buf), " %2d        1 lap  %-25s %-20s",
 							 xx + 1, car->_name, carName);
 				else
-					snprintf(buf, sizeof(buf), " %2d     %3d laps  %-20s %-20s",
+					snprintf(buf, sizeof(buf), " %2d     %3d laps  %-25s %-20s",
 							 xx + 1, car->_lapsBehindLeader, car->_name, carName);
 			}
 		}
