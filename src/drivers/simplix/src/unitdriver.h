@@ -425,6 +425,7 @@ private:
     static bool UseOldSkilling;
     static bool UseSCSkilling;
     static bool UseMPA1Skilling;
+        static float SkillingFactor;
 	static bool UseBrakeLimit;
 	static bool UseGPBrakeLimit;
 	static float BrakeLimit;

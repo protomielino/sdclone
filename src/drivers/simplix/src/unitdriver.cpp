@@ -96,6 +96,7 @@ bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
 bool  TDriver::UseMPA1Skilling = false;            // Use mpa1 car skilling
+float TDriver::SkillingFactor = 0.1;               // Skilling factor for career-mode
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 bool  TDriver::UseGPBrakeLimit = false;            // Use brake limit GP36
 float TDriver::BrakeLimit = -6;                    // Brake limit
@@ -1281,7 +1282,7 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   }
   else if (oSkilling && (oCar->priv.driveSkill > -1))
   {
-    oSkill = 1.0 + oCar->priv.driveSkill;
+    oSkill = 1.0 + SkillingFactor * oCar->priv.driveSkill;
 	Param.Tmp.oSkill = oSkill;
   }
 /*
