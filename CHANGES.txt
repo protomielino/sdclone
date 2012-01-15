@@ -13,7 +13,7 @@ http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
 
 Changes since 2.0.0 Beta 1 released in 2.0.0 Release Candidate 1.
 -----------------------------------------------------------------
-This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-rc1@4418.
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-rc1@4420.
 
 Main changes :
  * New "shinning" menu style, with great new track previews
@@ -23,11 +23,13 @@ Main changes :
  * New skins for many cars,
  * Bunches of graphics candy for many tracks,
  * Many other graphics improvements (but minor changes to the graphics engine),
- * Many bug fixes everywhere.
+ * Many bug fixes everywhere,
+ * New command line options for straight starting of a given race, with or without a GUI
+   (suitable for headless computers, for robots tuning, as an ex.).
 
 Known bugs / WIP tasks : See http://sourceforge.net/apps/trac/speed-dreams/report/9
 
-More details below (not exhaustive though).
+More details below.
 
 Cars:
 * All cars : 

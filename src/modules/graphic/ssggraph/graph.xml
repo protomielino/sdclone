@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="graph" type="param" mode="mw" version="1.5">
+<params name="graph" type="param" mode="mw" version="1.6">
   <section name="Graphic">
     <attnum name="smoke value" val="300"/>
     <attnum name="smoke interval" val="0.01"/>
@@ -89,11 +89,11 @@
 
   <section name="Display Mode">
     <section name="Player">
-      <attnum name="camera" val="2"/>
+      <attnum name="camera" val="3"/>
       <attnum name="camera head list" val="0"/>
     </section>
     <section name="0">
-      <attnum name="camera" val="2"/>
+      <attnum name="camera" val="3"/>
       <attnum name="camera head list" val="0"/>
       <attnum name="board width" val="100"/>
       <attnum name="speedometer vertical position" val="0"/>
