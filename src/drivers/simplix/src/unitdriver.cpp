@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.cpp
 // Created      : 2007.11.25
-// Last changed : 2011.11.20
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2011.01.15
+// Copyright    : © 2007-2012 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.03.000
+// Version      : 3.04.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -850,7 +850,7 @@ void TDriver::AdjustSkilling(PCarHandle Handle)
     oSkilling = false;
 	oSkill = 1.0;
 	//GfOut("#No skilling: Skill %g\n",oSkill);
-    Param.Tmp.oSkill = 1.0;
+    Param.Tmp.oSkill = oSkill;
   }
   else
   {
@@ -1277,6 +1277,11 @@ void TDriver::NewRace(PtCarElt Car, PSituation Situation)
   if (RM_TYPE_PRACTICE == oSituation->_raceType)
   {
     oSkill = 1.0;
+	Param.Tmp.oSkill = oSkill;
+  }
+  else if (oSkilling && (oCar->priv.driveSkill > -1))
+  {
+    oSkill = 1.0 + oCar->priv.driveSkill;
 	Param.Tmp.oSkill = oSkill;
   }
 /*

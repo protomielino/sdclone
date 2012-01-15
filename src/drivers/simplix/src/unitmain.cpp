@@ -8,10 +8,13 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2011.11.08
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2012.01.15
+// Copyright    : © 2007-2012 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.03.000
+// Version      : 3.04.000
+//--------------------------------------------------------------------------*
+// V3.04.000 (SimuV2.1):
+// Skilling for career mode
 //--------------------------------------------------------------------------*
 // V3.03.000 (SimuV2.1):
 // Braking for GP36 cars
