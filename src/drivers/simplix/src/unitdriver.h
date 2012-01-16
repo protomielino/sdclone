@@ -9,10 +9,10 @@
 //
 // File         : unitdriver.h
 // Created      : 2007.11.25
-// Last changed : 2011.09.06
-// Copyright    : © 2007-2011 Wolf-Dieter Beelitz
+// Last changed : 2011.01.16
+// Copyright    : © 2007-2012 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
-// Version      : 3.03.000
+// Version      : 3.04.000
 //--------------------------------------------------------------------------*
 // Teile dieser Unit basieren auf diversen Header-Dateien von TORCS
 //
@@ -425,7 +425,7 @@ private:
     static bool UseOldSkilling;
     static bool UseSCSkilling;
     static bool UseMPA1Skilling;
-        static float SkillingFactor;
+    static float SkillingFactor;
 	static bool UseBrakeLimit;
 	static bool UseGPBrakeLimit;
 	static float BrakeLimit;

@@ -8,7 +8,7 @@
 // 
 // File         : unitmain.cpp 
 // Created      : 2008.01.27
-// Last changed : 2012.01.15
+// Last changed : 2012.01.16
 // Copyright    : © 2007-2012 Wolf-Dieter Beelitz
 // eMail        : wdb@wdbee.de
 // Version      : 3.04.000
@@ -259,9 +259,10 @@ void SetParameters(int N, char const* DefaultCarType)
 //--------------------------------------------------------------------------*
 void SetUpSimplix()
 {
-  cRobotType = RTYPE_SIMPLIX;
-  SetParameters(NBBOTS, "car1-trb1");
-  TDriver::AdvancedParameters = true;
+    cRobotType = RTYPE_SIMPLIX;
+    SetParameters(NBBOTS, "car1-trb1");
+    TDriver::AdvancedParameters = true;
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -276,6 +277,7 @@ void SetUpSimplix_mpa1()
     TDriver::UseBrakeLimit = true;
     TDriver::Learning = true;
     TDriver::UseMPA1Skilling = true;            
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -284,9 +286,10 @@ void SetUpSimplix_mpa1()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_trb1()
 {
-  cRobotType = RTYPE_SIMPLIX_TRB1;
-  SetParameters(NBBOTS, "car1-trb1");
-  TDriver::Learning = true;
+    cRobotType = RTYPE_SIMPLIX_TRB1;
+    SetParameters(NBBOTS, "car1-trb1");
+    TDriver::Learning = true;
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -295,9 +298,10 @@ void SetUpSimplix_trb1()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_sc()
 {
-  cRobotType = RTYPE_SIMPLIX_SC;
-  SetParameters(NBBOTS, "sc996");
-  TDriver::UseSCSkilling = true;                 // Use supercar skilling
+    cRobotType = RTYPE_SIMPLIX_SC;
+    SetParameters(NBBOTS, "sc996");
+    TDriver::UseSCSkilling = true;                 // Use supercar skilling
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -306,12 +310,13 @@ void SetUpSimplix_sc()
 //--------------------------------------------------------------------------*
 void SetUpSimplix_36GP()
 {
-  cRobotType = RTYPE_SIMPLIX_36GP;
-  SetParameters(NBBOTS, "36GP-alfa12c");
-  TDriver::AdvancedParameters = true;
-  TDriver::UseBrakeLimit = true;
-  TDriver::UseGPBrakeLimit = true;
-  TDriver::Learning = true;
+    cRobotType = RTYPE_SIMPLIX_36GP;
+    SetParameters(NBBOTS, "36GP-alfa12c");
+    TDriver::AdvancedParameters = true;
+    TDriver::UseBrakeLimit = true;
+    TDriver::UseGPBrakeLimit = true;
+    TDriver::Learning = true;
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -324,6 +329,7 @@ void SetUpSimplix_ls1()
 	SetParameters(NBBOTS, "ls1-archer-r9");
     TDriver::AdvancedParameters = true;
     TDriver::UseBrakeLimit = true;
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -336,6 +342,7 @@ void SetUpSimplix_ls2()
 	SetParameters(NBBOTS, "ls2-bavaria-g3gtr");
     TDriver::AdvancedParameters = true;
     TDriver::UseBrakeLimit = true;
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
@@ -350,6 +357,7 @@ void SetUpSimplix_mp5()
     TDriver::UseBrakeLimit = true;
     TDriver::Learning = true;
 	//TDriver::UseSCSkilling = true; 
+    TDriver::SkillingFactor = 0.1;         // Skilling factor for career-mode
 };
 //==========================================================================*
 
