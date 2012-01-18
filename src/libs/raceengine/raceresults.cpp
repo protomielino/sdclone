@@ -600,17 +600,17 @@ ReUpdateQualifCurRes(tCarElt *car)
 			GfParmReleaseHandle(carparam);
 			
 			if (car->_state & RM_CAR_STATE_DNF) {
-				snprintf(buf, sizeof(buf), "out               %-20s %-20s", car->_name, carName);
+				snprintf(buf, sizeof(buf), "out \t               \t%-25s \t%-20s", car->_name, carName);
 			} else if (car->_bestLapTime <= 0.0f) {
-				snprintf(buf, sizeof(buf), " %2d        --:---  %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d \t      --:---   \t%-25s \t%-20s",
 						 xx + 1, car->_name, carName);
 			} else {
 				if (xx == 0)
-					tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 3);
+					tmp_str = GfTime2Str(car->_bestLapTime, " ", false, 3);
 				else
 					tmp_str = GfTime2Str(car->_bestLapTime - ReInfo->s->cars[0]->_bestLapTime,
 										 "+", false, 3);
-				snprintf(buf, sizeof(buf), " %2d %-12s  %-20s %-20s",
+				snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s",
 						 xx + 1, tmp_str, car->_name, carName);
 				free(tmp_str);
 			}
@@ -681,10 +681,10 @@ ReUpdateRaceCurRes()
 					free(tmp_str);
 				}
 				else if (car->_lapsBehindLeader == 1)
-					snprintf(buf, sizeof(buf), " %2d        1 lap  %-25s %-20s",
+					snprintf(buf, sizeof(buf), " %2d \t       1 lap  \t%-25s \t%-20s",
 							 xx + 1, car->_name, carName);
 				else
-					snprintf(buf, sizeof(buf), " %2d     %3d laps  %-25s %-20s",
+					snprintf(buf, sizeof(buf), " %2d \t    %3d laps  \t%-25s \t%-20s",
 							 xx + 1, car->_lapsBehindLeader, car->_name, carName);
 			}
 		}
