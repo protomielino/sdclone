@@ -510,6 +510,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 	int		i;
 	int		xx;
 	int		nCars;
+	int		nCarsReal;
 	int		printed;
 	int		maxLines;
 	void	*carparam;
@@ -540,8 +541,8 @@ ReUpdateQualifCurRes(tCarElt *car)
 
 		printed = 0;
 		snprintf(path, sizeof(path), "%s/%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK);
-		nCars = GfParmGetEltNb(results, path);
-		nCars = MIN(nCars + 1, maxLines);
+		nCarsReal = GfParmGetEltNb(results, path);
+		nCars = MIN(nCarsReal + 1, maxLines); // limit display to only those on 1st page
 		for (i = 1; i < nCars; i++) {
 			snprintf(path, sizeof(path), "%s/%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, race, RE_SECT_RANK, i);
 			if (!printed && car->_bestLapTime != 0.0
@@ -562,7 +563,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 	
 		if (!printed) {
 			tmp_str = GfTime2Str(car->_bestLapTime, "  ", false, 3);
-			snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s", i, tmp_str, car->_name, carName);
+			snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s", nCarsReal + 1, tmp_str, car->_name, carName);
 			free(tmp_str);
 			ReUI().setResultsTableRow(i - 1, buf, /*highlight=*/true);
 		}
