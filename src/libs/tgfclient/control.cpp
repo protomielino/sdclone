@@ -149,6 +149,11 @@ GfctrlGetRefByName(const char *name)
 	ref.type = GFCTRL_TYPE_NOT_AFFECTED;
 	return &ref;
     }
+    if (strcmp("---", name) == 0) {
+	ref.index = -1;
+	ref.type = GFCTRL_TYPE_NOT_AFFECTED;
+	return &ref;
+    }
     for (i = 0; i < gfmaxJoyButton; i++) {
 	if (strcmp(name, GfJoyBtn[i]) == 0) {
 	    ref.index = i;
