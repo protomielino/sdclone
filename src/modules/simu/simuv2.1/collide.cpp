@@ -44,7 +44,7 @@ void SimCarCollideZ(tCar *car)
 				if (dotProd < CRASH_THRESHOLD) {
 					car->collision |= SEM_COLLISION_Z_CRASH;
 				}
-				car->collision |= SEM_COLLISION | SEM_COLLISION_Z;
+				car->collision |= SEM_COLLISION_Z;
 				car->DynGCg.vel.x -= normal.x * dotProd;
 				car->DynGCg.vel.y -= normal.y * dotProd;
 				car->DynGCg.vel.z -= normal.z * dotProd;
