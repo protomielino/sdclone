@@ -110,15 +110,21 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
     const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
 
-	// Reset last damage value if top of the table.
-	if (start == 0)
-		NLastLapDamages = 0; 
 	
 	// Display the result table.
     y = yTopLine;
     
     snprintf(path, sizeof(path), "%s/%s/%s", info->track->name, RE_SECT_RESULTS, race);
     const int totLaps = (int)GfParmGetEltNb(results, path);
+
+	// Reset last damage value if top of the table.
+	if (start == 0)
+		NLastLapDamages = 0; 
+	else {
+		snprintf(path, sizeof(path), "%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, start - 1);
+		NLastLapDamages =  (int)(GfParmGetNum(results, path, RE_ATTR_DAMMAGES, NULL, 0)); 
+	}
+
     for (i = 0 + start; i < MIN(start + nMaxLines, totLaps); i++) {
 		snprintf(path, sizeof(path), "%s/%s/%s/%d", info->track->name, RE_SECT_RESULTS, race, i + 1);
 
