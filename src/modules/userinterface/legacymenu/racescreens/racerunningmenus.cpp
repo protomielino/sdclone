@@ -706,12 +706,24 @@ rmCleanRowText(const char* pszText)
 		if (!strchr(pszToken, ':')) // Leave time fields unchanged.
 		{
 			unsigned nLead0s = 0;
+			int minus = 0;
+
+			if (pszToken[0] == '-' && isdigit(pszToken[nLead0s+1])) {
+				minus = 1;
+				nLead0s++;
+			}
+
 			while (nLead0s + 1 < strlen(pszToken)
 				   && pszToken[nLead0s] == '0' && isdigit(pszToken[nLead0s+1]))
 				nLead0s++;
+
 			while (nLead0s != 0)
 			{
-				pszTargetText[pszToken - pszSearchText + nLead0s - 1] = ' ';
+				if (minus == 1) {
+                                	pszTargetText[pszToken - pszSearchText + nLead0s - 1] = '-';
+					minus = 0;
+				} else
+                                	pszTargetText[pszToken - pszSearchText + nLead0s - 1] = ' ';
 				nLead0s--;
 			}
 		}
