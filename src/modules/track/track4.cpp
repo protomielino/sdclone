@@ -1046,6 +1046,7 @@ static void AddPitDoors(tTrack *theTrack, void *TrackHandle, bool found) {
 
 						i++;
 					}//while i
+					GfLogDebug("\n");
 
 					for (mSeg = pitStart->prev; mSeg != pitEnd->next->next; mSeg = mSeg->next) {
 						curSeg2 = NULL;
@@ -1659,7 +1660,6 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 	}
 
 	/* GfLogDebug("\n"); */
-
 
 	theTrack->seg = root;
 	theTrack->length = totLength;
