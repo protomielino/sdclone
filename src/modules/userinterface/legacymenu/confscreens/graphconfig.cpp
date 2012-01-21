@@ -40,11 +40,10 @@ static const char* DynamicSkyDomeValues[] =
 	{ GR_ATT_DYNAMICSKYDOME_DISABLED, GR_ATT_DYNAMICSKYDOME_ENABLED };
 static const int NbDynamicSkyDomeValues = sizeof(DynamicSkyDomeValues) / sizeof(DynamicSkyDomeValues[0]);
 static const int PrecipDensityValues[] = {0, 20, 40, 60, 80, 100};
-static const int CloudLayernbValues[] = {1, 2, 3};
 static const int NbPrecipDensityValues = sizeof(PrecipDensityValues) / sizeof(PrecipDensityValues[0]);
-static const int NbCloudLayernbValues = sizeof(CloudLayernbValues) / sizeof(CloudLayernbValues[0]);
-static const char* BackgroundSkyValues[] =
-	{ GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_ENABLED };
+static const int CloudLayersValues[] = {1, 2, 3};
+static const int NbCloudLayersValues = sizeof(CloudLayersValues) / sizeof(CloudLayersValues[0]);
+static const char* BackgroundSkyValues[] = { GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_ENABLED };
 static const int NbBackgroundSkyValues = sizeof(BackgroundSkyValues) / sizeof(BackgroundSkyValues[0]);
 
 static void	*ScrHandle = NULL;
@@ -94,8 +93,8 @@ SaveGraphicOptions(void *prevMenu)
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, SkyDomeDistValues[SkyDomeDistIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, DynamicSkyDomeValues[DynamicSkyDomeIndex]);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", PrecipDensityValues[PrecipDensityIndex]);
-	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, CloudLayernbValues[CloudLayerIndex]);
-	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, BackgroundSkyValues[BackgroundSkyIndex]);
+    GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, CloudLayersValues[CloudLayerIndex]);
+    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, BackgroundSkyValues[BackgroundSkyIndex]);
     
     GfParmWriteFile(NULL, grHandle, "graph");
     
@@ -131,10 +130,10 @@ LoadGraphicOptions()
 
     SkyDomeDistIndex = 0; // Default value index, in case file value not found in list.
     const int nSkyDomeDist =
-		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0);
+		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, NULL, 0) + 0.5);
     for (int i = 0; i < NbSkyDomeDistValues; i++) 
     {
-		if (nSkyDomeDist == SkyDomeDistValues[i]) 
+		if (nSkyDomeDist <= SkyDomeDistValues[i]) 
 		{
 			SkyDomeDistIndex = i;
 			break;
@@ -183,10 +182,10 @@ LoadGraphicOptions()
 
     PrecipDensityIndex = NbPrecipDensityValues - 1; // Default value index, in case file value not found in list.
     const int nPrecipDensity =
-		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", 100.0);
+		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", 100) + 0.5f);
     for (int i = 0; i < NbPrecipDensityValues; i++) 
     {
-		if (nPrecipDensity == PrecipDensityValues[i]) 
+		if (nPrecipDensity <= PrecipDensityValues[i]) 
 		{
 			PrecipDensityIndex = i;
 			break;
@@ -196,16 +195,16 @@ LoadGraphicOptions()
     GfuiLabelSetText(ScrHandle, PrecipDensityLabelId, buf);
 
     const int nCloudLayer =
-		(int)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, 0);
-    for (int i = 0; i < NbCloudLayernbValues; i++) 
+		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, 1) + 0.5f);
+    for (int i = 0; i < NbCloudLayersValues; i++) 
     {
-		if (nCloudLayer == CloudLayernbValues[i]) 
+		if (nCloudLayer <= CloudLayersValues[i]) 
 		{
 			CloudLayerIndex = i;
 			break;
 		}
     }
-    snprintf(buf, sizeof(buf), "%d", CloudLayernbValues[CloudLayerIndex]);
+    snprintf(buf, sizeof(buf), "%d", CloudLayersValues[CloudLayerIndex]);
     GfuiLabelSetText(ScrHandle, CloudLayerLabelId, buf);
 
     GfParmReleaseHandle(grHandle);
@@ -325,8 +324,8 @@ static void
 ChangeCloudLayer(void* vp)
 {
     const long delta = (long)vp;
-    CloudLayerIndex = (CloudLayerIndex + NbCloudLayernbValues + delta) % NbCloudLayernbValues;
-    snprintf(buf, sizeof(buf), "%d", CloudLayernbValues[CloudLayerIndex]);
+    CloudLayerIndex = (CloudLayerIndex + NbCloudLayersValues + delta) % NbCloudLayersValues;
+    snprintf(buf, sizeof(buf), "%d", CloudLayersValues[CloudLayerIndex]);
     GfuiLabelSetText(ScrHandle, CloudLayerLabelId, buf);
 }
 
