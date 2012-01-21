@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- 
-    file        : championship-supercars.xml
+    file        : championship-trb1.xml
     created     : 2008
     copyright   : (C) 2012 by Xavier Bertaux
     web         : www.speed-dreams.org   
@@ -72,15 +72,15 @@
 
   <section name="Races">
     <section name="1">
-      <attstr name="name" val="Qualifications"/>
+      <attstr name="name" val="Qualifications Q1"/>
     </section>
 
     <section name="2">
-      <attstr name="name" val="First Race"/>
+      <attstr name="name" val="Qualifications Q2"/>
     </section>
 
     <section name="3">
-      <attstr name="name" val="Second Race"/>
+      <attstr name="name" val="Race"/>
     </section>
   </section>
 
@@ -89,7 +89,7 @@
   <section name="All Sessions">
     <attstr name="rain" val="random"/>
     <attstr name="clouds" val="random"/>
-    <attstr name="time of day" val="track"/>
+    <attstr name="time of day" val="from track"/>
   </section>
 
   <section name="Qualifications Q1">
@@ -125,17 +125,17 @@
   </section>
 
   <section name="Qualifications Q2">
-    <attnum name="laps" val="10"/>
+    <attnum name="laps" val="6"/>
     <attstr name="type" val="qualifications"/>
     <attstr name="starting order" val="last race"/>
-	<attstr name="display mode" val="results only"/>
+    <attstr name="display mode" val="results only"/>
     <attstr name="restart" val="no"/>
-	<attstr name="display results" val="yes"/>
+	<attnum name="maximum drivers" val="12"/>
+    <attstr name="display results" val="yes"/>
     <attstr name="must complete" val="yes"/>
-    <attnum name="maximum drivers" val="12"/>
     <section name="Starting Grid">
       <attnum name="rows" val="1"/>
-      <attnum name="distance to start" val="50"/>
+      <attnum name="distance to start" val="100"/>
       <attnum name="distance between columns" val="20"/>
       <attnum name="offset within a column" val="10"/>
       <attnum name="initial speed" val="0"/>
@@ -177,8 +177,8 @@
     </section>
   </section>
 
-  <section name="Second Race">
-    <attnum name="distance" unit="km" val="100"/>
+  <section name="Race">
+    <attnum name="distance" unit="km" val="150"/>
     <attstr name="type" val="race"/>
     <attstr name="starting order" val="last race"/>
     <attstr name="restart" val="no"/>
@@ -234,7 +234,7 @@
     <attnum name="focused idx" val="1"/>
     <attstr name="focused module" val="simplix_trb1"/>
     <attstr name="rejected types" val="networkhuman"/>
-    <attstr name="accepted categories" val="trb1"/>
+    <attstr name="accepted categories" val="TRB1"/>
 
     <section name="1">
       <attnum name="idx" val="1"/>
@@ -312,7 +312,7 @@
     </section>
 
     <section name="16">
-      <attnum name="idx" val="16"/>
+      <attnum name="idx" val="0"/>
       <attstr name="module" val="simplix_trb1"/>
     </section>
 
