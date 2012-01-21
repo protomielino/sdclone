@@ -235,17 +235,17 @@ RmStopRaceMenu()
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("abort", rmAbortRaceHookInit(),
-					 "resume", rmBackToRaceHookInit(),
+				    ("resume", rmBackToRaceHookInit(),
 					 "skip", rmSkipSessionHookInit(),
+					 "abort", rmAbortRaceHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 		else 
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("abort", rmAbortRaceHookInit(),
-					 "resume", rmBackToRaceHookInit(),
+				    ("resume", rmBackToRaceHookInit(),
+					 "abort", rmAbortRaceHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 	}
@@ -255,19 +255,19 @@ RmStopRaceMenu()
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("restart", rmRestartRaceHookInit(),
-					 "abort", rmAbortRaceHookInit(),
-					 "resume", rmBackToRaceHookInit(),
+				    ("resume", rmBackToRaceHookInit(),
 					 "skip", rmSkipSessionHookInit(),
+					 "restart", rmRestartRaceHookInit(),
+					 "abort", rmAbortRaceHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 		else 
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("restart", rmRestartRaceHookInit(),
+				    ("resume", rmBackToRaceHookInit(),
+					 "restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
-					 "resume", rmBackToRaceHookInit(),
 					 "quit", rmQuitHookInit());
 		}
 	}
