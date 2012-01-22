@@ -246,6 +246,15 @@ reTrackInitTimeOfDay(void)
 			GfLogDebug("  Track-defined time of day\n");
 			break;
 
+		case RM_IND_TIME_RANDOM:
+		{
+			int heure;
+			srand(time(NULL));
+			heure = rand()%(23);
+			trackLocal->timeofday = heure * 3600.0f + 0 * 60 + 0;
+			break;
+		}
+
 		default:
 			trackLocal->timeofday = 15 * 3600 + 0 * 60 + 0; // 15:00:00
 			GfLogError("Unsupported value %d for user timeofday (assuming 15:00)\n",

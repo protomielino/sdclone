@@ -334,9 +334,10 @@ typedef struct RmInfo
 #define RM_VAL_TIME_NIGHT	"night"
 #define RM_VAL_TIME_NOW		"now"
 #define RM_VAL_TIME_TRACK	"from track"
+#define RM_VAL_TIME_RANDOM	"random"
 #define RM_VALS_TIME { RM_VAL_TIME_DAWN, RM_VAL_TIME_MORNING, RM_VAL_TIME_NOON, \
                        RM_VAL_TIME_AFTERNOON, RM_VAL_TIME_DUSK, RM_VAL_TIME_NIGHT, \
-                       RM_VAL_TIME_NOW, RM_VAL_TIME_TRACK }
+                       RM_VAL_TIME_NOW, RM_VAL_TIME_TRACK, RM_VAL_TIME_RANDOM}
 
 // Indices for RM_VALS_TIME.
 #define RM_IND_TIME_DAWN	0
@@ -347,6 +348,7 @@ typedef struct RmInfo
 #define RM_IND_TIME_NIGHT	5
 #define RM_IND_TIME_NOW		6
 #define RM_IND_TIME_TRACK	7
+#define RM_IND_TIME_RANDOM	8
 
 #define RM_VAL_CLOUDS_NONE	"no cloud"
 #define RM_VAL_CLOUDS_FEW	"few clouds"
