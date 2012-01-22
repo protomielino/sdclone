@@ -15,13 +15,13 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="TRB1 Championship" version="1.0">
+<params name="TRB1 Championship" version="1.1">
   <section name="Header">
     <attstr name="name" val="TRB1 Championship"/>
     <attstr name="type" val="Championship"/>
     <attstr name="subtype" val="TRB1"/>
     <attstr name="description" val="TRB1 Championship"/>
-    <attnum name="priority" val="59"/>
+    <attnum name="priority" val="58"/>
     <attstr name="menu image" val="data/img/splash-champ.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
     <attstr name="start image" val="data/img/splash-champstart.jpg"/>
@@ -130,7 +130,7 @@
     <attstr name="starting order" val="last race"/>
     <attstr name="display mode" val="results only"/>
     <attstr name="restart" val="no"/>
-	<attnum name="maximum drivers" val="12"/>
+    <attnum name="maximum drivers" val="12"/>
     <attstr name="display results" val="yes"/>
     <attstr name="must complete" val="yes"/>
     <section name="Starting Grid">
