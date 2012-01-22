@@ -62,10 +62,10 @@ Section -CoreData
   SetOverwrite on
 
   ; Game core data files (racemanagers, ...)
-  ; Warning: Must be there too in case "HQ Cars & Tracks (1)" not installed.
   SetOutPath "$INSTDIR\data\config\raceman"
-  File "${BUILD_INST_DIR}\data\config\raceman\career*.*"
-  File "${BUILD_INST_DIR}\data\config\raceman\championship*.*"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-trb1.xml"
 
 SectionEnd
 
