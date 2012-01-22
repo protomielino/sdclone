@@ -223,6 +223,9 @@ Section -Tracks
   SetOutPath "$INSTDIR\data\tracks\speedway\sunshine"
   File /r "${BUILD_INST_DIR}\data\tracks\speedway\sunshine\*.*"
 
+  SetOutPath "$INSTDIR\data\tracks\speedway\tennessee"
+  File /r "${BUILD_INST_DIR}\data\tracks\speedway\tennessee\*.*"
+
 SectionEnd
 
 ; This function is called at installer startup.
