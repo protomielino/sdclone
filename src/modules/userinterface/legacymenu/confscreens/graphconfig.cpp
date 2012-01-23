@@ -168,7 +168,7 @@ LoadGraphicOptions()
 				break;
 			}
 		}
-		GfuiLabelSetText(ScrHandle, BackgroundSkyLabelId, BackgroundSkyValues[DynamicSkyDomeIndex]);
+		GfuiLabelSetText(ScrHandle, BackgroundSkyLabelId, BackgroundSkyValues[BackgroundSkyIndex]);
 
 
 		// FOV not taken into account when sky dome enabled.
