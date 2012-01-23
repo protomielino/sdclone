@@ -32,6 +32,7 @@ extern void grPreDrawSky(struct Situation* s, float fogStart, float fogEnd);
 extern void grPostDrawSky();
 extern void grDrawStaticBackground(class cGrCamera *cam, class cGrBackgroundCam *bgCam);
 extern void grShutdownBackground(void);
+extern void grLoadBackgroundSky(void);
 
 extern unsigned grSkyDomeDistance; // 0 means no sky dome (static background).
 extern const tdble grSkyDomeNeutralFOVDistance;

@@ -26,6 +26,7 @@
 #include <plib/ssgAux.h>
 
 #include "grscene.h"
+#include "grloadac.h"
 #include "grmain.h"
 #include "grcam.h"	//cGrBackgroundCam
 #include "grutil.h"
@@ -844,6 +845,27 @@ grLoadBackground(void)
 		GfLogWarning("shadow2.png/rgb not found ; no shadow mapping on cars for this track\n");
 }//grLoadBackground
 
+void grLoadBackgroundSky(void)
+{
+	char buf2[256];
+	const char		*bgsky;
+	ssgEntity		*desc2;
+	
+	bgsky = "background-sky.ac";
+	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
+	ssgTexturePath(buf2);
+	snprintf(buf2, sizeof(buf2), "data/objects");
+	ssgModelPath(buf2);
+		
+	desc2 = grssgLoadAC3D(bgsky, NULL);
+	BackSkyAnchor->addKid(desc2);
+
+	sgCoord BackSkypos;
+	//sgSetCoord ( &backskypos, double(grWrldX/2), 0.0f, double(grWrldZ/2));
+	sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
+	BackSkyLoc->setTransform(&BackSkypos);
+}
+
 void
 grPreDrawSky(tSituation* s, float fogStart, float fogEnd) 
 {
@@ -1005,6 +1027,9 @@ grShutdownBackground(void)
 	
 	if (SunAnchor)
 		SunAnchor = 0;
+		
+	if (BackSkyAnchor)
+		BackSkyAnchor = 0;
 	
 	if (grEnvState) {
 		ssgDeRefDelete(grEnvState);

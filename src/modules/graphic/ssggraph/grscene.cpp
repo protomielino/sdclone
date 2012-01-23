@@ -135,7 +135,13 @@ grLoadScene(tTrack *track)
 
 	// Build scene.
 	TheScene = new ssgRoot;
-
+	
+	/* Background Sky */
+	BackSkyAnchor = new ssgBranch;
+	BackSkyLoc = new ssgTransform;
+	BackSkyLoc->addKid(BackSkyAnchor);
+	TheScene->addKid(BackSkyLoc);
+	
 	/* Landscape */
 	LandAnchor = new ssgBranch;
 	TheScene->addKid(LandAnchor);
@@ -168,11 +174,6 @@ grLoadScene(tTrack *track)
 	TrackLightAnchor = new ssgBranch;
 	TheScene->addKid(TrackLightAnchor);
 
-	BackSkyAnchor = new ssgBranch;
-	BackSkyLoc = new ssgTransform;
-	BackSkyLoc->addKid(BackSkyAnchor);
-	TheScene->addKid(BackSkyLoc);
-
 	/* Load the background (horizon and sky) */
 	grLoadBackground();
 
@@ -204,21 +205,8 @@ grLoadScene(tTrack *track)
 	{
 		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
 		if (grBGSky)
-		{
-			acname = "background-sky.ac";
-			snprintf(buf, sizeof(buf), "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
-			ssgTexturePath(buf);
-			snprintf(buf, sizeof(buf), "data/objects");
-			ssgModelPath(buf);
+			grLoadBackgroundSky();
 		
-			desc = grssgLoadAC3D(acname, NULL);
-			BackSkyAnchor->addKid(desc);
-
-			sgCoord BackSkypos;
-			//sgSetCoord ( &backskypos, double(grWrldX/2), 0.0f, double(grWrldZ/2));
-			sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
-			BackSkyLoc->setTransform(&BackSkypos);
-		}
 	}
 
 
