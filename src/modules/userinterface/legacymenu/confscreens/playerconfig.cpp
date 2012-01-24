@@ -21,6 +21,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <deque>
+#include <string>
 
 #include <portability.h>
 #include <tgfclient.h>
@@ -701,7 +702,17 @@ onChangeName(void * /* dummy */)
 
     if (CurrPlayer != PlayersInfo.end()) {
         val = GfuiEditboxGetString(ScrHandle, NameEditId);
-        (*CurrPlayer)->setDispName(strcmp(val, PlayerNamePrompt) ? val : NoPlayer);
+
+        // Remove leading spaces (#587)
+        std::string strIn(val);
+        size_t startpos = strIn.find_first_not_of(" \t"); // Find the first character position after excluding leading blank spaces
+        if (startpos != std::string::npos) {
+        strIn = strIn.substr(startpos);
+        } else {
+            strIn.assign(NoPlayer); // If it was all whitespace, assign default
+        }
+
+        (*CurrPlayer)->setDispName(strIn == PlayerNamePrompt ? NoPlayer : strIn.c_str());
     }
 
     UpdtScrollList();
