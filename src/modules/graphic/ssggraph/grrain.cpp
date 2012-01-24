@@ -188,6 +188,8 @@ cGrRain::drawRain(double pitch, double roll, double heading, double hspeed, doub
 	glRotatef(angle, 1.0, 0.0, 0.0);
 
 	// up cone
+	if (angle == 0.0)
+		cone_height = 40.0;
 	drawCone(cone_base_radius, cone_height, slice_count, true, rain_norm, hspeed);
 
 	// down cone (usually not visible)
