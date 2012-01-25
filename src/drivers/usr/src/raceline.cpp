@@ -835,11 +835,13 @@ void LRaceLine::Smooth(int Step, int rl)
 
   if (rl >= LINE_RL)
   {
-   int movingout = 0;
+   // Unused code? (kilo)
+   /*int movingout = 0;
    if ((TargetRInverse > 0.0 && SRL[rl].tLane[next] > SRL[rl].tLane[prev]) ||
        (TargetRInverse < 0.0 && SRL[rl].tLane[next] < SRL[rl].tLane[prev]))
      movingout = 1;
-
+   */
+   
    if (ri0 * ri1 > 0)
    {
     double ac1 = fabs(ri0);
@@ -1051,7 +1053,7 @@ void LRaceLine::TrackInit(tSituation *p)
 
   if (SRL[idx].init <= 1)
   {
-   fprintf(stderr,"\nInitializing Raceline %d (%s) for %s...\n",idx,SRL[idx].trackname,car->_name); fflush(stderr);
+   GfLogInfo("USR initializing raceline %d (%s) for %s...\n", idx, SRL[idx].trackname, car->_name);
 
    SRL[idx].init = 2;
    SplitTrack(track, idx);
@@ -1074,8 +1076,7 @@ void LRaceLine::TrackInit(tSituation *p)
   }
   else
   {
-   fprintf(stderr,"\nRe-using Raceline %d for %s...\n",idx,car->_name);
-   fflush(stderr);
+   GfLogInfo("USR re-using raceline %d for %s...\n", idx, car->_name);
   }
 
   ComputeSpeed(idx);
@@ -1323,7 +1324,7 @@ void LRaceLine::FreeRaceline(int rl)
 {
  if (SRL[rl].init)
  {
-  fprintf(stderr,"Freeing raceline structure %d\n",rl); fflush(stderr);
+  GfLogInfo("USR freeing raceline structure %d\n", rl);
   SRL[rl].init = 0;
   if (SRL[rl].tx) free(SRL[rl].tx);
   if (SRL[rl].ty) free(SRL[rl].ty);
@@ -1354,7 +1355,7 @@ void LRaceLine::AllocRaceline(int rl, const char *trackname)
 {
  if (!SRL[rl].init)
  {
-  fprintf(stderr,"Allocating raceline structure %d\n",rl); fflush(stderr);
+  GfLogInfo("USR allocating raceline structure %d\n", rl);
   SRL[rl].init = 1;
   strncpy( SRL[rl].trackname, trackname, 63 );
   SRL[rl].tx = (double *) malloc( (Divs+1) * sizeof(double) );
@@ -2000,7 +2001,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
   double Error = 0;
   double VnError = 0;
   double Skid = 0;
-  double CosAngleError = 1;
+  //unused code? (kilo)
+  //double CosAngleError = 1;
   double SinAngleError = 0;
   double carspeed = Mag(car->_speed_X, car->_speed_Y);
   int KNext = (Next+1) % Divs;
@@ -2117,7 +2119,8 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
    double vy = car->_speed_Y;
    double dirx = cos(car->_yaw);
    double diry = sin(car->_yaw);
-   CosAngleError = dx * dirx + dy * diry;
+   //Unused code? (kilo)
+   //CosAngleError = dx * dirx + dy * diry;
    SinAngleError = dx * diry - dy * dirx;
    Skid = (dirx * vy - vx * diry) / (carspeed + 1.0);
    if (Skid > 0.9)
@@ -2206,8 +2209,7 @@ void LRaceLine::GetRaceLineData(tSituation *s, LRaceLineData *pdata)
 
  if (RaceLineDebug)
  {
-  fprintf(stderr, "%s: %d/%d RI=%.3f/%.3f z=%.3f (%.3f/%.3f) Fr=%.3f Speed=%.1f (%.1f/%.1f) Steer=%.3f (redux=%.3f)\n", car->_name, This, Next,SRL[SRLidx].tRInverse[Next],SRL[SRLidx].tRInverse[Next],SRL[SRLidx].tz[Next],SRL[SRLidx].tzd[Next],SegCamber(SRLidx, Next),SRL[SRLidx].tFriction[Next],TargetSpeed,tSpeed[LINE_RL][Next],tSpeed[LINE_MID][Next],k1999steer,data->accel_redux);
-  fflush(stderr);
+  GfLogDebug("USR %s: %d/%d RI=%.3f/%.3f z=%.3f (%.3f/%.3f) Fr=%.3f Speed=%.1f (%.1f/%.1f) Steer=%.3f (redux=%.3f)\n", car->_name, This, Next, SRL[SRLidx].tRInverse[Next], SRL[SRLidx].tRInverse[Next], SRL[SRLidx].tz[Next], SRL[SRLidx].tzd[Next], SegCamber(SRLidx, Next), SRL[SRLidx].tFriction[Next], TargetSpeed, tSpeed[LINE_RL][Next], tSpeed[LINE_MID][Next], k1999steer, data->accel_redux);
  }
 
  data->ksteer = k1999steer;

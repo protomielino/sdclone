@@ -210,13 +210,20 @@ fprintf(stderr," FRONTSLOW\n");
 
 			if ((s->currentTime > 3.0 || t_impact < 0.7))
 			{
-				double lane = driver->getRaceLane() * mycar->_trkPos.seg->width;
-				double max = MAX(lane, MAX(mycar->_trkPos.seg->width-mycar->_dimension_y/2, driver->getNextLeft()));
-				double min = MIN(lane, MIN(mycar->_dimension_y/2, driver->getNextLeft()));
+				//unused variable lane? (kilo)
+				//double lane = driver->getRaceLane() * mycar->_trkPos.seg->width;
+				//unused code? (kilo)
+				/*
+				 * double max = MAX(lane, MAX(mycar->_trkPos.seg->width-mycar->_dimension_y/2, driver->getNextLeft()));
+				 * double min = MIN(lane, MIN(mycar->_dimension_y/2, driver->getNextLeft()));
+				 */
 				//double mleft = MIN(max, MAX(min, (mycar->_trkPos.toLeft+(driver->getNextLeft()-mycar->_trkPos.toLeft) * (t_impact*deltamult)))) - driver->getAngle();
 				//double mleft = MIN(max, MAX(min, (mycar->_trkPos.toLeft+(t_impact*driver->getSpeedAngle())) + driver->getAngle()));
-				max = MAX(nextleft, car->_trkPos.seg->width-car->_dimension_y/2);
-				min = MIN(nextleft, car->_dimension_y/2);
+				//unused code? (kilo)
+				/*
+				 * max = MAX(nextleft, car->_trkPos.seg->width-car->_dimension_y/2);
+				 * min = MIN(nextleft, car->_dimension_y/2);
+				 */
 				//double oleft = MIN(max, MAX(min, (car->_trkPos.toLeft+(nextleft-car->_trkPos.toLeft) * (t_impact*deltamult)))) - angle;
 				//double oleft = MIN(max, MAX(min, (car->_trkPos.toLeft+(t_impact*speedangle)) + angle));
 
