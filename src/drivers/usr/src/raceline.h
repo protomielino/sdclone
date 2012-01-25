@@ -132,7 +132,7 @@ class LRaceLine {
   void setAvoidSpeedAdjust( double wi ) { AvoidSpeedAdjust = wi; }
   void setCarHandle( void *pCarHandle ) { carhandle = pCarHandle; }
   void setSkill( double tskill) { skill = tskill; }
-  void setCW( double cw ) { cw = CW; }
+  void setCW( double cw ) { CW = cw; }
   int getCarefulBrake() { return GetModI( tCarefulBrake, Next ); }
   double getRLAngle(int div);
 
