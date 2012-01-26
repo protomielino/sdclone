@@ -706,8 +706,9 @@ onChangeName(void * /* dummy */)
         // Remove leading spaces (#587)
         std::string strIn(val);
         size_t startpos = strIn.find_first_not_of(" \t"); // Find the first character position after excluding leading blank spaces
-        if (startpos != std::string::npos) {
-        strIn = strIn.substr(startpos);
+	size_t endpos = strIn.find_last_not_of(" \t");	// Find last non-whitespace char position
+        if (startpos != std::string::npos && endpos != std::string::npos) {
+            strIn = strIn.substr(startpos, endpos - startpos + 1);
         } else {
             strIn.assign(NoPlayer); // If it was all whitespace, assign default
         }
