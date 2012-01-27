@@ -9,7 +9,7 @@ ADD_SUBDIRECTORY(usr)
 # Work-in-progress / unofficial robots.
 IF(NOT OPTION_OFFICIAL_ONLY)
 	ADD_SUBDIRECTORY(networkhuman)
-	#ADD_SUBDIRECTORY(shadow)
+	ADD_SUBDIRECTORY(shadow)
 
 	#ADD_SUBDIRECTORY(bt)
 	#ADD_SUBDIRECTORY(hymie)
