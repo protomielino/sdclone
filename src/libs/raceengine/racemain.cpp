@@ -235,7 +235,7 @@ RePreRace(void)
 	
 	// Timed session doesn't exclude addional laps after the time finishes
 	// Make sure that if no time set, we set far below zero
-	if(ReInfo->s->_totTime < 0.0f )
+	if(ReInfo->s->_totTime <= 0.0f )
 		ReInfo->s->_totTime = -60.0f;
 		
 	// Get session distance (defaults to "All sessions" one, or else 0).
