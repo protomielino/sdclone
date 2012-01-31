@@ -1697,10 +1697,13 @@ void KDriver::SetMode(int newmode) {
         current_light = RM_LIGHT_HEAD2;
         break;
       case AVOIDING:
-        current_light = RM_LIGHT_HEAD1;
+        if (static_cast<int>(current_sim_time_ * 2.0) % 2 == 0)
+          current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+        else
+          current_light = RM_LIGHT_HEAD1;
         break;
       default:
-        current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
+        current_light = RM_LIGHT_HEAD1;
         break;
     }
   }  // mode_ != newmode
