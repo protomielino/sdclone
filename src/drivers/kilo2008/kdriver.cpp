@@ -34,11 +34,6 @@
 #include <string>
 
 // #define KDRIVER_DEBUG
-#ifdef KDRIVER_DEBUG
-#include <iostream>  // NOLINT(readability/streams), used for logging only
-using ::std::cout;
-using ::std::endl;
-#endif
 
 #include "src/drivers/kilo2008/opponent.h"
 #include "src/drivers/kilo2008/strategy.h"
@@ -651,9 +646,9 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   buf << botPath.str() << "default.xml";
   *carParmHandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
-  cout << "Default: " << buf.str() << endl;
+  GfLogInfo("KILO Default: %s\n", buf.str().c_str());
   if (carParmHandle)
-    cout << "default xml loaded, carParmHandle: " << *carParmHandle << endl;
+    GfLogDebug("KILO default xml loaded\n");
 #endif
 
   // Try to load the track-based informations
@@ -661,18 +656,14 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   buf << botPath.str() << "tracks/" << trackname;
   void *newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
-  cout << "track-based: " << buf.str() << endl;
+  GfLogInfo("KILO track-based: %s\n", buf.str().c_str());
   if (newhandle)
-    cout << "track-based xml loaded, newhandle: " << newhandle << endl;
+    GfLogDebug("KILO track-based XML loaded\n");
   else
-    cout << "no track-based xml present" << endl;
+    GfLogDebug("KILO no track-based XML present\n");
 #endif
 
   MergeCarSetups(carParmHandle, newhandle);
-#ifdef KDRIVER_DEBUG
-  cout << "merge #1, carParmHandle: " << *carParmHandle
-        << " newhandle: " << newhandle << endl;
-#endif
 
   // Discover somehow the name of the car used
   if (car_type_.empty()) {
@@ -689,7 +680,7 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
       }
     }  // if carType empty
 #ifdef KDRIVER_DEBUG
-  cout << "Cartype: " << car_type_ << endl;
+  GfLogInfo("KILO car type: %s\n", car_type_.c_str());
 #endif
 
   // Load setup tailored for car+track
@@ -697,11 +688,11 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
   buf << botPath.str() << car_type_ << "/" << trackname;
   newhandle = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
-  cout << "custom setup: " << buf.str() << endl;
+  GfLogInfo("KILO custom setup: %s\n", buf.str().c_str());
   if (newhandle)
-    cout << "car+track xml loaded, newhandle: " << newhandle << endl;
+    GfLogDebug("KILO car+track XML loaded\n");
   else
-    cout << "no car+track xml present" << endl;
+    GfLogDebug("KILO no car+track XML present\n");
 #endif
 
   // If there is no tailored setup, let's load a default one
@@ -710,16 +701,13 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
     newhandle = LoadDefaultSetup();
 #ifdef KDRIVER_DEBUG
   if (newhandle)
-    cout << "default setup xml loaded, newhandle: " << newhandle << endl;
+    GfLogDebug("KILO default setup XML loaded\n");
   else
-    cout << "no default setup loaded???" << endl;
+    GfLogError("KILO no default setup loaded???\n");
 #endif
 
   // Merge the above two setups
   MergeCarSetups(carParmHandle, newhandle);
-#ifdef KDRIVER_DEBUG
-  cout << "merge #2" << endl;
-#endif
 
   // Load and set parameters.
   MU_FACTOR = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
@@ -984,11 +972,8 @@ void* KDriver::LoadDefaultSetup() const {
   double dRatio = dLength / dCurves;
 
 #ifdef KDRIVER_DEBUG
-  cout << "Track " << track_->name
-    << " length: " << dLength
-    << " curves: " << dCurves
-    << " ratio: " << dRatio
-    << endl;
+  GfLogInfo("KILO Track %s, length %.2f, curves %.2f, ratio %.2f\n",
+    track_->name, dLength, dCurves, dRatio);
 #endif
 
   stringstream buf;
@@ -1007,9 +992,9 @@ void* KDriver::LoadDefaultSetup() const {
 
   ret = GfParmReadFile(buf.str().c_str(), GFPARM_RMODE_STD);
 #ifdef KDRIVER_DEBUG
-  cout << "Decision of setup: " << buf.str() << endl;
+  GfLogInfo("KILO Decision of setup: %s\n", buf.str().c_str());
   if (ret)
-    cout << "Def-XXX xml loaded" << endl;
+    GfLogDebug("KILO Def-XXX xml loaded\n");
 #endif
 
   return ret;
@@ -1696,6 +1681,9 @@ inline double KDriver::GetDistToSegEnd() const {
 void KDriver::SetMode(int newmode) {
   // if (car_->_distRaced < 30.0 && car_->_pos == 1)
     // newmode = NORMAL;
+#ifdef KDRIVER_DEBUG
+  GfLogInfo("KILO mode: %d newmode: %d\n", mode_, newmode);
+#endif
 
   if (mode_ != newmode) {
     if (mode_ == NORMAL || mode_ == PITTING) {
@@ -1894,12 +1882,8 @@ double KDriver::InitSkill(tSituation * s) {
   }   // if not practice
 
 #ifdef KDRIVER_DEBUG
-  cout << "Skill: " << skill_
-    << ", brake: " << brake_skill_
-    << ", accel: " << accel_skill_
-    << ", lookA: " << lookahead_skill_
-    << ", sides: " << side_skill_
-    << endl;
+  GfLogDebug("Skill: %.2f, brake: %.2f, accel: %.2f, lookA: %.2f, sides: %.2f\n",
+    skill_, brake_skill_, accel_skill_, lookahead_skill_, side_skill_);
 #endif
 
   return skill_;
