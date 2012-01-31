@@ -26,7 +26,7 @@
 #ifndef SRC_DRIVERS_KILO2008_LINALG_H_
 #define SRC_DRIVERS_KILO2008_LINALG_H_
 
-#include <math.h>    // sqrt
+#include <cmath>    // sqrt
 
 class v2d {
  public:

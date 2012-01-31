@@ -20,7 +20,7 @@
 
 
 #include "src/drivers/kilo2008/util.h"
-#include <math.h>
+#include <cmath>
 
 /////////////////////////////////////////////////////////////////////////////
 // Some utility macros and functions
