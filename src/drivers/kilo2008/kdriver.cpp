@@ -95,7 +95,7 @@ const double KDriver::WIDTHDIV = 2.0;
 // [m]
 const double KDriver::BORDER_OVERTAKE_MARGIN = 1.0;
 
-const double KDriver::SIDECOLL_MARGIN = 1.0;
+const double KDriver::SIDECOLL_MARGIN = 2.0;
 
 // [m/s] Offset change speed.
 const double KDriver::OVERTAKE_OFFSET_SPEED = 5.0;
@@ -133,8 +133,8 @@ static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 #define START_TIME 2.0
 
 
-KDriver::KDriver(int index) :
-  mode_(NORMAL) {
+KDriver::KDriver(int index)
+  : mode_(NORMAL) {
   INDEX = index;
 }
 
@@ -606,7 +606,6 @@ double KDriver::FilterSidecollOffset(const Opponent *o,
   }
 
   oppOnRight ? SetAvoidRight() : SetAvoidLeft();
-  avoid_mode_ |= AVOIDSIDE;
 
   my_offset_ = MIN(max_offset_, MAX(min_offset_, my_offset_));
   return my_offset_;
@@ -1410,7 +1409,7 @@ double KDriver::CorrectSteering(double avoidsteer, double racesteer) {
         * (0.5 + MIN(fabs(avoidsteer), fabs(racesteer)) / 10)));
 
   // TODO(kilo): check if START_TIME is enough
-  if (mode_ == CORRECTING && sim_time_ > START_TIME) {
+  if (mode_ == CORRECTING /*&& sim_time_ > START_TIME*/) {
     // move steering towards racesteer...
     if (correct_limit_ < 900.0) {
       if (steer < racesteer) {
