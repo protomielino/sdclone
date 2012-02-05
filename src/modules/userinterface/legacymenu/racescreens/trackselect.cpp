@@ -62,6 +62,9 @@ static int DescLine1LabelId;
 static int DescLine2LabelId;
 static int MaxPitsLabelId;
 
+// Max length of track description lines (loaded from menu properties).
+static unsigned DescLinesMaxLen = 35;
+
 /** 
  * rmtsWordWrap
  * 
@@ -73,7 +76,7 @@ static int MaxPitsLabelId;
  * @param   length  Line length limit where wrapping should occur
  */
 static void
-rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsigned int length)
+rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsigned length)
 {
 	//istream_iterator iterates through the container
 	//using whitespaces as delimiters, so it is an ideal tool
@@ -96,8 +99,6 @@ rmtsWordWrap(const std::string str, std::string &str1, std::string &str2, unsign
 static void
 rmtsUpdateTrackInfo(void)
 {
-	static const int nMaxLinesLength = 35;  //Line length for track description (chars)
-
 	if (!PCurTrack)
 		return;
 	
@@ -108,7 +109,7 @@ rmtsUpdateTrackInfo(void)
 	
 	// 1) Track description, optionally wrapped in 2 lines
 	std::string strDescLine1, strDescLine2;
-	rmtsWordWrap(PCurTrack->getDescription(), strDescLine1, strDescLine2, nMaxLinesLength);
+	rmtsWordWrap(PCurTrack->getDescription(), strDescLine1, strDescLine2, DescLinesMaxLen);
 	GfuiLabelSetText(ScrHandle, DescLine1LabelId, strDescLine1.c_str());
 	GfuiLabelSetText(ScrHandle, DescLine2LabelId, strDescLine2.c_str());
 
@@ -304,13 +305,16 @@ RmTrackSelect(void *vs)
 	GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "nextbutton", NULL, rmtsSelect);
 	GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "backbutton", MenuData->prevScreen, rmtsDeactivate);
 
-	DescLine1LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "descriptionlabel");
+	DescLine1LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "description1label");
 	DescLine2LabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "description2label");
 	LengthLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "lengthlabel");
 	WidthLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "widthlabel");
 	MaxPitsLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "pitslabel");
 	AuthorsLabelId = GfuiMenuCreateLabelControl(ScrHandle, hparmMenu, "authorslabel");
 
+	// Load menu properties.
+	DescLinesMaxLen = (unsigned)GfuiMenuGetNumProperty(hparmMenu, "nDescLinesMaxLen", 35);
+	
 	GfParmReleaseHandle(hparmMenu);
 
 	// Keyboard shortcuts.
