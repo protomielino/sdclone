@@ -31,6 +31,9 @@
 #include <raceman.h>
 #include <tgfclient.h>
 
+#include <race.h>
+#include <racemanagers.h>
+
 #include "legacymenu.h"
 #include "racescreens.h"
 
@@ -78,7 +81,7 @@ RmNextEventMenu(void)
 	// Create variable title label from race params.
 	int titleId = GfuiMenuCreateLabelControl(rmScrHandle, menuXMLDescHdle, "TitleLabel");
 	char pszTitle[128];
-	if (!strcmp(GfParmGetStr(reInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	if (LmRaceEngine().race()->getManager()->hasSubFiles())
 	{
 		const char* pszGroup = GfParmGetStr(reInfo->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
 		snprintf(pszTitle, sizeof(pszTitle), "%s - %s", reInfo->_reName, pszGroup);

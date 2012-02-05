@@ -72,6 +72,8 @@ public:
 	const std::string& getResultsDir() const;
 	bool hasResultsFiles() const;
 	
+	bool hasSubFiles() const;
+
 	//! Save data to params (in-memory, no file written to disk).
 	void store();
 	

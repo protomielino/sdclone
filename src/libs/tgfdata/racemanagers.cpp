@@ -321,7 +321,7 @@ void GfRaceManager::load() const
 	void* hparmHandle = _hparmHandle;
 	const char* pszHasSubFiles =
 		GfParmGetStr(_hparmHandle, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO);
-	_bHasSubFiles = strcmp(pszHasSubFiles, RM_VAL_YES) ? false : true;
+	_bHasSubFiles = strcmp(pszHasSubFiles, RM_VAL_YES) == 0;
 	if (_bHasSubFiles)
 	{
 		const char* psz1stSubFileName =
@@ -684,6 +684,11 @@ bool GfRaceManager::hasResultsFiles() const
 
 	// Answer.
 	return bAnswer;
+}
+
+bool GfRaceManager::hasSubFiles() const
+{
+	return _bHasSubFiles;
 }
 
 bool GfRaceManager::isDirty() const

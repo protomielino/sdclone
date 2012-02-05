@@ -27,8 +27,12 @@
 
 #include <portability.h>
 #include <tgfclient.h>
+
 #include <robot.h>
+
 #include <drivers.h> // GfDriver::getType
+#include <race.h>
+#include <racemanagers.h>
 
 #include "legacymenu.h"
 #include "racescreens.h"
@@ -110,7 +114,7 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 
     // Create variable title label.
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TitleLabel");
-	if (!strcmp(GfParmGetStr(info->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	if (LmRaceEngine().race()->getManager()->hasSubFiles())
 	{
 		const char* pszGroup = GfParmGetStr(info->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
 		snprintf(buf, sizeof(buf), "%s - %s", info->_reName, pszGroup);
