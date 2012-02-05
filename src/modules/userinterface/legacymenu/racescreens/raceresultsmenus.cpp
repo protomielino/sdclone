@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : results.cpp
+    file                 : raceresultsmenus.cpp
     created              : Fri Apr 14 22:36:36 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
@@ -26,8 +26,13 @@
 
 #include <portability.h>
 #include <tgfclient.h>
-#include <drivers.h>
 
+#include <drivers.h>
+#include <tracks.h>
+#include <race.h>
+#include <racemanagers.h>
+
+#include "legacymenu.h"
 #include "racescreens.h"
 
 
@@ -224,11 +229,14 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     void *hmenu = GfuiMenuLoad("raceresultsmenu.xml");
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
-    // Create variable title label.
-    snprintf(buf, sizeof(buf), "%s", info->track->name);
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
-    GfuiLabelSetText(rmScrHdle, subTitleId, buf);
+    // Create variable title and subtitle labels.
+    snprintf(buf, sizeof(buf), "%s Results", race);
+    const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
+    GfuiLabelSetText(rmScrHdle, titleId, buf);
   
+    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
+    GfuiLabelSetText(rmScrHdle, subTitleId, info->track->name);
+
 	// Get layout properties.
     const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 15);
     const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
@@ -511,9 +519,10 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	void *hmenu = GfuiMenuLoad("standingsmenu.xml");
 	GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
-    // Create variable title labels.
+    // Create variable title label (with group info for the Career mode).
 	const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
-	if (!strcmp(GfParmGetStr(info->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES))
+	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
+	if (pRaceMan->hasSubFiles())
 	{
 		const char* pszGroup = GfParmGetStr(info->params, RM_SECT_HEADER, RM_ATTR_NAME, "<no group>");
 		snprintf(buf, sizeof(buf), "%s - %s", info->_reName, pszGroup);
@@ -522,7 +531,15 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		snprintf(buf, sizeof(buf), "%s", info->_reName);
 	GfuiLabelSetText(rmScrHdle, titleId, buf);
 
-	snprintf(buf, sizeof(buf), "%s at %s - Standings", info->_reRaceName, info->track->name);
+    // Create variable subtitle label
+	// (the session is the _last_ one ; the track is the _previous_ one).
+	const unsigned nCurrEventIndex =
+		(unsigned)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+	const char* pszSessionName =
+		pRaceMan->getSessionName(pRaceMan->getSessionCount() - 1).c_str();
+	const char* pszTrackName =
+		pRaceMan->getPreviousEventTrack(nCurrEventIndex - 1)->getName().c_str();
+	snprintf(buf, sizeof(buf), "%s at %s - Standings", pszSessionName, pszTrackName);
 	const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
 	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
@@ -531,9 +548,9 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
     const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
     const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 20);
 
-	//List results line by line, paginated
+	// List results line by line, paginated
 	int y = yTopLine;
-	const int nbCars = (int)GfParmGetEltNb(results, (char*)RE_SECT_STANDINGS);
+	const int nbCars = (int)GfParmGetEltNb(results, RE_SECT_STANDINGS);
 	for (i = start; i < MIN(start + nMaxLines, nbCars); i++) {
 		snprintf(path, sizeof(path), "%s/%d", RE_SECT_STANDINGS, i + 1);
 		
@@ -565,7 +582,7 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		y -= yLineShift;	//Next line
 	}//for i
 
-	//If not on first page, show 'previous results' button on the bottom left
+	// If not on first page, show 'previous results' button on the bottom left
 	if (start > 0) {
 		RmPrevRace.prevHdle = prevHdle;
 		RmPrevRace.info     = info;
@@ -578,12 +595,11 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	// Add "Continue" button in the bottom left
 	GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "ContinueButton", prevHdle, GfuiScreenReplace);
     
-	//Create 'save' button in the bottom right if ... not Career mode.
-	if (!strcmp( GfParmGetStr( info->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO ), RM_VAL_YES ) == 0) {
+	// Add "save" button in the bottom right if ... not Career mode.
+	if (!LmRaceEngine().race()->getManager()->hasSubFiles())
 	    rmSaveButtonId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "SaveButton", info, rmSaveRes);
-	}
 
-	//If there is a next page, show 'next results' button on the bottom extreme right
+	// If there is a next page, show 'next results' button on the bottom extreme right
 	if (i < nbCars) {
 		RmNextRace.prevHdle = prevHdle;
 		RmNextRace.info     = info;
