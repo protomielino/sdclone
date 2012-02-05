@@ -14,8 +14,51 @@
 
 <!DOCTYPE params SYSTEM "../../libs/tgf/params.dtd">
 
-<params mode="mw" type="template" name="Player Pref" version="1.1">
+<params mode="mw" type="template" name="Player Pref" version="1.2">
 
+  <section name="Preferences">
+
+    <!-- The 'profile' = sub-section below to get the default values from -->
+    <attstr name="control" in="mouse,joystick" val="mouse"/>
+
+    <section name="Drivers">
+
+      <section name="1">
+        <!-- Initial parameters ; set to default if not specified (see above) -->
+        <attstr name="transmission" in="auto,sequential,grid" val="auto"/>
+        <attstr name="ABS on" in="yes,no" val="yes"/>
+        <attstr name="ASR on" in="yes,no" val="yes"/>        
+        <attnum name="programmed pit stops" val="0"/>
+        <attnum name="steer sensitivity" val="0.6"/>
+        <attnum name="steer dead zone" val="0.0"/>
+        <attstr name="left steer" val="MOUSE_LEFT"/>
+        <attnum name="left steer min" val="0"/>
+        <attnum name="left steer max" val="319"/>
+        <attnum name="left steer power" val="0.00315"/>
+        <attstr name="right steer" val="MOUSE_RIGHT"/>
+        <attnum name="right steer min" val="0"/>
+        <attnum name="right steer max" val="319"/>
+        <attnum name="right steer power" val="0.00315"/>
+        <attstr name="throttle" val="Up Arrow"/>
+        <attnum name="throttle min" val="0"/>
+        <attnum name="throttle max" val="1"/>
+        <attnum name="throttle power" val="0"/>
+        <attstr name="brake" val="Down Arrow"/>
+        <attnum name="brake min" val="0"/>
+        <attnum name="brake max" val="1"/>
+        <attnum name="brake power" val="0"/>
+        <attstr name="ebrake cmd" val="Space"/>
+        <attstr name="ASR cmd" val="t"/>
+        <attstr name="ABS cmd" val="a"/>
+        <attstr name="Light1 cmd" val="l"/>
+        <attstr name="Speed Limiter" val="s"/>
+      </section>
+
+    </section>
+
+  </section>
+
+  <!-- The default values for a 'joystick' profile -->
   <section name="joystick">
     <attstr name="up shift"   val="BTN1-0"/>
     <attstr name="down shift" val="BTN2-0"/>
@@ -63,11 +106,10 @@
     <attnum name="clutch power" val="1.2"/>
   </section>
 
+  <!-- The default values for a 'mouse' profile -->
   <section name="mouse">
-    <attstr name="up shift"   val=""/>
+    <attstr name="up shift" val=""/>
     <attstr name="down shift" val=""/>
-    <attstr name="ASR cmd" val="z"/>
-    <attstr name="ABS cmd" val="a"/>
     <attstr name="reverse gear" val=""/>
     <attstr name="neutral gear" val=""/>
     <attstr name="1st gear" val=""/>
@@ -83,12 +125,12 @@
     <attnum name="steer speed sensitivity" val="0.7"/>
     <attnum name="steer dead zone" unit="%" val="4.0"/>
 
-    <attstr name="left steer" val="Left Arrow"/>
+    <attstr name="left steer" val="MOUSE_LEFT"/>
     <attnum name="left steer min" val="0"/>
     <attnum name="left steer max" val="300"/>
     <attnum name="left steer power" val="0.0034"/>
 
-    <attstr name="right steer" val="Right Arrow"/>
+    <attstr name="right steer" val="MOUSE_RIGHT"/>
     <attnum name="right steer min" val="0"/>
     <attnum name="right steer max" val="300"/>
     <attnum name="right steer power" val="0.0034"/>
@@ -104,48 +146,26 @@
     <attnum name="brake max" val="1"/>
     <attnum name="brake sensitivity" val="1.0"/>
     <attnum name="brake power" val="0"/>
-    <attstr name="ebrake cmd" val=""/>
-  </section>
 
-  <section name="Preferences">
-    <attstr name="control" in="mouse,joystick" val="mouse"/>
+    <attstr name="ebrake cmd" val="Space"/>
+    <attnum name="ebrake min" val="0"/>
+    <attnum name="ebrake max" val="0"/>
+ 
+    <attstr name="ASR cmd" val="t"/>
+    <attstr name="ABS cmd" val="a"/>
+    <attstr name="Light1 cmd" val="l"/>
+    <attstr name="Speed Limiter" val="s"/>
 
-    <section name="Drivers">
+    <attstr name="left glance" val="MOUSE_LEFT_BTN"/>
+    <attnum name="left glance min" val="-1"/>
+    <attnum name="left glance max" val="-0.1"/>
+    <attstr name="right glance" val="MOUSE_RIGHT_BTN"/>
+    <attnum name="right glance min" val="0.1"/>
+    <attnum name="right glance max" val="1"/>
+    
+   </section>
 
-      <section name="1">
-	<attstr name="transmission" in="auto,sequential,grid" val="auto"/>
-	<!-- Starting parameters -->
-	<attstr name="ABS on" in="yes,no" val="yes"/>
-	<attstr name="ASR on" in="yes,no" val="yes"/>	
-	<attnum name="programmed pit stops" val="0"/>
-        <attnum name="steer sensitivity" val="0.6"/>
-        <attnum name="steer dead zone" val="0.0"/>
-        <attstr name="left steer" val="MOUSE_LEFT"/>
-        <attnum name="left steer min" val="0"/>
-        <attnum name="left steer max" val="319"/>
-        <attnum name="left steer power" val="0.00315"/>
-        <attstr name="right steer" val="MOUSE_RIGHT"/>
-        <attnum name="right steer min" val="0"/>
-        <attnum name="right steer max" val="319"/>
-        <attnum name="right steer power" val="0.00315"/>
-        <attstr name="throttle" val="Up Arrow"/>
-        <attnum name="throttle min" val="0"/>
-        <attnum name="throttle max" val="1"/>
-        <attnum name="throttle power" val="0"/>
-        <attstr name="brake" val="Down Arrow"/>
-        <attnum name="brake min" val="0"/>
-        <attnum name="brake max" val="1"/>
-        <attnum name="brake power" val="0"/>
-        <attstr name="ABS cmd" val="a"/>
-        <attstr name="ASR cmd" val="t"/>
-        <attstr name="Speed Limiter" val="s"/>
-        <attstr name="Light1 cmd" val="l"/>
-        <attstr name="ebrake cmd" val=""/>
-      </section>
-
-    </section>
-  </section>
-
+  <!-- The default values for an 'analog joystick' profile -->
   <section name="joystick analog">
     <attstr name="up shift"    val="BTN1-0"/>
     <attstr name="down shift"  val="BTN2-0"/>
@@ -172,6 +192,7 @@
     <attstr name="ebrake cmd" val=""/>
   </section>
 
+  <!-- The default values for a 'MS FF Wheel profile -->
   <section name="joystick USB MsFFWheel">
     <attstr name="up shift"    val="BTN8-0"/>
     <attstr name="down shift"  val="BTN7-0"/>
@@ -198,6 +219,7 @@
     <attstr name="ebrake cmd" val=""/>
   </section>
 
+  <!-- The default values for a 'digital joystick' profile -->
   <section name="joystick digital (joypad)">
     <attstr name="up shift" val="BTN3-0"/>
     <attstr name="down shift" val="BTN4-0"/>
