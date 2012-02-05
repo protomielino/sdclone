@@ -97,8 +97,8 @@ static tdble lastKeyUpdate = -10.0;
 
 void *PrefHdle = NULL;
 
-// Human drivers names.
-static std::vector<std::string> VecNames;
+// Local copy of human driver names (each one allocated by moduleInitialize).
+static std::vector<char*> VecNames;
 
 // Number of human drivers (initialized by moduleWelcome).
 static int NbDrivers = -1;
@@ -129,7 +129,8 @@ shutdown(const int index)
 {
 	int idx = index - 1;
 
-	VecNames.erase(VecNames.begin() + idx);
+	free(VecNames[idx]);
+	VecNames[idx] = 0;
 
 	free (HCtx[idx]);
 	HCtx[idx] = 0;
@@ -215,7 +216,7 @@ extern "C" int
 moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 {
 	// Open and load the human drivers params file
-	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
+	snprintf(buf, sizeof(buf), "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	// Count the number of human drivers registered in the params
@@ -224,7 +225,7 @@ moduleWelcome(const tModWelcomeIn* welcomeIn, tModWelcomeOut* welcomeOut)
 		const char *driver;
 		do {
 			NbDrivers++;
-			sprintf(sstring, "Robots/index/%d", NbDrivers+1);
+			snprintf(sstring, sizeof(sstring), "Robots/index/%d", NbDrivers+1);
 			driver = GfParmGetStr(drvInfo, sstring, "name", "");
 		} while (strlen(driver) > 0);
 
@@ -257,28 +258,27 @@ moduleInitialize(tModInfo *modInfo)
 	// Reset module interfaces info.
 	memset(modInfo, 0, NbDrivers*sizeof(tModInfo));
 
-	// Clear the local driver name vector
+	// Clear the local driver name vector (in case needed).
 	VecNames.clear();
 
 	// Open and load the human drivers params file
-	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
+	snprintf(buf, sizeof(buf), "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 
 	if (drvInfo) {
 		// Fill the module interfaces info : each driver is associated to 1 interface.
 		for (int i = 0; i < NbDrivers; i++) {
-			sprintf(sstring, "Robots/index/%d", i+1);
-			std::string driver =GfParmGetStr(drvInfo, sstring, "name", "");
-			if (driver.size() > 0) {
-				VecNames.push_back(driver); // Don't rely on GfParm allocated data
-				// char *pName = new char[VecNames[i].size()+1];
-				// memset((void*)pName,0,VecNames[i].size()+1);
-				// strncpy(pName,VecNames[i].c_str(),VecNames[i].size());
-				// modInfo->name = pName;
-				modInfo->name    = VecNames[i].c_str();	/* name of the module (short) */
-				modInfo->desc    = "Joystick controlable driver";	/* description of the module (can be long) */
+			snprintf(sstring, sizeof(sstring), "Robots/index/%d", i+1);
+			const char* pszDriverName = GfParmGetStr(drvInfo, sstring, "name", 0);
+			if (pszDriverName && strlen(pszDriverName) > 0) {
+				// Don't rely on GfParm allocated data : duplicate the name ;
+				// and also save the pointer somewhere in order to release it at the end.
+				char* pszLocDriverName = strdup(pszDriverName);
+				VecNames.push_back(pszLocDriverName);
+				modInfo->name = pszLocDriverName;	/* name of the module (short) */
+				modInfo->desc = "Joystick controlable driver";	/* description (can be longer) */
 				modInfo->fctInit = InitFuncPt;	/* init function */
-				modInfo->gfId    = ROB_IDENT;	/* supported framework version */
+				modInfo->gfId    = ROB_IDENT;	/* supported framework Id */
 				modInfo->index   = i+1;
 				modInfo++;
 			}//if strlen
@@ -301,12 +301,23 @@ moduleInitialize(tModInfo *modInfo)
 extern "C" int
 moduleTerminate()
 {
+	// Free the human context vector
 	std::vector<tHumanContext*>::iterator itDrvCtx = HCtx.begin();
 	while (itDrvCtx != HCtx.end())
 	{
 		free(*itDrvCtx);
 		itDrvCtx++;
 	}
+	HCtx.clear();
+	
+	// Free the local driver name vector
+	std::vector<char*>::iterator itDrvName = VecNames.begin();
+	while (itDrvName != VecNames.end())
+	{
+		free(*itDrvName);
+		itDrvName++;
+	}
+	VecNames.clear();
 
 	return 0;
 }//moduleTerminate
@@ -336,30 +347,30 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 	char *s2 = strchr(s1, '.');
 	strncpy(trackname, s1, s2 - s1);
 	trackname[s2 - s1] = 0;
-	sprintf(sstring, "Robots/index/%d", index);
+	snprintf(sstring, sizeof(sstring), "Robots/index/%d", index);
 
-	sprintf(buf, "%sdrivers/human/human.xml", GfLocalDir());
+	snprintf(buf, sizeof(buf), "%sdrivers/human/human.xml", GfLocalDir());
 	void *drvInfo = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	std::string carname = (drvInfo != NULL)
 		? GfParmGetStrNC(drvInfo, sstring, "car name", NULL)
 		: "";
 
-	sprintf(sstring, "%sdrivers/curcarnames.xml", GfLocalDir());
+	snprintf(sstring, sizeof(sstring), "%sdrivers/curcarnames.xml", GfLocalDir());
 	void *curCars = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (curCars) {
-		sprintf(sstring, "drivers/human/%d", index + NbDrivers + 1);
+		snprintf(sstring, sizeof(sstring), "drivers/human/%d", index + NbDrivers + 1);
 		carname = GfParmGetStr(curCars, sstring, "car name", carname.c_str());
 	}//if curCars
 
-	sprintf(sstring, "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());
+	snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/default.xml", GfLocalDir(), carname.c_str());
 	*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 
 	if (!*carParmHandle) {
-		sprintf(sstring, "%s/drivers/human/car.xml", GfLocalDir());
+		snprintf(sstring, sizeof(sstring), "%s/drivers/human/car.xml", GfLocalDir());
 		*carParmHandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	}
 
-	sprintf(sstring, "%sdrivers/human/cars/%s/%s.xml", GfLocalDir(), carname.c_str(), trackname);
+	snprintf(sstring, sizeof(sstring), "%sdrivers/human/cars/%s/%s.xml", GfLocalDir(), carname.c_str(), trackname);
 	void *newhandle = GfParmReadFile(sstring, GFPARM_RMODE_REREAD);
 	if (newhandle) {
 		*carParmHandle = (*carParmHandle)
@@ -377,7 +388,7 @@ initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSitu
 	}//if-else newhandle
 
 	if (curTrack->pits.type != TR_PIT_NONE) {
-		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
+		snprintf(sstring, sizeof(sstring), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
 		HCtx[idx]->nbPitStopProg = (int)GfParmGetNum(PrefHdle, sstring, HM_ATT_NBPITS, (char*)NULL, 0);
 		GfOut("Player: index %d , Pit stops %d\n", index, HCtx[idx]->nbPitStopProg);
 	} else {
@@ -706,7 +717,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	    || (cmd[CMD_ABS].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_ABS].deadZone == 1))
 	{
 		HCtx[idx]->paramAbs = !HCtx[idx]->paramAbs;
-		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
+		snprintf(sstring, sizeof(sstring), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
 		GfParmSetStr(PrefHdle, sstring, HM_ATT_ABS, Yn[!HCtx[idx]->paramAbs].c_str());
 		GfParmWriteFile(NULL, PrefHdle, "Human");
 	}
@@ -717,7 +728,7 @@ common_drive(const int index, tCarElt* car, tSituation *s)
 	    || (cmd[CMD_ASR].type == GFCTRL_TYPE_JOY_ATOB && cmd[CMD_ASR].deadZone == 1))
 	{
 		HCtx[idx]->paramAsr = !HCtx[idx]->paramAsr;
-		sprintf(sstring, "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
+		snprintf(sstring, sizeof(sstring), "%s/%s/%d", HM_SECT_PREF, HM_LIST_DRV, index);
 		GfParmSetStr(PrefHdle, sstring, HM_ATT_ASR, Yn[!HCtx[idx]->paramAsr].c_str());
 		GfParmWriteFile(NULL, PrefHdle, "Human");
 	}
