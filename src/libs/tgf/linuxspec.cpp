@@ -352,7 +352,6 @@ linuxModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList **
 		    if (handle)
 		    {
 			/* Initialize the module */
-		        GfLogTrace("Request info for %s\n", sopath);
 		        if (GfModInitialize(handle, sopath, GfIdAny, &curMod) == 0)
 			{
 			    if (curMod) /* Retained against gfid */

@@ -299,7 +299,6 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 
     char Dir_name[ 1024 ];
     sprintf( Dir_name, "%s\\*.*", dir );
-    GfLogTrace("Listing module directory %s for info. only\n", dir);
     long Dirent = _findfirst( Dir_name, &FData );
     if ( Dirent != -1 )
     {
@@ -335,12 +334,6 @@ windowsModInfoDir(unsigned int /* gfid */, const char *dir, int level, tModList 
 			    /* Terminate the module */
 			    GfModTerminate(handle, soPath);
 			} 
-			else
-			{
-			    GfLogError("windowsModInfo: Module init function failed %s\n", soPath);
-			    modnb = -1;
-			    break;
-			}
 
 			/* Close the DLL */
 			FreeLibrary(SOHandle(handle));

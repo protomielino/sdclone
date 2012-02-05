@@ -97,8 +97,8 @@ void GfDrivers::reload()
 	strDriversDirName += "drivers";
 
     tModList* lstDriverModules = 0;
-    GfModInfoDir(CAR_IDENT, strDriversDirName.c_str(), 1, &lstDriverModules);
-	if (!lstDriverModules)
+    const int nDriverModules = GfModInfoDir(CAR_IDENT, strDriversDirName.c_str(), 1, &lstDriverModules);
+	if (nDriverModules <= 0 || !lstDriverModules)
 	{
 		GfLogFatal("Could not load any driver module from %s", strDriversDirName.c_str());
 		return;
