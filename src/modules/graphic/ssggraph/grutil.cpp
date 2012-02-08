@@ -270,11 +270,11 @@ void grWriteTimeBuf(char *buf, tdble sec, int sgn)
     sec -= s;
     const int ms = (int)floor(sec * 1000.0);
     if (h) {
-		sprintf(buf, "%s%2.2d:%2.2d:%2.2d:%3.3d", sign,h,m,s,ms);
+		sprintf(buf, "%s%2.2d:%2.2d:%2.2d.%3.3d", sign,h,m,s,ms);
     } else if (m) {
-		sprintf(buf, "   %s%2.2d:%2.2d:%3.3d", sign,m,s,ms);
+		sprintf(buf, "   %s%2.2d:%2.2d.%3.3d", sign,m,s,ms);
     } else {
-		sprintf(buf, "      %s%2.2d:%3.3d", sign,s,ms);
+		sprintf(buf, "      %s%2.2d.%3.3d", sign,s,ms);
     }
 }
 
