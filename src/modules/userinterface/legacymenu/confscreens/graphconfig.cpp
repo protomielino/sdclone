@@ -107,6 +107,9 @@ static void
 ChangeSkyDomeDist(void* vp);
 
 static void
+ChangeBackgroundSky(void* vp);
+
+static void
 LoadGraphicOptions()
 {
     snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
@@ -144,6 +147,12 @@ LoadGraphicOptions()
 
 	if (nSkyDomeDist > 0)
 	{
+		// Enable controls for Dynamic Skydome and Background
+		GfuiEnable(ScrHandle, DynamicSkyDomeLeftButtonId, GFUI_ENABLE);
+		GfuiEnable(ScrHandle, DynamicSkyDomeRightButtonId, GFUI_ENABLE);
+		GfuiEnable(ScrHandle, BackgroundSkyLeftButtonId, GFUI_ENABLE);
+		GfuiEnable(ScrHandle, BackgroundSkyRightButtonId, GFUI_ENABLE);
+
 		DynamicSkyDomeIndex = 0; // Default value index, in case file value not found in list.
 		const char* pszDynamicSkyDome =
 			GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED);
@@ -178,6 +187,13 @@ LoadGraphicOptions()
 	{
 		// No dynamic time if no sky dome
 		ChangeSkyDomeDist(0);
+		ChangeBackgroundSky(0);
+
+		// Disable controls for Dynamic Skydome and Background
+		GfuiEnable(ScrHandle, DynamicSkyDomeLeftButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, DynamicSkyDomeRightButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, BackgroundSkyLeftButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, BackgroundSkyRightButtonId, GFUI_DISABLE);
 	}
 
     PrecipDensityIndex = NbPrecipDensityValues - 1; // Default value index, in case file value not found in list.
