@@ -105,7 +105,7 @@ AddTrackSurface(void *TrackHandle, tTrack *theTrack, const char *material)
 
     curSurf->material = material;
     sprintf(path, "%s/%.*s", TRK_SECT_SURFACES,
-	sizeof(path) - strlen(TRK_SECT_SURFACES),
+	(int)(sizeof(path) - strlen(TRK_SECT_SURFACES)),
 	material);
     curSurf->kFriction     = curSurf->kFrictionDry =
 		GfParmGetNum(TrackHandle, path, TRK_ATT_FRICTION, (char*)NULL, 0.8f);
@@ -205,7 +205,7 @@ AddSides(tTrackSeg *curSeg, void *TrackHandle, tTrack *theTrack, int curStep, in
     sprintf(path, "%s/%s", TRK_SECT_MAIN, TRK_LST_SEGMENTS);
     segName = GfParmListGetCurEltName(TrackHandle, path);
     sprintf(path, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS,
-	sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS),
+	(int)(sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS)),
 	segName);
     for (side = 0; side < 2; side++) {
 	curSeg = mSeg;
@@ -799,7 +799,7 @@ static bool InitPits(tTrack *theTrack, void *TrackHandle) {
 	bool found = false;
 	if (segName != 0) {
 		//Search for pit entry
-		sprintf(path, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS), segName);
+		sprintf(path, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS, (int)(sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS)), segName);
 		segId = (int)GfParmGetNum(TrackHandle, path, TRK_ATT_ID, (char*)NULL, -1);
 		pitEntrySeg = theTrack->seg;
 		for(i = 0; i < theTrack->nseg; i++) {
@@ -1720,7 +1720,7 @@ void ReadTrack4(tTrack *theTrack, void *TrackHandle,
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_SEGMENT);
 	    }
 	    sprintf(path2, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS,
-		sizeof(path2) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS),
+		(int)(sizeof(path2) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS)),
 		segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
 	    curSeg = theTrack->seg;
@@ -1742,7 +1742,7 @@ void ReadTrack4(tTrack *theTrack, void *TrackHandle,
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_CAM_FOV);
 	    }
 	    sprintf(path2, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS,
-		sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS),
+		(int)(sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS)),
 		segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
 	    curSeg = theTrack->seg;
@@ -1757,7 +1757,7 @@ void ReadTrack4(tTrack *theTrack, void *TrackHandle,
 		GfFatal("Bad Track Definition: in Camera %s %s is missing\n", curCam->name, TRK_ATT_CAM_FOVE);
 	    }
 	    sprintf(path2, "%s/%s/%.*s", TRK_SECT_MAIN, TRK_LST_SEGMENTS,
-		sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS),
+		(int)(sizeof(path) - strlen(TRK_SECT_MAIN) - strlen(TRK_LST_SEGMENTS)),
 		segName);
 	    segId = (int)GfParmGetNum(TrackHandle, path2, TRK_ATT_ID, (char*)NULL, 0);
 	
