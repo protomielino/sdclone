@@ -57,6 +57,8 @@ tFList * GfDirGetList(const char *dir)
 /** Get the list of files of a given directory
     @ingroup	dir
     @param	dir	directory name
+    @param	prefix	filtering prefix for file names
+    @param	suffix	filtering suffix for file name
     @return	The list of files
  */
 tFList * GfDirGetListFiltered(const char *dir, const char *prefix, const char *suffix)

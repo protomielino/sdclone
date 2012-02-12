@@ -130,9 +130,9 @@ ReRaceEventInit(void)
 	void *mainParams = ReInfo->mainParams;
 	void *params = ReInfo->params;
 
-	bool const careerMode = !strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES);
+	const bool careerMode = strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0;
 	
-	/* Look if it is necessary to open another file */
+	/* Career mode : Look if it is necessary to open another file */
 	if (strcmp(GfParmGetStr(mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES) == 0)
 	{
 		/* Close previous params */
@@ -909,17 +909,25 @@ RePostRace(void)
 	void *results = ReInfo->results;
 	void *params = ReInfo->params;
 
+	// Prepare for next session if any left in the event.
 	curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 	if (curRaceIdx < GfParmGetEltNb(params, RM_SECT_RACES)) {
+
+		// Next session.
 		curRaceIdx++;
-		GfLogInfo("Race Nb %d\n", curRaceIdx);
+		GfLogInfo("Next session will be #%d\n", curRaceIdx);
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, (tdble)curRaceIdx);
+		
+		// Update standings in the results file.
 		ReUpdateStandings();
+		
 		return RM_SYNC | RM_NEXT_RACE;
 	}
 
+	// No more session in the event : update standings in the results file.
 	ReUpdateStandings();
-	
+
+	// Next event if any will start with its first session.
 	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 	
 	return RM_SYNC | RM_NEXT_STEP;
@@ -935,20 +943,19 @@ ReRaceEventShutdown(void)
 	int nbTrk;
 	void *results = ReInfo->results;
 	int curRaceIdx;
-	char lastRaceOfRound;
-	char careerMode = FALSE;
-	char first = TRUE;
+	bool careerMode = false;
+	bool first = true;
 
 	// Notify the UI that the race event is finishing now.
 	ReUI().onRaceEventFinishing();
 
-	// 
+	// Shutdown track-physics-related stuff.
 	ReTrackShutdown();
 
-	// 
+	// Determine the track of the next event to come, if not the last one
+	// and, if Career mode, prepare race params / results for the next event or season.
 	do {
 		nbTrk = GfParmGetEltNb(params, RM_SECT_TRACKS);
-		lastRaceOfRound = TRUE;
 		curRaceIdx =(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1);
 		curTrkIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
 
@@ -966,8 +973,8 @@ ReRaceEventShutdown(void)
 
 		// Career mode.
 		if (!strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES)) {
-			careerMode = TRUE;
-			lastRaceOfRound = strcmp(GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_YES), RM_VAL_YES) == 0;
+			careerMode = true;
+			const bool lastRaceOfRound = strcmp(GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_YES), RM_VAL_YES) == 0;
 	
 			GfParmSetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE,
 			GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, ""));
@@ -1008,7 +1015,7 @@ ReRaceEventShutdown(void)
 				GfParmReleaseHandle( params );
 				break;
 			}
-			first = FALSE;
+			first = false;
 		} else {
 			// Normal mode (no subfiles, so free weekends possible, so nothing to check)
 			break;

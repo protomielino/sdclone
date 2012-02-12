@@ -442,9 +442,9 @@ void LegacyMenu::showStandings()
 
 bool LegacyMenu::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
 {
-	//Only display the standings if both:
-	//  * there are multiple races for this championship
-	//  * the results are relevant for the user (which means: do not display in career-mode in non-human groups
+	// Only display the standings if both:
+	// * there are multiple races for this championship
+	// * the results are relevant for the user (do not display in Career mode in non-human groups)
 	if (bMultiEvent && !careerNonHumanGroup)
 	{
 		// Start the standings menu.
@@ -454,7 +454,8 @@ bool LegacyMenu::onRaceEventFinished(bool bMultiEvent, bool careerNonHumanGroup)
 		return false;
 	}
 
-	GfLogInfo("Not starting Standings menu , as non-multi-event race type.\n");
+	GfLogInfo("Not starting Standings menu, as non-multi-event race mode"
+			  " or no human in this Career group\n");
 	
 	// Tell the race engine state automaton to go on looping.
 	return true;

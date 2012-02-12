@@ -157,18 +157,18 @@ void
 ReStartNewRace()
 {
 	// Save the race settings to the race manager file is anything changed.
-	if (RaceEngine::self().race()->isDirty())
+	GfRace* pRace = RaceEngine::self().race();
+	if (pRace->isDirty())
 	{
-		RaceEngine::self().race()->store(); // Save data to params.
+		pRace->store(); // Save data to params.
 		GfParmWriteFile(NULL, ReInfo->params, ReInfo->_reName); // Save params to disk.
 	}
 
 	// Initialize the result system (different way for the Career mode).
-	if (!strcmp(GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO),
-				RM_VAL_NO))
-		ReInitResults();
-	else
+	if (pRace->getManager()->hasSubFiles())
 		ReCareerNew();
+	else
+		ReInitResults();
 
 	// Enter EVENT_INIT state and return to the race engine automaton.
 	ReStateApply((void*)RE_STATE_EVENT_INIT);
