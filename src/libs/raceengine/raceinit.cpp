@@ -142,11 +142,37 @@ ReRaceConfigure(bool bInteractive)
 void
 ReRaceRestore(void* hparmResults)
 {
-	// Update race engine info.
+	// Update race engine info in order to set it in the exact state
+	// it was in when the race mode was saved.
 	GfRace* pRace = RaceEngine::self().race();
-	ReInfo->mainParams = ReInfo->params = pRace->getManager()->getDescriptorHandle();
-	ReInfo->mainResults = ReInfo->results = pRace->getResultsDescriptorHandle();
-	ReInfo->_reRaceName = pRace->getSessionName().c_str(); //ReInfo->_reName;
+	ReInfo->mainParams = pRace->getManager()->getDescriptorHandle();
+	ReInfo->mainResults = pRace->getResultsDescriptorHandle();
+	if (!pRace->getManager()->hasSubFiles())
+	{
+		// Non-Career mode.
+		ReInfo->params = ReInfo->mainParams;
+		ReInfo->results = ReInfo->mainResults;
+		ReInfo->_reRaceName = pRace->getSessionName().c_str(); //ReInfo->_reName;
+	}
+	else
+	{
+		// Career mode : More complicated, as everything is not in one params/results file
+		// (the target state is right after the end of the previous event,
+		//  which was from the previous group).
+		const char* pszPrevParamsFile =
+			GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_PREV_FILE, 0);
+		if (!pszPrevParamsFile)
+			GfLogWarning("Career : No previous file in MainResults\n");
+		ReInfo->params =
+			pszPrevParamsFile ? GfParmReadFile(pszPrevParamsFile, GFPARM_RMODE_STD) : ReInfo->mainParams;
+		const char* pszPrevResultsFile =
+			GfParmGetStr(ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, 0);
+		if (!pszPrevResultsFile)
+			GfLogWarning("Career : Failed to load previous results from previous params\n");
+		ReInfo->results = 
+			pszPrevResultsFile ? GfParmReadFile(pszPrevResultsFile, GFPARM_RMODE_STD) : ReInfo->mainResults;
+		ReInfo->_reRaceName = ReGetPrevRaceName(/* bLoop = */true);
+	}
 
 	GfParmRemoveVariable(ReInfo->params, "/", "humanInGroup");
 	GfParmSetVariable(ReInfo->params, "/", "humanInGroup", ReHumanInGroup() ? 1.0f : 0.0f);
@@ -853,7 +879,7 @@ ReGetCurrentRaceName(void)
 
 // Get the previous "race" (actually the previous "race session").
 char *
-ReGetPrevRaceName(void)
+ReGetPrevRaceName(bool bLoop)
 {
 	char path[64];
     int   curRaceIdx;
@@ -861,6 +887,8 @@ ReGetPrevRaceName(void)
     void  *results = ReInfo->results;
 
     curRaceIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_RACE, NULL, 1) - 1;
+	if (bLoop && curRaceIdx <= 0)
+		curRaceIdx = (int)GfParmGetEltNb(params, RM_SECT_RACES);
     snprintf(path, sizeof(path), "%s/%d", RM_SECT_RACES, curRaceIdx);
 
     return GfParmGetStrNC(params, path, RM_ATTR_NAME, 0);

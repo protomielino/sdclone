@@ -47,7 +47,7 @@ extern void ReRaceCleanDrivers(void);
 
 extern char *ReGetCurrentRaceName(void);
 
-extern char *ReGetPrevRaceName(void);
+extern char *ReGetPrevRaceName(bool bLoop);
 
 extern tModList *ReRacingRobotsModList;
 

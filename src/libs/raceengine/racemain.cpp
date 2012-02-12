@@ -143,9 +143,8 @@ ReRaceEventInit(void)
 		ReInfo->params = GfParmReadFile( GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, "" ), GFPARM_RMODE_STD );
 		GfLogTrace("Career : New params file is %s (from main results file)\n",
 				   GfParmGetStr( ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
-		if (!params)
+		if (!ReInfo->params)
 			GfLogWarning( "Career : MainResults params weren't read correctly\n" );
-		params = ReInfo->params;
 
 		/* Close previous results */
 		if (ReInfo->results != ReInfo->mainResults)
@@ -155,7 +154,7 @@ ReRaceEventInit(void)
 		}
 
 		/* Read the new results */
-		ReInfo->results = GfParmReadFile( GfParmGetStr( params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
+		ReInfo->results = GfParmReadFile( GfParmGetStr( ReInfo->params, RM_SECT_SUBFILES, RM_ATTR_RESULTSUBFILE, ""), GFPARM_RMODE_STD );
 		if (!ReInfo->results)
 			GfLogWarning( "Career : New results weren't read correctly\n" );
 	}
@@ -166,7 +165,7 @@ ReRaceEventInit(void)
 
 	ReUI().onRaceEventInitializing();
 	
-	ReInfo->s->_features = RmGetFeaturesList(params);
+	ReInfo->s->_features = RmGetFeaturesList(ReInfo->params);
 
 	ReTrackInit();
 	
@@ -661,7 +660,7 @@ ReRaceStart(void)
 		{
 			GfLogTrace("Starting grid in the order of the last race\n");
 			
-			prevRaceName = ReGetPrevRaceName();
+			prevRaceName = ReGetPrevRaceName(/* bLoop = */false);
 			if (!prevRaceName) {
 				return RM_ERROR;
 			}
@@ -689,7 +688,7 @@ ReRaceStart(void)
 		{
 			GfLogTrace("Starting grid in the reverse order of the last race\n");
 
-			prevRaceName = ReGetPrevRaceName();
+			prevRaceName = ReGetPrevRaceName(/* bLoop = */false);
 			if (!prevRaceName) {
 				return RM_ERROR;
 			}
@@ -975,9 +974,14 @@ ReRaceEventShutdown(void)
 		if (!strcmp(GfParmGetStr(ReInfo->mainParams, RM_SECT_SUBFILES, RM_ATTR_HASSUBFILES, RM_VAL_NO), RM_VAL_YES)) {
 			careerMode = true;
 			const bool lastRaceOfRound = strcmp(GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_LASTSUBFILE, RM_VAL_YES), RM_VAL_YES) == 0;
-	
+
+			// Previous file <= Current file.
+			GfParmSetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_PREV_FILE,
+						 GfParmGetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE, ""));
+			// Current file <= Next file.
 			GfParmSetStr(ReInfo->mainResults, RE_SECT_CURRENT, RE_ATTR_CUR_FILE,
-			GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, ""));
+						 GfParmGetStr(params, RM_SECT_SUBFILES, RM_ATTR_NEXTSUBFILE, ""));
+			
 			GfParmWriteFile(NULL, ReInfo->mainResults, NULL);
 			
 			/* Check if the next competition has a free weekend */

@@ -429,6 +429,7 @@ typedef struct RmInfo
 #define RE_ATTR_CUR_TRACK	"current track"
 #define RE_ATTR_CUR_DRIVER	"current driver"
 #define RE_ATTR_CUR_FILE	"current file"
+#define RE_ATTR_PREV_FILE	"previous file"
 #define RE_ATTR_CUR_SEASON	"current season"
 
 #define RE_SECT_DRIVERS		"Drivers"

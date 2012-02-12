@@ -531,14 +531,28 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		snprintf(buf, sizeof(buf), "%s", info->_reName);
 	GfuiLabelSetText(rmScrHdle, titleId, buf);
 
-    // Create variable subtitle label
-	// (the session is the _last_ one ; the track is the _previous_ one).
-	const unsigned nCurrEventIndex =
-		(unsigned)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
-	const char* pszSessionName =
-		pRaceMan->getSessionName(pRaceMan->getSessionCount() - 1).c_str();
-	const char* pszTrackName =
-		pRaceMan->getPreviousEventTrack(nCurrEventIndex - 1)->getName().c_str();
+    // Create variable subtitle label.
+	const char* pszSessionName;
+	const char* pszTrackName;
+	if (pRaceMan->hasSubFiles())
+	{
+		// Career mode : Can't rely on GfRaceManager/GfRace, they don't support Career mode yet.
+		pszSessionName = info->_reRaceName;
+		const int curTrackIdx =
+			(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1) - 1;
+		snprintf(path, sizeof(path), "%s/%d", RM_SECT_TRACKS, curTrackIdx);
+		pszTrackName = GfParmGetStr(info->params, path, RM_ATTR_NAME, "<unkown track>");
+	}
+	else
+	{
+		// Non-Career mode : The session is the _last_ one ; the track is the _previous_ one.
+		const unsigned nCurrEventIndex =
+			(unsigned)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_TRACK, NULL, 1);
+		pszSessionName =
+			pRaceMan->getSessionName(pRaceMan->getSessionCount() - 1).c_str();
+		pszTrackName =
+			pRaceMan->getPreviousEventTrack(nCurrEventIndex - 1)->getName().c_str();
+	}
 	snprintf(buf, sizeof(buf), "%s at %s - Standings", pszSessionName, pszTrackName);
 	const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
 	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
@@ -595,9 +609,10 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 	// Add "Continue" button in the bottom left
 	GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "ContinueButton", prevHdle, GfuiScreenReplace);
     
-	// Add "save" button in the bottom right if ... not Career mode.
-	if (!LmRaceEngine().race()->getManager()->hasSubFiles())
-	    rmSaveButtonId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "SaveButton", info, rmSaveRes);
+	// Add "save" button in the bottom right, but disable it when Career mode.
+	rmSaveButtonId = GfuiMenuCreateButtonControl(rmScrHdle, hmenu, "SaveButton", info, rmSaveRes);
+	if (LmRaceEngine().race()->getManager()->hasSubFiles())
+		GfuiEnable(rmScrHdle, rmSaveButtonId, GFUI_DISABLE);
 
 	// If there is a next page, show 'next results' button on the bottom extreme right
 	if (i < nbCars) {
