@@ -43,10 +43,14 @@ static tFList		*FileSelected;
 static void
 rmOnActivate(void * /* dummy */ )
 {
+	GfLogTrace("Entering File Select menu (filter: %s/%s*%s)\n",
+			   RmFs->dirPath.c_str(), RmFs->namePrefix.c_str(), RmFs->nameSuffix.c_str());
+
 	// Fill-in the Scroll List with the names of the files in the specified folder.
 	GfuiScrollListClear(ScrHandle, FilesScrollListId);
 	
-	FileList = GfDirGetList(RmFs->path.c_str());
+	FileList = GfDirGetListFiltered(RmFs->dirPath.c_str(),
+									RmFs->namePrefix.c_str(), RmFs->nameSuffix.c_str());
 	if (FileList)
 	{
 		tFList	*fileCur;

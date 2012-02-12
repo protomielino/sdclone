@@ -24,6 +24,7 @@
 // Common file name extensions
 #define TRKEXT	 "xml"
 #define PARAMEXT ".xml"
+#define RESULTEXT ".xml"
 
 // Windows -----------------------------------------------------------------
 #ifdef WIN32

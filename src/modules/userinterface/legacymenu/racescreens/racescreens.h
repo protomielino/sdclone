@@ -63,10 +63,12 @@ enum RmFileSelectMode { RmFSModeLoad, RmFSModeSave };
 
 typedef struct RmFileSelect
 {
-    std::string		title;
-    std::string		path;
-    void        	*prevScreen;
-    tfSelectFile	select;
+    std::string	title;
+    std::string	dirPath;
+	std::string namePrefix;
+	std::string nameSuffix;
+    void* prevScreen;
+    tfSelectFile select;
 	RmFileSelectMode mode;
 } tRmFileSelect;
 

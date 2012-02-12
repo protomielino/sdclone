@@ -286,10 +286,14 @@ rmOnLoadRaceFromConfigFile(void *pPrevMenu)
 	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
 	
 	FileSelectData.title = pRaceMan->getName();
-	FileSelectData.mode = RmFSModeLoad;
-	FileSelectData.path = pRaceMan->getSavedConfigsDir();
-	FileSelectData.select = rmLoadRaceFromConfigFile;
 	FileSelectData.prevScreen = pPrevMenu;
+	FileSelectData.mode = RmFSModeLoad;
+
+	FileSelectData.dirPath = pRaceMan->getSavedConfigsDir();
+	FileSelectData.namePrefix = "";
+	FileSelectData.nameSuffix = RESULTEXT;
+
+	FileSelectData.select = rmLoadRaceFromConfigFile;
 
 	// Fire the file selection menu.
 	GfuiScreenActivate(RmFileSelect(&FileSelectData));
@@ -301,10 +305,14 @@ rmOnLoadRaceFromResultsFile(void *pPrevMenu)
 	GfRaceManager* pRaceMan = LmRaceEngine().race()->getManager();
 	
 	FileSelectData.title = pRaceMan->getName();
-	FileSelectData.mode = RmFSModeLoad;
-	FileSelectData.path = pRaceMan->getResultsDir();
-	FileSelectData.select = rmLoadRaceFromResultsFile;
 	FileSelectData.prevScreen = pPrevMenu;
+	FileSelectData.mode = RmFSModeLoad;
+
+	FileSelectData.dirPath = pRaceMan->getResultsDir();
+	FileSelectData.namePrefix = "";
+	FileSelectData.nameSuffix = RESULTEXT;
+
+	FileSelectData.select = rmLoadRaceFromResultsFile;
 
 	// Fire the file selection menu.
 	GfuiScreenActivate(RmFileSelect(&FileSelectData));
@@ -320,9 +328,11 @@ rmOnSaveRaceToConfigFile(void *pPrevMenu)
 	FileSelectData.prevScreen = pPrevMenu;
 	FileSelectData.mode = RmFSModeSave;
 
-	FileSelectData.path = GfLocalDir();
-	FileSelectData.path += "config/raceman/";
-	FileSelectData.path += pRaceMan->getId();
+	FileSelectData.dirPath = GfLocalDir();
+	FileSelectData.dirPath += "config/raceman/";
+	FileSelectData.dirPath += pRaceMan->getId();
+	FileSelectData.namePrefix = "";
+	FileSelectData.nameSuffix = RESULTEXT;
 
 	FileSelectData.select = rmSaveRaceToConfigFile;
 
