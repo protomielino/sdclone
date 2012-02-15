@@ -676,7 +676,7 @@ ReUpdateRaceCurRes()
 				if (car->_lapsBehindLeader == 0)
 				{
 					tmp_str = GfTime2Str(car->_timeBehindLeader, "  ", false, 3);
-					snprintf(buf, sizeof(buf), " %2d \t%-12s  \t%-25s \t%-20s",
+					snprintf(buf, sizeof(buf), " %2d \t%-12s\t%-25s \t%-20s",
 							 xx + 1, tmp_str, car->_name, carName);
 					free(tmp_str);
 				}
