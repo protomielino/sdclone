@@ -15,7 +15,7 @@
 
 <!DOCTYPE params SYSTEM "../params.dtd">
 
-<params name="Quick Race" type="param" mode="mw" version="1.20">
+<params name="Quick Race" type="param" mode="mw" version="1.21">
 
     <section name="Header">
       <attstr name="name" val="Quick Race"/>
