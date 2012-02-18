@@ -115,6 +115,19 @@ grInitScene(void)
   return 0;
 }//grInitScene
 
+static void
+grLoadGraphicsOptions()
+{
+	char buf[256];
+	
+	if (!grHandle)
+	{
+		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
+		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
+	}//if grHandle
+
+	grLoadBackgroundGraphicsOptions();
+}
 
 int
 grLoadScene(tTrack *track)
@@ -124,12 +137,9 @@ grLoadScene(tTrack *track)
 	const char		*acname;
 	ssgEntity		*desc;
 
-	// Load graphic options if not already done.
-	if(!grHandle) {
-		sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-		grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_REREAD);
-	}//if grHandle
-
+	// Load graphics options.
+	grLoadGraphicsOptions();
+	
 	//GfLogDebug("grLoadScene(track=%p)\n", track);
 	grTrack = track;
 
@@ -199,16 +209,12 @@ grLoadScene(tTrack *track)
 	desc = grssgLoadAC3D(acname, NULL);
 	LandAnchor->addKid(desc);
 
-	grSkyDomeDistance =
-		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
 	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
 	{
 		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
 		if (grBGSky)
 			grLoadBackgroundSky();
-		
 	}
-
 
 	return 0;
 }//grLoadScene

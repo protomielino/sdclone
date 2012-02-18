@@ -372,7 +372,6 @@ grSwitchMirror(void * /* dummy */)
 int
 initView(int x, int y, int width, int height, int /* flag */, void *screen)
 {
-	char buf[256];
     int i;
 
     grWinx = x;
@@ -389,12 +388,6 @@ initView(int x, int y, int width, int height, int /* flag */, void *screen)
     frameInfo.nTotalFrames = 0;
 	fFPSPrevInstTime = GfTimeClock();
     nFPSTotalSeconds = 0;
-
-    if (!grHandle)
-    {
-    	sprintf(buf, "%s%s", GfLocalDir(), GR_PARAM_FILE);
-    	grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
-    }
 
 	// Create the screens and initialize each board.
     for (i = 0; i < GR_NB_MAX_SCREEN; i++) {
@@ -644,9 +637,9 @@ initTrack(tTrack *track)
 	// Now, do the real track loading job.
 	grTrackHandle = GfParmReadFile(track->filename, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 	if (grNbActiveScreens > 0)
-		grLoadScene(track);
+		return grLoadScene(track);
 
-	return 0;
+	return -1;
 }
 
 

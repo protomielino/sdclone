@@ -41,7 +41,7 @@ const tdble grSkyDomeNeutralFOVDistance = 20000.0f; // Not the smallest, a mediu
 static const int NbBackgroundFaces = 36; //Background faces
 static const float BackgroundDistance = 1.0f;
 
-static const unsigned grSkyDomeDistThresh = 12000; // No dynamic sky below that value.
+static const unsigned SkyDomeDistThresh = 12000; // No dynamic sky below that value.
 
 static const int NMaxStars = 1000;
 static const int NMaxPlanets = 0; //No planets displayed for the moment
@@ -78,7 +78,7 @@ cgrMultiTexState* grEnvShadowState = 0;
 cgrMultiTexState* grEnvShadowStateOnCars = 0;
 
 unsigned grSkyDomeDistance = 0;
-int grNBCloudLayers = 0;
+static unsigned grNbCloudLayers = 0;
 
 // Some private global variables.
 //static int grDynamicWeather = 0;
@@ -110,11 +110,9 @@ static sgVec4 SceneSpecular;
 /**
  * grInitBackground
  * Initialize the background (mainly the sky).
- * 
- * @return 0 if OK, -1 if something failed
  */
-int
-grInitBackground(void)
+void
+grInitBackground()
 {
 	char buf[256];
 	void *hndl = grTrackHandle;
@@ -256,10 +254,14 @@ grInitBackground(void)
 
 		cGrCloudLayer *cloudLayers[NMaxCloudLayers];
 		snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
-		if (grTrack->local.rain > 0 )
+		if (grTrack->local.rain > 0)
+		{
+			GfLogInfo("  Cloud cover : Rainy, 1 layer\n");
+
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 650,
 											  400 / domeSizeRatio, 400 / domeSizeRatio);
-		else if (grNBCloudLayers == 1)
+		}
+		else if (grNbCloudLayers == 1)
 		{
 			GfLogInfo("  Cloud cover : 3 layers\n");
 
@@ -270,7 +272,8 @@ grInitBackground(void)
 			
 			GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
 			
-		} else if (grNBCloudLayers == 2)
+		}
+		else if (grNbCloudLayers == 2)
 		{
 			GfLogInfo("  Cloud cover : 2 layers\n");
 
@@ -290,7 +293,8 @@ grInitBackground(void)
 			
 			GfLogInfo("   * layer 2 : speed=60, direction=45, texture=%s\n", buf);
 
-		} else if (grNBCloudLayers == 3)
+		}
+		else if (grNbCloudLayers == 3)
 		{
 			GfLogInfo("  Cloud cover : 3 layers\n");
 
@@ -426,13 +430,36 @@ grInitBackground(void)
 	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL_EXT,GL_SEPARATE_SPECULAR_COLOR_EXT);
 	#	endif
 #endif
-
-  return 0;
 }//grInitBackground
 
 
 void
-grLoadBackground(void)
+grLoadBackgroundGraphicsOptions()
+{
+	// Sky dome / background.
+	grSkyDomeDistance =
+		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0);
+	if (grSkyDomeDistance > 0 && grSkyDomeDistance < SkyDomeDistThresh)
+		grSkyDomeDistance = SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
+	
+	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
+
+	GfLogInfo("Graphic options : Sky dome : distance = %u m, dynamic = %s\n",
+			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
+
+	// Dynamic weather.
+	//grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
+			
+	// Cloud layers.
+	grNbCloudLayers =
+		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0);
+
+	GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
+
+}
+
+void
+grLoadBackground()
 {
 	char buf[256];
 	int			i;
@@ -450,23 +477,6 @@ grLoadBackground(void)
 	ssgColourArray	*bg_clr;
 	ssgNormalArray	*bg_nrm;
 	ssgSimpleState	*bg_st;
-
-	// Load graphic options for the sky dome / background.
-	grSkyDomeDistance =
-		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, (char*)NULL, grSkyDomeDistance);
-	if (grSkyDomeDistance > 0 && grSkyDomeDistance < grSkyDomeDistThresh)
-		grSkyDomeDistance = grSkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
-	grDynamicSkyDome = grSkyDomeDistance > 0 && strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_DYNAMICSKYDOME, GR_ATT_DYNAMICSKYDOME_DISABLED), GR_ATT_DYNAMICSKYDOME_ENABLED) == 0; 
-
-	//grDynamicWeather = GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_grDynamicWeather, (char*)NULL, grDynamicWeather);
-			
-	GfLogInfo("Graphic options : Sky dome : distance = %d m, dynamic = %s\n",
-			  grSkyDomeDistance, grDynamicSkyDome ? "true" : "false");
-
-	grNBCloudLayers =
-		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, (char*)NULL, grNBCloudLayers);
-
-	GfLogInfo("Graphic options : Number of cloud layers : %d\n", grNBCloudLayers);
 
 	snprintf(buf, sizeof(buf), "tracks/%s/%s;data/img;data/textures;.",
 			grTrack->category, grTrack->internalname);
