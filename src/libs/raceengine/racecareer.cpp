@@ -244,7 +244,7 @@ static void ReCareerNewAddDrivers( void *curParam, void *curResult, char *humans
 			}
 		}
 
-		/* Now it is certain that a bot should be added: no humans at this point */
+		/* Now it is certain that a bot should be added : no humans at this point */
 		GfLogDebug("  %d : simplix #%d, ext=%d\n", xx, xx, 1);
 		sprintf( buf, "%s/%d", RM_SECT_DRIVERS, xx + 1 );
 		path2 = strdup( buf );
@@ -291,10 +291,10 @@ static void ReCareerNewAddTeams( void *curParam, void *curResult, int curIndex, 
 		if( cur >= start ) {
 			snprintf( buf, 1024, "%s/%s", RE_SECT_TEAMINFO, GfParmGetCurStr( curParam, RM_SECT_TEAMS, RM_ATTR_NAME, "" ) );
 			GfParmSetNum( curResult, buf, RE_ATTR_POINTS, NULL, 1.0f );
-			if( GfParmIsFormula( curParam, RM_SECT_TEAMS, ROB_ATTR_CAR ) == 0 )
-				GfParmSetFormula( curResult, buf, ROB_ATTR_CAR, GfParmGetCurFormula( curParam, RM_SECT_TEAMS, ROB_ATTR_CAR ) );
+			if( GfParmIsFormula( curParam, RM_SECT_TEAMS, RM_ATTR_CARNAME ) == 0 )
+				GfParmSetFormula( curResult, buf, RM_ATTR_CARNAME, GfParmGetCurFormula( curParam, RM_SECT_TEAMS, RM_ATTR_CARNAME ) );
 			else
-				GfParmSetStr( curResult, buf, ROB_ATTR_CAR, GfParmGetCurStr( curParam, RM_SECT_TEAMS, ROB_ATTR_CAR, "" ) );
+				GfParmSetStr( curResult, buf, RM_ATTR_CARNAME, GfParmGetCurStr( curParam, RM_SECT_TEAMS, RM_ATTR_CARNAME, "" ) );
 		}
 		++cur;
 		GfParmListSeekNext( curParam, RM_SECT_TEAMS );
@@ -516,7 +516,7 @@ void ReCareerNew()
 	//srand((unsigned int)t); // Already done in tgf::gfInit (needed only once in the process life time)
 	snprintf( buf, 1024, "%sresults/%s/%%s-%4d-%02d-%02d-%02d-%02d%%s%%s%%s.xml%%s", GfLocalDir(), ReInfo->_reFilename,
 	          stm->tm_year + 1900, stm->tm_mon + 1, stm->tm_mday, stm->tm_hour, stm->tm_min );
-	filename = strdup(buf); //Makes it possible to reuse buf
+	filename = strdup(buf); // Makes it possible to reuse buf
 	ReCareerNewParams(filename, (double)t);
 	free(filename);
 
@@ -562,14 +562,14 @@ void ReCareerNextAddTeams( tGroupInfo *group, void *curParam, void *curResults )
 	//GfLogDebug( "ReCareerNextAddTeams()\n" );
 	for( xx = 0; xx < group->nbTeams; ++xx ) {
 		group->teams[ xx ].name = strdup( GfParmListGetCurEltName( curResults, RE_SECT_TEAMINFO ) );
-		group->teams[ xx ].car_dname = strdup( GfParmGetCurStr( curResults, RE_SECT_TEAMINFO, ROB_ATTR_CAR, "" ) );
+		group->teams[ xx ].car_dname = strdup( GfParmGetCurStr( curResults, RE_SECT_TEAMINFO, RM_ATTR_CARNAME, "" ) );
 		group->teams[ xx ].nbDrivers = 0;
 		group->teams[ xx ].curDriver = 0;
 		group->teams[ xx ].sortPoints = GfParmGetCurNum( curResults, RE_SECT_TEAMINFO, RE_ATTR_POINTS, NULL, 0 );
 		GfParmListSeekNext( curResults, RE_SECT_TEAMINFO );
 	}
 
-	//Add points from drivers belonging to this team
+	// Add points from drivers belonging to this team
 	if( GfParmListSeekFirst( curResults, RE_SECT_STANDINGS ) == 0 ) {
 		do {
 			for( xx = 0; xx < group->nbTeams; ++xx ) {
@@ -661,7 +661,7 @@ void ReCareerNextAddDrivers( tDriverInfo ***drivers, int *listLength, tCareerInf
 		}
 	}
 
-	/* New use the information we have to calculate the take the end-of-season points into account */
+	/* Now use the information we have to take the end-of-season points into account */
 	for( xx = *listLength; xx < *listLength + newNb; ++xx )
 	{
 		GfParmSetVariable( curParam, RM_SECT_ENDOFSEASON, "ownClassPos", curClass >= 0 ? (tdble)classPosition[ xx - *listLength ][ curClass ] : (tdble)newNb );
@@ -785,7 +785,7 @@ static void ReCareerNextCorrectIdx( tGroupInfo *group )
 		}
 
 		if( strcmp( group->teams[ curTeam ].drivers[ curDriver ]->module, "human" ) == 0 ) {
-			/* Skip human drivers: idx should not change at those drivers */
+			/* Skip human drivers : idx should not change for those drivers */
 			++curDriver;
 			continue;
 		}
@@ -987,9 +987,9 @@ static void ReCareerNextWrite( tCareerInfo *info )
 				                                                        curGroupPtr->teams[ zz ].drivers[ uu ]->extended,
 											curGroupPtr->teams[ zz ].drivers[ uu ]->idx );
 				GfParmSetStr( curParam, buf, RM_ATTR_NAME, curGroupPtr->teams[ zz ].drivers[ uu ]->name );
-				GfParmSetStr( curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
-				//GfLogDebug( "GfParmSetStr( %p, %s, %s, %s )\n", curParam, buf, ROB_ATTR_CAR, curGroupPtr->teams[ zz ].car_dname );
-				GfParmSetStr( curParam, buf, ROB_ATTR_TEAM, curGroupPtr->teams[ zz ].name );
+				GfParmSetStr( curParam, buf, RM_ATTR_CARNAME, curGroupPtr->teams[ zz ].car_dname );
+				//GfLogDebug( "GfParmSetStr( %p, %s, %s, %s )\n", curParam, buf, RM_ATTR_CARNAME, curGroupPtr->teams[ zz ].car_dname );
+				GfParmSetStr( curParam, buf, RM_ATTR_TEAMNAME, curGroupPtr->teams[ zz ].name );
 				GfParmSetNum( curParam, buf, RM_ATTR_SKILLLEVEL, NULL, (tdble)curGroupPtr->teams[ zz ].drivers[ uu ]->skill );
 				++yy;
 			}
@@ -1000,6 +1000,7 @@ static void ReCareerNextWrite( tCareerInfo *info )
 
 		/* Modify result file */
 		GfParmListClean( curResult, RE_SECT_CLASSPOINTS );
+		
 		/* Write team points */
 		uu = 0;
 		if( GfParmListSeekFirst( curResult, RE_SECT_TEAMINFO ) == 0 && uu < curGroupPtr->nbTeams ) {

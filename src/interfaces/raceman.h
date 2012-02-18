@@ -264,6 +264,7 @@ typedef struct RmInfo
 #define RM_ATTR_MODULE		"module"
 #define RM_ATTR_IDX		"idx"
 #define RM_ATTR_CARNAME	"car name"
+#define RM_ATTR_TEAMNAME	"team"
 #define RM_ATTR_SKINNAME	"skin name"
 #define RM_ATTR_SKINTARGETS	"skin targets"
 #define RM_ATTR_EXTENDED	"extended"
