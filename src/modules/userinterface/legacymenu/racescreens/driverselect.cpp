@@ -254,7 +254,11 @@ static void
 rmdsChangeSkin(void *vp)
 {
 	if (VecCurDriverPossSkins.empty())
-		return; // Should never happens (see GfDriver::getPossibleSkins).
+	{
+		GfuiLabelSetText(ScrHandle, SkinEditId, "no choice");
+		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
+		return;
+	}
 
 	// Update skin combo-box.
  	CurSkinIndex = (CurSkinIndex + VecCurDriverPossSkins.size()
@@ -343,7 +347,8 @@ rmdsClickOnDriver(void * /* dummy */)
 		// A driver from the Competitors scroll-list.
 		GfuiEnable(ScrHandle, SelectButtonId, GFUI_DISABLE);
 		GfuiEnable(ScrHandle, DeselectButtonId, GFUI_ENABLE);
-		GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
+		if (!MenuData->pRace->getManager()->hasSubFiles()) // Career disables car choice
+			GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_ENABLE);
 		GfuiVisibilitySet(ScrHandle, SkinEditId, GFUI_VISIBLE);
 	}
     else if (GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver))
@@ -373,27 +378,39 @@ rmdsClickOnDriver(void * /* dummy */)
 		// The selected driver is the new current one.
 		PCurrentDriver = pDriver;
 
-		// Update current driver info.
+		// Update current driver info (but don't show car information if Career mode,
+		// no choice, and we don't know yet which car actually)
 		GfuiLabelSetText(ScrHandle, CurrentDriverTypeLabelId, pDriver->getType().c_str());
-		const GfCar* pCar = pDriver->getCar();
-		GfuiLabelSetText(ScrHandle, CurrentDriverCarLabelId, pCar->getName().c_str());
-		GfuiLabelSetText(ScrHandle, CurrentDriverCarCategoryLabelId, pCar->getCategoryId().c_str());
+		if (!MenuData->pRace->getManager()->hasSubFiles())
+		{
+			const GfCar* pCar = pDriver->getCar();
+			GfuiLabelSetText(ScrHandle, CurrentDriverCarLabelId, pCar->getName().c_str());
+			GfuiLabelSetText(ScrHandle, CurrentDriverCarCategoryLabelId, pCar->getCategoryId().c_str());
+		}
+		else
+		{
+			GfuiLabelSetText(ScrHandle, CurrentDriverCarLabelId, "no choice");
+			GfuiLabelSetText(ScrHandle, CurrentDriverCarCategoryLabelId, "no choice");
+		}
+			 
+		if (!MenuData->pRace->getManager()->hasSubFiles())
+		{
+			// Get really available skins (the user may have changed some file somewhere
+			// since last time we got here for this driver).
+			VecCurDriverPossSkins = pDriver->getPossibleSkins();
 		
-		// Get really available skins (the user may have changed some file somewhere
-		// since last time we got here for this driver).
-		VecCurDriverPossSkins = pDriver->getPossibleSkins();
-		
-		// Determine the index of the currently selected skin for this driver.
-		CurSkinIndex = 0;
-		std::vector<GfDriverSkin>::iterator itSkin =
-			GfDriver::findSkin(VecCurDriverPossSkins, pDriver->getSkin().getName());
-		if (itSkin != VecCurDriverPossSkins.end())
-			CurSkinIndex = itSkin - VecCurDriverPossSkins.begin();
+			// Determine the index of the currently selected skin for this driver.
+			CurSkinIndex = 0;
+			std::vector<GfDriverSkin>::iterator itSkin =
+				GfDriver::findSkin(VecCurDriverPossSkins, pDriver->getSkin().getName());
+			if (itSkin != VecCurDriverPossSkins.end())
+				CurSkinIndex = itSkin - VecCurDriverPossSkins.begin();
 
-		const int skinButtonsEnabled =
-			VecCurDriverPossSkins.size() > 1 ? GFUI_ENABLE : GFUI_DISABLE;
-		GfuiEnable(ScrHandle, SkinRightButtonId, skinButtonsEnabled);
-		GfuiEnable(ScrHandle, SkinLeftButtonId, skinButtonsEnabled);
+			const int skinButtonsEnabled =
+				VecCurDriverPossSkins.size() > 1 ? GFUI_ENABLE : GFUI_DISABLE;
+			GfuiEnable(ScrHandle, SkinRightButtonId, skinButtonsEnabled);
+			GfuiEnable(ScrHandle, SkinLeftButtonId, skinButtonsEnabled);
+		}
 
 		// Update driver skin and show it in the GUI.
 		rmdsChangeSkin(0);
@@ -651,22 +668,33 @@ RmDriversSelect(void *vs)
     SkinLeftButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinleftarrow", (void*)-1, rmdsChangeSkin);
     SkinRightButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "skinrightarrow", (void*)1, rmdsChangeSkin);
     SkinEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "skintext");
+	GfuiEnable(ScrHandle, SkinRightButtonId, GFUI_DISABLE);
+	GfuiEnable(ScrHandle, SkinLeftButtonId, GFUI_DISABLE);
 
     // Car preview image
     CarImageId = GfuiMenuCreateStaticImageControl(ScrHandle, menuDescHdle, "carpreviewimage");
     GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 
 	// Initialize the car category Ids and names for the driver filter system.
-	for (unsigned nCatInd = 0; nCatInd < GfCars::self()->getCategoryIds().size(); nCatInd++)
+	if (!MenuData->pRace->getManager()->hasSubFiles())
 	{
-		// Keep only accepted categories.
-		if (MenuData->pRace->acceptsCarCategory(GfCars::self()->getCategoryIds()[nCatInd]))
+		for (unsigned nCatInd = 0; nCatInd < GfCars::self()->getCategoryIds().size(); nCatInd++)
 		{
-			VecCarCategoryIds.push_back(GfCars::self()->getCategoryIds()[nCatInd]);
-			VecCarCategoryNames.push_back(GfCars::self()->getCategoryNames()[nCatInd]);
-			//GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
+			// Keep only accepted categories.
+			if (MenuData->pRace->acceptsCarCategory(GfCars::self()->getCategoryIds()[nCatInd]))
+			{
+				VecCarCategoryIds.push_back(GfCars::self()->getCategoryIds()[nCatInd]);
+				VecCarCategoryNames.push_back(GfCars::self()->getCategoryNames()[nCatInd]);
+				//GfLogDebug("Accepted cat : %s\n", GfCars::self()->getCategoryIds()[nCatInd].c_str());
+			}
 		}
 	}
+	else // No filter needed for the Career mode.
+	{
+		VecCarCategoryIds.push_back(AnyCarCategory);
+		VecCarCategoryNames.push_back(AnyCarCategory);
+	}
+	
 	if (VecCarCategoryIds.size() > 1)
 	{
 		VecCarCategoryIds.push_back(AnyCarCategory);

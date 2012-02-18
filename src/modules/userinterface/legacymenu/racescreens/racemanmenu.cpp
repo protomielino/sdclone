@@ -243,7 +243,9 @@ rmOnRaceDataChanged()
 	{
 		const GfDriver* pComp = vecCompetitors[nCompIndex];
 		ossText.str("");
-		ossText << pComp->getName() << " (" << pComp->getCar()->getName() << ')';
+		ossText << pComp->getName();
+		if (!pRaceMan->hasSubFiles()) // Don't show car name if Career mode (N/A here).
+			ossText << " (" << pComp->getCar()->getName() << ')';
 		VecCompetitorsInfo.push_back(ossText.str());
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId,
 									VecCompetitorsInfo.back().c_str(), nCompIndex+1, (void*)pComp);

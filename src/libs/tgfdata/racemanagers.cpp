@@ -674,7 +674,7 @@ const std::string& GfRaceManager::getResultsDir() const
 
 bool GfRaceManager::hasResultsFiles() const
 {
-	tFList *pFileList = GfDirGetListFiltered(getResultsDir().c_str(), "", PARAMEXT);
+	tFList *pFileList = GfDirGetListFiltered(getResultsDir().c_str(), "", RESULTEXT);
 
 	// Now we know what to answer.
 	const bool bAnswer = (pFileList != 0);
