@@ -175,6 +175,10 @@ SimGearboxUpdate(tCar *car)
     }
 
     trans->curI = trans->driveI[gearbox->gear + 1] * clutch->transferValue + trans->freeI[gearbox->gear +  1] * (1.0f - clutch->transferValue);
+    if (clutch->state == CLUTCH_RELEASING && gearbox->gear != car->ctrl->gear) { 
+                /* Fast change during clutch release, re-releasing it */ 
+                clutch->state = CLUTCH_RELEASED; 
+    }
     if (clutch->state == CLUTCH_RELEASING) {
 		clutch->timeToRelease -= SimDeltaTime;
 		if (clutch->timeToRelease <= 0.0f) {
