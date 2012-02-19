@@ -438,7 +438,7 @@ grLoadBackgroundGraphicsOptions()
 {
 	// Sky dome / background.
 	grSkyDomeDistance =
-		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0);
+		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_SKYDOMEDISTANCE, 0, 0) + 0.5);
 	if (grSkyDomeDistance > 0 && grSkyDomeDistance < SkyDomeDistThresh)
 		grSkyDomeDistance = SkyDomeDistThresh; // If user enabled it (>0), must be at least the threshold.
 	
@@ -452,10 +452,9 @@ grLoadBackgroundGraphicsOptions()
 			
 	// Cloud layers.
 	grNbCloudLayers =
-		(unsigned)GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0);
+		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
 	GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
-
 }
 
 void
