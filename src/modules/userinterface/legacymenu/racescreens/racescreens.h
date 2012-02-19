@@ -31,7 +31,6 @@
 
 #include <tgfclient.h> // tfuiCallback
 
-
 class GfRace;
 
 typedef struct RmTrackSelect
@@ -137,6 +136,47 @@ extern void RmNetworkHostMenu(void* /* dummy */);
 // The Race Select menu.
 extern void *RmRaceSelectMenuHandle;
 
+// Progressive simulation time modifier, for more user-friendly resuming
+// a race from the Stop Race menu (progressively accelerates time from a low factor).
+class RmProgressiveTimeModifier
+{
+ public:
+	RmProgressiveTimeModifier();
+	void start();
+	void execute();
+
+ private:
+	void terminate();
+
+private:
+	
+	// Should we run the manager at next simu step ?
+	bool _bExecRunning;
+	
+	// Log the manager activation time (real value will be stored on start())
+	double _fExecStartTime;
+
+	// Total duration of the "progressive acceleration of time" process.
+	double _fWholeTimeLapse;
+
+	// Log the last time acceleration change (needed to calculate the time restore factor)
+	double _fOldTimeMultiplier;
+
+	// Log the integrated time acceleration change (needed when multiple start without terminate)
+	double _fResetterTimeMultiplier;
+	
+private:
+	
+	// Config: Set how much time will take to restore to normal speed (after the delay)
+	static const double _sfTimeMultiplier;
+
+	// Config: Set how much we wait befor starting to apply the time acceleration
+	static const double _sfDelay;
+	
+	// Config: Set how much the time will be initially changed (as a fraction of the current time)
+	static const double _sfTimeLapse;
+
+};
 
 #endif /* __RACESCREENS_H__ */
 

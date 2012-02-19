@@ -45,7 +45,7 @@ static int	rmPauseId;
 static int	rmMsgId;
 static int	rmBigMsgId;
 
-static float black[4] = {0.0, 0.0, 0.0, 0.0};
+static float black[4] = { 0.0, 0.0, 0.0, 0.0 };
 
 
 // Uncomment to activate FPS limiter at compile-time.
@@ -61,6 +61,90 @@ static double FPSLimLastTime = 0;
 
 #endif
 
+/**************************************************************************
+ * "Slow resume race" manager (from Race Stop menu)
+ */
+const double RmProgressiveTimeModifier::_sfTimeMultiplier = 4;
+const double RmProgressiveTimeModifier::_sfDelay = 1;
+const double RmProgressiveTimeModifier::_sfTimeLapse = 2;
+
+RmProgressiveTimeModifier rmProgressiveTimeModifier;
+
+RmProgressiveTimeModifier::RmProgressiveTimeModifier()
+: _bExecRunning(false), _fExecStartTime(0), _fWholeTimeLapse(0),
+  _fOldTimeMultiplier(_sfTimeMultiplier), _fResetterTimeMultiplier(1)
+{
+}
+
+void RmProgressiveTimeModifier::start()
+{
+	// First, reset to the initial time multiplier if already running.
+	if (_bExecRunning)
+		LmRaceEngine().accelerateTime(1 / _fResetterTimeMultiplier);
+	
+	// Initially apply the whole simulation-time change.
+	LmRaceEngine().accelerateTime(_sfTimeMultiplier);
+	
+	// Log the activation time.
+	_fExecStartTime = GfTimeClock();
+
+	// Initialize manager state.
+	_fWholeTimeLapse = _sfDelay + _sfTimeLapse;
+	_fOldTimeMultiplier = _fResetterTimeMultiplier = _sfTimeMultiplier;
+	
+	// Enable the manager.
+	_bExecRunning = true;
+}
+
+void RmProgressiveTimeModifier::execute()
+{
+	if (_bExecRunning)
+	{
+		// Get current time.
+		const double fExecCurrentTime = GfTimeClock();
+		
+		// Calculate the difference from start time to current time :
+		// how long have run the manger until now ?
+		double fExecTimeDifference = fExecCurrentTime - _fExecStartTime;
+		
+		// We wait until we reached the delay time.
+		if (fExecTimeDifference > _sfDelay)
+		{
+			// We should be sure that we dont set a speed higher than the 1.0 one ;
+			// this can happen if the execTimeDifference is higther that the timeLapse.
+			if (fExecTimeDifference > _fWholeTimeLapse)
+				fExecTimeDifference = _fWholeTimeLapse;
+
+			// Factor to restore normal game speed.
+			const double fResetter = 1 / _fOldTimeMultiplier;
+
+			// Factor to apply the new acceleration.
+			const double fNewMult =
+				1 + _sfTimeMultiplier * ((_fWholeTimeLapse - fExecTimeDifference) / _fWholeTimeLapse);
+
+			// Apply the simulation-time changes.
+			LmRaceEngine().accelerateTime(fResetter * fNewMult);
+
+			// Remember the integrated-since-start applied acceleration.
+			_fResetterTimeMultiplier *= fResetter * fNewMult;
+
+			// Remember the new applied acceleration.
+			_fOldTimeMultiplier = fNewMult;
+		}
+		
+		// if the timeLapse is reached we should not run next time.
+		if (fExecTimeDifference >= _fWholeTimeLapse)
+			terminate();
+	}
+}
+
+void RmProgressiveTimeModifier::terminate()
+{
+	// Seems we have done our work. Lets be quiet untill next start() call.		
+	_bExecRunning = false;
+}
+
+/***************************************************************************/
 static void
 rmUpdateRaceEngine()
 {
@@ -187,6 +271,7 @@ rmRedisplay()
 	const bool bPitRequested = RmCheckPitRequest();
 	
 #ifdef UseFPSLimiter
+
 	// Auto FPS limitation if specified and if not capturing frames.
 	if (FPSLimMaxRate > 0 && !rmMovieCapture.active)
 	{
@@ -213,7 +298,11 @@ rmRedisplay()
 		// Otherwise, last update time is now : go on with graphics update.
 		FPSLimLastTime = dCurrentTime;
 	}
+	
 #endif
+	
+	// Exec the "slow resume race" manager, if needed.
+	rmProgressiveTimeModifier.execute();
 
 	// Redraw the graphics part of the GUI if requested.
 	const bool bUpdateGraphics =

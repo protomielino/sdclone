@@ -22,7 +22,7 @@
 #include "legacymenu.h"
 #include "exitmenu.h"
 #include "racescreens.h"
-
+extern RmProgressiveTimeModifier rmProgressiveTimeModifier;
 
 // Abort race hook ******************************************************
 static void
@@ -67,6 +67,10 @@ rmBackToRaceHookActivate(void * /* dummy */)
 	LmRaceEngine().start();
 	
 	LegacyMenu::self().activateGameScreen();
+
+	// Launch the "slow resume race" manager if non-blind mode.
+	if (LmRaceEngine().outData()->_displayMode == RM_DISP_MODE_NORMAL)
+		rmProgressiveTimeModifier.start();
 }
 
 static void	*pvBackToRaceHookHandle = 0;
