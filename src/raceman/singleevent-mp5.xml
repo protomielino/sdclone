@@ -11,10 +11,10 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="MP5 Race" version="1.1">
+<params name="MP5 Challenge" version="1.2">
 
   <section name="Header">
-    <attstr name="name" val="MP5 Race"/>
+    <attstr name="name" val="MP5 Chalenge"/>
     <attstr name="type" val="Single Event"/>
     <attstr name="subtype" val="MP5 Challenge"/>
     <attstr name="description" val="MP5 Challenge race"/>

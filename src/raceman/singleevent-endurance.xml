@@ -15,10 +15,10 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Endurance Race" version="1.19">
+<params name="Endurance" version="1.20">
 
   <section name="Header">
-    <attstr name="name" val="Endurance Race"/>
+    <attstr name="name" val="Endurance"/>
     <attstr name="type" val="Single Event"/>
     <attstr name="subtype" val="Endurance"/>
     <attstr name="description" val="Endurance Race"/>

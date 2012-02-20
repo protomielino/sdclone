@@ -14,10 +14,10 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Challenge Race" version="1.7">
+<params name="Challenge" version="1.8">
 
   <section name="Header">
-    <attstr name="name" val="Challenge Race"/>
+    <attstr name="name" val="Challenge"/>
     <attstr name="type" val="Single Event"/>
     <attstr name="subtype" val="Challenge"/>
     <attstr name="description" val="Challenge race (DTM-like)"/>
@@ -31,7 +31,7 @@
     <attnum name="maximum number" val="1"/>
     <section name="1">
       <attstr name="name" val="espie"/>
-			<attstr name="category" val="circuit"/>
+      <attstr name="category" val="circuit"/>
     </section>
 
   </section>
