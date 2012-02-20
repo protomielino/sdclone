@@ -99,7 +99,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title labels.
-    snprintf(buf, sizeof(buf), "Practice Results at %s", info->track->name);
+    snprintf(buf, sizeof(buf), "Practice at %s", info->track->name);
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
     GfuiLabelSetText(rmScrHdle, titleId, buf);
  
@@ -229,14 +229,11 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
     void *hmenu = GfuiMenuLoad("raceresultsmenu.xml");
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
-    // Create variable title and subtitle labels.
-    snprintf(buf, sizeof(buf), "%s Results", race);
+    // Create variable title label.
+    snprintf(buf, sizeof(buf), "%s at %s", race, info->track->name);
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
     GfuiLabelSetText(rmScrHdle, titleId, buf);
   
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
-    GfuiLabelSetText(rmScrHdle, subTitleId, info->track->name);
-
 	// Get layout properties.
     const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 15);
     const int yTopLine = (int)GfuiMenuGetNumProperty(hmenu, "yTopLine", 400);
@@ -391,14 +388,10 @@ rmQualifResults(void *prevHdle, tRmInfo *info, const char* pszTitle, int start)
     void *hmenu = GfuiMenuLoad("qualifsresultsmenu.xml");
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
-    // Create variable title labels.
+    // Create variable title label.
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
-    snprintf(buf, sizeof(buf), "%s results", pszTitle);
+    snprintf(buf, sizeof(buf), "%s at %s", pszTitle, info->track->name);
     GfuiLabelSetText(rmScrHdle, titleId, buf);
-
-    const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
-    snprintf(buf, sizeof(buf), "%s", info->track->name);
-    GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 	// Get layout properties.
     const int nMaxLines = (int)GfuiMenuGetNumProperty(hmenu, "nMaxResultLines", 15);
@@ -553,7 +546,7 @@ RmShowStandings(void *prevHdle, tRmInfo *info, int start)
 		pszTrackName =
 			pRaceMan->getPreviousEventTrack(nCurrEventIndex - 1)->getName().c_str();
 	}
-	snprintf(buf, sizeof(buf), "%s at %s - Standings", pszSessionName, pszTrackName);
+	snprintf(buf, sizeof(buf), "%s at %s", pszSessionName, pszTrackName);
 	const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitle");
 	GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 

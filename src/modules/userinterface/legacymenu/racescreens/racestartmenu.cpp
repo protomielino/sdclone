@@ -133,7 +133,7 @@ rmStartRaceMenu(tRmInfo *info, void *startScr, void *abortScr, int start)
 	{
         // Create starting grid subtitle label.
         const int subTitleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "SubTitleLabel");
-		snprintf(buf, sizeof(buf), "%s at %s - Starting grid", info->_reRaceName, info->track->name);
+		snprintf(buf, sizeof(buf), "%s at %s", info->_reRaceName, info->track->name);
 		GfuiLabelSetText(rmScrHdle, subTitleId, buf);
 
 		// Get layout properties.
