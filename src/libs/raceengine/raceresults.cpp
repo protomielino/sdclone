@@ -458,11 +458,11 @@ ReInitCurRes()
 		{
 			static const char* pszTableHeader = "Rank    Time     Driver               Car";
 			char pszTitle[128];
-			snprintf(pszTitle, sizeof(pszTitle), "%s (%s)",
-					 ReInfo->s->cars[0]->_name, ReInfo->s->cars[0]->_carName);
-			char pszSubTitle[128];
-			snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s", 
+			snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
 					 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+			char pszSubTitle[128];
+			snprintf(pszSubTitle, sizeof(pszSubTitle), "%s (%s)",
+					 ReInfo->s->cars[0]->_name, ReInfo->s->cars[0]->_carName);
 			ReUI().setResultsTableTitles(pszTitle, pszSubTitle);
 			ReUI().setResultsTableHeader(pszTableHeader);
 		}
@@ -529,14 +529,14 @@ ReUpdateQualifCurRes(tCarElt *car)
 		carparam = GfParmReadFile(buf, GFPARM_RMODE_STD);
 		carName = GfParmGetName(carparam);
 
+		char pszTitle[128];
+		snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
+				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
 		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 			snprintf(buf, sizeof(buf), "%s (%s)", car->_name, carName);
 		else
 			snprintf(buf, sizeof(buf), "%s (%s) - Lap %d", car->_name, carName, car->_laps);
-		char pszSubTitle[128];
-		snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s", 
-				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
-		ReUI().setResultsTableTitles(buf, pszSubTitle);
+		ReUI().setResultsTableTitles(pszTitle, buf);
 		ReUI().setResultsTableHeader(pszTableHeader);
 
 		printed = 0;
@@ -575,6 +575,10 @@ ReUpdateQualifCurRes(tCarElt *car)
 		nCars = ReInfo->s->_ncars;
 		if (nCars > ReUI().getResultsTableRowCount())
 			nCars = ReUI().getResultsTableRowCount();
+
+		char pszTitle[128];
+		snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
+				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
 		if (ReInfo->s->_totTime > ReInfo->s->currentTime)
 		{
 			time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
@@ -586,10 +590,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 		{
 			snprintf( buf, sizeof(buf), "%d laps", ReInfo->s->_totLaps );
 		}
-		char pszSubTitle[128];
-		snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s", 
-				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
-		ReUI().setResultsTableTitles(buf, pszSubTitle);
+		ReUI().setResultsTableTitles(pszTitle, buf);
 		ReUI().setResultsTableHeader(pszTableHeader);
 		
 		for (xx = 0; xx < nCars; ++xx) {
@@ -635,6 +636,11 @@ ReUpdateRaceCurRes()
     ncars = ReInfo->s->_ncars;
     if (ncars > ReUI().getResultsTableRowCount())
     	ncars = ReUI().getResultsTableRowCount();
+
+	char pszTitle[128];
+	snprintf(pszTitle, sizeof(pszTitle), "%s at %s",
+			 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+
     if (ReInfo->s->_totTime > ReInfo->s->currentTime)
     {
     	time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
@@ -646,10 +652,7 @@ ReUpdateRaceCurRes()
     {
     	snprintf( buf, sizeof(buf), "%d laps", ReInfo->s->_totLaps );
     }
-	char pszSubTitle[128];
-	snprintf(pszSubTitle, sizeof(pszSubTitle), "%s at %s",
-			 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
-	ReUI().setResultsTableTitles(buf, pszSubTitle);
+	ReUI().setResultsTableTitles(pszTitle, buf);
 	ReUI().setResultsTableHeader(pszTableHeader);
 
     for (xx = 0; xx < ncars; ++xx) {
