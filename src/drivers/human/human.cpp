@@ -534,15 +534,10 @@ newrace(int index, tCarElt* car, tSituation *s)
 		HCtx[idx]->driveTrain = e4WD;
 	}//if traintype
 
-	// Determine cluch mode : auto or "manual" (footual ;-?).
+	// Set up the autoclutch
 	tControlCmd	*cmd = HCtx[idx]->cmdControl;
-	if (cmd[CMD_CLUTCH].type != GFCTRL_TYPE_JOY_AXIS &&
-			cmd[CMD_CLUTCH].type != GFCTRL_TYPE_MOUSE_AXIS)
-		HCtx[idx]->autoClutch = true;
-	else
-		HCtx[idx]->autoClutch = false;
+	HCtx[idx]->autoClutch = true;
 
-	// Set up the timing for the autoclutch
 	HCtx[idx]->maxClutchTime = GfParmGetNum(car->_carHandle, SECT_GEARBOX, PRM_SHIFTTIME, (char*)NULL, 0.2f);
 	switch (car->_skillLevel) {
 		case 0: // Rookie
