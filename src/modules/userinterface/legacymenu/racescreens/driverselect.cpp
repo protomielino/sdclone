@@ -39,7 +39,7 @@
 #include <race.h>
 
 #include "racescreens.h"
-#include "carselect.h"
+#include "garagemenu.h"
 
 
 // Uncomment to re-activate focus managment (what for ?)
@@ -71,7 +71,7 @@ static int      NextButtonId;
 static int      ChangeCarButtonId;
 
 // The car selection menu.
-static RmCarSelectMenu CarSelectMenu;
+static RmGarageMenu GarageMenu;
 
 // Car categories
 static const char* AnyCarCategory = "--- All car categories ---";
@@ -315,12 +315,12 @@ rmdsPreviousMenu(void *screen)
 }
 
 static void
-rmdsCarSelectMenu(void *pPreviousMenu)
+rmdsGarageMenu(void *pPreviousMenu)
 {
 	if (PCurrentDriver)
 	{
-		CarSelectMenu.setPreviousMenuHandle(pPreviousMenu);
-		CarSelectMenu.runMenu(MenuData->pRace, PCurrentDriver);
+		GarageMenu.setPreviousMenuHandle(pPreviousMenu);
+		GarageMenu.runMenu(MenuData->pRace, PCurrentDriver);
 	}
 }
 
@@ -740,7 +740,7 @@ RmDriversSelect(void *vs)
     GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "backbutton",
 								MenuData->prevScreen, rmdsPreviousMenu);
     ChangeCarButtonId = GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "carselectbutton",
-											ScrHandle, rmdsCarSelectMenu);
+											ScrHandle, rmdsGarageMenu);
 	GfuiEnable(ScrHandle, ChangeCarButtonId, GFUI_DISABLE);
 
     GfParmReleaseHandle(menuDescHdle);

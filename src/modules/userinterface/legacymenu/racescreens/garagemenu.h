@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : carselect.h
+    file                 : garagemenu.h
     created              : July 2010
     copyright            : (C) 2010 Jean-Philippe Meuret
     web                  : speed-dreams.sourceforge.net
@@ -17,8 +17,8 @@
  *                                                                         *
  ***************************************************************************/
 
-#ifndef _CARSELECT_H_
-#define _CARSELECT_H_
+#ifndef _GARAGEMENU_H_
+#define _GARAGEMENU_H_
 
 #include <map>
 
@@ -30,11 +30,11 @@ class GfDriver;
 class GfCar;
 
 
-class RmCarSelectMenu : public GfuiMenuScreen
+class RmGarageMenu : public GfuiMenuScreen
 {
 public:
 
-	RmCarSelectMenu();
+	RmGarageMenu();
 	void runMenu(GfRace* pRace, GfDriver* pDriver);
 	
 	std::string resetCarCategoryComboBox(const std::string& strSelCatName = "");
@@ -61,13 +61,13 @@ protected:
 	void setSelectedSkinIndex(int nSkinIndex);
 
 	// Control callback functions (have to be static, as used as tgfclient controls callbacks).
-	static void onActivateCB(void *pCarSelectMenu);
+	static void onActivateCB(void *pGarageMenu);
 	static void onChangeCategory(tComboBoxInfo *pInfo);
 	static void onChangeModel(tComboBoxInfo *pInfo);
 	static void onChangeSkin(tComboBoxInfo *pInfo);
-	static void onGarageCB(void *pCarSelectMenu);
-	static void onAcceptCB(void *pCarSelectMenu);
-	static void onCancelCB(void *pCarSelectMenu);
+	static void onCarSettingsCB(void *pGarageMenu);
+	static void onAcceptCB(void *pGarageMenu);
+	static void onCancelCB(void *pGarageMenu);
 
 private:
 
@@ -83,4 +83,4 @@ private:
 
 };
 
-#endif //_CARSELECT_H_
+#endif //_GARAGEMENU_H_

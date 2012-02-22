@@ -1,6 +1,6 @@
 /***************************************************************************
 
-    file                 : carselect.cpp
+    file                 : garagemenu.cpp
     created              : December 2009
     copyright            : (C) 2009 Brian Gavin, 2010 Jean-Philippe Meuret
     web                  : speed-dreams.sourceforge.net
@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 
-/* Car selection / preview menu */
+/* Garage menu : Car selection, preview and settings */
 
 #include <sys/stat.h>
 #include <algorithm>
@@ -32,15 +32,15 @@
 #include <cars.h>
 #include <drivers.h>
 
-#include "carselect.h"
+#include "garagemenu.h"
 
 
-void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
+void RmGarageMenu::onActivateCB(void *pGarageMenu)
 {
-	GfLogTrace("Entering Car Select menu\n");
+	GfLogTrace("Entering Garage menu\n");
 
-	// Get the RmCarSelectMenu instance.
-	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
+	// Get the RmGarageMenu instance.
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
 
 	// Get infos about the current car for the current driver
 	const GfDriver* pDriver = pMenu->getDriver();
@@ -54,9 +54,11 @@ void RmCarSelectMenu::onActivateCB(void *pCarSelectMenu)
 	pMenu->resetCarDataSheet(pCurCar->getId());
 	pMenu->resetSkinComboBox(pCurCar->getName(), &pDriver->getSkin());
 	pMenu->resetCarPreviewImage(pDriver->getSkin());
+
+	GfuiEnable(pMenu->getMenuHandle(), pMenu->getDynamicControlId("CarSettingsButton"), GFUI_DISABLE);
 }
 
-const GfCar* RmCarSelectMenu::getSelectedCarModel() const
+const GfCar* RmGarageMenu::getSelectedCarModel() const
 {
 	const char* pszSelCarName =
 		GfuiComboboxGetText(getMenuHandle(), getDynamicControlId("ModelCombo"));
@@ -67,21 +69,21 @@ const GfCar* RmCarSelectMenu::getSelectedCarModel() const
 	return 0;
 }
 
-const GfDriverSkin& RmCarSelectMenu::getSelectedSkin() const
+const GfDriverSkin& RmGarageMenu::getSelectedSkin() const
 {
 	return _vecPossSkins[_nCurSkinIndex];
 }
 
-void RmCarSelectMenu::setSelectedSkinIndex(int nSkinIndex)
+void RmGarageMenu::setSelectedSkinIndex(int nSkinIndex)
 {
 	_nCurSkinIndex = nSkinIndex;
 }
 
 
-void RmCarSelectMenu::onChangeCategory(tComboBoxInfo *pInfo)
+void RmGarageMenu::onChangeCategory(tComboBoxInfo *pInfo)
 {
-	// Get the RmCarSelectMenu instance from call-back user data.
-	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pInfo->userData);
+	// Get the RmGarageMenu instance from call-back user data.
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pInfo->userData);
 
 	// Update GUI.
 	const GfCar* pSelCar = pMenu->resetCarModelComboBox(pInfo->vecChoices[pInfo->nPos]);
@@ -90,10 +92,10 @@ void RmCarSelectMenu::onChangeCategory(tComboBoxInfo *pInfo)
 	pMenu->resetCarPreviewImage(pMenu->getSelectedSkin());
 }
 
-void RmCarSelectMenu::onChangeModel(tComboBoxInfo *pInfo)
+void RmGarageMenu::onChangeModel(tComboBoxInfo *pInfo)
 {
-	// Get the RmCarSelectMenu instance from call-back user data.
-	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pInfo->userData);
+	// Get the RmGarageMenu instance from call-back user data.
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pInfo->userData);
 
 	// Update GUI.
 	const GfCar* pSelCar = pMenu->getSelectedCarModel();
@@ -102,10 +104,10 @@ void RmCarSelectMenu::onChangeModel(tComboBoxInfo *pInfo)
 	pMenu->resetCarPreviewImage(pMenu->getSelectedSkin());
 }
 
-void RmCarSelectMenu::onChangeSkin(tComboBoxInfo *pInfo)
+void RmGarageMenu::onChangeSkin(tComboBoxInfo *pInfo)
 {
-	// Get the RmCarSelectMenu instance from call-back user data.
-	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pInfo->userData);
+	// Get the RmGarageMenu instance from call-back user data.
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pInfo->userData);
 
 	// Update currently selected skin skin index.
 	pMenu->setSelectedSkinIndex(pInfo->nPos);
@@ -114,17 +116,17 @@ void RmCarSelectMenu::onChangeSkin(tComboBoxInfo *pInfo)
 	pMenu->resetCarPreviewImage(pMenu->getSelectedSkin());
 }
 
-void RmCarSelectMenu::onGarageCB(void *pCarSelectMenu)
+void RmGarageMenu::onCarSettingsCB(void *pGarageMenu)
 {
-	// Get the RmCarSelectMenu instance from call-back user data.
-	// const RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
+	// Get the RmGarageMenu instance from call-back user data.
+	// const RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
 	// TODO.
 }
 
-void RmCarSelectMenu::onAcceptCB(void *pCarSelectMenu)
+void RmGarageMenu::onAcceptCB(void *pGarageMenu)
 {
-	// Get the RmCarSelectMenu instance from call-back user data.
-	RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
+	// Get the RmGarageMenu instance from call-back user data.
+	RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
 
 	// Assign new skin choice to the driver.
 	GfDriver* pDriver = pMenu->getDriver();
@@ -138,21 +140,21 @@ void RmCarSelectMenu::onAcceptCB(void *pCarSelectMenu)
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 }
 
-void RmCarSelectMenu::onCancelCB(void *pCarSelectMenu)
+void RmGarageMenu::onCancelCB(void *pGarageMenu)
 {
-	// Get the RmCarSelectMenu instance from call-back user data.
-	const RmCarSelectMenu* pMenu = static_cast<RmCarSelectMenu*>(pCarSelectMenu);
+	// Get the RmGarageMenu instance from call-back user data.
+	const RmGarageMenu* pMenu = static_cast<RmGarageMenu*>(pGarageMenu);
 
 	// Back to previous screen.
 	GfuiScreenActivate(pMenu->getPreviousMenuHandle());
 }
 
-RmCarSelectMenu::RmCarSelectMenu()
-: GfuiMenuScreen("carselectmenu.xml"), _pRace(0), _pDriver(0), _nCurSkinIndex(0)
+RmGarageMenu::RmGarageMenu()
+: GfuiMenuScreen("garagemenu.xml"), _pRace(0), _pDriver(0), _nCurSkinIndex(0)
 {
 }
 
-std::string RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
+std::string RmGarageMenu::resetCarCategoryComboBox(const std::string& strSelCatName)
 {
 	const int nCatComboId = getDynamicControlId("CategoryCombo");
 
@@ -190,7 +192,7 @@ std::string RmCarSelectMenu::resetCarCategoryComboBox(const std::string& strSelC
 	return vecCatNames[nCurCatIndex];
 }
 
-GfCar* RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
+GfCar* RmGarageMenu::resetCarModelComboBox(const std::string& strCatName,
 											  const std::string& strSelCarName)
 {
 	const int nModelComboId = getDynamicControlId("ModelCombo");
@@ -228,7 +230,7 @@ GfCar* RmCarSelectMenu::resetCarModelComboBox(const std::string& strCatName,
 	return vecCarsInCat[nCurrCarIndexInCat];
 }
 
-void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
+void RmGarageMenu::resetCarDataSheet(const std::string& strSelCarId)
 {
 	static const char* pszDriveWheels[GfCar::eNDriveTrains+1] =
 		{ "Rear", "Front", "4", "?" };
@@ -310,7 +312,7 @@ void RmCarSelectMenu::resetCarDataSheet(const std::string& strSelCarId)
 			   pSelCar->getInvertedZAxisInertia());
 }
 
-void RmCarSelectMenu::resetSkinComboBox(const std::string& strCarName,
+void RmGarageMenu::resetSkinComboBox(const std::string& strCarName,
 										const GfDriverSkin* pSelSkin)
 {
 	const int nSkinComboId = getDynamicControlId("SkinCombo");
@@ -341,7 +343,7 @@ void RmCarSelectMenu::resetSkinComboBox(const std::string& strCarName,
 			   _vecPossSkins.size() > 1 ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
-void RmCarSelectMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
+void RmGarageMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 {
 	const int nCarImageId = getDynamicControlId("PreviewImage");
 
@@ -353,7 +355,7 @@ void RmCarSelectMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 		GfuiStaticImageSet(getMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
 }
 
-void RmCarSelectMenu::runMenu(GfRace* pRace, GfDriver* pDriver)
+void RmGarageMenu::runMenu(GfRace* pRace, GfDriver* pDriver)
 {
 	// Initialize if not already done.
 	if (!getMenuHandle())
@@ -369,7 +371,7 @@ void RmCarSelectMenu::runMenu(GfRace* pRace, GfDriver* pDriver)
 	GfuiMenuScreen::runMenu();
 }
 
-bool RmCarSelectMenu::initialize()
+bool RmGarageMenu::initialize()
 {
 	// Create the menu and all its controls.
 	createMenu(NULL, this, onActivateCB, NULL, (tfuiCallback)NULL, 1);
@@ -398,7 +400,7 @@ bool RmCarSelectMenu::initialize()
 	createProgressbarControl("LowSpeedGripProgress");
 	createProgressbarControl("CorneringProgress");
 
-    createButtonControl("GarageButton", this, onGarageCB);
+    createButtonControl("CarSettingsButton", this, onCarSettingsCB);
 	createButtonControl("AcceptButton", this, onAcceptCB);
     createButtonControl("CancelButton", this, onCancelCB);
 
@@ -415,27 +417,27 @@ bool RmCarSelectMenu::initialize()
 	return true;
 }
 
-void RmCarSelectMenu::setDriver(GfDriver* pDriver)
+void RmGarageMenu::setDriver(GfDriver* pDriver)
 {
 	_pDriver = pDriver;
 }
 
-const GfDriver* RmCarSelectMenu::getDriver() const
+const GfDriver* RmGarageMenu::getDriver() const
 {
 	return _pDriver;
 }
 
-GfDriver* RmCarSelectMenu::getDriver()
+GfDriver* RmGarageMenu::getDriver()
 {
 	return _pDriver;
 }
 
-void RmCarSelectMenu::setRace(GfRace* pRace)
+void RmGarageMenu::setRace(GfRace* pRace)
 {
 	_pRace = pRace;
 }
 
-const GfRace* RmCarSelectMenu::getRace() const
+const GfRace* RmGarageMenu::getRace() const
 {
 	return _pRace;
 }

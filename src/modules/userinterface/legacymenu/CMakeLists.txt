@@ -31,12 +31,12 @@ SET(RS racescreens)
 SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
                         ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
                         ${RS}/raceconfigstate.cpp
-                        ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/carselect.cpp
+                        ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/garagemenu.cpp
                         ${RS}/raceparamsmenu.cpp
 			${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
                         ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
                         ${RS}/raceresultsmenus.cpp ${RS}/racenexteventmenu.cpp
-                        ${RS}/racescreens.h ${RS}/carselect.h)
+                        ${RS}/racescreens.h ${RS}/garagemenu.h)
 
 SET(LEGACYMENU_SOURCES ${MAINSCREENS_SOURCES} 
                        ${CONFSCREENS_SOURCES} 
