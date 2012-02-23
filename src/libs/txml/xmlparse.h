@@ -10,8 +10,15 @@ See the file copying.txt for copying permission.
 extern "C" {
 #endif
 
-#ifndef XMLPARSEAPI
-#define XMLPARSEAPI /* as nothing */
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef TXML_DLL
+#  define XMLPARSEAPI __declspec(dllexport)
+# else
+#  define XMLPARSEAPI __declspec(dllimport)
+# endif
+#else
+# define XMLPARSEAPI
 #endif
 
 typedef void *XML_Parser;

@@ -32,6 +32,9 @@ xmlrole.h
 xmltok_impl.h
 --
 
+'xmlparse.h' was slightly modified in order its exported symbols have a DLL interface
+under Windows / MSVC (limited to the XMLPARSEAPI define).
+
 'nametab.h' was sourced from:
 http://expat.cvs.sourceforge.net/viewvc/expat/expat/lib/nametab.h?view=log&hideattic=0&pathrev=MAIN
 
