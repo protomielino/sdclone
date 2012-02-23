@@ -532,7 +532,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 		char pszTitle[128];
 		snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
 				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
-		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE)
+		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE || car->_laps < 1 || car->_laps > ReInfo->s->_totLaps)
 			snprintf(buf, sizeof(buf), "%s (%s)", car->_name, carName);
 		else
 			snprintf(buf, sizeof(buf), "%s (%s) - Lap %d", car->_name, carName, car->_laps);
