@@ -151,12 +151,12 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
 		free(str);
 
 		/* Top Spd */
-		snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
+		snprintf(buf, sizeof(buf), "%3.1f", (GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TopSpeed", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
 		/* Min Spd */
-		snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_BOT_SPEED, NULL, 0) * 3.6));
+		snprintf(buf, sizeof(buf), "%3.1f", (GfParmGetNum(results, path, RE_ATTR_BOT_SPEED, NULL, 0) * 3.6));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "MinSpeed", true, // From template.
 								   buf, GFUI_TPL_X, y);
 
@@ -308,7 +308,7 @@ rmRaceResults(void *prevHdle, tRmInfo *info, int start)
 								   buf, GFUI_TPL_X, y);
         
         //Top speed
-        snprintf(buf, sizeof(buf), "%d", (int)(GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
+        snprintf(buf, sizeof(buf), "%3.1f", (GfParmGetNum(results, path, RE_ATTR_TOP_SPEED, NULL, 0) * 3.6));
 		GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "TopSpeed", true, // From template.
 								   buf, GFUI_TPL_X, y);
         
