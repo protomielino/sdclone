@@ -392,12 +392,12 @@ GraphMenuInit(void* prevMenu)
     BackgroundLandscapeLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "bgskydomelabel");
 
-    GfuiMenuCreateButtonControl(ScrHandle, param, "accept", prevMenu, onAccept);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "cancel", prevMenu, onCancel);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", prevMenu, onAccept);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", prevMenu, onCancel);
     
     GfParmReleaseHandle(param);
     
-    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", prevMenu, onAccept, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", prevMenu, onAccept, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, onCancel, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);

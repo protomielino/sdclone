@@ -157,15 +157,15 @@ void* SoundMenuInit(void *prevMenu)
 	GfuiMenuCreateButtonControl(scrHandle,param,"soundrightarrow",(void*)1,changeSoundState);
 
 	SoundOptionId = GfuiMenuCreateLabelControl(scrHandle,param,"soundlabel");
-	GfuiMenuCreateButtonControl(scrHandle,param,"accept",NULL,saveSoundOption);
-	GfuiMenuCreateButtonControl(scrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+	GfuiMenuCreateButtonControl(scrHandle,param,"ApplyButton",NULL,saveSoundOption);
+	GfuiMenuCreateButtonControl(scrHandle,param,"CancelButton",prevMenu,GfuiScreenActivate);
 
 	VolumeValueId = GfuiMenuCreateEditControl(scrHandle,param,"volumeedit",NULL,NULL,changeVolume);
 
 	GfParmReleaseHandle(param);
     
-	GfuiAddKey(scrHandle, GFUIK_RETURN, "Save", NULL, saveSoundOption, NULL);
-	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddKey(scrHandle, GFUIK_RETURN, "Apply", NULL, saveSoundOption, NULL);
+	GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F1, "Help", scrHandle, GfuiHelpScreen, NULL);
 	GfuiAddKey(scrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddKey(scrHandle, GFUIK_LEFT, "Previous Option in list", (void*)-1, changeSoundState, NULL);

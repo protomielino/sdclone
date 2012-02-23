@@ -128,13 +128,13 @@ AIMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle,param,"skillrightarrow",(void*)1,ChangeSkillLevel);
 
     SkillLevelId = GfuiMenuCreateLabelControl(ScrHandle,param,"skilllabel");
-    GfuiMenuCreateButtonControl(ScrHandle,param,"accept",prevMenu,SaveSkillLevel);
-    GfuiMenuCreateButtonControl(ScrHandle,param,"cancel",prevMenu,GfuiScreenActivate);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"ApplyButton",prevMenu,SaveSkillLevel);
+    GfuiMenuCreateButtonControl(ScrHandle,param,"CancelButton",prevMenu,GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
     
-    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, SaveSkillLevel, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, SaveSkillLevel, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
     GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);

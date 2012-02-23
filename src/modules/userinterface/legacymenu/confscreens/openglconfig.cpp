@@ -345,13 +345,13 @@ void* OpenGLMenuInit(void *prevMenu)
 							changeMultiSampleState);
 	MultiSampleLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MultiSampleLabel");
 
-	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"AcceptButton",NULL, onAccept);
+	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"ApplyButton",NULL, onAccept);
 	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"CancelButton",prevMenu, GfuiScreenActivate);
 
 	GfParmReleaseHandle(hparmMenu);
 
-	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save", NULL, onAccept, NULL);
-	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel Selection", prevMenu, GfuiScreenActivate, NULL);
+	GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, onAccept, NULL);
+	GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	GfuiAddKey(ScrHandle, GFUIK_LEFT, "Decrease Texture Size Limit", (void*)-1, changeMaxTextureSizeState, NULL);
