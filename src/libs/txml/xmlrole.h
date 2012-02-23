@@ -1,22 +1,6 @@
 /*
-The contents of this file are subject to the Mozilla Public License
-Version 1.0 (the "License"); you may not use this file except in
-compliance with the License. You may obtain a copy of the License at
-http://www.mozilla.org/MPL/
-
-Software distributed under the License is distributed on an "AS IS"
-basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-License for the specific language governing rights and limitations
-under the License.
-
-The Original Code is expat.
-
-The Initial Developer of the Original Code is James Clark.
-Portions created by James Clark are Copyright (C) 1998
-James Clark. All Rights Reserved.
-
-Contributor(s):
-$Id$
+Copyright (c) 1998, 1999 Thai Open Source Software Center Ltd
+See the file copying.txt for copying permission.
 */
 
 #ifndef XmlRole_INCLUDED
@@ -78,7 +62,13 @@ enum {
   XML_ROLE_CONTENT_ELEMENT_REP,
   XML_ROLE_CONTENT_ELEMENT_OPT,
   XML_ROLE_CONTENT_ELEMENT_PLUS,
-  XML_ROLE_PARAM_ENTITY_REF
+#ifdef XML_DTD
+  XML_ROLE_TEXT_DECL,
+  XML_ROLE_IGNORE_SECT,
+  XML_ROLE_INNER_PARAM_ENTITY_REF,
+#endif /* XML_DTD */
+  XML_ROLE_PARAM_ENTITY_REF,
+  XML_ROLE_EXTERNAL_GENERAL_ENTITY_NO_NOTATION
 };
 
 typedef struct prolog_state {
@@ -88,9 +78,16 @@ typedef struct prolog_state {
 		 const char *end,
 		 const ENCODING *enc);
   unsigned level;
+#ifdef XML_DTD
+  unsigned includeLevel;
+  int documentEntity;
+#endif /* XML_DTD */
 } PROLOG_STATE;
 
 void XMLTOKAPI XmlPrologStateInit(PROLOG_STATE *);
+#ifdef XML_DTD
+void XMLTOKAPI XmlPrologStateInitExternalEntity(PROLOG_STATE *);
+#endif /* XML_DTD */
 
 #define XmlTokenRole(state, tok, ptr, end, enc) \
  (((state)->handler)(state, tok, ptr, end, enc))

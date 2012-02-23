@@ -1,22 +1,6 @@
 /*
-The contents of this file are subject to the Mozilla Public License
-Version 1.0 (the "License"); you may not use this file except in
-compliance with the License. You may obtain a copy of the License at
-http://www.mozilla.org/MPL/
-
-Software distributed under the License is distributed on an "AS IS"
-basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-License for the specific language governing rights and limitations
-under the License.
-
-The Original Code is expat.
-
-The Initial Developer of the Original Code is James Clark.
-Portions created by James Clark are Copyright (C) 1998
-James Clark. All Rights Reserved.
-
-Contributor(s):
-$Id$
+Copyright (c) 1998, 1999 Thai Open Source Software Center Ltd
+See the file copying.txt for copying permission.
 */
 
 #ifndef XmlTok_INCLUDED
@@ -95,10 +79,26 @@ extern "C" {
 /* The following token is returned only by XmlCdataSectionTok */
 #define XML_TOK_CDATA_SECT_CLOSE 40
 
+/* With namespace processing this is returned by XmlPrologTok
+   for a name with a colon. */
+#define XML_TOK_PREFIXED_NAME 41
+
+#ifdef XML_DTD
+#define XML_TOK_IGNORE_SECT 42
+#endif /* XML_DTD */
+
+#ifdef XML_DTD
+#define XML_N_STATES 4
+#else /* not XML_DTD */
 #define XML_N_STATES 3
+#endif /* not XML_DTD */
+
 #define XML_PROLOG_STATE 0
 #define XML_CONTENT_STATE 1
 #define XML_CDATA_SECTION_STATE 2
+#ifdef XML_DTD
+#define XML_IGNORE_SECTION_STATE 3
+#endif /* XML_DTD */
 
 #define XML_N_LITERAL_TYPES 2
 #define XML_ATTRIBUTE_VALUE_LITERAL 0
@@ -137,7 +137,7 @@ struct encoding {
   int (*sameName)(const ENCODING *,
 	          const char *, const char *);
   int (*nameMatchesAscii)(const ENCODING *,
-			  const char *, const char *);
+			  const char *, const char *, const char *);
   int (*nameLength)(const ENCODING *, const char *);
   const char *(*skipS)(const ENCODING *, const char *);
   int (*getAtts)(const ENCODING *enc, const char *ptr,
@@ -198,6 +198,13 @@ literals, comments and processing instructions.
 #define XmlCdataSectionTok(enc, ptr, end, nextTokPtr) \
    XmlTok(enc, XML_CDATA_SECTION_STATE, ptr, end, nextTokPtr)
 
+#ifdef XML_DTD
+
+#define XmlIgnoreSectionTok(enc, ptr, end, nextTokPtr) \
+   XmlTok(enc, XML_IGNORE_SECTION_STATE, ptr, end, nextTokPtr)
+
+#endif /* XML_DTD */
+
 /* This is used for performing a 2nd-level tokenization on
 the content of a literal that has already been returned by XmlTok. */ 
 
@@ -212,8 +219,8 @@ the content of a literal that has already been returned by XmlTok. */
 
 #define XmlSameName(enc, ptr1, ptr2) (((enc)->sameName)(enc, ptr1, ptr2))
 
-#define XmlNameMatchesAscii(enc, ptr1, ptr2) \
-  (((enc)->nameMatchesAscii)(enc, ptr1, ptr2))
+#define XmlNameMatchesAscii(enc, ptr1, end1, ptr2) \
+  (((enc)->nameMatchesAscii)(enc, ptr1, end1, ptr2))
 
 #define XmlNameLength(enc, ptr) \
   (((enc)->nameLength)(enc, ptr))
@@ -267,9 +274,26 @@ int XMLTOKAPI XmlSizeOfUnknownEncoding(void);
 ENCODING XMLTOKAPI *
 XmlInitUnknownEncoding(void *mem,
 		       int *table,
-		       int (*convert)(void *userData, const char *p),
+		       int (*conv)(void *userData, const char *p),
 		       void *userData);
 
+int XMLTOKAPI XmlParseXmlDeclNS(int isGeneralTextEntity,
+			        const ENCODING *enc,
+			        const char *ptr,
+	  		        const char *end,
+			        const char **badPtr,
+			        const char **versionPtr,
+			        const char **encodingNamePtr,
+			        const ENCODING **namedEncodingPtr,
+			        int *standalonePtr);
+int XMLTOKAPI XmlInitEncodingNS(INIT_ENCODING *, const ENCODING **, const char *name);
+const ENCODING XMLTOKAPI *XmlGetUtf8InternalEncodingNS(void);
+const ENCODING XMLTOKAPI *XmlGetUtf16InternalEncodingNS(void);
+ENCODING XMLTOKAPI *
+XmlInitUnknownEncodingNS(void *mem,
+		         int *table,
+		         int (*conv)(void *userData, const char *p),
+		         void *userData);
 #ifdef __cplusplus
 }
 #endif

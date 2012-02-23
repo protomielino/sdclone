@@ -1,22 +1,6 @@
 /*
-The contents of this file are subject to the Mozilla Public License
-Version 1.0 (the "License"); you may not use this file except in
-compliance with the License. You may obtain a copy of the License at
-http://www.mozilla.org/MPL/
-
-Software distributed under the License is distributed on an "AS IS"
-basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See the
-License for the specific language governing rights and limitations
-under the License.
-
-The Original Code is expat.
-
-The Initial Developer of the Original Code is James Clark.
-Portions created by James Clark are Copyright (C) 1998
-James Clark. All Rights Reserved.
-
-Contributor(s):
-$Id$
+Copyright (c) 1998, 1999 Thai Open Source Software Center Ltd
+See the file copying.txt for copying permission.
 */
 
 /* 0x00 */ BT_NONXML, BT_NONXML, BT_NONXML, BT_NONXML,
@@ -33,7 +17,7 @@ $Id$
 /* 0x2C */ BT_COMMA, BT_MINUS, BT_NAME, BT_SOL,
 /* 0x30 */ BT_DIGIT, BT_DIGIT, BT_DIGIT, BT_DIGIT,
 /* 0x34 */ BT_DIGIT, BT_DIGIT, BT_DIGIT, BT_DIGIT,
-/* 0x38 */ BT_DIGIT, BT_DIGIT, BT_NMSTRT, BT_SEMI,
+/* 0x38 */ BT_DIGIT, BT_DIGIT, BT_COLON, BT_SEMI,
 /* 0x3C */ BT_LT, BT_EQUALS, BT_GT, BT_QUEST,
 /* 0x40 */ BT_OTHER, BT_HEX, BT_HEX, BT_HEX,
 /* 0x44 */ BT_HEX, BT_HEX, BT_HEX, BT_NMSTRT,

@@ -7,11 +7,9 @@ SET(TXML_SOURCES
 	xmlrole.h      
 	xmltok_impl.h
 	codepage.h  
-	hashtable.c  
 	nametab.h    
 	xmlparse.c  
 	xmltok.c
-	hashtable.h  
 	utf8tab.h    
 	xmlparse.h  
 	xmltok.h
