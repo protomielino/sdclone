@@ -880,6 +880,7 @@ PlayerConfigMenuInit(void *prevMenu)
     SkillEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "skilltext");
 
     /* Races and pits numbers editboxes (Must they really stay here ?) */
+    /* TODO: definitely should be moved from here to pre-race menus. kilo */
     RaceNumEditId = GfuiMenuCreateEditControl(ScrHandle, param, "racenumedit", NULL, NULL, onChangeNum);
     PitsEditId = GfuiMenuCreateEditControl(ScrHandle, param, "pitstopedit", NULL, NULL, onChangePits);
     
@@ -895,15 +896,15 @@ PlayerConfigMenuInit(void *prevMenu)
     AutoReverseEditId = GfuiMenuCreateLabelControl(ScrHandle, param, "autotext");
 
     // Accept and Cancel buttons.
-    GfuiMenuCreateButtonControl(ScrHandle, param, "accept", NULL, onSavePlayerList);
-    GfuiMenuCreateButtonControl(ScrHandle, param, "cancel", NULL, onQuitPlayerConfig);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", NULL, onSavePlayerList);
+    GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", NULL, onQuitPlayerConfig);
 
     // Close menu XML descriptor.
     GfParmReleaseHandle(param);
     
     // Register keyboard shortcuts.
-    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Save changes on players configuration", NULL, onSavePlayerList, NULL);
-    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel changes on players configuration", NULL, onQuitPlayerConfig, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_RETURN, "Accept and save changes", NULL, onSavePlayerList, NULL);
+    GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel changes", NULL, onQuitPlayerConfig, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F12, "Screen-Shot", NULL, GfuiScreenShot, NULL);
 	//     GfuiAddKey(ScrHandle, GFUIK_UP, "Previous Car", (void*)0, ChangeCar, NULL);
