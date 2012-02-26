@@ -200,6 +200,13 @@ grLoadScene(tTrack *track)
 		GfLogError("No specified track 3D model file\n");
 		return -1;
 	}
+	
+	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
+	{
+		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
+		if (grBGSky)
+			grLoadBackgroundSky();
+	}
 
 	snprintf(buf, sizeof(buf), "tracks/%s/%s;data/textures;data/img;.", grTrack->category, grTrack->internalname);
 	ssgTexturePath(buf);
@@ -207,14 +214,7 @@ grLoadScene(tTrack *track)
 	ssgModelPath(buf);
 
 	desc = grssgLoadAC3D(acname, NULL);
-	LandAnchor->addKid(desc);
-
-	if (grSkyDomeDistance > 0 && grTrack->skyversion > 0)
-	{
-		grBGSky = strcmp(GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_DISABLED), GR_ATT_BGSKY_ENABLED) == 0;
-		if (grBGSky)
-			grLoadBackgroundSky();
-	}
+	LandAnchor->addKid(desc);	
 
 	return 0;
 }//grLoadScene
