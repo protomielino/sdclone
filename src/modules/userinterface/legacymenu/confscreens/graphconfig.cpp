@@ -348,7 +348,7 @@ GraphMenuInit(void* prevMenu)
 
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void* param = GfuiMenuLoad("graphicconfig.xml");
+    void* param = GfuiMenuLoad("graphicsconfigmenu.xml");
 
     GfuiMenuCreateStaticControls(ScrHandle, param);
 

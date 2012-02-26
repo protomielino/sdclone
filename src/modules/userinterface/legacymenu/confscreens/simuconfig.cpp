@@ -175,7 +175,7 @@ SimuMenuInit(void *prevMenu)
 
     ScrHandle = GfuiScreenCreate((float*)NULL, NULL, onActivate, NULL, (tfuiCallback)NULL, 1);
 
-    void *menuDescHdle = GfuiMenuLoad("simulationmenu.xml");
+    void *menuDescHdle = GfuiMenuLoad("simuconfigmenu.xml");
     GfuiMenuCreateStaticControls(ScrHandle, menuDescHdle);
 
     SimuVersionId = GfuiMenuCreateLabelControl(ScrHandle,menuDescHdle,"simulabel");
