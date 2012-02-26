@@ -7,14 +7,13 @@ credits.xml
 
 doc/faq/faq.html
 doc/userman
+doc/man
 
 CMakeLists.txt
 
 cmake
 
 src/CMakeLists.txt
-
-src/doc
 
 src/drivers/CMakeLists.txt
 
