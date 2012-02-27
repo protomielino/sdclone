@@ -11,7 +11,7 @@ ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION ${VERSION} SOVERSION 1.0.0
              SOURCES ${ROBOT_SOURCES})
 
 ROBOT_DATA(NAME ${ROBOT_NAME}
-           FILES logo.png
+           FILES logo.png logo.rgb
            SUBDIRS cars PATTERNS *.xml)
 
 ROBOT_DATA(NAME ${ROBOT_NAME}
