@@ -106,8 +106,8 @@ void SoundInterface::initSharedSourcePool()
 
 void SoundInterface::setSkidSound (const char* sound_name)
 {
-	Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
 	for (int i=0; i<4; i++) {
+		Sound* sound = addSample (sound_name, ACTIVE_VOLUME|ACTIVE_PITCH, true);
 		skid_sound[i] = sound;
 	}
 
