@@ -80,7 +80,7 @@ ReCarsUpdateCarPitTime(tCarElt *car)
 			if (car->_scheduledEventTime < s->currentTime + RCM_MAX_DT_SIMU)
 				car->_scheduledEventTime += RCM_MAX_DT_SIMU;
 														 
-			GfLogInfo("%s in stop&go pit stop for %.1f s.\n", car->_name, info->totalPitTime);
+			GfLogInfo("%s in Stop-and-Go pit stop for %.1f s.\n", car->_name, info->totalPitTime);
 			break;
 	}
 }
@@ -110,13 +110,13 @@ reCarsAddPenalty(tCarElt *car, int penalty)
 	tCarPenalty *newPenalty;
 
 	if (penalty == RM_PENALTY_DRIVETHROUGH)
-		sprintf(msg, "%s Driver Through penalty", car->_name);
+		snprintf(msg, sizeof(msg), "%s Driver Through penalty", car->_name);
 	else if (penalty == RM_PENALTY_STOPANDGO)
-		sprintf(msg, "%s Stop and Go penalty", car->_name);
+		snprintf(msg, sizeof(msg), "%s Stop-and-Go penalty", car->_name);
 	else if (penalty == RM_PENALTY_10SEC_STOPANDGO)
-		sprintf(msg, "%s 10s Stop and Go penalty", car->_name);
+		snprintf(msg, sizeof(msg), "%s 10s Stop-and-Go penalty", car->_name);
 	else if (penalty == RM_PENALTY_DISQUALIFIED)
-		sprintf(msg, "%s disqualified", car->_name);
+		snprintf(msg, sizeof(msg), "%s disqualified", car->_name);
 
 	ReSituation::self().setRaceMessage(msg, 5);
 
@@ -192,13 +192,13 @@ reCarsApplyRaceRules(tCarElt *car)
     if (penalty) {
 		switch (penalty->penalty) {
 			case RM_PENALTY_DRIVETHROUGH:
-				sprintf(car->ctrl.msg[3], "Drive Through Penalty");
+				snprintf(car->ctrl.msg[3], RM_CMD_MAX_MSG_SIZE, "Drive-Through Penalty");
 				break;
 			case RM_PENALTY_STOPANDGO:
-				sprintf(car->ctrl.msg[3], "Stop And Go Penalty");
+				snprintf(car->ctrl.msg[3], RM_CMD_MAX_MSG_SIZE, "Stop-and-Go Penalty");
 				break;
 			case RM_PENALTY_10SEC_STOPANDGO:
-				sprintf(car->ctrl.msg[3], "10s Stop And Go Penalty");
+				snprintf(car->ctrl.msg[3], RM_CMD_MAX_MSG_SIZE, "10s Stop-and-Go Penalty");
 				break;
 			default:
 				*(car->ctrl.msg[3]) = 0;
@@ -231,17 +231,17 @@ reCarsApplyRaceRules(tCarElt *car)
 			if (seg->raceInfo & TR_PIT) {
 				switch (penalty->penalty) {
 					case RM_PENALTY_DRIVETHROUGH:
-						sprintf(msg, "%s Drive Through penalty clearing", car->_name);
+						snprintf(msg, sizeof(msg), "%s Drive-Through penalty clearing", car->_name);
 						ReSituation::self().setRaceMessage(msg, 5);
 						rules->ruleState |= RM_PNST_DRIVETHROUGH;
-						GfLogInfo("%s might get its Drive Through Penalty cleared.\n", car->_name);
+						GfLogInfo("%s might get its Drive-Through penalty cleared.\n", car->_name);
 						break;
 					case RM_PENALTY_STOPANDGO:
 					case RM_PENALTY_10SEC_STOPANDGO:
-						sprintf(msg, "%s Stop and Go penalty clearing", car->_name);
+						snprintf(msg, sizeof(msg), "%s Stop-and-Go penalty clearing", car->_name);
 						ReSituation::self().setRaceMessage(msg, 5);
 						rules->ruleState |= RM_PNST_STOPANDGO;
-						GfLogInfo("%s might get its Stop And Go Penalty cleared.\n", car->_name);
+						GfLogInfo("%s might get his Stop-and-Go Penalty cleared.\n", car->_name);
 						break;
 				}
 			}
@@ -255,8 +255,8 @@ reCarsApplyRaceRules(tCarElt *car)
 			if (car->_state & RM_CAR_STATE_PIT) {
 				//GfLogDebug("%s is pitting.\n", car->_name);
 				if (rules->ruleState & RM_PNST_STOPANDGO && car->_pitStopType == RM_PIT_STOPANDGO) {
-					GfLogInfo("%s Stop and Go accepted.\n", car->_name);
-					rules->ruleState |= RM_PNST_STOPANDGO_OK; // Stop and Go really done.
+					GfLogInfo("%s Stop-and-Go accepted.\n", car->_name);
+					rules->ruleState |= RM_PNST_STOPANDGO_OK; // Stop-and-Go really done.
 				}
 			}
 		} else if (seg->raceInfo & TR_PITEND) {
@@ -264,12 +264,12 @@ reCarsApplyRaceRules(tCarElt *car)
 			// 4b) Check if the penalty can really and finally be removed because exiting pit lane
 			//     and everything went well in the clearing process til then.
 			if (rules->ruleState & (RM_PNST_DRIVETHROUGH | RM_PNST_STOPANDGO_OK)) {
-				sprintf(msg, "%s penalty cleared", car->_name);
+				snprintf(msg, sizeof(msg), "%s penalty cleared", car->_name);
 				ReSituation::self().setRaceMessage(msg, 5);
 				penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
 				reCarsRemovePenalty(car, penalty);
 				GfLogInfo("%s %s penalty cleared.\n", car->_name,
-						  (rules->ruleState & RM_PNST_DRIVETHROUGH) ? "Drive Through" : "Stop And Go");
+						  (rules->ruleState & RM_PNST_DRIVETHROUGH) ? "Drive-Through" : "Stop-and-Go");
 			}
 			rules->ruleState = 0;
 		} else {
@@ -278,7 +278,7 @@ reCarsApplyRaceRules(tCarElt *car)
 			if (!(rules->ruleState & RM_PNST_STOPANDGO)) {
 				reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
 				rules->ruleState = RM_PNST_STOPANDGO;
-				GfLogInfo("%s got a Stop And Go penalty (went out the pits at a wrong place).\n",
+				GfLogInfo("%s got a Stop-and-Go penalty (went out the pits at a wrong place).\n",
 						  car->_name);
 			}
 		}
@@ -294,18 +294,18 @@ reCarsApplyRaceRules(tCarElt *car)
 		if (!(rules->ruleState & RM_PNST_STOPANDGO)) {
 			reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
 			rules->ruleState = RM_PNST_STOPANDGO;
-			GfLogInfo("%s got a Stop And Go penalty (went in the pits at a wrong place).\n",
+			GfLogInfo("%s got a Stop-and-Go penalty (went in the pits at a wrong place).\n",
 					  car->_name);
 		}
     }
 
-	// 7) If too fast in a speed limited section, add new drive through penalty if possible.
+	// 7) If too fast in a speed limited section, add new drive-through penalty if possible.
     if (seg->raceInfo & TR_SPEEDLIMIT) {
 		if (!(rules->ruleState & (RM_PNST_OVERSPEED | RM_PNST_STOPANDGO))
 			&& car->_speed_x > track->pits.speedLimit) {
 			rules->ruleState |= RM_PNST_OVERSPEED;
 			reCarsAddPenalty(car, RM_PENALTY_DRIVETHROUGH);
-			GfLogInfo("%s got a Drive Through penalty (too fast in the pits).\n", car->_name);
+			GfLogInfo("%s got a Drive-Through penalty (too fast in the pits).\n", car->_name);
 		}
     }
 }
@@ -340,9 +340,9 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 		if (car->ctrl.raceCmd & RM_CMD_PIT_ASKED) {
 			// Pit already occupied?
 			if (car->_pit->pitCarIndex == TR_PIT_STATE_FREE)
-				sprintf(car->ctrl.msg[2], "Can Pit");
+				snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Can Pit");
 			else
-				sprintf(car->ctrl.msg[2], "Pit Occupied");
+				snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Pit Occupied");
 			memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
 		}
 
@@ -355,11 +355,11 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				if (car->_scheduledEventTime < s->currentTime) {
 					car->_state &= ~RM_CAR_STATE_PIT;
 					car->_pit->pitCarIndex = TR_PIT_STATE_FREE;
-					sprintf(msg, "%s pit stop %.1f s", car->_name, info->totalPitTime);
+					snprintf(msg, RM_CMD_MAX_MSG_SIZE, "%s pit stop %.1f s", car->_name, info->totalPitTime);
 					ReSituation::self().setRaceMessage(msg, 5);
 					GfLogInfo("%s exiting pit (%.1f s elapsed).\n", car->_name, info->totalPitTime);
 				} else {
-					sprintf(car->ctrl.msg[2], "In pits %.1f s",
+					snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "In pits %.1f s",
 							s->currentTime - info->startPitTime);
 				}
 			}
@@ -369,7 +369,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 		} else if ((car->ctrl.raceCmd & RM_CMD_PIT_ASKED) &&
 				   car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
 				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage)) {
-			sprintf(car->ctrl.msg[2], "Pit request");
+			snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Pit request");
 
 			tdble lgFromStart = car->_trkPos.seg->lgfromstart;
 			
@@ -413,7 +413,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 						}
 					}
 					info->startPitTime = s->currentTime;
-					sprintf(msg, "%s in pits", car->_name);
+					snprintf(msg, sizeof(msg), "%s in pits", car->_name);
 					ReSituation::self().setRaceMessage(msg, 5);
 					GfLogInfo("%s entering in pit slot.\n", car->_name);
 					if (car->robot->rbPitCmd(car->robot->index, car, s) == ROB_PIT_MENU) {
@@ -438,7 +438,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
   				    if (Offset >= 0.0)
 					{
 						// The car's position across the track is out of accepted range 
-						sprintf(car->ctrl.msg[2], "Offset: %.02f",Offset);
+						snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Offset: %.02f",Offset);
 						if (TeamDriver)
 						  TeamDriver->MoreOffset = Offset;
 					}
@@ -447,7 +447,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
   				    if (TooFastBy >= 1.0)
 					{
 						// The car's speed is out of accepted range 
-						sprintf(car->ctrl.msg[2], "Speed: %.02f",TooFastBy);
+						snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Speed: %.02f",TooFastBy);
 						if (TeamDriver)
 						  TeamDriver->TooFastBy = TooFastBy;
 					}
@@ -467,14 +467,14 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				if (car->_pit->lmin > lgFromStart)
 				{
 				  float StillToGo = car->_pit->lmin - lgFromStart;
-				  sprintf(car->ctrl.msg[2], "Still to go: %0.2f m" ,StillToGo);
+				  snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Still to go: %0.2f m" ,StillToGo);
 				  if (TeamDriver)
 				    TeamDriver->StillToGo = StillToGo;
 				}
 				else if (car->_pit->lmax < lgFromStart)
 				{
   				  float StillToGo = lgFromStart - car->_pit->lmax;
-				  sprintf(car->ctrl.msg[2], "Overrun: %0.2f m" ,StillToGo);
+				  snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Overrun: %0.2f m" ,StillToGo);
 				  if (TeamDriver)
 				    TeamDriver->StillToGo = -StillToGo;
 				}
@@ -620,7 +620,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 						s->_raceState = RM_RACE_FINISHING;
 						if (ReInfo->s->_raceType == RM_TYPE_RACE) {
 							if (car->_pos == 1) {
-								sprintf(msg, "Winner %s", car->_name);
+								snprintf(msg, sizeof(msg), "Winner %s", car->_name);
 								ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
 								if (NetGetServer())
 								{
@@ -643,7 +643,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 											break;
 									}
 								}
-								sprintf(msg, "%s finished %d%s", car->_name, car->_pos, numSuffix);
+								snprintf(msg, sizeof(msg), "%s finished %d%s", car->_name, car->_pos, numSuffix);
 								ReSituation::self().setRaceMessage(msg, 5);
 							}
 						}
@@ -707,7 +707,7 @@ ReCarsSortCars(void)
 		&& s->cars[i]->_speed_xy > 10 
 		&& s->cars[i]->_driverType == RM_DRV_HUMAN
 		&& s->cars[i]->_state != RM_CAR_STATE_ELIMINATED) {
-	    sprintf(msg, "%s Wrong Way", s->cars[i]->_name);
+	    snprintf(msg, sizeof(msg), "%s Wrong Way", s->cars[i]->_name);
 	    ReSituation::self().setRaceMessage(msg, 2);
 	    // prevent flickering occuring by 'short timing', assuming > 10fps
 	    s->cars[i]->_wrongWayTime = s->currentTime + 1.9;

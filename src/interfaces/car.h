@@ -416,7 +416,8 @@ typedef struct {
     int		raceCmd;    /**< command issued by the driver */
 #define RM_CMD_NONE		0	/**< No race command */
 #define RM_CMD_PIT_ASKED	1	/**< Race command: Pit asked */
-    char	msg[4][32];     /**< 4 lines of 31 characters 0-1 from car 2-3 from race engine */
+#define RM_CMD_MAX_MSG_SIZE 32
+    char	msg[4][RM_CMD_MAX_MSG_SIZE];     /**< 4 lines of 31 characters : 0-1 from car, 2-3 from race engine */
 #define RM_MSG_LEN	31
     float	msgColor[4]; /**< RGBA of text */
     int		lightCmd;    /**< Lights command */
