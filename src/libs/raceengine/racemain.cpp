@@ -216,6 +216,16 @@ RePreRace(void)
 	// Get session max dammages.
 	ReInfo->s->_maxDammage = (int)GfParmGetNum(params, raceName, RM_ATTR_MAX_DMG, NULL, 10000);
 
+	// Get session type (race, qualification or practice).
+	raceType = GfParmGetStr(params, raceName, RM_ATTR_TYPE, RM_VAL_RACE);
+	if (!strcmp(raceType, RM_VAL_RACE)) {
+		ReInfo->s->_raceType = RM_TYPE_RACE;
+	} else if (!strcmp(raceType, RM_VAL_QUALIF)) {
+		ReInfo->s->_raceType = RM_TYPE_QUALIF;
+	} else if (!strcmp(raceType, RM_VAL_PRACTICE)) {
+		ReInfo->s->_raceType = RM_TYPE_PRACTICE;
+	}
+
 	// Get session duration (defaults to "All sessions" one, or else -60).
 	ReInfo->s->_totTime = GfParmGetNum(params, raceName, RM_ATTR_SESSIONTIME, NULL, -1);
 	if (ReInfo->s->_totTime < 0)
@@ -223,16 +233,21 @@ RePreRace(void)
 
 	// Determine the actual session duration and/or number of laps.
 	ReInfo->s->_extraLaps = 0; // TODO: Does this is ever needed ?
-	ReInfo->s->_totLaps = 30; // Make sure it is initialized
+	ReInfo->s->_totLaps = 0; // Make sure it is initialized
 
 	if (ReInfo->s->_totTime > 0 && !(ReInfo->s->_features & RM_FEATURE_TIMEDSESSION)) {
-		// Timed session not supported: add 2 km for every minute
-		ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 2000.0f / 60.0f / ReInfo->track->length + 0.5f);
+		// Timed session not supported: add 1 km for every minute in parctise or qualifying,
+		// and 150 km for every hour (2.5 km for every minute) in race
+		if (ReInfo->s->_raceType == RM_TYPE_RACE) {
+			ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 2500.0f / 60.0f / ReInfo->track->length + 0.5f);
+		} else {
+			ReInfo->s->_totLaps = (int)floor(ReInfo->s->_totTime * 1000.0f / 60.0f / ReInfo->track->length + 0.5f);
+		}
 		timedLapsReplacement = ReInfo->s->_totLaps;
 		ReInfo->s->_totTime = -60.0f;
 	}
 	
-	// Timed session doesn't exclude addional laps after the time finishes
+	// Timed session doesn't exclude additional laps after the time finishes
 	// Make sure that if no time set, we set far below zero
 	if(ReInfo->s->_totTime <= 0.0f )
 		ReInfo->s->_totTime = -60.0f;
@@ -243,30 +258,28 @@ RePreRace(void)
 		dist = GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_DISTANCE, NULL, 0);
 	
 	// If a (> 0) session distance was specified, deduce the number of laps
-	// in case the race settings don't specify it.
-	if (dist >= 0.001) { // Why not 'if (dist > 0)' ???
-		ReInfo->s->_totLaps = (int)(dist / ReInfo->track->length) + 1 + timedLapsReplacement;
+	// in case the race settings don't specify it, and it is not a timed race.
+	if ( (dist >= 0.001) && (ReInfo->s->_totTime < 0.0f) ) { // Why not 'if (dist > 0)' ???
+		ReInfo->s->_totLaps = (int)(dist / ReInfo->track->length) + 1;
 		ReInfo->s->_extraLaps = ReInfo->s->_totLaps; // Extralaps are used to find out how many laps there are after the time is up in timed sessions
-	}
+	} else {dist = -1;}
 	
 	// Get the number of laps (defaults to "All sessions" one,
-	// or else the already computed one from the session distance, or 30).
+	// or else the already computed one from the session distance, or 0).
 	int laps = (int)GfParmGetNum(params, raceName, RM_ATTR_LAPS, NULL, -1);
 	if (laps < 0)
-		laps = (int)GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_LAPS, NULL, (tdble)ReInfo->s->_totLaps);
-	if (laps > 0 ) {
-		ReInfo->s->_totLaps = laps + timedLapsReplacement;
+		laps = (int)GfParmGetNum(params, RM_VAL_ANYRACE, RM_ATTR_LAPS, NULL, 0);
+
+	// Use lap number only when race distance is not in use.
+	if ( (laps > 0) && (dist <= 0.0) && (timedLapsReplacement <= 0) ) {
+		ReInfo->s->_totLaps = laps;
 		ReInfo->s->_extraLaps = ReInfo->s->_totLaps; //Extralaps are used to find out how many laps there are after the time is up in timed sessions
 	}
 
-	// Get session type (race, qualification or practice).
-	raceType = GfParmGetStr(params, raceName, RM_ATTR_TYPE, RM_VAL_RACE);
-	if (!strcmp(raceType, RM_VAL_RACE)) {
-		ReInfo->s->_raceType = RM_TYPE_RACE;
-	} else if (!strcmp(raceType, RM_VAL_QUALIF)) {
-		ReInfo->s->_raceType = RM_TYPE_QUALIF;
-	} else if (!strcmp(raceType, RM_VAL_PRACTICE)) {
-		ReInfo->s->_raceType = RM_TYPE_PRACTICE;
+	// Make sure we have at least 1 lap race length.
+	if ( (laps <= 0) && (dist <=0) && (ReInfo->s->_totTime < 0) ) {
+		ReInfo->s->_totLaps = 1;
+		ReInfo->s->_extraLaps = ReInfo->s->_totLaps; //Extralaps are used to find out how many laps there are after the time is up in timed sessions
 	}
 
 	// Correct extra laps (possible laps run after the winner arrived ?) :
