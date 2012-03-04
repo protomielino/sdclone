@@ -15,13 +15,13 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="Supercar Championship" version="1.6">
+<params name="Supercars Championship" version="1.7">
 
   <section name="Header">
-    <attstr name="name" val="Supercar Championship"/>
+    <attstr name="name" val="Supercars Championship"/>
     <attstr name="type" val="Championship"/>
     <attstr name="subtype" val="Supercars"/>
-    <attstr name="description" val="Supercar Championship"/>
+    <attstr name="description" val="Supercars Championship"/>
     <attnum name="priority" val="59"/>
     <attstr name="menu image" val="data/img/splash-champ.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
