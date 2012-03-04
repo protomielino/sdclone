@@ -75,6 +75,9 @@ static GfRace::ETimeOfDaySpec	rmrpTimeOfDay;
 static GfRace::ERainSpec		rmrpRain;
 
 static int		rmrpFeatures;
+static bool rmrpSessionIsRace;
+static int rmrpFallbackDistance;
+static int rmrpExtraLaps;
 
 
 static void
@@ -101,6 +104,10 @@ rmrpUpdDist(void * /* dummy */)
 		snprintf(buf, sizeof(buf), "%d", rmrpDistance);
 		rmrpLaps = 0;
 		GfuiEditboxSetString(ScrHandle, rmrpLapsEditId, "---");
+		if (rmrpFeatures & RM_FEATURE_TIMEDSESSION) {
+			rmrpDuration = 0;
+			GfuiEditboxSetString(ScrHandle, rmrpDurationEditId, "---");
+		}
     }
     GfuiEditboxSetString(ScrHandle, rmrpDistEditId, buf);
 }
@@ -119,6 +126,10 @@ rmrpUpdLaps(void * /* dummy */)
 		snprintf(buf, sizeof(buf), "%d", rmrpLaps);
 		rmrpDistance = 0;
 		GfuiEditboxSetString(ScrHandle, rmrpDistEditId, "---");
+		if ((rmrpFeatures & RM_FEATURE_TIMEDSESSION) && !rmrpSessionIsRace) {
+			rmrpDuration = 0;
+			GfuiEditboxSetString(ScrHandle, rmrpDurationEditId, "---");
+		}
     }
     GfuiEditboxSetString(ScrHandle, rmrpLapsEditId, buf);
 }
@@ -176,13 +187,19 @@ rmrpUpdDuration(void * /*dummy*/)
     
     rmrpDuration = result;
     
-    if (rmrpDuration <= 0)
+    if (rmrpDuration <= 0) {
 		strcpy( buf, "---");
-    else
+    } else {
 		snprintf(buf, sizeof(buf), "%d:%02d:%02d",
 				 (int)floor((float)rmrpDuration / 3600.0f),
 				 (int)floor((float)rmrpDuration / 60.0f) % 60,
 				 (int)floor((float)rmrpDuration) % 60);
+		rmrpDistance = 0;
+		GfuiEditboxSetString(ScrHandle, rmrpDistEditId, "---");
+		if (!rmrpSessionIsRace) {rmrpLaps = 0;
+			GfuiEditboxSetString(ScrHandle, rmrpLapsEditId, "---");
+		}
+    }
     GfuiEditboxSetString(ScrHandle, rmrpDurationEditId, buf);
 }
 
@@ -262,8 +279,15 @@ rmrpValidate(void * /* dummy */)
 	{
 		if (rmrpConfMask & RM_CONF_RACE_LEN)
 		{
-			pRaceSessionParams->nDistance = rmrpDistance;
-			pRaceSessionParams->nLaps = rmrpLaps;
+			//in order to not delete hidden settings from the file, write back:
+			//fallback distance to nDistance when no distance set by user
+			if ((rmrpDistance == 0) && (rmrpFallbackDistance > 0))
+				pRaceSessionParams->nDistance = rmrpFallbackDistance;
+			else pRaceSessionParams->nDistance = rmrpDistance;
+			//extra laps to nLaps when no lap number set by user
+			if ((rmrpLaps == 0) && (rmrpExtraLaps > 0))
+				pRaceSessionParams->nLaps = rmrpExtraLaps;
+			else pRaceSessionParams->nLaps = rmrpLaps;
 			if (rmrpFeatures & RM_FEATURE_TIMEDSESSION)
 				pRaceSessionParams->nDuration = rmrpDuration;
 		}
@@ -311,6 +335,9 @@ RmRaceParamsMenu(void *vrp)
 	GfLogTrace("Entering %s Params menu for %s\n",
 			   MenuData->session.c_str(), MenuData->pRace->getManager()->getName().c_str());
 
+	//clear previous values
+	rmrpFallbackDistance = 0;
+	rmrpExtraLaps = 0;
 	// Update the conf mask according to the session params, graphics options and race features.
 	// 1) According to the availability of parameters for this session,.
 	GfRace::Parameters* pRaceSessionParams =
@@ -369,6 +396,7 @@ RmRaceParamsMenu(void *vrp)
 	}
 	
     // Otherwise, create and initialize the race length configuration controls.
+    rmrpSessionIsRace = true; //TODO: when available, get it from pRaceSessionParam
     if (rmrpConfMask & RM_CONF_RACE_LEN) 
     {
 		if (pRaceSessionParams->nDistance < 0)
@@ -380,14 +408,28 @@ RmRaceParamsMenu(void *vrp)
 			rmrpDuration = 0; // Default value.
 		else
 			rmrpDuration = pRaceSessionParams->nDuration;
-		if (rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION) && rmrpDistance == 0)
-			rmrpDistance = rmrpDuration / 30;
+		//if the session is timed, save the fallback distance, and unset rmrpDistance
+		if ( (rmrpFeatures & RM_FEATURE_TIMEDSESSION) && (rmrpDuration > 0) && (rmrpDistance > 0) )
+		{
+			rmrpFallbackDistance = rmrpDistance;
+			rmrpDistance = 0;
+		}
+		if (rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION) && rmrpDistance == 0) {
+			if (rmrpSessionIsRace) rmrpDistance = (int)((float)rmrpDuration * 2.5 / 60);//calculate with 150 km/h
+			else rmrpDistance = (int)((float)rmrpDuration / 60);//use 1 km/minute
+		}
 
 		if (pRaceSessionParams->nLaps < 0)
 			rmrpLaps = 0; // Default value.
 		else {
 			rmrpLaps = pRaceSessionParams->nLaps;
-			if (rmrpLaps > 0) rmrpDistance = 0;
+			if ((!rmrpSessionIsRace) && ((rmrpDistance > 0) || (rmrpDuration > 0)))
+				rmrpLaps = 0;
+			if (rmrpDuration > 0 && !(rmrpFeatures & RM_FEATURE_TIMEDSESSION))
+			{
+			    rmrpExtraLaps = rmrpLaps;
+			    rmrpLaps = 0;
+			}
 		}
 		if (rmrpDistance == 0 && rmrpLaps == 0 && rmrpDuration == 0)
 			rmrpLaps = 1;
