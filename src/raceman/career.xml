@@ -16,7 +16,7 @@
 <!DOCTYPE params SYSTEM "params.dtd">
 
 
-<params name="Career" version="1.7">
+<params name="Career" version="1.8">
 
   <section name="Header">
     <attstr name="name" val="Career"/>
@@ -26,7 +26,7 @@
     <attnum name="priority" val="30"/>
     <attstr name="menu image" val="data/img/splash-career.jpg"/>
     <attstr name="run image" val="data/img/splash-run-practice.jpg"/>
-    <attstr name="start image" val="data/img/splash-career.jpg"/>
+    <attstr name="start image" val="data/img/splash-careerstart.jpg"/>
     <section name="Subfiles">
       <attstr name="has subfiles" val="yes"/>
       <attstr name="first subfile" val="career_supercars.xmls"/>
