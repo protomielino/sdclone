@@ -395,7 +395,15 @@ rmRacePause(void * /* vboard */)
 
 		LmRaceEngine().start();
 
+		// Hide the "Pause" label.
 		GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
+		
+		// Show again the hidden message label.
+		GfuiVisibilitySet(rmScreenHandle, rmMsgId, GFUI_VISIBLE);
+
+		// Launch the "slow resume race" manager if non-blind mode.
+		if (LmRaceEngine().outData()->_displayMode == RM_DISP_MODE_NORMAL)
+			rmProgressiveTimeModifier.start();
     }
 	else
 	{
@@ -404,7 +412,13 @@ rmRacePause(void * /* vboard */)
 
 		LmRaceEngine().stop();
 
+		// Show the "Pause" label.
 		GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_VISIBLE);
+
+		// Hide the message label (no need to bother the user with the time mult. factor
+		// when it is changing, whihc occurs when the user hits P when a slow start
+		// is in-process).
+		GfuiVisibilitySet(rmScreenHandle, rmMsgId, GFUI_INVISIBLE);
     }
 	
 	// The menu changed.
