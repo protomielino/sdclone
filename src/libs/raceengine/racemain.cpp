@@ -86,8 +86,20 @@ int ReConfigure()
 
 void ReRaceAbandon()
 {
-	// Shutdown current event.
-	ReRaceEventShutdown();
+	// Notify the UI that the race event is finishing now.
+	ReUI().onRaceEventFinishing();
+
+	// Shutdown track-physics-related stuff.
+	ReTrackShutdown();
+
+	// Cleanup needed stuff.
+	FREEZ(ReInfo->_reCarInfo);
+
+	if (ReInfo->params != ReInfo->mainParams)
+	{
+		GfParmReleaseHandle(ReInfo->params);
+		ReInfo->params = ReInfo->mainParams;
+	}
 
 	// Return to race configuration step
 	ReStateApply((void*)RE_STATE_CONFIG);
