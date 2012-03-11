@@ -36,11 +36,12 @@
 
 
 /* list of available simulation engine */
+static const int DefaultSimuVersion = 1;
 static const char *SimuVersionList[] =
 	{RM_VAL_MOD_SIMU_V2, RM_VAL_MOD_SIMU_V2_1, RM_VAL_MOD_SIMU_V3};
 static const char *SimuVersionDispNameList[] = 	{"V2.0", "V2.1", "V3.0"};
 static const int NbSimuVersions = sizeof(SimuVersionList) / sizeof(SimuVersionList[0]);
-static int CurSimuVersion = 1;
+static int CurSimuVersion = DefaultSimuVersion;
 
 /* list of available multi-threading schemes */
 static const char *MultiThreadSchemeList[] = {RM_VAL_AUTO, RM_VAL_ON, RM_VAL_OFF};
@@ -71,11 +72,12 @@ static void loadSimuCfg(void)
 	int i;
 
 	char buf[1024];
-	snprintf(buf, 1024, "%s%s", GfLocalDir(), RACE_ENG_CFG);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
-	
-	simuVersionName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[1]);
+
+	// Simulation engine name.
+	simuVersionName = GfParmGetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[DefaultSimuVersion]);
 	for (i = 0; i < NbSimuVersions; i++) {
 		if (strcmp(simuVersionName, SimuVersionList[i]) == 0) {
 			CurSimuVersion = i;
@@ -83,6 +85,16 @@ static void loadSimuCfg(void)
 		}
 	}
 
+	// Check if the selected simulation module is there, and fall back to the default one if not.
+	snprintf(buf, sizeof(buf), "%smodules/simu/%s.%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
+	if (!GfFileExists(buf))
+	{
+		GfLogWarning("User settings %s physics engine module not found ; falling back to %s\n",
+					 SimuVersionList[CurSimuVersion], SimuVersionList[DefaultSimuVersion]);
+		CurSimuVersion = DefaultSimuVersion;
+	}
+
+	// Multi-threading.
 	multiThreadSchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_MULTI_THREADING, MultiThreadSchemeList[0]);
 	for (i = 0; i < NbMultiThreadSchemes; i++) {
 		if (strcmp(multiThreadSchemeName, MultiThreadSchemeList[i]) == 0) {
@@ -91,6 +103,7 @@ static void loadSimuCfg(void)
 		}
 	}
 
+	// Thread affinity.
 	threadAffinitySchemeName = GfParmGetStr(paramHandle, RM_SECT_RACE_ENGINE, RM_ATTR_THREAD_AFFINITY, ThreadAffinitySchemeList[0]);
 	for (i = 0; i < NbThreadAffinitySchemes; i++) {
 		if (strcmp(threadAffinitySchemeName, ThreadAffinitySchemeList[i]) == 0) {
@@ -111,7 +124,7 @@ static void loadSimuCfg(void)
 static void storeSimuCfg(void * /* dummy */)
 {
 	char buf[1024];
-	snprintf(buf, 1024, "%s%s", GfLocalDir(), RACE_ENG_CFG);
+	snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), RACE_ENG_CFG);
 
 	void *paramHandle = GfParmReadFile(buf, GFPARM_RMODE_REREAD | GFPARM_RMODE_CREAT);
 	GfParmSetStr(paramHandle, RM_SECT_MODULES, RM_ATTR_MOD_SIMU, SimuVersionList[CurSimuVersion]);
@@ -125,12 +138,24 @@ static void storeSimuCfg(void * /* dummy */)
 	return;
 }
 
-/* Change the simulation version */
+/* Change the simulation version (but only show really available modules) */
 static void
 onChangeSimuVersion(void *vp)
 {
-	CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
+	char buf[1024];
+
+	if (!vp)
+		return;
+
+	const int oldSimuVersion = CurSimuVersion;
+	do
+	{
+		CurSimuVersion = (CurSimuVersion + NbSimuVersions + (int)(long)vp) % NbSimuVersions;
 	
+		snprintf(buf, sizeof(buf), "%smodules/simu/%s.%s", GfLibDir(), SimuVersionList[CurSimuVersion], DLLEXT);
+	}
+	while (!GfFileExists(buf) && CurSimuVersion != oldSimuVersion);
+
 	GfuiLabelSetText(ScrHandle, SimuVersionId, SimuVersionDispNameList[CurSimuVersion]);
 }
 
