@@ -2,7 +2,7 @@
 <!-- 
     file                 : graph.xml
     created              : Sun Dec  2 11:58:59 CET 2001
-    copyright            : (C) 2001 by Eric Espié                         
+    copyright            : (C) 2001 by Eric Espiï¿½                         
     email                : Eric.Espie@torcs.org   
     version              : $Id$                                  
 -->
@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="graph" type="param" mode="mw" version="1.6">
+<params name="graph" type="param" mode="mw" version="1.7">
   <section name="Graphic">
     <attnum name="smoke value" val="300"/>
     <attnum name="smoke interval" val="0.01"/>
@@ -26,11 +26,11 @@
 
     <attnum name="fov factor" unit="%" val="100"/>
     <attnum name="LOD Factor" val="1"/>
-    <attnum name="sky dome distance" val="0"/>
-    <attstr name="dynamic sky dome" val="disabled"/>
+    <attnum name="sky dome distance" val="80000"/>
+    <attstr name="dynamic sky dome" val="enabled"/>
     <attnum name="precipitation density" unit="%" val="100"/>
     <attnum name="cloudlayer" val="1"/>
-    <attstr name="background skydome" val="disabled"/>
+    <attstr name="background skydome" val="enabled"/>
   </section>
 
   <section name="Playable Cameras Distance of Views">
