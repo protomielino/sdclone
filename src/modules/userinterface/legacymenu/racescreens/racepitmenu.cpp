@@ -118,19 +118,21 @@ RmPitMenuStart(tCarElt *car, tSituation *s, tfuiCallback callback)
     GfuiLabelSetText(menuHandle, titleId, buf);
 
    // Create labels for remaining laps and remaining fuel.
-    int remainLapsId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
-    if( s->_totTime > 0 && s->_totTime > s->currentTime ) /* Timed part of the timed session */
+    int remainLapsTimeId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapstimelabel");
+    if( s->_totTime > 0 && s->_totTime > s->currentTime ) // Timed part of the timed session
     {
+		GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingtimelabel");
     	if( s->_extraLaps > 0)
     	    snprintf(buf, sizeof(buf), "%s + %d laps", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ), s->_extraLaps);
-	else
+		else
     	    snprintf(buf, sizeof(buf), "%s", GfTime2Str( s->_totTime - s->currentTime, NULL, true, 0 ) );
     }
     else
     {
+		GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remaininglapslabel");
     	snprintf(buf, sizeof(buf), "%d", car->_remainingLaps); //Laps tot drive to win the race
     }
-    GfuiLabelSetText(menuHandle, remainLapsId, buf);
+    GfuiLabelSetText(menuHandle, remainLapsTimeId, buf);
 
     int remainFuelId = GfuiMenuCreateLabelControl(menuHandle, menuXMLDescHdle, "remainingfuellabel");
     snprintf(buf, sizeof(buf), "%.1f", car->_fuel);
