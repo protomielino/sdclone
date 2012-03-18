@@ -34,7 +34,7 @@ rmAbortRaceHookActivate(void * /* dummy */)
 static void *pvAbortRaceHookHandle = 0;
 
 static void *
-rmAbortRaceHookInit(void)
+rmAbortRaceHookInit()
 {
 	if (!pvAbortRaceHookHandle)
 		pvAbortRaceHookHandle = GfuiHookCreate(0, rmAbortRaceHookActivate);
@@ -52,7 +52,7 @@ rmSkipSessionHookActivate(void * /* dummy */)
 static void	*pvSkipSessionHookHandle = 0;
 
 static void *
-rmSkipSessionHookInit(void)
+rmSkipSessionHookInit()
 {
 	if (!pvSkipSessionHookHandle)
 		pvSkipSessionHookHandle = GfuiHookCreate(0, rmSkipSessionHookActivate);
@@ -64,8 +64,14 @@ rmSkipSessionHookInit(void)
 static void
 rmBackToRaceHookActivate(void * /* dummy */)
 {
-	LmRaceEngine().start();
-	
+	// Temporary hack for the Paused race case, in order
+	// the race does not get ended (as is is currently stopped)
+	// TODO: Activate the Stop Race menu directly, as for the Help menu (F1),
+	//      and no more through changing the race engine state to STOP
+	//      But beware of the other hooks ...
+	LmRaceEngine().inData()->_reState = RE_STATE_RACE;
+
+	// Back to the race screen in next display loop.
 	LegacyMenu::self().activateGameScreen();
 
 	// Launch the "slow resume race" manager if non-blind mode.
@@ -75,8 +81,8 @@ rmBackToRaceHookActivate(void * /* dummy */)
 
 static void	*pvBackToRaceHookHandle = 0;
 
-static void *
-rmBackToRaceHookInit(void)
+void *
+RmBackToRaceHookInit()
 {
 	if (!pvBackToRaceHookHandle)
 		pvBackToRaceHookHandle = GfuiHookCreate(0, rmBackToRaceHookActivate);
@@ -94,7 +100,7 @@ rmRestartRaceHookActivate(void * /* dummy */)
 static void	*pvRestartRaceHookHandle = 0;
 
 static void *
-rmRestartRaceHookInit(void)
+rmRestartRaceHookInit()
 {
 	if (!pvRestartRaceHookHandle)
 		pvRestartRaceHookHandle = GfuiHookCreate(0, rmRestartRaceHookActivate);
@@ -115,7 +121,7 @@ rmQuitHookActivate(void * /* dummy */)
 static void	*pvQuitHookHandle = 0;
 
 static void *
-rmQuitHookInit(void)
+rmQuitHookInit()
 {
 	if (!pvQuitHookHandle)
 		pvQuitHookHandle = GfuiHookCreate(0, rmQuitHookActivate);
@@ -239,7 +245,7 @@ RmStopRaceMenu()
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("resume", rmBackToRaceHookInit(),
+				    ("resume", RmBackToRaceHookInit(),
 					 "skip", rmSkipSessionHookInit(),
 					 "abort", rmAbortRaceHookInit(),
 					 "quit", rmQuitHookInit());
@@ -248,7 +254,7 @@ RmStopRaceMenu()
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("resume", rmBackToRaceHookInit(),
+				    ("resume", RmBackToRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
 					 "quit", rmQuitHookInit());
 		}
@@ -259,7 +265,7 @@ RmStopRaceMenu()
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("resume", rmBackToRaceHookInit(),
+				    ("resume", RmBackToRaceHookInit(),
 					 "skip", rmSkipSessionHookInit(),
 					 "restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
@@ -269,7 +275,7 @@ RmStopRaceMenu()
 		{
 			rmStopScrHandle =
 				rmStopRaceMenu
-				    ("resume", rmBackToRaceHookInit(),
+				    ("resume", RmBackToRaceHookInit(),
 					 "restart", rmRestartRaceHookInit(),
 					 "abort", rmAbortRaceHookInit(),
 					 "quit", rmQuitHookInit());

@@ -85,6 +85,7 @@ extern void RmGameScreen();
 
 extern void RmShowResults(void * /* prevHdle */, tRmInfo * /* info */);
 
+extern void* RmBackToRaceHookInit();
 extern void RmStopRaceMenu();
 extern void RmStopRaceMenuShutdown();
 
@@ -141,14 +142,25 @@ extern void *RmRaceSelectMenuHandle;
 class RmProgressiveTimeModifier
 {
  public:
+
+	//! Constructor.
 	RmProgressiveTimeModifier();
+
+	//! Reset state as if just born.
+	void reset();
+
+	//! Start the ramp up.
 	void start();
+
+	//! Simulation step : aimed at being called at each display loop.
 	void execute();
 
  private:
+
+	//! For when the ramp up is over.
 	void terminate();
 
-private:
+ private:
 	
 	// Should we run the manager at next simu step ?
 	bool _bExecRunning;
@@ -165,12 +177,12 @@ private:
 	// Log the integrated time acceleration change (needed when multiple start without terminate)
 	double _fResetterTimeMultiplier;
 	
-private:
+ private:
 	
 	// Config: Set how much time will take to restore to normal speed (after the delay)
 	static const double _sfTimeMultiplier;
 
-	// Config: Set how much we wait befor starting to apply the time acceleration
+	// Config: Set how much we wait before starting to apply the time acceleration
 	static const double _sfDelay;
 	
 	// Config: Set how much the time will be initially changed (as a fraction of the current time)

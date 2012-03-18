@@ -49,15 +49,29 @@ onDeactivate(void* /* dummy */)
 
 /** Generate a help screen.
     @ingroup	gui
-    @param	prevScreen	Previous screen to return to
+    @param	targetScreen	The screen to display help for and to return to when exiting
     @warning	The help screen is activated.
  */
 void
-GfuiHelpScreen(void *prevScreen)
+GfuiHelpScreen(void *targetScreen)
 {
-    tGfuiScreen	*pscr = (tGfuiScreen*)prevScreen;
+	GfuiHelpScreen(targetScreen, 0);
+}
 
-    // Create screen, load menu XML descriptor and create static controls.
+/** Generate a help screen.
+    @ingroup	gui
+    @param	targetScreen	The screen to display help for
+    @param	returnScreen	The screen to return to when exiting
+    @warning	The help screen is activated.
+ */
+void
+GfuiHelpScreen(void *targetScreen, void *returnScreen)
+{
+	// The return screen is the target screen if not specified (0).
+	if (!returnScreen)
+		returnScreen = targetScreen;
+
+    // Create help screen, load menu XML descriptor and create static controls.
     void* scrHandle = GfuiScreenCreate(0, 0, onActivate, 0, onDeactivate);
     
     void *hmenu = GfuiMenuLoad("helpmenu.xml");
@@ -75,8 +89,12 @@ GfuiHelpScreen(void *prevScreen)
     int ys = nYTopLine;
     int yn = nYTopLine;
     
-    tGfuiKey *curKey = pscr->userKeys;
+    tGfuiScreen	*pscrTgt = (tGfuiScreen*)targetScreen;
+
+    tGfuiKey *curKey = pscrTgt->userKeys;
     do {
+		// Decide if this key goes on the left of right column.
+		bool bLeft;
 		if (curKey) {
 			curKey = curKey->next;
 			switch(curKey->key) {
@@ -105,31 +123,45 @@ GfuiHelpScreen(void *prevScreen)
 				case GFUIK_DELETE:
 				case GFUIK_CLEAR:
 				case GFUIK_PAUSE:
-					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyName", true, // from template
-											   curKey->name, nXLeftColumn, ys);
-					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyDesc", true, // from template
-											   curKey->descr, nXLeftColumn + nNameFieldWidth, ys);
-					ys -= nLineShift;
+					bLeft = true;
 					break;
 
 				default:
-					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyName", true, // from template
-											   curKey->name, nXRightColumn, yn);
-					GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyDesc", true, // from template
-											   curKey->descr, nXRightColumn + nNameFieldWidth, yn);
-					yn -= nLineShift;
+					bLeft = curKey->modifier != GFUIM_NONE;
 					break;
 			}
 		}
-	
-		if (curKey == pscr->userKeys)
+
+		// Determine control coordinates, whether left or right column.
+		int x, y;
+		if (bLeft)
+		{
+			x = nXLeftColumn;
+			y = ys;
+			ys -= nLineShift;
+		}
+		else
+		{
+			x = nXRightColumn;
+			y = yn;
+			yn -= nLineShift;
+		}
+
+		// Create label controls.
+		GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyName", true, // from template
+								   curKey->name, x, y);
+		GfuiMenuCreateLabelControl(scrHandle, hmenu, "keyDesc", true, // from template
+								   curKey->descr, x + nNameFieldWidth, y);
+
+		// Stop if no more keys to explain.
+		if (curKey == pscrTgt->userKeys)
 			curKey = (tGfuiKey*)NULL;
 
     } while (curKey);
     
 
     // Create Back button.
-    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", prevScreen, GfuiScreenReplace);
+    GfuiMenuCreateButtonControl(scrHandle, hmenu, "backbutton", targetScreen, GfuiScreenReplace);
 
     // Create version label.
     const int versionId = GfuiMenuCreateLabelControl(scrHandle, hmenu, "versionlabel");
@@ -139,8 +171,8 @@ GfuiHelpScreen(void *prevScreen)
     GfParmReleaseHandle(hmenu);
     
     // Add keyboard shortcuts.
-    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Back to the menu", prevScreen, GfuiScreenReplace, NULL);
-    GfuiAddKey(scrHandle, GFUIK_RETURN, "Back to the menu", prevScreen, GfuiScreenReplace, NULL);
+    GfuiAddKey(scrHandle, GFUIK_ESCAPE, "Back to the menu", returnScreen, GfuiScreenReplace, NULL);
+    GfuiAddKey(scrHandle, GFUIK_RETURN, "Back to the menu", returnScreen, GfuiScreenReplace, NULL);
 	if (NRecursions == 0)
 		GfuiAddKey(scrHandle, GFUIK_F1, "Help on Help menu", scrHandle, GfuiHelpScreen, NULL);
     GfuiAddKey(scrHandle, GFUIK_F12, "Screen-shot", NULL, GfuiScreenShot, NULL);

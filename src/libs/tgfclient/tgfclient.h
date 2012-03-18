@@ -276,7 +276,8 @@ TGFCLIENT_API void GfuiAddKey(void *scr, int key, int modifier, const char *desc
 TGFCLIENT_API void GfuiRegisterKey(int key, const char *descr,
 								   void *userData, tfuiCallback onKeyPressed, tfuiCallback onKeyReleased);
 TGFCLIENT_API void GfuiSetKeyAutoRepeat(void *scr, int on);
-TGFCLIENT_API void GfuiHelpScreen(void *prevScreen);
+TGFCLIENT_API void GfuiHelpScreen(void *targetScreen);
+TGFCLIENT_API void GfuiHelpScreen(void *targetScreen, void *returnScreen);
 TGFCLIENT_API void GfuiScreenShot(void *notused);
 TGFCLIENT_API void GfuiScreenAddBgImg(void *scr, const char *filename);
 TGFCLIENT_API void GfuiKeyEventRegister(void *scr, tfuiKeyCallback onKeyAction);

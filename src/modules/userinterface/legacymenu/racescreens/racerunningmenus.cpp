@@ -71,9 +71,17 @@ const double RmProgressiveTimeModifier::_sfTimeLapse = 2;
 RmProgressiveTimeModifier rmProgressiveTimeModifier;
 
 RmProgressiveTimeModifier::RmProgressiveTimeModifier()
-: _bExecRunning(false), _fExecStartTime(0), _fWholeTimeLapse(0),
-  _fOldTimeMultiplier(_sfTimeMultiplier), _fResetterTimeMultiplier(1)
 {
+	reset();
+}
+
+void RmProgressiveTimeModifier::reset()
+{
+	_bExecRunning = false;
+	_fExecStartTime = 0;
+	_fWholeTimeLapse = 0;
+	_fOldTimeMultiplier = _sfTimeMultiplier;
+	_fResetterTimeMultiplier = 1;
 }
 
 void RmProgressiveTimeModifier::start()
@@ -140,8 +148,8 @@ void RmProgressiveTimeModifier::execute()
 
 void RmProgressiveTimeModifier::terminate()
 {
-	// Seems we have done our work. Lets be quiet untill next start() call.		
-	_bExecRunning = false;
+	// Seems we have done our work. Lets keep quiet until next time start() is called.
+	reset();
 }
 
 /***************************************************************************/
@@ -158,6 +166,16 @@ rmUpdateRaceEngine()
 // Current values for the menu messages.
 static std::string rmStrCurMsg;
 static std::string rmStrCurBigMsg;
+
+// Race pause flag
+// There are 2 concepts of "Pause" here, and they can overlap each other :
+// 1) the race engine : LmRaceEngine().outData()->s->_raceState & RM_RACE_PAUSED
+//      which matches with the in-game 'P' key shortcut to freeze the race screen,
+// 2) the menu one : you can also pause the game through the 'Esc' key (=> Stop Race menu)
+//      and through the 'F1' key (=> help menu).
+// This flag is for the 2nd one :
+//  when you unpause in the 2nd one meaning, you may stay paused in the 1st one meaning.
+static bool rmRacePaused = false;
 
 // Flag to know if the menu state has been changed (and thus needs a redraw+redisplay).
 static bool rmbMenuChanged = false;
@@ -202,6 +220,7 @@ rmInitMovieCapture()
 		strcmp(GfParmGetStr(hparmRaceEng, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_ENABLE,
 							RM_VAL_NO),
 			   RM_VAL_NO) ? true : false;
+	rmMovieCapture.active = false;
 	if (!rmMovieCapture.enabled)
 	{
 		rmMovieCapture.outputBase = 0;
@@ -209,7 +228,6 @@ rmInitMovieCapture()
 	}
 	else
 	{
-		rmMovieCapture.active = false;
 		rmMovieCapture.frameRate =
 			GfParmGetNum(hparmRaceEng, RM_SECT_MOVIE_CAPTURE, RM_ATT_CAPTURE_FPS, NULL, 25.0);
 		rmMovieCapture.simuRate = 1.0 / RCM_MAX_DT_SIMU;
@@ -339,6 +357,10 @@ rmRedisplay()
 	GfuiApp().eventLoop().postRedisplay();
 }
 
+// Warning : This function is called when the race is actually starting in "non-blind" mode,
+//           but also when coming back from the Stop Race menu (the user chose "Resume")
+//           or from the Help menu. It must also consider that the race may be currently paused !
+
 static void
 rmScreenActivate(void * /* dummy */)
 {
@@ -361,23 +383,21 @@ rmScreenActivate(void * /* dummy */)
 	
 #endif
 
-	// Hide the on-screen pause indicator in case it is visible.
-	GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
-
-	// Reset normal sound volume in any case.
-	if (LegacyMenu::self().soundEngine())
-		LegacyMenu::self().soundEngine()->mute(false);
-	
-	// Deactivate the movie capture mode in any case.
-	rmMovieCapture.active = false;
-	
 	// Configure the event loop.
 	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
     GfuiApp().eventLoop().setRedisplayCB(rmRedisplay);
 
-	// Resynchronize the race engine.
-	LmRaceEngine().start();
-
+	// If not paused ...
+    if (!rmRacePaused)
+	{
+		// Reset normal sound volume.
+		if (LegacyMenu::self().soundEngine())
+			LegacyMenu::self().soundEngine()->mute(false);
+	
+		// Resynchronize the race engine.
+		LmRaceEngine().start();
+	}
+	
 	// Request a redisplay for the next event loop.
     GfuiApp().eventLoop().postRedisplay();
 	
@@ -388,7 +408,7 @@ rmScreenActivate(void * /* dummy */)
 static void
 rmRacePause(void * /* vboard */)
 {
-    if (LmRaceEngine().outData()->s->_raceState & RM_RACE_PAUSED)
+    if (rmRacePaused)
 	{
 		if (LegacyMenu::self().soundEngine())
 			LegacyMenu::self().soundEngine()->mute(false);
@@ -420,6 +440,9 @@ rmRacePause(void * /* vboard */)
 		// is in-process).
 		GfuiVisibilitySet(rmScreenHandle, rmMsgId, GFUI_INVISIBLE);
     }
+	
+	// Toggle the race-paused flag.
+	rmRacePaused = !rmRacePaused;
 	
 	// The menu changed.
 	rmbMenuChanged = true;
@@ -509,10 +532,12 @@ rmApplyState(void *pvState)
 static void
 rmOpenHelpScreen(void * /* dummy */)
 {
+	LmRaceEngine().stop();
+
 	if (LegacyMenu::self().soundEngine())
 		LegacyMenu::self().soundEngine()->mute(true);
 	
-	GfuiHelpScreen(rmScreenHandle);
+	GfuiHelpScreen(rmScreenHandle, RmBackToRaceHookInit());
 }
 
 static void
@@ -540,9 +565,6 @@ rmAddKeys()
 void *
 RmScreenInit()
 {
-	// Initialize the movie capture system.
-	rmInitMovieCapture();
-	
     // Release screen if was initialized.
     RmScreenShutdown();
 
@@ -562,9 +584,17 @@ RmScreenInit()
     // Register keyboard shortcuts.
     rmAddKeys();
 
-    // Hide the Pause label for the moment.
-    GfuiVisibilitySet(rmScreenHandle, rmPauseId, 0);
+    // We are starting "unpaused".
+    GfuiVisibilitySet(rmScreenHandle, rmPauseId, GFUI_INVISIBLE);
+	rmRacePaused = false;
 
+	// Re-initialize the progressive time modifier,
+	// in case the race was exited while it was running.
+	rmProgressiveTimeModifier.reset();
+	
+	// Initialize the movie capture system.
+	rmInitMovieCapture();
+	
     return rmScreenHandle;
 }
 
@@ -650,6 +680,9 @@ rmResScreenActivate(void * /* dummy */)
 	// Configure the event loop.
 	GfuiApp().eventLoop().setRecomputeCB(rmUpdateRaceEngine);
 	GfuiApp().eventLoop().setRedisplayCB(rmResRedisplay);
+
+	// Resynchronize the race engine.
+	LmRaceEngine().start();
 
 	// Request a redisplay for the next event loop.
 	GfuiApp().eventLoop().postRedisplay();
