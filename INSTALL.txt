@@ -53,7 +53,7 @@ There are 2 ways to build and install Speed Dreams from sources :
 
 Pick only one of the above options. If you have trouble during the installation,
 have a look in the FAQ on the above sites. In case you get stuck,
-please learn how to report the problem in the FAQ before filling a bug or contact us.
+please learn how to report the problem in the FAQ before filing a bug or contact us.
 
 Have fun,
 
