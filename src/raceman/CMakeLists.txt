@@ -2,8 +2,9 @@ INCLUDE(../../cmake/macros.cmake)
 
 SD_INSTALL_FILES(DATA config/raceman USER config/raceman 
                  FILES practice.xml quickrace.xml
+                       singleevent-36gp.xml
                        singleevent-challenge.xml singleevent-endurance.xml
-		       singleevent-mp5.xml
+		       singleevent-ls-gt1.xml singleevent-mp5.xml
                        championship.xml championship-supercars.xml championship-trb1.xml
                        career.xml 
                        career_supercars.xmls career_ls1.xmls)

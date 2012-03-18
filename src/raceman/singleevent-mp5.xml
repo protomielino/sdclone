@@ -11,10 +11,10 @@
 
 <!DOCTYPE params SYSTEM "params.dtd">
 
-<params name="MP5 Challenge" version="1.2">
+<params name="MP5 Race" version="1.3">
 
   <section name="Header">
-    <attstr name="name" val="MP5 Chalenge"/>
+    <attstr name="name" val="MP5 Challenge"/>
     <attstr name="type" val="Single Event"/>
     <attstr name="subtype" val="MP5 Challenge"/>
     <attstr name="description" val="MP5 Challenge race"/>
@@ -35,7 +35,7 @@
 
   <section name="Races">
     <section name="1">
-      <attstr name="name" val="Qualifications"/>
+      <attstr name="name" val="Qualifying"/>
     </section>
 
     <section name="2">
@@ -58,10 +58,10 @@
     <attstr name="clouds" val="scarce clouds"/>
   </section>
 
-  <section name="Qualifications">
+  <section name="Qualifying">
     <attnum name="sessiontime" unit="s" val="1200"/>
-    <attnum name="laps" val="5"/>
-    <attnum name="distance" unit="km" val="0"/>
+    <attnum name="laps" val="0"/>
+    <attnum name="distance" unit="km" val="20"/>
     <attstr name="type" val="qualifications"/>
     <attstr name="starting order" val="drivers list"/>
     <attstr name="display mode" val="results only"/>
@@ -86,7 +86,7 @@
     <attnum name="laps" val="0"/>
     <attnum name="distance" unit="km" val="48"/>
     <attstr name="type" val="race"/>
-    <attstr name="starting order" val="last race"/>
+    <attstr name="starting order" val="Qualifying"/>
     <attstr name="restart" val="no"/>
     <attnum name="maximum drivers" val="30"/>
     <attstr name="splash menu" val="yes"/>
@@ -170,7 +170,7 @@
     <attnum name="laps" val="0"/>
     <attnum name="distance" unit="km" val="48"/>
     <attstr name="type" val="race"/>
-    <attstr name="starting order" val="last race"/>
+    <attstr name="starting order" val="Qualifying"/>
     <attstr name="restart" val="no"/>
     <attnum name="maximum drivers" val="30"/>
     <attstr name="splash menu" val="yes"/>
@@ -254,7 +254,7 @@
     <attnum name="laps" val="0"/>
     <attnum name="distance" unit="km" val="45"/>
     <attstr name="type" val="race"/>
-    <attstr name="starting order" val="last race"/>
+    <attstr name="starting order" val="Qualifying"/>
     <attstr name="restart" val="no"/>
     <attnum name="maximum drivers" val="30"/>
     <attstr name="splash menu" val="yes"/>
@@ -389,17 +389,9 @@
       <attstr name="type" val="drivers select"/>
     </section>
 
-    <!--section name="3">
-      <attstr name="type" val="race config"/>
-      <attstr name="race" val="All Sessions"/>
-      <section name="Options">
-
-      </section>
-    </section-->
-
     <section name="3">
       <attstr name="type" val="race config"/>
-      <attstr name="race" val="Qualifications"/>
+      <attstr name="race" val="Qualifying"/>
       <section name="Options">
         <section name="1">
           <attstr name="type" val="race length"/>
