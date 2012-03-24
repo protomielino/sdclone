@@ -22,10 +22,13 @@
 
 #include <cstdlib>
 #include <cstring>
+
 #ifdef _MSC_VER
 #include <direct.h>
 #include <process.h>
 #define _WINSOCKAPI_   /* Prevent inclusion of winsock.h in windows.h */
+#else
+#include <unistd.h>
 #endif
 
 #ifdef _MSC_VER
