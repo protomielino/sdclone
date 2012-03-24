@@ -1,6 +1,4 @@
 Here are the summarized changes since 1.4.0
-(More details for the associated 2.0.0 milestone here : 
-   http://sourceforge.net/apps/trac/speed-dreams/report/9)
 
 Dxx ids refer to tasks "specified" and listed here :
 http://sourceforge.net/apps/trac/speed-dreams/wiki/BigFeatureList
@@ -8,8 +6,122 @@ http://sourceforge.net/apps/trac/speed-dreams/wiki/BigFeatureList
 ... among the planned ones for 2.0.0 :
 http://sourceforge.net/apps/trac/speed-dreams/wiki/ActualFeaturePlanFor20
 
-More technical details about the work in progress for some tasks here :
+More technical details about the work in progress for many tasks here :
 http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
+
+Changes since 2.0.0 Release Candidate 1 release in final 2.0.0
+-----------------------------------------------------------------
+This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0@46??????????????.
+
+Main changes :
+ * Completed new "shinning" menu style with blurry backgrounds and button animations
+ * Realistic sky dome enabled by default (might slow down frame rates on low end configurations)
+ * Fixed broken track shadow mapping on cars when background landscape present
+ * 
+ * 
+ * 
+ * 
+ * 
+ * 
+ * Many bug fixes.
+
+??????????????????????????? r4520 ??????????????????????????????????
+
+
+Known bugs / WIP tasks : See http://sourceforge.net/apps/trac/speed-dreams/report/3
+
+More details below.
+
+Cars:
+* #350 Spreaded out mp5-fmc liveries evenly over the 3 mp5-fmc* cars
+* LS1 :
+  * #142 Final ls1-archer previews
+* 
+* 
+
+Tracks:
+* Dirt
+  * Fixed TORCS-labeled gantries on Dirt-2, Dirt-4 and Dirt-6
+* Circuit
+  * #628 Fixed Karwada shadow map making landscape too dark
+* 
+
+Robots :
+* Back to all RGB + small fixes on pit door logos for USR and Simplix SC and TRB1
+* 
+* 
+* 
+
+Input control :
+* 
+* 
+* 
+* 
+
+Graphics :
+ * Fixed broken track shadow mapping on cars when background landscape present
+
+Menus :
+* Menu system
+  * Final tweaks for the reworked menu style (colors, button icons, blurry backgrounds, button filets, ...)
+  * #542 
+    * All menu bottom buttons set to same Y coord (44) + text color scheme (white, hovered = yellow, clicked = red)
+    * Improved tips
+    * Ajusted layout / spacing
+    * Equivalent buttons at the same place, as much as possible + Apply / Continue on the right
+
+* Pit :
+  * #635 Improved pit menu labels 
+  * #636 Pit menu labels when timed session + improved tips
+* Options :
+  * Make things work smoothly when Simu V2 and/or V3 modules are not there, whatever user settings
+  * Made Sky Dome enabled by default, with dynamic time and background landscape + warned the user about lower frame rates (graphics options menu)
+  *
+  *
+  *
+* Results menus
+  * #562 Fixed results-only counting extra lap
+  * #549 Added decimal points for TopSpeed and MinSpeed
+  *
+  *
+  *
+
+
+* Race Params
+  * #491 Fixed race distance / session time logic
+* Track Select / Race manager
+  * Final blurry previews for all official HQ tracks (+ some others)
+* Driver Select / Garage 
+  * Change Car => Garage
+
+
+Race engine :
+* #460 F1 key really freezes the simulation
+* #568 Progressive time acceleration when unpausing a race, whatever the mean (F1 = Help menu, Esc = Stop menu, P = Pause)
+* Make things work smoothly when Simu V2 and/or V3 modules are not there, whatever user settings
+* #591 Fixes crash when abandoning non-Career multi-event races during 1st event
+* #491 Fixed race distance calculation
+* #638 Fixed Drive-through in-race message spelling
+* 
+
+Sound engine :
+
+Track loader :
+
+Build system :
+* Updated install instructions to the new multi-source-packaging scheme since 2.0.0 rc1
+* #625 USR RS driver added to the Windows WIP package
+* #602 Install manpages (after updating the original sources) for our executables
+* #604 Switch to GPL2-licensed 'legal' txml lib (old was Mozilla 1.0, not compatible), on the way to move to an external Expat dependency
+* 
+
+Tools:
+
+Other:
+* #307 More code cleanups (snprintf, ...)
+* Moved src/doc to doc/doxygen for consistency
+
+                         =====================================================
 
 Changes since 2.0.0 Beta 1 released in 2.0.0 Release Candidate 1.
 -----------------------------------------------------------------
