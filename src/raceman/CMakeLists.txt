@@ -6,6 +6,7 @@ SD_INSTALL_FILES(DATA config/raceman USER config/raceman
                        singleevent-challenge.xml singleevent-endurance.xml
 		       singleevent-ls-gt1.xml singleevent-mp5.xml
                        championship.xml championship-supercars.xml championship-trb1.xml
+                       championship-36gp.xml championship-ls-gt1.xml championship-mp5.xml
                        career.xml 
                        career_supercars.xmls career_ls1.xmls)
 
