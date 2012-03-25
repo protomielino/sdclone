@@ -551,7 +551,7 @@ createImageButton(void* hscr, void* hparm, const char* pszPath,
 	int butId =
 		GfuiGrButtonCreate(hscr,
 						   pszDisabledImage, pszEnabledImage, pszFocusedImage, pszPushedImage,
-						   nX, nY, nWidth, nHeight, GFUI_MOUSE_UP, true,
+						   nX, nY, nWidth, nHeight, GFUI_MIRROR_NONE, true, GFUI_MOUSE_UP,
 						   userDataOnPush, onPush,
 						   userDataOnFocus, onFocus, onFocusLost);
 

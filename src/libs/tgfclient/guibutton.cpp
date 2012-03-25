@@ -66,6 +66,8 @@ gfuiInitButton(void)
     @param	y		Y position on screen (0 = bottom)
     @param	width		Width on the screen (0 = image width)
     @param	height		Height on the screen (0 = image height)
+    @param	mirror		Left/right + up/down mirror when drawing the images
+                        <br>(Or-combination of GFUI_MIRROR_*)
     @param	mouse		Mouse behavior:
                         <br>GFUI_MOUSE_UP Action performed when the mouse right button is released
                         <br>GFUI_MOUSE_DOWN Action performed when the mouse right button is pushed
@@ -80,7 +82,7 @@ gfuiInitButton(void)
 void
 gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enabled,
 				 const char *focused, const char *pushed,
-				 int x, int y, int width, int height, int mouse,
+				 int x, int y, int width, int height, int mirror, int mouse,
 				 void *userDataOnPush, tfuiCallback onPush, 
 				 void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -97,6 +99,7 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
 	button->height = height <= 0 ? h : height;
 	button->x = x;
 	button->y = y;
+	button->mirror = mirror;
     button->buttonType = GFUI_BTN_PUSH;
     button->mouseBehaviour = mouse;
 
@@ -118,6 +121,9 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
     @param	y		Y position on screen (0 = bottom)
     @param	width		Width on the screen (0 = image width + h-padding)
     @param	height		Height on the screen (0 = image height + v-padding)
+    @param	mirror		Left/right + up/down mirror when drawing the images
+                        <br>(Or-combination of GFUI_MIRROR_*)
+    @param	padding		Padding flag
     @param	mouse		Mouse behavior:
                         <br>GFUI_MOUSE_UP Action performed when the mouse right button is released
                         <br>GFUI_MOUSE_DOWN Action performed when the mouse right button is pushed
@@ -133,7 +139,7 @@ gfuiGrButtonInit(tGfuiGrButton* button, const char *disabled, const char *enable
 int
 GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
 				   const char *focused, const char *pushed,
-				   int x, int y, int width, int height, int mouse, bool padding,
+				   int x, int y, int width, int height, int mirror, bool padding, int mouse,
 				   void *userDataOnPush, tfuiCallback onPush, 
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
@@ -151,7 +157,7 @@ GfuiGrButtonCreate(void *scr, const char *disabled, const char *enabled,
     tGfuiGrButton* button = &(object->u.grbutton);
 	gfuiGrButtonInit(button, disabled, enabled, focused, pushed,
 					 x + hPadding, y + vPadding,
-					 width - 2 * hPadding, height - 2 * vPadding, mouse,
+					 width - 2 * hPadding, height - 2 * vPadding, mirror, mouse,
 					 userDataOnPush, onPush, userDataOnFocus, onFocus, onFocusLost);
 
 	object->xmin = x;
@@ -529,16 +535,23 @@ gfuiGrButtonDraw(tGfuiGrButton *button, int state, int focus)
 	glBindTexture(GL_TEXTURE_2D, img);
 	glBegin(GL_QUADS);
 
-	glTexCoord2f(0.0, 0.0);
+	const float h = (button->mirror & GFUI_MIRROR_HORI) ? 1.0 : 0.0;
+	const float v = (button->mirror & GFUI_MIRROR_VERT) ? 1.0 : 0.0;
+	
+	//glTexCoord2f(0.0, 0.0);
+	glTexCoord2f(v, h); //H : 0, 1; V : 1, 0 ; HV : 1, 1
 	glVertex2i(button->x, button->y);
 	
-	glTexCoord2f(0.0, 1.0);
+	//glTexCoord2f(0.0, 1.0);
+	glTexCoord2f(v, 1.0 - h); // H : 0, 0; V : 1, 1 ; HV : 1, 0
 	glVertex2i(button->x, button->y + button->height);
 	
-	glTexCoord2f(1.0, 1.0);
+	//glTexCoord2f(1.0, 1.0);
+	glTexCoord2f(1.0 - v, 1.0 - h); // H : 1, 0; V : 0, 1 ; HV : 0, 0
 	glVertex2i(button->x + button->width, button->y + button->height);
 	
-	glTexCoord2f(1.0, 0.0);
+	//glTexCoord2f(1.0, 0.0);
+	glTexCoord2f(1.0 - v, h); // H : 1, 1; V : 0, 0 ; HV : 0, 1
 	glVertex2i(button->x + button->width, button->y);
 
 	glEnd();

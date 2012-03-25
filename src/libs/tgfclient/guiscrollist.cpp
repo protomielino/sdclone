@@ -124,9 +124,9 @@ gfuiScrollListPrevElt (tGfuiObject *object)
     @param	width	Total width of the box (pixels)
     @param	height	Total height of the box (pixels)
     @param	scrollBarPos	Position of the scrollbar:
-	<br>GFUI_SB_NONE	No scroll bar
-	<br>GFUI_SB_RIGHT	Right scroll bar
-	<br>GFUI_SB_LEFT	Left scroll bar
+				<br>GFUI_SB_NONE	No scroll bar
+				<br>GFUI_SB_RIGHT	Right scroll bar
+				<br>GFUI_SB_LEFT	Left scroll bar
     @param	scrollBarWidth	Width of the scroll-bar (pixels)
     @param	scrollBarButHeight	Height of the scroll-bar buttons (pixels)
     @param	userDataOnSelect	User data to pass to the onSelect callback
@@ -169,14 +169,14 @@ GfuiScrollListCreate(void *scr, int font, int x, int y, int width, int height,
 			scrollist->scrollBar =
 				GfuiScrollBarCreate(scr, x + width, y,
 									height, scrollBarWidth, scrollBarButHeight,
-									GFUI_VERT_SCROLLBAR, 
+									GFUI_VERT_SCROLLBAR, GFUI_SB_RIGHT,
 									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
 			break;
 		case GFUI_SB_LEFT:
 			scrollist->scrollBar =
 				GfuiScrollBarCreate(scr, x - scrollBarWidth, y,
 									height, scrollBarWidth, scrollBarButHeight,
-									GFUI_VERT_SCROLLBAR, 
+									GFUI_VERT_SCROLLBAR, GFUI_SB_LEFT, 
 									0, 10, 10, 10, (void *)(object->id), gfuiScroll);
 			break;
 		case GFUI_SB_NONE:

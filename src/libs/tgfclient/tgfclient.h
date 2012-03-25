@@ -112,6 +112,11 @@ TGFCLIENT_API tScreenSize* GfScrGetDefaultSizes(int* pnSizes);
 #define GFUI_ALIGN_HC  0x01
 #define GFUI_ALIGN_HR  0x02
 
+/* Mirror symetry */
+#define GFUI_MIRROR_NONE  0x00 // No symetry (as is)
+#define GFUI_MIRROR_HORI  0x01 // Vertical symetry
+#define GFUI_MIRROR_VERT  0x02 // Horizontal symetry
+
 // No more used for the moment (but keep it).
 // #define GFUI_ALIGN_VMASK  0x30
 // #define GFUI_ALIGN_VB  0x00
@@ -443,7 +448,8 @@ TGFCLIENT_API int GfuiButtonStateCreate(void* scr, const char* text, int font, i
 										void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 TGFCLIENT_API int GfuiGrButtonCreate(void* scr, const char* disabled, const char* enabled,
 									 const char* focused, const char* pushed,
-									 int x, int y, int width, int height, int mouse, bool padding,
+									 int x, int y, int width, int height,
+									 int mirror, bool padding, int mouse,
 									 void* userDataOnPush, tfuiCallback onPush, 
 									 void* userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost);
 
@@ -524,7 +530,8 @@ TGFCLIENT_API void GfuiScrollListSetColors(void* scr, int id, const GfuiColor& c
 /* Scroll bars */
 TGFCLIENT_API int GfuiScrollBarCreate(void* scr, int x, int y,
 									  int length, int thickness, int butLength,
-									  int orientation, int min, int max, int len, int start, 
+									  int orientation, int position,
+									  int min, int max, int len, int start, 
 									  void* userData, tfuiSBCallback onScroll);
 TGFCLIENT_API void GfuiScrollBarPosSet(void* scr, int id, int min, int max, int len, int start);
 TGFCLIENT_API int GfuiScrollBarPosGet(void* scr, int id);

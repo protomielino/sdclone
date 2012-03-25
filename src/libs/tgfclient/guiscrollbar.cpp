@@ -91,6 +91,11 @@ gfuiScrollMinus(void *idv)
     @param	orientation	Scroll bar orientation:
 				<br>GFUI_HORI_SCROLLBAR	Horizontal
 				<br>GFUI_VERT_SCROLLBAR	Vertical
+    @param	position	Scroll bar  position
+				<br>GFUI_SB_RIGHT	Right
+				<br>GFUI_SB_LEFT	Left
+				<br>GFUI_SB_TOP	    Top
+				<br>GFUI_SB_BOTTOM	Bottom
     @param	min	Minimum value for the "current position"
     @param	max	Maximum value for the "current position"
     @param	visLen	Visible length (as of "position")
@@ -102,7 +107,7 @@ gfuiScrollMinus(void *idv)
  */
 int
 GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butLength,
-					int orientation, int min, int max, int visLen, int start, 
+					int orientation, int position, int min, int max, int visLen, int start, 
 					void *userData, tfuiSBCallback onScroll)
 {
     tGfuiScreen* screen = (tGfuiScreen*)scr;
@@ -121,32 +126,40 @@ GfuiScrollBarCreate(void *scr, int x, int y, int length, int thickness, int butL
     switch (orientation) {
 		case GFUI_HORI_SCROLLBAR:
 		{
+			const int butMirror =
+				(position == GFUI_SB_BOTTOM) ? GFUI_MIRROR_HORI : GFUI_MIRROR_NONE;
 			const int arrowButId =
 				GfuiGrButtonCreate(scr, "data/img/arrow-left.png", "data/img/arrow-left.png",
 								   "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
-								   x, y, butLength, thickness, 1, false,
+								   x, y, butLength, thickness,
+								   butMirror, false, 1,
 								   (void*)(object->id), gfuiScrollMinus,
 								   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 			const tGfuiGrButton* pArrowBut = &(gfuiGetObject(scr, arrowButId)->u.grbutton);
 			GfuiGrButtonCreate(scr, "data/img/arrow-right.png", "data/img/arrow-right.png",
 							   "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
-							   x + length - pArrowBut->width, y, butLength, thickness, 1, false,
+							   x + length - pArrowBut->width, y, butLength, thickness,
+							   butMirror, false, 1,
 							   (void*)(object->id), gfuiScrollPlus,
 							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
 			break;
 		}
 		case GFUI_VERT_SCROLLBAR:
 		{
+			const int butMirror =
+				(position == GFUI_SB_LEFT) ? GFUI_MIRROR_VERT : GFUI_MIRROR_NONE;
 			const int arrowButId =
 				GfuiGrButtonCreate(scr, "data/img/arrow-down.png", "data/img/arrow-down.png",
 								   "data/img/arrow-down-focused.png", "data/img/arrow-down-pushed.png",
-								   x, y, thickness, butLength, 1, false,
+								   x, y, thickness, butLength,
+								   butMirror, false, 1,
 								   (void*)(object->id), gfuiScrollPlus,
 								   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);	    
 			const tGfuiGrButton* pArrowBut = &(gfuiGetObject(scr, arrowButId)->u.grbutton);
 			GfuiGrButtonCreate(scr, "data/img/arrow-up.png", "data/img/arrow-up.png",
 							   "data/img/arrow-up-focused.png", "data/img/arrow-up-pushed.png",
-							   x, y + length - pArrowBut->height, thickness, butLength, 1, false,
+							   x, y + length - pArrowBut->height, thickness, butLength,
+							   butMirror, false, 1,
 							   (void*)(object->id), gfuiScrollMinus,
 							   NULL, (tfuiCallback)NULL, (tfuiCallback)NULL);
 			break;

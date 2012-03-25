@@ -141,12 +141,13 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	gfuiGrButtonInit(&combobox->leftButton,
 					 "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
 					 "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
-					 x, y, arrowsWidth, arrowsHeight,
+					 x, y, arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE, 
 					 GFUI_MOUSE_UP,	 (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
 	gfuiGrButtonInit(&combobox->rightButton,
 					 "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
 					 "data/img/arrow-right-focused.png", "data/img/arrow-right-pushed.png",
-					 x + width - combobox->leftButton.width, y, arrowsWidth, arrowsHeight,
+					 x + width - combobox->leftButton.width, y,
+					 arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
 					 GFUI_MOUSE_UP, (void*)(object->id), gfuiRightArrow, 0, 0, 0);
 
 	// Compute total height (text or buttons)
