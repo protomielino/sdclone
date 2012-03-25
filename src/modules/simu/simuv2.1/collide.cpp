@@ -44,13 +44,18 @@ void SimCarCollideZ(tCar *car)
 				if (dotProd < CRASH_THRESHOLD) {
 					car->collision |= SEM_COLLISION_Z_CRASH;
 				}
-				car->collision |= SEM_COLLISION_Z;
+
+				if ((car->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
+				    int deltaDamage = (int)(wheel->trkPos.seg->surface->kDammage * fabs(dotProd) * simDammageFactor[car->carElt->_skillLevel]);
+					if (deltaDamage > 1)
+					{
+					  car->collision |= SEM_COLLISION_Z;
+					  car->dammage += deltaDamage;
+					}
+				}
 				car->DynGCg.vel.x -= normal.x * dotProd;
 				car->DynGCg.vel.y -= normal.y * dotProd;
 				car->DynGCg.vel.z -= normal.z * dotProd;
-				if ((car->carElt->_state & RM_CAR_STATE_FINISH) == 0) {
-					car->dammage += (int)(wheel->trkPos.seg->surface->kDammage * fabs(dotProd) * simDammageFactor[car->carElt->_skillLevel]);
-				}
 			}
 		}
 	}
