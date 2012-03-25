@@ -96,7 +96,7 @@ bool  TDriver::AdvancedParameters = false;         // Advanced parameters
 bool  TDriver::UseOldSkilling = false;             // Use old skilling
 bool  TDriver::UseSCSkilling = false;              // Use supercar skilling
 bool  TDriver::UseMPA1Skilling = false;            // Use mpa1 car skilling
-float TDriver::SkillingFactor = 0.1;               // Skilling factor for career-mode
+float TDriver::SkillingFactor = 0.1f;              // Skilling factor for career-mode
 bool  TDriver::UseBrakeLimit = false;              // Use brake limit
 bool  TDriver::UseGPBrakeLimit = false;            // Use brake limit GP36
 float TDriver::BrakeLimit = -6;                    // Brake limit
@@ -2948,7 +2948,7 @@ void TDriver::EvaluateCollisionFlags(
 	  ((OppInfo.CatchTime < ColTime) && OppInfo.GotFlags(F_COLLIDE))
 	  || ((OppInfo.CatchTime < CatTime) && OppInfo.GotFlags(F_CATCHING))
 	  || ((OppInfo.CatchAccTime < CacTime) && OppInfo.GotFlags(F_CATCHING_ACC))
-	  || ((OppCar->CatchSpeed < 0.9 * oTargetSpeed) && (OppInfo.State.RelPos < 30));
+	  || ((OppInfo.CatchSpeed < 0.9 * oTargetSpeed) && (OppInfo.State.RelPos < 30));
 
 	if (!IgnoreTeamMate &&
 	  (OppInfo.AvoidLatchTime > 0 
