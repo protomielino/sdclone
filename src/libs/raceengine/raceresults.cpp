@@ -38,7 +38,8 @@
 #include "raceresults.h"
 
 
-static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
+//TODO: is it still necessary?
+//static const char *aSessionTypeNames[3] = {"Practice", "Qualifications", "Race"};
 
 static char buf[1024];
 static char path[1024];
@@ -459,7 +460,7 @@ ReInitCurRes()
 			static const char* pszTableHeader = "Rank    Time     Driver               Car";
 			char pszTitle[128];
 			snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
-					 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+					 ReInfo->_reRaceName, ReInfo->track->name);
 			char pszSubTitle[128];
 			snprintf(pszSubTitle, sizeof(pszSubTitle), "%s (%s)",
 					 ReInfo->s->cars[0]->_name, ReInfo->s->cars[0]->_carName);
@@ -531,7 +532,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 
 		char pszTitle[128];
 		snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
-				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+				 race, ReInfo->track->name);
 		if (ReInfo->s->_raceType == RM_TYPE_PRACTICE || car->_laps < 1 || car->_laps > ReInfo->s->_totLaps)
 			snprintf(buf, sizeof(buf), "%s (%s)", car->_name, carName);
 		else
@@ -578,7 +579,7 @@ ReUpdateQualifCurRes(tCarElt *car)
 
 		char pszTitle[128];
 		snprintf(pszTitle, sizeof(pszTitle), "%s at %s", 
-				 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+				 race, ReInfo->track->name);
 		if (ReInfo->s->_totTime > ReInfo->s->currentTime)
 		{
 			time_left = ReInfo->s->_totTime - ReInfo->s->currentTime;
@@ -639,7 +640,7 @@ ReUpdateRaceCurRes()
 
 	char pszTitle[128];
 	snprintf(pszTitle, sizeof(pszTitle), "%s at %s",
-			 aSessionTypeNames[ReInfo->s->_raceType], ReInfo->track->name);
+			 ReInfo->_reRaceName, ReInfo->track->name);
 
     if (ReInfo->s->_totTime > ReInfo->s->currentTime)
     {

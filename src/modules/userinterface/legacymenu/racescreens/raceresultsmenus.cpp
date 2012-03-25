@@ -99,7 +99,7 @@ rmPracticeResults(void *prevHdle, tRmInfo *info, int start)
     GfuiMenuCreateStaticControls(rmScrHdle, hmenu);
 
     // Create variable title labels.
-    snprintf(buf, sizeof(buf), "Practice at %s", info->track->name);
+    snprintf(buf, sizeof(buf), "%s at %s", race, info->track->name);
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
     GfuiLabelSetText(rmScrHdle, titleId, buf);
  
@@ -390,7 +390,7 @@ rmQualifResults(void *prevHdle, tRmInfo *info, const char* pszTitle, int start)
 
     // Create variable title label.
     const int titleId = GfuiMenuCreateLabelControl(rmScrHdle, hmenu, "Title");
-    snprintf(buf, sizeof(buf), "%s at %s", pszTitle, info->track->name);
+    snprintf(buf, sizeof(buf), "%s at %s", race, info->track->name);
     GfuiLabelSetText(rmScrHdle, titleId, buf);
 
 	// Get layout properties.
