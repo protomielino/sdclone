@@ -2947,8 +2947,8 @@ void TDriver::EvaluateCollisionFlags(
 	bool Catching =
 	  ((OppInfo.CatchTime < ColTime) && OppInfo.GotFlags(F_COLLIDE))
 	  || ((OppInfo.CatchTime < CatTime) && OppInfo.GotFlags(F_CATCHING))
-	  || ((OppInfo.CatchAccTime < CacTime) 
-	     && OppInfo.GotFlags(F_CATCHING_ACC));
+	  || ((OppInfo.CatchAccTime < CacTime) && OppInfo.GotFlags(F_CATCHING_ACC))
+	  || ((OppCar->CatchSpeed < 0.9 * oTargetSpeed) && (OppInfo.State.RelPos < 30));
 
 	if (!IgnoreTeamMate &&
 	  (OppInfo.AvoidLatchTime > 0 
@@ -2965,10 +2965,10 @@ void TDriver::EvaluateCollisionFlags(
 	  bool AvoidR = OppInfo.State.CarDistLat > 0 && SpaceL;
 
 	  if (Catching)
-	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
-//	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 1.0 : 0.5;
+//	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 0.5 : 0.1;
+	    OppInfo.AvoidLatchTime = fabs(Crv) < MaxSpdCrv ? 2.0 : 1.0;
 
-	  if ((fabs(Crv) < MaxSpdCrv) || OppInfo.GotFlags(F_DANGEROUS) || (oCurrSpeed < 0.7 * oTargetSpeed))
+	  if (fabs(Crv) < MaxSpdCrv)
 	  {
 	    if (!AvoidL && !AvoidR)
 		{
@@ -2982,7 +2982,8 @@ void TDriver::EvaluateCollisionFlags(
 		Coll.OppsAhead |= F_LEFT;
 		Coll.MinLDist = MIN(OppInfo.State.CarAvgVelLong, Coll.MinLDist);
 	  }
-	  else if (AvoidR)
+
+	  if (AvoidR)
 	  {
 		Coll.OppsAhead |= F_RIGHT;
 		Coll.MinRDist = MIN(OppInfo.State.CarAvgVelLong, Coll.MinRDist);
