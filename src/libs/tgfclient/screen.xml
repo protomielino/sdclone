@@ -124,10 +124,10 @@
       </section>
 
       <section name="disabled button">
-        <attnum name="red" val="0.3"/>
-        <attnum name="green" val="0.3"/>
-        <attnum name="blue" val="1.0"/>
-        <attnum name="alpha" val="0.5"/>
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="0.33"/>
       </section>
 
        <section name="label">
@@ -208,10 +208,10 @@
       </section>
 
       <section name="disabled editbox">
-        <attnum name="red" val="0.3"/>
-        <attnum name="green" val="0.3"/>
-        <attnum name="blue" val="1.0"/>
-        <attnum name="alpha" val="0.5"/>
+        <attnum name="red" val="1"/>
+        <attnum name="green" val="1"/>
+        <attnum name="blue" val="1"/>
+        <attnum name="alpha" val="0.33"/>
       </section>
 
       <section name="editbox cursor color">
