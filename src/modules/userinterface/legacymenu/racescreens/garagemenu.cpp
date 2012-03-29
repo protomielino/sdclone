@@ -349,8 +349,7 @@ void RmGarageMenu::resetCarPreviewImage(const GfDriverSkin& selSkin)
 
 	// Load the preview image.
 	if (GfFileExists(selSkin.getCarPreviewFileName().c_str()))
-		GfuiStaticImageSet(getMenuHandle(), nCarImageId, selSkin.getCarPreviewFileName().c_str(),
-						   /* index= */ 0, /* canDeform= */false);
+		GfuiStaticImageSet(getMenuHandle(), nCarImageId, selSkin.getCarPreviewFileName().c_str());
 	else
 		GfuiStaticImageSet(getMenuHandle(), nCarImageId, "data/img/nocarpreview.png");
 }

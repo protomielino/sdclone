@@ -539,9 +539,9 @@ TGFCLIENT_API int GfuiScrollBarPosGet(void* scr, int id);
 /* Images */
 TGFCLIENT_API int GfuiStaticImageCreate(void* scr, int x, int y, int w, int h, const char* name,
 										bool canDeform = true);
-TGFCLIENT_API void GfuiStaticImageSet(void* scr, int id, const char* name,
-									  unsigned index = 0, bool canDeform = true);
+TGFCLIENT_API void GfuiStaticImageSet(void* scr, int id, const char* name, unsigned index = 0);
 TGFCLIENT_API void GfuiStaticImageSetActive(void* scr, int id, int index);
+TGFCLIENT_API void GfuiStaticImageSetDeformable(void *scr, int id, bool canDeform = true);
 
 /*****************************
  * Menu Management Interface *

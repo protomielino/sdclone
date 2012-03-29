@@ -271,9 +271,7 @@ rmdsChangeSkin(void *vp)
 
 	// Load associated preview image (or "no preview" panel if none available).
 	if (GfFileExists(curSkin.getCarPreviewFileName().c_str()))
-		GfuiStaticImageSet(ScrHandle, CarImageId,
-						   curSkin.getCarPreviewFileName().c_str(),
-						   /* index= */ 0, /* canDeform= */false);
+		GfuiStaticImageSet(ScrHandle, CarImageId, curSkin.getCarPreviewFileName().c_str());
 	else
 		GfuiStaticImageSet(ScrHandle, CarImageId, "data/img/nocarpreview.png");
 

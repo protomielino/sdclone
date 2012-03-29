@@ -249,7 +249,7 @@ createStaticImage(void* hscr, void* hparm, const char* pszName)
 		sprintf(pszImageFieldName, GFMNU_ATTR_IMAGE" %d", i);
 		const char* pszFileName = GfParmGetStr(hparm, pszName, pszImageFieldName, 0);
 		if (pszFileName)
-			GfuiStaticImageSet(hscr, id, pszFileName, i, canDeform);
+			GfuiStaticImageSet(hscr, id, pszFileName, i);
 		else
 			break; // Assumes an indexed image list, with no hole inside.
 	}

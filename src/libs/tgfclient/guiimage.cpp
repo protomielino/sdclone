@@ -87,13 +87,13 @@ int GfuiStaticImageCreate(void *scr, int x, int y, int w, int h, const char *nam
 
 /** Replace an image by another one (source image doesn't need to be a square or of POT sizes).
     @ingroup	gui
-    @param	scr	Screen where tthe image is displayed
+    @param	scr	Screen where the image is displayed
     @param	id	Image Id
     @param	name	Filename of the source image (PNG or JPEG)
     @param	index	Target index for the texture (defaults to 0)
     @return	none
 */
-void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index, bool canDeform)
+void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index)
 {
 	int pow2Width, pow2Height;
 	tGfuiObject *curObject;
@@ -101,14 +101,13 @@ void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index, boo
 	tGfuiImage *image;
 
 	curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id) {
 				if (curObject->widget == GFUI_IMAGE) {
 					image = &(curObject->u.image);
 					GfTexFreeTexture(image->texture[index]);
-					image->canDeform = canDeform;
 					// We don't use returned POT width and height, but passing non NULL pointers
 					// for them enforces POT sizes for the loaded texture.
 					image->texture[index] =
@@ -121,6 +120,13 @@ void GfuiStaticImageSet(void *scr, int id, const char *name, unsigned index, boo
 	}
 }
 
+/** Set active image by its index.
+    @ingroup	gui
+    @param	scr	Screen where the image is displayed
+    @param	id	Image Id
+    @param	index	Target image index
+    @return	none
+*/
 void GfuiStaticImageSetActive(void *scr, int id, int index)
 {
 	tGfuiObject *curObject;
@@ -128,13 +134,41 @@ void GfuiStaticImageSetActive(void *scr, int id, int index)
 	tGfuiImage *image;
 
 	curObject = screen->objects;
-	if (curObject != NULL) {
+	if (curObject) {
 		do {
 			curObject = curObject->next;
 			if (curObject->id == id) {
 				if (curObject->widget == GFUI_IMAGE) {
 					image = &(curObject->u.image);
 					image->activeimage = index;
+				}
+			return;
+			}
+		} while (curObject != screen->objects);
+	}
+}
+
+/** Set "can deform" property.
+    @ingroup	gui
+    @param	scr	Screen where the image is displayed
+    @param	id	Image Id
+    @param	canDeform	Target value
+    @return	none
+*/
+void GfuiStaticImageSetDeformable(void *scr, int id, bool canDeform)
+{
+	tGfuiObject *curObject;
+	tGfuiScreen *screen = (tGfuiScreen*)scr;
+	tGfuiImage *image;
+
+	curObject = screen->objects;
+	if (curObject) {
+		do {
+			curObject = curObject->next;
+			if (curObject->id == id) {
+				if (curObject->widget == GFUI_IMAGE) {
+					image = &(curObject->u.image);
+					image->canDeform = canDeform;
 				}
 			return;
 			}
