@@ -55,6 +55,7 @@ static tRmDriverSelect* MenuData;
 static int		CompetitorsScrollListId, CandidatesScrollListId;
 static int		SelectButtonId, DeselectButtonId;
 static int		RemoveAllButtonId, SelectRandomButtonId, ShuffleButtonId;
+static int		MoveUpButtonId, MoveDownButtonId;
 static int		CarCategoryEditId;
 static int		DriverTypeEditId;
 static int		SkinEditId;
@@ -158,19 +159,25 @@ rmdsReloadCompetitorsScrollList()
 		GfuiScrollListInsertElement(ScrHandle, CompetitorsScrollListId, (*itComp)->getName().c_str(),
 									MenuData->pRace->getCompetitorsCount(), (void*)(*itComp));
 
-	// Be carefull with max nb of competitors.	
+	// Disable selection when max nb of competitors reached or no more candidates.	
+	const bool bAcceptsMore = MenuData->pRace->acceptsMoreCompetitors();
+	const int nCandidates =
+		GfuiScrollListGetNumberOfElements(ScrHandle, CandidatesScrollListId);
 	GfuiEnable(ScrHandle, SelectButtonId,
-			   MenuData->pRace->acceptsMoreCompetitors() ? GFUI_ENABLE : GFUI_DISABLE);
+			   nCandidates > 0 && bAcceptsMore ? GFUI_ENABLE : GFUI_DISABLE);
+	GfuiEnable(ScrHandle, SelectRandomButtonId,
+			   nCandidates > 0 && bAcceptsMore ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
 // Screen activation call-back.
 static void
-rmdsActivate(void * /* notused */)
+rmdsActivate(void * /* not used */)
 {
 	GfLogTrace("Entering Driver Select menu\n");
 
 	// Update GUI : current driver info, car preview.
 	rmdsHighlightDriver(PCurrentDriver);
+	rmdsClickOnDriver(0);
 	
     // Initialize the driver type filter criteria to "any driver" if possible.
 	// or else the first available type.
@@ -332,6 +339,15 @@ rmdsMoveCompetitor(void *vd)
 
 		// Move the competitor in the race.
 		MenuData->pRace->moveCompetitor(PCurrentDriver, (int)(long)vd);
+
+		// Disable moveUp/Down according to the position of the selected competitor.
+		const unsigned nCompetitors = MenuData->pRace->getCompetitorsCount();
+		const int nSelCompInd =
+			GfuiScrollListGetSelectedElementIndex(ScrHandle, CompetitorsScrollListId);
+		GfuiEnable(ScrHandle, MoveUpButtonId,
+				   nSelCompInd > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+		GfuiEnable(ScrHandle, MoveDownButtonId,
+				   nSelCompInd < (int)nCompetitors -1 ? GFUI_ENABLE : GFUI_DISABLE);
 	}
 }
 
@@ -413,6 +429,31 @@ rmdsClickOnDriver(void * /* dummy */)
 		// Update driver skin and show it in the GUI.
 		rmdsChangeSkin(0);
     }
+	
+	// Disable random selection if max competitors reached or no more candidates.
+	const bool bAcceptsMore = MenuData->pRace->acceptsMoreCompetitors();
+	const int nCandidates =
+		GfuiScrollListGetNumberOfElements(ScrHandle, CandidatesScrollListId);
+	GfuiEnable(ScrHandle, SelectRandomButtonId,
+			   nCandidates > 0 && bAcceptsMore ? GFUI_ENABLE : GFUI_DISABLE);
+
+	// Disable removeAll if no more competitors.
+	const unsigned nCompetitors = MenuData->pRace->getCompetitorsCount();
+	GfuiEnable(ScrHandle, RemoveAllButtonId, nCompetitors > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+
+	// Disable shuffle if at most 1 competitor
+	GfuiEnable(ScrHandle, ShuffleButtonId, nCompetitors > 1 ? GFUI_ENABLE : GFUI_DISABLE);
+
+	// Disable moveUp/Down according to the position of the selected competitor.
+	const int nSelCompInd =
+		GfuiScrollListGetSelectedElementIndex(ScrHandle, CompetitorsScrollListId);
+	GfuiEnable(ScrHandle, MoveUpButtonId,
+			   nSelCompInd > 0 ? GFUI_ENABLE : GFUI_DISABLE);
+	GfuiEnable(ScrHandle, MoveDownButtonId,
+			   nSelCompInd >= 0 && nSelCompInd < (int)nCompetitors - 1 ? GFUI_ENABLE : GFUI_DISABLE);
+
+    // Don't allow user to Accept 0 drivers, this would cause a crash.
+    GfuiEnable(ScrHandle, NextButtonId, nCompetitors > 0 ? GFUI_ENABLE : GFUI_DISABLE);
 }
 
 static void
@@ -457,7 +498,7 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 				}
 			}
 
-			MenuData->pRace->appendCompetitor(pDriver); // Now selected.
+			MenuData->pRace->appendCompetitor(pDriver); // => Now selected.
 		}
     }
 
@@ -486,7 +527,14 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 			GfuiScrollListInsertElement(ScrHandle, dst, name,
 										pDriver->isHuman() ? 0 : GfDrivers::self()->getCount(), (void*)pDriver);
 		}
-		MenuData->pRace->removeCompetitor(pDriver); // No more selected.
+		MenuData->pRace->removeCompetitor(pDriver); // => No more selected.
+
+		// If no more competitor, select the 1st candidate if any.
+		if (MenuData->pRace->getCompetitorsCount() == 0)
+		{
+			GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, 0);
+			(void)GfuiScrollListGetSelectedElement(ScrHandle, CandidatesScrollListId, (void**)&pDriver);
+		}
     }
 
     // Focused driver management (inhibited for the moment : what is it useful for ?)
@@ -515,7 +563,7 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
     }
 	else
 	{
-		if (!pFocDriver || pDriver->isHuman())
+		if (pDriver && (!pFocDriver || pDriver->isHuman()))
 		{
 			MenuData->pRace->setFocusedCompetitor(pDriver);
 #ifdef FOCUS
@@ -526,10 +574,6 @@ rmdsSelectDeselectDriver(void * /* dummy */ )
 
     // Update selected driver displayed info.
     rmdsClickOnDriver(0);
-
-    // Don't allow user to Accept 0 drivers, this would cause a crash.
-    GfuiEnable(ScrHandle, NextButtonId,
-			   MenuData->pRace->getCompetitorsCount() > 0 ? GFUI_ENABLE : GFUI_DISABLE);
 
 	// For a smart display refresh, when automatically called multiple time.
     GfuiDisplay();
@@ -648,8 +692,10 @@ RmDriversSelect(void *vs)
     DriverTypeEditId = GfuiMenuCreateLabelControl(ScrHandle, menuDescHdle, "drivertypetext");
 
     // Scroll-lists manipulation buttons
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", (void*)-1, rmdsMoveCompetitor);
-    GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", (void*)1, rmdsMoveCompetitor);
+	MoveUpButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "moveupbutton", (void*)-1, rmdsMoveCompetitor);
+	MoveDownButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "movedownbutton", (void*)1, rmdsMoveCompetitor);
 	
     SelectButtonId =
 		GfuiMenuCreateButtonControl(ScrHandle, menuDescHdle, "selectbutton", 0, rmdsSelectDeselectDriver);
@@ -781,7 +827,7 @@ RmDriversSelect(void *vs)
 static void
 rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string& strType)
 {
-	// Empty the unselected scroll-list
+	// Empty the candidates scroll-list
     GfuiScrollListClear(ScrHandle, CandidatesScrollListId);
 
     // Fill it with drivers that match the filter criteria,
@@ -826,7 +872,19 @@ rmdsFilterCandidatesScrollList(const std::string& strCarCatId, const std::string
 										(void*)(*itCandidate));
     }
 
-			   
     // Show first element of the list if any.
     GfuiScrollListShowElement(ScrHandle, CandidatesScrollListId, 0);
+
+	// Select it if the Competitors scroll list has no element selected.
+	if (GfuiScrollListGetSelectedElementIndex(ScrHandle, CompetitorsScrollListId) < 0)
+		GfuiScrollListSetSelectedElement(ScrHandle, CandidatesScrollListId, 0);
+
+	// Disable selection if max nb of competitors reached or no more candidates.
+	const int nCandidates =
+		GfuiScrollListGetNumberOfElements(ScrHandle, CandidatesScrollListId);
+	const bool bAcceptsMore = MenuData->pRace->acceptsMoreCompetitors();
+	GfuiEnable(ScrHandle, SelectButtonId,
+			   nCandidates > 0 && bAcceptsMore ? GFUI_ENABLE : GFUI_DISABLE);
+	GfuiEnable(ScrHandle, SelectRandomButtonId,
+			   nCandidates > 0 && bAcceptsMore ? GFUI_ENABLE : GFUI_DISABLE);
 }
