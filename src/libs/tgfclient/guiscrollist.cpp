@@ -303,6 +303,28 @@ GfuiScrollListClearSelection(void *scr, int id)
     @ingroup	gui
     @param	scr		Current screen
     @param	id		Scroll list Id
+    @return	Index of the retrieved element
+	<br>-1 if none selected
+*/
+int
+GfuiScrollListGetSelectedElementIndex(void *scr, int id)
+{
+    tGfuiObject* object = gfuiGetObject(scr, id);
+    if (!object || object->widget != GFUI_SCROLLIST)
+		return -1;
+	
+	tGfuiScrollList* scrollist = &(object->u.scrollist);
+
+    if (scrollist->elts == NULL)
+		return -1;
+
+    return scrollist->selectedElt;
+}
+
+/** Get the selected element from the scroll list.
+    @ingroup	gui
+    @param	scr		Current screen
+    @param	id		Scroll list Id
     @param	userData	address of the userData of the element to retrieve
     @return	Name of the retrieved element
 	<br>NULL if Error

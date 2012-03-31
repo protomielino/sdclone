@@ -519,6 +519,7 @@ TGFCLIENT_API int GfuiScrollListMoveSelectedElement(void* scr, int Id, int delta
 TGFCLIENT_API const char* GfuiScrollListExtractSelectedElement(void* scr, int Id, void** userData);
 TGFCLIENT_API const char* GfuiScrollListExtractElement(void* scr, int Id, int index, void** userData);
 TGFCLIENT_API void GfuiScrollListClear(void* scr, int Id);
+TGFCLIENT_API int GfuiScrollListGetSelectedElementIndex(void *scr, int id);
 TGFCLIENT_API const char* GfuiScrollListGetSelectedElement(void* scr, int Id, void** userData);
 TGFCLIENT_API bool GfuiScrollListSetSelectedElement(void* scr, int Id, unsigned int selectElement);
 TGFCLIENT_API bool GfuiScrollListClearSelection(void* scr, int Id);
