@@ -3368,7 +3368,8 @@ float Driver::filterBPit(float brake)
         pit->setPitstop(false);
         return 0.0f;
       } else {
-        if (brakedist(0.0f, mu) > dist) {
+//        if (brakedist(0.0f, mu) > dist) {
+        if (brakedist(0.0f, 0.5f*mu) > dist) {
           return 2.0f;
         } else if (s > pit->getNPitLoc(pitpos)) {
           // Stop in the pit.
