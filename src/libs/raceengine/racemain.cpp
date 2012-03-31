@@ -824,7 +824,8 @@ ReRaceStart(void)
 		// non-timed Qualification or Practice session => 1 driver at a time = the "current" one.
 		int nCurrDrvInd =
 			(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
-		if (nCurrDrvInd == -1) return RM_ERROR;
+		if (nCurrDrvInd == -1)
+			return RM_ERROR;
 		if (nCurrDrvInd == 1)
 			ReUI().addLoadingMessage("Preparing Starting Grid ...");
 
@@ -853,9 +854,11 @@ ReRaceStart(void)
 		int currDriver = -1;
 		int aCars = 0;
 		
-		for (int i = 1; i < nCars + 1; i++) {
+		for (int i = 1; i < nCars + 1; i++)
+		{
 			currDriver = ReStartingOrderIdx[i-1];
-			if (currDriver == -1) continue;
+			if (currDriver == -1)
+				continue;
 			aCars++;
 			snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, currDriver);
 			snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, i);
@@ -867,13 +870,14 @@ ReRaceStart(void)
 						 GfParmGetNum(params, path, RM_ATTR_EXTENDED, NULL, 0));
 			GfParmSetNum(params, path2, RM_ATTR_SKINTARGETS, NULL,
 						 GfParmGetNum(params, path, RM_ATTR_SKINTARGETS, NULL, 0));
-			if (GfParmGetStr(results, path, RM_ATTR_SKINNAME, 0))
+			if (GfParmGetStr(params, path, RM_ATTR_SKINNAME, 0))
 				GfParmSetStr(params, path2, RM_ATTR_SKINNAME,
 							 GfParmGetStr(params, path, RM_ATTR_SKINNAME, ""));
 		}
 		
 		//no valid drivers present in the list
-		if (aCars == 0) {
+		if (aCars == 0)
+		{
 			GfLogError("No competitor in this race : cancelled.\n");
 			mode = RM_ERROR;
 		}
