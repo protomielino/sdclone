@@ -596,9 +596,10 @@ GfTrack* GfRaceManager::getPreviousEventTrack(unsigned nEventIndex)
 		if (nEventIndex >= _vecEventTrackIds.size())
 			nEventIndex = _vecEventTrackIds.size() - 1;
 
-		if (nEventIndex >= 1)
-			pTrack =
-				GfTracks::self()->getTrack(_vecEventTrackIds[nEventIndex - 1]);
+		const unsigned nPrevEventIndex = // Beware: Previous of 1st = last.
+			(nEventIndex > 0) ? nEventIndex - 1 : _vecEventTrackIds.size() - 1;
+
+		pTrack = GfTracks::self()->getTrack(_vecEventTrackIds[nPrevEventIndex]);
 	}
 		   
 	return pTrack;
