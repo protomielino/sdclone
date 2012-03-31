@@ -60,6 +60,7 @@ class LRaceLine;
 #define KILO_SECT_SKILL     "skill"
 #define KILO_SKILL_LEVEL    "level"
 #define KILO_SKILL_AGGRO    "aggression"
+#define KILO_FORCE_PITSTOP  "force pit"
 
 
 enum { NORMAL = 1, AVOIDING, CORRECTING, PITTING, BEING_OVERLAPPED };
@@ -232,6 +233,9 @@ class KDriver {
   double OVERTAKE_OFFSET_INC;    // [m/timestep]
   double MU_FACTOR;          // [-]
   double (KDriver::*GET_DRIVEN_WHEEL_SPEED)();
+
+  // DEBUG
+  bool forcePitStop;
 
   // Class constants.
   static const double MAX_UNSTUCK_ANGLE;

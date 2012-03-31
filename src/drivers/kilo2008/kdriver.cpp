@@ -131,6 +131,8 @@ static int current_light = RM_LIGHT_HEAD1 | RM_LIGHT_HEAD2;
 KDriver::KDriver(int index)
   : mode_(NORMAL) {
   INDEX = index;
+  forcePitStop = false;
+
 }
 
 
@@ -716,6 +718,8 @@ void KDriver::initTrack(tTrack * t, void *carHandle,
                             KILO_ATT_PITOFFSET, NULL, 10.0);
   brake_delay_ = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
                             KILO_ATT_BRDELAY, NULL, 10.0);
+  forcePitStop = GfParmGetNum(*carParmHandle, KILO_SECT_PRIV,
+                            KILO_FORCE_PITSTOP, NULL, 0) == 1;
 
   // Create a pit stop strategy object & initialize fuel.
   strategy_ = new KStrategy();
@@ -774,7 +778,7 @@ void KDriver::CheckPitStatus(tSituation *s) {
       if ((car_->_distFromStartLine < pit_->n_entry()
                 || car_->_distFromStartLine > pit_->n_end())
                 || car_->_fuel < 5.0) {
-          pit_->set_pitstop(strategy_->NeedPitstop());
+          pit_->set_pitstop(strategy_->NeedPitstop() || forcePitStop);
       }
     }  // if no pit planned
 
@@ -823,6 +827,7 @@ double KDriver::FilterBColl(const double brake) {
     double mu = car_->_trkPos.seg->surface->kFriction;
     Opponent *o = opponents_->GetOppByState(OPP_COLL);
     if (o != NULL) {  // Endangered species nearby
+//      if (BrakeDist(o->speed(), mu)
       if (BrakeDist(o->speed(), mu)
           + MIN(1.0, 0.5 + MAX(0.0, (speed() - o->speed()) / 4.0))
           > o->distance()) {  // Damn, too close, brake hard!!!
@@ -1256,7 +1261,8 @@ double KDriver::FilterBPit(double brake) {
     tdble dl, dw;
     RtDistToPit(car_, track_, &dl, &dw);
     if (dl < PIT_BRAKE_AHEAD) {
-      if (BrakeDist(0.0, mu) > dl)
+//      if (BrakeDist(0.0, mu) > dl)
+      if (BrakeDist(0.0, 0.5f * mu) > dl)
         return 1.0;
     }
   }

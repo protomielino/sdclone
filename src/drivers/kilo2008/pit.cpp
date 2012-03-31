@@ -84,7 +84,8 @@ Pit::Pit(const tSituation * s, KDriver * driver, const double pitoffset) {
       points_[i].y *= sign;
     }  // for i
 
-    points_[3].y = fabs(pitinfo_->driversPits->pos.toMiddle + 1.0) * sign;
+//    points_[3].y = fabs(pitinfo_->driversPits->pos.toMiddle + 1.0) * sign;
+    points_[3].y = fabs(pitinfo_->driversPits->pos.toMiddle + 2.0) * sign;
     spline_ = new Spline(NPOINTS, points_);
   }  // if pit not null
 }  // Pit::Pit
