@@ -33,7 +33,7 @@
     </section>
 
     <section name="1">
-      <attnum name="ratio" min="0" max="5" val="2.76/>
+      <attnum name="ratio" min="0" max="5" val="2.76"/>
     </section>
 
     <section name="2">

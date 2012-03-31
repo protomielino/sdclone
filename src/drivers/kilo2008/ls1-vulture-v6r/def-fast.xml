@@ -5,7 +5,7 @@
 <!-- 
     file                 : viper-gts-r.xml
     created              : Sat Mar  3 18:46:37 CET 2001
-    copyright            : (C) 2001 by Eric Espié                         
+    copyright            : (C) 2001 by Eric Espie                         
     email                : Eric.Espie@torcs.org   
     version              : $Id$                                  
 -->
@@ -33,7 +33,7 @@
     </section>
 
     <section name="1">
-      <attnum name="ratio" min="0" max="5" val="2.76/>
+      <attnum name="ratio" min="0" max="5" val="2.76"/>
     </section>
 
     <section name="2">
