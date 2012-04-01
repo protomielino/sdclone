@@ -248,11 +248,12 @@ bool LegacyMenu::onRaceEventStarting(bool careerNonHumanGroup)
 
 void LegacyMenu::onRaceInitializing()
 {
-	// Activate the loading screen only if not a practice or qualification session,
-	// or else if we are loading the 1st competitor of the race.
+	// Activate the loading screen at the start of sessions,
+	// that is at race session and timed practice or qualifying sessions,
+	// and for the first car in non-timed practice or qualifying sessions.
 	tRmInfo* pReInfo = _piRaceEngine->inData();
 	if ((pReInfo->s->_raceType == RM_TYPE_QUALIF || pReInfo->s->_raceType == RM_TYPE_PRACTICE)
-		&& pReInfo->s->_totTime < 0.0f) // <= What's this time test for ?
+		&& pReInfo->s->_totTime < 0.0f)
 	{
 		if ((int)GfParmGetNum(pReInfo->results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, 0, 1) == 1)
 		{
@@ -299,6 +300,7 @@ void LegacyMenu::onRaceLoadingDrivers()
 		_hscrGame = ::RmResScreenInit();
 	
 	// If neither a qualification, nor a practice, or else 1st driver,
+	// that is the non-first driver in a race session,
 	// activate race loading screen.
 	if (!(_piRaceEngine->inData()->s->_raceType == RM_TYPE_QUALIF
 		  || _piRaceEngine->inData()->s->_raceType == RM_TYPE_PRACTICE)
