@@ -299,8 +299,7 @@ void LegacyMenu::onRaceLoadingDrivers()
 	else
 		_hscrGame = ::RmResScreenInit();
 	
-	// If neither a qualification, nor a practice, or else 1st driver,
-	// that is the non-first driver in a race session,
+	// If first driver (of a practice or qualifying) or race session,
 	// activate race loading screen.
 	if (!(_piRaceEngine->inData()->s->_raceType == RM_TYPE_QUALIF
 		  || _piRaceEngine->inData()->s->_raceType == RM_TYPE_PRACTICE)
