@@ -448,7 +448,17 @@ RePreRace(void)
 	snprintf(path, sizeof(path), "%s/%s/%s", ReInfo->track->name, RE_SECT_RESULTS, raceName);
 	GfParmListClean(results, path);
 
-// Drivers starting order
+	// Drivers starting order
+	// The starting order is decided here,
+	// then car indexes are stored in ReStartingOrderIdx, in the starting order.
+	// The actual grid is assembled in ReRaceStart().
+	// In case of a race, when all cars start at the same time,
+	// cars are simply added to the starting list in the order stored in ReStartingOrderIdx.
+	// If only one car is at the track at a time (not timed session qualifying or practice),
+	// the race is divided into many sub-races.
+	// For a sub-race, only the car pointed by results/RE_ATTR_CUR_DRIVER
+	// is added to the starting grid.
+	// RE_ATTR_CUR_DRIVER is refreshed after every sub-race in ReRaceEnd().
 	ReCurrDriverNr = 0;
 	int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
@@ -826,8 +836,6 @@ ReRaceStart(void)
 			(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
 		if (nCurrDrvInd == -1)
 			return RM_ERROR;
-		if (nCurrDrvInd == 1)
-			ReUI().addLoadingMessage("Preparing Starting Grid ...");
 
 		// Propagate competitor drivers info to the real race starting grid
 		snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, nCurrDrvInd);
@@ -847,6 +855,7 @@ ReRaceStart(void)
 	}
 	else
 	{
+		// For a race, add cars to the starting grid in the order stored in ReStartingOrderIdx.
 		ReUI().addLoadingMessage("Preparing Starting Grid ...");
 		
 		int maxCars = (int)GfParmGetNum(params, sessionName, RM_ATTR_MAX_DRV, NULL, 100);
