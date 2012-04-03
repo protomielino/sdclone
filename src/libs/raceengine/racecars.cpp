@@ -110,13 +110,14 @@ reCarsAddPenalty(tCarElt *car, int penalty)
 	tCarPenalty *newPenalty;
 
 	if (penalty == RM_PENALTY_DRIVETHROUGH)
-		snprintf(msg, sizeof(msg), "%s Driver Through penalty", car->_name);
+		snprintf(msg, sizeof(msg), "%s Drive-Through penalty", car->_name);
 	else if (penalty == RM_PENALTY_STOPANDGO)
 		snprintf(msg, sizeof(msg), "%s Stop-and-Go penalty", car->_name);
 	else if (penalty == RM_PENALTY_10SEC_STOPANDGO)
 		snprintf(msg, sizeof(msg), "%s 10s Stop-and-Go penalty", car->_name);
 	else if (penalty == RM_PENALTY_DISQUALIFIED)
 		snprintf(msg, sizeof(msg), "%s disqualified", car->_name);
+	msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 
 	ReSituation::self().setRaceMessage(msg, 5);
 
@@ -204,6 +205,7 @@ reCarsApplyRaceRules(tCarElt *car)
 				*(car->ctrl.msg[3]) = 0;
 				break;
 		}
+		car->ctrl.msg[3][RM_CMD_MAX_MSG_SIZE - 1] = 0; // Some snprintf implementations fail to do so.
 		memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
     } else {
 		// No penalty => no message.
@@ -232,6 +234,7 @@ reCarsApplyRaceRules(tCarElt *car)
 				switch (penalty->penalty) {
 					case RM_PENALTY_DRIVETHROUGH:
 						snprintf(msg, sizeof(msg), "%s Drive-Through penalty clearing", car->_name);
+						msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 						ReSituation::self().setRaceMessage(msg, 5);
 						rules->ruleState |= RM_PNST_DRIVETHROUGH;
 						GfLogInfo("%s might get its Drive-Through penalty cleared.\n", car->_name);
@@ -239,6 +242,7 @@ reCarsApplyRaceRules(tCarElt *car)
 					case RM_PENALTY_STOPANDGO:
 					case RM_PENALTY_10SEC_STOPANDGO:
 						snprintf(msg, sizeof(msg), "%s Stop-and-Go penalty clearing", car->_name);
+						msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 						ReSituation::self().setRaceMessage(msg, 5);
 						rules->ruleState |= RM_PNST_STOPANDGO;
 						GfLogInfo("%s might get his Stop-and-Go Penalty cleared.\n", car->_name);
@@ -265,6 +269,7 @@ reCarsApplyRaceRules(tCarElt *car)
 			//     and everything went well in the clearing process til then.
 			if (rules->ruleState & (RM_PNST_DRIVETHROUGH | RM_PNST_STOPANDGO_OK)) {
 				snprintf(msg, sizeof(msg), "%s penalty cleared", car->_name);
+				msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 				ReSituation::self().setRaceMessage(msg, 5);
 				penalty = GF_TAILQ_FIRST(&(car->_penaltyList));
 				reCarsRemovePenalty(car, penalty);
@@ -313,7 +318,7 @@ reCarsApplyRaceRules(tCarElt *car)
 void
 ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 {
-	char msg[128];
+	char msg[64];
 	int i;
 	int xx;
 	tTrackSeg *sseg;
@@ -343,6 +348,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Can Pit");
 			else
 				snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Pit Occupied");
+			car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
 			memcpy(car->ctrl.msgColor, ctrlMsgColor, sizeof(car->ctrl.msgColor));
 		}
 
@@ -355,12 +361,14 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				if (car->_scheduledEventTime < s->currentTime) {
 					car->_state &= ~RM_CAR_STATE_PIT;
 					car->_pit->pitCarIndex = TR_PIT_STATE_FREE;
-					snprintf(msg, RM_CMD_MAX_MSG_SIZE, "%s pit stop %.1f s", car->_name, info->totalPitTime);
+					snprintf(msg, sizeof(msg), "%s pit stop %.1f s", car->_name, info->totalPitTime);
+					msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 					ReSituation::self().setRaceMessage(msg, 5);
 					GfLogInfo("%s exiting pit (%.1f s elapsed).\n", car->_name, info->totalPitTime);
 				} else {
 					snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "In pits %.1f s",
 							s->currentTime - info->startPitTime);
+					car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
 				}
 			}
 			
@@ -370,7 +378,8 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				   car->_pit->pitCarIndex == TR_PIT_STATE_FREE &&	
 				   (s->_maxDammage == 0 || car->_dammage <= s->_maxDammage)) {
 			snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Pit request");
-
+			car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
+ 
 			tdble lgFromStart = car->_trkPos.seg->lgfromstart;
 			
 			switch (car->_trkPos.seg->type) {
@@ -414,6 +423,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					}
 					info->startPitTime = s->currentTime;
 					snprintf(msg, sizeof(msg), "%s in pits", car->_name);
+					msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 					ReSituation::self().setRaceMessage(msg, 5);
 					GfLogInfo("%s entering in pit slot.\n", car->_name);
 					if (car->robot->rbPitCmd(car->robot->index, car, s) == ROB_PIT_MENU) {
@@ -439,6 +449,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					{
 						// The car's position across the track is out of accepted range 
 						snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Offset: %.02f",Offset);
+						car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
 						if (TeamDriver)
 						  TeamDriver->MoreOffset = Offset;
 					}
@@ -448,6 +459,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					{
 						// The car's speed is out of accepted range 
 						snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Speed: %.02f",TooFastBy);
+						car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
 						if (TeamDriver)
 						  TeamDriver->TooFastBy = TooFastBy;
 					}
@@ -468,6 +480,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				{
 				  float StillToGo = car->_pit->lmin - lgFromStart;
 				  snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Still to go: %0.2f m" ,StillToGo);
+				  car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
 				  if (TeamDriver)
 				    TeamDriver->StillToGo = StillToGo;
 				}
@@ -475,6 +488,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 				{
   				  float StillToGo = lgFromStart - car->_pit->lmax;
 				  snprintf(car->ctrl.msg[2], RM_CMD_MAX_MSG_SIZE, "Overrun: %0.2f m" ,StillToGo);
+				  car->ctrl.msg[2][RM_CMD_MAX_MSG_SIZE-1] = 0; // Some snprintf implementations fail to do so.
 				  if (TeamDriver)
 				    TeamDriver->StillToGo = -StillToGo;
 				}
@@ -621,6 +635,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 						if (ReInfo->s->_raceType == RM_TYPE_RACE) {
 							if (car->_pos == 1) {
 								snprintf(msg, sizeof(msg), "Winner %s", car->_name);
+								msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 								ReSituation::self().setRaceMessage(msg, 10, /*big=*/true);
 								if (NetGetServer())
 								{
@@ -644,6 +659,7 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 									}
 								}
 								snprintf(msg, sizeof(msg), "%s finished %d%s", car->_name, car->_pos, numSuffix);
+								msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 								ReSituation::self().setRaceMessage(msg, 5);
 							}
 						}
@@ -693,7 +709,7 @@ ReCarsSortCars(void)
     int		xx;
     tCarElt	*car;
     tSituation	*s = ReInfo->s;
-    char msg[128];
+    char msg[64];
 	
     // Check cars are driving the right way around track
     for (i = 0; i < s->_ncars; i++) {
@@ -708,6 +724,7 @@ ReCarsSortCars(void)
 		&& s->cars[i]->_driverType == RM_DRV_HUMAN
 		&& s->cars[i]->_state != RM_CAR_STATE_ELIMINATED) {
 	    snprintf(msg, sizeof(msg), "%s Wrong Way", s->cars[i]->_name);
+		msg[sizeof(msg)-1] = 0; // Some snprintf implementations fail to do so.
 	    ReSituation::self().setRaceMessage(msg, 2);
 	    // prevent flickering occuring by 'short timing', assuming > 10fps
 	    s->cars[i]->_wrongWayTime = s->currentTime + 1.9;
