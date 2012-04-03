@@ -247,7 +247,7 @@ reTrackInitTimeOfDay(void)
 			break;
 
 		case RM_IND_TIME_RANDOM:			
-			trackLocal->timeofday = rand() % (24*60*60);
+			trackLocal->timeofday = (tdble)(rand() % (24*60*60));
 			break;
 
 		default:
