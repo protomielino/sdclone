@@ -160,17 +160,18 @@ Cars:
   * Reworked 3D model front end of Archer R9 and updated liveries
 
 * RS
-  * Updated rs1-fmc-centre 3D model by W-E-C
+  * Updated rs1-fmc-centre 3D model
 
 * Supercars
-  * Fixed windows frame on sc-boxer-96 by W-E-C
-  * Updated sc-cavallo-360 3D model by W-E-C
+  * Fixed windows frame on sc-boxer-96
+  * Updated sc-cavallo-360 3D model
   * New 'sport' sking for sc-fmc-gt4
 
 Tracks
 
 * All tracks
   * Modified time of day for many tracks (why ?)
+  * New blurry-styled previews for all official tracks
 
 * Dirt
   * Fixed TORCS-labeled gantries on Dirt-2, Dirt-4 and Dirt-6
@@ -312,6 +313,7 @@ Race engine
 * Improved management of random time of day case
 * New TRB1 championship race mode
 * #647 Fixed liveries selector not working for 'normal' races
+* #655 Workaround snprintf misuse (of r4560) + MSVC 2005 C lib bug
 
 Sound engine
 
