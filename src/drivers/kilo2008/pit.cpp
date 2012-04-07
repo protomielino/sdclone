@@ -45,8 +45,10 @@ Pit::Pit(const tSituation * s, KDriver * driver, const double pitoffset) {
 
     // Compute pit spline points along the track.
     points_[3].x = mypit_->pos.seg->lgfromstart + mypit_->pos.toStart;
-    points_[2].x = points_[3].x - pitinfo_->len;
-    points_[4].x = points_[3].x + pitinfo_->len;
+//    points_[2].x = points_[3].x - pitinfo_->len;
+    points_[2].x = points_[3].x - 1.5 * pitinfo_->len;
+//    points_[4].x = points_[3].x + pitinfo_->len;
+    points_[4].x = points_[3].x + 0.75 * pitinfo_->len;
     points_[0].x = pitinfo_->pitEntry->lgfromstart + pitoffset;
     points_[1].x = pitinfo_->pitStart->lgfromstart;
     // Use nPitSeg to respect the pit speed limit on Migrants e.a.
@@ -85,7 +87,7 @@ Pit::Pit(const tSituation * s, KDriver * driver, const double pitoffset) {
     }  // for i
 
 //    points_[3].y = fabs(pitinfo_->driversPits->pos.toMiddle + 1.0) * sign;
-    points_[3].y = fabs(pitinfo_->driversPits->pos.toMiddle + 2.0) * sign;
+    points_[3].y = fabs(pitinfo_->driversPits->pos.toMiddle + MIN(3.0,fabs(pitinfo_->width  - 0.5))) * sign;
     spline_ = new Spline(NPOINTS, points_);
   }  // if pit not null
 }  // Pit::Pit
