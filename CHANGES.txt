@@ -50,7 +50,14 @@ I - Main changes since 1.4.0 (overall sum-up)
  * Simplix : Added support for wet track (but no change supported during the race)
 
  Physics
- * Simu V2.1 : a better Simu V2 (Kristof : a 4-6 line sum-up please ?)
+ * Simu V2.1 : a better Simu V2
+   - added emergency brake
+   - added gyroscopic forces
+   - added bump and rebound limit velocities to dampers
+   - improved engine brake calculation
+   - fix the downforce calculation for the rear wing
+   - fix the handling of gear and differential efficiencies
+   - fix the cars roll on highly banked tracks
 
  Sounds
  * Reworked sounds by Audio Berlin profesionals
