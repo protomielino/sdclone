@@ -35,14 +35,17 @@ src/libs
 src/main
 src/tools
 
+src/raceman/CMakeLists.txt
 src/raceman/extra
 src/raceman/practice.xml
 src/raceman/quickrace.xml
 src/raceman/singleevent-challenge.xml
 src/raceman/singleevent-endurance.xml
 
+src/modules/CMakeLists.txt
 src/modules/graphic
 src/modules/networking
+src/modules/simu/CMakeLists.txt
 src/modules/simu/simuv2.1
 src/modules/telemetry
 src/modules/track
