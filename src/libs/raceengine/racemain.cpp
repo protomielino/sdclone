@@ -55,7 +55,6 @@ typedef struct
 }tReGridPart;
 
 int *ReStartingOrderIdx = NULL; //array to hold indexes of cars (in params/RM_SECT_DRIVERS) in starting order
-int ReCurrDriverNr = 0;
 
 //Utility
 
@@ -456,10 +455,9 @@ RePreRace(void)
 	// cars are simply added to the starting list in the order stored in ReStartingOrderIdx.
 	// If only one car is at the track at a time (not timed session qualifying or practice),
 	// the race is divided into many sub-races.
-	// For a sub-race, only the car pointed by results/RE_ATTR_CUR_DRIVER
+	// For a sub-race, only the results/RE_ATTR_CUR_DRIVER-th driver in ReStartingOrderIdx
 	// is added to the starting grid.
 	// RE_ATTR_CUR_DRIVER is refreshed after every sub-race in ReRaceEnd().
-	ReCurrDriverNr = 0;
 	int nCars = GfParmGetEltNb(params, RM_SECT_DRIVERS);
 	GfParmListClean(params, RM_SECT_DRIVERS_RACING);
 	if (nCars == 0)
@@ -606,9 +604,7 @@ RePreRace(void)
 		}
 	}
 	
-	ReCurrDriverNr = 0;
-	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL,
-				(tdble)ReStartingOrderIdx[ReCurrDriverNr]);
+	GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1.0);
 
 	return RM_SYNC | RM_NEXT_STEP;
 }
@@ -834,11 +830,11 @@ ReRaceStart(void)
 		// non-timed Qualification or Practice session => 1 driver at a time = the "current" one.
 		int nCurrDrvInd =
 			(int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
-		if (nCurrDrvInd == -1)
+		if (nCurrDrvInd <= 0)
 			return RM_ERROR;
 
 		// Propagate competitor drivers info to the real race starting grid
-		snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, nCurrDrvInd);
+		snprintf(path, sizeof(path), "%s/%d", RM_SECT_DRIVERS, ReStartingOrderIdx[nCurrDrvInd-1]);
 		snprintf(path2, sizeof(path2), "%s/%d", RM_SECT_DRIVERS_RACING, 1);
 
 		GfParmSetStr(params, path2, RM_ATTR_MODULE,
@@ -952,23 +948,18 @@ ReRaceEnd(void)
 	if ((ReInfo->s->_raceType == RM_TYPE_QUALIF || ReInfo->s->_raceType == RM_TYPE_PRACTICE)
 		&& ReInfo->s->_totTime < 0.0f)
 	{
+		// Get the index of the current competitor (the one who just completed his race).
+		curDrvIdx = (int)GfParmGetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, 1);
+
 		// Up to the next competitor now, if not the last one.
+		curDrvIdx++;
 		nCars = MIN(GfParmGetEltNb(params, RM_SECT_DRIVERS),
 				(int)GfParmGetNum(params, sessionName, RM_ATTR_MAX_DRV, NULL, 100));
-		ReCurrDriverNr++;
-		if (ReStartingOrderIdx != NULL) {
-			if (ReCurrDriverNr < nCars) {curDrvIdx = ReStartingOrderIdx[ReCurrDriverNr];}
-			else {curDrvIdx = nCars + 1;}
-		}
-		else {
-			curDrvIdx = 1;
-		}
-		if (ReCurrDriverNr < nCars) 
+		if (curDrvIdx <= nCars) 
 			bEndOfSession = false;
-		else {
-			ReCurrDriverNr = 0; // Was the last one : end of session !
-			curDrvIdx = 1;
-		}
+		else
+			curDrvIdx = 1; // Was the last one : end of session !
+
 		GfParmSetNum(results, RE_SECT_CURRENT, RE_ATTR_CUR_DRIVER, NULL, (tdble)curDrvIdx);
 	}
 
@@ -976,10 +967,6 @@ ReRaceEnd(void)
 	if (bEndOfSession)
 	{
 		ReCalculateClassPoints (ReInfo->_reRaceName);
-		if (ReStartingOrderIdx != NULL) {
-			delete[] ReStartingOrderIdx;
-			ReStartingOrderIdx = NULL;
-		}
 	}
 	
 	// Determine the new race state automation mode.
