@@ -65,6 +65,10 @@ Section -CoreData
   File "${BUILD_INST_DIR}\data\config\raceman\singleevent-mp5.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-mp5.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\career.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\career_supercars.xmls"
+  File "${BUILD_INST_DIR}\data\config\raceman\career_ls1.xmls"
 
 SectionEnd
 

@@ -89,8 +89,16 @@ Section "!Base System" SEC01
   File /x sd-*.* /x *.lib "${BUILD_INST_DIR}\bin\*.*"
 
   ; Core loadable modules (physics and graphics engines, track loader, ...)
-  SetOutPath "$INSTDIR\lib\modules"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\*.*"
+  SetOutPath "$INSTDIR\lib\modules\graphic"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\graphic\*.*"
+  SetOutPath "$INSTDIR\lib\modules\simu\simuv2.1"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\simu\simuv2.1\*.*"
+  SetOutPath "$INSTDIR\lib\modules\telemetry"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\telemetry\*.*"
+  SetOutPath "$INSTDIR\lib\modules\track"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\track\*.*"
+  SetOutPath "$INSTDIR\lib\modules\userinterface"
+  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\userinterface\*.*"
 
   ; Core data files (sound, textures, menus, car categories, ...)
   SetOutPath "$INSTDIR\data"
@@ -99,8 +107,14 @@ Section "!Base System" SEC01
   SetOutPath "$INSTDIR\data\categories"
   File /r "${BUILD_INST_DIR}\data\categories\*.*"
 
-  SetOutPath "$INSTDIR\data\config"
-  File /r /x career*.* /x championship*.* /x *-mp5.xml "${BUILD_INST_DIR}\data\config\*.*"
+  SetOutPath "$INSTDIR\data\config\raceman\extra"
+  File /r "${BUILD_INST_DIR}\data\config\raceman\extra\*.*"
+
+  SetOutPath "$INSTDIR\data\config\raceman"
+  File "${BUILD_INST_DIR}\data\config\raceman\practice.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\quickrace.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\singleevent-challenge.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\singleevent-endurance.xml"
 
   SetOutPath "$INSTDIR\data\data"
   File /r "${BUILD_INST_DIR}\data\data\*.*"
@@ -214,6 +228,14 @@ Section /o "WIP cars and tracks" SEC05
   StrCpy $1 "speed-dreams-${WIPCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
   StrCpy $2 "WIP cars and tracks"
   !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 140
+
+SectionEnd
+
+Section /o "Unmaintained" SEC06
+
+  StrCpy $1 "speed-dreams-${UNMAINTAINED_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
+  StrCpy $2 "Unmaintained stuff"
+  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 1
 
 SectionEnd
 

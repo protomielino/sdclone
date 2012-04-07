@@ -63,11 +63,12 @@ Section -CoreData
 
   ; Game core data files (racemanagers, ...)
   SetOutPath "$INSTDIR\data\config\raceman"
+  File "${BUILD_INST_DIR}\data\config\raceman\singleevent-36gp.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\singleevent-ls-gt1.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship.xml"
   File "${BUILD_INST_DIR}\data\config\raceman\championship-supercars.xml"
-  File "${BUILD_INST_DIR}\data\config\raceman\career.xml"
-  File "${BUILD_INST_DIR}\data\config\raceman\career_supercars.xmls"
-  File "${BUILD_INST_DIR}\data\config\raceman\career_ls1.xmls"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-36gp.xml"
+  File "${BUILD_INST_DIR}\data\config\raceman\championship-ls-gt1.xml"
 
 SectionEnd
 

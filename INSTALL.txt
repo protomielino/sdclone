@@ -63,13 +63,16 @@ The Speed Dreams Team.
 2 - Installation from the official tarballs
 
   a - get these tarballs : please go to our SF.net download page at
-          http://sourceforge.net/projects/speed-dreams/files/2.0.0,
+
+        http://sourceforge.net/projects/speed-dreams/files/2.0.0,
+
       and you should find :
 
         speed-dreams-src-base-<version>.tar.xz
         speed-dreams-src-hq-cars-and-tracks-<version>.tar.xz
         speed-dreams-src-more-hq-cars-and-tracks-<version>.tar.xz
         speed-dreams-src-wip-cars-and-tracks-<version>.tar.xz
+        speed-dreams-src-unmaintained-<version>.tar.xz
 
       where <version> is something like "2.0.0-rc1-r4420", "2.0.0-r45xx", ...
 
@@ -79,7 +82,7 @@ The Speed Dreams Team.
       Let's say you downloaded them all in $HOME/sd, and that <version> is 2.0.0-rc1-r4420.
       (you can do as you like, but we'll use this folder in the explanations below).
 
-  b - uncompress the 4 tarballs :
+  b - uncompress the tarballs :
 
       $ cd $HOME/sd
       $ mkdir 2.0.0-rc1-r4420
@@ -241,7 +244,7 @@ II - Windows installation from sources
 Note: If you use an "Express" version, don't forget to install also the Windows SDK.
 
   a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
-  b.  Download the 4 official tarballs from SF.net
+  b.  Download the official tarballs from SF.net
         http://sourceforge.net/projects/speed-dreams/files/2.0.0
       (speed-dreams-src-<package>-<version>.tar.xz)
   c.  Extract their contents to your local disk (7Zip is an excellent tool for that),

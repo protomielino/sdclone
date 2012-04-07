@@ -33,9 +33,20 @@ src/drivers/human
 src/interfaces
 src/libs
 src/main
-src/modules
-src/raceman
 src/tools
+
+src/raceman/extra
+src/raceman/practice.xml
+src/raceman/quickrace.xml
+src/raceman/singleevent-challenge.xml
+src/raceman/singleevent-endurance.xml
+
+src/modules/graphic
+src/modules/networking
+src/modules/simu/simuv2.1
+src/modules/telemetry
+src/modules/track
+src/modules/userinterface
 
 data/CMakeLists.txt
 data/data

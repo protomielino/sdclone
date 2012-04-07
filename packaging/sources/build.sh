@@ -6,7 +6,8 @@
 #  cd my/svn/sandbox/tags/2.0.0-rc1
 #  ./packaging/sources/build.sh 2.0.0-rc1-r4420
 #
-# Warning: You need to get and extract all 4 packages before building.
+# Warning: The generated packages can't be used separately for building :
+#          you need to get and extract all of them before building.
 #
 # copyright  : (C) 2011 onwards Jean-Philippe Meuret
 # $Id$
@@ -38,11 +39,15 @@ tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-more-h
 
   ls -l speed-dreams-src-more-hq*.tar.xz
 
-  # WIP cars and tracks
   echo "* 'WIP cars and tracks' package ..."
   tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-wip-cars-and-tracks.lst -f speed-dreams-src-wip-cars-and-tracks-$1.tar.xz
 
   ls -l speed-dreams-src-wip*.tar.xz
+
+  echo "* 'unmaintained' package ..."
+  tar -c -J -X $specDir/sd-src-exclude.lst --exclude-vcs -T $specDir/sd-src-unmaintained.lst -f speed-dreams-src-unmaintained-$1.tar.xz
+
+  ls -l speed-dreams-src-unmaintained*.tar.xz
 
   echo "Done (`date`)."
   

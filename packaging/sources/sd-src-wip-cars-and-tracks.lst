@@ -1,3 +1,11 @@
+src/raceman/singleevent-mp5.xml
+src/raceman/championship.xml
+src/raceman/championship-supercars.xml
+src/raceman/championship-mp5.xml
+src/raceman/career.xml
+src/raceman/career_supercars.xmls
+src/raceman/career_ls1.xmls
+
 src/drivers/usr/usr_ls2
 src/drivers/usr/usr_rs
 
