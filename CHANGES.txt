@@ -12,8 +12,6 @@ http://sourceforge.net/apps/trac/speed-dreams/wiki/TheWayToRelease2
 I - Main changes since 1.4.0 (overall sum-up)
 -----------------------------------------------------------------
 
-WIP ???????????????????????????????????????
-
  Menus
  * New "shinning" menu style with blurry backgrounds and button animations
  * More user-friendly menu system, through improved labels, tips and control behavior
@@ -99,7 +97,8 @@ WIP ???????????????????????????????????????
  * New Windows binary multi-package system :
    - the small base package is enough for trying the game (kind of demo)
    - it can download and installation the other packages, for much more contents
- * Fixed non GPL 2+ compatible bundled code + other steps towards official Fedora packaging.
+ * Fixed non GPL 2+ compatible bundled code 
+   + other steps towards official packaging by 100%-OSS Linux distros.
 
  Other
  * New command line options for straight starting of a given race, with or without a GUI
@@ -114,8 +113,9 @@ WIP ???????????????????????????????????????
 More details below.
 
 II - Changes since 2.0.0 Release Candidate 1 release in final 2.0.0
------------------------------------------------------------------
-This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0@46??????????????.
+-------------------------------------------------------------------
+This release was build from SVN
+https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0@466x????????????????????????.
 
 1 - Main changes
 
@@ -136,11 +136,9 @@ This release was build from SVN https://speed-dreams.svn.sourceforge.net/svnroot
  * Reworked landscape and buildings for Long Pond speedway
  * Some graphics fixes to Karwada, Street-1, Manton, Brondehach
  * Many bug fixes (code and tracks graphics).
- * Fixed non GPL 2+ compatible bundled code + other steps towards official Fedora packaging.
+ * Fixed non GPL 2+ compatible bundled code + other steps towards official 100%-OSS packaging.
+ * New "Unmaintained" source and Windows binary package + moved Simu V2 and V3 inside.
  
-?????????????????????????????????? WIP (done up to r4640). ??????????????????????????????????
-
-
 2 - Known bugs / WIP tasks
  
  See http://sourceforge.net/apps/trac/speed-dreams/report/3
@@ -158,6 +156,8 @@ Cars:
 * LS1
   * #142 Final ls1-archer previews
   * Reworked 3D model front end of Archer R9 and updated liveries
+  * Improved Zentek engine sound
+  * Many HQ improved / new liveries
 
 * RS
   * Updated rs1-fmc-centre 3D model
@@ -172,6 +172,8 @@ Tracks
 * All tracks
   * Modified time of day for many tracks (why ?)
   * New blurry-styled previews for all official tracks
+  * New default background landscape texture for when Sky Dome is enabled
+  * Some track-specific background landscape textures
 
 * Dirt
   * Fixed TORCS-labeled gantries on Dirt-2, Dirt-4 and Dirt-6
@@ -186,6 +188,7 @@ Tracks
 * Speedways
   * Reworked landscape and buildings for Long Pond
   * Texture improvements to Manton Speedway
+  * Added consistent lanscape for reflexions on car bodies (env.png)
 
 Robots
 
@@ -275,6 +278,7 @@ Menus
 * Pit menu :
   * #635 Improved pit menu labels 
   * #636 Pit menu labels when timed session + improved tips
+  * #655 Workaround snprintf misuse + MSVC 2005 C lib bug
 
 * Results menus
   * #562 Fixed results-only counting extra lap
@@ -317,12 +321,11 @@ Race engine
 
 Sound engine
 
- * #583 Integrated new Audio-Berlin sounds (but gear_change1, backfire and skid_tyres,
-        for which we consider the old ones are equal or better in-game)
-
-Track loader
+* #583 Integrated new Audio-Berlin sounds (but gear_change1, backfire and skid_tyres,
+       for which we consider the old ones are equal or better in-game)
 
 Tools
+
 * Removed unused / unmaintained png2jpg and src/misc folder
 
 Build system / Packaging
@@ -339,6 +342,7 @@ Build system / Packaging
 * Split the source package following the Windows contents scheme (but CMake config untouched)
   + created scripts for easy building of these packages
 * Fixed wrong FSF address in various files
+* Added a 5th "unmaintained" source and windows binary package (for Simu V2 and V3)
 * Updated release notes for final 2.0
 * Updated credits
 
