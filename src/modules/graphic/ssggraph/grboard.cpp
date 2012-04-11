@@ -261,7 +261,7 @@ cGrBoard::grDispGGraph(tCarElt *car)
   // a) Detect wheel blocking, and change current color to red if so.
   for (int xx = 0; xx < 4; ++xx) 
   {
-    if (car->_wheelSpinVel(xx) < car->_speed_x - 5.0f)
+    if (fabs(car->_speed_x) - fabs(car->_wheelSpinVel(xx) * car->_wheelRadius(xx)) >  5.0f)
     {
       glColor4f(1.0, 0.0, 0.0, 1.0);
       break;
@@ -282,8 +282,8 @@ cGrBoard::grDispGGraph(tCarElt *car)
   // length proportional to the steer command).
   glVertex2f(X1, Y1 - THNSS);
   glVertex2f(X1, Y1 + THNSS);
-  glVertex2f(X1 - car->ctrl.steer * 100.0f, Y1 + THNSS);
-  glVertex2f(X1 - car->ctrl.steer * 100.0f, Y1 - THNSS);
+  glVertex2f(X1 - car->ctrl.steer * 50.0f, Y1 + THNSS);
+  glVertex2f(X1 - car->ctrl.steer * 50.0f, Y1 - THNSS);
 
   // Draw the clutch gauge (vertical thick segment, starting in xc, yc,
   // going upwards, length proportional to the clutch command).
