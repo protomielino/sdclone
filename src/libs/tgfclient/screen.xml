@@ -268,6 +268,7 @@
     <attstr name="multi-texturing" val="enabled"/>
     <attstr name="multi-sampling" val="enabled"/>
     <attstr name="multi-sampling samples" val="8"/>
+    <attstr name="stereo-vision" val="disabled"/>
   </section>
 
 </params>

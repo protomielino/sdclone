@@ -132,6 +132,10 @@
 #define GFSCR_ATT_MULTISAMPLING_ENABLED	"enabled"
 #define GFSCR_ATT_MULTISAMPLING_DISABLED	"disabled"
 
+#define GFSCR_ATT_STEREOVISION		"stereo-vision"
+#define GFSCR_ATT_STEREOVISION_ENABLED	"enabled"
+#define GFSCR_ATT_STEREOVISION_DISABLED	"disabled"
+
 #define GFSCR_ATT_MULTISAMPLINGSAMPLES		"multi-sampling samples"
 
 // Open GL auto-detected features

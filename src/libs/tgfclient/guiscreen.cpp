@@ -435,6 +435,10 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 			== GFSCR_VAL_YES;
 	else
 		bFullScreen = nFullScreen ? true : false;
+    bool bStereo =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_STEREOVISION,
+								 GFSCR_VAL_YES))
+		== GFSCR_VAL_YES;
     bool bTryBestVInitMode =
 		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,
 								 GFSCR_VAL_VINIT_BEST))
@@ -455,7 +459,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 		// Warning: Restarts the game if the frame buffer specs changed since last call.
 		// If specified and possible, setup the best possible settings.
 		if (GfglFeatures::self().checkBestSupport(nWinWidth, nWinHeight, nTotalDepth,
-			 									  bAlphaChannel, bFullScreen, hparmScreen))
+			 									  bAlphaChannel, bFullScreen, bStereo, hparmScreen))
 		{
 			// Load Open GL user settings from the config file.
 			GfglFeatures::self().loadSelection();
@@ -467,7 +471,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 			SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, nColorDepth/3);
 			SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, nColorDepth/3);
 			SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, nColorDepth);
-			
+
 			const int nAlphaDepth =
 				GfglFeatures::self().getSelected(GfglFeatures::AlphaDepth);
 			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, nAlphaDepth);
@@ -486,6 +490,10 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 				SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
 			}
 
+			const int nStereoVision =
+				GfglFeatures::self().isSelected(GfglFeatures::StereoVision) ? 1 : 0;
+			SDL_GL_SetAttribute(SDL_GL_STEREO, nStereoVision);
+			
 			// Try the video mode with these parameters : should always work
 			// (unless you downgraded you hardware / OS and didn't clear your config file).
 			PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
@@ -529,6 +537,10 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 	if (!PScreenSurface)
 	{
 		GfLogInfo("Trying 'default compatible' mode for video initialization.\n");
+
+		// cancel StereoVision
+		SDL_GL_SetAttribute(SDL_GL_STEREO, 0);
+
 		PScreenSurface = SDL_SetVideoMode(nWinWidth, nWinHeight, nTotalDepth, bfVideoMode);
 		if (!PScreenSurface)
 			GfLogTrace("Can't get a %s%dx%dx%d compatible video mode\n",

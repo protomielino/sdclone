@@ -164,11 +164,14 @@ void GfglFeatures::detectStandardSupport()
 	// 8) Non-power-of-2 textures.
 	_mapSupportedBool[TextureNonPowerOf2] =
 		gfglIsOpenGLExtensionSupported("GL_ARB_texture_non_power_of_two");
+
+	// 9) Stereo Vision (need a proper check)
+	_mapSupportedBool[StereoVision] = false;
 }
 
 // Best supported features detection for the given specs of the frame buffer.
 bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
-									 bool& bAlpha, bool& bFullScreen)
+									 bool& bAlpha, bool& bFullScreen, bool& bStereoVision)
 {
 	GfLogInfo("Detecting best supported features for a %dx%dx%d%s frame buffer.\n",
 			  nWidth, nHeight, nDepth, bFullScreen ? " full-screen" : "");
@@ -182,6 +185,8 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 	int nAlphaChannel = bAlpha ? 1 : 0;
 	int nCurrDepth = nDepth;
 	int nFullScreen = bFullScreen ? 1 : 0;
+	int nStereoVision = bStereoVision ? 1 : 0;
+
 	while (!pWinSurface && nFullScreen >= 0)
 	{
 		GfLogTrace("Trying %s mode\n", nFullScreen ? "full-screen" : "windowed");
@@ -200,7 +205,14 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 				SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, nCurrDepth/4);
 				SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, (3*nCurrDepth)/4);
 				SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, nAlphaChannel ? nCurrDepth/4 : 0);
-		
+
+				while (!pWinSurface && nStereoVision >= 0)
+				{
+					if (nStereoVision)
+						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_TRUE);
+					else
+						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_FALSE);
+#if 0		
 				// Anti-aliasing : detect the max supported number of samples
 				// (assumed to be <= 32).
 				int nMaxMultiSamples = 32; // Hard coded max value for the moment.
@@ -231,7 +243,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 						nMaxMultiSamples /= 2;
 					}
 				}
-				
+#endif
 				// Failed : try without anti-aliasing.
 				if (!pWinSurface)
 				{
@@ -241,6 +253,11 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 					if (!pWinSurface)
 						GfLogTrace("%d+%d bit double-buffer not supported\n",
 								   3*nCurrDepth/4, nCurrDepth/4);
+				}
+
+					// Failed : try without StereoVision
+					if (!pWinSurface)
+						nStereoVision--;
 				}
 
 				// Failed : try with lower color depth.
@@ -305,7 +322,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 }
 
 bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
-							   bool &bAlpha, bool &bFullScreen, void* hparmConfig)
+							   bool &bAlpha, bool &bFullScreen, bool &bStereo, void* hparmConfig)
 {
 	// Clear support data.
 	_mapSupportedBool.clear();
@@ -326,6 +343,9 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 		== GFSCR_VAL_YES;
     bFullScreen =
 		std::string(GfParmGetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_FSCR, GFSCR_VAL_NO))
+		== GFSCR_VAL_YES;
+    bStereo =
+		std::string(GfParmGetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_STEREOVISION, GFSCR_VAL_NO))
 		== GFSCR_VAL_YES;
 
 	// Check that we have something supported, and return if not.
@@ -426,6 +446,14 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 	if (nMultiSampSamples > 0)
 		_mapSupportedInt[MultiSamplingSamples] = nMultiSampSamples;
 
+	// 10) Stereo Vision
+	const std::string strStereoVision =
+		GfParmGetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_STEREOVISION, "");
+	if (strStereoVision == GFSCR_VAL_YES)
+		_mapSupportedBool[StereoVision] = true;
+	else if (strStereoVision == GFSCR_VAL_NO)
+		_mapSupportedBool[StereoVision] = false;
+	
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
@@ -437,7 +465,7 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 }
 
 void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
-								bool bAlpha, bool bFullScreen, void* hparmConfig)
+								bool bAlpha, bool bFullScreen, bool bStereo, void* hparmConfig)
 {
 	// Open the config file if not already done.
 	void* hparm = hparmConfig ? hparmConfig : openConfigFile();
@@ -466,6 +494,8 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 					 bAlpha ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_FSCR,
 					 bFullScreen ? GFSCR_VAL_YES : GFSCR_VAL_NO);
+		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_STEREOVISION,
+					 bStereo ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 	
 		// Write new values (remove the ones with no value supported).
 		// 1) Double-buffer.
@@ -523,6 +553,10 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 						 (tdble)getSupported(MultiSamplingSamples));
 		else
 			GfParmRemove(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_MULTISAMPLINGSAMPLES);
+
+		// 10) Stereo Vision
+		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_STEREOVISION,
+					 isSupported(StereoVision) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 	}
 	
 	// Write new params to config file.
@@ -537,7 +571,7 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 }
 
 bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
-									bool bAlpha, bool bFullScreen, void* hparmConfig)
+									bool bAlpha, bool bFullScreen, bool bStereo, void* hparmConfig)
 {
 	// Open the config file if not already done.
 	void* hparm = hparmConfig ? hparmConfig : openConfigFile();
@@ -545,26 +579,27 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 	// Get the frame buffer specs that are associated with the detected
 	// Open GL features in the config file, if any.
 	int nDetWidth, nDetHeight, nDetDepth;
-	bool bDetFullScreen, bDetAlpha;
+	bool bDetFullScreen, bDetAlpha, bDetStereo;
 	bool bPrevSupportFound =
-		loadSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, hparm);
+		loadSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetStereo, hparm);
 
 	// Compare with the requested frame buffer specs
 	// and run a new supported feature detection if any diffference.
 	bool bSupportFound = true;
 	if (!bPrevSupportFound || nWidth != nDetWidth || nHeight != nDetHeight || nDepth != nDetDepth
-		|| bAlpha != bDetAlpha || bFullScreen != bDetFullScreen)
+		|| bAlpha != bDetAlpha || bFullScreen != bDetFullScreen || bStereo != bDetStereo)
 	{
 		nDetWidth = nWidth;
 		nDetHeight = nHeight;
 		nDetDepth = nDepth;
 		bDetFullScreen = bFullScreen;
 		bDetAlpha = bAlpha;
+		bDetStereo = bStereo;
 		bSupportFound =
-			detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen);
+			detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetStereo);
 
 		// Store support data in any case.
-		storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, hparm);
+		storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetStereo, hparm);
 
 		// If frame buffer specs supported, update relevant user settings and restart.
 		if (bSupportFound)
@@ -653,6 +688,8 @@ void GfglFeatures::dumpSupport() const
 	if (isSupported(MultiSampling) && getSupported(MultiSamplingSamples) > 1)
 		GfLogInfo(" (%d samples)", getSupported(MultiSamplingSamples));
 	GfLogInfo("\n");
+	GfLogInfo("  Stereo Vision           : %s\n",
+			  isSupported(StereoVision) ? "Yes" : "No");
 }
 
 // Load the selected OpenGL features from the config file.
@@ -721,6 +758,16 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 	if (_mapSelectedInt[MultiSamplingSamples] > getSupported(MultiSamplingSamples))
 		_mapSelectedInt[MultiSamplingSamples] = getSupported(MultiSamplingSamples);
 
+	// 10) Stereo Vision : load from config file.
+	const std::string strStereoVision =
+		GfParmGetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_STEREOVISION,
+					 GFSCR_ATT_STEREOVISION_ENABLED);
+	_mapSelectedBool[StereoVision] =
+		isSupported(StereoVision)
+		&& std::string(GfParmGetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_STEREOVISION,
+									GFSCR_ATT_STEREOVISION_ENABLED))
+		   == GFSCR_ATT_STEREOVISION_ENABLED;
+
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
@@ -783,6 +830,10 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 						 GFSCR_VAL_VINIT_BEST);
 		}
 	}
+
+	GfParmSetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_STEREOVISION,
+				 isSelected(StereoVision)
+				 ? GFSCR_ATT_STEREOVISION_ENABLED : GFSCR_ATT_STEREOVISION_DISABLED);
 	
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
@@ -820,6 +871,7 @@ void GfglFeatures::dumpSelection() const
 	if (isSelected(MultiSampling))
 		GfLogInfo(" (%d samples)", getSelected(MultiSamplingSamples));
 	GfLogInfo("\n");
+	GfLogInfo("  Stereo vision           : %s\n", isSelected(StereoVision) ? "On" : "Off");
 }
 
 // Bool features management.
