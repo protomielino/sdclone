@@ -716,6 +716,7 @@ tRmInfo* ReSituationUpdater::copySituation(tRmInfo*& pTarget, const tRmInfo* pSo
 	pTarget->s->raceInfo = pSource->s->raceInfo;
 	pTarget->s->deltaTime = pSource->s->deltaTime;
 	pTarget->s->currentTime = pSource->s->currentTime;
+	pTarget->s->accelTime = pSource->s->accelTime;
 	pTarget->s->nbPlayers = pSource->s->nbPlayers;
 	for (int nCarInd = 0; nCarInd < _nInitDrivers; nCarInd++)
 		pTarget->s->cars[nCarInd] =
