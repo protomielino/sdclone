@@ -206,6 +206,7 @@ reTrackInitTimeOfDay(void)
 			break;
 		}
 
+	trackLocal->timeofdayindex = timeofday;
 	switch (timeofday) 
 	{
 		case RM_IND_TIME_DAWN:
@@ -217,6 +218,7 @@ reTrackInitTimeOfDay(void)
 			break;
 					
 		case RM_IND_TIME_NOON:
+		case RM_IND_TIME_24HR:
 			trackLocal->timeofday = 12 * 3600 + 0 * 60 + 0; // 12:00:00
 			break;
 					
@@ -252,6 +254,7 @@ reTrackInitTimeOfDay(void)
 
 		default:
 			trackLocal->timeofday = 15 * 3600 + 0 * 60 + 0; // 15:00:00
+			trackLocal->timeofdayindex = RM_IND_TIME_AFTERNOON;
 			GfLogError("Unsupported value %d for user timeofday (assuming 15:00)\n",
 					   timeofday);
 			break;

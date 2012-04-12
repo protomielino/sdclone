@@ -66,6 +66,7 @@ public:
 
 	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
 						  eTimeDusk, eTimeNight, eTimeNow, eTimeFromTrack, eTimeRandom,
+						  eTime24hr,
 						  nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
 	enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
 					   eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.

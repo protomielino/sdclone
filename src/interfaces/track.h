@@ -587,6 +587,7 @@ typedef struct TrackLocalInfo
 
 	/* Actual data for a race (computed at race start) */
     tdble timeofday;   /**< Local time of day, in seconds from 0:00 (0 = 0:00, 86400 = 24:00 */
+    int timeofdayindex;
 	tdble sunascension; /**< Local sun "height" (related to the latitude, not to the time of day) */
 
     int clouds;	/**< Clouds coverage in the sky  (warning : consistency with RM_VAL_CLOUDS_*) */

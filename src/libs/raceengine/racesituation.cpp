@@ -268,6 +268,21 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 		pCurrReInfo->_reLastRobTime = 0.0;
 	}
 
+	tTrackLocalInfo *trackLocal = &ReInfo->track->local;
+	if (s->currentTime > 0 && trackLocal->timeofdayindex == 9) { //RM_VAL_TIME_24HR
+		if (s->_totTime > 0) {
+			// Scaled on Total Time
+			s->accelTime = 24 * 3600 * s->currentTime / s->_totTime;
+		} else {
+			// Scaled on Number of Laps that the lead driver has completed
+			if (s->cars[0]->_laps > 0 && s->cars[0]->_laps <= s->_totLaps)
+				s->accelTime = 24 * 3600 * (s->cars[0]->_laps + (s->cars[0]->_distFromStartLine / pCurrReInfo->track->length)) / s->_totLaps;
+			else
+				s->accelTime = 0;
+		}
+	} else
+		s->accelTime = s->currentTime;
+
 	GfProfStartProfile("rbDrive*");
 	GfSchedBeginEvent("raceupdate", "robots");
 	if ((s->currentTime - pCurrReInfo->_reLastRobTime) >= RCM_MAX_DT_ROBOTS) {

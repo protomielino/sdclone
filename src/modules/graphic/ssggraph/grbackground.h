@@ -29,7 +29,7 @@ extern void grLoadBackgroundGraphicsOptions();
 extern void grLoadBackground();
 extern void grLoadBackgroundSky(void);
 extern void grInitBackground();
-extern void grUpdateSky(double currentTime);
+extern void grUpdateSky(double currentTime, double accelTime);
 extern void grPreDrawSky(struct Situation* s, float fogStart, float fogEnd);
 extern void grPostDrawSky();
 extern void grDrawStaticBackground(class cGrCamera *cam, class cGrBackgroundCam *bgCam);

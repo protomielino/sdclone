@@ -473,7 +473,7 @@ refresh(tSituation *s)
 	grPropagateDamage(s);
 
 	// Update sky if dynamic time enabled.
-	grUpdateSky(s->currentTime);
+	grUpdateSky(s->currentTime, s->accelTime);
 	
     GfProfStartProfile("grDrawBackground/glClear");
     glDepthFunc(GL_LEQUAL);

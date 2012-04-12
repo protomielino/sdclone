@@ -929,7 +929,7 @@ grPostDrawSky(void)
 
 // Update the sky when time changes
 void
-grUpdateSky(double currentTime)
+grUpdateSky(double currentTime, double accelTime)
 {
 	// Nothing to do if static sky dome, or race not started.
 	if (!grDynamicSkyDome)
@@ -945,7 +945,7 @@ grUpdateSky(double currentTime)
 	if (!bInitialized)
 	{
 		lastTimeHighSpeed = currentTime;
-		lastTimeLowSpeed = 60 * (int)floor(currentTime / 60.0);
+		lastTimeLowSpeed = 60 * (int)floor(accelTime / 60.0);
 		bInitialized = true;
 		return;
 	}
@@ -960,7 +960,7 @@ grUpdateSky(double currentTime)
 	lastTimeHighSpeed = currentTime;
 
 	// Check if time to update low speed objects : sun and moon (once every minute).
-	int nextTimeLowSpeed = 60 * (int)floor((currentTime + 60.0) / 60.0);
+	int nextTimeLowSpeed = 60 * (int)floor((accelTime + 60.0) / 60.0);
 	if (nextTimeLowSpeed == lastTimeLowSpeed)
 		return;
 	const float deltaTimeLowSpeed = (float)(nextTimeLowSpeed - lastTimeLowSpeed);
