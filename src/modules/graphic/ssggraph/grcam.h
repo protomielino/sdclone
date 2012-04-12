@@ -159,6 +159,7 @@ class cGrPerspCamera : public cGrCamera
     float ffar;
     float fogstart;
     float fogend;
+    float viewOffset;
     
  public:
     cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, int drawDrv, int drawBG, int mirrorAllowed,
@@ -169,6 +170,7 @@ class cGrPerspCamera : public cGrCamera
     void setProjection(void);
     void setModelView(void);
     void loadDefaults(char *attr);
+    void setViewOffset(float newOffset);
     void setZoom(int cmd);
     float getLODFactor(float x, float y, float z);
     float getFogStart(void) { return fogstart; }

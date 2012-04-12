@@ -28,6 +28,7 @@
 #include "grutil.h"		//grGetHOT
 
 static char path[1024];
+static float allfovy;
 
 // Utilities ================================================================
 
@@ -95,6 +96,7 @@ cGrPerspCamera::cGrPerspCamera(class cGrScreen *myscreen, int id, int drawCurr, 
     fogstart = myfogstart;
     fogend   = myfogend;
     
+    viewOffset = 0;
 }
 
 void cGrPerspCamera::setProjection(void)
@@ -153,6 +155,11 @@ float cGrPerspCamera::getLODFactor(float x, float y, float z) {
     return res;
 }
 
+void cGrPerspCamera::setViewOffset(float newOffset)
+{
+    viewOffset = newOffset;
+}
+
 void cGrPerspCamera::setZoom(int cmd)
 {
     char	buf[256];
@@ -190,6 +197,7 @@ void cGrPerspCamera::setZoom(int cmd)
     }
 
     limitFov();
+    allfovy = fovy;
 
     sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCurCamHead(), getId());
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
@@ -275,6 +283,7 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	sgVec3 P, p;
+	float offset;
 	
 	p[0] = car->_drvPos_x;
 	p[1] = car->_drvPos_y;
@@ -285,8 +294,12 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance);
-	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance);
+	// Compute offset angle (fudged in bezel compensation)
+	offset = viewOffset * 1.10 * atan(screen->getViewRatio() * tan(allfovy * M_PI / 360.0)) * 2;
+	fovy = allfovy;
+
+	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance + offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
 	P[2] = car->_drvPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -1593,8 +1606,8 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      1,	/* drawCurr */
 			      1,	/* drawBG  */
 			      75.5,	/* fovy */
-			      50.0,	/* fovymin */
-			      95.0,	/* fovymax */
+			      20.0,	/* fovymin */
+			      195.0,	/* fovymax */
 			      0.03,	/* near */
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
 			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */

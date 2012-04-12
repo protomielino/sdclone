@@ -46,6 +46,7 @@ class cGrScreen {
 		int drawCurrent;						// Should the current car be drawn.
 	
 		int scrx, scry, scrw, scrh;
+		float viewOffset;
 		float viewRatio;
 		int fakeWidth;
 		int boardWidth;
@@ -61,7 +62,7 @@ class cGrScreen {
 		cGrScreen(int id);
 		~cGrScreen();
 	
-		void activate(int x, int y, int w, int h);
+		void activate(int x, int y, int w, int h, float v);
 		inline void deactivate(void) { active = false; }
 		inline void setZoom(const long zoom) { curCam->setZoom(zoom); }
 		int  isInScreen(int x, int y);
