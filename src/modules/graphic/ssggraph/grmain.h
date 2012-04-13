@@ -81,7 +81,7 @@ extern class cGrScreen* grGetCurrentScreen(void);
 #define GR_NEXT_SCREEN	0
 #define GR_PREV_SCREEN	1
 
-#define GR_NB_MAX_SCREEN 4
+#define GR_NB_MAX_SCREEN 6
 
 extern tdble grLodFactorValue;
 
