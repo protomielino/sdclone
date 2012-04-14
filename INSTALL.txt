@@ -74,20 +74,22 @@ The Speed Dreams Team.
         speed-dreams-src-wip-cars-and-tracks-<version>.tar.xz
         speed-dreams-src-unmaintained-<version>.tar.xz
 
-      where <version> is something like "2.0.0-rc1-r4420", "2.0.0-r45xx", ...
+      where <version> is something like "2.0.0-rc1-r4420", "2.0.0-r4687", ...
 
       Warning: you must download them all, as our current build system
 	           can't cope with missing files.
 
-      Let's say you downloaded them all in $HOME/sd, and that <version> is 2.0.0-rc1-r4420.
+      Let's say that :
+      * you downloaded them all in $HOME/sd,
+      * and that <version> is x.y.z-rabcd.
       (you can do as you like, but we'll use this folder in the explanations below).
 
   b - uncompress the tarballs :
 
       $ cd $HOME/sd
-      $ mkdir 2.0.0-rc1-r4420
-      $ cd 2.0.0-rc1-r4420
-      $ for file in *.xz; do tar xvfa $file; done
+      $ mkdir x.y.z-rabcd
+      $ cd x.y.z-rabcd
+      $ for file in ../*.xz; do tar xvfa $file; done
 
       You should now see "cmake", "data" and "src" folders (among others).
 
@@ -203,8 +205,8 @@ The Speed Dreams Team.
   - we make branches under the "branches" root dir ; as an exemple,
     you can get the "1.4.x" release maintenance branch current state through :
      $ svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/branches/1.4.x sd-1.4.x
-  - we make release tags under the "tags" root dir ; as an exemple,
-    you can get the "2.0.0 RC 1" pre-release through :
+  - we make release tags under the "tags" root dir ; 
+    as an exemple, you can get the "2.0.0 RC 1" pre-release through :
      $ svn co https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0-rc1 sd-2.0.0-rc1
 
   See configure, build and install method above (2)
@@ -213,19 +215,39 @@ The Speed Dreams Team.
 
 4 - Run Speed-Dreams
 
-  If the default CMake settings were kept, Speed Dreams is normally installed in /usr/local :
+  If the default CMake settings were kept, Speed Dreams is normally installed in /usr/local.
+
+  So, if /usr/local/games is already in your PATH variable, simply try :
 
     $ speed-dreams-2
       
-  or, if /usr/local/games not already in your PATH :
-      
-    $ /usr/local/games/speed-dreams-2
+  If /usr/local/games not already in your PATH variable, you may want to add it ; to do so,
+  simply add the line "export PATH=$PATH:/usr/local/games" to your  ~/.bashrc file ;
+  you can use :
 
-  Runtime options :
+    $ echo "export PATH=$PATH:/usr/local/games" >> ~/.bashrc" for that
+
+  Then, the above startup command should work now :
+
+    $ speed-dreams-2
+
+  If not or if the game crashes, see right below "5 - Known run-time issues".
+      
+  Runtime options : type this command to get them explained :
 
     $ speed-dreams-2 --help
 
-5 - Getting Help
+5 - Known run-time issues :
+
+  * Under some Linux configurations, the game crashes after restarting a race,
+    of when exiting ; we have a build-time workaround for this :
+    see above, in II-2-c-2, the OPTION_UNLOAD_SSGGRAPH CMake option.
+
+  * If you get all white rectangles or ugly fonts in the menus,
+    it's likely that some game data was not properly installed ;
+    check again carefully the build and install instructions.
+
+6 - Getting Help
 
   From inside the game, press F1 at any time, you'll get a help page explaining
   the available keyboard shorcuts.
@@ -308,7 +330,7 @@ Some specific details though :
 
   b - build and install:
 
-    1.  cd $HOME/sd/2.0.0-rc1/build
+    1.  cd $HOME/sd/2.0.0/build
     2.  ccmake ..
     3.  press (t) for advanced options
     4.  wanted rows CMake CPPFLAGS
