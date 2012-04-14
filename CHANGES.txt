@@ -1,4 +1,5 @@
-Here are the summarized changes since 1.4.0
+Speed Dreams 2.0.0 Release notes
+================================
 
 Dxx ids refer to tasks "specified" and listed here :
 http://sourceforge.net/apps/trac/speed-dreams/wiki/BigFeatureList
@@ -51,19 +52,19 @@ I - Main changes since 1.4.0 (overall sum-up)
 
  Physics
  * Simu V2.1 : a better Simu V2
-   - added emergency brake
-   - added gyroscopic forces
-   - added bump and rebound limit velocities to dampers
-   - improved engine brake calculation
-   - fix the downforce calculation for the rear wing
-   - fix the handling of gear and differential efficiencies
-   - fix the cars roll on highly banked tracks
+   * added emergency brake
+   * added gyroscopic forces
+   * added bump and rebound limit velocities to dampers
+   * improved engine brake calculation
+   * fix the downforce calculation for the rear wing
+   * fix the handling of gear and differential efficiencies
+   * fix the cars roll on highly banked tracks
 
  Sounds
  * Reworked sounds by Audio Berlin profesionals
    (but all LS1, 36GP and half of Supercars engine sounds left untouched :-)
  * Pause sound when pausing a race, however
- * Open Al back-end : Simulate low-pass filter for engine sound by
+ * Open AL back-end : Simulate low-pass filter for engine sound by
    simply lowering the gain when releasing the throttle
 
  Race engine
@@ -79,9 +80,9 @@ I - Main changes since 1.4.0 (overall sum-up)
  * From scratch rework of LS1 and 36GP car physics, for more realism
  * Slightly Updated physics for TRB1 (Simu V2.1 compatibility)
  * Supercars physics left untouched (Simu V2.1 compatible)
- * Improved 3D models for LS1
- * Many new / reworked HQ liveries for LS1, Supercars and MP5 cars
  * New MP5 car set (kind of Formula Ford) with 3 models and realistic physics
+ * Many new / reworked HQ liveries for LS1, Supercars and MP5 cars
+ * Improved 3D models for LS1
  * New WIP LS-GT2 car set (WIP physics and USR robot setups) 
  * New WIP RS car set (Rally Series, WIP physics and Simplix robot setups)
  * New WIP TRB1 Vieringe 5 RB (WIP physics, copy of Silber RBLK)
@@ -102,8 +103,8 @@ I - Main changes since 1.4.0 (overall sum-up)
  * Moved to CMake-based build system
  * Multi-package deployement scheme, contents based
  * New Windows binary multi-package system :
-   - the small base package is enough for trying the game (kind of demo)
-   - it can download and installation the other packages, for much more contents
+   * the small base package is enough for trying the game (kind of demo)
+   * it can download and installation the other packages, for much more contents
  * Fixed non GPL 2+ compatible bundled code 
    + other steps towards official packaging by 100%-OSS Linux distros.
 
@@ -122,7 +123,9 @@ More details below.
 II - Changes since 2.0.0 Release Candidate 1 release in final 2.0.0
 -------------------------------------------------------------------
 This release was build from SVN
-https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0@466x????????????????????????.
+https://speed-dreams.svn.sourceforge.net/svnroot/speed-dreams/tags/2.0.0@4687
+(that is trunk@4663, after reverting r4660 changeset (LS1 car changes),
+ except new Toro and Zentek engine sounds).
 
 1 - Main changes
 
@@ -163,7 +166,7 @@ Cars:
 * LS1
   * #142 Final ls1-archer previews
   * Reworked 3D model front end of Archer R9 and updated liveries
-  * Improved Zentek engine sound
+  * Reworked Zentek and Toro engine sounds
   * Many HQ improved / new liveries
 
 * RS
@@ -177,7 +180,7 @@ Cars:
 Tracks
 
 * All tracks
-  * Modified time of day for many tracks (why ?)
+  * Updated time of day for most tracks, for more varied sky conditions
   * New blurry-styled previews for all official tracks
   * New default background landscape texture for when Sky Dome is enabled
   * Some track-specific background landscape textures
@@ -1182,7 +1185,8 @@ Other:
 * D08 : Work-in-progress code profiling 
   (see http://sourceforge.net/apps/trac/speed-dreams/wiki/CodeProfiling)
 
-Known issues : see http://sourceforge.net/apps/trac/speed-dreams/report/2 (version 2.0.0 alpha1).
+Known issues : see http://sourceforge.net/apps/trac/speed-dreams/report/3
+(milestones '2.1.0' and 'To be defined').
 
                          =====================================================
 
