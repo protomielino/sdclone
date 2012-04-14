@@ -92,44 +92,44 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
     tGfuiScreen	*pscrTgt = (tGfuiScreen*)targetScreen;
 
     tGfuiKey *curKey = pscrTgt->userKeys;
-    do {
+	while (curKey)
+	{
+		curKey = curKey->next;
+		
 		// Decide if this key goes on the left of right column.
 		bool bLeft;
-		if (curKey) {
-			curKey = curKey->next;
-			switch(curKey->key) {
-				case GFUIK_BACKSPACE:
-				case GFUIK_F1:
-				case GFUIK_F2:
-				case GFUIK_F3:
-				case GFUIK_F4:
-				case GFUIK_F5:
-				case GFUIK_F6:
-				case GFUIK_F7:
-				case GFUIK_F8:
-				case GFUIK_F9:
-				case GFUIK_F10:
-				case GFUIK_F11:
-				case GFUIK_F12:
-				case GFUIK_LEFT:
-				case GFUIK_UP:
-				case GFUIK_RIGHT:
-				case GFUIK_DOWN:
-				case GFUIK_PAGEUP:
-				case GFUIK_PAGEDOWN:
-				case GFUIK_HOME:
-				case GFUIK_END:
-				case GFUIK_INSERT:
-				case GFUIK_DELETE:
-				case GFUIK_CLEAR:
-				case GFUIK_PAUSE:
-					bLeft = true;
-					break;
+		switch(curKey->key) {
+			case GFUIK_BACKSPACE:
+			case GFUIK_F1:
+			case GFUIK_F2:
+			case GFUIK_F3:
+			case GFUIK_F4:
+			case GFUIK_F5:
+			case GFUIK_F6:
+			case GFUIK_F7:
+			case GFUIK_F8:
+			case GFUIK_F9:
+			case GFUIK_F10:
+			case GFUIK_F11:
+			case GFUIK_F12:
+			case GFUIK_LEFT:
+			case GFUIK_UP:
+			case GFUIK_RIGHT:
+			case GFUIK_DOWN:
+			case GFUIK_PAGEUP:
+			case GFUIK_PAGEDOWN:
+			case GFUIK_HOME:
+			case GFUIK_END:
+			case GFUIK_INSERT:
+			case GFUIK_DELETE:
+			case GFUIK_CLEAR:
+			case GFUIK_PAUSE:
+				bLeft = true;
+				break;
 
-				default:
-					bLeft = curKey->modifier != GFUIM_NONE;
-					break;
-			}
+			default:
+				bLeft = curKey->modifier != GFUIM_NONE;
+				break;
 		}
 
 		// Determine control coordinates, whether left or right column.
@@ -157,7 +157,7 @@ GfuiHelpScreen(void *targetScreen, void *returnScreen)
 		if (curKey == pscrTgt->userKeys)
 			curKey = (tGfuiKey*)NULL;
 
-    } while (curKey);
+    }
     
 
     // Create Back button.
