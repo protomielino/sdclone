@@ -156,7 +156,7 @@ The Speed Dreams Team.
             Full run-time traces if ON (def: ON)
 
         - OPTION_TRACE_LEVEL:STRING :
-            Run-time traces level integer threshold, only if OPTION_DEBUG
+            Run-time traces level integer threshold, only if OPTION_TRACE
             (traces with higher level are not logged ;
              0=Fatal, 1=Error, 2=Warning, 3=Info, 4=Trace, 5=Debug, ...) (def: 5)
 
@@ -167,8 +167,8 @@ The Speed Dreams Team.
             or simply makes SD crash because PLib is shipped as a set of shared libraries
             (see http://sourceforge.net/apps/trac/speed-dreams/ticket/459).
  
-        - OPTION_DEBUG:BOOL :
-            Enable debug symbols even in Release builds (def: ON)
+        - OPTION_FORCE_DEBUG:BOOL :
+            Enable debug symbols even in Release builds (def: OFF)
 
         Tips reported about some issues :
         - sometimes, ENET_INCLUDE_DIR is not detected correctly, resulting in something like
