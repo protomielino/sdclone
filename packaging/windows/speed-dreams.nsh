@@ -12,9 +12,9 @@
 !define VER_MAJOR 2
 !define VER_MINOR 0
 !define VER_PATCH 0
-!define VER_EXTRA "-rc1"
-!define VER_REVISION "r4420"
-!define VER_RELDATE 20120115
+!define VER_EXTRA ""
+!define VER_REVISION "r4687"
+!define VER_RELDATE 20120408
 
 !define GAME_SHORT_NAME "Speed Dreams"
 !define GAME_NAME "${GAME_SHORT_NAME} 2"
@@ -27,8 +27,9 @@
 !define GAME_LONG_NAME "${GAME_SHORT_NAME} ${GAME_LONG_VERSION}"
 !define GAME_PUBLISHER "the Speed Dreams Team"
 !define GAME_WEB_SITE "http://www.speed-dreams.org"
-!define COMMUNITY_WEB_SITE "http://community.speed-dreams.org"
+!define GAME_BUG_TRACKER "http://sourceforge.net/apps/trac/speed-dreams/report/3"
 !define GAME_DOWNLOAD_URL "http://sourceforge.net/projects/speed-dreams/files/2.0.0"
+!define COMMUNITY_WEB_SITE "http://community.speed-dreams.org"
 
 !define GAME_ROOT_REGKEY "HKLM"
 !define GAME_INST_REGKEY "Software\Microsoft\Windows\CurrentVersion\${GAME_FS_NAME}.exe"

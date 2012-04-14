@@ -60,11 +60,9 @@ Section -CoreBinaries
   SetOverwrite on
 
   ; Obsolete physics engines.
-  SetOutPath "$INSTDIR\lib\modules\simu\simuv2"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\simu\simuv2\*.*"
-
-  SetOutPath "$INSTDIR\lib\modules\simu\simuv3"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\simu\simuv3\*.*"
+  SetOutPath "$INSTDIR\lib\modules\simu"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv2.dll"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv3.dll"
 
 SectionEnd
 

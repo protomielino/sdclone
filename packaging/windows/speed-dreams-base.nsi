@@ -91,8 +91,8 @@ Section "!Base System" SEC01
   ; Core loadable modules (physics and graphics engines, track loader, ...)
   SetOutPath "$INSTDIR\lib\modules\graphic"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\graphic\*.*"
-  SetOutPath "$INSTDIR\lib\modules\simu\simuv2.1"
-  File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\simu\simuv2.1\*.*"
+  SetOutPath "$INSTDIR\lib\modules\simu"
+  File "${BUILD_INST_DIR}\lib\modules\simu\simuv2.1.dll"
   SetOutPath "$INSTDIR\lib\modules\telemetry"
   File /r /x *.lib "${BUILD_INST_DIR}\lib\modules\telemetry\*.*"
   SetOutPath "$INSTDIR\lib\modules\track"
@@ -106,6 +106,9 @@ Section "!Base System" SEC01
 
   SetOutPath "$INSTDIR\data\categories"
   File /r "${BUILD_INST_DIR}\data\categories\*.*"
+
+  SetOutPath "$INSTDIR\data\config"
+  File "${BUILD_INST_DIR}\data\config\*.*"
 
   SetOutPath "$INSTDIR\data\config\raceman\extra"
   File /r "${BUILD_INST_DIR}\data\config\raceman\extra\*.*"
@@ -211,7 +214,7 @@ Section /o "HQ cars and tracks (1)" SEC03
 
   StrCpy $1 "speed-dreams-${HQCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
   StrCpy $2 "HQ cars and tracks (1)"
-  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 320
+  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 340
 
 SectionEnd
 
@@ -227,14 +230,14 @@ Section /o "WIP cars and tracks" SEC05
 
   StrCpy $1 "speed-dreams-${WIPCARSTRACKS_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
   StrCpy $2 "WIP cars and tracks"
-  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 140
+  !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 150
 
 SectionEnd
 
 Section /o "Unmaintained" SEC06
 
   StrCpy $1 "speed-dreams-${UNMAINTAINED_SETUP_KEY}-${GAME_LONG_VERSION}-win32-setup.exe"
-  StrCpy $2 "Unmaintained stuff"
+  StrCpy $2 "Unmaintained contents"
   !insertmacro DownloadPackageIfNeededAndThenInstall $1 $2 1
 
 SectionEnd
@@ -255,6 +258,8 @@ Section -Shortcuts
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Web site.lnk" "$INSTDIR\${GAME_NAME}.url"
   WriteIniStr "$INSTDIR\${GAME_NAME} Community.url" "InternetShortcut" "URL" "${COMMUNITY_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Community.lnk" "$INSTDIR\${GAME_NAME} Community.url"
+  WriteIniStr "$INSTDIR\BugTracker.url" "InternetShortcut" "URL" "${GAME_BUG_TRACKER}"
+  CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Bug tracker.lnk" "$INSTDIR\BugTracker.url"
   CreateShortCut "$SMPROGRAMS\${GAME_VERSIONNED_NAME}\Uninstall.lnk" "$INSTDIR\uninst.exe"
 
   ; Desktop shortcut
@@ -302,6 +307,7 @@ SectionEnd
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "HQ tracks, fine-tuned LS1 + 36GP cars and AI drivers$\n(will be downloaded if needed and agreed)"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "More HQ tracks, fine-tuned TRB1 cars and AI drivers$\n(will be downloaded if needed and agreed)"
   !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "Work-in-progress cars (LS2, RS, MP5) and tracks$\n(will be downloaded if needed and agreed)"
+  !insertmacro MUI_DESCRIPTION_TEXT ${SEC06} "Unmaintained contents (Old physics engines)$\n(will be downloaded if needed and agreed)"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
