@@ -1022,7 +1022,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     # CMake options.
     SET(OPTION_OFFICIAL_ONLY false CACHE BOOL "Build / install only officially released contents")
 
-    SET(OPTION_DEBUG true CACHE BOOL "Enable debug symbols even in Release build")
+    SET(OPTION_FORCE_DEBUG false CACHE BOOL "Force debug symbols even in Release build (Automatic in Debug builds)")
 
     SET(OPTION_TRACE true CACHE BOOL "Enable traces into the console or log file")
 
@@ -1044,13 +1044,13 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
 
     IF(MSVC)
-      # Suppress meaningless MSVC warnings
+      # Suppress bothering MSVC warnings
       ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
     ENDIF(MSVC)
 
-    IF(OPTION_DEBUG)
+    IF(OPTION_FORCE_DEBUG)
       ADD_DEFINITIONS(-DDEBUG)
-    ENDIF(OPTION_DEBUG)
+    ENDIF(OPTION_FORCE_DEBUG)
     IF(OPTION_TRACE)
       ADD_DEFINITIONS(-DTRACE_OUT)
     ENDIF(OPTION_TRACE)
