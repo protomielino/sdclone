@@ -60,7 +60,6 @@ cGrScreen::cGrScreen(int myid)
 	scry = 0;
 	scrw = 800;
 	scrh = 600;
-	viewOffset = 0;
 }
 
 cGrScreen::~cGrScreen()
@@ -120,7 +119,6 @@ void cGrScreen::activate(int x, int y, int w, int h, float v)
 	scry = y;
 	scrw = w;
 	scrh = h;
-	viewOffset = v;
 	
 	if (boardCam) delete boardCam;
 
@@ -142,6 +140,7 @@ void cGrScreen::activate(int x, int y, int w, int h, float v)
 	if (curCam) {
 		curCam->limitFov ();
 		curCam->setZoom (GR_ZOOM_DFLT);
+		curCam->setViewOffset(v);
 	}
 	active = true;
 }
@@ -354,7 +353,6 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	glEnable(GL_SCISSOR_TEST);
 	glViewport(scrx, scry, scrw, scrh);
 	glScissor(scrx, scry, scrw, scrh);
-	curCam->setViewOffset(viewOffset);
 	dispCam = curCam;
 	camDraw(s);
 	glDisable(GL_SCISSOR_TEST);

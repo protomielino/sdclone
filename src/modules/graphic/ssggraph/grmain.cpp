@@ -138,8 +138,8 @@ grAdaptScreenSize(void)
 				grNbArrangeScreens = 0;
 			case 0:
 				// Left & Right half of the window
-				grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh, -0.5);
-				grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh, 0.5);
+				grScreens[0]->activate(grWinx,              grWiny, grWinw / 2, grWinh, -0.5 + 10);
+				grScreens[1]->activate(grWinx + grWinw / 2, grWiny, grWinw / 2, grWinh, 0.5 + 10);
 				break;
 			case 1:
 				// Top & Bottom half of the window
@@ -167,9 +167,9 @@ grAdaptScreenSize(void)
 				grNbArrangeScreens = 0;
 			case 0:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 3,   grWinh, -1);
-				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny, grWinw / 3,   grWinh, 0.0);
-				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, 1);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 3,   grWinh, -1 + 10);
+				grScreens[1]->activate(grWinx + grWinw / 3,   grWiny, grWinw / 3,   grWinh, 0.0 + 10);
+				grScreens[2]->activate(grWinx + grWinw * 2/3, grWiny, grWinw / 3,   grWinh, 1 + 10);
 				break;
 			case 1:
 				// Left/Right above wide
@@ -217,10 +217,10 @@ grAdaptScreenSize(void)
 				grNbArrangeScreens = 0;
 			case 0:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, -1.5);
-				grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, -0.5);
-				grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, 0.5);
-				grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 1.5);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 4,   grWinh, -1.5 + 10);
+				grScreens[1]->activate(grWinx + grWinw / 4,   grWiny, grWinw / 4,   grWinh, -0.5 + 10);
+				grScreens[2]->activate(grWinx + grWinw * 2/4, grWiny, grWinw / 4,   grWinh, 0.5 + 10);
+				grScreens[3]->activate(grWinx + grWinw * 3/4, grWiny, grWinw / 4,   grWinh, 1.5 + 10);
 				break;
 			case 1:
 				// Top/Bottom Left/Rigth Quarters
@@ -281,11 +281,11 @@ grAdaptScreenSize(void)
 				grNbArrangeScreens = 0;
 			case 0:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 5,   grWinh, -2.0);
-				grScreens[1]->activate(grWinx + grWinw / 5,   grWiny, grWinw / 5,   grWinh, -1.0);
-				grScreens[2]->activate(grWinx + grWinw * 2/5, grWiny, grWinw / 5,   grWinh, 0.0);
-				grScreens[3]->activate(grWinx + grWinw * 3/5, grWiny, grWinw / 5,   grWinh, 1.0);
-				grScreens[4]->activate(grWinx + grWinw * 4/5, grWiny, grWinw / 5,   grWinh, 2.0);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 5,   grWinh, -2.0 + 10);
+				grScreens[1]->activate(grWinx + grWinw / 5,   grWiny, grWinw / 5,   grWinh, -1.0 + 10);
+				grScreens[2]->activate(grWinx + grWinw * 2/5, grWiny, grWinw / 5,   grWinh, 0.0 + 10);
+				grScreens[3]->activate(grWinx + grWinw * 3/5, grWiny, grWinw / 5,   grWinh, 1.0 + 10);
+				grScreens[4]->activate(grWinx + grWinw * 4/5, grWiny, grWinw / 5,   grWinh, 2.0 + 10);
 				break;
 			}
 			for (i=5; i < GR_NB_MAX_SCREEN; i++)
@@ -297,12 +297,12 @@ grAdaptScreenSize(void)
 				grNbArrangeScreens = 0;
 			case 0:
 				// All side by side
-				grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, -2.5);
-				grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, -1.5);
-				grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, -0.5);
-				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, 0.5);
-				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, 1.5);
-				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 2.5);
+				grScreens[0]->activate(grWinx,                grWiny, grWinw / 6,   grWinh, -2.5 + 10);
+				grScreens[1]->activate(grWinx + grWinw / 6,   grWiny, grWinw / 6,   grWinh, -1.5 + 10);
+				grScreens[2]->activate(grWinx + grWinw * 2/6, grWiny, grWinw / 6,   grWinh, -0.5 + 10);
+				grScreens[3]->activate(grWinx + grWinw * 3/6, grWiny, grWinw / 6,   grWinh, 0.5 + 10);
+				grScreens[4]->activate(grWinx + grWinw * 4/6, grWiny, grWinw / 6,   grWinh, 1.5 + 10);
+				grScreens[5]->activate(grWinx + grWinw * 5/6, grWiny, grWinw / 6,   grWinh, 2.5 + 10);
 				break;
 			case 1:
 				// Top/Bottom Left/Middle/Rigth Matrix

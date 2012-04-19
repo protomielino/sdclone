@@ -96,6 +96,15 @@
 #define GR_ATT_REAR_MAP2        "Rear Level Map 2"
 #define GR_ATT_REAR_MAP3        "Rear Level Map 3"
 
+#define GR_SCT_MONITOR		"Monitor"
+#define GR_ATT_MONITOR		"monitor type"
+#define GR_VAL_MONITOR_16BY9		"16by9"
+#define GR_VAL_MONITOR_4BY3		"4by3"
+#define GR_ATT_SPANSPLIT		"span splits"
+#define GR_VAL_YES		"yes"
+#define GR_VAL_NO		"no"
+#define GR_ATT_BEZELCOMP		"bezel compensation"
+
 #endif /* _GRAPHV1_H_ */ 
 
 

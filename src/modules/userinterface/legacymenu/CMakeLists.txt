@@ -17,6 +17,7 @@ SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
                         ${CS}/joystickconfig.cpp ${CS}/mouseconfig.cpp
 			${CS}/joy2butconfig.cpp
                         ${CS}/displayconfig.cpp ${CS}/graphconfig.cpp ${CS}/openglconfig.cpp
+			${CS}/monitorconfig.cpp
                         ${CS}/simuconfig.cpp ${CS}/soundconfig.cpp ${CS}/aiconfig.cpp
                         ${CS}/carsettingsmenu.cpp ${CS}/hostsettingsmenu.cpp
                         ${CS}/confscreens.h 

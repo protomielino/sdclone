@@ -28,7 +28,10 @@
 #include "grutil.h"		//grGetHOT
 
 static char path[1024];
-static float allfovy;
+
+static int spansplit;
+static float spanfovy;
+static float bezelcomp;
 
 // Utilities ================================================================
 
@@ -157,7 +160,11 @@ float cGrPerspCamera::getLODFactor(float x, float y, float z) {
 
 void cGrPerspCamera::setViewOffset(float newOffset)
 {
-    viewOffset = newOffset;
+    if (spansplit && newOffset) {
+        viewOffset = newOffset;
+	spanfovy = fovy;
+    } else
+        viewOffset = 0;
 }
 
 void cGrPerspCamera::setZoom(int cmd)
@@ -197,7 +204,9 @@ void cGrPerspCamera::setZoom(int cmd)
     }
 
     limitFov();
-    allfovy = fovy;
+
+    if (spansplit && viewOffset)
+	spanfovy = fovy;
 
     sprintf(buf, "%s-%d-%d", GR_ATT_FOVY, screen->getCurCamHead(), getId());
     sprintf(path, "%s/%d", GR_SCT_DISPMODE, screen->getId());
@@ -283,7 +292,7 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	sgVec3 P, p;
-	float offset;
+	float offset = 0;
 	
 	p[0] = car->_drvPos_x;
 	p[1] = car->_drvPos_y;
@@ -294,9 +303,11 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	// Compute offset angle (fudged in bezel compensation)
-	offset = viewOffset * 1.10 * atan(screen->getViewRatio() * tan(allfovy * M_PI / 360.0)) * 2;
-	fovy = allfovy;
+	// Compute offset angle and bezel compensation)
+	if (spansplit && viewOffset) {
+		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}
 
 	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance + offset);
 	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
@@ -561,6 +572,7 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	sgVec3 P, p;
+	float offset = 0;
 	
 	p[0] = car->_bonnetPos_x;
 	p[1] = car->_bonnetPos_y;
@@ -570,9 +582,15 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
 	eye[0] = p[0];
 	eye[1] = p[1];
 	eye[2] = p[2];
+ 
+	// Compute offset angle and bezel compensation)
+	if (spansplit && viewOffset) {
+		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}
 
-	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance);
-	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance);
+	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance + offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -609,6 +627,7 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
     void update(tCarElt *car, tSituation *s) 
     {
 	sgVec3 P, p;
+	float offset = 0;
 	
 	p[0] = car->_bonnetPos_x - 6.0f;
 	p[1] = car->_bonnetPos_y;
@@ -619,8 +638,14 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	P[0] = car->_bonnetPos_x + 30.0;
-	P[1] = car->_bonnetPos_y;
+	// Compute offset angle and bezel compensation)
+	if (spansplit && viewOffset) {
+		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}
+
+	P[0] = car->_bonnetPos_x + 30.0 * cos(offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(offset);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -673,6 +698,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
     void update(tCarElt *car, tSituation *s) 
     {
 	sgVec3 P, p;
+	float offset = 0;
 	
 	p[0] = car->_bonnetPos_x - (car->_dimension_x/2);
 	p[1] = car->_bonnetPos_y;
@@ -682,9 +708,15 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
 	eye[0] = p[0];
 	eye[1] = p[1];
 	eye[2] = p[2];
+ 
+	// Compute offset angle and bezel compensation)
+	if (spansplit && viewOffset) {
+		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}
 
-	P[0] = car->_bonnetPos_x;
-	P[1] = car->_bonnetPos_y;
+	P[0] = car->_bonnetPos_x + 30.0 * cos(offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(offset);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -1560,6 +1592,13 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     int			c;
     class cGrCamera	*cam;
     
+    /* Check whether view should be spanned across vertical splits */
+    const char *pszSpanSplit =
+        GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_SPANSPLIT, GR_VAL_NO);
+    spansplit = strcmp(pszSpanSplit, GR_VAL_YES) ? 0 : 1;
+
+    bezelcomp = (float)GfParmGetNum(grHandle, GR_SCT_MONITOR, GR_ATT_BEZELCOMP, NULL, 120);
+
     /* Scene Cameras */
     c = 0;
 
