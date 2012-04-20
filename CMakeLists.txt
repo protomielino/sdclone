@@ -19,7 +19,7 @@ CHECK_PACKAGES()
 
 # Determine version
 SET(NEXT_LESSER_VERSION 0) # The next lesser version
-SET(NEXT_MAJOR_MINOR_VERSION "2.0") # Next major.minor version
+SET(NEXT_MAJOR_MINOR_VERSION "2.1") # Next major.minor version
 
 IF(NOT OPTION_AUTOVERSION)
 	
