@@ -305,7 +305,8 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
-		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
@@ -585,7 +586,8 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
  
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
-		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
@@ -640,7 +642,8 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
-		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
@@ -711,7 +714,8 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
  
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
-		offset += (viewOffset - 10) * bezelcomp / 100 * atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
