@@ -212,7 +212,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_TRUE);
 					else
 						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_FALSE);
-#if 0		
+		
 				// Anti-aliasing : detect the max supported number of samples
 				// (assumed to be <= 32).
 				int nMaxMultiSamples = 32; // Hard coded max value for the moment.
@@ -243,7 +243,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 						nMaxMultiSamples /= 2;
 					}
 				}
-#endif
+
 				// Failed : try without anti-aliasing.
 				if (!pWinSurface)
 				{
