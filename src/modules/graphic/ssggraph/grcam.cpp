@@ -32,6 +32,7 @@ static char path[1024];
 static int spansplit;
 static float spanfovy;
 static float bezelcomp;
+static int spanaspect;
 
 // Utilities ================================================================
 
@@ -111,7 +112,8 @@ void cGrPerspCamera::setProjection(void)
     // result back to an angle. Care needs to be taken to because the
     // tan and atan functions operate on angles in radians. Also,
     // we're only interested in half the viewing angle.
-    float fovx = atan(screen->getViewRatio() * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
+
+    float fovx = atan(screen->getViewRatio() / spanaspect * tan(fovy * M_PI / 360.0)) * 360.0 / M_PI;
     grContext.setFOV(fovx, fovy);
     grContext.setNearFar(fnear, ffar);
 }
@@ -295,7 +297,11 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	float offset = 0;
 	
 	p[0] = car->_drvPos_x;
+#if 1	//SDW test
+	p[1] = car->_bonnetPos_y;
+#else
 	p[1] = car->_drvPos_y;
+#endif
 	p[2] = car->_drvPos_z;
 	sgXformPnt3(p, car->_posMat);
 	
@@ -306,12 +312,16 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
-	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance + offset);
+	P[0] = car->_drvPos_x + 30.0 * cos(car->_glance + offset);
+#if 1	//SDW test
 	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
+#else
+	P[1] = car->_drvPos_y - 30.0 * sin(car->_glance + offset);
+#endif
 	P[2] = car->_drvPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -374,8 +384,8 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance);
-	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance);
+	P[0] = car->_drvPos_x + 30.0 * cos(car->_glance);
+	P[1] = car->_drvPos_y - 30.0 * sin(car->_glance);
 	P[2] = car->_drvPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -587,13 +597,69 @@ class cGrCarCamInsideFixedCar : public cGrPerspCamera
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
 	P[0] = car->_bonnetPos_x + 30.0 * cos(car->_glance + offset);
 	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
 	P[2] = car->_bonnetPos_z;
+	sgXformPnt3(P, car->_posMat);
+
+	center[0] = P[0];
+	center[1] = P[1];
+	center[2] = P[2];
+
+	up[0] = car->_posMat[2][0];
+	up[1] = car->_posMat[2][1];
+	up[2] = car->_posMat[2][2];
+
+	speed[0] =car->pub.DynGCg.vel.x;
+	speed[1] =car->pub.DynGCg.vel.y;
+	speed[2] =car->pub.DynGCg.vel.z;
+
+	Speed = car->_speed_x * 3.6;
+	}
+};
+
+// cGrCarCamInfrontFixedCar ================================================================
+
+class cGrCarCamInfrontFixedCar : public cGrPerspCamera
+{
+ public:
+    cGrCarCamInfrontFixedCar(class cGrScreen *myscreen, int id, int drawCurr, int drawBG,
+			    float myfovy, float myfovymin, float myfovymax,
+			    float myfnear, float myffar = 1500.0,
+			    float myfogstart = 1400.0, float myfogend = 1500.0)
+	: cGrPerspCamera(myscreen, id, drawCurr, 0, drawBG, 1,
+			 myfovy, myfovymin, myfovymax,
+			 myfnear, myffar, myfogstart, myfogend) {
+    }
+
+    void update(tCarElt *car, tSituation *s) {
+	sgVec3 P, p;
+	float offset = 0;
+	
+	p[0] = car->_dimension_x / 2;
+	p[1] = car->_bonnetPos_y;
+	p[2] = car->_statGC_z;
+	sgXformPnt3(p, car->_posMat);
+	
+	eye[0] = p[0];
+	eye[1] = p[1];
+	eye[2] = p[2];
+ 
+	// Compute offset angle and bezel compensation)
+	if (spansplit && viewOffset) {
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}
+
+	P[0] = (car->_dimension_x / 2) + 30.0 * cos(car->_glance + offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
+	P[2] = car->_statGC_z;
+
 	sgXformPnt3(P, car->_posMat);
 
 	center[0] = P[0];
@@ -630,9 +696,9 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
     {
 	sgVec3 P, p;
 	float offset = 0;
-	
-	p[0] = car->_bonnetPos_x - 6.0f;
-	p[1] = car->_bonnetPos_y;
+
+	p[0] = car->_drvPos_x - 6.0f * cos(1.5 * car->_glance);
+	p[1] = car->_bonnetPos_y + 6.0f * sin(1.5 * car->_glance);
 	p[2] = car->_bonnetPos_z + 1.0f;
 	sgXformPnt3(p, car->_posMat);
 	
@@ -643,12 +709,12 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
-	P[0] = car->_bonnetPos_x + 30.0 * cos(offset);
-	P[1] = car->_bonnetPos_y - 30.0 * sin(offset);
+	P[0] = car->_drvPos_x + 30.0 * cos(1.5 * car->_glance + offset);
+	P[1] = car->_bonnetPos_y - 30.0 * sin(1.5 * car->_glance + offset);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -715,7 +781,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
 	// Compute offset angle and bezel compensation)
 	if (spansplit && viewOffset) {
 		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-			atan(screen->getViewRatio() * tan(spanfovy * M_PI / 360.0)) * 2;
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
 		fovy = spanfovy;
 	}
 
@@ -1603,29 +1669,16 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 
     bezelcomp = (float)GfParmGetNum(grHandle, GR_SCT_MONITOR, GR_ATT_BEZELCOMP, NULL, 120);
 
+    const char *pszMonitorType =
+	GfParmGetStr(grHandle, GR_SCT_MONITOR, GR_ATT_MONITOR, GR_VAL_MONITOR_16BY9);
+    spanaspect = strcmp(pszMonitorType, GR_VAL_MONITOR_16BY9) ? 1.3333 : 1.7777;
+
     /* Scene Cameras */
     c = 0;
 
     /* F2 */
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
-
-    /* cam F2 = just outside the car, behind; camera fixed to car */
-    cam = new cGrCarCamBehindFixedCar(myscreen,
-				      id,
-				      1,	/* drawCurr */
-				      1,	/* drawBG  */
-				      67.5,	/* fovy */
-				      50.0,	/* fovymin */
-				      95.0,	/* fovymax */
-				      0.3,	/* near */
-				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
-				      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
-				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
-				      );
-    cam->add(&cams[c]);
-    id++;
-
 
     /* cam F2 = inside, from the driver's eye, with head movements (driver's view) */
     cam = new cGrCarCamInsideDynDriverEye(myscreen,
@@ -1649,7 +1702,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      1,	/* drawCurr */
 			      1,	/* drawBG  */
 			      75.5,	/* fovy */
-			      20.0,	/* fovymin */
+			      10.0,	/* fovymin */
 			      195.0,	/* fovymax */
 			      0.03,	/* near */
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
@@ -1665,7 +1718,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 				      1,	/* drawCurr */
 				      1,	/* drawBG  */
 				      67.5,	/* fovy */
-				      50.0,	/* fovymin */
+				      10.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
 				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
@@ -1676,12 +1729,16 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     id++;
     
     /* cam F2 = ahead the windshield, from the bonnet (road view, car not visible) */
+#if 1 //SDW test
+    cam = new cGrCarCamInfrontFixedCar(myscreen,
+#else
     cam = new cGrCarCamInsideFixedCar(myscreen,
+#endif
 				      id,
 				      0,	/* drawCurr */
 				      1,	/* drawBG  */
 				      67.5,	/* fovy */
-				      50.0,	/* fovymin */
+				      10.0,	/* fovymin */
 				      95.0,	/* fovymax */
 				      0.3,	/* near */
 				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
@@ -1707,6 +1764,23 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
+    /* cam F2 = just outside the car, behind; camera fixed to car */
+    cam = new cGrCarCamBehindFixedCar(myscreen,
+				      id,
+				      1,	/* drawCurr */
+				      1,	/* drawBG  */
+				      67.5,	/* fovy */
+				      50.0,	/* fovymin */
+				      95.0,	/* fovymax */
+				      0.3,	/* near */
+				      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+				      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
+				      );
+    cam->add(&cams[c]);
+    id++;
+
+#if 0 //SDW test
     /* cam F2 = behind the car, very near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1743,7 +1817,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      25.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
-
+#endif
 
     /* F3 */
     c++;
@@ -1766,23 +1840,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
 			      15.0	/* relaxation */
 			      );
-    cam->add(&cams[c]);
-    id++;
-
-    /* cam F3 = car behind */
-    cam = new cGrCarCamBehind2(myscreen,
-			       id,
-			       1,	/* drawCurr */
-			       1,	/* drawBG  */
-			       40.0,	/* fovy */
-			       5.0,	/* fovymin */
-			       95.0,	/* fovymax */
-			       30.0,	/* dist */
-			       1.0,	/* near */
-			       fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
-			       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
-			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
-			       );
     cam->add(&cams[c]);
     id++;
 
@@ -1819,6 +1876,23 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			     fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			     );
     cam->add(&cams[c]);
+
+    /* cam F3 = car behind */
+    cam = new cGrCarCamBehind2(myscreen,
+			       id,
+			       1,	/* drawCurr */
+			       1,	/* drawBG  */
+			       40.0,	/* fovy */
+			       5.0,	/* fovymin */
+			       95.0,	/* fovymax */
+			       30.0,	/* dist */
+			       1.0,	/* near */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+			       );
+    cam->add(&cams[c]);
+    id++;
 
     /* F4 */
     c++;

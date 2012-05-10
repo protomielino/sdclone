@@ -20,6 +20,7 @@
 #include <tgfclient.h>
 
 #include <displayconfig.h>
+#include <monitorconfig.h>
 #include <graphconfig.h>
 #include <openglconfig.h>
 #include <soundconfig.h>
@@ -36,6 +37,12 @@ static void
 onDisplayMenuActivate(void * /* dummy */)
 {
     GfuiScreenActivate(DisplayMenuInit(MenuHandle));
+}
+
+static void
+onMonitorMenuActivate(void * /* dummy */)
+{
+    GfuiScreenActivate(MonitorMenuInit(MenuHandle));
 }
 
 static void
@@ -80,7 +87,11 @@ OptionsMenuInit(void *prevMenu)
 
     GfuiMenuCreateStaticControls(MenuHandle, param);
     
+#if 0 // SDW hack to get access to Monitor menu, doesn't have a defined position yet
+    GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onMonitorMenuActivate);
+#else
     GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onDisplayMenuActivate);
+#endif
     GfuiMenuCreateButtonControl(MenuHandle, param, "graphic", NULL, onGraphMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, param, "opengl", NULL, onOpenGLMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, param, "sound", NULL, onSoundMenuActivate);
