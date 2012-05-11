@@ -33,6 +33,9 @@ static int spansplit;
 static float spanfovy;
 static float bezelcomp;
 static int spanaspect;
+static tdble spanA;
+
+static double lastTime;
 
 // Utilities ================================================================
 
@@ -374,6 +377,7 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 
     void update(tCarElt *car, tSituation *s) {
 	sgVec3 P, p;
+	float offset = 0;
 	
 	p[0] = car->_drvPos_x;
 	p[1] = car->_drvPos_y;
@@ -384,20 +388,35 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	eye[1] = p[1];
 	eye[2] = p[2];
 
-	P[0] = car->_drvPos_x + 30.0 * cos(car->_glance);
-	P[1] = car->_drvPos_y - 30.0 * sin(car->_glance);
+	// Compute offset angle and bezel compensation)
+	if (spansplit && viewOffset) {
+		offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+			atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+		fovy = spanfovy;
+	}
+
+	P[0] = car->_drvPos_x + 30.0 * cos(car->_glance + offset);
+	P[1] = car->_drvPos_y - 30.0 * sin(car->_glance + offset);
 	P[2] = car->_drvPos_z;
 	sgXformPnt3(P, car->_posMat);
 
 #if (CamDriverEyeDynamicBehaviour == 2)
+	tdble A = 0;
 
-	tdble A = car->_yaw;
-	if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
-	    PreA += 2*PI;
-	} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
-	    PreA -= 2*PI;
+	// We want uniform movement across split screens when 'spanning'
+	if (spansplit && viewOffset && lastTime == s->currentTime) {
+		A = spanA;
+	} else {
+		A = car->_yaw;
+		if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
+		    PreA += 2*PI;
+		} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
+		    PreA -= 2*PI;
+		}
+		RELAXATION(A, PreA, 4.0f);
+		spanA = A;
 	}
-	RELAXATION(A, PreA, 4.0f);
+	lastTime = s->currentTime;
 
 	// ignore if glancing left/right
 	if (car->_glance != 0)
@@ -713,9 +732,9 @@ class cGrCarCamBehindFixedCar : public cGrPerspCamera
 		fovy = spanfovy;
 	}
 
-	P[0] = car->_drvPos_x + 30.0 * cos(1.5 * car->_glance + offset);
-	P[1] = car->_bonnetPos_y - 30.0 * sin(1.5 * car->_glance + offset);
-	P[2] = car->_bonnetPos_z;
+	P[0] = car->_drvPos_x - 6.0f * cos(1.5 * car->_glance) + 30.0 * cos(1.5 * car->_glance + offset);
+	P[1] = car->_bonnetPos_y + 6.0f * sin(1.5 * car->_glance) - 30.0 * sin(1.5 * car->_glance + offset);
+	P[2] = car->_bonnetPos_z + 1.0f;;
 	sgXformPnt3(P, car->_posMat);
 
 	center[0] = P[0];
