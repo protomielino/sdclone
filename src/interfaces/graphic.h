@@ -73,6 +73,7 @@
 #define GR_ATT_BGSKY_RING	"background"
 #define GR_ATT_BGSKY_LAND	"land"
 #define GR_ATT_BGSKY_DISABLED	"disabled"
+#define GR_ATT_BGSKY_ENABLED	"enabled"
 #define GR_ATT_CLOUDLAYER	"cloudlayer"
 #define GR_ATT_AGR_FOREST	"forest LOD"
 #define GR_ATT_AGR_TREE		"tree LOD"
