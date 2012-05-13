@@ -43,7 +43,7 @@ static const int PrecipDensityValues[] = {0, 20, 40, 60, 80, 100};
 static const int NbPrecipDensityValues = sizeof(PrecipDensityValues) / sizeof(PrecipDensityValues[0]);
 static const int CloudLayersValues[] = {1, 2, 3};
 static const int NbCloudLayersValues = sizeof(CloudLayersValues) / sizeof(CloudLayersValues[0]);
-static const char* BackgroundLandscapeValues[] = { GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_ENABLED };
+static const char* BackgroundLandscapeValues[] = { GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_RING, GR_ATT_BGSKY_LAND };
 static const int NbBackgroundLandscapeValues = sizeof(BackgroundLandscapeValues) / sizeof(BackgroundLandscapeValues[0]);
 
 static void	*ScrHandle = NULL;

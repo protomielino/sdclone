@@ -22,6 +22,7 @@
 #include <displayconfig.h>
 #include <monitorconfig.h>
 #include <graphconfig.h>
+#include <advancedgraphconfig.h>
 #include <openglconfig.h>
 #include <soundconfig.h>
 #include <simuconfig.h>
@@ -49,6 +50,12 @@ static void
 onGraphMenuActivate(void * /* dummy */)
 {
     GfuiScreenActivate(GraphMenuInit(MenuHandle));
+}
+
+static void
+onAdvancedGraphMenuActivate(void * /*dummy */)
+{
+	GfuiScreenActivate(AdvancedGraphMenuInit(MenuHandle));
 }
 
 static void
@@ -93,6 +100,10 @@ OptionsMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(MenuHandle, param, "display", NULL, onDisplayMenuActivate);
 #endif
     GfuiMenuCreateButtonControl(MenuHandle, param, "graphic", NULL, onGraphMenuActivate);
+//#if _ADVANCED // CMAKE OPTION ADVANCED
+	GfuiMenuCreateButtonControl(MenuHandle, param, "advanced", NULL, onAdvancedGraphMenuActivate);
+//#endif
+
     GfuiMenuCreateButtonControl(MenuHandle, param, "opengl", NULL, onOpenGLMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, param, "sound", NULL, onSoundMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, param, "simulation", NULL, onSimuMenuActivate);

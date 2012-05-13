@@ -48,6 +48,12 @@ onRaceSelectMenuActivate(void * /* dummy */)
 }
 
 static void
+onRaceWESelectMenuActivate(void * /* dummy */)
+{
+	GfuiScreenActivate(RmRaceWESelectInit(MenuHandle));
+}
+
+static void
 onOptionsMenuActivate(void * /* dummy */)
 {
     GfuiScreenActivate(OptionsMenuInit(MenuHandle));
@@ -105,6 +111,7 @@ MainMenuInit(void)
 
     //Add buttons and create based on xml
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "race", NULL, onRaceSelectMenuActivate);
+	GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "weekend", NULL, onRaceWESelectMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "configure", NULL, onPlayerConfigMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "options", NULL, onOptionsMenuActivate);
     GfuiMenuCreateButtonControl(MenuHandle, menuDescHdle, "credits", NULL, onCreditsMenuActivate);

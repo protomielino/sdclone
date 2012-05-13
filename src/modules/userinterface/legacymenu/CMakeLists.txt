@@ -15,29 +15,30 @@ ENDIF(WIN32)
 SET(CS confscreens)
 SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
                         ${CS}/joystickconfig.cpp ${CS}/mouseconfig.cpp
-			${CS}/joy2butconfig.cpp
+						${CS}/joy2butconfig.cpp
                         ${CS}/displayconfig.cpp ${CS}/graphconfig.cpp ${CS}/openglconfig.cpp
-			${CS}/monitorconfig.cpp
+						${CS}/monitorconfig.cpp ${CS}/advancedgraphconfig.cpp
                         ${CS}/simuconfig.cpp ${CS}/soundconfig.cpp ${CS}/aiconfig.cpp
                         ${CS}/carsettingsmenu.cpp ${CS}/hostsettingsmenu.cpp
-                        ${CS}/confscreens.h 
+                        ${CS}/confscreens.h ${CS}/advancedgraphconfig.h
                         ${CS}/playerconfig.h ${CS}/controlconfig.h
-	                ${CS}/joystickconfig.h ${CS}/mouseconfig.h
-			${CS}/joy2butconfig.h
+						${CS}/joystickconfig.h ${CS}/mouseconfig.h
+						${CS}/joy2butconfig.h ${CS}/
                         ${CS}/displayconfig.h ${CS}/graphconfig.h ${CS}/openglconfig.h 
                         ${CS}/simuconfig.h ${CS}/soundconfig.h ${CS}/aiconfig.h
                         ${CS}/carsettingsmenu.h ${CS}/hostsettingsmenu.h)
 
 SET(RS racescreens)
 SET(RACESCREENS_SOURCES ${RS}/raceselectmenu.cpp
+						${RS}/raceweekendmenu.cpp
                         ${RS}/racemanmenu.cpp ${RS}/fileselect.cpp ${RS}/networkingmenu.cpp
                         ${RS}/raceconfigstate.cpp
                         ${RS}/trackselect.cpp ${RS}/driverselect.cpp ${RS}/garagemenu.cpp
                         ${RS}/raceparamsmenu.cpp
-			${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
+						${RS}/raceloadingmenu.cpp ${RS}/racerunningmenus.cpp
                         ${RS}/racestopmenu.cpp ${RS}/racestartmenu.cpp ${RS}/racepitmenu.cpp 
                         ${RS}/raceresultsmenus.cpp ${RS}/racenexteventmenu.cpp
-                        ${RS}/racescreens.h ${RS}/garagemenu.h)
+                        ${RS}/racescreens.h ${RS}/garagemenu.h ${RS}/raceweekendscreens.h)
 
 SET(LEGACYMENU_SOURCES ${MAINSCREENS_SOURCES} 
                        ${CONFSCREENS_SOURCES} 
