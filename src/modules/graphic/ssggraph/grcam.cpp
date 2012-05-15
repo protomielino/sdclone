@@ -836,7 +836,7 @@ class cGrCarCamBehindReverse : public cGrPerspCamera
 	}
 
 	P[0] = car->_bonnetPos_x + 30.0 * cos(offset);
-	P[1] = car->_bonnetPos_y - 30.0 * sin(offset);
+	P[1] = car->_bonnetPos_y + 30.0 * sin(offset);
 	P[2] = car->_bonnetPos_z;
 	sgXformPnt3(P, car->_posMat);
 
@@ -1828,28 +1828,13 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
-    id++;
 
-#if 0 //SDW test
-    /* cam F2 = behind the car, very near, looking forward */
-    cam = new cGrCarCamBehind(myscreen,
-			      id,
-			      1,	/* drawCurr */
-			      1,	/* drawBG  */
-			      40.0,	/* fovy */
-			      5.0,	/* fovymin */
-			      95.0,	/* fovymax */
-			      6.0,	/* dist */
-			      2.0,	/* height */
-			      1.0,	/* near */
-			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
-			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
-			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
-			      0.0	/* relaxation */
-			      );
-    cam->add(&cams[c]);
-    id++;
+    /* F3 */
+    c++;
+    GF_TAILQ_INIT(&cams[c]);
+    id = 0;
     
+#if 1 //SDW test
     /* cam F2 = behind the car, near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1867,13 +1852,10 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      25.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
+    id++;
 #endif
 
-    /* F3 */
-    c++;
-    GF_TAILQ_INIT(&cams[c]);
-    id = 0;
-    
+#if 0 //SDW Test
     /* cam F3 = behind the car, far */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1892,6 +1874,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      );
     cam->add(&cams[c]);
     id++;
+#endif
 
     /* cam F3 = car behind */
     cam = new cGrCarCamBehind(myscreen,
@@ -1926,24 +1909,29 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			     fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			     );
     cam->add(&cams[c]);
-
-    /* cam F3 = car behind */
-    cam = new cGrCarCamBehind2(myscreen,
-			       id,
-			       1,	/* drawCurr */
-			       1,	/* drawBG  */
-			       40.0,	/* fovy */
-			       5.0,	/* fovymin */
-			       95.0,	/* fovymax */
-			       30.0,	/* dist */
-			       1.0,	/* near */
-			       fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
-			       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
-			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
-			       );
-    cam->add(&cams[c]);
     id++;
 
+#if 1 //SDW test
+    /* cam F2 = behind the car, very near, looking forward */
+    cam = new cGrCarCamBehind(myscreen,
+			      id,
+			      1,	/* drawCurr */
+			      1,	/* drawBG  */
+			      40.0,	/* fovy */
+			      5.0,	/* fovymin */
+			      95.0,	/* fovymax */
+			      6.0,	/* dist */
+			      2.0,	/* height */
+			      1.0,	/* near */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
+			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
+			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
+			      0.0	/* relaxation */
+			      );
+    cam->add(&cams[c]);
+    id++;
+#endif
+    
     /* F4 */
     c++;
     GF_TAILQ_INIT(&cams[c]);
@@ -2366,6 +2354,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 				fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 				);
     cam->add(&cams[c]);
+    id++;
 
     /* F10 */
     c++;
@@ -2386,6 +2375,26 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
 			       );
     cam->add(&cams[c]);
+    id++;
+
+#if 1 //SDW Test
+    /* cam F3 = car behind */
+    cam = new cGrCarCamBehind2(myscreen,
+			       id,
+			       1,	/* drawCurr */
+			       1,	/* drawBG  */
+			       40.0,	/* fovy */
+			       5.0,	/* fovymin */
+			       95.0,	/* fovymax */
+			       30.0,	/* dist */
+			       1.0,	/* near */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor,	/* far */
+			       fixedFar ? fixedFar/2 : 500.0 * fovFactor,	/* fogstart */
+			       fixedFar ? fixedFar : 1000.0 * fovFactor	/* fogend */
+			       );
+    cam->add(&cams[c]);
+    id++;
+#endif
 
     /* F11 */
     c++;
