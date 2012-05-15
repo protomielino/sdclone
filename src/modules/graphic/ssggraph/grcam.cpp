@@ -349,11 +349,11 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 // Change define value to choose desired dynamic behaviour of the CamInsideDriverEye cameras
 // * 1 = Torcs's one : strange rotation of the camera around speed vector axis
 // * 2 = Use attenuated car yaw to translate camera center (by Andrew)
-#define CamDriverEyeDynamicBehaviour 2
+#define CamDriverEyeDynamicBehaviour 3
 
 class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 {
-#if (CamDriverEyeDynamicBehaviour == 2)
+#if (CamDriverEyeDynamicBehaviour != 1)
  private:
     tdble PreA;
 #endif
@@ -366,12 +366,12 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	: cGrCarCamInsideDriverEye(myscreen, id, drawCurr, drawBG,
 			 myfovy, myfovymin, myfovymax,
 			 myfnear, myffar, myfogstart, myfogend) {
-#if (CamDriverEyeDynamicBehaviour == 2)
-	PreA = 0.0f;
-#else
+#if (CamDriverEyeDynamicBehaviour == 1)
 	up[0] = 0;
 	up[1] = 0;
 	up[2] = 1;
+#else
+	PreA = 0.0f;
 #endif
     }
 
@@ -398,6 +398,37 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	P[0] = car->_drvPos_x + 30.0 * cos(car->_glance + offset);
 	P[1] = car->_drvPos_y - 30.0 * sin(car->_glance + offset);
 	P[2] = car->_drvPos_z;
+
+#if (CamDriverEyeDynamicBehaviour == 3)
+	tdble A = 0;
+
+	// We want uniform movement across split screens when 'spanning'
+	if (spansplit && viewOffset && lastTime == s->currentTime) {
+		A = spanA;
+	} else {
+		A = car->_yaw;
+		if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
+		    PreA += 2*PI;
+		} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
+		    PreA -= 2*PI;
+		}
+		RELAXATION(A, PreA, 8.0f);
+		spanA = A;
+	}
+	lastTime = s->currentTime;
+
+	// ignore head movement if glancing left/right
+	if (car->_glance == 0) {
+		tdble headTurn = (A - car->_yaw)/2;
+
+		if (headTurn > PI/3) headTurn = PI/3;
+		if (headTurn < -PI/3) headTurn = -PI/3;
+
+		P[0] = car->_drvPos_x + 30.0 * cos(car->_glance + offset + headTurn);
+		P[1] = car->_drvPos_y - 30.0 * sin(car->_glance + offset + headTurn);
+	}
+#endif
+
 	sgXformPnt3(P, car->_posMat);
 
 #if (CamDriverEyeDynamicBehaviour == 2)
@@ -439,7 +470,7 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 	center[2] = P[2];
 #endif
 
-#if (CamDriverEyeDynamicBehaviour == 2)
+#if (CamDriverEyeDynamicBehaviour != 1)
 	up[0] = car->_posMat[2][0];
 	up[1] = car->_posMat[2][1];
 	up[2] = car->_posMat[2][2];
@@ -1705,7 +1736,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      1,	/* drawCurr */
 			      1,	/* drawBG  */
 			      75.5,	/* fovy */
-			      50.0,	/* fovymin */
+			      10.0,	/* fovymin */
 			      95.0,	/* fovymax */
 			      0.03,	/* near */
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
@@ -1722,7 +1753,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      1,	/* drawBG  */
 			      75.5,	/* fovy */
 			      10.0,	/* fovymin */
-			      195.0,	/* fovymax */
+			      95.0,	/* fovymax */
 			      0.03,	/* near */
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
 			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
