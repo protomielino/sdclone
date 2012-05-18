@@ -300,7 +300,7 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	float offset = 0;
 	
 	p[0] = car->_drvPos_x;
-#if 1	//SDW test
+#if 1	//SDW Remove Before Release
 	p[1] = car->_bonnetPos_y;
 #else
 	p[1] = car->_drvPos_y;
@@ -320,7 +320,7 @@ class cGrCarCamInsideDriverEye : public cGrPerspCamera
 	}
 
 	P[0] = car->_drvPos_x + 30.0 * cos(car->_glance + offset);
-#if 1	//SDW test
+#if 1	//SDW Remove Before Release
 	P[1] = car->_bonnetPos_y - 30.0 * sin(car->_glance + offset);
 #else
 	P[1] = car->_drvPos_y - 30.0 * sin(car->_glance + offset);
@@ -888,14 +888,23 @@ class cGrCarCamBehind : public cGrPerspCamera
 	tdble x;
 	tdble y;
 
-	A = car->_yaw;
-	if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
-	    PreA += 2*PI;
-	} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
-	    PreA -= 2*PI;
+	// We want uniform movement across split screens when 'spanning'
+	if (spansplit && viewOffset && lastTime == s->currentTime) {
+		A = spanA;
+	} else {
+		A = car->_yaw;
+		if (fabs(PreA - A) > fabs(PreA - A + 2*PI)) {
+		    PreA += 2*PI;
+		} else if (fabs(PreA - A) > fabs(PreA - A - 2*PI)) {
+		    PreA -= 2*PI;
+		}
+		if (relax > 0.1)
+			RELAXATION(A, PreA, relax);
+		spanA = A;
 	}
-	if (relax > 0.1)
-		RELAXATION(A, PreA, relax);
+	lastTime = s->currentTime;
+
+#if 0	// SDW Remove Before Release
 	CosA = cos(A);
 	SinA = sin(A);
 	x = car->_pos_X - dist * CosA;
@@ -904,8 +913,18 @@ class cGrCarCamBehind : public cGrPerspCamera
 	eye[0] = x;
 	eye[1] = y;
 	eye[2] = RtTrackHeightG(car->_trkPos.seg, x, y) + height;
+
 	center[0] = car->_pos_X + (10 - dist) * CosA;
 	center[1] = car->_pos_Y + (10 - dist) * SinA;
+#else
+    
+	eye[0] = car->_pos_X - dist * cos(A + 1.5 * car->_glance);
+	eye[1] = car->_pos_Y - dist * sin(A + 1.5 * car->_glance);
+	eye[2] = RtTrackHeightG(car->_trkPos.seg, eye[0], eye[1]) + height;
+
+	center[0] = car->_pos_X + (10 - dist) * cos(A + 1.5 * car->_glance);
+	center[1] = car->_pos_Y + (10 - dist) * sin(A + 1.5 * car->_glance);
+#endif
 	center[2] = car->_pos_Z;
 
 	speed[0] = car->pub.DynGCg.vel.x;
@@ -1002,6 +1021,7 @@ class cGrCarCamFront : public cGrPerspCamera
     }
 
     void update(tCarElt *car, tSituation *s) {
+#if 0	//SDW Remove Before Release
 	tdble CosA = cos(car->_yaw);
 	tdble SinA = sin(car->_yaw);
 	tdble x = car->_pos_X + dist * CosA;
@@ -1010,6 +1030,12 @@ class cGrCarCamFront : public cGrPerspCamera
 	eye[0] = x;
 	eye[1] = y;
 	eye[2] = RtTrackHeightG(car->_trkPos.seg, x, y) + 0.5;
+#else
+	eye[0] = car->_pos_X + dist * cos(car->_yaw + 1.5 * car->_glance);
+	eye[1] = car->_pos_Y + dist * sin(car->_yaw + 1.5 * car->_glance);
+	eye[2] = RtTrackHeightG(car->_trkPos.seg, eye[0], eye[1]) + 0.5;
+#endif
+
 	center[0] = car->_pos_X;
 	center[1] = car->_pos_Y;
 	center[2] = car->_pos_Z;
@@ -1779,7 +1805,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     id++;
     
     /* cam F2 = ahead the windshield, from the bonnet (road view, car not visible) */
-#if 1 //SDW test
+#if 1 //SDW Remove Before Release
     cam = new cGrCarCamInfrontFixedCar(myscreen,
 #else
     cam = new cGrCarCamInsideFixedCar(myscreen,
@@ -1814,6 +1840,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
+#if 0
     /* cam F2 = just outside the car, behind; camera fixed to car */
     cam = new cGrCarCamBehindFixedCar(myscreen,
 				      id,
@@ -1828,13 +1855,14 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 				      fixedFar ? fixedFar : 600.0 * fovFactor	/* fogend */
 				      );
     cam->add(&cams[c]);
+#endif
 
     /* F3 */
     c++;
     GF_TAILQ_INIT(&cams[c]);
     id = 0;
     
-#if 1 //SDW test
+#if 1 //SDW Remove Before Release
     /* cam F2 = behind the car, near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1855,7 +1883,7 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     id++;
 #endif
 
-#if 0 //SDW Test
+#if 0 //SDW Remove Before Release
     /* cam F3 = behind the car, far */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1911,7 +1939,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
-#if 1 //SDW test
     /* cam F2 = behind the car, very near, looking forward */
     cam = new cGrCarCamBehind(myscreen,
 			      id,
@@ -1930,7 +1957,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      );
     cam->add(&cams[c]);
     id++;
-#endif
     
     /* F4 */
     c++;
@@ -2377,7 +2403,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
     cam->add(&cams[c]);
     id++;
 
-#if 1 //SDW Test
     /* cam F3 = car behind */
     cam = new cGrCarCamBehind2(myscreen,
 			       id,
@@ -2394,7 +2419,6 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			       );
     cam->add(&cams[c]);
     id++;
-#endif
 
     /* F11 */
     c++;
