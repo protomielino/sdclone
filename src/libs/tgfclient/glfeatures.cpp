@@ -227,9 +227,11 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 					// Now check if we have a video mode, and if it actually features
 					// what we specified.
 					int nActualSampleBuffers = 0;
-					SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
 					int nActualMultiSamples = 0;
-					SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
+					if (pWinSurface) {
+						SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
+						SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
+					}
 // 					GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
 // 							   nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
 
