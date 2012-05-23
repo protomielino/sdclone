@@ -24,10 +24,10 @@
         <attstr name="team" val="March Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-archer-r9"></attstr>
-        <attnum name="race number" val="18"></attnum>
+        <attnum name="race number" val="57"></attnum>
         <attnum name="red" val="0.9"></attnum>
-        <attnum name="green" val="0.9"></attnum>
-        <attnum name="blue" val="0.9"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.1"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
@@ -37,10 +37,10 @@
         <attstr name="team" val="March Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-archer-r9"></attstr>
-        <attnum name="race number" val="24"></attnum>
+        <attnum name="race number" val="58"></attnum>
         <attnum name="red" val="0.9"></attnum>
-        <attnum name="green" val="0.9"></attnum>
-        <attnum name="blue" val="0.9"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.1"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
@@ -50,10 +50,10 @@
         <attstr name="team" val="Erik Gaurdrault Voitures"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-vulture-v6r"></attstr>
-        <attnum name="race number" val="12"></attnum>
-        <attnum name="red" val="1.0"></attnum>
+        <attnum name="race number" val="63"></attnum>
+        <attnum name="red" val="0.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
-        <attnum name="blue" val="0.2"></attnum>
+        <attnum name="blue" val="0.8"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
@@ -63,10 +63,10 @@
         <attstr name="team" val="Erik Gaurdrault Voitures"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-vulture-v6r"></attstr>
-        <attnum name="race number" val="2"></attnum>
-        <attnum name="red" val="1.0"></attnum>
+        <attnum name="race number" val="64"></attnum>
+        <attnum name="red" val="0.0"></attnum>
         <attnum name="green" val="0.2"></attnum>
-        <attnum name="blue" val="0.2"></attnum>
+        <attnum name="blue" val="0.8"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
@@ -76,7 +76,7 @@
         <attstr name="team" val="All Inky Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-toro-rgt"></attstr>
-        <attnum name="race number" val="3"></attnum>
+        <attnum name="race number" val="52"></attnum>
         <attnum name="red" val="0.8"></attnum>
         <attnum name="green" val="0.7"></attnum>
         <attnum name="blue" val="0.2"></attnum>
@@ -86,23 +86,23 @@
       <section name="6">
         <attstr name="name" val="Audrey Sanchez"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="ProjectDiskie and Yukiho Speed"></attstr>
+        <attstr name="team" val="All Inky Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-toro-rgt"></attstr>
-        <attnum name="race number" val="666"></attnum>
-        <attnum name="red" val="1.0"></attnum>
-        <attnum name="green" val="0.5"></attnum>
-        <attnum name="blue" val="0.0"></attnum>
+        <attnum name="race number" val="53"></attnum>
+        <attnum name="red" val="0.8"></attnum>
+        <attnum name="green" val="0.7"></attnum>
+        <attnum name="blue" val="0.2"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
       <section name="7">
         <attstr name="name" val="Ai Chen"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="Uguu Technocraft"></attstr>
+        <attstr name="team" val="Frontline Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-zentek-z7r"></attstr>
-        <attnum name="race number" val="20"></attnum>
+        <attnum name="race number" val="61"></attnum>
         <attnum name="red" val="0.4"></attnum>
         <attnum name="green" val="0.4"></attnum>
         <attnum name="blue" val="1.0"></attnum>
@@ -112,13 +112,13 @@
       <section name="8">
         <attstr name="name" val="Hong Lin"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="Uguu Technocraft"></attstr>
+        <attstr name="team" val="Frontline Racing"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-zentek-z7r"></attstr>
-        <attnum name="race number" val="58"></attnum>
-        <attnum name="red" val="0.7"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="0.7"></attnum>
+        <attnum name="race number" val="62"></attnum>
+        <attnum name="red" val="0.4"></attnum>
+        <attnum name="green" val="0.4"></attnum>
+        <attnum name="blue" val="1.0"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
@@ -180,26 +180,26 @@
       <section name="13">
         <attstr name="name" val="Mai Maeda"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="USR"></attstr>
+        <attstr name="team" val="Ritsuko Tech"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-taipan-ltsr"></attstr>
-        <attnum name="race number" val="77"></attnum>
+        <attnum name="race number" val="65"></attnum>
         <attnum name="red" val="0.8"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="0.2"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.8"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
 
       <section name="14">
         <attstr name="name" val="Kaito Kinoshita"></attstr>
         <attstr name="desc" val=""></attstr>
-        <attstr name="team" val="USR"></attstr>
+        <attstr name="team" val="Ritsuko Tech"></attstr>
         <attstr name="author" val="Andrew Sumner"></attstr>
         <attstr name="car name" val="ls1-taipan-ltsr"></attstr>
-        <attnum name="race number" val="78"></attnum>
+        <attnum name="race number" val="66"></attnum>
         <attnum name="red" val="0.8"></attnum>
-        <attnum name="green" val="0.7"></attnum>
-        <attnum name="blue" val="0.2"></attnum>
+        <attnum name="green" val="0.2"></attnum>
+        <attnum name="blue" val="0.8"></attnum>
         <attstr name="features" val=""></attstr>
       </section>
     </section>
