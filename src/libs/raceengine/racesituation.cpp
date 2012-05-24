@@ -276,7 +276,7 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 		} else {
 			// Scaled on Number of Laps that the lead driver has completed
 			if (s->cars[0]->_laps > 0 && s->cars[0]->_laps <= s->_totLaps)
-				s->accelTime = 24 * 3600 * (s->cars[0]->_laps + (s->cars[0]->_distFromStartLine / pCurrReInfo->track->length)) / s->_totLaps;
+				s->accelTime = 24 * 3600 * (s->cars[0]->_laps - 1 + (s->cars[0]->_distFromStartLine / pCurrReInfo->track->length)) / s->_totLaps;
 			else
 				s->accelTime = 0;
 		}
