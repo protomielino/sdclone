@@ -1,4 +1,4 @@
-/***************************************************************************
+﻿/***************************************************************************
 
     file                 : grbackground.cpp
     created              : Thu Nov 25 21:09:40 CEST 2010
@@ -36,6 +36,9 @@
 
 // Some exported constants.
 const tdble grSkyDomeNeutralFOVDistance = 20000.0f; // Not the smallest, a medium one.
+
+static const double m_log01 = -log( 0.01 );
+static const double sqrt_m_log01 = sqrt( m_log01 );
 
 // Some private constants.
 static const int NbBackgroundFaces = 36; //Background faces
@@ -340,25 +343,33 @@ grInitBackground()
 		switch (grTrack->local.rain)	
 		{
 			case TR_RAIN_NONE:
-				visibility = 0.0f;
+				//visibility = 0.0f;
+				visibility = 2500.0;
 				break;
 			case TR_RAIN_LITTLE:
-				visibility = 400.0f;
+				//visibility = 400.0f;
+				visibility = 800.0f;
 				break;
 			case TR_RAIN_MEDIUM:
-				visibility = 500.0f;
+				//visibility = 500.0f;
+				visibility = 600.0f;
 				break;
 			case TR_RAIN_HEAVY:
-				visibility = 550.0f;
+				//visibility = 550.0f;
+				visibility = 400.0f;
 				break;
 			default:
 				GfLogWarning("Unsupported rain strength value %d (assuming none)",
 							 grTrack->local.rain);
-				visibility = 0.0f;
+				visibility = 10000.0f;
 				break;
 		}//switch Rain
 		
-		TheSky->modifyVisibility( visibility, 0);
+		//TheSky->modifyVisibility( visibility, 0);
+		TheSky->setVisibility( visibility ); // Visibility in meters
+
+		const GLfloat fog_exp_density = m_log01 / visibility;
+        const GLfloat fog_exp2_density = sqrt_m_log01 / visibility;
     
 		//Setup overall light level according to rain if any
 		const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();
@@ -883,7 +894,9 @@ grPreDrawSky(tSituation* s, float fogStart, float fogEnd)
 
 	if (grSkyDomeDistance && grTrack->skyversion > 0) 
 	{
-		const GLfloat fog_exp2_density = (float)sqrt_m_log01 / TheSky->getVisibility();
+		//const GLfloat fog_exp2_density = (float)sqrt_m_log01 / TheSky->getVisibility();
+		const GLfloat fog_exp_density = m_log01 / TheSky->getVisibility();
+        const GLfloat fog_exp2_density = sqrt_m_log01 / TheSky->getVisibility();
 		glEnable(GL_FOG);
 		//glFogf(GL_FOG_START, fogStart);
 		//glFogf(GL_FOG_END, fogEnd);

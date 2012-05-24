@@ -77,6 +77,7 @@ typedef struct {
     char	carName[MAX_NAME_LEN];	/**< Car object name */
     char	category[MAX_NAME_LEN];	/**< Car's category */
     int		raceNumber;		/**< Car's race number */
+	int		price;			/**<Car's Price */
     int		startRank;		/**< Car's starting position */
     int		driverType;		/**< Driver type */
     int		networkplayer;		/**< Network player */
@@ -118,6 +119,7 @@ typedef struct {
 #define _networkPlayer info.networkplayer   /**< short cut to tInitCar#networkplayer*/
 #define _skillLevel	info.skillLevel			/**< short cut to tInitCar#skillLevel */
 #define _raceNumber	info.raceNumber			/**< short cut to tInitCar#raceNumber */
+#define _Price		info.price				
 #define _startRank	info.startRank			/**< short cut to tInitCar#startRank */
 #define _dimension	info.dimension			/**< short cut to tInitCar#dimension */
 #define _dimension_x	info.dimension.x		/**< short cut to tInitCar#dimension.x */
@@ -510,7 +512,8 @@ typedef struct CarElt
 #define SECT_LIGHT		"Light"
 
 /* Parameter names */
-#define PRM_CATEGORY		"category"
+#define PRM_CATEGORY	"category"
+#define PRM_PRICE		"price"
 #define PRM_LEN			"body length"
 #define PRM_WIDTH		"body width"
 #define PRM_OVERALLLEN		"overall length"
