@@ -89,6 +89,7 @@ static bool grDynamicSkyDome = false;
 static int grBackgroundType = 0;
 static float grSunDeclination = 0.0f;
 static float grMoonDeclination = 0.0f;
+unsigned Visibility = 0;
 
 static ssgBranch *SunAnchor = NULL;
 
@@ -211,6 +212,7 @@ grInitBackground()
 		//No planets
 		NPlanets = 0;
 		APlanetsData = NULL;
+		int visibility = 0;
 
 		GfLogInfo("  Planets : %d\n", NPlanets);
 		
@@ -343,29 +345,29 @@ grInitBackground()
 
 		//Setup visibility according to rain if any
 		// TODO: Does visibility really decrease when rain gets heavier ????
-		float visibility = 0.0f;
+		//float visibility = 0.0f;
 		switch (grTrack->local.rain)	
 		{
 			case TR_RAIN_NONE:
 				//visibility = 0.0f;
-				visibility = 12000.0f;
+				visibility = Visibility;
 				break;
 			case TR_RAIN_LITTLE:
 				//visibility = 400.0f;
-				visibility = 800.0f;
+				visibility = 800.0;
 				break;
 			case TR_RAIN_MEDIUM:
 				//visibility = 500.0f;
-				visibility = 600.0f;
+				visibility = 600.0;
 				break;
 			case TR_RAIN_HEAVY:
 				//visibility = 550.0f;
-				visibility = 400.0f;
+				visibility = 400.0;
 				break;
 			default:
 				GfLogWarning("Unsupported rain strength value %d (assuming none)",
 							 grTrack->local.rain);
-				visibility = 10000.0f;
+				visibility = 15000.0;
 				break;
 		}//switch Rain
 		
@@ -470,6 +472,11 @@ grLoadBackgroundGraphicsOptions()
 		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, 0, 0) + 0.5);
 
 	GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
+
+	Visibility =
+		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
+
+
 }
 
 void
@@ -890,6 +897,27 @@ void grLoadBackgroundSky(void)
 	BackSkyLoc->setTransform(&BackSkypos);
 }
 
+void grLoadBackgroundLand(void)
+{
+	char buf2[256];
+	const char		*bgsky;
+	ssgEntity		*desc2;
+	
+	bgsky = "land.ac";
+	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
+	ssgTexturePath(buf2);
+	snprintf(buf2, sizeof(buf2), "data/objects");
+	ssgModelPath(buf2);
+		
+	desc2 = grssgLoadAC3D(bgsky, NULL);
+	BackSkyAnchor->addKid(desc2);
+
+	// move backgroundsky in scene center
+	//sgCoord BackSkypos;
+	//sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
+	//BackSkyLoc->setTransform(&BackSkypos);
+}
+
 void
 grPreDrawSky(tSituation* s, float fogStart, float fogEnd) 
 {
@@ -1006,7 +1034,24 @@ grUpdateSky(double currentTime, double accelTime)
 	// 3) Update scene color and light
 	const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();
 	const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-	const float scene_brightness = (float)pow(sky_brightness, 0.5f);
+	float scene_brightness = (float)pow(sky_brightness, 0.5f);
+
+	if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
+	{
+		BaseFogColor[0] = 0.40f;
+		BaseFogColor[1] = 0.43f;
+		BaseFogColor[2] = 0.45f;
+
+		scene_brightness = scene_brightness / 2.0f;			
+	}
+	else
+	{
+		BaseFogColor[0] = 0.84f;
+		BaseFogColor[1] = 0.87f;
+		BaseFogColor[2] = 1.00f;
+
+		scene_brightness = scene_brightness;
+	}
 	
 	SkyColor[0] = BaseSkyColor[0] * sky_brightness;
 	SkyColor[1] = BaseSkyColor[1] * sky_brightness;

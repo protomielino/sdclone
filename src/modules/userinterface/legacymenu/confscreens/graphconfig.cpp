@@ -46,7 +46,7 @@ static const int NbCloudLayersValues = sizeof(CloudLayersValues) / sizeof(CloudL
 static const char* BackgroundLandscapeValues[] = { GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_ENABLED };
 static const int NbBackgroundLandscapeValues = sizeof(BackgroundLandscapeValues) / sizeof(BackgroundLandscapeValues[0]);
 
-static const int VisibilityValues[] = { 4000, 6000, 8000, 10000, 12000, 15000 };
+static const int VisibilityValues[] = { 4000, 6000, 8000, 10000, 12000 };
 static const int NbVisibilityValues = sizeof(VisibilityValues) / sizeof(VisibilityValues[0]);
 
 static void	*ScrHandle = NULL;
@@ -153,12 +153,14 @@ loadOptions()
 
 	VisibilityIndex = NbVisibilityValues -1; // Default value index, in case file value not found in list.
 	const int nVisibility =
-		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, NULL, 12000.0));
+		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, NULL, 0)+ 0.5);
 	for (int i = 0; i < NbVisibilityValues; i++)
 	{
 		if (nVisibility <= VisibilityValues[i])
+		{
 			VisibilityIndex = i;
-		break;
+			break;
+		}
 	}
 
     GfParmReleaseHandle(grHandle);
