@@ -166,8 +166,14 @@ void SetupUSR_36GP() {
 
 // Schismatic init for usr_rs
 void SetupUSR_rs() {
-  // Add usr_36GP specific initialization here
+  // Add usr_RS specific initialization here
   robot_type = USR_RS;
+};
+
+// Schismatic init for usr_lp1
+void SetupUSR_lp1() {
+  // Add usr_LP1 specific initialization here
+  robot_type = USR_LP1;
 };
 
 
@@ -256,6 +262,18 @@ extern "C" int usr_rs(tModInfo *ModInfo) {
   return ret;
 }
 
+// Schismatic entry point for usr_LP1
+extern "C" int usr_lp1(tModInfo *ModInfo) {
+  int ret = -1;
+  setRobotName("usr_lp1");
+  robot_type = USR_LP1;
+  void *robot_settings = getFileHandle();
+  if (robot_settings) {
+    ret = usr(ModInfo);
+  }
+
+  return ret;
+}
 
 ////////////////////////////////////////////////////////////
 // General entry point (new scheme)
@@ -331,6 +349,8 @@ extern "C" int moduleWelcome(const tModWelcomeIn* welcomeIn,
 		SetupUSR_36GP();
   else if (strncmp(robot_name,"usr_rs", strlen("usr_rs")) == 0)
 		SetupUSR_rs();
+  else if (strncmp(robot_name,"usr_lp1", strlen("usr_lp1")) == 0)
+		SetupUSR_lp1();
 
   // Set max nb of interfaces to return.
   welcomeOut->maxNbItf = NBBOTS;

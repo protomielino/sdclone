@@ -3822,6 +3822,27 @@ double TDriver::CalcCrv_simplix(double Crv)
   else
     return 1.0;
 }
+
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcCrv_simplix_LP1(double Crv)
+{
+  double Offset = 800;
+
+  if (oCrvComp)
+  {
+    if (Crv < 0.01) 
+      return 1.0;
+	else
+      return ((1+Crv) * (200 + Offset)/(1/Crv + Offset));
+  }
+  else
+    return 1.0;
+}
+
 //==========================================================================*
 
 //==========================================================================*
@@ -4033,6 +4054,49 @@ double TDriver::CalcFriction_simplix_LS2(const double Crv)
 
   return FrictionFactor * oXXX;
 }
+
+//==========================================================================*
+
+//==========================================================================*
+// simplix
+//--------------------------------------------------------------------------*
+double TDriver::CalcFriction_simplix_LP1(const double Crv)
+{
+  double AbsCrv = fabs(Crv);
+
+  if (AbsCrv > 1/12.0)
+	oXXX = 0.60;
+  else if ((AbsCrv > 1/15.0) && (oXXX > 0.65))
+	oXXX = 0.65;
+  else if ((AbsCrv > 1/18.0) && (oXXX > 0.75))
+	oXXX = 0.75;
+  else if ((AbsCrv > 1/19.0) && (oXXX > 0.83))
+	oXXX = 0.83;
+  else if ((AbsCrv > 1/20.0) && (oXXX > 0.90))
+	oXXX = 0.90;
+  else
+	oXXX = MIN(1.0,oXXX+0.0003);
+
+  double FrictionFactor = 0.95;
+
+  if (AbsCrv > 0.10)
+    FrictionFactor = 0.44;
+  else if (AbsCrv > 0.05)
+    FrictionFactor = 0.53;
+  else if (AbsCrv > 0.045)
+    FrictionFactor = 0.74;
+  else if (AbsCrv > 0.03)
+    FrictionFactor = 0.83;
+  else if (AbsCrv > 0.02)
+    FrictionFactor = 0.92;
+  else if (AbsCrv > 0.01)
+    FrictionFactor = 0.93;
+  else if (AbsCrv > 0.005)
+    FrictionFactor = 0.95;
+
+  return FrictionFactor * oXXX;
+}
+
 //==========================================================================*
 
 //==========================================================================*
@@ -4096,6 +4160,18 @@ void TDriver::CalcSkilling_simplix_SC()
 	oSkillDriver = oSkillDriver / ((50.0 - oSkillGlobal)/40.0);
 	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver * 2) 
 		* (1.0 + oSkillDriver) + oSkillOffset;
+}
+
+//==========================================================================*
+
+//==========================================================================*
+// simplix_lp1
+//--------------------------------------------------------------------------*
+void TDriver::CalcSkilling_simplix_LP1()
+{
+	oSkillGlobal = oSkillGlobal/10.0;
+	oSkillDriver = oSkillDriver/3.0;
+	oSkill = oSkillScale * (oSkillGlobal + oSkillDriver) + oSkillOffset;
 }
 //==========================================================================*
 

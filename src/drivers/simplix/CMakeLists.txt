@@ -11,6 +11,7 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     simplix_ls1 
                     simplix_ls2 
                     simplix_mp5 
+					simplix_lp1
                     my_simplix_0 my_simplix_1 my_simplix_2 my_simplix_3 my_simplix_4
                     my_simplix_5 my_simplix_6 my_simplix_7 my_simplix_8 my_simplix_9)
 
@@ -83,7 +84,7 @@ SET(ROBOT_SOURCES
 )
 
 # Official-only simplix instances.
-SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5)
+SET(ROBOT_CLONES simplix_36GP simplix_sc simplix_trb1 simplix_ls1 simplix_ls2 simplix_mp5 simplix_lp1)
 
 IF(NOT OPTION_OFFICIAL_ONLY)
 
@@ -184,4 +185,12 @@ IF(NOT OPTION_OFFICIAL_ONLY)
                FILES simplix_mpa1.xml default.xml logo.rgb readme.txt
                SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
+# LP1 
+SET(ROBOT_SUBDIRS 0 1 2 3 4 5 
+                  lp1-pesci-p60 lp1-vieringe-vr8
+                  )
+
+ROBOT_DATA(NAME simplix_lp1 PREFIX simplix_lp1 
+           FILES simplix_lp1.xml default.xml logo.rgb readme.txt
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)			   
 ENDIF()

@@ -12,6 +12,7 @@ SET(ROBOT_INTERFACE LEGACY WELCOME
                     usr_ls2
                     usr_36GP
                     usr_rs
+					usr_lp1
                     )
 
 SET(ROBOT_SOURCES
@@ -36,7 +37,7 @@ SET(ROBOT_SOURCES
   src/xmldefs.h)
 
 # Official-only USR instances.
-SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1 usr_ls2 usr_36GP usr_rs)
+SET(ROBOT_CLONES usr_trb1 usr_sc usr_ls1 usr_ls2 usr_36GP usr_rs usr_lp1)
 
 ROBOT_MODULE(NAME ${ROBOT_NAME} VERSION 3.0.0 SOVERSION 1.0.0
               INTERFACE ${ROBOT_INTERFACE} 
@@ -121,13 +122,13 @@ ROBOT_DATA(NAME usr_36GP PREFIX usr_36GP
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
 ###################
-# USR_RS
+# USR_LP1
 ###################
-SET(ROBOT_SUBDIRS 1
-                  rs1-kenji-08
-                  tracks)
+SET(ROBOT_SUBDIRS 1 2 3 4
+                  lp1-pesci-p60 lp1-vieringe-vr8
+                  )
 
-ROBOT_DATA(NAME usr_rs PREFIX usr_rs
-           FILES usr_rs.xml default.xml logo.rgb readme.txt
+ROBOT_DATA(NAME usr_lp1 PREFIX usr_lp1
+           FILES usr_lp1.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 

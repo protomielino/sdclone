@@ -359,6 +359,19 @@ void SetUpSimplix_mp5()
 	//TDriver::UseSCSkilling = true; 
     TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
 };
+
+//==========================================================================*
+
+//==========================================================================*
+// Schismatic entry point for simplix_lp1
+//--------------------------------------------------------------------------*
+void SetUpSimplix_lp1()
+{
+    cRobotType = RTYPE_SIMPLIX_LP1;
+    SetParameters(NBBOTS, "lp1-vieringe-vr8");
+    TDriver::Learning = true;
+    TDriver::SkillingFactor = 0.1f;         // Skilling factor for career-mode
+};
 //==========================================================================*
 
 //==========================================================================*
@@ -451,6 +464,8 @@ int moduleWelcomeV1_00
 		SetUpSimplix_ls2();
 	else if (strncmp(RobName,"simplix_mp5",strlen("simplix_mp5")) == 0)
 		SetUpSimplix_mp5();
+	else if (strncmp(RobName," simplix_lp1", strlen("simplix_lp1")) == 0)
+		SetUpSimplix_lp1();
 	else 
 		SetUpSimplix();
 
@@ -722,6 +737,16 @@ static int InitFuncPt(int Index, void *Pt)
     //GfOut("#cRobotType == RTYPE_SIMPLIX_MP5\n");
     cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
     cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
+    cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
+    cInstances[Index-IndexOffset].cRobot->SideBorderOuter(0.20f);
+  }
+  else if (cRobotType == RTYPE_SIMPLIX_LP1)
+  {
+    //GfOut("#cRobotType == RTYPE_SIMPLIX_LP1\n");
+    cInstances[Index-IndexOffset].cRobot->CalcSkillingFoo = &TDriver::CalcSkilling_simplix;
+    cInstances[Index-IndexOffset].cRobot->CalcFrictionFoo = &TDriver::CalcFriction_simplix_LP1;
     cInstances[Index-IndexOffset].cRobot->CalcCrvFoo = &TDriver::CalcCrv_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->CalcHairpinFoo = &TDriver::CalcHairpin_simplix_Identity;
     cInstances[Index-IndexOffset].cRobot->ScaleSide(0.95f,0.95f);
@@ -1064,6 +1089,24 @@ extern "C" int simplix_mp5(tModInfo *ModInfo)
   TDriver::UseBrakeLimit = true;
   return simplixEntryPoint(ModInfo,RobotSettings);
 };
+
+//==========================================================================*
+
+//==========================================================================*
+// Schismatic entry point for simplix_lp1
+//--------------------------------------------------------------------------*
+extern "C" int simplix_lp1(tModInfo *ModInfo)
+{
+  void *RobotSettings = GetFileHandle("simplix_lp1");
+  if (!RobotSettings)
+	  return -1;
+
+  SetParameters(10, "lp1-vieringe-vr8");
+  TDriver::AdvancedParameters = true;
+  TDriver::UseBrakeLimit = true;
+  return simplixEntryPoint(ModInfo,RobotSettings);
+};
+
 //==========================================================================*
 
 //==========================================================================*

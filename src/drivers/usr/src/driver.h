@@ -49,7 +49,7 @@ class AbstractStrategy;
 enum { TEAM_FRIEND=1, TEAM_FOE };
 enum { avoidleft=1, avoidright=2, avoidside=4, avoidsideclosing=8, avoidback=16 };
 enum { debug_steer=1, debug_overtake=2, debug_brake=4 };
-enum { USR_TRB1=1, USR_SC, USR_LS1, USR_LS2, USR_36GP, USR_RS };
+enum { USR_TRB1=1, USR_SC, USR_LS1, USR_LS2, USR_36GP, USR_RS, USR_LP1 };
 
 class Driver {
 	public:
