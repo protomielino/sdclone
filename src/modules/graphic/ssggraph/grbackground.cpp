@@ -263,14 +263,18 @@ grInitBackground()
 
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 650,
 											  400 / domeSizeRatio, 400 / domeSizeRatio);
+			cloudLayers[0]->setSpeed(100);
+			cloudLayers[0]->setDirection(60);
 		}
 		else if (grNbCloudLayers == 1)
 		{
 			GfLogInfo("  Cloud cover : 3 layers\n");
 
+			int wind = (rand() % 60) + 40;
+
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
-			cloudLayers[0]->setSpeed(60);
+			cloudLayers[0]->setSpeed(wind);
 			cloudLayers[0]->setDirection(45);
 			
 			GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
@@ -304,7 +308,8 @@ grInitBackground()
 			snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", 1);
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 3000,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
-			cloudLayers[0]->setSpeed(30);
+			int wind = (rand() % 40) + 60;
+			cloudLayers[0]->setSpeed(wind);
 			cloudLayers[0]->setDirection(40);
 
 			GfLogInfo("   * layer 1 : speed=30, direction=40, texture=%s\n", buf);
@@ -333,7 +338,6 @@ grInitBackground()
 
 		// Initialize the whole sky dome.
 		sgVec3 viewPos;
-		//sgSetVec3(viewPos, (track->max.x)/2, 0, (track->max.z)/2);
 		sgSetVec3(viewPos,grWrldX/2, grWrldY/2, 0);
 		TheSky->repositionFlat(viewPos, 0, 0);    
 
@@ -344,7 +348,7 @@ grInitBackground()
 		{
 			case TR_RAIN_NONE:
 				//visibility = 0.0f;
-				visibility = 2500.0;
+				visibility = 12000.0f;
 				break;
 			case TR_RAIN_LITTLE:
 				//visibility = 400.0f;
@@ -880,8 +884,8 @@ void grLoadBackgroundSky(void)
 	desc2 = grssgLoadAC3D(bgsky, NULL);
 	BackSkyAnchor->addKid(desc2);
 
+	// move backgroundsky in scene center
 	sgCoord BackSkypos;
-	//sgSetCoord ( &backskypos, double(grWrldX/2), 0.0f, double(grWrldZ/2));
 	sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
 	BackSkyLoc->setTransform(&BackSkypos);
 }
@@ -966,7 +970,6 @@ grUpdateSky(double currentTime, double accelTime)
 	// At each call, update possibly high speed objects of the sky dome : the clouds.
  	sgVec3 viewPos;
  	sgSetVec3(viewPos, grWrldX/2, grWrldY/2, 0);
-	//sgSetVec3(viewPos, 0, 0, 0);
 	TheSky->repositionFlat(viewPos, 0, currentTime - lastTimeHighSpeed);    
 
 	// Now, we are done for high speed objects.
@@ -974,28 +977,31 @@ grUpdateSky(double currentTime, double accelTime)
 
 	// Check if time to update low speed objects : sun and moon (once every minute).
 	int nextTimeLowSpeed = 60 * (int)floor((accelTime + 60.0) / 60.0);
-	if (nextTimeLowSpeed == lastTimeLowSpeed)
-		return;
+	/*if (nextTimeLowSpeed == lastTimeLowSpeed)
+		return;*/
 	const float deltaTimeLowSpeed = (float)(nextTimeLowSpeed - lastTimeLowSpeed);
-	lastTimeLowSpeed = nextTimeLowSpeed;
+	//lastTimeLowSpeed = nextTimeLowSpeed;
 
 	// Update sun and moon, and thus global lighting / coloring parameters of the scene.
 	//GfLogDebug("%f : Updating slow objects of the dynamic sky dome (sun and moon)\n", currentTime);
+	if (nextTimeLowSpeed != lastTimeLowSpeed)
+	{
+		// 1) Update sun position
+		const float deltaDecl = deltaTimeLowSpeed * 360.0f / (24.0f * 60.0f * 60.0f);
+		grSunDeclination += deltaDecl;
+		if (grSunDeclination >= 360.0f)
+			grSunDeclination -= 360.0f;
 	
-	// 1) Update sun position
-	const float deltaDecl = deltaTimeLowSpeed * 360.0f / (24.0f * 60.0f * 60.0f);
-	grSunDeclination += deltaDecl;
-	if (grSunDeclination >= 360.0f)
-		grSunDeclination -= 360.0f;
-	
-	TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination) );
+		TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination) );
 
-	// 2) Update moon position
-	grMoonDeclination += deltaDecl;
-	if (grMoonDeclination >= 360.0f)
-		grMoonDeclination -= 360.0f;
+		// 2) Update moon position
+		grMoonDeclination += deltaDecl;
+		if (grMoonDeclination >= 360.0f)
+			grMoonDeclination -= 360.0f;
 	
-	TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
+		TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
+		lastTimeLowSpeed = nextTimeLowSpeed;
+	}
 
 	// 3) Update scene color and light
 	const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();

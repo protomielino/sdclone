@@ -43,8 +43,11 @@ static const int PrecipDensityValues[] = {0, 20, 40, 60, 80, 100};
 static const int NbPrecipDensityValues = sizeof(PrecipDensityValues) / sizeof(PrecipDensityValues[0]);
 static const int CloudLayersValues[] = {1, 2, 3};
 static const int NbCloudLayersValues = sizeof(CloudLayersValues) / sizeof(CloudLayersValues[0]);
-static const char* BackgroundLandscapeValues[] = { GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_RING, GR_ATT_BGSKY_LAND };
+static const char* BackgroundLandscapeValues[] = { GR_ATT_BGSKY_DISABLED, GR_ATT_BGSKY_ENABLED };
 static const int NbBackgroundLandscapeValues = sizeof(BackgroundLandscapeValues) / sizeof(BackgroundLandscapeValues[0]);
+
+static const int VisibilityValues[] = { 4000, 6000, 8000, 10000, 12000, 15000 };
+static const int NbVisibilityValues = sizeof(VisibilityValues) / sizeof(VisibilityValues[0]);
 
 static void	*ScrHandle = NULL;
 
@@ -57,6 +60,7 @@ static int	DynamicTimeOfDayLabelId, DynamicTimeOfDayLeftButtonId, DynamicTimeOfD
 static int	PrecipDensityLabelId;
 static int	CloudLayersLabelId, CloudLayersLeftButtonId, CloudLayersRightButtonId;
 static int	BackgroundLandscapeLabelId, BackgroundLandscapeLeftButtonId, BackgroundLandscapeRightButtonId;
+static int	VisibilityLabelId, VisibilityLeftButtonId, VisibilityRightButtonId;
 
 static int	FovFactorValue = 100;
 static int	SmokeValue = 300;
@@ -67,6 +71,7 @@ static int 	DynamicTimeOfDayIndex = 0;
 static int 	PrecipDensityIndex = NbPrecipDensityValues - 1;
 static int	CloudLayerIndex = 0;
 static int	BackgroundLandscapeIndex = 0;
+static int	VisibilityIndex = 0;
 
 static char	buf[512];
 
@@ -146,6 +151,16 @@ loadOptions()
 		}
     }
 
+	VisibilityIndex = NbVisibilityValues -1; // Default value index, in case file value not found in list.
+	const int nVisibility =
+		(int)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, NULL, 12000.0));
+	for (int i = 0; i < NbVisibilityValues; i++)
+	{
+		if (nVisibility <= VisibilityValues[i])
+			VisibilityIndex = i;
+		break;
+	}
+
     GfParmReleaseHandle(grHandle);
 }
 
@@ -167,6 +182,7 @@ saveOptions()
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_PRECIPDENSITY, "%", PrecipDensityValues[PrecipDensityIndex]);
     GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_CLOUDLAYER, NULL, CloudLayersValues[CloudLayerIndex]);
     GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, BackgroundLandscapeValues[BackgroundLandscapeIndex]);
+	GfParmSetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, NULL, VisibilityValues[VisibilityIndex]);
     
     GfParmWriteFile(NULL, grHandle, "graph");
     
@@ -174,6 +190,16 @@ saveOptions()
 }
 
 // GUI callback functions ===================================================================
+
+
+static void
+onChangeVisibility(void* vp)
+{
+    const long delta = (long)vp;
+    VisibilityIndex = (VisibilityIndex + NbVisibilityValues + delta) % NbVisibilityValues;
+    snprintf(buf, sizeof(buf), "%d", VisibilityValues[VisibilityIndex]);
+    GfuiLabelSetText(ScrHandle, VisibilityLabelId, buf);
+} 
 
 static void
 onChangeFov(void* vp)
@@ -294,6 +320,13 @@ onChangeSkyDomeDistance(void* vp)
 		onChangeCloudLayers(0); // Display real value.
 	else
 		GfuiLabelSetText(ScrHandle, CloudLayersLabelId, "1");
+
+	GfuiEnable(ScrHandle, VisibilityLeftButtonId, bSkyDome ? GFUI_ENABLE : GFUI_DISABLE);
+	GfuiEnable(ScrHandle, VisibilityRightButtonId, bSkyDome ? GFUI_ENABLE : GFUI_DISABLE);
+	if (bSkyDome)
+		onChangeVisibility(0); // Display Real value.
+	else
+		GfuiLabelSetText(ScrHandle, VisibilityLabelId, "4000");
 	
 	// No changes of FOV if sky dome enabled
 	GfuiEnable(ScrHandle, FovEditId, bSkyDome ? GFUI_DISABLE : GFUI_ENABLE);
@@ -320,6 +353,7 @@ onActivate(void* /* dummy */)
 	onChangeSkid(0);
 	onChangeSkyDomeDistance(0); // Also loads DynamicTimeOfDay,  BackgroundLandscape, CloudLayers
     onChangePrecipDensity(0);
+	onChangeVisibility(0);
 }
 
 static void
@@ -391,6 +425,13 @@ GraphMenuInit(void* prevMenu)
 		GfuiMenuCreateButtonControl(ScrHandle, param, "bgskyrightarrow", (void*)1, onChangeBackgroundLandscape);
     BackgroundLandscapeLabelId =
 		GfuiMenuCreateLabelControl(ScrHandle, param, "bgskydomelabel");
+
+	VisibilityLeftButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "visibilityleftarrow", (void*)-1, onChangeVisibility);
+    VisibilityRightButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, param, "visibilityrightarrow", (void*)1, onChangeVisibility);
+    VisibilityLabelId =
+		GfuiMenuCreateLabelControl(ScrHandle, param, "visibilitylabel");
 
     GfuiMenuCreateButtonControl(ScrHandle, param, "ApplyButton", prevMenu, onAccept);
     GfuiMenuCreateButtonControl(ScrHandle, param, "CancelButton", prevMenu, onCancel);

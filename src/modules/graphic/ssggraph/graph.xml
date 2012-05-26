@@ -14,7 +14,7 @@
 
 <!DOCTYPE params SYSTEM "../../../libs/tgf/params.dtd">
 
-<params name="graph" type="param" mode="mw" version="1.7">
+<params name="graph" type="param" mode="mw" version="1.8">
   <section name="Graphic">
     <attnum name="smoke value" val="300"/>
     <attnum name="smoke interval" val="0.01"/>
@@ -31,6 +31,12 @@
     <attnum name="precipitation density" unit="%" val="100"/>
     <attnum name="cloudlayer" val="1"/>
     <attstr name="background skydome" val="enabled"/>
+	<attstr name="background type" val="background"/>
+	<attnum name="visibility" val="12000"/>
+	<attstr name="spectator LOD" val="none"/>
+	<attstr name="forest LOD" val="none"/>
+	<attstr name="tree LOD" val="none"/>
+	<attstr name="parking LOD" val="none"/>
   </section>
 
   <section name="Playable Cameras Distance of Views">

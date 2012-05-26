@@ -70,7 +70,7 @@ loadOptions()
 
 	BackgroundTypeIndex = 0; // Default value index, in case file value not found in list.
 	const char* pszBackgroundType =
-		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, GR_ATT_BGSKY_RING);
+		GfParmGetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, GR_ATT_BGSKY_RING);
 	for (int i = 0; i < NbBackgroundTypeValues; i++) 
 	{
 		if (!strcmp(pszBackgroundType, BackgroundTypeValues[i]))
@@ -128,7 +128,7 @@ saveOptions()
     snprintf(buf, sizeof(buf), "%s%s", GfLocalDir(), GR_PARAM_FILE);
     void* grHandle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
     
-    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKY, BackgroundTypeValues[BackgroundTypeIndex]);
+    GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_BGSKYTYPE, BackgroundTypeValues[BackgroundTypeIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_FOREST, ForestValues[ForestIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_TREE, TreeValues[TreeIndex]);
 	GfParmSetStr(grHandle, GR_SCT_GRAPHIC, GR_ATT_AGR_PARKING, ParkingValues[ParkingIndex]);
