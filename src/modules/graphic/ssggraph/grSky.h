@@ -29,9 +29,6 @@ class cGrCloudLayerList;
 class cGrStars;
 class cGrSkyDome;
 class cGrSky;
-class cGrMoon;
-class cGrSun;
-
 
 class cGrCelestialBody
 {
@@ -39,6 +36,8 @@ private:
 
   ssgTransform *transform;
   ssgColourArray *cl;
+  ssgColourArray *ihalo_cl;
+  ssgColourArray *ohalo_cl;
 
   // used by repaint for rise/set effects
   double body_angle;
@@ -54,8 +53,8 @@ public:
   cGrCelestialBody( void );
   ~cGrCelestialBody( void );
 
-  ssgBranch *build( const char* body_tex_path, const char* halo_tex_path, double body_size );
-  ssgBranch *build( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double body_size );
+  ssgBranch *build( const char* body_tex_path, const char* ihalo_tex_path, const char* ohalo_tex, double body_size );
+  ssgBranch *build( ssgSimpleState *orb_state, ssgSimpleState *ihalo_state, ssgSimpleState *ohalo_state, double body_size );
 
   bool reposition( sgVec3 p, double angle ) 
   {
@@ -87,6 +86,7 @@ public:
 
   void setDist ( double dist ) { body_dist = dist; }
   double getDist () { return body_dist; }
+  double effective_visibility;
 
   inline float *getColor() { return  cl->get( 0 ); }
 } ;
@@ -305,8 +305,8 @@ public:
 	  int nplanets, sgdVec3 *planet_data,
 	  int nstars, sgdVec3 *star_data);
 
-  cGrCelestialBody* addBody( const char *body_tex_path, const char *halo_tex_path, double size, double dist, bool sol = false );
-  cGrCelestialBody* addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double size, double dist, bool sol = false );
+  cGrCelestialBody* addBody( const char *body_tex_path, const char *ihalo_path, const char* ohalo_path, double size, double dist, bool sol = false );
+  cGrCelestialBody* addBody( ssgSimpleState *orb_state, ssgSimpleState *ihalo_state, ssgSimpleState *ohalo_state, double size, double dist, bool sol = false );
   cGrCelestialBody* getBody(int i) { return bodies.get(i); }
   int getBodyCount() { return bodies.getNum(); }
 
@@ -345,7 +345,8 @@ public:
 
   // current effective visibility
   inline float getVisibility() const { return effective_visibility; }
-  inline void setVisibility( float v ) {
+  inline void setVisibility( float v ) 
+  {
     effective_visibility = visibility = v;
   }
 } ;
@@ -359,18 +360,18 @@ inline double grRandom(void)
 
 //#if defined( macintosh )
 //const float system_gamma = 1.4;
-//#elif defined (sgi)
-//const float system_gamma = 1.7;
-//#else	// others
+
 const float system_gamma = 2.5;
-//#endif
 
 // simple architecture independant gamma correction function.
 inline void grGammaCorrectRGB(float *color, float reff = 2.5, float system = system_gamma)
 {
-  color[0] = (float)pow(color[0], reff/system);
-  color[1] = (float)pow(color[1], reff/system);
-  color[2] = (float)pow(color[2], reff/system);
+	if (reff == system)
+       return;
+    float tmp = reff/system;
+	color[0] = (float)pow(color[0], reff/system);
+	color[1] = (float)pow(color[1], reff/system);
+	color[2] = (float)pow(color[2], reff/system);
 };
 
 inline void grGammaCorrectC(float *color, float reff = 2.5, float system = system_gamma)
@@ -390,6 +391,7 @@ inline void grGammaRestoreC(float *color, float reff = 2.5, float system = syste
   *color = (float)pow(*color, system/reff);
 };
 
+#if O
 class cGrMoon 
 {
     ssgTransform *moon_transform;
@@ -505,7 +507,6 @@ public:
 };
 
 // Not used.
-#if 0
 
 class cGrSun 
 {
@@ -574,8 +575,6 @@ public:
     // return the texture id of the sun halo texture
     inline GLuint get_texture_id() { return ohalo_state->getTextureHandle(); }
 };
-
 #endif
-
 
 #endif

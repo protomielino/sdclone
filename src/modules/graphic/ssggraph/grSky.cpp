@@ -108,10 +108,10 @@ void cGrSky::build( double h_radius, double v_radius,
 
 
 cGrCelestialBody*
-cGrSky::addBody( const char *body_tex_path, const char *halo_tex_path, double size, double dist, bool sol )
+cGrSky::addBody( const char *body_tex_path, const char *ihalo_tex_path, const char *ohalo_tex_path, double size, double dist, bool sol )
 {
   cGrCelestialBody* body = new cGrCelestialBody;
-  bodies_transform->addKid( body->build( body_tex_path, halo_tex_path, size ) );
+  bodies_transform->addKid( body->build( body_tex_path, ihalo_tex_path, ohalo_tex_path, size ) );
   bodies.add( body );
 
   body -> setDist( dist );
@@ -124,10 +124,10 @@ cGrSky::addBody( const char *body_tex_path, const char *halo_tex_path, double si
 
 
 cGrCelestialBody*
-cGrSky::addBody( ssgSimpleState *orb_state, ssgSimpleState *halo_state, double size, double dist, bool sol )
+cGrSky::addBody( ssgSimpleState *orb_state, ssgSimpleState *ihalo_state, ssgSimpleState *ohalo_state, double size, double dist, bool sol )
 {
   cGrCelestialBody* body = new cGrCelestialBody;
-  bodies_transform->addKid( body->build( orb_state, halo_state, size ) );
+  bodies_transform->addKid( body->build( orb_state, ihalo_state, ohalo_state, size ) );
   bodies.add( body );
 
   body -> setDist( dist );

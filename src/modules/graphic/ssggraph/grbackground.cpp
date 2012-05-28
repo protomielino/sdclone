@@ -222,7 +222,7 @@ grInitBackground()
 		
 		//Add the Sun itself
 		const double domeSizeRatio = grSkyDomeDistance / 80000.0;
-		TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba",
+		TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", "data/textures/outer_halo.rgba",
 												  2500 * domeSizeRatio, grSkyDomeDistance, /*isSun=*/true);
 		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
@@ -236,8 +236,8 @@ grInitBackground()
 				  grSunDeclination, RAD2DEG(sunAscension));
 
 		// Add the Moon (TODO: Find a better solution than this random positioning !)
-		TheCelestBodies[eCBMoon] = TheSky->addBody ( "data/textures/moon.rgba",NULL,
-													 2500 * domeSizeRatio, grSkyDomeDistance);
+		TheCelestBodies[eCBMoon] = TheSky->addBody ( "data/textures/moon.rgba",NULL, NULL,
+													 2000 * domeSizeRatio, grSkyDomeDistance);
 		if ( grSunDeclination > 180 )
 			grMoonDeclination = 3.0 + (rand() % 40);
 		else
