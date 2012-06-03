@@ -1947,13 +1947,13 @@ grCamCreateSceneCameraList(class cGrScreen *myscreen, tGrCamHead *cams,
 			      40.0,	/* fovy */
 			      5.0,	/* fovymin */
 			      95.0,	/* fovymax */
-			      6.0,	/* dist */
-			      2.0,	/* height */
+			      8.0,	/* dist */
+			      2.5,	/* height */
 			      1.0,	/* near */
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* far */
 			      fixedFar ? fixedFar/2 : 300.0 * fovFactor,	/* fogstart */
 			      fixedFar ? fixedFar : 600.0 * fovFactor,	/* fogend */
-			      0.0	/* relaxation */
+			      25.0	/* relaxation */
 			      );
     cam->add(&cams[c]);
     id++;
