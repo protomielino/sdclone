@@ -50,8 +50,6 @@ static const int NMaxStars = 1000;
 static const int NMaxPlanets = 0; //No planets displayed for the moment
 static const int NMaxCloudLayers = 3;
 
-enum {eCBSun = 0, eCBMoon, NMaxCelestianBodies};	// Celestial bodies in the sky.
-
 static const sgVec4 Black            = { 0.0f, 0.0f, 0.0f, 1.0f } ;
 static const sgVec4 White            = { 1.0f, 1.0f, 1.0f, 1.0f } ;
 static const sgVec4 TranslucentWhite = { 1.0f, 1.0f, 1.0f, 0.8f } ;
@@ -96,8 +94,10 @@ static ssgBranch *SunAnchor = NULL;
 static ssgRoot *TheBackground = NULL;
 static ssgTransform *TheSun = NULL;
 
-static cGrCelestialBody *TheCelestBodies[NMaxCelestianBodies] = { NULL, NULL };
+//static cGrCelestialBody *TheCelestBodies[NMaxCelestianBodies] = { NULL, NULL };
 static cGrSky *TheSky = NULL;
+static cGrSun *Sun = NULL;
+static cGrMoon *Moon = NULL;
 
 static sgdVec3 *AStarsData = NULL;
 static sgdVec3 *APlanetsData = NULL;
@@ -218,17 +218,18 @@ grInitBackground()
 		
 		//Build the sky
 		TheSky	= new cGrSky;
-		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData);
-		
-		//Add the Sun itself
+
 		const double domeSizeRatio = grSkyDomeDistance / 80000.0;
-		TheCelestBodies[eCBSun] = TheSky->addBody(NULL, "data/textures/halo.rgba", "data/textures/outer_halo.rgba",
-												  2500 * domeSizeRatio, grSkyDomeDistance, /*isSun=*/true);
+
+		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, "data/textures/halo.rgba", "data/textures/halo.rgba", "data/textures/outer_halo.rgba",
+			2500 * domeSizeRatio, "data/textures/moon.rgba", 2000 * domeSizeRatio, NPlanets, APlanetsData, NStars, AStarsData, 0.5f, visibility);
+		
+		//Add the Sun itself		
 		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
-		TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination));
-		TheCelestBodies[eCBSun]->setRightAscension ( sunAscension );
+		Sun->setDeclination ( DEG2RAD(grSunDeclination));
+		Sun->setRightAscension ( sunAscension );
 
 		GfLogInfo("  Sun : time of day = %02d:%02d:%02d (declination = %.1f deg), "
 		          "ascension = %.1f deg\n", 
@@ -236,8 +237,6 @@ grInitBackground()
 				  grSunDeclination, RAD2DEG(sunAscension));
 
 		// Add the Moon (TODO: Find a better solution than this random positioning !)
-		TheCelestBodies[eCBMoon] = TheSky->addBody ( "data/textures/moon.rgba",NULL, NULL,
-													 2000 * domeSizeRatio, grSkyDomeDistance);
 		if ( grSunDeclination > 180 )
 			grMoonDeclination = 3.0 + (rand() % 40);
 		else
@@ -245,8 +244,8 @@ grInitBackground()
 
 		const float moonAscension = (float)(rand() % 360);
 		
-		TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
-		TheCelestBodies[eCBMoon]->setRightAscension ( DEG2RAD(moonAscension) );
+		Moon->setmoonDeclination ( DEG2RAD(grMoonDeclination) );
+		Moon->setmoonRightAscension ( DEG2RAD(moonAscension) );
 
 		GfLogInfo("  Moon : declination = %.1f deg, ascension = %.1f deg\n",
 				  grMoonDeclination, moonAscension);
@@ -335,7 +334,7 @@ grInitBackground()
 
 		// Set up the light source to the Sun position.
 		sgCoord sunPosition;
-		TheCelestBodies[eCBSun]->getPosition(&sunPosition);
+		Sun->getPosition(&sunPosition);
     	light->setPosition(sunPosition.xyz);
 
 		// Initialize the whole sky dome.
@@ -378,7 +377,7 @@ grInitBackground()
         const GLfloat fog_exp2_density = sqrt_m_log01 / visibility;
     
 		//Setup overall light level according to rain if any
-		const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();
+		const float sol_angle = (float)Sun->getAngle();
 		const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 		float scene_brightness = (float)pow(sky_brightness, 0.5f);
         
@@ -413,7 +412,7 @@ grInitBackground()
 						NPlanets, APlanetsData, NStars, AStarsData);
 	
 		sgCoord solpos;
-		TheCelestBodies[eCBSun]->getPosition(&solpos);
+		Sun->getPosition(&solpos);
 		light->setPosition(solpos.xyz);	
 	
 		SceneAmbiant[0] = BaseAmbiant[0] * scene_brightness;
@@ -1020,19 +1019,19 @@ grUpdateSky(double currentTime, double accelTime)
 		if (grSunDeclination >= 360.0f)
 			grSunDeclination -= 360.0f;
 	
-		TheCelestBodies[eCBSun]->setDeclination ( DEG2RAD(grSunDeclination) );
+		Sun->setDeclination ( DEG2RAD(grSunDeclination) );
 
 		// 2) Update moon position
 		grMoonDeclination += deltaDecl;
 		if (grMoonDeclination >= 360.0f)
 			grMoonDeclination -= 360.0f;
 	
-		TheCelestBodies[eCBMoon]->setDeclination ( DEG2RAD(grMoonDeclination) );
+		Moon->setmoonDeclination ( DEG2RAD(grMoonDeclination) );
 		lastTimeLowSpeed = nextTimeLowSpeed;
 	}
 
 	// 3) Update scene color and light
-	const float sol_angle = (float)TheCelestBodies[eCBSun]->getAngle();
+	const float sol_angle = (float)Sun->getAngle();
 	const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 	float scene_brightness = (float)pow(sky_brightness, 0.5f);
 
@@ -1070,7 +1069,7 @@ grUpdateSky(double currentTime, double accelTime)
 
 	// 3c) update the main light position (it's at the sun position !)
 	sgCoord solpos;
-	TheCelestBodies[eCBSun]-> getPosition(&solpos);
+	Sun-> getPosition(&solpos);
 	ssgGetLight(0)-> setPosition(solpos.xyz);	
 
 	// 3c) update scene colors.

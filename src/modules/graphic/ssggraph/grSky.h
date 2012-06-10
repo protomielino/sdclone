@@ -22,15 +22,199 @@
 
 #include "plib/ssg.h"
 
-class cGrCelestialBody;
-class cGrCelestialBodyList;
+//class cGrCelestialBody;
+//class cGrCelestialBodyList;
+class cGrSun;
+class cGrMoon;
 class cGrCloudLayer;
 class cGrCloudLayerList;
 class cGrStars;
 class cGrSkyDome;
 class cGrSky;
 
-class cGrCelestialBody
+class cGrMoon 
+{
+    ssgTransform *moon_transform;
+    ssgSimpleState *orb_state;
+    ssgSimpleState *halo_state;
+
+    ssgColourArray *cl;
+
+    ssgVertexArray *halo_vl;
+    ssgTexCoordArray *halo_tl;
+
+    double prev_moon_angle;
+	double moon_angle;
+	double moon_size;
+	double moon_dist;
+	double moonAscension;
+	double moondeclination;
+
+
+public:
+
+    // Constructor
+    cGrMoon( void );
+
+    // Destructor
+    ~cGrMoon( void );
+
+    // build the moon object
+    ssgBranch *build( const char* moon_path, double moon_size );
+
+    // repaint the moon colors based on current value of moon_anglein
+    // degrees relative to verticle
+    // 0 degrees = high noon
+    // 90 degrees = moon rise/set
+    // 180 degrees = darkest midnight
+
+    //bool repaint(double moon_angle);
+
+    /*bool reposition( sgVec3 p, double angle,
+		     double rightAscension, double declination,
+		     double moon_dist  );*/
+
+    bool reposition(sgVec3 p, double moon_angle) 
+    {
+       return reposition (p, moon_angle, moonAscension, moondeclination, moon_dist); 
+    }
+
+    bool reposition(sgVec3 p, double moon_angle, double moonAscension, double moondeclination, double moon_dist);
+    bool repaint(double moon_angle);
+
+	void setmoonRightAscension ( double ra ) { moonAscension = ra; }
+	double getRightAscension () { return moonAscension; }
+
+	void setmoonDeclination ( double decl ) { moondeclination = decl; }
+	double getmoonDeclination () { return moondeclination; }
+};
+
+class cGrSun 
+{
+    ssgTransform *sun_transform;
+    ssgSimpleState *sun_state; 
+    ssgSimpleState *ihalo_state;
+    ssgSimpleState *ohalo_state;
+
+    ssgColourArray *sun_cl;
+    ssgColourArray *ihalo_cl;
+    ssgColourArray *ohalo_cl;
+
+    ssgVertexArray *sun_vl;
+    ssgVertexArray *ihalo_vl;
+    ssgVertexArray *ohalo_vl;
+
+    ssgTexCoordArray *sun_tl;
+    ssgTexCoordArray *ihalo_tl;
+    ssgTexCoordArray *ohalo_tl;
+
+    GLuint sun_texid;
+    GLubyte *sun_texbuf;
+
+    double visibility;
+    double prev_sun_angle;
+    double sun_angle;
+    double sun_rotation;
+
+    // used by reposition
+    double sun_right_ascension;
+    double sun_declination;
+    double sun_dist;
+    double path_distance;
+
+public:
+
+    // Constructor
+    cGrSun( void );
+
+    // Destructor
+    ~cGrSun( void );
+
+    // return the sun object
+    ssgBranch *build( const char* sun_path, const char *ihalo_path, const char* ohalo_path, float sun_size, float humidity, float visibility );
+
+    // repaint the sun colors based on current value of sun_anglein
+    // degrees relative to verticle
+    // 0 degrees = high noon
+    // 90 degrees = sun rise/set
+    // 180 degrees = darkest midnight
+    bool repaint( double sun_angle, double new_visibility );
+
+    // reposition the sun at the specified right ascension and
+    // declination, offset by our current position (p) so that it
+    // appears fixed at a great distance from the viewer.  Also add in
+    // an optional rotation (i.e. for the current time of day.)
+
+    /*bool reposition( sgVec3 p, double angle,
+		     double rightAscension, double declination,
+		     double sun_dist, double lat, double alt_asl, double sun_angle );*/
+
+    bool reposition( sgVec3 p, double sun_angle ) 
+    {
+       return reposition ( p, sun_angle, sun_right_ascension, sun_declination, sun_dist ); 
+    }
+
+    bool reposition( sgVec3 p, double sun_angle, double rightAscension, double declination, double dist );
+
+    void getPosition (sgCoord* p)
+    {
+		sgMat4 Xform;
+		sun_transform->getTransform(Xform);
+		sgSetCoord(p, Xform);
+    }
+
+    void setAngle (double angle) 
+    { 
+		sun_angle = angle; 
+    }
+
+    double getAngle () 
+    { 
+		return sun_angle; 
+    }
+
+    void setRotation (double rotation) 
+    { 
+		sun_rotation = rotation; 
+    }
+    double getRotation () 
+    { 
+		return sun_rotation; 
+    }
+
+    void setRightAscension (double ra) 
+    { 
+		sun_right_ascension = ra; 
+    }
+    double getRightAscension () 
+    { 
+		return sun_right_ascension; 
+    }
+
+    void setDeclination ( double decl ) 
+    { 
+		sun_declination = decl; 
+    }
+    double getDeclination () 
+    { 
+		return sun_declination; 
+    }
+
+    void setDist ( double dist ) 
+    { 
+ 		sun_dist = dist; 
+    }
+    double getDist () 
+    { 
+		return sun_dist; 
+    }
+
+    // retrun the current color of the sun
+    inline float *get_color() { return  ohalo_cl->get( 0 ); }
+	double effective_visibility;
+};
+
+/*class cGrCelestialBody
 {
 private:
 
@@ -117,7 +301,7 @@ public:
       delete get (i) ;
     ssgSimpleList::removeAll () ;
   }
-} ;
+} ;*/
 
 
 class cGrCloudLayer
@@ -273,8 +457,8 @@ private:
 
   // components of the sky
   cGrSkyDome *dome;
-  cGrCelestialBody* sol_ref;
-  cGrCelestialBodyList bodies;
+  cGrSun	*sun;
+  cGrMoon	*moon;
   cGrCloudLayerList clouds;
   cGrStars *planets;
   cGrStars *stars;
@@ -283,7 +467,7 @@ private:
 
   ssgSelector *pre_selector, *post_selector;
   ssgTransform *pre_transform, *post_transform;
-  ssgTransform *bodies_transform, *stars_transform;
+  ssgTransform *sun_transform, *moon_transform, *stars_transform;
 
   // visibility
   float visibility;
@@ -302,13 +486,11 @@ public:
   ~cGrSky( void );
 
   void build( double h_radius, double v_radius,
+	  const char *sun_path, const char *ihalo_path,
+	  const char *ohalo_path, float sun_size,
+	  const char *moon_path, float moon_size,
 	  int nplanets, sgdVec3 *planet_data,
-	  int nstars, sgdVec3 *star_data);
-
-  cGrCelestialBody* addBody( const char *body_tex_path, const char *ihalo_path, const char* ohalo_path, double size, double dist, bool sol = false );
-  cGrCelestialBody* addBody( ssgSimpleState *orb_state, ssgSimpleState *ihalo_state, ssgSimpleState *ohalo_state, double size, double dist, bool sol = false );
-  cGrCelestialBody* getBody(int i) { return bodies.get(i); }
-  int getBodyCount() { return bodies.getNum(); }
+	  int nstars, sgdVec3 *star_data, float humidity, float visibility);
 
   cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
   cGrCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
@@ -390,191 +572,5 @@ inline void grGammaRestoreC(float *color, float reff = 2.5, float system = syste
 {
   *color = (float)pow(*color, system/reff);
 };
-
-#if O
-class cGrMoon 
-{
-    ssgTransform *moon_transform;
-    ssgSimpleState *orb_state;
-    ssgSimpleState *halo_state;
-
-    ssgColourArray *cl;
-
-    ssgVertexArray *halo_vl;
-    ssgTexCoordArray *halo_tl;
-
-    double prev_moon_angle;
-    double moon_angle;
-    double moon_rotation;
-
-    // used by reposition
-    double moon_right_ascension;
-    double moon_declination;
-    double moon_dist;
-
-public:
-
-    // Constructor
-    cGrMoon( void );
-
-    // Destructor
-    ~cGrMoon( void );
-
-    // build the moon object
-    ssgBranch *build( const char* body_tex_path, double moon_size );
-
-    // repaint the moon colors based on current value of moon_anglein
-    // degrees relative to verticle
-    // 0 degrees = high noon
-    // 90 degrees = moon rise/set
-    // 180 degrees = darkest midnight
-
-    //bool repaint(double moon_angle);
-
-    /*bool reposition( sgVec3 p, double angle,
-		     double rightAscension, double declination,
-		     double moon_dist  );*/
-
-    /*bool reposition(sgVec3 p, double moon_angle) 
-    {
-       return reposition (p, moon_angle, rightAscension, declination, moon_dist); 
-    }*/
-
-    bool reposition(sgVec3 p, double moon_angle, double rightAscension, double declination, double moon_dist);
-
-    /*bool repaint() 
-    { 
-	return repaint (moon_angle); 
-    }*/
-    bool repaint(double moon_angle);
-
-    void getPosition (sgCoord* p)
-    {
-	sgMat4 Xform;
-	moon_transform->getTransform(Xform);
-	sgSetCoord(p, Xform);
-    }
-
-    void setAngle (double angle) 
-    { 
-	moon_angle = angle; 
-    }
-    double getAngle () 
-    { 
-	return moon_angle; 
-    }
-
-    void setRotation (double rotation) 
-    { 
-	moon_rotation = rotation; 
-    }
-    double getRotation () 
-    { 
-	return moon_rotation; 
-    }
-
-    void setRightAscension (double ra) 
-    { 
-	moon_right_ascension = ra; 
-    }
-    double getRightAscension () 
-    { 
-	return moon_right_ascension; 
-    }
-
-    void setDeclination ( double decl ) 
-    { 
-	moon_declination = decl; 
-    }
-    double getDeclination () 
-    { 
-	return moon_declination; 
-    }
-
-    void setDist ( double dist ) 
-    { 
- 	moon_dist = dist; 
-    }
-    double getDist () 
-    { 
-	return moon_dist; 
-    }
-
-    inline float *getColor() 
-    { 
-       return  cl->get( 0 ); 
-    }
-};
-
-// Not used.
-
-class cGrSun 
-{
-    ssgTransform *sun_transform;
-    ssgSimpleState *sun_state; 
-    ssgSimpleState *ihalo_state;
-    ssgSimpleState *ohalo_state;
-
-    ssgColourArray *sun_cl;
-    ssgColourArray *ihalo_cl;
-    ssgColourArray *ohalo_cl;
-
-    ssgVertexArray *sun_vl;
-    ssgVertexArray *ihalo_vl;
-    ssgVertexArray *ohalo_vl;
-
-    ssgTexCoordArray *sun_tl;
-    ssgTexCoordArray *ihalo_tl;
-    ssgTexCoordArray *ohalo_tl;
-
-    GLuint sun_texid;
-    GLubyte *sun_texbuf;
-
-    double visibility;
-    double prev_sun_angle;
-    // distance of light traveling through the atmosphere
-    double path_distance;
-
-public:
-
-    // Constructor
-    cGrSun( void );
-
-    // Destructor
-    ~cGrSun( void );
-
-    // return the sun object
-    ssgBranch *build( const char* body_tex_path, const char* halo_tex_path, double sun_size);
-
-    // repaint the sun colors based on current value of sun_anglein
-    // degrees relative to verticle
-    // 0 degrees = high noon
-    // 90 degrees = sun rise/set
-    // 180 degrees = darkest midnight
-    bool repaint( double sun_angle, double new_visibility );
-
-    // reposition the sun at the specified right ascension and
-    // declination, offset by our current position (p) so that it
-    // appears fixed at a great distance from the viewer.  Also add in
-    // an optional rotation (i.e. for the current time of day.)
-
-    /*bool reposition( sgVec3 p, double angle,
-		     double rightAscension, double declination,
-		     double sun_dist, double lat, double alt_asl, double sun_angle );*/
-
-    bool reposition( sgVec3 p, double sun_angle ) 
-    {
-       return reposition ( p, angle, sun_right_ascension, sun_declination, sun_body_dist ); 
-    }
-
-    bool reposition( sgVec3 p, double sun_angle, double rightAscension, double declination, double dist );
-
-    // retrun the current color of the sun
-    inline float *get_color() { return  ohalo_cl->get( 0 ); }
-
-    // return the texture id of the sun halo texture
-    inline GLuint get_texture_id() { return ohalo_state->getTextureHandle(); }
-};
-#endif
 
 #endif
