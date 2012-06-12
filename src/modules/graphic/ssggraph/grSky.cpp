@@ -63,10 +63,8 @@ cGrSky::~cGrSky( void )
 
 
 void cGrSky::build( double h_radius, double v_radius,
-				     const char *sun_path, const char *ihalo_path, const char *ohalo_path,
-					 float sun_size, const char *moon_path, float moon_size,
-                     int nplanets, sgdVec3 *planet_data,
-                     int nstars, sgdVec3 *star_data, float humidity, float visibility )
+				     int nplanets, sgdVec3 *planet_data,
+                     int nstars, sgdVec3 *star_data )
 {
   delete dome;
   delete sun;
@@ -94,12 +92,6 @@ void cGrSky::build( double h_radius, double v_radius,
   dome = new cGrSkyDome;
   pre_transform -> addKid( dome->build( h_radius, v_radius ) );
 
-  sun = new cGrSun;
-  sun_transform -> addKid( sun->build( sun_path, ihalo_path, ohalo_path, sun_size, humidity, visibility));
-
-  moon = new cGrMoon;
-  moon_transform -> addKid( moon->build( moon_path, moon_size ));
-
   planets = new cGrStars;
   stars_transform -> addKid( planets->build( nplanets, planet_data, h_radius ) );
 
@@ -120,37 +112,25 @@ void cGrSky::build( double h_radius, double v_radius,
   post_root->addKid( post_selector );
 }
 
-
-/*cGrCelestialBody*
-cGrSky::addBody( const char *body_tex_path, const char *ihalo_tex_path, const char *ohalo_tex_path, double size, double dist, bool sol )
+cGrSun*
+cGrSky::addSun( const char *sun_path, const char *ihalo_path, const char* ohalo_path, double sun_size, double sun_dist, double humidity, double visibility )
 {
-  cGrCelestialBody* body = new cGrCelestialBody;
-  bodies_transform->addKid( body->build( body_tex_path, ihalo_tex_path, ohalo_tex_path, size ) );
-  bodies.add( body );
-
-  body -> setDist( dist );
-
-  if ( sol )
-    sol_ref = body;
-
-  return body;
+	cGrSun* sun = new cGrSun;
+	sun_transform->addKid( sun->build( sun_path, ihalo_path, ohalo_path, sun_size, humidity, visibility ) );
+	sun->setDistance(sun_dist);
+    
+	return sun;
 }
 
-
-cGrCelestialBody*
-cGrSky::addBody( ssgSimpleState *orb_state, ssgSimpleState *ihalo_state, ssgSimpleState *ohalo_state, double size, double dist, bool sol )
+cGrMoon*
+cGrSky::addMoon( const char *moon_path, double moon_size, double moon_dist )
 {
-  cGrCelestialBody* body = new cGrCelestialBody;
-  bodies_transform->addKid( body->build( orb_state, ihalo_state, ohalo_state, size ) );
-  bodies.add( body );
+	cGrMoon* moon = new cGrMoon;
+	moon_transform->addKid( moon->build( moon_path, moon_size ));
+	moon->setmoonDist(moon_dist);
 
-  body -> setDist( dist );
-
-  if ( sol )
-    sol_ref = body;
-
-  return body;
-}*/
+	return moon;
+}
 
 
 cGrCloudLayer*
@@ -184,11 +164,15 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	moon->reposition( view_pos, 0 );
 
 	// Calc angles for rise/set effects
-    sun->getPosition ( & pos );
+    sun->getPosition ( &pos );
 	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
     sun->setAngle( angle );
     sun->setRotation( rotation );
 
+	moon->getPosition(&pos);
+	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
+    moon->setAngle( angle );
+    moon->setRotation( rotation );
 
 	for ( i = 0; i < clouds.getNum (); i++ ) 
 	{

@@ -41,9 +41,10 @@ static int grMoonOrbPostDraw( ssgEntity *e )
 }
 
 // Constructor
-cGrMoon::cGrMoon( void ) :
-    prev_moon_angle(-1)
+cGrMoon::cGrMoon( void )   
 {
+	moon_transform = 0;
+	prev_moon_angle= - 9999;
 }
 
 // Destructor
@@ -114,7 +115,7 @@ bool cGrMoon::repaint( double moon_angle )
     return true;
 }
 
-bool cGrMoon::reposition( sgVec3 p, double angle, double rightAscension, double declination, double moon_dist ) 
+bool cGrMoon::reposition( sgVec3 p, double moonangle, double moonrightAscension, double moondeclination, double moon_dist ) 
 {
     sgMat4 T1, T2, GST, RA, DEC;
     sgVec3 axis;
@@ -123,11 +124,11 @@ bool cGrMoon::reposition( sgVec3 p, double angle, double rightAscension, double 
     sgMakeTransMat4( T1, p );
 
     sgSetVec3( axis, 0.0, 0.0, -1.0 );
-    sgMakeRotMat4( GST, (float)angle, axis );
+    sgMakeRotMat4( GST, (float)moonangle, axis );
     sgSetVec3( axis, 0.0, 0.0, 1.0 );
-    sgMakeRotMat4( RA, ((float)rightAscension * SGD_RADIANS_TO_DEGREES) - 90.0, axis );
+    sgMakeRotMat4( RA, ((float)moonrightAscension * SGD_RADIANS_TO_DEGREES) - 90.0, axis );
     sgSetVec3( axis, 1.0, 0.0, 0.0 );
-    sgMakeRotMat4( DEC, (float)declination * SGD_RADIANS_TO_DEGREES, axis );
+    sgMakeRotMat4( DEC, (float)moondeclination * SGD_RADIANS_TO_DEGREES, axis );
     sgSetVec3( v, 0.0, moon_dist, 0.0 );
     sgMakeTransMat4( T2, v );
 

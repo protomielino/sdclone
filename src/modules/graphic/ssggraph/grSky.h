@@ -22,8 +22,6 @@
 
 #include "plib/ssg.h"
 
-//class cGrCelestialBody;
-//class cGrCelestialBodyList;
 class cGrSun;
 class cGrMoon;
 class cGrCloudLayer;
@@ -45,6 +43,7 @@ class cGrMoon
 
     double prev_moon_angle;
 	double moon_angle;
+    double moon_rotation;
 	double moon_size;
 	double moon_dist;
 	double moonAscension;
@@ -82,11 +81,23 @@ public:
     bool reposition(sgVec3 p, double moon_angle, double moonAscension, double moondeclination, double moon_dist);
     bool repaint(double moon_angle);
 
+    void getPosition (sgCoord* p)
+    {
+		sgMat4 Xform;
+		moon_transform->getTransform(Xform);
+		sgSetCoord(p, Xform);
+    }
+
+    void setAngle (double angle) { moon_angle = angle; }
+    double getAngle () { return moon_angle; }
+    void setRotation (double rotation) { moon_rotation = rotation; }
+    double getRotation () { return moon_rotation; }
 	void setmoonRightAscension ( double ra ) { moonAscension = ra; }
 	double getRightAscension () { return moonAscension; }
-
 	void setmoonDeclination ( double decl ) { moondeclination = decl; }
 	double getmoonDeclination () { return moondeclination; }
+    void setmoonDist ( double dist ) { moon_dist = dist; }
+    double getmoonDist() { return moon_dist; }
 };
 
 class cGrSun 
@@ -154,7 +165,7 @@ public:
        return reposition ( p, sun_angle, sun_right_ascension, sun_declination, sun_dist ); 
     }
 
-    bool reposition( sgVec3 p, double sun_angle, double rightAscension, double declination, double dist );
+    bool reposition( sgVec3 p, double sun_angle, double sun_right_ascension, double sun_declination, double sun_dist );
 
     void getPosition (sgCoord* p)
     {
@@ -200,11 +211,11 @@ public:
 		return sun_declination; 
     }
 
-    void setDist ( double dist ) 
+    void setDistance ( double dist ) 
     { 
  		sun_dist = dist; 
     }
-    double getDist () 
+    double getDistance () 
     { 
 		return sun_dist; 
     }
@@ -213,95 +224,6 @@ public:
     inline float *get_color() { return  ohalo_cl->get( 0 ); }
 	double effective_visibility;
 };
-
-/*class cGrCelestialBody
-{
-private:
-
-  ssgTransform *transform;
-  ssgColourArray *cl;
-  ssgColourArray *ihalo_cl;
-  ssgColourArray *ohalo_cl;
-
-  // used by repaint for rise/set effects
-  double body_angle;
-  double body_rotation;
-
-  // used by reposition
-  double body_right_ascension;
-  double body_declination;
-  double body_dist;
-
-public:
-
-  cGrCelestialBody( void );
-  ~cGrCelestialBody( void );
-
-  ssgBranch *build( const char* body_tex_path, const char* ihalo_tex_path, const char* ohalo_tex, double body_size );
-  ssgBranch *build( ssgSimpleState *orb_state, ssgSimpleState *ihalo_state, ssgSimpleState *ohalo_state, double body_size );
-
-  bool reposition( sgVec3 p, double angle ) 
-  {
-    return reposition ( p, angle, body_right_ascension, body_declination, body_dist ); 
-  }
-  bool reposition( sgVec3 p, double angle, double rightAscension, double declination, double dist );
-
-  bool repaint() { return repaint ( body_angle ); }
-  bool repaint( double angle );
-
-  void getPosition ( sgCoord* p )
-  {
-	sgMat4 Xform;
-	transform->getTransform(Xform);
-	sgSetCoord(p, Xform);
-  }
-
-  void setAngle ( double angle ) { body_angle = angle; }
-  double getAngle () { return body_angle; }
-
-  void setRotation ( double rotation ) { body_rotation = rotation; }
-  double getRotation () { return body_rotation; }
-
-  void setRightAscension ( double ra ) { body_right_ascension = ra; }
-  double getRightAscension () { return body_right_ascension; }
-
-  void setDeclination ( double decl ) { body_declination = decl; }
-  double getDeclination () { return body_declination; }
-
-  void setDist ( double dist ) { body_dist = dist; }
-  double getDist () { return body_dist; }
-  double effective_visibility;
-
-  inline float *getColor() { return  cl->get( 0 ); }
-} ;
-
-
-class cGrCelestialBodyList : private ssgSimpleList
-{
-public:
-
-  cGrCelestialBodyList ( int init = 3 )
-	  : ssgSimpleList ( sizeof(cGrCelestialBody*), init ) { }
-
-  ~cGrCelestialBodyList () { removeAll(); }
-
-  int getNum (void) { return total ; }
-
-  cGrCelestialBody* get ( unsigned int n )
-  {
-    assert(n<total);
-    return *( (cGrCelestialBody**) raw_get ( n ) ) ;
-  }
-
-  void add ( cGrCelestialBody* item ) { raw_add ( (char *) &item ) ;}
-
-  void removeAll ()
-  {
-    for ( int i = 0; i < getNum (); i++ )
-      delete get (i) ;
-    ssgSimpleList::removeAll () ;
-  }
-} ;*/
 
 
 class cGrCloudLayer
@@ -486,11 +408,11 @@ public:
   ~cGrSky( void );
 
   void build( double h_radius, double v_radius,
-	  const char *sun_path, const char *ihalo_path,
-	  const char *ohalo_path, float sun_size,
-	  const char *moon_path, float moon_size,
 	  int nplanets, sgdVec3 *planet_data,
-	  int nstars, sgdVec3 *star_data, float humidity, float visibility);
+	  int nstars, sgdVec3 *star_data );
+
+  cGrSun* addSun( const char *sun_path, const char *ihalo_path, const char* ohalo_path, double sun_size, double sun_dist, double humidity, double visibility );
+  cGrMoon* addMoon( const char *moon_path, double moon_size, double moon_dist );
 
   cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
   cGrCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
@@ -531,7 +453,7 @@ public:
   {
     effective_visibility = visibility = v;
   }
-} ;
+};
 
 
 // return a random number between [0.0, 1.0)

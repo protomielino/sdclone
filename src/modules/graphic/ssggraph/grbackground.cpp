@@ -219,12 +219,12 @@ grInitBackground()
 		//Build the sky
 		TheSky	= new cGrSky;
 
-		const double domeSizeRatio = grSkyDomeDistance / 80000.0;
-
-		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, "data/textures/halo.rgba", "data/textures/halo.rgba", "data/textures/outer_halo.rgba",
-			2500 * domeSizeRatio, "data/textures/moon.rgba", 2000 * domeSizeRatio, NPlanets, APlanetsData, NStars, AStarsData, 0.5f, visibility);
+		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, NPlanets, APlanetsData, NStars, AStarsData );
 		
-		//Add the Sun itself		
+		//Add the Sun itself
+		const double domeSizeRatio = grSkyDomeDistance / 80000.0;
+		Sun = TheSky->addSun( "data/textures/halo.rgba", "data/textures/halo.rgba", "data/textures/outer_halo.rgba",
+												  2500 * domeSizeRatio, grSkyDomeDistance, 0.5f, 10000.0 );
 		GLfloat sunAscension = grTrack->local.sunascension;
 		grSunDeclination = (float)(15 * (double)timeOfDay / 3600 - 90.0);
 
@@ -237,6 +237,7 @@ grInitBackground()
 				  grSunDeclination, RAD2DEG(sunAscension));
 
 		// Add the Moon (TODO: Find a better solution than this random positioning !)
+		Moon = TheSky->addMoon( "data/textures/moon.rgba", 2000 * domeSizeRatio, grSkyDomeDistance );
 		if ( grSunDeclination > 180 )
 			grMoonDeclination = 3.0 + (rand() % 40);
 		else

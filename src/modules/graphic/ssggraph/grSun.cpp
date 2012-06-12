@@ -22,6 +22,7 @@
 #include "grSphere.h"
 
 static float sun_exp2_punch_through;
+static double visibility;
 
 // Set up sun rendering call backs
 static int grSunPreDraw( ssgEntity *e ) 
@@ -64,6 +65,7 @@ static int grSunHaloPostDraw( ssgEntity *e )
 // Constructor
 cGrSun::cGrSun( void ) 
 {
+	sun_transform = 0;
     prev_sun_angle = -9999.0;
     visibility = -9999.0;
 }
