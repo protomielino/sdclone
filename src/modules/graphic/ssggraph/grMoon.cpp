@@ -50,38 +50,42 @@ cGrMoon::cGrMoon( void )
 // Destructor
 cGrMoon::~cGrMoon( void ) 
 {
+	ssgDeRefDelete( moon_transform );
 }
 
 // build the moon object
-ssgBranch * cGrMoon::build( const char *moon_path, double moon_size ) 
+ssgBranch * cGrMoon::build( double moon_size ) 
 {
-    orb_state = new ssgSimpleState();
-    orb_state->setTexture( moon_path );
-    orb_state->setShadeModel( GL_SMOOTH );
-    orb_state->enable( GL_LIGHTING );
-    orb_state->enable( GL_CULL_FACE );
-    orb_state->enable( GL_TEXTURE_2D );
-    orb_state->enable( GL_COLOR_MATERIAL );
-    orb_state->setColourMaterial( GL_DIFFUSE );
-    orb_state->setMaterial( GL_AMBIENT, 0, 0, 0, 1.0 );
-    orb_state->setMaterial( GL_EMISSION, 0.0, 0.0, 0.0, 1 );
-    orb_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
-    orb_state->enable( GL_BLEND );
-    orb_state->enable( GL_ALPHA_TEST );
-    orb_state->setAlphaClamp( 0.01 );
+	ssgDeRefDelete( moon_transform );
+    moon_transform = new ssgTransform;
+	moon_transform->ref();
+
+    moon_state = new ssgSimpleState();
+    moon_state->setTexture( "data/textures/moon.rgba" );
+    moon_state->setShadeModel( GL_SMOOTH );
+    moon_state->enable( GL_LIGHTING );
+    moon_state->enable( GL_CULL_FACE );
+    moon_state->enable( GL_TEXTURE_2D );
+    moon_state->enable( GL_COLOR_MATERIAL );
+    moon_state->setColourMaterial( GL_DIFFUSE );
+    moon_state->setMaterial( GL_AMBIENT, 0, 0, 0, 1.0 );
+    moon_state->setMaterial( GL_EMISSION, 0.0, 0.0, 0.0, 1 );
+    moon_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
+    moon_state->enable( GL_BLEND );
+    moon_state->enable( GL_ALPHA_TEST );
+    moon_state->setAlphaClamp( 0.01 );
 
     cl = new ssgColourArray( 1 );
     sgVec4 color;
     sgSetVec4( color, 1.0, 1.0, 1.0, 1.0 );
     cl->add( color );
 
-    ssgBranch *orb = grMakeSphere( orb_state, cl, moon_size, 15, 15,
+    ssgBranch *moon = grMakeSphere( moon_state, cl, moon_size, 15, 15,
 				    grMoonOrbPreDraw, grMoonOrbPostDraw );
 
     repaint( 0.0 );
 
-    moon_transform = new ssgTransform;
-    moon_transform->addKid( orb );
+    moon_transform->addKid( moon );
 
     return moon_transform;
 }
@@ -92,7 +96,7 @@ bool cGrMoon::repaint( double moon_angle )
 	{
         prev_moon_angle = moon_angle;
 
-        float moon_factor = 4*cos(moon_angle);
+        double moon_factor = 4*cos(moon_angle);
 
         if (moon_factor > 1) moon_factor = 1.0;
         if (moon_factor < -1) moon_factor = -1.0;
@@ -115,7 +119,7 @@ bool cGrMoon::repaint( double moon_angle )
     return true;
 }
 
-bool cGrMoon::reposition( sgVec3 p, double moonangle, double moonrightAscension, double moondeclination, double moon_dist ) 
+bool cGrMoon::reposition(sgVec3 p, double moonangle, double moonrightAscension, double moondeclination, double moon_dist) 
 {
     sgMat4 T1, T2, GST, RA, DEC;
     sgVec3 axis;

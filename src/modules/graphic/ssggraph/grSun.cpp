@@ -73,11 +73,17 @@ cGrSun::cGrSun( void )
 // Destructor
 cGrSun::~cGrSun( void ) 
 {
+	ssgDeRefDelete( sun_transform );
 }
 
-ssgBranch * cGrSun::build( const char *sun_path, const char *ihalo_path, const char *ohalo_path, float sun_size, float humidity, float visibility ) 
+ssgBranch * cGrSun::build( double sun_size ) 
 {
-    sgVec4 color;
+    ssgDeRefDelete( sun_transform );
+
+	sun_transform = new ssgTransform;
+	sun_transform->ref();
+
+	sgVec4 color;
     sgSetVec4( color, 1.0, 1.0, 1.0, 1.0 );
 
     sun_cl = new ssgColourArray( 1 );
@@ -96,7 +102,7 @@ ssgBranch * cGrSun::build( const char *sun_path, const char *ihalo_path, const c
     sun_state->setShadeModel( GL_SMOOTH );
     sun_state->disable( GL_LIGHTING );
     sun_state->disable( GL_CULL_FACE );
-    sun_state->setTexture( sun_path);
+    sun_state->setTexture( "data/textures/inner_halo.png");
     sun_state->enable( GL_TEXTURE_2D );
     sun_state->enable( GL_COLOR_MATERIAL );
     sun_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
@@ -136,7 +142,7 @@ ssgBranch * cGrSun::build( const char *sun_path, const char *ihalo_path, const c
     repaint( 0.0, 1.0 );
 
 	ihalo_state = new ssgSimpleState();
-	ihalo_state->setTexture( ihalo_path );
+	ihalo_state->setTexture( "data/textures/inner_halo.png" );
 	ihalo_state->enable( GL_TEXTURE_2D );
 	ihalo_state->disable( GL_LIGHTING );
 	ihalo_state->setShadeModel( GL_SMOOTH );
@@ -176,7 +182,7 @@ ssgBranch * cGrSun::build( const char *sun_path, const char *ihalo_path, const c
     ihalo->setState( ihalo_state );
   
     ohalo_state = new ssgSimpleState();
-    ohalo_state->setTexture( ohalo_path );
+    ohalo_state->setTexture( "data/textures/outer_halo.png" );
     ohalo_state->enable( GL_TEXTURE_2D );
     ohalo_state->disable( GL_LIGHTING );
     ohalo_state->setShadeModel( GL_SMOOTH );
@@ -214,8 +220,6 @@ ssgBranch * cGrSun::build( const char *sun_path, const char *ihalo_path, const c
 
     ssgLeaf *ohalo = new ssgVtxTable ( GL_TRIANGLE_STRIP, ohalo_vl, NULL, ohalo_tl, ohalo_cl );
     ohalo->setState( ohalo_state );
-
-    sun_transform = new ssgTransform;
 
     ihalo->setCallback( SSG_CALLBACK_PREDRAW, grSunHaloPreDraw );
     ihalo->setCallback( SSG_CALLBACK_POSTDRAW, grSunHaloPostDraw );

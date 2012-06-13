@@ -63,6 +63,8 @@ cGrSky::~cGrSky( void )
 
 
 void cGrSky::build( double h_radius, double v_radius,
+					 double sun_size, double sun_dist, 
+					 double moon_size, double moon_dist,
 				     int nplanets, sgdVec3 *planet_data,
                      int nstars, sgdVec3 *star_data )
 {
@@ -92,6 +94,14 @@ void cGrSky::build( double h_radius, double v_radius,
   dome = new cGrSkyDome;
   pre_transform -> addKid( dome->build( h_radius, v_radius ) );
 
+  sun = new cGrSun;
+  sun_transform -> addKid( sun->build( sun_size));
+  sun->setSunDistance( sun_dist );
+
+  moon = new cGrMoon;
+  moon_transform ->addKid( sun->build( moon_size));
+  moon->setMoonDist(moon_dist);
+
   planets = new cGrStars;
   stars_transform -> addKid( planets->build( nplanets, planet_data, h_radius ) );
 
@@ -110,26 +120,6 @@ void cGrSky::build( double h_radius, double v_radius,
 
   pre_root->addKid( pre_selector );
   post_root->addKid( post_selector );
-}
-
-cGrSun*
-cGrSky::addSun( const char *sun_path, const char *ihalo_path, const char* ohalo_path, double sun_size, double sun_dist, double humidity, double visibility )
-{
-	cGrSun* sun = new cGrSun;
-	sun_transform->addKid( sun->build( sun_path, ihalo_path, ohalo_path, sun_size, humidity, visibility ) );
-	sun->setDistance(sun_dist);
-    
-	return sun;
-}
-
-cGrMoon*
-cGrSky::addMoon( const char *moon_path, double moon_size, double moon_dist )
-{
-	cGrMoon* moon = new cGrMoon;
-	moon_transform->addKid( moon->build( moon_path, moon_size ));
-	moon->setmoonDist(moon_dist);
-
-	return moon;
 }
 
 
@@ -164,15 +154,15 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	moon->reposition( view_pos, 0 );
 
 	// Calc angles for rise/set effects
-    sun->getPosition ( &pos );
+    sun->getSunPosition ( &pos );
 	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
-    sun->setAngle( angle );
-    sun->setRotation( rotation );
+    sun->setSunAngle( angle );
+    sun->setSunRotation( rotation );
 
-	moon->getPosition(&pos);
+	moon->getMoonPosition(&pos);
 	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
-    moon->setAngle( angle );
-    moon->setRotation( rotation );
+    moon->setMoonAngle( angle );
+    moon->setMoonRotation( rotation );
 
 	for ( i = 0; i < clouds.getNum (); i++ ) 
 	{
@@ -183,12 +173,12 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	stars->reposition( view_pos, 0 );
 
 	/*if ( sol_ref ) 
-	{
-		dome->repositionFlat( view_pos, sol_ref->getRotation() );
-	}
+	{*/
+		dome->repositionFlat( view_pos, sun->getSunRotation() );
+	/*}
 	else 
 	{*/
-		dome->repositionFlat( view_pos, spin );
+		//dome->repositionFlat( view_pos, spin );
 	//}
 
 	return true;
@@ -403,3 +393,4 @@ void cGrSky::modifyVisibility( float alt, float time_factor )
 
   effective_visibility = effvis;
 }
+

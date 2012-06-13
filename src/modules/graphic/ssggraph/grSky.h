@@ -20,210 +20,34 @@
 #ifndef _GRSKY_H_
 #define _GRSKY_H_
 
+#include "plib/sg.h"
 #include "plib/ssg.h"
 
-class cGrSun;
-class cGrMoon;
+typedef struct 
+{
+	float *view_pos, *zero_elev, *view_up;
+	double lon, lat, alt, spin;
+	double gst;
+	double sun_ra, sun_dec, sun_dist;
+	double moon_ra, moon_dec, moon_dist;
+	double sun_angle;
+} cGrSkyState;
+
+typedef struct 
+{
+	float *sky_color, *fog_color, *cloud_color;
+	double sun_angle, moon_angle;
+	int nplanets, nstars;
+	sgdVec3 *planet_data, *star_data;
+} cGrSkyColor;
+
 class cGrCloudLayer;
 class cGrCloudLayerList;
+class cGrSun;
+class cGrMoon;
 class cGrStars;
 class cGrSkyDome;
 class cGrSky;
-
-class cGrMoon 
-{
-    ssgTransform *moon_transform;
-    ssgSimpleState *orb_state;
-    ssgSimpleState *halo_state;
-
-    ssgColourArray *cl;
-
-    ssgVertexArray *halo_vl;
-    ssgTexCoordArray *halo_tl;
-
-    double prev_moon_angle;
-	double moon_angle;
-    double moon_rotation;
-	double moon_size;
-	double moon_dist;
-	double moonAscension;
-	double moondeclination;
-
-
-public:
-
-    // Constructor
-    cGrMoon( void );
-
-    // Destructor
-    ~cGrMoon( void );
-
-    // build the moon object
-    ssgBranch *build( const char* moon_path, double moon_size );
-
-    // repaint the moon colors based on current value of moon_anglein
-    // degrees relative to verticle
-    // 0 degrees = high noon
-    // 90 degrees = moon rise/set
-    // 180 degrees = darkest midnight
-
-    //bool repaint(double moon_angle);
-
-    /*bool reposition( sgVec3 p, double angle,
-		     double rightAscension, double declination,
-		     double moon_dist  );*/
-
-    bool reposition(sgVec3 p, double moon_angle) 
-    {
-       return reposition (p, moon_angle, moonAscension, moondeclination, moon_dist); 
-    }
-
-    bool reposition(sgVec3 p, double moon_angle, double moonAscension, double moondeclination, double moon_dist);
-    bool repaint(double moon_angle);
-
-    void getPosition (sgCoord* p)
-    {
-		sgMat4 Xform;
-		moon_transform->getTransform(Xform);
-		sgSetCoord(p, Xform);
-    }
-
-    void setAngle (double angle) { moon_angle = angle; }
-    double getAngle () { return moon_angle; }
-    void setRotation (double rotation) { moon_rotation = rotation; }
-    double getRotation () { return moon_rotation; }
-	void setmoonRightAscension ( double ra ) { moonAscension = ra; }
-	double getRightAscension () { return moonAscension; }
-	void setmoonDeclination ( double decl ) { moondeclination = decl; }
-	double getmoonDeclination () { return moondeclination; }
-    void setmoonDist ( double dist ) { moon_dist = dist; }
-    double getmoonDist() { return moon_dist; }
-};
-
-class cGrSun 
-{
-    ssgTransform *sun_transform;
-    ssgSimpleState *sun_state; 
-    ssgSimpleState *ihalo_state;
-    ssgSimpleState *ohalo_state;
-
-    ssgColourArray *sun_cl;
-    ssgColourArray *ihalo_cl;
-    ssgColourArray *ohalo_cl;
-
-    ssgVertexArray *sun_vl;
-    ssgVertexArray *ihalo_vl;
-    ssgVertexArray *ohalo_vl;
-
-    ssgTexCoordArray *sun_tl;
-    ssgTexCoordArray *ihalo_tl;
-    ssgTexCoordArray *ohalo_tl;
-
-    GLuint sun_texid;
-    GLubyte *sun_texbuf;
-
-    double visibility;
-    double prev_sun_angle;
-    double sun_angle;
-    double sun_rotation;
-
-    // used by reposition
-    double sun_right_ascension;
-    double sun_declination;
-    double sun_dist;
-    double path_distance;
-
-public:
-
-    // Constructor
-    cGrSun( void );
-
-    // Destructor
-    ~cGrSun( void );
-
-    // return the sun object
-    ssgBranch *build( const char* sun_path, const char *ihalo_path, const char* ohalo_path, float sun_size, float humidity, float visibility );
-
-    // repaint the sun colors based on current value of sun_anglein
-    // degrees relative to verticle
-    // 0 degrees = high noon
-    // 90 degrees = sun rise/set
-    // 180 degrees = darkest midnight
-    bool repaint( double sun_angle, double new_visibility );
-
-    // reposition the sun at the specified right ascension and
-    // declination, offset by our current position (p) so that it
-    // appears fixed at a great distance from the viewer.  Also add in
-    // an optional rotation (i.e. for the current time of day.)
-
-    /*bool reposition( sgVec3 p, double angle,
-		     double rightAscension, double declination,
-		     double sun_dist, double lat, double alt_asl, double sun_angle );*/
-
-    bool reposition( sgVec3 p, double sun_angle ) 
-    {
-       return reposition ( p, sun_angle, sun_right_ascension, sun_declination, sun_dist ); 
-    }
-
-    bool reposition( sgVec3 p, double sun_angle, double sun_right_ascension, double sun_declination, double sun_dist );
-
-    void getPosition (sgCoord* p)
-    {
-		sgMat4 Xform;
-		sun_transform->getTransform(Xform);
-		sgSetCoord(p, Xform);
-    }
-
-    void setAngle (double angle) 
-    { 
-		sun_angle = angle; 
-    }
-
-    double getAngle () 
-    { 
-		return sun_angle; 
-    }
-
-    void setRotation (double rotation) 
-    { 
-		sun_rotation = rotation; 
-    }
-    double getRotation () 
-    { 
-		return sun_rotation; 
-    }
-
-    void setRightAscension (double ra) 
-    { 
-		sun_right_ascension = ra; 
-    }
-    double getRightAscension () 
-    { 
-		return sun_right_ascension; 
-    }
-
-    void setDeclination ( double decl ) 
-    { 
-		sun_declination = decl; 
-    }
-    double getDeclination () 
-    { 
-		return sun_declination; 
-    }
-
-    void setDistance ( double dist ) 
-    { 
- 		sun_dist = dist; 
-    }
-    double getDistance () 
-    { 
-		return sun_dist; 
-    }
-
-    // retrun the current color of the sun
-    inline float *get_color() { return  ohalo_cl->get( 0 ); }
-	double effective_visibility;
-};
 
 
 class cGrCloudLayer
@@ -311,7 +135,174 @@ public:
       delete get (i) ;
     ssgSimpleList::removeAll () ;
   }
-} ;
+};
+
+
+class cGrMoon 
+{
+private:
+    ssgTransform *moon_transform;
+    ssgSimpleState *moon_state;
+    ssgSimpleState *halo_state;
+
+    ssgColourArray *cl;
+
+    ssgVertexArray *halo_vl;
+    ssgTexCoordArray *halo_tl;
+
+    double prev_moon_angle;
+	double moon_angle;
+    double moon_rotation;
+	double moon_size;
+	double moon_dist;
+	double moonAscension;
+	double moondeclination;
+
+
+public:
+    // Constructor
+    cGrMoon( void );
+
+    // Destructor
+    ~cGrMoon( void );
+
+    // build the moon object
+    ssgBranch *build( double moon_size );
+
+    // repaint the moon colors based on current value of moon_anglein
+    // degrees relative to verticle
+    // 0 degrees = high noon
+    // 90 degrees = moon rise/set
+    // 180 degrees = darkest midnight
+
+    //bool repaint(double moon_angle);
+
+    /*bool reposition( sgVec3 p, double angle,
+		     double rightAscension, double declination,
+		     double moon_dist  );*/
+
+    bool reposition(sgVec3 p, double moon_angle) 
+    {
+       return reposition (p, moon_angle, moonAscension, moondeclination, moon_dist); 
+    }
+
+    bool reposition(sgVec3 p, double moon_angle, double moonAscension, double moondeclination, double moon_dist);
+    bool repaint(double moon_angle);
+
+    void getMoonPosition (sgCoord* p)
+    {
+		sgMat4 Xform;
+		moon_transform->getTransform(Xform);
+		sgSetCoord(p, Xform);
+    }
+
+    void setMoonAngle (double angle) { moon_angle = angle; }
+    double getMoonAngle () { return moon_angle; }
+
+    void setMoonRotation (double rotation) { moon_rotation = rotation; }
+    double getMoonRotation () { return moon_rotation; }
+
+	void setMoonRightAscension ( double ra ) { moonAscension = ra; }
+	double getMoonRightAscension () { return moonAscension; }
+
+	void setMoonDeclination ( double decl ) { moondeclination = decl; }
+	double getMoonDeclination () { return moondeclination; }
+
+    void setMoonDist ( double dist ) { moon_dist = dist; }
+    double getMoonDist() { return moon_dist; }
+};
+
+class cGrSun 
+{
+private:
+    ssgTransform *sun_transform;
+    ssgSimpleState *sun_state; 
+    ssgSimpleState *ihalo_state;
+    ssgSimpleState *ohalo_state;
+
+    ssgColourArray *sun_cl;
+    ssgColourArray *ihalo_cl;
+    ssgColourArray *ohalo_cl;
+
+    ssgVertexArray *sun_vl;
+    ssgVertexArray *ihalo_vl;
+    ssgVertexArray *ohalo_vl;
+
+    ssgTexCoordArray *sun_tl;
+    ssgTexCoordArray *ihalo_tl;
+    ssgTexCoordArray *ohalo_tl;
+
+    float visibility;
+    double prev_sun_angle;
+    double sun_angle;
+    double sun_rotation;
+
+    // used by reposition
+    double sun_right_ascension;
+    double sun_declination;
+    double sun_dist;
+    double path_distance;
+
+public:
+
+    // Constructor
+    cGrSun( void );
+
+    // Destructor
+    ~cGrSun( void );
+
+    // return the sun object
+    ssgBranch *build( double sun_size );
+
+    // repaint the sun colors based on current value of sun_anglein
+    // degrees relative to verticle
+    // 0 degrees = high noon
+    // 90 degrees = sun rise/set
+    // 180 degrees = darkest midnight
+    bool repaint( double sun_angle, double new_visibility );
+
+    // reposition the sun at the specified right ascension and
+    // declination, offset by our current position (p) so that it
+    // appears fixed at a great distance from the viewer.  Also add in
+    // an optional rotation (i.e. for the current time of day.)
+
+    /*bool reposition( sgVec3 p, double angle,
+		     double rightAscension, double declination,
+		     double sun_dist, double lat, double alt_asl, double sun_angle );*/
+
+    bool reposition( sgVec3 p, double sun_angle ) 
+    {
+       return reposition ( p, sun_angle, sun_right_ascension, sun_declination, sun_dist ); 
+    }
+
+    bool reposition( sgVec3 p, double sun_angle, double sun_right_ascension, double sun_declination, double sun_dist );
+
+    void getSunPosition (sgCoord* p)
+    {
+		sgMat4 Xform;
+		sun_transform->getTransform(Xform);
+		sgSetCoord(p, Xform);
+    }
+
+    void setSunAngle(double angle) { sun_angle = angle; }
+    double getSunAngle() { return sun_angle; }
+
+    void setSunRotation(double rotation) { sun_rotation = rotation; }
+    double getSunRotation() { return sun_rotation; }
+
+    void setSunRightAscension(double ra) { sun_right_ascension = ra; }
+    double getSunRightAscension() { return sun_right_ascension; }
+
+    void setSunDeclination( double decl ) { sun_declination = decl; }
+    double getSunDeclination() { return sun_declination; }
+
+    void setSunDistance( double dist ) { sun_dist = dist; }
+    double getSunDistance() { return sun_dist; }
+
+    // retrun the current color of the sun
+    inline float *get_color() { return  ohalo_cl->get( 0 ); }
+	double effective_visibility;
+};
 
 
 class cGrStars
@@ -376,83 +367,121 @@ public:
 class cGrSky
 {
 private:
+	// components of the sky
+	cGrSkyDome *dome;
+	cGrSun	*sun;
+	cGrMoon	*moon;
+	cGrCloudLayerList clouds;
+	cGrStars *planets;
+	cGrStars *stars;
 
-  // components of the sky
-  cGrSkyDome *dome;
-  cGrSun	*sun;
-  cGrMoon	*moon;
-  cGrCloudLayerList clouds;
-  cGrStars *planets;
-  cGrStars *stars;
+	ssgRoot *pre_root, *post_root;
 
-  ssgRoot *pre_root, *post_root;
+	ssgSelector *pre_selector, *post_selector;
+	ssgTransform *pre_transform, *post_transform;
+	ssgTransform *sun_transform, *moon_transform, *stars_transform;
 
-  ssgSelector *pre_selector, *post_selector;
-  ssgTransform *pre_transform, *post_transform;
-  ssgTransform *sun_transform, *moon_transform, *stars_transform;
+	// visibility
+	float visibility;
+	float effective_visibility;
 
-  // visibility
-  float visibility;
-  float effective_visibility;
-
-  // near cloud visibility state variables
-  bool in_puff;
-  double puff_length;       // in seconds
-  double puff_progression;  // in seconds
-  double ramp_up;           // in seconds
-  double ramp_down;         // in seconds
+	// near cloud visibility state variables
+	bool in_puff;
+	double puff_length;       // in seconds
+	double puff_progression;  // in seconds
+	double ramp_up;           // in seconds
+	double ramp_down;         // in seconds
 
 public:
 
-  cGrSky( void );
-  ~cGrSky( void );
+	cGrSky( void );
+	~cGrSky( void );
 
-  void build( double h_radius, double v_radius,
+	void build( double h_radius, double v_radius,
+	  double sun_size, double sun_dist, 
+	  double moon_size, double moon_dist,
 	  int nplanets, sgdVec3 *planet_data,
 	  int nstars, sgdVec3 *star_data );
 
-  cGrSun* addSun( const char *sun_path, const char *ihalo_path, const char* ohalo_path, double sun_size, double sun_dist, double humidity, double visibility );
-  cGrMoon* addMoon( const char *moon_path, double moon_size, double moon_dist );
+	cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
+	cGrCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
+	cGrCloudLayer* getCloud(int i) { return clouds.get(i); }
+	int getCloudCount() { return clouds.getNum(); }
 
-  cGrCloudLayer* addCloud( const char *cloud_tex_path, float span, float elevation, float thickness, float transition );
-  cGrCloudLayer* addCloud( ssgSimpleState *cloud_state, float span, float elevation, float thickness, float transition );
-  cGrCloudLayer* getCloud(int i) { return clouds.get(i); }
-  int getCloudCount() { return clouds.getNum(); }
+	bool repositionFlat( sgVec3 view_pos, double spin, double dt );
+	bool reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt );
 
-  bool repositionFlat( sgVec3 view_pos, double spin, double dt );
-  bool reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt );
-
-  bool repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle,
+	bool repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle,
 	  int nplanets, sgdVec3 *planet_data,
 	  int nstars, sgdVec3 *star_data );
 
-  // modify visibility based on cloud layers, thickness, transition range, and simulated "puffs".
-  void modifyVisibility( float alt, float time_factor );
+	// modify visibility based on cloud layers, thickness, transition range, and simulated "puffs".
+	void modifyVisibility( float alt, float time_factor );
 
-  // draw background portions of sky (do this before you draw rest of your scene).
-  void preDraw();
+	void setMA(double angle) { moon->setMoonAngle(angle); }
+	double getMA() { return moon->getMoonAngle(); }
 
-  // draw translucent clouds (do this after you've drawn all oapaque elements of your scene).
-  void postDraw( float alt );
+	void setMR(double rotation) { moon->setMoonRotation( rotation); }
+	double getMR() { return moon->getMoonRotation(); }
+	void setMRA( double ra ) { moon->setMoonRightAscension( ra ); }
+	double getMRA() { return moon->getMoonRightAscension(); }
 
-  // enable the sky
-  inline void enable() {
-    pre_selector->select( 1 );
-    post_selector->select( 1 );
-  }
+	void setMD( double decl ) { moon->setMoonDeclination( decl ); }
+	double getMD() { return moon->getMoonDeclination(); }
 
-  // disable the sky
-  inline void disable() {
-    pre_selector->select( 0 );
-    post_selector->select( 0 );
-  }
+    void setMDist( double dist ) { moon->setMoonDist(dist); }
+    double getMDist() { return moon->getMoonDist(); }
 
-  // current effective visibility
-  inline float getVisibility() const { return effective_visibility; }
-  inline void setVisibility( float v ) 
-  {
-    effective_visibility = visibility = v;
-  }
+    void setSA(double angle) { sun->setSunAngle(angle); }
+    double getSA() { return sun->getSunAngle(); }
+
+    void setSR(double rotation) { sun->setSunRotation( rotation ); }
+    double getSR() { return sun->getSunRotation(); }
+
+    void setSRA(double ra) { sun->setSunRightAscension( ra ); }
+    double getSRA() { return sun->getSunRightAscension(); }
+
+    void setSD( double decl ) { sun->setSunDeclination( decl ); }
+    double getSD() { return sun->getSunDeclination(); }
+
+    void setSDistance( double dist ) { sun->setSunDistance( dist ); }
+    double getSDistance() { return sun->getSunDistance(); }
+
+	void getSunPos(sgCoord* p) 
+	{
+		sgMat4 Xform;
+		sun_transform->getTransform(Xform);
+		sgSetCoord(p, Xform);
+    }
+
+	// draw background portions of sky (do this before you draw rest of your scene).
+	void preDraw();
+
+	// draw translucent clouds (do this after you've drawn all oapaque elements of your scene).
+	void postDraw( float alt );
+
+
+
+	// enable the sky
+	inline void enable() 
+	{
+		pre_selector->select( 1 );
+		post_selector->select( 1 );
+	}
+
+	// disable the sky
+	inline void disable() 
+	{
+		pre_selector->select( 0 );
+		post_selector->select( 0 );
+	}
+
+	// current effective visibility
+	inline float getVisibility() const { return effective_visibility; }
+	inline void setVisibility( float v ) 
+	{
+		effective_visibility = visibility = v;
+	}
 };
 
 
