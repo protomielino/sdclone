@@ -125,7 +125,7 @@ ROBOT_DATA(NAME usr_36GP PREFIX usr_36GP
 # USR_LP1
 ###################
 SET(ROBOT_SUBDIRS 1 2 3 4
-                  lp1-pesci-p60 lp1-vieringe-vr8
+                  lp1-pescy-p60 lp1-vieringe-vr8
                   )
 
 ROBOT_DATA(NAME usr_lp1 PREFIX usr_lp1
