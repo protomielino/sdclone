@@ -143,12 +143,8 @@ class cGrMoon
 private:
     ssgTransform *moon_transform;
     ssgSimpleState *moon_state;
-    ssgSimpleState *halo_state;
 
-    ssgColourArray *cl;
-
-    ssgVertexArray *halo_vl;
-    ssgTexCoordArray *halo_tl;
+    ssgColourArray *moon_cl;
 
     double prev_moon_angle;
 	double moon_angle;
@@ -174,12 +170,7 @@ public:
     // 0 degrees = high noon
     // 90 degrees = moon rise/set
     // 180 degrees = darkest midnight
-
-    //bool repaint(double moon_angle);
-
-    /*bool reposition( sgVec3 p, double angle,
-		     double rightAscension, double declination,
-		     double moon_dist  );*/
+    bool repaint(double moon_angle);
 
     bool reposition(sgVec3 p, double moon_angle) 
     {
@@ -187,9 +178,9 @@ public:
     }
 
     bool reposition(sgVec3 p, double moon_angle, double moonAscension, double moondeclination, double moon_dist);
-    bool repaint(double moon_angle);
 
-    void getMoonPosition (sgCoord* p)
+
+	void getMoonPosition (sgCoord* p)
     {
 		sgMat4 Xform;
 		moon_transform->getTransform(Xform);
@@ -224,11 +215,9 @@ private:
     ssgColourArray *ihalo_cl;
     ssgColourArray *ohalo_cl;
 
-    ssgVertexArray *sun_vl;
     ssgVertexArray *ihalo_vl;
     ssgVertexArray *ohalo_vl;
 
-    ssgTexCoordArray *sun_tl;
     ssgTexCoordArray *ihalo_tl;
     ssgTexCoordArray *ohalo_tl;
 

@@ -99,7 +99,7 @@ void cGrSky::build( double h_radius, double v_radius,
   sun->setSunDistance( sun_dist );
 
   moon = new cGrMoon;
-  moon_transform ->addKid( sun->build( moon_size));
+  moon_transform ->addKid( moon->build( moon_size));
   moon->setMoonDist(moon_dist);
 
   planets = new cGrStars;
@@ -149,6 +149,7 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	double angle;
 	double rotation;
 	sgCoord pos;
+
 
 	sun->reposition( view_pos, 0 );
 	moon->reposition( view_pos, 0 );

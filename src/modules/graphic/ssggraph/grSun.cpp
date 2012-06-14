@@ -99,47 +99,22 @@ ssgBranch * cGrSun::build( double sun_size )
 
     // set up the sun-state
     sun_state = new ssgSimpleState();
-    sun_state->setShadeModel( GL_SMOOTH );
-    sun_state->disable( GL_LIGHTING );
-    sun_state->disable( GL_CULL_FACE );
-    sun_state->setTexture( "data/textures/inner_halo.png");
-    sun_state->enable( GL_TEXTURE_2D );
-    sun_state->enable( GL_COLOR_MATERIAL );
-    sun_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
-    sun_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
-    sun_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
-    sun_state->enable( GL_BLEND );
+	sun_state->setShadeModel( GL_SMOOTH );
+	sun_state->disable( GL_LIGHTING );
+	sun_state->enable( GL_CULL_FACE );
+	sun_state->disable( GL_TEXTURE_2D );
+	sun_state->enable( GL_COLOR_MATERIAL );
+	sun_state->setColourMaterial( GL_AMBIENT_AND_DIFFUSE );
+	sun_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
+	sun_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
+	sun_state->disable( GL_BLEND );
     sun_state->setAlphaClamp( 0.01 );
-    sun_state->enable( GL_ALPHA_TEST );
-
-    // Build ssg structure
-    
-   sgVec3 va;
-   sun_vl = new ssgVertexArray;
-   sgSetVec3( va, -sun_size, 0.0, -sun_size );
-   sun_vl->add( va );
-   sgSetVec3( va, sun_size, 0.0, -sun_size );
-   sun_vl->add( va );
-   sgSetVec3( va, -sun_size, 0.0,  sun_size );
-   sun_vl->add( va );
-   sgSetVec3( va, sun_size, 0.0,  sun_size );
-   sun_vl->add( va );
-
-   sgVec2 vb;
-   sun_tl = new ssgTexCoordArray;
-   sgSetVec2( vb, 0.0f, 0.0f );
-   sun_tl->add( vb );
-   sgSetVec2( vb, 1.0, 0.0 );
-   sun_tl->add( vb );
-   sgSetVec2( vb, 0.0, 1.0 );
-   sun_tl->add( vb );
-   sgSetVec2( vb, 1.0, 1.0 );
-   sun_tl->add( vb );
+	sun_state->disable( GL_ALPHA_TEST );
 
     ssgBranch *sun = grMakeSphere( sun_state, sun_cl, sun_size, 15, 15,
 				    grSunPreDraw, grSunPostDraw );
 
-    repaint( 0.0, 1.0 );
+    repaint( 0.0, 10000.0 );
 
 	ihalo_state = new ssgSimpleState();
 	ihalo_state->setTexture( "data/textures/inner_halo.png" );
