@@ -157,7 +157,7 @@ ssgBranch * cGrSun::build( double sun_size )
     ihalo->setState( ihalo_state );
   
     ohalo_state = new ssgSimpleState();
-    ohalo_state->setTexture( "data/textures/outer_halo.png" );
+    ohalo_state->setTexture( "data/textures/halo.rgba" );
     ohalo_state->enable( GL_TEXTURE_2D );
     ohalo_state->disable( GL_LIGHTING );
     ohalo_state->setShadeModel( GL_SMOOTH );
@@ -170,7 +170,7 @@ ssgBranch * cGrSun::build( double sun_size )
     ohalo_state->setAlphaClamp(0.01);
     ohalo_state->enable ( GL_BLEND ) ;
 
-    float ohalo_size = (float)sun_size * 7.0;
+    float ohalo_size = (float)sun_size * 10.0;
     sgVec3 ve;
     ohalo_vl = new ssgVertexArray;
     sgSetVec3( ve, -ohalo_size, 0.0, -ohalo_size );

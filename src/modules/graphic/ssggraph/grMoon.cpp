@@ -73,7 +73,7 @@ ssgBranch * cGrMoon::build( double moon_size )
     moon_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
     moon_state->enable( GL_BLEND );
     moon_state->enable( GL_ALPHA_TEST );
-    moon_state->setAlphaClamp( 0.01 );
+    moon_state->setAlphaClamp( 0.01f );
 
     moon_cl = new ssgColourArray( 1 );
     sgVec4 color;
@@ -96,11 +96,11 @@ bool cGrMoon::repaint( double moon_angle )
 	{
         prev_moon_angle = moon_angle;
 
-        double moon_factor = 4*cos(moon_angle);
+        double moon_factor = 4 * cos(moon_angle);
 
         if (moon_factor > 1) moon_factor = 1.0;
         if (moon_factor < -1) moon_factor = -1.0;
-        moon_factor = moon_factor/2 + 0.5;
+        moon_factor = moon_factor / 2 + 0.5f;
 
         sgVec4 color;
         color[1] = sqrt(moon_factor);
