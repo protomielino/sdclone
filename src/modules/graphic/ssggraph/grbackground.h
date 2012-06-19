@@ -20,9 +20,14 @@
 #ifndef _GRBACKGROUND_H_
 #define _GRBACKGROUND_H_
 
+#define SGD_2PI      6.28318530717958647692
+
 class cGrCamera;
 class cGrBackgroundCam;
 struct Situation;
+
+void grUpdateLight(void);
+void grUpdateFogColor(double sol_angle);
 
 //! Public interface
 extern void grLoadBackgroundGraphicsOptions();

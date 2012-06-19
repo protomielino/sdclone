@@ -54,7 +54,8 @@ static const sgVec4 Black            = { 0.0f, 0.0f, 0.0f, 1.0f } ;
 static const sgVec4 White            = { 1.0f, 1.0f, 1.0f, 1.0f } ;
 static const sgVec4 TranslucentWhite = { 1.0f, 1.0f, 1.0f, 0.8f } ;
 
-static const sgVec4 BaseSkyColor    = { 0.39f, 0.50f, 0.74f, 1.0f } ;
+//static const sgVec4 BaseSkyColor    = { 0.39f, 0.50f, 0.74f, 1.0f } ;
+static const sgVec4 BaseSkyColor    = { 0.31f, 0.43f, 0.69f, 1.0f };
 
 static const sgVec4 BaseAmbiant      = { 0.35f, 0.35f, 0.40f, 1.0f } ;
 static const sgVec4 BaseDiffuse      = { 0.80f, 0.80f, 0.80f, 1.0f } ;
@@ -104,6 +105,7 @@ static sgVec4 SkyColor;
 static sgVec4 BaseFogColor;
 static sgVec4 FogColor;
 static sgVec4 CloudsColor;
+static sgVec4 CloudsColor2;
 
 static sgVec4 SceneAmbiant;
 static sgVec4 SceneDiffuse;
@@ -218,7 +220,7 @@ grInitBackground()
 		
 		//Build the sky
 		TheSky	= new cGrSky;
-		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance, 1500 * domeSizeRatio, grSkyDomeDistance,
+		TheSky->build(grSkyDomeDistance, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance, 2000 * domeSizeRatio, grSkyDomeDistance,
 			NPlanets, APlanetsData, NStars, AStarsData );
 		
 		//Add the Sun itself
@@ -234,7 +236,7 @@ grInitBackground()
 				  grSunDeclination, RAD2DEG(sunAscension));
 
 		if ( grSunDeclination > 180 )
-			grMoonDeclination = 3.0 + (rand() % 40);
+			grMoonDeclination = 3.0 + (rand() % 10);
 		else
 			grMoonDeclination = (rand() % 270);
 
@@ -260,7 +262,7 @@ grInitBackground()
 
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 650,
 											  400 / domeSizeRatio, 400 / domeSizeRatio);
-			cloudLayers[0]->setSpeed(100);
+			cloudLayers[0]->setSpeed(300);
 			cloudLayers[0]->setDirection(60);
 		}
 		else if (grNbCloudLayers == 1)
@@ -271,7 +273,7 @@ grInitBackground()
 
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
-			cloudLayers[0]->setSpeed(wind);
+			cloudLayers[0]->setSpeed(300);
 			cloudLayers[0]->setDirection(45);
 			
 			GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
@@ -371,61 +373,10 @@ grInitBackground()
 
 		const GLfloat fog_exp_density = m_log01 / visibility;
         const GLfloat fog_exp2_density = sqrt_m_log01 / visibility;
-    
+
 		//Setup overall light level according to rain if any
-		const float sol_angle = (float)TheSky->getSA();
-		const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-		float scene_brightness = (float)pow(sky_brightness, 0.5f);
-        
-		if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
-		{
-			BaseFogColor[0] = 0.40f;
-			BaseFogColor[1] = 0.43f;
-			BaseFogColor[2] = 0.45f;
+		grUpdateLight();
 
-			scene_brightness = scene_brightness / 2.0f;			
-		}
-		else
-		{
-			BaseFogColor[0] = 0.84f;
-			BaseFogColor[1] = 0.87f;
-			BaseFogColor[2] = 1.00f;
-
-			scene_brightness = scene_brightness;
-		}
-    
-		SkyColor[0] = BaseSkyColor[0] * sky_brightness;
-		SkyColor[1] = BaseSkyColor[1] * sky_brightness;
-		SkyColor[2] = BaseSkyColor[2] * sky_brightness;
-		SkyColor[3] = BaseSkyColor[3];
-		
-		CloudsColor[0] = FogColor[0] = BaseFogColor[0] * sky_brightness;
-		CloudsColor[1] = FogColor[1] = BaseFogColor[1] * sky_brightness;
-		CloudsColor[2] = FogColor[2] = BaseFogColor[2] * sky_brightness;
-		CloudsColor[3] = FogColor[3] = BaseFogColor[3];
-	
-		TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle,
-						NPlanets, APlanetsData, NStars, AStarsData);
-	
-		sgCoord solpos;
-		TheSky->getSunPos(&solpos);
-		light->setPosition(solpos.xyz);	
-	
-		SceneAmbiant[0] = BaseAmbiant[0] * scene_brightness;
-		SceneAmbiant[1] = BaseAmbiant[1] * scene_brightness;
-		SceneAmbiant[2] = BaseAmbiant[2] * scene_brightness;
-		SceneAmbiant[3] = 1.0;
-	
-		SceneDiffuse[0] = BaseDiffuse[0] * scene_brightness;
-		SceneDiffuse[1] = BaseDiffuse[1] * scene_brightness;
-		SceneDiffuse[2] = BaseDiffuse[2] * scene_brightness;
-		SceneDiffuse[3] = 1.0;
-	
-		SceneSpecular[0] = BaseSpecular[0] * scene_brightness;
-		SceneSpecular[1] = BaseSpecular[1] * scene_brightness;
-		SceneSpecular[2] = BaseSpecular[2] * scene_brightness;
-		SceneSpecular[3] = 1.0;
-	
 		glLightModelfv( GL_LIGHT_MODEL_AMBIENT, Black);
 		ssgGetLight(0) -> setColour( GL_AMBIENT, SceneAmbiant);
 		ssgGetLight(0) -> setColour( GL_DIFFUSE, SceneDiffuse);
@@ -906,11 +857,6 @@ void grLoadBackgroundLand(void)
 		
 	desc2 = grssgLoadAC3D(bgsky, NULL);
 	BackSkyAnchor->addKid(desc2);
-
-	// move backgroundsky in scene center
-	//sgCoord BackSkypos;
-	//sgSetCoord(&BackSkypos, grWrldX/2, grWrldY/2, 0, 0, 0, 0);
-	//BackSkyLoc->setTransform(&BackSkypos);
 }
 
 void
@@ -1027,59 +973,9 @@ grUpdateSky(double currentTime, double accelTime)
 	}
 
 	// 3) Update scene color and light
-	const float sol_angle = (float)TheSky->getSA();
-	const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-	float scene_brightness = (float)pow(sky_brightness, 0.5f);
 
-	if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
-	{
-		BaseFogColor[0] = 0.40f;
-		BaseFogColor[1] = 0.43f;
-		BaseFogColor[2] = 0.45f;
+	grUpdateLight();
 
-		scene_brightness = scene_brightness / 2.0f;			
-	}
-	else
-	{
-		BaseFogColor[0] = 0.84f;
-		BaseFogColor[1] = 0.87f;
-		BaseFogColor[2] = 1.00f;
-
-		scene_brightness = scene_brightness;
-	}
-	
-	SkyColor[0] = BaseSkyColor[0] * sky_brightness;
-	SkyColor[1] = BaseSkyColor[1] * sky_brightness;
-	SkyColor[2] = BaseSkyColor[2] * sky_brightness;
-	SkyColor[3] = BaseSkyColor[3];
-
-	// 3a)cloud and fog color
-	CloudsColor[0] = FogColor[0] = BaseFogColor[0] * sky_brightness;
-	CloudsColor[1] = FogColor[1] = BaseFogColor[1] * sky_brightness;
-	CloudsColor[2] = FogColor[2] = BaseFogColor[2] * sky_brightness;
-	CloudsColor[3] = FogColor[3] = BaseFogColor[3];
-
-	// 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
-	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle,
-					NPlanets, APlanetsData, NStars, AStarsData);
-
-	// 3c) update the main light position (it's at the sun position !)
-	sgCoord solpos;
-	TheSky->getSunPos(&solpos);
-	ssgGetLight(0)-> setPosition(solpos.xyz);	
-
-	// 3c) update scene colors.
-	SceneAmbiant[0] = BaseAmbiant[0] * scene_brightness;
-	SceneAmbiant[1] = BaseAmbiant[1] * scene_brightness;
-	SceneAmbiant[2] = BaseAmbiant[2] * scene_brightness;
-	
-	SceneDiffuse[0] = BaseDiffuse[0] * scene_brightness;
-	SceneDiffuse[1] = BaseDiffuse[1] * scene_brightness;
-	SceneDiffuse[2] = BaseDiffuse[2] * scene_brightness;
-	
-	SceneSpecular[0] = BaseSpecular[0] * scene_brightness;
-	SceneSpecular[1] = BaseSpecular[1] * scene_brightness;
-	SceneSpecular[2] = BaseSpecular[2] * scene_brightness;
 }//grUpdateSky
 
 void
@@ -1120,3 +1016,165 @@ grShutdownBackground(void)
 	}
 
 }//grShutdownBackground
+
+void grUpdateLight( void )
+{
+	const float sol_angle = (float)TheSky->getSA();
+	const float moon_angle = (float)TheSky->getMA();
+	GfLogInfo("   Sun Angle = %f  - Moon Angle = %f\n", sol_angle, moon_angle);
+	const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
+	float scene_brightness = (float)pow(sky_brightness, 0.5f);
+
+	if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
+	{
+		BaseFogColor[0] = 0.42f;
+		BaseFogColor[1] = 0.40f;
+		BaseFogColor[2] = 0.50f;
+
+		scene_brightness = scene_brightness / 2.0f;			
+	}
+	else
+	{
+		BaseFogColor[0] = 0.84f;
+		BaseFogColor[1] = 0.84f;
+		BaseFogColor[2] = 1.00f;
+
+		scene_brightness = scene_brightness;
+	}
+	
+	SkyColor[0] = BaseSkyColor[0] * sky_brightness;
+	SkyColor[1] = BaseSkyColor[1] * sky_brightness;
+	SkyColor[2] = BaseSkyColor[2] * sky_brightness;
+	SkyColor[3] = BaseSkyColor[3];
+	grUpdateFogColor(sol_angle);
+
+    grGammaCorrectRGB( SkyColor );
+
+	// 3a)cloud and fog color
+	CloudsColor[0] = FogColor[0] = BaseFogColor[0] * sky_brightness;
+	CloudsColor[1] = FogColor[1] = BaseFogColor[1] * sky_brightness;
+	CloudsColor[2] = FogColor[2] = BaseFogColor[2] * sky_brightness;
+	CloudsColor[3] = FogColor[3] = BaseFogColor[3];
+
+	grGammaCorrectRGB( CloudsColor );
+	//grUpdateFogColor(sol_angle);
+
+	float *sun_color = TheSky->get_sun_color();
+
+	GfLogInfo("   Sun Rouge = %f  - Sun Vert = %f - Sun Bleu = %f\n", sun_color[0], sun_color[1], sun_color[2]);
+
+	if (sol_angle > 1.0) 
+	{
+		float sun2 = sqrt(sol_angle);
+
+		CloudsColor[0] = CloudsColor[0] * sun_color[0];
+		CloudsColor[1] = CloudsColor[1] * sun_color[1];
+		CloudsColor[2] = CloudsColor[2] * sun_color[2];
+		GfLogInfo("   Cloud Rouge = %f  - Cloud Vert = %f - Cloud Bleu = %f\n", CloudsColor[0], CloudsColor[1], CloudsColor[2]);
+		//CloudsColor[0] /= sun2;
+		//CloudsColor[1] /= sun2;
+		//CloudsColor[2] /= sun2;
+	}
+
+	grGammaCorrectRGB( CloudsColor );
+
+	// 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
+	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle,
+					NPlanets, APlanetsData, NStars, AStarsData);
+
+	// 3c) update the main light position (it's at the sun position !)
+	sgCoord solpos;
+	TheSky->getSunPos(&solpos);
+	ssgGetLight(0)-> setPosition(solpos.xyz);	
+
+	// 3c) update scene colors.
+	//SceneAmbiant[0] = BaseAmbiant[0] * sky_brightness;
+	SceneAmbiant[0] = (sun_color[0]*0.25f + CloudsColor[0]*0.75f) * sky_brightness;
+	SceneAmbiant[1] = (sun_color[1]*0.25f + CloudsColor[1]*0.75f) * sky_brightness;
+	SceneAmbiant[2] = (sun_color[2]*0.25f + CloudsColor[2]*0.75f) * sky_brightness;
+	//SceneAmbiant[1] = BaseAmbiant[1] * sky_brightness;
+	//SceneAmbiant[2] = BaseAmbiant[2] * sky_brightness;
+	SceneAmbiant[3] = 1.0;
+	GfLogInfo("   Scene Rouge = %f  - Scene Vert = %f - Scene Bleu = %f\n", SceneAmbiant[0], SceneAmbiant[1], SceneAmbiant[2]);
+	
+	SceneDiffuse[0] = BaseDiffuse[0] * scene_brightness;
+	SceneDiffuse[1] = BaseDiffuse[1] * scene_brightness;
+	SceneDiffuse[2] = BaseDiffuse[2] * scene_brightness;
+	//SceneDiffuse[0] =(sun_color[0]*0.25f + FogColor[0]*0.75f) * scene_brightness;;
+	//SceneDiffuse[1] =(sun_color[1]*0.25f + FogColor[1]*0.75f) * BaseDiffuse[1];
+	//SceneDiffuse[0] =(sun_color[2]*0.25f + FogColor[2]*0.75f) * BaseDiffuse[2];
+	//SceneDiffuse[1] = (sun_color[1]*0.25f + FogColor[1]*0.75f) * scene_brightness;
+	//SceneDiffuse[2] = (sun_color[2]*0.25f + FogColor[2]*0.75f) * scene_brightness;
+	SceneDiffuse[3] = 1.0;
+	
+	SceneSpecular[0] = BaseSpecular[0] * scene_brightness;
+	//SceneSpecular[0] = sun_color[0] * scene_brightness;
+	//SceneSpecular[1] = sun_color[1] * scene_brightness;
+	//SceneSpecular[2] = sun_color[2] * scene_brightness;
+	SceneSpecular[1] = BaseSpecular[1] * scene_brightness;
+	SceneSpecular[2] = BaseSpecular[2] * scene_brightness;
+	SceneSpecular[3] = 1.0;
+}//grUpdateLight
+
+void grUpdateFogColor(double sol_angle) 
+{
+    /*double heading = globals->get_current_view()->getHeading_deg()
+                     * SGD_DEGREES_TO_RADIANS;
+    double heading_offset = globals->get_current_view()->getHeadingOffset_deg()
+                            * SGD_DEGREES_TO_RADIANS;*/
+
+    double rotation;
+
+    // first determine the difference between our view angle and local
+    // direction to the sun
+    rotation = -(TheSky->getSR() + SGD_PI);
+    while ( rotation < 0 ) 
+	{
+		rotation += SGD_2PI;
+    }
+    while ( rotation > SGD_2PI ) 
+	{
+		rotation -= SGD_2PI;
+    }
+
+    // revert to unmodified values before usign them.
+    //
+    float *sun_color = TheSky->get_sun_color();
+
+    grGammaRestoreRGB( FogColor );
+
+    // Calculate the fog color in the direction of the sun for
+    // sunrise/sunset effects.
+    //
+    float s_red =   (FogColor[0] + 2 * sun_color[0] * sun_color[0]) / 3;
+    float s_green = (FogColor[1] + 2 * sun_color[1] * sun_color[1]) / 3;
+    float s_blue =  (FogColor[2] + 2 * sun_color[2] * sun_color[2]) / 3;
+
+    // interpolate beween the sunrise/sunset color and the color
+    // at the opposite direction of this effect. Take in account
+    // the current visibility.
+    //
+    float av = TheSky->getVisibility();
+    if (av > 45000)
+       av = 45000;
+
+    float avf = 0.87 - (45000 - av) / 83333.33;
+    float sif = 0.5 - cos( sol_angle * 2)/2;
+
+    if (sif < 1e-4)
+       sif = 1e-4;
+
+    float rf1 = fabs((rotation - SGD_PI) / SGD_PI);             // 0.0 .. 1.0
+    float rf2 = avf * pow(rf1 * rf1, 1 /sif);
+    float rf3 = 0.94 - rf2;
+
+    FogColor[0] = rf3 * FogColor[0] + rf2 * s_red;
+    FogColor[1] = rf3 * FogColor[1] + rf2 * s_green;
+    FogColor[2] = rf3 * FogColor[2] + rf2 * s_blue;
+    grGammaCorrectRGB( FogColor );
+
+    // make sure the colors have their original value before they are being
+    // used by the rest of the program.
+    //
+    grGammaCorrectRGB( FogColor );
+}

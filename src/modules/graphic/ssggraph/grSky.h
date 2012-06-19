@@ -289,7 +289,7 @@ public:
     double getSunDistance() { return sun_dist; }
 
     // retrun the current color of the sun
-    inline float *get_color() { return  ohalo_cl->get( 0 ); }
+    inline float *get_color() { return  ihalo_cl->get( 0 ); }
 	double effective_visibility;
 };
 
@@ -465,11 +465,13 @@ public:
 		post_selector->select( 0 );
 	}
 
+    inline float *get_sun_color() { return sun->get_color(); }
+
 	// current effective visibility
 	inline float getVisibility() const { return effective_visibility; }
 	inline void setVisibility( float v ) 
 	{
-		effective_visibility = visibility = v;
+		effective_visibility = visibility = (v <= 25.0) ? 25.0 : v;
 	}
 };
 
