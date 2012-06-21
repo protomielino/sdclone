@@ -305,7 +305,7 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
 		else if ( i_halo_color[2] > 1) i_halo_color[2] = 1;
 		if ( o_halo_color[2] < 0 ) o_halo_color[2] = 0;
 		else if ( o_halo_color[2] > 1) o_halo_color[2] = 1;
-		if ( o_halo_color[3] < 0 ) o_halo_color[2] = 0;
+		if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
 		else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
 
         
