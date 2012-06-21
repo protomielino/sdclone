@@ -1088,23 +1088,18 @@ void grUpdateLight( void )
 	ssgGetLight(0)-> setPosition(solpos.xyz);	
 
 	// 3c) update scene colors.
-	//SceneAmbiant[0] = BaseAmbiant[0] * sky_brightness;
 	SceneAmbiant[0] = (sun_color[0]*0.25f + CloudsColor[0]*0.75f) * sky_brightness;
 	SceneAmbiant[1] = (sun_color[1]*0.25f + CloudsColor[1]*0.75f) * sky_brightness;
 	SceneAmbiant[2] = (sun_color[2]*0.25f + CloudsColor[2]*0.75f) * sky_brightness;
-	//SceneAmbiant[1] = BaseAmbiant[1] * sky_brightness;
-	//SceneAmbiant[2] = BaseAmbiant[2] * sky_brightness;
 	SceneAmbiant[3] = 1.0;
 	GfLogInfo("   Scene Rouge = %f  - Scene Vert = %f - Scene Bleu = %f\n", SceneAmbiant[0], SceneAmbiant[1], SceneAmbiant[2]);
 	
-	SceneDiffuse[0] = BaseDiffuse[0] * scene_brightness;
-	SceneDiffuse[1] = BaseDiffuse[1] * scene_brightness;
-	SceneDiffuse[2] = BaseDiffuse[2] * scene_brightness;
-	//SceneDiffuse[0] =(sun_color[0]*0.25f + FogColor[0]*0.75f) * scene_brightness;;
-	//SceneDiffuse[1] =(sun_color[1]*0.25f + FogColor[1]*0.75f) * BaseDiffuse[1];
-	//SceneDiffuse[0] =(sun_color[2]*0.25f + FogColor[2]*0.75f) * BaseDiffuse[2];
-	//SceneDiffuse[1] = (sun_color[1]*0.25f + FogColor[1]*0.75f) * scene_brightness;
-	//SceneDiffuse[2] = (sun_color[2]*0.25f + FogColor[2]*0.75f) * scene_brightness;
+	//SceneDiffuse[0] = BaseDiffuse[0] * scene_brightness;
+	//SceneDiffuse[1] = BaseDiffuse[1] * scene_brightness;
+	//SceneDiffuse[2] = BaseDiffuse[2] * scene_brightness;
+	SceneDiffuse[0] =(sun_color[0]*0.25f + FogColor[0]*0.75f) * sky_brightness;
+	SceneDiffuse[1] = (sun_color[1]*0.25f + FogColor[1]*0.75f) * sky_brightness;
+	SceneDiffuse[2] = (sun_color[2]*0.25f + FogColor[2]*0.75f) * sky_brightness;
 	SceneDiffuse[3] = 1.0;
 	
 	SceneSpecular[0] = BaseSpecular[0] * scene_brightness;
