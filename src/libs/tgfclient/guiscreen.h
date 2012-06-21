@@ -122,6 +122,10 @@
 #define GFSCR_ATT_TEXTURECOMPRESSION_ENABLED	"enabled"
 #define GFSCR_ATT_TEXTURECOMPRESSION_DISABLED	"disabled"
 
+#define GFSCR_ATT_BUMPMAPPING					"bump mapping"
+#define GFSCR_ATT_BUMPMAPPING_ENABLED			"enabled"
+#define GFSCR_ATT_BUMPMAPPING_DISABLED			"disabled"
+
 #define GFSCR_ATT_MAXTEXTURESIZE		"max texture size"
 
 #define GFSCR_ATT_MULTITEXTURING		"multi-texturing"

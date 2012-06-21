@@ -47,6 +47,16 @@ static int TextureCompLabelId;
 static int TextureCompLeftButtonId;
 static int TextureCompRightButtonId;
 
+// Bump Mapping.
+static const char *ABumpMappingTexts[] =
+	{GFSCR_ATT_BUMPMAPPING_DISABLED, GFSCR_ATT_BUMPMAPPING_ENABLED};
+static const int NBumpMapping =
+	sizeof(ABumpMappingTexts) / sizeof(ABumpMappingTexts[0]);
+static int NCurBumpMappingIndex = 0;
+static int BumpMappingLabelId;
+static int BumpMappingLeftButtonId;
+static int BumpMappingRightButtonId;
+
 // Max texture size (WARNING: the order in the list is important, do not change).
 static int AMaxTextureSizeTexts[] = {8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384};
 static int NMaxTextureSizes = sizeof(AMaxTextureSizeTexts) / sizeof(AMaxTextureSizeTexts[0]);
@@ -99,6 +109,9 @@ static void onAccept(void *)
 	if (VecMultiSampleTexts[NCurMultiSampleIndex] != GFSCR_ATT_MULTISAMPLING_DISABLED)
 		GfglFeatures::self().select(GfglFeatures::MultiSamplingSamples,
 									(int)pow(2.0, (double)NCurMultiSampleIndex));
+
+	GfglFeatures::self().select(GfglFeatures::BumpMapping, strcmp(ABumpMappingTexts[NCurBumpMappingIndex],
+										GFSCR_ATT_BUMPMAPPING_ENABLED) ? false : true);
 
 	// Store settings from the GL features layer to the screen.xml file.
 	GfglFeatures::self().storeSelection();
@@ -159,6 +172,13 @@ static void changeMaxTextureSizeState(void *vp)
 
 	snprintf(valuebuf, sizeof(valuebuf), "%d", AMaxTextureSizeTexts[NCurMaxTextureSizeIndex]);
 	GfuiLabelSetText(ScrHandle, MaxTextureSizeLabelId, valuebuf);
+}
+
+// Toggle texture compression state enabled/disabled.
+static void changeBumpMappingState(void *vp)
+{
+	NCurBumpMappingIndex = (NCurBumpMappingIndex + (int)(long)vp + NBumpMapping) % NBumpMapping;
+	GfuiLabelSetText(ScrHandle, BumpMappingLabelId, ABumpMappingTexts[NCurBumpMappingIndex]);
 }
 
 
@@ -296,6 +316,32 @@ static void onActivate(void * /* dummy */)
 		GfuiEnable(ScrHandle, MultiSampleRightButtonId, GFUI_DISABLE);
 		GfuiLabelSetText(ScrHandle, MultiSampleLabelId, "Not supported");
 	}
+
+	// Initialize current state and GUI from the GL features layer.
+	// 6) Bump Mapping.
+	if (GfglFeatures::self().isSupported(GfglFeatures::BumpMapping))
+	{
+		const char *pszBumpMapping =
+			GfglFeatures::self().isSelected(GfglFeatures::BumpMapping)
+			? GFSCR_ATT_BUMPMAPPING_ENABLED : GFSCR_ATT_BUMPMAPPING_DISABLED;
+		for (i = 0; i < NBumpMapping; i++)
+		{
+			if (!strcmp(pszBumpMapping, ABumpMappingTexts[i]))
+			{
+				NCurBumpMappingIndex = i;
+				break;
+			}
+		}
+
+		GfuiLabelSetText(ScrHandle, BumpMappingLabelId,
+						 ABumpMappingTexts[NCurBumpMappingIndex]);
+	}
+	else
+	{
+		GfuiEnable(ScrHandle, BumpMappingLeftButtonId, GFUI_DISABLE);
+		GfuiEnable(ScrHandle, BumpMappingRightButtonId, GFUI_DISABLE);
+		GfuiLabelSetText(ScrHandle, BumpMappingLabelId, "Not supported");
+	}
 }
 
 // OpenGL menu
@@ -344,6 +390,15 @@ void* OpenGLMenuInit(void *prevMenu)
 		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "MultiSampleRightArrowButton", (void*)+1,
 							changeMultiSampleState);
 	MultiSampleLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"MultiSampleLabel");
+
+	// Bump Mapping.
+	BumpMappingLeftButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingLeftArrowButton", (void*)-1,
+							changeBumpMappingState);
+	BumpMappingRightButtonId =
+		GfuiMenuCreateButtonControl(ScrHandle, hparmMenu, "BumpMappingRightArrowButton", (void*)+1,
+							changeBumpMappingState);
+	BumpMappingLabelId = GfuiMenuCreateLabelControl(ScrHandle,hparmMenu,"BumpMappingLabel");
 
 	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"ApplyButton",NULL, onAccept);
 	GfuiMenuCreateButtonControl(ScrHandle,hparmMenu,"CancelButton",prevMenu, GfuiScreenActivate);

@@ -167,11 +167,20 @@ void GfglFeatures::detectStandardSupport()
 
 	// 9) Stereo Vision (need a proper check)
 	_mapSupportedBool[StereoVision] = false;
+
+	//10) Bump Mapping 
+	bool bValueBump = gfglIsOpenGLExtensionSupported("GL_ARB_multitexture") &&
+                       gfglIsOpenGLExtensionSupported("GL_ARB_texture_cube_map") &&
+                       gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_combine") &&
+                       gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_dot3") && 
+                       gfglIsOpenGLExtensionSupported("GL_ARB_imaging");
+
+	_mapSupportedBool[BumpMapping] = bValueBump;
 }
 
 // Best supported features detection for the given specs of the frame buffer.
 bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
-									 bool& bAlpha, bool& bFullScreen, bool& bStereoVision)
+									 bool& bAlpha, bool& bFullScreen, bool& bBumpMapping, bool& bStereoVision)
 {
 	GfLogInfo("Detecting best supported features for a %dx%dx%d%s frame buffer.\n",
 			  nWidth, nHeight, nDepth, bFullScreen ? " full-screen" : "");
@@ -185,6 +194,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 	int nAlphaChannel = bAlpha ? 1 : 0;
 	int nCurrDepth = nDepth;
 	int nFullScreen = bFullScreen ? 1 : 0;
+	int nBump = bBumpMapping ? 1 : 0;
 	int nStereoVision = bStereoVision ? 1 : 0;
 
 	while (!pWinSurface && nFullScreen >= 0)
@@ -324,7 +334,7 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 }
 
 bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
-							   bool &bAlpha, bool &bFullScreen, bool &bStereo, void* hparmConfig)
+							   bool &bAlpha, bool &bFullScreen, bool &bBump, bool &bStereo, void* hparmConfig)
 {
 	// Clear support data.
 	_mapSupportedBool.clear();
@@ -348,6 +358,9 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 		== GFSCR_VAL_YES;
     bStereo =
 		std::string(GfParmGetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_STEREOVISION, GFSCR_VAL_NO))
+		== GFSCR_VAL_YES;
+	bBump =
+		std::string(GfParmGetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_BUMPMAPPING, GFSCR_VAL_NO))
 		== GFSCR_VAL_YES;
 
 	// Check that we have something supported, and return if not.
@@ -455,6 +468,14 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 		_mapSupportedBool[StereoVision] = true;
 	else if (strStereoVision == GFSCR_VAL_NO)
 		_mapSupportedBool[StereoVision] = false;
+
+	// 11) Bump Mapping.
+	const std::string strBumpMapping =
+		GfParmGetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_BUMPMAPPING, "");
+	if (strTexComp == GFSCR_VAL_YES)
+		_mapSupportedBool[BumpMapping] = true;
+	else if (strTexComp == GFSCR_VAL_NO)
+		_mapSupportedBool[BumpMapping] = false;
 	
 	// Close config file if we open it.
 	if (!hparmConfig)
@@ -467,7 +488,7 @@ bool GfglFeatures::loadSupport(int &nWidth, int &nHeight, int &nDepth,
 }
 
 void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
-								bool bAlpha, bool bFullScreen, bool bStereo, void* hparmConfig)
+								bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, void* hparmConfig)
 {
 	// Open the config file if not already done.
 	void* hparm = hparmConfig ? hparmConfig : openConfigFile();
@@ -498,6 +519,8 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 					 bFullScreen ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_STEREOVISION,
 					 bStereo ? GFSCR_VAL_YES : GFSCR_VAL_NO);
+		GfParmSetStr(hparm, GFSCR_SECT_GLDETSPECS, GFSCR_ATT_BUMPMAPPING,
+					 bBump ? GFSCR_VAL_YES : GFSCR_VAL_NO);
 	
 		// Write new values (remove the ones with no value supported).
 		// 1) Double-buffer.
@@ -559,7 +582,12 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 		// 10) Stereo Vision
 		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_STEREOVISION,
 					 isSupported(StereoVision) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
-	}
+		
+		// 11) Bump Mapping
+		GfParmSetStr(hparm, GFSCR_SECT_GLDETFEATURES, GFSCR_ATT_BUMPMAPPING,
+					 isSupported(BumpMapping) ? GFSCR_VAL_YES : GFSCR_VAL_NO);
+
+	}		
 	
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
@@ -573,7 +601,7 @@ void GfglFeatures::storeSupport(int nWidth, int nHeight, int nDepth,
 }
 
 bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
-									bool bAlpha, bool bFullScreen, bool bStereo, void* hparmConfig)
+									bool bAlpha, bool bFullScreen, bool bBump, bool bStereo, void* hparmConfig)
 {
 	// Open the config file if not already done.
 	void* hparm = hparmConfig ? hparmConfig : openConfigFile();
@@ -581,9 +609,9 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 	// Get the frame buffer specs that are associated with the detected
 	// Open GL features in the config file, if any.
 	int nDetWidth, nDetHeight, nDetDepth;
-	bool bDetFullScreen, bDetAlpha, bDetStereo;
+	bool bDetFullScreen, bDetAlpha, bDetBump, bDetStereo;
 	bool bPrevSupportFound =
-		loadSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetStereo, hparm);
+		loadSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, hparm);
 
 	// Compare with the requested frame buffer specs
 	// and run a new supported feature detection if any diffference.
@@ -597,11 +625,12 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 		bDetFullScreen = bFullScreen;
 		bDetAlpha = bAlpha;
 		bDetStereo = bStereo;
+		bDetBump = bBump;
 		bSupportFound =
-			detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetStereo);
+			detectBestSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo);
 
 		// Store support data in any case.
-		storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetStereo, hparm);
+		storeSupport(nDetWidth, nDetHeight, nDetDepth, bDetAlpha, bDetFullScreen, bDetBump, bDetStereo, hparm);
 
 		// If frame buffer specs supported, update relevant user settings and restart.
 		if (bSupportFound)
@@ -692,6 +721,8 @@ void GfglFeatures::dumpSupport() const
 	GfLogInfo("\n");
 	GfLogInfo("  Stereo Vision           : %s\n",
 			  isSupported(StereoVision) ? "Yes" : "No");
+	GfLogInfo("  Bump Mapping           : %s\n",
+			  isSupported(BumpMapping) ? "Yes" : "No");
 }
 
 // Load the selected OpenGL features from the config file.
@@ -770,6 +801,13 @@ void GfglFeatures::loadSelection(void* hparmConfig)
 									GFSCR_ATT_STEREOVISION_ENABLED))
 		   == GFSCR_ATT_STEREOVISION_ENABLED;
 
+	// 11) Bump Mapping : load from config file.
+	_mapSelectedBool[BumpMapping] =
+		isSupported(BumpMapping)
+		&& std::string(GfParmGetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_BUMPMAPPING,
+									GFSCR_ATT_BUMPMAPPING_ENABLED))
+		   == GFSCR_ATT_BUMPMAPPING_ENABLED;
+
 	// Close config file if we open it.
 	if (!hparmConfig)
 		closeConfigFile(hparm);
@@ -810,6 +848,7 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 	else
 		GfParmRemove(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_MULTISAMPLINGSAMPLES);
 
+
 	// Force 'best possible' mode for video initialization when anti-aliasing selected
 	if (isSelected(MultiSampling))
 	{
@@ -836,6 +875,10 @@ void GfglFeatures::storeSelection(void* hparmConfig) const
 	GfParmSetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_STEREOVISION,
 				 isSelected(StereoVision)
 				 ? GFSCR_ATT_STEREOVISION_ENABLED : GFSCR_ATT_STEREOVISION_DISABLED);
+
+	GfParmSetStr(hparm, GFSCR_SECT_GLSELFEATURES, GFSCR_ATT_BUMPMAPPING,
+				 isSelected(BumpMapping)
+				 ? GFSCR_ATT_BUMPMAPPING_ENABLED : GFSCR_ATT_BUMPMAPPING_DISABLED);
 	
 	// Write new params to config file.
 	GfParmWriteFile(NULL, hparm, "Screen");
@@ -874,6 +917,7 @@ void GfglFeatures::dumpSelection() const
 		GfLogInfo(" (%d samples)", getSelected(MultiSamplingSamples));
 	GfLogInfo("\n");
 	GfLogInfo("  Stereo vision           : %s\n", isSelected(StereoVision) ? "On" : "Off");
+	GfLogInfo("  Bump Mapping           : %s\n", isSelected(BumpMapping) ? "On" : "Off");
 }
 
 // Bool features management.
