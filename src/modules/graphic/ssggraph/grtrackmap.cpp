@@ -23,7 +23,7 @@
 	To get reasonable efficiency, the track is first rendered into a texture. During the
 	game just the texture needs to be redrawn.
 */
-#include <SDL/SDL.h>
+#include <SDL.h>
 #include <glfeatures.h> // GfglFeatures
 
 #include <raceman.h>	//tSituation

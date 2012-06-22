@@ -35,8 +35,8 @@
 #include <unistd.h>
 #endif
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_video.h>
+#include <SDL.h>
+#include <SDL_video.h>
 
 #include <portability.h>
 

@@ -42,7 +42,15 @@
 #else
 #  include <plib/js.h>
 #endif
-#include <SDL/SDL_keysym.h>
+
+#include <SDL.h>
+#if 0
+#if SDL_MAJOR_VERSION >= 2
+#include <SDL_keyboard.h>
+#else
+#include <SDL_keysym.h>
+#endif
+#endif
 
 #include <tgf.hpp>
 

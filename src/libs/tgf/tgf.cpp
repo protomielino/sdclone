@@ -31,7 +31,7 @@
 #include <cmath>
 #include <cstring>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <portability.h>
 

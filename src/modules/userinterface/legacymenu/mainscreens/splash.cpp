@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include <tgfclient.h>
 #include <glfeatures.h>

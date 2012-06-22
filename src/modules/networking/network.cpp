@@ -36,8 +36,8 @@ based on the server values.
 
 
 #include <cstdio>
-#include <SDL/SDL.h>
-#include <SDL/SDL_thread.h>
+#include <SDL.h>
+#include <SDL_thread.h>
 
 #include <graphic.h>
 

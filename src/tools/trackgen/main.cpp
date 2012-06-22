@@ -44,7 +44,7 @@
 
 #include <plib/ul.h>
 #include <plib/ssg.h>
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #ifdef WIN32
 #ifndef HAVE_CONFIG_H

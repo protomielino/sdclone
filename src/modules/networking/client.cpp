@@ -19,7 +19,7 @@
 
 #include <cstdio>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "network.h"
 #include "robotxml.h"

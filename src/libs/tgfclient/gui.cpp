@@ -29,8 +29,8 @@
 #include <string>
 #include <ctime>
 
-#include <SDL/SDL.h>
-#include <SDL/SDL_syswm.h>
+#include <SDL.h>
+#include <SDL_syswm.h>
 
 #include <raceman.h>
 

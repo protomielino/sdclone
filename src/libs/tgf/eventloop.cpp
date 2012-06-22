@@ -21,7 +21,7 @@
 
 #include <map>
 
-#include <SDL/SDL.h>
+#include <SDL.h>
 
 #include "tgf.hpp"
 

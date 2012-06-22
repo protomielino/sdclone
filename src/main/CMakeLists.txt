@@ -11,6 +11,7 @@ ENDIF(WIN32)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(tgf tgfclient tgfdata raceengine math portability)
+ADD_SDL_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
 
 # Disable developer warning
