@@ -68,8 +68,8 @@ ssgBranch * cGrMoon::build( double moon_size )
     moon_state->enable( GL_TEXTURE_2D );
     moon_state->enable( GL_COLOR_MATERIAL );
     moon_state->setColourMaterial( GL_DIFFUSE );
-    moon_state->setMaterial( GL_AMBIENT, 0, 0, 0, 1.0 );
-    moon_state->setMaterial( GL_EMISSION, 0.0, 0.0, 0.0, 1 );
+    moon_state->setMaterial( GL_AMBIENT, 0, 0, 0, 1 );
+    moon_state->setMaterial( GL_EMISSION, 0, 0, 0, 1 );
     moon_state->setMaterial( GL_SPECULAR, 0, 0, 0, 1 );
     moon_state->enable( GL_BLEND );
     moon_state->enable( GL_ALPHA_TEST );
