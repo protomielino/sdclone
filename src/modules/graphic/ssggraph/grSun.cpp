@@ -157,7 +157,7 @@ ssgBranch * cGrSun::build( double sun_size )
     ihalo->setState( ihalo_state );
   
     ohalo_state = new ssgSimpleState();
-    ohalo_state->setTexture( "data/textures/halo.rgba" );
+    ohalo_state->setTexture( "data/textures/halo.png" );
     ohalo_state->enable( GL_TEXTURE_2D );
     ohalo_state->disable( GL_LIGHTING );
     ohalo_state->setShadeModel( GL_SMOOTH );
@@ -212,10 +212,13 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
 {    
 	if ( visibility != new_visibility ) 
 	{
+		if (new_visibility < 100.0) new_visibility = 100.0;
+        else if (new_visibility > 45000.0) new_visibility = 45000.0;
         visibility = new_visibility;
 
         static const float sqrt_m_log01 = sqrt( -log( 0.01 ) );
         sun_exp2_punch_through = sqrt_m_log01 / ( visibility * 15 );
+		//sun_exp2_punch_through = 2.0/log(visibility);
     }
 
     if ( prev_sun_angle != sun_angle ) 
@@ -308,11 +311,9 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
 		if ( o_halo_color[3] < 0 ) o_halo_color[3] = 0;
 		else if ( o_halo_color[3] > 1) o_halo_color[3] = 1;
 
-        
+        grGammaCorrectRGB( sun_color );	
 		grGammaCorrectRGB( i_halo_color );
 		grGammaCorrectRGB( o_halo_color );
-		grGammaCorrectRGB( sun_color );	
-
 
         float *ptr;
         ptr = sun_cl->get( 0 );

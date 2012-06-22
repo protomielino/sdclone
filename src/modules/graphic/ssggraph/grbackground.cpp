@@ -23,7 +23,7 @@
 #include <portability.h> // snprintf
 #include <glfeatures.h>
 
-//#include <plib/ssgAux.h>
+#include <plib/ssgAux.h>
 
 #include "grscene.h"
 #include "grloadac.h"
@@ -88,7 +88,7 @@ static bool grDynamicSkyDome = false;
 static int grBackgroundType = 0;
 static float grSunDeclination = 0.0f;
 static float grMoonDeclination = 0.0f;
-unsigned Visibility = 0;
+static double Visibility = 0.0f;
 
 static ssgBranch *SunAnchor = NULL;
 
@@ -105,7 +105,6 @@ static sgVec4 SkyColor;
 static sgVec4 BaseFogColor;
 static sgVec4 FogColor;
 static sgVec4 CloudsColor;
-static sgVec4 CloudsColor2;
 
 static sgVec4 SceneAmbiant;
 static sgVec4 SceneDiffuse;
@@ -172,14 +171,14 @@ grInitBackground()
 		glEnable(GL_LIGHT0);
 		glEnable(GL_DEPTH_TEST);
 		
-		/*if (!TheSun && grTrack->local.rain == 0)
+		if (!TheSun && grTrack->local.rain == 0)
 		{
 			ssgaLensFlare *sun_obj = new ssgaLensFlare();
 			TheSun = new ssgTransform;
 			TheSun->setTransform(lightPosition);
 			TheSun->addKid(sun_obj);
 			SunAnchor->addKid(TheSun);
-		}*/
+		}
 	}
 	
 	// If realistic sky dome is requested,
@@ -1022,16 +1021,17 @@ void grUpdateLight( void )
 	const float sol_angle = (float)TheSky->getSA();
 	const float moon_angle = (float)TheSky->getMA();
 	GfLogInfo("   Sun Angle = %f  - Moon Angle = %f\n", sol_angle, moon_angle);
-	const float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
+	float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
 	float scene_brightness = (float)pow(sky_brightness, 0.5f);
 
 	if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
 	{
 		BaseFogColor[0] = 0.42f;
-		BaseFogColor[1] = 0.40f;
+		BaseFogColor[1] = 0.44f;
 		BaseFogColor[2] = 0.50f;
 
-		scene_brightness = scene_brightness / 2.0f;			
+		sky_brightness = (float)pow(sky_brightness, 0.1f);	
+		scene_brightness = scene_brightness / 2.0f;
 	}
 	else
 	{
@@ -1079,7 +1079,7 @@ void grUpdateLight( void )
 	grGammaCorrectRGB( CloudsColor );
 
 	// 3b) repaint the sky (simply update geometrical, color, ... state, no actual redraw)
-	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle,
+	TheSky->repaint(SkyColor, FogColor, CloudsColor, sol_angle, moon_angle,
 					NPlanets, APlanetsData, NStars, AStarsData);
 
 	// 3c) update the main light position (it's at the sun position !)

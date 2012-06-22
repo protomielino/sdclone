@@ -289,7 +289,7 @@ public:
     double getSunDistance() { return sun_dist; }
 
     // retrun the current color of the sun
-    inline float *get_color() { return  ihalo_cl->get( 0 ); }
+    inline float *get_color() { return  ohalo_cl->get( 0 ); }
 	double effective_visibility;
 };
 
@@ -400,7 +400,7 @@ public:
 	bool repositionFlat( sgVec3 view_pos, double spin, double dt );
 	bool reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, double lon, double lat, double alt, double spin, double gst, double dt );
 
-	bool repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle,
+	bool repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, double sol_angle, double moon_angle,
 	  int nplanets, sgdVec3 *planet_data,
 	  int nstars, sgdVec3 *star_data );
 
