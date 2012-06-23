@@ -1020,9 +1020,7 @@ void grUpdateLight( void )
 {
 	const float sol_angle = (float)TheSky->getSA();
 	const float moon_angle = (float)TheSky->getMA();
-	GfLogInfo("   Sun Angle = %f  - Moon Angle = %f\n", sol_angle, moon_angle);
 	float sky_brightness = (float)(1.0 + cos(sol_angle)) / 2.0f;
-	float scene_brightness = (float)pow(sky_brightness, 0.5f);
 
 	if (grTrack->local.rain > 0) // TODO: Different values for each rain strength value ?
 	{
@@ -1030,16 +1028,13 @@ void grUpdateLight( void )
 		BaseFogColor[1] = 0.44f;
 		BaseFogColor[2] = 0.50f;
 
-		sky_brightness = (float)pow(sky_brightness, 0.1f);	
-		scene_brightness = scene_brightness / 2.0f;
+		sky_brightness = (float)pow(sky_brightness, 0.5f);	
 	}
 	else
 	{
 		BaseFogColor[0] = 0.84f;
 		BaseFogColor[1] = 0.84f;
 		BaseFogColor[2] = 1.00f;
-
-		scene_brightness = scene_brightness;
 	}
 	
 	SkyColor[0] = BaseSkyColor[0] * sky_brightness;
@@ -1061,8 +1056,6 @@ void grUpdateLight( void )
 
 	float *sun_color = TheSky->get_sun_color();
 
-	GfLogInfo("   Sun Rouge = %f  - Sun Vert = %f - Sun Bleu = %f\n", sun_color[0], sun_color[1], sun_color[2]);
-
 	if (sol_angle > 1.0) 
 	{
 		float sun2 = sqrt(sol_angle);
@@ -1070,10 +1063,6 @@ void grUpdateLight( void )
 		CloudsColor[0] = CloudsColor[0] * sun_color[0];
 		CloudsColor[1] = CloudsColor[1] * sun_color[1];
 		CloudsColor[2] = CloudsColor[2] * sun_color[2];
-		GfLogInfo("   Cloud Rouge = %f  - Cloud Vert = %f - Cloud Bleu = %f\n", CloudsColor[0], CloudsColor[1], CloudsColor[2]);
-		//CloudsColor[0] /= sun2;
-		//CloudsColor[1] /= sun2;
-		//CloudsColor[2] /= sun2;
 	}
 
 	grGammaCorrectRGB( CloudsColor );
@@ -1092,32 +1081,20 @@ void grUpdateLight( void )
 	SceneAmbiant[1] = (sun_color[1]*0.25f + CloudsColor[1]*0.75f) * sky_brightness;
 	SceneAmbiant[2] = (sun_color[2]*0.25f + CloudsColor[2]*0.75f) * sky_brightness;
 	SceneAmbiant[3] = 1.0;
-	GfLogInfo("   Scene Rouge = %f  - Scene Vert = %f - Scene Bleu = %f\n", SceneAmbiant[0], SceneAmbiant[1], SceneAmbiant[2]);
-	
-	//SceneDiffuse[0] = BaseDiffuse[0] * scene_brightness;
-	//SceneDiffuse[1] = BaseDiffuse[1] * scene_brightness;
-	//SceneDiffuse[2] = BaseDiffuse[2] * scene_brightness;
+
 	SceneDiffuse[0] =(sun_color[0]*0.25f + FogColor[0]*0.75f) * sky_brightness;
 	SceneDiffuse[1] = (sun_color[1]*0.25f + FogColor[1]*0.75f) * sky_brightness;
 	SceneDiffuse[2] = (sun_color[2]*0.25f + FogColor[2]*0.75f) * sky_brightness;
 	SceneDiffuse[3] = 1.0;
 	
-	SceneSpecular[0] = BaseSpecular[0] * scene_brightness;
-	//SceneSpecular[0] = sun_color[0] * scene_brightness;
-	//SceneSpecular[1] = sun_color[1] * scene_brightness;
-	//SceneSpecular[2] = sun_color[2] * scene_brightness;
-	SceneSpecular[1] = BaseSpecular[1] * scene_brightness;
-	SceneSpecular[2] = BaseSpecular[2] * scene_brightness;
+	SceneSpecular[0] = sun_color[0] * sky_brightness;
+	SceneSpecular[1] = sun_color[1] * sky_brightness;
+	SceneSpecular[2] = sun_color[2] * sky_brightness;
 	SceneSpecular[3] = 1.0;
 }//grUpdateLight
 
 void grUpdateFogColor(double sol_angle) 
 {
-    /*double heading = globals->get_current_view()->getHeading_deg()
-                     * SGD_DEGREES_TO_RADIANS;
-    double heading_offset = globals->get_current_view()->getHeadingOffset_deg()
-                            * SGD_DEGREES_TO_RADIANS;*/
-
     double rotation;
 
     // first determine the difference between our view angle and local

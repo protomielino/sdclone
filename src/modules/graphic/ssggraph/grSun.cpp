@@ -209,16 +209,17 @@ ssgBranch * cGrSun::build( double sun_size )
 }
 
 bool cGrSun::repaint( double sun_angle, double new_visibility ) 
-{    
+{   
 	if ( visibility != new_visibility ) 
 	{
 		if (new_visibility < 100.0) new_visibility = 100.0;
         else if (new_visibility > 45000.0) new_visibility = 45000.0;
         visibility = new_visibility;
 
+
         static const float sqrt_m_log01 = sqrt( -log( 0.01 ) );
         sun_exp2_punch_through = sqrt_m_log01 / ( visibility * 15 );
-		//sun_exp2_punch_through = 2.0/log(visibility);
+		//sun_exp2_punch_through = 2.0 /log( visibility );
     }
 
     if ( prev_sun_angle != sun_angle ) 
@@ -300,7 +301,7 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
 		if ( i_halo_color[1] < 0 ) i_halo_color[1] = 0;
 		else if ( i_halo_color[1] > 1) i_halo_color[1] = 1;
 		if ( o_halo_color[1] < 0 ) o_halo_color[1] = 0;
-		else if ( o_halo_color[1] > 1) o_halo_color[1] = 1;
+		else if ( o_halo_color[0] > 1) o_halo_color[1] = 1;
 
 		if ( sun_color[2] < 0 ) sun_color[2] = 0;
 		else if ( sun_color[2] > 1) sun_color[2] = 1;

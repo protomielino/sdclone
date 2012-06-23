@@ -170,7 +170,7 @@ public:
     // 0 degrees = high noon
     // 90 degrees = moon rise/set
     // 180 degrees = darkest midnight
-    bool repaint(double moon_angle);
+    bool repaint(double angle);
 
     bool reposition(sgVec3 p, double moon_angle) 
     {

@@ -16,7 +16,6 @@
  *                                                                         *
  ***************************************************************************/
 
-
 #include "grSky.h"
 
 // Used for rise/set effects (flat earth - no rotation of skydome considered here )
@@ -94,23 +93,23 @@ void cGrSky::build( double h_radius, double v_radius,
   dome = new cGrSkyDome;
   pre_transform -> addKid( dome->build( h_radius, v_radius ) );
 
-  sun = new cGrSun;
-  sun_transform -> addKid( sun->build( sun_size));
-  sun->setSunDistance( sun_dist );
-
-  moon = new cGrMoon;
-  moon_transform ->addKid( moon->build( moon_size));
-  moon->setMoonDist(moon_dist);
-  
   planets = new cGrStars;
   stars_transform -> addKid( planets->build( nplanets, planet_data, h_radius ) );
 
   stars = new cGrStars;
   stars_transform -> addKid( stars->build( nstars, star_data, h_radius ) );
 
+  moon = new cGrMoon;
+  moon_transform ->addKid( moon->build( moon_size));
+  moon->setMoonDist( moon_dist );
+
+  sun = new cGrSun;
+  sun_transform -> addKid( sun->build( sun_size));
+  sun->setSunDistance( sun_dist );
+
+  pre_transform -> addKid( stars_transform );
   pre_transform -> addKid( sun_transform );
   pre_transform -> addKid( moon_transform );
-  pre_transform -> addKid( stars_transform );
 
   pre_selector->addKid( pre_transform );
   pre_selector->clrTraversalMaskBits( SSGTRAV_HOT );
@@ -153,13 +152,13 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 
 	// Calc angles for rise/set effects
 	sun->reposition( view_pos, 0 );
-    sun->getSunPosition ( &pos );
+    sun->getSunPosition ( & pos );
 	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
     sun->setSunAngle( angle );
     sun->setSunRotation( rotation );
 
 	moon->reposition( view_pos, 0 );
-	moon->getMoonPosition(&pos2);
+	moon->getMoonPosition( & pos2 );
 	calc_celestial_angles( pos2.xyz, view_pos, angle2, rotation2 );
     moon->setMoonAngle( angle2 );
     moon->setMoonRotation( rotation2 );
@@ -172,14 +171,9 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 	planets->reposition( view_pos, 0 );
 	stars->reposition( view_pos, 0 );
 
-	/*if ( sol_ref ) 
-	{*/
-		//dome->repositionFlat( view_pos, sun->getSunRotation() );
-	/*}
-	else 
-	{*/
-		dome->repositionFlat( view_pos, spin );
-	//}
+	dome->repositionFlat( view_pos, sun->getSunRotation() );
+
+	//dome->repositionFlat( view_pos, spin );
 
 	return true;
 }
@@ -211,7 +205,7 @@ bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, do
 {
   int i;
 
-  if ( effective_visibility > 1000.0 ) 
+  if ( effective_visibility > 300.0 ) 
   {
     // turn on sky
     enable();
@@ -222,7 +216,7 @@ bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, do
       clouds.get(i)->repaint( cloud_color );
 
 	sun->repaint( sol_angle, effective_visibility );
-	moon->repaint( moon_angle );
+	moon->repaint( moon->getMoonAngle() );
     planets->repaint( sol_angle, nplanets, planet_data );
     stars->repaint( sol_angle, nstars, star_data );
   }
