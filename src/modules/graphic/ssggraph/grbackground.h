@@ -42,7 +42,6 @@ extern void grDrawStaticBackground(class cGrCamera *cam, class cGrBackgroundCam 
 extern void grShutdownBackground(void);
 
 extern unsigned grSkyDomeDistance; // 0 means no sky dome (static background).
-extern double Visibility;
 extern const tdble grSkyDomeNeutralFOVDistance;
 
 #endif //_GRBACKGROUND_H_
