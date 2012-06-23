@@ -168,14 +168,15 @@ void GfglFeatures::detectStandardSupport()
 	// 9) Stereo Vision (need a proper check)
 	_mapSupportedBool[StereoVision] = false;
 
-	//10) Bump Mapping 
-	bool bValueBump = gfglIsOpenGLExtensionSupported("GL_ARB_multitexture") &&
-                       gfglIsOpenGLExtensionSupported("GL_ARB_texture_cube_map") &&
-                       gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_combine") &&
-                       gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_dot3") && 
-                       gfglIsOpenGLExtensionSupported("GL_ARB_imaging");
-
-	_mapSupportedBool[BumpMapping] = bValueBump;
+	// 10) Bump Mapping 
+	bValue = 
+		gfglIsOpenGLExtensionSupported("GL_ARB_multitexture")
+		&& gfglIsOpenGLExtensionSupported("GL_ARB_texture_cube_map")
+		&& gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_combine")
+		&& gfglIsOpenGLExtensionSupported("GL_ARB_texture_env_dot3")
+		&& gfglIsOpenGLExtensionSupported("GL_ARB_imaging");
+	
+	_mapSupportedBool[BumpMapping] = bValue;
 }
 
 // Best supported features detection for the given specs of the frame buffer.
@@ -194,7 +195,6 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 	int nAlphaChannel = bAlpha ? 1 : 0;
 	int nCurrDepth = nDepth;
 	int nFullScreen = bFullScreen ? 1 : 0;
-	int nBump = bBumpMapping ? 1 : 0;
 	int nStereoVision = bStereoVision ? 1 : 0;
 
 	while (!pWinSurface && nFullScreen >= 0)
@@ -721,7 +721,7 @@ void GfglFeatures::dumpSupport() const
 	GfLogInfo("\n");
 	GfLogInfo("  Stereo Vision           : %s\n",
 			  isSupported(StereoVision) ? "Yes" : "No");
-	GfLogInfo("  Bump Mapping           : %s\n",
+	GfLogInfo("  Bump Mapping            : %s\n",
 			  isSupported(BumpMapping) ? "Yes" : "No");
 }
 
@@ -917,7 +917,7 @@ void GfglFeatures::dumpSelection() const
 		GfLogInfo(" (%d samples)", getSelected(MultiSamplingSamples));
 	GfLogInfo("\n");
 	GfLogInfo("  Stereo vision           : %s\n", isSelected(StereoVision) ? "On" : "Off");
-	GfLogInfo("  Bump Mapping           : %s\n", isSelected(BumpMapping) ? "On" : "Off");
+	GfLogInfo("  Bump Mapping            : %s\n", isSelected(BumpMapping) ? "On" : "Off");
 }
 
 // Bool features management.
