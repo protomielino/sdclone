@@ -63,6 +63,7 @@ static const sgVec4 BaseSpecular     = { 0.33f, 0.33f, 0.30f, 1.0f } ;
 
 static int NStars = 0;
 static int NPlanets = 0;
+static int cloudsTextureIndex = 0;
 
 static const int CloudsTextureIndices[TR_CLOUDS_FULL+1] = { 1, 3, 5, 7, 8 };
 static const int NCloudsTextureIndices = sizeof(CloudsTextureIndices) / sizeof(int);
@@ -88,7 +89,8 @@ static bool grDynamicSkyDome = false;
 static int grBackgroundType = 0;
 static float grSunDeclination = 0.0f;
 static float grMoonDeclination = 0.0f;
-static double Visibility = 0.0f;
+static float grMax_Visibility = 0.0f;
+static double grVisibility = 0.0f;
 
 static ssgBranch *SunAnchor = NULL;
 
@@ -251,7 +253,7 @@ grInitBackground()
 		// TODO :
 		//  * Why does thickness and transition get greater as the sky dome distance decreases ?
 		//  * More/different cloud layers for each rain strength value (only 2 as for now) ?
-		const int cloudsTextureIndex = CloudsTextureIndices[grTrack->local.clouds];
+		cloudsTextureIndex = CloudsTextureIndices[grTrack->local.clouds];
 
 		cGrCloudLayer *cloudLayers[NMaxCloudLayers];
 		snprintf(buf, sizeof(buf), "data/textures/scattered%d.rgba", cloudsTextureIndex);
@@ -346,32 +348,32 @@ grInitBackground()
 		{
 			case TR_RAIN_NONE:
 				//visibility = 0.0f;
-				Visibility = Visibility;
+				grVisibility = grMax_Visibility;
 				break;
 			case TR_RAIN_LITTLE:
 				//visibility = 400.0f;
-				Visibility = 800.0;
+				grVisibility = 800.0;
 				break;
 			case TR_RAIN_MEDIUM:
 				//visibility = 500.0f;
-				Visibility = 600.0;
+				grVisibility = 600.0;
 				break;
 			case TR_RAIN_HEAVY:
 				//visibility = 550.0f;
-				Visibility = 400.0;
+				grVisibility = 400.0;
 				break;
 			default:
 				GfLogWarning("Unsupported rain strength value %d (assuming none)",
 							 grTrack->local.rain);
-				Visibility = 15000.0;
+				grVisibility = 15000.0;
 				break;
 		}//switch Rain
 		
 		//TheSky->modifyVisibility( visibility, 0);
-		TheSky->setVisibility( Visibility ); // Visibility in meters
+		TheSky->setVisibility( grVisibility ); // Visibility in meters
 
-		const GLfloat fog_exp_density = m_log01 / Visibility;
-        const GLfloat fog_exp2_density = sqrt_m_log01 / Visibility;
+		const GLfloat fog_exp_density = m_log01 / grVisibility;
+        const GLfloat fog_exp2_density = sqrt_m_log01 / grVisibility;
 
 		//Setup overall light level according to rain if any
 		grUpdateLight();
@@ -418,7 +420,7 @@ grLoadBackgroundGraphicsOptions()
 
 	GfLogInfo("Graphic options : Number of cloud layers : %u\n", grNbCloudLayers);
 
-	Visibility =
+	grMax_Visibility =
 		(unsigned)(GfParmGetNum(grHandle, GR_SCT_GRAPHIC, GR_ATT_VISIBILITY, 0, 0));
 
 
@@ -1060,7 +1062,7 @@ void grUpdateLight( void )
 	if (sol_angle > 1.0) 
 	{
 		float sun2 = sqrt(sol_angle);
-		if (Visibility > 1000)
+		if (grVisibility > 1000 && cloudsTextureIndex < 8)
 		{
 			CloudsColor[0] = CloudsColor[0] * sun_color[0];
 			CloudsColor[1] = CloudsColor[1] * sun_color[1];
@@ -1086,7 +1088,7 @@ void grUpdateLight( void )
 	ssgGetLight(0)-> setPosition(solpos.xyz);
 
 	// 3c) update scene colors.
-	if (Visibility > 1000)
+	if (grVisibility > 1000 && cloudsTextureIndex < 8)
 	{
 		SceneAmbiant[0] = (sun_color[0]*0.25f + CloudsColor[0]*0.75f) * sky_brightness;
 		SceneAmbiant[1] = (sun_color[1]*0.25f + CloudsColor[1]*0.75f) * sky_brightness;
