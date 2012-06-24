@@ -250,17 +250,29 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
 		}*/
 
 		sgVec4 i_halo_color, o_halo_color, sun_color;
+		float green_scat_f;
 		
 		float red_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
 		sun_color[0] = 1 - red_scat_f;
 		i_halo_color[0] = 1 - ( 1.1 * red_scat_f );
 		o_halo_color[0] = 1 - ( 1.4 * red_scat_f );
 
-		// Green - 546.1 nm
-		float green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
+		if (sun_declination > 5.0 || sun_declination < 2.0)
+		{
+			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 5E+07;
+		}
+		else
+			green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
+		
 		sun_color[1] = 1 - green_scat_f;
 		i_halo_color[1] = 1 - ( 1.1 * green_scat_f );
 		o_halo_color[1] = 1 - ( 1.4 * green_scat_f );
+
+		/*// Green - 546.1 nm
+		float green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
+		sun_color[1] = 1 - green_scat_f;
+		i_halo_color[1] = 1 - ( 1.1 * green_scat_f );
+		o_halo_color[1] = 1 - ( 1.4 * green_scat_f );*/
  
 		// Blue - 435.8 nm
 		float blue_scat_f = ( aerosol_factor * path_distance * density_avg ) / 3.607E+06;
