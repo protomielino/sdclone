@@ -44,7 +44,7 @@ static int grMoonOrbPostDraw( ssgEntity *e )
 cGrMoon::cGrMoon( void )   
 {
 	moon_transform = 0;
-	prev_moon_angle= - 9999;
+	prev_moon_angle= 9999;
 }
 
 // Destructor
@@ -83,9 +83,8 @@ ssgBranch * cGrMoon::build( double moon_size )
     ssgBranch *moon = grMakeSphere( moon_state, moon_cl, moon_size, 15, 15,
 				    grMoonOrbPreDraw, grMoonOrbPostDraw );
 
-    repaint( 0.0 );
-
     moon_transform->addKid( moon );
+	repaint( 0.0 );
 
     return moon_transform;
 }
@@ -103,16 +102,15 @@ bool cGrMoon::repaint( double angle )
         moon_factor = (moon_factor / 2) + 0.5f;
 
         sgVec4 color;
-        /*color[1] = sqrt(moon_factor);
+        color[1] = sqrt(moon_factor);
         color[0] = sqrt(color[1]);
         color[2] = moon_factor * moon_factor;
         color[2] *= color[2];
-        color[3] = 1.0;*/
-		color[0] = (float)pow(moon_factor, 0.25);
-		color[1] = (float)pow(moon_factor, 0.50);
-		color[2] = (float)pow(moon_factor, 4.0);
-		color[3] = 1.0;
-
+        color[3] = 1.0;
+		//color[0] = (float)pow(moon_factor, 0.25);
+		//color[1] = (float)pow(moon_factor, 0.50);
+		//color[2] = (float)pow(moon_factor, 4.0);
+		//color[3] = 1.0;
 
         grGammaCorrectRGB( color );
 

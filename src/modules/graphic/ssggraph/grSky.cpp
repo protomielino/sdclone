@@ -108,8 +108,8 @@ void cGrSky::build( double h_radius, double v_radius,
   sun->setSunDistance( sun_dist );
 
   pre_transform -> addKid( stars_transform );
-  pre_transform -> addKid( sun_transform );
   pre_transform -> addKid( moon_transform );
+  pre_transform -> addKid( sun_transform );
 
   pre_selector->addKid( pre_transform );
   pre_selector->clrTraversalMaskBits( SSGTRAV_HOT );
@@ -145,23 +145,24 @@ cGrSky::addCloud( ssgSimpleState *cloud_state, float span, float elevation, floa
 bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 {
 	int i;
-	double angle, angle2;
-	double rotation, rotation2;
+	double angle;
+	double rotation;
 	sgCoord pos;
-	sgCoord pos2;
-
+	
 	// Calc angles for rise/set effects
+
 	sun->reposition( view_pos, 0 );
+	moon->reposition( view_pos, 0 );
+
     sun->getSunPosition ( & pos );
 	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
     sun->setSunAngle( angle );
     sun->setSunRotation( rotation );
 
-	moon->reposition( view_pos, 0 );
-	moon->getMoonPosition( & pos2 );
-	calc_celestial_angles( pos2.xyz, view_pos, angle2, rotation2 );
-    moon->setMoonAngle( angle2 );
-    moon->setMoonRotation( rotation2 );
+	moon->getMoonPosition ( & pos );
+	calc_celestial_angles( pos.xyz, view_pos, angle, rotation );
+    moon->setMoonAngle( angle );
+    moon->setMoonRotation( rotation );
 
 	for ( i = 0; i < clouds.getNum (); i++ ) 
 	{
@@ -170,10 +171,7 @@ bool cGrSky::repositionFlat( sgVec3 view_pos, double spin, double dt )
 
 	planets->reposition( view_pos, 0 );
 	stars->reposition( view_pos, 0 );
-
 	dome->repositionFlat( view_pos, sun->getSunRotation() );
-
-	//dome->repositionFlat( view_pos, spin );
 
 	return true;
 }
@@ -190,8 +188,8 @@ bool cGrSky::reposition( sgVec3 view_pos, sgVec3 zero_elev, sgVec3 view_up, doub
   for ( i = 0; i < clouds.getNum (); i++ )
     clouds.get(i)->reposition( zero_elev, view_up, lon, lat, alt, dt );
 
-  sun->reposition( view_pos, angle);
   moon->reposition(view_pos, angle);
+  sun->reposition( view_pos, angle);
   planets->reposition( view_pos, angle );
   stars->reposition( view_pos, angle );
 
@@ -212,13 +210,16 @@ bool cGrSky::repaint( sgVec4 sky_color, sgVec4 fog_color, sgVec4 cloud_color, do
 
     dome->repaint( sky_color, fog_color, sol_angle, effective_visibility );
 
+	moon->repaint();
+	sun->repaint( sol_angle, effective_visibility );
+
     for ( i = 0; i < clouds.getNum (); i++ )
       clouds.get(i)->repaint( cloud_color );
 
-	sun->repaint( sol_angle, effective_visibility );
-	moon->repaint( moon->getMoonAngle() );
+
     planets->repaint( sol_angle, nplanets, planet_data );
     stars->repaint( sol_angle, nstars, star_data );
+
   }
   else 
   {

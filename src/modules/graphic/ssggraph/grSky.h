@@ -170,6 +170,7 @@ public:
     // 0 degrees = high noon
     // 90 degrees = moon rise/set
     // 180 degrees = darkest midnight
+	bool repaint() { return repaint ( moon_angle ); }
     bool repaint(double angle);
 
     bool reposition(sgVec3 p, double moon_angle) 
@@ -438,9 +439,7 @@ public:
 
 	void getSunPos(sgCoord* p) 
 	{
-		sgMat4 Xform;
-		sun_transform->getTransform(Xform);
-		sgSetCoord(p, Xform);
+		sun->getSunPosition( p);
     }
 
 	// draw background portions of sky (do this before you draw rest of your scene).

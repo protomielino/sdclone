@@ -237,7 +237,7 @@ grInitBackground()
 				  grSunDeclination, RAD2DEG(sunAscension));
 
 		if ( grSunDeclination > 180 )
-			grMoonDeclination = 3.0 + (rand() % 10);
+			grMoonDeclination = 3.0 + (rand() % 40);
 		else
 			grMoonDeclination = (rand() % 270);
 
@@ -270,11 +270,11 @@ grInitBackground()
 		{
 			GfLogInfo("  Cloud cover : 3 layers\n");
 
-			int wind = (rand() % 60) + 40;
+			int wind = (rand() % 200) + 100;
 
 			cloudLayers[0] = TheSky->addCloud(buf, grSkyDomeDistance, 2550,
 											  100 / domeSizeRatio, 100 / domeSizeRatio);
-			cloudLayers[0]->setSpeed(300);
+			cloudLayers[0]->setSpeed(wind);
 			cloudLayers[0]->setDirection(45);
 			
 			GfLogInfo("   * layer 1 : speed=60, direction=45, texture=%s\n", buf);
