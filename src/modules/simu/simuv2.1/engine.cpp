@@ -253,7 +253,8 @@ freerads += engine->Tq / engine->I * SimDeltaTime;
      engine->Tq = 0.0;
  } else if (engine->rads > engine->revsMax) {
      engine->rads = engine->revsMax;
-   if ( (trans->curOverallRatio > 0.01) || (trans->curOverallRatio < -0.01) )
+   if ( (clutch->transferValue > 0.01) &&
+        ((trans->curOverallRatio > 0.01) || (trans->curOverallRatio < -0.01)) )
        return engine->revsMax / trans->curOverallRatio;
    else {return 0.0;}
  }
