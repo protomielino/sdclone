@@ -20,6 +20,7 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math portability robottools tgf tgfclient tgfdata
                      networking)
 
+ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 
 IF(WIN32)

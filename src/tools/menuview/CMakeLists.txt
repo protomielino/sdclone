@@ -9,6 +9,7 @@ SET(_SOURCES main.cpp previewmenu.cpp)
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
 ADD_SDL_INCLUDEDIR()
+ADD_PLIB_INCLUDEDIR()
 
 #disable developer warning
 IF(COMMAND CMAKE_POLICY)

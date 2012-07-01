@@ -4,7 +4,8 @@ INCLUDE(../../../cmake/macros.cmake)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability tgf math)
-INCLUDE_DIRECTORIES(${SDL_INCLUDE_DIR} )
+ADD_SDL_INCLUDEDIR()
+ADD_PLIB_INCLUDEDIR()
 
 SET(ROBOTTOOLS_SOURCES rtteammanager.cpp rttelem.cpp rttimeanalysis.cpp  rttrack.cpp rtutil.cpp
 					   robottools.h teammanager.h timeanalysis.h)
