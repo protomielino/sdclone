@@ -617,7 +617,7 @@ bool GfglFeatures::checkBestSupport(int nWidth, int nHeight, int nDepth,
 	// and run a new supported feature detection if any diffference.
 	bool bSupportFound = true;
 	if (!bPrevSupportFound || nWidth != nDetWidth || nHeight != nDetHeight || nDepth != nDetDepth
-		|| bAlpha != bDetAlpha || bFullScreen != bDetFullScreen || bStereo != bDetStereo)
+		|| bAlpha != bDetAlpha || bFullScreen != bDetFullScreen || bStereo != bDetStereo || bBump != bDetBump)
 	{
 		nDetWidth = nWidth;
 		nDetHeight = nHeight;

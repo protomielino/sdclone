@@ -435,6 +435,10 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 			== GFSCR_VAL_YES;
 	else
 		bFullScreen = nFullScreen ? true : false;
+    bool bBumpMap =
+		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_BUMPMAPPING, 
+								 GFSCR_VAL_NO))
+		== GFSCR_VAL_YES;
     bool bStereo =
 		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_STEREOVISION,
 								 GFSCR_VAL_YES))
@@ -459,7 +463,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 		// Warning: Restarts the game if the frame buffer specs changed since last call.
 		// If specified and possible, setup the best possible settings.
 		if (GfglFeatures::self().checkBestSupport(nWinWidth, nWinHeight, nTotalDepth,
-			 									  bAlphaChannel, bFullScreen, bStereo, hparmScreen))
+			 									  bAlphaChannel, bFullScreen, bBumpMap, bStereo, hparmScreen))
 		{
 			// Load Open GL user settings from the config file.
 			GfglFeatures::self().loadSelection();
