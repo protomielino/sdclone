@@ -1,4 +1,4 @@
-<?xml version="1.0" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <install product="speed-dreams" desc="Speed Dreams - an Open Motorsport Simulator" version="1.4.0" binarypath="/usr/bin"
          promptbinaries="yes" express="no">
 
