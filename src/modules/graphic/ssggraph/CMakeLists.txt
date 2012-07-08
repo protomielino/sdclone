@@ -5,7 +5,7 @@ SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h
                      SoundInterface.cpp SoundInterface.h
                      PlibSoundInterface.cpp PlibSoundInterface.h 
                      OpenalSoundInterface.cpp OpenalSoundInterface.h 
-                     grMoonPos.h grMoonPos.cpp
+                     grMoonpos.h grMoonpos.cpp
 					 grMoon.cpp grSun.cpp grCloudLayer.cpp grSky.cpp grSky.h
                      grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
                      grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
