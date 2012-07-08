@@ -40,7 +40,11 @@
 #include <unistd.h>
 #endif
 
+#ifdef THIRD_PARTY_EXPAT
+#include <expat.h>
+#else
 #include <xmlparse.h>
+#endif
 
 #include <portability.h>
 #include "tgf.h"

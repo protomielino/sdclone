@@ -66,12 +66,6 @@ ENDMACRO(FIND_DEPENDENCY DEP_NAME INCLUDE_FILE INCLUDE_SUBDIRS LIBRARY_NAMES SEA
 
 MACRO(SEARCH_3RDPARTY ROOT_DIR)
 
-    FIND_DEPENDENCY(JPEG jpeglib.h "" jpeg_s ${ROOT_DIR} "")
-    
-    FIND_DEPENDENCY(OPENAL AL/al.h "" openal32 ${ROOT_DIR} "")
-	
-    FIND_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
-	
     FIND_DEPENDENCY(SDL sdl.h "SDL;SDL2" sdl "${ROOT_DIR}" "")
     FIND_DEPENDENCY(SDLMAIN sdl_main.h "SDL;SDL2" sdlmain "${ROOT_DIR}" "")
 	IF(SDL_FOUND) # Dirty hack to make FindPackage(SDL) work later.
@@ -86,6 +80,37 @@ MACRO(SEARCH_3RDPARTY ROOT_DIR)
     FIND_DEPENDENCY(PLIB_UL plib/ul.h "" ul ${ROOT_DIR} "")
     FIND_DEPENDENCY(PLIB_JS plib/js.h "" js ${ROOT_DIR} "")
 	
+    # Note: The Open GL includes are automatically added by MSVC 2005.
+    # We simply add here the include path for the Open GL extensions headers,
+    # and we use OPENGL_INCLUDE_DIR variable for this,
+    # as Find_Package(OpenGL) doesn't seem to set it.
+	Find_Package(OpenGL)
+    FIND_PATH(OPENGL_INCLUDE_DIR GL/glext.h ${ROOT_DIR}/include NO_DEFAULT_PATH)
+
+    FIND_DEPENDENCY(OPENAL AL/al.h "" openal32 ${ROOT_DIR} "")
+	
+    FIND_DEPENDENCY(ENET enet/enet.h "" enet ${ROOT_DIR} "")
+	
+	IF(OPTION_3RDPARTY_EXPAT)
+		FIND_DEPENDENCY(EXPAT expat.h "" expat ${ROOT_DIR} "")
+	ENDIF(OPTION_3RDPARTY_EXPAT)
+    
+	IF(OPTION_3RDPARTY_SOLID)
+
+		FIND_DEPENDENCY(SOLID SOLID/solid.h "" "solid;broad" ${ROOT_DIR} "")
+		FIND_DEPENDENCY(SOLID_SOLID SOLID/solid.h "" "solid" ${ROOT_DIR} "")
+		FIND_DEPENDENCY(SOLID_BROAD SOLID/broad.h "" "broad" ${ROOT_DIR} "")
+
+        IF(SOLID_FOUND)
+            # Force subsequent FindSOLID stuff not to search for other variables ... kind of a hack 
+            SET(SOLID_SOLIDINCLUDE_DIR ${SOLID_INCLUDE_DIR} CACHE FILEPATH "")
+            MARK_AS_ADVANCED(SOLID_SOLIDINCLUDE_DIR)
+        ENDIF(SOLID_FOUND)
+
+	ENDIF(OPTION_3RDPARTY_SOLID)
+    
+    FIND_DEPENDENCY(JPEG jpeglib.h "" jpeg_s ${ROOT_DIR} "")
+    
     FIND_DEPENDENCY(ZLIB zlib.h "" "z;zlib;zlib1" ${ROOT_DIR} "D")
 	
     IF(ZLIB_FOUND)
@@ -93,7 +118,7 @@ MACRO(SEARCH_3RDPARTY ROOT_DIR)
         FIND_DEPENDENCY(PNG png.h "" "libpng;libpng13;libpng14;libpng15;libpng16" ${ROOT_DIR} "D")
 		
         IF(PNG_FOUND)
-            #force subsequent FindPNG stuff not to search for other variables ... kind of a hack 
+            # Force subsequent FindPNG stuff not to search for other variables ... kind of a hack 
             SET(PNG_PNG_INCLUDE_DIR ${PNG_INCLUDE_DIR} CACHE FILEPATH "")
             MARK_AS_ADVANCED(PNG_PNG_INCLUDE_DIR)
         ENDIF(PNG_FOUND)
