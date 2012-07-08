@@ -32,7 +32,7 @@
 #include "grutil.h"
 #include "grSky.h"
 #include "grbackground.h"
-#include "grMoonPos.h"
+#include "grMoonpos.h"
 
 // Some exported constants.
 const tdble grSkyDomeNeutralFOVDistance = 20000.0f; // Not the smallest, a medium one.

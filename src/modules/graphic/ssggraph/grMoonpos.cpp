@@ -17,6 +17,7 @@
  ***************************************************************************/
 
 #include <ctime>
+#include "grMoonpos.h"
 
 // Position of the Moon first month 2012
 static const double MoonPositionDay[31] = { 40020, 41400, 42960, 44760, 46980, 49680, 52860, 56520, 60600, 64860, 69300, 73740,
