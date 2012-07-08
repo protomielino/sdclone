@@ -15,7 +15,7 @@ II - Linux Installation from sources
 
 III - Windows Installation from sources
 
-  1 - Cmake and MS VC++ 2005 (8) / 2008 (9) on Windows XP 32
+  1 - CMake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) on Windows XP 32
   2 - MS VC++ 6 no more supported
 
 IV - FreeBSD Installation from sources (Work in progress)
@@ -28,18 +28,20 @@ I - Pre-requisites
 ------------------
 
 - Working OpenGL Driver and header files / associated libraries
-- SDL 1.2 (http://www.libsdl.org/)
+- SDL 1.2.12/13/15 (http://www.libsdl.org/)
 - PLIB 1.8.3 / 4 / 5 (http://plib.sourceforge.net/). 
   Linux: Be carefull to compile plib with -fPIC on AMD64 if you run a 64 bit version.
-- OpenAL soft 1.5 / 1.6 / 1.11 (http://connect.creativelabs.com/openal)
+- OpenAL soft 1.5 / 1.6 / 1.11 / 1.14 (http://connect.creativelabs.com/openal)
    (Torcs modified 0.0.8 from www.torcs.org also used to work in the past).
-- ENet 1.2 (http://enet.bespin.org)
+- ENet 1.3.2/4 (http://enet.bespin.org)
   Linux: Be carefull to compile ENet with -fPIC on AMD64 if you run a 64 bit build.
+- Expat 2 (can be skipped for the moment, but won't anymore soon)
+- Free Solid 2 (optional for the moment, will soon get mandatory)
 - libpng
 - zlib
-- jpeg
+- jpeg 
 
-WARNING: On Windows, be carefull to compile anything for multi-threaded DLL integration (/MD & /MDd)
+WARNING: On Windows, be carefull to compile anything for multi-threaded DLL integration (/MD)
 
 
 II - Linux installation from sources
@@ -47,7 +49,7 @@ II - Linux installation from sources
 
 1 - Introduction
 
-There are 2 ways to build and install Speed Dreams from sources :
+There are 2 ways of building and installing Speed Dreams from sources :
 - from the official source tarballs,
 - from the subversion repository.
 
@@ -151,6 +153,16 @@ The Speed Dreams Team.
             (use /usr/local if you compiled some 3rdParty libs yourself).
         - CMAKE_INSTALL_PREFIX:PATH :
             Install path for Speed Dreams (def: /usr/local)
+
+        - OPTION_3RDPARTY_EXPAT:BOOL :
+            Enable building against 3rd party Expat 2 library, rather than bundled txml (def: ON)
+			Disable if "Expat 2 dev" is not available for your distro (which is very unlikely).
+
+        - OPTION_3RDPARTY_SOLID:BOOL :
+            Enable building against 3rd party Free Solid 2 library, rather than bundled one (def: OFF)
+			Note: This is not set by default, because Free Solid 2 dev is not yet available
+			      on most Linux distros (only Fedora is working on this right now, AFAIK, 2012, July)
+				  Ask the dev team for any hint about building it ...
 
         - OPTION_TRACE:BOOL :
             Full run-time traces if ON (def: ON)
@@ -269,11 +281,12 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
   b.  Download the official tarballs from SF.net
         http://sourceforge.net/projects/speed-dreams/files/2.0.0
       (speed-dreams-src-<package>-<version>.tar.xz)
+	  Note: See below if you want to do it from SVN ...
   c.  Extract their contents to your local disk (7Zip is an excellent tool for that),
       all in the same target folder.
       Warning: You need to extract all of the source packages in order to start building
                (see ablove 2-a chapter for more).
-  d.  Download the "MSVC 2005" release of the "3rdParty" package on SF.net
+  d.  Download the "MSVC 2005 / 2.0.0-or-earlier" release of the "3rdParty" package on SF.net
         http://sourceforge.net/projects/speed-dreams/files/3rd%20party
       (it contains necessary 3rd party libs compiled with/for MSVC 2005)
   e.  Extract from the zip file the "3rdParty" directory to where speed-dreams sources
@@ -309,13 +322,22 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
        a dedicated 3rdParty package for this compiler
 
  Note : If you need to recompile the 3rdParty package from sources,
-        (the "Sources" release of the "3rdParty" package on SF.net Download page)
+        (the "Sources/2.0.0-or-earlier" release of the "3rdParty" package on SF.net Download page)
         be carefull then to rebuild :
          - everything possible
          - for the same configuration (don't mix Release and Debug) 
          - everything for multithreaded DLL integration (/MD & /MDd),
         ... or be ready for headaches, and no support at all ;-)
 
+ Note: Building from SVN repo at SF.net :
+       From trunk@r4790, there's CMake support for a new MSVC 2005 3rd party binary package,
+	   with updated releases of the dependencies, + 2 new ones : Expat 2 and FreeSOLID 2,
+	   coming there in order to replace the bundled versions (txml and simuv2.1/SOLID-2.0),
+	   in order SD becomes compatible with FOSS Linux distros (like Fedora, Debian, ...).
+	   See http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MSVC%202005/post-2.0.0
+	   (and http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0),
+	   along with "II - Linux installation from sources" for some more tips about CMake options.
+	   
 
 3) MS VC++ 6 : No more supported.
 
