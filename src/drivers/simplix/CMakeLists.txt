@@ -172,6 +172,15 @@ ROBOT_DATA(NAME simplix_mp5 PREFIX simplix_mp5
            FILES simplix_mp5.xml default.xml logo.rgb readme.txt
            SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
+# LP1 
+SET(ROBOT_SUBDIRS 0 1 2 3 4 5 
+                  lp1-pesci-p60 lp1-vieringe-vr8
+                  )
+
+ROBOT_DATA(NAME simplix_lp1 PREFIX simplix_lp1 
+           FILES simplix_lp1.xml default.xml logo.rgb readme.txt
+           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)			   
+
 # Work-in-progress / unofficial simplix instances.
 IF(NOT OPTION_OFFICIAL_ONLY)
 
@@ -185,12 +194,4 @@ IF(NOT OPTION_OFFICIAL_ONLY)
                FILES simplix_mpa1.xml default.xml logo.rgb readme.txt
                SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)
 
-# LP1 
-SET(ROBOT_SUBDIRS 0 1 2 3 4 5 
-                  lp1-pesci-p60 lp1-vieringe-vr8
-                  )
-
-ROBOT_DATA(NAME simplix_lp1 PREFIX simplix_lp1 
-           FILES simplix_lp1.xml default.xml logo.rgb readme.txt
-           SUBDIRS ${ROBOT_SUBDIRS} PATTERNS *.xml logo.rgb *.png *.jpg)			   
 ENDIF()
