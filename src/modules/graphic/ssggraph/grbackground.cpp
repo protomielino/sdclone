@@ -32,7 +32,7 @@
 #include "grutil.h"
 #include "grSky.h"
 #include "grbackground.h"
-
+#include "grMoonPos.h"
 
 // Some exported constants.
 const tdble grSkyDomeNeutralFOVDistance = 20000.0f; // Not the smallest, a medium one.
@@ -54,12 +54,7 @@ static const sgVec4 Black            = { 0.0f, 0.0f, 0.0f, 1.0f } ;
 static const sgVec4 White            = { 1.0f, 1.0f, 1.0f, 1.0f } ;
 static const sgVec4 TranslucentWhite = { 1.0f, 1.0f, 1.0f, 0.8f } ;
 
-//static const sgVec4 BaseSkyColor    = { 0.39f, 0.50f, 0.74f, 1.0f } ;
 static const sgVec4 BaseSkyColor    = { 0.31f, 0.43f, 0.69f, 1.0f };
-
-static const sgVec4 BaseAmbiant      = { 0.35f, 0.35f, 0.40f, 1.0f } ;
-static const sgVec4 BaseDiffuse      = { 0.80f, 0.80f, 0.80f, 1.0f } ;
-static const sgVec4 BaseSpecular     = { 0.33f, 0.33f, 0.30f, 1.0f } ;
 
 static int NStars = 0;
 static int NPlanets = 0;
@@ -97,7 +92,6 @@ static ssgBranch *SunAnchor = NULL;
 static ssgRoot *TheBackground = NULL;
 static ssgTransform *TheSun = NULL;
 
-//static cGrCelestialBody *TheCelestBodies[NMaxCelestianBodies] = { NULL, NULL };
 static cGrSky *TheSky = NULL;
 
 static sgdVec3 *AStarsData = NULL;
@@ -236,12 +230,14 @@ grInitBackground()
 				  timeOfDay / 3600, (timeOfDay % 3600) / 60, timeOfDay % 60,
 				  grSunDeclination, RAD2DEG(sunAscension));
 
-		if ( grSunDeclination > 180 )
+		/*if ( grSunDeclination > 180 )
 			grMoonDeclination = 3.0 + (rand() % 40);
 		else
-			grMoonDeclination = (rand() % 270);
+			grMoonDeclination = (rand() % 270);*/
 
-		const float moonAscension = (float)(rand() % 360);
+		grMoonDeclination = grUpdateMoonPos(timeOfDay);
+
+		const float moonAscension = grTrack->local.sunascension;
 		
 		TheSky->setMD( DEG2RAD(grMoonDeclination) );
 		TheSky->setMRA( DEG2RAD(moonAscension) );

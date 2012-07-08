@@ -239,52 +239,52 @@ void cGrSky::preDraw()
 
 void cGrSky::postDraw( float alt )
 {
-  // Sort clouds in order of distance from alt (furthest to closest)
-  int i, j;
-  int num = clouds.getNum ();
-  if ( num > 0 ) 
-  {
-    // Initialise cloud index
-    int *index = new int [ num ];
-    for ( i = 0; i < num; i++ ) 
-    {
-	index [i] = i;
-    }
-
-	// Sort cloud index
-    int temp;   // holding variable
-    for ( i = 0; i < ( num - 1 ); i++ )    // to represent element to be compared
-    {
-      for( j = ( i + 1 ); j < num; j++ )   // to represent the rest of the elements
-      {
-	float d1 = (float)(fabs(alt - clouds.get(i)->getElevation()));
-	float d2 = (float)(fabs(alt - clouds.get(j)->getElevation()));
-
-        if (d1 < d2)
+	// Sort clouds in order of distance from alt (furthest to closest)
+	int i, j;
+	int num = clouds.getNum ();
+	if ( num > 0 ) 
 	{
-          temp = index[i];
-          index[i] = index[j];
-          index[j] = temp;
+		// Initialise cloud index
+		int *index = new int [ num ];
+		for ( i = 0; i < num; i++ ) 
+		{
+			index [i] = i;
+		}
+
+		// Sort cloud index
+		int temp;   // holding variable
+		for ( i = 0; i < ( num - 1 ); i++ )    // to represent element to be compared
+		{
+			for( j = ( i + 1 ); j < num; j++ )   // to represent the rest of the elements
+			{
+				float d1 = (float)(fabs(alt - clouds.get(i)->getElevation()));
+				float d2 = (float)(fabs(alt - clouds.get(j)->getElevation()));
+
+				if (d1 < d2)
+				{
+					temp = index[i];
+					index[i] = index[j];
+					index[j] = temp;
+				}
+			}
+		}
+
+		float slop = 5.0; // if we are closer than this to a cloud layer, don't draw cloud
+
+		for ( int i = 0; i < num; i++ ) 
+		{
+			cGrCloudLayer *cloud = clouds.get(index[i]);
+
+			float asl = cloud->getElevation();
+			float thickness = cloud->getThickness();
+
+			// draw cloud only if below or above cloud layer
+			if ( alt < asl - slop || alt > asl + thickness + slop )
+				cloud->draw();
+		}
+
+		delete [] index;
 	}
-      }
-    }
-
-    float slop = 5.0; // if we are closer than this to a cloud layer, don't draw cloud
-
-    for ( int i = 0; i < num; i++ ) 
-    {
-      cGrCloudLayer *cloud = clouds.get(index[i]);
-
-      float asl = cloud->getElevation();
-      float thickness = cloud->getThickness();
-
-      // draw cloud only if below or above cloud layer
-      if ( alt < asl - slop || alt > asl + thickness + slop )
-	    cloud->draw();
-    }
-
-    delete [] index;
-  }
 }
 
 void cGrSky::modifyVisibility( float alt, float time_factor )
