@@ -849,7 +849,7 @@ void grLoadBackgroundLand(void)
 	bgsky = "land.ac";
 	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/textures;.", grTrack->category, grTrack->internalname);
 	ssgTexturePath(buf2);
-	snprintf(buf2, sizeof(buf2), "data/objects");
+	snprintf(buf2, sizeof(buf2), "tracks/%s/%s;data/objects;.", grTrack->category, grTrack->internalname);
 	ssgModelPath(buf2);
 		
 	desc2 = grssgLoadAC3D(bgsky, NULL);
