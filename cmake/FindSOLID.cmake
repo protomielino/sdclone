@@ -11,22 +11,49 @@
 #
 # Created by Jean-Philippe Meuret (based on Mart Kelder's FindPLIB.cmake).
 
+# No use to do all of this twice.
+IF(SOLID_FOUND)
+  RETURN()
+ENDIF(SOLID_FOUND)
+
+# First, try with PkgConfig if available.
+FIND_PACKAGE(PkgConfig)
+IF(PKGCONFIG_FOUND)
+
+  PKG_CHECK_MODULES(SOLID FreeSOLID)
+  IF(NOT SOLID_FOUND)
+    PKG_CHECK_MODULES(SOLID SOLID)
+  ENDIF (NOT SOLID_FOUND)
+
+  IF(SOLID_FOUND)
+    SET(SOLID_FOUND TRUE)
+    SET(SOLID_INCLUDE_DIR ${SOLID_INCLUDE_DIRS} CACHE STRING "SOLID include paths")
+    SET(SOLID_SOLID_LIBRARY ${SOLID_LIBRARIES} CACHE STRING "SOLID library")
+    SET(SOLID_BROAD_LIBRARY "NOT-FOUND" CACHE STRING "BROAD libraries")
+    SET(SOLID_LIBRARY ${SOLID_SOLID_LIBRARY})
+    MESSAGE(STATUS "Looking for SOLID --- found using pkg-config (${SOLID_SOLID_LIBRARY})")
+    RETURN()
+  ENDIF(SOLID_FOUND)
+  
+ENDIF(PKGCONFIG_FOUND)
+
+# Then try the good old way for include dirs.
 IF(NOT APPLE)
 
   FIND_PATH(SOLID_SOLIDINCLUDE_DIR SOLID/solid.h
     HINTS ENV SOLID_DIR
     PATH_SUFFIXES 
-	  include/SOLID include
+	  include/FreeSOLID include/freesolid include/SOLID include
     PATHS
 	  /usr /usr/local
-    DOC "Location of SOLID")
+    DOC "Non-Apple location of SOLID")
 
 ELSE(NOT APPLE)
 
   FIND_PATH(SOLID_SOLIDINCLUDE_DIR solid.h
     HINTS ENV SOLID_DIR
     PATH_SUFFIXES 
-	  Headers include/SOLID include
+	  Headers include/FreeSOLID include/freesolid include/SOLID include
     PATHS
 	  #Additional MacOS Paths
    	  ~/Library/Frameworks/SOLID.framework
@@ -34,12 +61,13 @@ ELSE(NOT APPLE)
  	  /System/Library/Frameworks/SOLID.framework # Tiger
 
 	  /usr /usr/local
-    DOC "Location of SOLID")
+    DOC "Apple location of SOLID")
 
 ENDIF(NOT APPLE)
 
 SET(SOLID_INCLUDE_DIR ${SOLID_SOLIDINCLUDE_DIR} CACHE DOC "Include dir for SOLID")
 
+# Then try the good old way for libs.
 FIND_LIBRARY(SOLID_SOLID_LIBRARY 
   NAMES solid
   HINTS ENV SOLID_DIR
