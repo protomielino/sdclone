@@ -49,6 +49,7 @@
 
 #define TRK_SECT_LOCAL	"Local Info"
 
+#define TRK_ATT_STATION "station"
 #define TRK_ATT_ANYRAINLKHD "overall rain likelyhood"
 #define TRK_ATT_LITTLERAINLKHD "little rain likelyhood"
 #define TRK_ATT_MEDIUMRAINLKHD "medium rain likelyhood"
@@ -581,6 +582,7 @@ typedef struct TrackGraphicInfo
 typedef struct TrackLocalInfo
 {
 	/* Constant spec. data, read from <track>.xml */
+	const char *station;	/**<Station Weather */
     tdble anyrainlkhood; /**< Overall likelyhood of having rain (when random) [0, 1] */
     tdble littlerainlkhood; /**< Likelyhood of having little rain when it rains [0, 1] */
     tdble mediumrainlkhood;	 /**< Likelyhood of having medium rain when it rains [0, 1-little] */

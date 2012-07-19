@@ -146,6 +146,7 @@ GetTrackHeader(void *TrackHandle)
 	/* Local infos */
     local = &theTrack->local;
 
+	local->station = GfParmGetStr(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_STATION, "none");
     local->anyrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_ANYRAINLKHD, (char*)NULL, 0);
     local->littlerainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_LITTLERAINLKHD, (char*)NULL, 0);
     local->mediumrainlkhood = GfParmGetNum(TrackHandle, TRK_SECT_LOCAL, TRK_ATT_MEDIUMRAINLKHD, (char*)NULL, 0);
