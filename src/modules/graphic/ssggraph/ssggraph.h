@@ -50,7 +50,7 @@ extern "C" int SSGGRAPH_API closeGfModule();
 
 // The module main class
 // (Singleton, inherits GfModule, and implements IGraphicsEngine and ISoundEngine).
-class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine, public ISoundEngine
+class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine
 {
  public:
 
@@ -63,9 +63,10 @@ class SSGGRAPH_API SsgGraph : public GfModule, public IGraphicsEngine, public IS
 	virtual void shutdownView();
 	virtual void unloadCars();
 	virtual void unloadTrack();
+        virtual SoundCam *getCurCam();
 
 	// Implementation of ISoundEngine.
-	virtual void mute(bool bOn = true);
+	//virtual void mute(bool bOn = true);
 
 	// Accessor to the singleton.
 	static SsgGraph& self();

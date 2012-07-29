@@ -25,6 +25,8 @@
 #define _LEGACYMENU_H_
 
 #include <iuserinterface.h>
+#include <igraphicsengine.h>
+#include <isoundengine.h>
 
 #include <tgf.hpp>
 
@@ -163,6 +165,9 @@ public:
 
 	//! The graphics engine.
 	IGraphicsEngine* _piGraphicsEngine;
+        
+        //! The sound engine.
+	ISoundEngine* _piSoundEngine;
 
 	//! The "Race Engine update state" hook (a GfuiScreenActivate'able object).
 	void* _hscrReUpdateStateHook;

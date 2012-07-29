@@ -29,6 +29,7 @@
 #endif
 
 #include <graphic.h>
+#include "grcam.h"
 #include <raceman.h>	//tSituation
 
 
@@ -62,6 +63,7 @@ extern int  refresh(tSituation *s);
 extern void shutdownCars(void);
 extern void shutdownTrack(void);
 extern void shutdownView(void);
+extern cGrCamera * grGetCurCamera(void);
 //extern void bendCar (int index, sgVec3 poc, sgVec3 force, int cnt);
 
 extern int grMaxTextureUnits;
