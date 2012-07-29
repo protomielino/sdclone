@@ -335,12 +335,13 @@ typedef struct RmInfo
 #define RM_VAL_TIME_DUSK	"dusk"
 #define RM_VAL_TIME_NIGHT	"night"
 #define RM_VAL_TIME_NOW		"now"
+#define RM_VAL_TIME_REAL	"real"
 #define RM_VAL_TIME_TRACK	"from track"
 #define RM_VAL_TIME_RANDOM	"random"
 #define RM_VAL_TIME_24HR	"24 hour"
 #define RM_VALS_TIME { RM_VAL_TIME_DAWN, RM_VAL_TIME_MORNING, RM_VAL_TIME_NOON, \
                        RM_VAL_TIME_AFTERNOON, RM_VAL_TIME_DUSK, RM_VAL_TIME_NIGHT, \
-                       RM_VAL_TIME_NOW, RM_VAL_TIME_TRACK, RM_VAL_TIME_RANDOM, \
+                       RM_VAL_TIME_NOW, RM_VAL_TIME_REAL, RM_VAL_TIME_TRACK, RM_VAL_TIME_RANDOM, \
                        RM_VAL_TIME_24HR}
 
 // Indices for RM_VALS_TIME.
@@ -351,9 +352,10 @@ typedef struct RmInfo
 #define RM_IND_TIME_DUSK	4
 #define RM_IND_TIME_NIGHT	5
 #define RM_IND_TIME_NOW		6
-#define RM_IND_TIME_TRACK	7
-#define RM_IND_TIME_RANDOM	8
-#define RM_IND_TIME_24HR	9
+#define RM_IND_TIME_REAL	7
+#define RM_IND_TIME_TRACK	8
+#define RM_IND_TIME_RANDOM	9
+#define RM_IND_TIME_24HR	10
 
 #define RM_VAL_CLOUDS_NONE	"no cloud"
 #define RM_VAL_CLOUDS_FEW	"few clouds"
@@ -361,16 +363,18 @@ typedef struct RmInfo
 #define RM_VAL_CLOUDS_MANY	"many clouds"
 #define RM_VAL_CLOUDS_FULL	"full cover"
 #define RM_VAL_CLOUDS_RANDOM	"random"
+#define RM_VAL_CLOUDS_REAL	"real"
 #define RM_VALS_CLOUDS { RM_VAL_CLOUDS_NONE, RM_VAL_CLOUDS_FEW, RM_VAL_CLOUDS_SCARCE, \
-                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM }
+                         RM_VAL_CLOUDS_MANY, RM_VAL_CLOUDS_FULL, RM_VAL_CLOUDS_RANDOM, RM_VAL_CLOUDS_REAL }
 
 #define RM_VAL_RAIN_NONE	"none"
 #define RM_VAL_RAIN_LITTLE	"little"
 #define RM_VAL_RAIN_MEDIUM	"medium"
 #define RM_VAL_RAIN_HEAVY	"heavy"
 #define RM_VAL_RAIN_RANDOM	"random"
+#define RM_VAL_RAIN_REAL	"real"
 #define RM_VALS_RAIN { RM_VAL_RAIN_NONE, RM_VAL_RAIN_LITTLE, RM_VAL_RAIN_MEDIUM, \
-                       RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM }
+                       RM_VAL_RAIN_HEAVY, RM_VAL_RAIN_RANDOM, RM_VAL_RAIN_REAL }
 
 /* Movie capture */
 

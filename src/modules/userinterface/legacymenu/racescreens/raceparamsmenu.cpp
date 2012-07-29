@@ -252,11 +252,17 @@ rmChangeRain(void *vp)
 			cloudsComboEnabled = GFUI_DISABLE;
 			rmrpClouds = GfRace::eCloudsRandom;
 		}
+		else if (rmrpRain == GfRace::eRainReal) // Real rain => Real clouds.
+		{
+			cloudsComboEnabled = GFUI_DISABLE;
+			rmrpClouds = GfRace::eCloudsReal;
+		}
 		else if (rmrpRain != GfRace::eRainNone)
 		{
 			cloudsComboEnabled = GFUI_DISABLE;
 			rmrpClouds = GfRace::eCloudsFull; // Rain => Heavy clouds.
 		}
+		
 		GfuiLabelSetText(ScrHandle, rmrpCloudsEditId, CloudsValues[rmrpClouds]);
 		
 		// Show / hide clouds combo arrow buttons (any rain => no sky choice).

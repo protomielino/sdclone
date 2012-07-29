@@ -65,13 +65,13 @@ public:
 	GfRaceManager* getManager() const;
 
 	enum ETimeOfDaySpec { eTimeDawn, eTimeMorning, eTimeNoon, eTimeAfternoon,
-						  eTimeDusk, eTimeNight, eTimeNow, eTimeFromTrack, eTimeRandom,
+						  eTimeDusk, eTimeNight, eTimeNow, eTimeReal, eTimeFromTrack, eTimeRandom,
 						  eTime24hr,
 						  nTimeSpecNumber }; // Last = invalid value = nb of valid ones.
 	enum ECloudsSpec { eCloudsNone, eCloudsFew, eCloudsScarce, eCloudsMany, eCloudsFull,
-					   eCloudsRandom, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
+					   eCloudsRandom, eCloudsReal, nCloudsSpecNumber}; // Last = invalid value = nb of valid ones.
 	enum ERainSpec { eRainNone, eRainLittle, eRainMedium, eRainHeavy, eRainRandom,
-					 nRainSpecNumber }; // Last = invalid value = nb of valid ones.
+					 eRainReal, nRainSpecNumber }; // Last = invalid value = nb of valid ones.
 	class Parameters
 	{
 	  public:
