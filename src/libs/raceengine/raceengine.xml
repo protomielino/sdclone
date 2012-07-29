@@ -14,12 +14,13 @@
 
 <!DOCTYPE params SYSTEM "../tgf/params.dtd">
 
-<params name="" type="template" mode="mw" version="1.4">
+<params name="" type="template" mode="mw" version="1.5">
 
   <section name="Modules">
     <attstr name="track" val="track"/>
     <attstr name="simu" val="simuv2.1"/>
     <attstr name="graphic" val="ssggraph"/>
+    <attstr name="sound" val="snddefault"/>
   </section>
 
   <section name="Movie Capture">

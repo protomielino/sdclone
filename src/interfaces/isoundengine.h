@@ -16,21 +16,29 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
-    	Interface for sound engines
-		Only embryonic, as long as we don't have a real separate sound engine
-		(for the moment, it is inside the graphics engine)
-    @version	$Id$
-*/
+ #ifndef __ISOUNDENGINE__H__
+ #define __ISOUNDENGINE__H__
 
-#ifndef __ISOUNDENGINE__H__
-#define __ISOUNDENGINE__H__
 
-class ISoundEngine
+typedef float sndVec3[3];
+
+struct SoundCam
 {
-public:
-
-	virtual void mute(bool bOn = true) = 0;
+    sndVec3 * Posv;
+    sndVec3 * Speedv;
+    sndVec3 * Centerv;
+    sndVec3 * Upv;
 };
 
-#endif // __ISOUNDENGINE__H__
+class ISoundEngine 
+{
+public:
+ 
+ 	//virtual void mute(bool bOn = true) = 0;
+	virtual void initSound(struct Situation* s) = 0;
+	virtual void shutdownSound(struct Situation* s) = 0;
+	virtual void refreshSound(struct Situation *s, SoundCam *camera) = 0;
+	virtual void mute(bool bOn = true) = 0;
+};
+ 
+ #endif // __ISOUNDENGINE__H__

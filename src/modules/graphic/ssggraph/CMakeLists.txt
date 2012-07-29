@@ -1,12 +1,7 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h 
-                     Sound.cpp Sound.h PlibSound.cpp PlibSound.h OpenalSound.cpp OpenalSound.h
-                     SoundInterface.cpp SoundInterface.h
-                     PlibSoundInterface.cpp PlibSoundInterface.h 
-                     OpenalSoundInterface.cpp OpenalSoundInterface.h 
-                     grMoonpos.h grMoonpos.cpp
-					 grMoon.cpp grSun.cpp grCloudLayer.cpp grSky.cpp grSky.h
+SET(SSGGRAPH_SOURCES grMoonpos.h grMoonpos.cpp
+		     grMoon.cpp grSun.cpp grCloudLayer.cpp grSky.cpp grSky.h
                      grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
                      grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
                      grcarlight.cpp grcarlight.h grmain.cpp grmain.h 
@@ -17,7 +12,7 @@ SET(SSGGRAPH_SOURCES CarSoundData.cpp CarSoundData.h
                      grscreen.cpp grscreen.h 
                      grshadow.cpp grshadow.h grskidmarks.cpp grskidmarks.h
                      grsmoke.cpp grsmoke.h grtexture.cpp grtexture.h loadsgi.h
-                     grsound.cpp grsound.h grtracklight.cpp grtracklight.h 
+                     grtracklight.cpp grtracklight.h 
                      grtrackmap.cpp grtrackmap.h grutil.cpp grutil.h
                      grvtxtable.cpp grvtxtable.h grrain.cpp grrain.h
                      ssggraph.cpp ssggraph.h)
@@ -61,5 +56,5 @@ IF(OPENGL_FOUND)
     TARGET_LINK_LIBRARIES(ssggraph ${OPENGL_LIBRARY})
 ENDIF(OPENGL_FOUND)
 
-SD_INSTALL_FILES(DATA config USER config FILES graph.xml sound.xml)
+SD_INSTALL_FILES(DATA config USER config FILES graph.xml)
 SD_INSTALL_FILES(LIB modules/graphic TARGETS ssggraph)
