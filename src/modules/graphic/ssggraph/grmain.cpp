@@ -394,6 +394,11 @@ grSelectCamera(void *vp)
     grGetCurrentScreen()->selectCamera((long)vp);
 }
 
+cGrCamera * grGetCurCamera() 
+{
+    return grGetCurrentScreen()->getCurCamera();
+}
+
 static void
 grSelectBoard(void *vp)
 {
