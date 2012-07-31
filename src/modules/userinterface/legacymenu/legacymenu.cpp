@@ -539,7 +539,6 @@ void LegacyMenu::shutDownSound() {
     if (_bfGraphicsState & eCarsLoaded) {
         _piSoundEngine->shutdownSound();
     }
-    std::cout <<"there " << std::endl;
 }
 
 void LegacyMenu::unloadCarsGraphics() {
