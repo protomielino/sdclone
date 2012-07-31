@@ -18,7 +18,6 @@
 
 #include <string>
 #include <sstream>
-#include <iostream>
 
 #include <iraceengine.h>
 #include <igraphicsengine.h>
@@ -534,12 +533,10 @@ void LegacyMenu::redrawGraphicsView(struct Situation* pSituation) {
 }
 
 void LegacyMenu::shutDownSound() {
-    std::cout <<"there " << std::endl;
     if (!_piSoundEngine)
         return;
 
     if (_bfGraphicsState & eCarsLoaded) {
-std::cout <<"there " << std::endl;
         _piSoundEngine->shutdownSound();
     }
     std::cout <<"there " << std::endl;
