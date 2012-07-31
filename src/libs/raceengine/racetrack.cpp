@@ -233,7 +233,7 @@ reTrackInitTimeOfDay(void)
 		case RM_IND_TIME_NIGHT:
 			trackLocal->timeofday = 0 * 3600 + 0 * 60 + 0; // Midnight = 00:00:00
 			break;
-					
+		case RM_IND_TIME_REAL:					
 		case RM_IND_TIME_NOW:
 		{
 			time_t t = time(0);
