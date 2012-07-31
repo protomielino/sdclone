@@ -66,10 +66,6 @@
    email: matumoto@math.keio.ac.jp
 */
 
-#ifdef HAVE_CONFIG_H
-#  include <simgear_config.h>
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>         // for random(), srandom()
 #include <time.h>           // for time() to seed srandom()        
@@ -91,6 +87,7 @@ static int initf = 0;
 static unsigned long *next;
 
 /* initializes state[N] with a seed */
+
 void init_genrand(unsigned long s)
 {
     int j;
@@ -129,27 +126,35 @@ static void next_state(void)
 
 // Seed the random number generater with time() so we don't see the
 // same sequence every time
-void sg_srandom_time() {
+
+void sg_srandom_time() 
+{
     init_genrand(time(NULL));
 }
 
 // Seed the random number generater with time() in 10 minute intervals
 // so we get the same sequence within 10 minutes interval.
 // This is useful for synchronizing two display systems.
-void sg_srandom_time_10() {
+
+void sg_srandom_time_10() 
+{
     init_genrand(time(NULL) / 600);
 }
 
 
 // Seed the random number generater with your own seed so can set up
 // repeatable randomization.
-void sg_srandom( unsigned int seed ) {
+
+void sg_srandom( unsigned int seed ) 
+{
     init_genrand( seed );
 }
 
 
 // return a random number between [0.0, 1.0)
-double sg_random() {
+
+double sg_random() 
+{
     unsigned long y;
 
     if (--left == 0)

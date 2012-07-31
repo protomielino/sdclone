@@ -74,7 +74,7 @@ LegacyMenu& LegacyMenu::self() {
 }
 
 LegacyMenu::LegacyMenu(const std::string& strShLibName, void* hShLibHandle)
-: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0), _piGraphicsEngine(0),
+: GfModule(strShLibName, hShLibHandle), _piRaceEngine(0), _piGraphicsEngine(0), _piSoundEngine(0),
 _hscrReUpdateStateHook(0), _hscrGame(0), _bfGraphicsState(0) {
 }
 
