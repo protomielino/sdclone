@@ -156,7 +156,7 @@ void grInitSound(tSituation* s, int ncars)
 
 
 void 
-grShutdownSound(int ncars)
+grShutdownSound()
 {
     GfLogInfo("Shutting down sound engine\n");
 

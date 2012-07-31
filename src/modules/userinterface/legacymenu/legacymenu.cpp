@@ -18,6 +18,7 @@
 
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include <iraceengine.h>
 #include <igraphicsengine.h>
@@ -162,6 +163,7 @@ void LegacyMenu::quit() {
 void LegacyMenu::shutdown() {
     // Shutdown graphics in case relevant and not already done.
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
+	shutDownSound();
         unloadCarsGraphics();
         shutdownGraphicsView();
         unloadTrackGraphics();
@@ -330,8 +332,8 @@ void LegacyMenu::onRaceInterrupted() {
 
 void LegacyMenu::onRaceFinishing() {
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
+ 	shutDownSound();
         unloadCarsGraphics();
-        _piSoundEngine->shutdownSound(_piRaceEngine->outData()->s);
         shutdownGraphicsView();
         unloadTrackGraphics();
         RmScreenShutdown();
@@ -529,6 +531,18 @@ void LegacyMenu::redrawGraphicsView(struct Situation* pSituation) {
     _piGraphicsEngine->redrawView(pSituation);
     _piSoundEngine->refreshSound(pSituation,_piGraphicsEngine->getCurCam());
     
+}
+
+void LegacyMenu::shutDownSound() {
+    std::cout <<"there " << std::endl;
+    if (!_piSoundEngine)
+        return;
+
+    if (_bfGraphicsState & eCarsLoaded) {
+std::cout <<"there " << std::endl;
+        _piSoundEngine->shutdownSound();
+    }
+    std::cout <<"there " << std::endl;
 }
 
 void LegacyMenu::unloadCarsGraphics() {

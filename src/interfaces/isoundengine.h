@@ -36,7 +36,7 @@ public:
  
  	//virtual void mute(bool bOn = true) = 0;
 	virtual void initSound(struct Situation* s) = 0;
-	virtual void shutdownSound(struct Situation* s) = 0;
+	virtual void shutdownSound() = 0;
 	virtual void refreshSound(struct Situation *s, SoundCam *camera) = 0;
 	virtual void mute(bool bOn = true) = 0;
 };

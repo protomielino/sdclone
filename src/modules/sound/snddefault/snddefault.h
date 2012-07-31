@@ -34,7 +34,7 @@ class ssgLoaderOptions;
 
 // DLL exported symbols declarator for Windows.
 #ifdef WIN32
-# ifdef SNDDEFAULTDLL
+# ifdef SNDDEFAULT_DLL
 #  define SNDDEFAULT_API __declspec(dllexport)
 # else
 #  define SNDDEFAULT_API __declspec(dllimport)
@@ -55,7 +55,7 @@ class SNDDEFAULT_API sndDefault : public GfModule, public ISoundEngine
  public:
 
 	virtual void initSound(Situation* s);
-        virtual void shutdownSound(Situation* s);
+        virtual void shutdownSound();
         virtual void refreshSound(Situation *s, SoundCam*camera);
         virtual void mute(bool bOn = true);
 

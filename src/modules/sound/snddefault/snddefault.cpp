@@ -72,8 +72,8 @@ sndDefault::~sndDefault()
 void sndDefault::initSound(Situation* s){
     grInitSound(s,s->_ncars);
 }
-void sndDefault::shutdownSound(Situation* s){
-    grShutdownSound(s->_ncars);
+void sndDefault::shutdownSound(){
+    grShutdownSound();
 }
 void sndDefault::refreshSound(Situation *s, SoundCam	*camera){
     grRefreshSound(s, camera);

@@ -26,7 +26,7 @@
 class cGrCamera;	//Declared in ""grcam.h"
 
 extern void grInitSound(tSituation* s, int ncars);
-extern void grShutdownSound(int ncars);
+extern void grShutdownSound();
 extern void grRefreshSound(tSituation *s, SoundCam *camera);
 extern void grMuteSound(bool bOn = true);
 
