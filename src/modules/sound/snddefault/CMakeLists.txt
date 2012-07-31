@@ -19,7 +19,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
-    ADD_DEFINITIONS(-DSNDEFAULT_DLL)
+    ADD_DEFINITIONS(-DSNDDEFAULT_DLL)
 
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
