@@ -16,6 +16,9 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
+
+#include "celestialbody.h"
+#include "star.h"
  
 void ePhCelestialBody::updatePosition(double mjd, ePhStar *ourSun)
 {

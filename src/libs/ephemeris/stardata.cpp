@@ -45,7 +45,7 @@ bool ePhStarData::load( const char *path )
     	FILE * f;
   	double ra, dec, mag;
 	
-    	string name;
+    	char name;
 
   	f = fopen (path, "r");
   	if (f == NULL)
@@ -56,7 +56,7 @@ bool ePhStarData::load( const char *path )
    	{
     		for (i = 0; i < num; i++)
     		{
-     			fscanf (f, "%s %f %f %f ", &name, &ra, &dec, &mag);
+     			fscanf (f, "%s %lf %lf %lf ", &name, &ra, &dec, &mag);
      			_stars.push_back(SGVec3d(ra, dec, mag));
      		}
 
