@@ -17,6 +17,7 @@ ADD_SDL_INCLUDEDIR()
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DEPHEMERIS_DLL)
+    ADD_DEFINITIONS(-DNOMINMAX)
     
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
@@ -31,6 +32,8 @@ ADD_LIBRARY(ephemeris SHARED ${EPHEMERIS_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(raceengine PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+
+ADD_PLIB_LIBRARY(ephemeris ul sg)
 
 IF(WIN32)
     SD_INSTALL_FILES(BIN TARGETS ephemeris)
