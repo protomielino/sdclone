@@ -275,9 +275,15 @@ void ReSituationUpdater::runOneStep(double deltaTimeIncrement)
 			s->accelTime = 24 * 3600 * s->currentTime / s->_totTime;
 		} else {
 			// Scaled on Number of Laps that the lead driver has completed
-			if (s->cars[0]->_laps > 0 && s->cars[0]->_laps <= s->_totLaps)
-				s->accelTime = 24 * 3600 * (s->cars[0]->_laps - 1 + (s->cars[0]->_distFromStartLine / pCurrReInfo->track->length)) / s->_totLaps;
-			else
+			if (s->cars[0]->_laps > 0 && s->cars[0]->_laps <= s->_totLaps) {
+				// prevent issues if lead driver crosses line the wrong way
+				if (pCurrReInfo->raceEngineInfo.carInfo->lapFlag)
+					s->accelTime = s->cars[0]->_laps - 1;
+				else
+					s->accelTime = s->cars[0]->_laps - 1 + (s->cars[0]->_distFromStartLine / pCurrReInfo->track->length);
+
+				s->accelTime = 24 * 3600 * s->accelTime / s->_totLaps;
+			} else
 				s->accelTime = 0;
 		}
 	} else
