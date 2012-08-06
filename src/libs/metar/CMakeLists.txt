@@ -23,6 +23,8 @@ ADD_LIBRARY(metar SHARED ${METAR_SOURCES})
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(learning PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
+ADD_PLIB_LIBRARY(metar)
+
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS metar)
 ELSE(WIN32)
