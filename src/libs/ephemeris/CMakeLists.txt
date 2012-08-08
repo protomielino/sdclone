@@ -15,13 +15,17 @@ ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 
 IF(WIN32)
+    # What for ? Comment please !
+    ADD_DEFINITIONS(-DNOMINMAX)
+
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DEPHEMERIS_DLL)
-    ADD_DEFINITIONS(-DNOMINMAX)
+ENDIF(WIN32)
     
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 # Disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -31,7 +35,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 ADD_LIBRARY(ephemeris SHARED ${EPHEMERIS_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
-#SET_TARGET_PROPERTIES(raceengine PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+#SET_TARGET_PROPERTIES(ephemeris PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_PLIB_LIBRARY(ephemeris ul sg)
 

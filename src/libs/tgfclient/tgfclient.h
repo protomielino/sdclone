@@ -782,7 +782,7 @@ class TGFCLIENT_API GfuiApplication : public GfApplication
 
 
 //! Shortcut to the application singleton.
-inline TGFCLIENT_API GfuiApplication& GfuiApp()
+inline GfuiApplication& GfuiApp()
 {
 	return dynamic_cast<GfuiApplication&>(GfApplication::self());
 }

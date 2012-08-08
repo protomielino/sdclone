@@ -23,6 +23,9 @@
 #include <cstdlib>
 #include <cstring>
 
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #ifdef _MSC_VER
 #include <direct.h>
 #include <process.h>
@@ -41,9 +44,18 @@
 #include <config.h>
 #endif
 
+// Missing isnan (for Apple).
+#ifndef HAVE_ISNAN
+
+#ifndef isnan
+#define isnan(x) ((x) != (x))
+#endif
+
+#endif
+
 // Missing strndup, define it here (for FreeBSD).
-// TODO: Move it into library.
-// strndup code provided by Thierry Thomas.
+// TODO: Move it into a library !
+// Code provided by Thierry Thomas.
 #ifndef HAVE_STRNDUP
 
 static char *strndup(const char *str, int len)
@@ -61,12 +73,35 @@ static char *strndup(const char *str, int len)
 	return ret;
 }
 
-#endif
+#endif // HAVE_STRNDUP
+
+// Missing strtok_r, define it here (for MinGW).
+// TODO: Move it into a library !
+// Code provided by Charlie Gordon http://bytes.com/topic/c/answers/708293-strtok-strtok_r.
+#ifndef HAVE_STRTOK_R
+static char *strtok_r(char *str, const char *delim, char **nextp)
+{
+	char *ret;
+
+	if (!str)
+		str = *nextp;
+	str += strspn(str, delim);
+	if (*str == '\0')
+		return 0;
+	ret = str;
+	str += strcspn(str, delim);
+	if (*str)
+		*str++ = '\0';
+	*nextp = str;
+	return ret;
+}
+#endif // HAVE_STRTOK_R
+
 
 // Apple platform ---------------------------------------------------
 #ifdef __APPLE__
 
-#define isnan(x) ((x) != (x))
+// Nothing special for the moment.
 
 #endif
 
@@ -147,9 +182,12 @@ static char *strndup(const char *str, int len)
 
 #endif // _MSC_VER >= 1400
 
+// TODO: Remove this, now useless (see above, cmath included).
 // Constants from cmath / math.h
 // Note: Defining _USE_MATH_DEFINES before including cmath / math.h
 //       normally defines them, but it is not very handy.
+#ifndef M_PI
+
 #define M_E        2.71828182845904523536
 #define M_LOG2E    1.44269504088896340736
 #define M_LOG10E   0.434294481903251827651
@@ -164,7 +202,16 @@ static char *strndup(const char *str, int len)
 #define M_SQRT2    1.41421356237309504880
 #define M_SQRT1_2  0.707106781186547524401
 
+#endif
+
 #endif // _MSC_VER
+
+// MinGW compiler ---------------------------------------------------
+#ifdef __MINGW32__
+
+#define isnan(x) ((x) != (x))
+
+#endif
 
 #endif // _SD_PORTABILITY_H_
 

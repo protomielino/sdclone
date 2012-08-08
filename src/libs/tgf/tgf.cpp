@@ -31,6 +31,10 @@
 #include <cmath>
 #include <cstring>
 
+#ifdef __MINGW32__
+#include <fstream> // std::fstream
+#endif
+
 #include <SDL.h>
 
 #include <portability.h>
@@ -446,7 +450,7 @@ void GfInit(void)
 
 	// Initialize random generator.
 	srand((unsigned)time(NULL));
-	
+
 	// Initialize SDL and useful subsystems (some others may be initialized in tgfclient).
 	if (SDL_Init(SDL_INIT_TIMER) < 0)
 		GfLogFatal("Couldn't initialize SDL(timer) (%s)\n", SDL_GetError());

@@ -23,15 +23,11 @@
 */
 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
 #include <ctype.h>
-#include <cstring>
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
-
-#include <math.h>
 
 #include "portability.h"
 

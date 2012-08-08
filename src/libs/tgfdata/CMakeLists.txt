@@ -14,10 +14,12 @@ SET(TGFDATA_SOURCES tgfdata.cpp cars.cpp tracks.cpp racemanagers.cpp race.cpp dr
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DTGFDATA_DLL)
-	
+ENDIF(WIN32)
+    
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 # Disable developer warning
 IF (COMMAND CMAKE_POLICY)

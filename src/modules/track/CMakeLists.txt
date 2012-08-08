@@ -10,19 +10,21 @@ ADD_SDLIB_INCLUDEDIR(math tgf portability robottools)
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DTRACK_DLL)
+ENDIF(WIN32)
 
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 ADD_LIBRARY(track SHARED ${TRACK_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(track PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(track PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
 ADD_PLIB_LIBRARY(track ul sg)
 ADD_SDLIB_LIBRARY(track tgf robottools)

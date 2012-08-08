@@ -280,7 +280,7 @@ class TGF_API GfApplication
 };
 
 //! Shortcut to the application singleton.
-inline TGF_API GfApplication& GfApp()
+inline GfApplication& GfApp()
 {
 	return GfApplication::self();
 }

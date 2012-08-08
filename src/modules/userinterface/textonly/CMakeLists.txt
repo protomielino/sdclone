@@ -12,10 +12,12 @@ ADD_ENET_INCLUDEDIR()
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DTEXTONLY_DLL)
+ENDIF(WIN32)
     
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 # Disable developer warning
 IF(COMMAND CMAKE_POLICY)
@@ -27,9 +29,9 @@ ADD_LIBRARY(textonly SHARED ${_SOURCES})
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(textonly PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(textonly PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
 ADD_SDLIB_LIBRARY(textonly tgf tgfclient tgfdata networking)
 

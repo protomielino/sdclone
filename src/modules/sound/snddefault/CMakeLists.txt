@@ -10,6 +10,7 @@ SET(SNDDEFAULT_SOURCES  snddefault.cpp snddefault.h
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
+ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 ADD_OPENAL_INCLUDEDIR()
 
@@ -20,19 +21,21 @@ ENDIF(COMMAND CMAKE_POLICY)
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DSNDDEFAULT_DLL)
+ENDIF(WIN32)
 
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 ADD_LIBRARY(snddefault SHARED ${SNDDEFAULT_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
-#SET_TARGET_PROPERTIES(ssggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+#SET_TARGET_PROPERTIES(snddefault PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(snddefault PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
 ADD_PLIB_LIBRARY(snddefault ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(snddefault)

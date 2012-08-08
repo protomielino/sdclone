@@ -15,8 +15,9 @@ II - Linux Installation from sources
 
 III - Windows Installation from sources
 
-  1 - CMake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) on Windows XP 32
-  2 - MS VC++ 6 no more supported
+  1 - CMake and MinGW under Windows
+  2 - CMake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) under Windows
+  3 - MS VC++ 6 : no more supported
 
 IV - FreeBSD Installation from sources (Work in progress)
 
@@ -34,14 +35,14 @@ I - Pre-requisites
 - OpenAL soft 1.5 / 1.6 / 1.11 / 1.14 (http://connect.creativelabs.com/openal)
    (Torcs modified 0.0.8 from www.torcs.org also used to work in the past).
 - ENet 1.3.2/4 (http://enet.bespin.org)
-  Linux: Be carefull to compile ENet with -fPIC on AMD64 if you run a 64 bit build.
+  Linux: Be careful to compile ENet with -fPIC on AMD64 if you run a 64 bit build.
 - Expat 2 (can be skipped for the moment, but won't anymore soon)
 - Free Solid 2 (optional for the moment, will soon get mandatory)
 - libpng
 - zlib
 - jpeg 
 
-WARNING: On Windows, be carefull to compile anything for multi-threaded DLL integration (/MD)
+WARNING: Under Windows, be carefull to compile anything for multi-threaded DLL integration (/MD[d])
 
 
 II - Linux installation from sources
@@ -271,22 +272,123 @@ The Speed Dreams Team.
 II - Windows installation from sources
 ---------------------------------------
 
-1) Cmake and MinGW : We want it ! Who can help us in this MinGW porting work :-?
+Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wight be needed for newer / wider versions.
+
+0) Initial steps, common to all build methods
+
+  a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
+  b.  Download the official Speed Dreams tarballs from SF.net
+        http://sourceforge.net/projects/speed-dreams/files/2.0.0
+      (speed-dreams-src-<package>-<version>.tar.xz)
+	  Note: See below if you want to do it from SVN, in order to get the latest changes ...
+  c.  Extract their contents to your local disk (7Zip is an excellent tool for that),
+      all in the same target folder.
+      Warning: You need to extract all of the source packages in order to start building
+               (see ablove 2-a chapter for more).
+
+1) Cmake and MinGW :
+
+  Work-in-progress ...
+
+  Tested with success for :
+    - CMake 2.8.3 + MinGW shipped with Nokia Qt Creator 2.4.1 (gcc 4.4.0)
+    - CMake 2.8.8 + MinGW shipped with Nokia Qt Creator 2.4.1 (gcc 4.4.0)
+    - CMake 2.8.2 + MinGW 2012 April (gcc 4.7.0)
+    - CMake 2.8.8 + MinGW 2012 April (gcc 4.7.0)
+
+  d.  Install MinGW and MSYS 
+
+     Following the instructions of http://www.mingw.org/wiki/Getting_Started
+     (example here for the official release of 2012, April, featuring gcc 4.7.0) :
+
+     * Download and run the latest mingw-get-inst version from 
+        https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
+        => mingw-get-inst-20120426.exe
+     * Select the directory where to install MinGW, remembering the advice
+       that the path to this directory should not contain any spaces.
+       => C:\MinGW
+     * Select the minimal set of components to install :
+       * C++ compiler
+       * MSYS.
+
+     * Run MSYS, the MinGW Shell (bash) :
+       Start Menu / Programs / MinGW / MinGW Shell
+
+       Note: PATH is already configured for using all useful tools
+             (try the command "echo $PATH")
+
+     * Optional but usefull additional components :
+       * rxvt (a Linux-like terminal) : mingw-get install msys-rxvt
+         - customize rxvt terminal : in C:\MinGW\MSYS\1.0\msys.bat, line 98 : "start %WD%rxvt ...",
+           . -geometry 120x40
+           . -sl 9999
+         - change MSYS Shell shortcut command : msys.bat --rxvt
+       * vim (text editor for Linux geeks) : mingw-get install msys-vim
+       * patch : mingw-get install msys-patch
+       * xargs and co : mingw-get install msys-findutils
+       * bzip2 : mingw-get install msys-bzip2
+       * xz : mingw-get install msys-xz
+       * diff and co : mingw-get install msys-diffutils
+
+     * Optional tweaks to /etc/profile (C:\MinGW\msys\1.0\etc\profile)
+       * add your usual aliases : alias xx='command'
+       * a nicer prompt : export PS1='\w $ '
+
+     * Direct X 7 SDK for MinGW : Optional for building SD, but mandatory if you want
+       to build yourself the 3rd party libraries SDL, PLib, and OpenAL :
+       * download it from http://alleg.sourceforge.net/files/dx70_min.zip
+       * extract it somewhere on your hard disk (let's say C:\dx7_mingw)
+       * add the following line to /etc/fstab (C:\MinGW\msys\1.0\etc\fstab)
+         C:\dx7_mingw /dxsdk # DX7 SDK for compiling SDL, PLib, OpenAL
+
+       Note: The other newer versions from http://alleg.sourceforge.net/files didn't work for me.
+
+     Another solution (tested with success) :
+      * MinGW itself : You can use the one shipped with Nokia Qt Creator
+        (Release 2.4.1 worked for me)
+      * MSYS :
+  	  	- download and install the latest 1.0.x through the MinGW installer
+            https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
+        - add a /mingw mount point to the fstab in order MSYS knows where MinGW is installed
+          (inside Qt Creator folders) :
+          ex: add a "c:/Qt/qtcreator-2.4.1/mingw /mingw" line to /etc/fstab
+      * Qt creator is a full-fledged IDE, making you able to :
+        - open your SD "project" (equivalent to a MSVC "solution")
+          by simply opening the master CMakeLists.txt in Qt Creator,
+        - run CMake after specifying the needed options (see below),
+        - make and install SD,
+        - and everything you expect from a modern IDE (MSVC 2005 is not one ;-)
+        all of the above through the GUI.
+      * But you'll have to build yourself your 3rd party package for this (older) GCC version
+
+     Last minute news : It seems that Nokia no more ships MinGW with it's QtCreator IDE,
+      but let you use the one you like ... see Nokia's HOWTO pages.
+
+  e.  Download the "MinGW 4.7.0" release of the Speed Dreams "3rdParty" binary package from SF.net
+        http://sourceforge.net/projects/speed-dreams/files/3rd%20party
+      (it contains necessary 3rd party libs compiled with/for MinGW 4.7.0)
+
+  f.  Extract it to the /usr/local folder :
+      From the MinGW Shell :
+      $ cd /usr
+      $ tar xvfz .../3rdParty-2.1-win32-mingw470-g-O2.tar.gz
+
+  g.  Run CMake to configure the build (here we assume CMake 2.8, but newer versions should work) :
+
+      $ cd /path/to/sd/sources/trunk
+      $ mkdir build
+      $ cd build
+      $ /c/Program\ Files/CMake\ 2.8/bin/cmake -G "MSYS Makefiles" -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_PREFIX_PATH:STRING=/usr/local -DCMAKE_BUILD_TYPE:STRING=Release ..
+      $ make # -j2 or even -j4 if you own a dual/quad-core CPU
+      $ make install
+
+      Note: This 'Release' build gives you -O3-optimised binaries.
 
 2) Cmake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) on Windows XP 32
 
 Note: If you use an "Express" version, don't forget to install also the Windows SDK.
 
-  a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
-  b.  Download the official tarballs from SF.net
-        http://sourceforge.net/projects/speed-dreams/files/2.0.0
-      (speed-dreams-src-<package>-<version>.tar.xz)
-	  Note: See below if you want to do it from SVN ...
-  c.  Extract their contents to your local disk (7Zip is an excellent tool for that),
-      all in the same target folder.
-      Warning: You need to extract all of the source packages in order to start building
-               (see ablove 2-a chapter for more).
-  d.  Download the "MSVC 2005 / 2.0.0-or-earlier" release of the "3rdParty" package on SF.net
+  d.  Download the "MSVC 2005 / 2.0.0-or-earlier" release of the "3rdParty" binary package from SF.net
         http://sourceforge.net/projects/speed-dreams/files/3rd%20party
       (it contains necessary 3rd party libs compiled with/for MSVC 2005)
   e.  Extract from the zip file the "3rdParty" directory to where speed-dreams sources

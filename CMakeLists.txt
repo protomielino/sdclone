@@ -6,10 +6,11 @@ PROJECT(speed-dreams-2)
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
 
-# Pre-built 3rd Party under Windows.
-IF(WIN32)
+# Special 3rd Party handling for MS compilers.
+IF(MSVC)
 	INCLUDE(Find3rdPartyDependencies)
-ENDIF(WIN32)
+	SD_FIND_3RDPARTY()
+ENDIF(MSVC)
 
 CHECK_HEADERS_H()
 CHECK_FUNCTIONS()
@@ -21,6 +22,7 @@ CHECK_PACKAGES()
 SET(NEXT_LESSER_VERSION 0) # The next lesser version
 SET(NEXT_MAJOR_MINOR_VERSION "2.1") # Next major.minor version
 
+SET(OPTION_AUTOVERSION Off)
 IF(NOT OPTION_AUTOVERSION)
 	
 	SET(VERSION "${NEXT_MAJOR_MINOR_VERSION}-dev")
@@ -124,27 +126,19 @@ ADD_SUBDIRECTORY(cmake)
 INSTALL_SD_CMAKE()
 
 # Generate a 'make clobber'-like clobber.sh/.bat script in case of an in-source build.
-SD_GENERATE_CLOBBER_SCRIPT()
+IF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
+	SD_GENERATE_CLOBBER_SCRIPT()
+ENDIF("${PROJECT_SOURCE_DIR}" STREQUAL "${PROJECT_BINARY_DIR}")
 
 # Add an unistall target.
 CONFIGURE_FILE("${CMAKE_CURRENT_SOURCE_DIR}/cmake/uninstall.cmake" 
                "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" IMMEDIATE @ONLY)
-IF(WIN32)
-	ADD_CUSTOM_TARGET(UNINSTALL "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
-ELSE(WIN32)
-	ADD_CUSTOM_TARGET(uninstall "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
-ENDIF(WIN32)
-
-# Ensure system run-time libs are installed under Windows (MSVC*80.dll and co.).
-# We do it ourselves, but use InstallRequiredSystemLibraries to figure out what they are
-IF(WIN32)
-	SET(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS_SKIP TRUE)
-	INCLUDE(InstallRequiredSystemLibraries)
-	IF(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-		INSTALL(PROGRAMS ${CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS} 
-		        DESTINATION ${SD_BINDIR_ABS})
-	ENDIF(CMAKE_INSTALL_SYSTEM_RUNTIME_LIBS)
-ENDIF(WIN32)
+IF(MSVC)
+	SET(_UNINST_TGT_NAME "UNINSTALL")
+ELSE(MSVC)
+	SET(_UNINST_TGT_NAME "uninstall")
+ENDIF(MSVC)
+ADD_CUSTOM_TARGET(${_UNINST_TGT_NAME} "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake" )
 
 # Configure CPack.
 INCLUDE(cmake/packagemaker.cmake)

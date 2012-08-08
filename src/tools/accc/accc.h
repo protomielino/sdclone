@@ -176,7 +176,6 @@ double  findDistmin(ob_t * ob1, ob_t *ob2);
 #else
 #include <windows.h>
 #include <float.h>
-#define isnan _isnan
 #endif
 
 

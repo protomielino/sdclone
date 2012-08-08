@@ -20,14 +20,14 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(math tgf robottools portability)
 
 IF(WIN32)
-
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DSIMUV30_DLL)
+ENDIF(WIN32)
 
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 ADD_LIBRARY(simuv3 SHARED ${_SOURCES})
 
@@ -38,8 +38,8 @@ ADD_SOLID_LIBRARY(simuv3) # Ignored if not OPTION_3RDPARTY_SOLID
 
 ADD_SDLIB_LIBRARY(simuv3 tgf robottools solid) # solid ignored if OPTION_3RDPARTY_SOLID
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(simuv3 PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
 SD_INSTALL_FILES(LIB modules/simu TARGETS simuv3)

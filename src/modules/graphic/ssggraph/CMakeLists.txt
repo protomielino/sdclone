@@ -19,6 +19,7 @@ SET(SSGGRAPH_SOURCES grMoonpos.h grMoonpos.cpp
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
+ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 ADD_OPENAL_INCLUDEDIR()
 
@@ -29,19 +30,21 @@ ENDIF(COMMAND CMAKE_POLICY)
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DSSGGRAPH_DLL)
-
-    # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
-    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(WIN32)
+
+IF(MSVC)
+   # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
+    SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
+ENDIF(MSVC)
 
 ADD_LIBRARY(ssggraph SHARED ${SSGGRAPH_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(ssggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(ssggraph PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
 ADD_PLIB_LIBRARY(ssggraph ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(ssggraph)

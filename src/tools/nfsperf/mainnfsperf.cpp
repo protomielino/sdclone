@@ -23,7 +23,6 @@
 #endif
 
 #include <cstdio>
-#include <cstdlib>
 
 #ifndef WIN32
 #include <getopt.h>

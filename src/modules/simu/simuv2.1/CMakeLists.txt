@@ -33,13 +33,14 @@ IF(FALSE AND NOT OPTION_3RDPARTY_SOLID)
 ENDIF(FALSE AND NOT OPTION_3RDPARTY_SOLID)
 
 IF(WIN32)
-
 	# DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DSIMUV21_DLL)
+ENDIF(WIN32)
 
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 SET(SIMU_SOURCES aero.cpp axle.cpp brake.cpp car.cpp categories.cpp
                  collide.cpp differential.cpp engine.cpp simu.cpp
@@ -67,9 +68,9 @@ ADD_LIBRARY(simuv2.1 SHARED ${SIMU_SOURCES})
 ADD_SOLID_LIBRARY(simuv2.1) # Ignored if not OPTION_3RDPARTY_SOLID
 ADD_SDLIB_LIBRARY(simuv2.1 tgf robottools solid) # solid ignored if not OPTION_3RDPARTY_SOLID
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(simuv2.1 PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
 SD_INSTALL_FILES(LIB modules/simu TARGETS simuv2.1)
 

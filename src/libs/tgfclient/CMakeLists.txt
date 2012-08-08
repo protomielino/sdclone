@@ -25,13 +25,15 @@ ENDIF(COMMAND CMAKE_POLICY)
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DTGFCLIENT_DLL)
-
+ENDIF(WIN32)
+    
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG 
         "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmt.lib")
     SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE 
         "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
 

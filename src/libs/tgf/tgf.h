@@ -26,6 +26,9 @@
 #define __TGF__H__
 
 #include <cstdio>
+#ifdef __MINGW32__
+# include <climits>
+#endif
 
 #include "osspec.h"
 

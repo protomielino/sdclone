@@ -729,7 +729,7 @@ windowsGetOSInfo(int* pnMajor, int* pnMinor, int* pnBits)
 
     // Include build number.
     char buf[80];
-    sprintf(buf, " (build %d)", osvi.dwBuildNumber);
+    sprintf(buf, " (build %ld)", osvi.dwBuildNumber);
     strcat(pszVerSionString, buf);
 
     if (osvi.dwMajorVersion >= 6)
@@ -829,7 +829,7 @@ windowsSetThreadAffinity(int nCPUId)
 		// Affinity on a specified CPU => compute its mask (1 bit in the "system" mask).
 		int nCPUIndex = -1;
 		int nBitIndex = 0;
-		while (nBitIndex < sizeof(nSystemMask)*8 && nCPUIndex < nCPUId)
+		while (nBitIndex < (int)sizeof(nSystemMask)*8 && nCPUIndex < nCPUId)
 		{
 			if (nSystemMask & 1)
 				nCPUIndex++;

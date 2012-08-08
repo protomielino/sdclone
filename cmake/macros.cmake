@@ -200,6 +200,7 @@ MACRO(GENERATE_ROBOT_DEF_FILE ROBOTNAME DEF_FILE)
   ENDFOREACH(SYMBOL ${SYMBOLS})
 
   # Generate the .def file
+  SET(ROBOT_NAME "${ROBOTNAME}")
   IF(IN_SOURCETREE)
     CONFIGURE_FILE(${SOURCE_DIR}/cmake/robot_def.cmake ${DEF_FILE})
   ELSE(IN_SOURCETREE)
@@ -259,15 +260,15 @@ MACRO(ROBOT_MODULE)
   ADD_SDLIB_INCLUDEDIR(learning math portability robottools tgf)
   ADD_PLIB_INCLUDEDIR()
 
-  # Generate / add .def file for Windows
-  IF(WIN32)
+  # Generate / add .def file for MSVC compilers.
+  IF(MSVC)
     IF(NOT RBM_HAS_INTERFACE OR NOT RBM_INTERFACE)
       SET(RBM_INTERFACE "LEGACY_MIN")
     ENDIF()
     SET(ROBOT_DEF_FILE ${CMAKE_CURRENT_BINARY_DIR}/${RBM_NAME}_gen.def)
     GENERATE_ROBOT_DEF_FILE(${RBM_NAME} ${ROBOT_DEF_FILE} ${RBM_INTERFACE})
     SET(RBM_SOURCES ${RBM_SOURCES} ${ROBOT_DEF_FILE})
-  ENDIF(WIN32)
+  ENDIF(MSVC)
 
   # Disable developer warning
   IF (COMMAND cmake_policy)
@@ -283,8 +284,11 @@ MACRO(ROBOT_MODULE)
   ADD_LIBRARY(${RBM_NAME} SHARED ${RBM_SOURCES})
 
   # Customize shared library versions and file prefix.
-  IF(UNIX) # Use ldconfig version naming scheme + no "lib" prefix under Linux
+  IF(UNIX OR MINGW) # No "lib" prefix under Linux / MinGW
     SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES PREFIX "") 
+  ENDIF()
+
+  IF(UNIX) # Use ldconfig version naming scheme + no "lib" prefix under Linux
     # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
     #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES VERSION ${RBM_VERSION})
     #SET_TARGET_PROPERTIES(${RBM_NAME} PROPERTIES SOVERSION ${RBM_SOVERSION})
@@ -763,6 +767,9 @@ MACRO(ADD_PLIB_LIBRARY TARGET)
     FOREACH(PLIB_LIB ${ARGN})
       IF(PLIB_LIB STREQUAL "ul")
         SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_UL_LIBRARY})
+        IF(MINGW) # winmm must _follow_ ul in the linker command line (otherwise _timeGetTime undefined).
+          SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} winmm)
+        ENDIF(MINGW)
       ELSEIF(PLIB_LIB STREQUAL "js")
         SET(PLIB_LIBRARIES ${PLIB_LIBRARIES} ${PLIB_JS_LIBRARY})
       ELSEIF(PLIB_LIB STREQUAL "sg")
@@ -1007,7 +1014,6 @@ MACRO(ADD_X11_INCLUDEDIR)
 
   IF(X11_FOUND)
     INCLUDE_DIRECTORIES(${X11_INCLUDE_DIR})
-    MESSAGE(STATUS "INCLUDED ${X11_INCLUDE_DIR}")
   ELSE(X11_FOUND)
     MESSAGE(FATAL_ERROR "Cannot find X11 header files")
   ENDIF(X11_FOUND)
@@ -1112,13 +1118,13 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
   
     SET(OPTION_3RDPARTY_EXPAT true CACHE BOOL "Use 3rd party Expat library rather than bundled TXML")
 
-    # Enable building with 3rd party SOLID library with MSVC, as we ship the binary package,
+    # Enable building with 3rd party SOLID library under Windows, as we ship the binary package,
     # but not under Linux, where FreeSolid seems not to be available by default on most distros.
-    IF(MSVC)
+    IF(WIN32)
       SET(_OPTION_3RDPARTY_SOLID true)
-    ELSE(MSVC)
+    ELSE(WIN32)
       SET(_OPTION_3RDPARTY_SOLID false)
-    ENDIF(MSVC)
+    ENDIF(WIN32)
     SET(OPTION_3RDPARTY_SOLID ${_OPTION_3RDPARTY_SOLID} CACHE BOOL "Use 3rd party SOLID library rather than simu-bundled one")
 
     IF(UNIX)
@@ -1370,22 +1376,22 @@ MACRO(SD_INSTALL_FILES)
     ENDIF()
 
     # Execute xmlversion at install-time to do this registration job.
-    IF(WIN32)
+    GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
+    IF(MSVC)
 
-      # Under Windows, in order to run xmlversion.exe in the build tree,
-      # we have to copy dependencies next to it (txml or Expat, and SDL).
+      # When building with MSVC, in order to run xmlversion.exe in the build tree,
+      # we have to copy all dependencies next to it (tgf, txml or Expat, and SDL).
 	  IF(NOT OPTION_3RDPARTY_EXPAT)
         GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
       ELSE(NOT OPTION_3RDPARTY_EXPAT)
         FIND_PACKAGE(EXPAT)
-        GET_FILENAME_COMPONENT(EXPAT_LIBPATH ${EXPAT_LIBRARY} PATH)
-        GET_FILENAME_COMPONENT(EXPAT_LIBNAME ${EXPAT_LIBRARY} NAME_WE)
+        GET_FILENAME_COMPONENT(EXPAT_LIBPATH "${EXPAT_LIBRARY}" PATH)
+        GET_FILENAME_COMPONENT(EXPAT_LIBNAME "${EXPAT_LIBRARY}" NAME_WE)
         SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
       ENDIF(NOT OPTION_3RDPARTY_EXPAT)
-      GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
       FIND_PACKAGE(SDL)
-      GET_FILENAME_COMPONENT(SDL_LIBPATH ${SDL_LIBRARY} PATH)
-      GET_FILENAME_COMPONENT(SDL_LIBNAME ${SDL_LIBRARY} NAME_WE)
+      GET_FILENAME_COMPONENT(SDL_LIBPATH "${SDL_LIBRARY}" PATH)
+      GET_FILENAME_COMPONENT(SDL_LIBNAME "${SDL_LIBRARY}" NAME_WE)
       SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
       INSTALL(CODE 
@@ -1423,10 +1429,18 @@ MACRO(SD_INSTALL_FILES)
               ENDIF()
            ENDFOREACH()")
 
-    ELSE(WIN32)
+    ELSE(MSVC)
 
-      INSTALL(CODE 
+        INSTALL(CODE 
           "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+           GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
+		   SET(MINGW ${MINGW})
+      	   IF(MINGW)
+		     # When building with MinGW, in order to run xmlversion.exe in the build tree,
+        	 # we have to copy internal dependencies next to it (tgf).
+             SET(TGF_LIB ${TGF_LIB})
+			 FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${TGF_LIB})
+		   ENDIF(MINGW)
            SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
            IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
              GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
@@ -1442,11 +1456,11 @@ MACRO(SD_INSTALL_FILES)
              GET_FILENAME_COMPONENT(FILENAME \${FILE} NAME)
               EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
               IF(XMLVERSTATUS)
-               MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
+               MESSAGE(FATAL_ERROR \"Error: xmlversion failed \$ENV(PATH)\")
               ENDIF(XMLVERSTATUS)
            ENDFOREACH()")
 
-    ENDIF(WIN32)
+    ENDIF(MSVC)
 
   ENDIF(IS_USER)
 
@@ -1542,22 +1556,22 @@ MACRO(SD_INSTALL_DIRECTORIES)
     ENDIF()
 
     # Execute xmlversion at install-time to do this registration job.
-    IF(WIN32)
+    IF(MSVC)
 
-      # Under Windows, in order to run xmlversion.exe in the build tree,
+      # When building with MSVC, in order to run xmlversion.exe in the build tree,
       # we have to copy dependencies next to it (txml or Expat, and SDL).
       IF(NOT OPTION_3RDPARTY_EXPAT)
         GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
       ELSE(NOT OPTION_3RDPARTY_EXPAT)
         FIND_PACKAGE(EXPAT)
-        GET_FILENAME_COMPONENT(EXPAT_LIBPATH ${EXPAT_LIBRARY} PATH)
-        GET_FILENAME_COMPONENT(EXPAT_LIBNAME ${EXPAT_LIBRARY} NAME_WE)
+        GET_FILENAME_COMPONENT(EXPAT_LIBPATH "${EXPAT_LIBRARY}" PATH)
+        GET_FILENAME_COMPONENT(EXPAT_LIBNAME "${EXPAT_LIBRARY}" NAME_WE)
         SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 	  ENDIF(NOT OPTION_3RDPARTY_EXPAT)
       GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
       FIND_PACKAGE(SDL)
-      GET_FILENAME_COMPONENT(SDL_LIBPATH ${SDL_LIBRARY} PATH)
-      GET_FILENAME_COMPONENT(SDL_LIBNAME ${SDL_LIBRARY} NAME_WE)
+      GET_FILENAME_COMPONENT(SDL_LIBPATH "${SDL_LIBRARY}" PATH)
+      GET_FILENAME_COMPONENT(SDL_LIBNAME "${SDL_LIBRARY}" NAME_WE)
       SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
       INSTALL(CODE 
@@ -1604,7 +1618,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
              ENDFOREACH()
            ENDFOREACH()")
 
-    ELSE(WIN32)
+    ELSE(MSVC)
 
       INSTALL(CODE 
           "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
@@ -1636,7 +1650,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
              ENDFOREACH()
            ENDFOREACH()")
 
-    ENDIF(WIN32)
+    ENDIF(MSVC)
 
   ENDIF(IS_USER)
 
@@ -1668,9 +1682,7 @@ ENDIF(IN_SOURCETREE)
 # Generate clobber.sh/bat shell script (remove _any_ build system generated file)
 MACRO(SD_GENERATE_CLOBBER_SCRIPT)
 
-  IF(IN_SOURCETREE)
-  
-    IF(WIN32)
+    IF(MSVC)
   
       SET(TGT_SCRIPT "${SOURCE_DIR}/clobber.bat")
       FILE(WRITE  "${TGT_SCRIPT}" "@echo off\n")
@@ -1727,7 +1739,7 @@ MACRO(SD_GENERATE_CLOBBER_SCRIPT)
       FILE(APPEND "${TGT_SCRIPT}" "\n")
       FILE(APPEND "${TGT_SCRIPT}" ":END\n")
   
-    ELSE(WIN32)
+    ELSE(MSVC)
   
       SET(TGT_SCRIPT "${SOURCE_DIR}/clobber.sh")
       FILE(WRITE  "${TGT_SCRIPT}" "#!/bin/sh\n")
@@ -1768,10 +1780,8 @@ MACRO(SD_GENERATE_CLOBBER_SCRIPT)
       FILE(APPEND "${TGT_SCRIPT}" "  echo \"Bad current dir for that ; please run from the root folder of a CMake-enabled SD source tree.\"\n")
       FILE(APPEND "${TGT_SCRIPT}" "fi\n")
       EXECUTE_PROCESS(COMMAND chmod ugo+x ${TGT_SCRIPT})
-    ENDIF(WIN32)
+    ENDIF(MSVC)
   
-  ENDIF(IN_SOURCETREE)
-
 ENDMACRO(SD_GENERATE_CLOBBER_SCRIPT)
 
 # Add non-default compile options.

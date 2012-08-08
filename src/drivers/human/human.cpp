@@ -37,8 +37,8 @@
 #include <vector>
 #include <string>
 
-#include <portability.h>
 #include <tgfclient.h>
+#include <portability.h>
 #include <robottools.h>	//Rt*
 #include <robot.h>
 #include <playerpref.h>

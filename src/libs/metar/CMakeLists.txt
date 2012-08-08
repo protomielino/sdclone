@@ -9,7 +9,7 @@ SET(METAR_SOURCES mchannel.cpp msocket.cpp mexception.cpp mmetar.cpp
 ADD_SDLIB_INCLUDEDIR(portability math)
 
 # Disable developer warning
-IF (COMMAND CMAKE_POLICY)
+IF(COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
@@ -21,9 +21,10 @@ ENDIF(WIN32)
 ADD_LIBRARY(metar SHARED ${METAR_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
-#SET_TARGET_PROPERTIES(learning PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
+#SET_TARGET_PROPERTIES(metar PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-ADD_PLIB_LIBRARY(metar)
+# This line does nothing : what it really intended ?
+#ADD_PLIB_LIBRARY(metar)
 
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS metar)

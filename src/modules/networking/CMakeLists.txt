@@ -26,13 +26,15 @@ ADD_SDL_LIBRARY(networking)
 
 IF(WIN32)
 	TARGET_LINK_LIBRARIES(networking Winmm ws2_32)
+ENDIF(WIN32)
 
+IF(MSVC)
 	# Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
 	SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG 
 		"${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib /NODEFAULTLIB:libcmt.lib")
 	SET(CMAKE_SHARED_LINKER_FLAGS_RELEASE 
 		"${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 
 ADD_SDLIB_LIBRARY(networking tgf)

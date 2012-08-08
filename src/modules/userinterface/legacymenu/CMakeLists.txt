@@ -6,11 +6,11 @@ SET(MAINSCREENS_SOURCES ${MS}/splash.cpp ${MS}/mainmenu.cpp
                         ${MS}/splash.h ${MS}/mainmenu.h
                         ${MS}/optionsmenu.h ${MS}/creditsmenu.h ${MS}/exitmenu.h)
 
-IF(WIN32)
-	#errno.cpp should only be included under Windows
-	#(it fails to compile when added under Linux)
+IF(MSVC)
+	# errno.cpp should only be included with MSVC
+	# (it fails to compile when added with GCC)
 	SET(MAINSCREENS_SOURCES ${MAINSCREENS_SOURCES} ${MS}/errno.cpp)
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 SET(CS confscreens)
 SET(CONFSCREENS_SOURCES ${CS}/playerconfig.cpp ${CS}/controlconfig.cpp
@@ -55,10 +55,12 @@ ADD_ENET_INCLUDEDIR()
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DLEGACYMENU_DLL)
+ENDIF(WIN32)
     
+IF(MSVC)
     # Ignore some run-time libs to avoid link time warnings and sometimes even crashes.
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
-ENDIF(WIN32)
+ENDIF(MSVC)
 
 # Disable developer warning
 IF(COMMAND CMAKE_POLICY)
@@ -70,14 +72,14 @@ ADD_LIBRARY(legacymenu SHARED ${LEGACYMENU_SOURCES})
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(legacymenu PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
-IF(UNIX)
+IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(legacymenu PROPERTIES PREFIX "")
-ENDIF(UNIX)
+ENDIF(UNIX OR MINGW)
 
-IF(WIN32)
-    # Joystick library
-    TARGET_LINK_LIBRARIES(legacymenu winmm)
-ENDIF(WIN32)
+#IF(WIN32)
+#    # Joystick library
+#    TARGET_LINK_LIBRARIES(legacymenu winmm)
+#ENDIF(WIN32)
 
 ADD_SDLIB_LIBRARY(legacymenu tgf tgfclient tgfdata networking)
 
