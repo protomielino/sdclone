@@ -703,8 +703,14 @@ ReSavePracticeLap(tCarElt *car)
     void	*results = ReInfo->results;
     tReCarInfo	*info = &(ReInfo->_reCarInfo[car->index]);
 
-    snprintf(path, sizeof(path), "%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, ReInfo->_reRaceName, car->_laps - 1);
-    GfParmSetNum(results, path, RE_ATTR_TIME, NULL, (tdble)car->_lastLapTime);
+    if (car->_laps == 1) {
+        /* hack to allow results from practice hillclimb to be recorded (as lap1) */
+        snprintf(path, sizeof(path), "%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, ReInfo->_reRaceName, 1);
+        GfParmSetNum(results, path, RE_ATTR_TIME, NULL, (tdble)car->_curTime);
+    } else {	
+        snprintf(path, sizeof(path), "%s/%s/%s/%d", ReInfo->track->name, RE_SECT_RESULTS, ReInfo->_reRaceName, car->_laps - 1);
+        GfParmSetNum(results, path, RE_ATTR_TIME, NULL, (tdble)car->_lastLapTime);
+    }
     GfParmSetNum(results, path, RE_ATTR_BEST_LAP_TIME, NULL, (tdble)car->_bestLapTime);
     GfParmSetNum(results, path, RE_ATTR_TOP_SPEED, NULL, info->topSpd);
     GfParmSetNum(results, path, RE_ATTR_BOT_SPEED, NULL, info->botSpd);

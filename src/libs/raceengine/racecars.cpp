@@ -545,7 +545,6 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 					car->_currentSector = 0;
 					if (car->_laps > 1) {
 						car->_lastLapTime = s->currentTime - info->sTime;
-						car->_curTime += car->_lastLapTime;
 						if (car->_bestLapTime != 0) {
 							car->_deltaBestLapTime = car->_lastLapTime - car->_bestLapTime;
 						}
@@ -576,6 +575,9 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 									car->_timeBeforeNext = 0;
 							}
 						}
+					}
+					if (car->_laps > 0) {
+						car->_curTime += s->currentTime - info->sTime;
 						
 						if (car->_pos != 1 && s->_raceType == RM_TYPE_RACE) {
 							car->_timeBehindLeader = car->_curTime - s->cars[0]->_curTime;
@@ -589,43 +591,29 @@ ReCarsManageCar(tCarElt *car, bool& bestLapChanged)
 						}
 						
 						info->sTime = (tdble)s->currentTime;
-						switch (ReInfo->s->_raceType) {
+
+						if (ReInfo->s->_raceType == RM_TYPE_PRACTICE && 
+								(car->_laps > 1 || s->_totLaps == 0))
+							ReSavePracticeLap(car);
+					}
+
+					if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
+					{
+						switch(s->_raceType)
+						{
 							case RM_TYPE_PRACTICE:
-								if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1)
-									ReUpdatePracticeCurRes(car, /*forceNew=*/true);
-								/* save the lap result */
-								if (s->_ncars == 1)
-									ReSavePracticeLap(car);
+								ReUpdatePracticeCurRes(car);
 								break;
-				
 							case RM_TYPE_QUALIF:
-								if (ReInfo->_displayMode == RM_DISP_MODE_NONE && s->_ncars <= 1)
-									ReUpdateQualifCurRes(car);
+								ReUpdateQualifCurRes(car);
 								break;
 							case RM_TYPE_RACE:
-								if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
-									ReUpdateRaceCurRes();
+								ReUpdateRaceCurRes();
+								break;
+							default:
 								break;
 						}
-					} else {
-						if (ReInfo->_displayMode == RM_DISP_MODE_NONE)
-						{
-							switch(s->_raceType)
-							{
-								case RM_TYPE_PRACTICE:
-									ReUpdatePracticeCurRes(car);
-									break;
-								case RM_TYPE_QUALIF:
-									ReUpdateQualifCurRes(car);
-									break;
-								case RM_TYPE_RACE:
-									ReUpdateRaceCurRes();
-									break;
-								default:
-									break;
-							}
-						}
-					}	
+					}
 	
 					info->topSpd = car->_speed_x;
 					info->botSpd = car->_speed_x;
