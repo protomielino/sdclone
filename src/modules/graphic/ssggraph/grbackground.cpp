@@ -361,7 +361,7 @@ grInitBackground()
 			default:
 				GfLogWarning("Unsupported rain strength value %d (assuming none)",
 							 grTrack->local.rain);
-				grVisibility = 15000.0;
+				grVisibility = 12000.0;
 				break;
 		}//switch Rain
 		
@@ -372,6 +372,7 @@ grInitBackground()
         const GLfloat fog_exp2_density = sqrt_m_log01 / grVisibility;
 
 		//Setup overall light level according to rain if any
+		
 		grUpdateLight();
 
 		glLightModelfv( GL_LIGHT_MODEL_AMBIENT, Black);
@@ -978,7 +979,8 @@ grUpdateSky(double currentTime, double accelTime)
 void
 grShutdownBackground(void)
 {
-	if (TheSky) {
+	if (TheSky) 
+	{
 		delete TheSky;
 		TheSky = 0;
 	}

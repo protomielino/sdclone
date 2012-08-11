@@ -267,12 +267,6 @@ bool cGrSun::repaint( double sun_angle, double new_visibility )
 		sun_color[1] = 1 - green_scat_f;
 		i_halo_color[1] = 1 - ( 1.1 * green_scat_f );
 		o_halo_color[1] = 1 - ( 1.4 * green_scat_f );
-
-		/*// Green - 546.1 nm
-		float green_scat_f = ( aerosol_factor * path_distance * density_avg ) / 8.8938E+06;
-		sun_color[1] = 1 - green_scat_f;
-		i_halo_color[1] = 1 - ( 1.1 * green_scat_f );
-		o_halo_color[1] = 1 - ( 1.4 * green_scat_f );*/
  
 		// Blue - 435.8 nm
 		float blue_scat_f = ( aerosol_factor * path_distance * density_avg ) / 3.607E+06;
@@ -396,7 +390,7 @@ bool cGrSun::reposition( sgVec3 p, double angle, double rightAscension, double d
         /*if ( env_node )
 		{
 			//env_node->setDoubleValue( "atmosphere/altitude-troposphere-top", r_tropo - r_earth );
-            //env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
+			//env_node->setDoubleValue( "atmosphere/altitude-half-to-sun", alt_half );
 		}*/
     }
 
