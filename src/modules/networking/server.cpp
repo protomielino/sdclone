@@ -145,7 +145,7 @@ bool NetServer::Start(int port)
      #if (ENET_VERSION >= 0x010300)
         m_pServer = enet_host_create (& m_address /* the address to bind the server host to */, 
                                       MAXNETWORKPLAYERS,
-                                      0,     /* assume tha maximum number of channels is allowed*/
+                                      2,     /* assume tha maximum number of channels is allowed*/
                                       0      /* assume any amount of incoming bandwidth */,
                                       0      /* assume any amount of outgoing bandwidth */);
     #else

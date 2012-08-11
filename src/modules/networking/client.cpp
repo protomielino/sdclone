@@ -133,7 +133,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
 #if (ENET_VERSION >= 0x010300)
 	m_pClient = enet_host_create (NULL /* create a client host */,
 								  MAXNETWORKPLAYERS, 
-								  0, /*channel limit*/
+								  2, /*channel limit*/
 								  0/* downstream bandwidth */,
 								  0/* upstream bandwidth */);
 #else
@@ -159,7 +159,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
 #if (ENET_VERSION >= 0x010300)
 	m_pHost = enet_host_create (&caddress /* create a peer host */,
 								MAXNETWORKPLAYERS, 
-								0, /*channel limit*/
+								2, /*channel limit*/
 								0/* downstream bandwidth */,
 								0/* upstream bandwidth */);
 #else
@@ -175,7 +175,7 @@ bool NetClient::ConnectToServer(const char *pAddress,int port, NetDriver *pDrive
 		{
 			caddress.port++;
 #if (ENET_VERSION >= 0x010300)
-			m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0,0);
+			m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,2,0,0);
 #else
 			m_pHost = enet_host_create (&caddress,MAXNETWORKPLAYERS,0,0);
 #endif
