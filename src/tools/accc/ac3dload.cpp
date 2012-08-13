@@ -1160,7 +1160,7 @@ bool isTerrainSplit(ob_t* object)
 /** Go through all given objects, check whether a normal split or a terrain
  *  split is necessary and execute the split.
  */
-void performSplitsOnAllObjs(ob_t** object)
+void splitObjects(ob_t** object)
 {
     if (NULL == object)
         return;
@@ -1264,7 +1264,8 @@ int loadAC(char * inputFilename, char * outputFilename, int saveIn)
     fclose(file);
     root_ob = current_ob;
 
-    performSplitsOnAllObjs(&root_ob);
+    if(splitObjectsDuringLoad != 0)
+        splitObjects(&root_ob);
 
     if (saveIn == -1)
         return (0);
@@ -1355,7 +1356,8 @@ int loadACo(char * inputFilename, char * outputFilename, int saveIn)
     fclose(file);
     root_ob = current_ob;
 
-    performSplitsOnAllObjs(&root_ob);
+    if(splitObjectsDuringLoad != 0)
+        splitObjects(&root_ob);
 
     printf("\nobjects loaded\nresaving in AC3D\n");
     if (saveIn == 0)

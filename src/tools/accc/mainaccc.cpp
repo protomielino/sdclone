@@ -52,6 +52,7 @@ int isobjectacar = 0;
 int extendedTriangles = 0;
 int notexturesplit = 0;
 int collapseObject = 0;
+int splitObjectsDuringLoad = 1;
 int typeConvertion = 0;
 int far_dist = 10000;
 int normalMapping = 0;

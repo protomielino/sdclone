@@ -46,6 +46,7 @@ extern int isobjectacar;
 extern int normalMapping;
 extern char *OrderString;
 extern int collapseObject;
+
 extern void loadAndGroup(char *OutputFileName);
 extern int loadAC(char * inputFilename, char * outputFilename, int saveIn);
 
@@ -159,9 +160,23 @@ typedef struct mat
 
 extern int typeConvertion;
 extern ob_t * root_ob;
+
 extern int terrainSplitOb(ob_t **object);
 extern int mergeSplitted(ob_t **object);
 extern int distSplit;
+/** Whether to split objects during loading, i.e. calls to loadAC() and loadACo().
+ *  The default behavior is to split them during loading
+ *  (splitObjectsDuringLoad != 0). However, in loadAndGroup()
+ *  we want to manually trigger the object splitting, i.e. just after setting up the
+ *  texture channels. In that case the object splitting has to be skipped in loading
+ *  (splitObjectsDuringLoad == 0).
+ */
+extern int splitObjectsDuringLoad;
+/** Go through all given objects, check whether a normal split or a terrain
+ *  split is necessary and execute the split.
+ */
+void splitObjects(ob_t** object);
+
 extern int freeobject(ob_t *o);
 double findDistmin(ob_t * ob1, ob_t *ob2);
 

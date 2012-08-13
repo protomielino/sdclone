@@ -56,6 +56,11 @@ void loadAndGroup(char *OutputFileName)
     double dist = 0;
     int notinsameorder = FALSE;
 
+    /* disable object splitting during load. We split them
+     * after merging the texture channels.
+     */
+    splitObjectsDuringLoad = 0;
+
     if (fileL0)
     {
         fprintf(stderr, "\nloading file %s\n", fileL0);
@@ -92,6 +97,8 @@ void loadAndGroup(char *OutputFileName)
     fprintf(stderr, "\ncollapsing textures\n");
 
     collapseTextures(ob0, ob1, ob2, ob3);
+
+    splitObjects(&ob0);
 
     /* now make groups from ob0 */
 
