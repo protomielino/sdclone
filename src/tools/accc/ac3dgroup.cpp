@@ -37,6 +37,7 @@ extern int printOb(ob_t * ob);
 extern mat_t * root_material;
 extern void smoothTriNorm(ob_t * object);
 void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray);
+void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3);
 void loadAndGroup(char *OutputFileName)
 {
     ob_t * ob0 = NULL;
@@ -89,172 +90,9 @@ void loadAndGroup(char *OutputFileName)
 
     printf("collapsing textures \n");
     fprintf(stderr, "\ncollapsing textures\n");
-    tmpob = ob0;
-    while (tmpob != NULL)
-    {
-        if (tmpob->name == NULL)
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (tmpob->type != NULL)
-            if (!strcmp(tmpob->type, "group"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
 
-        tmpob2 = ob1;
-        while (tmpob2 != NULL)
-        {
-            if (tmpob2->name == NULL)
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "root"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "world"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (tmpob->type != NULL)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob2 = tmpob2->next;
-                    continue;
-                }
-            notinsameorder = FALSE;
-            if (!stricmp(tmpob2->name, tmpob->name)
-                    && tmpob->numvert == tmpob2->numvert)
-            {
-                /* found an ob in ob1 */
-                tmpob->texture1 = tmpob2->texture;
-                tmpob->textarray1 = tmpob2->textarray;
-                tmpob->vertexarray1 = tmpob2->vertexarray;
-                for (i = 0; i < tmpob->numvert; i++)
-                    if (fabs(tmpob->vertex[i].x - tmpob2->vertex[i].x) > MINVAL
-                            || fabs(
-                                    tmpob->vertex[i].y
-                                            - tmpob2->vertex[i].y)>MINVAL ||
-                                            fabs(tmpob->vertex[i].z - tmpob2->vertex[i].z )>MINVAL){
-                            notinsameorder=TRUE;
-                        }
-                if (notinsameorder == TRUE)
-                {
-                    printf(
-                            "%s : points not in the same order, reordering ...\n",
-                            tmpob->name);
-                    reorder(tmpob, tmpob2, tmpob->textarray1,
-                            tmpob->vertexarray1);
-                    printf("%s : reordering ... done\n", tmpob->name);
-                }
-                break;
-            }
-            tmpob2 = tmpob2->next;
-        }
+    collapseTextures(ob0, ob1, ob2, ob3);
 
-        tmpob2 = ob2;
-        while (tmpob2 != NULL)
-        {
-            if (tmpob2->name == NULL)
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "root"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "world"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (tmpob->type != NULL)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob2 = tmpob2->next;
-                    continue;
-                }
-
-            if (!stricmp(tmpob2->name, tmpob->name)
-                    && tmpob->numvert == tmpob2->numvert)
-            {
-                /* found an ob in ob2 */
-                tmpob->texture2 = tmpob2->texture;
-                tmpob->textarray2 = tmpob2->textarray;
-                tmpob->vertexarray2 = tmpob2->vertexarray;
-                break;
-            }
-            tmpob2 = tmpob2->next;
-        }
-
-        tmpob2 = ob3;
-        while (tmpob2 != NULL)
-        {
-            if (tmpob2->name == NULL)
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "root"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "world"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (tmpob->type != NULL)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob2 = tmpob2->next;
-                    continue;
-                }
-            if (!stricmp(tmpob2->name, tmpob->name)
-                    && tmpob->numvert == tmpob2->numvert)
-            {
-                /* found an ob in ob2 */
-                tmpob->texture3 = tmpob2->texture;
-                tmpob->textarray3 = tmpob2->textarray;
-                tmpob->vertexarray3 = tmpob2->vertexarray;
-                if (tmpob->texture3)
-                    for (i = 0; i < tmpob->numvert; i++)
-                    {
-                        if (tmpob->textarray3[i * 2] != tmpob->textarray[i * 2]
-                                || tmpob->textarray3[i * 2 + 1]
-                                        != tmpob->textarray[i * 2 + 1])
-                            printf("name=%s %.2lf!=%.2lf %.2lf!=%.2lf\n",
-                                    tmpob->name, tmpob->textarray[i * 2],
-                                    tmpob->textarray3[i * 2],
-                                    tmpob->textarray[i * 2 + 1],
-                                    tmpob->textarray3[i * 2 + 1]);
-                    }
-
-                break;
-            }
-            tmpob2 = tmpob2->next;
-        }
-        tmpob = tmpob->next;
-    }
     /* now make groups from ob0 */
 
     fprintf(stderr, "making groups\n");
@@ -722,3 +560,180 @@ void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
     return;
 }
 
+/** Match textures from ob1, ob2 and ob3 with ob0. In case a match is found
+ *  add them as additional texture channels in ob0.
+ */
+void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
+{
+    ob_t * tmpob = NULL;
+    ob_t * tmpob2 = NULL;
+    int notinsameorder = FALSE;
+    int i = 0;
+
+    tmpob = ob0;
+    while (tmpob != NULL)
+    {
+        if (tmpob->name == NULL)
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
+        if (!strcmp(tmpob->name, "root"))
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
+        if (!strcmp(tmpob->name, "world"))
+        {
+            tmpob = tmpob->next;
+            continue;
+        }
+        if (tmpob->type != NULL)
+            if (!strcmp(tmpob->type, "group"))
+            {
+                tmpob = tmpob->next;
+                continue;
+            }
+
+        tmpob2 = ob1;
+        while (tmpob2 != NULL)
+        {
+            if (tmpob2->name == NULL)
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (!strcmp(tmpob2->name, "root"))
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (!strcmp(tmpob2->name, "world"))
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (tmpob->type != NULL)
+                if (!strcmp(tmpob->type, "group"))
+                {
+                    tmpob2 = tmpob2->next;
+                    continue;
+                }
+            notinsameorder = FALSE;
+            if (!stricmp(tmpob2->name, tmpob->name)
+                    && tmpob->numvert == tmpob2->numvert)
+            {
+                /* found an ob in ob1 */
+                tmpob->texture1 = tmpob2->texture;
+                tmpob->textarray1 = tmpob2->textarray;
+                tmpob->vertexarray1 = tmpob2->vertexarray;
+                for (i = 0; i < tmpob->numvert; i++)
+                    if (fabs(tmpob->vertex[i].x - tmpob2->vertex[i].x) > MINVAL
+                            || fabs(
+                                    tmpob->vertex[i].y
+                                            - tmpob2->vertex[i].y)>MINVAL ||
+                                            fabs(tmpob->vertex[i].z - tmpob2->vertex[i].z )>MINVAL){
+                            notinsameorder=TRUE;
+                        }
+                if (notinsameorder == TRUE)
+                {
+                    printf(
+                            "%s : points not in the same order, reordering ...\n",
+                            tmpob->name);
+                    reorder(tmpob, tmpob2, tmpob->textarray1,
+                            tmpob->vertexarray1);
+                    printf("%s : reordering ... done\n", tmpob->name);
+                }
+                break;
+            }
+            tmpob2 = tmpob2->next;
+        }
+
+        tmpob2 = ob2;
+        while (tmpob2 != NULL)
+        {
+            if (tmpob2->name == NULL)
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (!strcmp(tmpob2->name, "root"))
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (!strcmp(tmpob2->name, "world"))
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (tmpob->type != NULL)
+                if (!strcmp(tmpob->type, "group"))
+                {
+                    tmpob2 = tmpob2->next;
+                    continue;
+                }
+
+            if (!stricmp(tmpob2->name, tmpob->name)
+                    && tmpob->numvert == tmpob2->numvert)
+            {
+                /* found an ob in ob2 */
+                tmpob->texture2 = tmpob2->texture;
+                tmpob->textarray2 = tmpob2->textarray;
+                tmpob->vertexarray2 = tmpob2->vertexarray;
+                break;
+            }
+            tmpob2 = tmpob2->next;
+        }
+
+        tmpob2 = ob3;
+        while (tmpob2 != NULL)
+        {
+            if (tmpob2->name == NULL)
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (!strcmp(tmpob2->name, "root"))
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (!strcmp(tmpob2->name, "world"))
+            {
+                tmpob2 = tmpob2->next;
+                continue;
+            }
+            if (tmpob->type != NULL)
+                if (!strcmp(tmpob->type, "group"))
+                {
+                    tmpob2 = tmpob2->next;
+                    continue;
+                }
+            if (!stricmp(tmpob2->name, tmpob->name)
+                    && tmpob->numvert == tmpob2->numvert)
+            {
+                /* found an ob in ob2 */
+                tmpob->texture3 = tmpob2->texture;
+                tmpob->textarray3 = tmpob2->textarray;
+                tmpob->vertexarray3 = tmpob2->vertexarray;
+                if (tmpob->texture3)
+                    for (i = 0; i < tmpob->numvert; i++)
+                    {
+                        if (tmpob->textarray3[i * 2] != tmpob->textarray[i * 2]
+                                || tmpob->textarray3[i * 2 + 1]
+                                        != tmpob->textarray[i * 2 + 1])
+                            printf("name=%s %.2lf!=%.2lf %.2lf!=%.2lf\n",
+                                    tmpob->name, tmpob->textarray[i * 2],
+                                    tmpob->textarray3[i * 2],
+                                    tmpob->textarray[i * 2 + 1],
+                                    tmpob->textarray3[i * 2 + 1]);
+                    }
+
+                break;
+            }
+            tmpob2 = tmpob2->next;
+        }
+        tmpob = tmpob->next;
+    }
+}
