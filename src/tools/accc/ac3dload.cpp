@@ -713,9 +713,6 @@ int doKids(char *Line, ob_t *object, mat_t *material)
 {
     char * p;
     int kids;
-    int i=0;
-    int j=0;
-    int needSplit=0;
 
     p=strstr(Line," ");
     if (p==NULL) {
@@ -724,93 +721,38 @@ int doKids(char *Line, ob_t *object, mat_t *material)
     }
     sscanf(p,"%d",&kids);
     if (kids==0) {
-	object->next->vertexarray=(tcoord_t *)	malloc(sizeof(tcoord_t)*numrefstotal);
-	object->next->textarray=(double *)	malloc(sizeof(double)*numrefstotal*2);
-	object->next->surfrefs=(int *)	malloc(sizeof(int)*numrefs);
-	object->next->norm=(point_t*)malloc(sizeof(point_t)*numrefstotal*3);
-	object->next->snorm=(point_t*)malloc(sizeof(point_t)*numrefstotal*3);
-	object->next->attrSurf=attrSurf;
-	object->next->attrMat=attrMat;
-	attrSurf=0x20;
-	memset(object->next->snorm,0,sizeof(point_t )*numrefstotal*3);
-	memset(object->next->norm,0,sizeof(point_t )*numrefstotal*3);
+        object->next->vertexarray=(tcoord_t *)	malloc(sizeof(tcoord_t)*numrefstotal);
+        object->next->textarray=(double *)	malloc(sizeof(double)*numrefstotal*2);
+        object->next->surfrefs=(int *)	malloc(sizeof(int)*numrefs);
+        object->next->norm=(point_t*)malloc(sizeof(point_t)*numrefstotal*3);
+        object->next->snorm=(point_t*)malloc(sizeof(point_t)*numrefstotal*3);
+        object->next->attrSurf=attrSurf;
+        object->next->attrMat=attrMat;
+        attrSurf=0x20;
+        memset(object->next->snorm,0,sizeof(point_t )*numrefstotal*3);
+        memset(object->next->norm,0,sizeof(point_t )*numrefstotal*3);
 
-	memcpy(object->next->vertexarray, tmpva,numrefstotal*sizeof(tcoord_t));
-	memcpy(object->next->textarray, tmptexa,numrefstotal*2*sizeof(double));
-	memcpy(object->next->surfrefs, tmpsurf,numrefs*sizeof(int)); 
-	object->next->numvertice=numvertice;
-	if ( (object->next->name)==NULL) {
-	    object->next->name=(char*)malloc(sizeof(char)+strlen(tmpname)+5);
-	    sprintf(object->next->name,"%s%d",tmpname,tmpIndice);
-	    tmpIndice++;
-	}
-	/* need to split this face in more face if there is common points with different texture */
-	for (i=0; i<numvertice; i++) {
-	    for (j=i+1 ; j<numvertice ; j++) {
-		if (object->next->vertexarray[i].indice == object->next->vertexarray[j].indice ) {
-		    if ( (object->next->vertexarray[i].u != object->next->vertexarray[j].u) ||
-			 (object->next->vertexarray[i].v != object->next->vertexarray[j].v)) {
-			needSplit=1;
-			break;
-		    }
-		}
-	    }
-	}
-	if( (typeConvertion==_AC3DTOAC3DS && (extendedStrips==1 || extendedTriangles==1)) ||
-	    typeConvertion==_AC3DTOAC3DGROUP ||
-	    (typeConvertion==_AC3DTOAC3D && (extendedTriangles==1))) {
-	    printf ("Computing normals for %s \n",object->next->name);
-	    computeObjectTriNorm(object->next );
-	    //smoothObjectTriNorm(object->next );
-	}
-	if ( ((needSplit!=0) && (notexturesplit==0)) || ((notexturesplit==0) && collapseObject)) {
-	    printf ("found in %s , a duplicate coord with not the same u,v, split is required\n",
-		    object->next->name);
-	    splitOb (&object->next);
-	} else {
-	    printf ("No split required for  %s \n",object->next->name);
-	}
+        memcpy(object->next->vertexarray, tmpva,numrefstotal*sizeof(tcoord_t));
+        memcpy(object->next->textarray, tmptexa,numrefstotal*2*sizeof(double));
+        memcpy(object->next->surfrefs, tmpsurf,numrefs*sizeof(int));
+        object->next->numvertice=numvertice;
+        if ( (object->next->name)==NULL) {
+            object->next->name=(char*)malloc(sizeof(char)+strlen(tmpname)+5);
+            sprintf(object->next->name,"%s%d",tmpname,tmpIndice);
+            tmpIndice++;
+        }
+        if( (typeConvertion==_AC3DTOAC3DS && (extendedStrips==1 || extendedTriangles==1)) ||
+            typeConvertion==_AC3DTOAC3DGROUP ||
+            (typeConvertion==_AC3DTOAC3D && (extendedTriangles==1))) {
+            printf ("Computing normals for %s \n",object->next->name);
+            computeObjectTriNorm(object->next );
+            //smoothObjectTriNorm(object->next );
+        }
 
-
-	if (distSplit>0 && typeConvertion!=_AC3DTOAC3DS )
-	{
-	    if(!strnicmp(object->next->name,"tkrb",4) || !strnicmp(object->next->name,"tkmn",4)
-	       || !strnicmp(object->next->name,"tkrs",4) 
-	       || !strnicmp(object->next->name,"tklb",4) 
-	       || !strnicmp(object->next->name,"brlt",4) 
-	       || !strnicmp(object->next->name,"brrt",4) 
-	       || !strnicmp(object->next->name,"tkls",4)
-	       || !strnicmp(object->next->name, "t0RB",4)
-	       || !strnicmp(object->next->name, "t1RB",4)
-	       || !strnicmp(object->next->name, "t2RB",4)
-	       || !strnicmp(object->next->name, "tkRS",4)
-	       || !strnicmp(object->next->name, "t0LB",4)
-	       || !strnicmp(object->next->name, "t1LB",4)
-	       || !strnicmp(object->next->name, "t2LB",4)
-	       || !strnicmp(object->next->name, "tkLS",4)
-	       || !strnicmp(object->next->name, "BOLt",4)
-	       || !strnicmp(object->next->name, "BORt",4) ) {
-		printf("no terrain split for %s\n",object->next->name);
-	    } else {
-		if (strstr( object->next->name,"terrain") 
-		    || strstr( object->next->name,"TERRAIN")
-		    ||strstr( object->next->name,"GROUND")
-		    ||strstr( object->next->name,"ground") ) {
-		    terrainSplitOb (&object->next);
-		    fprintf(stderr,"splitting surfaces of  %s                              \r", object->next->name);
-		}
-		else   if ( ((object->next->x_max-object->next->x_min) >1.5*distSplit ||
-			     (object->next->y_max-object->next->y_min) >1.5*distSplit)) {
-		    fprintf(stderr,"splitting surfaces of  %s                              \r", object->next->name);
-		    terrainSplitOb (&object->next);
-		}
-	    }
-	}
-      
-	numrefs=numrefstotal=0;
-	numvertFound=0;
-	numrefsFound=0;numvertex=0;
-	numvertice=0;
+        numrefs=numrefstotal=0;
+        numvertFound=0;
+        numrefsFound=0;numvertex=0;
+        numvertice=0;
 
     }
     else object->next->kids=kids;
@@ -1057,6 +999,112 @@ int doRefs(char *Line, ob_t *object, mat_t *material)
     return (0);
 }
 
+/* We need to split an object face in more faces
+ * if there are common points with different texture coordinates.
+ */
+bool isObjectSplit(ob_t* object)
+{
+    if (notexturesplit == 1)
+        return false;
+
+    bool same_pt = false, diff_u = false, diff_v = false;
+    int numverts = object->numvertice;
+
+    for (int i = 0; i < numverts; i++)
+    {
+        for (int j = i+1; j < numverts; j++)
+        {
+            same_pt = (object->vertexarray[i].indice == object->vertexarray[j].indice);
+            diff_u = (object->vertexarray[i].u != object->vertexarray[j].u);
+            diff_v = (object->vertexarray[i].v != object->vertexarray[j].v);
+
+                if (same_pt && (diff_u || diff_v))
+                    return true;
+        }
+    }
+
+    if(collapseObject)
+        return true;
+
+    return false;
+}
+
+bool isTerrainSplit(ob_t* object)
+{
+    /* general showstoppers */
+    if (typeConvertion == _AC3DTOAC3DS)
+        return false;
+
+    if (distSplit <= 0)
+        return false;
+
+    if (object->name)
+    {
+        /* denied prefixes */
+        const int num_prefixes = 17;
+        const char* denied_prefixes [num_prefixes] = {
+            "tkrb", "tkmn", "tkrs", "tklb", "brlt",
+            "brrt", "tkls", "t0RB", "t1RB", "t2RB",
+            "tkRS", "t0LB", "t1LB", "t2LB", "tkLS",
+            "BOLt", "BORt"
+        };
+
+        for(int i = 0; i < num_prefixes; i++)
+        {
+            if (!strnicmp(object->name, denied_prefixes[i], strlen(denied_prefixes[i])))
+                return false;
+        }
+
+        /* name contains terrain or ground */
+        if (strstr(object->name,"terrain")
+        || strstr(object->name,"TERRAIN")
+        || strstr(object->name,"GROUND")
+        || strstr(object->name,"ground"))
+            return true;
+    }
+
+
+    /* dimension within splitting distance */
+    if (((object->x_max - object->x_min) > 1.5*distSplit)
+    ||  ((object->y_max - object->y_min) > 1.5*distSplit))
+        return true;
+
+    return false;
+}
+
+/** Go through all given objects, check whether a normal split or a terrain
+ *  split is necessary and execute the split.
+ */
+void performSplitsOnAllObjs(ob_t** object)
+{
+    if(NULL == object)
+        return;
+
+    ob_t ** current_ob = object;
+
+    for (; *current_ob != NULL; current_ob = &(**current_ob).next)
+    {
+        const char* objname = (**current_ob).name;
+
+        if (isObjectSplit(*current_ob))
+        {
+            printf("Found in %s, a duplicate coord with not the same u,v, split is required\n",
+                    objname);
+            splitOb(current_ob);
+        }
+        else
+            printf("No split required for %s\n",objname);
+
+        if(isTerrainSplit(*current_ob))
+        {
+            printf("Splitting surfaces of %s\n", objname);
+            terrainSplitOb(current_ob);
+        }
+        else
+            printf("No terrain split for %s\n",objname);
+    }
+}
+
 int loadAC( char * inputFilename, char * outputFilename, int saveIn)
 {
     /* saveIn : 0= 3ds , 1= obj , 2=ac3d grouped (track) , 3 = ac3d strips (cars) */
@@ -1119,6 +1167,8 @@ int loadAC( char * inputFilename, char * outputFilename, int saveIn)
     }
     fclose(file);
     root_ob=current_ob;
+
+    performSplitsOnAllObjs(&root_ob);
 
     if (saveIn==-1)
 	return(0);
@@ -1197,6 +1247,9 @@ int loadACo( char * inputFilename, char * outputFilename, int saveIn)
     }
     fclose(file);
     root_ob=current_ob;
+
+    performSplitsOnAllObjs(&root_ob);
+
     printf("\nobjects loaded\nresaving in AC3D\n");
     if (saveIn==0)
 	computeSaveAC3D( outputFilename, root_ob);
