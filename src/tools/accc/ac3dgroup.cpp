@@ -567,180 +567,188 @@ void reorder(ob_t * ob, ob_t * ob2, double *textarray, tcoord_t *vertexarray)
     return;
 }
 
+/** Returns 0 if the given object has no name or is root, world or a group.
+ */
+int isNamedAndPolygon(ob_t * ob)
+{
+    if (ob->name == NULL)
+        return 0;
+    if (!strcmp(ob->name, "root"))
+        return 0;
+    if (!strcmp(ob->name, "world"))
+        return 0;
+    if (ob->type != NULL
+    && !strcmp(ob->type, "group"))
+        return 0;
+
+    return 1;
+}
+
+/** collapse the given tiledob into the texture channel 1 of tarobj */
+void collapseMapTiledTextures(ob_t * tarobj, ob_t * tiledob);
+/** collapse the given skidsob into the texture channel 2 of tarobj */
+void collapseSkidsGrassTextures(ob_t * tarobj, ob_t * skidsob);
+/** collapse the given shadob into the texture channel 3 of tarobj */
+void collapseShadowTextures(ob_t * tarobj, ob_t * shadob);
+
 /** Match textures from ob1, ob2 and ob3 with ob0. In case a match is found
  *  add them as additional texture channels in ob0.
  */
 void collapseTextures(ob_t * ob0, ob_t * ob1, ob_t * ob2, ob_t * ob3)
 {
     ob_t * tmpob = NULL;
-    ob_t * tmpob2 = NULL;
-    int notinsameorder = FALSE;
-    int i = 0;
 
     tmpob = ob0;
     while (tmpob != NULL)
     {
-        if (tmpob->name == NULL)
+        if (0 == isNamedAndPolygon(tmpob))
         {
             tmpob = tmpob->next;
             continue;
         }
-        if (!strcmp(tmpob->name, "root"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (!strcmp(tmpob->name, "world"))
-        {
-            tmpob = tmpob->next;
-            continue;
-        }
-        if (tmpob->type != NULL)
-            if (!strcmp(tmpob->type, "group"))
-            {
-                tmpob = tmpob->next;
-                continue;
-            }
 
-        tmpob2 = ob1;
-        while (tmpob2 != NULL)
-        {
-            if (tmpob2->name == NULL)
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "root"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "world"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (tmpob->type != NULL)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob2 = tmpob2->next;
-                    continue;
-                }
-            notinsameorder = FALSE;
-            if (!stricmp(tmpob2->name, tmpob->name)
-                    && tmpob->numvert == tmpob2->numvert)
-            {
-                /* found an ob in ob1 */
-                tmpob->texture1 = tmpob2->texture;
-                tmpob->textarray1 = tmpob2->textarray;
-                tmpob->vertexarray1 = tmpob2->vertexarray;
-                for (i = 0; i < tmpob->numvert; i++)
-                    if (fabs(tmpob->vertex[i].x - tmpob2->vertex[i].x) > MINVAL
-                            || fabs(
-                                    tmpob->vertex[i].y
-                                            - tmpob2->vertex[i].y)>MINVAL ||
-                                            fabs(tmpob->vertex[i].z - tmpob2->vertex[i].z )>MINVAL){
-                            notinsameorder=TRUE;
-                        }
-                if (notinsameorder == TRUE)
-                {
-                    printf(
-                            "%s : points not in the same order, reordering ...\n",
-                            tmpob->name);
-                    reorder(tmpob, tmpob2, tmpob->textarray1,
-                            tmpob->vertexarray1);
-                    printf("%s : reordering ... done\n", tmpob->name);
-                }
-                break;
-            }
-            tmpob2 = tmpob2->next;
-        }
+        collapseMapTiledTextures(tmpob, ob1);
+        collapseSkidsGrassTextures(tmpob, ob2);
+        collapseShadowTextures(tmpob, ob3);
 
-        tmpob2 = ob2;
-        while (tmpob2 != NULL)
-        {
-            if (tmpob2->name == NULL)
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "root"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "world"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (tmpob->type != NULL)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob2 = tmpob2->next;
-                    continue;
-                }
-
-            if (!stricmp(tmpob2->name, tmpob->name)
-                    && tmpob->numvert == tmpob2->numvert)
-            {
-                /* found an ob in ob2 */
-                tmpob->texture2 = tmpob2->texture;
-                tmpob->textarray2 = tmpob2->textarray;
-                tmpob->vertexarray2 = tmpob2->vertexarray;
-                break;
-            }
-            tmpob2 = tmpob2->next;
-        }
-
-        tmpob2 = ob3;
-        while (tmpob2 != NULL)
-        {
-            if (tmpob2->name == NULL)
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "root"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (!strcmp(tmpob2->name, "world"))
-            {
-                tmpob2 = tmpob2->next;
-                continue;
-            }
-            if (tmpob->type != NULL)
-                if (!strcmp(tmpob->type, "group"))
-                {
-                    tmpob2 = tmpob2->next;
-                    continue;
-                }
-            if (!stricmp(tmpob2->name, tmpob->name)
-                    && tmpob->numvert == tmpob2->numvert)
-            {
-                /* found an ob in ob2 */
-                tmpob->texture3 = tmpob2->texture;
-                tmpob->textarray3 = tmpob2->textarray;
-                tmpob->vertexarray3 = tmpob2->vertexarray;
-                if (tmpob->texture3)
-                    for (i = 0; i < tmpob->numvert; i++)
-                    {
-                        if (tmpob->textarray3[i * 2] != tmpob->textarray[i * 2]
-                                || tmpob->textarray3[i * 2 + 1]
-                                        != tmpob->textarray[i * 2 + 1])
-                            printf("name=%s %.2lf!=%.2lf %.2lf!=%.2lf\n",
-                                    tmpob->name, tmpob->textarray[i * 2],
-                                    tmpob->textarray3[i * 2],
-                                    tmpob->textarray[i * 2 + 1],
-                                    tmpob->textarray3[i * 2 + 1]);
-                    }
-
-                break;
-            }
-            tmpob2 = tmpob2->next;
-        }
         tmpob = tmpob->next;
+    }
+}
+
+/** copy the texture, textarray and vertexarray properties of srcob
+ *  into the corresponding places in destob based on the given channel.
+ *  The channel may be 1,2 or 3.
+ */
+void copyTextureChannel(ob_t * destob, ob_t * srcob, int channel)
+{
+    char* tex = srcob->texture;
+    double* texarr = srcob->textarray;
+    tcoord_t* vertarr = srcob->vertexarray;
+
+    if (channel == 1)
+    {
+        destob->texture1 = tex;
+        destob->textarray1 = texarr;
+        destob->vertexarray1 = vertarr;
+    }
+    else if (channel == 2)
+    {
+        destob->texture2 = tex;
+        destob->textarray2 = texarr;
+        destob->vertexarray2 = vertarr;
+    }
+    else if (channel == 3)
+    {
+        destob->texture3 = tex;
+        destob->textarray3 = texarr;
+        destob->vertexarray3 = vertarr;
+    }
+}
+
+void collapseMapTiledTextures(ob_t * tarob, ob_t * tiledob)
+{
+    ob_t * curtiledob = tiledob;
+    int notinsameorder = FALSE;
+    int curvert = 0;
+
+    while (curtiledob != NULL)
+    {
+        if (0 == isNamedAndPolygon(curtiledob))
+        {
+            curtiledob = curtiledob->next;
+            continue;
+        }
+        notinsameorder = FALSE;
+        if (!stricmp(curtiledob->name, tarob->name)
+        && tarob->numvert == curtiledob->numvert)
+        {
+            /* found an ob in ob1 */
+            copyTextureChannel(tarob, curtiledob, 1);
+            for (curvert = 0; curvert < tarob->numvert; curvert++)
+            {
+                if (fabs(tarob->vertex[curvert].x - curtiledob->vertex[curvert].x) > MINVAL
+                || fabs(tarob->vertex[curvert].y - curtiledob->vertex[curvert].y)>MINVAL
+                || fabs(tarob->vertex[curvert].z - curtiledob->vertex[curvert].z )>MINVAL)
+                {
+                    notinsameorder=TRUE;
+                }
+            }
+
+            if (notinsameorder == TRUE)
+            {
+                printf(
+                        "%s : points not in the same order, reordering ...\n",
+                        tarob->name);
+                reorder(tarob, curtiledob, tarob->textarray1,
+                        tarob->vertexarray1);
+                printf("%s : reordering ... done\n", tarob->name);
+            }
+            break;
+        }
+        curtiledob = curtiledob->next;
+    }
+}
+
+void collapseSkidsGrassTextures(ob_t * tarob, ob_t * skidsob)
+{
+    ob_t * curskidsob = skidsob;
+
+    while (curskidsob != NULL)
+    {
+        if (0 == isNamedAndPolygon(curskidsob))
+        {
+            curskidsob = curskidsob->next;
+            continue;
+        }
+
+        if (!stricmp(curskidsob->name, tarob->name)
+        && tarob->numvert == curskidsob->numvert)
+        {
+            /* found an ob in ob2 */
+            copyTextureChannel(tarob, curskidsob, 2);
+            break;
+        }
+
+        curskidsob = curskidsob->next;
+    }
+}
+
+void collapseShadowTextures(ob_t * tarob, ob_t * shadob)
+{
+    ob_t * curshadob = shadob;
+    int curvert = 0;
+
+    while (curshadob != NULL)
+    {
+        if (0 == isNamedAndPolygon(curshadob))
+        {
+            curshadob = curshadob->next;
+            continue;
+        }
+
+        if (!stricmp(curshadob->name, tarob->name)
+        && tarob->numvert == curshadob->numvert)
+        {
+            /* found an ob in ob2 */
+            copyTextureChannel(tarob, curshadob, 3);
+            if (tarob->texture3)
+            {
+                for (curvert = 0; curvert < tarob->numvert; curvert++)
+                {
+                    if (tarob->textarray3[curvert * 2] != tarob->textarray[curvert * 2]
+                    || tarob->textarray3[curvert * 2 + 1] != tarob->textarray[curvert * 2 + 1])
+                    {
+                        printf("name=%s %.2lf!=%.2lf %.2lf!=%.2lf\n",
+                                tarob->name, tarob->textarray[curvert * 2],
+                                tarob->textarray3[curvert * 2],
+                                tarob->textarray[curvert * 2 + 1],
+                                tarob->textarray3[curvert * 2 + 1]);
+                    }
+                }
+            }
+
+            break;
+        }
+        curshadob = curshadob->next;
     }
 }
