@@ -65,6 +65,13 @@ void copyTexCoord(tcoord_t * dest, tcoord_t * src)
     dest->v = src->v;
     dest->saved = src->saved;
 }
+void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved)
+{
+    dest->indice = indice;
+    dest->u = u;
+    dest->v = v;
+    dest->saved = saved;
+}
 
 #ifndef M_PI
 #define M_PI 3.14159267
