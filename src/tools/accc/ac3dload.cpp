@@ -181,63 +181,61 @@ void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
  *
  *  @param splitid the id of this split object
  *  @param srcobj the original object, which was split
- *  @param numvert the number of vertices
- *  @param ptarray the array of vertices
- *  @param normarray the array of normals corresponding to the vertices
- *  @param numidx the number of indices
- *  @param idxarray the array of indices that make up the surfaces
+ *  @param tmpob the temporary storage object using in splitting
+ *
+ *  In the tmpob the following should be set: numvertice, numsurf, vertex, snorm,
+ *  vertexarray, textarray
  *
  *  @return the created split object
  */
-ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj,
-        int numvert, point_t * ptarray, point_t * normarray,
-        int numidx, tcoord_t * idxarray)
+ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
 {
-    int numtri = numidx / 3;
+    int numtri = tmpob->numsurf;
+    int numidx = numtri * 3;
+    int numvert = tmpob->numvertice;
 
-    int size_pts = sizeof(point_t) * numvert;
+    int size_pts = sizeof(point_t) * tmpob->numvertice;
     int size_idx = sizeof(tcoord_t) * numidx;
     int size_texcoord = sizeof(double) * numvert * 2;
 
     /* allocate space */
-    ob_t * tob = (ob_t*) malloc(sizeof(ob_t));
-    memset(tob, 0, sizeof(ob_t));
-    tob->vertex = (point_t*) malloc(size_pts);
-    memset(tob->vertex, 0, size_pts);
-    tob->norm = (point_t*) malloc(size_pts);
-    memset(tob->norm, 0, size_pts);
-    tob->snorm = (point_t*) malloc(size_pts);
-    memset(tob->snorm, 0, size_pts);
-    tob->vertexarray = (tcoord_t *) malloc(size_idx);
-    memset(tob->vertexarray, 0, size_idx);
-    tob->textarray = (double *) malloc(size_texcoord);
-    memset(tob->textarray, 0, size_texcoord);
+    ob_t * retob = (ob_t*) malloc(sizeof(ob_t));
+    memset(retob, 0, sizeof(ob_t));
+    retob->vertex = (point_t*) malloc(size_pts);
+    memset(retob->vertex, 0, size_pts);
+    retob->norm = (point_t*) malloc(size_pts);
+    memset(retob->norm, 0, size_pts);
+    retob->snorm = (point_t*) malloc(size_pts);
+    memset(retob->snorm, 0, size_pts);
+    retob->vertexarray = (tcoord_t *) malloc(size_idx);
+    memset(retob->vertexarray, 0, size_idx);
+    retob->textarray = (double *) malloc(size_texcoord);
+    memset(retob->textarray, 0, size_texcoord);
 
-    tob->name = (char *) malloc(strlen(srcobj->name) + 10);
+    retob->name = (char *) malloc(strlen(srcobj->name) + 10);
 
     /* assign data */
-    tob->attrSurf = srcobj->attrSurf;
-    tob->attrMat = srcobj->attrMat;
+    retob->attrSurf = srcobj->attrSurf;
+    retob->attrMat = srcobj->attrMat;
 
     if (srcobj->data)
-        tob->data = strdup(srcobj->data);
+        retob->data = strdup(srcobj->data);
 
-    memcpy(tob->vertexarray, idxarray, size_idx);
-    memcpy(tob->vertex, ptarray, size_pts);
-    memcpy(tob->snorm, normarray, size_pts);
-    memcpy(tob->norm, normarray, size_pts);
+    memcpy(retob->vertex, tmpob->vertex, size_pts);
+    memcpy(retob->snorm, tmpob->snorm, size_pts);
+    memcpy(retob->norm, tmpob->snorm, size_pts);
+    memcpy(retob->vertexarray, tmpob->vertexarray, size_idx);
+    memcpy(retob->textarray, tmpob->textarray, size_texcoord);
 
-    createTexCoordArray(tob->textarray, idxarray, numidx);
+    retob->texture = strdup(srcobj->texture);
 
-    tob->texture = strdup(srcobj->texture);
+    sprintf(retob->name, "%s_s_%d", srcobj->name, splitid);
 
-    sprintf(tob->name, "%s_s_%d", srcobj->name, splitid);
+    retob->numsurf = numtri;
+    retob->numvert = numvert;
+    retob->numvertice = numvert;
 
-    tob->numsurf = numtri;
-    tob->numvert = numvert;
-    tob->numvertice = numvert;
-
-    return tob;
+    return retob;
 }
 
 int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
@@ -624,17 +622,16 @@ int terrainSplitOb(ob_t **object)
 
 int splitOb(ob_t **object)
 {
-    tcoord_t *vatmp = 0;
-    point_t *pttmp = 0;
     int *oldva = 0;
-    point_t *snorm;
-    double *text;
     int curtri = 0;
     int n = 0;
 
-    double curu[3];
-    double curv[3];
-    int curidx[3];
+    /* The object we use as storage during splitting.
+     * Following attribs will be used: vertexarray, vertex, snorm, textarray
+     */
+    ob_t * workob;
+
+    tcoord_t curvertex[3];
     int curstoredidx[3];
     int i = 0;
 
@@ -657,11 +654,14 @@ int splitOb(ob_t **object)
     orignumverts = orignumtris * 3;
 
     tri = (int *) calloc(orignumtris, sizeof(int));
-    vatmp = (tcoord_t *) calloc(orignumverts, sizeof(tcoord_t));
-    pttmp = (point_t *) calloc(orignumverts, sizeof(point_t));
     oldva = (int *) calloc(orignumverts, sizeof(int));
-    snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
-    text = (double *) calloc(2*orignumverts, sizeof(double));
+
+    workob = (ob_t *) malloc(sizeof(ob_t));
+    memset(workob, 0, sizeof(ob_t));
+    workob->vertexarray = (tcoord_t *) calloc(orignumverts, sizeof(tcoord_t));
+    workob->vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
+    workob->snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
+    workob->textarray = (double *) calloc(2*orignumverts, sizeof(double));
 
     while (mustcontinue == 1)
     {
@@ -687,11 +687,9 @@ int splitOb(ob_t **object)
                 /** find vertices of the triangle */
                 for(i = 0; i < 3; i++)
                 {
-                    curidx[i] = (*object)->vertexarray[curvert+i].indice;
-                    curu[i] = (*object)->vertexarray[curvert+i].u;
-                    curv[i] = (*object)->vertexarray[curvert+i].v;
+                    copyTexCoord(&curvertex[i], &((*object)->vertexarray[curvert+i]));
 
-                    curstoredidx[i] = findIndice(curidx[i], oldva, n);
+                    curstoredidx[i] = findIndice(curvertex[i].indice, oldva, n);
                 }
 
                 if (curstoredidx[0] == -1 && curstoredidx[1] == -1 && curstoredidx[2] == -1)
@@ -709,8 +707,8 @@ int splitOb(ob_t **object)
                     for(i = 0; i < 3; i++)
                     {
                         if (curstoredidx[i] != -1)
-                            if(text[curstoredidx[i] * 2] != curu[i]
-                            || text[curstoredidx[i] * 2 + 1] != curv[i])
+                            if(workob->textarray[curstoredidx[i] * 2] != curvertex[i].u
+                            || workob->textarray[curstoredidx[i] * 2 + 1] != curvertex[i].v)
                             {
                                 touse = 0;
                                 /* triangle is not ok */
@@ -731,20 +729,22 @@ int splitOb(ob_t **object)
                     {
                         if (curstoredidx[i] == -1)
                         {
-                            oldva[n] = curidx[i]; /* remember the value of the vertice already saved */
-                            text[n * 2] = curu[i];
-                            text[n * 2 + 1] = curv[i];
+                            oldva[n] = curvertex[i].indice; /* remember the value of the vertice already saved */
+                            workob->textarray[n * 2] = curvertex[i].u;
+                            workob->textarray[n * 2 + 1] = curvertex[i].v;
                             curstoredidx[i] = n;
                             n++;
 
                             (*object)->vertexarray[curvert+i].saved = 0;
-                            copyPoint(&pttmp[curstoredidx[i]], &((*object)->vertex[curidx[i]]));
-                            copyPoint(&snorm[curstoredidx[i]], &((*object)->norm[curidx[i]]));
+                            copyPoint(&workob->vertex[curstoredidx[i]],
+                                      &((*object)->vertex[curvertex[i].indice]));
+                            copyPoint(&workob->snorm[curstoredidx[i]],
+                                      &((*object)->norm[curvertex[i].indice]));
                         }
 
-                        vatmp[numvertstored].indice = curstoredidx[i];
-                        vatmp[numvertstored].u = curu[i];
-                        vatmp[numvertstored].v = curv[i];
+                        workob->vertexarray[numvertstored].indice = curstoredidx[i];
+                        workob->vertexarray[numvertstored].u = curvertex[i].u;
+                        workob->vertexarray[numvertstored].v = curvertex[i].v;
                         numvertstored++;
                     }
 
@@ -760,7 +760,10 @@ int splitOb(ob_t **object)
             continue;
 
         /* must saved the object */
-        tob = createObjectSplitCopy(numob++, *object, n, pttmp, snorm, numvertstored, vatmp);
+        workob->numvertice = n;
+        workob->numsurf = numvertstored/3;
+
+        tob = createObjectSplitCopy(numob++, *object, workob);
 
         attrSurf = tob->attrSurf;
         attrMat = tob->attrMat;
@@ -783,11 +786,8 @@ int splitOb(ob_t **object)
     *object = tob0;
 
     freez(tri);
-    freez(vatmp);
-    freez(pttmp);
     freez(oldva);
-    freez(snorm);
-    freez(text);
+    freeobject(workob);
 
     return 0;
 }
