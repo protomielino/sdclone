@@ -97,7 +97,7 @@ typedef struct ob
     point_t * vertex;
     point_t * norm;
     point_t * snorm;
-    tcoord_t * vertexarray;     /* in ac3d: one ref line */
+    tcoord_t * vertexarray;     /* array of indices that make up surfaces. in AC3D: one ref line */
     tcoord_t * vertexarray1;
     tcoord_t * vertexarray2;
     tcoord_t * vertexarray3;

@@ -152,6 +152,76 @@ verbaction_t verbTab[] =
 { CREASE, doCrease },
 { "END", NULL } };
 
+/** Creates a new object from the given data. This function is used during object splitting.
+ *
+ *  @param splitid the id of this split object
+ *  @param srcobj the original object, which was split
+ *  @param numvert the number of vertices
+ *  @param ptarray the array of vertices
+ *  @param normarray the array of normals corresponding to the vertices
+ *  @param numidx the number of indices
+ *  @param idxarray the array of indices that make up the surfaces
+ *
+ *  @return the created split object
+ */
+ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj,
+        int numvert, point_t * ptarray, point_t * normarray,
+        int numidx, tcoord_t * idxarray)
+{
+    int numtri = numidx / 3;
+    int curidx = 0;
+    tcoord_t * curidxobj = NULL;
+
+    int size_pts = sizeof(point_t) * numvert;
+    int size_idx = sizeof(tcoord_t) * numidx;
+
+    /* allocate space */
+    ob_t * tob = (ob_t*) malloc(sizeof(ob_t));
+    memset(tob, 0, sizeof(ob_t));
+    tob->vertex = (point_t*) malloc(size_pts);
+    memset(tob->vertex, 0, size_pts);
+    tob->norm = (point_t*) malloc(size_pts);
+    memset(tob->norm, 0, size_pts);
+    tob->snorm = (point_t*) malloc(size_pts);
+    memset(tob->snorm, 0, size_pts);
+    tob->vertexarray = (tcoord_t *) malloc(size_idx);
+    memset(tob->vertexarray, 0, size_idx);
+    tob->textarray = (double *) malloc(sizeof(tcoord_t) * numtri * 2);
+    memset(tob->textarray, 0, sizeof(tcoord_t) * numtri * 2);
+
+    tob->name = (char *) malloc(strlen(srcobj->name) + 10);
+
+    /* assign data */
+    tob->attrSurf = srcobj->attrSurf;
+    tob->attrMat = srcobj->attrMat;
+
+    if (srcobj->data)
+        tob->data = strdup(srcobj->data);
+
+    memcpy(tob->vertexarray, idxarray, size_idx);
+    memcpy(tob->vertex, ptarray, size_pts);
+    memcpy(tob->snorm, normarray, size_pts);
+    memcpy(tob->norm, normarray, size_pts);
+
+    for (curidx = 0; curidx < numidx; curidx++)
+    {
+        curidxobj = &idxarray[curidx];
+
+        tob->textarray[curidxobj->indice * 2] = curidxobj->u;
+        tob->textarray[curidxobj->indice * 2 + 1] = curidxobj->v;
+    }
+
+    tob->texture = strdup(srcobj->texture);
+
+    sprintf(tob->name, "%s_s_%d", srcobj->name, splitid);
+
+    tob->numsurf = numtri;
+    tob->numvert = numvert;
+    tob->numvertice = numvert;
+
+    return tob;
+}
+
 int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 {
     double p1, p2, p3, q1, q2, q3, dd;
@@ -542,7 +612,6 @@ int splitOb(ob_t **object)
     point_t *snorm;
     double *text;
     int curtri = 0;
-    int j = 0;
     int n = 0;
 
     double curu[3];
@@ -673,44 +742,11 @@ int splitOb(ob_t **object)
             continue;
 
         /* must saved the object */
-        tob = (ob_t*) malloc(sizeof(ob_t));
-        memset(tob, 0, sizeof(ob_t));
-        tob->vertex = (point_t*) malloc(sizeof(point_t) * numvertstored);
-        tob->norm = (point_t*) malloc(sizeof(point_t) * numvertstored);
-        tob->snorm = (point_t*) malloc(sizeof(point_t) * numvertstored);
-        memset(tob->snorm, 0, sizeof(point_t) * numvertstored);
-        memset(tob->norm, 0, sizeof(point_t) * numvertstored);
-        tob->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numvertstored);
-        tob->textarray = (double *) malloc(sizeof(tcoord_t) * numtristored * 2);
-        tob->attrSurf = (*object)->attrSurf;
-        tob->attrMat = (*object)->attrMat;
-        if ((*object)->data)
-        {
-            tob->data = strdup((*object)->data);
-        }
-        else
-        {
-            tob->data = NULL;
-        }
+        tob = createObjectSplitCopy(numob++, *object, n, pttmp, snorm, numvertstored, vatmp);
+
         attrSurf = tob->attrSurf;
         attrMat = tob->attrMat;
-        memcpy(tob->vertexarray, vatmp, numvertstored * sizeof(tcoord_t));
-        memcpy(tob->vertex, pttmp, n * sizeof(point_t));
-        memcpy(tob->snorm, snorm, n * sizeof(point_t));
-        memcpy(tob->norm, snorm, n * sizeof(point_t));
-        tob->kids = 0;
-        for (j = 0; j < numvertstored; j++)
-        {
-            tob->textarray[vatmp[j].indice * 2] = vatmp[j].u;
-            tob->textarray[vatmp[j].indice * 2 + 1] = vatmp[j].v;
-        }
-        tob->name = (char *) malloc(strlen((*object)->name) + 10);
-        tob->texture = strdup((*object)->texture);
-        sprintf(tob->name, "%s_s_%d", (*object)->name, numob++);
-        tob->numsurf = numtristored;
-        tob->numvert = n;
-        tob->numvertice = n;
-        tob->next = NULL;
+
         if (tob0 == NULL)
         {
             tob0 = tob;
@@ -723,7 +759,9 @@ int splitOb(ob_t **object)
         }
 
         printf("numtri = %d on orignumtris =%d \n", numtristored, orignumtris);
+
     } // while (mustcontinue == 1)
+
     *object = tob0;
 
     freez(tri);
