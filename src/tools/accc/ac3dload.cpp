@@ -51,6 +51,13 @@
 
 #define SetPoint(p, a, b, c) (p).x = a; (p).y = b; (p).z = c;
 
+void copyPoint(point_t * dest, point_t * src)
+{
+    dest->x = src->x;
+    dest->y = src->y;
+    dest->z = src->z;
+}
+
 #ifndef M_PI
 #define M_PI 3.14159267
 #endif
@@ -537,10 +544,13 @@ int splitOb(ob_t **object)
     int curtri = 0;
     int j = 0;
     int n = 0;
-    double u1, u2, u3;
-    double v1, v2, v3;
-    int indice1, indice2, indice3;
-    int m1, m2, m3;
+
+    double curu[3];
+    double curv[3];
+    int curidx[3];
+    int curstoredidx[3];
+    int i = 0;
+
     int touse = 0;
     int orignumtris = 0; /* number of surfaces/triangles in the source object */
     int orignumverts = 0; /* number of vertices in the source object: orignumtris * 3 */
@@ -588,20 +598,16 @@ int splitOb(ob_t **object)
                 curvert = curtri * 3;
 
                 /** find vertices of the triangle */
-                indice1 = (*object)->vertexarray[curvert].indice;
-                u1 = (*object)->vertexarray[curvert].u;
-                v1 = (*object)->vertexarray[curvert].v;
-                indice2 = (*object)->vertexarray[curvert + 1].indice;
-                u2 = (*object)->vertexarray[curvert + 1].u;
-                v2 = (*object)->vertexarray[curvert + 1].v;
-                indice3 = (*object)->vertexarray[curvert + 2].indice;
-                u3 = (*object)->vertexarray[curvert + 2].u;
-                v3 = (*object)->vertexarray[curvert + 2].v;
+                for(i = 0; i < 3; i++)
+                {
+                    curidx[i] = (*object)->vertexarray[curvert+i].indice;
+                    curu[i] = (*object)->vertexarray[curvert+i].u;
+                    curv[i] = (*object)->vertexarray[curvert+i].v;
 
-                m1 = findIndice(indice1, oldva, n);
-                m2 = findIndice(indice2, oldva, n);
-                m3 = findIndice(indice3, oldva, n);
-                if (m1 == -1 && m2 == -1 && m3 == -1)
+                    curstoredidx[i] = findIndice(curidx[i], oldva, n);
+                }
+
+                if (curstoredidx[0] == -1 && curstoredidx[1] == -1 && curstoredidx[2] == -1)
                 {
                     if (firstTri == 0)
                         touse = 1;
@@ -612,24 +618,17 @@ int splitOb(ob_t **object)
                 else
                 {
                     touse = 1;
-                    if (m1 != -1)
-                        if (text[m1 * 2] != u1 || text[m1 * 2 + 1] != v1)
-                        {
-                            touse = 0;
-                            /* triangle is not ok */
-                        }
-                    if (m2 != -1)
-                        if (text[m2 * 2] != u2 || text[m2 * 2 + 1] != v2)
-                        {
-                            touse = 0;
-                            /* triangle is not ok */
-                        }
-                    if (m3 != -1)
-                        if (text[m3 * 2] != u3 || text[m3 * 2 + 1] != v3)
-                        {
-                            touse = 0;
-                            /* triangle is not ok */
-                        }
+
+                    for(i = 0; i < 3; i++)
+                    {
+                        if (curstoredidx[i] != -1)
+                            if(text[curstoredidx[i] * 2] != curu[i]
+                            || text[curstoredidx[i] * 2 + 1] != curv[i])
+                            {
+                                touse = 0;
+                                /* triangle is not ok */
+                            }
+                    }
                 }
 
                 if (touse == 1)
@@ -641,64 +640,27 @@ int splitOb(ob_t **object)
 
                     /* store the vertices of the triangle with new indice */
                     /* not yet in the array : store it at the current position */
-                    if (m1 == -1)
+                    for(i = 0; i < 3; i++)
                     {
-                        oldva[n] = indice1; /* remember the value of the vertice already saved */
-                        text[n * 2] = u1;
-                        text[n * 2 + 1] = v1;
-                        m1 = n;
-                        n++;
-                        (*object)->vertexarray[curvert].saved = 0;
-                        pttmp[m1].x = (*object)->vertex[indice1].x;
-                        pttmp[m1].y = (*object)->vertex[indice1].y;
-                        pttmp[m1].z = (*object)->vertex[indice1].z;
-                        snorm[m1].x = (*object)->norm[indice1].x;
-                        snorm[m1].y = (*object)->norm[indice1].y;
-                        snorm[m1].z = (*object)->norm[indice1].z;
-                    }
-                    if (m2 == -1)
-                    {
-                        oldva[n] = indice2;
-                        text[n * 2] = u2;
-                        text[n * 2 + 1] = v2;
-                        m2 = n;
-                        n++;
-                        (*object)->vertexarray[curvert + 1].saved = 0;
-                        pttmp[m2].x = (*object)->vertex[indice2].x;
-                        pttmp[m2].y = (*object)->vertex[indice2].y;
-                        pttmp[m2].z = (*object)->vertex[indice2].z;
-                        snorm[m2].x = (*object)->norm[indice2].x;
-                        snorm[m2].y = (*object)->norm[indice2].y;
-                        snorm[m2].z = (*object)->norm[indice2].z;
-                    }
-                    if (m3 == -1)
-                    {
-                        oldva[n] = indice3;
-                        text[n * 2] = u3;
-                        text[n * 2 + 1] = v3;
-                        m3 = n;
-                        n++;
-                        (*object)->vertexarray[curvert + 2].saved = 0;
-                        pttmp[m3].x = (*object)->vertex[indice3].x;
-                        pttmp[m3].y = (*object)->vertex[indice3].y;
-                        pttmp[m3].z = (*object)->vertex[indice3].z;
-                        snorm[m3].x = (*object)->norm[indice3].x;
-                        snorm[m3].y = (*object)->norm[indice3].y;
-                        snorm[m3].z = (*object)->norm[indice3].z;
+                        if (curstoredidx[i] == -1)
+                        {
+                            oldva[n] = curidx[i]; /* remember the value of the vertice already saved */
+                            text[n * 2] = curu[i];
+                            text[n * 2 + 1] = curv[i];
+                            curstoredidx[i] = n;
+                            n++;
+
+                            (*object)->vertexarray[curvert+i].saved = 0;
+                            copyPoint(&pttmp[curstoredidx[i]], &((*object)->vertex[curidx[i]]));
+                            copyPoint(&snorm[curstoredidx[i]], &((*object)->norm[curidx[i]]));
+                        }
+
+                        vatmp[numvertstored].indice = curstoredidx[i];
+                        vatmp[numvertstored].u = curu[i];
+                        vatmp[numvertstored].v = curv[i];
+                        numvertstored++;
                     }
 
-                    vatmp[numvertstored].indice = m1;
-                    vatmp[numvertstored].u = u1;
-                    vatmp[numvertstored].v = v1;
-                    numvertstored++;
-                    vatmp[numvertstored].indice = m2;
-                    vatmp[numvertstored].u = u2;
-                    vatmp[numvertstored].v = v2;
-                    numvertstored++;
-                    vatmp[numvertstored].indice = m3;
-                    vatmp[numvertstored].u = u3;
-                    vatmp[numvertstored].v = v3;
-                    numvertstored++;
                     numtristored++;
                     atleastone = 1;
 

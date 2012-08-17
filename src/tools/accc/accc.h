@@ -66,6 +66,8 @@ typedef struct point
     double z;
 } point_t;
 
+void copyPoint(point_t * dest, point_t * src);
+
 typedef struct tcoord
 {
     int indice;
