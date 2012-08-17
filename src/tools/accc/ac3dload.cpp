@@ -245,6 +245,70 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     return retob;
 }
 
+/** Copies the data of a single vertex from srcob to destob.
+ *  In particular the vertexarray and textarray variables of destob will be modified.
+ *  This includes the data of additional texture channels.
+ *
+ *  This function is used in splitting specifically.
+ *
+ *  @param destob the destination object
+ *  @param srcob the source object
+ *  @param storedptidx the value of the indice variable in the destination vertex
+ *  @param destptidx the index in the "vertex" array to be used for modifying the textarray
+ *  @param destvertidx the index in the destination's vertexarray to be modified
+ *  @param srcvertidx the index in the vertexarray in the source object to take the data from
+ */
+void copySingleVertexData(ob_t * destob, ob_t * srcob,
+    int storedptidx, int destptidx, int destvertidx, int srcvertidx)
+{
+    tcoord_t * srcvert = &(srcob->vertexarray[srcvertidx]);
+
+    destob->textarray[destptidx * 2] = srcvert->u;
+    destob->textarray[destptidx * 2 + 1] = srcvert->v;
+
+    storeTexCoord(&(destob->vertexarray[destvertidx]),
+            storedptidx, srcvert->u, srcvert->v, 0);
+}
+
+/** Clears the saved flag for a single entry in ob's vertexarray and does so
+ *  for all texture channels.
+ */
+void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx)
+{
+    ob->vertexarray[vertidx].saved = 0;
+}
+
+/** Creates vertexarray{,1,2,3} and textarray{,1,2,3} in ob based on the given channel
+ *  and on the given number of vertices.
+ *
+ *  @param channel which texture channel, value in range [0,3]
+ */
+void allocTexChannelArrays(ob_t * ob, int channel, int numvert)
+{
+    tcoord_t * va = (tcoord_t *) calloc(numvert, sizeof(tcoord_t));
+    double* ta = (double *) calloc(2*numvert, sizeof(double));
+
+    switch(channel)
+    {
+    case 0:
+        ob->vertexarray = va;
+        ob->textarray = ta;
+        break;
+    case 1:
+        ob->vertexarray1 = va;
+        ob->textarray1 = ta;
+        break;
+    case 2:
+        ob->vertexarray2 = va;
+        ob->textarray2 = ta;
+        break;
+    case 3:
+        ob->vertexarray3 = va;
+        ob->textarray3 = ta;
+        break;
+    }
+}
+
 int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 {
     double p1, p2, p3, q1, q2, q3, dd;
