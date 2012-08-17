@@ -163,12 +163,57 @@ typedef struct mat
     struct mat * next;
 } mat_t;
 
+/** Helper function for copySingleVertexData(). Stores a single texture channel, i.e. copies
+ *  data from the srcvert into the destination arrays based on the given indices.
+ *  @sa copySingleVertexData()
+ */
+void copyTexChannel(double * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
+    int storedptidx, int destptidx, int destvertidx);
+
+/** Copies the data of a single vertex from srcob to destob.
+ *  In particular the vertexarray and textarray variables of destob will be modified.
+ *  This includes the data of additional texture channels.
+ *
+ *  This function is used in splitting specifically.
+ *
+ *  @param destob the destination object
+ *  @param srcob the source object
+ *  @param storedptidx the value of the indice variable in the destination vertex
+ *  @param destptidx the index in the "vertex" array to be used for modifying the textarray
+ *  @param destvertidx the index in the destination's vertexarray to be modified
+ *  @param srcvertidx the index in the vertexarray in the source object to take the data from
+ */
+void copySingleVertexData(ob_t * destob, ob_t * srcob,
+    int storedptidx, int destptidx, int destvertidx, int srcvertidx);
+
+/** Clears the saved flag for a single entry in ob's vertexarray and does so
+ *  for all texture channels.
+ */
+void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx);
+
+/** Allocates all texture channels in destob based on the texture channels present in srcob.
+ *  In particular, srcob's vertexarray properties determine whether a texture channel is present
+ *  and from numsurf and numvertice the number of points/indices are calculated.
+ */
+void allocTexChannelArrays(ob_t * destob, ob_t * srcob);
+
+/** Creates vertexarray{,1,2,3} and textarray{,1,2,3} in ob based on the given channel
+ *  and on the given number of vertices.
+ *
+ *  @param ob the object in which to allocate the texture channel
+ *  @param channel which texture channel, value in range [0,3]
+ *  @param numpt number of points, in ob_t corresponds to numvertice
+ *  @param numvert number of index points, in ob_t corresponds to numsurf*3
+ */
+void allocSingleTexChannelArrays(ob_t * ob, int channel, int numpt, int numvert);
+
 extern int typeConvertion;
 extern ob_t * root_ob;
 
 extern int terrainSplitOb(ob_t **object);
 extern int mergeSplitted(ob_t **object);
 extern int distSplit;
+
 /** Whether to split objects during loading, i.e. calls to loadAC() and loadACo().
  *  The default behavior is to split them during loading
  *  (splitObjectsDuringLoad != 0). However, in loadAndGroup()
@@ -177,6 +222,7 @@ extern int distSplit;
  *  (splitObjectsDuringLoad == 0).
  */
 extern int splitObjectsDuringLoad;
+
 /** Go through all given objects, check whether a normal split or a terrain
  *  split is necessary and execute the split.
  */

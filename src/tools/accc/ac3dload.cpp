@@ -214,10 +214,14 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     memset(retob->norm, 0, size_pts);
     retob->snorm = (point_t*) malloc(size_pts);
     memset(retob->snorm, 0, size_pts);
-    retob->vertexarray = (tcoord_t *) malloc(size_idx);
+
+    /*retob->vertexarray = (tcoord_t *) malloc(size_idx);
     memset(retob->vertexarray, 0, size_idx);
     retob->textarray = (double *) malloc(size_texcoord);
     memset(retob->textarray, 0, size_texcoord);
+    */
+    allocTexChannelArrays(retob, tmpob);
+
 
     retob->name = (char *) malloc(strlen(srcobj->name) + 10);
 
@@ -244,46 +248,61 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
 
     return retob;
 }
-
-/** Copies the data of a single vertex from srcob to destob.
- *  In particular the vertexarray and textarray variables of destob will be modified.
- *  This includes the data of additional texture channels.
- *
- *  This function is used in splitting specifically.
- *
- *  @param destob the destination object
- *  @param srcob the source object
- *  @param storedptidx the value of the indice variable in the destination vertex
- *  @param destptidx the index in the "vertex" array to be used for modifying the textarray
- *  @param destvertidx the index in the destination's vertexarray to be modified
- *  @param srcvertidx the index in the vertexarray in the source object to take the data from
- */
-void copySingleVertexData(ob_t * destob, ob_t * srcob,
-    int storedptidx, int destptidx, int destvertidx, int srcvertidx)
+void copyTexChannel(double * desttextarray, tcoord_t * destvertexarray, tcoord_t * srcvert,
+    int storedptidx, int destptidx, int destvertidx)
 {
-    tcoord_t * srcvert = &(srcob->vertexarray[srcvertidx]);
+    desttextarray[destptidx * 2] = srcvert->u;
+    desttextarray[destptidx * 2 + 1] = srcvert->v;
 
-    destob->textarray[destptidx * 2] = srcvert->u;
-    destob->textarray[destptidx * 2 + 1] = srcvert->v;
-
-    storeTexCoord(&(destob->vertexarray[destvertidx]),
+    storeTexCoord(&(destvertexarray[destvertidx]),
             storedptidx, srcvert->u, srcvert->v, 0);
 }
 
-/** Clears the saved flag for a single entry in ob's vertexarray and does so
- *  for all texture channels.
- */
+void copySingleVertexData(ob_t * destob, ob_t * srcob,
+    int storedptidx, int destptidx, int destvertidx, int srcvertidx)
+{
+    tcoord_t * srcvert;
+
+    /* channel 0 */
+    srcvert = &(srcob->vertexarray[srcvertidx]);
+
+    copyTexChannel(destob->textarray, destob->vertexarray, srcvert,
+            storedptidx, destptidx, destvertidx);
+
+    /* channel 1 */
+    if(destob->textarray1 != NULL)
+    {
+        srcvert = &(srcob->vertexarray1[srcvertidx]);
+
+        copyTexChannel(destob->textarray1, destob->vertexarray1, srcvert,
+                storedptidx, destptidx, destvertidx);
+    }
+
+    /* channel 2 */
+    if(destob->textarray2 != NULL)
+    {
+        srcvert = &(srcob->vertexarray2[srcvertidx]);
+
+        copyTexChannel(destob->textarray2, destob->vertexarray2, srcvert,
+                storedptidx, destptidx, destvertidx);
+    }
+
+    /* channel 3 */
+    if(destob->textarray3 != NULL)
+    {
+        srcvert = &(srcob->vertexarray3[srcvertidx]);
+
+        copyTexChannel(destob->textarray3, destob->vertexarray3, srcvert,
+                storedptidx, destptidx, destvertidx);
+    }
+}
+
 void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx)
 {
     ob->vertexarray[vertidx].saved = 0;
 }
 
-/** Creates vertexarray{,1,2,3} and textarray{,1,2,3} in ob based on the given channel
- *  and on the given number of vertices.
- *
- *  @param channel which texture channel, value in range [0,3]
- */
-void allocTexChannelArrays(ob_t * ob, int channel, int numvert)
+void allocSingleTexChannelArrays(ob_t * ob, int channel, int numpt, int numvert)
 {
     tcoord_t * va = (tcoord_t *) calloc(numvert, sizeof(tcoord_t));
     double* ta = (double *) calloc(2*numvert, sizeof(double));
@@ -308,6 +327,22 @@ void allocTexChannelArrays(ob_t * ob, int channel, int numvert)
         break;
     }
 }
+
+void allocTexChannelArrays(ob_t * destob, ob_t * srcob)
+{
+    int numvert = srcob->numsurf * 3;
+    int numpt = srcob->numvertice;
+
+    if(srcob->vertexarray != NULL)
+        allocSingleTexChannelArrays(destob, 0, numpt, numvert);
+    if(srcob->vertexarray1 != NULL)
+        allocSingleTexChannelArrays(destob, 1, numpt, numvert);
+    if(srcob->vertexarray2 != NULL)
+        allocSingleTexChannelArrays(destob, 2, numpt, numvert);
+    if(srcob->vertexarray3 != NULL)
+        allocSingleTexChannelArrays(destob, 3, numpt, numvert);
+}
+
 
 int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
 {
@@ -695,7 +730,8 @@ int splitOb(ob_t **object)
 {
     int *oldva = 0;
     int curtri = 0;
-    int n = 0;
+    int numptstored = 0; /* number of vertices stored */
+    int oldnumptstored = 0; /* temporary placeholder for numptstored */
 
     /* The object we use as storage during splitting.
      * Following attribs will be used: vertexarray, vertex, snorm, textarray
@@ -729,17 +765,18 @@ int splitOb(ob_t **object)
 
     workob = (ob_t *) malloc(sizeof(ob_t));
     memset(workob, 0, sizeof(ob_t));
-    workob->vertexarray = (tcoord_t *) calloc(orignumverts, sizeof(tcoord_t));
     workob->vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
     workob->snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
-    workob->textarray = (double *) calloc(2*orignumverts, sizeof(double));
+
+    // create texture channels
+    allocTexChannelArrays(workob, *object);
 
     while (mustcontinue == 1)
     {
         numvertstored = 0;
         numtristored = 0;
 
-        n = 0; /* number of vertices stored */
+        numptstored = 0;
         mustcontinue = 0;
         firstTri = 0;
         atleastone = 1;
@@ -760,7 +797,7 @@ int splitOb(ob_t **object)
                 {
                     copyTexCoord(&curvertex[i], &((*object)->vertexarray[curvert+i]));
 
-                    curstoredidx[i] = findIndice(curvertex[i].indice, oldva, n);
+                    curstoredidx[i] = findIndice(curvertex[i].indice, oldva, numptstored);
                 }
 
                 if (curstoredidx[0] == -1 && curstoredidx[1] == -1 && curstoredidx[2] == -1)
@@ -798,24 +835,23 @@ int splitOb(ob_t **object)
                     /* not yet in the array : store it at the current position */
                     for(i = 0; i < 3; i++)
                     {
+                        oldnumptstored = numptstored;
+
                         if (curstoredidx[i] == -1)
                         {
-                            oldva[n] = curvertex[i].indice; /* remember the value of the vertice already saved */
-                            workob->textarray[n * 2] = curvertex[i].u;
-                            workob->textarray[n * 2 + 1] = curvertex[i].v;
-                            curstoredidx[i] = n;
-                            n++;
+                            copyPoint(&(workob->vertex[numptstored]), &((*object)->vertex[curvertex[i].indice]));
+                            copyPoint(&(workob->snorm[numptstored]), &((*object)->norm[curvertex[i].indice]));
 
-                            (*object)->vertexarray[curvert+i].saved = 0;
-                            copyPoint(&workob->vertex[curstoredidx[i]],
-                                      &((*object)->vertex[curvertex[i].indice]));
-                            copyPoint(&workob->snorm[curstoredidx[i]],
-                                      &((*object)->norm[curvertex[i].indice]));
+                            clearSavedInVertexArrayEntry(*object, curvert+i);
+
+                            oldva[numptstored] = curvertex[i].indice; /* remember the value of the vertice already saved */
+                            curstoredidx[i] = numptstored;
+                            numptstored++;
                         }
 
-                        workob->vertexarray[numvertstored].indice = curstoredidx[i];
-                        workob->vertexarray[numvertstored].u = curvertex[i].u;
-                        workob->vertexarray[numvertstored].v = curvertex[i].v;
+                        copySingleVertexData(workob, *object, curstoredidx[i],
+                                oldnumptstored, numvertstored, curvert+i);
+
                         numvertstored++;
                     }
 
@@ -831,7 +867,7 @@ int splitOb(ob_t **object)
             continue;
 
         /* must saved the object */
-        workob->numvertice = n;
+        workob->numvertice = numptstored;
         workob->numsurf = numvertstored/3;
 
         tob = createObjectSplitCopy(numob++, *object, workob);
