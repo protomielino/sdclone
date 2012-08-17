@@ -76,6 +76,8 @@ typedef struct tcoord
     int saved;
 } tcoord_t;
 
+void copyTexCoord(tcoord_t * dest, tcoord_t * src);
+
 typedef struct ob
 {
     char * name;

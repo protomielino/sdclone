@@ -58,6 +58,14 @@ void copyPoint(point_t * dest, point_t * src)
     dest->z = src->z;
 }
 
+void copyTexCoord(tcoord_t * dest, tcoord_t * src)
+{
+    dest->indice = src->indice;
+    dest->u = src->u;
+    dest->v = src->v;
+    dest->saved = src->saved;
+}
+
 #ifndef M_PI
 #define M_PI 3.14159267
 #endif
