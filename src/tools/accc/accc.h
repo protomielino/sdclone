@@ -91,16 +91,16 @@ typedef struct ob
     double texrep_y;
     int numvert;
     int numsurf;
-    int numvertice; /* the real number of textcoord */
+    int numvertice; /* the real number of vertices */
     point_t * vertex;
     point_t * norm;
     point_t * snorm;
-    tcoord_t * vertexarray;
+    tcoord_t * vertexarray;     /* in ac3d: one ref line */
     tcoord_t * vertexarray1;
     tcoord_t * vertexarray2;
     tcoord_t * vertexarray3;
     int * va;
-    double * textarray;
+    double * textarray;     /* subset of vertexarray: contains only the texture coords */
     double * textarray1;
     double * textarray2;
     double * textarray3;

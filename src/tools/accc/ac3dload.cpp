@@ -534,7 +534,7 @@ int splitOb(ob_t **object)
     int *oldva = 0;
     point_t *snorm;
     double *text;
-    int i = 0;
+    int curtri = 0;
     int j = 0;
     int n = 0;
     double u1, u2, u3;
@@ -542,9 +542,10 @@ int splitOb(ob_t **object)
     int indice1, indice2, indice3;
     int m1, m2, m3;
     int touse = 0;
-    int num;
+    int orignumtris = 0; /* number of surfaces/triangles in the source object */
     int * tri;
-    int numtri = 0;
+    int numvertstored = 0; /* number of vertices stored in the object */
+    int numtristored = 0; /* number of triangles stored in the object: numvertstored/3 */
     int mustcontinue = 1;
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
@@ -552,19 +553,22 @@ int splitOb(ob_t **object)
     int firstTri = 0;
     ob_t * tobnext = (*object)->next;
     int atleastone = 0;
+    int curvert = 0;
 
-    num = (*object)->numsurf;
+    orignumtris = (*object)->numsurf;
 
-    tri = (int *) calloc(num, sizeof(int));
-    vatmp = (tcoord_t *) calloc(4 * num, sizeof(tcoord_t));
-    pttmp = (point_t *) calloc(4 * num, sizeof(point_t));
-    oldva = (int *) calloc(4 * num, sizeof(int));
-    snorm = (point_t *) calloc(4 * num, sizeof(point_t));
-    text = (double *) calloc(3 * num, sizeof(double));
+    tri = (int *) calloc(orignumtris, sizeof(int));
+    vatmp = (tcoord_t *) calloc(4 * orignumtris, sizeof(tcoord_t));
+    pttmp = (point_t *) calloc(4 * orignumtris, sizeof(point_t));
+    oldva = (int *) calloc(4 * orignumtris, sizeof(int));
+    snorm = (point_t *) calloc(4 * orignumtris, sizeof(point_t));
+    text = (double *) calloc(3 * orignumtris, sizeof(double));
 
     while (mustcontinue == 1)
     {
-        numtri = 0; /* number of triangle stored in the object */
+        numvertstored = 0;
+        numtristored = 0;
+
         n = 0; /* number of vertices stored */
         mustcontinue = 0;
         firstTri = 0;
@@ -572,22 +576,26 @@ int splitOb(ob_t **object)
         while (atleastone == 1)
         {
             atleastone = 0;
-            for (i = 0; i < num; i++)
+            for (curtri = 0; curtri < orignumtris; curtri++)
             {
                 touse = 0;
-                if (tri[i] == 1)
+                if (tri[curtri] == 1)
                     continue;
                 mustcontinue = 1;
+
+                curvert = curtri * 3;
+
                 /** find vertices of the triangle */
-                indice1 = (*object)->vertexarray[i * 3].indice;
-                u1 = (*object)->vertexarray[i * 3].u;
-                v1 = (*object)->vertexarray[i * 3].v;
-                indice2 = (*object)->vertexarray[i * 3 + 1].indice;
-                u2 = (*object)->vertexarray[i * 3 + 1].u;
-                v2 = (*object)->vertexarray[i * 3 + 1].v;
-                indice3 = (*object)->vertexarray[i * 3 + 2].indice;
-                u3 = (*object)->vertexarray[i * 3 + 2].u;
-                v3 = (*object)->vertexarray[i * 3 + 2].v;
+                indice1 = (*object)->vertexarray[curvert].indice;
+                u1 = (*object)->vertexarray[curvert].u;
+                v1 = (*object)->vertexarray[curvert].v;
+                indice2 = (*object)->vertexarray[curvert + 1].indice;
+                u2 = (*object)->vertexarray[curvert + 1].u;
+                v2 = (*object)->vertexarray[curvert + 1].v;
+                indice3 = (*object)->vertexarray[curvert + 2].indice;
+                u3 = (*object)->vertexarray[curvert + 2].u;
+                v3 = (*object)->vertexarray[curvert + 2].v;
+
                 m1 = findIndice(indice1, oldva, n);
                 m2 = findIndice(indice2, oldva, n);
                 m3 = findIndice(indice3, oldva, n);
@@ -627,7 +635,7 @@ int splitOb(ob_t **object)
                     firstTri = 1;
                     /* triangle is ok */
 
-                    tri[i] = 1; /* mark this triangle */
+                    tri[curtri] = 1; /* mark this triangle */
 
                     /* store the vertices of the triangle with new indice */
                     /* not yet in the array : store it at the current position */
@@ -638,7 +646,7 @@ int splitOb(ob_t **object)
                         text[n * 2 + 1] = v1;
                         m1 = n;
                         n++;
-                        (*object)->vertexarray[i * 3].saved = 0;
+                        (*object)->vertexarray[curvert].saved = 0;
                         pttmp[m1].x = (*object)->vertex[indice1].x;
                         pttmp[m1].y = (*object)->vertex[indice1].y;
                         pttmp[m1].z = (*object)->vertex[indice1].z;
@@ -653,7 +661,7 @@ int splitOb(ob_t **object)
                         text[n * 2 + 1] = v2;
                         m2 = n;
                         n++;
-                        (*object)->vertexarray[i * 3 + 1].saved = 0;
+                        (*object)->vertexarray[curvert + 1].saved = 0;
                         pttmp[m2].x = (*object)->vertex[indice2].x;
                         pttmp[m2].y = (*object)->vertex[indice2].y;
                         pttmp[m2].z = (*object)->vertex[indice2].z;
@@ -668,7 +676,7 @@ int splitOb(ob_t **object)
                         text[n * 2 + 1] = v3;
                         m3 = n;
                         n++;
-                        (*object)->vertexarray[i * 3 + 2].saved = 0;
+                        (*object)->vertexarray[curvert + 2].saved = 0;
                         pttmp[m3].x = (*object)->vertex[indice3].x;
                         pttmp[m3].y = (*object)->vertex[indice3].y;
                         pttmp[m3].z = (*object)->vertex[indice3].z;
@@ -677,34 +685,39 @@ int splitOb(ob_t **object)
                         snorm[m3].z = (*object)->norm[indice3].z;
                     }
 
-                    vatmp[numtri * 3].indice = m1;
-                    vatmp[numtri * 3].u = u1;
-                    vatmp[numtri * 3].v = v1;
-                    vatmp[numtri * 3 + 1].indice = m2;
-                    vatmp[numtri * 3 + 1].u = u2;
-                    vatmp[numtri * 3 + 1].v = v2;
-                    vatmp[numtri * 3 + 2].indice = m3;
-                    vatmp[numtri * 3 + 2].u = u3;
-                    vatmp[numtri * 3 + 2].v = v3;
-                    numtri++;
+                    vatmp[numvertstored].indice = m1;
+                    vatmp[numvertstored].u = u1;
+                    vatmp[numvertstored].v = v1;
+                    numvertstored++;
+                    vatmp[numvertstored].indice = m2;
+                    vatmp[numvertstored].u = u2;
+                    vatmp[numvertstored].v = v2;
+                    numvertstored++;
+                    vatmp[numvertstored].indice = m3;
+                    vatmp[numvertstored].u = u3;
+                    vatmp[numvertstored].v = v3;
+                    numvertstored++;
+                    numtristored++;
                     atleastone = 1;
 
-                }
+                } // if (touse == 1)
 
-            }
-        }
-        if (numtri == 0)
+            } // for (curtri = 0; curtri < orignumtris; curtri++)
+        } // while (atleastone == 1)
+
+        if (numtristored == 0)
             continue;
+
         /* must saved the object */
         tob = (ob_t*) malloc(sizeof(ob_t));
         memset(tob, 0, sizeof(ob_t));
-        tob->vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-        tob->norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-        tob->snorm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-        memset(tob->snorm, 0, sizeof(point_t) * numtri * 3);
-        memset(tob->norm, 0, sizeof(point_t) * numtri * 3);
-        tob->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numtri * 3);
-        tob->textarray = (double *) malloc(sizeof(tcoord_t) * numtri * 2);
+        tob->vertex = (point_t*) malloc(sizeof(point_t) * numvertstored);
+        tob->norm = (point_t*) malloc(sizeof(point_t) * numvertstored);
+        tob->snorm = (point_t*) malloc(sizeof(point_t) * numvertstored);
+        memset(tob->snorm, 0, sizeof(point_t) * numvertstored);
+        memset(tob->norm, 0, sizeof(point_t) * numvertstored);
+        tob->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numvertstored);
+        tob->textarray = (double *) malloc(sizeof(tcoord_t) * numtristored * 2);
         tob->attrSurf = (*object)->attrSurf;
         tob->attrMat = (*object)->attrMat;
         if ((*object)->data)
@@ -717,12 +730,12 @@ int splitOb(ob_t **object)
         }
         attrSurf = tob->attrSurf;
         attrMat = tob->attrMat;
-        memcpy(tob->vertexarray, vatmp, numtri * 3 * sizeof(tcoord_t));
+        memcpy(tob->vertexarray, vatmp, numvertstored * sizeof(tcoord_t));
         memcpy(tob->vertex, pttmp, n * sizeof(point_t));
         memcpy(tob->snorm, snorm, n * sizeof(point_t));
         memcpy(tob->norm, snorm, n * sizeof(point_t));
         tob->kids = 0;
-        for (j = 0; j < numtri * 3; j++)
+        for (j = 0; j < numvertstored; j++)
         {
             tob->textarray[vatmp[j].indice * 2] = vatmp[j].u;
             tob->textarray[vatmp[j].indice * 2 + 1] = vatmp[j].v;
@@ -730,7 +743,7 @@ int splitOb(ob_t **object)
         tob->name = (char *) malloc(strlen((*object)->name) + 10);
         tob->texture = strdup((*object)->texture);
         sprintf(tob->name, "%s_s_%d", (*object)->name, numob++);
-        tob->numsurf = numtri;
+        tob->numsurf = numtristored;
         tob->numvert = n;
         tob->numvertice = n;
         tob->next = NULL;
@@ -745,8 +758,8 @@ int splitOb(ob_t **object)
             tob0 = tob;
         }
 
-        printf("numtri = %d on num =%d \n", numtri, num);
-    }
+        printf("numtri = %d on orignumtris =%d \n", numtristored, orignumtris);
+    } // while (mustcontinue == 1)
     *object = tob0;
 
     freez(tri);
