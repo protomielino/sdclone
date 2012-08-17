@@ -191,21 +191,21 @@ void copySingleVertexData(ob_t * destob, ob_t * srcob,
  */
 void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx);
 
-/** Allocates all texture channels in destob based on the texture channels present in srcob.
+/** Creates all texture channels in destob based on the texture channels present in srcob.
  *  In particular, srcob's vertexarray properties determine whether a texture channel is present
  *  and from numsurf and numvertice the number of points/indices are calculated.
+ *  Creation means allocation and copying of the corresponding channels from srcob to destob.
  */
-void allocTexChannelArrays(ob_t * destob, ob_t * srcob);
+void createTexChannelArrays(ob_t * destob, ob_t * srcob);
 
 /** Creates vertexarray{,1,2,3} and textarray{,1,2,3} in ob based on the given channel
- *  and on the given number of vertices.
+ *  and on the given number of vertices. Creation means allocation and copying of the
+ *  corresponding channels from srcob to destob.
  *
  *  @param ob the object in which to allocate the texture channel
  *  @param channel which texture channel, value in range [0,3]
- *  @param numpt number of points, in ob_t corresponds to numvertice
- *  @param numvert number of index points, in ob_t corresponds to numsurf*3
  */
-void allocSingleTexChannelArrays(ob_t * ob, int channel, int numpt, int numvert);
+void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel);
 
 extern int typeConvertion;
 extern ob_t * root_ob;

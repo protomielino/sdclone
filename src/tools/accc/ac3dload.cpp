@@ -198,12 +198,9 @@ void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
 ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
 {
     int numtri = tmpob->numsurf;
-    int numidx = numtri * 3;
     int numvert = tmpob->numvertice;
 
-    int size_pts = sizeof(point_t) * tmpob->numvertice;
-    int size_idx = sizeof(tcoord_t) * numidx;
-    int size_texcoord = sizeof(double) * numvert * 2;
+    int size_pts = sizeof(point_t) * numvert;
 
     /* allocate space */
     ob_t * retob = (ob_t*) malloc(sizeof(ob_t));
@@ -215,17 +212,12 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     retob->snorm = (point_t*) malloc(size_pts);
     memset(retob->snorm, 0, size_pts);
 
-    /*retob->vertexarray = (tcoord_t *) malloc(size_idx);
-    memset(retob->vertexarray, 0, size_idx);
-    retob->textarray = (double *) malloc(size_texcoord);
-    memset(retob->textarray, 0, size_texcoord);
-    */
-    allocTexChannelArrays(retob, tmpob);
-
-
     retob->name = (char *) malloc(strlen(srcobj->name) + 10);
+    memset(retob->name, 0, strlen(srcobj->name) + 10);
 
     /* assign data */
+    createTexChannelArrays(retob, tmpob);
+
     retob->attrSurf = srcobj->attrSurf;
     retob->attrMat = srcobj->attrMat;
 
@@ -235,10 +227,14 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     memcpy(retob->vertex, tmpob->vertex, size_pts);
     memcpy(retob->snorm, tmpob->snorm, size_pts);
     memcpy(retob->norm, tmpob->snorm, size_pts);
-    memcpy(retob->vertexarray, tmpob->vertexarray, size_idx);
-    memcpy(retob->textarray, tmpob->textarray, size_texcoord);
 
     retob->texture = strdup(srcobj->texture);
+    if(srcobj->texture1)
+        retob->texture1 = strdup(srcobj->texture1);
+    if(srcobj->texture2)
+        retob->texture2 = strdup(srcobj->texture2);
+    if(srcobj->texture3)
+        retob->texture3 = strdup(srcobj->texture3);
 
     sprintf(retob->name, "%s_s_%d", srcobj->name, splitid);
 
@@ -302,45 +298,63 @@ void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx)
     ob->vertexarray[vertidx].saved = 0;
 }
 
-void allocSingleTexChannelArrays(ob_t * ob, int channel, int numpt, int numvert)
+void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel)
 {
-    tcoord_t * va = (tcoord_t *) calloc(numvert, sizeof(tcoord_t));
-    double* ta = (double *) calloc(2*numvert, sizeof(double));
+    int numvert = srcob->numsurf * 3;
+
+    int size_va = numvert * sizeof(tcoord_t);
+    int size_ta = 2 * numvert * sizeof(double);
+
+    tcoord_t * va = (tcoord_t *) malloc(size_va);
+    double* ta = (double *) malloc(size_ta);
 
     switch(channel)
     {
     case 0:
-        ob->vertexarray = va;
-        ob->textarray = ta;
+        memcpy(va, srcob->vertexarray, size_va);
+        memcpy(ta, srcob->textarray, size_ta);
+
+        destob->vertexarray = va;
+        destob->textarray = ta;
         break;
+
     case 1:
-        ob->vertexarray1 = va;
-        ob->textarray1 = ta;
+        memcpy(va, srcob->vertexarray1, size_va);
+        memcpy(ta, srcob->textarray1, size_ta);
+
+        destob->vertexarray1 = va;
+        destob->textarray1 = ta;
         break;
+
     case 2:
-        ob->vertexarray2 = va;
-        ob->textarray2 = ta;
+        memcpy(va, srcob->vertexarray2, size_va);
+        memcpy(ta, srcob->textarray2, size_ta);
+
+        destob->vertexarray2 = va;
+        destob->textarray2 = ta;
         break;
+
     case 3:
-        ob->vertexarray3 = va;
-        ob->textarray3 = ta;
+        memcpy(va, srcob->vertexarray3, size_va);
+        memcpy(ta, srcob->textarray3, size_ta);
+
+        destob->vertexarray3 = va;
+        destob->textarray3 = ta;
         break;
     }
 }
 
-void allocTexChannelArrays(ob_t * destob, ob_t * srcob)
+void createTexChannelArrays(ob_t * destob, ob_t * srcob)
 {
-    int numvert = srcob->numsurf * 3;
-    int numpt = srcob->numvertice;
 
     if(srcob->vertexarray != NULL)
-        allocSingleTexChannelArrays(destob, 0, numpt, numvert);
+        createSingleTexChannelArrays(destob, srcob, 0);
     if(srcob->vertexarray1 != NULL)
-        allocSingleTexChannelArrays(destob, 1, numpt, numvert);
+        createSingleTexChannelArrays(destob, srcob, 1);
     if(srcob->vertexarray2 != NULL)
-        allocSingleTexChannelArrays(destob, 2, numpt, numvert);
+        createSingleTexChannelArrays(destob, srcob, 2);
     if(srcob->vertexarray3 != NULL)
-        allocSingleTexChannelArrays(destob, 3, numpt, numvert);
+        createSingleTexChannelArrays(destob, srcob, 3);
 }
 
 
@@ -769,7 +783,7 @@ int splitOb(ob_t **object)
     workob->snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
 
     // create texture channels
-    allocTexChannelArrays(workob, *object);
+    createTexChannelArrays(workob, *object);
 
     while (mustcontinue == 1)
     {
