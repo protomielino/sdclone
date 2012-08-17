@@ -543,6 +543,7 @@ int splitOb(ob_t **object)
     int m1, m2, m3;
     int touse = 0;
     int orignumtris = 0; /* number of surfaces/triangles in the source object */
+    int orignumverts = 0; /* number of vertices in the source object: orignumtris * 3 */
     int * tri;
     int numvertstored = 0; /* number of vertices stored in the object */
     int numtristored = 0; /* number of triangles stored in the object: numvertstored/3 */
@@ -556,13 +557,14 @@ int splitOb(ob_t **object)
     int curvert = 0;
 
     orignumtris = (*object)->numsurf;
+    orignumverts = orignumtris * 3;
 
     tri = (int *) calloc(orignumtris, sizeof(int));
-    vatmp = (tcoord_t *) calloc(4 * orignumtris, sizeof(tcoord_t));
-    pttmp = (point_t *) calloc(4 * orignumtris, sizeof(point_t));
-    oldva = (int *) calloc(4 * orignumtris, sizeof(int));
-    snorm = (point_t *) calloc(4 * orignumtris, sizeof(point_t));
-    text = (double *) calloc(3 * orignumtris, sizeof(double));
+    vatmp = (tcoord_t *) calloc(orignumverts, sizeof(tcoord_t));
+    pttmp = (point_t *) calloc(orignumverts, sizeof(point_t));
+    oldva = (int *) calloc(orignumverts, sizeof(int));
+    snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
+    text = (double *) calloc(2*orignumverts, sizeof(double));
 
     while (mustcontinue == 1)
     {
