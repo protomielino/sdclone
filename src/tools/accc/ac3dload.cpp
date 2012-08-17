@@ -152,6 +152,23 @@ verbaction_t verbTab[] =
 { CREASE, doCrease },
 { "END", NULL } };
 
+/** copy the (u,v) coords from srcidxarr to the corresponding position in destarr.
+ *  destarr needs to have 2 * number of vertices entries.
+ */
+void createTexCoordArray(double * destarr, tcoord_t * srcidxarr, int numidx)
+{
+    tcoord_t * curidxobj = NULL;
+    int curidx = 0;
+
+    for (curidx = 0; curidx < numidx; curidx++)
+    {
+        curidxobj = &srcidxarr[curidx];
+
+        destarr[curidxobj->indice * 2] = curidxobj->u;
+        destarr[curidxobj->indice * 2 + 1] = curidxobj->v;
+    }
+}
+
 /** Creates a new object from the given data. This function is used during object splitting.
  *
  *  @param splitid the id of this split object
@@ -169,11 +186,10 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj,
         int numidx, tcoord_t * idxarray)
 {
     int numtri = numidx / 3;
-    int curidx = 0;
-    tcoord_t * curidxobj = NULL;
 
     int size_pts = sizeof(point_t) * numvert;
     int size_idx = sizeof(tcoord_t) * numidx;
+    int size_texcoord = sizeof(double) * numvert * 2;
 
     /* allocate space */
     ob_t * tob = (ob_t*) malloc(sizeof(ob_t));
@@ -186,8 +202,8 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj,
     memset(tob->snorm, 0, size_pts);
     tob->vertexarray = (tcoord_t *) malloc(size_idx);
     memset(tob->vertexarray, 0, size_idx);
-    tob->textarray = (double *) malloc(sizeof(tcoord_t) * numtri * 2);
-    memset(tob->textarray, 0, sizeof(tcoord_t) * numtri * 2);
+    tob->textarray = (double *) malloc(size_texcoord);
+    memset(tob->textarray, 0, size_texcoord);
 
     tob->name = (char *) malloc(strlen(srcobj->name) + 10);
 
@@ -203,13 +219,7 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj,
     memcpy(tob->snorm, normarray, size_pts);
     memcpy(tob->norm, normarray, size_pts);
 
-    for (curidx = 0; curidx < numidx; curidx++)
-    {
-        curidxobj = &idxarray[curidx];
-
-        tob->textarray[curidxobj->indice * 2] = curidxobj->u;
-        tob->textarray[curidxobj->indice * 2 + 1] = curidxobj->v;
-    }
+    createTexCoordArray(tob->textarray, idxarray, numidx);
 
     tob->texture = strdup(srcobj->texture);
 
