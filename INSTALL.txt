@@ -284,17 +284,14 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
   c.  Extract their contents to your local disk (7Zip is an excellent tool for that),
       all in the same target folder.
       Warning: You need to extract all of the source packages in order to start building
-               (see ablove 2-a chapter for more).
+               (see above 2-a chapter for more).
 
 1) Cmake and MinGW :
 
-  Work-in-progress ...
-
-  Tested with success for :
-    - CMake 2.8.3 + MinGW shipped with Nokia Qt Creator 2.4.1 (gcc 4.4.0)
-    - CMake 2.8.8 + MinGW shipped with Nokia Qt Creator 2.4.1 (gcc 4.4.0)
-    - CMake 2.8.2 + MinGW 2012 April (gcc 4.7.0)
-    - CMake 2.8.8 + MinGW 2012 April (gcc 4.7.0)
+  Notes: 
+   * Tested with success with CMake 2.8.2 and 2.8.8 + MinGW 2012 April (gcc 4.7.0),
+   * Also worked well with the version of MinGW shipped with Nokia Qt Creator 2.4.1 (gcc 4.4.0)
+     (see below for slightly different install instructions).
 
   d.  Install MinGW and MSYS 
 
@@ -332,7 +329,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
      * Optional tweaks to /etc/profile (C:\MinGW\msys\1.0\etc\profile)
        * add your usual aliases : alias xx='command'
-       * a nicer prompt : export PS1='\w $ '
+       * a simpler prompt : export PS1='\w $ '
 
      * Direct X 7 SDK for MinGW : Optional for building SD, but mandatory if you want
        to build yourself the 3rd party libraries SDL, PLib, and OpenAL :
@@ -347,7 +344,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
       * MinGW itself : You can use the one shipped with Nokia Qt Creator
         (Release 2.4.1 worked for me)
       * MSYS :
-  	  	- download and install the latest 1.0.x through the MinGW installer
+  	- download and install the latest 1.0.x through the MinGW installer
             https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
         - add a /mingw mount point to the fstab in order MSYS knows where MinGW is installed
           (inside Qt Creator folders) :
