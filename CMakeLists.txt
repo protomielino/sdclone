@@ -22,7 +22,10 @@ CHECK_PACKAGES()
 SET(NEXT_LESSER_VERSION 0) # The next lesser version
 SET(NEXT_MAJOR_MINOR_VERSION "2.1") # Next major.minor version
 
-SET(OPTION_AUTOVERSION Off)
+# Uncomment if you don't want automatic SVN version detection
+# (poor performances under Windows, don't work with git-svn, ...)
+# SET(OPTION_AUTOVERSION Off)
+
 IF(NOT OPTION_AUTOVERSION)
 	
 	SET(VERSION "${NEXT_MAJOR_MINOR_VERSION}-dev")
