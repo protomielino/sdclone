@@ -10,11 +10,11 @@
 ;        (at your option) any later version.
 
 !define VER_MAJOR 2
-!define VER_MINOR 0
+!define VER_MINOR 1
 !define VER_PATCH 0
 !define VER_EXTRA ""
-!define VER_REVISION "r4687"
-!define VER_RELDATE 20120408
+!define VER_REVISION "r????"
+!define VER_RELDATE 20130408 ; Initial guess ;-)
 
 !define GAME_SHORT_NAME "Speed Dreams"
 !define GAME_NAME "${GAME_SHORT_NAME} 2"
@@ -28,7 +28,7 @@
 !define GAME_PUBLISHER "the Speed Dreams Team"
 !define GAME_WEB_SITE "http://www.speed-dreams.org"
 !define GAME_BUG_TRACKER "http://sourceforge.net/apps/trac/speed-dreams/report/3"
-!define GAME_DOWNLOAD_URL "http://sourceforge.net/projects/speed-dreams/files/2.0.0"
+!define GAME_DOWNLOAD_URL "http://sourceforge.net/projects/speed-dreams/files/2.1.0"
 !define COMMUNITY_WEB_SITE "http://community.speed-dreams.org"
 
 !define GAME_ROOT_REGKEY "HKLM"
@@ -37,7 +37,7 @@
 !define GAME_DIR_REGKEY "Software\${GAME_PUBLISHER}\${GAME_NAME}"
 
 ; Folder where the build system installed everything
-!define BUILD_INST_DIR "C:\Program files\${GAME_FS_NAME}"
+!define BUILD_INST_DIR "\${GAME_FS_NAME}-build"
 
 ; Default target installation folder
 !define INST_INST_DIR_SUFFIX "${GAME_SHORT_FS_NAME}-${GAME_VERSION}"
