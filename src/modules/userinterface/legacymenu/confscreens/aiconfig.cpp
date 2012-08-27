@@ -18,7 +18,7 @@
  ***************************************************************************/
 
 /** @file
-    		
+
     @version	$Id$
 */
 
@@ -84,7 +84,7 @@ static void SaveSkillLevel(void * /* dummy */)
 	GfParmSetNum(paramHandle, "skill", "level", 0, SkillLevelValues[CurSkillLevelIndex]);
 	GfParmWriteFile(NULL, paramHandle, "Skill");
 	GfParmReleaseHandle(paramHandle);
-	
+
 	/* return to previous screen */
 	GfuiScreenActivate(PrevHandle);
 
@@ -132,7 +132,7 @@ AIMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle,param,"CancelButton",prevMenu,GfuiScreenActivate);
 
     GfParmReleaseHandle(param);
-    
+
     GfuiAddKey(ScrHandle, GFUIK_RETURN, "Apply", NULL, SaveSkillLevel, NULL);
     GfuiAddKey(ScrHandle, GFUIK_ESCAPE, "Cancel", prevMenu, GfuiScreenActivate, NULL);
     GfuiAddKey(ScrHandle, GFUIK_F1, "Help", ScrHandle, GfuiHelpScreen, NULL);
@@ -140,5 +140,5 @@ AIMenuInit(void *prevMenu)
     GfuiAddKey(ScrHandle, GFUIK_LEFT, "Previous Skill Level", (void*)-1, ChangeSkillLevel, NULL);
     GfuiAddKey(ScrHandle, GFUIK_RIGHT, "Next Skill Level", (void*)+1, ChangeSkillLevel, NULL);
 
-    return ScrHandle;  
+    return ScrHandle;
 }

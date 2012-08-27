@@ -44,7 +44,7 @@
 int GfuiProgressbarCreate(void *scr, int x, int y, int w, int h,
 						  const char *pszBgImg, const char *pszImg,
 						  const float* outlineColor,
-						  float min, float max, float value, 
+						  float min, float max, float value,
 						  void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
 	tGfuiProgressbar *progress;
@@ -99,7 +99,7 @@ void GfuiProgressbarSetValue(void *scr, int id, float value)
 {
     tGfuiObject *curObject;
     tGfuiScreen	*screen = (tGfuiScreen*)scr;
-    
+
     curObject = screen->objects;
     if (curObject) {
 		do {
@@ -187,5 +187,5 @@ gfuiDrawProgressbar(tGfuiObject *obj)
     glVertex2i(obj->xmax, obj->ymax);
     glVertex2i(obj->xmax, obj->ymin);
     glVertex2i(obj->xmin, obj->ymin);
-    glEnd();	
+    glEnd();
 }

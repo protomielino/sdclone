@@ -49,7 +49,7 @@ class Application : public GfuiApplication
 		// First the standard ones.
 		if (!GfuiApplication::parseOptions())
 			return false;
-		
+
 		// Then the specific ones.
 		if (!_vecRemArgs.empty())
 		{
@@ -60,7 +60,7 @@ class Application : public GfuiApplication
 			printUsage("No file specified.");
 			return false;
 		}
-		
+
 		// If "data dir" specified in any way, cd to it.
 		if(chdir(GfDataDir()))
 		{
@@ -78,7 +78,7 @@ class Application : public GfuiApplication
 		PreviewMenuInit(_strMenuFile.c_str());
 		PreviewMenuRun();
 	}
-	
+
  private:
 
 	//! The menu XML descriptor file to load.
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 {
 	// Create the MenuView application
 	Application app(argc, argv);
-	
+
 	// Parse the command line options
     if (!app.parseOptions())
 		return 1;
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
 	// Display the menu.
 	app.showMenu();
-	
+
 	// App. event loop.
 	app.eventLoop()();
 

@@ -2,7 +2,7 @@
                  iphysicsengine.h -- Interface for physics engines
 
     created              : Tue May 10 22:40:04 CEST 2011
-    copyright            : (C) 2011 by Jean-Philippe Meuret                         
+    copyright            : (C) 2011 by Jean-Philippe Meuret
     web                  : http://www.speed-dreams.org
     version              : $Id$
  ***************************************************************************/
@@ -16,7 +16,7 @@
  *                                                                         *
  ***************************************************************************/
 
-/** @file   
+/** @file
     	Interface for physics engines
     @version	$Id$
 */
@@ -42,19 +42,19 @@ public:
 
 	//! Activate / Deactivate telemetry for a given car (Limitation: only one at a time).
 	virtual void toggleCarTelemetry(int nCarIndex, bool bOn = true) = 0;
-	
+
 	//! Update the situation (1 simulation step)
 	virtual void updateSituation(struct Situation *pSituation, double fDeltaTime) = 0;
-	
+
 	//! Update only a given car (1 simulation step)
 	virtual void updateCar(struct Situation *pSituation, double fDeltaTime, int nCarIndex) = 0;
 
 	//! For network races, force the DynGCG of a given car (computed by a remote instance).
 	virtual void setCar(const struct DynPt& dynGCG, int nCarIndex) = 0;
-	
+
 	//! For network races, read the DynGCG of a given car.
 	virtual struct DynPt* getCar(int nCarIndex) = 0;
-	
+
 	//! Reset => ready for a new initialize
 	virtual void shutdown() = 0;
 };

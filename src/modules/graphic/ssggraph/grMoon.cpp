@@ -21,7 +21,7 @@
 #include "grSky.h"
 #include "grSphere.h"
 
-static int grMoonOrbPreDraw( ssgEntity *e ) 
+static int grMoonOrbPreDraw( ssgEntity *e )
 {
     ssgLeaf *f = (ssgLeaf *)e;
     if ( f -> hasState () ) f->getState()->apply() ;
@@ -33,7 +33,7 @@ static int grMoonOrbPreDraw( ssgEntity *e )
     return true;
 }
 
-static int grMoonOrbPostDraw( ssgEntity *e ) 
+static int grMoonOrbPostDraw( ssgEntity *e )
 {
     glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
     glPopAttrib();
@@ -41,20 +41,20 @@ static int grMoonOrbPostDraw( ssgEntity *e )
 }
 
 // Constructor
-cGrMoon::cGrMoon( void )   
+cGrMoon::cGrMoon( void )
 {
 	moon_transform = 0;
 	prev_moon_angle= 9999;
 }
 
 // Destructor
-cGrMoon::~cGrMoon( void ) 
+cGrMoon::~cGrMoon( void )
 {
 	ssgDeRefDelete( moon_transform );
 }
 
 // build the moon object
-ssgBranch * cGrMoon::build( double moon_size ) 
+ssgBranch * cGrMoon::build( double moon_size )
 {
 	ssgDeRefDelete( moon_transform );
     moon_transform = new ssgTransform;
@@ -89,9 +89,9 @@ ssgBranch * cGrMoon::build( double moon_size )
     return moon_transform;
 }
 
-bool cGrMoon::repaint( double angle ) 
+bool cGrMoon::repaint( double angle )
 {
-    if (prev_moon_angle != angle) 
+    if (prev_moon_angle != angle)
 	{
         prev_moon_angle = angle;
 
@@ -122,7 +122,7 @@ bool cGrMoon::repaint( double angle )
     return true;
 }
 
-bool cGrMoon::reposition(sgVec3 p, double angle, double moonrightAscension, double moondeclination, double moon_dist) 
+bool cGrMoon::reposition(sgVec3 p, double angle, double moonrightAscension, double moondeclination, double moon_dist)
 {
     sgMat4 T1, T2, GST, RA, DEC;
     sgVec3 axis;

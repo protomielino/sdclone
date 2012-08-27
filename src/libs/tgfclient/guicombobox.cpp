@@ -42,7 +42,7 @@ gfuiLeftArrow(void *idv)
 
 	if (combobox->pInfo->vecChoices.empty())
 		return;
-	
+
 	if (combobox->pInfo->nPos > 0)
 		combobox->pInfo->nPos--;
 	else
@@ -50,7 +50,7 @@ gfuiLeftArrow(void *idv)
 
 	gfuiLabelSetText(&combobox->label,
 					 combobox->pInfo->vecChoices[combobox->pInfo->nPos].c_str());
-	
+
 	if (combobox->onChange)
 		combobox->onChange(combobox->pInfo);
 }
@@ -66,10 +66,10 @@ gfuiRightArrow(void *idv)
 		return;
 
 	combobox = &(object->u.combobox);
-	
+
 	if (combobox->pInfo->vecChoices.empty())
 		return;
-	
+
 	if (combobox->pInfo->nPos < combobox->pInfo->vecChoices.size() - 1)
 		combobox->pInfo->nPos++;
 	else
@@ -77,7 +77,7 @@ gfuiRightArrow(void *idv)
 
 	gfuiLabelSetText(&combobox->label,
 					 combobox->pInfo->vecChoices[combobox->pInfo->nPos].c_str());
-	
+
 	if (combobox->onChange)
 		combobox->onChange(combobox->pInfo);
 }
@@ -110,13 +110,13 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 				   int arrowsWidth, int arrowsHeight,
 				   const char *pszText, int maxlen,
 				   const float *fgColor, const float *fgFocusColor,
-				   void *userData, tfuiComboboxCallback onChange, 
+				   void *userData, tfuiComboboxCallback onChange,
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiCombobox	*combobox;
     tGfuiObject		*object;
     tGfuiScreen		*screen = (tGfuiScreen*)scr;
-  
+
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
 	object->widget = GFUI_COMBOBOX;
 	object->focusMode = GFUI_FOCUS_MOUSE_MOVE;
@@ -124,12 +124,12 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
     object->visible = 1;
 
 	combobox = &(object->u.combobox);
-	
+
     combobox->userDataOnFocus = userDataOnFocus;
     combobox->onFocus = onFocus;
     combobox->onFocusLost = onFocusLost;
 	combobox->onChange = onChange;
-	
+
     combobox->pInfo = new tComboBoxInfo;
 	combobox->pInfo->nPos = 0;
 	combobox->pInfo->userData = userData;
@@ -141,7 +141,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	gfuiGrButtonInit(&combobox->leftButton,
 					 "data/img/arrow-left-disabled.png", "data/img/arrow-left.png",
 					 "data/img/arrow-left-focused.png", "data/img/arrow-left-pushed.png",
-					 x, y, arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE, 
+					 x, y, arrowsWidth, arrowsHeight, GFUI_MIRROR_NONE,
 					 GFUI_MOUSE_UP,	 (void*)(object->id), gfuiLeftArrow, 0, 0, 0);
 	gfuiGrButtonInit(&combobox->rightButton,
 					 "data/img/arrow-right-disabled.png", "data/img/arrow-right.png",
@@ -170,7 +170,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 	int yl = y;
 	if (height > gfuiFont[font]->getHeight())
 		yl += (height - gfuiFont[font]->getHeight()) / 2;
-		
+
 	gfuiLabelInit(&combobox->label, pszText, maxlen,
 				  x + combobox->leftButton.width, yl,
 				  width - 2 * combobox->leftButton.width, GFUI_ALIGN_HC,
@@ -178,7 +178,7 @@ GfuiComboboxCreate(void *scr, int font, int x, int y, int width,
 
 	// Add the combo control to the display list.
     gfuiAddObject(screen, object);
-	
+
     return object->id;
 }
 
@@ -201,7 +201,7 @@ gfuiGetCombobox(void *scr, int id)
 
 	return 0;
 }
-				  
+
 unsigned int
 GfuiComboboxAddText(void *scr, int id, const char *text)
 {
@@ -255,7 +255,7 @@ void
 GfuiComboboxSetPosition(void *scr, int id, unsigned int pos)
 {
 	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
+
     if (combo)
 		combo->pInfo->nPos = pos;
 }
@@ -264,9 +264,9 @@ unsigned int
 GfuiComboboxGetPosition(void *scr, int id)
 {
 	unsigned int index = 0;
-    
+
 	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
+
     if (combo)
 		index = combo->pInfo->nPos;
 
@@ -277,9 +277,9 @@ const char*
 GfuiComboboxGetText(void *scr, int id)
 {
 	const char* pszText = 0;
-    
+
 	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
+
     if (combo && combo->pInfo->nPos < combo->pInfo->vecChoices.size())
 		pszText = combo->pInfo->vecChoices[combo->pInfo->nPos].c_str();
 
@@ -290,15 +290,15 @@ unsigned
 GfuiComboboxGetNumberOfChoices(void *scr, int id)
 {
 	unsigned nChoices = 0;
-    
+
 	tGfuiCombobox* combo = gfuiGetCombobox(scr, id);
-	
+
     if (combo)
 		nChoices = combo->pInfo->vecChoices.size();
 
 	return nChoices;
 }
-				  
+
 
 void
 GfuiComboboxClear(void *scr, int id)
@@ -321,7 +321,7 @@ GfuiComboboxClear(void *scr, int id)
 void
 gfuiComboboxAction(int action)
 {
-	if (GfuiScreen->hasFocus->state == GFUI_DISABLE) 
+	if (GfuiScreen->hasFocus->state == GFUI_DISABLE)
 		return;
 
 	tGfuiCombobox* combo = &(GfuiScreen->hasFocus->u.combobox);

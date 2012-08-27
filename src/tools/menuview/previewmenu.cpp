@@ -32,7 +32,7 @@ std::string g_strFile;
 
 void LoadMenuScreen();
 
-static void 
+static void
 onQuit(void * /* dummy */)
 {
     GfuiApp().eventLoop().postQuit();
@@ -97,9 +97,9 @@ ReloadMenuScreen(void *)
 void
 LoadMenuScreen()
 {
-    menuHandle = GfuiScreenCreate((float*)NULL, 
-								  NULL, PreviewMenuActivate, 
-								  NULL, (tfuiCallback)NULL, 
+    menuHandle = GfuiScreenCreate((float*)NULL,
+								  NULL, PreviewMenuActivate,
+								  NULL, (tfuiCallback)NULL,
 								  1);
 
 	void *param = GfParmReadFile(g_strFile.c_str(), GFPARM_RMODE_REREAD);
@@ -107,7 +107,7 @@ LoadMenuScreen()
 		param = GfParmReadFileLocal(g_strFile.c_str(), GFPARM_RMODE_REREAD);
 
     GfuiMenuCreateStaticControls(menuHandle, param);
-	
+
 	ShowDynamicControls(menuHandle, param);
 
 	GfuiAddKey(menuHandle, GFUIK_F5, "Re-load", NULL, ReloadMenuScreen, NULL);
@@ -127,19 +127,19 @@ PreviewMenuInit(const char* pFile)
 }
 /*
  * Function
- *	
+ *
  *
  * Description
- *	
+ *
  *
  * Parameters
- *	
+ *
  *
  * Return
- *	
+ *
  *
  * Remarks
- *	
+ *
  */
 int
 PreviewMenuRun(void)

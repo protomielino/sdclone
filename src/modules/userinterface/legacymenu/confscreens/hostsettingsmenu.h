@@ -29,7 +29,7 @@ class HostSettingsMenu : public GfuiMenuScreen
 public:
 	HostSettingsMenu();
 	bool initialize(void *pPrevMenu);
-	
+
 protected:
 	//callback functions must be static
 	static void onActivate(void *p);
@@ -46,4 +46,4 @@ protected:
 	static bool m_bHumanHost;
 };
 
-#endif /* _HOSTSETTINGSMENU_H_ */ 
+#endif /* _HOSTSETTINGSMENU_H_ */

@@ -40,4 +40,4 @@ protected:
 	static std::string m_strCar;
 };
 
-#endif /* _CARSETTINGSMENU_H_ */ 
+#endif /* _CARSETTINGSMENU_H_ */

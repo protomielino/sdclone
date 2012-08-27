@@ -42,9 +42,9 @@ extern bool grMakeMipMaps(GLubyte *image, int xsize, int ysize, int zsize, int m
 class cgrStateFactory
 {
  public:
-	
+
 	cgrSimpleState* getSimpleState();
-	
+
 	cgrMultiTexState* getMultiTexState(cgrMultiTexState::tfnTexScheme fnTexScheme
 									   = cgrMultiTexState::modulate);
 };
@@ -63,9 +63,9 @@ extern bool grLoadJpegTexture(const char *fname, ssgTextureInfo* info);
 class cgrSGIHeader : public ssgSGIHeader
 {
  public:
-	
+
 	cgrSGIHeader(const char *fname, ssgTextureInfo* info);
-	
+
 };
 
 #endif // _GRTEXTURE_H_

@@ -28,7 +28,7 @@ typedef struct
 {
 	// Displayed name.
 	const char *name;
-	
+
 	// Display width (in screen pixels 640x400).
 	int	width;
 
@@ -40,7 +40,7 @@ typedef struct
 {
 	// Handle of the screen of the page that is about to be closed/released.
 	void	*prevPageScrHdle;
-	
+
 	// Index of the starting chapter for the requested page.
 	int		startChapterIndex;
 
@@ -64,13 +64,13 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex);
 static void creditsPageChange(void *vpcr)
 {
 	tPageChangeRequest *pcr = (tPageChangeRequest*)vpcr;
-	
+
 	// Get the screen handle of the currently activated page.
 	void* prevPageScrHdle = pcr->prevPageScrHdle;
-	
+
 	// Create and activate requested page screen : it is now the currently activated page.
 	GfuiScreenActivate(creditsPageCreate(pcr->startChapterIndex, pcr->startRecordIndex));
-	
+
 	// Release the previously activated page screen.
 	GfuiScreenRelease(prevPageScrHdle);
 }
@@ -92,7 +92,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	const int nChapters = (int)GfParmGetEltNb(hparmCredits, "chapters");
 	if (startChapterIndex < 0 || startChapterIndex >= nChapters)
 		return 0;
-	
+
 	// Get requested chapter info
 	sprintf(buf, "chapters/%d", startChapterIndex);
 	const char* chapName = GfParmGetStr(hparmCredits, buf, "name", "<no name>");
@@ -101,7 +101,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	const int nRecordsInChapter = (int)GfParmGetEltNb(hparmCredits, buf);
 	if (startRecordIndex >= nRecordsInChapter)
 		return 0;
-	
+
 	// Create screen, load menu XML descriptor and create static controls.
 	void* hscrPage = GfuiScreenCreate();
 
@@ -123,7 +123,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	const int xRecordLineShift = (int)GfuiMenuGetNumProperty(hmenu, "xRecordLineShift", 10);
 	const int yLineShift = (int)GfuiMenuGetNumProperty(hmenu, "yLineShift", 17);
 	const int yRecordShift = (int)GfuiMenuGetNumProperty(hmenu, "yRecordShift", 20);
-	
+
 	// Get columns info (names, width)
 	// (each chapter record may need more than 1 screen line, given the column width sum ...)
 	sprintf(buf, "chapters/%d/columns", startChapterIndex);
@@ -144,7 +144,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	{
 		tColumnDesc column;
 		column.name = GfParmGetCurStr(hparmCredits, buf, "name", "<no name>");
-		column.width = GfParmGetCurNum(hparmCredits, buf, "width", 0, 20); 
+		column.width = GfParmGetCurNum(hparmCredits, buf, "width", 0, 20);
 		if (x >= xRightLastCol)
 		{
 			// We need 1 more screen line for the current credits record ?
@@ -152,10 +152,10 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			x = x0;
 			//y -= yLineShift;
 			nLinesPerRecord++;
-		} 
-	
+		}
+
 		const char* colId = GfParmListGetCurEltName(hparmCredits, buf);
-		// GfuiLabelCreate(hscrPage, column.name, GFUI_FONT_MEDIUM_C, 
+		// GfuiLabelCreate(hscrPage, column.name, GFUI_FONT_MEDIUM_C,
 		// 				x, y, GFUI_ALIGN_HL, 0, colNameColor);
 		x += column.width;
 		orderedColumnIds.push_back(colId);
@@ -168,7 +168,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	if (startRecordIndex < 0)
 		startRecordIndex = nMaxRecordsPerPage * ((nRecordsInChapter - 1) / nMaxRecordsPerPage);
 	int nRecordInd = startRecordIndex;
-	int nLines = 0; 
+	int nLines = 0;
 	for (; nRecordInd < nRecordsInChapter && nRecordInd - startRecordIndex < nMaxRecordsPerPage;
 		 nRecordInd++)
 	{
@@ -196,7 +196,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 
 	// Close credits file
 	GfParmReleaseHandle(hparmCredits);
-	
+
 	// Create "Previous page" button, and disable it if not the first page.
 	const int nPrevButId =
 		GfuiMenuCreateButtonControl(hscrPage, hmenu, "previous page arrow",
@@ -214,26 +214,26 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			PrevPageRequest.startChapterIndex = startChapterIndex - 1;
 			PrevPageRequest.startRecordIndex  = -1;
 		}
-		GfuiAddKey(hscrPage, GFUIK_PAGEUP, "Previous page", 
+		GfuiAddKey(hscrPage, GFUIK_PAGEUP, "Previous page",
 				   (void*)&PrevPageRequest, creditsPageChange, NULL);
 	}
 	else
 	{
 		GfuiEnable(hscrPage, nPrevButId, GFUI_DISABLE);
 	}
-	
+
 	// Add "Continue" button (credits screen exit).
 	GfuiMenuCreateButtonControl(hscrPage, hmenu, "back button",
 								RetScrHdle, GfuiScreenReplace);
-	
+
 	// Add "Next page" button, and disable it  if not the last page.
 	const int nNextButId =
 		GfuiMenuCreateButtonControl(hscrPage, hmenu, "next page arrow",
 									(void*)&NextPageRequest, creditsPageChange);
-	if (nRecordInd < nRecordsInChapter || startChapterIndex + 1 < nChapters) 
+	if (nRecordInd < nRecordsInChapter || startChapterIndex + 1 < nChapters)
 	{
 		NextPageRequest.prevPageScrHdle = hscrPage;
-		if (nRecordInd < nRecordsInChapter) 
+		if (nRecordInd < nRecordsInChapter)
 		{
 			NextPageRequest.startChapterIndex = startChapterIndex;
 			NextPageRequest.startRecordIndex  = startRecordIndex + nMaxRecordsPerPage;
@@ -243,7 +243,7 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 			NextPageRequest.startChapterIndex = startChapterIndex + 1;
 			NextPageRequest.startRecordIndex  = 0;
 		}
-		GfuiAddKey(hscrPage, GFUIK_PAGEDOWN, "Next Page", 
+		GfuiAddKey(hscrPage, GFUIK_PAGEDOWN, "Next Page",
 				   (void*)&NextPageRequest, creditsPageChange, NULL);
 	}
 	else
@@ -252,17 +252,17 @@ static void* creditsPageCreate(int startChapterIndex, int startRecordIndex)
 	}
 
 	GfParmReleaseHandle(hmenu);
-	
+
 	// Add standard keyboard shortcuts.
-	GfuiAddKey(hscrPage, GFUIK_ESCAPE, "Return to previous menu", 
+	GfuiAddKey(hscrPage, GFUIK_ESCAPE, "Return to previous menu",
 			   RetScrHdle, GfuiScreenReplace, NULL);
-	GfuiAddKey(hscrPage, GFUIK_RETURN, "Return to previous menu", 
+	GfuiAddKey(hscrPage, GFUIK_RETURN, "Return to previous menu",
 			   RetScrHdle, GfuiScreenReplace, NULL);
-	GfuiAddKey(hscrPage, GFUIK_F1, "Help", 
+	GfuiAddKey(hscrPage, GFUIK_F1, "Help",
 			   hscrPage, GfuiHelpScreen, NULL);
-	GfuiAddKey(hscrPage, GFUIK_F12, "Take a Screen Shot", 
+	GfuiAddKey(hscrPage, GFUIK_F12, "Take a Screen Shot",
 			   NULL, GfuiScreenShot, NULL);
-	
+
 	return hscrPage;
 }
 
@@ -271,7 +271,7 @@ void CreditsMenuActivate(void *retScrHdle)
 {
 	// Store return screen handle.
 	RetScrHdle = retScrHdle;
-	
+
 	// Create first page screen and return its handle.
 	GfuiScreenActivate(creditsPageCreate(0, 0));
 }

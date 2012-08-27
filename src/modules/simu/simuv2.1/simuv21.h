@@ -1,8 +1,8 @@
 /***************************************************************************
 
     file        : simuv21.h
-    copyright   : (C) 2011 by Jean-Philippe Meuret                        
-    email       : pouillot@users.sourceforge.net   
+    copyright   : (C) 2011 by Jean-Philippe Meuret
+    email       : pouillot@users.sourceforge.net
     version     : $Id$
 
  ***************************************************************************/
@@ -15,8 +15,8 @@
  *   (at your option) any later version.                                   *
  *                                                                         *
  ***************************************************************************/
- 
-/** @file    
+
+/** @file
     		The "Simu V2.1" physics engine module
     @version    $Id$
 */
@@ -71,7 +71,7 @@ class SIMUV21_API Simuv21 : public GfModule, public IPhysicsEngine
 
 	// Protected constructor to avoid instanciation outside (but friends).
 	Simuv21(const std::string& strShLibName, void* hShLibHandle);
-	
+
 	// Make the C interface functions nearly member functions.
 	friend int openGfModule(const char* pszShLibName, void* hShLibHandle);
 	friend int closeGfModule();
@@ -82,4 +82,4 @@ class SIMUV21_API Simuv21 : public GfModule, public IPhysicsEngine
 	static Simuv21* _pSelf;
 };
 
-#endif /* _SIMUV21_H_ */ 
+#endif /* _SIMUV21_H_ */

@@ -427,14 +427,14 @@ bool grLoadPngTexture (const char *fname, ssgTextureInfo* info)
 	mipmap = doMipMap(fname, mipmap);
 
 // Don't know why this code, but it allocates with new something that is later freed
-// with free in grMakeMipMaps ... so I comment it out. 
+// with free in grMakeMipMaps ... so I comment it out.
 // #ifdef WIN32
 // 	GLubyte* tex2 = new GLubyte[w*h*4];
 // 	memcpy(tex2, tex, w*h*4);
 // 	free(tex);
 // 	tex = tex2;
 // #endif // WIN32
-	
+
 	return grMakeMipMaps(tex, w, h, 4, mipmap) == TRUE ? true : false;
 }
 

@@ -53,7 +53,7 @@ gfuiUnchecked(void *idv)
 {
 	GfuiCheckboxSetChecked(GfuiScreen, (long)idv, true);
 	GfuiUnSelectCurrent();
-	
+
     tGfuiObject* object = gfuiGetObject(GfuiScreen, (long)idv);
     if (!object)
 		return;
@@ -67,16 +67,16 @@ gfuiUnchecked(void *idv)
 
 }
 
-int 
+int
 GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageheight,
 				   const char *pszText, bool bChecked,
-				   void* userData, tfuiCheckboxCallback onChange, 
+				   void* userData, tfuiCheckboxCallback onChange,
 				   void *userDataOnFocus, tfuiCallback onFocus, tfuiCallback onFocusLost)
 {
     tGfuiCheckbox	*checkbox;
     tGfuiObject		*object;
     tGfuiScreen		*screen = (tGfuiScreen*)scr;
-  
+
     object = (tGfuiObject*)calloc(1, sizeof(tGfuiObject));
 	object->widget = GFUI_CHECKBOX;
 	object->focusMode = GFUI_FOCUS_NONE;
@@ -121,9 +121,9 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageh
 		pCheckedBut->y = pUncheckedBut->y =
 			y + (gfuiFont[font]->getHeight() - pCheckedBut->height) / 2;
 	}
-	
+
 	int width = imagewidth + 5 + gfuiFont[font]->getWidth(pszText);
-	
+
 	// Bounding box
 	object->xmin = x;
 	object->xmax = x + width;
@@ -139,11 +139,11 @@ GfuiCheckboxCreate(void *scr, int font, int x, int y, int imagewidth, int imageh
 
 	checkbox->labelId =
 		GfuiLabelCreate(scr, pszText, font, xl, yl, 0, GFUI_ALIGN_HL, strlen(pszText));
-	
+
     gfuiAddObject(screen, object);
 
 	GfuiCheckboxSetChecked(scr, object->id, bChecked);
-	
+
     return object->id;
 }
 
