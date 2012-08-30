@@ -40,17 +40,17 @@ ENDIF(PKGCONFIG_FOUND)
 # Then try the good old way for include dirs.
 IF(NOT APPLE)
 
-  FIND_PATH(SOLID_SOLIDINCLUDE_DIR SOLID/solid.h
+  FIND_PATH(SOLID_INCLUDE_DIR SOLID/solid.h
     HINTS ENV SOLID_DIR
     PATH_SUFFIXES 
 	  include/FreeSOLID include/freesolid include/SOLID include
     PATHS
 	  /usr /usr/local
-    DOC "Non-Apple location of SOLID")
+    DOC "Non-Apple include dir for SOLID")
 
 ELSE(NOT APPLE)
 
-  FIND_PATH(SOLID_SOLIDINCLUDE_DIR solid.h
+  FIND_PATH(SOLID_INCLUDE_DIR solid.h
     HINTS ENV SOLID_DIR
     PATH_SUFFIXES 
 	  Headers include/FreeSOLID include/freesolid include/SOLID include
@@ -61,11 +61,9 @@ ELSE(NOT APPLE)
  	  /System/Library/Frameworks/SOLID.framework # Tiger
 
 	  /usr /usr/local
-    DOC "Apple location of SOLID")
+    DOC "Apple include dir for SOLID")
 
 ENDIF(NOT APPLE)
-
-SET(SOLID_INCLUDE_DIR ${SOLID_SOLIDINCLUDE_DIR} CACHE DOC "Include dir for SOLID")
 
 # Then try the good old way for libs.
 FIND_LIBRARY(SOLID_SOLID_LIBRARY 
@@ -97,6 +95,4 @@ IF(SOLID_FOUND)
 ELSE(SOLID_FOUND)
   MESSAGE(FATAL_ERROR "Could not find SOLID")
 ENDIF(SOLID_FOUND)
-
-MARK_AS_ADVANCED(SOLID_SOLIDINCLUDE_DIR)
 
