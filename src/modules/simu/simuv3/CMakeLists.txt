@@ -36,7 +36,7 @@ ADD_LIBRARY(simuv3 SHARED ${_SOURCES})
 
 ADD_SOLID_LIBRARY(simuv3) # Ignored if not OPTION_3RDPARTY_SOLID
 
-ADD_SDLIB_LIBRARY(simuv3 tgf robottools solid) # solid ignored if OPTION_3RDPARTY_SOLID
+ADD_SDLIB_LIBRARY(simuv3 portability tgf robottools solid) # solid ignored if OPTION_3RDPARTY_SOLID
 
 IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(simuv3 PROPERTIES PREFIX "")

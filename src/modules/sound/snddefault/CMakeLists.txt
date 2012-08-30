@@ -40,7 +40,7 @@ ENDIF(UNIX OR MINGW)
 ADD_PLIB_LIBRARY(snddefault ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(snddefault)
 
-ADD_SDLIB_LIBRARY(snddefault tgf tgfclient robottools)
+ADD_SDLIB_LIBRARY(snddefault portability tgf tgfclient robottools)
 
 IF(OPENAL_FOUND)
     TARGET_LINK_LIBRARIES(snddefault ${OPENAL_LIBRARY})

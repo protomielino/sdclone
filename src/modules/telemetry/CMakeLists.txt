@@ -14,6 +14,6 @@ IF(UNIX OR MINGW)
 	SET_TARGET_PROPERTIES(telemetry PROPERTIES PREFIX "")
 ENDIF(UNIX OR MINGW)
 
-ADD_SDLIB_LIBRARY(telemetry tgf)
+ADD_SDLIB_LIBRARY(telemetry portability tgf)
 
 SD_INSTALL_FILES(LIB modules/telemetry TARGETS telemetry)

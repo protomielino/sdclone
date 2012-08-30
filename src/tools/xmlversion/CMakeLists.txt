@@ -12,12 +12,11 @@ ENDIF(COMMAND cmake_policy)
 ADD_EXECUTABLE(xmlversion ${XMLVERSION_SOURCES})
 
 IF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
-	#WARNING: the order of the library in the line below matters! First tgf, then
-	#txml!!!
-	ADD_SDLIB_LIBRARY(xmlversion tgf txml STATIC)
+	#WARNING: the order of the library in the line below matters! First tgf, then txml!!!
+	ADD_SDLIB_LIBRARY(xmlversion portability tgf txml STATIC)
 	ADD_SDL_LIBRARY(xmlversion)
 ELSE(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
-	ADD_SDLIB_LIBRARY(xmlversion tgf txml)
+	ADD_SDLIB_LIBRARY(xmlversion portability tgf txml)
 ENDIF(CMAKE_SKIP_RPATH OR CMAKE_SKIP_BUILD_RPATH)
 
 IF(UNIX)

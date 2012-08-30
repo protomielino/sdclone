@@ -41,7 +41,8 @@ ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_PLIB_LIBRARY(tgfclient ul sg sl)
-ADD_SDLIB_LIBRARY(tgfclient tgf networking)
+
+ADD_SDLIB_LIBRARY(tgfclient portability tgf networking)
 
 ADD_PNG_LIBRARY(tgfclient)
 ADD_JPEG_LIBRARY(tgfclient)

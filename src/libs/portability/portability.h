@@ -53,48 +53,29 @@
 
 #endif
 
-// Missing strndup, define it here (for FreeBSD).
-// TODO: Move it into a library !
-// Code provided by Thierry Thomas.
+// DLL exported symbols declarator for Windows.
+#ifdef WIN32
+# ifdef portability_EXPORTS
+#  define PORTABILITY_API __declspec(dllexport)
+# else
+#  define PORTABILITY_API __declspec(dllimport)
+# endif
+#else
+# define PORTABILITY_API
+#endif
+
+// Missing strndup, defined in portability.cpp (for FreeBSD).
 #ifndef HAVE_STRNDUP
 
-static char *strndup(const char *str, int len)
-{
-	if (!str || len < 0)
-		return 0;
-
-	char* ret;
-	if (!(ret = (char*)malloc(len + 1)))
-		return 0;
-
-	memcpy(ret, str, len);
-	ret[len] = '\0';
-
-	return ret;
-}
+PORTABILITY_API char *strndup(const char *str, int len);
 
 #endif // HAVE_STRNDUP
 
-// Missing strtok_r, define it here (for MinGW).
-// TODO: Move it into a library !
-// Code provided by Charlie Gordon http://bytes.com/topic/c/answers/708293-strtok-strtok_r.
+// Missing strtok_r, defined in portability.cpp (for MinGW).
 #ifndef HAVE_STRTOK_R
-static char *strtok_r(char *str, const char *delim, char **nextp)
-{
-	char *ret;
 
-	if (!str)
-		str = *nextp;
-	str += strspn(str, delim);
-	if (*str == '\0')
-		return 0;
-	ret = str;
-	str += strcspn(str, delim);
-	if (*str)
-		*str++ = '\0';
-	*nextp = str;
-	return ret;
-}
+PORTABILITY_API char *strtok_r(char *str, const char *delim, char **nextp);
+
 #endif // HAVE_STRTOK_R
 
 

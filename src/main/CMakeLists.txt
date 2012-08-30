@@ -21,7 +21,7 @@ ENDIF(COMMAND CMAKE_POLICY)
 
 ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES})
 
-ADD_SDLIB_LIBRARY(${_TARGET_NAME} tgf tgfclient tgfdata raceengine)
+ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability tgf tgfclient tgfdata raceengine)
 
 IF(UNIX)
     SD_INSTALL_FILES(MAN man6 PREFIX ${SOURCE_DIR}/doc/man FILES ${_TARGET_NAME}.6)

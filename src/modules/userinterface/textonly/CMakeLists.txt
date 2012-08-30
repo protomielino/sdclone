@@ -33,6 +33,6 @@ IF(UNIX OR MINGW)
     SET_TARGET_PROPERTIES(textonly PROPERTIES PREFIX "")
 ENDIF(UNIX OR MINGW)
 
-ADD_SDLIB_LIBRARY(textonly tgf tgfclient tgfdata networking)
+ADD_SDLIB_LIBRARY(textonly portability tgf tgfclient tgfdata networking)
 
 SD_INSTALL_FILES(LIB modules/userinterface TARGETS textonly)

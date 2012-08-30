@@ -27,6 +27,7 @@ IF(UNIX OR MINGW)
 ENDIF(UNIX OR MINGW)
 
 ADD_PLIB_LIBRARY(track ul sg)
-ADD_SDLIB_LIBRARY(track tgf robottools)
+
+ADD_SDLIB_LIBRARY(track portability tgf robottools)
 
 SD_INSTALL_FILES(LIB modules/track TARGETS track)

@@ -26,6 +26,8 @@ ADD_LIBRARY(metar SHARED ${METAR_SOURCES})
 # This line does nothing : what it really intended ?
 #ADD_PLIB_LIBRARY(metar)
 
+ADD_SDLIB_LIBRARY(metar portability)
+
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS metar)
 ELSE(WIN32)

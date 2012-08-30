@@ -49,7 +49,7 @@ ENDIF(UNIX OR MINGW)
 ADD_PLIB_LIBRARY(ssggraph ul sg sl ssg ssgaux)
 ADD_SDL_LIBRARY(ssggraph)
 
-ADD_SDLIB_LIBRARY(ssggraph tgf tgfclient robottools)
+ADD_SDLIB_LIBRARY(ssggraph portability tgf tgfclient robottools)
 
 IF(OPENAL_FOUND)
     TARGET_LINK_LIBRARIES(ssggraph ${OPENAL_LIBRARY})

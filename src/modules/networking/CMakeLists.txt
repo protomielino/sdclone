@@ -37,7 +37,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 
-ADD_SDLIB_LIBRARY(networking tgf)
+ADD_SDLIB_LIBRARY(networking portability tgf)
 
 IF(WIN32)
 	SD_INSTALL_FILES(BIN TARGETS networking)

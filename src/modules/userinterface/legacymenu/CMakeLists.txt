@@ -81,6 +81,6 @@ ENDIF(UNIX OR MINGW)
 #    TARGET_LINK_LIBRARIES(legacymenu winmm)
 #ENDIF(WIN32)
 
-ADD_SDLIB_LIBRARY(legacymenu tgf tgfclient tgfdata networking)
+ADD_SDLIB_LIBRARY(legacymenu portability tgf tgfclient tgfdata networking)
 
 SD_INSTALL_FILES(LIB modules/userinterface TARGETS legacymenu)

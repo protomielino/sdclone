@@ -40,6 +40,8 @@ ADD_LIBRARY(ephemeris SHARED ${EPHEMERIS_SOURCES})
 
 ADD_PLIB_LIBRARY(ephemeris ul sg)
 
+ADD_SDLIB_LIBRARY(ephemeris portability)
+
 IF(WIN32)
     SD_INSTALL_FILES(BIN TARGETS ephemeris)
 ELSE(WIN32)

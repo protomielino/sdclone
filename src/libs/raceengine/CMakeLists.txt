@@ -44,7 +44,7 @@ ADD_LIBRARY(raceengine SHARED ${RACEENGINE_SOURCES})
 #SET_TARGET_PROPERTIES(raceengine PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
 
 ADD_SDLIB_LIBRARY(raceengine
-                  tgf tgfdata robottools
+                  portability tgf tgfdata robottools
                   networking)
 
 IF(WIN32)
