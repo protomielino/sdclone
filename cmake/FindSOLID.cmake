@@ -67,7 +67,7 @@ ENDIF(NOT APPLE)
 
 # Then try the good old way for libs.
 FIND_LIBRARY(SOLID_SOLID_LIBRARY 
-  NAMES solid
+  NAMES solid FreeSOLID freesolid
   HINTS ENV SOLID_DIR
   PATH_SUFFIXES lib64 lib libs64 libs libs/Win32 libs/Win64
   PATHS /usr /usr/local)
