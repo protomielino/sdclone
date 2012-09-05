@@ -313,6 +313,16 @@ reCarsApplyRaceRules(tCarElt *car)
 			GfLogInfo("%s got a Drive-Through penalty (too fast in the pits).\n", car->_name);
 		}
     }
+
+    // Check for jumping starting lights
+    if (ReInfo->s->_raceState & RM_RACE_PRESTART  && car->_speed_x > 1) {
+		if (!(rules->ruleState & (RM_PNST_STOPANDGO))) {
+			reCarsAddPenalty(car, RM_PENALTY_STOPANDGO);
+			rules->ruleState = RM_PNST_STOPANDGO;
+			GfLogInfo("%s got a Stop-and-Go penalty (jumped starting lights).\n",
+				car->_name);
+		}
+    }
 }
 
 void

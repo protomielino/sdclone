@@ -50,6 +50,7 @@
 static const int FuelReserve = 3;
 static const tdble MaxFuelPerMeter = 0.0008;	// [kg/m] fuel consumption.
 
+static void updateKeys(void);
 static void initTrack(int index, tTrack* track, void *carHandle, void **carParmHandle, tSituation *s);
 static void drive_mt(int index, tCarElt* car, tSituation *s);
 static void drive_at(int index, tCarElt* car, tSituation *s);
@@ -114,6 +115,8 @@ const static int hboxChanges[] = {   0x02, // 0b00000010,  // R
                                      0xA2, // 0b10100010,  // 5
                                      0x42  // 0b01000010   // 6
                                 };
+
+static int preGear = 0;
 
 #ifdef _WIN32
 /* Must be present under MS Windows */
@@ -576,6 +579,36 @@ newrace(int index, tCarElt* car, tSituation *s)
 		}//KEYBOARD
 
 	}//for i
+
+	// Check whether Grid Gearbox is already in gear
+	if (HCtx[idx]->transmission == eTransGrid)
+	{
+		/* default to neutral gear */
+		preGear = 0;
+
+		/* Select the right gear if any gear command activated */
+		updateKeys();
+
+		if (joyPresent) {
+			GfctrlJoyGetCurrentStates(joyInfo);
+		}
+
+		GfctrlMouseGetCurrentState(mouseInfo);
+
+		for (int i = CMD_GEAR_R; i <= CMD_GEAR_6; i++) {
+			if ((cmd[i].type == GFCTRL_TYPE_JOY_BUT && joyInfo->levelup[cmd[i].val])
+			    || (cmd[i].type == GFCTRL_TYPE_MOUSE_BUT && mouseInfo->button[cmd[i].val])
+#if 0	//SDW fixme
+			    || (cmd[i].type == GFCTRL_TYPE_KEYBOARD && keyInfo[lookUpKeyMap(cmd[i].val)].state)
+#endif
+				)
+			{
+				preGear = i - CMD_GEAR_N;
+			}
+		}
+
+		GfOut("Gridbox Initial Gear %d\n", preGear);
+	}
 
 }//newrace
 
@@ -1489,6 +1522,12 @@ drive_mt(int index, tCarElt* car, tSituation *s)
 			if (car->_speed_x < 10 || car->_gear == 0)
 				car->_gearCmd = -1;
 		}
+	}
+
+	// check if Grid gear shift is left in gear
+	if (preGear) {
+		car->_gearCmd = preGear;
+		preGear = 0;
 	}
 
 	if (HCtx[idx]->autoClutch && car->_clutchCmd == 0.0f)
