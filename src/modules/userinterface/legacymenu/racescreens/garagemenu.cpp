@@ -328,8 +328,10 @@ void RmGarageMenu::resetSkinComboBox(const std::string& strCarName,
 	std::vector<GfDriverSkin>::const_iterator itSkin;
 	for (itSkin = _vecPossSkins.begin(); itSkin != _vecPossSkins.end(); itSkin++)
 	{
-		const std::string strDispSkinName =
+		std::string strDispSkinName =
 			itSkin->getName().empty() ? "standard" : itSkin->getName();
+		//#736: display skin name starting with capital letter
+		strDispSkinName[0] = toupper(strDispSkinName[0]);
 		GfuiComboboxAddText(getMenuHandle(), nSkinComboId, strDispSkinName.c_str());
 		if (pSelSkin && itSkin->getName() == pSelSkin->getName())
 			_nCurSkinIndex = itSkin - _vecPossSkins.begin();
