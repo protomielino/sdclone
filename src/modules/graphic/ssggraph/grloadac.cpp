@@ -424,8 +424,10 @@ static int do_material ( char *s )
   int   shi ;
   float trans ;
 
+  //#537: Limiting parsing 1023 bytes to fit in "name", as we have
+  // no info how long a string we received as param "s"
   if ( sscanf ( s,
-  "%s rgb %f %f %f amb %f %f %f emis %f %f %f spec %f %f %f shi %d trans %f",
+  "%1023s rgb %f %f %f amb %f %f %f emis %f %f %f spec %f %f %f shi %d trans %f",
     name,
     &rgb [0], &rgb [1], &rgb [2],
     &amb [0], &amb [1], &amb [2],
@@ -434,7 +436,9 @@ static int do_material ( char *s )
     &shi,
     &trans ) != 15 )
   {
-    ulSetError ( UL_WARNING, "grloadac:do_material: Can't parse this MATERIAL:%s", s ) ;
+	//#537: Limiting error message length, as PLIB error handler
+	// can store only 1024 bytes
+    ulSetError ( UL_WARNING, "grloadac:do_material: Can't parse this MATERIAL: %512s", s ) ;
   }
   else
   {
