@@ -143,7 +143,7 @@ public:
 	{
 		if (_info.dispname)
 			delete[] _info.dispname;
-		if (!dispname || strlen(dispname) == 0)
+		if (!dispname)
 			dispname = NoPlayer;
 		_info.dispname = new char[strlen(dispname)+1];
 		strcpy(_info.dispname, dispname); // Can't use strdup : free crashes in destructor !?
@@ -706,14 +706,37 @@ onChangeName(void * /* dummy */)
         // Remove leading spaces (#587)
         std::string strIn(val);
         size_t startpos = strIn.find_first_not_of(" \t"); // Find the first character position after excluding leading blank spaces
-	size_t endpos = strIn.find_last_not_of(" \t");	// Find last non-whitespace char position
+        size_t endpos = strIn.find_last_not_of(" \t");  // Find last non-whitespace char position
         if (startpos != std::string::npos && endpos != std::string::npos) {
             strIn = strIn.substr(startpos, endpos - startpos + 1);
         } else {
             strIn.assign(NoPlayer); // If it was all whitespace, assign default
         }
 
-        (*CurrPlayer)->setDispName(strIn == PlayerNamePrompt ? NoPlayer : strIn.c_str());
+        (*CurrPlayer)->setDispName((strIn == PlayerNamePrompt || strIn == NoPlayer) ? NoPlayer : strIn.c_str());
+    }
+
+    UpdtScrollList();
+}
+
+
+//#641 New player name should get empty when clicking on it
+// In the Player Configuration menu, when you create
+// a new player, his name is set to "-- Enter name --",
+// as a prompt for changing it.
+// But when you want to change it, you have to first erase
+// this prompt string all.
+// Would be great if the prompt string disappear when clicked.
+// Note(kilo): this way if one clicks the player name editbox
+// and leaves without entering anything, the new player will be called
+// "--No Player--" and stored with that name.
+static void
+onActivateName(void * /* dummy */)
+{
+    std::string strIn = GfuiEditboxGetString(ScrHandle, NameEditId);
+    if (strIn == PlayerNamePrompt) {
+        (*CurrPlayer)->setDispName("");
+        GfuiEditboxSetString(ScrHandle, NameEditId, (*CurrPlayer)->dispName());
     }
 
     UpdtScrollList();
@@ -872,7 +895,7 @@ PlayerConfigMenuInit(void *prevMenu)
     GfuiMenuCreateButtonControl(ScrHandle, param, "controls", NULL, onConfControls);
 
     /* Player name editbox */
-    NameEditId = GfuiMenuCreateEditControl(ScrHandle, param, "nameedit", NULL, NULL, onChangeName);
+    NameEditId = GfuiMenuCreateEditControl(ScrHandle, param, "nameedit", NULL, onActivateName, onChangeName);
 
     /* Player skill level "combobox" (left arrow, label, right arrow) */
     GfuiMenuCreateButtonControl(ScrHandle, param, "skillleftarrow", (void*)0, onChangeLevel);
