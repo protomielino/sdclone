@@ -272,9 +272,11 @@ rmdsChangeSkin(void *vp)
 					+ (int)(long)vp) % VecCurDriverPossSkins.size();
 
 	const GfDriverSkin& curSkin = VecCurDriverPossSkins[CurSkinIndex];
-	const std::string strCurSkinDispName =
+	std::string strCurSkinDispName =
 		curSkin.getName().empty() ? "standard " : curSkin.getName();
-    GfuiLabelSetText(ScrHandle, SkinEditId, strCurSkinDispName.c_str());
+	//#736: display skin name starting with capital letter
+	strCurSkinDispName[0] = toupper(strCurSkinDispName[0]);
+	GfuiLabelSetText(ScrHandle, SkinEditId, strCurSkinDispName.c_str());
 
 	// Load associated preview image (or "no preview" panel if none available).
 	if (GfFileExists(curSkin.getCarPreviewFileName().c_str()))
