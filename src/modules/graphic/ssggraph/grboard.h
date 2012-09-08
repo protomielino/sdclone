@@ -51,23 +51,27 @@ class cGrBoard
  private:
     void grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInfo* frame);
     void grDispGGraph(tCarElt *car);
-    void grDispCarBoard1(tCarElt *car, tSituation *s);
     void grDispMisc(bool bCurrentScreen);
     void grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdble val, const char *title);
-    void grDispCarBoard2(tCarElt *car, tSituation *s);
-    void grDispCarBoard(tCarElt *car, tSituation *s);
+
+    void grDispCarBoard(const tCarElt *car, const tSituation *s);
+    void grDispCarBoard1(const tCarElt *car, const tSituation *s);
+    void grDispCarBoard2(const tCarElt *car, const tSituation *s);
+
     void grDispCounterBoard(tCarElt *car);
+
     void grDispLeaderBoard(const tCarElt *car, const tSituation *s);
+    void grDispCounterBoard2(tCarElt *car);
     void grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const;
     void grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s);
-    void grDispCounterBoard2(tCarElt *car);
+
     void grDispArcade(tCarElt *car, tSituation *s);
     std::string grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation *s, const bool isLeader) const;
     // Track overview object
     cGrTrackMap *trackMap;
 
-    bool grGetSplitTime(tSituation *s, tCarElt *car, bool gap_inrace, double &time, int *laps_different, float **color);
-    void grGetLapsTime(tSituation *s, tCarElt *car, char* result, char const** label) const;
+    bool grGetSplitTime(const tSituation *s, const tCarElt *car, bool gap_inrace, double &time, int *laps_different, float **color);
+    void grGetLapsTime(const tSituation *s, const tCarElt *car, char* result, char const** label) const;
     void grMakeThreeLetterNames(const tSituation *s);
     void grSetupDrawingArea(int xl, int yb, int xr, int yt) const;
 		
