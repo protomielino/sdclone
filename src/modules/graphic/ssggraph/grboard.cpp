@@ -43,6 +43,7 @@ static float grGreen[4] = {0.0, 1.0, 0.0, 1.0};
 static float grBlack[4] = {0.0, 0.0, 0.0, 1.0};
 static float grPink[4] = {1.0, 0.0, 1.0, 1.0};
 static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
+static float grGrey[4] = {0.3, 0.3, 0.3, 1.0};
 
 static const int NB_BOARDS = 3;
 static const int NB_LBOARDS = 5; //# of leaderboard states
@@ -596,10 +597,14 @@ cGrBoard::grDispCarBoard(const tCarElt *car, const tSituation *s)
 
     case 1:
       grDispCarBoard1(car, s);
+      if (true)
+        grDispIndicators(car);
       break;
 
     case 2:
       grDispCarBoard2(car, s);
+      if (true)
+        grDispIndicators(car);
       break;
 
     default:
@@ -1747,3 +1752,53 @@ cGrBoard::grSetupDrawingArea(int xl, int yb, int xr, int yt) const
   glEnd();
   glDisable(GL_BLEND);
 }
+
+
+void
+cGrBoard::grDispIndicators(const tCarElt* car)
+{
+  //Only useful for humans - maybe robots should show that, too?
+  if (car->_driverType == RM_DRV_HUMAN) {
+    bool abs = false; //Show ABS indicator?
+    bool tcs = false; //Show TCS indicator?
+    bool spd = false; //Show speed limiter indicator?
+
+    //Parse control messages if they include ABS / TCS / SPD
+    for (int i = 0; i < 4; i++) {
+      if (car->ctrl.msg[i]) {
+        abs = abs || strstr(car->ctrl.msg[i], "ABS");
+        tcs = tcs || strstr(car->ctrl.msg[i], "TCS");
+        spd = spd || strstr(car->ctrl.msg[i], "Speed Limiter On");
+      }
+    }
+
+    //Setup drawing area
+    int dy = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
+    int dy2 = GfuiFontHeight(GFUI_FONT_SMALL_C);
+    int dx = GfuiFontWidth(GFUI_FONT_MEDIUM_C, "SPD");
+
+    int x = centerAnchor - 200;               //constant text left pos.
+    int y = BOTTOM_ANCHOR + dy2 * 8 + dy + 5; //first row top pos.
+
+    //Display board
+    grSetupDrawingArea(x - 5, y + dy + 5, x + dx + 5, y - dy2 * 8 - dy + 5);
+
+    //Display strings (until we are more advanced graphically)
+    if (abs)
+      GfuiDrawString("ABS", grGreen, GFUI_FONT_MEDIUM_C, x, y);
+    else
+      GfuiDrawString("ABS", grGrey, GFUI_FONT_MEDIUM_C, x, y);
+    y -= dy;
+
+    if (tcs)
+      GfuiDrawString("TCS", grGreen, GFUI_FONT_MEDIUM_C, x, y);
+    else
+      GfuiDrawString("TCS", grGrey, GFUI_FONT_MEDIUM_C, x, y);
+    y -= dy;
+
+    if (spd)
+      GfuiDrawString("SPD", grGreen, GFUI_FONT_MEDIUM_C, x, y);
+    else
+      GfuiDrawString("SPD", grGrey, GFUI_FONT_MEDIUM_C, x, y);
+  }  // if human
+}  // grDispIndicators
