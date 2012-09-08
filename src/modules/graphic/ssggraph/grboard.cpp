@@ -1535,8 +1535,8 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
  * 
  * Scrolls the leaderboard on the bottom line, as seen on TV broadcasts.
  * 
- * @param car pointer to the currently displayed car
- * @param s current situation, provided by the sim
+ * @param car[in] pointer to the currently displayed car
+ * @param s[in] current situation, provided by the sim
  */
 void
 cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
@@ -1545,7 +1545,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
   //we generate the 3-letter names to be used
   if(iTimer == 0 || iStringStart == 0 || sShortNames.size() == 0)
     grMakeThreeLetterNames(s);
-  
+
   //At first, get the current time and rebuild the ScrollLine text
   if(iTimer == 0 || s->currentTime < iTimer) {
     iTimer = s->currentTime;
@@ -1555,7 +1555,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
      * So it can happen it is somewhat mixed up, it will settle down
      * in the next lap.
     */ 
-    
+
     ostringstream osRoster;
     //Add the track name as separator, embedded with 3 spaces each side.
     osRoster << "   " << grTrack->name << "   ";
@@ -1581,23 +1581,23 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
 
     st.assign(osRoster.str());
   }
-    
+
   int offset = (s->currentTime - iTimer - LEADERBOARD_LINE_SCROLL_DELAY) * LEADERBOARD_LINE_SCROLL_RATE;
   if (offset < 0)
-	  offset = 0;
+    offset = 0;
 
   int dy = GfuiFontHeight(GFUI_FONT_MEDIUM_C);
   int dx = GfuiFontWidth(GFUI_FONT_SMALL_C, "W") * st.size();
-  
+
   //Set up drawing area
-  grSetupDrawingArea(leftAnchor, BOTTOM_ANCHOR, rightAnchor, BOTTOM_ANCHOR + dy);
+  grSetupDrawingArea(leftAnchor, TOP_ANCHOR, rightAnchor, TOP_ANCHOR - dy);
 
   // Check if scrolling is completed
   if (offset > dx + 5) 
     iTimer = 0;
   else
     //Display the line
-    GfuiDrawString(st.c_str(), grWhite, GFUI_FONT_MEDIUM_C, leftAnchor + 5 - offset, BOTTOM_ANCHOR);
+    GfuiDrawString(st.c_str(), grWhite, GFUI_FONT_MEDIUM_C, leftAnchor + 5 - offset, TOP_ANCHOR - dy);
 }//grDispLeaderBoardScrollLine
 
 
