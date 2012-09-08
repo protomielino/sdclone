@@ -725,31 +725,27 @@ cGrBoard::grDispCounterBoard(tCarElt *car)
  * 
  * Displayes the leader board (in the lower left corner of the screen)
  * If [drawLaps] is on, writes the lap counter on the top of the list.
- * @param car the car currently being viewed
- * @param s situation provided by the sim
+ * @param car[in] the car currently being viewed
+ * @param s[in] situation provided by the sim
  */
 void
 cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
 {
   double time_left;
-  if(leaderFlag == 4) 
-  {
+  if(leaderFlag == 4) {
     //Scrolling line in the bottom of the screen
     grDispLeaderBoardScrollLine(car, s);
   }
   //This mode is only reasonable if there are more drivers
   //than the leaderboard can display at once.
-  else if(leaderFlag == 3 && leaderNb < s->_ncars)
-  {
-    //Scrolling results in the bottom left corner
-    grDispLeaderBoardScroll(car, s);
-  }
-  else
-  { //Static leaderboard
+  else if(leaderFlag == 3 && leaderNb < s->_ncars) {
+    grDispLeaderBoardScroll(car, s); //Scrolling results in the bottom left corner
+  } else {
+    //Static leaderboard
     char buf[BUFSIZE];
 
     int current = 0;  //Position of the currently displayed car
-    for(int i = 0; i < s->_ncars; i++) {
+    for(int i = 0; i < s->_ncars; ++i) {
       if (car == s->cars[i]) {
         current = i;
         break;
@@ -757,25 +753,28 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
     }//for i
     
     //Coords, limits
-    const int x = leftAnchor + 5;
-    const int x2 = x + 105;
-	const int dxc = 60;
+    const int x = leftAnchor + 10;
+    const int x2 = x + 100;
+    const int dxc = 60;
     const int xr = x2 + dxc;
-    int y = BOTTOM_ANCHOR + 10;
 
     const int dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
     const int maxLines = MIN(leaderNb, s->_ncars);  //Max # of lines to display (# of cars in race or max 10 by default)
     const int drawLaps = MIN(1, leaderFlag - 1);  //Display # of laps on top of the list?
 
-    grSetupDrawingArea(x, y, xr + 5, y + dy * (maxLines + drawLaps));
+    int y = TOP_ANCHOR - 10;
+    int y2 = y - 5 - dy * (maxLines + drawLaps); 
+
+    grSetupDrawingArea(x, y, xr + 5, y2);
+    y = y2;
     
     //Display current car in last line (ie is its position >= 10)?
-    int drawCurrent = (current >= maxLines) ? 1 : 0;
+    bool drawCurrent = (current >= maxLines) ? true : false;
 
     //The board is built from bottom up:
     //driver position #10/current is drawn first,
     //then from #9 onto #1, then the text 'Laps' if drawLaps requires.
-    for(int j = maxLines; j > 0; j--) {
+    for(int j = maxLines; j > 0; --j) {
       int i;  //index of driver to be displayed
       if (drawCurrent) {
         i = current;
@@ -807,30 +806,27 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
 
     //Write 'Lap X/Y' on top of the leader board
     if (drawLaps) {
-      if (s->_raceType == RM_TYPE_RACE)
-      {
-        if (s->_totTime > s->currentTime)
-  {
+      if (s->_raceType == RM_TYPE_RACE) {
+        if (s->_totTime > s->currentTime) {
           GfuiDrawString(" Laps:", grWhite, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d", MAX(s->cars[0]->_laps-1,0));
           GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
-  } else {
+        } else {
           GfuiDrawString(" Lap:", grWhite, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d / %d", s->cars[0]->_laps, s->_totLaps);
           GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
-  }
+        }
       } else {
-        if (s->_totTime > 0.0f)
-  {
-    time_left = MAX(MIN(s->_totTime,s->_totTime - s->currentTime),0);
+        if (s->_totTime > 0.0f) {
+          time_left = MAX(MIN(s->_totTime,s->_totTime - s->currentTime),0);
           GfuiDrawString(" Time left:", grWhite, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d:%02d:%02d", (int)floor(time_left / 3600.0f), (int)floor(time_left/60.0f) % 60, (int)floor(time_left) % 60);
           GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
-  } else {
+        } else {
           GfuiDrawString(" Lap:", grWhite, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d / %d", s->cars[0]->_laps, s->_totLaps);
           GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
-  }
+        }
       }
     }//if drawLaps
   }//else
@@ -1450,24 +1446,25 @@ void grShutdownBoardCar(void)
  * Displays the leaderboard in a vertical scrolled fashion,
  * if there are more than 10 names to display.
  * 
- * @param car pointer to the currently displayed car
- * @param s current situation, provided by the sim
+ * @param car[in] pointer to the currently displayed car
+ * @param s[in] current situation, provided by the sim
 */
 void
 cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
 {
   //Scrolling
-  if(iTimer == 0 || s->currentTime < iTimer) iTimer = s->currentTime;
+  if(iTimer == 0 || s->currentTime < iTimer)
+    iTimer = s->currentTime;
   if(s->currentTime >= iTimer + LEADERBOARD_SCROLL_TIME) {
-      iTimer = s->currentTime;
-      ++iStart;
-      iStart = iStart % (s->_ncars + 1);  //Limit: number of cars + one separator line
-    }
+    iTimer = s->currentTime;
+    ++iStart;
+    iStart = iStart % (s->_ncars + 1);  //Limit: number of cars + one separator line
+  }
     
   char buf[BUFSIZE];
 
   int current = 0;  //Position of the currently displayed car
-  for(int i = 0; i < s->_ncars; i++) {
+  for(int i = 0; i < s->_ncars; ++i) {
     if (car == s->cars[i]) {
       current = i;
       break;
@@ -1475,15 +1472,17 @@ cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
   }//for i
 
   //Coords, limits
-  const int x = leftAnchor + 5;
+  const int x = leftAnchor + 10;
+  const int x2 = x + 100;
   static const int dxc = 60;
-  const int x2 = x + 105;
-  int y = BOTTOM_ANCHOR + 10;
-
+  
   const int dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
   const int maxLines = MIN(leaderNb, s->_ncars);  //Max # of lines to display (# of cars in race or max 10 by default)
+  int y = TOP_ANCHOR - 10;
+  int y2 = y - 5 - dy * (maxLines + 1);
   
-  grSetupDrawingArea(x, y, x + 175, y + dy * (maxLines + 1));
+  grSetupDrawingArea(x, y, x2 + dxc + 5, y2);
+  y = y2;
 
   //The board is built from bottom up:
   //driver position #10/current is drawn first,
