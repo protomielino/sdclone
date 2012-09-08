@@ -62,7 +62,7 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 	// Check that we are the only instance.
 	if (_pSelf)
 	{
-		GfLogError("More than one GfApplication instance ; exiting");
+		fprintf(stderr, "More than one GfApplication instance ; exiting\n");
 		::exit(1);
 	}
 
@@ -72,6 +72,14 @@ GfApplication::GfApplication(const char* pszName, const char* pszVersion, const 
 	// Initialize the gaming framework.
 	GfInit();
 
+	// Trace build information.
+	GfLogInfo("Built on %s\n", SD_BUILD_INFO_SYSTEM);
+	GfLogInfo("  with CMake %s, '%s' generator\n",
+			  SD_BUILD_INFO_CMAKE_VERSION, SD_BUILD_INFO_CMAKE_GENERATOR);
+	GfLogInfo("  with %s %s compiler ('%s' configuration)\n",
+			  SD_BUILD_INFO_COMPILER_NAME, SD_BUILD_INFO_COMPILER_VERSION,
+			  SD_BUILD_INFO_CONFIGURATION);
+		
 	// Store the command line args.
 	if (argv)
 		for (int i = 0; i < argc; i++)

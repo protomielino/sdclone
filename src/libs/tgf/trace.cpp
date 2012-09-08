@@ -105,13 +105,15 @@ void GfLogSetStream(FILE* fStream)
 				pszClock, stm->tm_year+1900, stm->tm_mon+1, stm->tm_mday,
 				stm->tm_hour, stm->tm_min, stm->tm_sec);
 		fprintf(gfLogStream, "%s Info    Version : %s\n", pszClock, GfApp().version().c_str());
-		
+
 		// Trace current trace level threshold.
 		fprintf(gfLogStream, "%s Info    Current trace level threshold : ", pszClock);
 		if (gfLogLevelThreshold >= gfLogFatal && gfLogLevelThreshold <= gfLogDebug)
 			fprintf(gfLogStream, "%s\n", gfLogLevelNames[gfLogLevelThreshold]);
 		else
 			fprintf(gfLogStream, "Level%d\n", gfLogLevelThreshold);
+
+		// That's all.
 		fflush(gfLogStream);
 		free(pszClock);
     }
