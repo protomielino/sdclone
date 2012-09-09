@@ -6,17 +6,9 @@ PROJECT(speed-dreams-2)
 INCLUDE(cmake/macros.cmake)
 INCLUDE(cmake/checks.cmake)
 
-# Special 3rd Party handling for MS compilers.
-IF(MSVC)
-	INCLUDE(Find3rdPartyDependencies)
-	SD_FIND_3RDPARTY()
-ENDIF(MSVC)
-
 CHECK_HEADERS_H()
 CHECK_FUNCTIONS()
 CHECK_LIBRARIES()
-CHECK_PLIB_LIBRARIES()
-CHECK_PACKAGES()
 
 # Determine version
 SET(NEXT_LESSER_VERSION 0) # The next lesser version

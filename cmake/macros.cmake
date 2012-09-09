@@ -837,10 +837,10 @@ MACRO(ADD_SDL_LIBRARY TARGET)
   FIND_PACKAGE(SDL)
 
   IF(SDL_FOUND)
-    TARGET_LINK_LIBRARIES(${TARGET} ${SDL_LIBRARY})
     IF(SDLMAIN_LIBRARY)
       TARGET_LINK_LIBRARIES(${TARGET} ${SDLMAIN_LIBRARY})
     ENDIF(SDLMAIN_LIBRARY)
+    TARGET_LINK_LIBRARIES(${TARGET} ${SDL_LIBRARY})
   ELSE(SDL_FOUND)
     MESSAGE(FATAL_ERROR "Cannot find SDL library")
   ENDIF(SDL_FOUND)
@@ -1123,7 +1123,7 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
   ENDIF(HAVE_CONFIG_H)
 
-  # Pre-processor definitions (do it only once).
+  # Build options (do it only once).
   IF(NOT _ALREADY_DONE)
 
     # CMake options.
@@ -1158,7 +1158,25 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
     SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
 	
-    # Compiler definitions.
+	# Custom 3rdParty location for some Windows builds (standard CMake Find<package> macros
+	# can't find it, so we needed another solution : see FindCustom3rdParty.cmake).
+	IF(MSVC)
+		SET(_OPTION_CUSTOM_3RDPARTY true) # Always needed for MSVC compilers.
+	ELSEIF(MINGW)
+		IF(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
+			# Not needed with "MSYS Makefiles" generator when using MinGW
+			# (3rd party libs assumed to be installed in standard location /usr/local).
+			SET(_OPTION_CUSTOM_3RDPARTY false)
+		ELSE(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
+			# Just as for MSVC builds : special location.
+			SET(_OPTION_CUSTOM_3RDPARTY true)
+		ENDIF(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
+	ENDIF(MSVC)
+
+	SET(OPTION_CUSTOM_3RDPARTY ${_OPTION_CUSTOM_3RDPARTY} CACHE BOOL "Set to ON to use 3rdParty prebuilt API located in <PROJECT_SOURCE_DIR>/../3rdparty")
+	MARK_AS_ADVANCED(OPTION_CUSTOM_3RDPARTY)
+
+    # Compiler definitions (needs more comments. Is it needed under Windows ?).
     ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
 
     IF(MSVC)
@@ -1398,31 +1416,38 @@ MACRO(SD_INSTALL_FILES)
       SET(DATA_PATH "${DATA_PATH}/")
     ENDIF()
 
-    # Execute xmlversion at install-time to do this registration job.
+    # In order to run xmlversion.exe in the build tree (see below), under Windows,
+    # we nearly always have to copy all dependencies next to it (tgf, txml or Expat, SDL, compiler run-time).
     GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
-    IF(MSVC)
+	IF(NOT OPTION_3RDPARTY_EXPAT)
+      GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
+    ELSE(NOT OPTION_3RDPARTY_EXPAT)
+      FIND_PACKAGE(EXPAT)
+      GET_FILENAME_COMPONENT(EXPAT_LIBPATH "${EXPAT_LIBRARY}" PATH)
+      GET_FILENAME_COMPONENT(EXPAT_LIBNAME "${EXPAT_LIBRARY}" NAME_WE)
+      SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+    FIND_PACKAGE(SDL)
+	SET(SDL_LIBPATHNAME "${SDL_LIBRARY}")
+    IF(MINGW)
+      # Multiple lib specs fuss ... find the one
+      STRING(REGEX REPLACE ".*;([^;]+dll[^;]*);.*" "\\1" SDL_LIBPATHNAME "${SDL_LIBPATHNAME}")
+    ENDIF(MINGW)
+    GET_FILENAME_COMPONENT(SDL_LIBPATH "${SDL_LIBPATHNAME}" PATH)
+    GET_FILENAME_COMPONENT(SDL_LIBNAME "${SDL_LIBPATHNAME}" NAME_WE)
+    IF(MINGW)
+      STRING(REGEX REPLACE "lib(.*)" "\\1" SDL_LIBNAME "${SDL_LIBNAME}")
+    ENDIF(MINGW)
+    SET(SDL_LIB ${SDL_LIBPATH}/../bin/${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
-      # When building with MSVC, in order to run xmlversion.exe in the build tree,
-      # we have to copy all dependencies next to it (tgf, txml or Expat, and SDL).
-	  IF(NOT OPTION_3RDPARTY_EXPAT)
-        GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
-      ELSE(NOT OPTION_3RDPARTY_EXPAT)
-        FIND_PACKAGE(EXPAT)
-        GET_FILENAME_COMPONENT(EXPAT_LIBPATH "${EXPAT_LIBRARY}" PATH)
-        GET_FILENAME_COMPONENT(EXPAT_LIBNAME "${EXPAT_LIBRARY}" NAME_WE)
-        SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-      ENDIF(NOT OPTION_3RDPARTY_EXPAT)
-      FIND_PACKAGE(SDL)
-      GET_FILENAME_COMPONENT(SDL_LIBPATH "${SDL_LIBRARY}" PATH)
-      GET_FILENAME_COMPONENT(SDL_LIBNAME "${SDL_LIBRARY}" NAME_WE)
-      SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    # Execute xmlversion at install-time to do the above mentioned registration job.
+    IF(MSVC)
 
       INSTALL(CODE 
           "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
            STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
            STRING(REPLACE \"$(ConfigurationName)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
            STRING(REPLACE \"$(Configuration)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
-           GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
            SET(_LIBS_TO_INSTALL \"${SDL_LIB}\")
            SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
            IF(NOT OPTION_3RDPARTY_EXPAT)
@@ -1439,7 +1464,9 @@ MACRO(SD_INSTALL_FILES)
            STRING(REPLACE \"$(ConfigurationName)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
            STRING(REPLACE \"$(Configuration)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
            LIST(APPEND _LIBS_TO_INSTALL \${TGF_LIB})
-           FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${_LIBS_TO_INSTALL})
+           GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
+           MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
+           FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
            SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
            IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
              GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
@@ -1456,13 +1483,26 @@ MACRO(SD_INSTALL_FILES)
 
         INSTALL(CODE 
           "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
-           GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
 		   SET(MINGW ${MINGW})
       	   IF(MINGW)
-		     # When building with MinGW, in order to run xmlversion.exe in the build tree,
-        	 # we have to copy internal dependencies next to it (tgf).
-             SET(TGF_LIB ${TGF_LIB})
-			 FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${TGF_LIB})
+             SET(_LIBS_TO_INSTALL \"${TGF_LIB}\")
+             SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
+             IF(NOT OPTION_3RDPARTY_EXPAT)
+               LIST(APPEND _LIBS_TO_INSTALL \"${TXML_LIB}\")
+             ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+             # CMake configuration for MSYS Makefiles generator assumes that 3rd party dependencies are installed
+             # in standard Linux folders, hence in the PATH ; so no need to install next to xmlversion exe.
+		     IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+               IF(OPTION_3RDPARTY_EXPAT)
+                 LIST(APPEND _LIBS_TO_INSTALL \"${EXPAT_LIB}\")
+               ENDIF(OPTION_3RDPARTY_EXPAT)
+               LIST(APPEND _LIBS_TO_INSTALL \"${SDL_LIB}\")
+	           GET_FILENAME_COMPONENT(_MINGW_BINDIR \"${CMAKE_CXX_COMPILER}\" PATH)
+               LIST(APPEND _LIBS_TO_INSTALL \"\${_MINGW_BINDIR}/libstdc++-6.dll\" \"\${_MINGW_BINDIR}/libgcc_s_dw2-1.dll\")
+		     ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+             GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
+             MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
+             FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
 		   ENDIF(MINGW)
            SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
            IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
@@ -1578,31 +1618,41 @@ MACRO(SD_INSTALL_DIRECTORIES)
       SET(DEST_ALL "${DATA_PATH}/")
     ENDIF()
 
+    # In order to run xmlversion.exe in the build tree (see below), under Windows,
+    # we nearly always have to copy all dependencies next to it (tgf, txml or Expat, SDL, compiler run-time).
+    GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
+	IF(NOT OPTION_3RDPARTY_EXPAT)
+      GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
+    ELSE(NOT OPTION_3RDPARTY_EXPAT)
+      FIND_PACKAGE(EXPAT)
+      GET_FILENAME_COMPONENT(EXPAT_LIBPATH "${EXPAT_LIBRARY}" PATH)
+      GET_FILENAME_COMPONENT(EXPAT_LIBNAME "${EXPAT_LIBRARY}" NAME_WE)
+      IF(MINGW) # Multiple lib specs ... assume the 1st is the one.
+        STRING(REGEX REPLACE "(.*);.*" "\\1" EXPAT_LIBNAME ${EXPAT_LIBNAME})
+      ENDIF(MINGW)
+      SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+    FIND_PACKAGE(SDL)
+	SET(SDL_LIBPATHNAME "${SDL_LIBRARY}")
+    IF(MINGW)
+      # Multiple lib specs fuss ... find the one
+      STRING(REGEX REPLACE ".*;([^;]+dll[^;]*);.*" "\\1" SDL_LIBPATHNAME "${SDL_LIBPATHNAME}")
+    ENDIF(MINGW)
+    GET_FILENAME_COMPONENT(SDL_LIBPATH "${SDL_LIBPATHNAME}" PATH)
+    GET_FILENAME_COMPONENT(SDL_LIBNAME "${SDL_LIBPATHNAME}" NAME_WE)
+    IF(MINGW)
+      STRING(REGEX REPLACE "lib(.*)" "\\1" SDL_LIBNAME "${SDL_LIBNAME}")
+    ENDIF(MINGW)
+    SET(SDL_LIB ${SDL_LIBPATH}/../bin/${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+
     # Execute xmlversion at install-time to do this registration job.
     IF(MSVC)
 
-      # When building with MSVC, in order to run xmlversion.exe in the build tree,
-      # we have to copy dependencies next to it (txml or Expat, and SDL).
-      IF(NOT OPTION_3RDPARTY_EXPAT)
-        GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
-      ELSE(NOT OPTION_3RDPARTY_EXPAT)
-        FIND_PACKAGE(EXPAT)
-        GET_FILENAME_COMPONENT(EXPAT_LIBPATH "${EXPAT_LIBRARY}" PATH)
-        GET_FILENAME_COMPONENT(EXPAT_LIBNAME "${EXPAT_LIBRARY}" NAME_WE)
-        SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-	  ENDIF(NOT OPTION_3RDPARTY_EXPAT)
-      GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
-      FIND_PACKAGE(SDL)
-      GET_FILENAME_COMPONENT(SDL_LIBPATH "${SDL_LIBRARY}" PATH)
-      GET_FILENAME_COMPONENT(SDL_LIBNAME "${SDL_LIBRARY}" NAME_WE)
-      SET(SDL_LIB ${SDL_LIBPATH}/../bin/${CMAKE_SHARED_LIBRARY_PREFIX}${SDL_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-
       INSTALL(CODE 
-          "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+          "FILE(READ \"${CMAKE_BINARY_DIR}/xmlversion_loc.txt\" XMLVERSION_EXE)
            STRING(REPLACE \"$(OutDir)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
            STRING(REPLACE \"$(ConfigurationName)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
            STRING(REPLACE \"$(Configuration)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" XMLVERSION_EXE \${XMLVERSION_EXE})
-           GET_FILENAME_COMPONENT(XMLVERSION_DIR \${XMLVERSION_EXE} PATH)
            SET(_LIBS_TO_INSTALL \"${SDL_LIB}\")
            SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
            IF(NOT OPTION_3RDPARTY_EXPAT)
@@ -1619,18 +1669,19 @@ MACRO(SD_INSTALL_DIRECTORIES)
            STRING(REPLACE \"$(ConfigurationName)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
            STRING(REPLACE \"$(Configuration)\" \"\${CMAKE_INSTALL_CONFIG_NAME}\" TGF_LIB \${TGF_LIB})
            LIST(APPEND _LIBS_TO_INSTALL \"\${TGF_LIB}\")
-           FILE(INSTALL DESTINATION \${XMLVERSION_DIR} TYPE FILE FILES \${_LIBS_TO_INSTALL})
+           MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
+           GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
+           FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
            SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
            IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
              GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
            ENDIF()
-
            FOREACH(DIRECTORY ${DIRECTORIES})
              SET(GLOB_EXPRS)
              FOREACH(PATTERN ${PATTERNS})
                LIST(APPEND GLOB_EXPRS \"${PREFIX}\${DIRECTORY}/\${PATTERN}\")
              ENDFOREACH()
-             FILE(GLOB_RECURSE FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS})
+             FILE(GLOB_RECURSE FILES RELATIVE \"${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS}\")
              FOREACH(FILE \${FILES})
                IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
                   EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DEST_ALL}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
@@ -1644,7 +1695,28 @@ MACRO(SD_INSTALL_DIRECTORIES)
     ELSE(MSVC)
 
       INSTALL(CODE 
-          "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+          "FILE(READ \"${CMAKE_BINARY_DIR}/xmlversion_loc.txt\" XMLVERSION_EXE)
+		   SET(MINGW ${MINGW})
+      	   IF(MINGW)
+             SET(_LIBS_TO_INSTALL \"${TGF_LIB}\")
+             SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
+             IF(NOT OPTION_3RDPARTY_EXPAT)
+               LIST(APPEND _LIBS_TO_INSTALL \"${TXML_LIB}\")
+             ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+             # CMake configuration for MSYS Makefiles generator assumes that 3rd party dependencies are installed
+             # in standard Linux folders, hence in the PATH ; so no need to install next to xmlversion exe.
+		     IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+               IF(OPTION_3RDPARTY_EXPAT)
+                 LIST(APPEND _LIBS_TO_INSTALL \"${EXPAT_LIB}\")
+               ENDIF(OPTION_3RDPARTY_EXPAT)
+               LIST(APPEND _LIBS_TO_INSTALL \"${SDL_LIB}\")
+	           GET_FILENAME_COMPONENT(_MINGW_BINDIR \"${CMAKE_CXX_COMPILER}\" PATH)
+               LIST(APPEND _LIBS_TO_INSTALL \"\${_MINGW_BINDIR}/libstdc++-6.dll\" \"\${_MINGW_BINDIR}/libgcc_s_dw2-1.dll\")
+		     ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+             MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
+             GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
+             FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
+		   ENDIF(MINGW)
            SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
            IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
              GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
@@ -1656,13 +1728,12 @@ MACRO(SD_INSTALL_DIRECTORIES)
            ELSE(CUR_DESTDIR MATCHES \"[^/]\")
             SET(CUR_DESTDIR_CORR \"\")
            ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
-
            FOREACH(DIRECTORY ${DIRECTORIES})
              SET(GLOB_EXPRS)
              FOREACH(PATTERN ${PATTERNS})
                LIST(APPEND GLOB_EXPRS \"${PREFIX}\${DIRECTORY}/\${PATTERN}\")
              ENDFOREACH()
-             FILE(GLOB_RECURSE FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS})
+             FILE(GLOB_RECURSE FILES RELATIVE \"${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS}\")
              FOREACH(FILE \${FILES})
                IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
                   EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DEST_ALL}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)

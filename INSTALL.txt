@@ -277,36 +277,48 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 0) Initial steps, common to all build methods
 
   a.  Install CMake v2.6+ http://www.cmake.org/cmake/resources/software.html
+
   b.  Download the official Speed Dreams tarballs from SF.net
         http://sourceforge.net/projects/speed-dreams/files/2.0.0
       (speed-dreams-src-<package>-<version>.tar.xz)
-	  Note: See below if you want to do it from SVN, in order to get the latest changes ...
-  c.  Extract their contents to your local disk (7Zip is an excellent tool for that),
-      all in the same target folder.
+
+	  or the latest trunk from SVN for building with MinGW (was not ready for 2.0.0).
+
+  c.  Extract their contents to your local disk all in the same target folder
+      (7Zip is an excellent tool for that http://www.7-zip.org/).
+      
       Warning: You need to extract all of the source packages in order to start building
                (see above 2-a chapter for more).
 
-1) Cmake and MinGW :
+1) CMake and MinGW :
 
   Notes: 
    * Tested with success with CMake 2.8.2 and 2.8.8 + MinGW 2012 April (gcc 4.7.0),
    * Also worked well with the version of MinGW shipped with Nokia Qt Creator 2.4.1 (gcc 4.4.0)
-     (see below for slightly different install instructions).
+     (but needs a dedicated 3rd party binary package which has not been published).
+   * Be aware that there are 2 different ways of building with CMake and MinGW :
+     - through "MSYS Makefiles" CMake generator : you'll then run all the build commands
+       (cmake and make) from the MSYS shell, (sort of a minimal "Linux + bash" environment)
+     - through "MinGW Makefiles" CMake generator : it is not compatible with the MSYS way,
+       but it works from inside the QtCreator IDE.
 
-  d.  Install MinGW and MSYS 
+  d.  Install MinGW (and optionaly MSYS)
 
      Following the instructions of http://www.mingw.org/wiki/Getting_Started
      (example here for the official release of 2012, April, featuring gcc 4.7.0) :
 
-     * Download and run the latest mingw-get-inst version from 
+	 * Download and run the latest mingw-get-inst version from 
         https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
         => mingw-get-inst-20120426.exe
      * Select the directory where to install MinGW, remembering the advice
        that the path to this directory should not contain any spaces.
        => C:\MinGW
      * Select the minimal set of components to install :
-       * C++ compiler
-       * MSYS.
+       * C++ compiler (always)
+       * MSYS (if you don't plan to use QtCreator).
+
+     If you installed MSYS, then you might be interested in the following,
+     otherwise, skip it and go to e.
 
      * Run MSYS, the MinGW Shell (bash) :
        Start Menu / Programs / MinGW / MinGW Shell
@@ -340,46 +352,90 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
        Note: The other newer versions from http://alleg.sourceforge.net/files didn't work for me.
 
-     Another solution (tested with success) :
-      * MinGW itself : You can use the one shipped with Nokia Qt Creator
-        (Release 2.4.1 worked for me)
-      * MSYS :
-  	- download and install the latest 1.0.x through the MinGW installer
-            https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
-        - add a /mingw mount point to the fstab in order MSYS knows where MinGW is installed
-          (inside Qt Creator folders) :
-          ex: add a "c:/Qt/qtcreator-2.4.1/mingw /mingw" line to /etc/fstab
-      * Qt creator is a full-fledged IDE, making you able to :
-        - open your SD "project" (equivalent to a MSVC "solution")
-          by simply opening the master CMakeLists.txt in Qt Creator,
-        - run CMake after specifying the needed options (see below),
-        - make and install SD,
-        - and everything you expect from a modern IDE (MSVC 2005 is not one ;-)
-        all of the above through the GUI.
-      * But you'll have to build yourself your 3rd party package for this (older) GCC version
+  e.  If you didn't install MSYS, you need to install QtCreator
+  
+      * Download and install the latest version :
+        - the simplest way is to get the standalone version from
+           http://qt.nokia.com/downloads/downloads#qt-creator
+        - you can also get the much heavier full Qt SDK, from
+           http://qt.nokia.com/downloads (on-line or off-line installed, as you will)
+          which bundles QtCreator itself ... along with the Qt libraries and other dev. tools ... 
+          which are not needed for building SD.
+          Note: It also ships a working MinGW, but probably not the version that we used
+                for building the "3rdParty" binary package for SD (MinGW 4.7.0) ;
+                so if you plan to use this version, be ready to build yourself (from sources)
+                your own "3rdParty" binary package for SD
+                (see http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0/).
 
-     Last minute news : It seems that Nokia no more ships MinGW with it's QtCreator IDE,
-      but let you use the one you like ... see Nokia's HOWTO pages.
-
-  e.  Download the "MinGW 4.7.0" release of the Speed Dreams "3rdParty" binary package from SF.net
-        http://sourceforge.net/projects/speed-dreams/files/3rd%20party
+      * Configure it for using your MinGW installation :
+        - start it,
+        - ... TODO.
+      
+  f.  Download the "MinGW 4.7.0" release of the Speed Dreams "3rdParty" binary package from SF.net
+        http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MinGW%204.7.0/
       (it contains necessary 3rd party libs compiled with/for MinGW 4.7.0)
 
-  f.  Extract it to the /usr/local folder :
-      From the MinGW Shell :
-      $ cd /usr
-      $ tar xvfz .../3rdParty-2.1-win32-mingw470-g-O2.tar.gz
+  g.  Install it in the right folder :
 
-  g.  Run CMake to configure the build (here we assume CMake 2.8, but newer versions should work) :
+      * If you are using MSYS, extract it to the /usr/local folder from the MSYS shell :
 
-      $ cd /path/to/sd/sources/trunk
-      $ mkdir build
-      $ cd build
-      $ /c/Program\ Files/CMake\ 2.8/bin/cmake -G "MSYS Makefiles" -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_PREFIX_PATH:STRING=/usr/local -DCMAKE_BUILD_TYPE:STRING=Release ..
-      $ make # -j2 or even -j4 if you own a dual/quad-core CPU
-      $ make install
+         $ cd /usr
+         $ tar xvfz .../3rdParty-2.1-win32-mingw470-g-O2.tar.gz
 
-      Note: This 'Release' build gives you -O3-optimised binaries.
+      * If you are using QtCreator, extract it into the "3rdParty" folder,
+        in the same folder as the one which contains your SD source tree :
+        - let's say (as an example) that your SD trunk source tree is inside the "sd" folder :
+          (so in this folder, you have the "trunk" folder, containing "src", "data", "credits.xml" and so on),
+        - open 3rdParty-2.1-win32-mingw470-g-O2.tar.gz in your favorite archive manager
+          (7zip is an excellent tool for this : http://www.7-zip.org/),
+        - extract the whole "local" folder into the "sd" folder,
+        - rename it to "3rdParty".
+
+  h.  Run CMake to configure the build (here we assume CMake 2.8, but newer versions should work) :
+
+      * If you are using MSYS, in the MSYS shell :
+
+        $ cd /path/to/sd/sources/trunk
+        $ mkdir build
+        $ cd build
+        $ /c/Program\ Files/CMake\ 2.8/bin/cmake -G "MSYS Makefiles" -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_PREFIX_PATH:STRING=/usr/local -DCMAKE_BUILD_TYPE:STRING=Release ..
+
+      * If you are using QtCreator (solution 1) :
+
+        - Start it, and File / Open the master CMakeLists.txt of Speed Dreams
+          (at the top of the source tree, next to the src and data folders)
+
+        - Then the CMake wizard opens up ; use :
+	      . CMake arguments :
+	        -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_BUILD_TYPE:STRING=Release
+	      . CMake generator : "MinGW generator"
+
+          Note: See II.2.c above for more about possible / useful CMake arguments.
+
+        - And finally click on the "Run cmake" button
+	  
+      * If you are using QtCreator (solution 2) :
+
+	    You can also use standard CMake GUI to do this before opening the master CMakeLists.txt in QtCreator,
+	    but you have to first add C:\MinGW\bin to your PATH environment variable
+		otherwise CMake GUI won't propose you the "MinGW generator", which is the one you have to use
+		("MSYS makefiles" does not work with QtCreator).
+
+        In QtCreator, provided you don't removed you CMakeCache.txt or the whole build folder,
+        you then won't need to specify any argument when re-running CMake.
+	  
+  i.  Build and install
+
+      * If you are using MSYS, in the MSYS shell :
+
+        $ make # -j2 or even -j4 if you own a dual/quad-core CPU
+        $ make install
+
+      * If you are using QtCreator :
+
+	    - Build / Make (TODO : more details)
+	  
+      Note: The 'Release' build gives you -O3-optimised binaries.
 
 2) Cmake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) on Windows XP 32
 
