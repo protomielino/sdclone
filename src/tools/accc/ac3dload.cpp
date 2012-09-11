@@ -106,20 +106,39 @@ void obInitSpacialExtend(ob_t * ob)
     }
 }
 
+/** Helper method for obCreateTextArrays().
+ *  Copies the u/v coords of the given texcoord into the given textarray, based
+ *  on texcoord->indice property. */
+void copyTexCoordToTextArray(double * textarray, tcoord_t * texcoord)
+{
+    int fstIdx = texcoord->indice * 2;
+    textarray[fstIdx] = texcoord->u;
+    textarray[fstIdx + 1] = texcoord->v;
+}
+
 void obCreateTextArrays(ob_t * ob)
 {
-    ob->textarray = (double *) calloc(ob->numvertice * 2, sizeof(tcoord_t));
+    const int numEls = ob->numvertice * 2;
+    const int elSize = sizeof(tcoord_t);
+
+    ob->textarray = (double *) calloc(numEls, elSize);
+    if(ob->vertexarray1)
+        ob->textarray1 = (double *) calloc(numEls, elSize);
+    if(ob->vertexarray2)
+        ob->textarray2 = (double *) calloc(numEls, elSize);
+    if(ob->vertexarray3)
+        ob->textarray3 = (double *) calloc(numEls, elSize);
 
     for (int i = 0; i < ob->numsurf * 3; i++)
     {
-        tcoord_t * idx = &ob->vertexarray[i];
-        int fstIdx = idx->indice * 2;
-
-        ob->textarray[fstIdx] = idx->u;
-        ob->textarray[fstIdx + 1] = idx->v;
+        copyTexCoordToTextArray(ob->textarray, &ob->vertexarray[i]);
+        if(ob->vertexarray1)
+            copyTexCoordToTextArray(ob->textarray1, &ob->vertexarray1[i]);
+        if(ob->vertexarray2)
+            copyTexCoordToTextArray(ob->textarray2, &ob->vertexarray2[i]);
+        if(ob->vertexarray3)
+            copyTexCoordToTextArray(ob->textarray3, &ob->vertexarray3[i]);
     }
-
-    // TODO: add other texture channels
 }
 
 void obCreateVertexArrays(ob_t * ob)
@@ -128,21 +147,38 @@ void obCreateVertexArrays(ob_t * ob)
 
     ob->vertexarray = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 
-    // TODO: add other texture channels
+    if(ob->texture1)
+        ob->vertexarray1 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+
+    if(ob->texture2)
+        ob->vertexarray2 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+
+    if(ob->texture3)
+        ob->vertexarray3 = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
 }
 
 void obCopyTextureNames(ob_t * destob, ob_t * srcob)
 {
     destob->texture = strdup(srcob->texture);
 
-    // TODO: add other texture channels
+    if(srcob->texture1)
+        destob->texture1 = strdup(srcob->texture1);
+    if(srcob->texture2)
+        destob->texture2 = strdup(srcob->texture2);
+    if(srcob->texture3)
+        destob->texture3 = strdup(srcob->texture3);
 }
 
 void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
 {
     ob->vertexarray[vaIdx].indice = newIndex;
 
-    // TODO: add other texture channels
+    if(ob->vertexarray1)
+        ob->vertexarray1[vaIdx].indice = newIndex;
+    if(ob->vertexarray2)
+        ob->vertexarray2[vaIdx].indice = newIndex;
+    if(ob->vertexarray3)
+        ob->vertexarray3[vaIdx].indice = newIndex;
 }
 
 #ifndef M_PI
@@ -249,7 +285,15 @@ void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int s
         copyTexCoord(&(destob->vertexarray[firstDestIdx + off]),
                      &(srcob->vertexarray[firstSrcIdx + off]));
 
-        // TODO: add other texture channels
+        if(srcob->vertexarray1)
+            copyTexCoord(&(destob->vertexarray1[firstDestIdx + off]),
+                         &(srcob->vertexarray1[firstSrcIdx + off]));
+        if(srcob->vertexarray2)
+            copyTexCoord(&(destob->vertexarray2[firstDestIdx + off]),
+                         &(srcob->vertexarray2[firstSrcIdx + off]));
+        if(srcob->vertexarray3)
+            copyTexCoord(&(destob->vertexarray3[firstDestIdx + off]),
+                         &(srcob->vertexarray3[firstSrcIdx + off]));
     }
 }
 
