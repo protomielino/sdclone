@@ -97,15 +97,31 @@ typedef struct ob
     int numvert;
     int numsurf;
     int numvertice; /* the real number of vertices */
+    /* the actual points, to which the entries in the vertexarray point to
+     * size: numvertice
+     */
     point_t * vertex;
+    /* the normals corresponding to entries in the above "vertex" array
+     * size: numvertice
+     */
     point_t * norm;
+    /* the smoothed normals corresponding to entries in the above "vertex" array
+     * size: numvertice
+     */
     point_t * snorm;
-    tcoord_t * vertexarray;     /* array of indices that make up surfaces. in AC3D: one ref line */
+    /* array of indices into the "vertex" array, that make up surfaces. In AC3D: one line in
+     * "refs" section
+     * size: numsurf * 3
+     */
+    tcoord_t * vertexarray;
     tcoord_t * vertexarray1;
     tcoord_t * vertexarray2;
     tcoord_t * vertexarray3;
     int * va;
-    double * textarray;     /* subset of vertexarray: contains only the texture coords */
+    /* Holds the texture coordinates of the vertices stored in "vertex" array
+     * size: numvertice * 2
+     */
+    double * textarray;
     double * textarray1;
     double * textarray2;
     double * textarray3;
