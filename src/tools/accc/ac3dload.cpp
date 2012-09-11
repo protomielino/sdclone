@@ -525,55 +525,51 @@ int findIndice(int indice, int *oldva, int n)
 
 int terrainSplitOb(ob_t **object)
 {
-    int i = 0;
-    int j = 0;
-    int k = 0;
-    double fi = 0;
-    double fj = 0;
     int numob = 0;
     point_t pttmp[10000];
     point_t snorm[10000];
-    int oldva[10000];
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
     ob_t * tobnext = (*object)->next;
     int *triIndex;
-    int triIndice;
     int numtri;
     int found_a_tri = 0;
-    int n = 0;
     int m1 = -1;
     int indice1 = 0;
+
     printf("terrain splitting %s \n", (*object)->name);
     if (((*object)->x_max - (*object)->x_min) < 2 * distSplit)
         return 0;
     if (((*object)->y_max - (*object)->y_min) < 2 * distSplit)
         return 0;
     printf("terrain splitting %s started\n", (*object)->name);
+
     numtri = (*object)->numsurf;
     triIndex = (int *) malloc(sizeof(int) * numtri);
     memset(triIndex, 0, sizeof(int) * numtri);
-    triIndice = 0;
-    for (fi = (*object)->x_min; fi < (*object)->x_max; fi += distSplit)
+
+    int numNewObjs = 0;
+
+    for (double curXPos = (*object)->x_min; curXPos < (*object)->x_max; curXPos += distSplit)
     {
         found_a_tri = 0;
-        for (fj = (*object)->y_min; fj < (*object)->y_max; fj += distSplit)
+        for (double curYPos = (*object)->y_min; curYPos < (*object)->y_max; curYPos += distSplit)
         {
 
             numtri = 0;
             found_a_tri = 0;
 
-            for (k = 0; k < (*object)->numsurf; k++)
+            for (int curObjSurf = 0; curObjSurf < (*object)->numsurf; curObjSurf++)
             {
                 point_t surfCentroid;
-                computeObSurfCentroid(*object, k, &surfCentroid);
+                computeObSurfCentroid(*object, curObjSurf, &surfCentroid);
 
-                if (surfCentroid.x >= fi && surfCentroid.x < fi + distSplit)
+                if (surfCentroid.x >= curXPos && surfCentroid.x < curXPos + distSplit)
                 {
-                    if (surfCentroid.y >= fj && surfCentroid.y < fj + distSplit)
+                    if (surfCentroid.y >= curYPos && surfCentroid.y < curYPos + distSplit)
                     {
                         found_a_tri = 1;
-                        triIndex[k] = triIndice;
+                        triIndex[curObjSurf] = numNewObjs;
                         numtri++;
                     }
                 }
@@ -581,23 +577,23 @@ int terrainSplitOb(ob_t **object)
 
             if (found_a_tri)
             {
-                printf("surface num %d : numtri : %d\n", triIndice, numtri);
-                triIndice++;
+                printf("surface num %d : numtri : %d\n", numNewObjs, numtri);
+                numNewObjs++;
             }
         }
 
     }
-    printf("found in %s : %d subsurfaces \n", (*object)->name, triIndice);
+    printf("found in %s : %d subsurfaces \n", (*object)->name, numNewObjs);
 
-    for (i = 0; i < triIndice; i++)
+    for (int curNewObj = 0; curNewObj < numNewObjs; curNewObj++)
     {
-        k = 0;
+        int numNewSurf = 0;
         /* find the number of surface */
-        for (j = 0; j < (*object)->numsurf; j++)
+        for (int curSurf = 0; curSurf < (*object)->numsurf; curSurf++)
         {
-            if (triIndex[j] != i)
+            if (triIndex[curSurf] != curNewObj)
                 continue;
-            k++;
+            numNewSurf++;
         }
         tob = (ob_t *) malloc(sizeof(ob_t));
         memset(tob, 0, sizeof(ob_t));
@@ -605,79 +601,92 @@ int terrainSplitOb(ob_t **object)
         tob->y_min = 1000000;
         tob->z_min = 1000000;
 
-        tob->numsurf = k;
-        tob->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * k * 3);
-        k = 0;
-        for (j = 0; j < (*object)->numsurf; j++)
+        tob->numsurf = numNewSurf;
+        tob->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numNewSurf * 3);
+
+        int curNewSurf = 0;
+        for (int curSurf = 0; curSurf < (*object)->numsurf; curSurf++)
         {
-            if (triIndex[j] != i)
+            if (triIndex[curSurf] != curNewObj)
                 continue;
-            tob->vertexarray[k * 3].indice =
-                    (*object)->vertexarray[j * 3].indice;
-            tob->vertexarray[k * 3].u = (*object)->vertexarray[j * 3].u;
-            tob->vertexarray[k * 3].v = (*object)->vertexarray[j * 3].v;
-            tob->vertexarray[k * 3 + 1].indice = (*object)->vertexarray[j * 3
+            tob->vertexarray[curNewSurf * 3].indice =
+                    (*object)->vertexarray[curSurf * 3].indice;
+            tob->vertexarray[curNewSurf * 3].u = (*object)->vertexarray[curSurf * 3].u;
+            tob->vertexarray[curNewSurf * 3].v = (*object)->vertexarray[curSurf * 3].v;
+            tob->vertexarray[curNewSurf * 3 + 1].indice = (*object)->vertexarray[curSurf * 3
                     + 1].indice;
-            tob->vertexarray[k * 3 + 1].u = (*object)->vertexarray[j * 3 + 1].u;
-            tob->vertexarray[k * 3 + 1].v = (*object)->vertexarray[j * 3 + 1].v;
-            tob->vertexarray[k * 3 + 2].indice = (*object)->vertexarray[j * 3
+            tob->vertexarray[curNewSurf * 3 + 1].u = (*object)->vertexarray[curSurf * 3 + 1].u;
+            tob->vertexarray[curNewSurf * 3 + 1].v = (*object)->vertexarray[curSurf * 3 + 1].v;
+            tob->vertexarray[curNewSurf * 3 + 2].indice = (*object)->vertexarray[curSurf * 3
                     + 2].indice;
-            tob->vertexarray[k * 3 + 2].u = (*object)->vertexarray[j * 3 + 2].u;
-            tob->vertexarray[k * 3 + 2].v = (*object)->vertexarray[j * 3 + 2].v;
-            k++;
+            tob->vertexarray[curNewSurf * 3 + 2].u = (*object)->vertexarray[curSurf * 3 + 2].u;
+            tob->vertexarray[curNewSurf * 3 + 2].v = (*object)->vertexarray[curSurf * 3 + 2].v;
+            curNewSurf++;
         }
-        n = 0;
+
         numtri = tob->numsurf;
-        for (j = 0; j < tob->numsurf; j++)
+
+        /** keep a list of the indices of points stored in the new object.
+         * If an index is contained in storedPtIdxArr we don't store the point itself,
+         * but only the index in the vertexarray of the new object.
+         */
+        int* storedPtIdxArr = (int*) calloc((*object)->numvertice, sizeof(int));
+        int curNewPtIdx = 0;
+
+        for (int curNewSurf = 0; curNewSurf < tob->numsurf; curNewSurf++)
         {
-            indice1 = tob->vertexarray[j * 3].indice;
-            m1 = findIndice(indice1, oldva, n);
+            indice1 = tob->vertexarray[curNewSurf * 3].indice;
+            m1 = findIndice(indice1, storedPtIdxArr, curNewPtIdx);
             if (m1 == -1)
             {
-                oldva[n] = indice1;
-                m1 = n;
-                pttmp[n].x = (*object)->vertex[indice1].x;
-                pttmp[n].y = (*object)->vertex[indice1].y;
-                pttmp[n].z = (*object)->vertex[indice1].z;
-                snorm[n].x = (*object)->norm[indice1].x;
-                snorm[n].y = (*object)->norm[indice1].y;
-                snorm[n].z = (*object)->norm[indice1].z;
-                n++;
+                storedPtIdxArr[curNewPtIdx] = indice1;
+                m1 = curNewPtIdx;
+                pttmp[curNewPtIdx].x = (*object)->vertex[indice1].x;
+                pttmp[curNewPtIdx].y = (*object)->vertex[indice1].y;
+                pttmp[curNewPtIdx].z = (*object)->vertex[indice1].z;
+                snorm[curNewPtIdx].x = (*object)->norm[indice1].x;
+                snorm[curNewPtIdx].y = (*object)->norm[indice1].y;
+                snorm[curNewPtIdx].z = (*object)->norm[indice1].z;
+                curNewPtIdx++;
             }
-            tob->vertexarray[j * 3].indice = m1;
+            tob->vertexarray[curNewSurf * 3].indice = m1;
 
-            indice1 = tob->vertexarray[j * 3 + 1].indice;
-            m1 = findIndice(indice1, oldva, n);
+            indice1 = tob->vertexarray[curNewSurf * 3 + 1].indice;
+            m1 = findIndice(indice1, storedPtIdxArr, curNewPtIdx);
             if (m1 == -1)
             {
-                oldva[n] = indice1;
-                m1 = n;
-                pttmp[n].x = (*object)->vertex[indice1].x;
-                pttmp[n].y = (*object)->vertex[indice1].y;
-                pttmp[n].z = (*object)->vertex[indice1].z;
-                snorm[n].x = (*object)->norm[indice1].x;
-                snorm[n].y = (*object)->norm[indice1].y;
-                snorm[n].z = (*object)->norm[indice1].z;
-                n++;
+                storedPtIdxArr[curNewPtIdx] = indice1;
+                m1 = curNewPtIdx;
+                pttmp[curNewPtIdx].x = (*object)->vertex[indice1].x;
+                pttmp[curNewPtIdx].y = (*object)->vertex[indice1].y;
+                pttmp[curNewPtIdx].z = (*object)->vertex[indice1].z;
+                snorm[curNewPtIdx].x = (*object)->norm[indice1].x;
+                snorm[curNewPtIdx].y = (*object)->norm[indice1].y;
+                snorm[curNewPtIdx].z = (*object)->norm[indice1].z;
+                curNewPtIdx++;
             }
-            tob->vertexarray[j * 3 + 1].indice = m1;
+            tob->vertexarray[curNewSurf * 3 + 1].indice = m1;
 
-            indice1 = tob->vertexarray[j * 3 + 2].indice;
-            m1 = findIndice(indice1, oldva, n);
+            indice1 = tob->vertexarray[curNewSurf * 3 + 2].indice;
+            m1 = findIndice(indice1, storedPtIdxArr, curNewPtIdx);
             if (m1 == -1)
             {
-                oldva[n] = indice1;
-                m1 = n;
-                pttmp[n].x = (*object)->vertex[indice1].x;
-                pttmp[n].y = (*object)->vertex[indice1].y;
-                pttmp[n].z = (*object)->vertex[indice1].z;
-                snorm[n].x = (*object)->norm[indice1].x;
-                snorm[n].y = (*object)->norm[indice1].y;
-                snorm[n].z = (*object)->norm[indice1].z;
-                n++;
+                storedPtIdxArr[curNewPtIdx] = indice1;
+                m1 = curNewPtIdx;
+                pttmp[curNewPtIdx].x = (*object)->vertex[indice1].x;
+                pttmp[curNewPtIdx].y = (*object)->vertex[indice1].y;
+                pttmp[curNewPtIdx].z = (*object)->vertex[indice1].z;
+                snorm[curNewPtIdx].x = (*object)->norm[indice1].x;
+                snorm[curNewPtIdx].y = (*object)->norm[indice1].y;
+                snorm[curNewPtIdx].z = (*object)->norm[indice1].z;
+                curNewPtIdx++;
             }
-            tob->vertexarray[j * 3 + 2].indice = m1;
+            tob->vertexarray[curNewSurf * 3 + 2].indice = m1;
         }
+
+        int numNewPts = curNewPtIdx;
+
+        free(storedPtIdxArr);
 
         tob->norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
         tob->snorm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
@@ -689,9 +698,9 @@ int terrainSplitOb(ob_t **object)
         tob->attrSurf = (*object)->attrSurf;
         tob->attrMat = (*object)->attrMat;
 
-        memcpy(tob->vertex, pttmp, n * sizeof(point_t));
-        memcpy(tob->snorm, snorm, n * sizeof(point_t));
-        memcpy(tob->norm, snorm, n * sizeof(point_t));
+        memcpy(tob->vertex, pttmp, numNewPts * sizeof(point_t));
+        memcpy(tob->snorm, snorm, numNewPts * sizeof(point_t));
+        memcpy(tob->norm, snorm, numNewPts * sizeof(point_t));
 
         if ((*object)->data)
         {
@@ -702,36 +711,36 @@ int terrainSplitOb(ob_t **object)
             tob->data = 0;
         }
         tob->kids = 0;
-        for (j = 0; j < numtri * 3; j++)
+        for (int curNewIdx = 0; curNewIdx < numtri * 3; curNewIdx++)
         {
-            tob->textarray[tob->vertexarray[j].indice * 2] =
-                    tob->vertexarray[j].u;
-            tob->textarray[tob->vertexarray[j].indice * 2 + 1] =
-                    tob->vertexarray[j].v;
+            tob->textarray[tob->vertexarray[curNewIdx].indice * 2] =
+                    tob->vertexarray[curNewIdx].u;
+            tob->textarray[tob->vertexarray[curNewIdx].indice * 2 + 1] =
+                    tob->vertexarray[curNewIdx].v;
         }
         tob->name = (char *) malloc(strlen((*object)->name) + 10);
         tob->texture = strdup((*object)->texture);
         tob->type = strdup((*object)->type);
         sprintf(tob->name, "%s__split__%d", (*object)->name, numob++);
         tob->numsurf = numtri;
-        tob->numvert = n;
-        tob->numvertice = n;
-        for (j = 0; j < tob->numvert; j++)
+        tob->numvert = numNewPts;
+        tob->numvertice = numNewPts;
+        for (int curNewVert = 0; curNewVert < tob->numvert; curNewVert++)
         {
-            if (tob->vertex[j].x > tob->x_max)
-                tob->x_max = tob->vertex[j].x;
-            if (tob->vertex[j].x < tob->x_min)
-                tob->x_min = tob->vertex[j].x;
+            if (tob->vertex[curNewVert].x > tob->x_max)
+                tob->x_max = tob->vertex[curNewVert].x;
+            if (tob->vertex[curNewVert].x < tob->x_min)
+                tob->x_min = tob->vertex[curNewVert].x;
 
-            if (tob->vertex[j].y > tob->y_max)
-                tob->y_max = tob->vertex[j].y;
-            if (tob->vertex[j].y < tob->y_min)
-                tob->y_min = tob->vertex[j].y;
+            if (tob->vertex[curNewVert].y > tob->y_max)
+                tob->y_max = tob->vertex[curNewVert].y;
+            if (tob->vertex[curNewVert].y < tob->y_min)
+                tob->y_min = tob->vertex[curNewVert].y;
 
-            if (tob->vertex[j].z > tob->z_max)
-                tob->z_max = tob->vertex[j].z;
-            if (tob->vertex[j].z < tob->z_min)
-                tob->z_min = tob->vertex[j].z;
+            if (tob->vertex[curNewVert].z > tob->z_max)
+                tob->z_max = tob->vertex[curNewVert].z;
+            if (tob->vertex[curNewVert].z < tob->z_min)
+                tob->z_min = tob->vertex[curNewVert].z;
 
         }
         tob->next = NULL;
