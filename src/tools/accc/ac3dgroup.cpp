@@ -47,14 +47,12 @@ void loadAndGroup(char *OutputFileName)
     ob_t * tmpob = NULL;
     ob_t * tmpob2 = NULL;
     mat_t * tmat = NULL;
-    int requiredExtraGroup = 0;
     extern FILE * ofile;
     int num_tkmn = 0;
     ob_groups_t * array_groups;
     int good_group = 0;
     int i = 0;
     double dist = 0;
-    int notinsameorder = FALSE;
 
     /* disable object splitting during load. We split them
      * after merging the texture channels.
@@ -354,7 +352,6 @@ void loadAndGroup(char *OutputFileName)
             {
                 printf("cannot insert object %s in group %s\n", tmpob->name,
                         array_groups[i].name);
-                requiredExtraGroup = 1;
             }
             /*if (!strnicmp(tmpob->name, "tk",2)){
              tmpob2=tmpob;

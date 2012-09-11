@@ -1411,10 +1411,14 @@ int loadAC(char * inputFilename, char * outputFilename, int saveIn)
         if (numvertFound == 1 && doVerb == NULL)
         {
             ret = doGetVertex(Line, current_ob, current_material);
+            if(ret != 0)
+                break;
         }
         else if (numrefsFound == 1 && doVerb == NULL)
         {
             ret = doGetSurf(Line, current_ob, current_material);
+            if(ret != 0)
+                break;
         }
         else
         {
@@ -1426,9 +1430,17 @@ int loadAC(char * inputFilename, char * outputFilename, int saveIn)
             numvertFound = 0;
             numrefsFound = 0;
             ret = doVerb(Line, current_ob, current_material);
+            if(ret != 0)
+                break;
         }
     }
     fclose(file);
+    if(ret != 0)
+    {
+        freeobject(current_ob);
+        return ret;
+    }
+
     root_ob = current_ob;
 
     if(splitObjectsDuringLoad != 0)
@@ -1503,10 +1515,14 @@ int loadACo(char * inputFilename, char * outputFilename, int saveIn)
         if (numvertFound == 1 && doVerb == NULL)
         {
             ret = doGetVertex(Line, current_ob, current_material);
+            if(ret != 0)
+                break;
         }
         else if (numrefsFound == 1 && doVerb == NULL)
         {
             ret = doGetSurf(Line, current_ob, current_material);
+            if(ret != 0)
+                break;
         }
         else
         {
@@ -1518,9 +1534,18 @@ int loadACo(char * inputFilename, char * outputFilename, int saveIn)
             numvertFound = 0;
             numrefsFound = 0;
             ret = doVerb(Line, current_ob, current_material);
+            if(ret != 0)
+                break;
         }
     }
     fclose(file);
+
+    if(ret != 0)
+    {
+        freeobject(current_ob);
+        return ret;
+    }
+
     root_ob = current_ob;
 
     if(splitObjectsDuringLoad != 0)
@@ -3009,7 +3034,6 @@ void computeSaveOBJ(char * OutputFilename, ob_t * object)
             tmpob = object;
             while (tmpob != NULL)
             {
-                int texnofound = 0;
                 if (tmpob->name == NULL)
                 {
                     tmpob = tmpob->next;
@@ -3025,7 +3049,6 @@ void computeSaveOBJ(char * OutputFilename, ob_t * object)
                     tmpob = tmpob->next;
                     continue;
                 }
-                texnofound = 1;
 
                 if (tmpob->texture != NULL)
                     if (*tmpob->texture != '\0')
@@ -3287,7 +3310,6 @@ void stripifyOb(ob_t * object, int writeit)
     int i = 0;
     int debj = 0;
     int dege = 0;
-    int wasdege = 0;
     tcoord_t * stripvertexarray;
     int k, v1, v2, v0;
     k = 0;
@@ -3459,7 +3481,6 @@ void stripifyOb(ob_t * object, int writeit)
 
     for (i = 0; i < (int) NumStrips; i++)
     {
-        wasdege = 0;
         /* get the first triangle */
         v1 = StripPoint[StripStart[i]];
         v2 = StripPoint[StripStart[i] + 1];
@@ -4674,7 +4695,6 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
     int oldva1[10000];
     int oldva2[10000];
     int n = 0;
-    int m = 0;
     int i = 0;
     int j = 0;
 
@@ -4730,7 +4750,7 @@ ob_t * mergeObject(ob_t *ob1, ob_t * ob2, char * nameS)
                 ob1->numvert * 2 * sizeof(tcoord_t));
     }
 
-    m = n = ob1->numvert;
+    n = ob1->numvert;
     for (i = 0; i < ob2->numvert; i++)
     {
         for (j = 0; j < ob1->numvert; j++)
@@ -4843,7 +4863,9 @@ int mergeSplitted(ob_t **object)
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
     ob_t * tobP = NULL;
+#ifdef NEWSRC
     int numtri;
+#endif
     int reduced = 0;
 
     tob = *object;
@@ -4888,8 +4910,9 @@ int mergeSplitted(ob_t **object)
             p = p + strlen("__split__");
         *p = '\0';
         k = 0;
-        numtri = 0;
+#ifdef NEWSRC
         numtri = tob->numsurf;
+#endif
         while (tob0)
         {
             if (tob0->name == NULL)
