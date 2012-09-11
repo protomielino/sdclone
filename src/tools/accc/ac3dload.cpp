@@ -333,8 +333,8 @@ ob_t * createObjectSplitCopy(int splitid, ob_t * srcobj, ob_t * tmpob)
     int size_pts = sizeof(point_t) * numvert;
 
     /* allocate space */
-    ob_t * retob = (ob_t*) malloc(sizeof(ob_t));
-    memset(retob, 0, sizeof(ob_t));
+    ob_t * retob = obCreate();
+
     retob->vertex = (point_t*) malloc(size_pts);
     memset(retob->vertex, 0, size_pts);
     retob->norm = (point_t*) malloc(size_pts);
@@ -859,8 +859,7 @@ int splitOb(ob_t **object)
     tri = (int *) calloc(orignumtris, sizeof(int));
     oldva = (int *) calloc(orignumverts, sizeof(int));
 
-    workob = (ob_t *) malloc(sizeof(ob_t));
-    memset(workob, 0, sizeof(ob_t));
+    workob = obCreate();
     workob->vertex = (point_t *) calloc(orignumverts, sizeof(point_t));
     workob->snorm = (point_t *) calloc(orignumverts, sizeof(point_t));
 
