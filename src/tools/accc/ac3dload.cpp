@@ -30,6 +30,7 @@
 #define _GNU_SOURCE
 #endif
 #include <math.h>
+#include <float.h>
 #include "portability.h"
 #include "accc.h"
 
@@ -71,6 +72,77 @@ void storeTexCoord(tcoord_t * dest, int indice, double u, double v, int saved)
     dest->u = u;
     dest->v = v;
     dest->saved = saved;
+}
+
+ob_t * obCreate()
+{
+    ob_t * ob = (ob_t *) malloc(sizeof(ob_t));
+    memset(ob, 0, sizeof(ob_t));
+
+    return ob;
+}
+
+void obInitSpacialExtend(ob_t * ob)
+{
+    ob->x_min = ob->y_min = ob->z_min = DBL_MAX;
+    ob->x_max = ob->y_max = ob->z_max = DBL_MIN;
+
+    for (int v = 0; v < ob->numvertice; v++)
+    {
+        if (ob->vertex[v].x > ob->x_max)
+            ob->x_max = ob->vertex[v].x;
+        if (ob->vertex[v].x < ob->x_min)
+            ob->x_min = ob->vertex[v].x;
+
+        if (ob->vertex[v].y > ob->y_max)
+            ob->y_max = ob->vertex[v].y;
+        if (ob->vertex[v].y < ob->y_min)
+            ob->y_min = ob->vertex[v].y;
+
+        if (ob->vertex[v].z > ob->z_max)
+            ob->z_max = ob->vertex[v].z;
+        if (ob->vertex[v].z < ob->z_min)
+            ob->z_min = ob->vertex[v].z;
+    }
+}
+
+void obCreateTextArrays(ob_t * ob)
+{
+    ob->textarray = (double *) calloc(ob->numvertice * 2, sizeof(tcoord_t));
+
+    for (int i = 0; i < ob->numsurf * 3; i++)
+    {
+        tcoord_t * idx = &ob->vertexarray[i];
+        int fstIdx = idx->indice * 2;
+
+        ob->textarray[fstIdx] = idx->u;
+        ob->textarray[fstIdx + 1] = idx->v;
+    }
+
+    // TODO: add other texture channels
+}
+
+void obCreateVertexArrays(ob_t * ob)
+{
+    int numEls = ob->numsurf * 3;
+
+    ob->vertexarray = (tcoord_t *) calloc(numEls, sizeof(tcoord_t));
+
+    // TODO: add other texture channels
+}
+
+void obCopyTextureNames(ob_t * destob, ob_t * srcob)
+{
+    destob->texture = strdup(srcob->texture);
+
+    // TODO: add other texture channels
+}
+
+void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex)
+{
+    ob->vertexarray[vaIdx].indice = newIndex;
+
+    // TODO: add other texture channels
 }
 
 #ifndef M_PI
@@ -166,6 +238,20 @@ verbaction_t verbTab[] =
 { REFS, doRefs },
 { CREASE, doCrease },
 { "END", NULL } };
+
+void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int srcSurfIdx)
+{
+    int firstDestIdx = destSurfIdx * 3;
+    int firstSrcIdx = srcSurfIdx * 3;
+
+    for(int off = 0; off < 3; off++)
+    {
+        copyTexCoord(&(destob->vertexarray[firstDestIdx + off]),
+                     &(srcob->vertexarray[firstSrcIdx + off]));
+
+        // TODO: add other texture channels
+    }
+}
 
 /** copy the (u,v) coords from srcidxarr to the corresponding position in destarr.
  *  destarr needs to have 2 * number of vertices entries.
@@ -523,17 +609,9 @@ int findIndice(int indice, int *oldva, int n)
 
 int terrainSplitOb(ob_t **object)
 {
-    int numob = 0;
-    point_t pttmp[10000];
-    point_t snorm[10000];
     ob_t * tob = NULL;
     ob_t * tob0 = NULL;
     ob_t * tobnext = (*object)->next;
-    int *triIndex;
-    int numtri;
-    int found_a_tri = 0;
-    int m1 = -1;
-    int indice1 = 0;
 
     printf("terrain splitting %s \n", (*object)->name);
     if (((*object)->x_max - (*object)->x_min) < 2 * distSplit)
@@ -542,20 +620,18 @@ int terrainSplitOb(ob_t **object)
         return 0;
     printf("terrain splitting %s started\n", (*object)->name);
 
-    numtri = (*object)->numsurf;
-    triIndex = (int *) malloc(sizeof(int) * numtri);
-    memset(triIndex, 0, sizeof(int) * numtri);
+    int numSurf = (*object)->numsurf;
+    int *oldSurfToNewObjMap = (int *) calloc(numSurf, sizeof(int));
 
     int numNewObjs = 0;
 
     for (double curXPos = (*object)->x_min; curXPos < (*object)->x_max; curXPos += distSplit)
     {
-        found_a_tri = 0;
         for (double curYPos = (*object)->y_min; curYPos < (*object)->y_max; curYPos += distSplit)
         {
 
-            numtri = 0;
-            found_a_tri = 0;
+            int numTriFound = 0;
+            int found_a_tri = 0;
 
             for (int curObjSurf = 0; curObjSurf < (*object)->numsurf; curObjSurf++)
             {
@@ -567,15 +643,15 @@ int terrainSplitOb(ob_t **object)
                     if (surfCentroid.y >= curYPos && surfCentroid.y < curYPos + distSplit)
                     {
                         found_a_tri = 1;
-                        triIndex[curObjSurf] = numNewObjs;
-                        numtri++;
+                        oldSurfToNewObjMap[curObjSurf] = numNewObjs;
+                        numTriFound++;
                     }
                 }
             }
 
             if (found_a_tri)
             {
-                printf("surface num %d : numtri : %d\n", numNewObjs, numtri);
+                printf("surface num %d : numtri : %d\n", numNewObjs, numTriFound);
                 numNewObjs++;
             }
         }
@@ -589,157 +665,101 @@ int terrainSplitOb(ob_t **object)
         /* find the number of surface */
         for (int curSurf = 0; curSurf < (*object)->numsurf; curSurf++)
         {
-            if (triIndex[curSurf] != curNewObj)
+            if (oldSurfToNewObjMap[curSurf] != curNewObj)
                 continue;
             numNewSurf++;
         }
-        tob = (ob_t *) malloc(sizeof(ob_t));
-        memset(tob, 0, sizeof(ob_t));
-        tob->x_min = 1000000;
-        tob->y_min = 1000000;
-        tob->z_min = 1000000;
+
+        /* initial creation of tob */
+
+        tob = obCreate();
 
         tob->numsurf = numNewSurf;
-        tob->vertexarray = (tcoord_t *) malloc(sizeof(tcoord_t) * numNewSurf * 3);
+        tob->attrSurf = (*object)->attrSurf;
+        tob->attrMat = (*object)->attrMat;
+        if ((*object)->data)
+            tob->data = strdup((*object)->data);
+        tob->name = (char *) malloc(strlen((*object)->name) + 10);
+        tob->type = strdup((*object)->type);
+        sprintf(tob->name, "%s__split__%d", (*object)->name, curNewObj);
+
+        obCopyTextureNames(tob, *object);
+
+        /* store the index data in tob's vertexarray */
+
+        obCreateVertexArrays(tob);
 
         int curNewSurf = 0;
         for (int curSurf = 0; curSurf < (*object)->numsurf; curSurf++)
         {
-            if (triIndex[curSurf] != curNewObj)
+            if (oldSurfToNewObjMap[curSurf] != curNewObj)
                 continue;
-            tob->vertexarray[curNewSurf * 3].indice =
-                    (*object)->vertexarray[curSurf * 3].indice;
-            tob->vertexarray[curNewSurf * 3].u = (*object)->vertexarray[curSurf * 3].u;
-            tob->vertexarray[curNewSurf * 3].v = (*object)->vertexarray[curSurf * 3].v;
-            tob->vertexarray[curNewSurf * 3 + 1].indice = (*object)->vertexarray[curSurf * 3
-                    + 1].indice;
-            tob->vertexarray[curNewSurf * 3 + 1].u = (*object)->vertexarray[curSurf * 3 + 1].u;
-            tob->vertexarray[curNewSurf * 3 + 1].v = (*object)->vertexarray[curSurf * 3 + 1].v;
-            tob->vertexarray[curNewSurf * 3 + 2].indice = (*object)->vertexarray[curSurf * 3
-                    + 2].indice;
-            tob->vertexarray[curNewSurf * 3 + 2].u = (*object)->vertexarray[curSurf * 3 + 2].u;
-            tob->vertexarray[curNewSurf * 3 + 2].v = (*object)->vertexarray[curSurf * 3 + 2].v;
+
+            copyVertexArraysSurface(tob, curNewSurf, *object, curSurf);
+
             curNewSurf++;
         }
 
-        numtri = tob->numsurf;
+        /* create a list with temporal points and smoothed normals and store the index
+         * to them in tob's vertexarray.indice property.
+         */
 
-        /** keep a list of the indices of points stored in the new object.
+        /* temporal storage for points and smoothed normals. Temporal because
+         * we don't know the size, so we allocate the same number as in the
+         * source object.
+         */
+        point_t* pttmp = (point_t*) calloc((*object)->numvertice, sizeof(point_t));
+        point_t* snorm = (point_t*) calloc((*object)->numvertice, sizeof(point_t));
+
+        /* storedPtIdxArr: keep a list of the indices of points stored in the new object.
          * If an index is contained in storedPtIdxArr we don't store the point itself,
          * but only the index in the vertexarray of the new object.
          */
         int* storedPtIdxArr = (int*) calloc((*object)->numvertice, sizeof(int));
+
         int curNewPtIdx = 0;
-
-        for (int curNewSurf = 0; curNewSurf < tob->numsurf; curNewSurf++)
+        for (int curNewIdx = 0; curNewIdx < numNewSurf * 3; curNewIdx++)
         {
-            indice1 = tob->vertexarray[curNewSurf * 3].indice;
-            m1 = findIndice(indice1, storedPtIdxArr, curNewPtIdx);
-            if (m1 == -1)
-            {
-                storedPtIdxArr[curNewPtIdx] = indice1;
-                m1 = curNewPtIdx;
-                pttmp[curNewPtIdx].x = (*object)->vertex[indice1].x;
-                pttmp[curNewPtIdx].y = (*object)->vertex[indice1].y;
-                pttmp[curNewPtIdx].z = (*object)->vertex[indice1].z;
-                snorm[curNewPtIdx].x = (*object)->norm[indice1].x;
-                snorm[curNewPtIdx].y = (*object)->norm[indice1].y;
-                snorm[curNewPtIdx].z = (*object)->norm[indice1].z;
-                curNewPtIdx++;
-            }
-            tob->vertexarray[curNewSurf * 3].indice = m1;
+            int idx = tob->vertexarray[curNewIdx].indice;
 
-            indice1 = tob->vertexarray[curNewSurf * 3 + 1].indice;
-            m1 = findIndice(indice1, storedPtIdxArr, curNewPtIdx);
-            if (m1 == -1)
+            int storedIdx = findIndice(idx, storedPtIdxArr, curNewPtIdx);
+            if (storedIdx == -1)
             {
-                storedPtIdxArr[curNewPtIdx] = indice1;
-                m1 = curNewPtIdx;
-                pttmp[curNewPtIdx].x = (*object)->vertex[indice1].x;
-                pttmp[curNewPtIdx].y = (*object)->vertex[indice1].y;
-                pttmp[curNewPtIdx].z = (*object)->vertex[indice1].z;
-                snorm[curNewPtIdx].x = (*object)->norm[indice1].x;
-                snorm[curNewPtIdx].y = (*object)->norm[indice1].y;
-                snorm[curNewPtIdx].z = (*object)->norm[indice1].z;
+                storedPtIdxArr[curNewPtIdx] = idx;
+                storedIdx = curNewPtIdx;
+                copyPoint(&(pttmp[curNewPtIdx]), &((*object)->vertex[idx]));
+                copyPoint(&(snorm[curNewPtIdx]), &((*object)->norm[idx]));
                 curNewPtIdx++;
             }
-            tob->vertexarray[curNewSurf * 3 + 1].indice = m1;
 
-            indice1 = tob->vertexarray[curNewSurf * 3 + 2].indice;
-            m1 = findIndice(indice1, storedPtIdxArr, curNewPtIdx);
-            if (m1 == -1)
-            {
-                storedPtIdxArr[curNewPtIdx] = indice1;
-                m1 = curNewPtIdx;
-                pttmp[curNewPtIdx].x = (*object)->vertex[indice1].x;
-                pttmp[curNewPtIdx].y = (*object)->vertex[indice1].y;
-                pttmp[curNewPtIdx].z = (*object)->vertex[indice1].z;
-                snorm[curNewPtIdx].x = (*object)->norm[indice1].x;
-                snorm[curNewPtIdx].y = (*object)->norm[indice1].y;
-                snorm[curNewPtIdx].z = (*object)->norm[indice1].z;
-                curNewPtIdx++;
-            }
-            tob->vertexarray[curNewSurf * 3 + 2].indice = m1;
+            obSetVertexArraysIndex(tob, curNewIdx, storedIdx);
         }
 
         free(storedPtIdxArr);
 
         int numNewPts = curNewPtIdx;
 
-        tob->norm = (point_t*) calloc(numNewPts, sizeof(point_t));
-        tob->snorm = (point_t*) calloc(numNewPts, sizeof(point_t));
-        tob->vertex = (point_t*) calloc(numNewPts, sizeof(point_t));
-
-        tob->textarray = (double *) calloc(numtri * 2, sizeof(tcoord_t));
-        tob->attrSurf = (*object)->attrSurf;
-        tob->attrMat = (*object)->attrMat;
-
-        memcpy(tob->vertex, pttmp, numNewPts * sizeof(point_t));
-        memcpy(tob->snorm, snorm, numNewPts * sizeof(point_t));
-        memcpy(tob->norm, snorm, numNewPts * sizeof(point_t));
-
-        if ((*object)->data)
-        {
-            tob->data = strdup((*object)->data);
-        }
-        else
-        {
-            tob->data = 0;
-        }
-        tob->kids = 0;
-        for (int curNewIdx = 0; curNewIdx < numtri * 3; curNewIdx++)
-        {
-            tob->textarray[tob->vertexarray[curNewIdx].indice * 2] =
-                    tob->vertexarray[curNewIdx].u;
-            tob->textarray[tob->vertexarray[curNewIdx].indice * 2 + 1] =
-                    tob->vertexarray[curNewIdx].v;
-        }
-        tob->name = (char *) malloc(strlen((*object)->name) + 10);
-        tob->texture = strdup((*object)->texture);
-        tob->type = strdup((*object)->type);
-        sprintf(tob->name, "%s__split__%d", (*object)->name, numob++);
-        tob->numsurf = numtri;
         tob->numvert = numNewPts;
         tob->numvertice = numNewPts;
-        for (int curNewVert = 0; curNewVert < tob->numvert; curNewVert++)
-        {
-            if (tob->vertex[curNewVert].x > tob->x_max)
-                tob->x_max = tob->vertex[curNewVert].x;
-            if (tob->vertex[curNewVert].x < tob->x_min)
-                tob->x_min = tob->vertex[curNewVert].x;
 
-            if (tob->vertex[curNewVert].y > tob->y_max)
-                tob->y_max = tob->vertex[curNewVert].y;
-            if (tob->vertex[curNewVert].y < tob->y_min)
-                tob->y_min = tob->vertex[curNewVert].y;
+        /* create and store tob's norm, snorm, vertex and textarray data */
 
-            if (tob->vertex[curNewVert].z > tob->z_max)
-                tob->z_max = tob->vertex[curNewVert].z;
-            if (tob->vertex[curNewVert].z < tob->z_min)
-                tob->z_min = tob->vertex[curNewVert].z;
+        tob->norm = (point_t*) calloc(numNewPts, sizeof(point_t));
+        memcpy(tob->norm, snorm, numNewPts * sizeof(point_t));
 
-        }
-        tob->next = NULL;
+        tob->snorm = (point_t*) calloc(numNewPts, sizeof(point_t));
+        memcpy(tob->snorm, snorm, numNewPts * sizeof(point_t));
+
+        tob->vertex = (point_t*) calloc(numNewPts, sizeof(point_t));
+        memcpy(tob->vertex, pttmp, numNewPts * sizeof(point_t));
+
+        free(pttmp);
+        free(snorm);
+
+        obCreateTextArrays(tob);
+
+        obInitSpacialExtend(tob);
+
         if (tob0 == NULL)
         {
             tob0 = tob;

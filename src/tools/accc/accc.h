@@ -142,6 +142,33 @@ typedef struct ob
     int inkids_o;
 } ob_t;
 
+/** Creates an instance of the ob_t struct and zeroes it.
+ */
+ob_t * obCreate();
+
+/** Initializes the min and max properties of the given object
+ *  must be set: numvertice, vertex
+ */
+void obInitSpacialExtend(ob_t * ob);
+
+/** Creates and zeroes the "vertexarray" properties.
+ *  must be set: "texture" properties (decide whether to create arrays), numsurf
+ */
+void obCreateVertexArrays(ob_t * ob);
+
+/** Creates and initializes ob's textarray properties, based on the "vertexarray" data
+ *  must be set: numsurf, numvertice, vertexarray
+ */
+void obCreateTextArrays(ob_t * ob);
+
+/** copies the "texture" properties from srcob to destob. */
+void obCopyTextureNames(ob_t * destob, ob_t * srcob);
+
+/** Assigns the given "newIndex" to the indice property of all active "vertexarray"s at index
+ *  "vaIdx".
+ */
+void obSetVertexArraysIndex(ob_t * ob, int vaIdx, int newIndex);
+
 typedef struct ob_groups
 {
     struct ob * kids;
@@ -178,6 +205,15 @@ typedef struct mat
     double trans;
     struct mat * next;
 } mat_t;
+
+/** Copies a single surface from the "vertexarray" attributes of srcob to the ones of destob.
+ *  It decides whether to copy multitexture data based on srcob's "vertexarray" attributes.
+ *
+ *  In particular it copies 3 entries starting at srcSurfIdx * 3 from srcob->vertexarray
+ *  to entries starting at destSurfIdx * 3 in destob->vertexarray. The same goes for the
+ *  multitexture entries.
+ */
+void copyVertexArraysSurface(ob_t * destob, int destSurfIdx, ob_t * srcob, int srcSurfIdx);
 
 /** Helper function for copySingleVertexData(). Stores a single texture channel, i.e. copies
  *  data from the srcvert into the destination arrays based on the given indices.
