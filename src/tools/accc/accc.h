@@ -207,6 +207,14 @@ void createTexChannelArrays(ob_t * destob, ob_t * srcob);
  */
 void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel);
 
+/** Computes the centroid of a triangle surface of the given object.
+ *
+ *  @param ob the object from which to take the surface
+ *  @param obsurf the surface index in the object (obsurf * 3 is the first entry in the vertexarray considered)
+ *  @param out the computed centroid
+ */
+void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out);
+
 extern int typeConvertion;
 extern ob_t * root_ob;
 

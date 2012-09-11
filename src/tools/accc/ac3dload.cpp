@@ -420,6 +420,30 @@ int computeNorm(point_t * pv1, point_t *pv2, point_t *pv3, point_t *norm)
     return 0;
 }
 
+void computeObSurfCentroid(ob_t * ob, int obsurf, point_t * out)
+{
+    tcoord_t * idx = ob->vertexarray;
+    point_t * vert = ob->vertex;
+
+    int firstIdx = obsurf * 3;
+
+    out->x = 0;
+    out->y = 0;
+    out->z = 0;
+
+    int curVert;
+    for(curVert = 0; curVert < 3; curVert++)
+    {
+        out->x += vert[idx[firstIdx + curVert].indice].x;
+        out->y += vert[idx[firstIdx + curVert].indice].y;
+        out->z += vert[idx[firstIdx + curVert].indice].z;
+    }
+
+    out->x /= 3;
+    out->y /= 3;
+    out->z /= 3;
+}
+
 int doMaterial(char *Line, ob_t *object, mat_t *material)
 {
     char * p;
@@ -516,8 +540,6 @@ int terrainSplitOb(ob_t **object)
     int *triIndex;
     int triIndice;
     int numtri;
-    double tri_x;
-    double tri_y;
     int found_a_tri = 0;
     int n = 0;
     int m1 = -1;
@@ -543,21 +565,12 @@ int terrainSplitOb(ob_t **object)
 
             for (k = 0; k < (*object)->numsurf; k++)
             {
-                tri_x =
-                        (*object)->vertex[(*object)->vertexarray[k * 3].indice].x;
-                tri_x +=
-                        (*object)->vertex[(*object)->vertexarray[k * 3 + 1].indice].x;
-                tri_x +=
-                        (*object)->vertex[(*object)->vertexarray[k * 3 + 2].indice].x;
-                tri_y =
-                        (*object)->vertex[(*object)->vertexarray[k * 3].indice].y;
-                tri_y +=
-                        (*object)->vertex[(*object)->vertexarray[k * 3 + 1].indice].y;
-                tri_y +=
-                        (*object)->vertex[(*object)->vertexarray[k * 3 + 2].indice].y;
-                if (tri_x / 3 >= fi && tri_x / 3 < fi + distSplit)
+                point_t surfCentroid;
+                computeObSurfCentroid(*object, k, &surfCentroid);
+
+                if (surfCentroid.x >= fi && surfCentroid.x < fi + distSplit)
                 {
-                    if (tri_y / 3 >= fj && tri_y / 3 < fj + distSplit)
+                    if (surfCentroid.y >= fj && surfCentroid.y < fj + distSplit)
                     {
                         found_a_tri = 1;
                         triIndex[k] = triIndice;
