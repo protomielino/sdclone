@@ -174,7 +174,7 @@ ROBOT_DATA(NAME simplix_mp5 PREFIX simplix_mp5
 
 # LP1 
 SET(ROBOT_SUBDIRS 0 1 2 3 4 5 
-                  lp1-pesci-p60 lp1-vieringe-vr8
+                  lp1-pescy-p60 lp1-vieringe-vr8
                   )
 
 ROBOT_DATA(NAME simplix_lp1 PREFIX simplix_lp1 
