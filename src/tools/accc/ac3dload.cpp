@@ -300,10 +300,8 @@ void clearSavedInVertexArrayEntry(ob_t * ob, int vertidx)
 
 void createSingleTexChannelArrays(ob_t * destob, ob_t * srcob, int channel)
 {
-    int numvert = srcob->numsurf * 3;
-
-    int size_va = numvert * sizeof(tcoord_t);
-    int size_ta = 2 * numvert * sizeof(double);
+    int size_va = srcob->numsurf * 3 * sizeof(tcoord_t);
+    int size_ta = 2 * srcob->numvertice * sizeof(double);
 
     tcoord_t * va = (tcoord_t *) malloc(size_va);
     double* ta = (double *) malloc(size_ta);
@@ -684,17 +682,15 @@ int terrainSplitOb(ob_t **object)
             tob->vertexarray[curNewSurf * 3 + 2].indice = m1;
         }
 
-        int numNewPts = curNewPtIdx;
-
         free(storedPtIdxArr);
 
-        tob->norm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-        tob->snorm = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-        tob->vertex = (point_t*) malloc(sizeof(point_t) * numtri * 3);
-        memset(tob->snorm, 0, sizeof(point_t) * numtri * 3);
-        memset(tob->norm, 0, sizeof(point_t) * numtri * 3);
+        int numNewPts = curNewPtIdx;
 
-        tob->textarray = (double *) malloc(sizeof(tcoord_t) * numtri * 2);
+        tob->norm = (point_t*) calloc(numNewPts, sizeof(point_t));
+        tob->snorm = (point_t*) calloc(numNewPts, sizeof(point_t));
+        tob->vertex = (point_t*) calloc(numNewPts, sizeof(point_t));
+
+        tob->textarray = (double *) calloc(numtri * 2, sizeof(tcoord_t));
         tob->attrSurf = (*object)->attrSurf;
         tob->attrMat = (*object)->attrMat;
 
