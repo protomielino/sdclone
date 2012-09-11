@@ -306,26 +306,36 @@ MACRO(ROBOT_MODULE)
 
   # Install clone robot modules shared libraries (use ldconfig version naming scheme under Linux)
   IF(RBM_HAS_CLONENAMES AND RBM_CLONENAMES)
+  
     GET_TARGET_PROPERTY(MODLOC ${RBM_NAME} LOCATION)
+
     FOREACH(CLONENAME ${RBM_CLONENAMES})
-      SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
-      IF(FALSE)
-      #IF(UNIX)
-	    # Might not work with GCC 4.5 or + (see above) 
-        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
-        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
-                           COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
-        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
-                         FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
-      ELSE()
-        ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
-                           COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC})
-        SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
-                         FILES ${CLONE_MODLOC})
-      ENDIF()
+    
+      # Check contents if specified (because SD_INSTALL_FILES(LIB ...) doesn't do it itself).
+      IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${CLONENAME} OR OPTION_CHECK_CONTENTS)
+      
+        SET(CLONE_MODLOC ${CLONENAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+        IF(FALSE)
+        #IF(UNIX)
+          # Might not work with GCC 4.5 or + (see above) 
+          ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                             COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC}.${RBM_VERSION})
+          ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                             COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_VERSION} ${CLONE_MODLOC}.${RBM_SOVERSION}
+                             COMMAND ${CMAKE_COMMAND} -E create_symlink ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC})
+          SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                           FILES ${CLONE_MODLOC} ${CLONE_MODLOC}.${RBM_SOVERSION} ${CLONE_MODLOC}.${RBM_VERSION} )
+        ELSE()
+          ADD_CUSTOM_COMMAND(TARGET ${RBM_NAME} POST_BUILD
+                             COMMAND ${CMAKE_COMMAND} -E copy ${MODLOC} ${CLONE_MODLOC})
+          SD_INSTALL_FILES(LIB drivers/${CLONENAME} PREFIX ${CMAKE_CURRENT_BINARY_DIR}
+                           FILES ${CLONE_MODLOC})
+        ENDIF()
+        
+      ENDIF() # Contents checking.
+      
     ENDFOREACH(CLONENAME ${RBM_CLONENAMES})
+    
   ENDIF()
 
 ENDMACRO(ROBOT_MODULE)
@@ -378,12 +388,12 @@ MACRO(ROBOT_DATA)
     # Install specified files.
     IF(RBD_IS_USER)
       SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} USER drivers/${RBD_NAME} 
-                                    PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
-                                 PATTERNS ${RBD_PATTERNS})
+                             PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
+                             PATTERNS ${RBD_PATTERNS})
     ELSE()
       SD_INSTALL_DIRECTORIES(DATA drivers/${RBD_NAME} 
-                                   PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
-                                    PATTERNS ${RBD_PATTERNS})
+                             PREFIX ${RBD_PREFIX} DIRECTORIES ${RBD_SUBDIRS} 
+                             PATTERNS ${RBD_PATTERNS})
     ENDIF()
 
   ENDIF(RBD_HAS_SUBDIRS AND RBD_SUBDIRS)
@@ -438,9 +448,9 @@ MACRO(ADD_INTERFACE_INCLUDEDIR)
   ENDIF(IN_SOURCETREE)
   
   FIND_PATH(INTERFACE_INCLUDE_DIR raceman.h 
-        PATHS ${INCLUDE_CANDIDATE} /usr/include /usr/local/include NO_DEFAULT_PATH)
+            PATHS ${INCLUDE_CANDIDATE} /usr/include /usr/local/include NO_DEFAULT_PATH)
   FIND_PATH(INTERFACE_INCLUDE_DIR raceman.h 
-        PATHS ${INCLUDE_CANDIDATE} /usr/include /usr/local/include)
+            PATHS ${INCLUDE_CANDIDATE} /usr/include /usr/local/include)
   MARK_AS_ADVANCED(INTERFACE_INCLUDE_DIR)
   IF(INTERFACE_INCLUDE_DIR)
     INCLUDE_DIRECTORIES(${INTERFACE_INCLUDE_DIR})
@@ -517,20 +527,20 @@ MACRO(ADD_SDLIB_INCLUDEDIR)
       MARK_AS_ADVANCED(SDLIB_MATH_INCLUDE_DIR)
       SET(SDLIB_EXTRA_INCLUDEDIR SDLIB_MATH_INCLUDE_DIR)
     ELSEIF(SDLIB_LIB STREQUAL "txml")
-	  # Temporary, as TXML will finally get replaced by Expat.
-	  IF(NOT OPTION_3RDPARTY_EXPAT)
+      # Temporary, as TXML will finally get replaced by Expat.
+      IF(NOT OPTION_3RDPARTY_EXPAT)
         IF(IN_SOURCETREE)
           SET(INCLUDE_CANDIDATE ${SOURCE_DIR}/src/libs/txml)
         ELSE(IN_SOURCETREE)
-            SET(INCLUDE_CANDIDATE ${SD_INCLUDEDIR_ABS})
+          SET(INCLUDE_CANDIDATE ${SD_INCLUDEDIR_ABS})
         ENDIF(IN_SOURCETREE)
         FIND_PATH(SDLIB_TXML_INCLUDE_DIR xml.h PATHS ${INCLUDE_CANDIDATE} /usr/include /usr/local/include NO_DEFAULT_PATH)
         FIND_PATH(SDLIB_TXML_INCLUDE_DIR xml.h PATHS ${INCLUDE_CANDIDATE} /usr/include /usr/local/include)
         MARK_AS_ADVANCED(SDLIB_TXML_INCLUDE_DIR)
         SET(SDLIB_EXTRA_INCLUDEDIR SDLIB_TXML_INCLUDE_DIR)
-	  ELSE(NOT OPTION_3RDPARTY_EXPAT)
-		SET(SDLIB_FOUND_LIB FALSE)
-	  ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+      ELSE(NOT OPTION_3RDPARTY_EXPAT)
+        SET(SDLIB_FOUND_LIB FALSE)
+      ENDIF(NOT OPTION_3RDPARTY_EXPAT)
     ELSEIF(SDLIB_LIB STREQUAL "robottools")
       IF(IN_SOURCETREE)
         SET(INCLUDE_CANDIDATE ${SOURCE_DIR}/src/libs/robottools)
@@ -622,13 +632,13 @@ MACRO(ADD_SDLIB_LIBRARY TARGET)
     ENDIF(SDLIB_LIB STREQUAL "OPTIONAL" OR SDLIB_LIB STREQUAL "STATIC")
 
     IF(SDLIB_LIB STREQUAL "txml" AND OPTION_3RDPARTY_EXPAT)
-	  SET(SDLIB_IGNORE TRUE) #Ignore: Use Expat
-	ENDIF(SDLIB_LIB STREQUAL "txml" AND OPTION_3RDPARTY_EXPAT)
-	
+      SET(SDLIB_IGNORE TRUE) #Ignore: Use Expat
+    ENDIF(SDLIB_LIB STREQUAL "txml" AND OPTION_3RDPARTY_EXPAT)
+    
     IF(SDLIB_LIB STREQUAL "solid" AND OPTION_3RDPARTY_SOLID)
-	  SET(SDLIB_IGNORE TRUE) #Ignore: Use 3rd party SOLID
-	ENDIF(SDLIB_LIB STREQUAL "solid" AND OPTION_3RDPARTY_SOLID)
-	
+      SET(SDLIB_IGNORE TRUE) #Ignore: Use 3rd party SOLID
+    ENDIF(SDLIB_LIB STREQUAL "solid" AND OPTION_3RDPARTY_SOLID)
+    
     IF(NOT SDLIB_IGNORE)
 
       SET(SDLIB_FOUND_LIB TRUE)
@@ -1127,6 +1137,9 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
   IF(NOT _ALREADY_DONE)
 
     # CMake options.
+    SET(OPTION_CHECK_CONTENTS false CACHE BOOL "Set to On if you don't want the build to be stopped by missing optional contents folders")
+    MARK_AS_ADVANCED(OPTION_CHECK_CONTENTS)
+
     SET(OPTION_OFFICIAL_ONLY false CACHE BOOL "Build / install only officially released contents")
 
     SET(OPTION_FORCE_DEBUG false CACHE BOOL "Force debug symbols even in Release build (Automatic in Debug builds)")
@@ -1157,24 +1170,24 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     ENDIF(UNIX)
 
     SET(OPTION_AUTOVERSION true CACHE BOOL "Enable automatic computation of the version from SVN source tree")
-	
-	# Custom 3rdParty location for some Windows builds (standard CMake Find<package> macros
-	# can't find it, so we needed another solution : see FindCustom3rdParty.cmake).
-	IF(MSVC)
-		SET(_OPTION_CUSTOM_3RDPARTY true) # Always needed for MSVC compilers.
-	ELSEIF(MINGW)
-		IF(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
-			# Not needed with "MSYS Makefiles" generator when using MinGW
-			# (3rd party libs assumed to be installed in standard location /usr/local).
-			SET(_OPTION_CUSTOM_3RDPARTY false)
-		ELSE(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
-			# Just as for MSVC builds : special location.
-			SET(_OPTION_CUSTOM_3RDPARTY true)
-		ENDIF(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
-	ENDIF(MSVC)
+    
+    # Custom 3rdParty location for some Windows builds (standard CMake Find<package> macros
+    # can't find it, so we needed another solution : see FindCustom3rdParty.cmake).
+    IF(MSVC)
+      SET(_OPTION_CUSTOM_3RDPARTY true) # Always needed for MSVC compilers.
+    ELSEIF(MINGW)
+      IF(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
+        # Not needed with "MSYS Makefiles" generator when using MinGW
+        # (3rd party libs assumed to be installed in standard location /usr/local).
+        SET(_OPTION_CUSTOM_3RDPARTY false)
+      ELSE(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
+        # Just as for MSVC builds : special location.
+        SET(_OPTION_CUSTOM_3RDPARTY true)
+      ENDIF(CMAKE_GENERATOR STREQUAL "MSYS Makefiles")
+    ENDIF(MSVC)
 
-	SET(OPTION_CUSTOM_3RDPARTY ${_OPTION_CUSTOM_3RDPARTY} CACHE BOOL "Set to ON to use 3rdParty prebuilt API located in <PROJECT_SOURCE_DIR>/../3rdparty")
-	MARK_AS_ADVANCED(OPTION_CUSTOM_3RDPARTY)
+    SET(OPTION_CUSTOM_3RDPARTY ${_OPTION_CUSTOM_3RDPARTY} CACHE BOOL "Set to ON to use 3rdParty prebuilt API located in <PROJECT_SOURCE_DIR>/../3rdparty")
+    MARK_AS_ADVANCED(OPTION_CUSTOM_3RDPARTY)
 
     # Compiler definitions (needs more comments. Is it needed under Windows ?).
     ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
@@ -1238,6 +1251,19 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
 
 ENDMACRO(ADD_SD_COMPILE_OPTIONS)
 
+# Use as a replacement of native ADD_DIRECTORY if the target folder may be optional
+# (if it is actually not there, and OPTION_CHECK_CONTENTS is Off,
+#  then the build will continue with a simple status message).
+MACRO(SD_ADD_SUBDIRECTORY DIR_PATH)
+
+  IF(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${DIR_PATH} OR OPTION_CHECK_CONTENTS)
+    ADD_SUBDIRECTORY(${DIR_PATH})
+  ELSE()
+    MESSAGE(STATUS "Note : Won't build missing dir. ${DIR_PATH}")
+  ENDIF()
+
+ENDMACRO(SD_ADD_SUBDIRECTORY PATH)
+
 MACRO(SD_INSTALL_CAR CARNAME)
 
   SET(SDIC_FILES ${CARNAME}.xml ${ARGN})
@@ -1283,6 +1309,7 @@ MACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
 ENDMACRO(SD_INSTALL_TRACK TRACKNAME CATEGORY)
 
 # Data/Lib/Bin/Include files installation (with user settings registration for data files)
+# Note: Missing files will be skipped if not there and OPTION_CHECK_CONTENTS is Off.
 # Args:
 #  DATA     : Data subdirectory where to install specified data files
 #  LIB      : Lib subdirectory where to install specified files/targets
@@ -1387,13 +1414,29 @@ MACRO(SD_INSTALL_FILES)
   # Prepend prefix to files if specified.
   SET(REAL_FILES) # Reset the list (remember, it's a CMakeLists.txt global variable :-()
   IF(HAS_FILES)
-    IF(HAS_PREFIX)
-      FOREACH(FILE ${FILES})
-        LIST(APPEND REAL_FILES ${PREFIX}/${FILE})
-      ENDFOREACH()
-    ELSE()
-       SET(REAL_FILES ${FILES})
-    ENDIF()
+    SET(_FILES) # Same.
+    FOREACH(FILE ${FILES})
+      #MESSAGE(STATUS "SD_INSTALL_FILES: ${FILE}")
+      IF(HAS_PREFIX)
+        SET(_FILE ${PREFIX}/${FILE})
+      ELSE()
+        SET(_FILE ${FILE})
+      ENDIF()
+      # Contents check for non-generated files if specified.
+      IF(NOT IS_ABSOLUTE ${_FILE})
+        SET(_FILE "${CMAKE_CURRENT_SOURCE_DIR}/${_FILE}")
+      ENDIF()
+      IF(IS_LIB OR IS_BIN OR EXISTS ${_FILE} OR OPTION_CHECK_CONTENTS)
+        LIST(APPEND REAL_FILES ${_FILE})
+        LIST(APPEND _FILES ${FILE})
+      ELSE()
+        IF(IS_ABSOLUTE ${_FILE}) # Make message less long : remove useless source dir path.
+          STRING(REPLACE "${CMAKE_CURRENT_SOURCE_DIR}/" "" _FILE "${_FILE}")
+        ENDIF()
+        MESSAGE(STATUS "Note : Won't install missing file ${_FILE}")
+      ENDIF()
+    ENDFOREACH()
+    SET(FILES ${_FILES})
   ENDIF()
 
   # Install files
@@ -1419,7 +1462,7 @@ MACRO(SD_INSTALL_FILES)
     # In order to run xmlversion.exe in the build tree (see below), under Windows,
     # we nearly always have to copy all dependencies next to it (tgf, txml or Expat, SDL, compiler run-time).
     GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
-	IF(NOT OPTION_3RDPARTY_EXPAT)
+    IF(NOT OPTION_3RDPARTY_EXPAT)
       GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
     ELSE(NOT OPTION_3RDPARTY_EXPAT)
       FIND_PACKAGE(EXPAT)
@@ -1428,7 +1471,7 @@ MACRO(SD_INSTALL_FILES)
       SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
     ENDIF(NOT OPTION_3RDPARTY_EXPAT)
     FIND_PACKAGE(SDL)
-	SET(SDL_LIBPATHNAME "${SDL_LIBRARY}")
+    SET(SDL_LIBPATHNAME "${SDL_LIBRARY}")
     IF(MINGW)
       # Multiple lib specs fuss ... find the one
       STRING(REGEX REPLACE ".*;([^;]+dll[^;]*);.*" "\\1" SDL_LIBPATHNAME "${SDL_LIBPATHNAME}")
@@ -1473,55 +1516,55 @@ MACRO(SD_INSTALL_FILES)
            ENDIF()
            FOREACH(FILE ${FILES})
              GET_FILENAME_COMPONENT(FILENAME \${FILE} NAME)
-              EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
-              IF(XMLVERSTATUS)
-               MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
-              ENDIF()
+             EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+             IF(XMLVERSTATUS)
+               MESSAGE(FATAL_ERROR \"Error: xmlversion failed : \${XMLVERSTATUS}\")
+             ENDIF()
            ENDFOREACH()")
 
     ELSE(MSVC)
 
         INSTALL(CODE 
-          "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
-		   SET(MINGW ${MINGW})
-      	   IF(MINGW)
-             SET(_LIBS_TO_INSTALL \"${TGF_LIB}\")
-             SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
-             IF(NOT OPTION_3RDPARTY_EXPAT)
-               LIST(APPEND _LIBS_TO_INSTALL \"${TXML_LIB}\")
-             ENDIF(NOT OPTION_3RDPARTY_EXPAT)
-             # CMake configuration for MSYS Makefiles generator assumes that 3rd party dependencies are installed
-             # in standard Linux folders, hence in the PATH ; so no need to install next to xmlversion exe.
-		     IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
-               IF(OPTION_3RDPARTY_EXPAT)
-                 LIST(APPEND _LIBS_TO_INSTALL \"${EXPAT_LIB}\")
-               ENDIF(OPTION_3RDPARTY_EXPAT)
-               LIST(APPEND _LIBS_TO_INSTALL \"${SDL_LIB}\")
-	           GET_FILENAME_COMPONENT(_MINGW_BINDIR \"${CMAKE_CXX_COMPILER}\" PATH)
-               LIST(APPEND _LIBS_TO_INSTALL \"\${_MINGW_BINDIR}/libstdc++-6.dll\" \"\${_MINGW_BINDIR}/libgcc_s_dw2-1.dll\")
-		     ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
-             GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
-             MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
-             FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
-		   ENDIF(MINGW)
-           SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
-           IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
-             GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
-           ENDIF()
-           # Why this path correction here ? This needs a comment !
-           SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
-           IF(CUR_DESTDIR MATCHES \"[^/]\")
-            STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
-           ELSE(CUR_DESTDIR MATCHES \"[^/]\")
-            SET(CUR_DESTDIR_CORR \"\")
-           ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
-           FOREACH(FILE ${FILES})
-             GET_FILENAME_COMPONENT(FILENAME \${FILE} NAME)
-              EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
-              IF(XMLVERSTATUS)
-               MESSAGE(FATAL_ERROR \"Error: xmlversion failed \$ENV(PATH)\")
-              ENDIF(XMLVERSTATUS)
-           ENDFOREACH()")
+            "FILE(READ ${CMAKE_BINARY_DIR}/xmlversion_loc.txt XMLVERSION_EXE)
+             SET(MINGW ${MINGW})
+             IF(MINGW)
+               SET(_LIBS_TO_INSTALL \"${TGF_LIB}\")
+               SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
+               IF(NOT OPTION_3RDPARTY_EXPAT)
+                 LIST(APPEND _LIBS_TO_INSTALL \"${TXML_LIB}\")
+               ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+               # CMake configuration for MSYS Makefiles generator assumes that 3rd party dependencies are installed
+               # in standard Linux folders, hence in the PATH ; so no need to install next to xmlversion exe.
+               IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+                 IF(OPTION_3RDPARTY_EXPAT)
+                   LIST(APPEND _LIBS_TO_INSTALL \"${EXPAT_LIB}\")
+                 ENDIF(OPTION_3RDPARTY_EXPAT)
+                 LIST(APPEND _LIBS_TO_INSTALL \"${SDL_LIB}\")
+                 GET_FILENAME_COMPONENT(_MINGW_BINDIR \"${CMAKE_CXX_COMPILER}\" PATH)
+                 LIST(APPEND _LIBS_TO_INSTALL \"\${_MINGW_BINDIR}/libstdc++-6.dll\" \"\${_MINGW_BINDIR}/libgcc_s_dw2-1.dll\")
+               ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+               GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
+               MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
+               FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
+             ENDIF(MINGW)
+             SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
+             IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
+               GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
+             ENDIF()
+             # Why this path correction here ? This needs a comment !
+             SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
+             IF(CUR_DESTDIR MATCHES \"[^/]\")
+               STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
+             ELSE(CUR_DESTDIR MATCHES \"[^/]\")
+               SET(CUR_DESTDIR_CORR \"\")
+             ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
+             FOREACH(FILE ${FILES})
+               GET_FILENAME_COMPONENT(FILENAME \${FILE} NAME)
+               EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DATA_PATH}\${FILENAME}\" \"${USER_PATH}/\${FILENAME}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+               IF(XMLVERSTATUS)
+                 MESSAGE(FATAL_ERROR \"Error: xmlversion failed : \${XMLVERSTATUS}\")
+               ENDIF(XMLVERSTATUS)
+             ENDFOREACH()")
 
     ENDIF(MSVC)
 
@@ -1530,6 +1573,7 @@ MACRO(SD_INSTALL_FILES)
 ENDMACRO(SD_INSTALL_FILES)
 
 # Directory installation with pattern matching on files and user settings registration
+# Note: Missing dirs will be skipped if not there and OPTION_CHECK_CONTENTS is Off.
 # Args:
 #  DATA        : Data subdirectory where to install specified sub-dirs
 #  USER        : User settings subdirectory where to install/update specified sub-dirs at run-time
@@ -1591,6 +1635,23 @@ MACRO(SD_INSTALL_DIRECTORIES)
     SET(DEST_ALL "${SD_DATADIR}/${DATA_PATH}")
   ENDIF()
 
+  # Check / filter contents if specified
+  SET(_DIRECTORIES)
+  FOREACH(DIRECTORY ${DIRECTORIES})
+    #MESSAGE(STATUS "SD_INSTALL_DIRS: ${DIRECTORY}")
+    IF(NOT IS_ABSOLUTE ${DIRECTORY})
+      SET(_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/${PREFIX}${DIRECTORY}")
+    ELSE()
+      SET(_DIRECTORY "${DIRECTORY}")
+    ENDIF()
+    IF(EXISTS ${_DIRECTORY} OR OPTION_CHECK_CONTENTS)
+      LIST(APPEND _DIRECTORIES ${DIRECTORY})
+    ELSE()
+      MESSAGE(STATUS "Note : Won't install missing dir. ${PREFIX}${DIRECTORY}")
+    ENDIF()
+  ENDFOREACH()
+  SET(DIRECTORIES ${_DIRECTORIES})
+  
   # Install selected files into the data dir.
   FOREACH(DIRECTORY ${DIRECTORIES})
     SET(GLOB_EXPRS)
@@ -1621,7 +1682,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
     # In order to run xmlversion.exe in the build tree (see below), under Windows,
     # we nearly always have to copy all dependencies next to it (tgf, txml or Expat, SDL, compiler run-time).
     GET_TARGET_PROPERTY(TGF_LIB tgf LOCATION)
-	IF(NOT OPTION_3RDPARTY_EXPAT)
+    IF(NOT OPTION_3RDPARTY_EXPAT)
       GET_TARGET_PROPERTY(TXML_LIB txml LOCATION)
     ELSE(NOT OPTION_3RDPARTY_EXPAT)
       FIND_PACKAGE(EXPAT)
@@ -1633,7 +1694,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
       SET(EXPAT_LIB ${EXPAT_LIBPATH}/../bin/${EXPAT_LIBNAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
     ENDIF(NOT OPTION_3RDPARTY_EXPAT)
     FIND_PACKAGE(SDL)
-	SET(SDL_LIBPATHNAME "${SDL_LIBRARY}")
+    SET(SDL_LIBPATHNAME "${SDL_LIBRARY}")
     IF(MINGW)
       # Multiple lib specs fuss ... find the one
       STRING(REGEX REPLACE ".*;([^;]+dll[^;]*);.*" "\\1" SDL_LIBPATHNAME "${SDL_LIBPATHNAME}")
@@ -1686,7 +1747,7 @@ MACRO(SD_INSTALL_DIRECTORIES)
                IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
                   EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${SD_DATADIR_ABS}/version.xml\" \"${DEST_ALL}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
                   IF(XMLVERSTATUS)
-                   MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
+                   MESSAGE(FATAL_ERROR \"Error: xmlversion failed : \${XMLVERSTATUS}\")
                   ENDIF(XMLVERSTATUS)
                ENDIF()
              ENDFOREACH()
@@ -1695,54 +1756,54 @@ MACRO(SD_INSTALL_DIRECTORIES)
     ELSE(MSVC)
 
       INSTALL(CODE 
-          "FILE(READ \"${CMAKE_BINARY_DIR}/xmlversion_loc.txt\" XMLVERSION_EXE)
-		   SET(MINGW ${MINGW})
-      	   IF(MINGW)
-             SET(_LIBS_TO_INSTALL \"${TGF_LIB}\")
-             SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
-             IF(NOT OPTION_3RDPARTY_EXPAT)
-               LIST(APPEND _LIBS_TO_INSTALL \"${TXML_LIB}\")
-             ENDIF(NOT OPTION_3RDPARTY_EXPAT)
-             # CMake configuration for MSYS Makefiles generator assumes that 3rd party dependencies are installed
-             # in standard Linux folders, hence in the PATH ; so no need to install next to xmlversion exe.
-		     IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
-               IF(OPTION_3RDPARTY_EXPAT)
-                 LIST(APPEND _LIBS_TO_INSTALL \"${EXPAT_LIB}\")
-               ENDIF(OPTION_3RDPARTY_EXPAT)
-               LIST(APPEND _LIBS_TO_INSTALL \"${SDL_LIB}\")
-	           GET_FILENAME_COMPONENT(_MINGW_BINDIR \"${CMAKE_CXX_COMPILER}\" PATH)
-               LIST(APPEND _LIBS_TO_INSTALL \"\${_MINGW_BINDIR}/libstdc++-6.dll\" \"\${_MINGW_BINDIR}/libgcc_s_dw2-1.dll\")
-		     ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
-             MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
-             GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
-             FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
-		   ENDIF(MINGW)
-           SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
-           IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
-             GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
-           ENDIF()
-           # Why this path correction here ? This needs a comment !
-           SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
-           IF(CUR_DESTDIR MATCHES \"[^/]\")
-            STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
-           ELSE(CUR_DESTDIR MATCHES \"[^/]\")
-            SET(CUR_DESTDIR_CORR \"\")
-           ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
-           FOREACH(DIRECTORY ${DIRECTORIES})
-             SET(GLOB_EXPRS)
-             FOREACH(PATTERN ${PATTERNS})
-               LIST(APPEND GLOB_EXPRS \"${PREFIX}\${DIRECTORY}/\${PATTERN}\")
-             ENDFOREACH()
-             FILE(GLOB_RECURSE FILES RELATIVE \"${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS}\")
-             FOREACH(FILE \${FILES})
-               IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
-                  EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DEST_ALL}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
-                  IF(XMLVERSTATUS)
-                   MESSAGE(FATAL_ERROR \"Error: xmlversion failed\")
-                  ENDIF(XMLVERSTATUS)
-               ENDIF()
-             ENDFOREACH()
-           ENDFOREACH()")
+            "FILE(READ \"${CMAKE_BINARY_DIR}/xmlversion_loc.txt\" XMLVERSION_EXE)
+             SET(MINGW ${MINGW})
+             IF(MINGW)
+               SET(_LIBS_TO_INSTALL \"${TGF_LIB}\")
+               SET(OPTION_3RDPARTY_EXPAT ${OPTION_3RDPARTY_EXPAT})
+               IF(NOT OPTION_3RDPARTY_EXPAT)
+                 LIST(APPEND _LIBS_TO_INSTALL \"${TXML_LIB}\")
+               ENDIF(NOT OPTION_3RDPARTY_EXPAT)
+               # CMake configuration for MSYS Makefiles generator assumes that 3rd party dependencies are installed
+               # in standard Linux folders, hence in the PATH ; so no need to install next to xmlversion exe.
+               IF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+                 IF(OPTION_3RDPARTY_EXPAT)
+                   LIST(APPEND _LIBS_TO_INSTALL \"${EXPAT_LIB}\")
+                 ENDIF(OPTION_3RDPARTY_EXPAT)
+                 LIST(APPEND _LIBS_TO_INSTALL \"${SDL_LIB}\")
+                 GET_FILENAME_COMPONENT(_MINGW_BINDIR \"${CMAKE_CXX_COMPILER}\" PATH)
+                 LIST(APPEND _LIBS_TO_INSTALL \"\${_MINGW_BINDIR}/libstdc++-6.dll\" \"\${_MINGW_BINDIR}/libgcc_s_dw2-1.dll\")
+               ENDIF(NOT CMAKE_GENERATOR STREQUAL \"MSYS Makefiles\")
+               MESSAGE(STATUS \"xmlversion : Libs to install=\${_LIBS_TO_INSTALL}\")
+               GET_FILENAME_COMPONENT(XMLVERSION_DIR \"\${XMLVERSION_EXE}\" PATH)
+               FILE(INSTALL DESTINATION \"\${XMLVERSION_DIR}\" TYPE FILE FILES \${_LIBS_TO_INSTALL})
+             ENDIF(MINGW)
+             SET(SD_DATADIR_ABS \"${SD_DATADIR}\")
+             IF(NOT IS_ABSOLUTE \${SD_DATADIR_ABS})
+               GET_FILENAME_COMPONENT(SD_DATADIR_ABS \"\${CMAKE_INSTALL_PREFIX}/\${SD_DATADIR_ABS}\" ABSOLUTE)
+             ENDIF()
+             # Why this path correction here ? This needs a comment !
+             SET(CUR_DESTDIR \"\$ENV{DESTDIR}\")
+             IF(CUR_DESTDIR MATCHES \"[^/]\")
+               STRING(REGEX REPLACE \"^(.*[^/])/*$\" \"\\\\1\" CUR_DESTDIR_CORR \"\${CUR_DESTDIR}\")
+             ELSE(CUR_DESTDIR MATCHES \"[^/]\")
+               SET(CUR_DESTDIR_CORR \"\")
+             ENDIF(CUR_DESTDIR MATCHES \"[^/]\")
+             FOREACH(DIRECTORY ${DIRECTORIES})
+               SET(GLOB_EXPRS)
+               FOREACH(PATTERN ${PATTERNS})
+                 LIST(APPEND GLOB_EXPRS \"${PREFIX}\${DIRECTORY}/\${PATTERN}\")
+               ENDFOREACH()
+               FILE(GLOB_RECURSE FILES RELATIVE \"${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX} ${CMAKE_CURRENT_SOURCE_DIR}${POSTFIX}/\${GLOB_EXPRS}\")
+               FOREACH(FILE \${FILES})
+                 IF(NOT \"\${FILE}\" MATCHES \"\\\\.svn\")
+                   EXECUTE_PROCESS(COMMAND \"\${XMLVERSION_EXE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}/version.xml\" \"${DEST_ALL}\${FILE}\" \"${USER_PATH}/\${FILE}\" \"\${CUR_DESTDIR_CORR}\${SD_DATADIR_ABS}\" RESULT_VARIABLE XMLVERSTATUS)
+                   IF(XMLVERSTATUS)
+                     MESSAGE(FATAL_ERROR \"Error: xmlversion failed : \${XMLVERSTATUS}\")
+                   ENDIF(XMLVERSTATUS)
+                 ENDIF()
+               ENDFOREACH()
+             ENDFOREACH()")
 
     ENDIF(MSVC)
 
