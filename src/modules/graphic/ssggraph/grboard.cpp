@@ -43,8 +43,10 @@ static float grBlue[4] = {0.0, 0.0, 1.0, 1.0};
 static float grGreen[4] = {0.0, 1.0, 0.0, 1.0};
 static float grBlack[4] = {0.0, 0.0, 0.0, 1.0};
 static float grPink[4] = {1.0, 0.0, 1.0, 1.0};
-static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
 static float grGrey[4] = {0.3, 0.3, 0.3, 1.0};
+static float grYellow[4] = {0.996, 0.882, 0.0, 1.0};
+static float grEckhard[4] = {0.0, 0.753, 1.0, 1.0};
+static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
 
 static const int NB_BOARDS = 3;
 static const int NB_LBOARDS = 5; //# of leaderboard states
@@ -336,7 +338,7 @@ cGrBoard::grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdb
   glVertex2f(X1 + THNSSFG, Y1 + curH);
   glVertex2f(X1 - THNSSFG, Y1 + curH);
   glEnd();
-  GfuiDrawString((char *)title, grBlue, GFUI_FONT_MEDIUM,
+  GfuiDrawString((char *)title, grYellow, GFUI_FONT_MEDIUM,
 				 (int)(X1 - (THNSSBG + THNSSFG)),
 				 (int)(Y1 - THNSSBG - GfuiFontHeight(GFUI_FONT_MEDIUM)),
 				 2*(THNSSBG + THNSSFG), GFUI_ALIGN_HC);
@@ -401,7 +403,8 @@ cGrBoard::grDispCarBoard1(const tCarElt *car, const tSituation *s)
   grSetupDrawingArea(x - 5, y + dy + 5, x + dx + 5, y - dy2 * 8 - dy + 5);
 
   //Display driver name and race position (in medium font size)
-  GfuiDrawString(buf, grCarInfo[car->index].iconColor, GFUI_FONT_MEDIUM_C, x, y);
+  //GfuiDrawString(buf, grCarInfo[car->index].iconColor, GFUI_FONT_MEDIUM_C, x, y);
+  GfuiDrawString(buf, grYellow, GFUI_FONT_MEDIUM_C, x, y);
   y -= dy;
 
   //From now on we use small font
@@ -491,7 +494,8 @@ cGrBoard::grDispCarBoard2(const tCarElt *car, const tSituation *s)
   grSetupDrawingArea(x - 5, y + dy + 5, x + dx + 5, y - dy2 * 8 - dy + 5);
 
   //Display driver name and race position (in medium font size)
-  GfuiDrawString(buf, grCarInfo[car->index].iconColor, GFUI_FONT_MEDIUM_C, x, y);
+  //GfuiDrawString(buf, grCarInfo[car->index].iconColor, GFUI_FONT_MEDIUM_C, x, y);
+  GfuiDrawString(buf, grYellow, GFUI_FONT_MEDIUM_C, x, y);
   y -= dy;
 
   //From now on we use small font
@@ -527,10 +531,12 @@ cGrBoard::grDispCarBoard2(const tCarElt *car, const tSituation *s)
     grWriteTime(clr, GFUI_FONT_SMALL_C, x3, y, dxc, time, 1);
   clr = grWhite;
   y -= dy;
+  y -= dy;
 
   //Display car ahead and diff
+  clr = grEckhard;
   if (car->_pos != 1) {
-    snprintf(buf, sizeof(buf),  "<- %s", s->cars[car->_pos - 2]->_name);
+    snprintf(buf, sizeof(buf), "%s", s->cars[car->_pos - 2]->_name);
     GfuiDrawString(buf, clr, GFUI_FONT_SMALL_C, x, y);
     if (s->_raceType == RM_TYPE_RACE) {
       if (s->cars[car->_pos - 2]->_laps == car->_laps) {
@@ -546,14 +552,15 @@ cGrBoard::grDispCarBoard2(const tCarElt *car, const tSituation *s)
       }
     }
   } else {
-    GfuiDrawString("<-", clr, GFUI_FONT_SMALL_C, x, y);
+    GfuiDrawString(" ", clr, GFUI_FONT_SMALL_C, x, y);
     GfuiDrawString("--:---", clr, GFUI_FONT_SMALL_C, x3, y, dxc, GFUI_ALIGN_HR);
   }
   y -= dy;
 
   //Display car behind and diff
+  clr = grWhite;
   if (car->_pos != s->_ncars) {
-    snprintf(buf, sizeof(buf),  "-> %s", s->cars[car->_pos]->_name);
+    snprintf(buf, sizeof(buf), "%s", s->cars[car->_pos]->_name);
     GfuiDrawString(buf, clr, GFUI_FONT_SMALL_C, x, y);
     if (s->_raceType == RM_TYPE_RACE) {
       if (s->cars[car->_pos]->_laps == car->_laps) {
@@ -569,7 +576,7 @@ cGrBoard::grDispCarBoard2(const tCarElt *car, const tSituation *s)
       }
     }
   } else {
-    GfuiDrawString("->", clr, GFUI_FONT_SMALL_C, x, y);
+    GfuiDrawString(" ", clr, GFUI_FONT_SMALL_C, x, y);
     GfuiDrawString("--:---", clr, GFUI_FONT_SMALL_C, x3, y, dxc, GFUI_ALIGN_HR);
   }
   y -= dy;
@@ -768,9 +775,16 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
 
       //Set colour of the drivers to that
       //defined in the drivers' XML file.
-      //Current driver is white...
+      //Current driver is yellow.
       float *clr = (i == current)
-        ? grWhite : grCarInfo[s->cars[i]->index].iconColor;
+        ? grYellow : grCarInfo[s->cars[i]->index].iconColor;
+        
+      if (i == current)
+        clr = grYellow;
+      else if (i < current)
+        clr = grEckhard;
+      else
+        clr = grWhite;
 
       //Driver position + name
       snprintf(buf, sizeof(buf), "%3d: %s", i + 1, s->cars[i]->_name);
@@ -791,25 +805,23 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
     if (drawLaps) {
       if (s->_raceType == RM_TYPE_RACE) {
         if (s->_totTime > s->currentTime) {
-          GfuiDrawString(" Laps:", grWhite, GFUI_FONT_SMALL_C, x, y);
+          GfuiDrawString(" Laps:", grYellow, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d", MAX(s->cars[0]->_laps-1,0));
-          GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
         } else {
-          GfuiDrawString(" Lap:", grWhite, GFUI_FONT_SMALL_C, x, y);
+          GfuiDrawString(" Lap:", grYellow, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d / %d", s->cars[0]->_laps, s->_totLaps);
-          GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
         }
+        GfuiDrawString(buf, grYellow, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
       } else {
         if (s->_totTime > 0.0f) {
           time_left = MAX(MIN(s->_totTime,s->_totTime - s->currentTime),0);
-          GfuiDrawString(" Time left:", grWhite, GFUI_FONT_SMALL_C, x, y);
+          GfuiDrawString(" Time left:", grYellow, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d:%02d:%02d", (int)floor(time_left / 3600.0f), (int)floor(time_left/60.0f) % 60, (int)floor(time_left) % 60);
-          GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
         } else {
-          GfuiDrawString(" Lap:", grWhite, GFUI_FONT_SMALL_C, x, y);
+          GfuiDrawString(" Lap:", grYellow, GFUI_FONT_SMALL_C, x, y);
           snprintf(buf, sizeof(buf), "%d / %d", s->cars[0]->_laps, s->_totLaps);
-          GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
         }
+        GfuiDrawString(buf, grYellow, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
       }
     }//if drawLaps
   }//else
@@ -901,11 +913,11 @@ cGrBoard::grDispCounterBoard2(const tCarElt *car)
     if (car->_fuel < 5.0f) {
       clr = grRed;
     } else {
-      clr = grWhite;
+      clr = grYellow;
     }
     
     grDrawGauge(centerAnchor + 140, BOTTOM_ANCHOR + 25, 100, clr, grBlack, car->_fuel / car->_tank, "F");
-    grDrawGauge(centerAnchor + 155, BOTTOM_ANCHOR + 25, 100, grRed, grGreen, (tdble)(car->_dammage) / grMaxDammage, "D");
+    grDrawGauge(centerAnchor + 155, BOTTOM_ANCHOR + 25, 100, grRed, grBlack, (tdble)(car->_dammage) / grMaxDammage, "D");
   }
 
   glTranslatef(0, -(speedoRise * TOP_ANCHOR / 100), 0);
@@ -1730,19 +1742,19 @@ cGrBoard::grDispIndicators(const tCarElt* car)
 
     //Display strings (until we are more advanced graphically)
     if (abs)
-      GfuiDrawString("ABS", grGreen, GFUI_FONT_MEDIUM_C, x, y);
+      GfuiDrawString("ABS", grYellow, GFUI_FONT_MEDIUM_C, x, y);
     else
       GfuiDrawString("ABS", grGrey, GFUI_FONT_MEDIUM_C, x, y);
     y -= dy;
 
     if (tcs)
-      GfuiDrawString("TCS", grGreen, GFUI_FONT_MEDIUM_C, x, y);
+      GfuiDrawString("TCS", grYellow, GFUI_FONT_MEDIUM_C, x, y);
     else
       GfuiDrawString("TCS", grGrey, GFUI_FONT_MEDIUM_C, x, y);
     y -= dy;
 
     if (spd)
-      GfuiDrawString("SPD", grGreen, GFUI_FONT_MEDIUM_C, x, y);
+      GfuiDrawString("SPD", grYellow, GFUI_FONT_MEDIUM_C, x, y);
     else
       GfuiDrawString("SPD", grGrey, GFUI_FONT_MEDIUM_C, x, y);
   }  // if human
