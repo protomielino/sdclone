@@ -492,7 +492,7 @@ void cGrTrackMap::selectTrackMap()
 
 // Draw the track map according to the display mode
 void cGrTrackMap::display(
-	tCarElt *currentCar,
+	const tCarElt *currentCar,
 	tSituation *situation,
 	int Winx,
 	int Winy,
@@ -554,7 +554,7 @@ void cGrTrackMap::drawTrackPanning(
 	int Winy,
 	int Winw,
 	int Winh,
-	tCarElt *currentCar,
+	const tCarElt *currentCar,
 	tSituation *s
 )
 {
@@ -628,7 +628,7 @@ void cGrTrackMap::drawTrackPanningAligned(
 	int Winy,
 	int Winw,
 	int Winh,
-	tCarElt *currentCar,
+	const tCarElt *currentCar,
 	tSituation *s
 )
 {
@@ -705,7 +705,7 @@ void cGrTrackMap::drawTrackPanningAligned(
 
 
 // Draw the dot of the car.
-void cGrTrackMap::drawCar(tCarElt *currentCar, GLfloat* color, int x, int y)
+void cGrTrackMap::drawCar(const tCarElt *currentCar, GLfloat* color, int x, int y)
 {
 	// Compute screen coordinates of the car.
 	float car_x = (currentCar->_pos_X - track_min_x)/track_width*map_size*track_x_ratio + x;
@@ -726,7 +726,7 @@ void cGrTrackMap::drawCar(tCarElt *currentCar, GLfloat* color, int x, int y)
 
 
 // Draw all opponents of the current car.
-void cGrTrackMap::drawCars(tCarElt *currentCar, tSituation *s, int x, int y)
+void cGrTrackMap::drawCars(const tCarElt *currentCar, tSituation *s, int x, int y)
 {
 	int i;
 	for (i = 0; i < s->_ncars; i++) {

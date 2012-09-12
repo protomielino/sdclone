@@ -34,7 +34,8 @@
 #include "grutil.h" //grWriteTime
 #include "grloadac.h" //grssgSetCurrentOptions
 
-using namespace std;
+using std::string;
+using std::vector;
 
 static float grWhite[4] = {1.0, 1.0, 1.0, 1.0};
 static float grRed[4] = {1.0, 0.0, 0.0, 1.0};
@@ -55,14 +56,6 @@ static const int TOP_ANCHOR = 600;
 static const int BOTTOM_ANCHOR = 0;
 static const int DEFAULT_WIDTH = 800;
 
-static char path[1024];
-
-//Scrolling leaderboard variables
-static int iStart = 0;
-static double iTimer = 0.0;
-static int iStringStart = 0;
-static string st; //This is the line we will display in the bottom
-  
 static const int BUFSIZE = 256;
 
 
@@ -70,6 +63,11 @@ cGrBoard::cGrBoard (int myid)
 {
   id = myid;
   trackMap = 0;
+
+  //Scrolling leaderboard variables
+  iStart = 0;
+  iTimer = 0.0;
+  iStringStart = 0;
 }
 
 
@@ -81,9 +79,10 @@ cGrBoard::~cGrBoard ()
 
 
 void
-cGrBoard::loadDefaults(tCarElt *curCar)
+cGrBoard::loadDefaults(const tCarElt *curCar)
 {
-  snprintf (path, sizeof(path), "%s/%d", GR_SCT_DISPMODE, id);
+  char path[1024];
+  snprintf(path, sizeof(path), "%s/%d", GR_SCT_DISPMODE, id);
   
   debugFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_DEBUG, NULL, 1);
   boardFlag = (int)GfParmGetNum(grHandle, path, GR_ATT_BOARD, NULL, 2);
@@ -131,8 +130,9 @@ cGrBoard::setWidth(int val)
 void
 cGrBoard::selectBoard(int val)
 {
-  snprintf (path, sizeof(path), "%s/%d", GR_SCT_DISPMODE, id);
-  
+  char path[1024];
+  snprintf(path, sizeof(path), "%s/%d", GR_SCT_DISPMODE, id);
+
   switch (val) {
     case 0:
       boardFlag = (boardFlag + 1) % NB_BOARDS;
@@ -180,15 +180,12 @@ cGrBoard::selectBoard(int val)
 void
 cGrBoard::grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInfo* frame)
 {
-  char buf[BUFSIZE];
-  int x, y, dy;
-
-  x = rightAnchor - 100;
-  y = TOP_ANCHOR - 15;
-  
-  dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
+  int x = rightAnchor - 100;
+  int y = TOP_ANCHOR - 15;
+  int dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
 
   //Display frame rates (instant and average)
+  char buf[BUFSIZE];
   snprintf(buf, sizeof(buf), "FPS: %.1f(%.1f)", frame->fInstFps, frame->fAvgFps);
   GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
 
@@ -197,12 +194,12 @@ cGrBoard::grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInf
     y -= dy;
     snprintf(buf, sizeof(buf),  "Frm: %u", frame->nTotalFrames);
     GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
-	
+
     //Display simulation time
     y -= dy;
     snprintf(buf, sizeof(buf),  "Time: %.f", s->currentTime);
     GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
-      
+
   } else if(debugFlag == 3) {  //Only display detailed information in Debug Mode > 1
     //Display segment name
     y -= dy;
@@ -222,11 +219,11 @@ cGrBoard::grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInf
       GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
     }
   }
-}
+} //grDispDebug
 
 
 void
-cGrBoard::grDispGGraph(tCarElt *car)
+cGrBoard::grDispGGraph(const tCarElt *car)
 {
   // Position the graph
   const tdble X1 = (tdble)(rightAnchor - 100);
@@ -382,8 +379,6 @@ void
 cGrBoard::grDispCarBoard1(const tCarElt *car, const tSituation *s)
 {
   char buf[BUFSIZE];
-  char const* lapsTimeLabel;
-  float *clr;
 
   //Populate buf to get the width of the drawing area
   snprintf(buf, sizeof(buf), "%s: %d/%d", car->_name, car->_pos, s->_ncars);
@@ -414,7 +409,7 @@ cGrBoard::grDispCarBoard1(const tCarElt *car, const tSituation *s)
 
   //Display fuel
   GfuiDrawString("Fuel:", grWhite, GFUI_FONT_SMALL_C, x, y);
-  clr = (car->_fuel < 5.0) ? grRed : grWhite;	//Display low fuel in red
+  float *clr = (car->_fuel < 5.0) ? grRed : grWhite;    //Display low fuel in red
   snprintf(buf, sizeof(buf), "%.1f l", car->_fuel);
   GfuiDrawString(buf, clr, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
   y -= dy;
@@ -428,6 +423,7 @@ cGrBoard::grDispCarBoard1(const tCarElt *car, const tSituation *s)
 
   //Display lap counter
   clr = grWhite;
+  char const* lapsTimeLabel;
   grGetLapsTime (s, car, buf, &lapsTimeLabel);
   GfuiDrawString(lapsTimeLabel, clr, GFUI_FONT_SMALL_C, x, y);
   GfuiDrawString(buf, clr, GFUI_FONT_SMALL_C, x2, y, dxc, GFUI_ALIGN_HR);
@@ -617,22 +613,21 @@ cGrBoard::grDispCarBoard(const tCarElt *car, const tSituation *s)
 #define ALIGN_LEFT  1
 #define ALIGN_RIGHT 2
 
-static void
-grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
+void
+cGrBoard::grDispEngineLeds(const tCarElt *car, int X, int Y, int align, bool bg)
 {
-  int  x, y;
-  int  xref;
+  //Green LED
   GLfloat ledcolg[2][3] = { 
     {0.0, 0.2, 0.0},
     {0.0, 1.0, 0.0}
   };
 
+  //Red LED
   GLfloat ledcolr[2][3] = { 
     {0.2, 0.0, 0.0},
     {1.0, 0.0, 0.0}
   };
 
-  int i;
   int ledNb     = 20;
   int ledHeight = 10;
   int ledWidth  = 5;
@@ -640,6 +635,7 @@ grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
   int ledRed    = (int)((car->_enginerpmRedLine * .9 / car->_enginerpmMax) * (tdble)ledNb);
   int ledLit    = (int)((car->_enginerpm / car->_enginerpmMax) * (tdble)ledNb);
 
+  int x;
   switch (align) {
     case ALIGN_CENTER:
       x = X - ((ledNb * ledWidth) + (ledNb - 1) * ledSpace) / 2;
@@ -655,9 +651,10 @@ grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
       break;
   }
 
-  y = Y;
+  int y = Y;
   glBegin(GL_QUADS);
-  
+
+  // Draw background?
   if (bg) {
     glColor3f(0.1, 0.1, 0.1);
     glVertex2f(x - ledSpace, y + ledHeight + ledSpace);
@@ -666,9 +663,9 @@ grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
     glVertex2f(x - ledSpace, BOTTOM_ANCHOR);
   }
 
-  xref = x;
+  const int xref = x;
   glColor3fv(ledcolg[0]);
-  for (i = 0; i < ledRed; i++) {
+  for (int i = 0; i < ledRed; ++i) {
     glVertex2f(x, y);
     glVertex2f(x + ledWidth, y);
     glVertex2f(x + ledWidth, y + ledHeight);
@@ -677,7 +674,7 @@ grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
   }
 
   glColor3fv(ledcolr[0]);
-  for (i = ledRed; i < ledNb; i++) {
+  for (int i = ledRed; i < ledNb; ++i) {
     glVertex2f(x, y);
     glVertex2f(x + ledWidth, y);
     glVertex2f(x + ledWidth, y + ledHeight);
@@ -685,9 +682,10 @@ grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
     x += ledWidth + ledSpace;
   }
   x = xref;
+  
 #define DD  1
   glColor3fv(ledcolg[1]);
-  for (i = 0; i < ledNb; i++) {
+  for (int i = 0; i < ledNb; ++i) {
     if (i == ledRed) {
       glColor3fv(ledcolr[1]);
     }
@@ -702,33 +700,13 @@ grDispEngineLeds (tCarElt *car, int X, int Y, int align, int bg)
     }
   }
   glEnd();
-}
+}  // grDispEngineLeds
 
-void
-cGrBoard::grDispCounterBoard(tCarElt *car)
-{
-  char buf[BUFSIZE];
-  
-  grDispEngineLeds (car, centerAnchor,  BOTTOM_ANCHOR + MAX(GfuiFontHeight(GFUI_FONT_BIG_C), GfuiFontHeight(GFUI_FONT_DIGIT)), ALIGN_CENTER, 1);
-  
-  int x = centerAnchor;
-  static const int y = BOTTOM_ANCHOR;
-
-  if (car->_gear <= 0)
-    snprintf(buf, sizeof(buf), " kph %s", car->_gear == 0 ? "N" : "R");
-  else
-    snprintf(buf, sizeof(buf), " kph %d", car->_gear);
-  GfuiDrawString(buf, grBlue, GFUI_FONT_BIG_C, x, y);
-  
-  x = centerAnchor;
-  snprintf(buf, sizeof(buf), "%3d", abs((int)(car->_speed_x * 3.6)));
-  GfuiDrawString(buf, grBlue, GFUI_FONT_BIG_C, x - 50, y, 50, GFUI_ALIGN_HR);
-}
 
 /** 
  * grDispLeaderBoard
  * 
- * Displayes the leader board (in the lower left corner of the screen)
+ * Displays the leader board (in the lower left corner of the screen)
  * If [drawLaps] is on, writes the lap counter on the top of the list.
  * @param car[in] the car currently being viewed
  * @param s[in] situation provided by the sim
@@ -839,17 +817,10 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
 
 
 void
-cGrBoard::grDispCounterBoard2(tCarElt *car)
+cGrBoard::grDispCounterBoard2(const tCarElt *car)
 {
-  int index;
-  tgrCarInstrument *curInst;
-  tdble val;
-  char buf[32];
-  
-  index = car->index; /* current car's index */
-
-  //RPM
-  curInst = &(grCarInfo[index].instrument[0]);
+  // RPM
+  tgrCarInstrument *curInst = &(grCarInfo[car->index].instrument[0]);
   
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
@@ -862,13 +833,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glCallList(curInst->CounterList);
   glBindTexture(GL_TEXTURE_2D, 0);
   
-  val = (*(curInst->monitored) - curInst->minValue) / curInst->maxValue;
-  if (val > 1.0) {
-    val = 1.0;
-  } else if (val < 0.0) {
-    val = 0.0;
-  }
-  
+  tdble val = (*(curInst->monitored) - curInst->minValue) / curInst->maxValue;
+  val = MIN(1.0, MAX(0.0, val));    // val between 0.0 and 1.0
   val = curInst->minAngle + val * curInst->maxAngle;
   
   RELAXATION(val, curInst->prevVal, 30);
@@ -880,6 +846,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glPopMatrix();
 
   //Show gear
+  char buf[32];
   if (car->_gear <= 0)
     snprintf(buf, sizeof(buf), "%s", car->_gear == 0 ? "N" : "R");
   else
@@ -890,7 +857,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   glTranslatef(-centerAnchor, -BOTTOM_ANCHOR, 0);
 
   //Speedo
-  curInst = &(grCarInfo[index].instrument[1]);
+  curInst = &(grCarInfo[car->index].instrument[1]);
   
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
@@ -907,9 +874,7 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   val = (*(curInst->monitored) - curInst->minValue) / curInst->maxValue;
   if (val < 0.0)
     val *= -1.0;
-  if (val > 1.0) {
-    val = 1.0;
-  }
+  val = MIN(1.0, val);
   val = curInst->minAngle + val * curInst->maxAngle;
   
   RELAXATION(val, curInst->prevVal, 30);
@@ -944,7 +909,8 @@ cGrBoard::grDispCounterBoard2(tCarElt *car)
   }
 
   glTranslatef(0, -(speedoRise * TOP_ANCHOR / 100), 0);
-}
+}  // grDispCounterBoard2
+
 
 void
 cGrBoard::initBoard(void)
@@ -959,33 +925,23 @@ cGrBoard::shutdown(void)
 {
   delete trackMap; // 'delete 0' is safe.
   trackMap = 0;
-  
-  // Reset scrolling leaderboard variables
-  sShortNames.clear();
-  st.clear();
-  iStart = 0;
-  iTimer = 0.0;
-  iStringStart = 0;
 }
 
+
 void
-cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
+cGrBoard::grDispArcade(const tCarElt *car, const tSituation *s)
 {
-	int  x, y, x2;
-  int  dy, dxc;
-  char buf[BUFSIZE];
-  float *clr;
+#define XM  15  // X margin
+#define YM  10  // Y margin
 
-#define XM  15
-#define YM  10
-
-  dy = GfuiFontHeight(GFUI_FONT_BIG_C);
-  dxc = 100;
+  int dy = GfuiFontHeight(GFUI_FONT_BIG_C);
+  int dxc = 100;
   
-  x = leftAnchor + XM;
-  x2 = x + 50;
-  y = TOP_ANCHOR - YM - dy;
+  int x = leftAnchor + XM;
+  int x2 = x + 50;
+  int y = TOP_ANCHOR - YM - dy;
 
+  char buf[BUFSIZE];
   snprintf(buf, sizeof(buf), "%d/%d", car->_pos, s->_ncars);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_BIG_C, x, y);
 
@@ -1005,12 +961,7 @@ cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
   snprintf(buf, sizeof(buf), "%s", car->_name);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, rightAnchor - leftAnchor - 2*XM, GFUI_ALIGN_HC);
 
-
-  if (car->_fuel < 5.0) {
-    clr = grRed;
-  } else {
-    clr = grWhite;
-  }
+  float *clr = (car->_fuel < 5.0) ? grRed : grWhite;
   grDrawGauge(leftAnchor + XM, BOTTOM_ANCHOR + 25, 100, clr, grBlack, car->_fuel / car->_tank, "F");
   grDrawGauge(leftAnchor + XM + 15, BOTTOM_ANCHOR + 25, 100, grRed, grGreen, (tdble)(car->_dammage) / grMaxDammage, "D");
 
@@ -1025,8 +976,9 @@ cGrBoard::grDispArcade(tCarElt *car, tSituation *s)
     snprintf(buf, sizeof(buf), "%d", car->_gear);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, rightAnchor - leftAnchor - 2*XM, GFUI_ALIGN_HR);
 
-  grDispEngineLeds (car, rightAnchor - XM, YM + dy + GfuiFontHeight (GFUI_FONT_BIG_C), ALIGN_RIGHT, 0);
-}
+  grDispEngineLeds (car, rightAnchor - XM, YM + dy + GfuiFontHeight (GFUI_FONT_BIG_C), ALIGN_RIGHT, false);
+} // grDispArcade
+
 
 /**
  * This function calculates if the split time must be displayed, and if so what the
@@ -1197,11 +1149,11 @@ void cGrBoard::grGetLapsTime(const tSituation *s, const tCarElt *car,
 }
 
 void cGrBoard::refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
-							bool forceArcade, tCarElt *currCar, bool isCurrScreen)
+							const tCarElt *currCar, bool isCurrScreen)
 {
   grDispMisc(isCurrScreen);
   
-  if (arcadeFlag || forceArcade) {
+  if (arcadeFlag) {
     grDispArcade(currCar, s);
   } else {
     if (debugFlag)
@@ -1228,22 +1180,14 @@ static int nstate = 0;
 void grInitBoardCar(tCarElt *car)
 {
   static const int nMaxTexPathSize = 4096;
-  int     index;
-  void    *handle;
-  const char  *param;
-  grssgLoaderOptions  options;
-  tgrCarInfo    *carInfo;
-  tgrCarInstrument  *curInst;
-  tdble   xSz, ySz, xpos, ypos;
-  tdble   needlexSz, needleySz;
-  int lg;
   const bool bMasterModel = strlen(car->_masterModel) != 0;
+
+  grssgLoaderOptions options;
+  grssgSetCurrentOptions(&options);
   
-  grssgSetCurrentOptions ( &options ) ;
-  
-  index = car->index; /* current car's index */
-  carInfo = &grCarInfo[index];
-  handle = car->_carHandle;
+  int index = car->index; /* current car's index */
+  tgrCarInfo *carInfo = &grCarInfo[index];
+  void *handle = car->_carHandle;
   
   /* Set tachometer/speedometer textures search path :
    1) driver level specified, in the user settings,
@@ -1251,7 +1195,7 @@ void grInitBoardCar(tCarElt *car)
    3) car level specified,
    4) common textures */
   grFilePath = (char*)malloc(nMaxTexPathSize);
-  lg = 0;
+  int lg = 0;
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "%sdrivers/%s/%d/%s;",
 				 GfLocalDir(), car->_modName, car->_driverIndex, car->_carName);
   if (bMasterModel)
@@ -1294,10 +1238,10 @@ void grInitBoardCar(tCarElt *car)
   lg += snprintf(grFilePath + lg, nMaxTexPathSize - lg, "data/textures");
 
   /* Tachometer --------------------------------------------------------- */
-  curInst = &(carInfo->instrument[0]);
+  tgrCarInstrument *curInst = &(carInfo->instrument[0]);
   
   /* Load the Tachometer texture */
-  param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.png");
+  const char *param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_TACHO_TEX, "rpm8000.png");
   
   curInst->texture = (ssgSimpleState*)grSsgLoadTexState(param);
   if (curInst->texture == 0)
@@ -1307,14 +1251,14 @@ void grInitBoardCar(tCarElt *car)
   nstate++;
   
   /* Load the instrument placement */
-  xSz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XSZ, (char*)NULL, 128);
-  ySz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YSZ, (char*)NULL, 128);
+  tdble xSz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XSZ, (char*)NULL, 128);
+  tdble ySz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YSZ, (char*)NULL, 128);
 
   // position are delta from center of screen
-  xpos = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XPOS, (char*)NULL, 0 - xSz);
-  ypos = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YPOS, (char*)NULL, 0);
-  needlexSz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_NDLXSZ, (char*)NULL, 50);
-  needleySz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_NDLYSZ, (char*)NULL, 2);
+  tdble xpos = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XPOS, (char*)NULL, 0 - xSz);
+  tdble ypos = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YPOS, (char*)NULL, 0);
+  tdble needlexSz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_NDLXSZ, (char*)NULL, 50);
+  tdble needleySz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_NDLYSZ, (char*)NULL, 2);
   curInst->needleXCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XCENTER, (char*)NULL, xSz / 2.0) + xpos;
   curInst->needleYCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_YCENTER, (char*)NULL, ySz / 2.0) + ypos;
   curInst->digitXCenter = GfParmGetNum(handle, SECT_GROBJECTS, PRM_TACHO_XDIGITCENTER, (char*)NULL, xSz / 2.0) + xpos;
@@ -1331,7 +1275,7 @@ void grInitBoardCar(tCarElt *car)
   curInst->needleColor[1] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_GREEN, (char*)NULL, 0.0);
   curInst->needleColor[2] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_BLUE, (char*)NULL, 0.0);
   curInst->needleColor[3] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_ALPHA, (char*)NULL, 1.0);
-  
+
   curInst->CounterList = glGenLists(1);
   glNewList(curInst->CounterList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
@@ -1344,7 +1288,7 @@ void grInitBoardCar(tCarElt *car)
   }
   glEnd();
   glEndList();
-  
+
   curInst->needleList = glGenLists(1);
   glNewList(curInst->needleList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
@@ -1357,11 +1301,11 @@ void grInitBoardCar(tCarElt *car)
   }
   glEnd();
   glEndList();
-  
-  
+
+
   /* Speedometer ----------------------------------------------------------- */
   curInst = &(carInfo->instrument[1]);
-  
+
   /* Load the Speedometer texture */
   param = GfParmGetStr(handle, SECT_GROBJECTS, PRM_SPEEDO_TEX, "speed360.png");
 
@@ -1370,10 +1314,10 @@ void grInitBoardCar(tCarElt *car)
     curInst->texture = (ssgSimpleState*)grSsgLoadTexState("speed360.rgb");
 
   free(grFilePath);
-  
+
   cleanup[nstate] = curInst->texture;
   nstate++;
-  
+
   /* Load the intrument placement */
   xSz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_SPEEDO_XSZ, (char*)NULL, 128);
   ySz = GfParmGetNum(handle, SECT_GROBJECTS, PRM_SPEEDO_YSZ, (char*)NULL, 128);
@@ -1396,13 +1340,13 @@ void grInitBoardCar(tCarElt *car)
   if (strcmp(GfParmGetStr(handle, SECT_GROBJECTS, PRM_SPEEDO_DIGITAL, "yes"), "yes") == 0) {
     curInst->digital = 1;
   }
-  
+
   /* Get colour to use for needle, default is Red */
   curInst->needleColor[0] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_RED, (char*)NULL, 1.0);
   curInst->needleColor[1] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_GREEN, (char*)NULL, 0.0);
   curInst->needleColor[2] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_BLUE, (char*)NULL, 0.0);
   curInst->needleColor[3] = GfParmGetNum(handle, SECT_GROBJECTS, PRM_NEEDLE_ALPHA, (char*)NULL, 1.0);
-  
+
   curInst->CounterList = glGenLists(1);
   glNewList(curInst->CounterList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
@@ -1415,7 +1359,7 @@ void grInitBoardCar(tCarElt *car)
   }
   glEnd();
   glEndList();
-  
+
   curInst->needleList = glGenLists(1);
   glNewList(curInst->needleList, GL_COMPILE);
   glBegin(GL_TRIANGLE_STRIP);
@@ -1428,7 +1372,8 @@ void grInitBoardCar(tCarElt *car)
   }
   glEnd();
   glEndList();
-}
+}//grInitBoardCar
+
 
 void grShutdownBoardCar(void)
 {
@@ -1455,7 +1400,7 @@ void grShutdownBoardCar(void)
  * @param s[in] current situation, provided by the sim
 */
 void
-cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const
+cGrBoard::grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s)
 {
   //Scrolling
   if(iTimer == 0 || s->currentTime < iTimer)
@@ -1561,7 +1506,7 @@ cGrBoard::grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s)
      * in the next lap.
     */ 
 
-    ostringstream osRoster;
+    std::ostringstream osRoster;
     //Add the track name as separator, embedded with 3 spaces each side.
     osRoster << "   " << grTrack->name << "   ";
     //Add # of laps
@@ -1713,7 +1658,7 @@ cGrBoard::grMakeThreeLetterNames(const tSituation *s)
       if(sSearch == origShortNames[j]) {  //Same 3-letter name found
         //Let's find the first mismatching character
         unsigned int k;
-        for(k = 0; k < min(origNames[i].size(), origNames[j].size()); k++) {
+        for(k = 0; k < std::min(origNames[i].size(), origNames[j].size()); k++) {
           if(origNames[i][k] != origNames[j][k]) break;
         }//for k
         //Set 3rd char of the short name to the mismatching char (or last one).

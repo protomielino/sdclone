@@ -47,26 +47,31 @@ class cGrBoard
     int rightAnchor;
     int speedoRise;
     std::vector<std::string> sShortNames;
-		
+    //Scrolling leaderboard variables
+    int iStart;
+    double iTimer;
+    int iStringStart;
+    std::string st; //This is the line we will display in the bottom
+
  private:
     void grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInfo* frame);
-    void grDispGGraph(tCarElt *car);
+    void grDispGGraph(const tCarElt *car);
     void grDispMisc(bool bCurrentScreen);
     void grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdble val, const char *title);
+    void grDispEngineLeds(const tCarElt *car, int X, int Y, int align, bool bg);
 
     void grDispCarBoard(const tCarElt *car, const tSituation *s);
     void grDispCarBoard1(const tCarElt *car, const tSituation *s);
     void grDispCarBoard2(const tCarElt *car, const tSituation *s);
 
-    void grDispCounterBoard(tCarElt *car);
     void grDispIndicators(const tCarElt *car);
 
     void grDispLeaderBoard(const tCarElt *car, const tSituation *s);
-    void grDispCounterBoard2(tCarElt *car);
-    void grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s) const;
+    void grDispCounterBoard2(const tCarElt *car);
+    void grDispLeaderBoardScroll(const tCarElt *car, const tSituation *s);
     void grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s);
 
-    void grDispArcade(tCarElt *car, tSituation *s);
+    void grDispArcade(const tCarElt *car, const tSituation *s);
     std::string grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation *s, const bool isLeader) const;
     // Track overview object
     cGrTrackMap *trackMap;
@@ -75,7 +80,7 @@ class cGrBoard
     void grGetLapsTime(const tSituation *s, const tCarElt *car, char* result, char const** label) const;
     void grMakeThreeLetterNames(const tSituation *s);
     void grSetupDrawingArea(int xl, int yb, int xr, int yt) const;
-		
+
  public:
     cGrBoard(int myid);
     ~cGrBoard();
@@ -84,12 +89,11 @@ class cGrBoard
     void shutdown(void);
     void selectBoard(int brd);
     void setWidth(int width);
-    void initBoardCar(tCarElt *car);
     inline cGrTrackMap *getTrackMap() { return trackMap; }
 
     void refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
-					  bool forceArcade, tCarElt *currCar, bool isCurrScreen);
-    void loadDefaults(tCarElt *curCar);
+					  const tCarElt *currCar, bool isCurrScreen);
+    void loadDefaults(const tCarElt *curCar);
 };
 
 extern void grInitBoardCar(tCarElt *car);

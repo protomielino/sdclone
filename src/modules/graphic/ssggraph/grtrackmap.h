@@ -73,7 +73,7 @@ class cGrTrackMap
 
 		// Draw the track map according to the display mode.
 		void display(
-			tCarElt *currentCar,
+			const tCarElt *currentCar,
 			tSituation *situation,
 			int Winx,
 			int Winy,
@@ -135,16 +135,16 @@ class cGrTrackMap
 		void drawTrackNormal(int x, int y);
 
 		// Draw the track in the panning mode.
-		void drawTrackPanning(int Winx, int Winy, int Winw, int Winh, tCarElt *currentCar, tSituation *situation);
+		void drawTrackPanning(int Winx, int Winy, int Winw, int Winh, const tCarElt *currentCar, tSituation *situation);
 
 		// Draw the track in the panning aligned mode.
-		void drawTrackPanningAligned(int Winx, int Winy, int Winw, int Winh, tCarElt *currentCar, tSituation *s);
+		void drawTrackPanningAligned(int Winx, int Winy, int Winw, int Winh, const tCarElt *currentCar, tSituation *s);
 
 		// Draw the dot of the car.
-		void drawCar(tCarElt *currentCar, GLfloat* color, int x, int y);
+		void drawCar(const tCarElt *currentCar, GLfloat* color, int x, int y);
 
 		// Draw all opponents of the current car.
-		void drawCars(tCarElt *currentCar, tSituation *s, int x, int y);
+		void drawCars(const tCarElt *currentCar, tSituation *s, int x, int y);
 
 		// Setus up colors.
 		void initColors();

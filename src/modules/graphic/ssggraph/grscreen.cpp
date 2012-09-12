@@ -382,7 +382,7 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	TRACE_GL("cGrScreen::update glDisable(GL_DEPTH_TEST)");
 	glEnable(GL_SCISSOR_TEST);
 	glScissor(scrx + (scrw * (100 - boardWidth)/200), scry, scrw * boardWidth / 100, scrh);
-	board->refreshBoard(s, frameInfo, false, curCar,
+	board->refreshBoard(s, frameInfo, curCar,
 						grNbActiveScreens > 1 && grGetCurrentScreen() == this);
 	glDisable(GL_SCISSOR_TEST);
 	TRACE_GL("cGrScreen::update display boards");
