@@ -44,9 +44,11 @@ static float grGreen[4] = {0.0, 1.0, 0.0, 1.0};
 static float grBlack[4] = {0.0, 0.0, 0.0, 1.0};
 static float grPink[4] = {1.0, 0.0, 1.0, 1.0};
 static float grGrey[4] = {0.3, 0.3, 0.3, 1.0};
-static float grYellow[4] = {0.996, 0.882, 0.0, 1.0};
-static float grEckhard[4] = {0.0, 0.753, 1.0, 1.0};
+static float grYellow[4] = {1.0, 0.878, 0.0, 1.0};//ffe000
+static float grCyan[4] = {0.31, 0.968, 0.933, 1.0};//4ff7ee
 static float grDefaultClr[4] = {0.9, 0.9, 0.15, 1.0};
+// darkblue to fit the menu style: 0a162f
+static float grBackground[4] = {0.039, 0.086, 0.184, 0.8};
 
 static const int NB_BOARDS = 3;
 static const int NB_LBOARDS = 5; //# of leaderboard states
@@ -308,19 +310,19 @@ cGrBoard::grDispGGraph(const tCarElt *car)
 
 
 void
-cGrBoard::grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdble val, const char *title)
+cGrBoard::grDrawGauge(tdble X1, tdble Y1, tdble H,
+                        float *clr1, float *clr2,
+                        tdble val, const char *title)
 {
-  tdble curH;
-
-  curH = MIN(val, 1.0);
-  curH = MAX(curH, 0.0);
+  tdble curH = MAX(MIN(val, 1.0), 0.0);
   curH *= H;
   
-  static const tdble THNSSBG = 2.0; // static => the assignment is only executed once ever.
-  static const tdble THNSSFG = 2.0; // static => the assignment is only executed once ever.
+  static const tdble THNSSBG = 2.0;
+  static const tdble THNSSFG = 2.0;
 
   glBegin(GL_QUADS);
-  glColor4fv(grBlack);
+  // set F and D column to: 404040
+  glColor4f(0.25, 0.25, 0.25, 0.8);
   glVertex2f(X1 - (THNSSBG + THNSSFG), Y1 - THNSSBG);
   glVertex2f(X1 + (THNSSBG + THNSSFG), Y1 - THNSSBG);
   glVertex2f(X1 + (THNSSBG + THNSSFG), Y1 + H + THNSSBG);
@@ -534,7 +536,7 @@ cGrBoard::grDispCarBoard2(const tCarElt *car, const tSituation *s)
   y -= dy;
 
   //Display car ahead and diff
-  clr = grEckhard;
+  clr = grCyan;
   if (car->_pos != 1) {
     snprintf(buf, sizeof(buf), "%s", s->cars[car->_pos - 2]->_name);
     GfuiDrawString(buf, clr, GFUI_FONT_SMALL_C, x, y);
@@ -782,7 +784,7 @@ cGrBoard::grDispLeaderBoard(const tCarElt *car, const tSituation *s)
       if (i == current)
         clr = grYellow;
       else if (i < current)
-        clr = grEckhard;
+        clr = grCyan;
       else
         clr = grWhite;
 
@@ -916,8 +918,8 @@ cGrBoard::grDispCounterBoard2(const tCarElt *car)
       clr = grYellow;
     }
     
-    grDrawGauge(centerAnchor + 140, BOTTOM_ANCHOR + 25, 100, clr, grBlack, car->_fuel / car->_tank, "F");
-    grDrawGauge(centerAnchor + 155, BOTTOM_ANCHOR + 25, 100, grRed, grBlack, (tdble)(car->_dammage) / grMaxDammage, "D");
+    grDrawGauge(centerAnchor + 140, BOTTOM_ANCHOR + 25, 100, clr, grBackground, car->_fuel / car->_tank, "F");
+    grDrawGauge(centerAnchor + 155, BOTTOM_ANCHOR + 25, 100, grRed, grBackground, (tdble)(car->_dammage) / grMaxDammage, "D");
   }
 
   glTranslatef(0, -(speedoRise * TOP_ANCHOR / 100), 0);
@@ -1701,7 +1703,8 @@ cGrBoard::grSetupDrawingArea(int xl, int yb, int xr, int yt) const
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA) ;
   glBegin(GL_QUADS);
-  glColor4f(0.1, 0.1, 0.1, 0.8);
+  // darkblue to fit the menu style: 0a162f
+  glColor4f(0.039, 0.086, 0.184, 0.8);
   glVertex2f(xl, yb);
   glVertex2f(xr, yb);
   glVertex2f(xr, yt);

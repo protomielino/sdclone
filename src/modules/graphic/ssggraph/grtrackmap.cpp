@@ -764,24 +764,24 @@ inline void cGrTrackMap::checkAndSetMaximum(float &currentmax, float &value)
 }
 
 
-// Setup colors.
+// Setup colors
 void cGrTrackMap::initColors()
 {
-	//grYellow
-	currentCarColor[0] = 0.995;
-	currentCarColor[1] = 0.882;
+	//grYellow: ffcc00
+	currentCarColor[0] = 1.0;
+	currentCarColor[1] = 0.8;
 	currentCarColor[2] = 0.0;
 	currentCarColor[3] = 1.0;
 
-	//grEckhard
+	//grCyan: 00c0ff
 	aheadCarColor[0] = 0.0;
 	aheadCarColor[1] = 0.753;
 	aheadCarColor[2] = 1.0;
 	aheadCarColor[3] = 1.0;
 
-	//Dark blue
-	behindCarColor[0] = 0.109;
-	behindCarColor[1] = 0.129;
-	behindCarColor[2] = 0.247;
+	//Dark blue: 0e3a70
+	behindCarColor[0] = 0.054;
+	behindCarColor[1] = 0.227;
+	behindCarColor[2] = 0.439;
 	behindCarColor[3] = 1.0;
 }
