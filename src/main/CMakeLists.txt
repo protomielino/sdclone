@@ -36,6 +36,6 @@ SD_INSTALL_FILES(BIN TARGETS ${_TARGET_NAME})
 
 # Under Windows, install needed 3rd party DLLs close to Speed Dreams executable.
 IF(WIN32)
-	INCLUDE(FindCustom3rdParty)
-    SD_INSTALL_3RDPARTY()
+	INCLUDE(customthirdparty)
+    SD_INSTALL_CUSTOM_3RDPARTY()
 ENDIF(WIN32)

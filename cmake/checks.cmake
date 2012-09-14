@@ -7,7 +7,7 @@ INCLUDE(CheckFunctionExists)
 INCLUDE(CheckLibraryExists)
 
 IF(WIN32)
-	INCLUDE(FindCustom3rdParty)
+	INCLUDE(customthirdparty)
 ENDIF(WIN32)
 
 MACRO(CHECK_HEADERS_H)

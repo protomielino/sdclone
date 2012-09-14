@@ -100,11 +100,11 @@ ELSE(NOT OPTION_AUTOVERSION)
 ENDIF(NOT OPTION_AUTOVERSION)
 
 # Generate config.h
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.cmake
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in.cmake
                ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 # Generate DOxygen configuration file
-CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygen_config.cmake
+CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygenconfig.in.cmake
 	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
 # Install top tree data files		   
