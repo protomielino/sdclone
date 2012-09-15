@@ -15,10 +15,6 @@ ADD_PLIB_INCLUDEDIR()
 ADD_SDL_INCLUDEDIR()
 
 IF(WIN32)
-    # Inhibit definition of Macros min(a,b) and max(a,b) on Windows
-    # as the names conflict with the template functions from SGMisc.h
-    ADD_DEFINITIONS(-DNOMINMAX)
-
     # DLL export stuff under Windows (to avoid .def file)
     ADD_DEFINITIONS(-DEPHEMERIS_DLL)
 ENDIF(WIN32)

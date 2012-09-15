@@ -103,8 +103,14 @@ MACRO(ADD_SD_COMPILE_OPTIONS)
     ADD_DEFINITIONS(-D_SVID_SOURCE -D_BSD_SOURCE -DSHM)
 
     IF(MSVC)
+	
       # Suppress bothering MSVC warnings
       ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS -D_CRT_SECURE_NO_DEPRECATE -D_CRT_NO_DEPRECATE -D_SCL_SECURE_NO_WARNINGS)
+	  
+      # Inhibit definition of Macros min(a,b) and max(a,b) for Windows MSVC builds,
+      # as the names conflict with the template functions from standard template library
+      ADD_DEFINITIONS(-DNOMINMAX)
+	  
     ENDIF(MSVC)
 
     IF(OPTION_FORCE_DEBUG)
