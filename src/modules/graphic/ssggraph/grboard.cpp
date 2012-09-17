@@ -618,13 +618,13 @@ cGrBoard::grDispCarBoard(const tCarElt *car, const tSituation *s)
     case 1:
       grDispCarBoard1(car, s);
       if (true)
-        grDispIndicators(car);
+        grDispIndicators(car, false);
       break;
 
     case 2:
       grDispCarBoard2(car, s);
       if (true)
-        grDispIndicators(car);
+        grDispIndicators(car, false);
       break;
 
     default:
@@ -1008,9 +1008,11 @@ cGrBoard::grDispArcade(const tCarElt *car, const tSituation *s)
   snprintf(buf, sizeof(buf), "%s", car->_name);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, rightAnchor - leftAnchor - 2*XM, GFUI_ALIGN_HC);
 
-  float *clr = (car->_fuel < 5.0) ? grRed : grWhite;
-  grDrawGauge(leftAnchor + XM, BOTTOM_ANCHOR + 25, 100, clr, grBlack, car->_fuel / car->_tank, "F");
-  grDrawGauge(leftAnchor + XM + 15, BOTTOM_ANCHOR + 25, 100, grRed, grGreen, (tdble)(car->_dammage) / grMaxDammage, "D");
+  float *clr = (car->_fuel < 5.0) ? grRed : grYellow;
+  grDrawGauge(leftAnchor + XM, BOTTOM_ANCHOR + 25, 100, clr, grBackground, car->_fuel / car->_tank, "F");
+  grDrawGauge(leftAnchor + XM + 15, BOTTOM_ANCHOR + 25, 100, grRed, grBackground, (tdble)(car->_dammage) / grMaxDammage, "D");
+
+  grDispIndicators(car, true);
 
   dy = GfuiFontHeight(GFUI_FONT_LARGE_C);
   y = YM + dy;
@@ -1770,7 +1772,7 @@ cGrBoard::grSetupDrawingArea(int xl, int yb, int xr, int yt) const
 
 
 void
-cGrBoard::grDispIndicators(const tCarElt* car)
+cGrBoard::grDispIndicators(const tCarElt* car, const bool arcade)
 {
   // Only useful for humans - maybe robots should show that, too?
   if (car->_driverType == RM_DRV_HUMAN) {
@@ -1792,8 +1794,14 @@ cGrBoard::grDispIndicators(const tCarElt* car)
     int dy2 = GfuiFontHeight(GFUI_FONT_SMALL_C);
     int dx = GfuiFontWidth(GFUI_FONT_MEDIUM_C, "SPD");
 
-    int x = centerAnchor - 200;                 // constant text left pos.
-    int y = BOTTOM_ANCHOR + dy2 * 8 + dy + 5;   // first row top pos.
+    int x, y;
+    if (arcade) {
+      x = leftAnchor + 15 + 30;                 // constant text left pos.
+      y = BOTTOM_ANCHOR + dy2 * 8 + dy - 2;   // first row top pos.
+    } else {
+      x = centerAnchor - 200;                 // constant text left pos.
+      y = BOTTOM_ANCHOR + dy2 * 8 + dy + 5;   // first row top pos.
+    }
 
     // Display board
     grSetupDrawingArea(x - 5, y + dy + 5, x + dx + 5, y - dy2 * 8 - dy + 5);

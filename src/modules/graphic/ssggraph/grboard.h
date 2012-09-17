@@ -66,7 +66,7 @@ class cGrBoard
     void grDispCarBoard1(const tCarElt *car, const tSituation *s);
     void grDispCarBoard2(const tCarElt *car, const tSituation *s);
 
-    void grDispIndicators(const tCarElt *car);
+    void grDispIndicators(const tCarElt *car, const bool arcade);
 
     void grDispLeaderBoard(const tCarElt *car, const tSituation *s);
     void grDispCounterBoard2(const tCarElt *car);
