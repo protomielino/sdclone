@@ -20,8 +20,8 @@
 #ifndef _GRBOARD_H_
 #define _GRBOARD_H_
 
-#include <car.h>			//tCarElt
-#include <raceman.h>	//tSituation
+#include <car.h>        // tCarElt
+#include <raceman.h>    // tSituation
 
 class cGrTrackMap;
 class cGrFrameInfo;
@@ -32,9 +32,9 @@ class cGrFrameInfo;
 class cGrBoard
 {
  protected:
-    int	id;		/* Board Id */
+    int id;     // Board Id
 
-    int	boardFlag;
+    int boardFlag;
     int leaderFlag;
     int debugFlag;
     int leaderNb;
@@ -47,17 +47,19 @@ class cGrBoard
     int rightAnchor;
     int speedoRise;
     std::vector<std::string> sShortNames;
-    //Scrolling leaderboard variables
+    // Scrolling leaderboard variables
     int iStart;
     double iTimer;
     int iStringStart;
-    std::string st; //This is the line we will display in the bottom
+    std::string st;     // This is the line we will display in the bottom
 
  private:
-    void grDispDebug(const tSituation *s, const tCarElt *car, const cGrFrameInfo* frame);
+    void grDispDebug(const tSituation *s, const tCarElt *car,
+                        const cGrFrameInfo* frame);
     void grDispGGraph(const tCarElt *car);
     void grDispMisc(bool bCurrentScreen);
-    void grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1, float *clr2, tdble val, const char *title);
+    void grDrawGauge(tdble X1, tdble Y1, tdble H, float *clr1,
+                        float *clr2, tdble val, const char *title);
     void grDispEngineLeds(const tCarElt *car, int X, int Y, int align, bool bg);
 
     void grDispCarBoard(const tCarElt *car, const tSituation *s);
@@ -72,17 +74,21 @@ class cGrBoard
     void grDispLeaderBoardScrollLine(const tCarElt *car, const tSituation *s);
 
     void grDispArcade(const tCarElt *car, const tSituation *s);
-    std::string grGenerateLeaderBoardEntry(const tCarElt *car, const tSituation *s, const bool isLeader) const;
+    std::string grGenerateLeaderBoardEntry(const tCarElt *car,
+                        const tSituation *s, const bool isLeader) const;
     // Track overview object
     cGrTrackMap *trackMap;
 
-    bool grGetSplitTime(const tSituation *s, const tCarElt *car, bool gap_inrace, double &time, int *laps_different, float **color);
-    void grGetLapsTime(const tSituation *s, const tCarElt *car, char* result, char const** label) const;
+    bool grGetSplitTime(const tSituation *s, const tCarElt *car,
+                        bool gap_inrace, double &time,
+                        int *laps_different, float **color);
+    void grGetLapsTime(const tSituation *s, const tCarElt *car,
+                        char* result, char const** label) const;
     void grMakeThreeLetterNames(const tSituation *s);
     void grSetupDrawingArea(int xl, int yb, int xr, int yt) const;
 
  public:
-    cGrBoard(int myid);
+    explicit cGrBoard(int myid);
     ~cGrBoard();
 
     void initBoard(void);
@@ -92,11 +98,11 @@ class cGrBoard
     inline cGrTrackMap *getTrackMap() { return trackMap; }
 
     void refreshBoard(tSituation *s, const cGrFrameInfo* frameInfo,
-					  const tCarElt *currCar, bool isCurrScreen);
+                        const tCarElt *currCar, bool isCurrScreen);
     void loadDefaults(const tCarElt *curCar);
 };
 
 extern void grInitBoardCar(tCarElt *car);
 extern void grShutdownBoardCar(void);
 
-#endif /* _GRBOARD_H_ */ 
+#endif /* _GRBOARD_H_ */
