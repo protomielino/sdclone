@@ -282,7 +282,12 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
         http://sourceforge.net/projects/speed-dreams/files/2.0.0
       (speed-dreams-src-<package>-<version>.tar.xz)
 
-	  or the latest trunk from SVN for building with MinGW (was not ready for 2.0.0).
+	  or 
+
+      Get the latest trunk from SVN for building with MinGW (was not ready for 2.0.0).
+
+      TODO: Add instructions explaining how to do so, including the minimal list
+            of files and sub-dirs needed (not all trunk is needed, from far).
 
   c.  Extract their contents to your local disk all in the same target folder
       (7Zip is an excellent tool for that http://www.7-zip.org/).
@@ -301,6 +306,8 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
        (cmake and make) from the MSYS shell, (sort of a minimal "Linux + bash" environment)
      - through "MinGW Makefiles" CMake generator : it is not compatible with the MSYS way,
        but it works from inside the QtCreator IDE.
+
+  a.b.c. See above 0) Initial steps, common to all build methods
 
   d.  Install MinGW (and optionaly MSYS)
 
@@ -367,9 +374,22 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
                 your own "3rdParty" binary package for SD
                 (see http://sourceforge.net/projects/speed-dreams/files/3rd%20party/Sources/post-2.0.0/).
 
-      * Configure it for using your MinGW installation :
+      * Configure it for using your MinGW installation (if not using the auto-detected one bundled with Qt SDK) :
         - start it,
-        - ... TODO.
+        - Tools / Options opens the Options windows,
+        - Select "Compile & Run" in the list of the left,
+        - Select the "Compile chain" tab,
+        - Click on the "Add / MinGW" button on the top right corner,
+        - fill in the fields at the bottom :
+          . Path to compiler : Browse and select the MinGW c++ compiler executable 
+              (C:\MinGW\bin\mingw32-c++.exe if you installed MinGW 4.7 as explained above)
+          . Debugger : Browse and select the MinGW debugger executable 
+              (C:\MinGW\bin\gdb.exe if you installed MinGW 4.7 as explained above)
+          . ABI, mkspec : leave as is,
+        - Apply (at the bottom right corner),
+        - Select the "CMake" tab,
+        - Browse and select your CMake executable (ex: C:\Program Files\CMake 2.8\bin\cmake.exe),
+        - OK (at the bottom right corner).
       
   f.  Download the "MinGW 4.7.0" release of the Speed Dreams "3rdParty" binary package from SF.net
         http://sourceforge.net/projects/speed-dreams/files/3rd%20party/MinGW%204.7.0/
@@ -377,10 +397,14 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 
   g.  Install it in the right folder :
 
-      * If you are using MSYS, extract it to the /usr/local folder from the MSYS shell :
+      * If you are using MSYS, extract it to the /usr folder from the MSYS shell :
 
          $ cd /usr
          $ tar xvfz .../3rdParty-2.1-win32-mingw470-g-O2.tar.gz
+
+         Note: this will populate the MSYS /usr/local tree, just as under Linux :-)
+
+      Or
 
       * If you are using QtCreator, extract it into the "3rdParty" folder,
         in the same folder as the one which contains your SD source tree :
@@ -400,20 +424,48 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
         $ cd build
         $ /c/Program\ Files/CMake\ 2.8/bin/cmake -G "MSYS Makefiles" -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_PREFIX_PATH:STRING=/usr/local -DCMAKE_BUILD_TYPE:STRING=Release ..
 
+        Note: The 'Release' build gives you -O3-optimised binaries.
+
+      Or
+
       * If you are using QtCreator (solution 1) :
 
-        - Start it, and File / Open the master CMakeLists.txt of Speed Dreams
+        - Start QtCreator,
+        - File / Open a file or project ...
+        - Browse and select the master CMakeLists.txt of Speed Dreams
           (at the top of the source tree, next to the src and data folders)
 
-        - Then the CMake wizard opens up ; use :
-	      . CMake arguments :
-	        -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_BUILD_TYPE:STRING=Release
-	      . CMake generator : "MinGW generator"
+        - Then the CMake wizard opens up : 
+          . Build location page :
+             + Browse and select a build folder (CMake will create and use it for building)
+                (ex: <path to CMakeLists.txt/../build)
+          . Next
+          . Run CMake page :  use :
+	         + CMake generator : "MinGW generator" (mandatory choice here !)
+	         + CMake arguments : 
+	             -DOPTION_OFFICIAL_ONLY:BOOL=On -DCMAKE_BUILD_TYPE:STRING=Release
+             + Click on the Run CMake button
 
-          Note: See II.2.c above for more about possible / useful CMake arguments.
+             Note: See II.2.c above for more about possible / useful CMake arguments.
 
-        - And finally click on the "Run cmake" button
-	  
+             Note: The 'Release' build gives you -O3-optimised binaries.
+
+             Apart from "won't build" or "won't install" message (don't care),
+             all should go smoothly, especially the detection of the 3rd party libraries.
+
+          . Done
+
+        - Then QtCreator opens your brand new project !
+
+        Note: 
+          . Later on, when starting again QtCreator, the project will be automatically
+            loaded in the default session.
+          . If you need to re-run CMake (sometimes, QtCreator can't detect it, like after adding
+            new / removing files in the source tree, or if you need to change the configuration
+            settings), simply use the menu : Compile / Run CMake.
+
+      Or
+
       * If you are using QtCreator (solution 2) :
 
 	    You can also use standard CMake GUI to do this before opening the master CMakeLists.txt in QtCreator,
@@ -421,25 +473,109 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
 		otherwise CMake GUI won't propose you the "MinGW generator", which is the one you have to use
 		("MSYS makefiles" does not work with QtCreator).
 
-        In QtCreator, provided you don't removed you CMakeCache.txt or the whole build folder,
-        you then won't need to specify any argument when re-running CMake.
+        - See below 2)f.g.h for how to use CMake GUI, but BEWARE, you have to select
+          the "MinGW generator" as the "compiler" (mandatory choice).
+
+          Note: The 'Release' build gives you -O3-optimised binaries.
+
+          Note: Apart from "won't build" or "won't install" message (don't care),
+          all should go smoothly, especially the detection of the 3rd party libraries.
 	  
-  i.  Build and install
+        - Start QtCreator,
+        - File / Open a file or project ...
+        - Browse and select the master CMakeLists.txt of Speed Dreams
+          (at the top of the source tree, next to the src and data folders)
+
+        - Then the CMake wizard opens up : 
+          . Build location page :
+             + Browse and select the build folder you chose when running CMake GUI
+          . Next
+          . Run CMake page : you normally don't need to change anything,
+            as QtCreator read it from the CMake generated CMakeCache.txt file :
+	         + CMake generator : "MinGW generator" (mandatory choice here !)
+	         + CMake arguments : <leave empty>
+             + Click on the Run CMake button
+               (Yes, CMake already ran, but needed again because ... hmmm ...
+                TODO : discover and then explain why :-)
+
+             Apart from "won't build" or "won't install" message (don't care),
+             all should go smoothly, especially the detection of the 3rd party libraries.
+
+          . Done
+
+        - Then QtCreator opens the project !
+
+        Note: 
+          . Later on, when starting again QtCreator, the project will be automatically
+            loaded in the default session (or any session you saved it in).
+          . If you need to re-run CMake (sometimes, QtCreator can't detect it, like after adding
+            new / removing files in the source tree, or if you need to change the configuration
+            settings), simply use the menu : Compile / Run CMake.
+
+  i.  Configure the build and deployment steps of your project
+
+      * click on the "Projects" button on the left vertical bar
+        in order to get the projects configuration panel
+
+      * select your project's tab on the top
+
+      * in the "Compile settings" sub-tab :
+        - stay with the default" "all" compile configuration (we need only this)
+        - don't change "CMake" section (note that you can re-run CMake from here,
+           you'd get into the wizard we used at the beginning)
+        - in the "Compilation steps" section, click on the "Details" button of the 1st step,
+          and add some arguments to the default "mingw32-make.exe" command :
+           . at least the "all" target, at the end of the argument line,
+           . and may be some "-j2" of "-j4" boosting option if you own a dual/quad-core CPU :-)
+        - leave the other sections as is, they are OK.
+
+      * in the "Run settings" sub-tab :
+        - in the "Deployment" section,
+          . (cosmetic) change the name of the "Method" : "No deployment" => "Install"
+          . click on the "Add the deployment step" button, and select "Make",
+          . add the "install" argument to the default "mingw32-make.exe" command.       
+
+  j.  Build and install
 
       * If you are using MSYS, in the MSYS shell :
 
-        $ make # -j2 or even -j4 if you own a dual/quad-core CPU
+        $ make # use -j2 or even -j4 if you own a dual/quad-core CPU
         $ make install
 
       * If you are using QtCreator :
 
-	    - Build / Make (TODO : more details)
+	    - "Build / Compile all" through the menu
 	  
-      Note: The 'Release' build gives you -O3-optimised binaries.
+  k.  Run (and debug) Speed Dreams
+
+      * Of course you can simply double click on the installed speed-dreams-2.exe executable
+        (should be in /speed-dreams-2-build/bin with default CMake settings) ...
+
+      * But you can run it from QtCreator : usefull for debugging it :-)
+
+      * For this, you need one last configuration step in QtCreator :
+
+        - click on the "Projects" button on the left vertical bar
+          in order to get the projects configuration panel
+
+        - select your project's tab on the top
+
+        - in the "Run settings" sub-tab :
+          . in the "Run" section, add a custom configuration
+            (we can't run the generated speed-dreams-2.exe in place, 
+             we must use the "installed" one) :
+            click on the "Add" button, and select "Custom executable",
+          . Executable : Browse and select it 
+              (should be in /speed-dreams-2-build/bin with default CMake settings)
+          . Check the "Run in a terminal" option, to get the run-time traces in a console.
+
+       * You can now "Compile / Run" or "Debug / Start debugging / Start debugging" from the menu !
 
 2) Cmake and MS VC++ 2005 (8) / 2008 (9) / 2010 (10) on Windows XP 32
 
 Note: If you use an "Express" version, don't forget to install also the Windows SDK.
+
+  a.b.c. See above 0) Initial steps, common to all build methods
 
   d.  Download the "MSVC 2005 / 2.0.0-or-earlier" release of the "3rdParty" binary package from SF.net
         http://sourceforge.net/projects/speed-dreams/files/3rd%20party
@@ -450,12 +586,12 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
                (inside which you should find at least the "src" and "data" folders), 
                then extract 3rd party zip in c:\gamesources\speed-dreams\3rdParty
                (inside which you should find at least the "include" and "lib" folders), 
-  f.  Startup CMake and set :
+  f.  Startup CMake GUI and set :
       * "Where is the source code" to c:\gamesources\speed-dreams\src-2.0.0
       * "Where to build the binaries" to c:\gamesources\speed-dreams\src-2.0.0\build
         (if you follow the folder specs above).
-  g.  Press "Configure" button, answer "Yes, create the ...\build folder"
-      and select the compiler.
+  g.  Press "Configure" button, answer "Yes, create the ...\build folder",
+      select the compiler and don't change the "Use native compilers" option.
       Press the "Configure" button again, until the "OK" button is no more greyed.
   h.  Press the "Generate" button.  CMake will generate the solution file "speed-dreams-2.sln"
       and associated project files (*.vcproj) in the ...\build folder
