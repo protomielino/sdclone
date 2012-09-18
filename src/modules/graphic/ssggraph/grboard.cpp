@@ -179,54 +179,56 @@ cGrBoard::selectBoard(int val)
  * 2 - Like 2 + the absolute frame counter
  * 3 - Like 2 + the segment the car is on, car's distance from startline, current camera
  *
- * @param s The current situation
- * @param car The current car
- * @param frame Frame info to display
+ * @param s[in]     The current situation
+ * @param car[in]   The current car
+ * @param frame[in] Frame info to display
  */
 void
 cGrBoard::grDispDebug(const tSituation *s, const tCarElt *car,
                         const cGrFrameInfo* frame)
 {
-  int x = rightAnchor - 100;
+  char buf[BUFSIZE];
+  snprintf(buf, sizeof(buf), "FPS: %.1f(%.1f)  ",
+            frame->fInstFps, frame->fAvgFps);
+  int dx = GfuiFontWidth(GFUI_FONT_SMALL_C, buf);
+
+  int x2 = rightAnchor - dx;    // 2nd column
   int y = TOP_ANCHOR - 15;
   int dy = GfuiFontHeight(GFUI_FONT_SMALL_C);
+  int x = (debugFlag > 1) ? x2 - dx : x2;   // 1st column
 
   // Display frame rates (instant and average)
-  char buf[BUFSIZE];
   snprintf(buf, sizeof(buf), "FPS: %.1f(%.1f)",
             frame->fInstFps, frame->fAvgFps);
   GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
 
   if (debugFlag == 2) {
     //Only display detailed information in Debug Mode > 1
-    // Display frame counter
-    y -= dy;
+    // Display frame counter in 2nd column
     snprintf(buf, sizeof(buf),  "Frm: %u", frame->nTotalFrames);
-    GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
+    GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y);
 
-    // Display simulation time
+    // Display simulation time in 2nd row, 1st column
     y -= dy;
     snprintf(buf, sizeof(buf),  "Time: %.f", s->currentTime);
     GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
 
   } else if (debugFlag == 3) {
     // Only display detailed information in Debug Mode > 1
-    // Display segment name
-    y -= dy;
+    // Display segment name in 2nd column
     snprintf(buf, sizeof(buf),  "Seg: %s", car->_trkPos.seg->name);
-    GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
+    GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y);
 
-    // Display distance from start
+    // Display distance from start in 2nd row, 1st column
     y -= dy;
     snprintf(buf, sizeof(buf), "DfS: %5.0f", car->_distFromStartLine);
     GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
 
-    // Display current camera
-    y -= dy;
+    // Display current camera in 2nd row, 2nd column
     tRoadCam *curCam = car->_trkPos.seg->cam;
     if (curCam) {
       snprintf(buf, sizeof(buf), "Cam: %s", curCam->name);
-      GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x, y);
+      GfuiDrawString(buf, grWhite, GFUI_FONT_SMALL_C, x2, y);
     }
   }
 }  // grDispDebug
