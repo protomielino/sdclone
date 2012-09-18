@@ -981,6 +981,7 @@ cGrBoard::grDispArcade(const tCarElt *car, const tSituation *s)
 #define XM  15  // X margin
 #define YM  10  // Y margin
 
+  // We are ARCADE, we draw BIIIIG
   int dy = GfuiFontHeight(GFUI_FONT_BIG_C);
   int dxc = 100;
 
@@ -988,16 +989,20 @@ cGrBoard::grDispArcade(const tCarElt *car, const tSituation *s)
   int x2 = x + 50;
   int y = TOP_ANCHOR - YM - dy;
 
+  // Display driver name and race position
   char buf[BUFSIZE];
   snprintf(buf, sizeof(buf), "%d/%d", car->_pos, s->_ncars);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_BIG_C, x, y);
 
   dy = GfuiFontHeight(GFUI_FONT_LARGE_C);
   y -= dy;
+
+  // Display current lap time
   GfuiDrawString("Time:", grDefaultClr, GFUI_FONT_LARGE_C, x, y);
   grWriteTime(grDefaultClr, GFUI_FONT_LARGE_C, x2, y, dxc, car->_curLapTime, 0);
-
   y -= dy;
+
+  // Display best lap time
   GfuiDrawString("Best:", grDefaultClr, GFUI_FONT_LARGE_C, x, y);
   grWriteTime(grDefaultClr, GFUI_FONT_LARGE_C, x2, y, dxc, car->_bestLapTime, 0);
 
@@ -1005,15 +1010,19 @@ cGrBoard::grDispArcade(const tCarElt *car, const tSituation *s)
   grGetLapsTime (s, car, buf, NULL);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, rightAnchor - leftAnchor - 2*XM, GFUI_ALIGN_HR);
 
+  // Display driver name
   snprintf(buf, sizeof(buf), "%s", car->_name);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, rightAnchor - leftAnchor - 2*XM, GFUI_ALIGN_HC);
 
+  // Draw fuel/damage gauges
   float *clr = (car->_fuel < 5.0) ? grRed : grYellow;
   grDrawGauge(leftAnchor + XM, BOTTOM_ANCHOR + 25, 100, clr, grBackground, car->_fuel / car->_tank, "F");
   grDrawGauge(leftAnchor + XM + 15, BOTTOM_ANCHOR + 25, 100, grRed, grBackground, (tdble)(car->_dammage) / grMaxDammage, "D");
 
+  // Display ABS/TCS/SPD indicators
   grDispIndicators(car, true);
 
+  // Display speed and gear
   dy = GfuiFontHeight(GFUI_FONT_LARGE_C);
   y = YM + dy;
   snprintf(buf, sizeof(buf), "%3d km/h", abs((int)(car->_speed_x * 3.6)));
@@ -1025,6 +1034,7 @@ cGrBoard::grDispArcade(const tCarElt *car, const tSituation *s)
     snprintf(buf, sizeof(buf), "%d", car->_gear);
   GfuiDrawString(buf, grDefaultClr, GFUI_FONT_LARGE_C, x, y, rightAnchor - leftAnchor - 2*XM, GFUI_ALIGN_HR);
 
+  // Display engine LED scale
   grDispEngineLeds(car, rightAnchor - XM, YM + dy + GfuiFontHeight (GFUI_FONT_BIG_C), ALIGN_RIGHT, false);
 }  // grDispArcade
 
