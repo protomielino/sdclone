@@ -17,7 +17,7 @@
  *                                                                         *
  ***************************************************************************/
 
-#include "src/modules/graphic/ssggraph/grboard.h"
+#include "grboard.h"
 
 #include <plib/ssg.h>
 #include <portability.h>    // snprintf
