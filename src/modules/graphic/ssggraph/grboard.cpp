@@ -29,11 +29,11 @@
 #include <vector>
 #include <string>
 
-#include "src/modules/graphic/ssggraph/grmain.h"       // grWinX, grHandle, grMaxDamage
-#include "src/modules/graphic/ssggraph/grtrackmap.h"   // cGrTrackMap
-#include "src/modules/graphic/ssggraph/grcar.h"        // grCarInfo
-#include "src/modules/graphic/ssggraph/grutil.h"       // grWriteTime
-#include "src/modules/graphic/ssggraph/grloadac.h"     // grssgSetCurrentOptions
+#include "grmain.h"       // grWinX, grHandle, grMaxDamage
+#include "grtrackmap.h"   // cGrTrackMap
+#include "grcar.h"        // grCarInfo
+#include "grutil.h"       // grWriteTime
+#include "grloadac.h"     // grssgSetCurrentOptions
 
 using std::string;
 
