@@ -5,10 +5,12 @@ PROJECT(accc)
 SET(_TARGET_NAME ${SD_TOOLS_EXECPREFIX}accc)
 
 SET(ACCC_SOURCES ac3dgroup.cpp ac3dload.cpp mainaccc.cpp)
+SET(ACCC_HEADERS accc.h)
 
 ADD_SDLIB_INCLUDEDIR(portability)
 
-ADD_EXECUTABLE(${_TARGET_NAME} ${ACCC_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_EXECUTABLE(${_TARGET_NAME} ${ACCC_SOURCES} ${ACCC_HEADERS})
 
 ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability)
 

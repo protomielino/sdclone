@@ -18,7 +18,8 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DMETAR_DLL)
 ENDIF(WIN32)
 
-ADD_LIBRARY(metar SHARED ${METAR_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_LIBRARY(metar SHARED ${METAR_SOURCES} ${METAR_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(metar PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

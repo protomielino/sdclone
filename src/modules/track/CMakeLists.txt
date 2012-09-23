@@ -1,7 +1,7 @@
 INCLUDE(../../../cmake/macros.cmake)
 
-SET(TRACK_SOURCES track.cpp track3.cpp track4.cpp trackitf.cpp trackutil.cpp
-                  trackitf.h trackinc.h)
+SET(TRACK_SOURCES track.cpp track3.cpp track4.cpp trackitf.cpp trackutil.cpp)
+SET(TRACK_HEADERS trackitf.h trackinc.h)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_PLIB_INCLUDEDIR()
@@ -17,7 +17,8 @@ IF(MSVC)
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
-ADD_LIBRARY(track SHARED ${TRACK_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_LIBRARY(track SHARED ${TRACK_SOURCES} ${TRACK_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(track PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

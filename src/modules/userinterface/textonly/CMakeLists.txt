@@ -1,6 +1,7 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(_SOURCES textonly.cpp textonly.h)
+SET(_SOURCES textonly.cpp)
+SET(_HEADERS textonly.h)
 
 #INCLUDE_DIRECTORIES(.)
 ADD_INTERFACE_INCLUDEDIR()
@@ -24,7 +25,8 @@ IF(COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-ADD_LIBRARY(textonly SHARED ${_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_LIBRARY(textonly SHARED ${_SOURCES} ${_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(textonly PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

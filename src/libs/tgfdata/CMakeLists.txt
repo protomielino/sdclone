@@ -8,8 +8,7 @@ ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability txml math tgf)
 
 SET(TGFDATA_HEADERS tgfdata.h cars.h tracks.h racemanagers.h race.h drivers.h)
-SET(TGFDATA_SOURCES tgfdata.cpp cars.cpp tracks.cpp racemanagers.cpp race.cpp drivers.cpp
-                    ${TGFDATA_HEADERS})
+SET(TGFDATA_SOURCES tgfdata.cpp cars.cpp tracks.cpp racemanagers.cpp race.cpp drivers.cpp)
 
 IF(WIN32)
     # DLL export stuff under Windows (to avoid .def file)
@@ -26,7 +25,8 @@ IF (COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-ADD_LIBRARY(tgfdata SHARED ${TGFDATA_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_LIBRARY(tgfdata SHARED ${TGFDATA_SOURCES} ${TGFDATA_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(tgfdata PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

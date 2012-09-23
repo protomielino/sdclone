@@ -12,6 +12,7 @@ SET(TGF_HEADERS os.h tgf.h tgf.hpp modinfo.h osspec.h)
 SET(TGF_SOURCES application.cpp eventloop.cpp directory.cpp file.cpp filesetup.cpp 
                 formula.cpp hash.cpp module.cpp legacymodule.cpp modinfo.cpp os.cpp
                 params.cpp profiler.cpp schedulespy.cpp tgf.cpp trace.cpp)
+SET(TGF_OTHER_SOURCES params.dtd)
 
 IF(WIN32)
     SET(TGF_HEADERS ${TGF_HEADERS} windowsspec.h)
@@ -31,7 +32,8 @@ IF(WIN32)
     ADD_DEFINITIONS(-DTGF_DLL)
 ENDIF(WIN32)
 
-ADD_LIBRARY(tgf SHARED ${TGF_HEADERS} ${TGF_SOURCES})
+# Note: Other sources needed for having them available in IDEs.
+ADD_LIBRARY(tgf SHARED ${TGF_HEADERS} ${TGF_SOURCES} ${TGF_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(tgf PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

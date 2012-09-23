@@ -16,6 +16,7 @@ SET(TGFCLIENT_SOURCES control.cpp glfeatures.cpp guibutton.cpp guifont.cpp
                       guicombobox.cpp guicheckbox.cpp guiprogresbar.cpp 
                       guiscreen.cpp guieventloop.cpp guiapplication.cpp 
                       glfeatures.h gui.h guiscreen.h guimenu.h tgfclient.h guifont.h )
+SET(TGFCLIENT_OTHER_SOURCES guimenutest.xml screen.xml)
 
 #disable developer warning
 IF (COMMAND CMAKE_POLICY)
@@ -35,7 +36,8 @@ IF(MSVC)
         "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /NODEFAULTLIB:libcmt.lib")
 ENDIF(MSVC)
 
-ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES})
+# Note: Other sources needed for having them available in IDEs.
+ADD_LIBRARY(tgfclient SHARED ${TGFCLIENT_SOURCES} ${TGFCLIENT_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(tgfclient PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

@@ -3,10 +3,10 @@ INCLUDE(../../../cmake/macros.cmake)
 #PROJECT(learning)
 
 SET(LEARNING_HEADERS learning.h ANN.h ann_policy.h Distribution.h learn_debug.h List.h 
-		     MathFunctions.h policy.h real.h string_utils.h)
+                     MathFunctions.h policy.h real.h string_utils.h)
 SET(LEARNING_SOURCES ANN.cpp Distribution.cpp List.cpp MathFunctions.cpp
-                     ann_policy.cpp policy.cpp string_utils.cpp
-		     ${LEARNING_HEADERS})
+                     ann_policy.cpp policy.cpp string_utils.cpp)
+SET(LEARNING_OTHER_SOURCES README) 
 
 ADD_SDLIB_INCLUDEDIR(portability)
 
@@ -20,7 +20,8 @@ IF(WIN32)
 	ADD_DEFINITIONS(-DLEARNING_DLL)
 ENDIF(WIN32)
 
-ADD_LIBRARY(learning SHARED ${LEARNING_SOURCES})
+# Note: Other sources and headers needed for having them available in IDEs.
+ADD_LIBRARY(learning SHARED ${LEARNING_SOURCES} ${LEARNING_HEADERS} ${LEARNING_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(learning PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

@@ -5,8 +5,9 @@ PROJECT(trackgen)
 SET(_TARGET_NAME ${SD_TOOLS_EXECPREFIX}trackgen)
 
 SET(_SOURCES ac3d.cpp easymesh.cpp elevation.cpp main.cpp
-             objects.cpp relief.cpp track.cpp util.cpp
-             ac3d.h easymesh.h elevation.h objects.h relief.h trackgen.h util.h)
+             objects.cpp relief.cpp track.cpp util.cpp)
+SET(_HEADERS ac3d.h easymesh.h elevation.h objects.h relief.h trackgen.h util.h)
+SET(_OTHER_SOURCES trackgen.xml)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
@@ -23,7 +24,8 @@ IF(MSVC)
     SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "${CMAKE_EXE_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
-ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES})
+# Note: Headers and other sources needed for having them available in IDEs.
+ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES} ${_SOURCES} ${_OTHER_SOURCES})
 
 ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability robottools tgf tgfclient)
 

@@ -5,6 +5,7 @@ PROJECT(menuview)
 SET(_TARGET_NAME ${SD_TOOLS_EXECPREFIX}menuview)
 
 SET(_SOURCES main.cpp previewmenu.cpp)
+SET(_HEADERS previewmenu.h)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(robottools tgf tgfclient math portability)
@@ -16,7 +17,8 @@ IF(COMMAND CMAKE_POLICY)
     CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_EXECUTABLE(${_TARGET_NAME} ${_SOURCES} ${_HEADERS})
 
 ADD_SDLIB_LIBRARY(${_TARGET_NAME} portability robottools tgf tgfclient)
 

@@ -107,10 +107,13 @@ CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/config.h.in.cmake
 CONFIGURE_FILE(${CMAKE_CURRENT_SOURCE_DIR}/cmake/doxygenconfig.in.cmake
 	       ${CMAKE_CURRENT_BINARY_DIR}/doxygen_config @ONLY)
 
-# Install top tree data files		   
-SD_INSTALL_FILES(DATA "/" 
-                 FILES credits.xml 
-                       CHANGES.txt COPYING.txt INSTALL.txt README.txt TODO.txt)
+
+# Fictive = no-output target, for having source files available in IDEs.
+SET(_SOURCES credits.xml CHANGES.txt COPYING.txt INSTALL.txt README.txt TODO.txt)
+ADD_CUSTOM_TARGET(rootdoc SOURCES ${_SOURCES})
+
+# Install top tree data files
+SD_INSTALL_FILES(DATA "/"  FILES ${_SOURCES})
 
 # Sub-dirs to build ...					   
 ADD_SUBDIRECTORY(src)

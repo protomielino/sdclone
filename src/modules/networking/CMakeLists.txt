@@ -2,14 +2,16 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(networking)
 
-SET(SD_NETWORK_SOURCES network.h network.cpp server.cpp client.cpp robotxml.cpp robotxml.h)
+SET(SD_NETWORK_SOURCES network.cpp server.cpp client.cpp robotxml.cpp)
+SET(SD_NETWORK_HEADERS network.h robotxml.h)
 
 #disable developer warning
 if (COMMAND cmake_policy)
 	cmake_policy(SET CMP0003 NEW)
 endif(COMMAND cmake_policy)
 
-ADD_LIBRARY(networking SHARED ${SD_NETWORK_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_LIBRARY(networking SHARED ${SD_NETWORK_SOURCES} ${SD_NETWORK_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(networking PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

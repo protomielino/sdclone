@@ -1,21 +1,38 @@
 INCLUDE(../../../../cmake/macros.cmake)
 
-SET(SSGGRAPH_SOURCES grMoonpos.h grMoonpos.cpp
-		     grMoon.cpp grSun.cpp grCloudLayer.cpp grSky.cpp grSky.h
-                     grSkyDome.cpp grSphere.cpp grSphere.h grStars.cpp
-                     grboard.cpp grboard.h grcam.cpp grcam.h grcar.cpp grcar.h
-                     grcarlight.cpp grcarlight.h grmain.cpp grmain.h 
-                     grsimplestate.cpp grsimplestate.h 
-                     grmultitexstate.cpp grmultitexstate.h 
-                     grloadac.cpp grloadac.h grssgext.h
-                     grscene.cpp grscene.h grbackground.cpp grbackground.h 
-                     grscreen.cpp grscreen.h 
-                     grshadow.cpp grshadow.h grskidmarks.cpp grskidmarks.h
-                     grsmoke.cpp grsmoke.h grtexture.cpp grtexture.h loadsgi.h
-                     grtracklight.cpp grtracklight.h 
-                     grtrackmap.cpp grtrackmap.h grutil.cpp grutil.h
-                     grvtxtable.cpp grvtxtable.h grrain.cpp grrain.h
-                     ssggraph.cpp ssggraph.h)
+SET(SSGGRAPH_HEADERS grMoonpos.h grSky.h
+                     grSphere.h grStars.cpp
+                     grboard.h grcam.h grcar.h
+                     grcarlight.h grmain.h 
+                     grsimplestate.h 
+                     grmultitexstate.h 
+                     grloadac.h grssgext.h
+                     grscene.h grbackground.h 
+                     grscreen.h 
+                     grshadow.h grskidmarks.h
+                     grsmoke.h grtexture.h loadsgi.h
+                     grtracklight.h 
+                     grtrackmap.h grutil.h
+                     grvtxtable.h grrain.h
+                     ssggraph.h)
+SET(SSGGRAPH_SOURCES grMoonpos.cpp
+                     grMoon.cpp grSun.cpp grCloudLayer.cpp grSky.cpp
+                     grSkyDome.cpp grSphere.cpp grStars.cpp
+                     grboard.cpp grcam.cpp grcar.cpp
+                     grcarlight.cpp grmain.cpp 
+                     grsimplestate.cpp 
+                     grmultitexstate.cpp 
+                     grloadac.cpp
+                     grscene.cpp grbackground.cpp 
+                     grscreen.cpp
+                     grshadow.cpp grskidmarks.cpp
+                     grsmoke.cpp grtexture.cpp
+                     grtracklight.cpp 
+                     grtrackmap.cpp grutil.cpp
+                     grvtxtable.cpp grrain.cpp
+                     ssggraph.cpp)
+
+SET(SSGGRAPH_OTHER_SOURCES graph.xml)
 
 ADD_INTERFACE_INCLUDEDIR()
 ADD_SDLIB_INCLUDEDIR(portability math tgf tgfclient robottools)
@@ -37,7 +54,8 @@ IF(MSVC)
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
-ADD_LIBRARY(ssggraph SHARED ${SSGGRAPH_SOURCES})
+# Note: Other sources and headers needed for having them available in IDEs.
+ADD_LIBRARY(ssggraph SHARED ${SSGGRAPH_SOURCES} ${SSGGRAPH_HEADERS} ${SSGGRAPH_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(ssggraph PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

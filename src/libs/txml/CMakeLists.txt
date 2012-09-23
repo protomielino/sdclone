@@ -1,24 +1,8 @@
 INCLUDE(../../../cmake/macros.cmake)
 
-SET(TXML_SOURCES 
-	asciitab.h  
-	latin1tab.h  
-	xml.h       
-	xmlrole.h      
-	xmltok_impl.h
-	codepage.h  
-	nametab.h    
-	xmlparse.c  
-	xmltok.c
-	utf8tab.h    
-	xmlparse.h  
-	xmltok.h
-	filemap.h   
-	iasciitab.h  
-	xmldef.h     
-	xmlrole.c   
-	xml.cpp
-)
+SET(TXML_HEADERS asciitab.h latin1tab.h xml.h xmlrole.h xmltok_impl.h codepage.h nametab.h
+                 utf8tab.h xmlparse.h xmltok.h filemap.h iasciitab.h xmldef.h)
+SET(TXML_SOURCES xmlparse.c xmltok.c xmlrole.c xml.cpp)
 
 IF(WIN32)
 	SET(TXML_SOURCES ${TXML_SOURCES} dllmain.c)
@@ -36,7 +20,8 @@ IF (COMMAND CMAKE_POLICY)
 	CMAKE_POLICY(SET CMP0003 NEW)
 ENDIF(COMMAND CMAKE_POLICY)
 
-ADD_LIBRARY(txml SHARED ${TXML_SOURCES})
+# Note: Headers needed for having them available in IDEs.
+ADD_LIBRARY(txml SHARED ${TXML_SOURCES} ${TXML_HEADERS})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(txml PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)

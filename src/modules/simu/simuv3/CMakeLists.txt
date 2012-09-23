@@ -4,9 +4,11 @@ SET(_SOURCES SimulationOptions.cpp aero.cpp axle.cpp brake.cpp
              car.cpp categories.cpp collide.cpp differential.cpp
              engine.cpp simu.cpp steer.cpp susp.cpp
              transmission.cpp wheel.cpp
-             aero.h axle.h brake.h carstruct.h differential.h engine.h
+             simuv30.cpp)
+SET(_HEADERS aero.h axle.h brake.h carstruct.h differential.h engine.h
              Options.h sim.h steer.h susp.h transmission.h wheel.h
-             simuv30.cpp simuv30.h)
+             simuv30.h)
+SET(_OTHER_SOURCES ChangeLog)
 
 IF(NOT OPTION_3RDPARTY_SOLID)
 	# BEFORE in order to prevent Windows 3rdParty/include/SOLID from taking the flag.
@@ -29,7 +31,8 @@ IF(MSVC)
     SET(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /NODEFAULTLIB:msvcrt.lib")
 ENDIF(MSVC)
 
-ADD_LIBRARY(simuv3 SHARED ${_SOURCES})
+# Note: Headers and other sources needed for having them available in IDEs.
+ADD_LIBRARY(simuv3 SHARED ${_SOURCES} ${_HEADERS} ${_OTHER_SOURCES})
 
 # Might not work with GCC 4.5 or + (non-robot modules crash at 1st reload = after 1 dlclose) 
 #SET_TARGET_PROPERTIES(simuv3 PROPERTIES VERSION ${VERSION} SOVERSION 0.0.0)
