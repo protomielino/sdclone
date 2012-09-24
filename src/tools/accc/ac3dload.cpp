@@ -3556,6 +3556,21 @@ void stripifyOb(ob_t * object, int writeit)
         tri = 0;
         if (writeit == 1)
         {
+            /** For some reason the surf attribute is modified for the output.
+             *  The surfaces are made double-sided, although stripification doesn't
+             *  introduce this property.
+             *  Thus, instead of the whole if-condition the actual code for outputting
+             *  this attribute should simply be:
+             *
+             *  fprintf(ofile, "SURF 0x%2x\n", object->attrSurf)
+             *
+             *  However this causes huge artifacts in the generated tracks. Thus, the
+             *  following is not correct behavior but works for whatever reason.
+             *  It is a legacy from TORCS and no details are known why it is done.
+             *
+             *  A proper solution would be to remove the attribute modification and
+             *  rework all tracks to fit the correct behavior.
+             */
             if (object->attrSurf)
             {
                 fprintf(ofile, "SURF 0x%2x\n",
