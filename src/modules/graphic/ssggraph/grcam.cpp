@@ -877,10 +877,6 @@ class cGrCarCamBehind : public cGrPerspCamera
 
     void update(tCarElt *car, tSituation *s) {
 	tdble A;
-	tdble CosA;
-	tdble SinA;
-	tdble x;
-	tdble y;
 
 	// We want uniform movement across split screens when 'spanning'
 	if (spansplit && viewOffset && lastTime == s->currentTime) {
@@ -899,10 +895,13 @@ class cGrCarCamBehind : public cGrPerspCamera
 	lastTime = s->currentTime;
 
 #if 0	// SDW Remove Before Release
+    tdble CosA;
+    tdble SinA;
+
 	CosA = cos(A);
 	SinA = sin(A);
-	x = car->_pos_X - dist * CosA;
-	y = car->_pos_Y - dist * SinA;
+       tdble x = car->_pos_X - dist * CosA;
+       tdble y = car->_pos_Y - dist * SinA;
     
 	eye[0] = x;
 	eye[1] = y;
@@ -1371,11 +1370,8 @@ class cGrCarCamRoadFly : public cGrPerspCamera
     }
     
     void update(tCarElt *car, tSituation *s) {
-	tRoadCam *curCam;
 	float height;
 	float dt;
-
-	curCam = car->_trkPos.seg->cam;
 
 	if (currenttime == 0.0) {
 	    currenttime = s->currentTime;
