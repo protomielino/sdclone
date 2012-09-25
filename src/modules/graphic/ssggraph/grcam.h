@@ -176,6 +176,13 @@ class cGrPerspCamera : public cGrCamera
     float getFogStart(void) { return fogstart; }
     float getFogEnd(void) { return fogend; }
 
+    /** called in cGrScreen::camDraw() before anything else. Can be used to setup any state
+     *  before any rendering takes place. */
+    virtual void beforeDraw() {}
+    /** called in cGrScreen::camDraw() after everything else. The counterpart to
+     *  cGrPerspCamera::beforeDraw(). */
+    virtual void afterDraw() {}
+
     cGrPerspCamera *next(void) {
 	return (cGrPerspCamera *)cGrCamera::next();
     }

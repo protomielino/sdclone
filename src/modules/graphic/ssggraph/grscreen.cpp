@@ -233,6 +233,10 @@ compareCars(const void *car1, const void *car2)
 
 void cGrScreen::camDraw(tSituation *s)
 {
+    GfProfStartProfile("dispCam->beforeDraw*");
+    dispCam->beforeDraw();
+    GfProfStopProfile("dispCam->beforeDraw*");
+
 	glDisable(GL_COLOR_MATERIAL);
 	
 	GfProfStartProfile("dispCam->update*");
@@ -300,6 +304,10 @@ void cGrScreen::camDraw(tSituation *s)
 			curCar->_roll * SG_RADIANS_TO_DEGREES, 0.0, curCar->_speed_x);
 	} else
 		grRain.drawPrecipitation(grTrack->local.rain, 1.0, 0.0, 0.0, 0.0, 0.0);
+
+    GfProfStartProfile("dispCam->afterDraw*");
+    dispCam->afterDraw();
+    GfProfStopProfile("dispCam->afterDraw*");
 }
 
 
