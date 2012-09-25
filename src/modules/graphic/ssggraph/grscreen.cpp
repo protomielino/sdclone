@@ -133,7 +133,7 @@ void cGrScreen::activate(int x, int y, int w, int h, float v)
 	if (mirrorCam) {
 		// mirror width adjusted to fit board size
 		mirrorCam->setViewport (scrx, scry, scrw, scrh);
-		mirrorCam->setPos (scrx + scrw / 2 - (scrw * boardWidth /400), 
+               mirrorCam->setScreenPos (scrx + scrw / 2 - (scrw * boardWidth /400),
 			scry +  5 * scrh / 6 - scrh / 10, 
 			(scrw * boardWidth /200), scrh / 6);
 	}
@@ -349,15 +349,6 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 		curCam->onSelect(curCar, s);
 	}
 	
-	/* Mirror */
-	if (mirrorFlag && curCam->isMirrorAllowed ()) {
-		mirrorCam->activateViewport ();
-		dispCam = mirrorCam;
-		glClear (GL_DEPTH_BUFFER_BIT);
-		camDraw (s);
-		mirrorCam->store ();
-	}
-	
 	glEnable(GL_SCISSOR_TEST);
 	glViewport(scrx, scry, scrw, scrh);
 	glScissor(scrx, scry, scrw, scrh);
@@ -374,11 +365,11 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	glDisable(GL_FOG);
 	glEnable(GL_TEXTURE_2D);
 	
-	/* Mirror */
-	if (mirrorFlag && curCam->isMirrorAllowed ()) {
-		mirrorCam->display ();
-		glViewport (scrx, scry, scrw, scrh);
-	}
+    /* Mirror */
+    if (mirrorFlag && curCam->isMirrorAllowed ()) {
+        dispCam = mirrorCam;
+        camDraw (s);
+    }
 	
 	GfProfStartProfile("boardCam*");
 	boardCam->action();

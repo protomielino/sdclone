@@ -486,33 +486,57 @@ class cGrCarCamInsideDynDriverEye : public cGrCarCamInsideDriverEye
 
 // cGrCarCamMirror ================================================================
 
-cGrCarCamMirror::~cGrCarCamMirror ()
+cGrCarCamMirror::cGrCarCamMirror(cGrScreen *myscreen, int id, int drawCurr, int drawBG,
+        float myfovy, float myfovymin, float myfovymax,
+        float myfnear, float myffar,
+        float myfogstart, float myfogend)
+    : cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
+         myfovy, myfovymin, myfovymax,
+         myfnear, myffar, myfogstart, myfogend)
 {
-    glDeleteTextures (1, &tex);
-    delete viewCam;
 }
 
+void cGrCarCamMirror::setModelView(void)
+{
+    sgMat4 mat, mat2, mirror;
 
-void cGrCarCamMirror::limitFov(void) {
-    fovy = 90.0 / screen->getViewRatio();
+    grMakeLookAtMat4(mat, eye, center, up);
+
+#define M(row,col)  mirror[row][col]
+    M(0,0) = 1.0;  M(0,1) = 0.0;  M(0,2) = 0.0;  M(0,3) = 0.0;
+    M(1,0) = 0.0;  M(1,1) =-1.0;  M(1,2) = 0.0;  M(1,3) = 0.0;
+    M(2,0) = 0.0;  M(2,1) = 0.0;  M(2,2) = 1.0;  M(2,3) = 0.0;
+    M(3,0) = 0.0;  M(3,1) = 0.0;  M(3,2) = 0.0;  M(3,3) = 1.0;
+#undef M
+    sgMultMat4(mat2, mat, mirror);
+
+    grContext.setCamera(mat2);
 }
-
 
 void cGrCarCamMirror::update(tCarElt *car, tSituation * /* s */)
 {
     sgVec3 P, p;
 
-    P[0] = car->_bonnetPos_x;
+    P[0] = car->_bonnetPos_x - (car->_dimension_x/2); // behind car
     P[1] = car->_bonnetPos_y;
     P[2] = car->_bonnetPos_z;
     sgXformPnt3(P, car->_posMat);
-	
+
     eye[0] = P[0];
     eye[1] = P[1];
     eye[2] = P[2];
-	
-    p[0] = car->_bonnetPos_x - 30.0;
-    p[1] = car->_bonnetPos_y;
+
+    float offset = 0;
+
+    // Compute offset angle and bezel compensation)
+    if (spansplit && viewOffset) {
+        offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
+            atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
+        fovy = spanfovy;
+    }
+
+    p[0] = car->_bonnetPos_x + 30.0 * cos(offset);
+    p[1] = car->_bonnetPos_y + 30.0 * sin(offset);
     p[2] = car->_bonnetPos_z;
     sgXformPnt3(p, car->_posMat);
 
@@ -523,6 +547,10 @@ void cGrCarCamMirror::update(tCarElt *car, tSituation * /* s */)
     up[0] = car->_posMat[2][0];
     up[1] = car->_posMat[2][1];
     up[2] = car->_posMat[2][2];
+
+    speed[0] =car->pub.DynGCg.vel.x;
+    speed[1] =car->pub.DynGCg.vel.y;
+    speed[2] =car->pub.DynGCg.vel.z;
 }
 
 
@@ -532,90 +560,56 @@ void cGrCarCamMirror::setViewport(int x, int y, int w, int h)
 	vpy = y;
 	vpw = w;
 	vph = h;
-
-	if (viewCam) {
-		delete viewCam;
-	}
-	viewCam = new cGrOrthoCamera(screen, x,  x + w, y, y + h);
-	limitFov();
+       vp_aspectratio = double(vph)/vpw;
 }
 
 
-void cGrCarCamMirror::setPos (int x, int y, int w, int h)
+void cGrCarCamMirror::setScreenPos (int x, int y, int w, int h)
 {
     mx = x;
     my = y;
     mw = w;
     mh = h;
-
-    // round up texture size to next power of two
-    tw = GfNearestPow2(w);
-    th = GfNearestPow2(h);
-    if (tw < w) {
-		tw *= 2;
-	}
-    if (th < h) {
-		th *= 2;
-	}
-
-    // Create texture object.
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glReadBuffer(GL_BACK);
-
-    glCopyTexImage2D(GL_TEXTURE_2D,
-		      0, // map level,
-		      GL_RGB, // internal format,
-		      0, 0, tw, th,
-		      0 ); // border
-
-    tsu = (float) mw / tw;
-    teu = 0.0;
-    tsv = 0.0;
-    tev = (float) mh / th;
+    m_centery = my + mh/2;
 }
 
 
-void cGrCarCamMirror::activateViewport (void)
+void cGrCarCamMirror::beforeDraw (void)
 {
+    glFrontFace( GL_CW );
+
+    /* The aspect ratio of the mirror is probably not the same
+     * as the real aspect ratio. Thus we do the following:
+     * 1) set up the mirror viewport with the same aspect ratio
+     *   as the real scene
+     * 2) scissor the area of the actual mirror
+     *
+     * The viewport in 1) will be the same as the actual mirror,
+     * but with the height adjusted to fit the real aspect ratio.
+     * For that the mirror's height is calculated by multiplying
+     * the mirror's width with the real aspect ratio.
+     * To get the lower-left corner of the mirror's viewport half
+     * of that new height is subtracted from the mirror center's
+     * y-coordinate.
+     */
+
+    double mvph = mw * vp_aspectratio;
+    int mvpy = m_centery - (mvph/2);
+
+    glViewport(mx, mvpy, mw, mvph);
+
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(mx, my, mw, mh);
+}
+
+void cGrCarCamMirror::afterDraw (void)
+{
+    glDisable(GL_SCISSOR_TEST);
+
     glViewport(vpx, vpy, vpw, vph);
 
-    // Enable scissor test to conserve graphics memory bandwidth.
-    glEnable(GL_SCISSOR_TEST);
-    glScissor(vpx + (vpw - mw)/2, vpy + (vph - mh)/2, mw, mh);
+    glFrontFace( GL_CCW );
 }
-
-void cGrCarCamMirror::store (void)
-{
-	glDisable(GL_SCISSOR_TEST);
-
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glReadBuffer(GL_BACK);
-
-	// NVidia recommends to NOT use glCopyTexImage2D for performance reasons.
-	glCopyTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
-			    vpx + (vpw - mw)/2,
-			    vpy + (vph - mh)/2, mw, mh);
-}
-
-
-void cGrCarCamMirror::display (void)
-{
-    viewCam->action ();
-
-    glBindTexture (GL_TEXTURE_2D, tex);
-    glBegin(GL_TRIANGLE_STRIP);
-    {
-	glColor4f(1.0, 1.0, 1.0, 1.0);
-	glTexCoord2f(tsu, tsv); glVertex2f(mx, my);
-	glTexCoord2f(tsu, tev); glVertex2f(mx, my + mh);
-	glTexCoord2f(teu, tsv); glVertex2f(mx + mw, my);
-	glTexCoord2f(teu, tev); glVertex2f(mx + mw, my + mh);
-    }
-    glEnd();
-}
-
 
 // cGrCarCamInsideFixedCar ================================================================
 

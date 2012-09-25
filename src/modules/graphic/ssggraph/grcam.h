@@ -247,34 +247,25 @@ class cGrCarCamMirror : public cGrPerspCamera
 {
  protected:
     int		vpx, vpy, vpw, vph;	/* viewport size */
-    int		tw, th;			/* texture size */
+    double  vp_aspectratio;     /* viewport aspect ratio: vph/vpw */
     int		mx, my, mw, mh;		/* drawing area */
-    float	tsu, tsv, teu, tev;	/* texture coord */
-    GLuint	tex;			/* texture */
-    cGrOrthoCamera *viewCam;
+    int     m_centery;          /* y-coordinate of the mirror's center point */
     
  public:
     cGrCarCamMirror(cGrScreen *myscreen, int id, int drawCurr, int drawBG,
 		    float myfovy, float myfovymin, float myfovymax,
 		    float myfnear, float myffar = 1500.0,
-		    float myfogstart = 1400.0, float myfogend = 1500.0)
-	: cGrPerspCamera(myscreen, id, drawCurr, 1, drawBG, 1,
-			 myfovy, myfovymin, myfovymax,
-			 myfnear, myffar, myfogstart, myfogend) {
-	glGenTextures (1, &tex);
-	limitFov();
-	viewCam = NULL;
-    }
-    virtual ~cGrCarCamMirror ();
+                   float myfogstart = 1400.0, float myfogend = 1500.0);
 
     void update (tCarElt *car, tSituation *s);
-    void limitFov (void);
 
     void setViewport (int x, int y, int w, int h);
-    void setPos (int x, int y, int w, int h);
-    void activateViewport (void);
-    void store (void);
-    void display (void);
+    void setScreenPos (int x, int y, int w, int h);
+
+    virtual void setModelView(void);
+
+    virtual void beforeDraw(void);
+    virtual void afterDraw(void);
 };
 
 
