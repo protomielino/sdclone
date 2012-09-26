@@ -85,8 +85,8 @@ gfuiInitColor(void)
 	void* hdle = GfParmReadFile(buf, GFPARM_RMODE_STD | GFPARM_RMODE_CREAT);
 
 	for (int i = 0; i < GFUI_COLORNB; i++) {
+		sprintf(buf, "%s/%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_LIST_COLORS, clr[i]);
 		for (int j = 0; j < 4; j++) {
-			sprintf(buf, "%s/%s/%s", GFSCR_SECT_MENUSETTINGS, GFSCR_LIST_COLORS, clr[i]);
 			gfuiColors[i][j] = GfParmGetNum(hdle, buf, rgba[j], (char*)NULL, 1.0);
 		}
 	}
