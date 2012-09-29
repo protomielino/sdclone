@@ -4,7 +4,7 @@
     created              : Thu Aug 17 23:57:10 CEST 2000
     copyright            : (C) 2000-2003 by Eric Espie, Christos Dimitrakakis
     email                : torcs@free.fr, dimitrak@idiap.ch
-    version              : $Id: grsound.cpp 4493 2012-02-12 15:22:24Z pouillot $
+    version              : $Id$
 
 ***************************************************************************/
 
@@ -19,8 +19,6 @@
 
 #include "grsound.h"
 
-//#include "grmain.h"
-//#include "grcam.h"
 #include "OpenalSoundInterface.h"
 #include "PlibSoundInterface.h"
 #include "CarSoundData.h"
@@ -212,7 +210,9 @@ grRefreshSound(tSituation *s, SoundCam	*camera)
 
 		sound_interface->update (car_sound_data, s->_ncars, 
 					 *p_camera, *u_camera, c_camera, *a_camera);
+		free(camera); //ssggraph use the variables pointed by camera, we do not want do free them.
 	}
+
 }
 
 void grMuteSound(bool bOn)

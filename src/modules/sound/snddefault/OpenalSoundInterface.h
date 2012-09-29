@@ -3,7 +3,7 @@
     created              : Tue Jul 18 19:57:35 CEST 2011
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id: OpenalSoundInterface.h 3741 2011-07-21 22:29:34Z pouillot $
+    version              : $Id$
 
 ***************************************************************************/
 

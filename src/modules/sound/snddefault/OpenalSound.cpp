@@ -3,7 +3,7 @@
     created              : Tue Jul 18 19:57:35 CEST 2011
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id: OpenalSound.cpp 4761 2012-06-22 04:58:08Z mungewell $
+    version              : $Id$
 
  ***************************************************************************/
 

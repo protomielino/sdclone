@@ -3,7 +3,7 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: OpenalSound.h 4146 2011-11-13 18:30:39Z pouillot $
+    version              : $Id$
 
  ***************************************************************************/
 

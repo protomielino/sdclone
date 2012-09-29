@@ -4,7 +4,7 @@
     created              : Thu Aug 17 23:19:19 CEST 2000
     copyright            : (C) 2000 by Eric Espie
     email                : torcs@free.fr
-    version              : $Id: ssggraph.cpp 3741 2011-07-21 22:29:34Z pouillot $
+    version              : $Id$
 
  ***************************************************************************/
 

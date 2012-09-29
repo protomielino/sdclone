@@ -3,7 +3,7 @@
     file        : ssggraph.h
     copyright   : (C) 2011 by Jean-Philippe Meuret                        
     email       : pouillot@users.sourceforge.net   
-    version     : $Id: ssggraph.h 3741 2011-07-21 22:29:34Z pouillot $
+    version     : $Id$
 
  ***************************************************************************/
 
@@ -18,7 +18,7 @@
  
 /** @file    
     		The "ssggraph" graphics engine module
-    @version    $Id: ssggraph.h 3741 2011-07-21 22:29:34Z pouillot $
+    @version    $Id$
 */
 
 #ifndef _SNDDEFAULT_H_

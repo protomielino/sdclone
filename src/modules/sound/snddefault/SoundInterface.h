@@ -3,7 +3,7 @@
     created              : Tue Apr 5 19:57:35 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis, Bernhard Wymann
     email                : dimitrak@idiap.ch
-    version              : $Id: SoundInterface.h 3741 2011-07-21 22:29:34Z pouillot $
+    version              : $Id$
 
 ***************************************************************************/
 

@@ -136,13 +136,14 @@ public:
 
 	//! Graphics engine control.
 	bool initializeGraphics();
+	bool initializeSound();
 	bool loadTrackGraphics(struct Track* pTrack);
 	bool loadCarsGraphics(struct Situation* pSituation);
 	bool setupGraphicsView();
 	void shutdownGraphicsView();
 	void unloadCarsGraphics();
 	void unloadTrackGraphics();
-	void shutDownSound(); 
+	void shutdownSound(); 
 
 	//! Load stuff in the background of the splash screen (menus, XML data, ...).
 	static bool backLoad();

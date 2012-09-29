@@ -3,7 +3,7 @@
     created              : Tue Jul 18 19:57:35 CEST 2011
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: Sound.h 4146 2011-11-13 18:30:39Z pouillot $
+    version              : $Id$
 
  ***************************************************************************/
 

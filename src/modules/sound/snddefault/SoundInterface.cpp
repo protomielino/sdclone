@@ -4,7 +4,7 @@
     created              : Thu Apr 7 04:21 CEST 2005
     copyright            : (C) 2005 Christos Dimitrakakis
     email                : dimitrak@idiap.ch
-    version              : $Id: SoundInterface.cpp 4549 2012-02-28 22:01:36Z pouillot $
+    version              : $Id$
 
 ***************************************************************************/
 

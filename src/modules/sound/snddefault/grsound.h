@@ -5,7 +5,7 @@
     created              : Thu Aug 17 23:57:35 CEST 2000
     copyright            : (C) 2000-2004 by Eric Espie, Christos Dimitrakakis
     email                : torcs@free.fr
-    version              : $Id: grsound.h 4146 2011-11-13 18:30:39Z pouillot $
+    version              : $Id$
 
  ***************************************************************************/
 

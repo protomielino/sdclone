@@ -162,7 +162,7 @@ void LegacyMenu::quit() {
 void LegacyMenu::shutdown() {
     // Shutdown graphics in case relevant and not already done.
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
-	shutDownSound();
+	shutdownSound();
         unloadCarsGraphics();
         shutdownGraphicsView();
         unloadTrackGraphics();
@@ -279,8 +279,8 @@ void LegacyMenu::onRaceDriversLoaded() {
         // The track will be unloaded if the event ends.
         // The graphics module is kept open if more than one race is driven.
 
-        // Initialize the graphics engine.
-        if (initializeGraphics()) {
+        // Initialize the graphics and sound engines.
+        if (initializeGraphics() && initializeSound()) {
             char buf[128];
             snprintf(buf, sizeof (buf), "Loading graphics for %s track ...",
                     _piRaceEngine->inData()->track->name);
@@ -331,7 +331,7 @@ void LegacyMenu::onRaceInterrupted() {
 
 void LegacyMenu::onRaceFinishing() {
     if (_piRaceEngine->inData()->_displayMode == RM_DISP_MODE_NORMAL) {
- 	shutDownSound();
+ 	shutdownSound();
         unloadCarsGraphics();
         shutdownGraphicsView();
         unloadTrackGraphics();
@@ -464,8 +464,11 @@ bool LegacyMenu::initializeGraphics() {
 
     _bfGraphicsState = 0;
 
+    return _piGraphicsEngine  != 0;
+}
 
-    // Check if the module is already loaded, and do nothing more if so.
+bool LegacyMenu::initializeSound(){
+	 // Check if the module is already loaded, and do nothing more if so.
     if (_piSoundEngine)
         return true;
 
@@ -484,8 +487,7 @@ bool LegacyMenu::initializeGraphics() {
         GfLogError("ISoundEngine not implemented by %s\n", oSSModLibName.str().c_str());
     }
 
-
-    return _piGraphicsEngine && _piSoundEngine != 0;
+    return _piSoundEngine != 0;
 }
 
 bool LegacyMenu::loadTrackGraphics(struct Track* pTrack) {
@@ -532,7 +534,7 @@ void LegacyMenu::redrawGraphicsView(struct Situation* pSituation) {
     
 }
 
-void LegacyMenu::shutDownSound() {
+void LegacyMenu::shutdownSound() {
     if (!_piSoundEngine)
         return;
 
