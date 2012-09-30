@@ -17,12 +17,13 @@
  *                                                                         *
  ***************************************************************************/
 
-#include <cstdio>
+#include <portability.h>
 
 #include <SDL.h>
 
 #include "network.h"
 #include "robotxml.h"
+#include "pack.h"
 
 NetClient::NetClient()
 {
@@ -263,24 +264,24 @@ void NetClient::SetDriverReady(bool bReady)
 	pNData->m_vecReadyStatus[idx-1] = bReady;
 	UnlockNetworkData();
 
-	int packetSize = 1+sizeof(idx)+sizeof(bReady);
-    unsigned char packetId = DRIVERREADY_PACKET;
+        PackedBuffer msg;
 
-	unsigned char *pData = new unsigned char[packetSize];
-	unsigned char *pDataStart = pData;
+        try
+        {
+                msg.pack_ubyte(DRIVERREADY_PACKET);
+                msg.pack_int(idx);
+                msg.pack_int(bReady);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SetDriverReady: packed buffer error\n");
+        }
+        GfLogTrace("SetDriverReady: packed data length=%d\n", msg.length());
 
-	memcpy(pData,&packetId,1);
-	pData++;
-
-	memcpy(pData,&idx,sizeof(idx));
-	pData+=sizeof(idx);
-	memcpy(pData,&bReady,sizeof(bReady));
-
-	ENetPacket * pPacket = enet_packet_create (pDataStart, 
-                                              packetSize, 
+	ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
+                                              msg.length(), 
                                               ENET_PACKET_FLAG_RELIABLE);
 
-	delete [] pDataStart;
 	if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
 		return;
 }
@@ -290,19 +291,54 @@ bool NetClient::SendDriverInfoPacket(NetDriver *pDriver)
 	SetDriverName(pDriver->name);
 	pDriver->address.port = m_pHost->address.port;
 
-	unsigned char  packetId = PLAYERINFO_PACKET;
-	int datasize = sizeof(NetDriver)+1;
+	GfLogTrace("SendDriverInfoPacket: pDriver\n");
+	GfLogTrace("->host=%d\n", pDriver->address.host);
+	GfLogTrace("->port=%d\n", pDriver->address.port);
+	GfLogTrace("->idx=%d\n", pDriver->idx);
+	GfLogTrace("->name=%s\n", pDriver->name);
+	GfLogTrace("->car=%s\n", pDriver->car);
+	GfLogTrace("->team=%s\n", pDriver->team);
+	GfLogTrace("->author=%s\n", pDriver->author);
+	GfLogTrace("->racenumber=%d\n", pDriver->racenumber);
+	GfLogTrace("->skilllevel=%s\n", pDriver->skilllevel);
+	GfLogTrace("->red=%.1f\n", pDriver->red);
+	GfLogTrace("->green=%.1f\n", pDriver->green);
+	GfLogTrace("->blue=%.1f\n", pDriver->blue);
+	GfLogTrace("->module=%s\n", pDriver->module);
+	GfLogTrace("->type=%s\n", pDriver->type);
+	GfLogTrace("->client=%d\n", pDriver->client);
 
-	unsigned char *pData = new unsigned char[datasize];
-	memcpy(&pData[0],&packetId,1);
-	memcpy(&pData[1],pDriver,sizeof(NetDriver));
+        PackedBuffer msg;
 
-	ENetPacket * pPacket = enet_packet_create (pData, 
-                                              datasize, 
+        try
+        {
+                msg.pack_ubyte(PLAYERINFO_PACKET);
+                msg.pack_int(pDriver->idx);
+                msg.pack_string(pDriver->name, sizeof pDriver->name);
+                msg.pack_string(pDriver->car, sizeof pDriver->car);
+                msg.pack_string(pDriver->team, sizeof pDriver->team);
+                msg.pack_string(pDriver->author, sizeof pDriver->author);
+                msg.pack_int(pDriver->racenumber);
+                msg.pack_string(pDriver->skilllevel,
+                        sizeof pDriver->skilllevel);
+                msg.pack_float(pDriver->red);
+                msg.pack_float(pDriver->green);
+                msg.pack_float(pDriver->blue);
+                msg.pack_string(pDriver->module, sizeof pDriver->module);
+                msg.pack_string(pDriver->type, sizeof pDriver->type);
+                msg.pack_int(pDriver->client);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SendDriverInfoPacket: packed buffer error\n");
+        }
+        GfLogTrace("SendDriverInfoPacket: packed data length=%d\n",
+                msg.length());
+
+	ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
+                                              msg.length(), 
                                               ENET_PACKET_FLAG_RELIABLE);
 
-	delete [] pData;
- 
 	if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket)==0)
 		return true;
 
@@ -314,20 +350,23 @@ void NetClient::SendReadyToStartPacket()
 	
 	std::string strDName = GetDriverName();
 	GfLogTrace("Sending ready to start packet\n");
-	int l = strDName.size();
-	int datasize = 1+sizeof(l)+l*sizeof(char);
-	unsigned char *pData = new unsigned char[datasize];
-	
-	unsigned char packetId = CLIENTREADYTOSTART_PACKET;
-	unsigned char *pCurData = pData;
-	memcpy(pCurData,&packetId,1);
-	pCurData++;
-	memcpy(pCurData,&l,sizeof(l));
-	pCurData+=sizeof(l);
-	memcpy(pCurData,strDName.c_str(),l);
 
-	ENetPacket * pPacket = enet_packet_create (pData, 
-                                              datasize, 
+        PackedBuffer msg;
+
+        try
+        {
+                msg.pack_ubyte(CLIENTREADYTOSTART_PACKET);
+                msg.pack_stdstring(strDName);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SendReadyToStartPacket: packed buffer error\n");
+        }
+        GfLogTrace("SendReadyToStartPacket: packed data length=%d\n",
+                msg.length());
+
+	ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
+                                              msg.length(), 
                                               ENET_PACKET_FLAG_RELIABLE);
 
 	if (enet_peer_send (m_pServer, RELIABLECHANNEL, pPacket))
@@ -338,9 +377,23 @@ void NetClient::SendReadyToStartPacket()
 void NetClient::SendServerTimeRequest()
 {
 	m_packetsendtime = GfTimeClock(); 
-	unsigned char packetId = SERVER_TIME_REQUEST_PACKET;
-	ENetPacket * pPacket = enet_packet_create (&packetId, 
-                                              1, 
+
+        PackedBuffer msg;
+
+        try
+        {
+                msg.pack_ubyte(SERVER_TIME_REQUEST_PACKET);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SendServerTimeRequest: packed buffer error\n");
+        }
+        GfLogTrace("SendServerTimeRequest: packed data length=%d\n",
+                msg.length());
+
+
+	ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
+                                              msg.length(), 
                                               ENET_PACKET_FLAG_UNSEQUENCED);
 
 	if (enet_peer_send (m_pServer, UNRELIABLECHANNEL, pPacket))
@@ -361,9 +414,21 @@ double NetClient::WaitForRaceStart()
 void NetClient::ReadStartTimePacket(ENetPacket *pPacket)
 {
 	GfLogTrace("Recieved the start race Packet\n");
-	unsigned char *pData = &pPacket->data[1];
-	memcpy(&m_racestarttime,pData,sizeof(m_racestarttime));
 	//double time = GfTimeClock();
+
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadStartTimePacket: packed data length=%d\n",
+                msg.length());
+
+        try
+        {
+                msg.unpack_ubyte();
+                m_racestarttime = msg.unpack_double();
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadStartTimePacket: packed buffer error\n");
+        }
 
 	//Adjust start time based on client clock
 	m_racestarttime= m_racestarttime+m_servertimedifference;
@@ -454,8 +519,7 @@ void NetClient::ReadPacket(ENetEvent event)
 {
 	ENetPacket *pPacket = event.packet;
 	assert(pPacket->dataLength>=1);
-	unsigned char packetId;
-	memcpy(&packetId,&pPacket->data[0],1);
+	unsigned char packetId = pPacket->data[0];
 	//unsigned char *pData = &pPacket->data[1];
 	//int datasize = pPacket->dataLength-1;
 	
@@ -596,30 +660,53 @@ void NetClient::ReadWeatherPacket(ENetPacket *pPacket)
 }
 void NetClient::ReadAllDriverReadyPacket(ENetPacket *pPacket)
 {
-	unsigned char *pData = &pPacket->data[1];
 	int rsize;
-	memcpy(&rsize,pData,sizeof(rsize));
-	pData+=sizeof(rsize);
-	NetMutexData *pNData = LockNetworkData();
-	pNData->m_vecReadyStatus.clear();
-	pNData->m_vecReadyStatus.resize(rsize);
-	bool *pReady = (bool*)pData;
-	for (int i=0;i<rsize;i++)
-		pNData->m_vecReadyStatus[i] = pReady[i];
 
-	UnlockNetworkData();
-	SetRaceInfoChanged(true);
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadAllDriverReadyPacket: packed data length=%d\n",
+                msg.length());
+
+        try
+        {
+                msg.unpack_ubyte();
+                rsize = msg.unpack_int();
+
+                NetMutexData *pNData = LockNetworkData();
+                pNData->m_vecReadyStatus.clear();
+                pNData->m_vecReadyStatus.resize(rsize);
+                for (int i=0;i<rsize;i++)
+                        pNData->m_vecReadyStatus[i] = msg.unpack_int();
+
+                UnlockNetworkData();
+                SetRaceInfoChanged(true);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadAllDriverReadyPacket: packed buffer error\n");
+        }
 
 	GfLogTrace("Recieved All Driver Ready Packet\n");
 }
 
 void NetClient::ReadFinishTimePacket(ENetPacket *pPacket)
 {
-	unsigned char *pData = &pPacket->data[1];
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadFinishTimePacket: packed data length=%d\n",
+                msg.length());
 	
-	NetMutexData *pNData = LockNetworkData();
-	memcpy(&pNData->m_finishTime,pData,sizeof(pNData->m_finishTime));
-	UnlockNetworkData();
+        try
+        {
+                msg.unpack_ubyte();
+
+                NetMutexData *pNData = LockNetworkData();
+                pNData->m_finishTime = msg.unpack_double();
+                UnlockNetworkData();
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadFinishTimePacket: packed buffer error\n");
+        }
+
 	GfOut("Recieved finish time packet\n");
 }
 
@@ -629,37 +716,68 @@ void NetClient::ReadTimePacket(ENetPacket *pPacket)
 	m_lag = (curTime-m_packetsendtime)/2.0;
 	GfLogTrace ("Connection lag is %lf seconds\n",m_lag);
 
-	unsigned char *pData = &pPacket->data[1];
 	double time;
-	memcpy(&time,pData,sizeof(double));
+
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadTimePacket: packed data length=%d\n",
+                msg.length());
+
+        try
+        {
+                msg.unpack_ubyte();
+                time = msg.unpack_double();
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadTimePacket: packed buffer error\n");
+        }
+
 	m_servertimedifference = curTime-time;
 	m_bTimeSynced = true;
 }
 void NetClient::ReadFilePacket(ENetPacket *pPacket)
 {
-
-	unsigned char *pData = &pPacket->data[1];
 	short len;
 	size_t writeSize;
-	memcpy(&len,pData,sizeof(short));
-	pData+=sizeof(short);
 	char file[255];
-	memset(&file[0],0,255);
-	memcpy(file,pData,len);
-	pData+=len;
 	unsigned int filesize;
-	memcpy(&filesize,pData,sizeof(unsigned int));
-	pData+=sizeof(unsigned int);
-	GfLogTrace("Client file size %u\n",filesize);
+        char *filedata;
+
+	memset(file, 0, sizeof file);
+
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadFilePacket: packed data length=%d\n",
+                msg.length());
+
+        try
+        {
+                msg.unpack_ubyte();
+                len = msg.unpack_short();
+                msg.unpack_string(file, len);
+                filesize = msg.unpack_int();
+
+                GfLogTrace("Client file size %u\n",filesize);
+                filedata = new char[filesize];
+
+                msg.unpack_string(filedata, filesize);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadFilePacket: packed buffer error\n");
+        }
 	
 	char filepath[255];
-	sprintf(filepath, "%s%s", GfLocalDir(), file);
+	snprintf(filepath, sizeof filepath, "%s%s", GfLocalDir(), file);
+
 	FILE *pFile = fopen(filepath,"w+b");
 	GfLogTrace("Reading file packet: File- %s\n",filepath);
-	writeSize = fwrite(pData,filesize,1,pFile);
+
+	writeSize = fwrite(filedata, filesize, 1, pFile);
 	if( writeSize <= 0 )
 		GfLogTrace("Not all bytes are send to file");
 	fclose(pFile);
+
+        delete [] filedata;
 }
 
 void NetClient::BroadcastPacket(ENetPacket *pPacket,enet_uint8 channel)

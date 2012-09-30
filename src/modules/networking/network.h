@@ -101,34 +101,33 @@ struct CarControlsPacked
 //Uncompressed car controls pack
 struct CarControlsData
 {
-	unsigned char	startRank;
-    tDynPt	DynGCg;		/* GC global data */
-
+	int startRank;
+        tDynPt DynGCg;		/* GC global data */
 	float steering;
 	float throttle;
 	float brake;
 	float clutch;
-	unsigned char gear;
+	int gear;
 	double time;
 };
 
 
 struct LapStatus
 {
-	float bestLapTime;
-	float bestSplitTime;
-	unsigned short laps;
-	unsigned char startRank;
+	double bestLapTime;
+	double bestSplitTime;
+	int laps;
+	int startRank;
 };
 
 struct CarStatus
 {
 	float topSpeed;
-	short state;
+	int state;
 	double time;
 	float fuel;
 	int dammage;
-	unsigned char startRank;
+	int startRank;
 };
 
 struct CarStatusPacked

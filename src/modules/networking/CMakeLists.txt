@@ -2,8 +2,8 @@ INCLUDE(../../../cmake/macros.cmake)
 
 #PROJECT(networking)
 
-SET(SD_NETWORK_SOURCES network.cpp server.cpp client.cpp robotxml.cpp)
-SET(SD_NETWORK_HEADERS network.h robotxml.h)
+SET(SD_NETWORK_SOURCES network.cpp server.cpp client.cpp robotxml.cpp pack.cpp)
+SET(SD_NETWORK_HEADERS network.h robotxml.h pack.h)
 
 #disable developer warning
 if (COMMAND cmake_policy)

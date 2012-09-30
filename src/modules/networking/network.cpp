@@ -42,6 +42,7 @@ based on the server values.
 #include <graphic.h>
 
 #include "network.h"
+#include "pack.h"
 
 
 bool g_bInit = false;
@@ -434,31 +435,28 @@ bool NetNetwork::SetCurrentDriver()
 
 void NetNetwork::SendLapStatusPacket(tCarElt *pCar)
 {
+        PackedBuffer msg;
 
-	LapStatus status;
+        try
+        {
+                msg.pack_ubyte(LAPSTATUS_PACKET);
+                msg.pack_double(pCar->race.bestLapTime);
+                msg.pack_double(*pCar->race.bestSplitTime);
+                msg.pack_int(pCar->race.laps);
+                msg.pack_int(pCar->info.startRank);
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SendLapStatusPacket: packed buffer error\n");
+        }
+        GfLogTrace("SendLapStatusPacket: packed data length=%d\n",
+                msg.length());
 
-	status.bestLapTime = (float)pCar->race.bestLapTime;
-	status.bestSplitTime = (float)*pCar->race.bestSplitTime;
-	status.laps = pCar->race.laps;
-	status.startRank =  pCar->info.startRank;
-
-	int packetSize = 1+(sizeof(LapStatus));
-    unsigned char packetId = LAPSTATUS_PACKET;
-
-	unsigned char *pData = new unsigned char[packetSize];
-	unsigned char *pDataStart = pData;
-
-	memcpy(pData,&packetId,1);
-	pData++;
-	memcpy(pData,&status,sizeof(status));
-
-	ENetPacket * pPacket = enet_packet_create (pDataStart, 
-                                              packetSize, 
-                                              ENET_PACKET_FLAG_RELIABLE);
+        ENetPacket *pPacket = enet_packet_create (msg.buffer(), 
+                msg.length(), 
+                ENET_PACKET_FLAG_RELIABLE);
 
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
-	
-	delete [] pDataStart;
 }
 
 
@@ -479,7 +477,7 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
 		return;
 	}
 
-	std::vector<CarStatusPacked> vecCarStatus;
+	std::vector<tCarElt *> local;
 	double time = 0.0;
 
 
@@ -490,15 +488,7 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
 		//Only transmit local drivers to other clients
 		if (m_setLocalDrivers.find(pCar->info.startRank)!=m_setLocalDrivers.end())
 		{
-			GfLogTrace("Sending car info: %s,startRank=%i\n",pCar->info.name,pCar->info.startRank);
-			CarStatusPacked status;
-			status.topSpeed = pCar->race.topSpeed;
-			status.state = pCar->pub.state;
-			status.startRank = pCar->info.startRank;
-			status.dammage = pCar->priv.dammage;
-			status.fuel = pCar->priv.fuel;
-
-			vecCarStatus.push_back(status);
+			local.push_back(pCar);
 		}
 
 	}
@@ -507,31 +497,39 @@ void NetNetwork::SendCarStatusPacket(tSituation *s,bool bForce)
 	m_sendCarDataTime = s->currentTime;
 
 
-	int iNumCars = vecCarStatus.size();
-	int packetSize = 1+sizeof(time)+iNumCars*sizeof(iNumCars)+iNumCars*(sizeof(CarStatusPacked));
-    	unsigned char packetId = CARSTATUS_PACKET;
-	unsigned char *pData = new unsigned char[packetSize];
-	unsigned char *pDataStart = pData;
+	int iNumCars = local.size();
 
-	memcpy(pData,&packetId,1);
-	pData++;
-	memcpy(pData,&time,sizeof(time));
-	pData+=sizeof(time);
-	memcpy(pData,&iNumCars,sizeof(iNumCars));
-	pData+=sizeof(iNumCars);
-	for (int i=0;i<iNumCars;i++)
-	{
-		memcpy(pData,(unsigned char*)&vecCarStatus[i],sizeof(CarStatusPacked));
-		pData+=sizeof(CarStatusPacked);
-	}
+        PackedBuffer msg;
 
-	ENetPacket * pPacket = enet_packet_create (pDataStart, 
-                                              packetSize, 
+        try
+        {
+                msg.pack_ubyte(CARSTATUS_PACKET);
+                msg.pack_double(time);
+                msg.pack_int(iNumCars);
+                for (int i=0;i<iNumCars;i++)
+                {
+                        GfLogTrace("Sending car info: %s,startRank=%i\n",
+                                local[i]->info.name, local[i]->info.startRank);
+                        msg.pack_float(local[i]->race.topSpeed);
+                        msg.pack_int(local[i]->pub.state);
+                        msg.pack_int(local[i]->info.startRank);
+                        msg.pack_int(local[i]->priv.dammage);
+                        msg.pack_float(local[i]->priv.fuel);
+                }
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SendCarStatusPacket: packed buffer error\n");
+        }
+        GfLogTrace("SendCarStatusPacket: packed data length=%d\n",
+                msg.length());
+
+	ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
+                                              msg.length(), 
                                               ENET_PACKET_FLAG_RELIABLE);
 
 	BroadcastPacket(pPacket,RELIABLECHANNEL);
 	
-	delete [] pDataStart;
 }
 
 void NetNetwork::SendCarControlsPacket(tSituation *s)
@@ -553,7 +551,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
 		return;
 	}
 
-	std::vector<CarControlsPacked> vecPackedCtrls;
+	std::vector<tCarElt *> local;
 	double time = 0.0;
 
 	//Pack controls values to reduce data size of packet
@@ -563,17 +561,7 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
 		//Only transmit local drivers to other clients
 		if (m_setLocalDrivers.find(pCar->info.startRank)!=m_setLocalDrivers.end())
 		{
-			CarControlsPacked ctrl;
-			ctrl.gear = pCar->ctrl.gear;
-			ctrl.brake = (short)(pCar->ctrl.brakeCmd*256);
-			ctrl.steering = (short)(pCar->ctrl.steer*256);
-			ctrl.throttle = (short)(pCar->ctrl.accelCmd*256);
-			ctrl.clutch = (short)(pCar->ctrl.clutchCmd*256);
-			
-			memcpy(&ctrl.DynGCg,&pCar->pub.DynGCg,sizeof(tDynPt));
-			
-			ctrl.startRank = pCar->info.startRank;
-			vecPackedCtrls.push_back(ctrl);
+			local.push_back(pCar);
 		}
 
 	}
@@ -581,40 +569,80 @@ void NetNetwork::SendCarControlsPacket(tSituation *s)
 
 	m_sendCtrlTime = s->currentTime;
 
-	int iNumCars = vecPackedCtrls.size();
-	int packetSize = 1+sizeof(time)+iNumCars*sizeof(iNumCars)+iNumCars*(sizeof(CarControlsPacked));
-    unsigned char packetId = CARCONTROLS_PACKET;
-	unsigned char *pData = new unsigned char[packetSize];
-	unsigned char *pDataStart = pData;
+	int iNumCars = local.size();
 
-	memcpy(pData,&packetId,1);
-	pData++;
-	memcpy(pData,&time,sizeof(time));
-	pData+=sizeof(time);
-	memcpy(pData,&iNumCars,sizeof(iNumCars));
-	pData+=sizeof(iNumCars);
-	for (int i=0;i<iNumCars;i++)
-	{
-		memcpy(pData,(unsigned char*)&vecPackedCtrls[i],sizeof(CarControlsPacked));
-		pData+=sizeof(CarControlsPacked);
-	}
+        PackedBuffer msg;
 
-	ENetPacket * pPacket = enet_packet_create (pDataStart, 
-                                              packetSize, 
+        try
+        {
+                msg.pack_ubyte(CARCONTROLS_PACKET);
+                msg.pack_double(time);
+                msg.pack_int(iNumCars);
+                for (int i = 0; i < iNumCars; i++)
+                {
+                        msg.pack_int(local[i]->ctrl.gear);
+                        msg.pack_float(local[i]->ctrl.brakeCmd);
+                        msg.pack_float(local[i]->ctrl.steer);
+                        msg.pack_float(local[i]->ctrl.accelCmd);
+                        msg.pack_float(local[i]->ctrl.clutchCmd);
+                        msg.pack_int(local[i]->info.startRank);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.x);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.y);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.z);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.xy);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.ax);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.ay);
+                        msg.pack_float(local[i]->pub.DynGCg.pos.az);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.x);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.y);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.z);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.xy);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.ax);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.ay);
+                        msg.pack_float(local[i]->pub.DynGCg.vel.az);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.x);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.y);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.z);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.xy);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.ax);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.ay);
+                        msg.pack_float(local[i]->pub.DynGCg.acc.az);
+                }
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("SendCarControlsPacket: packed buffer error\n");
+        }
+        GfLogTrace("SendCarControlsPacket: packed data length=%d\n",
+                msg.length());
+
+	ENetPacket * pPacket = enet_packet_create (msg.buffer(), 
+                                              msg.length(), 
                                               ENET_PACKET_FLAG_UNSEQUENCED);
 
 	BroadcastPacket(pPacket,UNRELIABLECHANNEL);
-	
-	delete [] pDataStart;
-
 }
 
 void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
 {
-	unsigned char *pData = &pPacket->data[1];
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadLapStatusPacket: packed data length=%d\n",
+                msg.length());
 	
 	LapStatus lstatus;
-	memcpy(&lstatus,pData,sizeof(lstatus));
+
+        try
+        {
+                msg.unpack_ubyte();
+                lstatus.bestLapTime = msg.unpack_double();
+                lstatus.bestSplitTime = msg.unpack_double();
+                lstatus.laps = msg.unpack_int();
+                lstatus.startRank = msg.unpack_int();
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadLapStatusPacket: packed buffer error\n");
+        }
 	
 	NetMutexData *pNData = LockNetworkData();
 	bool bFound = false;
@@ -636,64 +664,64 @@ void NetNetwork::ReadLapStatusPacket(ENetPacket *pPacket)
 
 void NetNetwork::ReadCarStatusPacket(ENetPacket *pPacket)
 {
-	unsigned char *pData = &pPacket->data[1];
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadCarStatusPacket: packed data length=%d\n",
+                msg.length());
 	
-	//time
-	double packettime=0;
-	memcpy(&packettime,pData,sizeof(packettime));
-	pData+=sizeof(packettime);
+        double packettime;
+	int iNumCars;
 
+        try
+        {
+                msg.unpack_ubyte();
+                packettime = msg.unpack_double();
+                iNumCars = msg.unpack_int();
 
-	int iNumCars = 0;
-	memcpy(&iNumCars,pData,sizeof(iNumCars));
-	pData+=sizeof(iNumCars);
+                NetMutexData *pNData = LockNetworkData();
+                        
+                //Car conrols values (steering,brake,gas,and etc
+                for (int i=0;i<iNumCars;i++)
+                {
+                        CarStatus status;
+                        
+                        status.topSpeed = msg.unpack_float();
+                        status.state = msg.unpack_int();
+                        status.startRank = msg.unpack_int();
+                        status.dammage = msg.unpack_int();
+                        status.fuel = msg.unpack_float();
 
-	NetMutexData *pNData = LockNetworkData();
-		
-	//Car conrols values (steering,brake,gas,and etc
-	for (int i=0;i<iNumCars;i++)
-	{
-		CarStatusPacked statusPacked;
-		memcpy(&statusPacked,pData,sizeof(CarStatusPacked));
-		
-		//Unpack values
-		CarStatus status;
+                        status.time = packettime;
 
-		status.state = statusPacked.state;
-		status.startRank =statusPacked.startRank;
+                        bool bFound = false;
+                        for (unsigned int i=0;i<pNData->m_vecCarStatus.size();i++)
+                        {
+                                if (pNData->m_vecCarStatus[i].startRank == status.startRank)
+                                {
+                                        bFound = true;
+                                        //Only use the data if the time is newer.  Prevent out of order packet
+                                        if (pNData->m_vecCarStatus[i].time < status.time)
+                                        {
+                                                pNData->m_vecCarStatus[i] = status;
+                                        }
+                                        else
+                                        {
+                                                GfLogTrace("Rejected car status from startRank %i\n",status.startRank);
+                                        }
+                                        GfLogTrace("Recieved car status from startRank %i\n",status.startRank);
+                        break;
+                                }
+                        }
 
-		status.topSpeed = statusPacked.topSpeed;
-		status.fuel = statusPacked.fuel;
-		status.dammage = statusPacked.dammage;
-		
-		status.time = packettime;
-		
-		bool bFound = false;
-		for (unsigned int i=0;i<pNData->m_vecCarStatus.size();i++)
-		{
-			if (pNData->m_vecCarStatus[i].startRank == status.startRank)
-			{
-				bFound = true;
-				//Only use the data if the time is newer.  Prevent out of order packet
-				if (pNData->m_vecCarStatus[i].time < status.time)
-				{
-					pNData->m_vecCarStatus[i] = status;
-				}
-				else
-				{
-					GfLogTrace("Rejected car status from startRank %i\n",status.startRank);
-				}
-				GfLogTrace("Recieved car status from startRank %i\n",status.startRank);
-			}
-		}
+                        if (!bFound)
+                                pNData->m_vecCarStatus.push_back(status);
+                }
 
-		if (!bFound)
-			pNData->m_vecCarStatus.push_back(status);
-
-		pData+=sizeof(CarStatusPacked);
-	}
-
-	UnlockNetworkData();
+                UnlockNetworkData();
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadCarStatusPacket: packed buffer error\n");
+        }
 }
 
 void NetNetwork::GetHostSettings(std::string &strCarCat,bool &bCollisions)
@@ -711,64 +739,84 @@ void NetNetwork::GetHostSettings(std::string &strCarCat,bool &bCollisions)
 
 void NetNetwork::ReadCarControlsPacket(ENetPacket *pPacket)
 {
-	unsigned char *pData = &pPacket->data[1];
-	
-	//time
-	double packettime=0;
-	memcpy(&packettime,pData,sizeof(packettime));
-	pData+=sizeof(packettime);
+        PackedBuffer msg(pPacket->data, pPacket->dataLength);
+        GfLogTrace("ReadCarControlsPacket: packed data length=%d\n",
+                msg.length());
 
+        double packettime;
+	int iNumCars;
 
-	int iNumCars = 0;
-	memcpy(&iNumCars,pData,sizeof(iNumCars));
-	pData+=sizeof(iNumCars);
+        try
+        {
+                msg.unpack_ubyte();
+                packettime = msg.unpack_double();
+                iNumCars = msg.unpack_int();
 
+                NetMutexData *pNData = LockNetworkData();
+                
+                //Car conrols values (steering,brake,gas,and etc
+                for (int i=0;i<iNumCars;i++)
+                {
+                        CarControlsData ctrl;	
 
-	NetMutexData *pNData = LockNetworkData();
-	
-	//Car conrols values (steering,brake,gas,and etc
-	for (int i=0;i<iNumCars;i++)
-	{
-		CarControlsPacked ctrlPacked;
-		memcpy(&ctrlPacked,pData,sizeof(CarControlsPacked));
-		
-		//Unpack values
-		CarControlsData ctrl;	
-		ctrl.throttle = (float)(ctrlPacked.throttle/256.0);
-		ctrl.brake = (float)(ctrlPacked.brake/256.0);
-		ctrl.clutch = (float)(ctrlPacked.clutch/256.0);
-		ctrl.gear = ctrlPacked.gear;
-		ctrl.steering = (float)(ctrlPacked.steering/256.0);
-		ctrl.DynGCg = ctrlPacked.DynGCg;
-		ctrl.startRank = ctrlPacked.startRank;
-		ctrl.time = packettime;
-	
-		
-		bool bFound = false;
-		for (unsigned int i=0;i<pNData->m_vecCarCtrls.size();i++)
-		{
-			if (pNData->m_vecCarCtrls[i].startRank == ctrl.startRank)
-			{
-				bFound = true;
-				//Only use the data if the time is newer.  Prevent out of order packet
-				if (pNData->m_vecCarCtrls[i].time < ctrl.time)
-				{
-					pNData->m_vecCarCtrls[i] = ctrl;
-				}
-				else
-				{
-					GfLogTrace("Rejected car control from startRank %i\n",ctrl.startRank);
-				}
-			}
-		}
+                        ctrl.gear = msg.unpack_int();
+                        ctrl.brake = msg.unpack_float();
+                        ctrl.steering = msg.unpack_float();
+                        ctrl.throttle = msg.unpack_float();
+                        ctrl.clutch = msg.unpack_float();
+                        ctrl.startRank = msg.unpack_int();
+                        ctrl.DynGCg.pos.x = msg.unpack_float();
+                        ctrl.DynGCg.pos.y = msg.unpack_float();
+                        ctrl.DynGCg.pos.z = msg.unpack_float();
+                        ctrl.DynGCg.pos.xy = msg.unpack_float();
+                        ctrl.DynGCg.pos.ax = msg.unpack_float();
+                        ctrl.DynGCg.pos.ay = msg.unpack_float();
+                        ctrl.DynGCg.pos.az = msg.unpack_float();
+                        ctrl.DynGCg.vel.x = msg.unpack_float();
+                        ctrl.DynGCg.vel.y = msg.unpack_float();
+                        ctrl.DynGCg.vel.z = msg.unpack_float();
+                        ctrl.DynGCg.vel.xy = msg.unpack_float();
+                        ctrl.DynGCg.vel.ax = msg.unpack_float();
+                        ctrl.DynGCg.vel.ay = msg.unpack_float();
+                        ctrl.DynGCg.vel.az = msg.unpack_float();
+                        ctrl.DynGCg.acc.x = msg.unpack_float();
+                        ctrl.DynGCg.acc.y = msg.unpack_float();
+                        ctrl.DynGCg.acc.z = msg.unpack_float();
+                        ctrl.DynGCg.acc.xy = msg.unpack_float();
+                        ctrl.DynGCg.acc.ax = msg.unpack_float();
+                        ctrl.DynGCg.acc.ay = msg.unpack_float();
+                        ctrl.DynGCg.acc.az = msg.unpack_float();
 
-		if (!bFound)
-			pNData->m_vecCarCtrls.push_back(ctrl);
+                        ctrl.time = packettime;
 
-		pData+=sizeof(ctrlPacked);
-	}
+                        bool bFound = false;
+                        for (unsigned int i=0;i<pNData->m_vecCarCtrls.size();i++)
+                        {
+                                if (pNData->m_vecCarCtrls[i].startRank == ctrl.startRank)
+                                {
+                                        bFound = true;
+                                        //Only use the data if the time is newer.  Prevent out of order packet
+                                        if (pNData->m_vecCarCtrls[i].time < ctrl.time)
+                                        {
+                                                pNData->m_vecCarCtrls[i] = ctrl;
+                                        }
+                                        else
+                                        {
+                                                GfLogTrace("Rejected car control from startRank %i\n",ctrl.startRank);
+                                        }
+                                }
+                        }
 
-	UnlockNetworkData();
+                        if (!bFound)
+                                pNData->m_vecCarCtrls.push_back(ctrl);
+                }
+
+                UnlockNetworkData();
+        }
+        catch (PackedBufferException &e)
+        {
+                GfLogFatal("ReadCarControlsPacket: packed buffer error\n");
+        }
 }
 
 //==========================================================
