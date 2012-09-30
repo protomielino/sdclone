@@ -554,7 +554,7 @@ gfuiMouseMotion(int x, int y)
 	GfuiMouse.X = (x - (ScrW - ViewW)/2) * (int)GfuiScreen->width / ViewW;
 	GfuiMouse.Y = (ViewH - y + (ScrH - ViewH)/2) * (int)GfuiScreen->height / ViewH;
 	gfuiUpdateFocus();
-	gfuiMouseAction((void*)(1 - GfuiScreen->mouse));
+	gfuiMouseAction((void*)(long)(1 - GfuiScreen->mouse));
 	GfuiApp().eventLoop().postRedisplay();
 	DelayRepeat = REPEAT1;
 }

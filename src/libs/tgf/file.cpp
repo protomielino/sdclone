@@ -193,6 +193,6 @@ bool GfFileCopy(const char* pszSrcName, const char* pszTgtName)
 					 pszTgtName, strerror(errnum));
 	}
 
-	return true;
+	return res;
 }
 

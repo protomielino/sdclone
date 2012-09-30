@@ -116,7 +116,6 @@ ReNetworkOneStep()
 	//Do network updates if needed
 	//CarControlsData *pControls = NULL;
 	int numCars = 0;
-	double time = 0.0f;
 	
 	NetMutexData *pNData = NetGetNetwork()->LockNetworkData();
 
@@ -142,7 +141,6 @@ ReNetworkOneStep()
 
 	//do car status updates if needed
 	numCars = pNData->m_vecCarStatus.size();
-	time = 0.0f;
 
 	if (numCars>0)
 	{
@@ -165,7 +163,6 @@ ReNetworkOneStep()
 
 	//do lap status updates if needed
 	numCars = 0;
-	time = 0.0f;
 	numCars = pNData->m_vecLapStatus.size();
 	if (numCars>0)
 	{

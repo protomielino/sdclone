@@ -389,9 +389,9 @@ RtTrackHeightL(tTrkLocPos *p)
     tdble	lg;
     tdble	tr = p->toRight;
     tTrackSeg	*seg = p->seg;
-    bool left_side = true;
+    //bool left_side = true; // Never used.
     if ((tr < 0) && (seg->rside != NULL)) {
-        left_side = false;
+    //    left_side = false; // Never used.
 
 	seg = seg->rside;
  	tr += seg->width;

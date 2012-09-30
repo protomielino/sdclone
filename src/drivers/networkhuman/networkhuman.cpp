@@ -969,7 +969,10 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		tdble angle = trackangle - car->_yaw;
 		NORM_PI_PI(angle);
 
-		tdble maxaccel = 0.0;
+        tdble origaccel = car->_accelCmd;
+
+#if 0
+        tdble maxaccel = 0.0;
 		if (car->_trkPos.seg->type == TR_STR)
 			maxaccel = MIN(car->_accelCmd, 0.2);
 		else if (car->_trkPos.seg->type == TR_LFT && angle < 0.0)
@@ -977,8 +980,6 @@ static void common_drive(int index, tCarElt* car, tSituation *s)
 		else if (car->_trkPos.seg->type == TR_RGT && angle > 0.0)
 			maxaccel = MIN(car->_accelCmd, MIN(0.6, angle));
 
-		tdble origaccel = car->_accelCmd;
-#if 0
 		tdble skidAng = atan2(car->_speed_Y, car->_speed_X) - car->_yaw;
 		NORM_PI_PI(skidAng);
 

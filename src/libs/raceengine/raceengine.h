@@ -110,7 +110,7 @@ protected:
 
 	// Protected constructor and destructor : clients can not use them.
 	RaceEngine();
-	~RaceEngine();
+	virtual ~RaceEngine();
 	
 protected:
 

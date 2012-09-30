@@ -161,7 +161,7 @@ void RaceEngine::updateState(void)
 
 void RaceEngine::applyState(int state)
 {
-	::ReStateApply((void*)state);
+	::ReStateApply((void*)(long)state);
 }
 
 void RaceEngine::selectRaceman(GfRaceManager* pRaceMan, bool bKeepHumans)

@@ -22,7 +22,7 @@
 #include "grSphere.h"
 
 static float sun_exp2_punch_through;
-static double visibility;
+//static double visibility; // Never used.
 
 // Set up sun rendering call backs
 static int grSunPreDraw( ssgEntity *e )

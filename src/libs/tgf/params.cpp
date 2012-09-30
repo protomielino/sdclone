@@ -1537,7 +1537,6 @@ int
 GfParmWriteBuf (void *handle, char *buf, int size)
 {
     struct parmHandle	*parmHandle = (struct parmHandle *)handle;
-    struct parmHeader	*conf;
     char		line[LINE_SZ];
     int			len;
     int			curSize;
@@ -1547,8 +1546,6 @@ GfParmWriteBuf (void *handle, char *buf, int size)
 		GfLogFatal ("GfParmWriteBuf: bad handle (%p)\n", parmHandle);
 		return 1;
     }
-
-    conf = parmHandle->conf;
 
     parmHandle->outCtrl.state = 0;
     parmHandle->outCtrl.curSection = NULL;

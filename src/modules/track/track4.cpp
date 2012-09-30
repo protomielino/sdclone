@@ -1160,7 +1160,8 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 	tdble	x1, x2, y1, y2;
 	tdble	al, alfl;
 	tdble	zsl, zsr, zel, zer, zs, ze;
-	tdble	bankings, bankinge, dz, dzl, dzr;
+	tdble	bankings, bankinge, dz;
+    //tdble dzl, dzr;
 	tdble	etgt, stgt;
 	tdble	etgtl, stgtl;
 	tdble	etgtr, stgtr;
@@ -1375,8 +1376,8 @@ CreateSegRing(void *TrackHandle, tTrack *theTrack, tTrackSeg *start, tTrackSeg *
 		}
 		GfParmSetCurNum(TrackHandle, path, TRK_ATT_ID, (char*)NULL, (tdble)curindex);
 
-		dzl = zel - zsl;
-		dzr = zer - zsr;
+		//dzl = zel - zsl; // Never used.
+		//dzr = zer - zsr; // Never used.
 		T1l = stgtl * length;
 		T2l = etgtl * length;
 		tl = 0.0;

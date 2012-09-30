@@ -491,7 +491,7 @@ inline void grGammaCorrectRGB(float *color, float reff = 2.5, float system = sys
 {
 	if (reff == system)
        return;
-    float tmp = reff/system;
+    //float tmp = reff/system;
 	color[0] = (float)pow(color[0], reff/system);
 	color[1] = (float)pow(color[1], reff/system);
 	color[2] = (float)pow(color[2], reff/system);

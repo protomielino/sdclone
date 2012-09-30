@@ -228,7 +228,8 @@ initStartingGrid(void)
   int i;
   tTrackSeg *curseg;
   int rows;
-  tdble a, b, wi2;
+  tdble a, b;
+  //tdble wi2; // Never used.
   tdble d1, d2,d3;
   tdble startpos, tr, ts;
   tdble speedInit;
@@ -262,7 +263,7 @@ initStartingGrid(void)
     a = 0;
     b = ReInfo->track->width;
   }
-  wi2 = ReInfo->track->width * 0.5f;
+  //wi2 = ReInfo->track->width * 0.5f; // Never used.
 
   rows = (int)GfParmGetNum(params, path, RM_ATTR_ROWS, (char*)NULL, 2);
   rows = (int)GfParmGetNum(trHdle, RM_SECT_STARTINGGRID, RM_ATTR_ROWS, (char*)NULL, (tdble)rows);
@@ -696,8 +697,8 @@ ReInitCars(void)
   int robotIdx;
   void *robhdle;
   tCarElt *elt;
-  const char *focused;
-  int focusedIdx;
+  //const char *focused; // Never used.
+  //int focusedIdx; // Never used.
   void *params = ReInfo->params;
 
   /* Get the number of cars (= drivers) racing */
@@ -708,8 +709,8 @@ ReInitCars(void)
   ReInfo->carList = (tCarElt*)calloc(nCars, sizeof(tCarElt));
   FREEZ(ReInfo->rules);
   ReInfo->rules = (tRmCarRules*)calloc(nCars, sizeof(tRmCarRules));
-  focused = GfParmGetStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
-  focusedIdx = (int)GfParmGetNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
+  //focused = GfParmGetStr(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSED, "");
+  //focusedIdx = (int)GfParmGetNum(ReInfo->params, RM_SECT_DRIVERS, RM_ATTR_FOCUSEDIDX, NULL, 0);
   index = 0;
 
   /* For each car/driver : */
