@@ -40,7 +40,7 @@ I - Pre-requisites
 - Free Solid 2 (optional for the moment, will soon get mandatory)
 - libpng
 - zlib
-- jpeg 
+- jpeg
 
 WARNING: Under Windows, be carefull to compile anything for multi-threaded DLL integration (/MD[d])
 
@@ -71,30 +71,49 @@ The Speed Dreams Team.
 
       and you should find :
 
-        speed-dreams-src-base-<version>.tar.xz
-        speed-dreams-src-hq-cars-and-tracks-<version>.tar.xz
-        speed-dreams-src-more-hq-cars-and-tracks-<version>.tar.xz
-        speed-dreams-src-wip-cars-and-tracks-<version>.tar.xz
-        speed-dreams-src-unmaintained-<version>.tar.xz
+        speed-dreams-src-base-2.0.0-r4687.tar.xz
+        speed-dreams-src-hq-cars-and-tracks-2.0.0-r4687.tar.xz
+        speed-dreams-src-more-hq-cars-and-tracks-2.0.0-r4687.tar.xz
+        speed-dreams-src-wip-cars-and-tracks-2.0.0-r4687.tar.xz
+        speed-dreams-src-unmaintained-2.0.0-r4687.tar.xz
+        
+        and 
+        
+        speed-dreams-src-partial-build-patch-2.0.0-r4687.tar.xz
 
-      where <version> is something like "2.0.0-rc1-r4420", "2.0.0-r4687", ...
-
-      Warning: you must download them all, as our current build system
-	           can't cope with missing files.
-
-      Let's say that :
-      * you downloaded them all in $HOME/sd,
-      * and that <version> is x.y.z-rabcd.
+      At this point, you have 2 options :
+      1. you want full game contents : you need to download the 4 first source packages
+         ("base", "hq-cars-and-tracks", "more-hq-cars-and-tracks", "wip-cars-and-tracks"),
+         and even the 5th "unmaintained" one (if you really need it, you know it :-)
+      2. you don't need full game contents : you need at least the "base" package,
+         along with the "partial-build-patch" one ; you can optionnaly add 1 or more of any
+         of the other source packages to you basket, as you like.
+      
+      Let's say that you downloaded your packages in $HOME/sd
+      and that we'll extract them in the "2.0.0-r4687" folder
       (you can do as you like, but we'll use this folder in the explanations below).
 
   b - uncompress the tarballs :
 
+
+      Whatever the chosen option (1 or 2) :
+      
       $ cd $HOME/sd
-      $ mkdir x.y.z-rabcd
-      $ cd x.y.z-rabcd
+      $ mkdir 
+      $ cd 2.0.0-r4687
       $ for file in ../*.xz; do tar xvfa $file; done
+      
+      If you chose option 2 (selected content), then you also have to :
+      $ tar xvfa speed-dreams-src-partial-build-patch-2.0.0-r4687.tar.xz
 
       You should now see "cmake", "data" and "src" folders (among others).
+
+      Advanced: If you chose option 2, and want to add another source package
+                after following the above extraction instructions, always
+                extract again at the end the "partial-build-patch" package
+                before configuring and building ; you can even add contents
+                like this after configuring and building ... of course you'll
+                then need to configure and build again.
 
   c - configure :
 
@@ -107,11 +126,11 @@ The Speed Dreams Team.
 
       - for a Release build using default 3rd party libs
 
+        Option 1 (full contents) :
         $ cmake -D OPTION_OFFICIAL_ONLY:BOOL=ON ..
 
-        Note: This "OFFICIAL_ONLY" stuff is mandatory, otherwise
-              you'll get errors saying that some (unofficial contents) folders
-              are missing, just because the official tarballs don't include them.
+        Option 2 (selected contents) :
+        $ cmake .. # Don't care about "missing files / folder" messages, this is expected :-)
 
       - you may also want to override some default settings :
 
@@ -269,7 +288,7 @@ The Speed Dreams Team.
   or our bug tracker at http://sourceforge.net/apps/trac/speed-dreams/report.
 
 
-II - Windows installation from sources
+III - Windows installation from sources
 ---------------------------------------
 
 Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wight be needed for newer / wider versions.
@@ -281,10 +300,12 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
   b.  Download the official Speed Dreams tarballs from SF.net
         http://sourceforge.net/projects/speed-dreams/files/2.0.0
       (speed-dreams-src-<package>-<version>.tar.xz)
+      
+        Note: See II.2.a above about which packages you really need.
 
 	  or 
 
-      Get the latest trunk from SVN for building with MinGW (was not ready for 2.0.0).
+      Get the latest trunk from SVN (needed for building with MinGW : was not supported by 2.0.0).
 
       TODO: Add instructions explaining how to do so, including the minimal list
             of files and sub-dirs needed (not all trunk is needed, from far).
@@ -292,8 +313,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
   c.  Extract their contents to your local disk all in the same target folder
       (7Zip is an excellent tool for that http://www.7-zip.org/).
       
-      Warning: You need to extract all of the source packages in order to start building
-               (see above 2-a chapter for more).
+        Note: See II.2.b above about the order in which you need to extract the packages.
 
 1) CMake and MinGW :
 
@@ -601,7 +621,7 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
   j.  Select the build configuration (Debug, Release, ...).
   k.  Build the whole Solution (Build / Build Solution)
   l.  Build the 'INSTALL' project (right click on it and select Build).
-  m.  Double-click on speed-dreams-2.exe in c:\Program Files\speed-dreams-2\bin
+  m.  Double-click on speed-dreams-2.exe in c:\speed-dreams-2-build\bin
 
  Note: First-ever startups sometimes fail to correctly write the necessary stuff
        into <My documents>\speed-dreams-2.settings and this prevents the game from starting.
@@ -632,8 +652,8 @@ Note: If you use an "Express" version, don't forget to install also the Windows 
 
 3) MS VC++ 6 : No more supported.
 
-III - FreeBSD installation from sources
----------------------------------------
+IV - FreeBSD installation from sources
+--------------------------------------
 
 Mostly the same as for "Linux installation from sources" ...
 
@@ -658,7 +678,7 @@ Some specific details though :
     TO BE COMPLETED
 
 
-IV - MacOS X installation from sources
+V - MacOS X installation from sources
 --------------------------------------
 
 To do ...
