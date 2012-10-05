@@ -93,6 +93,7 @@ class cGrScreen {
 		inline int getScrY (void) { return scry; }
 		inline int getScrW (void) { return scrw; }
 		inline int getScrH (void) { return scrh; }
+		inline int getBoardWidth(void) { return boardWidth; }
 };
 
 #endif //_GRSCREEN_H_

@@ -266,6 +266,10 @@ class cGrCarCamMirror : public cGrPerspCamera
 
     virtual void beforeDraw(void);
     virtual void afterDraw(void);
+
+    /** Called by cGrScreen::activate() after the screen updated it's screen size.
+     *  Cameras should use the cGrCamera::screen property to get the updated information. */
+    void adaptScreenSize();
 };
 
 

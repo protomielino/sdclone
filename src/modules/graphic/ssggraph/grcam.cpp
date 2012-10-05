@@ -544,26 +544,23 @@ void cGrCarCamMirror::update(tCarElt *car, tSituation * /* s */)
     speed[2] =car->pub.DynGCg.vel.z;
 }
 
-
-void cGrCarCamMirror::setViewport(int x, int y, int w, int h)
+void cGrCarCamMirror::adaptScreenSize()
 {
-	vpx = x;
-	vpy = y;
-	vpw = w;
-	vph = h;
-       vp_aspectratio = double(vph)/vpw;
-}
+    vpx = screen->getScrX();
+    vpy = screen->getScrY();
+    vpw = screen->getScrW();
+    vph = screen->getScrH();
+    vp_aspectratio = double(vph)/vpw;
 
+    // mirror width adjusted to fit board size
+    int boardW = screen->getBoardWidth();
 
-void cGrCarCamMirror::setScreenPos (int x, int y, int w, int h)
-{
-    mx = x;
-    my = y;
-    mw = w;
-    mh = h;
+    mx = vpx + vpw / 2 - (vpw * boardW /400);
+    my = vpy +  5 * vph / 6 - vph / 10;
+    mw = vpw * boardW /200;
+    mh = vph / 6;
     m_centery = my + mh/2;
 }
-
 
 void cGrCarCamMirror::beforeDraw (void)
 {

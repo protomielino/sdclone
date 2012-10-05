@@ -131,12 +131,10 @@ void cGrScreen::activate(int x, int y, int w, int h, float v)
 	board->setWidth(fakeWidth);
 
 	if (mirrorCam) {
-		// mirror width adjusted to fit board size
-		mirrorCam->setViewport (scrx, scry, scrw, scrh);
-               mirrorCam->setScreenPos (scrx + scrw / 2 - (scrw * boardWidth /400),
-			scry +  5 * scrh / 6 - scrh / 10, 
-			(scrw * boardWidth /200), scrh / 6);
+	    // call this method after scr* values have been updated
+	    mirrorCam->adaptScreenSize();
 	}
+
 	if (curCam) {
 		curCam->limitFov ();
 		curCam->setZoom (GR_ZOOM_DFLT);
@@ -244,8 +242,8 @@ void cGrScreen::camDraw(tSituation *s)
 	GfProfStopProfile("dispCam->update*");
 
 	// Draw the static background.
-	// TODO: Exclude this when sky dome enabled, because it is then actually invisible.
-	if (dispCam->getDrawBackground()) {
+	// Exclude this when sky dome enabled, because it is then actually invisible.
+	if (dispCam->getDrawBackground() &&  (grSkyDomeDistance == 0 || grTrack->skyversion == 0)) {
 		glDisable(GL_LIGHTING);
 		glDisable(GL_DEPTH_TEST);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
@@ -269,7 +267,8 @@ void cGrScreen::camDraw(tSituation *s)
 	
 	// Sort the cars by distance for transparent windows
 	TheDispCam = dispCam; // Needed by compareCars() ordering function
-	qsort(cars, s->_ncars, sizeof(tCarElt*), compareCars);
+	if (dispCam != mirrorCam)
+		qsort(cars, s->_ncars, sizeof(tCarElt*), compareCars);
 	
 	for (int i = 0; i < s->_ncars; i++) {
 		grDrawCar(s, cars[i], curCar, dispCam->getDrawCurrent(), dispCam->getDrawDriver(), s->currentTime, dispCam);
@@ -283,7 +282,7 @@ void cGrScreen::camDraw(tSituation *s)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	// Draw the sky dome if enabled (first part)
-  	if (dispCam->getDrawBackground()) {
+	if (dispCam->getDrawBackground() &&  grSkyDomeDistance > 0 && grTrack->skyversion > 0) {
   		grPreDrawSky(s, dispCam->getFogStart(), dispCam->getFogEnd());
   	}
 
@@ -291,7 +290,7 @@ void cGrScreen::camDraw(tSituation *s)
 	grDrawScene();
 
 	// Draw the sky dome if enabled (last part)
-	if (dispCam->getDrawBackground()) {
+	if (dispCam->getDrawBackground() &&  grSkyDomeDistance > 0 && grTrack->skyversion > 0) {
 		grPostDrawSky();
 	}
 	
@@ -355,6 +354,12 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	dispCam = curCam;
 	camDraw(s);
 	glDisable(GL_SCISSOR_TEST);
+
+	/* Mirror */
+	if (mirrorFlag && curCam->isMirrorAllowed ()) {
+		dispCam = mirrorCam;
+		camDraw (s);
+	}
 	
 	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	glDisable(GL_CULL_FACE);
@@ -364,12 +369,6 @@ void cGrScreen::update(tSituation *s, const cGrFrameInfo* frameInfo)
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_FOG);
 	glEnable(GL_TEXTURE_2D);
-	
-    /* Mirror */
-    if (mirrorFlag && curCam->isMirrorAllowed ()) {
-        dispCam = mirrorCam;
-        camDraw (s);
-    }
 	
 	GfProfStartProfile("boardCam*");
 	boardCam->action();
@@ -490,7 +489,7 @@ void cGrScreen::initCams(tSituation *s)
 			-1,
 			0,					// drawCurr
 			1,					// drawBG
-			90.0,				// fovy
+			50.0,				// fovy
 			0.0,				// fovymin
 			360.0,				// fovymax
 			0.3,				// near
