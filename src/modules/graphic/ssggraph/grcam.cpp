@@ -526,17 +526,8 @@ void cGrCarCamMirror::update(tCarElt *car, tSituation * /* s */)
     eye[1] = P[1];
     eye[2] = P[2];
 
-    float offset = 0;
-
-    // Compute offset angle and bezel compensation)
-    if (spansplit && viewOffset) {
-        offset += (viewOffset - 10 + (int((viewOffset - 10) * 2) * (bezelcomp - 100)/200)) *
-            atan(screen->getViewRatio() / spanaspect * tan(spanfovy * M_PI / 360.0)) * 2;
-        fovy = spanfovy;
-    }
-
-    p[0] = car->_bonnetPos_x + 30.0 * cos(offset);
-    p[1] = car->_bonnetPos_y + 30.0 * sin(offset);
+    p[0] = car->_bonnetPos_x + 30.0;
+    p[1] = car->_bonnetPos_y;
     p[2] = car->_bonnetPos_z;
     sgXformPnt3(p, car->_posMat);
 
