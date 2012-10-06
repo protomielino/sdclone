@@ -441,7 +441,7 @@ bool GfScrInit(int nWinWidth, int nWinHeight, int nFullScreen)
 		== GFSCR_VAL_YES;
     bool bStereo =
 		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_STEREOVISION,
-								 GFSCR_VAL_YES))
+								 GFSCR_VAL_NO))
 		== GFSCR_VAL_YES;
     bool bTryBestVInitMode =
 		std::string(GfParmGetStr(hparmScreen, pszScrPropSec, GFSCR_ATT_VINIT,

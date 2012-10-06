@@ -218,55 +218,56 @@ bool GfglFeatures::detectBestSupport(int& nWidth, int& nHeight, int& nDepth,
 
 				while (!pWinSurface && nStereoVision >= 0)
 				{
+					GfLogTrace("Trying with%s stereo vision\n", nStereoVision ? "" : "out");
 					if (nStereoVision)
 						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_TRUE);
 					else
 						SDL_GL_SetAttribute(SDL_GL_STEREO, GL_FALSE);
 		
-				// Anti-aliasing : detect the max supported number of samples
-				// (assumed to be <= 32).
-				int nMaxMultiSamples = 32; // Hard coded max value for the moment.
-				while (!pWinSurface && nMaxMultiSamples > 1)
-				{
-					// Set the anti-aliasing attributes and setup the video mode.
-					GfLogTrace("Trying %dx anti-aliasing\n", nMaxMultiSamples);
-					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
-					pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
-
-					// Now check if we have a video mode, and if it actually features
-					// what we specified.
-					int nActualSampleBuffers = 0;
-					int nActualMultiSamples = 0;
-					if (pWinSurface) {
-						SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
-						SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
+					// Anti-aliasing : detect the max supported number of samples
+					// (assumed to be <= 32).
+					int nMaxMultiSamples = 32; // Hard coded max value for the moment.
+					while (!pWinSurface && nMaxMultiSamples > 1)
+					{
+						// Set the anti-aliasing attributes and setup the video mode.
+						GfLogTrace("Trying %dx anti-aliasing\n", nMaxMultiSamples);
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, nMaxMultiSamples);
+						pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
+	
+						// Now check if we have a video mode, and if it actually features
+						// what we specified.
+						int nActualSampleBuffers = 0;
+						int nActualMultiSamples = 0;
+						if (pWinSurface) {
+							SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &nActualSampleBuffers);
+							SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &nActualMultiSamples);
+						}
+	 					//GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
+	 					//		   nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
+	
+						// If not, try a lower number of samples.
+						if (nActualSampleBuffers == 0 || nActualMultiSamples != nMaxMultiSamples)
+							pWinSurface = 0;
+						if (!pWinSurface)
+						{
+							GfLogTrace("%d+%d bit %dx anti-aliased double-buffer not supported\n",
+									   3*nCurrDepth/4, nCurrDepth/4, nMaxMultiSamples);
+							nMaxMultiSamples /= 2;
+						}
 					}
-// 					GfLogDebug("nMaxMultiSamples=%d : nActualSampleBuffers=%d, nActualMultiSamples=%d\n",
-// 							   nMaxMultiSamples, nActualSampleBuffers, nActualMultiSamples);
-
-					// If not, try a lower number of samples.
-					if (nActualSampleBuffers == 0 || nActualMultiSamples != nMaxMultiSamples)
-						pWinSurface = 0;
+	
+					// Failed : try without anti-aliasing.
 					if (!pWinSurface)
 					{
-						GfLogTrace("%d+%d bit %dx anti-aliased double-buffer not supported\n",
-								   3*nCurrDepth/4, nCurrDepth/4, nMaxMultiSamples);
-						nMaxMultiSamples /= 2;
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
+						SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
+						pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
+						if (!pWinSurface)
+							GfLogTrace("%d+%d bit double-buffer not supported\n",
+									   3*nCurrDepth/4, nCurrDepth/4);
 					}
-				}
-
-				// Failed : try without anti-aliasing.
-				if (!pWinSurface)
-				{
-					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 0);
-					SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 0);
-					pWinSurface = SDL_SetVideoMode(nWidth, nHeight, nCurrDepth, bfVideoMode);
-					if (!pWinSurface)
-						GfLogTrace("%d+%d bit double-buffer not supported\n",
-								   3*nCurrDepth/4, nCurrDepth/4);
-				}
-
+	
 					// Failed : try without StereoVision
 					if (!pWinSurface)
 						nStereoVision--;
