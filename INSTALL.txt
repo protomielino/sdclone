@@ -334,7 +334,7 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
      Following the instructions of http://www.mingw.org/wiki/Getting_Started
      (example here for the official release of 2012, April, featuring gcc 4.7.0) :
 
-	 * Download and run the latest mingw-get-inst version from 
+     * Download and run the latest mingw-get-inst version from 
         https://sourceforge.net/projects/mingw/files/Installer/mingw-get-inst/
         => mingw-get-inst-20120426.exe
      * Select the directory where to install MinGW, remembering the advice
@@ -343,6 +343,13 @@ Note that these instructions work under Windows XP 32 SP2/SP3 ; some tweaks wigh
      * Select the minimal set of components to install :
        * C++ compiler (always)
        * MSYS (if you don't plan to use QtCreator).
+     *  When installing MinGW with the setup wizard, it asks you :
+          Use pre-packaged catalogues or download the latest version?
+           1) Use pre-packaged catalogues 20120426
+           2) Download latest repository catalogues
+         => select the 2nd choice (for getting Gcc 4.7.0),
+            not the default 1st one, that'll give you the old Gcc 4.6.2,
+            which is _not_ compatible with the below mentioned 3rd party binary package.
 
      If you installed MSYS, then you might be interested in the following,
      otherwise, skip it and go to e.
