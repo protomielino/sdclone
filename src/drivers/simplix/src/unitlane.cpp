@@ -187,7 +187,7 @@ bool TLane::GetLanePoint(double TrackPos, TLanePoint& LanePoint) const
   TVec2d Tang1, Tang2;
   TUtils::CalcTangent(P0.GetXY(), P1.GetXY(), P2.GetXY(), Tang1);
   TUtils::CalcTangent(P1.GetXY(), P2.GetXY(), P3.GetXY(), Tang2);
-  TVec2d Dir = TUtils::VecUnit(Tang1) * (1 - Tx) + TUtils::VecUnit(Tang2) * Tx;
+  //TVec2d Dir = TUtils::VecUnit(Tang1) * (1 - Tx) + TUtils::VecUnit(Tang2) * Tx;
 
   Ang0 = TUtils::VecAngle(Tang1);
   Ang1 = TUtils::VecAngle(Tang2);

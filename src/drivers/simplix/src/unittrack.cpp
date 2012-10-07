@@ -436,7 +436,7 @@ void TTrackDescription::InitTrack
   Execute();                                     // Make description
 
   tTrackSeg* LastSeg = oTrack->seg;              // Save last segment
-  int LastSegType = TR_STR;                      // Assume straight
+  //int LastSegType = TR_STR;  // Set but bot used (see below)    // Assume straight
   tTrackSeg* Seg = LastSeg;                      // Start at last segment
 
   // Find usable additional width at sides of the track ...
@@ -449,14 +449,14 @@ void TTrackDescription::InitTrack
 	LastSeg = Seg;                               // Save last segment
     if (LastSeg->type != TR_STR)                 // if it was a curve
 	{                                            // save last type and
-	  LastSegType = LastSeg->type;               // reset counter
+	  //LastSegType = LastSeg->type;               // reset counter
 	  N = 0;
 	}
 	else                                         // increase counter
       N++;                                       //   on straights
 
-	if (N > 10)                                  // After 10 sections 
-	  LastSegType = LastSeg->type;               //   reset
+	//if (N > 10)                                  // After 10 sections 
+	//  LastSegType = LastSeg->type;               //   reset
 
     Seg = oSections[I].Seg;                      // Get torcs segment
 	//if (strncmp(Seg->name,"S7",2) == 0)

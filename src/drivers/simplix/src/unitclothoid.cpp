@@ -46,17 +46,17 @@
 //
 // Das Programm wurde unter Windows XP entwickelt und getestet.
 // Fehler sind nicht bekannt, dennoch gilt:
-// Wer die Dateien verwendet erkennt an, dass fï¿½r Fehler, Schï¿½den,
-// Folgefehler oder Folgeschï¿½den keine Haftung ï¿½bernommen wird.
+// Wer die Dateien verwendet erkennt an, dass für Fehler, Schäden,
+// Folgefehler oder Folgeschäden keine Haftung übernommen wird.
 //--------------------------------------------------------------------------*
 // This program is free software; you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation; either version 2 of the License, or
 // (at your option) any later version.
 //
-// Im ï¿½brigen gilt fï¿½r die Nutzung und/oder Weitergabe die
+// Im übrigen gilt für die Nutzung und/oder Weitergabe die
 // GNU GPL (General Public License)
-// Version 2 oder nach eigener Wahl eine spï¿½tere Version.
+// Version 2 oder nach eigener Wahl eine spätere Version.
 //--------------------------------------------------------------------------*
 #include "unitglobal.h"
 #include "unitcommon.h"
@@ -360,10 +360,10 @@ void TClothoidLane::SmoothBetween(int Step, double BumpMod)
 	  if (J >= Count)
 	    J = 0;
 
-	  TVec3d P0 = L0->Point;
-	  TVec3d P1 = L1->Point;
-	  TVec3d P2 = L2->Point;
-	  TVec3d P3 = L3->Point;
+//	  TVec3d P0 = L0->Point;
+//	  TVec3d P1 = L1->Point;
+//	  TVec3d P2 = L2->Point;
+//	  TVec3d P3 = L3->Point;
 
 	  double T = L0->Offset + L1->Offset + L2->Offset;
 	  L1->Offset = (float) (T/3);
@@ -772,29 +772,29 @@ bool TClothoidLane::LoadPointsFromFile(const char* TrackLoad)
 void TClothoidLane::SavePointsToFile(const char* TrackLoad)
 {
   FILE* F = fopen(TrackLoad, "wb");
-  bool error = false;
+  //bool error = false; // Set but not used (see below).
   size_t writeSize;
   if (F == 0)
     return;
 
   int K = 0;
   writeSize = fwrite(&K,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
+//  if( writeSize < 1)
+//    error = true;
   int Version = RL_VERSION;
   writeSize = fwrite(&Version,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
+//  if( writeSize < 1)
+//    error = true;
 
   int Weather = GetWeather();
   writeSize = fwrite(&Weather,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
+//  if( writeSize < 1)
+//    error = true;
 
   int N = oTrack->Count();
   writeSize = fwrite(&N,sizeof(int),1,F);
-  if( writeSize < 1)
-    error = true;
+//  if( writeSize < 1)
+//    error = true;
 
   //GfOut("\n\n\nsizeof(TPathPt): %d\n\n\n",sizeof(TPathPt));
   void* Start = &(oPathPoints[0]);
@@ -804,8 +804,8 @@ void TClothoidLane::SavePointsToFile(const char* TrackLoad)
   for (int I = 0; I < N; I++)
   {
     writeSize = fwrite(&(oPathPoints[I]),UsedLen,1,F);
-    if( writeSize < 1)
-      error = true;
+//    if( writeSize < 1)
+//      error = true;
   }
   fclose(F);
 }
