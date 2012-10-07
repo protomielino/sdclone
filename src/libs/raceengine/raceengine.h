@@ -73,7 +73,7 @@ public:
 	virtual void accelerateTime(double fMultFactor);
 	virtual void start();
 	virtual void stop();
-#ifdef DEBUG
+#ifdef SD_DEBUG
 	virtual void step(double dt);
 #endif
 

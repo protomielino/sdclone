@@ -35,7 +35,7 @@ extern void ReStart();
 extern void ReStop();
 extern int  ReUpdate();
 
-#ifdef DEBUG
+#ifdef SD_DEBUG
 extern void ReOneStep(double dt);
 #endif
 

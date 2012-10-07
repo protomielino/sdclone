@@ -237,8 +237,8 @@ void SimWheelUpdateForce(tCar *car, int index)
 	F *= wheel->forces.z * mu * wheel->trkPos.seg->surface->kFriction * (1.0f + 0.05f * sin(-wheel->staticPos.ax * 18.0f));	/* coeff */
 
 	//For debug weather with some tracks
-	#ifdef DEBUG
-		//printf("Simu v2 kFriction : %f   ", wheel->trkPos.seg->surface->kFriction);
+        #ifdef SD_DEBUG
+                GfLogDebug("Simu v2 kFriction : %f   ", wheel->trkPos.seg->surface->kFriction);
 	#endif
 
 	wheel->rollRes = wheel->forces.z * wheel->trkPos.seg->surface->kRollRes;

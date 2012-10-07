@@ -139,7 +139,7 @@ void ReStart(void)
 	situationUpdater->start();
 }
 
-#ifdef DEBUG
+#ifdef SD_DEBUG
 void ReOneStep(double dt)
 {
 	situationUpdater->runOneStep(dt);

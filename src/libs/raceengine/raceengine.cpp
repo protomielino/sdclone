@@ -228,7 +228,7 @@ void RaceEngine::stop(void)
 	::ReStop();
 }
 
-#ifdef DEBUG
+#ifdef SD_DEBUG
 void RaceEngine::step(double dt)
 {
 	::ReOneStep(dt);

@@ -138,13 +138,13 @@ reTrackDump(const tTrack *track, int verbose)
 	if (verbose) {
 		int i;
 		tTrackSeg *seg;
-#ifdef DEBUG
+#ifdef SD_DEBUG
 		const char  *stype[4] = { "", "RGT", "LFT", "STR" };
 #endif
 
 		for (i = 0, seg = track->seg->next; i < track->nseg; i++, seg = seg->next) {
 			GfLogTrace("  segment %d -------------- \n", seg->id);
-#ifdef DEBUG
+#ifdef SD_DEBUG
 			GfLogTrace("        type    %s\n", stype[seg->type]);
 #endif
 			GfLogTrace("        length  %f m\n", seg->length);
